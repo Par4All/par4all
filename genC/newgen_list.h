@@ -37,7 +37,7 @@ typedef struct cons {
 #define CDR(pcons) ((pcons)->cdr)
 #define REFCAR(pc) (&(CAR(pc).p))
 
-#define CONS(type,x,l) gen_cons(x, l)
+#define CONS(type,x,l) gen_cons((void*) (x), (l)) /* could check type? */
 
 #define MAPL(_map_list_cp,_code,_l) \
 	{cons* _map_list_cp = (_l) ; \
