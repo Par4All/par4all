@@ -1,7 +1,25 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include "genC.h"
 #include "misc.h"
 
+
+/* given li build argv, update *argc and free li */
+void
+list_to_arg(list li,
+            int * pargc,
+            char * argv[])
+{
+   list l2=li;
+
+   *pargc = 0;
+   while(l2!=NIL) {
+      argv[(*pargc)++] = STRING(CAR(l2));
+      l2= CDR(l2);
+   }
+   gen_free_list(li);
+   li= NIL;
+}
 
 
 void args_free(pargc, argv)
@@ -31,4 +49,25 @@ increasing ARGS_LENGTH in constants.h\n");
     argv[*pargc] = arg;
 
     *pargc += 1;
+}
+
+
+int
+compare_args_string_for_qsort(const void *x,
+                              const void *y)
+{
+   return strcmp(* (char **) x, * (char **) y);
+
+}
+
+
+/* Sort an arg list: */
+void
+args_sort(int argc,
+          char *argv[])
+{
+   qsort((char *) argv,
+         argc,
+         sizeof(char *),
+         compare_args_string_for_qsort);
 }
