@@ -1,11 +1,11 @@
 #
 # $RCSfile: makefile_macros.CRAY-T3D,v $ (version $Revision$)
-# $Date: 1996/10/17 10:21:52 $, 
+# $Date: 1996/10/17 14:28:43 $, 
 #
 # this file contains macro definitions 
 
 AR	= ar
-ARFLAGS	= rv
+ARFLAGS	= -rv
 CC	= cc -T cray-t3d
 CFLAGS	= -O 1 -g
 CMKDEP	= -M
