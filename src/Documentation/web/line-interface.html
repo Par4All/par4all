@@ -6,7 +6,7 @@
 
 <H1><IMG SRC=logo-pips.small.gif> Tpips: command line interpreter</H1>
 
-Author: <a href="/~oget">Guillaume Oget</a>.<p>
+Author: <a href="/~oget">Guillaume Oget</a><p>
 
 <HR>
 
@@ -125,11 +125,11 @@ href="pipsmake.html#DESCRIP">Pipsmake</a> rule name
 
 	<LI> <b><i>&lt;resource-descriptor&gt;</i></b> : <a
 href="pipsmake.html#DESCRIP">Pipsmake</a> resource name - format
-<i>[owner.]resource</i>.
+<i>resource[(OWNER)]</i>.
 
 	<LI> <b><i>&lt;rule-descriptor&gt;</i></b> : <a
 href="pipsmake.html#DESCRIP">Pipsmake</a> instanciated rule - format
-<i>[owner.]rulename</i>. This means that this rule is considered for
+<i>rulename[(OWNER)]</i>. This means that this rule is considered for
 the specified resources owners.
 
 </UL>
@@ -139,14 +139,14 @@ The owner - used in the previous <i>&lt;rule-descriptor&gt;</i> and
 <i>&lt;resource-descriptor&gt;</i> - can take these formats:<br>
 
 <UL>
-	<LI> <b>$PROGRAM.</b>
-	<LI> <b>$MODULE.</b>
-	<LI> <b>$ALL.</b>
-	<LI> <b>$CALLEES.</b>
-	<LI> <b>$CALLERS.</b>
-	<LI> <b>$MAIN.</b>
-	<LI> <b>&lt;module-name&gt;.</b>
-	<LI> <b>{&lt;module-name&gt;,&lt;module-name&gt;, ...}.</b>
+	<LI> <b>$PROGRAM</b>
+	<LI> <b>$MODULE</b>
+	<LI> <b>$ALL</b>
+	<LI> <b>$CALLEES</b>
+	<LI> <b>$CALLERS</b>
+	<LI> <b>$MAIN</b>
+	<LI> <b>&lt;module-name&gt;</b>
+	<LI> <b>&lt;module-name&gt;,&lt;module-name&gt;, ...</b>
 </UL>
 
 If no owner is specified, then the default module is assumed. For
@@ -165,11 +165,11 @@ tpips> activate must_regions        <i>// select the rule must_regions instead</
                                     <i>   of the default rule may_regoins</i>
 tpips> display callgraph_file       <i>// display the sub-callgraph for the</i>
                                     <i>   module TEST</i>
-tpips> make $ALL.proper_effects     <i>// compute proper effects for every</i>
+tpips> make proper_effects($ALL)    <i>// compute proper effects for every</i>
                                     <i>   module</i>
 tpips> activate region_chains       <i>// select the rule regions_chains for</i>
                                     <i>   computing Use-Def chainsin essai.f</i>
-tpips> display $ALL.dg_file         <i>// display all the dependance graphs</i>
+tpips> display dg_file($ALL)        <i>// display all the dependance graphs</i>
 tpips> close wfoo                   <i>// close the workspace</i>
 tpips> delete wfoo                  <i>// delete the workspace</i>
 tpips> quit                         <i>// quit tpips</i>
