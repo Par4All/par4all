@@ -524,10 +524,10 @@ io_intrinsic_p(
     entity e)
 {
     return top_level_entity_p(e) &&
-        ENTITY_WRITE_P(e) || ENTITY_REWIND_P(e) || ENTITY_OPEN_P(e) ||
-	ENTITY_CLOSE_P(e) || ENTITY_READ_P(e) || ENTITY_BUFFERIN_P(e) ||
-        ENTITY_BUFFEROUT_P(e) || ENTITY_ENDFILE_P(e) || 
-	ENTITY_IMPLIEDDO_P(e) || ENTITY_FORMAT_P(e) ;
+        (ENTITY_WRITE_P(e) || ENTITY_REWIND_P(e) || ENTITY_OPEN_P(e) ||
+	 ENTITY_CLOSE_P(e) || ENTITY_READ_P(e) || ENTITY_BUFFERIN_P(e) ||
+	 ENTITY_BUFFEROUT_P(e) || ENTITY_ENDFILE_P(e) || 
+	 ENTITY_IMPLIEDDO_P(e) || ENTITY_FORMAT_P(e));
 }
 
 /* true if continue
