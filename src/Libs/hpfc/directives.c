@@ -2,8 +2,8 @@
  *
  * these functions deal with HPF directives.
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/04/18 12:08:28 $, )
- * version $Revision$,
+ * $RCSfile: directives.c,v $ version $Revision$,
+ * ($Date: 1995/04/21 10:28:18 $, )
  */
 
 #include "defines-local.h"
@@ -119,15 +119,6 @@ expression e;
     debug(3, "new_dynamic", "entity is %s\n", entity_name(a));
 }
 
-static void new_pure(e)
-expression e;
-{
-    entity f = expression_to_entity(e);
-    add_a_pure(f);
-
-    debug(3, "new_pure", "entity is %s\n", entity_name(f));
-}
-
 /*-----------------------------------------------------------------
  * one simple ALIGN directive is handled.
  * retrieve the alignment from references array and template
@@ -239,6 +230,8 @@ bool dynamic;
 	array    = reference_variable(alignee);
     align
 	a = extract_the_align(alignee, temp);
+
+    normalize_align(array, a);
     
     debug(3, "one_align_directive", "%s %saligned with %s\n",
 	  entity_name(array), dynamic ? "re" : "", entity_name(template));
@@ -252,7 +245,7 @@ bool dynamic;
 		       array_distributed_p(array) && dynamic_entity_p(array));
 
 	new_array = array_synonym_aligned_as(array, a);
-	propagate_array_synonym(current, array, new_array);
+	propagate_synonym(current, array, new_array);
 	update_renamings(current, 
 			 CONS(RENAMING, make_renaming(array, new_array),
 			      load_renamings(current)));
@@ -269,7 +262,7 @@ entity f;
 list /* of expressions */ args;
 bool dynamic;
 {
-    list last=gen_last(args);
+    list last = gen_last(args);
     reference template;
 
     /* last points to the last item of args, which should be the template
@@ -384,15 +377,37 @@ bool dynamic;
 	d = extract_the_distribute(distributee, proc);
 
     assert(ENDP(reference_indices(proc))); /* no ... ONTO P(something) */
+    
+    normalize_distribute(template, d);
 
     debug(3, "one_distribute_directive", "%s %sdistributed onto %s\n",
 	  entity_name(template), dynamic ? "re" : "", entity_name(processor));
 
     if (dynamic)
     {
-	/* existing template, and related arrays, renamming, propagation...
+	statement current = current_stmt_head();
+	entity new_t;
+
+	message_assert("redistributing non dynamic template",
+		  entity_template_p(template) && dynamic_entity_p(template));
+
+	new_t = template_synonym_distributed_as(template, d);
+	propagate_synonym(current, template, new_t);
+
+	/*  all arrays aligned to template are propagated in turn.
 	 */
-	pips_error("one_redistribute_directive", "not implemented yet\n");
+	MAPL(ce,
+	 {
+	     entity array = ENTITY(CAR(ce));
+	     align a = new_align_with_template(load_entity_align(array), new_t);
+	     entity new_array = array_synonym_aligned_as(array, a);
+
+	     propagate_synonym(current, array, new_array);
+	     update_renamings(current, 
+			      CONS(RENAMING, make_renaming(array, new_array),
+				   load_renamings(current)));
+	 },
+	     alive_arrays(current, template));
     }
     else
 	store_entity_distribute(template, d);
@@ -426,7 +441,7 @@ bool dynamic;
  *    DIRECTIVE HANDLERS
  *
  * each directive is handled by a function here.
- * these handler may use the statement stack to proceed.
+ * these handlers may use the statement stack to proceed.
  * signature: void HANDLER (entity f, list args)
  */
 
@@ -569,13 +584,20 @@ list /* of expressions */ args;
     gen_map(new_dynamic, args); /* see new_dynamic */
 }
 
+/*   may be used to declare functions as pure. 
+ *   ??? it is not a directive in HPF, but I put it this way in F77.
+ *   ??? pure declarations are not yet used by HPFC.
+ */
 static void handle_pure_directive(f, args)
 entity f;
 list /* of expressions */ args;
 {
-    gen_map(new_pure, args); /* see new_pure */
-}
+    entity module = get_current_module_entity();
+    assert(ENDP(args));
+    add_a_pure(module);
 
+    debug(3, "handle_pure_directive", "entity is %s\n", entity_name(module));
+}
 
 static void handle_realign_directive(f, args)
 entity f;
@@ -622,6 +644,7 @@ static struct DirectiveHandler handlers[] =
 };
 
 /* returns the handler for directive name.
+ * assumes the name should point to a directive.
  */
 static void (*directive_handler(name))()
 string name;
