@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/03/25 17:45:53 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/04/11 10:52:49 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -138,7 +138,7 @@ char *module_name;
 	  db_get_current_module_name(),
 	  db_get_current_program_directory());
 
-    system(concatenate("$UTILDIR/filter-hpf < ",
+    system(concatenate("$UTILDIR/hpfc_filter < ",
 		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
 		       " > ",
 		       db_get_current_program_directory(),
@@ -200,12 +200,12 @@ char *module_name;
     hostfile = (FILE *) safe_fopen(hostfilename, "w");
     hpfc_print_code(hostfile, hostmodule, hoststat);
     safe_fclose(hostfile, hostfilename);
-    system(concatenate("$UTILDIR/add-includes ", hostfilename, NIL));
+    system(concatenate("$UTILDIR/hpfc_add_includes ", hostfilename, NIL));
 
     nodefile = (FILE *) safe_fopen(nodefilename, "w");
     hpfc_print_code(nodefile, nodemodule, nodestat);
     safe_fclose(nodefile, nodefilename);
-    system(concatenate("$UTILDIR/add-includes ", nodefilename, NIL));
+    system(concatenate("$UTILDIR/hpfc_add_includes ", nodefilename, NIL));
 
     parmfile = (FILE *) safe_fopen(parmfilename, "w");
     create_parameters_h(parmfile);
