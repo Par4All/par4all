@@ -148,7 +148,16 @@ generic_proper_effects_of_reference(reference ref)
 {
     list inds = reference_indices(ref);
     list le = NIL;
-    transformer context = effects_private_current_context_head();
+    transformer context;
+
+    /* CA: lazy, because in the in region backward translation of formal
+     * parameters that are not simple references on the caller side,
+     * this stuff may be called without proper context.
+     */
+    if (effects_private_current_context_empty_p())
+	context = transformer_undefined;
+    else
+	context = effects_private_current_context_head();
 
     pips_debug(3, "begin\n");
     
