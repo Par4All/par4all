@@ -156,6 +156,8 @@ void fprint_entity_list(FILE *fp, list l);
  ifdebug(D) {fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W);P;}
 
 #define DEBUG_STAT(D, W, S) GEN_DEBUG(D, W, print_statement(S))
+#define DEBUG_CODE(D, W, S) GEN_DEBUG(D, W, \
+    hpfc_print_code(stderr, get_current_module_entity(), S))
 #define DEBUG_SYST(D, W, S) GEN_DEBUG(D, W, syst_debug(S))
 #define DEBUG_ELST(D, W, L)\
    GEN_DEBUG(D, W, fprint_entity_list(stderr, L); fprintf(stderr, "\n"))
