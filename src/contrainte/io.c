@@ -70,7 +70,7 @@ char * (*variable_name)();
 		if (coeff == 1)
 		    (void) fprintf(fp,"%c %s ", signe, variable_name(v->var));
 		else 
-		    (void) fprintf(fp,"%c %d %s ", signe, coeff,
+		    (void) fprintf(fp,"%c %ld %s ", signe, coeff,
 			    variable_name(v->var));
 	    }
 	}
@@ -81,9 +81,9 @@ char * (*variable_name)();
 	v = v->succ;
     }
     if (is_inegalite)
-	(void) fprintf (fp," <= %d ,\n", -constante);
+	(void) fprintf (fp," <= %ld ,\n", -constante);
     else 
-	(void) fprintf (fp," == %d ,\n", -constante);
+	(void) fprintf (fp," == %ld ,\n", -constante);
 }
 
 /* void egalite_fprint(FILE * fp, Pcontrainte eg, char * (*variable_name)()):
@@ -191,7 +191,7 @@ boolean a_la_fortran;
 		    (void) sprintf(s+strlen(s),"%c%s", 
 				   signe, variable_name(v->var));
 		else 
-		    (void) sprintf(s+strlen(s),"%c%d%s", signe, coeff,
+		    (void) sprintf(s+strlen(s),"%c%ld%s", signe, coeff,
 			    variable_name(v->var));
 	    }
 	}
@@ -204,19 +204,19 @@ boolean a_la_fortran;
     if (is_inegalite)	
 	switch (a_la_fortran){
 	case FALSE :
-	    (void) sprintf(s+strlen(s) ,"<=%d", -constante);
+	    (void) sprintf(s+strlen(s) ,"<=%ld", -constante);
 	    break;
 	case TRUE : 
-	    (void) sprintf(s+strlen(s) ,".LE.%d", -constante);
+	    (void) sprintf(s+strlen(s) ,".LE.%ld", -constante);
 	    break;
 	}
     else 
 	switch (a_la_fortran){
 	case FALSE :
-	    (void) sprintf(s+strlen(s) ,"==%d", -constante);
+	    (void) sprintf(s+strlen(s) ,"==%ld", -constante);
 	    break;
 	case TRUE : 
-	    (void) sprintf(s+strlen(s) ,".EQ.%d", -constante);
+	    (void) sprintf(s+strlen(s) ,".EQ.%ld", -constante);
 	    break;
 	}
 
