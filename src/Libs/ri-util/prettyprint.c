@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.131  1999/05/07 12:33:39  ancourt
+ * remove label on tests
+ *
  * Revision 1.130  1999/01/29 16:42:39  ancourt
  * to deal with io in block IF
  *
@@ -232,7 +235,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.130 1999/01/29 16:42:39 ancourt Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.131 1999/05/07 12:33:39 ancourt Exp $";
 #endif /* lint */
 
  /*
@@ -1977,14 +1980,16 @@ text_block_elseif(
 
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, tb));
 
-    if(statement_test_p(fb)) {
-	MERGE_TEXTS(r, text_block_elseif(module, label, margin, 
+    if(statement_test_p(fb) 
+       && empty_comments_p(statement_comments(fb))
+       && entity_empty_label_p(statement_label(fb))) {
+	MERGE_TEXTS(r, text_block_elseif(module, statement_label(fb), margin, 
 					 statement_test(fb), n));
     }
     else {
 	MERGE_TEXTS(r, text_block_else(module, label, margin, fb, n));
     }
-
+    
     return(r);
 }
 
@@ -2018,7 +2023,7 @@ text_test(
 
 	r = text_block_ifthen(module, label, margin, obj, n);
 	MERGE_TEXTS(r, text_block_elseif
-		    (module, label, margin, statement_test(fb), n));
+		    (module,statement_label(fb), margin, statement_test(fb), n));
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
 
 	/* r = text_block_if(module, label, margin, obj, n); */
