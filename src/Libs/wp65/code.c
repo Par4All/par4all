@@ -14,7 +14,9 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
-#include "boolean.h"
+
+#include "linear.h"
+
 #include "genC.h"
 #include "misc.h"
 
