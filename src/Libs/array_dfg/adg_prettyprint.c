@@ -90,11 +90,11 @@ graph obj;
     exec_dom = dfg_vertex_label_exec_domain((dfg_vertex_label) vertex_vertex_label(crt_v));
 
     if(source_stmt == ENTRY_ORDER) {
-      fprintf(fp,"\nENTRY:\n");
+      fprintf(fp,"\nENTRY:\n******\n");
     }
     else {
       stmt = adg_vertex_to_statement(crt_v);
-      fprintf(fp,"\nins_%d:\n", statement_number(stmt));
+      fprintf(fp,"\nins_%d:\n******", statement_number(stmt));
     }
 
     if(exec_dom != predicate_undefined) {
@@ -102,6 +102,8 @@ graph obj;
       fprint_pred(fp, exec_dom);
     }
     else fprintf(fp, " Execution Domain: Nil\n");	/* AL 15 02 94 */
+    
+    fprintf(fp, "\n");
 
     su_l = vertex_successors(crt_v);
 
@@ -116,6 +118,8 @@ graph obj;
 
        for( ; df_l != NIL; df_l = CDR(df_l))
           fprint_dataflow(fp, statement_number(stmt), DATAFLOW(CAR(df_l)));
+
+       fprintf(fp, "\n");
       }
    }
 }
