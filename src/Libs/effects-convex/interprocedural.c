@@ -56,11 +56,7 @@
 
 jmp_buf overflow_error;
 
-
-
-/*********************************************************************************/
-/* INTERFACES                                                                    */
-/*********************************************************************************/
+/************************************************************** INTERFACES  */
 
 static statement current_stmt = statement_undefined;
 static entity current_callee = entity_undefined;
@@ -261,9 +257,7 @@ convex_regions_forward_translation(entity callee, list real_args,
 }
 
 
-/*********************************************************************************/
-/* BACKWARD TRANSLATION                                                          */
-/*********************************************************************************/
+/***************************************************** BACKWARD TRANSLATION */
 
 static list formal_regions_backward_translation(entity func, list real_args, 
 						list func_regions, 
@@ -271,9 +265,8 @@ static list formal_regions_backward_translation(entity func, list real_args,
 static list common_regions_backward_translation(entity func, list func_regions);
 static list common_region_translation(entity func, region reg, boolean backward);
 
-
 /* list regions_backward_tranlation(entity func, list real_args, 
- *                                        list func_regions, transformer context) 
+ *                                  list func_regions, transformer context) 
  * input    : an external function func, and the list of real arguments used 
  *            in the calling function.
  * output   : the corresponding list of regions, at call site.
@@ -302,7 +295,7 @@ list regions_backward_translation(entity func, list real_args,
     /* Compute the regions on formal variables. */
     tfe = formal_regions_backward_translation(func,real_args,func_regions,context);
     
-    /* Compute the regions on common variables (ie static & global variables). */
+    /* Compute the regions on common variables (static & global variables). */
     tce = common_regions_backward_translation(func, func_regions);
     
     if (proper)
@@ -325,9 +318,10 @@ list regions_backward_translation(entity func, list real_args,
 }
 
 
-/* static list formal_regions_backward_translation(entity func, list real_args, 
+/* static list formal_regions_backward_translation(entity func, list real_args,
  *                                   func_regions, transformer context)
- * input    : an external function func, its real arguments at call site (real_args),
+ * input    : an external function func, its real arguments at call site 
+ *            (real_args),
  *            its summary regions (with formal args), and the calling context. 
  * output   : the translated formal regions.
  * modifies : ?
@@ -450,15 +444,11 @@ static list common_regions_backward_translation(entity func, list func_regions)
 
 }
 
-
-
-/*********************************************************************************/
-/* FORWARD TRANSLATION                                                           */
-/*********************************************************************************/
+/****************************************************** FORWARD TRANSLATION */
 
 
 static list real_regions_forward_translation(entity func, list real_args, 
-						   list l_reg, transformer context);
+					     list l_reg, transformer context);
 static list common_regions_forward_translation(entity func, list real_regions);
 
 
@@ -466,9 +456,9 @@ static list common_regions_forward_translation(entity func, list real_regions);
  *                                  transformer context
  * input    : the called function func, the real arguments of the call,
  *            the list of regions to translate, and the context of the call.
- * output   : the translated list of regions : real arguments are translated into
- *            formal arguments, and common variables of the caller into common
- *            variables of the callee. 
+ * output   : the translated list of regions : real arguments are translated 
+ *            into formal arguments, and common variables of the caller into 
+ *            common variables of the callee. 
  * modifies : nothing.
  * comment  :	
  */
@@ -489,9 +479,11 @@ transformer context;
     set_interprocedural_translation_context_sc(func,real_args);
     set_forward_arguments_to_eliminate();
 
-    l_form_reg = real_regions_forward_translation(func, real_args, l_reg, context);
+    l_form_reg = real_regions_forward_translation
+	(func, real_args, l_reg, context);
     l_common_reg = common_regions_forward_translation(func, l_reg);
-    l_t_reg = RegionsMustUnion(l_form_reg, l_common_reg, regions_same_action_p);
+    l_t_reg = RegionsMustUnion
+	(l_form_reg, l_common_reg, regions_same_action_p);
 
     ifdebug(3)
     {
@@ -665,10 +657,7 @@ static list common_regions_forward_translation(entity func, list real_regions)
     return(func_regions);
 }
 
-
-/*********************************************************************************/
-/* COMMON FUNCTIONS                                                              */
-/*********************************************************************************/
+/********************************************************* COMMON FUNCTIONS */
 
 
 /* static list common_region_translation(entity func, region reg, 
