@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/03 16:36:19 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/10 12:01:12 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -40,8 +40,6 @@
 #include "semantics.h"
 #include "effects.h"
 
-entity CreateIntrinsic(string name);/* in syntax.h */
-
 #include "conversion.h"
 
 /********************************************************** TEST GENERATION */
@@ -56,8 +54,8 @@ Psysteme_to_expression(
     Psysteme systeme)
 {
     entity
-	equ = local_name_to_top_level_entity(EQUAL_OPERATOR_NAME),
-	leq = local_name_to_top_level_entity(LESS_OR_EQUAL_OPERATOR_NAME);
+	equ = entity_instrinsic(EQUAL_OPERATOR_NAME),
+	leq = entity_instrinsic(LESS_OR_EQUAL_OPERATOR_NAME);
     list conjonction;
     expression result;
 
@@ -390,7 +388,7 @@ constraints_to_loop_bound(
 	  if (vadd)
 	  {
 	      eadd = make_vecteur_expression(vadd);
-	      e = MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME),
+	      e = MakeBinaryCall(entity_instrinsic(PLUS_OPERATOR_NAME),
 				 eadd, ediv);
 	  }
 	  else
@@ -414,9 +412,7 @@ constraints_to_loop_bound(
   }
   else
   {
-      entity operator = is_lower ?
-	  CreateIntrinsic("MAX"): CreateIntrinsic("MIN");
-
+      entity operator = entity_instrinsic(is__lower ? "MAX" : "MIN");
       result = make_call_expression(operator, le);
   }
 
