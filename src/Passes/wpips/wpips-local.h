@@ -1,37 +1,3 @@
-/*#define REGULAR_VERSION "Regular Version"
-  #define PARALLEL_VERSION "Parallel Version"
-  */
-
-/* Labels for menu Edit/View (These definitions are almost automatically available as aliases
-   in wpips.rc; FI) */
-#define USER_VIEW "User View"
-#define SEQUENTIAL_VIEW "Sequential View"
-#define PARALLEL_VIEW "Parallel View"
-#define CALLGRAPH_VIEW "Callgraph View"
-#define ICFG_VIEW "ICFG View"
-#define DISTRIBUTED_VIEW "Distributed View"
-#define DEPENDENCE_GRAPH_VIEW "Dependence Graph View"
-#define FLINT_VIEW "Flint View"
-
-/* Labels for menu Transform */
-#define PARALLELIZE_TRANSFORM "! Parallelize"
-#define PRIVATIZE_TRANSFORM "Privatize"
-#define DISTRIBUTE_TRANSFORM "Distribute"
-#define PARTIAL_EVAL_TRANSFORM "Partial Eval"
-#define UNROLL_TRANSFORM "Loop Unroll"
-#define STRIP_MINE_TRANSFORM "Strip Mining"
-#define LOOP_INTERCHANGE_TRANSFORM "Loop Interchange"
-#define SUPPRESS_DEAD_CODE_TRANSFORM "! Dead Code Elimination"
-#define ATOMIZER_TRANSFORM "! Atomize"
-#define REDUCTIONS_TRANSFORM "!! Reductions"
-#define STATIC_CONTROLIZE_TRANSFORM "Static Controlize"
-
-#define SEMANTICS_ANALYZE "Semantics"
-#define CALLGRAPH_ANALYZE "Call Graph"
-
-#define FULL_DG_PROPS "Full Dependence Graph"
-#define FAST_DG_PROPS "Fast Dependence Graph"
-
 #define SMALL_BUFFER_LENGTH 256
 #define LARGE_BUFFER_LENGTH 256
 
@@ -76,7 +42,13 @@ extern int get_bool_property();
 /* Contourne certains manques de .h Sun. RK, 14/01/93.
 	Doit disparai^tre avec un nouveau compilateur. */
 /* extern char *vsprintf(char *, const char *, void *); */
+/*
 extern char *vsprintf();
 extern int      fprintf();
 extern int      pclose();
 extern int      textsw_possibly_normalize();
+*/
+
+/* This variable is used to indicate wether wpips is in the Emacs
+   mode: */
+extern bool wpips_emacs_mode;
