@@ -2,13 +2,18 @@
  * $Id$
  *
  * A pointer oriented hash table, to be used for variable sets.
- * It is a simplified version of what is in newgen.
+ * It is a simplified version of what is in newgen. 
+ * It is fully standalone.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
+/* expected headers:
+struct linear_hashtable_st;
+typedef struct linear_hashtable_st * linear_hashtable_pt;
+ */
 /* #define LINEAR_HASHTABLE_DEBUG 1 */
 
 #if defined(LINEAR_HASHTABLE_DEBUG)
@@ -56,24 +61,29 @@ static int key_location(linear_hashtable_pt h, void * k, boolean toget)
 
 /********************************************************************* DEBUG */
 
-static void linear_hashtable_dump(linear_hashtable_pt h)
+static void linear_hashtable_print(FILE * file, linear_hashtable_pt h)
 {
   register int i;
 
-  fprintf(stderr, "[linear_hashtable_dump] hash=%p size=%d nitems=%d\n",
+  fprintf(file, "[linear_hashtable_dump] hash=%p size=%d nitems=%d\n",
 	  h, h->size, h->nitems);
   
   for (i=0; i<h->size; i++)
   {
     register void * k = h->keys[i];
-    fprintf(stderr, "%d (%d): 0x%p -> 0x%p\n", 
+    fprintf(file, "%d (%d): 0x%p -> 0x%p\n", 
 	    i, 
-	    (k!=FREE_CHUNK && k!=EMPTIED_CHUNK)? 
-	        key_location(h, k, true):  -1, 
+	    (k!=FREE_CHUNK && k!=EMPTIED_CHUNK)? key_location(h, k, true): -1,
 	    k, h->vals[i]);
   }
 
-  fprintf(stderr, "[linear_hashtable_dump] done.\n");
+  fprintf(file, "[linear_hashtable_dump] done.\n");
+}
+
+/* convenient function to be called from gdb. */
+void linear_hashtable_dump(linear_hashtable_pt h)
+{
+  linear_hashtable_print(stderr, h);
 }
 
 /* check hashtable coherency */
@@ -90,27 +100,26 @@ boolean linear_hashtable_coherent_p(linear_hashtable_pt h)
   {
     register void * k = h->keys[i];
     if (k!=FREE_CHUNK && k!=EMPTIED_CHUNK)
+    {
+      /* check key index */
+      register int index = key_location(h, k, true);
+      if (index!=i) return false;
       n++;
+    }
   }
 
   if (n!=h->nitems)
     return false;
 
-  /* check keys */
-  for (i=0, n=0; i<h->size; i++)
-  {
-    register void * k = h->keys[i];
-    if (k!=FREE_CHUNK && k!=EMPTIED_CHUNK)
-    {
-      register int index = key_location(h, k, true);
-      if (index!=i) return false;
-    } 
-  }
-
   return true;
 }
 
 /********************************************************************* BUILD */
+
+/* size of internal table. 
+ * should be a not too big odd number.
+ */
+#define HASHTABLE_INITIAL_SIZE (17)
 
 /* constructor.
  * returns a newly allocated hashtable.
@@ -118,17 +127,17 @@ boolean linear_hashtable_coherent_p(linear_hashtable_pt h)
 linear_hashtable_pt linear_hashtable_make(void)
 {
   linear_hashtable_pt h;
-  register int i, size = 17;
+  register int i, size = HASHTABLE_INITIAL_SIZE;
 
   h = (linear_hashtable_pt) malloc(sizeof(struct linear_hashtable_st));
-  assert(h);
+  assert(h); /* check malloc */
 
   h->size = size;
   h->nitems = 0;
   h->keys = (void **) malloc(sizeof(void *)*size);
   h->vals = (void **) malloc(sizeof(void *)*size);
 
-  assert(h->keys && h->vals);
+  assert(h->keys && h->vals); /* check malloc */
 
   for (i=0; i<size; i++)
     h->keys[i] = FREE_CHUNK, 
@@ -164,7 +173,7 @@ static void linear_hashtable_extend(linear_hashtable_pt h)
   h->size = 2*oldsize + 1;
   h->keys = (void**) malloc(sizeof(void *)*h->size);
   h->vals = (void**) malloc(sizeof(void *)*h->size);
-  assert(h->keys && h->vals);
+  assert(h->keys && h->vals); /* check malloc */
 
   for (i=0; i<h->size; i++)
     h->keys[i] = FREE_CHUNK,
@@ -208,11 +217,6 @@ static void linear_hashtable_internal_put
     index = key_location(h, k, false);
   else 
     assert(!once);
-
-  debug_assert(index>=0 && index<h->size &&
-	       (h->keys[index]==FREE_CHUNK || 
-		h->keys[index]==EMPTIED_CHUNK ||
-		h->keys[index]==k));
 
   if (h->keys[index]!=k)
     h->nitems++;
