@@ -577,7 +577,7 @@ list gen_make_list(int domain, ...)
 list gen_cons(void * item, list next)
 {
   list ncons = (list) malloc(sizeof(struct cons));
-  ncons->car = item;
+  ncons->car.e = item;
   ncons->cdr = next;
   return ncons;
 }
