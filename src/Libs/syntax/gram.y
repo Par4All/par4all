@@ -271,6 +271,7 @@ lprg_exec: prg_exec
 	;
 
 prg_exec: begin_inst {reset_first_statement();} linstruction { check_first_statement();} end_inst
+        | begin_inst {reset_first_statement(); check_first_statement();} end_inst
 	;
 
 begin_inst: opt_fortran_type psf_keyword module_name
@@ -282,7 +283,7 @@ end_inst: TK_END TK_EOS
             { EndOfProcedure(); }
 	;
 
-linstruction: TK_EOS
+linstruction: TK_EOS 
         | instruction TK_EOS
 	| linstruction instruction TK_EOS
 	;
@@ -382,7 +383,8 @@ io_inst:  io_keyword io_f_u_id
 		case TK_OPEN:
 		case TK_CLOSE:
 		case TK_INQUIRE:
-		    FatalError("Syntax","Illegal syntax in IO statement");
+		    ParserError("Syntax",
+			       "Illegal syntax in IO statement, Parentheses and arguments required");
 		case TK_BACKSPACE:
 		case TK_REWIND:
 		case TK_ENDFILE:
@@ -423,7 +425,8 @@ io_inst:  io_keyword io_f_u_id
 		case TK_BACKSPACE:
 		case TK_REWIND:
 		case TK_ENDFILE:
-		    FatalError("Syntax","Illegal syntax in IO statement");
+		  ParserError("Syntax",
+			      "Illegal syntax in IO statement, Parentheses are required");
 		default:
 		    ParserError("Syntax","Unexpected token in IO statement");
 		}
@@ -436,8 +439,11 @@ io_inst:  io_keyword io_f_u_id
 	    { $$ = MakeIoInstB($1, $3, $5, $8, $10); }
 	;
 
-io_f_u_id: atom
-	    { $$ = make_expression($1, normalized_undefined); }	
+io_f_u_id: atom 
+        /* Should be an expression, but a conflict results for parentheses which may be
+	 * part of the expression or part of the IO statement (FI, 1/1/97)
+	 */
+	    { $$ = make_expression($1, normalized_undefined); }
         | const_simple
 	    { $$ = $1; }
 	| TK_STAR
@@ -453,12 +459,18 @@ lci: ci
 	    }
 	;
 
-ci: name TK_EQUALS io_f_u_id
+/* ci: name TK_EQUALS io_f_u_id */
+ci: name TK_EQUALS expression
 	    {
 		char buffer[20];
 		(void) strcpy(buffer, $1);
 		free($1);
 		(void) strcat(buffer, "=");
+
+		if(strcmp(buffer,"END")==0||strcmp(buffer,"ERR")) {
+		  Warning("parser", 
+			  "Control effects of IO clauses END and ERR are ignored\n");
+		}
 		
 		$$ = CONS(EXPRESSION, 
 			  MakeCharacterConstantExpression(buffer),
