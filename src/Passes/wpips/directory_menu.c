@@ -5,7 +5,7 @@
 /* $Id$ */
 
 #ifndef lint
-char vcid_directory_menu[] = "%A% ($Date: 1997/09/20 12:13:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_directory_menu[] = "%A% ($Date: 1997/09/30 06:56:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <xview/xview.h>
@@ -108,46 +108,46 @@ generate_a_directory_menu_notify(Menu menu, Menu_item menu_item)
 Menu
 generate_a_directory_menu(char * directory)
 {
-   char *file_list[ARGS_LENGTH];
-   int file_list_length;
-   int return_code;
-   int i;
-   Menu menu;
+    gen_array_t file_list;
+    int file_list_length;
+    int return_code;
+    int i;
+    Menu menu;
    
-   menu = (Menu) xv_create((int) NULL, MENU,
-			   /* The string is *not* copied in MENU_TITLE_ITEM: */
-			   MENU_TITLE_ITEM, strdup(directory),
-			   /* and furthermore MENU_TITLE_ITEM is write
-			      only, so add the info somewhere else: */
-			   XV_KEY_DATA, MENU_PATH_DATA_HANDLER, strdup(directory),
-			   /* Add its own notifying procedure: */
-			   MENU_NOTIFY_PROC, generate_a_directory_menu_notify,
-			   NULL);
-   debug(2, "generate_a_directory_menu", "menu = %#x (%s)\n",
-         menu, directory);
+    menu = (Menu) xv_create(
+	(int) NULL, MENU,
+	/* The string is *not* copied in MENU_TITLE_ITEM: */
+	MENU_TITLE_ITEM, strdup(directory),
+	/* and furthermore MENU_TITLE_ITEM is write
+	   only, so add the info somewhere else: */
+	XV_KEY_DATA, MENU_PATH_DATA_HANDLER, strdup(directory),
+	/* Add its own notifying procedure: */
+	MENU_NOTIFY_PROC, generate_a_directory_menu_notify,
+	NULL);
+    pips_debug(2, "menu = %#x (%s)\n", menu, directory);
 
    if (db_get_current_workspace_name()) {
-      xv_set(menu, MENU_APPEND_ITEM,
-             xv_create(XV_NULL, MENUITEM,
-                       MENU_STRING,
-                       "* Close the current workspace before changing directory *",
-                       MENU_RELEASE,
-                       MENU_INACTIVE, TRUE,
-                       NULL),
+       xv_set(menu, MENU_APPEND_ITEM,
+	      xv_create(XV_NULL, MENUITEM,
+			MENU_STRING,
+			"* Close the current workspace before "
+			"changing directory *",
+			MENU_RELEASE,
+			MENU_INACTIVE, TRUE,
+			NULL),
              NULL);
-      user_warning("generate_a_directory_menu",
-                   "Close the current workspace before changing directory.\n");
+       pips_user_warning("Close the current workspace before changing "
+			 "directory.\n");
    }
-   else {
+   else 
+   {
       /* Get all the files in the directory: */
-       /*
-      return_code = safe_list_files_in_directory(&file_list_length, file_list,
-                                                 directory,
-                                                 ".*", accept_all_file_names);
-						 */
-      return_code = safe_list_files_in_directory(&file_list_length, file_list,
-                                                 directory,
-                                                 ".*", directory_exists_p);
+       file_list = gen_array_make(0);
+       return_code = safe_list_files_in_directory(file_list, 
+						  directory,
+						  ".*", directory_exists_p);
+       file_list_length = gen_array_nitems(file_list);
+
       if (return_code == -1 || file_list_length == 0)
          xv_set(menu, MENU_APPEND_ITEM,
                 xv_create(XV_NULL, MENUITEM,
@@ -161,7 +161,8 @@ generate_a_directory_menu(char * directory)
          xv_set(menu, MENU_APPEND_ITEM,
                 xv_create(XV_NULL, MENUITEM,
                           MENU_STRING,
-                          "* Too many files. Type directly in the Directory line of the main panel *",
+			  "* Too many files. Type directly in the Directory "
+			  "line of the main panel *",
                           MENU_RELEASE,
                           MENU_INACTIVE, TRUE,
                           NULL),
@@ -171,22 +172,25 @@ generate_a_directory_menu(char * directory)
       }
       else
          /* Generate a corresponding entry for each file: */
-         for(i = 0; i < file_list_length; i++)
+	  for(i = 0; i < file_list_length; i++) 
+	  {
+	      string file_name = gen_array_item(file_list, i);
             /* Skip the "." directory: */
-            if (strcmp(file_list[i], ".") != 0) {
-               struct stat buf;
-               char complete_file_name[MAXNAMELEN + 1];
+	      if (strcmp(file_name, ".") != 0) {
+		  struct stat buf;
+		  char complete_file_name[MAXNAMELEN + 1];
+		  
+		  Menu_item menu_item =
+		      xv_create(XV_NULL, MENUITEM,
+				MENU_STRING, strdup(file_name),
+				MENU_RELEASE,
+				/* The strdup'ed string will also be
+				   freed when the menu is discarded: */
+				MENU_RELEASE_IMAGE,
+				NULL);
 
-               Menu_item menu_item =
-                  xv_create(XV_NULL, MENUITEM,
-                            MENU_STRING, strdup(file_list[i]),
-                            MENU_RELEASE,
-                            /* The strdup'ed string will also be
-                               freed when the menu is discarded: */
-                            MENU_RELEASE_IMAGE,
-                            NULL);
-
-               (void) sprintf(complete_file_name, "%s/%s", directory, file_list[i]);
+		  (void) sprintf(complete_file_name, "%s/%s", 
+				 directory, file_name);
                if (((stat(complete_file_name, &buf) == 0) 
                     && (buf.st_mode & S_IFDIR))) {
                   /* Since a menu item cannot be selected as an item, add an
@@ -198,7 +202,7 @@ generate_a_directory_menu(char * directory)
                   /* Now recreate another item that will be the submenu: */
                   menu_item =
                      xv_create(XV_NULL, MENUITEM,
-                               MENU_STRING, strdup(file_list[i]),
+                               MENU_STRING, strdup(file_name),
                                MENU_RELEASE,
                                /* The strdup'ed string will also be
                                   freed when the menu is discarded: */
@@ -207,15 +211,17 @@ generate_a_directory_menu(char * directory)
                                   entry: */
                                MENU_GEN_PULLRIGHT, directory_gen_pullright,
                                NULL);
-                  debug(2, "generate_a_directory_menu", " menu_item = %#x (%s)\n",
-                        menu_item, file_list[i]);
+                  pips_debug(2, " menu_item = %#x (%s)\n",
+			     menu_item, file_name);
                }
                else
                   /* And disable non-subdirectory entry: */
                   xv_set(menu_item, MENU_INACTIVE, TRUE, NULL);
          
                xv_set(menu, MENU_APPEND_ITEM, menu_item, NULL);    
-            }
+	      }
+	  }
+      gen_array_full_free(file_list);
    }
    return menu;
 }
