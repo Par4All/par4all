@@ -8,6 +8,9 @@
  * $Id$
  *
  * $Log: return.c,v $
+ * Revision 1.16  2003/06/19 07:38:06  nguyen
+ * Update calls to make_statement and make_variable with new RI for C
+ *
  * Revision 1.15  2002/06/20 15:51:10  irigoin
  * New version for handling alternate returns. Code used elsewhere moved into ri-util.
  *
@@ -285,7 +288,7 @@ static statement make_get_rc_statement(expression rc_ref)
 		make_functional(CONS(PARAMETER, 
 				     make_parameter(make_type(is_type_variable,
 							      make_variable(make_basic(is_basic_int, (value) 4),
-									    NIL)),
+									    NIL,NIL)),
 						    make_mode(is_mode_reference, UU)),
 				     NIL),
 				make_type(is_type_void, UU)));
@@ -295,7 +298,7 @@ static statement make_get_rc_statement(expression rc_ref)
 		make_functional(NIL,
 				make_type(is_type_variable,
 					  make_variable(make_basic(is_basic_int, (value) 4),
-							NIL))));
+							NIL,NIL))));
     */
     entity_storage(get_rc) = make_storage(is_storage_rom, UU);
     entity_initial(get_rc) = make_value(is_value_code, code_undefined);
@@ -380,7 +383,7 @@ static entity set_rc_function()
 		make_functional(CONS(PARAMETER, 
 				     make_parameter(make_type(is_type_variable,
 							      make_variable(make_basic(is_basic_int, (value) 4),
-									    NIL)),
+									    NIL,NIL)),
 						    make_mode(is_mode_reference, UU)),
 				     NIL),
 				make_type(is_type_void, UU)));
