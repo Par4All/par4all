@@ -165,16 +165,16 @@ expression ex;
     return ex;
 }
 
-/* build a expression X (referencing vaiable X) from a scalar variable X */
-expression entity_to_expression(v)
-entity v;
+/* if v is a constant, returns a constant call.
+ * if v is a variable, returns a reference to v.
+ */
+expression entity_to_expression(e)
+entity e;
 {
-    expression e;
-    reference r = make_reference(v, NIL);
-
-    e = reference_to_expression(r);
-
-    return e;
+    if (entity_constant_p(e))
+	return call_to_expression(make_call(e, NIL));
+    else /* should be a scalar variable! */
+	return reference_to_expression(make_reference(e, NIL));
 }
 
 /*
