@@ -157,18 +157,17 @@ Pvecteur v;
 Value vect_min(v)
 Pvecteur v;
 {
-    Value min;
-
     if(v!=NULL) {
-	min = val_of(v);
+	Value min = val_of(v);
 	for (v=v->succ; v!= NULL; v= v->succ)
 	     min = (val_of(v) < min) ? val_of(v) : min;
 
+	return min;
     }
     else {
 	vect_error("vect_min","ill. null vector as argument\n");
+	return 0 ; /* just to avoid a gcc warning */
     }
-    return(min);
 }
 
 /* Value vect_max(Pvecteur v): recherche du coefficient non nul maximum
@@ -190,18 +189,16 @@ Pvecteur v;
 Value vect_max(v)
 Pvecteur v;
 {
-    Value max;
-
     if(v!=NULL) {
-	max = val_of(v);
+	Value max = val_of(v);
 	for (v=v->succ; v!= NULL; v= v->succ)
 	     max = (val_of(v) > max) ? val_of(v) : max;
-
+	return max;
     }
     else {
 	vect_error("vect_max","ill. null vector as argument\n");
+	return 0;
     }
-    return(max);
 }
 
 /* boolean vect_equal(Pvecteur v1, Pvecteur v2): test a egalite de
@@ -346,7 +343,7 @@ Pvecteur v1,v2;
 int vect_proport(v1,v2)
 Pvecteur v1,v2;
 {
-    int prop;
+    int prop = 1;
     int c1;
     int c2;
     Pvecteur t1;
@@ -371,7 +368,7 @@ Pvecteur v1,v2;
 	if(prop!=0)
 	    /* on evite le test du produit c1*c2 a cause du SUN 4
 	       sans multiplication cablee */
-	    if(c1>0 && c2>0 || c1<0 && c2<0)
+	    if((c1>0 && c2>0) || (c1<0 && c2<0))
 		prop = 1;
 	    else
 		prop = -1;
