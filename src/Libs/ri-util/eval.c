@@ -15,7 +15,6 @@ range: a range is not evaluated.
 */
 
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 #include <ctype.h>
 
