@@ -6,6 +6,9 @@
  *
  * $Id$
  * $Log: directives.c,v $
+ * Revision 1.66  1997/04/29 11:57:16  coelho
+ * *** empty log message ***
+ *
  * Revision 1.65  1997/03/20 10:14:04  coelho
  * better RCS headers.
  *
@@ -360,8 +363,18 @@ one_align_directive(
     }
     else
     {
-	set_array_as_distributed(array);
-	store_hpf_alignment(array, a);
+	if (!array_distributed_p(array)) 
+	{
+	    set_array_as_distributed(array);
+	    store_hpf_alignment(array, a);
+	}
+	else
+	{
+	    /* a variable in a common can be declared several alignments
+	     * that MUST be the same...
+	     */
+	    pips_assert("some alignment", bound_hpf_alignment_p(array));
+	}
     }       
 }
 
