@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.19  2004/08/05 15:41:31  hurbain
+   Function claire_array_in_task() modified to check null column in fitting matrix and to avoid spurious warning by APOTRES for laurent03_explicit.f. Spurious warning still there. Intermediate version. (Isabelle and Francois)
+
    Revision 1.18  2004/08/04 07:19:17  irigoin
    Better handling of comments. CONTINUE are ignored.
 
@@ -64,6 +67,8 @@
    function print_claire_code() declared for the link but not programmed yet.
 
 */
+
+#define DEBUG_CLAIRE 1
 
 #include <stdio.h>
 #include <ctype.h>
@@ -162,7 +167,17 @@ static bool variable_p(entity e)
     (storage_ram_p(s) || storage_return_p(s));
 }
 
+int is_all_null(string totest[], int dim){
+  int i;
 
+  for(i = 0; i<dim && same_string_p(totest[i], "0"); i++);
+
+  if(i == dim)
+    return 1;
+  else
+    return 0;
+}
+      
 
 /************************************************************** DECLARATIONS */
 
@@ -493,32 +508,61 @@ static void claire_call_from_indice(call c, string * offset_array, string paving
   }
 }
 
+#define CLAIRE_ARRAY_PREFIX "A_"
+
 static string claire_array_in_task(reference r, bool first, int task_number){
-  string varname = strdup(concatenate("A_", claire_entity_local_name(reference_variable(r)), NULL));
+  /* CLAIRE name of the referenced array */
+  string varname = strdup(concatenate(CLAIRE_ARRAY_PREFIX, 
+				      claire_entity_local_name(reference_variable(r)), 
+				      NULL));
+  /* iterator for dimensions of array */
   int indice_nr = 0;
   list indices = reference_indices(r);
   string result = "";
-  int nb_loops = gen_array_nitems(extern_indices_array);
+  /* number of external loops*/
+  int extern_nb = gen_array_nitems(extern_indices_array);
   
-  int * index_of_array = (int *) (gen_array_item(array_dims, gen_array_index(array_names, varname)));
-  string offset_array[*index_of_array];
-  string paving_array[*index_of_array][gen_array_nitems(extern_indices_array)];
-  string fitting_array[*index_of_array][gen_array_nitems(intern_indices_array)];
+  /* number of dimensions of referenced array */
+  int index_of_array = gen_length(indices); /*((int *) (gen_array_item(array_dims, gen_array_index(array_names, varname))));*/
+
+   /* number of internal loops*/ 
+  int intern_nb = gen_array_nitems(intern_indices_array);
+
+  /* list of offsets for CLAIRE code */
+  string offset_array[index_of_array];
+  /* paving matrix for CLAIRE code
+   1st coeff: array dimension (row index)
+   2nd coeff: iteration dimension (column index) */
+  string paving_array[index_of_array][extern_nb];
+  
+  /* fitting matrix for CLAIRE code 
+   1st coeff: array dimension
+   2nd coeff: iteration dimension*/
+  string fitting_array[index_of_array][intern_nb];
   int i;
   int j;
-  
-  for (i=0; i<*index_of_array; i++)
+  int is_all_null_2D = 1;
+
+  bool null_fitting_p = TRUE;
+  string internal_index_declarations = strdup("");
+
+
+  /* initialization of the arrays */
+  for (i=0; i<index_of_array; i++)
     offset_array[i] = "0";
   
-  for (i=0; i<gen_array_nitems(extern_indices_array) ; i++)
-    for (j=0; j<*index_of_array; j++)
+  for (i=0; i<index_of_array ; i++)
+    for (j=0; j<extern_nb; j++)
       paving_array[i][j] = "0";
 
-  for (i=0; i<gen_array_nitems(intern_indices_array) ; i++)
-    for (j=0; j<*index_of_array; j++)
+  for (i=0; i<index_of_array ; i++)
+    for (j=0; j<intern_nb; j++)
       fitting_array[i][j] = "0";
+
+  /* CLAIRE reference header */
   result = strdup(concatenate(result, "DATA(name = symbol!(\"", "T_", int_to_string(task_number),
 			      "\" /+ \"", varname, "\"),", NL, TAB, TAB, NULL));
+
   result = strdup(concatenate(result, "darray = ", varname, "," NL, TAB, TAB, "accessMode = ", (first?"Wmode,":"Rmode,"),
 			      NL, TAB, TAB, "offset = list<VARTYPE>(", NULL));
   
@@ -549,50 +593,107 @@ static string claire_array_in_task(reference r, bool first, int task_number){
     }
     indice_nr++;
   }, indices);
-  for(i=0; i<*index_of_array - 1; i++){
+
+
+  /* generate offset list in CLAIRE code */  
+  for(i=0; i<index_of_array - 1; i++){
     result=strdup(concatenate(result, "vartype!(", offset_array[i],"), ", NULL));
   }
   result = strdup(concatenate(result, "vartype!(", offset_array[i], "))," NL, NULL));
+
+  /* fitting header */
   result = strdup(concatenate(result, TAB, TAB, "fitting = list<list[VARTYPE]>(", NULL));
-  for(i=0;i<gen_array_nitems(intern_indices_array) - 1; i++){
+
+  /* CLAIRE column-major storage of fitting matrix */
+  for(i=0;i<intern_nb; i++){
+    bool is_null_p = TRUE;
+    for(j = 0; j<index_of_array; j++){
+      is_null_p = is_null_p && (fitting_array[j][i] == 0);
+    }
     result = strdup(concatenate(result, "list(", NULL));
-    for(j = 0; j<(*index_of_array)-1; j++){
-      result = strdup(concatenate(result, "vartype!(", fitting_array[i][j], "), ", NULL));
+    if(!is_null_p){
+      null_fitting_p = FALSE;
+      for(j = 0; j<index_of_array-1; j++){
+	result = strdup(concatenate(result, "vartype!(", fitting_array[j][i], "), ", NULL));
+      }
+      result = strdup(concatenate(result, 
+				  "vartype!(", 
+				  fitting_array[j][i], 
+				  i<intern_nb-1?")),":"))),", 
+				  NL, TAB, TAB, 
+				  i<intern_nb-1?TAB:"", 
+				  NULL));
     }
-    result = strdup(concatenate(result, "vartype!(", fitting_array[i][j], ")),", NL, TAB, TAB, TAB, NULL));
   }
-  result = strdup(concatenate(result, "list(", NULL));
-  if(gen_array_nitems(intern_indices_array) > 0){
-    for(j = 0; j<(*index_of_array)-1; j++){
-      result = strdup(concatenate(result, "vartype!(", fitting_array[i][j], "), ", NULL));
-    }
-    result = strdup(concatenate(result, "vartype!(", fitting_array[i][j], "))),", NL, TAB, TAB, NULL));
+
+  if(null_fitting_p){
+    result = strdup(concatenate(result, "list()),", NL, TAB, TAB, NULL));
   }
-  else {
-    result = strdup(concatenate(result, ")),", NL, TAB, TAB, NULL));
-  }
+
+  null_fitting_p = TRUE;
+  /* Generation of paving CLAIRE code*/
   result = strdup(concatenate(result, TAB, TAB, "paving = list<list[VARTYPE]>(", NULL));
-  
- 
-  for(i=0;i<gen_array_nitems(extern_indices_array) - 1; i++){
+
+  for(i=0;i<extern_nb-1; i++){
     result = strdup(concatenate(result, "list(", NULL));
-    for(j = 0; j<(*index_of_array)-1; j++){
-      result = strdup(concatenate(result, "vartype!(", paving_array[i][j], "), ", NULL));
+    for(j = 0; j<index_of_array-1; j++){
+      result = strdup(concatenate(result, "vartype!(", paving_array[j][i], "), ", NULL));
     }
-    result = strdup(concatenate(result, "vartype!(", paving_array[i][j], ")),", NL, TAB, TAB, TAB, NULL));
+    result = strdup(concatenate(result, "vartype!(", paving_array[j][i], ")),", NL, TAB, TAB, TAB, NULL));
   }
   result = strdup(concatenate(result, "list(", NULL));
-  for(j = 0; j<(*index_of_array)-1; j++){
-    result = strdup(concatenate(result, "vartype!(", paving_array[i][j], "), ", NULL));
+  for(j = 0; j<index_of_array-1; j++){
+    result = strdup(concatenate(result, "vartype!(", paving_array[j][i], "), ", NULL));
   }
   result = strdup(concatenate(result, "vartype!(", paving_array[i][j], "))),", NL, TAB, TAB, NULL));
   
 #define MONMAX(a, b) ((a<b)?b:a)
-
+  
+  /* Definition of the inner loop nest */
   result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", int_to_string(MONMAX(gen_array_nitems(intern_indices_array), 1)), ",", NL, TAB, TAB, TAB, NULL));
   result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));
+
+  /* 3 cases :
+     - the fitting matrix is null : must generate a (0,0) loop with dummy index
+     - the fitting matrix column is null : do not generate anything
+     - the fitting matric column is not null : generate the corresponding loop bound and index name
+  */
+
+  for (j = 0; j<intern_nb; j++){
+    bool is_null_p = TRUE;
+    for(i = 0; i < index_of_array; i++){
+      is_null_p = is_null_p && (fitting_array[i][j] == 0);
+    }
+    if(!is_null_p){
+      null_fitting_p = FALSE;
+      result = strdup(concatenate(result, 
+				  "vartype!(", 
+				  *((string *)(gen_array_item(intern_upperbounds_array, j))), 
+				  j<intern_nb-1? "), ":"))," , 
+				  NULL));
+      internal_index_declarations = 
+	strdup(concatenate(internal_index_declarations, 
+			   QUOTE, 
+			   *((string *)(gen_array_item(intern_indices_array, j))), 
+			   QUOTE, 
+			   j<intern_nb-1?", ": ")",
+			   NULL));
+    }
+  }
+
+
+
+  if(null_fitting_p){
+ result = strdup(concatenate(result, "vartype!(1)),", NL, TAB, TAB, TAB, "names = list<string>(\"M_I\")", NULL));
+  }
+  else{
+    result = strdup(concatenate(result, NL, TAB, "names = list<string>(", internal_index_declarations, NULL));
+  }
+
+  /*    is_all_null_2D = is_all_null && !is_all_null(fitting_array[i], (*index_of_array));
+  }
   
-  if(gen_array_nitems(intern_indices_array) > 0){
+  if(gen_array_nitems(intern_indices_array) > 0 && !is_all_null_2D){
     for(i = 0; i<gen_array_nitems(intern_upperbounds_array) - 1; i++){
       result = strdup(concatenate(result, "vartype!(", *((string *)(gen_array_item(intern_upperbounds_array, i))), "), ", NULL));
     }
@@ -602,14 +703,20 @@ static string claire_array_in_task(reference r, bool first, int task_number){
     result = strdup(concatenate(result, NL, TAB, TAB, TAB, "names = list<string>(", NULL));
     
     for(i = 0; i<gen_array_nitems(intern_indices_array) - 1; i++){
-      result = strdup(concatenate(result, QUOTE, *((string *)(gen_array_item(intern_indices_array, i))), QUOTE, ", ", NULL));
+      if(!is_all_null(fitting_array[i], (*index_of_array))){
+	result = strdup(concatenate(result, QUOTE, *((string *)(gen_array_item(intern_indices_array, i))), QUOTE, ", ", NULL));
+      }
     }
-
-    result = strdup(concatenate(result, QUOTE, *((string *)(gen_array_item(intern_indices_array, i))), QUOTE, ")", NULL));
+    if(!is_all_null(fitting_array[i], (*index_of_array))){
+      result = strdup(concatenate(result, QUOTE, *((string *)(gen_array_item(intern_indices_array, i))), QUOTE, NULL));
+    }
+    result = strdup(concatenate(result, ")", NULL));
   }
   else{
     result = strdup(concatenate(result, "vartype!(1)),", NL, TAB, TAB, TAB, "names = list<string>(\"M_I\")", NULL));
-  }
+    }*/
+
+  /* Complete CLAIRE reference */
   result = strdup(concatenate(result, "))", (first?")":","), NL, NULL)); 
   return result;
   
