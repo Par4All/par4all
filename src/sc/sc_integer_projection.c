@@ -113,7 +113,9 @@ Variable v;
     int nb_pos=0;
     int nb_neg = 0;
     int i1,dim = sc->nb_ineq;
-    boolean ineg_stay[dim+1];
+    boolean *ineg_stay; /* [dim+1] */
+
+    ineg_stay = (boolean*) malloc(sizeof(boolean)*(dim+1));
 
     for (i1 =1; i1<=dim; ineg_stay[i1]=TRUE, i1++);
     if (!SC_UNDEFINED_P(sc)) {
@@ -122,7 +124,8 @@ Variable v;
     }
     else {
 	inegs = NULL;
-	return(1);
+	free(ineg_stay);
+	return 1;
     }
 
     constraint_sort(inegs,v,&rtri,&nb_pos,&nb_neg);
@@ -202,7 +205,7 @@ Variable v;
     sc_rm(scd);
     (sc->inegalites) = rtri.cnul;
 
-
+    free(ineg_stay);
     return(1);
 }
 
