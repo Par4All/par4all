@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <malloc.h>
 	
 #include "genC.h"
 #include "misc.h"
@@ -228,7 +229,7 @@ double get_process_memory_size()
 double get_process_gross_heap_size()
 {
     /* This is *used* part of the heap, but it may be bigger */
-    struct mallinfo heap_info = mallinfo();
+    struct mallinfo heap_info = mallinfo(); 
     /* double memory_size = (heap_info.uordbytes)/(double)(1 << 20); */
     double memory_size = ((double) heap_info.uordblks)/(double)(1 << 20);
 
