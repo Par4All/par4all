@@ -4,7 +4,7 @@
  *
  * also include functions for timings...
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/19 18:22:47 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/20 18:58:19 $, )
  * version $Revision$
  *
  * Fabien Coelho, June 1993
@@ -23,15 +23,11 @@
 #ifdef PVM_OLD
 #define pvmtaskinfo taskinfo
 #define pvmhostinfo hostinfo
-static struct pvmtaskinfo
-    task_not_found = {0, 0, 0, 0, "task not found"};
-#else
-static struct pvmtaskinfo
-    task_not_found = {0, 0, 0, 0, "task not found", 0};
 #endif
-
 /*   end of fix for compatibility
  */
+
+#define check(var, msg) if(var<0)fprintf(stderr,"Error %d (%s)\n",var,msg);
 
 static char *
 host_name(
@@ -46,7 +42,7 @@ host_name(
     return "name not found";
 }
 
-static struct pvmtaskinfo 
+static struct pvmtaskinfo *
 which_task(
     int ti_tid, /* the host number we are looking for */
     int ntask,  /* the number of hosts */
@@ -54,9 +50,9 @@ which_task(
 {
     int i;
     for(i=0 ; i<ntask ; i++)
-	if (taskp[i].ti_tid==ti_tid) return taskp[i];
+	if (taskp[i].ti_tid==ti_tid) return &taskp[i];
 
-    return task_not_found; /* just to avoid a gcc warning */
+    return (struct pvmtaskinfo *) NULL;
 }
 
 void 
@@ -66,8 +62,7 @@ FUNCTION(print_host_info) ARGS(`')
     struct pvmhostinfo *hostp;
 
     info = pvm_config(&nhost, &narch, &hostp);
-    if (info<0) 
-	fprintf(stderr, "[print_host_info] pvm_config error (%d)\n", info);
+    check(info, "pvm_config");
 
     /* print hosts
      */
@@ -85,31 +80,31 @@ FUNCTION(print_task_info) ARGS(`number, tids, hosttid')
 int *number, *tids, *hosttid;
 {
     int i, info, nhost, narch, ntask;
-    struct pvmtaskinfo *taskp;
+    struct pvmtaskinfo *taskp, *found;
     struct pvmhostinfo *hostp;
     
     /* get informations from pvm
      */
     info = pvm_config(&nhost, &narch, &hostp);
-    if (info<0) 
-	fprintf(stderr, "[print_task_info] pvm_config error (%d)\n", info);
+    check(info, "pvm_config");
 
     info = pvm_tasks(0, &ntask, &taskp);
-    if (info<0) 
-	fprintf(stderr, "[print_task_info] pvm_tasks error (%d)\n", info);
+    check(info, "pvm_tacks");
 
     /* print tasks
      */
+    found = which_task(*hosttid, ntask, taskp);
     fprintf(stderr, "host running on %s\n",
-	    host_name(which_task((*hosttid), ntask, taskp).ti_host,
-		      nhost, hostp));
+	    found ? host_name(found->ti_host, nhost, hostp) : "not found");
 
     fprintf(stderr, "%d nodes:\n", (*number));
 
     for( i=0 ; i<(*number) ; i++ )
+    {
+	found = which_task(tids[i], ntask, taskp);
 	fprintf(stderr, "%d running on %s\n", i+1,
-		host_name(which_task(tids[i], ntask, taskp).ti_host, 
-			  nhost, hostp));
+		found ? host_name(found->ti_host, nhost, hostp) : "not found");
+    }
 
     fprintf(stderr, "\n");	
 }
