@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.73  2003/06/17 13:51:07  nguyen
+    new ri...
+
     Revision 1.72  2002/07/22 17:18:52  irigoin
     Bug fix that implies no serious testing!
 
@@ -548,7 +551,7 @@ make_empty_statement()
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED, 
 			  empty_comments,
-			  make_instruction_block(NIL)));
+			  make_instruction_block(NIL),NIL,NULL));
 }
 
 /* to be compared with instruction_to_statement() which is a macro (thanks to FC?) ! */
@@ -561,7 +564,7 @@ instruction instr;
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED, 
 			  empty_comments,
-			  instr));
+			  instr,NIL,NULL));
 }
 
 instruction 
@@ -611,13 +614,13 @@ make_block_statement_with_stop()
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
 			  make_instruction(is_instruction_call,
-					   make_call(stop_function,NIL)));
+					   make_call(stop_function,NIL)),NIL,NULL);
 
     b = make_statement(entity_empty_label(),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
-			  make_instruction_block(CONS(STATEMENT, stop, NIL)));
+			  make_instruction_block(CONS(STATEMENT, stop, NIL)),NIL,NULL);
 
     ifdebug(8) {
 	fputs("make_block_statement_with_stop",stderr);
@@ -659,7 +662,7 @@ list body;
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
-			  make_instruction_block(body));
+			  make_instruction_block(body),NIL,NULL);
 
     return b;
 }
@@ -807,7 +810,7 @@ string c; /* comments, default empty_comments (was: "" (was: string_undefined)) 
 		      STATEMENT_ORDERING_UNDEFINED,
 		      c,
 		      make_instruction(is_instruction_call,
-				       make_call(called_function,args)));
+				       make_call(called_function,args)),NIL,NULL);
 
   ifdebug(8) {
     pips_debug(8, "cs is\n");
@@ -1303,12 +1306,12 @@ statement s_old;
 			     statement_number(s_old),
 			     statement_ordering(s_old),
 			     statement_comments(s_old),
-			     instr_l);
+			     instr_l,NIL,NULL);
     l_body = make_statement(entity_empty_label(),
 			    STATEMENT_NUMBER_UNDEFINED,
 			    STATEMENT_ORDERING_UNDEFINED,
 			    empty_comments,
-			make_instruction_block(CONS(STATEMENT,state_l,NIL)));
+			make_instruction_block(CONS(STATEMENT,state_l,NIL)),NIL,NULL);
 
     return(l_body);
 }
