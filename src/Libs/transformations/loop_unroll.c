@@ -1,7 +1,7 @@
 /*
  * LOOP_UNROLL()
  *
- * Bruno Baron
+ * Bruno Baron, Francois Irigoin
  */
 #include <stdio.h>
 #include <string.h>
@@ -340,7 +340,8 @@ void loop_unroll(statement loop_statement, int rate)
     debug(3, "loop_unroll", "done\n");
 }
 
-/* get rid of the loop by body duplication; the loop body is duplicated as many times
+/* get rid of the loop by body duplication; 
+ * the loop body is duplicated as many times
  * as there were iterations
  *
  * FI: could be improved to handle symbolic lower bounds (18 January 1993)
@@ -377,11 +378,17 @@ void full_loop_unroll(statement loop_statement)
 	pips_assert("full_loop_unroll", incval != 0);
     }
     else {
-	pips_error("full_loop_unroll", "loop range must be numerically known\n");
+	user_error("full_loop_unroll", 
+		   "loop range must be numerically known\n");
     }
 
     /* Instruction block is created and will contain everything */
     block = make_instruction(is_instruction_block, NIL);
+
+    /* get rid of labels in loop body (don't worry, useful labels have
+       been transformed into arcs by controlizer, you just loose loop
+       labels) */
+    (void) clear_labels (loop_body (il));
 
     for(iter = lbval; iter <= ubval; iter += incval) {
 	statement transformed_stmt;
@@ -400,15 +407,16 @@ void full_loop_unroll(statement loop_statement)
 	    pips_assert("full_loop_unroll", gen_consistent_p(transformed_stmt));
 	}
 	free_expression(expr);
-	
+
 	ifdebug(9) {
 	    pips_assert("full_loop_unroll", gen_consistent_p(transformed_stmt));
 	}
 	
 	/* Add the transformated old loop body (transformed_stmt) at
 	 * the end of the loop */
-	 instruction_block(block) = gen_nconc(instruction_block(block),
-					      CONS(STATEMENT, transformed_stmt, NIL));
+	 instruction_block(block) = 
+	     gen_nconc(instruction_block(block),
+		       CONS(STATEMENT, transformed_stmt, NIL));
     }
 
     /* Generate a statement to reinitialize old index 
@@ -428,7 +436,7 @@ void full_loop_unroll(statement loop_statement)
     /* FI: according to me, gen_copy_tree() does not create a copy sharing nothing
      * with its actual parameter; if the free is executed, Pvecteur normalized_linear
      * is destroyed (18 January 1993) */
-    /* gen_free(statement_instruction(loop_statement)); */
+    free_instruction(statement_instruction(loop_statement));
     statement_instruction(loop_statement) = block;
     ifdebug(9) {
 	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
@@ -523,7 +531,7 @@ bool recursiv_loop_unroll(statement stmt, entity lb_ent, int rate)
 }
 
 
-/* Top-level function
+/* Top-level functions
  */
 
 void unroll(char *mod_name)
@@ -567,7 +575,7 @@ void unroll(char *mod_name)
     mod_inst = statement_instruction(mod_stmt);
     /* FI: not necessarily the case anymore */
     if(!instruction_unstructured_p(mod_inst)) {
-	user_warning ("loop_unroll", "Non-standard instruction tag %d\n",
+	user_warning ("unroll", "Non-standard instruction tag %d\n",
 		      instruction_tag (mod_inst));
     }
     /* pips_assert("unroll", instruction_unstructured_p(mod_inst)); */
@@ -595,12 +603,78 @@ void unroll(char *mod_name)
 	break;
 
     default:
-	user_warning ("loop_unroll", "Non-acceptable instruction tag %d\n",
+	user_warning ("unroll", "Non-acceptable instruction tag %d\n",
 		      instruction_tag (mod_inst));
     }
 
     /* Reorder the module, because new statements have been generated. */
     module_body_reorder(mod_stmt);
+
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+
+    debug(2,"unroll","done for %s\n", mod_name);
+    debug_off();
+
+}
+
+static entity searched_loop_label = entity_undefined;
+
+bool find_loop_and_fully_unroll(statement s)
+{
+    instruction inst = statement_instruction (s);
+    bool go_on = TRUE;
+
+    if(instruction_loop_p(inst)) {
+	  entity do_lab_ent = loop_label(instruction_loop(inst));
+	  /* is it the right label? */
+	  if (do_lab_ent == entity_undefined) {
+	      pips_error("recursive_loop_unroll", "DO label undefined\n");
+	      go_on = FALSE;
+	  }
+	  else if (gen_eq(searched_loop_label, do_lab_ent)) {
+	      full_loop_unroll(s);
+	      go_on = FALSE;
+	  }
+	  else {
+	      go_on = TRUE;
+	  }
+      }
+
+    return go_on;
+}
+
+void full_unroll(char *mod_name)
+{
+    statement mod_stmt;
+    char lp_label[6];
+    string resp;
+    entity lb_ent = entity_undefined;
+
+    debug_on("FULL_UNROLL_DEBUG_LEVEL");
+
+    /* Get the loop label form the user */
+    resp= user_request("Which loop do you want to unroll fully?\n"
+		       "(give its label): ");
+    sscanf(resp, "%s", lp_label);
+    lb_ent = find_label_entity(mod_name, lp_label);
+    if (lb_ent==entity_undefined) {
+	user_error("unroll", "loop label `%s' does not exist\n", lp_label);
+    }
+
+    debug(1,"full_unroll","Fully unroll loop %s in module %s\n",
+	  lp_label, mod_name);
+
+    searched_loop_label = lb_ent;
+
+    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+
+    gen_recurse (mod_stmt, statement_domain, 
+		 find_loop_and_fully_unroll, gen_null);
+
+    /* Reorder the module, because new statements have been generated. */
+    module_body_reorder(mod_stmt);
+
+    searched_loop_label = entity_undefined;
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
 
