@@ -6,10 +6,9 @@
  */
 #ifdef __GNUC__
 #define pips_debug(level, format, args...)\
- ifdebug(level) { fprintf(stderr, "[%s] ", __FUNCTION__); \
-		  fprintf(stderr, format, ##args); }
+ ifdebug(level) fprintf(stderr, "[" __FUNCTION__  "] " format, ##args);
 #else
-#define pips_debug(level, args...) debug(level, "unknown", args)
+#define pips_debug pips_debug_function
 #endif
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
@@ -27,6 +26,8 @@ extern int re_exec();
 
 /*VARARGS2*/
 extern void debug();
+/* The next function should not be used. Use the pips_debug macro. */
+extern void pips_debug_function();
 extern void pips_error();
 extern void user_warning();
 extern void user_log();
