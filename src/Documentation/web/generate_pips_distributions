@@ -12,7 +12,7 @@ move()
 # SOURCES
 #
 
-echo "all sources *Pips, Newgen, Linear)"
+echo "all sources (Pips, Newgen, Linear)"
 move pips_sources
 make_pips_release -CS -pnle -rsz pips_sources
 
