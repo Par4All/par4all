@@ -3,7 +3,9 @@
   * Francois Irigoin, 21 April 1990
   */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 
 #include "genC.h"
 #include "ri.h"
