@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <assert.h>
-extern int fprintf();
 
 #include "boolean.h"
 #include "arithmetique.h"
