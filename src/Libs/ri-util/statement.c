@@ -111,6 +111,12 @@ statement s;
     return(instruction_continue_p(statement_instruction(s)));
 }
 
+bool statement_format_p(s)
+statement s;
+{
+    return(instruction_format_p(statement_instruction(s)));
+}
+
 bool unlabelled_statement_p(st)
 statement st;
 {
@@ -518,6 +524,12 @@ instruction i;
     return fortran_instruction_p(i, CONTINUE_FUNCTION_NAME);
 }
 
+bool instruction_format_p(i)
+instruction i;
+{
+    return fortran_instruction_p(i, FORMAT_FUNCTION_NAME);
+}
+
 bool fortran_instruction_p(i, s)
 instruction i;
 string s;
@@ -651,7 +663,9 @@ hash_table allocate_number_to_statement()
 }
 
 /* get rid of all labels in controlized code before duplication: all
- * labels have become useless and they cannot be freely duplicated
+ * labels have become useless and they cannot be freely duplicated.
+ *
+ * One caveat: FORMAT statements!
  */
 statement clear_labels(s)
 statement s;
@@ -668,6 +682,10 @@ statement s;
     if(instruction_loop_p(statement_instruction(s))) 
 	loop_label(instruction_loop(statement_instruction(s))) = 
 	    entity_empty_label();
+
+    if(statement_format_p(s)) {
+	user_error("clear_label", "Cannot clear FORMAT label!\n");
+    }
 }
 
 /*
