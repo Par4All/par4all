@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/12/07 15:30:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/12 16:38:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/12/07 15:30:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_text_util[] = "%A% ($Date: 1996/06/12 16:38:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -10,6 +10,7 @@ static char vcid[] = "%A% ($Date: 1995/12/07 15:30:55 $, ) version $Revision$, g
 #include "genC.h"
 #include "text.h"
 #include "text-util.h"
+#include "misc.h"
 
 char *
 i2a(int i)
@@ -47,3 +48,45 @@ add_one_unformated_printf_to_text(text r,
 }
 
 
+/* Return the first word of a sentence: */
+string
+first_word_of_sentence(sentence s)
+{
+    string begin;
+
+    if (sentence_formatted_p(s))
+	/* The sentence is seen as a big word: */
+	begin = sentence_formatted(s);
+    else if (sentence_unformatted_p(s)) {
+	list l = unformatted_words(sentence_unformatted(s));
+	/* From the first word to the last one. Label should is
+           skipped: */
+	begin = STRING(CAR(l));
+    }
+    else
+	pips_assert("s should be formatted or unformatted...", 0);
+
+    return begin;
+}
+
+
+/* Return the last word of a sentence: */
+string
+last_word_of_sentence(sentence s)
+{
+    string end;
+
+    if (sentence_formatted_p(s))
+	/* The sentence is seen as a big word: */
+	end = sentence_formatted(s);
+    else if (sentence_unformatted_p(s)) {
+	list l = unformatted_words(sentence_unformatted(s));
+	/* From the first word to the last one. Label should is
+           skipped: */
+	end = STRING(CAR(gen_last(l)));
+    }
+    else
+	pips_assert("s should be formatted or unformatted...", 0);
+
+    return end;
+}
