@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.IBMAIX,v $ (version $Revision$)
-# $Date: 1996/09/23 08:58:33 $, 
+# $Date: 1996/09/23 11:30:46 $, 
 #
 # this file contains macro definitions 
 
@@ -52,6 +52,8 @@ DIFF	= diff
 #
 # Well, AIX is not unix, and xlc does not have the expected behavior under -M
 DEPFILE = *.u
+
+TPIPS_ADDED_LIBS=-lreadline -lcurses
 
 # end of makefile_macros..
 #
