@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.215  2002/04/30 13:50:42  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.214  2002/04/30 11:24:08  phamdat
  * *** empty log message ***
  *
@@ -484,7 +487,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.214 2002/04/30 11:24:08 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.215 2002/04/30 13:50:42 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2476,15 +2479,7 @@ text_statement(
     if(!ENDP(text_sentences(temp))) {
       /***********written by Dat*********/
       text t = init_text_statement(module, margin, stmt);
-      {
-	string filename = "/users/tmp/phamdat/textout";
-	FILE * my_file = safe_fopen(filename, "w");
-	if (my_file) {
-		print_text(my_file, t);
-		safe_fclose(my_file, filename);
-	}
-	free(filename);
-      }
+      print_text(stderr, t);
       if (!ENDP(text_sentences(t))) {
 	MERGE_TEXTS(r, t);
 	if (! string_undefined_p(comments)) {
@@ -2492,15 +2487,6 @@ text_statement(
 						  strdup(comments)));
 	}
 	MERGE_TEXTS(r, temp);
-	{
-	  string filename = "/users/tmp/phamdat/textout";
-	  FILE * my_file = safe_fopen(filename, "w");
-	  if (my_file) {
-	    print_text(my_file, r);
-	    safe_fclose(my_file, filename);
-	  }
-	  free(filename);
-	}
 	found_filter = TRUE;
       } else {
 	MERGE_TEXTS(r, temp);
