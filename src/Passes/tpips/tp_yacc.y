@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.94  1998/11/24 19:04:55  coelho
+ * check lazy_open_module state.
+ *
  * Revision 1.93  1998/11/24 18:38:49  coelho
  * %MAIN is fixed. if none, try to parse just in case.
  *
@@ -774,19 +777,17 @@ i_delete: TK_DELETE TK_NAME /* workspace name */ TK_ENDOFLINE
 
 i_module: TK_MODULE TK_NAME /* module name */ TK_ENDOFLINE
 	{
-	    pips_debug(7,"reduce rule i_module\n");
-
-	    if (tpips_execution_mode) {
-		if (db_get_current_workspace_name()) {
-		    lazy_open_module (strupper($2,$2));
-		    $$ = TRUE;
-		} else {
-		    pips_user_error("No workspace open. "
-				    "Open or create one!\n");
-		    $$ = FALSE;
-		}
+	  pips_debug(7,"reduce rule i_module\n");
+	  
+	  if (tpips_execution_mode) {
+	    if (db_get_current_workspace_name()) {
+	      $$ = lazy_open_module(strupper($2,$2));
+	    } else {
+	      pips_user_error("No workspace open. Open or create one!\n");
+	      $$ = FALSE;
 	    }
-	    free($2);
+	  }
+	  free($2);
 	}
 	;
 
