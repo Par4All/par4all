@@ -325,71 +325,8 @@ static char * read_external(int which)
   return (*(dp->ex.read))(yyin, yyinput);
 }
 
-
-/* ENTER_TABULATED_DEF enters a new definition (previous refs are allowed if
-   ALLOW_REF) in the INDEX tabulation table of the DOMAIN, with the unique
-   ID and value CHUNKP. */
-
-gen_chunk *
-enter_tabulated_def(
-    int index,
-    int domain,
-    char *id,
-    gen_chunk *chunkp,
-    int allow_ref)
-{
-    gen_chunk *hash ;
-
-    if( Gen_tabulated_[ index ] == (gen_chunk *)NULL ) {
-	fatal( "enter_tabulated_def: Uninitialized %s\n", 
-	       Domains[ domain ].name ) ;
-    }
-    
-    if ((hash=(gen_chunk *) gen_get_tabulated_name_basic(domain, id)) !=
-	(gen_chunk *)HASH_UNDEFINED_VALUE ) {
-	
-	/* redefinitions of tabulated should not be allowed...
-	 * but you cannot be user it is a redefinition if allow_ref
-	 */
-	if(!allow_ref)
-	    (void) fprintf(stderr, "[make_%s] warning: %s redefined\n", 
-			   Domains[domain].name, id);
-
-	/* actually very obscure there... seems that negative domain
-	 * numbers are used to encode something... already used/seen ???
-	 */
-	if( allow_ref && hash->i < 0 ) 
-	{
-	    int i, size = gen_size( Domains+domain ) ;
-	    gen_chunk *cp, *gp ;
-
-	    hash->i = -hash->i ;
-
-	    if( (gp=(Gen_tabulated_[ index ]+hash->i)->p) == NULL ) {
-		fatal( "make_def: Null for %d%c%s\n", domain, HASH_SEPAR, id);
-	    }
-	    for( cp=chunkp, i=0 ; i<size ; i++ ) {
-		*gp++ = *cp++ ;
-	    }
-	    ((Gen_tabulated_[ index ]+hash->i)->p+1)->i = hash->i ;
-	    return( (Gen_tabulated_[ index ]+hash->i)->p ) ;
-	} 
-	else {
-	    if (hash_warn_on_redefinition_p()) {
-		user("Tabulated entry %d%c%s already defined: updating\n",
-		     domain, HASH_SEPAR, id);
-	    }
-	}
-    }
-    else {
-	hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
-	hash->i = gen_find_free_tabulated( &Domains[ domain ] ) ;
-	gen_put_tabulated_name(domain, id, (char *)hash);
-    }
-    (Gen_tabulated_[ index ]+hash->i)->p = chunkp ;
-    (chunkp+1)->i = hash->i ;
-    return( chunkp ) ;
-}
+extern gen_chunk * 
+  gen_enter_tabulated_def(int, int, char *, gen_chunk *, int);
 
 /* MAKE_DEF defines the object CHUNK of name STRING to be in the tabulation 
    table INT. domain translation is handled before in Chunk.
@@ -399,8 +336,8 @@ static gen_chunk * make_def(gen_chunk * gc)
   int domain = gc->i;
   char * id = strdup((gc+2)->s);
   message_assert("domain is tabulated", Domains[domain].index!=-1);
-  return enter_tabulated_def(Domains[domain].index, domain, id, gc, 
-			     newgen_allow_forward_ref) ;
+  return gen_enter_tabulated_def(Domains[domain].index, domain, id, gc, 
+				 newgen_allow_forward_ref) ;
 }
 
 /* MAKE_REF references the object of hash name STRING in the tabulation table
