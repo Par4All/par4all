@@ -30,11 +30,9 @@
  * Remi Triolet, Malik Imadache, Francois Irigoin, Yi-Qing Yang, 
  * Corinne Ancourt, Be'atrice Creusillet.
  *
- * Last modified : Be'atrice Creusillet, 16/12/94
  */
 
 #include <stdio.h>
-#include <setjmp.h>
 #include <assert.h>
 
 #include "boolean.h"
@@ -42,14 +40,6 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-
-
-jmp_buf overflow_error; 
-                 /* to deal with overflow errors occuring during the projection 
-                  * of a Psysteme along a variable */
-
-
-
 
 /* void sc_projection_along_variable_ofl_ctrl(Psysteme *psc, Variable v, 
  *                                            int ofl_ctrl)
@@ -848,12 +838,12 @@ Psysteme sc;
 Pvecteur pv;
 {
     Psysteme sc1 = sc_dup(sc);
-    if (setjmp(overflow_error)) {
+    CATCH(overflow_error) {
 	/* sc_rm(sc1); */
 	sc1=NULL;
 	return sc;
     }
-    else {
+    TRY {
 	boolean exact = TRUE;
 	sc1 = sc_projection_ofl_along_variables_with_test(sc1,pv,&exact);
 	sc_rm(sc);
