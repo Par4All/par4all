@@ -168,6 +168,16 @@ make_parameter_list(int n, parameter (* mkprm)(void))
 	    l = CONS(PARAMETER, mkprm(), l);
 	}
     }
+    else {
+	/* varargs */
+	parameter p = mkprm();
+	type pt = copy_type(parameter_type(p));
+	type v = make_type(is_type_varargs, pt);
+	parameter vp = make_parameter(v, make_mode(is_mode_reference, UU));
+
+	l = CONS(PARAMETER, vp, l);
+	free_parameter(p);
+    }
     return l;
 }
 
@@ -652,17 +662,17 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"DDIM", 2, double_to_double_type},
     {"DPROD", 2, real_to_double_type},
     {"MAX", (INT_MAX), default_intrinsic_type},
-    {"MAX0", (INT_MAX), default_intrinsic_type},
-    {"AMAX1", (INT_MAX), default_intrinsic_type},
-    {"DMAX1", (INT_MAX), default_intrinsic_type},
-    {"AMAX0", (INT_MAX), default_intrinsic_type},
-    {"MAX1", (INT_MAX), default_intrinsic_type},
+    {"MAX0", (INT_MAX), integer_to_integer_type},
+    {"AMAX1", (INT_MAX), real_to_real_type},
+    {"DMAX1", (INT_MAX), double_to_double_type},
+    {"AMAX0", (INT_MAX), integer_to_real_type},
+    {"MAX1", (INT_MAX), real_to_integer_type},
     {"MIN", (INT_MAX), default_intrinsic_type},
-    {"MIN0", (INT_MAX), default_intrinsic_type},
-    {"AMIN1", (INT_MAX), default_intrinsic_type},
-    {"DMIN1", (INT_MAX), default_intrinsic_type},
-    {"AMIN0", (INT_MAX), default_intrinsic_type},
-    {"MIN1", (INT_MAX), default_intrinsic_type},
+    {"MIN0", (INT_MAX), integer_to_integer_type},
+    {"AMIN1", (INT_MAX), real_to_real_type},
+    {"DMIN1", (INT_MAX), double_to_double_type},
+    {"AMIN0", (INT_MAX), integer_to_real_type},
+    {"MIN1", (INT_MAX), real_to_integer_type},
     {"LEN", 1, character_to_integer_type},
     {"INDEX", 2, character_to_integer_type},
     {"AIMAG", 1, complex_to_real_type},
