@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/08/10 18:02:12 $, 
+# $Date: 1995/08/10 18:06:19 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -104,7 +104,7 @@ do
 	     HPFC='-p HPFC_INSTALL' ;;
 	 full)
 	     DELETE='Delete' ;
-	     HPFC='-p HPFC_INSTALL' ;;
+	     HPFC='-p HPFC_INSTALL' ;
 	     MAKE='gmake' ;;
 	 timing)
 	     TIMEPROP='-1 LOG_TIMINGS' ;;
