@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1996/02/16 10:07:08 $, ) 
+ * ($Date: 1996/02/29 19:05:22 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -377,6 +377,10 @@ void fprint_entity_list(FILE *fp, list l);
  */
 #define hpfc_warning \
     if (!get_bool_property("HPFC_NO_WARNING")) pips_user_warning
+
+/* fake resources...
+ */
+#define NO_FILE (strdup("fake file name"))
 
 /* that is all
  */
