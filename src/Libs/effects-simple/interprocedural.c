@@ -645,7 +645,7 @@ summary_to_proper_effects(
     list pc, le = NIL, l_formals;
     int ipc, n_formals;
 
-    pips_debug(3, "effects on formals\n");
+    pips_debug(3, "effects on formals on call to %s\n", entity_name(func));
 
     /* check the number of parameters */
     l_formals = module_formal_parameters(func);
@@ -698,49 +698,49 @@ summary_to_proper_effects(
 	{
 	    /* check if there is no must write effect */
 	    MAP(EFFECT, formal_effect,
+	    {
+		entity formal_param = effect_entity(formal_effect);
+		
+		if (ith_parameter_p(func, formal_param, ipc))
 		{
-		    entity formal_param = effect_entity(formal_effect);
-		    
-		    if (ith_parameter_p(func, formal_param, ipc))
-		    {
-			if (effect_write_p(formal_effect)) {
-			    char * term = NULL;
-
-			    switch(ipc) {
-			    case 1: term = "st";
-				break;
-			    case 2: term = "nd";
-				break;
-			    case 3: term ="rd";
-				break;
-			    default:
-				term = "th";
-			    }
-
-			    if (effect_must_p(formal_effect))
-				pips_user_error
-				    ("\nmodule %s called by module %s:\n\twrite"
-				     " effect on non-variable actual"
-				     " parameter thru %d%s formal parameter %s\n",
-				     module_local_name(func),
-				     module_local_name
-				     (get_current_module_entity()),
-				     ipc, term, entity_local_name(formal_param));
-			    else
-				pips_user_warning
-				    ("\nmodule %s called by module %s:\n\t"
-				     "possible write effect on non-variable "
-				     "actual parameter thru %d%s "
-				     "formal parameter %s\n",
-				     module_local_name(func),
-				     module_local_name
-				     (get_current_module_entity()),
-				     ipc, term, 
-				     entity_local_name(formal_param));
+		    if (effect_write_p(formal_effect)) {
+			char * term = NULL;
+			
+			switch(ipc) {
+			case 1: term = "st";
+			    break;
+			case 2: term = "nd";
+			    break;
+			case 3: term ="rd";
+			    break;
+			default:
+			    term = "th";
 			}
+			
+			if (effect_must_p(formal_effect))
+			    pips_user_error
+				("\nmodule %s called by module %s:\n\twrite"
+				 " effect on non-variable actual"
+				 " parameter thru %d%s formal parameter %s\n",
+				 module_local_name(func),
+				 module_local_name
+				 (get_current_module_entity()),
+				 ipc, term, entity_local_name(formal_param));
+			else
+			    pips_user_warning
+				("\nmodule %s called by module %s:\n\t"
+				 "possible write effect on non-variable "
+				 "actual parameter thru %d%s "
+				 "formal parameter %s\n",
+				 module_local_name(func),
+				 module_local_name
+				 (get_current_module_entity()),
+				 ipc, term, 
+				 entity_local_name(formal_param));
 		    }
-		}, 
-		    func_sdfi);
+		}
+	    }, 
+		func_sdfi);
 	    
 	    /* if everything is fine, then the effects are the read effects
 	     * of the expression */
