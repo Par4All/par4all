@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/11/02 18:03:46 $, ) 
+ * ($Date: 1995/11/17 12:00:58 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -579,10 +579,10 @@ remapping_stats(
 	     CONS(STATEMENT, postl,
 		  NIL))));
 
-    statement_comments(result) = 
-	catdup("c - ", (what & LZY) ? "lazy " : "",
+    statement_comments(result) = strdup(concatenate
+	("c - ", (what & LZY) ? "lazy " : "",
 	       t==CPY ? "copy" : t==SND ? "send" : t==RCV ? "receiv" :
-	       t==BRD ? "broadcast" : "?",  "ing\n", NULL);
+	       t==BRD ? "broadcast" : "?",  "ing\n", NULL));
 
     return result;
 }
@@ -968,8 +968,8 @@ generate_hpf_remapping_file(
 
     /* put it in a file
      */
-    file_name = catdup(db_get_current_workspace_directory(),
-		       "/", remapping_file_name(r), NULL);
+    file_name = strdup(concatenate(db_get_current_workspace_directory(),
+				   "/", remapping_file_name(r), NULL));
 
     f = safe_fopen(file_name, "w");
     print_text(f, t);
@@ -990,8 +990,8 @@ generate_remapping_include(
     statement result;
 
     result = make_empty_statement();
-    statement_comments(result) =
-	catdup("      include '", remapping_file_name(r), "'\n", NULL);
+    statement_comments(result) = strdup(concatenate
+        ("      include '", remapping_file_name(r), "'\n", NULL));
 
     return result;
 }
