@@ -4,6 +4,9 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.55  2000/04/14 13:28:22  coelho
+ * same string moved.
+ *
  * Revision 1.54  2000/04/13 16:23:47  coelho
  * ...
  *
@@ -96,8 +99,6 @@
 /* non user domain must be taken care from outside? */
 /* #define FIRST_USER_DOMAIN (7) */
 #define TYPE(bp) (bp-Domains-Number_imports-Current_start)
-
-#define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
 
 #define DomainNumberError \
   "\"[newgen internal error]\""  \
