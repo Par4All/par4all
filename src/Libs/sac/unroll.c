@@ -13,6 +13,8 @@
 #include "effects-generic.h"
 #include "transformations.h"
 
+#include "control.h"
+
 #include "sac.h"
 
 
