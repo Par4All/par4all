@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.103  2003/08/11 13:57:16  coelho
+ * hop.
+ *
  * Revision 1.102  2003/08/08 16:31:36  irigoin
  * Two currently useless static functions commented out to silence gcc
  *
@@ -102,8 +105,11 @@
 #include "preprocessor.h"
 
 extern string strdup(string);
-static bool dot_c_file_p(string);
 extern int putenv(char *); /* Supposedly in stdlib.h */
+
+static bool dot_c_file_p(string);
+static bool dot_f_file_p(string);
+static bool dot_F_file_p(string);
 
 #define skip_line_p(s) \
   ((*(s))=='\0' || (*(s))=='!' || (*(s))=='*' || (*(s))=='c' || (*(s))=='C')
@@ -662,10 +668,12 @@ static bool pips_split_file(string name, string tempfile)
   FILE * out = safe_fopen(tempfile, "w");
   string dir = db_get_current_workspace_directory();
 
-  if(dot_c_file_p(name))
+  if (dot_c_file_p(name))
     err = csplit(dir, name, out);
-  else /* .f or .F */
+  else if (dot_f_file_p(name) || dot_F_file_p(name)) 
     err = fsplit(dir, name, out);
+  else
+    pips_user_error("unexpected file name for splitting: %s", name);
 
   free(dir);
   safe_fclose(out, tempfile);
@@ -673,8 +681,8 @@ static bool pips_split_file(string name, string tempfile)
   if (err) fprintf(stderr, "split error: %s\n", err);
   return err? TRUE: FALSE;
 }
-
-/********************************************** MANAGING .F AND .c FILES WITH CPP */
+
+/***************************************** MANAGING .F AND .c FILES WITH CPP */
 
 /* an issue is that the cpp used for .F must be Fortran 77 aware.
  */
@@ -947,7 +955,8 @@ bool process_user_file(string file)
     ;
   }
 
-  /* CPP if file extension if .F or .c (assumes string_equal_p(nfile, initial_file))
+  /* CPP if file extension if .F or .c 
+   * (assumes string_equal_p(nfile, initial_file))
    */
   cpp_processed_p = dot_F_file_p(nfile) || dot_c_file_p(nfile);
 
@@ -959,7 +968,7 @@ bool process_user_file(string file)
       return FALSE;
     }
   }
-  else if(!dot_f_file_p(nfile)) {
+  else if (!dot_f_file_p(nfile)) {
     pips_user_error("Unexpected file extension\n");
   }
 
@@ -968,8 +977,10 @@ bool process_user_file(string file)
    * it a zzz00n.f name 
    * Let's hope no user module is called ###???.f 
    */
-  file_list = strdup(concatenate(dir_name,
-				 dot_c_file_p(nfile)? "/.csplit_file_list" : "/.fsplit_file_list", 0));
+  file_list = 
+    strdup(concatenate(dir_name,
+		       dot_c_file_p(nfile)? 
+		         "/.csplit_file_list" : "/.fsplit_file_list", 0));
   unlink(file_list);
 
   user_log("Splitting file    %s\n", nfile);
