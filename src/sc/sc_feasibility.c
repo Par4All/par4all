@@ -282,6 +282,9 @@ boolean ofl_res;
   if (sc_rn_p(sc)) 
     return TRUE;
 
+  decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, 2);
+  decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, 1);
+
   /* else
    */
   switch (ofl_ctrl) 
@@ -319,33 +322,29 @@ boolean ofl_res;
        *   to build and manipulate.
        *
        * suggestion implemented here: 
-       *  1/ project equalities as much as possible.
+       *  1/ project equalities as much as possible,
+       *     if there are many of them... ???
        *  2/ chose between FM and SIMPLEX **after** that?
        */
-
-      sw = sc_dup(sc);
-
-      ok = sc_fm_project_variables(sw, integer_p, TRUE, ofl_ctrl);
-
-      if (!ok) break;
-
-      /* else it looks feasible as far as equalities are concerned, 
-       * let us deal with inequalities now.
-       */
-	
-      decision_data(sc_egalites(sw), &n_cont_eq, &n_ref_eq, 2);
-      decision_data(sc_inegalites(sw), &n_cont_in, &n_ref_in, 1);
-
+      
       use_simplex = (n_cont_in >= NB_CONSTRAINTS_MAX_FOR_FM || 
 		     (n_cont_in>=10 && n_ref_in>2*n_cont_in));
 
+      if (use_simplex && n_cont_eq >= 20)
+      {
+	sw = sc_dup(sc);
+	ok = sc_fm_project_variables(sw, integer_p, TRUE, ofl_ctrl);
+	if (!ok) break;
+      }
+
       if (use_simplex)
       {
-	ok = sc_simplexe_feasibility_ofl_ctrl(sw, ofl_ctrl);
+	ok = sc_simplexe_feasibility_ofl_ctrl(sw? sw: sc, ofl_ctrl);
       }
       else 
       {
-	ok = sc_fourier_motzkin_feasibility_ofl_ctrl(sw, integer_p, ofl_ctrl);
+	ok = sc_fourier_motzkin_feasibility_ofl_ctrl
+	  (sw? sw: sc, integer_p, ofl_ctrl);
       }
     }
   }
