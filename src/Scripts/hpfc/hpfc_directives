@@ -2,6 +2,9 @@
 #
 # $Id$
 # $Log: hpfc_directives,v $
+# Revision 1.76  1997/03/31 09:21:37  coelho
+# data is a declaration
+#
 # Revision 1.75  1997/03/19 17:48:20  coelho
 # better RCS headers.
 #
@@ -322,7 +325,7 @@ $SED "# clean template and processors declaration calls
 # i.e. last line of the declarations.
 #
 # first, find the last declaration line 
-# (program/subroutine/function/parameter/common are also needed...)
+# (program/subroutine/function/parameter/common/data are also needed...)
 
 LINE=`$SED -n '
      /^[^Cc\*!].... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	]/=
@@ -330,6 +333,7 @@ LINE=`$SED -n '
      /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	]/=
      /^[^Cc\*!].... [ 	]*[Pp][Aa][Rr][Aa][Mm][Ee][Tt][Ee][Rr][ 	(]/=
      /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\/]/=
+     /^[^Cc\*!].... [ 	]*[Dd][Aa][Tt][Aa][ 	]/=
      /^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Rr][Ee][Aa][Ll][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Cc][Hh][Aa][Rr][Aa][Cc][Tt][Ee][Rr][ 	\*]/=
