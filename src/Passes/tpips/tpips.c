@@ -254,8 +254,8 @@ tpips_help(string line)
 	 "\tfirst delete the workspace if it exists\n");
     TP_HELP("open", "open     <workspace-name>\n",
 	 "\topen an existing workspace\n");
-    TP_HELP("close", "close    <workspace-name>\n",
-	 "\tclose an opened workspace\n");
+    TP_HELP("close", "close\n",
+	 "\tclose the current opened workspace\n");
     TP_HELP("delete", "delete   <workspace-name>\n",
 	 "\tdelete an existing workspace\n");
     TP_HELP("module", "module   <module-name>\n",
