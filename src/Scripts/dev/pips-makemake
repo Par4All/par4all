@@ -2,8 +2,9 @@
 # for debug, try: /bin/sh -vx
 #
 # $Id$
+#
 # $Log: pips-makemake,v $
-# Revision 1.313  1997/08/19 15:11:04  coelho
+# Revision 1.314  1997/08/27 09:47:32  coelho
 # *** empty log message ***
 #
 # Revision 1.312  1997/08/19 15:00:07  coelho
@@ -32,9 +33,6 @@
 #
 # Revision 1.304  1997/08/18 12:31:07  coelho
 # end of fixes for ftest, I hope;-)
-#
-# Revision 1.303  1997/08/18 10:45:45  coelho
-# ...
 #
 # Revision 1.302  1997/08/18 10:41:48  coelho
 # fixed ftest, again;-) (wpips LD added args...)
@@ -497,7 +495,7 @@ endif
 	  ln -s \$@ index.html ; \
 	  chmod -R a+r-wx * ; \
 	  chmod a+rx,ug+w,o-w . ; } 
-	touch \$@
+	echo "<html><href=\$*/index.html>index</href></html>" > \$@
 #
 %.newgen: %.tex
 	# building \$@ from \$<
@@ -1047,5 +1045,5 @@ rm -f $MAKEFILE.depend* .depend
 ### end good case
 echo
 
-# end of $RCSfile: pips-makemake,v $
+# end of pips-makemake
 #
