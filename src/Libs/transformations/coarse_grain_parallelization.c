@@ -4,7 +4,10 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * This File contains the functions parallelizing loops from the 
- * regions of their bodies.
+ * regions of their bodies. This enables the parallelization of loops
+ * containing if constructs and unstructured parts of code. But it may
+ * be less aggressive that Allen and Kennedy on other loop nests, because
+ * the regions of the loop bodies may be imprecise.
  *
  */
 
@@ -46,9 +49,10 @@
 /* statement stack */
 DEFINE_LOCAL_STACK(current_stmt, statement)
 
+/* FIFO list of integers, to keep track of parallel loops */
 static list l_parallel_loops = NIL;
 
-/* This list is handled in reverse order to allow LIFO */
+/* This list is handled in normal order to allow FIFO (!= stack)*/
 static void
 set_l_parallel_loops()
 {
@@ -67,7 +71,7 @@ reset_l_parallel_loops()
 static void
 l_parallel_loops_push(int parallel_p)
 {
-    l_parallel_loops = gen_nconc(CONS(INT, parallel_p, NIL), l_parallel_loops);
+    l_parallel_loops = gen_nconc(l_parallel_loops,CONS(INT, parallel_p, NIL));
 }
 
 static void
@@ -95,7 +99,7 @@ l_parallel_loops_head()
 /* COARSE GRAIN PARALLELIZATION                                                  */
 /*********************************************************************************/
 
-static void
+static bool
 whole_loop_parallelize(loop l)
 {
     int this_loop_tag = l_parallel_loops_head();
@@ -105,6 +109,7 @@ whole_loop_parallelize(loop l)
 	execution_tag(loop_execution(l)) = is_execution_parallel; 
     }
     l_parallel_loops_pop();
+    return(TRUE);
 }
 
 static bool 
@@ -319,7 +324,7 @@ coarse_grain_loop_parallelization(statement module_stat,
 		      NULL);   
 
     gen_multi_recurse(module_parallelized_stat,
-		      loop_domain, gen_null, whole_loop_parallelize, 
+		      loop_domain, whole_loop_parallelize, gen_null,
 		      NULL);   
     
     pips_debug(1,"end\n");
