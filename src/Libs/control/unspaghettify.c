@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/07/21 22:26:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/22 14:01:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/07/21 22:26:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/07/22 14:01:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -1068,11 +1068,11 @@ static void
 display_interval_graph(graph intervals)
 {
     MAP(VERTEX, node, {
-	pips_debug(0, "Interval %p, control nodes:\n", (int) node);
+	pips_debug(0, "Interval %p, control nodes:\n", node);
 	display_address_of_control_nodes(interval_vertex_label_controls(vertex_vertex_label(node)));
 	pips_debug(0, "Interval predecessors:\n");
 	MAP(VERTEX, predecessor, {
-	    pips_debug(0, "\t%p\n", (int) predecessor_vertex(predecessor));
+	    pips_debug(0, "\t%p\n", predecessor_vertex(predecessor));
 	}, vertex_predecessors(node));    
     }, graph_vertices(intervals));
 }
@@ -1096,7 +1096,6 @@ interval_graph(graph intervals)
 {
     bool a_node_has_been_fused;
     bool the_interval_graph_has_been_modified = FALSE;
-    set selected_nodes = set_make(set_pointer);
     vertex entry_interval = VERTEX(CAR(graph_vertices(intervals)));
 
     /* Apply the T2 transformation, that is equivalent to my
@@ -1105,14 +1104,13 @@ interval_graph(graph intervals)
     do {
 	a_node_has_been_fused = FALSE;
 	MAP(VERTEX, node, {
-	    pips_debug(8, "vertex %p.\n", (int) node);
+	    pips_debug(8, "vertex %p.\n", node);
 	    if (node != entry_interval
 		/* The entry interval is kept untouched */
 		&& gen_length(vertex_predecessors(node)) == 1) {
 		/* Fuse a node with its only predecessor: */
 		vertex p_v = predecessor_vertex(PREDECESSOR(CAR(vertex_predecessors(node))));
-		pips_debug(8, "\tonly one vertex predecessor %p.\n",
-			   (int) p_v);
+		pips_debug(8, "\tonly one vertex predecessor %p.\n", p_v);
 		add_node_to_interval(intervals, p_v, node);
 		/* Let's go to find a new interval to fuse: */
 		a_node_has_been_fused = TRUE;
@@ -1174,14 +1172,13 @@ control_graph_to_interval_graph_format(control entry_node)
     graph intervals = make_graph(NIL);
 
     hash_table control_to_interval_node = hash_table_make(hash_pointer, 0);
-    pips_debug(5, "Control entry node %p:\n", (int) entry_node);   
+    pips_debug(5, "Control entry node %p:\n", entry_node);   
     CONTROL_MAP(c, {
 	vertex interval =
 	    create_or_get_an_interval_node(c,
 					   intervals,
 					   control_to_interval_node);
-	pips_debug(6, "\tControl %p -> interval %p\n",
-		   (int) c,  (int) interval);   
+	pips_debug(6, "\tControl %p -> interval %p\n", c,  interval);   
 	MAP(CONTROL, p, {
 	    vertex vertex_predecessor =
 		create_or_get_an_interval_node(p,
@@ -1192,7 +1189,7 @@ control_graph_to_interval_graph_format(control entry_node)
 	    vertex_predecessors(interval) =
 		CONS(PREDECESSOR, v_p, vertex_predecessors(interval));
 	    pips_debug(7, "\t\tControl predecessor %p -> interval %p\n",
-		   (int) p,  (int) vertex_predecessor);   
+		   p,  vertex_predecessor);   
 	}, control_predecessors(c));
     }, entry_node, blocs);
     gen_free_list(blocs);
@@ -1209,12 +1206,12 @@ interval_exit_nodes(vertex interval)
 {
     list exit_controls = NIL;
     
-    pips_debug(6, "Interval %p with controls ", (int) interval);
+    pips_debug(6, "Interval %p with controls ", interval);
     display_address_of_control_nodes(interval_vertex_label_controls(vertex_vertex_label(interval)));
     MAP(CONTROL, c, {
-	pips_debug(7, "\n\tControl %p:\n", (int) c);   
+	pips_debug(7, "\n\tControl %p:\n", c);   
 	MAP(CONTROL, successor, {	    
-	    pips_debug(7, "\t\tControl successor %p:\n", (int) successor);   
+	    pips_debug(7, "\t\tControl successor %p:\n", successor);   
 	    if (!gen_in_list_p(successor,
 			       interval_vertex_label_controls(vertex_vertex_label(interval)))) {
 		/* A successor that is not in the interval is an exit
@@ -1474,7 +1471,7 @@ control_graph_recursive_decomposition(unstructured u)
     intervals = control_graph_to_interval_graph_format(entry_node);
 
     pips_debug(3, "Entering with unstructured %p (%p, %p)\n",
-	       (int) u, (int) entry_node, (int) exit_node);
+	       u, entry_node, exit_node);
     ifdebug(5) {
 	pips_debug(0, "Nodes from entry_node: ");
 	display_linked_control_nodes(entry_node);
