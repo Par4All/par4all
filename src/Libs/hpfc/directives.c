@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/10/05 13:19:52 $, )
+ * ($Date: 1995/10/17 11:12:33 $, )
  */
 
 #include "defines-local.h"
@@ -140,7 +140,7 @@ alignment_p(list /* of expressions */ align_src,
 
     /*  the alignment should be a simple affine expression
      */
-    pips_assert("affine align subscript", *pshift==0 ? size<=1 : size<=2)
+    pips_user_assert("affine align subscript", *pshift==0 ? size<=1 : size<=2)
 
     /*   constant alignment case
      */
@@ -159,8 +159,8 @@ alignment_p(list /* of expressions */ align_src,
 	{
 	    v_src = normalized_linear(n);
 
-	    pips_assert("simple index",
-			vect_size(v_src)==1 && var_of(v_src)!=TCST);
+	    pips_user_assert("simple index",
+			     vect_size(v_src)==1 && var_of(v_src)!=TCST);
 	    
 	    *prate = vect_coeff(var_of(v_src), v);
 
@@ -188,25 +188,52 @@ extract_the_align(reference alignee,
     list/* of alignments  */ aligns    = NIL,
 	/* of expressions */ align_src = reference_indices(alignee),
 	                     align_sub = reference_indices(temp);
-    entity template = reference_variable(temp);
-    int array_dim, template_dim = 1;
+    entity template = reference_variable(temp), 
+           array = reference_variable(alignee);
+    int array_dim, template_dim, tndim, andim;
     Value rate, shift;
 
-    pips_assert("template", entity_template_p(template));
+    pips_user_assert("align with a template", entity_template_p(template));
+    tndim = NumberOfDimension(template);
+    andim = NumberOfDimension(array);
     
     /*  each array dimension is looked for a possible alignment
      */
-    for(template_dim=1; !ENDP(align_sub); POP(align_sub), template_dim++)
+
+    if (ENDP(align_src)) /* align A with T - implicit alignment */
     {
-	if (alignment_p(align_src, EXPRESSION(CAR(align_sub)),
-			&array_dim, &rate, &shift))
-	    aligns = CONS(ALIGNMENT, 
-			  make_alignment(array_dim,
-					 template_dim,
-					 Value_to_expression(rate),
-					 Value_to_expression(shift)),
+	int dim, ndim, tlower, alower, unused;
+	pips_assert("no template subscripts", ENDP(align_sub));
+
+	ndim=MIN(andim,tndim);
+	for (dim=1; dim<=ndim; dim++)
+	{
+	    get_entity_dimensions(template, dim, &tlower, &unused);
+	    get_entity_dimensions(array, dim, &alower, &unused);
+	      
+	    aligns = CONS(ALIGNMENT,
+			  make_alignment(dim, dim, 
+					 Value_to_expression(1),
+					 Value_to_expression(-alower+tlower)),
 			  aligns);
+	}
     }
+    else /* explicit alignment */
+    {
+	for(template_dim=1; !ENDP(align_sub); POP(align_sub), template_dim++)
+	{
+	    if (alignment_p(align_src, EXPRESSION(CAR(align_sub)),
+			    &array_dim, &rate, &shift))
+		aligns = CONS(ALIGNMENT, 
+			      make_alignment(array_dim,
+					     template_dim,
+					     Value_to_expression(rate),
+					     Value_to_expression(shift)),
+			      aligns);
+	}
+    }
+
+    ifdebug(8) gen_map(print_alignment, aligns);	
 
     /* built align is returned. should be normalized?
      */
@@ -240,20 +267,23 @@ one_align_directive(reference alignee,
 {
     entity template = reference_variable(temp),
 	   array    = reference_variable(alignee);
-    align a = extract_the_align(alignee, temp);
-
-    normalize_align(array, a);
+    align a;
     
     pips_debug(3, "%s %saligned with %s\n", entity_name(array),
 	       dynamic ? "re" : "", entity_name(template));
+
+    a = extract_the_align(alignee, temp);
+    normalize_align(array, a);
+
+    ifdebug(8) print_align(a);
 
     if (dynamic)
     {
 	statement current = current_stmt_head();
 	entity new_array;
 
-	pips_assert("dynamic array realignment",
-		    array_distributed_p(array) && dynamic_entity_p(array));
+	pips_user_assert("dynamic array realignment",
+	    array_distributed_p(array) && dynamic_entity_p(array));
 
 	new_array = array_synonym_aligned_as(array, a);
 	propagate_synonym(current, array, new_array);
@@ -281,7 +311,7 @@ handle_align_and_realign_directive(entity f,
 
     /* last points to the last item of args, which should be the template
      */
-    pips_assert("at least 2 arguments", gen_length(args)>=2);
+    pips_user_assert("align sg with sg", gen_length(args)>=2);
     template = expression_to_reference(EXPRESSION(CAR(last)));
 
     gen_map(normalize_all_expressions_of, args);
@@ -337,39 +367,59 @@ static distribute
 extract_the_distribute(reference distributee, reference proc)
 {
     expression parameter = expression_undefined;
-    entity processor = reference_variable(proc);
+    entity processor = reference_variable(proc),
+           template = reference_variable(distributee);
     list/* of expressions */   lformat = reference_indices(distributee),
 	                       largs,
 	/* of distributions */ ldist = NIL;
+    int npdim, ntdim;
     tag format;
+
+    ntdim = NumberOfDimension(template);
+    npdim = NumberOfDimension(processor);
+
+    pips_user_assert("more template dimensions than processor dimensions",
+		     ntdim>=npdim);
 
     /* the template arguments are scanned to build the distribution
      */
-    for(; !ENDP(lformat); POP(lformat))
+    if (ENDP(lformat)) /* distribute T onto P - implicit */
     {
-	format = distribution_format(EXPRESSION(CAR(lformat)), &largs);
-
-	switch (format)
+	int dim;
+	for (dim=1; dim<=npdim; dim++)
+	    ldist = CONS(DISTRIBUTION,
+			 make_distribution(make_style(is_style_block, UU),
+					   expression_undefined),
+			 ldist);
+    }
+    else /* explicit distribution */
+    {
+	for(; !ENDP(lformat); POP(lformat))
 	{
-	case is_style_block:
-	case is_style_cyclic:
-	    pips_assert("valid distribution", gen_length(largs)<=1);
-
-	    parameter = ENDP(largs) ? 
-		expression_undefined :                   /* implicit size */
-		copy_expression(EXPRESSION(CAR(largs))); /* explicit size */
-
-	    break;
-	case is_style_none:
-	    parameter = expression_undefined;
-	    break;
-	default:
-	    pips_internal_error("unexpected style tag\n");
+	    format = distribution_format(EXPRESSION(CAR(lformat)), &largs);
+	    
+	    switch (format)
+	    {
+	    case is_style_block:
+	    case is_style_cyclic:
+		pips_assert("valid distribution", gen_length(largs)<=1);
+		
+		parameter = ENDP(largs) ? 
+		    expression_undefined :                /* implicit size */
+                 copy_expression(EXPRESSION(CAR(largs))); /* explicit size */
+		
+		break;
+	    case is_style_none:
+		parameter = expression_undefined;
+		break;
+	    default:
+		pips_internal_error("unexpected style tag (%d)\n", format);
+	    }
+	    
+	    ldist = CONS(DISTRIBUTION, 
+			 make_distribution(make_style(format, UU), parameter),
+			 ldist);
 	}
-
-	ldist = CONS(DISTRIBUTION, 
-		     make_distribution(make_style(format, UU), parameter),
-		     ldist);
     }
     
     return make_distribute(gen_nreverse(ldist), processor);
@@ -386,7 +436,7 @@ one_distribute_directive(reference distributee,
            template  = reference_variable(distributee);
     distribute d = extract_the_distribute(distributee, proc);
 
-    pips_assert("no indices to processor", ENDP(reference_indices(proc)));
+    pips_user_assert("no indices to processor", ENDP(reference_indices(proc)));
     
     normalize_distribute(template, d);
 
@@ -398,7 +448,7 @@ one_distribute_directive(reference distributee,
 	statement current = current_stmt_head();
 	entity new_t;
 
-	pips_assert("dynamic template redistribution",
+	pips_user_assert("dynamic template redistribution",
 		  entity_template_p(template) && dynamic_entity_p(template));
 
 	new_t = template_synonym_distributed_as(template, d);
@@ -448,7 +498,7 @@ handle_distribute_and_redistribute_directive(
 
     /* last points to the last item of args, which should be the processors
      */
-    pips_assert("at least 2 args", gen_length(args)>=2);
+    pips_user_assert("distribute sg with sg", gen_length(args)>=2);
     proc = expression_to_reference(EXPRESSION(CAR(last)));
     gen_map(normalize_all_expressions_of, args);
 
@@ -617,10 +667,10 @@ HANDLER_PROTOTYPE(set)
 	string property;
 	int val, i;
 	
-	pips_assert("two args", gen_length(args)==2);
+	pips_user_assert("two args", gen_length(args)==2);
 	arg1 = EXPRESSION(CAR(args));
 	arg2 = EXPRESSION(CAR(CDR(args)));
-	pips_assert("constant args",
+	pips_user_assert("constant args",
 		    expression_is_constant_p(arg1) &&
 		    expression_is_constant_p(arg2));
 
