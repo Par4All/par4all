@@ -109,24 +109,35 @@ while (%changed)
 
 # module -> count in how many cycles it appears
 my %vertex_count = ();
+my %edge_count = ();
 
 foreach my $module (keys %indirect_callees)
 {
     #print STDERR "$module: ",
     #(join ' ', values %{$indirect_callees{$module}}),
     #"\n";
-
     if (exists ${$indirect_callees{$module}}{$module})
     {
 	my $cycle = ${$indirect_callees{$module}}{$module};
 	print STDOUT "recursion on $module: $cycle\n";
+        my $not_first = 0;
+        my $previous = $module;
         foreach my $m (split /->/, $cycle) {
+	    next unless $not_first++;
 	    $vertex_count{$m}++;
+	    $edge_count{"$previous->$m"}++;
+	    $previous = $m;
 	}       
     }
 }
 
-for my $module (keys %vertex_count)
+for my $module (sort(sub { $vertex_count{$a} <=> $vertex_count{$b}; },
+    keys %vertex_count))
 {
     print STDOUT "$module count is $vertex_count{$module}\n";
+}
+
+for my $edge (keys %edge_count)
+{
+    print "$edge: $edge_count{$edge}\n";
 }
