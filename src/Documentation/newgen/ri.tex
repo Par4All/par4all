@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/01/09 13:06:21 $, 
+%% $Date: 1997/02/06 17:41:29 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
@@ -913,20 +913,27 @@ les statements sans label.
 
 Member {\tt number} contains an external number which is not used by
 PIPS. This number may be used as a statement identifier for debugging
-purposes or for user interaction. The default value is
-\verb+STATEMENT_NUMBER_UNDEFINED+. This number could theoretically be
-set explictly by the user\footnote{Columns 73 to 80 are discarded for
+purposes or for user interaction because PIPS components try to propagate
+it as much as possible when new code derived. For instance, several
+parallel loops derived by loop distribution have the same statement
+number, inherited from the initial sequential loop. Desugared statements
+like computed GOTOs generate several simpler statements with a unique number.
+
+The default value is \verb+STATEMENT_NUMBER_UNDEFINED+\footnote{The
+prettyprinter is not too strict and take any non-positive value as an
+undefined statement number.}. This number could theoretically be set
+explictly by the user\footnote{Columns 73 to 80 are discarded for
 executable statements.}. In fact it is set by the parser. The parser
 uses an executable statement count from the source file. Only executable
-Fortran statements are stored as statement and only them are used to
-define statement numbers. Statement number one is the first line of the
-first executable statement and thus cannot be used to retrieve the text
-in the source file with a standard text editor. This number is
-theoretically never changed by PIPS once it has been initialized by the
-parser. Once the code has been transformed, statement numbers may not
-appear in increasing order, statement number may be duplicated, for
-instance, after loop unrolling, and statement number may not exist at
-all, for instance for fully synthesized statements.
+Fortran statements and \verb/FORMAT/ statements are stored as statement
+and only them are used to define statement numbers. Statement number one
+is the first line of the first executable statement and thus cannot be
+used to retrieve the text in the source file with a standard text editor.
+This number is theoretically never changed by PIPS once it has been
+initialized by the parser. Once the code has been transformed, statement
+numbers may not appear in increasing order, statement number may be
+duplicated, for instance, after loop unrolling, and statement number may
+not exist at all, for instance for fully synthesized statements.
 
 Note that parser messages are labelled by physical line numbers.
 
@@ -1007,14 +1014,28 @@ ou de manie`re systématique avec les fonctions de parcours de NewGen,
 \verb/gen_multi_recurse/\index{gen\_multi\_recurse},...
 \end{comment}
 
-Member {\tt comments} contains the comments associated to the statement
-in the source program. This string\footnote{To avoid problems with
-static buffers, a list of strings should have been used to store
-comments.} is used by the prettyprinter. Comments are associated to the
-{\em next} executable statement. For statements with no comments, this
-member receives a special value, \verb/string_undefined/. Comments
-associated to statements that may disappear during processing, such as
-CONTINUE, RETURN and GO~TO, may disappear too.
+Member {\tt comments} contains the comments associated to the statement in
+the source program. This string\footnote{To avoid problems with static 
+buffers, a list of strings should have been used to store comments.} is
+used by the prettyprinter. Comments are associated to the {\em next}
+executable statement. For statements with no comments, this member
+receives a special value, \verb/empty_comments/\footnote{This special
+value used to be \verb/string_undefined/, but its name carried less
+semantics. Empty comments could be defined either as NULL, or the null
+length string, "", or as the Newgen special value,
+\verb/string_undefined/. The NULL string was not chosen because it is not
+specific enough and because it is not compatible with the UNIX string
+library. The null length string is compatible with the string library,
+but sharing would have to be carefully considered. To avoid many
+allocations and desallocations of one byte areas, and many storage related
+bugs, the Newgen solution was chosen, although it is not comptaible with
+the UNIX library and although Newgen does not provide such a
+library. Objects of type \verb/string/ are not 100~\% equivalent to
+objects of type \verb/char */ and guards for \verb/string_undefined/ must
+be added..}, which can be tested with predicate
+\verb/empty_comments_p()/. Comments associated to statements that may
+disappear during processing, such as CONTINUE, RETURN and GO~TO, may
+disappear too.
 
 \begin{comment}
 Le sous-domaine {\tt comments} contient le texte du commentaire associé
