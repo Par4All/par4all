@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/03/23 16:54:35 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/03/24 15:02:12 $, )
  * version $Revision$
  */
 
@@ -73,7 +73,7 @@ void io_efficient_compile(stat, hp, np)
 statement stat, *hp, *np;
 {
     list
-	entities = load_statement_local_regions(stat),
+	/* of effect */ entities = load_statement_local_regions(stat),
 	lh_collect = NIL,
 	lh_io = NIL,
 	lh_update = NIL,
@@ -91,22 +91,19 @@ statement stat, *hp, *np;
 
     MAPL(ce,
      {
-	 effect
-	     e = EFFECT(CAR(ce));
-	 entity
-	     array = reference_variable(effect_reference(e));
-	 action
-	     act = effect_action(e);
-	 approximation
-	     apr = effect_approximation(e);
+	 effect e = EFFECT(CAR(ce));
+	 entity array = reference_variable(effect_reference(e));
+	 action act = effect_action(e);
+	 approximation apr = effect_approximation(e);
 	 
-	 debug(3, "io_efficient_compile", 
-	       "array %s\n", entity_name(array));
+	 debug(3, "io_efficient_compile", "array %s\n", entity_name(array));
+
+	 message_assert("replicated array I/O not implemented", 
+			!(array_distributed_p(array) && replicated_p(array)));
 
 	 if ((!array_distributed_p(array)) && action_read_p(act)) 
 	 {
-	     debug(7, 
-		   "io_efficient_compile", 
+	     debug(7, "io_efficient_compile", 
 		   "skipping array %s movements - none needed\n", 
 		   entity_name(array));
 	     continue;
@@ -184,9 +181,7 @@ list scanners;
 Psysteme *pcond, *penum;
 {
     Pbase base = entity_list_to_base(scanners);
-
     algorithm_row_echelon(syst, base, pcond, penum);
-
     base_rm(base);
 }
 
@@ -229,7 +224,6 @@ statement *psh, *psn;
 	 * to organise a scanning of the data and the communications that 
 	 * are needed
 	 */
-
 	put_variables_in_ordered_lists
 	    (&syst, array, &parameters, &processors, &scanners, &rebuild); 
 
