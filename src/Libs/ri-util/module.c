@@ -1,5 +1,5 @@
  /* $RCSfile: module.c,v $ (version $Revision$)
-  * $Date: 1997/04/17 20:43:53 $, 
+  * $Date: 1997/04/20 15:56:38 $, 
   */
 #include <stdio.h>
 #include <string.h>
@@ -166,12 +166,12 @@ static void store_this_variable(entity var)
 {
     message_assert("defined variable", !entity_undefined_p(var));
 
+    referenced_variables_list = CONS(ENTITY, var, referenced_variables_list);
+
     if (!bound_referenced_variables_p(var))
     {
 	pips_debug(9, "%s\n", entity_name(var));
 	store_referenced_variables(var, TRUE);
-	referenced_variables_list = 
-	    CONS(ENTITY, var, referenced_variables_list);
     }
 }
 
