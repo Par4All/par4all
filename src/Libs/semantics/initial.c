@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.16  2001/12/05 17:15:48  irigoin
+ * function program_postcondition() added for total precondition computation
+ *
  * Revision 1.15  2001/07/13 13:21:13  coelho
  * hop.
  *
@@ -163,7 +166,7 @@ intersect(
     transformer t1,
     transformer t2)
 {
-    predicate_system_(transformer_relation(t1)) = (char*)
+    predicate_system(transformer_relation(t1)) =
 	sc_append((Psysteme) predicate_system(transformer_relation(t1)),
 		  (Psysteme) predicate_system(transformer_relation(t2)));
 }
@@ -258,6 +261,30 @@ program_precondition(string name)
 
     debug_off();
     return TRUE;
+}
+
+/* The program correctness postcondition cannot be infered. It should be
+   provided by the user. */
+bool
+program_postcondition(string name)
+{
+  transformer post = transformer_identity();
+  entity the_main = get_main_entity();
+
+  debug_on("SEMANTICS_DEBUG_LEVEL");
+  pips_debug(1, "considering program \"%s\" with main \"%s\"\n", name,
+	     module_local_name(the_main));
+
+  pred_debug(1, "assumed program postcondition:\n", post);
+
+  ifdebug(1) 
+    pips_assert("consistent program postcondition", 
+		transformer_consistency_p(post));
+
+  DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_POSTCONDITION, "", post);
+
+  debug_off();
+  return TRUE;
 }
 
 
