@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: o-analysis.c,v $
+ * Revision 1.37  1997/04/17 15:29:00  coelho
+ * entity_mapping -> entity_int
+ *
  * Revision 1.36  1997/03/20 10:22:04  coelho
  * RCS headers.
  *
@@ -16,7 +19,7 @@
 
 static list lblocks = NIL, lloop  = NIL;
 
-GENERIC_LOCAL_MAPPING(variable_used, int, entity)
+GENERIC_LOCAL_FUNCTION(entity_variable_used, entity_int)
 
 /* true if there is no cyclic distribution for the array
  */
@@ -356,7 +359,7 @@ statement stat;
  */
 static bool hpfc_overlap_kill_unused_scalars(statement stat)
 {
-    assert(get_variable_used_map()!=hash_table_undefined);
+    message_assert("defined", !entity_variable_used_undefined_p());
 
     hpfc_killed_scalar = FALSE;
 
@@ -538,21 +541,13 @@ static statement
 static void variable_used_rewrite(r)
 reference r;
 {
-    entity v = reference_variable(r);
-    int n = load_entity_variable_used(v);
-    store_entity_variable_used(v, int_undefined_p(n) ? 1 : n+1);
-}
+    entity v = reference_variable(r);    
 
-/*
-static void 
-initialize_variable_used_map_for_statement(
-    statement stat)
-{
-    make_variable_used_map();
-    current_variable_used_statement = stat; 
-    gen_recurse(stat, reference_domain,	gen_true, variable_used_rewrite);
+    if (bound_entity_variable_used_p(v))
+	update_entity_variable_used(v, load_entity_variable_used(v)+1);
+    else
+	store_entity_variable_used(v, 1);
 }
-*/
 
 static void 
 initialize_variable_used_map_for_current_loop_nest(
@@ -562,7 +557,7 @@ initialize_variable_used_map_for_current_loop_nest(
     instruction i;
     loop l;
 
-    make_variable_used_map();     
+    init_entity_variable_used();     
     current_variable_used_statement = inner_body;
 
     gen_recurse(inner_body, reference_domain, gen_true,	variable_used_rewrite);
@@ -588,7 +583,7 @@ initialize_variable_used_map_for_current_loop_nest(
 
 static void close_variable_used_map_for_statement()
 {
-    free_variable_used_map();
+    close_entity_variable_used();
     current_variable_used_statement = statement_undefined;
 }
 
