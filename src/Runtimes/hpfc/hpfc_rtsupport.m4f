@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/05/06 11:51:12 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/05/06 12:10:30 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -1083,6 +1083,21 @@ c
       print *, 'initial global lower bound: ', llb,
      $    ' new lower bound: ', nlb,' new upper bound: ', nub
 #endif
+      end
+c
+c-----------------
+c
+c HPFC_DIVIDE
+c
+cdecl      external HPFC_DIVIDE
+cdecl      integer HPFC_DIVIDE
+      integer function HPFC_DIVIDE(i, j)
+      integer i,j
+      if (i.ge.0) then
+         HPFC_DIVIDE = i/j
+      else
+         HPFC_DIVIDE = -(-i+j-1)/j
+      endif
       end
 c
 c-----------------
