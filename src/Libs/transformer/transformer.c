@@ -107,7 +107,7 @@ transformer_combine(
      * ??? guard added to avoid an obscure bug, but I guess it should
      * never get here with en nil base... FC
      */
-    if (!sc_rn_p(r1)) {
+    if (sc_base(r1)) {
 	MAP(ENTITY, e_temp,
 	{
 	    sc_and_base_projection_along_variable_ofl_ctrl
