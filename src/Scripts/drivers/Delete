@@ -40,8 +40,10 @@ shift `expr $OPTIND - 1`
 
 if [ "$all" ] 
 then 
-  verb "deleting all databases in $PWD"
-  set *.database
+  test "`echo *.database`" != '*.database' && {
+      verb "deleting all databases in $PWD"
+      set *.database
+  }
 fi
 
 for ws 
