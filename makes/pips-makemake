@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/03 20:24:40 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/03 20:27:19 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -247,6 +247,9 @@ SOURCES=	$(SCRIPTS) $(FILES) $(CONFIG_FILE)
 .runable: $(SCRIPTS)
 	chmod a+x $(SCRIPTS)
 	touch .runable
+
+check_install:
+	@echo ok
 
 .quick-install: .runable
 	( cd $(UTILDIR) ; $(RM) $(SCRIPTS) $(FILES); )
