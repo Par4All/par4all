@@ -7,6 +7,12 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.29  2001/10/22 16:30:51  irigoin
+  one context parameter added to calls to
+  precondition_add_condition_information(). This routine should not be
+  called from here. The precondition should be available with the proper
+  handling of unstructured in semantics
+
   Revision 1.28  2000/12/13 10:31:51  ancourt
   renaming the other phase
 
@@ -627,6 +633,7 @@ dead_unstructured_test_filter(statement st)
     pre_true =
 	precondition_add_condition_information(transformer_dup(pre),
 					       cond,
+					       transformer_undefined,
 					       TRUE);
     ifdebug(6)
 	sc_fprint(stderr,
@@ -636,6 +643,7 @@ dead_unstructured_test_filter(statement st)
     pre_false =
 	precondition_add_condition_information(transformer_dup(pre),
 					       cond,
+					       transformer_undefined,
 					       FALSE);
     ifdebug(6)
 	sc_fprint(stderr,
@@ -878,6 +886,16 @@ dead_statement_filter(statement s)
 	*/
       if (!statement_weakly_feasible_p(s)) {
 	pips_debug(2, "Dead statement %d (%d, %d)\n",
+		   statement_number(s),
+		   ORDERING_NUMBER(statement_ordering(s)),
+		   ORDERING_STATEMENT(statement_ordering(s)));
+	  retour = discard_statement_and_save_label_and_comment(s);
+	  dead_code_statement_removed++;
+	  break;
+      }
+
+      if (instruction_sequence_p(i) && !statement_feasible_p(s)) {
+	pips_debug(2, "Dead sequence statement %d (%d, %d)\n",
 		   statement_number(s),
 		   ORDERING_NUMBER(statement_ordering(s)),
 		   ORDERING_STATEMENT(statement_ordering(s)));
