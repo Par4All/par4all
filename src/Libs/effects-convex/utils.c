@@ -378,7 +378,8 @@ void region_sc_append_and_normalize(region reg, Psysteme sc, int level)
     sc_reg = region_system(reg);    
     assert(sc_weak_consistent_p(sc_reg));
     assert(sc_weak_consistent_p(copy));
-    sc_reg = sc_safe_append(sc_safe_normalize(sc_reg), sc_safe_normalize(copy)); 
+    copy = sc_safe_normalize(copy);
+    sc_reg = sc_safe_append(sc_safe_normalize(sc_reg), copy); 
     assert(sc_weak_consistent_p(sc_reg));
     if (level!=-1) 
 	sc_reg = region_sc_normalize(sc_reg, level);
