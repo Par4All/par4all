@@ -57,9 +57,9 @@ statement_mapping efs_map;
 /* Return TRUE if the statement has a write effect on at least one of
    the argument of the module. */
 bool
-statement_write_argument_of_module_effect_p(statement s,
-                                            entity module,
-                                            statement_mapping effects_list_map)
+statement_has_a_module_formal_argument_write_effect_p(statement s,
+                                                      entity module,
+                                                      statement_mapping effects_list_map)
 {
    bool write_effect_on_a_module_argument_found = FALSE;
    list effects_list = (list) GET_STATEMENT_MAPPING(effects_list_map, s);
@@ -69,7 +69,7 @@ statement_write_argument_of_module_effect_p(statement s,
           entity a_variable = reference_variable(effect_reference(an_effect));
           
           if (action_write_p(effect_action(an_effect))
-              && variable_in_module_p(a_variable, module)) {
+              && variable_is_a_module_formal_parameter_p(a_variable, module)) {
              write_effect_on_a_module_argument_found = TRUE;
              break;
           }
