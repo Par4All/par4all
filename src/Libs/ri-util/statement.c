@@ -679,13 +679,14 @@ statement s;
 {
     statement_label(s) = entity_empty_label();
 
-    if(instruction_loop_p(statement_instruction(s))) 
-	loop_label(instruction_loop(statement_instruction(s))) = 
-	    entity_empty_label();
 
     if(statement_format_p(s)) {
 	user_error("clear_label", "Cannot clear FORMAT label!\n");
     }
+
+    if(instruction_loop_p(statement_instruction(s))) 
+	loop_label(instruction_loop(statement_instruction(s))) = 
+	    entity_empty_label();
 }
 
 /*
