@@ -415,7 +415,9 @@ i_set:
 	    
 		p = get_property ($<name>4);
 		strupper (yylval.name,yylval.name);
-		
+
+		user_log("set %s %s\n", $<name>4, yylval.name);
+
 		switch (property_tag(p))
 		{
 		case is_property_bool:
