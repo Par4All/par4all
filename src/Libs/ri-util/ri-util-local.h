@@ -253,20 +253,39 @@
 #define test_to_statement(t) instruction_to_statement(test_to_instruction(t))
 #define call_to_statement(c) instruction_to_statement(call_to_instruction(c))
 
-#define unary_intrinsic_statement(name, e)\
+
+/***************************************************** BOOLEAN EXPRESSIONS */
+/* Building quickly boolean expressions, FC.
+ */
+
+#define unary_intrinsic_expression(name, e)\
  call_to_expression(make_call(entity_intrinsic(name),CONS(EXPRESSION,e,NIL)))
 
-#define binary_intrinsic_statement(name, e1, e2)\
+#define binary_intrinsic_expression(name, e1, e2)\
  call_to_expression(make_call(entity_intrinsic(name),\
  CONS(EXPRESSION, e1, CONS(EXPRESSION, e2, NIL))))
   
 #define not_expression(e) \
-    unary_intrinsic_statement(NOT_OPERATOR_NAME, e)
+    unary_intrinsic_expression(NOT_OPERATOR_NAME, e)
 #define or_expression(e1, e2) \
-    binary_intrinsic_statement(OR_OPERATOR_NAME, e1, e2)
+    binary_intrinsic_expression(OR_OPERATOR_NAME, e1, e2)
 #define and_expression(e1, e2) \
-    binary_intrinsic_statement(AND_OPERATOR_NAME, e1, e2)
+    binary_intrinsic_expression(AND_OPERATOR_NAME, e1, e2)
+#define ne_expression(e1, e2) \
+    binary_intrinsic_expression(NON_EQUAL_OPERATOR_NAME, e1, e2)
+#define eq_expression(e1, e2) \
+    binary_intrinsic_expression(EQUAL_OPERATOR_NAME, e1, e2)
+#define gt_expression(e1, e2) \
+    binary_intrinsic_expression(GREATER_THAN_OPERATOR_NAME, e1, e2)
+#define ge_expression(e1, e2) \
+    binary_intrinsic_expression(GREATER_OR_EQUAL_OPERATOR_NAME, e1, e2)
+#define lt_expression(e1, e2) \
+    binary_intrinsic_expression(LESS_THAN_OPERATOR_NAME, e1, e2)
+#define le_expression(e1, e2) \
+    binary_intrinsic_expression(LESS_OR_EQUAL_OPERATOR_NAME, e1, e2)
 
+
+/******************************************************** CONTROL GRAPH... */
 /* For the control graph modifiers: */
 
 /* To specify the way that remove_a_control_from_a_list_and_relink
@@ -281,6 +300,8 @@ enum remove_a_control_from_a_list_and_relink_direction
 typedef enum remove_a_control_from_a_list_and_relink_direction
 remove_a_control_from_a_list_and_relink_direction;
 
+
+/********************************************************* DUMMY VARIABLES */
 #define PRIME_LETTER_FOR_VARIABLES	"p"
 
 /* define to build the _dummy and _prime of a variable.
