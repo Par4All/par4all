@@ -26,6 +26,9 @@
  * @author Fabien Coelho (with some advises from Ronan Keryell)
  *
  * $Log: wrapper.c,v $
+ * Revision 1.3  1998/06/26 08:01:01  coelho
+ * additionnal message added.
+ *
  * Revision 1.2  1998/05/27 14:49:12  coelho
  * stdout of wrapper not used any more.
  *
@@ -127,6 +130,7 @@ static void tpw_sig_handler(int sn /* signal number */)
     case SIGABRT:
     case SIGCHLD: /* tpips stopped. */
     case SIGPIPE: /* idem? */
+	fprintf(stderr, WRAPPER "killing tpips...\n");
 	KILL(tpips_pid, SIGKILL);
 	exit(2);
 	break;
