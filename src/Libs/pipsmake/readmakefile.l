@@ -1,6 +1,7 @@
 %START COMMENT TEXT
 %{
 #include <stdio.h>
+extern int fprintf();
 #include "genC.h"
 #include "makefile.h"
 #include "y.tab.h"
@@ -11,7 +12,7 @@
 <TEXT>"/*"		{BEGIN COMMENT;}
 <TEXT>"//[^\n]*\n"	;
 <COMMENT>"*/"		{BEGIN TEXT;}
-<COMMENT>.      	;
+<COMMENT>(.|\n)      	;
 <TEXT>PROGRAM		{return(PROGRAM);}
 <TEXT>MODULE		{return(MODULE);}
 <TEXT>MAIN		{return(MAIN);}
@@ -26,7 +27,7 @@
 <TEXT>\!	        {return(PRE_TRANSFORMATION);}
 <TEXT>\.		{return(DOT);}
 <TEXT>[-_a-zA-Z0-9]+	{return(NAME);}
-<TEXT>.               	{
+<*>.               	{
 			fprintf(stderr, 
 				"[readmakefile] unknown char %c (%d)\n", 
 				*yytext, *yytext);
