@@ -838,11 +838,10 @@ transformer call_site_to_module_precondition(entity caller,
     /* callee preconditions */
     transformer call_site_prec = transformer_undefined;
 	    
-    set_cumulated_effects_map
-	(effectsmap_to_listmap((statement_mapping)
-			       db_get_memory_resource
-			       (DBR_CUMULATED_EFFECTS,
-				module_local_name(caller), TRUE)));
+    set_cumulated_rw_effects((statement_effects)
+			     db_get_memory_resource
+			     (DBR_CUMULATED_EFFECTS,
+			      module_local_name(caller), TRUE));
 
     set_semantic_map((statement_mapping)
 		     db_get_memory_resource
@@ -877,7 +876,7 @@ transformer call_site_to_module_precondition(entity caller,
     reset_current_module_entity();
 
     reset_current_module_statement();
-    reset_cumulated_effects_map();
+    reset_cumulated_rw_effects();
     reset_semantic_map();
 
     return call_site_prec;
@@ -1103,11 +1102,10 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
     current_caller = caller;
     current_callee = callee;
 	    
-    set_cumulated_effects_map
-	(effectsmap_to_listmap((statement_mapping)
+    set_cumulated_rw_effects((statement_effects)
 			       db_get_memory_resource
 			       (DBR_CUMULATED_EFFECTS,
-				module_local_name(caller), TRUE)));
+				module_local_name(caller), TRUE));
 
     set_semantic_map((statement_mapping)
 		     db_get_memory_resource
@@ -1125,7 +1123,7 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
     free_value_mappings();
     reset_current_module_entity();
     reset_current_module_statement();
-    reset_cumulated_effects_map();
+    reset_cumulated_rw_effects();
     reset_semantic_map();
     set_current_module_entity(callee);
 
