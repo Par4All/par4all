@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.57  1997/05/03 16:45:33  coelho
+# *** empty log message ***
+#
 # Revision 1.56  1997/05/03 16:43:24  coelho
 # one all entry commented out...
 #
@@ -255,7 +258,7 @@ DEDUCED = $(PVM_HEADERS) $(RT_INIT) $(RT_SRC_FILES)
 #
 # make is the target asked for by pipsmake for HPFC_MAKE
 
-make: all install pvm
+make: $(DEDUCED) all pvm
 
 #
 # PVM quick control
