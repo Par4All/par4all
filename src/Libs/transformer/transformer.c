@@ -1,4 +1,14 @@
- /* Predicate transformer package: sc complexity level */
+ /* Predicate transformer package: sc complexity level
+  *
+  * $Id$
+  *
+  * $Log: transformer.c,v $
+  * Revision 1.43  2001/07/19 18:09:37  irigoin
+  * Lots of new functions used to support multiple value types, the general
+  * derivation of a transformer from an expression. Plus some reformatting.
+  *
+  *
+  */
 
 #include <stdio.h>
 
@@ -17,6 +27,162 @@
 
 #include "transformer.h"
 
+/* e and f are assumed to be values, Type independent. */
+transformer 
+simple_equality_to_transformer(entity e, entity f, bool assignment)
+{
+  transformer tf = generic_equality_to_transformer(e, f, assignment, FALSE);
+
+  return tf;
+}
+
+transformer 
+simple_unary_minus_to_transformer(entity e, entity f)
+{
+  transformer tf = generic_equality_to_transformer(e, f, FALSE, TRUE);
+
+  return tf;
+}
+
+transformer 
+generic_equality_to_transformer(entity e, entity f, bool assignment, bool unary_minus_p)
+{
+  transformer tf = transformer_undefined;
+  Pvecteur eq = vect_new((Variable) e, VALUE_ONE);
+  cons * tf_args = NIL;
+  Pcontrainte c;
+
+  ifdebug(9) {
+    pips_debug(9, "entity e: %s, entity f: %s, %s\n",
+	       entity_local_name(e), entity_local_name(f),
+	       assignment? "Is an assignment" : "Is not an assignment");
+  }
+
+  if(assignment)
+    tf_args = CONS(ENTITY, e, NIL);
+
+  vect_add_elem(&eq, (Variable) f, unary_minus_p? VALUE_ONE : VALUE_MONE);
+  c = contrainte_make(eq);
+  tf = make_transformer(tf_args,
+			make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
+
+  ifdebug(9) {
+    pips_debug(9, "end with tf=%p\n", tf);
+    dump_transformer(tf);
+  }
+
+  return tf;
+}
+
+/* e and e1 and e2 are assumed to be values. State e=e1+e2 or e=e1-e2. Type independent. */
+transformer 
+simple_addition_to_transformer(entity e, entity e1, entity e2, bool addition_p)
+{
+  transformer tf = transformer_undefined;
+  Pvecteur eq = vect_new((Variable) e, VALUE_ONE);
+  Pcontrainte c;
+
+  ifdebug(9) {
+    pips_debug(9, "entity e: %s, entity e1: %s, entity e2: %s, %s\n",
+	       entity_local_name(e), entity_local_name(e1), entity_local_name(e2),
+	       addition_p? "Is an addition" : "Is a subtraction");
+  }
+
+  vect_add_elem(&eq, (Variable) e1, VALUE_MONE);
+  vect_add_elem(&eq, (Variable) e2, addition_p? VALUE_MONE : VALUE_ONE);
+  c = contrainte_make(eq);
+  tf = make_transformer(NIL,
+			make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
+
+  ifdebug(9) {
+    pips_debug(9, "end with tf=%p\n", tf);
+    dump_transformer(tf);
+  }
+
+  return tf;
+}
+
+/* e and f are assumed to be values. Operator op is overloaded and the
+   result is operator and type dependent */
+transformer 
+relation_to_transformer(entity op, entity e1, entity e2, bool veracity)
+{
+  transformer tf = transformer_undefined;
+  basic b1 = variable_basic(type_variable(entity_type(e1)));
+  basic b2 = variable_basic(type_variable(entity_type(e2)));
+  Pvecteur eq = VECTEUR_NUL;
+  Pvecteur ineq = VECTEUR_NUL;
+  Pcontrainte ceq = CONTRAINTE_UNDEFINED;
+  Pcontrainte cineq = CONTRAINTE_UNDEFINED;
+
+  ifdebug(9) {
+    pips_debug(9, "Begin for entity e1: %s of basic %s, "
+	       "entity e2: %s of basic %s and operator %s\n",
+	       entity_local_name(e1), basic_to_string(b1),
+	       entity_local_name(e2), basic_to_string(b2),
+	       module_local_name(op));
+  }
+
+  /* Beware of type coercion... Fabien conjectures that values with
+     incompatible types won't get mixed up... */
+
+  if((ENTITY_EQUAL_P(op) && veracity)
+     || (ENTITY_NON_EQUAL_P(op) && !veracity)) {
+    /* type independent */
+    eq = vect_new((Variable) e1, VALUE_ONE);
+    vect_add_elem(&eq, (Variable) e2, VALUE_MONE);
+  }
+  else if((ENTITY_NON_EQUAL_P(op) && veracity)
+	  || (ENTITY_EQUAL_P(op) && !veracity)) {
+    /* Non convex information */
+    ;
+  }
+  else if((ENTITY_LESS_OR_EQUAL_P(op) && veracity)
+	  || (ENTITY_GREATER_THAN_P(op) && !veracity)) {
+    ineq = vect_new((Variable) e1, VALUE_ONE);
+    vect_add_elem(&ineq, (Variable) e2, VALUE_MONE);
+  }
+  else if((ENTITY_LESS_THAN_P(op) && veracity)
+	  ||(ENTITY_GREATER_OR_EQUAL_P(op) && !veracity)) {
+    ineq = vect_new((Variable) e1, VALUE_ONE);
+    vect_add_elem(&ineq, (Variable) e2, VALUE_MONE);
+    if(basic_int_p(b1) && basic_int_p(b2)) {
+      vect_add_elem(&ineq, TCST, VALUE_ONE);
+    }
+  }
+  else if((ENTITY_GREATER_OR_EQUAL_P(op) && veracity)
+	  || (ENTITY_LESS_THAN_P(op) && !veracity)) {
+    ineq = vect_new((Variable) e1, VALUE_MONE);
+    vect_add_elem(&ineq, (Variable) e2, VALUE_ONE);
+  }
+  else if((ENTITY_GREATER_THAN_P(op) && veracity)
+	  || (ENTITY_LESS_OR_EQUAL_P(op) && !veracity)) {
+    ineq = vect_new((Variable) e1, VALUE_MONE);
+    vect_add_elem(&ineq, (Variable) e2, VALUE_ONE);
+    if(basic_int_p(b1) && basic_int_p(b2)) {
+      vect_add_elem(&ineq, TCST, VALUE_ONE);
+    }
+  }
+  else {
+    pips_internal_error("Unexpected relational operator %s\n", entity_name(op));
+  }
+
+  ceq = VECTEUR_NUL_P(eq)? CONTRAINTE_UNDEFINED : contrainte_make(eq);
+  cineq = VECTEUR_NUL_P(ineq)? CONTRAINTE_UNDEFINED : contrainte_make(ineq);
+
+  if(ceq!=CONTRAINTE_UNDEFINED||cineq!=CONTRAINTE_UNDEFINED) {
+    tf = make_transformer(NIL,
+			  make_predicate(sc_make(ceq, cineq)));
+  }
+
+  ifdebug(9) {
+    pips_debug(9, "end with tf=%p\n", tf);
+    dump_transformer(tf);
+  }
+
+  return tf;
+}
+
 /* transformer transformer_combine(transformer t1, transformer t2):
  * compute the composition of transformers t1 and t2 (t1 then t2)
  *
@@ -25,10 +191,7 @@
  *
  * t1 is updated, but t2 is preserved
  */
-transformer 
-transformer_combine(
-    transformer t1,
-    transformer t2)
+transformer transformer_combine(transformer t1, transformer t2)
 {
     /* algorithm: 
        let a1 be t1 arguments, a2 be t2 arguments,
@@ -178,7 +341,94 @@ transformer_combine(
 
     return t1;
 }
+
+static transformer transformer_general_intersection(transformer t1,
+						    transformer t2,
+						    bool image_only)
+{
+  transformer t = transformer_identity();
+  Psysteme s1 = sc_dup((Psysteme) predicate_system(transformer_relation(t1)));
+  Psysteme s2 = (Psysteme) predicate_system(transformer_relation(t2));
 
+  /*
+  pips_debug(9, "begin with s1 and s2:\n");
+  sc_dump(s1);
+  sc_dump(s2);
+  */
+
+  s1 = sc_append(s1, s2);
+
+  /*
+  pips_debug(9, "new s1:\n");
+  sc_dump(s1);
+  */
+
+  predicate_system(transformer_relation(t)) = s1;
+
+  if(image_only) {
+    /* Do not restrict the transition but the image of the relation t1
+       with constraints in t2. */
+    if(!ENDP(transformer_arguments(t2))) {
+      dump_transformer(t2);
+      pips_assert("Transformer t2 has no arguments", ENDP(transformer_arguments(t2)));
+    }
+    transformer_arguments(t) = dup_arguments(transformer_arguments(t1));
+  }
+  else {
+    /* intersect transition t1 and transition t2 */
+    transformer_arguments(t) = arguments_intersection(transformer_arguments(t1),
+						      transformer_arguments(t2));
+  }
+
+  return t;
+}
+
+/* tf receives the constraints in t1 and t2. For implicit equalities
+   carried by args, this implies that the args for tf is the intersection
+   of the args. And that the resulting transformer may be empty: for
+   instance, a variable may be untouched in t1 and incremented in t2,
+   which is impossible. */
+transformer transformer_intersection(transformer t1, transformer t2)
+{
+  transformer t = transformer_general_intersection(t1, t2, FALSE);
+  return t;
+}
+transformer transformer_image_intersection(transformer t1, transformer t2)
+{
+  transformer t = transformer_general_intersection(t1, t2, TRUE);
+  return t;
+}
+
+static transformer transformer_safe_general_intersection(transformer t1,
+							 transformer t2,
+							 bool image_only)
+{
+  transformer tf = transformer_undefined;
+
+  if(transformer_undefined_p(t1))
+    tf = copy_transformer(t2);
+  else if(transformer_undefined_p(t2))
+    tf = copy_transformer(t1);
+  else
+    tf = transformer_general_intersection(t1, t2, image_only);
+
+  return tf;
+}
+
+transformer transformer_safe_intersection(transformer t1, transformer t2)
+{
+  transformer tf = transformer_safe_general_intersection(t1, t2, FALSE);
+
+  return tf;
+}
+
+transformer transformer_safe_image_intersection(transformer t1, transformer t2)
+{
+  transformer tf = transformer_safe_general_intersection(t1, t2, TRUE);
+
+  return tf;
+}
+
 /* eliminate (some) redundancy */
 transformer
 transformer_normalize(transformer t, int level)
@@ -304,6 +554,42 @@ transformer_normalize(transformer t, int level)
 
   return t;
 }
+
+transformer transformer_temporary_value_projection(transformer tf)
+{
+  list tv = NIL;
+
+  if(number_of_temporary_values()>0) {
+    Psysteme r = (Psysteme) predicate_system(transformer_relation(tf));
+    Pbase b = BASE_NULLE;
+
+    for(b = sc_base(r); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
+      entity e = (entity) vecteur_var(b);
+      if(local_temporary_value_entity_p(e)) {
+	tv = CONS(ENTITY, e, tv);
+      }
+    }
+    tf = transformer_projection(tf, tv);
+  }
+  else ifdebug(9) {
+    Psysteme r = (Psysteme) predicate_system(transformer_relation(tf));
+    Pbase b = BASE_NULLE;
+
+    for(b = sc_base(r); !BASE_NULLE_P(b); b = vecteur_succ(b)) {
+      entity e = (entity) vecteur_var(b);
+      if(local_temporary_value_entity_p(e)) {
+	tv = CONS(ENTITY, e, tv);
+      }
+    }
+    pips_assert("No temporary values exist in the system since a reset "
+		"counter for them has been performed\n", ENDP(tv));
+  }
+  
+
+  gen_free_list(tv);
+
+  return tf;
+}
 
 /* transformer transformer_projection(transformer t, cons * args):
  * projection of t along the hyperplane defined by entities in args;
@@ -344,7 +630,13 @@ transformer_projection_with_redundancy_elimination(
   list new_args = NIL;
   Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
 
-  pips_debug(9, "Begin\n");
+  ifdebug(9) {
+    pips_debug(9, "Begin with system\n");
+    /* sc_fprint(stderr, r, exernal_value_name); */
+    sc_fprint(stderr, r, (char * (*)(Variable)) entity_local_name);
+    pips_debug(9, "and entities to be projected: ");
+    print_arguments(args);
+  }
 
   if(!ENDP(args))
     {
@@ -441,11 +733,13 @@ transformer_projection_with_redundancy_elimination(
       /* replace the old arguments by the new one */
       gen_free_list(transformer_arguments(t));
       transformer_arguments(t) = new_args;
-    } 
+    }
+
+  pips_debug(9, "End for t=%p\n", t);
 
   return t;
 }
-
+
 /* transformer transformer_apply(transformer tf, transformer pre):
  * apply transformer tf on precondition pre to obtain postcondition post
  *
@@ -477,7 +771,7 @@ transformer transformer_apply(transformer tf, transformer pre)
 
     return post;
 }
-
+
 /* transformer transformer_filter(transformer t, cons * args):
  * projection of t along the hyperplane defined by entities in args;
  * this generate a projection and not a cylinder based on the projection;
@@ -562,7 +856,7 @@ cons * args;
   } 
   return t;
 }
-
+
 /* bool transformer_affect_linear_p(transformer tf, Pvecteur l): returns TRUE
  * if there is a state s such that eval(l, s) != eval(l, tf(s));
  * returns FALSE if l is invariant w.r.t. tf, i.e. for all state s,
@@ -587,6 +881,45 @@ Pvecteur l;
     return FALSE;
 }
 
+/* Transformer tf1 affects transformer tf2 if values modified by tf1
+   appear in any constraint of tf2. The two transformer do not commute and
+   tf1 o tf2 does not equal tf2 o tf1. */
+
+bool 
+transformer_affect_transformer_p(transformer tf1, transformer tf2)
+{
+  bool affect_p = FALSE;
+
+  /* No need to check if tf1 does not change the memory state */
+  if(!ENDP(transformer_arguments(tf1))) {
+    Psysteme s2 = predicate_system(transformer_relation(tf2));
+    Pcontrainte ceq = sc_egalites(s2);
+    Pcontrainte cineq = sc_inegalites(s2);
+    for(; !CONTRAINTE_UNDEFINED_P(ceq) && !affect_p; ceq = contrainte_succ(ceq)) {
+      Pvecteur v = contrainte_vecteur(ceq);
+      affect_p = transformer_affect_linear_p(tf1, v);
+    }
+
+    for(; !CONTRAINTE_UNDEFINED_P(cineq) && !affect_p; ceq = contrainte_succ(ceq)) {
+      Pvecteur v = contrainte_vecteur(ceq);
+      affect_p = transformer_affect_linear_p(tf1, v);
+    }
+  }
+
+  return affect_p;
+}
+
+bool 
+transformer_safe_affect_transformer_p(transformer tf1, transformer tf2)
+{
+  bool affect_p = FALSE;
+
+  if(!transformer_undefined_p(tf1) && !transformer_undefined_p(tf2))
+    affect_p = transformer_affect_transformer_p(tf1, tf2);
+
+  return affect_p;
+}
+
 /* Generates a transformer abstracting a totally unknown modification of
  * the values associated to variables in list le.
  */
@@ -613,7 +946,7 @@ list le; /* list of entities */
     predicate_system_(transformer_relation(tf)) = s;
     return tf;
 }
-
+
 /* transformer invariant_wrt_transformer(transformer p, transformer tf):
  * Assume that tf is a fix-point operator.
  *
@@ -654,7 +987,7 @@ transformer invariant_wrt_transformer(transformer p, transformer tf)
   transformer_free(fptf); /* must be freed, otherwise it is leaked. */
   return inv;
 }
-
+
 /* transformer transformer_value_substitute(transformer t,
  *                                         entity e1, entity e2):
  * if e2 does not appear in t initially:
@@ -671,45 +1004,180 @@ transformer invariant_wrt_transformer(transformer p, transformer tf)
  * See hidden.f in Bugs or Validation...
  */
 transformer 
-transformer_value_substitute(t, e1, e2)
-transformer t;
-entity e1;
-entity e2;
+transformer_value_substitute(transformer t, entity e1, entity e2)
 {
-    /* updates are performed by side effects */
+  /* updates are performed by side effects */
 
-    cons * a = transformer_arguments(t);
-    Psysteme s = (Psysteme) predicate_system(transformer_relation(t));
+  cons * a = transformer_arguments(t);
+  Psysteme s = (Psysteme) predicate_system(transformer_relation(t));
 
-    pips_assert("transformer_value_substitute",
-		e1 != entity_undefined && e2 != entity_undefined);
-    /*
+  pips_assert("e1 and e2 are defined entities",
+	      e1 != entity_undefined && e2 != entity_undefined);
+  /*
     pips_assert("transformer_value_substitute", 
-		!base_contains_variable_p(s->base, (Variable) e2));
-		*/
+    !base_contains_variable_p(s->base, (Variable) e2));
+  */
 
-    /* update only if necessary */
-    if(base_contains_variable_p(s->base, (Variable) e1)) {
+  /* update only if necessary */
+  if(base_contains_variable_p(s->base, (Variable) e1)) {
 
-	if(!base_contains_variable_p(s->base, (Variable) e2)) {
+    if(!base_contains_variable_p(s->base, (Variable) e2)) {
 
-	    (void) sc_variable_rename(s,(Variable) e1, (Variable)e2);
+      (void) sc_variable_rename(s,(Variable) e1, (Variable)e2);
 
-	    /* rename value e1 in argument a; e1 does not necessarily
-	       appear in a because it's not necessarily the new value of
-	       a modified variable */
-	    MAPL(ce, {entity e = ENTITY(CAR(ce));
-		      if( e == e1) ENTITY(CAR(ce)) = e2;},
-		 a);
+      /* rename value e1 in argument a; e1 does not necessarily
+	 appear in a because it's not necessarily the new value of
+	 a modified variable */
+      MAPL(ce, {entity e = ENTITY(CAR(ce));
+      if( e == e1) ENTITY(CAR(ce)) = e2;},
+	   a);
+    }
+    else {
+      pips_internal_error("cannot substitute e1=%s by e2=%s: e2 already in basis\n",
+			  entity_name(e1), entity_name(e2));
+    }
+  }
+
+  return t;
+}
+
+transformer 
+transformer_safe_value_substitute(transformer t, entity e1, entity e2)
+{
+  if(!transformer_undefined_p(t))
+    t = transformer_value_substitute(t, e1, e2);
+
+  return t;
+}
+
+static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
+{
+  string s1 = string_undefined;
+  int i1 = 0;
+  string s2 = string_undefined;
+  int i2 = 0;
+  double x = 0.;
+  bool is_string = FALSE;
+  bool is_float = FALSE;
+  bool type_undecided_p = TRUE;
+  Pvecteur cv = VECTEUR_UNDEFINED;
+  bool is_checked = TRUE;
+  int number_of_strings = 0;
+
+  for(cv=v; !VECTEUR_UNDEFINED_P(cv); cv = vecteur_succ(cv)) {
+    entity e = (entity) vecteur_var(cv);
+    Value val = vecteur_val(cv);
+
+    pips_assert("e is a constant", (Variable) e == TCST || entity_constant_p(e));
+
+    if((Variable) e!=TCST) {
+      basic b = constant_basic(e);
+
+      switch(basic_tag(b)) {
+      case is_basic_int:
+      case is_basic_logical:
+	/* Logical are represented by integer values*/
+	pips_internal_error("Unexpected integer or logical type for constant %s\n",
+			    entity_name(e));
+	break;
+      case is_basic_float:
+	/* PIPS does not represent negative constants: call to unary_minus */
+	if(type_undecided_p) {
+	  type_undecided_p = FALSE;
+	  is_float = TRUE;
 	}
 	else {
-	    pips_error("transformer_value_substitute",
-		       "cannot substitute e1=%s by e2=%s: e2 already in basis\n",
-		       entity_name(e1), entity_name(e2));
+	  if(is_string) {
+	    pips_internal_error("String constant mixed up with float constant %s\n",
+				entity_name(e));
+	  }
 	}
+	x = x + ((double) val) * float_constant_to_double(e);
+	break;
+      case is_basic_string:
+	if(type_undecided_p) {
+	  type_undecided_p = FALSE;
+	  is_string = TRUE;
+	}
+	else {
+	  if(is_float) {
+	    pips_internal_error("Float constant mixed up with string constant %s\n",
+				entity_name(e));
+	  }
+	}
+	if(number_of_strings==0) {
+	  s1 = module_local_name(e);
+	  i1 = (int) val;
+	}
+	else if(number_of_strings==1) {
+	  s2 = module_local_name(e);
+	  i2 = (int) val;
+	}
+	else
+	  pips_internal_error("Too many strings in a string constraint\n");
+
+	number_of_strings++;
+	break;
+      case is_basic_complex:
+	/* PIPS does not represent complex constants: call to CMPLX */
+	pips_internal_error("Unexpected complex type for constant %s\n",
+			    entity_name(e));
+	break;
+      case is_basic_overloaded:
+	pips_internal_error("Unexpected overloaded type for constant %s\n",
+			    entity_name(e));
+	break;
+      default:
+	pips_internal_error("unknown basic b=%d\n", basic_tag(b));
+      }
+    }
+    else {
+      if(vect_size(v)==1) {
+	/* Unfeasible equation or trivial inequality */
+	is_checked = (is_equation_p ? FALSE : (val <= 0));
+      }
+      else {
+	pips_internal_error("Unexpected integer constant mixed up with "
+			    "non-integer constants\n");
+      }
+    }
+  }
+
+  pips_assert("It can't be a float and a string simultaneously",
+	      !(is_float && is_string));
+
+  if(is_string) {
+    if(number_of_strings!=2)
+      pips_internal_error("Illegal number of strings in string constraint\n");
+    if(is_equation_p) {
+      if(i1+i2==0)
+	is_checked = (strcmp(s1, s2)==0);
+      else
+	pips_internal_error("Unexpected string coefficients i1=%d, i2=%d for equality\n",
+			    i1, i2);
+    }
+    else {
+      if(i1>0 && i1+i2==0)
+	is_checked = (fortran_string_compare(s1, s2) <= 0);
+      else if(i1<0 && i1+i2==0)
+	is_checked = (fortran_string_compare(s1, s2) >= 0);
+      else
+	pips_internal_error("Unexpected string coefficients i1=%d, i2=%d for inequality\n",
+			    i1, i2);
+    }
+  }
+  else if(is_float) {
+    if(is_equation_p)
+      is_checked = (x==0.);
+    else
+      is_checked = (x<0.);
+  }
+    else {
+      /* Must be a trivial integer constraint. Already processed*/
+      ;
     }
 
-    return t;
+  return is_checked;
 }
 
 /* If TRUE is returned, the transformer certainly is empty.
@@ -722,37 +1190,121 @@ parametric_transformer_empty_p(transformer t,
 			       Psysteme (*normalize)(Psysteme,
 						     char * (*)(Variable)))
 {
-    /* FI: the arguments seem to have no impact on the emptiness
-     * (i.e. falseness) of t
-     */
-    predicate pred = transformer_relation(t);
-    Psysteme ps = predicate_system(pred);
-    Psysteme new_ps = sc_dup (ps);
-    bool empty_p = FALSE;
+  /* FI: the arguments seem to have no impact on the emptiness
+   * (i.e. falseness) of t
+   */
+  predicate pred = transformer_relation(t);
+  Psysteme ps = predicate_system(pred);
+  Psysteme new_ps = sc_dup (ps);
+  bool empty_p = FALSE;
+  bool consistent_p = TRUE;
 
-    /* empty_p = !sc_faisabilite(ps); */
-    /* empty_p = !sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL, TRUE); */
+  pips_debug(9,"Begin for t=%p\n", t);
 
-    /* Normalize the transformer, use all "reasonnable" equations
-     * to reduce the problem
-     * size, check feasibility on the projected system
-     */
-    /* new_ps = normalize(new_ps, (char * (*)(Variable)) external_value_name); */
-    /* FI: when dealing with interprocedural preconditions, the value mappings
-     * are initialized for the caller but the convex hull, which calls this function,
-     * must be performed in the calle value space.
-     */
-    new_ps = normalize(new_ps, (char * (*)(Variable)) entity_local_name);
+  /* empty_p = !sc_faisabilite(ps); */
+  /* empty_p = !sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL, TRUE); */
 
-    if(SC_EMPTY_P(new_ps)) {
-	empty_p = TRUE;
+  /* Normalize the transformer, use all "reasonnable" equations
+   * to reduce the problem
+   * size, check feasibility on the projected system
+   */
+  /* new_ps = normalize(new_ps, (char * (*)(Variable)) external_value_name); */
+  /* FI: when dealing with interprocedural preconditions, the value mappings
+   * are initialized for the caller but the convex hull, which calls this function,
+   * must be performed in the calle value space.
+   */
+  new_ps = normalize(new_ps, (char * (*)(Variable)) entity_local_name);
+
+  if(SC_EMPTY_P(new_ps)) {
+    empty_p = TRUE;
+  }
+  else if(sc_empty_p(new_ps)) {
+    /* Depending on the instance of "normalize", might always be trapped
+       by the previous test. */
+    empty_p = TRUE;
+  }
+  else {
+    if(string_analyzed_p() || float_analyzed_p()) {
+      /* Inconsistent equalities or inequalities between constants may be
+         present. Project variable and temporary values and analyze resulting system. No
+         equations should be left over unless equal constants are encoded
+         differently. Inequations should be interpreted and checked. */
+      Pvecteur b = VECTEUR_UNDEFINED;
+      Pcontrainte eq = CONTRAINTE_UNDEFINED;
+      Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+      Pbase b_min = sc_to_minimal_basis(new_ps);
+
+      for (b = b_min ; !VECTEUR_UNDEFINED_P(b) && !empty_p; b = vecteur_succ(b)) {
+	Variable var = vecteur_var(b);
+	entity e_var = (entity) var;
+ 
+	if(!entity_constant_p(e_var)) {
+
+	  pips_debug(9, "Projection of %s\n", entity_name(e_var));
+
+	  CATCH(overflow_error) 
+	    {
+	      /* FC */
+	      pips_user_warning("overflow error in projection of %s, "
+				"variable eliminated\n",
+				entity_name(e_var)); 
+	      new_ps = sc_elim_var(new_ps, var);
+	    }
+	  TRY 
+	    {
+	      sc_projection_along_variable_ofl_ctrl
+		(&new_ps, var, NO_OFL_CTRL);
+	      UNCATCH(overflow_error);
+	    }
+
+	  sc_base_remove_variable(new_ps, var);
+	  /* No redundancy elimination... */
+	  /* new_ps = elim(new_ps); */
+
+	  ifdebug(10) {
+	    pips_debug(10, "System after projection of %s\n", entity_name(e_var));
+	    /* sc_fprint(stderr, r, exernal_value_name); */
+	    sc_fprint(stderr, new_ps, (char * (*)(Variable)) value_full_name);
+	  }
+	  empty_p = sc_empty_p(new_ps);
+	}
+      }
+
+      base_rm(b_min);
+
+      /* Check remaining equalities and inequalities */
+
+      ifdebug(9) {
+	pips_debug(9, "System after all projections or emptiness detection:\n");
+	/* sc_fprint(stderr, r, exernal_value_name); */
+	sc_fprint(stderr, new_ps, (char * (*)(Variable)) value_full_name);
+      }
+
+      if(!empty_p) {
+	for(eq = sc_egalites(new_ps);
+	    !CONTRAINTE_UNDEFINED_P(eq) && consistent_p;
+	    eq = contrainte_succ(eq)) {
+	  consistent_p = constant_constraint_check(contrainte_vecteur(eq), TRUE);
+	}
+
+	for(ineq = sc_inegalites(new_ps);
+	    !CONTRAINTE_UNDEFINED_P(ineq) && consistent_p;
+	    ineq = contrainte_succ(ineq)) {
+	  consistent_p = constant_constraint_check(contrainte_vecteur(ineq), FALSE);
+	}
+	empty_p = !consistent_p;
+      }
     }
     else {
-	sc_rm(new_ps);
-	empty_p = FALSE;
+      empty_p = FALSE;
     }
 
-    return empty_p;
+    sc_rm(new_ps);
+  }
+
+  pips_debug(9,"End: %sfeasible\n", empty_p? "not " : "");
+
+  return empty_p;
 }
 
 /* If TRUE is returned, the transformer certainly is empty.
