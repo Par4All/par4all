@@ -64,88 +64,88 @@ int l, t;
 
 void create_frames()
 {
-	int i;
-    Display *dpy;
-    Xv_Screen screen;
-    int screen_no,display_width,display_height;
+  int i;
+  Display *dpy;
+  Xv_Screen screen;
+  int screen_no,display_width,display_height;
 
-    main_frame = xv_create(NULL, FRAME, 
-			   FRAME_LABEL, "XView Pips", 
-/*			   XV_WIDTH, WPIPS_WIDTH, 
-			   XV_HEIGHT, WPIPS_HEIGHT,
-	*/		   NULL);
-    install_event_procedure(main_frame);
-
-
-    /* get the display dimensions */
-    dpy = (Display *)xv_get(main_frame, XV_DISPLAY);
-    screen = (Xv_Screen)xv_get(main_frame, XV_SCREEN);
-    screen_no = (int)xv_get(screen, SCREEN_NUMBER);
-
-    display_width = DisplayWidth(dpy, screen_no);
-    display_height = DisplayHeight(dpy, screen_no);
-
-    log_frame = xv_create(main_frame, FRAME, 
-			       XV_SHOW, FALSE,
-			       FRAME_DONE_PROC, close_log_subwindow,
-			       XV_WIDTH, DIALOG_WIDTH, 
-			       XV_HEIGHT, DIALOG_HEIGHT, 
-			       NULL);
-    install_event_procedure(log_frame);
-
-    xv_set(log_frame, FRAME_LABEL, "Pips Log Window", NULL);
+  main_frame = xv_create(NULL, FRAME, 
+			 FRAME_LABEL, "XView Pips", 
+			 /*			   XV_WIDTH, WPIPS_WIDTH, 
+						   XV_HEIGHT, WPIPS_HEIGHT,
+						   */		   NULL);
+  install_event_procedure(main_frame);
 
 
-		/* Footers added to edit window.
-			RK, 21/05/1993. */
-	for (i = 0; i < 2; i++)
-    	edit_frame[i] = xv_create(main_frame, FRAME, 
-			   XV_SHOW, FALSE,
-			   FRAME_DONE_PROC, hide_window,
-			   XV_WIDTH, EDIT_WIDTH, 
-			   XV_HEIGHT, EDIT_HEIGHT, 
-			   FRAME_SHOW_FOOTER, TRUE,
-			   FRAME_LEFT_FOOTER, "<",
-			   FRAME_RIGHT_FOOTER, ">",
-			   NULL);
+  /* get the display dimensions */
+  dpy = (Display *)xv_get(main_frame, XV_DISPLAY);
+  screen = (Xv_Screen)xv_get(main_frame, XV_SCREEN);
+  screen_no = (int)xv_get(screen, SCREEN_NUMBER);
+
+  display_width = DisplayWidth(dpy, screen_no);
+  display_height = DisplayHeight(dpy, screen_no);
+
+  log_frame = xv_create(main_frame, FRAME, 
+			XV_SHOW, FALSE,
+			FRAME_DONE_PROC, close_log_subwindow,
+			XV_WIDTH, DIALOG_WIDTH, 
+			XV_HEIGHT, DIALOG_HEIGHT, 
+			NULL);
+  install_event_procedure(log_frame);
+
+  xv_set(log_frame, FRAME_LABEL, "Pips Log Window", NULL);
 
 
-    help_frame = xv_create(main_frame, FRAME, 
-			   FRAME_LABEL, "Pips On Line Help Facility",
-			   XV_SHOW, FALSE,
-			   FRAME_DONE_PROC, hide_window,
-			   XV_WIDTH, HELP_WIDTH, 
-			   XV_HEIGHT, HELP_HEIGHT, 
-			   NULL);
-    install_event_procedure(help_frame);
-
-    mchoose_frame = xv_create(main_frame, FRAME,
+  /* Footers added to edit window.
+     RK, 21/05/1993. */
+  for (i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
+    edit_frame[i] = xv_create(main_frame, FRAME, 
 			      XV_SHOW, FALSE,
 			      FRAME_DONE_PROC, hide_window,
+			      XV_WIDTH, EDIT_WIDTH, 
+			      XV_HEIGHT, EDIT_HEIGHT, 
+			      FRAME_SHOW_FOOTER, TRUE,
+			      FRAME_LEFT_FOOTER, "<",
+			      FRAME_RIGHT_FOOTER, ">",
 			      NULL);
-    install_event_procedure(mchoose_frame);
 
-    schoose_frame = xv_create(main_frame, FRAME,
-			      XV_SHOW, FALSE,
-			      FRAME_DONE_PROC, hide_window,
-			      NULL);
-    install_event_procedure(schoose_frame);
 
-    query_frame = xv_create(main_frame, FRAME,
+  help_frame = xv_create(main_frame, FRAME, 
+			 FRAME_LABEL, "Pips On Line Help Facility",
+			 XV_SHOW, FALSE,
+			 FRAME_DONE_PROC, hide_window,
+			 XV_WIDTH, HELP_WIDTH, 
+			 XV_HEIGHT, HELP_HEIGHT, 
+			 NULL);
+  install_event_procedure(help_frame);
+
+  mchoose_frame = xv_create(main_frame, FRAME,
 			    XV_SHOW, FALSE,
 			    FRAME_DONE_PROC, hide_window,
-			    XV_WIDTH, QUERY_WIDTH, 
-			    XV_HEIGHT, QUERY_HEIGHT, 
 			    NULL);
-    install_event_procedure(query_frame);
+  install_event_procedure(mchoose_frame);
 
-    properties_frame = xv_create(main_frame, FRAME,
-				FRAME_LABEL, "Properties panel",
-			      XV_SHOW, FALSE,
-			      XV_WIDTH, display_width - EDIT_WIDTH -2*X_WM_DECOR_SIZE, 
-			      FRAME_DONE_PROC, hide_window,
-			      NULL);
-    install_event_procedure(properties_frame);
+  schoose_frame = xv_create(main_frame, FRAME,
+			    XV_SHOW, FALSE,
+			    FRAME_DONE_PROC, hide_window,
+			    NULL);
+  install_event_procedure(schoose_frame);
+
+  query_frame = xv_create(main_frame, FRAME,
+			  XV_SHOW, FALSE,
+			  FRAME_DONE_PROC, hide_window,
+			  XV_WIDTH, QUERY_WIDTH, 
+			  XV_HEIGHT, QUERY_HEIGHT, 
+			  NULL);
+  install_event_procedure(query_frame);
+
+  properties_frame = xv_create(main_frame, FRAME,
+			       FRAME_LABEL, "Properties panel",
+			       XV_SHOW, FALSE,
+			       XV_WIDTH, display_width - EDIT_WIDTH -2*X_WM_DECOR_SIZE, 
+			       FRAME_DONE_PROC, hide_window,
+			       NULL);
+  install_event_procedure(properties_frame);
 }
 
 void place_frames()
@@ -153,6 +153,7 @@ void place_frames()
     Rect rect;
     int main_l, main_t, main_w, main_h;
     int main_center_l, main_center_t;
+    int i;
    
     Frame full_frame;
     Xv_Screen screen;
@@ -207,11 +208,11 @@ void place_frames()
 		0, 
 		main_t - xv_get(properties_frame, XV_HEIGHT) - Y_WM_DECOR_SIZE);
 
-    /* in the upper right corner : */
-    place_frame(edit_frame[0], display_width, 0);
-
-    /* in the bottom right corner : */
-    place_frame(edit_frame[1], display_width, display_height);
+    /* in the upper right corner, in the bottom right corner, etc : */
+    for(i = 0; i < MAX_NUMBER_OF_WPIPS_WINDOWS; i++)
+      /* According to the 2 least bits of the window number... */
+      place_frame(edit_frame[i], display_width*(1 - ((i >> 1) & 1)),
+		  display_height*(i & 1));
 
     /* in the upper */
     place_frame(help_frame, 
