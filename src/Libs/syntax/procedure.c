@@ -348,8 +348,12 @@ cons *l;
     entity CurrentFunction = get_current_module_entity();
     type t = entity_type(CurrentFunction);
 
-    debug(8, "UpdateFunctionalType", "Begin for %s\n",
-	  module_local_name(CurrentFunction));
+    ifdebug(8) {
+	debug(8, "UpdateFunctionalType", "Begin for %s with type ",
+	      module_local_name(CurrentFunction));
+	fprint_functional(stderr, type_functional(t));
+	(void) fprintf(stderr, "\n");
+    }
 
     pips_assert("A module type should be functional", type_functional_p(t));
 
@@ -376,8 +380,12 @@ cons *l;
 			  CONS(PARAMETER, p, NIL));
     }
 
-    debug(8, "UpdateFunctionalType", "End for %s\n",
-	  module_local_name(CurrentFunction));
+    ifdebug(8) {
+	debug(8, "UpdateFunctionalType", "End for %s with type ",
+	      module_local_name(CurrentFunction));
+	fprint_functional(stderr, type_functional(t));
+	(void) fprintf(stderr, "\n");
+    }
 }
 
 /* this function creates one entity cf that represents the function f being
