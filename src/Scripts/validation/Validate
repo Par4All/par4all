@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/02/06 11:55:25 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/02/07 13:59:24 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -47,7 +47,7 @@ DEBUG2=":"
 VERBOSE=":"
 parallel="1"
 # time between sub-validation return checks.
-update=30 
+update=10
 
 #
 # functions
@@ -178,6 +178,7 @@ available_host()
   # get the result, hostname and remove the lock files
   #
   ah_file=`randomize $RESULT.*`
+  $DEBUG2 " | ah_file is $ah_file"
   # failed="$failed-"`cat $ah_file`
   #
   # failures append
