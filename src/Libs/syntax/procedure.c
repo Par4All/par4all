@@ -295,7 +295,17 @@ cons *lfp;
 
     /* a function has an initial value 'code' that contains an empty block */
     icf = MakeEmptyInstructionBlock();
-    PushBlock(icf, (string) NULL);
+
+    /* FI: This NULL string is a catastrophy for the strcmp used later
+     * to check the content of the stack. Any string, including
+     * the empty string "", would be better. icf is used to link new
+     * instructions/statement to the current block. Only the first
+     * block is not pushed for syntactic reasons. The later blocks
+     * will be pushed for DO's and IF's.
+     */
+    /* PushBlock(icf, (string) NULL); */
+    PushBlock(icf, "INITIAL");
+
     function_body = MakeStatement(MakeLabel(""), icf);
     entity_initial(cf) = make_value(is_value_code, make_code(NIL, NULL));
 
