@@ -149,6 +149,13 @@ load_list(statement_effects m, statement s)
     return effects_effects(apply_statement_effects(m, s));
 }
 
+/****************written by Dat**********************/
+void my_effects_filter(list l, string str_filter)
+{
+  return;
+}
+/****************************************************/
+
 /********************************************************************* TEXT */
 
 /* returns the text associated to a specified prettyprint and statement 
@@ -191,6 +198,9 @@ resource_text(
 	 }
     }
 
+    /*******************written by Dat****************/
+    my_effects_filter(l_eff, "KMAX");
+    /*************************************************/
     l_eff_text = (*(pps->get_text))(l_eff);
 
     /* (*attach_effects_decoration_to_text_func)(the_effect_text); */
