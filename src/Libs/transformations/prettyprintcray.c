@@ -169,7 +169,7 @@ text text_microtasked_loop(entity module, int margin, statement lp_stt)
     list ent_l= all_enclosed_scope_variables(lp_stt);
 
     /* initializations */
-    txt = empty_text(statement_undefined);
+    txt = make_text(NIL);
 
     wordl = CHAIN_SWORD(NIL, "DO ALL ");
 
@@ -276,7 +276,7 @@ text text_vectorized_loop(entity module, int margin, statement lp_stt)
     unformatted u;
     list wordl;
 
-    txt = empty_text(statement_undefined);
+    txt = make_text(NIL);
 
     wordl = CHAIN_SWORD(NIL, "IVDEP ");
 
@@ -297,7 +297,7 @@ text text_cray(entity module, int margin, statement stat)
 
 	switch(execution_tag(loop_execution(lp))) {
 	  case (is_execution_sequential):
-	    txt = empty_text(stat);
+	    txt = make_text(NIL);
 	    break;
 	  case (is_execution_parallel):
 	    if(instruction_assign_p(statement_instruction(body))) {
@@ -312,7 +312,7 @@ text text_cray(entity module, int margin, statement stat)
 	}
     }
     else {
-	txt = empty_text(stat);
+	txt = make_text(NIL);
     }
 
     return(txt);
