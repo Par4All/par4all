@@ -2,13 +2,13 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/16 17:25:21 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/21 17:23:07 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
 c
-include(`m4_macros')dnl
+include(`hpfc_lib_m4_macros')dnl
 c
 c-----------------
 c
@@ -400,6 +400,88 @@ c
       MCASTNODES = MCASTNODES + 2
       end
 c
+c-----------------
+c
+c HPFC_PVMLENGTH
+c
+      integer function HPFC_PVMLENGTH(what)
+      integer what
+      include "fpvm3.h"
+      if (what.eq.INTEGER4.or.what.eq.REAL4) then
+         HPFC_PVMLENGTH=4
+         return
+      endif
+      if (what.eq.REAL8.or.what.eq.COMPLEX8) then
+         HPFC_PVMLENGTH=8
+         return
+      endif
+      if (what.eq.BYTE1) then
+         HPFC_PVMLENGTH=1
+         return
+      endif
+      if (what.eq.INTEGER2) then
+         HPFC_PVMLENGTH=2
+         return
+      endif
+      if (what.eq.COMPLEX16) then
+         HPFC_PVMLENGTH=16
+         return
+      endif
+      print *, "[HPFC_PVMLENGTH] unexpected tag ", what
+      stop
+      end
+c
+_CM5(`c
+c-----------------
+c
+c CM_SNDTO_A
+c
+c send to all nodes, cmmd version
+c
+      subroutine CM_SNDTO_A(what, val)
+      integer what, val
+      include "cmmd_fort.h"
+      include "hpfc_commons.h"
+      external HPFC_PVMLENGTH
+      integer HPFC_PVMLENGTH
+      integer i, len
+      len = HPFC_PVMLENGTH(what)
+      do i=1, NBOFTASKS
+         if (i.ne.MYLID) then
+            if (0.ne.CMMD_send(
+     $           CM_NODE_IDS(i),
+     $           MCASTNODES,
+     $           val,
+     $           len)) then
+               print *, "[CM_SNDTO_A] send error ", MYLID, " to ", i
+            endif
+         endif
+      enddo
+      MCASTNODES = MCASTNODES + 2
+      end
+c
+c-----------------
+c
+c CM_RCVFR_mCS
+c
+      subroutine CM_RCVFR_mCS(what, goal)
+      integer what, goal
+      include "cmmd_fort.h"
+      include "hpfc_commons.h"
+      external HPFC_PVMLENGTH
+      integer HPFC_PVMLENGTH
+      integer len
+      len = HPFC_PVMLENGTH(what)
+      if (0.ne.CMMD_receive(
+     $     CM_NODE_IDS(SLID),
+     $     MCASTNODES,
+     $     goal,
+     $     len)) then
+         print *, "[CM_RCVFR_mCS] receive error on ", MYLID
+      endif
+      MCASTNODES = MCASTNODES + 2
+      end
+c')dnl
 c-----------------
 c
 c HPFC_HSNDTO_A
@@ -819,6 +901,7 @@ c
 c HPFC_INIT_NODE
 c
       subroutine HPFC_INIT_NODE()
+      _CM5(`include "cmmd_fort.h"')
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer i, bufid, info, inum
@@ -842,6 +925,24 @@ c
          call HPFC_CMPPOS(i, MYLID, MYPOS(1, i))
       enddo
       debug(`print *, "lid: ", MYLID, " tid: ", MYTID')
+
+_CM5(`
+c
+c cm5 related id initializations
+c
+      CM_HOST_ID = cmmd_host_node()
+      CM_MY_ID   = cmmd_self_address()
+      CM_SIZE    = cmmd_partition_size()
+c
+      call pvmfinitsend(PVMRAW, info)
+      call pvmfpack(INTEGER4, CM_MY_ID, 1, 1, info)
+      call pvmfsend(HOSTTID, 1, info)
+c
+      call pvmfrecv(HOSTTID, 1, bufid)
+      call pvmfunpack(INTEGER4, CM_NODE_IDS, NBOFTASKS, 1, info)
+c
+c end of cm5 related initializations
+c')dnl
 
       call pvmfjoingroup(HPFC_GROUP_NAME, inum)
       debug(`call HPFC_SYNCHRO()')
@@ -877,9 +978,10 @@ c
 c HPFC_INIT_HOST
 c
       subroutine HPFC_INIT_HOST()
+      _CM5(`include "cmmd_fort.h"')
       include "fpvm3.h"
       include "hpfc_commons.h"
-      integer bufid, info, inum
+      integer bufid, info, inum, i
       call hpfc_check()
       call pvmfmytid(MYTID)
       direct(`call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)')
@@ -915,13 +1017,32 @@ c
 
       call HPFC_INIT_COMMON_PROCS()
 
+_CM5(`
+c
+c cm5 related id initializations
+c
+      CM_HOST_ID = cmmd_self_address()
+      CM_MY_ID   = CM_HOST_ID
+      CM_SIZE    = cmmd_partition_size()
+c
+      do i=1, NBOFTASKS
+         call pvmfrecv(NODETIDS(i), 1, info)
+         call pvmfunpack(INTEGER4, CM_NODE_IDS(i), 1, 1, info)
+      enddo
+c
+      call pvmfinitsend(PVMRAW, bufid)
+      call pvmfpack(INTEGER4, CM_NODE_IDS, NBOFTASKS, 1, info)
+      call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
+c
+c end of cm5 related initializations
+c')dnl
+
       call pvmfjoingroup(HPFC_GROUP_NAME, inum)
       if (inum.lt.0) then
          call pvmfperror("while joining group", info)
          call pvmfexit(info)
          stop
       endif
-
       debug(`call HPFC_SYNCHRO()')
 
       end
