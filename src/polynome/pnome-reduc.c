@@ -7,7 +7,6 @@
 #include <stdio.h>
 /*for debug with dbmalloc */
 /*
-#include <sys/stdtypes.h>
 #include <malloc.h>
 */
 #include <assert.h>
