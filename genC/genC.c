@@ -4,9 +4,13 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.33  1998/04/11 12:23:42  coelho
+ * make based on gen_alloc on second thought.
+ * forgotten special case of tabulated fixed.
+ * initial definitions fixed for import.
+ *
  * Revision 1.32  1998/04/11 11:49:00  coelho
  * new version which generate struct.
- *
  */
 
 #include <stdio.h>
@@ -18,6 +22,7 @@
 
 #define INDENT "  "
 #define FIELD  "field_"
+#define STRUCT "_newgen_struct_"
 
 #define IS_TAB(x) ((x)==Tabulated_bp)
 #define TYPE(bp) (bp-Domains-Number_imports-Current_start)
@@ -27,7 +32,7 @@
  */
 int gen_size(struct gen_binding * bp)
 {
-    int overhead = GEN_HEADER+IS_TABULATED( bp ) ;
+    int overhead = GEN_HEADER + IS_TABULATED(bp);
 
     switch (bp->domain->ba.type) 
     {
@@ -115,18 +120,6 @@ static string newgen_kind_label(union domain * dp)
     }
 }
 
-static void generate_assignment_for_make(
-    FILE * out,
-    struct gen_binding * bp,
-    union domain * dom,
-    bool cast,
-    int arg)
-{
-    fprintf(out, INDENT "%s_%s(r) = ", bp->name, dom->ba.constructor);
-    if (cast) fprintf(out, "(%s) ", newgen_argument_type_name(dom));
-    fprintf(out, "a%d;\n", arg);
-}
-
 static void generate_make(
     FILE * header,
     FILE * code,
@@ -187,7 +180,7 @@ static void generate_make(
 			newgen_argument_type_name(dlp->domain), i);
 	    break;
 	case OR_OP:
-	    fprintf(code, "int tag, void * a2");
+	    fprintf(code, "int tag, void * val");
 	    break;
 	case ARROW_OP:
 	    fprintf(code, "void");
@@ -197,69 +190,40 @@ static void generate_make(
     case LIST_DT:
     case SET_DT:
     case ARRAY_DT:
-	fprintf(code, "%s a1", newgen_argument_type_name(dom));
+	fprintf(code, "%s a", newgen_argument_type_name(dom));
 	break;
     }
 
-    fprintf(code, 
-	    ")\n{\n"
-	    INDENT "%s r = (%s) malloc(sizeof(struct newgen_struct_%s));\n\n"
-	    INDENT "if (r==NULL) {\n"
-	    INDENT INDENT "fprintf(stderr, \"[make_%s] no more memory\\n\");\n"
-	    INDENT INDENT "exit(1);\n"
-	    INDENT "}\n\n"
-	    INDENT "%s_domain_number(r) = %s_domain;\n",
-	    name, name, name, /* malloc */
-	    name, /* check malloc */
-	    name, name /* set type field */);
-
-    if (domain_type==CONSTRUCTED_DT && operator==OR_OP)
-	fprintf(code, 
-		INDENT "%s_tag(r) = tag;\n"
-		INDENT "switch (tag) {\n", name);
-
-    /* set field */
-    switch (domain_type) 
+    fprintf(code,
+	    ")\n{ return (%s) "
+	    "gen_alloc(%d*sizeof(gen_chunk), GEN_CHECK_ALLOC, %s_domain",
+	    name, gen_size(bp), name);
+    
+    
+    switch (domain_type)
     {
     case CONSTRUCTED_DT:
 	switch (operator)
 	{
 	case AND_OP:
 	    for (i=1, dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr, i++)
-		generate_assignment_for_make(code, bp, dlp->domain, FALSE, i);
+		fprintf(code, ", a%d", i);
 	    break;
 	case OR_OP:
-	    for (i=1, dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr, i++)
-	    {
-		fprintf(code, INDENT "case is_%s_%s:\n" INDENT,
-			name, dlp->domain->ba.constructor);
-		generate_assignment_for_make(code, bp, dlp->domain, TRUE, 2);
-		fprintf(code, INDENT INDENT "break;\n");
-	    }
+	    fprintf(code, ", tag, val");
 	    break;
 	case ARROW_OP:
-	    fprintf(code, 
-	       INDENT "%s_hash_table(r) = hash_table_make(hash_chunk, 0);\n",
-		    name);
 	    break;
 	}
 	break;
     case LIST_DT:
     case SET_DT:
     case ARRAY_DT:
-	generate_assignment_for_make(code, bp, dom, FALSE, 1);
+	fprintf(code, ", a");
 	break;
     }
 
-    if (domain_type==CONSTRUCTED_DT && operator==OR_OP)
-	fprintf(code, 
-		INDENT "default:\n"
-		INDENT INDENT "fprintf(stderr, \"[make_%s] "
-		"unexpected tag %%d\\n\", tag);\n"
-		INDENT INDENT "abort();\n"
-		INDENT "}\n\n", name);
-
-    fprintf(code, INDENT "return r;\n}\n\n");
+    fprintf(code, "); }\n");
 }
 
 static void generate_struct_members(
@@ -276,10 +240,15 @@ static void generate_struct_members(
     /* generate the structure
      */
     fprintf(out, 
-	    "struct newgen_struct_%s {\n"
+	    "struct " STRUCT "%s {\n"
 	    INDENT "gen_chunk type; /* int */\n",
 	    bp->name);
  
+    /* there is an additionnal field in tabulated domains.
+     */
+    if (IS_TABULATED(bp))
+	fprintf(out, INDENT "gen_chunk index; /* int */\n");
+
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
 	fprintf(out, INDENT "gen_chunk tag; /* int */\n" INDENT "union {\n");
 	offset = INDENT;
@@ -461,22 +430,31 @@ generate_safe_definition(
     string name = bp->name, Name = strup(name);
     int index = TYPE(bp);
 
+    if (!IS_EXTERNAL(bp) && !IS_IMPORT(bp))
+	fprintf(out, 
+		"#define %s_domain (_gen_%s_start+%d)\n",
+		name, file, index);
+
     fprintf(out, 
-	   "#if !defined(_newgen_%s_defined)\n"
-	   "#define _newgen_%s_defined\n",
+	   "#if !defined(_newgen_%s_domain_defined_)\n"
+	   "#define _newgen_%s_domain_defined_\n",
 	    name, name);
+
     if (IS_EXTERNAL(bp))
+	/* kind of a bug here: if the very same externals appears
+	 * several times, they are not sure to be attributed the same
+	 * number in different files with different include orders.
+	 * externals should really be global?
+	 */
 	fprintf(out, 
 		"#define %s_NEWGEN_EXTERNAL (_gen_%s_start+%d)\n",
 		Name, file, index);
     else
 	fprintf(out, 
-		"#define %s_domain (_gen_%s_start+%d)\n"
-		"typedef struct newgen_struct_%s * %s;\n", 
-		name, file, index,
+		"typedef struct " STRUCT "%s * %s;\n", 
 		name, name);
     
-    fprintf(out, "#endif /* _newgen_%s_defined */\n\n", name);
+    fprintf(out, "#endif /* _newgen_%s_domain_defined_ */\n\n", name);
     free(Name);
 }
 
