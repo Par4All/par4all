@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/04/02 13:20:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/04/14 21:28:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1998/04/02 13:20:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1998/04/14 21:28:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -9,6 +9,7 @@ char vcid_syntax_equivalence[] = "%A% ($Date: 1998/04/02 13:20:08 $, ) version $
 #include <stdio.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "parser_private.h"
