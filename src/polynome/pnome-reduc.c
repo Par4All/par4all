@@ -1,4 +1,4 @@
-/***************************************************************** pnome-reduc.c
+/************************************************************* pnome-reduc.c
  *
  * REDUCTIONS ON POLYNOMIALS
  *
@@ -13,6 +13,7 @@
 #include <assert.h>
 
 #include "boolean.h"
+#include "arithmetique.h"
 #include "vecteur.h"
 #include "polynome.h"
 
