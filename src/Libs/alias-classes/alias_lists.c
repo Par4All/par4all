@@ -19,18 +19,13 @@
 
 #include "semantics.h"
 
-/* commented out for compilation - bc - beware, it seems dangerous */
-/*
-#include "effects-convex-local.h"
-#include "union-local.h"
-*/
 #include "pipsdbm.h"
 #include "resources.h"
 
 #define BACKWARD TRUE
 #define FORWARD FALSE
 
-static list l_alias_lists;
+static list l_alias_lists = NIL;
 
 /*
 static bool
@@ -171,72 +166,154 @@ make_alias_lists_for_sub_regions(string module_name)
 }
 */
 
-/*
 static bool
 add_pair_to_existing_list(alias_pair)
 {
-    list rest_alias_lists = l_alias_lists;
+    list *rest_alias_lists;
     list alias_list;
-    region reg, trans_reg, alias_reg;
+    region reg, alias_reg;
+    Psysteme reg_sys, alias_reg_sys;
     bool result = FALSE;
 
-    reg = EFFECT( CAR(alias_pair) );
-    trans_reg = EFFECT( CAR(CDR(alias_pair)) );
+    pips_debug(4,"begin\n");
 
+    reg = EFFECT( CAR(alias_pair) );
+
+    ifdebug(9)
+	{
+	    set_action_interpretation(ACTION_IN,ACTION_OUT);
+	    pips_debug(9,"compare:\n\t");
+	    print_region(reg);
+	}
+    
+    rest_alias_lists = &l_alias_lists;
     if (l_alias_lists != NIL)
 	do {
-	    alias_list = LIST( CAR(rest_alias_lists) );
+	    alias_list = LIST( CAR(*rest_alias_lists) );
 	    alias_reg = LIST( CAR(alias_list) );
-	    if (alias_reg == reg)
+
+	    ifdebug(9)
+		{
+		    pips_debug(9,"with:\n\t");
+		    print_region(alias_reg);
+		}
+
+	    if ( effects_same_action_p(reg,alias_reg) )
 	    {
-		result = TRUE;
-		alias_list = gen_nconc(alias_list,CDR(alias_pair));
+		reg_sys = region_system(reg);
+		alias_reg_sys = region_system(alias_reg);
+		if ( sc_equal_p_ofl(reg_sys,alias_reg_sys) )
+		{
+		    result = TRUE;
+
+		    pips_debug(4,"same region\n");
+
+		    alias_list = gen_nconc(alias_list,CDR(alias_pair));
+		}
 	    }
-	    rest_alias_lists = CDR(rest_alias_lists);
-	} while (rest_alias_lists != NIL && result == FALSE);
+	    rest_alias_lists = &CDR(*rest_alias_lists);
+	} while (*rest_alias_lists != NIL && result == FALSE);
+
+    ifdebug(9) 
+	{
+	    reset_action_interpretation();
+	}
+    pips_debug(4,"end\n");
+
     return result;
 }
-*/
 
 
 bool
 alias_lists( string module_name )
     {
-/*    list l_alias_pairs;
+    list in_alias_pairs, out_alias_pairs;
+    entity module;
 
     l_alias_lists = NIL;
-*/
+
+    pips_debug(4,"begin for module %s\n",module_name);
+
+    ifdebug(9)
+	{
+	    /* ATTENTION: we have to do ALL this
+	     * just to call print_inout_regions for debug !!
+	     */
+	    set_current_module_entity(
+		local_name_to_top_level_entity(module_name) );
+	    module = get_current_module_entity();
+	    set_current_module_statement( (statement)
+					  db_get_memory_resource(DBR_CODE,
+								 module_name,
+								 TRUE) );
+	    set_cumulated_rw_effects((statement_effects)
+				     db_get_memory_resource(
+					 DBR_CUMULATED_EFFECTS,
+					 module_name,
+					 TRUE));
+	    module_to_value_mappings(module);
+	    /* that's it, but we musn't forget to reset everything below */
+	}
+
     /* make alias lists from the IN_alias_pairs */
-/* l_alias_pairs = (list) db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
+    in_alias_pairs = effects_to_list((effects)
+				    db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
 					    module_name,
-					    TRUE);
+					    TRUE));
     MAP(EFFECTS, alias_pair_effects,
 	{
 	    list alias_pair = regions_dup(effects_to_list(alias_pair_effects));
+
+	    ifdebug(9)
+		{
+		    pips_debug(9,"IN alias pair: \n");
+		    print_inout_regions(alias_pair);
+		}
+
 	    if ( ! add_pair_to_existing_list(alias_pair) )
 	    l_alias_lists = gen_nconc(l_alias_lists,CONS(LIST,alias_pair,NIL));
+
+	    pips_debug(9,"IN pair added\n");
 		},
-	l_alias_pairs);
-	*/
+	in_alias_pairs);
+
     /* make alias lists from the OUT_alias_pairs */
-/*    l_alias_pairs = (list) db_get_memory_resource(DBR_OUT_ALIAS_PAIRS,
+    out_alias_pairs = effects_to_list((effects)
+				    db_get_memory_resource(DBR_OUT_ALIAS_PAIRS,
 					    module_name,
-					    TRUE);
+					    TRUE));
     MAP(EFFECTS, alias_pair_effects,
 	{
 	    list alias_pair = regions_dup(effects_to_list(alias_pair_effects));
+
+	    ifdebug(9)
+		{
+		    pips_debug(9,"OUT alias pair: \n");
+		    print_inout_regions(alias_pair);
+		}
+
 	    if ( ! add_pair_to_existing_list(alias_pair) )
 	    l_alias_lists = gen_nconc(l_alias_lists,CONS(LIST,alias_pair,NIL));
+
+	    pips_debug(9,"OUT pair added\n");
 	},
-	l_alias_pairs);
-	*/
+	out_alias_pairs);
+
     /* check all callees for sub-regions of existing aliases */
-/*    make_alias_lists_for_sub_regions(module_name);
+/*    make_alias_lists_for_sub_regions(module_name); */
 
     DB_PUT_MEMORY_RESOURCE(DBR_ALIAS_LISTS, 
 			   strdup(module_name),
 			   (char*) make_effects_classes(l_alias_lists));    
-			   */
+
+    ifdebug(9)
+	{
+	    reset_current_module_statement();
+	    reset_cumulated_rw_effects();
+	    reset_current_module_entity();
+	}
+    pips_debug(4,"end\n");
+
     return(TRUE);
 }
 
