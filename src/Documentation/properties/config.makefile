@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/02 10:47:07 $, 
+# $Date: 1996/09/02 10:49:55 $, 
 
 SOURCES	= properties-rc.tex
 
@@ -20,7 +20,8 @@ properties.rc: properties-rc.tex
 
 clean: local-clean
 local-clean:
-	$(RM) -r $(INSTALL_HTM) $(INSTALL_DOC) $(INSTALL_SHR) *.dvi
+	$(RM) -r $(INSTALL_HTM) $(INSTALL_DOC) $(INSTALL_SHR) \
+		properties-rc.html *.dvi
 
 # end of $RCSfile: config.makefile,v $
 #
