@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.25  1997/12/05 11:37:30  coelho
+# preprocessor added.
+#
 # Revision 1.24  1997/11/21 10:23:13  coelho
 # polylib added as an independent lib.
 #
@@ -19,9 +22,6 @@
 #
 # Revision 1.19  1997/08/18 12:29:02  coelho
 # X11 added explicitely to wpips for linux.
-#
-# Revision 1.18  1997/08/18 09:56:23  coelho
-# *** empty log message ***
 #
 # Revision 1.17  1997/08/18 07:43:58  coelho
 # *_MAIN added.
@@ -73,10 +73,10 @@ LINEAR_LIBS='-lmatrice -lunion -lpolyedre -lpolylib -lsparse_sc -lsc -lcontraint
 # many doc dirs are skipped (would be long?)
 PIPS_DOCS='Documentation constants help manl newgen'
 
-PIPS_ORDERED_LIBS='xpomp text-util properties misc ri-util conversion movements pipsdbm comp_sections transformer bootstrap control hyperplane flint syntax prettyprint static_controlize effects effects-generic effects-simple semantics complexity continuation reductions regions effects-convex alias-classes callgraph icfg paf-util pip ricedg array_dfg prgm_mapping scheduling reindexing chains rice transformations hpfc atomizer wp65 pipsmake top-level pips tpips wpips fpips'
+PIPS_ORDERED_LIBS='xpomp text-util properties misc ri-util conversion movements pipsdbm comp_sections transformer bootstrap control hyperplane flint syntax prettyprint static_controlize effects effects-generic effects-simple semantics complexity continuation reductions regions effects-convex alias-classes callgraph icfg paf-util pip ricedg array_dfg prgm_mapping scheduling reindexing chains rice transformations hpfc atomizer wp65 preprocessor pipsmake top-level pips tpips wpips fpips'
 
 # all libraires for pips
-PIPS_LIBS='-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -leffects-simple -leffects-convex -leffects-generic -lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint $(NEWGEN_LIBS) $(LINEAR_LIBS) -lm -lrx'
+PIPS_LIBS='-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -leffects-simple -leffects-convex -leffects-generic -lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer -lpip -lpreprocessor -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint $(NEWGEN_LIBS) $(LINEAR_LIBS) -lm -lrx'
 
 
 #
