@@ -1,15 +1,15 @@
 ! $RCSfile: hpfc_main.f,v $ (version $Revision$)
-! $Date: 1996/09/07 15:50:52 $, 
+! $Date: 1997/06/03 15:12:56 $, 
 !
 ! the main for the HPFC program (for both host and node)
 !
       program MAIN
       include "hpfc_commons.h"
       call HPFC INIT MAIN
-      if (HOST TID.eq.MY TID) then
-         call HOST
+      if (MY TID.eq.HOST TID) then
+       call HOST
       else
-         call NODE
+       call NODE
       end if
       end
 !
