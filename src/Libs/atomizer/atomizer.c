@@ -29,34 +29,8 @@
  * NLCs and is integer linear, is not decomposed by the atomizer, ie. it is
  * considered as a constant.
  */
-#include <stdlib.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <string.h>
 
-#include "genC.h"
-
-#include "properties.h"
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-#include "database.h"
-
-#include "ri-util.h"
-#include "text-util.h"
-#include "control.h"
-#include "constants.h"
-#include "misc.h"
-#include "text.h"
-
-#include "pipsdbm.h"
-#include "resources.h"
-
-#include "effects-generic.h"
-#include "transformations.h"
-
-/* #include "loop_normalize.h" */
-#include "atomizer.h"
+#include "local.h"
 
 /* Gives the size of the hash table named "MemToTmp". */
 #define MEM_TO_TMP_SIZE 100
