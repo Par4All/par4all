@@ -58,6 +58,8 @@ string phase;
     debug_on("PIPSMAKE_DEBUG_LEVEL");
     debug(1, "activate", "%s - requested\n", phase);
 
+    pips_assert("open_module",
+		db_get_current_workspace()!=database_undefined);
 
     /* find rule that describes phase */
     r = find_rule_by_phase(phase);
