@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.94  1998/11/24 17:48:19  coelho
+ * accept empty files. no big deal, just a warning.
+ *
  * Revision 1.93  1998/07/10 20:42:56  irigoin
  * Handling of complex constant commented out
  *
@@ -856,6 +859,8 @@ bool process_user_file(string file)
     if(!success_p)
 	pips_user_warning("No module was found when splitting file %s.\n",
 			  nfile);
+
     free(nfile);
-    return success_p; /* FALSE if no module was found. */
+
+    return TRUE; /* well, returns ok whether modules were found or not. */
 }
