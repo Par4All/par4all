@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/02/23 18:07:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/02/28 09:05:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/02/23 18:07:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/02/28 09:05:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -780,9 +780,11 @@ int n ;
     if(!ENDP(loop_locals(obj)) && (doall_loop_p || all_private)
        && !hpf_prettyprint) 
     {
-	MERGE_TEXTS(r, make_sentence(is_sentence_unformatted,
-		     make_unformatted(NULL, 0, margin+INDENTATION,
-				      loop_private_variables(obj))));
+	list /* of string */ lp = loop_private_variables(obj);
+
+	if (lp) 
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+	        make_unformatted(NULL, 0, margin+INDENTATION, lp)));
     }
 
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
