@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compiler-util.c,v $ ($Date: 1994/11/17 14:19:11 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1994/12/02 15:00:54 $, )
  * got on %D%, %T%
  * $Id$
  *
@@ -106,152 +106,70 @@ control_mapping map;
  * everything may be quite false regarding to the real effects of
  * the functions called, but it seems to me that the pips effect analysis
  * doesn't match my needs... and I have not much time to think about that...
+ *
+ * ??? these stupid functions assume no indirections on distributed arrays
+ * ??? also that they are not written by a function other than assign
  */
-void FindRefToDistArrayInStatement(stat, lwp, lrp)
-statement stat;
+
+static list
+   found_written = NIL,
+   found_read = NIL;
+
+#define call_assign_p(c) \
+  (strcmp(entity_local_name(call_function(c)), ASSIGN_OPERATOR_NAME)==0)
+
+static bool FindRefToDistArrayInStatement_call_filter(c)
+call c;
+{
+    list l;
+    syntax s;
+
+    if (!call_assign_p(c)) return(TRUE);
+
+    /*   else ASSIGN case
+     */
+
+    l = call_arguments(c);
+    s = expression_syntax(EXPRESSION(CAR(l)));
+    
+    if (array_distributed_p(reference_variable(syntax_reference(s))))
+	found_written = CONS(SYNTAX, s, found_written);
+    
+    found_read = 
+	gen_nconc(FindRefToDistArray(EXPRESSION(CAR(CDR(l)))),
+		  found_read);
+    
+    return(FALSE);
+}
+
+static bool FindRefToDistArrayInStatement_expression_filter(e)
+expression e;
+{
+    found_read = gen_nconc(FindRefToDistArray(e), found_read);
+    return(FALSE);
+}
+
+void FindRefToDistArrayInStatement(obj, lwp, lrp)
+chunk* obj;
 list *lwp, *lrp;
 {
-    instruction 
-	inst = statement_instruction(stat);
+    list
+	saved_r = found_read,
+	saved_w = found_written;
 
-    (*lwp) = NULL ;
-    (*lrp) = NULL ;
+    found_read = NIL, found_written = NIL;
 
-    switch(instruction_tag(inst))
-    {
-    case is_instruction_block:
-	debug(9, "FindRefToDistArrayInStatement", "block\n");
+    gen_multi_recurse(obj,
+		      call_domain,
+		      FindRefToDistArrayInStatement_call_filter,
+		      gen_null,
+		      expression_domain,
+		      FindRefToDistArrayInStatement_expression_filter,
+		      gen_null,
+		      NULL);
 
-	MAPL(cs,
-	 {
-	     statement 
-		 s = STATEMENT(CAR(cs));
-	     list 
-		 lw=NULL;
-	     list 
-		 lr=NULL;
-
-	     FindRefToDistArrayInStatement(s, &lw, &lr);
-
-	     (*lwp) = gen_nconc((*lwp), lw);
-	     (*lrp) = gen_nconc((*lrp), lr);
-	 },
-	     instruction_block(inst));
-
-	     debug(9, "FindRefToDistArrayInStatement", "end block\n");
-
-	break;
-    case is_instruction_test:
-    {
-	test
-	    t = instruction_test(inst);
-	list
-	    lw = NULL,
-	    lr = NULL;
-	
-	debug(9, "FindRefToDistArrayInStatement", "test\n");
-
-	FindRefToDistArrayInStatement(test_true(t), &lw, &lr);
-	(*lwp) = gen_nconc(lw, (*lwp));
-	(*lrp) = gen_nconc(lr, (*lrp));
-	
-	lw = NULL;
-	lr = NULL;
-	FindRefToDistArrayInStatement(test_false(t), &lw, &lr);
-	(*lwp) = gen_nconc(lw, (*lwp));
-	(*lrp) = gen_nconc(lr, (*lrp));
-
-	/*
-	 * ??? False!
-	 */
-	(*lrp) = gen_nconc(FindRefToDistArray(test_condition(t)), (*lrp));
-
-	break;
-    }
-    case is_instruction_loop:
-    {
-	loop
-	    l = instruction_loop(inst);
-	range
-	    r = loop_range(l);
-	list
-	    lw = NULL,
-	    lr = NULL;
-
-	debug(9, "FindRefToDistArrayInStatement", "loop\n");
-
-	FindRefToDistArrayInStatement(loop_body(l), &lw, &lr);
-	(*lwp) = gen_nconc((*lwp), lw);
-	(*lrp) = gen_nconc((*lrp), lr);
-
-	/*
-	 * ??? False!
-	 */
-	(*lrp) = gen_nconc(FindRefToDistArray(range_lower(r)), (*lrp));
-	(*lrp) = gen_nconc(FindRefToDistArray(range_upper(r)), (*lrp));
-	(*lrp) = gen_nconc(FindRefToDistArray(range_increment(r)), (*lrp));
-
-	break;
-    }
-    case is_instruction_goto:
-	break;
-    case is_instruction_call:
-    {
-	call
-	    c = instruction_call(inst);
-	list
-	    la = call_arguments(c);
-
-	debug(9, "FindRefToDistArrayInStatement", "call\n");
-
-	if (instruction_assign_p(inst))
-	{
-	    (*lwp) = FindRefToDistArray(EXPRESSION(CAR(la)));
-	    (*lrp) = FindRefToDistArray(EXPRESSION(CAR(CDR(la))));
-	}
-	else
-	{
-	    /*
-	     * ??? False!
-	     */
-	    (*lrp) = FindRefToDistArrayFromList(la);
-	}
-	break;
-    }
-    case is_instruction_unstructured:
-    {
-	unstructured
-	    u = instruction_unstructured(inst);
-	control
-	    ct = unstructured_control(u);
-	list
-	    blocks=NIL;
-
-	debug(9, "FindRefToDistArrayInStatement", "unstructured\n");
-
-	CONTROL_MAP(c,
-		{
-		    list
-			lw = NULL;
-		    list 
-			lr = NULL;
-
-		    FindRefToDistArrayInStatement(control_statement(c), &lw, &lr);
-		    
-		    (*lwp) = gen_nconc(lw, (*lwp));
-		    (*lrp) = gen_nconc(lr, (*lrp));
-		},
-		    ct,
-		    blocks);
-
-	gen_free_list(blocks);
-
-	break;
-    }
-    default:
-	pips_error("FindRefToDistArrayInStatement","unexpected instruction tag\n");
-	break;
-    }
+    *lwp = found_written, *lrp = found_read,
+    found_read = saved_r, found_written = saved_w;
 }
 
 
@@ -276,7 +194,7 @@ list IndicesOfRef(syn)
 syntax syn;
 {
     list 
-	l = NULL;
+	l = NIL;
 
     pips_assert("IndicesOfRef",(syntax_reference_p(syn)));
 
@@ -294,10 +212,7 @@ syntax syn;
 	     pips_error("IndicesOfRef","don't konw what to do with a range\n");
 	     break;
 	 case is_syntax_call:
-	     /*
-	      * ???
-	      *
-	      * could check that the given call is a constant.
+	     /*     ??? could check that the given call is a constant.
 	      */
 	     break;
 	 default:
@@ -329,17 +244,18 @@ list l, lsyn;
     return(lsyn);
 }
 
-/*
- * is_in_syntax_list
- */
 bool is_in_syntax_list(e, l)
 entity e;
 list l;
 {
-    return((ENDP(l))?
-	   (FALSE):
-	   ((e==reference_variable(syntax_reference(SYNTAX(CAR(l))))) ||
-	    (is_in_syntax_list(e, CDR(l)))));
+    MAPL(cs,
+     {
+	 if (e==reference_variable(syntax_reference(SYNTAX(CAR(cs)))))
+	     return(TRUE);
+     },
+	 l);
+
+    return(FALSE);
 }
 
 /*
@@ -348,86 +264,58 @@ list l;
  * ??? False!
  * The definition looked for must be an assignment call...
  */
+
+static list
+  syntax_list=NIL,
+  found_definitions=NIL;
+
+static void FindDefinitionsOf_rewrite(s)
+statement s;
+{
+    instruction
+	i = statement_instruction(s);
+
+    /* ??? False! nothing is checked about the statement movement...
+     */
+    if (instruction_assign_p(i))
+	if (is_in_syntax_list
+	    (reference_variable
+	     (expression_reference
+	      (EXPRESSION(CAR(call_arguments(instruction_call(i)))))),
+		 syntax_list))
+	{
+	    found_definitions = 
+		CONS(STATEMENT, make_stmt_of_instr(i), found_definitions);
+	    statement_instruction(s) = 
+		make_continue_instruction();
+	}
+}
+
 list FindDefinitionsOf(stat, lsyn)
 statement stat;
 list lsyn;
 {
     list
-	l = NULL;
-    instruction
-	inst = statement_instruction(stat);
+	result = NIL;
 
-    switch(instruction_tag(inst))
-    {
-    case is_instruction_block:
-	MAPL(cs,
-	 {
-	     l = gen_nconc(FindDefinitionsOf(STATEMENT(CAR(cs)), lsyn), l);
-	 },
-	     instruction_block(inst));
-	break;
-    case is_instruction_test:
-    {
-	test
-	    t = instruction_test(inst);
+    pips_assert("FindDefinitionsOf", 
+		ENDP(syntax_list) && ENDP(found_definitions));
 
-	l = gen_nconc(FindDefinitionsOf(test_true(t), lsyn),
-		      FindDefinitionsOf(test_false(t), lsyn));
+    syntax_list = lsyn;
 
-	break;
-    }
-    case is_instruction_loop:
-	l = FindDefinitionsOf(loop_body(instruction_loop(inst)), lsyn);
-	break;
-    case is_instruction_goto:
-	break;
-    case is_instruction_call:
-	/*
-	 * ??? False!
-	 * nothing is checked about the statement movement...
-	 */
-	if (instruction_assign_p(inst))
-	{
-	    if (is_in_syntax_list
-		(reference_variable
-		 (expression_reference
-		  (EXPRESSION(CAR(call_arguments(instruction_call(inst)))))),
-		 lsyn))
-	    {
-		l = CONS(STATEMENT, make_stmt_of_instr(inst), NIL);
-		statement_instruction(stat) = 
-		    make_continue_instruction();
-	    }
-	}
-	break;
-    case is_instruction_unstructured:
-    {
-	unstructured
-	    u = instruction_unstructured(inst);
-	control
-	    ct = unstructured_control(u);
-	list
-	    blocks=NIL;
+    gen_recurse(stat,
+		statement_domain,
+		gen_true,
+		FindDefinitionsOf_rewrite);
 
-	CONTROL_MAP(c, 
-		{
-		    l = gen_nconc(FindDefinitionsOf(control_statement(c), 
-						    lsyn), 
-				  l);
-		},
-		    ct, 
-		    blocks);
+    /* pips_assert("FindDefinitionsOf", 
+		gen_length(syntax_list)==gen_length(found_definitions)); */
 
-	gen_free_list(blocks);
+    result = found_definitions,
+    syntax_list = NIL,
+    found_definitions = NIL;
 
-	break;
-    }
-    default:
-	pips_error("FindDefinitionsOf","unexpected instruction tag\n");
-	break;
-    }
-    
-    return(l);
+    return(result);
 }
 
 /*
@@ -443,193 +331,11 @@ statement stat;
 {
     bool
 	result = TRUE;
-    list
-	lloop = NIL;
 
     user_warning("atomic_accesses_only_p", 
-		 "only partially implemented\n");
-
-/*
-    result = (!sequential_loop_in_statement_p
-	      (perfectly_nested_parallel_loop_to_body(stat, &lloop)));
-*/
-
-    gen_free_list(lloop);
+		 "not  implemented, returning TRUE\n");
 
     return(result);
-}
-
-bool sequential_loop_in_statement_p(stat)
-statement stat;
-{
-    instruction
-	inst = statement_instruction(stat);
-
-    switch(instruction_tag(inst))
-    {
-    case is_instruction_block:
-	MAPL(cs,
-	 {
-	     if (sequential_loop_in_statement_p(STATEMENT(CAR(cs))))
-		 return(TRUE);
-	 },
-	     instruction_block(inst));
-        break;
-    case is_instruction_test:
-    {
-	test
-	    t = instruction_test(inst);
-
-	return(sequential_loop_in_statement_p(test_true(t)) ||
-	       sequential_loop_in_statement_p(test_false(t)));
-    }
-    case is_instruction_loop:
-    {
-	loop
-	    l = instruction_loop(inst);
-
-	if (execution_parallel_p(loop_execution(l)))
-	    return(TRUE);
-	else
-	    return(sequential_loop_in_statement_p(loop_body(l)));
-    }
-    case is_instruction_goto:
-        break;
-    case is_instruction_call:
-        break;
-    case is_instruction_unstructured:
-     {
-	list
-	    blocks = NULL;
-	control
-	    ct = unstructured_control(instruction_unstructured(inst));
-	bool
-	    sequential_loop_inside = FALSE;
-	
-	CONTROL_MAP(c,
-		{
-		    if (sequential_loop_in_statement_p(control_statement(c)))
-			sequential_loop_inside = TRUE;
-		},
-		    ct,
-		    blocks);
-	gen_free_list(blocks);		
-	return(sequential_loop_inside);
-    }
-    default:
-        pips_error("","unexpected instruction tag\n");
-        break;
-    }
-
-    return(FALSE);
-}
-
-/*
- * stay_inside_statement_p
- *
- * checks that no "goto" goes outside a loop nest.
- * ??? should also checks that no goto may go inside the loop nest...
- * but I don't think that is allowed, even in Fortran:-)
- */
-bool stay_inside_statement_p(stat)
-statement stat;
-{
-    list
-	llabels = list_of_labels(stat),
-	lgotos  = list_of_gotos(stat);
-    bool
-	stay_in = TRUE;
-
-    MAPL(ce,
-     {
-	 if ((entity) gen_find_eq(ENTITY(CAR(ce)), llabels) == entity_undefined)
-	     stay_in = FALSE;
-     },
-	 lgotos);
-    
-    gen_free_list(llabels);
-    gen_free_list(lgotos);
-
-    debug(6, "stay_inside_statement_p", "returning %d\n", stay_in);
-    return(stay_in);
-}
-
-/*
- * io_inside_statement_p
- *
- * ??? should be with interprocedural informations...
- */
-bool io_inside_statement_p(stat)
-statement stat;
-{
-    instruction
-	inst = statement_instruction(stat);
-
-    switch(instruction_tag(inst))
-    {
-    case is_instruction_block:
-	debug(7, "io_inside_statement_p", "block beginning\n");
-	MAPL(cs,
-	 {
-	     if (io_inside_statement_p(STATEMENT(CAR(cs))))
-		 return(TRUE);
-	 },
-	     instruction_block(inst));
-	debug(7, "io_inside_statement_p", "block end\n");
-        break;
-    case is_instruction_test:
-    {
-	test
-	    t = instruction_test(inst);
-
-	debug(7, "io_inside_statement_p", "test\n");
-
-	return(io_inside_statement_p(test_true(t)) ||
-	       io_inside_statement_p(test_false(t)));
-    }
-    case is_instruction_loop:
-	debug(7, "io_inside_statement_p", 
-	      "loop %s\n", entity_name(loop_index(instruction_loop(inst))));
-	return(io_inside_statement_p(loop_body(instruction_loop(inst))));
-    case is_instruction_goto:
-	break;
-    case is_instruction_call:
-	/*
-	 * ??? but what about calling a function that has io...
-	 * there is the same problem in the expressions...
-	 */
-	debug(7, "io_inside_statement_p",
-	      "call to %s\n", entity_name(call_function(instruction_call(inst))));
-	if (IO_CALL_P(instruction_call(inst)))
-	    return(TRUE);
-	break;
-    case is_instruction_unstructured:
-    {
-	list
-	    blocks = NULL;
-	control
-	    ct = unstructured_control(instruction_unstructured(inst));
-	bool
-	    io_inside = FALSE;
-	
-	debug(7, "io_inside_statement_p", "unstructured\n");
-	
-	CONTROL_MAP(c,
-		{
-		    if (io_inside_statement_p(control_statement(c)))
-			io_inside = TRUE;
-		},
-		    ct,
-		    blocks);
-	gen_free_list(blocks);		
-	return(io_inside);
-    }
-    default:
-        pips_error("io_inside_statement_p","unexpected instruction tag\n");
-        break;
-    }
-
-    return(FALSE); /* just to avoid a gcc warning */
 }
 
 /*
@@ -646,143 +352,7 @@ statement stat;
     return(FALSE);
 }
 
-/*
- * list_of_labels
- *
- * list of labels in a given statement
- */
-list list_of_labels(stat)
-statement stat;
-{
-    entity
-	label = statement_label(stat);
-    instruction
-	inst = statement_instruction(stat);
-    list 
-	ll = NULL;
-
-    if (!entity_empty_label_p(label))
-	ll = CONS(ENTITY, label, ll);
-
-    switch(instruction_tag(inst))
-    {
-    case is_instruction_block:
-    {
-	MAPL(ce,
-	 {
-	     ll = gen_nconc(list_of_labels(STATEMENT(CAR(ce))), ll);
-	 },
-	     instruction_block(inst));
-        break;
-    }
-    case is_instruction_test:
-    {
-	test
-	    t = instruction_test(inst);
-
-	ll = gen_nconc(list_of_labels(test_false(t)),
-		       gen_nconc(list_of_labels(test_true(t)), ll));
-        break;
-    }
-    case is_instruction_loop:
-	ll = gen_nconc(list_of_labels(loop_body(instruction_loop(inst))), ll);
-        break;
-    case is_instruction_goto:
-        break;
-    case is_instruction_call:
-        break;
-    case is_instruction_unstructured:
-    {
-	list
-	    blocks = NULL;
-	control
-	    ct = unstructured_control(instruction_unstructured(inst));
-	
-	CONTROL_MAP(c,
-		{
-		    ll = gen_nconc(list_of_labels(control_statement(c)), ll);
-		},
-		    ct,
-		    blocks);
-	gen_free_list(blocks);		    
-
-        break;
-    }
-    default:
-        pips_error("list_of_labels","unexpected instruction tag\n");
-        break;
-    }
-
-    return(ll);
-}
-
-/*
- * list_of_gotos
- *
- * list og gotos in a given statement
- */
-list list_of_gotos(stat)
-statement stat;
-{
-    instruction
-	inst = statement_instruction(stat);
-    list 
-	ll = NULL;
-
-    switch(instruction_tag(inst))
-    {
-    case is_instruction_block:
-    {
-	MAPL(ce,
-	 {
-	     ll = gen_nconc(list_of_gotos(STATEMENT(CAR(ce))), ll);
-	 },
-	     instruction_block(inst));
-        break;
-    }
-    case is_instruction_test:
-    {
-	test
-	    t = instruction_test(inst);
-
-	ll = gen_nconc(list_of_gotos(test_false(t)),
-		       gen_nconc(list_of_gotos(test_true(t)), ll));
-        break;
-    }
-    case is_instruction_loop:
-	ll = gen_nconc(list_of_gotos(loop_body(instruction_loop(inst))), ll);
-        break;
-    case is_instruction_goto:
-	ll = CONS(ENTITY, statement_label(instruction_goto(inst)), ll);
-        break;
-    case is_instruction_call:
-        break;
-    case is_instruction_unstructured:
-    {
-	list
-	    blocks = NULL;
-	control
-	    ct = unstructured_control(instruction_unstructured(inst));
-	
-	CONTROL_MAP(c,
-		{
-		    ll = gen_nconc(list_of_gotos(control_statement(c)), ll);
-		},
-		    ct,
-		    blocks);
-	gen_free_list(blocks);		    
-
-        break;
-    }
-    default:
-        pips_error("list_of_gotos","unexpected instruction tag\n");
-        break;
-    }
-
-    return(ll);
-}
-
-/*
+/* ------------------------------------------------------------------
  * statement parallel_loop_nest_to_body(loop_nest, pblocks, ploops)
  * statement loop_nest;
  * list *pblocks, *ploops;
@@ -885,6 +455,68 @@ list *pblocks, *ploops;
     *ploops=loops;
 
     return(inner_body);
+}
+
+/*------------------------------------------------------------------------
+ *
+ *   CURRENT LOOPS
+ *
+ *   management of a list of current loops. very burk ???
+ *
+ */
+
+static list 
+  current_loop_list=NIL;
+
+static void set_current_loops_rewrite(l)
+loop l;
+{
+    current_loop_list =	CONS(ENTITY, l, current_loop_list);
+}
+
+void set_current_loops(obj)
+chunk* obj;
+{
+    pips_assert("set_current_loop_", current_loop_list==NIL);
+
+    gen_recurse(obj,
+		loop_domain,
+		gen_true,
+		set_current_loops_rewrite);
+}
+
+void reset_current_loops()
+{
+    gen_free_list(current_loop_list);
+    current_loop_list=NIL;
+}
+
+bool entity_loop_index_p(e)
+entity e;
+{
+    MAPL(cl,
+     {
+	 if (e == loop_index(LOOP(CAR(cl)))) return(TRUE);
+     },
+	 current_loop_list);
+
+    return(FALSE);
+}
+
+range loop_index_to_range(index)
+entity index;
+{
+    loop l;
+
+    MAPL(cl,
+     {
+	 l = LOOP(CAR(cl));
+
+	 if (loop_index(l)==index) return(loop_range(l));
+     },
+	 current_loop_list);
+    
+    return(range_undefined);
 }
 
 /*
