@@ -2,7 +2,7 @@
 # for debug, try:
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/09 10:37:29 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/09 12:00:41 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -303,7 +303,6 @@ SOURCES= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES)
 #
 # TARGETDIR=	$(PIPS_BINSRCDIR)/$(TARGET)
 #
-INSTALL_TARGETS=	$(INSTALL_FILE) $(INSTALL_LIB) $(INSTALL_EXE)
 
 $(BIN_TARGET): $(INC_TARGET) $(LIB_TARGET)
 	$(LINK) $(BIN_TARGET) $(LIB_TARGET) $(TARGET_LIBS)
@@ -333,6 +332,8 @@ check_os:
 	then echo "Cannot run make under this OS release"; \\
 	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
 	fi
+
+INSTALL_TARGETS=	$(INSTALL_FILE) $(INSTALL_LIB) $(INSTALL_EXE)
 
 # install installs sources, so depends on sources. FC
 # to insure the library is compiled before hand, a make is added.
