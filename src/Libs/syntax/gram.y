@@ -454,8 +454,11 @@ lci: ci
 	    { $$ = $1; }
 	| lci TK_COMMA ci
 	    { 
+	      /*
 		CDR(CDR($3)) = $1;
 		$$ = $3;
+		*/
+	      $$ = gen_nconc($1, $3);
 	    }
 	;
 
@@ -465,16 +468,37 @@ ci: name TK_EQUALS expression
 		char buffer[20];
 		(void) strcpy(buffer, $1);
 		free($1);
-		(void) strcat(buffer, "=");
 
-		if(strcmp(buffer,"END")==0||strcmp(buffer,"ERR")) {
+		if(strcmp(buffer,"END")==0||strcmp(buffer,"ERR")==0) {
 		  Warning("parser", 
 			  "Control effects of IO clauses END and ERR are ignored\n");
 		}
+
+		(void) strcat(buffer, "=");
 		
 		$$ = CONS(EXPRESSION, 
 			  MakeCharacterConstantExpression(buffer),
 			  CONS(EXPRESSION, $3, NULL));
+		ici += 1;
+	    }
+        | name TK_EQUALS TK_STAR
+            {
+		char buffer[20];
+		(void) strcpy(buffer, $1);
+		free($1);
+
+		if(strcmp(buffer,"UNIT")!=0 && strcmp(buffer,"FMT")!=0) {
+		  ParserError("parser", 
+			  "Illegal default option '*' in IO control list\n");
+		}
+
+		(void) strcat(buffer, "=");
+		
+		$$ = CONS(EXPRESSION, 
+			  MakeCharacterConstantExpression(buffer),
+			  CONS(EXPRESSION,
+			       MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME))
+			       , NULL));
 		ici += 1;
 	    }
         | io_f_u_id
