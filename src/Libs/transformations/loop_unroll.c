@@ -541,7 +541,7 @@ bool recursiv_loop_unroll(statement stmt, entity lb_ent, int rate)
 /* Top-level functions
  */
 
-void unroll(char *mod_name)
+bool unroll(char *mod_name)
 {
     statement mod_stmt;
     instruction mod_inst;
@@ -622,6 +622,7 @@ void unroll(char *mod_name)
     debug(2,"unroll","done for %s\n", mod_name);
     debug_off();
 
+    return TRUE;
 }
 
 static entity searched_loop_label = entity_undefined;
@@ -650,7 +651,7 @@ bool find_loop_and_fully_unroll(statement s)
     return go_on;
 }
 
-void full_unroll(char *mod_name)
+bool full_unroll(char *mod_name)
 {
     statement mod_stmt;
     char lp_label[6];
@@ -688,4 +689,5 @@ void full_unroll(char *mod_name)
     debug(2,"unroll","done for %s\n", mod_name);
     debug_off();
 
+    return TRUE;
 }
