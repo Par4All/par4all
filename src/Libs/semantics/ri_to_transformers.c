@@ -262,7 +262,7 @@ cons * e; /* list of effects */
     s->dimension = vect_size(b);
     /* NewGen should generate proper cast for external types */
     /* predicate_system(transformer_relation(tf)) = (Psysteme) s; */
-    predicate_system(transformer_relation(tf)) = (char *) s;
+    predicate_system_(transformer_relation(tf)) = (char *) s;
     return tf;
 }
 
@@ -401,14 +401,16 @@ cons * e; /* effects of loop l */
 		base_rm(b_tmp);
 		base_rm(b_lb);
 		if(SC_RN_P(sc)) {
-		    /* FI: a NULL is not acceptable; I assume that we cannot end up
-		     * with a SC_EMPTY...
+		    /* FI: a NULL is not acceptable; I assume that we cannot
+		     * end up with a SC_EMPTY...
 		     */
-		    predicate_system(transformer_relation(tf)) =
-			sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED);
+		    predicate_system_(transformer_relation(tf)) =
+			newgen_Psysteme
+			(sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED));
 		}
 		else
-		    predicate_system(transformer_relation(tf)) = sc;
+		    predicate_system_(transformer_relation(tf)) = 
+			newgen_Psysteme(sc);
 	    }
 
 	    ifdebug(8) {
@@ -760,7 +762,7 @@ transformer user_function_call_to_transformer(
 
 	ifdebug(8) {
 	    pips_debug(8, "Transformer 0x%x for callee %s:\n",
-		       t_caller, entity_local_name(f));
+		       (unsigned int) t_caller, entity_local_name(f));
 	    dump_transformer(t_caller);
 	}
 
