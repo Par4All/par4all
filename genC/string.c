@@ -19,10 +19,13 @@ contraire, la chaine resultat est padde avec des caracteres null.
 
 */
 
+#include <stdlib.h>
 #include <stdio.h>
+/*
 extern int fprintf();
 extern char toupper(char c);
-#include <varargs.h>
+*/
+#include <stdarg.h>
 #include "string.h"
 #include "genC.h"
 #include <ctype.h>
@@ -83,33 +86,40 @@ register string s; /* la chaine a copier */
 
 /* CONCATENATE() *********** Last argument must be NULL *********/
 /*VARARGS0*/
-string concatenate( va_alist )
-va_dcl
+string
+concatenate(char * first_string, ...)
 {
 #define CONCATENATE_BUFFER_SIZE 10240
-    va_list args ;
-    static char result[ CONCATENATE_BUFFER_SIZE ] ;
-    char *p ;
-    char * current = &result[0];
-    char * end = &result[ CONCATENATE_BUFFER_SIZE - 1 ];
+   va_list args ;
+   static char result[ CONCATENATE_BUFFER_SIZE ] ;
+   char *p ;
+   char * next_string ;
+   char * current = &result[0];
+   char * end = &result[ CONCATENATE_BUFFER_SIZE - 1 ];
 
-    va_start( args ) ;
-    result[ 0 ] = '\0' ;
+   va_start( args, first_string ) ;
+   result[ 0 ] = '\0' ;
 
-    while( (p=va_arg( args, char * )) != NULL ) {
-	/* strcat( result, p ) ; */
-	char * pc;
+   p = first_string;
+   
+   do {
+      /* strcat( result, p ) ; */
+      char * pc;
 
-	for(pc = p; *pc; pc++, current++)
-	    if( current < end )
-		*current = *pc;
-	    else
-		/* a larger buffer could be malloc'ed... */
-		pips_error("concatenate", "buffer overflow\n");
-    }
-    *current = '\0';
-    va_end( args ) ;
-    return( result ) ;
+      next_string = va_arg( args, char * );
+      for(pc = p; *pc; pc++, current++)
+         if( current < end )
+            *current = *pc;
+         else
+            /* a larger buffer could be malloc'ed... */
+            pips_error("concatenate", "buffer overflow\n");
+      p = next_string;
+   }
+   while( next_string != NULL );
+
+   *current = '\0';
+   va_end( args ) ;
+   return( result ) ;
 }
 
 char *strupper(s1, s2)
