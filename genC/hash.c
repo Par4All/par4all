@@ -60,18 +60,14 @@ struct __hash_table {
   unsigned int n_upd_iter;
 };
 
-#ifndef abs
-#define abs(v) (((v) > 0) ? (v) : (-(v)))
-#endif
-
 /* Constant to find the end of the prime numbers table 
  */
 #define END_OF_SIZE_TABLE ((int) 0)
 
-/* >>1: 50 percent limit 
- * >>1 + >>2: 75 percent limit
+/* 50 percent limit : ((size)>>1)
+ * 75 percent limit : (((size)>>1)+((size)>>2))
  */
-#define HASH_SIZE_LIMIT(size) (((size)>>1)+((size)>>2))
+#define HASH_SIZE_LIMIT(size) ((size)>>1)
 
 /* Hash function to get the index
  * of the array from the key 
@@ -487,16 +483,14 @@ hash_enlarge_table(hash_table htp)
 
 static unsigned int hash_string_rank(void * key, int size)
 {
-  unsigned int v;
+  unsigned int v = 0;
   char * s;
   
-  v = 0;
   for (s = (char*) key; *s; s++)
-    v <<= 2, v += *s;
-  /* FC: v = ((v<<7) & (v>>25)) ^ *s; */
-  v %= size ;
+    /* FC: */ v = ((v<<5) | (v>>27)) ^ *s;
+    /* GO: v <<= 2, v += *s; */
 
-  return v;
+  return v % size;
 }
 
 static unsigned int hash_int_rank(void * key, int size)
