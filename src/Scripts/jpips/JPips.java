@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: JPips.java,v $
+ * Revision 1.7  1998/11/12 17:20:36  coelho
+ * basic emacs display.
+ *
  * Revision 1.6  1998/10/30 15:43:57  ancourt
  * graphdisplayer instance added
  *
@@ -61,8 +64,11 @@ public class JPips
   public ModuleManager		moduleManager;		//manages the modules
   
   public TPips		tpips;		// tpips instance
+
   public TextDisplayer 	textDisplayer;	// regulates the displayed windows
   public GraphDisplayer graphDisplayer;
+  public EmacsDisplayer emacsDisplayer;
+
   public Vector		optionVector;	// contains the components for JPips
 			
   public PMenuBar	menu;		// menu of JPips
@@ -201,6 +207,13 @@ public class JPips
     
     graphDisplayer = new GraphDisplayer(frame);
     tpips.graphDisplayer = graphDisplayer;
+
+    if (System.getProperty("jpips.emacs").equals("true"))
+    {
+      emacsDisplayer = new EmacsDisplayer(System.out);
+      tpips.emacsDisplayer = emacsDisplayer;
+    }
+
     //directory
     directoryManager = new DirectoryManager(frame, tpips);
     p = (PPanel)directoryManager.getComponent();
