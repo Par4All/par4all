@@ -48,25 +48,49 @@ static void pop_path(void)
     free(saved_pips_src_path), saved_pips_src_path = NULL;
 }
 
+/* tpips used to convert lower cases into upper cases for all module
+   names, but this is no longer possible with C functions. To make it
+   easier for the user and for the validation, an upper case version of
+   name is open if name cannot be open. */
 bool open_module(string name)
 {
     bool success = FALSE;
+    string upper_case_name = strupper(strdup(name), name);
+    string module_name = string_undefined;
 
     if (!db_get_current_workspace_name())
       pips_user_error("No current workspace, open or create one first!\n");
 
     if (db_module_exists_p(name))
-    {
+      module_name = name;
+    else if(db_module_exists_p(upper_case_name)) {
+      module_name = upper_case_name;
+      pips_user_warning("Module %s selected instead of %s which was not found\n",
+			module_name, name);
+    }
+    else
+      module_name = NULL;
+
+    if(module_name) {
       if (db_get_current_module_name()) /* reset if needed */
 	db_reset_current_module_name();
       
-      success = db_set_current_module_name(name);
-      reset_unique_variable_numbers();
+      success = db_set_current_module_name(module_name);
     }
 
-    if (success) user_log("Module %s selected\n", name);
-    else pips_user_warning("Could not open module %s\n", name);
+    if (success) {
+      reset_unique_variable_numbers();
+      user_log("Module %s selected\n", module_name);
+    }
+    else {
+      if(strcmp(name, upper_case_name)==0)
+	pips_user_warning("Could not open module %s\n", name);
+      else
+	pips_user_warning("Could not open module %s (nor %s)\n",
+			  name, upper_case_name);
+    }
 
+    free(upper_case_name);
     return success;
 }
 
@@ -109,8 +133,13 @@ create_workspace(gen_array_t files)
     free(dir);
     set_entity_to_size();
 
+    /* pop_path() is too strict, let's push anyway since user errors
+       are not caught below! */
+    push_path();
+
     for (i = 0; i < argc; i++) 
     {
+      /* FI: it would be nice to have a catch here on user_error()! */
 	success = process_user_file(gen_array_item(files, i));
 	if (success == FALSE)
 	    break;
@@ -123,7 +152,7 @@ create_workspace(gen_array_t files)
 	user_log("Workspace %s created and opened.\n", name);
 	success = open_module_if_unique();
 	if (success) init_processed_include_cache();
-	push_path();
+	/* push_path(); */
     }
     else
     {
@@ -135,6 +164,8 @@ create_workspace(gen_array_t files)
         reset_entity_to_size();
 	close_log_file();
 	close_warning_file();
+	/* pop_path() is too strict, let's push anyway */
+	/* push_path(); */
     }
 
     return success;
