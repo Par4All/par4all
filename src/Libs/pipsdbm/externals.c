@@ -187,7 +187,7 @@ bool
 pipsdbm_consistent_statement_function(gen_chunkp map)
 {
     hash_table h = (map+1)->h;
-    STATEMENT_FUNCTION_MAP(s, x, 
+    STATEMENT_FUNCTION_MAP(s, not_used, 
     {
 	if (gen_type((void*)s)!=statement_domain) return FALSE;
 	if (!gen_consistent_p((void*)x)) return FALSE;
