@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.SUN4,v $ (version $Revision$)
-# $Date: 1996/07/11 13:14:21 $, 
+# $Date: 1996/07/15 11:45:09 $, 
 #
 # this file contains macro definitions 
 
@@ -11,6 +11,7 @@ CFLAGS	= -fast -Xc -g
 CPPFLAGS= -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR)
 LD	= $(CC) -bsdmalloc
 LDFLAGS	= -fast -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)
+RANLIB	= granlib
 LEX	= lex
 LFLAGS	=
 FC	= f77
