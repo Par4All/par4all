@@ -1,6 +1,12 @@
- /* package arithmetique */
+ /* package arithmetique 
+  *
+  * $RCSfile: exp.c,v $ (version $Revision$)
+  * $Date: 1996/07/13 12:28:24 $, 
+  */
 
 /*LINTLIBRARY*/
+/* no overflow is checked 
+ */
 
 #include <stdio.h>
 
@@ -11,22 +17,22 @@
  * 
  * Precondition: 	n => 0
  */
-int exponentiate(x,n)
-int	x;
-int	n;
+Value exponentiate(Value x, int n)
 {
-    int	loop;
-    int	y;
+    Value y;
 
-    /* validation - n is positive */
+    /* validation - n is positive 
+     */
     assert(n >= 0);
+    if (n == 0) return 1;
 
-    if (n == 0) return(1);
-
-    y = 1;
-    /* FI: la complexite pourrait etre reduite de O(n) a O(log n) */
-    for(loop=0; loop<n; loop++) 
+    /* FI: la complexite pourrait etre reduite de O(n) a O(log n) 
+     */
+    for(y=VALUE_ONE; n>0; n--)
 	y = y*x;
 
-    return(y);
+    return y;
 }
+
+/* end of $RCSfile: exp.c,v $
+ */
