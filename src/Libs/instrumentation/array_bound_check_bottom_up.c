@@ -45,6 +45,7 @@
 #include "semantics.h"
 
 #include "instrumentation.h"
+#include "transformations.h"
 
 /* As we create checks with stop error message who tell us there are 
  * bound violations for which array, on which dimension, the following 
