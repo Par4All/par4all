@@ -430,7 +430,7 @@ int c;
 	functional cf = 
 	    make_functional(NIL, 
 			    make_type(is_type_variable, 
-				      make_variable(make_basic(is_basic_int, (void*)c),
+				      make_variable(make_basic(is_basic_int, sizeof(int)),
 						    NIL)));
 	type ct = make_type(is_type_functional, cf);
 	ce = make_entity(strdup(cn), ct, MakeStorageRom(),
