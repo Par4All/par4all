@@ -1,5 +1,5 @@
 # $RCSfile: define_libraries.sh,v $ (version $Revision$)
-# $Date: 1996/08/30 17:42:36 $, 
+# $Date: 1996/08/30 17:50:30 $, 
 #
 # this file define newgen, linear and pips libraries.
 # it is to be included by some shell-scripts and makefiles (after a sed).
@@ -31,8 +31,8 @@ PIPS_LIBS='-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -l
 #
 # X11
 
-PIPS_X11_ADDED_CPPFLAGS=''
-PIPS_X11_ADDED_LDFLAGS=''
+PIPS_X11_ADDED_CPPFLAGS='-I$(X11_ROOT)/include'
+PIPS_X11_ADDED_LDFLAGS='-L$(X11_ROOT)/Lib'
 PIPS_X11_ADDED_LIBS='-lX11'
 
 #
