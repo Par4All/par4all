@@ -17,6 +17,7 @@ LINT	= lint
 LINTFLAGS= -habxu
 YACC	= yacc
 YFLAGS	=
+PROTO   = cproto
 
 # end of it!
 #
