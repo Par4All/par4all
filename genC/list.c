@@ -533,7 +533,7 @@ void gen_sort_list(list l, int (*compare)())
     list c;
     int n = gen_length(l);
     gen_chunk 
-	**table = (gen_chunk**) malloc(n*sizeof(gen_chunk*)),
+	**table = (gen_chunk**) alloc(n*sizeof(gen_chunk*)),
 	**point;
 
     /*   the list items are first put in the temporary table,
@@ -606,7 +606,7 @@ list gen_make_list(int domain, ...)
 
 list gen_cons(void * item, list next)
 {
-  list ncons = (list) malloc(sizeof(struct cons));
+  list ncons = (list) alloc(sizeof(struct cons));
   ncons->car.e = item;
   ncons->cdr = next;
   return ncons;
