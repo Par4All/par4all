@@ -65,10 +65,14 @@ Menu_item menu_item;
     }
 
     /* Clear the log window to avoid the message about the edited
-       state: */
-    clear_log_subwindow();
-    /* Quit: */
-    xv_destroy_safe(main_frame);
+       state: 
+    clear_log_subwindow(NULL, NULL);
+    Does not work...
+    Quit:
+    xv_destroy[_safe](main_frame);
+    */
+    /* Exit xv_main_loop() at top level: */
+    notify_stop();
 }
 
 
