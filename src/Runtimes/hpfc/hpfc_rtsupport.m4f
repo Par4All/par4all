@@ -3,7 +3,7 @@ c Runtime Support Functions for the High Performance Fortran Compiler
 c by Fabien COELHO.
 c
 c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-c ($Date: 1996/03/14 11:12:46 $, )
+c ($Date: 1996/03/14 11:42:22 $, )
 c
 c-----------------
 c
@@ -973,7 +973,7 @@ c 1 sends node version key to host
 c
       if (MYLID.eq.1) then
          call pvmfinitsend(PVMRAW, info)
-         call pvmfpack(STRING, hpfc_key, len(hpfc_key), 1, info)
+         call pvmfpack(STRING, hpfc_key, 64, 1, info)
          call pvmfsend(HOSTTID, 1, info)
       endif
 
@@ -1135,9 +1135,10 @@ c
       call HPFC_INIT_COMMON_BUFFER
 c
 c check version of host and node
+c to insure that both host and node where generated together...
 c
       call pvmfrecv(NODETIDS(1), 1, bufid)
-      call pvmfunpack(STRING, node_key, len(hpfc_key), 1, info)
+      call pvmfunpack(STRING, node_key, 64, 1, info)
       if (node_key.ne.hpfc_key) then
          print *, "*** incompatible version keys!"
          print *, "*** host: ", hpfc_key
