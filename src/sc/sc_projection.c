@@ -84,7 +84,7 @@ Variable v;
 int ofl_ctrl;
 {
     Pcontrainte eq;
-    int coeff;
+    Value coeff;
     Pbase base_init = base_dup((*psc)->base);
 
     /* trouver une egalite ou v a un coeff. minimal en valeur absolu */
@@ -99,7 +99,8 @@ int ofl_ctrl;
 	else 
 	{
 	    /* si au moins une egalite contient v avec un coeff. non nul */
-	    *psc = sc_variable_substitution_with_eq_ofl_ctrl(*psc,eq,v, ofl_ctrl);
+	    *psc = sc_variable_substitution_with_eq_ofl_ctrl
+		(*psc,eq,v, ofl_ctrl);
 	}
     }
     else {
@@ -219,7 +220,7 @@ int ofl_ctrl;
     Pcontrainte eq;
     Pvecteur current_pv, pve, pvr;
     Variable v;
-    int coeff;
+    Value coeff;
     Psysteme sc = *psc;
     Pbase base_sc = base_dup(sc->base);
     
@@ -233,10 +234,11 @@ int ofl_ctrl;
 	pvr = NULL;
 	current_pv = pve;
 
-	while (!VECTEUR_NUL_P(current_pv) && (sc->nb_eq != 0) && !sc_empty_p(sc)) {
+	while (!VECTEUR_NUL_P(current_pv) && 
+	       (sc->nb_eq != 0) && !sc_empty_p(sc)) {
 	    v = current_pv->var;
 	    eq = eq_v_min_coeff(sc->egalites, v, &coeff); 
-	    if ((eq == NULL) || (coeff != 1)) {
+	    if ((eq == NULL) || (value_notone_p(coeff))) {
 		pvr = current_pv;
 		current_pv = current_pv->succ;
 	    }
@@ -244,7 +246,8 @@ int ofl_ctrl;
 		/* the coefficient of v in eq is 1 : carry out integer
 		 * elimination for v with the other constraints of sc */
 		
-		sc = sc_variable_substitution_with_eq_ofl_ctrl(sc, eq, v, ofl_ctrl);
+		sc = sc_variable_substitution_with_eq_ofl_ctrl
+		    (sc, eq, v, ofl_ctrl);
 		
 		if (sc_empty_p(sc))
 		    break;
@@ -277,7 +280,8 @@ int ofl_ctrl;
 	pvr = NULL;
 	current_pv = pve;
 
-	while (!VECTEUR_NUL_P(current_pv) && (sc->nb_eq != 0) && !sc_empty_p(sc)) {
+	while (!VECTEUR_NUL_P(current_pv) && 
+	       (sc->nb_eq != 0) && !sc_empty_p(sc)) {
 
 	    v = current_pv->var;
 	    eq = eq_v_min_coeff(sc->egalites, v, &coeff); 
@@ -290,7 +294,8 @@ int ofl_ctrl;
 
 		if (*is_proj_exact) *is_proj_exact = FALSE;
 
-		sc = sc_variable_substitution_with_eq_ofl_ctrl(sc, eq, v, ofl_ctrl);
+		sc = sc_variable_substitution_with_eq_ofl_ctrl
+		    (sc, eq, v, ofl_ctrl);
 		
 		
 		sc = sc_safe_normalize(sc);
@@ -535,7 +540,8 @@ int ofl_ctrl;
     Psysteme sc1 = SC_UNDEFINED;
     Pcontrainte pos, neg, nul;
     Pcontrainte pc, pcp, pcn;
-    int c, nnul;
+    Value c;
+    int nnul;
 
     if ((pc = sc->inegalites) == NULL) 
 	return(TRUE);
@@ -546,19 +552,19 @@ int ofl_ctrl;
     nnul = 0;
     while (pc != NULL) {
 	Pcontrainte pcs = pc->succ;
-
-	if ((c = vect_coeff(v,pc->vecteur)) > 0) {
+	c = vect_coeff(v,pc->vecteur);
+	if (value_pos_p(c)) {
 	    pc->succ = pos;
 	    pos = pc;
 	}
-	else if (c < 0) {
+	else if (value_neg_p(c)) {
 	    pc->succ = neg;
 	    neg = pc;
 	}
 	else {
 	    pc->succ = nul;
 	    nul = pc;
-	    nnul += 1;
+	    nnul++;
 	}
 
 	pc = pcs;
@@ -573,10 +579,8 @@ int ofl_ctrl;
 	    if (integer_test_p) {
 		boolean int_comb_p;
 		pcnew = 
-		    sc_integer_inequalities_combination_ofl_ctrl(sc1, pcp, pcn,
-								 v,
-								 &int_comb_p,
-								 ofl_ctrl);
+		    sc_integer_inequalities_combination_ofl_ctrl
+			(sc1, pcp, pcn, v, &int_comb_p, ofl_ctrl);
 		*integer_test_res_p = *integer_test_res_p && int_comb_p;
 	    }								 
 	    else
@@ -598,7 +602,7 @@ int ofl_ctrl;
 	    else {
 		pcnew->succ = nul;
 		nul = pcnew;
-		nnul += 1;
+		nnul++;
 	    }
 	}
     }
@@ -613,13 +617,14 @@ int ofl_ctrl;
     sc->nb_ineq = nnul;
     if (integer_test_p) sc_rm(sc1);
 
-    return(TRUE);
+    return TRUE;
 }
 
 
 
 
-/* Psysteme sc_projection_on_variables(Psysteme sc, Pbase index_base, Pvecteur pv)
+/* Psysteme sc_projection_on_variables
+ *    (Psysteme sc, Pbase index_base, Pvecteur pv)
  * input    : 
  * output   : a Psysteme representing the union of all the systems 
  *            resulting of the projection of the system sc on each 
@@ -646,8 +651,8 @@ Pvecteur pv;
 	    var = vecteur_var(pv1);
 	    vect_erase_var(&lvar_proj,var);
 	    for (pv2 = lvar_proj;!VECTEUR_NUL_P(pv2); pv2=pv2->succ) {
-		sc_projection_along_variable_ofl_ctrl(&sc2,vecteur_var(pv2), 
-						   NO_OFL_CTRL);
+		sc_projection_along_variable_ofl_ctrl
+		    (&sc2,vecteur_var(pv2), NO_OFL_CTRL);
 		sc2 = sc_normalize(sc2);
 		if (SC_EMPTY_P(sc2)) {
 		    sc2 = sc_empty(base_dup(sc->base));
@@ -657,7 +662,7 @@ Pvecteur pv;
 		    build_sc_nredund_1pass(&sc2); 
 		}
 	    }
-	    vect_chg_coeff(&lvar_proj,var,1);
+	    vect_chg_coeff(&lvar_proj, var, VALUE_ONE);
 	    sc1 = sc_intersection(sc1,sc1,sc2);
 	    sc1 = sc_normalize(sc1);
 	    if (SC_EMPTY_P(sc1)) {
@@ -685,40 +690,43 @@ Pvecteur pv;
  *      projection is equivalent to the "integer projection". 
  *      else, it is set to FALSE.
  */
-Pcontrainte sc_integer_inequalities_combination_ofl_ctrl(sc,posit,negat,v,
-							 integer_combination_p,
-							 ofl_ctrl)	
+Pcontrainte sc_integer_inequalities_combination_ofl_ctrl
+  (sc,posit,negat,v, integer_combination_p, ofl_ctrl)	
 Psysteme sc;
 Pcontrainte posit, negat;
 Variable v;
 boolean *integer_combination_p;
 int ofl_ctrl;
 {
-    int cp, cn;
+    Value cp, cn;
     Pcontrainte ineg = NULL;
 
     if (!CONTRAINTE_UNDEFINED_P(posit) && !CONTRAINTE_UNDEFINED_P(negat))
     {
-	cp = abs_ofl_ctrl(vect_coeff(v,posit->vecteur), ofl_ctrl);
-	cn = abs_ofl_ctrl(vect_coeff(v,negat->vecteur), ofl_ctrl);
+	/* ??? one is positive and the other is negative! FC */
+	cp = vect_coeff(v, posit->vecteur);
+	cp = value_abs(cp); 
+	cn = vect_coeff(v, negat->vecteur);
+	cn = value_abs(cn);
 	
 	ineg = contrainte_new();
-	ineg->vecteur = vect_cl2_ofl_ctrl(cp, negat->vecteur,
-					  cn, posit->vecteur, ofl_ctrl);
+	ineg->vecteur = vect_cl2_ofl_ctrl
+	    (cp, negat->vecteur, cn, posit->vecteur, ofl_ctrl);
 	
-	if (cp > 1 && cn > 1)
+	if (value_gt(cp,VALUE_ONE) && value_gt(cn,VALUE_ONE))/* cp>1 && cn>1 */
 	{
-	    if ( contrainte_constante_p(ineg) 
-		&& (vect_coeff(TCST, ineg->vecteur)
-		    + abs_ofl_ctrl(cp*cn, ofl_ctrl) - cp - cn + 1) <= 0 ) {
+	    /* tmp = cp*cn - cp - cn + 1 // cp and cn are >0! */ 
+	    Value tmp = value_mult(cp,cn);
+	    tmp = value_minus(value_plus(tmp, VALUE_ONE), value_plus(cp, cn));
+
+	    if (contrainte_constante_p(ineg) &&
+		value_le(vect_coeff(TCST, ineg->vecteur), value_uminus(tmp)))
 		*integer_combination_p = TRUE;
-	    }
 	    else {
 		Pcontrainte ineg_test = contrainte_dup(ineg);
 		Psysteme sc_test = sc_dup(sc);
 		
-		vect_add_elem(&(ineg_test->vecteur), TCST, 
-			      + abs_ofl_ctrl(cn*cp, ofl_ctrl) - cp - cn +1);
+		vect_add_elem(&(ineg_test->vecteur), TCST, tmp);
 		
 		contrainte_reverse(ineg_test);
 		sc_add_inegalite(sc_test,ineg_test);
@@ -841,7 +849,9 @@ Pvecteur pv;
 {
     Psysteme sc1 = sc_dup(sc);
     if (setjmp(overflow_error)) {
-	return(sc);
+	/* sc_rm(sc1); */
+	sc1=NULL;
+	return sc;
     }
     else {
 	boolean exact = TRUE;
@@ -856,6 +866,6 @@ Pcontrainte eq_v_coeff_min(contraintes, v)
 Pcontrainte contraintes;
 Variable v;
 {
-    int coeff;
-    return (contrainte_var_min_coeff(contraintes, v, &coeff, TRUE));
+    Value coeff;
+    return contrainte_var_min_coeff(contraintes, v, &coeff, TRUE);
 }
