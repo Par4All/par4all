@@ -232,5 +232,6 @@ char *argv[];
 
     xv_main_loop(main_frame);
 
+    close_log_file();
     exit(0);
 }
