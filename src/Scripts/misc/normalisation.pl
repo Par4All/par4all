@@ -2,6 +2,11 @@
 #
 # $Id$
 #
+# (c) Fabien COELHO septembre 2000, Ecole des mines de Paris.
+#
+# Script pour mettre a jour les declarations fortran en fonction
+# des bornes trouvees par PIPS. Ajoute eventuellement des includes.
+#
 
 use Getopt::Long;
 
