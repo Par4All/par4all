@@ -1,9 +1,11 @@
-\documentstyle{article}
-\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\documentstyle[psfig]{article}
 
-\title{PIPS: Repre'sentation Interme'diaire}
+% \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\title{PIPS: Internal Representation of Fortran Code}
 \author{Franc,ois Irigoin \\
         Pierre Jouvelot \\
+	Ronan Keryell \\
         Re'mi Triolet\\
 \\
         CRI, Ecole des Mines de Paris}
@@ -18,6 +20,7 @@
 \sloppy
 
 \section*{Introduction}
+
 Ce document est utilise' directement et automatiquement par l'outil
 de ge'nie logiciel NewGen pour ge'ne'rer les de'clarations des structures
 de donne'es utilise'es dans le projet PIPS, ainsi que les routines de
@@ -325,10 +328,20 @@ nous e'tudierons la nature plus loin.
 
 \domain{Unstructured = control x exit:control}
 {
-Le domain \verb/unstructured/ permet de repre'senter des instructions 
-non-structure'es sous forme de graphe structure'. Le graphe est dans le
-champ \verb/control/ tandis que \verb/exit/ correspond au noeud de
-sortie du graphe (il ne doit pas e^tre modifie' par un utilisateur).
+
+Domain \verb/unstructured/ is used to represent unstructured parts of
+the code in a structured manner which as a unique statement. The entry
+node of the underlying CFG is in field \verb/control/, and the
+unique exit node is in field \verb/exit/. The exit node should not be
+modified by users of the unstructured\footnote{FI: I do not understand
+why...}.  See Figure~\ref{figure-untructured}.
+
+The hierarchical structure is induced by the recursive nature of
+statements.  Each control node points towards a statement which can also
+contain an unstructured area of the code as well as structured
+part. Unstructured parts of the code can thus be contained as much as
+possible as well as be recursively decomposed.
+
 }
 
 \domain{Test = condition:expression x true:statement x false:statement}
@@ -399,19 +412,38 @@ appele'e. Le sous-domaine \verb/arguments/ est une liste de sous-domaines
 \domain{Control = statement x predecessors:control* x successors:control*}
 \domain{Controlmap = persistant statement->control}
 { 
-Le domain \verb/control/ est utilise' pour imple'menter le graphe de
-contro^le structure' d'un \verb/statement/. Dans un tel graphe, tous les
-statements structure's sont conserve's; les branchements ont e'te'
-e'limine's et remplace's par des arcs du graphe de contro^le. Ce graphe
-est structure' car si un branchement est local (par exemple a` un corps
-de boucle) alors, pour les instructions englobantes, le statement
-correspondant sera vu comme structure'; ceci explique la re'cursion
-mutuelle de \verb/control/ et \verb/statement/ (via \verb/instruction/). 
 
-Tous les statements, sauf
-\verb/test/, ont un seul successeur; le premier successeur de
-\verb/test/ correspond au cas ou` la condition est ve'rifie'e (le second
-au cas contraire).
+Domain \verb/control/ is the type of nodes used to implement the CFG
+implied by an unstructured instruction (see Domain
+\verb/unstructured/). Each node points towards a statement which can
+represent an arbitrary large piece of structured code. GOTO statements
+are eliminated and represented by arcs. Nodes are doubly linked. Each
+node points towards its successors (at most 2) and towards its
+predecessors. The hierarchical nature of
+domain \verb/statement/ is used to hide local branches from higher and
+lower level pieces of code. The whole unstructured area of the code is
+seen as a unique atomic statement from above, and is entirely ignored
+from under. This explains the mutual recursion between \verb/control/
+and \verb/statement/ (via \verb/instruction/).
+
+\begin{figure}
+\begin{center}
+\mbox{\psfig{file=unstructured.idraw,width=\hsize}}
+\end{center}
+\caption{Hierarchical Control Flow Graph}
+\label{figure-unstructured}
+\end{figure}
+
+All statements but \verb/test/have only one successor. The first
+successor of \verb/test/ is the successor when the test condition is
+evaluated to true.  And the other way round for the second one. The exit
+node (see domain \verb/unstructured/) has no successor. The entry node
+as well as all other nodes may have an unlimited number of precedessors.
+
+All nodes of a CFG can be visited in a meaningless order using the
+\verb/CONTROL_MAP/ macros. Look for an example in library \verb/control/
+because auxiliary data structures must be decraled and freed.
+
 }
 
 \section{Repre'sentation des expressions}
