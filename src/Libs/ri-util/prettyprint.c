@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/11 13:36:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/11 13:48:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/11 13:36:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/11 13:48:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -458,7 +458,7 @@ list ldecl;
 		 pc = gen_nconc(pc, words_declaration(e, !from_hpfc));
 		 break;
 	     case is_basic_string:
-		 ps = CHAIN_SWORD(ps, ps==NIL ? "STRING  " : ",");
+		 ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
 		 ps = gen_nconc(ps, words_declaration(e, !from_hpfc));
 		 break;
 	     default:
