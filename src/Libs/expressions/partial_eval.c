@@ -659,23 +659,27 @@ struct eformat partial_eval_plus_or_minus_operator(int token,
 	else {
 	    ef.simpler= (ef1.simpler || ef2.simpler);
 	    if(ef1.icoef==0) {
-		if(ef1.ishift==0) ef.simpler=TRUE;
+		/* CA (9/9/97) condition <0 added in order to simplify 
+		   also expression like (J)+(-1) in (J-1)    */
+		if(ef1.ishift<=0) ef.simpler=TRUE;
 		ef.expr=ef2.expr;
 		ef.icoef=(token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
 	    }
 	    else {
-		if(ef2.ishift==0) ef.simpler=TRUE;
+		if(ef2.ishift<=0) ef.simpler=TRUE;
 		ef.expr=ef1.expr;
 		ef.icoef=ef1.icoef;
 	    }
 	}
 
 	/* generate ef.ishift */
-	if ( (ef1.icoef==0 || ef1.ishift!=0)
-	    && (ef2.icoef==0 || ef2.ishift!=0) ) {
+	if  ((ef1.icoef==0 || ef1.ishift!=0)
+	    && (ef2.icoef==0 || ef2.ishift!=0))
+        {
 	    /* simplify shifts */
 	    ef.simpler= TRUE;
 	}
+	
 	ef.ishift= (token==PERFORM_SUBTRACTION ? 
 		    ef1.ishift-ef2.ishift : ef1.ishift+ef2.ishift);
 
