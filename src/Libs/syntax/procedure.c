@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/05/29 10:37:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/06/20 16:29:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/05/29 10:37:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/06/20 16:29:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -117,14 +117,24 @@ void EndOfProcedure()
     /* are there undefined gotos ? */
     CheckAndInitializeStmt();
 
+    /* The following calls could be located in check_first_statement()
+     * which is called when the first executable statement is
+     * encountered. At that point, many declaration related
+     * problems should be fixed or fixeable. But additional
+     * undeclared variables will be added to the dynamic area
+     * and their addresses must be computed. At least, ComputeAddresses()
+     * must stay here.. so I keep all these calls together.
+     */
     UpdateFunctionalType(FormalParameters);
-
-    check_common_layouts(CurrentFunction);
 
     ComputeEquivalences();
     ComputeAddresses();
+
+    check_common_layouts(CurrentFunction);
+
     SaveChains();
 
+    reset_common_size_map();
 
     code_declarations(EntityCode(CurrentFunction)) =
 	    gen_nreverse(code_declarations(EntityCode(CurrentFunction))) ;
