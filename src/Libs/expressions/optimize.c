@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.35  1999/08/04 16:38:26  zory
+ * new strategies added.
+ *
  * Revision 1.34  1999/07/15 20:36:13  coelho
  * ac_cse expermimental phase added.
  *
@@ -165,7 +168,11 @@ typedef struct
 
   /* GCM CSE 
    */
-  bool apply_gcm_cse;
+  bool apply_gcm;
+
+  /* CSE 
+   */
+  bool apply_cse;
 
 } optimization_strategy, *poptimization_strategy;
 
@@ -1176,31 +1183,80 @@ static optimization_strategy
     /* huff */ TRUE, expression_gravity, TRUE,
     /* eole */ "0", TRUE, "", TRUE, "-m",
     /* simp */ TRUE, TRUE,
-    /* gcm cse */ TRUE
-	       
-  },
-  {
-    "test",
-    TRUE, expression_gravity, TRUE,
-    "0", TRUE, "", TRUE, "-m",
-    TRUE, TRUE,
-    FALSE
+    /* gcm */ TRUE,
+    /* cse */ FALSE
   },
   {
     "R10K",
     TRUE, expression_gravity_inv, FALSE,
     "1", TRUE, "", TRUE, "-m",
     TRUE, TRUE,
-    TRUE
+    TRUE,
+    FALSE
   },
-  {
+  { /* whatever you want */
+    "test",
+    TRUE, expression_gravity, TRUE,
+    "0", TRUE, "", TRUE, "-m",
+    TRUE, TRUE,
+    TRUE,
+    FALSE
+  },
+  {  /* EOLE with gravity criterion only - most balanced tree !*/
     "EOLE",
     FALSE, NULL, FALSE,
     "0", TRUE, "", TRUE, "-m",
     FALSE, FALSE, 
+    FALSE,
     FALSE
   },
-
+  {  /* EOLE and Huffman and Simplify with gravity - most balanced tree*/
+    "GRAVITY",
+    TRUE, expression_gravity, TRUE,
+    "0", TRUE, "", TRUE, "-m",
+    TRUE, TRUE, 
+    FALSE,
+    FALSE
+  },
+  {  /* EOLE and Huffman and Simplify - most UNbalanced tree*/
+    "UNBALANCED",
+    TRUE, expression_gravity_inv, FALSE,
+    "1", TRUE, "", TRUE, "-m",
+    TRUE, TRUE, 
+    FALSE,
+    FALSE
+  },
+  {  /* ICM only */
+    "ICM", 
+    FALSE, NULL, FALSE,
+    "0", FALSE, "", FALSE, "",
+    FALSE, FALSE,
+    TRUE,
+    FALSE
+  },
+  {  /* CSE only*/
+    "CSE", 
+    FALSE, NULL, FALSE,
+    "0", FALSE, "", FALSE, "",
+    FALSE, FALSE,
+    FALSE,
+    TRUE
+  },
+  {  /* both ICM and CSE */
+    "ICMCSE", 
+    FALSE, NULL, FALSE,
+    "0", FALSE, "", FALSE, "",
+    FALSE, FALSE,
+    TRUE,
+    TRUE
+  },
+  {  /* Everything must be done */
+    "FULL", 
+    TRUE, expression_gravity, TRUE,
+    "0", TRUE, "", TRUE, "-m",
+    TRUE, TRUE,
+    TRUE    
+  },
   /* this one MUST be the last one! */
   {
     NULL, /* default similar to P2SC. */
@@ -1296,11 +1352,11 @@ bool optimize_expressions(string module_name)
     /* CSE/ICM + atom
      */
 
-    if (strategy->apply_gcm_cse)
-    {
+    if (strategy->apply_gcm)
       perform_icm_association(module_name, s); 
+
+    if (strategy->apply_cse)
       perform_ac_cse(module_name, s);
-    }
 
     /* EOLE Stuff, second pass for FMA.
      */
