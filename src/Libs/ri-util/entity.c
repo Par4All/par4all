@@ -96,7 +96,19 @@ entity e;
     return(value_code(ve));
 }
 
- 
+entity 
+make_label(string strg)
+{
+
+    entity l = make_entity(strdup(strg), type_undefined, storage_undefined, 
+			value_undefined);
+    entity_type(l) = (type) MakeTypeStatement();
+    entity_storage(l) = (storage) MakeStorageRom();
+    entity_initial(l) = make_value(is_value_constant, 
+				   MakeConstantLitteral());
+    return l;
+}
+
 /* This function returns a new label */
 entity 
 make_new_label(module_name)
@@ -107,15 +119,7 @@ char * module_name;
        by the caller and here the entity is retrieved from its name! */
     entity mod = local_name_to_top_level_entity(module_name); 
     string strg = new_label_name(mod);
-    entity l;
-  
-    l = make_entity(strdup(strg), type_undefined, storage_undefined, 
-			value_undefined);
-    entity_type(l) = (type) MakeTypeStatement();
-    entity_storage(l) = (storage) MakeStorageRom();
-    entity_initial(l) = make_value(is_value_constant, MakeConstantLitteral());
- 
-    return(l);
+    return make_label(strg);
 
 }
 
