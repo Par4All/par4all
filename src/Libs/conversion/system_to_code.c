@@ -4,7 +4,7 @@
  *
  * SCCS stuff:
  * $RCSfile: system_to_code.c,v $ version $Revision$, 
- * ($Date: 1996/07/09 22:03:40 $, ) 
+ * ($Date: 1996/07/09 23:15:53 $, ) 
  */
 
 /* Standard includes
@@ -17,7 +17,6 @@
 /* Psystems stuff
  */
 
-#include "types.h"
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
