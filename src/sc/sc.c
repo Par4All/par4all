@@ -104,8 +104,11 @@ Variable v_new;
 {
     Pcontrainte e, i;
 
-    if(!SC_UNDEFINED_P(s)) {
+    /* v_new MUST NOT already be in the base. */
+    assert(vect_coeff(v_new, s->base)==VALUE_ZERO);
 
+    if(!SC_UNDEFINED_P(s)) 
+    {
 	/* rename all equations */
 	for(e=s->egalites; !CONTRAINTE_UNDEFINED_P(e); e = e->succ)
 	    (void) contrainte_variable_rename(e, v_old, v_new);
@@ -116,10 +119,8 @@ Variable v_new;
 
 	/* update basis in s; its dimension should not change */
 	s->base = vect_variable_rename(s->base, v_old, v_new);
-
-	/* this is not safe as v_new may already be in the basis */
-	assert(vect_check(s->base));
     }
+
     return s;
 }
 
