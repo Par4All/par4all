@@ -12,9 +12,12 @@
 #include "control.h"
 #include "properties.h"
 #include "semantics.h"
-#include "instrumentation.h"
+
 #include "transformer.h"
 #include "text-util.h" /* for words_to_string*/
+
+#include "instrumentation.h"
+#include "transformations.h"
 
 /* Top down Array Declaration Normalization  
 
@@ -1180,7 +1183,7 @@ Algorithm : For each module:
 
 - If the list is nil => put MODULE.new_declarations, "Okay, there is nothing to normalize"*/
 
-bool top_down_array_declaration_normalization(char *module_name)
+bool array_resizing_top_down(char *module_name)
 { 
   FILE * out;
   string new_declarations = db_build_file_resource_name(DBR_NEW_DECLARATIONS, 
