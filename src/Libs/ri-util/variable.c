@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: variable.c,v $
+ * Revision 1.45  2002/06/21 13:43:12  irigoin
+ * Bug fix for alternate returns when a parser error or a reparsing occurs
+ *
  * Revision 1.44  2002/06/17 15:31:39  irigoin
  * Functions added to manage alternate returns
  *
@@ -913,6 +916,7 @@ entity generate_pseudo_formal_variable_for_formal_label(string p, int l)
   /* let's assume that there are fewer than 999 formal label arguments */
   char buffer[4];
   string sn = &buffer[0];
+  string full_name = string_undefined;
   
   pips_assert("No more than 999 alternate returns", l<999);
   
@@ -920,12 +924,30 @@ entity generate_pseudo_formal_variable_for_formal_label(string p, int l)
 
   /* Generate a variable of type CHARACTER*(*). See gram.y,
      "lg_fortran_type:". It is postponed to MakeFormalParameter */
-  fs = make_entity(strdup(concatenate(p, MODULE_SEP_STRING, lsp, sn, NULL)),
-		   type_undefined,
-		   storage_undefined,
-		   value_undefined);
+  full_name = strdup(concatenate(p, MODULE_SEP_STRING, lsp, sn, NULL));
+  if((fs=gen_find_tabulated(full_name, entity_domain))==entity_undefined) {
+    fs = make_entity(full_name,
+		     type_undefined,
+		     storage_undefined,
+		     value_undefined);
+  }
+  else {
+    /* fs may already exists if a ParserError occured or if an edit of the
+       source file occured */
+    free(full_name);
+    full_name = string_undefined;
 
-  pips_debug(8, "Generate replacement for formal return label: %s\n",
+    /* Not so sure because CleanUpEntities() is called later */
+    pips_assert("The type, storage and value are undefined\n",
+		type_undefined_p(entity_type(fs))
+		&& storage_undefined_p(entity_storage(fs))
+		&& value_undefined_p(entity_initial(fs)));
+  }
+
+  /* Too early because the current_module_entity is not yet fully defined. */
+  /* AddEntityToDeclarations(fs, get_current_module_entity()); */
+
+  pips_debug(8, "Generated replacement for formal return label: %s\n",
 	     entity_name(fs));
   
   return fs;
