@@ -1,5 +1,5 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/09/03 18:14:03 $, 
+ * $Date: 1996/09/04 11:50:05 $, 
  */
 
 #include <unistd.h>
@@ -964,7 +964,9 @@ int * return_value;
     (void) memcpy(c_title, STRING_PTR(title), STRING_LEN(title));
     c_title[STRING_LEN(title)] = '\0';
 
-    printf("'%s'->'%s' %d\n", STRING_PTR(title), c_title, STRING_LEN(title));
+    /* printf("'%s'->'%s' %d\n", 
+	      STRING_PTR(title), c_title, STRING_LEN(title)); */
+
     *return_value = XPOMP_draw_frame(*screen,
 				     c_title, *title_color, *background_color,
 				     *X0, *Y0,
