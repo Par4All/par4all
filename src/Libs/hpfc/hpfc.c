@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.101  1997/09/26 10:30:08  coelho
+ * delete_all_resources moved to pipsmake.
+ *
  * Revision 1.100  1997/09/26 10:29:34  coelho
  * julien updates.
  *
@@ -790,7 +793,6 @@ bool hpfc_close(string name)
     /* ??? the next function is in pipsmake... (should be in pipsdbm only,
      * but pipsmake manages its own cache which must be destroyed also...
      */
-    delete_all_resources(); /* rough! */
     DB_PUT_FILE_RESOURCE(DBR_HPFC_COMMONS, name, NO_FILE); /* fake */
 
     debug_off();
