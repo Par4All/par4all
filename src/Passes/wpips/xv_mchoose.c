@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/15 15:26:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/05/13 09:59:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_mchoose[] = "%A% ($Date: 1996/07/15 15:26:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_mchoose[] = "%A% ($Date: 1997/05/13 09:59:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* Multiple choices handling */
@@ -151,30 +151,6 @@ try_to_avoid_mchoose_destruction(Notify_client client,
 */
 
 
-/* When we press on the "(De)Select" all button, select or deselect
-   all the items. */
-void static
-mchoose_de_select_all_notify(Panel_item item,
-			     Event * event)
-{
-    int i;
-    static bool select_all_when_press_this_button = TRUE;
-
-    int nchoices = (int) xv_get(choices, PANEL_LIST_NROWS);
-
-    for(i = nchoices - 1; i >= 0; i--)
-	xv_set (choices,
-		PANEL_LIST_SELECT, i, select_all_when_press_this_button,
-		NULL);
-
-    /* Update the "Current choices": */
-    (void) mchoose_notify(NULL, NULL, NULL, PANEL_LIST_OP_SELECT, NULL, NULL);
-
-    /* Next time we press this button, do the opposite: */
-    select_all_when_press_this_button = !select_all_when_press_this_button;
-}
-
-
 /* Function used to update the text panel according to the list panel: */
 int static
 mchoose_notify(Panel_item item,
@@ -223,6 +199,30 @@ mchoose_notify(Panel_item item,
 
    /* Accept the operation by default: */
    return XV_OK;
+}
+
+
+/* When we press on the "(De)Select" all button, select or deselect
+   all the items. */
+void static
+mchoose_de_select_all_notify(Panel_item item,
+			     Event * event)
+{
+    int i;
+    static bool select_all_when_press_this_button = TRUE;
+
+    int nchoices = (int) xv_get(choices, PANEL_LIST_NROWS);
+
+    for(i = nchoices - 1; i >= 0; i--)
+	xv_set (choices,
+		PANEL_LIST_SELECT, i, select_all_when_press_this_button,
+		NULL);
+
+    /* Update the "Current choices": */
+    (void) mchoose_notify(NULL, NULL, NULL, PANEL_LIST_OP_SELECT, NULL, NULL);
+
+    /* Next time we press this button, do the opposite: */
+    select_all_when_press_this_button = !select_all_when_press_this_button;
 }
 
 
