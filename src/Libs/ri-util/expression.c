@@ -328,14 +328,22 @@ int r;
    entity if necessary; it is not clear if strdup() is always/sometimes
    necessary and if a memory leak occurs; wait till syntax/expression.c
    is merged with ri-util/expression.c 
-*/
+
+   Negative constants do not seem to be included in PIPS internal
+   representation.
+  */
 expression 
 int_to_expression(int i)
 {
     char constant_name[12];
     expression e;
-    (void) sprintf(constant_name,"%d",i);
+
+    (void) sprintf(constant_name,"%d",i>=0?i:-i);
     e = MakeIntegerConstantExpression(strdup(constant_name));
+    if(i<0) {
+	entity um = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
+	e = MakeUnaryCall(um, e);
+    }
     return e;
 }
 
