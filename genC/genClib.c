@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/07/24 15:46:39 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/07/24 15:53:02 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2670,8 +2670,11 @@ gen_identity(gen_chunk * x)
     return(x);
 }
 
-gen_chunk * gen_identity(gen_chunk *p){ return p;}
-void gen_core(gen_chunk *p){ abort();}
+void 
+gen_core(gen_chunk *p)
+{
+    abort();
+}
 
 /* GLOBAL VARIABLES: to deal with decision tables
  *
