@@ -11,6 +11,9 @@
 
 #include "wpips.h"
 
+/* Include the label names: */
+#include "wpips-labels.h"
+
 #include "constants.h"
 
 
