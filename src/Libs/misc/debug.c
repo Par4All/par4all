@@ -48,6 +48,31 @@ int get_debug_level()
 static debug_level_stack[STACK_LENGTH];
 static int idls = 0;
 
+/* The pair get_ and set_debug_stack_pointer() should never be used
+except to clean up the stack fater a long jump */
+
+int get_debug_stack_pointer()
+{
+    return idls;
+}
+
+void set_debug_stack_pointer(i)
+{
+    if(i >= 0 && i <= idls) {
+	user_warning("set-debug_stack_pointer",
+		     "debug level stack is set\n");
+	idls = i;
+	if(idls>1) {
+	    set_debug_level(debug_level_stack[idls-1]);
+	}
+	else
+	    set_debug_level(0);
+    }
+    else
+	pips_error("set-debug_stack_pointer", 
+		   "value %d out of range [0..%d]\n", i, idls);
+}
+
 void debug_off()
 {
     message_assert("empty debug level stack", idls > 0);
