@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.14  1998/11/12 17:21:20  coelho
+# EmacsDisplayer added.
+#
 # Revision 1.13  1998/10/30 15:44:21  ancourt
 # graphdisplayer entry added
 #
@@ -64,6 +67,7 @@ J_FILES	=	\
 		Displayer.java \
 		TextDisplayer.java \
 		GraphDisplayer.java \
+		EmacsDisplayer.java \
 		Resetable.java \
 		Activatable.java \
 		Stateable.java \
@@ -197,6 +201,10 @@ $(d)/GraphDisplayer.class: \
 	$(d)/Pawt.class \
 	$(d)/Displayer.class 
 
+$(d)/EmacsDisplayer.class: \
+	$(d)/Pawt.class \
+	$(d)/Displayer.class 
+
 $(d)/Listener.class: \
 	$(d)/Requestable.class
 
@@ -242,4 +250,5 @@ $(d)/JPips.class: \
 	$(d)/TPips.class \
 	$(d)/TextDisplayer.class \
 	$(d)/GraphDisplayer.class \
+	$(d)/EmacsDisplayer.class \
 	$(d)/OptionParser.class
