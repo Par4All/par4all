@@ -1,6 +1,6 @@
 # PROJET PIPS: EXPLOITATION DE LA DOCUMENTATION
 # ---------------------------------------------
-# $RCSfile: old_documentation_makefile,v $ ($Date: 1995/09/05 16:47:18 $, )
+# $RCSfile: old_documentation_makefile,v $ ($Date: 1995/09/19 13:10:46 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -313,8 +313,9 @@ $(LIBDIR)/wpips.rc: pipsmake-rc.tex
 	@expand pipsmake-rc.tex | sed 's/ *$$//' | sed '/^alias /!d' \
 		>> $(LIBDIR)/wpips.rc
 
+# *.aux is needed by latex2html
 clean:
-	rm -i *.dvi *.log *.aux *.toc *~ *.listing *.printed *.datastructure
+	rm -i *.dvi *.log *.toc *~ *.listing *.printed *.datastructure
 
 clobber: clean
 	rm -i wpips-rc pipsmake-rc properties-rc
