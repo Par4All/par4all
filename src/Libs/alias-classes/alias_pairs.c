@@ -267,6 +267,7 @@ add_alias_pairs_for_this_caller( entity caller )
   
     reset_current_module_statement();
     reset_cumulated_rw_effects();
+    free_value_mappings();
     reset_precondition_map();
 
     reset_current_module_entity();
@@ -316,8 +317,9 @@ alias_pairs( string module_name, list l_reg )
 	    pips_debug(9,"list_regions_callee is: \n");
 	    print_inout_regions(list_regions_callee);
 
-	    reset_current_module_statement();
+	    free_value_mappings();
 	    reset_cumulated_rw_effects();
+	    reset_current_module_statement();
 	}
 
     /* we need the callers of the current module  */
