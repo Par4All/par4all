@@ -908,3 +908,44 @@ Variable v;
 
 
 }
+
+/* from sc_common_projection_convex_hull... 
+   extract exact equalities on cl, put them in common,
+   and project them in cl, s1 and s2...
+ */
+#define SUBS(s,e,v) \
+  sc_simple_variable_substitution_with_eq_ofl_ctrl(s,e,v,OFL_CTRL)
+/* sc_variable_substitution_with_eq_ofl_ctrl(s,contrainte_dup(e),v,OFL_CTRL) */
+
+void sc_extract_exact_common_equalities
+  (Psysteme cl, Psysteme common, Psysteme s1, Psysteme s2)
+{
+  Pcontrainte eq, neq, peq; 
+  for (peq = CONTRAINTE_UNDEFINED,
+	 eq = sc_egalites(cl),
+	 neq = eq? eq->succ: CONTRAINTE_UNDEFINED;
+       eq; 
+       peq = eq==neq? peq: eq,
+	 eq = neq,
+	 neq = eq? eq->succ: CONTRAINTE_UNDEFINED)
+  {
+    Variable v = vect_one_coeff_if_any(eq->vecteur);
+    if (v) 
+    {
+      /* unlink eq */
+      if (peq) peq->succ = neq; else sc_egalites(cl) = neq;
+
+      /* put equality back in common. */
+      eq->succ = sc_egalites(common);
+      sc_egalites(common) = eq;
+      sc_nbre_egalites(common)++;
+
+      /* drop variable. */
+      s1 = SUBS(s1, eq, v);
+      s2 = SUBS(s2, eq, v);
+      cl = SUBS(cl, eq, v);
+
+      eq = neq; /* let's hope neq is still there... */
+    }
+  }
+}
