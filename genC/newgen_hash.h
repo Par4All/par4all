@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 2003/07/04 08:56:48 $, )
+/* $RCSfile: newgen_hash.h,v $ ($Date: 2003/07/04 10:54:20 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -56,7 +56,7 @@ typedef struct __hash_table *hash_table;
 #define HASH_MAP(k,v,code,h) \
     {\
     hash_table _map_hash_h = (h) ; \
-    register hash_entry_pointer _map_hash_p = NULL; \
+    register void * _map_hash_p = NULL; \
     void *k, *v; \
     while ((_map_hash_p = hash_table_scan(_map_hash_h,_map_hash_p,&k,&v))) { \
             code ; }}
