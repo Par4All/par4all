@@ -189,6 +189,8 @@ extern int Read_spec_mode ;
   message_assert("gen_read_spec not performed prior to use", \
 		 Read_spec_performed);
 
+#define NEWGEN_FREED ((void*)NULL)
+
 #define newgen_free(p) (*((char*)(p))='\0',free(p)) /* just to hide bugs */
 
 /* inlined version of domain_index. what is done by optimizing compilers?
