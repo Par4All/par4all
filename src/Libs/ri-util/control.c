@@ -4,10 +4,10 @@
    Ronan Keryell.
    */
 
-/* 	%A% ($Date: 1997/04/23 18:37:32 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/05/27 14:01:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1997/04/23 18:37:32 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1997/05/27 14:01:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -133,11 +133,19 @@ display_linked_control_nodes(control c) {
 /* Remove all the control nodes (with its statement) from c in the
    successor tree of c up to the nodes with more than 1 predecessor.
    The entry node of the unstructured is given to avoid removing it
-   when there is an unreachable sequence pointing on it: */
+   when there is an unreachable sequence pointing on it.
+
+   If a control node contains a FORMAT, assume that it is useful and
+   stop removing. */
 void
 remove_unreachable_following_control(control c,
 				     control entry_node)
 {
+    /* If there is a FORMAT inside a control node, just stop deleting
+       the control nodes: */
+    if (format_inside_statement_p(control_statement(c)))
+	return;
+    
     /* For each successor of c: */
     MAP(CONTROL, a_successor, {
 	if (a_successor != entry_node
