@@ -433,12 +433,17 @@ Pvecteur v;
 {
     for(;!VECTEUR_NUL_P(v); v = v->succ) {
 	if(vecteur_var(v) != TCST) {
+	    if(entity_has_values_p((entity) vecteur_var(v))) {
 	    entity new_v = entity_to_new_value((entity) vecteur_var(v));
 	
 	    if(new_v != entity_undefined)
 		vecteur_var(v) = (Variable) new_v;
 	    else
 		return FALSE;
+	    }
+	    else {
+		return FALSE;
+	    }
 	}
     }
     return TRUE;
