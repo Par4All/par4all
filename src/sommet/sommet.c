@@ -109,7 +109,11 @@ char * (*nom_var)();
 	fprint_Value(f,s->denominateur);
 	(void) fprintf(f, "\t");
     }
-    vect_fprint(f,s->vecteur,nom_var); 
+    if (s->vecteur)
+	vect_fprint(f,s->vecteur,nom_var); 
+    else
+	fprintf(f, "0\n");
+
     /* malgre le clash de type, je kludge... */
    /* ray_dte_fprint(f, s, nom_var);*/
 }
