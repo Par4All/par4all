@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/09/16 21:42:40 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/09/16 21:46:56 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -75,8 +75,6 @@
 #include <stdarg.h>
 #include "newgen_include.h"
 #include "genC.h"
-
-extern int fprintf();
 
 int gen_eq( obj1, obj2 )
 gen_chunk *obj1, *obj2 ;
