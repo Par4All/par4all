@@ -1,4 +1,6 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -131,11 +133,37 @@ Event *event;
 
 /* Ne fait rien d'autre que de fermer la fene^tre... */
 void
-cancel_query_notify(Panel_item item
-                    , Event * event)
+cancel_query_notify(Panel_item item,
+                    Event * event)
 {
    hide_window(query_frame);
 }
+
+
+#if 0
+/* Do nothing since it cannot be interrupted... */
+void
+cancel_user_request_notify(Panel_item item,
+                           Event * event)
+{
+   hide_window(query_frame);
+}
+
+
+void
+wpips_user_request(char *a_printf_format,
+                   va_list args)
+{
+   start_query("User Query",
+               "Waiting for your response: ", 
+               "UserQuery",
+               end_user_request_notify,
+               cancel_user_request_notify);
+
+   xv_main_loop(main_frame);
+}
+#endif
+
 
 void create_query_window()
 {
