@@ -2,9 +2,12 @@
  * $Id$
  *
  * Cloning of a subroutine.
- * debug: CLONING_DEBUG_LEVEL
+ * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.5  1997/11/04 10:06:26  coelho
+ * new clone_substitute interface added.
+ *
  * Revision 1.4  1997/11/03 18:18:45  coelho
  * cloning seemes ok with both interface... more tests needed however.
  *
@@ -35,6 +38,7 @@
 #include "prettyprint.h"
 #include "semantics.h"
 
+#define DEBUG_ON   debug_on("CLONE_DEBUG_LEVEL")
 #define ALL_DECLS  "PRETTYPRINT_ALL_DECLARATIONS"
 #define STAT_ORDER "PRETTYPRINT_STATEMENT_NUMBER"
 
@@ -46,6 +50,7 @@ static void
 callees_rwt(call c)
 {
     entity called = call_function(c);
+    pips_assert("defined entity", !entity_undefined_p(called));
 
     if (type_functional_p(entity_type(called)) &&
 	storage_rom_p(entity_storage(called)) &&
@@ -265,25 +270,29 @@ set_clone(entity the_ref, entity the_clone, int argn, int val)
 /**************************************************** CLONING TRANSFORMATION */
 
 static void
-do_clone_arg_val(
+do_clone(
     call c, 
     int argn, 
-    int val)
+    int val,
+    entity clonee /* if provided */)
 {
-    entity cloned = call_function(c), new_clone;
+    entity cloned = call_function(c);
     pips_debug(3, "%s cloned on argument %d for value %d\n", 
 	       entity_name(cloned), argn, val);
     
     /* first check whether the cloning was already performed.
      */
-    new_clone = get_clone(cloned, argn, val);
-    if (new_clone==entity_undefined)
+    if (entity_undefined_p(clonee))
     {
-	new_clone = build_a_clone_for(cloned, argn, val);
-	if (argn!=0) set_clone(cloned, new_clone, argn, val);
+	clonee = get_clone(cloned, argn, val);
+	if (clonee==entity_undefined)
+	{
+	    clonee = build_a_clone_for(cloned, argn, val);
+	    if (argn!=0) set_clone(cloned, clonee, argn, val);
+	}
     }
 
-    call_function(c) = new_clone;
+    call_function(c) = clonee;
 }
 
 DEFINE_LOCAL_STACK(stmt, statement)
@@ -332,6 +341,7 @@ this_expression_constant_p(
 static entity module_to_clone = entity_undefined;
 static int argument_to_clone = 0;
 static int statement_to_clone = STATEMENT_NUMBER_UNDEFINED;
+static entity clonee_to_substitute = entity_undefined;
 
 static void 
 clone_rwt(call c)
@@ -346,13 +356,13 @@ clone_rwt(call c)
     {
 	nth_arg = EXPRESSION(gen_nth(argument_to_clone-1, call_arguments(c)));
 	if (this_expression_constant_p(nth_arg, &val)) /* yeah! */
-	    do_clone_arg_val(c, argument_to_clone, val);
+	    do_clone(c, argument_to_clone, val, entity_undefined);
     }
     else if (statement_to_clone!=STATEMENT_NUMBER_UNDEFINED &&
 	     statement_to_clone==statement_number(stmt_head()))
     {
-	do_clone_arg_val(c, 0, 0);
-    }	
+	do_clone(c, 0, 0, clonee_to_substitute);
+    }
 }
 
 /* clone module calls on argument arg in caller.
@@ -363,7 +373,8 @@ perform_clone(
     entity module      /* the module being cloned */,
     string caller_name /* the caller of interest */,
     int argn           /* the argument number to be cloned */,
-    int number         /* the statement number to clone a call */)
+    int number         /* the statement number to clone a call */,
+    entity substitute  /* entity to substitute to module */)
 {
     entity caller;
     statement stat;
@@ -382,6 +393,7 @@ perform_clone(
     module_to_clone = module;
     argument_to_clone = argn;
     statement_to_clone = number;
+    clonee_to_substitute = substitute;
 
     /* perform cloning
      */
@@ -399,12 +411,13 @@ perform_clone(
     module_to_clone = entity_undefined;
     argument_to_clone = 0;
     statement_to_clone = STATEMENT_NUMBER_UNDEFINED;
+    clonee_to_substitute = entity_undefined;
     free_stmt_stack();
     if (argn!=0) reset_precondition_map();
 }
 
 
-/******************************************************* PIPSMAKE INTERFACES */
+/********************************************************************* UTILS */
 
 static void
 set_currents(string name)
@@ -433,6 +446,29 @@ reset_currents(string name)
     pips_debug(1, "done with module %s\n", name);
 }
 
+/* check that caller is indeed a caller of name.
+ */
+static void
+is_a_caller_or_error(
+    string name,
+    string caller)
+{
+    bool is_a_caller = FALSE;
+    callees callers;
+
+    callers = (callees) db_get_memory_resource(DBR_CALLERS, name, TRUE);
+    
+    MAP(STRING, s, 
+	is_a_caller |= same_string_p(s, caller),
+	callees_callees(callers));
+
+    if (!is_a_caller) 
+	pips_user_error("%s is not a caller of %s\n", caller, name);    
+}
+
+
+/******************************************************* PIPSMAKE INTERFACES */
+
 #define ARG_TO_CLONE "TRANSFORMATION_CLONE_ON_ARGUMENT"
 
 /* clone module name, on the argument specified by property
@@ -454,7 +490,7 @@ clone_on_argument(string name)
     callees callers; /* warf, warf */
     int argn;
 
-    debug_on("CLONING_DEBUG_LEVEL");
+    DEBUG_ON;
     set_currents(name);
     module = get_current_module_entity();
     callers = (callees) db_get_memory_resource(DBR_CALLERS, name, TRUE);
@@ -490,7 +526,8 @@ clone_on_argument(string name)
     }
 
     MAP(STRING, caller_name, 
-	perform_clone(module, caller_name, argn, STATEMENT_NUMBER_UNDEFINED),
+	perform_clone(module, caller_name, argn, 
+		      STATEMENT_NUMBER_UNDEFINED, entity_undefined),
 	callees_callees(callers));    
 
     reset_currents(name);
@@ -512,31 +549,66 @@ bool
 clone(string name)
 {
     entity module;
-    callees callers;
     string caller, number_s;
-    bool is_a_caller = FALSE;
     int number;
 
-    debug_on("CLONING_DEBUG_LEVEL");
+    DEBUG_ON;
     set_currents(name);
     module = get_current_module_entity();
-    callers = (callees) db_get_memory_resource(DBR_CALLERS, name, TRUE);
-    
+
     caller = user_request("%s caller to update?", name);
-    MAP(STRING, s, 
-	is_a_caller |= same_string_p(s, caller),
-	callees_callees(callers));
-    if (!is_a_caller) 
-	pips_user_error("%s is not a caller of %s\n", caller, name);
+    is_a_caller_or_error(name, caller);
 	
     number_s = user_request("statement number of %s to clone?", caller);
     number = atoi(number_s);
     free(number_s);
 
-    perform_clone(module, caller, 0, number);
+    perform_clone(module, caller, 0, number, entity_undefined);
     
     free(caller);
     reset_currents(name);
     debug_off();
-    return FALSE;
+    return TRUE;
+}
+
+/* substitute a call by another, usually a already cloned version.
+ *
+ * clone_substitute	> CALLERS.code
+ * 			> CALLERS.callees
+ * 	< MODULE.code
+ *      < MODULE.user_file
+ *      < CALLERS.code
+ *	< CALLERS.callees
+ */
+bool
+clone_substitute(string name)
+{
+    entity module, substitute;
+    string caller, number_s, substitute_s;
+    int number;
+
+    DEBUG_ON;
+    set_currents(name);
+    module = get_current_module_entity();
+    
+    caller = user_request("%s caller to update?", name);
+    is_a_caller_or_error(name, caller);
+	
+    number_s = user_request("statement number of %s to clone?", caller);
+    number = atoi(number_s);
+    free(number_s);
+
+    substitute_s = user_request("replacement for %s?", name);
+    substitute = local_name_to_top_level_entity(substitute_s);
+    if (entity_undefined_p(substitute) || 
+	!type_functional_p(entity_type(substitute)))
+	pips_user_error("%s is not an existing function\n", substitute_s);
+    free(substitute_s);
+
+    perform_clone(module, caller, 0, number, substitute);
+
+    free(caller);
+    reset_currents(name);
+    debug_off();
+    return TRUE;
 }
