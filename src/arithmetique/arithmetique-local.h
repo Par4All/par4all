@@ -143,9 +143,10 @@ typedef int Value;
 #define value_product(ref,val) ref*=(val)
 #define value_substract(ref,val) ref-=(val)
 #define value_division(ref,val) ref/=(val)
-#define value_pdivision(ref,val) value_assign(ref,value_pdiv(ref,val))
-#define value_oppose(ref) ref=value_uminus(ref)
 #define value_modulus(ref,val) ref%=(val)
+#define value_pdivision(ref,val) value_assign(ref,value_pdiv(ref,val))
+#define value_oppose(ref) value_assign(ref,value_uminus(ref))
+#define value_absolute(ref) value_assign(ref,value_abs(ref))
 
 /* unary operators on values
  */
