@@ -4,6 +4,10 @@
 #
 # one database name as an argument
 #
+# result is quite partial : ONE cycle is found for each module
+# which belongs to one or more recursion cycle.
+# the counts displayed at the end just rely on the cycles found.
+#
 
 use strict;
 
@@ -54,7 +58,9 @@ my %direct_callees = ();
 while (my ($module, $file) = each %file_names)
 {
     open CALLEES_FILE, $file or die $!;
+    # one line is enough
     my $callees = <CALLEES_FILE>;
+    # extract list
     $callees =~ s/.*\(([^\(\)]*)\).*/$1/;
     $direct_callees{$module} = [ split /[ \"]+/, $callees ];
     close CALLEES_FILE or die $!;
