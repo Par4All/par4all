@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.39  2001/06/22 09:43:19  irigoin
+ * basic_of_external: call to pips_error() replaced by call to pips_user_error() when a subroutine is used as a function
+ *
  * Revision 1.38  2000/04/17 14:49:20  phamdinh
  * basic_inferior_p types tags fixed.
  *
@@ -862,8 +865,14 @@ basic_of_external(call c)
 
     return_type = functional_result(type_functional(call_type));
 
-    if (type_tag(return_type) != is_type_variable)
+    if (!type_variable_p(return_type)) {
+      if(type_void_p(return_type)) {
+	pips_user_error("A subroutine is used as a function\n");
+      }
+      else {
 	pips_error("basic_of_external", "Bad return call type tag");
+      }
+    }
 
     b = (variable_basic(type_variable(return_type)));
 
