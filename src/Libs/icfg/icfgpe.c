@@ -64,7 +64,7 @@ static text text_statement_any_effect_type_flt(entity module, int margin, statem
 }
 
 static void
-load_resources(string module_name)
+load_resources_icfg(string module_name)
 {
   MAPL(l, {
     p_icfgpe_print_stuff ips = (p_icfgpe_print_stuff) STRING(CAR(l));
@@ -90,7 +90,7 @@ static text get_any_effects_text_flt(string module_name)
   
   /* resources to be printed...
    */
-  load_resources(module_name);
+  load_resources_icfg(module_name);
   
   debug_on("EFFECTS_DEBUG_LEVEL");
   
