@@ -497,6 +497,9 @@ call_to_transformer(call c, list ef) /* effects of call c */
       default:
 	pips_internal_error("unknown tag %d\n", tt);
     }
+    pips_assert("transformer tt is consistent", 
+		transformer_consistency_p(tf)); 
+
 
     pips_debug(8,"end\n");
 
@@ -610,10 +613,14 @@ user_function_call_to_transformer(
 	}
 	*/
     }
+    pips_assert("transformer t_caller is consistent", 
+		transformer_consistency_p(t_caller)); 
+
 
     debug(8, "user_function_call_to_transformer",
 	  "end with t_caller=%p\n", t_caller);
 
+    
     return t_caller;
 }
 
@@ -773,7 +780,12 @@ user_call_to_transformer(
 		      /* e_new and e_old must be replaced by the
 			 actual entity argument */
 		      entity e_old = external_entity_to_old_value(e);
-
+ ifdebug(8) {
+	debug(8, "user_call_to_transformer", 
+	      "entity=%s entity_old_value= %s",entity_local_name(e),entity_local_name(e_old));
+	
+	
+    }
 		      if(vect_size(v) != 1 || vecteur_var(v) == TCST) {
 			/* Actual argument is not a reference: it might be a user error!
 			 * Transformers do not carry the may/must information.
@@ -782,11 +794,13 @@ user_call_to_transformer(
 			 * FI: does effect computation emit a warning?
 			 */
 			list args = arguments_add_entity(arguments_add_entity(NIL, e_new), e_old);
+			
 			user_warning("user_call_to_transformer",
 				     "value (!) might be modified by call to %s\n%dth formal parameter %s\n",
 				     entity_local_name(f), r, entity_local_name(e));
 			t_caller = transformer_filter(t_caller, args);
 			free_arguments(args);
+			
 		      }
 		      else {
 			a_new = entity_to_new_value((entity) vecteur_var(v));
@@ -795,9 +809,10 @@ user_call_to_transformer(
 			  (t_caller, e_new, a_new);
 			t_caller = transformer_value_substitute
 			  (t_caller, e_old, a_old);
+			
 		      }
 		    }
-		    else {
+		    else { 
 			/* simple case: formal parameter e is not
 			   modified and can be replaced by actual
 			   argument expression */
@@ -806,13 +821,21 @@ user_call_to_transformer(
 							    v);
 		    }
 		}
-		else {
+		else { 
 		    /* formal parameter e has to be eliminated:
 		       e_new and e_old will be eliminated */
 		    vect_rm(v);
 		}
 	    }
 	}
+
+   ifdebug(8) {
+	debug(8, "user_call_to_transformer", 
+	      "Before formal new values left over are eliminated\n");
+	dump_transformer(t_caller);
+	
+    }
+
 	/* formal new values left over are eliminated */
 	MAPL(ce,{entity e = ENTITY(CAR(ce));
 		 entity e_new = external_entity_to_new_value(e);
@@ -878,7 +901,10 @@ user_call_to_transformer(
 	dump_transformer(t_caller);
     }
 
-    pips_assert("transformer t_caller is consistent", transformer_consistency_p(t_caller));
+    /* pips_assert("transformer t_caller is consistent", transformer_consistency_p(t_caller)); 
+     */
+
+
     return t_caller;
 }
 
