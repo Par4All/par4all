@@ -165,16 +165,6 @@ rice_loop(statement stat, int l)
     return nstat;
 }
 
-static void
-print_statistics(string module, string msg, statement s)
-{
-    if (get_bool_property("PARALLELIZATION_STATISTICS"))
-    {
-	fprintf(stderr, "%s %s parallelization statistics", module, msg);
-	print_number_of_loop_statistics(stderr, "", s);
-    }
-}
-
 /*
  * RICE_DEBUG_LEVEL (properly?) included, FC 23/09/93
  */
@@ -198,7 +188,7 @@ do_it(
 
     debug_on("RICE_DEBUG_LEVEL");
 
-    print_statistics(mod_name, "ante", mod_stat);
+    print_parallelization_statistics(mod_name, "ante", mod_stat);
 
     ifdebug(7)
     {
@@ -259,10 +249,9 @@ do_it(
     debug_off();
 
     /* FI: This may be parallel or sequential code */
-    DB_PUT_MEMORY_RESOURCE(what, strdup(mod_name), (char*) mod_parallel_stat);
+    DB_PUT_MEMORY_RESOURCE(what, mod_name, (char*) mod_parallel_stat);
 
-    print_statistics(mod_name, "post", 
-		     mod_parallel_stat);
+    print_parallelization_statistics(mod_name, "post", mod_parallel_stat);
 
     dg = graph_undefined;
     reset_current_module_statement();
@@ -273,8 +262,7 @@ do_it(
 
 /****************************************************** PIPSMAKE INTERFACE */
 
-bool 
-distributer(string mod_name)
+bool distributer(string mod_name)
 {  
     bool success;
     entity module = local_name_to_top_level_entity(mod_name);
@@ -291,8 +279,7 @@ distributer(string mod_name)
     return success;
 }
 
-static bool 
-rice(string mod_name)
+static bool rice(string mod_name)
 { 
     bool success = TRUE;
     entity module = local_name_to_top_level_entity(mod_name);
@@ -304,24 +291,21 @@ rice(string mod_name)
     return success;
 }
 
-bool rice_all_dependence(mod_name)
-char *mod_name;
+bool rice_all_dependence(string mod_name)
 {
     set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", TRUE ) ;
     set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", FALSE ) ;
     return rice( mod_name ) ;
 }
 
-bool rice_data_dependence(mod_name)
-char *mod_name;
+bool rice_data_dependence(string mod_name)
 {
     set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", TRUE ) ;
     set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", TRUE ) ;
     return rice( mod_name ) ;
 }
 
-bool rice_cray(mod_name)
-char *mod_name;
+bool rice_cray(string mod_name)
 {
     set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", FALSE ) ;
     set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", FALSE ) ;
