@@ -1317,7 +1317,7 @@ statement Tiling_buffer_allocation ()
           MATRIX_ELEM(P1,i,j/2+1)=VALUE_ZERO;
       };
   
-  matrix_print(P1);
+  
   P2=matrix_new(depth,depth);
   for(i=depth+1;i<=2*depth;i++)
     for(j=2;j<=2*depth;j=j+2)
@@ -1378,6 +1378,7 @@ statement Tiling_buffer_allocation ()
 	MATRIX_ELEM(N[i],j,1)= value_plus(value_minus(sequen[i].nd[j-1].upper,sequen[i].nd[j-1].lower),VALUE_ONE);
       NP[i]=matrix_new(depth,1);
       matrix_multiply(P1,N[i],NP[i]);
+   
       if (i<=k1-2)
 	{
 	  lis2=NULL;
@@ -1400,19 +1401,22 @@ statement Tiling_buffer_allocation ()
 	  ref[i]= ( entity  *)malloc((depth+1) *sizeof( entity));
 	  buf_ref[i]=( reference  *)malloc((depth+1) *sizeof( reference));
           scopy[i]=( statement   *)malloc((depth+1) *sizeof( statement));
- 
+	 
 	  for(j=1;j<=depth;j++)
 	    {	      
 
 	      lis= NULL;
               lis1=NULL;
+	     
 	      lis=CONS(DIMENSION, make_dimension(int_to_expression(0), int_to_expression(1)), lis);
 	      pos=position_one_element(P1,j);
 	      pv= vect_make(VECTEUR_NUL ,itert[pos-1], VALUE_ONE,TCST,VALUE_ZERO);
 	      exp= binary_intrinsic_expression ("MOD",Pvecteur_to_expression(pv ),Value_to_expression(2));
 	      lis1 =CONS(EXPRESSION, exp,lis1);
+	 
 	      for (k=1;k<=j-1;k++)
 		{
+		 
 		  lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus 
 										      (MATRIX_ELEM(ATEP,k,1),VALUE_ONE))), lis);
 		  pos=position_one_element(P1,k);
@@ -1427,19 +1431,30 @@ statement Tiling_buffer_allocation ()
 	      pos=position_one_element(P1,k);
               con=value_minus(MATRIX_ELEM(G_PRO[i],pos,1), MATRIX_ELEM(ATE,pos,1));    
 	      pv= vect_make(VECTEUR_NUL ,iter[pos-1], VALUE_ONE,TCST,con);
+	      printf(" totot \n");
 	      exp=Pvecteur_to_expression(pv);
+	      printf(" tototo fin \n");
 	      lis1 =CONS(EXPRESSION, exp,lis1);
 	      for (k=j+1;k<=depth;k++)
 		{
+		  Value v1;
 		  lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus 
 										      (MATRIX_ELEM(NP[i],k,1),VALUE_ONE))), lis);
 		  pos=position_one_element(P1,k);
-		  pv= vect_make(VECTEUR_NUL ,iter[pos-1], VALUE_ONE,itert[pos-1], MATRIX_ELEM(ATE,pos,1) ,TCST,VALUE_ZERO);
+		 v1=sequen[i].nd[pos-1].lower+MATRIX_ELEM( sequen[i].delai,pos,1 );
+		 printf("dddd %lld \n", MATRIX_ELEM(ATE,pos,1));
+		 getchar();
+		 pv= vect_make(VECTEUR_NUL ,iter[pos-1], VALUE_ONE,itert[pos-1], MATRIX_ELEM(ATE,pos,1) ,TCST,
+				value_uminus(v1)  );
+		  printf(" ah1 %d \n",k);
+		  vect_dump(pv);
 		  exp=Pvecteur_to_expression(pv);
+		  print_expression(exp);
+		  printf(" ah2 %d \n",k);
 		  lis1 =CONS(EXPRESSION, exp,lis1);
 		}
 	      
-	      
+	   
 	      name= make_new_array_variable(i+1,j,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
 	      buf_ref[i][j-1]=make_reference(name,lis1);
 	      ref[i][j-1]=name;
@@ -1460,8 +1475,10 @@ statement Tiling_buffer_allocation ()
 		m++;
 	      },call_arguments(c)) ;
 	      syntax_reference(expression_syntax(gauche))= buf_ref[i][j-1];
+	      
 
 	    }
+	 
 	  lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(MATRIX_ELEM(G_PROPP[i],1,1))), NIL);
 	  pos=position_one_element(P2,1);
 	  pv= vect_make(VECTEUR_NUL ,iter[pos-1], VALUE_ONE,TCST,VALUE_ZERO);
@@ -1499,7 +1516,7 @@ statement Tiling_buffer_allocation ()
 	  seq= make_sequence(lis2);
 	  ins= make_instruction_sequence(seq);
 	  sequenp[i]= instruction_to_statement(ins);
-	  
+	   printf(" 3 \n");
 	};
     };
   
@@ -1511,6 +1528,7 @@ statement Tiling_buffer_allocation ()
       Pmatrix *temp;
       reference *regi[nid_nbr];
       int m1;
+     
       for(j=1;j<=depth;j++)
 	{
 	  Value v2;
@@ -1595,19 +1613,23 @@ statement Tiling_buffer_allocation ()
 		      if(r==l)
 			{
 			  Value t;
-			  t=value_minus(MATRIX_ELEM(ATEP,r+1,1),MATRIX_ELEM(temp[k],r+1,1));
-			  pv = vect_make(VECTEUR_NUL,iter[r], VALUE_ONE, TCST,t);
+			  int pos;
+			  pos=position_one_element(P1,r+1);
+			  t=value_minus(MATRIX_ELEM(ATEP,r+1,1),MATRIX_ELEM(temp[k],pos,1));
+			  pv = vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE, TCST,t);
 			  delai_plus=Pvecteur_to_expression(pv);
 			  ExpressionReplaceReference(exp,
-						     make_reference((entity) iter[r],NIL), delai_plus);
+						     make_reference((entity) iter[pos-1],NIL), delai_plus);
 			}		   
 		      
 		      else	     
 			{
-			  pv = vect_make(VECTEUR_NUL,iter[r], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],r+1,1));
+			  int pos;
+			  pos=position_one_element(P1,r+1);
+			  pv = vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],pos,1));
 			  delai_plus=Pvecteur_to_expression(pv);
 			  ExpressionReplaceReference(exp,
-						     make_reference((entity) iter[r],NIL), delai_plus);
+						     make_reference((entity) iter[pos-1],NIL), delai_plus);
 			}
 		    }
 
@@ -1647,7 +1669,7 @@ statement Tiling_buffer_allocation ()
 		  pos=position_one_element(P1,l+1);
 		  pv1= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST ,VALUE_ZERO);
 		  exp1= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv1 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
-		  pv2= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST , -MATRIX_ELEM(temp[k],l+1,1));
+		  pv2= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST , -MATRIX_ELEM(temp[k],pos,1));
 		  exp2= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv2 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
 		  exp=lt_expression(Pvecteur_to_expression(pv2 ),Value_to_expression(VALUE_ZERO));
 		  t= make_test(exp,stemp[l],s);
@@ -1735,7 +1757,7 @@ statement Tiling_buffer_allocation ()
       
       /* */
 	  
-      
+      printf(" je suis ic \n");
       for(j=1;j<=depth;j++)
 	{
 	  
@@ -1829,19 +1851,23 @@ statement Tiling_buffer_allocation ()
 		     if(r==l)
 			{
 			  Value t;
-			  t=value_minus(MATRIX_ELEM(ATEP,r+1,1),MATRIX_ELEM(temp[k],r+1,1));
-			  pv = vect_make(VECTEUR_NUL,iter[r], VALUE_ONE, TCST,t);
+			  int pos;
+			  pos=position_one_element(P1,r+1);
+			  t=value_minus(MATRIX_ELEM(ATEP,r+1,1),MATRIX_ELEM(temp[k],pos,1));
+			  pv = vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE, TCST,t);
 			  delai_plus=Pvecteur_to_expression(pv);
 			  ExpressionReplaceReference(exp,
-						     make_reference((entity) iter[r],NIL), delai_plus);
+						     make_reference((entity) iter[pos-1],NIL), delai_plus);
 			}		   
 		      
 		      else	     
 			{
-			  pv = vect_make(VECTEUR_NUL,iter[r], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],r+1,1));
+			  int pos;
+			  pos=position_one_element(P1,r+1);
+			  pv = vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],pos,1));
 			  delai_plus=Pvecteur_to_expression(pv);
 			  ExpressionReplaceReference(exp,
-						     make_reference((entity) iter[r],NIL), delai_plus);
+						     make_reference((entity) iter[pos-1],NIL), delai_plus);
 			}
 		    
 		}
@@ -1881,7 +1907,7 @@ statement Tiling_buffer_allocation ()
 	      pos=position_one_element(P1,l+1);
 	      pv1= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST ,VALUE_ZERO);
 	      exp1= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv1 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
-	      pv2= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST , -MATRIX_ELEM(temp[k],l+1,1));
+	      pv2= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST , -MATRIX_ELEM(temp[k],pos,1));
 	      exp2= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv2 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
 	      exp=lt_expression( Pvecteur_to_expression(pv2 ) ,Value_to_expression(VALUE_ZERO) );
 	      t= make_test(exp,stemp[l],s);
@@ -1961,7 +1987,7 @@ statement Tiling_buffer_allocation ()
 	  lower= int_to_expression(0);
 	  
 	  tiling_indice[plus/2]=vect_make(VECTEUR_NUL ,pb->var , VALUE_ONE,TCST,VALUE_ZERO);
-	  
+	        
 	  vect_dump( tiling_indice[plus/2]);
 	  
 	 
