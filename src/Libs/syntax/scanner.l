@@ -4,8 +4,6 @@
 
 /* les definitions des valeurs des tokens */
 #include <stdio.h>
-extern int fprintf();
-extern int _flsbuf();
 
 #include "genC.h"
 #include "parser_private.h"
