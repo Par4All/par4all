@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/03 12:02:17 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/03 16:27:34 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -121,6 +121,7 @@
 # - header en Makefile entry added, idem.
 # - Makefile added to special .INIT target, idem.
 # - no installation of header files if not modified. FC 03/08/95
+# - {,quick-} install with .xx touches
 #
 # wish:
 #
@@ -291,7 +292,7 @@ $(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
 
 # install installs sources, so depends on sources. FC
 # to insure the library is compiled before hand, a make is added.
-install: $(SOURCES)
+.install: $(SOURCES)
 	$(MAKE) $(INC_TARGET) $(LIB_TARGET)
 	@if test \`echo *.a | wc -w\` -gt 1 ; \\
 	then \\
@@ -305,17 +306,17 @@ install: $(SOURCES)
 		$(SOURCES)
 	@pips_install_file $(MAKEFILE) $(TARGETDIR)/Makefile
 	cd $(TARGETDIR) ; $(MAKE) depend
-	touch install
+	touch .install
 	$(MAKE) quick-install
 
 # quick-install installs lib and so, so depends on these. FC
 # header installed only if different.
 # should avoid some recompilations if headers are not touched.
-quick-install: $(INC_TARGET) $(LIB_TARGET)
+.quick-install: $(INC_TARGET) $(LIB_TARGET)
 	@pips_install_file $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
 	@pips_install_file $(LIB_TARGET) $(LIBDIR)/$(LIB_TARGET) 
 	ranlib $(LIBDIR)/$(LIB_TARGET)
-	touch quick-install
+	touch .quick-install
 
 $(LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
 	cp $(LIB_TARGET) $(LIBDIR)
@@ -352,7 +353,7 @@ TARGET_IFILES=	$(TARGET_CFILES:.c=.i)
 $(BIN_TARGET): $(OBJECTS) $(INC_TARGET)
 	$(LINK) $(BIN_TARGET) $(OBJECTS) $(TARGET_LIBS)
 
-install: $(SOURCES) 
+.install: $(SOURCES) 
 	@touch _tmp_hack.a
 	@test \`echo *.a | wc -w\` -eq 1 || \\
 	{ \\
@@ -369,13 +370,13 @@ install: $(SOURCES)
 		$(SOURCES)
 	@pips_install_file $(MAKEFILE) $(TARGETDIR)/Makefile
 	cd $(TARGETDIR) ; $(MAKE) depend
-	touch install
+	touch .install
 	$(MAKE) quick-install
 
-quick-install: $(INC_TARGET) $(BIN_TARGET) $(BINDIR)
+.quick-install: $(INC_TARGET) $(BIN_TARGET) $(BINDIR)
 	@pips_install_file $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
 	@pips_install_file $(BIN_TARGET) $(BINDIR)/$(BIN_TARGET)
-	touch quick-install
+	touch .quick-install
 
 clean:
 	-$(RM) TAGS $(OBJECTS) $(BIN_TARGET) \\
@@ -449,6 +450,9 @@ production-depend: $(DERIVED_HEADERS) $(EXTERN)
 	} > $(MAKEFILE).new
 	@pips_install_file $(MAKEFILE).new $(MAKEFILE)
 	$(RM) $(MAKEFILE).new
+
+install: .install
+quick-install: .quick-install
 
 ### DO NOT DELETE THIS LINE. USED FOR MAKE DEPEND
 %
