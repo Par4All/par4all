@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/01/03 11:03:58 $, 
+%% $Date: 1997/01/09 10:07:06 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,newgen_domain}
@@ -914,19 +914,21 @@ les statements sans label.
 Member {\tt number} contains an external number which is not used by
 PIPS. This number may be used as a statement identifier for debugging
 purposes or for user interaction. The default value is
-\verb+STATEMENT_NUMBER_UNDEFINED+. This number may be set explictly by
-the user (Well do we really parse columns 73-80? No they are discarded!) or implictly by the
-parser. The parser uses the line number of the first line of the
-statement in the source file. Only executable Fortran statements are
-stored as statement and only them are used to define statement
-numbers. Statement number one is the first line of the first executable
-statement and thus cannot be used to retrieve the text in the source
-file with a standard text editor. This number is theoretically never
-changed by PIPS once it has been initialized by the parser. Once the
-code has been transformed, statement numbers may not appear in
-increasing order, statement number may be duplicated, for instance,
-after loop unrolling, and statement number may not exist at all, for
-instance for fully synthesized statements.
+\verb+STATEMENT_NUMBER_UNDEFINED+. This number could theoretically be
+set explictly by the user\footnote{Columns 73 to 80 are discarded for
+executable statements.}. In fact it is set by the parser. The parser
+uses an executable statement count from the source file. Only executable
+Fortran statements are stored as statement and only them are used to
+define statement numbers. Statement number one is the first line of the
+first executable statement and thus cannot be used to retrieve the text
+in the source file with a standard text editor. This number is
+theoretically never changed by PIPS once it has been initialized by the
+parser. Once the code has been transformed, statement numbers may not
+appear in increasing order, statement number may be duplicated, for
+instance, after loop unrolling, and statement number may not exist at
+all, for instance for fully synthesized statements.
+
+Note that parser messages are labelled by physical line numbers.
 
 \iffalse
 Le sous-domaine \verb/number/ contient un numéro permettant de repérer
@@ -941,14 +943,19 @@ plusieurs \verb/statement/s peuvent avoir le me^me numéro.
 Member {\tt ordering} is a 32-bit statement internal identifier. It is
 made out of two 16-bit fields: the most-significant field is a {\tt
 control} number and the least-significant one is a statement number
-within a structured code piece. It is linked to the Hierarchical Control
-Flow Graph (HCFG) used by PIPS. See Section~\ref{subsubsection-unstructured} for information about
-the HCFG. It is fully managed by PIPS, with no user control, and
-periodically recomputed when the code structure is modified. It is used
-to compute the lexical ordering of statements, to label a statement with
-information such as effects, regions,...through hash tables on disk, to
-label nodes of the dependence graph with statements by reference,... Its
-default value is \verb+STATEMENT_ORDERING_UNDEFINED+.
+within a structured code piece. Two statements are textually comparable
+if their control numbers are equal. If they are comparable, their
+textual order is given by the least significant 16 bits.
+
+The ordering structure is linked to the Hierarchical Control Flow Graph
+(HCFG) used by PIPS. See Section~\ref{subsubsection-unstructured} for
+information about the HCFG. It is fully managed by PIPS, with no user
+control, and systematically recomputed when the code structure is
+modified. It is used to compute the lexical ordering of statements, to
+label a statement with information such as effects, regions,...through
+hash tables on disk, to label nodes of the dependence graph with
+statements by reference,... Its default value is
+\verb+STATEMENT_ORDERING_UNDEFINED+.
 
 A special hash table is used for each module to convert \verb/ordering/
 into \verb/statement/. This redundant table is not part of the internal
@@ -976,13 +983,17 @@ interne et doit cond e^tre calculée explicitement.
 
 Member {\tt ordering} is not computed for all statements reachable
 through the NewGen internal representation. Specifically, statements
-which are not reachable through the control flow graph are not
-ordered. For instance, label free statements following a GO~TO
-statements have no ordering. Statements can be walked in two different
-ways. C macro \verb/CONTROL_MAP/\index{CONTROL MAP} uses the control
-flow graph, whereas NewGen iterators
-\verb/gen_recurse/\index{gen\_recurse},
-\verb/gen_multi_recurse/\index{gen\_multi\_recurse}, are systematic.
+which are not reachable forwards or backwards through the control flow
+graph only using the entry point of an unstructured are not ordered. For
+instance, label free statements following a GO~TO statements may have or
+not an ordering. Statements can be walked in two different ways. C macro
+\verb/CONTROL_MAP/\index{CONTROL MAP} uses the control flow graph,
+whereas NewGen iterators \verb/gen_recurse/\index{gen\_recurse},
+\verb/gen_multi_recurse/\index{gen\_multi\_recurse}, are systematic,
+using both the entry and exit controls of unstructured. Note that fully
+unreachable statements, which cannot be reached backwards or forwards
+from the entry or the exit control of an unstructured are fully lost by
+the controlizer.
 
 \iffalse
 Notons que le champs \verb/ordering/ n'est pas forcément calculé pour
@@ -1057,10 +1068,11 @@ instruction is allowed and explicit {\tt goto}'s are used. In the later
 case, {\tt goto}'s are forbidden and abstracted by {\tt
 unstructered}. of course, a fully-structured code does not contain
 either {\tt goto} or {\tt unstructured}\footnote{PIPS does not contain a
-control restructurer but it is interfaced to Toolpack.}. The user-defined form only is
-used by the parser and some pretty-printers. The pretty-printers are
-able to restore Fortran-77 {\tt goto}'s from the {\tt
-unstructured}. More on this in Section~\ref{subsubsection-unstructured}.
+control restructurer but it is interfaced to Toolpack.}. The
+user-defined form only is used by the parser and some
+pretty-printers. The pretty-printers are able to restore Fortran-77 {\tt
+goto}'s from the {\tt unstructured}. More on this in
+Section~\ref{subsubsection-unstructured}.
 
 \iffalse
 Le domaine \verb/instruction/ permet de représenter les instructions
@@ -1093,14 +1105,35 @@ no effect, a NOP. See {\tt empty\_statement\_p()}.
 \index{Unstructured}\index{HCFG}\index{Control Flow Graph}\index{GO TO}
 
 \domain{Unstructured = control x exit:control}
-{
+{}
 
 Domain \verb/unstructured/ is used to represent unstructured parts of
 the code in a structured manner which as a unique statement. The entry
 node of the underlying CFG is in field \verb/control/, and the
 unique exit node is in field \verb/exit/. The exit node should not be
 modified by users of the unstructured\footnote{FI: I do not understand
-why...}.  See Figure~\ref{figure-unstructured}.
+why...}.  See Figure~\ref{figure-unstructured}. Note that the exit node
+may not be reachable, for instance because the program does not terminate. For instance node C7 could very well be the exit
+node. Note also that node C6 is not forward reachable. Like C7, C6 is
+reachable using the \verb+predecessors+ field in
+\verb+control+. Nodes unconnected to either the entry or the exit
+control in \verb+unstructured+ like C*, C9 and C10 are lost by the
+\verb+controlizer+ but they can be seen in the \verb+user_view+
+representations of the program.
+
+An \verb+unstructured+ object can be walked by function
+\verb+gen_multi_recurse+ and nodes C1 to C7 are visited, because the
+entry and exit nodes are used to perform a transitive closure. It can be
+walked by macro \verb+CONTROL_MAP+ and nodes C1 to C6 are visited
+because the undirected transitive closure starts at the entry node
+C1. This macro is used to compute the ordering and, if they exist, nodes
+such as C6 and C7 are oredered. Nodes C1 to C5 only could be visited by
+performing a forward transitive closure on the entry
+node. Transformation \verb+unspaghettify+, which should be included in
+the \verb+controlizer+, eliminates surious nodes such as C6 and C7 and
+makes all walks equal, but for the visiting order. Note that a fourth
+kind of walk is implemented by the \verb+prettyprinter+. It can bump
+into nodes not visited by \verb+CONTROL_MAP+.
 
 The hierarchical structure is induced by the recursive nature of
 statements.  Each control node points towards a statement which can also
@@ -1164,7 +1197,6 @@ Figure~\ref{figure-hierarchical-control-flow-graph}).
 \label{figure-hierarchical-control-flow-graph}
 \end{figure}
 
-}
 
 \subsubsection{Conditional (a.k.a. Test)}
 \label{subsubsection-test}
