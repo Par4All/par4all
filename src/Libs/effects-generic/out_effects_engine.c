@@ -509,7 +509,8 @@ out_effects_from_test_to_branches(test t)
 
     pips_debug(1,"begin\n");
 
-    /* First, we get the out regions of the statement corresponding to the test */
+    /* First, we get the out regions of the statement corresponding to the test
+     */
     l_out_test = load_out_effects_list(test_stat);
 
     /* Then we compute the out regions for each branch */
@@ -529,6 +530,23 @@ out_effects_from_test_to_branches(test t)
     
     pips_debug(1,"end\n");
     return(TRUE);
+}
+
+/* Rout[s in while(c)s] = Rw[s] * MAY ?
+ */
+static bool out_effects_from_while_to_body(whileloop w)
+{
+  statement body;
+  list /* of effect */ lout;
+
+  body = whileloop_body(w);
+  lout = effects_write_effects_dup(load_rw_effects_list(body));
+  MAP(EFFECT, e,
+      approximation_tag(effect_approximation(e)) = is_approximation_may,
+      lout);
+  store_out_effects_list(body, lout);
+
+  return TRUE;
 }
 
 /* void out_regions_from_block_to_statements(list l_stat, list l_out, ctrans)
@@ -699,6 +717,7 @@ out_effects_of_module_statement(statement module_stat)
       sequence_domain, out_effects_from_block_to_statements, gen_null,
       test_domain, out_effects_from_test_to_branches, gen_null,
       loop_domain, out_effects_from_loop_to_body, gen_null,
+      whileloop_domain, out_effects_from_while_to_body, gen_null,
       unstructured_domain, out_effects_from_unstructured_to_nodes, gen_null,
       call_domain, gen_false, gen_null, /* calls are treated in another phase*/
       NULL);     
