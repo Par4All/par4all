@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# Derivation of builder_map.h from pipsmake.rc
+
+# Francois Irigoin, 8 October 1993
+
+functions=`/lib/cpp $LIBDIR/pipsmake.rc | grep '^[a-z]' | \
+		sed 's/ .*//' |	sort | uniq `
+
+# echo $functions
+
+cat </dev/null >decl$$
+
+cat >map$$ <<EOF
+
+static struct builder_map {
+    char *builder_name;
+    void (*builder_func)();
+} builder_maps[] = {
+
+EOF
+
+for func in $functions
+do
+#	echo $func
+	FUNC=`echo $func | tr a-z A-Z`
+	echo "extern void $func();" >>decl$$
+	echo "    { BUILDER_$FUNC, $func }," >>map$$
+done
+
+cat >>map$$ <<EOF
+
+    { NULL, NULL }
+};
+EOF
+
+cat $INCLUDEDIR/auto.h decl$$ map$$ >$INCLUDEDIR/builder_map.h
+
+/bin/rm -f decl$$ map$$
