@@ -21,39 +21,58 @@ typedef struct {
 } statement_arguments;
 
 
-/* Calc the number of statements we can pack, based on the
- * arguments size 
+/* Computes the optimal opcode for simdizing 'argc' statements of the
+ * 'kind' operation, applied to the 'args' arguments
  */
-static int calc_nb_pack(int kind, int argc, list* args)
+static opcode get_optimal_opcode(int kind, int argc, list* args)
 {
    int max_width = 0;
-
-   /* for these operations, it is enough to look at the size
-    * of the result: we can truncate the higher order bits of
-    * the input operands.
-    */
    int i;
+   opcode best;
+   list l;
 
+   //Find out the maximum width of all variables used
    for(i = 0; i < argc; i++)
    {
-      int width;
-      type t = entity_type(reference_variable(expression_reference(EXPRESSION(CAR(args[i])))));
-      basic b;
-	    
-      switch(basic_tag(b = variable_basic(type_variable(t))))
+      MAP(EXPRESSION,
+	  arg,
       {
-	 case is_basic_int: width = 8*basic_int(b); break;
-	 case is_basic_float: width = 8*basic_float(b); break;
-	 case is_basic_logical: width = 8*basic_logical(b); break;
-	 default: /* HELP: what to do ? */
-	    printf("unsuppported basic type\n");
-	    return 0;
-      }
-      if (width > max_width)
-	 max_width = width;
+	 int width;
+	 type t = entity_type(reference_variable(expression_reference(arg)));
+	 basic b;
+	    
+	 switch(basic_tag(b = variable_basic(type_variable(t))))
+	 {
+	    case is_basic_int: width = 8*basic_int(b); break;
+	    case is_basic_float: width = 8*basic_float(b); break;
+	    case is_basic_logical: width = 8*basic_logical(b); break;
+	    default: /* HELP: what to do ? */
+	       printf("unsuppported basic type\n");
+	       return 0;
+	 }
+	 if (width > max_width)
+	    max_width = width;
+      },
+	  args[i]);
    }
 
-   return argc;
+   /* Based on the available implementations of the operation, decide
+    * how many statements to pack together
+    */
+   best = NULL;
+   for( l = get_operation(kind)->opcodes; 
+	l != NIL;
+	l = CDR(l) )
+   {
+      opcode oc = OPCODE(CAR(l));
+
+      if ( (oc->subwordSize >= max_width) &&
+	   (oc->vectorSize <= argc) &&
+	   ((best == NULL) || (oc->vectorSize > best->vectorSize)) )
+	 best = oc;
+   }
+
+   return best;
 }
 
 static entity get_function_entity(string name)
@@ -346,17 +365,9 @@ static statement make_save_statement(int argc, list args)
    return make_loadsave_statement(argc, args, FALSE);
 }
 
-static statement make_exec_statement(int kind, int argc, list args)
+static statement make_exec_statement(opcode oc, list args)
 {
-   char* name;
-
-   name = get_operation_opcode(kind, argc, 64/argc);
-   if (name == NULL)
-   {
-      printf("ERROR: no matching operator !\n");
-      name = "UnknownSIMDOperator";
-   }
-   return call_to_statement(make_call(get_function_entity(name),
+   return call_to_statement(make_call(get_function_entity(oc->name),
 				      args));
 }
 
@@ -434,7 +445,7 @@ static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
    return new_ent;
 }
 
-static void pack_instructions(int kind, int nb_pack, list* args, cons** instr)
+static void pack_instructions(int kind, opcode oc, list* args, cons** instr)
 {
    expression result;
    expression * operands;
@@ -450,13 +461,13 @@ static void pack_instructions(int kind, int nb_pack, list* args, cons** instr)
 
    /* build the variables */
    for(j=nbargs-1; j>=0; j--)
-      operands[j] = entity_to_expression(make_new_simd_vector(64/nb_pack,nb_pack,TRUE));
-   result = entity_to_expression(make_new_simd_vector(64/nb_pack,nb_pack,TRUE));
+      operands[j] = entity_to_expression(make_new_simd_vector(oc->subwordSize,oc->vectorSize,TRUE));
+   result = entity_to_expression(make_new_simd_vector(oc->subwordSize,oc->vectorSize,TRUE));
 
    /* make the save statement(s) */
    argList = CONS(EXPRESSION, result, NIL);
    iargs = argList;
-   for( j=0; j<nb_pack; j++)
+   for( j=0; j<oc->vectorSize; j++)
    {
       CDR(iargs) = CONS(EXPRESSION, 
 			copy_expression(EXPRESSION(CAR(args[j]))), 
@@ -464,7 +475,7 @@ static void pack_instructions(int kind, int nb_pack, list* args, cons** instr)
       iargs = CDR(iargs);
    }
    *instr = CONS( STATEMENT, 
-		  make_save_statement(nb_pack, argList),
+		  make_save_statement(oc->vectorSize, argList),
 		  *instr);
 
    /* make the calculation statement(s) */
@@ -476,22 +487,22 @@ static void pack_instructions(int kind, int nb_pack, list* args, cons** instr)
       iargs = CDR(iargs);
    }
    *instr = CONS( STATEMENT,
-		  make_exec_statement(kind, nb_pack, argList),
+		  make_exec_statement(oc, argList),
 		  *instr);
 
    /* make the load instruction(s) */
    {
-   list * pArgs = (list*)malloc(nb_pack*sizeof(list));
+   list * pArgs = (list*)malloc(oc->vectorSize*sizeof(list));
    int i;
 
-   for(i=0; i<nb_pack; i++)
+   for(i=0; i<oc->vectorSize; i++)
       pArgs[i] = CDR(args[i]);
 
    for( j=0; j<nbargs; j++)
    {
       argList = CONS(EXPRESSION, operands[j], NIL);
       iargs = argList;
-      for( i=0; i<nb_pack; i++)
+      for( i=0; i<oc->vectorSize; i++)
       {
 	 CDR(iargs) = CONS( EXPRESSION, 
 			    copy_expression(EXPRESSION(CAR(pArgs[i]))), 
@@ -502,7 +513,7 @@ static void pack_instructions(int kind, int nb_pack, list* args, cons** instr)
       }
 
       *instr = CONS( STATEMENT,
-		     make_load_statement(nb_pack, argList),
+		     make_load_statement(oc->vectorSize, argList),
 		     *instr);
    }
 
@@ -529,7 +540,7 @@ cons* make_simd_statements(list kinds, cons* first, cons* last)
    type = INT(CAR(kinds));
    while(i != CDR(last))
    {
-      int nb_pack;
+      opcode oc;
       cons * j;
 
       /* get the variables */
@@ -541,22 +552,30 @@ cons* make_simd_statements(list kinds, cons* first, cons* last)
 	 args[index] = m->args;
       }
 
-      /* compute number of instructions to pack */
-      nb_pack = calc_nb_pack(type, index, args);
+      /* compute the opcode to use */
+      oc = get_optimal_opcode(type, index, args);
 
-      /* update the pointer to the next statement to be processed */
-      for(index = 0; (index<nb_pack) && (i!=CDR(last)); index++)
-	 i = CDR(i);
-
-      /* generate the instructions */
-      instr = NIL;
-      pack_instructions(type, nb_pack, args, &instr);
-
-      /* insert the new statements */
-      if (all_instr == NIL)
-	 all_instr = instr;
+      if (oc == NULL)
+      {
+	 /* No optimized opcode found --> simply copy the statement... */
+	 ;
+      }
       else
-	 all_instr = gen_concatenate(all_instr, instr);
+      {
+	 /* update the pointer to the next statement to be processed */
+	 for(index = 0; (index<oc->vectorSize) && (i!=CDR(last)); index++)
+	    i = CDR(i);
+
+         /* generate the instructions */
+	 instr = NIL;
+	 pack_instructions(type, oc, args, &instr);
+
+	 /* insert the new statements */
+	 if (all_instr == NIL)
+	    all_instr = instr;
+	 else
+	    all_instr = gen_concatenate(all_instr, instr);
+      }
    }
 
    return all_instr;
