@@ -47,7 +47,7 @@ create_workspace(gen_array_t files)
 	(* pips_update_props_handler)();
 
 	name = db_get_current_workspace_name();
-	user_log("Workspace %s created and opened\n", name);
+	user_log("Workspace %s created and opened.\n", name);
 
 	success = open_module_if_unique();
     }
@@ -70,7 +70,7 @@ open_module_if_unique()
     bool success = TRUE;
     gen_array_t a;
 
-    pips_assert("open_module_if_unique", db_get_current_workspace_name());
+    pips_assert("some current workspace", db_get_current_workspace_name());
 
     /* First parse the makefile to avoid writing
        an empty one */
@@ -89,7 +89,7 @@ open_module(name)
 char *name;
 {
     bool success;
-    pips_assert("open_module", db_get_current_workspace_name());
+    pips_assert("some current workspace", db_get_current_workspace_name());
 
     if (db_get_current_module_name()) /* reset if needed */
 	db_reset_current_module_name();
@@ -121,7 +121,7 @@ char *name;
 	if (strcmp(current_name, name) != 0)
 	    success = open_module(name);
 	else 
-	    user_log ("Module %s already active\n", name);
+	    user_log ("Module %s already active.\n", name);
     } else
 	success = open_module(name);
 
@@ -137,7 +137,7 @@ open_workspace(char *name)
     if (make_open_workspace(name) == NULL) {
 	/* should be show_message */
 	/* FI: what happens since log_file is not open? */
-	user_log("Cannot open workspace %s\n", name);
+	user_log("Cannot open workspace %s.\n", name);
 	success = FALSE;
     }
     else {
@@ -146,7 +146,7 @@ open_workspace(char *name)
 	open_log_file();
 	set_entity_to_size();
 
-	user_log("Workspace %s opened\n", name);
+	user_log("Workspace %s opened.\n", name);
 
 	success = open_module_if_unique();
     }
