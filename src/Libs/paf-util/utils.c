@@ -1507,7 +1507,7 @@ list *init_l, *elim_l;
 		substitute_var_with_vec(sc_elim, var, val, vect_dup(pv_elim));
 		
 		/* The initial equality is added to "sc_elim". */
-		sc_add_egalite(sc_elim, contrainte_make(init_vec));
+		sc_add_egalite(sc_elim, contrainte_make(vect_dup(init_vec)));
 		
 		/* We reinitialize the list of equalities. */
 		eqs = ps->egalites;
