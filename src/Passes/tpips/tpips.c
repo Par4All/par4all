@@ -528,6 +528,7 @@ struct t_handler
 static struct t_handler handlers[] =
 {
   { QUIT,		quit_handler },
+  { "exit",		quit_handler }, /* exit is a synonymous for quit */
   { CHANGE_DIR, 	cdir_handler },
   { SET_ENV,		setenv_handler },
   { GET_ENV, 		getenv_handler },
@@ -590,7 +591,7 @@ static char * tpips_read_a_line(char * main_prompt)
     
     /* handle backslash-style continuations
      */
-    while (line && (l=strlen(line), line[l-1]==TPIPS_CONTINUATION_CHAR))
+    while (line && (l=strlen(line), l>1 && line[l-1]==TPIPS_CONTINUATION_CHAR))
     {
 	char *tmp, *next = get_next_line(TPIPS_SECONDARY_PROMPT);
 	line[l-1] = '\0';
