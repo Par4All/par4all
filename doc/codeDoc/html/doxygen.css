@@ -1,4 +1,5 @@
 H1 { text-align: center; }
+CAPTION { font-weight: bold }
 A.qindex {}
 A.qindexRef {}
 A.el { text-decoration: none; font-weight: bold }
@@ -14,6 +15,31 @@ TD.mdname1 { background-color: #f2f2ff; font-weight: bold; color: #602020; }
 TD.mdname { background-color: #f2f2ff; font-weight: bold; color: #602020; width: 600px; }
 DIV.groupHeader { margin-left: 16px; margin-top: 12px; margin-bottom: 6px; font-weight: bold }
 DIV.groupText { margin-left: 16px; font-style: italic; font-size: smaller }
+BODY { background: white }
+TD.indexkey { 
+   background-color: #eeeeff; 
+   font-weight: bold; 
+   padding-right  : 10px; 
+   padding-top    : 2px; 
+   padding-left   : 10px; 
+   padding-bottom : 2px; 
+   margin-left    : 0px; 
+   margin-right   : 0px; 
+   margin-top     : 2px; 
+   margin-bottom  : 2px  
+}
+TD.indexvalue { 
+   background-color: #eeeeff; 
+   font-style: italic; 
+   padding-right  : 10px; 
+   padding-top    : 2px; 
+   padding-left   : 10px; 
+   padding-bottom : 2px; 
+   margin-left    : 0px; 
+   margin-right   : 0px; 
+   margin-top     : 2px; 
+   margin-bottom  : 2px  
+}
 FONT.keyword       { color: #008000 }
 FONT.keywordtype   { color: #604020 }
 FONT.keywordflow   { color: #e08000 }

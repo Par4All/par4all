@@ -87,7 +87,8 @@ static double compute_enode(enode *p, Value *list_args) {
   value_init(param);
 
   if (p->type == polynomial) {
-    value_assign(param,list_args[p->pos-1]);
+    if (p->size > 1)
+	 	value_assign(param,list_args[p->pos-1]);
     
     /* Compute the polynomial using Horner's rule */
     for (i=p->size-1;i>0;i--) {
