@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: OptionParser.java,v $
+ * Revision 1.9  1998/10/16 14:50:22  coelho
+ * import fixed.
+ *
  * Revision 1.8  1998/07/03 22:14:50  coelho
  * cleaner.
  *
@@ -32,9 +35,11 @@ package JPips;
 import java.lang.*;
 import java.util.*;
 import java.io.*;
+
 import java.awt.event.*;
 import java.awt.*;
-import java.awt.swing.*;
+
+import com.sun.java.swing.*;
 
 import JPips.Pawt.*;
 
