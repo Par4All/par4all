@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.77  1998/04/14 16:16:56  coelho
+ * getwd -> getcwd
+ *
  * Revision 1.76  1998/01/24 10:06:06  coelho
  * function to ask whether to behave as a shell.
  *
@@ -396,7 +399,7 @@ i_pwd: TK_PWD TK_ENDOFLINE
 	{
 	    char pathname[MAXPATHLEN];
 	    fprintf(stdout, "current working directory: %s\n", 
-		    (char*) getwd(pathname));
+		    (char*) getcwd(pathname, MAXPATHLEN));
 	    fflush(stdout);
 	}
 	;
