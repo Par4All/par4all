@@ -40,7 +40,7 @@
 typedef struct typ_som {
     int *eq_sat;
     Pvecteur vecteur;
-    int denominateur;
+    Value denominateur;
     struct typ_som *succ;
 } *Psommet,Ssommet;
 
