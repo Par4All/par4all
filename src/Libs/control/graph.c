@@ -2,7 +2,7 @@
  *
  *  (c) Fabien COELHO - march 1995
  *
- *  $RCSfile: graph.c,v $ ($Date: 1995/09/15 22:04:13 $, )
+ *  $RCSfile: graph.c,v $ ($Date: 1996/02/15 14:21:12 $, )
  *  version $Revision$
  */
 
@@ -306,16 +306,17 @@ bool (*decision)();
 bool next_ctrl_graph_travel(ps)
 statement *ps;
 {
-    if (to_see_empty_p()) /* nothing else to visit */
-	return(FALSE);
+    while (!to_see_empty_p())
+    {
+	*ps = to_see_pop();
+	if ((*travel_decision)(*ps))
+	{
+	    push_successors(*ps);
+	    return TRUE;
+	}
+    }
 
-    /*  else get the next and push its successors if needed
-     */
-    *ps = to_see_pop();
-    if ((*travel_decision)(*ps))
-	push_successors(*ps);
-
-    return(TRUE);
+    return FALSE;
 }
 
 void close_ctrl_graph_travel()
