@@ -55,6 +55,7 @@ Pmatrix	a;			/* input */
 Pmatrix b;			/* input */
 Pmatrix	c;			/* output */
 {
+    register Value va, vb;
     int	loop1,loop2,loop3;
     Value i;
 
@@ -76,9 +77,11 @@ Pmatrix	c;			/* output */
 	for(loop2=1; loop2<=r; loop2++) {
 	    i = VALUE_ZERO;
 	    for(loop3=1; loop3<=q; loop3++) 
-		value_add(i,
-			  value_mult(MATRIX_ELEM(a,loop1,loop3),
-				     MATRIX_ELEM(b,loop3,loop2))); 
+	    {
+		va = MATRIX_ELEM(a,loop1,loop3), 
+		vb = MATRIX_ELEM(b,loop3,loop2);
+		value_addto(i, value_mult(va, vb))
+	    }
 	    MATRIX_ELEM(c,loop1,loop2) = i;
 	}
 }
@@ -488,8 +491,8 @@ Value x;
     int i;
     int n = MATRIX_NB_LINES(MAT);
     for (i=1; i<=n; i++)
-	value_sub(MATRIX_ELEM(MAT,i,c1),
-		  value_mult(x,MATRIX_ELEM(MAT,i,c2)));
+	value_substract(MATRIX_ELEM(MAT,i,c1),
+			value_mult(x,MATRIX_ELEM(MAT,i,c2)));
 }
 
 /* void matrix_subtraction_line(Pmatrix MAT,int r1,int r2,int x):
@@ -514,6 +517,6 @@ Value x;
     int i;
     int m = MATRIX_NB_COLUMNS(MAT);
     for (i=1; i<=m; i++)
-	value_sub(MATRIX_ELEM(MAT,r1,i),
-		  value_mult(x,MATRIX_ELEM(MAT,r2,i)));
+	value_substract(MATRIX_ELEM(MAT,r1,i),
+			value_mult(x,MATRIX_ELEM(MAT,r2,i)));
 }
