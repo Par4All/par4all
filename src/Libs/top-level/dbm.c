@@ -21,6 +21,8 @@ void default_update_props()
  */
 void (* pips_update_props_handler)() = default_update_props;
 
+/* FI: should be called "initialize_workspace()"; a previous call to
+   db_create_workspace() is useful to create the log file says RK */
 bool create_workspace(pargc, argv)
 int *pargc;
 char *argv[];
