@@ -8,7 +8,8 @@
    - add intrinsics according to Fortran standard Table 5, pp. 15.22-15-25,
    Francois Irigoin, 02/06/90
    - add .SEQ. to handle ranges outside of arrays [pj]
-   - add intrinsic DFLOAT. bc. 13/1//96.
+   - add intrinsic DFLOAT. bc. 13/1/96.
+   - add pseudo-intrinsics SUBSTR and ASSIGN_SUBSTR to handle strings, fi, 25/12/96
    Bugs:
    - intrinsics are not properly typed
    */
@@ -151,8 +152,11 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"BUFFEROUT", (INT_MAX)},
     {"ENDFILE", (INT_MAX)},
     {"IMPLIED-DO", (INT_MAX)},
-    {"FORMAT", 1},
+    {FORMAT_FUNCTION_NAME, 1},
     {"INQUIRE", (INT_MAX)},
+
+    {SUBSTRING_FUNCTION_NAME, (INT_MAX)},
+    {ASSIGN_SUBSTRING_FUNCTION_NAME, (INT_MAX)},
 
     {"CONTINUE", 0},
     {"ENDDO", 0},
