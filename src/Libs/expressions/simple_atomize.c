@@ -141,15 +141,15 @@ statement s;
 /* returns the assignment statement is moved, or NULL if not.
  */
 statement atomize_this_expression(entity (*create)(entity, basic),
-				  expression *pe)
+				  expression e)
 {
   basic bofe;
 
   /* it does not make sense to atomize a range...
    */
-  if (syntax_range_p(expression_syntax(*pe))) return NULL;
+  if (syntax_range_p(expression_syntax(e))) return NULL;
   
-  bofe = please_give_me_a_basic_for_an_expression(*pe);
+  bofe = please_give_me_a_basic_for_an_expression(e);
   if (!basic_overloaded_p(bofe))
     {
       entity newvar; 
@@ -157,13 +157,12 @@ statement atomize_this_expression(entity (*create)(entity, basic),
       statement assign;
 
       newvar = (*create)(get_current_module_entity(), bofe);
-      rhs = make_expression(expression_syntax(*pe), normalized_undefined);
+      rhs = make_expression(expression_syntax(e), normalized_undefined);
       normalize_all_expressions_of(rhs);
       assign = make_assign_statement(entity_to_expression(newvar), rhs);
 	
-      *pe = make_expression(make_syntax(is_syntax_reference, 
-					make_reference(newvar, NIL)),
-			    expression_normalized(*pe));
+      expression_syntax(e) = make_syntax(is_syntax_reference, 
+					make_reference(newvar, NIL));
       return assign;
     }
   
@@ -173,7 +172,7 @@ statement atomize_this_expression(entity (*create)(entity, basic),
 
 static void compute_before_current_statement(expression *pe)
 {
-    statement stat = atomize_this_expression(create_new_variable, pe);
+    statement stat = atomize_this_expression(create_new_variable,*pe);
     if (stat) insert_before_current_statement(stat);
 }
 
