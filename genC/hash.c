@@ -14,13 +14,14 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/08/10 11:35:07 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/08/10 11:35:44 $, )
  * version $Revision$
  */
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <malloc.h>
 
 #include "newgen_types.h"
 #include "genC.h"
