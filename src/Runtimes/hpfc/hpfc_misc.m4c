@@ -4,8 +4,8 @@
  *
  * also include functions for timings...
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/27 12:42:42 $, )
- * version $Revision$
+ * $RCSfile: hpfc_misc.m4c,v $ version $Revision$
+ * ($Date: 1995/09/28 08:59:27 $, )
  *
  * Fabien Coelho, June 1993
  */
@@ -16,13 +16,19 @@
 
 #include "pvm3.h"
 
-/* PVM 3.2 compatibility: managed by m4
- *  - pvmhostinfo <-> hostinfo
- *  - pvmtaskinfo <-> taskinfo (also adds ti_pid)
+/* PVM 3.2 / PVMe compatibility: managed by m4
+ *  - pvmhostinfo -> hostinfo
+ *  - pvmtaskinfo -> taskinfo (also adds ti_pid)
  */
 
+/* quick checking of PVM function returns
+ */
 #define check(var, msg) if(var<0)fprintf(stderr,"Error %d (%s)\n",var,msg);
 
+
+/* returns the host name from its number and the table of hosts.
+ * ??? I guess I should abort if not found...
+ */
 static char *
 host_name(
     int ti_host, /* the host number we are looking for */
@@ -39,6 +45,10 @@ host_name(
     return "name not found";
 }
 
+
+/* returns the task information structure that holds the data 
+ * for a given task. ??? should I abort if not found? I guess so?
+ */
 static struct pvmtaskinfo *
 which_task(
     int ti_tid, /* the host number we are looking for */
@@ -55,6 +65,10 @@ which_task(
     return (struct pvmtaskinfo *) NULL;
 }
 
+
+/* Function called by the RUNTIME under the DEMO compilation option. 
+ * Prints the hosts that compose the Parallel Virtual Machine.
+ */
 void 
 FUNCTION(print_host_info) ARGS(`')
 {
@@ -75,6 +89,10 @@ FUNCTION(print_host_info) ARGS(`')
     fprintf(stderr, "\n");
 }
 
+
+/* Function called by the RUNTIME under the DEMO compilation option.
+ * Called the the host. Prints the tasks and the machine they are running on.
+ */
 void 
 FUNCTION(print_task_info) ARGS(`number, tids, hosttid')
 int *number, *tids, *hosttid;
@@ -109,6 +127,7 @@ int *number, *tids, *hosttid;
     fprintf(stderr, "\n");	
 }
 
+
 /******************************************************************** TIME */
 /* functions to measure wall clock time and be called by the rt.
  * there is a static stack of ten timer starts, thus imbrication is possible.
@@ -116,15 +135,18 @@ int *number, *tids, *hosttid;
  */
 #include <sys/time.h>
 
+
 /* gettimeofday is not declared anywhere! 
  */
 extern int gettimeofday(struct timeval *, struct timezone *);
+
 
 /* static stack of timings...
  */
 #define TIMER_STACK_SIZE 10
 static struct timeval initial[TIMER_STACK_SIZE];
 static int timer_index=0;
+
 
 void
 FUNCTION(hpfc_timeon) ARGS(`')
@@ -140,9 +162,9 @@ FUNCTION(hpfc_timeon) ARGS(`')
      */
 }
 
-#define MAX_COMMENT_LENGTH 63
 
-/* to print the micros with leading and trailing 0s if needed
+/* to print the micros with leading and trailing 0s if needed.
+ * ??? static buffer... I could not find any way to do that with formats.
  */
 static char *
 print_micros(long micros)
@@ -158,6 +180,9 @@ print_micros(long micros)
     return buffer;
 }
 
+
+#define MAX_COMMENT_LENGTH 63
+
 void 
 FUNCTION(hpfc_timeoff) ARGS(`STRING_ARG(comment)')
 STRING_ARG_DECL(comment);
@@ -167,8 +192,7 @@ STRING_ARG_DECL(comment);
     long seconds, micros;
     int i;
 
-    assert(timer_index>0);
-    timer_index--;
+    assert(timer_index>0); timer_index--;
 
     /* copy the comment in the buffer to ensure there is a NULL at the end.
      */  
@@ -176,19 +200,22 @@ STRING_ARG_DECL(comment);
 	buffer[i] = STRING_PTR(comment)[i];
     buffer[i]='\0';
 
-    /* get current time.
+    /* get current time, and compute the delta.
      */
     if (gettimeofday(&current, (struct timezone *) NULL))
 	fprintf(stderr, "gettimeofday error\n");
 
-    /* display result, with the level.
-     */
     seconds = current.tv_sec-initial[timer_index].tv_sec;
     micros = current.tv_usec-initial[timer_index].tv_usec;
-
     if (micros<0) micros+=1000000, seconds--;
 
-    fprintf(stderr, "%s [%d]: %ld.%s s\n", 
+    /* display the result, with the associated level.
+     */
+    /* stdout or stderr. stderr! 
+     * but I'm not sure of what is done by loadleveler on the SP2,
+     * so I put, hopefully temporarily, stdout as the output for that machine.
+     */
+    fprintf(ifdef(`USE_PVMe',stdout,stderr), "%s [%d]: %ld.%s s\n", 
 	    buffer, timer_index, seconds, print_micros(micros));
 }
 
