@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ for hpfc scripts
-# (version $Revision$, $Date: 1996/08/22 15:01:18 $, )
+# (version $Revision$, $Date: 1996/09/13 17:35:50 $, )
 #
 
 SCRIPTS = 	hpfc \
@@ -9,12 +9,12 @@ SCRIPTS = 	hpfc \
 		hpfc_delete \
 		hpfc_install
 
-SOURCES	=	$(SCRIPTS) hpfc_interactive.c hpfc_fake.f
+SOURCES	=	$(SCRIPTS) hpfc_interactive.c hpfc_stubs.f
 
-INSTALL_SHR=	$(SCRIPTS) hpfc_fake.f
+INSTALL_SHR=	$(SCRIPTS) hpfc_stubs.f hpfc_stubs.direct
 INSTALL_BIN=	$(ARCH)/hpfc_interactive
 
-all:	$(ARCH)/hpfc_interactive
+all:	$(ARCH)/hpfc_interactive hpfc_stubs.direct
 
 #
 # Some rules
@@ -25,6 +25,11 @@ $(ARCH)/hpfc_interactive: $(ARCH)/hpfc_interactive.o
 		-o $(ARCH)/hpfc_interactive \
 		$(ARCH)/hpfc_interactive.o -lreadline -ltermcap
 	chmod a+rx-w $(ARCH)/hpfc_interactive
+
+# the direct version of the stubs need not be filtered by hpfc_directives.
+hpfc_stubs.direct: hpfc_stubs.f
+	# building $@ from $<
+	sed 's,^!fcd\$$ fake,      call hpfc9,' $< > $@
 
 clean: local-clean
 
