@@ -3,11 +3,17 @@
 #ifndef FLEX_SCANNER
 /* the portability of the following macro makes many (:-) assumptions
  * about lex internals hence should not be very portable...
- * POSIX states that input and unput should not be modified.
+ * POSIX states that input cannot be redefined.
+ * the only possible posix implementation would be to refilter the
+ * file through PipsGetc and then to use a standard lex/yacc.
  */
 #undef input()
 #define input() (((yytchar=yysptr>yysbuf?U(*--yysptr):PipsGetc(yyin))==10?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
+
 #else
+
+/* now flex incompatible way of playing with input characters:-)
+ */
 #define YY_INPUT(buf,result,max_size) \
 { \
  int c = PipsGetc(yyin); \
