@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/01/31 13:54:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/03 17:54:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/01/31 13:54:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/02/03 17:54:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -62,15 +62,15 @@ display_unspaghettify_statistics()
 		+ number_of_restructured_if_then_else
 		    + number_of_restructured_null_if;
 	if (number_of_restructured_tests != 0) {
-	    printf("%d test%s %s been restructured:\n",
-		   number_of_restructured_tests,
-		   number_of_restructured_tests > 1 ? "s" : "",
-		   number_of_restructured_tests > 1 ? "have" : "has");
-	    printf("\t %d IF/THEN/ELSE, %d IF/THEN, %d IF/ELSE & %d null IF.\n",
-		   number_of_restructured_if_then_else,
-		   number_of_restructured_if_then,
-		   number_of_restructured_if_else,
-		   number_of_restructured_null_if);
+	    user_log("%d test%s %s been restructured:\n",
+		     number_of_restructured_tests,
+		     number_of_restructured_tests > 1 ? "s" : "",
+		     number_of_restructured_tests > 1 ? "have" : "has");
+	    user_log("\t %d IF/THEN/ELSE, %d IF/THEN, %d IF/ELSE & %d null IF.\n",
+		     number_of_restructured_if_then_else,
+		     number_of_restructured_if_then,
+		     number_of_restructured_if_else,
+		     number_of_restructured_null_if);
 	}
     }
 }
@@ -699,6 +699,7 @@ take_out_the_exit_node_if_not_a_continue(statement s)
     if (! empty_statement_or_continue_p(the_exit_statement)
 	&& ! return_statement_p(the_exit_statement)) {
 	statement new_statement;
+	statement out_keeping;
 	/* Put an empty exit node and keep the statement for the
            label: */
 	statement_instruction(the_exit_statement) =
@@ -708,12 +709,13 @@ take_out_the_exit_node_if_not_a_continue(statement s)
 	/* Replace the unstructured by an unstructured followed by the
 	   out-keeped instruction: */
 	new_statement = make_stmt_of_instr(i);
+	out_keeping = make_stmt_of_instr(the_exit_instruction);
+	/* Keep track of the statement number: */
+	statement_number(out_keeping) = statement_number(the_exit_statement);
 	statement_instruction(the_unstructured) =
 	    make_instruction_block(CONS(STATEMENT,
 					new_statement,
-					CONS(STATEMENT,
-					     make_stmt_of_instr(the_exit_instruction),
-					     NIL)));
+					CONS(STATEMENT, out_keeping, NIL)));
 	the_unstructured = new_statement;
     }
     /* Heavily rely on a later clean_up_sequences to normalize the
