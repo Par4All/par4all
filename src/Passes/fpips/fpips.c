@@ -95,9 +95,13 @@ fpips_main(int argc, char **  argv)
 {
     if (argc<1) return TPIPS(argc, argv); /* should not happen */
 
-    if (name_end_p(argv[0],  "/pips")) return  PIPS(argc, argv);
-    if (name_end_p(argv[0], "/tpips")) return TPIPS(argc, argv);
-    if (name_end_p(argv[0], "/wpips")) return WPIPS(argc, argv);
+    /* According to the shell or the debugger, the path may be
+       complete or not... RK. */
+    if (name_end_p(argv[0], "tpips")) return TPIPS(argc, argv);
+    if (name_end_p(argv[0], "wpips")) return WPIPS(argc, argv);
+    if (name_end_p(argv[0], "/pips")
+	|| strcmp(argv[0], "pips") == 0)
+	return  PIPS(argc, argv);
 
     /* else look for the first option, if any.
      */
@@ -107,10 +111,21 @@ fpips_main(int argc, char **  argv)
      */
     if (same_string_p(argv[1], "-h")) return  fpips_usage(0);
 
-    if (same_string_p(argv[1], "-P")) return  PIPS(argc-1, argv+1);
-    if (same_string_p(argv[1], "-T")) return TPIPS(argc-1, argv+1);
-    if (same_string_p(argv[1], "-W")) return WPIPS(argc-1, argv+1);
-
+    if (same_string_p(argv[1], "-P")) {
+	/* Do not forget to update what will become the new
+           argv[0]. Especially for X11 or XView in WPips which parse
+           the arguments later... RK. */
+	argv[1] = argv[0];
+	return  PIPS(argc-1, argv+1);
+    }
+    if (same_string_p(argv[1], "-T")) {
+	argv[1] = argv[0];
+	return TPIPS(argc-1, argv+1);
+    }
+    if (same_string_p(argv[1], "-W")) {
+	argv[1] = argv[0];
+	return WPIPS(argc-1, argv+1);
+    }
     /* else try tpips...
      */
     return TPIPS(argc, argv);
