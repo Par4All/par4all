@@ -1,7 +1,7 @@
 c
 c everything about packing
 c
-c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/09/21 17:23:09 $, )
+c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/12/21 16:17:03 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -71,19 +71,19 @@ c
 ONE_PACKING(1,$1,$2)
 ONE_PACKING(2,$1,$2)
 ONE_PACKING(3,$1,$2)
-ONE_PACKING(4,$1,$2)
-ONE_PACKING(5,$1,$2)
-ONE_PACKING(6,$1,$2)
-ONE_PACKING(7,$1,$2)
+c ONE _PACKING(4,$1,$2)
+c ONE _PACKING(5,$1,$2)
+c ONE _PACKING(6,$1,$2)
+c ONE _PACKING(7,$1,$2)
 c')dnl
 c
-ALLPACK(byte,BYTE1)
-ALLPACK(integer*2,INTEGER2)
+c ALL PACK(byte,BYTE1)
+c ALL PACK(integer*2,INTEGER2)
 ALLPACK(integer*4,INTEGER4)
 ALLPACK(real*4,REAL4)
 ALLPACK(real*8,REAL8)
-ALLPACK(complex*8,COMPLEX8)
-ALLPACK(complex*16,COMPLEX16)
+c ALL PACK(complex*8,COMPLEX8)
+c ALL PACK(complex*16,COMPLEX16)
 c
 c that is all
 c
