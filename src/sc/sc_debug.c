@@ -14,44 +14,176 @@
 
 #include "sc-private.h"
 
-/************************************************************* DEBUG */
+#ifdef FILTERING
+#include "signal.h"
+#endif
 
+/************************************************************* DEBUG */
 #define SC_DEBUG_LEVEL "SC_DEBUG_LEVEL"
-#define SC_PRINT_FLAG "SC_PRINT_FLAG"
-#define TIMEOUT_FOR_SIMPLEX "TIMEOUT_FOR_SIMPLEX"
-#define TIMEOUT_FOR_FM "TIMEOUT_FOR_FM"
-#define TIMEOUT_FOR_SC_CONVEX_HULL "TIMEOUT_FOR_SC_CONVEX_HULL"
+#define SC_SWITCH_HEURISTIC_FLAG "SC_SWITCH_HEURISTIC_FLAG"
+
+/************************************************************* CONTROL */
+//Note: CONTROL and FILTER are different.
+
+//OVERFLOW_CONTROL is implemented. 
+//SIZE_CONTROL is to be implemented
+//TIMEOUT_CONTROL is not completed yet.
+
+#ifdef FILTERING
+
+#define FLAG_CONTROL_DIMENSION_CONVEX_HULL "CONTROL_DIMENSION_CONVEX_HULL"
+#define FLAG_CONTROL_NUMBER_CONSTRAINTS_CONVEX_HULL "CONTROL_NUMBER_CONSTRAINTS_CONVEX_HULL"
+#define FLAG_CONTROL_DIMENSION_PROJECTION "CONTROL_DIMENSION_PROJECTION"
+#define FLAG_CONTROL_NUMBER_CONSTRAINTS_PROJECTION "CONTROL_NUMBER_CONSTRAINTS_PROJECTION"
+
+
+/************************************************************* FILTERING TIMEOUT*/
+#define FLAG_FILTERING_TIMEOUT_JANUS "FILTERING_TIMEOUT_JANUS"
+#define FLAG_FILTERING_TIMEOUT_LINEAR_SIMPLEX "FILTERING_TIMEOUT_LINEAR_SIMPLEX"
+#define FLAG_FILTERING_TIMEOUT_FM "FILTERING_TIMEOUT_FM"
+#define FLAG_FILTERING_TIMEOUT_CONVEX_HULL "FILTERING_TIMEOUT_CONVEX_HULL"
+#define FLAG_FILTERING_TIMEOUT_PROJECTION "FILTERING_TIMEOUT_PROJECTION"
+
+/************************************************************* FILTERING SIZE*/
+#define FLAG_FILTERING_DIMENSION_FEASIBILITY "FILTERING_DIMENSION_FEASIBILITY"
+#define FLAG_FILTERING_NUMBER_CONSTRAINTS_FEASIBILITY "FILTERING_NUMBER_CONSTRAINTS_FEASIBILITY"
+#define FLAG_FILTERING_DENSITY_FEASIBILITY "FILTERING_DENSITY_FEASIBILITY"
+#define FLAG_FILTERING_MAGNITUDE_FEASIBILITY "FILTERING_MAGNITUDE_FEASIBILITY"
+
+#define FLAG_FILTERING_DIMENSION_PROJECTION "FILTERING_DIMENSION_PROJECTION"
+#define FLAG_FILTERING_NUMBER_CONSTRAINTS_PROJECTION "FILTERING_NUMBER_CONSTRAINTS_PROJECTION"
+#define FLAG_FILTERING_DENSITY_PROJECTION "FILTERING_DENSITY_PROJECTION"
+#define FLAG_FILTERING_MAGNITUDE_PROJECTION "FILTERING_MAGNITUDE_PROJECTION"
+
+#define FLAG_FILTERING_DIMENSION_CONVEX_HULL "FILTERING_DIMENSION_CONVEX_HULL"
+#define FLAG_FILTERING_NUMBER_CONSTRAINTS_CONVEX_HULL "FILTERING_NUMBER_CONSTRAINTS_CONVEX_HULL"
+#define FLAG_FILTERING_DENSITY_CONVEX_HULL "FILTERING_DENSITY_CONVEX_HULL"
+#define FLAG_FILTERING_MAGNITUDE_CONVEX_HULL "FILTERING_MAGNITUDE_CONVEX_HULL"
+
+#endif
 
 int sc_debug_level = 0;
-int sc_print_flag = 0;
-int timeout_for_S = 180;
-int timeout_for_FM = 180;
-int timeout_for_scCH = 180;
+int sc_switch_heuristic_flag = 0;
+
+#ifdef FILTERING
+
+int filtering_timeout_J = 0;
+int filtering_timeout_S = 0;
+int filtering_timeout_FM = 0;
+int filtering_timeout_CH = 0;
+int filtering_timeout_projection = 0;
+
+int filtering_dimension_feasibility = 0;
+int filtering_number_constraints_feasibility = 0;
+int filtering_density_feasibility = 0;
+long int filtering_magnitude_feasibility = 0;// need to cast to Value
+
+int filtering_dimension_projection = 0;
+int filtering_number_constraints_projection = 0;
+int filtering_density_projection = 0;
+long int filtering_magnitude_projection = 0;// need to cast to Value
+
+int filtering_dimension_convex_hull = 0;
+int filtering_number_constraints_convex_hull = 0;
+int filtering_density_convex_hull = 0;
+long int filtering_magnitude_convex_hull = 0;// need to cast to Value
+
+#endif
+
+/* SET FUNCTIONS*/
+/* Let's change variables directly here, except sc_debug_level?*/
+/* or use functions returning values, within private variables? DN*/
 
 void set_sc_debug_level(int l)
 { 
     sc_debug_level = l ;
 }
 
-void set_sc_print_flag(int l)
+static void set_sc_switch_heuristic_flag(int l)
 { 
-    sc_print_flag = l ;
-}
-void set_timeout_for_S(int l)
-{ 
-    timeout_for_S = l ;
+    sc_switch_heuristic_flag = l ;
 }
 
-void set_timeout_for_FM(int l)
-{ 
-   timeout_for_FM = l ;
+
+#ifdef FILTERING
+
+/*TIMEOUT*/
+static void set_filtering_timeout_J(int l)
+{
+  filtering_timeout_J = l;
 }
-void set_timeout_for_sc_convex_hull(int l)
+static void set_filtering_timeout_S(int l)
 { 
-   timeout_for_scCH = l ;
+    filtering_timeout_S = l ;
 }
+static void set_filtering_timeout_FM(int l)
+{ 
+   filtering_timeout_FM = l ;
+}
+static void set_filtering_timeout_convex_hull(int l)
+{ 
+   filtering_timeout_CH = l ;
+}
+static void set_filtering_timeout_projection(int l)
+{ 
+   filtering_timeout_projection = l ;
+}
+
+/*SIZE - dimension, number of constraints, density and magnitude*/
+
+static void set_filtering_dimension_feasibility(int l)
+{
+  filtering_dimension_feasibility = l ;
+}
+static void set_filtering_number_constraints_feasibility(int l)
+{
+  filtering_number_constraints_feasibility = l ;
+}
+static void set_filtering_density_feasibility(int l)
+{
+  filtering_density_feasibility = l ;
+}
+static void set_filtering_magnitude_feasibility(long int l)
+{
+  filtering_magnitude_feasibility = l ;
+}
+
+static void set_filtering_dimension_projection(int l)
+{
+  filtering_dimension_projection = l ;
+}
+static void set_filtering_number_constraints_projection(int l)
+{
+  filtering_number_constraints_projection = l ;
+}
+static void set_filtering_density_projection(int l)
+{
+  filtering_density_projection = l ;
+}
+static void set_filtering_magnitude_projection(long int l)
+{
+  filtering_magnitude_projection = l ;
+}
+
+static void set_filtering_dimension_convex_hull(int l)
+{
+  filtering_dimension_convex_hull = l ;
+}
+static void set_filtering_number_constraints_convex_hull(int l)
+{
+  filtering_number_constraints_convex_hull = l ;
+}
+static void set_filtering_density_convex_hull(int l)
+{
+  filtering_density_convex_hull = l ;
+}
+static void set_filtering_magnitude_convex_hull(long int l)
+{
+  filtering_magnitude_convex_hull = l ;
+}
+#endif
+
 /***************************************************** VARIABLE NAME STACK */
-
 typedef char * (*var_name_t)(Variable);
 
 static var_name_t * var_name_stack = NULL;
@@ -96,27 +228,73 @@ char * default_variable_to_string(Variable v)
 
 void initialize_sc(char *(*var_to_string)(Variable))
 {
-  char * l;
-  char * f;
-
-  /* sc print */
-  f = getenv(SC_PRINT_FLAG);  
-  if (f) set_sc_print_flag(atoi(f));
+  char * tmp;
 
   /* sc debug */
-  l = getenv(SC_DEBUG_LEVEL);
-  if (l) set_sc_debug_level(atoi(l));
+  tmp = getenv(SC_DEBUG_LEVEL);
+  if (tmp) set_sc_debug_level(atoi(tmp));
 
-  /* timeout */
-  l = getenv(TIMEOUT_FOR_SIMPLEX);
-  if (l) set_timeout_for_S(atoi(l));
+  /* sc switch heuristic */
+  tmp = getenv(SC_SWITCH_HEURISTIC_FLAG);
+  if (tmp) set_sc_switch_heuristic_flag(atoi(tmp));
 
-  l = getenv(TIMEOUT_FOR_FM);
-  if (l) set_timeout_for_FM(atoi(l));
+#ifdef  FILTERING
+  
+  /* timeout filtering*/
+  tmp = getenv(FLAG_FILTERING_TIMEOUT_JANUS);
+  if (tmp) set_filtering_timeout_J(atoi(tmp));
 
-  l = getenv(TIMEOUT_FOR_SC_CONVEX_HULL);
-  if (l) set_timeout_for_sc_convex_hull(atoi(l));
+  tmp = getenv(FLAG_FILTERING_TIMEOUT_LINEAR_SIMPLEX);
+  if (tmp) set_filtering_timeout_S(atoi(tmp));
 
+  tmp = getenv(FLAG_FILTERING_TIMEOUT_FM);
+  if (tmp) set_filtering_timeout_FM(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_TIMEOUT_CONVEX_HULL);
+  if (tmp) set_filtering_timeout_convex_hull(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_TIMEOUT_PROJECTION);
+  if (tmp) set_filtering_timeout_projection(atoi(tmp));
+
+  /* size filtering*/
+  tmp = getenv(FLAG_FILTERING_DIMENSION_FEASIBILITY);
+  if (tmp) set_filtering_dimension_feasibility(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_NUMBER_CONSTRAINTS_FEASIBILITY);
+  if (tmp) set_filtering_number_constraints_feasibility(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_DENSITY_FEASIBILITY);
+  if (tmp) set_filtering_density_feasibility(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_MAGNITUDE_FEASIBILITY);
+  if (tmp) set_filtering_magnitude_feasibility(atol(tmp));
+
+  tmp = getenv(FLAG_FILTERING_DIMENSION_PROJECTION);
+  if (tmp) set_filtering_dimension_projection(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_NUMBER_CONSTRAINTS_PROJECTION);
+  if (tmp) set_filtering_number_constraints_projection(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_DENSITY_PROJECTION);
+  if (tmp) set_filtering_density_projection(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_MAGNITUDE_PROJECTION);
+  if (tmp) set_filtering_magnitude_projection(atol(tmp));
+
+  tmp = getenv(FLAG_FILTERING_DIMENSION_CONVEX_HULL);
+  if (tmp) set_filtering_dimension_convex_hull(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_NUMBER_CONSTRAINTS_CONVEX_HULL);
+  if (tmp) set_filtering_number_constraints_convex_hull(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_DENSITY_CONVEX_HULL);
+  if (tmp) set_filtering_density_convex_hull(atoi(tmp));
+
+  tmp = getenv(FLAG_FILTERING_MAGNITUDE_CONVEX_HULL);
+  if (tmp) set_filtering_magnitude_convex_hull(atol(tmp));
+
+#endif
+ 
   /* variable name stuff */
   sc_variable_name_init();
   sc_variable_name_push(var_to_string);
