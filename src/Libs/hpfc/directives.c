@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/04/01 11:36:40 $, )
+ * ($Date: 1996/04/17 18:32:14 $, )
  */
 
 #include "defines-local.h"
@@ -786,6 +786,17 @@ HANDLER_PROTOTYPE(prescriptive)
 
 }
 
+/* tells the compiler that the array values are dead from now on.
+ * can be used by the propagation to stop the process...
+ * and mark at this point all copies as live! pretty simple handling!
+ * I let the call as a marker for itself, and it will be removed later
+ * on at the compilation stage *only*...
+ */
+HANDLER_PROTOTYPE(dead)
+{
+    pips_debug(4, "dead directive encountered");
+}
+
 HANDLER_PROTOTYPE(nothing)
 {
     pips_debug(4, "skipping entity %s\n", entity_name(f));
@@ -838,6 +849,7 @@ static struct DirectiveHandler handlers[] =
     {HPF_PREFIX INDEPENDENT_SUFFIX,	3,	HANDLER(independent) },
     {HPF_PREFIX NEW_SUFFIX,		3,	HANDLER(new) },
     {HPF_PREFIX REDUCTION_SUFFIX,	3,	HANDLER(reduction) }, 
+    {HPF_PREFIX DEAD_SUFFIX,		3,	HANDLER(dead) },
     
     /* remappings before/after a call. internal management. 
      */
