@@ -49,7 +49,7 @@ void set_contracted_rw_effects(bool b)
 bool summary_rw_effects_engine(string module_name)
 {
 
-    list l_glob = NIL, l_loc = NIL; 
+    list l_glob = NIL, l_loc = NIL,l_loc2 = NIL, l_dec=NIL; 
     statement module_stat;
 
     set_current_module_entity(local_name_to_top_level_entity(module_name)); 
@@ -69,12 +69,17 @@ bool summary_rw_effects_engine(string module_name)
 	(*effects_prettyprint_func)(l_loc);
     }
 
-    l_glob = (*effects_local_to_global_translation_op)(l_loc);
+    l_dec = summary_effects_from_declaration(module_name);
+    
+    l_loc2 = gen_append(l_loc,l_dec);
+    
+    // MAP(EFFECT, e, fprintf(stderr, "=%s=", entity_name(reference_variable(effect_reference(e)))) ,l_loc2);
+    l_glob = (*effects_local_to_global_translation_op)(l_loc2);
     
 
     ifdebug(2){
 	pips_debug(2, "local regions, after translation to global scope:\n");
-	(*effects_prettyprint_func)(l_loc);
+	(*effects_prettyprint_func)(l_loc2);
 	pips_debug(2, "global regions, after translation to global scope:\n");
 	(*effects_prettyprint_func)(l_glob);
     }
