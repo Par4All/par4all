@@ -826,11 +826,17 @@ call c;
 
 }
 
-transformer call_site_to_module_precondition(entity caller, 
-					     entity callee, 
-					     statement s,
-					     call c)
+/* This function does everything needed. 
+ * Called by ICFG with many different contexts.
+ */
+text
+call_site_to_module_precondition_text(
+    entity caller, 
+    entity callee, 
+    statement s,
+    call c)
 {
+    text result;
     /* summary effects for the callee */
     list seffects_callee = load_summary_effects(callee);
     /* caller preconditions */
@@ -858,6 +864,7 @@ transformer call_site_to_module_precondition(entity caller,
     set_current_module_entity(caller);
     /* create htable for old_values ... */
     module_to_value_mappings(caller);
+
     /* add to preconditions the links to the callee formal params */
     caller_prec = add_formal_to_actual_bindings (c, caller_prec);
     /* transform the preconditions to make sense for the callee */
@@ -865,6 +872,7 @@ transformer call_site_to_module_precondition(entity caller,
 						  caller_prec,
 						  seffects_callee);
     call_site_prec = transformer_normalize(call_site_prec, 2);
+
     /* translate_global_values(e_caller, call_site_prec); */
     free_value_mappings();
     reset_current_module_entity();
@@ -873,15 +881,17 @@ transformer call_site_to_module_precondition(entity caller,
     set_current_module_entity(callee);
     /* Set the htable with its variables because now we work
        in this frame */
-    module_to_value_mappings(callee); 
-    reset_current_module_entity();
+    module_to_value_mappings(callee);  
 
+    result = text_transformer(call_site_prec);
+
+    reset_current_module_entity();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
     reset_semantic_map();
     free_value_mappings();
 
-    return call_site_prec;
+    return result;
 }
 
 /* Context to compute summary preconditions */
