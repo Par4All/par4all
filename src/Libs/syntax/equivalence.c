@@ -2,11 +2,14 @@
  * and in the static area and in the dynamic area. The heap area is left
  * aside.
  *
- * 	%A% ($Date: 2001/04/05 08:27:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+ * 	%A% ($Date: 2001/04/06 11:49:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: equivalence.c,v $
+ * Revision 1.23  2001/04/06 11:49:50  irigoin
+ * Additional tests to detect conflicting EQUIVALENCE and DATA statements
+ *
  * Revision 1.22  2001/04/05 08:27:15  irigoin
  * Test added for non-standard adjustable arrays in MakeEquivAtom() for Nga
  * NMguyen (equiv23.f)
@@ -28,7 +31,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 2001/04/05 08:27:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 2001/04/06 11:49:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -125,6 +128,15 @@ syntax s;
 			entity_local_name(e));
 	    ParserError("MakeEquivAtom", "Formal parameter in equivalence chain\n");
     }
+
+    /* Equivalenced variables cannot be initialized by a DATA statement: FALSE */
+    /*
+    if(value_defined_p(entity_initial(e))) {
+      pips_user_warning("Initialized variable %s appears in EQUIVALENCE declaration\n",
+			entity_local_name(e));
+	    ParserError("MakeEquivAtom", "Initialized variable in equivalence chain\n");
+    }
+    */
 
     /* In case an adjustable array which is not a formal parameter has
        been encountered, reject it. */
@@ -790,7 +802,35 @@ SaveChains()
 	    ram_shared(re) = gen_copy_seq(shared);
 
 	}, chain_atoms(c));
-	
+
+	/* Check conflicting intializations */
+	MAPL(pa, {
+	    atom a = ATOM(CAR(pa));
+	    entity e = atom_equivar(a);
+	    storage se = entity_storage(e);
+	    ram re = storage_ram(se);
+	    list lce = ram_shared(re);
+
+	    if(value_defined_p(entity_initial(e))
+	       && !value_unknown_p(entity_initial(e))) {
+	      debug(8, "SaveChains",
+		    "\tCheck initalization consistency for %s\n",
+		    entity_name(e));
+	      MAP(ENTITY, ce, {
+		if(e!=ce && entity_conflict_p(e, ce)) {
+		  if(value_defined_p(entity_initial(ce))
+		     && !value_unknown_p(entity_initial(ce))) {
+		    pips_user_warning("Overlapping initializations for %s and %s\n",
+				      entity_local_name(e), entity_local_name(ce));
+		    ParserError("SaveChains",
+				"ANSI extension: overlapping initializations\n");
+		  }
+		}
+	      }, lce);
+	    }
+
+	}, chain_atoms(c));
+
     }, equivalences_chains(FinalEquivSet));
 
     debug(8, "SaveChains", "End\n");
