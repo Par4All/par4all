@@ -32,6 +32,10 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.68  2002/06/27 15:00:33  irigoin
+ * DeclareVariable() updated to cope with the special case of character*(*)
+ * variables defined by PIPS to replace formal return labels.
+ *
  * Revision 1.67  2002/06/21 13:47:16  irigoin
  * Comments are used in MakeDataStatement()
  *
@@ -606,7 +610,7 @@ void DeclarePointer(entity ptr, entity pointed_array, list decl_dims)
 
     }
     else {
-      pips_user_warning("DeclareVariable",
+      pips_user_warning("DeclarePointer",
 			"%s %s between lines %d and % d\n",
 			"Redefinition of type for entity",
 			entity_local_name(ptr), line_b_I, line_e_I);
@@ -687,223 +691,244 @@ DeclareVariable(
     storage s,
     value v)
 {
-    type et = entity_type(e);
-    list etd = list_undefined;
-    bool variable_had_implicit_type_p = FALSE;
+  type et = entity_type(e);
+  list etd = list_undefined;
+  bool variable_had_implicit_type_p = FALSE;
 
-    debug(8, "DeclareVariable", "%s\n", entity_name(e));
-    pips_assert("DeclareVariable", t == type_undefined || type_variable_p(t));
+  debug(8, "DeclareVariable", "%s\n", entity_name(e));
+  pips_assert("DeclareVariable", t == type_undefined || type_variable_p(t));
 
-    if(et == type_undefined) {
-	if(t == type_undefined) {
-	    entity_type(e) = ImplicitType(e);
-	    variable_dimensions(type_variable(entity_type(e))) = d;
-	}
-	else {
-	    type nt;
-	    nt = MakeTypeVariable
-		(copy_basic(variable_basic(type_variable(t))),
-		 d);
-	    entity_type(e) = nt;
-	}
-    }
-    else
-	switch(type_tag(et)) {
-	case is_type_functional:
-	    if(d!=NIL) {
-		user_warning("DeclareVariable",
-			     "%s %s between lines %d and % d\n",
-			     "Attempt to dimension functional entity",
-			     entity_local_name(e), line_b_I, line_e_I);
-		ParserError("DeclareVariable", "Likely name conflict\n");
-	    }
-	    if(t == type_undefined)
-		/* no new information: do nothing */
-		;
-	    else 
-		if (implicit_type_p(e)) {
-		    /* update functional type */
-		    type nt = MakeTypeVariable
-			(copy_basic(variable_basic(type_variable(t))),
-			 NIL);
-		    functional_result(type_functional(et)) = nt;
-		    /* the old type should be gen_freed... */
-		}
-		else if(type_equal_p(t, functional_result(type_functional(et)))) {
-		    user_warning("DeclareVariable",
-				 "%s %s between lines %d and % d\n",
-				 "Redefinition of functional type for entity",
-				 entity_local_name(e), line_b_I, line_e_I);
-		}
-		else {
-		    user_warning("DeclareVariable",
-				 "%s %s between lines %d and % d\n",
-				 "Modification of functional result type for entity",
-				 entity_local_name(e), line_b_I, line_e_I);
-		    ParserError("DeclareVariable",
-				"Possible name conflict?\n");
-		}
-	    break;
-	case is_type_variable:
-	    etd = variable_dimensions(type_variable(et));
-	    if(t == type_undefined) {
-		/* set dimension etd if NIL */
-		if(etd==NIL)
-		    variable_dimensions(type_variable(et)) = d;
-		else if (d==NIL)
-		    ;
-		else {
-		    user_warning("DeclareVariable",
-				 "%s %s between lines %d and % d\n",
-				 "Redefinition of dimension for entity",
-				 entity_name(e), line_b_I, line_e_I);
-		    ParserError("DeclareVariable", "Name conflict?\n");
-		}
-	    }
-	    else {
-		pips_assert("DeclareVariable",
-			    variable_dimensions(type_variable(t))==NIL);
-		if(implicit_type_p(e)){
-		    type nt;
-
-		    variable_had_implicit_type_p = TRUE;
-
-		    /* set dimension etd if NIL */
-		    if(etd==NIL)
-			variable_dimensions(type_variable(et)) = d;
-		    else if (d==NIL)
-			;
-		    else {
-			user_warning("DeclareVariable",
-				     "%s %s between lines %d and % d\n",
-				     "Redefinition of dimension for entity",
-				     entity_local_name(e), line_b_I, line_e_I);
-			ParserError("DeclareVariable", "Name conflict?\n");
-		    }
-		    /* update type */
-		    nt = MakeTypeVariable
-			(copy_basic(variable_basic(type_variable(t))),
-			 variable_dimensions(type_variable(et)));
-		    
-		    if(!same_basic_and_scalar_p(entity_type(e), nt))
-		    {
-			
-			if(/*FI: to check update_common_layout*/ FALSE && 
-			   entity_storage(e)!=storage_undefined &&
-			   storage_ram_p(entity_storage(e)) &&
-			   basic_type_size(variable_basic(type_variable(t)))
-	   > basic_type_size(variable_basic(type_variable(entity_type(e))))) 
-			{
-			    user_warning("DeclareVariable",
-     "Storage information for %s is likely to be wrong because its type is "
-     "redefined as a larger type\nType is *not* redefined internally to avoid "
-     "aliasing\n", entity_local_name(e));
-		    /* FI: it should be redefined and the offset be updated,
-		     * maybe in check_common_area(); 1 Feb. 1994
-		     */
-			}
-			else {
-			    entity_type(e) = nt;
-			}
-		    }
-		    else {
-			free_type(nt);
-		    }
-		}
-		else {
-		    user_warning("DeclareVariable",
-				 "%s %s between lines %d and % d\n",
-				 "Redefinition of type for entity",
-				 entity_local_name(e), line_b_I, line_e_I);
-		    ParserError("DeclareVariable",
-				"Name conflict or declaration ordering "
-				"not supported by PIPS\n"
-				"Late typing of formal parameter and/or "
-				"interference with IMPLICIT\n");
-		}
-	    }
-	    break;
-	case is_type_area:
-	    user_warning("DeclareVariable",
-			 "%s %s between lines %d and % d\n%s\n",
-			 "COMMON/VARIABLE homonymy for entity name",
-			 entity_local_name(e), line_b_I, line_e_I,
-			 "Rename your common.");
-	    ParserError("DeclareVariable", "Name conflict\n");
-	    break;
-	default:
-	    pips_error("DeclareVariable",
-		       "unexpected entity type tag: %d\n",
-		       type_tag(et));
-	}
-
-    if (s != storage_undefined) {
-	if (entity_storage(e) != storage_undefined) {
-	    ParserError("DeclareVariable", "storage non implemented\n");
-	}
-	else {
-	    entity_storage(e) = s;
-	}
-    }
-
-    if (v == value_undefined) {
-	if (entity_initial(e) == value_undefined) {
-	    entity_initial(e) = MakeValueUnknown();
-	}
+  if(et == type_undefined) {
+    if(t == type_undefined) {
+      entity_type(e) = ImplicitType(e);
+      variable_dimensions(type_variable(entity_type(e))) = d;
     }
     else {
-	ParserError("DeclareVariable", "value non implemented\n");
+      type nt;
+      nt = MakeTypeVariable
+	(copy_basic(variable_basic(type_variable(t))),
+	 d);
+      entity_type(e) = nt;
     }
-
-    AddEntityToDeclarations(e, get_current_module_entity());
-
-    /* If the return variable is retyped, the function must be retyped */
-
-    if(!type_undefined_p(t) && !storage_undefined_p(entity_storage(e)) 
-       && storage_return_p(entity_storage(e))) {
-	entity f = get_current_module_entity();
-	type tf = entity_type(f);
-	functional func = type_functional(tf);
-	type tr = functional_result(func);
-	basic old = variable_basic(type_variable(tr));
-	basic new = variable_basic(type_variable(t));
-
-	pips_assert("Return variable and function must have the same name",
-		    strcmp(entity_local_name(e), module_local_name(f)) == 0 );
-	pips_assert("Function must have functional type", type_functional_p(tf));
-	pips_assert("New type must be of kind variable", type_variable_p(t));
-
-	if(!type_equal_p(tr, t)) {
-	    if(variable_had_implicit_type_p) {
-		debug(8, "DeclareVariable", " Type for result of function %s "
-		      "changed from %s to %s: ", module_local_name(f),
-			     basic_to_string(old), basic_to_string(new));
-		free_type(functional_result(func));
-		old = basic_undefined; /* the pointed area has just been freed! */
-		functional_result(func) = copy_type(t);
-		ifdebug(8) {
-		  fprint_functional(stderr, type_functional(tf));
-		  fprintf(stderr, "\n");
-		}
-	    }
-	    else {
-		user_warning("DeclareVariable",
-			     "Attempt to retype function %s with result of type "
-			     "%s with new type %s\n", module_local_name(f),
-			     basic_to_string(old), basic_to_string(new));
-		ParserError("DeclareVariable", "Illegal retyping");
-	    }
+  }
+  else
+    switch(type_tag(et)) {
+    case is_type_functional:
+      if(d!=NIL) {
+	user_warning("DeclareVariable",
+		     "%s %s between lines %d and % d\n",
+		     "Attempt to dimension functional entity",
+		     entity_local_name(e), line_b_I, line_e_I);
+	ParserError("DeclareVariable", "Likely name conflict\n");
+      }
+      if(t == type_undefined)
+	/* no new information: do nothing */
+	;
+      else 
+	if (implicit_type_p(e)) {
+	  /* update functional type */
+	  type nt = MakeTypeVariable
+	    (copy_basic(variable_basic(type_variable(t))),
+	     NIL);
+	  functional_result(type_functional(et)) = nt;
+	  /* the old type should be gen_freed... */
+	}
+	else if(type_equal_p(t, functional_result(type_functional(et)))) {
+	  user_warning("DeclareVariable",
+		       "%s %s between lines %d and % d\n",
+		       "Redefinition of functional type for entity",
+		       entity_local_name(e), line_b_I, line_e_I);
 	}
 	else {
-	    /* Meaningless warning when the result variable is declared the first time
-	     * with the function itself
-	     * user_warning("DeclareVariable",
-	     *	     "Attempt to retype function %s with result of type "
-	     *	     "%s with very same type %s\n", module_local_name(f),
-	     *	     basic_to_string(old), basic_to_string(new));
-	     */
+	  user_warning("DeclareVariable",
+		       "%s %s between lines %d and % d\n",
+		       "Modification of functional result type for entity",
+		       entity_local_name(e), line_b_I, line_e_I);
+	  ParserError("DeclareVariable",
+		      "Possible name conflict?\n");
 	}
+      break;
+    case is_type_variable:
+      etd = variable_dimensions(type_variable(et));
+      if(t == type_undefined) {
+	/* set dimension etd if NIL */
+	if(etd==NIL)
+	  variable_dimensions(type_variable(et)) = d;
+	else if (d==NIL)
+	  ;
+	else {
+	  user_warning("DeclareVariable",
+		       "%s %s between lines %d and % d\n",
+		       "Redefinition of dimension for entity",
+		       entity_name(e), line_b_I, line_e_I);
+	  ParserError("DeclareVariable", "Name conflict?\n");
+	}
+      }
+      else {
+	pips_assert("DeclareVariable",
+		    variable_dimensions(type_variable(t))==NIL);
+	if(implicit_type_p(e)){
+	  type nt;
+
+	  variable_had_implicit_type_p = TRUE;
+
+	  /* set dimension etd if NIL */
+	  if(etd==NIL)
+	    variable_dimensions(type_variable(et)) = d;
+	  else if (d==NIL)
+	    ;
+	  else {
+	    user_warning("DeclareVariable",
+			 "%s %s between lines %d and % d\n",
+			 "Redefinition of dimension for entity",
+			 entity_local_name(e), line_b_I, line_e_I);
+	    ParserError("DeclareVariable", "Name conflict?\n");
+	  }
+	  /* update type */
+	  nt = MakeTypeVariable
+	    (copy_basic(variable_basic(type_variable(t))),
+	     variable_dimensions(type_variable(et)));
+		    
+	  if(!same_basic_and_scalar_p(entity_type(e), nt))
+	    {
+			
+	      if(/*FI: to check update_common_layout*/ FALSE && 
+		 entity_storage(e)!=storage_undefined &&
+		 storage_ram_p(entity_storage(e)) &&
+		 basic_type_size(variable_basic(type_variable(t)))
+		 > basic_type_size(variable_basic(type_variable(entity_type(e))))) 
+		{
+		  user_warning("DeclareVariable",
+			       "Storage information for %s is likely to be wrong because its type is "
+			       "redefined as a larger type\nType is *not* redefined internally to avoid "
+			       "aliasing\n", entity_local_name(e));
+		  /* FI: it should be redefined and the offset be updated,
+		   * maybe in check_common_area(); 1 Feb. 1994
+		   */
+		}
+	      else {
+		entity_type(e) = nt;
+	      }
+	    }
+	  else {
+	    free_type(nt);
+	  }
+	}
+	else {
+	  if(formal_label_replacement_p(e)) {
+	    /* Exception: since it is a synthetic variable, it is
+	       unlikely to be typed explicitly. But it can appear
+	       in later PIPS regenerated declarations. Unless
+	       there is a clash with a user variable. */
+	    if(type_equal_p(entity_type(e), t)) {
+	      /* No problem, but do not free t because this is performed in gram.y */
+	      /* free_type(t); */
+	    }
+	    else {
+	      pips_user_warning(
+				"%s %s between lines %d and % d\n",
+				"Redefinition of type for formal label substitution entity",
+				entity_name(e), line_b_I, line_e_I);
+	      ParserError("DeclareVariable",
+			  "Name conflict for formal label substitution variable? "
+			  "Use property PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX?\n");
+	    }
+	  }
+	  else {
+	    pips_user_warning(
+			      "%s %s between lines %d and % d\n",
+			      "Redefinition of type for entity",
+			      entity_name(e), line_b_I, line_e_I);
+	    ParserError("DeclareVariable",
+			"Name conflict or declaration ordering "
+			"not supported by PIPS\n"
+			"Late typing of formal parameter and/or "
+			"interference with IMPLICIT\n");
+	  }
+	}
+      }
+      break;
+    case is_type_area:
+      user_warning("DeclareVariable",
+		   "%s %s between lines %d and % d\n%s\n",
+		   "COMMON/VARIABLE homonymy for entity name",
+		   entity_local_name(e), line_b_I, line_e_I,
+		   "Rename your common.");
+      ParserError("DeclareVariable", "Name conflict\n");
+      break;
+    default:
+      pips_error("DeclareVariable",
+		 "unexpected entity type tag: %d\n",
+		 type_tag(et));
     }
+
+  if (s != storage_undefined) {
+    if (entity_storage(e) != storage_undefined) {
+      ParserError("DeclareVariable", "storage non implemented\n");
+    }
+    else {
+      entity_storage(e) = s;
+    }
+  }
+
+  if (v == value_undefined) {
+    if (entity_initial(e) == value_undefined) {
+      entity_initial(e) = MakeValueUnknown();
+    }
+  }
+  else {
+    ParserError("DeclareVariable", "value non implemented\n");
+  }
+
+  AddEntityToDeclarations(e, get_current_module_entity());
+
+  /* If the return variable is retyped, the function must be retyped */
+
+  if(!type_undefined_p(t) && !storage_undefined_p(entity_storage(e)) 
+     && storage_return_p(entity_storage(e))) {
+    entity f = get_current_module_entity();
+    type tf = entity_type(f);
+    functional func = type_functional(tf);
+    type tr = functional_result(func);
+    basic old = variable_basic(type_variable(tr));
+    basic new = variable_basic(type_variable(t));
+
+    pips_assert("Return variable and function must have the same name",
+		strcmp(entity_local_name(e), module_local_name(f)) == 0 );
+    pips_assert("Function must have functional type", type_functional_p(tf));
+    pips_assert("New type must be of kind variable", type_variable_p(t));
+
+    if(!type_equal_p(tr, t)) {
+      if(variable_had_implicit_type_p) {
+	debug(8, "DeclareVariable", " Type for result of function %s "
+	      "changed from %s to %s: ", module_local_name(f),
+	      basic_to_string(old), basic_to_string(new));
+	free_type(functional_result(func));
+	old = basic_undefined; /* the pointed area has just been freed! */
+	functional_result(func) = copy_type(t);
+	ifdebug(8) {
+	  fprint_functional(stderr, type_functional(tf));
+	  fprintf(stderr, "\n");
+	}
+      }
+      else {
+	user_warning("DeclareVariable",
+		     "Attempt to retype function %s with result of type "
+		     "%s with new type %s\n", module_local_name(f),
+		     basic_to_string(old), basic_to_string(new));
+	ParserError("DeclareVariable", "Illegal retyping");
+      }
+    }
+    else {
+      /* Meaningless warning when the result variable is declared the first time
+       * with the function itself
+       * user_warning("DeclareVariable",
+       *	     "Attempt to retype function %s with result of type "
+       *	     "%s with very same type %s\n", module_local_name(f),
+       *	     basic_to_string(old), basic_to_string(new));
+       */
+    }
+  }
 }
 
 /* Intrinsic e is used in the current module */
@@ -1409,7 +1434,7 @@ retype_formal_parameters()
     type tm = entity_type(m);
     type tr = type_undefined;
 
-    debug(8, "retype_formal_parameters", "Begin for module %s\n",
+    pips_debug(8, "Begin for module %s\n",
 	  module_local_name(m));
 
     MAP(ENTITY, v, {
@@ -1418,7 +1443,7 @@ retype_formal_parameters()
 		free_type(entity_type(v));
 		entity_type(v) = ImplicitType(v);
 
-		debug(8, "retype_formal_parameters", "Retype formal parameter %s\n",
+		pips_debug(8, "Retype formal parameter %s\n",
 		      entity_local_name(v));
 	    }
 	}
@@ -1428,13 +1453,12 @@ retype_formal_parameters()
 	{
 	    pips_debug(8, "Cannot retype entity %s: warning!!!\n",
 		       entity_local_name(v));
-		user_warning("retype_formal_parameters",
-			     "Cannot retype variable or function %s."
+		pips_user_warning("Cannot retype variable or function %s."
 			     " Move up the implicit statement at the beginning of declarations.\n",
 			     entity_local_name(v));
 	}
 	else {
-	    debug(8, "retype_formal_parameters", "Ignore entity %s\n",
+	    pips_debug(8, "Ignore entity %s\n",
 		  entity_local_name(v));
 	}
     }, vars);
@@ -1455,8 +1479,8 @@ retype_formal_parameters()
 	    entity r = entity_undefined;
 	    free_type(tr);
 	    functional_result(type_functional(tm)) = ImplicitType(m);
-	    debug(8, "retype_formal_parameters", "Retype result of function %s\n",
-		      module_local_name(m));
+	    pips_debug(8, "Retype result of function %s\n",
+		       module_local_name(m));
 
 	    /* Update type of internal variable used to store the function result */
 	    if((r=global_name_to_entity(module_local_name(m), module_local_name(m)))
@@ -1482,7 +1506,7 @@ retype_formal_parameters()
     pips_assert("Parameter type list should still be empty",
                 ENDP(functional_parameters(type_functional(tm))));
 
-    debug(8, "retype_formal_parameters", "End for module %s\n",
+    pips_debug(8, "End for module %s\n",
 	  module_local_name(m));
 }
 
