@@ -21,6 +21,9 @@
   - intrinsics are not properly typed
 
   $Log: bootstrap.c,v $
+  Revision 1.79  2003/09/05 14:24:58  nguyen
+  Add C intrinsics to handle SPEC 2000 benchmarks
+
   Revision 1.78  2003/08/06 13:47:51  nguyen
   Add intrinsics for C
 
@@ -41,6 +44,9 @@
 
   Revision 1.72  2002/06/10 12:00:37  irigoin
   $Log: bootstrap.c,v $
+  Revision 1.79  2003/09/05 14:24:58  nguyen
+  Add C intrinsics to handle SPEC 2000 benchmarks
+
   Revision 1.78  2003/08/06 13:47:51  nguyen
   Add intrinsics for C
 
@@ -3542,21 +3548,9 @@ simplification_dcomplex(expression exp, type_context_p context)
 /* Move the following functions to ri-util/type.c */
 
 type 
-MakePointerResult()
-{
-    return MakeAnyScalarResult(is_basic_pointer, DEFAULT_POINTER_TYPE_SIZE);
-}
-
-type 
 MakeVoidResult()
 {
     return make_type(is_type_void, UU);
-}
-
-parameter 
-MakePointerParameter()
-{
-  return MakeAnyScalarParameter(is_basic_pointer, DEFAULT_POINTER_TYPE_SIZE);
 }
 
 parameter 
@@ -3581,20 +3575,6 @@ integer_to_overloaded_type(int n)
 }
 
 static type 
-pointer_to_overloaded_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  
-  ft = make_functional(NIL, MakeOverloadedResult());
-  t = make_type(is_type_functional, ft);
-  
-  functional_parameters(ft) = 
-    make_parameter_list(n, MakePointerParameter);
-  return t;
-}
-
-static type 
 void_to_overloaded_type(int n)
 {
   type t = type_undefined;
@@ -3605,20 +3585,6 @@ void_to_overloaded_type(int n)
   
   functional_parameters(ft) = 
     make_parameter_list(n, MakeVoidParameter);
-  return t;
-}
-
-static type 
-overloaded_to_pointer_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  
-  ft = make_functional(NIL, MakePointerResult());
-  functional_parameters(ft) = 
-    make_parameter_list(n, MakeOverloadedParameter);
-  t = make_type(is_type_functional, ft);
-  
   return t;
 }
 
@@ -3645,62 +3611,6 @@ void_to_integer_type(int n)
   ft = make_functional(NIL, MakeIntegerResult());
   functional_parameters(ft) = 
     make_parameter_list(n, MakeVoidParameter);
-  t = make_type(is_type_functional, ft);
-  
-  return t;
-}
-
-static type 
-void_to_pointer_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  
-  ft = make_functional(NIL, MakePointerResult());
-  functional_parameters(ft) = 
-    make_parameter_list(n, MakeVoidParameter);
-  t = make_type(is_type_functional, ft);
-  
-  return t;
-}
-
-static type 
-pointer_to_integer_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  
-  ft = make_functional(NIL, MakeIntegerResult());
-  functional_parameters(ft) = 
-    make_parameter_list(n, MakePointerParameter);
-  t = make_type(is_type_functional, ft);
-  
-  return t;
-}
-
-static type 
-pointer_to_pointer_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  
-  ft = make_functional(NIL, MakePointerResult());
-  functional_parameters(ft) = 
-    make_parameter_list(n, MakePointerParameter);
-  t = make_type(is_type_functional, ft);
-  
-  return t;
-}
-
-static type 
-pointer_to_void_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  
-  ft = make_functional(NIL, MakeVoidResult());
-  functional_parameters(ft) = 
-    make_parameter_list(n, MakePointerParameter);
   t = make_type(is_type_functional, ft);
   
   return t;
@@ -4026,7 +3936,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"*indirection", 1, default_intrinsic_type, 0, 0},
   /* ISO 6.5.3.3 unary arithmetic operators */
   {"+unary", 1, default_intrinsic_type, typing_arithmetic_operator, 0},
-  {"-unary", 1, default_intrinsic_type, typing_arithmetic_operator, 0},
+  /* Unuary minus : ALREADY EXIST (FORTRAN)
+  {"-unary", 1, default_intrinsic_type, typing_arithmetic_operator, 0},*/
   {"~", 1, integer_to_overloaded_type, typing_arithmetic_operator, 0},
   {"!", 1, overloaded_to_integer_type, 0, 0},
   /* ISO 6.5.5 multiplicative operators : ALREADY EXIST (FORTRAN)
@@ -4057,6 +3968,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"&&", 2, overloaded_to_integer_type, 0, 0},
   /* ISO 6.5.14 logical OR operator */ 
   {"||", 2, overloaded_to_integer_type, 0, 0},
+   /* ISO 6.5.15 conditional operator */
+  {"?", 3, default_intrinsic_type, 0, 0}, 
   /* ISO 6.5.16.1 simple assignment : ALREADY EXIST (FORTRAN)
      {"=", 2, default_intrinsic_type, typing_of_assign, 0}, */
   /* ISO 6.5.16.2 compound assignments*/
@@ -4084,12 +3997,12 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {BRACE_INTRINSIC, (INT_MAX) , default_intrinsic_type, no_typing, 0},
 
   /* #include <assert.h> */
-  /*  {"__assert",3,overloaded_to_void_type,0,0},*/
+  {"__assert", 3, overloaded_to_void_type,0,0},
 
   /* #include <complex.h>*/
 
   /* #include <ctype.h>*/
-  /* {"isalnum", 1, integer_to_integer_type, 0, 0}, 
+  {"isalnum", 1, integer_to_integer_type, 0, 0}, 
   {"isalpha", 1, integer_to_integer_type, 0, 0}, 
   {"iscntrl", 1, integer_to_integer_type, 0, 0}, 
   {"isdigit", 1, integer_to_integer_type, 0, 0}, 
@@ -4105,7 +4018,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"isascii", 1, integer_to_integer_type, 0, 0}, 
   {"toascii", 1, integer_to_integer_type, 0, 0}, 
   {"_tolower", 1, integer_to_integer_type, 0, 0}, 
-  {"_toupper", 1, integer_to_integer_type, 0, 0}, */
+  {"_toupper", 1, integer_to_integer_type, 0, 0}, 
   
   /* #include <errno.h>*/
   /*  {"errno", 0, overloaded_to_integer_type, 0, 0}, */
@@ -4120,26 +4033,30 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   /* #include <iso646.h>*/
 
   /* {"_sysconf", 1, integer_to_integer_type, 0, 0}, 
-  {"setlocale", 2, overloaded_to_pointer_type, 0, 0},
-  {"localeconv", 1, void_to_pointer_type, 0, 0},
-  {"dcgettext", 3, overloaded_to_pointer_type, 0, 0},
-  {"dgettext", 2, pointer_to_pointer_type, 0, 0},
-  {"gettext", 1, pointer_to_pointer_type, 0, 0},
-  {"textdomain", 1, pointer_to_pointer_type, 0, 0},
-  {"bindtextdomain", 2, pointer_to_pointer_type, 0, 0},
+  {"setlocale", 2, default_intrinsic_type, 0, 0},
+  {"localeconv", 1, default_intrinsic_type, 0, 0},
+  {"dcgettext", 3, default_intrinsic_type, 0, 0},
+  {"dgettext", 2, default_intrinsic_type, 0, 0},
+  {"gettext", 1, default_intrinsic_type, 0, 0},
+  {"textdomain", 1, default_intrinsic_type, 0, 0},
+  {"bindtextdomain", 2, default_intrinsic_type, 0, 0},
   {"wdinit", 1, void_to_integer_type, 0 ,0}, 
   {"wdchkind", 1, overloaded_to_integer_type, 0 ,0}, 
   {"wdbindf", 3, overloaded_to_integer_type, 0 ,0}, 
-  {"wddelim", 3, overloaded_to_pointer_type, 0, 0}, 
+  {"wddelim", 3, default_intrinsic_type, 0, 0}, 
   {"mcfiller", 1, void_to_overloaded_type, 0, 0},
   {"mcwrap", 1, void_to_integer_type, 0 ,0},*/
 
   /* #include <limits.h>*/
-
+  /* This is not true, read is in unistd.h which is included by limits.h.
+     So this line is added just to make art(SPEC 2000) pass */
+  
+  {"read",3,default_intrinsic_type, 0, 0},
+  
   /* #include <locale.h>*/
 
   /* #include <math.h>*/
-  /*  {"acos", 1, double_to_double_type, 0, 0},  
+  {"acos", 1, double_to_double_type, 0, 0},  
   {"asin", 1, double_to_double_type, 0, 0}, 
   {"atan", 1, double_to_double_type, 0, 0}, 
   {"atan2", 2, double_to_double_type, 0, 0},   
@@ -4215,16 +4132,16 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"fcvt", 4, default_intrinsic_type, 0, 0},  
   {"gcvt", 3, default_intrinsic_type, 0, 0},  
   {"atof", 1, overloaded_to_double_type, 0, 0},  
-  {"strtod", 2, overloaded_to_double_type, 0, 0},  */
+  {"strtod", 2, overloaded_to_double_type, 0, 0}, 
 
   /*#include <setjmp.h>*/
 
-  /* {"setjmp", 1, overloaded_to_integer_type, 0, 0},
+  {"setjmp", 1, overloaded_to_integer_type, 0, 0},
   {"__setjmp", 1, overloaded_to_integer_type, 0, 0},
   {"longjmp", 2, overloaded_to_void_type, 0, 0},
   {"__longjmp", 2, overloaded_to_void_type, 0, 0},
   {"sigsetjmp", 2, overloaded_to_integer_type, 0, 0},
-  {"siglongjmp", 2, overloaded_to_void_type, 0, 0},*/
+  {"siglongjmp", 2, overloaded_to_void_type, 0, 0},
 
   /*#include <signal.h>*/
   /*#include <stdarg.h>*/
@@ -4233,81 +4150,95 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   /*#include <stdint.h>*/
   /*#include <stdio.h>*/
 
-  /*  {"remove", 1, pointer_to_integer_type, 0, 0},
-  {"rename", 2, pointer_to_integer_type, 0, 0},
-  {"tmpfile", 1, void_to_pointer_type, 0, 0},
-  {"tmpnam", 1, pointer_to_pointer_type, 0, 0}, 
-  {"fclose", 1, pointer_to_integer_type, 0, 0},
-  {"fflush", 1, pointer_to_integer_type, 0, 0},
-  {"fopen", 2, pointer_to_pointer_type, 0, 0}, 
-  {"freopen", 3, pointer_to_pointer_type, 0, 0}, 
-  {"setbuf", 2, pointer_to_void_type, 0, 0},
+  {"remove", 1, overloaded_to_integer_type, 0, 0},
+  {"rename", 2, overloaded_to_integer_type, 0, 0},
+  {"tmpfile", 1, default_intrinsic_type, 0, 0},
+  {"tmpnam", 1, default_intrinsic_type, 0, 0}, 
+  {"fclose", 1, overloaded_to_integer_type, 0, 0},
+  {"fflush", 1, overloaded_to_integer_type, 0, 0},
+  {"fopen", 2, default_intrinsic_type, 0, 0}, 
+  {"freopen", 3, default_intrinsic_type, 0, 0}, 
+  {"setbuf", 2, default_intrinsic_type, 0, 0},
   {"setvbuf", 4, overloaded_to_integer_type, 0, 0},
   {"fprintf", (INT_MAX), overloaded_to_integer_type, 0, 0},
-  {"fscanf", (INT_MAX), overloaded_to_integer_type, 0, 0},*/
+  {"fscanf", (INT_MAX), overloaded_to_integer_type, 0, 0},
   {"printf", (INT_MAX), overloaded_to_integer_type, 0, 0},
-  /* {"scanf", (INT_MAX), overloaded_to_integer_type, 0, 0},
+  {"scanf", (INT_MAX), overloaded_to_integer_type, 0, 0},
   {"sprintf", (INT_MAX), overloaded_to_integer_type, 0, 0},
   {"sscanf", (INT_MAX), overloaded_to_integer_type, 0, 0},
   {"vfprintf", 3, overloaded_to_integer_type, 0, 0},
   {"vprintf", 2, overloaded_to_integer_type, 0, 0},
   {"vsprintf", 3, overloaded_to_integer_type, 0, 0},
-  {"fgetc", 1, pointer_to_integer_type, 0, 0},
-  {"fgets", 3, overloaded_to_pointer_type, 0, 0}, 
+  {"fgetc", 1, overloaded_to_integer_type, 0, 0},
+  {"fgets", 3, default_intrinsic_type, 0, 0}, 
   {"fputc", 2, overloaded_to_integer_type, 0, 0},
-  {"fputs", 2, pointer_to_integer_type, 0, 0},
-  {"getc", 1, pointer_to_integer_type, 0, 0},
+  {"fputs", 2, overloaded_to_integer_type, 0, 0},
+  {"getc", 1, overloaded_to_integer_type, 0, 0},
   {"putc", 2, overloaded_to_integer_type, 0, 0},
   {"getchar", 1, void_to_integer_type, 0, 0},
   {"putchar", 1, integer_to_integer_type, 0, 0},
-  {"gets", 1, pointer_to_pointer_type, 0, 0}, 
-  {"puts", 1, pointer_to_integer_type, 0, 0},
+  {"gets", 1, default_intrinsic_type, 0, 0}, 
+  {"puts", 1, overloaded_to_integer_type, 0, 0},
   {"ungetc", 2, overloaded_to_integer_type, 0, 0},
   {"fread", 4, default_intrinsic_type, 0, 0}, 
   {"fwrite", 4, default_intrinsic_type, 0, 0},
-  {"fgetpos", 2, pointer_to_integer_type, 0, 0},
+  {"fgetpos", 2, overloaded_to_integer_type, 0, 0},
   {"fseek", 3, overloaded_to_integer_type, 0, 0},
-  {"fsetpos", 2, pointer_to_integer_type, 0, 0},
-  {"ftell",1, pointer_to_integer_type, 0, 0}, 
-  {"rewind",1, pointer_to_void_type, 0, 0},
-  {"clearerr",1, pointer_to_void_type, 0, 0},
-  {"feof", 1, pointer_to_integer_type, 0, 0},
-  {"ferror", 1, pointer_to_integer_type, 0, 0},
-  {"perror", 1, pointer_to_integer_type, 0, 0},
-  {"__filbuf", 1, pointer_to_integer_type, 0, 0},
+  {"fsetpos", 2, overloaded_to_integer_type, 0, 0},
+  {"ftell",1, default_intrinsic_type, 0, 0}, 
+  {"rewind",1, default_intrinsic_type, 0, 0},
+  {"clearerr",1, default_intrinsic_type, 0, 0},
+  {"feof", 1, overloaded_to_integer_type, 0, 0},
+  {"ferror", 1, overloaded_to_integer_type, 0, 0},
+  {"perror", 1, default_intrinsic_type, 0, 0},
+  {"__filbuf", 1, overloaded_to_integer_type, 0, 0},
   {"__flsbuf", 2, overloaded_to_integer_type, 0, 0},
   {"setbuffer", 3, overloaded_to_void_type, 0, 0},
-  {"setlinebuf", 1, pointer_to_integer_type, 0, 0},
+  {"setlinebuf", 1, default_intrinsic_type, 0, 0},
   {"snprintf", (INT_MAX), overloaded_to_integer_type, 0, 0},
   {"vsnprintf", 4, overloaded_to_integer_type, 0, 0},
-  {"fdopen", 2, overloaded_to_pointer_type, 0, 0}, 
-  {"ctermid", 1, pointer_to_pointer_type, 0, 0}, 
-  {"fileno", 1, pointer_to_integer_type, 0, 0},
-  {"popen", 2, pointer_to_pointer_type, 0, 0}, 
-  {"cuserid", 1, pointer_to_pointer_type, 0, 0}, 
-  {"tempnam", 2, pointer_to_pointer_type, 0, 0}, 
+  {"fdopen", 2, default_intrinsic_type, 0, 0}, 
+  {"ctermid", 1, default_intrinsic_type, 0, 0}, 
+  {"fileno", 1, default_intrinsic_type, 0, 0},
+  {"popen", 2, default_intrinsic_type, 0, 0}, 
+  {"cuserid", 1, default_intrinsic_type, 0, 0}, 
+  {"tempnam", 2,default_intrinsic_type, 0, 0}, 
   {"getopt", 3, overloaded_to_integer_type, 0, 0},
-  {"getsubopt", 3, pointer_to_integer_type, 0, 0},
-  {"getw", 1, pointer_to_integer_type, 0, 0},
+  {"getsubopt", 3, default_intrinsic_type, 0, 0},
+  {"getw", 1, default_intrinsic_type, 0, 0},
   {"putw", 2, overloaded_to_integer_type, 0, 0},
-  {"pclose", 1, pointer_to_integer_type, 0, 0},
+  {"pclose", 1, default_intrinsic_type, 0, 0},
   {"fseeko", 3, overloaded_to_integer_type, 0, 0},
-  {"ftello", 1, pointer_to_overloaded_type, 0, 0},
-  {"fopen64", 2, pointer_to_pointer_type, 0, 0}, 
-  {"freopen64", 3, pointer_to_pointer_type, 0, 0},
-  {"tmpfile64", 1, void_to_pointer_type, 0, 0},
-  {"fgetpos64", 2, pointer_to_integer_type, 0, 0},
-  {"fsetpos64", 2, pointer_to_integer_type, 0, 0},
+  {"ftello", 1, default_intrinsic_type, 0, 0},
+  {"fopen64", 2, default_intrinsic_type, 0, 0}, 
+  {"freopen64", 3, default_intrinsic_type, 0, 0},
+  {"tmpfile64", 1,default_intrinsic_type, 0, 0},
+  {"fgetpos64", 2, default_intrinsic_type, 0, 0},
+  {"fsetpos64", 2, default_intrinsic_type, 0, 0},
   {"fseeko64", 3, overloaded_to_integer_type, 0, 0},
-  {"ftello64", 1, pointer_to_overloaded_type, 0, 0},*/ 
+  {"ftello64", 1, default_intrinsic_type, 0, 0},
 
 
   /*#include <stdlib.h>*/
+
   /*#include <string.h>*/
+
+  {"strcmp",2,overloaded_to_integer_type, 0, 0},
   /*#include <tgmath.h>*/
   /*#include <time.h>*/
   /*#include <wchar.h>*/
   /*#include <wctype.h>*/
+
+  /* #include <fcntl.h>*/
+
+  
+
+  {"fcntl", (INT_MAX), overloaded_to_integer_type, 0, 0},
+  {"open", (INT_MAX), overloaded_to_integer_type, 0, 0},
+  {"creat", 2, overloaded_to_integer_type, 0, 0},
+  {"directio", 2, integer_to_integer_type, 0, 0},
+  {"open64", (INT_MAX), overloaded_to_integer_type, 0, 0},
+  {"creat64", 2, overloaded_to_integer_type, 0, 0},
 
   {NULL, 0, 0, 0, 0}
 };
