@@ -165,11 +165,9 @@ void print_text(fd, t)
 FILE *fd;
 text t;
 {
-    cons *ps;
-
-    for (ps = text_sentences(t); ps != NULL; ps = CDR(ps)) {
-	print_sentence(fd, SENTENCE(CAR(ps)));
-    }
+    MAPL(cs, 
+	 print_sentence(fd, SENTENCE(CAR(cs))), 
+	 text_sentences(t));
 }
 
 string words_to_string(lw)
