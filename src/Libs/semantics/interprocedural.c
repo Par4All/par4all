@@ -3,6 +3,12 @@
  * $Id$
  *
  * $Log: interprocedural.c,v $
+ * Revision 1.30  1999/01/15 08:59:08  irigoin
+ * Bug fix in precondition_intra_to_inter(): a non feasible transformer must
+ * be preserved even though the intersection of the effects of the called
+ * procedure and the basis of the transformer is empty (since the basis of
+ * the transformer is empty).
+ *
  * Revision 1.29  1999/01/14 17:27:43  irigoin
  * Kludge to avoid a useless costly projection in
  * precondition_intra_to_inter(). This was motivated by XERCTL in KIVA,
@@ -490,8 +496,10 @@ cons * le;
      *
      */
     if(ENDP(preserved_values)) {
-	free_transformer(pre);
-	pre = transformer_identity();
+	if(!transformer_empty_p(pre)) {
+	    free_transformer(pre);
+	    pre = transformer_identity();
+	}
     }
     else {
 	pre = transformer_projection_with_redundancy_elimination
