@@ -272,7 +272,7 @@ expression_and_precondition_to_integer_interval(expression e,
     }
     else if(vect_size(v) == 1) {
       Psysteme s = transformer_undefined_p(p) ?
-	sc_make(NIL, NIL) :
+	sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED) :
 	sc_dup((Psysteme) predicate_system(transformer_relation(p)));
       Value lb = VALUE_ZERO, ub = VALUE_ZERO;
       entity var = (entity) vecteur_var(v);
