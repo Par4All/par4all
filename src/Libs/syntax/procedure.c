@@ -388,6 +388,42 @@ cons *l;
     }
 }
 
+void
+remove_module_entity(entity m)
+{
+    /* It is assumed that neither variables nor areas have been declared in m
+     * but that m may have been declared by EXTERNAL in other modules.
+     */
+    gen_array_t modules = db_get_module_list();
+    int module_list_length = gen_array_nitems(modules);
+    int i = 0;
+
+    for(i = 0; i < module_list_length; i++) {
+	entity om = local_name_to_top_level_entity(gen_array_item(modules, i));
+
+	if(!entity_undefined_p(om)) {
+	    value v = entity_initial(om);
+
+	    if(!value_undefined_p(v) && !value_unknown_p(v)) {
+		code c = value_code(v);
+
+		if(!code_undefined_p(c)) {
+		    ifdebug(1) {
+			if(gen_in_list_p(m, code_declarations(c))) {
+			    debug(1, "remove_module_entity",
+				  "Declaration of module %s removed from %s's declarations",
+				  entity_name(m), entity_name(om));
+			}
+		    }
+		    gen_remove(&code_declarations(c), m);
+		}
+	    }
+	}
+    }
+    gen_array_full_free(modules);
+    free_entity(m);
+}
+
 /* this function creates one entity cf that represents the function f being
 analyzed. if f is a Fortran FUNCTION, a second entity is created; this
 entity represents the variable that is used in the function body to
@@ -450,9 +486,18 @@ MakeCurrentFunction(
     free(fcfn);
     ce = global_name_to_entity(TOP_LEVEL_MODULE_NAME, cfn);
     if(!entity_undefined_p(ce) && ce!=cf) {
+      if(!value_undefined_p(entity_initial(cf)) || msf!=TK_BLOCKDATA) {
 	user_warning("MakeCurrentFunction", "Global name %s used for a function or subroutine"
 		     " and for a %s\n", cfn, msf==TK_BLOCKDATA? "blockdata" : "main");
 	ParserError("MakeCurrentFunction", "Name conflict\n");
+      }
+      else {
+	/* A block data may be declared in an EXTERNAL statement, see Standard 8-9 */
+	debug(1, "MakeCurrentFunction", "Entity \"%s\" does not really exist."
+	      " A blockdata is declared in an EXTERNAL statement.");
+	/* remove_variable_entity(ce); */
+	remove_module_entity(ce);
+      }
     }
 
     /* Let's hope cf is not an intrinsic */
@@ -549,6 +594,47 @@ MakeCurrentFunction(
     }
 }
 
+entity
+NameToFunctionalEntity(string name)
+{
+    entity f = gen_find_tabulated
+	(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
+		     BLOCKDATA_PREFIX, name, 0),
+	 entity_domain);
+
+    if(entity_undefined_p(f)) {
+	f = gen_find_tabulated
+	    (concatenate(CurrentPackage, MODULE_SEP_STRING, name, 0),
+	     entity_domain);
+
+	/* Ignore ghost variables, they are *not* in the current scope */
+	f = ghost_variable_entity_p(f)? entity_undefined : f;
+
+	if(entity_undefined_p(f)) {
+	    f = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
+	}
+	else if(!storage_undefined_p(entity_storage(f))
+		&& storage_formal_p(entity_storage(f))) {
+	    /* The functional entity must be a formal parameter */
+	    ;
+	}
+	else if(storage_undefined_p(entity_storage(f))) {
+	    /* The current declaration is wrong and should be fixed
+	     * later, i.e. by MakeExternalFunction() or MakeCallInst()
+	     */
+	    ;
+	}
+	else {
+	    pips_assert("Unexpected kind of functional entity!", TRUE);
+	}
+    }
+    else {
+	/* It is the name of a blockdata */
+	;
+    }
+    return f;
+}
+
 /* 
  * This function creates an external function. It may happen in
  * Fortran that a function is declared as if it were a variable; example:
@@ -567,6 +653,9 @@ MakeCurrentFunction(
  * ie. the variable declaration must be
  * deleted and replaced by a function declaration. 
  *
+ * This function is called when an EXTERNAL or a CALL statement is
+ * analyzed.
+ *
  * See DeclareVariable for other combination based on EXTERNAL
  *
  * Modifications:
@@ -579,11 +668,12 @@ MakeCurrentFunction(
  *    Francois Irigoin, 11 July 1992;
  *  - remove_variable_entity() added to avoid problems in semantics analysis
  *    with an inexisting variable, FI, June 1993;
+ *  - a BLOCKDATA can be declared EXTERNAL, FI, May 1998
  */
 
 entity 
 MakeExternalFunction(
-    entity e, /* entity to be turned an external function */
+    entity e, /* entity to be turned into external function */
     type r /* type of result */)
 {
     type te;
@@ -591,6 +681,11 @@ MakeExternalFunction(
     type tfe;
 
     debug(8, "MakeExternalFunction", "Begin for %s\n", entity_name(e));
+
+    if(entity_blockdata_p(e)) {
+      debug(8, "MakeExternalFunction", "End for blockdata %s\n", entity_name(e));
+      return e;
+    }
 
     te = entity_type(e);
     if (te != type_undefined) {
