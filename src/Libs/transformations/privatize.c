@@ -135,12 +135,13 @@ static list loop_prefix(list l1, list l2)
 /* UPDATE_LOCALS removes the entity E from the locals of loops in LS that
    are not in common with the PREFIX. */
 
-static void update_locals(list prefix, list ls, entity e)
+static void 
+update_locals(list prefix, list ls, entity e)
 {
   debug(1, "update_locals", "Begin\n");
 
     if( ENDP( prefix )) {
-      if(ENDP(ls)) {
+      if(!ENDP(ls)) {
 	ifdebug(1) {
 	    debug(1, "update_locals", "Removing %s", entity_name( e )) ;
 	    fprintf( stderr, " from locals of " ) ;
@@ -255,7 +256,8 @@ bool is_implied_do_index(entity e, instruction ins)
    statement ST of the vertex V of the dependency graph. Arrays are not 
    privatized. */
 
-static void try_privatize(vertex v, statement st, effect f, entity e)
+static void 
+try_privatize(vertex v, statement st, effect f, entity e)
 {
     cons *ls ;
 
@@ -266,9 +268,15 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
     ls = load_statement_enclosing_loops(st);
 
     ifdebug(1) {
-      debug(1, "try_privatize", "Trying to privatize %s in statement %d with local(s) ",
+	if(statement_loop_p(st)) {
+	    debug(1, "try_privatize", "Trying to privatize %s in loop statement %d with local(s) ",
+		  entity_local_name( e ), statement_number( st )) ;
+	    print_arguments(loop_locals(statement_loop(st)));
+	}
+	else {
+	    debug(1, "try_privatize", "Trying to privatize %s in statement %d\n",
 	    entity_local_name( e ), statement_number( st )) ;
-      print_arguments(loop_locals(statement_loop(st)));
+	}
     }
 
     MAPL( succs, {
