@@ -861,27 +861,31 @@ int db_delete_obsolete_resources(bool (*keep_p)(string, string))
  * As FI points out to me (FC), it just means that the
  * name has been used by some-one, some-where, some-time...
  *
- * It just checks that some, maybe empty, resource table is associated to 
+ * It just checks that an non empty resource table is associated to 
  * this name. The table may be created when resources are marked as
- * required by pipsmake, and is never destroyed.
+ * required by pipsmake, and is never destroyed?
  */
 bool db_module_exists_p(string name)
 {
-  if (pips_database_undefined_p()) 
-    return FALSE;
+  bool ok = FALSE;
 
-  DB_RESOURCES_MAP(os, or, 
+  if (!pips_database_undefined_p()) /* some database? */
   {
-    ifdebug(9) {
-      pips_assert("consistant stuff", 
-		  db_owned_resources_consistent_p(or));
-    }
-    if (same_string_p(db_symbol_name(os), name)) 
-      return TRUE;
-  },
-		   get_pips_database());
+    db_symbol s = gen_find_tabulated(name, db_symbol_domain);
+    if (!db_symbol_undefined_p(s)) /* some symbol? */
+    {
+      db_resources dbr = get_pips_database();
+      if (bound_db_resources_p(dbr, s)) /* some resource table? */
+      {
+	db_owned_resources or = apply_db_resources(dbr, s);
 
-  return FALSE;
+	/* some actual resource? */
+	ok = hash_table_entry_count(db_owned_resources_hash_table(or))>0;
+      }
+    }
+  }
+
+  return ok;
 }
 
 gen_array_t db_get_module_list_initial_order(void)
@@ -904,6 +908,7 @@ gen_array_t db_get_module_list_initial_order(void)
     /* if it is a module, append... */
     if (!string_undefined_p(name) &&
 	!same_string_p(name, "") && 
+	/* I should check that some actual resources is stored? */
 	bound_db_resources_p(dbr, symbol))
       gen_array_dupappend(a, name);
   },
@@ -934,3 +939,5 @@ gen_array_t db_get_module_list(void)
     gen_array_sort(a);
     return a;
 }
+
+
