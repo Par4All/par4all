@@ -180,8 +180,7 @@ parse_properties(void)
 	if ((opr = (property) hash_get(pl, n)) != 
             (property) HASH_UNDEFINED_VALUE) {
             if(!property_equal_p(pr, opr))
-                fprintf(stderr, 
-			"[parse_properties] property %s redefined\n", n);
+                fprintf(stderr, "user warning, property %s redefined\n", n);
             free_property(opr);
             hash_update(pl, n, (char *) pr); 
         }
