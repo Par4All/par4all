@@ -357,6 +357,21 @@ AnalyzeData(list ldvr, list ldvl)
     }
 }
 
+
+/* type_equal_p -> same_basic_and_scalar_p in latter... FC.
+ */
+static bool
+same_basic_and_scalar_p(type t1, type t2)
+{
+    variable v1, v2;
+    if (!type_variable_p(t1) || !type_variable_p(t2)) return FALSE;
+    v1 = type_variable(t1);
+    v2 = type_variable(t2);
+    if (variable_undefined_p(v1) || variable_undefined_p(v2)) return FALSE;
+    if (!basic_equal_p(variable_basic(v1), variable_basic(v2))) return FALSE;
+    return variable_dimensions(v1)==NIL && variable_dimensions(v2)==NIL;
+}
+
 /* void DeclareVariable(e, t, d, s, v): update entity e description
  * as declaration statements are encountered. Examples of sequences:
  *
@@ -495,19 +510,23 @@ DeclareVariable(
 		    nt = MakeTypeVariable
 			(gen_copy_tree(variable_basic(type_variable(t))),
 			 variable_dimensions(type_variable(et)));
-		    if(!type_equal_p(entity_type(e),nt)) {
+		    
+		    if(!same_basic_and_scalar_p(entity_type(e), nt))
+		    {
+			
 			if(/*FI: to check update_common_layout*/ FALSE && 
 			   entity_storage(e)!=storage_undefined &&
 			   storage_ram_p(entity_storage(e)) &&
 			   basic_type_size(variable_basic(type_variable(t)))
-			   > basic_type_size(variable_basic(type_variable(entity_type(e))))) {
+	   > basic_type_size(variable_basic(type_variable(entity_type(e))))) 
+			{
 			    user_warning("DeclareVariable",
      "Storage information for %s is likely to be wrong because its type is "
      "redefined as a larger type\nType is *not* redefined internally to avoid "
      "aliasing\n", entity_local_name(e));
-			    /* FI: it should be redefined and the offset be updated,
-			     * maybe in check_common_area(); 1 Feb. 1994
-			     */
+		    /* FI: it should be redefined and the offset be updated,
+		     * maybe in check_common_area(); 1 Feb. 1994
+		     */
 			}
 			else {
 			    entity_type(e) = nt;
