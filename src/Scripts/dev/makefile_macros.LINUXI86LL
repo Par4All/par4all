@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: makefile_macros.LINUXI86LL,v $
+# Revision 1.6  1998/01/23 09:09:25  coelho
+# .pentium included.
+#
 # Revision 1.5  1997/09/09 13:08:23  coelho
 # smaller.
 #
@@ -13,6 +16,7 @@
 
 include $(ROOT)/Include/makefile_macros.GNULL
 include $(ROOT)/Include/makefile_macros.linux
+include $(ROOT)/Include/makefile_macros.pentium
 
 # end of it!
 #
