@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: host_node_entities.c,v $
+ * Revision 1.23  1997/04/17 18:48:48  coelho
+ * has_put warnings--
+ *
  * Revision 1.22  1997/03/20 10:26:11  coelho
  * RCS headers.
  *
@@ -24,15 +27,19 @@ GENERIC_GLOBAL_FUNCTION(old_node, entitymap)
 void store_new_node_variable(new, old)
 entity new, old;
 {
-    pips_assert("defined",!entity_undefined_p(new)&&!entity_undefined_p(old));
-    store_new_node(old, new), store_old_node(new, old);
+    pips_assert("defined", !entity_undefined_p(new)&&!entity_undefined_p(old));
+
+    store_or_update_new_node(old, new);
+    store_or_update_old_node(new, old);
 }
 
 void store_new_host_variable(new, old)
 entity new, old;
 {
-    pips_assert("defined",!entity_undefined_p(new) && !entity_undefined_p(old));
-    store_new_host(old, new), store_old_host(new, old);
+    pips_assert("defined", !entity_undefined_p(new)&&!entity_undefined_p(old));
+
+    store_or_update_new_host(old, new);
+    store_or_update_old_host(new, old);
 }
 
 void init_entity_status()
