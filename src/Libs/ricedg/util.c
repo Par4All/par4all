@@ -271,7 +271,7 @@ Pbase b;
 {
     fprintf(fd,"(");
     for(; b!=NULL; b=b->succ) {
-	fprintf(fd, " %d",vect_coeff(b->var,v));
+	fprint_string_Value(fd, " ",vect_coeff(b->var,v));
 	if(b->succ !=NULL)
 	    fprintf(fd,",");
     }
@@ -293,7 +293,8 @@ Pbase basis;
 	fprintf(fd,"%d vertice(s) :",sg_nbre_sommets(dc));
 	v = sg_sommets(dc);
 	for(; v!=NULL; v= v->succ) {
-	    fprintf(fd, " \n\t denominator = %d\t", v->denominateur);
+	    fprint_string_Value(fd, " \n\t denominator = ", v->denominateur);
+	    fprintf(fd, "\t");
 	    print_vect_in_vertice_val(fd,v->vecteur,basis);	
 	}
 
