@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/08/29 13:56:30 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/08/30 15:47:18 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -115,8 +115,6 @@ c-----------------
 c
 c HPFC_CMPLID
 c
-cdecl      external HPFC_CMPLID
-cdecl      integer HPFC_CMPLID
       integer function HPFC_CMPLID(pn, p1, p2, p3, p4, p5, p6, p7)
       integer pn, p1, p2, p3, p4, p5, p6, p7
       include 'hpfc_commons.h'
@@ -245,8 +243,6 @@ c-----------------
 c
 c HPFC_OWNERP
 c
-cdecl      external HPFC_OWNERP
-cdecl      logical  HPFC_OWNERP
 c
       logical function HPFC_OWNERP()
       include 'hpfc_commons.h'
@@ -268,8 +264,6 @@ c-----------------
 c
 c HPFC_SENDERP
 c
-cdecl      external HPFC_SENDERP
-cdecl      logical  HPFC_SENDERP
 c
       logical function HPFC_SENDERP()
       include 'hpfc_commons.h'
@@ -280,8 +274,6 @@ c-----------------
 c
 c HPFC_COMPUTERP
 c
-cdecl      external HPFC_COMPUTERP
-cdecl      logical  HPFC_COMPUTERP
 c
       logical function HPFC_COMPUTERP()
       include 'hpfc_commons.h'
@@ -292,8 +284,6 @@ c-----------------
 c
 c HPFC_COMPUTERINOWNERSP
 c
-cdecl      external HPFC_COMPUTERINOWNERSP
-cdecl      logical  HPFC_COMPUTERINOWNERSP
 c
       logical function HPFC_COMPUTERINOWNERSP()
       include 'hpfc_commons.h'
@@ -723,8 +713,6 @@ c HPFC_LOCALINDGAMMA
 c
 c computation of the gamma function for local indice access
 c
-cdecl      external HPFC_LOCALINDGAMMA
-cdecl      integer  HPFC_LOCALINDGAMMA
 c
       integer function HPFC_LOCALINDGAMMA(an, dim, indice)
       integer an, dim, indice
@@ -753,8 +741,6 @@ c HPFC_LOCALINDDELTA
 c
 c computation of the delta function for local indice access
 c
-cdecl      external HPFC_LOCALINDDELTA
-cdecl      integer HPFC_LOCALINDDELTA 
 c
       integer function HPFC_LOCALINDDELTA(an, dim, indice)
       integer an, dim, indice
@@ -783,8 +769,6 @@ c-----------------
 c
 c HPFC_LOCALIND
 c
-cdecl      external HPFC_LOCALIND
-cdecl      integer  HPFC_LOCALIND
 c
       integer function HPFC_LOCALIND(an, dim, indice)
       integer an, dim, indice
@@ -1030,8 +1014,6 @@ c-----------------
 c
 c HPFC_DIVIDE
 c
-cdecl      external HPFC_DIVIDE
-cdecl      integer HPFC_DIVIDE
       integer function HPFC_DIVIDE(i, j)
       integer i,j
       if (i.ge.0) then
