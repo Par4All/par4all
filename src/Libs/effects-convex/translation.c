@@ -463,12 +463,12 @@ void append_declaration_sc_if_exact_without_constraints(region r)
   if (entity_scalar_p(v) || region_may_p(r)) return;
   /* we have an exact array region */
 
-  pips_debug(3, "considering exact region of array %s\n", entity_name(v));
+  pips_debug(5, "considering exact region of array %s\n", entity_name(v));
   
   if (!some_phi_variable(sc_egalites(s)) && 
       !some_phi_variable(sc_inegalites(s)))
   {
-    pips_debug(1, "appending declaration system\n");
+    pips_debug(7, "appending declaration system\n");
     region_sc_append(r, entity_declaration_sc(region_entity(r)), FALSE);
   } 
 }
