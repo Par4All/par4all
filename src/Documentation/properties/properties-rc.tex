@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1996/11/14 13:24:30 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/04 18:39:10 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -182,6 +182,14 @@ TPIPS_NO_EXECUTION_MODE      FALSE
 \label{section-analyses}
 
 \subsection{Parser}
+
+Some subtle errors occur because the PIPS parser uses a fixed
+format. Columns 73 to 80 are ignored, but the parser may emit a warning
+if some characters are encountered in this comment field.
+
+\begin(verbatim}
+PARSER_DO_NOT_WARN_73_80	TRUE
+\end{document}
 
 \subsection{Chains}
 
