@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1994/12/30 13:58:38 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/03/17 17:11:28 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -517,14 +517,25 @@ int data ;
 	gen_trav_simple(dlp->domain, obj+data+1, dr);
 	break ;
     }
+	/* well, what's given is *directly* the object,
+	 * not a chunk to the object, otherwise you can't make
+	 * the function works, that is retrieve the needed values...
+	 * FC
+	 */
     case ARROW_OP: 
+    {
+	union domain 
+	    *dkeyp=dlp->domain, 
+	    *dvalp=dlp->cdr->domain;
+
 	HASH_MAP(k, v, 
 	     {
-		 gen_trav_simple( dlp->domain, (gen_chunk *)k, dr ) ;
-		 gen_trav_simple( dlp->cdr->domain, (gen_chunk *)v, dr ) ;
+		 gen_trav_simple(dkeyp, (gen_chunk *) k, dr) ;
+		 gen_trav_simple(dvalp, (gen_chunk *) v, dr) ;
 	     }, 
 		 (obj+data)->h ) ;
 	break ;
+    }
     default:
 	fatal( "gen_trav_obj: Unknown op %s\n", itoa(dp->co.op)) ;
     }
@@ -1637,7 +1648,7 @@ union domain *dp ;
    number of which is printed before the object.) */
 
 void
-gen_write( fd, obj )
+gen_write(fd, obj)
 FILE *fd ;
 gen_chunk *obj ;
 {
@@ -1659,6 +1670,7 @@ gen_chunk *obj ;
 
     shared_pointers( obj, FALSE ) ;
     (void) fprintf( fd, "%d ", shared_number ) ;
+
     gen_trav_obj( obj, &dr ) ;
 
     pop_gen_trav_env() ;
