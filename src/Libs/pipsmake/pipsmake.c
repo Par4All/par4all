@@ -198,11 +198,13 @@ string rname, oname;
 
     status = rmake(rname, oname);
 
-    if ( signal_occured() ) {
-	accounting_signal();
-	make_close_program();
-	exit(1);
-    }
+    /*
+       if ( signal_occured() ) {
+       accounting_signal();
+       make_close_program();
+       exit(1);
+       }
+       */
 
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
