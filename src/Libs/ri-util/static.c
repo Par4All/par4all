@@ -107,7 +107,5 @@ reset_current_module_statement()
 void 
 error_reset_current_module_statement()
 {
-    pips_assert("current module statement defined", 
-       !statement_undefined_p(current_module_statement));
     current_module_statement = statement_undefined;
 }
