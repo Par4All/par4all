@@ -47,7 +47,7 @@ string full_name;
 					      make_type(is_type_void, UU))),
 		    MakeStorageRom(),
 		    make_value(is_value_code,
-			       make_code(NIL,"")));
+			       make_code(NIL, strdup(""))));
 
     name = module_local_name(e);
     DynamicArea = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
