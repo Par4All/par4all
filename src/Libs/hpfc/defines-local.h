@@ -3,6 +3,9 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.71  1998/04/14 16:27:56  coelho
+ * switch to linear.h
+ *
  * Revision 1.70  1998/03/17 15:38:30  coelho
  * statement number added
  *
@@ -47,15 +50,7 @@
 
 /*  C3/LINEAR
  */
-#include "boolean.h"
-#include "arithmetique.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "polyedre.h"
-#include "sg.h"
+#include "linear.h"
 
 /*  NEWGEN
  */
