@@ -122,20 +122,21 @@ char *s ;
 /* MAX_TABULATED_ELEMENTS returns the maximum number of elements for 
    tabulated domains. */
 
-int max_tabulated_elements()
+int max_tabulated_elements(void)
 {
-  char *s ;
   static int max = -1 ;
 
-  if( max < 0 ) {
-    if( (s=getenv( "NEWGEN_MAX_TABULATED_ELEMENTS" )) == NULL ) {
-      user( "max_tabulated_elements: %s",
-	   "NEWGEN_MAX_TABULATED_ELEMENTS not set\n" ) ;
-      exit( 1 ) ;
-    }
-    max = atoi( s );
+  if(max<0) /* then initialization needed */
+  {
+      char *s = getenv("NEWGEN_MAX_TABULATED_ELEMENTS");
+
+      if (s) /* value taken from the environment */
+	  max = atoi(s);
+      else
+	  max = 12000; /* default value assume if nothing specified */
   }
-  return( max ) ;
+
+  return max;
 }
 
 /* INIT initializes global data structures. */
