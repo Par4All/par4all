@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1994/06/17 13:21:48 $, ) version $Revision$,
+# $RCSfile: validate-sequential,v $ ($Date: 1994/12/01 17:33:15 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -214,6 +214,8 @@ test_aspect()
      then
        $DEBUG " || .test case"
        $shell $aspect/$name.test > $tmpout 2> $tmperr
+       [ -f core ] && rm -f core
+
        report $? \
          "Execution of $aspect/$name.test failed with $pips_version" || \
          { $DEBUG " || error"; continue;}
@@ -231,6 +233,8 @@ test_aspect()
        sed "s/tested_file/$name/g;s/TESTED_FILE/$u_name/g" \
        $aspect/default_test > $aspect/$name.test
        $shell $aspect/$name.test > $tmpout 2> $tmperr
+       [ -f core ] && rm -f core
+
        report $? "Execution of $aspect/default_test on $name.f failed with $pips_version" || { $DEBUG " || error"; rm -f $aspect/$name.test; continue;}
        
        rm -f $aspect/$name.test
@@ -246,10 +250,13 @@ test_aspect()
      
      for module in `cat $name.database/modules` ; do
        Display -m $module > $tmpout 2> $tmperr
+       [ -f core ] && rm -f core
+
        report $? "Cannot parallelize module $module in $file with $pips_version" || continue
        
        make_diff $aspect $name $module
      done
+
      
      rm -f $tmpout $tmperr
      Delete $name > $tmpout 2> $tmperr
