@@ -734,6 +734,8 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
   
     value_init(tmp);
     d = D->Dimension;
+    if (MAXRAYS < 2*D->NbConstraints)
+	MAXRAYS = 2*D->NbConstraints;
     M = Matrix_Alloc(MAXRAYS, D->Dimension+2);
     M->NbRows = D->NbConstraints;
   
