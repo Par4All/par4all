@@ -686,7 +686,7 @@ parse_arguments(int argc, char * argv[])
 	    break;
 	case 'h':
 	case '?':
-	    fprintf (stderr,usage, argv[0]);
+	    fprintf (stderr, usage, argv[0]);
 	    return;
 	    break;
 	case 'n':
@@ -711,28 +711,53 @@ parse_arguments(int argc, char * argv[])
 	/* process file arguments. */
 	while (optind < argc )
 	{
+	    string tps = NULL, saved_srcpath = NULL;
 	    FILE * toprocess;
 	    bool use_rl = FALSE;
 
-	    if (same_string_p(argv[optind], "-")) {
+	    if (same_string_p(argv[optind], "-")) 
+	    {
 		toprocess = stdin;
 		use_rl = isatty(0);
 	    }
-	    else {
-		if((toprocess = fopen(argv[optind], "r"))==NULL) {
-		    perror(argv[optind]);
+	    else
+	    {
+		string dir, new_srcpath;
+		saved_srcpath = getenv("PIPS_SRCPATH");
+		saved_srcpath = strdup(saved_srcpath? saved_srcpath: "");
+		tps = find_file_in_directories(argv[optind], saved_srcpath);
+		dir = dirname(tps);
+		new_srcpath = strdup
+		    (concatenate("PIPS_SRCPATH=", saved_srcpath, ":", dir, 0));
+		free(dir), dir = NULL;
+
+		pips_debug(1, "PIPS_SRCPATH=%s\n", new_srcpath);
+
+		/* the tpips dirname is appended to PIPS_SRCPATH */
+		putenv(new_srcpath);
+
+		if ((toprocess = fopen(tps, "r"))==NULL)
+		{
+		    perror(tps);
 		    exit(1);
 		}
-		else {
-		    use_rl = FALSE;
-		}
+
+		use_rl = FALSE;
 	    }
 	    
-	    pips_debug(1, "reading from file %s\n",argv[optind]);
+	    pips_debug(1, "reading from file %s\n", tps);
 	    
 	    tpips_process_a_file (toprocess, use_rl);
+
 	    if (!same_string_p(argv[optind], "-"))
-		safe_fclose(toprocess, argv[optind]);
+		safe_fclose(toprocess, tps);
+	    if (tps)
+		free(tps), tps = NULL;
+	    if (saved_srcpath) 
+	    {
+		putenv(strdup(concatenate("PIPS_SRCPATH=", saved_srcpath, 0)));
+		free(saved_srcpath), saved_srcpath = NULL;
+	    }
 	    
 	    optind++;
 	}
