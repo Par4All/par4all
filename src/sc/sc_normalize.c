@@ -3,7 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-#include <values.h>
+/* #include <values.h> */
+#include <limits.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -674,7 +675,7 @@ Psysteme sc_strong_normalize4(Psysteme ps, char * (*variable_name)(Variable))
     /*
     Psysteme new_ps =
 	sc_strong_normalize_and_check_feasibility2
-	    (ps, sc_normalize, variable_name, MAXINT);
+	    (ps, sc_normalize, variable_name, INT_MAX);
 	    */
 
     Psysteme new_ps =
@@ -711,7 +712,7 @@ Psysteme sc_strong_normalize5(Psysteme ps, char * (*variable_name)(Variable))
  * the lexicographic minimal variables is chosen among equivalent variables.
  *
  * Equations with more than "level" variables are not used for the 
- * substitution. Unless level==MAXINT.
+ * substitution. Unless level==INT_MAX.
  *
  * Finally, an additional normalization procedure is applied on the
  * substituted system. Another stronger normalization can be chosen
