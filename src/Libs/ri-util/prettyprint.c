@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.103  1997/11/22 12:16:49  coelho
+ * OMP style prettyprint of parallel loops added.
+ *
  * Revision 1.102  1997/11/21 13:33:38  coelho
  * type fixed.
  *
@@ -129,7 +132,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.102 1997/11/21 13:33:38 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.103 1997/11/22 12:16:49 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -1007,16 +1010,14 @@ text_block(
     }
 
     if (!get_bool_property("PRETTYPRINT_FOR_FORESYS") &&
-			   (get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
-			    get_bool_property("PRETTYPRINT_BLOCKS"))) {
-	unformatted u;
-
-	u = make_unformatted(strdup("C"), n, margin, pend);
-
+	(get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
+	 get_bool_property("PRETTYPRINT_BLOCKS"))) 
+    {
+	unformatted u = make_unformatted(strdup("C"), n, margin, pend);
 	ADD_SENTENCE_TO_TEXT(r, 
 			     make_sentence(is_sentence_unformatted, u));
     }
-    return(r) ;
+    return r;
 }
 
 /* private variables.
@@ -1029,6 +1030,7 @@ loop_private_variables(loop obj)
     bool
 	all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"),
 	hpf_private = pp_hpf_style_p(),
+	omp_private = pp_omp_style_p(),
 	some_before = FALSE;
     list l = NIL;
 
@@ -1056,8 +1058,12 @@ loop_private_variables(loop obj)
      */
     if (l)
     {
-	l = CONS(STRING, MAKE_SWORD(hpf_private ? "NEW(" : "PRIVATE "), l);
-	if (hpf_private) CHAIN_SWORD(l, ")");
+	string private;
+	if (hpf_private) private = "NEW(";
+	else if (omp_private) private = "PRIVATE(";
+	else private = "PRIVATE ";
+	l = CONS(STRING, MAKE_SWORD(private), l);
+	if (hpf_private || omp_private) CHAIN_SWORD(l, ")");
     }
 
     return l;
@@ -1068,54 +1074,89 @@ loop_private_variables(loop obj)
  * unformatted domain, because the directive prolog would not be well
  * managed there.
  */
-#define HPF_DIRECTIVE "!HPF$ "
+static string
+marged(
+    string prefix,
+    int margin)
+{
+    int len = strlen(prefix), i;
+    string result = (string) malloc(strlen(prefix)+margin+1);
+    strcpy(result, prefix);
+    for (i=len; margin-->0;) 
+	result[i++] = ' '; result[i]='\0';
+    return result;
+}
 
 static text 
-text_hpf_directive(
+text_directive(
     loop obj,   /* the loop we're interested in */
-    int margin) /* margin */
+    int margin,
+    string basic_directive,
+    string basic_continuation,
+    string parallel)
 {
-    list /* of string */ l = NIL, ln = NIL,
-         /* of sentence */ ls = NIL;
+    string
+	dir = marged(basic_directive, margin),
+	cont = marged(basic_continuation, margin);
+    text t = make_text(NIL);
+    char buffer[100]; /* ??? */
+    list /* of string */ l = NIL;
+    bool is_hpf = pp_hpf_style_p(), is_omp = pp_omp_style_p();
+
+    /* start buffer */
+    buffer[0] = '\0';
     
     if (execution_parallel_p(loop_execution(obj)))
     {
+	add_to_current_line(buffer, dir, cont, t, TRUE);
+	add_to_current_line(buffer, parallel, cont, t, TRUE);
 	l = loop_private_variables(obj);
-	ln = CHAIN_SWORD(ln, "INDEPENDENT");
-	if (l) ln = CHAIN_SWORD(ln, ", ");
+	if (l && is_hpf) 
+	    add_to_current_line(buffer, ", ", cont, t, TRUE);
     }
     else if (get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"))
-	l = loop_private_variables(obj);
-    
-    ln = gen_nconc(ln, l);
-    
-    /* ??? directly put as formatted, doesn't matter?
-     */
-    if (ln) 
     {
-	ls = CONS(SENTENCE, 
-		  make_sentence(is_sentence_formatted, strdup("\n")), NIL);
-	
-	ln = gen_nreverse(ln);
-
-	MAPL(ps, 
+	l = loop_private_variables(obj);
+	if (l) 
 	{
-	    ls = CONS(SENTENCE,
-		make_sentence(is_sentence_formatted, STRING(CAR(ps))), ls);
-	},
-	     ln);
-	
-	for (; margin>0; margin--) /* margin managed by hand:-) */
-	    ls = CONS(SENTENCE, make_sentence(is_sentence_formatted, 
-					    strdup(" ")), ls);
-
-	ls = CONS(SENTENCE, make_sentence(is_sentence_formatted, 
-					  strdup(HPF_DIRECTIVE)), ls);
-
-	gen_free_list(ln);
+	    add_to_current_line(buffer, dir, cont, t, TRUE);
+	    if (is_omp) add_to_current_line(buffer, "DO", cont, t, TRUE);
+	}
     }
+    
+    if (strlen(buffer)>0)
+	MAP(STRING, s, add_to_current_line(buffer, s, cont, t, FALSE), l);
 
-    return make_text(ls);
+    /* what about reductions? should be associated to the ri somewhere.
+     */
+    close_current_line(buffer, t);
+    free(dir);
+    free(cont);
+    return t;
+}
+
+#define HPF_SENTINEL 		"!HPF$"
+#define HPF_DIRECTIVE 		HPF_SENTINEL " "
+#define HPF_CONTINUATION 	HPF_SENTINEL "x"
+#define HPF_INDEPENDENT 	"INDEPENDENT"
+
+static text
+text_hpf_directive(loop l, int m)
+{
+    return text_directive(l, m, "\n" HPF_DIRECTIVE, HPF_CONTINUATION,
+			  HPF_INDEPENDENT);
+}
+
+#define OMP_SENTINEL 		"!$OMP"
+#define OMP_DIRECTIVE 		OMP_SENTINEL " "
+#define OMP_CONTINUATION 	OMP_SENTINEL "x"
+#define OMP_PARALLELDO		"PARALLEL DO "
+
+static text 
+text_omp_directive(loop l, int m)
+{
+    return text_directive(l, m, "\n" OMP_DIRECTIVE, OMP_CONTINUATION,
+			  OMP_PARALLELDO);
 }
 
 text 
@@ -1181,10 +1222,10 @@ text_loop(
 	pips_error("text_loop", "Unknown tag\n") ;
     }
 
-    /* HPF directives before the loop if required (INDEPENDENT and NEW)
-     */
-    if (hpf_prettyprint)
-	MERGE_TEXTS(r, text_hpf_directive(obj, margin));
+    /* HPF directives before the loop if required (INDEPENDENT and NEW) */
+    if (hpf_prettyprint)  MERGE_TEXTS(r, text_hpf_directive(obj, margin));
+    /* idem if Open MP directives are required */
+    if (pp_omp_style_p()) MERGE_TEXTS(r, text_omp_directive(obj, margin));
 
     /* LOOP prologue.
      */
