@@ -354,7 +354,12 @@ entity m;
 	  reference_variable(effect_reference(EFFECT(CAR(cef))));
 	  action a = effect_action(EFFECT(CAR(cef)));
 	  if(integer_scalar_entity_p(e) && action_write_p(a)) 
-	      add_intraprocedural_value_entities(e);
+	      if(storage_return_p(entity_storage(e))) {
+		  add_interprocedural_value_entities(e);
+	      }
+	      else {
+		  add_intraprocedural_value_entities(e);
+	      }
       },
 	 module_intra_effects);
 
