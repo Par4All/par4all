@@ -3,6 +3,10 @@
  * $Id$
  * 
  * $Log: tiling.c,v $
+ * Revision 1.4  1998/10/13 07:17:53  irigoin
+ * Intermediate version of tiling which works on at least a small set of
+ * cases for Martin Griebl's visit.
+ *
  * Revision 1.3  1998/10/12 17:00:37  ancourt
  * essai ca code generation
  *
@@ -143,7 +147,8 @@ interactive_partitioning_matrix(matrice P, int n)
 }
 
 
-/* Generate the tile membership constraints
+/* Generate the tile membership constraints between a tile coordinates and
+ an iteration coordinate
  */
 static Psysteme
 tile_membership_constraints(Pbase initial_basis,
@@ -178,11 +183,12 @@ tile_membership_constraints(Pbase initial_basis,
 	    col++, civ = vecteur_succ(civ), ctv = vecteur_succ(ctv)) {
 	    if(ACCESS(HT, dim, row, col)!=VALUE_ZERO) {
 		Value coeff = ACCESS(HT, dim, row, col);
+		Value offset = vect_coeff(vecteur_var(civ), tiling_offset);
+
 		vect_add_elem(&upper, vecteur_var(civ), coeff);
+		vect_add_elem(&upper, TCST, value_uminus(offset*coeff));
 	    }
 	    if(col==row) {
-		/* For the time being, I do not know what to do with the offset! */
-		/* Value offset = vect_coeff(civ, tiling_offset); */
 		vect_add_elem(&upper, vecteur_var(ctv), value_uminus(k));
 	    }
 	}
@@ -205,62 +211,78 @@ tile_membership_constraints(Pbase initial_basis,
     return mc;
 }
 
+/* Find the origin of the iteration domain. Use 0 as default coordinate */
 
-/* Generate tiled code for a loop nest, PPoPP'91
+Pvecteur
+loop_nest_to_offset(list lls)
+{
+    Pvecteur origin = VECTEUR_NUL;
+    list cs = list_undefined;
+
+    for (cs = lls; cs != NIL; cs = CDR(cs)){
+	loop l = instruction_loop(statement_instruction(STATEMENT(CAR(cs))));
+	entity ind = loop_index(l);
+	range r = loop_range(l);
+	expression lower = range_lower(r);
+	int val;
+
+	if(expression_integer_value(lower, &val)) {
+	    vect_chg_coeff(&origin, (Variable) ind, (Value) val);
+	}
+    }
+
+    return origin;
+}
+
+/* Generate tiled code for a loop nest, PPoPP'91, p. 46, Figure 15.
+ *
+ * The row-echelon algorithm is called from new_loop_bound().
  */
 
 statement 
 tiling( list lls)
 {
     Psysteme sci;			/* iteration domain */
-    Psysteme scn;			/* sc nouveau */
     Psysteme sc_tile_scan;
     Psysteme sc_tile;
-    Psysteme sc_newbase;
     Psysteme mc = SC_UNDEFINED; /* Tile membership constraints */
     Psysteme sc_B_prime = SC_UNDEFINED;
     Psysteme sc_B_second = SC_UNDEFINED;
     Pbase initial_basis = NULL;
     Pbase tile_basis = NULL;
-    Pbase local_basis = NULL;
+    Pbase reverse_tile_basis = NULL;
+    /* Pbase local_basis = NULL; */
     Pbase new_basis = NULL;
-    matrice B; /* Constraints for loop bounds */
     matrice P; /* Partitioning matrix */
     matrice HT; /* Transposed matrix of the inverse of P */
-    /*
-    matrice S;
-    matrice AG;
-    matrice A;
-    */
     matrice G; /* Change of basis in the tile space to use vector 1 as hyperplane direction */
-    matrice PG; /* Change of basis from the hyperplaned tile space to the iteration space */
-    matrice BPG; /* Constraints for the tile coordinates */
     int n;				/* number of indices, i.e. loop nest depth */
-    int m ;				/* number of constraints */
     Value *h;
     statement s_lhyp;
     Pvecteur *pvg;
     Pbase pb;  
     expression lower, upper;
-    Pvecteur pv1, pv2;
-    loop l;
     int col;
     Pvecteur to = VECTEUR_NUL; /* Tiling offset: 0 by default */
 
     debug_on("TILING_DEBUG_LEVEL");
 
-    debug(8,"tiling","Begin:\n");
+    debug(8,"tiling","Begin with iteration domain:\n");
 
-    /* make the  constraint system for the iteration space */
+    /* make the constraint system for the iteration space and find a good
+       origin for the tiling */
+
     sci = loop_iteration_domaine_to_sc(lls, &initial_basis);
-    
-    /* create the constraint matrix B for the loop bounds */
     n = base_dimension(initial_basis);
-    m = sci->nb_ineq;
-    B = matrice_new(m,n);
-    sys_matrice_index(sci, initial_basis, B, n, m);
+    to = loop_nest_to_offset(lls);
+    ifdebug(8) {
+	sc_fprint(stderr, sci, entity_local_name);
+	debug(8,"tiling","And with origin:\n");
+	vect_fprint(stderr, to, entity_local_name);
+    }
 
     /* computation of the partitioning matrix P and its inverse HT */
+
     P = matrice_new(n, n);
     HT = matrice_new(n, n);
 
@@ -283,6 +305,7 @@ tiling( list lls)
     }
 
     /* Compute B': each iteration i in the iteration space is linked to its tile s */
+
     derive_new_basis(initial_basis, &tile_basis, make_tile_index_entity);
     mc = tile_membership_constraints(initial_basis, tile_basis, HT, to);
     mc = sc_normalize(mc);
@@ -297,30 +320,33 @@ tiling( list lls)
 	sc_fprint(stderr, sc_B_prime, entity_local_name);
     }
     mc = SC_UNDEFINED;
+    /* Save a copy to compute B" later */
     sc_B_second = sc_dup(sc_B_prime);
 
     /* Get constraints on tile coordinates */
+
     sc_projection_along_variables_ofl_ctrl(&sc_B_prime, initial_basis, OFL_CTRL);
     ifdebug(8) {
 	(void) fprintf(stderr,"Tile domain:\n");
 	sc_fprint(stderr, sc_B_prime, entity_local_name);
     }
 
-    /* Build code to scan the tiles */
+    /* Build the constraint system to scan the set of tiles */
     sc_tile_scan = new_loop_bound(sc_B_prime, tile_basis);
     ifdebug(8) {
 	(void) fprintf(stderr,"Tile domain in echelon format:\n");
 	sc_fprint(stderr, sc_tile_scan, entity_local_name);
     }
-    /* Build the new basis (tile_basis+initial_basis)*/
+
+    /* CA: Build the new basis (tile_basis+initial_basis)*/
     /* base It, Jt, I, J  pour notre exemple */ 
-    new_basis = vect_add(vect_dup(initial_basis),vect_dup(tile_basis)
-			 );
- ifdebug(8) {
+    new_basis = vect_add(vect_dup(initial_basis),vect_dup(tile_basis));
+    ifdebug(8) {
 	(void) fprintf(stderr,"new_basis\n");
 	vect_fprint(stderr, new_basis, entity_local_name);
     }
-    /* Build the code to scan any one tile */
+
+    /* Build the constraint system sc_tile to scan one tile (BS IN PPoPP'91 paper) */
     ifdebug(8) {
 	(void) fprintf(stderr,"sc_B_second:\n");
 	sc_fprint(stderr, sc_B_second, entity_local_name);
@@ -337,9 +363,9 @@ tiling( list lls)
     for(col=0; col<n; col++) {
 	h[col] = VALUE_ONE;
     }
-
     /* computation of the tile scanning base G: right now, let's assume it's Id.
-     * This is OK to tile parallel loops
+     * This is OK to tile parallel loops... or to scan tiles sequentially on a 
+     * monoprocessor.
      */
     G = matrice_new(n,n); 
     scanning_base_hyperplane(h, n, G);	  
@@ -348,41 +374,36 @@ tiling( list lls)
 	(void) fprintf(stderr,"The tile scanning base G is:");
 	matrice_fprint(stderr, G, n, n);
     }
-    
-    /* generation of code for scanning all tiles */
-    /*  generation of bounds */
-    /* est completement inutile 
-    for (pb = tile_basis; pb!=NULL; pb=pb->succ) {
-	make_bound_expression(pb->var, tile_basis, sc_tile_scan, &lower, &upper);
-    } */ 
-    
-    /* generation of code for scanning one tile */
-    /*  generation of bounds */ 
-    /* est completement inutile 
-    for (pb = initial_basis; pb!=NULL; pb=pb->succ) {
-	make_bound_expression(pb->var, initial_basis, sc_tile, &lower, &upper); 
-    } */
-  
-    /* loop body generation */
 
-    /* Compute the coordinate changes: there should be none for the time being
+    /* generation of code for scanning one tile */
+
+    /* Compute the local coordinate changes: there should be none for the time being
      * because we keep the initial basis to scan iterations within one tile, i.e
      * G must be the identity matrix
      */
     pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
-    scanning_base_to_vect(G, n, tile_basis, pvg);
-    pv1 = sc_tile_scan->inegalites->succ->vecteur;
-    pv2 = vect_change_base(pv1, initial_basis, pvg);    
+    scanning_base_to_vect(G, n, initial_basis, pvg);
 
-    l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
-    lower = range_upper(loop_range(l));
-    upper= expression_to_expression_newbase(lower, pvg, initial_basis);
+    /* generation of code to scan one tile and update of loop body using pvg */
 
-
-   s_lhyp = code_generation(lls, pvg, initial_basis, tile_basis, sc_tile_scan);
-/* essai avec new-basis au lieu de tile basis mais ne marche pas car itere 2 fois uniquement 
- tu as maintenant le parcours de l'interieur et des tiles mais plus celui des tiles*/
     s_lhyp = code_generation(lls, pvg, initial_basis, new_basis, sc_tile);
+
+    /* generation of code for scanning all tiles */
+
+    reverse_tile_basis = base_reversal(tile_basis);
+    for (pb = reverse_tile_basis; pb!=NULL; pb=pb->succ) {
+	loop tl = loop_undefined;
+
+	make_bound_expression(pb->var, tile_basis, sc_tile_scan, &lower, &upper);
+	tl = make_loop((entity) vecteur_var(pb),
+		       make_range(copy_expression(lower), copy_expression(upper),
+				  int_to_expression(1)),
+		       s_lhyp,
+		       entity_empty_label(),
+		       make_execution(is_execution_sequential, UU),
+		       NIL);
+	s_lhyp = instruction_to_statement(make_instruction(is_instruction_loop, tl));
+    }
     
     debug(8," tiling","End\n");
 
