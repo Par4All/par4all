@@ -1,5 +1,5 @@
 /* 
- * $RCSfile: generate.c,v $ ($Date: 1994/12/28 18:14:52 $, )
+ * $RCSfile: generate.c,v $ ($Date: 1995/03/14 14:43:15 $, )
  * version $Revision$
  * got on %D%, %T%
  * 
@@ -444,8 +444,7 @@ list *lhp, *lnp;
     syntax_reference(s) = make_reference(temp, NIL);
 }
 
-/*
- * generate_compute_local_indices
+/* generate_compute_local_indices
  *
  * this function generate the list of statement necessary to compute
  * the local indices of the given reference. It gives back the new list
@@ -456,36 +455,31 @@ reference ref;
 list *lsp, *lindsp; 
 { 
     int i; 
-    entity
- 	array = reference_variable(ref);
-    list
- 	inds = reference_indices(ref);
-
+    entity array = reference_variable(ref);
+    list inds = reference_indices(ref);
 
     assert(array_distributed_p(array));
 
-    (*lsp) = NIL;
-    (*lindsp) = NIL;
+    (*lsp) = NIL, (*lindsp) = NIL;
 
     debug(9, "generate_compute_local_indices", 
 	  "number of dimensions of %s to compute: %d\n",
-	  entity_name(array),
-	  NumberOfDimension(array));
+	  entity_name(array), NumberOfDimension(array));
 
-    for(i=1;i<=NumberOfDimension(array);i++) 
+    for(i=1; i<=NumberOfDimension(array); i++, inds = CDR(inds)) 
     {
 	if (local_index_is_different_p(array, i))
 	{
-	    statement stat;
 	    syntax s;
+	    statement stat = st_compute_ith_local_index(array, i, 
+					      EXPRESSION(CAR(inds)), &s);
 	    
-	    stat = st_compute_ith_local_index(array, i, EXPRESSION(CAR(inds)), &s);
 	    IFDBPRINT(9, "generate_compute_local_indexes", node_module, stat);
 	    
 	    (*lsp) = gen_nconc((*lsp), CONS(STATEMENT, stat, NIL));
 	    (*lindsp) =
-		gen_nconc((*lindsp), 		
-			  CONS(EXPRESSION, make_expression(s, normalized_undefined), NIL));
+		gen_nconc((*lindsp), CONS(EXPRESSION, 
+			   make_expression(s, normalized_undefined), NIL));
 	}
 	else
 	{
@@ -496,7 +490,6 @@ list *lsp, *lindsp;
 		gen_nconc((*lindsp),  		
 			  CONS(EXPRESSION, expr, NIL));
 	} 
-	inds = CDR(inds);
     }
 
     debug(8, "generate_compute_local_indices", "result:\n");
