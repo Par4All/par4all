@@ -1,12 +1,13 @@
-/* 	%A% ($Date: 1997/09/10 13:55:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/04/14 21:28:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1997/09/10 13:55:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 1998/04/14 21:28:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "parser_private.h"
