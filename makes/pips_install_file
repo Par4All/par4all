@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/08/23 22:25:18 $, )
+# ($Date: 1996/08/24 09:55:29 $, )
 #
 
 RUN=':'
@@ -57,11 +57,11 @@ do
 	verb "skipping $file"
     else
 	verb "copying $file"
-	test -f $target && rm -f $target
+	test ! -f $target || rm -f $target
 	cp $file $directory
 	eval "$RUN $target"
 	chmod a+r-w $target
-	test -x $file && chmod a+x $target
+	test ! -x $file || chmod a+x $target
     fi
   fi
 done
