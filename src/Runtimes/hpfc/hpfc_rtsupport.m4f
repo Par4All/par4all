@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/05/29 09:50:49 $, )
+! ($Date: 1997/05/29 12:50:04 $, )
 !
 !-----------------
 !
@@ -1045,7 +1045,7 @@ _CM5(
       subroutine HPFC INIT NODE
       _CM5(include "cmmd_fort.h")
       include "hpfc_commons.h"
-      integer i, bufid, info, inum
+      integer i, bufid, info
 
       debug(print *, "[HPFC INIT NODE] in tid:", MY TID)
 
@@ -1204,7 +1204,7 @@ _direct(`'
       subroutine HPFC INIT HOST
       _CM5(include "cmmd_fort.h")
       include "hpfc_commons.h"
-      integer bufid, info, inum, i
+      integer bufid, info
       character*64 node key
 
       debug(print *, "[HPFC INIT HOST] in ", MY LID)
