@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/10/22 12:00:53 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/10/23 14:19:09 $, )
  * version $Revision$
  */
  
@@ -596,12 +596,21 @@ bool hpfc_make(string name)
 
     safe_system(concatenate("cd ", dir, "/hpfc ; $HPFC_MAKE make &", NULL));
 
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_CONSTRUCTION, strdup(name), NO_FILE);
-
     debug_off();
     return TRUE;
 }
 
+/* bool hpfc_run(string name)
+ *
+ * what: run the program.
+ * how: system call sut $HPFC_MAKE...
+ * input: none.
+ * output: none.
+ * side effects:
+ *  - forks a process.
+ *  - may stop if cannot execute.
+ * bugs or features:
+ */
 bool hpfc_run(string name)
 {
     string dir = db_get_current_workspace_directory();
