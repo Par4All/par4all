@@ -1338,15 +1338,15 @@ same_expression_name_p(expression e1, expression e2)
 #define DV_CIRCLE ",a(\"_GO\",\"circle\")"
 #define DV_YELLOW ",a(\"COLOR\",\"yellow\")"
 
-static void davinci_dump_expression_rc(
+static bool  davinci_dump_expression_rc(
     FILE * out, expression e, hash_table seen)
 {
   syntax s;
   string name, shape, color;
   list sons = NIL;
-  bool first = TRUE;
+  bool first = TRUE, something = TRUE;
 
-  if (ALREADY_SEEN(e)) return;
+  if (ALREADY_SEEN(e)) return FALSE;
   SEEN(e);
 
   s = expression_syntax(e);
@@ -1393,8 +1393,14 @@ static void davinci_dump_expression_rc(
 
     /* node epilog */
   fprintf(out, "]))\n");
+  
+  MAP(EXPRESSION, son, 
+  { 
+    if (something) fprintf(out, ","); 
+    something = davinci_dump_expression_rc(out, son, seen);
+  }, sons);
 
-  MAP(EXPRESSION, son, davinci_dump_expression_rc(out, son, seen), sons);
+  return TRUE;
 }
 
 /* dump expression e in file out as a davinci graph.
@@ -1402,8 +1408,9 @@ static void davinci_dump_expression_rc(
 void davinci_dump_expression(FILE * out, expression e)
 {
   hash_table seen = hash_table_make(hash_pointer, 0);
+  fprintf(out, "[\n");
   davinci_dump_expression_rc(out, e, seen);
-  fprintf(out, "\n\n");
+  fprintf(out, "]\n\n");
   hash_table_free(seen);
 }
 
