@@ -23,6 +23,10 @@
 /* $Id$
  * 
  * $Log: dbm_interface.c,v $
+ * Revision 1.43  2003/07/11 15:37:04  irigoin
+ * Intermediate version. No core dump but a lot of problem related to
+ * pipsmake.rc and interprocedurality.
+ *
  * Revision 1.42  2003/06/27 11:52:59  irigoin
  * temporary/intermediate version. resource SUMMARY_PRECONDITION should not
  * be generated in intraprocedural mode. other modifs linked to Duong's needs
@@ -231,8 +235,12 @@ bool refine_transformers(char * module_name)
 
 bool summary_transformer(char * module_name)
 {
-    /* there is a choice: do nothing and leave the effective computation
-       in module_name_to_transformers, or move it here */
+  /* There is a choice: do nothing and leave the effective computation
+     in module_name_to_transformers, or move it here */
+  /* There is another choice: distinguish between inter- and
+     intra-procedural analyses at the summary level or in
+     module_name_to_transformers(). The choice does not have to be
+     consistent with the similar choice made for summary_precondition. */
   pips_debug(1, "considering module %s\n", module_name);
   return TRUE;
 }
@@ -343,56 +351,120 @@ bool old_summary_precondition(char * module_name)
   return TRUE;
 }
 
-bool summary_precondition(char * module_name)
+bool intraprocedural_summary_precondition(char * module_name)
 {
-  /* Look for all call sites in the callers
-   */
-  callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
-						     module_name,
-						     TRUE);
-  entity callee = local_name_to_top_level_entity(module_name);
-  /* transformer t = transformer_identity(); */
+  /* The current module is sufficient to derive it. */
+  set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
+  return summary_precondition(module_name);
+}
+
+bool interprocedural_summary_precondition(char * module_name)
+{
+  /* The DATA statement from all modules, called or not called, are used,
+     as well as the preconditions at all call sites. */
+  set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
+  return summary_precondition(module_name);
+}
+
+/* Special case: main module
+ *
+ * Intraprocedural case: use the local DATA statement to define the initial store.
+ *
+ * Interprocedural case: use the program precondition
+ *
+ * */
+
+static transformer main_summary_precondition(entity callee)
+{
   transformer t = transformer_undefined;
 
-  debug_on(SEMANTICS_DEBUG_LEVEL);
-
-  set_current_module_entity(callee);
-
-  ifdebug(1) {
-    debug(1, "summary_precondition", "begin for %s with %d callers\n",
-	  module_name,
-	  gen_length(callees_callees(callers)));
-    MAP(STRING, caller_name, {
-      (void) fprintf(stderr, "%s, ", caller_name);
-    }, callees_callees(callers));
-    (void) fprintf(stderr, "\n");
+  if (get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+    t = copy_transformer((transformer)
+      db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE));
+    if(transformer_empty_p(t)) {
+      pips_user_warning(
+			"Initial preconditions are not consistent.\n"
+			" The Fortran standard rules about variable initialization"
+			" with DATA statements are likely to be violated.\n"
+			"set property PARSER_ACCEPT_ANSI_EXTENSIONS to false\n"
+			"and CHECK_FORTRAN_SYNTAX_BEFORE_PIPS to true.\n");
+    }
+  }
+  else {
+    /* Do we need to initialize the mappings before calling this subroutine? */
+    /* Why not use a DB_GET of DBR_INITIAL_PRECONDITION? */
+    /* t = data_to_precondition(callee); */
+    t = copy_transformer
+      ((transformer) db_get_memory_resource(DBR_INITIAL_PRECONDITION,
+					    module_local_name(callee),
+					    FALSE));
   }
 
-  reset_call_site_number();
+  return t;
+}
 
-  MAP(STRING, caller_name, 
-  {
-    entity caller = local_name_to_top_level_entity(caller_name);
-    t = update_precondition_with_call_site_preconditions(t, caller, callee);
-  }, callees_callees(callers));
+/* Standard cases: called modules
+ *
+ * If a main is present, modules which are never called receive an
+ * unfeasible summary_precondition.
+ *
+ * If no main is present in the current workspace, modules which are never
+ * called receive an identity summary precondition, i.e. no information.
+ *
+ * If an interprocedural analysis is required, the preconditions of all
+ * call sites are translated and the unioned.
+ *
+ * */
 
-  if (!callees_callees(callers) && 
-      !entity_main_module_p(callee) && 
-      some_main_entity_p())
+static transformer ordinary_summary_precondition(string module_name,
+						 entity callee)
+{
+  transformer t = transformer_undefined;
+
+  if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+    /* Look for all call sites in the callers
+     */
+    callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
+						       module_name,
+						       TRUE);
+    list lc = callees_callees(callers);
+
+    ifdebug(1) {
+      debug(1, "summary_precondition", "begin for %s with %d callers\n",
+	    module_name,
+	    gen_length(lc));
+      MAP(STRING, caller_name, {
+	(void) fprintf(stderr, "%s, ", caller_name);
+      }, lc);
+      (void) fprintf(stderr, "\n");
+    }
+
+    reset_call_site_number();
+
+    MAP(STRING, caller_name, 
     {
-      /* no callers => empty precondition (but the main). 
+      entity caller = local_name_to_top_level_entity(caller_name);
+      t = update_precondition_with_call_site_preconditions(t, caller, callee);
+    }, callees_callees(callers));
+
+    if (ENDP(callees_callees(callers)) && 
+	some_main_entity_p()) {
+      /* no callers => empty precondition if a main is being analyzed
 	 FC. 08/01/1999.
       */
       pips_user_warning("empty precondition to %s "
 			"because not in call tree from main.\n", module_name);
       t = transformer_empty();
-    } else if (transformer_undefined_p(t)) {
+    } 
+    else if (transformer_undefined_p(t)) {
+      /* No main in the application? Do declare every module executed. */
       t = transformer_identity();
-    } else {
-      /* try to eliminate (some) redundancy at a reasonnable cost */
-      /* t = transformer_normalize(t, 2); */
+    }
+    else {
+      /* Try to eliminate (some) redundancy at a reasonnable cost. */
+      /* What is a reasonnable cost? */
 
-      /* what cost? */
+      /* t = transformer_normalize(t, 2); */
       t = transformer_normalize(t, 7);
 
       /* Corinne's best one... for YPENT2 in ARC2D, but be ready to pay
@@ -405,6 +477,31 @@ bool summary_precondition(char * module_name)
       /* pips_assert("The summary precondition is consistent",
 	 transformer_consistency_p(t));*/
     }
+  }
+  else {
+    /* Intraprocedural case */
+    t = transformer_identity();
+  }
+
+  return t;
+}
+
+bool summary_precondition(char * module_name)
+{
+  /* transformer t = transformer_identity(); */
+  transformer t = transformer_undefined;
+  entity callee = local_name_to_top_level_entity(module_name);
+
+  debug_on(SEMANTICS_DEBUG_LEVEL);
+
+  set_current_module_entity(callee);
+
+  if(entity_main_module_p(callee)) {
+    t = main_summary_precondition(callee);
+  }
+  else {
+    t = ordinary_summary_precondition(module_name, callee);
+  }
 
   /* Add declaration information: arrays cannot be empty (Fortran
    * standard, Section 5.1.2)
@@ -416,9 +513,9 @@ bool summary_precondition(char * module_name)
    */
   if(FALSE && get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
     set_current_module_statement(
-	(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
+				 (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
     set_cumulated_rw_effects((statement_effects) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings( get_current_module_entity() );
     transformer_add_declaration_information(t,
 					    get_current_module_entity());
@@ -426,14 +523,21 @@ bool summary_precondition(char * module_name)
     reset_current_module_statement();
     free_value_mappings();
   }
+    
+  pips_assert("t is defined", !transformer_undefined_p(t));
+
+  ifdebug(3) {
+    pips_debug(1, "considering summary precondition for %s\n", module_name);
+    dump_transformer(t);
+  }
 
   DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
 			 module_name, (char * )t);
 
   ifdebug(1) {
     pips_debug(1,
-	  "initial summary precondition %p for %s (%d call sites):\n",
-	  t, module_name, get_call_site_number());
+	       "initial summary precondition %p for %s (%d call sites):\n",
+	       t, module_name, get_call_site_number());
     dump_transformer(t);
     pips_debug(1, "end for module %s\n", module_name);
   }
@@ -443,7 +547,7 @@ bool summary_precondition(char * module_name)
 
   return TRUE;
 }
-
+
 bool summary_total_postcondition(char * module_name)
 {
   /* Look for all call sites in the callers
@@ -748,95 +852,11 @@ bool module_name_to_preconditions(char *module_name)
 
     /* debug_on(SEMANTICS_DEBUG_LEVEL); */
 
-    /* compute the module precondition: it should be passed as an
-       additionnal parameter to module_to_preconditions by
-       interprocedural analysis; for a main program and for modules called
-       only once, data statements are exploited, although data
-       statement are not dynamic */
-    /* should be the dynamic call site count...*/
-    /* if(call_site_count( get_current_module_entity() )<=1) */
-    /* Let's assume static initializations (FI, 14 September 1993) */
-
-    if(entity_main_module_p(get_current_module_entity())) 
-    {
-      if (get_bool_property(SEMANTICS_INTERPROCEDURAL)) 
-      {
-	pre = (transformer)
-	  db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE);
-	if(transformer_empty_p(pre)) {
-	  pips_user_warning(
-	     "Initial preconditions are not consistent.\n"
-	     " The Fortran standard rules about variable initialization"
-	     " with DATA statements are likely to be violated.\n"
-	     "set property PARSER_ACCEPT_ANSI_EXTENSIONS to false\n"
-	     "and CHECK_FORTRAN_SYNTAX_BEFORE_PIPS to true.\n");
-	}
-      }
-      else
-	pre = data_to_precondition(get_current_module_entity());
-    }
-    else
-      pre = transformer_identity();
-    
-    ifdebug(3) {
-      pips_debug(1, "considering initial precondition for %s\n", module_name);
-      print_transformer(pre);
-    }
-
-    /* interprocedural try for DRET demo - I'm not sure it's correct! 
-       especially when there are DATA statements... */
-    /* DRET demo: I cancel top-down propagation - missing binding
-       take away FALSE in below test later, 23/4/90 */
-    if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	transformer ip = 
-	    load_summary_precondition(get_current_module_entity());
-	if( ip == transformer_undefined) {
-	    /* that might be because we are at the call tree root
-	       or because no information is available;
-	       maybe, every module precondition should be initialized
-	       to a neutral value? */
-	    pips_user_warning("no interprocedural module precondition for %s\n",
-			      entity_local_name(get_current_module_entity() ));
-	    ;
-	}
-	else {
-	    /* convert global variables in the summary precondition in the
-	     * local frame as defined by value mappings (FI, 31 January 1994) 
-	     */
-	  ifdebug(1) {
-	    /* An external-transformer_consistency_p() is needed.
-	    pips_assert("The summary precondition is consistent",
-			transformer_consistency_p(ip));
-	    */
-	  }
-	    translate_global_values(get_current_module_entity(), ip);
-	    ifdebug(8) {
-		(void) fprintf(stderr,
-			     "module_name_to_preconditions\n"
-			     "\t summary_precondition %p after translation:\n",
-			       ip);
-		print_transformer(ip);
-		pips_assert("The summary precondition is consistent",
-			    transformer_consistency_p(ip));
-	    }
-	    /* pre = ip o pre */
-	    pre = transformer_combine(transformer_dup(ip), pre);
-	    /* memory leak: the old pre should be freed */
-	}
-    }
-    else {
-      /* FI: in the intraprocedural mode, this is not declared to
-         pipsmake.rc and should not be done. */
-      /*
-      DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
-			   module_name, 
-			   (char*) transformer_dup(pre) );
-      */
-      ;
-    }
+    pre = copy_transformer(load_summary_precondition(get_current_module_entity()));
 
     /* Add declaration information: arrays cannot be empty (Fortran
-       standard, Section 5.1.2) */
+       standard, Section 5.1.2). But according to summary_precondition(),
+       this is now supposed to be performed by the transformer phase? */
     if(get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
         precondition_add_declaration_information(pre, get_current_module_entity());
     }
@@ -1094,28 +1114,33 @@ void update_summary_precondition(entity e, transformer t)
  */
 transformer load_summary_precondition(entity e)
 {
-    /* memoization could be used to improve efficiency */
-    transformer t;
+  /* memoization could be used to improve efficiency */
+  transformer t;
 
-    pips_assert("load_summary_precondition", entity_module_p(e));
+  pips_assert("e is a module", entity_module_p(e));
 
-    debug(8, "load_summary_precondition", "begin\n for %s\n", 
-	  module_local_name(e));
+  pips_debug(8, "begin\n for %s\n", 
+	     module_local_name(e));
 
-    t = (transformer) 
-	db_get_memory_resource(DBR_SUMMARY_PRECONDITION, module_local_name(e), 
-			       TRUE);
+  t = (transformer) 
+    db_get_memory_resource(DBR_SUMMARY_PRECONDITION, module_local_name(e), 
+			   TRUE);
+  /* Not done earlier, because the value mappings were not available. On
+     the other hand, htis assumes that the value mappings have been
+     initialized before a call to load_summary_precondition(0 is
+     performed.*/
+  translate_global_values(e, t);
 
-    pips_assert("load_summary_precondition", t != transformer_undefined);
+  pips_assert("the summary precondition t is defined", t != transformer_undefined);
     
-    ifdebug(8) {
-	debug(8, "load_summary_precondition", " precondition for %s:\n",
-	      module_local_name(e));
-	dump_transformer(t);
-	debug(8, "load_summary_precondition", " end\n");
-    }
+  ifdebug(8) {
+    pips_debug(8, " precondition for %s:\n",
+	       module_local_name(e));
+    dump_transformer(t);
+    pips_debug(8, " end\n");
+  }
 
-    return t;
+  return t;
 }
 
 /* summary_preconditions are expressed in any possible frame, in fact the frame of
@@ -1127,7 +1152,7 @@ transformer load_summary_total_postcondition(entity e)
 
     pips_assert("e is a module", entity_module_p(e));
 
-    debug(8, "load_summary_precondition", "begin\n for %s\n", 
+    pips_debug(8, "begin\n for %s\n", 
 	  module_local_name(e));
 
     t_post = (transformer) 
