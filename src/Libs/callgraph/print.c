@@ -141,6 +141,19 @@ string module_name;
 }
 
 /*
+ * Print callgrpah with preconditions
+ */
+bool print_call_graph_with_total_preconditions(module_name)
+string module_name;
+{
+    bool success = FALSE;
+
+    success = print_decorated_call_graph(module_name,CG_DECOR_TOTAL_PRECONDITIONS);
+
+    return success;
+}
+
+/*
  * Print callgrpah with transformers
  */
 bool print_call_graph_with_transformers(module_name)
