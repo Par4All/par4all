@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1995/08/01 17:45:58 $, )
+ * ($Date: 1995/08/30 15:16:21 $, )
  */
 
 #include "defines-local.h"
@@ -30,6 +30,15 @@
 GENERIC_GLOBAL_FUNCTION(dynamic_hpf, entity_entities);
 GENERIC_GLOBAL_FUNCTION(primary_entity, entitymap);
 GENERIC_GLOBAL_FUNCTION(renamings, statement_renamings);
+
+entity safe_load_primary_entity(entity e)
+{
+    if (!bound_dynamic_hpf_p(e))
+	user_error("safe_load_primary_entity",
+		   "%s is not dynamic\n", entity_local_name(e));
+   
+    return load_primary_entity(e);
+}
 
 #define primary_entity_p(a) (a==load_primary_entity(a))
 
@@ -453,10 +462,9 @@ statement s;
 
 /*  TRUE if not a remapping for old. 
  *  if it is a remapping, operates the switch.
- *  ??? just check for realign right now.
  */
-static bool continue_propagation_p(s)
-statement s;
+static bool 
+continue_propagation_p(statement s)
 {
     instruction i = statement_instruction(s);
 
@@ -476,8 +484,12 @@ statement s;
 	    MAP(EXPRESSION, e,
 	    {
 		reference r = expression_to_reference(e);
+		entity var = reference_variable(r);
+
+		if (entity_template_p(var)) /* up to the template, stop */
+		    return TRUE;
 		
-		if (load_primary_entity(reference_variable(r))==old_variable)
+		if (safe_load_primary_entity(var)==old_variable)
 		{
 		    /*  the variable is realigned.
 		     */
@@ -495,9 +507,14 @@ statement s;
 		
 	    MAP(EXPRESSION, e,
 	    {
+		entity v = expression_to_entity(e);
+
+		if (!entity_template_p(v)) /* up to the processor, stop */
+		    return TRUE;
+
 		/*   if template t is redistributed...
 		 */
-		if (load_primary_entity(expression_to_entity(e))==t)
+		if (safe_load_primary_entity(v)==t)
 		{
 		    if (array_propagation)
 			/*  then the new_variable is the alive one.
@@ -528,7 +545,7 @@ entity old, new;
     what_stat_debug(3, s);
     pips_debug(3, "%s -> %s\n", entity_name(old), entity_name(new));
 
-    old_variable = load_primary_entity(old), new_variable = new, 
+    old_variable = safe_load_primary_entity(old), new_variable = new, 
     array_propagation = array_distributed_p(old),
     array_used = FALSE,
     initial_statement = s;
