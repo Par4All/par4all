@@ -16,6 +16,18 @@
 #include "sc.h"
 #include "matrice.h"
 #include "conversion.h"
+void derive_new_basis(Pbase base_oldindex, Pbase * base_newindex, entity (*new_entity)(entity))
+{
+    Pbase pb;
+    entity new_name;
+
+    for (pb=base_oldindex; pb!=NULL; pb=pb->succ)
+    {
+	new_name = new_entity((entity) pb->var);
+	base_add_dimension(base_newindex, (Variable) new_name);
+    }
+    *base_newindex = base_reversal(*base_newindex);
+}
 
 /* void change_of_base_index(Pbase base_oldindex, Pbase *base_newindex)
  * change of variable index from  base_oldindex to
@@ -25,23 +37,15 @@ void change_of_base_index(base_oldindex, base_newindex)
 Pbase base_oldindex;
 Pbase *base_newindex;
 {
-    Pbase pb;
-    entity new_name;
-
-    for (pb=base_oldindex; pb!=NULL; pb=pb->succ)
-    {
-	new_name = make_index_entity((entity) pb->var);
-	base_add_dimension(base_newindex, (Variable) new_name);
-    }
-    *base_newindex = base_reversal(*base_newindex);
+    derive_new_basis(base_oldindex, base_newindex, make_index_prime_entity);
 }
 
 
 
-/*entity make_index_entity(old_index)
+/*entity make_index_prime_entity(old_index)
  *create a new entity for a new index 
  */
-entity make_index_entity(old_index)
+entity make_index_prime_entity(old_index)
 entity old_index;
 {
     entity new_index;
@@ -52,11 +56,24 @@ entity old_index;
     for (sprintf(new_name, "%s%s", old_name, "p");
          gen_find_tabulated(new_name, entity_domain)!=entity_undefined; 
 
-         old_name = new_name)
+         old_name = new_name) {
         sprintf(new_name, "%s%s", old_name, "p");
-    new_index=make_entity(new_name,entity_type(old_index),
-			  entity_storage(old_index),entity_initial(old_index));
+    }
+ 
+   new_index = make_entity(new_name,
+			   copy_type(entity_type(old_index)),
+			   /* Should be AddVariableToCommon(DynamicArea) or
+			      something similar! */
+			   copy_storage(entity_storage(old_index)),
+			   copy_value(entity_initial(old_index)));
+
     return(new_index);
+}
+
+entity make_index_entity(old_index)
+entity old_index;
+{
+    return make_index_prime_entity(old_index);
 }
 
 /* Psysteme sc_change_baseindex(Psysteme sc, Pbase base_old, Pbase base_new)
