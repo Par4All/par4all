@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/10/10 11:38:15 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/12/19 15:52:36 $, )
  * version $Revision$
  */
 
@@ -260,7 +260,7 @@ entity array;
 
     for(; dim>0; dim--)
     {
-	n = new_declaration(array, dim);
+	n = new_declaration_tag(array, dim);
 	if ((n==is_hpf_newdecl_gamma) || (n==is_hpf_newdecl_delta))
 	    /* distributed && (nd==is_hpf_newdecl_none)) ?
 	     * ??? the case is not handled later on 
