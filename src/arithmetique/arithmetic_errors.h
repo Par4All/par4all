@@ -34,7 +34,7 @@ extern int  simplex_arithmetic_error;
   fprintf(stderr, "%s %d - %d (%s %s %d)\n", 		\
 	  msg, what, n, __FUNCTION__, __FILE__, __LINE__)
 #else
-#define exception_debug(msg, what) 1
+#define exception_debug(msg, n, what) 1
 #endif
 
 #define exception_debug_push(what) \
