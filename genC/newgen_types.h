@@ -52,7 +52,8 @@ typedef int tag;
 #define tag_undefined (-3)
 
 typedef int unit ;
-#define UU 0
+#define UU ((void*)0)
+#define UUINT(i) ((void*)i)
 
 #define array_undefined NULL
 #define array_undefined_p(a) ((a)==NULL)
