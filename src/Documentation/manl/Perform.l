@@ -32,7 +32,7 @@ Default is last workspace used (current workspace).
 .TP
 .B \-m
 is the name of the module on which applies 
-.B Display.
+.B Display. 
 Default is last module used (current module).
 .TP
 .B \-v
