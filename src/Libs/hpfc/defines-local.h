@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/09/01 14:25:51 $, ) 
+ * ($Date: 1995/09/12 10:20:02 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -224,7 +224,9 @@ void fprint_entity_list(FILE *fp, list l);
 #define HOST_TIMEOFF	"HPFC_HTIMEOFF"
 #define NODE_TIMEOFF	"HPFC_NTIMEOFF"
 
-/* PVM
+/********************************************************************** PVM */
+
+/* PVM functions that may be called by the generated code
  */
 #define PVM_INITSEND	"pvmfinitsend"
 #define PVM_SEND	"pvmfsend"
@@ -233,14 +235,18 @@ void fprint_entity_list(FILE *fp, list l);
 #define PVM_PACK	"pvmfpack"
 #define PVM_UNPACK	"pvmfunpack"
 
-/* Variables
+/* PVM types encoding for packing and unpacking
  */
-#define T_LID		"T_LID"
-#define T_LIDp		"T_LIDp"
-#define INFO		"HPFC_INFO"
-#define BUFID		"HPFC_BUFID"
-#define LAZY_SEND	"LAZY_SEND"
-#define LAZY_RECV	"LAZY_RECV"
+#define PVM_BYTE1	"BYTE1"
+#define PVM_INTEGER2	"INTEGER2"
+#define PVM_INTEGER4	"INTEGER4"
+#define PVM_REAL4	"REAL4"
+#define PVM_REAL8	"REAL8"
+#define PVM_COMPLEX8	"COMPLEX8"
+#define PVM_COMPLEX16	"COMPLEX16"
+#define PVM_STRING	"STRING"
+
+/********************************************************* COMMON VARIABLES */
 
 #define MYPOS		"MYPOS"
 #define MYLID		"MYLID"
@@ -252,6 +258,23 @@ void fprint_entity_list(FILE *fp, list l);
 #define SEND_CHANNELS	"SENDCHANNELS"
 #define RECV_CHANNELS	"RECVCHANNELS"
 #define HOST_CHANNEL	"HOSTCHANNEL"
+
+/* common /hpfc_buffers/
+ */
+#define BUFFER_SUFFIX	"_BUFF"
+#define BUFFER_INDEX	"BUFINDEX"
+#define BUFFER_SIZE	"SIZEOFBUFFER"
+#define BUFFER_RCV_SIZE	"SIZEOFRECEIVEDBUFFER"
+#define LAZY_SEND	"LAZY_SEND"
+#define LAZY_RECV	"LAZY_RECV"
+
+
+/* Variables
+ */
+#define T_LID		"T_LID"
+#define T_LIDp		"T_LIDp"
+#define INFO		"HPFC_INFO"
+#define BUFID		"HPFC_BUFID"
 
 /************************************************************** DIRECTIVES */
 
@@ -295,9 +318,14 @@ void fprint_entity_list(FILE *fp, list l);
 #define TIMEON_SUFFIX		"2"
 #define TIMEOFF_SUFFIX		"3"
 
+/*************************************************************** PROPERTY */
+
 /* property prefix for ignoring FCD directives
+ * TIME and SYNCHRO exists.
  */
 #define FCD_IGNORE_PREFIX	"HPFC_IGNORE_FCD_"
+
+#define HPFC_USE_BUFFERS	"HPFC_USE_BUFFERS"
 
 /***************************************************************** MACROS */
 
