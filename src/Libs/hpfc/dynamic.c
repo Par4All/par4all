@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/03/20 13:19:22 $, )
+ * ($Date: 1996/03/20 19:09:45 $, )
  */
 
 #include "defines-local.h"
@@ -373,20 +373,96 @@ hpfc_call_with_distributed_args_p(call c)
     return FALSE;
 }
 
+/* ??? only simple calls are handled. imbrication may cause problems.
+ */
 void
 hpfc_translate_call_with_distributed_args(
     statement s, /* the statement the call belongs to */
     call c)      /* the call. (not necessarily an instruction) */
 {
+    list /* of remapping */ lr = NIL,
+         /* of expression */ args;
+    int len, i;
     entity f;
-    list /* of expression */ args;
 
     f = call_function(c);
     args = call_arguments(c);
+    len = gen_length(args);
 
-    pips_debug(1, "considering function %s\n", entity_name(f));
+    pips_debug(1, "function %s\n", entity_name(f));
 
-    return;
+    for (i=1; i<=len; i++, POP(args))
+    {
+	entity arg = find_ith_parameter(f, i);
+
+	if (array_distributed_p(arg))
+	{
+	    align al;
+	    entity passed, copy;
+	    expression e = EXPRESSION(CAR(args));
+
+	    passed = expression_to_entity(e);
+
+	    pips_assert("distributed and conformant",
+			array_distributed_p(passed) &&
+			conformant_entities_p(passed, arg));
+
+	    set_entity_as_dynamic(passed);
+	    add_a_dynamic(passed);
+
+	    al = copy_align(load_hpf_alignment(arg));
+	    copy = array_synonym_aligned_as(passed, al);
+
+	    pips_debug(3, "%s (arg %d) %s -> %s\n", entity_name(arg), i, 
+		       entity_name(passed), entity_name(copy));
+
+	    /* substitute the copy array if necessary 
+	     */
+	    if (copy!=passed)
+	    {
+		syntax sy = expression_syntax(e);
+		pips_assert("reference", syntax_reference_p(sy));
+		reference_variable(syntax_reference(sy)) = copy;
+	    }
+	    
+	    /* add the renaming in the list 
+	     * ??? should be added only once! what about call(A,A)...
+	     */
+	    lr = CONS(RENAMING, make_renaming(passed, copy), lr);
+	}
+    }
+
+    if (lr) /* should always be the case */
+    {
+	list /* of statement */ lpre = NIL, lpos = NIL;
+	entity rename = hpfc_name_to_entity(HPF_PREFIX RENAME_SUFFIX);
+	
+	lpre = CONS(STATEMENT, 
+		    instruction_to_statement(statement_instruction(s)), 
+		    NIL);
+
+	MAP(RENAMING, r,
+	{
+	    entity passed = renaming_old(r);
+	    entity copied = renaming_new(r);
+
+	    lpre = CONS(STATEMENT, call_to_statement(make_call(rename,
+			CONS(EXPRESSION, entity_to_expression(passed),
+			CONS(EXPRESSION, entity_to_expression(copied), NIL)))),
+			lpre);
+
+	    lpos = CONS(STATEMENT, call_to_statement(make_call(rename,
+			CONS(EXPRESSION, entity_to_expression(copied),
+			CONS(EXPRESSION, entity_to_expression(passed), NIL)))),
+			lpos);
+	},
+	    lr);
+
+	statement_instruction(s) =
+	    make_instruction(is_instruction_block, gen_nconc(lpre, lpos));
+
+	DEBUG_STAT(3, "out", s);
+    }
 }
 
 
@@ -574,6 +650,12 @@ simple_switch_old_to_new(statement s)
     }
 }
 
+static bool 
+rename_directive_p(entity f)
+{
+    return same_string_p(entity_local_name(f), HPF_PREFIX RENAME_SUFFIX);
+}
+
 /*  TRUE if not a remapping for old. 
  *  if it is a remapping, operates the switch.
  */
@@ -593,8 +675,27 @@ continue_propagation_p(statement s)
     {
 	call c = instruction_call(i);
 	entity fun = call_function(c);
+	
+	if (rename_directive_p(fun) && array_propagation)
+	{
+	    entity
+		primary = safe_load_primary_entity(old_variable),
+		array;
 
-	if (realign_directive_p(fun) && array_propagation)
+	    DEBUG_STAT(8, "rename directive", s);
+
+	    array = expression_to_entity(EXPRESSION(CAR(call_arguments(c))));
+
+	    if (safe_load_primary_entity(array)==primary)
+	    {
+		fprintf(stderr, "some bug there???\n");
+		array_used = TRUE; /* ??? */
+		add_alive_synonym(s, new_variable);
+		add_as_a_closing_statement(s);
+		return FALSE;
+	    }
+	}
+	else if (realign_directive_p(fun) && array_propagation)
 	{
 	    entity primary = safe_load_primary_entity(old_variable);
 
