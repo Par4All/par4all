@@ -1,4 +1,7 @@
+#ifndef _STDARG_H
+/* If we have already used stdarg.h do not include: */
 #include <varargs.h>
+#endif
 
 #define ifdebug(l) if(the_current_debug_level>=(l))
 
