@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/19 11:06:11 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/19 11:07:36 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -25,7 +25,7 @@
 #   thus should not appear in the program, otherwise troubles...
 # - some default value is assigned to number of processors...
 # - some specific directives for HPFC.
-# - * for descriptive mappings at subroutine interface are not managed yet.
+# - simple management of descriptive interfaces.
 #
 # (c) Fabien Coelho, February 95 and later.
 # don't expect anything from this script.
