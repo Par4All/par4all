@@ -117,6 +117,12 @@ int ofl_ctrl;
 
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
 
+    ifscdebug(1) {
+	fprintf(stderr, "[sc_enveloppe_chernikova_ofl_ctrl] considering:\n");
+	sc_default_dump(s1);
+	sc_default_dump(s2);
+    }
+
     switch (ofl_ctrl) 
     {
     case OFL_CTRL :
@@ -139,7 +145,7 @@ int ofl_ctrl;
 	{
 	    Psysteme sc2 = sc_dup(s2);
 	    sc2 = sc_elim_redond(sc2);
-	    s = (SC_UNDEFINED_P(sc2)) ? sc_empty(base_dup(sc_base(s2))) : sc2;
+	    s = SC_UNDEFINED_P(sc2)? sc_empty(base_dup(sc_base(s2))): sc2;
 	}
 	else 
 	    if (SC_RN_P(s1) ||sc_rn_p(s1) || sc_dimension(s1)==0   
@@ -147,12 +153,11 @@ int ofl_ctrl;
 	    {
 		Psysteme sc1 = sc_dup(s1);
 		sc1 = sc_elim_redond(sc1);
-		s = (SC_UNDEFINED_P(sc1)) ? sc_empty(base_dup(sc_base(s1))) : sc1;
+		s = SC_UNDEFINED_P(sc1)? sc_empty(base_dup(sc_base(s1))): sc1;
 	    }
 	    else 
 	    {
 		/* calcul de l'enveloppe convexe */
-		s = sc_new();
 		s = sc_convex_hull(s1,s2);
 		/* printf("systeme final \n"); sc_dump(s);  */
 	    }
