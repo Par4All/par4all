@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.74  1997/09/15 14:28:53  coelho
+ * fixes for new COMMON prefix.
+ *
  * Revision 1.73  1997/09/15 11:58:20  coelho
  * initial value may be undefined from wp65... guarded.
  *
@@ -35,7 +38,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.73 1997/09/15 11:58:20 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.74 1997/09/15 14:28:53 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1034,7 +1037,7 @@ sentence_variable(entity e)
 static sentence 
 sentence_area(entity e, entity module)
 {
-    string area_name = entity_local_name(e);
+    string area_name = module_local_name(e);
     type te = entity_type(e);
     bool prettyprint_hpfc = get_bool_property("PRETTYPRINT_HPFC");
     list 
@@ -2473,8 +2476,7 @@ text_statement(
 	    entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
     string comments = statement_comments(stmt);
 
-    debug(2, "text_statement", "Begin for statement %s\n",
-	  statement_identification(stmt));
+    pips_debug(2, "Begin for statement %s\n", statement_identification(stmt));
 
     if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
        statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
@@ -2529,8 +2531,7 @@ text_statement(
 		    && unlabelled_statement_p(stmt));
     }
 
-    debug(2, "text_statement", "End for statement %s\n",
-	  statement_identification(stmt));
+    pips_debug(2, "End for statement %s\n", statement_identification(stmt));
        
     return(r);
 }
@@ -2599,10 +2600,8 @@ output_a_graph_view_of_the_unstructured_successors(text r,
    if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE")) {
       add_one_unformated_printf_to_text(r, "C Unstructured node %p ->", c);
       MAP(CONTROL, a_successor,
-          {
-             add_one_unformated_printf_to_text(r," %p", a_successor);
-          },
-             control_successors(c));
+	  add_one_unformated_printf_to_text(r," %p", a_successor),
+	  control_successors(c));
       add_one_unformated_printf_to_text(r,"\n");
    }
 
