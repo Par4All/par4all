@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.72  1997/12/08 14:51:29  coelho
+ * free_text added.
+ *
  * Revision 1.71  1997/11/22 16:34:03  coelho
  * translation not needed any more...
  *
@@ -258,9 +261,12 @@ init_host_and_node_entities ()
 
     ifdebug(3)
     {
+	text t;
 	debug_on("PRETTYPRINT_DEBUG_LEVEL");
 	pips_debug(3, "old declarations:\n");
-	print_text(stderr, text_declaration(current_module));
+	t = text_declaration(current_module);
+	print_text(stderr, t);
+	free_text(t);
 	debug_off();
     }
 
@@ -314,14 +320,19 @@ init_host_and_node_entities ()
 
     ifdebug(3)
     {
+	text t;
 	debug_on("PRETTYPRINT_DEBUG_LEVEL");
 	pips_debug(3,"new declarations - node_module:\n");
 	(void) gen_consistent_p(node_module);
-	print_text(stderr, text_declaration(node_module));
+	t = text_declaration(node_module);
+	print_text(stderr, t);
+	free_text(t);
 
 	pips_debug(3, "new declarations - host_module:\n");
 	(void) gen_consistent_p(host_module);
-	print_text(stderr, text_declaration(host_module));
+	t = text_declaration(host_module);
+	print_text(stderr, t);
+	free_text(t);
 	debug_off();
     }
 }
@@ -403,7 +414,8 @@ hpfc_print_code(
     set_prettyprinter_common_hook(hpfc_common_hook);
 
     t = text_module(module, stat);
-    print_text(file, t); /* t is freed as a side effect... */
+    print_text(file, t);
+    free_text(t);
     
     reset_prettyprinter_common_hook();
     reset_prettyprinter_head_hook();
