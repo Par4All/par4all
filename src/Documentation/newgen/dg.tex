@@ -1,7 +1,7 @@
 \documentstyle{article}
 \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
-\title{PIPS: Graphe Oriente' Ge'ne'rique}
+\title{PIPS: Dependence Graph}
 \author{Franc,ois Irigoin \\
     Pierre Jouvelot \\
     Re'mi Triolet\\
@@ -13,52 +13,92 @@
 
 \begin{document}
 \maketitle
+
 \sloppy
+
+The dependence graph specific data structures, as well as auxiliary data
+structures used to compute it are described in this report. The graph
+itself is a generic graph defined in \verb/Newgen/graph.f.tex/. It is
+specialized into a dependence graph by using specific arc and vertex
+labels. 
+
+The genericity is not supported explicitly by NewGen. Althoug the arc
+and vertex labels are NewGen objects, they are seen as external
+types. Specific procedures are specified in calls to
+\verb/gen_init_external/. C module using these labels must use explicit
+casts to convert the generic labels into dependence graph labels.
+
+Auxiliary data structures are used to compute the strongly connected
+components (SCC) of the dependence graph. The SCC routines are not as
+generic as could be hoped. They take into account the graph hierarchy
+implied by the dependence levels of the Allen \& Kennedy parallelization
+algorithm. This explains why the SCC related data structures are
+declared here and not with data structure \verb/graph/.
+
+\iffalse
 Les structures de donne'es suivantes sont utilise'es par la phase de
 construction du graphe des de'pendances. Elles sont construites en
 utilisant les structures de donne'es \verb+statement+ et \verb+effect+
 qui ont e'te' de'finies dans la repre'sentation interne, ainsi que la
 structure de donne'es ge'ne'riques \verb+vertex+ qui fait partie du
 package {\em graph}.
+\fi
 
-\section*{Domaines NewGen importe's}
+\section*{Imported NewGen Types}
 
+\iffalse
 \domain{Import statement from "ri.newgen"}
 {}
+\fi
+
 \domain{Import effect from "ri.newgen"}
 {}
+
 \domain{Import vertex from "graph.newgen"}
 {}
 
-\section*{Structures de donne'es externes}
+\section*{Data Structures External to NewGen}
+
+Generating systems are used to abstract a set of dependence arcs by
+dependence cones (convex and transitive closure of the dependence set)
+and/or dependence polyhedron (convex closure). This data structure is
+part of the C3 Linear Algebra library.
 
 \domain{External Ptsg}
 
-\section*{De'corations du graphe de de'pendance}
+\section*{Arc and Vertex Labels for the Dependence Graph}
 
 \domain{dg\_vertex\_label = statement:int x sccflags}
-{Ce domaine est utilise' pour contenir les informations qui sont
+{}
+
+Ce domaine est utilise' pour contenir les informations qui sont
 attache'es a` chaque noeud du graphe de de'pendances (voir le domaine
 {\tt graph} dans le fichier {\tt graph.f.tex}). Le sous-domaine {\tt
 statement} permet de retrouver l'instruction qui porte la de'pendance;
 cet entier est le champ {\tt ordering} de l'instruction concerne'e. Le
 sous-domaine {\tt sccflags} contient diverses informations utiles pour
-le calcul des composantes fortement connexes.}
+le calcul des composantes fortement connexes.
 
 \domain{dg\_arc\_label = conflicts:conflict*}
-{Ce domaine est utilise' pour contenir les informations qui sont
+{}
+
+Ce domaine est utilise' pour contenir les informations qui sont
 attache'es a` chaque arc du graphe de de'pendances (voir le domaine {\tt
 graph} dans le fichier {\tt graph.f.tex}). Chaque arc du GD contient les
-conflits entre les deux statements des noeuds du graphe de de'pendance.}
+conflits entre les deux statements des noeuds du graphe de de'pendance.
 
-\domain{conflict = source:effect x sink:effect x cone}
-{Un conflit existe entre deux effets pre'sents dans deux noeuds voisins
+\domain{conflict = persistant source:effect x persistant sink:effect x cone}
+{}
+
+Un conflit existe entre deux effets pre'sents dans deux noeuds voisins
 du graphe de de'pendance. Les types d'effet (write, read) sert a`
 distinguer les conflits ``use-def'', ``def-def'' et ``{def-use}''. Le
-cone comprend les informations precises de conflict.}
+cone comprend les informations precises de conflict.
 
 \domain{cone = levels:int* x generating\_system:Ptsg}
-{Le domaine co^ne de'finit une approximation polye'drique de l'ensemble
+{}
+
+Le domaine co^ne de'finit une approximation polye'drique de l'ensemble
 des de'pendances porte'es par un arc. Plusieurs types d'approximation
 sont possibles: les niveaux de de'pendance, les vecteurs de direction de
 de'pendance, les syste`mes ge'ne'rateurs (aussi
@@ -67,22 +107,29 @@ du {\em Data Flow Graph} n'est pas imple'mente' avec cette structure
 de donne'es mais avec \verb|paf_ri|.
 
 Le niveau d'une de'pendance d\'ecrivent le nombre de boucles englobantes concerne\'ees.
-``{generating\_system}'' est la r\'epresentation de system generateur}
+``{generating\_system}'' est la r\'epresentation de system generateur.
 
-\section*{Composantes fortement connexes}
+\section*{Strongly Connected Components}
 
 \domain{Sccflags = enclosing\_scc:scc x mark:int x dfnumber:int x lowlink:int}
-{Ce domaine est utilise' par l'algorithme de calcul des composantes
-fortement connexes d'un graphe.}
+{}
+
+Ce domaine est utilise' par l'algorithme de calcul des composantes
+fortement connexes d'un graphe.
 
 \domain{Sccs = sccs:scc*}
-{Ce domaine permet de contenir le re'sultat de l'algorithme de calcul
+{}
+
+Ce domaine permet de contenir le re'sultat de l'algorithme de calcul
 des composantes fortement connexes d'un graphe. Il s'agit d'une liste de
-{\tt scc}, c'est a` dire de composantes fortement connexes.}
+{\tt scc}, c'est a` dire de composantes fortement connexes.
+
 \domain{Scc = vertices:vertex* x indegree:int}
-{Ce domaine permet de repre'senter une composante fortement connexe d'un
+{}
+
+Ce domaine permet de repre'senter une composante fortement connexe d'un
 graphe. Une {\tt scc} se compose d'un ensemble de noeuds, et d'un
 sous-domaine {\tt indegree} utilise' par l'algorithme de tri topologique.
-}
+
 \end{document}
 \end
