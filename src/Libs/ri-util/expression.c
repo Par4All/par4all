@@ -207,8 +207,8 @@ expression eg, ed;
 expression call_to_expression(c)
 call c;
 {
-    return(make_expression(make_syntax(is_syntax_call, c),
-			   make_normalized(is_normalized_complex, UU)));
+    return make_expression(make_syntax(is_syntax_call, c),
+			   normalized_undefined);
 }
 
 expression make_call_expression(e, l)
