@@ -2,6 +2,9 @@
  * $Id$
  */
 
+#define PROGRAM_RESOURCE_OWNER ""
+#define WORKSPACE_TMP_SPACE "Tmp"
+
 /* conform to old interface.
  */
 #define DB_PUT_MEMORY_RESOURCE(res_name, own_name, res_val) \
