@@ -357,7 +357,7 @@ user_irrecoverable_error_function(char * a_message_format, ...)
    va_list some_arguments;
    va_start(some_arguments, a_message_format);
    /* print name of function causing error */
-   (void) fprintf(stderr, "user error in UNKNOW...: ", );
+   (void) fprintf(stderr, "user error in UNKNOW...: ");
 
    /* print out remainder of message */
    (void) vfprintf(stderr, a_message_format, some_arguments);
