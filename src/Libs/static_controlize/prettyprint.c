@@ -39,9 +39,11 @@
 #include "text-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
+#include "prettyprint.h"
 #include "paf-util.h"
 
 #define MAX_STATIC_CONTROL_LINE_NUMBER 2048
+#define CODE_WITH_STATIC_CONTROLIZE_EXT ".stco"
 
 /* Global variables */
 static statement_mapping 	Gsc_map;
@@ -53,11 +55,10 @@ static statement_mapping 	Gsc_map;
 boolean print_code_static_control(module_name)
 string module_name;
 {
-    FILE 	*fd;
-    char 	*filename;
     entity 	module;
     statement 	module_stat;
     text 	txt = make_text(NIL);
+    bool success;
 
     debug_on( "PRINT_STATIC_CONTROL_DEBUG_LEVEL" );
 
@@ -71,19 +72,30 @@ string module_name;
     Gsc_map = (statement_mapping) 
 	db_get_memory_resource( DBR_STATIC_CONTROL, module_name, TRUE); 
     init_prettyprint(text_static_control);
+
+/*
     filename = strdup(concatenate(db_get_current_workspace_directory(), 
 				  "/", module_name, ".stco", NULL));
-
     fd = safe_fopen(filename, "w");
+*/
+
     MERGE_TEXTS(txt, text_module(module, module_stat)); 
+
+/*
     print_text(fd, txt);
     safe_fclose(fd, filename);
-
     DB_PUT_FILE_RESOURCE(DBR_PRINTED_FILE, strdup(module_name), 
 			 	filename);
-    debug_off();
+*/    
 
-    return(TRUE);
+    success = make_text_resource(module_name,
+				 DBR_PRINTED_FILE,
+				 CODE_WITH_STATIC_CONTROLIZE_EXT,
+				 txt);
+
+    debug_off();
+    
+    return(success);
 }
 
 
