@@ -90,9 +90,12 @@ void Matrix_Free(Matrix *Mat) {
   Value *p;
 
 #ifdef GNUMP
-  p = *(Mat->p);
-  for(i=0;i<Mat->p_allocsize;i++) {
-    value_clear(*p++);
+  if( Mat->p_allocsize )
+  {
+    p = *(Mat->p);
+    for(i=0;i<Mat->p_allocsize;i++) {
+      value_clear(*p++);
+    }
   }
 #else
   for(i=0;i<Mat->NbRows;i++) {
