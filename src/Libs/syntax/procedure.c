@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.64  2002/06/21 13:48:16  irigoin
+ * Complexification of DATA handling. The repeat function is no longer
+ * systematically called when the repeat factor is 1.
+ *
  * Revision 1.63  2002/06/20 15:46:32  irigoin
  * New handling of DATA statements thru the initializations field in code
  *
@@ -663,27 +667,23 @@ static list find_target_position(list cvl, int ctp, int * pmin_cp, int * pmax_cp
       list args = call_arguments(c);
       expression rfe = expression_undefined; /* Repeat Factor Expression */
       expression cve = expression_undefined; /* Constant Value Expression */
+      int n = 1; /* Default repeat factor */
 
-      pips_assert("The repeat function is called", ENTITY_REPEAT_VALUE_P(rf));
-      pips_assert("The repeat function is called with two arguments", gen_length(args)==2);
+      if(ENTITY_REPEAT_VALUE_P(rf)) {
+	/* pips_assert("The repeat function is called", ENTITY_REPEAT_VALUE_P(rf)); */
+	pips_assert("The repeat function is called with two arguments", gen_length(args)==2);
 
-      rfe = EXPRESSION(CAR(args));
-      cve = EXPRESSION(CAR(CDR(args)));
-
-      pips_assert("A constant value expression is a call", expression_call_p(cve));
-      *pcve = cve;
-      *pmax_cp += expression_to_int(rfe);
-    }
-    else if(expression_call_p(vs)){
-      /* The value is directly available */
-      expression cve = vs; /* Constant Value Expression */
-
-      
-
+	rfe = EXPRESSION(CAR(args));
+	cve = EXPRESSION(CAR(CDR(args)));
+	n = expression_to_int(rfe);
+      }
+      else {
+	cve = vs;
+      }
 
       pips_assert("A constant value expression is a call", expression_call_p(cve));
       *pcve = cve;
-      *pmax_cp = *pmax_cp+1;
+      *pmax_cp += n;
     }
     else {
       pips_internal_error("Call expression expected");
