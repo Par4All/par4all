@@ -34,7 +34,7 @@ char * malloc();
  */
 
 
-pivoter_pas(eq,ligne,var)
+void pivoter_pas(eq,ligne,var)
 Psommet eq;
 Psommet ligne;
 Variable var;
@@ -44,8 +44,8 @@ Variable var;
     Pvecteur pvec = NULL;
     Pvecteur ligne2;
 
-    int c1 = 0;
-    int den;
+    Value c1 = VALUE_ZERO;
+    Value den;
     boolean cst = FALSE;
 #ifdef TRACE
     printf(" --- pas - pivoter \n");
@@ -55,24 +55,35 @@ Variable var;
 
 	den = ligne->denominateur;
 	cst = FALSE;
-	if ((eq != ligne) && (c1 = vect_coeff(var,pv3)) != 0) {
+	if ((eq != ligne) && value_notzero_p(c1 = vect_coeff(var,pv3))) {
 
 	    ligne2 = vect_dup(ligne->vecteur);
-	    eq->denominateur *= den;
+	    value_product(eq->denominateur,den);
 	    for (pvec =pv3;pvec!= NULL; pvec=pvec->succ) {
+		Value tmp;
 		if (pvec->var == NULL) cst = TRUE;
-		pvec->val =pvec->val* den - c1 * vect_coeff(pvec->var,
-							    ligne->vecteur);
-		vect_chg_coeff(&ligne2,pvec->var,0);
+
+		value_product(pvec->val,den);
+		tmp = vect_coeff(pvec->var,ligne->vecteur);
+		value_product(tmp,c1);
+		value_substract(pvec->val,tmp);
+
+		vect_chg_coeff(&ligne2,pvec->var,VALUE_ZERO);
 	    }
 
 	    for (pvec=ligne2;pvec!= NULL;pvec = pvec->succ)
 		if (pvec->var != TCST)
-		    vect_add_elem(&pv3,pvec->var,
-				  -c1*vect_coeff(pvec->var,ligne2));
+		{
+		    Value tmp = vect_coeff(pvec->var,ligne2);
+		    value_product(tmp,c1);
+		    vect_add_elem(&pv3,pvec->var,value_uminus(tmp));
+		}
 	    if (!cst)
-		vect_add_elem(&pv3,
-			      TCST,-c1*vect_coeff(TCST,ligne->vecteur));
+	    {
+		Value tmp = vect_coeff(TCST,ligne->vecteur);
+		value_product(tmp,c1);
+		vect_add_elem(&pv3,TCST,value_uminus(tmp));
+	    }
 	}
 	eq->vecteur = pv3;
     }
@@ -93,7 +104,7 @@ Variable var;
  *  Psommet ligne  : ligne pivot
  *  int     var    : variable pivot   
  */
-pivoter(sys,ligne,var,fonct)
+void pivoter(sys,ligne,var,fonct)
 Psommet sys;
 Psommet ligne;
 Variable var;
@@ -104,25 +115,27 @@ Psommet fonct;
     Psommet sys1 = fonct;
     Psommet ps1 = NULL;
     int sgn_den = 1;
-    int den;
+    Value den,tmp;
 #ifdef TRACE
     printf(" *** on effectue le pivot \n");
 #endif
     if (ligne) {
 
 	den = vect_coeff(var,ligne->vecteur);
-	if (den <0)
+	if (value_neg_p(den))
 	{
 	    sgn_den = -1;
-	    den *= sgn_den;
+	    value_oppose(den);
 	}
 	if (fonct != NULL)
 	    fonct->succ = sys;
 	else sys1 = sys;
 
 	/* mise a jour du denominateur   */
-	(void) vect_multiply(ligne->vecteur,sgn_den*ligne->denominateur);
-	ligne->denominateur *= den;
+	tmp = ligne->denominateur;
+	if (sgn_den==-1) value_oppose(tmp);
+	(void) vect_multiply(ligne->vecteur,tmp);
+	value_product(ligne->denominateur,den);
 	den = ligne->denominateur;
 	for (ps1 = sys1; ps1!= NULL; ps1=ps1->succ)
 	    pivoter_pas(ps1,ligne,var);
