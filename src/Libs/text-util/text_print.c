@@ -121,11 +121,8 @@ print_sentence(FILE * fd,
 	
 	pips_assert("not too many columns", col <= MAX_END_COLUMN);
 	
-	while (lw) {
-	    string w = STRING(CAR(lw));
-	    STRING(CAR(lw)) = NULL;
-	    lw = CDR(lw);
-	    
+	MAP(STRING, w, 
+	{
 	    /* if the string fits on the current line: no problem */
 	    if (col + strlen(w) <= 70) {
 		deal_with_attachments_in_this_string(w,
@@ -216,8 +213,8 @@ print_sentence(FILE * fd,
 			col += ncar;
 		    }
 		}
-	    free(w);
-	}
+	},
+	    lw);
 
 	pips_debug(9, "line completed, col=%d\n", col);
 	pips_assert("not too many columns", col <= MAX_END_COLUMN+1);
@@ -298,7 +295,7 @@ dump_words(list lw)
 static void 
 debug_word(string w)
 {
-    fprintf(stderr, "# string--%s--\n", w);
+    fprintf(stderr, "# string--%s--\n", w? w: "<null>");
 }
 
 void
@@ -317,8 +314,8 @@ static void
 debug_unformatted(unformatted u)
 {
     fprintf(stderr, "# unformatted\n# label %s, %d, %d\n",
-	    unformatted_label(u), unformatted_number(u), 
-	    unformatted_extra_margin(u));
+	    unformatted_label(u)? unformatted_label(u): "<null>", 
+	    unformatted_number(u), unformatted_extra_margin(u));
     debug_words(unformatted_words(u));
     fprintf(stderr, "# end unformatted\n");
 }
