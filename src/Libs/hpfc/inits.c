@@ -7,7 +7,7 @@
  * run-time resolution parameters.
  *
  * SCCS stuff:
- * $RCSfile: inits.c,v $ ($Date: 1995/03/14 14:43:16 $, ) version $Revision$,
+ * $RCSfile: inits.c,v $ ($Date: 1995/03/22 10:56:57 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  *
@@ -156,13 +156,13 @@ entity module;
      {
 	 entity
 	     array = ENTITY(CAR(ce));
-	 int an = load_entity_hpf_number(array);
+	 int an = load_hpf_number(array);
 	 int nd = NumberOfDimension(array);
 	 align
 	     al = load_entity_align(array);
 	 entity
 	     template = align_template(al);
-	 int tn = load_entity_hpf_number(template);
+	 int tn = load_hpf_number(template);
 	 distribute
 	     di = load_entity_distribute(template);
 	 int i;
@@ -381,13 +381,13 @@ FILE* file;
      {
 	 entity
 	     template = ENTITY(CAR(ce));
-	 int tn = load_entity_hpf_number(template);
+	 int tn = load_hpf_number(template);
 	 int nd  = NumberOfDimension(template);
 	 distribute
 	     di = load_entity_distribute(template);
 	 entity
 	     proc = distribute_processors(di);
-	 int pn = load_entity_hpf_number(proc);
+	 int pn = load_hpf_number(proc);
 	 int procdim = 1;
 	 int tempdim = 1;
 	 
@@ -471,7 +471,7 @@ FILE* file;
      {
 	 entity
 	     proc = ENTITY(CAR(ce));
-	 int pn = load_entity_hpf_number(proc);
+	 int pn = load_hpf_number(proc);
 	 int nd  = NumberOfDimension(proc);
 	 int procdim = 1;
 	 
