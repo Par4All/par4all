@@ -100,7 +100,7 @@ Pbase * b;
 void vect_fprint(f, v, variable_name)
 FILE * f;
 Pvecteur v;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     Pvecteur p;
 
@@ -327,7 +327,7 @@ Pvecteur v;
 void base_fprint(f, b, variable_name)
 FILE * f;
 Pbase b;
-char * (*variable_name)();
+char * (*variable_name)(Variable);
 {
     if(VECTEUR_NUL_P(b)) 
 	(void) fprintf(f,"base vide\n");
