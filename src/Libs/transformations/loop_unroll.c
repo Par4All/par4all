@@ -3,6 +3,9 @@
   $Id$
 
   $Log: loop_unroll.c,v $
+  Revision 1.20  1999/05/05 15:47:46  irigoin
+  Error message improved in full_loop_unroll()
+
   Revision 1.19  1998/10/20 15:01:07  ancourt
   add whileloop entry
 
@@ -401,7 +404,8 @@ void full_loop_unroll(statement loop_statement)
     }
     else {
 	user_error("full_loop_unroll", 
-		   "loop range must be numerically known\n");
+		   "loop range for loop %s must be numerically known\n",
+		   label_local_name(loop_label(il)));
     }
 
     /* Instruction block is created and will contain everything */
