@@ -209,6 +209,7 @@ static bool privatizer(char *module_name)
 	reset_private_effects();
 	reset_copy_out_effects();
     }
+    free_value_mappings();
 
     return(TRUE);
 }
@@ -844,6 +845,7 @@ declarations_privatizer(char *mod_name)
     reset_rw_effects();
     reset_in_effects();
     reset_out_effects();
+    free_value_mappings();
     return( TRUE );
 }
 
