@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/01/06 15:55:50 $, 
+ * $Date: 1997/03/28 21:34:11 $, 
  *
  * adapted from whta can be seen by FC 31/12/96
  * 
@@ -12,6 +12,7 @@
  * - bug labeled end (skipped) in lend()
  * - tab in first columns...
  * - bang comments added
+ * - bug name[20] overflow not checked in lname (20 -> 80)
  */
 
 /*
@@ -353,7 +354,8 @@ int fsplit(char * file_name, FILE *out)
     int nflag,		/* 1 if got name of subprog., 0 otherwise */
 	retval,
 	i;
-    char name[20];
+   /* ??? 20 -> 80 because not checked... smaller than a line is ok ? FC */
+    char name[80]; 
 	
     if ((ifp = fopen(file_name, "r")) == NULL) {
 	fprintf(stderr, "fsplit: cannot open %s\n", file_name);
@@ -364,6 +366,10 @@ int fsplit(char * file_name, FILE *out)
 	/* look for a temp file that doesn't correspond to an existing file */
 	get_name(x, 3);
 	ofp = fopen(x, "w");
+	if (!ofp) {
+	    fprintf(stderr, "fopen(\"%s\") failed\n", x);
+	    exit(2);
+	}
 	nflag = 0;
 	rv = 0;
 	while (getline() > 0) {
@@ -374,7 +380,10 @@ int fsplit(char * file_name, FILE *out)
 		if (nflag == 0)		/* if no name yet, try and find one */
 			nflag = lname(name);
 	}
-	fclose(ofp);
+	if (fclose(ofp)) {
+	    fprintf(stderr, "fclose(ofp) failed\n");
+	    exit(2);
+	}
 	if (rv == 0) {			/* no lines in file, forget the file */
 		unlink(x);
 		retval = 0;
@@ -384,7 +393,10 @@ int fsplit(char * file_name, FILE *out)
 				fprintf( stderr, "fsplit: %s not found\n",
 					extrnames[i]);
 			}
-		fclose(ifp);
+		if (fclose(ifp)) {
+		    fprintf(stderr, "fclose(ifp) failed\n");
+		    exit(2);
+		}
 		return ( retval );
 	}
 	if (nflag) {			/* rename the file */
@@ -404,13 +416,16 @@ int fsplit(char * file_name, FILE *out)
 			unlink(x);
 			continue;
 	}
-	if(!extr)
+	if(!extr) 
 		fprintf(out, "%s\n", x);
 	else
 		unlink(x);
     }
 
-    fclose(ifp);
+    if (fclose(ifp)) {
+	fprintf(stderr, "fclose(ifp) failed\n");
+	exit(2);
+    }
     return 1;
 }
 
