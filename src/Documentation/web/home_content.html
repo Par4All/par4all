@@ -1,15 +1,17 @@
 <center>
 
+<!--
+
 <h2>Parall&eacute;liseur Interproc&eacute;dural de Programmes
 Scientifiques</h2>
 
 <h2>(Interprocedural Parallelizer for Scientific Programs)</h2>
 
-<IMG SRC=images/logo-pips.half-size.gif> <H1>PIPS</H1>
+-->
 
-<h2><a href="http://www.cri.ensmp.fr">Centre de Recheche en Informatique</a></h2>
+<IMG SRC=images/logo-pips.small.gif> <H1>The PIPS Workbench Project</H1>
 
-<h2><a href="http://www.ensmp.fr">École des mines de Paris</a></h2>
+<h2><a href="http://www.cri.ensmp.fr">Centre de Recherche en Informatique/</a><a href="http://www.ensmp.fr">École des mines de Paris</a></h2>
 
 </center>
 
@@ -33,10 +35,12 @@ href="http://wwwbode.informatik.tu-muenchen.de/~hackenbe/hips96.html">High-Level
 Programming Models and Supportive Environments</a></STRONG> at
 IPPS'96.
 
--->
-
 <P>
 <hr> 
+
+-->
+
+<!--
 
 <img
 src="http://www.cri.ensmp.fr/icons/new/big_blue_new_trans.gif"
@@ -57,35 +61,229 @@ src="http://www.cri.ensmp.fr/icons/new/big_blue_new_trans.gif"
 align=middle> You can get a beta version of the
 <a href="distribution.html">PIPS software</a>.
 
-<hr> 
+-->
 
-</p>
-
-</center><br>
+<a name="new-features"><h2>What's new?</h2></a>
+<P>
+<ul>
+  <li> WHILE loops are parsed and analyzed, as well as multiple RETURNs; ENTRY statements are on their way into the parser...
+  <li> Cloning
+  <li> Forward substitution
+  <li> OpenMP output
+  <li> Graph representation of large call graphs (with DaVinci)
+  <li> A Java-based user interface (jpips)
+  <li> Perfect Club benchmarks:
+  <li> Spec-CFP95 benchmarks: applu, apsi , fpppp, hydro2d, mgrid, su2cor, swim, tomcatv, turb3d (wave5 is missing because of its ENTRY number)
+</ul>
 
 <hr>
 
-Last update: $Date: 1997/03/17 11:32:17 $, 
-
-<p>
+<b>Last update: </b>$Date: 1998/06/26 15:00:18 $
 
 <b>URL: </b>http://www.cri.ensmp.fr/pips
 
+<b>E-mail: </b><code>pips@cri.ensmp.fr</code>
+
 
 <hr>
-<a name="introduction"><h2>Introduction</h2></a>
 
-<b>PIPS</b> is an automatic parallelizer for scientific programs. It
-takes as input Fortran 77 codes and emphasizes interprocedural
-techniques for program analyses. PIPS specific interprocedural analyses
-are <a href="cnrs-nsf92/cnrs-nsf92.html">precondition</a> and <a
-href="regions.html">array region</a> computations. PIPS computes affine
-preconditions for integer scalar variables which are much more powerful
-than standard constant propagation or forward substitution. PIPS also
-computes several kinds of polyhedral array regions (READ, WRITE, IN and
-OUT). PIPS is based on linear algebra techniques for analyses, e.g.
-dependence testing, as well as for code generation, e.g. loop
-interchange or tiling.
+<a name="introduction"><h2>Objectives</h2></a>
+
+The goal of the <b>PIPS</b> project is to develop a free, open and
+extensible workbench for automatically analyzing and transforming signal
+processing and scientific applications. The <b>PIPS</b> workbench is
+especially relevant for people interested in whole program compilation,
+reverse-engineering, program verification, source-to-source program
+optimization and parallelization. Its interprocedural analyses help with
+program understanding and with checking legality and impact of automatic
+program transformations. These transformations are used to reduce the
+execution cost and latency, as well as the optimization cost itself.
+
+<p>
+
+Techniques developped for <b>PIPS</b> can be re-used for signal processing
+code written in C, because pointers, data structures and dynamic
+allocation are not used much, and for Java code optimization because array
+boundary checking must be minimized conservatively.
+
+<p>
+
+<b>PIPS</b> is a free open workbench which has been used as support to develop
+new analyses or program transformations by several teams from CEA-DAM,
+Southampton University, SRU and ENS Cachan. These new developments benefit
+at no cost from the general infrastructure and from already available
+analyses and transformations. <b>PIPS</b> has also been used to develop a
+HPF prototype compiler and to study optimizations for HPF.
+
+<p>
+
+<b>PIPS</b> is not primarily designed to support compiler back-end
+research like <b>SUIF</b> but is much better as a Fortran source-to-source
+tool because the data types (e.g. complex) the code structures, the
+comments and, to some extent, the initial statement numbers are preserved.
+
+<a name="Examples"><h2>Examples</h2></a>
+
+<p>
+
+<b>PIPS</b> was initially designed as an automatic parallelizer for
+scientific programs. It takes as input Fortran 77 codes and emphasizes
+<b>interprocedural</b> techniques for program analyses. <b>PIPS</b> specific
+interprocedural analyses are <a
+href="cnrs-nsf92/cnrs-nsf92.html">precondition</a> and <a
+href="regions.html">array region</a> computations. <b>PIPS</b> automatically
+computes affine preconditions for integer scalar variables which are much
+more powerful than standard constant propagation or forward substitution
+as shown below:
+
+<p>
+
+<pre>
+      I = 1
+      N = 10 
+      J = 3
+
+C  P(I,J,N) {I==1, J==3, N==10}
+
+      DO WHILE (I.LT.N)
+
+C  P(I,J,N) {N==10, I<=9, 5<=2I+J, J<=3}
+
+         PRINT *, I
+         IF (T(I).GT.0.) THEN 
+            J = J-2 
+         ENDIF
+
+         I = I+1
+
+      ENDDO
+
+C  P(I,J,N) {N==10, I==10, 5<=2I+J, J<=3}
+
+      PRINT *, I, J
+</pre>
+
+<p>
+
+<b>PIPS</b> also computes several kinds of polyhedral array regions (READ,
+WRITE, IN and OUT) which are used for array and partial array
+interprocedural privatization as well as for interprocedural
+parallelization. Here, for instance, array <code>TI</code> is
+automatically privatized in spite of its initialization thru call to
+<code>PVNMUT</code>:
+
+<p>
+
+<pre>
+!$OMP PARALLEL DO PRIVATE(J)
+      DO K = K1, K2
+
+!$OMP    PARALLEL DO PRIVATE(TI(1:3))
+         DO J = J1, JA
+
+            CALL PVNMUT(TI)
+            T(J,K,NN) = S*TI(1)
+            T(J,K,NN+1) = S*TI(2)
+            T(J,K,NN+2) = S*TI(3)
+         ENDDO
+      ENDDO
+</pre>
+
+<p>
+
+As mentionned above, <b>PIPS</b> can also be used as a reverse engineering
+tool. Region analyses provide useful summaries of procedure effects, while
+precondition-based partial evaluation and dead-code elimination reduce
+code size. Cloning has also be used successfully to split a routine
+implementing several functionalities into a set of routines implementing
+each exactly one functionality. Auomatic cleaning of declarations is
+useful when commons are over-declared thru include statements.
+
+<a name="analyses-and-transformations"><h2>Analyses and Transformations</h2></a>
+
+<p>
+
+All analyses and transformations are listed in the documentation of the
+<a href="pipsmake-rc/pipsmake-rc.html"><em>PIPS API</em></a>. Static
+analyses compute call graphs, memory effects, use-def chains, dependence
+graphs, interpocedural checks, transformers, preconditions, continuation
+conditions, complexity estimation, reduction detection, array regions
+(read, write, in and out, may or exact), aliases and complementary
+sections. The results of analyses can be displayed with the source code,
+with the call graph or with an elapsed interprocedural control flow graph,
+as texts or as graphs. The dependence graphs can also be displayed either
+as text or graph.
+
+<p>
+
+Several parallelization algorithms are available, including Allen&Kennedy,
+as well as automatic code distribution, including a prototype HPF
+compiler, <b>hpfc</b>. Different views of the parallel outputs are
+available: HPF, OpenMP, Fortran90, Cray Fortran. Furthermore, the
+polyedral method of Pr. Feautrier also is implemented.
+
+<p>
+
+Program transformations include loop distribution, scalar and
+array privatizion, Atomizers (reduction of a statements to a three-address
+form), loop unrolling (partial and full), strip-mining, loop interchange,
+partial evaluation, dead-code elimination, use-def elimination, control
+restructuring, loop normalization, declaration
+cleaning, cloning, forward substitution and expression optimizations.
+
+<a name="user-interfaces"><h2>User Interfaces</h2></a>
+
+<p>
+
+Five user interfaces are available: a Shell interface <a
+href="dret144/dret144.html"><em>(Pips)</em></a>, a line interface <a
+href="line-interface.html"><em>(Tpips)</em></a> and three window-based
+interfaces. The two X-window interfaces (<a href="wpips.html"><em>wpips
+man</em></a>, <a
+href="wpips-epips-user-manual/wpips-epips-user-manual.html"><em>WPips and
+EPips user manual</em></a>) to the parallelizer are the best suited for
+users. The last interface is Java based.  Click <a
+href="images/wpips-screen-snapshot.gif">here</a> for a Wpips screen
+snpashot.
+
+<p>
+
+<a href="images/wpips-screen-snapshot.gif"><IMG
+SRC="images/wpips-screen-reduced-snapshot.gif"></a>.
+
+<a name="research"><h2>On-going research at CRI</h2></a>
+
+<p>
+
+The current research objectives are:
+<P>
+<ul>
+  <li>expression optimization for superscalar and VLIW architectures (<a
+href="http://www.cri.ensmp.fr/~zory">Julien Zory</a>)
+
+  <li>analysis refinment to support automatic computation of
+module signatures (<a
+href="http://www.cri.ensmp.fr/~albez">Olivier Albiez</a>, Nicky Williams-Preston)
+
+  <li>new effective encodings of sets of integer to support signal
+processing application better (<a
+href="http://www.cri.ensmp.fr/~albiez">Oliver Albiez</a>)
+
+  <li>compilation of signal processing specifications (<a
+href="http://www.cri.ensmp.fr/~ancourt">Corinne Ancourt</a>)
+</ul>
+
+These objectives were defined with our industrial partners (CEA, EDF,
+SAGEM, Thomson-CSF).
+
+
+<a name="workbench"><h2>Workbench</h2></a>
+
+<p>
+
+<b>PIPS</b> is based on linear algebra techniques for analyses, e.g.
+dependence testing, as well as for code generation, e.g. loop interchange
+or tiling.
 
 <p>
 
@@ -98,25 +296,8 @@ demand to perform the analyses or transformations required by the user.
 
 <center>
 <IMG SRC=images/poster_aggrandi.gif><br>
-<b>PIPS Overall Structure</b>
+<b>PIPS Overall Structure (Note: an OpenMP output is now available)</b>
 </center>
-
-<p>
-
-Three user interfaces are available: a Shell interface <a
-href="dret144/dret144.html"><em>(Pips)</em></a>, a line interface <a
-href="line-interface.html"><em>(Tpips)</em></a> and a X-window
-interface (<a href="wpips.html"><em>wpips man</em></a>, <a
-href="wpips-epips-user-manual/wpips-epips-user-manual.html"><em>WPips
-and EPips user manual</em></a>) to the parallelizer which is the best
-suited for users.  Click <a
-href="images/wpips-screen-snapshot.gif">here</a> for a WPips screen
-snpashot.
-
-<p>
-
-<a href="images/wpips-screen-snapshot.gif"><IMG
-SRC="images/wpips-screen-reduced-snapshot.gif"></a>.
 
 <p>
 
@@ -131,7 +312,7 @@ is up-to-date, although major functionalities have been added since.
 
 <p>
 
-<b>PIPS</b> is built on top of two tools. The first one is <a
+<b>PIPS</b> is built on top of two other tools. The first one is <a
 href="Newgen/newgen_manual/newgen_manual.html"><em>Newgen</em></a> which
 manages data structures a la <em>IDL</em>. It provides basic
 manipulation functions for data structures described in a declaration
@@ -146,7 +327,7 @@ All <b>PIPS</b> data-types are based on <em>Newgen</em>. A description
 of PIPS internal representation is available in a <a
 href="ri/ri.html">technical report</a>. The mapping of Fortran onto the
 PIPS internal representation is described in Technical Report <a
-href="dret105/dret105.html">TR E/105.</a>, Section 2.
+href="dret105/dret105.html">TR E/105</a>, Section 2.
 
 <p>
 
@@ -163,43 +344,46 @@ PRISM a C implementation of PIP (Parametric Integer Programming).
 
 <p>
 
+<!--
+
 New phases have been developped for distributed-memory machines, both in
-house (WP65 and HPFC projects) and outside. A team at CEA, lead by
+house (WP65 and HPFC projects) and outside.
+
+-->
+
+A team at CEA, lead by
 Benoit de Dinechin, contributed several phases which implement
 techniques developped by Paul Feautrier (PRISM) for TMC CM-5 and Cray
 T-3D machines, as well as extensions of these techniques (see <a
 href="poly_meth.html">Polyhedric method</a>). These external phases were
-easily blended within PIPS thanks to NewGen, which constraints the
+easily blended within <b>PIPS</b> thanks to NewGen, which constraints the
 number of data structures used by programmers and provide a general
 framework for low-level classes (list, hash-table,...), and thanks to
 <em>pipsmake</em> which hides the intra- and inter-procedural chaining
 of analyses and transformations from the programmer as well as from the
 user.
 
+<a name="availability"><h2>Availability</h2></a>
+
 <p>
 
-Seven years after its inception, PIPS as a workbench is still alive
-and well. PIPS provides a robust infrastructure for new experiments in
+Ten years after its inception, <b>PIPS</b> as a workbench is still alive
+and well. <b>PIPS</b> provides a robust infrastructure for new experiments in
 compilation, program analysis, optimisation, transformation and
-parallelization. The PIPS developper environment is described in a <a
+parallelization. The <b>PIPS</b> developper environment is described in a <a
 href="developer_guide">technical report</a> but it also is possible
-to develop new phases on top of but <em>outside</em> of PIPS since all
-(in fact, most...) PIPS data structures can be reloaded using Newgen
+to develop new phases on top of but <em>outside</em> of <b>PIPS</b> since all
+(in fact, most...) <b>PIPS</b> data structures can be reloaded using Newgen
 primitives from C or Lisp programs.
 
 <p>
 
-PIPS can also be used as a reverse engineering tool. Region
-analyses provide useful summaries of procedure effects, while
-precondition-based partial evaluation and dead code elimination reduce
-code size. 
-
-<p>
-
-PIPS is written in C and developped under SUNOS 4.1.4. PIPS can also
-be used under SOLARIS 2. It is available on request for the source but
-you can have an <a href="distribution.html">executable
-idea of it</a>.
+<b>PIPS</b> is written in C and developped under SUNOS 4.1.4. <b>PIPS</b>
+can also be used under SOLARIS 2.5.1 and Solaris 2.6, under LINUX, under
+AIX and Digital UNIX. Two versions are available: Integer values are
+represented either by 32-bit or by 64-bit words. The source code is
+available on request and executables are
+<a href="distribution.html">downloadable</a>.
 
 
 <hr> 
