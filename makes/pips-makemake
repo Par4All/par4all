@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/04 08:54:09 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/04 08:55:19 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -113,9 +113,6 @@ cat >> $MAKEFILE <<%
 CONFIG_FILE=	$CONFIG_FILE
 MAKEFILE=	$MAKEFILE
 #
-
-$(TARGETDIR):
-	mkdir $(TARGETDIR)
 
 .SCCS_GET:
 
@@ -283,6 +280,9 @@ INC_CFILES = $(TARGET_CFILES)
 #
 
 cat >> $MAKEFILE <<%
+
+$(TARGETDIR):
+	mkdir $(TARGETDIR)
 
 # install installs sources, so depends on sources. FC
 # to insure the library is compiled before hand, a make is added.
