@@ -1,6 +1,13 @@
-
 /* package hyperplane
-*/
+ *
+ * $Id*
+ * 
+ * $Log: hyperplane.c,v $
+ * Revision 1.7  1998/10/09 15:49:46  irigoin
+ * Reformatting + conversion from int to Value
+ *
+ *
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -46,7 +53,7 @@ cons * lls;
     matrice AG;
     int n;				/* number of index */
     int m ;				/* number of constraints */
-    int *h;
+    Value *h;
     int i;   
     statement s_lhyp;
     Pvecteur *pvg;
@@ -55,9 +62,12 @@ cons * lls;
     Pvecteur pv1, pv2;
     loop l;
 
+    debug_on("HYPERPLANE_DEBUG_LEVEL");
+
+    debug(8," hyperplane","Begin:\n");
+
     /* make the  system "sc" of constraints of iteration space */
     sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
-    debug(8," hyperplane","\n begin :");
     
     /* create the  matrix A of coefficients of  index in (Psysteme)sci */
     n = base_dimension(base_oldindex);
@@ -67,42 +77,48 @@ cons * lls;
 
     /* computation of the hyperplane direction */
     /*  use the  hyperplane direction  */
-    h = (int*)(malloc(n*sizeof(int)));
+    h = (Value*)(malloc(n*sizeof(Value)));
 
-   hyperplane_direction(h,n);
+    if(!interactive_hyperplane_direction(h, n)) {
+	pips_user_error("A proper hyperplane direction was not provided\n");
+    }
 
-    debug(8," hyperplane","\n  vecteur h :");
-    for (i = 0; i<n; i++)
-	debug(3," hyperplane"," %d",*(h+i));
+    ifdebug(8) {
+	debug(8," hyperplane","Vector h :");
+	for (i = 0; i<n; i++) {
+	    (void) fprintf(stderr," " VALUE_FMT, *(h+i));
+	}
+	(void) fprintf(stderr,"\n");
+    }
+
     G = matrice_new(n,n); 
     /* computation of the  scanning base G */
-    scanning_base_hyperplane(h,n,G);	  
-    if (get_debug_level() ==8) {
-	(void) fprintf(stderr,"The scanning base G is \n");
-	matrice_fprint(stderr,G,n,n);
+    scanning_base_hyperplane(h, n, G);	  
+    ifdebug(8) {
+	(void) fprintf(stderr,"The scanning base G is:");
+	matrice_fprint(stderr, G, n, n);
     }
 
     /* the new matrice of constraints AG = A * G */
     AG = matrice_new(m,n);
-    matrice_multiply(A,G,AG,m,n,n);
+    matrice_multiply(A, G, AG, m, n, n);
 
-    
     /* create the new system of constraintes (Psysteme scn) with  
        AG and sci */
     scn = sc_dup(sci);
-    matrice_index_sys(scn,base_oldindex,AG,n,m);
+    matrice_index_sys(scn, base_oldindex, AG, n,m );
 
     /* computation of the new iteration space in the new basis G */
-    sc_row_echelon = new_loop_bound(scn,base_oldindex);
+    sc_row_echelon = new_loop_bound(scn, base_oldindex);
 
-    /* changeof basis for index */
-    change_of_base_index(base_oldindex,&base_newindex);
-    sc_newbase=sc_change_baseindex(sc_dup(sc_row_echelon),base_oldindex,base_newindex);
+    /* change of basis for index */
+    change_of_base_index(base_oldindex, &base_newindex);
+    sc_newbase = sc_change_baseindex(sc_dup(sc_row_echelon), base_oldindex, base_newindex);
     
     /* generation of hyperplane  code */
     /*  generation of bounds */
     for (pb=base_newindex; pb!=NULL; pb=pb->succ) {
-	make_bound_expression(pb->var,base_newindex,sc_newbase,&lower,&upper);
+	make_bound_expression(pb->var, base_newindex, sc_newbase, &lower, &upper);
     }
   
     /* loop body generation */
@@ -116,7 +132,11 @@ cons * lls;
     upper= expression_to_expression_newbase(lower, pvg, base_oldindex);
 
 
-    s_lhyp = code_generation(lls,pvg,base_oldindex,base_newindex,sc_newbase);
+    s_lhyp = code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase);
+
+    debug(8," hyperplane","End\n");
+
+    debug_off();
 
     return(s_lhyp);
 }
