@@ -1,4 +1,9 @@
-% -*- Mode: TeX -*-
+%%
+%% $RCSfile: newgen_manual.tex,v $ (version $Revision$)
+%% $Date: 1996/11/22 22:06:02 $, 
+%%
+%% -*- Mode: TeX -*-
+%%
 \documentstyle[11pt]{article}
 
 \title{Newgen User Manual}
@@ -6,11 +11,12 @@
         {\em Remi Triolet}\\
         \\
         CRI\\
-        Ecole des Mines de Paris\\
-        60 bvd Saint-Michel\\
-        75272 Paris}
+        École des mines de Paris,\\
+        35, rue Saint-Honoré,\\
+        F-77305 Fontainebleau \textsc{cedex}}
 
-\date{December 1990}
+\date{December 1990 \\ last modified: $Date: 1996/11/22 22:06:02 $
+}
 
 \begin{document}
 
@@ -326,7 +332,7 @@ structures by calling the function {\tt gen\_consistent\_p}.  Also,
 the function {\tt gen\_sharing\_p} returns 1 if its two arguments have
 a pointer (either a Newgen value or a CONS cell) in common.
 
-Finally, when recursively traversing a Newgen value, one can use the
+When recursively traversing a Newgen value, one can use the
 general parametrized traversal routine {\tt gen\_recurse}, which is a
 simplified version of {\tt gen-recurse} used in the CommonLISP mode.
 It allows for easy definition of top-down and bottom-up algorithms on
@@ -351,6 +357,22 @@ performed.  Otherwise, once the recursive traversal of subobjects of
 
 For any domain {\tt d} defined in Newgen, the macro {\tt d\_domain} is
 defined.
+
+An extended version of this function is also available to traverse a
+Newgen value with filtering top-down decisions and rewriting bottom-up
+actions at several domains. 
+The traversal is optimized so that only useful arcs are followed,
+\emph{i.e.} arcs that may lead to a domain to be visited.
+
+{\small
+\begin{verbatim}
+void
+gen_multi_recurse(<Newgen Object> obj,
+ [int d, bool (*flt)(<Newgen Object>), void (*rwt)(<Newgen Object>)]*,
+            NULL);
+\end{verbatim}
+}
+
 
 \subsection{Modification functions}
 
