@@ -228,5 +228,5 @@ endif # INSTALL_UTL
 
 # clean installation. TOO ROUGH!
 uninstall:
-	$(RM) -r $(INC.d) $(LIB.d) $(BIN.d) $(DOC.d)
+	$(RM) -r $(INC.d) $(LIB.d) $(BIN.d) $(DOC.d) $(SHR.d) $(UTL.d)
 	-$(RMDIR) $(ROOT)/Bin $(ROOT)/Lib

@@ -51,6 +51,8 @@ FWD_ROOT	= .
 FWD_OUT		=
 FWD_MKFLAGS	=
 
+-include *.mk
+
 la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 
 # Forward any command to the specified directories (if any).
