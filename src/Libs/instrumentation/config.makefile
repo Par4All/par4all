@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: config.makefile,v $
+# Revision 1.6  2000/12/12 16:40:50  nguyen
+# Add new phases : interprocedural_array_bound_check and top_down_array_declaration_normalization
+#
 # Revision 1.5  2000/09/22 09:32:59  nguyen
 # Add Partial_redundancy_elimination for logical expression
 #
@@ -24,7 +27,9 @@ LIB_CFILES 	= \
 	bottom_up_array_bound_check.c \
 	top_down_array_bound_check.c \
 	array_bound_check_instrumentation.c \
-	partial_redundancy_elimination.c
+	partial_redundancy_elimination.c \
+	interprocedural_array_bound_check.c \
+	top_down_array_declaration_normalization.c
 
 LIB_HEADERS	= instrumentation-local.h
 
