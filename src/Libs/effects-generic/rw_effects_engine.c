@@ -36,10 +36,9 @@
 
 /************************************************ TO CONTRACT PROPER EFFECTS */
 
-static contract_p = TRUE;
+static bool contract_p = TRUE;
 
-void
-set_contracted_rw_effects(bool b)
+void set_contracted_rw_effects(bool b)
 {
     contract_p = b;
 }
@@ -47,8 +46,7 @@ set_contracted_rw_effects(bool b)
 
 /*********************************************** INTERPROCEDURAL COMPUTATION */
 
-bool 
-summary_rw_effects_engine(string module_name)
+bool summary_rw_effects_engine(string module_name)
 {
 
     list l_glob = NIL, l_loc = NIL; 
@@ -94,12 +92,9 @@ summary_rw_effects_engine(string module_name)
     return(TRUE);
 }
 
-/*********************************************************************************/
-/* INTRAPROCEDURAL COMPUTATION                                                   */
-/*********************************************************************************/
+/*********************************************** INTRAPROCEDURAL COMPUTATION */
 
-static void
-rw_effects_of_unstructured(unstructured unst)
+static void rw_effects_of_unstructured(unstructured unst)
 {
     statement current_stat = effects_private_current_stmt_head();
     list blocs = NIL ;
@@ -142,8 +137,61 @@ rw_effects_of_unstructured(unstructured unst)
     pips_debug(2, "end\n");
 }
 
-static void 
-rw_effects_of_loop(loop l)
+/*
+ * From BC's PhD:
+ *
+ * R[while(C) S] = 
+ *   R[C] U ( R[S] o E[C] ) U ( R[while(C) S] o T[S] o E[C] )
+ *
+ * however we do not have the lpf available to solve the recursive equation...
+ *
+ * Ok, let's try something else
+ *
+ * R[while(C)S]  = Rc[while(C)S] u Rs[while(C)S] ;
+ *
+ * Rc[while(C)S] = R[C] u R[C] o T[S] o E[C] u ...
+ *               = U_i=0^inf R[C] o (T[S] o E[C])^i
+ *               = R[C] O U_i=0^inf (T[S] o E[C])^i
+ *               = R[C] O T*[while(C)S] ;
+ *
+ * Rs[while(C)S] = R[S] o E[C] u R[S] o E[C] o T[S] o E[C] u ...
+ *               = U_i=0^inf R[S] o E[C] o (T[S] o E[C])^i
+ *               = R[S] o E[C] O U_i=0^inf (T[S] o E[C])^i
+ *               = R[S] o E[C] O T*[while(C)S] ;
+ *
+ * thus
+ *
+ * R[while(C)S]  = (R[C] u R[S] o E[C]) O T*[while(C)S] ;
+ *
+ * I assume that someone (FI) is to provide:
+ *
+ *   T*[while(C)S] = U_i=0^inf (T[S] o E[C])^i ;
+ *
+ * note that T[] Sigma -> Sigma, 
+ * but T*[] Sigma -> P(Sigma) 
+ * that is it describes exactly intermediate stores reached by the while.
+ *
+ * FC, 04/06/1998
+ */
+static void rw_effects_of_while(whileloop w)
+{
+    statement current_stat = effects_private_current_stmt_head();
+    list l_prop, l_body;
+    statement b = whileloop_body(w);
+    transformer trans;
+    
+    l_prop = effects_dup(load_proper_rw_effects_list(current_stat)); /* R[C] */
+    l_body = effects_dup(load_rw_effects_list(b)); /* R[S] */
+    /* I use the famous over-approximation of E[C]: Id */
+    trans = (*load_transformer_func)(current_stat); /* T*[while(C)S] */
+
+    l_body = (*effects_union_op)(l_body, l_prop, effects_same_action_p);
+    l_body = (*effects_transformer_composition_op)(l_body, trans);
+
+    store_rw_effects_list(current_stat, l_body);
+}
+
+static void rw_effects_of_loop(loop l)
 {
     statement current_stat = effects_private_current_stmt_head();
     list l_prop, l_body, l_loop = NIL;
@@ -214,8 +262,7 @@ rw_effects_of_loop(loop l)
 
 }
 
-static void
-rw_effects_of_call(call c)
+static void rw_effects_of_call(call c)
 {
     statement current_stat = effects_private_current_stmt_head();
     transformer context = (*load_context_func)(current_stat);
@@ -247,8 +294,7 @@ rw_effects_of_call(call c)
     pips_debug(2, "end\n");
 }
 
-static void 
-rw_effects_of_test(test t)
+static void rw_effects_of_test(test t)
 {
     statement current_stat = effects_private_current_stmt_head();
     list le, lt, lf, lc, lr;
@@ -280,8 +326,7 @@ rw_effects_of_test(test t)
     pips_debug(2, "end\n");
 }
 
-static list
-r_rw_effects_of_sequence(list l_inst)
+static list r_rw_effects_of_sequence(list l_inst)
 {
     statement first_statement;
     list remaining_block = NIL;
@@ -334,8 +379,7 @@ r_rw_effects_of_sequence(list l_inst)
     return(l_rw);
 }
 
-static void
-rw_effects_of_sequence(sequence seq)
+static void rw_effects_of_sequence(sequence seq)
 {
     statement current_stat = effects_private_current_stmt_head();
     list le = NIL;
@@ -364,16 +408,14 @@ rw_effects_of_sequence(sequence seq)
     pips_debug(2, "end\n");
 }
 
-static bool 
-rw_effects_stmt_filter(statement s)
+static bool rw_effects_stmt_filter(statement s)
 {
     pips_debug(1, "Entering statement %03d :\n", statement_ordering(s));
     effects_private_current_stmt_push(s);
     return(TRUE);
 }
 
-static void
-rw_effects_of_statement(statement s)
+static void rw_effects_of_statement(statement s)
 {
     store_invariant_rw_effects_list(s, NIL);
     effects_private_current_stmt_pop();
@@ -381,8 +423,7 @@ rw_effects_of_statement(statement s)
 }
 
 
-void
-rw_effects_of_module_statement(statement module_stat)
+void rw_effects_of_module_statement(statement module_stat)
 {
 
     make_effects_private_current_stmt_stack();
@@ -395,6 +436,7 @@ rw_effects_of_module_statement(statement module_stat)
 	 test_domain, gen_true, rw_effects_of_test,
 	 call_domain, gen_true, rw_effects_of_call,
 	 loop_domain, gen_true, rw_effects_of_loop,
+	 whileloop_domain, gen_true, rw_effects_of_while,
 	 unstructured_domain, gen_true, rw_effects_of_unstructured,
 	 expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
 	 NULL); 
@@ -403,8 +445,7 @@ rw_effects_of_module_statement(statement module_stat)
     free_effects_private_current_stmt_stack();
 }
 
-bool
-rw_effects_engine(char *module_name)
+bool rw_effects_engine(char * module_name)
 {
     /* Get the code of the module. */
     set_current_module_statement( (statement)
