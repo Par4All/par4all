@@ -3,6 +3,10 @@
  * $Id$
  *
  * $Log: code_generation.c,v $
+ * Revision 1.5  1998/10/13 06:57:27  irigoin
+ * Generate fresh new loops instead of creating meaningless sharing with
+ * initial loops.
+ *
  * Revision 1.4  1998/10/09 15:53:20  irigoin
  * Typing improved and better integration with RCS
  *
@@ -58,36 +62,35 @@ Psysteme sc_newbase;
     statement_newbase(bl,pvg,base_oldindex);
     /* make the parallel loops from inner loop to out loop*/
    
-    for(pb=base_reversal(base_newindex);lls!=NIL; lls=CDR(lls)) {
-	/* traitement of current loop */
+    for(pb=base_reversal(base_newindex);lls!=NIL; lls=CDR(lls), pb = pb->succ) {
+	/* handling of current loop */
 	s_loop = STATEMENT(CAR(lls));
 	l_old = instruction_loop(statement_instruction(s_loop));
 
-	/*new bounds de new index correspondant a old index de cet loop*/
-	make_bound_expression(pb->var,base_newindex,sc_newbase,&lower,&upper);
-	rl = make_range(lower,upper,make_integer_constant_expression(1));
+	/* new bounds for new index related to the old index of the old loop*/
+	make_bound_expression(pb->var, base_newindex,sc_newbase, &lower, &upper);
+	rl = make_range(lower, upper, make_integer_constant_expression(1));
 
+	/*
+	l_hyp = make_loop((entity) pb->var,
+			  rl,
+			  bl,
+			  loop_label(l_old),
+			  make_execution(is_execution_sequential,UU),
+			  loop_locals(l_old));
+	*/
 
-/*	if (CDR(lls)!=NULL) {		   make  the inner parallel loops
-					   they will be the inner parallel loops after 
-					   integration the phase  of parallelization
-	    l_hyp = make_loop(pb->var,
-			      rl,
-			      bl,
-			      loop_label(l_old),
-			      make_execution(is_execution_parallel,UU),
-			      loop_locals(l_old));
-	    bl = makeloopbody(l_hyp,s_loop);
-	    pb=pb->succ;
-	}
+	/* FI: I do not understand how you could keep a go to target (!)
+	 * or a list of local variables
+	 */
+	l_hyp = make_loop((entity) pb->var,
+			  rl,
+			  bl,
+			  entity_empty_label(),
+			  make_execution(is_execution_sequential,UU),
+			  NIL);
 
-	make the last loop which is sequential */
-   
-	l_hyp = make_loop((entity) pb->var,rl,bl,loop_label(l_old),
-		      make_execution(is_execution_sequential,UU),
-		      loop_locals(l_old));
 	bl = makeloopbody(l_hyp, s_loop);
-	pb=pb->succ;
     }
     
     instr_lhyp = make_instruction(is_instruction_loop,l_hyp);
