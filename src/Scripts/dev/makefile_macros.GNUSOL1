@@ -1,8 +1,13 @@
 #
-# $RCSfile: makefile_macros.GNUSOL1,v $ (version $Revision$)
-# $Date: 1996/09/30 11:50:26 $, 
+# $Id$
+#
+# $Log: makefile_macros.GNUSOL1,v $
+# Revision 1.27  1997/03/26 17:31:00  coelho
+# cleaner.
+#
 #
 # this file contains macro definitions 
+# this is the default file at CRI.
 
 #
 # for compiling:
@@ -11,9 +16,17 @@ ARFLAGS	= rv
 CC	= gcc
 CFLAGS	= -g -O2 -msupersparc -ansi -pedantic -Wall -pipe
 CMKDEP	= -M
-CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
+CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ \
+	-I. -I$(NEWGEN_ROOT)/Include \
+	-I$(LINEAR_ROOT)/Include \
+	-I$(PIPS_ROOT)/Include \
+	-I$(EXTERN_ROOT)/Include
 LD	= $(CC) 
-LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(EXTERN_ROOT)/Lib/$(ARCH)
+LDFLAGS	= -g -L./$(ARCH) \
+	-L$(PIPS_ROOT)/Lib/$(ARCH) \
+	-L$(NEWGEN_ROOT)/Lib/$(ARCH) \
+	-L$(LINEAR_ROOT)/Lib/$(ARCH) \
+	-L$(EXTERN_ROOT)/Lib/$(ARCH)
 FC	= g77
 FFLAGS	= -g -O2 -Wimplicit -pipe
 RANLIB	= granlib
@@ -49,5 +62,5 @@ TAR	= gtar
 ZIP	= gzip -v9
 DIFF	= diff
 
-# end of $RCSfile: makefile_macros.GNUSOL1,v $
+# end of it!
 #
