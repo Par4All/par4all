@@ -2,6 +2,9 @@
   $Id$
  
   $Log: OptionParser.java,v $
+  Revision 1.11  1998/10/30 09:46:02  ancourt
+  removes spaces around keywords.
+
   Revision 1.10  1998/10/17 12:21:22  coelho
   colors fixed.
 
@@ -191,7 +194,7 @@ public class OptionParser
   public void parseCommand(PMenu m1, PMenu m2, PLabel l, 
 			   PButtonGroup bg1, PButtonGroup bg2)
     {
-      String s = p.nextNonEmptyLine();
+      String s = p.nextNonEmptyLine().trim();
       
       while(s != null && !s.equals(CLOSE))
         {
