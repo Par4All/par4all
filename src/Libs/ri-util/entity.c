@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.41  1999/01/08 14:20:29  coelho
+ * some_main_entity_p function added.
+ *
  * Revision 1.40  1998/12/18 19:53:59  irigoin
  * Stronger asserts put in CreateIntrinsic() and entity_intrinsic().
  *
@@ -838,4 +841,18 @@ find_ith_formal_parameter(
 			rank, entity_name(the_fnct));
 
     return entity_undefined;
+}
+
+/* returns whether there is a main in the database
+ */
+bool some_main_entity_p(void)
+{
+  gen_array_t modules = db_get_module_list();
+  bool some_main = FALSE;
+  GEN_ARRAY_MAP(name, 
+	        if (entity_main_module_p(local_name_to_top_level_entity(name)))
+		    some_main = TRUE,
+		modules);
+  gen_array_full_free(modules);
+  return some_main;
 }
