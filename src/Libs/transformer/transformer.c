@@ -51,9 +51,9 @@ transformer t2;
 
     debug(8,"transformer_combine","begin\n");
     debug(8,"transformer_combine","arg. t1=%x\n",t1);
-    ifdebug(8) (void) print_transformer(t1);
+    ifdebug(8) (void) dump_transformer(t1);
     debug(8,"transformer_combine","arg. t2=%x\n",t2);
-    ifdebug(8) (void) print_transformer(t2);
+    ifdebug(8) (void) dump_transformer(t2);
 
     /* build new argument list and rename old and intermediate values,
        as well as new (i.e. unmodified) variables in t1 */
@@ -128,7 +128,7 @@ transformer t2;
     predicate_system(transformer_relation(t1)) = (char *) r1;
 
     debug(8,"transformer_combine","res. t1=%x\n",t1);
-    ifdebug(8) (void) print_transformer(t1);
+    ifdebug(8) (void) dump_transformer(t1);
     debug(8,"transformer_combine","end\n");
     return t1;
 }
@@ -142,16 +142,53 @@ transformer_normalize(transformer t)
     if (!sc_empty_p(r)) {
 	Pbase b = base_dup(sc_base(r));
 
+	/* Select one tradeoff between speed and accuracy:
+	 * enumerated by increasing speeds according to Beatrice
+	 */
+
+	/* Our best choice, but damned slow on ocean */
+	/*
 	r = sc_elim_redund(r);
+	*/
+
+	/* Beatrice's best choice: does not deal with minmax2 (only)
+	 * but still requires 74 minutes of real time (55 minutes of CPU time)
+	 * for ocean preconditions, when applied to each precondition stored.
+	 *
+	 * Only 64 s for ocean, if preconditions are not normalized.
+	 * But andne, callabsval, dead2, hind, negand, negand2, or,
+	 * validation_dead_code are not validated any more. Redundancy
+	 * could always be detected in a trivial way after propagating
+	 * values from equations into inequalities.
+	 */
+	/*
+	sc_nredund(&r);	    predicate_system(transformer_relation(t)) = r;
+	*/
+
+	/* Pretty lousy: equations are not even used to eliminate redundant 
+	 * inequalities!
+	 */
+	/* r = sc_normalize(r); */
+
+	/* Francois' own: does most of the easy stuff.
+	 * Fails on mimax2 and sum_prec, but it is somehow
+	 * more user-friendly because trivial preconditions are
+	 * not destroyed as redundant. It makes you feel safer.
+	 *
+	 * Result for full precondition normalization on ocean: 114 s
+	 * for preconditions, 4 minutes between split ocean.f and
+	 * OCEAN.prec
+	 */
+	r = sc_strong_normalize(r);
 
 	if (SC_EMPTY_P(r)) {
 	    r = sc_empty(b);
-	    predicate_system(transformer_relation(t)) = r;
 	}
 	else 
 	    base_rm(b);
 
 	r->dimension = vect_size(r->base);
+	predicate_system(transformer_relation(t)) = r;
     }
     return t;
 }
@@ -268,6 +305,7 @@ transformer tf;
 transformer pre;
 {
     transformer post;
+    transformer copy_pre;
 
     debug(8,"transformer_apply","begin\n");
     pips_assert("transformer_apply", tf!=transformer_undefined);
@@ -278,7 +316,8 @@ transformer pre;
     ifdebug(8) (void) print_transformer(pre);
 
     /* post = tf o pre ; pre would be modified by transformer_combine */
-    post = transformer_combine(transformer_dup(pre), tf);
+    copy_pre = transformer_dup(pre);
+    post = transformer_combine(copy_pre, tf);
 
     pips_assert("transformer_apply", post!=transformer_undefined);
     debug(8,"transformer_apply","post=%x\n", post);
