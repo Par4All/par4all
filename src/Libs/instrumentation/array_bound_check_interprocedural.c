@@ -24,7 +24,7 @@
 #include "transformer.h"
 #include "conversion.h" /* for Psysteme_to_expression*/
 #include "instrumentation.h"
-
+#include "transformations.h"
 
 /* As we create checks with stop error message who tell us there are 
  * bound violations for which array in which call, the following 
