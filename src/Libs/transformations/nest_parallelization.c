@@ -253,7 +253,7 @@ bool nest_parallelization(string module_name)
     ifdebug(7)
     {
 	fprintf(stderr, "\nparallelized code %s:", module_name);
-	if (gen_consistent_p((statement)mod_parallel_stat))
+	if (statement_consistent_p((statement)mod_parallel_stat))
 	    fprintf(stderr," gen consistent ");
     }
 
@@ -300,7 +300,7 @@ statement one_loop_parallelization(statement s)
     debug(9,"one_loop_parallelization", "begin - input loop\n");
     if(get_debug_level()>=9) {
 	print_text(stderr,text_statement(entity_undefined,0,s));
-	pips_assert("one_loop_parallelization", gen_consistent_p(s));
+	pips_assert("one_loop_parallelization", statement_consistent_p(s));
     }
 
     /* find out the loop iteration count c */
@@ -337,7 +337,7 @@ statement one_loop_parallelization(statement s)
     ifdebug(9) {
 	debug(9,"one_loop_parallelization", "output loop\n");
 	print_text(stderr,text_statement(entity_undefined,0,s));
-	pips_assert("loop_unroll", gen_consistent_p(s));
+	pips_assert("one_loop_parallelization", statement_consistent_p(s));
 	debug(9,"one_loop_parallelization", "end\n");
     }
 
