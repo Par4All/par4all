@@ -115,6 +115,8 @@ Polyhedron *PDomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRa
 	  d = AddPolyToDomain(p3,d);
       }
     }
+    if (p2 != Pol2)
+	Domain_Free(Pol1);
     Pol1 = d;
     d = (Polyhedron *)0;
   }
