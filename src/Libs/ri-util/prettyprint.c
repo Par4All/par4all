@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/06 17:43:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/11 08:39:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/02/06 17:43:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/02/11 08:39:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -2085,6 +2085,7 @@ int precedence;
     bool complex_io_control_list = FALSE;
     list fmt_words = NIL;
     list unit_words = NIL;
+    string called = entity_local_name(call_function(obj));
     
     /* AP: I try to convert WRITE to PRINT. Three conditions must be
        fullfilled. The first, and obvious, one, is that the function has
@@ -2104,21 +2105,13 @@ int precedence;
 	c = syntax_call(s);
 
 	if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
-	   if(strcmp(words_to_string(fmt_words = words_expression(arg)), "*") == 0) {
-	    good_fmt= TRUE;
-	   }
-	   else {
-	    good_fmt= FALSE;
-	   }
+	   good_fmt = strcmp
+	       (words_to_string(fmt_words = words_expression(arg)), "*")==0;
 	   pio_write = CDR(CDR(pio_write));
 	}
 	else if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
-	    if(strcmp(words_to_string(unit_words = words_expression(arg)), "*") == 0) {
-		good_unit = TRUE;
-	    }
-	    else {
-		good_unit = FALSE;
-	    }
+	    good_unit = strcmp
+		(words_to_string(unit_words = words_expression(arg)), "*")==0;
 	    pio_write = CDR(CDR(pio_write));
 	}
 	else if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
@@ -2131,13 +2124,18 @@ int precedence;
 	}
       }
 
-    if (good_fmt && good_unit && strcmp(entity_local_name(call_function(obj)), "WRITE") == 0) {
-      /* AP: Allright for the substitution of WRITE by PRINT. For the
-         IOLIST prettyprint, we skip everything but elements following the
-         first "IOLIST=" keyword. */
-      pc = CHAIN_SWORD(pc, "PRINT *, ");
-      pcio = pio_write;
+    if (good_fmt && good_unit && same_string_p(called, "WRITE"))
+    {
+	/* WRITE (*,*) -> PRINT * */
+	pc = CHAIN_SWORD(pc, "PRINT *, ");
+	pcio = pio_write;
     }
+    else if (good_fmt && good_unit && same_string_p(called, "READ"))
+    {
+	/* READ (*,*) -> READ * */
+	pc = CHAIN_SWORD(pc, "READ *, ");
+	pcio = pio_write;
+    }	
     else if(!complex_io_control_list) {
 	pips_assert("A unit must be defined", !ENDP(unit_words));
       pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
