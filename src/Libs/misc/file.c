@@ -31,8 +31,8 @@ FILE * check_fopen(char * file, char * mode)
     FILE * fd = fopen(file, mode);
     if (fd==(FILE*)NULL)
     {
-	pips_user_error("fopen failed on file \"%s\" (mode \"%s\")\n%s\n",
-			file, mode, sys_errlist[errno]);
+	pips_user_warning("fopen failed on file \"%s\" (mode \"%s\")\n%s\n",
+			  file, mode, sys_errlist[errno]);
     }
     return fd;
 }
