@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/01 10:32:43 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/03 15:56:37 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -11,6 +11,7 @@
 # clever or stupid:-)
 # Only one subroutine or function should be put in the pipe. 
 # ??? I do not deal with "R E A L" like Fortran lexical problems.
+# ??? There may be problems with if and do instructions...
 #
 # FC 02/95.
 #
@@ -35,6 +36,8 @@
 # _t: template
 # _y: dynamic
 #
+# missing: inherit, pure
+#
 # move static directives AFTER declarations, since I need to parse them
 # as statements.
 #
@@ -44,6 +47,7 @@
 #
 # the sed version should be able to handle very large lines... 
 # gnu sed is okay.
+# idem tr.
 
 SED=sed
 TR=tr
@@ -79,13 +83,13 @@ $TR '' '\012' |
 #
 # massive transformations
 #
-$SED '/^chpf\$/s,[Bb][Ll][Oo][Cc][Kk],_k,g
+$SED '/^chpf\$/s,\([ 	\,(]\)[Bb][Ll][Oo][Cc][Kk]\([ 	\,(]\),\1_k\2,g
       /^chpf\$/s,_k\([\,)]\),_k(\*)\1,g
-      /^chpf\$/s,[Cc][Yy][Cc][Ll][Ii][Cc],_c,g
+      /^chpf\$/s,\([ 	\,(]\)[Cc][Yy][Cc][Ll][Ii][Cc]\([ 	\,(]\),\1_c\2,g
       /^chpf\$/s,_c\([\,)]\),_c(1)\1,g
       s,^chpf\$ [Dd][Yy][Nn][Aa][Mm][Ii][Cc] \(.*\),      _y(\1),
-      s,^chpf\$ [Tt][Ee][Mm][Pp][Ll][Aa][Tt][Ee] \(.*\),      integer \1      _t(\1),
-      s,^chpf\$ [Pp][Rr][Oo][Cc][Ee][Ss][Ss][Oo][Rr][Ss] \(.*\),      integer \1      _p(\1),
+      s,^chpf\$ [Tt][Ee][Mm][Pp][Ll][Aa][Tt][Ee] \(.*\),      logical \1      _t(\1),
+      s,^chpf\$ [Pp][Rr][Oo][Cc][Ee][Ss][Ss][Oo][Rr][Ss] \(.*\),      logical \1      _p(\1),
       s,^chpf\$ [Aa][Ll][Ii][Gg][Nn] \(.*\) [Ww][Ii][Tt][Hh] \(.*\),      _a(\1\,\2),
       s,^chpf\$ [Rr][Ee][Aa][Ll][Ii][Gg][Nn] \(.*\) [Ww][Ii][Tt][Hh] \(.*\),      _b(\1\,\2),
       s,^chpf\$ [Dd][Ii][Ss][Tt][Rr][Ii][Bb][Uu][Tt][Ee] \(.*\) [Oo][Nn][Tt][Oo] \(.*\),      _d(\1\,\2),
@@ -93,15 +97,13 @@ $SED '/^chpf\$/s,[Bb][Ll][Oo][Cc][Kk],_k,g
       s,^chpf\$ [Ii][Nn][Dd][Ee][Pp][Ee][Nn][Dd][Ee][Nn][Tt][ 	]*\([^( ,][^()\,]*\),      _i(\1),
       s,^chpf\$ [Ii][Nn][Dd][Ee][Pp][Ee][Nn][Dd][Ee][Nn][Tt][ 	]*\(.*\),      _i\1,
       s,^      _i\,,      _i()\,,
-      s,^      _i(\([^)]*\))[ 	]*\,[ 	]*[Nn][Ee][Ww]\(.*\),      _i(\1)      _n\2,
+      s,^      _i(\([^)]*\))[ 	]*\,[ 	]*[Nn][Ee][Ww][ 	]*(\([^)]*\)),      _i(\1)      _n(\2),
       s,_\([abdeintpy]\),call hpfc\1,g
       s,_\([ck]\),hpfc\1,g' |
 #
 # handles multi lines breaking (independent with new...)
 #
 $TR '' '\012' |
-#
-# ??? I should also break the created lines which are too long...
 #
 # separates static directives from others
 #
@@ -119,8 +121,8 @@ LINE=`
 $SED -n '/^ .... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
          /^ .... [ 	]*[Rr][Ee][Aa][Ll][ 	\*]/=
          /^ .... [ 	]*[Ss][Tt][Rr][Ii][Nn][Gg][ 	\*]/=
-         /^ .... [ 	]*[Ss][Uu][Bb][Rr][Oo][Uu][Tt][Ii][Nn][Ee][ 	\*]/=
-         /^ .... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	\*]/=
+         /^ .... [ 	]*[Ss][Uu][Bb][Rr][Oo][Uu][Tt][Ii][Nn][Ee][ 	]/=
+         /^ .... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	]/=
          /^ .... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
          /^ .... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
          /^ .... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 | 
@@ -146,9 +148,21 @@ LINE=${LAST_LINE:-$LINE}
 #
 # final output
 
-$SED -n "1,$LINE p" $TMP.0
-$SED -n p $TMP.1
-$SED "1,$LINE d" $TMP.0
+{
+  $SED -n "1,$LINE p" $TMP.0
+  $SED -n p $TMP.1
+  $SED "1,$LINE d" $TMP.0
+} | 
+#
+# breaks generated lines which are too long
+# first insert some marks, after comma or parenthesis
+# there should be no identifiers larger than 15 characters (55+15=70)
+#
+$SED '/^ .... call hpfc.(.\{50,\}$/s/\([^]\{55\}[^,()]*[,()]\)/\1     x /g' |
+#
+# later replaced by CR
+#
+$TR '' '\012'
 
 #
 # clean temporary files
