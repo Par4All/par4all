@@ -319,8 +319,7 @@ init_convex_rw_regions(string module_name)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings( local_name_to_top_level_entity(module_name));
 
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
 }
 
 void
@@ -345,8 +344,8 @@ init_convex_in_out_regions(string module_name)
     set_cumulated_rw_effects((statement_effects)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings( local_name_to_top_level_entity(module_name));
-    set_read_action_interpretation(READ_IS_IN);
-    set_write_action_interpretation(WRITE_IS_OUT);
+
+    set_action_interpretation(ACTION_IN, ACTION_OUT);
 }
 
 void 
@@ -377,8 +376,7 @@ init_convex_summary_rw_regions(string module_name)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings( local_name_to_top_level_entity(module_name));
 
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
 }
 
 void
@@ -401,9 +399,7 @@ init_convex_summary_in_out_regions(string module_name)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings( local_name_to_top_level_entity(module_name));
 
-    set_read_action_interpretation(READ_IS_IN);
-    set_write_action_interpretation(WRITE_IS_OUT);
-
+    set_action_interpretation(ACTION_IN, ACTION_OUT);
 }
 
 void
