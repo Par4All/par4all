@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.137  2002/04/23 07:35:09  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.136  2000/05/29 13:00:42  coelho
  * fms added.
  *
@@ -250,7 +253,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.136 2000/05/29 13:00:42 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.137 2002/04/23 07:35:09 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2405,10 +2408,10 @@ text_named_module(
     }
     else 
     {
-	ADD_SENTENCE_TO_TEXT(r, 
+      /*ADD_SENTENCE_TO_TEXT(r, 
             attach_head_to_sentence(make_sentence(is_sentence_formatted, 
 						  strdup(s)),
-				    module));
+						  module));*/
     }
 
     if (stat != statement_undefined) {
