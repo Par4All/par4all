@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1994/12/29 18:44:14 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1994/12/30 09:03:31 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -94,14 +94,9 @@ chunk *obj ;
 /* inlined version of domain_index. what is done by optimizing compilers?
  */
 #define quick_domain_index(obj) \
-  (((! obj) || (obj==chunk_undefined) || (obj->i<0) || (obj->i>MAX_DOMAIN)) ? \
-   domain_index(obj) : obj->i) /* prints the error message or returns */
-
-/* dangerous version that assumes a consistent object?
- */
-#define very_quick_domain_index(obj) \
-  (((! obj) || (obj==chunk_undefined)) ? (abort(), -1) : obj->i)
-
+  (((! (obj)) || ((obj)==chunk_undefined) || \
+    ((obj)->i<0) || ((obj)->i>MAX_DOMAIN)) ? \
+   domain_index(obj) : (obj)->i) /* prints the error message or returns */
 
 /* FPRINTF_SPACES prints NUMBER spaces on the FD file descriptor.`
  */
@@ -592,7 +587,7 @@ struct binding *bp ;
 static char *first_seen = (char *)NULL ;
 static char *seen_once = (char *)NULL ;
 
-#define FIRST_SEEN(s) (s>=first_seen && s<first_seen+MAX_SHARED_OBJECTS)
+#define FIRST_SEEN(s) ((s)>=first_seen && (s)<first_seen+MAX_SHARED_OBJECTS)
 
 /* The OBJ_TABLE maps objects to addresses within the arrays FIRST_SEEN
  * and SEEN_ONCE. In the first case, if the address is FIRST_SEEN, then
@@ -2070,9 +2065,9 @@ extern int error_seen ;
 static FILE *black_hole = NULL ;
 static void open_black_hole()
 {
-    if( black_hole == NULL ) 
-	if( (black_hole=fopen( "/dev/null", "r")) == NULL ) 
-	    fatal( "Cannot open /dev/null !", "" ) ; /* not reached */
+    if (black_hole == NULL)  
+	if ((black_hole=fopen("/dev/null", "r")) == NULL) 
+	    fatal("Cannot open /dev/null !", "") ; /* not reached */
 }
 
 /* GEN_CONSISTENT_P dynamically checks the type correctness of OBJ. 
@@ -2083,6 +2078,7 @@ chunk *obj ;
 {
     int old_gen_debug = gen_debug ;
 
+    check_read_spec_performed();
     open_black_hole();
 
     error_seen = 0 ;
