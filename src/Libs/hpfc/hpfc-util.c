@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/04/10 18:49:35 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/06/09 16:53:18 $, )
  * version $Revision$
  */
 
@@ -125,6 +125,25 @@ distribution dist;
 	 la);
 
     return(TRUE);
+}
+
+/* TRUE if array a is replicated on processors p i-th dimension.
+ */
+bool processors_dim_replicated_p(p, a, i)
+entity p, a;
+int i;
+{
+    int tdim;
+    align al = load_entity_align(a);
+    entity t = align_template(al);
+    distribute d = load_entity_distribute(t);
+    distribution di =
+	FindDistributionOfProcessorDim(distribute_distribution(d), i, &tdim);
+    alignment ali = 
+	FindAlignmentOfTemplateDim(align_alignment(al), tdim);
+
+    return(!style_none_p(distribution_style(di)) &&
+	   alignment_undefined_p(ali));
 }
 
 /* bool ith_dim_distributed_p(array, i)
