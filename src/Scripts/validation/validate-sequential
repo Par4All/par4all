@@ -217,7 +217,7 @@ report()
 	cat $tmperr
 	echo "--";
       }
-      echo "Validate Message from $hostname:"
+      echo "Validate Message from $hostname ($PIPS_ARCH):"
       echo
       echo "PIPS: $pips_version"
       echo "TPIPS: $tpips_version"
@@ -506,7 +506,7 @@ else
 $aspects ${FILES:+($FILES)}
   
 $final
-   on $hostname
+   on $hostname ($PIPS_ARCH)
 
 $PERFORMANCE
 
