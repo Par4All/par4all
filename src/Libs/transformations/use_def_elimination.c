@@ -359,6 +359,7 @@ use_def_deal_if_useful(statement s)
    bool this_statement_has_an_io_effect;
    bool this_statement_writes_a_procedure_argument;
    bool this_statement_is_a_format;
+   bool this_statement_is_an_unstructured_test = FALSE;
 
    if (get_debug_level() >= 5) {
       fprintf(stderr, "use_def_deal_if_useful: statement %p (%#x)\n",
@@ -383,18 +384,35 @@ use_def_deal_if_useful(statement s)
    
    /* Avoid to remove formats in a first approach: */
    this_statement_is_a_format = instruction_format_p(statement_instruction(s));
-   
+
+   /* Unstructured tests are very hard to deal with since they can
+      have major control effects, such as leading to an infinite loop,
+      etc. and it is very hard to cope with... Thus, keep all
+      unstructured tests in this approach since I cannot prove the
+      termination of the program and so on.  */
+   if (bound_control_father_p(s)) {
+       control control_father = load_control_father(s);
+       if (gen_length(control_successors(control_father)) == 2)
+	   /* It is an unstructured test: keep it: */
+	   this_statement_is_an_unstructured_test = TRUE;
+   }
+
    if (get_debug_level() >= 6) {
       if (this_statement_has_an_io_effect)
          fprintf(stderr, "Statement %p has an io effect.\n", s);
       if (this_statement_writes_a_procedure_argument)
          fprintf(stderr,
                  "Statement %p writes an argument of its procedure.\n", s);
+      if (this_statement_is_a_format)
+         fprintf(stderr, "Statement %p is a FORMAT.\n", s);
+      if (this_statement_is_an_unstructured_test)
+         fprintf(stderr, "Statement %p is an unstructured test.\n", s);
    }
    
    if (this_statement_has_an_io_effect
-      || this_statement_writes_a_procedure_argument
-      || this_statement_is_a_format)
+       || this_statement_writes_a_procedure_argument
+       || this_statement_is_a_format
+       || this_statement_is_an_unstructured_test)
       /* Mark this statement as useful: */
       set_add_element(the_useful_statements, the_useful_statements, (char *) s);
 
@@ -413,19 +431,6 @@ remove_this_statement_if_useless(statement s)
       fix_sequence_statement_attributes(s);
       if (get_debug_level() >= 6)
          fprintf(stderr, "remove_this_statement_if_useless removes statement %p (%#x).\n", s, statement_ordering(s));
-      if (bound_control_father_p(s)) {
-	  /* s is owned by a control node: */
-	  control control_father = load_control_father(s);
-	  if (gen_length(control_successors(control_father))) {
-	      /* The statement is in fact an unstructured IF. Since it
-                 is useless, it does no longer control any useful
-                 statement and thus we can discard the then or else
-                 branch. In fact, if the exit node is only reachable
-                 though only one branch, we should not discard this
-                 one since we would break the the unstructured... */
-	      
-	  }
-      }
    }
 }
 
