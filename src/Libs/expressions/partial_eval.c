@@ -28,8 +28,8 @@ Des que l'evaluation n'est plus possible, il faut regenerer l'expression
  */
 
 #include <stdio.h>
-extern int fprintf();
-extern int printf();
+extern int fprintf(FILE *, const char *, ...);
+extern int printf(const char *, ...);
 #include <string.h>
 
 #include "genC.h"
@@ -55,25 +55,20 @@ extern int printf();
 static struct eformat  eformat_undefined = {expression_undefined, 1, 0, FALSE};
 /* when formating is useless (ie. = (1 * expr + 0)) */
 
-static statement_mapping proper_effects_map = 
-    (statement_mapping) HASH_UNDEFINED_VALUE;
 
-void init_use_proper_effects(module_name)
-char *module_name;
+void init_use_proper_effects(char *module_name)
 {
-    proper_effects_map = (statement_mapping)
-	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE);
+    set_proper_effects_map( effectsmap_to_listmap((statement_mapping)
+	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE)) );
     pips_assert("init_use_proper_effects",
-		proper_effects_map != (statement_mapping) HASH_UNDEFINED_VALUE);
+		get_proper_effects_map() != hash_table_undefined );
 }
 
 /* returns proper effects associated to statement stmt */
 /* Current implementation of effects mappings involves lists of effect!
  * (sa. pipsdbm/io.c). Lists become effects here.
  */
-effects stmt_to_fx(stmt, stmt_fx_map)
-statement stmt;
-statement_mapping stmt_fx_map;
+effects stmt_to_fx(statement stmt, statement_mapping stmt_fx_map)
 {
     effects fx;
     list ls;
@@ -93,7 +88,8 @@ statement_mapping stmt_fx_map;
     else {
 	/* sorry for this dusty alloc... never freed! */ 
 	fx= make_effects(ls);
-	if(get_debug_level()>=5) {
+	ifdebug(5) 
+	{
 	    print_effects(effects_effects(fx));
 	}
     }
@@ -101,9 +97,7 @@ statement_mapping stmt_fx_map;
     return(fx);
 }
 
-bool entity_written_p(ent, fx)
-entity ent;
-effects fx;
+bool entity_written_p(entity ent, effects fx)
 {
     if(fx==effects_undefined)
 	pips_error("entity_written_p", "effects undefined\n");
@@ -119,16 +113,13 @@ effects fx;
     return(FALSE);
 }
 
-static statement_mapping preconditions_map = 
-    (statement_mapping) HASH_UNDEFINED_VALUE;
 
-void init_use_preconditions(module_name)
-char *module_name;
+void init_use_preconditions(char *module_name)
 {
-    preconditions_map = (statement_mapping)
-	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE);
+    set_precondition_map( (statement_mapping)
+	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
     pips_assert("init_use_preconditions",
-		preconditions_map != (statement_mapping) HASH_UNDEFINED_VALUE);
+		get_precondition_map() != hash_table_undefined);
     if(get_debug_level()==9) {
 	transformer_map_print();
     }
@@ -137,8 +128,7 @@ char *module_name;
 /*
   cf. load_statement_transformer() in semantics/dbm_interface.c
   */
-Psysteme stmt_prec(stmt)
-statement stmt;
+Psysteme stmt_prec(statement stmt)
 {
     transformer t;
 
@@ -148,7 +138,7 @@ statement stmt;
 	  "Look for preconditions for statement at %d (ordering %d, number %d):\n", 
 	  (int) stmt, statement_ordering(stmt), statement_number(stmt));
 
-    t = (transformer) GET_STATEMENT_MAPPING(preconditions_map, stmt);
+    t = load_statement_precondition(stmt);
 
     if(t==(transformer) HASH_UNDEFINED_VALUE) t = transformer_undefined;
 
@@ -160,10 +150,10 @@ statement stmt;
 
 }
 
-void transformer_map_print()
+void transformer_map_print(void)
 {
     FILE * f =stderr;
-    hash_table htp = preconditions_map;
+    hash_table htp = get_precondition_map();
 
     fprintf(f, "hash_key_type:     %d\n", htp->hash_type);
     fprintf(f, "hash_size:         %d\n", htp->hash_size);
@@ -179,8 +169,7 @@ void transformer_map_print()
 	     htp);
 }
 
-bool eformat_equivalent_p(ef1,ef2)
-struct eformat ef1, ef2;
+bool eformat_equivalent_p(struct eformat ef1, struct eformat ef2)
 {
      /* should not require anything about expr */
     return( ef1.expr == ef2.expr /* ie expression_eq(ef1.expr, ef2.expr) */
@@ -188,19 +177,14 @@ struct eformat ef1, ef2;
 	   && ef1.ishift == ef2.ishift );
 }
 
-void print_eformat(ef, name)
-struct eformat ef;
-char *name;
+void print_eformat(struct eformat ef, char *name)
 {
     (void) printf("eformat %s = %d x EXPR + %d, %ssimpler, with EXPR:\n", 
 	   name, ef.icoef, ef.ishift, (ef.simpler ? "" : "NOT "));
     print_expression(ef.expr);
 }
 
-void partial_eval_expression_and_regenerate(ep, ps, fx)
-expression *ep;
-Psysteme ps;
-effects fx;
+void partial_eval_expression_and_regenerate(expression *ep, Psysteme ps, effects fx)
 {
     struct eformat ef;
 
@@ -216,10 +200,7 @@ effects fx;
     }
 }
 
-struct eformat partial_eval_expression_and_copy(expr, ps, fx)
-expression expr;
-Psysteme ps;
-effects fx;
+struct eformat partial_eval_expression_and_copy(expression expr, Psysteme ps, effects fx)
 {
     struct eformat ef;
 
@@ -232,18 +213,12 @@ effects fx;
     return(ef);
 }
 
-struct eformat partial_eval_expression(e, ps, fx)
-expression e;
-Psysteme ps;
-effects fx;
+struct eformat partial_eval_expression(expression e, Psysteme ps, effects fx)
 {
     return(partial_eval_syntax(e, ps, fx));
 }
 
-struct eformat partial_eval_syntax(e, ps, fx)
-expression e;
-Psysteme ps;
-effects fx;
+struct eformat partial_eval_syntax(expression e, Psysteme ps, effects fx)
 {
     struct eformat ef;
     syntax s = expression_syntax(e);
@@ -269,10 +244,7 @@ effects fx;
     return(ef);
 }
 
-struct eformat partial_eval_reference(e, ps, fx)
-expression e;
-Psysteme ps;
-effects fx;
+struct eformat partial_eval_reference(expression e, Psysteme ps, effects fx)
 {
     reference r;
     Pvecteur pv;
@@ -340,13 +312,13 @@ effects fx;
 
 		/*		new_expr=int_expr((int)min); */		
 		/* replace expression_normalized(e) with 
-		   expression_normalized(new_expr) * /
+		   expression_normalized(new_expr) */
 		   /*		free_normalized(expression_normalized(e));
 				expression_normalized(e) = expression_normalized(new_expr);
-				expression_normalized(new_expr) = normalized_undefined;*/
+				expression_normalized(new_expr) = normalized_undefined; */
 
 		       /* replace expression_syntax(e) with 
-			  expression_syntax(new_expr) * /
+			  expression_syntax(new_expr) */
 			  /*
 			    free_syntax(expression_syntax((e)));
 			    expression_syntax(e) = expression_syntax(new_expr);
@@ -361,7 +333,7 @@ effects fx;
 			    gen_consistent_p(e);
 			    pips_assert("partial_eval_reference", 
 			    syntax_call_p(expression_syntax(e)));
-			    }*/
+			    } */
 			  }
 	    /*	    return(entity_initial(call_function(syntax_call(expression_syntax(e)))));
 	     */
@@ -371,10 +343,7 @@ effects fx;
     return(eformat_undefined);
 }
 
-void partial_eval_call_and_regenerate(ca, ps, fx)
-call ca;
-Psysteme ps;
-effects fx;
+void partial_eval_call_and_regenerate(call ca, Psysteme ps, effects fx)
 {
     pips_assert("partial_eval_call_and_regenerate", 
 		ca!= call_undefined);
@@ -388,10 +357,7 @@ effects fx;
 }
 
 
-struct eformat partial_eval_call(exp, ps, fx)
-expression exp;
-Psysteme ps;
-effects fx;
+struct eformat partial_eval_call(expression exp, Psysteme ps, effects fx)
 {
     call ec;
     entity func;
@@ -446,11 +412,7 @@ effects fx;
     return(ef);
 }
 
-struct eformat partial_eval_unary_operator(func, la, ps, fx)
-entity func;
-cons *la;
-Psysteme ps;
-effects fx;
+struct eformat partial_eval_unary_operator(entity func, cons *la, Psysteme ps, effects fx)
 {
     struct eformat ef;
     expression *sub_ep;
@@ -486,11 +448,7 @@ effects fx;
 #define DIV 4
 #define MOD 5
 
-struct eformat partial_eval_binary_operator(func, la, ps, fx)
-entity func;
-cons *la;
-Psysteme ps;
-effects fx;
+struct eformat partial_eval_binary_operator(entity func, cons *la, Psysteme ps, effects fx)
 {
     struct eformat ef, ef1, ef2;
     expression *ep1, *ep2;
@@ -697,9 +655,7 @@ effects fx;
  * optimized so that it can be called for any compatible ef and *ep;
  * result in *ep.
  */
-int regenerate_expression(efp, ep)
-struct eformat *efp;
-expression *ep;
+int regenerate_expression(struct eformat *efp, expression *ep)
 {
     if(eformat_equivalent_p(*efp,eformat_undefined)) {
 	/* nothing to do because expressions are the same */
@@ -759,9 +715,7 @@ expression *ep;
     }
 }
 
-expression generate_monome(coef, expr)
-int coef;
-expression expr;
+expression generate_monome(int coef, expression expr)
 {
     if(coef==0) {
 	pips_assert("generate_monome", expr==expression_undefined);
@@ -781,11 +735,10 @@ expression expr;
 }
 
 
-void recursiv_partial_eval(stmt)
-statement stmt;
+void recursiv_partial_eval(statement stmt)
 {
     instruction inst = statement_instruction(stmt);
-    statement_mapping pfx_map= proper_effects_map;
+    statement_mapping pfx_map = get_proper_effects_map(); 
 
     debug(8, "recursiv_partial_eval", "begin with tag %d\n", 
 	  instruction_tag(inst));
@@ -852,10 +805,9 @@ statement stmt;
 /* Top-level function
  */
 
-void partial_eval(mod_name)
-char *mod_name;
+void partial_eval(char *mod_name)
 {
-    entity module = local_name_to_top_level_entity(mod_name);
+    entity module;
     statement mod_stmt;
     instruction mod_inst;
     cons *blocs = NIL;
@@ -866,22 +818,27 @@ char *mod_name;
     /* DBR_CODE will be changed: argument "pure" is TRUE because 
        partial_eval() *modifies* DBR_CODE. */
     /* still bugs in dbm because effects are stored on disc after this phase */
-    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
-    init_use_proper_effects(mod_name);
+    set_current_module_entity(local_name_to_top_level_entity(mod_name));
+    module = get_current_module_entity();
+
+    set_current_module_statement(
+		(statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE));
+    mod_stmt = get_current_module_statement();
+
+    init_use_proper_effects(mod_name); /* uses set_proper_effects_map */
 
     /* preconditions may need to print preconditions for debugging purposes */
-    set_cumulated_effects_map( (statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE));
-    set_current_module_entity(module);
-    set_current_module_statement(mod_stmt);
+    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE)));
+
     module_to_value_mappings(module);
 
     init_use_preconditions(mod_name);
 
     mod_inst = statement_instruction(mod_stmt);
-    pips_assert("unroll", instruction_unstructured_p(mod_inst),
-		"unstructured expected\n");
+    pips_assert("unroll", instruction_unstructured_p(mod_inst));
+    /* "unstructured expected\n"); */
 
     /* go through unstructured and apply recursiv_partial_eval */
     CONTROL_MAP(ctl, {
@@ -895,12 +852,17 @@ char *mod_name;
 
     gen_free_list(blocs);
 
-    preconditions_map = (statement_mapping) HASH_UNDEFINED_VALUE;
-
      /* Reorder the module, because new statements have been generated. */
     module_body_reorder(mod_stmt);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
 
+    reset_precondition_map();
+    reset_cumulated_effects_map();
+    reset_proper_effects_map();
+    reset_current_module_entity();
+    reset_current_module_statement();
+
     debug_off();
 }
+
