@@ -22,6 +22,20 @@ static argumentInfo* arguments = NULL;
 static int nbArguments = 0;
 static int nbAllocatedArguments = 0;
 
+entity vectorElement_vector(vectorElement ve)
+{
+   return simdStatementInfo_vectors(vectorElement_statement(ve))[vectorElement_vectorIndex(ve)];
+}
+
+int vectorElement_vectorLength(vectorElement ve)
+{
+   return opcode_vectorSize(simdStatementInfo_opcode(vectorElement_statement(ve)));
+}
+
+int vectorElement_subwordSize(vectorElement ve)
+{
+   return opcode_subwordSize(simdStatementInfo_opcode(vectorElement_statement(ve)));
+}
 
 /* Computes the optimal opcode for simdizing 'argc' statements of the
  * 'kind' operation, applied to the 'args' arguments
@@ -83,7 +97,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
    return best;
 }
 
-static entity get_function_entity(string name)
+entity get_function_entity(string name)
 {
    entity e = local_name_to_top_level_entity(name);
    if (entity_undefined_p(e))
@@ -439,7 +453,8 @@ static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
 						 CONS(DIMENSION, 
 						      make_dimension(int_expr(0),
 								     int_expr(nbItems-1)), 
-						      NIL))),
+						      NIL),
+						 NIL)),
 			 storage_undefined,
 			 make_value(is_value_unknown, UU));
    dynamic_area = global_name_to_entity(module_local_name(mod_ent),
@@ -544,7 +559,7 @@ static statementInfo make_nonsimd_statement_info(statement s)
 
 static vectorElement make_vector_element(simdStatementInfo ssi, int i, int j)
 {
-   return make_vectorElement(simdStatementInfo_vectors(ssi)[i], j);
+   return make_vectorElement(ssi, i, j);
 }
 
 static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list* args)
@@ -723,13 +738,38 @@ static list merge_available_places(list l1, list l2, int element)
 	 vectorElement ei = VECTORELEMENT(CAR(i));
 	 vectorElement ej = VECTORELEMENT(CAR(j));
 
-	 if ( (vectorElement_vector(ei) == vectorElement_vector(ej)) &&
-	      (vectorElement_element(ei) == element) )
-	    res = CONS(VECTORELEMENT, ej, NIL);
+	 if (vectorElement_vector(ei) == vectorElement_vector(ej))
+	 {
+	    if (element < 0)
+	    {
+	       vectorElement ve = copy_vectorElement(ej);
+
+	       //quite a hack here: this vectorElement represents in fact an 
+	       //aggregate entity x int, where the int is the order param
+	       //to be used for shuffle
+	       vectorElement_element(ve) = 
+		  vectorElement_element(ei) | 
+		  (vectorElement_element(ej) << (2*element));
+
+	       res = CONS(VECTORELEMENT, ej, res);
+	    }
+	    else if (vectorElement_element(ei) == element)
+	       res = CONS(VECTORELEMENT, ej, res);
+	 }
       }
    }
 
    return res;
+}
+
+static statement make_shuffle_statement(entity dest, entity src, int order)
+{
+   list args = gen_make_list(expression_domain,
+			     entity_to_expression(dest),
+			     entity_to_expression(src),
+			     make_integer_constant_expression(order));
+   return call_to_statement(make_call(get_function_entity("pshufw"),
+				      args));
 }
 
 static statement generate_load_statement(simdStatementInfo si, int line)
@@ -737,31 +777,63 @@ static statement generate_load_statement(simdStatementInfo si, int line)
    list args = NIL;
    int i;
    int offset = line * opcode_vectorSize(simdStatementInfo_opcode(si));
-   list sources;
+   list sourcesCopy = NIL;
+   list sourcesShuffle = NIL;
 
    //try to see if the arguments have not already been loaded
-   sources = gen_copy_seq(statementArgument_dependances(simdStatementInfo_arguments(si)[offset]));
+   MAP(VECTORELEMENT,
+       ve,
+   {
+      if (vectorElement_element(ve) == 0)
+	 sourcesCopy = CONS(VECTORELEMENT, ve, sourcesCopy);
+      if ( (vectorElement_subwordSize(ve) == 16) &&
+	   (vectorElement_vectorLength(ve) == 4) )
+      {
+	 vectorElement e = copy_vectorElement(ve);
+	 sourcesShuffle = CONS(VECTORELEMENT, e, sourcesShuffle);
+      }
+   },
+       statementArgument_dependances(simdStatementInfo_arguments(si)[offset]));
 
    for(i = 1; 
-       (i<opcode_vectorSize(simdStatementInfo_opcode(si))) && (sources!=NIL); 
+       (i<opcode_vectorSize(simdStatementInfo_opcode(si))) && 
+	  ((sourcesShuffle!=NIL) || (sourcesCopy!=NIL)); 
        i++)
    {
       list new_sources;
 
+      //update the list of places where the copy can be found
       new_sources = merge_available_places(
 	 statementArgument_dependances(simdStatementInfo_arguments(si)[i + offset]), 
-	 sources, 
+	 sourcesCopy, 
 	 i);
 
-      gen_free_list(sources);
-      sources = new_sources;
+      gen_free_list(sourcesCopy);
+      sourcesCopy = new_sources;
+
+      //update the list of places where shuffled copy can be found
+      new_sources = merge_available_places(
+	 statementArgument_dependances(simdStatementInfo_arguments(si)[i + offset]), 
+	 sourcesShuffle,
+	 -1);
+
+      gen_free_list(sourcesShuffle); //we should free the elements too (but not recusively, else we would free the simdStatementInfo...)
+      sourcesShuffle = new_sources;
    }
 
-   if (sources != NIL)
+   if (sourcesCopy != NIL)
    {
-      vectorElement vec = VECTORELEMENT(CAR(sources));
+      vectorElement vec = VECTORELEMENT(CAR(sourcesCopy));
       simdStatementInfo_vectors(si)[line] = vectorElement_vector(vec);
       return statement_undefined;
+   }
+   else if (sourcesShuffle != NIL)
+   {
+      vectorElement ve = VECTORELEMENT(CAR(sourcesShuffle));
+      return make_shuffle_statement(simdStatementInfo_vectors(si)[line],
+				    vectorElement_vector(ve),
+				    vectorElement_element(ve));
+				    
    }
    else
    {
@@ -772,7 +844,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
       {
 	 args = CONS(EXPRESSION,
 		     copy_expression(statementArgument_expression(simdStatementInfo_arguments(si)[i + offset])),
-		     args);
+		  args);
       }
       args = CONS(EXPRESSION,
 		  entity_to_expression(simdStatementInfo_vectors(si)[line]),
@@ -784,7 +856,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
 	 args);
    }
 }
-
+   
 static statement generate_save_statement(simdStatementInfo si)
 {
    list args = NIL;
