@@ -435,8 +435,9 @@ output_an_attachment(FILE * output_file,
     pips_assert("begin and end should be initialized.",
 		begin != POSITION_UNDEFINED && end != POSITION_UNDEFINED);
 		
-    /* Begin an Emacs Lisp properties: */
-    fprintf(output_file, "\n\t\t%d %d (", begin, end);
+    /* Begin an Emacs Lisp properties. + 1 since in a buffer (and not
+       a string). Use backquoting to evaluate keymaps later: */
+    fprintf(output_file, "(add-text-properties %d %d `(", begin + 1, end + 1);
 
     switch(attachee_tag(at))
     {
@@ -444,7 +445,7 @@ output_an_attachment(FILE * output_file,
 	{	    
 	    reference r = attachee_reference(at);
 	    pips_debug(5, "\treference %#x\n", (unsigned int) r);
-	    /* Output the aEvaluate the keymap: */
+	    /* Evaluate the keymap: */
 	    fprintf(output_file, "face epips-face-reference mouse-face epips-mouse-face-reference local-map ,epips-reference-keymap epips-property-reference \"%#x\" epips-property-reference-variable \"%#x\"",
 		    (unsigned int) r, (unsigned int) reference_variable(r));
 	    break;
@@ -519,7 +520,7 @@ output_an_attachment(FILE * output_file,
     }
 
     /* End an Emacs Lisp properties: */
-    fprintf(output_file, ")");
+    fprintf(output_file, "))\n");
 }
 
 
@@ -601,7 +602,7 @@ static void
 init_output_the_attachments_for_emacs(FILE * output_file)
 {
     /* Begin a string with Emacs Lisp properties: */
-    fprintf(output_file, "(epips-insert-with-properties\n\t `(\"");
+    fprintf(output_file, "(insert \"");
 }
 
 
@@ -613,7 +614,7 @@ output_the_attachments_for_emacs(FILE * output_file)
     debug_on("ATTACHMENT_DEBUG_LEVEL");
 
     /* End the string part: */
-    fprintf(output_file, "\"");
+    fprintf(output_file, "\")\n");
 
     /* Enumerate all the attachments: */
     gen_recurse(get_word_to_attachments_begin(),
@@ -650,7 +651,7 @@ output_the_attachments_for_emacs(FILE * output_file)
 			    get_word_to_attachments_begin());
 
     /* End the property part: */
-    fprintf(output_file, "\n\t)\n)\n");
+    /* fprintf(output_file, "\n\t)\n)\n"); */
 
     debug_off();
 }
