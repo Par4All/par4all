@@ -122,7 +122,7 @@ int argc;
 char * argv[];
 {
     initialize_newgen();
-    initialize_sc(entity_local_name); 
+    initialize_sc((char*(*)(Variable)) entity_local_name); 
 
     parse_arguments(argc, argv);
 
