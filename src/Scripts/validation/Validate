@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:16:40 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:17:02 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -110,7 +110,7 @@ validate_usage()
 	  This script executes pips non regressive tests (in \$PIPS_VALIDDIR).
 	  The modules to test (script arguments) are executed in parallel on
 	  available hosts from \$PIPS_HOSTS. Reports are sent to the user.
-	Usage: $script [-dsvpnhtVD] [-a address] [-u xx] [-r dir] [-l dir]
+	Usage: $script [-dsvpnhtVD] [-a address] [-r dir] [-l dir]
 	       [-x/y pips/tpips] [-i lines] [-f file] [modules]
 	  -h: this help
 	  -d: debug
