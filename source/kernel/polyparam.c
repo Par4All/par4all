@@ -1252,6 +1252,10 @@ void Compute_PDomains(Param_Domain *PD,int nb_domains,int working_space) {
     return;
   }
 
+  /* Already filled out by GenParamPolyhedron */
+  if (!PD->next && PD->F)
+    return;
+
    /* Initialization */
    nv = (nb_domains - 1)/(8*sizeof(int)) + 1;
 
