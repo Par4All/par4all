@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1996/11/16 19:55:06 $, 
+%% $Date: 1996/11/17 17:36:02 $, 
 
 \documentstyle[a4,psfig,html,verbatim,newgen_domain]{article}
 
@@ -302,6 +302,15 @@ large, puisqu'il s'agit par exemple du code pour les entités
 représentant des modules.
 \fi
 
+Functions mostly dealing with entities are grouped in
+\verb/ri-util/entity.c/ and \verb/ri-util/variable.c/ for entities used
+to represent program variables.
+
+Note the {\em tabulated} attribute. It means that NewGen keeps track
+implicitly of all entities allocated. All entities (and objects of other
+tabulated types) are accessible through a huge hash table using their
+names as keys.
+
 \domain{entity\_int = entity->int}
 
 This domain is used to map entities towards integer. Any interpretation
@@ -443,7 +452,8 @@ nom '*D*' est utilisée pour les tableaux de taille non définie
 
 \subsubsection{Basic Type}
 \label{subsubsection-basic}
-\index{Basic}\index{Integer}\index{Real}\index{Complex}\index{Character}
+\index{Basic}\index{Integer}\index{Real}\index{Complex}
+\index{Character}\index{Overloaded}\index{Logical}
 
 \domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value}
 
@@ -465,6 +475,10 @@ be typed explictly if they still have their default type when the type
 declaration is encountered. PIPS parser is implemented in such a way
 that {\tt IMPLICIT} statements should appear as early as possible in a
 module declarations.
+
+It is not clear that mapping caracter strings on \verb/string:value/ was
+the right choice. It might have been better to represent them as 1-D
+array of one character.
 
 \subsubsection{Dimension}
 \label{subsubsection-dimension}
@@ -489,11 +503,15 @@ tableau, c'est-a`-dire un couple borne inférieure -- sous-domaine
 \domain{Functional = parameters:parameter* x result:type}
 
 Type {\tt functional} is used for objects representing the explicit
-syntactic type of a module, function, subroutine or main
-program. Effects on global variables are not taken into account. Field
-{\tt parameters} contains the type of each formal parameter, and the
-in/out information. Field {\tt result} contains the result type. Type
-{\tt void} is used for subroutines and main programs.
+syntactic type of a module, function, subroutine or main program. It
+also is used for Fortran operators and intrinsics. Even constants have a
+functional type because they are seen as 0-ary functions. This reduces
+the amount of coding because many Fortran constructs can be handled as
+(pseudo) function calls. Effects on global variables are not taken into
+account for typing. Field {\tt parameters} contains the type of each
+formal parameter, and the in/out information. Field {\tt result}
+contains the result type. Type {\tt void} is used for subroutines and
+main programs.
 
 \iffalse
 Le domaine \verb/functional/ représente le type d'un module,
@@ -519,6 +537,10 @@ interdit pour les modules définis par le programmeur, de nombreux
 intrinse`ques comme \verb+MIN0+ ou \verb+WRITE+ n'ont pas un profil
 unique.
 \fi
+
+Intrinsics are statically declared in libraries
+\verb+bootstrap/bootstrap.c+ and \verb+effects/intrinsics.c+. There is a
+predicate to recognize intrinsics entities.
 
 \subsubsection{Parameter Type and Mode}
 \label{subsubsection-parameter}
@@ -749,7 +771,7 @@ source fide`le.
 
 \subsubsection{Constant Value}
 \label{subsubsection-constant}
-\index{Constant}
+\index{Constant}\index{DATA}\index{PARAMETER}
 
 \domain{Constant = int + litteral:unit}
 {}
@@ -811,6 +833,9 @@ or synthesized, the field \verb/decls_text/ is destroyed and set to the
 empty string\footnote{A symbolic constant should be used instead of the
 C empty string constant "".} to force declaration generation.
 
+It is sometimes useful to regenerate declarations because lazy users
+include every single common in every procedure.
+
 \iffalse
 Le sous-domaine {\tt decls\_text} contient le texte exact de toutes les
 déclarations du module; ce texte est utilisé par défaut par le
@@ -845,6 +870,16 @@ interprocédurales, et sera enrichi dans le futur.  Le sous-domaine {\tt
 callees} contient la liste des noms des sous-programmes et fonctions
 directement appelés dans le code. Il contient une partie du callgraph.
 \fi
+
+A set of such variables, \verb/callers/\footnote{Obviously, \verb/callers/ are
+of type \verb/callees/...}, \verb/callees/, \verb/all/, is
+used by Pipsmake to schedule interprocedural
+analyses\cite{Trio90}. Pipsmake and Pipsdbm are strongly
+string-oriented and not entity-oriented, because it is easier to deal
+with disk storage and ASCII files. Some C functions in library
+\verb/ri-util/ have either a string or an entity type for an entity
+formal parameter. The NewGen hash-table for entities makes both
+functionally equivalent, but strings are often more of a pain to handle.
 
 \subsection{Statement}
 \label{subsection-statement}
@@ -983,6 +1018,8 @@ Le sous-domaine \verb/instruction/ contient
 l'instruction proprement dite.
 \fi
 
+\paragraph{Mappings from statement to statement}
+
 \domain{persistant\_statement\_to\_statement = persistant statement -> persistant statement}
 {}
 
@@ -1036,6 +1073,8 @@ structuré. Toutes ces instructions
 sont représentées par des appels a` des fonctions prédéfinies dont
 nous étudierons la nature plus loin.
 \fi
+
+Several PIPS contributors have asked for a \verb/while/ construct.
 
 \subsubsection{Sequence}
 
@@ -1207,12 +1246,32 @@ exécutées en paralle`le.
 \label{range}
 \index{Range}
 \domain{Range = lower:expression x upper:expression x increment:expression}
-{
+{}
+
+Type \verb/range/ is used to store the loop bounds and step. The three
+fields are used to store the lower bound (\verb/lower/), the upper bound
+(\verb/upper/) and the step expression (\verb/increment/).
+
+\iffalse
 Le domaine \verb/range/ permet de représenter les bornes des boucles DO
 Fortran. Il y a trois sous-domaines \verb/lower/, \verb/upper/ et \verb/increment/ de
 type \verb/expression/ qui sont respectivement la borne inférieure, la borne
 supérieure et l'incrément.
-}
+\fi
+
+Expressions of type range can be used in other context. For instance,
+Fortran~90 triplet construct is a range. See
+Section~\ref{section-expressions} for details about expressions. For
+loops, other ranges are {\em not} expected in bound and step expressions.
+
+Field /verb/locals/\index{Private} is used to declare variables whose life time is
+limited to the loop body. They can be privatized and their effects can
+be ignored when running the loop in parallel if each processor gets a
+private copy of it.
+
+This field should be factored out in the \verb/statement/ type in order
+to declare variables local to a block, as in C. However, the two levels,
+statement and instruction, would make coding more difficult.
 
 \subsubsection{Function Call}
 \label{subsubsection-call}
@@ -1226,13 +1285,14 @@ user-defined function and subroutine calls in a pseudo-functional
 way. These pseudo-functions with side effects are very important for the
 PIPS internal representation since constants, operators such as + and *,
 intrinsics like {\tt MOD} or {\tt SIN}, and basic Fortran statements
-such as assignment {\tt =},{\tt READ, WRITE, RETURN, CALL}, are all
-encoded in the same way, like user-defined function calls. The number of
-arguments depends on the pseudo-function: 0 for constants, 1 or 2 for
-operators, and so on. Fortran keywords, operators and intrinsics are
-known as predefined functions. This unification of language and user
-defined functions is useful to reduce the size of the datastructure
-definition as well as the code required for many algorithms.
+such as assignment {\tt =},{\tt READ, WRITE, PAUSE, OPEN, CLOSE, RETURN,
+CALL, FORMAT}, and so on... are all encoded in the same way, like
+user-defined function calls. The number of arguments depends on the
+pseudo-function: 0 for constants, 1 or 2 for operators, and so
+on. Fortran keywords, operators and intrinsics are known as predefined
+functions. This unification of language and user defined functions is
+useful to reduce the size of the datastructure definition as well as the
+code required for many algorithms.
 
 \iffalse
 Le domaine \verb/call/ permet de représenter les commandes et les
@@ -1241,7 +1301,8 @@ Ces pseudo-fonctions jouent un rôle important dans notre
 représentation intermédiaire puisque les constantes, les opérateurs
 comme + et *, les intrinse`ques comme {\tt MOD} ou {\tt SIN} et surtout
 les commandes (i.e. instructions) Fortran, a` commencer par
-l'assignation et en continuant avec {\tt READ, WRITE, RETURN, CALL}
+l'assignation et en continuant avec {\tt READ, WRITE, PAUSE, OPEN,
+CLOSE, RETURN, CALL, FORMAT,}
 etc..., sont représentées comme les appels de fonctions définies par
 l'utilisateur. Le nombre d'arguments de chaque pseudo-fonction varie: 0
 pour les constantes, 1 ou 2 pour les opérateurs, etc. Les commandes
