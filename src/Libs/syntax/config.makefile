@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/11 21:26:09 $m 
+# $Date: 1996/08/12 15:20:17 $m 
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
@@ -55,7 +55,7 @@ syn_yacc.c syn_yacc.h: tokyacc.h gram.y
 # avoid lots of gcc warnings; the two calls to sed are *not* mandatory;
 #
 
-scanner.c: scanner.l 
+scanner.c: scanner.l syn_yacc.h
 	$(SCAN) scanner.l | \
 	sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/SYN_/g;s/yy/syn_/g' > $@
 
