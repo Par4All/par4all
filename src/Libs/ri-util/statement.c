@@ -1324,6 +1324,19 @@ fix_sequence_statement_attributes(statement s)
 }
 
 
+/* Apply fix_sequence_statement_attributes() on the statement only if
+   it really a sequence. */
+void
+fix_sequence_statement_attributes_if_sequence(statement s)
+{
+    instruction i = statement_instruction(s);
+    if (!instruction_undefined_p(i)) {
+	if (instruction_sequence_p(i))
+	    fix_sequence_statement_attributes(s);
+    }
+}
+
+
 /* See if statement s is labelled and can be reached by a GO TO */
 entity
 statement_to_label(statement s)
