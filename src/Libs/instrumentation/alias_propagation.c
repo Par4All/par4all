@@ -1,5 +1,7 @@
 /******************************************************************
  *
+ * $Id$
+ *
  *		     ALIAS PROPAGATION
  *
  *
@@ -30,6 +32,7 @@ this call for the callee => if the precondition = {0==-1} => no more check */
 
 #include "linear.h"
 #include "ri.h"
+#include "alias_private.h"
 #include "ri-util.h"
 #include "database.h"
 #include "pipsdbm.h"
@@ -168,7 +171,7 @@ static bool alias_propagation_call_flt(call c)
 		      ram r = storage_ram(s);
 		      int off = ram_offset(r);
 		      sec = ram_section(r);
-		      if (expresison_undefined_p(subval))
+		      if (expression_undefined_p(subval))
 			{
 			  /* The offset of actual variable is an integer 
 			     that can always be translated into the callee's frame*/
@@ -195,56 +198,58 @@ static bool alias_propagation_call_flt(call c)
 						    CONS(ALIAS_ASSOCIATION,one_alias,NIL));
 		    }
 		  if (storage_formal_p(s))
+		  {
+		    /* The actual argument is a formal parameter of the current caller, 
+		       we must take the alias_associations of the caller */
+		    string caller_name = module_local_name(current_caller);
+		    alias_associations caller_aliases = (alias_associations)
+		      db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,
+					     caller_name, TRUE);
+		    list l_caller_aliases = 
+		      alias_associations_list(caller_aliases); 
+		    while (!ENDP(l_caller_aliases))
 		    {
-		      /* The actual argument is a formal parameter of the current caller, 
-			 we must take the alias_associations of the caller */
-		      string caller_name = module_local_name(current_caller);
-		      alias_associations caller_aliases = db_get_memory_resource(
-					      DBR_ALIAS_ASSOCIATIONS,caller_name,TRUE);
-		      list l_caller_aliases = alias_associations_alias_associations(caller_aliases); 
-		      while (!ENDP(l_caller_aliases))
+		      alias_association aa = ALIAS_ASSOCIATION(CAR(l_caller_aliases));
+		      entity caller_var = alias_association_variable(aa);
+		      if (same_entity_p(caller_var,actual_var))
+		      {
+			list path = gen_nconc(alias_association_call_chain(aa),
+					      c_site);
+			sec = alias_association_section(aa);
+			
+			/* We must translate the lower and upper offsets 
+			   of aa to the callee's frame by using precondition +
+			   binding information. 
+			   
+			   ......implement here */
+
+			if (expression_undefined_p(subval))
 			{
-			  alias_association aa = CAR(l_caller_aliases);
-			  entity caller_var = alias_association_variable(aa);
-			  if (same_entity_p(caller_var,actual_var))
-			    {
-			      list path = gen_nconc(alias_association_call_path(aa),
-						    c_site);
-			      sec = alias_association_section(aa);
-
-			      /* We must translate the lower and upper offsets 
-				 of aa to the callee's frame by using precondition +
-				 binding information. 
-				 
-				 ......implement here */
-
-			      if (expression_undefined_p(subval))
-				{
-				  lo = alias_association_lower_offset(aa);
-				  uo = alias_association_upper_offset(aa);
-				}
-			      else 
-				{
-				  /* We must translate the subscript value
-				     into the callee's frame 
-				     lo = lower_offset + lower_approximation(subval)
-				     uo = upper_offset + upper_approximation(subval)
-				     
-				     ......implement here */
-				  lo =  binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-								    alias_association_lower_offset(aa),
-								    subval);
-				  uo =  binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-								    alias_association_upper_offset(aa),
-								    subval);
-				}
-			      one_alias = make_alias_association(formal_var,sec,lo,uo,path);
-			      l_current_aliases = gen_nconc(l_current_aliases,
-							    CONS(ALIAS_ASSOCIATION,one_alias,NIL));
-			    }
-			  l_caller_aliases = CDR(l_caller_aliases);
+			  lo = alias_association_lower_offset(aa);
+			  uo = alias_association_upper_offset(aa);
 			}
+			else 
+			{
+			  /* We must translate the subscript value
+			     into the callee's frame 
+			     lo = lower_offset + lower_approximation(subval)
+			     uo = upper_offset + upper_approximation(subval)
+			     
+			     ......implement here */
+			  lo =  binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+							    alias_association_lower_offset(aa),
+							    subval);
+			  uo =  binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+							    alias_association_upper_offset(aa),
+							    subval);
+			}
+			one_alias = make_alias_association(formal_var,sec,lo,uo,path);
+			l_current_aliases = gen_nconc(l_current_aliases,
+						      CONS(ALIAS_ASSOCIATION,one_alias,NIL));
+		      }
+		      l_caller_aliases = CDR(l_caller_aliases);
 		    }
+		  }
 		} 
 	    }
 	}
@@ -318,17 +323,18 @@ bool alias_propagation(char * module_name)
 	fprintf(stderr," \n  no formal parameter, do nothing");
       else
 	{
-	  ifdebug(2)
-	    {
-	      fprintf(stderr," \n The formal parameters list :");
-	      my_print_list_entities(l_formals);
-	    }
 	  /* Take the list of callers */
 	  callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
 							     module_name,
 							     TRUE);
 	  list l_callers = callees_callees(callers); 
 	  
+	  ifdebug(2)
+	    {
+	      fprintf(stderr," \n The formal parameters list :");
+	      my_print_list_entities(l_formals);
+	    }
+
 	  /* if there is no caller, do nothing */
 	  if (l_callers == NIL)
 	    fprintf(stderr," \n  no caller, do nothing");
