@@ -1,13 +1,24 @@
-%% $RCSfile: database.ftex,v $ (version $Revision$)
-%% $Date: 1996/08/21 10:40:06 $, 
+%% 
+%% $Id$
+%% 
+%% $Log: database.ftex,v $
+%% Revision 1.4  1997/09/19 11:49:48  coelho
+%% hop !
+%%
+%%
+%%
+%% newgen domain for pips detabase management.
+%%
 
-\documentstyle[newgen_domain]{article}
+\documentclass[a4paper,newgen_domain]{article}
+
+\title{Pips Database Manager}
 
 \begin{document}
-\sloppy
 
-\domain{Import entity from "ri.newgen"}
-{}
+\maketitle
+
+\section{Old database structures}
 
 \domain{Database = name:string x directory:string x resources:resource*}
 { Le domaine {\tt database} est utilise' par pips-db pour de'crire
@@ -76,4 +87,4 @@ somewhere in pipsdbm!
 }
 
 \end{document}
-\end
+
