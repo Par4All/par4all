@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.13  1999/07/15 20:35:46  coelho
+   temporary working version of AC-CSE...
+
    Revision 1.12  1999/05/28 09:15:37  coelho
    cleaner and more comments.
 
@@ -73,6 +76,37 @@
 #include "eole_private.h"
 
 extern char * itoa(int); /* somewhere in newgen */
+
+/******************************************************************* FLATTEN */
+
+static void flatten_sequence(sequence sq)
+{
+  list /* of statement */ nsl = NIL;
+  MAP(STATEMENT, s,
+  {
+    instruction i = statement_instruction(s);
+    if (instruction_sequence_p(i))
+      {
+	sequence included = instruction_sequence(i);
+	nsl = gen_nconc(nsl, sequence_statements(included));
+	sequence_statements(included) = NIL;
+	free_statement(s);
+      }
+    else
+      {
+	nsl = gen_nconc(nsl, CONS(STATEMENT, s, NIL));
+      }
+  },
+      sequence_statements(sq));
+
+  gen_free_list(sequence_statements(sq));
+  sequence_statements(sq) = nsl;
+}
+
+void flatten_sequences(statement s)
+{
+  gen_recurse(s, sequence_domain, gen_true, flatten_sequence);
+}
 
 /***************************************** COMMUTATIVE ASSOCIATIVE OPERATORS */
 
@@ -272,7 +306,11 @@ static bool atomizable_sub_expression_p(expression e)
     case is_syntax_reference:
       return FALSE;
     case is_syntax_call:
-      return !entity_constant_p(call_function(syntax_call(s)));
+      {
+	entity called = call_function(syntax_call(s));
+	/* missing cases? user functions? I/O? */
+	return !entity_constant_p(called) && !ENTITY_IMPLIEDDO_P(called);
+      }
     default:
       pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
       return FALSE;
@@ -469,6 +507,13 @@ static void atomize_or_associate_for_level(expression e, int level)
     }
 }
 
+/* don't go into I/O calls... */
+static bool icm_atom_call_flt(call c)
+{
+  entity called = call_function(c);
+  return !(io_intrinsic_p(called) || ENTITY_IMPLIEDDO_P(called));
+}
+
 /* maybe I could consider moving the call as a whole?
  */
 static void atomize_instruction(instruction i)
@@ -522,6 +567,8 @@ static void loop_rwt(loop l)
   do_atomize_if_different_level(range_increment(bounds), level);
 }
 
+static bool insert_reverse_order = TRUE;
+
 /* insert in front if some inserted.
  */
 static void insert_rwt(statement s)
@@ -535,7 +582,8 @@ static void insert_rwt(statement s)
 
       /* reverse list of inserted statements (#1#) */
       seq = instruction_sequence(i);
-      sequence_statements(seq) = gen_nreverse(sequence_statements(seq));
+      if (insert_reverse_order)
+	sequence_statements(seq) = gen_nreverse(sequence_statements(seq));
 
       /* insert */
       sequence_statements(seq) = 
@@ -565,6 +613,10 @@ perform_icm_association(
   /* set full (expr and statements) PROPER EFFECTS
    */
   full_simple_proper_effects(name, s);
+  /*
+  simple_cumulated_effects(name, s);
+  set_cumulated_rw_effects(get_rw_effects());
+  */
 
   /* GET CUMULATED EFFECTS
    */
@@ -590,9 +642,11 @@ perform_icm_association(
       expression_domain, gen_true, atomize_or_associate,
       /* do not atomize index computations at the time... */     
       reference_domain, gen_false, gen_null,
+      call_domain, icm_atom_call_flt, gen_null, /* skip IO calls */
 		    NULL);
 
   /* insert moved code in statement. */
+  insert_reverse_order = TRUE;
   gen_multi_recurse(s, statement_domain, gen_true, insert_rwt, NULL);
 
 #if defined(PUSH_BODY)
@@ -609,5 +663,602 @@ perform_icm_association(
   reset_cumulated_rw_effects();
 
   close_expr_prw_effects();  /* no memory leaks? */
-  close_proper_rw_effects();
+  close_proper_rw_effects(); 
+
+  /* some clean up */
+  flatten_sequences(s);
 }
+
+/********************************************************** EXTRACT ENTITIES */
+
+static list seen = NIL;
+
+static void add_ref_ent(reference r)
+{ seen = gen_once(reference_variable(r), seen); }
+
+static void add_call_ent(call c)
+{ seen = gen_once(call_function(c), seen); }
+
+static list get_all_entities(expression e)
+{
+  list result;
+  seen = NIL;
+
+  gen_multi_recurse(e,
+		    reference_domain, gen_true, add_ref_ent,
+		    call_domain, gen_true, add_call_ent,
+		    NULL);
+
+  result = seen;
+  seen = NIL;
+  return result;
+}
+
+/******************************************************************** AC-CSE */
+/* performs 
+   Associative-Commutative Common Subexpression Elimination
+   on sequences.
+
+   reimplements an atomization once more?
+   should not atomize I/O...
+*/
+
+typedef struct
+{
+  entity scalar; /* the entity which holds the value? or partial? */
+  entity operator; /* NULL for references */
+  list /* of entity */ depends; /* W effects on these invalidates the scalar */
+  statement container; /* statement in which it appears (for atomization) */
+  expression contents; /* call or reference... could be a syntax? */
+  list available_contents; /* part of which is available */
+}
+  available_scalar_t, * available_scalar_pt;
+
+static void dump_aspt(available_scalar_pt aspt)
+{
+  syntax s = expression_syntax(aspt->contents);
+  fprintf(stderr, 
+	  "DUMP ASPT\n"
+	  "%s [%s] len=%d, avail=%d\n",
+	  entity_name(aspt->scalar), 
+	  aspt->operator? entity_name(aspt->operator): "NOP",
+	  syntax_call_p(s)? gen_length(call_arguments(syntax_call(s))): -1,
+	  gen_length(aspt->available_contents));
+}
+
+static list current_availables = NIL;
+static statement current_statement = statement_undefined;
+
+/* whether to get in here, whether to atomize... */
+static bool expr_cse_flt(expression e)
+{
+  syntax s = expression_syntax(e);
+  switch (syntax_tag(s))
+    {
+    case is_syntax_call:
+      return !IO_CALL_P(syntax_call(s));
+    case is_syntax_reference:
+      return entity_scalar_p(reference_variable(syntax_reference(s)));
+    case is_syntax_range:
+    default:
+      return FALSE;
+    }
+}
+
+#define NO_SIMILARITY (0)
+#define MAX_SIMILARITY (1000)
+
+/* return the entity stored by this function.
+   should be a scalar reference or a constant...
+   or a call to an inverse operator.
+ */
+static entity entity_of_expression(expression e, bool * inverted, entity inv)
+{
+  syntax s = expression_syntax(e);
+  *inverted = FALSE;
+  switch (syntax_tag(s))
+    {
+    case is_syntax_call:
+      {
+	call c = syntax_call(s);
+	if (call_function(c)==inv)
+	  {
+	    *inverted = TRUE;
+	    return entity_of_expression(EXPRESSION(CAR(call_arguments(c))),
+					inverted, NULL);
+	  }
+	else
+	  return call_function(c);
+      }
+    case is_syntax_reference:
+      {
+	reference r = syntax_reference(s);
+	if (reference_indices(r))
+	  return NULL;
+	else
+	  return reference_variable(r);
+      }
+    case is_syntax_range:
+    default:
+    }
+  return NULL;
+}
+
+static bool expression_in_list_p(expression e, list seen)
+{
+  MAP(EXPRESSION, f, if (e==f) return TRUE, seen);
+  return FALSE;
+}
+
+static expression 
+find_equal_expression_not_in_list(expression e, list avails, list seen)
+{
+  MAP(EXPRESSION, f,
+      if (expression_equal_p(e, f) && !expression_in_list_p(f, seen))
+        return f,
+      avails);
+  return NULL;
+}
+
+static list /* of expression */ 
+common_expressions(list args, list avails)
+{
+  list already_seen = NIL;
+
+  MAP(EXPRESSION, e, 
+  {
+    expression n = find_equal_expression_not_in_list(e, avails, already_seen);
+    if (n) already_seen = CONS(EXPRESSION, n, already_seen);
+  },
+      args);
+
+  return already_seen;
+}
+
+static int similarity(expression e, available_scalar_pt aspt)
+{
+  syntax s = expression_syntax(e), sa = expression_syntax(aspt->contents);
+
+  /*
+  fprintf(stderr, "similarity on %s\n", entity_name(aspt->scalar));
+  print_expression(e);
+  dump_aspt(aspt);
+  */
+
+  if (syntax_tag(s)!=syntax_tag(sa)) return NO_SIMILARITY;
+  
+  if (syntax_reference_p(s))
+    {
+      reference r = syntax_reference(s), ra = syntax_reference(sa);
+      if (reference_equal_p(r, ra)) return MAX_SIMILARITY;
+    }
+
+  if (syntax_call_p(s))
+    {
+      call c = syntax_call(s), ca = syntax_call(sa);
+      entity cf = call_function(c);
+      if (cf!=call_function(ca)) return NO_SIMILARITY;
+
+      /* same function...
+       */
+      if (Is_Associatif_Commutatif(cf))
+	{
+	  /* similarity is the number of args in common.
+	     inversion is not tested at the time.
+	   */
+	  list com = common_expressions(call_arguments(c),
+					aspt->available_contents);
+	  int n = gen_length(com);
+	  gen_free_list(com);
+	  if (n<=1) return NO_SIMILARITY;
+	  return (n == gen_length(call_arguments(ca)) &&
+	          n == gen_length(call_arguments(c))) ? MAX_SIMILARITY: n;
+	}
+      else
+	{
+	  /* any call: must be equal
+	   */
+	  list l = call_arguments(c), la = call_arguments(ca);
+	  pips_assert("same length", gen_length(l)==gen_length(la));
+	  for (; l; l = CDR(l), la = CDR(la))
+	    {
+	      expression el = EXPRESSION(CAR(l)), ela = EXPRESSION(CAR(la));
+	      if (!expression_equal_p(el, ela))
+		return NO_SIMILARITY;
+	    }
+	  return MAX_SIMILARITY;
+	}
+    }
+
+  return NO_SIMILARITY;
+}
+
+static available_scalar_pt 
+best_similar_expression(expression e, int * best_quality)
+{
+  available_scalar_pt best = NULL;
+  (*best_quality) = 0;
+
+  MAPL(caspt,
+  {
+    available_scalar_pt aspt = (available_scalar_pt) STRING(CAR(caspt));
+    int quality = similarity(e, aspt);
+    if (quality==MAX_SIMILARITY) 
+    {
+	(*best_quality) = quality;
+      return aspt;
+    }
+    if (quality>0 && (*best_quality)<quality)
+      {
+	best = aspt;
+	(*best_quality) = quality;
+      }
+  },
+       current_availables);
+
+  return best;
+}
+
+static available_scalar_pt 
+make_available_scalar(
+    entity scalar,
+    statement container,
+    expression contents)
+{
+  syntax s = expression_syntax(contents);
+
+  available_scalar_pt aspt = 
+    (available_scalar_pt) malloc(sizeof(available_scalar_t));
+
+  aspt->scalar = scalar;
+  aspt->container = container;
+  aspt->contents = contents;
+
+  aspt->depends = get_all_entities(contents);
+
+  if (syntax_call_p(s))
+    {
+      call c = syntax_call(s);
+      aspt->operator = call_function(c);
+      if (Is_Associatif_Commutatif(aspt->operator))
+	aspt->available_contents = gen_copy_seq(call_arguments(c));
+      else
+	aspt->available_contents = NIL;
+    }
+  else
+    {
+      aspt->operator = NULL;
+      aspt->available_contents = NIL;
+    }
+
+  return aspt;
+}
+
+static bool expression_eq_in_list_p(expression e, list l, expression *f)
+{
+  MAP(EXPRESSION, et,
+      if (expression_equal_p(e, et))
+      {
+	*f = et;
+	return TRUE;
+      },
+      l);
+  return FALSE;
+}
+
+/* returns an allocated l1-l2 with expression_equal_p
+   l2 included in l1.
+ */
+static list /* of expression */ list_diff(list l1, list l2)
+{
+  list diff = NIL, l2bis = gen_copy_seq(l2);
+  expression found;
+
+  MAP(EXPRESSION, e,
+      if (expression_eq_in_list_p(e, l2bis, &found))
+      {
+	gen_remove(&l2bis, found);
+      }
+      else
+      {
+	diff = CONS(EXPRESSION, e, diff);
+      },
+      l1);
+
+  pips_assert("list should be empty...", !l2bis);
+  /* if (l2bis) gen_free_list(l2bis); */
+
+  return diff;
+}
+
+static bool simple_reference_p(expression e)
+{
+  syntax s = expression_syntax(e);
+  return syntax_reference_p(s) && !reference_indices(syntax_reference(s));
+}
+
+/* remove some inpropriate ones...
+ */
+static void clean_current_availables(void)
+{
+  
+}
+
+static void atom_cse_expression(expression e)
+{
+  /* statement head = current_statement_head(); */
+  syntax s = expression_syntax(e);
+  int quality;
+  available_scalar_pt aspt;
+  
+  /* fprintf(stderr, "[atom_cse_expression]\n"); */
+
+  if (syntax_call_p(s) && ENTITY_ASSIGN_P(call_function(syntax_call(s))))
+    return;
+
+  do { /* extract every possible common subexpression */
+    aspt = best_similar_expression(e, &quality);
+    if (aspt) /* some common expression found. */ {
+
+      /*
+      fprintf(stderr, "some similar expression found (%s: %d)\n", 
+	      entity_name(aspt->scalar), quality);
+      print_expression(aspt->contents);
+      */
+
+      switch (syntax_tag(s))
+	{
+	case is_syntax_reference:
+	  syntax_reference(s) = make_reference(aspt->scalar, NIL);
+	  return;
+	case is_syntax_call:
+	  {
+	    if (quality==MAX_SIMILARITY)
+	      {
+		/* identicals, just make a reference to the scalar.
+		   whatever the stuff stored inside.
+		 */
+		/* fprintf(stderr, "AC-CSE is equal...\n"); */
+
+		syntax_tag(s) = is_syntax_reference;
+		syntax_reference(s) = make_reference(aspt->scalar, NIL);
+		return;
+	      }
+	    else /* partial common expression... */
+	      {
+		available_scalar_pt naspt;
+		call c = syntax_call(s), ca;
+		syntax sa = expression_syntax(aspt->contents);
+		entity op = call_function(c), scalar;
+		expression cse, cse2;
+		statement scse;
+		list /* of expression */ in_common, linit, lo1, lo2, old;
+
+		pips_assert("AC operator", 
+			 Is_Associatif_Commutatif(op) && op==aspt->operator);
+		pips_assert("contents is a call", syntax_call_p(sa));
+		ca = syntax_call(sa);
+
+		linit = call_arguments(ca);
+
+		/*
+		   there is a common part to build,
+		   and a CSE to substitute in both...
+		*/
+		in_common = common_expressions(call_arguments(c),
+					       aspt->available_contents);
+
+		if (gen_length(linit)==gen_length(in_common))
+		{
+		  /* fprintf(stderr, "AC-CSE is included...\n"); */
+		  /* just substitute lo1, don't build a new aspt. */
+		  lo1 = list_diff(call_arguments(c), in_common);
+		  free_arguments(call_arguments(c));
+		  call_arguments(c) = 
+		    gen_nconc(lo1, 
+			      CONS(EXPRESSION,
+				   entity_to_expression(aspt->scalar), NIL));
+		}
+		else
+		{
+		  /* fprintf(stderr, "AC-CSE is shared...\n"); */
+
+		lo1 = list_diff(call_arguments(c), in_common);
+		lo2 = list_diff(linit, in_common);
+		
+		cse = call_to_expression(make_call(aspt->operator, in_common));
+		scse = atomize_this_expression(hpfc_new_variable, cse);
+		/* now cse is a reference to the newly created scalar. */
+		pips_assert("a reference...",
+			    syntax_reference_p(expression_syntax(cse)));
+		scalar = reference_variable(syntax_reference
+					    (expression_syntax(cse)));
+		insert_before_statement(scse, aspt->container);
+
+		/* don't visit it later. */
+		gen_recurse_stop(scse);
+		
+		cse2 = copy_expression(cse);
+		
+		/* update both expressions... */
+		old = call_arguments(c); /* in code */
+		call_arguments(c) = CONS(EXPRESSION, cse, lo1);
+		gen_free_list(old);
+
+		old = call_arguments(ca);
+		call_arguments(ca) = CONS(EXPRESSION, cse2, lo2);
+		gen_free_list(old);
+
+		/* updates... */
+		aspt->depends = CONS(ENTITY, scalar, aspt->depends);
+		old = aspt->available_contents; 
+		aspt->available_contents = list_diff(old, in_common);
+		gen_free_list(old);
+
+		/* add the new scalar as an available CSE. */
+		naspt = make_available_scalar(scalar,
+					      aspt->container,
+		   EXPRESSION(CAR(CDR(call_arguments(instruction_call
+			      (statement_instruction(scse)))))));
+		}
+	      }
+	    break;
+	  }
+	case is_syntax_range:
+	default:
+	  /* nothing */
+	  return;
+	}
+    }
+  } while(aspt);
+
+  if (!simple_reference_p(e))
+    {
+      statement atom;
+
+      /* fprintf(stderr, "atomizing..."); print_expression(e); */
+      /* create a new atom... */
+      atom = atomize_this_expression(hpfc_new_variable, e);
+      insert_before_statement(atom, current_statement);
+      /* don't visit it later, just in case... */
+      gen_recurse_stop(atom);
+      {
+	entity scalar;
+	call ic;
+	syntax s = expression_syntax(e);
+	instruction i = statement_instruction(atom);
+	pips_assert("it is a reference", syntax_reference_p(s));
+	pips_assert("instruction is an assign", 
+		    instruction_call_p(i)) /* ??? */
+		    
+	scalar = reference_variable(syntax_reference(s));
+	ic = instruction_call(i);
+	
+	/* if there are variants in the expression it cannot be moved,
+	   and it is not available. Otherwise I should move it?
+	 */
+	aspt = make_available_scalar(scalar, 
+				     current_statement,
+				     EXPRESSION(CAR(CDR(call_arguments(ic)))));
+	
+	current_availables = CONS(STRING, (char*)aspt, current_availables);
+      }
+    }
+}
+
+static bool loop_stop(loop l)
+{ gen_recurse_stop(loop_body(l)); return TRUE; }
+
+static bool test_stop(test t)
+{ gen_recurse_stop(test_true(t));
+  gen_recurse_stop(test_false(t)); return TRUE; }
+
+static bool while_stop(whileloop wl)
+{ gen_recurse_stop(whileloop_body(wl)); return TRUE; }
+
+static bool cse_atom_call_flt(call c)
+{
+  entity called = call_function(c);
+
+  /* should avoid any W effect... */
+  if (ENTITY_ASSIGN_P(called))
+    gen_recurse_stop(EXPRESSION(CAR(call_arguments(c))));
+
+  return !(io_intrinsic_p(called) || ENTITY_IMPLIEDDO_P(called));
+}
+
+/* side effects: use current_availables and current_statement
+ */
+static list /* of available_scalar_pt */
+atomize_cse_this_statement_expressions(statement s, list availables)
+{
+  current_availables = availables;
+  current_statement = s;
+
+  /* fprintf(stderr, "[] BEFORE\n"); print_statement(s); */
+
+  /* scan expressions in s; 
+     atomize/cse them; 
+     update availables;
+  */
+  gen_multi_recurse(s,
+		    /* statement_domain, current_statement_filter, 
+		       current_statement_rewrite, */
+
+		    /* don't go inside these... */
+		    loop_domain, loop_stop, gen_null,
+		    test_domain, test_stop, gen_null,
+		    unstructured_domain, gen_false, gen_null,
+		    whileloop_domain, while_stop, gen_null,
+		    
+		    /* . */
+		    call_domain, cse_atom_call_flt, gen_null,
+		    
+		    /* do the job on the found expression. */
+		    expression_domain, expr_cse_flt, atom_cse_expression,
+		    NULL);
+
+  /* fprintf(stderr, "[] AFTER\n"); print_statement(s); */
+  /* free_current_statement_stack(); */
+  availables = current_availables;
+  
+  current_statement = statement_undefined;
+  current_availables = NIL;
+
+  return availables;
+}
+
+/* top down. */
+static bool seq_flt(sequence s)
+{
+  list availables = NIL;
+
+  /* fprintf(stderr, "considering sequence %d\n", 
+     gen_length(sequence_statements(s))); */
+
+  MAP(STATEMENT, ss,
+      /* should clean availables with effects...
+       */
+      availables = atomize_cse_this_statement_expressions(ss, availables),
+      sequence_statements(s));
+
+  return TRUE;
+}
+
+void perform_ac_cse(string name, statement s)
+{
+  /* they have to be recomputed, because if ICM before. */
+
+  /* set full (expr and statements) PROPER EFFECTS
+     well, they are computed twice here...
+     looks rather temporary.
+   */
+  /*
+  full_simple_proper_effects(name, s);
+  simple_cumulated_effects(name, s);
+  */
+
+  /* make_current_statement_stack(); */
+  init_inserted();
+
+  gen_recurse(s, sequence_domain, seq_flt, gen_null);
+
+  /* insert moved code in statement. */
+  insert_reverse_order = FALSE;
+  gen_multi_recurse(s, statement_domain, gen_true, insert_rwt, NULL);
+
+  close_inserted();
+  /*
+  close_expr_prw_effects();
+  close_proper_rw_effects();
+  close_rw_effects();
+  */
+}
+
+
+
+
+
+
+
+
