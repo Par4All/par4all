@@ -139,7 +139,7 @@ i_open:
 			user_log("Main module PROGRAM \"%s\" found.\n", main_module_name);
 			lazy_open_module(main_module_name);
 		}
-		return TRUE;
+		$$ = TRUE;
 	}
 	;
 
@@ -171,7 +171,7 @@ i_create:
 			user_log("Main module PROGRAM \"%s\" found.\n", main_module_name);
 			lazy_open_module(main_module_name);
 		}		
-		return TRUE;
+		$$ = TRUE;
 	}
 	;
 
@@ -186,7 +186,7 @@ i_close:
 			user_warning ("tp_parse","No workspace to close\n");
 			$$ = FALSE;
 		}	
-		return TRUE;
+		$$ = TRUE;
 	}
 	;
 
@@ -197,7 +197,6 @@ i_delete:
 	{
 		debug(7,"tp_parse","reduce rule i_delete\n");
 		$$ = TRUE;
-		return TRUE;
 	}
 	;
 
@@ -212,7 +211,6 @@ i_module:
 		lazy_open_module (strupper(t,t));
 		free(t);
 		$$ = TRUE;
-		return TRUE;
 	}
 	;
 
@@ -230,7 +228,6 @@ i_make:
 		}, $3.the_owners);
 
 		$$ = TRUE;
-		return TRUE;
 	}
 	;
 
@@ -245,7 +242,6 @@ i_apply:
 		}, $3.the_owners);
 
 		$$ = TRUE;
-		return TRUE;
 	}
 	;
 
@@ -268,7 +264,6 @@ i_display:
 		}, $3.the_owners);
 
 		$$ = TRUE;
-		return TRUE;
 	}
 	;
 
@@ -280,7 +275,6 @@ i_activate:
 		debug(7,"tp_parse","reduce rule i_activate\n");
 		activate ($3);
 		$$ = TRUE;
-		return TRUE;
 	}
 	;
 
@@ -335,7 +329,7 @@ i_set:
 			}
 		}
 		print_property($<name>4,p);
-		return TRUE;
+		$$ = TRUE;
 	}
 
 
@@ -353,7 +347,7 @@ i_get:
 		p = get_property (yylval.name);
 
 		print_property(yylval.name, p);
-		return TRUE;
+		$$ = TRUE;
 	}
 
 
