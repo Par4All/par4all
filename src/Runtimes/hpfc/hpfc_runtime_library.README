@@ -1,15 +1,19 @@
-$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/11/21 23:16:51 $, 
+$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/11/22 20:52:34 $, 
 
- (c) Fabien Coelho, 1993-1995
+ (c) Centre de Recherche en Informatique,
+     Ecole des mines de Paris, 
+     Fabien Coelho, 
+     1993-1994-1995
+
 
 This file describes the content of the Hpfc Runtime Library.
-Don't expect anything from these sources, so you won't be disapointed.
+Don't expect anything from these sources, so you won't be disappointed.
 
 
 Introduction:
 -------------
 
-This library was developped as a support to the Prototype HPF Compiler
+This library was developed as a support to the Prototype HPF Compiler
 generated codes. It includes functions for runtime description of the
 distributed arrays, communications, shifts, broadcasts, and so on.
 It is based on PVM. Some never tested extensions tried to use the CMMD
@@ -22,16 +26,16 @@ How to built the library:
 
 Define the following environment variables:
 
-PIPS_AR and PIPS_ARFLAGS
-PIPS_M4 and HPFC_M4 
+PIPS_AR (ar)  and PIPS_ARFLAGS (rv)
+PIPS_M4 (gm4) and HPFC_M4 (gm4)
   These m4 should include the shift operator. 
-  I had bad experiences with SUN and DEC m4. 
-  GNU m4 1.4 is okay.
+  I had bad experiences with SUN and DEC m4. GNU m4 1.4 is okay.
 PVM_ROOT and PVM_ARCH
 HPFC_RUNTIME_M4_PARAMS:
  -D HPFC_GNU	  (uses the GNU compilers: gcc/g77)
+  * some files cannot be compiled by g77 beta, they must be split by hand.
  -D DEMO          (print some messages when launched)
- -D DIRECT        (use direct connexions)
+ -D DIRECT        (use direct connexions, if enough pes...)
  -D DEBUG         (verbose run)
  -D SYNC_EXIT     (synchronize on exit, needed by old PVM versions)
  -D USE_PVMe      (for IBM's PVM. a PVM3_ROOT is expected if set)
@@ -44,7 +48,7 @@ Then make (and hope:-)...
 Library content and organization:
 ---------------------------------
 
-Misc: Demo support. 
+Misc: Demo support: verbose run, timings...
 Runtime: (rtsupport) everything to manage data distributions descriptors.
 Reductions: for stride-1 aligned block-distributed arrays.
 Broadcast: functions for partial broadcasts.
