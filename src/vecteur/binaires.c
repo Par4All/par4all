@@ -4,9 +4,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-/* #include <values.h> */
 #include <limits.h>
-#include <setjmp.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -62,7 +60,7 @@ Pvecteur v1,v2;
  * etape d'acculumulation dans une combinaison lineaire;
  * aucun sharing entre v et u n'est cree (allocation implicite)
  * Le controle de l'overflow est effectue et traite par le retour 
- * du contexte correspondant au dernier setjmp(overflow_error) effectue.
+ * du contexte correspondant au dernier CATCH(overflow_error) effectue.
  *
  * ->   ->         ->
  * v := v + lambda u;
@@ -86,7 +84,6 @@ Pvecteur u;
 int ofl_ctrl;
 {
     Pvecteur cu;
-    extern jmp_buf overflow_error;
 
     if(lambda==VALUE_ZERO)
 	return v;
@@ -111,15 +108,12 @@ int ofl_ctrl;
 		vect_add_elem(&v, var_of(cu), value_uminus(val_of(cu)));
 	else
 	    for(cu=u ;cu!=NULL;cu=cu->succ) {
-		/* this could/should be in value_mult!
-		 */
-		if (ofl_ctrl != NO_OFL_CTRL) 
-		    if (!value_lt(value_abs(lambda),
-				  value_div(VALUE_MAX,
-					    value_abs(val_of(cu)))))
-			longjmp(overflow_error, 5);
+		/* bof, FC */
+		Value x = ofl_ctrl!=NO_OFL_CTRL?
+		    value_protected_mult(lambda,val_of(cu)):
+		    value_mult(lambda,val_of(cu));
 
-		vect_add_elem(&v, var_of(cu), value_mult(lambda,val_of(cu)));
+		vect_add_elem(&v, var_of(cu), x);
 	    }
     
     return v;
@@ -148,7 +142,7 @@ Pvecteur u;
  * la combinaison lineaire des deux vecteurs v1 et v2 avec les 
  * coefficients respectifs x1 et x2
  * Le controle de l'overflow est effectue par vect_cl_ofl et traite par 
- * le retour du contexte correspondant au dernier setjmp(overflow_error) 
+ * le retour du contexte correspondant au dernier CATCH(overflow_error) 
  * effectue.
  *          ->
  * allocate v;
