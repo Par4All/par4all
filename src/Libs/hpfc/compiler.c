@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/06/12 15:52:46 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/07/23 16:54:54 $, )
  * version $Revision$
  *
  * Compiler
@@ -589,7 +589,7 @@ statement *hoststatp, *nodestatp;
 	    at_ac = atomic_accesses_only_p(stat),
 	    in_in = indirections_inside_statement_p(stat);
 	
-	debug(5, "hpf_compile_loop", "condition results: sh %d, aa %d, in %d\n",
+	pips_debug(5, "condition results: sh %d, aa %d, in %d\n",
 	      is_shift, at_ac, in_in);
 
 	if (is_full_copy)
@@ -614,29 +614,28 @@ statement *hoststatp, *nodestatp;
 
 	    if (Overlap_Analysis(stat, &overlapstat))
 	    {
-		debug(7, "hpf_compile_loop", "overlap analysis succeeded\n");
+		pips_debug(7, "overlap analysis succeeded\n");
 
 		*hoststatp = make_continue_statement(entity_empty_label());
 		*nodestatp = overlapstat;
-		statement_comments(*nodestatp) = statement_comments(stat);
+		statement_comments(*nodestatp) = 
+		    strdup(statement_comments(stat));
 	    }
 	    else
 	    {
-		debug(7, "hpf_compile_loop", "overlap analysis is not ok...\n");
-
+		pips_debug(7, "overlap analysis is not ok...\n");
 		hpf_compile_parallel_loop(stat, hoststatp, nodestatp);
 	    }
 	}
 	else
 	{
-	    debug(7,"hpf_compile_loop",
-		  "compiling a parallel loop sequential...\n");
+	    pips_debug(7, "compiling a parallel loop sequential...\n");
 	    hpf_compile_sequential_loop(stat, hoststatp, nodestatp);
 	}
     }
     else
     {
-	debug(7,"hpf_compile_loop","compiling a sequential loop\n");
+	pips_debug(7,"compiling a sequential loop\n");
     
 	hpf_compile_sequential_loop(stat, hoststatp, nodestatp);
     }
