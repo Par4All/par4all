@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1996/02/16 12:02:22 $, ) 
+ * ($Date: 1996/03/11 17:15:37 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -354,6 +354,14 @@ elements_loop(
 				hpfc_name_to_entity(IDIVIDE));
 }
 
+static expression 
+mylid_ne_lid(entity lid)
+{
+    return MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
+			  entity_to_expression(hpfc_name_to_entity(MYLID)),
+			  entity_to_expression(lid));
+}
+
 /* to be generated:
  * 
  *   IF (MYLID.NE.LID)
@@ -367,12 +375,41 @@ if_different_pe(
     statement true,  /* then statement */
     statement false) /* else statement */
 {
-    return test_to_statement
-      (make_test(MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
-	   entity_to_expression(hpfc_name_to_entity(MYLID)),
-	   entity_to_expression(lid)),
-		      true, false));
+    return test_to_statement(make_test(mylid_ne_lid(lid), true, false));
 }
+
+/* to be generated:
+ * IF (MYLID.NE.LID[.AND.NOT.HPFC_TWIN_P(an, LID)])
+ * THEN true 
+ * ELSE false
+ * ENDIF
+ */
+static statement 
+if_different_pe_and_not_twin(
+    entity src,      /* source array processor */
+    entity lid,      /* process local id variable */
+    statement true,  /* then statement */
+    statement false) /* else statement */
+{
+    expression cond = mylid_ne_lid(lid);
+
+    if (get_bool_property("HPFC_GUARDED_TWINS") && replicated_p(src))
+    {
+	list /* of expression */ largs;
+	expression not_twin;
+
+	largs = CONS(EXPRESSION, int_to_expression(load_hpf_number(src)),
+		CONS(EXPRESSION, entity_to_expression(lid), NIL));
+	not_twin = not_expression(call_to_expression
+	    (make_call(hpfc_name_to_entity(TWIN_P), largs)));
+
+	cond = and_expression(cond, not_twin);
+    }
+
+    return test_to_statement(make_test(cond, true, false));
+}
+    
+
 
 /* builds the diffusion loop.
  *
@@ -506,7 +543,7 @@ gen(int what,
 				     TRUE /* send! */, is_lazy));
     case RCV+INL+BUF:
     case RCV+INL+LZY+BUF:
-	ret(hpfc_lazy_buffer_packing(trg, trg, lid, proc, create_trg,
+	ret(hpfc_lazy_buffer_packing(src, trg, lid, proc, create_trg,
 				     FALSE /* receive! */, is_lazy));
     case RCV+INL:
     case RCV+INL+LZY:
@@ -716,7 +753,7 @@ generate_remapping_code(
     receive = processor_loop
 	(procs, lp, l, p_trg, p_src, lid, NULL,
 	 get_ith_processor_prime, get_ith_processor_dummy,
-	 if_different_pe(lid, recv, copy), TRUE);
+	 if_different_pe_and_not_twin(src, lid, recv, copy), TRUE);
 
     if (dist_p) gen_remove(&l, lambda);
 
