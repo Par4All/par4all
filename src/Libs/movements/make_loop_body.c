@@ -4,7 +4,9 @@
   * Corinne Ancourt  - September 1991
   */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 
 /* #include "values.h" */
