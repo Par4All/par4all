@@ -25,6 +25,11 @@
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.14  2003/12/20 17:42:05  irigoin
+ Bug fix in clean_up_embedding_graph(). Iteration over a list whose
+ elements might be freed by a previous iteration. Why didn't it show up
+ earlier?
+
  Revision 1.13  2003/08/02 13:34:49  irigoin
  Four useless/obsolete static functions removed to reduce gcc warnings.
 
@@ -713,16 +718,17 @@ static int clean_up_control_test(control c)
     /* FI: I do not see why you are sure not to need all meaningless
        controls... There might be no meaningless control at all. The next
        two assertions seem too strong. */
-    pips_assert("More true successors", !ENDP(c_e_succs));
+    pips_assert("More empty successors", !ENDP(c_e_succs));
 
     nel = ns - gen_length(n_succs);
     pips_assert("The successor list is reduced", nel>0);
     
-    /* Courageously, free the remaining meaninless successors */
+    /* Courageously, free the remaining meaningless successors */
     MAP(CONTROL, e, {
+      ifdebug(9) fprintf(stderr,"control %p is consistent and is going to be freed\n", e);
       free_meaningless_control(e);
     }, c_e_succs);
-    
+
     /* Update the successor list of c */
     gen_free_list(control_successors(c));
     control_successors(c) = n_succs;
@@ -738,9 +744,19 @@ static int clean_up_control_test(control c)
 static void clean_up_embedding_graph(control c)
 {
   list el = node_to_linked_nodes(c);
+  list tl = NIL;
   int nor = 0; /* number of replications */
   int nel = 0; /* number of eliminations */
   
+  ifdebug(1) {
+    pips_assert("c is consistent", control_consistent_p(c));
+    MAP(CONTROL, ec, {
+      pips_assert("ec is consistent first", control_consistent_p(ec));
+      ifdebug(10) fprintf(stderr,"control %p is consistent first\n", ec);
+    }
+	, el);
+  }
+
   /* A meaningless control must have only one predecessor and no
      successor. */
   MAP(CONTROL, ec, {
@@ -763,16 +779,36 @@ static void clean_up_embedding_graph(control c)
   }
       , el);
 
+    ifdebug(1) {
+      MAP(CONTROL, ec, {
+	pips_assert("ec is consistent second", control_consistent_p(ec));
+	ifdebug(9) fprintf(stderr,"control %p is consistent second\n", ec);
+      }
+	  , el);
+    }
+
   /* A non-deterministic test does not need too many meaningless
-     successors. */
+     successors. A new list must be built first because
+     clean_up_control_test() destroys elements of el, which cannot be
+     scanned any longer. */
   MAP(CONTROL, ec, {
+    ifdebug(10) fprintf(stderr,"is control %p is consistent?\n", ec);
+    ifdebug(1) pips_assert("ec is consistent third", control_consistent_p(ec));
     if(control_test_p(ec)) {
-      nel += clean_up_control_test(ec);
+      tl = CONS(CONTROL, ec, tl);
     }
   }
       , el);
 
+  MAP(CONTROL, ec, {
+    ifdebug(10) fprintf(stderr,"is control %p is consistent?\n", ec);
+    ifdebug(1) pips_assert("ec is consistent fourth", control_consistent_p(ec));
+    nel += clean_up_control_test(ec);
+  }
+      , tl);
+
   gen_free_list(el);
+  gen_free_list(tl);
 
   pips_debug(2, "End: %d useless successors destroyed\n", nel);
 }
