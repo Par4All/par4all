@@ -1,14 +1,13 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/03 12:46:29 $, 
+# $Date: 1996/09/03 12:46:56 $, 
 #
 # (c) Fabien COELHO 1996
 
 # creates a release, with sources / executables ???
 # namely a compressed tar file?
 
-script=$RCSfile: make_release,v $
 unset name dirs root trgt oths edit
 tar=${PIPS_TAR:-gtar}
 taropt=cf
@@ -26,7 +25,7 @@ usage()
     ret=$1; shift
     cat <<-EOF
 	$RCSfile: make_release,v $ (version $Revision$): $@
-	usage: $script [options] dirs...
+	usage: $RCSfile: make_release,v $ [options] dirs...
 	 -h: print this help
 	 -v: verbose
 	 -e: edit list
