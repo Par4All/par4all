@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.95  1998/11/27 17:03:52  coelho
+ * should resist wrong module names a little bit...
+ *
  * Revision 1.94  1998/11/24 19:04:55  coelho
  * check lazy_open_module state.
  *
@@ -198,6 +201,37 @@ static void set_env_log_and_free(string var, string val)
     free(var); free(val);
 }
 
+/* forward.
+ */
+static bool perform(bool (*)(string, string), res_or_rule *);
+
+static void try_to_parse_everything_just_in_case(void)
+{
+  gen_array_t modules = db_get_module_list();
+  res_or_rule * pr = (res_or_rule*) malloc(sizeof(res_or_rule));
+  pr->the_owners = modules;
+  pr->the_name = strdup(DBR_CALLEES);
+  perform(safe_make, pr); /* pr is freed inside. */
+}
+
+/* try hard to open a module.
+ */
+static bool tp_set_current_module(string name)
+{
+  bool ok = lazy_open_module(name);
+  if (!ok) 
+  {
+    try_to_parse_everything_just_in_case();
+    ok = lazy_open_module(name);
+    if (!ok)
+    {
+      safe_make(DBR_CODE, name);
+      ok = lazy_open_module(name);
+    }
+  }
+  return ok;
+}
+
 /* display a resource using $PAGER if defined and stdout on a tty.
  */
 static bool display_a_resource(string rname, string mname)
@@ -205,7 +239,11 @@ static bool display_a_resource(string rname, string mname)
     string fname, pager = getenv("PAGER");
     if (!isatty(fileno(stdout))) pager = NULL;
 
-    lazy_open_module(mname);
+    if (!tp_set_current_module(mname))
+    {
+      pips_user_error("could not find module %s to display\n", mname);
+    }
+
     fname = build_view_file(rname);
 
     if (!fname) 
@@ -428,7 +466,17 @@ static gen_array_t get_main(void)
   gen_array_t result = gen_array_make(0), modules;
   int number_of_main = 0, nmodules = 0;
   int n = 0;
+  string main_name = get_first_main_module();
   
+  if (!string_undefined_p(main_name))
+  {
+    gen_array_append(result, main_name);
+    return result;
+  }
+  
+  /* else try something else just in case...
+   * well, it looks rather useless, maybe.
+   */
   while (number_of_main==0 && n<2)
   {
     n++;
@@ -437,11 +485,8 @@ static gen_array_t get_main(void)
     
     if (n==2) 
     {
-      res_or_rule * pr = (res_or_rule*) malloc(sizeof(res_or_rule));
-      pips_user_warning("no main directly found, searching...\n");
-      pr->the_owners = modules;
-      pr->the_name = strdup(DBR_CALLEES);
-      perform(safe_make, pr); /* pr is freed inside. */
+      pips_user_warning("no main directly found, parsing...\n");
+      try_to_parse_everything_just_in_case();
     }
 
     GEN_ARRAY_MAP(on, 
@@ -452,7 +497,7 @@ static gen_array_t get_main(void)
 	  entity_main_module_p(mod))
       {
 	if (number_of_main)
-	  pips_internal_error("More than one main\n");
+	  pips_user_error("More than one main\n");
 	
 	number_of_main++;
 	gen_array_dupappend(result, on);
@@ -460,7 +505,7 @@ static gen_array_t get_main(void)
     },
       modules);
     
-    if (n==1) gen_array_full_free(modules);
+    gen_array_full_free(modules);
   }
 
   return result;
@@ -781,7 +826,7 @@ i_module: TK_MODULE TK_NAME /* module name */ TK_ENDOFLINE
 	  
 	  if (tpips_execution_mode) {
 	    if (db_get_current_workspace_name()) {
-	      $$ = lazy_open_module(strupper($2,$2));
+	      $$ = tp_set_current_module(strupper($2,$2));
 	    } else {
 	      pips_user_error("No workspace open. Open or create one!\n");
 	      $$ = FALSE;
