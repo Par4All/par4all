@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #include <string.h>
-extern char *strdup(const char *);
 
 #include <assert.h>
 #include <ctype.h>
