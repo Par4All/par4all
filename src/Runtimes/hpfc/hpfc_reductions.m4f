@@ -2,7 +2,7 @@ c
 c     Reductions management 
 c
 c $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-c ($Date: 1995/11/21 23:16:53 $, )
+c ($Date: 1995/12/01 11:51:34 $, )
 c
 c     it is supposed that the reduction is computed on a full
 c     array, which is nor replicated anyway. If used on a part,
@@ -111,7 +111,7 @@ ifelse(ARCHITECTURE,`CM5',`dnl
      $     HOSTCHANNEL,
      $     result,
      $     M4_PVM_LENGTH(PVMTYPE))) then
-         print *, "hpfc reduction: send failed"
+         write (unit=0, fmt=*) "hpfc reduction: send failed"
          stop
       endif
       HOSTCHANNEL = HOSTCHANNEL+2
@@ -140,7 +140,7 @@ ifelse(ARCHITECTURE,`CM5',`dnl
      $     RECVCHANNELS(i),
      $     result(i),
      $     M4_PVM_LENGTH(PVMTYPE))) then
-            print *, "hpfc reduction: reveive failed"
+            write (unit=0, fmt=*)  "hpfc reduction: reveive failed"
          endif
          RECVCHANNELS(i) = RECVCHANNELS(i)+2',`dnl
          SENDERTID = NODETIDS(i)
