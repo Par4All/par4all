@@ -79,4 +79,20 @@ unstructured statement_unstructured (statement stat);
  */
 int beautify_ordering (int an_ordering);
 
+void clean_statement_from_tags (string comment_portion,
+				statement stat);
+
+list get_statements_with_comments_containing (string comment_portion,
+					      statement stat);
+
+bool statement_is_contained_in_a_sequence_p (statement root_statement,
+					     statement searched_stat);
+
+statement sequence_statement_containing (statement root_statement,
+					 statement searched_stat);
+
+void replace_in_sequence_statement_with (statement old_stat, 
+					 statement new_stat,
+					 statement root_stat);
+
 #endif
