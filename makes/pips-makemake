@@ -4,14 +4,11 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.317  1997/09/25 09:00:16  coelho
+# CPROTO guards possibles...
+#
 # Revision 1.316  1997/09/24 15:23:58  coelho
 # XXX -> $(ARCH)/XXX if necessary for FI.
-#
-# Revision 1.315  1997/08/27 11:42:36  coelho
-# *** empty log message ***
-#
-# Revision 1.314  1997/08/27 09:47:32  coelho
-# *** empty log message ***
 #
 # Revision 1.312  1997/08/19 15:00:07  coelho
 # fixes for fpips compilation if no wpips nor tpips.
@@ -430,7 +427,7 @@ SCAN=	  \$(LEX) \$(LFLAGS) \$(LOPT) -t
 TYPECHECK=\$(LINT) \$(LINTFLAGS) \$(CPPFLAGS) \$(LINT_LIBS)
 PARSE=	  \$(YACC) \$(YFLAGS) \$(YOPT)
 ARCHIVE=  \$(AR) \$(ARFLAGS)
-PROTOIZE= \$(PROTO) \$(PRFLAGS) -E "\$(PREPROC)"
+PROTOIZE= \$(PROTO) \$(PRFLAGS) -E "\$(PREPROC) -DCPROTO_IS_PROTOTYPING"
 M4FILTER= \$(M4) \$(M4OPT) \$(M4FLAGS)
 MAKEDEP=  \$(CC) \$(CMKDEP) \$(CANSI) \$(CPPFLAGS) \$(CPPOPT) \$(CFLAGS) \$(COPT)
 #
