@@ -147,6 +147,8 @@ boolean simd_atomizer(char * mod_name)
    /* We save the new CODE. */
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
 
+   module_reorder(mod_stat);
+
    reset_current_module_statement();
    reset_current_module_entity();
 
