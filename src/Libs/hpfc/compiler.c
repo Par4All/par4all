@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/07/23 16:54:54 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/07/23 19:03:36 $, )
  * version $Revision$
  *
  * Compiler
@@ -614,12 +614,13 @@ statement *hoststatp, *nodestatp;
 
 	    if (Overlap_Analysis(stat, &overlapstat))
 	    {
+		string c = statement_comments(stat);
 		pips_debug(7, "overlap analysis succeeded\n");
 
 		*hoststatp = make_continue_statement(entity_empty_label());
 		*nodestatp = overlapstat;
 		statement_comments(*nodestatp) = 
-		    strdup(statement_comments(stat));
+		    string_undefined_p(c)? c: strdup(c);
 	    }
 	    else
 	    {
