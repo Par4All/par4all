@@ -149,7 +149,7 @@ static void call_rwt(call c)
   /* hum... pushes the current entity... */
   entity e_caller = get_current_module_entity();
   entity e_filter = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, "KMAX");
-  printf(stderr, entity_local_name(e_filter));
+
   reset_current_module_entity();
 
 
