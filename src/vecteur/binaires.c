@@ -4,7 +4,8 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include <values.h>
+/* #include <values.h> */
+#include <limits.h>
 #include <setjmp.h>
 
 #include "boolean.h"
@@ -115,10 +116,10 @@ int ofl_ctrl;
 	default: 
 	    for(cu=u ;cu!=NULL;cu=cu->succ) {
 		if (ofl_ctrl == NO_OFL_CTRL) {
-		    assert(ABS(lambda)<MAXINT/ABS(val_of(cu)));
+		    assert(ABS(lambda)<INT_MAX/ABS(val_of(cu)));
 		}
 		else {
-		    if (!(ABS(lambda)<MAXINT/ABS(val_of(cu))))
+		    if (!(ABS(lambda)<INT_MAX/ABS(val_of(cu))))
 			longjmp(overflow_error, 5);
 		}
 
