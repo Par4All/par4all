@@ -104,12 +104,7 @@ list *pl;
 static char *reduction_name(kind)
 int kind;
 {
-    static char *reduction_names[] =
-    {
-      {"MAX"},
-      {"MIN"},
-      {"SUM"}
-    };
+    static char *reduction_names[] = {"MAX", "MIN", "SUM"};
 
     pips_assert("reduction_name", (kind>=0) && (kind<3));
 
