@@ -61,12 +61,12 @@ string name;
     return db_get_current_workspace_name();
 }
 
+/* FI->GO: could be in top-level, no? */
 bool make_close_workspace()
 {
     bool res = TRUE;
     bool tmp_res;
     string name;
-
 
     tmp_res = db_set_current_module_name(NULL);
     if (!tmp_res)
@@ -82,7 +82,10 @@ bool make_close_workspace()
     if (!tmp_res)
 	res = FALSE;
 
-    user_log("Workspace %s closed\n\n", name);
+    if(res)
+	user_log("Workspace %s closed\n\n", name);
+    else
+	user_log("Failed to close workspace %s\n\n", name);
 
     return res;
 }
