@@ -3,14 +3,8 @@
 # $Id$
 # 
 # $Log: install_pips_sources,v $
-# Revision 1.16  1997/05/22 08:49:34  coelho
-# *** empty log message ***
-#
-# Revision 1.15  1997/05/22 06:55:35  coelho
-# *** empty log message ***
-#
-# Revision 1.14  1997/05/20 14:49:56  coelho
-# debug and verbose off.
+# Revision 1.17  1997/05/22 08:50:55  coelho
+# debug off.
 #
 # Revision 1.13  1997/05/20 14:48:40  coelho
 # ok for both RCS and SCCS?
@@ -24,8 +18,8 @@ script=`basename $0`
 verb=':'
 debg=':'
 
-verb='verbose'
-debg='debug'
+#verb='verbose'
+#debg='debug'
 
 unset source_dir target_dir comment options clean_cs files 
 only_diff=':'
