@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.105  1997/12/09 14:21:46  coelho
+ * cleaner...
+ *
  * Revision 1.104  1997/11/25 10:18:16  coelho
  * updates for add_to_current_line
  *
@@ -135,7 +138,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.104 1997/11/25 10:18:16 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.105 1997/12/09 14:21:46 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -357,11 +360,10 @@ words_regular_call(call obj)
 static list 
 words_assign_op(call obj, int precedence)
 {
-    list pc = NIL;
-    list args = call_arguments(obj);
+    list pc = NIL, args = call_arguments(obj);
     int prec = words_intrinsic_precedence(obj);
 
-    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)),  prec));
+    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec));
     pc = CHAIN_SWORD(pc, " = ");
     pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec));
 
@@ -557,7 +559,8 @@ words_io_inst(call obj,
 	    entity f;
 	    /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
 	    good_fmt = syntax_call_p(expression_syntax(arg))
-		&& value_intrinsic_p(entity_initial(f = call_function(syntax_call(expression_syntax(arg)))))
+		&& value_intrinsic_p(entity_initial(f = 
+                   call_function(syntax_call(expression_syntax(arg)))))
 		    && (strcmp(entity_local_name(f),
 			       LIST_DIRECTED_FORMAT_NAME)==0);
 	    pio_write = CDR(CDR(pio_write));
@@ -571,7 +574,8 @@ words_io_inst(call obj,
 	    entity f;
 	    /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
 	    good_unit = syntax_call_p(expression_syntax(arg))
-		&& value_intrinsic_p(entity_initial(f = call_function(syntax_call(expression_syntax(arg)))))
+		&& value_intrinsic_p(entity_initial(f = 
+		    call_function(syntax_call(expression_syntax(arg)))))
 		    && (strcmp(entity_local_name(f),
 			       LIST_DIRECTED_FORMAT_NAME)==0);
 	    /* To display the unit later: */
@@ -654,7 +658,7 @@ words_io_inst(call obj,
 	if (CDR(pp) != NIL) {
 	    POP(pp);
 	    if(pp==NIL) 
-		pips_error("words_io_inst","missing element in IO list");
+		pips_internal_error("missing element in IO list");
 	    pc = CHAIN_SWORD(pc, ", ");
 	}
     }, pcio);
@@ -843,21 +847,19 @@ intrinsic_precedence(string n)
     struct intrinsic_handler *p = tab_intrinsic_handler;
 
     while (p->name != NULL) {
-	if (strcmp(p->name, n) == 0) {
+	if (strcmp(p->name, n) == 0)
 	    return(p->prec);
-	}
 	p++;
     }
 
-    return(0);
+    return 0;
 }
 
 static int
 words_intrinsic_precedence(call obj)
 {
     char *n = entity_local_name(call_function(obj));
-
-    return(intrinsic_precedence(n));
+    return intrinsic_precedence(n);
 }
 
 /* exported for cmfortran.c
@@ -868,14 +870,11 @@ words_call(
     int precedence)
 {
     list pc;
-
     entity f = call_function(obj);
     value i = entity_initial(f);
-    
     pc = (value_intrinsic_p(i)) ? words_intrinsic_call(obj, precedence) : 
 	                          words_regular_call(obj);
-
-    return(pc);
+    return pc;
 }
 
 /* exported for expression.c 
@@ -1297,12 +1296,6 @@ init_text_statement(
 	    attach_decoration_to_text(r);
     }
 
-    /*
-    if (! string_undefined_p(comments)) {
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
-					      comments));
-    }
-    */
     if (get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
 	get_bool_property("PRETTYPRINT_STATEMENT_ORDERING")) {
 	static char buffer[ 256 ] ;
@@ -1322,7 +1315,7 @@ init_text_statement(
 		if(user_view_p())
 	      ADD_SENTENCE_TO_TEXT(r, 
 				   make_sentence(is_sentence_formatted, 
-						   strdup("C (unreachable)\n")));
+						 strdup("C (unreachable)\n")));
 	    }
 	}
     }
