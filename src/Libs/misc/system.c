@@ -1,5 +1,5 @@
 /* $RCSfile: system.c,v $ version $Revision$
- * ($Date: 1995/10/06 20:46:52 $, )
+ * ($Date: 1997/04/29 10:47:58 $, )
  *
  * a safe system call. abort if fails.
  * FC 09/95
@@ -18,8 +18,8 @@ safe_system(
     int status = system(command);
     
     if (status)
-	pips_error("safe_system", "Failed (ret: %d, sig: %d) for %s\n", 
-		   (status/0x100) & 0xff, status & 0xff, command);
+	pips_internal_error("Failed (ret: %d, sig: %d) for %s\n", 
+			    (status/0x100) & 0xff, status & 0xff, command);
 }
 
 int
@@ -30,6 +30,10 @@ safe_system_no_abort(
     
     if (status == 127)
 	pips_error("safe_system", "Could not execute : %s\n", command);
+
+    if (status)
+	pips_user_warning("Failed (ret: %d, sig: %d) for %s\n", 
+			  (status/0x100) & 0xff, status & 0xff, command);
 
     return (status / 256) & 255;
 }
