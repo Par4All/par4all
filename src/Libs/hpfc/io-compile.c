@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/04/10 18:49:41 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/04/21 10:28:16 $, )
  * version $Revision$
  */
 
@@ -13,12 +13,8 @@
 #include "semantics.h"
 #include "effects.h"
 
-/* in paf-util.h:
+/* Yi-Qing stuff
  */
-list base_to_list(Pbase base);
-void fprint_entity_list(FILE *fp, list l);
-
- /* Yi-Qing stuff */
 #include "graph.h"
 #include "dg.h"
 #include "rice.h"
@@ -162,16 +158,9 @@ statement stat;
 tag move, act;
 statement *psh, *psn;
 {
-    Psysteme
-	syst = generate_io_system(array, stat, move, act);
+    Psysteme syst = generate_io_system(array, stat, move, act);
 
     assert(entity_variable_p(array) && syst!=SC_UNDEFINED);
-
-
-    /* ifdebug(9)
-     *	 fprintf(stderr, "[generate_io_collect_or_update] syst\n"),
-     *	 sc_fprint(stderr, syst, entity_local_name);
-     */
 
     if (array_distributed_p(array))
     {
@@ -185,11 +174,7 @@ statement *psh, *psn;
 	    proc_echelon = SC_UNDEFINED,
 	    tile_echelon = SC_UNDEFINED,
 	    condition = SC_UNDEFINED;
-	list
-	    parameters = NIL,
-	    processors = NIL,
-	    scanners = NIL,
-	    rebuild = NIL;
+	list parameters = NIL, processors = NIL, scanners = NIL, rebuild = NIL;
 
 	/* Now we have a set of equations and inequations, and we are going
 	 * to organise a scanning of the data and the communications that 
@@ -228,14 +213,8 @@ statement *psh, *psn;
     }
     else
     {
-	Psysteme
-	    row_echelon = SC_UNDEFINED,
-	    condition = SC_UNDEFINED;
-	list
-	    tmp = NIL,
-	    parameters = NIL,
-	    scanners = NIL,
-	    rebuild = NIL;
+	Psysteme row_echelon = SC_UNDEFINED, condition = SC_UNDEFINED;
+	list tmp = NIL, parameters = NIL, scanners = NIL, rebuild = NIL;
 
 	assert(movement_update_p(move));
 
@@ -273,12 +252,9 @@ statement *psh, *psn;
 
     ifdebug(8)
     {
-	fprintf(stderr, 
-		"[generate_io_collect_or_update] output:\n");
-	fprintf(stderr, "Host:\n");
-	print_statement(*psh);
-	fprintf(stderr, "Node:\n");
-	print_statement(*psn);
+	fprintf(stderr, "[generate_io_collect_or_update] output:\n");
+	fprintf(stderr, "Host:\n"); print_statement(*psh);
+	fprintf(stderr, "Node:\n"); print_statement(*psn);
     }
 }
 
@@ -291,8 +267,7 @@ entity array;
 statement stat;
 tag move, act;
 {
-    Psysteme
-	result = SC_UNDEFINED;
+    Psysteme result = SC_UNDEFINED;
 
     assert(entity_variable_p(array));
 
@@ -309,16 +284,11 @@ tag move, act;
 
     sc_vect_sort(result, compare_Pvecteur);
 
-    /*
-     * Final DEBUG message
-     */
     ifdebug(2)
     {
-	fprintf(stderr, 
-		"[generate_io_system] returning for array %s:\n",
+	fprintf(stderr, "[generate_io_system] returning for array %s:\n",
 		entity_local_name(array));
-	fprintf(stderr, "Result:\n");
-	sc_fprint(stderr, result, entity_local_name);
+	syst_debug(result);
     }
 
     return(result);
@@ -328,8 +298,7 @@ list make_list_of_dummy_variables(creation, number)
 entity (*creation)();
 int number;
 {
-    list
-	result = NIL;
+    list result = NIL;
 
     for(;number>0;number--)
 	result = CONS(ENTITY, creation(number), result);
@@ -361,12 +330,10 @@ tag move, act;
 	fprintf(stderr, 
 		"[generate_shared_io_system] whole system for array %s:\n",
 		entity_local_name(array));
-	fprintf(stderr, "Result:\n");
-	sc_fprint(stderr, result, entity_local_name);
+	syst_debug(result);
     }
     
-    /*
-     * the noisy system is cleaned
+    /* the noisy system is cleaned
      * some variables are not used, they are removed here.
      */
     sc_nredund(&result);
@@ -374,22 +341,14 @@ tag move, act;
     sc_base(result) = NULL;
     sc_creer_base(result);
     
-    /*
-     * DEBUG stuff: the systems are printed
-     */
     ifdebug(7)
     {
-	fprintf(stderr, 
-		"[generate_shared_io_system] systems for array %s:\n",
+	fprintf(stderr, "[generate_shared_io_system] systems for array %s:\n",
 		entity_local_name(array));
-	fprintf(stderr, "Region:\n");
-	sc_fprint(stderr, region, entity_local_name);
-	fprintf(stderr, "Array declaration:\n");
-	sc_fprint(stderr, a_decl, entity_local_name);
-	fprintf(stderr, "Unstammer:\n");
-	sc_fprint(stderr, stamme, entity_local_name);
-	fprintf(stderr, "Context:\n");
-	sc_fprint(stderr, contxt, entity_local_name);
+	fprintf(stderr, "Region:\n"); syst_debug(region);
+	fprintf(stderr, "Array declaration:\n"); syst_debug(a_decl);
+	fprintf(stderr, "Unstammer:\n"); syst_debug(stamme);
+	fprintf(stderr, "Context:\n"); syst_debug(contxt);
     }
     
     ifdebug(6)
@@ -397,14 +356,10 @@ tag move, act;
 	fprintf(stderr, 
 	  "[generate_shared_io_system] resulting system for array %s:\n",
 		entity_local_name(array));
-	fprintf(stderr, "Result:\n");
-	sc_fprint(stderr, result, entity_local_name);
+	syst_debug(result);
     }
  
     return(result);
-
-    
-
 }
 
 Psysteme generate_distributed_io_system(array, stat, move, act)
@@ -412,23 +367,14 @@ entity array;
 statement stat;
 tag move, act;
 {
-    entity
-	template = array_to_template(array),
-	processors = template_to_processors(template);
-    Psysteme
-	result = SC_UNDEFINED,
+    Psysteme result = SC_UNDEFINED,
 	/*
 	 * ??? bug: the preconditions may be in the regions.  To update, I
 	 * should have the postconditions instead, that is the statement
 	 * transformer should be applied to the system.
 	 */
 	region = effect_system(entity_to_region(stat, array, act)),
-	a_decl = entity_to_declaration_constraints(array),
-	n_decl = entity_to_new_declaration(array),
-	t_decl = entity_to_declaration_constraints(template),
-	p_decl = entity_to_declaration_constraints(processors),
-	salign = entity_to_hpf_constraints(array),
-	sdistr = entity_to_hpf_constraints(template),
+	dist_v = generate_system_for_distributed_variable(array),
 	sother = hpfc_compute_unicity_constraints(array), /* ??? */
 	stamme = hpfc_unstutter_dummies(array),
 	contxt = statement_context(stat, move);
@@ -436,12 +382,7 @@ tag move, act;
     /* ??? massive memory leak 
      */
     result = sc_append(sc_rn(NULL), region);
-    result = sc_append(result, a_decl);
-    result = sc_append(result, n_decl);
-    result = sc_append(result, t_decl);
-    result = sc_append(result, p_decl);
-    result = sc_append(result, salign);
-    result = sc_append(result, sdistr);
+    result = sc_append(result, dist_v);
     result = sc_append(result, sother);
     result = sc_append(result, stamme);
     result = sc_append(result, contxt);
@@ -451,12 +392,10 @@ tag move, act;
 	fprintf(stderr, 
 		"[generate_distributed_io_system] whole system for array %s:\n",
 		entity_local_name(array));
-	fprintf(stderr, "Result:\n");
-	sc_fprint(stderr, result, entity_local_name);
+	fprintf(stderr, "Result:\n"); syst_debug(result);
     }
     
-    /*
-     * the noisy system is cleaned
+    /* the noisy system is cleaned
      * some variables are not used, they are removed here.
      */
     build_sc_nredund_2pass(&result);
@@ -464,34 +403,18 @@ tag move, act;
     sc_base(result) = NULL;
     sc_creer_base(result);
     
-    /*
-     * DEBUG stuff: the systems are printed
+    /* DEBUG stuff: the systems are printed
      */
     ifdebug(7)
     {
 	fprintf(stderr, 
 		"[generate_distributed_io_system] systems for array %s:\n",
 		entity_local_name(array));
-	fprintf(stderr, "Region:\n");
-	sc_fprint(stderr, region, entity_local_name);
-	fprintf(stderr, "Array declaration:\n");
-	sc_fprint(stderr, a_decl, entity_local_name);
-	fprintf(stderr, "Array new declaration:\n");
-	sc_fprint(stderr, n_decl, entity_local_name);
-	fprintf(stderr, "Template declaration:\n");
-	sc_fprint(stderr, t_decl, entity_local_name);
-	fprintf(stderr, "Processors declaration:\n");
-	sc_fprint(stderr, p_decl, entity_local_name);
-	fprintf(stderr, "Hpf align:\n");
-	sc_fprint(stderr, salign, entity_local_name);
-	fprintf(stderr, "Hpf distribute:\n");
-	sc_fprint(stderr, sdistr, entity_local_name);
-	fprintf(stderr, "Hpf unicity:\n");
-	sc_fprint(stderr, sother, entity_local_name);
-	fprintf(stderr, "Unstammer:\n");
-	sc_fprint(stderr, stamme, entity_local_name);
-	fprintf(stderr, "Context:\n");
-	sc_fprint(stderr, contxt, entity_local_name);
+	fprintf(stderr, "Region:\n"); syst_debug(region);
+	fprintf(stderr, "Array system:\n"); syst_debug(dist_v);
+	fprintf(stderr, "Hpf unicity:\n"); syst_debug(sother);
+	fprintf(stderr, "Unstammer:\n"); syst_debug(stamme);
+	fprintf(stderr, "Context:\n"); syst_debug(contxt);
     }
     
     ifdebug(6)
@@ -499,35 +422,30 @@ tag move, act;
 	fprintf(stderr, 
 	  "[generate_distributed_io_system] resulting system for array %s:\n",
 		entity_local_name(array));
-	fprintf(stderr, "Result:\n");
-	sc_fprint(stderr, result, entity_local_name);
+	fprintf(stderr, "Result:\n"); syst_debug(result);
     }
  
     return(result);
 }
 
-void remove_variables_if_possible(psyst, lvars)
+void remove_variables_if_possible(psyst, plvars)
 Psysteme *psyst;
-list lvars;
+list *plvars;
 {
-    Psysteme 
-	syst = *psyst;
+    Psysteme syst = *psyst;
+    list kept = NIL;
 
     MAPL(ce, 
      {
-	 Variable
-	     var = (Variable) ENTITY(CAR(ce));
-	 int
-	     coeff = -1;
+	 Variable var = (Variable) ENTITY(CAR(ce));
+	 int coeff = -1;
 
 	 (void) contrainte_var_min_coeff(sc_egalites(syst), var, &coeff, FALSE);
 
 	 if (coeff==1)
 	 {
-	     Pvecteur
-		 v = vect_new(var, 1);
-	     bool 
-		 exact = TRUE;
+	     Pvecteur v = vect_new(var, 1);
+	     bool exact = TRUE;
 	     
 	     debug(7, "remove_variables_if_possible", 
 		   "removing variable %s\n", 
@@ -539,10 +457,15 @@ list lvars;
 	     assert(exact);
 	     vect_rm(v);
 	 }
+	 else
+	     kept = CONS(ENTITY, (entity) var, kept);
      }, 
-	 lvars);
+	 *plvars);
+    
+    base_rm(sc_base(syst)), sc_base(syst) = BASE_NULLE, sc_creer_base(syst);
 
     *psyst = syst;
+    gen_free_list(*plvars), *plvars=kept;
 }
 
 Psysteme clean_shared_io_system(syst, array, move)
@@ -550,51 +473,40 @@ Psysteme syst;
 entity array;
 tag move;
 {
-    int
-	array_dim = NumberOfDimension(array);
-    list
-	keep = NIL,
-	try_keep = NIL,
-	remove = NIL,
-	try_remove = base_to_list(sc_base(syst));
+    int	array_dim = NumberOfDimension(array);
+    list keep = NIL, try_keep = NIL, remove = NIL,
+         try_remove = base_to_list(sc_base(syst));
 
     debug(5, "clean_shared_io_system", "array %s, movement %s\n",
 	  entity_local_name(array), 
 	  (movement_collect_p(move))?"collect":"update");
 
-    /* ALPHA_i's */
-    keep =
-	gen_nconc(make_list_of_dummy_variables
-		  (get_ith_array_dummy, array_dim), 
-		  keep);
+    /* ALPHA_i's
+     * PHI_i's
+     */
+    add_to_list_of_vars(keep, get_ith_array_dummy, array_dim);
+    add_to_list_of_vars(remove, get_ith_region_dummy, array_dim);
     
-    /* PHI_i's */
-    remove = 
-	gen_nconc(make_list_of_dummy_variables
-		  (get_ith_region_dummy, array_dim), 
-		  remove);
-
-    /* Keep parameters ! */
+    /*   keep parameters !
+     */
     MAPL(ce,
      {
-	 entity
-	     e = ENTITY(CAR(ce));
-	 string
-	     s = entity_module_name(e);
+	 entity e = ENTITY(CAR(ce));
+	 string s = entity_module_name(e);
 
 	 if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
 	     keep = CONS(ENTITY, e, keep);
      },
 	 try_remove);
 
-    /* others */
+    /*   others
+     */
     gen_remove(&try_remove, (entity) TCST);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, try_keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, remove);
     
-    /*
-     * Remove variables that have to be removed
+    /*    remove variables that have to be removed
      */
     MAPL(ce, 
      {
@@ -604,13 +516,11 @@ tag move;
      },
 	 remove);
     
-    /*
-     * Try to remove other unusefull variables
+    /* Try to remove other unusefull variables
      */
-    remove_variables_if_possible(&syst, try_remove);
+    remove_variables_if_possible(&syst, &try_remove);
 
-    /*
-     * the noisy system is cleaned
+    /* the noisy system is cleaned
      * some variables are not used, they are removed here.
      */
     build_sc_nredund_2pass(&syst);
@@ -618,19 +528,35 @@ tag move;
     sc_base(syst) = BASE_NULLE;
     sc_creer_base(syst);
 
-    /*
-     * DEBUG
-     */
     ifdebug(6)
     {
 	fprintf(stderr, 
 	   "[clean_shared_io_system] resulting system for array %s:\n",
 		entity_local_name(array));
-	fprintf(stderr, "Result:\n");
-	sc_fprint(stderr, syst, entity_local_name);
+	fprintf(stderr, "Result:\n"); syst_debug(syst);
     }
     
     return(syst);
+}
+
+void remove_variables_from_system(ps, plv)
+Psysteme *ps;
+list /* of entity (Variable) */ *plv;
+{
+    MAPL(ce, sc_projection_along_variable_ofl_ctrl
+	 (ps, (Variable) ENTITY(CAR(ce)), NO_OFL_CTRL), *plv);
+    gen_free_list(*plv), *plv=NIL;
+}
+
+void clean_the_system(ps, plrm, pltry)
+Psysteme *ps;
+list /* of entities */ *plrm, *pltry;
+{
+    remove_variables_from_system(ps, plrm);
+    remove_variables_if_possible(ps, pltry);
+
+    build_sc_nredund_2pass(ps);
+    base_rm(sc_base(*ps)), sc_base(*ps) = BASE_NULLE, sc_creer_base(*ps);
 }
 
 Psysteme clean_distributed_io_system(syst, array, move)
@@ -638,13 +564,11 @@ Psysteme syst;
 entity array;
 tag move;
 {
-    /*
-     * ??? what about the variables?
+    /* ??? what about the variables?
      * some are usefull, some are constants, and others should
      * be discarded. This selection and projection may be done here.
      */
-    /*
-     * to be removed:
+    /* to be removed:
      * PHIi...
      * THETAi...
      * some GAMMAi...
@@ -655,7 +579,6 @@ tag move;
      * some GAMMAi...
      * some DELTAi...
      * complementary ALPHAi... (LALPHAi?)
-     * 
      */
     entity
 	template = array_to_template(array),
@@ -676,51 +599,32 @@ tag move;
 
     assert(array_distributed_p(array));
     
-    /* THETA_i's */
-    remove = 
-	gen_nconc(make_list_of_dummy_variables
-		  (get_ith_template_dummy, template_dim), 
-		  remove);
-    
-    /* PHI_i's */
-    remove = 
-	gen_nconc(make_list_of_dummy_variables
-		  (get_ith_region_dummy, array_dim), 
-		  remove);
-    
-    /* PSI_i's */
-    keep = 
-	gen_nconc(make_list_of_dummy_variables
-		  (get_ith_processor_dummy, processor_dim), 
-		  keep);
-    
-    /* ALPHA_i's */
-    keep =
-	gen_nconc(make_list_of_dummy_variables
-		  (get_ith_array_dummy, array_dim), 
-		  keep);
+    /* THETA_i's
+     * PHI_i's
+     * PSI_i's
+     * ALPHA_i's
+     * LALPHA_i's 
+     */
+    add_to_list_of_vars(remove, get_ith_template_dummy, template_dim);
+    add_to_list_of_vars(remove, get_ith_region_dummy, array_dim);
+    add_to_list_of_vars(keep, get_ith_processor_dummy, processor_dim);
+    add_to_list_of_vars(keep, get_ith_array_dummy, array_dim);
+    add_to_list_of_vars(try_keep, get_ith_local_dummy, array_dim);
 
-    /* LALPHA_i's */
-    try_keep =
-	gen_nconc(make_list_of_dummy_variables
-		  (get_ith_local_dummy, array_dim), 
-		  try_keep);
-    
-
-    /* Keep parameters ! */
+    /*   Keep parameters !
+     */
     MAPL(ce,
      {
-	 entity
-	     e = ENTITY(CAR(ce));
-	 string
-	     s = entity_module_name(e);
+	 entity e = ENTITY(CAR(ce));
+	 string s = entity_module_name(e);
 
 	 if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
 	     keep = CONS(ENTITY, e, keep);
      },
 	 try_remove);
 
-    /* others */
+    /*   others
+     */
     gen_remove(&try_remove, (entity) TCST);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, try_keep);
@@ -740,43 +644,20 @@ tag move;
 	fprintf(stderr, "\n");
     }
 
-    /*
-     * Remove variables that have to be removed
-     */
-    MAPL(ce, 
-     {
-	 sc_projection_along_variable_ofl_ctrl(&syst,
-					       (Variable) ENTITY(CAR(ce)),
-					       NO_OFL_CTRL);
-     },
-	 remove);
+    clean_the_system(&syst, &remove, &try_remove);
     
-    /*
-     * Try to remove other unusefull variables
-     */
-    remove_variables_if_possible(&syst, try_remove);
-
-    /*
-     * the noisy system is cleaned
-     * some variables are not used, they are removed here.
-     */
-    build_sc_nredund_2pass(&syst);
-    base_rm(sc_base(syst));
-    sc_base(syst) = BASE_NULLE;
-    sc_creer_base(syst);
-
-    /*
-     * DEBUG
-     */
     ifdebug(6)
     {
 	fprintf(stderr, 
 	   "[clean_distributed_io_system] resulting system for array %s:\n",
 		entity_local_name(array));
-	fprintf(stderr, "Result:\n");
-	sc_fprint(stderr, syst, entity_local_name);
+	fprintf(stderr, "Result:\n"); syst_debug(syst);
     }
     
+    gen_free_list(keep);
+    gen_free_list(try_keep);
+    gen_free_list(try_remove);
+
     return(syst);
 }
 
@@ -817,8 +698,7 @@ list *plparam, *plproc, *plscan, *plrebuild;
     debug(5, "put_variables_in_ordered_lists",
 	  "considering %d variables\n", gen_length(all));
 
-    /*
-     * parameters: those variables that are not dummies...
+    /* parameters: those variables that are not dummies...
      */
     MAPL(ce,
      {
@@ -832,8 +712,7 @@ list *plparam, *plproc, *plscan, *plrebuild;
 
     MAPL(ce, {gen_remove(&all, ENTITY(CAR(ce)));}, lparam);
     
-    /*
-     * processors
+    /* processors
      */
     for(dim=processor_dim; dim>=1; dim--)
     {
@@ -844,8 +723,7 @@ list *plparam, *plproc, *plscan, *plrebuild;
 	gen_remove(&all, dummy);
     }
 
-    /*
-     * scanners and deducables
+    /* scanners and deducables
      */
     lrebuild = 
 	simplify_deducable_variables(*psyst,
@@ -853,8 +731,7 @@ list *plparam, *plproc, *plscan, *plrebuild;
 								       TRUE)),
 				     &lscan);
 
-    /*
-     * return results
+    /* return results
      */
     *plparam 	= lparam, 
     *plproc 	= lproc, 
@@ -865,8 +742,7 @@ list *plparam, *plproc, *plscan, *plrebuild;
 
     ifdebug(4)
     {
-	Pcontrainte
-	    pc = contrainte_make(VECTEUR_NUL);
+	Pcontrainte pc = contrainte_make(VECTEUR_NUL);
 
 	fprintf(stderr, "[put_variables_in_ordered_lists] returning:\n");
 	fprintf(stderr, " - params:\n   ");
@@ -878,21 +754,16 @@ list *plparam, *plproc, *plscan, *plrebuild;
 	fprintf(stderr, "\n - deducables:\n   ");
 	MAPL(ce,
 	 {
-	     expression
-		 ex = EXPRESSION(CAR(ce));
+	     expression ex = EXPRESSION(CAR(ce));
 
-	     pc->vecteur = 
-		 normalized_linear(expression_normalized(ex));
+	     pc->vecteur = normalized_linear(expression_normalized(ex));
 	     
-	     fprintf(stderr, "%s rebuilt with ", 
-		     entity_local_name
+	     fprintf(stderr, "%s rebuilt with ", entity_local_name
 		     (reference_variable(expression_reference(ex))));
 	     egalite_fprint(stderr, pc, entity_local_name);
 	 },
 	     lrebuild);
     }
-
-    /* syst = sc_elim_redund(syst); */
 
     build_sc_nredund_2pass(psyst);
     sc_base(*psyst) = (base_rm(sc_base(*psyst)), BASE_NULLE);
@@ -900,10 +771,9 @@ list *plparam, *plproc, *plscan, *plrebuild;
 
     ifdebug(4)
     {
-	fprintf(stderr, 
-		"[put_variables_in_ordered_lists] system for %s:\n",
+	fprintf(stderr, "[put_variables_in_ordered_lists] system for %s:\n",
 		entity_local_name(array));
-	sc_fprint(stderr, *psyst, entity_local_name);
+	syst_debug(*psyst);
     }
 }
 
@@ -920,17 +790,15 @@ list simplify_deducable_variables(syst, vars, pleftvars)
 Psysteme syst;
 list vars, *pleftvars;
 {
-    list
-	result = NIL;
+    list result = NIL;
+
+    *pleftvars = NIL;
 
     MAPL(ce,
      {
-	 entity
-	     dummy = ENTITY(CAR(ce));
-	 int 
-	     coeff = 0;
-	 Pcontrainte
-	     eq = CONTRAINTE_UNDEFINED;
+	 Pcontrainte eq = CONTRAINTE_UNDEFINED;
+	 entity dummy = ENTITY(CAR(ce));
+	 int coeff = 0;
 
 	 if (eq = eq_v_min_coeff(sc_egalites(syst), (Variable) dummy, &coeff),
 	     (coeff == 1))
@@ -954,6 +822,8 @@ list vars, *pleftvars;
      },
 	 vars);
 
+    base_rm(sc_base(syst)), sc_base(syst) = BASE_NULLE, sc_creer_base(syst);
+
     return(result);
 }
 
@@ -963,24 +833,21 @@ static list hpfc_order_specific_variables(le, creation)
 list le;
 entity (*creation)();
 {
-    list
-	result = NIL;
+    list result = NIL;
     int i;
 
     for(i=7; i>=1; i--)
     {
-	entity
-	    dummy = creation(i);
+	entity dummy = creation(i);
 
-	if (gen_find_eq(dummy, le)==dummy)
+	if (gen_in_list_p(dummy, le))
 	    result = CONS(ENTITY, dummy, result);
     }
 
     return(result);
 }
 
-/*
- * list hpfc_order_variables(list)
+/* list hpfc_order_variables(list)
  *
  * the input list of entities is ordered so that:
  * PSI_i's, GAMMA_i's, DELTA_i's, IOTA_i's, ALPHA_i's, LALPHA_i's...
@@ -989,13 +856,11 @@ list hpfc_order_variables(le, number_first)
 list le;
 bool number_first;
 {
-    list
-	result = NIL;
+    list result = NIL;
 
-    result = 
+    result =
 	gen_nconc(result,
-		  hpfc_order_specific_variables
-		  (le, get_ith_processor_dummy));
+		  hpfc_order_specific_variables(le, get_ith_processor_dummy));
     
     if (number_first)
     {
@@ -1013,7 +878,7 @@ bool number_first;
 	 {
 	     entity e = ENTITY(CAR(ce));
 
-	     if (gen_find_eq(e, le)==e) 
+	     if (gen_in_list_p(e, le)) 
 		 lr = CONS(ENTITY, e, lr); /* reverse! */
 	 },
 	     l);
@@ -1060,9 +925,11 @@ Psysteme *pcondition, *pproc_echelon, *ptile_echelon;
 	inner = entity_list_to_base(scanners);
 
     ifdebug(8)
-	fprintf(stderr, "[hpfc_algorithm_tiling] initial system:\n"),
-	sc_fprint(stderr, syst, entity_local_name),
+    {
+	fprintf(stderr, "[hpfc_algorithm_tiling] initial system:\n");
+	syst_debug(syst);
 	fprintf(stderr, "\n");
+    }
 	
 
     algorithm_tiling(syst, outer, inner, 
@@ -1071,13 +938,13 @@ Psysteme *pcondition, *pproc_echelon, *ptile_echelon;
     ifdebug(3)
     {
 	fprintf(stderr, "[hpfc_algorithm_tiling] results:\n - condition:\n");
-	sc_fprint(stderr, *pcondition, entity_local_name);
+	syst_debug(*pcondition);
 	fprintf(stderr, "- processors: ");
 	base_fprint(stderr, outer, entity_local_name);
-	sc_fprint(stderr, *pproc_echelon, entity_local_name);
+	syst_debug(*pproc_echelon);
 	fprintf(stderr, " - tiles: ");
 	base_fprint(stderr, inner, entity_local_name);
-	sc_fprint(stderr, *ptile_echelon, entity_local_name);
+	syst_debug(*ptile_echelon);
 	fprintf(stderr, "\n");
     }
 
@@ -1088,16 +955,12 @@ Psysteme *pcondition, *pproc_echelon, *ptile_echelon;
 Pbase entity_list_to_base(l)
 list l;
 {
-    list
-	l2 = gen_nreverse(gen_copy_seq(l));
-    Pbase
-	result = BASE_NULLE;
+    list l2 = gen_nreverse(gen_copy_seq(l));
+    Pbase result = BASE_NULLE;
 	
     MAPL(ce,
      {
-	 Pbase
-	     new = (Pbase) vect_new((Variable) ENTITY(CAR(ce)), (Value) 1);
-
+	 Pbase new = (Pbase) vect_new((Variable) ENTITY(CAR(ce)), (Value) 1);
 	 new->succ = result;
 	 result = new;
      },
