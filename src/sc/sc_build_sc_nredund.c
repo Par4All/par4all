@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 2000/07/21 13:23:44 $, 
+ * $Date: 2000/10/27 13:36:24 $, 
  */
 
 #include <stdio.h>
@@ -145,6 +145,7 @@ int ofl_ctrl;
     Psysteme sc;
     Psysteme ps = *psc;
     Pcontrainte ineq, ineg;
+    int init_exception_thrown = linear_number_of_exception_thrown;
 
     if (SC_UNDEFINED_P(ps) || sc_rn_p(ps) || sc_empty_p(ps)) 
 	return;
@@ -164,7 +165,10 @@ int ofl_ctrl;
     sc->nb_eq = ps->nb_eq;
  
     for (ineq = ps->inegalites;
-	 !CONTRAINTE_UNDEFINED_P(ineq);
+	 !CONTRAINTE_UNDEFINED_P(ineq) &&
+	   /* if more than 6 exceptions are thrown from within the loop,
+	      the loop is stopped. */
+	   linear_number_of_exception_thrown-init_exception_thrown<7;
 	 ineq=ineq->succ) 
     {
 	ineg = contrainte_dup(ineq);
