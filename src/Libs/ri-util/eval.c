@@ -99,14 +99,17 @@ EvalCall(call c)
 value 
 EvalConstant(constant c) 
 {
+  return make_value(is_value_constant, copy_constant(c));
+  /*
     return((constant_int_p(c)) ?
 	   make_value(is_value_constant, make_constant(is_constant_int,
 						   (void*) constant_int(c))) :
 	   make_value(is_value_constant, 
 		      make_constant(is_constant_litteral, NIL)));
+  */
 
 }
-
+
 /* this function tries to evaluate a call to an intrinsic function.
 right now, we only try to evaluate unary and binary intrinsic functions,
 ie. fortran operators.
