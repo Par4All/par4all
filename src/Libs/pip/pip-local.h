@@ -16,7 +16,7 @@
     (_list = gen_nconc( _list, CONS( _type, _element, NIL)))
 
 /* PIP includes */
-#include "type.h"
-#include "sol.h"
-#include "tab.h"
+#include "pip__type.h"
+#include "pip__sol.h"
+#include "pip__tab.h"
 
