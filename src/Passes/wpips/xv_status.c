@@ -22,7 +22,8 @@
 
 #define DECALAGE_STATUS 100
 
-static Panel_item directory_name, program_name,
+Panel_item directory_name_panel_item;
+Panel_item workspace_name_panel_item,
 memory_name, message, window_number;
 Panel_item module_name_panel_item;
 
@@ -58,7 +59,7 @@ window_number_notify(Panel_item item, int value, Event *event)
 void
 show_directory()
 {
-   xv_set(directory_name, PANEL_VALUE, get_cwd(), 0);
+   xv_set(directory_name_panel_item, PANEL_VALUE, get_cwd(), NULL);
    display_memory_usage();
 }
 
@@ -73,7 +74,7 @@ show_program()
    if (name == NULL)
       name = none;
 
-   xv_set(program_name, PANEL_VALUE, name, 0);
+   xv_set(workspace_name_panel_item, PANEL_VALUE, name, 0);
    display_memory_usage();
 }
 
@@ -125,23 +126,25 @@ create_status_subwindow()
                 PANEL_VALUE_STORED_LENGTH, 1000,
                 NULL);
 
-   directory_name = 
+   directory_name_panel_item = 
       xv_create(main_panel, PANEL_TEXT, 
                 PANEL_VALUE_X, DECALAGE_STATUS,
                 PANEL_VALUE_Y, xv_rows(main_panel, 2),
                 PANEL_LABEL_STRING, "Directory:",
-                PANEL_READ_ONLY, TRUE,
+                PANEL_READ_ONLY, FALSE,
+                PANEL_NOTIFY_PROC, end_directory_text_notify,
                 PANEL_VALUE_DISPLAY_LENGTH, 64,
                 PANEL_VALUE_STORED_LENGTH, 256,
                 NULL);
 
-   program_name = schoose_create_abbrev_menu_with_text(main_panel,
-                                                       "Workspace:",
-                                                       20,
-                                                       DECALAGE_STATUS,
-                                                       xv_rows(main_panel, 3),
-                                                       generate_workspace_menu,
-                                                       open_or_create_workspace);
+   workspace_name_panel_item =
+      schoose_create_abbrev_menu_with_text(main_panel,
+                                           "Workspace:",
+                                           20,
+                                           DECALAGE_STATUS,
+                                           xv_rows(main_panel, 3),
+                                           generate_workspace_menu,
+                                           open_or_create_workspace);
 
    module_name_panel_item =
       schoose_create_abbrev_menu_with_text(main_panel,
@@ -183,7 +186,7 @@ create_status_subwindow()
                                         pips_icon_server_image,
                                 /* Put the Pixmap above the Help button: */
                                         XV_X, xv_get(quit_button, XV_X) + (xv_get(quit_button, XV_WIDTH) - xv_get(pips_icon_server_image, XV_WIDTH))/2,
-                                        XV_Y, xv_rows(main_panel, 3) - 10,
+                                        XV_Y, xv_rows(main_panel, 3) + 10,
                                         NULL);
    
    window_fit(main_panel);
