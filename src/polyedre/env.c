@@ -66,7 +66,7 @@ int x;			/* x=1  si c'est pour dupliquer l'equation */
      * eg_soeur->vecteur = vect_multiply(vect_dup(eg->vecteur),x);
      */
     eg_soeur->vecteur = vect_dup(eg->vecteur);
-    (void) vect_multiply(eg_soeur->vecteur,x);
+    if (x==-1) vect_chg_sgn(eg_soeur->vecteur);
     return(eg_soeur);
 }
 
@@ -501,13 +501,14 @@ int type;
 int indice;
 int nb_s;
 int nb_r;
-int den;
+Value den;
 int nb_s_tot;
 int nb_r_tot;
 int dim;
 {
     Pcontrainte ineg;
-    int vl,i;
+    Value vl;
+    int i;
 
     /* il faut construire les contraintes a combiner a partir des contraintes
        retenues (voir la these d'Halbwachs) */
@@ -518,7 +519,8 @@ int dim;
 	    /* pour un sommet il faut faire attention au denominateur
 	       pour construire les contraintes a combiner */
 	    (void) vect_multiply(ineg->vecteur,den);
-	    vect_chg_coeff(&(ineg->vecteur),TCST,COEFF_CST(ineg)-vl);
+	    vect_chg_coeff(&(ineg->vecteur),TCST,
+			   value_minus(COEFF_CST(ineg),vl));
 	}
 	/* mk_couple(dim+1,vl,ineg); FI: probleme pour la creation d'une
 	   nouvelle variable! Mieux vaut utiliser variable_dump_name
@@ -969,7 +971,7 @@ Ppoly pa,pb;
 	(void) fprintf(stderr,"polyedre a:\n");
 	poly_fprint(stderr, pa, variable_dump_name);
 	(void) fprintf(stderr,"polyedre b:\n");
-	poly_fprint(stderr, pb, variable_dump_name);
+
     }
 
     /* rappel : un polyedre est NULL si c'est le polyedre initial de la
