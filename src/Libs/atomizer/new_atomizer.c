@@ -1,28 +1,11 @@
 /* An atomizer that uses the one made by Fabien Coelho for HPFC.
 
-   Ronan Keryell, 17/5/1995. */
+   $Id$
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+   Ronan Keryell, 17/5/1995. 
+*/
 
-#include "genC.h"
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-#include "ri-util.h"
-#include "text-util.h"
-#include "database.h"
-#include "misc.h"
-#include "pipsdbm.h"
-#include "resources.h"
-#include "transformer.h"
-#include "semantics.h"
-#include "conversion.h" 
-#include "control.h"
-#include "transformations.h"
-
-#include "atomizer.h"
+#include "local.h"
 
 extern entity hpfc_new_variable(entity, tag);
 extern bool expression_constant_p(expression);
