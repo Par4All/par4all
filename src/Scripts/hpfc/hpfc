@@ -1,7 +1,7 @@
 #! /bin/sh
 # 
 # $RCSfile: hpfc,v $ (version $Revision$)
-# $Date: 1995/04/22 14:44:40 $, 
+# $Date: 1995/04/22 14:49:03 $, 
 #
 # hpfc scripts very front-end
 # just an easy way not to have to remember the name of some scripts.
@@ -22,6 +22,7 @@ usage()
 	  F|filter: show filter result
 	  m|make: compile and link
 	  r|run: run...
+	  v|validate: used by the validation...
 	END
   exit ${1:-1}
 }
@@ -48,6 +49,7 @@ case $key in
   c|com*) hpfc_compile -k $DEMO "$@" ;;
   f|ful*) hpfc_compile -k $DEMO -k full "$@" ;;
   D|deb*) hpfc_compile -k debug "$@" ;;
+  v|val*) hpfc_compile -k validate "$@" ;;
   C|cle*) Delete "$@" ; hpfc_del "$@" ;;
   d|del*) hpfc_del "$@" ;;
   F|fil*) hpfc_directives < "$@" ;;
