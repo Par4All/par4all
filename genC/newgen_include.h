@@ -14,14 +14,11 @@
 
 */
 
-
-/* include.h */
-
 #include "newgen_types.h"
 #include "newgen_set.h"
 
-/* Types of domain */
-
+/* Types of domain
+ */
 #define UNDEF_DT 0
 #define EXTERNAL_DT 1
 #define BASIS_DT 2
@@ -31,16 +28,12 @@
 #define IMPORT_DT 6
 #define SET_DT 7
 
-/* Operators for CONSTRUCTED domains */
-
+/* Operators for CONSTRUCTED domains
+ */
 #define UNDEF_OP 0
 #define AND_OP 1
 #define OR_OP 2
 #define ARROW_OP 3
-
-/* Names of CONSTRUCTED operators */
-
-extern char *Op_names[] ;
 
 /* The UNIT_TYPE_NAME is the used to type expressions which only perform 
    side-effects. It is mainly used to build sets. */
@@ -123,31 +116,13 @@ union domain {
 } ;
 
 /* MAX_DOMAIN is the maximum number of entries in the DOMAINS table */
-
 #define MAX_DOMAIN 250
 
 /* For tabulated types. */
-
 #define MAX_TABULATED 10
 
-/* FI: huge increas to cope with Renault's code :-(
- * #define MAX_TABULATED_ELEMENTS 12013
- */
-#define MAX_TABULATED_ELEMENTS 200003
-
+/* hack to walk thru tabulateds... */
 extern struct gen_binding *Tabulated_bp ;
-
-/* INLINE[] gives, for each inlinable (i.e., unboxed) type, its NAME,
-   its initial VALUE and its printing FORMAT (for each language which can
-   be a target. */
-
-extern struct inlinable {
-  char *name ;
-  char *C_value ;
-  char *C_format ;
-  char *Lisp_value ;
-  char *Lisp_format ;
-} Inline[] ;
 
 /* Different kinds of BINDING structure pointers */
 
@@ -192,8 +167,7 @@ extern int Current_start ;
 /* extern int Current_first ; */
 extern int Read_spec_mode ;
 
-/* For tabulated domains, their index in the Gen_tabulated_ table. */
-
+/* For tabulated domains, their index in table of tabulateds. */
 extern int Current_index ;
 
 /* For tabulated objects, the offset HASH_OFFSET of the hashed subdomain 
