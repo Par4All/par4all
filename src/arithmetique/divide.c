@@ -1,7 +1,7 @@
 /* package arithmetique 
  *
  * $RCSfile: divide.c,v $ (version $Revision$)
- * $Date: 1996/07/13 12:22:53 $, 
+ * $Date: 1996/07/16 19:26:49 $, 
  */
 
 /*LINTLIBRARY*/
@@ -39,7 +39,8 @@ Value divide_fast(Value a, Value b)
 #define DIVIDE_MAX_A 7
 #define DIVIDE_MAX_B 8
 
-    static Value divide_look_up[2*DIVIDE_MAX_A+1][DIVIDE_MAX_B]= {
+    static int
+	divide_look_up[2*DIVIDE_MAX_A+1][DIVIDE_MAX_B]={
 	/* b ==         1   2   3   4   5   6   7   8 */
 	{/* a == - 7 */ -7, -4, -3, -2, -2, -2, -1, -1},
 	{/* a == - 6 */ -6, -3, -2, -2, -2, -1, -1, -1},
@@ -59,7 +60,7 @@ Value divide_fast(Value a, Value b)
     };
     /* translation de a pour acces a la look-up table par indice positif:
        la == a + DIVIDE_MAX_A >= 0 */
-    Value la;
+
     Value quotient;     /* valeur du quotient C */
 
     assert(VALUE_NOTZERO_P(b));
@@ -68,45 +69,27 @@ Value divide_fast(Value a, Value b)
        cette routine n'est-elle jamais appelee avec a=0 par le package vecteur?
        */
 
-    if(b>VALUE_CONST(0)) {
-	if((la=a+DIVIDE_MAX_A) >= VALUE_ZERO && 
-	   a <= DIVIDE_MAX_A && 
-	   b <= DIVIDE_MAX_B) {
-	    /* acceleration par une look-up table */
-	    quotient = divide_look_up[la][b-1];
-	}
-	else {
-	    /* calcul effectif du quotient: attention, portabilite douteuse */
-	    if(VALUE_POS_P(a)) 
-		quotient = a / b;
-	    else
-		quotient = (a-b+1) / b;
-	}
+    if (value_le(a, (Value)DIVIDE_MAX_A) && 
+	value_ge(a, (Value)-DIVIDE_MAX_A) &&
+	value_le(b, (Value)DIVIDE_MAX_B) &&
+	value_ge(b, (Value)-DIVIDE_MAX_B))
+    {
+	/* direct table look up */
+	int bint = VALUE_TO_INT(b),
+	    la = VALUE_TO_INT(a)+DIVIDE_MAX_A; /* shift a for the table */
+	quotient = (bint>0)?
+	    (Value)divide_look_up[la][bint-1]:
+		(Value)-divide_look_up[la][(-bint)-1];
     }
-    else {
-	/* b est negatif, on prend l'oppose et on corrige le resultat */
-	b = -b;
-	if((la=a+DIVIDE_MAX_A) >= VALUE_ZERO && 
-	   a <= DIVIDE_MAX_A && 
-	   b <= DIVIDE_MAX_B) {
-	    /* acceleration par une look-up table */
-	    quotient = -divide_look_up[la][b-1];
-	}
-	else {
-	    /* calcul effectif du divide: attention, portabilite douteuse */
-	    if(a > VALUE_ZERO) 
-		quotient = - (a / b);
-	    else
-		quotient = - ((a-b+1) / b);
-	}
-    }
+    else 
+	quotient = value_pdiv(a,b); /* this is just divide_slow */
 
     return quotient;
 }
 
 Value divide_slow(Value a, Value b)
 {
-    return DIVIDE(a, b);
+    return value_pdiv(a, b);
 }
 
 /* end of $RCSfile: divide.c,v $
