@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/04/09 09:00:33 $, ) 
+# ($Date: 1997/04/09 09:02:48 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -329,7 +329,8 @@ failed with $tpips_version" || \
      # default case
      rm -f $tmpout $tmperr
      echo "testing with none (parallelize) - Init" > $tmperr
-     Init -f $file -d $name > $tmpout 2>> $tmperr
+     # arg, no .F...
+     Init -f $aspect/$name.f -d $name > $tmpout 2>> $tmperr
      report $? "Cannot initialize $file" || continue
      
      for module in `cat $name.database/modules` ; do
