@@ -295,7 +295,7 @@ static void instruction_rwt (instruction i)
 	pips_debug (5,"dealing with a block, appending texts\n");
 
 	{
-	  list s_list = (list)instruction_block(i);
+	  list s_list = (list)(instruction_block(i));
 	  statement s;
 	  for(; s; POP(s_list)) {
 	    s = STATEMENT(CAR(s_list));
