@@ -406,7 +406,8 @@ order of the arguments (such as {\tt reservation\_spec}) is output by
 {\tt newgen}.
 
 For each external type, you have to call {\tt gen\_init\_external} with
-five arguments: the type (in upper case), a read function that receives
+five arguments: the type (in upper case) with \verb|_NEWGEN_EXTERNAL|
+appended), a read function that receives 
 as argument the function to read characters from, a write function that
 expects a {\tt (FILE *)}, a free function that receives an object of
 the external type and a copy function that receives an object of the
@@ -434,7 +435,7 @@ login copy_login( login obj ) ;
 
 main()  {
         gen_read_spec( location_spec, reservation_spec, NULL ) ;
-        gen_init_external( LOGIN, 
+        gen_init_external( LOGIN_NEWGEN_EXTERNAL, 
                            read_login, write_login, 
                            free_login, copy_login ) ;
         {
