@@ -3,14 +3,14 @@
 #include "tab.h"
 extern long int cross_product, limit;
 
-extern Entier pgcd();
+extern Entier sol_pgcd();
 extern void sol_new();
 extern void sol_div();
 extern void sol_forme();
 extern void sol_val();
 extern int llog();
 
-Entier mod(x, y)
+Entier sol_mod(x, y)
 Entier x, y;
 {Entier r;
  r = x % y;
@@ -58,18 +58,18 @@ int D;
       if(ff & Unit)continue;
       ok_var = False;
       for(j = 0; j<*pnvar; j++)
-          {x = coupure[j] = mod(Index(*ptp, i, j), D);
+          {x = coupure[j] = sol_mod(Index(*ptp, i, j), D);
 	   if(x > 0) ok_var = True;
 	  }
       if(! ok_var) continue;
-      x = coupure[*pnvar] = - mod(-Index(*ptp, i, *pnvar), D);
+      x = coupure[*pnvar] = - sol_mod(-Index(*ptp, i, *pnvar), D);
       ok_const = (x != 0);
       d = x;
       ok_parm = False;
       for(j = (*pnvar)+1; j<ncol; j++)
           {
-	   x = coupure[j] = - mod(- Index(*ptp, i, j), D);
-	   d = pgcd(d, x);
+	   x = coupure[j] = - sol_mod(- Index(*ptp, i, j), D);
+	   d = sol_pgcd(d, x);
 	   if(x != 0) ok_parm = True;
 	  }
 #if (DEBUG > 2)
@@ -85,7 +85,7 @@ int D;
 	       fprintf(stderr, "Trop de parametres : %d\n", *pnparm);
 	       exit(4);
 	       }
-           d = pgcd(d, D);
+           d = sol_pgcd(d, D);
 	   sol_new(*pnparm);
 	   sol_div();
 	   sol_forme(*pnparm+1);
