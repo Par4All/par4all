@@ -12,6 +12,9 @@
 ;; buffer-invisibility-spec and the cursor is no longer on a sensitive
 ;; text, the cursor shape is still x-sensitive-text-pointer-shape
 
+;; Try to be XEmacs compatible:
+(defvar epips-running-xemacs-p (string-match "XEmacs\\|Lucid" emacs-version))
+
 ;; To store the module name in a buffer:
 (make-variable-buffer-local 'epips-local-module-name)
 
@@ -44,6 +47,10 @@
      (set-face-underline-p 'epips-face-reference t)
      (copy-face 'highlight 'epips-mouse-face-reference)
 
+     (copy-face 'bold-italic 'epips-face-call)
+     (set-face-underline-p 'epips-face-call t)
+     (copy-face 'highlight 'epips-mouse-face-call)
+
      (copy-face 'default 'epips-face-preconditions)
      (set-face-foreground 'epips-face-preconditions "black")
      (set-face-background 'epips-face-preconditions "lightblue")
@@ -75,16 +82,24 @@
 
 (let
     (
-     (epips-frame-height (- (/ (- (/ (x-display-pixel-height)
-				  2) ; 2 stacked frames
-			       26) ; estimated window manager decor per frame
-			       (frame-char-height))
-			    1 ;; Keep room for the menu-bar
-			    )
+     (epips-frame-height (if epips-running-xemacs-p
+			     400 ;; Why not ?
+			   ;; Else compute half the height of the screen:
+			   (- (/ (- (/ (x-display-pixel-height)
+				       2) ; 2 stacked frames
+				    26) ; estimated window manager decor
+					; per frame
+				 (frame-char-height))
+			      1 ;; Keep room for the menu-bar
+			      )			  
+			   )
 			 )
-     (epips-log-frame-height (/ 250
-				(frame-char-height))
-			 )
+     (epips-log-frame-height (if epips-running-xemacs-p
+				 12
+				 (/ 250
+				    (frame-char-height))
+				 )
+			     )
      )
   (add-to-list
    'special-display-regexps `("Pips-Log" (top - 0) (left . 0) (height . ,epips-log-frame-height)))
@@ -1054,6 +1069,7 @@ epips-command-content contains the name of the file to display."
 (defun epips-mouse-module-select (event)
   "Select the module with the name under the mouse"
   (interactive "e")
+  (epips-debug event)
   (mouse-set-point event)
 					; Guess that the module name
 					; is the word where the user
@@ -1137,6 +1153,7 @@ such as the preconditions, the regions, etc."
   "Keymap for the Emacs PIPS mode.")
 (defvar epips-menu-keymap (make-sparse-keymap "The PIPS menu")
   "Keymap for the menu of the Emacs PIPS mode.")
+(define-key epips-keymap "\C-C\C-J" 'jpips)
 ;(define-key epips-keymap "\C-C\C-K" 'epips-kill-the-buffers)
 (define-key epips-keymap "\C-C\C-L" 'epips-clear-log-buffer)
 (define-key epips-keymap "\C-C\C-M" 'epips-select-module)
@@ -1155,8 +1172,10 @@ such as the preconditions, the regions, etc."
 
 (define-key epips-menu-keymap [epips-kill-the-buffers-menu-item]
   '("Quit and kill the Pips buffers" . epips-kill-the-buffers))
+(define-key epips-menu-keymap [epips-another-jpips-process-menu-item]
+  '("Launch another JPips process" . jpips))
 (define-key epips-menu-keymap [epips-another-pips-process-menu-item]
-  '("Launch another Pips process" . epips))
+  '("Launch another WPips process" . epips))
 (define-key epips-menu-keymap [epips-clear-log-buffer-menu-item]
   '("Clear log buffer" . epips-clear-log-buffer))
 (define-key epips-menu-keymap [epips-save-to-seminal-file-menu-item]
@@ -1166,11 +1185,10 @@ such as the preconditions, the regions, etc."
 (define-key epips-menu-keymap [epips-select-module-menu-item]
   '("Select a Fortran module" . epips-select-module))
 
-(define-key epips-keymap [S-down-mouse-1]
-  '("Go to module" . epips-mouse-module-select))
-(define-key epips-keymap [S-mouse-1]
-  '("Avoid a bip" . ignore))
-(define-key epips-keymap [S-down-mouse-3] 'epips-main-menu)
+;;(define-key epips-keymap [S-mouse-1]
+;;  '("Avoid a bip" . ignore))
+;;(define-key epips-keymap [S-down-mouse-3] 'epips-main-menu)
+(define-key epips-keymap [(shift button3)] 'epips-main-menu)
 
 
 ;;(defun epips-add-keymaps-and-menu-in-the-current-buffer ()
@@ -1182,10 +1200,16 @@ such as the preconditions, the regions, etc."
 (defvar epips-reference-keymap (make-sparse-keymap "The PIPS keymap for references")
   "Keymap active when the mouse is on a reference.")
 
-(define-key epips-reference-keymap [down-mouse-2] 'epips-display-the-declaration-of-a-reference-variable)
-(define-key epips-reference-keymap [double-mouse-2] 'epips-jump-to-a-declaration)
+(define-key epips-reference-keymap [down-mouse-1] 'epips-display-the-declaration-of-a-reference-variable)
+(define-key epips-reference-keymap [double-mouse-1] 'epips-jump-to-a-declaration)
 (define-key epips-keymap "\C-C\C-A" 'epips-show-property)
 
+
+(defvar epips-call-keymap (make-sparse-keymap "The PIPS keymap for calls")
+  "Keymap active when the mouse is on a call site.")
+
+(define-key epips-call-keymap [double-mouse-1]
+  '("Go to module" . epips-mouse-module-select))
 
 
 (defun epips-build-menu-from-layout (layout keymap menu-name menu-vector)
@@ -1510,7 +1534,7 @@ of the reference variable we are clicking on"
 
 ;; Launch the wpips process from Emacs:
       
-(defun epips ()
+(defun epips (&optional type)
   "The Emacs-PIPS mode.
 
 The Fortran codes are dealt with the Fortran mode of Emacs.
@@ -1546,6 +1570,10 @@ variable to its path.
 
 By the way, EPips is nicer when use with a package such as font-lock-mode...
 
+If epips is launched with the string \"jpips\", the jpips backend (Java
+interface) is used instead of the X11/XView backend. See also the jpips
+command.
+
 Special commands: 
 \\{epips-keymap}
 "
@@ -1570,23 +1598,38 @@ Special commands:
 
   (epips-build-menu)
 
-  (let
-      (
-       (process-connection-type nil)	; Use a pipe to communicate
-       )
-    (setq epips-process (start-process "WPips"
-				       "Pips-Log"
-				       (or (getenv "EPIPS_WPIPS")
-					   "wpips")
-				       "-emacs"))
-    ;;(setq epips-process (start-process "WPips" "Pips-Log" "/projects/Pips/Development/Libs/effects/wpips" "-emacs"))
+  (catch 'some-error
+    (let
+	(
+	 (process-connection-type nil)	; Use a pipe to communicate
+	 )
+      (if type (if (equal type "jpips")
+		   (setq epips-process (start-process "JPips"
+						      "Pips-Log"
+						      (or (getenv "EPIPS_JPIPS")
+							  "jpips")
+						      "-e"))
+		 (progn
+		   (epips-user-error-command
+		    (format "Cannot launch epips with \"%s\" type." type))
+		   (throw 'some-error))
+		 )
+	(
+	 setq epips-process (start-process "WPips"
+					   "Pips-Log"
+					   (or (getenv "EPIPS_WPIPS")
+					       "wpips")
+					   "-emacs")
+	      )
+	)
+      ;;(setq epips-process (start-process "WPips" "Pips-Log" "/projects/Pips/Development/Libs/effects/wpips" "-emacs"))
 					;(goto-char (process-mark epips-process))
-    (message "WPips process launched...")
-    (setq epips-process-buffer (process-buffer epips-process))
-    (set-process-filter epips-process 'epips-output-filter)
-    (epips-select-and-display-a-buffer epips-process-buffer)
+      (message (concat (process-name epips-process) " process launched..."))
+      (setq epips-process-buffer (process-buffer epips-process))
+      (set-process-filter epips-process 'epips-output-filter)
+      (epips-select-and-display-a-buffer epips-process-buffer)
 					; Clean up the environment :
-    ;; (epips-kill-the-local-variables-in-the-buffers)
+      ;; (epips-kill-the-local-variables-in-the-buffers)
 					;(switch-to-buffer
 					; epips-process-buffer) Hum, I
 					; do not know why I need to
@@ -1594,15 +1637,26 @@ Special commands:
 					; epips-process) if I do not
 					; want a rude #<marker in no
 					; buffer>. It used to work, but...
-    (goto-char (point-max))
-    (set-marker (process-mark epips-process) (point))
-    ;;    (epips-add-keymaps-and-menu)
-    ;; Enter EPips mode:
-    (save-excursion
-      (set-buffer epips-process-buffer)
-      (epips-mode 1)
+      (goto-char (point-max))
+      (set-marker (process-mark epips-process) (point))
+      ;;    (epips-add-keymaps-and-menu)
+      ;; Enter EPips mode:
+      (save-excursion
+	(set-buffer epips-process-buffer)
+	(epips-mode 1)
+	)
       )
     )
+  )
+
+(defun jpips (&optional type)
+  "The Emacs-PIPS mode with the jpips Java backend. See the documentation
+of epips."
+
+					; Just to have the function
+					; for the user :
+  (interactive)
+  (epips "jpips")
   )
 
 
@@ -1612,6 +1666,17 @@ Used by the epips shell script to run EPips as a stand alone Emacs."
   (let
       ((the-current-frame (window-frame (get-buffer-window (current-buffer)))))
     (epips)
+    (delete-frame the-current-frame)
+    )
+  )
+
+
+(defun jpips-launch-alone ()
+  "Act as epips but discard the current buffer after the jpips start-up.
+Used by the jepips shell script to run EPips as a stand alone Emacs."
+  (let
+      ((the-current-frame (window-frame (get-buffer-window (current-buffer)))))
+    (jpips)
     (delete-frame the-current-frame)
     )
   )
