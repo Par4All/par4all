@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/12 16:42:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/12 23:39:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/12 16:42:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/12 23:39:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -836,17 +836,17 @@ statement obj;
     text r = make_text( NIL ) ;
     /* string comments = statement_comments(obj); */
 
-    if (get_bool_property("PRETTYPRINT_ALL_EFFECTS")) {
-	r = (*text_statement_hook)( module, margin, obj ) ;
-    }
-    else if ((instruction_block_p(i) && 
+    if (get_bool_property("PRETTYPRINT_ALL_EFFECTS")
+	|| !((instruction_block_p(i) && 
 	      !get_bool_property("PRETTYPRINT_BLOCKS")) || 
 	     (instruction_unstructured_p(i) && 
-	      !get_bool_property("PRETTYPRINT_UNSTRUCTURED")))
-	    ;
-    else {
-	r = (*text_statement_hook)( module, margin, obj ) ;
+	      !get_bool_property("PRETTYPRINT_UNSTRUCTURED")))) {
+	r = (*text_statement_hook)( module, margin, obj );
+	
+	if (text_statement_hook != empty_text)
+	    attach_decoration_to_text(r);
     }
+
     /*
     if (! string_undefined_p(comments)) {
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
@@ -1645,8 +1645,8 @@ reference obj;
 	}, reference_indices(obj));
 	pc = CHAIN_SWORD(pc,")");
     }
-    attach_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
-			make_attachee(is_attachee_entity, e));
+    attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
+				  obj);
 
     return(pc);
 }
