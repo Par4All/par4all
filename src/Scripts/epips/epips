@@ -1,2 +1,15 @@
 #! /bin/sh
-emacs "$@" -iconic -name epips -f epips
+#
+# $RCSfile: epips,v $ (version $Revision$)
+# $Date: 1995/10/06 11:56:53 $, 
+#
+
+${EPIPS_EMACS:-emacs} \
+     "$@" \
+     -l ${EPIPS_LISP:-${PIPS_UTILDIR}/epips.el} \
+     -iconic \
+     -name epips \
+     -f epips
+
+# that is all
+#
