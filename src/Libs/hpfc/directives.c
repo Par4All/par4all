@@ -6,6 +6,9 @@
  *
  * $Id$
  * $Log: directives.c,v $
+ * Revision 1.68  1998/03/17 16:52:10  coelho
+ * more debug.
+ *
  * Revision 1.67  1997/07/24 14:21:34  keryell
  * Added a call to fix_sequence_statement_attributes().
  *
@@ -1085,18 +1088,25 @@ void handle_hpf_directives(statement s, bool dyn)
 
     initial_alignment(s);
 
+    ifdebug(7) dump_current_remapping_graph("after phase 3");
     DEBUG_STAT(7, "after phase 3", s);
 
     /* OPTIMIZATION
      */
-    pips_debug(1, "starting optimization phase\n");
-    simplify_remapping_graph();
+    if (get_bool_property("HPFC_OPTIMIZE_REMAPPINGS"))
+    {
+	pips_debug(1, "starting optimization phase\n");
+	simplify_remapping_graph();
+    }
+
     clean_ctrl_graph();
 
     hpfc_check_for_similarities(get_the_dynamics());
 
     close_dynamic_locals();
     close_the_dynamics();
+
+    DEBUG_STAT(7, "after optimization phase", s);
     }
 
     /* CLEAN
