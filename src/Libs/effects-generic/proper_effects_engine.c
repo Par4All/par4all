@@ -118,9 +118,9 @@ generic_proper_effects_of_range(range r)
 
     pips_debug(5, "begin\n");
 
-    le = generic_proper_effects_of_expression(el);
-    le = gen_nconc(le, generic_proper_effects_of_expression(eu));
-    le = gen_nconc(le, generic_proper_effects_of_expression(ei));
+    le = generic_proper_effects_of_expression(ei);
+    le = gen_nconc(generic_proper_effects_of_expression(eu), le);
+    le = gen_nconc(generic_proper_effects_of_expression(el), le);
 
     pips_debug(5, "end\n");
     return(le);
@@ -286,9 +286,8 @@ generic_proper_effects_of_expressions(list exprs)
     pips_debug(5, "begin\n");
 
     MAP(EXPRESSION, exp,
-    {
-	le = gen_nconc(le, generic_proper_effects_of_expression(exp));
-    },
+	/* le may be long... */
+	le = gen_nconc(generic_proper_effects_of_expression(exp), le),
 	exprs);
 
     pips_debug(5, "end\n");
@@ -386,7 +385,7 @@ generic_r_proper_effects_of_call(call c)
 static void 
 proper_effects_of_call(call c)
 {
-    list l_proper=NIL;
+    list l_proper = NIL;
     statement current_stat = effects_private_current_stmt_head();
     instruction inst = statement_instruction(current_stat);
     list l_cumu_range = cumu_range_effects();
@@ -401,15 +400,14 @@ proper_effects_of_call(call c)
 		
 	if (contract_p)
 	    l_proper = proper_effects_contract(l_proper);
-	ifdebug(2)
-	    {
-		pips_debug(2, "Proper effects for statement%03d:\n",
-			   statement_ordering(current_stat));  
-		(*effects_prettyprint_func)(l_proper);
-		pips_debug(2, "end\n");
-	    }
+	ifdebug(2) {
+	  pips_debug(2, "Proper effects for statement%03d:\n",
+		     statement_ordering(current_stat));  
+	  (*effects_prettyprint_func)(l_proper);
+	  pips_debug(2, "end\n");
+	}
 
-	store_proper_rw_effects_list(current_stat,l_proper);
+	store_proper_rw_effects_list(current_stat, l_proper);
     }
 }
 
@@ -426,7 +424,7 @@ loop_filter(loop l)
     list l_proper = generic_proper_effects_of_range(loop_range(l));
     list l_eff = cumu_range_effects();
     
-    l_eff = gen_nconc(l_eff, l_proper);
+    l_eff = gen_nconc(l_proper, l_eff);
     current_downward_cumulated_range_effects_push(make_effects(l_eff));
     return(TRUE);
 }
