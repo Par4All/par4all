@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (Version $Revision$)
-# $Date: 1996/10/10 18:34:43 $, 
+# $Date: 1996/10/10 18:38:26 $, 
 #
 # revu par FC
 # pour fabriquer un executable FOO, faire "make FOO"
@@ -19,17 +19,17 @@ CFILES	=	sc_to_sg_test1.c \
 		time_sg_union.c \
 		feasability.c
 
-SOURCE	= $(CFILES) test_simp.sh filtre.sed
+SOURCE	= $(CFILES) 
 
 all: test_chernikova simp sc_to_sg_test
 
 %: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $< $(LINEAR_LIBS) -o $@
 
-test_simp:	simp
-	sh ./test_simp.sh | sed -f filtre.sed > resultat.2 ; 
-	diff resultat.2 RM/resultat.1 
-	$(RM) resultat.2
+# test_simp:	simp
+# 	sh ./test_simp.sh | sed -f filtre.sed > resultat.2 ; 
+# 	diff resultat.2 RM/resultat.1 
+# 	$(RM) resultat.2
 
 clean: local-clean
 local-clean:
