@@ -10,7 +10,7 @@ bullet-proof and is large (200,000 lines of C code). Its compilation
 requires many public-domain tools to be installed, thus we recommend that
 you download the compiled version if you do not plan to use <a
 href=http://www.cri.ensmp.fr/pips>PIPS</a> as a base for developing new
-analyses or transformations phases. <p>
+analysis or transformation phases. <p>
 
 When installing PIPS on your system, please read the README and INSTALL
 files at the root directory of the distribution for further instructions
@@ -20,15 +20,16 @@ on how to run or compile PIPS. For help mail to
 <h2>PIPS executables</h2>
 
 PIPS executables are available for SUN workstations, under SunOS
-or Solaris.
+or Solaris, and under IBM Aix.
 
 <ul>
-<li> <a href=distribution/pips_GNU.tar.gz>PIPS for SunOS4</a> (4MB)
 <li> <a href=distribution/pips_GNUSOL2LL.tar.gz>PIPS for SOLARIS2</a>
      (Ultra Sparc <code>long long</code> integers version)  (8MB)
-<li> <a href=distribution/pips_Public_GNUSOL2LL.tar.gz>PIPS for SOLARIS2</a>
-     (Ultra Sparc <code>long long</code> integers version, toolpack
-	 1.2 and daVinci 2) (caution! 17MB!)
+<li> <a href=distribution/public_GNUSOL2LL.tar.gz>Public parts for SOLARIS2</a>
+     (toolpack 1.2 and daVinci 2) (caution! 10MB!)
+<li> <a href=distribution/pips_GNU.tar.gz>PIPS for SunOS4</a> (4MB)
+<li> <a href=distribution/pips_IBMAIX.tar.gz>PIPS for IBM AIX4</a>
+     (does not include wpips and epips, but only basic intefaces). 
 </ul>
 
 <h2>PIPS and tools at the source level</h2>
@@ -36,7 +37,7 @@ or Solaris.
 PIPS and public domain tools PIPS is built upon are available at the
 source level.  Note that the code is distributed as is with no warranty,
 even implicit, of any kind. It is distributed under the term of the GNU
-general license that you may find quite easily on the net. <p>
+public license (GPL) that you may find quite easily on the net. <p>
 
 GNU make, cproto, flex, bison and some other tools are required to
 PIPS. See the next section for pointers on how to find and download these
