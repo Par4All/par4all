@@ -17,11 +17,13 @@ my $verbose = 0;
 my @includes = ();
 my $modify = 0;
 my $suffix = '.old';
+my $prefix = '!';
 
 GetOptions("i|include=s" => \@includes,
 	   "v|verbose+" => \$verbose,
 	   "m|modify" => \$modify,
-	   "s|suffix" => \$suffix,
+	   "s|suffix=s" => \$suffix,
+	   "p|prefix=s" => \$prefix,
 	   "h|help" => sub {
 	       print STDERR 
 		   "$0 [-i dir]* [-vmh] fortran_files\n" .
@@ -29,6 +31,7 @@ GetOptions("i|include=s" => \@includes,
 		   "\t-v: verbose\n" .
 		   "\t-m: modify by commenting out useless includes\n" .
 		   "\t-s suffix: suffix for old file (default '.old')\n" .
+		   "\t-p prefix: prefix for commented lines (default '!')\n" .
    	           "\t-h: this help\n";
 	       exit 0;
 	   })
@@ -216,7 +219,7 @@ for my $file (@ARGV)
 		# comment out not used includes
 		my $name = $1;
 		if (not exists $useful_includes{$name}) {
-		    $_ = '!' . $_;
+		    $_ = $prefix . $_;
 		}
 	    }
 	} @file_content;
