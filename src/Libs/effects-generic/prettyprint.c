@@ -150,16 +150,17 @@ load_list(statement_effects m, statement s)
 }
 
 /****************written by Dat**********************/
-void my_effects_filter(list *l_effs, string str_filter)
+list my_effects_filter(list l_effs, string str_filter)
 {
+  list l_flt = NIL;
   MAPL(ce, {
     effect eff = EFFECT(CAR(ce));
-    string t = effect_words_reference(effect_reference(*eff));
-    if (!same_string_p(t, str_filter))
-      gen_remove(*l_effs, eff);
+    string t = effect_words_reference(effect_reference(eff));
+    if (same_string_p(t, str_filter))
+      l_flt = CONS(EFFECT, eff, l_flt);
     free(t);
-  }, *l_effs); 
-  return;
+  }, l_effs); 
+  return l_flt;
 }
 /****************************************************/
 
@@ -206,9 +207,10 @@ resource_text(
     }
 
     /*******************written by Dat****************/
-    my_effects_filter(&l_eff, "KMAX");
+    list l_eff_flt = my_effects_filter(l_eff, "KMAX");
+    l_eff_text = (*(pps->get_text))(l_eff_flt);
     /*************************************************/
-    l_eff_text = (*(pps->get_text))(l_eff);
+    /*l_eff_text = (*(pps->get_text))(l_eff);*/
 
     /* (*attach_effects_decoration_to_text_func)(the_effect_text); */
 
