@@ -1,5 +1,5 @@
  /* $RCSfile: module.c,v $ (version $Revision$)
-  * $Date: 1997/10/27 08:01:52 $, 
+  * $Date: 1997/10/27 16:48:14 $, 
   */
 #include <stdlib.h>
 #include <stdio.h>
@@ -145,12 +145,9 @@ variable_declaration_coherency_p(entity module, statement st)
     return(module_coherent_p);
 }
 
-/* ------------------------------------------------------------------
- *
- * new and as efficient as possible version
- * My programs may be rather long with many references and variables...
- *
- * FC 08/06/94
+/********************************************************* CLEAN DECLARATION */
+
+/* new and as efficient as possible version. FC 08/06/94
  */
 
 /* should be in Newgen? */
@@ -174,6 +171,7 @@ static void
 store_this_entity(entity var)
 {
     message_assert("defined entity", !entity_undefined_p(var));
+    pips_debug(5, "ref to %s\n", entity_name(var));
     if (!bound_referenced_variables_p(var))
     {
 	storage s = entity_storage(var);
@@ -255,11 +253,12 @@ insure_declaration_coherency(
     list decl = entity_declarations(module), new_decl = NIL;
 
     debug_on("RI_UTIL_DEBUG_LEVEL");
-    pips_assert("initialized", !referenced_variables_undefined_p());
     pips_debug(2, "Processing module %s\n", entity_name(module));
 
     init_declared_variables();
+    init_referenced_variables();
     referenced_variables_list = NIL;
+
     if (le) MAP(ENTITY, e, store_this_entity(e), le);
 
     pips_debug(3, "tagging references\n");
@@ -313,6 +312,7 @@ insure_declaration_coherency(
     /* the temporaries are cleaned
      */
     close_declared_variables();
+    close_referenced_variables();
     gen_free_list(decl);
     gen_free_list(referenced_variables_list),
     referenced_variables_list = NIL;
@@ -328,9 +328,7 @@ insure_declaration_coherency_of_module(
     entity module,
     statement stat)
 {
-    init_referenced_variables();
     insure_declaration_coherency(module, stat, NIL);
-    close_referenced_variables();
 }
 
 
