@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.224 2002/06/10 15:19:05 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.225 2002/06/12 09:43:55 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -445,88 +445,104 @@ words_subscript_range(range obj)
 list 
 words_reference(reference obj)
 {
-    list pc = NIL;
-    string begin_attachment;
+  list pc = NIL;
+  string begin_attachment;
     
-    entity e = reference_variable(obj);
+  entity e = reference_variable(obj);
 
-    pc = CHAIN_SWORD(pc, entity_local_name(e));
-    begin_attachment = STRING(CAR(pc));
+  pc = CHAIN_SWORD(pc, entity_local_name(e));
+  begin_attachment = STRING(CAR(pc));
     
-    if (reference_indices(obj) != NIL) {
-	pc = CHAIN_SWORD(pc,"(");
-	MAPL(pi, {
-	    expression subscript = EXPRESSION(CAR(pi));
-	    syntax ssubscript = expression_syntax(subscript);
+  if (reference_indices(obj) != NIL) {
+    pc = CHAIN_SWORD(pc,"(");
+    MAPL(pi, {
+      expression subscript = EXPRESSION(CAR(pi));
+      syntax ssubscript = expression_syntax(subscript);
 
-	    if(syntax_range_p(ssubscript)) {
-		pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript)));
-	    }
-	    else {
-		pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE));
-	    }
+      if(syntax_range_p(ssubscript)) {
+	pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript)));
+      }
+      else {
+	pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE));
+      }
 
-	    if (CDR(pi) != NIL)
-		pc = CHAIN_SWORD(pc,",");
-	}, reference_indices(obj));
-	pc = CHAIN_SWORD(pc,")");
-    }
-    attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
-				  obj);
+      if (CDR(pi) != NIL)
+	pc = CHAIN_SWORD(pc,",");
+    }, reference_indices(obj));
+    pc = CHAIN_SWORD(pc,")");
+  }
+  attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
+				obj);
 
-    return(pc);
+  return(pc);
 }
 
 static list 
 words_regular_call(call obj, bool is_a_subroutine)
 {
-    list pc = NIL;
+  list pc = NIL;
 
-    entity f = call_function(obj);
-    value i = entity_initial(f);
-    type t = entity_type(f);
+  entity f = call_function(obj);
+  value i = entity_initial(f);
+  type t = entity_type(f);
     
-    if (call_arguments(obj) == NIL) {
-	if (type_statement_p(t))
-	    return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
-	if (value_constant_p(i)||value_symbolic_p(i))
-	    return(CHAIN_SWORD(pc, entity_local_name(f)));
-    }
+  if (call_arguments(obj) == NIL) {
+    if (type_statement_p(t))
+      return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
+    if (value_constant_p(i)||value_symbolic_p(i))
+      return(CHAIN_SWORD(pc, entity_local_name(f)));
+  }
 
-    if (type_void_p(functional_result(type_functional(t)))) 
+  if (type_void_p(functional_result(type_functional(t)))) 
     {
-	if (is_a_subroutine) 
-	  pc = CHAIN_SWORD(pc, "CALL ");
-	else
-	  pips_user_warning("subroutine '%s' used as a function.\n",
-			    entity_name(f));
+      if (is_a_subroutine) 
+	pc = CHAIN_SWORD(pc, "CALL ");
+      else
+	pips_user_warning("subroutine '%s' used as a function.\n",
+			  entity_name(f));
 
     }
-    else if (is_a_subroutine) {
-      pips_user_warning("function '%s' used as a subroutine.\n",
-			entity_name(f));
-      pc = CHAIN_SWORD(pc, "CALL ");
-    }
+  else if (is_a_subroutine) {
+    pips_user_warning("function '%s' used as a subroutine.\n",
+		      entity_name(f));
+    pc = CHAIN_SWORD(pc, "CALL ");
+  }
 
-    /* the implied complex operator is hidden... [D]CMPLX_(x,y) -> (x,y)
-     */
-    if (!ENTITY_IMPLIED_CMPLX_P(f) && !ENTITY_IMPLIED_DCMPLX_P(f))
-	pc = CHAIN_SWORD(pc, entity_local_name(f));
+  /* the implied complex operator is hidden... [D]CMPLX_(x,y) -> (x,y)
+   */
+  if (!ENTITY_IMPLIED_CMPLX_P(f) && !ENTITY_IMPLIED_DCMPLX_P(f))
+    pc = CHAIN_SWORD(pc, entity_local_name(f));
 
-    if( !ENDP( call_arguments(obj))) {
-	pc = CHAIN_SWORD(pc, "(");
-	MAPL(pa, {
-	    pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pa))));
-	    if (CDR(pa) != NIL)
-		    pc = CHAIN_SWORD(pc, ", ");
-	}, call_arguments(obj));
-	pc = CHAIN_SWORD(pc, ")");
-    }
-    else if(!type_void_p(functional_result(type_functional(t))) ||
-	    !is_a_subroutine) {
-	pc = CHAIN_SWORD(pc, "()");
-    }
-    return pc;
+  /* The corresponding formal parameter cannot be checked by
+     formal_label_replacement_p() because the called modules may not have
+     been parserd yet. */
+
+  if( !ENDP( call_arguments(obj))) {
+    pc = CHAIN_SWORD(pc, "(");
+    MAPL(pa, {
+      expression eap = EXPRESSION(CAR(pa));
+      if(get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
+	 && actual_label_replacement_p(eap)) {
+	string ls = entity_local_name(call_function(syntax_call(expression_syntax(eap))));
+	string ls1 = malloc(strlen(ls));
+	/* Get rid of initial and final quotes */
+	ls1 = strncpy(ls1, ls+1, strlen(ls)-2);
+	pips_assert("eap must be a call to a constant string", expression_call_p(eap));
+	pc = CHAIN_SWORD(pc, ls1);
+	free(ls1);
+      }
+      else
+	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pa))));
+      if (CDR(pa) != NIL)
+	pc = CHAIN_SWORD(pc, ", ");
+    }, call_arguments(obj));
+    pc = CHAIN_SWORD(pc, ")");
+  }
+  else if(!type_void_p(functional_result(type_functional(t))) ||
+	  !is_a_subroutine) {
+    pc = CHAIN_SWORD(pc, "()");
+  }
+  return pc;
 }
 
 
