@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/05/28 13:06:05 $, )
+! ($Date: 1997/05/29 09:02:59 $, )
 !
 !-----------------
 !
@@ -965,7 +965,7 @@ _CM5(
       end if)
       
 
-      call HPFC JOIN GROUPE(inum)
+      call HPFC JOIN GROUP(inum)
 
       debug(print *, "[HPFC INIT MAIN] group ", HPFC GROUP NAME, inum)
 
@@ -1028,7 +1028,7 @@ _CM5(
 !
 ! done before the spawn so host is (group, 0)
 !
-      call HPFC JOIN GROUPE(inum)
+      call HPFC JOIN GROUP(inum)
 
       if (inum.ne.0) then
          SPAWN PERFORMED = .true.
