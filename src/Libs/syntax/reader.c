@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/30 17:13:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/25 13:34:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_reader[] = "%A% ($Date: 1997/04/30 17:13:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_reader[] = "%A% ($Date: 1997/07/25 13:34:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -84,6 +84,11 @@ char vcid_syntax_reader[] = "%A% ($Date: 1997/04/30 17:13:05 $, ) version $Revis
  *
  *  - double quotes can be used instead of simple quotes for character
  *    string constants (Francois Irigoin, 11 novembre 1996)
+ *
+ *  - empty and invisible lines made of TAB and SPACE characters are preserved
+ *    as comments in the executable part as they are in the declaration part
+ *    (Francois Irigoin, 25 juillet 1997).
+
  */
 
 /*-------------------------------------------------------------------------*/
@@ -412,6 +417,9 @@ FILE * fp;
  * cannot be touched by the error handling routine, changes of fp are tracked
  * in GetChar() and dynamically tested. Kludge suggested by Fabien Coelho to
  * avoid adding more global variables. (FI)
+ *
+ * Empty (or rather invisible) lines made of TAB and SPACE characters are 
+ * replaced by the string "\n".
  */
 int 
 GetChar(fp)
@@ -504,9 +512,12 @@ FILE * fp;
 	}
 	else {
 	    if (EmptyBuffer) {
-		ibuffer = lbuffer = UNDEF;
+		/* ibuffer = lbuffer = UNDEF; */
+		debug(8, "GetChar", "An empty line has been detected\n");
+		ibuffer = lbuffer = 0;
+		buffer[lbuffer++] = '\n';
 		col = 0;
-		LineNumber += 1;
+		/* LineNumber += 1; */
 	    }
 	    else {
 		col = 0;
@@ -516,11 +527,21 @@ FILE * fp;
 	ifdebug(8) {
 	    int i;
 
-	    debug(8, "GetChar",
-		  "Input line after tab expansion lbuffer=%d, col=%d:\n",
-		  lbuffer, col);
-	    for (i=0; i < lbuffer; i++)
+	    if(lbuffer==UNDEF) {
+		debug(8, "GetChar",
+		      "Input line after tab expansion is empty:\n");
+	    }
+	    else {
+		debug(8, "GetChar",
+		      "Input line after tab expansion lbuffer=%d, col=%d:\n",
+		      lbuffer, col);
+	    }
+	    for (i=0; i < lbuffer; i++) {
 		(void) putc((char) buffer[i], stderr);
+	    }
+	    if(lbuffer<=0) {
+		(void) putc('\n', stderr);
+	    }
 	}
     }
 
@@ -554,6 +575,9 @@ FILE * fp;
     /*
      * on lit le label et le caractere de continuation de la premiere
      * ligne non vide et non ligne de commentaire.
+     *
+     * Modification:
+     *  - an empty line is assumed to be a comment line
      */
     if(iComm!=0) {
 	Comm[iComm] = '\0';
@@ -567,28 +591,44 @@ FILE * fp;
 	PrevComm[0] = '\0';
     }
     while (strchr(START_COMMENT_LINE,(c = GetChar(fp))) != NULL) {
-      if (tmp_b_C == UNDEF)
-	tmp_b_C = LineNumber;
+	if (tmp_b_C == UNDEF)
+	    tmp_b_C = LineNumber;
 
-      /* Modif by AP: oct 18th 1995
+	/* Modif by AP: oct 18th 1995
 
-       	 Deals with comment buffer overflow. If the buffer is full, we
-       	 just skip everything else. */
-      if(iComm >= COMMLENGTH-2)
-	while((c = GetChar(fp)) != '\n') {continue;}
-      else {
-	do {
-	  Comm[iComm++] = c;
-	} while((c = GetChar(fp)) != '\n' && iComm < COMMLENGTH-2);
+	   Deals with comment buffer overflow. If the buffer is full, we
+	   just skip everything else. */
+	/*
 	if(iComm >= COMMLENGTH-2)
-	  while((c = GetChar(fp)) != '\n') {continue;}
-	else
-	  Comm[iComm++] = c;
-      }
+	    while((c = GetChar(fp)) != '\n') 
+		continue;
+	else {
+	    do {
+		Comm[iComm++] = c;
+	    } while((c = GetChar(fp)) != '\n' && iComm < COMMLENGTH-2);
+	    if(iComm >= COMMLENGTH-2)
+		while((c = GetChar(fp)) != '\n')
+		    continue;
+	    else
+		Comm[iComm++] = c;
+	}
+	*/
+	ifdebug(8) {
+	    if(c=='\n')
+		debug(8, "ReadLine", "Empty comment line detected\n");
+	}
+	while(c!=EOF) {
+	    if(iComm < COMMLENGTH-2)
+		Comm[iComm++] = c;
+	    if(c=='\n')
+		break;
+	    c = GetChar(fp);
+	}
+
     }
     if(iComm >= COMMLENGTH-2)
-      user_warning("ReadLine", 
-		   "Too many comments. Comment buffer overflow\n");
+	user_warning("ReadLine", 
+		     "Too many comment lines. Truncation occured.\n");
 
     if (c != EOF) {
 	/*
@@ -643,7 +683,7 @@ FILE * fp;
 			    EtatQuotes = NONINQUOTES;
 		    }
 		else if(EtatQuotes == INQUOTEBACKSLASH) 
-		        EtatQuotes = INQUOTES;
+		    EtatQuotes = INQUOTES;
 		else {
 		    EtatQuotes = INQUOTES;
 		    QuoteChar = c;
