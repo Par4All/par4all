@@ -25,9 +25,9 @@ substract[3] {
 }
 
 assign[2] {
-	SIMD_MOV: 8,8;
-	SIMD_MOV: 4,16;
-	SIMD_MOV: 2,32;
+	SIMD_MOV8: 8,8;
+	SIMD_MOV4: 4,16;
+	SIMD_MOV2: 2,32;
 }
 
 oppose[2] {
