@@ -3,10 +3,10 @@
    Ronan Keryell, 1995.
    */
 
-/* 	%A% ($Date: 1995/11/07 23:09:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/10 11:48:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
- char vcid_unspaghettify[] = "%A% ($Date: 1995/11/07 23:09:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+ char vcid_unspaghettify[] = "%A% ($Date: 1995/11/10 11:48:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -168,19 +168,14 @@ fuse_sequences_in_unstructured(unstructured u)
                      if (number_of_successors_of_the_successor == 1 &&
                          number_of_predecessors_of_the_successor == 1)
                         /* Ok, we have found a node in a sequence. */
-                        if (the_successor !=
-                            CONTROL(CAR(control_predecessors(c))))
-                           /* And it is not a loop with only one
-                              control node: */
-                           /* Put the control in the fuse
-                              list. Since no fusing occurs yet, the
-                              address of a control node is itself: */
-                           hash_put(controls_to_fuse_with_their_successors,
-                                    (char *) c,
-                                    (char *) c);
-                        else
-                           debug(3, "fuse_sequences_in_unstructured",
-                                 "\tA loop with only one control...\n");     
+                        /* The fact we can have a cycle is considered
+                           a page below... */
+                        /* Put the control in the fuse
+                           list. Since no fusing occurs yet, the
+                           address of a control node is itself: */
+                        hash_put(controls_to_fuse_with_their_successors,
+                                 (char *) c,
+                                 (char *) c);
                   }
                   else {
                      debug(3, "fuse_sequences_in_unstructured",
@@ -216,67 +211,75 @@ fuse_sequences_in_unstructured(unstructured u)
                if (get_debug_level() > 0)
                   pips_assert("control inconsistants...",
                               gen_consistent_p(its_successor));
-               
-               the_third_successor = CONTROL(CAR(control_successors(its_successor)));
-               if (get_debug_level() > 0)
-                  pips_assert("control inconsistants...",
-                              gen_consistent_p(the_third_successor));
+
+               if (a_control_to_fuse == its_successor)
+                  debug(3, "fuse_sequences_in_unstructured",
+                        "\tA loop of control has been found... Do not fuse the control %#x\n", (int) a_control_to_fuse);     
+
+               else {
+                  /* Well, it seems to be a real sequence, at most a
+                     loop with 2 control nodes... */
+                  the_third_successor = CONTROL(CAR(control_successors(its_successor)));
+                  if (get_debug_level() > 0)
+                     pips_assert("control inconsistants...",
+                                 gen_consistent_p(the_third_successor));
            
-               /* make st with the statements of 2 following nodes: */
-               st = make_empty_statement();
-               statement_instruction(st) =
-                  make_instruction_block(CONS(STATEMENT,
-                                              control_statement(a_control_to_fuse),
-                                              CONS(STATEMENT,
-                                                   control_statement(its_successor), NIL)));
-               /* Reconnect the new statement to the node to fuse: */
-               control_statement(a_control_to_fuse) = st;
+                  /* make st with the statements of 2 following nodes: */
+                  st = make_empty_statement();
+                  statement_instruction(st) =
+                     make_instruction_block(CONS(STATEMENT,
+                                                 control_statement(a_control_to_fuse),
+                                                 CONS(STATEMENT,
+                                                      control_statement(its_successor), NIL)));
+                  /* Reconnect the new statement to the node to fuse: */
+                  control_statement(a_control_to_fuse) = st;
 
-               /* Link the first node with the third one in the forward
-                  direction: */
-               CONTROL(CAR(control_successors(a_control_to_fuse))) =
-                  the_third_successor;
-               /* Since the third successor may have more than 1
-                  predecessor, we need to update only the link to
-                  "its_successor": */
-               MAPL(another_control_list,
-                    {
-                       if (CONTROL(CAR(another_control_list)) == its_successor) {
-                          CONTROL(CAR(another_control_list)) =
-                             a_control_to_fuse;
-                          break;
-                       }
-                    },
-                       control_predecessors(the_third_successor));
-               /* If the node "its_successor" is in the fuse list, we
-                  want to keep track of its new place, that is in fact
-                  fused in "a_control_to_fuse", so that an eventual
-                  fusion will use "a_control_to_fuse" instead of
-                  "its_successor": */
-               if (hash_defined_p(controls_to_fuse_with_their_successors,
-                                  (char *) its_successor)) {
-                  /* Ok, "its_successor" is a node to fuse or that has
-                     been already fused (in this case the following is
-                     useless, but anyway...). Thus we keep track of
-                     its new location: */
-                  hash_update(controls_to_fuse_with_their_successors,
-                              (char *) its_successor,
-                              (char *) a_control_to_fuse);
-               }
+                  /* Link the first node with the third one in the forward
+                     direction: */
+                  CONTROL(CAR(control_successors(a_control_to_fuse))) =
+                     the_third_successor;
+                  /* Since the third successor may have more than 1
+                     predecessor, we need to update only the link to
+                     "its_successor": */
+                  MAPL(another_control_list,
+                       {
+                          if (CONTROL(CAR(another_control_list)) == its_successor) {
+                             CONTROL(CAR(another_control_list)) =
+                                a_control_to_fuse;
+                             break;
+                          }
+                       },
+                          control_predecessors(the_third_successor));
+                  /* If the node "its_successor" is in the fuse list, we
+                     want to keep track of its new place, that is in fact
+                     fused in "a_control_to_fuse", so that an eventual
+                     fusion will use "a_control_to_fuse" instead of
+                     "its_successor": */
+                  if (hash_defined_p(controls_to_fuse_with_their_successors,
+                                     (char *) its_successor)) {
+                     /* Ok, "its_successor" is a node to fuse or that has
+                        been already fused (in this case the following is
+                        useless, but anyway...). Thus we keep track of
+                        its new location: */
+                     hash_update(controls_to_fuse_with_their_successors,
+                                 (char *) its_successor,
+                                 (char *) a_control_to_fuse);
+                  }
 
-               /* If the successor is the exit node, then update
-                  exit_node to point to the new one: */
-               if (its_successor == exit_node)
-                  /* Actually I think it cannot happend according to
-                     some previous conditions... */
-                  exit_node = a_control_to_fuse;
+                  /* If the successor is the exit node, then update
+                     exit_node to point to the new one: */
+                  if (its_successor == exit_node)
+                     /* Actually I think it cannot happend according to
+                        some previous conditions... */
+                     exit_node = a_control_to_fuse;
                   
-               /* Now we remove the useless intermediate node
-                  "its_successor": */
-               control_successors(its_successor) = NIL;
-               control_predecessors(its_successor) = NIL;
-               control_statement(its_successor) = make_empty_statement();
-               gen_free(its_successor);
+                  /* Now we remove the useless intermediate node
+                     "its_successor": */
+                  control_successors(its_successor) = NIL;
+                  control_predecessors(its_successor) = NIL;
+                  control_statement(its_successor) = make_empty_statement();
+                  gen_free(its_successor);
+               }
             },
                controls_to_fuse_with_their_successors);
 
