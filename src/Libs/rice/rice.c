@@ -162,7 +162,7 @@ char *what ;
 
     ifdebug(1) {
 	debug(1, "do_it", "original sequential code:\n\n");
-	print_text(stderr, text_statement(entity_undefined, 0, mod_stat));
+	print_statement(mod_stat);
     }
 
     mod_parallel_stat = copy_statement(mod_stat);
@@ -178,7 +178,7 @@ char *what ;
 
     ifdebug(1) {
 	debug(1, "do_it", "copy of sequential code:\n\n");
-	print_text(stderr, text_statement(entity_undefined, 0, mod_stat));
+	print_statement(mod_stat);
     }
 
     if (graph_undefined_p(dg)) {
@@ -203,7 +203,7 @@ char *what ;
 
     ifdebug(7)
     {
-	fprintf(stderr, "\nparalized code %s:",mod_name);
+	fprintf(stderr, "\nparallelized code %s:",mod_name);
 	if (gen_consistent_p((statement)mod_parallel_stat))
 	    fprintf(stderr," gen consistent ");
     }
@@ -287,8 +287,8 @@ int l ;
     set region;
 
     ifdebug(1) {
-	fprintf(stderr, "\n original nest of loops:\n\n");
-	print_text(stderr, text_statement(entity_undefined, 0, stat));
+	debug(1, "rice_loop", "original nest of loops:\n\n");
+	print_statement(stat);
     }
 
     if ((region = distributable_loop(stat)) == set_undefined) {
@@ -308,29 +308,38 @@ int l ;
     }
 
     ifdebug(2) {
-	fprintf(stderr, "[rice_loop] applied on region:\n");
+	debug(2, "rice_loop", "applied on region:\n");
 	print_statement_set(stderr, region);
     }
 
     set_enclosing_loops_map( loops_mapping_of_statement(stat) );
 
     nstat = CodeGenerate(dg, region, l, TRUE);
-    if (get_debug_level() >=7){
-	fprintf(stderr, "\nCodeGenerate : ");
+    ifdebug(7){
+	debug(7, "rice_loop", "consistency checking for CodeGenerate output: ");
 	if (gen_consistent_p((statement)nstat))
 	    fprintf(stderr," gen consistent\n");
     }
     pips_assert( "rice_loop", nstat != statement_undefined ) ;
+    /* FI: I'd rather not return a block when a unique loop statement has to
+     * be wrapped.
+     */
+    /*
     pips_assert("rice_loop", 
 		instruction_block_p(statement_instruction(nstat))) ;
+		*/
+    pips_assert("rice_loop", 
+		instruction_block_p(statement_instruction(nstat)) ||
+		instruction_loop_p(statement_instruction(nstat))) ;
     statement_label(nstat) = entity_empty_label();
-    statement_number(nstat) = statement_number(stat);
+    statement_number(nstat) = (statement_block_p(nstat)? STATEMENT_NUMBER_UNDEFINED :
+			       statement_number(stat));
     statement_ordering(nstat) = statement_ordering(stat);
     statement_comments(nstat) = statement_comments(stat);
 
     ifdebug(1) {
 	fprintf(stderr, "final nest of loops:\n\n");
-	print_text(stderr, text_statement(entity_undefined, 0, nstat));
+	print_statement(nstat);
     }
 
     /* StatementToContext should be freed here. but it is not easy. */
