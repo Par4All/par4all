@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/03/20 19:37:04 $, )
+ * ($Date: 1996/04/17 18:31:56 $, )
  */
 
 #include "defines-local.h"
@@ -761,6 +761,14 @@ continue_propagation_p(statement s)
 		}
 	    },
 		call_arguments(c));
+	}
+	else if (dead_fcd_directive_p(fun))
+	{
+	    entity primary = safe_load_primary_entity(old_variable);
+	    
+	    MAP(EXPRESSION, e, 
+		if (primary==expression_to_entity(e)) return FALSE,
+		call_arguments(c)); 
 	}
 
 	return TRUE;
