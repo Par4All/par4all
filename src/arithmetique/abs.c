@@ -3,7 +3,8 @@
 /*LINTLIBRARY*/
 
 #include <stdio.h>
-#include <values.h>
+/* #include <values.h> */
+#include <limits.h>
 #include <setjmp.h>
 
 #include "arithmetique.h"
@@ -35,10 +36,10 @@ int ofl_ctrl;
 
     extern jmp_buf overflow_error;
     
-    if ((ofl_ctrl == 1) && (i == -MAXINT-1))   
+    if ((ofl_ctrl == 1) && (i == INT_MIN))   
 	longjmp(overflow_error, 5);
         
-    assert(i != -MAXINT-1);
+    assert(i != INT_MIN);
     return (i>0) ? i: -i;    
     
 }
