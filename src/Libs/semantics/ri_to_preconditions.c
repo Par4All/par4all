@@ -341,64 +341,13 @@ call_to_postcondition(
 
     return post;
 }
-
-transformer 
-data_to_precondition(m)
-entity m;
-{
-    transformer pre = transformer_identity();
-    /* cons * effects_ = 
-	load_statement_cumulated_effects(
-           code_statement(value_code(entity_initial(m)))); */
-    /* FI: to be recoded using a hash_map on one of value_mappings' hash
-       tables or the argument field of m's intraprocedural transformer;
-       statement s of module m could be passed as argument */
-    list effects_ = load_module_intraprocedural_effects(m);
-    /* the same entity might be entered twice, once as part of a read
-       effect and a second time as part of a write effect; b is used
-       to keep track of them */
-    Pbase b = (Pbase) VECTEUR_NUL;
 
-    /* assume m is a module and value mappings for m are available */
+/******************************************************** DATA PRECONDITIONS */
 
-    /* FI: variables v initialized in a BLOCKDATA foo are not recognized 
-     * because they are known as foo:v in the symbole table and not 
-     * identified in the effects since a blockdata does not read or write any 
-     * variable 
-     */
-
-    pips_debug(8, "begin for %s\n", module_local_name(m));
-
-    /* look for entities with an integer initial value that are analyzed */
-    MAPL(cef,
-     {entity e = reference_variable(effect_reference(EFFECT(CAR(cef))));
-      value val = entity_initial(e);
-      if(value_constant_p(val) && constant_int_p(value_constant(val))) {
-	  int int_val = constant_int(value_constant(val));
-	  if(entity_has_values_p(e)
-	     && !base_contains_variable_p(b, (Variable) e)) {
-	      Pvecteur v = vect_new((Variable) e, VALUE_ONE);
-	      vect_add_elem(&v, TCST, int_to_value(-int_val));
-	      pre = transformer_equality_add(pre, v);
-	      b = vect_add_variable(b, (Variable) e);
-	  }}},
-	 effects_);
-
-    base_rm(b);
-    pips_assert("data_to_precondition", pre != transformer_undefined);
-
-    ifdebug(8) {
-	dump_transformer(pre);
-	debug(8, "data_to_precondition", "end for %s\n", module_local_name(m));
-    }
-
-    return pre;
-}
-
-/* a simpler remake of the previous one that works in all cases. FC.
+/* a remake that works in all cases. FC.
  */
-transformer 
-all_data_to_precondition(entity m) 
+static transformer 
+data_to_prec_for_variables(entity m, list /* of entity */le) 
 {
   transformer pre = transformer_identity();
   linear_hashtable_pt b = linear_hashtable_make(); /* already seen */
@@ -418,8 +367,9 @@ all_data_to_precondition(entity m)
 	int int_val = constant_int(value_constant(val));
 	if(entity_has_values_p(e) && !linear_hashtable_isin(b, e))
 	{
-	  Pvecteur v = vect_new((Variable) e, VALUE_ONE);
-	  vect_add_elem(&v, TCST, int_to_value(-int_val));
+	  Pvecteur v = vect_make(VECTEUR_NUL,
+				 (Variable) e, VALUE_ONE,
+				 TCST, int_to_value(-int_val));
 	  pre = transformer_equality_add(pre, v);
 	  linear_hashtable_put_once(b, e, e);
 	}
@@ -431,14 +381,14 @@ all_data_to_precondition(entity m)
 	  Pvecteur v = vect_make(VECTEUR_NUL,
 				 (Variable) e, VALUE_ONE,
 				 (Variable) constant_call(c), VALUE_MONE,
-				 NULL);
+				 TCST, VALUE_ZERO);
 	  pre = transformer_equality_add(pre, v);
 	  linear_hashtable_put_once(b, e, e);
 	}
       }
     }
   },
-      code_declarations(entity_code(m)));
+      le);
       
   linear_hashtable_free(b);
   pips_assert("some transformer", pre != transformer_undefined);
@@ -448,6 +398,36 @@ all_data_to_precondition(entity m)
     pips_debug(8, "end for %s\n", module_local_name(m));
   }
   
+  return pre;
+}
+
+/* returns an allocated list of entities that appear in lef.
+ * an entity may appear several times.
+ */
+list effects_to_entity_list(list lef)
+{
+  list le = NIL;
+  MAP(EFFECT, e, 
+      le = CONS(ENTITY, reference_variable(effect_reference(e)), le),
+      lef);
+  return gen_nreverse(le);
+}
+
+/* restricted to variables with effects. */
+transformer data_to_precondition(entity m)
+{
+  list lef = load_module_intraprocedural_effects(m);
+  list le = effects_to_entity_list(lef);
+  transformer pre = data_to_prec_for_variables(m, le);
+  gen_free_list(le);
+  return pre;
+}
+
+/* any variable is included. */
+transformer all_data_to_precondition(entity m)
+{
+  transformer pre =
+    data_to_prec_for_variables(m, code_declarations(entity_code(m)));
   return pre;
 }
 
