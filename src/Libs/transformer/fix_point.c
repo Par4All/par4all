@@ -803,13 +803,13 @@ look_for_the_best_counter(Pcontrainte egs)
 			failed = TRUE;
 		}
 		else if(new_value_entity_p((entity) vecteur_var(lv))) {
-		    if(entity_undefined_p(new_index))
+		    if(entity_undefined_p(p_new_index))
 			p_new_index = (entity) vecteur_var(lv);
 		    else
 			failed = TRUE;
 		}
 		else {
-		    pips_error("transformer_pattern_fix_point", "Unexpected value entity %s",
+		    pips_error("look_for_the_best_counter", "Unexpected value entity %s",
 			       entity_local_name((entity) vecteur_var(lv)));
 		}
 	    }
