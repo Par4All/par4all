@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/12/22 16:57:25 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/04/21 17:01:50 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -333,8 +333,8 @@ c
       integer bufid, info
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
-      call pvmfsend(COMPUTERTID, NODECHANNELS(CLID), info)
-      NODECHANNELS(CLID) = NODECHANNELS(CLID) + 2
+      call pvmfsend(COMPUTERTID, SENDCHANNELS(CLID), info)
+      SENDCHANNELS(CLID) = SENDCHANNELS(CLID) + 2
       end
 c
 c-----------------
@@ -368,8 +368,8 @@ c
       debug(`print *, "sending to ", OLID')
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
-      call pvmfsend(OWNERTID, NODECHANNELS(OLID), info)
-      NODECHANNELS(OLID) = NODECHANNELS(OLID) + 2
+      call pvmfsend(OWNERTID, SENDCHANNELS(OLID), info)
+      SENDCHANNELS(OLID) = SENDCHANNELS(OLID) + 2
       end
 c
 c-----------------
@@ -585,9 +585,9 @@ c
      $                             indp, OPN, lid, .FALSE.)
                               call pvmfsend(
      $                             NODETIDS(lid), 
-     $                             NODECHANNELS(lid), 
+     $                             SENDCHANNELS(lid), 
      $                             info)
-                              NODECHANNELS(lid) = NODECHANNELS(lid) + 2
+                              SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
                               debug(`print *, "sending to ", lid')
                            enddo
                         enddo
@@ -654,9 +654,9 @@ c
                            if (lid.NE.CLID) then
                               call pvmfsend(
      $                             NODETIDS(lid), 
-     $                             NODECHANNELS(lid), 
+     $                             SENDCHANNELS(lid), 
      $                             info)
-                              NODECHANNELS(lid) = NODECHANNELS(lid) + 2
+                              SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
                            endif
                         enddo
                      enddo
@@ -696,8 +696,8 @@ c
      $           result = result.AND.(OINDP(i).EQ.indp(i))
          enddo
          if (.NOT.result) then
-            call pvmfsend(NODETIDS(lid), NODECHANNELS(lid), info)
-            NODECHANNELS(lid) = NODECHANNELS(lid) + 2
+            call pvmfsend(NODETIDS(lid), SENDCHANNELS(lid), info)
+            SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
          endif
       enddo
       end
@@ -725,9 +725,9 @@ c
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfrecv(SENDERTID, NODECHANNELS(SLID), bufid)
+      call pvmfrecv(SENDERTID, RECVCHANNELS(SLID), bufid)
       call pvmfunpack(what, goal, 1, 1, info)
-      NODECHANNELS(SLID) = NODECHANNELS(SLID) + 2
+      RECVCHANNELS(SLID) = RECVCHANNELS(SLID) + 2
       end
 c
 c-----------------
@@ -739,9 +739,9 @@ c
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfrecv(COMPUTERTID, NODECHANNELS(CLID), bufid)
+      call pvmfrecv(COMPUTERTID, RECVCHANNELS(CLID), bufid)
       call pvmfunpack(what, goal, 1, 1, info)
-      NODECHANNELS(CLID) = NODECHANNELS(CLID) + 2
+      RECVCHANNELS(CLID) = RECVCHANNELS(CLID) + 2
       end
 c
 c-----------------
@@ -956,7 +956,10 @@ c
       include "hpfc_commons.h"
       integer i
       do i=1, NBOFTASKS
-         NODECHANNELS(i) = 2
+         SENDCHANNELS(i) = 2
+      enddo
+      do i=1, NBOFTASKS
+         RECVCHANNELS(i) = 2
       enddo
       MCASTNODES = 1
       MCASTHOST  = 3
@@ -1078,7 +1081,7 @@ c
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
-      call pvmfrecv(NTID, NODECHANNELS(NLID), info)
+      call pvmfrecv(NTID, RECVCHANNELS(NLID), info)
       end
 c
 c-----------------
@@ -1089,7 +1092,7 @@ c
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
-      call pvmfsend(NTID, NODECHANNELS(NLID), info)
+      call pvmfsend(NTID, SENDCHANNELS(NLID), info)
       end
 c
 c-----------------
