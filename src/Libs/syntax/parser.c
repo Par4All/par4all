@@ -121,7 +121,7 @@ the_actual_parser(
 
 /* parser for HPFC.
  * just a different input file not to touch the original source file.
- * this parser should be generated automatically.
+ * this parser should be selected/activated automatically.
  */
 bool hpfc_parser(string module)
 {
