@@ -1,5 +1,5 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/09/03 11:28:24 $, 
+ * $Date: 1996/09/03 18:14:03 $, 
  */
 
 #include <unistd.h>
@@ -719,6 +719,7 @@ int
 XPOMP_draw_frame(XPOMP_display screen,
 		 char * title,
 		 int title_color,
+		 int background_color,
 		 int X0,
 		 int Y0,
 		 int X1,
@@ -740,6 +741,7 @@ XPOMP_draw_frame(XPOMP_display screen,
 	sh->p4 = Y1;
 	sh->p5 = color;
 	sh->p6 = title_color;
+	sh->p7 = background_color;
 	strcpy(sh->buf1, title);
 	sh->lock = 1;
 	pc_basic_flush(sh);
@@ -945,11 +947,12 @@ FUNCTION_(xpomp_scroll)(XPOMP_display * screen,
 /* Deal with nasty conventions with strings between Fortran and C: */
 void
 FUNCTION_(xpomp_draw_frame)ARGS(`screen, STRING_ARG(title),
-				title_color, X0, Y0, X1, Y1, color,
+				title_color, background_color, X0, Y0, X1, Y1, color,
 				return_value')
 XPOMP_display * screen;
 STRING_ARG_DECL(title);
 int * title_color;
+int * background_color;
 int * X0;
 int * Y0;
 int * X1;
@@ -960,9 +963,10 @@ int * return_value;
     char * c_title = malloc(STRING_LEN(title) + 1);
     (void) memcpy(c_title, STRING_PTR(title), STRING_LEN(title));
     c_title[STRING_LEN(title)] = '\0';
-    
+
+    printf("'%s'->'%s' %d\n", STRING_PTR(title), c_title, STRING_LEN(title));
     *return_value = XPOMP_draw_frame(*screen,
-				     c_title, *title_color,
+				     c_title, *title_color, *background_color,
 				     *X0, *Y0,
 				     *X1, *Y1,
 				     *color);
