@@ -281,7 +281,7 @@ transformer_normalize(transformer t, int level)
 	  /* Very expensive: the system is rebuilt by adding constraints
 	   * one by one
 	   */
-	  r = sc_safe_build_sc_nredund_1pass(r);
+	  sc_safe_build_sc_nredund_1pass(&r);
 	  break;
 	  
 	default:
