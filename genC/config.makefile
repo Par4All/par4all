@@ -1,6 +1,5 @@
 #
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1997/09/26 12:44:22 $, 
+# $Id$
 #
 # Newgen should be quite particular...
 
@@ -22,7 +21,8 @@ LIB_HEADERS=\
         newgen_generic_function.h \
         newgen_map.h \
         newgen_stack.h \
-	newgen_array.h
+	newgen_array.h \
+	newgen_string.h
 
 OTHER_HEADERS=\
         newgen_include.h \
@@ -43,7 +43,8 @@ LIB_CFILES=\
         set.c \
         list.c \
         stack.c \
-	array.c
+	array.c \
+	string.c
 
 OTHER_CFILES=\
 	new.c \
