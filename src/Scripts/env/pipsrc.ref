@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/09/12 14:12:18 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/09/15 10:42:23 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -91,7 +91,7 @@ PIPS_CC="gcc"
 # For SUNOS' cc:
 # PIPS_CFLAGS="-pipe -temp=${PIPS_TEMPDIR} -g"
 # For GNU cc:
-PIPS_CFLAGS="-O2 -g -ansi -Wall -mv8 -pipe"
+PIPS_CFLAGS="-O2 -g -ansi -pedantic -Wall -mv8 -pipe"
 PIPS_CPPFLAGS="-D__USE_FIXED_PROTOTYPES__ -I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
 # PIPS_LD="cc"
 PIPS_LD="gcc"
