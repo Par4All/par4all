@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/27 16:53:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/29 13:50:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1995/11/27 16:53:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1995/11/29 13:50:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -583,13 +583,12 @@ create_edit_menu()
                 MENU_ACTION_ITEM, SEQUENTIAL_GRAPH_VIEW, view_notify,
                                 /* Just a separator: */
                 WPIPS_MENU_SEPARATOR,
-                MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
-                                 /* Just a separator: */
+                MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
+                                /* Just a separator: */
                 WPIPS_MENU_SEPARATOR,
                 MENU_ACTION_ITEM, ARRAY_DFG_VIEW, view_notify,
-                MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
-                MENU_ACTION_ITEM, PLACEMENT_VIEW, view_notify,
                 MENU_ACTION_ITEM, TIME_BASE_VIEW, view_notify,
+                MENU_ACTION_ITEM, PLACEMENT_VIEW, view_notify,
                                  /* Just a separator: */
                 WPIPS_MENU_SEPARATOR,
                 MENU_ACTION_ITEM, CALLGRAPH_VIEW, view_notify,
@@ -597,7 +596,12 @@ create_edit_menu()
                                  /* Just a separator: */
                 WPIPS_MENU_SEPARATOR,
                 MENU_ACTION_ITEM, DISTRIBUTED_VIEW, view_notify,
+                MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
+                                 /* Just a separator: */
+                WPIPS_MENU_SEPARATOR,
                 MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
+                                 /* Just a separator: */
+                WPIPS_MENU_SEPARATOR,
                 MENU_APPEND_ITEM, close_menu_item,
                 NULL);
 
