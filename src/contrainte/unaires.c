@@ -295,7 +295,7 @@ Pbase base_index;
 void 
 contrainte_vect_sort(c, compare)
 Pcontrainte c;
-int (*compare)();
+int (*compare)(Pvecteur *, Pvecteur *);
 {
     for (; c!=NULL; c=c->succ)
 	vect_sort_in_place(&c->vecteur, compare);
