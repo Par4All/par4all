@@ -3,8 +3,8 @@
 # $Id$
 # 
 # $Log: hpfc,v $
-# Revision 1.27  1997/05/03 15:36:53  coelho
-# *** empty log message ***
+# Revision 1.28  1997/06/07 09:12:30  coelho
+# -T option passed to hpfc_compile.
 #
 # Revision 1.26  1997/05/03 15:32:46  coelho
 # more help.
@@ -42,6 +42,7 @@ usage()
 	    -d: demo (default)
 	    -q: quiet
 	    -t: timings
+	    -T: time pips
 	    -o name: name for the generated file (forwarded to compiler)
 	    -D macro: additionnal cpp macros
 	    -E var=val: additional environment variables
@@ -86,6 +87,7 @@ usage()
 HPFC_MODE=${HPFC_MODE:-demo}
 export HPFC_MODE
 TIMING=void
+unset COPT
 
 # options
 
@@ -96,7 +98,8 @@ do
     q) HPFC_MODE=demo ;;
     d) HPFC_MODE=debug ;;
     t) TIMING=timing ;;
-    o) COPT="-w $OPTARG";;
+    T) COPT="-T $COPT" ;; 
+    o) COPT="-w $OPTARG $COPT";;
     h) usage 0 ;;
     D) PIPS_CPP_FLAGS="$PIPS_CPP_FLAGS -D$OPTARG" ;;
     E) export $OPTARG ;;
