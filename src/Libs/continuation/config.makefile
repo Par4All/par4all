@@ -36,4 +36,4 @@ MAIN=		main
 # Do not include the main program source file.
 LIB_CFILES=	continuation.c
 LIB_HEADERS=	continuation-local.h
-LIB_OBJECTS=	continuation.0
+LIB_OBJECTS=	continuation.o
