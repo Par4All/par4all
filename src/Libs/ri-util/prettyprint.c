@@ -1,3 +1,8 @@
+/* 	%A% ($Date: 1995/09/05 15:18:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+static char vcid[] = "%A% ($Date: 1995/09/05 15:18:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
   *
@@ -38,10 +43,11 @@
 /* Define the markers used in the raw unstructured output when the
    PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH property is true: */
 #define PRETTYPRINT_UNSTRUCTURED_BEGIN_MARKER "\200Unstructured"
+#define PRETTYPRINT_UNSTRUCTURED_END_MARKER "\201Unstructured End"
+#define PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER "\202Unstructured Item"
+#define PRETTYPRINT_UNSTRUCTURED_SUCCESSOR_MARKER "\203Unstructured Successor ->"
 #define PRETTYPRINT_UNSTRUCTURED_EDGE_MARKER "\201Unstructured Edge"
 #define PRETTYPRINT_UNSTRUCTURED_EDGE_WITH_NODE_MARKER "\206Unstructured Edge With Node"
-#define PRETTYPRINT_UNSTRUCTURED_END_MARKER "\202Unstructured End"
-#define PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER "\203Unstructured Item"
 #define PRETTYPRINT_UNSTRUCTURED_SONS_BEGIN_MARKER "\204Unstructured Sons Begin"
 #define PRETTYPRINT_UNSTRUCTURED_SONS_END_MARKER "\205Unstructured Sons End"
 
@@ -898,123 +904,42 @@ add_one_unformated_printf_to_text(text r,
 
 
 void
-output_a_graph_view_of_the_unstructured_edge(text r,
-                                             control from,
-                                             control to)
-{
-   add_one_unformated_printf_to_text(r, "%s %#x -> %#x\n",
-                                     PRETTYPRINT_UNSTRUCTURED_EDGE_MARKER,
-                                     (unsigned int) from,
-                                     (unsigned int) to);
-}
-
-
-void
-output_a_graph_view_of_the_unstructured_edge_with_node(text r,
-                                             control from,
-                                             control to)
-{
-   add_one_unformated_printf_to_text(r, "%s %#x -> %#x\n",
-                                     PRETTYPRINT_UNSTRUCTURED_EDGE_WITH_NODE_MARKER,
-                                     (unsigned int) from,
-                                     (unsigned int) to);
-}
-
-
-void
-output_a_graph_view_of_the_unstructured_sons_begin(text r,
-                                                   control c,
-                                                   list to)
-{
+output_a_graph_view_of_the_unstructured_successors(text r,
+                                                   entity module,
+                                                   int margin,
+                                                   control c)
+{                  
    char buffer[200];
 
-   sprintf(buffer, "%s %#x ->",
-           PRETTYPRINT_UNSTRUCTURED_SONS_BEGIN_MARKER, c);
-   ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                         strdup(buffer)));
-   MAP(CONTROL, a_successor,
-       {
-          sprintf(buffer, " %#x", a_successor);
-          ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                                strdup(buffer)));
-       },
-          to);
-   ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                         strdup("\n")));
-}
+   add_one_unformated_printf_to_text(r, "%s %#x\n",
+                                     PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER,
+                                     (unsigned int) c);
 
-
-void
-output_a_graph_view_of_the_unstructured_sons_end(text r,
-                                                 control c,
-                                                 list to)
-{
-   char buffer[200];
-
-   sprintf(buffer, "%s %#x ->",
-           PRETTYPRINT_UNSTRUCTURED_SONS_END_MARKER, c);
-   ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                         strdup(buffer)));
-   MAP(CONTROL, a_successor,
-       {
-          sprintf(buffer, " %#x", a_successor);
-          ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                                strdup(buffer)));
-       },
-          to);
-   ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                         strdup("\n")));
-}
-
-
-void
-output_a_graph_view_of_the_unstructured_control_map(text r,
-                                                    entity module,
-                                                    string label,
-                                                    int margin,
-                                                    control c,
-                                                    int num,
-                                                    set nodes_already_seen)
-{
-   char buffer[200];
-
-   sprintf(buffer, "%s %#x\n",
-           PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER, c);
-   ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                         strdup(buffer)));
+   if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH")) {
+      add_one_unformated_printf_to_text(r, "C Unstructured node %#x ->",
+                                        (unsigned int) c);
+      MAP(CONTROL, a_successor,
+          {
+             add_one_unformated_printf_to_text(r," %#x",
+                                               (unsigned int) a_successor);
+          },
+             control_successors(c));
+      add_one_unformated_printf_to_text(r,"\n");
+   }
 
    MERGE_TEXTS(r, text_statement(module,
                                  margin,
                                  control_statement(c)));
-   /* Mark the node as visited now: */
-   set_add_element(nodes_already_seen, nodes_already_seen, (char *) c);
 
-   output_a_graph_view_of_the_unstructured_sons_begin(r,
-                                                      c,
-                                                      control_successors(c));
-   
+   add_one_unformated_printf_to_text(r,
+                                     PRETTYPRINT_UNSTRUCTURED_SUCCESSOR_MARKER);
    MAP(CONTROL, a_successor,
        {
-          if (set_belong_p(nodes_already_seen, (char *) a_successor))
-             /* Ok we have already visited this node: */
-             output_a_graph_view_of_the_unstructured_edge(r, c, a_successor);
-          else {
-             /* Display a son (that is a successor): */
-             output_a_graph_view_of_the_unstructured_edge_with_node(r, c, a_successor);
-             output_a_graph_view_of_the_unstructured_control_map(r,
-                                                                 module,
-                                                                 label,
-                                                                 margin,
-                                                                 a_successor,
-                                                                 num,
-                                                                 nodes_already_seen);
-          }
+          add_one_unformated_printf_to_text(r," %#x",
+                                            (unsigned int) a_successor);
        },
-       control_successors(c));
-
-   output_a_graph_view_of_the_unstructured_sons_end(r,
-                                                    c,
-                                                    control_successors(c));
+          control_successors(c));
+   add_one_unformated_printf_to_text(r,"\n");
 }
 
 
@@ -1027,35 +952,32 @@ output_a_graph_view_of_the_unstructured(text r,
                                         int num)
 {
    char buffer[200];
-   set nodes_already_seen = set_make(set_pointer);
+   list blocs = NIL;
    control begin_control = unstructured_control(u);
    control end_control = unstructured_exit(u);
 
-   sprintf(buffer, "%s %#x end: %#x\n",
-           PRETTYPRINT_UNSTRUCTURED_BEGIN_MARKER,
-           (unsigned int) begin_control,
-           (unsigned int) end_control);
-   ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                         strdup(buffer)));
+   add_one_unformated_printf_to_text(r, "%s %#x end: %#x\n",
+                                     PRETTYPRINT_UNSTRUCTURED_BEGIN_MARKER,
+                                     (unsigned int) begin_control,
+                                     (unsigned int) end_control);
 
-   /*  add_one_unformated_printf_to_text(r */
-   
-   output_a_graph_view_of_the_unstructured_control_map(r,
-                                                       module,
-                                                       label,
-                                                       margin,
-                                                       begin_control,
-                                                       num,
-                                                       nodes_already_seen);
+   CONTROL_MAP(c,
+               {
+                  /* Display the statements of each node followed by
+                     the list of its successors if any: */
+                  output_a_graph_view_of_the_unstructured_successors(r,
+                                                                     module,
+                                                                     margin,
+                                                                     c);
+               },
+                  begin_control,
+                  blocs);
+   gen_free_list(blocs);
 
-   sprintf(buffer, "%s %#x end: %#x\n",
-           PRETTYPRINT_UNSTRUCTURED_END_MARKER,
-           (unsigned int) begin_control,
-           (unsigned int) end_control);
-   ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                         strdup(buffer)));
-   
-   set_free(nodes_already_seen);
+   add_one_unformated_printf_to_text(r, "%s %#x end: %#x\n",
+                                     PRETTYPRINT_UNSTRUCTURED_END_MARKER,
+                                     (unsigned int) begin_control,
+                                     (unsigned int) end_control);
 }
 
 
