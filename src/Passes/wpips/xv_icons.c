@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 
+#include <types.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <xview/xview.h>
@@ -8,7 +9,7 @@
 #include <xview/text.h>
 #include <xview/svrimage.h>
 #include <xview/icon.h>
-#include <types.h>
+#include <X11/Xlib.h>
 
 #include "genC.h"
 #include "misc.h"
@@ -39,6 +40,11 @@ static unsigned short int pips_icons_data[LAST_ICON][256] = {
   }
 };
 
+
+/*#include "logo_pips_small.xpm"*/
+#include "logo_pips_small.xbm"
+
+
 void create_icons()
 {
     int i;
@@ -56,6 +62,35 @@ void create_icons()
 }
 
 
+Server_image
+create_status_window_pips_image()
+{
+   Server_image image;
+   /*  Pixmap logo_pips_small_pixmap;
+   
+   logo_pips_small_pixmap = XCreatePixmap((Display *) xv_get(main_frame,
+                                                             XV_DISPLAY),
+                                          (Window) xv_get(main_frame,
+                                                          XV_ID),
+                                                          */                                     
+   image = (Server_image) xv_create(NULL, SERVER_IMAGE,
+                                /*SERVER_IMAGE_PIXMAP,
+                                    logo_pips_small,
+                                    SERVER_IMAGE_X_BITS,
+                                    logo_pips_small,
+                                    SERVER_IMAGE_DEPTH, 8,
+                                    XV_WIDTH, 56,
+                                    XV_HEIGHT, 51,*/
+                                    SERVER_IMAGE_X_BITS,
+                                    logo_pips_small_bits,
+                                    XV_WIDTH, logo_pips_small_width,
+                                    XV_HEIGHT, logo_pips_small_height,
+                                    NULL);
+   
+   return image;
+}
+
+
 void set_pips_icon(Frame frame, int icon_number, char *icon_text)
 {
   /*if (icon_number != PIPS_ICON) return;*/
@@ -66,6 +101,8 @@ void set_pips_icon(Frame frame, int icon_number, char *icon_text)
     int height, width;
 
     image = pips_icon_server_image[icon_number];
+    image = create_status_window_pips_image();
+    
     width = xv_get(image, XV_WIDTH);
     height = xv_get(image, XV_HEIGHT);
 
