@@ -151,25 +151,25 @@ static dg_type = DG_FAST;
 static void rice_dependence_graph(char */*mod_name*/);
 
 
-void rice_fast_dependence_graph(mod_name)
+bool rice_fast_dependence_graph(mod_name)
 char *mod_name;
 {
     dg_type = DG_FAST;
-    rice_dependence_graph(mod_name);
+    return rice_dependence_graph(mod_name);
 }
 
-void rice_full_dependence_graph(mod_name)
+bool rice_full_dependence_graph(mod_name)
 char *mod_name;
 {
     dg_type = DG_FULL;
-    rice_dependence_graph(mod_name);
+    return rice_dependence_graph(mod_name);
 }
 
-void rice_semantics_dependence_graph(mod_name)
+bool rice_semantics_dependence_graph(mod_name)
 char *mod_name;
 {
     dg_type = DG_SEMANTICS;
-    rice_dependence_graph(mod_name);
+    return rice_dependence_graph(mod_name);
 }
 
 
@@ -229,7 +229,7 @@ static void writeresult(char */*mod_name*/);
 
 /* The supplementary call to init_ordering_to_statement should be 
    avoided if ordering.c were more clever. */
-static void rice_dependence_graph(mod_name)
+static bool rice_dependence_graph(mod_name)
 char *mod_name;
 {
     FILE *fp;
@@ -354,6 +354,7 @@ char *mod_name;
     reset_cumulated_effects_map();
     reset_enclosing_loops_map();
 
+    return TRUE;
 }
 
 
@@ -2087,31 +2088,32 @@ effect ef1,ef2;
 /* DG PRINTING FUNCTIONS                                                         */
 /*********************************************************************************/
 
-void print_whole_dependence_graph(mod_name)
+bool print_whole_dependence_graph(mod_name)
 string mod_name;
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS", FALSE);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS", FALSE);
-    print_dependence_graph(mod_name);
+    return print_dependence_graph(mod_name);
 }
 
-void print_effective_dependence_graph(mod_name)
+bool print_effective_dependence_graph(mod_name)
 string mod_name;
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS", TRUE);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS", FALSE);
-    print_dependence_graph(mod_name);
+    print_return dependence_graph(mod_name);
 }
 
-void print_loop_carried_dependence_graph(mod_name)
+bool print_loop_carried_dependence_graph(mod_name)
 string mod_name;
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS", TRUE);
-    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS", TRUE);
-    print_dependence_graph(mod_name);
+    set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS",
+		      TRUE);
+    return print_dependence_graph(mod_name);
 }
 
-void print_dependence_graph(mod_name)
+bool print_dependence_graph(mod_name)
 string mod_name;
 {
     string dg_name;
@@ -2145,6 +2147,8 @@ string mod_name;
 
     reset_current_module_statement();
     reset_current_module_entity();
+
+    return TRUE;
 }
 
 
