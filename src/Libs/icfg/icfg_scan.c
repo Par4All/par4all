@@ -463,7 +463,7 @@ void print_module_icfg(entity module)
     make_icfg_map();
     make_current_stmt_stack();
 
-    /*append_marged_text(txt, 0, module_name, "");*/
+    append_marged_text(txt, 0, module_name, "");
 
     current_margin = ICFG_SCAN_INDENT;
 
