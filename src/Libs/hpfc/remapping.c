@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/04/24 14:32:29 $, ) 
+ * ($Date: 1995/04/24 15:47:58 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -262,14 +262,19 @@ Psysteme s;
 list /* of entities */ ll, /* of expressions */ ld;
 entity lid, src, trg;
 {
-    statement inner =
-	in(t, src, trg, get_ith_local_dummy, get_ith_local_prime);
+    statement 
+	inner =	in(t, src, trg, get_ith_local_dummy, get_ith_local_prime),
+	result = make_block_statement
+	    (CONS(STATEMENT, pre(t, lid),
+	     CONS(STATEMENT, elements_loop(s, ll, ld, inner),
+	     CONS(STATEMENT, post(t, lid),
+		  NIL))));
 
-    return(make_block_statement
-	   (CONS(STATEMENT, pre(t, lid),
-	    CONS(STATEMENT, elements_loop(s, ll, ld, inner),
-	    CONS(STATEMENT, post(t, lid),
-		 NIL)))));
+    statement_comments(result) = 
+	strdup(concatenate("c - %sing\n",
+			   t==0 ? "copy" :
+			   t==1 ? "send" :
+			   t==2 ? "receiv" : "?"));
 }
 
 static statement
