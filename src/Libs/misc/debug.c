@@ -68,8 +68,8 @@ void set_debug_stack_pointer(i)
 	    }
 	    else {
 		set_debug_level(0);
+	    }
 	}
-    }
     }
     else
 	pips_error("set_debug_stack_pointer", 
