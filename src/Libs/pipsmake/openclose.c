@@ -65,7 +65,7 @@ string  make_open_workspace(string name)
 	else
 	{
 	    pips_user_warning("Cannot read properties...\n");
-	    db_close_workspace();
+	    db_close_workspace(TRUE);
 	}
     } else
 	pips_user_warning("No workspace %s to open\n", name);
