@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/04/24 16:39:17 $, ) 
+ * ($Date: 1995/04/24 17:01:10 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -271,9 +271,7 @@ entity lid, src, trg;
 		  NIL))));
 
     statement_comments(result) = 
-	strdup(concatenate("c - ",
-			   t==0 ? "copy" :
-			   t==1 ? "send" :
+	strdup(concatenate("c - ", t==0 ? "copy" : t==1 ? "send" :
 			   t==2 ? "receiv" : "?", "ing\n", NULL));
 
     return(result);
@@ -300,9 +298,20 @@ list /* of entities */ l, lp, ll, /* of expressions */ ld;
 	    (procs, lp, l, p_trg, p_src, lid,
 	     get_ith_processor_prime, get_ith_processor_dummy,
 	     if_different_pe(lid, remap_recv, remap_copy), TRUE),
+	cont = make_empty_statement(),
 	result = make_block_statement(CONS(STATEMENT, send,
 				      CONS(STATEMENT, recv,
-					   NIL)));
+				      CONS(STATEMENT, cont,
+					   NIL))));
+
+    /*   some comments are generated to help understand the generated code
+     */
+    statement_comments(result) =
+	strdup(concatenate("c remapping ", entity_local_name(src), 
+			   " -> ", entity_local_name(trg), "\n", NULL));
+    statement_comments(send) = strdup("c send part\n");
+    statement_comments(recv) = strdup("c receive part\n");
+    statement_comments(cont) = strdup("c end of remapping\n");
     
     DEBUG_STAT(3, "result", result);
     
@@ -338,9 +347,6 @@ entity src, trg;
     DEBUG_SYST(3, "enum", enume);
 
     s = generate_remapping_code(src, trg, proc, enume, l, lp, scanners, lddc);
-    statement_comments(s) =
-	strdup(concatenate("c remapping ", entity_local_name(src), 
-			   " -> ", entity_local_name(trg), "\n", NULL));
     
     return(s);
 }
