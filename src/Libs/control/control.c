@@ -1,7 +1,7 @@
 
 /* - control.c
 
-   Computes the Structured Control Graph of a given statement. 
+   Computes the Hierarchical Control Flow Graph of a given statement. 
 
    WARNINGS: 
 
@@ -343,7 +343,7 @@ loop l;
 statement loop_test(l)
 loop l;
 {
-    call c = make_call(entity_intrinsic(".LE."),
+    call c = make_call(entity_intrinsic(".GT."),
 		        CONS(EXPRESSION,
 			     make_entity_expression(loop_index(l), NIL),
 			     CONS(EXPRESSION,
@@ -422,7 +422,7 @@ hash_table used_labels;
 	control_predecessors(c_test) =
 		CONS(CONTROL, c_res, CONS(CONTROL, c_inc, NIL)),
 	control_successors(c_test) =
-		CONS(CONTROL, c_body, CONS(CONTROL, succ, NIL));
+		CONS(CONTROL, succ, CONS(CONTROL, c_body, NIL));
 	control_statement(c_inc) = loop_inc(l);
 	control_successors(c_inc) = CONS(CONTROL, c_test, NIL);
 	UPDATE_CONTROL(c_res,
