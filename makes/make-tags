@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS STuff
-# $RCSfile: make-tags,v $ ($Date: 1994/12/09 12:01:27 $, )
+# $RCSfile: make-tags,v $ ($Date: 1995/08/08 17:32:36 $, )
 # version $Revision$,
 # got on %D%, %T%
 # %A%
@@ -32,7 +32,7 @@ FILES=/tmp/PIPS-FILES
 # only directories in this variable
 #
 
-PATHNAME_LIST="${DEVEDIR}/Lib/[a-z]* ${DEVEDIR}/Passes/[a-z]* ${INCLUDEDIR} ${EXTEDIR} ${NEWGENDIR}/C"
+PATHNAME_LIST="${PIPS_DEVEDIR}/Lib/[a-z]* ${PIPS_DEVEDIR}/Passes/[a-z]* ${PIPS_INCLUDEDIR} ${PIPS_EXTEDIR} ${NEWGENDIR}/C"
 
 rm -f $FILES $TAGS
 
