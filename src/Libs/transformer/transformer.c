@@ -595,7 +595,8 @@ entity e2;
 		 a);
 	}
 	else {
-	    pips_error("transformer_value_substitute", "conflict between e1=%s and e2=%s\n",
+	    pips_error("transformer_value_substitute",
+		       "cannot substitute e1=%s by e2=%s: e2 already in basis\n",
 		       entity_name(e1), entity_name(e2));
 	}
     }
