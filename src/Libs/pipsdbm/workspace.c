@@ -149,7 +149,7 @@ static bool save_meta_data(bool do_free)
     pips_debug(2, "saving database symbols\n");
     file_name = meta_data_db_file_name(DATABASE_SYMBOLS);
     file = safe_fopen(file_name, "w");
-    gen_write_tabulated(file, db_symbol_domain);
+    write_tabulated_db_symbol(file);
     safe_fclose(file, file_name);
     free(file_name);
 
@@ -200,9 +200,7 @@ static bool load_meta_data(void)
     file_name = meta_data_db_file_name(DATABASE_SYMBOLS);
     file = check_fopen(file_name, "r");
     ONERROR(!file,/* nope */)
-    read = gen_read_tabulated(file, FALSE);
-    ONERROR(read!=db_symbol_domain,
-	    pips_user_error("Invalid symbol domain in metadata!"))
+    read_tabulated_db_symbol(file);
 	    
     safe_fclose(file, file_name);
     free(file_name);
