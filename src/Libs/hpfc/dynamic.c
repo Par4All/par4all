@@ -6,7 +6,7 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/05/05 16:42:36 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/05/05 16:51:09 $, )
  * version $Revision$
  */
 
@@ -858,9 +858,7 @@ static list /* of statements */
 list_of_remapping_statements()
 {
     list /* of statements */ l = NIL;
-
     CONTROLMAP_MAP(s, c, l = CONS(STATEMENT, s, l), get_remapping_graph());
-
     return(l);
 }
 
