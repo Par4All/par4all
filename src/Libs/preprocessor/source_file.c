@@ -202,7 +202,10 @@ string file;
     chdir(database_directory(pgm));
     /* reverse sort because the list of modules is reversed later */
     system(concatenate("pips-split ", abspath,
-		       "| sed -e /zzz00[0-9].f/d | sort -r > ", tempfile, NULL));
+		       "| sed -e /zzz00[0-9].f/d | sort -r > ",
+		       tempfile, NULL));
+    chdir(cwd);
+    free(cwd);
 
     /* the newly created module files are registered in the database */
     fd = safe_fopen(tempfile, "r");
@@ -228,7 +231,4 @@ string file;
      */
     unlink(tempfile);
     tempfile = NULL;
-
-    chdir(cwd);
-    free(cwd);
 }
