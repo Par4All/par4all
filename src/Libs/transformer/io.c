@@ -5,9 +5,8 @@
 
 #include <stdio.h>
 
-#include "misc.h"
-
 #include "genC.h"
+#include "misc.h"
 #include "ri.h"
 #include "ri-util.h"
 
