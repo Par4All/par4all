@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 11:52:43 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 15:15:20 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -525,7 +525,8 @@ quick-install: .quick-install
 	touch .makefile
 
 generate_makefile_if_necessary_and_possible:
-	-@[ -x $(PIPS_UTILDIR)/pips-makemake ] && $(MAKE) .makefile
+	-@[ -x $(PIPS_UTILDIR)/pips-makemake ] && \
+		$(MAKE) --no-print-directory  .makefile 
 
 count:
 	@wc -l $(SOURCES)
