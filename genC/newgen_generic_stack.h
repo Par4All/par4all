@@ -2,7 +2,7 @@
  * Fabien COELHO, 05/12/94
  * 
  * $RCSfile: newgen_generic_stack.h,v $ verison $Revision$
- * $Date: 1998/12/24 09:30:26 $, 
+ * $Date: 1999/05/27 15:10:35 $, 
  * got on %D%, %T%
  */
 
@@ -39,7 +39,7 @@ PREFIX bool name##_empty_p()\
 { return(stack_empty_p(name##_stack));}\
 PREFIX int name##_size()\
 { return(stack_size(name##_stack));}\
-void error_reset_##name##_stack(void)\
+PREFIX void error_reset_##name##_stack(void)\
 { name##_stack = stack_undefined;} \
 static void check_##name##_stack()\
 { stack s = get_##name##_stack();\
@@ -57,6 +57,7 @@ static void check_##name##_stack()\
   assert(name##_size()==0);\
   free_##name##_stack();\
   reset_##name##_stack();\
+  error_reset_##name##_stack();\
   set_##name##_stack(s);\
 }
 
