@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1996/04/03 08:38:01 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1996/04/04 10:01:51 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -763,12 +763,18 @@ HPFC_USE_BUFFERS TRUE
 This transfomation privatizes array sections. Several privitizability
 criterions could be applied, and its not clear which one should be used. The
 default case is to remove potential false dependences between
-iterations. The following option, when set to false, remove this
+iterations. The first option, when set to false, removes this
 constraint. It is useful for single assignment programs, to discover what
-section is really local to each iteration.
+section is really local to each iteration. When the second option is set to
+false, the copy-out problem is not considered, i.e. only array elements that
+are not further resued in the program continuation can be privatized. 
 
 \begin{verbatim}
 ARRAY_PRIV_FALSE_DEP_ONLY TRUE
+\end{verbatim}
+
+\begin{verbatim}
+ARRAY_SECTION_PRIV_COPY_OUT TRUE
 \end{verbatim}
 
 \subsubsection{Partial Atomizer}
