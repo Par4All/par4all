@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.75  1997/09/16 07:58:28  coelho
+ * more debug, and print dimension of SAVEd args?
+ *
  * Revision 1.74  1997/09/15 14:28:53  coelho
  * fixes for new COMMON prefix.
  *
@@ -38,7 +41,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.74 1997/09/15 14:28:53 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.75 1997/09/16 07:58:28 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -191,7 +194,7 @@ words_declaration(
 
     if (type_variable_p(entity_type(e)))
     {
-	if (!((variable_in_common_p(e) || variable_static_p(e)) &&
+	if (!(variable_in_common_p(e) &&
 	      !prettyprint_common_variable_dimensions_p))
 	{
 	    if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
@@ -1694,30 +1697,36 @@ text_entity_declaration(entity module, list ldecl)
 	else if (param || external)
 	{
 	    before = CONS(SENTENCE, sentence_basic_declaration(e), before);
-	    if (param) 
+	    if (param) {
 		/*        PARAMETER
 		 */
+		pips_debug(7, "considered as a parameter\n");
 		before = CONS(SENTENCE, sentence_symbolic(e), before);
-	    else 
+	    } else {
 		/*        EXTERNAL
 		 */
+		pips_debug(7, "considered as an external\n");
 		before = CONS(SENTENCE, sentence_external(e), before);
+	    }
 	 }
 	else if (area_p && !SPECIAL_COMMON_P(e))
 	{
 	    /*            AREAS 
 	     */	     
+	    pips_debug(7, "considered as a regular common\n");
 	    area_decl = CONS(SENTENCE, sentence_area(e, module), area_decl);
 	}
 	else if (var)
 	{
 	    basic b = variable_basic(type_variable(te));
+	    pips_debug(7, "is a variable...\n");
 	    
 	    switch (basic_tag(b)) 
 	    {
 	    case is_basic_int:
 		 /* simple integers are moved ahead...
 		  */
+		pips_debug(7, "is an integer\n");
 		if (variable_dimensions(type_variable(te)))
 		{
 		    pi = CHAIN_SWORD(pi, pi==NIL ? "INTEGER " : ",");
@@ -1730,6 +1739,7 @@ text_entity_declaration(entity module, list ldecl)
 		}
 		break;
 	    case is_basic_float:
+		pips_debug(7, "is a float\n");
 		switch (basic_float(b))
 		{
 		case 4:
@@ -1744,6 +1754,7 @@ text_entity_declaration(entity module, list ldecl)
 		}
 		break;			
 	    case is_basic_logical:
+		pips_debug(7, "is a logical\n");
 		pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ",");
 		pl = gen_nconc(pl, words_declaration(e, !from_hpfc));
 		break;
@@ -1752,12 +1763,14 @@ text_entity_declaration(entity module, list ldecl)
 		 */
 		break; 
 	    case is_basic_complex:
+		pips_debug(7, "is a complex\n");
 		pc = CHAIN_SWORD(pc, pc==NIL ? "COMPLEX " : ",");
 		pc = gen_nconc(pc, words_declaration(e, !from_hpfc));
 		break;
 	    case is_basic_string:
 	    {
 		value v = basic_string(b);
+		pips_debug(7, "is a string\n");
 		
 		if (value_constant_p(v) && constant_int_p(value_constant(v)))
 		{
