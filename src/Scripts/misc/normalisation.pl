@@ -190,8 +190,8 @@ sub save
 
 	if ($opt_control) {
 	    print STDERR "SCCS EDIT $current_file\n";	
-	    system("sccs edit $current_file")
-		and die "canNOT sccs edit $current_file ($!)\n";
+	    system("sccs edit -G$current_file $current_file")
+	      and die "canNOT sccs edit -G$current_file $current_file ($!)\n";
 	}
 
 	unlink $current_file;
@@ -201,8 +201,9 @@ sub save
 	close FILE or die $!;
 	
 	if ($opt_control) {
-	    system("sccs delget -y'$opt_control' $current_file") 
-		and die "cannot sccs delget -y'$opt_control' $current_file ($!)\n";
+	 system("sccs delget -y'$opt_control' -G$current_file $current_file") 
+	   and die "cannot " .
+	   "sccs delget -y'$opt_control' -G$current_file $current_file ($!)\n";
 	}
     }
 }
