@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1996/06/11 13:27:21 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1996/07/23 15:08:28 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -89,7 +89,7 @@ list l;
     return result;
 }
 
-/* caution, is initial list is destroied.
+/* caution, is initial list is destroyed.
  */
 list add_elem_to_list_of_Pvecteur(l, var, val)
 list l;
@@ -98,7 +98,8 @@ int var, val;
     list result = NIL;
 
     if (ENDP(l)) 
-	return CONS(PVECTOR, (VECTOR) vect_new((Variable) var, val), NIL);
+	return CONS(PVECTOR, (VECTOR) vect_new((Variable) var, 
+					       int_to_value(val)), NIL);
 
     if ((var==0) || (val==0))
 	return l;
@@ -108,11 +109,8 @@ int var, val;
     MAPL(cv,
      {
 	 Pvecteur v = (Pvecteur) PVECTOR(CAR(cv));
-
 	 pips_debug(9, "size of vector %x is %d\n", (int) v, vect_size(v));
-
-	 vect_add_elem(&v, (Variable) var, val);
-	 
+	 vect_add_elem(&v, (Variable) var, int_to_value(val));
 	 result = gen_nconc(result, CONS(PVECTOR, (VECTOR) v, NIL));
      },
 	 l);
@@ -211,14 +209,19 @@ list l;
     MAP(RANGE, r,
     {
 	if (!firstrange)
-	    s += strlen(sprintf(s, ", "));
-	
-	firstrange = FALSE;
-	s += strlen(sprint_range(s, r));
+	{
+	    sprintf(s, ", "); 
+	    s += strlen(s);
+	}
+	else
+	    firstrange = FALSE;
+
+	sprint_range(s, r);
+	s += strlen(s);
     },
 	l);
 
-    return(str);
+    return str;
 }
 
 char *sprint_range(str, r)
@@ -235,14 +238,16 @@ range r;
     {
 	if (in==1)
 	    if (lo==up)
-		return(sprintf(str, "%d", lo));
+		sprintf(str, "%d", lo);
 	    else
-		return(sprintf(str, "%d:%d", lo, up));
+		sprintf(str, "%d:%d", lo, up);
 	else
-	    return(sprintf(str, "%d:%d:%d", lo, up, in));
+	    sprintf(str, "%d:%d:%d", lo, up, in);
     }
     else
-	return(sprintf(str, "X"));
+	sprintf(str, "X");
+
+    return str+strlen(str);
 }
 
 list compute_receive_content(array, lr, v)
@@ -259,8 +264,9 @@ Pvecteur v;
     {
 	int procdim = 0;
 	bool distributed_dim = ith_dim_distributed_p(array, i, &procdim);
-	int neighbour = ((distributed_dim)?
-			 ((int) vect_coeff((Variable) procdim, v)):(0));
+	Value vn = distributed_dim? 
+	    vect_coeff((Variable) procdim, v): VALUE_ZERO;
+	int neighbour = VALUE_TO_INT(vn);
 	range r = RANGE(CAR(l));
 
 	if (neighbour!=0)
@@ -304,7 +310,8 @@ Pvecteur v;
     for ( ; l!=NIL ; i++, l=CDR(l))
     {
 	range r = RANGE(CAR(l));
-	int neighbour = (int) vect_coeff((Variable) i, v);
+	Value vn = vect_coeff((Variable) i, v);
+	int neighbour = VALUE_TO_INT(vn);
 
 	if (neighbour==0)
 	    domain = gen_nconc(domain, CONS(RANGE, r, NIL)); /* shared! */
@@ -344,8 +351,8 @@ message m1, m2;
     if (message_array(m1)!=message_array(m2))
 	return(FALSE);
 
-    if ((int) vect_coeff(TCST, (Pvecteur) message_neighbour(m1))!=
-	(int) vect_coeff(TCST, (Pvecteur) message_neighbour(m2)))
+    if (value_ne(vect_coeff(TCST, (Pvecteur) message_neighbour(m1)),
+		 vect_coeff(TCST, (Pvecteur) message_neighbour(m2))))
 	return(FALSE);
 
     /*
@@ -569,8 +576,8 @@ list lkref, lvref;
 	case aligned_constant:
 	case local_constant:
 	{
-	    expression
-		arraycell = int_to_expression(vect_coeff(TCST, v));
+	    Value tc = vect_coeff(TCST, v);
+	    expression arraycell = Value_to_expression(tc);
 
 	    lra = gen_nconc(lra,
 			    CONS(RANGE,
@@ -592,10 +599,8 @@ list lkref, lvref;
 		in = range_increment(rg),
 		al = expression_undefined,
 		au = expression_undefined;
-	    int
-		lb = -1, 
-		ub = -1,
-		dt = vect_coeff(TCST, (Pvecteur) normalized_linear(n));
+	    Value vdt =  vect_coeff(TCST, (Pvecteur) normalized_linear(n));
+	    int lb = -1, ub = -1, dt = VALUE_TO_INT(vdt);
 
 	    if (expression_integer_constant_p(rl))
 		lb = HpfcExpressionToInt(rl),
@@ -618,11 +623,12 @@ list lkref, lvref;
 	    Pvecteur v2 = vect_del_var(v, TCST);
 	    entity index = (entity) var_of(v2);
 	    range rg = loop_index_to_range(index);
+	    Value vdt =  vect_coeff(TCST, (Pvecteur) normalized_linear(n));
 	    int	rate = val_of(v2),
-		in = HpfcExpressionToInt(range_increment(rg)),
+	        in = HpfcExpressionToInt(range_increment(rg)),
 		lb = HpfcExpressionToInt(range_lower(rg)),
 		ub = HpfcExpressionToInt(range_upper(rg)),
-		dt = vect_coeff(TCST, (Pvecteur) normalized_linear(n));
+	        dt = VALUE_TO_INT(vdt);
 	    expression
 		ai = int_to_expression(rate*in),
 		al = int_to_expression(rate*lb-dt),
