@@ -20,10 +20,10 @@ add=
 
 # main machines for each os.
 
-sun4="chailly  /projects/Pips/Experiments"
-sol2="recanati /projects/Pips/Experiments2"
-i386="tirnanog /projects/Pips/Experiments3"
-i586="loreto   /projects/Pips/Experiments3"
+sun4="chailly   /projects/Pips/Experiments"
+sol2="deauville /projects/Pips/Experiments2"
+i386="tirnanog  /projects/Pips/Experiments3"
+i586="loreto    /projects/Pips/Experiments3"
 
 #
 # FUNCTIONS
