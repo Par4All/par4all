@@ -1081,8 +1081,9 @@ string phase_n, module_n;
     bool print_timing_p = get_bool_property("LOG_TIMINGS");
     bool print_memory_usage_p = get_bool_property("LOG_MEMORY_USAGE");
     double initial_memory_size = 0.;
+    rule r;
 
-    if (find_rule_by_phase(phase_n) == rule_undefined) {
+    if ((r = find_rule_by_phase(phase_n)) == rule_undefined) {
 	user_warning("safe_apply", "Unkown phase/rule \"%s\"\n", phase_n);
 	success = FALSE;
 	return success;
@@ -1110,6 +1111,14 @@ string phase_n, module_n;
 	    initial_memory_size = get_process_gross_heap_size();
 	}
 
+	if (rule_use_resource_produced(r) && (! active_phase_p(phase_n))) {
+	    user_warning("safe_apply",
+			 "Request aborted in pipsmake: "
+			 "cyclic rule %s not activated.\n",
+			 phase_n);
+	    return FALSE;
+	}
+     
 	success = apply(phase_n, module_n);
 
 	if (success) {
