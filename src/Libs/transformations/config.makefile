@@ -26,13 +26,19 @@ LIB_CFILES =	replace.c \
 		clone.c \
 	        transformation_test.c \
 		freeze_variables.c \
-		bottom_up_array_declaration_normalization.c \
+		array_resizing_bottom_up.c \
+		array_resizing_top_down.c\
+		array_resizing_statistic.c\
+		partial_redundancy_elimination.c
 
 #		optimize_misc.c
 
 LIB_HEADERS =	transformations-local.h
 
 LIB_OBJECTS =	$(LIB_CFILES:%.c=%.o)
+
+
+
 
 
 
