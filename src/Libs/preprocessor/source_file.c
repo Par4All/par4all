@@ -122,46 +122,39 @@ hpfc_get_file_list(int * file_number,
 }
 
 
-char *pips_change_directory(dir)
-char *dir;
+char *
+pips_change_directory(char *dir)
 {
     if (directory_exists_p(dir)) {
 	chdir(dir);
-	/*
-	  log_execl("pwd", NULL);
-	  log_execl("/bin/echo Available Fortran Files:", NULL);
-	  log_execl("/bin/ls -C *.f", NULL);
-	  log_execl("/bin/echo", NULL);
-	  log_execl("/bin/echo Available Workspaces:", NULL);
-	  log_execl("/bin/ls -C *.DATABASE | sed s/.DATABASE//g", 
-	  NULL);
-	  */
-
 	return(get_cwd());	
     }
 
-    return(NULL);
+    return NULL;
 }
 
-char *
-build_view_file(char * print_type)
+/* returns the allocated full path name 
+ */
+static char *
+get_view_file(char * print_type, bool displayable)
 {
    char * module_name = db_get_current_module_name();
 
-   if(!unloadable_file_p(print_type)) {
+   if(displayable && !unloadable_file_p(print_type)) {
        user_error("build_view_file", "resource %s cannot be displayed\n",
 		   print_type);
    }
 
-   if(module_name != NULL) {
-      if ( safe_make(print_type, module_name) ) {
-         static char file_name_in_database[MAXPATHLEN];
-           
-         char * file_name = db_get_file_resource(print_type, module_name, TRUE);
-         sprintf(file_name_in_database, "%s/%s",
-                 build_pgmwd(db_get_current_workspace_name()),
-                 file_name);
-            
+   if(module_name != NULL)
+   {
+      if ( safe_make(print_type, module_name) ) 
+      {
+         char *file_name = db_get_file_resource(print_type, module_name, TRUE);
+	 char *pgm_wd = build_pgmwd(db_get_current_workspace_name());
+	 char *file_name_in_database = strdup(
+	     concatenate(pgm_wd, "/", file_name, NULL));
+
+	 free(pgm_wd); 
          return file_name_in_database;
       }
    }
@@ -173,27 +166,15 @@ build_view_file(char * print_type)
 }
 
 char *
+build_view_file(char * print_type)
+{
+    return get_view_file(print_type, TRUE);
+}
+
+char *
 get_dont_build_view_file(char * print_type)
 {
-   char *module_name = db_get_current_module_name();
-
-   if(module_name != NULL) {
-      /* Allow some place for "/./" and other useless stuff: */
-       static char file_name_in_database[MAXPATHLEN];
-           
-      char * file_name = db_get_file_resource(print_type, module_name, TRUE);
-
-      sprintf(file_name_in_database, "%s/%s",
-              build_pgmwd(db_get_current_workspace_name()),
-              file_name);
-            
-      return file_name_in_database;
-   }
-   else {
-      /* should be show_message */
-      user_log("No current module; select a module\n");
-   }
-   return NULL;
+    return get_view_file(print_type, FALSE);
 }
 
 char *read_line(fd)
@@ -525,14 +506,14 @@ bool process_user_file(
     database pgm;
     FILE *fd;
     char *cwd;
-    static char buffer[MAXNAMLEN];
+    char buffer[MAXNAMLEN];
     string abspath = NULL;
-    /* string relpath = NULL; */
-    static char *tempfile = NULL;
-    static int number_of_files = 0;
-    static int number_of_modules = 0;
     string initial_file = file;
     int err;
+    char *tempfile = NULL;
+
+    static int number_of_files = 0;
+    static int number_of_modules = 0;
 
     number_of_files++;
     pips_debug(1, "file %s (number %d)\n", file, number_of_files);
