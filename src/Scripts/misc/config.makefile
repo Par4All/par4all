@@ -14,7 +14,8 @@ INSTALL_SHR =	pips-deal-with-include \
 UTL_SCRIPTS = 	filter_verbatim \
 		job-make \
 		job-receive \
-		unjustify
+		unjustify \
+		multi_sccs.sh
 
 FILES =	 	extract-doc.awk \
 		accent.sed
