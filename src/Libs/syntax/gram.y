@@ -1336,5 +1336,5 @@ char * s;
 /* #endif */
 	
 	/* pas de recouvrement d'erreurs */
-	user_error("yyerror", "Syntax error\n");
+	ParserError("yyerror", "Syntax error\n");
 }
