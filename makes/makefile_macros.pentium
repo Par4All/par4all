@@ -1,0 +1,13 @@
+#
+# $Id$
+#
+# makefile specific issues for gcc and pentium compilation
+#
+# $Log: makefile_macros.pentium,v $
+# Revision 1.1  1998/01/23 09:09:40  coelho
+# Initial revision
+#
+#
+
+# specific optimizations with gcc 2.8.0
+CFLAGS	+=	-march=pentium -mwide-multiply -malign-double
