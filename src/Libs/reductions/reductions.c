@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1997/07/18 15:22:27 $, 
+ * $Date: 1997/07/21 12:39:52 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -215,7 +215,7 @@ static bool safe_effects_for_reductions(statement s, reductions rs)
 	if ((effect_write_p(e) && !gen_in_list_p(effect_reference(e), lr)) ||
 	    io_effect_entity_p(effect_variable(e)))
 	{
-	    pips_debug(8, "effect on %s (ref %#p) not trusted\n",
+	    pips_debug(8, "effect on %s (ref %p) not trusted\n",
 		       entity_name(effect_variable(e)), 
 		       effect_reference(e));
 
@@ -422,7 +422,7 @@ build_creductions_of_statement(
     /* list of candidate entities */
     le = list_of_reduced_variables(node, ls);
 
-    pips_debug(5, "stat %s %#p: %d candidate(s)\n",
+    pips_debug(5, "stat %s %p: %d candidate(s)\n",
 	       note_for_statement(node), node, gen_length(le));
 
     /* for each candidate, extract the reduction if any */
@@ -432,7 +432,7 @@ build_creductions_of_statement(
 	le);
 
     /* store the result */
-    pips_debug(5, "stat %s %#p -> %d reductions\n", 
+    pips_debug(5, "stat %s %p -> %d reductions\n", 
 	       note_for_statement(node), node, gen_length(lr));
 
     store_cumulated_reductions(node, make_reductions(lr)); 
