@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/24 12:58:58 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/24 13:05:14 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -217,7 +217,7 @@ $SED -n '$p'`
 LINE=${LAST_LINE:-$LINE}
 
 DEFAULT_USED=`$SED -n '/\,hpfcX)/p;/\,hpfcX)/q;' $TMP.0 $TMP.1`
-STILL_SOME_DIRECTIVES=`$SED -n '//p;//q;' $TMP.0 $TMP.1`
+#STILL_SOME_DIRECTIVES=`$SED -n '//p;//q;' $TMP.0 $TMP.1`
 
 #
 # final output
@@ -255,7 +255,7 @@ $RM -f $TMP.*
 #
 # error if some directives where not analyzed
 
-[ "$STILL_SOME_DIRECTIVES" ] && exit 1 ;
+#[ "$STILL_SOME_DIRECTIVES" ] && exit 1 ;
 
 # That is all
 #
