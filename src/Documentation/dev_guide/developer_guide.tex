@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: developer_guide.tex,v $
+%% Revision 1.14  2003/04/15 09:13:11  keryell
+%% Wrong \verb.
+%%
 %% Revision 1.13  2003/04/15 08:24:54  keryell
 %% Updated around $PIPS_DEVEDIR/Scripts/dev and $PIPS_DEVEDIR/Scripts/env
 %%
@@ -50,6 +53,8 @@
 
 \renewcommand{\indexname}{Index}
 \makeindex
+
+\sloppy
 
 \begin{document}
 \maketitle
@@ -863,9 +868,10 @@ Here are now the steps to install a new library named {\tt mylib}:
     modules, but after the libraries whose modules it uses.
     
   \item Run the {\tt make} command to automaticall build the files
-    \verb|define_libraries.make. The command {\tt make install} then
+    \verb|define_libraries.make|. The command {\tt make install} then
     installs these scripts in \verb+$PIPS_UTILDIR+.
 % $    
+
 
   \end{itemize}
   
