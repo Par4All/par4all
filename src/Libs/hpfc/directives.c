@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/02/29 19:05:22 $, )
+ * ($Date: 1996/03/19 14:36:51 $, )
  */
 
 #include "defines-local.h"
@@ -296,9 +296,10 @@ static void initial_alignment(statement s)
  * store the mappings in internal data structures.
  */
 static void 
-one_align_directive(reference alignee,
-		    reference temp,
-		    bool dynamic)
+one_align_directive(
+    reference alignee,/* the array */
+    reference temp,   /* the template */
+    bool dynamic)     /* realign or align */
 {
     entity template = reference_variable(temp),
 	   array    = reference_variable(alignee);
@@ -466,9 +467,10 @@ extract_the_distribute(reference distributee, reference proc)
 /*  handles a simple (one template) distribute or redistribute directive.
  */
 static void 
-one_distribute_directive(reference distributee,
-			 reference proc,
-			 bool dynamic)
+one_distribute_directive(
+    reference distributee, /* the template */
+    reference proc,        /* the processor arrangement */
+    bool dynamic)          /* redistribute or distribute */
 {
     entity processor = reference_variable(proc),
            template  = reference_variable(distributee);
@@ -531,6 +533,7 @@ handle_distribute_and_redistribute_directive(
 {
     list /* of expression */ last = gen_last(args);
     reference proc;
+    bool descriptive;
 
     if (dynamic) store_renamings(current_stmt_head(), NIL);
 
@@ -543,7 +546,7 @@ handle_distribute_and_redistribute_directive(
     /*  calls the simple case handler.
      */
     for(; args!=last; POP(args))
-       one_distribute_directive(expression_to_reference(EXPRESSION(CAR(args))), 
+       one_distribute_directive(expression_to_reference(EXPRESSION(CAR(args))),
 				proc, dynamic);
 }
 
