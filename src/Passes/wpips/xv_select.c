@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/30 14:59:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* $Id$ */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1997/04/30 14:59:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1997/09/20 12:15:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -164,7 +164,7 @@ void start_directory_notify(menu, menu_item)
      Menu menu;
      Menu_item menu_item;
 {
-  if (db_get_current_workspace() != database_undefined)
+  if (db_get_current_workspace_name())
      prompt_user_not_allowed_to_change_directory(NULL, NULL);
   else
     start_query("Change Directory",
