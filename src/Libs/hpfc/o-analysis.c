@@ -3,7 +3,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1994/12/27 19:46:48 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/03/14 14:43:17 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -316,15 +316,14 @@ statement stat, *pstat;
 bool block_distributed_p(array)
 entity array;
 {
-    int
-	dim = NumberOfDimension(array),
-	n = NEW_DECLARATION_UNDEFINED;
+    int	dim = NumberOfDimension(array);
+    tag n;
 
     for(; dim>0; dim--)
     {
 	n = new_declaration(array, dim);
-	if ((n==GAMMA_NEW_DECLARATION) || (n==DELTA_NEW_DECLARATION))
-	    /* distributed && (nd==NO_NEW_DECLARATION)) ?
+	if ((n==is_hpf_newdecl_gamma) || (n==is_hpf_newdecl_delta))
+	    /* distributed && (nd==is_hpf_newdecl_none)) ?
 	     * ??? the case is not handled later on 
 	     */
 	    return(FALSE);
