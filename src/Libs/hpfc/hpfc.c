@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: hpfc.c,v $ ($Date: 1995/04/10 14:23:38 $, ) version $Revision$,
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/04/10 14:39:32 $, ) version $Revision$,
  * got on %D%, %T%
  */
  
@@ -370,10 +370,8 @@ string name;
     debug_off();
 }
 
-/* close the hpf compiler execution.
+/* closes the hpf compiler execution.
  * must deal with the commons, which are global to the program.
- * no way to tell the database/make that the HPFC_STATUS is destroyed.
- * the NO_FILE hack does not seem to work.
  */
 void hpfc_close(name)
 string name;
