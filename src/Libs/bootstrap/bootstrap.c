@@ -61,8 +61,7 @@
 #define GET_TYPE(h, e) ((basic)hash_get(h, (char*)(e)))
 #define PUT_TYPE(h, e, b) hash_put(h, (char*)(e), (char*)(b))
 
-/* This declaration is temporal. It will be moved to ri-util.h */
-extern expression insert_cast(basic cast, basic from, expression exp);
+extern expression insert_cast(basic cast, basic from, expression exp, type_context_p);
 
 void 
 CreateAreas()
@@ -890,48 +889,51 @@ arguments_are_compatible(call c, hash_table types)
  * Typing all the arguments of c to basic b if their basic <> b
  */
 static void 
-typing_arguments(call c, hash_table types, basic b)
+typing_arguments(call c, type_context_p context, basic b)
 {
     basic b1;
     list args = call_arguments(c);
 
     while (args != NIL)
     {
-	b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
+	b1 = GET_TYPE(context->types, EXPRESSION(CAR(args)));
 	if (!basic_equal_p(b, b1))
 	{
-	    EXPRESSION(CAR(args)) = insert_cast(b, b1, EXPRESSION(CAR(args)));
+	    EXPRESSION(CAR(args)) = insert_cast(b, b1, EXPRESSION(CAR(args)), context);
 	    // Update hash table
-	    PUT_TYPE(types, EXPRESSION(CAR(args)), b);
+	    PUT_TYPE(context->types, EXPRESSION(CAR(args)), b);
 	}
 	args = CDR(args);
     }
 }
 
 /***************************************************************************************** 
+ *                           TYPING THE INTRINSIC FUNCTIONS
  * Typing assignment statement (=)
  */
 static basic
-typing_assignment(call c, hash_table types, statement s)
+typing_assignment(call c, type_context_p context)
 {
     basic b1, b2;
     list args = call_arguments(c);
 
-    if(!arguments_are_compatible(c, types))
+    if(!arguments_are_compatible(c, context->types))
     {
-	add_one_line_of_comment(s, "Arguments of assignement '%s' are not compatible", 
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Arguments of assignement '%s' are not compatible", 
 				entity_local_name(call_function(c))); 
-
+	/* Count the number of errors */
+	context->number_of_error++;
 	// Just for return a result
 	return make_basic_float(4); 
     }
 
-    b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
-    b2 = GET_TYPE(types, EXPRESSION(CAR(CDR(args))));
+    b1 = GET_TYPE(context->types, EXPRESSION(CAR(args)));
+    b2 = GET_TYPE(context->types, EXPRESSION(CAR(CDR(args))));
     if (!basic_equal_p(b1, b2))
     {
 	EXPRESSION(CAR(CDR(args))) = 
-	    insert_cast(b1, b2, EXPRESSION(CAR(CDR(args))));
+	    insert_cast(b1, b2, EXPRESSION(CAR(CDR(args))), context);
     }
 
     return copy_basic(b1);    
@@ -940,25 +942,28 @@ typing_assignment(call c, hash_table types, statement s)
  * Typing arithmetic operator (+, -, --, *, /), except **
  */
 static basic
-typing_arithmetic_operator(call c, hash_table types, statement s)
+typing_arithmetic_operator(call c, type_context_p context)
 {
     basic b;
 
-    if(!arguments_are_IRDC(c, types))
+    if(!arguments_are_IRDC(c, context->types))
     {
         // ERROR: Invalide of type
-	add_one_line_of_comment(s, 
+	add_one_line_of_comment((statement) stack_head(context->stats), 
 				"Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX" \
 				" and not DOUBLE & COMPLEX",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	// Just for return a result
 	return make_basic_float(4); 
     }
     // Find the longest type amongs all arguments
-    b = basic_union_arguments(c, types);
+    b = basic_union_arguments(c, context->types);
 
     // Typing all arguments to b if necessary
-    typing_arguments(c, types, b);
+    typing_arguments(c, context, b);
 
     return copy_basic(b);    
 }
@@ -966,36 +971,29 @@ typing_arithmetic_operator(call c, hash_table types, statement s)
  * Typing power operator (**)
  */
 static basic
-typing_power_operator(call c, hash_table types, statement s)
+typing_power_operator(call c, type_context_p context)
 {
     basic b, b1, b2;
     list /* of expression */ args = call_arguments(c);
     b = basic_undefined;
 
-    if(!arguments_are_IRDC(c, types))
+    if(!arguments_are_IRDC(c, context->types))
     {
         // ERROR: Invalide of type
 
-	add_one_line_of_comment(s,"Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX" \
+	add_one_line_of_comment((statement) stack_head(context->stats),
+				"Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX" \
 				" and not DOUBLE & COMPLEX",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	// Just for return a result
 	return make_basic_float(4); 
     }
     
-    b1 = GET_TYPE(types, EXPRESSION(CAR(args)));
-    b2 = GET_TYPE(types, EXPRESSION(CAR(CDR(args))));
-    /* - I have done it in function arguments_are_IRDC()
-    if ((basic_float_p(b1) && (basic_float(b1)==8) && basic_complex_p(b2)) ||
-	(basic_float_p(b2) && (basic_float(b2)==8) && basic_complex_p(b1)))
-    {
-        // ERROR: C**D, D**C: prohibited!
-        fprintf(stderr,"Intrinsic [%s]: <COMPLEX>**<DOUBLE> or <DOUBLE>**<COMPLEX> are prohibited\n", 
-		entity_name(function_called));
-	// Just for return a result
-	return make_basic_float(4); 
-    }
-    */
+    b1 = GET_TYPE(context->types, EXPRESSION(CAR(args)));
+    b2 = GET_TYPE(context->types, EXPRESSION(CAR(CDR(args))));
 
     if (is_inferior_basic(b1, b2))
     {
@@ -1009,7 +1007,7 @@ typing_power_operator(call c, hash_table types, statement s)
     if (!basic_equal_p(b, b1))
     {
 	EXPRESSION(CAR(args)) = 
-	  insert_cast(b, b1, EXPRESSION(CAR(args)));
+	  insert_cast(b, b1, EXPRESSION(CAR(args)), context);
     }
     // Fortran prefers: (ANSI X3.9-1978, FORTRAN 77, PAGE 6-6, TABLE 3)
     // "var_double = var_double ** var_int" instead of
@@ -1017,7 +1015,7 @@ typing_power_operator(call c, hash_table types, statement s)
     if (!basic_equal_p(b, b2) && !basic_int_p(b2))
     {
 	EXPRESSION(CAR(CDR(args))) = 
-	  insert_cast(b, b2, EXPRESSION(CAR(CDR(args))));
+	  insert_cast(b, b2, EXPRESSION(CAR(CDR(args))), context);
     }
     return copy_basic(b);
 }
@@ -1025,25 +1023,28 @@ typing_power_operator(call c, hash_table types, statement s)
  * Typing relational operator (LT, LE, EQ, GT, GE) 
  */
 static basic
-typing_relational_operator(call c, hash_table types, statement s)
+typing_relational_operator(call c, type_context_p context)
 {
     basic b;
 
-    if(!arguments_are_IRDC(c, types))
+    if(!arguments_are_IRDC(c, context->types))
     {
      /* ERROR: Invalide of type */
-      add_one_line_of_comment(s, 
+      add_one_line_of_comment((statement) stack_head(context->stats), 
 			      "Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX" \
 			      " and not DOUBLE & COMPLEX",
 			      entity_local_name(call_function(c))); 
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	// Just for return a result
 	return make_basic(is_basic_logical, UUINT(4));
     }
     // Find the longest type amongs all arguments
-    b = basic_union_arguments(c, types);
+    b = basic_union_arguments(c, context->types);
 
     // Typing all arguments to b if necessary
-    typing_arguments(c, types, b);
+    typing_arguments(c, context, b);
 
     return make_basic(is_basic_logical, UUINT(4));
 }
@@ -1051,13 +1052,17 @@ typing_relational_operator(call c, hash_table types, statement s)
  * Typing logical operator (NOT, AND, OR, EQV, NEQV)
  */
 static basic
-typing_logical_operator(call c, hash_table types, statement s)
+typing_logical_operator(call c, type_context_p context)
 {
-    if(!arguments_are_logical(c, types))
+    if(!arguments_are_logical(c, context->types))
     {
         // ERROR: Invalide of type
-        add_one_line_of_comment(s,"Argument(s) of '%s' must be LOGICAL",
+        add_one_line_of_comment((statement) stack_head(context->stats),
+				"Argument(s) of '%s' must be LOGICAL",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	// Just for return a result
 	return make_basic(is_basic_logical, UUINT(4));
     }
@@ -1067,13 +1072,17 @@ typing_logical_operator(call c, hash_table types, statement s)
  * Typing concatenate operator (//)
  */
 static basic
-typing_concat_operator(call c, hash_table types, statement s)
+typing_concat_operator(call c, type_context_p context)
 {
-    if(!arguments_are_character(c, types))
+    if(!arguments_are_character(c, context->types))
     {
         // ERROR: Invalide of type
-        add_one_line_of_comment(s, "Argument(s) of '%s' must be CHARACTER",
-			      entity_local_name(call_function(c))); 
+        add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument(s) of '%s' must be CHARACTER",
+				entity_local_name(call_function(c))); 
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	// Just for return a result
 	return make_basic(is_basic_string, value_undefined);
     }
@@ -1084,7 +1093,7 @@ typing_concat_operator(call c, hash_table types, statement s)
  * Typing function C whose argument type is from_type and whose return type is to_type
  */
 static basic 
-typing_function_argument_type_to_return_type(call c, hash_table types, statement s,
+typing_function_argument_type_to_return_type(call c, type_context_p context,
 					     basic from_type, basic to_type)
 {
     bool check_arg = FALSE;
@@ -1092,37 +1101,37 @@ typing_function_argument_type_to_return_type(call c, hash_table types, statement
     // INT
     if(basic_int_p(from_type))
     {
-        check_arg = arguments_are_integer(c, types);
+        check_arg = arguments_are_integer(c, context->types);
     }
     // REAL
     else if(basic_float_p(from_type) && basic_float(from_type) == 4)
     {
-        check_arg = arguments_are_real(c, types);
+        check_arg = arguments_are_real(c, context->types);
     }
     // DOUBLE
     else if(basic_float_p(from_type) && basic_float(from_type) == 8)
     {
-        check_arg = arguments_are_double(c, types);
+        check_arg = arguments_are_double(c, context->types);
     }
     // COMPLEX
     else if(basic_complex_p(from_type) && basic_complex(from_type) == 8)
     {
-        check_arg = arguments_are_complex(c, types);
+        check_arg = arguments_are_complex(c, context->types);
     }
     // DOUBLE COMPLEX
     else if(basic_complex_p(from_type) && basic_complex(from_type) == 16)
     {
-        check_arg = arguments_are_dcomplex(c, types);
+        check_arg = arguments_are_dcomplex(c, context->types);
     }
     // CHAR
     else if(basic_string_p(from_type))
     {
-        check_arg = arguments_are_character(c, types);
+        check_arg = arguments_are_character(c, context->types);
     }
     // LOGICAL
     else if(basic_logical_p(from_type))
     {
-        check_arg = arguments_are_logical(c, types);
+        check_arg = arguments_are_logical(c, context->types);
     }
     // UNEXPECTED
     else
@@ -1133,187 +1142,207 @@ typing_function_argument_type_to_return_type(call c, hash_table types, statement
     // ERROR: Invalide of argument type
     if(check_arg == FALSE)
     {
-        add_one_line_of_comment(s, "Invalid argument(s) of '%s'!",
+        add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Invalid argument(s) of '%s'!",
 				entity_local_name(call_function(c))); 
+
+	/* Count the number of errors */
+	context->number_of_error++;
     }
 
     return copy_basic(to_type);
 }
 
 static basic
-typing_function_int_to_int(call c, hash_table types, statement s)
+typing_function_int_to_int(call c, type_context_p context)
 {
     basic type_INT = make_basic_int(4);
-    return typing_function_argument_type_to_return_type(c, types, s, type_INT, type_INT);
+    return typing_function_argument_type_to_return_type(c, context, type_INT, type_INT);
 }
 static basic
-typing_function_real_to_real(call c, hash_table types, statement s)
+typing_function_real_to_real(call c, type_context_p context)
 {
     basic type_REAL = make_basic_float(4);
-    return typing_function_argument_type_to_return_type(c, types, s, type_REAL, type_REAL);
+    return typing_function_argument_type_to_return_type(c, context, type_REAL, type_REAL);
 }
 static basic
-typing_function_double_to_double(call c, hash_table types, statement s)
+typing_function_double_to_double(call c, type_context_p context)
 {
     basic type_DBLE = make_basic_float(8);
-    return typing_function_argument_type_to_return_type(c, types, s, type_DBLE, type_DBLE);
+    return typing_function_argument_type_to_return_type(c, context, type_DBLE, type_DBLE);
 }
 static basic
-typing_function_complex_to_complex(call c, hash_table types, statement s)
+typing_function_complex_to_complex(call c, type_context_p context)
 {
     basic type_CMPLX = make_basic_complex(8);
-    return typing_function_argument_type_to_return_type(c, types, s, type_CMPLX, type_CMPLX);
+    return typing_function_argument_type_to_return_type(c, context, type_CMPLX, type_CMPLX);
 }
 static basic
-typing_function_dcomplex_to_dcomplex(call c, hash_table types, statement s)
+typing_function_dcomplex_to_dcomplex(call c, type_context_p context)
 {
     basic type_DCMPLX = make_basic_complex(16);
-    return typing_function_argument_type_to_return_type(c, types, s, type_DCMPLX, type_DCMPLX);
+    return typing_function_argument_type_to_return_type(c, context, type_DCMPLX, type_DCMPLX);
 }
 static basic
-typing_function_char_to_int(call c, hash_table types, statement s)
+typing_function_char_to_int(call c, type_context_p context)
 {
     basic type_INT = make_basic_int(4);
     basic type_CHAR = make_basic(is_basic_string, value_undefined);
-    return typing_function_argument_type_to_return_type(c, types, s, type_CHAR, type_INT);
+    return typing_function_argument_type_to_return_type(c, context, type_CHAR, type_INT);
 }
 static basic
-typing_function_int_to_char(call c, hash_table types, statement s)
+typing_function_int_to_char(call c, type_context_p context)
 {
     basic type_INT = make_basic_int(4);
     basic type_CHAR = make_basic(is_basic_string, value_undefined);
-    return typing_function_argument_type_to_return_type(c, types, s, type_INT, type_CHAR);
+    return typing_function_argument_type_to_return_type(c, context, type_INT, type_CHAR);
 }
 static basic
-typing_function_real_to_int(call c, hash_table types, statement s)
+typing_function_real_to_int(call c, type_context_p context)
 {
     basic type_INT = make_basic_int(4);
     basic type_REAL = make_basic_float(4);
-    return typing_function_argument_type_to_return_type(c, types, s, type_REAL, type_INT);
+    return typing_function_argument_type_to_return_type(c, context, type_REAL, type_INT);
 }
 static basic
-typing_function_int_to_real(call c, hash_table types, statement s)
+typing_function_int_to_real(call c, type_context_p context)
 {
     basic type_INT = make_basic_int(4);
     basic type_REAL = make_basic_float(4);
-    return typing_function_argument_type_to_return_type(c, types, s, type_INT, type_REAL);
+    return typing_function_argument_type_to_return_type(c, context, type_INT, type_REAL);
 }
 static basic
-typing_function_double_to_int(call c, hash_table types, statement s)
+typing_function_double_to_int(call c, type_context_p context)
 {
     basic type_INT = make_basic_int(4);
     basic type_DBLE = make_basic_float(8);
-    return typing_function_argument_type_to_return_type(c, types, s, type_DBLE, type_INT);
+    return typing_function_argument_type_to_return_type(c, context, type_DBLE, type_INT);
 }
 static basic
-typing_function_real_to_double(call c, hash_table types, statement s)
+typing_function_real_to_double(call c, type_context_p context)
 {
     basic type_REAL = make_basic_float(4);
     basic type_DBLE = make_basic_float(8);
-    return typing_function_argument_type_to_return_type(c, types, s, type_REAL, type_DBLE);
+    return typing_function_argument_type_to_return_type(c, context, type_REAL, type_DBLE);
 }
 static basic
-typing_function_complex_to_real(call c, hash_table types, statement s)
+typing_function_complex_to_real(call c, type_context_p context)
 {
     basic type_REAL = make_basic_float(4);
     basic type_CMPLX = make_basic_complex(8);
-    return typing_function_argument_type_to_return_type(c, types, s, type_CMPLX, type_REAL);
+    return typing_function_argument_type_to_return_type(c, context, type_CMPLX, type_REAL);
 }
 static basic
-typing_function_dcomplex_to_double(call c, hash_table types, statement s)
+typing_function_dcomplex_to_double(call c, type_context_p context)
 {
     basic type_DBLE = make_basic_float(8);
     basic type_DCMPLX = make_basic_complex(16);
-    return typing_function_argument_type_to_return_type(c, types, s, type_DCMPLX, type_DBLE);
+    return typing_function_argument_type_to_return_type(c, context, type_DCMPLX, type_DBLE);
 }
 static basic
-typing_function_char_to_logical(call c, hash_table types, statement s)
+typing_function_char_to_logical(call c, type_context_p context)
 {
     basic type_LOGICAL = make_basic_logical(4);
     basic type_CHAR = make_basic(is_basic_string, value_undefined);
-    return typing_function_argument_type_to_return_type(c, types, s, type_CHAR, type_LOGICAL);
+    return typing_function_argument_type_to_return_type(c, context, type_CHAR, type_LOGICAL);
 }
 
 /***************************************************************************************** 
  * Arguments are REAL (or DOUBLE); and the return is the same with argument
  */
 static basic
-typing_function_RealDouble_to_RealDouble(call c, hash_table types, statement s)
+typing_function_RealDouble_to_RealDouble(call c, type_context_p context)
 {
     basic b;
 
-    if(!arguments_are_RD(c, types))
+    if(!arguments_are_RD(c, context->types))
     {
         // ERROR: Invalide of type
-        add_one_line_of_comment(s, "Argument(s) of '%s' must be REAL or DOUBLE",
+        add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument(s) of '%s' must be REAL or DOUBLE",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	return make_basic_float(4); // Just for return a result
     }
     // Find the longest type amongs all arguments
-    b = basic_union_arguments(c, types);
+    b = basic_union_arguments(c, context->types);
 
     // Typing all arguments to b if necessary
-    typing_arguments(c, types, b);
+    typing_arguments(c, context, b);
 
     return copy_basic(b);    
 }
 static basic
-typing_function_RealDouble_to_Integer(call c, hash_table types, statement s)
+typing_function_RealDouble_to_Integer(call c, type_context_p context)
 {
     basic b;
 
-    if(!arguments_are_RD(c, types))
+    if(!arguments_are_RD(c, context->types))
     {
         // ERROR: Invalide of type
-        add_one_line_of_comment(s, "Argument(s) of '%s' must be REAL or DOUBLE",
+        add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument(s) of '%s' must be REAL or DOUBLE",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	return make_basic_float(4); // Just for return a result
     }
     // Find the longest type amongs all arguments
-    b = basic_union_arguments(c, types);
+    b = basic_union_arguments(c, context->types);
 
     // Typing all arguments to b if necessary
-    typing_arguments(c, types, b);
+    typing_arguments(c, context, b);
 
     return make_basic_int(4);
 }
 static basic
-typing_function_RealDoubleComplex_to_RealDoubleComplex(call c, hash_table types, statement s)
+typing_function_RealDoubleComplex_to_RealDoubleComplex(call c, type_context_p context)
 {
     basic b;
 
-    if(!arguments_are_RDC(c, types))
+    if(!arguments_are_RDC(c, context->types))
     {
         // ERROR: Invalide of type
-        add_one_line_of_comment(s,"Argument(s) of '%s' must be REAL, DOUBLE or COMPLEX",
+        add_one_line_of_comment((statement) stack_head(context->stats),
+				"Argument(s) of '%s' must be REAL, DOUBLE or COMPLEX",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
+	
 	return make_basic_float(4); // Just for return a result
     }
     // Find the longest type amongs all arguments
-    b = basic_union_arguments(c, types);
+    b = basic_union_arguments(c, context->types);
 
     // Typing all arguments to b if necessary
-    typing_arguments(c, types, b);
+    typing_arguments(c, context, b);
 
     return copy_basic(b);
 }
 static basic
-typing_function_IntegerRealDouble_to_IntegerRealDouble(call c, hash_table types, statement s)
+typing_function_IntegerRealDouble_to_IntegerRealDouble(call c, type_context_p context)
 {
     basic b;
 
-    if(!arguments_are_IRD(c, types))
+    if(!arguments_are_IRD(c, context->types))
     {
         // ERROR: Invalide of type
-        add_one_line_of_comment(s,"Argument(s) of '%s' must be INT, REAL or DOUBLE",
+        add_one_line_of_comment((statement) stack_head(context->stats),
+				"Argument(s) of '%s' must be INT, REAL or DOUBLE",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	return make_basic_float(4); // Just for return a result
     }
     // Find the longest type amongs all arguments
-    b = basic_union_arguments(c, types);
+    b = basic_union_arguments(c, context->types);
 
     // Typing all arguments to b if necessary
-    typing_arguments(c, types, b);
+    typing_arguments(c, context, b);
 
     return copy_basic(b);    
 }
@@ -1324,22 +1353,26 @@ typing_function_IntegerRealDouble_to_IntegerRealDouble(call c, hash_table types,
  * Note: Only for Intrinsic ABS(): ABS(CMPLX(x)) --> REAL
  */
 static basic
-typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c, hash_table types, statement s)
+typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c, type_context_p context)
 {
     basic b;
 
-    if(!arguments_are_IRDC(c, types))
+    if(!arguments_are_IRDC(c, context->types))
     {
         // ERROR: Invalide of type
-        add_one_line_of_comment(s,"Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX",
+        add_one_line_of_comment((statement) stack_head(context->stats),
+				"Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	return make_basic_float(4); // Just for return result
     }
     // Find the longest type amongs all arguments
-    b = basic_union_arguments(c, types);
+    b = basic_union_arguments(c, context->types);
 
     // Typing all arguments to b if necessary
-    typing_arguments(c, types, b);
+    typing_arguments(c, context, b);
 
     if (basic_complex_p(b))
     {
@@ -1354,69 +1387,81 @@ typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c, hash_t
  * Note: argument must be numeric
  */
 static basic
-typing_function_conversion_to_numeric(call c, hash_table types, statement s, basic to_type)
+typing_function_conversion_to_numeric(call c, type_context_p context, basic to_type)
 {
-    if(!arguments_are_IRDC(c, types))
+    if(!arguments_are_IRDC(c, context->types))
     {
         // ERROR: Invalide of type
-        add_one_line_of_comment(s, 
+        add_one_line_of_comment((statement) stack_head(context->stats), 
 				"Argument(s) of '%s' must be INT, REAL, DOUBLE or COMPLEX",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
     }
     return copy_basic(to_type);
 }
 static basic
-typing_function_conversion_to_integer(call c, hash_table types, statement s)
+typing_function_conversion_to_integer(call c, type_context_p context)
 {
-    return typing_function_conversion_to_numeric(c, types, s, make_basic_int(4));
+    return typing_function_conversion_to_numeric(c, context, make_basic_int(4));
 }
 static basic
-typing_function_conversion_to_real(call c, hash_table types, statement s)
+typing_function_conversion_to_real(call c, type_context_p context)
 {
-    return typing_function_conversion_to_numeric(c, types, s, make_basic_float(4));
+    return typing_function_conversion_to_numeric(c, context, make_basic_float(4));
 }
 static basic
-typing_function_conversion_to_double(call c, hash_table types, statement s)
+typing_function_conversion_to_double(call c, type_context_p context)
 {
-    return typing_function_conversion_to_numeric(c, types, s, make_basic_float(8));
+    return typing_function_conversion_to_numeric(c, context, make_basic_float(8));
 }
 static basic
-typing_function_conversion_to_complex(call c, hash_table types, statement s)
+typing_function_conversion_to_complex(call c, type_context_p context)
 {
-    return typing_function_conversion_to_numeric(c, types, s, make_basic_complex(8));
+    return typing_function_conversion_to_numeric(c, context, make_basic_complex(8));
 }
 static basic
-typing_function_conversion_to_dcomplex(call c, hash_table types, statement s)
+typing_function_conversion_to_dcomplex(call c, type_context_p context)
 {
-    return typing_function_conversion_to_numeric(c, types, s, make_basic_complex(16));
+    return typing_function_conversion_to_numeric(c, context, make_basic_complex(16));
 }
+/* CMPLX_ */
 static basic
-typing_function_constant_complex(call c, hash_table types, statement s)
+typing_function_constant_complex(call c, type_context_p context)
 {
-    if(!arguments_are_IR(c, types))
+    if(!arguments_are_IR(c, context->types))
     {
         // ERROR: Invalide of type
-        add_one_line_of_comment(s, "Argument(s) of '%s' must be INT, REAL",
+        add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument(s) of '%s' must be INT, REAL",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	return make_basic_float(4); // Just for return result
     }
     // Typing all arguments to REAL if necessary
-    typing_arguments(c, types, make_basic_float(4));
+    typing_arguments(c, context, make_basic_float(4));
 
     return make_basic_complex(8);
 }
+/* DCMPLX_ */
 static basic
-typing_function_constant_dcomplex(call c, hash_table types, statement s)
+typing_function_constant_dcomplex(call c, type_context_p context)
 {
-    if(!arguments_are_IRD(c, types))
+    if(!arguments_are_IRD(c, context->types))
     {
         // ERROR: Invalide of type
-        add_one_line_of_comment(s,"Argument(s) of '%s' must be INT, REAL or DOUBLE",
+        add_one_line_of_comment((statement) stack_head(context->stats),
+				"Argument(s) of '%s' must be INT, REAL or DOUBLE",
 				entity_local_name(call_function(c)));
+	/* Count the number of errors */
+	context->number_of_error++;
+
 	return make_basic_float(4); // Just for return result
     }
     // Typing all arguments to DOUBLE if necessary
-    typing_arguments(c, types, make_basic_float(8));
+    typing_arguments(c, context, make_basic_float(8));
 
     return make_basic_complex(16);
 }
@@ -1433,18 +1478,16 @@ typing_no_value_intrinsic(call c, hash_table types, statement s)
 }
 */
 
-/********************************************************** SIMPLIFICATION DES EXPRESSIONS */
+/***************************************** SIMPLIFICATION DES EXPRESSIONS */
 /* Find the specific name from the specific argument
  */
 
-typedef void (*switch_name_function)(call, hash_table);
-
-/***************************************************************************************** 
- * Each intrinsic of name generic have a function for switching to the specific name
- * correspondent with the argument
+/************************************************************************ 
+ * Each intrinsic of name generic have a function for switching to the
+ * specific name correspondent with the argument
  */
 static void
-switch_generic_to_specific(call c, hash_table types,
+switch_generic_to_specific(call c, type_context_p context,
 			   string arg_int_name,
 			   string arg_real_name,
 			   string arg_double_name,
@@ -1453,7 +1496,7 @@ switch_generic_to_specific(call c, hash_table types,
 {
     string specific_name = NULL;
     list args = call_arguments(c);
-    basic arg_basic = GET_TYPE(types, EXPRESSION(CAR(args)));
+    basic arg_basic = GET_TYPE(context->types, EXPRESSION(CAR(args)));
 
     if (basic_int_p(arg_basic))
     {
@@ -1482,178 +1525,179 @@ switch_generic_to_specific(call c, hash_table types,
        strcmp(specific_name, entity_local_name(call_function(c))) != 0)
     {
 	call_function(c) = CreateIntrinsic(specific_name);
+	
+	/* Count number of simplifications */
+	context->number_of_simplication++;
     }
 }
 
 // AINT
 static void
-switch_specific_aint(call c, hash_table types)
+switch_specific_aint(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "AINT", "DINT", NULL, NULL);
 }
 // ANINT
 static void
-switch_specific_anint(call c, hash_table types)
+switch_specific_anint(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "ANINT", "DNINT", NULL, NULL);
 }
 // NINT
 static void
-switch_specific_nint(call c, hash_table types)
+switch_specific_nint(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "NINT", "IDNINT", NULL, NULL);
 }
 // ABS
 static void
-switch_specific_abs(call c, hash_table types)
+switch_specific_abs(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       "IABS", "ABS", "DABS", "CABS", NULL);
 }
 // MOD
 static void
-switch_specific_mod(call c, hash_table types)
+switch_specific_mod(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       "MOD", "AMOD", "DMOD", NULL, NULL);
 }
 // SIGN
 static void
-switch_specific_sign(call c, hash_table types)
+switch_specific_sign(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       "ISIGN", "SIGN", "DSIGN", NULL, NULL);
 }
 // DIM
 static void
-switch_specific_dim(call c, hash_table types)
+switch_specific_dim(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       "IDIM", "DIM", "DDIM", NULL, NULL);
 }
 // MAX
 static void
-switch_specific_max(call c, hash_table types)
+switch_specific_max(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       "MAX0", "AMAX1", "DMAX1", NULL, NULL);
 }
 // MIN
 static void
-switch_specific_min(call c, hash_table types)
+switch_specific_min(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       "MIN0", "AMIN1", "DMIN1", NULL, NULL);
 }
 // SQRT
 static void
-switch_specific_sqrt(call c, hash_table types)
+switch_specific_sqrt(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "SQRT", "DSQRT", "CSQRT", NULL);
 }
 // EXP
 static void
-switch_specific_exp(call c, hash_table types)
+switch_specific_exp(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "EXP", "DEXP", "CEXP", NULL);
 }
 // LOG
 static void
-switch_specific_log(call c, hash_table types)
+switch_specific_log(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "ALOG", "DLOG", "CLOG", NULL);
 }
 // LOG10
 static void
-switch_specific_log10(call c, hash_table types)
+switch_specific_log10(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "ALOG10", "DLOG10", NULL, NULL);
 }
 // SIN
 static void
-switch_specific_sin(call c, hash_table types)
+switch_specific_sin(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL,"SIN","DSIN", "CSIN", NULL);
 }
 // COS
 static void
-switch_specific_cos(call c, hash_table types)
+switch_specific_cos(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "COS", "DCOS", "CCOS", NULL);
 }
 // TAN
 static void
-switch_specific_tan(call c, hash_table types)
+switch_specific_tan(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "TAN", "DTAN", NULL, NULL);
 }
 // ASIN
 static void
-switch_specific_asin(call c, hash_table types)
+switch_specific_asin(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "ASIN", "DASIN", NULL, NULL);
 }
 // ACOS
 static void
-switch_specific_acos(call c, hash_table types)
+switch_specific_acos(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "ACOS", "DACOS", NULL, NULL);
 }
 // ATAN
 static void
-switch_specific_atan(call c, hash_table types)
+switch_specific_atan(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "ATAN", "DATAN", NULL, NULL);
 }
 // ATAN2
 static void
-switch_specific_atan2(call c, hash_table types)
+switch_specific_atan2(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "ATAN2", "DATAN2", NULL, NULL);
 }
 // SINH
 static void
-switch_specific_sinh(call c, hash_table types)
+switch_specific_sinh(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "SINH", "DSINH", NULL, NULL);
 }
 // COSH
 static void
-switch_specific_cosh(call c, hash_table types)
+switch_specific_cosh(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "COSH", "DCOSH", NULL, NULL);
 }
 // TANH
 static void
-switch_specific_tanh(call c, hash_table types)
+switch_specific_tanh(call c, type_context_p context)
 {
-    switch_generic_to_specific(c, types,
+    switch_generic_to_specific(c, context,
 			       NULL, "TANH", "DTANH", NULL, NULL);
 }
 
 
-/*********************************************************************** INTRINSICS LIST */
+/******************************************************** INTRINSICS LIST */
 
 /* the following data structure describes an intrinsic function: its
 name and its arity and its type. */
-
-typedef basic (*typing_function_t)(call, hash_table, statement);
 
 typedef struct IntrinsicDescriptor 
 {
