@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/03/13 11:14:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/23 18:02:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/03/13 11:14:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/04/23 18:02:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -166,7 +166,7 @@ entity e, module;
 	entities = NIL;
 
     if (dynamic_area_p(e))
-	return(make_sentence(is_sentence_formatted, ""));
+	return(make_sentence(is_sentence_formatted, strdup("")));
 
     assert(type_area_p(te));
 
