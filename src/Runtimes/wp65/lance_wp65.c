@@ -1,5 +1,5 @@
 /* $RCSfile: lance_wp65.c,v $ (version $Revision$)
- * ($Date: 1995/09/19 22:28:35 $, )
+ * ($Date: 1995/11/30 14:40:22 $, )
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +10,25 @@
 
 #include "genC.h"
 #include "misc.h"
+
+/* G77 adds 2 underscores to function name which has 1 _ soemewhere
+ * and only one to functions that have no underscores at all.
+ * I just cannot see the rationale, but this is not the point:-)
+ * FC, 30/11/95
+ */
+#ifdef COMPILE_FOR_G77
+#define FUNCTION_(name) name##__
+#define FUNCTION(name) name##_
+#else
+#define FUNCTION_(name) name##_
+#define FUNCTION(name) name##_
+#endif
+
+extern void FUNCTION(wp65)(int*);
+extern void FUNCTION(bank)(int*);
+
+/* not found in any header file */
+extern int gethostname(char*, int);
 
 /* Dans #include "wp65.h" : */
 extern void get_model(int *ppn, int *pbn, int *pls);
@@ -169,10 +188,10 @@ int estampiller(int PE, int banc, int taille, int direction)
 }
 
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {      
   int i, nb_t;
-  char *argv_fils[3], *debut_basename, *p, *chaine_env;
+  char *argv_fils[3], *chaine_env;
   int niveau_debug_pvm;
   
   mytid = pvm_mytid();
@@ -298,7 +317,7 @@ main(int argc, char *argv[])
 	  "Je suis le PE %d de tid 0x%x\n", numero, mytid);
     if (get_debug_level() >= 1)
       affiche_entete_X("%s:%s PE %d", machine, basename(argv[0]), numero);
-    WP65_(&numero);
+    FUNCTION(wp65)(&numero);
   }
   else {
     banc = numero - nb_procs;
@@ -306,7 +325,7 @@ main(int argc, char *argv[])
 	  "Je suis le banc %d de tid 0x%x\n", banc, mytid);
     if (get_debug_level() >= 1)
       affiche_entete_X("%s:%s Banc %d", machine, basename(argv[0]), banc);
-    BANK_(&banc);
+    FUNCTION(bank)(&banc);
   }
 
   /* Rajout d'une barrière car il semble que PVM puisse perdre des émissions
@@ -479,7 +498,7 @@ void receive_8(int tid, int proc_or_bank_id, double *donnee, int taille)
   }
 }
 
-void BANK_SEND_4_(int *proc_id, float *donnee, int *taille)
+void FUNCTION_(bank_send_4)(int *proc_id, float *donnee, int *taille)
 {
   debug(4, "BANK_SEND_4",
 	"Envoi de banc %d -> PE %d, taille = %d (estampille %d)\n",
@@ -488,7 +507,7 @@ void BANK_SEND_4_(int *proc_id, float *donnee, int *taille)
   send_4(tids[*proc_id], donnee, *taille);
 }
 
-void BANK_SEND_8_(int *proc_id, double *donnee, int *taille)
+void FUNCTION_(bank_send_8)(int *proc_id, double *donnee, int *taille)
 {
   debug(4, "BANK_SEND_8",
 	"Envoi de banc %d -> PE %d, taille = %d (estampille %d)\n",
@@ -497,7 +516,7 @@ void BANK_SEND_8_(int *proc_id, double *donnee, int *taille)
   send_8(tids[*proc_id], donnee, *taille);
 }
 
-void BANK_RECEIVE_4_(int *proc_id, float *donnee, int *taille)
+void FUNCTION_(bank_receive_4)(int *proc_id, float *donnee, int *taille)
 {
   debug(4, "BANK_RECEIVE_4",
 	"Réception de banc %d <- PE %d, taille = %d (estampille %d)\n",
@@ -506,7 +525,7 @@ void BANK_RECEIVE_4_(int *proc_id, float *donnee, int *taille)
   receive_4(tids[*proc_id], *proc_id, donnee, *taille);
 }
 
-void BANK_RECEIVE_8_(int *proc_id, double *donnee, int *taille)
+void FUNCTION_(bank_receive_8)(int *proc_id, double *donnee, int *taille)
 {
   debug(4, "BANK_RECEIVE_8",
 	"Réception de banc %d <- PE %d, taille = %d (estampille %d)\n",
@@ -515,7 +534,7 @@ void BANK_RECEIVE_8_(int *proc_id, double *donnee, int *taille)
   receive_8(tids[*proc_id], *proc_id, donnee, *taille);
 }
 
-void WP65_SEND_4_(int *bank_id, float *donnee, int *taille)
+void FUNCTION_(wp65_send_4)(int *bank_id, float *donnee, int *taille)
 {
   debug(4, "WP65_SEND_4",
 	"Envoi de PE %d -> banc %d, taille = %d (estampille %d)\n",
@@ -524,7 +543,7 @@ void WP65_SEND_4_(int *bank_id, float *donnee, int *taille)
   send_4(tids[*bank_id + nb_procs], donnee, *taille);
 }
 
-void WP65_SEND_8_(int *bank_id, double *donnee, int *taille)
+void FUNCTION_(wp65_send_8)(int *bank_id, double *donnee, int *taille)
 {
   debug(4, "WP65_SEND_8",
 	"Envoi de PE %d -> banc %d, taille = %d (estampille %d)\n",
@@ -534,7 +553,7 @@ void WP65_SEND_8_(int *bank_id, double *donnee, int *taille)
 }
 
 
-void WP65_RECEIVE_4_(int *bank_id, float *donnee, int *taille)
+void FUNCTION_(wp65_receive_4)(int *bank_id, float *donnee, int *taille)
 {
   debug(4, "WP65_RECEIVE_4",
 	"Réception de PE %d <- banc %d, taille = %d (estampille %d)\n",
@@ -543,7 +562,7 @@ void WP65_RECEIVE_4_(int *bank_id, float *donnee, int *taille)
   receive_4(tids[*bank_id + nb_procs], *bank_id, donnee, *taille);
 }
 
-void WP65_RECEIVE_8_(int *bank_id, double *donnee, int *taille)
+void FUNCTION_(wp65_receive_8)(int *bank_id, double *donnee, int *taille)
 {
   debug(4, "WP65_RECEIVE_8",
 	"Réception de PE %d <- banc %d, taille = %d (estampille %d)\n",
@@ -552,14 +571,16 @@ void WP65_RECEIVE_8_(int *bank_id, double *donnee, int *taille)
   receive_8(tids[*bank_id + nb_procs], *bank_id, donnee, *taille);
 }
 
-int idiv_(int * i, int * j)
+int FUNCTION(idiv)(int * i, int * j)
 {
     return (*i)>=0 ? (*i)/(*j) : (-(-(*i)+(*j)-1)/(*j));
 }
 
 /* Horreur pour que la bibliothèque F77 soit contente : */
-void MAIN_()
+#ifndef COMPILE_FOR_G77
+void FUNCTION(MAIN)()
 {
   /* Jamais exécuté, je pense... */
   fprintf(stderr, "Entrée dans MAIN_ !\n");
 }
+#endif
