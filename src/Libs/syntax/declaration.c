@@ -37,6 +37,7 @@
 #include <ctype.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "parser_private.h"
