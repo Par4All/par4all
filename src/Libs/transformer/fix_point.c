@@ -263,7 +263,7 @@ transformer tf;
     int n_inv = 0;
 
     int i = 0;
-    Pbase t = BASE_UNDEFINED;
+    /* Pbase t = BASE_UNDEFINED; */
 
     ifdebug(8) {
 	debug(8, "transformer_equality_fix_point", "begin for transformer %p\n", tf);
@@ -999,12 +999,16 @@ invariant_vector_p(Pvecteur v)
 
 /* Computation of a fix point using constraints on the discrete derivative.
  *
+ * Implicit equations, n#new - n#old = 0, are not added. Instead, invariant
+ * constraints in tf are obtained by projection and added.
+ *
  * Intermediate values are used to encode the differences. For instance,
  * i#int = i#new - i#old
  */
 transformer transformer_derivative_fix_point(transformer tf)
 {
   transformer fix_tf = transformer_dup(tf);
+  transformer inv_tf = transformer_undefined; /* invariant constraints of tf */
   /* sc is going to be modified and destroyed and eventually replaced in 
      fix_tf */
   Psysteme sc = predicate_system(transformer_relation(fix_tf));
@@ -1216,6 +1220,24 @@ transformer transformer_derivative_fix_point(transformer tf)
 
   /* Plug sc back into fix_tf */
   predicate_system(transformer_relation(fix_tf)) = sc;
+
+  /* Add constraints about invariant variables. This could be avoided if
+     implicit equalities were added before the derivative are processed:
+     each invariant variable would generate an implicit null
+     difference. 
+
+     Such invariant constraints do not exist in general. We have them when
+     array references are trusted.
+
+     This is wrong because we compute f* and not f+ and this is not true
+     for the initial store.
+
+  */
+  /* 
+  inv_tf = transformer_arguments_projection(transformer_dup(tf));
+  fix_tf = transformer_image_intersection(fix_tf, inv_tf);
+  free_transformer(inv_tf);
+  */
 
   /* That's all! */
   
