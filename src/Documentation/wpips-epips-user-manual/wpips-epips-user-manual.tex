@@ -1,26 +1,49 @@
-\documentstyle[a4,psfig]{report}
+\documentstyle[a4,psfig,html,xr,fancybox,amstext,alltt,pstricks]{report}
 
-\input{wpips-epips-declarations}
+%% Since it includes some parts of pipsmake-rc.tex, add some external
+%% references from it:
+\externallabels{http://www.cri.ensmp.fr/pips/pipsmake-rc}{/projects/Pips/Documentation/public_html/pipsmake-rc/labels.pl}
+%% Idem for LaTeX with "xr":
+\externaldocument{../pipsmake/pipsmake-rc}
+%% Je voudrais bien trouver un moyen de rajouter un préfixe à ces
+%% labels... :-(
+
+\newenvironment{PipsExample}{\VerbatimEnvironment
+\begin{Verbatim}}{\end{Verbatim}}
+
+\input{wpips-epips-declarations.tex}
 
 \begin{document}
 
+%% Add a link to PIPS in the navigation panel:
+\htmladdtonavigation{\htmladdnormallink{\htmladdimg{http://www.cri.ensmp.fr/pips/images/logo-pips-36x36.gif}}{http://www.cri.ensmp.fr/pips}}
+
+
 \title{WPips \& EPips User Manual\\ (Paralléliseur Interprocédural de
-  Programmes Scientifiques) --- a Linear Algebra based Automatic
+  Programmes Scientifiques) \\
+  --- \\
+  Linear Algebra based Automatic
   Parallelizer \& Program Transformer}
 
 \author{Ronan Keryell}
 
 \maketitle
 
+\setcounter{tocdepth}{6}
+\tableofcontents
+
+\centerline{\psfig{file=images/logo-pips-embossed.eps,width=0.25\hsize}}
+
+
 \chapter{Introduction}
 \label{cha:introduction}
 
-PIPS is an automatic parallelizer for scientific programs that takes as
+\PIPS{} is an automatic parallelizer for scientific programs that takes as
 input Fortran 77 and HPF codes.  Since its inception in 1988, it
 emphasizes interprocedural techniques based on linear algebra
 techniques.
 
-PIPS is a highly modular framework which can be used to test and
+\PIPS{} is a highly modular framework which can be used to test and
 implement independently various compilation schemes, program analyses
 and transformations, such as automatic vectorization and
 parallelization (Cray Fortran, CRAFT, CM Fortran, F90 \& PVM output),
@@ -31,21 +54,21 @@ perform the analyses or transformations required by the user.
 Consistency and interprocedurality issues are dealt with
 automatically.
 
-The phase chaining is driven by an interprocedural make system {\em
-pipsmake\/} and internal data structures are automatically stored in a
+The phase chaining is driven by an interprocedural make system
+\PIPSMAKE{} and internal data structures are automatically stored in a
 database {\em pipsdbm\/} wich manages persistence through different
 runs. Persistence is used to avoid the memory bottleneck when large
 programs are analyzed interprocedurally. It is also used by newcommers
 to develop new applications without interferring with existing code.
 
-PIPS is built on top of two tools. The first one is data structure
-description language, {\em Newgen\/}, which manages allocation,
+\PIPS{} is built on top of two tools. The first one is data structure
+description language, \PNEWGEN{}, which manages allocation,
 de-allocation, storage for persistent objects, walks thru complex data
 structures, and provides basic classes, such as list, set and mapping.
-{\em Newgen\/} is embedded in C, CommonLISP and SML.
-All PIPS data-types are declared with {\em Newgen\/} descriptions and used with the C or the Common LISP embedding.
+\PNEWGEN{} is embedded in C, CommonLISP and SML.
+All \PIPS{} data-types are declared with \PNEWGEN{} descriptions and used with the C or the Common LISP embedding.
 
-The second tool is the {\em Linear $C^3$\/} library which handles
+The second tool is the \PLinear{} library which handles
 linear formul\ae{} and structures based on these, such as vectors,
 constraints, polyhedra, generating system. This library is used to
 analyze codes (preconditions, regions, dependence test) and to generate
@@ -55,7 +78,12 @@ tiling, send/receive, temporary array allocation,...)
 Three interfaces are available: a shell interface ({\em Pips\/}), an X-WindowS interface
 ({\tt wpips\/}) and a hypertextual interface ({\tt epips\/}).
 
-To have more information: {\tt http://www.cri.ensmp.fr/$\sim$pips}
+To have more information:
+\htmladdnormallink{http://www.cri.ensmp.fr/pips}{http://www.cri.ensmp.fr/pips}.
+A WWW version of this report can be shown at
+\htmladdnormallink{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html}
+and a PostScript version of this report at
+\htmladdnormallink{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.ps}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.ps}
 
 This report give a user manual on the X-WindowS (XView) interface
 \WPIPS{} and the hypertextual GNU-Emacs based interface \EPIPS{}.
@@ -65,7 +93,7 @@ environment features:
 \begin{itemize}
 \item create workspaces from Fortran sources;
 \item close and re-open these workspace later by exploiting the
-  \PNewGen{} persistent data types;
+  \PNEWGEN{} persistent data types;
 \item edit the Fortran sources;
 \item analyse the programs by displaying various interprocedural
   informations based on the interprodural linear algebra framework
@@ -86,8 +114,64 @@ developper level and allow easily some various extensions.
 \label{cha:getting_started}
 
 
+In the {\tt GettingStarted} directory, there is a collection of small
+programs to start up with the \PIPS{} environment.
+
+\section{Parallelizing a small program}
+\label{sec:parallelizing_a_small_program}
+
+We begin here by using 4 different parallelizing methods on a small
+program, a matrix multiplication.
+
+
+\subsection{Parallelize or vectorize the code}
+\label{sec:parallelize_or_vectorize_the_code}
+
+
+\subsection{Generate parallel PVM code from HPF}
+\label{sec:generate_parallel_PVM_code_from_HPF}
+
+
+\subsection{Generate distributed code for processors and memory banks}
+\label{sec:generate_distributed_code}
+
+{\em This section comes mainly from Corinne A{\sc ncourt}.}
+
+\input{presentation_WP65.tex}
+
+
+\subsection{Parallelize the code with a polyhedric method}
+\label{sec:parallelize_polyhedric}
+
+
+
+
+\section{Optimizing a small program}
+\label{sec:optimizing_a_small_program}
+
+
+\section{Array Regions for Interprocedural Parallelization and Array
+  Privatization}
+\label{sec:parallelizing_a_program_with_aray_privatization}
+
+{\em This is mainly the internal report A/279/CRI from Béatrice C{\sc
+    reusillet} you can get at
+  \htmladdnormallink{http://www.cri.ensmp.fr/doc/A-279.ps.Z}{http://www.cri.ensmp.fr/doc/A-279.ps.Z}.}
+
+\input{A-279-modified}
+
+
 \chapter{User manual}
 
+
+\section{PIPS input language}
+\label{sec:input_language}
+
+To be defined... :-(
+
+F77, implicit none, include, .F (cpp) \& .f
+
+What is not in the \PIPS input language...
 
 
 \section{The PIPS Unix commands}
@@ -256,7 +340,7 @@ easier by clicking up or down the small arrows.
 \subsection{PIPS icon button}
 \label{sec:pips_icon_button}
 
-This button is used to interrupt the current PIPS work. It is taken
+This button is used to interrupt the current \PIPS{} work. It is taken
 into account by \PIPSMAKE{} at a phase boundary. That means that if
 you are doing a compute intensive phase, you will wait until the end
 of this one, since it is the only way to have clean and easy data
@@ -268,8 +352,113 @@ coherence.
 %\psfig{file=images/select_menu.eps,width=\hsize}
 
 
+
+\section{Log window}
+\label{sec:log_window}
+
+Since \PIPS is an interactive environment, some information about what
+is hapening or what failed, etc. is important. A special window is
+allocated to this purpose.
+
+Since dealing with big programs can lead to huge log information, think
+to empty the log windows from time to time.
+
+
+\subsection{WPips log window}
+\label{sec:wpips_log_window}
+
+In the \WPIPS mode, an XView {\tt textedit}-like window is used.
+It can be opened, closed or emptied from the main panel.
+
+
+\subsection{EPips log window}
+\label{sec:Epips_log_window}
+
+In the Emacs mode, the log window is naturally an Emacs buffer. This
+able to display different messages with various text properties (such
+as colors, shape, etc.) according to the importance of each messages:
+a user warning, a user error, a pips error, etc.
+
+There is also \PIPS-specific menus added to the buffer.
+
+
+\section{View windows}
+\label{sec:display_windows}
+
+According to the mode, that is \EPIPS or \WPIPS, different kind of
+windows are used to give information to the user, such as display the
+code, display the data dependences, edit the code, etc.
+
+A window to be diplayed is chosen among a pool of $n$ windows, $n$
+given by the number of display windows in the main panel
+(Section~\ref{sec:main_number_display_windows}). To do some advance
+usage, it is often useful to increase the number of available windows
+at the same time from the default value of 2 to a greater value.
+
+Since it is useful to keep some information in a window, such as for
+example the original code when the user is applying various
+transformations on the code, windows can be frozen and retained unused
+when they have a retain attribute. According to the mode, different
+methods are used to change the retain state.
+
+\subsection{Wpips display windows}
+\label{sec:wpips_display_windows}
+
+
+\subsubsection{Default XView windows}
+
+By default a XView textedit window is open to display user
+information. 
+
+Functionalities of this kind of windows can be found in the manual
+page with {\tt man textedit}. The most interesting thing to know about
+is that you can display a menu with the right button to do operations
+on files, etc.
+
+At the bottom of the window there is a mark box to retain a window.
+Its retain state can be changer by clicking on this button.
+
+\subsubsection{Alternate view/edit windows}
+
+Some users found useful to be able to chose their editors. For this
+feature, an environment variable is used: \verb|PIPS_WPIPS_EDITOR|.
+If this variable is set, its value is the name of the command to
+execute to display or edit a file. The name of the file to display is
+concatenated to that value before being executed.
+For example, in a \verb|csh|-like shell,
+\begin{verbatim}
+setenv PIPS_WPIPS_EDITOR 'xterm -e vi'
+\end{verbatim}
+will use a \verb|vi| editor in an \verb|xterm|.
+
+Note that with this feature, the control of these windows are under
+the control of their users, that means that the retain mode is
+meaningless and there is no pool of windows. A new editor windows is
+used to display each new data and the user is responsible to remove no
+longer used windows.
+
+
+\subsection{Epips display windows}
+\label{sec:epips_display_windows}
+
+In the Emacs mode, an Emacs buffer is of course used to inherit of the
+editing power, language-orented editing, hypertextual interactivity,
+colored highlighting, etc.
+
+Each \EPIPS window has some \PIPS specific menus and a special keymap.
+
+As for the XView windows of \WPIPS, the number of windows in the pool
+is choosen according to the number of display windows in the main panel
+(Section~\ref{sec:main_number_display_windows}).
+
+Note that the visited file name of the buffer is set to the displayed
+file but since a file cannot be directly visited in different buffer
+in Emacs, when \EPIPS is asked to display twice the same version of
+the same resource, a confirmation is asked to the user and the file
+name is not set in the last buffer.
+
 \section{View menu}
-\label{sec:view_menu}
+\label{sec:epips_view_menu}
 
 It is used to display some code or some informations from \PIPS. To
 display these, \PIPS{} may execute lots of analyses or code
@@ -284,7 +473,7 @@ transformations according to \PIPSMAKE.
   display windows;
 
 \item[\PSequentialView:] it is the basic view of a module : the code is
-  displayed as \PIPS{} understand it. It may be decorated with some
+  displayed as \PIPS{} understands it. It may be decorated with some
   internal informations by using options ``\PSequentialView''
   (section~\ref{sec:option_sequential_view});
 
@@ -435,68 +624,22 @@ the current module in \PIPS. Furthermore, the user can edit the code
 of the module as a special transformation.
 
 \begin{center}
-  \mbox{\psfig{file=images/transform_edit_menu.eps,width=0.3\hsize}}
+  \mbox{\psfig{file=images/transform_edit_menu.eps,width=0.6\hsize}}
 \end{center}
 
 \input{wpips-epips-transform-menu.tex}
 
+  
 \begin{description}
-\item[\PDistributeLoops:] distribute all the loops of the module;
-
-\item[\PFullLoopUnroll:] unroll all the iterations of a loop with
-  constant loop bounds (that means that some ``\PPartialEval'' may be
-  useful before);
-
-\item[\PLoopUnroll:] unroll a loop by a given number of iterations;
-  
-\item[\PLoopInterchange:] interchange a loop nest by pointing the
-  outermost loop;
-  
-\item[\PLoopNormalize:] normalize all the loop of the module.
-  Afterward, all loops have a step of 1 and begin at 1, if possible;
-
-\item[\PStripMining:] replace a loop by a loop nest;
-
-\item[\PPrivatizeScalars:] try to find loop private scalar variables;
-
-\item[\PPrivatizeScalarsAndArrays:] try to find loop private scalar and
-  array variables by using the IN/OUT regions;
-  
-\item[\PDeadCodeElimination::] use the semantical anylisis of \PIPS{}
-  to remove some use less code, such as \PIF{} alway true, loops never
-  executed, etc. Useful to simplify the code after code
-  transformations;
-  
-\item[\PPartialEval:] use the semantical anylisis of \PIPS{} to
-  compute values known at compile time. Useful to simplify the code
-  before applying some code transformations;
-
-\item[\PRestructureWithSTF:] use the STF restructrurer from ToolPack
-  to restructure the code;
-
-\item[\PUnspaghettifyTheControlGraph:] simplify the internal
-  representation of the control graph and try to restructure some
-  \PIF;
-
-\item[\PUseDefElimination:] remove the instructions that are not
-  involved in any IO nor are necessary for any IO related result;
-
-\item[\PAtomize:] transform the code in simpler one such as {\tt A = B
-    op C};
-
-\item[\PNewAtomize:] another version of ``\Patomize'', more robust;
-
-\item[\PStaticControlize:] try to transform the code in a more
-  suitable form for the polyhedral method: normalize the loops, create
-  an internal ressource, etc;
-  
 \item[\PEdit:] a special transformation : the user one! Load the
   original code of the module. Do not forget to save your modification
   after you have finished (the menu {\em File/Save Current File\/} in
   a \WPIPS{} Edit window or the menu {\em Save the file after edit in
     the seminal .f} in \EPIPS).
-
 \end{description}
+
+%% Get a more precise comment about the transformations:
+\input{wpips-epips-transform-end.tex}
 
 
 \section{Compile}
@@ -529,8 +672,14 @@ of the module as a special transformation.
   \mbox{\psfig{file=images/options_menu.eps,width=0.3\hsize}}
 \end{center}
 
+\input{wpips-epips-options-menu.tex}
 
 \chapter{Conclusion}
 \label{cha:conclusion}
+
+{\small
+\bibliographystyle{plain}
+\bibliography{mybib-beatrice}
+}
 
 \end{document}
