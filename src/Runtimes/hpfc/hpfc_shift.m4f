@@ -1,5 +1,5 @@
 c
-c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1995/09/06 13:33:13 $, )
+c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1995/09/07 10:24:43 $, )
 c version $Revision$
 c got on %D%, %T% 
 c
@@ -214,8 +214,8 @@ define(`INIT_TABLE',`dnl
 c
 define(`GENERIC_SHIFT',`dnl
 pushdef(`LEVEL',$1)dnl
-pushdef(`TYPE',$2)dnl
-pushdef(`PVMTYPE',$3)dnl
+pushdef(`PVMTYPE',$2)dnl
+pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
       subroutine build_name(HPFC_SHIFT,PVMTYPE,LEVEL)(
      $  array, an, dim, sh, dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
@@ -321,17 +321,21 @@ popdef(`PVMTYPE')dnl')dnl
 c
 c
 define(`ALL_SHIFT',`dnl
-GENERIC_SHIFT(1,$1,$2)
-GENERIC_SHIFT(2,$1,$2)
-GENERIC_SHIFT(3,$1,$2)
-GENERIC_SHIFT(4,$1,$2)
-c G ENERIC_SHIFT(5,$1,$2)
-c G ENERIC_SHIFT(6,$1,$2)
-c G ENERIC_SHIFT(7,$1,$2)')dnl
+GENERIC_SHIFT(1,$1)
+GENERIC_SHIFT(2,$1)
+GENERIC_SHIFT(3,$1)
+dnl GENERIC_SHIFT(4,$1)
+dnl GENERIC_SHIFT(5,$1)
+dnl GENERIC_SHIFT(6,$1)
+dnl GENERIC_SHIFT(7,$1)')dnl
 c
-ALL_SHIFT(integer*4,INTEGER4)
-ALL_SHIFT(real*4,REAL4)
-ALL_SHIFT(real*8,REAL8)
+ALL_SHIFT(INTEGER4)
+ALL_SHIFT(REAL4)
+ALL_SHIFT(REAL8)
+dnl ALL_SHIFT(BYTE1)
+dnl ALL_SHIFT(INTEGER2)
+dnl ALL_SHIFT(COMPLEX8)
+dnl ALL_SHIFT(COMPLEX16)
 c
 c That is all
 c
