@@ -1,6 +1,6 @@
 dnl
 dnl $RCSfile: hpfc_architecture_m4_macros,v $ version $Revision$
-dnl ($Date: 1995/09/25 13:10:24 $, )
+dnl ($Date: 1995/09/25 17:34:11 $, )
 dnl
 dnl DEFAULT ARCHITECTURE
 dnl
@@ -32,6 +32,11 @@ dnl
 dnl TO USE IBM PVMe IMPLEMENTATION
 dnl 
 ifdef(`USE_PVMe',`define(`_PVMe',`$@')',`define(`_PVMe',)')dnl
+dnl
+dnl
+define(`DEFAULTLINK',`$@')dnl
+ifelse(ARCHITECTURE,`CM5',`define(`DEFAULTLINK',)')dnl
+dnl
 dnl
 dnl THAT IS ALL
 dnl
