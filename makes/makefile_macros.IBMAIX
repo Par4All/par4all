@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.IBMAIX,v $ (version $Revision$)
-# $Date: 1996/09/20 12:07:09 $, 
+# $Date: 1996/09/20 17:15:14 $, 
 #
 # this file contains macro definitions 
 
@@ -48,6 +48,10 @@ RMAN	= rman
 TAR	= tar
 ZIP	= gzip -v9
 DIFF	= diff
+
+#
+# Well, AIX is not unix, and xlc does not have the expected behavior under -M
+DEPFILE = *.u
 
 # end of makefile_macros..
 #
