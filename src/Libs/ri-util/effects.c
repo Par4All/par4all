@@ -1,6 +1,10 @@
 /* Created by B. Apvrille, april 11th, 1994 */
 /* functions related to types effects and effect */
 
+#include <stdio.h>
+
+#include "linear.h"
+
 #include "genC.h"
 
 #include "ri.h"
