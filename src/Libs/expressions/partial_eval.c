@@ -1,0 +1,907 @@
+/*
+ * Integer constants calculated by preconditions are replaced by their value.
+ * Expressions are evaluated to (ICOEF*SUBEXPR + ISHIFT) in order to perform
+ * some simplifications.
+ */
+/* Hypotheses pour l'implementation:
+
+Toute fonction d'evaluation partielle retourne eformat_undefined
+lorsqu'elle n'a rien evalue (ex: lors d'un appel d'une fonction
+externe).
+
+eformat.expr NE DOIT JAMAIS partager de structures avec le code. Par
+contre, une expression detachee du code peut appartenir a eformat.expr.
+
+Lorsqu'une expression est detachee du code, il faut prendre garde a la
+remplacer par expression_undefined. Sinon, le free (dans
+regenerate_expression()) causera des degas!
+
+Si une information est ajoutee a eformat_undefined, alors l'expression
+est RECOPIEE. Pourtant, eformat.simpler reste FALSE et l'expression
+d'origine n'est pas freee, car une seule information ne permet aucune
+simplification. A partir de la prise en compte de la seconde
+information, de`s qu'eformat est simplife', alors eformat.simpler
+devient vrai. L'expression d'origine sera alors free'e lorsque
+regenerate_expression().
+
+Des que l'evaluation n'est plus possible, il faut regenerer l'expression
+ */
+
+#include <stdio.h>
+extern int fprintf();
+extern int printf();
+#include <string.h>
+
+#include "hash.h"
+#include "genC.h"
+#include "ri.h"
+#include "text.h"
+
+#include "text-util.h"
+#include "database.h"
+#include "pipsdbm.h"
+#include "resources.h"
+#include "control.h"
+#include "ri-util.h"
+#include "misc.h"
+
+#include "effects.h" /* for print_effects() */
+#include "transformer.h"
+#include "semantics.h" /* for module_to_value_mappings() */
+
+#include "arithmetique.h"
+
+#include "transformations.h"
+
+static struct eformat  eformat_undefined = {expression_undefined, 1, 0, FALSE};
+/* when formating is useless (ie. = (1 * expr + 0)) */
+
+static statement_mapping proper_effects_map = 
+    (statement_mapping) HASH_UNDEFINED_VALUE;
+
+void init_use_proper_effects(module_name)
+char *module_name;
+{
+    proper_effects_map = (statement_mapping)
+	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE);
+    pips_assert("init_use_proper_effects",
+		proper_effects_map != (statement_mapping) HASH_UNDEFINED_VALUE);
+}
+
+/* returns proper effects associated to statement stmt */
+/* Current implementation of effects mappings involves lists of effect!
+ * (sa. pipsdbm/io.c). Lists become effects here.
+ */
+effects stmt_to_fx(stmt, stmt_fx_map)
+statement stmt;
+statement_mapping stmt_fx_map;
+{
+    effects fx;
+    list ls;
+
+    pips_assert("stmt_prec", stmt != statement_undefined);
+
+    debug(9, "stmt_to_fx", 
+	  "Look for effects for statement at %d (ordering %d, number %d):\n", 
+	  (int) stmt, statement_ordering(stmt), statement_number(stmt));
+
+    ls = (list) GET_STATEMENT_MAPPING(stmt_fx_map, stmt);
+
+    if(ls==(list) HASH_UNDEFINED_VALUE) {
+	fx = effects_undefined;
+	debug(5, "stmt_to_fx", "effects_undefined");
+    }
+    else {
+	/* sorry for this dusty alloc... never freed! */ 
+	fx= make_effects(ls);
+	if(get_debug_level()>=5) {
+	    print_effects(effects_effects(fx));
+	}
+    }
+
+    return(fx);
+}
+
+bool entity_written_p(ent, fx)
+entity ent;
+effects fx;
+{
+    if(fx==effects_undefined)
+	pips_error("entity_written_p", "effects undefined\n");
+
+    MAPL(ftl, {
+	effect ft = EFFECT(CAR(ftl));
+	if( ENDP(reference_indices(effect_reference(ft)))
+	   && same_entity_p(ent, reference_variable(effect_reference(ft)))
+	   && action_write_p(effect_action(ft)) )
+	    return(TRUE);
+    }, effects_effects(fx));
+
+    return(FALSE);
+}
+
+static statement_mapping preconditions_map = 
+    (statement_mapping) HASH_UNDEFINED_VALUE;
+
+void init_use_preconditions(module_name)
+char *module_name;
+{
+    preconditions_map = (statement_mapping)
+	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE);
+    pips_assert("init_use_preconditions",
+		preconditions_map != (statement_mapping) HASH_UNDEFINED_VALUE);
+    if(get_debug_level()==9) {
+	transformer_map_print();
+    }
+}
+
+/*
+  cf. load_statement_transformer() in semantics/dbm_interface.c
+  */
+Psysteme stmt_prec(stmt)
+statement stmt;
+{
+    transformer t;
+
+    pips_assert("stmt_prec", stmt != statement_undefined);
+
+    debug(9, "stmt_prec", 
+	  "Look for preconditions for statement at %d (ordering %d, number %d):\n", 
+	  (int) stmt, statement_ordering(stmt), statement_number(stmt));
+
+    t = (transformer) GET_STATEMENT_MAPPING(preconditions_map, stmt);
+
+    if(t==(transformer) HASH_UNDEFINED_VALUE) t = transformer_undefined;
+
+    /* pips_assert("stmt_prec", t != transformer_undefined);*/
+    
+    return(t==transformer_undefined ? 
+	   SC_UNDEFINED :
+	   (Psysteme)predicate_system(transformer_relation(t)) );
+
+}
+
+void transformer_map_print()
+{
+    FILE * f =stderr;
+    hash_table htp = preconditions_map;
+
+    fprintf(f, "hash_key_type:     %d\n", htp->hash_type);
+    fprintf(f, "hash_size:         %d\n", htp->hash_size);
+    fprintf(f, "hash_entry_number: %d\n", htp->hash_entry_number);
+
+    HASH_MAP(k, v, {
+	fprintf(f, "\nFor statement at %d (ordering %d, number %d):\n", 
+		(int) k,
+		statement_ordering((statement) k), 
+		statement_number((statement) k));
+	print_transformer((transformer) v);
+    },
+	     htp);
+}
+
+bool eformat_equivalent_p(ef1,ef2)
+struct eformat ef1, ef2;
+{
+     /* should not require anything about expr */
+    return( ef1.expr == ef2.expr /* ie expression_eq(ef1.expr, ef2.expr) */
+	   && ef1.icoef == ef2.icoef
+	   && ef1.ishift == ef2.ishift );
+}
+
+void print_eformat(ef, name)
+struct eformat ef;
+char *name;
+{
+    (void) printf("eformat %s = %d x EXPR + %d, %ssimpler, with EXPR:\n", 
+	   name, ef.icoef, ef.ishift, (ef.simpler ? "" : "NOT "));
+    print_expression(ef.expr);
+}
+
+void partial_eval_expression_and_regenerate(ep, ps, fx)
+expression *ep;
+Psysteme ps;
+effects fx;
+{
+    struct eformat ef;
+
+    ef= partial_eval_expression(*ep, ps, fx);
+
+    if (get_debug_level()>=5)
+	print_eformat(ef, "before regenerate");
+
+    regenerate_expression(&ef, ep);
+
+    if(get_debug_level()>=5 && !gen_consistent_p(*ep)) {
+	pips_error("partial_eval_expression_and_regenerate", "bad evaluation");
+    }
+}
+
+struct eformat partial_eval_expression_and_copy(expr, ps, fx)
+expression expr;
+Psysteme ps;
+effects fx;
+{
+    struct eformat ef;
+
+    ef= partial_eval_expression(expr, ps, fx);
+
+    if(eformat_equivalent_p(ef,eformat_undefined)) {
+	ef.expr= gen_copy_tree(expr);
+    }
+
+    return(ef);
+}
+
+struct eformat partial_eval_expression(e, ps, fx)
+expression e;
+Psysteme ps;
+effects fx;
+{
+    return(partial_eval_syntax(e, ps, fx));
+}
+
+struct eformat partial_eval_syntax(e, ps, fx)
+expression e;
+Psysteme ps;
+effects fx;
+{
+    struct eformat ef;
+    syntax s = expression_syntax(e);
+
+    switch (syntax_tag(s)) {
+      case is_syntax_reference:
+	ef = partial_eval_reference(e, ps, fx);
+	break;
+      case is_syntax_range:
+	ef = eformat_undefined;
+	break;
+      case is_syntax_call:
+	ef = partial_eval_call(e, ps, fx);
+	break;
+      default:
+	pips_error( "partial_eval_syntax", "case default\n");
+	abort();
+    }
+
+    if (get_debug_level()==9)
+	print_eformat(ef, "after partial_eval_syntax");
+
+    return(ef);
+}
+
+struct eformat partial_eval_reference(e, ps, fx)
+expression e;
+Psysteme ps;
+effects fx;
+{
+    reference r;
+    Pvecteur pv;
+    entity var;
+    
+    pips_assert("partial_eval_reference", 
+		syntax_reference_p(expression_syntax(e)));
+    r = syntax_reference(expression_syntax(e));
+    var = reference_variable(r);
+
+    if(reference_indices(r) != NIL) {
+	MAPL(li, {
+	    expression expr = EXPRESSION(CAR(li));
+
+	    partial_eval_expression_and_regenerate(&expr, ps, fx);
+	    EXPRESSION(CAR(li)) = expr;
+	}, reference_indices(r));
+
+	debug(9, "partial_eval_reference", "Array elements not evaluated\n");
+	return(eformat_undefined);
+    }
+    if(!type_variable_p(entity_type(var)) || 
+       !basic_int_p(variable_basic(type_variable(entity_type(var)))) ) {
+	debug(9, "partial_eval_reference", "Reference cannot be evaluated\n");
+	return(eformat_undefined);
+    }
+
+    if (SC_UNDEFINED_P(ps)) {
+	return(eformat_undefined);
+    }
+
+    if(entity_written_p(var, fx)) {
+	/* entity cannot be replaced */
+	return(eformat_undefined);
+    }
+
+    /* faire la Variable */
+    /* verification de la presence de la variable dans ps */
+    for ( pv=ps->base; !VECTEUR_NUL_P(pv) ; pv=pv->succ) {
+	if ((entity)var_of(pv)==var) {
+	    bool feasible;
+	    Value min, max;
+	    Psysteme ps1 = sc_dup(ps);
+
+	    feasible = sc_minmax_of_variable(ps1, (Variable)var, &min, &max);
+	    if (! feasible) {
+		user_warning("partial_eval_reference", 
+			     "Not feasable system: there is probably some dead code.\n");
+	    }
+	    if ( min == max ) {
+		struct eformat ef;
+
+		/* var is constant and has to be replaced */
+		if ( get_debug_level() == 9) {
+		    debug(9, "partial_eval_reference", 
+			  "Constant to replace: \n");
+		    print_expression(e);
+		}
+
+		ef.icoef = 0;
+		ef.ishift = (int)min;
+		ef.expr = expression_undefined;
+		ef.simpler = TRUE;
+		return(ef);
+
+		/*		new_expr=int_expr((int)min); */		
+		/* replace expression_normalized(e) with 
+		   expression_normalized(new_expr) * /
+		   /*		free_normalized(expression_normalized(e));
+				expression_normalized(e) = expression_normalized(new_expr);
+				expression_normalized(new_expr) = normalized_undefined;*/
+
+		       /* replace expression_syntax(e) with 
+			  expression_syntax(new_expr) * /
+			  /*
+			    free_syntax(expression_syntax((e)));
+			    expression_syntax(e) = expression_syntax(new_expr);
+			    expression_syntax(new_expr) = syntax_undefined;
+			    
+			    free_expression(new_expr);
+			    
+			    if ( get_debug_level() == 9) {
+			    debug(9, "partial_eval_reference", 
+			    "Constant replaced by expression: \n");
+			    print_expression(e);
+			    gen_consistent_p(e);
+			    pips_assert("partial_eval_reference", 
+			    syntax_call_p(expression_syntax(e)));
+			    }*/
+			  }
+	    /*	    return(entity_initial(call_function(syntax_call(expression_syntax(e)))));
+	     */
+	    return(eformat_undefined);
+	}
+    }
+    return(eformat_undefined);
+}
+
+void partial_eval_call_and_regenerate(ca, ps, fx)
+call ca;
+Psysteme ps;
+effects fx;
+{
+    pips_assert("partial_eval_call_and_regenerate", 
+		ca!= call_undefined);
+
+    MAPL(le, {
+	expression exp= EXPRESSION(CAR(le));
+
+	partial_eval_expression_and_regenerate(&exp, ps, fx);
+	EXPRESSION(CAR(le))= exp;
+    }, call_arguments(ca));
+}
+
+
+struct eformat partial_eval_call(exp, ps, fx)
+expression exp;
+Psysteme ps;
+effects fx;
+{
+    call ec;
+    entity func;
+    value vinit;
+    struct eformat ef;
+    
+    pips_assert("partial_eval_call", 
+		syntax_call_p(expression_syntax(exp)));
+    ec = syntax_call(expression_syntax(exp));
+
+    func = call_function(ec);
+    vinit = entity_initial(func);
+	
+    switch (value_tag(vinit)) {
+      case is_value_intrinsic:
+      case is_value_unknown: {
+	  /* it might be an intrinsic function */
+	  cons *la = call_arguments(ec);
+	  int token;
+
+	  if ((token = IsUnaryOperator(func)) > 0)
+	      ef = partial_eval_unary_operator(func, la, ps, fx);
+	  else if ((token = IsBinaryOperator(func)) > 0)
+	      ef = partial_eval_binary_operator(func, la, ps, fx);
+	  else {
+	      MAPL(le, {
+		  expression expr = EXPRESSION(CAR(le));
+
+		  partial_eval_expression_and_regenerate(&expr, ps, fx);
+	      }, call_arguments(ec) );
+	      ef = eformat_undefined;
+	  }
+      }
+	break;
+      case is_value_constant:
+	if(integer_constant_p(func, &ef.ishift)) {
+	    ef.icoef = 0;
+	    ef.expr = expression_undefined;
+	    ef.simpler = FALSE;
+	}
+	else ef = eformat_undefined;
+	break;
+      case is_value_symbolic:
+	/*ef = EvalConstant((symbolic_constant(value_symbolic(vinit))));*/
+	/*break;*/
+      case is_value_code:
+	ef = eformat_undefined;
+	break;
+      default:
+	pips_error("partial_eval_call", "case default\n");
+    }
+    return(ef);
+}
+
+struct eformat partial_eval_unary_operator(func, la, ps, fx)
+entity func;
+cons *la;
+Psysteme ps;
+effects fx;
+{
+    struct eformat ef;
+    expression *sub_ep;
+
+    pips_assert("partial_eval_unary_operator", gen_length(la)==1);
+    sub_ep=&EXPRESSION(CAR(la));
+
+    if (strcmp(entity_local_name(func), UNARY_MINUS_OPERATOR_NAME) == 0) {
+	ef = partial_eval_expression_and_copy(*sub_ep, ps, fx);
+
+	if(ef.icoef==0
+	   || ((ef.icoef<0 || ef.icoef>1) 
+	       && (ef.ishift<=0)) 
+	   ) {
+	    ef.simpler= TRUE;
+	}
+
+	ef.icoef= -(ef.icoef);
+	ef.ishift= -(ef.ishift);
+    }
+    else {
+	/* operator is unknown */
+	partial_eval_expression_and_regenerate(sub_ep, ps, fx);
+	ef= eformat_undefined;
+    }
+    return(ef);
+}
+
+
+#define PLUS 1
+#define MINUS 2
+#define MULT 3
+#define DIV 4
+#define MOD 5
+
+struct eformat partial_eval_binary_operator(func, la, ps, fx)
+entity func;
+cons *la;
+Psysteme ps;
+effects fx;
+{
+    struct eformat ef, ef1, ef2;
+    expression *ep1, *ep2;
+    int token= -1;
+
+    pips_assert("partial_eval_binary_operator", gen_length(la)==2);
+    ep1= &EXPRESSION(CAR(la));
+    ep2= &EXPRESSION(CAR(CDR(la)));
+
+    if (strcmp(entity_local_name(func), MINUS_OPERATOR_NAME) == 0) {
+	token = MINUS;
+    }
+    if (strcmp(entity_local_name(func), PLUS_OPERATOR_NAME) == 0) {
+	token = PLUS;
+    }
+    if (strcmp(entity_local_name(func), MULTIPLY_OPERATOR_NAME) == 0) {
+	token = MULT;
+    }
+    if (strcmp(entity_local_name(func), DIVIDE_OPERATOR_NAME) == 0) {
+	token = DIV;
+    }
+    if (strcmp(entity_local_name(func), "MOD") == 0) {
+	token = MOD;
+    }
+
+    if ( token==PLUS || token==MINUS ) {
+	ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+	ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
+
+	/* generate ef.icoef and ef.expr */
+	if( (ef1.icoef==ef2.icoef || ef1.icoef==-ef2.icoef)
+	   && (ef1.icoef<-1 || ef1.icoef>1) ) {
+	    /* factorize */
+	    ef.simpler=TRUE;
+	    if( (token==PLUS && ef1.icoef==ef2.icoef)
+	       || (token==MINUS && ef1.icoef==-ef2.icoef) ) {
+		/* addition */
+		ef.expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+					ef1.expr, 
+					ef2.expr);
+		ef.icoef= ef1.icoef;
+	    }
+	    else if( (ef1.icoef>1)
+		    && (token==MINUS ? (ef2.icoef>0) : (ef2.icoef<0)) ) {
+		/* substraction e1-e2 */
+		ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+					ef1.expr, 
+					ef2.expr);
+		ef.icoef= ef1.icoef;
+	    }
+	    else {
+		/* substraction e2-e1 */
+		ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+					ef2.expr, 
+					ef1.expr);
+		ef.icoef= -ef1.icoef;
+	    }
+	}
+	else if(ef1.icoef!=0 && ef2.icoef!=0) {
+	    int c1 = ef1.icoef;
+	    int c2 = (token==MINUS ? -ef2.icoef : ef2.icoef);
+	    expression e1= generate_monome((c1>0 ? c1: -c1), ef1.expr);
+	    expression e2= generate_monome((c2>0 ? c2: -c2), ef2.expr);
+	    /* generate without factorize */
+	    ef.simpler= (ef1.simpler || ef2.simpler); /* not precise ?? */
+	    if(c1*c2>0) {
+		ef.expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+					e1, e2);
+		ef.icoef= (c1>0 ? 1 : -1);
+	    }
+	    else if(c1>0) {
+		ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+					e1, e2);
+		ef.icoef= 1;
+	    }
+	    else {
+		ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+					e2, e1);
+		ef.icoef= 1;
+	    }
+	}
+	else {
+	    ef.simpler= (ef1.simpler || ef2.simpler);
+	    if(ef1.icoef==0) {
+		if(ef1.ishift==0) ef.simpler=TRUE;
+		ef.expr=ef2.expr;
+		ef.icoef=(token==MINUS ? -ef2.icoef : ef2.icoef);
+	    }
+	    else {
+		if(ef2.ishift==0) ef.simpler=TRUE;
+		ef.expr=ef1.expr;
+		ef.icoef=ef1.icoef;
+	    }
+	}
+
+	/* generate ef.ishift */
+	if ( (ef1.icoef==0 || ef1.ishift!=0)
+	    && (ef2.icoef==0 || ef2.ishift!=0) ) {
+	    /* simplify shifts */
+	    ef.simpler= TRUE;
+	}
+	ef.ishift= (token==MINUS ? 
+		    ef1.ishift-ef2.ishift : ef1.ishift+ef2.ishift);
+    }
+    else if( token==MULT ) {
+	ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+	ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
+
+	if(ef1.icoef==0 && ef2.icoef==0) {
+	    ef.icoef=0;
+	    ef.expr=expression_undefined;
+	    ef.ishift= ef1.ishift * ef2.ishift;
+	    ef.simpler= TRUE;
+	}
+	else if(ef1.icoef!=0 && ef2.icoef!=0) {
+	    if(ef2.icoef!=1 && ef2.ishift==0) {
+		expression *ep;
+		/* exchange ef1 and ef2 (see later) */
+		ef=ef2; ef2=ef1; ef1=ef; ef= eformat_undefined;
+		ep=ep2; ep2=ep1; ep1=ep;
+	    }
+	    if(ef1.icoef!=1 && ef1.ishift==0) {
+		ef.simpler= ef1.simpler;
+		ef.icoef= ef1.icoef;
+		regenerate_expression(&ef2, ep2);
+		ef.expr= MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+					ef1.expr, *ep2);
+		ef.ishift= 0;
+	    }
+	    else { /* cannot optimize */
+		regenerate_expression(&ef1, ep1);
+		regenerate_expression(&ef2, ep2);
+		
+		ef= eformat_undefined;
+	    }
+	}
+	else {
+	    if(ef2.icoef==0) {
+		expression *ep;
+		/* exchange ef1 and ef2 (see later) */
+		ef=ef2; ef2=ef1; ef1=ef; ef= eformat_undefined;
+		ep=ep2; ep2=ep1; ep1=ep;
+	    }
+	    /* here we know that ef1.ecoef==0 and ef2.ecoef!=0 */
+	    if(ef1.ishift==0) {
+		ef.icoef= 0;
+		ef.expr= expression_undefined;
+		ef.ishift= 0;
+		ef.simpler= TRUE;
+		regenerate_expression(&ef2, ep2);
+	    }
+	    else {
+		ef.icoef= ef1.ishift * ef2.icoef;
+		ef.expr= ef2.expr;
+		ef.ishift= ef1.ishift * ef2.ishift;
+		ef.simpler= (ef1.ishift==1 || ef2.icoef!=1 
+			     || ef1.simpler || ef2.simpler);
+	    }
+	}
+    }
+    else if(token==DIV || token==MOD) {
+	ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+	ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
+
+	if( ef2.icoef==0 && ef2.ishift == 0 ) 
+	    user_error("partial_eval_binary_operator", 
+		       "division by zero!\n");
+	if( token==DIV && ef2.icoef==0 
+	   && (ef1.ishift % ef2.ishift)==0 
+	   && (ef1.icoef % ef2.ishift)==0 ) {
+	    /* integer division does NOT commute with in any */
+	    /* multiplication -> only performed if "exact" */
+	    ef.simpler= TRUE;
+	    ef.icoef= ef1.icoef / ef2.ishift;
+	    ef.ishift= ef1.ishift / ef2.ishift;
+	    ef.expr= ef1.expr;
+	}
+	else if(ef1.icoef==0 && ef2.icoef==0) {
+	    ef.simpler= TRUE;
+	    ef.icoef= 0;
+	    ef.expr= expression_undefined;
+	    if (token==DIV) { /* refer to Fortran77 chap 6.1.5 */
+		ef.ishift= FORTRAN_DIV(ef1.ishift, ef2.ishift);
+	    }
+	    else { /* tocken==MOD */
+		ef.ishift= FORTRAN_MOD(ef1.ishift, ef2.ishift);
+	    }
+	}
+	else {
+	    regenerate_expression(&ef1, ep1);
+	    regenerate_expression(&ef2, ep2);
+	    ef= eformat_undefined;
+	}
+    }
+    else {
+	partial_eval_expression_and_regenerate(ep1, ps, fx);
+	partial_eval_expression_and_regenerate(ep2, ps, fx);
+	ef= eformat_undefined;
+    }
+    return(ef);
+}
+
+/* in order to regenerate expression from eformat.;
+ * optimized so that it can be called for any compatible ef and *ep;
+ * result in *ep.
+ */
+int regenerate_expression(efp, ep)
+struct eformat *efp;
+expression *ep;
+{
+    if(eformat_equivalent_p(*efp,eformat_undefined)) {
+	/* nothing to do because expressions are the same */
+    }
+    else if(!efp->simpler) {
+	/* simply free efp->expr */
+	/* ?? ******commented out for debug******* */
+	/*free_expression(efp->expr);*/
+	efp->expr= expression_undefined; /* useless */
+    }
+    else {
+	expression tmp_expr;
+
+	/* *ep must be freed */
+	/* ?? ******commented out for debug******* */
+	/* free_expression(*ep); */
+
+	if(efp->icoef != 0) {
+	    /* check */
+	    pips_assert("regenerate_expression", 
+			efp->expr != expression_undefined);
+
+	    if(efp->icoef == 1) {
+		tmp_expr= efp->expr;
+	    }
+	    else if(efp->icoef == -1) {
+		/* generate unary_minus */
+		tmp_expr= MakeUnaryCall(entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),
+					 efp->expr);
+	    }
+	    else {
+		/* generate product */
+		tmp_expr= MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+					 int_expr(efp->icoef), 
+					 efp->expr);
+	    }
+
+	    if(efp->ishift != 0) {
+		/* generate addition or substraction */
+		string operator = (efp->ishift>0) ? PLUS_OPERATOR_NAME 
+		    : MINUS_OPERATOR_NAME;
+		tmp_expr= MakeBinaryCall(entity_intrinsic(operator),
+					 tmp_expr, 
+					 int_expr(ABS(efp->ishift)));
+	    }
+	}
+	else {
+	    /* check */
+	    pips_assert("regenerate_expression", 
+			efp->expr == expression_undefined);
+	    /* final expression is constant efp->ishift */
+	    tmp_expr= int_expr(efp->ishift);
+	}
+
+	/* replace *ep by tmp_expr */
+	*ep = tmp_expr;
+    }
+}
+
+expression generate_monome(coef, expr)
+int coef;
+expression expr;
+{
+    if(coef==0) {
+	pips_assert("generate_monome", expr==expression_undefined);
+	return(int_expr(0));
+    }
+    pips_assert("generate_monome", expr!=expression_undefined);
+    if(coef==1) {
+	return(expr);
+    }
+    if(coef==-1) {
+	return(MakeUnaryCall(entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),
+			     expr));
+    }
+    return(MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+			  int_expr(coef),
+			  expr));
+}
+
+
+void recursiv_partial_eval(stmt)
+statement stmt;
+{
+    instruction inst = statement_instruction(stmt);
+    statement_mapping pfx_map= proper_effects_map;
+
+    debug(8, "recursiv_partial_eval", "begin with tag %d\n", 
+	  instruction_tag(inst));
+
+    switch(instruction_tag(inst)) {
+      case is_instruction_block :
+	MAPL( sts, {
+	    statement s = STATEMENT(CAR(sts));
+
+	    recursiv_partial_eval(s);
+	}, instruction_block(inst));
+	break;
+      case is_instruction_test : {
+	  test t = instruction_test(inst);
+	  partial_eval_expression_and_regenerate(&test_condition(t), 
+						 stmt_prec(stmt), 
+						 stmt_to_fx(stmt, pfx_map));
+	  recursiv_partial_eval(test_true(t));
+	  recursiv_partial_eval(test_false(t));
+	  if(get_debug_level()>=9) {
+	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	      pips_assert("recursiv_partial_eval", gen_consistent_p(stmt));
+	  }
+	  break;
+      }
+      case is_instruction_loop : {
+	  loop l = instruction_loop(inst);
+	  range r = loop_range(l);
+	  partial_eval_expression_and_regenerate(&range_lower(r), 
+						 stmt_prec(stmt), 
+						 stmt_to_fx(stmt, pfx_map));
+	  partial_eval_expression_and_regenerate(&range_upper(r), 
+						 stmt_prec(stmt), 
+						 stmt_to_fx(stmt, pfx_map));
+	  partial_eval_expression_and_regenerate(&range_increment(r), 
+						 stmt_prec(stmt), 
+						 stmt_to_fx(stmt, pfx_map));
+	  recursiv_partial_eval(loop_body(l));
+	  if(get_debug_level()>=9) {
+	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	      pips_assert("recursiv_partial_eval", gen_consistent_p(stmt));
+	  }
+	  break;
+      }
+      case is_instruction_call : {
+	  partial_eval_call_and_regenerate(instruction_call(inst), 
+					   stmt_prec(stmt), 
+					   stmt_to_fx(stmt, pfx_map));
+	  break;
+      }
+      case is_instruction_goto :
+	break;
+      case is_instruction_unstructured :
+	/* ?? What should I do? */
+	  /* pips_error("recursiv_partial_eval", "?? :-(\n"); */
+	break;
+	default : 
+	pips_error("recursiv_partial_eval", 
+		   "Bad instruction tag");
+    }
+}
+
+
+/* Top-level function
+ */
+
+void partial_eval(mod_name)
+char *mod_name;
+{
+    entity module = local_name_to_top_level_entity(mod_name);
+    statement mod_stmt;
+    instruction mod_inst;
+    cons *blocs = NIL;
+
+    debug_on("PARTIAL_EVAL_DEBUG_LEVEL");
+
+    /* be carrefull not to get any mapping before the code */
+    /* DBR_CODE will be changed: argument "pure" is TRUE because 
+       partial_eval() *modifies* DBR_CODE. */
+    /* still bugs in dbm because effects are stored on disc after this phase */
+    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+
+    init_use_proper_effects(mod_name);
+
+    /* preconditions may need to print preconditions for debugging purposes */
+    set_cumulated_effects_map( (statement_mapping) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE));
+    set_current_module_entity(module);
+    set_current_module_statement(mod_stmt);
+    module_to_value_mappings(module);
+
+    init_use_preconditions(mod_name);
+
+    mod_inst = statement_instruction(mod_stmt);
+    pips_assert("unroll", instruction_unstructured_p(mod_inst),
+		"unstructured expected\n");
+
+    /* go through unstructured and apply recursiv_partial_eval */
+    CONTROL_MAP(ctl, {
+	statement st = control_statement(ctl);
+
+	debug(5, "partial_eval", "will eval in statement number %d\n",
+	      statement_number(st));
+
+	recursiv_partial_eval(st);	
+    }, unstructured_control(instruction_unstructured(mod_inst)), blocs);
+
+    gen_free_list(blocs);
+
+    preconditions_map = (statement_mapping) HASH_UNDEFINED_VALUE;
+
+     /* Reorder the module, because new statements have been generated. */
+    module_body_reorder(mod_stmt);
+
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+
+    debug_off();
+}
