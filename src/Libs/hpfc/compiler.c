@@ -1,6 +1,6 @@
 /* Fabien Coelho, May 1993
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/08/28 15:00:34 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/08/30 14:34:00 $, )
  * version $Revision$
  *
  * Compiler
@@ -476,10 +476,11 @@ statement *hoststatp, *nodestatp;
 
     if (execution_parallel_p(loop_execution(the_loop)))
     {
-	entity var, right;
+	entity var;
+	reference left, right;
 	list l=NIL;
 	bool is_shift = subarray_shift_p(stat, &var, &l),
-	     is_full_copy = full_copy_p(stat, &var, &right),
+	     is_full_copy = full_copy_p(stat, &left, &right),
 	    /* 
 	     * should verify that only listed in labels and distributed
 	     * entities are defined inside the body of the loop
@@ -494,7 +495,7 @@ statement *hoststatp, *nodestatp;
 	{
 	    pips_debug(4, "full copy detected\n");
 
-	    *nodestatp = generate_full_copy(var, right);
+	    *nodestatp = generate_full_copy(left, right);
 	    *hoststatp = make_empty_statement();
 	}
 	else if (is_shift)
@@ -506,10 +507,9 @@ statement *hoststatp, *nodestatp;
 	}
 	else if (at_ac && !in_in)
 	{
-	    statement
-		overlapstat;
+	    statement overlapstat;
 
-	    debug(7, "hpf_compile_loop", "compiling a parallel loop\n");
+	    pips_debug(7, "compiling a parallel loop\n");
 
 	    if (Overlap_Analysis(stat, &overlapstat))
 	    {
