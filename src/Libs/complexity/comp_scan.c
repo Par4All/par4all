@@ -332,6 +332,7 @@ list effects_list;
     }
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
+	(void) gen_consistent_p(comp);
 	fprintf(stderr, "block comp is at %x and comp value is ", (int)comp);
 	complexity_fprint(stderr, comp, FALSE, TRUE);
     }
