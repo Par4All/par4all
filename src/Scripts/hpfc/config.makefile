@@ -2,7 +2,7 @@
 # $RCSfile: config.makefile,v $ for hpfc scripts
 #
 
-SCRIPTS= 	hpfc \
+SCRIPTS	= 	hpfc \
 		hpfc_directives \
 		hpfc_add_warning \
 		hpfc_generate_h \
@@ -12,9 +12,10 @@ SCRIPTS= 	hpfc \
 		hpfc_install \
 		hpfc_llcmd
 
-FILES=
-SFILES=		hpfc_interactive.c
-RFILES=		$(ARCH)/hpfc_interactive
+SOURCES	=	$(SCRIPTS) hpfc_interactive.c
+
+INSTALL_SHR=	$(SCRIPTS)
+INSTALL_BIN=	$(ARCH)/hpfc_interactive
 
 #
 # Some rules
@@ -24,17 +25,19 @@ $(ARCH)/hpfc_interactive: $(ARCH)/hpfc_interactive.o
 	$(LD) $(LDFLAGS) \
 		-o $(ARCH)/hpfc_interactive \
 		$(ARCH)/hpfc_interactive.o -lreadline -ltermcap
-	chmod a-w $(ARCH)/hpfc_interactive
+	chmod a+rx-w $(ARCH)/hpfc_interactive
 
 clean: local-clean
 
 local-clean:
 	$(RM) $(ARCH)/hpfc_interactive.o $(ARCH)/hpfc_interactive *~
 
+FC_HTML= /users/cri/coelho/public_html
+
 web: hpfc_directives
-	$(RM) $(HOME)/public_html/hpfc_directives
-	cp hpfc_directives $(HOME)/public_html/
-	chmod a+r $(HOME)/public_html/hpfc_directives
+	$(RM) $(FC_HTML)/hpfc_directives
+	cp hpfc_directives $(FC_HTML)
+	chmod a+r $(FC_HTML)/hpfc_directives
 
 # that is all
 #
