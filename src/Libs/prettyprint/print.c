@@ -103,6 +103,7 @@ char *mod_name;
     return success;
 }
 
+
 bool print_code(mod_name)
 char *mod_name;
 {
@@ -115,30 +116,6 @@ char *mod_name;
 {
   is_user_view = TRUE;
   return print_code_or_source(mod_name);
-}
-
-
-/* Idem as print_code but add some emacs properties in the output.
-   RK, 21/06/1995 */
-bool
-emacs_print_code(char *mod_name)
-{
-    bool success;
-    /*
-       is_emacs_prettyprint = TRUE;
-       is_attachment_prettyprint = TRUE;
-       */
-    set_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES", TRUE);
-  
-    success = print_code(mod_name);
-
-    set_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES", FALSE);
-    /*
-       is_emacs_prettyprint = FALSE;  
-       is_attachment_prettyprint = FALSE;  
-       */
-
-    return success;
 }
 
 
@@ -155,12 +132,10 @@ char *mod_name;
     string resource_name = strdup
 	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
 	    DBR_GRAPH_PRINTED_FILE
-		: is_emacs_prettyprint ? DBR_EMACS_PRINTED_FILE :
-		    (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE));
+		: (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE));
     string file_ext =
 	strdup(concatenate
 	       (is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
-		is_emacs_prettyprint ? EMACS_FILE_EXT : "",
 		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
 		NULL));
 
@@ -209,21 +184,42 @@ text texte;
 
     fd = safe_fopen(filename, "w");
 
-    /* Add the attachment if necessary: */
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
-	init_output_the_attachments_for_emacs(fd);
-    
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
     print_text(fd, texte);
     debug_off();
 
-    /* Add the attachment if necessary: */
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
-	output_the_attachments_for_emacs(fd);
-    
     safe_fclose(fd, filename);
 
     DB_PUT_FILE_RESOURCE(strdup(res_name), strdup(mod_name), localfilename);
+
+    /* Add the attachment in Emacs mode by creating a twin file that
+       is decorated with Emacs properties: */
+    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {
+	char * emacs_file_name = concatenate(filename, EMACS_FILE_EXT, NULL);
+	FILE * emacs_file_stream = safe_fopen(emacs_file_name, "w");
+	init_output_the_attachments_for_emacs(emacs_file_stream);
+	/* Now include the original plain file: */
+	fd = safe_fopen(filename, "r");
+	for(;;) {
+	    char c = getc(fd);
+	    /* Strange semantics: must have read the character first: */
+	    if (feof(fd))
+		break;
+	    
+	    /* Just backslashify the '"' and '\': */
+	    if (c == '"' || c == '\\')
+		(void) putc('\\', fd);
+	    
+	    (void) putc(c, emacs_file_stream);	  
+	}
+	safe_fclose(fd, filename);
+	/* Actually add the interesting stuff: */
+	output_the_attachments_for_emacs(emacs_file_stream);
+	safe_fclose(emacs_file_stream, emacs_file_name);
+	free(emacs_file_name);
+    }
+    
     free(filename);
+    
     return TRUE;
 }
