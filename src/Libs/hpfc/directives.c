@@ -3,7 +3,7 @@
  * these functions deal with HPF directives.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/08/02 10:40:20 $, )
+ * ($Date: 1995/08/02 15:40:41 $, )
  */
 
 #include "defines-local.h"
@@ -83,9 +83,7 @@ bool redistribute_directive_p(entity f)
 	same_string_p(HPF_PREFIX REDISTRIBUTE_SUFFIX, entity_local_name(f));
 }
 
-/*-----------------------------------------------------------------
- *
- *  PROCESSORS and TEMPLATE directives.
+/* management of PROCESSORS and TEMPLATE directives.
  *
  * just change the basic type to overloaded and 
  * store the entity as a processor or a template.
@@ -124,8 +122,7 @@ static void new_dynamic(expression e)
     pips_debug(3, "entity is %s\n", entity_name(a));
 }
 
-/*-----------------------------------------------------------------
- * one simple ALIGN directive is handled.
+/* one simple ALIGN directive is handled.
  * retrieve the alignment from references array and template
  */
 /*  TRUE if the template dimension subscript is an alignment.
@@ -298,8 +295,7 @@ handle_align_and_realign_directive(entity f,
 			    template, dynamic);
 }
 
-/*-----------------------------------------------------------------
- * one DISTRIBUTE directive management
+/* one DISTRIBUTE directive management
  */
 /* returns the expected style tag for the given distribution format,
  * plus a pointer to the list of arguments.
@@ -470,12 +466,6 @@ HANDLER_PROTOTYPE(unexpected)
     user_error("handle_hpf_directives", "unexpected hpf directive\n");
 }
 
-/*-----------------------------------------------------------------
- *
- * HPF OBJECTS DECLARATIONS
- *
- *   namely TEMPLATE and PROCESSORS directives.
- */
 HANDLER_PROTOTYPE(processors)
 {
     gen_map(new_processor, args); /* see new_processor */
@@ -486,12 +476,6 @@ HANDLER_PROTOTYPE(template)
     gen_map(new_template, args); /* see new_template */
 }
 
-/*-----------------------------------------------------------------
- *
- * HPF STATIC MAPPING
- *
- *   namely ALIGN and DISTRIBUTE directives.
- */
 HANDLER_PROTOTYPE(align)
 {
     handle_align_and_realign_directive(f, args, FALSE);
@@ -502,13 +486,6 @@ HANDLER_PROTOTYPE(distribute)
     handle_distribute_and_redistribute_directive(f, args, FALSE);
 }
 
-/*-----------------------------------------------------------------
- *
- * HPF PARALLELISM DIRECTIVES
- *
- *   namely INDEPENDENT and NEW directives.
- *
- */
 /* ??? I wait for the next statements in a particular order, what
  * should not be necessary. Means I should deal with independent 
  * directives on the PARSED_CODE rather than after the CONTROLIZED.
@@ -573,11 +550,6 @@ HANDLER_PROTOTYPE(new)
     return; /* (that's indeed a first implementation:-) */
 }
 
-/*-----------------------------------------------------------------
- *
- * DYNAMIC HPF DIRECTIVES.
- *
- */
 HANDLER_PROTOTYPE(dynamic)
 {
     gen_map(new_dynamic, args); /* see new_dynamic */
