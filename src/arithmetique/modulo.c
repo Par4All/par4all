@@ -1,7 +1,7 @@
 /* package arithmetique 
  *
  * $RCSfile: modulo.c,v $ (version $Revision$)
- * $Date: 1996/07/18 19:22:06 $, 
+ * $Date: 1996/07/19 19:50:42 $, 
  */
 
 /*LINTLIBRARY*/
@@ -63,9 +63,9 @@ Value modulo_fast(Value a, Value b)
      *     return(0);
      */
 
-    if (value_le(a, (Value) MODULO_MAX_A) &&
-	value_ge(a, (Value)-MODULO_MAX_A) &&
-	value_le(b, (Value) MODULO_MAX_B))
+    if (value_le(a, int_to_value( MODULO_MAX_A)) &&
+	value_ge(a, int_to_value(-MODULO_MAX_A)) &&
+	value_le(b, int_to_value( MODULO_MAX_B)))
     {
 	/* acceleration par une look-up table 
 	 */
