@@ -74,12 +74,14 @@ typedef float Value;
 #define VALUE_TO_INT(val) ((int)val)
 /* end LINEAR_VALUE_IS_FLOAT
  */
+/* the purpose of the chars version is to detect invalid assignments
+ */
 #elif defined(LINEAR_VALUE_IS_CHARS)
 typedef char * Value;
 #define VALUE_FMT "%s"
 #define VALUE_CONST(val) val
-#define VALUE_MIN LONG_MIN
-#define VALUE_MAX LONG_MAX
+#define VALUE_MIN (char*)INT_MIN
+#define VALUE_MAX (char*)INT_MAX
 #define VALUE_ZERO (char*)0
 #define VALUE_ONE  (char*)1
 #define VALUE_MONE (char*)-1
