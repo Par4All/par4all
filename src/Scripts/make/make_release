@@ -1,0 +1,107 @@
+#! /bin/sh
+#
+# $RCSfile: make_release,v $ (version $Revision$)
+# $Date: 1996/09/02 17:12:10 $, 
+#
+# (c) Fabien COELHO 1996
+
+# creates a release, with sources / executables ???
+# namely a compressed tar file?
+
+script=$RCSfile: make_release,v $
+unset name dirs root trgt oths
+tar=${PIPS_TAR:-gtar}
+make=${PIPS_MAKE:-gmake}
+verb=:
+
+verbose()
+{ echo "$RCSfile: make_release,v $: $@" >&2;}
+
+error()
+{ ret=$1; shift; verbose "$@"; exit $ret;}
+
+usage()
+{
+    ret=$1; shift
+    cat <<-EOF
+	$RCSfile: make_release,v $ (version $Revision$): $@
+	usage: $script [options] dirs...
+	 -h: print this help
+	 -v: verbose
+	 -r dir: Root directory -- absolute!
+	 -t dir: Target directory -- idem!
+         -s dir: Source directories -- with release!
+	 -d dir: Other directories -- direct!
+	 dirs: direct directories relative to root -- cleaned!
+	EOF
+    exit $ret
+}
+
+while getopts hvr:s:t:d: opt
+do
+    case $opt in
+	h) usage 0 "some help" ;;
+	v) verb=verbose ;;
+	r) root=$OPTARG ;;
+	s) dirs="$dirs $OPTARG" ;;
+	t) trgt=$OPTARG ;;
+	d) oths="$oths $OPTARG" ;;
+	*) error 2 invalid option -$opt ;;
+    esac
+done
+
+shift `expr $OPTIND - 1`
+
+$verb going to $root
+cd $root || error 3 "cannot cd to $root"
+
+#
+# tmp files
+
+tmp="/tmp/$script.`whoami`.$$"
+rm -f $tmp.*
+
+$verb in `pwd`
+
+{
+    # Sources
+    for dir in $dirs 
+    do
+	$verb "considering $dir -- source"
+	$make --no-print-directory -C $dir \
+	    FWD_MKFLAGS='--no-print-directory' FWD_ROOT="./$dir" release
+	find ./$dir -name 'Makefile' -print
+    done 
+
+    # Direct 
+    for dir in $oths "$@"
+    do
+	$verb "considering $dir -- direct"
+	find ./$dir ! -type d -print
+    done 
+
+} > $tmp.list
+
+sed '/OLD/d;/SCCS/d;/~/d' $tmp.list | 
+sort -u | 
+xargs $tar cvf $tmp.tar 
+
+#
+# target 
+
+test -d $trgt || mkdir $trgt || error 4 "cannot mkdir $trgt"
+cd $trgt || error 5 "cannot cd to $trgt"
+
+$verb copying files in $trgt
+
+$tar xf $tmp.tar
+
+$verb done
+
+#
+# cleaning
+
+rm -f $tmp.*
+
+# end of $RCSfile: make_release,v $ 
+#
