@@ -2221,7 +2221,7 @@ void gen_read_spec(char * spec, ...)
 
 void
 gen_init_external(int which,
-		  void *(*read)(FILE*),
+		  void *(*read)(FILE*, int(*)(void)),
 		  void (*write)(FILE*, void*),
 		  void (*free)(void*),
 		  void *(*copy)(void*),
