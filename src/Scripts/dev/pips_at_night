@@ -228,7 +228,8 @@ $debug "report=$report"
     }
 
     $verbose "Ending $user/$host"
-} 2>&1 | $mail -s "$script: report" ${email}
+} 2>&1 
+# | $mail -s "$script: report" ${email}
 
 $debug done
 
