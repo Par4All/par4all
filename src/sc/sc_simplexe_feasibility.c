@@ -136,10 +136,11 @@ static void printfrac(frac x) {
 }
 
 void dump_tableau(tableau *t,int colonnes) {
-    int i,j, k, w, max = 0 ;
+    int i,j, k, w;
+    long max=0;
     for(i=0;i<colonnes;i++) 
       if(t[i].colonne[t[i].taille-1].numero>max)max=t[i].colonne[t[i].taille-1].numero ; 
-    printf("Dump du tableau ------ %d colonnes  %d lignes\n",colonnes,max) ;
+    printf("Dump du tableau ------ %d colonnes  %ld lignes\n",colonnes,max) ;
     printf("%d Variables  visibles :\n",colonnes-2) ;
     for(i=0;i<colonnes-2;i++) printf("%7d",variables[i]) ;
     printf("\n") ;
@@ -158,6 +159,7 @@ if(DEBUG){
     }
 } /* DEBUG */
   
+    printf("Nb lignes: %ld\n", max);
     for(j=0;j<=max;j++) { printf("\nLigne %d ",j) ;
         for(i=0;i<colonnes;i++) {
             w=1 ;
@@ -261,8 +263,11 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 	    free(eg);
 	}
 
-	for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++) 
-	    free(t[i].colonne);
+	/* In two cases, it does not seem to appreciate this loop at all!
+	 * I remove it for the moment. BC.
+	 */
+	/* for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)  */
+/* 	    free(t[i].colonne); */
 	free(t);
 	free(nlle_colonne);
 	longjmp(overflow_error,5);
@@ -321,7 +326,7 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 		       eg[0].colonne[eg[0].taille].num = valeur ;
 		       eg[0].colonne[eg[0].taille].den = 1 ;
 		       eg[0].taille++ ;
-	       }
+		   }
 	    }
 	    /* Cas ou` valeur de variable est connue : */
 	    if(j==1) hashtable[hh].val = valeur ;
