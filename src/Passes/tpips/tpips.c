@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.95  1998/05/05 17:40:49  coelho
+ * help update about "info".
+ *
  * Revision 1.94  1998/04/29 08:25:47  coelho
  * help updated for show and info.
  *
@@ -621,8 +624,9 @@ tpips_help(string line)
 	 " description of one\n");
     TP_HELP("show", "show     <resourcename([OWNER])>\n",
 	 "\treturns the file of this resource\n");
-    TP_HELP("info", "info\n",
-	 "\tprint information about current module and workspace\n");
+    TP_HELP("info", "info <name>\n",
+	    "\tprint information about <name>\n"
+	    "\tname: module, modules, workspace, directory\n");
     TP_HELP("shell", "shell   [<shell-function>]\n",
 	 "\tallow shell functions call\n");
     TP_HELP("owner", "- owner : variable*\n",
