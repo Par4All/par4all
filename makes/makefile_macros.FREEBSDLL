@@ -3,7 +3,8 @@
 # 
 # this file contains macro definitions 
 
-include $(ROOT)/Include/makefile_macros.GNU
+include $(ROOT)/Include/makefile_macros.GNULL
+include $(ROOT)/Include/makefile_macros.pentium
 
 AR	=	ar
 RANLIB	=	ranlib
