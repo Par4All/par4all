@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: hpfc.c,v $ ($Date: 1995/03/13 11:56:22 $, ) version $Revision$,
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/03/14 14:43:18 $, ) version $Revision$,
  * got on %D%, %T%
  */
  
@@ -36,6 +36,22 @@ extern system();
 #include "defines-local.h"
 
 #define NO_FILE "no file name"
+
+/*  COMPILER STATUS MANAGEMENT
+ */
+static void save_hpfc_status()
+{
+    string name = db_get_current_program_name();
+    hpfc_status s = hpfc_status_undefined;
+
+    DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, strdup(name), s);
+}
+
+static void load_hpfc_status()
+{
+    string name = db_get_current_program_name();
+    hpfc_status s = (hpfc_status) db_get_resource(DBR_HPFC_STATUS, name, TRUE);
+}
 
 /* the source code is transformed with hpfc_directives
  * into something that can be parsed with a standard f77 compiler.
