@@ -1001,8 +1001,10 @@ hash_table hash_complexity_params;
 	action ac = effect_action(obj);
 	approximation ap = effect_approximation(obj);
 	entity e = reference_variable(r);
+	storage s = entity_storage(e);
 
-	if ( action_read_p(ac) && approximation_must_p(ap) ) {
+	if ( !storage_formal_p(s) &&
+	    action_read_p(ac) && approximation_must_p(ap) ) {
 	    debug(5,"add_common_variables_to_hash_table",
 		  "%s added\n", module_local_name(e));
 	    hash_put(hash_complexity_params, (char *) module_local_name(e),
