@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.229 2002/06/20 15:41:23 ancourt Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.230 2003/07/23 13:53:01 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -2173,7 +2173,9 @@ text_block_elseif(
     if(statement_test_p(fb) 
        && empty_comments_p(statement_comments(fb))
        && entity_empty_label_p(statement_label(fb))) {
-	MERGE_TEXTS(r, text_block_elseif(module, statement_label(fb), margin, 
+	MERGE_TEXTS(r, text_block_elseif(module,
+					 label_local_name(statement_label(fb)),
+					 margin, 
 					 statement_test(fb), n));
     }
     else {
@@ -2215,7 +2217,9 @@ text_test(
 
 	r = text_block_ifthen(module, label, margin, obj, n);
 	MERGE_TEXTS(r, text_block_elseif
-		    (module,statement_label(fb), margin, statement_test(fb), n));
+		    (module,
+		     label_local_name(statement_label(fb)),
+		     margin, statement_test(fb), n));
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
 
 	/* r = text_block_if(module, label, margin, obj, n); */
