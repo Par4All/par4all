@@ -424,6 +424,26 @@ expression e;
   }
 }
 
+/* The expression may be complicated but all its leaves are constants or
+   para,eters. It evaluates to a signed integer constant. I am too lazy to
+   fully implement it as I should and I only take care of affine
+   expressions (Francois). */
+bool expression_with_constant_signed_integer_value_p(e)
+expression e;
+{
+  normalized ne = NORMALIZE_EXPRESSION(e);
+  bool constant_p = FALSE;
+
+  if(normalized_linear_p(ne)) {
+    Pvecteur ve = normalized_linear(ne);
+    /* No vecteur_constant_p() in linear library? */
+    constant_p = VECTEUR_NUL_P(ve)
+      || (term_cst(ve) && VECTEUR_UNDEFINED_P(vecteur_succ(ve)));
+  }
+
+  return constant_p;
+}
+
 bool modulo_expression_p(e)
 expression e;
 {
@@ -748,7 +768,7 @@ normalized n;
 	   ever added to linear library */
 	vect_debug((Pvecteur)normalized_linear(n));
 }
-
+
 bool expression_equal_p(e1, e2)
 expression e1;
 expression e2;
@@ -876,7 +896,7 @@ call_equal_p(call c1, call c2)
 
     return TRUE;
 }
-
+
 /* expression make_integer_constant_expression(int c)
  *  make expression for integer
  */
@@ -1802,6 +1822,3 @@ expression substitute_entity_in_expression(entity old, entity new, expression e)
 
   return retour;
 }
-
-
-    
