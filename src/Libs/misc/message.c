@@ -1,4 +1,7 @@
-/* error & message handling handling routines (s.a. debug.c) :
+/*
+ * $Id$
+ * 
+ * error & message handling handling routines (s.a. debug.c) :
  * user_log()
  * user_request()
  * user_warning()
@@ -55,10 +58,9 @@ extern bool get_bool_property(string);
  * where format and arg-list are passed as arguments to vprintf.  
  */
 
-void default_user_log(char *fmt, va_list args)
+void default_user_log(char * fmt, va_list args)
 {
-    if(!get_bool_property("USER_LOG_P")) 
-	return;
+    if(!get_bool_property("USER_LOG_P")) return;
     (void) vfprintf(stdout, fmt, args);
     fflush(stdout);
 }
@@ -151,7 +153,22 @@ void close_warning_file(void)
     }
 }
 
-void
+static void 
+append_to_warning_file(char * calling_function_name,
+		       char * a_message_format,
+		       va_list * some_arguments)
+{
+   if (warning_file) 
+   {
+     fprintf(warning_file, "%s[%s] (%s) ", 
+	     current_phase? current_phase: "unknown",
+	     current_module? current_module: "unknown",
+	     calling_function_name);
+     vfprintf(warning_file, a_message_format, *some_arguments);
+   }
+}
+
+static void
 default_user_warning(char * calling_function_name,
                      char * a_message_format,
                      va_list * some_arguments)
@@ -167,8 +184,8 @@ default_user_warning(char * calling_function_name,
  * top-level (eg. wpips) may need a special user_warning proceedure; they 
  * should let pips_warning_handler point toward it.
  */
-void (* pips_warning_handler)
-    (char *, char *, va_list *) = default_user_warning;
+void (* pips_warning_handler)(char *, char *, va_list *) 
+     = default_user_warning;
 
 
 void
@@ -177,28 +194,24 @@ user_warning(char * calling_function_name,
              ...)
 {
    va_list some_arguments;
-   
-   if (warning_file) 
-   {
-       va_start(some_arguments, a_message_format);
-       fprintf(warning_file, "%s[%s] (%s) ", 
-	       current_phase? current_phase: "unknown",
-	       current_module? current_module: "unknown",
-	       calling_function_name);
-       vfprintf(warning_file, a_message_format, some_arguments);
-       va_end(some_arguments);
-   }
 
    if (get_bool_property("NO_USER_WARNING")) return; /* FC */
 
+   /* WARNING FILE */
+   va_start(some_arguments, a_message_format);
+   append_to_warning_file
+       (calling_function_name, a_message_format, &some_arguments);
+   va_end(some_arguments);
+
+   /* STDERR or whatever... */
    va_start(some_arguments, a_message_format);
    (* pips_warning_handler)
        (calling_function_name, a_message_format, &some_arguments);
    va_end(some_arguments);
 }
 
-/* if not GNU C
- */
+/* if not GNU C */
+#if !defined(__GNUC__)
 void 
 pips_user_warning_function(
     char * format,
@@ -237,16 +250,16 @@ pips_internal_error_function(
    (void) abort();
 }
 
+#endif /* no __GNUC__ */
+
 /* make sure the user has noticed something */
-void default_prompt_user(s)
-char *s;
+void default_prompt_user(string s)
 {
     fprintf(stderr, "%s\nPress <Return> to continue ", s);
     while (getchar() != '\n') ;
 }
 
-void 
-pips_exit_function(int code, char * format, ...)
+void pips_exit_function(int code, char * format, ...)
 {
     va_list some_arguments;
     va_start(some_arguments, format);
