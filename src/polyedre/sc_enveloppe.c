@@ -10,10 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <setjmp.h>
-
 #include "assert.h"
-
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
@@ -25,11 +22,6 @@
 #include "sg.h"
 
 #include "polyedre.h"
-
-
-
-jmp_buf overflow_error;
-
 
 /* Psysteme sc_enveloppe(s1, s2): calcul d'une representation par systeme
  * lineaire de l'enveloppe convexe des polyedres definis par les systemes
@@ -129,14 +121,14 @@ int ofl_ctrl;
     {
     case OFL_CTRL :
 	ofl_ctrl = FWD_OFL_CTRL;
-	if (setjmp(overflow_error)) {
+	CATCH(overflow_error) {
 	    /* 
 	     *   PLEASE do not remove this warning.
 	     *
 	     *   BC 24/07/95
 	     */
 	    fprintf(stderr, "[sc_enveloppe_chernikova_ofl_ctrl] "
-		    "arithmetic error\n" );
+		    "arithmetic error occured\n" );
 	    s = sc_rn(base_dup(sc_base(s1)));
 	    break;
 	}		
