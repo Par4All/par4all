@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/09 19:44:08 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/09 19:46:57 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -484,7 +484,7 @@ $(${PART}_INCLUDEDIR)/$(TARGET).h: header
 	@pips_install_file -f $(${PART}_INCLUDEDIR) $(TARGET).h
 
 $(${PART}_LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
-	@pips_install_file -l $(${PART}_LIBDIR) $(LIB_TARGET)
+	@pips_install_file -l $(${PART}_LIBDIR)/$(ARCH) $(LIB_TARGET)
 
 $(LIB_OBJECTS): $(TARGET).h
 
