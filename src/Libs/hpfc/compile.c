@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/11/17 12:00:53 $, )
+ * ($Date: 1995/12/27 11:56:48 $, )
  */
 
 #include "defines-local.h"
@@ -15,9 +15,6 @@
 #include "transformations.h"
 
 extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
-
-#define add_warning(filename)\
-   safe_system(concatenate("$HPFC_TOOLS/hpfc_add_warning ", filename, NULL));
 
 static string 
 hpfc_local_name (string name, string suffix)
@@ -178,6 +175,25 @@ init_host_and_node_entities (void)
     }
 }
 
+static FILE *
+hpfc_fopen(
+    string name)
+{
+    FILE *f = (FILE *) safe_fopen(name, "w");
+    fprintf(f, "c\nc This file has been automatically generated " 
+	    "by the hpf compiler\nc\n");
+    return f;
+}
+
+static void
+hpfc_fclose(
+    FILE *f,
+    string name)
+{
+    fprintf(f, "c\nc That is all\nc\n");
+    safe_fclose(f, name);
+}
+
 #define generate_file_name(prefix, suffix)\
   strdup(concatenate(db_get_current_workspace_directory(),\
 		     "/", prefix, suffix, NULL))
@@ -197,30 +213,25 @@ put_generated_resources_for_common (entity common)
     parm_filename = generate_file_name(prefix, "_parameters.h");
     init_filename = generate_file_name(prefix, "_init.h");
 
-    host_file = (FILE *) safe_fopen(host_filename, "w");
+    host_file = hpfc_fopen(host_filename);
     hpfc_print_common(host_file, host_module, host_common);
-    safe_fclose(host_file, host_filename);
-    add_warning(host_filename);
+    hpfc_fclose(host_file, host_filename);
 
-    node_file = (FILE *) safe_fopen(node_filename, "w");
+    node_file = hpfc_fopen(node_filename);
     hpfc_print_common(node_file, node_module, node_common);
-    safe_fclose(node_file, node_filename);
-    add_warning(node_filename);
+    hpfc_fclose(node_file, node_filename);
 
-    parm_file = (FILE *) safe_fopen(parm_filename, "w");
+    parm_file = hpfc_fopen(parm_filename);
     create_parameters_h(parm_file, common);
-    safe_fclose(parm_file, parm_filename);
-    add_warning(parm_filename);
+    hpfc_fclose(parm_file, parm_filename);
 
-    init_file = (FILE *) safe_fopen(init_filename, "w");
+    init_file = hpfc_fopen(init_filename);
     create_init_common_param_for_arrays(init_file, common);
-    safe_fclose(init_file, init_filename);
-    add_warning(init_filename);
+    hpfc_fclose(init_file, init_filename);
 
     ifdebug(1)
     {
-	fprintf(stderr, "Result of HPFC for common %s\n", 
-		entity_name(common));
+	fprintf(stderr, "Result of HPFC for common %s\n", entity_name(common));
 	fprintf(stderr, "-----------------\n");
 
 	hpfc_print_file(parm_filename);
@@ -246,38 +257,32 @@ statement stat, host_stat, node_stat;
     entity module = get_current_module_entity();
     
     host_filename = generate_file_name(prefix, "_host.f");
-    host_file = (FILE *) safe_fopen(host_filename, "w");
+    host_file = hpfc_fopen(host_filename);
     hpfc_print_code(host_file, host_module, host_stat);
-    safe_fclose(host_file, host_filename);
-    add_warning(host_filename);
+    hpfc_fclose(host_file, host_filename);
+
     safe_system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
-			    host_filename, 
-			    " host ", 
-			    module_local_name(module),
-			    NIL));
+			    host_filename, " host ", 
+			    module_local_name(module), NULL));
 
     node_filename = generate_file_name(prefix, "_node.f");
-    node_file = (FILE *) safe_fopen(node_filename, "w");
+    node_file = hpfc_fopen(node_filename);
     hpfc_print_code(node_file, node_module, node_stat);
-    safe_fclose(node_file, node_filename);
-    add_warning(node_filename);
+    hpfc_fclose(node_file, node_filename);
+
     safe_system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
-			    node_filename,
-			    " node ", 
-			    module_local_name(module),
-			    NIL));
+			    node_filename, " node ", 
+			    module_local_name(module), NULL));
 
     parm_filename = generate_file_name(prefix, "_parameters.h");
-    parm_file = (FILE *) safe_fopen(parm_filename, "w");
+    parm_file = hpfc_fopen(parm_filename);
     create_parameters_h(parm_file, module);
-    safe_fclose(parm_file, parm_filename);
-    add_warning(parm_filename);
+    hpfc_fclose(parm_file, parm_filename);
 
     init_filename = generate_file_name(prefix, "_init.h");
-    init_file = (FILE *) safe_fopen(init_filename, "w");
+    init_file = hpfc_fopen(init_filename);
     create_init_common_param_for_arrays(init_file, module);
-    safe_fclose(init_file, init_filename);
-    add_warning(init_filename);
+    hpfc_fclose(init_file, init_filename);
 
     ifdebug(1)
     {
@@ -296,10 +301,12 @@ statement stat, host_stat, node_stat;
     DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, strdup(prefix), node_filename);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, strdup(prefix), init_filename);
 
-    /* free(parm_filename),
+    /* no! 
+    free(parm_filename),
     free(init_filename),
     free(host_filename),
-    free(node_filename);*/
+    free(node_filename);
+    */
 }
 
 void 
@@ -307,36 +314,32 @@ put_generated_resources_for_program (program_name)
 string program_name;
 {
     FILE *comm_file, *init_file;
-    string comm_filename, init_filename, directory_name;
+    string comm, init, directory_name;
 
     directory_name = db_get_current_workspace_directory();
 
-    comm_filename = 
-	strdup(concatenate(directory_name, "/real_parameters.h", NULL));
-    init_filename =
-	strdup(concatenate(directory_name, "/hpf_init.h", NULL));
+    comm = strdup(concatenate(directory_name, "/real_parameters.h", NULL));
+    init = strdup(concatenate(directory_name, "/hpf_init.h", NULL));
 
-    comm_file = (FILE *) safe_fopen(comm_filename, "w");
+    comm_file = hpfc_fopen(comm);
     create_common_parameters_h(comm_file);
-    safe_fclose(comm_file, comm_filename);
-    add_warning(comm_filename);
+    hpfc_fclose(comm_file, comm);
 
-    init_file = (FILE *) safe_fopen(init_filename, "w");
+    init_file = hpfc_fopen(init);
     create_init_common_param(init_file);
-    safe_fclose(init_file, init_filename);
-    add_warning(init_filename);
+    hpfc_fclose(init_file, init);
     
     ifdebug(1)
     {
 	fprintf(stderr, "Results of HPFC for the program\n");
 	fprintf(stderr, "-----------------\n");
 
-	hpfc_print_file(comm_filename);
-	hpfc_print_file(init_filename);
+	hpfc_print_file(comm);
+	hpfc_print_file(init);
     }
 
-    free(comm_filename);
-    free(init_filename);
+    free(comm);
+    free(init);
 }
 
 /* Compiler call, obsole. left here for allowing linking
