@@ -597,8 +597,11 @@ output_an_attachment(FILE * output_file,
     pips_debug(5, "begin: %d, end: %d, attachment %p (attachee %p)\n",
 	       begin, end, a, at);
 
-    pips_assert("begin and end should be initialized.",
-		begin != POSITION_UNDEFINED && end != POSITION_UNDEFINED);
+    if (begin!=POSITION_UNDEFINED && end!=POSITION_UNDEFINED)
+    {
+	pips_user_warning("begin and end should be initialized.");
+	return;
+    }
 		
     /* Begin an Emacs Lisp properties. + 1 since in a buffer (and not
        a string). (end + 1) + 1 since the property is set between
