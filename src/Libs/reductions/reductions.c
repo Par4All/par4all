@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/09/27 14:02:02 $, 
+ * $Date: 1996/12/18 09:04:32 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -191,7 +191,7 @@ static list list_of_trusted_references(reductions rs)
     MAP(REDUCTION, r,
     {
 	MAP(PREFERENCE, p, 
-	    lr = CONS(REFERENCE, preference_ref(p), lr), 
+	    lr = CONS(REFERENCE, preference_reference(p), lr), 
 	    reduction_trusted(r));
 	lr = CONS(REFERENCE, reduction_reference(r), lr); /* ??? */
     },
