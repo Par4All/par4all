@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/01 21:24:16 $, 
+%% $Date: 1996/09/01 21:30:57 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html}
@@ -538,11 +538,11 @@ It is developped by \FC. In order to compile an HPF program which uses
 
 \subsection{XPOMP/HPFC headers}
 
-Firstly headers are provided (\verb"xpomp_graphics_F.h" file) that must be
+Firstly headers are provided (\verb|xpomp_graphics_F.h| file) that must be
 included by all user HPF functions or subroutines that make use of the
 \xPOMP library. This header file simply lists the subroutines and
 declares them as I/O routines to the \HPFC compiler through the special
-\verb"io" directive:
+\verb|io| directive:
 \begin{verbatim}
 !fcd$ io xpomp_show_real4
 !fcd$ io xpomp_is_mouse
@@ -565,15 +565,15 @@ that simply mimic their effects on arguments are provided.
 They must be compiled together with the HPF program through \PIPS in
 order to provide the compiler with the necessary information for
 using the \xPOMP display facilities. All \xPOMP functions are annoted
-as \verb"io" and\verb"fake" with special \verb"!fcd$" %% $
+as \verb|io| and\verb|fake| with special \verb|!fcd$| %% $
 (\FC directives). The first directive tells that the function or
 subroutine performs only I/O. 
 The second directive tells that the source provided are fake. The effect is
 that the compiler will not generate code by compiling the functions, but
 they will have to be provided at link-time.
 %%
-The \verb"hpfc" front end accepts
-a list of files for compilation, hence for compiling the \verb"fractal"
+The \verb|hpfc| front end accepts
+a list of files for compilation, hence for compiling the \verb|fractal|
 exemple one must write:
 \begin{verbatim}
     hpfc xpomp_fake.f fractal.f
@@ -584,12 +584,12 @@ exemple one must write:
 Since the source files for the functions are fake ones (the functions
 are actually written in C), these functions must be provided latter on
 at link-time. The \HPFC compiler allows to give this information
-with the \verb"!ldi$" %%$
+with the \verb|!ldi$| %%$
 (Link eDitor I/o) special directive. This directive supplies aditionnal
-\verb"ld" options for linking the program with an I/O library (hence
+\verb|ld| options for linking the program with an I/O library (hence
 the library is just linked to the \emph{host} program.
 Assuming the \xPOMP library and executables being stored in
-a directory described by the \verb"$XPOMP_RUNTIME" environment
+a directory described by the \verb|$XPOMP_RUNTIME| environment
 variable, then the desired effect is achieved with: 
 \begin{verbatim}
 !ldi$ -L$XPOMP_RUNTIME -lxpomp
