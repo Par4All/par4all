@@ -10,6 +10,7 @@
 #include "genC.h"
 #include "database.h"
 #include "misc.h"
+#include "ri.h"
 #include "pipsdbm.h"
 #include "top-level.h"
 
