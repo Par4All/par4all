@@ -46,8 +46,9 @@
   ATTENTION : FORTRAN standard (15.9.3) says that an association of dummy and actual 
   arguments is valid only if the type of the actual argument is the same as the type 
   of the corresponding dummy argument. But in practice, not much program respect this 
-  rule , so we have to multiply the array size by its element size in order to find out
-  new value.
+  rule , so we have to take into account the element size when computing the new value.
+  We have an option when computing the array size : multiply the array size with the 
+  element size or not
   
   For example : SPEC95, benchmark 125.turb3d : 
   SUBROUTINE TURB3D
@@ -62,8 +63,7 @@
   SUBROUTINE FOO(U,V,W)
   REAL*8 U(2,NXHP,NY,*)
 
-  If we take into account the different types, as we have NXHP=IXPP/2, IY=NY, NZ=IZ => *=NZ  
-*/
+  If we take into account the different types, as we have NXHP=IXPP/2, IY=NY, NZ=IZ => *=NZ  */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -84,20 +84,117 @@
 #include "instrumentation.h"
 #include "transformations.h"
 
-#define PREFIX_DEC  "$DEC"
+#define PREFIX1  "$ARRAY_DECLARATION"
+#define PREFIX2  "$COMMON_DECLARATION"
+#define PREFIX3  "$COMMON_DECLARATION_END"
 #define NEW_DECLARATIONS  ".new_declarations"
 
 /* Define a static stack and related functions to remember the current
    statement and then get the current precondition for top_down_adn_flt(): */
 DEFINE_LOCAL_STACK(current_statement, statement)
 
-static list l_current_caller_values = NIL;
+static list l_values_of_current_caller = NIL;
 static entity current_callee = entity_undefined;
 static entity current_caller = entity_undefined;
 static entity current_dummy_array = entity_undefined;
-static call current_callsite = call_undefined;
-static int number_of_right_array_declarations = 0;
-static int number_of_one_and_assumed_array_declarations_but_no_caller = 0;
+static entity current_variable_caller = entity_undefined;
+static FILE * out2;
+static int number_of_unnormalized_arrays_without_caller = 0;
+static int number_of_replaced_array_declarations = 0;
+static int number_of_instrumented_array_declarations = 0;
+static int number_of_array_size_assignments = 0;
+static int number_of_processed_modules = 0;
+static string file_name_caller= NULL;
+
+bool module_is_called_by_main_program_p(entity mod)
+{
+  if (!entity_main_module_p(mod))
+    {
+      string mod_name = module_local_name(mod);
+      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,mod_name,TRUE);
+      list l_callers = callees_callees(callers); 
+      while (!ENDP(l_callers))
+	{
+	  string caller_name = STRING(CAR(l_callers));
+	  entity current_caller = local_name_to_top_level_entity(caller_name);
+	  if (module_is_called_by_main_program_p(current_caller)) return TRUE;
+	  l_callers = CDR(l_callers);
+	}
+      return FALSE;
+    }
+  return TRUE;
+}
+
+static void display_array_resizing_top_down_statistics()
+{
+  user_log("* Number of unnormalized arrays without caller: %d *\n",
+	   number_of_unnormalized_arrays_without_caller);	
+  user_log("* Number of right array declarations replaced: %d*\n",
+	   number_of_replaced_array_declarations);	
+  user_log("* Number of array declarations instrumented: %d *\n",
+	   number_of_instrumented_array_declarations);
+  user_log("* Number of assignments added: %d *\n",
+	   number_of_array_size_assignments);
+  user_log("\n Number of processed modules: %d \n"
+	   ,number_of_processed_modules); 
+}
+
+/* This function creates a common for a given name in a given module. 
+   This is an entity with the following fields :
+   Example:  SUBROUTINE SUB1
+             COMMON /FOO/ W1,V1 
+
+   name = top_level:~name (TOP-LEVEL:~FOO)
+   type = area 
+          with size = 8 [2*8], layout = NIL [SUB1:W,SUB1:V] 
+   storage = ram 
+          with function = module (TOP-LEVEL:SUB1) (first occurence ? SUB2,SUB3,..)
+               section = TOP-LEVEL:~FOO  (recursive ???)
+               offset = undefined
+               shared = NIL
+  initial = unknown 
+
+  The area size and area layout must be updated each time when 
+  a common variable is added to this common */
+
+entity make_new_common(string name, entity mod)
+{
+  string common_global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING
+						 COMMON_PREFIX,name,NULL)); 
+  type common_type = make_type(is_type_area, make_area(8, NIL));
+  entity StaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_AREA_LOCAL_NAME);
+  storage common_storage = make_storage(is_storage_ram,
+					(make_ram(mod,StaticArea, 0, NIL)));
+  value common_value = MakeValueUnknown();
+  return  make_entity(common_global_name,common_type,common_storage,common_value);
+}
+
+/* This function creates a common variable in a given common in a given module. 
+   This is an entity with the following fields :
+   name = module_name:name (SUB1:W1)
+   type = variable 
+          with basic = int, dimension = NIL
+   storage = ram 
+          with function = module (TOP-LEVEL:SUB1)
+               section = common (TOP-LEVEL:~FOO)
+               offset = 0
+               shared = 
+  initial = unknown 
+
+  The common must be updated with new area size and area layout */
+
+entity make_new_integer_scalar_common_variable(string name, entity mod, entity com)
+{
+  string var_global_name = strdup(concatenate(module_local_name(mod),MODULE_SEP_STRING,
+					      name,NULL)); 
+  type var_type = make_type(is_type_variable, make_variable(make_basic_int(8), NIL));
+  storage var_storage = make_storage(is_storage_ram,
+				     (make_ram(mod,com,0,NIL)));
+  value var_value = MakeValueUnknown();
+  entity e = make_entity(var_global_name,var_type,var_storage,var_value);
+  //area_layout(type_area(entity_type(com))) = CONS(ENTITY,e,NIL);
+  return e;
+}
 
 bool unbounded_expression_p(expression e)
 {
@@ -136,6 +233,13 @@ bool array_argument_p(expression e)
     }
   return FALSE;
 }
+
+bool scalar_argument_p(entity e)
+{
+  type t = entity_type(e);
+  return(ENDP(variable_dimensions(type_variable(t))));
+}
+
 
 bool assumed_size_array_p(entity e)
 {  
@@ -190,15 +294,17 @@ void print_array_declaration(entity e)
    => to use the script $PIPS_ROOT/Src/Script/misc/normalization.pl*/
   variable v = type_variable(entity_type(e));   
   list l_dims = variable_dimensions(v);
-  user_log("(");
+  fprintf(out2,"(");
   while (!ENDP(l_dims)) 
     {
       dimension dim = DIMENSION(CAR(l_dims));
       string s = words_to_string(words_dimension(dim));
-      user_log("%s", s);  
+      fprintf(out2,"%s",s);
       l_dims = CDR(l_dims);
-      if (l_dims == NIL)  user_log(")");
-      else user_log(",");
+      if (l_dims == NIL) 
+	fprintf(out2,")");
+      else
+	fprintf(out2,",");
       free(s);
     }
 }
@@ -237,6 +343,21 @@ static list my_list_intersection(list l1, list l2)
   return l2;
 }
 
+/* Multiply each element of list l by e*/
+static list my_list_multiplication(list l, expression e)
+{
+  list l_tmp = NIL;
+  while (!ENDP(l))
+    {
+      expression e1= EXPRESSION(CAR(l));
+      e1 = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,e1,e);
+      l_tmp = gen_nconc(l_tmp,CONS(EXPRESSION,e1,NIL));
+      l = CDR(l);
+    }
+  return l_tmp;
+}
+
+/* Divide each element of list l by e*/
 static list my_list_division(list l, expression e)
 {
   list l_tmp = NIL;
@@ -250,6 +371,7 @@ static list my_list_division(list l, expression e)
   return l_tmp;
 }
 
+/* Replace each element e of list l1 by "op e"*/
 static list my_list_change(list l1, entity op)
 {
   list l = NIL;
@@ -262,6 +384,7 @@ static list my_list_change(list l1, entity op)
   return l;
 }
 
+/* Create new list of expressions "e1 op e2" where e1 is in l1, e2 is in l2*/
 static list my_list_combination(list l1, list l2, entity op)
 {
   list l = NIL;
@@ -273,6 +396,8 @@ static list my_list_combination(list l1, list l2, entity op)
 	{
 	  expression e2 = EXPRESSION(CAR(l_tmp));
 	  expression e = MakeBinaryCall(op,e1,e2);
+
+	  /* attention : add the expression_in_list_p test ??? */
 	  l = gen_nconc(l,CONS(EXPRESSION,e,NIL));
 	  l_tmp = CDR(l_tmp);
 	}
@@ -283,7 +408,7 @@ static list my_list_combination(list l1, list l2, entity op)
 
 list entity_to_formal_integer_parameters(entity f )
 {
-  /* get unsorted list of formal integer parameters for f by declaration
+  /* get unsorted list of formal integer parameters of module f by declaration
      filtering; these parameters may not be used by the callee's
      semantics analysis, but we have no way to know it because
      value mappings are not available */
@@ -386,7 +511,7 @@ bool expression_equal_in_context_p(expression e1, expression e2, transformer con
   clean_all_normalized(e2);
   n1 = NORMALIZE_EXPRESSION(e1);
   n2 = NORMALIZE_EXPRESSION(e2);
-  ifdebug(3) 
+  ifdebug(4) 
     {	  
       fprintf(stderr, "\n First expression : ");    
       print_expression(e1);	
@@ -491,10 +616,12 @@ static list translate_to_callee_frame(expression e, transformer context)
      Return list of all possible translated expressions.
      Return list NIL if the expression can not be translated.
 
+     BE CAREFUL when adding expressions to list => may have combination exploration 
+
      If e is a reference:    
         1. Common variable => replace e by the corresponding variable 
 	2. From the current context of the call site (precondition + association):
-	   e = e1 where e1 is constant or e1 contains formal variable of the callee
+	   e = e1 where e1 is constant or e1 contains formal variables of the callee
 	   => l = {e1}
 
      If e is a call : 
@@ -517,22 +644,27 @@ static list translate_to_callee_frame(expression e, transformer context)
   switch(t){  
   case is_syntax_reference: 
     {
-      /* There are 3 cases for a reference M
-	 Precondition : M =10
-	 Association : M = FOO::N -1
-	 Common variable : CALLER::M = CALLEE::M or M'*/
+      /* There are 2 cases for a reference M
+	 1. Common variable : CALLER::M = CALLEE::M or M'
+	 2. Precondition +  Association : M =10 or M = FOO::N -1 */
       reference ref = syntax_reference(syn);
       entity en = reference_variable(ref);
       normalized ne;
+      ifdebug(2)
+	{
+	  fprintf(stderr, "\n Syntax reference \n");
+	  print_expression(e);
+	} 
       if (variable_in_common_p(en))
 	{
 	  /* Check if the COOMON/FOO/ N is also declared in the callee or not 
 	   * We can use ram_shared which contains a list of aliased variables with en 
 	   * but it does not work ????  
-
+	   
 	   * Another way : looking for a variable in the declaration of the callee
 	   * that has the same offset in the same common block */
 	  list l_callee_decl = code_declarations(entity_code(current_callee));
+	  bool in_callee = FALSE;
 	  /* search for equivalent variable in the list */	  
 	  MAP(ENTITY, enti,
 	  {
@@ -555,17 +687,46 @@ static list translate_to_callee_frame(expression e, transformer context)
 		  expr = entity_to_expression(enti);
 		ifdebug(2)
 		  {
-		    fprintf(stderr, "\n Common variable, add to list: \n");
+		    fprintf(stderr, "\n Syntax reference: Common variable, add to list: \n");
 		    print_expression(expr);
 		  } 
+		in_callee = TRUE;
 		l = gen_nconc(l,CONS(EXPRESSION,copy_expression(expr),NIL));
 		break;
 	      }
 	  },  l_callee_decl);
+
+	  /* If en is a pips created common variable, we can add this common declaration
+	     to the callee's declaration list => use this value.
+	     If en is an initial program's common variable => do we have right to add ? 
+	     confusion between local and global varibales that have same name  ??? */
+
+	  if (!in_callee && strstr(entity_local_name(en),"I_PIPS_") != NULL)
+	    {
+	      string callee_name = module_local_name(current_callee);
+	      string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,TRUE);
+	      string base_name = pips_basename(user_file, NULL);
+	      string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
+	      string pips_variable_name = entity_local_name(en);
+	      string pips_common_name = strstr(entity_local_name(en),"PIPS_");
+	      string new_decl = strdup(concatenate("      INTEGER*8 ",pips_variable_name,"\n",
+						   "      COMMON /",pips_common_name,"/ ",pips_variable_name,"\n",NULL));
+	      /* Attention, miss a test if this declaration has already been added or not 
+		 => Solutions : 
+		 1. if add pips variable declaration for current module => add for all callees 
+		 where the array is passed ???
+		 2. Filter when using script array_resizing_instrumentation => simpler ??? */
+	      fprintf(out2,"%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name,callee_name,0,1);
+	      fprintf(out2,new_decl);
+	      fprintf(out2,"%s\n",PREFIX3);
+	      free(file_name), file_name = NULL;
+	      free(new_decl), new_decl = NULL;
+	      l = gen_nconc(l,CONS(EXPRESSION,e,NIL));
+	    }
 	}      
       /* Use the precondition + association of the call site:
 	 Take only the equalities.
-	 Project all variables belonging the the caller, except the current variable (from e)
+	 Project all variables belonging to the caller, except the current variable (from e)
 	 there are 2 cases :
 	 1. The projection is not exact , there are over flows
 	 Return the SC_UNDEFINED => what to do, like before ? 
@@ -596,9 +757,9 @@ static list translate_to_callee_frame(expression e, transformer context)
 	      Psysteme ps = sc_dup(ps_tmp);
 	      Pbase b = ps->base;
 	      Pvecteur pv_var = VECTEUR_NUL; 	  
-	      ifdebug(3)
+	      ifdebug(4)
 		{
-		  fprintf(stderr, "\n Reference : using precondition + association \n");
+		  fprintf(stderr, "\n Syntax reference : using precondition + association \n");
 		  fprint_transformer(stderr,context,entity_local_name);
 		}
 	      for(; !VECTEUR_NUL_P(b); b = b->succ) 
@@ -616,12 +777,6 @@ static list translate_to_callee_frame(expression e, transformer context)
 		{
 		  // the projection is exact		       
 		  Pcontrainte egal, egal1;
-		  ifdebug(3)
-		    {
-		      fprintf(stderr, "\n Check if e can be translated by using precondition + association: \n");
-		      print_expression(e);
-		      fprint_transformer(stderr,context, entity_local_name);
-		    } 
 		  for (egal = ps->egalites; egal != NULL; egal = egal1) 
 		    {
 		      /* Take only the equations of the system */
@@ -663,11 +818,6 @@ static list translate_to_callee_frame(expression e, transformer context)
 		    }
 		}	 
 	      sc_rm(ps);
-	      ifdebug(3)
-		{
-		  fprintf(stderr, "\n Reference : using precondition + association \n");
-		  fprint_transformer(stderr,context, entity_local_name);
-		}
 	    }
 	}
       break;
@@ -677,22 +827,31 @@ static list translate_to_callee_frame(expression e, transformer context)
       call ca = syntax_call(syn);
       entity fun = call_function(ca);
       list l_args = call_arguments(ca);
+      ifdebug(2)
+	{
+	  fprintf(stderr, "\n Syntax call \n");
+	  print_expression(e);
+	} 
       if (l_args==NIL)
 	{
-	  /* Numerical constant or symbolic value (PARAMETER) . 
-	     There are two cases:
+	  /* Numerical constant or symbolic value (PARAMETER (M=2000)) . 
+	     There are 2 cases:
 	     1. Constant : 2000 => add to list
-	     2. Association : 2000 = FOO:N (formal variable) => add N to the list
-	     3. Precondition + Association : 2000 = M = FOO:N -1=> add N-1 to the list*/
+	     2. Precondition + Association : 2000 = M = FOO:N -1=> add N-1 to the list  
+	     => trade-off : we have more chances vs more computations */
 	  value val = entity_initial(fun);
 	  constant con = constant_undefined;
 	  int i;
-	  ifdebug(2)
+	  /*  ifdebug(2)
 	    {
-	      fprintf(stderr, "\n Add numerical constant or symbolic value to list: \n");
+	      fprintf(stderr, "\n Add  symbolic value to list: \n");
 	      print_expression(e);
-	    } 
-	  l = gen_nconc(l,CONS(EXPRESSION,e,NIL));
+	      } */
+	  /* There is something changed in PIPS ? 
+	     PARAMETER M =10 
+	     add M, not 10 as before ??? */
+	  // l = gen_nconc(l,CONS(EXPRESSION,e,NIL));
+
 	  if (value_symbolic_p(val))
 	    {
 	      /* Symbolic constant: PARAMETER (Fortran) or CONST (Pascal) */
@@ -717,6 +876,19 @@ static list translate_to_callee_frame(expression e, transformer context)
 		  Psysteme ps = sc_dup(ps_tmp);
 		  Pbase b = ps->base;
 		  Pvecteur pv_var = VECTEUR_NUL; 
+
+		   /* There is something changed in PIPS ? 
+		      PARAMETER M =10 
+		      add M, not 10 as before ??? */
+		  int j = constant_int(con);
+		  ifdebug(2)
+		    {
+		      fprintf(stderr, "\n Add numerical constant to list: \n");
+		      print_expression(int_to_expression(j));
+		    } 
+		  l = gen_nconc(l,CONS(EXPRESSION,int_to_expression(j),NIL));
+
+
 		  for(; !VECTEUR_NUL_P(b); b = b->succ) 
 		    {
 		      Variable var = vecteur_var(b);
@@ -732,7 +904,7 @@ static list translate_to_callee_frame(expression e, transformer context)
 		      // the projection is exact		       
 		      Pcontrainte egal, egal1;
 		      i = constant_int(con);
-		      ifdebug(3)
+		      ifdebug(4)
 			{
 			  fprintf(stderr, "\n Call : using Precondition + Association to find formal parameter equal to %d \n", i);
 			  fprint_transformer(stderr,context, entity_local_name);
@@ -776,6 +948,11 @@ static list translate_to_callee_frame(expression e, transformer context)
 	     Recursive : with the arguments of the call
 	     As our generated expression e is a call with operators : +,-,* only,
 	     we treat only these cases */
+	  ifdebug(2)
+	    {
+	      fprintf(stderr, "\n Syntax call : recursive \n");
+	      print_expression(e);
+	    } 
 	  if (gen_length(l_args)==1)
 	    {
 	      expression e1 = EXPRESSION(CAR(l_args));
@@ -804,8 +981,8 @@ static list translate_to_callee_frame(expression e, transformer context)
 
 /*****************************************************************************
 
- This function returns the size of an unnormalized array, from position i+1, 
- multiplied by array element size: (D(i+1)*...*D(n-1))* element_size    
+ This function returns the size of an unnormalized array, from position i+1:
+  (D(i+1)*...*D(n-1))
  
 *****************************************************************************/
 
@@ -815,8 +992,6 @@ static expression size_of_unnormalized_dummy_array(entity dummy_array,int i)
   list l_dummy_dims = variable_dimensions(dummy_var);
   int num_dim = gen_length(l_dummy_dims),j;
   expression e = expression_undefined;
-  basic b = variable_basic(type_variable(entity_type(dummy_array)));
-  expression e_size = int_to_expression(SizeOfElements(b));
   for (j=i+1; j<= num_dim-1; j++)
     {
       dimension dim_j = find_ith_dimension(l_dummy_dims,j);
@@ -836,12 +1011,6 @@ static expression size_of_unnormalized_dummy_array(entity dummy_array,int i)
       else
 	e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(e),size_j);  
     }
-  if (!expression_undefined_p(e))
-    e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(e),e_size);
-  else 
-    /* A(..,Di,*), as the size of actual array is multiplied by its element size,
-       we have to mutilply the dummy array size by its element size also*/
-    e = copy_expression(e_size);
   ifdebug(2)
     {
       fprintf(stderr, "\n Size of unnormalized dummy array: \n");
@@ -853,9 +1022,8 @@ static expression size_of_unnormalized_dummy_array(entity dummy_array,int i)
 /*****************************************************************************
 
  This function returns the size of an array, from position i+1, minus the 
- subscript value of array reference from position i+1, multiplied by array 
- element size : 
- (D(i+1)*...*Dn - (1+ s(i+1)-l(i+1) + (s(i+2)-l(i+2))*d(i+1)+...-1))* element_size   
+ subscript value of array reference from position i+1: 
+ (D(i+1)*...*Dn - (1+ s(i+1)-l(i+1) + (s(i+2)-l(i+2))*d(i+1)+...-1))
  
 *****************************************************************************/
 expression size_of_actual_array(entity actual_array,list l_actual_ref,int i)
@@ -864,8 +1032,6 @@ expression size_of_actual_array(entity actual_array,list l_actual_ref,int i)
   variable actual_var = type_variable(entity_type(actual_array));   
   list l_actual_dims = variable_dimensions(actual_var);
   int num_dim = gen_length(l_actual_dims),j;
-  basic b = variable_basic(type_variable(entity_type(actual_array)));
-  expression e_size = int_to_expression(SizeOfElements(b));
   for (j=i+1; j<= num_dim; j++)
     {
       dimension dim_j = find_ith_dimension(l_actual_dims,j);
@@ -903,7 +1069,7 @@ expression size_of_actual_array(entity actual_array,list l_actual_ref,int i)
 	  expression lower_j = dimension_lower(dim_j);
 	  expression sub_j = find_ith_argument(l_actual_ref,j);
 	  expression upper_j = dimension_upper(dim_j);
-	  expression size_j;
+	  expression size_j,sub_low_j,elem_j;
 	  if ( expression_constant_p(lower_j) && (expression_to_int(lower_j)==1))
 	    size_j = copy_expression(upper_j);
 	  else 
@@ -912,11 +1078,24 @@ expression size_of_actual_array(entity actual_array,list l_actual_ref,int i)
 	      size_j =  binary_intrinsic_expression(PLUS_OPERATOR_NAME,
 						    copy_expression(size_j),int_to_expression(1));
 	    }    
-	  if (!same_expression_p(sub_j,lower_j))
+	  /* ATTENTION : heuristic 
+	     We can distinguish or not the special case: lower_bound = subscript, 
+	     1. If not, we do not lose information such as in SPEC95/applu.f :
+	          real u(5,33,33,33)
+	          call exact(i,j,1,u(1,i,j,1))
+		    => size = 5.33.33.33 -((i-1)5 +(j-1)5.33 +(k-1)5.33.33), 
+		    not 5.33.33.33 -((i-1)5 +(j-1)5.33) (as k=1)
+		  subroutine exact(i,j,k,u000ijk)
+		  We will have more combinations, but more chance to translate 
+		  the size of actual array to the callee's frame
+	     2. If yes, there are so much combinations => it takes long time to compute,
+	        such as in SPEC95/turb3d.f 
+	     CONCLUSION : for the efficiency of time, we distinguish this case*/
+
+	  if (!same_expression_p(sub_j,lower_j)) 
 	    {
-	      expression sub_low_j = binary_intrinsic_expression(MINUS_OPERATOR_NAME,
-								 sub_j,lower_j);
-	      expression elem_j;
+	      sub_low_j = binary_intrinsic_expression(MINUS_OPERATOR_NAME,
+						      sub_j,lower_j);
 	      if (expression_undefined_p(prod))
 		elem_j = copy_expression(sub_low_j);
 	      else
@@ -953,10 +1132,6 @@ expression size_of_actual_array(entity actual_array,list l_actual_ref,int i)
 	    }
 	}
     }
-  if (!expression_undefined_p(e))
-    e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(e),e_size);
-  else 
-    e = copy_expression(e_size);
   ifdebug(2)
     {
       fprintf(stderr, "\n Size of actual array:\n");
@@ -965,102 +1140,295 @@ expression size_of_actual_array(entity actual_array,list l_actual_ref,int i)
   return e;
 }
 
+/* This function computes a list of translated values corresponding to the current call site,
+   and then modify the list of values of the current caller*/
 static bool top_down_adn_call_flt(call c)
 {
-  current_callsite = c;
-  if(call_function(current_callsite) == current_callee)
+  if(call_function(c) == current_callee)
     {    
       int off = formal_offset(storage_formal(entity_storage(current_dummy_array)));
-      list l_actual_args = call_arguments(current_callsite);
+      list l_actual_args = call_arguments(c);
       expression actual_arg = find_ith_argument(l_actual_args,off);
-      if (! expression_undefined_p(actual_arg) && array_argument_p(actual_arg))
-	{
-	  reference actual_ref = expression_reference(actual_arg);
-	  entity actual_array = reference_variable(actual_ref);
-	  if (!unnormalized_array_p(actual_array))
+      if (! expression_undefined_p(actual_arg))
+	{	
+	  entity actual_array = expression_to_entity(actual_arg);
+	  int same_dim = 0;
+	  statement stmt = current_statement_head();
+	  expression actual_array_size = expression_undefined;
+	  list l_values_of_current_call_site = NIL;
+	  transformer context;
+	  ifdebug(3) 
+	    {	  
+	      fprintf(stderr, " \n Current statement : \n");
+	      print_statement(stmt);
+	    }
+	  if (statement_weakly_feasible_p(stmt))
 	    {
-	      /* The actual array is not an assumed_sized array nor a pointer-type array
-		 Attention : there may exist a declaration REAL A(1) which is good ? */
-	      statement  stmt = current_statement_head();
-	      expression actual_array_size = expression_undefined;
-	      list l_new_caller_values = NIL;
-	      int same_dim = 0;
-	      list l_actual_ref = reference_indices(actual_ref);
-	      transformer context;
-	      if (statement_weakly_feasible_p(stmt))
-		{
-		  transformer prec = load_statement_precondition(stmt); 
-		  ifdebug(3) 
-		    {	  
-		      fprintf(stderr, " \n Does the precondition is modified ? Before \n");
-		      fprint_transformer(stderr,prec, entity_local_name);
-		    }
-		  // context = formal_and_actual_parameters_association(c,prec);
-		  context = formal_and_actual_parameters_association(c,transformer_dup(prec));
-
-		  ifdebug(3) 
-		    {	  
-		      fprintf(stderr, " \n Does the precondition is modified ? After \n");
-		      fprint_transformer(stderr,prec, entity_local_name);
-		    }
+	      transformer prec = load_statement_precondition(stmt); 
+	      ifdebug(4) 
+		{	  
+		  fprintf(stderr, " \n The precondition before \n");
+		  fprint_transformer(stderr,prec, entity_local_name);
 		}
-	      else 
-		context = formal_and_actual_parameters_association(c,transformer_identity());	     
-	      while (same_dimension_p(actual_array,current_dummy_array,l_actual_ref,same_dim+1,context))
-		same_dim ++;
-	      ifdebug(2)
-		fprintf(stderr, "\n Number of same dimensions : %d \n",same_dim);
-	      actual_array_size = size_of_actual_array(actual_array,l_actual_ref,same_dim); 
-	      ifdebug(2)
+	      // context = formal_and_actual_parameters_association(c,prec);
+	      context = formal_and_actual_parameters_association(c,transformer_dup(prec));
+	      ifdebug(4) 
+		{	  
+		  fprintf(stderr, " \n The precondition after \n");
+		  fprint_transformer(stderr,prec,entity_local_name);
+		}
+	    }
+	  else 
+	    context = formal_and_actual_parameters_association(c,transformer_identity());
+	  if (array_argument_p(actual_arg))
+	    {
+	      /* Actual argument is an array */     
+	      if (!unnormalized_array_p(actual_array))
 		{
-		  fprintf(stderr, "\n Size of actual array before translation : \n");
-		  print_expression(actual_array_size);
-		}  
-	      l_new_caller_values = translate_to_callee_frame(actual_array_size,context);
-	      ifdebug(2)
-		{
-		  fprintf(stderr, "\n List of values after translation : \n");
-		  print_expressions(l_new_caller_values);
-		}  
-	      if (l_new_caller_values != NIL)
-		{
-		  /* we have a list of translated actual array size expressions 
-		     (in the frame of callee)*/
-		  expression dummy_array_size = size_of_unnormalized_dummy_array(current_dummy_array,same_dim);
-		  l_new_caller_values = my_list_division(l_new_caller_values,dummy_array_size);  
-		  l_current_caller_values = my_list_intersection(l_current_caller_values,
-								 l_new_caller_values); 
+		  /* The actual array is not an assumed_sized array nor a pointer-type array
+		     Attention : there may exist a declaration REAL A(1) which is good ? */	
+		  reference actual_ref = expression_reference(actual_arg);
+		  list l_actual_ref = reference_indices(actual_ref);
+		  while (same_dimension_p(actual_array,current_dummy_array,l_actual_ref,same_dim+1,context))
+		    same_dim ++;
 		  ifdebug(2)
-		    {
-		      fprintf(stderr, "\n List after intersection (new caller + current caller) : \n");
-		      print_expressions(l_new_caller_values);
-		    }  
-		  if (l_current_caller_values == NIL)
-		    /* There is no same values for different call sites => STOP  
-		       gen_stop ?????*/
-		    return FALSE;
-		  /* We have a list of same values for different call sites => continue 
-		     to find other calls to the callee*/
-		  return TRUE;
+		    fprintf(stderr, "\n Number of same dimensions : %d \n",same_dim);
+		  actual_array_size = size_of_actual_array(actual_array,l_actual_ref,same_dim); 
+		}
+	      else
+		{
+		  /* Actual argument is an unnormalized array => 
+		     Pointer case => compute actual array size => try to translate 
+		     if not ok => code instrumentation*/
+		  l_values_of_current_caller = NIL;
+		  return FALSE;
 		}
 	    }
 	  else
-	    pips_user_warning(" The array declaration of the caller is *\n"); 
+	    {
+	      /* Actual argument is not an array*/
+	      if (scalar_argument_p(actual_array))
+		{
+		  /* Actual argument is a scalar variable like in PerfectClub/spc77
+		     SUBROUTINE MSTADB
+		     REAL T
+		     CALL SATVAP(T,1)
+		     SUBROUTINE SATVAP(T,JMAX)
+		     REAL T(1)
+		     T(1:JMAX)*/
+		  ifdebug(2)
+		    fprintf(stderr,"Actual argument is a scalar variable");
+		  actual_array_size = int_to_expression(1);
+		}
+	      else
+		{
+		  if (value_constant_p(entity_initial(actual_array)) &&
+		      constant_call_p(value_constant(entity_initial(actual_array))))
+		    { 
+		      /* Actual argument can be a string as in SPEC/wave5 
+			 CALL ABRT("BAD BY",6)
+			 SUBROUTINE ABRT(MESS,NC)
+			 CHARACTER MESS(1)
+			 The argument's name is TOP-LEVEL:'name'*/
+		      ifdebug(2)
+			fprintf(stderr,"Actual argument is a string");
+		      actual_array_size = int_to_expression(strlen(entity_name(actual_array))-12);
+		    }
+		  else 
+		    {
+		      /* Actual argument is not an array, not a scalar variable, not a string
+			 => code instrumentation*/
+		      l_values_of_current_caller = NIL;
+		      return FALSE;
+		    }
+		}
+	    }
+	  ifdebug(2)
+	    {
+	      fprintf(stderr, "\n Size of actual array before translation : \n");
+	      print_expression(actual_array_size);
+	    }  
+	  l_values_of_current_call_site = translate_to_callee_frame(actual_array_size,context);
+	  ifdebug(2)
+	    {
+	      fprintf(stderr, "\n Size of actual array after translation (list of possible values) : \n");
+	      print_expressions(l_values_of_current_call_site);
+	    }  
+	  if (l_values_of_current_call_site != NIL)
+	    {
+	      /* we have a list of translated actual array sizes (in the callee's frame)*/
+	      expression dummy_array_size = size_of_unnormalized_dummy_array(current_dummy_array,same_dim);
+	      if (value_constant_p(entity_initial(actual_array)))
+		{
+		  /* String case : do not compare the element size*/
+		  if (!expression_undefined_p(dummy_array_size))
+		    l_values_of_current_call_site = my_list_division(l_values_of_current_call_site,
+								     dummy_array_size);
+		}
+	      else 
+		{
+		  /* Now, compare the element size of actual and dummy arrays*/
+		  basic b_dummy = variable_basic(type_variable(entity_type(current_dummy_array)));
+		  basic b_actual = variable_basic(type_variable(entity_type(actual_array)));
+		  int i_dummy = SizeOfElements(b_dummy);
+		  int i_actual = SizeOfElements(b_actual);
+		  if (i_dummy == i_actual)
+		    {
+		      if (!expression_undefined_p(dummy_array_size))
+			l_values_of_current_call_site = my_list_division(l_values_of_current_call_site,
+									 dummy_array_size);
+		    }
+		  else
+		    {
+		      l_values_of_current_call_site = my_list_multiplication(l_values_of_current_call_site,
+									     int_to_expression(i_actual));
+		      if (expression_undefined_p(dummy_array_size))
+			l_values_of_current_call_site = my_list_division(l_values_of_current_call_site,
+									 int_to_expression(i_dummy));
+		      else
+			{
+			  dummy_array_size = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,dummy_array_size,
+									 int_to_expression(i_dummy));
+			  l_values_of_current_call_site = my_list_division(l_values_of_current_call_site,
+									   dummy_array_size);
+			}
+		    }
+		}
+	      l_values_of_current_caller = my_list_intersection(l_values_of_current_caller,
+								l_values_of_current_call_site); 
+	      ifdebug(2)
+		{
+		  fprintf(stderr, "\n List of values of the current caller (after intersection): \n");
+		  print_expressions(l_values_of_current_caller); 
+		}  
+	      if (l_values_of_current_caller == NIL)
+		/* There is no same value for different call sites 
+		   => code instrumentation  */
+		return FALSE;
+	      /* We have a list of same values for different call sites => continue 
+		 to find other calls to the callee*/
+	      return TRUE;
+	    }	 
 	}
       else 
-	pips_user_warning("The actual and formal argument lists do not have the same number of arguments OR arguments are not corresponding !!! \n"); 
-      l_current_caller_values = NIL;
+	/* Actual argument is an undefined expression => code instrumentation*/
+      l_values_of_current_caller = NIL;
       return FALSE;
     }
-  current_callsite = call_undefined;
   return TRUE;
 }
+
+/* Insert "I_PIPS_SUB_ARRAY = actual_array_size" before each call to the current callee*/
+static void instrument_call_rwt(call c)
+{
+  if(call_function(c) == current_callee)
+    {    
+      int off = formal_offset(storage_formal(entity_storage(current_dummy_array)));
+      list l_actual_args = call_arguments(c);
+      expression actual_arg = find_ith_argument(l_actual_args,off);
+      if (! expression_undefined_p(actual_arg))
+	{  
+	  entity actual_array = expression_to_entity(actual_arg);
+	  expression actual_array_size = expression_undefined;
+	  if (array_argument_p(actual_arg))
+	    {
+	      if (!unnormalized_array_p(actual_array))
+		{
+		  /* The actual array is not an assumed_sized array nor a pointer-type array
+		     Attention : there may exist a declaration REAL A(1) which is good ? */
+		  reference actual_ref = expression_reference(actual_arg);
+		  list l_actual_ref = reference_indices(actual_ref);
+		  actual_array_size = size_of_actual_array(actual_array,l_actual_ref,0);
+		}
+	      else
+		pips_user_warning(" The array declaration in the caller %s is unnormalized.\n",
+				  module_local_name(current_caller)); 
+	      /* How to instrument code ??? Pointer cases ??? 
+		 Caller is not called by the main program => already excluded*/
+	    }
+	  else
+	    {
+	      /* Actual argument is not an array*/
+	      if (scalar_argument_p(actual_array))
+		{
+		  ifdebug(2)
+		    fprintf(stderr,"Actual argument is a scalar variable");
+		  actual_array_size = int_to_expression(1);
+		}
+	      else
+		{
+		  if (value_constant_p(entity_initial(actual_array)) &&
+		      constant_call_p(value_constant(entity_initial(actual_array))))
+		    { 
+		      /* Actual argument can be a string whose name is TOP-LEVEL:'name'*/
+		      ifdebug(2)
+			fprintf(stderr,"Actual argument is a string");
+		      actual_array_size = int_to_expression(strlen(entity_name(actual_array))-12);
+		    }
+		  else 
+		    /* Abnormal case*/
+		    pips_user_warning(" \n Actual argument is not an array, not a scalar variable, not a string.\n");
+		}
+	    }
+	  if (!expression_undefined_p(actual_array_size))
+	    {
+	      /* The actual array size is computable */
+	      statement stmt = current_statement_head();
+	      int order = statement_ordering(stmt);
+	      expression left = entity_to_expression(current_variable_caller);
+	      statement new_s;
+	      if (!value_constant_p(entity_initial(actual_array)))
+		{
+		  /* Compare the element size*/
+		  basic b_dummy = variable_basic(type_variable(entity_type(current_dummy_array)));
+		  basic b_actual = variable_basic(type_variable(entity_type(actual_array)));
+		  int i_dummy = SizeOfElements(b_dummy);
+		  int i_actual = SizeOfElements(b_actual);
+		  if (i_dummy != i_actual)
+		    {
+		      actual_array_size = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,actual_array_size,
+								      int_to_expression(i_actual));
+		      actual_array_size = binary_intrinsic_expression(DIVIDE_OPERATOR_NAME,actual_array_size,
+								      int_to_expression(i_dummy));
+		    }
+		}
+	      new_s = make_assign_statement(left,actual_array_size);
+	      ifdebug(2)
+		{
+		  fprintf(stderr, "\n Size of actual array: \n");
+		  print_expression(actual_array_size);
+		}
+	      /* As we can not modify ALL.code, we cannot use a function like :
+		 insert_statement(stmt,new_s,TRUE).
+		 Instead, we have to stock the assignment as weel as the ordering 
+		 of the call site in a special file, named instrument.out, and 
+		 then use a script to insert the assignment before the call site.*/
+	      ifdebug(2)
+		{
+		  fprintf(stderr, "\n New statements: \n");
+		  print_statement(new_s);
+		  print_statement(stmt);
+		}
+	      fprintf(out2, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,
+		      module_local_name(current_caller),ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
+	      print_text(out2, text_statement(entity_undefined,0,new_s));
+	      fprintf(out2,"%s\n",PREFIX3);
+	      number_of_array_size_assignments++;
+	    }
+	}
+      else 
+	/* Abnormal case*/
+	pips_user_warning("Actual argument is an undefined expression\n");
+    }
+}
+
+/* This function computes a list of translated values for the new size of the formal array*/
 
 static list top_down_adn_caller_array()
 {
   string caller_name = module_local_name(current_caller);
   statement caller_statement = (statement) db_get_memory_resource(DBR_CODE,caller_name,TRUE);  
-  l_current_caller_values = NIL;
+  l_values_of_current_caller = NIL;
   make_current_statement_stack();
   set_precondition_map((statement_mapping)
 		       db_get_memory_resource(DBR_PRECONDITIONS,caller_name,TRUE));  
@@ -1072,89 +1440,114 @@ static list top_down_adn_caller_array()
   free_current_statement_stack(); 
   ifdebug(2)
     {
-      fprintf(stderr, "\n Current list of values of the caller is :\n ");
-      print_expressions(l_current_caller_values);
+      fprintf(stderr, "\n List of values of the current caller is :\n ");
+      print_expressions(l_values_of_current_caller);
     }
-  return l_current_caller_values;
+  return l_values_of_current_caller;
 }
 
-static void top_down_adn_callers_arrays(list l_arrays,list callers)
+static void instrument_caller_array()
 {
-  /* For one array, we may have different values from different call sites in different callers
-     The algorithm tries to translate these values to the callee's frame by using the formal  
-     parameters if it is possible. So :
+  string caller_name = module_local_name(current_caller);
+  statement caller_statement = (statement) db_get_memory_resource(DBR_CODE,caller_name,TRUE);  
+  make_current_statement_stack();
+  set_precondition_map((statement_mapping)
+		       db_get_memory_resource(DBR_PRECONDITIONS,caller_name,TRUE));  
+  gen_multi_recurse(caller_statement,
+		    statement_domain, current_statement_filter,current_statement_rewrite,
+		    call_domain,gen_true,instrument_call_rwt,NULL);  
+  reset_precondition_map();
+  free_current_statement_stack(); 
+  return;
+}
 
-     For all call sites in all callers, we have a list of possible values. If this list is NIL, 
-     the value can not be translated into the callee's frame => STOP */
+static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
+{
+  /* For each unnormalized array:
+     For each call site in each caller, we compute a list of possible values 
+     (these values have been translated to the frame of the callee). 
+     If this list is NIL => code instrumentation
+     Else, from different lists of different call sites in different callers, 
+     try to find a same value that becomes the new size of the unnormalized array. 
+     If this value does not exist  => code instrumentation */
 
-  string callee_name = entity_local_name(current_callee);
+  /* Find out the name of the printed file in Src directory: database/Src/file.f */
+  string callee_name = module_local_name(current_callee);
+  string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,TRUE);
+  string base_name = pips_basename(user_file, NULL);
+  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
+  
   while (!ENDP(l_arrays))
     {
-      entity e = ENTITY(CAR(l_arrays));
-      list l_callers = gen_copy_seq(callers);
+      list l = gen_copy_seq(l_callers),l_values = NIL,l_dims;
       bool flag = TRUE;
-      list l_old_values = NIL;
-      variable v = type_variable(entity_type(e));   
-      list l_dims = variable_dimensions(v);
-      int length = gen_length(l_dims);
-      dimension last_dim =  find_ith_dimension(l_dims,length);
-      current_dummy_array = e;
-      if (callers == NIL) 
+      variable v;
+      int length;
+      dimension last_dim;
+      expression new_value;
+      current_dummy_array = ENTITY(CAR(l_arrays));      
+      v = type_variable(entity_type(current_dummy_array));   
+      l_dims = variable_dimensions(v);
+      length = gen_length(l_dims);
+      last_dim =  find_ith_dimension(l_dims,length);
+      while (flag && !ENDP(l))
 	{
-	  user_log(" \n Module without caller: %s \n", callee_name);
-	  number_of_one_and_assumed_array_declarations_but_no_caller ++;
-	}
-      while (flag && !ENDP(l_callers))
-	{
-	  string caller_name = STRING(CAR(l_callers));
-	  list l_new_values = NIL;
+	  string caller_name = STRING(CAR(l));
 	  current_caller = local_name_to_top_level_entity(caller_name);
-	  l_new_values = top_down_adn_caller_array();
-	  ifdebug(2)
-	    {
-	      fprintf(stderr, "\n List of new values :\n ");
-	      print_expressions(l_new_values);
-	      fprintf(stderr, "\n List of old values (before intersection):\n ");
-	      print_expressions(l_old_values);
-	    }
-	  if (l_new_values == NIL)
-	    flag = FALSE;
+	  if (get_bool_property("ARRAY_RESIZING_USING_MAIN_PROGRAM") &&
+	      (! module_is_called_by_main_program_p(current_caller)))
+	    /* If the current caller is never called by the main program => 
+	       no need to follow this caller*/
+	    pips_user_warning("Module %s is not called by the main program \n",caller_name);
 	  else
 	    {
-	      l_old_values = my_list_intersection(l_old_values,l_new_values);
+	      list l_values_of_one_caller = top_down_adn_caller_array();
 	      ifdebug(2)
 		{
-		  fprintf(stderr, "\n List of old values (after intersection):\n ");
-		  print_expressions(l_old_values);
+		  fprintf(stderr, "\n List of values computed for caller %s is:\n ",caller_name);
+		  print_expressions(l_values_of_one_caller);
 		}
-	      if (l_old_values == NIL)
+	      if (l_values_of_one_caller == NIL)
 		flag = FALSE;
+	      else
+		{
+		  ifdebug(2)
+		    {
+		      fprintf(stderr, "\n List of values (before intersection):\n ");
+		      print_expressions(l_values);
+		    }
+		  l_values = my_list_intersection(l_values,l_values_of_one_caller);
+		  ifdebug(2)
+		    {
+		      fprintf(stderr, "\n List of values (after intersection):\n ");
+		      print_expressions(l_values);
+		    }
+		  if (l_values == NIL)
+		    flag = FALSE;
+		}
 	    }
 	  current_caller = entity_undefined;
-	  l_callers = CDR(l_callers);
-	}
-      user_log("%s\t%s\t%s\t%s\t%d\t", PREFIX_DEC, 
-	       db_get_memory_resource(DBR_USER_FILE,callee_name,TRUE), 
-	       callee_name,entity_local_name(e),length);     
-      if (flag && (l_old_values!=NIL))
+	  l = CDR(l);
+	} 
+      if (flag && (l_values!=NIL))
 	{
-	  /* We have l_old_values is the list of same values for different callers 
-	     => replace the unnormalized upper bound by 1 value in the list */
-	  expression exp = EXPRESSION (CAR(l_old_values));
+	  /* We have l_values is the list of same values for different callers 
+	     => replace the unnormalized upper bound by 1 value in this list */
 	  normalized n;
-	  clean_all_normalized(exp);
-	  n = NORMALIZE_EXPRESSION(exp);
+	  new_value = EXPRESSION (CAR(l_values));
+	  clean_all_normalized(new_value);
+	  n = NORMALIZE_EXPRESSION(new_value);
 	  if (normalized_linear_p(n))
 	    {
-	      Pvecteur v = normalized_linear(n);
-	      exp = Pvecteur_to_expression(v);
+	      Pvecteur ve = normalized_linear(n);
+	      new_value = Pvecteur_to_expression(ve);
 	    }
 	  else 
 	    {
 	      // Try to normalize the divide expression
-	      if (operator_expression_p(exp,DIVIDE_OPERATOR_NAME))
+	      if (operator_expression_p(new_value,DIVIDE_OPERATOR_NAME))
 		{
-		  call c = syntax_call(expression_syntax(exp));
+		  call c = syntax_call(expression_syntax(new_value));
 		  list l = call_arguments(c);
 		  expression e1 = EXPRESSION(CAR(l));
 		  expression e2 = EXPRESSION(CAR(CDR(l)));
@@ -1165,145 +1558,223 @@ static void top_down_adn_callers_arrays(list l_arrays,list callers)
 		    {
 		      Pvecteur v1 = normalized_linear(n1);
 		      expression e11 = Pvecteur_to_expression(v1);
-		      exp = binary_intrinsic_expression(DIVIDE_OPERATOR_NAME,e11,e2);
+		      new_value = binary_intrinsic_expression(DIVIDE_OPERATOR_NAME,e11,e2);
 		    }
 		}
 	    }
-	  // print new bound
-	  user_log("%s\t",words_to_string(words_expression(exp)));
-	  // print old declaration
-	  print_array_declaration(e);
-	  dimension_upper(last_dim) = exp;
-	  if (!unbounded_expression_p(exp))
-	    number_of_right_array_declarations++;
+	  number_of_replaced_array_declarations++;
 	}
       else 
 	{
-	  /* We have different value for different callers, or there are variables that 
-	     can not be translated to the callee's frame => we must leave * as the last
-	     bound of this array*/
-	  // print new bound
-	  user_log("%s\t",words_to_string(words_expression(make_unbounded_expression())));
-	  // print old declaration
-	  print_array_declaration(e);
-	  dimension_upper(last_dim) = make_unbounded_expression(); 
-	}      
-      user_log("\n");
-      user_log("---------------------------------------------------------------------------------------\n");
-      current_dummy_array = entity_undefined;
+	  /* We have different values for different callers, or there are variables that 
+	     can not be translated to the callee's frame => use code instrumentation:
+	     ......................
+	     Insert "INTERGER I_PIPS_SUB_ARRAY
+	     COMMON /PIPS_SUB_ARRAY/ I_PIPS_SUB_ARRAY"
+	     in the declaration of current callee and every caller that is called by the main program
+	     Modify array declaration ARRAY(,,I_PIPS_SUB_ARRAY/dummy_array_size)
+	     Insert "I_PIPS_SUB_ARRAY = actual_array_size" before each call site
+	     ......................*/
+	  
+	  /* Insert new declaration in the current callee*/
+	  string pips_common_name = strdup(concatenate("PIPS_",callee_name,"_",
+						       entity_local_name(current_dummy_array),NULL));
+	  string pips_variable_name = strdup(concatenate("I_",pips_common_name,NULL));
+	  entity pips_common = make_new_common(pips_common_name,current_callee);
+	  entity pips_variable = make_new_integer_scalar_common_variable(pips_variable_name,
+									 current_callee,pips_common);
+	  string new_decl = strdup(concatenate("      INTEGER*8 ",pips_variable_name,"\n",
+					       "      COMMON /",pips_common_name,"/ ",pips_variable_name,"\n",NULL));
+	  //  string old_decl = code_decls_text(entity_code(current_callee));
+	  expression dummy_array_size = size_of_unnormalized_dummy_array(current_dummy_array,0);
+	  new_value = entity_to_expression(pips_variable);
+	  if (!expression_undefined_p(dummy_array_size))
+	    new_value = binary_intrinsic_expression(DIVIDE_OPERATOR_NAME,new_value,dummy_array_size);
+	  
+	  /* We do not modify  code_decls_text(entity_code(module)) because of
+	     repeated bugs with ENTRY */
+	  
+	  /* ifdebug(2)
+	     fprintf(stderr,"\n Old declaration of %s is %s\n",callee_name,
+	     code_decls_text(entity_code(current_callee)));  
+	     code_decls_text(entity_code(current_callee)) = strdup(concatenate(old_decl,new_decl,NULL));  
+	     ifdebug(2)
+	     fprintf(stderr,"\n New declaration of %s is %s\n",callee_name,
+	     code_decls_text(entity_code(current_callee)));  
+	     free(old_decl), old_decl = NULL; */
+	  
+	  fprintf(out2,"%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name,callee_name,0,1);
+	  fprintf(out2,new_decl);
+	  fprintf(out2,"%s\n",PREFIX3);
+	  
+	  /* Insert new declaration and assignments in callers that are called by the main program*/
+	  l = gen_copy_seq(l_callers);
+	  while (!ENDP(l))
+	    {
+	      string caller_name = STRING(CAR(l));
+	      current_caller = local_name_to_top_level_entity(caller_name);
+	      if (get_bool_property("ARRAY_RESIZING_USING_MAIN_PROGRAM") &&
+		  (! module_is_called_by_main_program_p(current_caller)))
+		/* If the current caller is never called by the main program => 
+		   no need to follow this caller*/
+		pips_user_warning("Module %s is not called by the main program \n",caller_name);
+	      else
+		{
+		  string user_file_caller = db_get_memory_resource(DBR_USER_FILE,caller_name,TRUE);
+		  string base_name_caller = pips_basename(user_file_caller, NULL);
+		  file_name_caller = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE),
+							"/",base_name_caller,0));
+		  current_variable_caller = make_new_integer_scalar_common_variable(pips_variable_name,current_caller,
+										    pips_common);
+		  fprintf(out2, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,caller_name,0,1);
+		  fprintf(out2, new_decl);
+		  fprintf(out2, "%s\n",PREFIX3);
+		  
+		  /* insert "I_PIPS_SUB_ARRAY = actual_array_size" before each call site*/
+		  instrument_caller_array();
+		  current_variable_caller = entity_undefined;
+		  free(file_name_caller), file_name_caller = NULL;
+		}
+	      current_caller = entity_undefined;
+	      l = CDR(l);
+	    }
+	  number_of_instrumented_array_declarations++;
+	  free(new_decl), new_decl = NULL;
+	}
+      fprintf(out2,"%s\t%s\t%s\t%s\t%d\t",PREFIX1,file_name,
+	      callee_name,entity_local_name(current_dummy_array),length);    
+      // print new bound
+      fprintf(out2,"%s\t",words_to_string(words_expression(new_value)));
+      // print old declaration
+      print_array_declaration(current_dummy_array);
+      fprintf(out2,"\n");
+      dimension_upper(last_dim) = new_value;
       l_arrays = CDR(l_arrays);
     }
+  free(file_name), file_name = NULL;
 }
 
-/* The rule in pipsmake permits a top-down analyses  
+/* The rule in pipsmake permits a top-down analysis  
      
-top_down_array_declaration_normalization         > MODULE.new_declarations
-                                                 > PROGRAM.entities
+array_resizing_top_down         > MODULE.new_declarations
+                                > PROGRAM.entities
         < PROGRAM.entities
         < CALLERS.code
 	< CALLERS.new_declarations
-        < CALLERS.new_declarations
 
-Algorithm : For each module: 
+Algorithm : For each module that is called by the main program 
 - Take the declaration list. 
-- Take list of unnormalized array declarations, if this list is not nil      
-  - Take the list of unnormalized array that are formal variable 
-       - save the offset of each array in the formal argument list
+- Take list of unnormalized array declarations   
+  - For each unnormalized array that is formal variable. 
+       - save the offset of this array in the formal arguments list
        - get the list of callers of the module 
        - for each caller, get the list of call sites 
-       - for each call site, calculate the normalized bounds 
-          - base on offset 
-          - base on actual array size (if the actual array is assumed-size  => return the * value, 
-	    this case violates the standard norm but it exists in many case (SPEC95/applu,..))
-	  - base on dummy array size
-	  - base on subscript value of array element
-	  - base on binding informations
-	  - base on preconditions of the call site
-	  - if the normalized bound expression contain only visible variables of the callee, 
-	     => take this new value
-	  - if not =>  it will become * 
-       - if the normalized bounds for one array are different for different call sites and different caller 
-         =>  it will become *
-       - if they are all the same => take the new value
+       - for each call site, compute the new size for this array
+          - base on the offset 
+          - base on the actual array size (if the actual array is assumed-size => return the * value, 
+	    this case violates the standard norm but it exists in many case (SPEC95/applu,..)
+	    NN 26/10/2001: But now our goal is 100% resized arrays, by using code instrumentation 
+	    as a complementary phase, so this case does not exist anymore)
+	  - base on the dummy array size
+	  - base on the subscript value of the array element
+	  - base on the binding information
+	  - base on the precondition of the call site
+	  - base on the translation from the caller's to the callee's name space
+	  - if success (the size can be translated to the callee's frame) => take this new value
+	  - if fail => using code instrumentation  
+       - For all call sites and all callers, if there exists a same value 
+           => take this value as the new size for the unnormalized array
+       - Else, using code instrumentation
        - Modify the upper bound of the last dimension of the unnormalized declared array entity 
-         by the new value or the *.
+         by the new value.
        - Put MODULE.new_declarations = "Okay, normalization has been done with right value"
-           or "Okay, normalization has been done with * value" (for the case of *)
-   - Take other unnormalized array => what to do with ? 
 - If the list is nil => put MODULE.new_declarations, "Okay, there is nothing to normalize"*/
 
 bool array_resizing_top_down(char *module_name)
 { 
-  FILE * out;
+  /* The file out1 is used to save the new declarations
+     The file out2 is used to save the assignments to be inserted/instrumented*/
+  FILE * out1;
   string new_declarations = db_build_file_resource_name(DBR_NEW_DECLARATIONS, 
-							module_name, NEW_DECLARATIONS);
-  string dir = db_get_current_workspace_directory();
-  string filename = strdup(concatenate(dir, "/", new_declarations, NULL));
+							module_name,NEW_DECLARATIONS);
+  string dir_name = db_get_current_workspace_directory();
+  string file_name1 = strdup(concatenate(dir_name, "/", new_declarations, NULL));
+  string file_name2 = strdup(concatenate(dir_name, "/instrument.out", 0));
+  out2 = safe_fopen(file_name2, "a");  
   current_callee = local_name_to_top_level_entity(module_name);
+
+  number_of_processed_modules++;
   debug_on("ARRAY_RESIZING_TOP_DOWN_DEBUG_LEVEL");
   ifdebug(1)
     fprintf(stderr, " \n Begin top down array resizing for %s \n", module_name); 
   if (!entity_main_module_p(current_callee))
     {
-      list l_callee_decl = NIL, l_formal_unnorm_arrays = NIL, l_other_unnorm_arrays = NIL;
+      list l_callee_decl = NIL, l_formal_unnorm_arrays = NIL;
       set_current_module_entity(current_callee);		   
-      l_callee_decl = code_declarations(entity_code(current_callee));
-   
-      /* search for unnormalized array declarations in the list */
-      MAP(ENTITY, e,
-      {
-	if (unnormalized_array_p(e))
-	  {
-	    if (formal_parameter_p(e))
-	      l_formal_unnorm_arrays = gen_nconc(l_formal_unnorm_arrays,CONS(ENTITY,e,NIL));
-	    else
-	      /* it can not be return or rom storage 
-	       * it can be ram storage ( local variables,  COMMON A(1) => i.e PerfectClub/SPICE)*/
-	      l_other_unnorm_arrays = gen_nconc(l_other_unnorm_arrays,CONS(ENTITY,e,NIL));
-	  }
+      l_callee_decl = code_declarations(entity_code(current_callee));  
+ 
+      /* search for unnormalized formal array declarations in the declaration list */
+      MAP(ENTITY, e,{
+	if (unnormalized_array_p(e) && formal_parameter_p(e))
+	  l_formal_unnorm_arrays = gen_nconc(l_formal_unnorm_arrays,CONS(ENTITY,e,NIL));
       }, l_callee_decl);     
-      ifdebug(2)
-	{
-	  fprintf(stderr," \n The formal unnormalized arrays list :");
-	  print_entities(l_formal_unnorm_arrays);
-	  fprintf(stderr," \n The other unnormalized arrays list :");
-	  print_entities(l_other_unnorm_arrays);
-	}
+      
       if (l_formal_unnorm_arrays != NIL)
 	{
-	  /* Look for all call sites in the callers */
-	  callees callers = (callees) db_get_memory_resource(DBR_CALLERS,module_name,TRUE);
-	  list l_callers = callees_callees(callers); 
-	  user_log("\n-------------------------------------------------------------------------------------\n");
-	  user_log("Prefix \tFile \tModule \tArray \tNdim \tNew declaration\tOld declaration\n");
-	  user_log("---------------------------------------------------------------------------------------\n");
-	  ifdebug(2)
+	  /* There are several options: 
+	     1. If the current module is never called by the main program => do nothing
+	     2. If there is no main program (libraries, for example) => try to do thing
+	     It is up to users to choose among these options. 
+	     But of course, with all options, we can do nothing with modules that have no 
+	     callers at all, because this is a top-down approach ! */
+	  
+	  if (get_bool_property("ARRAY_RESIZING_USING_MAIN_PROGRAM") &&
+	      (!module_is_called_by_main_program_p(current_callee)))
 	    {
-	      fprintf(stderr," \n There is/are %d callers : ",
-		      gen_length(l_callers));
-	      MAP(STRING, caller_name, {
-		(void) fprintf(stderr, "%s, ", caller_name);
-	      }, l_callers);
-	      (void) fprintf(stderr, "\n");	
-	    }	  
-	  top_down_adn_callers_arrays(l_formal_unnorm_arrays,l_callers);  
+	      pips_user_warning("Module %s is not called by the main program\n",module_name);
+	      number_of_unnormalized_arrays_without_caller += 
+		gen_length(l_formal_unnorm_arrays);
+	    }
+	  else
+	    {
+	      /* ARRAY_RESIZING_USING_MAIN_PROGRAM = FALSE or module_is_called_by_main_program.
+		 Take all callers of the current callee*/
+	      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,module_name,TRUE);
+	      list l_callers = callees_callees(callers); 
+	      if (l_callers == NIL)
+		{
+		  pips_user_warning("Module %s has no caller \n",module_name);
+		  number_of_unnormalized_arrays_without_caller += 
+		    gen_length(l_formal_unnorm_arrays);
+		}
+	      ifdebug(2)
+		{
+		  fprintf(stderr," \n The formal unnormalized array list :");
+		  print_entities(l_formal_unnorm_arrays);
+		  fprintf(stderr," \n The caller list : ");
+		  MAP(STRING, caller_name, {
+		    (void) fprintf(stderr, "%s, ", caller_name);
+		  }, l_callers);
+		  (void) fprintf(stderr, "\n");	
+		} 
+	      top_down_adn_callers_arrays(l_formal_unnorm_arrays,l_callers); 
+	    }
 	}
       reset_current_module_entity();
     }
-   /* save to file */
-  out = safe_fopen(filename, "w");
-  fprintf(out, "/* Top down array resizing for module %s. */\n", module_name);
-  safe_fclose(out, filename);
-  free(dir);
-  free(filename);
+  display_array_resizing_top_down_statistics();
+  /* save to file */
+  out1 = safe_fopen(file_name1, "w");
+  fprintf(out1, "/* Top down array resizing for module %s. */\n", module_name);
+  safe_fclose(out1, file_name1);
+  safe_fclose(out2, file_name2);
+  free(dir_name), dir_name = NULL;
+  free(file_name1), file_name1 = NULL;
+  free(file_name2), file_name2 = NULL;
   current_callee = entity_undefined;
-  user_log("\n The total number of right array declarations replaced: %d \n"
-	  ,number_of_right_array_declarations );
-  user_log(" \n The total number of unnormalized declarations without calller: %d \n"
-	  ,number_of_one_and_assumed_array_declarations_but_no_caller );
   DB_PUT_FILE_RESOURCE(DBR_NEW_DECLARATIONS, module_name, new_declarations);
   ifdebug(1)
-    fprintf(stderr, " \n End top down adn for %s \n", module_name);
+    fprintf(stderr, " \n End top down array resizing for %s \n", module_name);
   debug_off();
   return TRUE;
 }
