@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/17 22:06:25 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/18 09:10:23 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -68,7 +68,7 @@
 # _5: setint  // dangerous and added for validation purposes...
 # _6: io      // declares an io function (host call only...)
 # _7: host/end host // host section...
-# _8: dead // tell that an array value is dead, so no remapping needed.
+# _8: kill // tell that the values of an array are dead...
 #
 # (_ is hpfc)
 #
@@ -170,7 +170,7 @@ $SED '#
       s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
       s, end *local,      enddo,
       s, io\(.*\),6(\1),
-      s, dead\(.*\),8(\1),
+      s, kill\(.*\),8(\1),
       #
       # host section: hack to build blocks...
       #
