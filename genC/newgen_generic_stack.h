@@ -2,25 +2,26 @@
  * Fabien COELHO, 05/12/94
  * 
  * $RCSfile: newgen_generic_stack.h,v $ verison $Revision$
- * $Date: 1996/09/21 15:38:54 $, 
+ * $Date: 1998/12/24 09:30:26 $, 
  * got on %D%, %T%
  */
 
 #define DEFINE_STACK(PREFIX, name, type) \
 static stack name##_stack = stack_undefined; \
-PREFIX void make_##name##_stack() \
+PREFIX void make_##name##_stack(void) \
 { assert(name##_stack==stack_undefined);\
   name##_stack = stack_make(type##_domain, 0, 0);}\
-PREFIX void free_##name##_stack() \
+PREFIX void free_##name##_stack(void) \
 { stack_free(&name##_stack); \
   name##_stack = stack_undefined;}\
-PREFIX stack get_##name##_stack() \
+PREFIX stack get_##name##_stack(void) \
 { return(name##_stack);}\
 PREFIX void set_##name##_stack(stack s) \
 { assert(name##_stack==stack_undefined);\
   name##_stack = s;}\
-PREFIX void reset_##name##_stack()\
-{ name##_stack = stack_undefined;}\
+PREFIX void reset_##name##_stack(void)\
+{ assert(name##_stack!=stack_undefined);\
+  name##_stack = stack_undefined;}\
 PREFIX void name##_push(type i)\
 { stack_push((char *)i, name##_stack);}\
 PREFIX bool name##_filter(type i)\
@@ -38,6 +39,8 @@ PREFIX bool name##_empty_p()\
 { return(stack_empty_p(name##_stack));}\
 PREFIX int name##_size()\
 { return(stack_size(name##_stack));}\
+void error_reset_##name##_stack(void)\
+{ name##_stack = stack_undefined;} \
 static void check_##name##_stack()\
 { stack s = get_##name##_stack();\
   char *item_1 = (char *) check_##name##_stack,\
@@ -58,7 +61,7 @@ static void check_##name##_stack()\
 }
 
 #define DEFINE_LOCAL_STACK(name, type) DEFINE_STACK(static, name, type)
-#define DEFINE_GLOBAL_STACK(name, type) DEFINE_STACK(/**/, name, type)
+#define DEFINE_GLOBAL_STACK(name, type) DEFINE_STACK(extern, name, type)
 
 /*  That is all
  */
