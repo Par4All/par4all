@@ -436,7 +436,7 @@ static void  pips_code_abc_statement(statement module_statement)
 }
 
 
-bool array_bound_check_instrumentation(char *module_name)
+bool old_array_bound_check_instrumentation(char *module_name)
 { 
   statement module_statement;  
   /* add COMMON ARRAY_BOUND_CHECK_COUNT to the declaration
@@ -524,9 +524,74 @@ bool array_bound_check_instrumentation(char *module_name)
   return TRUE;
 }
 
-
-
-
+static list l_commons = NIL;
+static int number_of_scalar_variables = 0; 
+static int number_of_array_variables = 0; 
+bool array_bound_check_instrumentation(char *module_name)
+{
+  entity mod = local_name_to_top_level_entity(module_name);
+  list d = code_declarations(value_code(entity_initial(mod))); 
+  MAP(ENTITY,ent,
+  {
+    if (!formal_parameter_p(ent))
+      {
+	if (variable_in_common_p(ent))
+	  {
+	    entity sec = ram_section(storage_ram(entity_storage(ent)));	
+	    if (!entity_in_list(sec,l_commons)) 
+	      {
+		area a = type_area(entity_type(sec));
+		list l = area_layout(a);
+		/*user_log("*\n%d variable in %s *\n",gen_length(l),entity_name(sec));
+		  number_of_variables = number_of_variables + gen_length(l);*/
+		MAP(ENTITY, e, 
+		{
+		  type t = entity_type(e);
+		  if (type_variable_p(t))
+		    {
+		      if (entity_scalar_p(e))
+			{
+			  user_log("*\nCommon and scalar variable %s *\n",entity_name(e));
+			  number_of_scalar_variables++;
+			}
+		      else
+			{
+			  user_log("*\nCommon and array variable %s *\n",entity_name(e));
+			  number_of_array_variables++;
+			}
+		    }
+		},l);
+		l_commons = gen_nconc(l_commons,CONS(ENTITY,sec,NIL));
+	      }
+	  }
+	else 
+	  {
+	    if (local_entity_of_module_p(ent,mod))
+	      {		
+		type t = entity_type(ent);
+		user_log("*\nLocal variable %s of type %d *\n",entity_name(ent),type_tag(t));
+		if (type_variable_p(t))
+		  {
+		    if (entity_scalar_p(ent))
+		      {
+			user_log("*\nLocal and scalar variable %s *\n",entity_name(ent));
+			number_of_scalar_variables++;
+		      }
+		    else
+		      {
+			user_log("*\nLocal and array variable %s *\n",entity_name(ent));
+			number_of_array_variables++;
+		      }
+		  }
+	      }
+	  }
+      }
+  },d);
+  /* Eliminate 4 special variables : MAIN000:*DYNAMIC*, MAIN000:*STATIC*,MAIN000:*HEAP*, MAIN000:*STACK* **/
+  user_log("*\nNumber of scalar variables :%d *\n", number_of_scalar_variables);
+  user_log("*\nNumber of array variables :%d *\n", number_of_array_variables);
+  return TRUE;
+} 
 
 
 
