@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1996/04/17 18:31:38 $, ) 
+ * ($Date: 1996/06/11 13:27:10 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -292,7 +292,7 @@ processor_loop(
 
     /* simplifies the processor arrangement for the condition
      */
-    known = sc_dup(entity_to_declaration_constraints(psi));
+    known = sc_dup(entity_to_declaration_constraints(psi, 2));
     if (sh) known = shift_system_to_prime_variables(known);
 
     DEBUG_SYST(7, "initial system", s);
