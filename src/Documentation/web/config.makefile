@@ -1,6 +1,6 @@
 # 
-# $RCSfile$ (version $Revision$)
-# $Date$, 
+# $Id$
+#
 
 # To deal with non-framed viewer and no server side include:
 HTML_AUTO = \
@@ -45,7 +45,7 @@ INSTALL_HTM= $(HTMS)
 INSTALL_UTL= $(SCRIPTS)
 
 # To deal with non-framed viewer and no server side include:
-APPLY_CPP = cpp -C -P
+APPLY_CPP = $(CC) -E -C -P
 
 # Overkill for home.html and index.html but anyway...
 %.html : %.cpp.html go_back.html
@@ -58,4 +58,3 @@ index.html : home_content.html
 local-clean:
 	$(RM) $(HTML_AUTO:.cpp.html=.html) 
 
-# end of $RCSfile$
