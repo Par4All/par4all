@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.67  1998/12/24 11:06:45  irigoin
+ * Improved error handling
+ *
  * Revision 1.66  1998/12/03 11:56:11  irigoin
  * Typo in format in get_builder() fixed.
  *
@@ -170,6 +173,9 @@ void reset_static_phase_variables()
     extern void error_reset_cumulated_rw_effects(void);
     extern void reset_transformer_map(void);
     extern void error_reset_value_mappings(void);
+    extern void error_reset_effects_private_current_stmt_stack(void);
+    extern void error_reset_effects_private_current_context_stack(void);
+    extern void error_reset_current_downward_cumulated_range_effects_stack(void);
 
     /* From ri-util/static.c */
     error_reset_current_module_entity();
@@ -181,6 +187,11 @@ void reset_static_phase_variables()
     error_reset_proper_rw_effects();
     error_reset_cumulated_rw_effects();
     reset_transformer_map();
+
+    /* Macro-generated resets in effects-generic/utils.c */
+    error_reset_effects_private_current_stmt_stack();
+    error_reset_effects_private_current_context_stack();
+    error_reset_current_downward_cumulated_range_effects_stack();
 
     /* Special cases */
     error_reset_value_mappings();
@@ -728,6 +739,7 @@ static bool concurrent_apply(
     string pname,       /* phase to be applied */
     gen_array_t modules /* modules that must be computed */)
 {
+    bool okay = TRUE;
     rule ru = find_rule_by_phase(pname);
 
     init_make_cache();
@@ -735,20 +747,24 @@ static bool concurrent_apply(
     save_active_phases();
 
     GEN_ARRAY_MAP(oname,
-		  if (!make_pre_transformation(oname, ru)) return FALSE,
+		  if (!make_pre_transformation(oname, ru)) { okay = FALSE; break; },
 		  modules);
 
-    GEN_ARRAY_MAP(oname,
-		  if (!make_required(oname, ru)) return FALSE,
-		  modules);
+    if (okay) {
+	GEN_ARRAY_MAP(oname,
+		      if (!make_required(oname, ru)) { okay = FALSE; break; },
+		      modules);
+    }
 
-    GEN_ARRAY_MAP(oname, 
-		  if (!apply_a_rule(oname, ru)) return FALSE,
-		  modules);
+    if (okay) {
+	GEN_ARRAY_MAP(oname, 
+		      if (!apply_a_rule(oname, ru)) { okay = FALSE; break; },
+		      modules);
+    }
 
     reset_make_cache();
     retrieve_active_phases();
-    return TRUE;
+    return okay;
 }
 
 /* compute all resources needed to apply a rule on an object */
