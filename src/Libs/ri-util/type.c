@@ -743,8 +743,11 @@ call c;
       b = copy_basic(basic_of_constant(c));
       break;
     case is_value_unknown:
-      pips_error("basic_of_call", "unknown function %s\n",
-				      entity_name(e));
+      debug(1, "basic_of_call", "function %s has no initial value.\n"
+	    " Maybe it has not been parsed yet.\n",
+	    entity_name(e));
+      b = copy_basic(basic_of_external(c));
+      break;
     default: pips_error("basic_of_call", "unknown tag %d\n", t);
       /* Never go there... */
     }
@@ -836,7 +839,7 @@ call c;
 {
   type call_type, return_type;
 
-  debug(7, "basic_of_call", "Constant call\n");
+  debug(7, "basic_of_constant", "Constant call\n");
 
   call_type = entity_type(call_function(c));
 
