@@ -8,6 +8,7 @@
 #include <setjmp.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 
 jmp_buf pips_top_level;
