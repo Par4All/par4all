@@ -235,10 +235,8 @@ $debug "report=$report"
 # send the report...
 
 test $debug = : || cat $report.output
-$debug "${mail} -s \"${script}: report\" ${email} < ${report}.output"
+# $debug "${mail} -s \"${script}: report\" ${email} < ${report}.output"
 ${mail} -s "${script}: report" ${email} < ${report}.output
-
-date | ${mail} ${email}
 
 rm -f $report*
 
