@@ -63,8 +63,9 @@ graph dep_graph;
 	    {
 		if (quick_privatize_loop(s1, successors)) 
 		{
-		    debug(8, "quick_privatize_graph", 
-			  "loop %d privatized\n", statement_number(s1));
+		    debug(1, "quick_privatize_graph", 
+			  "Index for loop %d privatized\n",
+			  statement_number(s1));
 		    
 		    loop_locals(l) = CONS(ENTITY, ind, locals);
 		}
