@@ -1,0 +1,26 @@
+# cost_trigo_1  - Unity cost for each intrinsic trigonometrical function
+
+#	int	float	double	complex	double-complex    <-- type of argument(s)
+
+SIN	1	1	1	1	1
+DSIN	1	1	1	1	1
+CSIN	1	1	1	1	1
+COS	1	1	1	1	1
+DCOS	1	1	1	1	1
+CCOS	1	1	1	1	1
+TAN	1	1	1	1	1
+DTAN	1	1	1	1	1
+ASIN	1	1	1	1	1
+DASIN	1	1	1	1	1
+ACOS	1	1	1	1	1
+DACOS	1	1	1	1	1
+ATAN	1	1	1	1	1
+DATAN	1	1	1	1	1
+ATAN2	1	1	1	1	1
+DATAN2	1	1	1	1	1
+SINH	1	1	1	1	1
+DSINH	1	1	1	1	1
+COSH	1	1	1	1	1
+DCOSH	1	1	1	1	1
+TANH	1	1	1	1	1
+DTANH	1	1	1	1	1
