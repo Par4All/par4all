@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: hpfc-util.c,v $
+ * Revision 1.50  1997/03/28 19:10:57  coelho
+ * obscure bug on AIX hacked around.
+ *
  * Revision 1.49  1997/03/20 10:18:09  coelho
  * RCS headers.
  *
@@ -806,24 +809,25 @@ DEFINE_LOCAL_STACK(current_stmt, statement)
 static void test_rewrite(test t)
 {
     entity e = expression_to_entity(test_condition(t));
+
     if (ENTITY_TRUE_P(e))
     {
-	instruction i = statement_instruction(current_stmt_head());
+	statement s = current_stmt_head();
+	instruction i = statement_instruction(s);
 	pips_debug(5, "true test simplified\n");
 
-	statement_instruction(current_stmt_head()) = 
-	    statement_instruction(test_true(t));
+	statement_instruction(s) = statement_instruction(test_true(t));
 
 	statement_instruction(test_true(t)) = instruction_undefined;
 	free_instruction(i);
     }
     else if (ENTITY_FALSE_P(e))
     {	
-	instruction i = statement_instruction(current_stmt_head());
+	statement s = current_stmt_head();
+	instruction i = statement_instruction(s);
 	pips_debug(5, "false test simplified\n");
 
-	statement_instruction(current_stmt_head()) = 
-	    statement_instruction(test_false(t));
+	statement_instruction(s) = statement_instruction(test_false(t));
 
 	statement_instruction(test_false(t)) = instruction_undefined;
 	free_instruction(i);
@@ -835,19 +839,19 @@ static void loop_rewrite(loop l)
     range r = loop_range(l);
     if (expression_equal_p(range_lower(r), range_upper(r)))
     {
-	instruction i = statement_instruction(current_stmt_head());
+	statement s = current_stmt_head();
+	instruction i = statement_instruction(s);
 	pips_debug(5, "loop on %s simplified\n", entity_name(loop_index(l)));
 
-	statement_instruction(current_stmt_head()) = 
+	statement_instruction(s) = 
 	    make_instruction_block(
 	      CONS(STATEMENT, make_assign_statement
-		         (entity_to_expression(loop_index(l)),
-			  copy_expression(range_lower(r))),
-	      CONS(STATEMENT, loop_body(l),
-		   NIL)));
+		   (entity_to_expression(loop_index(l)),
+		    copy_expression(range_lower(r))),
+	      CONS(STATEMENT, loop_body(l), NIL)));
 
 	loop_body(l) = statement_undefined;
-	free_instruction(i);
+	/* free_instruction(i); */ /* ??? memory leak, cores on AIX */
     }
 }
 
