@@ -211,7 +211,9 @@ struct eformat partial_eval_expression_and_copy(expression expr, Psysteme ps, ef
 
 struct eformat partial_eval_expression(expression e, Psysteme ps, effects fx)
 {
-    return(partial_eval_syntax(e, ps, fx));
+    struct eformat ef= partial_eval_syntax(e, ps, fx);
+
+    return ef;
 }
 
 struct eformat partial_eval_syntax(expression e, Psysteme ps, effects fx)
@@ -345,7 +347,7 @@ void partial_eval_call_and_regenerate(call ca, Psysteme ps, effects fx)
 		ca!= call_undefined);
 
     MAPL(le, {
-	expression exp= EXPRESSION(CAR(le));
+	expression exp = EXPRESSION(CAR(le));
 
 	partial_eval_expression_and_regenerate(&exp, ps, fx);
 	EXPRESSION(CAR(le))= exp;
@@ -637,37 +639,37 @@ struct eformat partial_eval_div_or_mod_operator(int token,
     struct eformat ef, ef1, ef2;
 
     ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
-	ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
+    ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
 
-	if( ef2.icoef==0 && ef2.ishift == 0 ) 
-	    user_error("partial_eval_binary_operator", 
-		       "division by zero!\n");
-	if( token==PERFORM_DIVISION && ef2.icoef==0 
-	   && (ef1.ishift % ef2.ishift)==0 
-	   && (ef1.icoef % ef2.ishift)==0 ) {
-	    /* integer division does NOT commute with in any */
-	    /* multiplication -> only performed if "exact" */
-	    ef.simpler= TRUE;
-	    ef.icoef= ef1.icoef / ef2.ishift;
-	    ef.ishift= ef1.ishift / ef2.ishift;
-	    ef.expr= ef1.expr;
+    if( ef2.icoef==0 && ef2.ishift == 0 ) 
+	user_error("partial_eval_div_or_mod_operator", 
+		   "division by zero!\n");
+    if( token==PERFORM_DIVISION && ef2.icoef==0 
+       && (ef1.ishift % ef2.ishift)==0 
+       && (ef1.icoef % ef2.ishift)==0 ) {
+	/* integer division does NOT commute with in any */
+	/* multiplication -> only performed if "exact" */
+	ef.simpler= TRUE;
+	ef.icoef= ef1.icoef / ef2.ishift;
+	ef.ishift= ef1.ishift / ef2.ishift;
+	ef.expr= ef1.expr;
+    }
+    else if(ef1.icoef==0 && ef2.icoef==0) {
+	ef.simpler= TRUE;
+	ef.icoef= 0;
+	ef.expr= expression_undefined;
+	if (token==PERFORM_DIVISION) { /* refer to Fortran77 chap 6.1.5 */
+	    ef.ishift= FORTRAN_DIV(ef1.ishift, ef2.ishift);
 	}
-	else if(ef1.icoef==0 && ef2.icoef==0) {
-	    ef.simpler= TRUE;
-	    ef.icoef= 0;
-	    ef.expr= expression_undefined;
-	    if (token==PERFORM_DIVISION) { /* refer to Fortran77 chap 6.1.5 */
-		ef.ishift= FORTRAN_DIV(ef1.ishift, ef2.ishift);
-	    }
-	    else { /* tocken==PERFORM_MODULO */
-		ef.ishift= FORTRAN_MOD(ef1.ishift, ef2.ishift);
-	    }
+	else { /* tocken==PERFORM_MODULO */
+	    ef.ishift= FORTRAN_MOD(ef1.ishift, ef2.ishift);
 	}
-	else {
-	    regenerate_expression(&ef1, ep1);
-	    regenerate_expression(&ef2, ep2);
-	    ef= eformat_undefined;
-	}
+    }
+    else {
+	regenerate_expression(&ef1, ep1);
+	regenerate_expression(&ef2, ep2);
+	ef= eformat_undefined;
+    }
     return ef;
 }
 
@@ -718,7 +720,7 @@ struct eformat partial_eval_min_or_max_operator(int token,
     else {
 	regenerate_expression(&ef1, ep1);
 	regenerate_expression(&ef2, ep2);
-	ef= eformat_undefined;
+	ef = eformat_undefined;
     }
 
     return ef;
@@ -1150,13 +1152,29 @@ void recursiv_partial_eval(statement stmt)
       }
       case is_instruction_goto :
 	break;
-      case is_instruction_unstructured :
-	/* ?? What should I do? */
+      case is_instruction_unstructured : {
+	  /* ?? What should I do? */
 	  /* pips_error("recursiv_partial_eval", "?? :-(\n"); */
+	  /* FI: I do not understand why Bruno (?) had metaphysical
+	   * problems here
+	   */
+	  list blocs = NIL;
+
+	  CONTROL_MAP(ctl, {
+	      statement st = control_statement(ctl);
+
+	      debug(5, "partial_eval", "will eval in statement number %d\n",
+		    statement_number(st));
+
+	      recursiv_partial_eval(st);	
+	  }, unstructured_control(instruction_unstructured(inst)), blocs);
+
+	  gen_free_list(blocs);
+      }
 	break;
-	default : 
+    default : 
 	pips_error("recursiv_partial_eval", 
-		   "Bad instruction tag");
+		   "Bad instruction tag %d", instruction_tag(inst));
     }
 }
 
