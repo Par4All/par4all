@@ -87,7 +87,7 @@ int (*f)();
     }
 
     /* read buffer up to new line */
-    while ((c = f()) != -1 && (c!='\n' && previous!='\\'))
+    while ((c = f()) != -1 && (!(c=='\n' && previous!='\\')))
     {
       if (ibuffer+1>=buffersize)
       {
