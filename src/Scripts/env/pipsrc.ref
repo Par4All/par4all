@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.139  1998/05/06 09:17:38  coelho
+# Linux arch default moved to LINUXI86LL.
+#
 # Revision 1.138  1998/04/15 13:10:09  coelho
 # -x c with gcc does not work properly.
 # the cpp must know about the fortran language lexical properties.
@@ -96,7 +99,7 @@ test ${uname_s} = SunOS && expr ${uname_r} : '^4' > /dev/null && \
 	PIPS_ARCH="GNUSOL1"
 
 test ${uname_s} = Linux && \
-	PIPS_ARCH="LINUXI86"
+	PIPS_ARCH="LINUXI86LL"
 
 # could use ll as a default on loreto.
 # test ${uname_s} = Linux -a $HOSTNAME = loreto.ensmp.fr && \
