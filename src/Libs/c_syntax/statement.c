@@ -307,7 +307,9 @@ statement MakeCaseStatement(expression e)
   string lab = strdup(concatenate("switch_",int_to_string(i),
 				  "_case_",words_to_string(words_expression(e)),NULL));
   statement s = MakeLabeledStatement(lab,make_continue_statement(entity_empty_label()));
-  expression cond = eq_expression(stack_head(SwitchControllerStack),e);
+  expression cond = call_to_expression(make_call(entity_intrinsic("=="),
+						 CONS(EXPRESSION, stack_head(SwitchControllerStack), 
+						      CONS(EXPRESSION, e, NIL))));
   test t = make_test(cond,MakeGotoStatement(lab),make_continue_statement(entity_undefined));
   sequence CurrentSwitchGotoStack = stack_head(SwitchGotoStack);
   sequence_statements(CurrentSwitchGotoStack) = gen_nconc(sequence_statements(CurrentSwitchGotoStack),
