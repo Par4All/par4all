@@ -913,7 +913,7 @@ char *module_name;
 bool in_out_regions_chains(module_name)
 char *module_name;
 {
-    return(module_name, USE_IN_OUT_REGIONS);
+    return chains(module_name, USE_IN_OUT_REGIONS);
 }
 
 
