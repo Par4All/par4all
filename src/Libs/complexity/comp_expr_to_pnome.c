@@ -235,7 +235,10 @@ int maximize;
         }
 	else { 
 	    /* We keep this symbol (including TCST) in the polynome */
-	    ppvar = make_polynome(VALUE_TO_FLOAT(val), var, VALUE_ONE);
+	    Value exp = VALUE_ONE;
+	    float coeff = VALUE_TO_FLOAT(val);
+
+	    ppvar = make_polynome(coeff, var, exp);
 	    if (complexity_zero_p(comp))
 		comp = polynome_to_new_complexity(ppvar);
 	    else
