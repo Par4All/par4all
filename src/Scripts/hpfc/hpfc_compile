@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1994/09/03 18:06:17 $, 
+# $Date: 1994/09/05 19:33:14 $, 
 # got on %D%, %T%
 #
 
@@ -61,7 +61,7 @@ set +e
 $VERBOSE "installing generated codes"
 
 [ -d "$WORKSPACE.hpfc" ] || mkdir $WORKSPACE.hpfc
-${INSTALL} -b $WORKSPACE.database -r $HPFFILE -i -t $WORKSPACE.hpfc
+${INSTALL} -b $WORKSPACE.database -r $HPFFILE -i -t $WORKSPACE.hpfc -n $MODULE
 
 $DELETE $WORKSPACE
 
