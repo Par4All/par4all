@@ -1,5 +1,4 @@
-\documentstyle{article}
-\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\documentstyle[a4]{article}
 
 \title{PIPS: Generic Oriented Graph}
 \author{Franc,ois Irigoin \\
