@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1994/11/04 15:59:51 $, 
+# $Date: 1994/11/26 13:35:51 $, 
 # got on %D%, %T%
 #
 
@@ -64,6 +64,7 @@ shift `expr $OPTIND - 1`
 [ "$WORKSPACE" ] || WORKSPACE=`basename $HPFFILE .f`
 
 $VERBOSE "applying hpfc on file $HPFFILE"
+$VERBOSE "pips is `type $PIPS`"
 
 set -e
 $PIPS -f $HPFFILE $PIPSARGS -m $MODULE $WORKSPACE
