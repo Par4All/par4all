@@ -83,14 +83,7 @@ flint_initialize_statement_def_use_variables(graph dependence_graph)
 			    /* Something is useful for the current
 			       statement if it writes something that
 			       is used in the current statement: */
-			    if (action_read_p(effect_action(conflict_source(a_conflict)))
-				&& action_write_p(effect_action(conflict_sink(a_conflict)))) {
-				use = s1;
-				a_use_cell =
-				    effect_cell(conflict_source(a_conflict));
-				def = s2;
-			    }
-			    else if (action_write_p(effect_action(conflict_source(a_conflict)))
+			    if (action_write_p(effect_action(conflict_source(a_conflict)))
 				     && action_read_p(effect_action(conflict_sink(a_conflict)))) {
 				def = s1;
 				a_use_cell =
@@ -206,7 +199,7 @@ flint_check_uninitialized_variables_in_statement(statement s)
 		    /* Nothing has been output yet: add a banner: */
 		    raw_flint_message(FALSE,
 				      "\n\nNon-initialized variables:"
-				      "\n------------------------\n");
+				      "\n--------------------------\n");
 		    flint_no_uninitialized_variable_ouput_yet = FALSE;
 		}
 		if (!something_said_about_this_statement) {
