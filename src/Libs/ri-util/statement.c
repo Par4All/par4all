@@ -1096,7 +1096,85 @@ gather_all_comments_of_a_statement(statement s)
     gather_all_comments_of_a_statement_string = NULL;
     gen_recurse(s, statement_domain,
 		gather_all_comments_of_a_statement_filter, gen_null);
-    return gather_all_comments_of_a_statement_string;
+    
+    if (gather_all_comments_of_a_statement_string == NULL)
+	return empty_comments;
+    else
+	return gather_all_comments_of_a_statement_string;
+}
+
+
+/* Find the first statement of a statement, if any: */
+string
+find_first_statement_comment(statement s)
+{
+    instruction i = statement_instruction(s);
+    if (instruction_sequence_p(i)) {
+	list sts = sequence_statements(instruction_sequence(statement_instruction(s)));
+	if (sts == NIL)
+	    /* An empty sequence: return an empty comment: */
+	    return empty_comments;
+	else
+	    return find_first_statement_comment(STATEMENT(CAR(sts)));
+    }
+    else
+	/* Ok, plain statement: */
+	return statement_comments(s);
+}
+
+
+/* Put a comment on a statement in a safe way. That is it find the
+   first non-block statement to attach it or insert a CONTINUE and put
+   the statement on it. You should free the old one...
+
+   Return TRUE on success, FALSE else. */
+bool
+try_to_put_a_comment_on_a_statement(statement s,
+				    string the_comments)
+{
+    instruction i = statement_instruction(s);
+    if (instruction_sequence_p(i)) {
+	/* We are not allowed to put a comment on a sequence, find the
+           first non sequence statement if any: */
+	MAP(STATEMENT, st,
+	    {
+		if (try_to_put_a_comment_on_a_statement(st, the_comments))
+		    /* Ok, we succeed to put the comment: */
+		    return TRUE;
+	    },
+	    sequence_statements(instruction_sequence(i)));
+	/* Hmm, no good statement found to attach a comment: */
+	return FALSE;
+    }
+    else {
+	/* Ok, it is a plain statement, we can put a comment on it: */
+	statement_comments(s) = the_comments;
+	return TRUE;
+    }
+}
+
+
+/* Similar to try_to_put_a_comment_on_a_statement() but insert a
+   CONTINUE to put the comment on it if there is only empty
+   sequence(s): */
+void
+put_a_comment_on_a_statement(statement s,
+			     string the_comments)
+{
+    if (empty_comments_p(the_comments))
+	/* Nothing to add... */
+	return;
+ 
+    if (!try_to_put_a_comment_on_a_statement(s, the_comments)) {
+	/* It failed because it is an empty sequence. So add a
+           CONTINUE to attach the statement on it: */
+	sequence seq = instruction_sequence(statement_instruction(s));
+	statement s_cont = make_continue_statement(entity_empty_label());
+	statement_comments(s_cont) = the_comments;
+	sequence_statements(seq) = CONS(STATEMENT,
+					s_cont,
+					sequence_statements(seq));
+    }
 }
 
 
@@ -1106,17 +1184,18 @@ void
 append_comments_to_statement(statement s,
 			     string the_comments)
 {
-    string old = statement_comments(s);
+    string old;
 
     if (empty_comments_p(the_comments))
 	/* Nothing to add... */
 	return;
-    
+
+    old = find_first_statement_comment(s);
     if (empty_comments_p(old))
 	/* There is no comment yet: */
-	statement_comments(s) = strdup(the_comments);
+	put_a_comment_on_a_statement(s, strdup(the_comments));
     else {
-	statement_comments(s) = strdup(concatenate(old, the_comments, NULL));
+	put_a_comment_on_a_statement(s, strdup(concatenate(old, the_comments, NULL)));
 	free(old);
     }
 }
@@ -1128,17 +1207,18 @@ void
 insert_comments_to_statement(statement s,
 			     string the_comments)
 {
-    string old = statement_comments(s);
+    string old;
 
     if (empty_comments_p(the_comments))
 	/* Nothing to add... */
 	return;
     
+    old  = find_first_statement_comment(s);
     if (empty_comments_p(old))
 	/* There are no comments yet: */
-	statement_comments(s) = strdup(the_comments);
+	put_a_comment_on_a_statement(s, strdup(the_comments));
     else {
-	statement_comments(s) = strdup(concatenate(the_comments, old, NULL));
+	put_a_comment_on_a_statement(s, strdup(concatenate(the_comments, old, NULL)));
 	free(old);
     }
 }
