@@ -562,6 +562,13 @@ static vectorElement make_vector_element(simdStatementInfo ssi, int i, int j)
    return make_vectorElement(ssi, i, j);
 }
 
+static vectorElement copy_vector_element(vectorElement ve)
+{
+   return make_vectorElement(vectorElement_statement(ve),
+			     vectorElement_vectorIndex(ve),
+			     vectorElement_element(ve));
+}
+
 static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list* args)
 {
    statementInfo si;
@@ -742,16 +749,16 @@ static list merge_available_places(list l1, list l2, int element)
 	 {
 	    if (element < 0)
 	    {
-	       vectorElement ve = copy_vectorElement(ej);
+	       vectorElement ve = copy_vector_element(ej);
 
 	       //quite a hack here: this vectorElement represents in fact an 
 	       //aggregate entity x int, where the int is the order param
 	       //to be used for shuffle
 	       vectorElement_element(ve) = 
-		  vectorElement_element(ei) | 
-		  (vectorElement_element(ej) << (2*element));
+		  vectorElement_element(ej) | 
+		  (vectorElement_element(ei) << (-2*element));
 
-	       res = CONS(VECTORELEMENT, ej, res);
+	       res = CONS(VECTORELEMENT, ve, res);
 	    }
 	    else if (vectorElement_element(ei) == element)
 	       res = CONS(VECTORELEMENT, ej, res);
@@ -767,8 +774,9 @@ static statement make_shuffle_statement(entity dest, entity src, int order)
    list args = gen_make_list(expression_domain,
 			     entity_to_expression(dest),
 			     entity_to_expression(src),
-			     make_integer_constant_expression(order));
-   return call_to_statement(make_call(get_function_entity("pshufw"),
+			     make_integer_constant_expression(order),
+			     NULL);
+   return call_to_statement(make_call(get_function_entity("mmx_pshufw"),
 				      args));
 }
 
@@ -789,7 +797,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
       if ( (vectorElement_subwordSize(ve) == 16) &&
 	   (vectorElement_vectorLength(ve) == 4) )
       {
-	 vectorElement e = copy_vectorElement(ve);
+	 vectorElement e = copy_vector_element(ve);
 	 sourcesShuffle = CONS(VECTORELEMENT, e, sourcesShuffle);
       }
    },
@@ -815,26 +823,28 @@ static statement generate_load_statement(simdStatementInfo si, int line)
       new_sources = merge_available_places(
 	 statementArgument_dependances(simdStatementInfo_arguments(si)[i + offset]), 
 	 sourcesShuffle,
-	 -1);
+	 -i);
 
       gen_free_list(sourcesShuffle); //we should free the elements too (but not recusively, else we would free the simdStatementInfo...)
       sourcesShuffle = new_sources;
    }
 
+   //Best case is we already have the same thing in another register
    if (sourcesCopy != NIL)
    {
       vectorElement vec = VECTORELEMENT(CAR(sourcesCopy));
       simdStatementInfo_vectors(si)[line] = vectorElement_vector(vec);
       return statement_undefined;
    }
+   //Else, maybe we can use a shuffle instruction
    else if (sourcesShuffle != NIL)
    {
       vectorElement ve = VECTORELEMENT(CAR(sourcesShuffle));
       return make_shuffle_statement(simdStatementInfo_vectors(si)[line],
 				    vectorElement_vector(ve),
 				    vectorElement_element(ve));
-				    
    }
+   //Only choice left is to load from memory
    else
    {
       //Build the arguments list
