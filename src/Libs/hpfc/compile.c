@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/06/08 15:53:30 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/09/01 15:47:36 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -34,76 +34,102 @@ extern int system();
 
 #include "misc.h"
 #include "ri-util.h"
+#include "properties.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "effects.h"
 #include "semantics.h"
 #include "regions.h"
+#include "callgraph.h"
 #include "hpfc.h"
 #include "defines-local.h"
 
 /* external functions */
-extern char    *getenv();
+extern char *getenv();
 extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
 
-/*
- * hpfcompile
- *
- * Compiler call
+/*  GLOBAL VARIABLES
  */
-void hpfcompile(module_name)
-char *module_name;
+static list the_callees = NIL;
+
+/*    global list of encountered commons and modules
+ */
+static list the_commons = NIL;
+static list the_modules = NIL;
+
+GENERIC_CURRENT_MAPPING(hpfc_already_compiled, bool, entity);
+
+static string 
+hpfc_find_a_not_compiled_module (void)
 {
-    entity          
+    entity module;
+
+    MAPL(ce,
+     {
+	 module = ENTITY(CAR(ce));
+
+	 if (entity_hpfc_already_compiled_undefined_p(module))
+	     return(module_local_name(module));
+     },
+	 the_modules);
+
+    return(string_undefined);
+}
+
+#define generate_file_name(filename, prefix, suffix)\
+  filename = strdup(concatenate(db_get_current_program_directory(),\
+				"/", prefix, suffix, NULL));
+
+#define add_warning(filename)\
+  system(concatenate("$HPFC_TOOLS/hpfc_add_warning ", filename, NULL));
+
+
+void 
+reset_resources_for_module (string module_name)
+{
+    debug(5, "reset_resources_for_module",
+	  "resetting resources of module %s\n", module_name);
+
+    reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_effects_map();
+    reset_proper_effects_map();
+    reset_local_regions_map();
+    reset_precondition_map();
+
+    free_only_io_map();
+    free_postcondition_map();
+    free_host_gotos_map();
+    free_node_gotos_map();
+
+    gen_free_list(the_callees), the_callees = NIL;
+}
+		     
+void 
+set_resources_for_module (string module_name)
+{
+    entity 
 	module = local_name_to_top_level_entity(module_name);
-    statement   
-	module_stat,
-	hoststat,
-	nodestat;
-    FILE 
-	*hostfile,
-	*nodefile,
-	*parmfile,
-	*initfile,
-	*normfile;
-    string
-	hostfilename,
-	nodefilename,
-	parmfilename,
-	initfilename,
-	normfilename;
 
-    debug_on("HPFC_DEBUG_LEVEL");
-
-    debug(3,"hpfcompile","module: %s\n",module_name);
-
+    db_set_current_module_name(module_name);
     set_current_module_entity(module);
     set_current_module_statement
 	((statement) db_get_memory_resource(DBR_CODE, module_name, FALSE));
-    module_stat = get_current_module_statement();
 
-/*    set_cumulated_effects_map
- *	((statement_mapping) 
- *	 db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, FALSE));
- *    set_proper_effects_map
- *	((statement_mapping) 
- *	 db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, FALSE));
- */
-    /*
-     * Preconditions are loaded
+    /*   PRECONDITIONS
      */
     set_precondition_map
 	((statement_mapping)
 	 db_get_memory_resource(DBR_PRECONDITIONS, module_name, FALSE));
-    /*
-     * Postconditions are computed
+
+    /*   POSTCONDITIONS
      */
     set_postcondition_map
-	(compute_postcondition(module_stat, 
+	(compute_postcondition(get_current_module_statement(),
 			       MAKE_STATEMENT_MAPPING(),
 			       get_precondition_map()));
-    /*
-     * Regions are loaded
+
+    /*   REGIONS
      */
     set_local_regions_map
 	(effectsmap_to_listmap((statement_mapping)
@@ -112,12 +138,304 @@ char *module_name;
     /*
      * Initialize mappings
      */
-    make_hpfc_current_mappings();
-    only_io_mapping_initialize(module_stat);
+    only_io_mapping_initialize(get_current_module_statement());
+
+    make_host_gotos_map();
+    make_node_gotos_map();
+
+    /*   CALLEES
+     */
+    the_callees = entity_to_callees(module);
+
+    make_host_and_node_modules(module);
+
+    MAPL(ce,
+     {
+	 entity callee = ENTITY(CAR(ce));
+
+	 pips_assert("set_resources_for_module", entity_module_p(callee));
+
+	 if (!value_intrinsic_p(entity_initial(callee)) &&
+	     !hpfc_entity_reduction_p(callee) &&
+	     !hpfc_intrinsic_like_function(callee))
+	 {
+	     debug(5, "set_resources_for_module", 
+		   "callee %s to be {host,node}ify\n", entity_name(callee));
+
+	     make_host_and_node_modules(callee);
+	     if (gen_find_eq(callee, the_modules)!=callee)
+		 the_modules = CONS(ENTITY, callee, the_modules);
+	 }
+     },
+	 the_callees);
+
+    hpfc_init_run_time_entities();
+
+    debug(1, "set_resources_for_module", 
+	  "building %s.hpf in %s\n",
+	  module_name,
+	  db_get_current_program_directory());
+
+    system(concatenate("$HPFC_TOOLS/hpfc_filter < ",
+		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
+		       " > ",
+		       db_get_current_program_directory(),
+		       "/",
+		       module_name,
+		       ".hpf",
+		       NIL));
+}
+
+void 
+put_generated_resources_for_common (entity common)
+{
+    FILE 
+	*host_file,
+	*node_file,
+	*parm_file,
+	*init_file;
+    string
+	prefix = entity_local_name(common),
+	host_filename,
+	node_filename,
+	parm_filename,
+	init_filename;
+    entity
+	node_common = load_entity_node_new(common),
+	host_common = load_entity_host_new(common);
     
-    /* HPFC-PACKAGE is used to put dummy variables in
+    generate_file_name(host_filename, prefix, "_host.h");
+    generate_file_name(node_filename, prefix, "_node.h");
+    generate_file_name(parm_filename, prefix, "_parameters.h");
+    generate_file_name(init_filename, prefix, "_init.h");
+
+    host_file = (FILE *) safe_fopen(host_filename, "w");
+    hpfc_print_common(host_file, host_module, host_common);
+    safe_fclose(host_file, host_filename);
+    add_warning(host_filename);
+
+    node_file = (FILE *) safe_fopen(node_filename, "w");
+    hpfc_print_common(node_file, node_module, node_common);
+    safe_fclose(node_file, node_filename);
+    add_warning(node_filename);
+
+    parm_file = (FILE *) safe_fopen(parm_filename, "w");
+    create_parameters_h(parm_file, common);
+    safe_fclose(parm_file, parm_filename);
+    add_warning(parm_filename);
+
+    init_file = (FILE *) safe_fopen(init_filename, "w");
+    create_init_common_param_for_arrays(init_file, common);
+    safe_fclose(init_file, init_filename);
+    add_warning(init_filename);
+
+    ifdebug(1)
+    {
+	fprintf(stderr, "Result of HPFC for common %s\n", 
+		entity_name(common));
+	fprintf(stderr, "-----------------\n");
+
+	hpfc_print_file(stderr, parm_filename);
+	hpfc_print_file(stderr, init_filename);
+	hpfc_print_file(stderr, host_filename);
+	hpfc_print_file(stderr, node_filename);
+    }
+
+    free(parm_filename),
+    free(init_filename),
+    free(host_filename),
+    free(node_filename);
+}
+
+void 
+put_generated_resources_for_module (statement stat, statement host_stat, statement node_stat)
+{
+    FILE 
+	*host_file,
+	*node_file,
+	*parm_file,
+	*init_file;
+    string
+	prefix = db_get_current_module_name(),
+	host_filename,
+	node_filename,
+	parm_filename,
+	init_filename;
+    entity
+	module = get_current_module_entity();
+    
+    generate_file_name(host_filename, prefix, "_host.f");
+    generate_file_name(node_filename, prefix, "_node.f");
+    generate_file_name(parm_filename, prefix, "_parameters.h");
+    generate_file_name(init_filename, prefix, "_init.h");
+
+    host_file = (FILE *) safe_fopen(host_filename, "w");
+    hpfc_print_code(host_file, host_module, host_stat);
+    safe_fclose(host_file, host_filename);
+    add_warning(host_filename);
+    system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
+		       host_filename, 
+		       " host ", 
+		       module_local_name(module),
+		       NIL));
+
+    node_file = (FILE *) safe_fopen(node_filename, "w");
+    hpfc_print_code(node_file, node_module, node_stat);
+    safe_fclose(node_file, node_filename);
+    add_warning(node_filename);
+    system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
+		       node_filename,
+		       " node ", 
+		       module_local_name(module),
+		       NIL));
+
+    parm_file = (FILE *) safe_fopen(parm_filename, "w");
+    create_parameters_h(parm_file, module);
+    safe_fclose(parm_file, parm_filename);
+    add_warning(parm_filename);
+
+    init_file = (FILE *) safe_fopen(init_filename, "w");
+    create_init_common_param_for_arrays(init_file, module);
+    safe_fclose(init_file, init_filename);
+    add_warning(init_filename);
+
+    ifdebug(1)
+    {
+	fprintf(stderr, "Result of HPFC for module %s:\n", 
+		module_local_name(module));
+	fprintf(stderr, "-----------------\n");
+
+	hpfc_print_file(stderr, parm_filename);
+	hpfc_print_file(stderr, init_filename);
+	hpfc_print_file(stderr, host_filename);
+	hpfc_print_file(stderr, node_filename);
+    }
+
+    free(parm_filename),
+    free(init_filename),
+    free(host_filename),
+    free(node_filename);
+}
+
+void 
+put_generated_resources_for_program (void)
+{
+    FILE
+	*comm_file,
+	*init_file;
+    string
+	comm_filename,
+	init_filename;
+
+    comm_filename = 
+	strdup(concatenate(db_get_current_program_directory(),
+			   "/real_parameters.h",
+			   NULL));
+    init_filename =
+	strdup(concatenate(db_get_current_program_directory(),
+			   "/hpf_init.h",
+			   NULL));
+
+    comm_file = (FILE *) safe_fopen(comm_filename, "w");
+    create_common_parameters_h(comm_file);
+    safe_fclose(comm_file, comm_filename);
+    add_warning(comm_filename);
+
+    init_file = (FILE *) safe_fopen(init_filename, "w");
+    create_init_common_param(init_file);
+    safe_fclose(init_file, init_filename);
+    add_warning(init_filename);
+
+    system(concatenate("$HPFC_TOOLS/hpfc_generate_init ",
+		       db_get_current_program_directory(),
+		       NULL));
+    
+    ifdebug(1)
+    {
+	fprintf(stderr, "Results of HPFC for the program\n");
+	fprintf(stderr, "-----------------\n");
+
+	hpfc_print_file(stderr, comm_filename);
+	hpfc_print_file(stderr, init_filename);
+    }
+
+    free(comm_filename);
+    free(init_filename);
+}
+
+void 
+init_hpfc_for_program (void)
+{
+    /* HPFC-PACKAGE is used to put dummy variables in, and other things
      */
     (void) make_empty_program(HPFC_PACKAGE);
+
+    the_commons = NIL;
+    the_modules = NIL;
+    reset_hpf_object_lists();
+
+    hpfc_init_unique_numbers();
+
+    init_hpf_number_management();
+    init_overlap_management();
+
+    make_align_map();       /* ??? memory leak */
+    make_distribute_map();  /* ??? memory leak */
+    make_host_node_maps();
+    make_hpfc_already_compiled_map();
+    make_hpfc_current_mappings();
+    make_new_declaration_map();
+    make_referenced_variables_map();
+    make_update_common_map();
+}
+
+void 
+close_hpfc_for_program (void)
+{
+    gen_free_list(the_commons), the_commons = NIL;
+    gen_free_list(the_modules), the_modules = NIL;
+    free_hpf_object_lists();
+
+    close_hpf_number_management();
+    close_overlap_management();
+
+    free_align_map();
+    free_distribute_map();
+    free_host_node_maps();
+    free_hpfc_already_compiled_map();
+    free_hpfc_current_mappings();
+    free_new_declaration_map();
+    free_referenced_variables_map();
+    free_update_common_map();
+}
+
+void 
+hpfcompile_common (string common_name)
+{
+    entity 
+	common = local_name_to_top_level_entity(common_name);
+
+    declaration_with_overlaps_for_module(common);
+    clean_common_declaration(load_entity_host_new(common));
+    put_generated_resources_for_common(common);
+
+    store_entity_hpfc_already_compiled(common, TRUE);
+}
+
+void 
+hpfcompile_module (string module_name)
+{
+    entity 
+	module = entity_undefined;
+    statement   
+	module_stat,
+	host_stat,
+	node_stat;
+
+    set_resources_for_module(module_name);
+
+    module = get_current_module_entity();
+    module_stat = get_current_module_statement();
 
     /* what is to be done 
      * filter the source for the directives
@@ -133,166 +451,161 @@ char *module_name;
      * and find a way to print it!
      */
 
-    debug(1, "hpfccompile", 
-	  "building %s.hpf in %s\n",
-	  db_get_current_module_name(),
-	  db_get_current_program_directory());
-
-    system(concatenate("$HPFC_TOOLS/hpfc_filter < ",
-		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
-		       " > ",
-		       db_get_current_program_directory(),
-		       "/",
-		       db_get_current_module_name(),
-		       ".hpf",
-		       NIL));
-
-    InitializeGlobalVariablesOfHpfc();
-    hpfc_init_run_time_entities();
-    init_overlap_management();
+    NormalizeCommonVariables(module, module_stat);
     ReadHpfDir(module_name);
     NormalizeHpfDeclarations();
     NormalizeCodeForHpfc(module_stat);
-   
-    normfilename = 
-	strdup(concatenate(db_get_current_program_directory(), 
-			   "/",
-			   module_local_name(get_current_module_entity()),
-			   ".norm", 
-			   NULL));
 
-    normfile = (FILE *) safe_fopen(normfilename, "w");
-    hpfc_print_code(normfile, get_current_module_entity(), module_stat);
-    safe_fclose(normfile, normfilename);
-
-    init_host_and_node_entities();
-    /* init_pvm_based_intrinsics(); // old */
-    
-    hoststat = statement_undefined;
-    nodestat = statement_undefined;
-
-    hpfcompiler(module_stat, &hoststat, &nodestat);
-    add_pvm_init_and_end(&hoststat, &nodestat);
-
-    declaration_with_overlaps();
-
-    update_object_for_module(nodestat, node_module);
-    update_object_for_module(hoststat, host_module);
-    insure_declaration_coherency(node_module, nodestat);
-    insure_declaration_coherency(host_module, hoststat);
-
-    close_overlap_management();
-
-    /*
-    DeduceGotos(hoststat, hostgotos);
-    DeduceGotos(nodestat, nodegotos);
-    */
-    /*
-     * output
+    /* put here because the current module is updated with some external
+     * declarations 
      */
+    init_host_and_node_entities(); 
     
-    hostfilename = 
-	strdup(concatenate(db_get_current_program_directory(),
-			   "/host.f", NULL));
-    nodefilename = 
-	strdup(concatenate(db_get_current_program_directory(),
-			   "/node.f", NULL));
-    parmfilename = 
-	strdup(concatenate(db_get_current_program_directory(),
-			   "/parameters.h", NULL));
-    initfilename = 
-	strdup(concatenate(db_get_current_program_directory(),
-			   "/init_param.f", NULL));
+    host_stat = statement_undefined, node_stat = statement_undefined;
 
+    hpfcompiler(module_stat, &host_stat, &node_stat);
+    
+    if (entity_main_module_p(module))
+	add_pvm_init_and_end(&host_stat, &node_stat);
 
-    hostfile = (FILE *) safe_fopen(hostfilename, "w");
-    hpfc_print_code(hostfile, host_module, hoststat);
-    safe_fclose(hostfile, hostfilename);
-    system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
-		       hostfilename, 
-		       " ", 
-		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
-		       NIL));
+    declaration_with_overlaps_for_module(module);
 
-    nodefile = (FILE *) safe_fopen(nodefilename, "w");
-    hpfc_print_code(nodefile, node_module, nodestat);
-    safe_fclose(nodefile, nodefilename);
-    system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
-		       nodefilename,
-		       " ", 
-		       db_get_file_resource(DBR_SOURCE_FILE, module_name, TRUE),
-		       NIL));
+    update_object_for_module(node_stat, node_module);
+    update_object_for_module(host_stat, host_module);
+    insure_declaration_coherency(node_module, node_stat);
+    insure_declaration_coherency(host_module, host_stat);
 
-    parmfile = (FILE *) safe_fopen(parmfilename, "w");
-    create_parameters_h(parmfile);
-    safe_fclose(parmfile, parmfilename);
+    /*
+    DeduceGotos(host_stat, get_host_gotos_map());
+    DeduceGotos(node_stat, get_node_gotos_map());
+    */
 
-    initfile = (FILE *) safe_fopen(initfilename, "w");
-    create_init_common_param(initfile);
-    safe_fclose(initfile, initfilename);
+    put_generated_resources_for_module(module_stat, host_stat, node_stat);
+    
+    reset_resources_for_module(module_name);
 
-    ifdebug(1)
+    /*   Now the module is compiled
+     */
+    store_entity_hpfc_already_compiled(module, TRUE);
+}
+
+/*
+ * hpfcompile
+ *
+ * Compiler call
+ */
+void 
+hpfcompile (char *module_name)
+{
+    string name = NULL;
+
+    debug_on("HPFC_DEBUG_LEVEL");
+
+    debug(1, "hpfcompile", "module: %s\n", module_name);
+
+    set_bool_property("PRETTYPRINT_COMMONS", FALSE); 
+    set_bool_property("PRETTYPRINT_HPFC", TRUE);
+
+    init_hpfc_for_program();
+
+    hpfcompile_module(module_name);
+
+    while(!string_undefined_p(name=hpfc_find_a_not_compiled_module()))
     {
-	fprintf(stderr, "Result of HPFC:\n");
-	fprintf(stderr, "-----------------\n");
-	hpfc_print_code(stderr, host_module, hoststat);
-	fprintf(stderr, "-----------------\n");
-	hpfc_print_code(stderr, node_module, nodestat);
-	fprintf(stderr, "-----------------\n");
-	create_parameters_h(stderr);
-	fprintf(stderr, "-----------------\n");
-	create_init_common_param(stderr);
-	fprintf(stderr, "-----------------\n");
+	db_set_current_module_name(name);
+	hpfcompile_module(name);
     }
 
-/*    DB_PUT_FILE_RESOURCE(DBR_xxx, strdup(module_name), filename);
- */
+    /*    COMMONS
+     */
+
+    set_bool_property("PRETTYPRINT_COMMONS", TRUE); 
+    db_set_current_module_name(module_name);
+
+    MAPL(ce,
+     {
+	 hpfcompile_common(entity_local_name(ENTITY(CAR(ce))));
+     },
+	 the_commons);
     
-    debug(4,"hpfcompile","end of procedure\n");
+    put_generated_resources_for_program();
 
-    reset_current_module_entity();
-    reset_current_module_statement();
-    reset_cumulated_effects_map();
-    reset_proper_effects_map();
-    reset_local_regions_map();
+    close_hpfc_for_program();
 
-    free_postcondition_map();
-    reset_postcondition_map();
-
-    free_hpfc_current_mappings();
     debug_off();
 }
 
 /*
  * ReadHpfDir
  */
-void ReadHpfDir(module_name)
-string module_name;
+void 
+ReadHpfDir (string module_name)
 {
-    debug(8,"ReadHpfDir","module: %s\n",module_name);
+    debug(8,"ReadHpfDir", "module: %s\n", module_name);
     
     /* filter */
     hpfcparser(module_name);
     
 }
 
-
-/*
- * InitializeGlobalVariablesOfHpfc
- *
- * Global variable initialization
- */	 
-void InitializeGlobalVariablesOfHpfc()
+static string 
+hpfc_local_name (string name, string suffix)
 {
-    debug(8, "InitializeGlobalVariablesOfHpfc", "Hello !\n");
+    static char buffer[100]; /* should be enough */
 
-    hpfc_init_unique_numbers();
-    reset_hpf_object_lists();
-    make_new_declaration_map();
-    make_align_map();
-    make_distribute_map();
+    return(sprintf(buffer, "%s_%s", name, suffix));
 }
 
+string 
+hpfc_host_local_name (string name)
+{
+    return(hpfc_local_name(name, HOST_NAME));
+}
+
+string 
+hpfc_node_local_name (string name)
+{
+    return(hpfc_local_name(name, NODE_NAME));
+}
+
+void 
+make_host_and_node_modules (entity module)
+{
+    string
+	name = entity_local_name(module);
+    entity
+	host = entity_undefined,
+	node = entity_undefined;
+
+    if (!entity_node_new_undefined_p(module))
+	return;
+
+    if (entity_main_module_p(module))
+    {
+	host = make_empty_program(HOST_NAME);
+	node = make_empty_program(NODE_NAME);
+    }
+    else 
+    {
+	host = make_empty_subroutine(hpfc_host_local_name(name));
+	node = make_empty_subroutine(hpfc_node_local_name(name));
+
+	/* ??? the arity is not initialized.
+	 */
+
+	if (entity_function_p(module))
+	{
+	    update_result_type_as_model(host, module);
+	    update_result_type_as_model(node, module);
+	}
+    }
+
+
+    /*  to allow the update of the call sites.
+     */
+    store_new_host_variable(host, module);
+    store_new_node_variable(node, module);
+}
 
 /*
  * init_host_and_node_entities
@@ -303,22 +616,17 @@ void InitializeGlobalVariablesOfHpfc()
  * and the declarations of which are modified in the node_module
  * (call to NewDeclarationsOfDistributedArrays)...
  */
-void init_host_and_node_entities()
+void 
+init_host_and_node_entities (void)
 {
-    host_module = make_empty_program(HOST_NAME);
-    node_module = make_empty_program(NODE_NAME);
+    entity
+	current_module = get_current_module_entity();
 
+    host_module = load_entity_host_new(current_module);
+    node_module = load_entity_node_new(current_module);
 
-    hostgotos = MAKE_STATEMENT_MAPPING();
-    nodegotos = MAKE_STATEMENT_MAPPING();
-
-    /*
-     * ??? be carefull, sharing of structures...
-     * between the compiled module, the host and the node.
+    /*  First, the commons are updated
      */
-
-    make_host_node_maps();
-
     MAPL(ce,
      {
 	 entity 
@@ -326,24 +634,44 @@ void init_host_and_node_entities()
 	 type
 	     t = entity_type(e);
 
-	 /* 
-	  * parameters are selected. I think they may be either
+	 if (type_area_p(t) && !SPECIAL_COMMON_P(e))
+	 {
+	     debug(3, "init_host_and_node_entities",    /* COMMONS */
+		   "considering common %s\n", entity_name(e));
+
+	     AddCommonToHostAndNodeModules(e); 
+
+	     if (gen_find_eq(e, the_commons)!=e)
+		 the_commons = CONS(ENTITY, e, the_commons);
+	 }
+     },
+	 entity_declarations(current_module)); 
+
+    /*   Then, the other entities
+     */
+    MAPL(ce,
+     {
+	 entity 
+	     e = ENTITY(CAR(ce));
+	 type
+	     t = entity_type(e);
+
+	 /* parameters are selected. I think they may be either
 	  * functional of variable (if declared...) FC 15/09/93
 	  */
 
-	 if ((type_variable_p(t)) ||
+	 if ((type_variable_p(t)) ||                    /* VARIABLES */
 	     ((storage_rom_p(entity_storage(e))) &&
 	      (value_symbolic_p(entity_initial(e)))))
 	     AddEntityToHostAndNodeModules(e);
 	 else
-	 if (type_functional_p(t))
+	 if (type_functional_p(t))                      /* PARAMETERS */
 	 {
-	     AddEntityToDeclarations(e, host_module);
+	     AddEntityToDeclarations(e, host_module);   
 	     AddEntityToDeclarations(e, node_module);
 	 }
-	 
      },
-	 entity_declarations(get_current_module_entity())); 
+	 entity_declarations(current_module));
     
     NewDeclarationsOfDistributedArrays();    
 
@@ -351,11 +679,16 @@ void init_host_and_node_entities()
     {
 	debug_off();
 	fprintf(stderr,"[init_host_and_node_entities]\n old declarations:\n");
-	print_text(stderr,text_declaration(get_current_module_entity()));
-	fprintf(stderr, "new declarations,\nhost_module:\n");
-	print_text(stderr,text_declaration(host_module));
+	print_text(stderr, text_declaration(current_module));
+
 	fprintf(stderr,"node_module:\n");
-	print_text(stderr,text_declaration(node_module));
+	(void) gen_consistent_p(node_module);
+	print_text(stderr, text_declaration(node_module));
+
+	fprintf(stderr, "new declarations,\nhost_module:\n");
+	(void) gen_consistent_p(host_module);
+	print_text(stderr, text_declaration(host_module));
+
 	debug_on("HPFC_DEBUG_LEVEL");
     }
 }
