@@ -19,6 +19,9 @@
  * implemented by gen_chunks (see genC.c).
  *
  * $Log: genClib.c,v $
+ * Revision 1.122  2003/07/25 12:30:14  coelho
+ * check for undefined first.
+ *
  * Revision 1.121  2003/06/19 16:22:02  coelho
  * all warnings out.
  *
@@ -2418,6 +2421,9 @@ int gen_defined_p(gen_chunk * obj)
     check_read_spec_performed();
     open_black_hole();
 
+    if (gen_chunk_undefined_p(obj))
+      return FALSE;
+
     error_seen = 0  ;
     dr.null = defined_null ;
     dr.leaf_out = gen_null ;
@@ -2436,7 +2442,7 @@ int gen_defined_p(gen_chunk * obj)
 
     pop_gen_trav_env() ;
 
-    return( error_seen == 0 ) ;
+    return error_seen == 0;
 }
 
 /* GEN_SHARING_P checks whether OBJ1 uses objects (except tabulated) or
