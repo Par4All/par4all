@@ -120,7 +120,7 @@ static bool simple_simd_unroll_loop_filter(statement s)
    }
 
    /* Unroll as many times as needed by the variables width */
-   loop_unroll(s, regWidth / regWidth);
+   loop_unroll(s, regWidth / varwidth);
 
    /* Do not recursively analyse the loop */
    return FALSE;
