@@ -1,9 +1,9 @@
 #
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/06/18 14:28:20 $, 
+# $Id$
+#
 # Source, header and object files used to build the library.
 
-LIB_CFILES=	stub.c \
+LIB_CFILES =	stub.c \
 		reductions.c \
 		utils.c \
 		transformation.c \
@@ -12,9 +12,8 @@ LIB_CFILES=	stub.c \
 
 # should have LIB_LISPFILES
 # they sould be put somewhere for execution
-LIB_HEADERS=	reductions-local.h \
-		local-header.h \
-		eval.cl \
+
+LISP_FILES =	eval.cl \
 		match.cl \
 		reduc.cl \
 		top.cl \
@@ -23,7 +22,12 @@ LIB_HEADERS=	reductions-local.h \
 		simplify.cl \
 		util.cl
 
-LIB_OBJECTS=	$(LIB_CFILES:.c=.o) 	
+LIB_HEADERS =	reductions-local.h \
+		local-header.h \
+		$(LISP_FILES)
+
+LIB_OBJECTS =	$(LIB_CFILES:.c=.o) 	
 
 #
 #
+
