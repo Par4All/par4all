@@ -5,6 +5,9 @@
  * preprocessed.
  *
  * $Log: csplit_file.c,v $
+ * Revision 1.10  2003/09/03 16:27:49  irigoin
+ * Activation of TRY/CATCH/UNCATCH in csplit() to recover from parsing errors.
+ *
  * Revision 1.9  2003/08/14 16:13:27  irigoin
  * Operational check for files with the same name
  *
@@ -333,6 +336,7 @@ string  csplit(
   extern FILE * splitc_in;
   extern void init_keyword_typedef_table(void);
   extern void splitc_parse();
+  string error_message = string_undefined;
 
   /* */
   debug_on("CSPLIT_DEBUG_LEVEL");
@@ -358,12 +362,14 @@ string  csplit(
   module_list_file = out;
   csplit_open_compilation_unit(file_name);
 
-  /* CATCH(user_error) {*/ 
-  /* error_message = "" */
-  /*} TRY {*/
-  splitc_parse();
-  /* error_message = NULL; */
-  /* UNCATCH(user_error); } */
+  CATCH(any_exception_error) {
+    error_message = "parser error";
+  }
+  TRY {
+    splitc_parse();
+    error_message = NULL;
+    UNCATCH(any_exception_error); 
+  }
 
   csplit_close_compilation_unit(file_name);
   safe_fclose(splitc_in, file_name);
@@ -382,5 +388,5 @@ string  csplit(
 
   debug_off();
 
-  return NULL;
+  return error_message;
 }
