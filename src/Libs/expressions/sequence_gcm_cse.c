@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.6  1999/05/12 14:46:15  zory
+   basic_of_expression replace by please_give_me_a_basic_for_an_expression
+
    Revision 1.5  1999/05/12 12:24:39  zory
    level of unknow entities changed !
 
@@ -221,7 +224,7 @@ make_new_scalar_variable_with_correct_type(expression e)
 {
 
   /* determine type of expression (new object allocated by function) */
-  basic b = basic_of_expression(e);
+  basic b = please_give_me_a_basic_for_an_expression(e);
 
   return make_scalar_var(b);
 }
@@ -643,7 +646,7 @@ create_new_statement(list /* of expression */ args,
   normalize_all_expressions_of(rhs);
 
   /* make lhs */
-  b = basic_of_expression(rhs); /* b is allocated */
+  b = please_give_me_a_basic_for_an_expression(rhs); /* b is allocated */
   new = make_new_scalar_variable(get_current_module_entity(),b);
   lhs = entity_to_expression(new);
 
