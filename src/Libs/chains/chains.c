@@ -150,7 +150,7 @@ statement st ;
 	vertex v ;
 
 	ifdebug(2) {
-	    fprintf(stderr, "Init statement %d with effects %#p\n", 
+	    fprintf(stderr, "Init statement %d with effects %p\n", 
 		    statement_number( st ), load_statement_effects(st) );
 	    print_effects( load_statement_effects(st) ) ;
 	}
@@ -543,7 +543,7 @@ statement s;
     genkill_one_statement( s ) ;
     genkill_instruction( statement_instruction(s), s ) ;
     ifdebug(2) {
-	debug(2, "genkill_statement", "Result for Statement %#p [%s]:\n", 
+	debug(2, "genkill_statement", "Result for Statement %p [%s]:\n", 
 		s, statement_identification(s));;
 	local_print_statement_set( "GEN", GEN( s )) ;
 	local_print_statement_set( "REF", REF( s )) ;
@@ -715,7 +715,7 @@ statement st ;
     */
     
     ifdebug(2) {
-	fprintf( stderr, "%*s> Statement %#p (%d):\n", 
+	fprintf( stderr, "%*s> Statement %p (%d):\n", 
 		 indent++, "", st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
 	local_print_statement_set( "DEF_OUT", DEF_OUT( st )) ;
@@ -745,7 +745,7 @@ statement st ;
 	pips_error( "inout_statement", "Unknown tag %d\n", i ) ;
     }
     ifdebug(2) {
-	fprintf( stderr, "%*s> Statement %#p (%d):\n", 
+	fprintf( stderr, "%*s> Statement %p (%d):\n", 
 		 indent--, "", st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
 	local_print_statement_set( "DEF_OUT", DEF_OUT( st )) ;
@@ -783,7 +783,7 @@ control ct ;
     }
 
     ifdebug(2) {
-	fprintf(stderr, "Computing DEF_IN and OUT of control %#p entering", 
+	fprintf(stderr, "Computing DEF_IN and OUT of control %p entering", 
 		ct ) ;
 	local_print_statement_set( "", DEF_IN( control_statement( ct ))) ;
     }
@@ -806,7 +806,7 @@ control ct ;
 
     for( change = TRUE ; change ; ) {
 	ifdebug(3) {
- 	    fprintf( stderr, "Iterating on %#p ...\n", ct ) ;
+ 	    fprintf( stderr, "Iterating on %p ...\n", ct ) ;
 	}
 	change = FALSE ;
 
@@ -919,7 +919,7 @@ bool (*which)() ;
     }
 
     ifdebug(2) {
-	fprintf( stderr, "Conflicts %d(%#p) -> %d(%#p) %s\n",
+	fprintf( stderr, "Conflicts %d(%p) -> %d(%p) %s\n",
 		statement_number( stin ), stin,
 		statement_number( stout ), stout,
 		(which == ud) ? "ud" : "dd_du" ) ;
@@ -1337,7 +1337,7 @@ set s ;
 {
     fprintf( stderr, "\t%s ", msg ) ;
     SET_MAP( st, {
-	fprintf(stderr, ",%#p (%d) ", 
+	fprintf(stderr, ",%p (%d) ", 
 		st, statement_number( (statement)st ));
     }, s ) ;
     fprintf( stderr, "\n" );
