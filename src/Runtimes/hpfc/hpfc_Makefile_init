@@ -2,7 +2,7 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
-# Revision 1.61  1997/05/30 09:32:12  coelho
+# Revision 1.62  1997/06/09 09:53:06  coelho
 # *** empty log message ***
 #
 # Revision 1.60  1997/05/16 14:26:36  coelho
@@ -214,8 +214,11 @@ $(NAME).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(NAME)
 $(NAME).qsub:; $(RT_DIR)/hpfc_qsub $(NAME) > $@
 
 RUNTIME_LIBS	+= -lhpfcruntime
+HPFC_PVM_LIB	+= -lhpfcpvm
+HPFC_PMI_LIB	+= -lhpfcmpi
 
-COMMON_LIBS	+= $(RUNTIME_LIBS) $(PVM_FLIB) $(PVM_GLIB) 
+COMMON_LIBS	+= $(RUNTIME_LIBS) 
+COMMON_PVM_LIBS	+= $(HPFC_PVM_LIB) $(PVM_FLIB) $(PVM_GLIB) 
 
 HOST_LIBS	+= $(PVM_HLIB)
 NODE_LIBS 	+= $(PVM_NLIB) 
@@ -355,6 +358,7 @@ $(HOST):  $(HEADERS) hpfc_main_host.o $(COMMON_OFILES) $(HOST_OFILES)
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
 		$(COMMON_LIBS) \
+		$(COMMON_PVM_LIBS) \
 		$(HOST_LIBS) \
 		$(LDIO) $(LDPURE)
 	$(STRIP) $@
@@ -365,6 +369,7 @@ $(NODE):  $(HEADERS) hpfc_main_node.o $(COMMON_OFILES) $(NODE_OFILES)
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
 		$(COMMON_LIBS) \
+		$(COMMON_PVM_LIBS) \
 		$(NODE_LIBS) \
 		$(LDPURE)
 	$(STRIP) $@
@@ -376,6 +381,7 @@ $(MAIN): $(HEADERS) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
 		$(COMMON_LIBS) \
+		$(COMMON_PVM_LIBS) \
 		$(NODE_LIBS)\
 		$(LDIO) $(LDPURE)
 	$(STRIP) $@
