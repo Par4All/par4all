@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/09/23 16:46:04 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/11/09 16:19:31 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -90,7 +90,7 @@ PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
 
 # libraries which are not part of Pips project
 # the readline library may be expected here for instance.
-PIPS_EXTEDIR="${PIPS_DIR}/Externals"
+# PIPS_EXTEDIR="${PIPS_DIR}/Externals"
 
 
 ############################################################ DEVELOPPING PIPS
@@ -99,25 +99,25 @@ PIPS_EXTEDIR="${PIPS_DIR}/Externals"
 PIPS_DEVEDIR="${PIPS_DIR}/Development"
 
 # scripts and programs created to manage the project
-PIPS_UTILDIR="${PIPS_ROOT}/Utils"
+# PIPS_UTILDIR="${PIPS_ROOT}/Utils"
 
 # other executables...
-PATH="${PATH}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc"
+PATH="${PATH}:${PIPS_ROOT}/Utils:/usr5/gnu/bin-sparc"
 
 
 ################################################################ TESTING PIPS
 
 # Validation directory
-PIPS_VALIDDIR="${PIPS_ROOT}/Validation"
+# PIPS_VALIDDIR="${PIPS_ROOT}/Validation"
 
 # hosts for Validate
 PIPS_HOSTS="chailly:episy:aiguebelette"
 
 # PIPS_EXPERIMENTSDIR="${PIPS_DIR}/Experiments"
-PIPS_TESTSDIR="${PIPS_DIR}/Tests"
+# PIPS_TESTSDIR="${PIPS_DIR}/Tests"
 
 # current demo version - binaries only ???
-PIPS_RELEASEDIR="${PIPS_DIR}/Release"
+# PIPS_RELEASEDIR="${PIPS_DIR}/Release"
 
 #
 #         #    #  #####      #    #####    ####
@@ -242,8 +242,8 @@ PATH="${PATH}:${EXTERN_ROOT}/Share:${EXTERN_ROOT}/Bin:${EXTERN_ROOT}/Utils"
 
 # test `whoami` != coelho && {
 
-LINEARDIR="${LINEAR_DIR}"
-NEWGENDIR="${NEWGEN_DIR}"
+# LINEARDIR="${LINEAR_DIR}"
+# NEWGENDIR="${NEWGEN_DIR}"
 
 # empty string if make can be run in this environment
 # PIPS_CHECK_OS="`${PIPS_UTILDIR}/check_os`"
@@ -270,29 +270,29 @@ NEWGENDIR="${NEWGEN_DIR}"
 # complexity cost tables directory
 # PIPS_COSTDIR="${PIPS_SHRDIR}/complexity"
 
-NEWGEN_PRODDIR="${NEWGEN_DIR}/Production"
-NEWGEN_DOCDIR="${NEWGEN_DIR}/Documentation"
-NEWGEN_RELEASEDIR="${NEWGEN_DIR}/Release"
+# NEWGEN_PRODDIR="${NEWGEN_DIR}/Production"
+# NEWGEN_DOCDIR="${NEWGEN_DIR}/Documentation"
+# NEWGEN_RELEASEDIR="${NEWGEN_DIR}/Release"
 
-NEWGEN_INCLUDEDIR="${NEWGEN_PRODDIR}/Include"
-NEWGEN_SHRDIR="${NEWGEN_PRODDIR}/Include"
-NEWGEN_SRCDIR="${NEWGEN_PRODDIR}/Src"
-NEWGEN_LIBDIR="${NEWGEN_PRODDIR}/Lib"
-NEWGEN_BINDIR="${NEWGEN_PRODDIR}/Bin"
+# NEWGEN_INCLUDEDIR="${NEWGEN_PRODDIR}/Include"
+# NEWGEN_SHRDIR="${NEWGEN_PRODDIR}/Include"
+# NEWGEN_SRCDIR="${NEWGEN_PRODDIR}/Src"
+# NEWGEN_LIBDIR="${NEWGEN_PRODDIR}/Lib"
+# NEWGEN_BINDIR="${NEWGEN_PRODDIR}/Bin"
 
-LINEAR_PRODDIR="${LINEAR_DIR}/Production"
-LINEAR_DOCDIR="${LINEAR_DIR}/Documentation"
-LINEAR_RELEASEDIR="${LINEAR_DIR}/Release"
-LINEAR_INCLUDEDIR="${LINEAR_PRODDIR}/Include"
-LINEAR_SHRDIR="${LINEAR_PRODDIR}/Include"
-LINEAR_SRCDIR="${LINEAR_PRODDIR}/Src"
-LINEAR_LIBDIR="${LINEAR_PRODDIR}/Lib"
-LINEAR_BINDIR="${LINEAR_PRODDIR}/Bin"
+# LINEAR_PRODDIR="${LINEAR_DIR}/Production"
+# LINEAR_DOCDIR="${LINEAR_DIR}/Documentation"
+# LINEAR_RELEASEDIR="${LINEAR_DIR}/Release"
+# LINEAR_INCLUDEDIR="${LINEAR_PRODDIR}/Include"
+# LINEAR_SHRDIR="${LINEAR_PRODDIR}/Include"
+# LINEAR_SRCDIR="${LINEAR_PRODDIR}/Src"
+# LINEAR_LIBDIR="${LINEAR_PRODDIR}/Lib"
+# LINEAR_BINDIR="${LINEAR_PRODDIR}/Bin"
 
 # PIPS
 #
 # current production version - sources and binaries
-PIPS_PRODDIR="${PIPS_DIR}/Production"
+# PIPS_PRODDIR="${PIPS_DIR}/Production"
 
 # scripts and files for running pips 
 # Pips and so...
@@ -300,27 +300,27 @@ PIPS_PRODDIR="${PIPS_DIR}/Production"
 # help...
 # hpfc scripts...
 # cost tables and so...
-PIPS_SHRDIR="${PIPS_ROOT}/Share"
+# PIPS_SHRDIR="${PIPS_ROOT}/Share"
 
 # binaries
-PIPS_BINDIR="${PIPS_ROOT}/Bin"
+# PIPS_BINDIR="${PIPS_ROOT}/Bin"
 
 # documentation
-PIPS_DOCDIR="${PIPS_ROOT}/Doc"
+# PIPS_DOCDIR="${PIPS_ROOT}/Doc"
 
 # headers
-PIPS_INCLUDEDIR="${PIPS_ROOT}/Include"
+# PIPS_INCLUDEDIR="${PIPS_ROOT}/Include"
 
 # libraries
-PIPS_LIBDIR="${PIPS_ROOT}/Lib"
+# PIPS_LIBDIR="${PIPS_ROOT}/Lib"
 
 # sources
-PIPS_SRCDIR="${PIPS_ROOT}/Src"
+# PIPS_SRCDIR="${PIPS_ROOT}/Src"
 
 # where Public software sources are stored
-PIPS_PUBLICDIR="${PIPS_SRCDIR}/Public"
+# PIPS_PUBLICDIR="${PIPS_SRCDIR}/Public"
 
-PIPS_RUNTIMEDIR="${PIPS_ROOT}/Runtime"
+# PIPS_RUNTIMEDIR="${PIPS_ROOT}/Runtime"
 
 # }
 
