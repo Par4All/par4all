@@ -1,0 +1,26 @@
+%%
+%% $Id$
+%%
+%% $Log: eole_private.tex,v $
+%% Revision 1.1  1998/12/08 15:48:07  coelho
+%% Initial revision
+%%
+%%
+
+\documentclass[a4paper,11pt]{article}
+
+\title{PIPS to EOLE data structures}
+\author{Julien Zory \and Fabien Coelho}
+\date{
+$Date: 1998/12/08 15:48:07 $
+}
+
+\begin{document}
+\maketitle
+
+\domain{import expression from "ri.newgen"}
+\domain{import entity from "ri.newgen"}
+\domain{expressionwithlevel = level:entity* x expression}
+\domain{lexpressionwithlevel = list:expressionwithlevel*}
+
+\end{document}
