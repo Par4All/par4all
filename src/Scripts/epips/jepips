@@ -1,0 +1,16 @@
+#! /bin/sh
+#
+# $RCSfile: jepips,v $ (version $Revision$)
+# $Date: 1998/11/12 16:44:26 $, 
+#
+
+${EPIPS_EMACS:-emacs} \
+     "$@" \
+     -l ${EPIPS_LISP:-${PIPS_ROOT}/Share/epips.el} \
+     -iconic \
+     -name Epips \
+     -title Epips \
+     -f jpips-launch-alone
+
+# that is all
+#
