@@ -1,7 +1,9 @@
 #! /bin/sh
 #
+# HPFC driver, Fabien COELHO
+#
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/03/24 14:19:18 $, 
+# $Date: 1995/03/24 14:33:48 $, 
 
 script=`basename $0`
 STATUS='0'
@@ -14,7 +16,7 @@ TMP="/tmp/hpfc_tmp.`hostname`.$$"
 INSTALL="$HPFC_TOOLS/hpfc_install"
 PIPSARGS='-s MUST_REGIONS -p HPFC_CLOSE'
 
-unset HPFFILE MODULE WORKSPACE DUMPFILES NOINSTALL
+unset HPFFILE MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR
 rm -f $TMP.*
 
 #
@@ -27,24 +29,8 @@ verbose()
 
 debug()
 {
-  echo "$script: $@" 1>&2
+  echo "$script: $@" >&2
 }
-
-#
-# not very convincing. stdin is taken as stdout and stderr...
-
-output_tty()
-{
-  if tty -s
-  then
-    tty
-  else
-    echo /dev/null
-  fi
-}
-
-STDOUT=`output_tty`
-STDERR="$STDOUT"
 
 default_module()
 {
@@ -91,9 +77,7 @@ do
     p) PIPS="$OPTARG" ;;
     v) VERBOSE='verbose' ;;
     x) VERBOSE=':' ;;
-    D) DEBUG='debug' ; 
-       STDOUT=`output_tty` ; 
-       STDERR="$STDOUT" ;;
+    D) DEBUG='debug' ;;
     d) DELETE='Delete' ;;
     M) MAKE='gmake' ;;
     q) STDOUT='/dev/null' ;;
@@ -116,8 +100,10 @@ shift `expr $OPTIND - 1`
 $VERBOSE "applying hpfc on file $HPFFILE"
 $DEBUG "`type $PIPS`"
 
-$PIPS -f $HPFFILE $PIPSARGS -m $MODULE $WORKSPACE > $STDOUT 2> $STDERR
-STATUS=$?
+eval $PIPS -f $HPFFILE $PIPSARGS -m $MODULE $WORKSPACE \
+	${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
+
+STATUS="$?"
 
 [ "$NOINSTALL" ] ||
 {
