@@ -382,7 +382,7 @@ bool transformer_internal_consistency_p(transformer t)
   Pbase b = sc_base(sc);
   Pbase e = BASE_UNDEFINED;
   list args = transformer_arguments(t);
-  bool consistent = transformer_consistency_p(transformer t);
+  bool consistent = transformer_consistency_p(t);
 
   MAP(ENTITY, e, {
     entity v = entity_to_new_value(e);
@@ -390,18 +390,18 @@ bool transformer_internal_consistency_p(transformer t)
     if(v!=e) {
       pips_user_warning("New value %s should be the same entity as variable %s"
 			" as long as equivalence equations are not added\n", 
-			variable_local_name(v), variable_local_name(e));
+			entity_local_name(v), entity_local_name(e));
       pips_assert("Argument must be a value", FALSE);
     }
   }, args);
 
-  for(e=b; !BASE_NULLE_P(vect_succ(e)); e = vecteur_succ(e)) {
-    entity val = (entity) vecteur_var(t);
+  for(e=b; !BASE_NULLE_P(e); e = vecteur_succ(e)) {
+    entity val = (entity) vecteur_var(e);
 
     if(!(new_value_entity_p(val) || old_value_entity_p(val)
-	 || intermediate_value_entity_p(val)) {
+	 || intermediate_value_entity_p(val))) {
       pips_user_warning("Variable %s in basis should be an internal value",
-			variable_local_name(val));
+			entity_local_name(val));
       pips_assert("Basis variables must be an internal value", FALSE);
     }
   }
