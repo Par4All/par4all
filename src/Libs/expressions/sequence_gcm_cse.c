@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.19  2000/07/21 08:26:56  phamdinh
+   Modification of the update aspt->available_contents
+
    Revision 1.18  2000/07/20 16:47:27  phamdinh
    New statements are inserted in the correct position in hash_table
 
@@ -1049,11 +1052,11 @@ dump_expresison_nary(expression e)
 static int similarity(expression e, available_scalar_pt aspt)
 {
   syntax s = expression_syntax(e), sa = expression_syntax(aspt->contents);
-  /*
+
   fprintf(stderr, "similarity on %s\n", entity_name(aspt->scalar));
   print_expression(e);
   dump_aspt(aspt);
-  */
+
   if (syntax_tag(s)!=syntax_tag(sa)) return NO_SIMILARITY;
   
   if (syntax_reference_p(s))
@@ -1351,7 +1354,8 @@ static void atom_cse_expression(expression e)
 		  /* updates... */
 		  aspt->depends = CONS(ENTITY, scalar, aspt->depends);
 		  old = aspt->available_contents; 
-		  aspt->available_contents = list_diff(old, in_common);
+		  aspt->available_contents = CONS(EXPRESSION, cse,
+						  list_diff(old, in_common));
 		  gen_free_list(old);
 		  
 		  /* add the new scalar as an available CSE. */
