@@ -299,7 +299,7 @@ static gen_chunk * chunk_for_domain(int domain)
 {
   gen_chunk * cp;
   check_domain(domain);
-  cp = (gen_chunk*) alloc(sizeof(gen_chunk)*Domains[domain].size));
+  cp = (gen_chunk*) alloc(sizeof(gen_chunk)*Domains[domain].size);
   cp->i = domain;
   return cp;
 }
