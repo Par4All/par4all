@@ -389,6 +389,7 @@ test ${uname_s} = AIX && cat >> pipsrc.tmp <<EOF
 #
 # fixes for AIX
 #
+PIPS_FLINT='xlf -c -u -qlanglvl=77std'
 PIPS_PING='ping -c 1'
 PIPS_DIFF='gdiff'
 PIPS_MORE='cat'
