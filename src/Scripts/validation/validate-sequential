@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/04/09 09:02:48 $, ) 
+# ($Date: 1997/04/09 10:04:54 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -197,6 +197,9 @@ report()
       }
       echo "Validate Message from $HOSTNAME:"
       echo
+      echo "PIPS: $pips_version"
+      echo "TPIPS: $tpips_version"
+      echo
       echo "$message" 
     } | $MAIL -s "$subject ${3:-$directory/$program}" $RUNNER
 
@@ -240,7 +243,7 @@ make_diff()
   fi
 
   report $status \
-  "`echo Run accept on mail message to resynchronize for $pips_version. ;\
+  "`echo Run accept on mail message to resynchronize. ;\
   echo Differences for $module in $refresult: ;\
   cat $diffout ;\
   echo ; `"
@@ -277,9 +280,7 @@ test_aspect()
        [ -f core ] && rm -f core
 
        report $STATUS \
-         "Execution of $aspect/$name.test 
-failed with $pips_version 
-or $tpips_version" || \
+         "Execution of $aspect/$name.test failed" || \
          { $DEBUG " || error"; continue;}
        
        make_diff $aspect $name test
@@ -297,8 +298,7 @@ or $tpips_version" || \
        test -f core && rm -f core
        
        report $STATUS \
-         "Execution of $aspect/$name.tpips
-failed with $tpips_version" || \
+         "Execution of $aspect/$name.tpips failed" || \
          { $DEBUG " || error"; continue;}
 
        make_diff $aspect $name test
@@ -318,7 +318,8 @@ failed with $tpips_version" || \
        STATUS=$?
        [ -f core ] && rm -f core
 
-       report $STATUS "Execution of $aspect/default_test on $name.f failed with $pips_version" || { $DEBUG " || error"; rm -f $aspect/$name.test; continue;}
+       report $STATUS "Execution of $aspect/default_test on $name.f failed" ||
+	    { $DEBUG " || error"; rm -f $aspect/$name.test; continue;}
        
        rm -f $aspect/$name.test
        make_diff $aspect $name test
@@ -340,7 +341,7 @@ failed with $tpips_version" || \
        STATUS=$?
        [ -f core ] && rm -f core
 
-       report $STATUS "Cannot parallelize module $module in $file with $pips_version or $tpips_version" || continue
+       report $STATUS "Cannot parallelize module $module in $file" || continue
        
        make_diff $aspect $name $module
      done
