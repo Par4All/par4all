@@ -26,7 +26,7 @@
 #include "newgen_include.h"
 #include "x.tab.h"
 
-#ifdef flex_scanner
+#ifdef FLEX_SCANNER
 #undef yywrap
 #endif
 
@@ -81,7 +81,7 @@ static void append_to_literal() ;
 				 (int) yytext[0]);}
 %%
 
-#ifdef flex_scanner
+#ifdef FLEX_SCANNER
 int yyinput()
 {
     return( input()) ;
@@ -90,7 +90,7 @@ int yyinput()
 
 yywrap()
 {
-#ifdef flex_scanner
+#ifdef FLEX_SCANNER
     yy_init = 1 ;
 #endif
     return( 1 ) ;
