@@ -1,0 +1,83 @@
+#!/bin/sh
+
+# Formattage sous latex de certaines des informations conservees optionnellement lors
+# du calcul du test de dependance
+
+# Francois Irigoin, 28 mai 1993
+
+workspace=$1
+global=tmp$$
+
+if [ ! -d $workspace.database ]
+then
+	echo Workspace $workspace does not exist!
+	exit
+fi
+
+dgoptions="resulttestfast resulttestseman resulttestfull"
+
+for dgoption in $dgoptions
+do
+	>$global.$dgoption
+	for source in $workspace.database/*.f
+	do
+		module=`basename $source .f`
+		module=`echo $module | tr a-z A-Z`
+#		echo module=$module
+		stats=$workspace.database/$module.$dgoption
+#		echo stats="$stats"
+		if [ -f $stats ]
+		then
+			cat $stats >>$global.$dgoption
+		else
+			echo $0: missing statistics for module $module and option $dgoption
+			echo "$module 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" >>$global.$dgoption
+		fi
+	done
+done
+
+# exit
+
+for dgoption in $dgoptions
+do
+	dependencetest=`echo $dgoption|sed s/resulttest//`
+#	cat $UTILDIR/dg-statistics.texheader >$workspace-$dgoption.tex
+	cat >$workspace-$dgoption.tex <<EOF
+\batchmode
+
+\documentstyle[]{seminar}
+
+\renewcommand{\landscape}{\special{landscape}}
+
+\slideframe{plain}
+
+\slidestyle{empty}
+
+\pagestyle{myheadings}
+
+\markboth{PIPS - Dependence Graph Statistics {\em $dependencetest} for $workspace\hfill\today~~~}{PIPS - Dependence Graph Statistics {\em $dependencetest} for $workspace\hfill\today~~~}
+
+\begin{document}
+
+\begin{slide}
+
+{\scriptsize
+\begin{tabular}{| l | r | r | r | r |} \hline
+Module & array pairs & self & independent & dependent \\\\ \hline
+EOF
+	awk -f $UTILDIR/dg-statistics.awk WORKSPACE=$workspace <$global.$dgoption >>$workspace-$dgoption.tex
+#	cat $UTILDIR/dg-statistics.textrailer >>$workspace-$dgoption.tex
+	cat >>$workspace-$dgoption.tex <<EOF
+\end{tabular}
+
+}
+
+\vfill
+
+\end{slide}
+
+\end{document}
+EOF
+	latex $workspace-$dgoption.tex
+	rm $global.$dgoption
+done
