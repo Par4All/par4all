@@ -71,7 +71,7 @@ void create_frames()
   int screen_no,display_width,display_height;
 
   main_frame = xv_create(NULL, FRAME, 
-			 FRAME_LABEL, "XView Pips", 
+			 FRAME_LABEL, "Wpips", 
 			 /*			   XV_WIDTH, WPIPS_WIDTH, 
 						   XV_HEIGHT, WPIPS_HEIGHT,
 						   */		   NULL);
@@ -141,7 +141,7 @@ void create_frames()
   install_event_procedure(query_frame);
 
   options_frame = xv_create(main_frame, FRAME,
-                            FRAME_LABEL, "Options panel",
+                            FRAME_LABEL, "Wpips options",
                             XV_SHOW, FALSE,
                             XV_WIDTH, display_width - EDIT_WIDTH -2*X_WM_DECOR_SIZE, 
                             FRAME_DONE_PROC, hide_window,
