@@ -18,7 +18,6 @@
 
 #include "effects.h"
 
-/* #include "hash.h" */
 
 #include "transformer.h"
 
