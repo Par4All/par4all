@@ -15,6 +15,51 @@
 
 static void delete_derived_resources();
 
+static list saved_active_phases = NIL;
+
+bool save_active_phases()
+{
+    makefile current_makefile = parse_makefile();
+    bool result = TRUE;
+    
+    if (saved_active_phases != NIL)
+	result = FALSE;
+    else {
+	MAPL(pa, {
+	    saved_active_phases = gen_nconc(saved_active_phases, 
+					    CONS(STRING, 
+						 strdup(STRING(CAR(pa))),
+						 NIL));
+	}, makefile_active_phases(current_makefile));
+    }
+    return result;
+}
+
+bool retrieve_active_phases()
+{
+    makefile current_makefile = parse_makefile();
+    bool result = TRUE;
+
+    ifdebug(2) {
+	puts("----- BEFORE RETREIVING -----");
+	fprint_activated(stdout);
+    }
+
+    if (saved_active_phases == NIL)
+	result = FALSE;
+    else {
+	gen_free_list (makefile_active_phases(current_makefile));
+	makefile_active_phases(current_makefile) = saved_active_phases;
+	saved_active_phases = NIL;
+
+	ifdebug(2) {
+	    puts("----- AFTER RETREIVING -----");
+	    fprint_activated(stdout);
+	}
+    }
+    return result;
+}
+
 bool active_phase_p(phase)
 string phase;
 {
