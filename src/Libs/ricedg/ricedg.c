@@ -760,12 +760,10 @@ rice_update_dependence_graph(
 		    }
 
 		    llv1 = gen_copy_seq(llv);
-		    
+		    /* freed in of leaked. */
 		    levels = TestCoupleOfEffects(s1, e1, s2, e2, llv1, &gs,
 						 &levelsop, &gsop);
 
-		    gen_free_list(llv1);
-		    
 		    /* updating DG for the dependence (s1,e1)-->(s2,e2)*/
 		    if (levels == NIL) 
 		    {
@@ -888,12 +886,13 @@ rice_update_dependence_graph(
 
 
 static list 
-TestCoupleOfEffects(s1, e1, s2, e2,llv,gs,levelsop,gsop)
-statement s1, s2;
-effect e1, e2;
-list llv; 
-list *levelsop;
-Ptsg *gs,*gsop;
+TestCoupleOfEffects(
+    statement s1, effect e1, 
+    statement s2, effect e2,
+    list llv, /* must be freed */
+    Ptsg * gs,
+    list * levelsop,
+    Ptsg * gsop)
 {
     list n1 = load_statement_enclosing_loops(s1);
     Psysteme sc1 = SC_UNDEFINED;
@@ -942,11 +941,9 @@ Ptsg *gs,*gsop;
     }
 
 
-    return(TestCoupleOfReferences(n1, sc1, s1, e1, r1, n2, sc2, s2, e2, 
-				  r2, llv, gs, levelsop, gsop));
+    return TestCoupleOfReferences(n1, sc1, s1, e1, r1, n2, sc2, s2, e2, 
+				  r2, llv, gs, levelsop, gsop);
 }
-
-
 
 /* 
  * This function checks if two references have memory locations in common.
@@ -963,16 +960,13 @@ Ptsg *gs,*gsop;
 */
 
 list 
-TestCoupleOfReferences(n1, sc1, s1, ef1, r1, n2, sc2, s2, ef2, r2,llv,gs,levelsop, gsop)
-list n1, n2;
-Psysteme sc1, sc2;
-statement s1, s2;
-effect ef1, ef2;
-reference r1, r2;
-list llv;
-list *levelsop ;
-Ptsg *gs, *gsop;
-/*boolean Finds2s1;*/
+TestCoupleOfReferences(
+    list n1, Psysteme sc1, statement s1, effect ef1, reference r1,
+    list n2, Psysteme sc2, statement s2, effect ef2, reference r2,
+    list llv,
+    Ptsg * gs,
+    list * levelsop, 
+    Ptsg * gsop)
 {
     int i, cl, dims, ty;
     list levels = NIL, levels1 = NIL;
@@ -1033,10 +1027,12 @@ Ptsg *gs, *gsop;
 		
 		*levelsop = levels1;
 	    }
-	}
 
+	    gen_free_list(llv);
+	}
 	else 
 	{
+	    /* llv is freed here */
 	    levels = TestDependence(n1, sc1, s1, ef1, r1, n2,sc2,s2, ef2,
 				    r2,llv,gs,levelsop,gsop); 
 	}
@@ -1208,16 +1204,13 @@ Ptsg *gs, *gsop;
  * - sc_rm() added for dep_syst, dep_syst1, dep_syst_op and dep_syst2
  */
 static list 
-TestDependence(n1, sc1, s1, ef1, r1, n2, sc2, s2, ef2, r2, llv, gs,levelsop,gsop)
-list n1, n2;
-Psysteme sc1, sc2;
-statement s1, s2;
-effect ef1, ef2;
-reference r1, r2;
-list llv;
-list *levelsop;
-Ptsg *gs,*gsop;
-/*boolean Finds2s1;*/
+TestDependence(
+    list n1, Psysteme sc1, statement s1, effect ef1, reference r1, 
+    list n2, Psysteme sc2, statement s2, effect ef2, reference r2, 
+    list llv,
+    Ptsg * gs,
+    list * levelsop,
+    Ptsg * gsop)
 {
     Psysteme dep_syst = SC_UNDEFINED;
     Psysteme dep_syst1 = SC_UNDEFINED;
@@ -1240,7 +1233,7 @@ Ptsg *gs,*gsop;
     MAP(STATEMENT, s, 
     {
 	entity i = loop_index(statement_loop(s));
-	gen_remove(&llv,i);
+	gen_remove(&llv,i); /* llv is dead, must be freed... */
     },
 	n2);
 
@@ -1259,7 +1252,8 @@ Ptsg *gs,*gsop;
     /* Build the dependence context system from the two initial context systems
      * sc1 and sc2. BC 
      */
-    if (!build_and_test_dependence_context(r1, r2, sc1, sc2, &dep_syst, llv, n2)) 
+    if (!build_and_test_dependence_context(r1, r2, sc1, sc2, &dep_syst, 
+					   llv, n2)) 
     {
 	/* the context system is not feasible : no dependence. BC */
 	/* No dep_syst() to deallocate either, FI */
@@ -1271,8 +1265,9 @@ Ptsg *gs,*gsop;
 	    mem_spy_end("TestDependence: Step 1.b.a");
 	    mem_spy_end("TestDependence-1");
 	}
-
-	return(NIL);
+	
+	gen_free_list(llv);
+	return NIL;
     }
     
 
@@ -1298,8 +1293,11 @@ Ptsg *gs,*gsop;
 	    mem_spy_end("TestDependence-2");
 	}
 
-	return(NIL);
+	gen_free_list(llv);
+	return NIL;
     }
+
+    gen_free_list(llv);
 
     ifdebug(1) {
 	mem_spy_end("TestDependence: Step 1.c.b");
@@ -1777,11 +1775,11 @@ Ptsg *gs,*gsop;
  *    should have no accuracy impact (FI, 12 December 1995)
  */
 static boolean 
-build_and_test_dependence_context(r1, r2, sc1, sc2, psc_dep, llv, 
-						 s2_enc_loops)
-reference r1, r2;
-Psysteme sc1, sc2, *psc_dep;
-list llv, s2_enc_loops;
+build_and_test_dependence_context(
+    reference r1, reference r2, 
+    Psysteme sc1, Psysteme sc2, 
+    Psysteme * psc_dep, 
+    list llv, list s2_enc_loops)
 {
     Psysteme sc_dep, sc_tmp;
     list pc;
@@ -1965,7 +1963,6 @@ list llv, s2_enc_loops;
 }
 
 
-
 /* static boolean gcd_and_constant_dependence_test(references r1, r2, 
  *                                                 list llv, s2_enc_loops,
  *                                                 Psysteme *psc_dep)
@@ -1983,10 +1980,10 @@ list llv, s2_enc_loops;
  *  - no side effects on r1, r2,...
  */
 static boolean 
-gcd_and_constant_dependence_test(r1, r2, llv, s2_enc_loops, psc_dep)
-reference r1, r2;
-list llv, s2_enc_loops;
-Psysteme *psc_dep;
+gcd_and_constant_dependence_test(
+    reference r1, reference r2, 
+    list llv, list s2_enc_loops, 
+    Psysteme * psc_dep)
 {
     list pc1, pc2, pc;
     int l;
