@@ -3,7 +3,7 @@ c Runtime Support Functions for the
 c High Performance Fortran Compiler
 c by Fabien COELHO.
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/09/01 15:35:55 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/09/04 17:55:34 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -1182,6 +1182,7 @@ c
 c HPFC_NTIMEON
 c
       subroutine HPFC_NTIMEON()
+      character comment*(*)
       call HPFC_SYNCHRO()
       call HPFC_SYNCHRO()
       end
@@ -1190,16 +1191,18 @@ c-----------------
 c
 c HPFC_HTIMEOFF
 c
-      subroutine HPFC_HTIMEOFF()
+      subroutine HPFC_HTIMEOFF(comment)
+      character comment*(*)
       call HPFC_SYNCHRO()
-      call HPFC_TIMEOFF()
+      call HPFC_TIMEOFF(comment)
       end
 c
 c-----------------
 c
 c HPFC_NTIMEOFF
 c
-      subroutine HPFC_NTIMEOFF()
+      subroutine HPFC_NTIMEOFF(comment)
+      character comment*(*)
       call HPFC_SYNCHRO()
       end
 c
