@@ -103,13 +103,15 @@ char fsplit_sccsid[] = "@(#)fsplit.c	5.5 (Berkeley) 3/12/91";
 #define BSZ 512
 static char buf[BSZ];
 static FILE *ifp;
-static char 	x[]="zzz000.f",
+static char
+ 	x[]="zzz000.f",
 	mainp[]="main000.f",
 	blkp[]="data000.f";
 
 #define TRUE 1
 #define FALSE 0
-static int	extr = FALSE,
+static int
+	extr = FALSE,
 	extrknt = -1,
 	extrfnd[100];
 static char *extrnames[100];
@@ -366,10 +368,8 @@ static void print_name(FILE * o, char * name, int n) /* FC */
     while (n-->0) putc(*name++, o);
 }
 
-/*
-main(argc, argv)
-char **argv;
-*/
+static void drop_end_of_line_blanks(char *);
+
 int fsplit(char * file_name, FILE * out)
 {
     register FILE *ofp;	/* output file */
