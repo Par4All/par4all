@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/08/08 19:23:02 $, )
+# ($Date: 1996/08/08 19:50:44 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -67,28 +67,24 @@ usage()
     exit $ret
 }
 
-# compile n|l|p(=what) name file(=report) arch...
-# compile "what" for all architectures.
-# the detailed report is sent only on failures
-compile()
+# MAKE nlp(=what) name file(=report) 'targets' arch...
+# make 'target' for all specified arch.
+# the detailed report is sent only on failures.
+MAKE()
 {
-    what=$1; name=$2; report=$3; shift 3
-
+    what=$1; name=$2; report=$3; targets="$4"; shift 4
     detailed=$report.detailed
     summary=$report.summary
 
-    {
-      make-pips -$what -o $summary clean 
-      for a in "$@"; do
-	make-pips -$what -o $summary -m $a ARCH=$a clean-compiled recompile
-      done 
-    } 2> $detailed > /dev/null
-    
+    for a in "$@"; do
+	make-pips -$what -o $summary -m $a ARCH=$a $targets
+    done 2> $detailed > /dev/null
+
     cat $summary >> $report
 
     # send the detailed report if some failures occured
     grep 'failed$' $summary > /dev/null 2>&1 &&
-	$mail -s "$script: $name recompile report" $email \
+	$mail -s "$script: $name report" $email \
 	< $detailed > /dev/null 2>&1
 
     rm -f $detailed $summary
@@ -145,6 +141,9 @@ shift `expr $OPTIND - 1`
 	$verbose - Deleting forgotten validation directories and files
 	find ${PIPS_HOME}/Pips -name '.validate_*' -mtime +7 -print |
 	    xargs rm -rf
+
+	$verbose - Removing generated files in Production...
+        MAKE nlp cleaning $report clean .
     }
 
     #
@@ -157,7 +156,7 @@ shift `expr $OPTIND - 1`
 	$verbose Compiling Newgen/Production
 	$verbose date: `date`
 	msg="${msg} N"
-	compile n newgen $report $arch
+	MAKE n newgen $report "clean-compiled recompile" $arch
     }
     
     # 2: LINEAR
@@ -167,7 +166,7 @@ shift `expr $OPTIND - 1`
 	$verbose Compiling Linear/Production
 	$verbose date: `date`
 	msg="${msg} L"
-	compile l linear $report $arch
+	MAKE l linear $report "clean-compiled recompile" $arch
     }
 
     # 3: PIPS
@@ -177,7 +176,7 @@ shift `expr $OPTIND - 1`
 	$verbose Compiling Pips/Production
 	$verbose date: `date`
 	msg="${msg} P"
-	compile p pips $report $arch
+	MAKE p pips $report "clean-compiled recompile" $arch
     }
 
     # 4: SUMMARY
