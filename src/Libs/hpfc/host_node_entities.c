@@ -1,7 +1,10 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: host_node_entities.c,v $ ($Date: 1996/12/24 15:24:26 $, ) 
- * version $Revision$
+ * $Id$
+ * $Log: host_node_entities.c,v $
+ * Revision 1.22  1997/03/20 10:26:11  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
