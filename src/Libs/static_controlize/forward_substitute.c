@@ -15,8 +15,6 @@
 
 /* Newgen includes	*/
 #include "genC.h"
-#include "hash.h" 
-#include "list.h"
 
 #include "boolean.h"
 #include "arithmetique.h"
