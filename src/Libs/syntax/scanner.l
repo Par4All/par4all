@@ -243,7 +243,7 @@ DCON (({MANT}|{UICON}){DEXP}?)
                                 /* Ignore carriage return from VMS and Microsoft and Apple?
                                  * Not here! It must have been done earlier in the processing.
                                  */
-                                pips_user_warning("illegal character %c (hex %X)\n",
+                                pips_user_warning("illegal character \"%c\" (hexadecimal %#04x)\n",
                                                   yytext[0], yytext[0]);
                                 ParserError("Lexical Analysis", 
                                 "Check standard Fortran character set.\n");
