@@ -232,7 +232,7 @@ double get_process_gross_heap_size()
     /* This is *used* part of the heap, but it may be bigger */
     /* struct mallinfo heap_info = mallinfo();  */
     /* double memory_size = (heap_info.uordbytes)/(double)(1 << 20); */
-    double memory_size = (sbrk(0))/(double)(1 << 20);
+    double memory_size = -1.0 /*(sbrk(0))/(double)(1 << 20)*/;
     return memory_size;
 }
 
