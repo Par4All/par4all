@@ -357,7 +357,7 @@ i_apply:
 		    db_get_current_module_name() == NULL? 
 		    NULL : strdup(db_get_current_module_name());
 
-		if(db_get_current_workspace()==database_undefined) {
+		if(!db_get_current_workspace_name()) {
 		    user_error("apply", "Open or create a workspace first!\n");
 		}
 	    
@@ -402,7 +402,7 @@ i_display:
 		    db_get_current_module_name() == NULL? 
 		    NULL : strdup(db_get_current_module_name());
 
-		if(db_get_current_workspace()==database_undefined) {
+		if(!db_get_current_workspace_name()) {
 		    user_error("display",
 			       "Open or create a workspace first!\n");
 		}
@@ -453,7 +453,7 @@ i_activate:
 	    debug(7,"yyparse","reduce rule i_activate\n");
 	    if (tpips_execution_mode) {
 
-		if(db_get_current_workspace()==database_undefined) {
+		if(!db_get_current_workspace_name()) {
 		    user_error("activate",
 			       "Open or create a workspace first!\n");
 		}
