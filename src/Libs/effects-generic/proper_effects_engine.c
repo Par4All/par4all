@@ -387,6 +387,7 @@ proper_effects_of_loop(loop l)
     list l_proper=NIL;
     statement current_stat = effects_private_current_stmt_head();
     list l_cumu_range = NIL;
+    reference tmp;
 
     entity i = loop_index(l);
     range r = loop_range(l);
@@ -420,7 +421,9 @@ proper_effects_of_loop(loop l)
      * such a feature. FC, 23/09/93
      */
 
-    li = generic_proper_effects_of_lhs(make_reference(i, NIL));
+    tmp = make_reference(i, NIL);
+    li = generic_proper_effects_of_lhs(tmp);
+    free_reference(tmp);
 
     /* effects of loop bound expressions. */
     lb = generic_proper_effects_of_range(r);
