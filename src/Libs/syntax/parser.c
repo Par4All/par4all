@@ -49,7 +49,8 @@ char FormatValue[FORMATLENGTH];
 
 extern void syn_reset_lex(void);
 
-void ParserError(char * f, char * m)
+void 
+ParserError(char * f, char * m)
 {
     entity mod = get_current_module_entity();
 
@@ -80,7 +81,12 @@ void ParserError(char * f, char * m)
     reset_current_module_entity();
     free(CurrentFN);
     CurrentFN = NULL;
-    CurrentPackage = NULL;
+
+    /* GetChar() will reinitialize its own buffer when called */
+
+    /* Because of the strange behavior of BeginingOfParsing*/
+    /* CurrentPackage = NULL; */
+    CurrentPackage = TOP_LEVEL_MODULE_NAME;
     /* Too bad for memory leak... */
     DynamicArea = entity_undefined;
     StaticArea = entity_undefined;
@@ -94,8 +100,23 @@ void ParserError(char * f, char * m)
 }
 
 
-/* this function is called for each new file (FI: once?) */
-void BeginingOfParsing()
+/* this function is called for each new file (FI: once?)
+ * FI: I do not understand how this works. It has an effect only once
+ * during a pips process lifetime. The error handling routine resets
+ * CurrentPackage to NULL, as it is when the pips process is started.
+ * 
+ * Should I: 
+ *
+ *  A modify the error handling routine to reset CurrentPackage to
+ *    TOP_LEVEL_MODULE_NAME? 
+ *
+ *  B reset CurrentPackage to TOP_LEVEL_MODULE_NAME each time the parser
+ *    is entered?
+ *
+ * I choose A.
+ */
+void 
+BeginingOfParsing()
 {
     static bool called = FALSE;
 
@@ -155,17 +176,20 @@ the_actual_parser(
  * just a different input file not to touch the original source file.
  * this parser should be selected/activated automatically.
  */
-bool hpfc_parser(string module)
+bool 
+hpfc_parser(string module)
 {
     return the_actual_parser(module, DBR_HPFC_FILTERED_FILE);
 }
 
-bool parser(string module)
+bool 
+parser(string module)
 {
     return the_actual_parser(module, DBR_SOURCE_FILE);
 }
 
-void init_parser_properties()
+void 
+init_parser_properties()
 {
   init_parser_reader_properties();
 }
