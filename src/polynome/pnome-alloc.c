@@ -14,6 +14,41 @@
 #include "vecteur.h"
 #include "polynome.h"
 
+/* allocation of an unitialized monome (to avoid various direct
+ * unchecked call to malloc)
+ */
+Pmonome new_monome()
+{
+    extern int etext;
+
+    Pmonome pm = (Pmonome) malloc(sizeof(Smonome));
+    if (pm == NULL) {
+	(void) fprintf(stderr,"new_monome: Out of memory space\n");
+	(void) fprintf(stderr, "%10.3f MB", 
+		       (sbrk(0) - etext)/(double)(1 << 20));
+	abort();
+	/*exit(-1);*/
+    }
+    return pm;
+}
+
+/* allocation of an unitialized polynome (to avoid various direct
+ * unchecked call to malloc)
+ */
+Ppolynome new_polynome()
+{
+    extern int etext;
+
+    Ppolynome pp = (Ppolynome) malloc(sizeof(Spolynome));
+    if (pp == NULL) {
+	(void) fprintf(stderr,"new_polynome: Out of memory space\n");
+	(void) fprintf(stderr, "%10.3f MB", 
+		       (sbrk(0) - etext)/(double)(1 << 20));
+	abort();
+	/*exit(-1);*/
+    }
+    return pp;
+}
 
 /* Pmonome make_monome(float coeff, Variable var, Value exp)
  *  PRIVATE
@@ -27,7 +62,7 @@ Value exp;
     if (coeff == 0)
 	return (MONOME_NUL);
     else {
-	Pmonome pm = (Pmonome) malloc(sizeof(Smonome));
+	Pmonome pm = new_monome();
 	monome_coeff(pm) = coeff;
 	monome_term(pm) = vect_new((exp == 0 ? TCST : var),
 				   (exp == 0 ?    1 : exp));
@@ -62,7 +97,7 @@ Pmonome pm;
     else if (MONOME_UNDEFINED_P(pm)) 
 	return (POLYNOME_UNDEFINED);
     else {
-	Ppolynome pp = (Ppolynome) malloc(sizeof(Spolynome));
+	Ppolynome pp = new_polynome();
 	polynome_monome(pp) = pm;
 	polynome_succ(pp) = NIL;
 	return (pp);
@@ -81,7 +116,7 @@ Pmonome pm;
     else if (MONOME_UNDEFINED_P(pm)) 
 	return (MONOME_UNDEFINED);
     else {
-	Pmonome pmd = (Pmonome) malloc(sizeof(Smonome));
+	Pmonome pmd = new_monome();
 	monome_coeff(pmd) = monome_coeff(pm);
 	monome_term(pmd) = vect_dup(monome_term(pm));
 	return(pmd);
