@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.113  2000/07/06 13:35:28  coelho
+ * remove added to automatic completion.
+ *
  * Revision 1.112  2000/02/29 10:30:16  coelho
  * typo--
  *
@@ -336,6 +339,7 @@ static struct t_completion_scheme completion_scheme[] =
 { "delete",     COMP_NONE,       COMP_NONE },
 { "module",     COMP_NONE,       COMP_NONE },
 { "make",       COMP_RESOURCE,   COMP_NONE },
+{ "remove",	COMP_RESOURCE,   COMP_NONE },
 { "apply",      COMP_RULE,       COMP_NONE },
 { "capply",      COMP_RULE,       COMP_NONE },
 { "display",    COMP_FILE_RSC,   COMP_NONE },
@@ -748,8 +752,8 @@ void tpips_help(string line)
 	 "\n\tExamples:\n\n"
 	 "\t\t apply SUPPRESS_DEAD_CODE[%%ALL]\n"
 	 "\t\t apply PARTIAL_EVAL[%%CALLEES]\n");
-    TP_HELP("display", "display  <resourcename([OWNER])>\n",
-	 "\tprint a resource\n"
+    TP_HELP("display", "display  <fileresourcename([OWNER])>\n",
+	 "\tprint a file resource\n"
 	 "\n\tExamples:\n\n"
 	 "\t\t display PRINTED_FILE\n"
 	 "\t\t display CALLGRAPH_FILE[my_module]\n"
