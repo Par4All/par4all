@@ -65,22 +65,6 @@ pips_region_user_name(entity ent)
     return name;
 }
 
-/* list words_region(effect reg)
- * input    : a region.
- * output   : a list of strings representing the region.
- * modifies : nothing.
- * comment  :	because of 'buffer', this function cannot be called twice
- * before
- * its output is processed. Also, overflows in relation_to_string() 
- * cannot be prevented. They are checked on return.
- */
-list
-words_region(region reg)
-{
-    pips_internal_error("implementation dropped\n");
-    return NIL;
-}
-
 string
 region_sc_to_string(string s, Psysteme ps)
 {
@@ -374,9 +358,12 @@ void print_regions(list l) { print_rw_regions(l);}
 void 
 print_region(effect r)
 {
-    fprintf(stderr,"\t");
-    if(effect_region_p(r)) 
-	print_words(stderr, words_region(r));
+    fprintf(stderr,"\n");
+    if(effect_region_p(r)) {
+	text t = text_region(r);
+	print_text(stderr, t);
+	free_text(t);
+    }
     /* else print_words(stderr, words_effect(r)); */
     fprintf(stderr,"\n");
 }
