@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/15 15:26:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/03/20 18:02:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_help[] = "%A% ($Date: 1996/07/15 15:26:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_help[] = "%A% ($Date: 1997/03/20 18:02:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,7 +21,7 @@ char vcid_xv_help[] = "%A% ($Date: 1996/07/15 15:26:03 $, ) version $Revision$, 
 #include "misc.h"
 
 #define min(a,b) ((a) < (b) ? (a) : (b))
-#define HELP_LINES 8
+#define HELP_LINES 32
 
 /* The URL of the PIPS documentation at the École des Mines de Paris: */
 #define PIPS_DOCUMENTATION_URL "http://www.cri.ensmp.fr/~pips"
@@ -125,13 +125,48 @@ create_help_menu()
                     "The PIPS documentation",
                     MENU_GEN_PIN_WINDOW, main_frame, "Help Menu",
                     MENU_ITEM,
-                    MENU_STRING, "Few words about \"Workspace\"...",
+                    MENU_STRING, "A few introductory words...",
+                    MENU_CLIENT_DATA, strdup("Introduction"),
+                    MENU_NOTIFY_PROC, help_notify,
+                    NULL,
+                    MENU_ITEM,
+                    MENU_STRING, "A few words about \"Workspace\"...",
                     MENU_CLIENT_DATA, strdup("Workspace"),
                     MENU_NOTIFY_PROC, help_notify,
                     NULL,
                     MENU_ITEM,
-                    MENU_STRING, "Few words about \"Module\"...",
-                    MENU_CLIENT_DATA, strdup("Workspace"),
+                    MENU_STRING, "A few words about \"Module\"...",
+                    MENU_CLIENT_DATA, strdup("Module"),
+                    MENU_NOTIFY_PROC, help_notify,
+                    NULL,
+                    MENU_ITEM,
+                    MENU_STRING, "A few words about \"Directory\"...",
+                    MENU_CLIENT_DATA, strdup("Directory"),
+                    MENU_NOTIFY_PROC, help_notify,
+                    NULL,
+                    MENU_ITEM,
+                    MENU_STRING, "A few words about \"View\"...",
+                    MENU_CLIENT_DATA, strdup("View"),
+                    MENU_NOTIFY_PROC, help_notify,
+                    NULL,
+                    MENU_ITEM,
+                    MENU_STRING, "A few words about \"Transform/Edit\"...",
+                    MENU_CLIENT_DATA, strdup("Transform/Edit"),
+                    MENU_NOTIFY_PROC, help_notify,
+                    NULL,
+                    MENU_ITEM,
+                    MENU_STRING, "A few words about \"Compile\"...",
+                    MENU_CLIENT_DATA, strdup("Compile"),
+                    MENU_NOTIFY_PROC, help_notify,
+                    NULL,
+                    MENU_ITEM,
+                    MENU_STRING, "A few words about \"Options\"...",
+                    MENU_CLIENT_DATA, strdup("Options"),
+                    MENU_NOTIFY_PROC, help_notify,
+                    NULL,
+                    MENU_ITEM,
+                    MENU_STRING, "A few words about \"Log\"...",
+                    MENU_CLIENT_DATA, strdup("Log"),
                     MENU_NOTIFY_PROC, help_notify,
                     NULL,
                     /* Just a separator: */
