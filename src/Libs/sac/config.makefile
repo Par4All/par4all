@@ -4,7 +4,7 @@
 
 LIB_CFILES = \
 	simdizer.c varwidth.c codegen.c unroll.c operatorid.c \
-	treematch.c main.c
+	treematch.c atomizer.c main.c
 
 LIB_HEADERS = sac-local.h patterns.l patterns.y patterns.def
 
