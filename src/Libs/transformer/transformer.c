@@ -61,7 +61,7 @@ transformer_combine(
        debug level of 10. */
     ifdebug(10) pips_assert("consistent t1", transformer_consistency_p(t1));
 
-    pips_debug(8,"arg. t2=%x\n",t2);
+    pips_debug(8,"arg. t2=%p\n",t2);
     ifdebug(8) (void) dump_transformer(t2);
     ifdebug(10) pips_assert("consistent t2", transformer_consistency_p(t2));
 
@@ -104,7 +104,7 @@ transformer_combine(
     ifdebug(9) {
 	(void) fprintf(stderr, "%s: %s", "[transformer_combine]",
 		       "global linear system r1 before projection\n");
-	sc_fprint(stderr, r1, dump_value_name);
+	sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
 	sc_dump(r1);
     }
     
@@ -119,13 +119,13 @@ transformer_combine(
 		ifdebug(9) {
 		    pips_debug(9, "expensive projection on %s with\n",
 			       entity_local_name(e_temp));
-		    sc_fprint(stderr, r1,entity_local_name);
+		    sc_fprint(stderr, r1, (char * (*)(Variable)) entity_local_name);
 		}
 		sc_elim_var(r1,(Variable) e_temp);
 		sc_base_remove_variable(r1,(Variable) e_temp);
 		ifdebug(9) {
 		    pips_debug(9, "simplified tranformer\n");
-		    sc_fprint(stderr, r1,entity_local_name);
+		    sc_fprint(stderr, r1,(char * (*)(Variable)) entity_local_name);
 		}
 	    }
 	    else {		   
@@ -159,7 +159,7 @@ transformer_combine(
 
     ifdebug(9) {
 	pips_debug(9, "global linear system r1 after projection\n");
-	sc_fprint(stderr, r1, dump_value_name);
+	sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
 	sc_dump(r1);
     }
 
@@ -172,7 +172,7 @@ transformer_combine(
     predicate_system(transformer_relation(t1)) = r1;
 
      
-    pips_debug(8,"res. t1=%x\n",t1);
+    pips_debug(8,"res. t1=%p\n",t1);
     ifdebug(8) dump_transformer(t1);
     pips_debug(8,"end\n");
 
@@ -187,7 +187,7 @@ transformer_normalize(transformer t, int level)
 
   if (!sc_empty_p(r)) {
     Pbase b = base_dup(sc_base(r));
-    Pbase r2 = sc_dup(r);
+    Psysteme r2 = sc_dup(r);
     /* Select one tradeoff between speed and accuracy:
      * enumerated by increasing speeds according to Beatrice
      */
@@ -275,6 +275,13 @@ transformer_normalize(transformer t, int level)
 	   * inequalities!
 	   */
 	  r = sc_normalize(r);
+	  break;
+	  
+	case 8:
+	  /* Very expensive: the system is rebuilt by adding constraints
+	   * one by one
+	   */
+	  r = sc_safe_build_sc_nredund_1pass(r);
 	  break;
 	  
 	default:
@@ -393,7 +400,7 @@ transformer_projection_with_redundancy_elimination(
 	ifdebug(9) {
 	  pips_debug(9, "System after projection of %s\n", entity_name(e));
 	  /* sc_fprint(stderr, r, exernal_value_name); */
-	  sc_fprint(stderr, r, entity_local_name);
+	  sc_fprint(stderr, r, (char * (*)(Variable)) entity_local_name);
 	}
       }
 
@@ -452,10 +459,10 @@ transformer transformer_apply(transformer tf, transformer pre)
 
     pips_debug(8,"begin\n");
     pips_assert("tf is not undefined", tf!=transformer_undefined);
-    pips_debug(8,"tf=%x\n", tf);
+    pips_debug(8,"tf=%p\n", tf);
     ifdebug(8) (void) print_transformer(tf);
     pips_assert("pre is not undefined", pre!=transformer_undefined);
-    pips_debug(8,"pre=%x\n", pre);
+    pips_debug(8,"pre=%p\n", pre);
     ifdebug(8) (void) print_transformer(pre);
 
     /* post = tf o pre ; pre would be modified by transformer_combine */
@@ -463,7 +470,7 @@ transformer transformer_apply(transformer tf, transformer pre)
     post = transformer_combine(copy_pre, tf);
 
     pips_assert("post is not undefined", post!=transformer_undefined);
-    pips_debug(8,"post=%x\n", post);
+    pips_debug(8,"post=%p\n", post);
     ifdebug(8) (void) print_transformer(post);
     pips_assert("unexpected sharing",post != pre);
     pips_debug(8,"end\n");
