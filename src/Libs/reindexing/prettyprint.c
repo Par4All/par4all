@@ -89,19 +89,12 @@ statement make_layout_statement(ae, serial, news)
   } 
   sprintf(comment, "%s)\n", comment);
  
-  stat = make_statement(entity_empty_label(),
-			STATEMENT_NUMBER_UNDEFINED,
-			STATEMENT_ORDERING_UNDEFINED,
-			comment, 
-			make_instruction_block(NIL));
+  stat = make_nop_statement();
+  insert_comments_to_statement(stat, comment);
   lstat = CONS(STATEMENT, stat, lstat);
  
   /* put all the pieces of lstat in one statement */
-  ins = make_instruction_block(lstat);
-  stat = make_statement(entity_empty_label(),
-			STATEMENT_NUMBER_UNDEFINED,
-			STATEMENT_ORDERING_UNDEFINED,
-			string_undefined, ins);
+  stat = make_block_statement(lstat);
 
   if(get_debug_level() > 1)
     fprintf(stderr, 
@@ -141,19 +134,12 @@ statement make_shared_statement(ae, serial, news)
   } 
   sprintf(comment, "%s)\n", comment);
  
-  stat = make_statement(entity_empty_label(),
-			STATEMENT_NUMBER_UNDEFINED,
-			STATEMENT_ORDERING_UNDEFINED,
-			comment, 
-			make_instruction_block(NIL));
+  stat = make_nop_statement();
+  insert_comments_to_statement(stat, comment);
   lstat = CONS(STATEMENT, stat, lstat);
  
   /* put all the pieces of lstat in one statement */
-  ins = make_instruction_block(lstat);
-  stat = make_statement(entity_empty_label(),
-			STATEMENT_NUMBER_UNDEFINED,
-			STATEMENT_ORDERING_UNDEFINED,
-			string_undefined, ins);
+  stat = make_block_statement(lstat);
 
   if(get_debug_level() > 1)
     fprintf(stderr, 
