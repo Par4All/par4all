@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1996/06/22 10:33:51 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1996/07/16 15:33:29 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -24,8 +24,9 @@
 #ifndef LIST_INCLUDED
 #define LIST_INCLUDED
 
-#include <sys/stdtypes.h>   /* for size_t, used in malloc.h from malloclib */
-#include "malloc.h"
+/* for size_t, used in malloc.h from malloclib */
+/* #include <sys/stdtypes.h> */
+/* #include "malloc.h" */
 
 typedef struct cons { 
   gen_chunk car; 
