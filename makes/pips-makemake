@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.301  1997/08/18 10:38:07  coelho
+# Am I tired?;-)
+#
 # Revision 1.300  1997/08/18 10:35:34  coelho
 # full path to main object file is needed for linking.
 #
@@ -564,7 +567,7 @@ test: all
 	#
 	# building a local PIPS
 	#
-	\$(LINK) \$(ARCH)/pips \$(ROOT)/\$(ARCH)/\$(PIPS_MAIN) \\
+	\$(LINK) \$(ARCH)/pips \$(ROOT)/Lib/\$(ARCH)/\$(PIPS_MAIN) \\
 	    -lpips \$(PIPS_LIBS) 
 	@echo 
 
@@ -573,7 +576,7 @@ wtest: all
 	# building a local WPIPS
 	#
 	\$(LINK) \$(ARCH)/wpips \$(WPIPS_ADDED_LDFLAGS) \\
-	    \$(ROOT)/\$(ARCH)/\$(WPIPS_MAIN) \\
+	    \$(ROOT)/Lib/\$(ARCH)/\$(WPIPS_MAIN) \\
 		-lwpips \$(PIPS_LIBS) \$(WPIPS_ADDED_LIBS)
 	@echo 
 
@@ -581,7 +584,7 @@ ttest: all
 	#
 	# building a local TPIPS
 	#
-	\$(LINK) \$(ARCH)/tpips \$(ROOT)/\$(ARCH)/\$(TPIPS_MAIN) \\
+	\$(LINK) \$(ARCH)/tpips \$(ROOT)/Lib/\$(ARCH)/\$(TPIPS_MAIN) \\
 	    -ltpips \$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS)
 	@echo 
 
@@ -589,7 +592,7 @@ ftest: all
 	#
 	# building a local Full PIPS
 	#
-	\$(LINK) \$(ARCH)/fpips \$(ROOT)/\$(ARCH)/\$(FPIPS_MAIN) \\
+	\$(LINK) \$(ARCH)/fpips \$(ROOT)/Lib/\$(ARCH)/\$(FPIPS_MAIN) \\
 	    -lfpips -lpips -ltpips -lwpips \$(PIPS_LIBS) \\
 	    \$(TPIPS_ADDED_LIBS) \$(WPIPS_ADDED_LIBS) \$(PIPS_X11_ADDED_LIBS)
 	#
