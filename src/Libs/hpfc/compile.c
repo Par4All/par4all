@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/11/17 14:19:11 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/11/28 14:45:01 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -65,13 +65,13 @@ hpfc_find_a_not_compiled_module (void)
     entity module;
     
     MAPL(ce,
-	 {
-	     module = ENTITY(CAR(ce));
-	     
-	     if (entity_hpfc_already_compiled_undefined_p(module))
-		 return(module_local_name(module));
-	 },
-	     the_modules);
+     {
+	 module = ENTITY(CAR(ce));
+	 
+	 if (entity_hpfc_already_compiled_undefined_p(module))
+	     return(module_local_name(module));
+     },
+	 the_modules);
 
     return(string_undefined);
 }
@@ -160,7 +160,7 @@ set_resources_for_module (string module_name)
 	     !hpfc_entity_reduction_p(callee) &&
 	     !hpfc_intrinsic_like_function(callee))
 	 {
-	     debug(5, "set_resources_for_module", 
+	     debug(4, "set_resources_for_module", 
 		   "callee %s to be {host,node}ify\n", entity_name(callee));
 
 	     make_host_and_node_modules(callee);
@@ -255,7 +255,8 @@ put_generated_resources_for_common (entity common)
 }
 
 void 
-put_generated_resources_for_module (statement stat, statement host_stat, statement node_stat)
+put_generated_resources_for_module(stat, host_stat, node_stat)
+statement stat, host_stat, node_stat;
 {
     FILE 
 	*host_file,
@@ -482,13 +483,12 @@ hpfcompile_module (string module_name)
 
     update_object_for_module(node_stat, node_module);
     update_object_for_module(host_stat, host_module);
-    insure_declaration_coherency(node_module, node_stat);
-    insure_declaration_coherency(host_module, host_stat);
 
-    /*
-    DeduceGotos(host_stat, get_host_gotos_map());
-    DeduceGotos(node_stat, get_node_gotos_map());
-    */
+    insure_declaration_coherency(node_module, node_stat);
+    update_object_for_module(entity_code(node_module), node_module);
+
+    insure_declaration_coherency(host_module, host_stat);
+    update_object_for_module(entity_code(host_module), host_module);
 
     put_generated_resources_for_module(module_stat, host_stat, node_stat);
     
@@ -528,7 +528,6 @@ hpfcompile (char *module_name)
 
     /*    COMMONS
      */
-
     set_bool_property("PRETTYPRINT_COMMONS", TRUE); 
     db_set_current_module_name(module_name);
 
@@ -553,7 +552,8 @@ ReadHpfDir (string module_name)
 {
     debug(8,"ReadHpfDir", "module: %s\n", module_name);
     
-    /* filter */
+    /* filter 
+     */
     hpfcparser(module_name);
     
 }
@@ -600,16 +600,40 @@ make_host_and_node_modules (entity module)
 	host = make_empty_subroutine(hpfc_host_local_name(name));
 	node = make_empty_subroutine(hpfc_node_local_name(name));
 
-	/* ??? the arity is not initialized.
+	/*  Arity and result
 	 */
+	update_functional_as_model(host, module);
+	update_functional_as_model(node, module);
 
 	if (entity_function_p(module))
 	{
-	    update_result_type_as_model(host, module);
-	    update_result_type_as_model(node, module);
-	}
-    }
+	    /* then the variable corresponding to the function name
+	     * must be created for those new functions. The overloaded
+	     * basic is used to be sure that the variable will not be put 
+	     * in the declarations by the enforced coherency. 
+	     * ??? this issue could be managed by the coherency function ?
+	     */
+	    string
+		var_name = concatenate(name, MODULE_SEP_STRING, name, NULL),
+		tmp_name;
+	    entity
+		var = gen_find_tabulated(var_name, entity_domain),
+		new = entity_undefined;
 
+	    pips_assert("make_host_and_node_modules",
+			!entity_undefined_p(var));
+
+	    tmp_name = entity_local_name(host);
+	    new = find_or_create_scalar_entity(tmp_name, tmp_name, 
+					       is_basic_overloaded);
+	    store_new_host_variable(new, var);
+
+	    tmp_name = entity_local_name(node);
+	    new = find_or_create_scalar_entity(tmp_name, tmp_name, 
+					       is_basic_overloaded);
+	    store_new_node_variable(new, var);
+	}		
+    }
 
     /*  to allow the update of the call sites.
      */
