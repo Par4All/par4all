@@ -1023,6 +1023,7 @@ test_to_postcondition(
 	 * just in case another core dump occurs (25 April 1997).
 	 */
 	if(!empty_statement_p(sf)||TRUE) {
+	  
 	    pref = precondition_add_condition_information(transformer_dup(pre),e,
 							  FALSE);
 	    /* transformer_normalize(pref, 3); */
