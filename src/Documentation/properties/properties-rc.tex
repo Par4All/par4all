@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.140  2000/05/16 16:35:58  coelho
+%% props added for type checker...
+%%
 %% Revision 1.139  2000/04/28 09:57:11  quoc
 %% Added new property: DECLARATION_TABLE_DISPLAY_STATISTICS
 %%
@@ -125,7 +128,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2000/04/28 09:57:11 $~$
+$~$Date: 2000/05/16 16:35:58 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1641,6 +1644,16 @@ PARTIAL_EVAL_LOGICAL_EXPRESSIONS FALSE
 PARTIAL_EVAL_PROPAGATE_INTEGER_CONSTANTS TRUE
 \end{verbatim}
 
+\subsection{Type Checker}
+
+Here are type checker options. Whether to deal with double complex or to
+refuse them. Whether to add a summary of errors, conversions and
+simplifications as a comment to the routine.
+
+\begin{verbatim}
+TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION FALSE
+TYPE_CHECKER_ADD_SUMMARY FALSE
+\end{verbatim}
 
 %%
 %% PRETTYPRINTER
