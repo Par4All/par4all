@@ -7,6 +7,10 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.101  2003/08/04 16:54:24  irigoin
+ * Mostly, addition of code to process PIPS_SRCPATH. Plus some more error
+ * detection and propagation.
+ *
  * Revision 1.100  2003/08/01 06:00:25  irigoin
  * Intermediate version installed to let Production link
  *
@@ -709,10 +713,37 @@ static bool dot_c_file_p(string name)
  * Returns NULL if cpp fails.
  */
 
+/* The structure of the string is not checked. Funny results to be expected for strings starting or ending with ':' and containing lots of SPACES*/
+static int colon_number(string s)
+{
+  int number = s? 1: 0;
+  string new_s = s;
+  char c;
+
+  while((c=*new_s++))
+    if(c==':' && new_s!=s+1 && *new_s!='\000')
+      number++;
+
+  return number;
+}
+
 static string process_thru_C_cpp(string name)
 {
     string dir_name, new_name, simpler, cpp_options, cpp, cpp_err;
+    int status = 0;
+    string includes = getenv(SRCPATH);
+    string new_includes = includes; /* pointer towards the current
+                                       character in includes. */
+    int include_option_length = 5+strlen(includes)+3*colon_number(includes)+1+1;
+    /* Dynamic size, gcc only? Use malloc() instead */
+    char include_options[include_option_length];
+    /* Pointer to the current end of include_options: */
+    string new_include_options = string_undefined;
+    /* Pointer to the beginning of include_options, for debugging purposes: */
+    string old_include_options = &include_options[0]; 
 
+    (void) strcpy(old_include_options, "-I. ");
+    new_include_options = include_options+strlen(include_options);
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".c");
     new_name = strdup(concatenate(dir_name, "/", simpler, CPP_C_ED, 0));
@@ -722,19 +753,53 @@ static string process_thru_C_cpp(string name)
 
     cpp = getenv(CPP_PIPS_ENV);
     cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
-    
-    /* Note: the cpp used **must** know somehow about Fortran
-     * and its lexical and comment conventions. This is ok with gcc
-     * when g77 is included. Otherwise, "'" appearing in Fortran comments
-     * results in errors to be reported.
-     * Well, the return code could be ignored maybe, but I prefer not to.
-     */
-    safe_system(concatenate("/usr/local/bin/gcc "/* cpp? cpp: CPP_CPP  */,
-			    "-E " /* CPP_CPPFLAGS, cpp_options? cpp_options: ""*/, 
-			    name, " > ", new_name, " 2> ", cpp_err, 
-			    " && cat ", cpp_err, 
+
+    /* Convert PIPS_SRCPATH syntax to gcc -I syntax */
+    /* Could have reused nth_path()... */
+    if (includes && *includes) {
+      (void) strcat(old_include_options, " -I");
+      new_include_options += 3;
+      do {
+	/* Skip leading and trailing colons. */
+	if(*new_includes==':' && new_includes!=includes+1 && *new_includes!='\000') {
+	  new_includes++;
+	  *new_include_options = '\000';
+	  new_include_options = strcat(new_include_options, " -I");
+	  new_include_options += 3;
+	}
+	else
+	  *new_include_options++ = *new_includes++;
+      } while(includes && *new_includes);
+    }
+    *new_include_options++ = ' ';
+    *new_include_options++ = '\000';
+
+    pips_assert("include_options is large enough",
+		strlen(include_options) < include_option_length);
+
+    pips_debug(1, "PIPS_SRCPATH=\"%s\"\n", includes);
+    pips_debug(1, "INCLUDE=\"%s\"\n", include_options);
+
+
+    status = safe_system_no_abort
+      (concatenate("/usr/local/bin/gcc "/* cpp? cpp: CPP_CPP  */,
+		   "-E -C " /* CPP_CPPFLAGS, cpp_options? cpp_options: ""*/, 
+		   old_include_options,
+		   name, " > ", new_name, " 2> ", cpp_err, 0));
+
+    if(status) {
+      (void) safe_system_no_abort
+	(concatenate("cat ", cpp_err, 0));
+
+      /* check "test" could be performed before "cat" but not after, and
+	 the error file may be useful for the user. Why should we remove
+	 it so soon?
+
 			    " && test ! -s ", cpp_err, 
-			    " && rm -f ", cpp_err, 0));
+			    " && rm -f ", cpp_err, 0)); */
+      free(new_name);
+      new_name = NULL;
+    }
 
     return new_name;
 }
@@ -759,6 +824,15 @@ static string process_thru_fortran_cpp(string name)
      * results in errors to be reported.
      * Well, the return code could be ignored maybe, but I prefer not to.
      */
+
+    /* FI->FC: it should be a safe_system_no_abort(). Errors are
+       supposedly displayed... but their display is skipped because of the
+       return code of the first process and pips_internal_error is
+       executed!. PIPS_SRCPATH is not used to find the include files. A
+       pips_user_error is not caught at the process_user_file level.
+
+       See preprocessor/Validation/csplit09.tpips */
+
     safe_system(concatenate(cpp? cpp: CPP_CPP, 
 			    CPP_CPPFLAGS, cpp_options? cpp_options: "", 
 			    name, " > ", new_name, " 2> ", cpp_err, 
@@ -875,6 +949,10 @@ bool process_user_file(string file)
   if (cpp_processed_p) {
     user_log("Preprocessing file %s\n", initial_file);
     nfile = process_thru_cpp(initial_file);
+    if(nfile==NULL) {
+      pips_user_warning("Cannot preprocess file: %s\n", initial_file);
+      return FALSE;
+    }
   }
   else if(!dot_f_file_p(nfile)) {
     pips_user_error("Unexpected file extension\n");
