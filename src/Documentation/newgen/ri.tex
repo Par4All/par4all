@@ -383,10 +383,14 @@ rattachement est donc \verb/TOP-LEVEL/.
 
 Field {\tt size} is the amount of memory space expressed in bytes, or
 according to the Fortran standard in {\em character storage unit}
-(X3.9-1978, \S~2.13), which is required to allocate the area in
-memory. This space is the largest space encountered in all modules of a
-program. At some stages, PIPS used to enforce a unique size for all
-declarations of a common, but this is not true in the current version.
+(X3.9-1978, \S~2.13), which is required to allocate the area in memory.
+This space is the largest\footnote{It may even be larger than the space
+  required in any module if some typing information is given after the
+  common declaration and results in smaller variables in the common. For
+  instance variables implicitly REAL could be redeclared CHARACTER*1.}
+space encountered in all modules of a program. At some stages, PIPS used
+to enforce a unique size for all declarations of a common, but this is not
+true in the current version which only emits a warning.
 
 \begin{comment}
 Le sous-domaine {\tt size} donne la taille de l'aire
@@ -395,12 +399,13 @@ X3.9-1978, \S~2.13). Cette taille est la taille maximum rencontrée
 parmi les modules d'un programme. 
 \end{comment}
 
-Field {\tt layout} is the list of variables declared allocated in the
+Field {\tt layout} is the list of all variables declared allocated in the
 area. These variables may have been declared in different modules, where
-the common itself is declared. Their names are non-ambiguous because
-PIPS entity names include a package name as prefix. Their offsets in the
-common are stored in Type {\tt storage} (see
-Section~\ref{subsubsection-ram}).
+the common itself is declared. They may have been declared explicitly in a
+COMMON declaration or implicitly through EQUIVALENCE declarations. Their
+names are non-ambiguous because PIPS entity names include a package name
+as prefix. Their offsets in the common are stored in Type {\tt storage}
+(see Section~\ref{subsubsection-ram}).
 
 \begin{comment}
 Le sous-domaine {\tt layout} donne la
@@ -408,12 +413,22 @@ liste des entités stockées dans cette aire. Il s'agit des variables
 déclarées dans ce common dans n'importe quel module.
 \end{comment}
 
-As long as no program transformation has been applied, the textual ordre
-for declarations is preserved in the layout list. This can be used to
-regenerate declarations close to the programmer declarations. To provide
-the best possible user-friendliness, programmer declarations are in fact
-stored as a huge string which is used by prettyprinter as long as it is
-consistent with the code.
+As long as no program transformation has been applied, the textual order
+for common declarations is preserved in the layout list. This can be used
+to regenerate declarations close to the programmer declarations. Note that
+equivalenced variables appear {\em after} all variables explictly declared
+in a common\footnote{This is not true for the *dynamic* area used to
+  allocate stack variables. The bug should be fixed... soon.}. It is
+possible to detect the first implicit variable by checking that the
+increasing offsets of variables is suddenly no longer increasing. The
+first variable whose offset is less than or equal to the previous offset
+is the first variable declared in the common through an {\tt EQUIVALENCE}
+statement. All variables declared in the same module and appearing beyond
+this one also have been declared with an {\tt EQUIVALENCE} statement.
+
+To provide the best possible user-friendliness, remember that programmer
+declarations are in fact stored as a huge string which is used by
+prettyprinter as long as it is consistent with the code.
 
 \begin{comment}
 L'ordre des déclarations des variables est respecté, ce qui
