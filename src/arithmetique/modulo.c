@@ -1,7 +1,7 @@
 /* package arithmetique 
  *
  * $RCSfile: modulo.c,v $ (version $Revision$)
- * $Date: 1996/07/16 22:04:39 $, 
+ * $Date: 1996/07/18 19:22:06 $, 
  */
 
 /*LINTLIBRARY*/
@@ -49,7 +49,7 @@ Value modulo_fast(Value a, Value b)
     /* translation de a pour acces a la look-up table */
 
     Value mod;    /* valeur du modulo C */
-    assert(VALUE_NOTZERO_P(b));
+    assert(value_notzero_p(b));
 
     /* premier changement de signe, ne changeant pas le resultat */
     b = value_abs(b);
@@ -74,7 +74,7 @@ Value modulo_fast(Value a, Value b)
     else {
 	/* calcul effectif du modulo: attention, portabilite douteuse */
 	mod = value_mod(a,b);
-	mod = VALUE_NEG_P(mod)? value_minus(b,mod): mod;
+	mod = value_neg_p(mod)? value_minus(b,mod): mod;
     }
 
     return mod;
