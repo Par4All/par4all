@@ -30,4 +30,5 @@
 #define ICFG_DECOR_IN_REGIONS 7
 #define ICFG_DECOR_OUT_REGIONS 8
 
-#endif /* ICFG_INCLUDED */
+/* ENDIF ICFG_INCLUDED */
+#endif
