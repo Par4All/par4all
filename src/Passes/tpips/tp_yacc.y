@@ -46,8 +46,10 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>     
+#include <sys/param.h>
 #include <unistd.h>
-#include <string.h>
+
 
 #include "genC.h"
 
@@ -95,6 +97,14 @@ close_workspace_if_opened(void)
 {
     if (db_get_current_workspace_name() != NULL)
 	close_workspace();
+}
+
+static void
+set_env(string var, string val)
+{
+    string ival = getenv(var);
+    if (!ival || !same_string_p(val, ival))
+	putenv(strdup(concatenate(var, "=", val)));
 }
 
 %}
@@ -158,13 +168,13 @@ i_getenv: GET_ENVIRONMENT NAME
 
 i_setenv: SET_ENVIRONMENT NAME NAME
 	{
-	    setenv($2, $3, 1);
+	    set_env($2, $3);
 	    user_log("setenv %s %s\n", $2, $3);
 	    free($2); free($3);
 	}
 	| SET_ENVIRONMENT NAME EQUAL NAME
 	{
-	    setenv($2, $4, 1);
+	    set_env($2, $4);
 	    user_log("setenv %s %s\n", $2, $4);
 	    free($2); free($4);
 	}
