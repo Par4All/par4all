@@ -178,18 +178,11 @@ entity_minimal_name(e)
 entity e;
 {
     entity m = get_current_module_entity();
-    string name;
 
-    if (entity_undefined_p(m))
-	/* when called thru the icfg/regions, there is no current entity... 
-	 * thus safely returns the entity name...
-	 */
-	name = entity_name(e);
-    else 
-	name = (strcmp(module_local_name(m), entity_module_name(e)) == 0) ? 
+    pips_assert("some current entity", !entity_undefined_p(m));
+
+    return (strcmp(module_local_name(m), entity_module_name(e)) == 0) ? 
 	    entity_local_name(e) : entity_name(e) ;
-
-    return name;
 }
 
 bool 
