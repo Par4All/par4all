@@ -2,7 +2,7 @@
  *
  *  (c) Fabien COELHO - march 1995
  *
- *  $RCSfile: graph.c,v $ ($Date: 1995/03/28 16:22:42 $, )
+ *  $RCSfile: graph.c,v $ ($Date: 1995/05/05 16:40:03 $, )
  *  version $Revision$
  */
 
@@ -35,7 +35,9 @@ void clean_ctrl_graph()
 {
     CONTROLMAP_MAP(s, c, 
       {
-	  debug(7, "clean_crtl_graph", "statement 0x%x\n", (unsigned int) s);
+	  debug(7, "clean_crtl_graph", "statement (%d,%d)\n", 
+		ORDERING_NUMBER(statement_ordering(s)),
+		ORDERING_STATEMENT(statement_ordering(s)));
 
 	  control_statement(c) = statement_undefined;
 	  gen_free_list(control_successors(c)); control_successors(c) = NIL;
@@ -59,7 +61,11 @@ statement s1, s2;
 	c2 = load_ctrl_graph(s2);
 
     debug(7, "add_arrow_in_ctrl_graph",
-	  "0x%x -> 0x%x\n", (unsigned int) s1, (unsigned int) s2);
+	  "(%d,%d) -> (%d,%d)\n", 
+	  ORDERING_NUMBER(statement_ordering(s1)),
+	  ORDERING_STATEMENT(statement_ordering(s1)),
+	  ORDERING_NUMBER(statement_ordering(s2)),
+	  ORDERING_STATEMENT(statement_ordering(s2)));
 
     control_successors(c1) = gen_once(c2, control_successors(c1));
     control_predecessors(c2) = gen_once(c1, control_predecessors(c2));
@@ -170,6 +176,9 @@ list /* of statements */ next;
 	    blocks = NIL,
 	    lstat = NIL;	
 	statement x;
+	control c_in = unstructured_control(u);
+
+	add_arrow_in_ctrl_graph(s, control_statement(c_in));
 
 	/* hmmm... I'm not too confident in this loop.
 	 * ??? what should be done with next?
@@ -184,7 +193,7 @@ list /* of statements */ next;
 		    statement_arrows(x, lstat);
 		    gen_free_list(lstat);
 		},
-		    unstructured_control(u),
+		    c_in,
 		    blocks);
 
 	gen_free_list(blocks);
@@ -207,17 +216,15 @@ statement s;
 void build_full_ctrl_graph(s)
 statement s;
 {
-    debug(3, "build_full_ctrl_graph", "statement 0x%x\n", (unsigned int) s);
+    debug(3, "build_full_ctrl_graph", "statement (%d,%d)\n", 
+	  ORDERING_NUMBER(statement_ordering(s)), 
+	  ORDERING_STATEMENT(statement_ordering(s)));
 
     /*  first pass to initialize the ctrl_graph controls
      */
     init_ctrl_graph();
     gen_multi_recurse(s,
-		      /*  STATEMENT
-		       */
-		      statement_domain,
-		      gen_true,
-		      stmt_rewrite,
+		      statement_domain, gen_true, stmt_rewrite, /* STATEMENT */
 		      NULL);
 
     /*  second pass to link the statements
