@@ -5,6 +5,15 @@
 #include "boolean.h"
 #include "arithmetique.h"
 
+#define MAX_STACKED_CONTEXTS 20
+jmp_buf global_exception_stack[MAX_STACKED_CONTEXTS];
+int     global_exception_type[MAX_STACKED_CONTEXTS];
+int     global_exception_index = 0;
+int     global_exception_thrown = 0;
+
+int overflow_error = 1;
+int simplex_arithmetic_error = 2;
+
 void throw_exception(what)
 int what;
 {
