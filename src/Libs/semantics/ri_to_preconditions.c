@@ -1151,10 +1151,12 @@ transformer_add_condition_information_updown(
 #   define DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN 7
     /* default option: no condition can be added */
     transformer newpre = pre;
+    syntax s = expression_syntax(c);
 
     /* check first that c's effects are purely reads on integer scalar
        variable; I'm not sure I'm reusing Remi's function well... */
-    cons * ef = proper_effects_of_expression(c);
+
+    /*   cons * ef = proper_effects_of_expression(c); */
 
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
 	debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
@@ -1166,111 +1168,137 @@ transformer_add_condition_information_updown(
 	print_transformer(pre);
     }
 
-    if(integer_scalar_read_effects_p(ef)) {
-	syntax s = expression_syntax(c);
-	if(syntax_call_p(s)) {
-	    entity e = call_function(syntax_call(s));
-	    /* do not factor out c1/e1 and c2/e2 initialization; they do not
-	       exist for all calls */
-	    if(ENTITY_RELATIONAL_OPERATOR_P(e)) {
-		expression e1 = 
-		    EXPRESSION(CAR(call_arguments(syntax_call(s))));
-		expression e2 = 
-		    EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-		newpre = transformer_add_relation_information(pre, e, e1, e2, 
-							      veracity, upwards);
-	    }
-	    else if(ENTITY_AND_P(e)) {
-		/* call transformer_add_condition_information recursively
-		 * on both sub-expressions if veracity == TRUE; else
-		 * try your best...
-		 */
-		if(veracity) {
-		    /* FI: this is a bit confusing because of aliasing conditions.
-		     * The second condition is added after the first one was analyzed
-		     * and the "and" effect is enforced by side effect
-		     *
-		     * This is equivalent to allocating copies of pre and then computing
-		     * their intersection.
-		     */
-		    transformer pre1 = pre;
-		    transformer pre2 = pre;
-		    expression c1 = 
-			EXPRESSION(CAR(call_arguments(syntax_call(s))));
-		    expression c2 = 
-			EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-		    pre1 = transformer_add_condition_information_updown
-			(pre1, c1, veracity, upwards);
-		    pre2 = transformer_add_condition_information_updown
-			(pre2, c2, veracity, upwards);
-		    newpre = pre2;
-		}
-		else if(!upwards) {
-		    /* compute !(c1&&c2) as !c1 || !c2 */
-		    transformer pre1 = transformer_dup(pre);
-		    transformer pre2 = pre;
-		    expression c1 = 
-			EXPRESSION(CAR(call_arguments(syntax_call(s))));
-		    expression c2 = 
-			EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-		    pre1 = transformer_add_condition_information_updown
-			(pre1, c1, veracity, upwards);
-		    pre2 = transformer_add_condition_information_updown
-			(pre2, c2, veracity, upwards);
-		    newpre = transformer_convex_hull(pre1, pre2);
+    /* The following test is not right or too early: if in the while loop condition, 
+       there are 2 or more sub-expressions (e1.AND.e2 , e1.OR.e2 , ....) that one of 
+       them does not have integer scalar read effects, the informations of others 
+       are not counted !!!  */
 
-		    ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
-			debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN, "transformer_add_condition_information_updown", "pre1 =\n");
-			(void) (void) print_transformer(pre1);
-			debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN, "transformer_add_condition_information_updown", "pre2 =\n");
-			(void) (void) print_transformer(pre2);
-			debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN, "transformer_add_condition_information_updown", "newpre =\n");
-			(void) (void) print_transformer(newpre);
-		    }
+    /*   if(integer_scalar_read_effects_p(ef)) */
+
+    
+    if(syntax_call_p(s)) 
+      {
+	entity e = call_function(syntax_call(s));
+	/* do not factor out c1/e1 and c2/e2 initialization; they do not
+	   exist for all calls */
+	if(ENTITY_RELATIONAL_OPERATOR_P(e)) 
+	  {
+	    expression e1 = 
+	      EXPRESSION(CAR(call_arguments(syntax_call(s))));
+	    expression e2 = 
+	      EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
+	    cons * ef1 = proper_effects_of_expression(e1);
+	    cons * ef2 = proper_effects_of_expression(e2);
+	
+	    if(integer_scalar_read_effects_p(ef1) && integer_scalar_read_effects_p(ef2))  
+	      newpre = transformer_add_relation_information(pre, e, e1, e2, 
+							veracity, upwards);
+	    //    free_effect(ef1);
+	    //    free_effect(ef2);
+	  }
+	else 
+	  if(ENTITY_AND_P(e)) {
+	    /* call transformer_add_condition_information recursively
+	     * on both sub-expressions if veracity == TRUE; else
+	     * try your best...
+	     */
+	    if(veracity) 
+	      {
+		/* FI: this is a bit confusing because of aliasing conditions.
+		 * The second condition is added after the first one was analyzed
+		 * and the "and" effect is enforced by side effect
+		 *
+		 * This is equivalent to allocating copies of pre and then computing
+		 * their intersection.
+		 */
+		transformer pre1 = pre;
+		transformer pre2 = pre;
+		expression c1 = 
+		  EXPRESSION(CAR(call_arguments(syntax_call(s))));
+		expression c2 = 
+		  EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
+	  
+		pre1 = transformer_add_condition_information_updown
+		  (pre1, c1, veracity, upwards);
+	  
+		pre2 = transformer_add_condition_information_updown
+		  (pre2, c2, veracity, upwards);
+		newpre = pre2;
+	      }
+	    else 
+	      if(!upwards) 
+		{
+		  /* compute !(c1&&c2) as !c1 || !c2 */
+		  transformer pre1 = transformer_dup(pre);
+		  transformer pre2 = pre;
+		  expression c1 = 
+		    EXPRESSION(CAR(call_arguments(syntax_call(s))));
+		  expression c2 = 
+		    EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
+		  pre1 = transformer_add_condition_information_updown
+		    (pre1, c1, veracity, upwards);
+		  pre2 = transformer_add_condition_information_updown
+		    (pre2, c2, veracity, upwards);
+		  newpre = transformer_convex_hull(pre1, pre2);
+		  
+		  ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
+		    debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN, "transformer_add_condition_information_updown", "pre1 =\n");
+		    (void) (void) print_transformer(pre1);
+		    debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN, "transformer_add_condition_information_updown", "pre2 =\n");
+		    (void) (void) print_transformer(pre2);
+		    debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN, "transformer_add_condition_information_updown", "newpre =\n");
+		    (void) (void) print_transformer(newpre);
+		  }
 		}
-		else {
-		    /* might be possible to add a convex hull on the initial values
-		     * as in !upwards
-		     */
-		    ;
+	      else 
+		{
+		  /* might be possible to add a convex hull on the initial values
+		   * as in !upwards
+		   */
+		  ;
 		}
-	    }
-	    else if(ENTITY_OR_P(e)) {
+	  }
+	  else 
+	    if(ENTITY_OR_P(e)) 
+	      {
 		/* call transformer_add_condition_information recursively
 		 * on both sub-expressions if veracity == FALSE; else
 		 * try to do your best...
 		 *
 		 * Should be fused with the .AND. case?!? Careful with veracity...
 		 */
-		if(!veracity) {
+		if(!veracity) 
+		  {
 		    /* compute !(c1||c2) as !c1 && !c2 */
 		    expression c1 = 
-			EXPRESSION(CAR(call_arguments(syntax_call(s))));
+		      EXPRESSION(CAR(call_arguments(syntax_call(s))));
 		    expression c2 = 
-			EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
+		      EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
 		    newpre = transformer_add_condition_information_updown
-			(pre, c1, veracity, upwards);
+		      (pre, c1, veracity, upwards);
 		    newpre = transformer_add_condition_information_updown
-			(newpre, c2, veracity, upwards);
-		}
-		else if(!upwards) {
-		    /* compute (c1||c2) as such */
-		    transformer pre1 = transformer_dup(pre);
-		    transformer pre2 = pre;
-		    expression c1 = 
+		      (newpre, c2, veracity, upwards);
+		  }
+		else 
+		  if(!upwards) 
+		    {
+		      /* compute (c1||c2) as such */
+		      transformer pre1 = transformer_dup(pre);
+		      transformer pre2 = pre;
+		      expression c1 = 
 			EXPRESSION(CAR(call_arguments(syntax_call(s))));
-		    expression c2 = 
+		      expression c2 = 
 			EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-		    pre1 = transformer_add_condition_information_updown
+		      pre1 = transformer_add_condition_information_updown
 			(pre1, c1, veracity, upwards);
-		    pre2 = transformer_add_condition_information_updown
+		      pre2 = transformer_add_condition_information_updown
 			(pre2, c2, veracity, upwards);
-		    newpre = transformer_convex_hull(pre1, pre2);
-
-		    /* free_transformer(pre1); */
-		    /* free_transformer(pre2); */
-
-		    ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
+		      newpre = transformer_convex_hull(pre1, pre2);
+		      
+		      /* free_transformer(pre1); */
+		      /* free_transformer(pre2); */
+		      
+		      ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
 			debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
 			      "transformer_add_condition_information_updown", "pre1 =\n");
 			(void) (void) print_transformer(pre1);
@@ -1280,45 +1308,51 @@ transformer_add_condition_information_updown(
 			debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
 			      "transformer_add_condition_information_updown", "newpre =\n");
 			(void) (void) print_transformer(newpre);
+		      }
 		    }
+		  else 
+		    {
+		      /* might be possible to add a convex hull on the initial values
+		       * as in !upwards
+		       */
+		      newpre = pre;
+		    }
+	      }
+	    else 
+	      if(ENTITY_NOT_P(e)) 
+		{
+		  expression c1 = 
+		    EXPRESSION(CAR(call_arguments(syntax_call(s))));
+		  newpre = transformer_add_condition_information_updown
+		    (pre, c1, !veracity, upwards);
 		}
-		else {
-		    /* might be possible to add a convex hull on the initial values
-		     * as in !upwards
-		     */
-		    newpre = pre;
-		}
-	    }
-	    else if(ENTITY_NOT_P(e)) {
-		    expression c1 = 
-			EXPRESSION(CAR(call_arguments(syntax_call(s))));
-		    newpre = transformer_add_condition_information_updown
-			(pre, c1, !veracity, upwards);
-	    }
-	    else if((ENTITY_TRUE_P(e) && !veracity) ||
-		    (ENTITY_FALSE_P(e) && veracity)) {
-		free_transformer(pre);
-		newpre = transformer_empty();
-	    }
-	    else
-		/* do not know what to do with other logical operators, for the time being! 
-		 * keep pre unmodified
-		 */
-		newpre = pre;
-	}
-	else
-	    pips_error("transformer_add_condition_information_updown",
-		       "ill. expr. as test condition\n");
-    }
-    /* Help! I need a free_effects(ef) here */
-
+	      else 
+		if((ENTITY_TRUE_P(e) && !veracity) ||
+		      (ENTITY_FALSE_P(e) && veracity)) 
+		  {
+		    free_transformer(pre);
+		    newpre = transformer_empty();
+		  }
+		else
+		  /* do not know what to do with other logical operators, for the time being! 
+		   * keep pre unmodified
+		   */
+		  newpre = pre;
+      }
+    else
+      pips_error("transformer_add_condition_information_updown",
+		 "ill. expr. as test condition\n");
+    /* Help! I need a free_effects(ef) here 
+       NN : I've done it , free_effect(ef1) and free_effect(ef2) */
+    
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
-	debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
+      debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
 	      "transformer_add_condition_information_updown", "end newpre=\n");
-	print_transformer(newpre);
+      print_transformer(newpre);
+        
     }
-
     return newpre;
+
 }
 
 transformer 
