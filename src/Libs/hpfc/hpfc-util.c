@@ -3,8 +3,11 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1997/01/10 15:25:55 $, )
- * version $Revision$
+ * $Id$
+ * $Log: hpfc-util.c,v $
+ * Revision 1.49  1997/03/20 10:18:09  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
@@ -18,8 +21,7 @@
  * ??? not very intelligent, should use the regions, the problem is
  * that I should normalize the code *before* the pips analysis...
  */
-bool ref_to_dist_array_p(obj)
-gen_chunk* obj;
+bool ref_to_dist_array_p(gen_chunk* obj)
 {
     list l = FindRefToDistArray(obj);
     bool b = (l!=NIL);
@@ -29,9 +31,9 @@ gen_chunk* obj;
 
 /* written_effects_to_dist_arrays_p
  */
-bool written_effect_p(var, le)
-entity var;
-list le;
+bool written_effect_p(
+    entity var,
+    list le)
 {
     MAP(EFFECT, e,
     {
@@ -44,8 +46,7 @@ list le;
     return FALSE;
 }
 
-bool written_effects_to_dist_arrays_p(expr)
-expression expr;
+bool written_effects_to_dist_arrays_p(expression expr)
 {
     list l, leffects_to_dist_arrays = DistArraysEffects(expr);
 
