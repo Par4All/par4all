@@ -522,6 +522,9 @@ entity get_ith_##lname##_prime(int i)\
 #define CONTROL_MAP( ctl, code, c, list ) \
     GENERIC_CONTROL_MAP( control_map_get_blocs, ctl, code, c, list ) 
 
+#define BACKWARD_CONTROL_MAP( ctl, code, c, list ) \
+    GENERIC_CONTROL_MAP( backward_control_map_get_blocs, ctl, code, c, list ) 
+
 #define FORWARD_CONTROL_MAP( ctl, code, c, list ) \
     GENERIC_CONTROL_MAP( forward_control_map_get_blocs, ctl, code, c, list ) 
 
