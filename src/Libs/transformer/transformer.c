@@ -311,8 +311,8 @@ transformer_projection(t, args)
 transformer t;
 cons * args;
 {
-    t = transformer_projection_with_redundancy_elimination(t, args, 
-							   sc_elim_redund);
+    t = transformer_projection_with_redundancy_elimination(t, args,
+							   sc_safe_elim_redund);
     return t;
 }
 
@@ -328,98 +328,115 @@ transformer_projection_with_redundancy_elimination(
     list args,
     Psysteme (*elim)(Psysteme))
 {
-    /* Library Linear/sc contains several reundancy elimination functions:
-     *  sc_elim_redund()
-     *  build_sc_nredund_2pass_ofl_ctrl() --- if it had the same profile...
-     *  ...
-     * no_elim() is provided here to obtain the fastest possible projection
-     */
-    list new_args = NIL;
-    Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
+  /* Library Linear/sc contains several reundancy elimination functions:
+   *  sc_elim_redund()
+   *  build_sc_nredund_2pass_ofl_ctrl() --- if it had the same profile...
+   *  ...
+   * no_elim() is provided here to obtain the fastest possible projection
+   */
+  list new_args = NIL;
+  Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
 
-    if(!ENDP(args))
+  pips_debug(9, "Begin\n");
+
+  if(!ENDP(args))
     {
-	list cea;
+      list cea;
 
-	/* get rid of unwanted values in the relation r and in the basis */
-	for (cea = args ; !ENDP(cea); POP(cea)) {
-	    entity e = ENTITY(CAR(cea));
-            pips_assert("base contains variable to project...",
-                        base_contains_variable_p(sc_base(r), (Variable) e));
-            
-	    CATCH(overflow_error) 
-	    {
-                /* FC */
-		pips_user_warning("overflow error in projection of %s, "
-				  "variable eliminated\n",
-				  entity_name(e)); 
-		r = sc_elim_var(r, (Variable) e);
-	    }
-	    TRY 
-	    {
-		sc_projection_along_variable_ofl_ctrl
-		    (&r,(Variable) e, NO_OFL_CTRL);
-		UNCATCH(overflow_error);
-	    }
+      /* get rid of unwanted values in the relation r and in the basis */
+      for (cea = args ; !ENDP(cea); POP(cea)) {
+	entity e = ENTITY(CAR(cea));
+	pips_assert("base contains variable to project...",
+		    base_contains_variable_p(sc_base(r), (Variable) e));
+ 
+	pips_debug(9, "Projection of %s\n", entity_name(e));
 
-	    sc_base_remove_variable(r,(Variable) e);
+	CATCH(overflow_error) 
+	  {
+	    /* FC */
+	    pips_user_warning("overflow error in projection of %s, "
+			      "variable eliminated\n",
+			      entity_name(e)); 
+	    r = sc_elim_var(r, (Variable) e);
+	  }
+	TRY 
+	  {
+	    sc_projection_along_variable_ofl_ctrl
+	      (&r,(Variable) e, NO_OFL_CTRL);
+	    UNCATCH(overflow_error);
+	  }
+
+	sc_base_remove_variable(r,(Variable) e);
 	 
-	    /* could eliminate redundancy at each projection stage
-	     * to avoid explosion of the constraint number...
-	     * however it is pretty expensive to do so.
-	     */
-	    /*
-	    if (!sc_empty_p(r) {
-		r = elim(r);
-		if (SC_EMPTY_P(r)) {
-		    r = sc_empty(b);
-		    sc_base_remove_variable(r,(Variable) e);
-		}
-		else base_rm(b);
-	    }
-	    */
-	}
-
-	/* Eliminate redundancy only once projections have all
-	 * been performed because redundancy elimination is
-	 * expensive and because most variables are exactly 
-	 * projected because they appear in at least one equation
+	/* could eliminate redundancy at each projection stage to avoid
+	 * explosion of the constraint number...  however it is pretty
+	 * expensive to do so. But we explode with NPRIO in FPPP (Spec
+	 * CFP'95 benchmark). A heuristic could apply redundacy elimination
+	 * from time to time?
+	 *
 	 */
-	if (!sc_empty_p(r)) {
-	    Pbase b = base_dup(sc_base(r));
+
+	if(TRUE) {
+	  // if (!sc_empty_p(r)) {
+	  // Pbase b = base_dup(sc_base(r));
+
 	    r = elim(r);
-	    if (SC_EMPTY_P(r)) {
-		r = sc_empty(b);
+	    /* if (SC_EMPTY_P(r)) {
+	      r = sc_empty(b);
+	      sc_base_remove_variable(r,(Variable) e);
 	    }
-	    else 
-		base_rm(b);
+	    else base_rm(b);
+	  }*/
+
 	}
 
-	r->dimension = vect_size(r->base);
+	ifdebug(9) {
+	  pips_debug(9, "System after projection of %s\n", entity_name(e));
+	  /* sc_fprint(stderr, r, exernal_value_name); */
+	  sc_fprint(stderr, r, entity_local_name);
+	}
+      }
 
-	/* compute new_args */
-	MAP(ENTITY, e, 
-	{ 
-	  if((entity) gen_find_eq(e, args) == (entity) chunk_undefined)
+      /* Eliminate redundancy only once projections have all
+       * been performed because redundancy elimination is
+       * expensive and because most variables are exactly 
+       * projected because they appear in at least one equation
+       */
+      if (!sc_empty_p(r)) {
+	Pbase b = base_dup(sc_base(r));
+	r = elim(r);
+	if (SC_EMPTY_P(r)) {
+	  r = sc_empty(b);
+	}
+	else 
+	  base_rm(b);
+      }
+
+      r->dimension = vect_size(r->base);
+
+      /* compute new_args */
+      MAP(ENTITY, e, 
+      { 
+	if((entity) gen_find_eq(e, args) == (entity) chunk_undefined)
 	  {
 	    /* e must be kept if it is not in args */
 	    new_args = arguments_add_entity(new_args, e);
 	  }
-	},
-	    transformer_arguments(t));
+      },
+	  transformer_arguments(t));
 
-	/* update the relation and the arguments field for t */
+      /* update the relation and the arguments field for t */
 
-	/* the relation is updated by side effect FI ?
-	 * Maybe not if SC_EMPTY(r) 1 Feb. 94 */
-	predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
+      /* the relation is updated by side effect FI ?
+       * Maybe not if SC_EMPTY(r) 1 Feb. 94 */
+      predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
 
-	/* replace the old arguments by the new one */
-	gen_free_list(transformer_arguments(t));
-	transformer_arguments(t) = new_args;
+      /* replace the old arguments by the new one */
+      gen_free_list(transformer_arguments(t));
+      transformer_arguments(t) = new_args;
     } 
 
-    return t;
+  return t;
 }
 
 /* transformer transformer_apply(transformer tf, transformer pre):
@@ -479,61 +496,64 @@ transformer_filter(t, args)
 transformer t;
 cons * args;
 {
-    cons * new_args = NIL;
-    Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
+  cons * new_args = NIL;
+  Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
 
-    if(!ENDP(args) && !SC_EMPTY_P(r)) {
-	/* get rid of unwanted values in the relation r and in the basis */
-	MAPL(cea, { entity e = ENTITY(CAR(cea));
-		    if(base_contains_variable_p(r->base, (Variable) e)) {
-			/* r = sc_projection(r, (Variable) e); */
-			/*
-                        sc_projection_along_variable_ofl_ctrl(&r, (Variable) e,
-                                                              NO_OFL_CTRL);  */
-			CATCH(overflow_error) 
-			    {				    
+  if(!ENDP(args) && !SC_EMPTY_P(r)) {
+    /* get rid of unwanted values in the relation r and in the basis */
+    list cea = list_undefined;
+
+    for(cea=args; !ENDP(cea); POP(cea)) {
+      entity e = ENTITY(CAR(cea));
+      if(base_contains_variable_p(r->base, (Variable) e)) {
+	/* r = sc_projection(r, (Variable) e); */
+	/*
+	  sc_projection_along_variable_ofl_ctrl(&r, (Variable) e,
+	  NO_OFL_CTRL);  */
+	CATCH(overflow_error) 
+	  {				    
 				/* CA */
-				pips_user_warning("overflow error in projection of %s, "
-						  "variable eliminated\n",
-						  entity_name(e)); 
-				r = sc_elim_var(r, (Variable) e);
-			    }
-			TRY 
-			    {
-				sc_projection_along_variable_ofl_ctrl
-				    (&r, (Variable) e, NO_OFL_CTRL);
-				UNCATCH(overflow_error);
-			    }
-			/*       sc_projection_along_variable_ofl_ctrl(&r, (Variable) e,
-				 OFL_CTRL);*/
-			sc_base_remove_variable(r,(Variable) e);}},
-	args);
-	r->dimension = vect_size(r->base);
+	    pips_user_warning("overflow error in projection of %s, "
+			      "variable eliminated\n",
+			      entity_name(e)); 
+	    r = sc_elim_var(r, (Variable) e);
+	  }
+	TRY 
+	  {
+	    sc_projection_along_variable_ofl_ctrl
+	      (&r, (Variable) e, NO_OFL_CTRL);
+	    UNCATCH(overflow_error);
+	  }
+	/*       sc_projection_along_variable_ofl_ctrl(&r, (Variable) e,
+		 OFL_CTRL);*/
+	sc_base_remove_variable(r,(Variable) e);}
+    }
+    r->dimension = vect_size(r->base);
 	
-	/* compute new_args */
-	/* use functions on arguments instead of in-lining !
-	  MAPL(ce, { entity e = ENTITY(CAR(ce));
-	  if((entity) gen_find_eq(e, args)== (entity) chunk_undefined) {
-	  -- e must be kept if it is not in args --
-	  new_args = arguments_add_entity(new_args, e);
-	  }},
-	  transformer_arguments(t));
-	  */
-	new_args = arguments_difference(transformer_arguments(t), args);
+    /* compute new_args */
+    /* use functions on arguments instead of in-lining !
+       MAPL(ce, { entity e = ENTITY(CAR(ce));
+       if((entity) gen_find_eq(e, args)== (entity) chunk_undefined) {
+       -- e must be kept if it is not in args --
+       new_args = arguments_add_entity(new_args, e);
+       }},
+       transformer_arguments(t));
+    */
+    new_args = arguments_difference(transformer_arguments(t), args);
 
-	/* update the relation and the arguments field for t */
+    /* update the relation and the arguments field for t */
 
-	/* Is the relation updated by side effect?
-	 * Yes, in general. No if the system is non feasible
-	 */
+    /* Is the relation updated by side effect?
+     * Yes, in general. No if the system is non feasible
+     */
 
-	predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
+    predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
 
-	/* replace the old arguments by the new one */
-	free_arguments(transformer_arguments(t));
-	transformer_arguments(t) = new_args;
-    } 
-    return t;
+    /* replace the old arguments by the new one */
+    free_arguments(transformer_arguments(t));
+    transformer_arguments(t) = new_args;
+  } 
+  return t;
 }
 
 /* bool transformer_affect_linear_p(transformer tf, Pvecteur l): returns TRUE
