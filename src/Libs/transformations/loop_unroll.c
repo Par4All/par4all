@@ -15,7 +15,6 @@
 #include "ri-util.h"
 #include "text-util.h"
 
-#include "types.h"
 #include "boolean.h"
 
 #include "pipsdbm.h"
