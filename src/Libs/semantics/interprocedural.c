@@ -947,7 +947,7 @@ call_site_to_module_precondition_text(
        in this frame */
     module_to_value_mappings(callee);  
 
-    result = text_transformer(call_site_prec);
+    result = text_for_a_transformer(call_site_prec, FALSE);
 
     reset_current_module_entity();
     reset_current_module_statement();
