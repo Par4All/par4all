@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/03/30 22:30:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/06/20 16:31:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_statement[] = "%A% ($Date: 1997/03/30 22:30:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_statement[] = "%A% ($Date: 1997/06/20 16:31:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -1145,6 +1145,7 @@ check_in_declarations()
     }
 }
 
+/* This function is called when the first executable statement is encountered */
 #define SIZE 32384
 void check_first_statement()
 {
@@ -1210,6 +1211,7 @@ void check_first_statement()
 	    }
 
 	    if (ibuffer >= SIZE) {
+		/* Well, comments are sometimes very long! */
 		ParserError("check_first_statement", "Static buffer too small, resize!\n");
 	    }
 
@@ -1240,6 +1242,21 @@ void check_first_statement()
 
 	/* clean up the declarations */
 	update_common_sizes();
+
+	/* It might seem logical to perform these calls from EndOfProcedure()
+	 * here. But at least ComputeAddresses() is useful for implictly 
+	 * declared variables.
+	 */
+	/*
+	UpdateFunctionalType(FormalParameters);
+	
+	ComputeEquivalences();
+	ComputeAddresses();
+
+	check_common_layouts(get_current_module_entity());
+
+	SaveChains();
+	*/
 
 	reset_statement_number();
     }
