@@ -45,9 +45,23 @@ char FormatValue[FORMATLENGTH];
 
 
 
-void ParserError(char * f,char *m)
+void ParserError(char * f, char * m)
 {
-    user_error(f,"Parser error between lines %d and %d\n%s\n",line_b_I,line_e_I,m);
+    /* reset lex... Might be better to read the whole file like sserror() */
+    extern char sssbuf[];
+    extern char * sssptr;
+    extern int ssprevious;
+
+    sssptr = sssbuf;
+# define MMNEWLINE 10
+    ssprevious = MMNEWLINE;
+
+    ResetBlockStack();
+    reset_current_module_entity();
+
+    debug_off();
+    user_error(f,"Parser error between lines %d and %d\n%s\n",
+	       line_b_I,line_e_I,m);
 }
 
 
