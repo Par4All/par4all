@@ -174,8 +174,8 @@ i_create:
 	    
 	    if (tpips_execution_mode) {
 		if (workspace_exists_p($<name>4))
-		    pips_user_error
-			("i_create: Workspace %s already exists. Delete it!\n",
+		    user_error
+			("create", "Workspace %s already exists. Delete it!\n",
 			 $<name>4);
 		else {
 		  if(db_create_workspace ((string) $<name>4))
@@ -186,7 +186,7 @@ i_create:
 			/* string wname = db_get_current_workspace_name();*/
 			db_close_workspace();
 			delete_workspace($<name>4);
-			pips_user_error("i_create: Could not create workspace"
+			user_error("create", "Could not create workspace"
 					" %s\n", $<name>4);
 		    }
 
@@ -202,7 +202,7 @@ i_create:
 		    $$ = TRUE;
 		  }
 		  else {
-		    pips_user_error("Cannot create directory for workspace,"
+		    user_error("create", "Cannot create directory for workspace,"
 				    " check rights!\n");
 		  }
 		}
