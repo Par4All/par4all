@@ -7,27 +7,19 @@
 #include <stdio.h>
 #include "linear.h"
 
-/******************************************** NEWGEN SET -> LINEAR HASHTABLE */
-
-#define set linear_hashtable_pt
-#define set_belong_p(s, v) linear_hashtable_isin(s, v)
-#define set_add_element(s, old, v) linear_hashtable_put(s, v, v)
-#define set_make(t) linear_hashtable_make()
-#define set_free(s) linear_hashtable_free(s)
-
 /********************************************** SET BASED TRANSITIVE CLOSURE */
 
 /* put base variables in set.
    returns whether something was put.
  */
-static boolean base_to_set(set s, Pvecteur b)
+static boolean base_to_set(linear_hashtable_pt s, Pvecteur b)
 {
   boolean modified = FALSE;
 
   for (; b; b=b->succ)
-    if (b->var && !set_belong_p(s, b->var)) 
+    if (b->var && !linear_hashtable_isin(s, b->var)) 
     {
-      (void) set_add_element(s, s, b->var);
+      linear_hashtable_put(s, b->var, b->var);
       modified = TRUE;
     }
 
@@ -35,10 +27,10 @@ static boolean base_to_set(set s, Pvecteur b)
 }
 
 /* returns whether c contains variables of vars. */
-static boolean contains_variables(Pvecteur v, set vars)
+static boolean contains_variables(Pvecteur v, linear_hashtable_pt vars)
 {
   for (; v; v = v->succ)
-    if (v->var && set_belong_p(vars, v->var))
+    if (v->var && linear_hashtable_isin(vars, v->var))
       return TRUE;
   return FALSE;
 }
@@ -48,7 +40,8 @@ static boolean contains_variables(Pvecteur v, set vars)
  * appends extracted constraints to ex.
  */
 static boolean 
-transitive_closure_pass(Pcontrainte * pc, Pcontrainte * ex, set vars)
+transitive_closure_pass(Pcontrainte * pc, Pcontrainte * ex, 
+			linear_hashtable_pt vars)
 {
   Pcontrainte c, cp, cn;
   boolean modified = FALSE;
@@ -75,7 +68,7 @@ transitive_closure_pass(Pcontrainte * pc, Pcontrainte * ex, set vars)
 
 /* transtitive extraction of constraints.
  */
-static Psysteme transitive_closure_system(Psysteme s, set vars)
+static Psysteme transitive_closure_system(Psysteme s, linear_hashtable_pt vars)
 {
   Pcontrainte e = CONTRAINTE_UNDEFINED, i = CONTRAINTE_UNDEFINED;
   boolean modified;
@@ -97,12 +90,12 @@ static Psysteme
 transitive_closure_from_two_bases(Psysteme s, Pbase b1, Pbase b2)
 {
   Psysteme st;
-  set vars = set_make(set_pointer);
+  linear_hashtable_pt vars = linear_hashtable_make();
 
   base_to_set(vars, b1);
   base_to_set(vars, b2);
   st = transitive_closure_system(s, vars);
-  set_free(vars);
+  linear_hashtable_free(vars);
 
   return st;
 }
@@ -220,12 +213,6 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
 }
 
 /********************************************************************** PIPS */
-
-#undef set
-#undef set_belong_p
-#undef set_add_element
-#undef set_make
-#undef set_free
 
 #include "genC.h"
 #include "ri.h"
