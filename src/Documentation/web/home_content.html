@@ -66,32 +66,22 @@ align=middle> You can get a beta version of the
 <a name="new-features"><h2>What&#039;s new?</h2></a>
 <P>
 <ul>
-  <li> ENTRY statements are parsed and transformed into independent
-       subroutines or functions sharing static variables thru a common
-  <li> WHILE loops are parsed and analyzed
-  <li> Multiple RETURNs are parsed and transformed using either an
-       explicit return code and explicit testing by the caller, or a STOP if
-       alternate returns only are used to report errors. The behavior is
-       user-selectable
-  <li> Cloning
-  <li> Forward substitution
-  <li> OpenMP output
-  <li> Graph representation of large call graphs (with DaVinci)
-  <li> A Java-based user interface, jpips; still in its infancy!
+  <li> Semantics analysis of CFG sharpened
+  <li> Semantics analysis for non-integer types: boolean, float and strings
+  <li> Array Bound Checking with minimal overhead
+  <li> Array Alias analysis
+  <li> Variable Freeze for code specialization
   <li> Perfect Club benchmarks: adm, arc2d, bdna, dyfesm, flo52, mdg, ocean, qcd,
        smsi, spec77, spice, track, trdf
-       
   <li> Spec-CFP95 benchmarks: applu, apsi , fpppp, hydro2d, mgrid, su2cor,
        swim, tomcatv, turb3d, wave5
-  <li> Number of simultaneously analyzed modules above 200!
-  <li> Concurrent apply of transformations such as partial evaluation to avoid
-       too many intermediate interprocedural analyses
+  <li> Number of simultaneously analyzed modules above 700 (150 K lines)!
 </ul>
 
 <hr>
 
 <b>Last update: </b>
-$Date: 2000/05/10 12:27:51 $
+$Date: 2001/07/13 09:44:01 $
 
 <b>URL: </b>http://www.cri.ensmp.fr/pips
 
