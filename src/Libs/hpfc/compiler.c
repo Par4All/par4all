@@ -1,6 +1,6 @@
 /* Fabien Coelho, May 1993
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/08/30 14:34:00 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/09/04 18:07:51 $, )
  * version $Revision$
  *
  * Compiler
@@ -33,7 +33,8 @@ entity host_module, node_module;
 	  gen_length(control_successors(c))); \
   print_statement(control_statement(c));
 
-static void hpf_compile_block(stat,hoststatp,nodestatp)
+static void 
+hpf_compile_block(stat, hoststatp, nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
@@ -56,9 +57,13 @@ statement *hoststatp,*nodestatp;
 
     instruction_block(statement_instruction(*hoststatp)) = gen_nreverse(lhost);
     instruction_block(statement_instruction(*nodestatp)) = gen_nreverse(lnode);
+
+    DEBUG_STAT(9, entity_name(host_module), *hoststatp);
+    DEBUG_STAT(9, entity_name(node_module), *nodestatp);
 }
 
-static void hpf_compile_test(s,hoststatp,nodestatp)
+static void 
+hpf_compile_test(s, hoststatp, nodestatp)
 statement s;
 statement *hoststatp,*nodestatp;
 {
@@ -101,7 +106,8 @@ statement *hoststatp,*nodestatp;
     DEBUG_STAT(9, entity_name(node_module), *nodestatp);
 }
 
-static void hpf_compile_call(stat, hoststatp, nodestatp)
+static void 
+hpf_compile_call(stat, hoststatp, nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
@@ -109,7 +115,7 @@ statement *hoststatp,*nodestatp;
 
     assert(instruction_call_p(statement_instruction(stat)));
 
-    debug(7,"hpf_compile_call", "function %s\n", entity_name(call_function(c)));
+    pips_debug(7, "function %s\n", entity_name(call_function(c)));
 
     /* IO functions should be detected earlier, in hpf_compiler
      */
@@ -124,7 +130,7 @@ statement *hoststatp,*nodestatp;
 	    leh=lUpdateExpr(host_module, call_arguments(c)),
 	    len=lUpdateExpr(node_module, call_arguments(c));
 	
-	debug(7,"hpf_compile_call","no reference to distributed variable\n");
+	pips_debug(7, "no reference to distributed variable\n");
 
 	(*hoststatp)=MakeStatementLike(stat, is_instruction_call);
 	(*nodestatp)=MakeStatementLike(stat, is_instruction_call);
@@ -156,7 +162,7 @@ statement *hoststatp,*nodestatp;
 	if (array_distributed_p
 	    (reference_variable(syntax_reference(expression_syntax(w)))))
 	{
-	    debug(8,"hpf_compile_call","c1-alpha\n");
+	    pips_debug(8, "c1-alpha\n");
 	    
 	    generate_c1_alpha(stat, &lh, &ln); /* C1-ALPHA */
 	}
@@ -168,9 +174,7 @@ statement *hoststatp,*nodestatp;
 	     */
 	    if (syntax_call_p(s) && call_reduction_p(syntax_call(s)))
 	    {
-		statement
-		    sh = statement_undefined,
-		    sn = statement_undefined;
+		statement sh, sn;
 
 		if (!compile_reduction(stat, &sh, &sn))
 		    pips_error("hpf_compile_call", 
@@ -181,7 +185,7 @@ statement *hoststatp,*nodestatp;
 	    }
 	    else
 	    {
-		debug(8,"hpf_compile_call","c1-beta\n");
+		pips_debug(8, "c1-beta\n");
 		
 		generate_c1_beta(stat, &lh, &ln); /* C1-BETA */
 	    }
@@ -206,7 +210,8 @@ statement *hoststatp,*nodestatp;
     hpfc_warning("hpf_compile_call", "not implemented yet\n");
 }
 
-static void hpf_compile_unstructured(stat,hoststatp,nodestatp)
+static void 
+hpf_compile_unstructured(stat,hoststatp,nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
@@ -216,7 +221,7 @@ statement *hoststatp,*nodestatp;
 
     if (one_statement_unstructured(instruction_unstructured(inst)))
     {
-	debug(7,"hpf_compile_unstructured","one statement recognize\n");
+	pips_debug(7, "one statement recognize\n");
 	/* 
 	 * nothing spacial is done! 
 	 *
@@ -241,7 +246,7 @@ statement *hoststatp,*nodestatp;
 	statement statc, stath, statn;
 	list blocks = NIL;
 
-	debug(6, "hpf_compile_unstructured", "beginning\n");
+	pips_debug(6, "beginning\n");
 
 	CONTROL_MAP
 	    (c,
@@ -336,7 +341,8 @@ statement *hoststatp,*nodestatp;
     }
 }
 
-static void hpf_compile_sequential_loop(stat,hoststatp,nodestatp)
+static void 
+hpf_compile_sequential_loop(stat,hoststatp,nodestatp)
 statement stat, *hoststatp, *nodestatp;
 {
     loop the_loop=statement_loop(stat);
@@ -393,7 +399,8 @@ statement stat, *hoststatp, *nodestatp;
     DEBUG_STAT(8, "node stat", *nodestatp);
 }
 
-static void hpf_compile_parallel_body(body, hoststatp, nodestatp)
+static void 
+hpf_compile_parallel_body(body, hoststatp, nodestatp)
 statement body, *hoststatp, *nodestatp;
 {
     list lw = NIL, lr = NIL, li = NIL, ls = NIL, lbs = NIL;
@@ -466,7 +473,8 @@ statement stat, *hoststatp, *nodestatp;
 		  NULL);
 }
 
-static void hpf_compile_loop(stat, hoststatp, nodestatp)
+static void 
+hpf_compile_loop(stat, hoststatp, nodestatp)
 statement stat;
 statement *hoststatp, *nodestatp;
 {
