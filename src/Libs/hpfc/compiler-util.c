@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compiler-util.c,v $ ($Date: 1996/06/12 17:42:14 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1996/06/12 21:22:38 $, )
  * version $Revision$
  */
 
@@ -236,8 +236,7 @@ static list
 static void FindDefinitionsOf_rewrite(s)
 statement s;
 {
-    instruction
-	i = statement_instruction(s);
+    instruction i = statement_instruction(s);
 
     /* ??? False! nothing is checked about the statement movement...
      */
@@ -324,62 +323,33 @@ statement stat;
 static list 
     loops, /* lisp of loops */
     blocks;/* list of lists, may be NIL if none */
-static int 
-    n_loops, n_levels;
-static statement 
-    inner_body;
+static int n_loops, n_levels;
+static statement inner_body;
 
-static bool inst_filter(i)
-instruction i;
+static bool loop_filter(loop l)
 {
-    /* descend only thru blocks and parallel loops 
-     */
-    switch(instruction_tag(i))
-    {
-    case is_instruction_block:
-	return(TRUE);
-    case is_instruction_loop:
-	return(execution_parallel_p(loop_execution(instruction_loop(i))));
-    }
-
-    return(FALSE);
+    return execution_parallel_p(loop_execution(l));
 }
 
-static void inst_rewrite(i)
-instruction i;
+static void sequence_rewrite(sequence s)
 {
-    switch(instruction_tag(i))
-    {
-    case is_instruction_block:
-    {
-	if (n_loops==0 && n_levels==0) /* there was no doall inside */
-	    return;
+    if (n_loops==0 && n_levels==0) /* there was no doall inside */
+	return;
+    
+    if (n_loops-n_levels!=1)
+	pips_internal_error("block within a block encountered\n");
+    
+    n_levels++, blocks = CONS(CONSP, sequence_statements(s), blocks);
+}
 
-	if (n_loops-n_levels!=1)
-	    pips_internal_error("block within a block encountered\n");
-
-	n_levels++, blocks = CONS(CONSP, instruction_block(i), blocks);
-
-	break;
-    }
-    case is_instruction_loop:
-    {
-	loop l = instruction_loop(i);
-
-	if (n_loops!=n_levels) /* a loop was found directly as a body */
-	    n_levels++, 
-	    blocks = CONS(CONSP, NIL, blocks);
-	
-	if (n_loops==0) inner_body=loop_body(l);
-	loops = CONS(LOOP, l, loops);
-	n_loops++;
-
-	break;
-    }
-    default: /* consistent with inst_filter */
-	pips_internal_error("unexpected instruction tag (%d)\n",
-			    instruction_tag(i));
-    }
+static void loop_rewrite(loop l)
+{
+    if (n_loops!=n_levels) /* a loop was found directly as a body */
+	n_levels++, blocks = CONS(CONSP, NIL, blocks);
+    
+    if (n_loops==0) inner_body=loop_body(l);
+    loops = CONS(LOOP, l, loops);
+    n_loops++;
 }
 
 statement parallel_loop_nest_to_body(loop_nest, pblocks, ploops)
@@ -392,10 +362,10 @@ list *pblocks, *ploops;
 
     pips_assert("loop", instruction_loop_p(statement_instruction(loop_nest)));
 
-    gen_recurse(loop_nest,
-		instruction_domain,
-		inst_filter,
-		inst_rewrite);
+    gen_multi_recurse(loop_nest,
+		      sequence_domain, gen_true, sequence_rewrite,
+		      loop_domain, loop_filter, loop_rewrite,
+		      NULL);
     
     pips_assert("loops found", n_loops!=0 && (n_loops-n_levels==1));
 
