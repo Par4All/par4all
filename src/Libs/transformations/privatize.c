@@ -236,8 +236,10 @@ bool privatize_module(char *mod_name)
     
     mod_inst = statement_instruction(mod_stat);
 
+    /*
     if (! instruction_unstructured_p(mod_inst))
 	pips_error("privatize_module", "unstructured expected\n");
+	*/
 
     set_proper_effects_map( effectsmap_to_listmap((statement_mapping) 
 	db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE)) );
@@ -249,7 +251,8 @@ bool privatize_module(char *mod_name)
 	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
 
     debug_on("PRIVATIZE_DEBUG_LEVEL");
-    scan_unstructured(instruction_unstructured(mod_inst), NIL);
+    /* scan_unstructured(instruction_unstructured(mod_inst), NIL); */
+    scan_statement(mod_stat, NIL);
 
     MAPL( vs, {
 	vertex v = VERTEX( CAR( vs )) ;
