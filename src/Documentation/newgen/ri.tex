@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1996/08/27 22:31:15 $, 
+%% $Date: 1996/10/15 10:25:02 $, 
 
 \documentstyle[a4,psfig,html,verbatim,newgen_domain]{article}
 
@@ -1440,6 +1440,12 @@ unstructured}.
 The next domain can be used to store summary effects of callees.
 
 \domain{entity\_effects = entity->effects}
+{}
+
+The next domain can be used to store a statement to effects mapping.
+Should be used for proper and cumulated effects and references.
+
+\domain{statement\_effects = statement->effects}
 {}
 
 \subsection{Effect}
