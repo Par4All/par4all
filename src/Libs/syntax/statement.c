@@ -1,8 +1,6 @@
-/* 	%A% ($Date: 1997/09/11 19:49:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char vcid_syntax_statement[] = "%A% ($Date: 1997/09/11 19:49:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
+/*
+ * $Id$
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,16 +24,39 @@ char vcid_syntax_statement[] = "%A% ($Date: 1997/09/11 19:49:06 $, ) version $Re
 /* the purpose of the following data structure is to associate labels to
 instructions. The data structure contains a string (the label's name)
 and a statement (the statement which the label is attached to). */
-#define MAXSTMT 200
-typedef struct stmt {
+
+#define INITIAL_STMTHEAP_BUFFER_SIZE 10
+
+typedef struct {
     string l; /* the name of the label */
     statement s; /* the statement attached to l */
 } stmt;
-LOCAL stmt StmtHeap[MAXSTMT];
-LOCAL int CurrentStmt = 0;
 
+static stmt * StmtHeap_buffer;
+static int StmtHeap_buffer_size;
+static int CurrentStmt = 0;
 
-
+static void
+init_StmtHeap_buffer(void)
+{
+    if (StmtHeap_buffer_size!=0) return; /* if needed */
+    pips_debug(9, "allocating StmtHeap buffer\n");
+    StmtHeap_buffer_size = INITIAL_STMTHEAP_BUFFER_SIZE;
+    StmtHeap_buffer = (stmt*) malloc(sizeof(stmt)*StmtHeap_buffer_size);
+    pips_assert("malloc ok", StmtHeap_buffer);
+}
+
+static void
+resize_StmtHeap_buffer(void)
+{
+    pips_debug(9, "resizing StmtHeap buffer\n");
+    pips_assert("buffer initialized", StmtHeap_buffer_size>0);
+    StmtHeap_buffer_size*=2;
+    StmtHeap_buffer = (stmt*) realloc(StmtHeap_buffer, 
+				      sizeof(stmt)*StmtHeap_buffer_size);
+    pips_assert("realloc ok", StmtHeap_buffer);
+}
+
 /* to produce statement numbers */
 static int stat_num = 1;
 static bool skip_num = FALSE ;
@@ -89,8 +110,8 @@ string l;
     int i;
 
     for (i = 0; i < CurrentStmt; i++)
-	    if (strcmp(l, StmtHeap[i].l) == 0)
-		    return(StmtHeap[i].s);
+	    if (strcmp(l, StmtHeap_buffer[i].l) == 0)
+		    return(StmtHeap_buffer[i].s);
 
     return(statement_undefined);
 }
@@ -108,10 +129,11 @@ CheckAndInitializeStmt()
     int MustStop = FALSE;
 
     for (i = 0; i < CurrentStmt; i++) {
-	statement s = StmtHeap[i].s;
+	statement s = StmtHeap_buffer[i].s;
 	if (statement_instruction(s) == instruction_undefined) {
 	    MustStop = TRUE;
-	    user_log("CheckAndInitializeStmt %s\n", entity_name(statement_label(s)));
+	    user_log("CheckAndInitializeStmt %s\n", 
+		     entity_name(statement_label(s)));
 	}
     }
 
@@ -133,21 +155,23 @@ NewStmt(e, s)
 entity e;
 statement s;
 {
-  if (LabelToStmt(entity_name(e)) != statement_undefined) {
-    user_log("NewStmt: duplicate label: %s\n", entity_name(e));
-    ParserError("NewStmt", "duplicate label\n");
-  }
+    init_StmtHeap_buffer();
 
-    if (CurrentStmt == MAXSTMT)
-	    ParserError("NewStmt", "statement heap full\n");
+    if (LabelToStmt(entity_name(e)) != statement_undefined) {
+	user_log("NewStmt: duplicate label: %s\n", entity_name(e));
+	ParserError("NewStmt", "duplicate label\n");
+    }
 
-    StmtHeap[CurrentStmt].l = entity_name(e);
-    StmtHeap[CurrentStmt].s = s;
+    if (CurrentStmt >= StmtHeap_buffer_size)
+	resize_StmtHeap_buffer();
+
+    StmtHeap_buffer[CurrentStmt].l = entity_name(e);
+    StmtHeap_buffer[CurrentStmt].s = s;
     CurrentStmt += 1;
 }
 
 
-
+
 /* The purpose of the following data structure is to build the control
 structure of the procedure being analyzed. each time a control statement
 (do loop, block if, ...) is analyzed, a new block is created and pushed
@@ -1235,7 +1259,7 @@ expression e1, e2, e3, e4;
 			    make_call(CreateIntrinsic(NameOfToken(keyword)),
 				      l)));
 }
-
+
 static int seen = FALSE;
 
 void 
@@ -1254,12 +1278,12 @@ void
 check_in_declarations()
 {
     if(first_executable_statement_seen()) {
-	ParserError("Syntax", "Declaration appears after executable statement");
+	ParserError("Syntax", 
+		    "Declaration appears after executable statement");
     }
 }
 
 /* This function is called when the first executable statement is encountered */
-#define SIZE 32384
 void 
 check_first_statement()
 {
@@ -1270,10 +1294,16 @@ check_first_statement()
     int end_of_constant_string = FALSE;
     char string_sep = '\000';
 
-    if (! seen) {
+    if (! seen) 
+    {
 	FILE *fd;
 	int cpt = 0, ibuffer = 0, c;
-	static char buffer[SIZE];
+
+	/* dynamic local buffer
+	 */
+	int buffer_size = 1000;
+	char * buffer = (char*) malloc(buffer_size);
+	pips_assert("malloc ok", buffer);
 
 	seen = TRUE;
 	
@@ -1324,9 +1354,12 @@ check_first_statement()
 		  }
 	    }
 
-	    if (ibuffer >= SIZE) {
-		/* Well, comments are sometimes very long! */
-		ParserError("check_first_statement", "Static buffer too small, resize!\n");
+	    if (ibuffer >= buffer_size-10)
+	    {
+		pips_assert("buffer initialized", buffer_size>0);
+		buffer_size*=2;
+		buffer = (char*) realloc(buffer, buffer_size);
+		pips_assert("realloc ok", buffer);
 	    }
 
 	    if (c == '\n') {
@@ -1343,7 +1376,10 @@ check_first_statement()
 	}
 	safe_fclose(fd, CurrentFN);
 	buffer[ibuffer++] = '\0';
-	code_decls_text(EntityCode(get_current_module_entity())) = strdup(buffer);
+	code_decls_text(EntityCode(get_current_module_entity())) = 
+	    strdup(buffer);
+
+	free(buffer), buffer=NULL;
 
 	/* kill the first statement's comment because it's already
 	   included in the declaration text */
@@ -1359,7 +1395,8 @@ check_first_statement()
 
 	/* It might seem logical to perform these calls from EndOfProcedure()
 	 * here. But at least ComputeAddresses() is useful for implictly 
-	 * declared variables. These calls are better located in EndOfProcedure().
+	 * declared variables. 
+	 * These calls are better located in EndOfProcedure().
 	 */
 	/*
 	 * UpdateFunctionalType(FormalParameters);
