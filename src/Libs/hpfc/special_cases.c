@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1996/06/08 15:04:19 $, 
+ * $Date: 1996/06/11 13:27:33 $, 
  */
 
 #include "defines-local.h"
@@ -569,8 +569,10 @@ instruction i;
     case is_instruction_test:
     case is_instruction_goto:
 	subarray_shift_ok = FALSE;
+	break;
     default:
-	pips_internal_error("unexpected instruction tag\n");
+	pips_internal_error("unexpected instruction tag (%d)\n", 
+			    instruction_tag(i));
     }
 
     return subarray_shift_ok;
