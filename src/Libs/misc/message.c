@@ -1,0 +1,317 @@
+/* error & message handling handling routines (s.a. debug.c) :
+ * user_log()
+ * user_request()
+ * user_warning()
+ * user_error()
+ * pips_error()
+ * pips_assert()
+ */
+
+#include <stdio.h>
+extern int fprintf();
+extern int printf();
+extern int fflush();
+extern int vfprintf(FILE *stream, char *format, ...);
+extern int _flsbuf();
+extern int _filbuf();
+#include <varargs.h>
+#include <setjmp.h>
+#include <ctype.h>
+
+#include "types.h"
+
+extern bool get_bool_property(string);
+
+#define INPUT_BUFFER_LENGTH 256 /*error caught by terminal at 257th character*/
+
+
+/* USER_LOG is a function that should be called to log the current
+ * PIPS request, as soon as it is relevant. loging will occure if property
+ * USER_LOG_P is TRUE. USER_LOG should be called as:
+ *
+ * USER_LOG(format [, arg] ... )
+ *
+ * where format and arg-list are passed as arguments to vprintf.  
+ */
+
+void default_user_log(fmt, args)
+char *fmt;
+va_list args;
+{
+    if(get_bool_property("USER_LOG_P")==FALSE)
+	return;
+
+    (void) vfprintf(stdout, fmt, args);
+    fflush(stdout);
+}
+
+/* default assignment of pips_log_handler is default_user_log. Some 
+ * top-level (eg. wpips) may need a special user_log proceedure; they 
+ * should let pips_log_handler point toward it.
+ *
+ * Every procedure pointed to by pips_log_handler must test the property 
+ * USER_LOG_P; this is necessary because (* pips_log_handler) may be called 
+ * anywhere (because VARARGS), whithout verifying it.
+ */
+void (* pips_log_handler)(char * fmt, va_list args) = default_user_log;
+
+
+/* USER_LOG(format [, arg] ... ) */
+/*VARARGS1*/
+void user_log(va_alist)
+va_dcl
+{
+    char *fmt;
+    va_list args;
+
+    va_start(args);
+    fmt=va_arg(args, char *);
+    (* pips_log_handler)(fmt, args);
+    va_end(args);
+}
+
+
+/* USER_REQUEST is a function that should be called to request some data 
+ * from the user. It returns the string typed by the user until the 
+ * return key is typed.
+ * USER_REQUEST should be called as:
+ *
+ * USER_REQUEST(format [, arg] ... )
+ *
+ * where format and arg-list are passed as arguments to vprintf.  
+ */
+
+string default_user_request(fmt, args)
+char *fmt;
+va_list args;
+{
+    static char buf[INPUT_BUFFER_LENGTH];
+    string str;
+
+    printf("\nWaiting for your response: ");
+    (void) vfprintf(stdout, fmt, args);
+    fflush(stdout);
+    str= gets(buf);
+    return(str);
+}
+
+/* default assignment of pips_request_handler is default_user_request. Some 
+ * top-level (eg. wpips) may need a special user_request proceedure; they 
+ * should let pips_request_handler point toward it.
+ */
+string (* pips_request_handler)() = default_user_request;
+
+
+/* USER_REQUEST(format [, arg] ... ) */
+/*VARARGS1*/
+string user_request(va_alist)
+va_dcl
+{
+    char *fmt;
+    va_list args;
+    string str;
+
+    va_start(args);
+    fmt=va_arg(args, char *);
+    str = (* pips_request_handler)(fmt, args);
+    va_end(args);
+    return(str);
+}
+
+
+/* USER_WARNING issues a warning and don't stop the program (cf. user_error
+ * for infos.) 
+ */
+
+void default_user_warning(args)
+va_list * args;
+{
+    char *fmt, *fct;
+
+    fct=va_arg(* args, char *);
+    fmt=va_arg(* args, char *);
+
+    /* print name of function causing warning */
+    (void) fprintf(stderr, "\nuser warning in %s: ", fct);
+
+    /* print out remainder of message */
+    (void) vfprintf(stderr, fmt, * args);
+}
+
+/* default assignment of pips_warning_handler is default_user_warning. Some 
+ * top-level (eg. wpips) may need a special user_warning proceedure; they 
+ * should let pips_warning_handler point toward it.
+ */
+void (* pips_warning_handler)() = default_user_warning;
+
+/* USER_WARNING(fonction, format [, arg] ... )
+ * string fonction, format;
+ */
+/*VARARGS2*/
+void user_warning(va_alist)
+va_dcl
+{
+    va_list args;
+
+    va_start(args);
+    (* pips_warning_handler)(& args);
+    va_end(args);
+}
+
+/* make sure the user has noticed something */
+void default_prompt_user(s)
+char *s;
+{
+    fprintf(stderr, "%s\n", s);
+    fprintf(stderr, "Press <Return> to continue ");
+    while (getchar() != '\n') ;
+}
+
+/* PROMPT_USER schould be implemented. (its a warning with consent of the user)
+The question is: how schould it be called?
+*/
+
+/* USER_ERROR is a function that should be called to terminate the current
+PIPS request execution or to restore the previous saved stack environment 
+when an error in a Fortran file or elsewhere is detected.
+USER_ERROR first prints on stderr a description of the error, then tests 
+the property ABORT_ON_USER_ERROR and aborts case true. Else it will restore 
+the last saved stack environment (ie. come back to the last executed 
+setjmp(pips_top_level) ), except for eventuality it has already been 
+called. In this case, it terminates execution with exit.
+USER_ERROR should be called as:
+
+   USER_ERROR(fonction, format [, arg] ... )
+
+where function is a string containing the name of the function
+calling USER_ERROR, and where format and arg-list are passed as
+arguments to vprintf.
+
+Modifications:
+ - user_error() was initially called when a Fortran syntax error was
+   encountered by the parser; execution was stopped; this had to be changed
+   because different kind of errors can occur and because pips is no longer
+   structured using exec(); one has to go back to PIPS top level, in tpips
+   or in wpips; (Francois Irigoin, 19 November 1990)
+ - user_error() calls (* pips_error_handler) which can either be 
+   default_user_error or a user_error function specific to the used top-level.
+   But each user_error function should have the same functionalities.
+*/
+
+void default_user_error(args)
+va_list * args;
+{
+    extern jmp_buf pips_top_level;
+    string fonction, fmt;
+
+    fonction=va_arg(* args, char *);
+    fmt=va_arg(* args, char *);
+
+    /* print name of function causing error */
+    (void) fprintf(stderr, "user error in %s: ", fonction);
+
+    /* print out remainder of message */
+    (void) vfprintf(stderr, fmt, * args);
+
+    /* terminate PIPS request */
+    if(get_bool_property("ABORT_ON_USER_ERROR")) {
+	abort();
+    }
+    else {
+	static bool user_error_called= FALSE;
+
+	if (user_error_called) {
+	    (void) fprintf(stderr, "This user_error is too much! Exiting.\n");
+	    exit(1);
+	}
+	else {
+	    user_error_called= TRUE;
+	}
+
+	/*prompt_user schould be used... if it were implemented!*/
+	/*prompt_user("Something went wrong. Flash back to top_level.");*/
+	longjmp(pips_top_level, 2);
+    }
+}
+
+/* default assignment of pips_error_handler is default_user_error. Some 
+ * top-level (eg. wpips) may need a special user_error proceedure; they 
+ * should let pips_error_handler point toward it.
+ */
+void (* pips_error_handler)() = default_user_error;
+
+/* USER_ERROR(fonction, format [, arg] ... )
+ * string fonction, format;
+ */
+/*VARARGS2*/
+void user_error(va_alist)
+va_dcl
+{
+    va_list args;
+
+    va_start(args);
+
+    (* pips_error_handler)(&args);
+
+    va_end(args)
+}
+
+
+
+/* PIPS_ERROR is a function that should be called to terminate PIPS
+execution when data structures are corrupted. PIPS_ERROR should be
+called as:
+  PIPS_ERROR(fonction, format [, arg] ... )
+where function is a string containing the name of the function
+calling PIPS_ERROR, and where format and arg-list are passed as
+arguments to vprintf. PIPS_ERROR terminates execution with abort.
+*/
+/* PIPS_ERROR(fonction, format [, arg] ... )
+ * string fonction, format;
+ */
+/*VARARGS2*/
+void pips_error(va_alist)
+va_dcl
+{
+    va_list args;
+    char *fmt;
+
+    va_start(args);
+
+    /* print name of function causing error */
+    (void) fprintf(stderr, "pips error in %s: ", va_arg(args, char *));
+    fmt = va_arg(args, char *);
+
+    /* print out remainder of message */
+    (void) vfprintf(stderr, fmt, args);
+    va_end(args);
+
+    /* create a core file for debug */
+    (void) abort();
+}
+
+/* PIPS_ASSERT tests whether the second argument is true. If not, message
+is issued and the program aborted. The first argument is the function name.
+  pips_assert(function_name, boolean);
+*/
+/*VARARGS1*/
+void pips_assert(va_alist)
+va_dcl
+{
+    va_list args;
+    char *function ;
+
+    va_start(args);
+    function = va_arg(args, char *) ;
+
+    if( va_arg( args, int ) == 0 ) {
+	/* print name of function causing error */
+	(void) fprintf(stderr, "pips assertion failed in %s: ", function ) ;
+
+	va_end(args);
+
+	/* create a core file for debug */
+	(void) abort();
+    }
+}
+
