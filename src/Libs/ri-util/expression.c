@@ -590,10 +590,11 @@ reference r2;
 	return FALSE;
 
     if(gen_length(dims1) != gen_length(dims2))
-	pips_error("reference_equal_p",
-		   "Different dimensions for %s: %d and %d\n",
-		   entity_local_name(v1),
-		   gen_length(dims1), gen_length(dims2));
+	return FALSE;
+    /*
+       pips_internal_error("Different dimensions for %s: %d and %d\n",
+       entity_local_name(v1), gen_length(dims1), gen_length(dims2));
+       */
 
     for(; !ENDP(dims1); POP(dims1), POP(dims2))
 	if(!expression_equal_p(EXPRESSION(CAR(dims1)), EXPRESSION(CAR(dims2))))
@@ -623,7 +624,7 @@ call c2;
     if(f1 != f2)
 	return FALSE;
 
-    if(gen_length(args1) != gen_length(args2))
+    if(gen_length(args1) != gen_length(args2)) /* this should be a bug */
 	return FALSE;
 
     for(; !ENDP(args1); POP(args1), POP(args2))
