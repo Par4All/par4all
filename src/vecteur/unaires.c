@@ -153,7 +153,13 @@ Variable v_old,v_new;
     }
 }
 
-
+Variable vect_one_coeff_if_any(Pvecteur v)
+{
+  for (; v; v=v->succ)
+    if (v->var && (value_one_p(v->val) || value_mone_p(v->val)))
+      return v->var;
+  return NULL;
+}
 
 /* Pvecteur vect_del_var(Pvecteur v_in, Variable var): allocation d'un
  * nouveau vecteur egal a la projection de v_in selon la direction var
