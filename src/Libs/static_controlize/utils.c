@@ -46,11 +46,12 @@
 #include "static_controlize.h"
 
 /* Global variables 	*/
-extern	list		Gscalar_written_forward;
+/* extern	list		Gscalar_written_forward; */
 extern 	list		Gstructure_parameters;
+/*
 extern  list		Genclosing_loops;
 extern  list		Genclosing_tests;
-/* extern  hash_table	Gforward_substitute_table; */
+extern  hash_table	Gforward_substitute_table; */
 
 
 /*=======================================================================*/
@@ -176,12 +177,13 @@ int	  in_ct;
 }
 
 /*=================================================================*/
-/* expression sc_opposite_exp_of_conjunction( expression exp )	AL 08/19/93
- * Input 	: exp a conjunction of linear expressions
- * Output	: simplified value of NOT( exp )
+/* expression sc_opposite_exp_of_conjunction(expression exp, (list) *ell)
+ * AL 08/19/93 Input : exp a conjunction of linear expressions Output :
+ * simplified value of NOT( exp )
  */
-expression sc_opposite_exp_of_conjunction( exp )
+expression sc_opposite_exp_of_conjunction(exp, ell)
 expression exp;
+list *ell;
 {
 	expression ret_exp;
 
@@ -190,7 +192,7 @@ expression exp;
                 (syntax_tag(expression_syntax( exp )) != is_syntax_call) ) {
 		ret_exp = expression_undefined;
         }
-	else if (splc_positive_relation_p( exp )) {
+	else if (splc_positive_relation_p(exp, ell)) {
 		expression 	exp1, exp2;
 		exp1 = EXPRESSION(CAR( call_arguments(
 				syntax_call(expression_syntax( exp )))));
@@ -209,8 +211,8 @@ expression exp;
 		l_exp = EXPRESSION(CAR( args ));
 		r_exp = EXPRESSION(CAR(CDR( args )));
 		ret_exp = MakeBinaryCall( ENTITY_OR,
-				sc_opposite_exp_of_conjunction( l_exp ),
-				sc_opposite_exp_of_conjunction( r_exp ) );
+				sc_opposite_exp_of_conjunction(l_exp, ell),
+				sc_opposite_exp_of_conjunction(r_exp, ell));
 			
 	}
 	else ret_exp = expression_undefined;
@@ -221,12 +223,13 @@ expression exp;
 
 
 /*=================================================================*/
-/* bool splc_positive_relation_p((expression) exp )		AL 04/93
- * Returns TRUE if exp is an affine form of structural parameters
- * and of loop-counters.
+/* bool splc_positive_relation_p((expression) exp, list *ell) AL 04/93
+ * Returns TRUE if exp is an affine form of structural parameters and of
+ * loop-counters.
  */
-bool splc_positive_relation_p( exp )
+bool splc_positive_relation_p(exp, ell)
 expression exp;
+list *ell;
 {
 	syntax s = expression_syntax( exp );
 	call c;
@@ -238,18 +241,19 @@ expression exp;
 	c = syntax_call( s );
 	if (!ENTITY_GREATER_OR_EQUAL_P(call_function( c ))) return( FALSE );
 	args = call_arguments( c );
-	return(	splc_linear_expression_p(EXPRESSION(CAR(args))) &&
-		expression_equal_integer_p( EXPRESSION(CAR(CDR(args))), 0 ) );
+	return(splc_linear_expression_p(EXPRESSION(CAR(args)), *ell) &&
+	       expression_equal_integer_p( EXPRESSION(CAR(CDR(args))), 0 ) );
 }
 
 /*=================================================================*/
-/* list 	ndf_normalized_test( (expression) exp )		AL 04/93
- * Returns a list of positive linear forms from an input expression
- * which is a logical combinaison of affine forms of structural 
- * parameters and of loop counters.
+/* list ndf_normalized_test( (expression) exp, (list) *ell) AL 04/93
+ * Returns a list of positive linear forms from an input expression which
+ * is a logical combinaison of affine forms of structural parameters and
+ * of loop counters.
  */
-list 	ndf_normalized_test( exp )
+list 	ndf_normalized_test(exp, ell)
 expression exp;
+list *ell;
 {
 	list 		args, ret_list = NIL;
 	entity		fun;
@@ -265,13 +269,13 @@ expression exp;
 
 	fun = call_function(syntax_call(expression_syntax( exp )));
 	args = call_arguments(syntax_call(expression_syntax( exp )));
-	if (splc_positive_relation_p( exp ))  {
+	if (splc_positive_relation_p(exp, ell))  {
 		ADD_ELEMENT_TO_LIST( ret_list, EXPRESSION, exp );
 		return( ret_list );
 	}	
 	if (ENTITY_NOT_P( fun )) {
 		arg1 = EXPRESSION(CAR(args));
-		if (splc_positive_relation_p( arg1 )) {
+		if (splc_positive_relation_p(arg1, ell)) {
 			exp3 = EXPRESSION(CAR( call_arguments(
 				 syntax_call(expression_syntax( arg1 )))));
 			exp2 = MakeBinaryCall( ENTITY_GE,
@@ -288,13 +292,13 @@ expression exp;
 			MAPL( exp_ptr, {
 			   exp3 = EXPRESSION(CAR( exp_ptr ));
 			   if (exp2 == expression_undefined) 
-				exp2 = sc_opposite_exp_of_conjunction( exp3 );
+			     exp2 = sc_opposite_exp_of_conjunction(exp3, ell);
 			   else 
-				exp2 = MakeBinaryCall( ENTITY_AND,
-					sc_opposite_exp_of_conjunction( exp3 ),
-					expression_dup( exp2 ) );
-			}, ndf_normalized_test( arg1 ));
-			ret_list = ndf_normalized_test( exp2 );
+			     exp2 = MakeBinaryCall(ENTITY_AND,
+				     sc_opposite_exp_of_conjunction(exp3, ell),
+						   expression_dup( exp2 ) );
+			}, ndf_normalized_test(arg1, ell));
+			ret_list = ndf_normalized_test(exp2, ell);
 			return( ret_list );
 		}
 	}
@@ -309,11 +313,11 @@ expression exp;
 	   MAPL( exp_ptr, {
 	      exp3 = EXPRESSION(CAR( exp_ptr ));
 	      ADD_ELEMENT_TO_LIST( ret_list, EXPRESSION, exp3 );
-	      }, ndf_normalized_test( arg1 ));
+	      }, ndf_normalized_test(arg1, ell));
 	   MAPL( exp_ptr, {
 	      exp3 = EXPRESSION(CAR( exp_ptr ));
 	      ADD_ELEMENT_TO_LIST( ret_list, EXPRESSION, exp3 );
-	      }, ndf_normalized_test( arg2 ));
+	      }, ndf_normalized_test(arg2, ell));
 	   return( ret_list );
 	}
 	 
@@ -325,10 +329,10 @@ expression exp;
 	/* if (ENTITY_OR_P( fun )) {
 	 * list		not_l1, not_l2, l1, l2;
 	 *
-	 *l1 = ndf_normalized_test( arg1 );
-	 *l2 = ndf_normalized_test( arg2 );
-	 *not_l1 = ndf_normalized_test( MakeUnaryCall(ENTITY_NOT, arg1) );
-	 *not_l2 = ndf_normalized_test( MakeUnaryCall(ENTITY_NOT, arg2) );
+	 *l1 = ndf_normalized_test(arg1, ell);
+	 *l2 = ndf_normalized_test( arg2, ell);
+	 *not_l1 = ndf_normalized_test( MakeUnaryCall(ENTITY_NOT, arg1), ell );
+	 *not_l2 = ndf_normalized_test( MakeUnaryCall(ENTITY_NOT, arg2), ell );
 	 *
 	 * MAPL( exp_ptr, {
 	 * expression S1 = EXPRESSION(CAR( exp_ptr ));
@@ -364,8 +368,8 @@ expression exp;
 		expression 	exp4, exp5, exp6;
 		list		l1, l2;
 		
-		l1 = ndf_normalized_test( arg1 );
-		l2 = ndf_normalized_test( arg2 );
+		l1 = ndf_normalized_test(arg1, ell);
+		l2 = ndf_normalized_test(arg2, ell);
 		MAPL( exp_ptr, {
 			exp4 = EXPRESSION(CAR( exp_ptr ));
 			MAPL( ep, {
@@ -382,12 +386,13 @@ expression exp;
 	
 
 /*=================================================================*/
-/* expression normalize_test_leaves( (expression) exp )	AL 04/93
- * If exp is linear in structurals and loop-counters, it returns
- * the same expression with linear positive forms
+/* expression normalize_test_leaves((expression) exp, (list) *ell) AL 04/93
+ * If exp is linear in structurals and loop-counters, it returns the same
+ * expression with linear positive forms
  */
-expression normalize_test_leaves( exp )
+expression normalize_test_leaves(exp, ell)
 expression exp;
+list *ell;
 {
 	syntax		s 	 = expression_syntax( exp );
 	entity		fun  	 = call_function(syntax_call( s ));
@@ -402,7 +407,8 @@ expression exp;
 	if (syntax_tag( s ) != is_syntax_call) return( ret_exp );
 
 	if (ENTITY_NOT_P( fun )) {
-		expression exp1 = normalize_test_leaves(EXPRESSION(CAR(args)));
+		expression exp1 =
+		  normalize_test_leaves(EXPRESSION(CAR(args)), ell);
 
 		/* We return expression_undefined if we can not normalize */
 		if (exp1 == expression_undefined) return(expression_undefined);
@@ -442,7 +448,7 @@ expression exp;
 	if (ENTITY_STRICT_LOGICAL_OPERATOR_P( fun )) {
 		MAPL( exp_ptr, {
 			e = EXPRESSION(CAR( exp_ptr ));
-			ne = normalize_test_leaves( e );
+			ne = normalize_test_leaves(e, ell);
 			if (ne == expression_undefined) return(ne);
 			ADD_ELEMENT_TO_LIST(new_args, EXPRESSION, 
 					expression_dup( ne ));
@@ -454,8 +460,8 @@ expression exp;
 		return( ret_exp );
 	}
 	else if (	ENTITY_RELATIONAL_OPERATOR_P( fun ) &&
-		(!splc_linear_expression_p(arg1) || 
-		 !splc_linear_expression_p(arg2)) ) {
+		(!splc_linear_expression_p(arg1, ell) || 
+		 !splc_linear_expression_p(arg2, ell)) ) {
 
 		debug(7, "normalize_test_leaves", "returning : %s\n",
 					"expression_undefined" );
@@ -528,12 +534,13 @@ expression exp;
 			
 
 /*=================================================================*/
-/* expression sc_conditional( (expression) exp )		AL 04/93
- * If exp is linear in structurals and loop-counters, it returns
- * the same expression with a normal disjunctive form.
+/* expression sc_conditional( (expression) exp, (list) *ell ) AL 04/93 If
+ * exp is linear in structurals and loop-counters, it returns the same
+ * expression with a normal disjunctive form.
  */
-expression sc_conditional( exp )
+expression sc_conditional(exp, ell)
 expression exp;
+list *ell;
 {
 	expression 	e, ret_exp = expression_undefined;
 	syntax		s = expression_syntax( exp );
@@ -543,8 +550,8 @@ expression exp;
 				words_to_string(words_expression(exp)));
 
 	if ( syntax_tag(s) != is_syntax_call ) return( ret_exp );
-	e = normalize_test_leaves( exp );
-	ndf_list = ndf_normalized_test(e);
+	e = normalize_test_leaves(exp, ell);
+	ndf_list = ndf_normalized_test(e, ell);
 	if (ndf_list != list_undefined) {
 		ret_exp = EXPRESSION(CAR( ndf_list ));
 		ndf_list = CDR( ndf_list );
@@ -586,39 +593,37 @@ list l;
 /* bool splc_linear_expression_p((expression) exp) 		AL 04/93
  * Returns TRUE if exp is linear in structural parameters and loop counters.
  */
-bool splc_linear_expression_p( exp )
+bool splc_linear_expression_p(exp, ell)
 expression exp;
+list *ell;
 {
-   Pvecteur     vect;
-   bool         ONLY_SPLC;
+  Pvecteur     vect;
+  bool         ONLY_SPLC;
 
-   debug(7, "splc_linear_expression_p", "exp : %s\n",
-                words_to_string(words_expression(exp)));
+  debug(7, "splc_linear_expression_p", "exp : %s\n",
+	words_to_string(words_expression(exp)));
 
-   if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
-        ONLY_SPLC = FALSE;
-   else
-   {
-        vect = (Pvecteur) normalized_linear(expression_normalized(exp));
-        ONLY_SPLC = TRUE;
+  if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
+    ONLY_SPLC = FALSE;
+  else
+  {
+    vect = (Pvecteur) normalized_linear(expression_normalized(exp));
+    ONLY_SPLC = TRUE;
 
-        for(; !VECTEUR_NUL_P(vect) && ONLY_SPLC ; vect = vect->succ)
-        {
-                entity var = (entity) vect->var;
+    for(; !VECTEUR_NUL_P(vect) && ONLY_SPLC ; vect = vect->succ)
+    {
+      entity var = (entity) vect->var;
 
-                if( ! term_cst(vect) )
-                if(!( ENTITY_SP_P(var) ||
-	    	      (gen_find_eq(var,loops_to_indices(Genclosing_loops)) 
-			!= chunk_undefined)
-		    ) 
-		  )
-                        ONLY_SPLC = FALSE;
-        }
-   }
-   unnormalize_expression(exp);
-   debug(7, "splc_linear_expression_p",
-		"  result : %s\n", (ONLY_SPLC?"TRUE":"FALSE") );
-   return(ONLY_SPLC);
+      if( ! term_cst(vect) )
+	if(!(ENTITY_SP_P(var) ||
+           (gen_find_eq(var,loops_to_indices(*ell)) != chunk_undefined)))
+	  ONLY_SPLC = FALSE;
+    }
+  }
+  unnormalize_expression(exp);
+  debug(7, "splc_linear_expression_p",
+	"  result : %s\n", (ONLY_SPLC?"TRUE":"FALSE") );
+  return(ONLY_SPLC);
 }
 
 
@@ -627,8 +632,8 @@ expression exp;
  * Returns TRUE if all expressions exp are structural parameters 
  * and loop counters linear functions.
  */
-bool splc_linear_expression_list_p( l )
-list l;
+bool splc_linear_expression_list_p(l, ell)
+list l, *ell;
 {
 	bool		bo = TRUE;
 	expression 	exp;
@@ -636,18 +641,18 @@ list l;
 	debug( 7, "splc_linear_expression_list_p", "doing \n");
 	MAPL( exp_ptr, {
 		exp = EXPRESSION(CAR( exp_ptr ));
-		bo = bo && splc_linear_expression_p( exp );
+		bo = bo && splc_linear_expression_p(exp, ell);
 		}, l );
 	return( bo );
 }
 
 /*=================================================================*/
-/* bool splc_linear_access_to_arrays_p((list) l) 		AL 04/93
- * Returns TRUE if all expressions exp are structural parameters 
- * and loop counters linear functions.
+/* bool splc_linear_access_to_arrays_p((list) l, (list) *ell) AL 04/93
+ * Returns TRUE if all expressions exp are structural parameters and loop
+ * counters linear functions.
  */
-bool splc_linear_access_to_arrays_p( l )
-list l;
+bool splc_linear_access_to_arrays_p(l, ell)
+list l, *ell;
 {
 	bool 		bo, ret_bo = TRUE;
 	expression 	exp;
@@ -657,15 +662,17 @@ list l;
 	debug(7, "splc_linear_access_to_arrays_p", "doing\n");
 	if (l == NIL) return(TRUE);
 	MAPL( exp_ptr, {
-		exp = EXPRESSION(CAR( exp_ptr ));
-		s   = expression_syntax( exp );
-		t   = syntax_tag( s );
-		if (t == is_syntax_call) 
-			bo = splc_linear_access_to_arrays_p(
-				call_arguments(syntax_call( s )) );
-		else if (t == is_syntax_reference) 
-			bo = splc_linear_expression_list_p( 
-				reference_indices(syntax_reference( s )) );
+	  exp = EXPRESSION(CAR( exp_ptr ));
+	  s   = expression_syntax( exp );
+	  t   = syntax_tag( s );
+	  if (t == is_syntax_call) 
+	    bo =
+	      splc_linear_access_to_arrays_p(call_arguments(syntax_call(s)),
+					     ell); 
+	  else if (t == is_syntax_reference) 
+	    bo =
+	      splc_linear_expression_list_p(reference_indices(syntax_reference(s)),
+					    ell); 
 		else bo = FALSE;
 		ret_bo = ret_bo && bo;
 	}, l );
@@ -777,14 +784,15 @@ list make_undefined_list()
 /* int in_forward_defined( (entity) ent ) 			AL 30/08/93
  * Returns the number of entities ent in the list Gscalar_written_forward.
  */
-int in_forward_defined( ent )
+int in_forward_defined( ent, swfl)
 entity ent;
+list *swfl;
 {
     cons *pc;
     int  ret_int = 0;
 
     debug(9, "in_forward_defined", "doing \n");
-    for (pc = Gscalar_written_forward; pc != NIL; pc = pc->cdr ) {
+    for (pc = *swfl; pc != NIL; pc = pc->cdr ) {
         if ((chunk*) ent == CAR(pc).p)
                 ret_int++;
     }
@@ -797,15 +805,16 @@ entity ent;
 /* bool in_forward_defined_p( (entity) ent )			AL 04/93
  * Returns TRUE if ent is in global variable Gscalar_written_forward.
  */
-bool in_forward_defined_p( ent )
+bool in_forward_defined_p( ent, swfl)
 entity ent;
+list *swfl;
 {
 	chunk* ch;
 
 	debug( 7, "in_forward_defined_p", "doing \n");  
-	ch = gen_find_eq( ent, Gscalar_written_forward );
+	ch = gen_find_eq( ent, *swfl );
 	debug( 9, "in_forward_defined_p", "scalar written_forward = %s\n",
-			print_structurals(Gscalar_written_forward) );
+			print_structurals(*swfl) );
 	return( ch != chunk_undefined );
 }
 	
@@ -837,14 +846,15 @@ list l;
  * An entity will be a structural parameter if it is a candidate and if it
  * is not written forward.
  */
-void verify_structural_parameters( the_list )
+void verify_structural_parameters( the_list, swfl)
 list the_list;
+list *swfl;
 {
 	debug(7, "verify_structural_parameters","doing\n");
 	MAPL( el_ptr,
 		{
 		entity ent = ENTITY(CAR( el_ptr ));
-		if (   gen_find_eq( ent, Gscalar_written_forward )
+		if (   gen_find_eq( ent, *swfl )
 		    == chunk_undefined )
 			ADD_ELEMENT_TO_LIST( Gstructure_parameters,
 					     ENTITY,
@@ -913,17 +923,18 @@ call c;
  * in the global list Gscalar_written_forward if Genclosing_loops
  * or Genclosing_tests are not empty.
  */
-void scalar_written_in_call( the_call )
+void scalar_written_in_call( the_call, ell, etl, swfl)
 call the_call;
+list *ell, *etl, *swfl;
 {
    entity ent;
 
    debug( 7, "scalar_written_in_call", "doing\n");
    if (    ((ent = scalar_assign_call(the_call)) != entity_undefined)
-        && ( (Genclosing_loops != NIL) || (Genclosing_tests != NIL) )
+        && ( (*ell != NIL) || (*etl != NIL) )
 	&& entity_integer_scalar_p( ent ) )
 
-	ADD_ELEMENT_TO_LIST(Gscalar_written_forward, ENTITY, ent);
+	ADD_ELEMENT_TO_LIST(*swfl, ENTITY, ent);
 }
 
 /*=================================================================*/
@@ -995,8 +1006,9 @@ expression exp;
  * Returns TRUE if exp quasi affine form in structural parameters
  * and in surrounding loop-counters.
  */
-bool splc_feautrier_expression_p( exp )
+bool splc_feautrier_expression_p(exp, ell)
 expression exp;
+list *ell;
 {
 	bool b = FALSE;
 	syntax s = expression_syntax( exp );
@@ -1005,7 +1017,7 @@ expression exp;
 		((exp == expression_undefined)?"expression_undefined":
 			words_to_string( words_expression( exp ) ) ));
 
-	if (splc_linear_expression_p( exp )) return( TRUE );
+	if (splc_linear_expression_p(exp, ell)) return( TRUE );
 	if ( syntax_tag( s ) == is_syntax_call ) {
 		call c;
 		list args;
@@ -1016,8 +1028,8 @@ expression exp;
 			args = call_arguments( c );
 			exp1 = EXPRESSION(CAR( args ));
 			exp2 = EXPRESSION(CAR( CDR(args) ));
-			b    = splc_feautrier_expression_p( exp1 )
-		    			&& expression_constant_p( exp2 );
+			b    = splc_feautrier_expression_p(exp1, ell)
+			       && expression_constant_p( exp2 );
 		}
 	}
 	debug(7, "splc_feautrier_expression_p", "returning : %s\n",
@@ -1092,9 +1104,10 @@ call c;
  * AP, sep 95 : Gforward_substitute_table is no longer a global variable,
  * we pass it as an argument.
  */
-bool get_sp_of_call_p( c, fst)
+bool get_sp_of_call_p( c, fst, swfl)
 call c;
 hash_table fst; /* forward substitute table */
+list *swfl;
 {
    entity 	lhs_ent, ent;
    bool		ret_bool = FALSE;
@@ -1112,14 +1125,14 @@ hash_table fst; /* forward substitute table */
           {
 	  expression exp = EXPRESSION(CAR( exp_ptr ));
 	  ent = expression_int_scalar( (expression) exp );
-          if ((ent != entity_undefined)  && !in_forward_defined_p(ent))
+          if ((ent != entity_undefined)  && !in_forward_defined_p(ent, swfl))
 		ADD_ELEMENT_TO_LIST( Gstructure_parameters, ENTITY, ent );
           },
           the_arg);
    }
 
    if (    ((lhs_ent = sp_feautrier_scalar_assign_call(c)) != entity_undefined) 
-	&& (in_forward_defined(lhs_ent) <= 1) )	{	
+	&& (in_forward_defined(lhs_ent, swfl) <= 1) )	{	
 
 	expression nsp_exp;
 	entity     nsp_ent;
