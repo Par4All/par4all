@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 19:48:05 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 19:54:59 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -183,6 +183,12 @@ char * gen_get_tabulated_name_basic(int domain, char * id)
 char * gen_get_tabulated_name(gen_chunk * obj)
 {
     char * key = build_unique_tabulated_name_for_obj(obj);
+    check_Gen_tabulated_names();
+    return hash_get(Gen_tabulated_names, key);
+}
+
+char * gen_get_tabulated_name_direct(char * key)
+{
     check_Gen_tabulated_names();
     return hash_get(Gen_tabulated_names, key);
 }
