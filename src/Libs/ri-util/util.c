@@ -4,6 +4,9 @@
  * $Id$
  *
  * $Log: util.c,v $
+ * Revision 1.15  2002/03/08 10:14:33  irigoin
+ * predicate stack_area_p() added for StackArea + reformatting
+ *
  * Revision 1.14  2000/08/29 13:51:32  irigoin
  * Bug fix in new_label_name(), call to entity_local_name() replaced by call
  * to module_local_name()
@@ -118,7 +121,7 @@ char *s;
     return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
 		       s, SEQUENTIAL_CODE_EXT, NULL));
 }
-
+
 /* generation des noms de fichiers */
 string 
 module_codefilename(e)
@@ -216,7 +219,7 @@ entity e;
 {
     return(string_entitiesfilename(entity_local_name(e)));
 }
-
+
 /* functions for expressions */
 
 expression 
@@ -229,7 +232,7 @@ cons *inds;
     return(make_expression(make_syntax(is_syntax_reference,E),
 			   normalized_undefined));			    
 }
-
+
 string 
 new_label_name(module)
 entity module;
@@ -259,7 +262,7 @@ entity module;
     }
     return(name);
 }
-	 
+	 
 entity 
 find_ith_parameter(e, i)
 entity e;
@@ -312,15 +315,13 @@ int i;
 
     return(FALSE);
 }
-
+
 /* functions for effects */
-entity 
-effect_entity(e)
-effect e;
+entity effect_entity(effect e)
 {
-    return(reference_variable(effect_reference(e)));
+  return(reference_variable(effect_reference(e)));
 }
-
+
 /* functions for references */
 
 /* returns the ith index of an array reference */
@@ -338,37 +339,35 @@ int i;
 
     return(EXPRESSION(CAR(pi)));
 }
+
+/* functions for areas */
 
-/* functions for area */
-
-bool 
-dynamic_area_p(aire)
-entity aire;
+bool dynamic_area_p(entity aire)
 {
-    return(strcmp(entity_local_name(aire), DYNAMIC_AREA_LOCAL_NAME) == 0);
+  return(strcmp(entity_local_name(aire), DYNAMIC_AREA_LOCAL_NAME) == 0);
 }
 
-bool 
-static_area_p(aire)
-entity aire;
+bool static_area_p(entity aire)
 {
-    return(strcmp(entity_local_name(aire), STATIC_AREA_LOCAL_NAME) == 0);
+  return(strcmp(entity_local_name(aire), STATIC_AREA_LOCAL_NAME) == 0);
 }
 
-bool 
-heap_area_p(aire)
-entity aire;
+bool heap_area_p(entity aire)
 {
-    return(strcmp(entity_local_name(aire), HEAP_AREA_LOCAL_NAME) == 0);
+  return(strcmp(entity_local_name(aire), HEAP_AREA_LOCAL_NAME) == 0);
 }
 
+bool stack_area_p(entity aire)
+{
+  return(strcmp(entity_local_name(aire), STACK_AREA_LOCAL_NAME) == 0);
+}
+
 
 /* Test if a string can be a Fortran 77 comment: */
-bool
-comment_string_p(const string comment)
+bool comment_string_p(const string comment)
 {
-    char c = *comment;
-    /* If a line begins with a non-space character, claims it may be a
-       Fortran comment. Assume empty line are comments. */
-    return c != '\0' && c != ' ' && c != '\t';
+  char c = *comment;
+  /* If a line begins with a non-space character, claims it may be a
+     Fortran comment. Assume empty line are comments. */
+  return c != '\0' && c != ' ' && c != '\t';
 }
