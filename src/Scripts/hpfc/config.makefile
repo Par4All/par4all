@@ -39,7 +39,7 @@ FC_HTML= /users/cri/coelho/public_html
 web: hpfc_directives
 	$(RM) $(FC_HTML)/hpfc_directives
 	cp hpfc_directives $(FC_HTML)
-	chmod a+r $(FC_HTML)/hpfc_directives
+	chmod a+r-wx $(FC_HTML)/hpfc_directives
 
 # that is all
 #
