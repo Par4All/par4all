@@ -1,7 +1,7 @@
 /* this is a set of functions to help hpfc debugging
  *
  * $RCSfile: debug-util.c,v $ (version $Revision$)
- * $Date: 1995/12/20 08:50:04 $, 
+ * $Date: 1995/12/29 14:35:59 $, 
  *
  * Fabien Coelho, May 1993.
  */
