@@ -1,7 +1,7 @@
 /* package arithmetique 
  *
  * $RCSfile: divide.c,v $ (version $Revision$)
- * $Date: 1996/07/16 19:26:49 $, 
+ * $Date: 1996/07/16 22:04:38 $, 
  */
 
 /*LINTLIBRARY*/
@@ -39,7 +39,7 @@ Value divide_fast(Value a, Value b)
 #define DIVIDE_MAX_A 7
 #define DIVIDE_MAX_B 8
 
-    static int
+    static Value
 	divide_look_up[2*DIVIDE_MAX_A+1][DIVIDE_MAX_B]={
 	/* b ==         1   2   3   4   5   6   7   8 */
 	{/* a == - 7 */ -7, -4, -3, -2, -2, -2, -1, -1},
@@ -78,8 +78,8 @@ Value divide_fast(Value a, Value b)
 	int bint = VALUE_TO_INT(b),
 	    la = VALUE_TO_INT(a)+DIVIDE_MAX_A; /* shift a for the table */
 	quotient = (bint>0)?
-	    (Value)divide_look_up[la][bint-1]:
-		(Value)-divide_look_up[la][(-bint)-1];
+	    divide_look_up[la][bint-1]:
+		value_uminus(divide_look_up[la][(-bint)-1]);
     }
     else 
 	quotient = value_pdiv(a,b); /* this is just divide_slow */
