@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/10/07 22:51:55 $, ) 
+ * ($Date: 1995/10/10 11:38:21 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -19,9 +19,7 @@
  */
 #include <sys/time.h>
 #include <sys/resource.h>
-int getrusage(int, struct rusage*); /* not found in any header! */
-
-entity CreateIntrinsic(string name); /* in syntax */
+extern int getrusage(int, struct rusage*); /* not found in any header! */
 
 /* linearize the processor arrangement on which array is distributed
  * or replicated (driven by distributed). The variables are those created 
@@ -364,7 +362,7 @@ if_different_pe(
     statement false)
 {
     return test_to_statement
-      (make_test(MakeBinaryCall(CreateIntrinsic(NON_EQUAL_OPERATOR_NAME),
+      (make_test(MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
 	   entity_to_expression(hpfc_name_to_entity(MYLID)),
 	   entity_to_expression(lid)),
 		      true, false));
@@ -744,7 +742,7 @@ generate_remapping_guard(
 				    int_to_expression(trg_n));
 
     /* MSTATUS(primary_number).eq.src_number */
-    cond = MakeBinaryCall(CreateIntrinsic(EQUAL_OPERATOR_NAME),
+    cond = MakeBinaryCall(entity_intrinsic(EQUAL_OPERATOR_NAME),
 			  m_stat_ref, int_to_expression(src_n));
 
     result = test_to_statement(make_test(cond, 
