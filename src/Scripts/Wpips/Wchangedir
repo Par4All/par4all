@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/11 15:44:23 $, 
+# $Date: 1996/09/11 16:04:34 $, 
 #
 # this script allow to chose a directory in interactively
 #
@@ -21,11 +21,8 @@ proc filldirlist { list dir } {
     $list delete 0 end
     set pwd [pwd]
     cd $dir
-    if {$dir != "/"} {
-	$list insert end ".."
-    }
-    foreach d [lsort [glob *]] {
-	if {[file readable $d]} {
+    foreach d [lsort [glob * .*]] {
+	if {$d != "." && [file readable $d]} {
 	    set name $d
 	    # follows link...
 	    while {[file type $d] == "link"} {
