@@ -83,8 +83,7 @@ typedef float Value;
 /* the purpose of the chars version is to detect invalid assignments
  */
 #elif defined(LINEAR_VALUE_IS_CHARS)
-typedef union _u_Value Value;
-union _u_Value { char *s; long l; int i; float f; double d;};
+typedef union { char *s; long l; int i; float f; double d;} Value;
 #define VALUE_FMT "%s"
 #define VALUE_CONST(val) ((Value)val)
 #define VALUE_MIN ((Value)0xdeadbeef)
