@@ -264,3 +264,67 @@
       dest(6) = src1(6) * src2(6)
       dest(7) = src1(7) * src2(7)
       end
+
+      subroutine simd_mov2(dest, src)
+      integer*4 dest(2)
+      integer*4 src(2)
+
+      dest(0) = src(0)
+      dest(1) = src(1)
+      end
+
+      subroutine simd_mov4(dest, src)
+      integer*2 dest(4)
+      integer*2 src(4)
+
+      dest(0) = src(0)
+      dest(1) = src(1)
+      dest(2) = src(2)
+      dest(3) = src(3)
+      end
+
+      subroutine simd_mov8(dest, src)
+      integer*1 dest(8)
+      integer*1 src(8)
+
+      dest(0) = src(0)
+      dest(1) = src(1)
+      dest(2) = src(2)
+      dest(3) = src(3)
+      dest(4) = src(4)
+      dest(5) = src(5)
+      dest(6) = src(6)
+      dest(7) = src(7)
+      end
+
+      subroutine simd_opp2(dest, src)
+      integer*4 dest(2)
+      integer*4 src(2)
+
+      dest(0) = -src(0)
+      dest(1) = -src(1)
+      end
+
+      subroutine simd_opp4(dest, src)
+      integer*2 dest(4)
+      integer*2 src(4)
+
+      dest(0) = -src(0)
+      dest(1) = -src(1)
+      dest(2) = -src(2)
+      dest(3) = -src(3)
+      end
+
+      subroutine simd_opp8(dest, src)
+      integer*1 dest(8)
+      integer*1 src(8)
+
+      dest(0) = -src(0)
+      dest(1) = -src(1)
+      dest(2) = -src(2)
+      dest(3) = -src(3)
+      dest(4) = -src(4)
+      dest(5) = -src(5)
+      dest(6) = -src(6)
+      dest(7) = -src(7)
+      end
