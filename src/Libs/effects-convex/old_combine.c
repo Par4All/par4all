@@ -438,8 +438,8 @@ effect regions_must_convex_hull(region r1, region r2)
     ifdebug(8)
     {
 	pips_debug(8, "syste`mes initiaux\n");
-	syst_debug(s1);
-	syst_debug(s2);
+	sc_syst_debug(s1);
+	sc_syst_debug(s2);
     }
 
     /* sc_empty : no part of the array is accessed */
@@ -661,8 +661,8 @@ static effect regions_may_convex_hull(region r1, region r2)
     ifdebug(8)
     {
 	pips_debug(8, "initial systems\n");
-	syst_debug(s1);
-	syst_debug(s2);
+	sc_syst_debug(s1);
+	sc_syst_debug(s2);
     }
 
     /* sc_empty : no part of the array is accessed */
@@ -823,7 +823,7 @@ static Psysteme my_sc_check_after_chernikova(Psysteme sc)
 		ifdebug(1)
 		{
 		    pips_debug(1, "\tBUG CHERNIKOVA: RETURNING sc_rn.\n");
-		    syst_debug(sc);
+		    sc_syst_debug(sc);
 		}
 		sc_rm(sc);
 		debug_off();
@@ -844,7 +844,7 @@ static Psysteme my_sc_check_after_chernikova(Psysteme sc)
 		ifdebug(1)
 		{
 		    pips_debug(1, "\tBUG CHERNIKOVA: RETURNING sc_rn.\n");
-		    syst_debug(sc);
+		    sc_syst_debug(sc);
 		}
 		sc_rm(sc);
 		debug_off();
@@ -878,9 +878,9 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
     {
 	pips_debug(6,"begin\n");
 	fprintf(stderr, "ps1:\n");
-	syst_debug(ps1);    
+	sc_syst_debug(ps1);    
 	fprintf(stderr, "ps2:\n");
-	syst_debug(ps2);
+	sc_syst_debug(ps2);
     }
 
     /* update bases using their "union"; convex hull has to be computed 
@@ -924,7 +924,7 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
     ifdebug(6)
     {
 	fprintf(stderr, "convex hull:\n");
-	syst_debug(ps);
+	sc_syst_debug(ps);
     }
 
     pips_debug(5,"end\n");
