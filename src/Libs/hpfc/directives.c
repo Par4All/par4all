@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/04/18 09:12:36 $, )
+ * ($Date: 1996/04/19 15:53:28 $, )
  */
 
 #include "defines-local.h"
@@ -291,7 +291,7 @@ static void initial_alignment(statement s)
     {
 	if (array_distributed_p(array))
         {
-	    propagate_synonym(s, array, array);
+	    propagate_synonym(s, array, array, TRUE);
 	    update_renamings(s, CONS(RENAMING, make_renaming(array, array),
 				     load_renamings(s)));
 	}
@@ -329,7 +329,7 @@ one_align_directive(
 	    array_distributed_p(array) && dynamic_entity_p(array));
 
 	new_array = array_synonym_aligned_as(array, a);
-	propagate_synonym(current, array, new_array);
+	propagate_synonym(current, array, new_array, TRUE);
 	update_renamings(current, 
 			 CONS(RENAMING, make_renaming(array, new_array),
 			      load_renamings(current)));
@@ -498,7 +498,12 @@ one_distribute_directive(
 		  entity_template_p(template) && dynamic_entity_p(template));
 
 	new_t = template_synonym_distributed_as(template, d);
-	propagate_synonym(current, template, new_t);
+	propagate_synonym(current, template, new_t, FALSE);
+
+	/* the new template may be an array, thus auto-aligned 
+	 */
+	if (array_distributed_p(template) && !bound_hpf_alignment_p(new_t))
+	    array_as_template(new_t);
 
 	/*  all arrays aligned to template are propagated in turn.
 	 */
@@ -508,12 +513,12 @@ one_distribute_directive(
 	    entity new_array;
 
 	    pips_debug(7, "array 0x%x\n", (unsigned int) array);
-	    pips_debug(7, "alived array %s\n", entity_name(array));
+	    pips_debug(7, "alive array %s\n", entity_name(array));
 	    
 	    a = new_align_with_template(load_hpf_alignment(array), new_t);
 	    new_array = array_synonym_aligned_as(array, a);
 	    
-	    propagate_synonym(current, array, new_array);
+	    propagate_synonym(current, array, new_array, TRUE);
 	    update_renamings(current, 
 			     CONS(RENAMING, make_renaming(array, new_array),
 				  load_renamings(current)));
@@ -777,7 +782,7 @@ HANDLER_PROTOTYPE(prescriptive)
     array = expression_to_entity(EXPRESSION(CAR(args)));
     new_array = expression_to_entity(EXPRESSION(CAR(CDR(args))));
 
-    propagate_synonym(current, array, new_array);
+    propagate_synonym(current, array, new_array, TRUE);
 
     /* only one renaming per rename directive!
      */
