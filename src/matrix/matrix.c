@@ -519,3 +519,28 @@ Value x;
 	value_substract(MATRIX_ELEM(MAT,r1,i),
 			value_mult(x,MATRIX_ELEM(MAT,r2,i)));
 }
+
+/* void matrix_uminus(A, mA)
+ *
+ * computes mA = - A
+ *
+ * input: A, larger allocated mA
+ * output: none
+ * modifies: mA
+ */
+void matrix_uminus(
+    Pmatrix A,
+    Pmatrix mA)
+{
+    int i,j;
+
+    assert(MATRIX_NB_LINES(mA)>=MATRIX_NB_LINES(A) &&
+	   MATRIX_NB_COLUMNS(mA)>=MATRIX_NB_COLUMNS(A));
+
+    for (i=1; i<=MATRIX_NB_LINES(A); i++)
+	for (j=1; j<=MATRIX_NB_COLUMNS(A); j++)
+	    MATRIX_ELEM(mA, i, j) = value_uminus(MATRIX_ELEM(A, i, j));
+}
+
+/* that is all
+ */
