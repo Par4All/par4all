@@ -75,7 +75,7 @@ static text
 resource_text_flt(entity module, int margin, statement stat, p_icfgpe_print_stuff ips)
 {
   list l_eff = load_list_icfg(ips->resource, stat);
-  entity e_flt = FindOrCreateEntity(TOP_LEVEL_MODULE, "KMAX");
+  entity e_flt = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, "KMAX");
   list l_eff_flt = effects_filter(l_eff, e_flt);
   text l_eff_text = (*(ips->get_text))(l_eff_flt);
   gen_free_list(l_eff_flt);
