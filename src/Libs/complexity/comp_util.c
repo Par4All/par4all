@@ -369,8 +369,10 @@ struct intrinsic_cost_rec {
     { "ALOG",                     is_basic_float,   FLOAT_NBYTES,   EMPTY_COST },
     { "DLOG",                     is_basic_float,   DOUBLE_NBYTES,  EMPTY_COST },
     { "CLOG",                     is_basic_complex, COMPLEX_NBYTES, EMPTY_COST },
+    { "LOG",                      is_basic_complex, COMPLEX_NBYTES, EMPTY_COST },
     { "ALOG10",                   is_basic_float,   FLOAT_NBYTES,   EMPTY_COST },
     { "DLOG10",                   is_basic_float,   DOUBLE_NBYTES,  EMPTY_COST },
+    { "LOG10",                    is_basic_float,   DOUBLE_NBYTES,  EMPTY_COST },
     { "SIN",                      is_basic_float,   FLOAT_NBYTES,   EMPTY_COST },
     { "DSIN",                     is_basic_float,   DOUBLE_NBYTES,  EMPTY_COST },
     { "CSIN",                     is_basic_complex, COMPLEX_NBYTES, EMPTY_COST },
@@ -412,7 +414,7 @@ struct intrinsic_cost_rec {
     { "ENDFILE",                  is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
     { IMPLIED_DO_NAME,            is_basic_overloaded, ZERO_BYTE, EMPTY_COST },
 
-    { "",                         0, ZERO_BYTE, EMPTY_COST },
+    { NULL,                         0, ZERO_BYTE, EMPTY_COST },
 };
 
 
@@ -426,7 +428,7 @@ FILE *fd;
     fprintf(fd, "        Intrinsic name        int    float   double   complex   dcomplex\n");
     fprintf(fd, "------------------------------------------------------------------------\n");
 	    
-    for(; strcmp(p->name, "") != 0 ;p++) {
+    for(; p->name != NULL ;p++) {
 	if (1 ||(p->int_cost      != 0) ||
 	    (p->float_cost    != 0) ||
 	    (p->double_cost   != 0) ||
@@ -530,7 +532,7 @@ float file_factor;
 		       &int_cost, &float_cost, &double_cost,
 		       &complex_cost, &dcomplex_cost);
 		recognized = FALSE;
-		for (p = intrinsic_cost_table; !streq(p->name, ""); p++) {
+		for (p = intrinsic_cost_table; p->name != NULL; p++) {
 		    if (streq(p->name, intrinsic_name)) {
 			p->int_cost = (int)
 			    (int_cost * scale_factor * file_factor + 0.5);
@@ -570,38 +572,44 @@ int intrinsic_cost(s, pargsbasic)
 char *s;
 basic *pargsbasic;
 {
-    struct intrinsic_cost_rec *p;
-    basic b;
+  struct intrinsic_cost_rec *p;
+  basic b;
 
-    for (p = intrinsic_cost_table; p->name != NULL; p++) {
-	if (streq(p->name, s)) {
-	    b = make_basic(p->min_basic_result, p->min_nbytes_result);
-	    if (is_inferior_basic(*pargsbasic, b)) {
-		free_basic(*pargsbasic);
-		*pargsbasic = simple_basic_dup(b);
-	    }
+  for (p = intrinsic_cost_table; p->name != NULL; p++) {
+    if (streq(p->name, s)) {
 
-	    switch (basic_tag(*pargsbasic)) {
-	    case is_basic_int:
-		return(p->int_cost);
-	    case is_basic_float:
-		return (basic_float(*pargsbasic) <= FLOAT_NBYTES ?
-			p->float_cost : p->double_cost);
-	    case is_basic_complex:
-		return (basic_complex(*pargsbasic) <= COMPLEX_NBYTES ?
-			p->complex_cost : p->dcomplex_cost);
-	    case is_basic_string:
-		return (STRING_INTRINSICS_COST);
-	    case is_basic_logical:
-		return (LOGICAL_INTRINSICS_COST);
-	    default:
-		pips_error("intrinsic_cost",
-			   "basic tag is %d\n", basic_tag(*pargsbasic));
-	    }
+      /* Inserted by AP, oct 24th 1995 */
+      if (streq(p->name, "LOG") || streq(p->name, "LOG10")) {
+	user_warning("intrinsic_cost", "LOG or LOG10 functions used\n");
+      }
+
+      b = make_basic(p->min_basic_result, p->min_nbytes_result);
+      if (is_inferior_basic(*pargsbasic, b)) {
+	free_basic(*pargsbasic);
+	*pargsbasic = simple_basic_dup(b);
+      }
+
+      switch (basic_tag(*pargsbasic)) {
+	case is_basic_int:
+	  return(p->int_cost);
+	case is_basic_float:
+	  return (basic_float(*pargsbasic) <= FLOAT_NBYTES ?
+		  p->float_cost : p->double_cost);
+	case is_basic_complex:
+	  return (basic_complex(*pargsbasic) <= COMPLEX_NBYTES ?
+		  p->complex_cost : p->dcomplex_cost);
+	case is_basic_string:
+	  return (STRING_INTRINSICS_COST);
+	case is_basic_logical:
+	  return (LOGICAL_INTRINSICS_COST);
+	default:
+	  pips_error("intrinsic_cost",
+		     "basic tag is %d\n", basic_tag(*pargsbasic));
 	}
     }
-    /* To satisfy cproto . LZ 02 Feb. 93 */
-    return (STRING_INTRINSICS_COST); 
+  }
+  /* To satisfy cproto . LZ 02 Feb. 93 */
+  return (STRING_INTRINSICS_COST); 
 }
 
 /* boolean is_inferior_basic(basic1, basic2)
