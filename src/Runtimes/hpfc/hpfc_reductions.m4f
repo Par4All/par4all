@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/04/11 10:23:56 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/05/13 14:38:24 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -114,6 +114,7 @@ c
 ^      include 'fpvm3.h'						\
 ^      include 'hpfc_commons.h'						\
 ^      TYPE result(MAXMAXSIZEOFPROCS), final				\
+^      integer i							\
 ^c									\
 ^c get partial results							\
 ^c									\
@@ -210,6 +211,7 @@ c
 ^      include 'fpvm3.h'						\
 ^      include 'hpfc_commons.h'						\
 ^      TYPE result(MAXMAXSIZEOFPROCS), final				\
+^      integer i							\
 ^c									\
 ^c get partial results							\
 ^c									\
@@ -294,6 +296,7 @@ c
 ^      include 'fpvm3.h'						\
 ^      include 'hpfc_commons.h'						\
 ^      TYPE result(MAXMAXSIZEOFPROCS), final				\
+^      integer i							\
 ^c									\
 ^c get partial results							\
 ^c									\
