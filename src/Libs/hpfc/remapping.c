@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1996/07/23 15:08:34 $, ) 
+ * ($Date: 1996/12/24 15:24:26 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -617,7 +617,7 @@ remapping_stats(
     /* comments are added to help understand the generated code
      */
     statement_comments(result) = strdup(concatenate
-	("c - ", (what & LZY) ? "lazy " : "",
+	("! - ", (what & LZY) ? "lazy " : "",
 	       t==CPY ? "copy" : t==SND ? "send" : t==RCV ? "receiv" :
 	       t==BRD ? "broadcast" : "?",  "ing\n", NULL));
 
@@ -758,15 +758,15 @@ generate_remapping_code(
     {
 	char buffer[128];
 	
-	sprintf(buffer, "c remapping %s[%d]: %s[%d] -> %s[%d]\n",
+	sprintf(buffer, "! remapping %s[%d]: %s[%d] -> %s[%d]\n",
 		entity_local_name(primary), load_hpf_number(primary),
 		entity_local_name(src), load_hpf_number(src),
 		entity_local_name(trg), load_hpf_number(trg));
 	
 	statement_comments(result) = strdup(buffer);
-	statement_comments(send) = strdup("c send part\n");
-	statement_comments(receive) = strdup("c receive part\n");
-	statement_comments(cont) = strdup("c end of remapping\n");
+	statement_comments(send) = strdup("! send part\n");
+	statement_comments(receive) = strdup("! receive part\n");
+	statement_comments(cont) = strdup("! end of remapping\n");
     }
     
     DEBUG_STAT(3, "result", result);
@@ -867,7 +867,7 @@ generate_all_live(
      */
     result = make_block_statement(ls);
     statement_comments(result) = 
-	strdup(concatenate("c all live for ", 
+	strdup(concatenate("! all live for ", 
 			   entity_local_name(primary), "\n", NULL));
     return result;
 }
@@ -900,7 +900,7 @@ generate_dynamic_liveness_for_primary(
      */
     result = make_block_statement(ls);
     statement_comments(result) = 
-	strdup(concatenate("c clean live set for ", 
+	strdup(concatenate("! clean live set for ", 
 			   entity_local_name(primary), "\n", NULL));
     return result;
 }
@@ -915,7 +915,7 @@ generate_dynamic_liveness_management(statement s)
     
     result = make_empty_statement();
     statement_comments(result) = 
-	strdup(concatenate("c end of liveness management\n", NULL));
+	strdup(concatenate("! end of liveness management\n", NULL));
     ls = CONS(STATEMENT, result, NIL);
 
     /* for each primary remapped at s, generate the management code.
@@ -938,7 +938,7 @@ generate_dynamic_liveness_management(statement s)
      */
     result = make_block_statement(ls);
     statement_comments(result) = 
-	strdup(concatenate("c liveness management\n", NULL));
+	strdup(concatenate("! liveness management\n", NULL));
     return result;
 }
 
@@ -1098,8 +1098,10 @@ generate_hpf_remapping_file(renaming r)
     list /* of entity */ l;
 
     /* generates the remapping code and text
+     * !!! generated between similar arrays...
      */
-    remap = hpf_remapping(renaming_old(r), renaming_new(r));
+    remap = hpf_remapping(load_similar_mapping(renaming_old(r)), 
+			  load_similar_mapping(renaming_new(r)));
     update_object_for_module(remap, node_module);
     t = protected_text_statement(remap);
 
@@ -1114,12 +1116,11 @@ generate_hpf_remapping_file(renaming r)
 				   "/", remapping_file_name(r), NULL));
 
     f = hpfc_fopen(file_name);
-    print_text(f, t);
+    print_text(f, t); /* frees t as a side effect... */
     hpfc_fclose(f, file_name);
 
     free(file_name);
     free_statement(remap);
-    /* free_text(t); */ /* ??? memory leak or core dump... */
     gen_free_list(l);
 }
 
@@ -1167,7 +1168,7 @@ remapping_compile(
     /* comment at the end
      */
     tmp = make_empty_statement();
-    statement_comments(tmp) = strdup(concatenate("c end remappings\n", NULL));
+    statement_comments(tmp) = strdup(concatenate("! end remappings\n", NULL));
     l = CONS(STATEMENT, tmp, l);
 
     /* dynamic liveness management if required
@@ -1192,7 +1193,7 @@ remapping_compile(
     /* comment at the beginning
      */
     tmp = make_empty_statement();
-    statement_comments(tmp)=strdup(concatenate("c begin remappings\n", NULL));
+    statement_comments(tmp)=strdup(concatenate("! begin remappings\n", NULL));
     l = CONS(STATEMENT, tmp, l);
 
     *nsp = make_block_statement(l); /* block of remaps for the nodes */
