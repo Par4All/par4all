@@ -199,7 +199,9 @@ create_status_subwindow()
                                            DECALAGE_STATUS,
                                            xv_rows(main_panel, 2),
                                            generate_directory_menu,
-                                           (void (*)(char *)) end_directory_notify);
+                                /* generate_directory_menu() use its
+                                   own notify procedure: */
+                                           NULL);
 
    xv_set(directory_name_panel_item,
           PANEL_VALUE_STORED_LENGTH, 256,
