@@ -38,9 +38,6 @@ char *CurrentPackage = NULL;
 entity DynamicArea = entity_undefined;
 entity StaticArea = entity_undefined;
 
-/* the current debugging level. see debug.h */
-int debugging_level = 0;
-
 /* where the current instruction starts and ends. its label */
 int line_b_I, line_e_I, line_b_C, line_e_C;
 char lab_I[6];
@@ -93,6 +90,8 @@ ParserError(char * f, char * m)
     DynamicArea = entity_undefined;
     StaticArea = entity_undefined;
     reset_common_size_map_on_error();
+    parser_reset_all_reader_buffers();
+    parser_reset_StmtHeap_buffer();
     AbortOfProcedure();
 
     /* FI: let catch_error() take care of this in pipsmake since debug_on()
