@@ -8,8 +8,13 @@
 
 extern int Nbrdo;
 
-
 DEFINE_CURRENT_MAPPING(enclosing_loops, list)
+
+void clean_enclosing_loops(void)
+{
+    STATEMENT_MAPPING_MAP(s, l, gen_free_list(l), get_enclosing_loops_map());
+    free_enclosing_loops_map();
+}
 
 static void rloops_mapping_of_statement();
 
@@ -82,11 +87,10 @@ statement s;
 
 
 
-statement_mapping loops_mapping_of_statement(stat)
-statement stat;
+statement_mapping 
+loops_mapping_of_statement(statement stat)
 {   
     statement_mapping loops_map;
-
     loops_map = MAKE_STATEMENT_MAPPING();
     Nbrdo = 0;
     rloops_mapping_of_statement(loops_map, NIL, stat);
@@ -95,21 +99,17 @@ statement stat;
 	STATEMENT_MAPPING_MAP(stat, loops, {
 	    fprintf(stderr, "statement %d in loops ", 
 		    statement_number((statement) stat));
-	    MAPL(ps, {
-		fprintf(stderr, "%d ", 
-			statement_number(STATEMENT(CAR(ps))));
-	    }, (list) loops);
+	    MAP(STATEMENT, s, 
+		fprintf(stderr, "%d ", statement_number(s)),
+		(list) loops);
 	    fprintf(stderr, "\n");
 	}, loops_map)
     }
     return(loops_map);
 }
 
-
-
-static bool distributable_statement_p(stat, region)
-statement stat;
-set region;
+static bool 
+distributable_statement_p(statement stat, set region)
 {
     instruction i = statement_instruction(stat);
 
