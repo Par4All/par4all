@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1997/02/18 11:21:26 $, )
+ * ($Date: 1997/02/18 18:35:44 $, )
  */
 
 #include "defines-local.h"
@@ -237,29 +237,32 @@ void hpfc_check_for_similarities(list /* of entity */ le)
 {
     MAP(ENTITY, array,
     {
-	list /* of entity */ 
-	    seens = CONS(ENTITY, array, NIL); /* similar bases */
-
-	pips_assert("is a primary!", primary_entity_p(array));
-
-	check_for_similarity(array, NIL);
-	
-	MAP(ENTITY, a,
+	if (array_distributed_p(array))
 	{
-	    if (!gen_in_list_p(a, seens))
+	    list /* of entity */ 
+		seens = CONS(ENTITY, array, NIL); /* similar bases */
+	    
+	    pips_assert("is a primary!", primary_entity_p(array));
+	    
+	    check_for_similarity(array, NIL);
+	    
+	    MAP(ENTITY, a,
 	    {
-		entity similar;
-		check_for_similarity(a, seens);
-		similar = load_similar_mapping(a);
-		pips_debug(1, "%s similar to %s\n",
-			   entity_name(a), entity_name(similar));
-
-		seens = gen_once(similar, seens);
-	    }
-	},
-	    entities_list(load_dynamic_hpf(array)));
-
-	gen_free_list(seens);
+		if (!gen_in_list_p(a, seens))
+		{
+		    entity similar;
+		    check_for_similarity(a, seens);
+		    similar = load_similar_mapping(a);
+		    pips_debug(1, "%s similar to %s\n",
+			       entity_name(a), entity_name(similar));
+		    
+		    seens = gen_once(similar, seens);
+		}
+	    },
+		entities_list(load_dynamic_hpf(array)));
+	    
+	    gen_free_list(seens);
+	}
     },
 	le);
 }
