@@ -110,8 +110,6 @@ add_parameter_aliases_for_this_call_site(call call_site,
 	     pips_debug(9,"\tand entity %s\n",
 			entity_name(region_entity(callee_region)));
 
-	     pips_debug(9,"begin map\n");
-
 	     /* If the formal parameter corresponds to the real argument then
 	      * we perform the translation.
 	      */
@@ -149,7 +147,8 @@ add_parameter_aliases_for_this_call_site(call call_site,
 		    
 		    ifdebug(9)
 			{
-			    print_region(real_reg);
+			    pips_debug(9,"complete\n");
+/*			    print_region(real_reg);*/
 			}
 
 		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
