@@ -3,15 +3,13 @@
   */
 #include <stdio.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "misc.h"
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
 #include "conversion.h"
 
 /* Psysteme loop_iteration_domaine_to_sc(cons *lls , Pbase *baseindex)
