@@ -15,7 +15,7 @@ SCRIPTS = 	MakeExtern \
 		tape-pips \
 		make-gdbinit
 
-FILES =		
+FILES =		ctags2extern.awk
 
 # that is all
 #
