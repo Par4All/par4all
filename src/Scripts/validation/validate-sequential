@@ -2,17 +2,18 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1995/09/04 16:34:27 $, ) 
+# ($Date: 1995/09/12 15:05:23 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
 # Validate without arguments takes the contents of the default_file file,
-# else arguments are subdirectories D in pips_test_directory. For each
-# D, one applies test_aspect that checks every file .f F. If a file
-# F.test exists, it is executed and its output is compared to
-# $F.result/test. Otherwise, every module M in F.database/modules is
-# parallelized and its output is compared with $F.result/M (which is
-# assumed to have been created by the user).
+# else arguments are subdirectories D in pips_test_directory. 
+# For each D, one applies test_aspect that checks every file .f F.
+# If a file F.{tpips,test} exists, it is executed and its output is
+# compared to $F.result/test.
+# Otherwise, every module M in F.database/modules is parallelized and its
+# output is compared with $F.result/M (which is assumed to have been
+# created by the user).
 #
 # A mail report is sent to the person running validate (see accept).
 # 
@@ -140,12 +141,12 @@ $VERBOSE "pips to be used: $pips_version"
 
 $VERBOSE "running in directory `pwd`"
 
-tmpout=/tmp/validate.$$
-tmperr=/tmp/validate_err.$$
-diffout_e=/tmp/diff_e.$$
-diffout=/tmp/diff.$$
+tmpout=${PIPS_TEMPDIR}/validate.$$
+tmperr=${PIPS_TEMPDIR}/validate_err.$$
+diffout_e=${PIPS_TEMPDIR}/diff_e.$$
+diffout=${PIPS_TEMPDIR}/diff.$$
 # global variable...
-errors=/tmp/errors.$$
+errors=${PIPS_TEMPDIR}/errors.$$
 shell='/bin/sh'
 
 echo 0 > $errors
@@ -221,8 +222,26 @@ test_aspect()
      rm -f $tmpout $tmperr
      
      #
-     # .test case
+     # .tpips case
      
+     if [ -f $aspect/$name.tpips ]
+     then 
+       $DEBUG " || .tpips case"
+       $aspect/$name.tpips > $tmpout 2> $tmperr
+       STATUS=$?
+       [ -f core ] && rm -f core
+
+       report $STATUS \
+         "Execution of $aspect/$name.tpips failed with $pips_version" || \
+         { $DEBUG " || error"; continue;}
+       
+       make_diff $aspect $name test
+       continue
+     fi
+
+     #
+     # .test case
+       
      if [ -f $aspect/$name.test ] 
      then
        $DEBUG " || .test case"
