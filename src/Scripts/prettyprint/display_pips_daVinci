@@ -1,0 +1,21 @@
+#! /bin/csh -f
+
+# This takes a PIPS output file in the GRAPH format
+# and display it with daVinci.
+
+# 	%A% ($Date: 1995/09/05 13:51:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+
+# Ronan.Keryell@cri.ensmp.fr, 5/09/1995.
+
+if ($#argv != 1) then
+	echo "$0 takes one file name such as OCEAN.pref-graph and display it with daVinci."
+	exit 1
+endif
+
+set input_file_name=$1
+# Hum... A cleaner way, Fabien ? :-)
+alias set_output_file_name 'set output_file_name=\!*:s/-graph/-daVinci/'
+eval set_output_file_name $input_file_name
+pips_unstructured2daVinci < $input_file_name > $output_file_name
+
+exec daVinci $output_file_name
