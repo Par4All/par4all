@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/02/16 12:02:21 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/02/24 16:45:21 $, )
  * version $Revision$
  */
  
@@ -403,7 +403,8 @@ bool hpfc_filter(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
 
-    safe_system(concatenate("$HPFC_TOOLS/hpfc_filter ", 
+    safe_system(concatenate(hpf_directive_string_p(name) ?
+                            "$HPFC_TOOLS/hpfc_filter " : "cp ", 
 			    dir_name, "/", file_name, " ",
 			    dir_name, "/", new_name, NULL));
 
