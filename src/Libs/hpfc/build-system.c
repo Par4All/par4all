@@ -126,6 +126,72 @@ int i;
  * DECLARATION CONSTRAINTS GENERATION
  */
 
+/*
+ * Psysteme compute_entity_to_constraints(ent, suffix, prefix)
+ * entity ent: variable the constraints of which are computed
+ * strings suffix and prefix: to be used in the dummy variables created
+ *
+ * computes the constraints due to the declarations.
+ *! usefull
+ */
+Psysteme compute_entity_to_declaration_constraints(ent, suffix, prefix)
+entity ent;
+string suffix, prefix;
+{
+    list 
+	dims = variable_dimensions(type_variable(entity_type(ent)));
+    int 
+	dim_number = 1;
+    Psysteme
+	new_system = sc_new();
+    
+    pips_assert("compute_entity_to_declaration_constraints",
+		entity_variable_p(ent));
+    pips_assert("compute_entity_to_declaration_constraints",
+		gen_length(dims)!=0);
+    
+    debug(5,"compute_entity_to_declaration_constraints",
+	  "computing constraints for entity %s, prefix %s, suffix %s\n",
+	  entity_name(ent), prefix, suffix);
+    
+    MAPL(cd,
+     {
+	 dimension
+	     dim = DIMENSION(CAR(cd));
+	 entity
+	     dummy = get_ith_dummy(prefix, suffix, dim_number);
+	 int ilower;
+	 int iupper;
+	 bool
+	     blower = hpfc_integer_constant_expression_p
+		 (dimension_lower(dim), &ilower);
+	 bool
+	     bupper = hpfc_integer_constant_expression_p
+		 (dimension_upper(dim), &iupper);
+
+	 pips_assert("compute_entity_to_declaration_constraints", 
+		     blower && bupper);
+	 
+	 /*
+	  * now the dummy is to be used to generate two inequalities: 
+	  * -dummy + lower <= 0 and dummy - upper <= 0
+	  */
+	 
+	 sc_add_inegalite(new_system,
+			  contrainte_make(vect_add(vect_new(TCST, ilower),
+						   vect_new(dummy, -1))));
+	 sc_add_inegalite(new_system,
+			  contrainte_make(vect_add(vect_new(TCST, -iupper),
+						   vect_new(dummy, 1))));
+	 sc_creer_base(new_system);
+	 
+	 dim_number++;
+     },
+	 dims);
+    
+    return(new_system);
+}
+
 static Psysteme hpfc_compute_entity_to_declaration_constraints(e)
 entity e;
 {
@@ -141,7 +207,7 @@ entity e;
     pips_assert("hpfc_compute_entity_to_declaration_constraints",
 		(is_array || is_template || is_processor));
 
-    return(compute_entity_to_declaration_contraints
+    return(compute_entity_to_declaration_constraints
 	   (e, HPFC_PACKAGE, local_prefix));
 }
 
@@ -160,7 +226,7 @@ entity e;
 
     pips_assert("entity_to_declaration_constraints", entity_variable_p(e));
     pips_assert("entity_to_declaration_constraints",
-		distributed_array_p(e) ||
+		array_distributed_p(e) ||
 		entity_template_p(e) ||
 		entity_processor_p(e));
 
@@ -171,72 +237,6 @@ entity e;
     }
 
     return(p);
-}
-
-/*
- * Psysteme compute_entity_to_constraints(ent, suffix, prefix)
- * entity ent: variable the constraints of which are computed
- * strings suffix and prefix: to be used in the dummy variables created
- *
- * computes the constraints due to the declarations.
- *! usefull
- */
-Psysteme compute_entity_to_declaration_constraints(ent, suffix, prefix)
-entity ent;
-string suffix, prefix;
-{
-    list 
-	dims = variable_dimensions(type_variable(entity_type(e)));
-    int 
-	dim_number = 1;
-    Psysteme
-	new_system = sc_new();
-
-    pips_assert("compute_entity_to_declaration_constraints",
-		entity_variable_p(ent));
-    pips_assert("compute_entity_to_declaration_constraints",
-		gen_length(dims)!=0);
-
-    debug(5,"compute_entity_to_declaration_constraints",
-	  "computing constraints for entity %s, prefix %s, suffix %s\n",
-	  entity_name(ent), prefix, suffix);
-
-    MAPL(cd,
-     {
-	 dimension
-	     dim = DIMENSION(CAR(cd));
-	 entity
-	     dummy = get_ith_dummy(prefix, suffix, dim_number);
-	 int ilower;
-	 int iupper;
-	 bool
-	     blower = hpfc_integer_constant_expression_p
-		 (dimension_lower(dim), &ilower);
-	 bool
-	     bupper = hpfc_integer_constant_expression_p
-		 (dimension_upper(dim), &iupper);
-
-	 pips_assert("compute_entity_to_declaration_constraints", 
-		     blower && bupper);
-
-	 /*
-	  * now the dummy is to be used to generate two inequalities: 
-	  * -dummy + lower <= 0 and dummy - upper <= 0
-	  */
-
-	 sc_add_inegalite(new_system,
-			  contrainte_make(vect_add(vect_new(TCST, ilower),
-						   vect_new(dummy, -1))));
-	 sc_add_inegalite(new_system,
-			  contrainte_make(vect_add(vect_new(TCST, -iupper),
-						   vect_new(dummy, 1))));
-	 sc_creer_base(new_system);
-
-	 dim_number++;
-     },
-	 dims);
-
-    return(new_system);
 }
 
 /*
@@ -279,14 +279,6 @@ int i;
     return(get_ith_dummy(HPFC_PACKAGE, LPHI_PREFIX, i));
 }
 
-static Psysteme hpfc_compute_entity_to_hpf_constraints(e)
-entity e;
-{
-    return(distributed_array_p(e) ?
-	   hpfc_compute_align_constraints(e) :
-	   hpfc_compute_distribute_constraints(e));
-}
-
 /*
  * Psysteme hpfc_compute_align_constraints(e)
  * entity e is an array
@@ -307,7 +299,7 @@ entity e;
     int i;
 
     pips_assert("hpfc_compute_align_constraints", 
-		distributed_array_p(e));
+		array_distributed_p(e));
 
     for(i=1 ; i<=NumberOfDimension(template) ; i++)
     {
@@ -366,7 +358,7 @@ entity e;
     int i;
 
     pips_assert("hpfc_compute_unicity_constraints", 
-		distributed_array_p(e));
+		array_distributed_p(e));
 
     for(i=1 ; i<=NumberOfDimension(template) ; i++)
     {
@@ -438,7 +430,7 @@ entity e;
 	bool
 	    is_block = style_block_p(distribution_style(d));
 	Pvecteur
-	    v = VECTEUR_NULL;
+	    v = VECTEUR_NUL;
 
 	/*
 	 * -delta_j <= 0
@@ -481,6 +473,14 @@ entity e;
     return(new_system);
 }
 
+static Psysteme hpfc_compute_entity_to_hpf_constraints(e)
+entity e;
+{
+    return(array_distributed_p(e) ?
+	   hpfc_compute_align_constraints(e) :
+	   hpfc_compute_distribute_constraints(e));
+}
+
 /*
  * entity_to_hpf_constraints(e)
  * entity e;
@@ -497,7 +497,7 @@ entity e;
 
     pips_assert("entity_to_hpf_constraints", entity_variable_p(e));
     pips_assert("entity_to_hpf_constraints",
-		distributed_array_p(e) || entity_template_p(e));
+		array_distributed_p(e) || entity_template_p(e));
 
     if (Psysteme_undefined_p(p))
     {
