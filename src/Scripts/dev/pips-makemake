@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/07 15:26:02 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/07 16:49:06 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -693,17 +693,17 @@ $(INC_TARGET): $(TARGET)-local.h
 # Makefile.depend if that very file does not exist.
 
 .depend: $(CFILES) $(DERIVED_CFILES) 
-	$(RM) $MAKEFILE.depend
+	$(RM) $MAKEFILE.depend.$(ARCH)
 	test ! "$(CFILES)$(DERIVED_CFILES)" || \
 	        $(PREPROC) -M $(CFILES) $(DERIVED_CFILES) |\
-		sed 's,^\(.*\.o:\),\$\$(ARCH)/\1,' > $MAKEFILE.depend
-	touch $MAKEFILE.depend .depend 
+		sed 's,^\(.*\.o:\),\$\$(ARCH)/\1,' > $MAKEFILE.depend.$(ARCH)
+	touch $MAKEFILE.depend.$(ARCH) .depend 
 
 depend: $(INC_TARGET) .depend
 
 # default rule if the dependence file is not there...
 # forces the regeneration.
-$MAKEFILE.depend:
+$MAKEFILE.depend.$(ARCH):
 	touch \$@
 	$(RM) .depend
 	$(MAKE) depend
@@ -721,13 +721,7 @@ touch .makefile
 
 ### force dependence list generation
 
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Newgen' -o $DIRTYPE = 'Linear' ] &&
-{
-  rm -f $MAKEFILE.depend
-  touch $MAKEFILE.depend
-  rm -f .depend
-  ${PIPS_MAKE} -f $MAKEFILE depend
-}
+rm -f $MAKEFILE.depend.* .depend
 
 ### end good case
 
