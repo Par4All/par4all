@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1994/06/08 15:53:32 $, ) version $Revision$,
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1994/09/01 15:48:11 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -92,6 +92,27 @@ void make_host_node_maps()
     make_node_old_map();
 }
 
+void free_host_node_maps()
+{
+    free_host_new_map();
+    free_host_old_map();
+    free_node_new_map();
+    free_node_old_map();
+}
+
+string hpfc_module_suffix(module)
+entity module;
+{
+    if (module==node_module) return(NODE_NAME);
+    if (module==host_module) return(HOST_NAME);
+
+    /* else */
+
+    pips_error("hpfc_module_suffix", "unexpected module\n");
+    return(string_undefined);
+}
+  
+
 /*
  * updates
  */
@@ -111,7 +132,9 @@ entity module;
     return(hash_table_undefined);
 }
 
-static void update_for_module_rewrite(ref)
+/* shift the references to the right variable, in the module
+ */
+static void update_reference_for_module_rewrite(ref)
 reference ref;
 {
     entity
@@ -120,6 +143,19 @@ reference ref;
 
     if (new != (entity) HASH_UNDEFINED_VALUE)
 	reference_variable(ref) = new;
+}
+
+/* shift the calls to the right variable, in the module
+ */
+static void update_call_for_module_rewrite(c)
+call c;
+{
+    entity
+	fun = call_function(c),
+	new = (entity) GET_ENTITY_MAPPING(current_entity_map, fun);
+
+    if (new != (entity) HASH_UNDEFINED_VALUE)
+	call_function(c) = new;
 }
 
 void update_object_for_module(object, module)
@@ -134,7 +170,12 @@ entity module;
     gen_recurse(object, 
 		reference_domain, 
 		gen_true, 
-		update_for_module_rewrite);
+		update_reference_for_module_rewrite);
+
+    gen_recurse(object, 
+		call_domain, 
+		gen_true, 
+		update_call_for_module_rewrite);
 
     current_entity_map = saved;
 }
@@ -148,6 +189,39 @@ entity module;
 	 update_object_for_module(CHUNK(CAR(cx)), module);
      },
 	 l);
+}
+
+/* removed unreferenced items in the common
+ * the global map refenreced_variables should be set and ok
+ * the variables updated are those local to the common...
+ */
+void clean_common_declaration(common)
+entity common;
+{
+    entity
+	var = entity_undefined;
+    type
+	t = entity_type(common);
+    list
+	l = NIL,
+	lnew = NIL;
+
+    pips_assert("clean_common_declaration", type_area_p(t));
+
+    l = area_layout(type_area(t));
+
+    MAPL(ce,
+     {
+	 var = ENTITY(CAR(ce));
+
+	 if (load_entity_referenced_variables(var)==TRUE &&
+	     local_entity_of_module_p(var, common))
+	     lnew = CONS(ENTITY, var, lnew);
+     },
+	 l);
+
+    gen_free_list(l);
+    area_layout(type_area(t)) = lnew;
 }
 
 /*
@@ -269,7 +343,9 @@ statement stat;
 	 },
 	     instruction_block(inst));
 
-	updatedstat = MakeStatementLike(stat, is_instruction_block, nodegotos);
+	updatedstat = MakeStatementLike(stat, 
+					is_instruction_block, 
+					get_node_gotos_map());
 	instruction_block(statement_instruction(updatedstat)) = lstat;
 	break;
     }
@@ -280,7 +356,9 @@ statement stat;
 
 	debug(8, "UpdateStatementForModule", "test\n");
 
-	updatedstat = MakeStatementLike(stat, is_instruction_test, nodegotos);
+	updatedstat = MakeStatementLike(stat, 
+					is_instruction_test, 
+					get_node_gotos_map());
 	instruction_test(statement_instruction(updatedstat)) = 
 	    make_test(UpdateExpressionForModule(module, test_condition(t)),
 		      UpdateStatementForModule(module, test_true(t)),
@@ -298,7 +376,9 @@ statement stat;
 
 	debug(8, "UpdateStatementForModule", "loop\n");
 
-	updatedstat = MakeStatementLike(stat, is_instruction_loop, nodegotos);
+	updatedstat = MakeStatementLike(stat, 
+					is_instruction_loop, 
+					get_node_gotos_map());
 	instruction_loop(statement_instruction(updatedstat)) = 
 	    make_loop(nindex,
 		      make_range(UpdateExpressionForModule(module, 
@@ -317,7 +397,9 @@ statement stat;
     {
 	debug(8, "UpdateStatementForModule", "goto\n");
 
-	updatedstat = MakeStatementLike(stat, is_instruction_goto, nodegotos);
+	updatedstat = MakeStatementLike(stat, 
+					is_instruction_goto, 
+					get_node_gotos_map());
 	instruction_goto(statement_instruction(updatedstat)) = 
 	    instruction_goto(inst);
 
@@ -332,7 +414,9 @@ statement stat;
 	      "call to %s\n", 
 	      entity_name(call_function(c)));
 
-	updatedstat = MakeStatementLike(stat, is_instruction_call, nodegotos);
+	updatedstat = MakeStatementLike(stat,
+					is_instruction_call,
+					get_node_gotos_map());
 	instruction_call(statement_instruction(updatedstat)) = 
 	    make_call(call_function(c), lUpdateExpr(module, call_arguments(c)));
 
@@ -378,7 +462,7 @@ statement stat;
 
 	updatedstat = MakeStatementLike(stat,
 					is_instruction_unstructured,
-					nodegotos);
+					get_node_gotos_map());
 	statement_instruction(instruction_unstructured(updatedstat)) =
 	    make_unstructured((control) GET_CONTROL_MAPPING(ctrmap, ct),
 			      (control) GET_CONTROL_MAPPING(ctrmap, ce));
@@ -395,3 +479,4 @@ statement stat;
     debug(7, "UpdateStatementForModule", "end of update\n");
     return(updatedstat);
 }
+
