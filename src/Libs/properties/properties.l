@@ -22,11 +22,13 @@
 #define TIDENT   12
 #define TNUMB	13
 #define TSTRING  14
+#define ENDOFLINE 15
 
 /* properties are stored in this hash table (string -> property)
  * for fast accesses.
  */
 static hash_table pl = (hash_table) NULL;
+static bool update_property = FALSE;
 
 #ifdef FLEX_SCANNER
 
@@ -55,16 +57,20 @@ static void parse_properties(void);
 
 void parse_properties_string(char *s) 
 {
+    update_property = TRUE;
     string_to_parse = s;
     parse_properties();
     string_to_parse = (char *) 0;
+    update_property = FALSE;
 }
 
 #else /* ATT/POSIX just seem to like parsing yyin... */
 
 void parse_properties_string(char *s)
 {
-    pips_internal_error("cannot parse string (%s) without flex\n", s);
+    fprintf(stderr, "[parse_properties_string] "
+	    "cannot parse string (%s) without flex\n", s);
+    exit(1);
 }
 
 #endif /* FLEX_SCANNER */
@@ -77,13 +83,15 @@ FALSE			{return(TFALSE);}
 [0-9]+       		{return(TNUMB);}
 [-_a-zA-Z][-_a-zA-Z0-9]* {return(TIDENT);}
 \"[^\"]*\"		{/*"*/return(TSTRING);}
-^[ \t]*#.*$		; /* comments are skipped. */
-[ \t\n]*		; /* blanks are skipped. */
-=			; /* ignore an = */
-.                       { pips_user_error("unexpected char %c (%d)\n",
-					  *yytext, *yytext);
+^[ \t]*#.*$		/* comments are skipped. */
+[ \t\n]*		/* blanks are skipped. */
+=			/* ignore an = */
+.                       { fprintf(stderr, "skipping unexpected char %c (%d)\n",
+				  *yytext, *yytext);
 			}
 %%
+
+#define error(f, s)  fprintf(stderr, "[property] " f, s), abort()
 
 int yywrap(void)
 { return 1;}
@@ -105,12 +113,14 @@ property_equal_p(property p1, property p2)
             equal_p = (strcmp(property_string(p1),property_string(p2))==0);
             break;
         default:
-            pips_error("property_equal_p", "ill. tag %d\n", property_tag(p1));
+	    error("illegal tag %d\n", property_tag(p1));
         }
     }
 
     return equal_p;
 }
+
+static property get_property(string, bool);
 
 static void 
 parse_properties(void)
@@ -123,10 +133,19 @@ parse_properties(void)
     while ((tok = yylex())) {
 	string n;
 	
-	if (tok != TIDENT)
-	    pips_user_error("syntax error, ident expected.\n");
-			  
+	if (tok != TIDENT) {
+	    fprintf(stderr, "syntax error in parse_properties, "
+		    "ident expected, got %d for -%s-.\n", tok, yytext);
+	    return;
+	}
+
 	n = strdup(yytext);
+
+	if (update_property && property_undefined_p(get_property(n, TRUE))) {
+	    fprintf(stderr, "user error in parse_properties: "
+		    "Unknown property %s to update\n", n);
+	    return;
+	}
 
 	switch (tok = yylex()) {
 	  case TTRUE:
@@ -143,19 +162,26 @@ parse_properties(void)
 		 the quote and do not use s+1 anymore*/
             char *s = strdup(yytext + 1);
             char *q = strrchr(s, '"');
-            if (q == NULL) pips_user_error("bad string : %s\n", yytext);
+            if (q == NULL) {
+		fprintf(stderr, "user error in parse_properties: "
+			"bad string : %s\n", yytext);
+		return;
+	    }
             *q = '\0';            
 	    pr = make_property(is_property_string, s);
 	    break;
           }
 	  default:
-	    pips_user_error("bad value for property %s : %s\n", n, yytext);
+	    fprintf(stderr, "user error in parse_properties: "
+		    "bad value for property %s: %s\n", n, yytext);
+	    return;
 	}
 
 	if ((opr = (property) hash_get(pl, n)) != 
             (property) HASH_UNDEFINED_VALUE) {
             if(!property_equal_p(pr, opr))
-                pips_user_warning("property %s redefined\n", n);
+                fprintf(stderr, 
+			"[parse_properties] property %s redefined\n", n);
             free_property(opr);
             hash_update(pl, n, (char *) pr); 
         }
@@ -167,7 +193,7 @@ parse_properties(void)
 static void
 parse_properties_file(FILE * fd)
 {
-    yyin = fd;
+    yyrestart(fd);
     parse_properties();
     yyin = (FILE*) NULL;
 }
@@ -181,14 +207,15 @@ read_properties(void)
 	return;
     /* else */
     pl = hash_table_make(hash_string, 0);
+    update_property = FALSE;
 
     /* ${PIPS_ROOT}/Share/properties.rc
      */
     rc = PROPERTIES_LIB_FILE;
-    if ((yyin = fopen(rc, "r")) == NULL)
-	pips_user_warning("no default properties (%s), "
-			  "check PIPS installation!\n", rc);
-    else {
+    if ((yyin = fopen(rc, "r")) == NULL) {
+	fprintf(stderr, "[read_properties] no default properties (%s), "
+		"check PIPS installation!\n", rc);
+    } else {
 	parse_properties_file(yyin);
 	fclose(yyin);
     }
@@ -200,8 +227,8 @@ read_properties(void)
     if (rc)
     {
 	if ((yyin = fopen(rc, "r")) == NULL)
-	    pips_internal_error("no properties (%s), "
-			"check Shell variable $PIPS_PROPERTIESRC\n", rc);
+	    fprintf(stderr, "[read_properties] no properties (%s), "
+		    "check Shell variable $PIPS_PROPERTIESRC\n", rc);
 	/* else */
 	parse_properties_file(yyin);
 	fclose(yyin);
@@ -221,9 +248,8 @@ get_property(string name, bool cool)
     property p;
     if (!pl) read_properties(); /* rather lazy... */
     if ((p=(property) hash_get(pl, name)) == (property)HASH_UNDEFINED_VALUE) {
-	if (!cool) pips_internal_error("unknown property: --%s--\n", name);
+	if (!cool) error("unknown property: --%s--\n", name);
 	/* else */
-	pips_user_warning("unknown property: --%s--\n", name);
 	p = property_undefined;
     }
     return p;
@@ -234,7 +260,7 @@ get_bool_property(string name)
 {
     property p = get_property(name, FALSE);
     if (! property_bool_p(p))
-	pips_internal_error("property %s is not bool\n", name);
+	error("property %s is not bool\n", name);
     return(property_bool(p));
 }
 
@@ -243,7 +269,7 @@ set_bool_property(string name, bool b)
 {
     property p = get_property(name, FALSE);
     if (! property_bool_p(p))
-	pips_internal_error("property %s is not bool\n", name);
+	error("property %s is not bool\n", name);
     property_bool(p) = b;
 }
 
@@ -252,7 +278,7 @@ get_string_property(string name)
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p)) 
-	pips_internal_error("property %s is not string\n", name);
+	error("property %s is not string\n", name);
     return property_string(p);
 }
 
@@ -261,7 +287,7 @@ set_string_property(string name, string s)
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p))
-	pips_internal_error("property %s is not string\n", name);
+	error("property %s is not string\n", name);
     free(property_string(p));
     property_string(p) = strdup(s);
 }
@@ -271,7 +297,7 @@ get_int_property(string name)
 {
     property p = get_property(name, FALSE);
     if (! property_int_p(p)) 
-	pips_internal_error("property %s is not int\n", name);
+	error("property %s is not int\n", name);
     return property_int(p);
 }
 
@@ -280,7 +306,7 @@ set_int_property(string name, int i)
 {
     property p = get_property(name, FALSE);
     if (! property_int_p(p)) 
-	pips_internal_error("property %s is not int\n", name);
+	error("property %s is not int\n", name);
     property_int(p) = i;
 }
 
