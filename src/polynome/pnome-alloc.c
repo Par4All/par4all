@@ -7,7 +7,7 @@
 /*LINTLIBRARY*/
 
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -19,13 +19,11 @@
  */
 Pmonome new_monome()
 {
-    extern int etext;
-
     Pmonome pm = (Pmonome) malloc(sizeof(Smonome));
     if (pm == NULL) {
 	(void) fprintf(stderr,"new_monome: Out of memory space\n");
-	(void) fprintf(stderr, "%10.3f MB", 
-		       (sbrk(0) - etext)/(double)(1 << 20));
+	/* (void) fprintf(stderr, "%10.3f MB", 
+		       (sbrk(0) - etext)/(double)(1 << 20)); */
 	abort();
 	/*exit(-1);*/
     }
@@ -37,13 +35,11 @@ Pmonome new_monome()
  */
 Ppolynome new_polynome()
 {
-    extern int etext;
-
     Ppolynome pp = (Ppolynome) malloc(sizeof(Spolynome));
     if (pp == NULL) {
 	(void) fprintf(stderr,"new_polynome: Out of memory space\n");
-	(void) fprintf(stderr, "%10.3f MB", 
-		       (sbrk(0) - etext)/(double)(1 << 20));
+	/* (void) fprintf(stderr, "%10.3f MB", 
+	   (sbrk(0) - etext)/(double)(1 << 20)); */
 	abort();
 	/*exit(-1);*/
     }
