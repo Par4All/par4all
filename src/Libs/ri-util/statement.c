@@ -1638,8 +1638,8 @@ statement_to_comment_length(statement stmt)
 static current_line = -1;
 static persistant_statement_to_int stmt_to_line = persistant_statement_to_int_undefined;
 
-static void
-down_counter(statement s);
+static bool
+down_counter(statement s)
 {
     instruction i = statement_instruction(s);
 
@@ -1658,17 +1658,19 @@ down_counter(statement s);
     }
 
     extend_persistant_statement_to_int(stmt_to_line, s, current_line);
+
+    return TRUE;
 }
 
 static void
-up_counter(statement s);
+up_counter(statement s)
 {
     instruction i = statement_instruction(s);
 
     if(instruction_loop_p(i)) {
 	loop l = instruction_loop(i);
 
-	if(empty_label_p(loop_label(l))) {
+	if(entity_empty_label_p(loop_label(l))) {
 	    /* There must be an ENDDO here */
 	    current_line += 1;
 	}
