@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/09/04 11:33:34 $, 
+! $Date: 1996/09/04 11:48:12 $, 
 !
       program fractal
 
@@ -53,8 +53,9 @@
 ! cyclic would make more sense as far as load balancing is concerned
 ! However HPFC would not be very good at it...
 ! No communication -> block distribution on the second dimension
+!   for best cache effects 
       integer nproc
-      parameter (nproc=5)
+      parameter (nproc=8)
 !hpf$ processors pe(nproc)
 !hpf$ distribute image(*,block) onto pe
       
