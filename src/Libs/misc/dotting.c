@@ -22,8 +22,10 @@
 
 #include "misc.h"
 
+/*
 static FILE * dotting_file;
 static char dotting_character;
+*/
 
 /*
 static void print_dot()
