@@ -1,7 +1,7 @@
 /* this is a set of functions to help hpfc debugging
  *
  * $RCSfile: debug-util.c,v $ (version $Revision$)
- * $Date: 1995/12/29 15:31:37 $, 
+ * $Date: 1995/12/29 15:37:20 $, 
  *
  * Fabien Coelho, May 1993.
  */
@@ -197,7 +197,7 @@ hpfc_common_hook(
     return strdup(concatenate
         ("      include \"", old_name(module, common), "_parameters.h\"\n"
 	 "      include \"", old_name(module, common),  
-	 module==host_module ? "_host.h\n" : "_node.h\n", NULL));
+	 module==host_module ? "_host.h\n" : "_node.h\"\n", NULL));
 }
 
 void hpfc_print_code(file, module, stat)
