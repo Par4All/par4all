@@ -2,6 +2,11 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.65  2003/06/05 09:17:05  irigoin
+ * Guard calls to CleanLocalEntities() in MakeCurrentFunction() to reduce the
+ * execution time for large source code. The global symbol table was
+ * systematically traversed each time a module was parsed.
+ *
  * Revision 1.64  2002/06/21 13:48:16  irigoin
  * Complexification of DATA handling. The repeat function is no longer
  * systematically called when the repeat factor is 1.
@@ -1308,6 +1313,21 @@ MakeCurrentFunction(
     fcfn = strdup(concatenate(prefix, cfn, NULL));
     cf = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, fcfn);
     free(fcfn);
+
+    /* if(!type_undefined_p(entity_type(cf))
+       || ! storage_undefined_p(entity_storage(cf))
+       || !value_undefined_p(entity_initial(cf))) */
+
+    if(!value_undefined_p(entity_initial(cf))) {
+      if(value_code_p(entity_initial(cf))) {
+	code c = value_code(entity_initial(cf));
+	if(!code_undefined_p(c) && !ENDP(code_declarations(c))) {
+	  /* Clean up existing local entities in case of a recompilation. */
+	  CleanLocalEntities(cf);
+	}
+      }
+    }
+
     ce = global_name_to_entity(TOP_LEVEL_MODULE_NAME, cfn);
     if(!entity_undefined_p(ce) && ce!=cf) {
       if(!value_undefined_p(entity_initial(cf)) || msf!=TK_BLOCKDATA) {
@@ -1368,9 +1388,6 @@ MakeCurrentFunction(
 	}
     }
 
-    /* Clean up existing local entities in case of a recompilation. */
-    CleanLocalEntities(cf);
-
     /* The parameters part of cf's functional type is not created because
        the types of formal parameters are not known yet. This is performed
        later by UpdateFunctionalType().
@@ -1417,8 +1434,9 @@ MakeCurrentFunction(
     ScanFormalParameters(cf, add_formal_return_code(lfp));
 
     if (msf == TK_FUNCTION) {
-	/* a result entity is created */
-	/*result = FindOrCreateEntity(CurrentPackage, entity_local_name(cf));*/
+      /* a result entity is created */
+      /*result = FindOrCreateEntity(CurrentPackage, entity_local_name(cf));*/
+      /*
 	result = make_entity(strdup(concatenate(CurrentPackage, 
 						MODULE_SEP_STRING, 
 						module_local_name(cf), 
@@ -1426,9 +1444,15 @@ MakeCurrentFunction(
 			     type_undefined, 
 			     storage_undefined, 
 			     value_undefined);
-	DeclareVariable(result, t, NIL, make_storage(is_storage_return, cf),
-			value_undefined);
-	AddEntityToDeclarations(result, cf);
+      */
+      /* CleanLocalEntities() does not remove any entity */
+      result = find_or_create_entity(concatenate(CurrentPackage, 
+						 MODULE_SEP_STRING, 
+						 module_local_name(cf), 
+						 NULL));
+      DeclareVariable(result, t, NIL, make_storage(is_storage_return, cf),
+		      value_undefined);
+      AddEntityToDeclarations(result, cf);
     }
 }
 
@@ -1439,7 +1463,8 @@ MakeCurrentFunction(
  * entry_entities, for later processing. When the current module has been
  * fully parsed, the two entry lists are scanned together. The current
  * module code is duplicated for each entry, a GOTO the proper entry label
- * is added, the code is controlized to get rid of unwanted code, and:
+ * is added, the code is controlized to get rid of the unwanted pieces of
+ * code, and:
  *
  * - either all references are translated into the entry
  *   reference. The entry declarations are then initialized.
@@ -1456,8 +1481,7 @@ MakeCurrentFunction(
  * call to the parser is executed to parse the .f file just produced by
  * the first call. This scheme was designed to make entries unvisible from
  * pipsmake.
- *
- */
+ * */
 
 static list entry_labels = NIL;
 static list entry_targets = NIL;
@@ -2202,8 +2226,14 @@ SafeLocalToGlobal(entity e, type r)
 			   "Unexpected storage class for top level entity\n");
 	    }
 	    if(value_undefined_p(entity_initial(fe))) {
+	      /* Should we anticipate the value code, since we know it has
+                 to be a value code for a function and it may be tested
+                 later after the parsing phase of the caller but before
+                 the parsing phase of the callee, or should we wait till
+                 the code is really known? */
+	      /* entity_initial(fe) = make_value(is_value_unknown, UU); */
 		entity_initial(fe) = make_value(is_value_code,
-						make_code(NIL, strdup(""), make_sequence(NIL)));
+		make_code(NIL, strdup(""), make_sequence(NIL)));
 	    }
 
 	    pips_debug(1, "external function %s re-declared as %s\n",
