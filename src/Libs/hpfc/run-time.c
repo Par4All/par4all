@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1995/10/05 11:32:34 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1995/10/10 11:38:18 $, )
  * version $Revision$,
  */
 
@@ -14,7 +14,6 @@
 #include "semantics.h"
 #include "effects.h"
 
-extern entity CreateIntrinsic(string name);                 /* in syntax.h */
 extern entity MakeExternalFunction(entity e, type r);       /* idem */
 
 /* entity MakeRunTimeSupportSubroutine(local_name, number_of_arguments)
@@ -199,7 +198,7 @@ expression expr;
 	    expression
 		shift = int_to_expression(1 - dl);
 	    
-	    return(MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME), 
+	    return(MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME), 
 				  expr, shift));
 	}
 	case is_hpf_newdecl_beta:
@@ -224,34 +223,35 @@ expression expr;
 			  HpfcExpressionToInt(dimension_lower(template_dim)));
 	    
 	    
-	    prod = ((HpfcExpressionToInt(rate)==1)?
-		    (expr):
-		    ((iabsrate==1)?
-		     (MakeUnaryCall(CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME),
-				    expr)):
-		     (MakeBinaryCall(CreateIntrinsic(MULTIPLY_OPERATOR_NAME),
-				     rate,
-				     expr))));
+	    prod = 
+		((HpfcExpressionToInt(rate)==1)?
+		 (expr):
+		 ((iabsrate==1)?
+		  (MakeUnaryCall(entity_intrinsic(UNARY_MINUS_OPERATOR_NAME),
+				 expr)):
+		  (MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+				  rate,
+				  expr))));
 	    
 	    t1 = ((ishift==0)?
 		  (prod):
 		  ((ishift>0)?
-		   (MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME),prod,
+		   (MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),prod,
 				   int_to_expression(ishift))):
-		   (MakeBinaryCall(CreateIntrinsic(MINUS_OPERATOR_NAME),prod,
+		   (MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),prod,
 				   int_to_expression(abs(ishift))))));
 	    
-	    the_mod = MakeBinaryCall(CreateIntrinsic(MOD_INTRINSIC_NAME),
+	    the_mod = MakeBinaryCall(entity_intrinsic(MOD_INTRINSIC_NAME),
 				     t1,
 				     parameter);
 	    
 	    t2 = ((iabsrate==1)?
 		  (the_mod):
-		  MakeBinaryCall(CreateIntrinsic(DIVIDE_OPERATOR_NAME),
+		  MakeBinaryCall(entity_intrinsic(DIVIDE_OPERATOR_NAME),
 				 the_mod,
 				 int_to_expression(iabsrate)));
 	    
-	    return(MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME), 
+	    return(MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME), 
 			      t2,
 				  int_to_expression(1)));
 	}
