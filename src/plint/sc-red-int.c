@@ -8,8 +8,10 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
+#include "matrix.h"
 
 #include "sommet.h"
+#include "plint.h"
 
 #define MALLOC(s,t,f) malloc(s)
 
@@ -37,7 +39,7 @@ Psysteme sys;
 	    /* inversion du sens de l'inegalite par multiplication */
 	    /* par -1 du coefficient de chaque variable            */
 	    vect_chg_sgn(eq->vecteur);
-	    vect_add_elem(&(eq->vecteur),TCST,1);
+	    vect_add_elem(&(eq->vecteur),TCST,VALUE_ONE);
 	    /* test de faisabilite avec la nouvelle inegalite      */
 	    if (sys_int_fais(sys) == FALSE)
 	    {
@@ -49,7 +51,7 @@ Psysteme sys;
 	    }
 	    else
 	    {
-		vect_add_elem (&(eq->vecteur),TCST,-1);
+		vect_add_elem (&(eq->vecteur),TCST,VALUE_MONE);
 		vect_chg_sgn(eq->vecteur);
 	    }
 	}
