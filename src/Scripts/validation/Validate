@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/10 12:11:47 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/10 16:21:53 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -93,17 +93,12 @@ alive()
 
 which_executable()
 {
-  if [ -x $1 ]
-  then 
-    echo $PWD/$1
-  else
-    if [ -x $PIPS_BINDIR/$PIPS_ARCH/$1 ]
-    then
-      echo $PIPS_BINDIR/$PIPS_ARCH/$1
-    else
-      type $1 | sed "s,^$1 is ,,"
-    fi
-  fi
+  for x in $PWD/$1 $PWD/$PIPS_ARCH/$1 $PIPS_BINDIR/$PIPS_ARCH/$1
+  do
+    test -x $x && echo $x
+  done
+  # default:
+  type $1 | sed "s,^$1 is ,,"
 }
 
 #
@@ -129,8 +124,9 @@ validate_usage()
     echo "   -i lines: max number of lines for sending a full message"
     echo "   -l dir: lock directory (default .)"
     echo "   -f file: what file in a module (use with -n)"
-    echo "   -x pips: pips to be used (default ., \$PIPS_ARCH, type)"
-    echo "   -y tpips: tpips to be used (default .,\$PIPS_ARCH, type)"
+    echo "   -x pips: pips to be used"
+    echo "   -y tpips: tpips to be used (same defaults as pips)"
+    echo "   default {,t}pips: . ./\$PIPS_ARCH \$PIPS_BINDIR/\$PIPS_ARCH type)"
   } >&2
   exit ${1:-1}
 }
