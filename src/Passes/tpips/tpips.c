@@ -815,12 +815,23 @@ static char *param_generator(char *texte, int state)
 
 void tpips_user_log(char *fmt, va_list args)
 {
+    FILE * log_file = get_log_file();
+
+    if(log_file!=NULL) {
+	if (vfprintf(log_file, fmt, args) <= 0) {
+	    perror("tpips_user_log");
+	    abort();
+	}
+	else
+	    fflush(log_file);
+    }
+
     if(get_bool_property("USER_LOG_P")==FALSE)
 	return;
 
     /* It goes to stderr to have only displayed files on stdout */
     (void) vfprintf(stderr, fmt, args);
-    fflush(stdout);
+    fflush(stderr);
 }
 
 /* Tpips user request */
