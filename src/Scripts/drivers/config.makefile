@@ -1,7 +1,7 @@
 #
 # $RCSfile: config.makefile,v $ for pips drivers
 # 
-# version $Revision$ ($Date: 1996/08/21 14:41:24 $, )
+# version $Revision$ ($Date: 1996/08/22 08:59:32 $, )
 #
 
 SCRIPTS =	Display \
@@ -10,8 +10,7 @@ SCRIPTS =	Display \
 		Perform \
 		Delete \
 		Build \
-		Select \
-		Interchange
+		Select
 
 SOURCES =	$(SCRIPTS)
 
