@@ -6,19 +6,18 @@ LIB_CFILES = \
 	simdizer.c varwidth.c codegen.c unroll.c operatorid.c \
 	treematch.c main.c
 
-LIB_HEADERS = sac-local.h
+LIB_HEADERS = sac-local.h patterns.l patterns.y patterns.def
 
-LIB_OBJECTS = patterns.tab.o patterns.lex.o $(LIB_CFILES:.c=.o) 
+DERIVED_HEADERS= patterns.tab.h
+DERIVED_CFILES= patterns.tab.c patterns.lex.c
 
-%.lex.c: %.l %.tab.c
-	flex -Cf -o$@ -Ppatterns_yy $<
+LIB_OBJECTS = $(DERIVED_CFILES:.c=.o) $(LIB_CFILES:.c=.o) 
 
-%.tab.c: %.y
-	bison -o $@ -d -p patterns_yy $<
+$(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
 
-patterns.tab.h: %.tab.c
+patterns.lex.c: patterns.l patterns.tab.h
+	flex -Cf -opatterns.lex.c -Ppatterns_yy patterns.l
 
-clean: clean_patterns
+patterns.tab.c patterns.tab.h: patterns.y
+	bison -o patterns.tab.c -d -p patterns_yy patterns.y
 
-clean_patterns:
-	-$(RM) patterns.tab.c patterns.tab.h patterns.lex.c
