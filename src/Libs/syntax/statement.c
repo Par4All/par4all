@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/11 08:07:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/11 19:49:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_statement[] = "%A% ($Date: 1997/09/11 08:07:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_statement[] = "%A% ($Date: 1997/09/11 19:49:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -649,6 +649,7 @@ update_functional_type_with_actual_arguments(entity e, list l)
 
 
     if( ENDP(functional_parameters(ft))) {
+	/* OK, it is not safe: may be it's a 0-ary function */
 	for (pc = l; pc != NULL; pc = CDR(pc)) {
 	    basic b = basic_of_expression(EXPRESSION(CAR(pc)));
 	    variable v = make_variable(b, NIL); 
@@ -661,30 +662,37 @@ update_functional_type_with_actual_arguments(entity e, list l)
 			  CONS(PARAMETER, p, NIL));
 	}
     }
-    else {
+    else if(get_bool_property("PARSER_TYPE_CHECK_CALL_SITES"))  {
 	/* The pre-existing typing of e should match the new one */
 	if(gen_length(functional_parameters(ft))!=gen_length(l)) {
-	    user_warning("MakeCallInst", "inconsistent arg. list lengths for %s:\n"
+	    user_warning("update_functional_type_with_actual_arguments", "inconsistent arg. list lengths for %s:\n"
 			 " %d args according to type and %d actual arguments\n"
 			 "between lines %d and %d. Current type is not updated\n",
 			 module_local_name(e),
 			 gen_length(functional_parameters(ft)), 
 			 gen_length(l), line_b_I, line_e_I);
 	}
-	else if(get_bool_property("PARSER_TYPE_CHECK_CALL_SITES")) {
-	    for (pc = l, pc2 = functional_parameters(ft);
+	else {
+	    int i = 0;
+
+	    for (pc = l, pc2 = functional_parameters(ft), i = 1;
 		 pc != NULL && !ENDP(pc2);
-		 POP(pc), POP(pc2)) {
+		 POP(pc), POP(pc2), i++) {
 		basic b = basic_of_expression(EXPRESSION(CAR(pc)));
 		variable v = make_variable(b, NIL); 
 		type at = make_type(is_type_variable, v);
 		type ft = parameter_type(PARAMETER(CAR(pc2)));
 
-		if(!type_equal_p(at, ft)) {
-		    user_warning("MakeCallInst",
-				 "incompatible actual argument and type in call to %s\n"
+		if((type_variable_p(ft)
+		   && basic_overloaded_p(variable_basic(type_variable(ft))))
+		   || type_equal_p(at, ft)) {
+		    /* OK */
+		}
+		else {
+		    user_warning("update_functional_type_with_actual_arguments",
+				 "incompatible %dth actual argument and type in call to %s\n"
 				 "between lines %d and %d. Current type is not updated\n",
-				 module_local_name(e), line_b_I, line_e_I);
+				 i,module_local_name(e), line_b_I, line_e_I);
 		    free_type(at);
 		    break;
 		}
