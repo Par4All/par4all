@@ -1,0 +1,6 @@
+#ifndef FSM_GENERATION_DEFS
+#define FSM_GENERATION_DEFS
+
+#define STATE_VARIABLE_NAME "STATE"
+
+#endif
