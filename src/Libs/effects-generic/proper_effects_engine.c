@@ -54,6 +54,13 @@ set_contracted_proper_effects(bool b)
 
 DEFINE_LOCAL_STACK(current_downward_cumulated_range_effects, effects)
 
+void proper_effects_error_handler()
+{
+    error_reset_effects_private_current_stmt_stack();
+    error_reset_effects_private_current_context_stack();
+    error_reset_current_downward_cumulated_range_effects_stack();
+}
+
 static list
 cumu_range_effects()
 {
