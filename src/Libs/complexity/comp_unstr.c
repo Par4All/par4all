@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "linear.h"
+
 #include "genC.h"
 
 #include "ri.h"
