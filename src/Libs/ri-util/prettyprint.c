@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/08 12:47:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/13 14:30:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/08 12:47:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/09/13 14:30:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1728,6 +1728,7 @@ int precedence;
        to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
        "UNIT" has to be equal either to "*" or "6".  In such case,
        "WRITE(*,*)" is replaced by "PRINT *,". */
+    /* GO: Not anymore for UNIT=6 leave it ... */
     good_fmt = FALSE;
     good_unit = FALSE;
     if (strcmp(entity_local_name(call_function(obj)), "WRITE") == 0) {
@@ -1744,16 +1745,13 @@ int precedence;
 
 	c = syntax_call(s);
 
-	if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
-	  if (strcmp(words_to_string(words_expression(arg)), "*") == 0)
+	if ((strcmp(entity_local_name(call_function(c)), "FMT=") == 0) &&
+	    (strcmp(words_to_string(words_expression(arg)), "*") == 0))
 	    good_fmt= TRUE;
-	}
 
-	if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
-	  if ((strcmp(words_to_string(words_expression(arg)), "*") == 0) ||
-	      (strcmp(words_to_string(words_expression(arg)), "6") == 0))
+	if ((strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) &&
+	    (strcmp(words_to_string(words_expression(arg)), "*") == 0))
 	    good_unit = TRUE;
-	}
 
 	if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
 	  iolist_reached = TRUE;
