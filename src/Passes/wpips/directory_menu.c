@@ -2,10 +2,10 @@
    chooser. */
 
 
-/* 	%A% ($Date: 1995/11/29 13:38:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/12 15:03:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_directory_menu[] = "%A% ($Date: 1995/11/29 13:38:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_directory_menu[] = "%A% ($Date: 1996/07/12 15:03:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <xview/xview.h>
@@ -15,6 +15,8 @@ char vcid_directory_menu[] = "%A% ($Date: 1995/11/29 13:38:52 $, ) version $Revi
 #include "genC.h"
 #include "misc.h"
 #include "database.h"
+#include "ri.h"
+#include "ri-util.h"
 #include "pipsdbm.h"
 #include "wpips.h"
 
