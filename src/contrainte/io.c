@@ -71,7 +71,7 @@ fprint_contrainte_vecteur(
 	}
 	else
 	    /* on admet plusieurs occurences du terme constant!?! */
-	    value_add(constante, coeff);
+	    value_addto(constante, coeff);
 
 	v = v->succ;
     }
@@ -219,7 +219,7 @@ boolean a_la_fortran;
 	}
 	else
 	    /* on admet plusieurs occurences du terme constant!?! */
-	    value_add(constante, coeff);
+	    value_addto(constante, coeff);
 
 	v = v->succ;
     }
