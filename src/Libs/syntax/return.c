@@ -31,8 +31,13 @@ SubstituteAlternateReturns(string option)
     substitute_rc_p = (strcmp(option, "RC")==0);
     substitute_stop_p = (strcmp(option, "STOP")==0);
 
-    pips_assert("Three options for alternate return handling",
-		substitute_rc_p || substitute_stop_p || strcmp(option, "NO")==0);
+    if(!(substitute_rc_p || substitute_stop_p || strcmp(option, "NO")==0)) {
+	user_log("Unknown option \"%s\" for property "
+		 "PARSER_SUBSTITUTE_ALTERNATE_RETURNS.\n"
+		 "Three options are available for alternate return handling: "
+		 "\"NO\", \"RC\" and \"STOP\"\n", option);
+	ParserError("SubstituteAlternateReturns", "Illegal property value");
+    }
 
     if((substitute_rc_p || substitute_stop_p) 
        && !get_bool_property("PRETTYPRINT_ALL_DECLARATIONS"))
@@ -215,6 +220,7 @@ generate_return_code_checks(list labels)
     instruction i = instruction_undefined;
     list lln = NIL;
     entity rcv = GetReturnCodeVariable();
+    expression ercv = entity_to_expression(rcv);
 
     pips_assert("The label list is not empty", !ENDP(labels));
 
@@ -222,7 +228,7 @@ generate_return_code_checks(list labels)
 	lln = CONS(STRING, label_local_name(l), lln);
     }, labels);
 
-    i = MakeComputedGotoInst(lln, rcv);
+    i = MakeComputedGotoInst(lln, ercv);
 
     /* The reset is controlled from gram.y, as is the set */
     /* reset_alternate_returns(); */
