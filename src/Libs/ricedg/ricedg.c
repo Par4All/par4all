@@ -37,6 +37,7 @@
 #include "graph.h"
 #include "dg.h"
 #include "database.h"
+#include "makefile.h"
 
 #include "misc.h"
 #include "text-util.h"
@@ -46,6 +47,7 @@
 #include "effects.h"
 #include "pipsdbm.h"
 #include "semantics.h"
+#include "pipsmake.h"
 
 #include "constants.h"
 #include "properties.h"
