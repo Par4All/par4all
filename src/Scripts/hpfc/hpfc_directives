@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/02 08:39:38 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/02 14:36:20 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -155,31 +155,33 @@ $SED '#
       #
       # FC directives and hacks...
       #
-      s, synchro,      1,
-      s, timeon,      2,
-      s, timeoff,      3,
-      s, setbool,      4,
-      s, setint,      5,
-      s, begin *local\(.*\),      i(I_LOCAL)\1      do I_LOCAL = 0\, 0,
-      s, local\(.*\),      i(I_LOCAL)\1      do I_LOCAL = 0\, 0,
+      s, synchro,1,
+      s, timeon,2,
+      s, timeoff,3,
+      s, setbool,4,
+      s, setint,5,
+      s, begin *local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
+      s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
       s, end *local,      enddo,
-      s, io\(.*\),      6(\1),
-      s, host\(.*\),      6(\1),
-      # io/host section: hack to build a block 
-      s, begin *io,      if (.true.) then      7,
-      s, begin *host,      if (.true.) then      7,
-      s, end *io,      endif,
-      s, end *host,      endif,
+      s, io\(.*\),6(\1),
+      s, host\(.*\),6(\1),
+      #
+      # io/host section: hack to build blocks...
+      #
+      s, begin *io,      if (.true.) then7if (.true.) then,
+      s, begin *host,      if (.true.) then7if (.true.) then,
+      s, end *io,      endifendif,
+      s, end *host,      endifendif,
       # io args shoud look like calls for pips
       /6(/s,\,,()\,,g;
       /6(/s,\([a-z0-9]\))$,\1()),;
       #
       # HPF declaration directives (well, pure is not)
       #
-      s, dynamic \(.*\),      y(\1),
-      s, template \(.*\),      logical \1      t(\1),
-      s, processors \(.*\),      logical \1      p(\1),
-      s, pure\(.*\),      u(\1),
+      s, dynamic \(.*\),y(\1),
+      s, template \(.*\),      logical \1t(\1),
+      s, processors \(.*\),      logical \1p(\1),
+      s, pure\(.*\),u(\1),
       # pure treated as io above.
       /u(/s,\,,()\,,g;
       /u(/s,\([a-z0-9]\))$,\1()),;
@@ -187,16 +189,16 @@ $SED '#
       # HPF static and dynamic mapping directives
       #  - some simple free style is parsed.
       #
-      s, align \(.*\) with \(.*\),      a(\1\,\2),
-      s, align with \(.*\)::\(.*\),      a(\2\,\1),
-      s, realign \(.*\) with \(.*\),      b(\1\,\2),
-      s, realign with \(.*\)::\(.*\),      a(\2\,\1),
-      s, distribute \(.*\) onto \(.*\),      d(\1\,\2),
-      s, distribute onto \(.*\)::\(.*\),      d(\2\,\1),
-      s, distribute \(.*\),      d(\1\,hpfcX),
-      s, redistribute \(.*\) onto \(.*\),      e(\1\,\2),
-      s, redistribute onto \(.*\)::\(.*\),      d(\2\,\1),
-      s, redistribute \(.*\),      e(\1\,hpfcX),
+      s, align \(.*\) with \(.*\),a(\1\,\2),
+      s, align with \(.*\)::\(.*\),a(\2\,\1),
+      s, realign \(.*\) with \(.*\),b(\1\,\2),
+      s, realign with \(.*\)::\(.*\),a(\2\,\1),
+      s, distribute \(.*\) onto \(.*\),d(\1\,\2),
+      s, distribute onto \(.*\)::\(.*\),d(\2\,\1),
+      s, distribute \(.*\),d(\1\,hpfcX),
+      s, redistribute \(.*\) onto \(.*\),e(\1\,\2),
+      s, redistribute onto \(.*\)::\(.*\),d(\2\,\1),
+      s, redistribute \(.*\),e(\1\,hpfcX),
       #
       # HPF parallelism directives
       #
@@ -207,17 +209,21 @@ $SED '#
       //s,\,independent\([(\,]\), independent\1,g
       //s,\,independent *$, independent,
       # specific handling
-      s, new,      n,g
-      s, reduction,      r,g
-      s, independent,      i,g
+      s, new,n,g
+      s, reduction,r,g
+      s, independent,i,g
       #
       # directives that may remain are errors:
       #
       s,, syntax error:,
+      # 
+      # insert needed spaces
       #
-      # switch to special hpfc functions...
+      s,\([^]\),      \1,g
       #
-      s,\([1234567abdeintpryu]\),call hpfc\1,g
+      # SWITCH to special hpfc functions...
+      #
+      s,\([1234567abdeintpryu]\),      call hpfc\1,g
       s,\([ck#s]\),hpfc\1,g' | 
 #
 # handles multi lines breaking (independent/new/reduction...)
