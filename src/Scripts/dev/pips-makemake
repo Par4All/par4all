@@ -3,11 +3,8 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
-# Revision 1.288  1997/06/03 06:28:31  coelho
-# *** empty log message ***
-#
-# Revision 1.287  1997/05/29 16:27:24  coelho
-# *** empty log message ***
+# Revision 1.289  1997/06/23 09:02:53  coelho
+# info entry for rlog improved.
 #
 # Revision 1.276  1997/03/28 07:13:52  coelho
 # SOFT_ARCH better defined?
@@ -743,7 +740,7 @@ count:;	@wc -l \$(ALL_SOURCES)
 # some quick entries for SCCS:
 info:
 	-test -d SCCS && sccs info
-	-test -d RCS && rlog -L -R RCS/*
+	-test -d RCS && rlog -L -l RCS/*
 
 # try to delta all checked out files
 delta:
