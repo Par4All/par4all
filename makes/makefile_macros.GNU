@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNU,v $ (version $Revision$)
-# $Date: 1996/07/15 18:43:00 $, 
+# $Date: 1996/07/15 21:09:34 $, 
 #
 # this file contains macro definitions 
 
@@ -23,7 +23,8 @@ LINT	= lint
 LINTFLAGS= -habxu
 YACC	= bison
 YFLAGS	= -y
-PROTOIZE= cproto -vcf2
+PROTO	= cproto
+PRFLAGS	= -evcf2
 ETAGS	= etags
 TAR	= gtar
 ZIP	= gzip -v9
