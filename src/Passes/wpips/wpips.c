@@ -52,8 +52,7 @@ static wpips_main_loop_command_type wpips_main_loop_command = WPIPS_EXIT;
 /* To deal with argument parsing: */
 string static workspace_name_given_to_wpips = NULL;
 string static module_name_given_to_wpips = NULL;
-string static * files_given_to_wpips = NULL;
-int static number_of_files_given_to_wpips = 0;
+static gen_array_t files_given_to_wpips = NULL;
     
 
 
@@ -141,7 +140,7 @@ void create_icon()
 					 XV_HEIGHT, 64,
 					 SERVER_IMAGE_BITS, pips_bits, 
 					 NULL);
-    icon = (Icon)xv_create(NULL, ICON, 
+    icon = (Icon)xv_create(XV_NULL, ICON, 
 			   ICON_IMAGE, pips_image,
 			   NULL);
     rect.r_width= (int)xv_get(icon, XV_WIDTH);
@@ -182,8 +181,10 @@ wpips_parse_arguments(int argc,
       }
       else if (same_string_p(argv[iarg], "-files")) {
          argv[iarg] = NULL;
-         files_given_to_wpips = &argv[++iarg];
-         number_of_files_given_to_wpips = argc-iarg;
+	 
+	 if (!files_given_to_wpips) /* lazy init */
+	     files_given_to_wpips = gen_array_make(0);
+	 gen_array_append(files_given_to_wpips, argv[++iarg]);
       }
       else {
          if (argv[iarg][0] == '-') {
@@ -202,21 +203,22 @@ wpips_parse_arguments(int argc,
 
 /* Execute some actions asked as option after XView initialization: */
 void static
-execute_workspace_creation_and_so_on_given_with_options()
+execute_workspace_creation_and_so_on_given_with_options(void)
 {
-   if (workspace_name_given_to_wpips != NULL) {
-      if (files_given_to_wpips != NULL) {
+   if (workspace_name_given_to_wpips != NULL) 
+   {
+      if (files_given_to_wpips != NULL) 
+      {
          if (! db_create_workspace(workspace_name_given_to_wpips))
             /* It fails, Go on with the normal WPips behaviour... */
             return;
          
-         if (! create_workspace(&number_of_files_given_to_wpips,
-                                files_given_to_wpips))
+         if (! create_workspace(files_given_to_wpips))
             /* It fails, Go on with the normal WPips behaviour... */
             return;
          
-      }
-      else {
+	 gen_array_free(files_given_to_wpips), files_given_to_wpips = NULL;
+      } else {
          if (! open_workspace(workspace_name_given_to_wpips))
             /* It fails, Go on with the normal WPips behaviour... */
             return;
