@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/12/23 16:30:47 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/12/27 08:53:19 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -46,6 +46,14 @@ entity
 GENERIC_CURRENT_MAPPING(host_gotos, statement, statement);
 GENERIC_CURRENT_MAPPING(node_gotos, statement, statement);
 
+#define debug_print_control(c)\
+  fprintf(stderr, \
+	  "control 0x%x (stat 0x%x) , %d predecessors, %d successors\n", \
+          (unsigned int) c, (unsigned int) control_statement(c), \
+	  gen_length(control_predecessors(c)), \
+	  gen_length(control_successors(c))); \
+  print_statement(control_statement(c));
+
 /*
  * Compiler
  *
@@ -61,60 +69,7 @@ GENERIC_CURRENT_MAPPING(node_gotos, statement, statement);
  * I don't think this is a problem.
  */
 
-
-/*
- * hpfcompiler
- *
- * drive the compilation of the statement to the relevent
- * procedure.
- *
- * Recursive calls used in the top-down walk of the program.
- */
-void hpfcompiler(stat, hoststatp, nodestatp)
-statement stat;
-statement *hoststatp,*nodestatp;
-{
-    if (get_bool_property("HPFC_NEW_IO_COMPILATION") &&
-	load_statement_only_io(stat)==TRUE) /* necessary */
-	if (io_efficient_compilable_p(stat))
-	{
-	    io_efficient_compile(stat,  hoststatp, nodestatp);
-	    return;
-	}
-    
-    /* else usual stuff */
-
-    switch(instruction_tag(statement_instruction(stat)))
-    {
-    case is_instruction_block:
-	hpfcompileblock(stat, hoststatp, nodestatp);
-	break;
-    case is_instruction_test:
-	hpfcompiletest(stat, hoststatp, nodestatp);
-	break;
-    case is_instruction_loop:
-	hpfcompileloop(stat, hoststatp, nodestatp);
-	break;
-    case is_instruction_goto:
-	hpfcompilegoto(stat, hoststatp, nodestatp);
-	break;
-    case is_instruction_call:
-	hpfcompilecall(stat, hoststatp, nodestatp);
-	break;
-    case is_instruction_unstructured:
-	hpfcompileunstructured(stat, hoststatp, nodestatp);
-	break;
-    default:
-	pips_error("hpfcompiler",
-		   "unexpected instruction tag\n");
-	break;
-    }
-}
-
-/*
- * hpfcompileblock
- */
-void hpfcompileblock(stat,hoststatp,nodestatp)
+static void hpf_compile_block(stat,hoststatp,nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
@@ -150,10 +105,7 @@ statement *hoststatp,*nodestatp;
     instruction_block(statement_instruction(*nodestatp)) = lnode;
 }
 
-/*
- * hpfcompiletest
- */
-void hpfcompiletest(stat,hoststatp,nodestatp)
+static void hpf_compile_test(stat,hoststatp,nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
@@ -205,86 +157,11 @@ statement *hoststatp,*nodestatp;
 		  statnodetrue,
 		  statnodefalse);
 
-    IFDBPRINT(9,"hpfcompiletest",host_module,(*hoststatp));
-    IFDBPRINT(9,"hpfcompiletest",node_module,(*nodestatp));
+    IFDBPRINT(9,"hpf_compiletest",host_module,(*hoststatp));
+    IFDBPRINT(9,"hpf_compiletest",node_module,(*nodestatp));
 }
 
-/*
- * hpfcompileloop
- */
-void hpfcompileloop(stat, hoststatp, nodestatp)
-statement stat;
-statement *hoststatp, *nodestatp;
-{
-    loop
-	the_loop = instruction_loop(statement_instruction(stat));
-
-    assert(statement_loop_p(stat));
-
-    if (execution_parallel_p(loop_execution(the_loop)))
-    {
-	entity var=entity_undefined;
-	list l=NIL;
-	bool
-	    is_sh = subarray_shift_p(stat, &var, &l),
-	    /* 
-	     * should verify that only listed in labels and distributed
-	     * entities are defined inside the body of the loop
-	     */
-	    at_ac = atomic_accesses_only_p(stat),
-	    in_in = indirections_inside_statement_p(stat);
-	
-	debug(5, "hpfcompileloop", "condition results: sh %d, aa %d, in %d\n",
-	      is_sh, at_ac, in_in);
-
-	if (is_sh)
-	{
-	    debug(4, "hpfcompileloop", "shift detected\n");
-	    
-	    *nodestatp = generate_subarray_shift(stat, var, l);
-	    *hoststatp = make_continue_statement(entity_empty_label());
-	}
-	else if (at_ac && !in_in)
-	{
-	    statement
-		overlapstat;
-
-	    debug(7, "hpfcompileloop", "compiling a parallel loop\n");
-
-	    if (Overlap_Analysis(stat, &overlapstat))
-	    {
-		debug(7, "hpfcompileloop", "overlap analysis succeeded\n");
-
-		*hoststatp = make_continue_statement(entity_empty_label());
-		*nodestatp = overlapstat;
-		statement_comments(*nodestatp) = statement_comments(stat);
-	    }
-	    else
-	    {
-		debug(7, "hpfcompileloop", "overlap analysis is not ok...\n");
-
-		hpfcompileparallelloop(stat, hoststatp, nodestatp);
-	    }
-	}
-	else
-	{
-	    debug(7,"hpfcompileloop",
-		  "compiling a parallel loop sequential...\n");
-	    hpfcompilesequentialloop(stat, hoststatp, nodestatp);
-	}
-    }
-    else
-    {
-	debug(7,"hpfcompileloop","compiling a sequential loop\n");
-    
-	hpfcompilesequentialloop(stat, hoststatp, nodestatp);
-    }
-}
-
-/*
- * hpfcompilegoto
- */
-void hpfcompilegoto(stat,hoststatp,nodestatp)
+static void hpf_compile_goto(stat,hoststatp,nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
@@ -312,10 +189,7 @@ statement *hoststatp,*nodestatp;
 	instruction_goto(statement_instruction(stat));
 }
 
-/*
- * hpfcompilecall
- */
-void hpfcompilecall(stat, hoststatp, nodestatp)
+static void hpf_compile_call(stat, hoststatp, nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
@@ -324,7 +198,7 @@ statement *hoststatp,*nodestatp;
 
     assert(instruction_call_p(statement_instruction(stat)));
 
-    debug(7,"hpfcompilecall", "function %s\n", entity_name(call_function(c)));
+    debug(7,"hpf_compile_call", "function %s\n", entity_name(call_function(c)));
 
     /*
      * {"WRITE", (MAXINT)},
@@ -355,7 +229,7 @@ statement *hoststatp,*nodestatp;
 	    leh=lUpdateExpr(host_module,call_arguments(c)),
 	    len=lUpdateExpr(node_module,call_arguments(c));
 	
-	debug(7,"hpfcompilecall","no reference to distributed variable\n");
+	debug(7,"hpf_compile_call","no reference to distributed variable\n");
 
 	(*hoststatp)=MakeStatementLike(stat,
 				       is_instruction_call,
@@ -371,8 +245,8 @@ statement *hoststatp,*nodestatp;
 	instruction_call(statement_instruction((*nodestatp)))=
 	    make_call(call_function(c),len);
 
-	IFDBPRINT(8,"hpfcompilecall",host_module,(*hoststatp));
-	IFDBPRINT(8,"hpfcompilecall",node_module,(*nodestatp));
+	IFDBPRINT(8,"hpf_compile_call",host_module,(*hoststatp));
+	IFDBPRINT(8,"hpf_compile_call",node_module,(*nodestatp));
 
 	return;
     }
@@ -402,7 +276,7 @@ statement *hoststatp,*nodestatp;
 	    /*
 	     * c1-alpha
 	     */
-	    debug(8,"hpfcompilecall","c1-alpha\n");
+	    debug(8,"hpf_compile_call","c1-alpha\n");
 	    
 	    generate_c1_alpha(stat,&lh,&ln);
 	}
@@ -421,7 +295,7 @@ statement *hoststatp,*nodestatp;
 		    sn = statement_undefined;
 
 		if (!compile_reduction(stat, &sh, &sn))
-		    pips_error("hpfcompilecall", 
+		    pips_error("hpf_compile_call", 
 			       "reduction compilation failed\n");
 
 		lh = CONS(STATEMENT, sh, NIL);
@@ -432,7 +306,7 @@ statement *hoststatp,*nodestatp;
 		/*
 		 * c1-beta
 		 */
-		debug(8,"hpfcompilecall","c1-beta\n");
+		debug(8,"hpf_compile_call","c1-beta\n");
 		
 		generate_c1_beta(stat, &lh, &ln);
 	    }
@@ -451,8 +325,8 @@ statement *hoststatp,*nodestatp;
 	instruction_block(statement_instruction(*hoststatp)) = lh;
 	instruction_block(statement_instruction(*nodestatp)) = ln;
 	
-	IFDBPRINT(8,"hpfcompilecall", host_module, (*hoststatp));
-	IFDBPRINT(8,"hpfcompilecall", node_module, (*nodestatp));
+	IFDBPRINT(8,"hpf_compilecall", host_module, (*hoststatp));
+	IFDBPRINT(8,"hpf_compilecall", node_module, (*nodestatp));
 	
 	return;
     }
@@ -462,13 +336,10 @@ statement *hoststatp,*nodestatp;
      * an assignment. Since I do not use the effects as I should, nothing
      * is done...
      */
-    user_warning("hpfcompilecall","not implemented yet\n");
+    user_warning("hpf_compile_call","not implemented yet\n");
 }
 
-/*
- * hpfcompileunstructured
- */
-void hpfcompileunstructured(stat,hoststatp,nodestatp)
+static void hpf_compile_unstructured(stat,hoststatp,nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
@@ -478,7 +349,7 @@ statement *hoststatp,*nodestatp;
 
     if (one_statement_unstructured(instruction_unstructured(inst)))
     {
-	debug(7,"hpfcompileunstructured","one statement recognize\n");
+	debug(7,"hpf_compile_unstructured","one statement recognize\n");
 	/* 
 	 * nothing spacial is done! 
 	 *
@@ -512,7 +383,7 @@ statement *hoststatp,*nodestatp;
 	list 
 	    blocks = NIL;
 
-	debug(6, "hpfcompileunstructured", "beginning\n");
+	debug(6, "hpf_compile_unstructured", "beginning\n");
 
 	CONTROL_MAP
 	    (c,
@@ -523,7 +394,7 @@ statement *hoststatp,*nodestatp;
 	     
 	     ifdebug(7)
 	     {
-		 fprintf(stderr, "[hpfcompileunstructured] statements:\n");
+		 fprintf(stderr, "[hpf_compile_unstructured] statements:\n");
 		 fprintf(stderr, "statc = \n");
 		 print_statement(statc);
 		 fprintf(stderr, "host stat = \n");
@@ -551,14 +422,6 @@ statement *hoststatp,*nodestatp;
 	 },
 	     blocks);
 
-#define debug_print_control(c)\
-  fprintf(stderr, \
-	  "control 0x%x (stat 0x%x) , %d predecessors, %d successors\n", \
-          (unsigned int) c, (unsigned int) control_statement(c), \
-	  gen_length(control_predecessors(c)), \
-	  gen_length(control_successors(c))); \
-  print_statement(control_statement(c));
-
 	ifdebug(9)
 	{
 	    control
@@ -566,7 +429,7 @@ statement *hoststatp,*nodestatp;
 		h_tmp = control_undefined,
 		n_tmp = control_undefined;
 
-	    fprintf(stderr, "[hpfcompileunstructured] controls:\n");
+	    fprintf(stderr, "[hpf_compile_unstructured] controls:\n");
 	    
 	    MAPL(cc,
 	     {
@@ -594,13 +457,12 @@ statement *hoststatp,*nodestatp;
 	new_ct = (control) GET_CONTROL_MAPPING(hostmap, ct);
 	new_ce = (control) GET_CONTROL_MAPPING(hostmap, ce);
 
-	assert(!control_undefined_p(new_ct) || 
-	       !control_undefined_p(new_ce));
+	assert(!control_undefined_p(new_ct) && !control_undefined_p(new_ce));
 
 	ifdebug(9)
 	{
 	    fprintf(stderr,
-		    "[hpfcompileunstructured] host unstructured controls:\n");
+		    "[hpf_compile_unstructured] host unstructured controls:\n");
 	    
 		 fprintf(stderr, "Main:\n");
 		 debug_print_control(new_ct);
@@ -613,7 +475,7 @@ statement *hoststatp,*nodestatp;
 
 	ifdebug(7)
 	{
-	    fprintf(stderr, "[hpfcompileunstructured] host new stat:\n");
+	    fprintf(stderr, "[hpf_compile_unstructured] host new stat:\n");
 	    print_statement(*hoststatp);
 	}
 
@@ -627,14 +489,14 @@ statement *hoststatp,*nodestatp;
 	new_ct = (control) GET_CONTROL_MAPPING(nodemap, ct);
 	new_ce = (control) GET_CONTROL_MAPPING(nodemap, ce);
 
-	assert(!control_undefined_p(new_ct) || 
-	       !control_undefined_p(new_ce));
+	assert(!control_undefined_p(new_ct) && !control_undefined_p(new_ce));
+
 	instruction_unstructured(statement_instruction(*nodestatp)) =
 	    make_unstructured(new_ct, new_ce);
 
 	ifdebug(7)
 	{
-	    fprintf(stderr, "[hpfcompileunstructured] host new stat:\n");
+	    fprintf(stderr, "[hpf_compileunstructured] host new stat:\n");
 	    print_statement(*hoststatp);
 	}
 	
@@ -644,57 +506,7 @@ statement *hoststatp,*nodestatp;
     }
 }
 
-
-/*
- * DeduceGotos
- *
- * Goto Deduction Pass
- */
-void DeduceGotos(stat,map)
-statement stat;
-statement_mapping map;
-{
-    instruction inst=statement_instruction(stat);
-
-    switch (instruction_tag(inst))
-    {
-    case is_instruction_block:
-	MAPL(cs,{DeduceGotos(STATEMENT(CAR(cs)),map);},instruction_block(inst));
-	break;
-    case is_instruction_test:
-	DeduceGotos(test_true(instruction_test(inst)),map);
-	DeduceGotos(test_false(instruction_test(inst)),map);
-	break;
-    case is_instruction_loop:
-	DeduceGotos(loop_body(instruction_loop(inst)),map);	     
-	break;
-    case is_instruction_goto:
-	instruction_goto(inst)=
-	    (statement) GET_STATEMENT_MAPPING(map,instruction_goto(inst));
-	break;
-    case is_instruction_call:
-	/* nothing */
-	break;
-    case is_instruction_unstructured:
-    {
-	list blocks=NIL;
-	control ct=unstructured_control(instruction_unstructured(inst));
-
-	CONTROL_MAP(c,{DeduceGotos(control_statement(c),map);},ct,blocks);
-	gen_free_list(blocks);
-
-	break;
-    }
-    default:
-	pips_error("hpfcompiler","unexpected instruction tag\n");
-	break;
-    }
-}
-
-/*
- * hpfcompilesequentialloop
- */
-void hpfcompilesequentialloop(stat,hoststatp,nodestatp)
+static void hpf_compile_sequential_loop(stat,hoststatp,nodestatp)
 statement stat, *hoststatp, *nodestatp;
 {
     loop
@@ -746,7 +558,7 @@ statement stat, *hoststatp, *nodestatp;
 
     ifdebug(8)
     {
-	fprintf(stderr, "[hpfcompilesequentialloop] host stat:\n");
+	fprintf(stderr, "[hpf_compile_sequential_loop] host stat:\n");
 	print_statement(*hoststatp);
     }
     
@@ -765,16 +577,37 @@ statement stat, *hoststatp, *nodestatp;
 
     ifdebug(8)
     {
-	fprintf(stderr, "[hpfcompilesequentialloop] node stat:\n");
+	fprintf(stderr, "[hpf_compile_sequential_loop] node stat:\n");
 	print_statement(*nodestatp);
     }
 }
 
+static void hpf_compile_parallel_body(body, hoststatp, nodestatp)
+statement body, *hoststatp, *nodestatp;
+{
+    list
+	lw = NULL,
+	lr = NULL,
+	li = NULL,
+	ls = NULL,
+	lbs = NULL;
+    /*
+     * ???
+     * dependances are not surely respected respected in the definitions list...
+     * should check that only locals variables, that are not replicated,
+     * may be defined during the body of the loop...
+     */
+    FindRefToDistArrayInStatement(body, &lw, &lr);
+    li = AddOnceToIndicesList(lIndicesOfRef(lw), lIndicesOfRef(lr));
+    ls = FindDefinitionsOf(body, li);
 
-/*
- * hpfcompileparallelloop
- */
-void hpfcompileparallelloop(stat, hoststatp, nodestatp)
+    generate_parallel_body(body, &lbs, lw, lr);
+
+    (*hoststatp) = NULL;
+    (*nodestatp) = make_block_statement(gen_nconc(ls, lbs));
+}
+
+static void hpf_compile_parallel_loop(stat, hoststatp, nodestatp)
 statement stat, *hoststatp, *nodestatp;
 {
     loop
@@ -801,11 +634,11 @@ statement stat, *hoststatp, *nodestatp;
     if ((instruction_loop_p(bodyinst)) &&
 	(execution_parallel_p(loop_execution(instruction_loop(bodyinst)))))
     {
-	hpfcompileparallelloop(body, &s, &nodebody);
+	hpf_compile_parallel_loop(body, &s, &nodebody);
     }
     else
     {
-	hpfcompileparallelbody(body, &s, &nodebody);
+	hpf_compile_parallel_body(body, &s, &nodebody);
     }
     
     (*hoststatp) = make_continue_statement(entity_undefined);
@@ -823,31 +656,121 @@ statement stat, *hoststatp, *nodestatp;
 		  NULL);
 }
 
-/*
- * hpfcompileparallelbody
- */
-void hpfcompileparallelbody(body, hoststatp, nodestatp)
-statement body, *hoststatp, *nodestatp;
+static void hpf_compile_loop(stat, hoststatp, nodestatp)
+statement stat;
+statement *hoststatp, *nodestatp;
 {
-    list
-	lw = NULL,
-	lr = NULL,
-	li = NULL,
-	ls = NULL,
-	lbs = NULL;
-    /*
-     * ???
-     * dependances are not surely respected respected in the definitions list...
-     * should check that only locals variables, that are not replicated,
-     * may be defined during the body of the loop...
-     */
-    FindRefToDistArrayInStatement(body, &lw, &lr);
-    li = AddOnceToIndicesList(lIndicesOfRef(lw), lIndicesOfRef(lr));
-    ls = FindDefinitionsOf(body, li);
+    loop
+	the_loop = instruction_loop(statement_instruction(stat));
 
-    generate_parallel_body(body, &lbs, lw, lr);
+    assert(statement_loop_p(stat));
 
-    (*hoststatp) = NULL;
-    (*nodestatp) = make_block_statement(gen_nconc(ls, lbs));
+    if (execution_parallel_p(loop_execution(the_loop)))
+    {
+	entity var=entity_undefined;
+	list l=NIL;
+	bool
+	    is_sh = subarray_shift_p(stat, &var, &l),
+	    /* 
+	     * should verify that only listed in labels and distributed
+	     * entities are defined inside the body of the loop
+	     */
+	    at_ac = atomic_accesses_only_p(stat),
+	    in_in = indirections_inside_statement_p(stat);
+	
+	debug(5, "hpf_compile_loop", "condition results: sh %d, aa %d, in %d\n",
+	      is_sh, at_ac, in_in);
+
+	if (is_sh)
+	{
+	    debug(4, "hpf_compile_loop", "shift detected\n");
+	    
+	    *nodestatp = generate_subarray_shift(stat, var, l);
+	    *hoststatp = make_continue_statement(entity_empty_label());
+	}
+	else if (at_ac && !in_in)
+	{
+	    statement
+		overlapstat;
+
+	    debug(7, "hpf_compile_loop", "compiling a parallel loop\n");
+
+	    if (Overlap_Analysis(stat, &overlapstat))
+	    {
+		debug(7, "hpf_compile_loop", "overlap analysis succeeded\n");
+
+		*hoststatp = make_continue_statement(entity_empty_label());
+		*nodestatp = overlapstat;
+		statement_comments(*nodestatp) = statement_comments(stat);
+	    }
+	    else
+	    {
+		debug(7, "hpf_compile_loop", "overlap analysis is not ok...\n");
+
+		hpf_compile_parallel_loop(stat, hoststatp, nodestatp);
+	    }
+	}
+	else
+	{
+	    debug(7,"hpf_compile_loop",
+		  "compiling a parallel loop sequential...\n");
+	    hpf_compile_sequential_loop(stat, hoststatp, nodestatp);
+	}
+    }
+    else
+    {
+	debug(7,"hpf_compile_loop","compiling a sequential loop\n");
+    
+	hpf_compile_sequential_loop(stat, hoststatp, nodestatp);
+    }
 }
+
+/*
+ * hpfcompiler
+ *
+ * drive the compilation of the statement to the relevant
+ * procedure.
+ *
+ * Recursive calls used in the top-down walk of the program.
+ */
+void hpfcompiler(stat, hoststatp, nodestatp)
+statement stat;
+statement *hoststatp,*nodestatp;
+{
+    if (get_bool_property("HPFC_NEW_IO_COMPILATION") &&
+	load_statement_only_io(stat)==TRUE) /* necessary */
+	if (io_efficient_compilable_p(stat))
+	{
+	    io_efficient_compile(stat,  hoststatp, nodestatp);
+	    return;
+	}
+    
+    /* else usual stuff */
+
+    switch(instruction_tag(statement_instruction(stat)))
+    {
+    case is_instruction_block:
+	hpf_compile_block(stat, hoststatp, nodestatp);
+	break;
+    case is_instruction_test:
+	hpf_compile_test(stat, hoststatp, nodestatp);
+	break;
+    case is_instruction_loop:
+	hpf_compile_loop(stat, hoststatp, nodestatp);
+	break;
+    case is_instruction_goto:
+	hpf_compile_goto(stat, hoststatp, nodestatp);
+	break;
+    case is_instruction_call:
+	hpf_compile_call(stat, hoststatp, nodestatp);
+	break;
+    case is_instruction_unstructured:
+	hpf_compile_unstructured(stat, hoststatp, nodestatp);
+	break;
+    default:
+	pips_error("hpfcompiler", "unexpected instruction tag\n");
+	break;
+    }
+}
+
 
