@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1996/08/21 10:40:07 $, 
+%% $Date: 1996/08/25 23:00:03 $, 
 
 \documentstyle[a4,psfig,html,verbatim,newgen_domain]{article}
 
@@ -265,7 +265,8 @@ typing information, their local names are prefixed by a constant
 character, \verb/MAIN_PREFIX/. Local names of labels\index{Label} also
 are prefixed by one character, \verb/LABEL_PREFIX/. Two special label
 entities are used and defined by two special names: 
-\verb/EMPTY_LABEL_NAME/, which is used for statements with no label, and
+\verb/EMPTY_LABEL_NAME/, which is used for statements with no label (see
+Function {\tt empty\_label\_p()}), and
 \verb/RETURN_LABEL_NAME/ which is used to define the unique return point
 of a module. Every {\tt RETURN} statement is translated into a jump to
 this artificial return point.
@@ -282,7 +283,7 @@ instance, the value of a module is its {\tt code}.
 \iffalse
 Tout objet ayant un nom dans un programme Fortran est représenté par
 une \verb/entity/. Un tel objet peut e^tre un module, une variable, un
-common, un opérateur, une constante, un label, etc. Pour chaque objet,
+common, un opérateur, une constante, un label, etc... Pour chaque objet,
 le sous-domaine \verb/name/ de l'entité donne le nom de l'objet tel
 qu'il apparaît dans le texte source du programme préfixé par le nom du
 package dans lequel l'entité est déclarée, le sous-domaine
@@ -840,7 +841,8 @@ directement appelés dans le code. Il contient une partie du callgraph.
 \domain{Statement = label:entity x number:int x ordering:int x comments:string x instruction}
 {}
 
-Type {\tt statement} is used as a container of instructions. Member {\tt
+Type {\tt statement} is used as a container of instructions. Methods for
+statements are in Library {\tt ri-util/statement.c}. Member {\tt
 label} is an entity of kind label. Such entities can be recognized by
 their names. See Section~\ref{subsection-entity} for more details about
 name structures and handling of statements with no labels and return
@@ -981,10 +983,31 @@ statements when the mapping is freed. See NewGen documentation in ???.
 \label{subsection-instruction}
 \index{Instruction}
 
-\domain{Sequence = statements:statement*}
 \domain{Instruction = sequence + test + loop + goto:statement + call + unstructured}
 
-{ 
+Type {\tt instruction} is used to represent the command associated to a
+statement. An instruction can either be a sequence, a test, a loop,
+parallel or sequential, an unconditional branch ({\tt goto}) pointing to
+the branch target, an elementary command ({\tt call}) or a whole control
+flow graph.
+
+Elementary commands are used for Fortran statements and intrinsics and
+operators. There are {\tt call}'s for assignments, subroutine calls,
+input-outputs, returns, stops, modulos, the overloaded {\tt +}, and so
+on. This is detailed in Section~\ref{subsubsection-call}.
+
+The code of a module is either in a user-defined form or in so-called
+{\tt controlized} form. In the former case, no {\tt unstructured}
+instruction is allowed and explicit {\tt goto}'s are used. In the later
+case, {\tt goto}'s are forbidden and abstracted by {\tt
+unstructered}. of course, a fully-structured code does not contain
+either {\tt goto} or {\tt unstructured}\footnote{PIPS does not contain a
+control restructurer but it is interfaced to Toolpack.}. The user-defined form only is
+used by the parser and some pretty-printers. The pretty-printers are
+able to restore Fortran-77 {\tt goto}'s from the {\tt
+unstructured}. More on this in Section~\ref{subsubsection-unstructured}.
+
+\iffalse
 Le domaine \verb/instruction/ permet de représenter les instructions
 d'un module. Une instruction peut être un sous-domaine \verb/block/,
 c'est-a`-dire une liste de \verb/statement/, un sous-domaine \verb/test/
@@ -998,7 +1021,15 @@ subroutine, entrées-sorties, return, stop, etc) ou un sous-domaine de
 structuré. Toutes ces instructions 
 sont représentées par des appels a` des fonctions prédéfinies dont
 nous étudierons la nature plus loin.
-}
+\fi
+
+\subsubsection{Sequence}
+
+\domain{Sequence = statements:statement*}
+
+Type {\tt sequence} is self-explanatory. This is the standard sequence
+constructor. The empty sequence is used to represent an instruction with
+no effect, a NOP. See {\tt empty\_statement\_p()}.
 
 \subsubsection{Control Flow Graph (a.k.a. Unstructured)}
 \label{subsubsection-unstructured}
@@ -1083,7 +1114,26 @@ Figure~\ref{figure-hierarchical-control-flow-graph}).
 \index{Test}
 
 \domain{Test = condition:expression x true:statement x false:statement}
-{
+
+Type {\tt test} is used to represent conditional statements. Field {\tt
+condition} must contain a {\em boolean}\footnote{Note that expressions
+are untyped in PIPS internal representation. They are kept in an
+overloaded form because typing does not matter for parallelization. An
+new pass would be required to insert the conversion operators. Besides,
+fully typed Fortran operators would have to be added.} expression to
+evaluate. Fields {\tt true} and {\tt false} contain the statement to
+execute if the test evaluates to true or false.
+
+If the false branch is empty, an {\em empty} statement is inserted. It might
+be an empty sequence or a {\tt CONTINUE} statement or... (see Function
+{\tt empty\_statement\_p}). Of course, an empty statement {\em must} have
+an empty label (see Section~\ref{subsection-entity}).
+
+If necessary, Fortran control instructions, but DO loops, are decomposed into
+combinations of such {\tt test} instructions and other PIPS instructions
+by the parser, which may add {\tt goto} statements, and by the controlizer.
+
+\iffalse
 Le domaine \verb/test/ permet de représenter toutes les instructions a` base
 de contrôle. Le sous-domaine \verb/condition/ contient l'expression a`
 tester, et les deux sous-domaines \verb/true/ et \verb/false/ contiennent les
@@ -1093,7 +1143,7 @@ Il faut noter que chaque instruction de contrôle de Fortran,
 a` l'exception de l'instruction \verb/DO/, est
 transformée en une combinaison sémantiquement équivalente de \verb/test/s
 et de \verb/goto/s.
-}
+\fi
 
 \subsubsection{DO Loop, Sequential or Parallel}
 \label{subsubsection-loop}
