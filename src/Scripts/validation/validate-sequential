@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/04/02 10:46:19 $, ) 
+# ($Date: 1997/04/02 11:16:36 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -290,7 +290,7 @@ or $tpips_version" || \
      if [ -r $aspect/$name.tpips ]
      then
        $DEBUG " || .tpips case"
-       $tpips_version $aspect/$name.tpips 2> $tmperr
+       $tpips_version $aspect/$name.tpips > $tmpout 2> $tmperr
        STATUS=$?
        test -f core && rm -f core
        
