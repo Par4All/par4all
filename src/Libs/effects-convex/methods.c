@@ -368,6 +368,7 @@ reset_convex_rw_regions(string module_name)
     reset_transformer_map();
     reset_precondition_map();
     reset_cumulated_rw_effects();
+    free_value_mappings();
 }
 
 void 
@@ -377,6 +378,7 @@ reset_convex_in_out_regions(string module_name)
     reset_transformer_map();
     reset_precondition_map();
     reset_cumulated_rw_effects();
+    free_value_mappings();
 }
 
 void
@@ -396,6 +398,7 @@ reset_convex_summary_rw_regions(string module_name)
 {
     regions_end();
     reset_cumulated_rw_effects();
+    free_value_mappings();
 }
 
 void
@@ -425,4 +428,5 @@ reset_convex_summary_in_out_regions(string module_name)
 {
     regions_end();
     reset_cumulated_rw_effects();
+    free_value_mappings();
 }
