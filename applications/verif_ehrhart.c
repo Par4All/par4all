@@ -258,7 +258,7 @@ int main(int argc,char *argv[]) {
 #endif
 
   /******* CHECK NOW *********/
-  if(!check_poly(S,C,en,C->Dimension,0,p)) {
+  if(S && !check_poly(S,C,en,C->Dimension,0,p)) {
     fprintf(stderr,"Check failed !\n");
     for(i=0;i<=(P->Dimension+1);i++) 
       value_clear(p[i]);
