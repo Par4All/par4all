@@ -195,7 +195,10 @@ dbll_stat_file(string file_name, bool okifnotthere)
     if (error<0) { /* some error */
 	if (!okifnotthere || get_bool_property("WARNING_ON_STAT_ERROR")) {
 	    perror(file_name);
-	    pips_internal_error("error in stat for %s\n", file_name);
+	    pips_user_warning("error in stat for %s\n", file_name);
+	}
+	if (!okifnotthere) {
+	    pips_internal_error("stat error not permitted here\n");
 	}	    
     } else time = (int) buf.st_mtime; /* humm... unsigned... */
     return time;
