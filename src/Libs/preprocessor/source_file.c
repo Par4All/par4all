@@ -300,7 +300,7 @@ static void handle_file(FILE * f) /* process f for includes and nones */
     regmatch_t matches[2]; /* matched strings */
     int nline = 0;
 
-    while (!fgets(line, LINE_LENGTH, f))
+    while (fgets(line, LINE_LENGTH, f))
     {
 	nline++;
 	
@@ -317,8 +317,6 @@ static void handle_file(FILE * f) /* process f for includes and nones */
 	    fprintf(output_file, "%s", line);
 	}
     }
-    
-    pips_debug(5, "NULL out after %d lines\n", nline);
 }
 
 static void init_rx(void)
