@@ -232,7 +232,10 @@ static db_resource find_or_create_db_resource(string rname, string oname)
     return r;
 }
 
-/* on checkpoints, status may be "loaded", but is is not true!
+/* on checkpoints... there are some incoherencies!
+ * - status may be 'loaded', but it is not true!
+ * - status may be 'required', but it is not true either.
+ * - also, as obsolete resources are not cleaned...
  */
 static void db_clean_db_resources()
 {
