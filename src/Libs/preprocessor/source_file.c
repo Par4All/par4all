@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.91  1998/07/10 08:16:41  coelho
+ * modules are put in the right order...
+ *
  * Revision 1.90  1998/07/09 18:24:39  coelho
  * hack for entry: file names are preceded by their modules...
  *
@@ -777,6 +780,7 @@ bool process_user_file(string file)
     while ((a_line = safe_readline(fd))) 
     {
 	string mod_name = NULL, res_name = NULL, abs_res, file_name;
+	list modules = NIL;
 	bool renamed=FALSE;
 
 	file_name = extract_last_name(a_line);
@@ -784,9 +788,10 @@ bool process_user_file(string file)
 	number_of_modules++;
 	pips_debug(2, "module %s (number %d)\n", file_name, number_of_modules);
 
-	/* extract module names from last to first.
-	 */
 	while (mod_name!=a_line && (mod_name = extract_last_name(a_line)))
+	    modules = CONS(STRING, mod_name, modules);
+
+	MAP(STRING, mod_name, 
 	{
 	    user_log("  Module         %s\n", mod_name);
 
@@ -813,7 +818,10 @@ bool process_user_file(string file)
 	     * absolute path to the file so that db moves should be ok?
 	     */
 	    DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
-	}
+	},
+	    modules);
+
+	gen_free_list(modules), modules=NIL;
 
 	if (res_name) free(res_name), res_name = NULL;
 	free(a_line);
