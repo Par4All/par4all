@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.74  1997/12/12 15:42:34  coelho
+ * leaks--
+ *
  * Revision 1.73  1997/12/12 14:48:19  coelho
  * leaks--.
  *
@@ -300,8 +303,7 @@ i_exit: TK_EXIT TK_ENDOFLINE
 
 i_help: TK_HELP TK_NAME TK_ENDOFLINE 
 	{
-	    tpips_help($2);
-	    free($2);
+	    tpips_help($2); free($2);
 	}
 	| TK_HELP TK_ENDOFLINE
 	{
@@ -620,6 +622,7 @@ i_activate: TK_ACTIVATE rulename TK_ENDOFLINE
 		activate ($2);
 		$$ = TRUE;
 	    }
+	    free($2);
 	}
 	;
 
@@ -631,6 +634,7 @@ i_get: TK_GET_PROPERTY propname TK_ENDOFLINE
 		fprint_property(stdout, $2);
 		$$ = TRUE;
 	    }
+	    free($2);
 	}
 	;
 
