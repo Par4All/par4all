@@ -124,20 +124,15 @@ rm_live_loop_index(entity i)
 
 void init_use_proper_effects(char *module_name)
 {
-    set_proper_effects_map( effectsmap_to_listmap((statement_mapping)
-	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE)) );
-    pips_assert("init_use_proper_effects",
-		get_proper_effects_map() != hash_table_undefined );
+    set_proper_rw_effects((statement_effects)
+	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+    pips_assert("init_use_proper_effects", !proper_rw_effects_undefined_p());
 }
 
 /* returns proper effects associated to statement stmt */
-/* Current implementation of effects mappings involves lists of effect!
- * (sa. pipsdbm/io.c). Lists become effects here.
- */
-effects stmt_to_fx(statement stmt, statement_mapping stmt_fx_map)
+effects stmt_to_fx(statement stmt, statement_effects fx_map)
 {
     effects fx;
-    list ls;
 
     pips_assert("stmt_prec", stmt != statement_undefined);
 
@@ -145,20 +140,11 @@ effects stmt_to_fx(statement stmt, statement_mapping stmt_fx_map)
 	  "Look for effects for statement at %d (ordering %d, number %d):\n", 
 	  (int) stmt, statement_ordering(stmt), statement_number(stmt));
 
-    ls = (list) GET_STATEMENT_MAPPING(stmt_fx_map, stmt);
-
-    if(ls==(list) HASH_UNDEFINED_VALUE) {
-	fx = effects_undefined;
-	debug(5, "stmt_to_fx", "effects_undefined");
-    }
-    else {
-	/* sorry for this dusty alloc... never freed! */ 
-	fx= make_effects(ls);
-	ifdebug(5) 
+    fx = apply_statement_effects(fx_map, stmt);
+    ifdebug(5) 
 	{
 	    print_effects(effects_effects(fx));
 	}
-    }
 
     return(fx);
 }
@@ -1216,7 +1202,7 @@ expression generate_monome(int coef, expression expr)
 void recursiv_partial_eval(statement stmt)
 {
     instruction inst = statement_instruction(stmt);
-    statement_mapping pfx_map = get_proper_effects_map(); 
+    statement_effects fx_map = get_proper_rw_effects();
 
     debug(8, "recursiv_partial_eval", "begin with tag %d\n", 
 	  instruction_tag(inst));
@@ -1233,7 +1219,7 @@ void recursiv_partial_eval(statement stmt)
 	  test t = instruction_test(inst);
 	  partial_eval_expression_and_regenerate(&test_condition(t), 
 						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt, pfx_map));
+						 stmt_to_fx(stmt,fx_map));
 	  recursiv_partial_eval(test_true(t));
 	  recursiv_partial_eval(test_false(t));
 	  if(get_debug_level()>=9) {
@@ -1247,13 +1233,13 @@ void recursiv_partial_eval(statement stmt)
 	  range r = loop_range(l);
 	  partial_eval_expression_and_regenerate(&range_lower(r), 
 						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt, pfx_map));
+						 stmt_to_fx(stmt,fx_map));
 	  partial_eval_expression_and_regenerate(&range_upper(r), 
 						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt, pfx_map));
+						 stmt_to_fx(stmt,fx_map));
 	  partial_eval_expression_and_regenerate(&range_increment(r), 
 						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt, pfx_map));
+						 stmt_to_fx(stmt,fx_map));
 	  add_live_loop_index(loop_index(l));
 	  recursiv_partial_eval(loop_body(l));
 	  rm_live_loop_index(loop_index(l));
@@ -1267,7 +1253,7 @@ void recursiv_partial_eval(statement stmt)
       case is_instruction_call : {
 	  partial_eval_call_and_regenerate(instruction_call(inst), 
 					   stmt_prec(stmt), 
-					   stmt_to_fx(stmt, pfx_map));
+					   stmt_to_fx(stmt,fx_map));
 	  break;
       }
       case is_instruction_goto :
@@ -1323,8 +1309,8 @@ bool partial_eval(char *mod_name)
     init_use_proper_effects(mod_name); /* uses set_proper_effects_map */
 
     /* preconditions may need to print preconditions for debugging purposes */
-    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE)));
+    set_cumulated_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE));
 
     module_to_value_mappings(module);
 
@@ -1371,8 +1357,8 @@ bool partial_eval(char *mod_name)
 
     reset_live_loop_indices();
     reset_precondition_map();
-    reset_cumulated_effects_map();
-    reset_proper_effects_map();
+    reset_cumulated_rw_effects();
+    reset_proper_rw_effects();
     reset_current_module_entity();
     reset_current_module_statement();
 
