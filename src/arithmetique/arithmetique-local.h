@@ -225,6 +225,10 @@ typedef int Value;
 #define value_pmod(v1,v2)  		(modulo(v1,v2))
 #define value_min(v1,v2)   		(value_le(v1,v2)? (v1): (v2))
 #define value_max(v1,v2)   		(value_ge(v1,v2)? (v1): (v2))
+#define value_or(v1,v2)  		((v1)|(v2))
+#define value_and(v1,v2)  		((v1)&(v2))
+#define value_lshift(v1,v2)  	((v1)<<(v2))
+#define value_rshift(v1,v2)  	((v1)>>(v2))
 
 /* assigments
  */
@@ -232,6 +236,7 @@ typedef int Value;
 #define value_addto(ref,val) 		ref+=(val)
 #define value_increment(ref) 		ref++
 #define value_direct_product(ref,val)	ref*=(val) /* direct! */
+#define value_multiply(ref,val)	value_assign(ref,value_mult(ref,val))
 #define value_substract(ref,val) 	ref-=(val)
 #define value_decrement(ref) 		ref--
 #define value_division(ref,val) 	ref/=(val)
