@@ -1,13 +1,13 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_generate_h,v $ ($Date: 1995/09/06 13:18:52 $, )
+# $RCSfile: hpfc_generate_h,v $ ($Date: 1996/09/07 16:11:27 $, )
 # version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
 
 tr '[A-Z]' '[a-z]' |
-sed -n '/function/s,^      [ 	]*\([a-z\*0-9]*\)[ 	]*function[ 	]*\([a-z0-9_]*\).*$,      external \2      \1 \2,p' |
+sed -n '/function/s,^      [ 	]*\([a-z\*0-9]*\)[ 	]*function[ 	]*\([a-z0-9_ ]*\).*$,      external \2      \1 \2,p' |
 tr '' '\012'
 
 #
