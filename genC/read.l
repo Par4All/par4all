@@ -22,6 +22,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
+
 #include "genC.h"
 #include "newgen_include.h"
 #include "genread.h"
@@ -47,31 +49,31 @@ static void append_to_literal() ;
 <a_string>[ \t\n]*        {append_to_literal();}
 <a_string>\"		{
 			BEGIN 0 ;
-			return( READ_STRING );
+			return READ_STRING ;
 			}
 
-\[                      {return( LB );}
-\#\(\#\]type            {return( CHUNK_BEGIN );}
-\#\(			{return( VECTOR_BEGIN );}
-\#\]arrow               {return( ARROW_BEGIN );}
-\(		        {return( LP );}
-\)			{return( RP );}
-\{		        {return( LC );}
-\}			{return( RC );}
-\#\]shared              {return( SHARED_POINTER ) ;}
-\#\]unit		{return( READ_UNIT );}
-\#\]bool		{return( READ_BOOL );}
-\#\]external 		{return( READ_EXTERNAL );}
-\#\]def			{return( READ_DEF );}
-\#\]ref			{return( READ_REF );}
-\#\]null		{return( READ_NULL );}
-\#\]list                {return( READ_LIST_UNDEFINED );}
-\#\]set                 {return( READ_SET_UNDEFINED );}
-\#\]array               {return( READ_ARRAY_UNDEFINED );}
-\#\\.			{return( READ_CHAR );}
-[+-]?[ \t]*[0-9]+       {return( READ_INT );}
-[+-]?[ \t]*[0-9]+\.[0-9]+ {
-                        return( READ_FLOAT );}
+\[                      {return LB ;}
+\#\(\#\]type            {return CHUNK_BEGIN ;}
+\#\(			{return VECTOR_BEGIN ;}
+\#\]arrow               {return ARROW_BEGIN ;}
+\(		        {return LP ;}
+\)			{return RP ;}
+\{		        {return LC ;}
+\}			{return RC ;}
+\#\]shared              {return SHARED_POINTER  ;}
+\#\]unit		{return READ_UNIT ;}
+\#\]bool		{return READ_BOOL ;}
+\#\]external 		{return READ_EXTERNAL ;}
+\#\]def			{return READ_DEF ;}
+\#\]ref			{return READ_REF ;}
+\#\]null		{return READ_NULL ;}
+\#\]list                {return READ_LIST_UNDEFINED ;}
+\#\]set                 {return READ_SET_UNDEFINED ;}
+\#\]array               {return READ_ARRAY_UNDEFINED ;}
+\#\\.			{ yylval.c=*(yytext+2); return READ_CHAR ;}
+[+-]?[ \t]*[0-9]+       { yylval.val=atoi(yytext); return READ_INT ;}
+[+-]?[ \t]*[0-9]+\.[0-9]+ { yylval.d=atof(yytext);
+                        return READ_FLOAT ;}
 \"			{
 			BEGIN a_string ;
                         literal[0] = '\0';
