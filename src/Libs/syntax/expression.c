@@ -150,9 +150,19 @@ int HasParenthesis;
 	/* if (variable_dimensions(type_variable(te))==NULL
 	    && (indices!=NULL || HasParenthesis)) { */
 	if (variable_dimensions(type_variable(te))==NULL
-	    && (indices!=NULL || HasParenthesis) 
-	    && !basic_string_p(variable_basic(type_variable(te)))) {
+	    && (indices!=NULL || HasParenthesis)) {
+	  if(fc==expression_undefined && lc==expression_undefined)
+	  /*
+	  if( !basic_string_p(variable_basic(type_variable(te)))
+	      || (fc==expression_undefined && lc==expression_undefined)) */ {
 	    e = MakeExternalFunction(e, type_undefined);
+	    /* FI: probleme here for character returning function! You have to know if
+	     * you are dealing with a substring operator or a function call.
+	     *
+	     * Fortunately, according to SUN f77 compiler, you are not allowed to
+	     * take the substring of a function call!
+	     */
+	  }
 	}
     }
 
