@@ -6,6 +6,7 @@
 #include <sys/dirent.h>
 #include <sys/stat.h>
 #include <sys/param.h>
+#include <dirent.h>
 
 #include "genC.h"
 #include "misc.h"
