@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/20 13:13:21 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/20 14:38:23 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2448,8 +2448,10 @@ struct gen_binding *bp ;
 {
     if (IS_INLINABLE(bp))
     {
-	if (strcmp(bp->name, "string")==0)
+	if (*bp->name=='s' && obj->s && !string_undefined_p(obj->s) &&
+	    !allocated_memory_already_seen_p(obj->s))
 	    current_size += strlen(obj->s) + 1; /* under approximation! */
+
 	return !GO;
     }
 
