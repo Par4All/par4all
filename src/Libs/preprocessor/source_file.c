@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.102  2003/08/08 16:31:36  irigoin
+ * Two currently useless static functions commented out to silence gcc
+ *
  * Revision 1.101  2003/08/04 16:54:24  irigoin
  * Mostly, addition of code to process PIPS_SRCPATH. Plus some more error
  * detection and propagation.
@@ -324,13 +327,14 @@ static bool try_this_one(
     return modified;
 }
 
+/* an assigned goto may look like "goto l, (10,20)",
+ * and we wish not to consider (10,20) as a complex constant...
+ */
+/*
 static void handle_complex_constants(string * line)
 {
     bool diff = FALSE;
 
-    /* an assigned goto may look like "goto l, (10,20)",
-     * and we wish not to consider (10,20) as a complex constant...
-     */
     if (!regexec(&some_goto_rx, *line, 0, NULL, 0)) return;
 
     diff |= try_this_one(&complex_cst_rx, line, IMPLIED_COMPLEX_NAME, diff);
@@ -340,6 +344,7 @@ static void handle_complex_constants(string * line)
 
     if (diff) add_continuation_if_needed(line);
 }
+*/
 
 /* tries several path for a file to include...
  * first rely on $PIPS_SRCPATH, then other directories.
@@ -609,8 +614,8 @@ static bool zzz_file_p(string s) /* .../zzz???.f */
 { int len = strlen(s)-1;
   return len>=8 && s[len-8]=='/' && s[len-7]=='#' && s[len-6]=='#' && 
       s[len-5]=='#' && s[len-1]=='.' && s[len]=='f'; }
-static int cmp(const void * x1, const void * x2)
-{ return strcmp(*(char**)x1, *(char**)x2);}
+/* static int cmp(const void * x1, const void * x2)
+{ return strcmp(*(char**)x1, *(char**)x2);} */
 static void clean_file(string name)
 {
     FILE *f;
