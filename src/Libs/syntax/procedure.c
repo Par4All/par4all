@@ -117,14 +117,20 @@ void EndOfProcedure()
      */
     if (get_bool_property("HPFC_FILTER_CALLEES"))
     {
-	extern bool hpf_directive_string_p();
-	string s;
+	extern bool hpf_directive_string_p(string);
+	extern bool keep_directive_in_code_p(string);
 	list l = NIL;
+	string s;
 
 	MAPL(cs,
 	 {
 	     s = STRING(CAR(cs));
-	     if (!hpf_directive_string_p(s))
+
+	     if (hpf_directive_string_p(s) && !keep_directive_in_code_p(s))
+	     {
+		 pips_debug(3, "ignoring %s\n", s);
+	     }
+	     else
 		 l = CONS(STRING, s, l);
 	 },
 	     called_modules);
@@ -137,7 +143,7 @@ void EndOfProcedure()
 			   strdup(module_local_name(CurrentFunction)), 
 			   (char*) make_callees(called_modules));
 
-    if( get_debug_level() >= 5 ) {
+    ifdebug(5) {
 	fprintf(stderr, "Parser: checking code consistency = %d\n",
 		gen_consistent_p( function_body )) ;
     }
