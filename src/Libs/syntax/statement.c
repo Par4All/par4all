@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.45  1998/10/15 16:18:56  irigoin
+ * Update to handle labelled ELSEIFs for EDF
+ *
  * Revision 1.44  1998/10/07 15:58:08  irigoin
  * RCS logging added
  *
@@ -144,13 +147,13 @@ CheckAndInitializeStmt(void)
 	statement s = StmtHeap_buffer[i].s;
 	if (statement_instruction(s) == instruction_undefined) {
 	    MustStop = TRUE;
-	    user_log("CheckAndInitializeStmt %s\n", 
-		     entity_name(statement_label(s)));
+	    user_warning("CheckAndInitializeStmt", "Undefined label \"%s\"\n", 
+		     label_local_name(statement_label(s)));
 	}
     }
 
     if (MustStop) {
-	ParserError("CheckAndInitializeStmt", "Undefined labels\n");
+	ParserError("CheckAndInitializeStmt", "Undefined label(s)\n");
     }
     else {
 	CurrentStmt = 0;
@@ -197,6 +200,8 @@ linked to the block that is on the top of the stack. blocks are removed
 from the stack when the corresponding end statement is encountered
 (endif, end of loop, ...). 
 
+The block ending statements are ELSE, ENDIF,...
+
 There does not seem to be any limit on the nesting level in Fortran standard.
 MAXBLOCK is set to "large" value for our users.
 */
@@ -204,10 +209,12 @@ MAXBLOCK is set to "large" value for our users.
 #define MAXBLOCK 100
 
 typedef struct block {
-	instruction i; /* the instruction that contains this block */
-	string l;      /* the label that will end this block */
-	cons * c;      /* the list of statements contained in this block */
-	int elsifs ;
+    instruction i; /* the instruction that contains this block */
+    string l;      /* the expected statement which will end this block */
+    cons * c;      /* the list of statements contained in this block */
+    int elsifs ;   /* ELSEIF statements are desugared as nested IFs. They
+                      must be counted to generate the effect of the proper
+                      number of ENDIF */
 } block;
 LOCAL block BlockStack[MAXBLOCK];
 LOCAL int CurrentBlock = 0;
@@ -305,8 +312,8 @@ instruction i;
 {
     statement s;
 
-    debug(9, "MakeNewLabelledStatement", "begin for label \"%s\"\n",
-	  label_local_name(l));
+    debug(9, "MakeNewLabelledStatement", "begin for label \"%s\" and instruction %s\n",
+	  label_local_name(l), instruction_identification(i));
 
     if(instruction_loop_p(i) && get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
 	statement c = make_continue_statement(l);
@@ -359,6 +366,8 @@ instruction i;
 
     pips_assert("Should have no number", 
 		statement_number(s)==STATEMENT_NUMBER_UNDEFINED);
+    pips_assert("The statement instruction should be undefined",
+		instruction_undefined_p(statement_instruction(s)));
 
     if(instruction_loop_p(i) && get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
 	/* Comments probably are lost... */
@@ -445,7 +454,8 @@ instruction i;
 {
     statement s;
 
-    debug(5, "MakeStatement", "%s\n", entity_name(l));
+    debug(5, "MakeStatement", "Begin for label %s and instruction %s\n",
+	  entity_name(l), instruction_identification(i));
 
     pips_assert("MakeStatement", type_statement_p(entity_type(l)));
     pips_assert("MakeStatement", storage_rom_p(entity_storage(l)));
@@ -462,8 +472,8 @@ instruction i;
 	 * logical IF, unknowingly.
 	 */
 	/*
-	if (instruction_block_p(i))
-	    ParserError("makeStatement", "a block must have no label\n");
+	  if (instruction_block_p(i))
+	  ParserError("makeStatement", "a block must have no label\n");
 	*/
 
 	/* FI, PJ: the "rice" phase does not handle labels on DO like 100 in:
@@ -475,7 +485,8 @@ instruction i;
 	if (instruction_loop_p(i)) {
 	    if(!get_bool_property("PARSER_SIMPLIFY_LABELLED_LOOPS")) {
 		user_warning("MakeStatement",
-			     "DO loop reachable by GO TO via label %s cannot be parallelized by PIPS\n",
+			     "DO loop reachable by GO TO via label %s "
+			     "cannot be parallelized by PIPS\n",
 			     entity_local_name(l));
 	    }
 	}
@@ -493,9 +504,23 @@ instruction i;
 	     */
 
 	    if(statement_instruction(s) != instruction_undefined) {
-		user_warning("MakeStatement", "Label %s may be used twice\n",
-			     entity_local_name(l));
-		ParserError("MakeStatement", "Same label used twice\n");
+		    /* The CONTINUE slot can be re-used. It is likely to
+		    be an artificial CONTINUE added to carry a
+		    comment. Maybe it would be better to manage lab_I in a
+		    more consistent way by resetting it as soon as it is
+		    used. But I did not find the reset! */
+		/*
+		if(statement_continue_p(s)) {
+		    free_instruction(statement_instruction(s));
+		    statement_instruction(s) = instruction_undefined;
+		    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+		}
+		else {
+		    */
+		    user_warning("MakeStatement", "Label %s may be used twice\n",
+				 entity_local_name(l));
+		    ParserError("MakeStatement", "Same label used twice\n");
+		    /* } */
 	    }
 	    s = ReuseLabelledStatement(s, i);
 	}
@@ -528,6 +553,12 @@ bool number_it;
     statement s;
     cons * pc;
     entity l = MakeLabel(strdup(lab_I));
+
+    pips_debug(8, "Begin for instruction %s with label \"%s\"\n",
+	       instruction_identification(i), &(lab_I[0]));
+
+    /* A label cannot be used twice */
+    reset_current_label_string();
  
     if (IsBlockStackEmpty())
 	    ParserError("LinkInstToCurrentBlock", "no current block\n");
@@ -558,7 +589,7 @@ bool number_it;
       s = MakeStatement(l, i);
     }
     else {
-      s = MakeStatement(MakeLabel(strdup(lab_I)), i);
+      s = MakeStatement(l, i);
       if(!number_it) {
 	decrement_statement_number();
       }
@@ -614,8 +645,11 @@ bool number_it;
 
     /* while i is the last instruction of the current block ... */
     while (BlockStack[CurrentBlock-1].l != NULL &&
-	   strcmp(lab_I, BlockStack[CurrentBlock-1].l) == 0)
+	   strcmp(label_local_name(l), BlockStack[CurrentBlock-1].l) == 0)
 		PopBlock();
+
+    pips_debug(8, "End for instruction %s with label \"%s\"\n",
+	       instruction_identification(i), label_local_name(l));
 }		
 
 
@@ -1262,25 +1296,37 @@ int elsif;
     BlockStack[CurrentBlock-1].elsifs = elsif ;
 }
 
+/* This function is used to handle either an ELSE or an ELSEIF construct */
+
 int 
-MakeElseInst()
+MakeElseInst(bool is_else_p)
 {
     statement if_stmt;
     test if_test;
     int elsifs;
+    bool has_comments_p = (iPrevComm != 0);
 
     if(CurrentBlock==0) {
+	/* No open block can be closed by this ELSE */
 	ParserError("MakeElseInst", "unexpected ELSE statement\n");
     }
 
     elsifs = BlockStack[CurrentBlock-1].elsifs ;
 
     if (strcmp("ELSE", BlockStack[CurrentBlock-1].l))
-	    FatalError("MakeElseInst", "block if statement badly nested\n");
+	ParserError("MakeElseInst", "block if statement badly nested\n");
 
-    if (iPrevComm != 0) {
-      /* generate a CONTINUE to carry the comments */
-      LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+    if (is_else_p && has_comments_p) {
+	/* Generate a CONTINUE to carry the comments but not the label
+           because the ELSE is not represented in the IR and cannot carry
+           comments whereas the ELSEIF is transformed into an IF which can
+           carry comments and label. The current label is temporarily
+           hidden. */
+	string ln = strdup(get_current_label_string());
+	reset_current_label_string();
+	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+	set_current_label_string(ln);
+	free(ln);
     }
 
     (void) PopBlock();
@@ -1288,11 +1334,18 @@ MakeElseInst()
     if_stmt = STATEMENT(CAR(BlockStack[CurrentBlock-1].c));
 
     if (! instruction_test_p(statement_instruction(if_stmt)))
-	    FatalError("MakeElseInst", "no block if statement\n");
+	FatalError("MakeElseInst", "no block if statement\n");
 
     if_test = instruction_test(statement_instruction(if_stmt));
 
     PushBlock(statement_instruction(test_false(if_test)), "ENDIF");
+
+    if (is_else_p && !empty_current_label_string_p()) {
+	/* generate a CONTINUE to carry the label because the ELSE is not
+           represented in the IR */
+	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+    }
+
     return( BlockStack[CurrentBlock-1].elsifs = elsifs ) ;
 }
 
@@ -1312,7 +1365,7 @@ MakeEndifInst()
 
     if (BlockStack[CurrentBlock-1].l != NULL &&
 	strcmp("ELSE", BlockStack[CurrentBlock-1].l) == 0) {
-	elsifs = MakeElseInst();
+	elsifs = MakeElseInst(TRUE);
 	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
     }
     if (BlockStack[CurrentBlock-1].l == NULL ||
