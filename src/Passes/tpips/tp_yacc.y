@@ -311,8 +311,8 @@ i_make:
 
 	    if (tpips_execution_mode) {
 		string save_current_module_name = 
-		    db_get_current_module_name() == NULL? 
-		    NULL : strdup(db_get_current_module_name());
+		    db_get_current_module_name()?
+		    strdup(db_get_current_module_name()): NULL;
 
 		MAPL(e, {
 		    string mod_name = STRING(CAR(e));
@@ -330,9 +330,13 @@ i_make:
 		    }
 		}, $3.the_owners);
 
-		db_set_current_module_name(save_current_module_name);
-		if(save_current_module_name!=NULL)
+		/* restore the initial current module, if there was one */
+		if(save_current_module_name!=NULL) {
+		    if (db_get_current_module_name())
+			db_reset_current_module_name();
+		    db_set_current_module_name(save_current_module_name);
 		    free(save_current_module_name);
+		}
 	    }
 	    $$ = result;
 /*	    free ($3.the_name);
@@ -354,16 +358,15 @@ i_apply:
 
 	    if (tpips_execution_mode) {
 		string save_current_module_name = 
-		    db_get_current_module_name() == NULL? 
-		    NULL : strdup(db_get_current_module_name());
+		    db_get_current_module_name()?
+		    strdup(db_get_current_module_name()): NULL;
 
 		if(!db_get_current_workspace_name()) {
 		    user_error("apply", "Open or create a workspace first!\n");
 		}
 	    
-		MAPL(e, {
-		    string mod_name = STRING(CAR(e));
-		    
+		MAP(STRING, mod_name, 
+		{
 		    if (mod_name != NULL)
 		    {
 			if (safe_apply ($3.the_name, mod_name) == FALSE) {
@@ -376,10 +379,14 @@ i_apply:
 			user_warning("apply", "Select a module first!\n");
 		    }
 		}, $3.the_owners);
+
 		/* restore the initial current module, if there was one */
-		db_set_current_module_name(save_current_module_name);
-		if(save_current_module_name!=NULL)
+		if(save_current_module_name!=NULL) {
+		    if (db_get_current_module_name())
+			db_reset_current_module_name();
+		    db_set_current_module_name(save_current_module_name);
 		    free(save_current_module_name);
+		}
 	    }
 	    $$ = result;
 /*	    free ($3.the_name);
@@ -399,8 +406,8 @@ i_display:
 	    if (tpips_execution_mode) {
 		string pager;
 		string save_current_module_name = 
-		    db_get_current_module_name() == NULL? 
-		    NULL : strdup(db_get_current_module_name());
+		    db_get_current_module_name()?
+		    strdup(db_get_current_module_name()): NULL;
 
 		if(!db_get_current_workspace_name()) {
 		    user_error("display",
@@ -432,9 +439,14 @@ i_display:
 		    }
 
 		}, $3.the_owners);
-		db_set_current_module_name(save_current_module_name);
-		if(save_current_module_name!=NULL)
+
+		/* restore the initial current module, if there was one */
+		if(save_current_module_name!=NULL) {
+		    if (db_get_current_module_name())
+			db_reset_current_module_name();
+		    db_set_current_module_name(save_current_module_name);
 		    free(save_current_module_name);
+		}
 	    }
 	    $$ = TRUE;
 /*
