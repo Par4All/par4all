@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Delete,v $ (version $Revision$)
-# $Date: 1996/04/20 12:16:14 $, 
+# $Date: 1996/08/13 13:40:29 $, 
 #
 # Delete removes a list of workspaces whose names are provided
 # after the command, no matter which the current workspace is.
@@ -17,6 +17,8 @@
 
 unset DEFAULT
 
+pips_current_program=${PIPS_CURRENT_PROGRAM:-.pipsprogram}
+
 if [ $# -eq 0 ] 
 then 
   DEFAULT=yes
@@ -28,7 +30,7 @@ for WS
 do
   WS=`echo $WS | sed 's/\/$//'`
   # delete .PIPS_CURRENT_PROGRAM
-  rm -f `dirname $WS`/$PIPS_CURRENT_PROGRAM
+  rm -f `dirname $WS`/$pips_current_program
   # so that both zzz.database and zzz are good workspace names
   WS=`dirname $WS`/`basename $WS .database`.database
   if [ ! -d "$WS" ]
