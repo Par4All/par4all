@@ -133,6 +133,7 @@ int yywrap(void)
 #ifdef FLEX_SCANNER
     yy_init = 1 ;
 #endif
+    message_assert("function not used", yyunput==yyunput);
     newgen_start_lexer(NULL);
     return 1;
 }
