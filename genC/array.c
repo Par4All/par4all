@@ -117,13 +117,19 @@ gen_array_item(gen_array_t a, int i)
 static int 
 gen_array_cmp(const void * a1, const void * a2)
 {
-    return strcmp(* (void **) a1, * (void **) a2);
+    return strcmp(* (char **) a1, * (char **) a2);
+}
+
+void
+gen_array_sort_with_cmp(gen_array_t a, int (*cmp)(const void *, const void *))
+{
+  qsort(a->array, a->nitems, sizeof(void *), cmp);
 }
 
 void
 gen_array_sort(gen_array_t a)
 {
-   qsort(a->array, a->nitems, sizeof(void *), gen_array_cmp);
+  gen_array_sort_with_cmp(a, gen_array_cmp);
 }
 
 gen_array_t
