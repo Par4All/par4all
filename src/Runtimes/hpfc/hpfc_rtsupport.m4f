@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/05/15 15:12:15 $, )
+! ($Date: 1997/05/28 13:06:05 $, )
 !
 !-----------------
 !
@@ -270,7 +270,7 @@
 !
 ! where should I put it?
 !
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       end
 !
 !-----------------
@@ -364,7 +364,7 @@
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       call HPFC SEND(COMPUTERTID, SENDCHANNELS(CLID), info)
       SENDCHANNELS(CLID) = SENDCHANNELS(CLID) + 2
@@ -380,7 +380,7 @@
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       call HPFC SEND(HOSTTID, HOST SND CHANNEL, info)
       HOST SND CHANNEL = HOST SND CHANNEL + 2
@@ -397,7 +397,7 @@
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "sending to ", OLID)
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       call HPFC SEND(OWNERTID, SENDCHANNELS(OLID), info)
       SENDCHANNELS(OLID) = SENDCHANNELS(OLID) + 2
@@ -413,7 +413,7 @@
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       if (MYLID.GT.1)
      $     call HPFC BCAST ROOT(
@@ -524,7 +524,7 @@ _CM5(
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "sending to all nodes")
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       call HPFC BCAST ROOT(NBOFTASKS, NODETIDS, MCASTHOST, info)
       MCASTHOST = MCASTHOST + 2
@@ -541,7 +541,7 @@ _CM5(
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       if (MYLID.GT.1)
      $     call HPFC BCAST ROOT(
@@ -588,7 +588,7 @@ _CM5(
             lb(i) = 1
             ub(i) = 1
          enddo
-         call HPFC INIT SEND
+         call HPFC INIT SEND(PVMRAW, bufid)
          call HPFC PACK(what, val, 1, 1, info)
          do i7=lb(7), ub(7)
             indp(7) = i7
@@ -656,7 +656,7 @@ _CM5(
          lb(i) = 1
          ub(i) = 1
       enddo
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       do i7=lb(7), ub(7)
          indp(7) = i7
@@ -705,7 +705,7 @@ _CM5(
       include "hpfc_commons.h"
       integer bufid, info, i, indp(7), ndim, lid
       logical result
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       ndim = NODIMP(OPN)
       do lid=1, NBOFTASKS
@@ -1090,7 +1090,7 @@ _CM5(
 !
       if (MY LID.eq.1) then
       debug(print *, "[HPFC INIT NODE] sending key to ", HOSTTID)
-         call HPFC INIT SEND
+         call HPFC INIT SEND(PVMRAW, bufid)
          call HPFC PACK(STRING, hpfc key, 64, 1, info)
          call HPFC SEND(HOSTTID, 1, info)
       endif
@@ -1103,7 +1103,7 @@ _CM5(
       CM MY ID   = cmmd_self_address()
       CM SIZE    = cmmd_partition_size()
 !
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(INTEGER4, CM MY ID, 1, 1, info)
       call HPFC SEND(HOSTTID, 1, info)
 !
@@ -1250,7 +1250,7 @@ _direct(`'
       
       _spawn(
 ! if not T3D and not MPI, the host sends the tids...
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
       debug(if (info.lt.0) then
          call HPFC PRINT ERROR MSG("initial pack", info)
@@ -1296,7 +1296,7 @@ _CM5(
          call HPFC UNPACK(INTEGER4, CM NODE IDS(i), 1, 1, info)
       enddo
 !
-      call HPFC INIT SEND
+      call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
       call HPFC BCAST ROOT(NBOFTASKS, NODETIDS, 1, info)
 !
