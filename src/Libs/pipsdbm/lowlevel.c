@@ -30,7 +30,7 @@ typedef struct {
  */
 #define no_read (READER) abort
 #define no_write (WRITER) abort
-static void no_free(char * p) { pips_debug(2, "memory leak\n"); }
+static void no_free(char * p) { pips_debug(2, "memory leak (%p)\n", p); }
 static void writeln_string(FILE * f, char * p) { fprintf(f, "%s\n", p); }
 static void unexpected(void)
 { pips_internal_error("unexpected pipsdbm method\n");}
