@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/03/31 16:24:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/16 10:58:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/03/31 16:24:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/04/16 10:58:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -150,10 +150,9 @@ bool give_code_p;
     mod_stat = get_current_module_statement();
 
     /* To set up the hash table to translate value into value names */
-    set_cumulated_effects_map( effectsmap_to_listmap
-			      ((statement_mapping)
-			       db_get_memory_resource
-			       (DBR_CUMULATED_EFFECTS, module_name, TRUE)));
+    set_cumulated_rw_effects((statement_effects)
+			  db_get_memory_resource
+			  (DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
     debug_on("SEMANTICS_DEBUG_LEVEL");
 
@@ -229,7 +228,7 @@ bool give_code_p;
     reset_semantic_map();
     reset_current_module_entity();
     reset_current_module_statement();
-    reset_cumulated_effects_map();
+    reset_cumulated_rw_effects();
 
     return r;
 }
