@@ -437,9 +437,7 @@ expression e;
 list lr;
 {
     syntax s = expression_syntax(e);
-
     lr = syntax_to_reference_list(s, lr);
-
     return lr;
 }
 
