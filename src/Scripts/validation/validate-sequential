@@ -265,7 +265,8 @@ test_aspect()
 {
   aspect=$1
   
-  (for file in ${FILES:-`ls $aspect/*.[fF]`} ; do
+  (
+   for file in ${FILES:-`ls $aspect/*.[fF]`} ; do
      name=`basename $file .f`
      name=`basename $name .F`
      u_name=`echo $name | tr [a-z] [A-Z]`
@@ -283,7 +284,7 @@ test_aspect()
 	ffile=$aspect/$name.f
      else
 	ffile=$aspect/$name.F
-     endif
+     fi
 
      bfile=`basename $ffile`
      
