@@ -52,13 +52,14 @@ Pvecteur v;
 Value vect_prod_scal(v1,v2)
 Pvecteur v1, v2;
 {
-    Value result = 0;
+    Value result = VALUE_ZERO;
 
     if(v2!=NULL)
 	for(; v1!=NULL; v1 = v1->succ)
-	    result += val_of(v1) * vect_coeff(var_of(v1),v2);
+	    value_add(result,
+		      value_mult(val_of(v1),vect_coeff(var_of(v1),v2)));
 
-    return(result);
+    return result;
 }
 
 /* Value vect_pgcd(Pvecteur v):
@@ -73,16 +74,13 @@ Pvecteur v1, v2;
 Value vect_pgcd_all(v)
 Pvecteur v;
 {
-    int d = (v!=NULL ? ABS(val_of(v)) : 1);
+    Value d = (v!=NULL ? value_abs(val_of(v)) : VALUE_ONE);
 
-    if (v==NULL)
-	d = 1;
-    else {
-	d = ABS(val_of(v));
-	for (v=v->succ;v!=NULL && d!=1;v=v->succ)
-	    d = pgcd(d,ABS(val_of(v)));
+    if (v!=NULL) {
+	for (v=v->succ; v!=NULL && value_notone_p(d); v=v->succ)
+	    d = pgcd(d, value_abs(val_of(v)));
     }
-    return(d);
+    return d;
 }
 
 /* Value vect_pgcd_except(Pvecteur v, Variable var):
@@ -107,15 +105,15 @@ Variable var;
 
 
     if(v==NULL)
-	d = 1;
+	d = VALUE_ONE;
     else {
-	d = ABS(val_of(v));
-	for (v=v->succ;v!=NULL && d!=1;v=v->succ)
+	d = value_abs(val_of(v));
+	for (v=v->succ; v!=NULL && value_notone_p(d); v=v->succ)
 	    if (var_of(v) != var)
-		d = pgcd(d,ABS(val_of(v)));
+		d = pgcd(d,value_abs(val_of(v)));
     }
 
-    return(d);
+    return d;
 }
 
 /* Value vect_max0(Pvecteur v): recherche du coefficient maximum
@@ -132,12 +130,12 @@ Variable var;
 Value vect_max0(v)
 Pvecteur v;
 {
-    int max =0;
+    Value max = VALUE_ZERO;
 
     for(; v!= NULL; v= v->succ)
-	max = (val_of(v) > max) ? val_of(v) : max;
+	max = value_max(val_of(v),max);
 
-    return (max);
+    return max;
 }
 
 /* Value vect_min0(Pvecteur v): recherche du coefficient minimum
@@ -154,12 +152,12 @@ Pvecteur v;
 Value vect_min0(v)
 Pvecteur v;
 {
-    int min =0;
+    Value min = VALUE_ZERO;
 
     for(; v!= NULL; v= v->succ)
-	min = (val_of(v) < min) ? val_of(v) : min;
+	min = value_min(val_of(v),min);
 
-    return(min);
+    return min;
 }
 
 /* Value vect_min(Pvecteur v): recherche du coefficient non nul minimum
@@ -179,13 +177,13 @@ Pvecteur v;
     if(v!=NULL) {
 	Value min = val_of(v);
 	for (v=v->succ; v!= NULL; v= v->succ)
-	     min = (val_of(v) < min) ? val_of(v) : min;
+	     min = value_min(val_of(v),min);
 
 	return min;
     }
     else {
 	vect_error("vect_min","ill. null vector as argument\n");
-	return 0 ; /* just to avoid a gcc warning */
+	return VALUE_NAN; /* just to avoid a gcc warning */
     }
 }
 
@@ -211,12 +209,12 @@ Pvecteur v;
     if(v!=NULL) {
 	Value max = val_of(v);
 	for (v=v->succ; v!= NULL; v= v->succ)
-	     max = (val_of(v) > max) ? val_of(v) : max;
+	     max = value_max(val_of(v), max);
 	return max;
     }
     else {
 	vect_error("vect_max","ill. null vector as argument\n");
-	return 0;
+	return VALUE_NAN;
     }
 }
 
@@ -228,12 +226,11 @@ Pvecteur v;
  */
 Value vect_sum(Pvecteur v)
 {
-    Pvecteur e = VECTEUR_UNDEFINED;
-    Value sum = 0;
+    Value sum = VALUE_ZERO;
 
-    for (e=v; e!= NULL; e= e->succ) {
-	sum += vecteur_val(e);
-    }
+    for (v; v!=NULL; v=v->succ)
+	value_add(sum, val_of(v));
+
     return sum;
 }
 
@@ -247,8 +244,7 @@ Value vect_sum(Pvecteur v)
 boolean vect_equal(v1,v2)
 Pvecteur v1,v2;
 {
-    /*
-     * Note: le test n'est pas optimal puisque v2 est parcouru et compare
+    /* Note: le test n'est pas optimal puisque v2 est parcouru et compare
      * a v1 meme si ces coefficients ont ete deja ete compare lors du
      * parcours de v1; mais cela evite le "marquage" des coefficients vus;
      *
@@ -266,16 +262,16 @@ Pvecteur v1,v2;
     for (v=v1; 
 	 v && result;
 	 v=v->succ)
-	result = (val_of(v)==vect_coeff(var_of(v),v2));
+	result = value_eq(val_of(v),vect_coeff(var_of(v),v2));
     
     /*   now v2 may be lost: use v2
      */
     for (;
 	 v2 && result;
 	 v2=v2->succ) 
-	result = (val_of(v2)==vect_coeff(var_of(v2),v1));
+	result = value_eq(val_of(v2),vect_coeff(var_of(v2),v1));
     
-    return(result);
+    return result;
 }
 
 /* boolean vect_equal_except(Pvecteur v1, Pvecteur v2, Variable var):
@@ -309,15 +305,15 @@ Variable var;
 
 	for (pv = v1; pv != NULL && result == TRUE; pv = pv->succ)
 	    if (var_of(pv) != var)
-		result = (val_of(pv) == vect_coeff(var_of(pv), v2));
+		result = value_eq(val_of(pv),vect_coeff(var_of(pv), v2));
 
 	for (pv = v2; pv != NULL && result == TRUE; pv = pv->succ)
 	    if (var_of(pv) != var)
-		result = (val_of(pv) == vect_coeff(var_of(pv), v1));
+		result = value_eq(val_of(pv),vect_coeff(var_of(pv), v1));
 
     }
 
-    return(result);
+    return result;
 }
 
 /* boolean vect_oppos(Pvecteur v1, Pvecteur v2): test de l'opposition de
@@ -346,14 +342,16 @@ Pvecteur v1,v2;
 	result = TRUE;
 
 	for (pv = v1; pv != NULL && result == TRUE; pv = pv->succ)
-	    result = (val_of(pv) == -vect_coeff(var_of(pv), v2));
+	    result = value_eq(val_of(pv),
+			      value_uminus(vect_coeff(var_of(pv), v2)));
 
 	for (pv = v2; pv != NULL && result == TRUE; pv = pv->succ)
-	    result = (val_of(pv) == -vect_coeff(var_of(pv), v1));
+	    result = value_eq(val_of(pv),
+			      value_uminus(vect_coeff(var_of(pv), v1)));
 
     }
 
-    return(result);
+    return result;
 }
 
 /* boolean vect_opposite_except(Pvecteur v1, Pvecteur v2, Variable var):
@@ -387,11 +385,13 @@ Variable var;
 
 	for (pv = v1; pv != NULL && result == TRUE; pv = pv->succ)
 	    if (var_of(pv) != var)
-		result = (val_of(pv) == -vect_coeff(var_of(pv), v2));
+		result = value_eq(val_of(pv),
+				  value_uminus(vect_coeff(var_of(pv), v2)));
 
 	for (pv = v2; pv != NULL && result == TRUE; pv = pv->succ)
 	    if (var_of(pv) != var)
-		result = (val_of(pv) == -vect_coeff(var_of(pv), v1));
+		result = value_eq(val_of(pv),
+				  value_uminus(vect_coeff(var_of(pv), v1)));
 
     }
 
@@ -422,36 +422,35 @@ int vect_proport(v1,v2)
 Pvecteur v1,v2;
 {
     int prop = 1;
-    int c1;
-    int c2;
-    Pvecteur t1;
-    Pvecteur t2;
 
-    if(v1==NULL && v2==NULL) {
+    if (v1==NULL && v2==NULL)
 	vect_error("vect_proport","ill. NULL v1 and v2 args\n");
-    }
-    else if(v1==NULL || v2==NULL)
-	prop = 1;
-    else {
+    
+    if (v1!=NULL && v2!=NULL) {
+	Value c1, c2;
+	Pvecteur t1;
+	Pvecteur t2;
+
 	c1 = val_of(v1);
 	c2 = vect_coeff(var_of(v1),v2);
 	prop = 1;
 
 	for (t1 = v1->succ; (t1!=NULL) && (prop != 0); t1=t1->succ)
-	    prop = (c2*val_of(t1) == c1*vect_coeff(var_of(t1),v2));
+	    prop = value_eq(value_mult(c2,val_of(t1)),
+			    value_mult(c1,vect_coeff(var_of(t1),v2)));
 
 	for (t2 = v2; (t2!=NULL) && (prop != 0);t2=t2->succ) 
-	    prop = (c1*val_of(t2) == c2*vect_coeff(var_of(t2),v1));
+	    prop = value_eq(value_mult(c1,val_of(t2)),
+			    value_mult(c2,vect_coeff(var_of(t2),v1)));
 
 	if(prop!=0)
-	    /* on evite le test du produit c1*c2 a cause du SUN 4
-	       sans multiplication cablee */
-	    if((c1>0 && c2>0) || (c1<0 && c2<0))
+	    if (value_pos_p(value_mult(c1,c2)))
 		prop = 1;
 	    else
 		prop = -1;
     }
-    return(prop);
+
+    return prop;
 }
 
 /* boolean vect_colin_base(Pvecteur vec, Variable var): renvoie TRUE si
@@ -481,18 +480,16 @@ Variable var;
 boolean vect_check(v)
 Pvecteur v;
 {
-    Pvecteur base = NULL;
+    Pvecteur base = (Pvecteur) NULL;
     boolean consistent = TRUE;
     boolean in_base;
 
     for(; v!=NULL && consistent; v=v->succ) {
-	consistent = (val_of(v) != 0);
-	in_base = base_contains_variable_p(base,vecteur_var(v));
-	consistent = consistent && 
-	    !in_base;
-	base = vect_add_variable(base,vecteur_var(v));
+	consistent = value_notzero_p(val_of(v));
+	in_base = base_contains_variable_p(base, vecteur_var(v));
+	consistent &= !in_base;
+	base = vect_add_variable(base, vecteur_var(v));
     }
     vect_rm(base);
-    base = (Pvecteur) NULL;
-    return(consistent);
+    return consistent;
 }
