@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/21 18:19:23 $ 
+# $Date: 1996/08/23 20:08:38 $ 
 #
 
 CPPFLAGS+=	-D COMPILE_FOR_G77
@@ -8,7 +8,7 @@ SCRIPTS = 	compile_wp65
 CFILES=		lance_wp65.c
 MFILE=		Makefile.compile_wp65
 
-SOURCES=	$(CFILES) $(SCRIPTS) $(MFILE)
+SOURCES=	$(CFILES) $(SCRIPTS) $(MFILE) model.rc
 
 LOCAL_LIB=	$(PVM_ARCH)/libwp65runtime.a
 
@@ -22,7 +22,7 @@ INSTALL_LIB_DIR= $(INSTALL_RTM_DIR)/$(PVM_ARCH)
 
 INSTALL_LIB=	$(LOCAL_LIB)
 INSTALL_RTM=	$(MFILE) $(SCRIPTS)
-INSTALL_SHR=	$(SCRIPTS)
+INSTALL_SHR=	$(SCRIPTS) model.rc
 
 #
 # pvm headers:
@@ -45,8 +45,7 @@ $(LOCAL_LIB):	$(OFILES)
 
 clean-compiled: clean
 clean: local-clean
-local-clean:
-	-$(RM) *~ $(OFILES) $(LOCAL_LIB)
+local-clean:; -$(RM) *~ $(OFILES) $(LOCAL_LIB)
 
 # that is all
 #
