@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-! ($Date: 1996/10/17 13:49:21 $, )
+! ($Date: 1997/01/02 18:21:59 $, )
 !
 !
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -247,7 +247,7 @@ SIMPLE_REPLICATE(LEVEL,`INIT_TABLE')dnl
             debug(`write (unit=0, fmt=*) MYLID, " dim ", i, " bounds: ", 
      $           l(i), u(i)')
          else
-            call hpfc shift
+            call hpfcshift
      $           (an, dim, il(i), iu(i), sh,
      $            l(i), u(i), lid(1),
      $            lp, up, lid(2))
