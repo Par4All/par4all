@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/04/14 19:35:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/06/03 08:26:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1998/04/14 19:35:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1998/06/03 08:26:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -246,7 +246,7 @@ bool controlize(
     instruction i = statement_instruction(st);
     string label = entity_name(statement_label(st));
     bool controlize_list(), controlize_test(), controlize_loop(),
-         controlize_call();
+	controlize_whileloop(), controlize_call();
     bool controlized=FALSE;
 
     ifdebug(5) {
@@ -274,6 +274,10 @@ bool controlize(
     case is_instruction_loop:
 	controlized = controlize_loop(st, instruction_loop(i),
 				      pred, succ, c_res, used_labels);
+	break;
+    case is_instruction_whileloop:
+	controlized = controlize_whileloop(st, instruction_whileloop(i),
+					   pred, succ, c_res, used_labels);
 	break;
     case is_instruction_goto: {
 	string name = entity_name(statement_label(instruction_goto(i)));
@@ -494,6 +498,103 @@ hash_table used_labels;
 	controlized = TRUE ;
 	control_predecessors(succ) = ADD_PRED(c_test, succ);
     }
+    control_successors(pred) = ADD_SUCC(c_res, pred);
+
+    union_used_labels( used_labels, loop_used_labels);
+    hash_table_free(loop_used_labels);
+    
+    pips_debug(5, "Exiting\n");
+    
+    return(controlized);
+}
+
+
+statement whileloop_test(statement sl)
+{
+    whileloop l = instruction_whileloop(statement_instruction(sl));
+    statement ts = statement_undefined;
+    string cs = string_undefined;
+    call c = make_call(entity_intrinsic(".NOT."),
+		       CONS(EXPRESSION,
+			    whileloop_condition(l),
+			    NIL));
+    test t = make_test(make_expression(make_syntax(is_syntax_call, c),
+				       normalized_undefined), 
+		       MAKE_CONTINUE_STATEMENT(), 
+		       MAKE_CONTINUE_STATEMENT());
+    string csl = statement_comments(sl);
+    string prev_comm = empty_comments_p(csl)? "" : strdup(csl);
+    string lab = string_undefined;
+
+    if(entity_empty_label_p(whileloop_label(l)))
+	lab = "";
+    else 
+	lab = label_local_name(whileloop_label(l));
+
+    cs = strdup(concatenate(prev_comm,
+			    "C     DO WHILE loop ",
+			    lab,
+			    " with GO TO exit had to be desugared\n",
+			    NULL));
+
+    ts = make_statement(entity_empty_label(), 
+			statement_number(sl),
+			STATEMENT_ORDERING_UNDEFINED,
+			cs,
+			make_instruction(is_instruction_test, t));
+
+    return ts;
+}
+
+
+/* CONTROLIZE_LOOP computes in C_RES the control graph of the loop L (of
+ *  statement ST) with PREDecessor and SUCCessor
+ *
+ * Derived by FI from controlize_loop()
+ */
+
+bool controlize_whileloop(st, l, pred, succ, c_res, used_labels)
+statement st;
+whileloop l;
+control pred, succ;
+control c_res;
+hash_table used_labels;
+{
+    hash_table loop_used_labels = hash_table_make(hash_string, 0);
+    control c_body = make_conditional_control(whileloop_body(l));
+    bool controlized;
+
+    pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
+	       st, pred, succ, c_res);
+    
+    /* c_res = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL); */
+    controlize(whileloop_body(l), c_res, c_res, c_body, loop_used_labels);
+
+    if(covers_labels_p(whileloop_body(l),loop_used_labels)) {
+	whileloop new_l = make_whileloop(whileloop_condition(l),
+					 control_statement(c_body),
+					 whileloop_label(l));
+
+	UPDATE_CONTROL(c_res,
+		       make_statement(statement_label(st),
+				      statement_number(st),
+				      STATEMENT_ORDERING_UNDEFINED,
+				      statement_comments(st),
+				      make_instruction(is_instruction_whileloop, 
+						       new_l)),
+		       ADD_PRED(pred, c_res),
+		       ADD_SUCC(succ, c_res )) ;
+	controlized = FALSE;
+    }
+    else {
+	control_statement(c_res) = whileloop_test(st);
+	control_predecessors(c_res) =
+		CONS(CONTROL, pred, control_predecessors(c_res));
+	control_successors(c_res) =
+		CONS(CONTROL, succ, control_successors(c_res));
+	controlized = TRUE ;
+    }
+    control_predecessors(succ) = ADD_PRED(c_res, succ);
     control_successors(pred) = ADD_SUCC(c_res, pred);
 
     union_used_labels( used_labels, loop_used_labels);
@@ -1054,7 +1155,7 @@ statement st;
     debug_on("CONTROL_DEBUG_LEVEL");
 
     ifdebug(1) {
-	pips_assert("Statement should be OK.", gen_consistent_p(st));
+	pips_assert("Statement should be OK.", statement_consistent_p(st));
 	set_bool_property("PRETTYPRINT_BLOCKS", TRUE);
 	set_bool_property("PRETTYPRINT_EMPTY_BLOCKS", TRUE);
     }
@@ -1106,7 +1207,7 @@ statement st;
     ifdebug(1) {
 	check_control_coherency(unstructured_control(u));
 	check_control_coherency(unstructured_exit(u));
-	pips_assert("Unstructured should be OK.", gen_consistent_p(u));
+	pips_assert("Unstructured should be OK.", unstructured_consistent_p(u));
     }
 
     debug_off();
