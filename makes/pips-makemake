@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.333  1998/09/16 11:16:28  coelho
+# .quick-install dependencies fixed?
+#
 # Revision 1.332  1998/08/06 15:57:48  coelho
 # UMASK added to cooperate with SHELL.
 #
@@ -841,15 +844,7 @@ ALL_SOURCES =	\$(SOURCES) \$(CONFIG)
 
 \$(TARGET_DIR):;	mkdir \$(TARGET_DIR)
 
-#check_os:
-#	@if test -n "\$(PIPS_CHECK_OS)"; \\
-#	then echo "Cannot run make under this OS release"; \\
-#	     echo "\$(PIPS_CHECK_OS)"; exit 1; \\
-#	fi
-
-.quick-install: \$(INSTALL_INC) \$(INSTALL_LIB) \$(INSTALL_BIN) \\
-	\$(INSTALL_SHR) \$(INSTALL_DOC) \$(INSTALL_UTL) \$(INSTALL_RTM) \\
-	\$(INSTALL_HTM) 
+.quick-install: all
 	#
 	# installing files 
 	# 
