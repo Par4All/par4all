@@ -1,8 +1,11 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1997/03/19 15:55:48 $, ) 
+ * $Id$
+ * $Log: defines-local.h,v $
+ * Revision 1.62  1997/03/19 15:59:19  coelho
+ * *** empty log message ***
+ *
  */
 
 /* Most includes are centralized here.
@@ -408,6 +411,7 @@ void fprint_entity_list(FILE *fp, list l);
 
 #define HOST_SUFFIX	"_host.f"
 #define NODE_SUFFIX	"_node.f"
+#define HINC_SUFFIX	"_host.h"
 #define NINC_SUFFIX	"_node.h"
 #define BOTH_SUFFIX	"_both.f"
 #define PARM_SUFFIX	"_parameters.h"
