@@ -397,8 +397,7 @@ fprint_properties(FILE * fd)
 
 extern string db_get_meta_data_directory(void); /* in pipsdbm */
 
-static string
-get_property_file_name(void)
+static string get_property_file_name(void)
 {
     string dir_name = db_get_meta_data_directory(),
 	name = strdup(concatenate(dir_name, "/properties", 0));
@@ -406,23 +405,24 @@ get_property_file_name(void)
 }
 
 /* when opening a workspace, retrieve the properties.
+ * @return whether okay
  */
-void
-open_properties(void)
+bool open_properties(void)
 {
     string file_name = get_property_file_name();
-    FILE * file = safe_fopen(file_name, "r");
+    FILE * file = check_fopen(file_name, "r");
+    if (!file) return FALSE;
     if (pl) hash_table_free(pl), pl = (hash_table) NULL; /* lazy clean... */
     parse_properties_file(file);
     safe_fclose(file, file_name);
     free(file_name);
+    return TRUE;
 }
 
 /* on close, save the properties in the current workspace.
  * this is called from close_workspace, so there is some current one.
  */
-void
-save_properties(void)
+void save_properties(void)
 {
     string file_name = get_property_file_name();
     FILE * file = safe_fopen(file_name, "w");
