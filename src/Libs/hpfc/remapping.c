@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/11/17 12:00:58 $, ) 
+ * ($Date: 1995/12/20 08:50:05 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -977,7 +977,7 @@ generate_hpf_remapping_file(
 
     free(file_name);
     free_statement(remap);
-    free_text(t);
+    /* free_text(t); */ /* ??? memory leak or core dump... */
     gen_free_list(l);
 }
 
