@@ -74,6 +74,11 @@ string dbll_get_ith_resource_name(int i)
     return all_methods[i].name;
 }
 
+bool dbll_very_special_resource_p(string rname, string oname)
+{
+  return same_string_p(rname, DBR_ENTITIES) && same_string_p(oname, "");
+}
+
 /********************************************************************** FILE */
 
 static string current_builder = NULL;
