@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 
 #include "genC.h"
 
@@ -69,4 +70,25 @@ log_on_file(char chaine[])
       else
          fflush(log_file);
    }
+}
+
+#define PIPS_THANKS_STRING						\
+  "%s (ARCH=" SOFT_ARCH ")\n\n"						\
+  "  (c) 1988-1998 Centre de Recherche en Informatique,\n"		\
+  "                École des mines de Paris, France.\n\n"		\
+  "  URL: http://www.cri.ensmp.fr/pips\n"				\
+  "  E-MAIL: pipsgroup@cri.ensmp.fr\n\n"				\
+  "  This software is provided as is, under the terms of the GPL.\n"	\
+  "  It includes software from GNU (readline, rx) and Berkeley (fsplit).\n\n"
+
+/* display pips thanks on startup, if it on a tty.
+ */
+void
+pips_thanks(string name)
+{
+    if (isatty(0))
+    {
+	fprintf(stdout, PIPS_THANKS_STRING, name);
+	fflush(stdout);
+    }
 }
