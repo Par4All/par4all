@@ -1,14 +1,14 @@
-/* Clean up the sequences and their contents by fusing thme or
+/* Clean up the sequences and their contents by fusing them or
    removing useless continues or empty instructions.
 
    Ronan.Keryell@cri.ensmp.fr
 
    */
 
-/* 	%A% ($Date: 2003/08/02 13:37:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2004/01/23 13:32:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 2003/08/02 13:37:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_clean_up_sequences[] = "%A% ($Date: 2004/01/23 13:32:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -343,9 +343,9 @@ clean_up_sequences_internal(statement s)
 }
 
 
-/* Recursively clean up the statement sequences by fusing if possible
-   and by removing useless one. Remove also epty blocs and useless
-   continue. */
+/* Recursively clean up the statement sequences by fusing them if possible
+   and by removing useless one. Remove also empty blocs and useless
+   continues. */
 void
 clean_up_sequences(statement s)
 {
