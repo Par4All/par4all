@@ -197,6 +197,7 @@ static bool
 rice_dependence_graph(mod_name)
 char *mod_name;
 {
+  printf("HERE");
     FILE *fp;
 
     statement mod_stat;
