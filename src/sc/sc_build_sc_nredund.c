@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 1997/09/08 19:25:35 $, 
+ * $Date: 2000/07/19 15:25:10 $, 
  */
 
 #include <stdio.h>
@@ -198,26 +198,26 @@ Psysteme *ps;
     build_sc_nredund_1pass_ofl_ctrl(ps,OFL_CTRL);
 } 
 
-
-
 void build_sc_nredund_2pass_ofl_ctrl(psc,ofl_ctrl)
 Psysteme *psc;
 int ofl_ctrl;
 {
-    Psysteme ps = *psc;
-       Pbase psbase = base_dup(sc_base(ps));
+  Psysteme ps = *psc;
+  Pbase b;
+    
+  if (SC_UNDEFINED_P(ps) || sc_rn_p(ps) || sc_empty_p(ps))
+    return;
+  
+  b = base_dup(sc_base(ps)); /* save base */
+  ps = sc_normalize(ps);
 
-    if (SC_UNDEFINED_P(ps) || sc_rn_p(ps) || sc_empty_p(ps)) {
-	base_rm(psbase);
-	return;
-    }
-    ps = sc_normalize(ps);
-    if (SC_UNDEFINED_P(ps)) 
-         *psc =  sc_empty(psbase);
-    else {
-	 build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl);
-	 build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl);
-    }
+  if (SC_UNDEFINED_P(ps)) {
+    *psc = sc_empty(b);
+  } else {
+    base_rm(b);
+    build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl);
+    build_sc_nredund_1pass_ofl_ctrl(psc, ofl_ctrl);
+  }
 }
 
 
