@@ -597,7 +597,7 @@ void print_module_icfg(entity module)
 				     current_vertex, verlist, TRUE);
 
     if (get_bool_property(ICFG_DV))
-        make_resource_from_starting_node(module_name, DBR_DVICFG_FILE, ".daVinci",
+        make_resource_from_starting_node(module_name, DBR_DVICFG_FILE, ".dvicfg",
 				       current_vertex, verlist, FALSE);
 
     free_icfg_map();
