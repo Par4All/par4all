@@ -625,3 +625,78 @@ statement_has_a_formal_argument_write_effect_p(statement s)
 
 }
 
+
+
+list /* of effect */ make_effects_for_array_declarations(list refs)
+{     
+  list leff = NIL;
+  effect eff;
+  MAPL(l1,
+  {  
+    
+    reference ref = REFERENCE(CAR(l1));
+     eff = (*reference_to_effect_func)(ref,make_action(is_action_read, UU));
+    leff= CONS(EFFECT,eff,leff);
+  },refs);
+  
+  
+  gen_free_list(refs);
+  return leff;
+}
+
+     
+
+typedef struct { list le, lr; } deux_listes;
+
+static void make_uniq_reference_list(reference r, deux_listes * l)
+{
+  entity e = reference_variable(r);
+  if (! (storage_rom_p(entity_storage(e)) && 
+	 !(value_undefined_p(entity_initial(e))) &&
+	 value_symbolic_p(entity_initial(e)) &&
+	 type_functional_p(entity_type(e)))) {
+    
+    /* Add reference r only once */
+    if (l->le ==NIL || !gen_in_list_p(e, l->le)) {
+      l->le = CONS(ENTITY,e,  l->le); 
+      l->lr = CONS(REFERENCE,r,l->lr);
+    }
+  }
+}
+list extract_references_from_declarations(list decls)
+{
+  list arrays = NIL; 
+  deux_listes lref = { NIL, NIL };
+  
+  MAPL(le,{ 
+    entity e= ENTITY(CAR(le));
+    type t = entity_type(e);
+    
+    if (type_variable_p(t) && !ENDP(variable_dimensions(type_variable(t))))
+      arrays = CONS(VARIABLE,type_variable(t), arrays);
+  }, decls );
+  
+  MAPL(array,
+  { variable v = VARIABLE(CAR(array));
+  list ldim = variable_dimensions(v);  
+  while (!ENDP(ldim))
+    {
+      dimension d = DIMENSION(CAR(ldim)); 
+      gen_context_recurse(d, &lref, reference_domain,  make_uniq_reference_list,gen_null);
+      ldim=CDR(ldim);
+      
+    }	   
+  }, arrays);
+  gen_free_list(lref.le);
+  
+  return(lref.lr);
+}   
+
+list  summary_effects_from_declaration(string module_name)
+{  
+  entity mod = local_name_to_top_level_entity(module_name);
+  list decls = code_declarations(value_code(entity_initial(mod)));
+  list refs = extract_references_from_declarations(decls);
+  return(make_effects_for_array_declarations(refs));
+  
+ }
