@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.80  1997/09/19 16:34:09  irigoin
+ * Bug fix in text-entity_declaration: SAVE statements were not generated any
+ * longer
+ *
  * Revision 1.79  1997/09/19 07:50:09  coelho
  * hpf directive with !.
  *
@@ -53,7 +57,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.79 1997/09/19 07:50:09 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.80 1997/09/19 16:34:09 irigoin Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1725,9 +1729,9 @@ text_entity_declaration(entity module, list ldecl)
 		before = CONS(SENTENCE, sentence_external(e), before);
 	    }
 	 }
-	else if (area_p && !SPECIAL_COMMON_P(e))
+	else if (area_p && !dynamic_area_p(e))
 	{
-	    /*            AREAS 
+	    /*            AREAS: COMMONS and SAVEs
 	     */	     
 	    pips_debug(7, "considered as a regular common\n");
 	    area_decl = CONS(SENTENCE, sentence_area(e, module), area_decl);
@@ -1864,7 +1868,7 @@ text_entity_declaration(entity module, list ldecl)
     attach_declaration_type_to_words(ps, "CHARACTER");
     MERGE_TEXTS(r, t_chars);
 
-    /* all about COMMON declarations */
+    /* all about COMMON and SAVE declarations */
     MERGE_TEXTS(r, make_text(area_decl));
 
     /* and EQUIVALENCE statements... - BC -*/
