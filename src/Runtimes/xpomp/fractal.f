@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/09/02 18:29:05 $, 
+! $Date: 1996/09/03 18:07:50 $, 
 !
       program fractal
 
@@ -47,6 +47,7 @@
       real*8 zoom, xcenter, ycenter
       real*8 zr, zrp, zi, cr, ci, d
       integer status, button, state
+      integer X0, Y0, X1, Y1
       
 ! Some HPF distributions:
 ! cyclic would make more sense as far as load balancing is concerned
@@ -66,6 +67,7 @@
       call xpomp_show_usage
 
       print *, 'Mouse button 1 to zoom in, 2 to recenter, 3 to zoom out'
+      print *, 'A mouse + Shift: restart.'
 
 ! Initial position
       xcenter = 0
@@ -108,9 +110,22 @@
       xcenter = xcenter + (x/x_display_zoom - x_size/2)*zoom/x_size
       ycenter = ycenter + (y/y_display_zoom - y_size/2)*zoom/y_size
       
-      if (button.eq.1) then
+      if (state .eq. 1) then
+!     A button with shift -> restart from the begining:
+       xcenter = 0
+       ycenter = 0
+       zoom = 5
+      else if (button .eq. 1) then
          zoom = zoom/zooming_factor
-      else if (button.eq.3) then
+! Display the frame that will be zoomed in:
+         X0 = x - x_display_size/zooming_factor/2
+         Y0 = y - y_display_size/zooming_factor/2
+         X1 = x + x_display_size/zooming_factor/2
+         Y1 = y + y_display_size/zooming_factor/2
+         call xpomp_draw_frame(display, '', 255, -1,
+     &        X0, Y0, X1, Y1,
+     &        -181, status)
+      else if (button .eq .3) then
          zoom = zoom*zooming_factor
       endif
 
