@@ -310,6 +310,7 @@ set_methods_for_cumulated_references()
 
     reference_to_effect_func = reference_to_reference_effect;
 
+    /* effect_union_op = ; *//* ??? */
     effects_union_op = ReferenceUnion;
     effects_test_union_op = ReferenceTestUnion;
     effects_intersection_op = effects_undefined_binary_operator;
@@ -327,7 +328,9 @@ set_methods_for_cumulated_references()
 	effects_undefined_descriptors_variable_change;
     loop_descriptor_make_func = loop_undefined_descriptor_make;
     effects_loop_normalize_func = effects_undefined_loop_normalize;
-    effects_union_over_range_op = effects_undefined_union_over_range;
+    effects_union_over_range_op = effects_union_over_range_nop;
+    /* FC was: effects_undefined_union_over_range */
+
     vector_to_descriptor_func = effects_undefined_vector_to_descriptor;
     effects_backward_translation_op = simple_effects_backward_translation;
 /*  effects_forward_translation_op = ; */
