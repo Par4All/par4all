@@ -1,6 +1,9 @@
 
 /** $Id$
   * $Log: WorkspaceManager.java,v $
+  * Revision 1.2  1998/07/03 11:55:30  coelho
+  * workspace menu moved here.
+  *
   * Revision 1.1  1998/06/30 17:35:33  coelho
   * Initial revision
   *
@@ -31,35 +34,39 @@ public class WorkspaceManager implements JPipsComponent
 {
 
 
-  public TPips			tpips;		//tpips instance
-  public PFrame			frame;		//frame of jpips
-  public DirectoryManager	directoryManager;	//manager instance
-  public ModuleManager		moduleManager;		//manager instance
-  public TextDisplayer		textDisplayer;		//displayer instance
-  public Vector			optionVector;		//contains options
-  public PTextField		tf,		//textfield of the panel
-				editText;	//gets a new workspace name
+  public TPips			tpips;		// tpips instance
+  public PFrame			frame;		// frame of jpips
+  public DirectoryManager	directoryManager;	// manager instance
+  public ModuleManager		moduleManager;		// manager instance
+  public TextDisplayer		textDisplayer;		// displayer instance
+  public PTextField		tf,		// textfield of the panel
+				editText;	// gets a new workspace name
   
-  public File			workspace;	//current workspace
-  public PDialog		dialog;		//opened to create a workspace 
-  public PPanel			panel;		//jpips workspace panel
-  public PList			filesList;	//contains fortran files
+  public File			workspace;	// current workspace
+  public PDialog		dialog;		// opened to create a workspace
+  public PPanel			panel;		// jpips workspace panel
+  public PList			filesList;	// contains fortran files
+  public PMenu 			wk_menu;	// menu.
+  private Vector 		v1, v2; 	// used by Option...
+  private Option		option;
 
 
   /** Creates a workspace file.
     * Creates the workspace component.
     */  
-  public WorkspaceManager(TPips tpips, PFrame frame,
-           DirectoryManager directoryManager, ModuleManager moduleManager,
-           TextDisplayer textDisplayer, Vector optionVector)
+  public WorkspaceManager(TPips tpips, 
+			  PFrame frame,
+			  DirectoryManager directoryManager, 
+			  ModuleManager moduleManager,
+			  TextDisplayer textDisplayer)
     {
       this.tpips = tpips;
       this.frame = frame;
       this.directoryManager = directoryManager;
       this.moduleManager = moduleManager;
       this.textDisplayer = textDisplayer;
-      this.optionVector = optionVector;
       buildPanel();
+      buildMenu();
     }
 
 
@@ -107,7 +114,7 @@ public class WorkspaceManager implements JPipsComponent
       tpips.sendCommand("open "+workspace.getName());
       if(check())
         {
-          ((Option)optionVector.elementAt(0)).setState(false);
+          option.setState(false);
           moduleManager.setModules();
           directoryManager.setActivated(false);
           frame.lock(false);
@@ -133,7 +140,7 @@ public class WorkspaceManager implements JPipsComponent
     {
       tf.setText("");
       tpips.sendCommand("close ");
-      ((Option)optionVector.elementAt(0)).setState(true);
+      option.setState(true);
       frame.lock(true);
       directoryManager.setActivated(true);
       textDisplayer.closeAll();
@@ -202,7 +209,7 @@ public class WorkspaceManager implements JPipsComponent
       
       //add & remove
       PPanel p2 = new PPanel(new GridLayout(1,0));
-      b = new PButton("Add");
+      b = new PButton("Add...");
       a = new ActionListener()
         {
 	  public void actionPerformed(ActionEvent e)
@@ -352,7 +359,7 @@ public class WorkspaceManager implements JPipsComponent
 	  command = command + " " + pathFile;
         }
       tpips.sendCommand(command);
-      ((Option)optionVector.elementAt(0)).setState(false);
+      option.setState(false);
       moduleManager.setModules();
       check();
       directoryManager.setActivated(false);
@@ -416,17 +423,116 @@ public class WorkspaceManager implements JPipsComponent
 
   public PMenu getMenu()
     {
-      return null;
+      return wk_menu;
     }
   
-  
-  public void setActivated(boolean yes) {}
+  /** @return the option object for the workspace menu
+    */
+  public Option getOption()
+    {
+      return option;
+    }
 
+  /** Build the workspace menu.
+    */
+  public void buildMenu()
+    {
+      PMenuItem mi;
+      PCheckBoxMenuItem cbmi;
+
+      wk_menu = new PMenu("Workspace");
+      v1 = new Vector();
+      v2 = new Vector();
+
+      //create
+      mi = (PMenuItem) wk_menu.add(new PMenuItem("Create"));
+      mi.addActionListener(new ActionListener()
+	{
+	  public void actionPerformed(ActionEvent e)
+	    { create(); }
+	});
+      v1.addElement(mi);
+
+      //open
+      mi = (PMenuItem) wk_menu.add(new PMenuItem("Open"));
+      mi.addActionListener(new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { choose(); }
+	});
+      v1.addElement(mi);
+
+      //checkpoint
+      mi = (PMenuItem) wk_menu.add(new PMenuItem("Checkpoint"));
+      mi.addActionListener(new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { checkPoint(); }
+	});
+      mi.setEnabled(false);
+      v2.addElement(mi);
+
+      //close
+      mi = (PMenuItem) wk_menu.add(new PMenuItem("Close"));
+      mi.addActionListener(new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { close(false); }
+	});
+      mi.setEnabled(false);
+      v2.addElement(mi);
+      
+      //quit
+      mi = (PMenuItem) wk_menu.add(new PMenuItem("Quit"));
+      mi.addActionListener(new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { tpips.quit(); System.exit(0); }
+	});
+      v1.addElement(mi);
+
+      //close & quit
+      mi = (PMenuItem) wk_menu.add(new PMenuItem("Close & Quit"));
+      mi.addActionListener(new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { close(false); tpips.quit(); System.exit(0);}
+	});
+      mi.setEnabled(false);
+      v2.addElement(mi);
+      
+      //close & delete & quit
+      mi = (PMenuItem) wk_menu.add(new PMenuItem("Delete & Quit"));
+      mi.addActionListener(new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    {
+	      close(true);
+	      tpips.quit();
+	      System.exit(0);
+	    }
+	});
+      mi.setEnabled(false);
+      v2.addElement(mi);
+      
+      //exit
+      mi = (PMenuItem) wk_menu.add(new PMenuItem("Exit"));
+      mi.addActionListener(new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { tpips.exit(); System.exit(0); }
+	});
+      mi.setForeground(Color.red);
+
+      option = new Option(wk_menu.getName(), wk_menu, null, null, null, v1,v2);
+    }
+
+  public void setActivated(boolean yes) {}
 
   public void reset()
     {
       tf.setText("");
-      ((Option)optionVector.elementAt(0)).setState(true);
+      option.setState(true);
       workspace = null;
     }
 
