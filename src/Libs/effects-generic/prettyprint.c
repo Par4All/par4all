@@ -150,8 +150,9 @@ load_list(statement_effects m, statement s)
 }
 
 /****************written by Dat**********************/
-void my_effects_filter(list l, string str_filter)
+void my_effects_filter(list l_effs, string str_filter)
 {
+  //MAP(
   return;
 }
 /****************************************************/
