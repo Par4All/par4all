@@ -21,6 +21,9 @@
   - intrinsics are not properly typed
 
   $Log: bootstrap.c,v $
+  Revision 1.78  2003/08/06 13:47:51  nguyen
+  Add intrinsics for C
+
   Revision 1.77  2003/07/28 15:07:42  coelho
   INVERSE operator name...
 
@@ -38,6 +41,9 @@
 
   Revision 1.72  2002/06/10 12:00:37  irigoin
   $Log: bootstrap.c,v $
+  Revision 1.78  2003/08/06 13:47:51  nguyen
+  Add intrinsics for C
+
   Revision 1.77  2003/07/28 15:07:42  coelho
   INVERSE operator name...
 
@@ -4004,56 +4010,56 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {EOLE_FMS_OPERATOR_NAME, 3, default_intrinsic_type , 
    typing_arithmetic_operator, 0},
   
-  // Here are C intrinsics 
+  /* Here are C intrinsics */
 
-  // ISO 6.5.2.3 structure and union members 
+  /* ISO 6.5.2.3 structure and union members */
   {".", 2, default_intrinsic_type, 0, 0},
   {"->", 2, default_intrinsic_type, 0, 0},
-  // ISO 6.5.2.4 postfix increment and decrement operators, real or pointer type operand
+  /* ISO 6.5.2.4 postfix increment and decrement operators, real or pointer type operand */
   {"post++", 1, default_intrinsic_type, 0, 0},
   {"post--", 1, default_intrinsic_type, 0, 0},
-  // ISO 6.5.3.1 prefix increment and decrement operators, real or pointer type operand
+  /* ISO 6.5.3.1 prefix increment and decrement operators, real or pointer type operand */
   {"++pre", 1, default_intrinsic_type, 0, 0},
   {"--pre", 1, default_intrinsic_type, 0, 0},
-  // ISO 6.5.3.2 address and indirection operators, add pointer type
+  /* ISO 6.5.3.2 address and indirection operators, add pointer type */
   {"&", 1, default_intrinsic_type, 0, 0},
   {"*indirection", 1, default_intrinsic_type, 0, 0},
-  // ISO 6.5.3.3 unary arithmetic operators
+  /* ISO 6.5.3.3 unary arithmetic operators */
   {"+unary", 1, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"-unary", 1, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"~", 1, integer_to_overloaded_type, typing_arithmetic_operator, 0},
   {"!", 1, overloaded_to_integer_type, 0, 0},
-  // ISO 6.5.5 multiplicative operators : ALREADY EXIST (FORTRAN)
-  // {"*", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
-  // {"/", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
+  /* ISO 6.5.5 multiplicative operators : ALREADY EXIST (FORTRAN)
+     {"*", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
+     {"/", 2, default_intrinsic_type, typing_arithmetic_operator, 0},*/
   {"%", 2, integer_to_overloaded_type, typing_arithmetic_operator, 0},
-  // ISO 6.5.6 additive operators, arithmetic types or pointer + integer type
+  /* ISO 6.5.6 additive operators, arithmetic types or pointer + integer type*/
   {"+C", 2, default_intrinsic_type, 0, 0},
   {"-C", 2, default_intrinsic_type, 0, 0},
-  // ISO 6.5.7 bitwise shift operators
+  /* ISO 6.5.7 bitwise shift operators*/
   {"<<", 2, integer_to_overloaded_type, 0, 0},
   {">>", 2, integer_to_overloaded_type, 0, 0},
-  // ISO 6.5.8 relational operators,arithmetic or pointer types 
+  /* ISO 6.5.8 relational operators,arithmetic or pointer types */
   {"<", 2, overloaded_to_integer_type, 0, 0},
   {">", 2, overloaded_to_integer_type, 0, 0},
   {"<=", 2, overloaded_to_integer_type, 0, 0},
   {">=", 2, overloaded_to_integer_type, 0, 0},
-  // ISO 6.5.9 equality operators, return 0 or 1
+  /* ISO 6.5.9 equality operators, return 0 or 1*/
   {"==", 2, overloaded_to_integer_type, 0, 0},
   {"!=", 2, overloaded_to_integer_type, 0, 0},
-  // ISO 6.5.10 bitwise AND operator 
+  /* ISO 6.5.10 bitwise AND operator */
   {"&bitand", 2, integer_to_integer_type, typing_arithmetic_operator, 0},
-  // ISO 6.5.11 bitwise exclusive OR operator 
+  /* ISO 6.5.11 bitwise exclusive OR operator */
   {"^", 2, integer_to_integer_type, typing_arithmetic_operator, 0},
-  // ISO 6.5.12 bitwise inclusive OR operator 
+  /* ISO 6.5.12 bitwise inclusive OR operator */
   {"|", 2, integer_to_integer_type, typing_arithmetic_operator, 0},
-  // ISO 6.5.13 logical AND operator 
+  /* ISO 6.5.13 logical AND operator */ 
   {"&&", 2, overloaded_to_integer_type, 0, 0},
-  // ISO 6.5.14 logical OR operator 
+  /* ISO 6.5.14 logical OR operator */ 
   {"||", 2, overloaded_to_integer_type, 0, 0},
-  // ISO 6.5.16.1 simple assignment : ALREADY EXIST (FORTRAN)
-  // {"=", 2, default_intrinsic_type, typing_of_assign, 0}, 
-  // ISO 6.5.16.2 compound assignments
+  /* ISO 6.5.16.1 simple assignment : ALREADY EXIST (FORTRAN)
+     {"=", 2, default_intrinsic_type, typing_of_assign, 0}, */
+  /* ISO 6.5.16.2 compound assignments*/
   {"*=", 2, default_intrinsic_type, typing_of_assign, 0},
   {"/=", 2, default_intrinsic_type, typing_of_assign, 0},
   {"%=", 2, default_intrinsic_type, typing_of_assign, 0},
@@ -4064,25 +4070,25 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"&=", 2, default_intrinsic_type, typing_of_assign, 0},
   {"^=", 2, default_intrinsic_type, typing_of_assign, 0},
   {"|=", 2, default_intrinsic_type, typing_of_assign, 0},
-  // ISO 6.5.17 comma operator
+  /* ISO 6.5.17 comma operator */
   {",", (INT_MAX), default_intrinsic_type, 0, 0}, 
 
-  // null statement
-  {";", 0, default_intrinsic_type, 0, 0},
+  /* null statement*/
+  {NULL_STATEMENT_INTRINSIC, 0, default_intrinsic_type, 0, 0},
   {"break", 0, default_intrinsic_type, 0, 0},
   {"case", 0, default_intrinsic_type, 0, 0},  
   {"default", 0, default_intrinsic_type, 0, 0},
   {"return", 1, default_intrinsic_type, 0, 0},
 
-  // intrinsic to handle C initialization 
+  /* intrinsic to handle C initialization */
   {BRACE_INTRINSIC, (INT_MAX) , default_intrinsic_type, no_typing, 0},
 
-  // #include <assert.h>
-  //  {"__assert",3,overloaded_to_void_type,0,0},
+  /* #include <assert.h> */
+  /*  {"__assert",3,overloaded_to_void_type,0,0},*/
 
-  // #include <complex.h>
+  /* #include <complex.h>*/
 
-  // #include <ctype.h>
+  /* #include <ctype.h>*/
   /* {"isalnum", 1, integer_to_integer_type, 0, 0}, 
   {"isalpha", 1, integer_to_integer_type, 0, 0}, 
   {"iscntrl", 1, integer_to_integer_type, 0, 0}, 
@@ -4101,17 +4107,17 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"_tolower", 1, integer_to_integer_type, 0, 0}, 
   {"_toupper", 1, integer_to_integer_type, 0, 0}, */
   
-  // #include <errno.h>
-  //  {"errno", 0, overloaded_to_integer_type, 0, 0}, 
+  /* #include <errno.h>*/
+  /*  {"errno", 0, overloaded_to_integer_type, 0, 0}, */
 
-  // #include <fenv.h>
+  /* #include <fenv.h>*/
 
-  // #include <float.h>
-  // {"__flt_rounds", 1, void_to_integer_type, 0, 0}, 
+  /* #include <float.h>*/
+  /* {"__flt_rounds", 1, void_to_integer_type, 0, 0}, */
 
-  // #include <inttypes.h>
+  /* #include <inttypes.h>*/
 
-  // #include <iso646.h>
+  /* #include <iso646.h>*/
 
   /* {"_sysconf", 1, integer_to_integer_type, 0, 0}, 
   {"setlocale", 2, overloaded_to_pointer_type, 0, 0},
@@ -4128,11 +4134,11 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"mcfiller", 1, void_to_overloaded_type, 0, 0},
   {"mcwrap", 1, void_to_integer_type, 0 ,0},*/
 
-  // #include <limits.h>
+  /* #include <limits.h>*/
 
-  // #include <locale.h>
+  /* #include <locale.h>*/
 
-  // #include <math.h>
+  /* #include <math.h>*/
   /*  {"acos", 1, double_to_double_type, 0, 0},  
   {"asin", 1, double_to_double_type, 0, 0}, 
   {"atan", 1, double_to_double_type, 0, 0}, 
@@ -4211,7 +4217,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"atof", 1, overloaded_to_double_type, 0, 0},  
   {"strtod", 2, overloaded_to_double_type, 0, 0},  */
 
-  //#include <setjmp.h>
+  /*#include <setjmp.h>*/
 
   /* {"setjmp", 1, overloaded_to_integer_type, 0, 0},
   {"__setjmp", 1, overloaded_to_integer_type, 0, 0},
@@ -4220,12 +4226,12 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"sigsetjmp", 2, overloaded_to_integer_type, 0, 0},
   {"siglongjmp", 2, overloaded_to_void_type, 0, 0},*/
 
-  //#include <signal.h>
-  //#include <stdarg.h>
-  //#include <stdbool.h>
-  //#include <stddef.h>
-  //#include <stdint.h>
-  //#include <stdio.h>
+  /*#include <signal.h>*/
+  /*#include <stdarg.h>*/
+  /*#include <stdbool.h>*/
+  /*#include <stddef.h>*/
+  /*#include <stdint.h>*/
+  /*#include <stdio.h>*/
 
   /*  {"remove", 1, pointer_to_integer_type, 0, 0},
   {"rename", 2, pointer_to_integer_type, 0, 0},
@@ -4296,12 +4302,12 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"ftello64", 1, pointer_to_overloaded_type, 0, 0},*/ 
 
 
-  //#include <stdlib.h>
-  //#include <string.h>
-  //#include <tgmath.h>
-  //#include <time.h>
-  //#include <wchar.h>
-  //#include <wctype.h>
+  /*#include <stdlib.h>*/
+  /*#include <string.h>*/
+  /*#include <tgmath.h>*/
+  /*#include <time.h>*/
+  /*#include <wchar.h>*/
+  /*#include <wctype.h>*/
 
   {NULL, 0, 0, 0, 0}
 };
