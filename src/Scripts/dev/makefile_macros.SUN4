@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.SUN4,v $ (version $Revision$)
-# $Date: 1996/09/08 19:15:31 $, 
+# $Date: 1996/09/19 11:51:51 $, 
 #
 # this file contains macro definitions 
 
@@ -8,6 +8,7 @@ AR	= gar
 ARFLAGS	= rv
 CC	= acc -temp=$(PIPS_HOME)/tmp
 CFLAGS	= -fast -g -Xc
+CMKDEP	= -M
 # The SC3 acc compiler forget to define the sparc flag;
 CPPFLAGS= -Dsparc -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC) -bsdmalloc
