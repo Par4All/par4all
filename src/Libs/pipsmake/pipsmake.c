@@ -883,16 +883,16 @@ void delete_all_resources(void)
 string 
 get_first_main_module(void)
 {
-    string dir_name = db_get_current_workspace_directory(), main_name;
+    string dir_name = db_get_current_workspace_directory(), main_name, name;
     debug_on("PIPSMAKE_DEBUG_LEVEL");
     main_name = strdup(concatenate(dir_name, "/.fsplit_main_list", 0));
     free(dir_name);
 
     if (file_exists_p(main_name)) 
     {
-	FILE * tmp_file = safe_fopen(tmp_file_name, "r");
+	FILE * tmp_file = safe_fopen(main_name, "r");
 	name = safe_readline(tmp_file);
-	safe_fclose(tmp_file, tmp_file_name);
+	safe_fclose(tmp_file, main_name);
     }
     else name = string_undefined;
     free(main_name);
