@@ -30,7 +30,9 @@ extern FILE * yyin;
 
 /* This constant should be adapted to the particular need of the application */
 
-#define YYMAXDEPTH 1000
+/* set to 10000 by BC - necessary in PIPS for DYNA */
+/* Should be a compilation option ? */
+#define YYMAXDEPTH 10000
 
 /* User selectable options. */
 
