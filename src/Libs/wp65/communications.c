@@ -31,7 +31,8 @@
  * where it should be communicated  (this statement is often external to the call)
 */
 
-void call_instruction_to_communications(
+void 
+call_instruction_to_communications(
     statement s,
     statement st_level1,
     statement st_level2,
@@ -180,7 +181,8 @@ void statement_to_communications(statement stmt, statement st_level1, statement 
 					r_to_ud,lpv);
 	}, instruction_block(inst));
 	ifdebug(7) 
-	    (void) fprintf(stderr,"statement_to_communications-instruction block- end\n");
+	    (void) fprintf(stderr,
+			   "statement_to_communications-instruction block- end\n");
 	break;
     }
     case is_instruction_test:
@@ -233,7 +235,8 @@ void statement_to_communications(statement stmt, statement st_level1, statement 
  * after its execution.
 */
 
-void compute_communications(list l, statement_mapping *fetch_map,statement_mapping *store_map) 
+void 
+compute_communications(list l, statement_mapping *fetch_map,statement_mapping *store_map) 
 {
     list lwr=NIL;			/* list of written variables */
     list lwr_local= NIL;		/* list of variables written in a local
@@ -304,14 +307,15 @@ array_indices_communication(
     list ind=NIL;
     list lrs = NIL;
     statement stat;
-    Pbase bas_var[2];
+    Pbase bas_var[3];
     Pvecteur pv1,pv2,pv,pvi;
     int i,j;
     Value coef;
    
     /* movements for the scalar variables 
        for the compute module or  the memory module */
-    bas_var[1] = bas_var[2] = VECTEUR_NUL;
+    bas_var[1] =  VECTEUR_NUL;
+    bas_var[2] = VECTEUR_NUL;
     for (lrs =  lrefs;  !ENDP(lrs); POP(lrs)) { 
 	reference r = REFERENCE(CAR(lrs));
 	Variable vbank,vligne,vofs;
@@ -323,14 +327,15 @@ array_indices_communication(
 	    expression e = EXPRESSION(CAR(ind));
 	    normalized norm = NORMALIZE_EXPRESSION(e);
 	    if (normalized_linear_p(norm))
-		bas_var[i] = (Pvecteur) normalized_linear(norm);
-	    else {  normalized norm =NormalizeSyntax(expression_syntax(e));
-		    bas_var[i] = (Pvecteur) normalized_linear(norm);
+		bas_var[i]=vect_dup((Pvecteur) normalized_linear(norm));
+	    else {  normalized norm=NormalizeSyntax(expression_syntax(e));
+		    bas_var[i]=vect_dup((Pvecteur) normalized_linear(norm));
 		    fprintf(stderr,
 			    "[array_indices_communication ERROR]--> NON LINEAR funct.\n");
 		}
 	}
-	t = entity_type(reference_variable(r));
+
+ 	t = entity_type(reference_variable(r));
 	if (type_variable_p(t)) {
 	    variable var = type_variable(t);
 	    cons * dims = variable_dimensions(var);
@@ -342,27 +347,30 @@ array_indices_communication(
 	    Value min_ms = VALUE_ZERO;
 	    Value max_ms = VALUE_ZERO;
 	    if (normalized_linear_p(norm1) && normalized_linear_p(norm2)) {
-		min_ms = vect_coeff(TCST,(Pvecteur) normalized_linear(norm1));
-		max_ms = vect_coeff(TCST,(Pvecteur) normalized_linear(norm2));
+		min_ms=vect_coeff(TCST,(Pvecteur) normalized_linear(norm1));
+		max_ms=vect_coeff(TCST,(Pvecteur) normalized_linear(norm2));
 	    }
 	    ms = value_minus(max_ms,min_ms);
 	    value_increment(ms);
 	}
+	
 	vbank = (Variable) var_id;
 	vligne = vecteur_var(bank_indices->succ);
 	vofs = vecteur_var(bank_indices->succ->succ);
 	if (VECTEUR_NUL_P(bas_var[2]))
 	    bas_var[2] = vect_new(TCST,VALUE_ONE);
-
 	for (i=1;i<=2;i++) {	
 	    for (pvi = loop_indices,j=1; !VECTEUR_NUL_P(pvi); 
 		 pvi = pvi->succ,j++) {
-		if (value_notzero_p(coef = vect_coeff(pvi->var,bas_var[i]))) {
+		if (value_notzero_p(coef = vect_coeff(pvi->var,
+						      bas_var[i]))) 
+		{ 
 		    pv = make_loop_indice_equation
 			(loop_indices,tile, tile_delay,
 			 tile_indices,tile_local_indices,j);
-		    vect_add_elem(&bas_var[i],pvi->var,value_uminus(coef));
-		    bas_var[i] =vect_add(bas_var[i],vect_multiply(pv,coef));
+		  vect_add_elem(&bas_var[i],pvi->var,value_uminus(coef)); 
+		
+		  bas_var[i] =vect_add(bas_var[i],vect_multiply(pv,coef));
 		}
 	    }
 	}
@@ -411,7 +419,6 @@ array_indices_communication(
 	icode = CONS(STATEMENT,stat,NIL);
 	gcode = gen_nconc(gcode,icode);
     }
-	 
     return (gcode);
 }
 
@@ -426,18 +433,20 @@ array_scalar_access_to_compute_communication(
     Pvecteur tile_indices,Pvecteur tile_local_indices)
 {
    
-    list icode  = array_indices_communication(compute_module,bank_indices,bn,ls,lt,
-					     load_code,var_id,loop_indices,tile,
-					       tile_delay,
-					     tile_indices,tile_local_indices);
-
-    list lst = CONS(REFERENCE,make_reference(var_id,NIL),
+    list icode,lst,lrscc;
+    icode  = array_indices_communication(compute_module,bank_indices,
+					 bn,ls,lt,
+					 load_code,var_id,loop_indices,tile,
+					 tile_delay,
+					 tile_indices,tile_local_indices);
+  lst = CONS(REFERENCE,make_reference(var_id,NIL),
 		    CONS(REFERENCE, 
-			 make_reference((entity) bank_indices->succ->var,NIL),
+			 make_reference((entity) bank_indices->succ->var,
+					NIL),
 			 CONS(REFERENCE, 
 			      make_reference((entity) bank_indices->succ->succ->var,NIL),
 			      NIL)));
-   
+
     if (!fully_sequential) { 
 	/*    Generation of the compute code corresponding to the transfer 
 	      of a scalar array element :
@@ -470,7 +479,6 @@ array_scalar_access_to_compute_communication(
 
 	statement  stat = loop_to_statement(newloop);
     add_variable_declaration_to_module(compute_module,ent1);
-	
 	icode = gen_nconc(icode,CONS(STATEMENT,stat,NIL));
 	ccode = constant_symbolic_communication(compute_module,lt,load_code,var_id);
 	icode = gen_nconc(icode,ccode);  
@@ -543,7 +551,8 @@ list array_scalar_access_to_bank_communication(entity memory_module,Pbase  bank_
     }
 }
 
-static list build_esv_list(list lt, hash_table v_to_esv, Pbase bank_indices)
+static list 
+build_esv_list(list lt, hash_table v_to_esv, Pbase bank_indices)
 {
     list endlt=NIL;
     list newlt=NIL;
@@ -569,14 +578,15 @@ static void insert_array_scalar_access_movement(entity compute_module,entity mem
 						Pbase loop_indices,tiling  tile,Pvecteur tile_delay, 
 				      Pvecteur tile_indices,  Pvecteur tile_local_indices)
 {
-    list ccode ;
+    list ccode ;list lrscc;
     ifdebug(8) {
 	fprintf(stderr,
 		" communication to be inserted at run time stat no %d: ",
 		statement_number(stat));
 	reference_list_print(lt); 
-    }
-
+   
+	       }
+  
     /* creation d'une nouvelle entite pour servir de temporaire au 
        numero de banc memoire contenant la variable scalaire */
     ccode =array_scalar_access_to_compute_communication(compute_module, 
@@ -585,11 +595,13 @@ static void insert_array_scalar_access_movement(entity compute_module,entity mem
 							ent1,fully_sequential,
 							loop_indices,tile, tile_delay,tile_indices,
 							tile_local_indices); 
+
     *new_slst = gen_nconc(*new_slst,ccode); 
     lt = build_esv_list(lt,v_to_esv,bank_indices);
     ccode =array_scalar_access_to_bank_communication(memory_module, bank_indices,bn,
 						     ls,lt,!load, proc_id,
-						     ent1,fully_sequential); 
+						     ent1,fully_sequential);
+
     *new_blist = gen_nconc(*new_blist,ccode);
 }  
 	    
@@ -649,9 +661,11 @@ void insert_run_time_communications(entity compute_module,entity memory_module,
        }
        case is_instruction_call: {
 	   list  lt;
+	 
 	   if ((lt= (list) 
 		GET_STATEMENT_MAPPING(fetch_map,STATEMENT(CAR(st1))))
 	       != (list) HASH_UNDEFINED_VALUE && nbcall ) { 
+
 	       ent1 = make_new_module_variable(compute_module,100);
 	       add_variable_declaration_to_module(compute_module,ent1);
 	       
@@ -688,7 +702,8 @@ void insert_run_time_communications(entity compute_module,entity memory_module,
 boolean 
 test_run_time_communications(list list_statement_block,
 				    statement_mapping fetch_map,statement_mapping store_map)
-{boolean ok ;
+{
+    boolean ok ;
     int nbcall =0;
     MAPL(st1, 
      { instruction inst = statement_instruction(STATEMENT(CAR(st1)));
@@ -696,12 +711,14 @@ test_run_time_communications(list list_statement_block,
        case is_instruction_block: { 
 	   ok = FALSE;
 	   MAPL(st2, {
-	  ok = (ok) ? ok : test_run_time_communications(CONS(STATEMENT,
-						       STATEMENT(CAR(st2)),NIL),
-						  fetch_map,store_map);
-      }, 
-		instruction_block(inst));
-	  return ok;
+	       ok = (ok) ? ok : 
+		   test_run_time_communications(CONS(STATEMENT,
+						     STATEMENT(CAR(st2)),
+						     NIL),
+						fetch_map,store_map);
+	   }, 
+	       instruction_block(inst));
+	   return ok;
 	   break; }
        case is_instruction_loop: {
 	   return(test_run_time_communications(CONS(STATEMENT,
