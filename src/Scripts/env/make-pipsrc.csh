@@ -17,8 +17,9 @@
 	#	   --------------------------------------------------------
 	!
 
-  sed '/^[ 	]*[A-Za-z_0-9]*=/!d;s/\([A-Za-z_0-9]*\)=/setenv \1 /' \
-	pipsrc.sh 
+  sed '/^test/p;
+       /^[ 	]*[A-Za-z_0-9]*=/!d;
+       s/\([A-Za-z_0-9]*\)=/setenv \1 /;' pipsrc.sh 
 
   echo 'rehash' 
 } > pipsrc.csh
