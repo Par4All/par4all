@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.56  1997/05/29 13:31:49  zory
+# _HPFC_DEBUG_ added
+#
 # Revision 1.55  1997/05/28 15:48:14  zory
 # *** empty log message ***
 #
@@ -40,7 +43,7 @@ M4FLAGS+= -D _HPFC_ENCODING_=$(PVM_ENCODING_OPTION)
 
 M4FLAGS	+= -D _HPFC_DEMO_
 M4FLAGS	+= -D _HPFC_DIRECT_
-# M4FLAGS	+= -D _HPFC_DEBUG_
+M4FLAGS	+= -D _HPFC_DEBUG_
 
 # the default on IBM is to use PVMe
 ifeq ($(PVM_ARCH),RS6K)
