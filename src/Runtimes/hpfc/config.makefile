@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/09/13 12:50:24 $, )
+# ($Date: 1996/09/13 13:18:43 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -24,7 +24,15 @@ endif
 M4FLAGS	+= -D DEMO
 M4FLAGS	+= -D DIRECT
 # M4FLAGS	+= -D DEBUG
-# M4FLAGS	+= -D USE_PVMe
+
+
+ifeq ($(PVM_ARCH),RS6K)
+#
+# some different settings to use PVMe, the IBM version
+#
+M4FLAGS	+= -D USE_PVMe
+USE_PVMe = 1
+endif
 
 
 #############################################################################
