@@ -31,24 +31,14 @@ typedef enum {PIPS_ICON, ICFG_ICON, WP65_PE_ICON, WP65_bank_ICON, callgraph_ICON
 		parallel_ICON, sequential_ICON, user_ICON, LAST_ICON} icon_list;
 
 
-extern char *strdup(), *re_comp();
+extern char *re_comp();
 extern int re_exec();
-
 
 typedef bool success ;
 
 /* Manques dans les .h de PIPS : */
 extern int get_bool_property();
 
-/* Contourne certains manques de .h Sun. RK, 14/01/93.
-	Doit disparai^tre avec un nouveau compilateur. */
-/* extern char *vsprintf(char *, const char *, void *); */
-/*
-extern char *vsprintf();
-extern int      fprintf();
-extern int      pclose();
-extern int      textsw_possibly_normalize();
-*/
 
 /* This variable is used to indicate wether wpips is in the Emacs
    mode: */
