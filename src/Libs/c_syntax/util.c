@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: util.c,v $
+   Revision 1.7  2003/12/18 22:41:55  nguyen
+   Change FILE_SEP_STRING from % to !
+
    Revision 1.6  2003/12/05 17:19:04  nguyen
    Add more syntax types : subscript and application.
    Handle entity creation : array, function, ..
@@ -499,8 +502,8 @@ bool static_module_p(entity e)
 
 bool compilation_unit_p(string module_name)
 {
-  /* A module name is a compilation unit if and only if its last character is % */
-  if (module_name[strlen(module_name)-1]=='%')
+  /* A module name is a compilation unit if and only if its last character is FILE_SEP */
+  if (module_name[strlen(module_name)-1]==FILE_SEP)
     return TRUE;
   return FALSE;
 }
@@ -540,9 +543,9 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
  
      Possible name combinations and the looking order:
        
-	1. FILE%MODULE:BLOCK~PREFIXname or MODULE:BLOCK~PREFIXname
-        2. FILE%MODULE:PREFIXname or MODULE:PREFIXname
-        3. FILE%PREFIXname
+	1. FILE!MODULE:BLOCK`PREFIXname or MODULE:BLOCK`PREFIXname
+        2. FILE!MODULE:PREFIXname or MODULE:PREFIXname
+        3. FILE!PREFIXname
 	4. TOP-LEVEL:PREFIXname
 			      
      with 5 possible prefixes: blank, STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX, TYPEDEF_PREFIX */
@@ -1123,7 +1126,7 @@ string CreateMemberScope(string derived, bool is_external)
      - if the struct/union is declared outside any function, its scope is the CurrentCompilationUnit
      - if the struct/union is declared inside a function, we have to know the CurrentBlock, 
      which is omitted for the moment 
-        - if the function is static, its scope is CurrentCompilationUnit%CurrentModule
+        - if the function is static, its scope is CurrentCompilationUnit!CurrentModule
         - if the function is global, its scope is CurrentModule
 
   The name of the struct/union is then added to the field entity name, with 
