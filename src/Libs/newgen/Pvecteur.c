@@ -11,6 +11,12 @@
   *    prevents a very simple fscanf() with format %d and %s and
   *    implies a copy in a temporary buffer (Francois Irigoin)
   *  - fixed for '\ )' in tokens (FC 2001/07/06)
+  *
+  * $Log: Pvecteur.c,v $
+  * Revision 1.18  2002/08/29 09:00:11  irigoin
+  * vect_gen_copy_tree() now calls vect_copy() instead of vect_dup()
+  *
+  *
   */
 
 #include <stdio.h>
@@ -139,7 +145,7 @@ void vect_gen_free(Pvecteur v)
 
 Pvecteur vect_gen_copy_tree(Pvecteur v)
 {
-    return vect_dup(v);
+    return vect_copy(v);
 }
 
 int vect_gen_allocated_memory(Pvecteur v)
