@@ -416,6 +416,8 @@ Psysteme sc;
     Ptsg sg = sg_new();
     Polyhedron *A;
 
+    /* mem_spy_begin(); */
+
     assert(!SC_UNDEFINED_P(sc) && (sc_dimension(sc) != 0));
 
     nbrows = sc->nb_eq + sc->nb_ineq + 1;
@@ -437,6 +439,9 @@ Psysteme sc;
     /*   printf(" systeme generateur\n");
 	 sg_fprint(stdout,sg,variable_dump_name);
 	 */
+
+    /* mem_spy_end("sc_to_sg_chernikova"); */
+
     return(sg);
 }
 
@@ -513,7 +518,8 @@ Psysteme sc1,sc2;
     Polyhedron *A;
     int i1,i2,j;
     int Dimension,cp;
-    
+
+    /* mem_spy_begin(); */
 
     assert(!SC_UNDEFINED_P(sc1) && (sc_dimension(sc1) != 0));
     assert(!SC_UNDEFINED_P(sc2) && (sc_dimension(sc2) != 0));
@@ -690,13 +696,13 @@ Psysteme sc1,sc2;
 	Pcontrainte pc = contrainte_make(vect_new(TCST, 1));
 	sc = sc_make(pc, CONTRAINTE_UNDEFINED);
 	sc->base = base_dup(sc1->base);
-	sc->dimension = vect_size(sc->base);	}
+	sc->dimension = vect_size(sc->base);
+	}
 
     /*    printf(" impression du systeme \n"); 
 	  sc_dump(sc);*/
 
+    /* mem_spy_end("sc_convex_hull"); */
+
     return(sc);
-
-
-
 }
