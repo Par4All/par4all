@@ -8,13 +8,12 @@
 # Mail problem to jouvelot@ensmp.fr
 #
 # modified by Fabien COELHO
-# - cut used instead of awk
-# - theline variable added
+# - sed and read are used to select the fields
 # - mv instead if ed used to update the results
 # - several files may be piped simultaneously
 #
 # SCCS Stuff:
-# $RCSfile: Accept,v $ ($Date: 1994/07/15 19:23:53 $, ) version $Revision$,
+# $RCSfile: Accept,v $ ($Date: 1994/07/15 19:40:32 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -30,13 +29,9 @@ error()
   exit $1
 }
 
-
-sed -n "/^$header/p" |
-while read theline
+sed -n "/^$header/s,^$header \([^ ]*\) .* \([^ ]*\)\$,\1 \2,p" |
+while read module file
 do
-  module=`echo $theline | cut -d' ' -f 4`
-  file=`echo $theline | cut -d' ' -f 6`
-
   resultdir=`dirname $file`/`basename $file .f`.result
   outfile=$resultdir/$module.out
   reffile=$resultdir/$module
