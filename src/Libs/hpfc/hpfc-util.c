@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/12/19 15:52:34 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/03/21 15:56:02 $, )
  * version $Revision$
  */
 
@@ -129,9 +129,7 @@ int i;
 	   alignment_undefined_p(ali));
 }
 
-/* bool ith_dim_distributed_p(array, i)
- *
- * whether a dimension is distributed or not.
+/* whether a dimension is distributed or not.
  */
 bool ith_dim_distributed_p(array, i, pprocdim)
 entity array;
@@ -148,6 +146,26 @@ int i, *pprocdim;
     if (alignment_undefined_p(alt)) return(FALSE);
     d = FindDistributionOfDim(ld, alignment_templatedim(alt), pprocdim);
     return(!style_none_p(distribution_style(d)));
+}
+
+bool 
+ith_dim_overlapable_p(
+    entity array,
+    int i)
+{
+    align       al = load_hpf_alignment(array);
+    list       lal = align_alignment(al);
+    alignment  alt = FindAlignmentOfDim(lal, i);
+    entity template = align_template(al);
+    distribute dis = load_hpf_distribution(template);
+    list ld = distribute_distribution(dis);
+    distribution d;
+    int p;
+
+    if (alignment_undefined_p(alt)) return FALSE;
+    d = FindDistributionOfDim(ld, alignment_templatedim(alt), &p);
+
+    return style_block_p(distribution_style(d));
 }
 
 /* creates a new statement for the given module
