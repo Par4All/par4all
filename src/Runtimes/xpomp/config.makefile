@@ -1,16 +1,27 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/30 16:02:09 $ 
+# $Date: 1996/08/30 18:15:57 $ 
+
+ifeq ($(FC),g77)
+CPPFLAGS+=	-DCOMPILE_FOR_G77
+endif
 
 CPPFLAGS+=	$(PIPS_X11_ADDED_CPPFLAGS)
 LDFLAGS+=	$(PIPS_X11_ADDED_LDFLAGS)
 
-LOCAL_LIB=	$(ARCH)/libxpomp.a
-CFILES=		cgraphic.c xpomp.c
+LIB=		$(ARCH)/libxpomp.a
+BIN=		$(ARCH)/xpomp
 
-SOURCES=	$(CFILES)
+LOCAL_HEADERS=	gr.h rasterfile.h 
+EXPORT_HEADERS=	xpomp_graphic.h xpomp_graphic_F.h
+CFILES=		cgraphic.c xpomp.c 
+DEMO=		test_xpomp.c fatal.f 
 
-OFILES=	cgraphic.o
-# OFILES:= $(addprefix $(ARCH)/, $(CFILES))
+SOURCES=	$(LOCAL_HEADERS) \
+		$(EXPORT_HEADERS) \
+		$(CFILES) \
+		$(DEMO)
+
+OFILES=		cgraphic.o
 
 #
 # installation
@@ -18,30 +29,33 @@ OFILES=	cgraphic.o
 INSTALL_RTM_DIR:=$(INSTALL_RTM_DIR)/xpomp
 INSTALL_BIN_DIR:=$(INSTALL_RTM_DIR)/$(ARCH)
 
-INSTALL_BIN=	$(ARCH)/xpomp $(ARCH)/libxpomp.a
-INSTALL_RTM=	
+INSTALL_BIN=	$(BIN) $(LIB)
+INSTALL_RTM=	$(EXPORT_HEADERS)
 
 # 
-# compilation and so.
+# compilation and so
 
-.SUFFIXES: .c .o
+all: $(LIB) $(ARCH)/xpomp test_xpomp fractal
 
 cproto :
 	$(PROTOIZE) xpomp.c
 
-all: $(LOCAL_LIB) xpomp test_xpomp fractal
+xpomp: $(ARCH)/xpomp.o
+	$(LINK) $@ $+ $(PIPS_X11_ADDED_LIBS)
 
+$(LIB):	$(OFILES)
+	$(AR) $(ARFLAGS) $(LIB) $(OFILES)
+	ranlib $(LIB)
 
-test_xpomp : test_xpomp.o cgraphic.o
-	$(CC) -g -o test_xpomp test_xpomp.o cgraphic.o -lm
+$(ARCH)/test_xpomp : $(ARCH)/test_xpomp.o $(LIB)
+	$(LINK) $@ $+ -lm $(LIB)
 
-fractal : fractal.f cgraphic.o
-	f77 -g -o fractal fractal.f cgraphic.o -lm
+$(ARCH)/fractal : $(ARCH)/fractal.o $(LIB)
+	$(FC) $(FFLAGS) $(LDFLAGS) -o $@ $+ -lm $(LIB)
 
-$(LOCAL_LIB):	$(OFILES)
-	$(AR) $(ARFLAGS) $(LOCAL_LIB) $(OFILES)
-	ranlib $(LOCAL_LIB)
-
+clean: local-clean
+local-clean:
+	$(RM) $(ARCH)/*.o $(BIN) $(LIB) $(ARCH)/fractal $(ARCH)/test_xpomp
 
 # that is all
 #
