@@ -12,7 +12,8 @@
 #include "text-util.h"
 #include "ri-util.h"
 #include "properties.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 
 /* includes pour system generateur */
 #include "ray_dte.h"
