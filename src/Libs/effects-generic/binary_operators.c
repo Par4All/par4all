@@ -190,8 +190,8 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     (*effects_prettyprint_func)(l_effects);	
   }
   
-  all_read_effects = hash_table_make(hash_string, 0);
-  all_write_effects = hash_table_make(hash_string, 0);
+  all_read_effects = hash_table_make(hash_string, 10);
+  all_write_effects = hash_table_make(hash_string, 10);
 
   cur = l_effects;
   /* scan the list of effects... the list is modified in place */
