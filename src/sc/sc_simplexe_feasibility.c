@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/06 19:55:17 $, 
+ * $Date: 1996/08/07 13:31:43 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -355,35 +355,34 @@ static int NB_INEQ = 0;
 }
 
 /* multiplies two Values of no arithmetic overflow, or throw exception.
- * should be value_mult? FC.
+ * this version is local to the simplex. 
  */
-#define value_mult_ae(v,w)						\
-(value_zero_p(w) || value_zero_p(v)? VALUE_ZERO:			\
- value_lt(value_abs(v),value_div(VALUE_MAX,value_abs(w)))?		\
- value_mult(v,w): (longjmp(simplex_arithmetic_error, 5), VALUE_MAX))
+#undef value_protected_mult
+#define value_protected_mult(v,w) \
+    value_protected_multiply(v,w,THROW(simplex_arithmetic_error))
 
 /* Version with and without arithmetic exceptions...
  */
 #define MULT(RES,A,B) RES=value_mult(A,B)
-#define MULTOFL(RES,A,B) RES=value_mult_ae(A,B)
+#define MULTOFL(RES,A,B) RES=value_protected_mult(A,B)
 
 #define DIV(x,y,z) DIV_MACRO(x,y,z,value_mult)
 #define DIVOFL(x,y,z) DIV_MACRO(x,y,z,value_mult_ae)
 
 #define MUL(x,y,z) MUL_MACRO(x,y,z,value_mult)
-#define MULOFL(x,y,z) MUL_MACRO(x,y,z,value_mult_ae)
+#define MULOFL(x,y,z) MUL_MACRO(x,y,z,value_protected_mult)
 
 #define SUB(X,A,B) SUB_MACRO(X,A,B,value_mult)
-#define SUBOFL(X,A,B) SUB_MACRO(X,A,B,value_mult_ae)
+#define SUBOFL(X,A,B) SUB_MACRO(X,A,B,value_protected_mult)
 
 #define PIVOT(X,A,B,C,D) PIVOT_MACRO(X,A,B,C,D,value_mult)
-#define PIVOTOFL(X,A,B,C,D) PIVOT_MACRO(X,A,B,C,D,value_mult_ae)
+#define PIVOTOFL(X,A,B,C,D) PIVOT_MACRO(X,A,B,C,D,value_protected_mult)
 
 #define EGAL(x,y) EGAL_MACRO(x,y,value_mult)
-#define EGALOFL(x,y) EGAL_MACRO(x,y,value_mult_ae)
+#define EGALOFL(x,y) EGAL_MACRO(x,y,value_protected_mult)
 
 #define INF(x,y) INF_MACRO(x,y,value_mult)
-#define INFOFL(x,y) INF_MACRO(x,y,value_mult_ae)
+#define INFOFL(x,y) INF_MACRO(x,y,value_protected_mult)
 
 /* this is already too much...
  */
@@ -488,7 +487,7 @@ sc_simplexe_feasibility_ofl_ctrl(
      *  en sortie de la procedure.
      */
     static hashtable_t hashtable[MAX_VAR] ;
-    jmp_buf simplex_arithmetic_error;
+    EXCEPTION simplex_arithmetic_error;
     tableau *eg = NULL; /* tableau des egalite's  */
     tableau *t = NULL; /* tableau des inegalite's  */
     /* les colonnes 0 et 1 sont reservees au terme const: */
@@ -533,7 +532,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    NB_INEQ++;
     }
     
-    if (setjmp(simplex_arithmetic_error))
+    CATCH(simplex_arithmetic_error)
     {
 	DEBUG(fprintf(stdout, "arithmetic error in simplex\n"));
 
@@ -554,7 +553,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 	free(nlle_colonne); 
 
 	if (ofl_ctrl == FWD_OFL_CTRL) 
-	    longjmp(overflow_error,5);
+	    THROW(overflow_error);
 
 	return TRUE; /* default is feasible */
     }
