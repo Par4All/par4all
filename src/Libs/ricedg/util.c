@@ -49,6 +49,27 @@ vertex v;
     return dg_vertex_label_statement(dvl);
 }
 
+
+/* Define a mapping from the statement ordering to the dependence
+   graph vertices: */
+hash_table
+compute_ordering_to_dg_mapping(graph dependance_graph)
+{
+   hash_table ordering_to_dg_mapping = hash_table_make(hash_int, 0);
+   
+   MAP(VERTEX,
+       a_vertex,
+       {
+          hash_put(ordering_to_dg_mapping,
+                   (char *) dg_vertex_label_statement(vertex_vertex_label(a_vertex)),
+                   (char *) a_vertex);
+       },
+       graph_vertices(dependance_graph));
+   
+   return ordering_to_dg_mapping;
+}
+
+
     static string dependence_graph_banner[8] = {
 	"\n ********* Dependence Graph (ill. option combination) *******\n",
 	"\n **************** Effective Dependence Graph ****************\n",
