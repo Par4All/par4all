@@ -36,47 +36,38 @@ entity f;
     code_declarations(EntityCode(f)) = CONS(ENTITY, e, l);
 }
 
-
-/*
-void update_storage_of_variable_to_formal(v, m)
-entity v;
-entity m;
-{
-    entity_storage(fp) = make_storage(is_storage_formal, 
-				      make_formal(m, 1));
-}
-*/
-
-
-/*
- * entity make_scalar_entity(name, module_name, base)
+/* entity make_scalar_entity(name, module_name, base)
  */
 entity make_scalar_entity(name, module_name, base)
 string name;
 string module_name;
 basic base;
 {
-    string 
-	full_name;
-    entity 
-	e, f, a;
-    basic 
-	b = base;
+    string full_name;
+    entity e, f, a;
+    basic b = base;
 
     full_name =
 	strdup(concatenate(module_name, MODULE_SEP_STRING, name, NULL));
 
-    debug(8,"make_scalar_entity", "name %s\n", full_name);
+    pips_debug(8, "name %s\n", full_name);
 
-    e = make_entity(full_name,
-		    type_undefined, 
-		    storage_undefined, 
-		    value_undefined);
+    if ((e=gen_find_tabulated(full_name, entity_domain))!=entity_undefined)
+    {
+	/* it may happen that it is already defined.
+	 * let's say it's ok. (It is for hpfc. FC)
+	 * should check that the type and so are ok...
+	 * otherwise should be checked beforehand...
+	 */
+	free(full_name);
+	return e;
+    }
+
+    e = make_entity(full_name, type_undefined, 
+		    storage_undefined, value_undefined);
 
     entity_type(e) = (type) MakeTypeVariable(b, NIL);
-
     f = local_name_to_top_level_entity(module_name);
-
     a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME); 
 
     entity_storage(e) = 
