@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1996/06/08 17:41:15 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1996/07/23 15:08:30 $, )
  * version $Revision$
  */
 
@@ -64,16 +64,14 @@ static bool simple_indices_p(reference r)
 	 }
 	 else
 	 {
-	     Pvecteur
-		 v = (Pvecteur) normalized_linear(n);
-	     int
-		 s = vect_size(v);
+	     Pvecteur v = (Pvecteur) normalized_linear(n);
+	     int s = vect_size(v);
 	     
 	     if (s>1) return(FALSE);
 	     
 	     if ((s==1) && 
 		 (!entity_loop_index_p((entity)v->var)) &&
-		 ((int) vect_coeff(TCST, v)==0))
+		 (value_zero_p(vect_coeff(TCST, v))))
 	     {
 		 debug(7, "simple_indices_p",
 		   "returning FALSE (not simple) for ref to %s, dim %d\n",
@@ -86,12 +84,9 @@ static bool simple_indices_p(reference r)
 		 /* ??? checks that there is a shift alignment, 
 		  * what shouldn't be necessary...
 		  */
-		 alignment
-		     al = FindArrayDimAlignmentOfArray(array, dim);
-		 int
-		     rate = 
-			 (al==alignment_undefined) ?
-			 (0) : HpfcExpressionToInt(alignment_rate(al)) ;
+		 alignment al = FindArrayDimAlignmentOfArray(array, dim);
+		 int rate = al==alignment_undefined?
+		     0: HpfcExpressionToInt(alignment_rate(al)) ;
 
 		 if (rate!=0 && rate!=1)
 		 {
@@ -135,23 +130,26 @@ aligned_p(
     {
 	tag t = access_tag(INT(CAR(lk)));
 	Pvecteur v = (Pvecteur) PVECTOR(CAR(lv));
+	Value vt = vect_coeff(TEMPLATEV, v),
+	      vd = vect_coeff(DELTAV, v),
+	      vs = vect_coeff(TSHIFTV, v);
 	int p,
 	    tpldim = template_dimension_of_array_dimension(e2, i),
-	    tpl = vect_coeff(TEMPLATEV, v),
-	    dlt = vect_coeff(DELTAV, v),
-	    tsh = vect_coeff(TSHIFTV, v);
+	    tpl = VALUE_TO_INT(vt),
+	    dlt = VALUE_TO_INT(vd),
+	    tsh = VALUE_TO_INT(vs);
 
 	if ((t==not_aligned) ||
 	    ((t==aligned_constant) && 
 	     (processor_number(template, tpldim, tpl, &p)!=
 	      processor_number(template, tpldim, tpl-dlt, &p))) ||
 	    ((t==aligned_shift) && (tsh!=0)))
-	    return(FALSE);
+	    return FALSE;
 
 	i++;
     }
     
-    return(result);
+    return result;
 }
 
 /* true if the given template elements on the specified dimension
@@ -183,10 +181,14 @@ message_manageable_p(
     for(i=1, lk=lkref, lp=lpref ; lk!=NIL ; lk=CDR(lk), lp=CDR(lp))
     {
 	tag ta = access_tag(INT(CAR(lk)));
+	Pvecteur v = (Pvecteur) PVECTOR(CAR(lp));
+	Value vs = vect_coeff(TSHIFTV, v),
+	      vd = vect_coeff(DELTAV, v),
+	      vt = vect_coeff(TEMPLATEV, v);
 	int p = 0,
-	    shift = vect_coeff(TSHIFTV, (Pvecteur) PVECTOR(CAR(lp))),
-	    dlt = vect_coeff(DELTAV, (Pvecteur) PVECTOR(CAR(lp))),
-	    t2 = vect_coeff(TEMPLATEV, (Pvecteur) PVECTOR(CAR(lp)));
+	    shift = VALUE_TO_INT(vs),
+	    dlt = VALUE_TO_INT(vd),
+	    t2 = VALUE_TO_INT(vt);
 
 	if ((ta==not_aligned) ||
 	    /*(ta==local_star) ||*/
@@ -221,7 +223,8 @@ message_manageable_p(
     for(i=1, lk=lkref, lp=lpref ; lk!=NIL ; lk=CDR(lk), lp=CDR(lp))
     {
 	tag ta = access_tag(INT(CAR(lk)));
-	int shift = vect_coeff(TSHIFTV, (Pvecteur) PVECTOR(CAR(lp)));
+	Value vs = vect_coeff(TSHIFTV, (Pvecteur) PVECTOR(CAR(lp)));
+	int shift = VALUE_TO_INT(vs);
 
 	if ((ta==aligned_shift) && (shift!=0))
 	    set_overlap(array, i, (shift<0)?(0):(1), abs(shift));
@@ -261,7 +264,7 @@ expression e;
 
 	if (s==0) return(TRUE);
 	if (s>1) return(FALSE);
-	return((s==1) && ((int) vect_coeff(TCST,v)!=0));
+	return((s==1) && value_notzero_p(vect_coeff(TCST,v)));
     }
     else
     if (syntax_call_p(s))
@@ -436,9 +439,9 @@ update_indices_for_local_computation(
 		    oldindex = (entity) var_of(vindex),
 		    newindex = (entity) GET_ENTITY_MAPPING(new_indexes, 
 							   oldindex);
-		int shift = (int) vect_coeff(TSHIFTV, v);
+		Value shift = vect_coeff(TSHIFTV, v);
 
-		if (shift==0)
+		if (value_zero_p(shift))
 		{
 		    li2 = gen_nconc(li2,
 				    CONS(EXPRESSION,
@@ -451,11 +454,11 @@ update_indices_for_local_computation(
 			gen_nconc(li2,
 				  CONS(EXPRESSION,
 				       MakeBinaryCall
-				       (entity_intrinsic((shift>0)?
+				       (entity_intrinsic(value_pos_p(shift)?
 							(PLUS_OPERATOR_NAME):
 							(MINUS_OPERATOR_NAME)),
 					entity_to_expression(newindex),
-					int_to_expression(abs(shift))),
+					Value_to_expression(value_abs(shift))),
 				       NIL));
 		}
 
@@ -463,7 +466,8 @@ update_indices_for_local_computation(
 	    }
 	    case aligned_constant: /* compute the local indice */
 	    {
-		int tval = vect_coeff(TEMPLATEV, v);
+		Value vval = vect_coeff(TEMPLATEV, v);
+		int tval = VALUE_TO_INT(vval);
 		
 		li2 = gen_nconc(li2,
 				CONS(EXPRESSION,
