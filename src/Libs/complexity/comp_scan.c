@@ -428,7 +428,7 @@ list effects_list;
     statement s = loop_body(loop_instr);
     execution ex = loop_execution(loop_instr);
     complexity comp, cbody, crange, clower, cupper, cincr, cioh, cboh;
-    char sl[9],su[9];
+    char sl[9],su[9], si[9];
     /* FI: Lei chose to allocate the UL and UU entities in the current
        module... Maybe, we are ready fo some dynamic profiling... */
     /* string mod_name = entity_module_name(ll); */
@@ -444,11 +444,13 @@ list effects_list;
 	 */
 	(void) strcpy(sl, "UL_");
 	(void) strcpy(su, "UU_");
+	(void) strcpy(si, "UU_");
     }
     else {
 	/*  In order to get rid of at-sign, add 1 , LZ 010492 */
 	sprintf(sl,"UL_%s",entity_local_name(loop_label(loop_instr))+1);
 	sprintf(su,"UU_%s",entity_local_name(loop_label(loop_instr))+1);
+	sprintf(si,"UI_%s",entity_local_name(loop_label(loop_instr))+1);
     }
 
     /* tell callees that they mustn't try to evaluate the loop index */
@@ -509,6 +511,7 @@ list effects_list;
 	    user_error("loop_to_complexity", "null increment\n");
 	else if ( incr < 0 ) {
 	    complexity cswap;
+
 	    complexity_scalar_mult(&cincr, -1.0);
 	    if ( incr != -1.0 ) {
 		complexity_div(&clower, cincr);
@@ -547,12 +550,27 @@ list effects_list;
 	/* an intermediate test based on preconditions would give better
 	   result with affine loop bounds */
     }
+
     /*
     if ( !complexity_constant_p(cincr) 
 	|| complexity_constant_p(clower) || complexity_constant_p(cupper) ) {
 	complexity_div(&comp, cincr);
     }
-*/
+    */
+
+    if(!complexity_constant_p(cincr)) {
+	if(complexity_is_monomial_p(cincr) && complexity_degree(cincr)==1) {
+	    complexity_div(&comp, cincr);
+	}
+	else {
+	    free_complexity(cincr);
+	    cincr = make_single_var_complexity(1.0,
+					       (Variable)make_new_scalar_variable_with_prefix(si,
+								get_current_module_entity(),
+								MakeBasic(is_basic_int)));
+	}
+    }
+
     if ( complexity_constant_p(comp) && complexity_TCST(comp) < 0 )
 	comp = make_zero_complexity();
 
@@ -944,17 +962,20 @@ list effects_list;
     trace_on("range");
 
     if (!expression_undefined_p(lower))
-	compl = expression_to_complexity(lower, &rngbasic, precond, effects_list);
+	compl = expression_to_complexity(lower, &rngbasic, precond,
+					 effects_list);
     else 
 	pips_error("range_to_complexity", "lower undefined\n");
 
     if (!expression_undefined_p(upper))
-	compu = expression_to_complexity(upper, &rngbasic, precond, effects_list);
+	compu = expression_to_complexity(upper, &rngbasic, precond,
+					 effects_list);
     else 
 	pips_error("range_to_complexity", "upper undefined\n");
 
     if (!expression_undefined_p(incr))
-	compi = expression_to_complexity(incr, &rngbasic, precond, effects_list);
+	compi = expression_to_complexity(incr, &rngbasic, precond,
+					 effects_list);
     else 
 	pips_error("range_to_complexity", "increment undefined\n");
 
