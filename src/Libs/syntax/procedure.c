@@ -175,10 +175,12 @@ AbortOfProcedure()
     (void) ResetBlockStack() ;
 }
 
-/* this function is called when the parsing of a procedure is done. it
-performs a few calculations which cannot be done on the fly and write
-the internal representation of the CurrentFunction with a call to
-gen_free. */
+/* This function is called when the parsing of a procedure is completed.
+ * It performs a few calculations which cannot be done on the fly such
+ * as address computations.
+ *
+ * And it writes the internal representation of the CurrentFunction with a
+ * call to gen_free (?). */
 
 void 
 EndOfProcedure()
@@ -187,10 +189,6 @@ EndOfProcedure()
 
     debug(8, "EndOfProcedure", "Begin for module %s\n",
 	  entity_name(CurrentFunction));
-
-    uses_alternate_return(FALSE);
-    ResetReturnCodeVariable();
-    SubstituteAlternateReturns(FALSE);
 
     /* get rid of ghost variable entities */
     remove_ghost_variable_entities();
@@ -203,6 +201,11 @@ EndOfProcedure()
     /* we generate statement last+1 to eliminate returns */
     GenerateReturn();
 
+    uses_alternate_return(FALSE);
+    ResetReturnCodeVariable();
+    SubstituteAlternateReturns(FALSE);
+
+    /* Check the block stack */
     (void) PopBlock() ;
     if (!IsBlockStackEmpty())
 	    ParserError("EndOfProcedure", "bad program structure\n");
