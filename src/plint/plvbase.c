@@ -91,14 +91,15 @@ int no_ligne;
 Pvecteur *lvbase;
 {
     Pvecteur pv = NULL;
-    Pvecteur pl = vect_new(var,no_ligne);
+    Value vno_ligne = int_to_value(no_ligne);
+    Pvecteur pl = vect_new(var,vno_ligne);
     boolean trouve = FALSE;
 
-    for (pv = *lvbase; pv != NULL && (pv->val != no_ligne);pv=pv->succ);
+    for (pv = *lvbase; pv != NULL && (pv->val != vno_ligne);pv=pv->succ);
     if (pv !=NULL) trouve = TRUE;
     for (pv = *lvbase;( pv != NULL) &&(trouve) ;pv=pv->succ) {
-	if (pv->val >= no_ligne)
-	    pv->val ++;
+	if (value_ge(pv->val,vno_ligne))
+	    value_increment(pv->val);
     }
     pl->succ = *lvbase;
     *lvbase = pl;
@@ -119,12 +120,13 @@ Pvecteur *lvbase;
 {
     Pvecteur pv;
     Pvecteur pred = *lvbase;
+    Value vno_ligne = int_to_value(no_ligne);
 
 #ifdef TRACE
     printf(" **** oter la variable d'indice %d \n",no_ligne);
 #endif
     if (pred != NULL)
-	if (pred->val == no_ligne)
+	if (value_eq(pred->val,vno_ligne))
 	{
 	    pv = (*lvbase)->succ;
 	    (*lvbase)->succ = NULL;
@@ -133,10 +135,10 @@ Pvecteur *lvbase;
 	}
 	else {
 	    for (pv = (*lvbase)->succ;
-		 pv!= NULL && (pv->val != no_ligne);
+		 pv!= NULL && value_ne(pv->val,vno_ligne);
 		 pv = pv->succ, pred = pred->succ);
 
-	    if (pv->val == no_ligne ) {
+	    if (value_eq(pv->val,vno_ligne)) {
 		pred->succ = pv->succ;
 		FREE(pv,VECTEUR,"ote_var_Liste");
 	    }
@@ -165,7 +167,7 @@ Pvecteur lvbase;
     printf(" *** recherche d'une variable de base \n");
 #endif
     if (eq != NULL) {
-	int cst = vect_coeff(TCST,eq->vecteur);
+	Value cst = vect_coeff(TCST,eq->vecteur);
 	Pvecteur pv3;
 	vect_chg_coeff(&(eq->vecteur),TCST,0);
 	pv = vect_sort(eq->vecteur, vect_compare);
@@ -200,9 +202,10 @@ Pvecteur lvbase;
 int no_ligne;
 {
     Pvecteur pv;
+    Value vno_ligne = int_to_value(no_ligne);
 
     for (pv = lvbase; 
-	 (pv!= NULL) && (pv->val != no_ligne); 
+	 (pv!= NULL) && value_ne(pv->val,vno_ligne); 
 	 pv= pv->succ);
     if (pv != NULL)
 	return (pv->var);
