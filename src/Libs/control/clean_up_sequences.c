@@ -5,10 +5,10 @@
 
    */
 
-/* 	%A% ($Date: 1997/02/04 17:18:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/05 00:36:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 1997/02/04 17:18:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_clean_up_sequences[] = "%A% ($Date: 1997/02/05 00:36:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -96,7 +96,7 @@ clean_up_sequences_rewrite(statement s)
 	    string the_comments = NULL;
 	    useful_sts = delete_sts = NIL;
 
-	    pips_assert("This statement should be labelless at commentless.",
+	    pips_assert("This statement should be labelless and commentless.",
 			statement_with_empty_comment_p(s)
 			&& unlabelled_statement_p(s));
 	    
