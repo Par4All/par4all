@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.19  1998/12/26 20:24:40  irigoin
+ * error_handler added
+ *
  * Revision 1.18  1998/09/17 11:55:25  coelho
  * error handling added when dealing with user interaction.
  *
@@ -341,7 +344,17 @@ static entity module_to_clone = entity_undefined;
 static int argument_to_clone = 0;
 static int statement_to_clone = STATEMENT_NUMBER_UNDEFINED;
 static entity clonee_to_substitute = entity_undefined;
-static bool some_cloning_performed;
+static bool some_cloning_performed = FALSE;
+
+void clone_error_handler()
+{
+    error_reset_stmt_stack();
+    module_to_clone = entity_undefined;
+    argument_to_clone = 0;
+    statement_to_clone = STATEMENT_NUMBER_UNDEFINED;
+    clonee_to_substitute = entity_undefined;
+    some_cloning_performed = FALSE;
+}
 
 /* returns if the expression is a constant, maybe thanks to the preconditions.
  */
