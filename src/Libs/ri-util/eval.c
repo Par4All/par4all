@@ -41,23 +41,29 @@ EvalExpression(expression e)
 value 
 EvalSyntax(syntax s)
 {
-	value v;
-
-	switch (syntax_tag(s)) {
-	    case is_syntax_reference:
-	    case is_syntax_range:
-		v = make_value(is_value_unknown, NIL);
-		break;
-	    case is_syntax_call:
-		v = EvalCall((syntax_call(s)));
-		break;
-	    default:
-		fprintf(stderr, "[EvalExpression] Unexpected default case %d\n",
-			syntax_tag(s));
-		abort();
-	}
-
-	return v;
+  value v;
+  
+  switch (syntax_tag(s)) {
+  case is_syntax_reference:
+  case is_syntax_range:
+    v = make_value(is_value_unknown, NIL);
+    break;
+  case is_syntax_call:
+    v = EvalCall((syntax_call(s)));
+    break;
+  case is_syntax_cast:
+    v = make_value(is_value_unknown, NIL);
+    break;
+  case is_syntax_sizeofexpression:
+    v = make_value(is_value_unknown, NIL);
+    break;
+  default:
+    fprintf(stderr, "[EvalExpression] Unexpected default case %d\n",
+	    syntax_tag(s));
+    abort();
+  }
+  
+  return v;
 }
 
 /* only calls to constant, symbolic or intrinsic functions might be
