@@ -283,8 +283,6 @@ print_out_alias_pairs( string module_name )
     return(TRUE);
 }
 
-
-/*
 bool
 print_alias_lists( string module_name )
 {
@@ -300,10 +298,7 @@ print_alias_lists( string module_name )
 
     return(TRUE);
 }
-*/
 
-
-/*
 bool
 print_alias_classes( string module_name )
 {
@@ -320,4 +315,3 @@ print_alias_classes( string module_name )
 
     return(TRUE);
 }
-*/
