@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: newgen.c,v $
+ * Revision 1.19  1998/04/14 16:01:37  coelho
+ * moved to an independent directory.
+ *
  * Revision 1.18  1998/04/14 15:27:23  coelho
  * includes added.
  *
@@ -26,7 +29,7 @@ typedef void * vertex_label;
 #include "specs.h"
 #include "all_newgen_headers.h"
 
-#include "ri-util.h"
+#include "newgen.h"
 
 void initialize_newgen()
 {
