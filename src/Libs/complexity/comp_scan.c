@@ -124,7 +124,7 @@ char *module_name;
     return TRUE;
 }
 
-void summary_complexity(module_name)
+bool summary_complexity(module_name)
 char *module_name;
 {
     complexity summary_comp = complexity_undefined;
