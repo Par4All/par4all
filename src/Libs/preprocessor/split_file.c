@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/04/11 21:45:26 $, 
+ * $Date: 1997/04/11 21:50:23 $, 
  *
  * adapted from what can be seen by FC 31/12/96
  * 
@@ -441,6 +441,8 @@ int fsplit(char * file_name, FILE *out)
  * FC 11 Apr 1997
  *
  * bugs:
+ *  - under special circonstances, the dilatation of the transformation
+ *    may lead continuations to exceed the 19 lines limit. 
  */
 
 #define isbegincomment(c) ((c)=='!' || (c)=='*' || (c)=='c' || (c)=='C')
@@ -573,6 +575,7 @@ static void hollerith(char * line)
     if (touched) {
 	int len = strlen(line); /* the new line may exceed the 72 column */
 	/* caution, len includes cr... */
+	/* the dilatation cannot exceed one line (?) */
 	if (len-1>72) /* then shift and continuation... */
 	{
 	    for (i=len; i>=72; i--) line[i+7] = line[i];
