@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: manual_accept,v $ (version $Revision$)
-# $Date: 1997/01/02 16:05:35 $, 
+# $Date: 1997/01/04 11:51:24 $, 
 #
 
 CD=$PWD
@@ -11,9 +11,9 @@ do
   if test -d $dir
   then 
     cd $dir
-    for f in *.result/test.out
+    for f in *.result/*.out
     do 
-        if [ "$f" != "*.result/test.out" ] 
+        if [ "$f" != "*.result/*.out" ] 
         then
 	    ref="`dirname $f`/`basename $f .out`"
 	    echo CONSIDERING $ref and $f
