@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/18 15:57:09 $, 
+ * $Date: 1996/06/18 15:59:09 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -37,7 +37,6 @@ static reduction
 compute_one_summary_reduction(reduction model, list /* of effect */ le)
 {
     reduction r = copy_reduction(model);
-    entity var = reduction_variable(model);
 
     /* keep the entities that are exported... 
      */
