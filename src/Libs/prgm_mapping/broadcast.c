@@ -23,7 +23,7 @@
 #include "sc.h"
 #include "polyedre.h"
 #include "union.h"
-#include "matrice.h"
+/*#include "matrice.h"   Obsolete */
 #include "matrix.h"
 
 #include "ri.h"
@@ -154,7 +154,8 @@ broadcast_of_dataflow(df, stmt, exec_domain)
   int             n,		/* Number of transformation equations */
                   m,		/* Number of englobing loops */
                   r,		/* Rank of H */
-                  det_p, det_q, i, j;
+                  i, j;
+  Value           det_p, det_q;
   predicate       new_pred,	/* Equations of broadcast vectors */
                   gov_pred;	/* Governing predicate */
   communication   comm;		/* Communication of the dataflow */
