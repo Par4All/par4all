@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/10 16:45:36 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/10 16:47:19 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -248,7 +248,7 @@ all: $(ARCH) $ALL_RULE_TARGET
 recompile: depend header all
 recompile: generate_makefile_if_necessary_and_possible
 #
-full-clean: clean-all-compiled clean
+full-clean: clean clean-all-compiled
 clean-all-compiled: 
 	-for d in $(PIPS_ALL_ARCH) ; do \\
 	  echo "cleaning \$\$d"; \\
