@@ -50,12 +50,24 @@ get_next_statement_number()
 }
 
 int
+look_at_next_statement_number()
+{
+  return stat_num;
+}
+
+int
 get_future_statement_number()
 {
   int next = stat_num+1;
   pips_assert("skip_num must be false",!skip_num);
   skip_num = TRUE;
   return next;
+}
+
+void
+decrement_statement_number()
+{
+  stat_num--;
 }
 
 /* this functions looks up in table StmtHeap for the statement s whose
@@ -200,7 +212,7 @@ string s;
 	if( name == NULL ) {
 	    name = (char *)malloc( LABEL_SIZE+strlen(LABEL_PREFIX)+1 ) ;
 	}
-	debug(5, "", "[MakeLabel] %s\n", s);
+	debug(5, "MakeLabel", "%s\n", s);
 
 	strcpy(name, LABEL_PREFIX);
 	strcat(name, s);	
@@ -210,7 +222,7 @@ string s;
 		        CurrentPackage, name);
 
 	if (entity_type(l) == type_undefined) {
-	    debug(5, "", "[MakeLabel] %s\n", name);
+	    debug(5, "MakeLabel", "%s\n", name);
 	    entity_type(l) = MakeTypeStatement();
 	    entity_storage(l) = MakeStorageRom();
 	    entity_initial(l) = make_value(is_value_constant,
@@ -234,7 +246,7 @@ instruction i;
 {
   statement s;
 
-  debug(5, "", "[MakeStatement] %s\n", entity_name(l));
+  debug(5, "MakeStatement", "%s\n", entity_name(l));
 
   pips_assert("MakeStatement", type_statement_p(entity_type(l)));
   pips_assert("MakeStatement", storage_rom_p(entity_storage(l)));
@@ -242,7 +254,7 @@ instruction i;
   pips_assert("MakeStatement", 
 	      constant_litteral_p(value_constant(entity_initial(l))));
 
-  if (strcmp(entity_local_name(l), EMPTY_LABEL_NAME) != 0) {
+  if (!entity_empty_label_p(l)) {
     if (instruction_block_p(i))
       ParserError("makeStatement", "a block must have no label\n");
 
@@ -272,9 +284,10 @@ instruction i;
       }
       else {
 	s = make_statement(l, 
-			   instruction_goto_p(i)? STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
+			   (instruction_goto_p(i)||instruction_block_p(i))?
+			   STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
-			   string_undefined, 
+			   empty_comments,
 			   i);
 	NewStmt(l, s);
       }
@@ -306,15 +319,17 @@ instruction i;
       }
       else {
 	statement_instruction(s) = i;
-	statement_number(s) = get_next_statement_number();
+	statement_number(s) = (instruction_goto_p(i)||instruction_block_p(i))?
+	  STATEMENT_NUMBER_UNDEFINED : get_next_statement_number();
       }
     }
   }
   else {
     s = make_statement(l, 
-		       instruction_goto_p(i)? STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
+		       (instruction_goto_p(i)||instruction_block_p(i))?
+		         STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
 		       STATEMENT_ORDERING_UNDEFINED,
-		       string_undefined, 
+		       empty_comments, 
 		       i);
   }
 	
@@ -328,30 +343,45 @@ statements. if i is the last instruction of the block (i and the block
 have the same label), the current block is popped from the stack. in
 fortran, one instruction migth end more than one block. */
 
-void LinkInstToCurrentBlock(i)
+void LinkInstToCurrentBlock(i, number_it)
 instruction i;
+bool number_it;
 {
     statement s;
     cons * pc;
+    entity l = MakeLabel(strdup(lab_I));
  
     if (IsBlockStackEmpty())
 	    ParserError("LinkInstToCurrentBlock", "no current block\n");
 
-    if(instruction_block_p(i)) {
+    if(instruction_block_p(i) && !entity_empty_label_p(l)) {
       /* a CONTINUE instruction must be added to carry the label,
          because blocks cannot be labelled */
-      list l = instruction_block(i);
-      statement c = MakeStatement(MakeLabel(strdup(lab_I)), 
-				  make_continue_instruction());
+      list ls = instruction_block(i);
+      statement c = MakeStatement(l, make_continue_instruction());
 
-      instruction_block(i) = CONS (STATEMENT, c, l);
-      s = MakeStatement(entity_empty_label(), i);
+      /* The above continue is not a user statement an should not be numbered */
+      /* OK, an argument could be added to MakeStatement()... */
+      decrement_statement_number();
+
+      instruction_block(i) = CONS (STATEMENT, c, ls);
+      if(number_it) {
+	/* pips_assert("Why do you want to number a block?!?", FALSE); */
+	/* OK, let's be cool and ignore this request to save the caller a test */
+	/* s = MakeStatement(entity_empty_label(), i); */
+	s = instruction_to_statement(i);
+      }
+      else
+	s = instruction_to_statement(i);
     }
     else {
       s = MakeStatement(MakeLabel(strdup(lab_I)), i);
+      if(!number_it) {
+	decrement_statement_number();
+      }
     }
 
-    if (iPrevComm != 0) {
+    if (iPrevComm != 0 && !instruction_block_p(i)) {
 	statement_comments(s) = strdup(PrevComm);
     }
 
@@ -373,7 +403,7 @@ instruction i;
 
 
 
-/* this function creatyes an empty block */
+/* this function creates an empty block */
 
 instruction MakeEmptyInstructionBlock()
 {
@@ -433,7 +463,7 @@ instruction make_goto_instruction(entity l)
     s = make_statement(l, 
 		       STATEMENT_NUMBER_UNDEFINED,
 		       STATEMENT_ORDERING_UNDEFINED,
-		       string_undefined, 
+		       empty_comments, 
 		       instruction_undefined);
     NewStmt(l, s);
   }
@@ -455,6 +485,9 @@ entity i;
 
     /* Warning: the desugaring of a computed goto generates a
      * block... wich cannot be labelled when a stament is made later
+     *
+     * But a CONTINUE is added by MakeStatement a first block statements...
+     * although the first statement of the block could carry the label.
      */
 
     DeclareVariable(i, type_undefined, NIL, storage_undefined, value_undefined);
@@ -472,12 +505,24 @@ entity i;
 			   int_to_expression(l));
 	instruction iif = make_instruction(is_instruction_test,
 					  make_test(cond,
-						    MakeStatement(MakeLabel(""), g),
+						    instruction_to_statement(g),
 						    make_empty_statement()));
 	statement s =  make_stmt_of_instr(iif);
-
+	
+	statement_number(s) = look_at_next_statement_number();
 	cs = CONS(STATEMENT, s, cs);
     }
+    /* Add a label on first statement */
+    /* This is not possible because the corresponding statement may already exist. */
+    /* Hence (at least one reason for) the spurious CONTINUE added in MakeStatement... */
+    /*
+    statement_label(STATEMENT(CAR(cs))) = MakeLabel(strdup(lab_I));
+    */
+
+    /* MakeStatement won't increment the current statement number
+     * because this is a block... so it has to be done here
+     */
+    (void) get_next_statement_number();
     ins = make_instruction_block(cs);
 
     (void) gen_consistent_p(ins);
@@ -584,7 +629,7 @@ string l;
 						    UU),
 				     NIL));
 
-    LinkInstToCurrentBlock(ido);
+    LinkInstToCurrentBlock(ido, TRUE);
    
     PushBlock(instblock_do, l);
 }
@@ -648,38 +693,46 @@ string l1, l2, l3;
 {
     expression e1, e2;
     statement s1, s2, s3, s;
-    instruction b1, b2, b3, b;
+    /* instruction b1, b2, b3, b; */
+    instruction ifarith = instruction_undefined;
+
+    /* FI: Should be improved by testing equality between l1, l2 and l3
+     * Cases observed:
+     *  l1 == l2
+     *  l2 == l3
+     *  l1 == l3
+     */
 
     e1 = MakeBinaryCall(CreateIntrinsic(".LT."), 
 			e, MakeIntegerConstantExpression("0"));
     e2 = MakeBinaryCall(CreateIntrinsic(".EQ."), 
 			e, MakeIntegerConstantExpression("0"));
 
-    s1 = MakeStatement(MakeLabel(""), MakeGotoInst(l1));
-    s2 = MakeStatement(MakeLabel(""), MakeGotoInst(l2));
-    s3 = MakeStatement(MakeLabel(""), MakeGotoInst(l3));
+    s1 = instruction_to_statement(MakeGotoInst(l1));
+    s2 = instruction_to_statement(MakeGotoInst(l2));
+    s3 = instruction_to_statement(MakeGotoInst(l3));
 
+    /*
     b1 = MakeEmptyInstructionBlock();
     instruction_block(b1) = CONS(INSTRUCTION, s1, instruction_block(b1));
     b2 = MakeEmptyInstructionBlock();
     instruction_block(b2) = CONS(INSTRUCTION, s2, instruction_block(b2));
     b3 = MakeEmptyInstructionBlock();
     instruction_block(b3) = CONS(INSTRUCTION, s3, instruction_block(b3));
+    */
 
-    s = MakeStatement(MakeLabel(""),
-		      make_instruction(is_instruction_test, 
-				       make_test(e2,
-						 MakeStatement(MakeLabel(""), 
-							       b2), 
-						 MakeStatement(MakeLabel(""),
-							       b3))));
+    s = instruction_to_statement(make_instruction(is_instruction_test, 
+						  make_test(e2,s2,s3)));
+    statement_number(s) = look_at_next_statement_number();
+
+    /*
     b = MakeEmptyInstructionBlock();
     instruction_block(b) = CONS(INSTRUCTION, s, instruction_block(b));
+    */
 
-    return(make_instruction(is_instruction_test, 
-		     make_test(e1,
-			       MakeStatement(MakeLabel(""), b1),
-			       MakeStatement(MakeLabel(""), b))));
+    ifarith = make_instruction(is_instruction_test, make_test(e1,s1,s));
+
+    return ifarith;
 }
 
 /* this function and the two next ones create a block if statement. the
@@ -708,7 +761,7 @@ int elsif;
 				   MakeStatement(MakeLabel(""), bt),
 				   MakeStatement(MakeLabel(""), bf)));
 
-    LinkInstToCurrentBlock(i);
+    LinkInstToCurrentBlock(i, TRUE);
    
     PushBlock(bt, "ELSE");
     BlockStack[CurrentBlock-1].elsifs = elsif ;
@@ -728,6 +781,11 @@ int MakeElseInst()
 
     if (strcmp("ELSE", BlockStack[CurrentBlock-1].l))
 	    FatalError("MakeElseInst", "block if statement badly nested\n");
+
+    if (iPrevComm != 0) {
+      /* generate a CONTINUE to carry the comments */
+      LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+    }
 
     (void) PopBlock();
 
@@ -750,11 +808,15 @@ void MakeEndifInst()
 	ParserError("MakeEndifInst", "unexpected ENDIF statement\n");
     }
 
+    if (iPrevComm != 0) {
+      /* generate a CONTINUE to carry the comments */
+      LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+    }
+
     if (BlockStack[CurrentBlock-1].l != NULL &&
 	strcmp("ELSE", BlockStack[CurrentBlock-1].l) == 0) {
 	elsifs = MakeElseInst();
-	LinkInstToCurrentBlock(MakeZeroOrOneArgCallInst("CONTINUE",
-							expression_undefined));
+	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
     }
     if (BlockStack[CurrentBlock-1].l == NULL ||
 	strcmp("ENDIF", BlockStack[CurrentBlock-1].l)) {
