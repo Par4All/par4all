@@ -2,17 +2,17 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.70  1997/09/13 15:37:49  coelho
+ * fixed a bug that added a blank line in the regenerated declarations.
+ * basic block data recognition added.
+ * integer data initializations also added.
+ * many functions moved as static.
+ *
  * Revision 1.69  1997/09/03 14:44:07  coelho
  * no assert.
  *
- * Revision 1.68  1997/08/04 16:56:49  coelho
- * *** empty log message ***
- *
  * Revision 1.67  1997/08/04 16:56:08  coelho
  * back to initial, because  declarations are not atomic as I thought.
- *
- * Revision 1.66  1997/08/04 13:02:08  coelho
- * *** empty log message ***
  *
  * Revision 1.65  1997/07/24 15:10:08  keryell
  * Assert added to insure no attribute on a sequence statement.
@@ -26,7 +26,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.69 1997/09/03 14:44:07 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.70 1997/09/13 15:37:49 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -56,10 +56,12 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
   *   array declarators now only appear with the type declaration, not with the
   *   area. - BC - october 196.
   * - Modification of text_entity_declaration to ensure that the OUTPUT of PIPS
-  *   can also be used as INPUT; in particular, variable declarations must appear
+  *   can also be used as INPUT; in particular, variable declarations must 
+  *   appear
   *   before common declarations. BC.
+  * - neither are DATA statements for non integers (FI/FC)
   * - Also, EQUIVALENCE statements are not generated for the moment. BC.
-  * - neither are DATA statements (FI)
+  *     Thay are now??? FC?
   */
 #include <stdlib.h>
 #include <stdio.h>
@@ -80,9 +82,12 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 #define PRETTYPRINT_UNSTRUCTURED_BEGIN_MARKER "\200Unstructured"
 #define PRETTYPRINT_UNSTRUCTURED_END_MARKER "\201Unstructured End"
 #define PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER "\202Unstructured Item"
-#define PRETTYPRINT_UNSTRUCTURED_SUCCESSOR_MARKER "\203Unstructured Successor ->"
+#define PRETTYPRINT_UNSTRUCTURED_SUCC_MARKER "\203Unstructured Successor ->"
 #define PRETTYPRINT_UNREACHABLE_EXIT_MARKER "\204Unstructured Unreachable"
 
+
+
+/********************************************************************* MISC */
 
 text empty_text(entity e, int m, statement s)
 { return( make_text(NIL));}
@@ -107,6 +112,836 @@ void close_prettyprint()
     text_statement_hook = empty_text;
 }
 
+
+/********************************************************************* WORDS */
+
+static int words_intrinsic_precedence(call);
+static int intrinsic_precedence(string);
+
+static list 
+words_parameters(entity e)
+{
+    list pc = NIL;
+    type te = entity_type(e);
+    functional fe;
+    int nparams, i;
+
+    pips_assert("words_parameters", type_functional_p(te));
+
+    fe = type_functional(te);
+    nparams = gen_length(functional_parameters(fe));
+
+    for (i = 1; i <= nparams; i++) {
+	entity param = find_ith_parameter(e, i);
+
+	if (pc != NIL) {
+	    pc = CHAIN_SWORD(pc, ",");
+	}
+
+	pc = CHAIN_SWORD(pc, entity_local_name(param));
+    }
+
+    return(pc);
+}
+
+
+/* This function is added by LZ
+ * 21/10/91
+ * extended to cope with PRETTYPRINT_HPFC 
+ */
+
+static list 
+words_dimension(dimension obj)
+{
+    list pc;
+
+    pc = words_expression(dimension_lower(obj));
+    pc = CHAIN_SWORD(pc,":");
+    pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
+
+    return(pc);
+}
+
+/* some compilers don't like dimensions that are declared twice.
+ * this is the case of g77 used after hpfc. thus I added a
+ * flag not to prettyprint again the dimensions of common variables. FC.
+ *
+ * It is in the standard that dimensions cannot be declared twice in a 
+ * single module. BC.
+ */
+list 
+words_declaration(
+    entity e,
+    bool prettyprint_common_variable_dimensions_p)
+{
+    list pl = NIL;
+    pl = CHAIN_SWORD(pl, entity_local_name(e));
+
+    if (type_variable_p(entity_type(e)))
+    {
+	if (!((variable_in_common_p(e) || variable_static_p(e)) &&
+	      !prettyprint_common_variable_dimensions_p))
+	{
+	    if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
+	    {
+		list dims = variable_dimensions(type_variable(entity_type(e)));
+	
+		pl = CHAIN_SWORD(pl, "(");
+
+		MAPL(pd, 
+		{
+		    pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
+		    if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, ",");
+		}, 
+		    dims);
+	
+		pl = CHAIN_SWORD(pl, ")");
+	    }
+	}
+    }
+    
+    attach_declaration_to_words(pl, e);
+
+    return(pl);
+}
+
+static list 
+words_constant(constant obj)
+{
+    list pc;
+
+    pc=NIL;
+
+    if (constant_int_p(obj)) {
+	pc = CHAIN_IWORD(pc,constant_int(obj));
+    }
+    else {
+	pips_internal_error("unexpected tag");
+    }
+
+    return(pc);
+}
+
+static list 
+words_value(value obj)
+{
+    list pc;
+
+    if (value_symbolic_p(obj)) {
+	pc = words_constant(symbolic_constant(value_symbolic(obj)));
+    }
+    else if (value_constant(obj)) {
+	pc = words_constant(value_constant(obj));
+    }
+    else {
+	pips_internal_error("unexpected tag");
+	pc = NIL;
+    }
+
+    return(pc);
+}
+
+static list 
+words_basic(basic obj)
+{
+    list pc = NIL;
+
+    if (basic_int_p(obj)) {
+	pc = CHAIN_SWORD(pc,"INTEGER*");
+	pc = CHAIN_IWORD(pc,basic_int(obj));
+    }
+    else if (basic_float_p(obj)) {
+	pc = CHAIN_SWORD(pc,"REAL*");
+	pc = CHAIN_IWORD(pc,basic_float(obj));
+    }
+    else if (basic_logical_p(obj)) {
+	pc = CHAIN_SWORD(pc,"LOGICAL*");
+	pc = CHAIN_IWORD(pc,basic_logical(obj));
+    }
+    else if (basic_overloaded_p(obj)) {
+	pc = CHAIN_SWORD(pc,"OVERLOADED");
+    }
+    else if (basic_complex_p(obj)) {
+	pc = CHAIN_SWORD(pc,"COMPLEX*");
+	pc = CHAIN_IWORD(pc,basic_complex(obj));
+    }
+    else if (basic_string_p(obj)) {
+	pc = CHAIN_SWORD(pc,"STRING*(");
+	pc = gen_nconc(pc, words_value(basic_string(obj)));
+	pc = CHAIN_SWORD(pc,")");
+    }
+    else {
+	pips_error("words_basic", "unexpected tag");
+    }
+
+    return(pc);
+}
+
+/* exported for craft 
+ */
+list 
+words_loop_range(range obj)
+{
+    list pc;
+    call c = syntax_call(expression_syntax(range_increment(obj)));
+
+    pc = words_subexpression(range_lower(obj), 0);
+    pc = CHAIN_SWORD(pc,", ");
+    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0));
+    if (/*  expression_constant_p(range_increment(obj)) && */
+	 strcmp( entity_local_name(call_function(c)), "1") == 0 )
+	return(pc);
+    pc = CHAIN_SWORD(pc,", ");
+    pc = gen_nconc(pc, words_expression(range_increment(obj)));
+
+    return(pc);
+}
+
+list /* of string */ 
+words_range(range obj)
+{
+    list pc = NIL ;
+
+    /* if undefined I print a star, why not!? */
+    if (expression_undefined_p(range_lower(obj)))
+	return CONS(STRING, MAKE_SWORD("*"), NIL);
+    /* else */
+    pc = CHAIN_SWORD(pc,"(/I,I=");
+    pc = gen_nconc(pc, words_expression(range_lower(obj)));
+    pc = CHAIN_SWORD(pc,",");
+    pc = gen_nconc(pc, words_expression(range_upper(obj)));
+    pc = CHAIN_SWORD(pc,",");
+    pc = gen_nconc(pc, words_expression(range_increment(obj)));
+    pc = CHAIN_SWORD(pc,"/)") ;
+
+    return(pc);
+}
+
+/* exported for expression.c
+ */
+list 
+words_reference(reference obj)
+{
+    list pc = NIL;
+    string begin_attachment;
+    
+    entity e = reference_variable(obj);
+
+    pc = CHAIN_SWORD(pc, entity_local_name(e));
+    begin_attachment = STRING(CAR(pc));
+    
+    if (reference_indices(obj) != NIL) {
+	pc = CHAIN_SWORD(pc,"(");
+	MAPL(pi, {
+	    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(pi)), 0));
+	    if (CDR(pi) != NIL)
+		pc = CHAIN_SWORD(pc,",");
+	}, reference_indices(obj));
+	pc = CHAIN_SWORD(pc,")");
+    }
+    attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
+				  obj);
+
+    return(pc);
+}
+
+static list 
+words_label_name(string s)
+{
+    return(CHAIN_SWORD(NIL, local_name(s)+strlen(LABEL_PREFIX))) ;
+}
+
+list 
+words_regular_call(call obj)
+{
+    list pc = NIL;
+
+    entity f = call_function(obj);
+    value i = entity_initial(f);
+    type t = entity_type(f);
+    
+    if (call_arguments(obj) == NIL) {
+	if (type_statement_p(t))
+	    return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
+	if (value_constant_p(i)||value_symbolic_p(i))
+	    return(CHAIN_SWORD(pc, entity_local_name(f)));
+    }
+
+    if (type_void_p(functional_result(type_functional(t)))) {
+	pc = CHAIN_SWORD(pc, "CALL ");
+    }
+
+    pc = CHAIN_SWORD(pc, entity_local_name(f));
+
+    if( !ENDP( call_arguments(obj))) {
+	pc = CHAIN_SWORD(pc, "(");
+	MAPL(pa, {
+	    pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pa))));
+	    if (CDR(pa) != NIL)
+		    pc = CHAIN_SWORD(pc, ", ");
+	}, call_arguments(obj));
+	pc = CHAIN_SWORD(pc, ")");
+    }
+    else if(!type_void_p(functional_result(type_functional(t)))) {
+	pc = CHAIN_SWORD(pc, "()");
+    }
+    return(pc);
+}
+
+static list 
+words_assign_op(call obj, int precedence)
+{
+    list pc = NIL;
+    list args = call_arguments(obj);
+    int prec = words_intrinsic_precedence(obj);
+
+    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)),  prec));
+    pc = CHAIN_SWORD(pc, " = ");
+    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec));
+
+    return(pc);
+}
+
+static list 
+words_substring_op(call obj, int precedence)
+{
+  /* The substring function call is reduced to a syntactic construct */
+    list pc = NIL;
+    expression r = expression_undefined;
+    expression l = expression_undefined;
+    expression u = expression_undefined;
+    /* expression e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj)))))); */
+    int prec = words_intrinsic_precedence(obj);
+
+    pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 3 || 
+		gen_length(call_arguments(obj)) == 4);
+
+    r = EXPRESSION(CAR(call_arguments(obj)));
+    l = EXPRESSION(CAR(CDR(call_arguments(obj))));
+    u = EXPRESSION(CAR(CDR(CDR(call_arguments(obj)))));
+
+    pc = gen_nconc(pc, words_subexpression(r,  prec));
+    pc = CHAIN_SWORD(pc, "(");
+    pc = gen_nconc(pc, words_subexpression(l, prec));
+    pc = CHAIN_SWORD(pc, ":");
+    pc = gen_nconc(pc, words_subexpression(u, prec));
+    pc = CHAIN_SWORD(pc, ")");
+
+    return(pc);
+}
+
+static list 
+words_assign_substring_op(call obj, int precedence)
+{
+  /* The assign substring function call is reduced to a syntactic construct */
+    list pc = NIL;
+    expression e = expression_undefined;
+    int prec = words_intrinsic_precedence(obj);
+
+    pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 4);
+
+    e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj))))));
+
+    pc = gen_nconc(pc, words_substring_op(obj,  prec));
+    pc = CHAIN_SWORD(pc, " = ");
+    pc = gen_nconc(pc, words_subexpression(e, prec));
+
+    return(pc);
+}
+
+static list 
+words_nullary_op(call obj, int precedence)
+{
+    list pc = NIL;
+
+    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+
+    return(pc);
+}
+
+static list 
+words_io_control(list *iol, int precedence)
+{
+    list pc = NIL;
+    list pio = *iol;
+
+    while (pio != NIL) {
+	syntax s = expression_syntax(EXPRESSION(CAR(pio)));
+	call c;
+
+	if (! syntax_call_p(s)) {
+	    pips_error("words_io_control", "call expected");
+	}
+
+	c = syntax_call(s);
+
+	if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
+	    *iol = CDR(pio);
+	    return(pc);
+	}
+
+	if (pc != NIL)
+	    pc = CHAIN_SWORD(pc, ",");
+	
+	pc = CHAIN_SWORD(pc, entity_local_name(call_function(c)));
+	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(CDR(pio)))));
+
+	pio = CDR(CDR(pio));
+    }
+
+    if (pio != NIL)
+	    pips_error("words_io_control", "bad format");
+
+    *iol = NIL;
+
+    return(pc);
+}
+
+static list 
+words_implied_do(call obj, int precedence)
+{
+    list pc = NIL;
+
+    list pcc;
+    expression index;
+    syntax s;
+    range r;
+
+    pcc = call_arguments(obj);
+    index = EXPRESSION(CAR(pcc));
+
+    pcc = CDR(pcc);
+    s = expression_syntax(EXPRESSION(CAR(pcc)));
+    if (! syntax_range_p(s)) {
+	pips_error("words_implied_do", "range expected");
+    }
+    r = syntax_range(s);
+
+    pc = CHAIN_SWORD(pc, "(");
+    MAPL(pcp, {
+	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pcp))));
+	if (CDR(pcp) != NIL)
+	    pc = CHAIN_SWORD(pc, ",");
+    }, CDR(pcc));
+    pc = CHAIN_SWORD(pc, ", ");
+
+    pc = gen_nconc(pc, words_expression(index));
+    pc = CHAIN_SWORD(pc, " = ");
+    pc = gen_nconc(pc, words_loop_range(r));
+    pc = CHAIN_SWORD(pc, ")");
+
+    return(pc);
+}
+
+static list 
+words_unbounded_dimension(call obj, int precedence)
+{
+    list pc = NIL;
+
+    pc = CHAIN_SWORD(pc, "*");
+
+    return(pc);
+}
+
+static list 
+words_list_directed(call obj, int precedence)
+{
+    list pc = NIL;
+
+    pc = CHAIN_SWORD(pc, "*");
+
+    return(pc);
+}
+
+static list 
+words_io_inst(call obj, int precedence)
+{
+    list pc = NIL;
+    list pcio = call_arguments(obj);
+    list pio_write = pcio;
+    boolean good_fmt = FALSE;
+    bool good_unit = FALSE;
+    bool iolist_reached = FALSE;
+    bool complex_io_control_list = FALSE;
+    list fmt_words = NIL;
+    list unit_words = NIL;
+    string called = entity_local_name(call_function(obj));
+    
+    /* AP: I try to convert WRITE to PRINT. Three conditions must be
+       fullfilled. The first, and obvious, one, is that the function has
+       to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
+       "UNIT" has to be equal either to "*" or "6".  In such case,
+       "WRITE(*,*)" is replaced by "PRINT *,". */
+    /* GO: Not anymore for UNIT=6 leave it ... */
+      while ((pio_write != NIL) && (!iolist_reached)) {
+	syntax s = expression_syntax(EXPRESSION(CAR(pio_write)));
+	call c;
+	expression arg = EXPRESSION(CAR(CDR(pio_write)));
+
+	if (! syntax_call_p(s)) {
+	    pips_error("words_io_inst", "call expected");
+	}
+
+	c = syntax_call(s);
+	if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
+	   good_fmt = strcmp
+	       (STRING(CAR(fmt_words = words_expression(arg))), "*")==0;
+	   pio_write = CDR(CDR(pio_write));
+	}
+	else if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
+	    good_unit = strcmp
+		(STRING(CAR(unit_words = words_expression(arg))), "*")==0;
+	    pio_write = CDR(CDR(pio_write));
+	}
+	else if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
+	  iolist_reached = TRUE;
+	  pio_write = CDR(pio_write);
+	}
+	else {
+	    complex_io_control_list = TRUE;
+	  pio_write = CDR(CDR(pio_write));
+	}
+      }
+
+    if (good_fmt && good_unit && same_string_p(called, "WRITE"))
+    {
+	/* WRITE (*,*) -> PRINT * */
+
+       if (pio_write != NIL) /* WRITE (*,*) pio -> PRINT *, pio */
+       {
+          pc = CHAIN_SWORD(pc, "PRINT *, ");
+       }
+       else     /* WRITE (*,*)  -> PRINT *  */
+       {
+          pc = CHAIN_SWORD(pc, "PRINT * ");
+       }
+       
+       pcio = pio_write;
+    }
+    else if (good_fmt && good_unit && same_string_p(called, "READ"))
+    {
+       /* READ (*,*) -> READ * */
+	
+       if (pio_write != NIL) /* READ (*,*) pio -> READ *, pio */
+       {
+          pc = CHAIN_SWORD(pc, "READ *, ");
+       }
+       else   /* READ (*,*)  -> READ *  */
+       {
+          pc = CHAIN_SWORD(pc, "READ * ");
+       }
+       pcio = pio_write;
+    }	
+    else if(!complex_io_control_list) {
+	pips_assert("A unit must be defined", !ENDP(unit_words));
+      pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+      pc = CHAIN_SWORD(pc, " (");
+      pc = gen_nconc(pc, unit_words);
+      if(!ENDP(fmt_words)) {
+	  pc = CHAIN_SWORD(pc, ", ");
+	  pc = gen_nconc(pc, fmt_words);
+      }
+      pc = CHAIN_SWORD(pc, ") ");
+      pcio = pio_write;
+    }
+    else {
+      pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+      pc = CHAIN_SWORD(pc, " (");
+      /* FI: missing argument; I use "precedence" because I've no clue;
+         see LZ */
+      pc = gen_nconc(pc, words_io_control(&pcio, precedence));
+      pc = CHAIN_SWORD(pc, ") ");
+      /* 
+	free_words(unit_words);
+	free_words(fmt_words);
+      */
+    }
+
+    /* because the "IOLIST=" keyword is embedded in the list
+       and because the first IOLIST= has already been skipped,
+       only odd elements are printed */
+    MAPL(pp, {
+	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pp))));
+
+	if (CDR(pp) != NIL) {
+	    POP(pp);
+	    if(pp==NIL) 
+		pips_error("words_io_inst","missing element in IO list");
+	    pc = CHAIN_SWORD(pc, ", ");
+	}
+    }, pcio);
+    return(pc) ;
+}
+
+static list 
+null(call obj, int precedence)
+{
+    return(NIL);
+}
+
+static list
+words_prefix_unary_op(call obj, int precedence)
+{
+    list pc = NIL;
+    expression e = EXPRESSION(CAR(call_arguments(obj)));
+    int prec = words_intrinsic_precedence(obj);
+
+    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+    pc = gen_nconc(pc, words_subexpression(e, prec));
+
+    return(pc);
+}
+
+static list 
+words_unary_minus(call obj, int precedence)
+{
+    list pc = NIL;
+    expression e = EXPRESSION(CAR(call_arguments(obj)));
+    int prec = words_intrinsic_precedence(obj);
+
+    if ( prec < precedence )
+	pc = CHAIN_SWORD(pc, "(");
+    pc = CHAIN_SWORD(pc, "-");
+    pc = gen_nconc(pc, words_subexpression(e, prec));
+    if ( prec < precedence )
+	pc = CHAIN_SWORD(pc, ")");
+
+    return(pc);
+}
+
+list /* of string */
+words_goto_label(string tlabel)
+{
+    list pc = NIL;
+    if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
+	pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
+    }
+    else {
+	pc = CHAIN_SWORD(pc, "GOTO ");
+	pc = CHAIN_SWORD(pc, tlabel);
+    }
+    return pc;
+}
+
+/* 
+ * If the infix operator is either "-" or "/", I perfer not to delete 
+ * the parentheses of the second expression.
+ * Ex: T = X - ( Y - Z ) and T = X / (Y*Z)
+ *
+ * Lei ZHOU       Nov. 4 , 1991
+ */
+static list 
+words_infix_binary_op(call obj, int precedence)
+{
+    list pc = NIL;
+    list args = call_arguments(obj);
+    int prec = words_intrinsic_precedence(obj);
+    list we1 = words_subexpression(EXPRESSION(CAR(args)), prec);
+    list we2;
+
+    if ( strcmp(entity_local_name(call_function(obj)), "/") == 0 )
+	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), 100);
+    else if ( strcmp(entity_local_name(call_function(obj)), "-") == 0 ) {
+	expression exp = EXPRESSION(CAR(CDR(args)));
+	if ( expression_call_p(exp) &&
+	     words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >= 
+	     intrinsic_precedence("*") )
+	    /* precedence is greter than * or / */
+	    we2 = words_subexpression(exp, prec);
+	else
+	    we2 = words_subexpression(exp, 100);
+    }
+    else
+	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec);
+
+    
+    if ( prec < precedence )
+	pc = CHAIN_SWORD(pc, "(");
+    pc = gen_nconc(pc, we1);
+    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+    pc = gen_nconc(pc, we2);
+    if ( prec < precedence )
+	pc = CHAIN_SWORD(pc, ")");
+
+    return(pc);
+}
+
+/* precedence needed here
+ * According to the Precedence of Operators 
+ * Arithmetic > Character > Relational > Logical
+ * Added by Lei ZHOU    Nov. 4,91
+ */
+struct intrinsic_handler {
+    char * name;
+    list (*f)();
+    int prec;
+} tab_intrinsic_handler[] = {
+    {"**", words_infix_binary_op, 30},
+
+    {"//", words_infix_binary_op, 30},
+
+    {"--", words_unary_minus, 25},
+
+    {"*", words_infix_binary_op, 21},
+    {"/", words_infix_binary_op, 21},
+
+    {"+", words_infix_binary_op, 20},
+    {"-", words_infix_binary_op, 20},
+
+
+    {".LT.", words_infix_binary_op, 15},
+    {".GT.", words_infix_binary_op, 15},
+    {".LE.", words_infix_binary_op, 15},
+    {".GE.", words_infix_binary_op, 15},
+    {".EQ.", words_infix_binary_op, 15},
+    {".NE.", words_infix_binary_op, 15},
+
+    {".NOT.", words_prefix_unary_op, 9},
+
+    {".AND.", words_infix_binary_op, 8},
+
+    {".OR.", words_infix_binary_op, 6},
+
+    {".EQV.", words_infix_binary_op, 3},
+    {".NEQV.", words_infix_binary_op, 3},
+
+    {"=", words_assign_op, 1},
+
+    {"WRITE", words_io_inst, 0},
+    {"READ", words_io_inst, 0},
+    {"PRINT", words_io_inst, 0},
+    {"OPEN", words_io_inst, 0},
+    {"CLOSE", words_io_inst, 0},
+    {"INQUIRE", words_io_inst, 0},
+    {"BACKSPACE", words_io_inst, 0},
+    {"REWIND", words_io_inst, 0},
+    {"ENDFILE", words_io_inst, 0},
+    {"IMPLIED-DO", words_implied_do, 0},
+
+    {RETURN_FUNCTION_NAME, words_nullary_op, 0},
+    {"PAUSE", words_nullary_op, 0},
+    {"STOP", words_nullary_op, 0},
+    {"CONTINUE", words_nullary_op, 0},
+    {"END", words_nullary_op, 0},
+    {FORMAT_FUNCTION_NAME, words_prefix_unary_op, 0},
+    {UNBOUNDED_DIMENSION_NAME, words_unbounded_dimension, 0},
+    {LIST_DIRECTED_FORMAT_NAME, words_list_directed, 0},
+
+    {SUBSTRING_FUNCTION_NAME, words_substring_op, 0},
+    {ASSIGN_SUBSTRING_FUNCTION_NAME, words_assign_substring_op, 0},
+
+    {NULL, null, 0}
+};
+
+static list 
+words_intrinsic_call(call obj, int precedence)
+{
+    struct intrinsic_handler *p = tab_intrinsic_handler;
+    char *n = entity_local_name(call_function(obj));
+
+    while (p->name != NULL) {
+	if (strcmp(p->name, n) == 0) {
+	    return((*(p->f))(obj, precedence));
+	}
+	p++;
+    }
+
+    return(words_regular_call(obj));
+}
+
+static int 
+intrinsic_precedence(string n)
+{
+    struct intrinsic_handler *p = tab_intrinsic_handler;
+
+    while (p->name != NULL) {
+	if (strcmp(p->name, n) == 0) {
+	    return(p->prec);
+	}
+	p++;
+    }
+
+    return(0);
+}
+
+static int
+words_intrinsic_precedence(call obj)
+{
+    char *n = entity_local_name(call_function(obj));
+
+    return(intrinsic_precedence(n));
+}
+
+/* exported for cmfortran.c
+ */
+list 
+words_call(
+    call obj,
+    int precedence)
+{
+    list pc;
+
+    entity f = call_function(obj);
+    value i = entity_initial(f);
+    
+    pc = (value_intrinsic_p(i)) ? words_intrinsic_call(obj, precedence) : 
+	                          words_regular_call(obj);
+
+    return(pc);
+}
+
+/* exported for expression.c 
+ */
+list 
+words_syntax(syntax obj)
+{
+    list pc;
+
+    if (syntax_reference_p(obj)) {
+	pc = words_reference(syntax_reference(obj));
+    }
+    else if (syntax_range_p(obj)) {
+	pc = words_range(syntax_range(obj));
+    }
+    else if (syntax_call_p(obj)) {
+	pc = words_call(syntax_call(obj), 0);
+    }
+    else {
+	pips_error("words_syntax", "tag inconnu");
+	pc = NIL;
+    }
+
+    return(pc);
+}
+
+/* this one is exported. */
+list /* of string */
+words_expression(expression obj)
+{
+    return words_syntax(expression_syntax(obj));
+}
+
+/* exported for cmfortran.c 
+ */
+list 
+words_subexpression(
+    expression obj,
+    int precedence)
+{
+    list pc;
+    
+    if ( expression_call_p(obj) )
+	pc = words_call(syntax_call(expression_syntax(obj)), precedence);
+    else 
+	pc = words_syntax(expression_syntax(obj));
+    
+    return pc;
+}
+
+
+/**************************************************************** SENTENCE */
+
+
 /* We have no way to distinguish between the SUBROUTINE and PROGRAM
  * They two have almost the same properties.
  * For the time being, especially for the PUMA project, we have a temporary
@@ -115,34 +950,44 @@ void close_prettyprint()
  * Lei ZHOU 18/10/91
  *
  * correct PROGRAM and SUBROUTINE distinction added, FC 18/08/94
+ * approximate BLOCK DATA / SUBROUTINE distinction also added. FC 09/97
  */
-sentence sentence_head(e)
-entity e;
+static sentence 
+sentence_head(entity e, statement stat)
 {
-    cons *pc = NIL;
+    list pc = NIL;
     type te = entity_type(e);
     functional fe;
     type tr;
-    cons *args = words_parameters(e);
+    list args = words_parameters(e);
 
-    pips_assert("sentence_head", type_functional_p(te));
+    pips_assert("is functionnal", type_functional_p(te));
 
     fe = type_functional(te);
     tr = functional_result(fe);
-
     
     if (type_void_p(tr)) 
     {
-	/* the condition was ENDP(args) */
-	pc = CHAIN_SWORD(pc, entity_main_module_p(e) ? 
-			 "PROGRAM " : "SUBROUTINE ");
+	if (entity_main_module_p(e))
+	    pc = CHAIN_SWORD(pc, "PROGRAM ");
+	else
+	{
+	    if (ENDP(args) && empty_code_p(stat))
+		/* this is quite approximated. should be encoded somewhere.
+		 * if you have an empty sunroutine with no arg, it is going
+		 * to be considered as a block data.
+		 */
+		pc = CHAIN_SWORD(pc, "BLOCKDATA ");
+	    else
+		pc = CHAIN_SWORD(pc, "SUBROUTINE ");
+	}
     }
     else if (type_variable_p(tr)) {
 	pc = gen_nconc(pc, words_basic(variable_basic(type_variable(tr))));
 	pc = CHAIN_SWORD(pc, " FUNCTION ");
     }
     else {
-	pips_error("sentence_head", "unexpected type for result\n");
+	pips_internal_error("unexpected type for result\n");
     }
     pc = CHAIN_SWORD(pc, module_local_name(e));
 
@@ -155,15 +1000,16 @@ entity e;
 			 make_unformatted(NULL, 0, 0, pc)));
 }
 
-sentence sentence_tail()
+sentence 
+sentence_tail(void)
 {
     return(MAKE_ONE_WORD_SENTENCE(0, "END"));
 }
 
-sentence sentence_variable(e)
-entity e;
+sentence 
+sentence_variable(entity e)
 {
-    cons *pc = NIL;
+    list pc = NIL;
     type te = entity_type(e);
 
     pips_assert("sentence_variable", type_variable_p(te));
@@ -180,8 +1026,8 @@ entity e;
 /*  special management of empty commons added.
  *  this may happen in the hpfc generated code.
  */
-sentence sentence_area(e, module)
-entity e, module;
+static sentence 
+sentence_area(entity e, entity module)
 {
     string area_name = entity_local_name(e);
     type te = entity_type(e);
@@ -190,8 +1036,8 @@ entity e, module;
 	pc = NIL,
 	entities = NIL;
 
-    if (dynamic_area_p(e))
-	return(make_sentence(is_sentence_formatted, strdup("")));
+    if (dynamic_area_p(e)) /* shouldn't get in? */
+	return sentence_undefined;
 
     assert(type_area_p(te));
 
@@ -247,56 +1093,39 @@ entity e, module;
 }
 
 sentence 
-sentence_goto(module, label, margin, obj, n)
-entity module;
-string label;
-int margin;
-statement obj;
-int n;
-{
-    string tlabel = entity_local_name(statement_label(obj)) + 
-	           strlen(LABEL_PREFIX);
-
-    return( sentence_goto_label(module, label, margin, tlabel, n)) ;
-}
-
-sentence 
-sentence_goto_label(module, label, margin, tlabel, n)
-entity module;
-string label;
-int margin;
-string tlabel;
-int n;
+sentence_goto_label(
+    entity module,
+    string label,
+    int margin,
+    string tlabel,
+    int n)
 {
     list pc = words_goto_label(tlabel);
 
-
     return(make_sentence(is_sentence_unformatted, 
-			 make_unformatted(label?strdup(label):NULL, n, margin, pc)));
+	    make_unformatted(label?strdup(label):NULL, n, margin, pc)));
 }
 
-list 
-words_goto_label(string tlabel)
+static sentence 
+sentence_goto(
+    entity module,
+    string label,
+    int margin,
+    statement obj,
+    int n)
 {
-    cons *pc = NIL;
-    if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
-	pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
-    }
-    else {
-	pc = CHAIN_SWORD(pc, "GOTO ");
-	pc = CHAIN_SWORD(pc, tlabel);
-    }
-    return pc;
+    string tlabel = entity_local_name(statement_label(obj)) + 
+	           strlen(LABEL_PREFIX);
+    return sentence_goto_label(module, label, margin, tlabel, n);
 }
 
-sentence 
-sentence_basic_declaration(e)
-entity e;
+static sentence 
+sentence_basic_declaration(entity e)
 {
     list decl = NIL;
     basic b = entity_basic(e);
 
-    pips_assert("sentence_basic_declaration", !basic_undefined_p(b));
+    pips_assert("b is defined", !basic_undefined_p(b));
 
     decl = CHAIN_SWORD(decl, basic_to_string(b));
     decl = CHAIN_SWORD(decl, " ");
@@ -306,9 +1135,8 @@ entity e;
 			 make_unformatted(NULL, 0, 0, decl)));
 }
 
-sentence 
-sentence_external(f)
-entity f;
+static sentence 
+sentence_external(entity f)
 {
     list pc = NIL;
 
@@ -319,11 +1147,10 @@ entity f;
 			 make_unformatted(NULL, 0, 0, pc)));
 }
 
-sentence 
-sentence_symbolic(f)
-entity f;
+static sentence 
+sentence_symbolic(entity f)
 {
-    cons *pc = NIL;
+    list pc = NIL;
     value vf = entity_initial(f);
     expression e = symbolic_expression(value_symbolic(vf));
 
@@ -337,10 +1164,12 @@ entity f;
 			 make_unformatted(NULL, 0, 0, pc)));
 }
 
-sentence sentence_data(e)
-entity e;
+/* why is it assumed that the constant is an int ??? 
+ */
+static sentence 
+sentence_data(entity e)
 {
-    cons *pc = NIL;
+    list pc = NIL;
     constant c;
 
     if (! value_constant_p(entity_initial(e)))
@@ -360,6 +1189,9 @@ entity e;
     return(make_sentence(is_sentence_unformatted, 
 			 make_unformatted(NULL, 0, 0, pc)));
 }
+
+
+/********************************************************************* TEXT */
 
 #define ADD_WORD_LIST_TO_TEXT(t, l)\
   if (!ENDP(l)) ADD_SENTENCE_TO_TEXT(t,\
@@ -528,7 +1360,8 @@ text_equivalence_class(list /* of entities */ l_equiv)
 	ent2 = ENTITY(CAR(l2));
 	offset2 = ram_offset(storage_ram(entity_storage(ent2)));
 	
-	pips_debug(EQUIV_DEBUG, "dealing with: %s %s\n", entity_local_name(ent1),
+	pips_debug(EQUIV_DEBUG, "dealing with: %s %s\n",
+		   entity_local_name(ent1),
 		   entity_local_name(ent2));
 	
 	/* If the two variables have the same offset, their
@@ -583,12 +1416,14 @@ text_equivalence_class(list /* of entities */ l_equiv)
 		int dim_max = NumberOfDimension(ent1);		    
 		int size_elt_1 = SizeOfElements(
 		    variable_basic(type_variable(entity_type(ent1))));
-		list l_tmp = variable_dimensions(type_variable(entity_type(ent1)));
+		list l_tmp = variable_dimensions
+		    (type_variable(entity_type(ent1)));
 		normalized nlo;
 		Pvecteur pvlo;
 		    
 		pips_debug(EQUIV_DEBUG, "third case\n");
-		pips_debug(EQUIV_DEBUG, "offset=%d, dim_max=%d, size_elt_1=%d\n",
+		pips_debug(EQUIV_DEBUG, 
+			   "offset=%d, dim_max=%d, size_elt_1=%d\n",
 			   offset, dim_max,size_elt_1);
 				
 		if (! first)
@@ -600,7 +1435,8 @@ text_equivalence_class(list /* of entities */ l_equiv)
 		lw = CHAIN_SWORD(lw, "(");
 		
 		pips_assert("partial association case not implemented:\n"
-			    "offset % size_elt_1 == 0", (offset % size_elt_1) == 0);
+			    "offset % size_elt_1 == 0",
+			    (offset % size_elt_1) == 0);
 		
 		offset = offset/size_elt_1;
 		current_dim = 1;
@@ -619,7 +1455,7 @@ text_equivalence_class(list /* of entities */ l_equiv)
 		    nlo = NORMALIZE_EXPRESSION(dimension_lower(dim));
 		    pvlo = normalized_linear(nlo);
 		    
-		    pips_assert("", vect_constant_p(pvlo));			
+		    pips_assert("sg", vect_constant_p(pvlo));			
 		    pips_debug(EQUIV_DEBUG,
 			       "size=%d, rest=%d, offset=%d, lower_bound=%d\n",
 			       size, rest, offset, VALUE_TO_INT(val_of(pvlo)));
@@ -657,7 +1493,7 @@ text_equivalence_class(list /* of entities */ l_equiv)
  * modifies : nothing
  * comment  :
  */
-text 
+static text 
 text_equivalences(entity module, list ldecl)
 {
     list equiv_classes = NIL, l_tmp;
@@ -670,101 +1506,106 @@ text_equivalences(entity module, list ldecl)
     pips_debug(EQUIV_DEBUG, "loop on declarations\n");
     /* consider each entity in the declaration */
     MAP(ENTITY, e,
+    {
+	/* but only variables which have a ram storage must be considered
+	 */
+	if (type_variable_p(entity_type(e)) && 
+	    storage_ram_p(entity_storage(e)))
 	{
-	    /* but only variables which have a ram storage must be considered */
-	    if (type_variable_p(entity_type(e)) && storage_ram_p(entity_storage(e)))
+	    list l_shared = ram_shared(storage_ram(entity_storage(e)));
+	    
+	    ifdebug(EQUIV_DEBUG)
 	    {
-		list l_shared = ram_shared(storage_ram(entity_storage(e)));
+		pips_debug(1, "considering entity: %s\n", 
+			   entity_local_name(e));
+		pips_debug(1, "shared variables:\n");
+		equiv_class_debug(l_shared);
+	    }
+	    
+	    /* If this variable is statically aliased */
+	    if (!ENDP(l_shared))
+	    {
+		bool found = FALSE;
+		list found_equiv_class = NIL;
 		
-		ifdebug(EQUIV_DEBUG)
+		/* We first look in already found equivalence classes
+		 * if there is already a class in which one of the
+		 * aliased variables appears 
+		 */
+		MAP(LIST, equiv_class,
 		{
-		    pips_debug(1, "considering entity: %s\n", entity_local_name(e));
-		    pips_debug(1, "shared variables:\n");
-		    equiv_class_debug(l_shared);
-		}
-
-		/* If this variable is statically aliased */
-		if (!ENDP(l_shared))
-		{
-		    bool found = FALSE;
-		    list found_equiv_class = NIL;
-
-		    /* We first look in already found equivalence classes
-		     * if there is already a class in which one of the
-		     * aliased variables appears 
-		     */
-		    MAP(LIST, equiv_class,
+		    ifdebug(EQUIV_DEBUG)
+		    {
+			pips_debug(1, "considering equivalence class:\n");
+			equiv_class_debug(equiv_class);
+		    }
+		    
+		    MAP(ENTITY, ent,
+		    {
+			if (variable_in_list_p(ent, equiv_class))
 			{
-			    ifdebug(EQUIV_DEBUG)
-			    {
-				pips_debug(1, "considering equivalence class:\n");
-				equiv_class_debug(equiv_class);
-			    }
-
-			    MAP(ENTITY, ent,
-				{
-				    if (variable_in_list_p(ent, equiv_class))
-				    {
-					found = TRUE;
-					found_equiv_class = equiv_class;
-					break;
-				    }
-				}, l_shared);
-
-			    if (found) break;			    
-			}, equiv_classes);
-
-		    if (found)
+			    found = TRUE;
+			    found_equiv_class = equiv_class;
+			    break;
+			}
+		    }, l_shared);
+		    
+		    if (found) break;			    
+		}, equiv_classes);
+		
+		if (found)
+		{
+		    pips_debug(EQUIV_DEBUG, "already there\n");
+		    /* add the entities of shared which are not already in 
+		     * the existing equivalence class. Useful ??
+		     */
+		    MAP(ENTITY, ent,
 		    {
-			pips_debug(EQUIV_DEBUG, "already there\n");
-			/* add the entities of shared which are not already in 
-			 * the existing equivalence class. Useful ??
-			 */
-			MAP(ENTITY, ent,
-			    {
-				if(!variable_in_list_p(ent, found_equiv_class))
-				    found_equiv_class =
-					gen_nconc(found_equiv_class,
-						  CONS(ENTITY, ent, NIL));
-			    }, l_shared)
-		    }
-		    else
+			if(!variable_in_list_p(ent, found_equiv_class))
+			    found_equiv_class =
+				gen_nconc(found_equiv_class,
+					  CONS(ENTITY, ent, NIL));
+		    }, l_shared)
+		}
+		else
+		{
+		    list l_tmp = NIL;
+		    pips_debug(EQUIV_DEBUG, "not found\n");
+		    /* add the list of variables in l_shared; necessary 
+		     * because variables may appear several times in 
+		     * l_shared. */
+		    MAP(ENTITY, shared_ent,
 		    {
-			list l_tmp = NIL;
-			pips_debug(EQUIV_DEBUG, "not found\n");
-			/* add the list of variables in l_shared; necessary 
-			 * because variables may appear several times in 
-                         * l_shared. */
-			MAP(ENTITY, shared_ent,
-			    {
-				if (!variable_in_list_p(shared_ent, l_tmp))
-				    l_tmp = gen_nconc(l_tmp,
-						      CONS(ENTITY, shared_ent,
-							   NIL));
-			    }, l_shared);
-			equiv_classes =
-			    gen_nconc(equiv_classes, CONS(LIST, l_tmp, NIL));
-		    }
+			if (!variable_in_list_p(shared_ent, l_tmp))
+			    l_tmp = gen_nconc(l_tmp,
+					      CONS(ENTITY, shared_ent,
+						   NIL));
+		    }, 
+			l_shared);
+		    equiv_classes =
+			gen_nconc(equiv_classes, CONS(LIST, l_tmp, NIL));
 		}
 	    }
-	}, ldecl);
-
+	}
+    }, ldecl);
+    
     ifdebug(EQUIV_DEBUG)
     {
 	pips_debug(1, "final equivalence classes:\n");
 	MAP(LIST, equiv_class,
 	{
 	    equiv_class_debug(equiv_class);
-	},equiv_classes);	
+	},
+	    equiv_classes);	
     }
 
     /* SECOND, PRETTYPRINT THEM */
     t_equiv_class = make_text(NIL); 
     MAP(LIST, equiv_class,
-	{
-	    MERGE_TEXTS(t_equiv_class, text_equivalence_class(equiv_class));
-	}, equiv_classes);
-
+    {
+	MERGE_TEXTS(t_equiv_class, text_equivalence_class(equiv_class));
+    }, equiv_classes);
+    
     /* AND FREE THEM */    
     for(l_tmp = equiv_classes; !ENDP(l_tmp); POP(l_tmp))
     {
@@ -777,6 +1618,28 @@ text_equivalences(entity module, list ldecl)
     /* THE END */
     pips_debug(EQUIV_DEBUG, "end\n");
     return(t_equiv_class);
+}
+
+/* returns the DATA initializations.
+ * limited to integers, because I do not know where is the value
+ * for other types...
+ */
+static text 
+text_data(entity module, list /* of entity */ ldecl)
+{
+    list /* of sentence */ ls = NIL;
+
+    MAP(ENTITY, e,
+    {
+	value v = entity_initial(e);
+	if(value_constant_p(v) && constant_int_p(value_constant(v)))
+	{
+	    ls = CONS(SENTENCE, sentence_data(e), ls);
+	}
+    },
+	ldecl);
+
+    return make_text(ls);
 }
 
 static text 
@@ -792,145 +1655,146 @@ text_entity_declaration(entity module, list ldecl)
     t_chars = make_text(NIL); 
 
     MAP(ENTITY, e,
-     {
-	 type te = entity_type(e);
-	 bool func = 
-		 type_functional_p(te) && storage_rom_p(entity_storage(e));
-	 bool param = func && value_symbolic_p(entity_initial(e));
-	 bool external =     /* subroutines won't be declared */
-		 (func && 
-		  value_code_p(entity_initial(e)) &&
-		  !type_void_p(functional_result(type_functional(te))));
-	 bool area_p = type_area_p(te);
-	 bool var = type_variable_p(te);
-	 bool in_ram = storage_ram_p(entity_storage(e));
-	 
-	 pips_debug(3, "entity name is %s\n", entity_name(e));
+    {
+	type te = entity_type(e);
+	bool func = 
+	    type_functional_p(te) && storage_rom_p(entity_storage(e));
+	bool param = func && value_symbolic_p(entity_initial(e));
+	bool external =     /* subroutines won't be declared */
+	    (func && 
+	     value_code_p(entity_initial(e)) &&
+	     !type_void_p(functional_result(type_functional(te))));
+	bool area_p = type_area_p(te);
+	bool var = type_variable_p(te);
+	bool in_ram = storage_ram_p(entity_storage(e));
+	
+	pips_debug(3, "entity name is %s\n", entity_name(e));
 
-	 if (!print_commons && area_p && !SPECIAL_COMMON_P(e))
-	 {
-	     area_decl = 
-		 CONS(SENTENCE, make_sentence(is_sentence_formatted,
-					      common_hook(module, e)),
-		      area_decl);
+	if (!print_commons && area_p && !SPECIAL_COMMON_P(e))
+	{
+	    area_decl = 
+		CONS(SENTENCE, make_sentence(is_sentence_formatted,
+					     common_hook(module, e)),
+		     area_decl);
+	}
+	
+	if (!print_commons && 
+	    (area_p || (var && in_ram && 
+	  !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e)))))))
+	{
+	    pips_debug(5, "skipping entity %s\n", entity_name(e));
+	}
+	else if (param || external)
+	{
+	    before = CONS(SENTENCE, sentence_basic_declaration(e), before);
+	    if (param) 
+		/*        PARAMETER
+		 */
+		before = CONS(SENTENCE, sentence_symbolic(e), before);
+	    else 
+		/*        EXTERNAL
+		 */
+		before = CONS(SENTENCE, sentence_external(e), before);
 	 }
-
-	 if (!print_commons && 
-	     (area_p || (var && in_ram && 
-             !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e)))))))
-	 {
-	     pips_debug(5, "skipping entity %s\n", entity_name(e));
-	 }
-	 else if (param || external)
-	 {
-	     before = CONS(SENTENCE, sentence_basic_declaration(e), before);
-	     if (param) 
-		 /*        PARAMETER
-		  */
-		 before = CONS(SENTENCE, sentence_symbolic(e), before);
-	     else 
-		 /*        EXTERNAL
-		  */
-		 before = CONS(SENTENCE, sentence_external(e), before);
-	 }
-	 else if (area_p)
-	 {
-	     /*            AREAS 
-	      */	     
-	     area_decl = CONS(SENTENCE, sentence_area(e, module),
-			   area_decl);
-	 }
-	 else if (var)
-	 {
-	     basic b = variable_basic(type_variable(te));
-	     
-	     switch (basic_tag(b)) 
-	     {
-	     case is_basic_int:
+	else if (area_p && !SPECIAL_COMMON_P(e))
+	{
+	    /*            AREAS 
+	     */	     
+	    area_decl = CONS(SENTENCE, sentence_area(e, module), area_decl);
+	}
+	else if (var)
+	{
+	    basic b = variable_basic(type_variable(te));
+	    
+	    switch (basic_tag(b)) 
+	    {
+	    case is_basic_int:
 		 /* simple integers are moved ahead...
 		  */
-		 if (variable_dimensions(type_variable(te)))
-		 {
-		     pi = CHAIN_SWORD(pi, pi==NIL ? "INTEGER " : ",");
-		     pi = gen_nconc(pi, words_declaration(e, !from_hpfc)); 
-		 }
-		 else
-		 {
-		     ph = CHAIN_SWORD(ph, ph==NIL ? "INTEGER " : ",");
-		     ph = gen_nconc(ph, words_declaration(e, !from_hpfc)); 
-		 }
-		 break;
-	     case is_basic_float:
-		 switch (basic_float(b))
-		 {
-		 case 4:
-		     pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : ",");
-		     pf4 = gen_nconc(pf4, words_declaration(e, !from_hpfc));
-		     break;
-		 case 8:
-		 default:
-		     pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : ",");
-		     pf8 = gen_nconc(pf8, words_declaration(e, !from_hpfc));
-		     break;
-		 }
-		 break;			
-	     case is_basic_logical:
-		 pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ",");
-		 pl = gen_nconc(pl, words_declaration(e, !from_hpfc));
-		 break;
-	     case is_basic_overloaded:
-		 /* nothing! some in hpfc I guess...
-		  */
-		 break; 
-	     case is_basic_complex:
-		 pc = CHAIN_SWORD(pc, pc==NIL ? "COMPLEX " : ",");
-		 pc = gen_nconc(pc, words_declaration(e, !from_hpfc));
-		 break;
-	     case is_basic_string:
-	     {
-		 value v = basic_string(b);
-
-		 if (value_constant_p(v) && constant_int_p(value_constant(v)))
-		 {
-		     int i = constant_int(value_constant(v));
-
-		     if (i==1)
-		     {
-			 ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
-			 ps = gen_nconc(ps, words_declaration(e, !from_hpfc));
-		     }
-		     else
-		     {
-			 list chars=NIL;
-			 chars = CHAIN_SWORD(chars, "CHARACTER*");
-			 chars = CHAIN_IWORD(chars, i);
-			 chars = CHAIN_SWORD(chars, " ");
-			 chars = gen_nconc(chars, 
-					   words_declaration(e, !from_hpfc));
-			 attach_declaration_size_type_to_words(chars, "CHARACTER", i);
-			 ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		     }
-		 }
-		 else if (value_unknown_p(v))
-		 {
-			 list chars=NIL;
-			 chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
-			 chars = gen_nconc(chars, 
-					   words_declaration(e, !from_hpfc));
-			 attach_declaration_type_to_words(chars, "CHARACTER*(*)");
-			 ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		     }
-		 else
-		     pips_internal_error("unexpected value\n");
-		 break;
-		 }
-	     default:
-		 pips_internal_error("unexpected basic tag (%d)\n",
-				     basic_tag(b));
-	     }
-	 }
-     }, ldecl);
-
+		if (variable_dimensions(type_variable(te)))
+		{
+		    pi = CHAIN_SWORD(pi, pi==NIL ? "INTEGER " : ",");
+		    pi = gen_nconc(pi, words_declaration(e, !from_hpfc)); 
+		}
+		else
+		{
+		    ph = CHAIN_SWORD(ph, ph==NIL ? "INTEGER " : ",");
+		    ph = gen_nconc(ph, words_declaration(e, !from_hpfc)); 
+		}
+		break;
+	    case is_basic_float:
+		switch (basic_float(b))
+		{
+		case 4:
+		    pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : ",");
+		    pf4 = gen_nconc(pf4, words_declaration(e, !from_hpfc));
+		    break;
+		case 8:
+		default:
+		    pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : ",");
+		    pf8 = gen_nconc(pf8, words_declaration(e, !from_hpfc));
+		    break;
+		}
+		break;			
+	    case is_basic_logical:
+		pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ",");
+		pl = gen_nconc(pl, words_declaration(e, !from_hpfc));
+		break;
+	    case is_basic_overloaded:
+		/* nothing! some in hpfc I guess...
+		 */
+		break; 
+	    case is_basic_complex:
+		pc = CHAIN_SWORD(pc, pc==NIL ? "COMPLEX " : ",");
+		pc = gen_nconc(pc, words_declaration(e, !from_hpfc));
+		break;
+	    case is_basic_string:
+	    {
+		value v = basic_string(b);
+		
+		if (value_constant_p(v) && constant_int_p(value_constant(v)))
+		{
+		    int i = constant_int(value_constant(v));
+		    
+		    if (i==1)
+		    {
+			ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
+			ps = gen_nconc(ps, words_declaration(e, !from_hpfc));
+		    }
+		    else
+		    {
+			list chars=NIL;
+			chars = CHAIN_SWORD(chars, "CHARACTER*");
+			chars = CHAIN_IWORD(chars, i);
+			chars = CHAIN_SWORD(chars, " ");
+			chars = gen_nconc(chars, 
+					  words_declaration(e, !from_hpfc));
+			attach_declaration_size_type_to_words
+			    (chars, "CHARACTER", i);
+			ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		    }
+		}
+		else if (value_unknown_p(v))
+		{
+		    list chars=NIL;
+		    chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
+		    chars = gen_nconc(chars, 
+				      words_declaration(e, !from_hpfc));
+		    attach_declaration_type_to_words
+			(chars, "CHARACTER*(*)");
+		    ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		}
+		else
+		    pips_internal_error("unexpected value\n");
+		break;
+	    }
+	    default:
+		pips_internal_error("unexpected basic tag (%d)\n",
+				    basic_tag(b));
+	    }
+	}
+    }, ldecl);
+    
     /* parameters must be kept in order
      * because that may depend one from the other, hence the reversion.
      */ 
@@ -952,24 +1816,32 @@ text_entity_declaration(entity module, list ldecl)
     ADD_WORD_LIST_TO_TEXT(r, ps);
     attach_declaration_type_to_words(ps, "CHARACTER");
     MERGE_TEXTS(r, t_chars);
+
+    /* all about COMMON declarations */
     MERGE_TEXTS(r, make_text(area_decl));
 
-    /* And lastly, equivalence statements... - BC -*/
+    /* and EQUIVALENCE statements... - BC -*/
     MERGE_TEXTS(r, text_equivalences(module, ldecl)); 
+
+    /* what about DATA statements! FC */
+    MERGE_TEXTS(r, text_data(module, ldecl));
 
     return r;
 }
 
-text text_declaration(module)
-entity module;
+/* exported for hpfc.
+ */
+text 
+text_declaration(entity module)
 {
-    return(text_entity_declaration(module,
-				   code_declarations(entity_code(module))));
+    return text_entity_declaration
+	(module, code_declarations(entity_code(module)));
 }
 
 /* needed for hpfc 
  */
-text text_common_declaration(common, module)
+text 
+text_common_declaration(common, module)
 entity common, module;
 {
     type t = entity_type(common);
@@ -985,69 +1857,16 @@ entity common, module;
     return result;
 }
 
-text text_instruction(module, label, margin, obj, n)
-entity module;
-string label ;
-int margin;
-instruction obj;
-int n ;
-{
-    text r=text_undefined, text_block(), text_unstructured() ;
-
-    if (instruction_block_p(obj)) {
-	r = text_block(module, label, margin, instruction_block(obj), n) ;
-    }
-    else if (instruction_test_p(obj)) {
-	r = text_test(module, label, margin, instruction_test(obj), n);
-    }
-    else if (instruction_loop_p(obj)) {
-	r = text_loop(module, label, margin, instruction_loop(obj), n);
-    }
-    else if (instruction_goto_p(obj)) {
-	r = make_text(CONS(SENTENCE, 
-			   sentence_goto(module, label, margin,
-					 instruction_goto(obj), n), 
-			   NIL));
-    }
-    else if (instruction_call_p(obj)) {
-	unformatted u;
-	sentence s;
-
-	if (instruction_continue_p(obj) &&
-	    empty_local_label_name_p(label) &&
-	    !get_bool_property("PRETTYPRINT_ALL_LABELS")) {
-	    debug(5, "text_instruction", "useless CONTINUE not printed\n");
-	    r = make_text(NIL);
-	}
-	else {
-	    u = make_unformatted(strdup(label), n, margin, 
-				 words_call(instruction_call(obj), 0));
-
-	    s = make_sentence(is_sentence_unformatted, u);
-
-	    r = make_text(CONS(SENTENCE, s, NIL));
-	}
-    }
-    else if (instruction_unstructured_p(obj)) {
-	r = text_unstructured(module, label, margin, 
-			      instruction_unstructured(obj), n) ;
-    }
-    else {
-	pips_error("text_instruction", "unexpected tag");
-    }
-
-    return(r);
-}
-
-text text_block(module, label, margin, objs, n)
-entity module;
-string label ;
-int margin;
-cons *objs;
-int n;
+static text 
+text_block(
+    entity module,
+    string label,
+    int margin,
+    list objs,
+    int n)
 {
     text r = make_text(NIL);
-    cons *pbeg, *pend ;
+    list pbeg, pend ;
 
     pend = NIL;
 
@@ -1195,12 +2014,13 @@ text_hpf_directive(
     return make_text(ls);
 }
 
-text text_loop(module, label, margin, obj, n)
-entity module;
-string label;
-int margin;
-loop obj;
-int n ;
+text 
+text_loop(
+    entity module,
+    string label,
+    int margin,
+    loop obj,
+    int n)
 {
     list pc = NIL;
     sentence first_sentence;
@@ -1275,7 +2095,8 @@ int n ;
     pc = CHAIN_SWORD(pc, " = ");
     pc = gen_nconc(pc, words_loop_range(loop_range(obj)));
     u = make_unformatted(strdup(label), n, margin, pc) ;
-    ADD_SENTENCE_TO_TEXT(r, first_sentence = make_sentence(is_sentence_unformatted, u));
+    ADD_SENTENCE_TO_TEXT(r, first_sentence = 
+			 make_sentence(is_sentence_unformatted, u));
 
     /* builds the PRIVATE scalar declaration if required
      */
@@ -1307,10 +2128,13 @@ int n ;
     return r;
 }
 
-text init_text_statement(module, margin, obj)
-entity module;
-int margin;
-statement obj;
+/* exported for unstructured.c 
+ */
+text 
+init_text_statement(
+    entity module,
+    int margin,
+    statement obj)
 {
     instruction i = statement_instruction(obj);
     text r = make_text( NIL ) ;
@@ -1321,7 +2145,8 @@ statement obj;
 	      !get_bool_property("PRETTYPRINT_BLOCKS")) || 
 	     (instruction_unstructured_p(i) && 
 	      !get_bool_property("PRETTYPRINT_UNSTRUCTURED")))) {
-      /* FI: before calling the hook, statement_ordering(obj) should be checked */
+      /* FI: before calling the hook,
+       * statement_ordering(obj) should be checked */
 	r = (*text_statement_hook)( module, margin, obj );
 	
 	if (text_statement_hook != empty_text)
@@ -1360,13 +2185,282 @@ statement obj;
     return( r ) ;
 }
 
+static text 
+text_logical_if(
+    entity module,
+    string label,
+    int margin,
+    test obj,
+    int n)
+{
+    text r = make_text(NIL);
+    list pc = NIL;
+    statement tb = test_true(obj);
+    instruction ti = statement_instruction(tb);
+    call c = instruction_call(ti);
+
+    pc = CHAIN_SWORD(pc, "IF (");
+    pc = gen_nconc(pc, words_expression(test_condition(obj)));
+    pc = CHAIN_SWORD(pc, ") ");
+    pc = gen_nconc(pc, words_call(c, 0));
+
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, 
+				       make_unformatted(strdup(label), n, 
+							margin, pc)));
+
+    return(r);
+}
+
+static text 
+text_block_if(
+    entity module,
+    string label,
+    int margin,
+    test obj,
+    int n)
+{
+    text r = make_text(NIL);
+    list pc = NIL;
+    statement test_false_obj;
+
+    pc = CHAIN_SWORD(pc, "IF (");
+    pc = gen_nconc(pc, words_expression(test_condition(obj)));
+    pc = CHAIN_SWORD(pc, ") THEN");
+
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, 
+				       make_unformatted(strdup(label), n, 
+							margin, pc)));
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
+				  test_true(obj)));
+
+    test_false_obj = test_false(obj);
+    if(statement_undefined_p(test_false_obj)){
+	pips_error("text_test","undefined statement\n");
+    }
+    if (!statement_with_empty_comment_p(test_false_obj)
+	||
+	(!empty_statement_p(test_false_obj)
+	 && !statement_continue_p(test_false_obj))
+	||
+	(empty_statement_p(test_false_obj)
+	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
+	||
+	(statement_continue_p(test_false_obj)
+	 && (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
+	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
+				      test_false_obj));
+    }
+
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
+
+    return(r);
+}
+
+static text 
+text_block_ifthen(
+    entity module,
+    string label,
+    int margin,
+    test obj,
+    int n)
+{
+    text r = make_text(NIL);
+    list pc = NIL;
+
+    pc = CHAIN_SWORD(pc, "IF (");
+    pc = gen_nconc(pc, words_expression(test_condition(obj)));
+    pc = CHAIN_SWORD(pc, ") THEN");
+
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, 
+				       make_unformatted(strdup(label), n, 
+							margin, pc)));
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
+				  test_true(obj)));
+
+    return(r);
+}
+
+static text 
+text_block_else(
+    entity module,
+    string label,
+    int margin,
+    statement stmt,
+    int n)
+{    
+    text r = make_text(NIL);
+
+    if (!statement_with_empty_comment_p(stmt)
+	||
+	(!empty_statement_p(stmt)
+	 && !statement_continue_p(stmt))
+	||
+	(empty_statement_p(stmt)
+	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
+	||
+	(statement_continue_p(stmt)
+	 && (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
+	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt));
+    }
+
+    return r;
+}
+
+static text 
+text_block_elseif(
+    entity module,
+    string label,
+    int margin,
+    test obj,
+    int n)
+{
+    text r = make_text(NIL);
+    list pc = NIL;
+    statement tb = test_true(obj);
+    statement fb = test_false(obj);
+
+    /*
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
+				  test_true(obj)));
+				  */
+
+    pc = CHAIN_SWORD(pc, "ELSEIF (");
+    pc = gen_nconc(pc, words_expression(test_condition(obj)));
+    pc = CHAIN_SWORD(pc, ") THEN");
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, 
+				       make_unformatted(strdup(label), n, 
+							margin, pc)));
+
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, tb));
+
+    if(statement_test_p(fb)) {
+	MERGE_TEXTS(r, text_block_elseif(module, label, margin, 
+					 statement_test(fb), n));
+    }
+    else {
+	MERGE_TEXTS(r, text_block_else(module, label, margin, fb, n));
+    }
+
+    return(r);
+}
+
+static text 
+text_test(
+    entity module,
+    string label,
+    int margin,
+    test obj,
+    int n)
+{
+    text r = text_undefined;
+    statement tb = test_true(obj);
+    statement fb = test_false(obj);
+
+    /* 1st case: one statement in the true branch => logical IF */
+    if(nop_statement_p(fb)
+       && statement_call_p(tb)
+       && entity_empty_label_p(statement_label(tb))
+       && empty_comments_p(statement_comments(tb))
+       && !statement_continue_p(tb)
+       && !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")) {
+	r = text_logical_if(module, label, margin, obj, n);
+    }
+    /* 2nd case: one test in the false branch => ELSEIF block */
+    else if(statement_test_p(fb)
+	    && empty_comments_p(statement_comments(fb))
+	    && entity_empty_label_p(statement_label(fb))
+	    && !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")) {
+	r = text_block_ifthen(module, label, margin, obj, n);
+	MERGE_TEXTS(r, text_block_elseif
+		    (module, label, margin, statement_test(fb), n));
+	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
+
+	/* r = text_block_if(module, label, margin, obj, n); */
+    }
+    else {
+	r = text_block_if(module, label, margin, obj, n);
+    }
+
+    return r;
+}
+
+/* hook for adding something in the head. used by hpfc.
+ * done so to avoid hpfc->prettyprint dependence in the libs. 
+ * FC. 29/12/95.
+ */
+static string (*head_hook)(entity) = NULL;
+void set_prettyprinter_head_hook(string(*f)(entity)){ head_hook=f;}
+void reset_prettyprinter_head_hook(){ head_hook=NULL;}
+
+static text 
+text_instruction(
+    entity module,
+    string label,
+    int margin,
+    instruction obj,
+    int n)
+{
+    text r=text_undefined, text_block(), text_unstructured() ;
+
+    if (instruction_block_p(obj)) {
+	r = text_block(module, label, margin, instruction_block(obj), n) ;
+    }
+    else if (instruction_test_p(obj)) {
+	r = text_test(module, label, margin, instruction_test(obj), n);
+    }
+    else if (instruction_loop_p(obj)) {
+	r = text_loop(module, label, margin, instruction_loop(obj), n);
+    }
+    else if (instruction_goto_p(obj)) {
+	r = make_text(CONS(SENTENCE, 
+			   sentence_goto(module, label, margin,
+					 instruction_goto(obj), n), 
+			   NIL));
+    }
+    else if (instruction_call_p(obj)) {
+	unformatted u;
+	sentence s;
+
+	if (instruction_continue_p(obj) &&
+	    empty_local_label_name_p(label) &&
+	    !get_bool_property("PRETTYPRINT_ALL_LABELS")) {
+	    debug(5, "text_instruction", "useless CONTINUE not printed\n");
+	    r = make_text(NIL);
+	}
+	else {
+	    u = make_unformatted(strdup(label), n, margin, 
+				 words_call(instruction_call(obj), 0));
+
+	    s = make_sentence(is_sentence_unformatted, u);
+
+	    r = make_text(CONS(SENTENCE, s, NIL));
+	}
+    }
+    else if (instruction_unstructured_p(obj)) {
+	r = text_unstructured(module, label, margin, 
+			      instruction_unstructured(obj), n) ;
+    }
+    else {
+	pips_error("text_instruction", "unexpected tag");
+    }
+
+    return(r);
+}
+
 /* Handles all statements but tests that are nodes of an unstructured.
  * Those are handled by text_control.
  */
-text text_statement(module, margin, stmt)
-entity module;
-int margin;
-statement stmt;
+text 
+text_statement(
+    entity module,
+    int margin,
+    statement stmt)
 {
     instruction i = statement_instruction(stmt);
     text r= make_text(NIL);
@@ -1381,7 +2475,7 @@ statement stmt;
     if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
        statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
       /* we are in trouble with some kind of dead (?) code... */
-      user_warning("text_statement", "I unexpectedly bumped into dead code?\n");
+      pips_user_warning("I unexpectedly bumped into dead code?\n");
     }
 
     if (strcmp(label, RETURN_LABEL_NAME) == 0) {
@@ -1437,217 +2531,6 @@ statement stmt;
     return(r);
 }
 
-text 
-text_test(module, label, margin, obj, n)
-entity module;
-string label ;
-int margin;
-test obj;
-int n;
-{
-    text r = text_undefined;
-    statement tb = test_true(obj);
-    statement fb = test_false(obj);
-
-    /* 1st case: one statement in the true branch => logical IF */
-    if(nop_statement_p(fb)
-       && statement_call_p(tb)
-       && entity_empty_label_p(statement_label(tb))
-       && empty_comments_p(statement_comments(tb))
-       && !statement_continue_p(tb)
-       && !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")) {
-	r = text_logical_if(module, label, margin, obj, n);
-    }
-    /* 2nd case: one test in the false branch => ELSEIF block */
-    else if(statement_test_p(fb)
-	    && empty_comments_p(statement_comments(fb))
-	    && entity_empty_label_p(statement_label(fb))
-	    && !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")) {
-	r = text_block_ifthen(module, label, margin, obj, n);
-	MERGE_TEXTS(r, text_block_elseif(module, label, margin, statement_test(fb), n));
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
-
-	/* r = text_block_if(module, label, margin, obj, n); */
-    }
-    else {
-	r = text_block_if(module, label, margin, obj, n);
-    }
-
-    return r;
-}
-
-text 
-text_logical_if(module, label, margin, obj,n)
-entity module;
-string label ;
-int margin;
-test obj;
-int n;
-{
-    text r = make_text(NIL);
-    cons *pc = NIL;
-    statement tb = test_true(obj);
-    instruction ti = statement_instruction(tb);
-    call c = instruction_call(ti);
-
-    pc = CHAIN_SWORD(pc, "IF (");
-    pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    pc = CHAIN_SWORD(pc, ") ");
-    pc = gen_nconc(pc, words_call(c, 0));
-
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_unformatted, 
-				       make_unformatted(strdup(label), n, 
-							margin, pc)));
-
-    return(r);
-}
-
-text 
-text_block_if(module, label, margin, obj,n)
-entity module;
-string label ;
-int margin;
-test obj;
-int n;
-{
-    text r = make_text(NIL);
-    cons *pc = NIL;
-    statement test_false_obj;
-
-    pc = CHAIN_SWORD(pc, "IF (");
-    pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    pc = CHAIN_SWORD(pc, ") THEN");
-
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_unformatted, 
-				       make_unformatted(strdup(label), n, 
-							margin, pc)));
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
-				  test_true(obj)));
-
-    test_false_obj = test_false(obj);
-    if(statement_undefined_p(test_false_obj)){
-	pips_error("text_test","undefined statement\n");
-    }
-    if (!statement_with_empty_comment_p(test_false_obj)
-	||
-	(!empty_statement_p(test_false_obj)
-	 && !statement_continue_p(test_false_obj))
-	||
-	(empty_statement_p(test_false_obj)
-	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
-	||
-	(statement_continue_p(test_false_obj)
-	 && (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
-				      test_false_obj));
-    }
-
-    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
-
-    return(r);
-}
-
-text 
-text_block_ifthen(module, label, margin, obj,n)
-entity module;
-string label ;
-int margin;
-test obj;
-int n;
-{
-    text r = make_text(NIL);
-    cons *pc = NIL;
-
-    pc = CHAIN_SWORD(pc, "IF (");
-    pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    pc = CHAIN_SWORD(pc, ") THEN");
-
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_unformatted, 
-				       make_unformatted(strdup(label), n, 
-							margin, pc)));
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
-				  test_true(obj)));
-
-    return(r);
-}
-
-text 
-text_block_elseif(module, label, margin, obj,n)
-entity module;
-string label ;
-int margin;
-test obj;
-int n;
-{
-    text r = make_text(NIL);
-    cons *pc = NIL;
-    statement tb = test_true(obj);
-    statement fb = test_false(obj);
-
-    /*
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
-				  test_true(obj)));
-				  */
-
-    pc = CHAIN_SWORD(pc, "ELSEIF (");
-    pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    pc = CHAIN_SWORD(pc, ") THEN");
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_unformatted, 
-				       make_unformatted(strdup(label), n, 
-							margin, pc)));
-
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, tb));
-
-    if(statement_test_p(fb)) {
-	MERGE_TEXTS(r, text_block_elseif(module, label, margin, statement_test(fb), n));
-    }
-    else {
-	MERGE_TEXTS(r, text_block_else(module, label, margin, fb, n));
-    }
-
-    return(r);
-}
-
-text 
-text_block_else(module, label, margin, stmt, n)
-entity module;
-string label ;
-int margin;
-statement stmt;
-int n;
-{    
-    text r = make_text(NIL);
-
-    if (!statement_with_empty_comment_p(stmt)
-	||
-	(!empty_statement_p(stmt)
-	 && !statement_continue_p(stmt))
-	||
-	(empty_statement_p(stmt)
-	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
-	||
-	(statement_continue_p(stmt)
-	 && (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt));
-    }
-
-    return r;
-}
-
-/* hook for adding something in the head. used by hpfc.
- * done so to avoid hpfc->prettyprint dependence in the libs. 
- * FC. 29/12/95.
- */
-static string (*head_hook)(entity) = NULL;
-void set_prettyprinter_head_hook(string(*f)(entity)){ head_hook=f;}
-void reset_prettyprinter_head_hook(){ head_hook=NULL;}
-
 /* function text text_module(module, stat)
  *
  * carefull! the original text of the declarations is used
@@ -1668,7 +2551,7 @@ text_module(entity module,
 	    /* Add the original header comments if any: */
 	    ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
 	
-	ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(sentence_head(module),
+	ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(sentence_head(module, stat),
 							module));
 	if (head_hook) 
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
@@ -1723,7 +2606,7 @@ output_a_graph_view_of_the_unstructured_successors(text r,
                                  control_statement(c)));
 
    add_one_unformated_printf_to_text(r,
-                                     PRETTYPRINT_UNSTRUCTURED_SUCCESSOR_MARKER);
+                                     PRETTYPRINT_UNSTRUCTURED_SUCC_MARKER);
    MAP(CONTROL, a_successor,
        {
           add_one_unformated_printf_to_text(r," %p", a_successor);
@@ -1817,813 +2700,4 @@ output_a_graph_view_of_the_unstructured(text r,
                                      PRETTYPRINT_UNSTRUCTURED_END_MARKER,
                                      begin_control,
                                      end_control);
-}
-
-cons *words_parameters(e)
-entity e;
-{
-    cons *pc = NIL;
-    type te = entity_type(e);
-    functional fe;
-    int nparams, i;
-
-    pips_assert("words_parameters", type_functional_p(te));
-
-    fe = type_functional(te);
-    nparams = gen_length(functional_parameters(fe));
-
-    for (i = 1; i <= nparams; i++) {
-	entity param = find_ith_parameter(e, i);
-
-	if (pc != NIL) {
-	    pc = CHAIN_SWORD(pc, ",");
-	}
-
-	pc = CHAIN_SWORD(pc, entity_local_name(param));
-    }
-
-    return(pc);
-}
-
-
-/* This function is added by LZ
- * 21/10/91
- * extended to cope with PRETTYPRINT_HPFC 
- */
-
-/* some compilers don't like dimensions that are declared twice.
- * this is the case of g77 used after hpfc. thus I added a
- * flag not to prettyprint again the dimensions of common variables. FC.
- *
- * It is in the standard that dimensions cannot be declared twice in a 
- * single module. BC.
- */
-list words_declaration(
-    entity e,
-    bool prettyprint_common_variable_dimensions_p)
-{
-    list pl = NIL;
-    pl = CHAIN_SWORD(pl, entity_local_name(e));
-
-    if (type_variable_p(entity_type(e)))
-    {
-	if (!((variable_in_common_p(e) || variable_static_p(e)) &&
-	      !prettyprint_common_variable_dimensions_p))
-	{
-	    if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
-	    {
-		list dims = variable_dimensions(type_variable(entity_type(e)));
-	
-		pl = CHAIN_SWORD(pl, "(");
-
-		MAPL(pd, 
-		     {
-			 pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
-			 if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, ",");
-		     }, 
-		     dims);
-	
-		pl = CHAIN_SWORD(pl, ")");
-	    }
-	}
-    }
-    
-    attach_declaration_to_words(pl, e);
-
-    return(pl);
-}
-
-cons *words_basic(obj)
-basic obj;
-{
-    cons *pc = NIL;
-
-    if (basic_int_p(obj)) {
-	pc = CHAIN_SWORD(pc,"INTEGER*");
-	pc = CHAIN_IWORD(pc,basic_int(obj));
-    }
-    else if (basic_float_p(obj)) {
-	pc = CHAIN_SWORD(pc,"REAL*");
-	pc = CHAIN_IWORD(pc,basic_float(obj));
-    }
-    else if (basic_logical_p(obj)) {
-	pc = CHAIN_SWORD(pc,"LOGICAL*");
-	pc = CHAIN_IWORD(pc,basic_logical(obj));
-    }
-    else if (basic_overloaded_p(obj)) {
-	pc = CHAIN_SWORD(pc,"OVERLOADED");
-    }
-    else if (basic_complex_p(obj)) {
-	pc = CHAIN_SWORD(pc,"COMPLEX*");
-	pc = CHAIN_IWORD(pc,basic_complex(obj));
-    }
-    else if (basic_string_p(obj)) {
-	pc = CHAIN_SWORD(pc,"STRING*(");
-	pc = gen_nconc(pc, words_value(basic_string(obj)));
-	pc = CHAIN_SWORD(pc,")");
-    }
-    else {
-	pips_error("words_basic", "unexpected tag");
-    }
-
-    return(pc);
-}
-
-cons *words_value(obj)
-value obj;
-{
-    cons *pc;
-
-    if (value_symbolic_p(obj)) {
-	pc = words_constant(symbolic_constant(value_symbolic(obj)));
-    }
-    else if (value_constant(obj)) {
-	pc = words_constant(value_constant(obj));
-    }
-    else {
-	pips_error("words_value", "unexpected tag");
-	pc = NIL;
-    }
-
-    return(pc);
-}
-
-cons *words_constant(obj)
-constant obj;
-{
-    cons *pc;
-
-    pc=NIL;
-
-    if (constant_int_p(obj)) {
-	pc = CHAIN_IWORD(pc,constant_int(obj));
-    }
-    else {
-	pips_error("words_constant", "unexpected tag");
-    }
-
-    return(pc);
-}
-
-cons *words_dimension(obj)
-dimension obj;
-{
-    cons *pc;
-
-    pc = words_expression(dimension_lower(obj));
-    pc = CHAIN_SWORD(pc,":");
-    pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
-
-    return(pc);
-}
-
-cons *words_expression(obj)
-expression obj;
-{
-    cons *pc;
-
-    pc = words_syntax(expression_syntax(obj));
-
-    return(pc);
-}
-
-cons *words_subexpression(obj, precedence)
-expression obj;
-int precedence;
-{
-    cons *pc;
-
-    if ( expression_call_p(obj) )
-	pc = words_call(syntax_call(expression_syntax(obj)), precedence);
-    else 
-	pc = words_syntax(expression_syntax(obj));
-
-     return(pc);
-}
-
-cons *words_loop_range(obj)
-range obj;
-{
-    cons *pc;
-    call c = syntax_call(expression_syntax(range_increment(obj)));
-
-    pc = words_subexpression(range_lower(obj), 0);
-    pc = CHAIN_SWORD(pc,", ");
-    pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0));
-    if (/*  expression_constant_p(range_increment(obj)) && */
-	 strcmp( entity_local_name(call_function(c)), "1") == 0 )
-	return(pc);
-    pc = CHAIN_SWORD(pc,", ");
-    pc = gen_nconc(pc, words_expression(range_increment(obj)));
-
-    return(pc);
-}
-
-list /* of string */ words_range(range obj)
-{
-    cons *pc = NIL ;
-
-    /* if undefined I print a star, why not!? */
-    if (expression_undefined_p(range_lower(obj)))
-	return CONS(STRING, MAKE_SWORD("*"), NIL);
-    /* else */
-    pc = CHAIN_SWORD(pc,"(/I,I=");
-    pc = gen_nconc(pc, words_expression(range_lower(obj)));
-    pc = CHAIN_SWORD(pc,",");
-    pc = gen_nconc(pc, words_expression(range_upper(obj)));
-    pc = CHAIN_SWORD(pc,",");
-    pc = gen_nconc(pc, words_expression(range_increment(obj)));
-    pc = CHAIN_SWORD(pc,"/)") ;
-
-    return(pc);
-}
-
-cons *words_reference(obj)
-reference obj;
-{
-    cons *pc = NIL;
-    string begin_attachment;
-    
-    entity e = reference_variable(obj);
-
-    pc = CHAIN_SWORD(pc, entity_local_name(e));
-    begin_attachment = STRING(CAR(pc));
-    
-    if (reference_indices(obj) != NIL) {
-	pc = CHAIN_SWORD(pc,"(");
-	MAPL(pi, {
-	    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(pi)), 0));
-	    if (CDR(pi) != NIL)
-		pc = CHAIN_SWORD(pc,",");
-	}, reference_indices(obj));
-	pc = CHAIN_SWORD(pc,")");
-    }
-    attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
-				  obj);
-
-    return(pc);
-}
-
-cons *words_label_name(s)
-string s ;
-{
-    return(CHAIN_SWORD(NIL, local_name(s)+strlen(LABEL_PREFIX))) ;
-}
-
-cons *words_syntax(obj)
-syntax obj;
-{
-    cons *pc;
-
-    if (syntax_reference_p(obj)) {
-	pc = words_reference(syntax_reference(obj));
-    }
-    else if (syntax_range_p(obj)) {
-	pc = words_range(syntax_range(obj));
-    }
-    else if (syntax_call_p(obj)) {
-	pc = words_call(syntax_call(obj), 0);
-    }
-    else {
-	pips_error("words_syntax", "tag inconnu");
-	pc = NIL;
-    }
-
-    return(pc);
-}
-
-cons *words_call(obj, precedence)
-call obj;
-int precedence;
-{
-    cons *pc;
-
-    entity f = call_function(obj);
-    value i = entity_initial(f);
-    
-    pc = (value_intrinsic_p(i)) ? words_intrinsic_call(obj, precedence) : 
-	                          words_regular_call(obj);
-
-    return(pc);
-}
-
-cons *words_regular_call(obj)
-call obj;
-{
-    cons *pc = NIL;
-
-    entity f = call_function(obj);
-    value i = entity_initial(f);
-    type t = entity_type(f);
-    
-    if (call_arguments(obj) == NIL) {
-	if (type_statement_p(t))
-	    return(CHAIN_SWORD(pc, entity_local_name(f)+strlen(LABEL_PREFIX)));
-	if (value_constant_p(i)||value_symbolic_p(i))
-	    return(CHAIN_SWORD(pc, entity_local_name(f)));
-    }
-
-    if (type_void_p(functional_result(type_functional(t)))) {
-	pc = CHAIN_SWORD(pc, "CALL ");
-    }
-
-    pc = CHAIN_SWORD(pc, entity_local_name(f));
-
-    if( !ENDP( call_arguments(obj))) {
-	pc = CHAIN_SWORD(pc, "(");
-	MAPL(pa, {
-	    pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pa))));
-	    if (CDR(pa) != NIL)
-		    pc = CHAIN_SWORD(pc, ", ");
-	}, call_arguments(obj));
-	pc = CHAIN_SWORD(pc, ")");
-    }
-    else if(!type_void_p(functional_result(type_functional(t)))) {
-	pc = CHAIN_SWORD(pc, "()");
-    }
-    return(pc);
-}
-
-cons *words_prefix_unary_op(obj, precedence)
-call obj;
-int precedence;
-{
-    cons *pc = NIL;
-    expression e = EXPRESSION(CAR(call_arguments(obj)));
-    int prec = words_intrinsic_precedence(obj);
-
-    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-    pc = gen_nconc(pc, words_subexpression(e, prec));
-
-    return(pc);
-}
-
-cons *words_unary_minus(obj, precedence)
-call obj;
-int precedence;
-{
-    cons *pc = NIL;
-    expression e = EXPRESSION(CAR(call_arguments(obj)));
-    int prec = words_intrinsic_precedence(obj);
-
-    if ( prec < precedence )
-	pc = CHAIN_SWORD(pc, "(");
-    pc = CHAIN_SWORD(pc, "-");
-    pc = gen_nconc(pc, words_subexpression(e, prec));
-    if ( prec < precedence )
-	pc = CHAIN_SWORD(pc, ")");
-
-    return(pc);
-}
-
-/* 
- * If the infix operator is either "-" or "/", I perfer not to delete 
- * the parentheses of the second expression.
- * Ex: T = X - ( Y - Z ) and T = X / (Y*Z)
- *
- * Lei ZHOU       Nov. 4 , 1991
- */
-cons *words_infix_binary_op(obj, precedence)
-call obj;
-int precedence;
-{
-    cons *pc = NIL;
-    cons *args = call_arguments(obj);
-    int prec = words_intrinsic_precedence(obj);
-    cons *we1 = words_subexpression(EXPRESSION(CAR(args)), prec);
-    cons *we2;
-
-    if ( strcmp(entity_local_name(call_function(obj)), "/") == 0 )
-	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), 100);
-    else if ( strcmp(entity_local_name(call_function(obj)), "-") == 0 ) {
-	expression exp = EXPRESSION(CAR(CDR(args)));
-	if ( expression_call_p(exp) &&
-	     words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >= 
-	     intrinsic_precedence("*") )
-	    /* precedence is greter than * or / */
-	    we2 = words_subexpression(exp, prec);
-	else
-	    we2 = words_subexpression(exp, 100);
-    }
-    else
-	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec);
-
-    
-    if ( prec < precedence )
-	pc = CHAIN_SWORD(pc, "(");
-    pc = gen_nconc(pc, we1);
-    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-    pc = gen_nconc(pc, we2);
-    if ( prec < precedence )
-	pc = CHAIN_SWORD(pc, ")");
-
-    return(pc);
-}
-
-cons *words_assign_op(obj, precedence)
-call obj;
-int precedence;
-{
-    cons *pc = NIL;
-    cons *args = call_arguments(obj);
-    int prec = words_intrinsic_precedence(obj);
-
-    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)),  prec));
-    pc = CHAIN_SWORD(pc, " = ");
-    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec));
-
-    return(pc);
-}
-
-cons *words_substring_op(obj, precedence)
-call obj;
-int precedence;
-{
-  /* The substring function call is reduced to a syntactic construct */
-    cons *pc = NIL;
-    expression r = expression_undefined;
-    expression l = expression_undefined;
-    expression u = expression_undefined;
-    /* expression e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj)))))); */
-    int prec = words_intrinsic_precedence(obj);
-
-    pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 3 || 
-		gen_length(call_arguments(obj)) == 4);
-
-    r = EXPRESSION(CAR(call_arguments(obj)));
-    l = EXPRESSION(CAR(CDR(call_arguments(obj))));
-    u = EXPRESSION(CAR(CDR(CDR(call_arguments(obj)))));
-
-    pc = gen_nconc(pc, words_subexpression(r,  prec));
-    pc = CHAIN_SWORD(pc, "(");
-    pc = gen_nconc(pc, words_subexpression(l, prec));
-    pc = CHAIN_SWORD(pc, ":");
-    pc = gen_nconc(pc, words_subexpression(u, prec));
-    pc = CHAIN_SWORD(pc, ")");
-
-    return(pc);
-}
-
-cons *words_assign_substring_op(obj, precedence)
-call obj;
-int precedence;
-{
-  /* The assign substring function call is reduced to a syntactic construct */
-    cons *pc = NIL;
-    expression e = expression_undefined;
-    int prec = words_intrinsic_precedence(obj);
-
-    pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 4);
-
-    e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj))))));
-
-    pc = gen_nconc(pc, words_substring_op(obj,  prec));
-    pc = CHAIN_SWORD(pc, " = ");
-    pc = gen_nconc(pc, words_subexpression(e, prec));
-
-    return(pc);
-}
-
-cons *words_nullary_op(obj, precedence)
-call obj;
-int precedence;
-{
-    cons *pc = NIL;
-
-    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-
-    return(pc);
-}
-
-cons *words_io_control(iol, precedence)
-cons **iol;
-int precedence;
-{
-    cons *pc = NIL;
-    cons *pio = *iol;
-
-    while (pio != NIL) {
-	syntax s = expression_syntax(EXPRESSION(CAR(pio)));
-	call c;
-
-	if (! syntax_call_p(s)) {
-	    pips_error("words_io_control", "call expected");
-	}
-
-	c = syntax_call(s);
-
-	if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
-	    *iol = CDR(pio);
-	    return(pc);
-	}
-
-	if (pc != NIL)
-	    pc = CHAIN_SWORD(pc, ",");
-	
-	pc = CHAIN_SWORD(pc, entity_local_name(call_function(c)));
-	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(CDR(pio)))));
-
-	pio = CDR(CDR(pio));
-    }
-
-    if (pio != NIL)
-	    pips_error("words_io_control", "bad format");
-
-    *iol = NIL;
-
-    return(pc);
-}
-
-cons *words_implied_do(obj, precedence)
-call obj;
-int precedence;
-{
-    cons *pc = NIL;
-
-    cons *pcc;
-    expression index;
-    syntax s;
-    range r;
-
-    pcc = call_arguments(obj);
-    index = EXPRESSION(CAR(pcc));
-
-    pcc = CDR(pcc);
-    s = expression_syntax(EXPRESSION(CAR(pcc)));
-    if (! syntax_range_p(s)) {
-	pips_error("words_implied_do", "range expected");
-    }
-    r = syntax_range(s);
-
-    pc = CHAIN_SWORD(pc, "(");
-    MAPL(pcp, {
-	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pcp))));
-	if (CDR(pcp) != NIL)
-	    pc = CHAIN_SWORD(pc, ",");
-    }, CDR(pcc));
-    pc = CHAIN_SWORD(pc, ", ");
-
-    pc = gen_nconc(pc, words_expression(index));
-    pc = CHAIN_SWORD(pc, " = ");
-    pc = gen_nconc(pc, words_loop_range(r));
-    pc = CHAIN_SWORD(pc, ")");
-
-    return(pc);
-}
-
-cons *words_unbounded_dimension(obj, precedence)
-call obj;
-int precedence;
-{
-    cons *pc = NIL;
-
-    pc = CHAIN_SWORD(pc, "*");
-
-    return(pc);
-}
-
-cons *words_list_directed(obj, precedence)
-call obj;
-int precedence;
-{
-    cons *pc = NIL;
-
-    pc = CHAIN_SWORD(pc, "*");
-
-    return(pc);
-}
-
-cons *words_io_inst(obj, precedence)
-call obj;
-int precedence;
-{
-    cons *pc = NIL;
-    cons *pcio = call_arguments(obj);
-    cons *pio_write = pcio;
-    boolean good_fmt = FALSE;
-    bool good_unit = FALSE;
-    bool iolist_reached = FALSE;
-    bool complex_io_control_list = FALSE;
-    list fmt_words = NIL;
-    list unit_words = NIL;
-    string called = entity_local_name(call_function(obj));
-    
-    /* AP: I try to convert WRITE to PRINT. Three conditions must be
-       fullfilled. The first, and obvious, one, is that the function has
-       to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
-       "UNIT" has to be equal either to "*" or "6".  In such case,
-       "WRITE(*,*)" is replaced by "PRINT *,". */
-    /* GO: Not anymore for UNIT=6 leave it ... */
-      while ((pio_write != NIL) && (!iolist_reached)) {
-	syntax s = expression_syntax(EXPRESSION(CAR(pio_write)));
-	call c;
-	expression arg = EXPRESSION(CAR(CDR(pio_write)));
-
-	if (! syntax_call_p(s)) {
-	    pips_error("words_io_inst", "call expected");
-	}
-
-	c = syntax_call(s);
-	if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
-	   good_fmt = strcmp
-	       (STRING(CAR(fmt_words = words_expression(arg))), "*")==0;
-	   pio_write = CDR(CDR(pio_write));
-	}
-	else if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
-	    good_unit = strcmp
-		(STRING(CAR(unit_words = words_expression(arg))), "*")==0;
-	    pio_write = CDR(CDR(pio_write));
-	}
-	else if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
-	  iolist_reached = TRUE;
-	  pio_write = CDR(pio_write);
-	}
-	else {
-	    complex_io_control_list = TRUE;
-	  pio_write = CDR(CDR(pio_write));
-	}
-      }
-
-    if (good_fmt && good_unit && same_string_p(called, "WRITE"))
-    {
-	/* WRITE (*,*) -> PRINT * */
-
-       if (pio_write != NIL) /* WRITE (*,*) pio -> PRINT *, pio */
-       {
-          pc = CHAIN_SWORD(pc, "PRINT *, ");
-       }
-       else     /* WRITE (*,*)  -> PRINT *  */
-       {
-          pc = CHAIN_SWORD(pc, "PRINT * ");
-       }
-       
-       pcio = pio_write;
-    }
-    else if (good_fmt && good_unit && same_string_p(called, "READ"))
-    {
-       /* READ (*,*) -> READ * */
-	
-       if (pio_write != NIL) /* READ (*,*) pio -> READ *, pio */
-       {
-          pc = CHAIN_SWORD(pc, "READ *, ");
-       }
-       else   /* READ (*,*)  -> READ *  */
-       {
-          pc = CHAIN_SWORD(pc, "READ * ");
-       }
-       pcio = pio_write;
-    }	
-    else if(!complex_io_control_list) {
-	pips_assert("A unit must be defined", !ENDP(unit_words));
-      pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-      pc = CHAIN_SWORD(pc, " (");
-      pc = gen_nconc(pc, unit_words);
-      if(!ENDP(fmt_words)) {
-	  pc = CHAIN_SWORD(pc, ", ");
-	  pc = gen_nconc(pc, fmt_words);
-      }
-      pc = CHAIN_SWORD(pc, ") ");
-      pcio = pio_write;
-    }
-    else {
-      pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
-      pc = CHAIN_SWORD(pc, " (");
-      /* FI: missing argument; I use "precedence" because I've no clue;
-         see LZ */
-      pc = gen_nconc(pc, words_io_control(&pcio, precedence));
-      pc = CHAIN_SWORD(pc, ") ");
-      /* 
-	free_words(unit_words);
-	free_words(fmt_words);
-      */
-    }
-
-    /* because the "IOLIST=" keyword is embedded in the list
-       and because the first IOLIST= has already been skipped,
-       only odd elements are printed */
-    MAPL(pp, {
-	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pp))));
-
-	if (CDR(pp) != NIL) {
-	    POP(pp);
-	    if(pp==NIL) 
-		pips_error("words_io_inst","missing element in IO list");
-	    pc = CHAIN_SWORD(pc, ", ");
-	}
-    }, pcio);
-    return(pc) ;
-}
-
-cons *null(obj, precedence)
-call obj;
-int precedence;
-{
-    return(NIL);
-}
-
-/* precedence needed here
- * According to the Precedence of Operators 
- * Arithmetic > Character > Relational > Logical
- * Added by Lei ZHOU    Nov. 4,91
- */
-struct intrinsic_handler {
-    char * name;
-    cons *(*f)();
-    int prec;
-} tab_intrinsic_handler[] = {
-    {"**", words_infix_binary_op, 30},
-
-    {"//", words_infix_binary_op, 30},
-
-    {"--", words_unary_minus, 25},
-
-    {"*", words_infix_binary_op, 21},
-    {"/", words_infix_binary_op, 21},
-
-    {"+", words_infix_binary_op, 20},
-    {"-", words_infix_binary_op, 20},
-
-
-    {".LT.", words_infix_binary_op, 15},
-    {".GT.", words_infix_binary_op, 15},
-    {".LE.", words_infix_binary_op, 15},
-    {".GE.", words_infix_binary_op, 15},
-    {".EQ.", words_infix_binary_op, 15},
-    {".NE.", words_infix_binary_op, 15},
-
-    {".NOT.", words_prefix_unary_op, 9},
-
-    {".AND.", words_infix_binary_op, 8},
-
-    {".OR.", words_infix_binary_op, 6},
-
-    {".EQV.", words_infix_binary_op, 3},
-    {".NEQV.", words_infix_binary_op, 3},
-
-    {"=", words_assign_op, 1},
-
-    {"WRITE", words_io_inst, 0},
-    {"READ", words_io_inst, 0},
-    {"PRINT", words_io_inst, 0},
-    {"OPEN", words_io_inst, 0},
-    {"CLOSE", words_io_inst, 0},
-    {"INQUIRE", words_io_inst, 0},
-    {"BACKSPACE", words_io_inst, 0},
-    {"REWIND", words_io_inst, 0},
-    {"ENDFILE", words_io_inst, 0},
-    {"IMPLIED-DO", words_implied_do, 0},
-
-    {RETURN_FUNCTION_NAME, words_nullary_op, 0},
-    {"PAUSE", words_nullary_op, 0},
-    {"STOP", words_nullary_op, 0},
-    {"CONTINUE", words_nullary_op, 0},
-    {"END", words_nullary_op, 0},
-    {FORMAT_FUNCTION_NAME, words_prefix_unary_op, 0},
-    {UNBOUNDED_DIMENSION_NAME, words_unbounded_dimension, 0},
-    {LIST_DIRECTED_FORMAT_NAME, words_list_directed, 0},
-
-    {SUBSTRING_FUNCTION_NAME, words_substring_op, 0},
-    {ASSIGN_SUBSTRING_FUNCTION_NAME, words_assign_substring_op, 0},
-
-    {NULL, null, 0}
-};
-
-cons *words_intrinsic_call(obj, precedence)
-call obj;
-int precedence;
-{
-    struct intrinsic_handler *p = tab_intrinsic_handler;
-    char *n = entity_local_name(call_function(obj));
-
-    while (p->name != NULL) {
-	if (strcmp(p->name, n) == 0) {
-	    return((*(p->f))(obj, precedence));
-	}
-	p++;
-    }
-
-    return(words_regular_call(obj));
-}
-
-int words_intrinsic_precedence(obj)
-call obj;
-{
-    char *n = entity_local_name(call_function(obj));
-
-    return(intrinsic_precedence(n));
-}
-
-int intrinsic_precedence(n)
-string n;
-{
-    struct intrinsic_handler *p = tab_intrinsic_handler;
-
-    while (p->name != NULL) {
-	if (strcmp(p->name, n) == 0) {
-	    return(p->prec);
-	}
-	p++;
-    }
-
-    return(0);
 }
