@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.73  2003/08/12 12:40:12  irigoin
+ * comments added to mark else clauses
+ *
  * Revision 1.72  2003/08/11 16:24:58  irigoin
  * User error detection improved. Better handling of functional formal parameter.
  *
@@ -2184,13 +2187,13 @@ SafeFindOrCreateEntity(
     /* This is a request for a global variable */
     e = find_or_create_entity(concatenate(package, MODULE_SEP_STRING, name, 0));
   }
-  else {
+  else { /* May be a local or a global entity */
     /* This is a request for a local or a global variable. If a local
        variable with name "name" exists, return it. */
     string full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
     entity le = gen_find_tabulated(full_name, entity_domain);
 
-    if(entity_undefined_p(le)) {
+    if(entity_undefined_p(le)) { /* No such local variable yet. */
       /* Does a global variable with the same name exist and is it
 	 in the package's scope? */
 	    
@@ -2206,7 +2209,7 @@ SafeFindOrCreateEntity(
 	e = make_entity(strdup(full_name),
 			type_undefined, storage_undefined, value_undefined);
       }
-      else {
+      else { /* A global entity with the same local name exists. */
 	if(!entity_undefined_p(get_current_module_entity())
 	   && entity_is_argument_p(fe, 
 				   code_declarations(entity_code(get_current_module_entity())))) {
@@ -2216,30 +2219,29 @@ SafeFindOrCreateEntity(
 	else if(FALSE && intrinsic_entity_p(fe)) {
 	  /* Here comes the mistake if the current_module_entity is not
              yet defined as is the case when formal parameters are
-             parsed.*/
+             parsed. Intrinsics may wrongly picked out. See capture01.f, variable DIM. */
 	  e = fe;
 	}
-	else {
-	  /* The global variable is not be in the scope. A local
-	     variable must be created. */
+	else { /* The global variable is not be in the scope. */
+	  /* A local variable must be created. It is later replaced by a
+	     global variable if necessary and becomes a ghost variable. */
 	  full_name = concatenate(package, MODULE_SEP_STRING, name, 0);
 	  e = make_entity(strdup(full_name),
 			  type_undefined, storage_undefined, value_undefined);
 	}
       }
     }
-    else {
-      /* A local variable has been found */
+    else { /* A local variable has been found */
       if(ghost_variable_entity_p(le)) {
 	string full_top_name = concatenate(TOP_LEVEL_MODULE_NAME,
 					   MODULE_SEP_STRING, name, 0);
 
 	entity fe = gen_find_tabulated(full_top_name, entity_domain);
 
-	pips_assert("Entity fe must be defined", entity_defined_p(fe));
+	pips_assert("Entity fe must be defined", !entity_undefined_p(fe));
 	e = fe;
       }
-      else {
+      else { /* le is not a ghost variable */
 	e = le;
       }
     }
