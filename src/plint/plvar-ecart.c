@@ -49,7 +49,7 @@ Pvecteur *lvbase;
     Pvecteur pvsom=NULL;
     Pvecteur pvsom2 = NULL;
     boolean egalite = FALSE;
-    int den = 1;
+    Value den = VALUE_ONE;
 
 #ifdef TRACE
 
@@ -69,7 +69,7 @@ Pvecteur *lvbase;
 	    pv3 = vect_dup(eq->vecteur);
 	    vect_chg_sgn(pv3);
 	    (void) vect_multiply(pv3,den);
-	    den *= eq->denominateur;
+	    value_product(den,eq->denominateur);
 	    (void) vect_multiply(pvsom,eq->denominateur);
 	    pvsom2 = vect_add(pvsom,pv3);
 	    vect_rm(pv3);
@@ -151,7 +151,7 @@ Pbase *b;
 	    for (ineg = sys2;ineg!= NULL;ineg=ineg->succ) {
 		if (*(ineg->eq_sat) == -1) {
 		    nv = creat_new_var(ps1);
-		    vect_add_elem(&(ineg->vecteur),nv,1);
+		    vect_add_elem(&(ineg->vecteur),nv,VALUE_ONE);
 		    lvbase_add(nv,nb_som,lvbase);
 		    *(ineg->eq_sat) = 1;
 		    *b = vect_add_variable(*b,nv);
@@ -207,13 +207,14 @@ Psommet fonct;
 	    for (ineg = sys2;ineg!= NULL;ineg=ineg->succ) {
 		if (*(ineg->eq_sat) == -1) {
 		    nv = creat_new_var(ps1);
-		    vect_add_elem(&(ineg->vecteur),nv,1);
+		    vect_add_elem(&(ineg->vecteur),nv,VALUE_ONE);
 		    *b = vect_add_variable(*b,nv);
 		    (*nbvars) ++;
-		    if (vect_coeff(TCST,ineg->vecteur) > 0) {
+		    if (value_pos_p(vect_coeff(TCST,ineg->vecteur))) {
 			nv = creat_new_var(ps1);
-			vect_add_elem(&(ineg->vecteur),nv,-1);
-			vect_add_elem(&(fonct->vecteur),nv,999);
+			vect_add_elem(&(ineg->vecteur),nv,VALUE_MONE);
+			vect_add_elem(&(fonct->vecteur),nv,
+				      int_to_value(999)); /* ??? 999 ??? */
 			lvbase_add(nv,nb_som,lvsup);
 		    }
 		    lvbase_add(nv,nb_som,lvbase);
