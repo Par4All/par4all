@@ -1660,6 +1660,9 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
      typing_function_conversion_to_double, 0}, /* Arnauld Leservot, code CEA */
     {"CMPLX", (INT_MAX), overloaded_to_complex_type, 
      typing_function_conversion_to_complex, 0},
+
+    {"CMPLX_", (INT_MAX), overloaded_to_complex_type, /* PDSon: I.R. of constant complex*/
+     typing_function_conversion_to_complex, 0},
     {"DCMPLX", (INT_MAX), overloaded_to_doublecomplex_type, 
      typing_function_conversion_to_dcomplex, 0},
 
