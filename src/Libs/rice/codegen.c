@@ -93,7 +93,7 @@ int l;
 	statement st = STATEMENT(CAR(pl));
 	list l = loop_locals(instruction_loop(statement_instruction(st)));
 	ifdebug(8) {
-	    print_text(stderr, text_statement(entity_undefined,0,st)) ;   
+	  print_statement(st);
 	    fprintf(stderr,"The list of prived variables : \n");
 	    MAPL(v, {entity e = ENTITY (CAR(v));
 		     fprintf(stderr," %s", entity_local_name(e));
@@ -110,7 +110,7 @@ int l;
 	statement st = STATEMENT(CAR(pl));
 	list l = loop_locals(instruction_loop(statement_instruction(st)));
 	ifdebug(8) {
-	    print_text(stderr, text_statement(entity_undefined,0,st)) ;   
+	  print_statement(st);
 	    fprintf(stderr,"The list of prived variables : \n");
 	    MAPL(v, {entity e = ENTITY (CAR(v));
 		     fprintf(stderr," %s", entity_local_name(e));
@@ -131,7 +131,7 @@ level l. its vertices are enclosed in at least l loops. this gives us a
 solution to retrieve the level l loop enclosing a scc: to take its first
 vertex and retrieve the l th loop aroung this vertex.  */
 
-loop find_level_l_loop(s, l)
+statement find_level_l_loop_statement(s, l)
 scc s;
 int l;
 {
@@ -142,9 +142,9 @@ int l;
     if (l > 0)
 	MAPL(pl, {
 	    if (l-- == 1)
-		return(statement_loop(STATEMENT(CAR(pl))));
+		return(STATEMENT(CAR(pl)));
 	}, loops);
-    return( loop_undefined ) ;
+    return( statement_undefined ) ;
 }
 
 
@@ -260,17 +260,19 @@ bool task_parallelize_p;
 	s = MakeNestOfParallelLoops(l-1, 
 				    CDR(loops), body, task_parallelize_p) ;
     else {
-	loop lo = statement_loop(STATEMENT(CAR(loops)));
+      statement slo = STATEMENT(CAR(loops));
+	loop lo = statement_loop(slo);
 	tag  seq_or_par = ((CDR(loops) == NIL || task_parallelize_p)
 			   && index_private_p(lo)) ? 
 			       is_execution_parallel : is_execution_sequential;
 	
 	/* At most one outer loop parallel */
-	bool task_parallelize_inner = (seq_or_par == is_execution_parallel
-				       && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?  
-				       FALSE:task_parallelize_p;
+	bool task_parallelize_inner = 
+	  (seq_or_par == is_execution_parallel
+	   && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?  
+	  FALSE:task_parallelize_p;
 	
-	s = MakeLoopAs(lo, seq_or_par,
+	s = MakeLoopAs(slo, seq_or_par,
 		       MakeNestOfParallelLoops(0, CDR(loops), body,
 					       task_parallelize_inner));
     }
@@ -296,13 +298,12 @@ bool task_parallelize_p;
     statement stat = statement_undefined;
     statement statb = statement_undefined;
     statement rst = statement_undefined;
-    entity module = get_current_module_entity();
     int nbl = 0;
     extern int enclosing;
 
    debug_on("RICE_DEBUG_LEVEL");
 
-    debug(9, "CodeGenerate", "starting at level %d ...\n", l); 
+    debug(9, "CodeGenerate", "Begin: starting at level %d ...\n", l); 
     ifdebug(9)
 	print_statement_set(stderr, region);
  
@@ -337,7 +338,7 @@ bool task_parallelize_p;
 				  "isolated comp. that does not contain"
 				  " dep.at Lev %d\n",
 					   l);
-			    print_text(stderr, text_statement(module,0,st)) ;
+			    print_statement(st);
 			}
 			lst = gen_nconc(lst, CONS(STATEMENT, st, NIL));
 			loops = load_statement_enclosing_loops(st);
@@ -371,8 +372,8 @@ bool task_parallelize_p;
 	    }
 	    INSERT_AT_END(block, eblock, CONS(STATEMENT, stat, NIL));
 	    ifdebug(9) {
-		fprintf(stderr,"CodeGenerate - generated statement\n") ;
-		print_text(stderr, text_statement(module,0,stat)) ;
+		debug(9, "CodeGenerate", "generated statement:\n") ;
+		print_statement(stat);
 	    }
 	}
     }
@@ -394,16 +395,27 @@ bool task_parallelize_p;
 	nbl = 0;
     }
 
-    if( !ENDP( block ))	
-	rst = make_block_statement(block);
-    else 
-	rst = statement_undefined ;
+    switch(gen_length(block)) {
+    case 0:
+      rst = statement_undefined ;
+      break;
+    case 1:
+      rst = STATEMENT(CAR(block));
+      gen_free_list(block);
+      break;
+    default:
+      rst = make_block_statement(block);
+    }
 
     ifdebug(8) { 
-	(void) fprintf(stderr,"CodeGenerate - Exiting ...\n") ;
+	debug(8, "CodeGenerate", "Result:\n") ;
+
 	if (rst==statement_undefined)  
-	    (void) fprintf(stderr,"CodeGenerate - No code to generate\n") ;
-	else print_text(stderr, text_statement(module,0,rst)) ;
+	    debug(8, "CodeGenerate", "No code to generate\n") ;
+	else
+	  print_statement(rst);
+
+	debug(8, "CodeGenerate", "Result:\n") ;
     }
     debug_off();
     return(rst);
@@ -417,18 +429,19 @@ bool task_parallelize_p;
  * fixed bug about private variable without effects, FC 22/09/93
  */
 
-statement MakeLoopAs(old_loop, seq_or_par, body)
-loop old_loop;
+statement MakeLoopAs(old_loop_statement, seq_or_par, body)
+statement old_loop_statement;
 tag seq_or_par;
 statement body;
 {
+  loop old_loop = statement_loop(old_loop_statement);
     loop new_loop;
     statement new_loop_s;
-    list 
-	new_locals = NewLoopLocals(body, loop_locals(old_loop));
+    list new_locals = NewLoopLocals(body, loop_locals(old_loop));
     instruction ibody = statement_instruction(body);  
     entity module = get_current_module_entity();
     char * module_name = entity_module_name(module);
+
     if (instruction_loop_p(ibody))
 	body = make_block_statement(CONS(STATEMENT,body,NIL));
     ibody = statement_instruction(body);  
@@ -466,14 +479,14 @@ statement body;
     }
    
     new_loop_s = make_statement(entity_empty_label(), 
-			  STATEMENT_NUMBER_UNDEFINED,
+			  statement_number(old_loop_statement),
 			  STATEMENT_ORDERING_UNDEFINED,
 			  string_undefined,
 			  make_instruction(is_instruction_loop, new_loop));
 
-    ifdebug(8) 
-    {	debug(8, "MakeLoopAs", "New loop\n");
-	print_text(stderr, text_statement(entity_undefined,0,new_loop_s));
+    ifdebug(8) {
+      debug(8, "MakeLoopAs", "New loop\n");
+      print_statement(new_loop_s);
     }
     
     return(new_loop_s);
@@ -496,11 +509,11 @@ list locals;
 	body_effects = statement_to_effects(body),
 	result = NIL;
 
-    ifdebug(8)
-    {	fprintf(stderr, "[NewLoopLocals] body is:\n");
-	print_text(stderr, text_statement(entity_undefined,0,body));
-	fprintf(stderr, "[NewLoopLocals] effects considered are:\n");
-	print_effects(body_effects);
+    ifdebug(8) {
+      debug(8, "NewLoopLocals", "body is:\n");
+      print_statement(body);
+      debug(8, "NewLoopLocals", "effects considered are:\n");
+      print_effects(body_effects);
     }
 
     MAPL(ce,
@@ -562,7 +575,8 @@ int l;
 bool task_parallelize_p;
 {
     extern int enclosing ;
-    loop lo = find_level_l_loop(s, l-enclosing);
+    statement slo = find_level_l_loop_statement(s, l-enclosing);
+    loop lo = statement_loop(slo);
     statement inner_stat;
     set inner_region;
     tag seq_or_par;
@@ -586,14 +600,5 @@ bool task_parallelize_p;
 
     if( inner_stat == statement_undefined )
 	return( inner_stat );
-    else return(MakeLoopAs(lo, seq_or_par, inner_stat));
+    else return(MakeLoopAs(slo, seq_or_par, inner_stat));
 }
-
-
-
-
-
-
-
-
-
