@@ -23,8 +23,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/stdtypes.h>  /* for debug with dbmalloc */
-#include "malloc.h"        /* for debug with dbmalloc */
+/* #include <sys/stdtypes.h> */ /* for debug with dbmalloc */
+/* #include "malloc.h"  */       /* for debug with dbmalloc */
 #include "newgen_include.h"
 
 struct inlinable Inline[] = {
