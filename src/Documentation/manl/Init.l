@@ -32,7 +32,7 @@ In order to execute "Delete
 .I workspace
 " before creating a new one.
 .\"
-.SH ENVIRONMENT
+.SH ENVIRONMENT 
 In order to add a directory to your path and to set some environment variables, you should run one of the shell script: Pips/pipsrc.sh (under any sh compatible shell) or Pips/pipsrc.csh (under any csh compatible shell).
 .\"
 .SH FILES
