@@ -143,9 +143,9 @@ bool (*loop_predicate)();
 	    /*there are no more nested loops */
 
 	    look_for_nested_loop_statements(ss,loop_transformation, loop_predicate);
-	    debug_off();
+	    debug_on("ZERO_DEBUG_LEVEL");
 	    new_s = (*loop_transformation)(sl,loop_predicate);
-	    debug_on("GENERATION_DEBUG_LEVEL");
+	    debug_off();
 	}
 	
 	for( b1=CDR(b); !ENDP(b1); b1 = CDR(b1) ) {
