@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/11/30 16:54:01 $, ) 
+ * ($Date: 1996/03/11 17:14:52 $, ) 
  */
 
 #include "defines-local.h"
@@ -302,26 +302,31 @@ hpfc_buffer_packing(
 
 static entity
 hpfc_ith_broadcast_function(
-    int dim) /* number of dimensions of the broadcast */
+    int dim,      /* number of dimensions of the broadcast */
+    bool special) /* whether to use the special version */
 {
     char buffer[20]; /* ??? static buffer size */
-    (void) sprintf(buffer, BROADCAST "%d", dim);
+    (void) sprintf(buffer, "%s%d", special? GUARDED_BRD: BROADCAST, dim);
     return MakeRunTimeSupportSubroutine(buffer, 2*dim+1);
 }
 
 /* send the buffer, possibly a broadcast.
  * unconditional ? if non empty ?
  * generates hpfc_broadcast_x as required.
+ * ??? hardwired for remappings... 
  */
-statement 
+static statement 
 hpfc_broadcast_buffers(
-    entity array, /* should be the target array */
+    entity src,   /* source array */
+    entity trg,   /* should be the target array */
     entity lid,   /* broadcast base, maybe partial?! */
     entity proc)  /* processor related to the array... (redundant!?) */
 {
     Pcontrainte c;
     int size, npdim, nreplicated;
     list /* of expression */ args = NIL;
+    bool avoid_twins = 
+	get_bool_property("HPFC_GUARDED_TWINS") && replicated_p(src);
 
     c = full_linearization(proc, (entity) NULL, &size, 
 			   get_ith_temporary_dummy, FALSE, 0);
@@ -330,8 +335,9 @@ hpfc_broadcast_buffers(
     
     for (nreplicated=0; npdim; npdim--)
     {
-	if (processors_dim_replicated_p(proc, array, npdim))
+	if (processors_dim_replicated_p(proc, trg, npdim))
 	{
+	    /* ??? possible replication on sections overlooked here */
 	    entity v;
 	    int number, step;
 	    
@@ -347,10 +353,14 @@ hpfc_broadcast_buffers(
     }
 
     args = CONS(EXPRESSION, entity_to_expression(lid), args);
+
+    /* an argument needed by the special function */
+    if (avoid_twins) 
+	args = CONS(EXPRESSION, int_to_expression(load_hpf_number(src)), args);
     contraintes_free(c);
 
     return call_to_statement
-	(make_call(hpfc_ith_broadcast_function(nreplicated), args));
+      (make_call(hpfc_ith_broadcast_function(nreplicated, avoid_twins), args));
 }
 
 statement 
@@ -365,8 +375,8 @@ hpfc_broadcast_if_necessary(
     statement send, pack;
 
     not_empty = buffer_full_condition(array, TRUE, FALSE);
-    send = hpfc_broadcast_buffers(trg, lid, proc);
-    pack = call_to_statement(make_call(hpfc_buffer_entity(array, BUFPCK), NIL));
+    send = hpfc_broadcast_buffers(array, trg, lid, proc);
+    pack = call_to_statement(make_call(hpfc_buffer_entity(array,BUFPCK), NIL));
 
     if (is_lazy)
 	return test_to_statement
@@ -379,7 +389,7 @@ hpfc_broadcast_if_necessary(
 	    (CONS(STATEMENT, test_to_statement(make_test(not_empty, pack,
 			     make_continue_statement(entity_undefined))),
 	     CONS(STATEMENT, test_to_statement(make_test(not_expression
-                (entity_to_expression(hpfc_name_to_entity(SND_NOT_INIT))), send,
+                (entity_to_expression(hpfc_name_to_entity(SND_NOT_INIT))),send,
 			     make_continue_statement(entity_undefined))),
 		  NIL)));
 }
@@ -388,7 +398,7 @@ hpfc_broadcast_if_necessary(
  */
 statement 
 hpfc_lazy_buffer_packing(
-    entity array, /* array being (un)packed */
+    entity src,   /* source array */
     entity trg,   /* target array */
     entity lid,   /* local id for base target */
     entity proc,  /* the processors, needed for broadcasts */
@@ -399,7 +409,9 @@ hpfc_lazy_buffer_packing(
     statement packing, realpack, indexeq0, ifcond, optional;
     expression condition;
     list /* of statement */ l;
+    entity array; /* array being manipulated */
 
+    array = is_send ? src : trg;
     packing = hpfc_buffer_packing(array, array_dim, is_send);
     condition = buffer_full_condition(array, is_send, TRUE);
     realpack = call_to_statement
@@ -407,7 +419,7 @@ hpfc_lazy_buffer_packing(
 	   is_send ? NIL : CONS(EXPRESSION, entity_to_expression(lid), NIL)));
     indexeq0 = set_integer(hpfc_name_to_entity(BUFFER_INDEX), 0);
     optional = is_lazy ? 
-	is_send ? hpfc_broadcast_buffers(trg, lid, proc) :
+	is_send ? hpfc_broadcast_buffers(array, trg, lid, proc) :
 	          set_logical(hpfc_name_to_entity(RCV_NOT_PRF), TRUE) :
 	make_continue_statement(entity_undefined);
 			   
