@@ -224,7 +224,7 @@ double get_process_memory_size()
     /* extern etext; 
     double memory_size = (sbrk(0) - etext)/(double)(1 << 20);
     */
-    return memory_size;
+    return 0.0;
 }
 
 double get_process_gross_heap_size()
