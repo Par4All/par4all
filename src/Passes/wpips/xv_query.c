@@ -33,8 +33,15 @@ start_query(char * window_title,
    xv_set(query_frame, FRAME_LABEL, window_title, NULL);
    /*	     PANEL_NOTIFY_PROC, cancel_query_notify, */
 
-   xv_set(query_cancel_button, PANEL_NOTIFY_PROC, cancel_func,
-          NULL);
+   if (cancel_func == NULL)
+      /* No cancel button requested: */
+      xv_set(query_cancel_button, 
+             PANEL_INACTIVE, TRUE,
+             NULL);
+   else
+      xv_set(query_cancel_button, PANEL_NOTIFY_PROC, cancel_func,
+             PANEL_INACTIVE, FALSE,
+             NULL);
 
    xv_set(query_pad, PANEL_LABEL_STRING, query_title, NULL);
 
@@ -148,21 +155,37 @@ cancel_user_request_notify(Panel_item item,
 {
    hide_window(query_frame);
 }
+#endif
 
 
-void
-wpips_user_request(char *a_printf_format,
+success
+end_user_request_notify(char * the_answer)
+{
+   hide_window(query_frame);
+   xv_window_return((Xv_opaque) the_answer);
+   /* In fact, the function above never return... */
+   return TRUE;
+}
+
+
+string
+wpips_user_request(char * a_printf_format,
                    va_list args)
 {
+   static char message_buffer[SMALL_BUFFER_LENGTH];
+
+   (void) vsprintf(message_buffer, a_printf_format, args);
+
    start_query("User Query",
-               "Waiting for your response: ", 
+               message_buffer, 
                "UserQuery",
                end_user_request_notify,
-               cancel_user_request_notify);
+               /* It is not possible to interrupt wpips_user_request: */
+               NULL);
 
-   xv_main_loop(main_frame);
+   /* Loop on the Query window: */
+   return (string) xv_window_loop(query_frame);
 }
-#endif
 
 
 void create_query_window()
