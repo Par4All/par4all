@@ -404,13 +404,23 @@ void check_the_reference(ref)
     ok = find_bd_type_variable(tp, &base, &dims);
     if (!ok)
 	return;
+
     len_dim = gen_length(dims);
+
     if (len_dim < len_ind) {
 	flint_message("reference",
 		      "too many indices for a reference (%d>%d)\n",
 		      len_ind, len_dim);
 	return;
     }
+
+    if (len_dim > len_ind) {
+	flint_message("reference",
+		      "too few indices for a reference (%d<%d)\n",
+		      len_ind, len_dim);
+	return;
+    }
+
     if (basic_overloaded_p(base))
 	return;
 
