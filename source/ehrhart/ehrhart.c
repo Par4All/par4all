@@ -309,6 +309,7 @@ void reduce_evalue (evalue *e) {
 
         /* Try to reduce its strength */
         if (p->size == 1) {
+	    value_clear(e->d);
             memcpy(e,&p->arr[0],sizeof(evalue));
             free(p);
         }
@@ -329,6 +330,7 @@ void reduce_evalue (evalue *e) {
 
         /* Try to reduce its strength */
         if (p->size == 1) {
+	    value_clear(e->d);
             memcpy(e,&p->arr[0],sizeof(evalue));
             free(p);
         }
