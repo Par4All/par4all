@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.97  1998/05/22 14:36:09  coelho
+ * "interactive" state.
+ *
  * Revision 1.96  1998/05/22 13:33:32  coelho
  * some fixes for jpips. -j option added.
  *
@@ -110,6 +113,7 @@
 /********************************************************** Static variables */
 
 bool tpips_execution_mode = TRUE;
+bool tpips_is_interactive = FALSE;
 
 static bool tpips_is_a_shell = FALSE;
 static bool use_readline = FALSE;
@@ -177,12 +181,7 @@ tpips_behaves_like_a_shell(void)
  */
 
 #define JPIPS_TAG	"#jpips:"
-static bool it_is_jpips = FALSE;
-
-bool jpips_is_running(void)
-{
-    return it_is_jpips;
-}
+bool jpips_is_running = FALSE;
 
 void jpips_begin_tag(string s)
 {
@@ -536,7 +535,7 @@ tpips_user_request(string fmt, va_list args)
 
     debug_on("TPIPS_DEBUG_LEVEL");
 
-    if (jpips_is_running())
+    if (jpips_is_running)
     {
 	jpips_tag(BEGIN_RQ);
 	vfprintf(stdout, fmt, args); /* ??? */
@@ -576,10 +575,10 @@ tpips_user_error(string calling_function_name,
     fprintf(stderr, "user error in %s: ", calling_function_name);
     vfprintf(stderr, a_message_format, * some_arguments);
 
-    if (jpips_is_running())
+    if (jpips_is_running)
     {
 	jpips_tag(BEGIN_UE);
-	fprintf(stdout, "user error in %s: ", calling_function_name);
+	fprintf(stdout, "%s\n", calling_function_name);
 	vfprintf(stdout, a_message_format, * some_arguments);
 	jpips_tag(END_UE);
     }
@@ -981,7 +980,7 @@ tpips_process_a_file(FILE * file, bool use_rl)
     while ((line = tpips_read_a_line(TPIPS_PRIMARY_PROMPT))) {
 	tpips_exec(line);
 	free(line);
-	if (jpips_is_running() && file==stdin) jpips_done();
+	if (jpips_is_running && file==stdin) jpips_done();
     }
 
     /* pop globals */
@@ -1036,7 +1035,7 @@ parse_arguments(int argc, char * argv[])
 	    tpipsrc = strdup(optarg);
 	    break;
 	case 'j':
-	    it_is_jpips = TRUE;
+	    jpips_is_running = TRUE;
 	    break;
 	default: 
 	    fprintf(stderr, tpips_usage, argv[0]);
@@ -1062,6 +1061,7 @@ parse_arguments(int argc, char * argv[])
     {
 	/* no arguments, parses stdin. */
 	bool use_rl = isatty(0);
+	tpips_is_interactive = use_rl;
 	pips_debug(1, "reading from stdin, which is%s a tty\n",
 		   use_rl ? "" : " not");
 	tpips_process_a_file(stdin, use_rl);
@@ -1080,9 +1080,11 @@ parse_arguments(int argc, char * argv[])
 		tps = strdup("-");
 		toprocess = stdin;
 		use_rl = isatty(0);
+		tpips_is_interactive = use_rl;
 	    }
 	    else
 	    {
+		tpips_is_interactive = FALSE;
 		tps = find_file_in_directories(argv[optind], 
 					       getenv("PIPS_SRCPATH"));
 		if (tps)
