@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/09/11 07:15:24 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/09/11 19:57:43 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -253,10 +253,15 @@ PARSER_WARN_FOR_COLUMNS_73_80   TRUE
 
 Each argument list at calls to a function or a subroutine is compared to
 the functional type of the callee. Turn this off if you need to support
-variable numbers of arguments.
+variable numbers of arguments or if you use overloading and do not want to
+hear about it. For instance, an IO routine can be used to write an array
+of integers or an array of reals or an array of complex if the length
+parameter is appropriate.
+
+Since the functional typing is shaky, let's turn it off by default!
 
 \begin{verbatim}
-PARSER_TYPE_CHECK_CALL_SITES   TRUE
+PARSER_TYPE_CHECK_CALL_SITES   FALSE
 \end{verbatim}
 
 The PIPS implementation of Allen\&Kennedy algorithm cannot cope with
