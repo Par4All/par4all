@@ -2,6 +2,10 @@
  * Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
+ * $RCSfile: overlap.c,v $ ($Date: 1994/09/01 15:47:54 $, )
+ * version $Revision$
+ * got on %D%, %T%
+ * $Id$
  */
 
 /*
@@ -10,7 +14,7 @@
 
 #include <stdio.h>
 #include <string.h>
-extern int      fprintf();
+extern int fprintf();
 
 #include "genC.h"
 
@@ -156,7 +160,8 @@ int ov;
  *
  *
  */
-void declaration_with_overlaps()
+void declaration_with_overlaps(l)
+list l;
 {
     MAPL(ce,
      {
@@ -177,8 +182,12 @@ void declaration_with_overlaps()
 	     dimension
 		 the_dim = entity_ith_dimension(ent, i);
 
-	     int lower_overlap = get_overlap(oldent, i, LOWER);
-	     int upper_overlap = get_overlap(oldent, i, UPPER);
+	     int lower_overlap = get_overlap(oldent, i, 0);
+	     int upper_overlap = get_overlap(oldent, i, 1);
+
+	     debug(8, "declaration_with_overlaps", 
+		   "%s(DIM=%d): -%d, +%d\n", 
+		   entity_name(ent), i, lower_overlap, upper_overlap);
 
 	     if (lower_overlap!=0) 
 	     {
@@ -193,6 +202,15 @@ void declaration_with_overlaps()
 	     }
 	 }
      },
-	 list_of_distributed_arrays());
+	 l);
 }
 
+void declaration_with_overlaps_for_module(module)
+entity  module;
+{
+    list
+	l = list_of_distributed_arrays_for_module(module);
+
+    declaration_with_overlaps(l);
+    gen_free_list(l);
+}
