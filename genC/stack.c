@@ -11,12 +11,11 @@
  * More thoughts needed. 
  *
  * $RCSfile: stack.c,v $ version $Revision$
- * $Date: 1995/02/03 11:42:40 $, 
+ * $Date: 1995/09/16 22:10:19 $, 
  * got on %D%, %T%
  */
 
 #include <stdio.h>
-extern int fprintf();
 #include "malloc.h"
 #include "newgen_assert.h"
 #include "newgen_stack.h"
@@ -26,16 +25,16 @@ extern int fprintf();
  *
  */
 
-/* the stack bulks, i.e. arrays containing the elements
+/* the stack buckets, i.e. arrays containing the elements
  */
-typedef struct __stack_bulk
+typedef struct __stack_bucket
 {
-    int n_item;                 /* next available item in the bulk */
-    int max_items;              /* the maximun number of items of this bulk */
+    int n_item;                 /* next available item in the bucket */
+    int max_items;              /* the maximun number of items of this bucket */
     char **items;               /* the items (only pointers at the moment) */
-    struct __stack_bulk *succ;  /* the next bulk */
+    struct __stack_bucket *succ;/* the next bucket */
 }
-   _stack_bulk, *_stack_ptr;
+   _stack_bucket, *_stack_ptr;
 
 /*  the stack head
  */
@@ -43,10 +42,10 @@ typedef struct __stack_head
 {
     int size;        /* current number of elements in stack */
     int max_extent;  /* maximum extension of the stack */
-    _stack_ptr stack;/* bulks in use by the stack */
-    _stack_ptr avail;/* allocated bulks not in use anymore */
-    int bulk_size;   /* reference bulk size for allocation */
-    int n_bulks;     /* number of allocated bulks */
+    _stack_ptr stack;/* buckets in use by the stack */
+    _stack_ptr avail;/* allocated buckets not in use anymore */
+    int bucket_size; /* reference bucket size for allocation */
+    int n_buckets;   /* number of allocated buckets */
     int type;        /* as BASIC, LIST, EXTERNAL, CHUNK, domain? */
     int policy;      /* may be used to indicate an allocation policy */
 }
@@ -64,10 +63,10 @@ typedef struct __stack_head
  */
 typedef struct __stack_iterator
 {
-    _stack_ptr bulk; /* current bulk */
-    int downward;    /* true if downward iterations */
-    int index;       /* current index in bulk */
-    _stack_ptr list; /* all bulks */
+    _stack_ptr bucket; /* current bucket */
+    int downward;      /* true if downward iterations */
+    int index;         /* current index in bucket */
+    _stack_ptr list;   /* all buckets */
 }
     _stack_iterator; /* and also *stack_iterator (in headers) */
 
@@ -76,22 +75,23 @@ stack_iterator i;
 {
     _stack_ptr x=i->list;
 
-    while(!STACK_PTR_NULL_P(x) && x->succ!=i->bulk) 
+    while(!STACK_PTR_NULL_P(x) && x->succ!=i->bucket) 
 	x=x->succ;
 
-    i->bulk=x, i->index=0;
+    i->bucket=x, i->index=0;
 
-    if (x && i->bulk->n_item==0) i->bulk = STACK_PTR_NULL;
+    if (x && i->bucket->n_item==0) i->bucket = STACK_PTR_NULL;
 }
 
-#define STACK_ITERATOR_END_P(i) STACK_PTR_NULL_P(i->bulk)
+#define STACK_ITERATOR_END_P(i) STACK_PTR_NULL_P(i->bucket)
 #define DEFINE_ITERATOR(i,blk,idx,dwn,lst) \
-    { i->bulk=(blk), i->index=(idx), i->list=lst, i->downward=dwn;}
+    { i->bucket=(blk), i->index=(idx), i->list=lst, i->downward=dwn;}
 #define UPDATE_ITERATOR_DOWNWARD(i)\
  if (i->index==-1) \
- { i->bulk = i->bulk->succ, i->index = (i->bulk) ? (i->bulk->n_item)-1 : -1; }
+ { i->bucket = i->bucket->succ,\
+   i->index = (i->bucket) ? (i->bucket->n_item)-1 : -1; }
 #define UPDATE_ITERATOR_UPWARD(i)\
- if (i->index==i->bulk->n_item) update_iterator_upward(i);
+ if (i->index==i->bucket->n_item) update_iterator_upward(i);
 #define NEXT_ITERATION(i) \
   if (i->downward)\
   { i->index--; UPDATE_ITERATOR_DOWNWARD(i);}\
@@ -136,7 +136,7 @@ char **pitem;
     }
     else
     {
-	*pitem = (i->bulk->items)[i->index];
+	*pitem = (i->bucket->items)[i->index];
 	NEXT_ITERATION(i);
 	return(1);
     }
@@ -159,12 +159,12 @@ stack_iterator *pi;
  *
  */
 
-/* allocates a bulk of size size
+/* allocates a bucket of size size
  */
-static _stack_ptr allocate_bulk(size)
+static _stack_ptr allocate_bucket(size)
 int size;
 {
-    _stack_ptr x = (_stack_ptr) malloc(sizeof(_stack_bulk));
+    _stack_ptr x = (_stack_ptr) malloc(sizeof(_stack_bucket));
     
     x->n_item = 0;
     x->max_items = size;
@@ -174,8 +174,8 @@ int size;
     return(x);
 }
 
-/* search for a new bulk, first in the available list,
- * if none are available, a new bulk is allocated
+/* search for a new bucket, first in the available list,
+ * if none are available, a new bucket is allocated
  */
 static _stack_ptr find_or_allocate(s)
 stack s;
@@ -185,32 +185,32 @@ stack s;
 	_stack_ptr x = s->avail;
 
 	s->avail = (s->avail)->succ;
-	x->succ = STACK_PTR_NULL; /*  clean the bulk to be returned */
+	x->succ = STACK_PTR_NULL; /*  clean the bucket to be returned */
 	return(x);
     }
     else
     {
-	s->n_bulks++;
-	return(allocate_bulk(s->bulk_size)); /* may depend from the policy? */
+	s->n_buckets++;
+	return(allocate_bucket(s->bucket_size)); /* may depend from the policy? */
     }
 }
 
 /* ALLOCATEs a new stack of type
  */
-stack stack_make(type, bulk_size, policy)
-int type, bulk_size, policy;
+stack stack_make(type, bucket_size, policy)
+int type, bucket_size, policy;
 {
     stack s = malloc(sizeof(_stack_head));
 
-    if (bulk_size<10) bulk_size=STACK_DEFAULT_SIZE; /* not too small */
+    if (bucket_size<10) bucket_size=STACK_DEFAULT_SIZE; /* not too small */
 
     s->size = 0;
     s->type = type;
     s->policy = policy; /* not used */
-    s->bulk_size = bulk_size;
+    s->bucket_size = bucket_size;
     s->max_extent = 0;
-    s->n_bulks = 0;
-    s->stack = allocate_bulk(bulk_size);
+    s->n_buckets = 0;
+    s->stack = allocate_bucket(bucket_size);
     s->avail = STACK_PTR_NULL;
  
     return(s);
@@ -218,13 +218,13 @@ int type, bulk_size, policy;
 
 /* FREEs the stack
  */
-static void free_bulk(x)
+static void free_bucket(x)
 _stack_ptr x;
 {
     free(x->items), x->items = (char **) NULL, free(x);
 }
 
-static void free_bulks(x)
+static void free_buckets(x)
 _stack_ptr x;
 {
     _stack_ptr tmp;
@@ -232,15 +232,15 @@ _stack_ptr x;
     while(!STACK_PTR_NULL_P(x))
     {
 	tmp=x, x=x->succ, tmp->succ=STACK_PTR_NULL;
-	free_bulk(tmp);
+	free_bucket(tmp);
     }
 }
 
 void stack_free(ps)
 stack *ps;
 {
-    free_bulks((*ps)->stack), (*ps)->stack=STACK_PTR_NULL;
-    free_bulks((*ps)->avail), (*ps)->avail=STACK_PTR_NULL;
+    free_buckets((*ps)->stack), (*ps)->stack=STACK_PTR_NULL;
+    free_buckets((*ps)->avail), (*ps)->avail=STACK_PTR_NULL;
     free(*ps); *ps = STACK_NULL;
 }
 
@@ -251,12 +251,12 @@ stack *ps;
 #define STACK_OBSERVER(name, what)\
 int stack_##name(s) stack s; { STACK_CHECK(s); return(what);}
 
-STACK_OBSERVER(size, s->size);
-STACK_OBSERVER(bulk_size, s->bulk_size);
-STACK_OBSERVER(policy, s->policy);
-STACK_OBSERVER(max_extent, s->max_extent);
-STACK_OBSERVER(empty_p, s->size==0);
-STACK_OBSERVER(consistent_p, 1); /* well, it is not implemented */
+STACK_OBSERVER(size, s->size)
+STACK_OBSERVER(bsize, s->bucket_size)
+STACK_OBSERVER(policy, s->policy)
+STACK_OBSERVER(max_extent, s->max_extent)
+STACK_OBSERVER(empty_p, s->size==0)
+STACK_OBSERVER(consistent_p, 1) /* well, it is not implemented */
 
 #undef STACK_OBSERVER
 
@@ -276,7 +276,7 @@ void (*f)();
 	    (*f)(x->items[i]);
 }
 
-static int number_of_bulks(x)
+static int number_of_buckets(x)
 _stack_ptr x;
 {
     int n=0;
@@ -304,8 +304,8 @@ stack s;
     /* else */
     fprintf(f, " - type %d, size %d, max extent %d\n", 
 	    s->type, s->size, s->max_extent);
-    fprintf(f, " - bulks: %d in use, %d available\n",
-	    number_of_bulks(s->stack), number_of_bulks(s->avail));
+    fprintf(f, " - buckets: %d in use, %d available\n",
+	    number_of_buckets(s->stack), number_of_buckets(s->avail));
 }
 
 /*
@@ -315,8 +315,8 @@ stack s;
 
 /* PUSHes the item on stack s
  *
- * a new bulk is allocated if necessary. 
- * the size it the same than the initial bulk size. 
+ * a new bucket is allocated if necessary. 
+ * the size it the same than the initial bucket size. 
  * Other policies may be considered.
  */
 void stack_push(item, s)
@@ -345,7 +345,7 @@ stack s;
 
 /* POPs one item from stack s
  *
- * the empty bulks are not freed here. 
+ * the empty buckets are not freed here. 
  * stack_free does the job.
  */
 char *stack_pop(s)
