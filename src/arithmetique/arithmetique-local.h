@@ -82,7 +82,9 @@ typedef long long int Value;
     ((int)((val)>(Value)INT_MIN&&(val)<=(Value)INT_MAX)?\
      (val):(THROW(overflow_error), INT_MIN))
 #define VALUE_TO_DOUBLE(val) ((double)(val))
-#define VALUE_TO_FLOAT(val) ((float)(val))
+/* FI: I do not understand why, but the first definition isn't working with gcc */
+/* #define VALUE_TO_FLOAT(val) ((float)(val)) */
+#define VALUE_TO_FLOAT(val) ((float)((int)(val)))
 
 /* end LINEAR_VALUE_IS_LONGLONG
  */
