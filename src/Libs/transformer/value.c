@@ -9,7 +9,7 @@
   *
   * Constant values may be used as values. They are 0-ary functions. They
   * are used to encode character strings. They are not dealt with by this
-  * package. It might be possible to handle scalar floating point
+  * package. It is possible to handle scalar floating point
   * constants in the same way.
   *
   * Temporary values may be used to denote expression values. These
@@ -28,7 +28,7 @@
   *
   * Three different kind of variable values are used: new, old and
   * intermediate.  New values are used in post-condition predicates. Old
-  * Values are used in pre-condition predicates. New and Old values are
+  * values are used in pre-condition predicates. New and old values are
   * also used in predicate transformers. Intermediate values are used to
   * combine transformers.
   *
@@ -65,16 +65,16 @@
   * names I#new, I#old and I#tmp and to print readable debug information.
   *
   * To accelerate conversions between new, old and intermediate value
-  * entities, three hash tables are set up for each module before
+  * entities, four hash tables are set up for each module before
   * semantics analysis is started:
   *
-  *  - hash_entity_to_new_value associates an entity representing a new *
+  *  - hash_entity_to_new_value associates an entity representing a new
   *  value to each scalar variable with an analyzed type; this value
-  *  entity * is most of the time the variable entity itself and thus this
-  *  hash * table almost represents an identity function; however,
-  *  perfectly * equivalenced variables are represented by one of them
-  *  only and some * eligible analyzable scalar variables are not mapped to
-  *  anything because * they are equivalenced to an array
+  *  entity is most of the time the variable entity itself and thus this
+  *  hash table almost represents an identity function; however,
+  *  perfectly equivalenced variables are represented by one of them
+  *  only and some eligible analyzable scalar variables are not mapped to
+  *  anything because they are equivalenced to an array
   *
   *  - hash_entity_to_old_value associates an entity representing an old
   *  value to each scalar analyzable variable
@@ -160,6 +160,10 @@
   * $Id$
   *
   * $Log: value.c,v $
+  * Revision 1.22  2002/03/19 17:42:04  irigoin
+  * Due to a bug fixed in ../semantics/mappings.c, improvement of comments,
+  * replacement of debug() by pips_debug() and of pips_error() by pips_internal_error()
+  *
   * Revision 1.21  2001/07/24 13:10:42  irigoin
   * Bug fix in make_local_value_entity(): types inherited by temporary values
   * were wrong due to a "specificity" of type_equal_p() which returns true for
@@ -188,7 +192,7 @@
 #include "misc.h"
 
 #include "transformer.h"
-
+
 /* STATIC VARIABLES */
 
 /* Four global hash tables used to map scalar analyzable variable entities
@@ -626,7 +630,7 @@ bool value_entity_p(entity e)
     return TRUE;
   }
 }
-
+
 /* used with hash_table_fprintf */
 static string string_identity(string s)
 { return s;}
@@ -780,7 +784,7 @@ static void add_new_value_name(entity e)
   string new_value_name = 
     strdup(concatenate(entity_name(e), NEW_VALUE_SUFFIX, 
 		       (char *) NULL));
-  debug(8,"add_new_value_name","begin: for %s\n", entity_name(e));
+  pips_debug(8,"begin: for %s\n", entity_name(e));
   if(hash_get(hash_value_to_name, (char *) e) == HASH_UNDEFINED_VALUE)
     hash_put(hash_value_to_name, (char *) e, (char *) new_value_name);
   else
@@ -789,7 +793,7 @@ static void add_new_value_name(entity e)
 
 void add_new_value(entity e)
 {
-  debug(8,"add_new_value","begin: for %s\n", entity_name(e));
+  pips_debug(8,"begin: for %s\n", entity_name(e));
   if(hash_get(hash_entity_to_new_value, (char *) e)
      == HASH_UNDEFINED_VALUE) {
     hash_put(hash_entity_to_new_value, (char *) e, (char *) e);
@@ -800,9 +804,9 @@ void add_new_value(entity e)
 void add_new_alias_value(entity e, entity a)
 {
   entity v = entity_undefined;
-  debug(8,"add_new_alias_value","begin: for %s and %s\n",
+  pips_debug(8, "begin: for %s and %s\n",
 	entity_name(e),entity_name(a));
-  pips_assert("add_new_alias_valued", 
+  pips_assert("hash_entity_to_new_value is defined", 
 	      (hash_get(hash_entity_to_new_value, (char *) e)
 	       == HASH_UNDEFINED_VALUE));
 
@@ -982,10 +986,18 @@ remove_entity_values(entity e, bool readonly)
 
 void add_synonym_values(entity e, entity eq, bool readonly)
 {
-  /* e and eq are entities whose values are always equal because they share
-   * the exact same memory location (i.e. they are alias) */
+  /* e and eq are entities whose values are always equal because they
+   * share the exact same memory location (i.e. they are alias). Values
+   * for e have already been declared. Values for eq have to be
+   * declared. */
   entity new_value = entity_to_new_value(e);
   entity intermediate_value;
+
+  pips_debug(8, "Begin for registered variable %s"
+	     " equivalenced with new variable %s"
+	     " with status %s\n",
+	     entity_local_name(e), entity_local_name(eq),
+	     readonly? "readonly" : "read/write");
 
   hash_put(hash_entity_to_new_value, (char *) eq,
 	   (char *) new_value);
@@ -1007,8 +1019,10 @@ void add_synonym_values(entity e, entity eq, bool readonly)
   hash_put(hash_value_to_name, (char *) eq,
 	   strdup(concatenate(entity_name(eq),
 			      NEW_VALUE_SUFFIX, (char *) NULL)));
-}
 
+  pips_debug(8, "End\n");
+}
+
 /* This function used to be restricted to values seen by the
  * current module. It was extended to values in general to
  * cope with translation issues.
@@ -1057,9 +1071,8 @@ entity value_to_variable(entity val)
     else
       /* It can be an equivalenced variable... Additional testing
 	 should be performed! */
-      pips_error("value_to_variable",
-		 "%s is not a locally visible value\n",
-		 entity_name(val));
+      pips_internal_error("%s is not a locally visible value\n",
+			  entity_name(val));
   }
 
   var_name = strdup(s);
@@ -1068,12 +1081,12 @@ entity value_to_variable(entity val)
   free(var_name);
 
   if( var == entity_undefined )
-    pips_error("value_to_variable",
-	       "no related variable for val=%s\n", entity_name(val));
+    pips_internal_error("no related variable for val=%s\n",
+			entity_name(val));
 
   return var;
 }
-
+
 entity old_value_to_new_value(entity o_val)
 {
   entity var = entity_undefined;
