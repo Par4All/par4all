@@ -78,6 +78,8 @@ typedef Scontrainte Sinegalite, * Pinegalite;
 /* passage au champ vecteur d'une contrainte "a la  Newgen" */
 #define contrainte_vecteur(c) ((c)->vecteur)
 
+#define contrainte_succ(c) ((c)->succ)
+
 /* contrainte nulle (non contrainte 0 == 0 ou 0 <= 0) */
 #define CONTRAINTE_NULLE_P(c) (VECTEUR_NUL_P(contrainte_vecteur(c)))
 
