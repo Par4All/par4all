@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/08/08 10:49:12 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/08/08 11:56:34 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2118,7 +2118,7 @@ int create_p ;
     char buffer[ 1024 ] ;
 
     genread_in = file ;
-#ifdef flex_scanner
+#ifdef FLEX_SCANNER
     if( (i=genread_lex()) != READ_INT ) {
 	(void) sprintf( buffer, "%d", i ) ;
 	user( "Incorrect data for gen_read_tabulated: %s\n", buffer ) ;
