@@ -302,36 +302,22 @@ bool db_resource_p(string rname, string oname)
 
 static void db_load_resource(string rname, string oname, db_resource r)
 {
-  int current_time;
   pips_debug(7, "loading %s of %s\n", rname, oname);
   pips_assert("resource stored", db_resource_stored_p(r));
   db_resource_pointer(r) = dbll_load_resource(rname, oname);
   db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
-
-  if (displayable_file_p(rname)) /* time the resource, not the stored */
+  if (displayable_file_p(rname))
   {
-    current_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
-    if (current_time!=db_resource_file_time(r)) 
-    {
-      pips_user_warning("resource file %s[%s] changed %d to %d!\n", 
-			rname, oname, db_resource_file_time(r), current_time);
-      db_resource_file_time(r) = current_time;
-
-      /* we update the logical time for this new resource... 
-       */
-      db_inc_logical_time();
-      db_resource_time(r) = db_get_logical_time();
-      db_inc_logical_time();
-    }
+    int its_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
+    if (its_time > db_resource_file_time(r))
+      /* should be an internal error? */
+      pips_user_warning("internal resource %s[%s] updated!\n", rname, oname);
   }
   else
   {
-    current_time = dbll_stat_resource_file(rname, oname, FALSE);
-    if (current_time != db_resource_file_time(r)) {
-      pips_user_warning("file of internal resource %s[%s] changed!\n", 
-			rname, oname);
-      db_resource_file_time(r) = current_time;
-    }
+    int its_time = dbll_stat_resource_file(rname, oname, TRUE);
+    if (its_time > db_resource_file_time(r))
+      pips_user_warning("file resource %s[%s] updated!\n", rname, oname);
   }
 }
 
@@ -356,12 +342,14 @@ int db_time_of_resource(string rname, string oname)
 	/* check time of actual resource... 
 	 * note that source files are skipped!
 	 */
-	int time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
-	if (time!=db_resource_file_time(r)) 
+	int current_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
+	if (current_time > db_resource_file_time(r)) 
 	{
-	    pips_user_warning("file %s has been edited...\n", 
-			      db_resource_pointer(r));
-	    db_resource_file_time(r) = time;
+	    pips_user_warning("file '%s' has been edited (%d -> %d)...\n", 
+			      db_resource_pointer(r),
+			      db_resource_file_time(r), current_time);
+	    db_resource_file_time(r) = current_time;
+
 	    db_inc_logical_time();
 	    db_resource_time(r) = db_get_logical_time();
 	    db_inc_logical_time();
@@ -379,7 +367,10 @@ static void db_save_resource(string rname, string oname, db_resource r)
       pips_internal_error("cannot store %s\n",rname);
     dbll_save_resource(rname, oname, db_resource_pointer(r));
     db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
-    db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
+
+    /* let us set the file time if appropriate... */
+    if (!displayable_file_p(rname))
+      db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
 }
 
 static void db_save_and_free_resource(
