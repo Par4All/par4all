@@ -242,7 +242,7 @@ Je remercie B. Apvrille pour ces remarques ainsi que pour sa contribution
 \section{Fichier des types.} Ce fichier comprend la définition des types et des
 redéfinitions de fonctions pour des questions de compatibilité avec
 les versions antérieures.
-@o union-types.h @{
+@o union-local.h @{
 @< Type @> 
 /* FOR BACKWARD COMPATIBILITY */
 #define my_sc_full()         sc_full()
