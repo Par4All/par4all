@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/17 16:20:29 $, 
+ * $Date: 1996/06/17 17:45:27 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -145,6 +145,8 @@ reductions sload_cumulated_reductions(statement s)
     return make_reductions(NIL); /* ??? memory leak */
 }
 
+/************************************************ LIST OF REDUCED ENTITIES */
+
 /* list of entities that may be reduced
  */
 static list /* of entity */
@@ -171,7 +173,11 @@ list_of_reduced_variables(
     return le;
 }
 
+/************************************** CUMULATED REDUCTIONS OF STATEMENT */
+
 /* returns a r reduction of any compatible with { node } u ls
+ * input: var, node and ls
+ * output: TRUE and some *pr, or FALSE
  */
 static bool 
 build_reduction_of_variable(
@@ -208,8 +214,11 @@ build_reduction_of_variable(
     return TRUE;
 }
 
+/* builds cumulated reductions for node, depending on node and
+ * list of statement ls.
+ */
 static void 
-build_reductions_of_statement(
+build_creductions_of_statement(
     statement node,
     list /* of statement */ ls)
 {
@@ -217,7 +226,7 @@ build_reductions_of_statement(
     list /* of reduction */ lr=NIL;
     reduction r;
 
-    /* list of candidates */
+    /* list of candidate entities */
     le = list_of_reduced_variables(node, ls);
 
     /* for each candidate, extract the reduction if any */
@@ -236,16 +245,17 @@ build_reductions_of_statement(
  * - its own proper reductions and effects
  * - the cumulated reductions and effects of its sons
  * the computation is performed by build_reductions_of_statement.
+ * the current statement is retrieved thru the crt_stat stack.
  */
 static void cr_sequence_rwt(sequence s)
 {
-    build_reductions_of_statement(crt_stat_head(), sequence_statements(s));
+    build_creductions_of_statement(crt_stat_head(), sequence_statements(s));
 }
 
 static void cr_loop_rwt(loop l)
 {
     list /* of statement */ ls = CONS(STATEMENT, loop_body(l), NIL);
-    build_reductions_of_statement(crt_stat_head(), ls);
+    build_creductions_of_statement(crt_stat_head(), ls);
     gen_free_list(ls);
 }
 
@@ -253,7 +263,7 @@ static void cr_test_rwt(test t)
 {
     list /* of statement */ ls = 
 	CONS(STATEMENT, test_true(t), CONS(STATEMENT, test_false(t), NIL));
-    build_reductions_of_statement(crt_stat_head(), ls);
+    build_creductions_of_statement(crt_stat_head(), ls);
     gen_free_list(ls);
 }
 
@@ -261,7 +271,7 @@ static void cr_unstructured_rwt(unstructured u)
 {
     list /* of statements */ ls = NIL;
     CONTROL_MAP(c, {}, unstructured_control(u), ls);
-    build_reductions_of_statement(crt_stat_head(), ls);
+    build_creductions_of_statement(crt_stat_head(), ls);
     gen_free_list(ls);
 }
 
@@ -274,7 +284,8 @@ static void cr_call_rwt(call c)
 /* Perform the bottom-up propagation of cumulated reductions 
  * for statement s, through gen_multi_recurse.
  * only call instructions must be walked thru,
- * hence it is stoped on expressions.
+ *   hence it is stoped on expressions.
+ * the crt_stat stack is used.
  */
 static void compute_cumulated_reductions(statement s)
 {
