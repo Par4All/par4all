@@ -15,7 +15,7 @@ cat >map$$ <<EOF
 
 static struct builder_map {
     char *builder_name;
-    void (*builder_func)();
+    bool (*builder_func)();
 } builder_maps[] = {
 
 EOF
