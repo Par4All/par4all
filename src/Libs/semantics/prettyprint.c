@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/07/21 12:22:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/21 12:26:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/07/21 12:22:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/07/21 12:26:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -36,7 +36,6 @@ char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/07/21 12:22:03 $, ) versio
 #include "effects.h"
 
 #include "semantics.h"
-extern void qsort();
 
 #define PREC_FORESYS_PREFIX "C$PREC"
 #define TRAN_FORESYS_PREFIX "C$TRAN"
