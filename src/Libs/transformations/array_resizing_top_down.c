@@ -581,6 +581,319 @@ bool same_dimension_p(entity actual_array, entity dummy_array,
   return FALSE;
 }
 
+static list translate_reference_to_callee_frame(expression e, reference ref, transformer context)
+{
+  /* There are 2 cases for a reference M
+     1. Common variable : CALLER::M = CALLEE::M or M'
+     2. Precondition +  Association : M =10 or M = FOO::N -1 */
+  list l = NIL;
+  entity en = reference_variable(ref);
+  normalized ne;
+  if (variable_in_common_p(en))
+    {
+      /* Check if the COOMON/FOO/ N is also declared in the callee or not 
+       * We can use ram_shared which contains a list of aliased variables with en 
+       * but it does not work ????  
+       
+       * Another way : looking for a variable in the declaration of the callee
+       * that has the same offset in the same common block */
+      list l_callee_decl = code_declarations(entity_code(current_callee));
+      bool in_callee = FALSE;
+      /* search for equivalent variable in the list */	  
+      MAP(ENTITY, enti,
+      {
+	if (same_scalar_location_p(en, enti))
+	  {
+	    expression expr;
+	    /* ATTENTION : enti may be an array, such as A(2):
+	       COMMON C1,C2,C3,C4,C5
+	       COMMON C1,A(2,2)
+	       we must return A(1,1), not A */
+	    if (array_entity_p(enti))
+	      {
+		variable varenti = type_variable(entity_type(enti));   		      
+		int len =  gen_length(variable_dimensions(varenti));
+		list l_inds = make_list_of_constant(1,len);
+		reference refer = make_reference(enti,l_inds);
+		expr = reference_to_expression(refer);
+	      }
+	    else 
+	      expr = entity_to_expression(enti);
+	    ifdebug(2)
+	      {
+		fprintf(stderr, "\n Syntax reference: Common variable, add to list: \n");
+		print_expression(expr);
+	      } 
+	    in_callee = TRUE;
+	    l = gen_nconc(l,CONS(EXPRESSION,copy_expression(expr),NIL));
+	    break;
+	  }
+      },l_callee_decl);
+      
+      /* If en is a pips created common variable, we can add this common declaration
+	 to the callee's declaration list => use this value.
+	 If en is an initial program's common variable => do we have right to add ? 
+	 confusion between local and global varibales that have same name  ??? */
+      
+      if (!in_callee && strstr(entity_local_name(en),"I_PIPS_") != NULL)
+	{
+	  string callee_name = module_local_name(current_callee);
+	  string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,TRUE);
+	  string base_name = pips_basename(user_file, NULL);
+	  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
+	  string pips_variable_name = entity_local_name(en);
+	  string pips_common_name = strstr(entity_local_name(en),"PIPS_");
+	  string new_decl = strdup(concatenate("      INTEGER*8 ",pips_variable_name,"\n",
+					       "      COMMON /",pips_common_name,"/ ",pips_variable_name,"\n",NULL));
+	  /* Attention, miss a test if this declaration has already been added or not 
+	     => Solutions : 
+	     1. if add pips variable declaration for current module => add for all callees 
+	     where the array is passed ???
+	     2. Filter when using script array_resizing_instrumentation => simpler ??? */
+	  fprintf(instrument_file,"%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name,callee_name,0,1);
+	  fprintf(instrument_file,new_decl);
+	  fprintf(instrument_file,"%s\n",PREFIX3);
+	  free(file_name), file_name = NULL;
+	  free(new_decl), new_decl = NULL;
+	  l = gen_nconc(l,CONS(EXPRESSION,e,NIL));
+	}
+    }      
+  /* Use the precondition + association of the call site:
+     Take only the equalities.
+     Project all variables belonging to the caller, except the current variable (from e)
+     there are 2 cases :
+     1. The projection is not exact , there are over flows
+     Return the SC_UNDEFINED => what to do, like before ? 
+     2. The result is exact, three small cases: 
+     2.1 The system is always false sc_empty => unreachable code ?
+     2.2 The system is always true sc_rn => we have nothing ?
+     2.3 The system is parametric =>
+     
+     Look for equality that contain e
+     Delete e from the vector 
+     Check if the remaining of the vectors contains only constant (TCTS) 
+     or formal variable of the callee,
+     Add to the list the expression (= remaining vertor)*/
+  clean_all_normalized(e);
+  ne =  NORMALIZE_EXPRESSION(e);
+  if (normalized_linear_p(ne))
+    {
+      Pvecteur ve = normalized_linear(ne);
+      Variable vare = var_of(ve); 
+      Psysteme ps_tmp = predicate_system(transformer_relation(context));
+      Pbase b_tmp = ps_tmp->base;
+      /* Attention :   here the transformer current_con text is consistent 
+	 but not the system ps_tmp. I do not understand why ?
+	 fprintf(stderr, "consistent psystem ps_tmp before");
+	 pips_assert("consistent psystem ps_tmp", sc_consistent_p(ps_tmp));*/
+      if (base_contains_variable_p(b_tmp,vare))
+	{
+	  Psysteme ps = sc_dup(ps_tmp);
+	  Pbase b = ps->base;
+	  Pvecteur pv_var = VECTEUR_NUL; 	  
+	  ifdebug(4)
+	    {
+	      fprintf(stderr, "\n Syntax reference : using precondition + association \n");
+	      fprint_transformer(stderr,context,entity_local_name);
+	    }
+	  for(; !VECTEUR_NUL_P(b); b = b->succ) 
+	    {
+	      Variable var = vecteur_var(b);
+	      if ((strcmp(module_local_name(current_caller),entity_module_name((entity)var))==0)
+		  && (var!=vare))
+		vect_add_elem(&pv_var, var, VALUE_ONE); 
+	    }
+	  ps->inegalites = contraintes_free(ps->inegalites);
+	  ps->nb_ineq = 0;
+	  ps = my_system_projection_along_variables(ps, pv_var);       
+	  vect_rm(pv_var);  
+	  if (ps != SC_UNDEFINED)
+	    {
+	      // the projection is exact		       
+	      Pcontrainte egal, egal1;
+	      for (egal = ps->egalites; egal != NULL; egal = egal1) 
+		{
+		  /* Take only the equations of the system */
+		  Pvecteur vec = egal->vecteur;
+		  if (vect_contains_variable_p(vec,vare))
+		    {
+		      Value vale = vect_coeff(vare,vec);
+		      Pvecteur newv = VECTEUR_UNDEFINED; 
+		      if (value_one_p(vale) || value_mone_p(vale))
+			newv = vect_del_var(vec,vare);
+		      if  (value_one_p(vale))
+			vect_chg_sgn(newv);
+		      if (!VECTEUR_UNDEFINED_P(newv))
+			{
+			  /*the coefficient of e is 1 or -1.
+			    Check if the remaining vector contains only constant or formal argument of callee*/
+			  Pvecteur v;
+			  bool check = TRUE;
+			  for (v = newv; (v !=NULL) && (check); v = v->succ)
+			    { 
+			      Variable var = v->var;
+			      if ((var != TCST) && (!variable_is_a_module_formal_parameter_p((entity)var,current_callee)) )
+				check = FALSE;
+			    }
+			  if (check)
+			    {
+			      expression new_exp = Pvecteur_to_expression(newv);
+			      ifdebug(2)
+				{
+				  fprintf(stderr, "\n Add new expression/reference to list by using prec+ asso : \n");
+				  print_expression(new_exp);
+				} 
+			      l = gen_nconc(l,CONS(EXPRESSION,new_exp,NIL));
+			    }
+			  vect_rm(newv);
+			}
+		    }
+		  egal1 = egal->succ;
+		}
+	    }	 
+	  sc_rm(ps);
+	}
+    }
+  return l;
+}
+
+static list translate_to_callee_frame(expression e, transformer context);
+
+static list translate_call_to_callee_frame(call ca, transformer context)
+{
+  list l = NIL;
+  entity fun = call_function(ca);
+  list l_args = call_arguments(ca);
+  if (l_args==NIL)
+    {
+      /* Numerical constant or symbolic value (PARAMETER (M=2000)) . 
+	 There are 2 cases:
+	 1. Constant : 2000 => add to list
+	 2. Precondition + Association : 2000 = M = FOO:N -1=> add N-1 to the list  
+	 => trade-off : we have more chances vs more computations */
+      value val = entity_initial(fun);
+      constant con = constant_undefined;
+      int i;
+      /*  ifdebug(2)
+	  {
+	  fprintf(stderr, "\n Add  symbolic value to list: \n");
+	  print_expression(e);
+	  } */
+      /* There is something changed in PIPS ? 
+	 PARAMETER M =10 
+	 add M, not 10 as before ??? */
+      // l = gen_nconc(l,CONS(EXPRESSION,e,NIL));
+      
+      if (value_symbolic_p(val))
+	{
+	  /* Symbolic constant: PARAMETER (Fortran) or CONST (Pascal) */
+	  symbolic sym = value_symbolic(val);
+	  con = symbolic_constant(sym);
+	}
+      if (value_constant_p(val))
+	con = value_constant(val);
+      if (!constant_undefined_p(con))
+	{
+	  if (constant_int_p(con))
+	    {
+	      /* Looking for a formal parameter of the callee that equals 
+		 to i in the Precondition + Association information 
+		 Add this formal parameter to the list
+		 We have to project all variables of the caller
+		 Attention : bug in PerfectClub/mdg :
+		 looking for formal parameter equal to 1 in system: {==-1} */
+	      Psysteme ps_tmp = predicate_system(transformer_relation(context));
+	      Psysteme ps = sc_dup(ps_tmp);
+	      Pbase b = ps->base;
+	      Pvecteur pv_var = VECTEUR_NUL; 
+	      /* There is something changed in PIPS ? 
+		 PARAMETER M =10 
+		 add M, not 10 as before ??? */
+	      int j = constant_int(con);
+	      ifdebug(2)
+		{
+		  fprintf(stderr, "\n Add numerical constant to list: \n");
+		  print_expression(int_to_expression(j));
+		} 
+	      l = gen_nconc(l,CONS(EXPRESSION,int_to_expression(j),NIL));
+	      for(; !VECTEUR_NUL_P(b); b = b->succ) 
+		{
+		  Variable var = vecteur_var(b);
+		  if (!variable_is_a_module_formal_parameter_p((entity)var,current_callee))
+		    vect_add_elem(&pv_var, var, VALUE_ONE); 
+		}
+	      ps->inegalites = contraintes_free(ps->inegalites);
+	      ps->nb_ineq = 0;
+	      ps = my_system_projection_along_variables(ps, pv_var);       
+	      vect_rm(pv_var);    
+	      if (ps != SC_UNDEFINED)
+		{
+		  // the projection is exact		       
+		  Pcontrainte egal, egal1;
+		  i = constant_int(con);
+		  ifdebug(4)
+		    {
+		      fprintf(stderr, "\n Call : using Precondition + Association to find formal parameter equal to %d \n", i);
+		      fprint_transformer(stderr,context, entity_local_name);
+		    }
+		  for (egal = ps->egalites; egal != NULL; egal = egal1) 
+		    {
+		      /* Take the equations of the system */
+		      Pvecteur vec = egal->vecteur,v;
+		      for (v = vec; v !=NULL; v = v->succ)
+			{ 
+			  if (term_cst(v))
+			    {
+			      Value valu = v->val;
+			      if (value_eq(value_abs(valu),int_to_value(i)))
+				{
+				  Pvecteur newv = vect_del_var(vec,TCST);
+				  expression new_exp;
+				  if (value_pos_p(valu))
+				    vect_chg_sgn(newv);
+				  new_exp = Pvecteur_to_expression(newv);
+				  ifdebug(2)
+				    {
+				      fprintf(stderr, "\n Add new expression/constant to list by prec+asso: \n");
+				      print_expression(new_exp);
+				    } 
+				  l = gen_nconc(l,CONS(EXPRESSION,new_exp,NIL));
+				  vect_rm(newv);
+				}
+			    }
+			}
+		      egal1 = egal->succ;
+		    } 
+		}
+	      sc_rm(ps);
+	    }
+	}
+    }
+  else 
+    {
+      /* e is a call, not a constant 
+	 Recursive : with the arguments of the call
+	 As our generated expression e is a call with operators : +,-,* only,
+	 we treat only these cases */
+      if (gen_length(l_args)==1)
+	{
+	  expression e1 = EXPRESSION(CAR(l_args));
+	  list l1 = translate_to_callee_frame(e1, context);
+	  l1 = my_list_change(l1,fun);
+	  l = gen_nconc(l,l1);
+	}
+      if (gen_length(l_args)==2)
+	{
+	  expression e1 = EXPRESSION(CAR(l_args));
+	  expression e2 = EXPRESSION(CAR(CDR(l_args)));
+	  list l1 = translate_to_callee_frame(e1, context);
+	  list l2 = translate_to_callee_frame(e2, context);
+	  list l3 = my_list_combination(l1,l2,fun);
+	  l = gen_nconc(l,l3);
+	} 
+    }
+  return l;
+}
 
 static list translate_to_callee_frame(expression e, transformer context)
 {
@@ -616,333 +929,23 @@ static list translate_to_callee_frame(expression e, transformer context)
   switch(t){  
   case is_syntax_reference: 
     {
-      /* There are 2 cases for a reference M
-	 1. Common variable : CALLER::M = CALLEE::M or M'
-	 2. Precondition +  Association : M =10 or M = FOO::N -1 */
       reference ref = syntax_reference(syn);
-      entity en = reference_variable(ref);
-      normalized ne;
       ifdebug(2)
 	{
 	  fprintf(stderr, "\n Syntax reference \n");
 	  print_expression(e);
 	} 
-      if (variable_in_common_p(en))
-	{
-	  /* Check if the COOMON/FOO/ N is also declared in the callee or not 
-	   * We can use ram_shared which contains a list of aliased variables with en 
-	   * but it does not work ????  
-	   
-	   * Another way : looking for a variable in the declaration of the callee
-	   * that has the same offset in the same common block */
-	  list l_callee_decl = code_declarations(entity_code(current_callee));
-	  bool in_callee = FALSE;
-	  /* search for equivalent variable in the list */	  
-	  MAP(ENTITY, enti,
-	  {
-	    if (same_scalar_location_p(en, enti))
-	      {
-		expression expr;
-		/* ATTENTION : enti may be an array, such as A(2):
-		   COMMON C1,C2,C3,C4,C5
-		   COMMON C1,A(2,2)
-		   we must return A(1,1), not A */
-		if (array_entity_p(enti))
-		  {
-		    variable varenti = type_variable(entity_type(enti));   		      
-		    int len =  gen_length(variable_dimensions(varenti));
-		    list l_inds = make_list_of_constant(1,len);
-		    reference refer = make_reference(enti,l_inds);
-		    expr = reference_to_expression(refer);
-		  }
-		else 
-		  expr = entity_to_expression(enti);
-		ifdebug(2)
-		  {
-		    fprintf(stderr, "\n Syntax reference: Common variable, add to list: \n");
-		    print_expression(expr);
-		  } 
-		in_callee = TRUE;
-		l = gen_nconc(l,CONS(EXPRESSION,copy_expression(expr),NIL));
-		break;
-	      }
-	  },  l_callee_decl);
-
-	  /* If en is a pips created common variable, we can add this common declaration
-	     to the callee's declaration list => use this value.
-	     If en is an initial program's common variable => do we have right to add ? 
-	     confusion between local and global varibales that have same name  ??? */
-
-	  if (!in_callee && strstr(entity_local_name(en),"I_PIPS_") != NULL)
-	    {
-	      string callee_name = module_local_name(current_callee);
-	      string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,TRUE);
-	      string base_name = pips_basename(user_file, NULL);
-	      string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,0));
-	      string pips_variable_name = entity_local_name(en);
-	      string pips_common_name = strstr(entity_local_name(en),"PIPS_");
-	      string new_decl = strdup(concatenate("      INTEGER*8 ",pips_variable_name,"\n",
-						   "      COMMON /",pips_common_name,"/ ",pips_variable_name,"\n",NULL));
-	      /* Attention, miss a test if this declaration has already been added or not 
-		 => Solutions : 
-		 1. if add pips variable declaration for current module => add for all callees 
-		 where the array is passed ???
-		 2. Filter when using script array_resizing_instrumentation => simpler ??? */
-	      fprintf(instrument_file,"%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name,callee_name,0,1);
-	      fprintf(instrument_file,new_decl);
-	      fprintf(instrument_file,"%s\n",PREFIX3);
-	      free(file_name), file_name = NULL;
-	      free(new_decl), new_decl = NULL;
-	      l = gen_nconc(l,CONS(EXPRESSION,e,NIL));
-	    }
-	}      
-      /* Use the precondition + association of the call site:
-	 Take only the equalities.
-	 Project all variables belonging to the caller, except the current variable (from e)
-	 there are 2 cases :
-	 1. The projection is not exact , there are over flows
-	 Return the SC_UNDEFINED => what to do, like before ? 
-	 2. The result is exact, three small cases: 
-	 2.1 The system is always false sc_empty => unreachable code ?
-	 2.2 The system is always true sc_rn => we have nothing ?
-	 2.3 The system is parametric =>
-	 
-	 Look for equality that contain e
-	 Delete e from the vector 
-	 Check if the remaining of the vectors contains only constant (TCTS) 
-	 or formal variable of the callee,
-         Add to the list the expression (= remaining vertor)*/
-      clean_all_normalized(e);
-      ne =  NORMALIZE_EXPRESSION(e);
-      if (normalized_linear_p(ne))
-	{
-	  Pvecteur ve = normalized_linear(ne);
-	  Variable vare = var_of(ve); 
-	  Psysteme ps_tmp = predicate_system(transformer_relation(context));
-	  Pbase b_tmp = ps_tmp->base;
-	  /* Attention :   here the transformer current_con text is consistent 
-	     but not the system ps_tmp. I do not understand why ?
-	     fprintf(stderr, "consistent psystem ps_tmp before");
-	     pips_assert("consistent psystem ps_tmp", sc_consistent_p(ps_tmp));*/
-	  if (base_contains_variable_p(b_tmp,vare))
-	    {
-	      Psysteme ps = sc_dup(ps_tmp);
-	      Pbase b = ps->base;
-	      Pvecteur pv_var = VECTEUR_NUL; 	  
-	      ifdebug(4)
-		{
-		  fprintf(stderr, "\n Syntax reference : using precondition + association \n");
-		  fprint_transformer(stderr,context,entity_local_name);
-		}
-	      for(; !VECTEUR_NUL_P(b); b = b->succ) 
-		{
-		  Variable var = vecteur_var(b);
-		  if ((strcmp(module_local_name(current_caller),entity_module_name((entity)var))==0)
-		      && (var!=vare))
-		    vect_add_elem(&pv_var, var, VALUE_ONE); 
-		}
-	      ps->inegalites = contraintes_free(ps->inegalites);
-	      ps->nb_ineq = 0;
-	      ps = my_system_projection_along_variables(ps, pv_var);       
-	      vect_rm(pv_var);  
-	      if (ps != SC_UNDEFINED)
-		{
-		  // the projection is exact		       
-		  Pcontrainte egal, egal1;
-		  for (egal = ps->egalites; egal != NULL; egal = egal1) 
-		    {
-		      /* Take only the equations of the system */
-		      Pvecteur vec = egal->vecteur;
-		      if (vect_contains_variable_p(vec,vare))
-			{
-			  Value vale = vect_coeff(vare,vec);
-			  Pvecteur newv = VECTEUR_UNDEFINED; 
-			  if (value_one_p(vale) || value_mone_p(vale))
-			    newv = vect_del_var(vec,vare);
-			  if  (value_one_p(vale))
-			    vect_chg_sgn(newv);
-			  if (!VECTEUR_UNDEFINED_P(newv))
-			    {
-			      /*the coefficient of e is 1 or -1.
-				Check if the remaining vector contains only constant or formal argument of callee*/
-			      Pvecteur v;
-			      bool check = TRUE;
-			      for (v = newv; (v !=NULL) && (check); v = v->succ)
-				{ 
-				  Variable var = v->var;
-				  if ((var != TCST) && (!variable_is_a_module_formal_parameter_p((entity)var,current_callee)) )
-				    check = FALSE;
-				}
-			      if (check)
-				{
-				  expression new_exp = Pvecteur_to_expression(newv);
-				  ifdebug(2)
-				    {
-				      fprintf(stderr, "\n Add new expression/reference to list by using prec+ asso : \n");
-				      print_expression(new_exp);
-				    } 
-				  l = gen_nconc(l,CONS(EXPRESSION,new_exp,NIL));
-				}
-			      vect_rm(newv);
-			    }
-			}
-		      egal1 = egal->succ;
-		    }
-		}	 
-	      sc_rm(ps);
-	    }
-	}
-      break;
+      return translate_reference_to_callee_frame(e,ref,context);
     }
   case is_syntax_call:
     {
       call ca = syntax_call(syn);
-      entity fun = call_function(ca);
-      list l_args = call_arguments(ca);
       ifdebug(2)
 	{
 	  fprintf(stderr, "\n Syntax call \n");
 	  print_expression(e);
 	} 
-      if (l_args==NIL)
-	{
-	  /* Numerical constant or symbolic value (PARAMETER (M=2000)) . 
-	     There are 2 cases:
-	     1. Constant : 2000 => add to list
-	     2. Precondition + Association : 2000 = M = FOO:N -1=> add N-1 to the list  
-	     => trade-off : we have more chances vs more computations */
-	  value val = entity_initial(fun);
-	  constant con = constant_undefined;
-	  int i;
-	  /*  ifdebug(2)
-	    {
-	      fprintf(stderr, "\n Add  symbolic value to list: \n");
-	      print_expression(e);
-	      } */
-	  /* There is something changed in PIPS ? 
-	     PARAMETER M =10 
-	     add M, not 10 as before ??? */
-	  // l = gen_nconc(l,CONS(EXPRESSION,e,NIL));
-
-	  if (value_symbolic_p(val))
-	    {
-	      /* Symbolic constant: PARAMETER (Fortran) or CONST (Pascal) */
-	      symbolic sym = value_symbolic(val);
-	      con = symbolic_constant(sym);
-	    }
-	  if (value_constant_p(val))
-	    con = value_constant(val);
-	  if (!constant_undefined_p(con))
-	    {
-	      if (constant_int_p(con))
-		{
-		  /* Looking for a formal parameter of the callee that equals 
-		     to i in the Precondition + Association information 
-		     Add this formal parameter to the list
-
-		     We have to project all variables of the caller
-		     
-		     Attention : bug in PerfectClub/mdg :
-		     looking for formal parameter equal to 1 in system: {==-1} */
-		  Psysteme ps_tmp = predicate_system(transformer_relation(context));
-		  Psysteme ps = sc_dup(ps_tmp);
-		  Pbase b = ps->base;
-		  Pvecteur pv_var = VECTEUR_NUL; 
-
-		   /* There is something changed in PIPS ? 
-		      PARAMETER M =10 
-		      add M, not 10 as before ??? */
-		  int j = constant_int(con);
-		  ifdebug(2)
-		    {
-		      fprintf(stderr, "\n Add numerical constant to list: \n");
-		      print_expression(int_to_expression(j));
-		    } 
-		  l = gen_nconc(l,CONS(EXPRESSION,int_to_expression(j),NIL));
-
-
-		  for(; !VECTEUR_NUL_P(b); b = b->succ) 
-		    {
-		      Variable var = vecteur_var(b);
-		      if (!variable_is_a_module_formal_parameter_p((entity)var,current_callee))
-			vect_add_elem(&pv_var, var, VALUE_ONE); 
-		    }
-		  ps->inegalites = contraintes_free(ps->inegalites);
-		  ps->nb_ineq = 0;
-		  ps = my_system_projection_along_variables(ps, pv_var);       
-		  vect_rm(pv_var);    
-		  if (ps != SC_UNDEFINED)
-		    {
-		      // the projection is exact		       
-		      Pcontrainte egal, egal1;
-		      i = constant_int(con);
-		      ifdebug(4)
-			{
-			  fprintf(stderr, "\n Call : using Precondition + Association to find formal parameter equal to %d \n", i);
-			  fprint_transformer(stderr,context, entity_local_name);
-			}
-		      for (egal = ps->egalites; egal != NULL; egal = egal1) 
-			{
-			  /* Take the equations of the system */
-			  Pvecteur vec = egal->vecteur,v;
-			  for (v = vec; v !=NULL; v = v->succ)
-			    { 
-			      if (term_cst(v))
-				{
-				  Value valu = v->val;
-				  if (value_eq(value_abs(valu),int_to_value(i)))
-				    {
-				      Pvecteur newv = vect_del_var(vec,TCST);
-				      expression new_exp;
-				      if (value_pos_p(valu))
-					vect_chg_sgn(newv);
-				      new_exp = Pvecteur_to_expression(newv);
-				      ifdebug(2)
-					{
-					  fprintf(stderr, "\n Add new expression/constant to list by prec+asso: \n");
-					  print_expression(new_exp);
-					} 
-				      l = gen_nconc(l,CONS(EXPRESSION,new_exp,NIL));
-				      vect_rm(newv);
-				    }
-				}
-			    }
-			  egal1 = egal->succ;
-			} 
-		    }
-		  sc_rm(ps);
-		}
-	    }
-	}
-      else 
-	{
-	  /* e is a call, not a constant 
-	     Recursive : with the arguments of the call
-	     As our generated expression e is a call with operators : +,-,* only,
-	     we treat only these cases */
-	  ifdebug(2)
-	    {
-	      fprintf(stderr, "\n Syntax call : recursive \n");
-	      print_expression(e);
-	    } 
-	  if (gen_length(l_args)==1)
-	    {
-	      expression e1 = EXPRESSION(CAR(l_args));
-	      list l1 = translate_to_callee_frame(e1, context);
-	      l1 = my_list_change(l1,fun);
-	      l = gen_nconc(l,l1);
-	    }
-	  if (gen_length(l_args)==2)
-	    {
-	      expression e1 = EXPRESSION(CAR(l_args));
-	      expression e2 = EXPRESSION(CAR(CDR(l_args)));
-	      list l1 = translate_to_callee_frame(e1, context);
-	      list l2 = translate_to_callee_frame(e2, context);
-	      list l3 = my_list_combination(l1,l2,fun);
-	      l = gen_nconc(l,l3);
-	    } 
-	}
-      break;
+      return translate_call_to_callee_frame(ca,context);
     }
   default:
     pips_error("", "Abnormal cases \n");
