@@ -2,35 +2,7 @@
 /* QUICK PRIVATIZATION                                                           */
 /*********************************************************************************/
 
-#include <stdio.h>
-/* #include <values.h> */
-
-#include "genC.h"
-#include "text.h"
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-
-/* instantiation of the dependence graph */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-/* #include "database.h" */
-
-#include "misc.h"
-/* #include "text-util.h" */
-
-#include "ri-util.h" /* linear.h is included in */
-#include "effects-generic.h"
-#include "effects-simple.h"
-
-/* includes pour system generateur */
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "polyedre.h"
-
-#include "ricedg.h"
+#include "local.h"
 #include "transformations.h"
 
 static bool quick_privatize_loop(statement /*stat*/, list /*successors*/);
