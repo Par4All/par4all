@@ -37,6 +37,8 @@ typedef dg_vertex_label vertex_label;
 #include "effects-simple.h"
 #include "effects-convex.h"
 
+#include "transformer.h"
+
 #include "phrase_distribution.h"
 
 /**
@@ -116,6 +118,22 @@ void store_new_module (string module_name,
 {
   string source_file;
   
+  pips_debug(2, "[BEGIN] store_new_module [%s]\n", module_name);
+  ifdebug(2) {
+    entity set_entity = get_current_module_entity();
+    reset_current_module_entity();
+    set_current_module_entity(module);
+    pips_debug(2, "Statement for module: ");
+    print_statement(module_statement);
+    pips_debug(7, "Declarations for module: \n");
+    MAP (ENTITY, e, {
+      pips_debug(2, "Declared entity %s\n", entity_global_name(e));
+    },code_declarations(value_code(entity_initial(module))));
+    fprint_environment(stderr, module);
+    reset_current_module_entity();
+    set_current_module_entity(set_entity);
+  }
+
   init_prettyprint(empty_text);
   make_text_resource(module_name,
 		     DBR_SOURCE_FILE, 
@@ -130,6 +148,7 @@ void store_new_module (string module_name,
   DB_PUT_NEW_FILE_RESOURCE (DBR_USER_FILE, module_name, source_file);
   DB_PUT_NEW_FILE_RESOURCE (DBR_INITIAL_FILE, module_name, source_file);
 
+  pips_debug(2, "[END] store_new_module [%s]\n", module_name);
 }
 	
 /**
@@ -210,13 +229,13 @@ void declare_common_variables_in_module (entity common, entity module)
   list new_variables = NIL;
   list primary_variables = NIL;
   boolean is_primary_area = TRUE;
-  int totalized_offset = 0;
+  int totalized_offset = -1;
 
   /* Compute the primary variables */
   MAP (ENTITY, v, {
     if (is_primary_area) {
       int offset = ram_offset(storage_ram(entity_storage(v)));
-      if (offset >= totalized_offset) {
+      if (offset > totalized_offset) {
 	totalized_offset = offset;
 	primary_variables = CONS (ENTITY,v,primary_variables);
       }
@@ -228,6 +247,17 @@ void declare_common_variables_in_module (entity common, entity module)
   
   primary_variables = gen_nreverse(primary_variables);
 
+  ifdebug(4) {
+    pips_debug(4, "Current layout for %s\n", entity_global_name(common));     
+    MAP(ENTITY, v, {
+      pips_debug(4, "[%s] offset %d\n", entity_global_name(v),ram_offset(storage_ram(entity_storage(v))));     
+   }, area_layout(type_area(entity_type(common))));
+    pips_debug(4, "Primary variables for %s\n", entity_global_name(common));     
+    MAP(ENTITY, v, {
+      pips_debug(4, "[%s] offset %d PRIMARY\n", entity_global_name(v),ram_offset(storage_ram(entity_storage(v))));     
+   }, primary_variables);
+  }
+  
   MAP (ENTITY, v, {
 
     /* We iterate on the primary variables declared in the common and
@@ -235,7 +265,6 @@ void declare_common_variables_in_module (entity common, entity module)
 
     entity new_variable;  
     string name = entity_local_name(v); 
-    int variable_size = storage_space_of_variable(v); 
     int v_offset = ram_offset(storage_ram(entity_storage(v)));
     
     /* Creates the name for the new variable */
@@ -573,12 +602,10 @@ static entity create_externalized_function_common (entity main_module,
  * Main function for PHRASE_DISTRIBUTION_CONTROL_CODE
  */
 static statement controlize_distribution (statement module_stat, 
-					  entity module,
-					  string module_name) 
+					  entity module) 
 {
   statement returned_statement = module_stat;
   list l_calls;
-  list l_in, l_out;
   string function_name;
   entity called_module;
   statement called_module_stat;
@@ -591,7 +618,6 @@ static statement controlize_distribution (statement module_stat,
   statement wait_ru_module_statement;
 
   entity global_common;
-  entity externalized_function;
   entity externalized_fonction_common;
   list l_commons = NIL;
 
@@ -649,12 +675,18 @@ static statement controlize_distribution (statement module_stat,
       /* Let's begin to iterate on all externalized functions,
        * in order to build commons and controlization modules */
       
+      pips_debug(2, "Found %d externalized functions\n", hash_table_entry_count(ht_calls));
+
       HASH_MAP (externalized_function, calls_for_f, {
 	
 	entity f = (entity)externalized_function;
 	
 	/* Get the function name */
 	function_name = entity_local_name(f);
+
+	pips_debug(2, "Found %d calls for externalized function %s\n", 
+		   gen_length((list)calls_for_f),
+		   function_name);
 
 	/* Creates a common used to store variable for communications
 	 * between control code and externalized code */
@@ -701,8 +733,7 @@ static statement controlize_distribution (statement module_stat,
 					      l_commons);
       
       /* Build WAIT_RU module */
-      wait_ru_module = make_wait_ru_module (ht_params, 
-					    &wait_ru_module_statement, 
+      wait_ru_module = make_wait_ru_module (&wait_ru_module_statement, 
 					    number_of_deployment_units,
 					    global_common,
 					    l_commons);
@@ -714,10 +745,10 @@ static statement controlize_distribution (statement module_stat,
 							     l_commons);
       
       /* Build RECEIVE_PARAMS modules */
-      send_params_modules = make_receive_scalar_params_modules (ht_out_communications,
-								number_of_deployment_units,
-								global_common,
-								l_commons);
+      receive_params_modules = make_receive_scalar_params_modules (ht_out_communications,
+								   number_of_deployment_units,
+								   global_common,
+								   l_commons);
 
       /* Let's begin to iterate on all externalized functions and statements,
        * in order to add controlization code  */
@@ -727,7 +758,7 @@ static statement controlize_distribution (statement module_stat,
 	entity f = (entity)externalized_function;
 	list l_stats = NIL;
 	entity func_id_variable;
-	entity unit_id_variable;
+	entity unit_id_variable = NULL;
 	
 	/* Get the function name */
 	function_name = entity_local_name(f);
@@ -739,6 +770,7 @@ static statement controlize_distribution (statement module_stat,
 	
 	MAP (STATEMENT, s, {
 	  
+	  l_stats = NIL;
 	  unit_id = 0;
 	  
 	  if (number_of_deployment_units > 1) {
@@ -754,8 +786,8 @@ static statement controlize_distribution (statement module_stat,
 	    
 	    /* Some debug */
 	    pips_debug(2, "Externalized function [%s] being executed on unit %d:\n", function_name, unit_id);
-	    ifdebug(7) {
-	      pips_debug(7, "Current statement is:\n");
+	    ifdebug(2) {
+	      pips_debug(2, "Current statement is:\n");
 	      print_statement(s);
 	    }  
 
@@ -800,6 +832,24 @@ static statement controlize_distribution (statement module_stat,
 	    call_params = CONS (EXPRESSION, 
 				make_expression_from_entity(param),
 				call_params);
+
+	    
+	    if (!region_scalar_p(reg))
+	      {
+		/* Add dynamic variables */
+		
+		list l_reg_params; /* list of entities: phi1, phi2,... */
+		list l_reg_variables; /* list of dynamic variables....*/
+		compute_region_variables(reg,&l_reg_params,&l_reg_variables);
+		
+		MAP (ENTITY, dyn_var, {
+		  call_params = CONS (EXPRESSION, 
+				      make_expression_from_entity(dyn_var),
+				      call_params);
+		}, l_reg_variables);
+	      }
+
+
 	    new_stat = make_statement(entity_empty_label(),
 				      STATEMENT_NUMBER_UNDEFINED,
 				      STATEMENT_ORDERING_UNDEFINED,
@@ -884,6 +934,23 @@ static statement controlize_distribution (statement module_stat,
 	    call_params = CONS (EXPRESSION, 
 				make_expression_from_entity(param),
 				call_params);
+
+
+	    if (!region_scalar_p(reg))
+	      {
+		/* Add dynamic variables */
+		
+		list l_reg_params; /* list of entities: phi1, phi2,... */
+		list l_reg_variables; /* list of dynamic variables....*/
+		compute_region_variables(reg,&l_reg_params,&l_reg_variables);
+		
+		MAP (ENTITY, dyn_var, {
+		  call_params = CONS (EXPRESSION, 
+				      make_expression_from_entity(dyn_var),
+				      call_params);
+		}, l_reg_variables);
+	      }
+
 	    new_stat = make_statement(entity_empty_label(),
 				      STATEMENT_NUMBER_UNDEFINED,
 				      STATEMENT_ORDERING_UNDEFINED,
@@ -910,7 +977,7 @@ static statement controlize_distribution (statement module_stat,
 						      make_sequence(l_stats));
 
 	  ifdebug(7) {
-	    pips_debug(7, "After controlization, statement is\n", entity_local_name(f));
+	    pips_debug(7, "After controlization, statement is\n");
 	    print_statement(s);
 	  }
 
@@ -998,8 +1065,13 @@ bool phrase_distributor_control_code(string module_name)
   /* Now do the job */
 
   pips_debug(2, "BEGIN of PHRASE_DISTRIBUTOR_CONTROL_CODE\n");
-  module_stat = controlize_distribution (module_stat, module, module_name);
+  module_stat = controlize_distribution (module_stat, module);
   pips_debug(2, "END of PHRASE_DISTRIBUTOR_CONTROL_CODE\n");
+
+  /* Display the statement before to check consistency */
+  ifdebug(4) {
+    print_statement(module_stat);
+  }
 
   /* Check the coherency of data */
 
