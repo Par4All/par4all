@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.42  1999/01/08 15:30:12  coelho
+ * *** empty log message ***
+ *
  * Revision 1.41  1999/01/08 14:20:29  coelho
  * some_main_entity_p function added.
  *
@@ -845,6 +848,8 @@ find_ith_formal_parameter(
 
 /* returns whether there is a main in the database
  */
+extern gen_array_t db_get_module_list(void);
+
 bool some_main_entity_p(void)
 {
   gen_array_t modules = db_get_module_list();
