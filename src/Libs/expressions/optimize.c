@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.34  1999/07/15 20:36:13  coelho
+ * ac_cse expermimental phase added.
+ *
  * Revision 1.33  1999/07/15 13:33:19  coelho
  * binary to nary stuff added...
  *
@@ -129,6 +132,7 @@
 
 extern void module_reorder(statement);
 extern void perform_icm_association(string, statement);
+extern void perform_ac_cse(string, statement);
 
 /****************************************************************** STRATEGY */
 
@@ -1293,7 +1297,10 @@ bool optimize_expressions(string module_name)
      */
 
     if (strategy->apply_gcm_cse)
+    {
       perform_icm_association(module_name, s); 
+      perform_ac_cse(module_name, s);
+    }
 
     /* EOLE Stuff, second pass for FMA.
      */
