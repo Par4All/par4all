@@ -271,6 +271,7 @@ add_alias_pairs_for_this_caller( entity caller )
     reset_cumulated_rw_effects();
     free_value_mappings();
     reset_precondition_map();
+    regions_end();
 
     reset_current_module_entity();
     set_current_module_entity(callee);    
