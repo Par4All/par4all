@@ -508,8 +508,11 @@ filename_list:
 	    if (the_file_list.argc < FILE_LIST_MAX_LENGTH) {
 		the_file_list.argv[the_file_list.argc] = $1;
 		the_file_list.argc++;
-	    } else
+	    } else {
+	      pips_error("tpips",
+			 "Too many files - Resize FILE_LIST_MAX_LENGTH\n");
 		YYERROR;
+	    }
 	    
 	}
 	|
