@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1995/01/31 10:36:12 $, 
+ * date: $Date: 1995/07/24 16:37:29 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -31,6 +31,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <setjmp.h>
+#include <assert.h>
+#include <malloc.h>
+
 extern int fprintf();
 
 #include "boolean.h"
@@ -38,8 +41,7 @@ extern int fprintf();
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-
-
+#include "sc-private.h"
 
 extern jmp_buf overflow_error;
 
@@ -47,7 +49,8 @@ extern jmp_buf overflow_error;
  * INTERFACES
  */
 
-boolean sc_rational_feasibility_ofl_ctrl(sc, ofl_ctrl, ofl_res)
+boolean 
+sc_rational_feasibility_ofl_ctrl(sc, ofl_ctrl, ofl_res)
 Psysteme sc;
 int ofl_ctrl;
 boolean ofl_res;
@@ -55,7 +58,8 @@ boolean ofl_res;
     return sc_feasibility_ofl_ctrl(sc, FALSE, ofl_ctrl, ofl_res);
 }
 
-boolean sc_integer_feasibility_ofl_ctrl(sc,ofl_ctrl, ofl_res)
+boolean 
+sc_integer_feasibility_ofl_ctrl(sc,ofl_ctrl, ofl_res)
 Psysteme sc;
 int ofl_ctrl;
 boolean ofl_res;
@@ -68,7 +72,8 @@ boolean ofl_res;
  */
 /*  just a test to improve the Simplex/FM decision.
  */
-static void decision_data(c, pc, pv, weight)
+static void 
+decision_data(c, pc, pv, weight)
 Pcontrainte c;
 int *pc, *pv, weight;
 {
@@ -86,7 +91,8 @@ int *pc, *pv, weight;
     }
 }
 
-boolean sc_feasibility_ofl_ctrl(sc, integer_p, ofl_ctrl, ofl_res)
+boolean 
+sc_feasibility_ofl_ctrl(sc, integer_p, ofl_ctrl, ofl_res)
 Psysteme sc;
 boolean integer_p;
 int ofl_ctrl;
@@ -126,8 +132,8 @@ boolean ofl_res;
 	     *
 	     *   FC 30/01/95
 	     */
-	    fprintf(stderr, 
-      "[sc_feasibility_ofl_ctrl] arithmetic error (%s[%d,%d,%d]) -> %s\n",
+	    fprintf(stderr, "[sc_feasibility_ofl_ctrl] "
+		    "arithmetic error (%s[%d,%d,%d]) -> %s\n",
 		    use_simplex ? "Simplex" : "Fourier-Motzkin", 
 		    n_var, n_cont, n_ref,
 		    ofl_res ? "TRUE" : "FALSE");
@@ -142,6 +148,115 @@ boolean ofl_res;
     }
 
     return(ok);
+}
+
+/* chose the next variable in base b for projection in system s.
+ * tries to avoid Fourier potential explosions when combining inequalities.
+ * - if there are equalities, chose the var with the min |coeff| (not null)
+ * - if there are only inequalities, chose the var that will generate the
+ *   minimum number of constraints with pairwise combinations.
+ *
+ * (c) FC 21 July 1995
+ */
+static Variable
+chose_variable_to_project_for_feasability(s, b)
+Psysteme s;
+Pbase b;
+{
+    Pcontrainte c = sc_egalites(s);
+    Pvecteur v;
+    Variable var;
+    Value val;
+    int size = vect_size(b);
+
+    ifscdebug(8)
+    {
+	fprintf(stderr, "[chose_variable_to_project_for_feasability] b/s:\n");
+	vect_fprint(stderr, b, variable_default_name);
+	sc_fprint(stderr, s, variable_default_name);
+    }
+
+    if (size==1) return var_of(b);
+    assert(size>1);
+    
+    if (c)
+    {
+	/* find the lowest coeff 
+	 */
+	Variable minvar = TCST;
+	Value minval = 0;
+
+	for (; c; c=c->succ)
+	{
+	    for (v = contrainte_vecteur(c); v; v=v->succ)
+	    {
+		 var = var_of(v);
+
+		 if (var!=TCST)
+		 {
+		     val = abs(val_of(v));
+		     if ((minval && val<minval) || !minval) 
+			 minval = val, minvar = var;
+		     
+		     if (minval==1) return minvar;
+		 }
+	    }
+	}
+
+	assert(minvar!=TCST); /* shouldn't find empty equalities ?? */
+	var = minvar;
+    }
+    else
+    {
+	/* only inequalities, reduce the explosion
+	 */
+	int i, (*t)[2] = malloc(2*size*sizeof(int));
+	Pbase tmp;
+	int min_new;
+
+	c = sc_inegalites(s);
+
+	/* initialize t
+	 */
+	for (i=0; i<size; i++) t[i][0]=0, t[i][1]=0;
+
+	/* t[x][0 (resp. 1)] = number of negative (resp. positive) coeff
+	 */
+	for (; c; c=c->succ)
+	{
+	    for (v = contrainte_vecteur(c); v; v=v->succ)
+	    {
+		var = var_of(v); 
+		if (var!=TCST)
+		{
+		    ifscdebug(9) fprintf(stderr, "%s\n", var);
+
+		    for (i=0, tmp=b; tmp && var_of(tmp)!=var; 
+			 i++, tmp=tmp->succ);
+		    assert(tmp);
+		    
+		    t[i][val_of(v)<0?0:1]++;
+		}
+	    }
+	}
+
+	/* t[x][0] = number of combinations, i.e. new created constraints.
+	 */
+	for (i=0; i<size; i++) t[i][0] *= t[i][1];
+
+	for (tmp=b->succ, var=var_of(b), min_new=t[i][0], i=1;
+	     min_new && i<size; 
+	     i++, tmp=tmp->succ)
+	    if (val_of(tmp)<min_new) min_new=val_of(tmp), var=var_of(tmp);
+
+	free(t);
+    }
+
+    ifscdebug(8)
+	fprintf(stderr, "[chose_variable_to_project_for_feasability] "
+		"suggesting %s\n", var);
+
+    return var;
 }
 
 /* boolean sc_fourier_motzkin_faisabilite_ofl(Psysteme s):
@@ -160,28 +275,52 @@ boolean ofl_res;
  * Le controle de l'overflow est effectue et traite par le retour 
  * du contexte correspondant au dernier setjmp(overflow_error) effectue.
  */
-boolean sc_fourier_motzkin_feasibility_ofl_ctrl(s, integer_p, ofl_ctrl)
+boolean 
+sc_fourier_motzkin_feasibility_ofl_ctrl(s, integer_p, ofl_ctrl)
 Psysteme s;
 boolean integer_p;
 int ofl_ctrl;
 {
     Psysteme s1;
-    register Pbase b;
     boolean faisable = TRUE;
     extern jmp_buf overflow_error;
 
-    if (s == NULL)
-	return(TRUE);
-
+    if (s == NULL) return TRUE;
     s1 = sc_dup(s);
-    if ((s1 = sc_kill_db_eg(s1))) {
-	/* projection successive selon les  variables du systeme */
-	for (b = s1->base;
-	     !VECTEUR_NUL_P(b) && faisable;
-	     b = b->succ)
-	{	      
-	    sc_projection_along_variable_ofl_ctrl(&s1, vecteur_var(b), 
-						  ofl_ctrl);
+
+    ifscdebug(8)
+    {
+	fprintf(stderr, "[sc_fourier_motzkin_feasibility_ofl_ctrl] system:\n");
+	sc_fprint(stderr, s1, variable_default_name);
+    }
+
+    if ((s1 = sc_kill_db_eg(s1)))
+    {
+	/* projection successive selon les  variables du systeme
+	 */
+	Variable var;
+	Pbase b = base_dup(sc_base(s1));
+	
+	while (b && faisable)
+	{
+	    var = chose_variable_to_project_for_feasability(s1, b);
+	    vect_erase_var(&b, var);
+
+	    ifscdebug(8)
+	    {
+		fprintf(stderr, "sc_fourier_motzkin_feasibility_ofl_ctrl]"
+			" system before %s projection:\n", var);
+		sc_fprint(stderr, s1, variable_default_name);
+	    }
+	    
+	    sc_projection_along_variable_ofl_ctrl(&s1, var, ofl_ctrl);
+	    
+	    ifscdebug(8)
+	    {
+		fprintf(stderr, "sc_fourier_motzkin_feasibility_ofl_ctrl]"
+			" system after projection:\n");
+		sc_fprint(stderr, s1, variable_default_name);
+	    }
 	    
 	    if (sc_empty_p(s1))
 	    {
@@ -197,14 +336,16 @@ int ofl_ctrl;
 		}
 	    }
 	}
+	
 	sc_rm(s1);
+	base_rm(b);
     }
     else 
 	/* sc_kill_db_eg a de'sallouer s1 a` la detection de 
 	   sa non-faisabilite */
 	faisable = FALSE;
 
-    return(faisable);
+    return faisable;
 }
 
 
