@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/04/10 11:27:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/10 20:55:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/04/10 11:27:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/04/10 20:55:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -174,11 +174,8 @@ clean_up_exit_node(unstructured u)
       pips_assert("clean_up_exit_node",
                   gen_length(control_successors(exit_node)) == 1
                   && gen_length(control_successors(c)) == 0
-                  && gen_length(control_predecessors(c)) == 1);
-      /* I used to assert
-	 empty_statement_or_continue_p(control_statement(c)) but with
-	 the camat-t.f code and a debugged version of controlize.c it
-	 is no longer the case... */
+                  && gen_length(control_predecessors(c)) == 1
+		  && empty_statement_or_continue_p(control_statement(c)));
 
       /* Remove the useless node: */
       CONTROL(CAR(control_predecessors(c))) = control_undefined;
@@ -1005,7 +1002,11 @@ unspaghettify_rewrite_unstructured(statement s)
     remove_the_unreachable_controls_of_an_unstructured(u);
 
     ifdebug(5) {
-	pips_debug(5, "after remove_the_unreachable_controls_of_an_unstructured\n");
+	pips_debug(0, "after remove_the_unreachable_controls_of_an_unstructured\n");
+	pips_debug(0, "Accessible nodes from entry:\n");
+	display_linked_control_nodes(unstructured_control(u));
+	pips_debug(0, "Accessible nodes from exit:\n");
+	display_linked_control_nodes(unstructured_exit(u));
 	print_text(stderr, text_statement(get_current_module_entity(), 0, s));
     }
 
