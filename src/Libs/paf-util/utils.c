@@ -89,7 +89,7 @@ typedef dfg_vertex_label vertex_label;
  * multiplies all elements of matrix A by the number nb.
  *
  */
-
+/* never called
 void matrix_scalar_multiply(A, nb)
 Pmatrix   A;
 int      nb;
@@ -106,7 +106,7 @@ int      nb;
     for (j = 1; j <= n; j++)
       MATRIX_ELEM(A,i,j) = (nb/p) * MATRIX_ELEM(A,i,j);
 }
-
+*/
 
 /*=====================================================================*/
 /*
@@ -127,14 +127,13 @@ int      nb;
  * Precondition:        n > 0; m > 0;
  * Note: aliasing between a and b or c is supported
  */
-
+/* never called
 void pu_matrix_add(a,b,c)
-Pmatrix a;         /* output */
-Pmatrix b, c;      /* input */
+Pmatrix a;   
+Pmatrix b, c;
 {
   int d1, d2, i, j, n, m;
 
-  /* precondition */
   n = MATRIX_NB_LINES(a);
   m = MATRIX_NB_COLUMNS(a);
   pips_assert("matrix_add", (n > 0) && (m > 0));
@@ -157,7 +156,7 @@ Pmatrix b, c;      /* input */
     MATRIX_DENOMINATOR(a) = lcm;
   }
 }
-
+*/
 
 /* ======================================================================= */
 /*
@@ -181,6 +180,7 @@ Pmatrix b, c;      /* input */
  * m1 must be the exact number of variables in "ib".
  * m2 must be the exact number of variables in "cb" PLUS ONE (TCST).
  */
+/* never called
 void pu_constraints_with_sym_cst_to_matrices(pc,ib,cb,A,B)
 Pcontrainte pc;
 Pbase ib,cb;
@@ -212,7 +212,7 @@ Pmatrix A, B;
         MATRIX_ELEM(B,i,m2) = vect_coeff(TCST,eq->vecteur);
     }
 }
-
+*/
 
 /* ======================================================================= */
 /*
@@ -240,6 +240,7 @@ Pmatrix A, B;
  * Note: the formal parameter pc is a "Pcontrainte *". Instead, the resulting
  * Pcontrainte could have been returned as the result of this function.
  */
+/* never called
 void pu_matrices_to_constraints_with_sym_cst(pc,ib,cb,A,B)
 Pcontrainte *pc;
 Pbase ib,cb;
@@ -265,7 +266,6 @@ Pmatrix A, B;
         Pcontrainte cp = contrainte_new();
         Pvecteur vect, pv = NULL;
 
-        /* build the constant terme if it exists */
         if ((coeff = MATRIX_ELEM(B,i,m2)) != 0) {
             pv = vect_new(TCST,  (lcm/denb) * coeff);
             found = TRUE;
@@ -275,7 +275,6 @@ Pmatrix A, B;
                 if (found)
                     vect_chg_coeff(&pv, vecteur_var(vect),(lcm/dena) * coeff);
                 else {
-                    /* build a new vecteur if there is not constant term */
                     pv = vect_new(vecteur_var(vect), (lcm/dena) * coeff);
                     found = TRUE;
                 }
@@ -285,7 +284,6 @@ Pmatrix A, B;
                 if (found)
                     vect_chg_coeff(&pv, vecteur_var(vect),(lcm/denb) * coeff);
                 else {
-                    /* build a new vecteur if there is not constant term */
                     pv = vect_new(vecteur_var(vect), (lcm/denb) * coeff);
                     found = TRUE;
                 }
@@ -296,7 +294,7 @@ Pmatrix A, B;
     }
     *pc = newpc;
 }
-
+*/
 
 /*============================================================================*/
 /* void pu_matrices_to_contraintes(Pcontrainte *pc, Pbase b, matrice A B,
@@ -320,7 +318,8 @@ int n, m;
 {
   Pvecteur vect,pv=NULL;
   Pcontrainte cp, newpc= NULL;
-  int i,j,cst,coeff,dena,denb;
+  int i,j;
+  Value cst,coeff,dena,denb;
   boolean trouve ;
 
   dena = DENOMINATOR(A);
@@ -331,18 +330,19 @@ int n, m;
     cp = contrainte_new();
 
     /* build the constant terme if it is null */
-    if ((cst = ACCESS(B,n,i,1)) != 0) {
-      pv = vect_new(TCST,  dena * cst);
+    if (value_notzero_p(cst = ACCESS(B,n,i,1))) {
+      pv = vect_new(TCST,  value_mult(dena,cst));
       trouve = TRUE;
     }
 
     for (vect = b,j=1;j<=m;vect=vect->succ,j++) {
-      if ((coeff = ACCESS(A,n,i,j)) != 0)
+      if (value_notzero_p(coeff = ACCESS(A,n,i,j)))
         if (trouve)
-          vect_chg_coeff(&pv, vecteur_var(vect),denb * coeff);
+          vect_chg_coeff(&pv, vecteur_var(vect),
+			 value_mult(denb,coeff));
         else {
 	  /* build a new vecteur if there is a null constant term */
-          pv = vect_new(vecteur_var(vect), denb * coeff);
+          pv = vect_new(vecteur_var(vect), value_mult(denb,coeff));
           trouve = TRUE;
         }
     }
@@ -408,8 +408,8 @@ int m;
 void contraintes_with_sym_cst_to_matrices(pc,index_base,const_base,A,B,n,m1,m2)
 Pcontrainte pc;
 Pbase index_base,const_base;
-int A[];
-int B[];
+matrice A;
+matrice B;
 int n,m1,m2;
 {
 
@@ -465,12 +465,13 @@ int n,m1,m2;
 void matrices_to_contraintes_with_sym_cst(pc,index_base,const_base,A,B,n,m1,m2)
 Pcontrainte *pc;
 Pbase index_base,const_base;
-int A[],B[];
+matrice A,B;
 int n,m1,m2;
 {
   Pvecteur vect,pv=NULL;
   Pcontrainte cp,newpc= NULL;
-  int i,j,cst,coeff,dena,denb;
+  int i,j;
+  Value cst,coeff,dena,denb;
   boolean trouve ;
 
   dena = DENOMINATOR(A);
@@ -481,29 +482,33 @@ int n,m1,m2;
     cp = contrainte_new();
 
     /* build the constant terme if it exists */
-    if ((cst = ACCESS(B,n,i,m2)) != 0) {
-      pv = vect_new(TCST,  dena * cst);
+    if (value_notzero_p(cst = ACCESS(B,n,i,m2))) {
+      pv = vect_new(TCST,  value_mult(dena,cst));
       trouve = TRUE;
     }
 
-    for (vect = base_union(index_base, const_base),j=1;j<=m1;vect=vect->succ,j++) {
-      if ((coeff = ACCESS(A,n,i,j)) != 0)
+    for (vect = base_union(index_base, const_base),j=1;
+	 j<=m1;vect=vect->succ,j++) {
+      if (value_notzero_p(coeff = ACCESS(A,n,i,j)))
 	if (trouve) 
-	  vect_chg_coeff(&pv, vecteur_var(vect),denb * coeff);
+	  vect_chg_coeff(&pv, vecteur_var(vect),
+			 value_mult(denb, coeff));
 	else {			
 	  /* build a new vecteur if there is not constant term */
-	  pv = vect_new(vecteur_var(vect), denb * coeff);
+	  pv = vect_new(vecteur_var(vect), value_mult(denb, coeff));
 	  trouve = TRUE;
 	}
     }
 
     for (j=1;j<=m2-1;vect=vect->succ,j++) {
-      if ((coeff = ACCESS(B,n,i,j)) != 0)
+      if (value_notzero_p(coeff = ACCESS(B,n,i,j)))
 	if (trouve) 
-          vect_chg_coeff(&pv, vecteur_var(vect),denb * coeff);
+          vect_chg_coeff(&pv, vecteur_var(vect),
+			 value_mult(denb, coeff));
 	else {			
 	  /* build a new vecteur if there is not constant term */
-	  pv = vect_new(vecteur_var(vect), denb * coeff);
+	  pv = vect_new(vecteur_var(vect), 
+			value_mult(denb, coeff));
 	  trouve = TRUE;
 	}
     }
@@ -528,6 +533,7 @@ int n,m1,m2;
  * "n" must be the exact number of equalities contained in "leg".
  * "m" must be the exact number of variables contained in "b".
  */
+/* never called
 void pu_egalites_to_matrice(a, n, m, leg, b)
 matrice a;
 int n;
@@ -556,7 +562,7 @@ Pbase b;
     }
   }
 }
-
+*/
 /* end MATRIX functions */
 
 
@@ -859,7 +865,7 @@ hash_table STS;
        loop aux_loop = ENTITY(CAR(loop_l));
        entity index_ent = loop_index(aux_loop);
 
-       vect_index = vect_new((char *) index_ent, 1);
+       vect_index = vect_new((char *) index_ent, VALUE_ONE);
        nlb = NORMALIZE_EXPRESSION(range_lower(loop_range(aux_loop)));
        nub = NORMALIZE_EXPRESSION(range_upper(loop_range(aux_loop)));
    
@@ -941,7 +947,9 @@ int stmt;
  list el_l;
 
  for(el_l = find_el_with_num(stmt) ; el_l != NIL; el_l = CDR(el_l))
-   vect_add_elem((Pvecteur *) &new_b, (char *) loop_index(LOOP(CAR(el_l))), 1);
+   vect_add_elem((Pvecteur *) &new_b, 
+		 (Variable) loop_index(LOOP(CAR(el_l))), 
+		 VALUE_ONE);
 
  return(new_b);
 }
@@ -1131,7 +1139,7 @@ Ppolynome pp;
 
   for(ppp = pp; ppp != NULL; ppp = ppp->succ) {
     entity var;
-    int val;
+    Value val;
     Pvecteur pv = (ppp->monome)->term;
 
     if(VECTEUR_NUL_P(pv))
@@ -1140,7 +1148,7 @@ Ppolynome pp;
       pips_error("new_polynome_to_vecteur", "Polynome is not of degree one\n");
 
     var = (entity) pv->var;
-    val = (int) (ppp->monome)->coeff;
+    val = float_to_value((ppp->monome)->coeff);
     vect_add_elem(&new_pv, (Variable) var, val);
   }
   return(new_pv);
@@ -1274,7 +1282,7 @@ list l;
 void substitute_var_with_vec(ps, var, val, vec)
 Psysteme ps;
 entity var;
-int val;
+Value val;
 Pvecteur vec;
 {
  Variable Var = (Variable) var;
@@ -1287,40 +1295,40 @@ fprintf(stdout, "\n");
  }
 
   /* "val" must be positive. */
-  if(val < 0) {
-    val = 0-val;
-    vect_chg_sgn(vec);
+  if(value_neg_p(val)) {
+      value_oppose(val);
+      vect_chg_sgn(vec);
   }
 
   /* Vnew = (c/p)*vec + (val/p)*Vaux = (c/p)*vec + (val/p)*(Vold - c*var) */
   for(assert = ps->egalites; assert != NULL; assert = assert->succ) {
     Pvecteur v_old = assert->vecteur;
-    int coeff = vect_coeff(Var, v_old);
-    if(coeff != 0) {
-      int p = pgcd_slow(coeff, val);
+    Value coeff = vect_coeff(Var, v_old);
+    if(value_notzero_p(coeff)) {
+	Value p = pgcd_slow(coeff, val);
 
-      assert->vecteur = vect_cl2_ofl_ctrl(coeff/p, vec,
-					  val/p,
-					  vect_cl2_ofl_ctrl(1, v_old, -1,
-							    vect_new(Var,
-								     coeff),
-							    NO_OFL_CTRL),
-					  NO_OFL_CTRL);
+	assert->vecteur = vect_cl2_ofl_ctrl
+	    (value_div(coeff,p), vec,
+	     value_div(val,p),
+	     vect_cl2_ofl_ctrl(VALUE_ONE, v_old, VALUE_MONE,
+			       vect_new(Var, coeff),
+			       NO_OFL_CTRL),
+	     NO_OFL_CTRL);
     }
   }
   for(assert = ps->inegalites; assert != NULL; assert = assert->succ) {
     Pvecteur v_old = assert->vecteur;
-    int coeff = vect_coeff(Var, v_old);
-    if(coeff != 0) {
-      int p = pgcd_slow(coeff, val);
+    Value coeff = vect_coeff(Var, v_old);
+    if(value_notzero_p(coeff)) {
+	Value p = pgcd_slow(coeff, val);
 
-      assert->vecteur = vect_cl2_ofl_ctrl(coeff/p, vec,
-					  val/p,
-					  vect_cl2_ofl_ctrl(1, v_old, -1,
-							    vect_new(Var,
-								     coeff),
-							    NO_OFL_CTRL),
-					  NO_OFL_CTRL);
+      assert->vecteur = vect_cl2_ofl_ctrl
+	  (value_div(coeff,p), vec,
+	   value_div(val,p),
+	   vect_cl2_ofl_ctrl(VALUE_ONE, v_old, VALUE_MONE,
+			     vect_new(Var, coeff),
+			     NO_OFL_CTRL),
+	   NO_OFL_CTRL);
     }
   }
   vect_rm((Pvecteur) ps->base);
@@ -1328,9 +1336,9 @@ fprintf(stdout, "\n");
   sc_creer_base(ps);
 
  if(get_debug_level() > 6) {
-fprintf(stdout, "\t\t\tApres Sub: \n");
-fprint_psysteme(stdout, ps);
-fprintf(stdout, "\n");
+     fprintf(stdout, "\t\t\tApres Sub: \n");
+     fprint_psysteme(stdout, ps);
+     fprintf(stdout, "\n");
  }
 
 }
@@ -1438,7 +1446,7 @@ list *init_l, *elim_l;
 	while(eqs != NULL) {
 	    boolean coeff_one_not_found, var_not_found;
 	    entity var = entity_undefined;
-	    int val = 0;
+	    Value val = VALUE_ZERO;
 	    Pvecteur init_vec, pv_elim;
 
 	    init_vec = eqs->vecteur;
@@ -1453,9 +1461,9 @@ list *init_l, *elim_l;
 	    coeff_one_not_found = TRUE;
 	    for(l = vl ; (l != NIL) && coeff_one_not_found; l = CDR(l)) {
 		entity crt_var = ENTITY(CAR(l));
-		int crt_val = (int) vect_coeff((Variable) crt_var, init_vec);
+		Value crt_val = vect_coeff((Variable) crt_var, init_vec);
 		
-		if((crt_val == 1) || (crt_val == -1)) {
+		if(value_one_p(crt_val) || value_mone_p(crt_val)) {
 		    coeff_one_not_found = FALSE;
 		    var_not_found = FALSE;
 		    var = crt_var;
@@ -1487,8 +1495,9 @@ list *init_l, *elim_l;
 		 *
 		 * So: pv_elim = val*var - V
 		 * */
-		pv_elim = vect_cl2_ofl_ctrl(-1, vect_dup(init_vec),
-					    1, vect_new((Variable) var, val),
+		pv_elim = vect_cl2_ofl_ctrl(VALUE_MONE, vect_dup(init_vec),
+					    VALUE_ONE,
+					    vect_new((Variable) var, val),
 					    NO_OFL_CTRL);
 		
 		/* We substitute "val*var" by its value (pv_elim) in the
@@ -1604,7 +1613,7 @@ list *init_l, *elim_l;
 
   for(l = vl; !ENDP(l); POP(l)) {
     Variable v = (Variable) ENTITY(CAR(l));
-    int coeff;
+    Value coeff;
 
     if ((eq = contrainte_var_min_coeff(ps->egalites,v, &coeff, TRUE))
 	!= NULL) {
@@ -1683,7 +1692,7 @@ list l;
  list el_l;
 
  for(el_l = l ; el_l != NIL; el_l = CDR(el_l))
-   vect_add_elem((Pvecteur *) &new_b, (char *) ENTITY(CAR(el_l)), 1);
+   vect_add_elem((Pvecteur *) &new_b, (char *) ENTITY(CAR(el_l)), VALUE_ONE);
 
  new_b = base_reversal(new_b);
  return(new_b);
@@ -1736,7 +1745,8 @@ Pvecteur vec;
  Ppolynome pp_new = POLYNOME_NUL;
 
  for( ; vec != NULL; vec = vec->succ)
-    polynome_add(&pp_new, make_polynome((float) vec->val, vec->var, 1));
+    polynome_add(&pp_new, 
+		 make_polynome(VALUE_TO_FLOAT(vec->val), vec->var, VALUE_ONE));
 
  return(pp_new);
 }
@@ -1759,10 +1769,10 @@ Pvecteur pv;
     pp = NULL;
     for(vec = pv; vec != NULL; vec = vec->succ) {
       Variable var = vecteur_var(vec);
-      float val = (float) vecteur_val(vec);
+      float val = VALUE_TO_FLOAT(vecteur_val(vec));
       Ppolynome newpp;
 
-      newpp = make_polynome(val, var, 1);
+      newpp = make_polynome(val, var, VALUE_ONE);
       polynome_succ(newpp) = pp;
       pp = newpp;
     }
@@ -2146,22 +2156,24 @@ Pvecteur v1, v2;
 
   for(pv1 = v1; pv1 != NULL; pv1 = pv1->succ) {
     Variable var1 = pv1->var;
-    int val1 = pv1->val;
+    Value val1 = pv1->val;
     for(pv2 = v2; pv2 != NULL; pv2 = pv2->succ) {
       Variable var2 = pv2->var;
-      int val2 = pv2->val;
+      Value val2 = pv2->val;
+      Value p = value_mult(val1,val2);
+      float f = VALUE_TO_FLOAT(p);
 
       if(var1 == TCST)
-        new_pp = make_polynome((float) (val1 * val2), var2, 1);
+        new_pp = make_polynome(f, var2, VALUE_ONE);
       else if(var2 == TCST)
-        new_pp = make_polynome((float) (val1 * val2), var1, 1);
+        new_pp = make_polynome(f, var1, VALUE_ONE);
       else if(same_entity_p((entity) var1, (entity) var2))
-        new_pp = make_polynome((float) (val1 * val2), var1, 2);
+        new_pp = make_polynome(f, var1, VALUE_CONST(2));
       else {
-        new_pp = make_polynome((float) (val1 * val2), var1, 1);
+        new_pp = make_polynome(f, var1, VALUE_ONE);
         ppv = (new_pp->monome)->term;
         pips_assert("vecteur_mult", ppv->succ == NULL);
-        ppv->succ = vect_new(var2, 1);
+        ppv->succ = vect_new(var2, VALUE_ONE);
       }
       polynome_add(&pp, new_pp);
     }
@@ -2184,18 +2196,21 @@ Pvecteur prototype_factorize(pp, var)
 Ppolynome pp;
 Variable var;
 {
-  Pvecteur pv = NULL;
-
-  if(POLYNOME_NUL_P(pp))
-    pv = VECTEUR_NUL;
-  else if(var == TCST)
-    pv = vect_new(TCST, (int) polynome_TCST(pp));
-  else {
+    Pvecteur pv = NULL;
+    
+    if(POLYNOME_NUL_P(pp))
+	pv = VECTEUR_NUL;
+    else if(var == TCST)
+    {
+	float f = polynome_TCST(pp);
+	pv = vect_new(TCST, float_to_value(f));
+    }
+    else {
     Ppolynome ppp;
 
     for(ppp = pp; ppp != NULL; ppp = ppp->succ) {
       Variable newvar = VARIABLE_UNDEFINED;
-      int newval;
+      Value newval;
       Pvecteur vec, newpv;
       entity first = entity_undefined, second = entity_undefined;
       boolean factor_found = TRUE;
@@ -2218,7 +2233,7 @@ Variable var;
         factor_found = FALSE;
 
       if(factor_found) {
-        newval = (int) (ppp->monome)->coeff;
+        newval = float_to_value((ppp->monome)->coeff);
         newpv = vect_new(newvar, newval);
         newpv->succ = pv;
         pv = newpv;
@@ -2332,18 +2347,18 @@ int min_or_max;
   for(apc = new_pc; apc != NULL; apc = apc->succ) { 
     Pvecteur pv;
     Pcontrainte aapc;
-    int xc;
+    Value xc;
     
     pv = vect_dup(apc->vecteur);
     xc = vect_coeff((Variable) ref_ent, pv);
-    if((xc == 1) && (min_or_max == IS_MIN)) {
+    if(value_one_p(xc) && (min_or_max == IS_MIN)) {
       vect_erase_var(&pv, (Variable) ref_ent);
       vect_chg_sgn(pv);
       aapc = contrainte_make(pv);
       aapc->succ = newnew_pc;
       newnew_pc = aapc;
     }
-    else if((xc == -1) && (min_or_max == IS_MAX)) {
+    else if(value_mone_p(xc) && (min_or_max == IS_MAX)) {
       vect_erase_var(&pv, (Variable) ref_ent);
       aapc = contrainte_make(pv);
       aapc->succ = newnew_pc;
@@ -2485,7 +2500,7 @@ Psysteme ps;
      * one (Expr + 1 <= 0).
      */
     expr = ineg->vecteur;
-    ineg->vecteur = vect_add(expr, vect_new(TCST, 1));
+    ineg->vecteur = vect_add(expr, vect_new(TCST, VALUE_ONE));
 
     /* We test the feasibility. If it is not feasible, we add one more
      * implicit equation in our implicit system : Expr == 0.
@@ -2561,23 +2576,23 @@ statement s;
 
 expression make_rational_exp(v, d)
 Pvecteur    v;
-int         d;
+Value       d;
 {
   expression e;
 
   if(VECTEUR_NUL_P(v))
     /* make a "zero" expression */
     e = make_integer_constant_expression(0);
-  else if(MODULO(vect_pgcd_all(v), ABS(d)) == 0)
+  else if(value_zero_p(value_mod(vect_pgcd_all(v), value_abs(d))))
     /* divide "v" by "d", and make the expression with no denominator */
-    e = make_vecteur_expression(vect_div(v, d));
+      e = make_vecteur_expression(vect_div(v, d));
   else {
-    expression  e1, e2;
-    entity      ent;
-    list        le = NIL;
+      expression  e1, e2;
+      entity      ent;
+      list        le = NIL;
   
     /* build the denominator */
-    e2 = int_to_expression(d);
+    e2 = Value_to_expression(d);
     le = CONS(EXPRESSION, e2, NIL);
     
     /* build the numerator */
