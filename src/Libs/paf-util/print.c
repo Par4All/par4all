@@ -47,7 +47,8 @@
 #include "text-util.h"
 #include "misc.h"
 #include "paf-util.h"
-#include "array_dfg.h"
+
+extern int adg_number_to_ordering(int /*in_nb*/);
 
 /* Macro functions  	*/
 #define IS_INEG 0
