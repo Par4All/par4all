@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/24 10:10:00 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/24 11:16:31 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -839,9 +839,9 @@ include $MAKEFILE.depend.\$(ARCH)
 
 touch .makefile
 
-### force dependence list generation
+### force dependence list generation, later on...
 rm -f $MAKEFILE.depend* .depend
-${PIPS_MAKE:-gmake} depend
+# ${PIPS_MAKE:-gmake} depend
 
 ### end good case
 echo
