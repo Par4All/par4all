@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: developer_guide.tex,v $
+%% Revision 1.13  2003/04/15 08:24:54  keryell
+%% Updated around $PIPS_DEVEDIR/Scripts/dev and $PIPS_DEVEDIR/Scripts/env
+%%
 %% Revision 1.12  2001/06/01 09:05:30  coelho
 %% closer to reality;-)
 %%
@@ -43,7 +46,7 @@
 \end{tabular}
 }
 
-\date{August 1996 - May 2001}
+\date{August 1996 - April 2003}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -847,17 +850,32 @@ Here are now the steps to install a new library named {\tt mylib}:
     
   \end{itemize}
   
-\item In the directory {\tt \$PIPS\_DEVEDIR/Scripts/env}:
+\item In the directory {\tt \$PIPS\_DEVEDIR/Scripts/dev}:
   
   \begin{itemize}
     
-  \item Update the file {\tt pipsrc.ref}\index{pipsrc.ref}. It contains the
-    shell environement variables for PIPS. To update it, just add the character
-    string {\tt -lmylib} in the variable {\tt
-      \$PIPS\_LIBS}. Notice that the order in which the libraries are added
-    is importaant (l'ordre des bibliotheques est important; the new library
-    must be added after the libraries which use its modules, but after the
-    libraries whose modules it uses. 
+  \item Update the file {\tt define\_libraries.sh}\index{define\_libraries.sh}. It contains
+    the shell environment variables for the PIPS libraries. To update it, just add the
+    character string {\tt -lmylib} in the variable {\tt \$PIPS\_LIBS} and
+    {\tt mylib} to the variable \verb|$PIPS_ORDERED_LIBS|. %$    
+    Notice that the order in which the libraries are added is important :
+    the new library must be added after the libraries which use its
+    modules, but after the libraries whose modules it uses.
+    
+  \item Run the {\tt make} command to automaticall build the files
+    \verb|define_libraries.make. The command {\tt make install} then
+    installs these scripts in \verb+$PIPS_UTILDIR+.
+% $    
+
+  \end{itemize}
+  
+\item In the directory {\tt \$PIPS\_DEVEDIR/Scripts/env}, if you need to
+  introduce new environment variables or to modify old ones:
+  
+  \begin{itemize}
+    
+  \item Update the file {\tt pipsrc.ref}\index{pipsrc.ref}. It contains
+    the shell environement variables for PIPS..
     
   \item Run the {\tt make} command to automaticall build the files {\tt
     pipsrc.sh} and {\tt pipsrc.csh} respectively for {\tt sh} or {\tt ksh}
@@ -905,14 +923,14 @@ myphase > MODULE.res2
     
   \end{itemize}
   
+\item In the directory {\tt \$PIPS\_ROOT/Src/Libs/pipsmake}:
+
+Execute the command \texttt{make recompile} to recompile the pipsmake library.
+  
 \item In the directory {\tt \$PIPS\_ROOT/Src/Passes}:
 
   Execute the command \texttt{make recompile} to recompile and install
   updated versions of {\tt pips}, {\tt tpips} and {\tt wpips}.
-  
-\item In the directory {\tt \$PIPS\_ROOT/Src/Libs/pipsmake}:
-
-Execute the command \texttt{make recompile} to recompile the pipsmake library.
   
 \end{itemize}
 
