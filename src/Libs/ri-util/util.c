@@ -1,6 +1,10 @@
-
+/*
+ * $Id$
+ */
 #include <stdio.h>
 #include <string.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "misc.h"
@@ -66,7 +70,7 @@ string module_name, label_local_name;
 			      LABEL_PREFIX, label_local_name, NULL);
 
     debug(5, "find_label_entity", "searched entity: %s\n", full);
-    return(gen_find_tabulated(full, entity_domain));
+    return (entity) gen_find_tabulated(full, entity_domain);
 }
 
 string 
@@ -224,7 +228,7 @@ entity module;
     for(sprintf(name, "%s%s%s%d", module_name, MODULE_SEP_STRING, LABEL_PREFIX,
 		--init);
 	 init >= 0 && 
-	 gen_find_tabulated(name, entity_domain) != entity_undefined ;
+	    (entity)gen_find_tabulated(name, entity_domain) != entity_undefined ;
 	sprintf(name, "%s%s%s%d", module_name, MODULE_SEP_STRING, LABEL_PREFIX,
 		--init)) {
     /* loop */ 
