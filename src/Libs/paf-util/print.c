@@ -147,9 +147,9 @@ char * (*variable_name)();
  
   /* trail */
   if (is_what == IS_INEG)
-      fprintf (fp,"<= 0 ,");
+      fprintf (fp," <= 0 ,");
   else if(is_what == IS_EG) 
-      fprintf (fp,"== 0 ,");
+      fprintf (fp," == 0 ,");
   else /* IS_VEC */ 
       fprintf (fp," ,");
 }
