@@ -1,5 +1,5 @@
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/07/10 20:57:21 $, 
+# $Date: 1996/07/10 21:05:57 $, 
 # (c) Fabien COELHO 1996
 #
 # this makefile forwards make targets to sub-directories...
@@ -21,7 +21,8 @@ FWD_REPORT=/dev/tty
 
 # forward any command to the specified directories
 %::
-	-for d in $(FWD_DIRS) ; do \
+	@echo Forwarding $@ to $(FWD_DIRS)
+	-@for d in $(FWD_DIRS) ; do \
 	  if test -d $$d ; then \
 	    if $(MAKE) -C $$d FWD_MSG="$(FWD_MSG)/$$d" $@ ;\
 	    then echo "$@ failed [$(FWD_MSG)] in $$d" >> $(FWD_REPORT) ;\
