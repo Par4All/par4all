@@ -36,25 +36,23 @@ particularly troublesome problem that requires a precise intra- and
 inter-procedural analysis of array data flow.
 <P>
 
-<A HREF="#feautrier">Paul Feautrier</A> has opened up wide
-perspectives in this area.  His method provides an exact analysis of array
-data flow, originally in monoprocedural programs with static control. This
-last constraint has since been partially removed by <A
-HREF="#maslov">Vadim Maslov</A> and <A
-HREF="#collard">Jean-Fran&ccedil;ois Collard</A>, to the
-detriment of the accuracy of the results. Furthermore, this method has not
-yet been extended to interprocedural analyses, and its complexity makes it
-unpracticable on large programs.  <P>
+<A HREF="#feautrier">Paul Feautrier</A> has opened up wide perspectives in
+this area.  His method provides an exact analysis of array data flow,
+originally in monoprocedural programs with static control. This last
+constraint has since been partially removed by <A HREF="#maslov">Vadim
+Maslov</A> and <A HREF="#collard">Jean-Fran&ccedil;ois Collard</A>, at the
+expense of accuracy. Furthermore, this method has not yet been extended to
+interprocedural analyses, and its complexity makes it useless on large
+programs.  <P>
 
-Another approach is to calculate conservative summaries of the effects of
-procedure calls on sets of array elements (<A
-HREF="#triolet">R&eacute;mi Triolet</A>, <A
-HREF="#callahan">David Callahan and Ken Kennedy</A>). They allow
-the analysis of large programs, thanks to their weak complexity (in
-practice). But since these analyses are flow insensitive, and since they do
-not precisely take into account the modifications of the values of integer
-scalar variables, they are not accurate enough to handle powerful
-optimizations.  <P>
+Another approach is to compute conservative summaries of the effects of
+procedure calls on sets of array elements (<A HREF="#triolet">R&eacute;mi
+Triolet</A>, <A HREF="#callahan">David Callahan and Ken Kennedy</A>). Their
+weak complexity (in practice) allows the analysis of large programs. But
+since these analyses are flow insensitive, and since they do not precisely
+take into account the modifications of the values of integer scalar
+variables, they are not accurate enough to support powerful optimizations.
+<P>
 
 In <A HREF="/~pips">PIPS</A>, the Interprocedural Parallelizer of Scientific
 Programs developed at E'cole des Mines de Paris, we have extended Triolet's
@@ -81,7 +79,7 @@ memories; the array elements that do not appear in these sets and that are
 accessed in the current piece of code, are only temporaries, and should be
 handled as such.  For fault-tolerant systems, checkpointing is a software
 solution that regularly saves the current state: as they provide the set of
-elements that will be used in further computations, IN and OUT regions could
+elements that will be used in further computations, IN or OUT regions could
 be used to reduce the amount of data to be saved.  <P>
 
 <HR>
@@ -116,8 +114,8 @@ dimensions of <TT>A</TT>, corresponds to a definition of the element
 <P>
 
 In order to manipulate regions and propagate them along the control flow
-graph of the program, we need several binary operators: union, intersection,
-and difference. We also need unary operators to eliminate the variables of
+graph of the program, several binary operators are needed: union, intersection,
+and difference. Unary operators are also used to eliminate the variables of
 the program that appear in the region predicates and that are modified. See
 some related <A HREF="/~creusil/references.html#publications">publications</A> for
 more details on these operators.
@@ -125,49 +123,36 @@ more details on these operators.
 <P>
 <HR>
 <P>
-<H2> <A NAME="interproc">3. Interprocedural propagation</A> </H2>
+<H2> <A NAME="interproc">3. Interprocedural propagation of array regions</A> </H2>
 
 The interprocedural propagation of READ/WRITE regions is a backward analysis: the
 summary regions of the called subroutine are translated from the callee's
 name space into the caller's name space. Because of array reshaping, this
 operation is not straightforward.  <P>
 
-In PIPS, arrays in <TT>COMMON</TT>s are handled in a very conservative
-way: either they are similarly declared (same offset in the common, and same
-shape, but not necessarily the same name) and the translation consists in
+In his thesis, Triolet gave conditions to perform the translation by simply
 changing the name of the array, and projecting the polyhedron onto the name
-space of the caller; or they do not have the same offset in the common, or
-the same shape, and the corresponding regions are propagated as such after
-prefixing the name of the array with the name of the called subroutine, and
-projecting the polyhedron onto the name space of the caller; the subsequent
-analyses or program transformations must be able to handle this aliasing. <P>
+space of the caller. These conditions are that the formal array is either
+similar to the actual array, or a <I>subarray</I> of the actual array, for
+instance a single column of a matrix. <P>
 
-Let us now concentrate on the translation from a formal to an actual array.
-In his thesis, Triolet gave conditions under which it only consists in
-changing the name of the array, possibly adding equalities between phi
-variables and the array reference indices at call site, and projecting the
-polyhedron onto the name space of the caller. These conditions are that the
-formal array is either similar to the actual array, or a <I>subarray</I> of
-the actual array, for instance a single column of a matrix. <P>
+For the Perfect Club Benchmarks, these conditions are too restrictive. In
+particular, they cannot handle offsets in declarations, general offsets in
+the references at call site, and array reshaping is rarely treated.
 
-By examining the Perfect Club Benchmarks, we found these conditions to be
-too restrictive. In particular, they cannot handle offsets in declarations,
-general offsets in the references at call site, and array reshaping is
-treated in a very few cases. In order to handle the general case, we have
-chosen to use <B>subscript values</B> as they are described in the FORTRAN
-norm. The subscript value of an array element is its <I>rank</I> in the
-array, given the fact that array elements are held in <I>column
-order</I>. The interprocedural translation of regions relies on the fact
-that the actual and formal arguments must have the same subscript values,
-more or less the offset of the actual argument. It consists in adding to the
-predicate of the region the equation giving the relations between the
-subscript values of the arrays in terms of phi variables. The phi variables
-of the formal array are then eliminated. This can be optimized by
-considering the similar dimensions of both arrays. This method handles array
-reshaping when the partial subscript values of the non similar dimensions
-are affine. Translation between arrays that do not have the same type of
-elements is also handled.
+In order to handle the general case, <B>subscript values</B> (see the
+FORTRAN standard) are used. The subscript value of an array element is its
+<I>rank</I> in the array, given the fact that array elements are held in
+<I>column order</I>. This is equivalent to a linearization of the
+array. However, this may lead to non-linear expressions that are not
+handled in PIPS. The method tries instead to find similar dimensions, which
+are translated in a trivial way. The subscript values are then used for the
+remaining dimensions. This method supports array reshaping when the partial
+subscript values of the non similar dimensions are affine.
 
+The translation from formal to real parameters, as well as the translation
+of global variables, are supported. The translation of arrays with different
+types of elements is also performed.
 
 <P>
 <HR>
@@ -176,11 +161,10 @@ elements is also handled.
 
 READ and WRITE regions summarize the exact effects of statements and
 procedures upon array elements. However, they do not represent the flow of
-array elements, the knowledge of which is necessary to achieve many
-optimizations.  For that purpose, we introduce two new types of region:
-IN and OUT regions. <P>
+array elements. For that purpose, two new types of region,
+IN and OUT regions, are introduced. <P>
 
-IN regions contain the array elements, the values of which are (MUST) or
+IN regions contain the array elements, whose values are (MUST) or
 may be (MAY) <I>imported</I> by the current piece of code. These are the
 elements that are read before being possibly redefined by another
 instruction of the same fragment.  <P>
@@ -191,18 +175,10 @@ the execution order of the program. These are the <I>live</I> or <I>
 exported</I> array elements. <P>
 
 The interprocedural propagation of IN regions is similar to that of READ or
-WRITE regions. It is a backward propagation: IN regions corresponding to
-formal parameters are translated into regions corresponding to actual
-parameters, at each call site. On the contrary, the propagation of OUT
+WRITE regions. On the contrary, the propagation of OUT
 regions on the call graph is a forward propagation: actual parameters are
 translated into formal ones at each call site, and the resulting regions are
 merged into a unique summary, which forms the OUT regions of the procedure.
-For both types of region, the propagation consists in adding to the
-predicate of the region the equation giving the relations between the
-subscript values of the arrays in terms of phi variables. The phi variables
-of the formal (resp. actual) array in case of IN (resp. OUT) regions are
-then eliminated. This can be optimized by considering the similar dimensions
-of both arrays.
 
 <P>
 <HR>
