@@ -484,7 +484,7 @@ statement make_fsm_from_statement(statement stat,
     = make_instruction(is_instruction_sequence,
 		       new_sequence);
   
-  returned_statement = make_statement(statement_label(stat),
+  returned_statement = make_statement(entity_empty_label(),
 				      statement_number(stat),
 				      statement_ordering(stat),
 				      empty_comments,
