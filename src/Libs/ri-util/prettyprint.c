@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.97  1997/11/12 15:30:10  coelho
+ * cleaner...
+ *
  * Revision 1.96  1997/11/08 17:25:10  coelho
  * extension for cloning (name different from actual module)
  *
@@ -109,7 +112,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.96 1997/11/08 17:25:10 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.97 1997/11/12 15:30:10 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1524,27 +1527,24 @@ text_statement(
       pips_user_warning("I unexpectedly bumped into dead code?\n");
     }
 
-    if (strcmp(label, RETURN_LABEL_NAME) == 0) {
+    if (same_string_p(label, RETURN_LABEL_NAME)) 
+    {
 	pips_assert("Statement with return label must be a return statement",
 		    return_statement_p(stmt));
 
 	/* do not add a redundant RETURN before an END, unless requested */
 	if(get_bool_property("PRETTYPRINT_FINAL_RETURN")
-	    || !last_statement_p(stmt)) {
-	    /*
-	    ADD_SENTENCE_TO_TEXT(temp,
-				 MAKE_ONE_WORD_SENTENCE(margin,
-							RETURN_FUNCTION_NAME));
-	    */
-	    sentence s = MAKE_ONE_WORD_SENTENCE(margin,
-						RETURN_FUNCTION_NAME);
+	    || !last_statement_p(stmt)) 
+	{
+	    sentence s = MAKE_ONE_WORD_SENTENCE(margin, RETURN_FUNCTION_NAME);
 	    temp = make_text(CONS(SENTENCE, s ,NIL));
 	}
 	else {
 	    temp = make_text(NIL);
 	}
     }
-    else {
+    else
+    {
 	temp = text_instruction(module, label, margin, i,
 				statement_number(stmt)) ;
     }
