@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.239 2003/12/22 15:02:23 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.240 2004/02/18 10:09:28 nguyen Exp $";
 #endif /* lint */
 
  /*
@@ -587,13 +587,15 @@ words_regular_call(call obj, bool is_a_subroutine)
       if (is_a_subroutine) 
 	pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
       else
-	pips_user_warning("subroutine '%s' used as a function.\n",
-			  entity_name(f));
-
+	if (is_fortran) /* to avoid this warning for C*/
+	  pips_user_warning("subroutine '%s' used as a function.\n",
+			    entity_name(f));
+      
     }
   else if (is_a_subroutine) {
-    pips_user_warning("function '%s' used as a subroutine.\n",
-		      entity_name(f));
+    if (is_fortran) /* to avoid this warning for C*/
+      pips_user_warning("function '%s' used as a subroutine.\n",
+			entity_name(f));
     pc = CHAIN_SWORD(pc, is_fortran?"CALL ":"");
   }
 
@@ -2711,10 +2713,13 @@ find_last_statement(statement s)
     if(!(statement_undefined_p(last)
 	 || !block_statement_p(s)
 	 || return_statement_p(last))) {
-	pips_user_warning("Last statement is not a RETURN!\n");
-	last = statement_undefined;
+      if (is_fortran) /* to avoid this warning for C, is it right for C ?*/
+	{
+	  pips_user_warning("Last statement is not a RETURN!\n");
+	}
+      last = statement_undefined;
     }
-
+    
     /* I had a lot of trouble writing the condition for this assert... */
     pips_assert("Last statement is either undefined or a call to return",
 	 statement_undefined_p(last) /* let's give up: it's always safe */
@@ -2784,7 +2789,7 @@ text_named_module(
 	    ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
 	  
 	  ADD_SENTENCE_TO_TEXT(r, 
-			       attach_head_to_sentence(sentence_head(name,TRUE), module));
+			       attach_head_to_sentence(sentence_head(name), module));
 	  
 	  if (head_hook) 
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
@@ -2812,7 +2817,7 @@ text_named_module(
       if (!compilation_unit_p(entity_name(name)))
 	{
 	  /* Print function header if the current module is not a compilation unit*/
-	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name,TRUE), module)); 
+	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name), module)); 
 	  ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(0,"{"));
 	}
     }
@@ -3004,8 +3009,10 @@ static list words_subscript(subscript s)
   expression a = subscript_array(s);
   list lexp = subscript_indices(s);
   bool first = TRUE;
+  /* Parentheses must be added for array expression like __ctype+1 in (__ctype+1)[*np]*/
+  pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, words_expression(a));
-  pc = CHAIN_SWORD(pc,"[");
+  pc = CHAIN_SWORD(pc,")[");
   MAP(EXPRESSION,exp,
   {
     if (!first) 
@@ -3023,10 +3030,10 @@ static list words_application(application a)
   expression f = application_function(a);
   list lexp = application_arguments(a);
   bool first = TRUE;
+  /* Parentheses must be added for function expression */
   pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, words_expression(f));
-  pc = CHAIN_SWORD(pc,")");
-  pc = CHAIN_SWORD(pc,"(");
+  pc = CHAIN_SWORD(pc,")(");
   MAP(EXPRESSION,exp,
   {
     if (!first) 
