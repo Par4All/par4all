@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/04/15 09:09:09 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/04/15 15:17:09 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -82,7 +82,7 @@ y.tab.c: tokyacc.h gram.y
 # For gcc: lex generated array initializations are reformatted with sed to
 # avoid lots of gcc warnings; the two calls to sed are *not* mandatory;
 
-scanner.c: scanner.l
+scanner.c: toklex.h scanner.l
 	$(SCAN) scanner.l | sed -e 's/YY/HH/g;s/yy/hh/g' | \
 	sed -e '/hhcrank\[\]/,/^0,0};/s/^/{/;/hhcrank\[\]/,/^{0,0};$$/s/,$$/},/;/hhcrank\[\]/,/^{0,0};$$/s/,	$$/},/;/hhcrank\[\]/,/^{0,0};$$/s/,	/},	{/g;s/^{0,0};$$/{0,0}};/;/hhcrank\[\]/s/{//' | \
 	sed -e 's/^0,	0,	0,/{0,	0,	0},/;s/^0,	0,	0};/{0,	0,	0}};/;/^hhcrank+/s/^/{/;/^{hhcrank+/s/,$$/},/;/^{hhcrank+/s/,	$$/},/' > scanner.c
