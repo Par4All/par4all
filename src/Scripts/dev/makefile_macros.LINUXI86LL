@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: makefile_macros.LINUXI86LL,v $
+# Revision 1.2  1997/05/12 15:08:51  coelho
+# *** empty log message ***
+#
 # Revision 1.1  1997/05/12 12:58:47  coelho
 # Initial revision
 #
@@ -9,6 +12,9 @@
 # this file contains macro definitions 
 
 include $(ROOT)/Include/makefile_macros.GNULL
+
+AR=ar
+RANLIB=ranlib
 
 # end of it!
 #
