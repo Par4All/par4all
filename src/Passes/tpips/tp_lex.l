@@ -16,7 +16,7 @@ OPTEMPTY (([ \t\n])*)
 #include "genC.h"
 #include "misc.h"
 #include "tpips.h"
-#include "y.tab.h"
+#include "tp_yacc.h"
 
 /* now get the characters from a string, not from a file */
 #ifndef FLEX_SCANNER
