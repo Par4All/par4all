@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.24  2003/08/18 14:56:14  coelho
+  *** empty log message ***
+
   Revision 1.23  2003/08/18 14:55:15  coelho
   better callback called on throw...
 
@@ -157,7 +160,7 @@ void dump_exception_stack_to_file(FILE * f)
 	    exception_stack[i].line,
 	    exception_stack[i].function,
 	    exception_stack[i].what,
-	    exception_stack[i[.callback);
+	    exception_stack[i].callback);
   }
   fprintf(f, "\n");
 }
