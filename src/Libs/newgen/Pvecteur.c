@@ -45,7 +45,8 @@ FILE *fd; /* ignored */
 int (*f)();
 {
 /* VBUFSIZE was increased from 1024 to 2048 for cgg:opmkrnl; FI, 13 March 92 */
-#define VBUFSIZE 2048
+/* VBUFSIZE was increased from 2048 to 4096 for mat:zebulon5; FI, 3 Jan 97 */
+#define VBUFSIZE 4096
     Value val;
     Variable var;
     char *varname;
