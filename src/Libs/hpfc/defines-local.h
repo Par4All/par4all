@@ -236,6 +236,8 @@ void fprint_entity_list(FILE *fp, list l);
 #define T_LIDp		"T_LIDp"
 #define INFO		"HPFC_INFO"
 #define BUFID		"HPFC_BUFID"
+#define LAZY_SEND	"LAZY_SEND"
+#define LAZY_RECV	"LAZY_RECV"
 
 #define MYPOS		"MYPOS"
 #define MYLID		"MYLID"
@@ -359,6 +361,8 @@ void fprint_entity_list(FILE *fp, list l);
  */
 #define hpfc_warning \
     if (!get_bool_property("HPFC_NO_WARNING")) user_warning
+
+#define lazy_message_p() get_bool_property("HPFC_LAZY_MESSAGES")
 
 /* that is all
  */
