@@ -119,10 +119,9 @@ static void get_name();
 
 #define trim(p)	while (*p == ' ' || *p == '\t') p++
 
-static int saveit(name)
-char *name;
+static int saveit(char * name)
 {
-    return(1);
+    return 1;
 }
 
 static char * 
@@ -273,8 +272,8 @@ char *s;
 	} else {
 	    implicit_program = 1;
 	    it_is_a_main = 1;
-	    get_name( mainp);
-	    strcpy( s, mainp);
+	    get_name(mainp);
+	    strcpy(s, mainp);
 	}
 	return(1);
 }
@@ -362,10 +361,10 @@ char *s, *m;
 	return (sp);
 }
 
-static void print_name(FILE * o, char * name, int n) /* FC */
+static void print_name(FILE * o, char * name, int n, int upper) /* FC */
 {
     name = name + strlen(name) - n - 2;
-    while (n-->0) putc(*name++, o);
+    while (n-->0) putc(upper? toupper(*name++): *name++, o);
 }
 
 #define FREE_STRINGS					\
@@ -411,6 +410,7 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 	    hollerith(buf); /* FC */
 	    if (nflag == 0) /* if no name yet, try and find one */
 		nflag = lname(name);
+
 	    if (it_is_a_main) {
 		char * c = name;
 		FILE * fm = fopen(main_list, "a");
@@ -418,28 +418,32 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 		    fprintf(stderr, "fopen(\"%s\", ...) failed\n", main_list);
 		    abort();
 		}
-		while (*c && *c!='.') putc(toupper(*c++), fm);
+		if (implicit_program_name==1 || implicit_program==1)
+		    print_name(fm, name, 7, 1);
+		else
+		    while (*c && *c!='.') putc(toupper(*c++), fm);
 		putc('\n', fm);
 		fclose(fm);
 		it_is_a_main = 0;
 	    }
+
 	    if (implicit_program==1) /* FC again */ 
 	    {
 		fprintf(ofp, 
 			"! next line added by fsplit() in pips\n"
 			"      PROGRAM ");
-		print_name(ofp, name, 7);
+		print_name(ofp, name, 7, 0);
 		putc('\n', ofp);
 		implicit_program = 0; /* now we gave it a name! */
 	    }
-	    
+
 	    if (implicit_blockdata_name==1 || implicit_program_name==1) 
 	    {
 		fprintf(ofp, 
 			"! next line modified by fsplit() in pips\n"
 			"      %s ", 
 			implicit_program_name==1? "PROGRAM": "BLOCK DATA");
-		print_name(ofp, name, 7);
+		print_name(ofp, name, 7, 0);
 		putc('\n', ofp);
 		implicit_blockdata_name = 0;
 		implicit_program_name = 0;
