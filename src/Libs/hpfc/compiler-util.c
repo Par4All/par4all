@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compiler-util.c,v $ ($Date: 1994/12/22 16:52:14 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1994/12/30 16:49:10 $, )
  * got on %D%, %T%
  * $Id$
  *
@@ -148,7 +148,7 @@ expression e;
 }
 
 void FindRefToDistArrayInStatement(obj, lwp, lrp)
-chunk* obj;
+statement obj;
 list *lwp, *lrp;
 {
     list
@@ -466,7 +466,7 @@ loop l;
 }
 
 void set_current_loops(obj)
-chunk* obj;
+statement obj;
 {
     assert(current_loop_list==NIL);
 
