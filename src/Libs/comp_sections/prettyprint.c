@@ -1,4 +1,7 @@
 /* print complementary sections */
+#include <stdlib.h>
+#include <malloc.h>
+
 #include "all.h"
 #include "text-util.h"
 #include "top-level.h"
