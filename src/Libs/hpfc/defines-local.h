@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/11/30 16:47:30 $, ) 
+ * ($Date: 1995/12/19 15:44:43 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -278,10 +278,10 @@ void fprint_entity_list(FILE *fp, list l);
   (FindAlignmentOfTemplateDim(align_alignment(load_entity_align(array)), dim))
 
 #define array_to_template(array) \
-  (align_template(load_entity_align(array)))
+  (align_template(load_hpf_alignment(array)))
 
 #define template_to_processors(template) \
-  (distribute_processors(load_entity_distribute(template)))
+  (distribute_processors(load_hpf_distribution(template)))
 
 #define array_to_processors(array) \
   (template_to_processors(array_to_template(array)))
