@@ -21,7 +21,6 @@
   */
 
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 
 #include "genC.h"
