@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.46  1997/05/28 13:48:22  coelho
+ * more debug messages.
+ *
  * Revision 1.45  1997/05/02 19:53:06  coelho
  * *** empty log message ***
  *
@@ -684,6 +687,7 @@ hpfc_translate_call_with_distributed_args(
     for (i=1; i<=len; i++, POP(args))
     {
 	entity arg = find_ith_parameter(f, i);
+	pips_debug(7, "considering argument %d\n", i);
 
 	if (array_distributed_p(arg))
 	{
@@ -693,6 +697,8 @@ hpfc_translate_call_with_distributed_args(
 
 	    passed = expression_to_entity(e);
 
+	    pips_debug(8, "passed:%s, arg:%s\n", 
+		       entity_name(passed), entity_name(arg));
 	    pips_assert("distributed and conformant",
 			array_distributed_p(passed) &&
 			conformant_entities_p(passed, arg));
