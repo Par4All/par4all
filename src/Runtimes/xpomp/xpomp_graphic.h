@@ -41,13 +41,15 @@ XPOMP_set_user_color_map(XPOMP_display screen,
 extern int
 XPOMP_wait_mouse(XPOMP_display screen,
 		 int * X,
-		 int * Y);
+		 int * Y,
+		 int * state);
 
 /* Just test for a mouse click: */
 extern int
 XPOMP_is_mouse(XPOMP_display screen,
 	       int * X,
-	       int * Y);
+	       int * Y,
+	       int * state);
 
 /* The user interface to show something uncooked. Return -1 if it
    fails, 0 if not: */
