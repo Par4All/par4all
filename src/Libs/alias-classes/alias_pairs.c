@@ -39,34 +39,8 @@ static list list_regions_callee = NIL;
 static statement current_caller_stmt = statement_undefined;
 static list list_pairs = NIL;
 
-/*
-static Pbase
-make_base_phi_variables(region reg)
-{
-    Pbase phi_variables;
-    int dim;
-    int dim_max;
-    entity e;
 
-    pips_debug(4,"begin\n");
-
-    phi_variables = BASE_NULLE;
-    e = reference_variable(region_reference(reg));
-    dim_max = NumberOfDimension(e);
-
-    for (dim = 1; dim<=dim_max; dim ++)
-    {
-	entity phi = make_phi_entity(dim);
-	base_add_variable(phi_variables, (Variable) phi);
-    }
-
-    pips_debug(4,"end\n");
-
-    return phi_variables;
-}
-*/
-
-
+/* creation of a Pbase containing just the PHI variables of the region */
 static Pbase
 make_base_phi_variables(region reg)
 {
@@ -97,6 +71,12 @@ make_base_phi_variables(region reg)
 }
 
 
+/* strips from the region all the constraints which do not affect
+ * (even transitively) the PHI variables
+ * i.e. the function representing the region no longer returns the
+ * empty region if a branch condition is not satisfied
+ * so the region becomes MAY-in-the-usual-dataflow-sense
+ */
 static region
 restrict_to_phi_constraints(region reg)
 {
@@ -110,8 +90,6 @@ restrict_to_phi_constraints(region reg)
     sc = region_system(reg);
     phi_variables = make_base_phi_variables(reg);
     new_reg = region_dup(reg);
-
-/* meme si on laisse new_reg comme ceci, on a tjs le probleme Newgen */
 
     ifdebug(9)
 	{
@@ -135,7 +113,9 @@ restrict_to_phi_constraints(region reg)
     return new_reg;
 }
 
-
+/* "convert" EXACT regions to exact representations of
+ * MAY-in-the-usual-dataflow-sense regions
+ */
 static region
 convert_exact_to_exact_may(region reg)
 {
@@ -152,6 +132,11 @@ convert_exact_to_exact_may(region reg)
 }
 
 
+/* all MAY regions are "converted" to over-approximate representations of
+ * MAY-in-the-usual-dataflow-sense regions (some regions may in fact be
+ * precise representations  of MAY-in-the-usual-dataflow-sense regions after
+ * this operation, but we cannot detect which)
+ */
 static region
 approx_convert_may_to_approx_may(region reg)
 {
@@ -168,6 +153,15 @@ approx_convert_may_to_approx_may(region reg)
 }
 
 
+/* takes EXACT (i.e. precise representations of MUST in the usual
+ * dataflow sense) and MAY (i.e. over-approximate representations of MUST
+ * regions or either over-approximate or precise representations of
+ * MAY-in-the-usual-dataflow-sense) regions and "converts" them to
+ * exact or over-approximate representations of
+ * MAY-in-the-usual-dataflow-sense) regions
+ * by stripping all the constraints which do not affect
+ * (even transitively) the PHI variables
+ */
 static region
 approx_convert(region reg)
 {
@@ -323,6 +317,8 @@ add_parameter_aliases_for_this_call_site(call call_site,
 			    print_inout_regions(pair);
 			}
 
+		    /* convert actual and formal regions to
+		       MAY-in-the-usual-dataflow-sense */
 		    actual = approx_convert(EFFECT(CAR(pair)));
 
 		    pair = CONS(EFFECT,actual,NIL);
@@ -333,8 +329,9 @@ add_parameter_aliases_for_this_call_site(call call_site,
 			    print_inout_regions(pair);
 			}
 
-/* donne erreur Newgen
+/* gave Newgen error
    formal = approx_convert(callee_region); */
+
 		    formal = approx_convert(region_dup(callee_region));
 
 		    pair = CONS(EFFECT,formal,pair);
@@ -439,12 +436,6 @@ add_alias_pairs_for_this_caller( entity caller )
     /* that's it,
      * but we musn't forget to reset it all again below !
      */
-
-    /* need this for regions_dynamic_elim?
-    set_transformer_map( (statement_mapping)
-	db_get_memory_resource(DBR_TRANSFORMERS, caller_name, TRUE) );
-		       */
-
     
     caller_statement = get_current_module_statement();
 
@@ -473,9 +464,6 @@ add_alias_pairs_for_this_caller( entity caller )
     free_value_mappings();
     reset_precondition_map();
     regions_end();
-
-    /* need this for regions_dynamic_elim?
-    reset_transformer_map(); */
 
     reset_current_module_entity();
     set_current_module_entity(callee);    
