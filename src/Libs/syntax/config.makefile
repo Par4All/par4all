@@ -1,6 +1,6 @@
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
-# CFLAGS=		$(PIPS_CFLAGS)
+# bof...
 ifeq ($(ARCH),SUN4)
 CFLAGS=	-Xc -g
 else
