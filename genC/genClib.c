@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/22 11:31:53 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/22 15:50:19 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -313,12 +313,14 @@ gen_alloc(int size, int gen_check_p, int dom, ...)
     gen_chunk *cp ;
     int data ;
 
-    va_start(ap, dom);
-
     check_read_spec_performed();
 
+    va_start(ap, dom);
+
     cp = (gen_chunk *)alloc(size) ;
-    bp = &Domains[ cp->i = dom ] ;
+    cp->i = dom;
+
+    bp = &Domains[dom];
     data = 1 + IS_TABULATED( bp );
 
     switch( (dp = bp->domain)->ba.type ) {
@@ -339,10 +341,10 @@ gen_alloc(int size, int gen_check_p, int dom, ...)
     default:
 	fatal( "gen_alloc: Unknown type %s\n", itoa( dp->ba.type )) ;
     }
-    if( IS_TABULATED( bp )) {
-	enter_tabulated_def(bp->index, bp-Domains, 
-			    (cp+HASH_OFFSET)->s, cp, 0) ;
-    }
+
+    if (IS_TABULATED(bp)) 
+	enter_tabulated_def(bp->index, dom, (cp+HASH_OFFSET)->s, cp, FALSE);
+
     va_end( ap ) ;
 
     return( cp ) ;
@@ -933,18 +935,19 @@ struct driver *dr ;
 {
     union domain *dp ;
 
-    if( IS_TABULATED( bp )) {
-	static char local[ 1024 ] ;
+    if( IS_TABULATED( bp ))
+    {
+	static char local[512];
 	    
-	(void) sprintf( local, "%d%c%s", 
-		quick_domain_index(obj), HASH_SEPAR, (obj+HASH_OFFSET)->s ) ;
+	(void) sprintf(local, "%d%c%s", 
+		quick_domain_index(obj), HASH_SEPAR, (obj+HASH_OFFSET)->s) ;
 
-	if( Gen_tabulated_names == (hash_table)NULL ) {
-	    fatal( "free_obj_out: Null tabulated names for %s\n", bp->name ) ;
-	}
-	if( hash_del( Gen_tabulated_names, local ) == HASH_UNDEFINED_VALUE ) {
-	    user( "free_tabulated: clearing unexisting %s\n", local ) ;
-	}
+	if (!Gen_tabulated_names) 
+	    fatal("free_obj_out: Null tabulated names for %s\n", bp->name) ;
+	
+	if (hash_del(Gen_tabulated_names, local)==HASH_UNDEFINED_VALUE)
+	    user("free_tabulated: clearing unexisting \"%s\"\n", local);
+	
 	(Gen_tabulated_[bp->index]+abs((obj+1)->i))->p=gen_chunk_undefined;
     }
 
@@ -2014,16 +2017,15 @@ gen_read_spec(char * spec, ...)
 
 	    bp->alloc = 1 ;
 	    Gen_tabulated_[ bp->index ] = 
-		    (gen_chunk *)alloc( max_tabulated_elements()*sizeof( gen_chunk )) ;
+		(gen_chunk *)alloc(max_tabulated_elements()*sizeof(gen_chunk));
 	    
 	    for( i=0 ; i<max_tabulated_elements() ; i++ ) {
 		(Gen_tabulated_[ bp->index ]+i)->p = gen_chunk_undefined ;
 	    }
 	    if( Gen_tabulated_names == NULL ) {
 		Gen_tabulated_names = 
-			hash_table_make( hash_string,
-					 MAX_TABULATED*
-					max_tabulated_elements() ) ;
+		    hash_table_make(hash_string,
+				    MAX_TABULATED*max_tabulated_elements());
 	    }
 
 	}
@@ -2034,8 +2036,7 @@ gen_read_spec(char * spec, ...)
     Read_spec_performed = TRUE ;
     va_end( ap ) ;
 
-    /*
-     * quick recurse decision tables initializations
+    /* quick recurse decision tables initializations
      */
     init_gen_quick_recurse_tables();
 }
