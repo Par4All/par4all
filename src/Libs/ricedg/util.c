@@ -49,6 +49,16 @@ vertex v;
     return dg_vertex_label_statement(dvl);
 }
 
+    static string dependence_graph_banner[8] = {
+	"\n ********* Dependence Graph (ill. option combination) *******\n",
+	"\n **************** Effective Dependence Graph ****************\n",
+	"\n ********* Dependence Graph (ill. option combination) *******\n",
+	"\n ********* Dependence Graph (ill. option combination) *******\n",
+	"\n ******** Whole Dependence Graph with Dependence Cones ******\n",
+	"\n ********* Dependence Graph (ill. option combination) *******\n",
+	"\n ********* Dependence Graph (ill. option combination) *******\n",
+	"\n **** Loop Carried Dependence Graph with Dependence Cones ***\n"
+    };
 
 /* a` renommer print_dependence_graph ? */
 void print_graph(fd, mod_stat, mod_graph)
@@ -58,8 +68,16 @@ graph mod_graph;
 {
     cons *pv1, *ps, *pc;
     Ptsg gs;
+    int banner_number = 0;
 
-    fprintf(fd, "\n ************************ Dependence Graph ************************\n");
+    banner_number =
+	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") +
+	    2*get_bool_property
+		("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS") +
+		    4*get_bool_property
+			("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES");
+
+    fprintf(fd, "%s\n", dependence_graph_banner[banner_number]);
   debug_on("RICEDG_DEBUG_LEVEL");
     for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {
 	vertex v1 = VERTEX(CAR(pv1));
@@ -114,7 +132,7 @@ graph mod_graph;
 	}
     } 
     debug_off();
-    fprintf(fd, "\n******************** End of Dependence Graph ********************\n");
+    fprintf(fd, "\n****************** End of Dependence Graph ******************\n");
 }
 
 void print_graph_with_reduction(fd, mod_stat, mod_graph)
@@ -124,11 +142,19 @@ graph mod_graph;
 {
     cons *pv1, *ps, *pc;
     Ptsg gs;
+    int banner_number = 0;
 
-    
+    banner_number =
+	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") +
+	    2*get_bool_property
+		("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS") +
+		    4*get_bool_property
+			("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES");
+
+    fprintf(fd, "%s\n", dependence_graph_banner[banner_number]);
+
     set_enclosing_loops_map( loops_mapping_of_statement(mod_stat) );
 
-    fprintf(fd, "\n ************************ Dependence graph ************************\n");
     debug_on("RICEDG_DEBUG_LEVEL");
     for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {
 	vertex v1 = VERTEX(CAR(pv1));
@@ -209,7 +235,7 @@ graph mod_graph;
     }
     reset_enclosing_loops_map();
     debug_off();
-    fprintf(fd, "\n******************** End of Dependence graph ********************\n");
+    fprintf(fd, "\n****************** End of Dependence Graph ******************\n");
 }
 		    
 void print_vect_in_vertice_val(fd,v,b)
