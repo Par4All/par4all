@@ -204,7 +204,7 @@ int ls;
 
     for( ; !ENDP(ldv); POP(ldv)) {
 	dimension d = DIMENSION(CAR(ldv));
-	int size = SizeOfDimension(d);
+	int size = dimension_size(d);
 	number_of_elements *= size;
     }
 
