@@ -109,10 +109,11 @@ db_get_current_builder_name(void)
 string 
 db_get_directory_name_for_module(string name)
 {
-    string dir_name;
+    string dir_name, ws_dir_name;
     pips_assert("some valid name", name && !same_string_p(name, ""));
-    dir_name = strdup(concatenate
-		      (db_get_current_workspace_directory(), "/", name, 0));
+    ws_dir_name = db_get_current_workspace_directory();
+    dir_name = strdup(concatenate(ws_dir_name, "/", name, 0));
+    free(ws_dir_name);
     if (!directory_exists_p(dir_name))
 	if (!create_directory(dir_name)) /* MKDIR */
 	    pips_user_irrecoverable_error
