@@ -13,8 +13,236 @@
 
 #include "genC.h"
 
+#include "ri.h"
+#include "ri-util.h"
+#include "database.h"
+#include "resources.h"
+#include "pipsdbm.h"
+
 #include "effects-generic.h"
 #include "effects-simple.h"
+
+/******************************************************* PIPSDBM INTERFACES */
+
+static statement_effects
+db_get_proper_references(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_PROPER_REFERENCES,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+static void
+db_put_proper_references(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_PROPER_REFERENCES,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+static list
+db_get_summary_references(char *mod_name)
+{
+    list l_res = NIL;
+    
+    l_res = effects_to_list(
+	(effects) db_get_memory_resource(DBR_SUMMARY_EFFECTS, mod_name, TRUE));
+    return l_res;
+}
+
+/* summary references are never computed */
+static void
+db_put_summary_references(char *mod_name, list l_eff)
+{
+    return;
+}
+
+static statement_effects
+db_get_cumulated_references(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_CUMULATED_REFERENCES,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+static void
+db_put_cumulated_references(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_REFERENCES,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+static statement_effects
+db_get_invariant_references(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_CUMULATED_REFERENCES,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+static void
+db_put_invariant_references(char *mod_name, statement_effects eff_map)
+{
+    return;
+}
+
+static statement_effects
+db_get_simple_proper_rw_effects(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_PROPER_EFFECTS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+static void
+db_put_simple_proper_rw_effects(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_PROPER_EFFECTS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+static statement_effects
+db_get_simple_invariant_rw_effects(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+static void
+db_put_simple_invariant_rw_effects(char *mod_name, statement_effects eff_map)
+{
+   return;
+}
+
+static statement_effects
+db_get_simple_rw_effects(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+static void
+db_put_simple_rw_effects(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_EFFECTS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+static list
+db_get_simple_summary_rw_effects(char *mod_name)
+{
+    list l_res = NIL;
+    
+    l_res = effects_to_list(
+	(effects) db_get_memory_resource(DBR_SUMMARY_EFFECTS, mod_name, TRUE));
+    return l_res;
+}
+
+static void
+db_put_simple_summary_rw_effects(char *mod_name, list l_eff)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_EFFECTS,
+			   strdup(mod_name),
+			   (char *) list_to_effects(l_eff));
+}
+
+static statement_effects
+db_get_simple_in_effects(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_IN_EFFECTS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+static void
+db_put_simple_in_effects(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_IN_EFFECTS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+static statement_effects
+db_get_simple_cumulated_in_effects(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_CUMULATED_IN_EFFECTS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+static void
+db_put_simple_cumulated_in_effects(char *mod_name, statement_effects eff_map)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_IN_EFFECTS,
+			   strdup(mod_name),
+			   (char *) eff_map);
+}
+
+static statement_effects
+db_get_simple_invariant_in_effects(char *mod_name)
+{
+    statement_effects eff_map;
+    
+    eff_map =
+	(statement_effects) db_get_memory_resource(DBR_IN_EFFECTS,
+						   mod_name, TRUE);
+    return(eff_map);
+}
+
+static void
+db_put_simple_invariant_in_effects(char *mod_name, statement_effects eff_map)
+{
+    return;
+}
+
+
+static list
+db_get_simple_summary_in_effects(char* mod_name)
+{
+    list l_res = NIL;
+    
+    l_res = effects_to_list(
+    (effects) db_get_memory_resource(DBR_IN_SUMMARY_EFFECTS, mod_name, TRUE));
+    return l_res;
+}
+
+static void
+db_put_simple_summary_in_effects(char *mod_name, list l_eff)
+{
+    DB_PUT_MEMORY_RESOURCE(DBR_IN_SUMMARY_EFFECTS,
+			   strdup(mod_name),
+			   (char *) list_to_effects(l_eff));
+}
+
 
 void
 set_methods_for_proper_references()
@@ -60,6 +288,8 @@ set_methods_for_proper_references()
 
     effects_descriptor_normalize_func = simple_effects_descriptor_normalize;
 
+    proper_to_summary_effect_func = effect_nop; /* FC */
+
     db_get_summary_rw_effects_func = db_get_summary_references;
     db_get_proper_rw_effects_func = db_get_proper_references;
     db_put_proper_rw_effects_func = db_put_proper_references;
@@ -86,7 +316,8 @@ set_methods_for_cumulated_references()
     effects_sup_difference_op = effects_undefined_binary_operator;
     effects_inf_difference_op = effects_undefined_binary_operator;
     effects_transformer_composition_op =
-	effects_undefined_composition_with_transformer;
+	effects_composition_with_transformer_nop;
+	/* FC: effects_undefined_composition_with_transformer; */
     effects_transformer_inverse_composition_op =
 	effects_undefined_composition_with_transformer;
     effects_precondition_composition_op =
@@ -108,6 +339,8 @@ set_methods_for_cumulated_references()
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
     empty_context_test = empty_context_test_false;
+
+    proper_to_summary_effect_func = effect_nop; /* FC */
 
     effects_descriptor_normalize_func = simple_effects_descriptor_normalize;
 
@@ -177,6 +410,7 @@ set_methods_for_proper_simple_effects()
 
     db_get_proper_rw_effects_func = db_get_simple_proper_rw_effects;
     db_put_proper_rw_effects_func = db_put_simple_proper_rw_effects;
+    db_get_summary_rw_effects_func = db_get_simple_summary_rw_effects; /* FC */
 
     set_contracted_proper_effects(PROPER_EFFECTS_CONTRACT);
     set_descriptor_range_p(FALSE);
