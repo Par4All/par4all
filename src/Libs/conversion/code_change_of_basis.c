@@ -48,18 +48,33 @@ Pbase base_oldindex;
 Pvecteur pvg[];
 {
     Pvecteur pv,pv1,pv2 = NULL;
+    Pbase to_erase = BASE_NULLE, b;
     int r;
 
-    for (pv=pv_old; pv!=NULL; pv=pv->succ){
-	r = base_find_variable_rank(base_oldindex,pv->var,nom_de_variable);
-	if ( r!= -1) { /* var is in base_oldindex */
+    for (pv=pv_old; pv!=NULL; pv=pv->succ)
+    {
+	r = base_find_variable_rank(base_oldindex, pv->var, nom_de_variable);
+
+	if (r != -1) 
+	{ /* var is in base_oldindex */
 	    pv1 = vect_multiply(vect_dup(pvg[r]),pv->val); 
 	    pv2 = vect_add(pv2,pv1);
-	    vect_erase_var(&pv_old,pv->var);
+
+	    /* on bousille tranquillement le vecteur sur lequel on itere;-) */
+	    /* vect_erase_var(&pv_old,pv->var); */
+	    to_erase = base_add_variable(to_erase, pv->var);
 	}
     }
+
+    /* clean vector 
+     */
+    for(b=to_erase; b!=NULL; b=b->succ)
+	vect_erase_var(&pv_old, b->var);
+    base_rm(to_erase);
+    
     pv2 = vect_add(pv2,pv_old);
-    return(pv2);
+
+    return pv2;
 }
 
 
@@ -83,7 +98,7 @@ Pbase base_oldindex;
     }
     return(gen_nreverse(l_new));
 }
-
+
 /* expression expression_to_expression_newbase(expression e_old,Pvecteur pvg[],
  * Pbase base_oldindex)
  * compute the new expression for e_old  in the new basis pvg[]
@@ -103,20 +118,29 @@ Pbase base_oldindex;
     Pvecteur pve_old,pve_new;
     
     e_old_norm = NORMALIZE_EXPRESSION(e_old);
-    debug(8,"expression_to_expression_newbase","\ntag=%d",normalized_tag(e_old_norm));
-    if (normalized_linear_p(e_old_norm)){ /* linear */
+
+    pips_debug(8, "tag=%d\n", normalized_tag(e_old_norm));
+    ifdebug(9) {
+	pips_debug(9, "considering expression %p:\n", e_old);
+	print_expression(e_old);
+    }
+
+    if (normalized_linear_p(e_old_norm))
+    { /* linear */
 	pve_old = (Pvecteur) normalized_linear(e_old_norm);
 	pve_new = vect_change_base(pve_old,base_oldindex,pvg);
 	e_new = make_vecteur_expression(pve_new); 
 	return(e_new);
     }
-    else {				/* complex */
+    else 
+    {				/* complex */
 	syn = expression_syntax(e_old);
 	if (syntax_reference_p(syn)) {	
 	    ref = syntax_reference(syn);
 	    l_ex = reference_indices(ref);
 	    if (l_ex!=NULL){	
-		l_ex_new = listexpres_to_listexpres_newbase(l_ex,pvg,base_oldindex);
+		l_ex_new = listexpres_to_listexpres_newbase(
+		    l_ex,pvg,base_oldindex);
 		reference_indices(ref) = l_ex_new;		
 		gen_free_list(l_ex);
 	    }
@@ -125,7 +149,8 @@ Pbase base_oldindex;
 	    cal = syntax_call(syn);
 	    l_ex = call_arguments(cal);
 	    if (l_ex!=NULL){
-		l_ex_new = listexpres_to_listexpres_newbase(l_ex,pvg,base_oldindex);
+		l_ex_new = listexpres_to_listexpres_newbase(
+		    l_ex,pvg,base_oldindex);
 		call_arguments(cal) = l_ex_new;
 		gen_free_list(l_ex);
 	    }
