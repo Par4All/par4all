@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/08/31 17:53:20 $, 
+! $Date: 1996/08/31 18:18:07 $, 
 !
       program fractal
 
@@ -26,8 +26,8 @@
 
 ! Size of the iteration space:
       integer x_size, y_size
-      parameter(x_size = 300)     
-      parameter(y_size = 300)
+      parameter(x_size = 400)     
+      parameter(y_size = 400)
 
 ! The zooming ratio to display this iteration space:      
       integer x_display_zoom, y_display_zoom
@@ -54,7 +54,7 @@
 ! Some HPF distributions:
 ! cyclic would make more sense as far as load balancing is concerned
 ! However HPFC would not be very good at it...
-!hpf$ processors pe(2,4)
+!hpf$ processors pe(2,2)
 !hpf$ template space(0:x_size - 1, 0:y_size - 1)
 !hpf$ distribute space(block, block) onto pe
 !hpf$ align image with space
