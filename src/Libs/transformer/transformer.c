@@ -141,6 +141,7 @@ transformer_combine(
     /* predicate_system(transformer_relation(t1)) = (Psysteme) r1; */
     predicate_system_(transformer_relation(t1)) = (char *) r1;
 
+     
     debug(8,"transformer_combine","res. t1=%x\n",t1);
     ifdebug(8) (void) dump_transformer(t1);
     debug(8,"transformer_combine","end\n");
