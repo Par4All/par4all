@@ -1,0 +1,66 @@
+Dans ce fichier contient le text formate' du help accessible 
+sous wpips comme sous Pips (interface batch).
+
+Le format est (en retirant `|')
+|comment lines
+|BEGIN entry_name
+|0 to 8 text lines
+|END
+|...
+
+on pourrait ajouter: BEGIN entry_name [w|b]
+w: l'entree ne concerne que wpips
+b: l'entree ne concerne que batch pips (Pips...)
+
+Noter que le text doit e^tre formate, en particulier les lignes 
+ne doivent pas depasser 64 caracteres:
+123456789 123456789 123456789 123456789 123456789 123456789 1234
+
+----------------------------------------------------------------
+BEGIN ChangeDirectory
+Enter the directory path in the 'Change Directory' window
+and press the OK button.
+END
+
+BEGIN CreateProgram
+Enter the program name in the 'Create Program' window
+and press the OK button
+END
+
+BEGIN MultipleChoice
+Select one or more items from the scrolling list by clicking 
+the left mouse button while pointing on the items. 
+
+Press OK when you are done with choosing items.
+
+The current list of items is permanetly shown in the 'Current 
+Choices' message pad.  
+END
+
+----------------------------------------------------------------
+BEGIN SingleChoice
+Select a single item from the scrolling list by clicking the
+left mouse button while pointing on the item, then press OK.
+
+The current item is permanetly shown in the 'Current Choice'
+message pad.  
+END
+
+BEGIN Workspace
+A workspace is a collection of Fortran modules (main program, 
+subroutines or functions). Most commands refer to a workspace
+by its name.
+
+A workspace is created or selected with the 'Select' menu.
+END
+
+----------------------------------------------------------------
+BEGIN Module
+A module is the pips internal representation of a Fortran 
+module (main program, subroutine or function). Most commands 
+refer to a module by its name.
+
+A module name must only contain UPPER case characters or digits.
+
+A module may be selected with the 'Select' menu.
+END
