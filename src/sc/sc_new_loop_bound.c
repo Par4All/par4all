@@ -147,7 +147,7 @@ algorithm_row_echelon(
     }
 
     reverse_base = base_reversal(base_index);
-
+    
     for (pb=reverse_base, i=dimension;
 	 !VECTEUR_NUL_P(pb);
 	 pb=pb->succ, i--)
@@ -177,7 +177,7 @@ algorithm_row_echelon(
 
     /* returns a a la Omega system, with no innerward redundancy.
      * in fact this is just a quick approximation of that property.
-     * the way the system is computed may keep some outerward redundancy,
+     * the way the system is computed may keep some outerward redundancies,
      * because a constraint may be redundant with some not yet computed
      * projection...
      */
