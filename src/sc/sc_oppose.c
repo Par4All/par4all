@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
-extern   int fprintf();
+
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
