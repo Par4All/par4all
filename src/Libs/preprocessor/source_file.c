@@ -238,7 +238,6 @@ pips_process_file(string file_name)
 
 #else
 
-#define MAX_LINE_LENGTH 100
 #include "rxposix.h"
 
 #define IMPLICIT_NONE_RX "^[ \t]*implicit[ \t]*none"
@@ -297,15 +296,13 @@ static void handle_file_name(char * file_name, bool comment)
 
 static void handle_file(FILE * f) /* process f for includes and nones */
 {
-    char line[MAX_LINE_LENGTH];
+    char line[LINE_LENGTH];
     regmatch_t matches[2]; /* matched strings */
+    int nline = 0;
 
-    while (!feof(f))
+    while (!fgets(line, LINE_LENGTH, f))
     {
-	line[0]='\0'; 
-	
-	if (!fgets(line, MAX_LINE_LENGTH, f))
-	    return;
+	nline++;
 	
 	if (!regexec(&include_file_rx, line, 2, matches, 0))
 	{
@@ -316,9 +313,12 @@ static void handle_file(FILE * f) /* process f for includes and nones */
 	{
 	    if (!regexec(&implicit_none_rx, line, 0, matches, 0))
 		fprintf(output_file, "! MIL-STD-1553 Fortran not in PIPS\n! ");
+	    
 	    fprintf(output_file, "%s", line);
 	}
     }
+    
+    pips_debug(5, "NULL out after %d lines\n", nline);
 }
 
 static void init_rx(void)
@@ -426,7 +426,12 @@ string file;
     string abspath = NULL;
     /* string relpath = NULL; */
     static char *tempfile = NULL;
+    static int number_of_files = 0;
+    static int number_of_modules = 0;
     int err;
+
+    number_of_files++;
+    pips_debug(1, "file %s (number %d)\n", file, number_of_files);
 
     if (! file_exists_p(file)) {
 	pips_user_warning("Cannot open file : %s\n", file);
@@ -483,13 +488,13 @@ string file;
     fd = safe_fopen(tempfile, "r");
     while (fscanf(fd, "%s", buffer) != EOF) {
 	char *modname;
-	/* char *modfullfilename; */
 	char * modrelfilename = NULL;
 
+	number_of_modules++;
+	pips_debug(2, "module %s (number %d)\n", buffer, number_of_modules);
+
 	success_p = TRUE;
-	/*
-	modfullfilename = strdup(concatenate(database_directory(pgm), 
-					     "/", buffer, NULL)); */
+
 	modrelfilename = strdup(buffer);
 
 	*strchr(buffer, '.') = '\0';
