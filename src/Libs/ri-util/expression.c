@@ -1403,6 +1403,7 @@ void davinci_dump_expression(FILE * out, expression e)
 {
   hash_table seen = hash_table_make(hash_pointer, 0);
   davinci_dump_expression_rc(out, e, seen);
+  fprintf(out, "\n\n");
   hash_table_free(seen);
 }
 
