@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1997/12/10 13:59:22 $, )
+/* $RCSfile: hash.c,v $ ($Date: 2000/04/20 18:49:54 $, )
  * version $Revision$
  */
 
@@ -31,14 +31,14 @@
 /* Some predefined values for the key 
  */
 
-#define HASH_ENTRY_FREE (char *) 0
-#define HASH_ENTRY_FREE_FOR_PUT (char *) -1
+#define HASH_ENTRY_FREE (void *) 0
+#define HASH_ENTRY_FREE_FOR_PUT (void *) -1
 
 typedef struct __hash_entry hash_entry;
 
 struct __hash_entry {
-    char *key;
-    char *val;
+  void * key;
+  void * val;
 };
 
 struct __hash_table {
@@ -103,7 +103,7 @@ static int hash_int_equal();
 static int hash_int_rank();
 static int hash_pointer_equal();
 static int hash_pointer_rank();
-static char *hash_print_key();
+static string hash_print_key();
 static int hash_string_equal();
 static int hash_string_rank();
 static int hash_chunk_equal() ;
@@ -241,7 +241,7 @@ hash_table htp;
 
 void hash_put(htp, key, val)
 hash_table htp;
-char *key, *val;
+void *key, *val;
 {
     int rank;
     hash_entry_pointer hep;
@@ -271,14 +271,14 @@ char *key, *val;
 
 /* deletes key from the hash table. returns the val and key
  */ 
-char * 
+void * 
 hash_delget(
     hash_table htp, 
-    char * key, 
-    char ** pkey)
+    void * key, 
+    void ** pkey)
 {
     hash_entry_pointer hep;
-    char *val;
+    void *val;
     int rank;
     
     message_assert("legal input key",
@@ -302,11 +302,9 @@ hash_delget(
    couple whose key is equal to key. nothing is done if no such couple
    exists. ??? shoudl abort ? (FC) */
 
-char *hash_del(htp, key)
-hash_table htp;
-char *key;
+void *hash_del(hash_table htp, void *key)
 {
-    char * tmp;
+    void * tmp;
     return hash_delget(htp, key, &tmp);
 }
 
@@ -315,9 +313,7 @@ char *key;
    returned if no such couple exists. otherwise the corresponding value
    is returned. */ 
 
-char *hash_get(htp, key)
-hash_table htp;
-char *key;
+void * hash_get(hash_table htp, void * key)
 {
     hash_entry_pointer hep;
     int n;
@@ -337,9 +333,7 @@ char *key;
 
 /* TRUE if key has e value in htp.
  */
-bool hash_defined_p(htp, key)
-hash_table htp;
-char *key;
+bool hash_defined_p(hash_table htp, void * key)
 {
     return(hash_get(htp, key)!=HASH_UNDEFINED_VALUE);
 }
@@ -348,7 +342,7 @@ char *key;
  */
 void hash_update(htp, key, val)
 hash_table htp;
-char *key, *val;
+void *key, *val;
 {
     hash_entry_pointer hep;
     int n;
@@ -447,7 +441,7 @@ hash_enlarge_table(hash_table htp)
     /* Get the next prime number in the table */
     GET_NEXT_HASH_TABLE_SIZE(htp->hash_size,prime_list);
     htp->hash_array = (hash_entry_pointer) 
-	malloc(htp->hash_size* sizeof(hash_entry));
+	alloc(htp->hash_size* sizeof(hash_entry));
     htp->hash_size_limit = HASH_SIZE_LIMIT(htp->hash_size);
 
     for (i = 0; i < htp->hash_size ; i++)
@@ -474,15 +468,13 @@ hash_enlarge_table(hash_table htp)
     free(old_array);
 }
 
-static int hash_string_rank(key, size)
-char *key;
-int size;
+static int hash_string_rank(void * key, int size)
 {
     int v;
-    char *s;
+    char * s;
 
     v = 0;
-    for (s = key; *s; s++)
+    for (s = (char*) key; *s; s++)
  	v <<= 2, v += *s;
     v = abs(v) ;
     v %= size ;
@@ -490,71 +482,59 @@ int size;
     return v;
 }
 
-static int hash_int_rank(key, size)
-char *key;
-int size;
+static int hash_int_rank(void * key, int size)
 {
-    return HASH_FUNCTION(key, size);
+  return HASH_FUNCTION(key, size);
 }
 
-static int hash_pointer_rank(key, size)
-char *key;
-int size;
+static int hash_pointer_rank(void * key, int size)
 {
-    return HASH_FUNCTION(key, size);
+  return HASH_FUNCTION(key, size);
 }
 
-static int hash_chunk_rank(key, size)
-char *key;
-int size;
+static int hash_chunk_rank(gen_chunk * key, int size)
 {
-    return HASH_FUNCTION(((chunk *)key)->i, size);
+  return HASH_FUNCTION(key->i, size);
 }
 
-static int hash_string_equal(key1, key2)
-char *key1, *key2;
+static int hash_string_equal(char * key1, char * key2)
 {
-    return strcmp(key1, key2)==0;
+  return strcmp(key1, key2)==0;
 }
 
-static int hash_int_equal(key1, key2)
-char *key1, *key2;
+static int hash_int_equal(int key1, int key2)
 {
-    return key1 == key2;
+  return key1 == key2;
 }
 
-static int hash_pointer_equal(key1, key2)
-char *key1, *key2;
+static int hash_pointer_equal(void * key1, void * key2)
 {
-    return key1 == key2;
+  return key1 == key2;
 }
 
-static int hash_chunk_equal(key1, key2)
-gen_chunk *key1, *key2;
+static int hash_chunk_equal(gen_chunk * key1, gen_chunk * key2)
 {
-    return memcmp((char*)key1, (char*)key2, sizeof(gen_chunk))==0;
+  return key1->p == key2->p;
 }
 
-static char *hash_print_key(t, key)
-hash_key_type t;
-char *key;
+static char * hash_print_key(hash_key_type t, void * key)
 {
-    static char buffer[256];
+  static char buffer[256]; /* buggy */
 
-    if (t == hash_string)
-	sprintf(buffer, "%s", key);
-    else if (t == hash_int)
-	sprintf(buffer, "%d", (int)key);
-    else if (t == hash_pointer)
-	sprintf(buffer, "%x", (unsigned int) key);
-    else if (t == hash_chunk)
-	sprintf(buffer, "%x", (unsigned int)((gen_chunk *)key)->p);	    
-    else {
-	fprintf(stderr, "[hash_print_key] bad type : %d\n", t);
-	abort();
-    }
-
-    return(buffer);
+  if (t == hash_string)
+    sprintf(buffer, "%s", (char*) key);
+  else if (t == hash_int)
+    sprintf(buffer, "%d", (int)key);
+  else if (t == hash_pointer)
+    sprintf(buffer, "%x", (unsigned int) key);
+  else if (t == hash_chunk)
+    sprintf(buffer, "%x", (unsigned int)((gen_chunk *)key)->p);	    
+  else {
+    fprintf(stderr, "[hash_print_key] bad type : %d\n", t);
+    abort();
+  }
+  
+  return buffer;
 }
 
 /*  buggy function, the hash table stuff should be made again from scratch.
@@ -562,7 +542,7 @@ char *key;
  */
 static hash_entry_pointer hash_find_entry(htp, key, prank, operation)
 hash_table htp;
-char *key;
+void *key;
 int *prank;
 hash_operation operation;
 {
@@ -640,8 +620,8 @@ hash_table htp;
 hash_entry_pointer hash_table_scan(htp, hentryp, pkey, pval)
 hash_table htp;
 hash_entry_pointer hentryp;
-char **pkey;
-char **pval;
+void ** pkey;
+void ** pval;
 {
     hash_entry_pointer hend = htp->hash_array + htp->hash_size;
 
@@ -650,7 +630,7 @@ char **pval;
 
     while (hentryp < hend)
     {
-	char *key = hentryp->key;
+	void *key = hentryp->key;
 
 	if ((key !=HASH_ENTRY_FREE) && (key !=HASH_ENTRY_FREE_FOR_PUT))
 	{
@@ -663,9 +643,7 @@ char **pval;
     return NULL;
 }
 
-int
-hash_table_own_allocated_memory(
-    hash_table htp)
+int hash_table_own_allocated_memory(hash_table htp)
 {
     return htp ? 
       sizeof(struct __hash_table) + sizeof(hash_entry)*(htp->hash_size) : 0 ;
