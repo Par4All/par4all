@@ -62,7 +62,7 @@ static string actual_fortran_string_to_compare(string fs, int * plength)
 
 /* compare pips fortran string constants from the fortran point of view.
  *
- * as if 3.1 and 6.3.5 of the Fortran 77 standard, the character order 
+ * as of 3.1 and 6.3.5 of the Fortran 77 standard, the character order 
  * is not fully specified. It states:
  *  - A < B < C ... < Z
  *  - 0 < 1 < 2 ... < 9
