@@ -140,32 +140,42 @@ static void rw_effects_of_unstructured(unstructured unst)
 /*
  * From BC's PhD:
  *
- * R[while(C) S] = 
- *   R[C] U ( R[S] o E[C] ) U ( R[while(C) S] o T[S] o E[C] )
+ *   R[while(C)S] = R[C] U ( R[S] o E[C] ) U ( R[while(C)S] o T[S] o E[C] )
  *
- * however we do not have the lpf available to solve the recursive equation...
+ * However we do not have the lpf available to solve the recursive equation...
+ * Ok, let's try something else, with a few transformations:
  *
- * Ok, let's try something else
+ *   R[while(C)S]  = Rc[while(C)S] u Rs[while(C)S] ;
  *
- * R[while(C)S]  = Rc[while(C)S] u Rs[while(C)S] ;
+ *   Rc[while(C)S] = R[C] u R[C] o T[S] o E[C] u ...
+ *                 = U_i=0^inf R[C] o (T[S] o E[C])^i
+ *                 = R[C] O U_i=0^inf (T[S] o E[C])^i
+ *                 = R[C] O T*[while(C)S] ;
  *
- * Rc[while(C)S] = R[C] u R[C] o T[S] o E[C] u ...
- *               = U_i=0^inf R[C] o (T[S] o E[C])^i
- *               = R[C] O U_i=0^inf (T[S] o E[C])^i
- *               = R[C] O T*[while(C)S] ;
+ *   Rs[while(C)S] = R[S] o E[C] u R[S] o E[C] o T[S] o E[C] u ...
+ *                 = U_i=0^inf R[S] o E[C] o (T[S] o E[C])^i
+ *                 = R[S] o E[C] O U_i=0^inf (T[S] o E[C])^i
+ *                 = R[S] o E[C] O T*[while(C)S] ;
  *
- * Rs[while(C)S] = R[S] o E[C] u R[S] o E[C] o T[S] o E[C] u ...
- *               = U_i=0^inf R[S] o E[C] o (T[S] o E[C])^i
- *               = R[S] o E[C] O U_i=0^inf (T[S] o E[C])^i
- *               = R[S] o E[C] O T*[while(C)S] ;
+ * Thus
  *
- * thus
+ *   R[while(C)S]  = (R[C] u R[S] o E[C]) O T*[while(C)S] ;
  *
- * R[while(C)S]  = (R[C] u R[S] o E[C]) O T*[while(C)S] ;
  *
  * I assume that someone (FI) is to provide:
  *
  *   T*[while(C)S] = U_i=0^inf (T[S] o E[C])^i ;
+ *
+ * Note that T* can be computed as a fixpoint from the recursice equation:
+ *
+ *   T*[while(C)S] = T*[while(C)S] o T[S] o E[C] u Id
+ *
+ * That is the resolution of the fixpoint for R is expressed as a fixpoint
+ * on transformers only, and a direct computation on R. 
+ *
+ * Also we know that the output state is the one which makes C false.
+ *
+ *   T[while(C)S] = E[.not.C] O T*[while(C)S] ;
  *
  * note that T[] Sigma -> Sigma, 
  * but T*[] Sigma -> P(Sigma) 
@@ -187,6 +197,8 @@ static void rw_effects_of_while(whileloop w)
 
     l_body = (*effects_union_op)(l_body, l_prop, effects_same_action_p);
     l_body = (*effects_transformer_composition_op)(l_body, trans);
+
+    (*effects_descriptor_normalize_func)(l_body);
 
     store_rw_effects_list(current_stat, l_body);
 }
