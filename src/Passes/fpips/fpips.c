@@ -19,6 +19,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "genC.h"
+#include "misc.h"
 
 /******************************************************************** MACROS */
 
@@ -42,11 +44,6 @@ extern int tpips_main(int, char**);
 extern int wpips_main(int, char**);
 #define WPIPS(c, v) wpips_main(c, v)
 #endif
-
-#define true  (1)
-#define false (0)
-
-#define same_string_p(s1, s2) (strcmp((s1),(s2))==0)
 
 
 /******************************************************************** UTILS */
@@ -78,11 +75,11 @@ static int
 name_end_p(char * name, char * ref)
 {
     int nlen = strlen(name), rlen = strlen(ref);
-    if (nlen<rlen) return false;
+    if (nlen<rlen) return FALSE;
     while (rlen>0) 
 	if (ref[--rlen]!=name[--nlen]) 
-	    return false;
-    return true;
+	    return FALSE;
+    return TRUE;
 }
 
 
