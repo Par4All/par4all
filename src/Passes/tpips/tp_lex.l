@@ -26,6 +26,8 @@ OPTEMPTY (([ \t\n])*)
 #undef unput()
 #define unput(c) tpips_lex_unput(c)
 
+void yyrestart(FILE *f){ yyin = f;}
+
 #else
 
 #define YY_INPUT(buf,result,max_size) \
