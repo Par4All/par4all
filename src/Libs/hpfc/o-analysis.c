@@ -30,8 +30,9 @@ extern int      fprintf();
 
 entity CreateIntrinsic(string name); /* in syntax.h */
 
-list
-    lloop  = NULL;
+static list
+    lblocks = NIL,
+    lloop  = NIL;
 
 /*
  * Overlap_Analysis
@@ -66,14 +67,19 @@ statement stat, *pstat;
 
     set_hpfc_current_statement(stat);
 
+    lblocks = NIL,
     lloop = NIL;
-    innerbody = perfectly_nested_parallel_loop_to_body(stat, &lloop);
+    innerbody = parallel_loop_nest_to_body(stat, &lblocks, &lloop);
+
+    /*
     if (!statically_decidable_loops(lloop)) 
-	{
-	    debug(7, "Overlap_Analysis", 
-		  "returning FALSE because no static loop\n");
-	    return(FALSE);
-	}
+    {
+	debug(7, "Overlap_Analysis", 
+	      "returning FALSE because no static loop\n");
+	return(FALSE);
+    }
+    */
+
     FindRefToDistArrayInStatement(innerbody, &lw, &lr);
 
     /*
@@ -112,12 +118,12 @@ statement stat, *pstat;
 
     the_written_reference = syntax_reference(the_written_syntax);
     Wa = CONS(SYNTAX, the_written_syntax, NIL);
-    if (!align_check(the_written_reference, the_written_reference, &lvect, &lkind))
+    if (!align_check(the_written_reference,
+		     the_written_reference, &lvect, &lkind))
 	pips_error("Overlap_Analysis","no self alignment!\n");
     
-    lWa = CONS(CONSP,
-	       CONS(CONSP, lkind, CONS(CONSP, lvect, NIL)),
-	       NIL);
+    lWa = CONS(CONSP, CONS(CONSP, lkind,
+		      CONS(CONSP, lvect, NIL)), NIL);
 
     MAPL(cs,
      {
@@ -163,6 +169,7 @@ statement stat, *pstat;
 	gen_free_list(Wa);
 	gen_free_list(lWa);
 	gen_free_list(Wrt);
+	gen_free_list(lblocks);
 	gen_free_list(lloop);
 	return(FALSE);
     }
@@ -245,6 +252,7 @@ statement stat, *pstat;
 	gen_free_list(Ro);
 	gen_free_list(lRo);
 	gen_free_list(Rrt);
+	gen_free_list(lblocks);
 	gen_free_list(lloop);
 	return(FALSE);
     }
@@ -277,20 +285,20 @@ statement stat, *pstat;
      * the common case)
      */
     
-    if (!generate_optimized_code_for_loop_nest(innerbody, &newloopnest,
+    if (!generate_optimized_code_for_loop_nest(innerbody, 
+					       &newloopnest,
 					       Wa, Ra, Ro, 
 					       lWa, lRa, lRo))
 	return(FALSE);
 
     (*pstat) = 
-	make_block_statement(CONS(STATEMENT,
-				  messages_stat,
-			     CONS(STATEMENT,
-				  loop_nest_guard(newloopnest,
-						  the_written_reference,
-						  CONSP(CAR(CONSP(CAR(lWa)))),
-						  CONSP(CAR(CDR(CONSP(CAR(lWa)))))),
-				  NIL)));    
+	make_block_statement
+	    (CONS(STATEMENT, messages_stat,
+	     CONS(STATEMENT, loop_nest_guard(newloopnest,
+					     the_written_reference,
+					     CONSP(CAR(CONSP(CAR(lWa)))),
+					     CONSP(CAR(CDR(CONSP(CAR(lWa)))))),
+		  NIL)));    
 
     IFDBPRINT(8, "Overlap_Analysis", node_module, (*pstat));
 
@@ -627,6 +635,27 @@ expression e;
     return(FALSE);
 }
 
+/*   generate the call to the dynamic loop bounds computation
+ */
+statement statement_compute_bounds(newlobnd, newupbnd, oldidxvl, 
+				   lb, ub, an, dp)
+entity newlobnd, newupbnd, oldidxvl;
+expression lb, ub;
+int an, dp;
+{
+    list
+	l = CONS(EXPRESSION, entity_to_expression(newlobnd),
+	    CONS(EXPRESSION, entity_to_expression(newupbnd),
+	    CONS(EXPRESSION, entity_to_expression(oldidxvl),
+	    CONS(EXPRESSION, lb,
+	    CONS(EXPRESSION, ub,
+	    CONS(EXPRESSION, int_to_expression(an),
+	    CONS(EXPRESSION, int_to_expression(dp),
+		 NIL)))))));
+
+    return(hpfc_make_call_statement(hpfc_name_to_entity(LOOP_BOUNDS), l));
+}
+
 /*
  * bool generate_optimized_code_for_loop_nest(...)
  *
@@ -655,40 +684,35 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
 	newloops = NIL;
     statement
 	newnest = NULL;
-   
+    range rg;
+    expression
+	lb, ub;
+    entity
+	index, newindex, newlobnd, newupbnd, oldidxvl;
+    loop l, nl;
+    int p, dim;
 
     MAPL(cl,
      {
-	 loop
-	     l = LOOP(CAR(cl));
-	 entity
-	     index = loop_index(l);
-	 int
-	     p;
-	 int
-	     dim = which_array_dimension(the_written_reference, index);
+	 l = LOOP(CAR(cl));
+	 index = loop_index(l);
+	 dim = which_array_dimension(the_written_reference, index);
 
 	 if (ith_dim_distributed_p(array, dim, &p))
 	 {
 	     /* new bounds to compute, and so on */
-	     range
-		 rg = loop_range(l);
-	     int
-		 lb = HpfcExpressionToInt(range_lower(rg));
-	     int
-		 ub = HpfcExpressionToInt(range_upper(rg));
-	     entity
-		 newindex = NewTemporaryVariable(node_module, 
-						 MakeBasic(is_basic_int));
-	     entity
-		 newlobnd = NewTemporaryVariable(node_module, 
-						 MakeBasic(is_basic_int));
-	     entity
-		 newupbnd = NewTemporaryVariable(node_module, 
-						 MakeBasic(is_basic_int));
-	     entity
-		 oldidxvl = NewTemporaryVariable(node_module, 
-						 MakeBasic(is_basic_int));
+	     rg = loop_range(l);
+	     lb = copy_expression(range_lower(rg));
+	     ub = copy_expression(range_upper(rg));
+	     
+	     newindex = NewTemporaryVariable(node_module, 
+					     MakeBasic(is_basic_int));
+	     newlobnd = NewTemporaryVariable(node_module, 
+					     MakeBasic(is_basic_int));
+	     newupbnd = NewTemporaryVariable(node_module, 
+					     MakeBasic(is_basic_int));
+	     oldidxvl = NewTemporaryVariable(node_module, 
+					     MakeBasic(is_basic_int));
 
 	     boundcomp = 
 		 gen_nconc(boundcomp,
@@ -712,13 +736,12 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
 	 }
 	 else
 	 {
-	     loop
-		 nl = make_loop(loop_index(l),
-				loop_range(l),
-				statement_undefined,
-				loop_label(l),
-				make_execution(is_execution_sequential, UU),
-				NIL);
+	     nl = make_loop(loop_index(l),
+			    loop_range(l),
+			    statement_undefined,
+			    loop_label(l),
+			    make_execution(is_execution_sequential, UU),
+			    NIL);
 /* ??? there is a core dump on the second free, when executed, in test 37~;
 	     free_execution(loop_execution(l));
 	     free_loop(l);
@@ -750,7 +773,9 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
     close_variable_used_map_for_statement();
 
     
-    (*pstat) = make_block_statement(gen_nconc(boundcomp, CONS(STATEMENT, newnest, NIL)));
+    (*pstat) = make_block_statement(gen_nconc(boundcomp,
+					      CONS(STATEMENT, newnest,
+						   NIL)));
 
     return(TRUE);
 }
@@ -847,34 +872,6 @@ entity e;
 }
 
 /*
- * statement_compute_bounds(newlobnd, newupbnd, oldidxvl, lb, ub, an, dp)
- *
- */
-statement statement_compute_bounds(newlobnd, newupbnd, oldidxvl, lb, ub, an, dp)
-entity newlobnd, newupbnd, oldidxvl;
-int  lb, ub, an, dp;
-{
-    list
-	l = CONS(EXPRESSION,
-		 entity_to_expression(newlobnd),
-	    CONS(EXPRESSION,
-		 entity_to_expression(newupbnd),
-	    CONS(EXPRESSION,
-		 entity_to_expression(oldidxvl),
-	    CONS(EXPRESSION,
-		 int_to_expression(lb),
-	    CONS(EXPRESSION,
-		 int_to_expression(ub),
-	    CONS(EXPRESSION,
-		 int_to_expression(an),
-	    CONS(EXPRESSION,
-		 int_to_expression(dp),
-		 NIL)))))));
-
-    return(my_make_call_statement(hpfc_name_to_entity(LOOP_BOUNDS), l));
-}
-
-/*
  * loop make_loop_skeleton(newindex, newlobnd, newupbnd)
  *
  * 
@@ -945,7 +942,8 @@ list Ref, lRef;
 		    vindex = the_index_of_vect(v);
 		entity
 		    oldindex = (entity) var_of(vindex),
-		    newindex = (entity) GET_ENTITY_MAPPING(new_indexes, oldindex);
+		    newindex = (entity) GET_ENTITY_MAPPING(new_indexes, 
+							   oldindex);
 		int
 		    shift = (int) vect_coeff(TSHIFTV, v);
 
@@ -958,15 +956,16 @@ list Ref, lRef;
 		}
 		else
 		{
-		    li2 = gen_nconc(li2,
-				    CONS(EXPRESSION,
-					 MakeBinaryCall
-					 (CreateIntrinsic((shift>0)?
-							  (PLUS_OPERATOR_NAME):
-							  (MINUS_OPERATOR_NAME)),
-							entity_to_expression(newindex),
-							int_to_expression(abs(shift))),
-					 NIL));
+		    li2 = 
+			gen_nconc(li2,
+				  CONS(EXPRESSION,
+				       MakeBinaryCall
+				       (CreateIntrinsic((shift>0)?
+							(PLUS_OPERATOR_NAME):
+							(MINUS_OPERATOR_NAME)),
+					entity_to_expression(newindex),
+					int_to_expression(abs(shift))),
+				       NIL));
 		}
 
 		break;
@@ -1001,7 +1000,8 @@ list Ref, lRef;
 
 	ifdebug(8)
 	 {
-	     fprintf(stderr, "[update_indices_for_local_computation]\nnew reference is:\n");
+	     fprintf(stderr,
+	      "[update_indices_for_local_computation]\nnew reference is:\n");
 	     print_reference(r);
 	     fprintf(stderr, "\n");
 	 }
@@ -1240,3 +1240,28 @@ int dim;
     return(processor_number(template, dim, t1, &p) ==
 	   processor_number(template, dim, t2, &p));
 }
+
+/*
+ * range loop_index_to_range(index)
+ */
+range loop_index_to_range(index)
+entity index;
+{
+    MAPL(cl,
+     {
+	 loop
+	     l = LOOP(CAR(cl));
+
+	 if (loop_index(l)==index)
+	     return(loop_range(l));
+     },
+	 lloop);
+    
+    /* ??? other (sequential) loops may be added, and not only lloop... */
+    return(range_undefined);
+}
+
+
+/*
+ * That is all
+ */
