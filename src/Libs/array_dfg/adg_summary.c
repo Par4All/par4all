@@ -64,7 +64,6 @@ typedef dg_vertex_label vertex_label;
 /* Global variables */
 extern 	hash_table 		Gvertex_number_to_statement;
 extern	int			Gcount_re;
-extern	hash_table		Gforward_substitute_table;
 extern	statement_mapping	Gstco_map;
 extern  list			Gstructural_parameters;
 
