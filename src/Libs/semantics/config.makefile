@@ -1,8 +1,5 @@
 # Semantics Analysis
 #
-# SCCS Stuff:
-# $RCSfile: config.makefile,v $ ($Date: 1997/06/23 07:46:43 $, ) version $Revision$
-# got on %D%, %T%
 # $Id$
 #
 # Francois Irigoin, 17 April 1990
@@ -36,9 +33,19 @@
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
-LIB_CFILES=	misc.c ri_to_transformers.c interprocedural.c\
-		ri_to_preconditions.c mappings.c dbm_interface.c \
-		prettyprint.c postcondition.c utils.c
+
+LIB_CFILES=	misc.c \
+		ri_to_transformers.c \
+		interprocedural.c\
+		ri_to_preconditions.c \
+		mappings.c \
+		dbm_interface.c \
+		prettyprint.c \
+		postcondition.c \
+		utils.c \
+		initial.c
+
 LIB_HEADERS=	semantics-local.h
+
 LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
 
