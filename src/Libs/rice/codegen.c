@@ -594,13 +594,17 @@ bool task_parallelize_p;
 		      is_execution_sequential : is_execution_parallel;
 
     /* At most one outer loop parallel */
-    task_parallelize_inner = (seq_or_par == is_execution_parallel
-			      && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?
-				  FALSE : task_parallelize_p;
+    task_parallelize_inner = 
+	(seq_or_par == is_execution_parallel
+	 && ! get_bool_property("GENERATE_NESTED_PARALLEL_LOOPS") ) ?
+	FALSE : task_parallelize_p;
 
     inner_stat = CodeGenerate(g, inner_region, l+1, task_parallelize_inner);
 
-    if( inner_stat == statement_undefined )
-	return( inner_stat );
-    else return(MakeLoopAs(slo, seq_or_par, inner_stat));
+    set_free(inner_region);
+
+    if (statement_undefined_p(inner_stat))
+	return inner_stat;
+    else 
+	return MakeLoopAs(slo, seq_or_par, inner_stat);
 }
