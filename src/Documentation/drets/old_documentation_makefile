@@ -1,6 +1,6 @@
 # PROJET PIPS: EXPLOITATION DE LA DOCUMENTATION
 # ---------------------------------------------
-# $RCSfile: old_documentation_makefile,v $ ($Date: 1995/10/02 17:57:44 $, )
+# $RCSfile: old_documentation_makefile,v $ ($Date: 1995/11/07 13:26:06 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -267,7 +267,10 @@ LOT9 = dret134.printed dret136.printed dret137.printed \
 # EXTRACTION DE FICHIERS C ET HTML A PARTIR DE FICHIERS LATEX
 
 all: documentation-html \
-	$(LIBDIR)/pipsmake.rc $(LIBDIR)/properties.rc $(LIBDIR)/wpips.rc
+	$(LIBDIR)/pipsmake.rc \
+	$(LIBDIR)/properties.rc \
+	$(LIBDIR)/wpips.rc \
+	$(INCLUDEDIR)/wpips_transform_menu_layout.h
 
 documentation-html: pipsmake-rc.dvi properties-rc.dvi
 	(cd public_html; $(MAKE))
@@ -320,6 +323,10 @@ $(LIBDIR)/wpips.rc: pipsmake-rc.tex
 	@sed 's/^[\/ ]\*\/*/--/' $(INCLUDEDIR)/auto.h > $(LIBDIR)/wpips.rc
 	@expand pipsmake-rc.tex | sed 's/ *$$//' | sed '/^alias /!d' \
 		>> $(LIBDIR)/wpips.rc
+
+$(INCLUDEDIR)/wpips_transform_menu_layout.h :  pipsmake-rc.tex
+	@echo 'Building wpips_transform_menu_layout.h from pipsmake-rc.tex:'
+	make-pips-menu < pipsmake-rc.tex
 
 # *.aux is needed by latex2html
 clean:
