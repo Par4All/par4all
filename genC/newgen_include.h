@@ -128,7 +128,7 @@ extern struct gen_binding *Tabulated_bp ;
 
 #define IS_INLINABLE(bp) ((bp)->inlined != NULL)
 #define IS_EXTERNAL(bp) ((bp)->domain->ba.type == EXTERNAL_DT)
-#define IS_TABULATED(bp) ((bp)->index >= 0)
+#define IS_TABULATED(bp) ((bp)->tabulated!=NULL)
 #define IS_IMPORT(bp) ((bp)->domain->ba.type == IMPORT_DT)
 #define IS_NORMAL(bp) \
 	(!IS_INLINABLE(bp)&&!IS_EXTERNAL(bp)&&!IS_TABULATED(bp))
@@ -167,15 +167,8 @@ extern int Current_start ;
 /* extern int Current_first ; */
 extern int Read_spec_mode ;
 
-/* For tabulated domains, their index in table of tabulateds. */
-extern int Current_index ;
-
-/* For tabulated objects, the offset HASH_OFFSET of the hashed subdomain 
-   and the separation character HASH_SEPAR between domain number and 
-   hashed name. */
-
+/* For tabulated objects, the offset HASH_OFFSET of the hashed subdomain */
 #define HASH_OFFSET 2
-#define HASH_SEPAR '|'
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
 
@@ -198,9 +191,6 @@ extern int Current_index ;
 #define check_read_spec_performed() \
   message_assert("gen_read_spec not performed prior to use", \
 		 Read_spec_performed);
-
-#define check_index(i) \
-  message_assert("valid tabulated index", (i)>=0 && (i)<MAX_TABULATED);
 
 #define newgen_free(p) (*((char*)(p))='\0',free(p)) /* just to hide bugs */
 
@@ -229,15 +219,9 @@ extern int genspec_lex(void);
 extern int genread_parse(void);
 extern int genread_lex(void);
 
-extern void gen_init_gen_tabulated_names(void);
-extern void gen_lazy_init_gen_tabulated_names(void);
-extern void gen_close_gen_tabulated_names(void);
-
+extern gen_tabulated_p gen_init_tabulated(int);
 extern gen_chunk * gen_enter_tabulated(int, char *, gen_chunk *, bool);
 extern gen_chunk * gen_do_enter_tabulated(int, char *, gen_chunk *, bool);
-
-extern void gen_init_all_tabulateds(void);
-extern void gen_init_tabulated_set_domain(int, int);
-
 extern gen_chunk * gen_tabulated_fake_object_hack(int);
+
 extern int newgen_domain_index(gen_chunk *);
