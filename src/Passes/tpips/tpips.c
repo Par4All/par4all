@@ -1,5 +1,4 @@
-/* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/30 11:50:08 $, 
+/* $Id$
  */
 
 #include <stdio.h>
@@ -38,7 +37,10 @@ bool tpips_execution_mode = TRUE;
 static bool use_readline;
 static FILE *logfile;
 static FILE * current_file; /* current file being processed */
+
 extern int tgetnum();
+extern void tp_restart( FILE * ); /* tp_lex.c */
+
 static char *usage = 
   "Usage: %s [-n] [-h/?] [-v] [-l logfilename] tpips-scripts\n";
 
