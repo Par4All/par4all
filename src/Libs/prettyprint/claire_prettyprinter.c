@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.17  2004/08/03 09:47:04  hurbain
+   Bugs corrections
+
    Revision 1.16  2004/07/05 08:41:46  hurbain
    checkin pour install sur ciboure
 
@@ -290,7 +293,7 @@ static string claire_dim_string(list ldim, string name)
 static string this_entity_clairedeclaration(entity var)
 {
   string result = strdup("");
-  string name = entity_local_name(var);
+  string name = strdup(concatenate("A_", entity_local_name(var), NULL));
   type t = entity_type(var);
   storage s = entity_storage(var);
   pips_debug(2,"Entity name : %s\n",entity_name(var));
@@ -380,7 +383,7 @@ static string claire_call_from_assignation(call c, int task_number, bool * input
     }
     case is_syntax_reference:{
       reference ref = syntax_reference(syn);
-      string varname = claire_entity_local_name(reference_variable(ref));
+      string varname = strdup(concatenate("A_", claire_entity_local_name(reference_variable(ref)), NULL));
       if(gen_array_index(array_names, varname) != ITEM_NOT_IN_ARRAY){
 	result = strdup(concatenate(result, claire_array_in_task(ref, FALSE, task_number), NULL));
 	*input_provided = TRUE;
@@ -488,7 +491,7 @@ static void claire_call_from_indice(call c, string * offset_array, string paving
 }
 
 static string claire_array_in_task(reference r, bool first, int task_number){
-  string varname = claire_entity_local_name(reference_variable(r));
+  string varname = strdup(concatenate("A_", claire_entity_local_name(reference_variable(r)), NULL));
   int indice_nr = 0;
   list indices = reference_indices(r);
   string result = "";
@@ -636,7 +639,7 @@ static string claire_call_from_loopnest(call c, int task_number){
     case is_syntax_reference:{
       
       reference r = syntax_reference(s);
-      string varname = claire_entity_local_name(reference_variable(r));
+      string varname = strdup(concatenate("A_", claire_entity_local_name(reference_variable(r)), NULL));
       if(gen_array_index(array_names, varname) != ITEM_NOT_IN_ARRAY){
 	if(first){
 	  first_result = claire_array_in_task(r, first, task_number);
@@ -673,8 +676,12 @@ static call claire_loop_from_loop(loop l, string * result, int task_number){
   string * claire_name = malloc(sizeof(string));
   statement s = loop_body(l);
   instruction i = statement_instruction(s);
+  int u, low;
 
-  *up = claire_expression(range_upper(loop_range(l)));
+  u = atoi(claire_expression(range_upper(loop_range(l))));
+  low = atoi(claire_expression(range_lower(loop_range(l))));
+  *up = strdup(int_to_string(u - low +1));
+	       //*up = claire_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
   *claire_name = claire_entity_local_name(loop_index(l));
   if( (*claire_name)[0] == 'M'){
     gen_array_append(intern_indices_array, claire_name);
@@ -722,11 +729,14 @@ static string claire_loop_from_sequence(loop l, int task_number){
 
   instruction ins = statement_instruction(s);
   list li = statement_declarations(s);
-
   string * name = malloc(sizeof(string));
-  *name = claire_entity_local_name(loop_index(l));
   string * up = malloc(sizeof(string));
-  *up = claire_expression(range_upper(loop_range(l)));
+  int u, low;
+  *name = claire_entity_local_name(loop_index(l));
+  u = atoi(claire_expression(range_upper(loop_range(l))));
+  low = atoi(claire_expression(range_lower(loop_range(l))));
+  *up = strdup(int_to_string(u - low +1));
+  //*up = claire_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
 
   if((*name)[0] == 'M'){
     pips_user_error("At least one extern loop is needed");
