@@ -1,19 +1,18 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/04 11:08:09 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/08 08:37:17 $, )
 # version $Revision$, 
-# got on %D%, %T%
-# $Id$
 #
 
 set -a
 
+#
 # This file is used to set up *environment variables* for Pips.
 # Another set up file (pipsrc.csh) is automaticaly generated from this 
 # one. Thus, you should not do anything else as initializing shell 
 # variables.
 # If you add some variables, see at the end of the file.
-# run "Utilities/make-pipsrc.csh" after modifying this file
 # Bug: EOL cannot be back-quoted (ie: definitions of variables on 
 #      more than one line makes errors).
+#
 
 # A restricted version of this file should be defined for pips users.
 # Variables of interest: PIPSDIR (?), UTILDIR, BINDIR, LIBDIR, path and manpath
@@ -21,20 +20,39 @@ set -a
 # space for temporary files
 TEMPDIR="/tmp"
 
-# home directory for openwin (only used by the XView interface: wpips)
-OPENWINHOME="/usr/openwin"
-
 # hosts for Validate
 PIPS_HOSTS="chailly:episy:aiguebelette"
 
-# home directories for external softwares
+#
+# external softwares
+#
 LINEARDIR=/projects/C3/Linear
 NEWGENDIR=/projects/Newgen
+NEWGEN_MAX_TABULATED_ELEMENTS=12007
 
 # An absolute file name is necessary for LISP
 LISP=/usr/local/bin/cl
-# Required by NewGen.
-NEWGEN_MAX_TABULATED_ELEMENTS=12007
+
+#
+# For the daVinci Graph Viewer/Editor :
+#
+
+DAVINCI_DIR=$RTSRCDIR/daVinci/daVinci_V1.4_solaris_1
+GRAPHEDITOR_DIRECTORY=$DAVINCI_DIR/grapheditor
+DAVINCI_ICONDIR=$DAVINCI_DIR/images
+
+MANPATH=${MANPATH}:$DAVINCI_DIR/man
+PATH=${PATH}:$DAVINCI_DIR
+#
+
+# 
+#         #####      #    #####    ####
+#         #    #     #    #    #  #
+#         #    #     #    #    #   ####
+#         #####      #    #####        #
+#         #          #    #       #    #
+#         #          #    #        ####
+# 
 
 # Pips project sources and binaries
 PIPSHOME=/home/users/pips
@@ -71,6 +89,9 @@ BINSRCDIR="${SRCDIR}/Passes"
 # runtime sources
 RTSRCDIR="${SRCDIR}/Runtime"
 
+# PVM directory
+PVMDIR="${RTSRCDIR}/pvm3.3"
+
 # headers
 INCLUDEDIR="${PRODDIR}/Include"
 
@@ -85,9 +106,6 @@ RELEDIR="${PIPSDIR}/Release"
 
 # where documents are stored
 DOCDIR="${PIPSDIR}/Documentation"
-
-# PVM directory
-PVMDIR="${RTSRCDIR}/pvm3.3"
 
 # where manl directory is (Pb: cannot be derived to cshrc)
 # MANPATH="${MANPATH}${MANPATH:+:}${DOCDIR}"
@@ -118,32 +136,33 @@ PIPS_LINT="lint"
 PIPS_LINTFLAGS="-habxu"
 PIPS_YACC="yacc"
 PIPS_YFLAGS=""
-
-# FC 07/03/94
-# protoizer to be used by PIPS:
 PIPS_PROTOIZE="$UTILDIR/cproto -vcf2"
-# to be switched to /usr5/gnu/bin-sparc/protoize...
-
 PIPS_ETAGS='/usr5/gnu/bin-sparc/etags'
-
-# list of PIPS libraries 
-
-# Warning: -lm and /usr/lib/debug/malloc are not given by the 
-# automatic generation
-# PIPS_LIBS=`analyze_libraries ;order_libraries; sed 's/^lib/ -l/;s/.a$//' </tmp/libs.o`
-
-# Dynamic memory allocation (last item in PIPS_LIBS):
-#  - debug malloc for SUNOS: /usr/lib/debug/malloc.o
-#  - public domain debug malloc: -ldbmalloc (implies a special "malloc.h" in
-# EXTEDIR)
-
-PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcontrol -lsemantics -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lgenC -lplint -lmatrice  -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique -lreductions -lflint -lm /usr/lib/debug/malloc.o"
 		
 # file name in which pips current program is stored (for batch version).
+
 PIPS_CURRENT_PROGRAM=".pipsprogram"
 
-# To start wpips without problem
-# xhost +`hostname`
+# list of PIPS libraries 
+#
+# Dynamic memory allocation (last item in PIPS_LIBS):
+#  - debug malloc for SUNOS: /usr/lib/debug/malloc.o
+#  - public domain debug malloc: -ldbmalloc
+#   (implies a special "malloc.h" in EXTEDIR)
+#
+
+PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcontrol -lsemantics -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lgenC -lplint -lmatrice  -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique -lreductions -lflint -lm /usr/lib/debug/malloc.o"
+
+#
+# Settings added for WPIPS (used for wpips and wtest)
+#
+
+# home directory for openwin (only used by the XView interface: wpips)
+OPENWINHOME="/usr/openwin"
+
+WPIPS_ADDED_CPPFLAGS="-I$(OPENWINHOME)/include -Iicons"
+WPIPS_ADDED_LIBS="-lxview -lolgx -lX11"
+WPIPS_ADDED_LDFLAGS="-L$(OPENWINHOME)/lib -static"
 
 #
 # HPFC environment variables 
@@ -158,12 +177,5 @@ HPFC_TOOLS=$UTILDIR
 HPFC_SED=/usr5/gnu/bin-sparc/sed
 HPFC_TR=/bin/tr
 
-# For the daVinci Graph Viewer/Editor :
-DAVINCI_DIR=$RTSRCDIR/daVinci/daVinci_V1.4_solaris_1
-GRAPHEDITOR_DIRECTORY=$DAVINCI_DIR/grapheditor
-DAVINCI_ICONDIR=$DAVINCI_DIR/images
-MANPATH=${MANPATH}:$DAVINCI_DIR/man
-PATH=${PATH}:$DAVINCI_DIR
-#
 # that is all
 #
