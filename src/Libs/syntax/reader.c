@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: reader.c,v $
+ * Revision 1.31  2001/02/02 15:14:23  coelho
+ * handle continuation on long DATA...
+ *
  * Revision 1.30  1998/12/28 12:37:02  coelho
  * bug--
  *
@@ -262,14 +265,32 @@ static int iLine = 0, lLine = 0;
 
 void append_data_current_stmt_buffer_to_declarations(void)
 {
-    int i=0;
-    char * tmp = (char*) malloc(lStmt+1), * ndecls, * odecls;
+    int i=0, j=0, column=6;
+    char * tmp = (char*) malloc(lStmt+200), * ndecls, * odecls;
     code c = EntityCode(get_current_module_entity());
 
-    for (; i<lStmt; i++)
-      tmp[i] = (char) stmt_buffer[i]; /* int[] */
+    for (; i<lStmt; i++, j++, column++) 
+    {
+      if (column==71) 
+      {
+	tmp[j++] = '\n';
+	tmp[j++] = ' ';
+	tmp[j++] = ' ';
+	tmp[j++] = ' ';
+	tmp[j++] = ' ';
+	tmp[j++] = ' ';
+	tmp[j++] = 'x';
+	tmp[j++] = ' ';
+	tmp[j++] = ' ';
+	tmp[j++] = ' ';
+	tmp[j++] = ' ';
+	tmp[j++] = ' ';
+	column = 10;
+      }
+      tmp[j] = (char) stmt_buffer[i]; /* int[] */
+    }
     stmt_buffer[i]='\0';
-    tmp[i] = '\0';
+    tmp[j] = '\0';
 
     odecls = code_decls_text(c);
     ndecls = strdup(concatenate(odecls, "! moved up...\n      DATA ", 
