@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.15  1998/11/24 13:01:42  zory
+ * debug manipulations
+ *
  * Revision 1.14  1998/11/18 22:46:52  coelho
  * huffman included.
  *
@@ -397,6 +400,24 @@ static int cost_expression_cmp(const void * v1, const void * v2)
   return 2*(c1->cost<c2->cost) - 1;
 }
 
+/* debug function */
+/* print informations from an cost_expressions array */
+static void
+debug_cost_expression_array(string s,
+			    cost_expression * tce,
+			    int size)
+{
+  int i;
+  pips_debug(3,"%s \n", s);
+  pips_debug(3," %d elements in cost_expression array \n", size);
+
+  for (i=0; i<size; i++) {
+    pips_debug(3," - %d - expression : ", i); 
+    print_expression(tce[i].expr);
+    pips_debug(3,"\n - %d - cost : %f \n", i, tce[i].cost);
+  }
+}
+
 /* build an cost_expression array from an expression list.
  */
 static cost_expression * 
@@ -415,6 +436,9 @@ list_of_expressions_to_array(list /* of expression */ le)
     le);
 
   qsort(tce, len, sizeof(cost_expression), cost_expression_cmp);
+
+  ifdebug(3) 
+    debug_cost_expression_array("qsort output", tce, len);
 
   return tce;
 }
@@ -469,6 +493,10 @@ static void call_rwt(call c)
       ce.cost = huffman_cost(ce.expr);
 
       insert_sorted_into_array(tce, nargs-2, ce);
+
+      ifdebug(3) 
+	debug_cost_expression_array("insert done", tce, nargs-1);
+
       nargs--;
     }
 
@@ -478,6 +506,9 @@ static void call_rwt(call c)
 			     CONS(EXPRESSION, tce[1].expr, NIL));
     free(tce), tce = NULL;
   }
+  else 
+    pips_debug(3,"non huffman operator : %s \n ", 
+	       entity_local_name(call_function(c)));
 }
 
 /* apply the huffman balancing on every call to nary_operator
@@ -493,6 +524,9 @@ build_binary_operators_with_huffman(
   huffman_nary_operator = nary_operator;
   huffman_binary_operator = binary_operator;
   huffman_cost = cost;
+
+  // debug !
+  print_statement(s);
 
   gen_multi_recurse(s,
 		    call_domain, gen_true, call_rwt,
