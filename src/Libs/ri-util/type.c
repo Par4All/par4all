@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.36  1999/05/12 14:40:38  zory
+ * please_give_me_a_basic_for_an_expression added...
+ *
  * Revision 1.35  1999/05/12 14:35:04  zory
  * *** empty log message ***
  *
@@ -556,6 +559,19 @@ expression_basic(expression expr)
     }
 
     return b;
+}
+
+/* returns an allocated basic.
+ */ 
+basic
+please_give_me_a_basic_for_an_expression(expression e)
+{
+  basic r = expression_basic(e);
+  if (basic_overloaded_p(r)) 
+    r = basic_of_expression(e); /* try something else... */
+  else
+    r = copy_basic(r);
+  return r;
 }
 
 dimension 
