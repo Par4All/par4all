@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.64  1997/07/21 15:05:48  zory
+# hpfc_misc -> hpfc_misc + hpfc_misc_mpi + hpfc_misc_pvm
+#
 # Revision 1.63  1997/07/03 10:59:49  zory
 # add mpi library manipulation
 #
@@ -210,7 +213,8 @@ LIB_M4FFILES = 	hpfc_packing.m4f \
 		hpfc_communication_pvm.m4f \
 		hpfc_communication_mpi.m4f
 LIB_M4CFILES =	hpfc_misc_pvm.m4c \
-		hpfc_misc_mpi.m4c
+		hpfc_misc_mpi.m4c \
+		hpfc_misc.m4c
 LIB_FFILES =	hpfc_check.f \
 		hpfc_main.f \
 		hpfc_main_host.f \
