@@ -305,6 +305,11 @@ print_domain( out, dp )
 FILE *out ;
 union domain *dp ;
 {
+    if (!dp) {
+	fprintf(out, " NULL union domain");
+	return;
+    }
+
     switch( dp->ba.type ) {
     case EXTERNAL_DT:
 	break ;
