@@ -6,6 +6,10 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.3  2000/11/23 17:16:11  irigoin
+  * Too many modifications. Lots of bug fixes for PLDI'2001. New debugging
+  * statements, new functions, new consistency checks.
+  *
   * Revision 1.2  2000/11/03 17:12:57  irigoin
   * New version on Nov. 3
   *
@@ -139,6 +143,9 @@ static void store_control_postcondition(statement stat, transformer post,
     print_transformer(post);
   }
 
+  pips_assert("The postcondition to insert is consistent", 
+	      transformer_consistency_p(post));
+
   pips_assert("The postcondition is not defined yet", 
 	      hash_get((hash_table) control_postcondition_map, (char *) stat)
 	      == HASH_UNDEFINED_VALUE);
@@ -194,10 +201,19 @@ static bool considered_already_processed_p(control c, list to_be_processed,
   if(!already) {
     if(!gen_in_list_p(c, to_be_processed)) {
       /* unreachable node with empty precondition */
-      transformer pre = transformer_empty();
+      /* transformer pre = transformer_empty(); */
       statement stmt = control_statement(c);
-      transformer post = statement_to_postcondition(pre, stmt);
-      store_control_postcondition(stmt, post, control_postcondition_map);
+      transformer post = load_control_postcondition(stmt, control_postcondition_map);
+
+      if(transformer_undefined_p(post)) {
+	post = transformer_empty();
+	/* transformer post = statement_to_postcondition(pre, stmt); */
+	store_control_postcondition(stmt, post, control_postcondition_map);
+      }
+      else {
+	pips_assert("Postcondition for unreachable nodes must be empty",
+		    transformer_empty_p(post));
+      }
       already = TRUE;
     }
   }
@@ -242,10 +258,19 @@ static bool ready_to_be_processed_p(control c,
     }
     else if(!gen_in_list_p(pred, to_be_processed)) {
       /* postcondition must be empty because pred is not reachable */
-      transformer pre = transformer_empty();
+      /* transformer pre = transformer_empty(); */
       statement stmt = control_statement(pred);
-      transformer post = statement_to_postcondition(pre, stmt);
-      store_control_postcondition(stmt, post, control_postcondition_map);
+      transformer post = load_control_postcondition(stmt, control_postcondition_map);
+
+      if(transformer_undefined_p(post)) {
+	post = transformer_empty();
+	/* transformer post = statement_to_postcondition(pre, stmt); */
+	store_control_postcondition(stmt, post, control_postcondition_map);
+      }
+      else {
+	pips_assert("Postcondition for unreachable nodes must be empty",
+		    transformer_empty_p(post));
+      }
     }
     else if(gen_in_list_p(pred, still_to_be_processed)) {
       ready &= FALSE;
@@ -391,24 +416,65 @@ static void process_ready_node(control c, transformer pre_entry, unstructured u,
   store_control_postcondition(stmt, post, control_postcondition_map);
 }
 
-static bool process_unreachable_node(control c, statement_mapping control_postcondition_map)
+static bool process_unreachable_node(control c,
+				     statement_mapping control_postcondition_map,
+				     bool postcondition_p)
 {
   statement s = control_statement(c);
 
+  pips_debug(9,"Statement %s", statement_identification(s));
+
+  if(statement_ordering(s)==STATEMENT_ORDERING_UNDEFINED) {
+    pips_user_warning("Improper control restructuration, statement with no ordering:%s",
+		      statement_identification(s));
+  }
+
   if(transformer_undefined_p
      (load_control_postcondition(s, control_postcondition_map))) {
-    /* Do not compute postcondition: this module could be used to compute transformers */
-    /* 
-    transformer pre = transformer_empty();
-    statement stmt = control_statement(c);
-    transformer post = statement_to_postcondition(pre, stmt);
-    */
-    transformer post = transformer_empty();
+    transformer post = transformer_undefined;
 
-    pips_user_warning("After restructuration, unexpected unreachable node:",
+    if(postcondition_p) {
+      transformer pre = transformer_empty();
+      post = statement_to_postcondition(pre, s);
+    }
+    else {
+      /* Careful, this may have been done earlier by the CONTROL_MAP in
+         unstructured_to_transformers() */
+      if(transformer_undefined_p(load_statement_transformer(s))) {
+	(void) statement_to_transformer(s);
+      }
+      post = transformer_empty();
+    }
+
+    pips_user_warning("After restructuration, unexpected unreachable node:%s",
 		      statement_identification(s));
 
     store_control_postcondition(s, post, control_postcondition_map);
+  }
+  else if(postcondition_p
+	  && transformer_undefined_p(load_statement_precondition(s))) {
+    /* Problem with ELSIP in ARC2D after partial redundancy elimination */
+    /* pips_error("Statement has a postcondition but no precondition:%s",
+       statement_identification(s)); */
+    transformer pre = transformer_empty();
+    transformer post = statement_to_postcondition(pre, s);
+
+    pips_assert("the new postcondition is empty", transformer_empty_p(post));
+    pips_assert("the previous postcondition is empty", 
+		transformer_empty_p(load_control_postcondition(s, control_postcondition_map)));
+
+    pips_user_warning("After restructuration (?),"
+		      " postcondtion for unexpected unreachable node:%s",
+		      statement_identification(s));
+  }
+  else if(!postcondition_p
+	  && transformer_undefined_p(load_statement_transformer(s))) {
+    /* Problem with SHALLOW in SWIM */
+    (void) statement_to_transformer(s);
+
+    pips_user_warning("After restructuration (?),"
+		      " transformer for unexpected unreachable node:%s",
+		      statement_identification(s));
   }
 
   return TRUE;
@@ -576,7 +642,7 @@ static transformer control_node_set_to_fix_point
 					  statement_mapping);
 
   ifdebug(5) {
-    pips_debug(5, "Begin for set:");
+    pips_debug(5, "Begin for set:\n");
     print_control_nodes(set);
   }
 
@@ -601,6 +667,10 @@ static transformer control_node_set_to_fix_point
 				    NULL /* control_postcondition_map*/,
 				    secondary_entries,
 				    statement_to_subcycle_fix_point_map);
+
+	pips_assert("The fix point transformer to insert is consistent", 
+		    transformer_consistency_p(fptf));
+
 	hash_put((hash_table) statement_to_subcycle_fix_point_map,
 		 (char *) s, (char *) fptf);
       }
@@ -664,10 +734,13 @@ static transformer control_node_sequence_to_fix_point
     }
 
     if(!control_undefined_p(pred)) {
-      transformer ctf = load_predecessor_test_condition(pred, c, control_postcondition_map);
-      tf_with_cond = transformer_combine(tf_with_cond, ctf);
+      transformer ctf =
+	load_predecessor_test_condition(pred, c,
+							control_postcondition_map);
+      transformer new_tf_with_cond = transformer_combine(ctf, tf_with_cond);
 
-      free_transformer(ctf);
+      free_transformer(tf_with_cond);
+      tf_with_cond = new_tf_with_cond;
     }
     seqtf = transformer_combine(seqtf, tf_with_cond);
     free_transformer(tf_with_cond);
@@ -675,7 +748,7 @@ static transformer control_node_sequence_to_fix_point
   }, seq);
 
   ifdebug(5) {
-    pips_debug(5, "Sequence transformer:");
+    pips_debug(5, "Sequence transformer:\n");
     print_transformer(seqtf);
   }
 
@@ -885,25 +958,88 @@ static list control_set_to_control_cycle(list set)
   return path;
 }
 
+/* find begining of cycles in the scc containing h in cycle */
+static list scc_to_secondary_entries(list cycle, control h)
+{
+  list secondary_entries = NIL;
+  int reached = 0;
+  list reached_nodes = NIL;
+  list newly_reached_nodes = CONS(CONTROL, h, NIL);
+
+  pips_assert("head belongs to scc", gen_in_list_p(h, cycle));
+
+  do {
+    list reachable_nodes = NIL;
+    reached = 0;
+    MAP(CONTROL,c ,{
+      MAP(CONTROL, succ, {
+	if(gen_in_list_p(succ, cycle)) {
+	  if(gen_in_list_p(succ, reached_nodes)
+	     || gen_in_list_p(succ, newly_reached_nodes)) {
+	    if(!gen_in_list_p(succ, secondary_entries)) {
+	      secondary_entries = CONS(CONTROL, succ, secondary_entries);
+	    }
+	  }
+	  else {
+	    reachable_nodes = CONS(CONTROL, succ, reachable_nodes);
+	    reached++;
+	  }
+	}
+      }, control_successors(c));
+    }, newly_reached_nodes);
+
+    reached_nodes = gen_nconc(reached_nodes, newly_reached_nodes);
+    newly_reached_nodes = reachable_nodes;
+  } while(reached!=0);
+
+  return secondary_entries;
+}
+
 /* Find the scc's containing h but not the first control node in cycle */
-static list head_to_subcycle(list cycle, control h)
+static list head_to_subcycle(list cycle, control h, list secondary_entries)
 {
   list subcycle = list_undefined;
   list preds = NIL;
   list succs = NIL;
   control f = CONTROL(CAR(cycle));
+  control outernode = control_undefined;
+  list new_secondary_entries = list_undefined;
 
   pips_debug(5, "Begin for head %s", 
 	     statement_identification(control_statement(h)));
 
   pips_assert("The subcycle head is in the cycle", gen_in_list_p(h, cycle));
 
-  /* subcycle or more precisely, sub-scc for h is made of h predecessors
-     and successors which are not linked thru the cycle entry node f */
-  forward_control_map_get_blocs_but(h, f, &succs);
-  backward_control_map_get_blocs_but(h, f, &preds);
+  new_secondary_entries = scc_to_secondary_entries(cycle, h);
+
+  if(h!=f) {
+    /* subcycle or more precisely, sub-scc for h is made of h predecessors
+       and successors which are not linked thru the cycle entry node f */
+    outernode = f;
+  }
+  else {
+    /* one of h's predecessors must not be in the subcycle, or h would not
+       be a secondary entry. */
+    list outernodes = gen_copy_seq(control_predecessors(h));
+
+    gen_list_and(&outernodes, new_secondary_entries);
+
+
+    pips_assert("At least one node can be used to break the master scc",
+		gen_length(outernodes)>=1);
+    if(gen_length(outernodes)>=2) {
+      pips_user_warning("Several opportunities to break the scc: %d\n",
+			gen_length(outernodes));
+    }
+    outernode = CONTROL(CAR(outernodes));
+    gen_free_list(outernodes);
+  }
+
+  forward_control_map_get_blocs_but(h, outernode, &succs);
+  backward_control_map_get_blocs_but(h, outernode, &preds);
   gen_list_and(&succs, preds);
   subcycle = succs;
+
   /* get rid of nodes in the main cycle but add again the head */
   /*
     gen_list_and_not(&subcycle, cycle);
@@ -911,11 +1047,53 @@ static list head_to_subcycle(list cycle, control h)
   */
 
   /* make sure that h comes first */
-  gen_remove(&subcycle, h);
-  subcycle = CONS(CONTROL, h, subcycle);
+  if(gen_in_list_p(h, subcycle)) {
+    gen_remove(&subcycle, h);
+    subcycle = CONS(CONTROL, h, subcycle);
+  }
+  else {
+    /* Here, we are in trouble! */
+    ifdebug(5) {
+      pips_debug(5, "Head is %s", statement_identification(control_statement(h)));
+      pips_debug(5, "Outer node is %s", statement_identification(control_statement(outernode)));
+      pips_debug(5, "Initial cycle is:\n");
+      print_control_nodes(cycle);
+      pips_debug(5, "Predecessors are:\n");
+      print_control_nodes(preds);
+      pips_debug(5, "Successors are:\n");
+      forward_control_map_get_blocs_but(h, outernode, &succs);
+      print_control_nodes(succs);
+      pips_debug(5, "Subcycle is:\n");
+      print_control_nodes(subcycle);
+    }
+    pips_assert("The head of a scc must be in the scc", FALSE);
+  }
+
+  if(gen_length(subcycle)==1) {
+    control unique = CONTROL(CAR(subcycle));
+    if(gen_in_list_p(unique, control_predecessors(unique))
+       && gen_in_list_p(unique, control_successors(unique))) {
+      pips_user_warning("One node cycle\n", statement_identification(control_statement(unique)));
+    }
+    else {
+      /* We are in trouble */
+      pips_debug(5, "Head is %s", statement_identification(control_statement(h)));
+      pips_debug(5, "Outer node is %s", statement_identification(control_statement(outernode)));
+      pips_debug(5, "Initial cycle is:\n");
+      print_control_nodes(cycle);
+      pips_debug(5, "Predecessors are:\n");
+      print_control_nodes(preds);
+      pips_debug(5, "Successors are:\n");
+      forward_control_map_get_blocs_but(h, outernode, &succs);
+      print_control_nodes(succs);
+      pips_debug(5, "Subcycle is:\n");
+      print_control_nodes(subcycle);
+      pips_assert("The scc is a scc", FALSE);
+    }
+  }
 
   ifdebug(5) {
-    pips_debug(5, "Subcycle contains:\n");
+    pips_debug(5, "Subcycle contains %d nodes:\n", gen_length(subcycle));
     print_control_nodes(subcycle);
   }
   return subcycle;
@@ -925,12 +1103,14 @@ static transformer subcycle_to_fixpoint
 (list cycle, control h, statement_mapping control_postcondition_map, list secondary_entries,
  statement_mapping statement_to_subcycle_fix_point_map)
 {
-  list subcycle = head_to_subcycle(cycle, h);
+  list subcycle = list_undefined;
   transformer fptf = transformer_undefined;
   list path = list_undefined;
 
   pips_debug(5, "Begin for head %s", 
 	     statement_identification(control_statement(h)));
+
+  subcycle = head_to_subcycle(cycle, h, secondary_entries);
 
   if(!ENDP(path = control_set_to_control_cycle(subcycle))) {
     gen_free_list(subcycle);
@@ -998,10 +1178,11 @@ static void cycle_to_postconditions(list cycle,
 				    statement_mapping control_postcondition_map)
 {
   transformer post = copy_transformer(pre);
+  list cc;
 
   pips_debug(5, "Begin\n");
 
-  MAPL(cc, {
+  for(cc= cycle;!ENDP(cc); POP(cc)){
     control c = CONTROL(CAR(cc));
     statement s = control_statement(c);
     transformer previous_pre = transformer_undefined;
@@ -1011,7 +1192,9 @@ static void cycle_to_postconditions(list cycle,
 
     /* Apply the subcycle */
     if(gen_in_list_p(c, secondary_entries)) {
-      tfs = (transformer) hash_get((hash_table) fp_map, (char *) s);
+      tfs = copy_transformer((transformer) hash_get((hash_table) fp_map, (char *) s));
+      pips_assert("The fix point transformer is consistent", 
+		  transformer_consistency_p(tfs));
     }
     else {
       tfs = transformer_identity();
@@ -1049,8 +1232,14 @@ static void cycle_to_postconditions(list cycle,
     }
     */
     /* convex hull with previous postcondition and storage */
-    previous_pre = load_control_postcondition(s, control_postcondition_map);
+    previous_pre = copy_transformer(load_control_postcondition(s, control_postcondition_map));
+    pips_assert("Previous value of postcondition is consistent",
+		transformer_consistency_p(previous_pre));
+    pips_assert("Value of postcondition for current path is consistent",
+		transformer_consistency_p(real_pre));
     composite_pre = transformer_convex_hull(previous_pre, real_pre);
+    pips_assert("Previous value of postcondition is consistent",
+		transformer_consistency_p(previous_pre));
     update_control_postcondition(s, composite_pre, control_postcondition_map);
 
     ifdebug(5) {
@@ -1062,7 +1251,10 @@ static void cycle_to_postconditions(list cycle,
       print_transformer(composite_pre);
     }
 
+    free_transformer(previous_pre);
+    free_transformer(real_pre);
     free_transformer(post);
+
     /* add arc information */
     if(!ENDP(CDR(cc))) {
       control cnext = CONTROL(CAR(CDR(cc)));
@@ -1079,13 +1271,32 @@ static void cycle_to_postconditions(list cycle,
 	    cpred = ctmp;
 	    break;
 	  }
-	}, control_predecessors(cnext));;
-	pips_assert("A predecessor has been found", !control_undefined_p(cpred));
+	}, control_predecessors(cnext));
+	if(control_undefined_p(cpred)) {
+	  list cpreds = gen_copy_seq(control_predecessors(cnext));
+
+	  /* This happens in AXIAL from COCCINELLE because this routine is
+             called with the tail of a scc from
+             subcycle_to_postcondition(). The dropped head may be the
+             unique predecessor of some other nodes in cycle. */
+	  ifdebug(5) {
+	    pips_debug(5, "No explicit predecessor for node %s",
+		       statement_identification(control_statement(cnext)));
+	    pips_debug(5, "in set:\n");
+	    print_control_nodes(cycle);
+	  }
+	  /* cpred must be a predecessor of the cycle's head as well */
+	  gen_list_and(&cpreds, control_predecessors(CONTROL(CAR(cycle))));
+	  if(gen_length(cpreds)==1) {
+	    cpred = CONTROL(CAR(cpreds));
+	  }
+	  pips_assert("A predecessor has been found", !control_undefined_p(cpred));
+	  gen_free_list(cpreds);
+	}
 	post = load_predecessor_postcondition(cpred, cnext, control_postcondition_map);
       }
     }
-    free_transformer(previous_pre);
-  }, cycle);
+  }
 
   pips_debug(5, "End\n");
 }
@@ -1099,7 +1310,7 @@ static void subcycle_to_postconditions(list cycle,
 				       list secondary_entries,
 				       statement_mapping control_postcondition_map)
 {
-  list subcycle = head_to_subcycle(cycle, h);
+  list subcycle = head_to_subcycle(cycle, h, secondary_entries);
   list path = control_set_to_control_cycle(subcycle);
   list tail = list_undefined;
   transformer pre = transformer_undefined;
@@ -1133,16 +1344,41 @@ static void subcycle_to_postconditions(list cycle,
   pips_assert("subcycle or subset is defined and starts with h", subcycle!=list_undefined
 	      && CONTROL(CAR(subcycle))==h);
 
-  tail = CDR(subcycle);
-  pre = load_predecessor_postcondition(h, CONTROL(CAR(tail)), control_postcondition_map);
-  pips_assert("As h is part of the main cycle, its precondition must has been defined",
-	      !transformer_undefined_p(pre));
-  cycle_to_postconditions(tail, pre, fp_map, secondary_entries, control_postcondition_map);
+  /* There are subcycles with a unique node. See INJALL in wave5... */
+  if(!ENDP(tail = CDR(subcycle))) {
+    pre = load_predecessor_postcondition(h, CONTROL(CAR(tail)), control_postcondition_map);
+    pips_assert("As h is part of the main cycle, its precondition must has been defined",
+		!transformer_undefined_p(pre));
+    cycle_to_postconditions(tail, pre, fp_map, secondary_entries, control_postcondition_map);
+  }
 
   gen_free_list(subcycle);
 
   pips_debug(5, "End\n");
 }
+
+/* Returns secondary entries in their order of appearance in cycle */
+static list sort_secondary_entries(list secondary_entries, list cycle)
+{
+  list ordered_secondary_entries = NIL;
+
+  MAP(CONTROL, c, {
+    if(gen_in_list_p(c, secondary_entries)) {
+      ordered_secondary_entries = gen_nconc(ordered_secondary_entries,
+					    CONS(CONTROL,c, NIL));
+    }
+  }, cycle);
+
+  ifdebug(5) {
+    pips_debug(5, "Seccondary entries:\n");
+    print_control_nodes(secondary_entries);
+    pips_debug(5, "Ordered secondary entries:\n");
+    print_control_nodes(ordered_secondary_entries);
+  }
+
+  return ordered_secondary_entries;
+}
+
 
 /* Accumulate postconditions for one global cycle in the scc. A global
    cycle starts with the first node in scc and ends with it. Preconditions
@@ -1161,8 +1397,12 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
   transformer generic_pre = transformer_undefined;
   transformer real_pre = transformer_undefined;
   statement_mapping statement_to_subcycle_fix_point_map = MAKE_STATEMENT_MAPPING();
+  list ordered_secondary_entries = list_undefined;
+
   pips_debug(5, "Begin for cycle:\n");
   ifdebug(5) print_control_nodes(cycle);
+
+  ordered_secondary_entries = sort_secondary_entries(secondary_entries, cycle);
 
   /* compute a fix point for each sub-cycle head (i.e. secondary entry) */
   MAPL(hc, {
@@ -1170,24 +1410,38 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
     statement s = control_statement(h);
 
     if(gen_in_list_p(h, cycle)) {
-      transformer fptf = subcycle_to_fixpoint(cycle, h,
-					      control_postcondition_map,
-					      secondary_entries,
-					      statement_to_subcycle_fix_point_map);
+      /* Why? It could appear on different paths for one entry or for
+         different entries... As long as preconditions are not used to
+         refine fix points, it does not matter. */      
 
-      ifdebug(5) {
-	pips_debug(5, "Fix point transformer for cycle starting with %s",
-		   statement_identification(control_statement(h)));
-      }
-
-      /* Why? It could appear on different paths for different entries... */
-      pips_assert("The subcycle fix point transformer is not defined yet", 
+      /* pips_assert("The subcycle fix point transformer is not defined yet", 
 		  hash_get((hash_table) statement_to_subcycle_fix_point_map, (char *) s)
-		  == HASH_UNDEFINED_VALUE);
-      hash_put((hash_table) statement_to_subcycle_fix_point_map,
-	       (char *) s, (char *) fptf);
+		  == HASH_UNDEFINED_VALUE); */
+
+      if(hash_get((hash_table) statement_to_subcycle_fix_point_map, (char *) s)
+	 == HASH_UNDEFINED_VALUE) {
+	transformer fptf = subcycle_to_fixpoint(cycle, h,
+						control_postcondition_map,
+						ordered_secondary_entries,
+						statement_to_subcycle_fix_point_map);
+
+	ifdebug(5) {
+	  pips_debug(5, "Fix point transformer for cycle starting with %s",
+		     statement_identification(control_statement(h)));
+	}
+
+	pips_assert("The fix point transformer to insert is consistent", 
+		    transformer_consistency_p(fptf));
+
+	hash_put((hash_table) statement_to_subcycle_fix_point_map,
+		 (char *) s, (char *) fptf);
+      }
+      else {
+	pips_user_warning("subcycle fix point transformer could be recomputed for node %s",
+			  statement_identification(s));
+      }
     }
-  }, secondary_entries);
+  }, ordered_secondary_entries);
 
   /* compute transformer along path, as in a sequence but with test
      conditions added, without ignoring subcycles */
@@ -1197,7 +1451,7 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
     transformer tfs = load_statement_transformer(s);
 
     /* if the node is the head of a cycle, apply its fix point */
-    if(gen_in_list_p(c, secondary_entries)) {
+    if(gen_in_list_p(c, ordered_secondary_entries)) {
       transformer sctf = (transformer)
 	hash_get((hash_table)statement_to_subcycle_fix_point_map ,
 		 (char *) s);
@@ -1260,6 +1514,8 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
   ifdebug(5) {
     pips_debug(5, "Precondition fwd_pre after unstructured entry node processing:\n");
     print_transformer(fwd_pre);
+    pips_assert("Precondition fwd_pre is consistent",
+		transformer_consistency_p(fwd_pre));
   }
 
   /* process forward edges first */
@@ -1281,6 +1537,8 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
 	pips_debug(5, "Precondition fwd_pre using predecessor %s",
 		   statement_identification(control_statement(p)));
 	print_transformer(fwd_pre);
+	pips_assert("Current precondition fwd_pre is consistent",
+		transformer_consistency_p(fwd_pre));
       }
 
     }
@@ -1289,6 +1547,8 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
   ifdebug(5) {
     pips_debug(5, "Precondition fwd_pre:\n");
     print_transformer(fwd_pre);
+    pips_assert("Precondition fwd_pre is consistent",
+		transformer_consistency_p(fwd_pre));
   }
 
   /* Apply simple fix-point to approximate the entry precondition for this
@@ -1317,7 +1577,7 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
   /* propagate the real_pre precondition down the cycle */
   cycle_to_postconditions(cycle, real_pre,
 			  statement_to_subcycle_fix_point_map,
-			  secondary_entries, control_postcondition_map);
+			  ordered_secondary_entries, control_postcondition_map);
 
   /* propagate preconditions in sub-cycles */
   MAPL(hc, {
@@ -1326,14 +1586,16 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
     if(gen_in_list_p(h, cycle)) {
       subcycle_to_postconditions(cycle, h,
 				 statement_to_subcycle_fix_point_map,
-				 secondary_entries,
+				 ordered_secondary_entries,
 				 control_postcondition_map);
     }
-  }, secondary_entries);
+  }, ordered_secondary_entries);
 
   /* FI: I guess that all entries should be freed too! */
   FREE_STATEMENT_MAPPING(statement_to_subcycle_fix_point_map);
   statement_to_subcycle_fix_point_map = NULL;
+
+  gen_free_list(ordered_secondary_entries);
 
   pips_debug(5, "End\n");
 }
@@ -1360,9 +1622,6 @@ static void add_control_to_cycle(list scc, list cycle, control succ,
   else {
     if(succ==gen_find_eq(succ, cycle)) {
       /* we have found a sub-cycle in a cycle :-( */
-      pips_user_warning("Have you performed a full control restructuration?\n"
-			"New cycle head is %s",
-			statement_identification(control_statement(succ)));
       ifdebug(6) {
 	debug(6,"Sub-cycle starts at: %s",
 	      statement_identification(control_statement(succ)));
@@ -1373,6 +1632,9 @@ static void add_control_to_cycle(list scc, list cycle, control succ,
       if(!process_it) {
 	/* add succ to secondary entry list */
 	if(succ!=gen_find_eq(succ, *psecondary_entries)) {
+	  pips_user_warning("Have you performed a full control restructuration?\n"
+			    "New cycle head is %s",
+			    statement_identification(control_statement(succ)));
 	  /* *psecondary_entries = gen_cons(succ, *psecondary_entries); */
 	  *psecondary_entries = CONS(CONTROL, succ, *psecondary_entries);
 	}
@@ -1539,10 +1801,10 @@ static void process_ready_scc_for_one_entry(list scc,
   list secondary_entries = NIL;
   /* list check_entries = NIL; */
 
-  ifdebug(5) {
-    pips_debug(5, "Begin for scc:\n");
+  ifdebug(4) {
+    pips_debug(4, "Begin for scc:\n");
     print_control_nodes(scc);
-    pips_debug(5, "with entry point: %s\n",
+    pips_debug(4, "with entry point: %s\n",
 	  statement_identification(control_statement(e)));
   }
 
@@ -1552,8 +1814,8 @@ static void process_ready_scc_for_one_entry(list scc,
   build_control_cycles_in_scc(scc, cycle, pre_entry, u, FALSE, &secondary_entries,
 			      control_postcondition_map);
 
-  ifdebug(5) {
-    pips_debug(5,"Secondary entries: %d nodes\n", gen_length(secondary_entries));
+  ifdebug(4) {
+    pips_debug(4,"Secondary entries: %d nodes\n", gen_length(secondary_entries));
     print_control_nodes(secondary_entries);
   }
 
@@ -1567,24 +1829,24 @@ static void process_ready_scc_for_one_entry(list scc,
 
   /* most nodes should have executable preconditions after
      restructuration, but there might be a stop somewhere */
-  ifdebug(5) {
+  ifdebug(4) {
     int count = 0;
-    pips_debug(5, "Make sure that most nodes have non empty postconditions\n");
+    pips_debug(4, "Make sure that most nodes have non empty postconditions\n");
     MAP(CONTROL, c, {
       transformer post = load_control_postcondition(control_statement(c), control_postcondition_map);
 
-      pips_debug(5, "Postcondition for node %s",
+      pips_debug(4, "Postcondition for node %s",
 		 statement_identification(control_statement(c)));
       print_transformer(post);
       if(transformer_empty_p(post)) count++;
     }, scc);
-    pips_debug(5, "Number of nodes with empty postconditions: %d\n", count);
+    pips_debug(4, "Number of nodes with empty postconditions: %d\n", count);
   }
 
-  ifdebug(5) {
-    pips_debug(5, "End for scc:\n");
+  ifdebug(4) {
+    pips_debug(4, "End for scc:\n");
     print_control_nodes(scc);
-    pips_debug(5, "with entry point: %s\n",
+    pips_debug(4, "with entry point: %s\n",
 	  statement_identification(control_statement(e)));
   }
 }
@@ -1605,10 +1867,10 @@ static void process_ready_scc(list scc,
   list entry_nodes = find_scc_entry_nodes(scc, u, already_processed);
   list ordered_scc = list_undefined;
 
-  ifdebug(5) {
-    pips_debug(5, "Begin for scc:\n");
+  ifdebug(3) {
+    pips_debug(3, "Begin for scc:\n");
     print_control_nodes(scc);
-    pips_debug(5, "with entry nodes:\n");
+    pips_debug(3, "with entry nodes:\n");
     print_control_nodes(entry_nodes);
   }
 
@@ -1637,8 +1899,8 @@ static void process_ready_scc(list scc,
   /* ordered_scc = gen_copy_seq(scc); */
 
   /* Display results obtained for all entries and all paths for each entry */
-  ifdebug(5) {
-    pips_debug(5, "Postconditions obtained for control nodes:\n");
+  ifdebug(3) {
+    pips_debug(3, "Postconditions obtained for control nodes:\n");
     MAP(CONTROL, c, {
       print_control_node(c);
       print_transformer(load_control_postcondition(control_statement(c),
@@ -1659,9 +1921,36 @@ static void process_ready_scc(list scc,
 
   gen_free_list(ordered_scc);
 
-  pips_debug(5, "End\n");
+  pips_debug(3, "End\n");
 }
 
+  
+static void local_process_unreachable_node(control c, struct  { 
+    bool pcond;
+    statement_mapping smap;
+} * pcontext)
+{
+  process_unreachable_node(c, pcontext->smap, pcontext->pcond);
+}
+  
+static void node_to_path_transformer_or_postcondition(control c, struct  { 
+    bool pcond;
+    statement_mapping smap;
+} * pcontext)
+{
+  bool postcondition_p = pcontext->pcond;
+  statement_mapping control_postcondition_map = pcontext->smap;
+  statement s = control_statement(c);
+  transformer tf = (transformer)
+    hash_get((hash_table) control_postcondition_map,
+	     (char *) s);
+
+  fprintf(stderr, "Statement %s", statement_identification(s));
+  pips_assert("Transformer or postcondition is consistent",
+	      transformer_consistency_p(tf));
+  print_transformer(tf);
+}
+
 /* compute either the postconditions in an unstructured or the transformer
    of this unstructured. In both cases, transformers for all nodes are
    supposed to be available. */
@@ -1674,14 +1963,21 @@ transformer unstructured_to_accurate_postconditions_or_transformer
   list already_processed = NIL;
   list linked_nodes = NIL; /* all nodes in unstructured u */
   statement_mapping control_postcondition_map = make_control_postcondition();
+  
+  struct  { 
+    bool pcond;
+    statement_mapping smap;
+  } context = { postcondition_p, control_postcondition_map };
 
-  ifdebug(5) {
-    pips_debug(5, "Begin for %s for nodes:\n",
+  ifdebug(2) {
+    pips_debug(2, "Begin for %s for nodes:\n",
 	       postcondition_p? "postconditions" : "transformer");
-    gen_recurse(u, control_domain, gen_true, print_control_node);
-    pips_debug(5, "With entry nodes\n");
+    /* Do not go down into nested unstructured */
+    gen_multi_recurse(u, statement_domain, gen_false, gen_null,
+		      control_domain, gen_true, print_control_node, NULL);
+    pips_debug(2, "With entry nodes\n");
     print_control_node(unstructured_control(u));
-    pips_debug(5, "And exit node\n");
+    pips_debug(2, "And exit node\n");
     print_control_node(unstructured_exit(u));
   }
 
@@ -1702,7 +1998,7 @@ transformer unstructured_to_accurate_postconditions_or_transformer
 
       /* process forward */
       pips_debug(5, "Try forward processing for\n");
-      ifdebug(5) print_control_nodes(still_to_be_processed);
+      ifdebug(2) print_control_nodes(still_to_be_processed);
 
       count = 0;
       for(l=still_to_be_processed; !ENDP(l); ) {
@@ -1722,15 +2018,15 @@ transformer unstructured_to_accurate_postconditions_or_transformer
     if(!ENDP(still_to_be_processed)) {
       list scc = list_undefined;
       /* find a scc and process it */
-      pips_debug(5, "Find a scc and process it\n");
+      pips_debug(2, "Find a scc and process it\n");
       scc = find_ready_scc_in_cfg(u, to_be_processed,
 				  still_to_be_processed,
 				  already_processed,
 				  control_postcondition_map);
       pips_assert("scc is defined\n", scc!=list_undefined);
       pips_assert("scc is not empty\n", !ENDP(scc));
-      pips_debug(5, "scc found:\n");
-      ifdebug(5) print_control_nodes(scc);
+      pips_debug(2, "scc found:\n");
+      ifdebug(2) print_control_nodes(scc);
       process_ready_scc(scc, pre, u, already_processed,
 			control_postcondition_map, postcondition_p);
       gen_list_and_not(&still_to_be_processed, scc);
@@ -1740,12 +2036,33 @@ transformer unstructured_to_accurate_postconditions_or_transformer
 
   /* Make sure that all control nodes have been processed.  gen_recurse()
    cannot be used with hierarchical unstructured graphs.*/
+  /*
   CONTROL_MAP(c, {
-    process_unreachable_node(c, control_postcondition_map);
+    process_unreachable_node(c, control_postcondition_map, postcondition_p);
   }, unstructured_control(u), linked_nodes);
   CONTROL_MAP(c, {
-    process_unreachable_node(c, control_postcondition_map);
+    process_unreachable_node(c, control_postcondition_map, postcondition_p);
   }, unstructured_exit(u), linked_nodes);
+  */
+
+  
+  gen_context_multi_recurse(
+			    u, (void *) & context,
+			    statement_domain, gen_false, gen_null,
+			    control_domain, gen_true, local_process_unreachable_node,
+			    NULL);
+  
+  ifdebug(2) {
+    pips_debug(2, "%s for unstructured\n",
+	       postcondition_p? "Postconditions": "Path transformer");
+    gen_context_multi_recurse(
+			      u, (void *) & context,
+			      statement_domain, gen_false, gen_null,
+			      control_domain, gen_true,
+			      node_to_path_transformer_or_postcondition,
+			      NULL);
+    pips_debug(2, "End of map\n");
+  }
 
   post = copy_transformer
     (load_control_postcondition(control_statement(unstructured_exit(u)),
@@ -1759,25 +2076,233 @@ transformer unstructured_to_accurate_postconditions_or_transformer
   gen_free_list(already_processed);
   already_processed = list_undefined;
 
-  ifdebug(5) {
-    pips_debug(5, "End with unstructured postcondition:\n");
+  ifdebug(2) {
+    pips_debug(2, "End with unstructured postcondition:\n");
     print_transformer(post);
   }
 
   return post;
 }
+
+static transformer
+unstructured_to_postconditions(
+    transformer pre,
+    transformer pre_first,
+    unstructured u)
+{
+  list nodes = NIL ;
+  control entry_node = unstructured_control(u) ;
+  control exit_node = unstructured_exit(u) ;
+  transformer c_pre = transformer_undefined;
+  transformer post = transformer_undefined;
+  transformer exit_post = transformer_undefined;
+
+  debug(8,"unstructured_to_postconditions","begin\n");
+
+  /* SHARING! Every statement gets a pointer to the same precondition!
+   * I do not know if it's good or not but beware the bugs!!!
+   */
+  /* FI: changed to make free_transformer_mapping possible without 
+   * testing sharing.
+   *
+   * pre and pre_first can or not be used depending on the
+   * unstructured structure. They are always duplicated and
+   * the caller has to take care of their de-allocation.
+   */
+  CONTROL_MAP(c, {
+    statement st = control_statement(c) ;
+    if(c==entry_node && ENDP(control_predecessors(c)) && statement_test_p(st)) {
+      /* special case for the first node if it has no predecessor */
+      /* and if it is a test, as it always should, at least if */
+      /* unspaghettify has been applied... */
+      /* this is pretty useless and should be generalized to the
+	 DAG part of the CFG */
+      c_pre = transformer_dup(pre_first);
+      post = statement_to_postcondition(c_pre, st);
+      transformer_free(post);
+    }
+    else {
+      transformer c_pre_m = transformer_undefined;
+
+      c_pre = transformer_dup(pre);
+      c_pre_m = c_pre;
+
+      /* refine the precondition if the node has only one
+	 predecessor and if this predecessor is a test and if the
+	 test can be exploited */
+      if(gen_length(control_predecessors(c))==1 && c!=entry_node) {
+	control prev_c = CONTROL(CAR(control_predecessors(c)));
+	statement prev_st = control_statement(prev_c);
+
+	if(statement_test_p(prev_st)) {
+	  /* the condition is TRUE if c is the first successor of prev_c */
+	  bool true_false = (c==(CONTROL(CAR(control_successors(prev_c)))));
+	  expression e = test_condition(statement_test(prev_st));
+
+	  c_pre_m = precondition_add_condition_information(c_pre, e, true_false);
+	  /* If the free is performed, core dump guaranteed on some
+             examples: see unclear comments about the previously called
+             function:-( */
+	  /* free_transformer(c_pre); */
+	}
+      }
+
+      post = statement_to_postcondition(c_pre_m, st);
+      if(c==exit_node) {
+	exit_post = post;
+      }
+      else {
+	transformer_free(post);
+      }
+    }
+  }, entry_node, nodes);
+
+  gen_free_list(nodes) ;
+
+  if(transformer_undefined_p(exit_post)) {
+    exit_post = transformer_empty();
+  }
+
+  ifdebug(8) {
+    debug(8,"unstructured_to_postconditions","exit postcondition:\n");
+    (void) print_transformer(exit_post) ;
+  }
+  debug(8,"unstructured_to_postconditions","end\n");
+
+  return exit_post;
+}
+
 /* compute pre- and post-conditions in an unstructured from the entry
    precondition pre and return the exit postcondition. pre_u is pre
    filtered by the u's transformer and can be used for any node.  */
 transformer unstructured_to_accurate_postconditions
 (transformer pre_u, transformer pre, unstructured u)
 {
-  return unstructured_to_accurate_postconditions_or_transformer
-    (pre_u, pre, u, TRUE);
+  transformer post = transformer_undefined;
+  list succs = NIL;
+  control head = unstructured_control(u);
+  /* control tail = unstructured_exit(u); */
+
+  forward_control_map_get_blocs(head, &succs);
+
+  if(gen_length(succs)>SEMANTICS_MAX_CFG_SIZE1) {
+      pips_user_warning("\nControl flow graph too large for an accurate analysis (%d nodes)\n"
+			"Have you fully restructured your code?\n", gen_length(succs));
+    post = unstructured_to_postconditions(pre_u, pre, u);
+  }
+  else {
+    post = unstructured_to_accurate_postconditions_or_transformer
+      (pre_u, pre, u, TRUE);
+  }
+  gen_free_list(succs);
+
+  pips_assert("Postcondition for unstructured is consistent",
+	      transformer_consistency_p(post));
+
+  return post;
+}
+
+static void unreachable_node_to_transformer(control c)
+{
+  statement s = control_statement(c);
+
+  pips_debug(9,"Statement %s", statement_identification(s));
+
+  if(statement_ordering(s)==STATEMENT_ORDERING_UNDEFINED) {
+    pips_user_warning("Improper control restructuration, statement with no ordering:%s",
+		      statement_identification(s));
+  }
+
+  if(transformer_undefined_p(load_statement_transformer(s))) {
+    pips_user_warning("After restructuration, unexpected unreachable node:%s",
+		      statement_identification(s));
+    (void) statement_to_transformer(s);
+  }
+}
+
+/* This function is also used when computing preconditions if the exit
+   node is not reached. It assumes that transformers for all statements in
+   the unstructured have already been computed. */
+transformer 
+unstructured_to_global_transformer(
+    unstructured u)
+{
+  /* Assume any reachable node is executed at each iteration. A fix-point
+     of the result can be used to approximate the node preconditions. Some
+     nodes can be discarded because they do not modify the store such as
+     IF statements (always) and CONTINUE statements (if they do not link
+     the entry and the exit nodes). */
+  
+  list nodes = NIL;
+  /* Entry node */
+  control entry_node = unstructured_control(u);
+  control exit_node = unstructured_exit(u);
+  transformer tf_u = transformer_empty();
+  transformer fp_tf_u = transformer_undefined;
+  
+  pips_debug(8,"begin\n");
+
+  FORWARD_CONTROL_MAP(c, {
+    statement st = control_statement(c);
+    /* transformer_convex_hull has side effects on its arguments:-( */
+    /* Should be fixed now, 29 June 2000 */
+    /* transformer tf_st = copy_transformer(load_statement_transformer(st)); */
+    transformer tf_st = load_statement_transformer(st);
+    transformer tf_old = tf_u;
+    
+    if(statement_test_p(st)) {
+      /* Any side effect? */
+      if(!ENDP(transformer_arguments(tf_st))) {
+	tf_u = transformer_convex_hull(tf_old, tf_st); /* test */
+	free_transformer(tf_old);
+      }
+    }
+    else {
+      if(continue_statement_p(st)) {
+	if(gen_find_eq(entry_node, control_predecessors(c))!=chunk_undefined
+	   && gen_find_eq(exit_node, control_successors(c))!=chunk_undefined) {
+	  tf_u = transformer_convex_hull(tf_old, tf_st); /* continue */
+	  free_transformer(tf_old);
+	}
+      }
+      else {
+	tf_u = transformer_convex_hull(tf_old, tf_st); /* other */
+	free_transformer(tf_old);
+      }
+    }
+
+    ifdebug(1) {
+      pips_assert("tf_st is internally consistent",
+		  transformer_internal_consistency_p(tf_st));
+      pips_assert("tf_u is internally consistent",
+		  transformer_internal_consistency_p(tf_u));
+    }
+    
+  }, entry_node, nodes) ;
+  
+  gen_free_list(nodes) ;
+  
+  fp_tf_u = (*transformer_fix_point_operator)(tf_u);
+  /* fp_tf_u = transformer_derivative_fix_point(tf_u); */
+  
+  ifdebug(8) {
+    pips_debug(8,"Result for one step tf_u:\n");
+    print_transformer(tf_u);
+    pips_assert("tf_u is internally consistent",
+		transformer_internal_consistency_p(tf_u));
+    pips_debug(8,"Result for fix-point fp_tf_u:\n");
+    print_transformer(fp_tf_u);
+    pips_assert("fp_tf_u is internally consistent",
+		transformer_internal_consistency_p(fp_tf_u));
+  }
+  
+  pips_debug(8,"end\n");
+  
+  return fp_tf_u;
 }
 
 /* It is assumed that all transformers for nodes in u have already been computed */
-transformer unstructured_to_accurate_transformer(unstructured u)
+transformer unstructured_to_accurate_transformer(unstructured u, list e)
 {
   transformer tf = transformer_undefined;
   list succs = NIL;
@@ -1792,11 +2317,31 @@ transformer unstructured_to_accurate_transformer(unstructured u)
     transformer pre_u = transformer_identity();
     transformer pre = transformer_identity();
 
-    tf = unstructured_to_accurate_postconditions_or_transformer
-      (pre_u, pre, u, FALSE);
+    /* These tests should be performed at the scc level */
+    if(gen_length(succs)>SEMANTICS_MAX_CFG_SIZE2) {
+      pips_user_warning("\nControl flow graph too large for any analysis (%d nodes)\n"
+			"Have you fully restructured your code?\n", gen_length(succs));
+      tf = effects_to_transformer(e);
+    }
+    else if(gen_length(succs)>SEMANTICS_MAX_CFG_SIZE1) {
+      pips_user_warning("\nControl flow graph too large for an accurate analysis (%d nodes)\n"
+			"Have you fully restructured your code?\n", gen_length(succs));
+      tf = unstructured_to_global_transformer(u);
+    }
+    else {
+      tf = unstructured_to_accurate_postconditions_or_transformer
+	(pre_u, pre, u, FALSE);
+    }
   }
   else {
-    /* The unstructured is never exited */
+    /* The unstructured is never exited, but all nodes are supposed to
+       have transformers. This should never occur if the control
+       restructuration were clean. */
+    gen_multi_recurse(
+		      u,
+		      statement_domain, gen_false, gen_null,
+		      control_domain, gen_true, unreachable_node_to_transformer,
+		      NULL);
     tf = transformer_empty();
   }
 
