@@ -239,11 +239,13 @@ void yyerror(char * msg)
 {
     int c;
 
-    pips_user_warning("Syntax error - %s line %d near %s\n", 
+    /* Do not use pips_user_warning() to avoid portability issues */
+
+    user_warning("syn_error", "Syntax error - %s line %d near %s\n", 
 		      msg, line, yytext);
 
     /* what does it mean? */
-    pips_user_warning("Non analyzed source text stored in logfile\n");
+    user_warning("syn_error", "Non analyzed source text stored in logfile\n");
     
     while ((c = getc(yyin)) != EOF)
 	putc(c, stderr);
