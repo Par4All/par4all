@@ -1,5 +1,8 @@
-/* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/08/11 12:52:53 $, 
+/* $Id$
+ * $Log: hpfc_interactive.c,v $
+ * Revision 1.18  1997/03/19 17:52:04  coelho
+ * better RCS headers.
+ *
  *
  * interactive interface to hpfc,
  * based on the GNU READLINE library for interaction,
