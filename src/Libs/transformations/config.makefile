@@ -31,6 +31,10 @@ LIB_CFILES =	replace.c \
 		transformation_test.c
 
 #		optimize_misc.c
+                
+                faire_jolie_expression.c \
+                verifier_instruction_GOTO.c \
+                normaliser_declaration_table.c \
 
 LIB_HEADERS =	transformations-local.h
 
