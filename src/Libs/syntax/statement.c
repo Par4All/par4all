@@ -649,8 +649,8 @@ MakeAssignInst(syntax l, expression e)
 	       if (get_bool_property("PARSER_EXPAND_STATEMENT_FUNCTIONS"))
 	       {
 		   /* Let us keep it somewhere. */
-		   pips_user_warning("considering %s as a macro\n", 
-			     entity_name(call_function(syntax_call(l))));
+		   pips_debug(5, "considering %s as a macro\n", 
+			      entity_name(call_function(syntax_call(l))));
 		   parser_add_a_macro(syntax_call(l), e);
 	       }
 	       else
