@@ -2,6 +2,9 @@
   $Id$
   
   $Log: WorkspaceManager.java,v $
+  Revision 1.4  1998/10/16 17:45:28  coelho
+  ok.
+
   Revision 1.3  1998/10/16 17:15:46  coelho
   attempt to update to 1.2b4.
 
@@ -199,10 +202,9 @@ public class WorkspaceManager implements JPipsComponent
 
       filesList.addMouseListener(new MouseAdapter() {
 	public void mouseClicked(MouseEvent e) {
-	  if (e.getClickCount() == 2)
-	  {
-	    //DefaultListModel dlm = (DefaultListModel) filesList.getModel();
-	    files.removeElement(filesList.getSelectedValue());
+	  if (e.getClickCount() == 2) {
+	    DefaultListModel dlm = (DefaultListModel) filesList.getModel();
+	    dlm.removeElement(filesList.getSelectedValue());
 	  }
 	}
       });
@@ -279,7 +281,7 @@ public class WorkspaceManager implements JPipsComponent
 	    if(files.size() != 0)
 	    {
 	      File f = new File(directoryManager.getDirectory()
-				+"/"+editText.getText());
+				+ "/" + editText.getText());
 	      File truefile
 	      = new File(f.getAbsolutePath()+".database");
 	      if(!truefile.exists())
@@ -291,8 +293,7 @@ public class WorkspaceManager implements JPipsComponent
 	      else
 	      {
 		JOptionPane.showMessageDialog
-		(frame,
-		 "File "+editText.getText()+" exists!","Error",
+		(frame, "File " + editText.getText() + " exists!", "Error",
 		 JOptionPane.ERROR_MESSAGE);
 	      }
 	    }
