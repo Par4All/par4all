@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/24 00:50:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/12/09 18:33:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/09/24 00:50:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/12/09 18:33:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -1076,6 +1076,7 @@ statement st;
     }
     hash_table_free(Label_statements);
     hash_table_free(Label_control);
+    hash_table_free(used_labels);
 
     u = simplified_unstructured(top, bottom, result);
 
