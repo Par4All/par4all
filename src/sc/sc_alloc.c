@@ -152,40 +152,39 @@ Pbase b;
  * Modification: la base est maintenant recopiee dans le meme ordre que la
  * base initiale. (CA, 28/08/91) 
  */
-Psysteme sc_dup(ps)
-Psysteme ps;
+Psysteme sc_dup(Psysteme ps)
 {
-    Psysteme cp = SC_UNDEFINED;
+  Psysteme cp = SC_UNDEFINED;
+
+  if (!SC_UNDEFINED_P(ps)) {
     Pcontrainte eq, eq_cp;
-
-    if (!SC_UNDEFINED_P(ps)) {
-	cp = sc_new();
-
-	for (eq = ps->egalites; eq != NULL; eq = eq->succ) {
-	    eq_cp = contrainte_new();
-	    contrainte_vecteur(eq_cp) = vect_dup(contrainte_vecteur(eq));
-	    sc_add_egalite(cp, eq_cp);
-	}
-
-	for(eq=ps->inegalites;eq!=NULL;eq=eq->succ) {
-	    eq_cp = contrainte_new();
-	    contrainte_vecteur(eq_cp) = vect_dup(contrainte_vecteur(eq));
-	    sc_add_inegalite(cp, eq_cp);
-	}
-
-	if(ps->dimension==0) {
-	    assert(VECTEUR_UNDEFINED_P(ps->base));
-	    cp->dimension = 0;
-	    cp->base = VECTEUR_UNDEFINED;
-	}
-	else {
-	    assert(ps->dimension==vect_size(ps->base));
-	    cp->dimension = ps->dimension;
-	    cp->base = base_dup(ps->base);
-	    
-	}
+    cp = sc_new();
+    
+    for (eq = ps->egalites; eq != NULL; eq = eq->succ) {
+      eq_cp = contrainte_new();
+      contrainte_vecteur(eq_cp) = vect_dup(contrainte_vecteur(eq));
+      sc_add_egalite(cp, eq_cp);
     }
-    return(cp);
+    
+    for(eq=ps->inegalites;eq!=NULL;eq=eq->succ) {
+      eq_cp = contrainte_new();
+      contrainte_vecteur(eq_cp) = vect_dup(contrainte_vecteur(eq));
+      sc_add_inegalite(cp, eq_cp);
+    }
+    
+    if(ps->dimension==0) {
+      assert(VECTEUR_UNDEFINED_P(ps->base));
+      cp->dimension = 0;
+      cp->base = VECTEUR_UNDEFINED;
+    }
+    else {
+      assert(ps->dimension==vect_size(ps->base));
+      cp->dimension = ps->dimension;
+      cp->base = base_dup(ps->base);
+    }
+  }
+
+  return cp;
 }
 
 /* void sc_rm(Psysteme ps): liberation de l'espace memoire occupe par le
