@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1997/04/14 08:43:15 $, 
+%% $Date: 1997/08/27 11:41:21 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html,verbatim}
@@ -129,13 +129,25 @@ From the user point of view, an \xPOMP window is a X11 window as shown
 on Figure~\ref{fig:xPOMP_window}. It uses its own X11 colormap to
 display a 256-level image.
 
-\begin{figure}
-  \begin{center}
-    \psfig{file=xPOMP_window_explained.eps,width=\hsize}    
-  \end{center}
-  \caption{Example of an \xPOMP window displaying a fractal.}
-  \label{fig:xPOMP_window}
-\end{figure}
+\begin{htmlonly}
+  \begin{figure}[htbp]
+    \begin{rawhtml}
+      <img src=xPOMP_window_explained.gif>
+    \end{rawhtml}
+    \caption{Example of an \xPOMP window displaying a fractal.}
+    \label{fig:xPOMP_window}
+  \end{figure}
+\end{htmlonly}
+
+\begin{latexonly}
+  \begin{figure}
+    \begin{center}
+      \psfig{file=xPOMP_window_explained.eps,width=\hsize}    
+    \end{center}
+    \caption{Example of an \xPOMP window displaying a fractal.}
+    \label{fig:xPOMP_window}
+  \end{figure}
+\end{latexonly}
 
 Such a window is splitted in 2 parts:
 \begin{itemize}
