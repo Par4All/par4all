@@ -2,7 +2,7 @@
  *
  *  (c) Fabien COELHO - march 1995
  *
- *  $RCSfile: graph.c,v $ ($Date: 1995/08/09 16:36:45 $, )
+ *  $RCSfile: graph.c,v $ ($Date: 1995/09/04 11:22:37 $, )
  *  version $Revision$
  */
 
@@ -236,7 +236,7 @@ statement s;
 void full_control_graph(name)
 string name;
 {
-    statement s = (statement) db_get_resource(DBR_CODE, name, TRUE);
+    statement s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
     build_full_ctrl_graph(s);
     
     /*  should put something in the db if made as a pass
