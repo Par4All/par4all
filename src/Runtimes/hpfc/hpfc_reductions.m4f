@@ -60,7 +60,7 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
      & )
 _CM5(`      include "cmmd_fort.h"')
-      include "hpfc_commons_pvm.h"
+      include "hpfc_commons.h"
       include "hpfc_rtsupport.h"
       integer dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS')
@@ -71,9 +71,13 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS')
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
       TYPE result
 SIMPLE_REPLICATE(LEVEL, `REDUCTION_NODE_DECL')
+
+      debug(print *, MYLID, "[build_name(nred,LEVEL,PVMTYPE,NAME)] in")
+
 !
 ! initiate with a valid value
 !
+
 DISJUNCTION(``
       'CALL HPFC CMPOWNERS(an, 
      $  COMMA_REPLICATE(LEVEL, `LOWER_REF'),
@@ -81,12 +85,16 @@ DISJUNCTION(``
       if (HPFC SENDERP()) then
 SIMPLE_REPLICATE(LEVEL, `COMPUTE_LOCALIND')
          result = a(COMMA_REPLICATE(LEVEL, `TEMPO_REF'))
-         call COM_PREFIX SNDTO A(PVMTYPE, result)
+         call COM_PREFIX NSNDTO A(PVMTYPE, result)
       else
-         call COM_PREFIX RCVFR mCS(PVMTYPE, result)
+         call COM_PREFIX RCVFR NBCAST S(PVMTYPE, result)
       endif',``
       'result = ifelse(NAME, `SUM', 0, NAME, `MULT', 1, dnl
                       FATAL_ERROR(`unexpected name'))')
+
+      debug(print *, MYLID, "NRED initate done ")
+
+
 !
 ! compute the loop bounds
 !
@@ -112,10 +120,20 @@ ifelse(PVM_ARCH,`CM5',`dnl
          write (unit=0, fmt=*) "hpfc reduction: send failed"
          stop
       endif
+
+      debug(print *, MYLID, "NRED compute loop bounds done")
+
+
       HOST SND CHANNEL = HOST SND CHANNEL+2
       call CMMD_receive_bc_from_host(result, M4_PVM_LENGTH(PVMTYPE))',`
+
+      debug(print *, MYLID, "[build_name(nred,LEVEL,PVMTYPE,NAME)]")
+
+      debug(print *, MYLID, "send partial results to", HOSTLID)
       call HPFC SNDTO H(PVMTYPE, result)
-      call HPFC RCVFR mCH(PVMTYPE, result)')
+      debug(`print *, MYLID, "receive final results by bcast 
+     $     from", HOSTLID')
+      call HPFC RCVFR HNBCAST H(PVMTYPE, result)')
       build_name(nred,LEVEL,PVMTYPE,NAME) = result
       return
       end
@@ -124,7 +142,7 @@ ifelse(PVM_ARCH,`CM5',`dnl
 !
       TYPE function build_name(hred,LEVEL,PVMTYPE,NAME)()
 _CM5(`      include "cmmd_fort.h"')
-      include "hpfc_commons_pvm.h"
+      include "hpfc_commons.h"
       TYPE result(MAX MAX SIZE OF PROCS), final
       integer i
 !
@@ -198,13 +216,13 @@ dnl CUMULATE_REDUCTIONS($1)
 !
 ! All the reductions:
 !
-ifdef(`_HPFC_NO_BYTE1_',,`REDUCTIONS(BYTE1)')
-ifdef(`_HPFC_NO_INTEGER2_',,`REDUCTIONS(INTEGER2)')
-ifdef(`_HPFC_NO_INTEGER4_',,`REDUCTIONS(INTEGER4)')
-ifdef(`_HPFC_NO_REAL4_',,`REDUCTIONS(REAL4)')
-ifdef(`_HPFC_NO_REAL8_',,`REDUCTIONS(REAL8)')
-ifdef(`_HPFC_NO_COMPLEX8_',,`CUMULATE_REDUCTIONS(COMPLEX8)')
-ifdef(`_HPFC_NO_COMPLEX16_',,`CUMULATE_REDUCTIONS(COMPLEX16)')
+ifdef(`_HPFC_NO_BYTE1_',,`REDUCTIONS(HPFC BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`REDUCTIONS(HPFC INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`REDUCTIONS(HPFC INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`REDUCTIONS(HPFC REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`REDUCTIONS(HPFC REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`CUMULATE_REDUCTIONS(HPFC COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`CUMULATE_REDUCTIONS(HPFC COMPLEX16)')
 
 dnl
 dnl 
@@ -214,7 +232,8 @@ dnl
 dnl
 dnl pvm_reduce does not allow all members to get the result:-(
 dnl
-define(`pvm_opname',`ifelse($1,`PROD',PvmProduct,PVM`'$1)')dnl
+!define(`hpfc_opname',`ifelse($1,`PROD',HPFC PROD,HPFC`'$1)')dnl
+define(`hpfc_opname',`HPFC`'$1')dnl
 define(`identity',`ifelse($1,`SUM',0,$1,`PROD',1,$2)')dnl
 define(`HPFC_REDUCTIONS',`dnl
 pushdef(`NAME',$1)dnl
@@ -239,42 +258,42 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
       subroutine build_name(hpost,NAME,PVMTYPE)(val, size)
       integer size
       TYPE val(size)
-      include "hpfc_commons_pvm.h"
-      external pvm_opname(NAME)
+      include "hpfc_commons.h"
+!      external pvm_opname(NAME)
       integer info, bufid
 !
 ! performs the reduction to the host
 !
-      call pvmfreduce(pvm_opname(NAME),
-     x      val,size,PVMTYPE,MCAST HOST,HPFCGROUPNAME,0,info)
+      call HPFC REDUCTION(hpfc_opname(NAME),
+     x      val,size,PVMTYPE,MCAST HOST,0,info)
       MCAST HOST = MCAST HOST+2
 
+ 
 !
 ! send final result to nodes 
 !      
-      call HPFC INIT SEND(_HPFC_ENCODING_, bufid)
+      call HPFC INIT SEND(BUFFER ENCODING, bufid)
       call HPFC PACK(PVMTYPE, val, size, 1, info)
-      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS(1), MCASTHOST, info)
-      MCASTHOST = MCASTHOST + 2
-
+      call HPFC HCAST
       end 
+
       subroutine build_name(npost,NAME,PVMTYPE)(val, size)
       integer size
       TYPE val(size)
-      include "hpfc_commons_pvm.h"
-      external pvm_opname(NAME)
+      include "hpfc_commons.h"
+!      external pvm_opname(NAME)
       integer info
 !
 ! performs the reduction to the host
 !
-      call pvmfreduce(pvm_opname(NAME),
-     x      val,size,PVMTYPE,MCASTHOST,HPFCGROUPNAME,0,info)
+      call HPFC REDUCTION(hpfc_opname(NAME),
+     x      val,size,PVMTYPE,MCASTHOST,0,info)
       MCAST HOST=MCAST HOST+2
 
 !
 ! get final result 
 !      
-      call HPFC BCAST RECV(HOSTLID, MCASTHOST)
+      call HPFC NCAST
       call HPFC UNPACK(PVMTYPE, val, size, 1, info)
       MCASTHOST = MCASTHOST + 2
       end
@@ -290,13 +309,14 @@ HPFC_REDUCTIONS(MAX,$1)
 HPFC_REDUCTIONS(MIN,$1)')dnl
 dnl
 
-ifdef(`_HPFC_NO_BYTE1_',,`ALL_HPFC_REDUCTIONS(BYTE1)')
-ifdef(`_HPFC_NO_INTEGER2_',,`ALL_HPFC_REDUCTIONS(INTEGER2)')
-ifdef(`_HPFC_NO_INTEGER4_',,`ALL_HPFC_REDUCTIONS(INTEGER4)')
-ifdef(`_HPFC_NO_REAL4_',,`ALL_HPFC_REDUCTIONS(REAL4)')
-ifdef(`_HPFC_NO_REAL8_',,`ALL_HPFC_REDUCTIONS(REAL8)')
-ifdef(`_HPFC_NO_COMPLEX8_',,`ALL_HPFC_REDUCTIONS(COMPLEX8)')
-ifdef(`_HPFC_NO_COMPLEX16_',,`ALL_HPFC_REDUCTIONS(COMPLEX16)')
+ifdef(`_HPFC_NO_BYTE1_',,`ALL_HPFC_REDUCTIONS(HPFC BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`ALL_HPFC_REDUCTIONS(HPFC INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`ALL_HPFC_REDUCTIONS(HPFC INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`ALL_HPFC_REDUCTIONS(HPFC REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`ALL_HPFC_REDUCTIONS(HPFC REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`ALL_HPFC_REDUCTIONS(HPFC COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`ALL_HPFC_REDUCTIONS(HPFC COMPLEX16)')
+
 !
 ! that is all
 !
