@@ -359,8 +359,7 @@ entity m;
     cons * module_inter_effects;
     cons * module_intra_effects;
 
-    pips_debug(8,"begin\n");
-    pips_debug(8,"module = %s\n", module_local_name(m));
+    pips_debug(8,"begin for module %s\n", module_local_name(m));
 
     pips_assert("m is a module", entity_module_p(m));
 
@@ -411,13 +410,14 @@ entity m;
     {
 	entity e = reference_variable(effect_reference(ef));
 	action a = effect_action(ef);
-	if(integer_scalar_entity_p(e) && action_write_p(a)) 
+	if(integer_scalar_entity_p(e) && action_write_p(a)) {
 	    if(storage_return_p(entity_storage(e))) {
 		add_interprocedural_value_entities(e);
 	    }
 	    else {
 		add_intraprocedural_value_entities(e);
 	    }
+	}
     },
 	 module_intra_effects);
     
@@ -468,13 +468,11 @@ entity m;
 
     /* for debug, print hash tables */
     ifdebug(8) {
-	
-	(void) fprintf(stderr,"[module_to_value_mappings] hash tables\n");
+	pips_debug(8, "hash tables for module %s\n", module_local_name(m));
 	print_value_mappings();
 	test_mapping_entry_consistency();
-	
     }
-    pips_debug(8,"end\n");
+    pips_debug(8,"end for module %s\n", module_local_name(m));
 }
 
 /* transform a vector based on variable entities into a vector based
