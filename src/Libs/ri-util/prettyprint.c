@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.220 2002/05/04 13:15:03 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.221 2002/05/04 15:50:30 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -1406,7 +1406,7 @@ sentence_goto(
     return sentence_goto_label(module, label, margin, tlabel, n);
 }
 
-static bool found_filter = FALSE;
+/*static bool found_filter = FALSE;*/
 /********************************************************************* TEXT */
 
 static text 
@@ -1455,11 +1455,7 @@ text_block(
 	statement s = STATEMENT(CAR(objs));
 
 	text t = text_statement(module, margin, s);
-	/**********written by Dat************/
-	if (found_filter) {
-	  text_sentences(r) = 
-	    gen_nconc(text_sentences(r), text_sentences(t));
-	}
+	text_sentences(r) = gen_nconc(text_sentences(r), text_sentences(t));
 	text_sentences(t) = NIL;
 	free_text(t);
     }
@@ -2230,17 +2226,16 @@ text_statement(
 	temp = text_instruction(module, label, margin, i,
 				statement_number(stmt));
     }
-    /*************written by Dat**************/
+    /*************written by Dat**************
     found_filter = FALSE;
-    /*****************************************/
+    *****************************************/
 
     /* note about comments: they are duplicated here, but I'm pretty
      * sure that the free is NEVER performed as it should. FC.
      */
     if(!ENDP(text_sentences(temp))) {
-      /***********written by Dat*********/
+      /***********written by Dat*********
       text t = init_text_statement(module, margin, stmt);
-      /*print_text(stderr, t);*/
       if (!ENDP(text_sentences(t))) {
 	MERGE_TEXTS(r, t);
 	if (! string_undefined_p(comments)) {
@@ -2252,13 +2247,13 @@ text_statement(
       } else {
 	MERGE_TEXTS(r, temp);
       }
-      /**********************************/
-      /*MERGE_TEXTS(r, init_text_statement(module, margin, stmt));
-	if (! string_undefined_p(comments)) {
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
-						  strdup(comments)));
-	}
-	MERGE_TEXTS(r, temp);*/
+      **********************************/
+      MERGE_TEXTS(r, init_text_statement(module, margin, stmt));
+      if (! string_undefined_p(comments)) {
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+					      strdup(comments)));
+      }
+      MERGE_TEXTS(r, temp);
     }
     else {
 	/* Preserve comments */
