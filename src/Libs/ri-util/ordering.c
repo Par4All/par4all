@@ -7,8 +7,6 @@
 #include "ri-util.h"
 #include "control.h"
 
-static void rinitialize_ordering_to_statement(hash_table ots, statement s);
-
 /* a hash table to map orderings (integer) to statements (pointers)
  * assumed to be valid for the current module returned by
  * get_current_module_entity(). This is assumed to hold when
@@ -17,20 +15,30 @@ static void rinitialize_ordering_to_statement(hash_table ots, statement s);
  * db_get_current_module() returns the module used in the request
  * to pipsmake and is usually different.
  */
-static hash_table OrderingToStatement = (hash_table) NULL;
+static hash_table OrderingToStatement = hash_table_undefined;
+
+/* It would be possible to expose a lower level interface to manage
+ * several ordering_to_statement hash tables
+ */
+
+static void rinitialize_ordering_to_statement(hash_table ots, statement s);
+
+static statement apply_ordering_to_statement(hash_table ots, int o);
+
+static hash_table set_ordering_to_statement(statement s);
 
 
 
 bool ordering_to_statement_initialized_p()
 {
-    return OrderingToStatement != (hash_table) NULL;
+    return OrderingToStatement != hash_table_undefined;
 }
 
 void initialize_ordering_to_statement(s)
 statement s;
 {
     /* FI: I do not like that automatic cleaning any more... */
-    if (OrderingToStatement != (hash_table) NULL) {
+    if (OrderingToStatement != hash_table_undefined) {
 	reset_ordering_to_statement();
     }
 
@@ -40,12 +48,16 @@ statement s;
 statement ordering_to_statement(o)
 int o;
 {
-    return apply_ordering_to_statement(OrderingToStatement, o);
+    statement s = statement_undefined;
+
+    s = apply_ordering_to_statement(OrderingToStatement, o);
+
+    return s;
 }
 
 
 
-hash_table set_ordering_to_statement(s)
+static hash_table set_ordering_to_statement(s)
 statement s;
 {
     hash_table ots =  hash_table_make(hash_int, 101);
@@ -57,11 +69,12 @@ statement s;
 
 void reset_ordering_to_statement()
 {
-    if (OrderingToStatement != (hash_table) NULL) {
+    if (OrderingToStatement != hash_table_undefined) {
 	hash_table_clear(OrderingToStatement);
+	OrderingToStatement = hash_table_undefined;
     }
     else {
-	pips_error("reset_ordering_to_statement", "ill. NULL arg.\n");
+	pips_error("reset_ordering_to_statement", "ill. undefined arg.\n");
     }
 }
 
@@ -112,12 +125,17 @@ statement s;
     }
 }
 
-statement apply_ordering_to_statement(ots, o)
+static statement apply_ordering_to_statement(ots, o)
 hash_table ots;
 int o;
 {
     statement s;
+
+    pips_assert("apply_ordering_to_statement", 
+		ots != NULL && ots != hash_table_undefined);
+
     s = (statement) hash_get(ots, (char *) o);
+
     if(s == statement_undefined) {
 	pips_error("ordering_to_statement",
 		   "no statement for order %d=(%d,%d)\n",
