@@ -6,7 +6,7 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/05/05 19:06:22 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/07/20 18:40:37 $, )
  * version $Revision$
  */
 
@@ -204,17 +204,15 @@ list /* of alignments */ l;
     int adim = alignment_arraydim(a),
         tdim = alignment_templatedim(a);
 
-    MAPL(ca,
-     {
-	 alignment b = ALIGNMENT(CAR(ca));
-	 
-	 if (adim==alignment_arraydim(b) && tdim==alignment_templatedim(b))
-	     return(expression_equal_p(alignment_rate(a), 
-				       alignment_rate(b)) &&
-		    expression_equal_p(alignment_constant(a), 
-				       alignment_constant(b)));
-     },
-	 l);
+    MAP(ALIGNMENT, b,
+    {
+	if (adim==alignment_arraydim(b) && tdim==alignment_templatedim(b))
+	    return(expression_equal_p(alignment_rate(a), 
+				      alignment_rate(b)) &&
+		   expression_equal_p(alignment_constant(a), 
+				      alignment_constant(b)));
+    },
+	l);
 
     return(FALSE);
 }
@@ -227,10 +225,9 @@ align a1, a2;
 
     if (align_template(a1)!=align_template(a2)) return(FALSE);
 
-    MAPL(ca,
-	 if (!same_alignment_in_list_p(ALIGNMENT(CAR(ca)), l2))
-	     return(FALSE),
-	 l1);
+    MAP(ALIGNMENT, a,
+	if (!same_alignment_in_list_p(a, l2)) return(FALSE),
+	l1);
 
     return(TRUE);
 }
@@ -476,49 +473,46 @@ statement s;
 	{
 	    DEBUG_STAT(8, "realign directive", s);
 
-	    MAPL(ce,
-	     {
-		 reference r = expression_to_reference(EXPRESSION(CAR(ce)));
-
-		 if (load_primary_entity(reference_variable(r))==old_variable)
-		 {
-		     /*  the variable is realigned.
-		      */
-		     reference_variable(r) = new_variable;
-		     add_as_a_closing_statement(s);
-		     return(FALSE);
-		 }
-	     },
-		 call_arguments(c));
+	    MAP(EXPRESSION, e,
+	    {
+		reference r = expression_to_reference(e);
+		
+		if (load_primary_entity(reference_variable(r))==old_variable)
+		{
+		    /*  the variable is realigned.
+		     */
+		    reference_variable(r) = new_variable;
+		    add_as_a_closing_statement(s);
+		    return(FALSE);
+		}
+	    },
+		call_arguments(c));
 	}
 	else if (redistribute_directive_p(fun))
 	{
 	    entity t = array_propagation ?
 		align_template(load_entity_align(new_variable)) : old_variable;
-	    expression e;
 		
-	    MAPL(ce,
-	     {
-		 e = EXPRESSION(CAR(ce));
-
-		 /*   if template t is redistributed...
-		  */
-		 if (load_primary_entity(expression_to_entity(e))==t)
-		 {
-		     if (array_propagation)
-			 /*  then the new_variable is the alive one.
-			  */
-			 add_alive_synonym(s, new_variable);
-		     else
-			 reference_variable
-			     (syntax_reference(expression_syntax(e))) = 
-				 new_variable;
-		     
-		     add_as_a_closing_statement(s);
-		     return(FALSE);
-		 }
-	     },
-		 call_arguments(c));
+	    MAP(EXPRESSION, e,
+	    {
+		/*   if template t is redistributed...
+		 */
+		if (load_primary_entity(expression_to_entity(e))==t)
+		{
+		    if (array_propagation)
+			/*  then the new_variable is the alive one.
+			 */
+			add_alive_synonym(s, new_variable);
+		    else
+			reference_variable
+			    (syntax_reference(expression_syntax(e))) = 
+				new_variable;
+		    
+		    add_as_a_closing_statement(s);
+		    return(FALSE);
+		}
+	    },
+		call_arguments(c));
 	}
 
 	return(TRUE);
@@ -573,21 +567,19 @@ statement s;
 {
     list /* of entities */ le = NIL, lp = NIL, ll = NIL;
     entity old, new;
-    renaming r;
 
     what_stat_debug(4, s);
 
-    MAPL(cr,
-     {
-	 r = RENAMING(CAR(cr));
-	 old = renaming_old(r);
-	 new = renaming_new(r);
-
-	 le = CONS(ENTITY, old, le);
-	 lp = gen_once(load_primary_entity(old), lp);
-	 ll = CONS(ENTITY, new, ll);
-     },	 
-	 load_renamings(s));
+    MAP(RENAMING, r,
+    {
+	old = renaming_old(r);
+	new = renaming_new(r);
+	
+	le = CONS(ENTITY, old, le);
+	lp = gen_once(load_primary_entity(old), lp);
+	ll = CONS(ENTITY, new, ll);
+    },	 
+	load_renamings(s));
 
     store_reaching_mappings(s, make_entities(le));
     store_remapped(s, make_entities(lp));
@@ -608,20 +600,20 @@ list /* of statements */ ls;
 {
     entity primary = load_primary_entity(array);
 
-    MAPL(cc,
-     {
-	 statement s = control_statement(CONTROL(CAR(cc)));
-	 entities es = load_reaching_mappings(s);
-	 list lr = entities_list(es);
-
-	 if (gen_in_list_p(primary, entities_list(load_remapped(s))) &&
-	     !gen_in_list_p(array, lr))
-	 {
-	     ls = gen_once(s, ls);
-	     entities_list(es) = CONS(ENTITY, array, lr);
-	 }
-     },
-	 lc);
+    MAP(CONTROL, c,
+    {
+	statement s = control_statement(c);
+	entities es = load_reaching_mappings(s);
+	list lr = entities_list(es);
+	
+	if (gen_in_list_p(primary, entities_list(load_remapped(s))) &&
+	    !gen_in_list_p(array, lr))
+	{
+	    ls = gen_once(s, ls);
+	    entities_list(es) = CONS(ENTITY, array, lr);
+	}
+    },
+	lc);
 
     return(ls);
 }
@@ -639,23 +631,22 @@ list /* of statements */ ls;
                            le = entities_list(load_used_dynamics(s)),
          /* of controls */ lc = control_successors(load_remapping_graph(s));
 
-    MAPL(ce,
-     {
-	 entity array = ENTITY(CAR(ce));
-	 entity primary = load_primary_entity(array);
-
-	 if (!gen_in_list_p(primary, le) && !gen_in_list_p(array, lp))
-	 {
-	     what_stat_debug(4, s);
-	     pips_debug(4, "propagating %s\n", entity_name(array));
-
-	     ls = propagate_reaching_array(array, lc, ls);
-	     entities_list(leaving) = gen_once(array, entities_list(leaving));
-	     entities_list(propagated) = 
-		 CONS(ENTITY, array, entities_list(propagated));
-	 }
-     },
-	 entities_list(load_reaching_mappings(s)));
+    MAP(ENTITY, array,
+    {
+	entity primary = load_primary_entity(array);
+	
+	if (!gen_in_list_p(primary, le) && !gen_in_list_p(array, lp))
+	{
+	    what_stat_debug(4, s);
+	    pips_debug(4, "propagating %s\n", entity_name(array));
+	    
+	    ls = propagate_reaching_array(array, lc, ls);
+	    entities_list(leaving) = gen_once(array, entities_list(leaving));
+	    entities_list(propagated) = 
+		CONS(ENTITY, array, entities_list(propagated));
+	}
+    },
+	entities_list(load_reaching_mappings(s)));
     
     return(ls);
 }
@@ -673,23 +664,22 @@ statement s;
 	lr = entities_list(load_remapped(s)),
 	li = entities_list(load_reaching_mappings(s)),
 	lu = entities_list(load_used_dynamics(s));
-    entity array, primary;
+    entity primary;
 
-    MAPL(ce,
-     {
-	 array = ENTITY(CAR(ce));
-	 primary = load_primary_entity(array);
-
-	 if (!gen_in_list_p(primary, lu) && /* NOT USED and */
-	      gen_in_list_p(primary, lr) && /* REMAPPED and */
-	     !gen_in_list_p(array, li))     /* NOT REACHED */
-	 {
-	     what_stat_debug(4, s);
-	     pips_debug(4, "removing %s\n", entity_name(array));
-	     gen_remove(&ln, array);	    /* => NOT LEAVED */
-	 }
-     },
-	 ll);
+    MAP(ENTITY, array,
+    {
+	primary = load_primary_entity(array);
+	
+	if (!gen_in_list_p(primary, lu) && /* NOT USED and */
+	    gen_in_list_p(primary, lr) && /* REMAPPED and */
+	    !gen_in_list_p(array, li))     /* NOT REACHED */
+	{
+	    what_stat_debug(4, s);
+	    pips_debug(4, "removing %s\n", entity_name(array));
+	    gen_remove(&ln, array);	    /* => NOT LEAVED */
+	}
+    },
+	ll);
 
     gen_free_list(ll), entities_list(leaving) = ln;
 }
@@ -703,10 +693,10 @@ static bool reached_mapping_p(array, lc)
 entity array;
 list /* of controls */ lc;
 {
-    MAPL(cc,
-	 if (gen_in_list_p(array, 
-	     entities_list(load_leaving_mappings
-			   (control_statement(CONTROL(CAR(cc)))))))
+    MAP(CONTROL, c,
+	if (gen_in_list_p(array, 
+			  entities_list(load_leaving_mappings
+			   (control_statement(c)))))
 	     return(TRUE),
 	 lc);
 
@@ -721,7 +711,7 @@ statement s;
 list /* of statements */ ls;
 {
     list /* of controls */ lc = control_successors(load_remapping_graph(s));
-    MAPL(cc, ls = gen_once(control_statement(CONTROL(CAR(cc))), ls), lc);
+    MAP(CONTROL, c, ls = gen_once(control_statement(c), ls), lc);
     return(ls);
 }
 
@@ -733,14 +723,12 @@ entities es;
 {
     list /* of entity(s) */ le = gen_copy_seq(entities_list(es));
 
-    MAPL(ce,
-     {
-	 entity array = ENTITY(CAR(ce));
-
-	 if (load_primary_entity(array)==primary)
-	     gen_remove(&entities_list(es), array);
-     },
-	 le);
+    MAP(ENTITY, array,
+    {
+	if (load_primary_entity(array)==primary)
+	    gen_remove(&entities_list(es), array);
+    },
+	le);
 
     gen_free_list(le);
 }
@@ -755,20 +743,17 @@ statement s;
              leaving = load_leaving_mappings(s);
     list /* of entity(s) */ le = gen_copy_seq(entities_list(remapped)),
                             lu = entities_list(load_used_dynamics(s));
-    entity primary;
 
-    MAPL(ce,
-     {
-	 primary = ENTITY(CAR(ce));
-
-	 if (!gen_in_list_p(primary, lu))
-	 {
-	     remove_from_entities(primary, remapped);
-	     remove_from_entities(primary, reaching);
-	     remove_from_entities(primary, leaving);
-	 }
-     },
-	 le);
+    MAP(ENTITY, primary,
+    {
+	if (!gen_in_list_p(primary, lu))
+	{
+	    remove_from_entities(primary, remapped);
+	    remove_from_entities(primary, reaching);
+	    remove_from_entities(primary, leaving);
+	}
+    },
+	le);
 
     gen_free_list(le);
 }
@@ -780,7 +765,7 @@ kill_dead_remappings(s, ls)
 statement s;
 list /* of statements */ ls;
 {
-    entity primary, array;
+    entity primary;
     entities reaching = load_reaching_mappings(s),
              leaving = load_leaving_mappings(s);
     list /* of controls */ lc = control_predecessors(load_remapping_graph(s)),
@@ -790,26 +775,25 @@ list /* of statements */ ls;
 
     if (s==get_current_module_statement()) return(ls); 
 
-    MAPL(ce,
-     {
-	 array = ENTITY(CAR(ce));
-	 primary = load_primary_entity(array);
-	 
-	 if (!reached_mapping_p(array, lc))
-	 {
-	     what_stat_debug(4, s);
-	     pips_debug(4, "killing reaching %s\n", entity_name(array));
-
-	     gen_remove(&entities_list(reaching), array);
-
-	     if (!gen_in_list_p(primary, lu) && gen_in_list_p(primary, lr))
-	     {
-		 gen_remove(&entities_list(leaving), array);
-		 ls = add_successors(s, ls);
-	     }
-	 }	     
-     }, 
-	 le);
+    MAP(ENTITY, array,
+    {
+	primary = load_primary_entity(array);
+	
+	if (!reached_mapping_p(array, lc))
+	{
+	    what_stat_debug(4, s);
+	    pips_debug(4, "killing reaching %s\n", entity_name(array));
+	    
+	    gen_remove(&entities_list(reaching), array);
+	    
+	    if (!gen_in_list_p(primary, lu) && gen_in_list_p(primary, lr))
+	    {
+		gen_remove(&entities_list(leaving), array);
+		ls = add_successors(s, ls);
+	    }
+	}	     
+    }, 
+	le);
 
     gen_free_list(le); 
     return(ls);
@@ -824,29 +808,26 @@ statement s;
 	lr = entities_list(load_reaching_mappings(s)),
 	ll = entities_list(load_leaving_mappings(s)),
 	ln = NIL;
-    entity target, source, primary;
+    entity primary;
     
     what_stat_debug(4, s);
 
-    MAPL(cl,
-     {
-	 target = ENTITY(CAR(cl));
-	 primary = load_primary_entity(target);
+    MAP(ENTITY, target,
+    {
+	primary = load_primary_entity(target);
 
-	 MAPL(cr,
-	  {
-	      source = ENTITY(CAR(cr));
-
-	      if (load_primary_entity(source)==primary && source!=target)
-	      {
-		  pips_debug(4, "%s -> %s\n", 
-			     entity_name(source), entity_name(target));
-		  ln = CONS(RENAMING, make_renaming(source, target), ln);
-	      }
-	  },
-	      lr);
-     },
-	 ll);
+	MAP(ENTITY, source,
+	{
+	    if (load_primary_entity(source)==primary && source!=target)
+	    {
+		pips_debug(4, "%s -> %s\n", 
+			   entity_name(source), entity_name(target));
+		ln = CONS(RENAMING, make_renaming(source, target), ln);
+	    }
+	},
+	    lr);
+    },
+	ll);
 
     {
 	list /* of renaming(s) */ l = load_renamings(s);
@@ -957,38 +938,33 @@ statement s;
 entity t;
 {
     list /* of entities */ l = NIL,lseens = NIL; /* to tag seen primaries. */
-    entity array;
 
     assert(entity_template_p(t));
 
     /*   first the alive list is scanned.
      */
-    MAPL(ce,
-     {
-	 array = ENTITY(CAR(ce));
-	 
-	 if (align_template(load_entity_align(array))==t)
-	     l = CONS(ENTITY, array, l);
-
-	 lseens = CONS(ENTITY, load_primary_entity(array), l);
-     },
-	 entities_list(load_alive_synonym(s)));
+    MAP(ENTITY, array,
+    {
+	if (align_template(load_entity_align(array))==t)
+	    l = CONS(ENTITY, array, l);
+	
+	lseens = CONS(ENTITY, load_primary_entity(array), l);
+    },
+	entities_list(load_alive_synonym(s)));
 
     /*   second the defaults are looked for. namely the primary entities.
      */
-    MAPL(ce,
-     {
-	 array = ENTITY(CAR(ce));
-
-	 if (primary_entity_p(array) && !gen_in_list_p(array, lseens))
-	 {
-	     if (align_template(load_entity_align(array))==t)
-		 l = CONS(ENTITY, array, l);
-
-	     lseens = CONS(ENTITY, array, l);
-	 }
-     },
-	 list_of_distributed_arrays());
+    MAP(ENTITY, array,
+    {
+	if (primary_entity_p(array) && !gen_in_list_p(array, lseens))
+	{
+	    if (align_template(load_entity_align(array))==t)
+		l = CONS(ENTITY, array, l);
+	    
+	    lseens = CONS(ENTITY, array, l);
+	}
+    },
+	list_of_distributed_arrays());
 
     gen_free_list(lseens); return(l);
 }
