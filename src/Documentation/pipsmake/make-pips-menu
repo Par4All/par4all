@@ -1,5 +1,8 @@
 #! /bin/sh
 
+PIPS_INCLUDEDIR=${PIPS_ROOT}/Include
+export PIPS_INCLUDEDIR
+
 perl -e '
 $menu_dir = $ENV{"PIPS_INCLUDEDIR"};
 $program_name = $ARGV[0];
