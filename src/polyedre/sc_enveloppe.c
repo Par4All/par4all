@@ -329,10 +329,20 @@ transitive_closure_from_two_bases(Psysteme s, Pbase b1, Pbase b2)
  * base(P) n base(Q) = 0 => P u Q = Rn
  * and some other very basic simplifications...
  * which are not really interesting if no decomposition is performed?
+ *
+ * on overflows FI suggested.
+ * 
+ * 1/ we want to compute : (A n B1) u (A n B2)
+ * 2/ we chose to approximate it as : (A n B1) v (A n B2)
+ * 3/ we try Corinne's factorization with transitive closure
+ *    A' n ((A'' n B1) v (A'' n B2))
+ * 4/ on overflow, we can try A n (B1 v B2) // NOT IMPLEMENTED YET
+ * 5/ if we have one more overflow, then A looks good as an approximation.
  */
 Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
 {
   Psysteme s1, s2, sc, stc, su, scsaved;
+  int current_overflow_count;
 
   s1 = sc_dup(is1);
   s2 = sc_dup(is2);
@@ -357,22 +367,18 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
 
   stc = NULL;
 
-  /* how useful it is:
-  fprintf(stderr, "common eg=%d/%d, in=%d/%d\n",
-	  sc_nbre_egalites(sc), 
-	  sc_nbre_egalites(sc)+sc_nbre_egalites(s1)+sc_nbre_egalites(s2),
-	  sc_nbre_inegalites(sc),
-	 sc_nbre_inegalites(sc)+sc_nbre_inegalites(s1)+sc_nbre_inegalites(s2));
-  */
+  current_overflow_count = linear_number_of_exception_thrown;
+
   su = elementary_convex_union(s1, s2);
   
   /* usually we use V (convex hull) as a U (set union) approximation.
    * as we have : (A n B1) U (A n B2) \in A
    * the common part of both systems is an approximation of the union!
    * sc_rn is returned on overflows (and some other case).
-   * I don't think that the result is improved apart when actual overflow occurs. FC/CA.
+   * I don't think that the result is improved apart 
+   * when actual overflow occurs. FC/CA.
    */
-  if (SC_RN_P(su) || sc_rn_p(su)) 
+  if (current_overflow_count!=linear_number_of_exception_thrown)
   {
     if (su) sc_rm(su), su = NULL;
     if (sc) sc_rm(sc), sc = NULL;
@@ -392,7 +398,7 @@ Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
    * if part of the system is separated. Other calls may be considered here?
    */
   sc_transform_ineg_in_eg(sc); /* ok, it will look better. */
-  /* not really projected. { x==y, y==3 } => { x==3, y==3 } */
+  /* misleading... not really projected. { x==y, y==3 } => { x==3, y==3 } */
   sc_project_very_simple_equalities(sc);
 
   /* sc, su: fast union of disjoint. */
