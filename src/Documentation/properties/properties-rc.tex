@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.116  1998/02/03 09:50:29  ancourt
+%% PRETTYPRINT_WITH_COMMON_NAMES property
+%%
 %% Revision 1.115  1997/12/12 12:15:35  coelho
 %% TPIPS_IS_A_SHELL added.
 %%
@@ -49,7 +52,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1997/12/12 12:15:35 $~$
+$~$Date: 1998/02/03 09:50:29 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1486,6 +1489,15 @@ some information must be stored and displayed.}.
 
 \begin{verbatim}
 PRETTYPRINT_BLOCK_IF_ONLY FALSE
+\end{verbatim}
+
+Effects give data that may be read and written in a procedure. These data
+are represented by their entity name (module name+local name). In order to
+have information on the scope of commons, we need to know the common in
+which the entity is declared if any. 
+
+\begin{verbatim}
+PRETTYPRINT_WITH_COMMON_NAMES FALSE
 \end{verbatim}
 
 \subsubsection{Declarations}
