@@ -88,7 +88,7 @@ statement s;
 	int so = statement_ordering(s);
 	transformer stf = load_statement_transformer(s);
 
-	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %#p:\n",
+	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
 		       statement_number(s),
 		       ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
 		       stf);
@@ -96,7 +96,7 @@ statement s;
 	pips_assert("statement_to_transformer", stf==t);
     }
 
-    debug(8,"statement_to_transformer","end with t=%#p\n", t);
+    debug(8,"statement_to_transformer","end with t=%p\n", t);
 
     return(t);
 }
@@ -716,7 +716,7 @@ list ef;
 	}
     }
 
-    pips_debug(8, "end with tf=%#p\n", tf);
+    pips_debug(8, "end with tf=%p\n", tf);
 
     return tf;
 }
@@ -754,7 +754,7 @@ transformer user_function_call_to_transformer(
 	t_caller = user_call_to_transformer(f, pc, ef);
 
 	ifdebug(8) {
-	    pips_debug(8, "Transformer %#p for callee %s:\n",
+	    pips_debug(8, "Transformer %p for callee %s:\n",
 		       t_caller, entity_local_name(f));
 	    dump_transformer(t_caller);
 	}
@@ -784,7 +784,7 @@ transformer user_function_call_to_transformer(
 
 	ifdebug(8) {
 	    debug(8, "user_function_call_to_transformer", 
-		  "Transformer %#p for assignment of %s with %s:\n",
+		  "Transformer %p for assignment of %s with %s:\n",
 		  t_assign, entity_local_name(e), entity_name (rv));
 	    dump_transformer(t_assign);
 	}
@@ -801,7 +801,7 @@ transformer user_function_call_to_transformer(
 
 	ifdebug(8) {
 	    debug(8, "user_function_call_to_transformer", 
-		  "Final transformer %#p for assignment of %s with %s:\n",
+		  "Final transformer %p for assignment of %s with %s:\n",
 		  t_caller, entity_local_name(e), entity_name(rv));
 	    dump_transformer(t_caller);
 	}
@@ -829,7 +829,7 @@ transformer user_function_call_to_transformer(
     }
 
     debug(8, "user_function_call_to_transformer",
-	  "end with t_caller=%#p\n", t_caller);
+	  "end with t_caller=%p\n", t_caller);
 
     return t_caller;
 }
@@ -1081,7 +1081,7 @@ list ef;
 
     ifdebug(8) {
 	debug(8, "user_call_to_transformer", 
-	      "End: after taking non-integer scalar effects %#p\n",
+	      "End: after taking non-integer scalar effects %p\n",
 	      t_caller);
 	dump_transformer(t_caller);
     }
