@@ -2,6 +2,11 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.92  1997/11/01 09:09:41  irigoin
+ * assert transformed into a warning in find_last_statement() because people
+ * do not have enough time to fix the problemes in Transformations and in the
+ * polyhedral method. However Wp65 and hpfc have been fixed.
+ *
  * Revision 1.91  1997/10/29 12:35:09  irigoin
  * Guard added to avoid calling find_last_statement() thru
  * set_last_statement() when it is not needed
@@ -92,7 +97,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.91 1997/10/29 12:35:09 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.92 1997/11/01 09:09:41 irigoin Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1610,6 +1615,14 @@ find_last_statement(statement s)
     if(!statement_undefined_p(last)
        && (block_statement_p(last) || unstructured_statement_p(last))) {
 	last = find_last_statement(last);
+    }
+
+    /* Too many program transformations and syntheses violate the following assert */
+    if(!(statement_undefined_p(last)
+	 || !block_statement_p(s)
+	 || return_statement_p(last))) {
+	pips_user_warning("Last statement is not a RETURN!\n");
+	last = statement_undefined;
     }
 
     /* I had a lot of trouble writing the condition for this assert... */
