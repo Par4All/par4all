@@ -96,10 +96,13 @@ list prgm_parameter_l;
 typedef dfg_vertex_label vertex_label;
 typedef dfg_arc_label arc_label;
 
+#define PLC_EXT ".plc_file"
+
 /* ======================================================================== */
 bool print_plc(module_name)
 string module_name;
 {
+  char *localfilename;
   FILE        *fd;
   char        *filename;
   plc the_plc;
@@ -110,14 +113,18 @@ string module_name;
       user_log("\n\n *** PRINTING PLC for %s\n", module_name);
 
   the_plc = (plc) db_get_memory_resource(DBR_PLC, module_name, TRUE);
-  filename = (string) strdup(concatenate(db_get_current_workspace_directory(),
-                    	     "/", module_name, ".plc_file", (string) NULL));
+
+  localfilename = strdup(concatenate(module_name, PLC_EXT, NULL));
+  filename = strdup(concatenate(db_get_current_workspace_directory(), 
+				"/", localfilename, NULL));
 
   fd = safe_fopen(filename, "w");
   fprint_plc(fd, the_plc);
   safe_fclose(fd, filename);
 
-  DB_PUT_FILE_RESOURCE(DBR_PLC_FILE, strdup(module_name), filename);
+  DB_PUT_FILE_RESOURCE(DBR_PLC_FILE, strdup(module_name), localfilename);
+  
+  free(filename);
 
   if(get_debug_level() > 0)
     fprintf(stderr, "\n\n *** PRINT_PLC DONE\n");
