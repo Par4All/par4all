@@ -199,12 +199,12 @@ Variable var;
 	    b1 = b1->succ);
 	if (VECTEUR_NUL_P(b1)) {
 	    for (b1 = sc->base; !VECTEUR_NUL_P(b1->succ); b1=b1->succ);
-	    b1->succ = vect_new(var, 1);
+	    b1->succ = vect_new(var, VALUE_ONE);
 	    sc_dimension(sc)++;
 	} 
     }
     else {
-	sc->base = vect_new(var, 1);
+	sc->base = vect_new(var, VALUE_ONE);
 	sc_dimension(sc)++; }
 }
 
@@ -248,12 +248,12 @@ Psysteme sc;
 	for(eq = sc->egalites; eq!= NULL; eq=eq->succ) {
 	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
 		if (pv->var != TCST)
-		    vect_chg_coeff(&diagonale,pv->var,1);
+		    vect_chg_coeff(&diagonale,pv->var, VALUE_ONE);
 	}
 	for(eq = sc->inegalites; eq!= NULL; eq=eq->succ) {
 	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
 		if (pv->var != TCST)
-		    vect_chg_coeff(&diagonale,pv->var,1);
+		    vect_chg_coeff(&diagonale,pv->var, VALUE_ONE);
 	}
 	diff = base_difference(diagonale, sc_base(sc));
 	consistent = BASE_NULLE_P(diff);
@@ -306,12 +306,12 @@ boolean sc_weak_consistent_p(Psysteme sc)
 	for(eq = sc->egalites; eq!= NULL; eq=eq->succ) {
 	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
 		if (pv->var != TCST)
-		    vect_chg_coeff(&diagonale,pv->var,1);
+		    vect_chg_coeff(&diagonale,pv->var, VALUE_ONE);
 	}
 	for(eq = sc->inegalites; eq!= NULL; eq=eq->succ) {
 	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
 		if (pv->var != TCST)
-		    vect_chg_coeff(&diagonale,pv->var,1);
+		    vect_chg_coeff(&diagonale,pv->var, VALUE_ONE);
 	}
 	weak_consistent =  base_included_p(diagonale, sc_base(sc));
     }
