@@ -2,6 +2,10 @@
 %% $Id$
 %%
 %% $Log: developer_guide.tex,v $
+%% Revision 1.9  2000/02/02 14:57:46  irigoin
+%% PIPS environment variables have been updated... but not their documented
+%% use. Nga bumped into the problem.
+%%
 %% Revision 1.8  1997/11/20 07:58:28  coelho
 %% ref to new pips architectures added.
 %%
@@ -843,15 +847,17 @@ Here are now the steps to install a new library named {\tt mylib}:
     pipsrc.sh} and {\tt pipsrc.csh} respectively for {\tt sh} or {\tt ksh}
     and {\tt csh} or {\tt tcsh} shells. The command {\tt make install} then
     installs these scripts in \verb+$PIPS_UTILDIR+.
-    
+% $    
+
   \end{itemize}
   
-\item In the directory {\tt \$PIPS\_DOCDIR}:
+\item In the directory {\tt \$PIPS\_DOCDIR}, i.e. {\tt
+    \$PIPS\_DEVEDIR/Documentation/pipsmake-rc/}:
   
   \begin{itemize}
     
   \item declare the new phase to {\tt pipsmake} by adding the necessary
-    rules in the file {\tt pipsmake-rc.f.tex}. Each rule describes the
+    rules in the file {\tt pipsmake-rc.tex}. Each rule describes the
     dependances between the input and output resources of each phase. Just
     have a look at hte other rules to build your owns. You can also add
     aliases to obtain nice menus in the \verb+wpips+ interface.
@@ -876,14 +882,16 @@ myphase > MODULE.res2
     be delared in the file {\tt properties-rc.tex}.
     
   \item Run the command {\tt make all} to now derive from {\tt
-      pipsmake-rc.tex} the files {\tt phases.h}, {\tt resources.h} and {\tt
-      builder-map.h} and to copy them into {\tt \$PIPS\_INCLUDEDIR}; to also
-    derive {\tt pipsmake.rc}, {\tt properties.rc} and {\tt wpips.rc}, and to
-    copy them into {\tt \$PIPS\_LIBDIR}.
+      pipsmake-rc.tex} the files {\tt phases.h}, {\tt resources.h} and
+    {\tt builder-map.h} and to copy them into {\tt \$PIPS\_INCLUDEDIR}
+    (i.e. {\tt \$PIPS\_ROOT/Include}); to also derive {\tt pipsmake.rc},
+    {\tt properties.rc} and {\tt wpips.rc}, and to copy them into {\tt
+      \$PIPS\_LIBDIR}.
     
   \end{itemize}
   
-\item In the directory {\tt \$PIPS\_BINSRCDIR}:
+\item In the directory {\tt \$PIPS\_BINSRCDIR} (i.e. {\tt
+    \$PIPS\_ROOT/Src/Passes}):
 
   Execute the command {\tt
   make-pips -r}, to recompile and install updated versions of {\tt pips},
