@@ -130,6 +130,7 @@
   (if (fboundp 'hilit-rehighlight-buffer)
       (hilit-rehighlight-buffer)
     )
+  (epips-add-keymaps-and-menu-in-the-current-buffer)
   )
 
 
@@ -615,12 +616,9 @@
 
 ;(setq epips-menu-keymap (cons "Pips" (make-sparse-keymap "Pips")))
 ;(fset 'epips-menu epips-menu-keymap)
-(defun epips-add-keymaps-and-menu ()
-  "This function add the menus and define some keyboard accelerators"
-					; Add the menus on all the
-					; Pips windows and log window:
-  (mapcar '(lambda (a-buffer)
-	     (set-buffer a-buffer)
+(defun epips-add-keymaps-and-menu-in-the-current-buffer ()
+  "This function add the menus and define some keyboard accelerators
+ to the current buffer"
 	     (local-set-key [menu-bar epips] (cons "Pips" (make-sparse-keymap "Pips")))
 	     (local-set-key [menu-bar epips epips-kill-the-buffers]
 			    '("Kill the Pips buffers" . epips-kill-the-buffers))
@@ -630,6 +628,15 @@
 			    '("Go to module" . epips-mouse-module-select))
 	     (local-set-key [S-mouse-1]
 			    '("Nothing..." . ignore))
+)
+
+(defun epips-add-keymaps-and-menu ()
+  "This function add the menus and define some keyboard accelerators"
+					; Add the menus on all the
+					; Pips windows and log window:
+  (mapcar '(lambda (a-buffer)
+	     (set-buffer a-buffer)
+	     (epips-add-keymaps-and-menu-in-the-current-buffer)
 	     )
 	  (append epips-buffers (list epips-process-buffer))
 	  )
