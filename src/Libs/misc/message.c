@@ -12,9 +12,12 @@
 #include <setjmp.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <setjmp.h>
 
 #include "types.h"
 
+/* FI: grah, qu'est-ce que c'est que cette heresie? misc ne devait pas
+   dependre de NewGen! */
 extern bool get_bool_property(string);
 
 #define INPUT_BUFFER_LENGTH 256 /*error caught by terminal at 257th character*/
@@ -198,7 +201,8 @@ default_user_error(char * calling_function_name,
                    char * a_message_format,
                    va_list *some_arguments)
 {
-   extern jmp_buf pips_top_level;
+    /* extern jmp_buf pips_top_level; */
+    jmp_buf * ljbp = 0;
 
    /* print name of function causing error */
    (void) fprintf(stderr, "user error in %s: ", calling_function_name);
@@ -223,7 +227,11 @@ default_user_error(char * calling_function_name,
 
       /*prompt_user schould be used... if it were implemented!*/
       /*prompt_user("Something went wrong. Flash back to top_level.");*/
-      longjmp(pips_top_level, 2);
+      /*prompt_user("Something went wrong. Flash back to exception handler.");*/
+
+      /* longjmp(pips_top_level, 2); */
+      ljbp = top_pips_context_stack();
+      longjmp(*ljbp, 2);
    }
 }
 
