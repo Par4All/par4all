@@ -40,8 +40,7 @@
 #include "matrix.h"
 
 #include "genC.h"
-#include "list.h"
-#include "boolean.h"
+
 #include "ri.h"
 #include "ri-util.h"
 #include "constants.h"
