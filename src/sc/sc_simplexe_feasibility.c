@@ -43,18 +43,18 @@ static int NB_INEQ = 0;
 #define DEBUG1(code) { }
 #else 
 #undef DEBUG1
-#define DEBUG1(code) { code } 
+#define DEBUG1(code) { code }
 #endif
 
 #ifndef DEBUG2
-#define DEBUG2(code) { } 
+#define DEBUG2(code) { }
 #else 
 #undef DEBUG2
 #define DEBUG2(code) { code }
 #endif
 
 #ifndef DEBUG3
-#define DEBUG3(code) { } 
+#define DEBUG3(code) { }
 #else 
 #undef DEBUG3
 #define DEBUG3(code) { code }
@@ -171,7 +171,14 @@ static int NB_INEQ = 0;
    (value_notzero_p(x.den) && value_notzero_p(y.den) && 	\
     value_eq(mult(x.num,y.den),mult(x.den,y.num))))
 
-#define INF_MACRO(x,y,mult) (value_lt(mult(x.num,y.den),mult(x.den,y.num)))
+/*#define INF_MACRO(x,y,mult) (value_lt(mult(x.num,y.den),mult(x.den,y.num)))
+// c'est pas assez pour la comparaison entre deux fractions, que se passe  \
+// s'il y a seulement un denominateur negatif??? Ca donnera un resultat faux. On l'utilise, ce macro!
+// a/b < c/d <=> if b*d > 0 then a*d < b*c else a*d < b*c : duong.
+// remarque : ici on utilise deja le macro mult_protected
+*/
+
+#define INF_MACRO(x,y,mult) ((value_pos_p(mult(x.den,y.den)) && value_lt(mult(x.num,y.den),mult(x.den,y.num))) || (value_neg_p(mult(x.den,y.den)) && value_gt(mult(x.num,y.den),mult(x.den,y.num))))
 
 /* computes x = simplify(y/z)
  */
@@ -494,7 +501,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     long i, j, k, h, trouve, hh=0, ligne, i0, i1, jj, ii ;
     Value poidsM, valeur, tmpval;
     long w ;
-    int soluble = 1 ; /* valeur retournee par feasible */
+    static int soluble = 1 ; /* valeur retournee par feasible */
     frac *nlle_colonne = NULL, *colo;
     frac objectif[2] ; /* objectif de max pour simplex : 
 			  somme des (b2,c2) termes constants "inferieurs" */
@@ -518,7 +525,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 		"should not (yet) be called with control %d...\n", ofl_ctrl);
 
     DEBUG(fprintf(stdout, "\n\n IN sc_simplexe_feasibility_ofl_ctrl:\n");
-          sc_fprint(stdout, sc, default_variable_to_string));
+          sc_fprint(stdout, sc, default_variable_to_string);)
 
     /* the input Psysteme must be consistent; this is not the best way to
      * do this; array bound checks should be added instead in proper places;
@@ -543,10 +550,10 @@ sc_simplexe_feasibility_ofl_ctrl(
     CATCH(simplex_arithmetic_error)
     {
       ifscdebug(2) {
-       fprintf(stderr,"[sc_simplexe_feasibility_ofl_ctrl] arithmetic error\n");
+	fprintf(stderr,"[sc_simplexe_feasibility_ofl_ctrl] arithmetic error\n");
       }
 
-      DEBUG(fprintf(stdout, "arithmetic error in simplex\n"));
+      DEBUG(fprintf(stdout, "arithmetic error in simplex\n");)
       
       for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
 	hashtable[i].nom = 0 ;
@@ -633,7 +640,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    /* Cas ou` valeur de variable est connue : */
 	    if(j==1) hashtable[hh].val = valeur ;
 	    DEBUG1(if(sc->egalites!=0)
-		   dump_tableau("eg",eg,compteur));
+		   dump_tableau("eg",eg,compteur);)
 	}
 	else
 	    ligne--;
@@ -762,8 +769,8 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    ligne--;
     }
 
-    DEBUG1(dump_hashtable(hashtable));
-    DEBUG1(dump_tableau("avant sol prov", t, compteur));
+    DEBUG1(dump_hashtable(hashtable);)
+    DEBUG1(dump_tableau("avant sol prov", t, compteur);)
     
     /* NON IMPLEMENTE' */
     
@@ -856,7 +863,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         t[1].taille++ ;
 	/* Creation d'une colonne cachee */
         CREVARCACHEE ;
-	DEBUG1(dump_tableau("cre col cach 2", t, compteur));
+	DEBUG1(dump_tableau("cre col cach 2", t, compteur);)
     }
     
     for(pc=sc->egalites ; pc!=0; pc=pc->succ, ligne++)
@@ -936,7 +943,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         t[1].taille++ ;
 	/* Creation d'une colonne cachee */
         CREVARCACHEE ;
-	DEBUG1(dump_tableau("cre col cach 3", t, compteur));
+	DEBUG1(dump_tableau("cre col cach 3", t, compteur);)
     }
     
     /* FIN DE SOLUTION PROVISOIRE */
@@ -1009,21 +1016,21 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    
 	    if(cond)
 	    {
-                DEBUG1(printf("Systeme soluble (faisable) en rationnels\n"));
+                DEBUG1(printf("Systeme soluble (faisable) en rationnels\n");)
 		SOLUBLE(1)
 	    }
 	    else 
 	    {
-		DEBUG1(printf("Systeme insoluble (infaisable)\n"));
+		DEBUG1(printf("Systeme insoluble (infaisable)\n");)
 		SOLUBLE(0)
 	    }
-	    DEBUG1(printf("fin\n"));
+	    DEBUG1(printf("fin\n");)
         }
 
 	DEBUG1(printf("1 : jj= %ld\n",jj);
-	      dump_tableau("avant ch pivot", t, compteur));
+	      dump_tableau("avant ch pivot", t, compteur);)
 
-	DEBUG1(min1.num = 32700; min1.den=1; min2=min1);
+	DEBUG1(min1.num = 32700; min1.den=1; min2=min1;)
 	
         /*  Recherche de la ligne de pivot  
 	 *  si ii==-1, pas encore trouve, min{1,2} non valides...
@@ -1033,7 +1040,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    boolean cond;
 
 	    DEBUG1(fprintf(stdout, "itering i{,0,1} = %ld %ld %ld\n", 
-			  i, i0, i1));
+			  i, i0, i1);)
 
             if(((i0<t[0].taille && t[jj].colonne[i].numero <= 
 		 t[0].colonne[i0].numero)  || i0>=t[0].taille)
@@ -1066,7 +1073,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 			  printfrac(min1);
 			  printfrac(rapport2);
 			  printfrac(min2);
-			  fprintf(stdout, "\nand cond: "));
+			  fprintf(stdout, "\nand cond: ");)
 
 		    if (ii==-1) 
 			cond = TRUE; /* first assignment is forced */
@@ -1080,7 +1087,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 				(EGAL(rapport2,min2) && 
 				 INF(rapport1,min1));
 		    
-		    DEBUG1(fprintf(stdout, "%d\n", cond));
+		    DEBUG1(fprintf(stdout, "%d\n", cond);)
 
 		    if (cond) {
 			AFF(min1,rapport1) ;
@@ -1103,13 +1110,13 @@ sc_simplexe_feasibility_ofl_ctrl(
 			 i,i0,i1,
 			 i<t[jj].taille? t[jj].colonne[i].numero: -1,
 			 i0<t[0].taille? t[0].colonne[i0].numero: -1,
-			 i1<t[1].taille? t[1].colonne[i1].numero: -1));
+			 i1<t[1].taille? t[1].colonne[i1].numero: -1);)
         }
 
         /* Cas d'impossibilite'  */
 	if(ii==-1) {
 	    DEBUG1(dump_tableau("sol infinie", t, compteur);
-		   printf("Solution infinie\n"););
+		   printf(stderr,"Solution infinie\n");)
 	    SOLUBLE(1)
 	}
 
@@ -1136,7 +1143,7 @@ sc_simplexe_feasibility_ofl_ctrl(
          *     qui remplacera la colonne j,
          *  cc = element (colonne j, ligne ii)
          */
-	DEBUG(printf("Pivoter %ld %ld\n",ii,jj));
+	DEBUG(printf("Pivoter %ld %ld\n",ii,jj);)
         
 	/* Remplir la derniere colonne temporaire de t
 	 *   qui contient un 1 en position ligne ii
@@ -1168,7 +1175,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 			   printfrac(t[j].colonne[i]) ;
 			   printfrac(t[jj].colonne[i1]) ;
 			   printfrac(cc);
-			   printfrac(pivot));
+			   printfrac(pivot);)
 		    
 		    if(i<t[j].taille &&  
 		       i1<t[jj].taille && 
@@ -1222,8 +1229,9 @@ sc_simplexe_feasibility_ofl_ctrl(
 			    } else {
 				frac *n = &(nlle_colonne[k]),
 				     *b = &(t[jj].colonne[i1]);
+				
 				if(ofl_ctrl == FWD_OFL_CTRL)
-				{
+				{				
 				    PIVOTOFL((*n),frac0,(*b),cc,pivot) ;
 				}
 				else 
@@ -1261,12 +1269,12 @@ sc_simplexe_feasibility_ofl_ctrl(
 			    if(i<t[j].taille) i++ ; else i1++ ;
 			}
 			else
-			    DEBUG2(printf(" ??? "));
+			    DEBUG2(printf(" ??? ");)
 
 		    DEBUG2(printf(" -> ");
 			   printfrac(nlle_colonne[k-1]);
 			   printf(" [ligne numero %d]\n", 
-				  nlle_colonne[k-1].numero));
+				  nlle_colonne[k-1].numero);)
 
 		}
 		if(j==compteur) w = jj ; else w = j ;
@@ -1282,8 +1290,8 @@ sc_simplexe_feasibility_ofl_ctrl(
 
     /* Restauration des entrees vides de la table hashee  */
     FINSIMPLEX :
-    DEBUG1(dump_tableau("fin simplexe", t, compteur));
-    DEBUG(fprintf(stderr, "soluble = %d\n", soluble));
+    DEBUG1(dump_tableau("fin simplexe", t, compteur);)
+    DEBUG(fprintf(stderr, "soluble = %d\n", soluble);)
 
     for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
       hashtable[i].nom = 0 ;
@@ -1304,9 +1312,10 @@ sc_simplexe_feasibility_ofl_ctrl(
     vect_rm(sc_base(sc));
     sc_base(sc) = saved_base;
     sc_dimension(sc) = saved_dimension;
-
+  
     return soluble;
 }     /* main */
 
 /* (that is all, folks!:-)
  */
+;
