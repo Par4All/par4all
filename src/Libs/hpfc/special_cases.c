@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: special_cases.c,v $
+ * Revision 1.26  1997/08/04 14:05:02  coelho
+ * convex also needed.
+ *
  * Revision 1.25  1997/08/04 14:03:31  coelho
  * new generic includes.
  *
@@ -23,6 +26,7 @@
 #include "conversion.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
+#include "effects-convex.h"
 
 /************************************************************** REDUCTIONS */
 
