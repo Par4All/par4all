@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.180  2002/04/26 12:53:54  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.179  2002/04/26 11:01:55  phamdat
  * *** empty log message ***
  *
@@ -379,7 +382,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.179 2002/04/26 11:01:55 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.180 2002/04/26 12:53:54 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2361,12 +2364,24 @@ text_statement(
      * sure that the free is NEVER performed as it should. FC.
      */
     if(!ENDP(text_sentences(temp))) {
-	MERGE_TEXTS(r, init_text_statement(module, margin, stmt));
+      /***********written by Dat*********/
+      text t = init_text_statement(module, margin, stmt);
+      if (!text_undefined_p(t)) {
+	MERGE_TEXTS(r, t);
 	if (! string_undefined_p(comments)) {
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
 						  strdup(comments)));
 	}
 	MERGE_TEXTS(r, temp);
+      }
+      gen_free_text(t);
+      /**********************************/
+      /*MERGE_TEXTS(r, init_text_statement(module, margin, stmt));
+	if (! string_undefined_p(comments)) {
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+						  strdup(comments)));
+	}
+	MERGE_TEXTS(r, temp);*/
     }
     else {
 	/* Preserve comments */
