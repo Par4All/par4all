@@ -87,11 +87,11 @@ static void insert_mapping(oper_id_mapping* item)
       operator_id_tree * next;
       char c = *s;
 
-      next = (operator_id_tree *)hash_get(t->sons, (void*)c);
+      next = (operator_id_tree *)hash_get(t->sons, (void*)((int)c));
       if (next == HASH_UNDEFINED_VALUE)
       {
 	 next = make_operator_id_tree();
-	 hash_put(t->sons, (void *)(c), (void*)next);
+	 hash_put(t->sons, (void *)((int)c), (void*)next);
       }
 
       t = next;
@@ -125,7 +125,7 @@ int get_operator_id(entity e)
       operator_id_tree * next;
       char c = *s;
 
-      next = (operator_id_tree *)hash_get(t->sons, (void*)c);
+      next = (operator_id_tree *)hash_get(t->sons, (void*)((int)c));
       if (next == HASH_UNDEFINED_VALUE)
 	 return UNKNOWN_TOK;
 
