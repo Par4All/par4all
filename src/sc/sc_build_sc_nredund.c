@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 2000/10/27 14:03:27 $, 
+ * $Date: 2000/11/17 16:37:09 $, 
  */
 
 #include <stdio.h>
@@ -194,6 +194,23 @@ int ofl_ctrl;
     *psc = sc;
 } 
 
+void sc_safe_build_sc_nredund_1pass(ps)
+Psysteme *ps;
+{   
+
+  if (!sc_rn_p(*ps) && !sc_empty_p(*ps))
+    {
+      Pbase b = base_dup(sc_base(*ps));
+      build_sc_nredund_1pass(ps);
+      if (*ps == SC_EMPTY)
+	*ps = sc_empty(b);
+      else {
+	base_rm(sc_base(*ps)); 
+	(*ps)->base = base_dup(b);
+      }
+    }
+}
+
 
 /* Computation of a new system sc from the system ps, where each 
  * constraint of the system ps is added to the new system sc, 
@@ -230,6 +247,23 @@ int ofl_ctrl;
   }
 }
 
+
+void sc_safe_build_sc_nredund_2pass(ps)
+Psysteme *ps;
+{   
+
+  if (!sc_rn_p(*ps) && !sc_empty_p(*ps))
+    {
+      Pbase b = base_dup(sc_base(*ps));
+      build_sc_nredund_2pass(ps);
+      if (*ps == SC_EMPTY)
+	*ps = sc_empty(b);
+      else {
+	base_rm(sc_base(*ps)); 
+	(*ps)->base = base_dup(b);
+      }
+    }
+}
 
 /* void  build_sc_nredund_2pass
  * Psysteme *psc;
