@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.81  1998/05/05 17:40:21  coelho
+ * info ++
+ *
  * Revision 1.80  1998/05/05 08:50:01  coelho
  * close accpet the current workspace name as an argument.
  *
@@ -313,6 +316,36 @@ static bool tp_close_the_workspace(string s)
     return result;
 }
 
+static void tp_some_info(string about)
+{
+    if (same_string_p(about, "workspace"))
+    {
+	string ws = db_get_current_workspace_name();
+	fprintf(stdout, "%s", ws? ws: "");
+    }
+    else if (same_string_p(about, "module"))
+    {
+	string m = db_get_current_module_name();
+	fprintf(stdout, "%s", m? m: "");
+    }
+    else if (same_string_p(about, "modules") &&
+	     db_get_current_workspace_name())
+    {
+	gen_array_t modules = db_get_module_list();
+	int n = gen_array_nitems(modules), i;
+	for(i=0; i<n; i++) 
+	    fprintf(stdout, "%s ", gen_array_item(modules, i));
+	gen_array_full_free(modules);
+    }
+    else if (same_string_p(about, "directory"))
+    {
+	char pathname[MAXPATHLEN];
+	fprintf(stdout, "%s", (char*) getcwd(pathname, MAXPATHLEN));
+    }
+    
+    fprintf(stdout, "\n");
+}
+
 %}
 
 %union {
@@ -439,13 +472,10 @@ i_echo: TK_ECHO TK_LINE TK_ENDOFLINE
 	}
 	;
 
-i_info: TK_INFO TK_ENDOFLINE
+i_info: TK_INFO TK_NAME TK_ENDOFLINE
 	{
-	    user_log("info: workspace is %s, module is %s\n",
-		     db_get_current_workspace_name()? 
-		     db_get_current_workspace_name(): "<none>",
-		     db_get_current_module_name()?
-		     db_get_current_module_name(): "<none>");
+	    tp_some_info($2);
+	    free($2);
 	}
 	;
 
