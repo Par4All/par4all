@@ -894,9 +894,9 @@ expression expr;
 				    (Variable) e_new,
 				    (Variable) e_old);
 
-	vect_add_elem(&vlb, e_new, d);
-	vect_add_elem(&vub, e_new, -d);
-	vect_add_elem(&vub, TCST, -(d-1));
+	vect_add_elem(&vlb, (Variable) e_new, (Value) d);
+	vect_add_elem(&vub, (Variable) e_new, (Value) -d);
+	vect_add_elem(&vub, TCST, (Value) -(d-1));
 	clb = contrainte_make(vlb);
 	cub = contrainte_make(vub);
 	clb->succ = cub;
