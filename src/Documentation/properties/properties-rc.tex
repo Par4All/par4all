@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.141  2000/05/17 07:57:55  coelho
+%% complex constant constructors option.
+%%
 %% Revision 1.140  2000/05/16 16:35:58  coelho
 %% props added for type checker...
 %%
@@ -128,7 +131,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2000/05/16 16:35:58 $~$
+$~$Date: 2000/05/17 07:57:55 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1648,11 +1651,13 @@ PARTIAL_EVAL_PROPAGATE_INTEGER_CONSTANTS TRUE
 
 Here are type checker options. Whether to deal with double complex or to
 refuse them. Whether to add a summary of errors, conversions and
-simplifications as a comment to the routine.
+simplifications as a comment to the routine. Whether to always show complex
+constructors.
 
 \begin{verbatim}
 TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION FALSE
 TYPE_CHECKER_ADD_SUMMARY FALSE
+TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
 \end{verbatim}
 
 %%
