@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.135  2000/05/16 11:19:19  coelho
+ * fixed prettypring of wrong codes (function/subroutine).
+ *
  * Revision 1.134  2000/05/15 16:05:05  coelho
  * fixed prettyprint bug when functions are used as subroutines...
  *
@@ -244,7 +247,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.134 2000/05/15 16:05:05 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.135 2000/05/16 11:19:19 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -488,12 +491,14 @@ words_regular_call(call obj, bool is_a_subroutine)
 	    return(CHAIN_SWORD(pc, entity_local_name(f)));
     }
 
-    if (type_void_p(functional_result(type_functional(t)))) {
-	pc = CHAIN_SWORD(pc, "CALL ");
-	if (!is_a_subroutine) {
+    if (type_void_p(functional_result(type_functional(t)))) 
+    {
+	if (is_a_subroutine) 
+	  pc = CHAIN_SWORD(pc, "CALL ");
+	else
 	  pips_user_warning("subroutine '%s' used as a function.\n",
 			    entity_name(f));
-	}
+
     }
     else if (is_a_subroutine) {
       pips_user_warning("function '%s' used as a subroutine.\n",
@@ -515,7 +520,8 @@ words_regular_call(call obj, bool is_a_subroutine)
 	}, call_arguments(obj));
 	pc = CHAIN_SWORD(pc, ")");
     }
-    else if(!type_void_p(functional_result(type_functional(t)))) {
+    else if(!type_void_p(functional_result(type_functional(t))) ||
+	    !is_a_subroutine) {
 	pc = CHAIN_SWORD(pc, "()");
     }
     return pc;
