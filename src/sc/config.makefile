@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/08 16:42:59 $, 
+# $Date: 1997/04/14 15:30:20 $, 
 
 LIB_CFILES=	sc_alloc.c \
 	        sc_projection.c \
@@ -32,22 +32,24 @@ LIB_HEADERS=	sc-local.h \
 		sc_gram.y \
 		sc_lex.l
 
-DERIVED_HEADERS=y.tab.h
+DERIVED_HEADERS=sc_gram.h
 DERIVED_CFILES=	sc_gram.c sc_lex.c
 
-$(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
+# $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
 
 LIB_OBJECTS= $(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o) 
 
-sc_lex.c: sc_lex.l
-	$(SCAN) $< | \
-	sed '/^FILE *\*/s,=[^,;]*,,g;s/YY/SYST_/g;s/yy/syst_/g;' > $@
+YY2SYST	= sed '/extern char \*malloc/d;/^FILE *\*/s,=[^,;]*,,g;\
+	s/YY/SYST_/g;s/yy/syst_/g;' 
 
-sc_gram.c y.tab.h: sc_gram.y
+sc_lex.c: sc_lex.l
+	$(SCAN) $< | $(YY2SYST)	> $@
+
+sc_gram.c sc_gram.h: sc_gram.y
 	$(PARSE) -d $<
-	sed -e '/extern char \*malloc/d;s/YY/SYST_/g;s/yy/syst_/g;' \
-		y.tab.c > sc_gram.c
-	$(RM) y.tab.c
+	$(YY2SYST) y.tab.c > sc_gram.c
+	$(YY2SYST) y.tab.h > sc_gram.h
+	$(RM) y.tab.c y.tab.h
  
 # end of $RCSfile: config.makefile,v $
 #
