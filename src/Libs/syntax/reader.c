@@ -325,6 +325,7 @@ char * s;
     /*NOTREACHED*/
 }
 
+/* Routine de lecture pour l'analyseur lexical, lex ou flex */
 int PipsGetc(fp)
 FILE * fp;
 {
@@ -370,6 +371,7 @@ FILE * fp;
     return((eof) ? EOF : UNQUOTE(c));
 }
 
+/* Routine de lecture physique */
 int GetChar(fp)
 FILE * fp;
 {
@@ -417,7 +419,11 @@ FILE * fp;
 				 LineNumber, col, lbuffer);
 		    LineTooLong = TRUE;
 		}
-		buffer[lbuffer++] = (col > 72) ? ' ' : c;
+		/* buffer[lbuffer++] = (col > 72) ? ' ' : c; */
+		/* buffer[lbuffer++] = (col > 72) ? '\n' : c; */
+		if(col <= 72) {
+		  buffer[lbuffer++] = c;
+		}
 		if (c != ' ')
 		    EmptyBuffer = FALSE;
 	    }
@@ -465,6 +471,7 @@ FILE * fp;
     return(c);
 }
 
+/* regroupementde la ligne initiale et des lignes suite en un unique buffer, Line */
 int ReadLine(fp)
 FILE * fp;
 {
@@ -493,28 +500,9 @@ FILE * fp;
 	PrevComm[0] = '\0';
     }
     while (strchr(START_COMMENT_LINE,(c = GetChar(fp))) != NULL) {
-      /* old version:
-	 Comm[iComm++] = c;
-	 if (tmp_b_C == UNDEF)
-	 tmp_b_C = LineNumber;
-	 
-	 while ((c = GetChar(fp)) != '\n')
-	 Comm[iComm++] = c;
-	  
-	 Comm[iComm++] = '\n';
-	 */
       if (tmp_b_C == UNDEF)
 	tmp_b_C = LineNumber;
 
-      /* OLD VERSION
-	do {
-	  Comm[iComm++] = c;
-	} while((c = GetChar(fp)) != '\n' && iComm < COMMLENGTH-2);
-      	if(iComm == COMMLENGTH-2)
-	  ParserError("ReadLine", 
-		      "Too many comments. Comment buffer overflow");
-        Comm[iComm++] = c;
-      */
       /* Modif by AP: oct 18th 1995
 
        	 Deals with comment buffer overflow. If the buffer is full, we
@@ -616,9 +604,12 @@ FILE * fp;
 	tmp_b_I = LineNumber;
     }
 
+    /* debug(9, "ReadLine", "Aggregation of continuation lines: '%s'\n", Line); */
+
     return(TypeOfLine);
 }
 
+/* regroupement des lignes du statement en une unique ligne sans continuation */
 int ReadStmt(fp)
 FILE * fp;
 {
@@ -645,8 +636,8 @@ FILE * fp;
 	    tmp_b_C = tmp_e_C = UNDEF;
 
 	    if ((TypeOfLine = ReadLine(fp)) == CONTINUATION_LINE) {
-		FatalError("ReadStmt",
-			   "[scanner] incorrect continuation line\n");
+		ParserError("ReadStmt",
+			   "[scanner] incorrect continuation line as first line\n");
 	    }
 	    else if (TypeOfLine == EOF_LINE) {
 		result = EOF;
