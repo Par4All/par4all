@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: config.makefile,v $
+# Revision 1.7  2001/01/04 09:48:36  nguyen
+# Add new phase : adn_instrumentation
+#
 # Revision 1.6  2000/12/12 16:40:50  nguyen
 # Add new phases : interprocedural_array_bound_check and top_down_array_declaration_normalization
 #
@@ -29,7 +32,8 @@ LIB_CFILES 	= \
 	array_bound_check_instrumentation.c \
 	partial_redundancy_elimination.c \
 	interprocedural_array_bound_check.c \
-	top_down_array_declaration_normalization.c
+	top_down_array_declaration_normalization.c \
+	adn_instrumentation.c
 
 LIB_HEADERS	= instrumentation-local.h
 
