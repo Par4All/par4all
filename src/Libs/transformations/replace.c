@@ -16,7 +16,7 @@
 
 #include "pipsdbm.h"
 #include "resources.h"
-#include "loop_normalize.h"
+/* #include "loop_normalize.h" */
 
 #include "transformations.h"
 
@@ -205,7 +205,7 @@ void ReplaceReference(char *mod_name, reference ref, expression next_expr)
     debug(1,"ReplaceReference","ReplaceReference for %s\n", mod_name);
 
     /* Sets the current module to "mod_name". */
-    current_module(local_name_to_top_level_entity(mod_name));
+    set_current_module_entity(local_name_to_top_level_entity(mod_name));
 
     mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, FALSE);
 
