@@ -104,6 +104,9 @@ expression has already been parsed to find all the items.
 \domain{statementInfo = simd:simdStatementInfo + nonsimd:statement}
 {}
 
+\domain{argumentInfo = expression x placesAvailable:vectorElement*}
+{}
+
 \section*{Transformation}
 
 \domain{transformation = name:string x vectorLength:int x subwordSize:int x nbArgs:int x mapping:int[16]}
