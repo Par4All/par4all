@@ -249,6 +249,7 @@ void insure_declaration_coherency(
 
 	 if (!entity_variable_p(var) ||
 	     !local_entity_of_module_p(var, module) ||
+	     storage_formal_p(entity_storage(var)) ||
 	     value_symbolic_p(entity_initial(var)) ||
 	     bound_referenced_variables_p(var))
 	 {
