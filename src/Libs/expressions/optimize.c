@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.44  2003/07/28 15:10:07  coelho
+ * "INV" -> INVERSE_OPERATOR_NAME
+ *
  * Revision 1.43  2000/08/22 08:36:40  coelho
  * comments added.
  *
@@ -736,7 +739,7 @@ static void optimize_simplify_nary_patterns(statement s)
   /* N-ARY * and 1/ -> N-ARY* / N-ARY*
    */
   multiply = entity_intrinsic(EOLE_PROD_OPERATOR_NAME);
-  inverse  = entity_intrinsic("INV");
+  inverse  = entity_intrinsic(INVERSE_OPERATOR_NAME);
   divide   = entity_intrinsic("/");
 
   gen_recurse(s, call_domain, gen_true, call_nary_rwt);
@@ -942,7 +945,7 @@ typedef struct
 
 static symetric_opertor_t symop[] =
 { { "-", "+", "--", FALSE },
-  { "/", "*", "INV", TRUE },
+  { "/", "*", INVERSE_OPERATOR_NAME, TRUE },
   { NULL, NULL, NULL, FALSE }
 };
 
