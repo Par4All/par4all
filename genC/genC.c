@@ -4,6 +4,9 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.37  1998/04/14 22:05:56  coelho
+ * more named fields (tag and index).
+ *
  * Revision 1.36  1998/04/14 20:18:53  coelho
  * more hacks and compatibility.
  *
@@ -251,16 +254,21 @@ static void generate_struct_members(
      */
     fprintf(out, 
 	    "struct " STRUCT "%s {\n"
-	    INDENT "gen_chunk type; /* int */\n",
+	    INDENT "gen_chunk _type_; /* int */\n",
 	    bp->name);
  
     /* there is an additionnal field in tabulated domains.
      */
     if (IS_TABULATED(bp))
-	fprintf(out, INDENT "gen_chunk index; /* int */\n");
+	fprintf(out, 
+		INDENT "gen_chunk _%s_index_; /* int */\n", 
+		bp->name);
 
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
-	fprintf(out, INDENT "gen_chunk tag; /* int */\n" INDENT "union {\n");
+	fprintf(out, 
+		INDENT "gen_chunk _%s_tag_; /* int */\n" 
+		INDENT "union {\n",
+		bp->name);
 	offset = INDENT;
     }
 
@@ -301,11 +309,11 @@ static void generate_access_members(
     string in_between, name=bp->name;
     int i;
 
-    fprintf(out, "#define %s_domain_number(x) ((x)->type.i)\n", name);
+    fprintf(out, "#define %s_domain_number(x) ((x)->_type_.i)\n", name);
 
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
 	in_between = "u.";
-	fprintf(out, "#define %s_tag(x) ((x)->tag.i)\n", name);
+	fprintf(out, "#define %s_tag(x) ((x)->_%s_tag_.i)\n", name, name);
     }
     else in_between = "";
     
