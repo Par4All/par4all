@@ -46,7 +46,7 @@ install_macros:
 	#
 	# installing makefile macros for pips/newgen/linear
 	#
-	# $(COPY) $(MACROS) $(PIPS_INCLUDEDIR)
+	$(COPY) $(MACROS) $(PIPS_INCLUDEDIR)
 	$(COPY) $(MACROS) $(NEWGEN_INCLUDEDIR)
 	$(COPY) $(MACROS) $(LINEAR_INCLUDEDIR)
 
@@ -61,6 +61,7 @@ install_forward_makefiles:
 	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Passes/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Scripts/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Runtime/Makefile
+	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Documentation/Makefile
 	#
 	# NEWGEN
 	$(COPY) forward_gnu_makefile ${NEWGEN_ROOT}/Makefile
