@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.51  1998/12/23 12:54:47  ancourt
+ * eliminate sharing on expression
+ *
  * Revision 1.50  1998/12/18 19:51:03  irigoin
  * Detection of PARAMETER variable used as lhs in assignment,
  * MakeAssingInst(). Two new functions, MakeSimpleIoInst1() and
@@ -1186,7 +1189,8 @@ instruction i;
 /* this function transforms an arithmetic if statement into a set of
 regular tests. long but easy to understand without comments.
 
-e is the test expression.
+e is the test expression. e is inserted in the instruction returned
+(beware of sharing)
 
 l1, l2, l3 are the three labels of the original if statement.
 
@@ -1277,7 +1281,7 @@ string l1, l2, l3;
 	e1 = MakeBinaryCall(CreateIntrinsic(".LT."), 
 			    e, MakeIntegerConstantExpression("0"));
 	e2 = MakeBinaryCall(CreateIntrinsic(".EQ."), 
-			    e, MakeIntegerConstantExpression("0"));
+			    copy_expression(e), MakeIntegerConstantExpression("0"));
 
 	s1 = instruction_to_statement(MakeGotoInst(l1));
 	s2 = instruction_to_statement(MakeGotoInst(l2));
