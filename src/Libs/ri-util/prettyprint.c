@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.210  2002/04/29 14:56:41  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.209  2002/04/29 14:54:42  phamdat
  * *** empty log message ***
  *
@@ -469,7 +472,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.209 2002/04/29 14:54:42 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.210 2002/04/29 14:56:41 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -1626,7 +1629,7 @@ sentence_goto(
     return sentence_goto_label(module, label, margin, tlabel, n);
 }
 
-
+static bool found_filter = FALSE;
 /********************************************************************* TEXT */
 
 static text 
@@ -2404,7 +2407,6 @@ text_instruction(
 /* Handles all statements but tests that are nodes of an unstructured.
  * Those are handled by text_control.
  */
-static bool found_filter = FALSE;
 
 text 
 text_statement(
