@@ -209,6 +209,10 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     a = effect_action_tag(current);
 
     /* may/do we have to combine ? */
+    /* ??? FC this should be no big deal... anyway :
+     * in the previous implementation, 'current' was not yet
+     * passed thru proper_to_summary_effect_func when tested...
+     */
     may_combine = !scalars_only_p || effect_scalar_p(current);
 
     if (may_combine)
