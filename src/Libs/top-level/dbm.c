@@ -134,7 +134,55 @@ char *name;
 
     return success;
 }
-     
+
+
+/* Used when a worspace is closed since it is useless and dangerous to
+   save on disk some no longer valid resources... */
+void
+free_any_non_up_to_date_resource_in_memory()
+{
+    list non_up_to_date_resources = NIL;
+    list up_to_date_resources = NIL;
+
+    debug_on("PIPSDBM_DEBUG_LEVEL");
+    /* For all the resources of the current workspace: */
+    MAP(RESOURCE, r, {
+	string rn = resource_name(r);
+	string on = resource_owner_name(r);
+	if (status_memory_p(resource_status(r))
+	    /* Quite inefficient... */
+	    && !real_resource_up_to_date_p(rn, on)) {
+	    /* Add this resource to the list of useless ones: */
+	    non_up_to_date_resources =
+		CONS(RESOURCE, r, non_up_to_date_resources);
+	    debug(2, "free_any_non_up_to_date_resource_in_memory",
+		  "mark %s(%s) as non up to date\n", rn, on);
+	}
+	else {
+	    up_to_date_resources =
+		CONS(RESOURCE, r, up_to_date_resources);
+	    debug(2, "free_any_non_up_to_date_resource_in_memory",
+		  "keep %s(%s) as up to date resource or on disk\n", rn, on);
+	}
+    }, database_resources(db_get_current_workspace()));
+
+    /* Free all the non up to date resources in memory: */
+    MAP(RESOURCE, r, {
+	free_resource_content(r);
+    },
+	non_up_to_date_resources);
+    gen_full_free_list(non_up_to_date_resources);
+    
+    /* Keep the useful resources: */
+    gen_free_list(database_resources(db_get_current_workspace()));
+    /* Put the useful resources in the original order: */
+    database_resources(db_get_current_workspace()) =
+	gen_nreverse(up_to_date_resources);
+
+    debug_off();
+}
+
+
 /* should be: success (cf wpips.h) */
 bool open_workspace(name)
 char *name;
@@ -164,6 +212,8 @@ bool close_workspace()
 {
     bool success;
 
+    /* It is useless to save on disk some non up to date resources: */
+    free_any_non_up_to_date_resource_in_memory();
     success = make_close_workspace();
     close_log_file();
     reset_entity_to_size();
