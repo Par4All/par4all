@@ -296,7 +296,7 @@ set_methods_for_convex_effects()
     db_get_summary_out_effects_func = db_get_convex_summary_out_regions;
     db_put_summary_out_effects_func = db_put_convex_summary_out_regions;
 
-    set_contracted_proper_effects(PROPER_EFFECTS_CONTRACT);
+    set_contracted_proper_effects(TRUE);
     set_descriptor_range_p(TRUE);
 }
 
