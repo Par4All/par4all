@@ -1,10 +1,13 @@
 /*
-  $Id: errors.c,v 1.4 2004/02/11 10:19:54 verdoolaege Exp $
+  $Id: errors.c,v 1.5 2004/08/31 18:01:56 verdoolaege Exp $
 
   Exception management.
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.5  2004/08/31 18:01:56  verdoolaege
+  remove warning
+
   Revision 1.4  2004/02/11 10:19:54  verdoolaege
   add const qualifier
 
@@ -75,6 +78,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "arithmetique.h"
 
