@@ -107,6 +107,9 @@ static void db_reset_logical_time(void)
 #define DATABASE_SYMBOLS	"SYMBOLS"
 #define DATABASE_MISC		"MISC"
 
+/* newgen type translation data... */
+#define DATABASE_NEWGEN		"NEWGEN"
+
 string db_get_meta_data_directory()
 {
     return db_get_directory_name_for_module(METADATA);
@@ -163,6 +166,11 @@ static bool save_meta_data(bool do_free)
     safe_fclose(file, file_name);
     free(file_name);
 
+    pips_debug(2, "saving newgen type translation data\n");
+    file_name = meta_data_db_file_name(DATABASE_NEWGEN);
+    gen_type_translation_write(file_name);
+    free(file_name);
+    
     pips_debug(2, "done\n");
 
     return TRUE;
@@ -178,7 +186,7 @@ static bool load_meta_data(void)
 {
     string file_name, ws_name;
     FILE * file;
-    int time, read;
+    int time;
     bool ok;
     
     pips_debug(2, "loading database misc data\n");
@@ -214,6 +222,14 @@ static bool load_meta_data(void)
     safe_fclose(file, file_name);
     free(file_name);
 
+    pips_debug(2, "loading newgen type translation data\n");
+    file_name = meta_data_db_file_name(DATABASE_NEWGEN);
+    if (file_exists_p(file_name))
+      gen_type_translation_read(file_name);
+    else
+      pips_user_warning("no newgen type translation file...");
+    free(file_name);
+    
     pips_debug(2, "done\n");
 
     return TRUE;
