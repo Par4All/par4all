@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.79  1997/09/19 07:50:09  coelho
+ * hpf directive with !.
+ *
  * Revision 1.78  1997/09/17 13:47:58  coelho
  * complex 8/16 distinction.
  *
@@ -50,7 +53,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.78 1997/09/17 13:47:58 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.79 1997/09/19 07:50:09 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -2010,6 +2013,8 @@ loop_private_variables(loop obj)
  * unformatted domain, because the directive prolog would not be well
  * managed there.
  */
+#define HPF_DIRECTIVE "!HPF$ "
+
 static text 
 text_hpf_directive(
     loop obj,   /* the loop we're interested in */
@@ -2050,7 +2055,7 @@ text_hpf_directive(
 					    strdup(" ")), ls);
 
 	ls = CONS(SENTENCE, make_sentence(is_sentence_formatted, 
-					  strdup("CHPF$ ")), ls);
+					  strdup(HPF_DIRECTIVE)), ls);
 
 	gen_free_list(ln);
     }
