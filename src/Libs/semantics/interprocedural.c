@@ -866,6 +866,7 @@ transformer call_site_to_module_precondition(entity caller,
 						  seffects_callee);
     call_site_prec = transformer_normalize(call_site_prec, 2);
     /* translate_global_values(e_caller, call_site_prec); */
+    free_value_mappings();
     reset_current_module_entity();
 
     /* Now deal with the callee */
@@ -878,6 +879,7 @@ transformer call_site_to_module_precondition(entity caller,
     reset_current_module_statement();
     reset_cumulated_rw_effects();
     reset_semantic_map();
+    free_value_mappings();
 
     return call_site_prec;
 }
