@@ -127,14 +127,10 @@ char *f;
 Pvecteur vect_make(va_alist)
 va_dcl
 {
-    va_list 
-	ap = NULL;
-    Variable
-	var = (Variable) NULL;
-    Value
-	val = (Value) 0;
-    Pvecteur
-	v = VECTEUR_UNDEFINED;
+    va_list ap = NULL;
+    Variable var = (Variable) NULL;
+    Value val = (Value) 0;
+    Pvecteur v = VECTEUR_UNDEFINED;
 
     va_start (ap);
     v = va_arg(ap, Pvecteur);
