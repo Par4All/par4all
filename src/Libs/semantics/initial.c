@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.9  1997/09/11 12:34:16  coelho
+ * duplicates instead of relying on pipsmake/pipsdbm...
+ *
  * Revision 1.8  1997/09/11 12:00:10  coelho
  * none.
  *
@@ -160,9 +163,9 @@ program_precondition(string name)
 	transformer tm;
 	pips_debug(1, "considering module %s\n", module_list[i]);
 	
-	tm = (transformer) 
+	tm = transformer_dup((transformer) /* no dup & FALSE => core */
 	    db_get_memory_resource(DBR_INITIAL_PRECONDITION,  
-				   module_list[i], FALSE);
+				   module_list[i], TRUE));
 
 	pred_debug(3, "current: t =\n", t);
 	pred_debug(2, "to be added: tm =\n", tm);
