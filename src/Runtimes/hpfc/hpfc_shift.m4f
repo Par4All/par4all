@@ -1,6 +1,6 @@
 c
 c $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-c ($Date: 1996/09/07 16:42:21 $, )
+c ($Date: 1996/09/09 17:04:01 $, )
 c
 c
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -146,7 +146,7 @@ c
       integer glb, gub, glbd, gubd, p1, p2, last
 c
       debug(write (unit=0, fmt=*)
-     $     "hpfc shift array/dim/area: ", array, dim, lb, ub)
+     $     "hpfcshift array/dim/area: ", array, dim, lb, ub)
       call hpfc tdim(array, dim, template, tdim)
       call hpfc pdim(template, tdim, procs, pdim)
       call hpfc loop bounds(nlb, nub, llb, lb, ub, array, pdim)
@@ -160,7 +160,7 @@ c
          lb2=1
          ub2=0
          lid2=-1
-         debug(write (unit=0, fmt=*) "hpfc shift, nothing for ", MYLID)
+         debug(write (unit=0, fmt=*) "hpfcshift, nothing for ", MYLID)
          return
       endif
       glb = llb+1
@@ -191,8 +191,6 @@ c only one target
          ub2=nub
          call hpfc cmp lid(procs, pdim, p2, lid2)
       endif
-      debug(write (unit=0, fmt=*) "hpfc shift, for ", MYLID,
-     $     ": ", lb1, ub1, lid1, lb2, ub2, lid2)
       end
 c
 c after packing functions
@@ -246,8 +244,8 @@ c
             call HPFC LOOP BOUNDS
      $           (l(i), u(i), tmp, il(i), iu(i), 
      $            an, hpfc proc dim(an, i))
-            debug(write (unit=0, fmt=*) MYLID, " dim ", i, " bounds: ",
-     $           l(i), u(i))
+            debug(`write (unit=0, fmt=*) MYLID, " dim ", i, " bounds: ", 
+     $           l(i), u(i)')
          else
             call hpfc shift
      $           (an, dim, il(i), iu(i), sh,
@@ -264,7 +262,7 @@ c
       enddo
       do j=1, 2
          if (lid(j).eq.MY LID) then
-            debug(write (unit=0, fmt=*) MYLID, " copying shift")
+            debug(write (unit=0, fmt=*) MYLID, " copying Shift")
 c
 c the SHIFT is local
 c         
@@ -275,7 +273,7 @@ SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
          else
             if (lid(j).gt.0) then
                debug(write (unit=0, fmt=*)
-     $              MYLID, " sending shift to ", lid(j))
+     $              MYLID, " sending Shift to ", lid(j))
 c
 c the SHIFT is to another processor
 c
@@ -304,7 +302,7 @@ c
        do j=1, 2
           if (lid(j).gt.0.and.lid(j).ne.MY LID) then
              debug(write (unit=0, fmt=*) 
-     $            MY LID, " receiving shift from ", lid(j))
+     $            MY LID, " receiving Shift from ", lid(j))
 c
 c the SHIFT is to another processor
 c
