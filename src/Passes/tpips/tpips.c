@@ -399,7 +399,9 @@ void help_handler(char * line)
 
 void quit_handler(char * line)
 {
-    debug_off();
+    /* FI: cannot be done here because debug_on() was called
+       in another function. Fortunately, it does not matter. */
+    /* debug_off(); */
 
     /*   close history: truncate list and write history file
      */
