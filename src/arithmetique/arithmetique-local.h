@@ -23,13 +23,7 @@
 /* to be included for _MIN and _MAX: #include <limits.h>
  */
 
-/* default type for Value
- */
-#ifndef LINEAR_VALUE
-#define LINEAR_VALUE LONG
-#endif
-
-#if LINEAR_VALUE == LONGLONG
+#if defined(LINEAR_VALUE_IS_LONGLONG)
 typedef long long Value;
 #define VALUE_FMT "%lld"
 #define VALUE_CONST(val) val##LL
@@ -45,9 +39,9 @@ typedef long long Value;
     ((long)(val>=(Value)LONG_MIN&&val<=(Value)LONG_MAX)?val:abort())
 #define VALUE_TO_INT(val) \
     ((int)(val>=(Value)INT_MIN&&val<=(Value)INT_MAX)?val:abort())
-#endif /* LONGLONG */
-
-#if LINEAR_VALUE == LONG
+/* end LINEAR_VALUE_IS_LONGLONG
+ */
+#elif defined(LINEAR_VALUE_IS_LONG)
 typedef long Value;
 #define VALUE_FMT "%ld"
 #define VALUE_CONST(val) val##L
@@ -58,7 +52,35 @@ typedef long Value;
 #define VALUE_MONE -1L
 #define VALUE_TO_LONG(val) (val)
 #define VALUE_TO_INT(val) ((int)val)
-#endif /* LONG */
+/* end LINEAR_VALUE_IS_LONG
+ */
+#elif defined(LINEAR_VALUE_IS_FLOAT)
+typedef float Value;
+#define VALUE_FMT "%f"
+#define VALUE_CONST(val) val
+#define VALUE_MIN FLOAT_MIN
+#define VALUE_MAX FLOAT_MAX
+#define VALUE_ZERO 0
+#define VALUE_ONE  1
+#define VALUE_MONE -1
+#define VALUE_TO_LONG(val) ((long)val)
+#define VALUE_TO_INT(val) ((int)val)
+/* end LINEAR_VALUE_IS_FLOAT
+ */
+#else /* default: LINEAR_VALUE_IS_INT */
+typedef int Value;
+#define VALUE_FMT "%d"
+#define VALUE_CONST(val) val
+#define VALUE_MIN INT_MIN
+#define VALUE_MAX INT_MAX
+#define VALUE_ZERO 0
+#define VALUE_ONE  1
+#define VALUE_MONE -1
+#define VALUE_TO_LONG(val) ((long)val)
+#define VALUE_TO_INT(val) ((int)val)
+/* end LINEAR_VALUE_IS_INT
+ */
+#endif 
 
 #define VALUE_POS_P(val) (val>VALUE_ZERO)
 #define VALUE_NEG_P(val) (val<VALUE_ZERO)
