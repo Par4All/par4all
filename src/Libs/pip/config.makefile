@@ -1,24 +1,38 @@
 #
 # List of other libraries used to build the test main program
-MAIN_LIBS=	-lri-util -lproperties -ltext-util -ldg-util -lmisc \
-                -lproperties -lgenC -lplint -lmatrice -lpolyedre \
-                -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte \
-                -lpolynome -lvecteur -larithmetique -lreductions -lm \
-                /usr/lib/debug/malloc.o
+# MAIN_LIBS=	-lri-util -lproperties -ltext-util -ldg-util -lmisc \
+#                 -lproperties -lgenC -lplint -lmatrice -lpolyedre \
+#                 -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte \
+#                 -lpolynome -lvecteur -larithmetique -lreductions -lm \
+#                /usr/lib/debug/malloc.o
 
+# can't stand bison:-(
+YACC=	yacc
+YFLAGS=	
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
-LIB_CFILES=	pip.c ps_max_to_min.c ps_to_fic_pip.c solpip.c \
-		pip_interface.c sol.c traiter.c tab.c integrer.c maind.c
-LIB_HEADERS=	pip-local.h solpip_parse.y solpip_scan.l type.h tab.h sol.h
-LIB_OBJECTS=	pip.o ps_max_to_min.o ps_to_fic_pip.o solpip.o \
-		solpip_parse.o solpip_scan.o pip_interface.o sol.o traiter.o tab.o integrer.o maind.o
+LIB_CFILES=	pip.c \
+		ps_max_to_min.c \
+		ps_to_fic_pip.c \
+		solpip.c \
+		pip_interface.c \
+		sol.c \
+		traiter.c \
+		tab.c \
+		integrer.c \
+		maind.c
 
-solpip_parse.o : solpip_parse.c
-	${CC} $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -g $< -o $@
+DERIVED_CFILES=	solpip_parse.c \
+		solpip_scan.c
 
-solpip_scan.o : solpip_scan.c solpip_parse.h
-	${CC} $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -g $< -o $@
+LIB_HEADERS=	pip-local.h \
+		solpip_parse.y \
+		solpip_scan.l \
+		type.h \
+		tab.h \
+		sol.h
+
+LIB_OBJECTS=	$(DERIVED_CFILES:.c=.o)  $(LIB_CFILES:.c=.o)
 
 solpip_parse.c solpip_parse.h : solpip_parse.y
 	${YACC} -d solpip_parse.y
