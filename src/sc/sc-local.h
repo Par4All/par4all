@@ -17,11 +17,14 @@
   *    le terme constant; FI, 13/12/89;
   */
 
+
 #ifndef SYSTEME
 /* constante definissant le type Systeme */
 #define SYSTEME 1001
 
 #include "arithmetique.h"
+#include "iproblem.h"
+#include "rproblem.h"
 
 /*
  * Le champ dimension donne le nombre de variables utilisees dans 
@@ -48,6 +51,7 @@ typedef struct Ssysteme {
 	int dimension;
 	Pbase base;
 	} *Psysteme,Ssysteme;
+
 
 /* - Traitement des overflows :
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~ 
