@@ -386,8 +386,6 @@ Ptsg  sc_to_sg_chernikova(Psysteme sc)
     Ptsg sg = NULL;
     Polyhedron *A = NULL;
 
-    assert(!SC_UNDEFINED_P(sc) && (sc_dimension(sc) != 0));
-
     CATCH(any_exception_error)
     {
       if (A) Polyhedron_Free(A);
@@ -398,6 +396,8 @@ Ptsg  sc_to_sg_chernikova(Psysteme sc)
     }
     TRY 
     {
+      assert(!SC_UNDEFINED_P(sc) && (sc_dimension(sc) != 0));
+
       sg = sg_new();
       nbrows = sc->nb_eq + sc->nb_ineq + 1;
       nbcolumns = sc->dimension +2;
@@ -485,12 +485,25 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     int nbcolumns2 = 0;
     Polyhedron *A1 = NULL,*A2 = NULL;
     Matrix *a = NULL;
-    Psysteme sc = sc_new();
+    Psysteme sc = NULL;
     Polyhedron *A = NULL;
     unsigned int i1,i2,j;
     int Dimension,cp;
 
-    /* mem_spy_begin(); */
+    CATCH(any_exception_error)
+    {
+      if (a) Matrix_Free(a);
+      if (a1) Matrix_Free(a1);
+      if (a2) Matrix_Free(a2);
+      if (A) Polyhedron_Free(A);
+      if (A1) Polyhedron_Free(A1);
+      if (A2) Polyhedron_Free(A2);
+      if (sc) sc_rm(sc);
+      
+      RETHROW();
+    }
+    TRY 
+    {
 
     assert(!SC_UNDEFINED_P(sc1) && (sc_dimension(sc1) != 0));
     assert(!SC_UNDEFINED_P(sc2) && (sc_dimension(sc2) != 0));
@@ -522,20 +535,6 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	fprintf(stderr, "\na2 =");
 	Matrix_Print(stderr, "%4d",a2);
     }
-    
-    CATCH(any_exception_error)
-    {
-      if (a) Matrix_Free(a);
-      if (a1) Matrix_Free(a1);
-      if (a2) Matrix_Free(a2);
-      if (A) Polyhedron_Free(A);
-      if (A1) Polyhedron_Free(A1);
-      if (A2) Polyhedron_Free(A2);
-      
-      RETHROW();
-    }
-    TRY 
-    {
 
     A1 = Constraints2Polyhedron(a1, MAX_NB_RAYS);
     Matrix_Free(a1), a1 = NULL; 
@@ -617,20 +616,17 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	Polyhedron_Free(A2), A2 = NULL;
 	
 	A = Rays2Polyhedron(a, MAX_NB_RAYS);
-
 	Matrix_Free(a), a = NULL;
+
 	a = Polyhedron2Constraints(A);    
 	Polyhedron_Free(A), A = NULL;
     }
 
+    sc = sc_new();
     matrix_to_sc(a,sc);
-    Matrix_Free(a);
+    Matrix_Free(a), a = NULL;
 
     sc = sc_normalize(sc);
-
-    } /* end TRY */
-
-    UNCATCH(any_exception_error);
 
     if (sc == NULL) {
 	Pcontrainte pc = contrainte_make(vect_new(TCST, VALUE_ONE));
@@ -639,7 +635,9 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	sc->dimension = vect_size(sc->base);
     }
 
-    /* mem_spy_end("sc_convex_hull"); */
+    } /* end TRY */
+
+    UNCATCH(any_exception_error);
 
     return sc;
 }
