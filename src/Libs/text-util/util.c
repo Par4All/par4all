@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+
+#include "arithmetique.h"
+
 #include "genC.h"
 #include "text.h"
 #include "text-util.h"
@@ -168,6 +171,16 @@ add_to_current_line(
 	return;
 
     strcat(buffer, append);
+}
+
+void
+add_Value_to_current_line(
+    string buffer,
+    Value v,
+    string continuation,
+    text t)
+{
+    add_to_current_line(buffer, Value_to_string(v), continuation, t);
 }
 
 void
