@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2002/10/14 15:28:59 olaru Exp $
+# $Id: makefile,v 1.1 2002/10/15 08:20:48 kienhuis Exp $
 #
 
 ROOT  = ../..
@@ -24,7 +24,7 @@ test:
 	@failedtest=0; \
 	for x in $(GENERAL) ; do \
 		echo "Verify file $$x"; \
-		$(ROOT)/bin/$(OBJ_DIR)/polytest.exec < $$x > xyz;\
+		$(ROOT)/bin/polytest.exec < $$x > xyz;\
 		diff -w xyz `basename $$x .in`.out ; \
 		result=$$?; \
 		if [ "$$result" -eq "1" ]; then \

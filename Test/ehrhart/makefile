@@ -1,5 +1,5 @@
 #
-# $Id: makefile,v 1.1 2002/10/14 15:31:43 olaru Exp $
+# $Id: makefile,v 1.2 2002/10/15 08:20:48 kienhuis Exp $
 #
 
 ROOT  = ../..
@@ -51,7 +51,7 @@ test:
 	@failedtest=0; \
 	for x in $(EHRHART) ; do \
 		echo "Verify file $$x" ; \
-		$(ROOT)/bin/$(OBJ_DIR)/testehrhart.exec < $$x > xyz;\
+		$(ROOT)/bin/testehrhart.exec < $$x > xyz;\
 		diff -w xyz `basename $$x .in`.out ; \
 		result=$$?; \
 		if [ "$$result" -eq "1" ]; then \
