@@ -1434,7 +1434,6 @@ int gen_free_tabulated(int domain)
   hash_table_free(free_already_seen);
   free_already_seen = NULL;
 
-  /* bp->alloc = 1; // ??? */
   return domain;
 }
 
@@ -2201,8 +2200,6 @@ void gen_read_spec(char * spec, ...)
 
     compile() ;
 
-    gen_init_all_tabulateds();
-
     for (bp=Domains ; bp<&Domains[MAX_DOMAIN]; bp++)
     {
 	if(bp->name && !IS_INLINABLE(bp) && !IS_EXTERNAL(bp) &&
@@ -2210,15 +2207,9 @@ void gen_read_spec(char * spec, ...)
 	  user( "Cannot run with imported domains: %s\n", bp->name ) ;
 	    return ;
 	}
-	if (IS_TABULATED(bp))
-	{
-	    int i ;
-	    bp->alloc = 1 ;
-	    gen_lazy_init_gen_tabulated_names();
-	    gen_init_tabulated_set_domain(bp->index, bp-Domains);
-	}
     }
 
+    /* burk. turn CONS to functions? */
     gen_cp_ = &Gen_cp_[ 0 ] ;
     gen_hash_ = &Gen_hash_[ 0 ] ;
 
