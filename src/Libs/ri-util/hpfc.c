@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc.c,v $ (version $Revision$)
- * $Date: 1997/01/18 16:19:06 $, 
+ * $Date: 1998/04/14 15:20:42 $, 
  *
  * functions to test hpfc-related special entities. needed by syntax.
  * moved here from hpfc to break a cyclic dependence hpfc -> syntax.
@@ -10,6 +10,8 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "ri.h"
