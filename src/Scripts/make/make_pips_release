@@ -1,11 +1,11 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/10/22 20:29:57 $, 
+# $Date: 1996/12/04 23:43:28 $, 
 #
 # (c) Fabien COELHO 1996
 
-unset pack what tz zip name tostrip strip install
+unset pack what tz zip name tostrip strip install addpublic
 
 tar=${PIPS_TAR:-gtar}
 taropt=cf
@@ -45,6 +45,7 @@ usage()
 	    -n: Newgen
 	    -l: Linear
 	    -e: Extern (other softs...)
+	    -P: Public (daVinci, toolpack)
 	  name: target (a date & content-dependent default is provided)
 	EOF
     exit $ret
@@ -53,7 +54,7 @@ usage()
 #
 # get options
 
-while getopts hvrszw:CSB:L:D:pnle opt
+while getopts hvrszw:CSB:L:D:pnleP opt
 do
     case $opt in
 	h) usage 0 some help ;;
@@ -75,6 +76,7 @@ do
 	n) pack="$pack NEWGEN" ; name="${name}n" ;;
 	l) pack="$pack LINEAR" ; name="${name}l" ;;
 	e) pack="$pack EXTERN" ; name="${name}e" ;;
+	P) addpublic="$TOOLPACK_DIR $DAVINCIHOME" ;;
 	*) usage 1 "invalid option -$opt" ;;
     esac
 done
@@ -91,6 +93,7 @@ test -d $name || mkdir $name || error 2 "cannot create directory $name"
 #
 # get the files
 
+$verb getting ${pack}:
 for p in $pack
 do
     #
@@ -100,6 +103,7 @@ do
 	NEWGEN) root=$NEWGEN_ROOT ; trg=$cwd/$name/Newgen ;;
 	LINEAR) root=$LINEAR_ROOT ; trg=$cwd/$name/Linear ;;
 	EXTERN) root=$EXTERN_ROOT ; trg=$cwd/$name/Extern ;;
+	TOOLPACK) root=$TOOLPACK_DIR ; trg=$cwd/$name/Toolpack ;;
     esac
 
     #
@@ -115,6 +119,15 @@ do
 	$verb stripping binaries
 	for d in $tostrip ; do $strip $trg/$d/* ; done
     }
+done
+
+
+#
+# Get public directory in a raw fashion, unstripped any way:
+$verb getting raw ${addpublic}:
+for p in ${addpublic}
+do
+    (cd `dirname $p`; gtar cf - `basename $p`) | (cd $cwd/$name; gtar xf -)
 done
 
 #
