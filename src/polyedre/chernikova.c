@@ -15,12 +15,15 @@
 #include "sg.h"
 #include "polyedre.h"
 
-/* IRISA  data structures */
+/* IRISA  data structures.
+ */
 #include "polylib/polylib.h"
 
 /* maximum number of rays allowed in chernikova... (was 20000)
+ * it does not look a good idea to move the limit up, as it
+ * makes both time and memory consumption to grow a lot.
  */
-#define MAX_NB_RAYS (25000)
+#define MAX_NB_RAYS (20000)
 
 /* Irisa is based on int. We would like to change this to 
  * some other type, say "long long" if desired, as VALUE may
