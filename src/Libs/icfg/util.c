@@ -57,7 +57,7 @@ string remove_newline_of_string(string s)
     return r;
 }
 
-string add_flash_newline_to_string(string s)
+static string convert_string_for_daVinci_graph(string s)
 {
     string r;
     int l = strlen(s);
@@ -66,11 +66,21 @@ string add_flash_newline_to_string(string s)
     else if (*(s + l - 1) == '\n') {
         r = (string)malloc(l + 1);
 	memset(r, 0, l + 1);
-	strncpy(r, s, l - 1);
+	if (strstr(s, "C               <") == s) {/* effects lines */
+	    r[0] = ' '; /* delete the comment of effects */
+	    strncpy(r + 1, s + 1, l - 2);
+	} else {
+	    strncpy(r, s, l - 1);
+	}
     } else {
         r = (string)malloc(l + 2);
 	memset(r, 0, l + 2);
-	strcpy(r, s);
+	if (strstr(s, "C               <") == s) {/* effects lines */
+	    r[0] = ' '; /* delete the comment of effects */
+	    strcpy(r + 1, s + 1);
+	} else {
+	    strcpy(r, s);
+	}
     }
     strcat(r, "\\n");
     return r;
@@ -147,9 +157,9 @@ void print_graph_of_text_to_daVinci(FILE * f_out, list l_of_vers)
 		first_sentence = FALSE;
 	    }
 	    if (strstr(s, CALL_MARK)) {
-	      /*fprintf(f_out, add_flash_newline_to_string(s + strlen(CALL_MARK)));*/
+	      /*fprintf(f_out, convert_string_for_daVinci_graph(s + strlen(CALL_MARK)));*/
 	    } else {
-	        fprintf(f_out, add_flash_newline_to_string(s));
+	        fprintf(f_out, convert_string_for_daVinci_graph(s));
 	    }
 	}, text_sentences(node_parent_text));
 	
