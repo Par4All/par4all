@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/12/10 16:20:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/12/12 14:20:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/12/10 16:20:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/12/12 14:20:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -234,11 +234,11 @@ hash_table used_labels;
    that CONTROLIZE links predecessors and successors of C_RES, updates the
    successors of PRED and the predecessors of SUCC. */
 
-bool controlize(st, pred, succ, c_res, used_labels)
-statement st;
-control pred, succ;
-control c_res;
-hash_table used_labels;
+bool controlize(
+    statement st,
+    control pred, succ,
+    control c_res,
+    hash_table used_labels)
 {
     instruction i = statement_instruction(st);
     string label = entity_name(statement_label(st));
@@ -247,7 +247,8 @@ hash_table used_labels;
     bool controlized=FALSE;
 
     ifdebug(5) {
-	pips_debug(1, "(st = %p, pred = %p, succ = %p, c_res = %p)\nst at entry:\n",
+	pips_debug(1, 
+	   "(st = %p, pred = %p, succ = %p, c_res = %p)\nst at entry:\n",
 		   st, pred, succ, c_res);
 	print_statement(st);
 	pips_debug(1, "Successors of c_res:\n");
@@ -1088,7 +1089,8 @@ statement st;
     u = simplified_unstructured(top, bottom, result);
 
     if( get_debug_level() > 5) {
-	pips_debug(1, "Nodes in unstructured %p (entry %p, exit %p) from entry:\n",
+	pips_debug(1, 
+	  "Nodes in unstructured %p (entry %p, exit %p) from entry:\n",
 		   u, unstructured_control(u), unstructured_exit(u));
 	display_linked_control_nodes(unstructured_control(u));
 	pips_debug(1, "Accessible nodes from exit:\n");
@@ -1108,3 +1110,6 @@ statement st;
 
     return(u);
 }
+
+
+
