@@ -2,117 +2,6 @@
  *
  * Each full syntax looks for ENDOFLINE so as to check that the right
  * number of arguments is matched.
- *
- * $Log: tp_yacc.y,v $
- * Revision 1.98  2000/11/29 09:15:47  coelho
- * pips_user_error and properties may not have been loaded yet.
- *
- * Revision 1.97  2000/11/29 09:10:56  coelho
- * hop.
- *
- * Revision 1.96  2000/02/29 10:29:11  coelho
- * fixed if file does not exist.
- *
- * Revision 1.95  1998/11/27 17:03:52  coelho
- * should resist wrong module names a little bit...
- *
- * Revision 1.94  1998/11/24 19:04:55  coelho
- * check lazy_open_module state.
- *
- * Revision 1.93  1998/11/24 18:38:49  coelho
- * %MAIN is fixed. if none, try to parse just in case.
- *
- * Revision 1.92  1998/07/08 12:56:54  coelho
- * user errors protect files to view.
- *
- * Revision 1.91  1998/07/03 21:36:23  coelho
- * checkactive added.
- *
- * Revision 1.90  1998/06/30 15:19:39  coelho
- * property -> result for jpips checks.
- *
- * Revision 1.89  1998/06/18 12:38:35  coelho
- * missing \n added.
- *
- * Revision 1.88  1998/05/29 12:42:17  coelho
- * bug--
- *
- * Revision 1.87  1998/05/29 08:09:11  coelho
- * info modules: missing ws added.
- *
- * Revision 1.86  1998/05/25 10:43:38  coelho
- * more log on errors.
- *
- * Revision 1.85  1998/05/25 06:45:13  coelho
- * fixed nesting in tp_system.
- * tpips_is_interactive ok in "source".
- *
- * Revision 1.84  1998/05/22 14:52:34  coelho
- * missing cr added.
- *
- * Revision 1.83  1998/05/22 14:37:17  coelho
- * jpips show + error if shell fails in scripts.
- *
- * Revision 1.82  1998/05/22 13:33:15  coelho
- * fixes for jpips.
- *
- * Revision 1.81  1998/05/05 17:40:21  coelho
- * info ++
- *
- * Revision 1.80  1998/05/05 08:50:01  coelho
- * close accpet the current workspace name as an argument.
- *
- * Revision 1.79  1998/04/29 08:24:11  coelho
- * show added.
- *
- * Revision 1.78  1998/04/15 15:31:55  coelho
- * linear.h added.
- *
- * Revision 1.77  1998/04/14 16:16:56  coelho
- * getwd -> getcwd
- *
- * Revision 1.76  1998/01/24 10:06:06  coelho
- * function to ask whether to behave as a shell.
- *
- * Revision 1.75  1997/12/12 17:22:26  coelho
- * leaks--
- *
- * Revision 1.74  1997/12/12 15:42:34  coelho
- * leaks--
- *
- * Revision 1.73  1997/12/12 14:48:19  coelho
- * leaks--.
- *
- * Revision 1.72  1997/12/12 12:56:46  coelho
- * typo fixed.
- *
- * Revision 1.71  1997/12/12 12:54:43  coelho
- * clearer warning.
- *
- * Revision 1.70  1997/12/12 12:25:24  coelho
- * guarded unknown rule to behave like a shell...
- *
- * Revision 1.69  1997/12/11 16:17:02  coelho
- * fixed log on shells.
- *
- * Revision 1.68  1997/12/11 16:08:02  coelho
- * implicit shell added.
- *
- * Revision 1.67  1997/12/10 12:28:57  coelho
- * internal cat for display.
- *
- * Revision 1.66  1997/12/05 16:50:03  coelho
- * i_checkpoint added.
- *
- * Revision 1.65  1997/12/05 13:28:20  coelho
- * capply rule added.
- *
- * Revision 1.64  1997/11/27 13:34:04  coelho
- * some user errors moved as user warnings in delete...
- *
- * Revision 1.63  1997/11/27 12:14:52  coelho
- * list of command are ok.
- *
  */
 
 %token TK_OPEN TK_CREATE TK_CLOSE TK_CHECKPOINT TK_DELETE
@@ -193,12 +82,6 @@ static void free_owner_content(res_or_rule * pr)
 {
     gen_array_full_free(pr->the_owners), pr->the_owners = NULL;
     free(pr->the_name), pr->the_name = NULL;
-}
-
-void close_workspace_if_opened(void)
-{
-    if (db_get_current_workspace_name())
-	close_workspace();
 }
 
 static void set_env_log_and_free(string var, string val)
