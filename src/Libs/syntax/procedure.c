@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.55  1998/12/02 15:00:59  irigoin
+ * Some calls to reset_current_module_statement() replaced by calls to error_reset_current_module_statement()
+ *
  * Revision 1.54  1998/12/02 13:46:55  irigoin
  * No reset_current_module_entity() in BeginingOfProcedure()
  *
@@ -887,7 +890,7 @@ AbortEntries()
     effective_formal_parameters = NIL;
 
     /* the current module statement is used when processing entries */
-    reset_current_module_statement();
+    error_reset_current_module_statement();
 }
 
 bool
