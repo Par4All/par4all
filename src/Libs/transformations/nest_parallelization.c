@@ -1,8 +1,8 @@
  /* loop nest parallelization */
 
 #include <stdio.h>
-extern int fprintf();
-extern int sscanf();
+extern int fprintf(FILE *, const char *, ...);
+extern int sscanf(const char *, const char *, ...);
 #include <string.h>
 #include <values.h>
 
@@ -20,7 +20,8 @@ extern int sscanf();
 #include "resources.h"
 
 #include "control.h"
-#include "generation.h"
+#include "conversion.h"
+/* #include "generation.h" */
 
 #include "arithmetique.h"
 #include "vecteur.h"
@@ -30,14 +31,13 @@ extern int sscanf();
 /* dependence graph */
 static graph dg;
 
-/* only one level of parallelism is allowed; this is checked intra-procedurally only
- * for the time being; pipsmake mechanism would make an interprocedural propagation easy 
- * but it would be hard to defer the parallel loop choice up to a whole program
- * analysis;
- *
- * This static variable is a screwed up mechanism; the information should be
- * recursively maintainted by look_for_nested_loops() and propagated downwards only
- * (not forwards as with the static variable...).
+/* only one level of parallelism is allowed; this is checked
+ * intra-procedurally only for the time being; pipsmake mechanism would
+ * make an interprocedural propagation easy but it would be hard to defer
+ * the parallel loop choice up to a whole program analysis; * This static
+ * variable is a screwed up mechanism; the information should be
+ * recursively maintainted by look_for_nested_loops() and propagated
+ * downwards only (not forwards as with the static variable...).
  *
  * The same result could be achived by restarting a different occurence of 
  * look_for_nested_loops() with a simple vectorization trasnformation and
@@ -45,9 +45,6 @@ static graph dg;
  * No state memorization is needed...
  */
 static bool parallel_loop_has_been_selected;
-
-/* to map statements to enclosing loops */
-static statement_mapping StatementToLoops;
 
 /* No lambda closure in C */
 static entity current_loop_index = entity_undefined;
@@ -65,27 +62,33 @@ static int current_loop_depth = -1;
 #define VECTOR_DIRECTION 1
 #define PARALLEL_DIRECTION 2
 
-/* the transformation strategy is chosen according to the loop iteration count */
+/* the transformation strategy is chosen according to the loop iteration count
+ */
 typedef struct transformation_strategy {
     int maximum_iteration_count;
     statement (*loop_transformation)();
 } transformation_strategy;
 
 transformation_strategy 
-    one_loop_transformation_strategies[PARALLEL_DIRECTION+1][LARGE_LOOP_COUNT+1] = {
-
-    {{-1, loop_preserve}, {4, tuned_loop_unroll }, {80, loop_preserve }, {MAXINT, loop_preserve}},
-
-    {{-1, loop_vectorize}, {4, tuned_loop_unroll }, {80, loop_vectorize }, {MAXINT, tuned_loop_strip_mine}},
-
-    {{-1, tuned_loop_parallelize}, {4, tuned_loop_unroll }, {80, tuned_loop_parallelize }, {MAXINT, tuned_loop_parallelize}}
-
-    };
+    one_loop_transformation_strategies
+            [PARALLEL_DIRECTION+1][LARGE_LOOP_COUNT+1] = 
+               {
+	       {{-1, loop_preserve}, 
+		{4, tuned_loop_unroll }, 
+		{80, loop_preserve }, 
+		{MAXINT, loop_preserve}},
+	       {{-1, loop_vectorize}, 
+		{4, tuned_loop_unroll }, 
+		{80, loop_vectorize }, 
+		{MAXINT, tuned_loop_strip_mine}},
+	       {{-1, tuned_loop_parallelize}, 
+		{4, tuned_loop_unroll }, 
+		{80, tuned_loop_parallelize }, 
+		{MAXINT, tuned_loop_parallelize}}
+	       };
 
 
-statement loop_preserve(s, c)
-statement s;
-int c;
+statement loop_preserve(statement s, int c)
 {
     debug(9, "loop_preserve", "begin\n");
 
@@ -94,9 +97,7 @@ int c;
     return s;
 }
     
-statement loop_vectorize(s, c)
-statement s;
-int c;
+statement loop_vectorize(statement s, int c)
 {
     loop l = statement_loop(s);
 
@@ -109,9 +110,7 @@ int c;
     return s;
 }
 
-statement tuned_loop_parallelize(s, c)
-statement s;
-int c;
+statement tuned_loop_parallelize(statement s, int c)
 {
     loop l = statement_loop(s);
 
@@ -121,10 +120,12 @@ int c;
     if(parallel_loop_has_been_selected && !parallel_loop_has_been_selected)
 	;
     else {
-	/* the body complexity should be checked and, if it is a constant, a strip-mining
-	   factor should be derived to get the best possible load balancing */
+	/* the body complexity should be checked and, if it is a constant,
+	   a strip-mining factor should be derived to get the best
+	   possible load balancing */
 
-	/* the easy way to go is to use the processor number to make chunks */
+	/* the easy way to go is to use the processor number to make chunks 
+	 */
 
 	loop_strip_mine(s, -1, get_processor_number());
 
@@ -138,9 +139,7 @@ int c;
     return s;
 }
 
-statement tuned_loop_unroll(s, c)
-statement s;
-int c;
+statement tuned_loop_unroll(statement s, int c)
 {
     loop il = instruction_loop(statement_instruction(s));
     range lr = loop_range(il);
@@ -165,8 +164,12 @@ int c;
     return s;
 }
 
-statement tuned_loop_strip_mine(s)
-statement s;
+bool current_loop_index_p(reference r)
+{
+    return reference_variable(r) == current_loop_index;
+}
+
+statement tuned_loop_strip_mine(statement s)
 {
     statement inner_loop = statement_undefined;
 
@@ -200,46 +203,55 @@ statement s;
 }
 
 
-static bool always_select_p(l)
-loop l;
+static bool always_select_p(loop l)
 {
     return TRUE;
 }
 
-void nest_parallelization(module_name)
-string module_name;
+void nest_parallelization(string module_name)
 {
-    entity module = local_name_to_top_level_entity(module_name);
-    statement s;
+    entity module;
+    statement mod_stat;
+
+    set_current_module_entity( local_name_to_top_level_entity(module_name) );
+    module = get_current_module_entity();
 
     pips_assert("loop_interchange", entity_module_p(module));
 
     /* DBR_CODE will be changed into DBR_PARALLELIZED_CODE */
-    s = (statement) db_get_memory_resource(DBR_CODE, module_name, FALSE);
+    set_current_module_statement(
+		(statement) db_get_memory_resource(DBR_CODE, module_name, FALSE) );
+    mod_stat = get_current_module_statement();
+
     dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
 
     debug_on("NEST_PARALLELIZATION_DEBUG_LEVEL");
 
     parallel_loop_has_been_selected = FALSE;
 
-    look_for_nested_loop_statements(s, parallelization, always_select_p);
+    look_for_nested_loop_statements(mod_stat, parallelization, always_select_p);
 
     debug_off();
 
     DB_PUT_MEMORY_RESOURCE(DBR_PARALLELIZED_CODE,
 			   strdup(module_name), 
-			   (char*) s);
+			   (char*) mod_stat);
+    reset_current_module_statement();
+
     /* FI: hack for hash-tables consistency; see Lib/rice/rice.c for details */
-    s = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+     set_current_module_statement(
+		(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    mod_stat = get_current_module_statement();
     DB_PUT_MEMORY_RESOURCE(DBR_CODE,
 			   strdup(module_name), 
-			   (char*) s);
+			   (char*) mod_stat);
+
+    reset_current_module_entity();
+    reset_current_module_statement();
 
 }
 
-statement parallelization(lls, loop_predicate)
-list lls;
-bool (*loop_predicate)();
+statement parallelization(list lls, bool (*loop_predicate) (/* ??? */))
 {
     statement s = statement_undefined;
 
@@ -259,8 +271,7 @@ bool (*loop_predicate)();
     return s;
 }
 
-statement one_loop_parallelization(s)
-statement s;
+statement one_loop_parallelization(statement s)
 {
     statement new_s = s;
     int c;
@@ -310,8 +321,55 @@ statement s;
     return new_s;
 }
 
-statement loop_nest_parallelization(lls)
-list lls;
+
+reference reference_identity(reference r)
+{
+    return r;
+}
+
+bool constant_array_reference_p(reference r)
+{
+    /* Uses a static global variable, current_loop_index */
+    list li = reference_indices(r);
+
+    ifdebug(9) {
+	debug(9, "constant_array_reference_p", "begin: index=%s reference=", 
+	      entity_local_name(current_loop_index));
+	print_reference(r);
+	putc('\n', stderr);
+    }
+
+    if(!array_reference_p(r)) {
+	debug(9, "constant_array_reference_p", "end: FALSE\n");
+	return FALSE;
+    }
+
+    /* FI: this is a very approximate evaluation that assumes no induction variables */
+    MAPL(ci, {
+	expression i = EXPRESSION(CAR(ci));
+	int count = look_for_references_in_expression(i, reference_identity, current_loop_index_p);
+
+	if(count!=0) {
+	    debug(9, "constant_array_reference_p", "end: count=%d FALSE\n", count);
+	    return FALSE;
+	}
+    }, li);
+
+    debug(9, "constant_array_reference_p", "end: TRUE\n");
+    return TRUE;
+}
+
+
+/* FI: there are at least two problems:
+ *
+ * - transformations like loop coalescing and full loop unrolling are not considered when
+ * the iteration counts are small (although they are considered in one_loop_parallelization!)
+ *
+ * - the cost function should be non-linear (C has conditional expressions:-)
+ *
+ * Besides, it's bugged
+ */
+statement loop_nest_parallelization(list lls)
 {
     /* FI: see Corinne and Yi-Qing; in which order is this loop list?!? */
     statement s = STATEMENT(CAR(lls=gen_nreverse(lls)));
@@ -374,7 +432,7 @@ list lls;
 	MAPL(cls, {
 	    statement ls = STATEMENT(CAR(cls));
 
-	    (void) fprintf(stderr,"index %s\t#c %d\t// %s\t#r %d\t#i %d\n",
+	    (void) fprintf(stderr,"index %s\t#contiguous %d\t// %s\t#reuse %d\t#range %d\n",
 			   entity_local_name(loop_index(statement_loop(ls))),
 			   *(characteristics[DIRECTION_CONTIGUOUS_COUNT]+ln),
 			   bool_to_string(*(characteristics[DIRECTION_PARALLEL_P]+ln)),
@@ -436,8 +494,7 @@ list lls;
     return s;
 }
 
-statement mark_loop_as_parallel(lls)
-list lls;
+statement mark_loop_as_parallel(list lls)
 {
     statement ls = STATEMENT(CAR(lls));
     execution_tag(loop_execution(statement_loop(ls))) = is_execution_parallel;
@@ -445,8 +502,7 @@ list lls;
     return ls;
 }
 
-bool nth_loop_p(ls)
-statement ls;
+bool nth_loop_p(statement ls)
 {
     /* FI: this is *wrong* but should work for a demo :-( */
     static int count = 0;
@@ -455,8 +511,7 @@ statement ls;
     return count == current_loop_depth;
 }
 
-int numerical_loop_iteration_count(l)
-loop l;
+int numerical_loop_iteration_count(loop l)
 {
     Pvecteur count = estimate_loop_iteration_count(l);
     int c;
@@ -475,14 +530,12 @@ loop l;
     return c;
 }
 
-Pvecteur estimate_loop_iteration_count(l)
-loop l;
+Pvecteur estimate_loop_iteration_count(loop l)
 {
     return estimate_range_count(loop_range(l));
 }
 
-Pvecteur estimate_range_count(r)
-range r;
+Pvecteur estimate_range_count(range r)
 {
     normalized nlb = NORMALIZE_EXPRESSION(range_lower(r));
     normalized nub = NORMALIZE_EXPRESSION(range_upper(r));
@@ -519,16 +572,30 @@ range r;
     return count;
 }
 
-bool carried_dependence_p(s)
-statement s;
+bool contiguous_array_reference_p(reference r)
+{
+    /* Uses a static global variable, current_loop_index */
+    list li = reference_indices(r);
+    expression first_index = expression_undefined;
+
+    if(!ENDP(li)) {
+	first_index = EXPRESSION(CAR(li));
+	return expression_reference_p(first_index) &&
+	    reference_variable(expression_reference(first_index)) == current_loop_index;
+    }
+
+    return FALSE;
+}
+
+
+
+
+bool carried_dependence_p(statement s)
 {
     return FALSE;
 }
 
-int look_for_references_in_statement(s, reference_transformation, reference_predicate)
-statement s;
-statement (*reference_transformation)();
-bool (*reference_predicate)();
+int look_for_references_in_statement(statement s, statement (*reference_transformation) (/* ??? */), bool (*reference_predicate) (/* ??? */))
 {
     instruction inst = statement_instruction(s);
     int count = 0;
@@ -584,10 +651,7 @@ bool (*reference_predicate)();
     return count;
 }
 
-int look_for_references_in_expression(e, reference_transformation, reference_predicate)
-expression e;
-statement (*reference_transformation)();
-bool (*reference_predicate)();
+int look_for_references_in_expression(expression e, statement (*reference_transformation) (/* ??? */), bool (*reference_predicate) (/* ??? */))
 {
     syntax s = expression_syntax(e);
     int count = 0;
@@ -631,10 +695,7 @@ bool (*reference_predicate)();
     return count;
 }
 
-int look_for_references_in_range(r, reference_transformation, reference_predicate)
-range r;
-statement (*reference_transformation)();
-bool (*reference_predicate)();
+int look_for_references_in_range(range r, statement (*reference_transformation) (/* ??? */), bool (*reference_predicate) (/* ??? */))
 {
     int count = 0;
     expression rl = range_lower(r);
@@ -652,10 +713,7 @@ bool (*reference_predicate)();
     return count;
 }
 
-int look_for_references_in_call(c, reference_transformation, reference_predicate)
-call c;
-statement (*reference_transformation)();
-bool (*reference_predicate)();
+int look_for_references_in_call(call c, statement (*reference_transformation) (/* ??? */), bool (*reference_predicate) (/* ??? */))
 {
     value vin;
     entity f;
@@ -702,63 +760,17 @@ bool (*reference_predicate)();
 
     return count;
 }
-
-bool contiguous_array_reference_p(r)
-reference r;
-{
-    /* Uses a static global variable, current_loop_index */
-    list li = reference_indices(r);
-    expression first_index = expression_undefined;
 
-    if(!ENDP(li)) {
-	first_index = EXPRESSION(CAR(li));
-	return expression_reference_p(first_index) &&
-	    reference_variable(expression_reference(first_index)) == current_loop_index;
-    }
 
-    return FALSE;
-}
 
-bool constant_array_reference_p(r)
-reference r;
-{
-    /* Uses a static global variable, current_loop_index */
-    list li = reference_indices(r);
 
-    debug(9, "constant_array_reference_p", "begin: index=%s reference=", 
-	  entity_local_name(current_loop_index));
-    ifdebug(9) {
-	print_reference(r);
-    }
 
-    if(!array_reference_p(r)) {
-	debug(9, "constant_array_reference_p", "end: FALSE\n");
-	return FALSE;
-    }
 
-    /* FI: this is a very approximate evaluation that assumes no induction variables */
-    MAPL(ci, {
-	expression i = EXPRESSION(CAR(ci));
-	int count = look_for_references_in_expression(i, reference_identity, current_loop_index_p);
 
-	if(count!=0) {
-	    debug(9, "constant_array_reference_p", "end: count=%d FALSE\n", count);
-	    return FALSE;
-	}
-    }, li);
 
-    debug(9, "constant_array_reference_p", "end: TRUE\n");
-    return TRUE;
-}
 
-bool current_loop_index_p(r)
-reference r;
-{
-    return reference_variable(r) == current_loop_index;
-}
 
-reference reference_identity(r)
-reference r;
-{
-    return r;
-}
+
+
+
+
