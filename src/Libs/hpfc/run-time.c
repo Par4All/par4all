@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: run-time.c,v $
+ * Revision 1.37  1997/08/04 13:58:59  coelho
+ * new generic effects includes.
+ *
  * Revision 1.36  1997/06/12 14:20:59  coelho
  * functions reorder.
  *
@@ -19,9 +22,10 @@
 #include "bootstrap.h"
 
 #include "control.h"
-#include "regions.h"
 #include "semantics.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 
 extern entity MakeExternalFunction(entity e, type r);       /* idem */
 
