@@ -7,6 +7,12 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.26  2000/12/11 13:39:55  nguyen
+  Modified function remove_dead_loop to deal with bug caused by nested loops
+  with same labels
+  Modified  dead_test_filter : change statement_feasible_p by
+  statement_strongly_feasible_p (see example )
+
   Revision 1.25  2000/11/28 15:10:46  nguyen
   *** empty log message ***
 
@@ -164,12 +170,25 @@ dead_test_filter(statement true, statement false)
   stdebug(9, "dead_test_filter: then branch", true);
   stdebug(9, "dead_test_filter: else branch", false);
 
-  if (!statement_feasible_p(true)) {
+  ifdebug(8)
+    {
+      transformer pretrue = load_statement_precondition(true);
+      transformer prefalse = load_statement_precondition(false);
+      fprintf(stderr,"NN true and false branches");
+      sc_fprint(stderr,
+		predicate_system(transformer_relation(pretrue)),
+		entity_local_name);
+      sc_fprint(stderr,
+		predicate_system(transformer_relation(prefalse)),
+		entity_local_name);
+    }
+
+  if (!statement_strongly_feasible_p(true)) {
     pips_debug(5, "End: then_is_dead\n");
     return then_is_dead;
   }
   
-  if (!statement_feasible_p(false)) {
+  if (!statement_strongly_feasible_p(false)) {
     pips_debug(5, "End: else_is_dead\n");
     return else_is_dead;
   }
@@ -399,6 +418,8 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
   range lr;
   statement as;
   expression init_val;
+  instruction block =  make_instruction_block(NIL); 
+  entity flbl;
 
   /* On va remplacer la boucle par l'initialisation de l'indice a`
      sa valeur initiale seulement. */
@@ -411,14 +432,54 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
   pips_assert("remove_dead_loop", entity_scalar_p(loop_index(l)));
 
   index = make_factor_expression(1, loop_index(l));
-  statement_instruction(s) =
-    make_instruction_block(CONS(STATEMENT,
-				as = make_assign_statement(index , init_val),
-				NIL));
+
+  /* NN -> Bug found : if we have two loops with the same label 
+     such as : 
+     DO 100 I=1,N
+        DO 100 J=1,M
+     ......
+     
+     100 CONTINUE    
+     and the inner loop is a dead statement, there is an error when 
+     compiling the generated file Fortran. 
+     Because the label of the last statement in the inner loop 
+     might be used by an outer loop and, in doubt, should be preserved.
+
+     SOLUTION : like in full_loop_unroll()*/
+
+  /*  *****OLD CODE***************
+      statement_instruction(s) =
+      make_instruction_block(CONS(STATEMENT,
+      as = make_assign_statement(index , init_val),
+      NIL));
+      statement_label(as) = statement_label(s);
+      statement_label(s) = entity_empty_label();
+      
+      fix_sequence_statement_attributes(s);*/
+
+  /*  *****NEW CODE***************/
+
+    
+  instruction_block(block)= 
+    gen_nconc(instruction_block(block),
+	      CONS(STATEMENT,
+		   as = make_assign_statement(index , init_val),
+		   NIL ));
+
+  flbl = find_final_statement_label(loop_body(l));
+  
+  if(!entity_empty_label_p(flbl)) {
+    statement stmt = make_continue_statement(flbl);   
+    instruction_block(block)= gen_nconc(instruction_block(block),
+					CONS(STATEMENT, stmt, NIL ));  
+  }
+ 
+  statement_instruction(s) = block;      
+  /* Since the RI need to have no label on instruction block: */
   statement_label(as) = statement_label(s);
   statement_label(s) = entity_empty_label();
   fix_sequence_statement_attributes(s);
-
+  
   stdebug(9, "remove_dead_loop: New value of statement", s);
 
   free_instruction(i);
@@ -769,6 +830,13 @@ dead_statement_filter(statement s)
 	      statement_number(s),
 	      ORDERING_NUMBER(statement_ordering(s)),
 	      ORDERING_STATEMENT(statement_ordering(s)));
+   ifdebug(8)
+     {
+       transformer pre = load_statement_precondition(s);
+       sc_fprint(stderr,
+		 predicate_system(transformer_relation(pre)),
+		 entity_local_name);
+     }
 
    stdebug(9, "dead_statement_filter: The current statement", s);
 
@@ -802,7 +870,6 @@ dead_statement_filter(statement s)
 		   statement_number(s),
 		   ORDERING_NUMBER(statement_ordering(s)),
 		   ORDERING_STATEMENT(statement_ordering(s)));
-
 	  retour = discard_statement_and_save_label_and_comment(s);
 	  dead_code_statement_removed++;
 	  break;
