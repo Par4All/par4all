@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/06 11:59:08 $, 
+ * $Date: 1996/08/06 19:55:17 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -24,6 +24,7 @@
 #include "contrainte.h"
 #include "sc.h"
 
+/* some global jmp is shared for handling arithmetic errors */
 extern jmp_buf overflow_error;
 
 /* To replace #define NB_EQ and #define NB_INEQ - BC, 2/4/96 - 
@@ -211,7 +212,6 @@ static int NB_INEQ = 0;
  */
 #define SUB_MACRO(X,A,B,mult)						      \
 { tag("SUB_MACRO")							      \
-    DEBUG3(fprintf(stdout, "sub on: ");	printfrac(A); printfrac(B));	      \
     if (value_zero_p(A.num))						      \
 	X.num = value_uminus(B.num),					      \
 	X.den = B.den;							      \
@@ -228,7 +228,6 @@ static int NB_INEQ = 0;
     {									      \
 	Value ad=A.den, bd=B.den, gd, v;				      \
 	GCD(gd,ad,bd);							      \
-      DEBUG3(fprint_string_Value(stdout," ! ",gd));\
 	if (value_notone_p(gd)) value_division(ad,gd), value_division(bd,gd); \
         X.num = mult(A.num,bd);						      \
         v = mult(B.num,ad);						      \
@@ -237,7 +236,6 @@ static int NB_INEQ = 0;
 	X.den = mult(X.den,gd);						      \
 	SIMPLIFIE(X);							      \
     }									      \
-    DEBUG3(fprintf(stdout, " = "); printfrac(X); fprintf(stdout, "\n"));      \
 }
 
 /* computes X = A - B*C/D, trying to avoid arithmetic exceptions...
@@ -359,10 +357,10 @@ static int NB_INEQ = 0;
 /* multiplies two Values of no arithmetic overflow, or throw exception.
  * should be value_mult? FC.
  */
-#define value_mult_ae(v,w)					\
-(value_zero_p(w) || value_zero_p(v)? VALUE_ZERO:		\
- value_lt(value_abs(v),value_div(VALUE_MAX,value_abs(w)))?	\
- value_mult(v,w): (longjmp(overflow_error, 5), VALUE_MAX))
+#define value_mult_ae(v,w)						\
+(value_zero_p(w) || value_zero_p(v)? VALUE_ZERO:			\
+ value_lt(value_abs(v),value_div(VALUE_MAX,value_abs(w)))?		\
+ value_mult(v,w): (longjmp(simplex_arithmetic_error, 5), VALUE_MAX))
 
 /* Version with and without arithmetic exceptions...
  */
@@ -490,7 +488,7 @@ sc_simplexe_feasibility_ofl_ctrl(
      *  en sortie de la procedure.
      */
     static hashtable_t hashtable[MAX_VAR] ;
-    jmp_buf overflow_error3;
+    jmp_buf simplex_arithmetic_error;
     tableau *eg = NULL; /* tableau des egalite's  */
     tableau *t = NULL; /* tableau des inegalite's  */
     /* les colonnes 0 et 1 sont reservees au terme const: */
@@ -508,6 +506,10 @@ sc_simplexe_feasibility_ofl_ctrl(
      * "eg" : tableau a "nb_eq" lignes et "dimension"+2 colonnes.
      */
     
+    if (ofl_ctrl!=FWD_OFL_CTRL)
+	fprintf(stderr, "[sc_simplexe_feasibility_ofl_ctrl] "
+		"should not (yet) be called with control %d...\n", ofl_ctrl);
+
     DEBUG(fprintf(stdout, "\n\n IN sc_simplexe_feasibility_ofl_ctrl:\n");
           sc_fprint(stdout, sc, default_variable_to_string));
 
@@ -531,8 +533,10 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    NB_INEQ++;
     }
     
-    if (setjmp(overflow_error3))
+    if (setjmp(simplex_arithmetic_error))
     {
+	DEBUG(fprintf(stdout, "arithmetic error in simplex\n"));
+
 	for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
 	    hashtable[i].nom = 0 ;
 	if(NB_EQ > 0) {
@@ -548,9 +552,11 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    free(t[i].colonne); 
 	free(t); 
 	free(nlle_colonne); 
+
 	if (ofl_ctrl == FWD_OFL_CTRL) 
 	    longjmp(overflow_error,5);
-	return TRUE; 
+
+	return TRUE; /* default is feasible */
     }
 
     if(NB_EQ != 0)
@@ -741,7 +747,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     }
 
     DEBUG1(dump_hashtable(hashtable));
-    DEBUG(dump_tableau("avant sol prov", t, compteur));
+    DEBUG1(dump_tableau("avant sol prov", t, compteur));
     
     /* NON IMPLEMENTE' */
     
@@ -998,10 +1004,10 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    DEBUG1(printf("fin\n"));
         }
 
-	DEBUG(printf("1 : jj= %ld\n",jj);
+	DEBUG1(printf("1 : jj= %ld\n",jj);
 	      dump_tableau("avant ch pivot", t, compteur));
 
-	DEBUG(min1.num = 32700; min1.den=1; min2=min1);
+	DEBUG1(min1.num = 32700; min1.den=1; min2=min1);
 	
         /*  Recherche de la ligne de pivot  
 	 *  si ii==-1, pas encore trouve, min{1,2} non valides...
@@ -1252,7 +1258,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 		t[w].colonne=nlle_colonne ;
 		nlle_colonne = colo ;
 		t[w].taille=k ;
-		DEBUG(printf("w = %ld  t[w].taille=%d \n",w,t[w].taille);
+		DEBUG1(printf("w = %ld  t[w].taille=%d \n",w,t[w].taille);
 		      dump_tableau("last", t, compteur););
 	    }
         }
@@ -1260,10 +1266,11 @@ sc_simplexe_feasibility_ofl_ctrl(
 
     /* Restauration des entrees vides de la table hashee  */
     FINSIMPLEX :
+    DEBUG1(dump_tableau("fin simplexe", t, compteur));
+    DEBUG(fprintf(stderr, "soluble = %d\n", soluble));
+
 	for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
 	    hashtable[i].nom = 0 ;
-    DEBUG(dump_tableau("fin simplexe", t, compteur);
-	  fprintf(stderr, "soluble = %d\n", soluble));
 
 	if (NB_EQ > 0) {
 	    for(i=0 ; i<(3+DIMENSION) ; i++)
