@@ -132,13 +132,10 @@ add_to_current_line(
 
 	if (divide) 
 	{
-	    /* only to remain coherent with the last validation. CA.
-	     */
-	    if (crt_line[last_cut+1]==' ')
-		last_cut++;
-
-	    strcpy(tmp, crt_line+last_cut+1); /* save the end of the line */
-	    crt_line[last_cut+1] = '\0';      /* trunc! */
+	    int nl_cut = last_cut;
+	    if (crt_line[last_cut+1]==' ') nl_cut++;
+	    strcpy(tmp, crt_line+nl_cut+1); /* save the end of the line */
+	    crt_line[last_cut+1] = '\0';    /* trunc! */
 	}
 	
 	/* happend new line. */
