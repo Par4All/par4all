@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.IBMAIX,v $
+# Revision 1.10  1997/03/28 09:53:39  coelho
+# -qfullpath added (for debug)
+#
 # Revision 1.9  1997/03/26 14:06:05  coelho
 # ansi option added for newgen.
 #
@@ -16,7 +19,7 @@ ARFLAGS	= rv
 CC	= cc
 # -ma to allow alloca():
 # ansi required for newgen (otherwise __STDC__ or __STRICT_ANSI__ not def).
-CFLAGS	= -g -O2 -qmaxmem=8192 -qlanglvl=ansi -ma
+CFLAGS	= -g -O2 -qmaxmem=8192 -qfullpath -qlanglvl=ansi -ma 
 # if -E is ommitted, the file is *compiled*:-(
 CMKDEP	= -E -M
 CPPFLAGS= 	-I. \
