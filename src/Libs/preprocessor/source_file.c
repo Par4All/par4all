@@ -289,26 +289,58 @@ insert_at(
 	line[offset+shift]=what[shift];
 }
 
+#define CONTINUATION "\n     x "
+
+static void
+add_continuation_if_needed(char line[LINE_LENGTH])
+{
+    int len = strlen(line);
+    if (len<=73) return; /* nothing to do */
+    /* else let us truncate */
+    {
+	int i = 71;
+	while (i>5 && (isalnum(line[i]) || line[i]=='_')) 
+	    i--;
+	pips_assert("still in line", i>5);
+	insert_at(line, i, CONTINUATION);
+    }
+}
+
+/* return if modified
+ */
+static bool
+try_this_one(
+    regex_t * prx, 
+    string line,
+    string replacement, 
+    bool was_modified)
+{
+    bool modified = FALSE;
+    regmatch_t matches[2]; /* matched strings */
+
+    while (!regexec(prx, line, 2, matches, 0)) {
+	if (!was_modified && !modified && strlen(line)>73) {
+	    pips_user_warning("line truncated in complex constant handling");
+	    line[72] = '\n', line[73] = '\0';
+	}
+	modified = TRUE;
+	insert_at(line, matches[1].rm_so, replacement);
+    }
+    
+    return modified;
+}
+
 static void
 handle_complex_constants(string line)
 {
-    regmatch_t matches[2]; /* matched strings */
+    bool diff = FALSE;
 
-    /* implied complex */
-    while (!regexec(&complex_cst_rx, line, 2, matches, 0))
-	insert_at(line, matches[1].rm_so, IMPLIED_COMPLEX_NAME);
+    diff |= try_this_one(&complex_cst_rx, line, IMPLIED_COMPLEX_NAME, diff);
+    diff |= try_this_one(&complex_cst2_rx, line, IMPLIED_COMPLEX_NAME, diff);
+    diff |= try_this_one(&dcomplex_cst_rx, line, IMPLIED_DCOMPLEX_NAME, diff);
+    diff |= try_this_one(&dcomplex_cst2_rx, line, IMPLIED_DCOMPLEX_NAME, diff);
 
-    /* implied complex 2 */
-    while (!regexec(&complex_cst2_rx, line, 2, matches, 0))
-	insert_at(line, matches[1].rm_so, IMPLIED_COMPLEX_NAME);
-
-    /* implied double complex */
-    while (!regexec(&dcomplex_cst_rx, line, 2, matches, 0))
-	insert_at(line, matches[1].rm_so, IMPLIED_DCOMPLEX_NAME);
-
-    /* implied double complex */
-    while (!regexec(&dcomplex_cst2_rx, line, 2, matches, 0))
-	insert_at(line, matches[1].rm_so, IMPLIED_DCOMPLEX_NAME);
+    if (diff) add_continuation_if_needed(line);
 }
 
 /* tries several path for a file to include...
