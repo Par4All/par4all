@@ -5,6 +5,9 @@
 # a shell wrapper for "JPips", the java-based pips interface.
 #
 # $Log: jpips,v $
+# Revision 1.10  1998/11/18 12:19:22  coelho
+# beta4 used.
+#
 # Revision 1.9  1998/11/12 14:24:14  coelho
 # -e option added to be used by emacs.
 #
@@ -126,7 +129,7 @@ fi
 
 [ ! "${men}" ] || error 3 "menu ${men} not found"
 
-PATH="${JAVA_ROOT:-/usr/local/jdk1.2beta3}/bin:${PATH}"
+PATH="${JAVA_ROOT:-/usr/local/jdk1.2beta4}/bin:${PATH}"
 
 #
 # now do the job
