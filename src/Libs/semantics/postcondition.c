@@ -1,7 +1,7 @@
 /*
  * by Fabien COELHO
  *
- * $RCSfile: postcondition.c,v $ ($Date: 1995/08/10 09:14:17 $, %U)
+ * $RCSfile: postcondition.c,v $ ($Date: 1995/08/10 09:15:03 $, )
  * version $Revision$,
  */
 
