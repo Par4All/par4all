@@ -8,6 +8,9 @@
 # $Id$
 #
 # $Log: pips_set_directory_for_binaries,v $
+# Revision 1.9  1997/11/20 13:59:14  coelho
+# some fixes...
+#
 # Revision 1.8  1997/11/17 07:37:40  coelho
 # remove depend files as well.
 #
@@ -93,7 +96,8 @@ for x in Prod Deve ; do
     for s in PIPS NEWGEN LINEAR EXTERN ; do
 	md ${dir}/${arch}/${x}/${s}
         for d in Bin Lib ; do
-            md ${dir}/${arch}/${x}/${s}/${d}
+            md ${dir}/${arch}/${x}/${s}/${d} \
+		${dir}/${arch}/${x}/${s}/${d}/${arch}
         done
     done
     for d in Passes Libs Runtimes Scripts ; do
@@ -103,7 +107,9 @@ done
 
 md  ${dir}/${arch}/Prod/PIPS/Runtime \
     ${dir}/${arch}/Prod/PIPS/Runtime/hpfc \
-    ${dir}/${arch}/Prod/PIPS/Runtime/wp65
+    ${dir}/${arch}/Prod/PIPS/Runtime/wp65\
+    ${dir}/${arch}/Prod/PIPS/Runtime/hpfc/${arch} \
+    ${dir}/${arch}/Prod/PIPS/Runtime/wp65/${arch}
 
 #
 # owner and rights
@@ -129,6 +135,7 @@ ml()
    lnk=${2}
    test -d ${d} || error 3 "[ml] no ${d} directory"
    test -d ${lnk} && { mv ${lnk}/* ${d}; rmdir ${lnk}; }
+   test -L ${lnk} && rm ${lnk}
    ln -s ${d} ${lnk}
 }
 
@@ -137,8 +144,8 @@ make_all_links()
 {
     targ=${1}
     root=${2}
-    ml ${targ}/Lib ${root}/Lib/${arch}
-    ml ${targ}/Bin ${root}/Bin/${arch}
+    ml ${targ}/Lib/${arch} ${root}/Lib/${arch}
+    ml ${targ}/Bin/${arch} ${root}/Bin/${arch}
 }
 
 make_all_links ${dir}/${arch}/Prod/PIPS   ${PIPS_ROOT}
@@ -146,8 +153,10 @@ make_all_links ${dir}/${arch}/Prod/NEWGEN ${NEWGEN_ROOT}
 make_all_links ${dir}/${arch}/Prod/LINEAR ${LINEAR_ROOT}
 make_all_links ${dir}/${arch}/Prod/EXTERN ${EXTERN_ROOT}
 
-ml ${dir}/${arch}/Prod/PIPS/Runtime/hpfc ${PIPS_ROOT}/Runtime/hpfc
-ml ${dir}/${arch}/Prod/PIPS/Runtime/wp65 ${PIPS_ROOT}/Runtime/wp65
+ml ${dir}/${arch}/Prod/PIPS/Runtime/hpfc/${arch} \
+	${PIPS_ROOT}/Runtime/hpfc/${arch}
+ml ${dir}/${arch}/Prod/PIPS/Runtime/wp65/${arch} \
+	${PIPS_ROOT}/Runtime/wp65/${arch}
 
 #
 # cleaning sources
