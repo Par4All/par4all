@@ -15,9 +15,6 @@
 
 #include "malloc.h"
 
-/* #include <stdlib.h> */
-extern int      fprintf();
-
 /* PiPs specific includes */
 #include "genC.h"
 #include "ri.h"
