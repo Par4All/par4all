@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1994/11/28 13:56:12 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1994/11/29 08:31:54 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -240,7 +240,9 @@ Pcontrainte lower, upper;
     vect_add_elem(&sum, TCST, the_ppcm-1);
     vect_normalize(sum);
 
-    result = VECTEUR_NUL_P(sum) || (var_of(sum)==TCST && val_of(sum)==0);
+    result = VECTEUR_NUL_P(sum) || 
+	(sum->succ==NULL && var_of(sum)==TCST && val_of(sum)==0);
+
     vect_rm(v_lower), vect_rm(v_upper), vect_rm(sum);
 
     return(result);
