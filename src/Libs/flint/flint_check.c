@@ -16,6 +16,7 @@
 #include <strings.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 /* To avoid a global variable to pass the dependence graph in flint.c: */
 #include "graph.h"
