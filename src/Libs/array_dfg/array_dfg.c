@@ -554,8 +554,8 @@ char* 	mod_name;
 	       "\n CAN'T APPLY FEAUTRIER'S ALGORITHM :\n This is not a static control program !\n" );
   }
   Gstructural_parameters = static_control_params( stco );
-  set_proper_effects_map( effectsmap_to_listmap((statement_mapping) 
-						db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE) ));
+  set_proper_rw_effect((statement_effects) 
+		       db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
 
   /* What will we compute ? */
   SUMMARY = ((ss = getenv("SUMMARY")) != NULL)? atoi(ss) : FALSE;
@@ -596,7 +596,7 @@ char* 	mod_name;
   if (get_debug_level() > 0) user_log("\n\n *** ARRAY_DFG done\n");
   debug_off();
 
-  reset_proper_effects_map();
+  reset_proper_rw_effects();
   reset_current_module_entity();
   reset_current_module_statement();
 
