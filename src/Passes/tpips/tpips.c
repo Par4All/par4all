@@ -452,7 +452,7 @@ void default_handler(char * line)
 
     /* error if some characters are still here */
     if (*line_to_parse) {
- 	tp_error("syntax error");
+ 	tp_error("syntax error: cannot parse the end of the line");
     }
 }
 
