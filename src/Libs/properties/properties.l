@@ -88,13 +88,38 @@ static void parse_properties()
 
 	if ((opr = (property) hash_get(pl, n)) != 
             (property) HASH_UNDEFINED_VALUE) {
-            user_warning("parse_properties","property %s redefined\n", n);
+            if(!property_equal_p(pr, opr)) {
+                user_warning("parse_properties","property %s redefined\n", n);
+            }
             free_property(opr);
             hash_update(pl, n, (char *) pr); 
         }
         else
 	    hash_put(pl, n, (char *) pr);
     }
+}
+
+bool property_equal_p(property p1, property p2)
+{
+    bool equal_p = (property_tag(p1)==property_tag(p2));
+
+    if(equal_p) {
+        switch(property_tag(p1)) {
+        case is_property_int:
+            equal_p = (property_int(p1)==property_int(p2));
+            break;
+        case is_property_bool:
+            equal_p = (property_bool(p1)==property_bool(p2));
+            break;
+        case is_property_string:
+            equal_p = (strcmp(property_string(p1),property_string(p2))==0);
+            break;
+        default:
+            pips_error("property_equal_p", "ill. tag %d\n", property_tag(p1));
+        }
+    }
+
+    return equal_p;
 }
 
 static void read_properties()
