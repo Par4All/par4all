@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1996/06/08 15:30:38 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1996/06/08 15:37:33 $, )
  * version $Revision$
  */
 
@@ -1039,8 +1039,6 @@ statement stat, *pstat;
 	 }
      },
 	 lr);
-
-    gen_free_list(lr);
 
     debug(5, "Overlap_Analysis",
 	  "Ra length is %d, Ro length is %d, Rrt lenght is %d\n",
