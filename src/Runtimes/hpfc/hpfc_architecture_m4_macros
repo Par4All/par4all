@@ -1,6 +1,6 @@
 dnl
 dnl $RCSfile: hpfc_architecture_m4_macros,v $ version $Revision$
-dnl ($Date: 1996/09/07 17:14:23 $, )
+dnl ($Date: 1996/09/09 16:43:32 $, )
 dnl
 dnl DEFAULT ARCHITECTURE
 dnl
@@ -13,7 +13,7 @@ define(`_SUN4')dnl
 define(`_SUNMP')dnl
 define(`_PGON')dnl
 define(`_CM5')dnl
-define(`_CRAYT3D')dnl
+define(`_CRAY')dnl
 define(`_RS6K')dnl
 define(`_ALPHA')dnl
 dnl
@@ -27,15 +27,15 @@ ifelse(PVM_ARCH,`CM5',`define(`COM_PREFIX',`CM')')dnl
 ifelse(PVM_ARCH,`SUN4',`define(`_SUN4',`$@')',
        PVM_ARCH,`SUNMP',`define(`_SUNMP',`$@')', 
        PVM_ARCH,`PGON',`define(`_PGON',`$@')',
-       PVM_ARCH,`CRAYT3D',`define(`_CRAYT3D',`$@')',
+       PVM_ARCH,`CRAY',`define(`_CRAY',`$@')',
        PVM_ARCH,`CM5',`define(`_CM5',`$@')',
        PVM_ARCH,`ALPHA',`define(`_ALPHA',`$@')',
        PVM_ARCH,`RS6K',`define(`_RS6K',`$@')')dnl
 dnl
 dnl whether to spawn
 dnl
-ifelse(PVM_ARCH, `CRAYT3D', `define(`_spawn',)')dnl
-ifelse(PVM_ARCH, `CRAYT3D', `define(`_getpe',`$@')')dnl
+ifelse(PVM_ARCH, `CRAY', `define(`_spawn',)')dnl
+ifelse(PVM_ARCH, `CRAY', `define(`_getpe',`$@')')dnl
 dnl
 dnl GNU Fortran compiler g77
 dnl byte is not supported...
