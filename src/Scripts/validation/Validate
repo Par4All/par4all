@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:17:02 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/12 10:31:30 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -30,9 +30,8 @@ unset VALIDOPT PERFORMANCE
 vdir="$PIPS_VALIDDIR"
 VALID="$PIPS_UTILDIR/validate-sequential"
 
-ping='/usr/etc/ping'
-mail='/usr/ucb/mail'
-date='/usr/bin/date'
+# so as to find the right ping, mail and date...
+PATH="/usr/ucb:/usr/etc:/usr/sbin:/usr/bin:$PATH"
 
 hostname=`hostname`
 user=`whoami`
@@ -86,7 +85,7 @@ alive()
 {
   for v_host in `echo $1 | tr ':' ' '`
   do
-    $ping $v_host > /dev/null 2>&1 && echo -n ":$v_host"
+    ping $v_host > /dev/null 2>&1 && echo -n ":$v_host"
   done
 }
 
@@ -184,10 +183,7 @@ available_host()
 #
 # date taken for timing
 #
-local_date()
-{
-  $date +"%h %d %y, %T"
-}
+local_date() { date +"%h %d %y, %T";}
 
 #
 # to avoid nfs problems
@@ -407,7 +403,7 @@ $PERFORMANCE
 In case of problems, contact coelho@cri.ensmp.fr
 %
 
-$mail -s "$finalsubject" $user < $MSG
+mail -s "$finalsubject" $user < $MSG
 
 rm -f $FAILED $MSG
 
