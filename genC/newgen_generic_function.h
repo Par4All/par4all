@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/03/28 15:18:22 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/04/14 14:56:53 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -42,8 +42,16 @@ PREFIX type##_value_type load_##name(k) type##_key_type k;\
 PREFIX bool bound_##name##_p(k) type##_key_type k; \
        { return(bound_##type##_p(name, k));}
 
+/* plus a non good looking hack to avoid gcc warnings about undefined statics.
+ * init, close and store are NOT put in the hack because they MUST be used.
+ */
 #define GENERIC_LOCAL_FUNCTION(name, type)\
-        GENERIC_FUNCTION(static, name, type)
+        GENERIC_FUNCTION(static, name, type)\
+static int name##_hack()\
+{ return((int) name##_undefined_p & (int) reset_##name & \
+	 (int) set_##name & (int) get_##name & \
+	 (int) update_##name & (int) load_##name & \
+	 (int) bound_##name##_p & (int) name##_hack);}
 
 #define GENERIC_GLOBAL_FUNCTION(name, type)\
         GENERIC_FUNCTION(/**/, name, type)
