@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1996/12/17 18:04:33 $, 
+ * $Date: 1996/12/26 17:27:11 $, 
  */
 
 #include "defines-local.h"
@@ -797,6 +797,7 @@ bool full_define_p(reference r, list /* of loops */ ll)
     list /* of expression */ li = reference_indices(r),
          /* of dimension */ ld,
          /* of entity */ lseen = NIL;
+    int ndim;
     
     pips_assert("variable", entity_variable_p(array));
 
@@ -806,7 +807,7 @@ bool full_define_p(reference r, list /* of loops */ ll)
     /* checks that the indices are *simply* the loop indexes,
      * and that the whole dimension is scanned. Also avoids (i,i)...
      */
-    for(; li; POP(li), POP(ld))
+    for(ndim=1; li; POP(li), POP(ld), ndim++)
     {
 	syntax s = expression_syntax(EXPRESSION(CAR(li)));
 	entity index;
@@ -853,6 +854,8 @@ bool full_define_p(reference r, list /* of loops */ ll)
 	    !expression_equal_p(range_lower(rg), dimension_lower(dim)) ||
 	    !expression_equal_p(range_upper(rg), dimension_upper(dim)))
 	{
+	    pips_debug(9, "uncomplete scan of %s[dim=%d]\n", 
+		       entity_name(array), ndim);
 	    gen_free_list(lseen);
 	    return FALSE;
 	}
@@ -872,10 +875,19 @@ bool full_define_p(reference r, list /* of loops */ ll)
  * side effects:
  *  - uses some static data
  * bugs or features:
- *  - pattern matching done this way os just a hack...
+ *  - pattern matching done this way is just a hack...
  */
 #define XDEBUG(msg) \
   pips_debug(6, "statement 0x%x: " msg "\n", (unsigned int) s)
+
+static int 
+number_of_non_empty_statements(
+    list /* of statement */ ls)
+{
+    int n = 0;
+    MAP(STATEMENT, s, if (!hpfc_empty_statement_p(s)) n++, ls);
+    return n;
+}
 
 bool full_copy_p(statement s, reference * pleft, reference * pright)
 {
@@ -889,10 +901,11 @@ bool full_copy_p(statement s, reference * pleft, reference * pright)
 
     DEBUG_STAT(6, "considering statement", s);
 
-    /* the loop nest must be perfect... ??? should check for continues?
+    /* the loop nest must be perfect... !!!
+     * should check for continues?
      */
     for (l=lb; l; POP(l)) 
-	if (gen_length(CONSP(CAR(l)))>1) 
+	if (number_of_non_empty_statements(CONSP(CAR(l)))>1) 
 	    {
 		XDEBUG("non perfectly nested");
 		gen_free_list(lb), gen_free_list(ll); return FALSE;
