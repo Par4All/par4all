@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/11/17 14:19:12 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/12/02 15:00:57 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -230,16 +230,14 @@ statement *hoststatp, *nodestatp;
 	 * entities are defined inside the body of the loop
 	 */
 	bool
-	    io_in = io_inside_statement_p(stat),
 	    at_ac = atomic_accesses_only_p(stat),
-	    st_in = stay_inside_statement_p(stat),
 	    in_in = indirections_inside_statement_p(stat);
 	
 	debug(5, "hpfcompileloop",
-	      "condition results: io %d, aa %d, in %d, id %d\n",
-	      io_in, at_ac, st_in, in_in);
+	      "condition results: aa %d, in %d\n",
+	      at_ac, in_in);
 
-	if ((!io_in) && at_ac && st_in && (!in_in))
+	if (at_ac && !in_in)
 	{
 	    statement
 		overlapstat;
@@ -257,8 +255,6 @@ statement *hoststatp, *nodestatp;
 	    else
 	    {
 		debug(7, "hpfcompileloop", "overlap analysis is not ok...\n");
-
-		
 
 		hpfcompileparallelloop(stat, hoststatp, nodestatp);
 	    }
