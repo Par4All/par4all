@@ -6,7 +6,7 @@
 #
 
 move()
-{ test -f $1 && mv $1 $1.old ; }
+{ test -f $1 && { rm -f $1.old ; mv $1 $1.old ; } ; }
 
 verbose()
 { echo "$RCSfile$: $*" ; }
@@ -18,9 +18,10 @@ error()
 # SOURCES
 #
 
-echo "all sources (Pips, Newgen, Linear)"
+echo "all sources [Pips (including Validation), Newgen, Linear]"
 move pips_sources
-make_pips_release -CS -pnle -rsz pips_sources || error 1 "ret $?"
+make_pips_release -CS -D Examples -F Validation/exportonly -pnle -rsz \
+	pips_sources || error 1 "ret $?"
 
 echo "Newgen sources"
 move newgen_sources
@@ -33,7 +34,7 @@ make_pips_release -CS -l -rsz linear_sources || error 3 "ret $?"
 echo "Xpomp sources"
 move xpomp_sources
 make_pips_release -rz -D Doc/xpomp_manual.ps \
-	-D Include -D Src/Runtimes/xpomp -p -w -e xpomp_sources || 
+	-D Include -w "-s Src/Runtimes/xpomp" -p -w -e xpomp_sources || 
 	    error 4 "ret $?"
 
 
@@ -43,15 +44,17 @@ make_pips_release -rz -D Doc/xpomp_manual.ps \
 
 echo "SunOS4 binary version"
 move pips_GNU
-make_pips_release -CB GNU -pe -rsz pips_GNU || error 5 "ret $?"
+make_pips_release -CB GNU -D Examples -pe -rsz pips_GNU || 
+	error 5 "ret $?"
 
-echo "Solaris 2 binary version"
+echo "Solaris 2 binary version "
 move pips_GNUSOL2LL
-make_pips_release -CB GNUSOL2LL -pe -rz pips_GNUSOL2LL || error 6 "ret $?"
+make_pips_release -CB GNUSOL2LL -D Examples -pe -rz pips_GNUSOL2LL || 
+	error 6 "ret $?"
 
 echo "Solaris 2 binary version, including Public softs (big!)"
 move pips_Public_GNUSOL2LL
-make_pips_release -CB GNUSOL2LL -peP -rz pips_Public_GNUSOL2LL ||
+make_pips_release -CB GNUSOL2LL -D Examples -peP -rz pips_Public_GNUSOL2LL ||
 	error 7 "ret $?"
 
 echo done
