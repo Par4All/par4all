@@ -53,124 +53,129 @@ entity make_new_entity(ba, kind)
 basic ba;
 int kind;
 {
-extern int count_tmp, count_aux;
-extern list integer_entities, real_entities, logical_entities, complex_entities,
-            double_entities, char_entities;
+  extern int count_tmp, count_aux;
+  extern list integer_entities, real_entities, logical_entities, complex_entities,
+  double_entities, char_entities;
 
-entity new_ent, mod_ent;
-char prefix[4], *name, *num;
-int number;
+  entity new_ent, mod_ent;
+  char prefix[4], *name, *num;
+  int number;
+  entity dynamic_area;
+  
+  /* The first letter of the local name depends on the basic:
+   *       int --> I
+   *     real  --> F (float single precision)
+   *    others --> O
+   */
+  switch(basic_tag(ba))
+    {
+    case is_basic_int: { (void) sprintf(prefix, "I"); break;}
+    case is_basic_float:
+      {
+	if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
+	  (void) sprintf(prefix, "O");
+	else
+	  (void) sprintf(prefix, "F");
+	break;
+      }
+    default: (void) sprintf(prefix, "O");
+    }
 
-/* The first letter of the local name depends on the basic:
- *       int --> I
- *     real  --> F (float single precision)
- *    others --> O
- */
-switch(basic_tag(ba))
-  {
-  case is_basic_int: { (void) sprintf(prefix, "I"); break;}
-  case is_basic_float:
+  /* The three following letters are whether "TMP", for temporaries
+   * or "AUX" for auxiliary variables.
+   */
+  switch(kind)
     {
-    if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
-      (void) sprintf(prefix, "O");
-    else
-      (void) sprintf(prefix, "F");
-    break;
+    case TMP_ENT:
+      {
+	number = (++count_tmp);
+	(void) sprintf(prefix+1, "TMP");
+	break;
+      }
+    case AUX_ENT:
+      {
+	number = (++count_aux);
+	(void) sprintf(prefix+1, "AUX");
+	break;
+      }
+    default: user_error("make_new_entity", "Bad kind of entity: %d", kind);
     }
-  default: (void) sprintf(prefix, "O");
-  }
 
-/* The three following letters are whether "TMP", for temporaries
- * or "AUX" for auxiliary variables.
- */
-switch(kind)
-  {
-  case TMP_ENT:
-    {
-    number = (++count_tmp);
-    (void) sprintf(prefix+1, "TMP");
-    break;
-    }
-  case AUX_ENT:
-    {
-    number = (++count_aux);
-    (void) sprintf(prefix+1, "AUX");
-    break;
-    }
-  default: user_error("make_new_entity", "Bad kind of entity: %d", kind);
-  }
+  mod_ent = current_module(entity_undefined);
+  num = malloc(32);
+  (void) sprintf(num, "%d", number);
 
-mod_ent = current_module(entity_undefined);
-num = malloc(32);
-(void) sprintf(num, "%d", number);
+  /* The first part of the full name is the concatenation of the define
+   * constant ATOMIZER_MODULE_NAME and the local name of the module
+   * entity.
+   */
+  /* ATOMIZER_MODULE_NAME discarded : it is a bug ! RK, 31/05/1994.
+     name = strdup(concatenate(ATOMIZER_MODULE_NAME, entity_local_name(mod_ent),
+     MODULE_SEP_STRING, prefix, num, (char *) NULL));
+     */
+  name = strdup(concatenate(entity_local_name(mod_ent),
+			    MODULE_SEP_STRING, prefix, num, (char *) NULL));
+  /*
+     new_ent = make_entity(name,
+     make_type(is_type_variable,
+     make_variable(ba,
+     NIL)),
+     make_storage(is_storage_rom, UU),
+     make_value(is_value_unknown, UU));
+     */
+  /* Create a true dynamic variable. RK, 31/05/1994 : */
+  new_ent = make_entity(name,
+			make_type(is_type_variable,
+				  make_variable(ba,
+						NIL)),
+			storage_undefined,
+			make_value(is_value_unknown, UU));
+  dynamic_area = global_name_to_entity(module_local_name(mod_ent),
+			    DYNAMIC_AREA_LOCAL_NAME);
+  entity_storage(new_ent) = make_storage(is_storage_ram,
+					 make_ram(mod_ent,
+						  dynamic_area,
+						  add_variable_to_area(dynamic_area, new_ent),
+						  NIL));
+  add_variable_declaration_to_module(mod_ent, new_ent);
 
-/* The first part of the full name is the concatenation of the define
- * constant ATOMIZER_MODULE_NAME and the local name of the module
- * entity.
- */
-name = strdup(concatenate(ATOMIZER_MODULE_NAME, entity_local_name(mod_ent),
-                          MODULE_SEP_STRING, prefix, num, (char *) NULL));
+  /* Is the following useless : */
+  
+  /* The new entity is stored in the list of entities of the same type. */
+  switch(basic_tag(ba))
+    {
+    case is_basic_int:
+      {
+	integer_entities = CONS(ENTITY, new_ent, integer_entities);
+	break;
+      }
+    case is_basic_float:
+      {
+	if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
+	  double_entities = CONS(ENTITY, new_ent, double_entities);
+	else
+	  real_entities = CONS(ENTITY, new_ent, real_entities);
+	break;
+      }
+    case is_basic_logical:
+      {
+	logical_entities = CONS(ENTITY, new_ent, logical_entities);
+	break;
+      }
+    case is_basic_complex:
+      {
+	complex_entities = CONS(ENTITY, new_ent, complex_entities);
+	break;
+      }
+    case is_basic_string:
+      {
+	char_entities = CONS(ENTITY, new_ent, char_entities);
+	break;
+      }
+    default:break;
+    }
 
-new_ent = make_entity(name,
-		      make_type(is_type_variable,
-			        make_variable(ba,
-					      NIL)),
-                      make_storage(is_storage_rom, UU),
-		      make_value(is_value_unknown, UU));
-/*
-new_ent = make_entity(name,
-		      make_type(is_type_variable,
-			        make_variable(ba,
-					      NIL)),
-                      make_storage(is_storage_ram, ram_undefined),
-		      make_value(is_value_unknown, UU));
-*/
-/* The storage is made to DYNAMIC, ie the variable is local. */
-/*
-dynamic_area = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
-                                  DYNAMIC_AREA_LOCAL_NAME);
-new_dynamic_ram = make_ram(mod_ent, 
-                           dynamic_area,
-                           CurrentOffsetOfArea(dynamic_area, new_ent),
-                           NIL);
-storage_ram(entity_storage(new_ent)) = new_dynamic_ram;
-*/
-
-/* The new entity is stored in the list of entities of the same type. */
-switch(basic_tag(ba))
-  {
-  case is_basic_int:
-    {
-    integer_entities = CONS(ENTITY, new_ent, integer_entities);
-    break;
-    }
-  case is_basic_float:
-    {
-    if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
-      double_entities = CONS(ENTITY, new_ent, double_entities);
-    else
-      real_entities = CONS(ENTITY, new_ent, real_entities);
-    break;
-    }
-  case is_basic_logical:
-    {
-    logical_entities = CONS(ENTITY, new_ent, logical_entities);
-    break;
-    }
-  case is_basic_complex:
-    {
-    complex_entities = CONS(ENTITY, new_ent, complex_entities);
-    break;
-    }
-  case is_basic_string:
-    {
-    char_entities = CONS(ENTITY, new_ent, char_entities);
-    break;
-    }
-  default:break;
-  }
-
-return new_ent;
+  return new_ent;
 }
 
 
