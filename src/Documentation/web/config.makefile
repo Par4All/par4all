@@ -54,9 +54,6 @@ home.html : home_content.html
 
 index.html : home_content.html
 
-local_clean:
-	$(RM) $(HTML_AUTO)
-
 local-clean:
 	$(RM) $(HTML_AUTO:.cpp.html=.html) 
 
