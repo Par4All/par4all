@@ -22,14 +22,14 @@
 
 /* Types of domain */
 
-#define UNDEF 0
-#define EXTERNAL 1
-#define BASIS 2
-#define LIST 3
-#define ARRAY 4
-#define CONSTRUCTED 5
-#define IMPORT 6
-#define SET 7
+#define UNDEF_DT 0
+#define EXTERNAL_DT 1
+#define BASIS_DT 2
+#define LIST_DT 3
+#define ARRAY_DT 4
+#define CONSTRUCTED_DT 5
+#define IMPORT_DT 6
+#define SET_DT 7
 
 /* Operators for CONSTRUCTED domains */
 
@@ -42,10 +42,10 @@
 
 extern char *Op_names[] ;
 
-/* The UNIT_TYPE is the used to type expressions which only perform 
+/* The UNIT_TYPE_NAME is the used to type expressions which only perform 
    side-effects. It is mainly used to build sets. */
 
-#define UNIT_TYPE "unit"
+#define UNIT_TYPE_NAME "unit"
 
 /* A list type constructor */
 
@@ -151,9 +151,9 @@ extern struct inlinable {
 /* Different kinds of BINDING structure pointers */
 
 #define IS_INLINABLE(bp) ((bp)->inlined != NULL)
-#define IS_EXTERNAL(bp) ((bp)->domain->ba.type == EXTERNAL)
+#define IS_EXTERNAL(bp) ((bp)->domain->ba.type == EXTERNAL_DT)
 #define IS_TABULATED(bp) ((bp)->index >= 0)
-#define IS_IMPORT(bp) ((bp)->domain->ba.type == IMPORT)
+#define IS_IMPORT(bp) ((bp)->domain->ba.type == IMPORT_DT)
 #define IS_NORMAL(bp) \
 	(!IS_INLINABLE(bp)&&!IS_EXTERNAL(bp)&&!IS_TABULATED(bp))
 
