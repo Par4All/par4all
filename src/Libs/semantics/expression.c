@@ -4,6 +4,13 @@
   * $Id$
   *
   * $Log: expression.c,v $
+  * Revision 1.5  2001/10/22 15:50:39  irigoin
+  * Lots of "context" arguments added because repeated calls to
+  * transformer_range() were too slow on ocean. However, the previous version
+  * was correct with respect to side effects in conditions because the context
+  * was recomputed from the current transformer. The new version might be
+  * faster but wrong in those cases. But they do no occur frequently.
+  *
   * Revision 1.4  2001/07/24 13:16:53  irigoin
   * Set of modifications:
   *  1. side effect analysis moved into transformer library
@@ -86,7 +93,7 @@ generic_minmax_to_transformer(entity e,
 
   pips_debug(8, "begin\n");
 
-  pips_assert("Precondition is unused", transformer_undefined_p(pre));
+  /* pips_assert("Precondition is unused", transformer_undefined_p(pre)); */
 
   for(cexpr = args; !ENDP(cexpr); POP(cexpr)) {
     expression arg = EXPRESSION(CAR(cexpr));
@@ -306,12 +313,14 @@ transformer_add_anded_conditions_updown(
     transformer pre,
     expression c1,
     expression c2,
+    transformer context,
     bool veracity,
     bool upwards)
 {
   static transformer transformer_add_condition_information_updown(
 								  transformer,
 								  expression,
+								  transformer,
 								  bool,
 								  bool);
   transformer newpre = transformer_undefined;
@@ -335,7 +344,7 @@ transformer_add_anded_conditions_updown(
     }
 	  
     pre1 = transformer_add_condition_information_updown
-      (pre, c1, veracity, upwards);
+      (pre, c1, context, veracity, upwards);
 
     ifdebug(9) {
       pips_debug(9, "pre1=%p:\n", pre1);
@@ -343,7 +352,7 @@ transformer_add_anded_conditions_updown(
     }
 	  
     newpre = transformer_add_condition_information_updown
-      (pre1, c2, veracity, upwards);
+      (pre1, c2, context, veracity, upwards);
 
     ifdebug(9) {
       pips_debug(9, "newpre=%p:\n", newpre);
@@ -358,9 +367,9 @@ transformer_add_anded_conditions_updown(
     transformer pre2 = pre;
 
     pre1 = transformer_add_condition_information_updown
-      (pre1, c1, FALSE, upwards);
+      (pre1, c1, context, FALSE, upwards);
     pre2 = transformer_add_condition_information_updown
-      (pre2, c2, FALSE, upwards);
+      (pre2, c2, context, FALSE, upwards);
     newpre = transformer_convex_hull(pre1, pre2);
 		  
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
@@ -374,6 +383,8 @@ transformer_add_anded_conditions_updown(
 		 "newpre =\n");
       dump_transformer(newpre);
     }
+    free_transformer(pre1);
+    free_transformer(pre2);
   }
   else {
     /* might be possible to add a convex hull on the initial values
@@ -401,26 +412,28 @@ static transformer transformer_add_ored_conditions_updown(
     transformer pre,
     expression c1,
     expression c2,
+    transformer context,
     bool veracity,
     bool upwards)
 {
   static transformer transformer_add_condition_information_updown(
     transformer,
     expression,
+    transformer,
     bool,
     bool);
   transformer newpre = transformer_undefined;
 
-  pips_debug(9,"Begin with pre=%p, veracity=%s, upwards=%s\n,",
-	     pre, bool_to_string(veracity),
+  pips_debug(9,"Begin with pre=%p, context=%p, veracity=%s, upwards=%s\n,",
+	     pre, context, bool_to_string(veracity),
 	     bool_to_string(upwards));
 
   if(!veracity) {
     /* compute !(c1||c2) as !c1 && !c2 */
     newpre = transformer_add_condition_information_updown
-      (pre, c1, FALSE, upwards);
+      (pre, c1, context, FALSE, upwards);
     newpre = transformer_add_condition_information_updown
-      (newpre, c2, FALSE, upwards);
+      (newpre, c2, context, FALSE, upwards);
   }
   else if(!upwards) {
     /* compute (c1||c2) as such */
@@ -428,13 +441,10 @@ static transformer transformer_add_ored_conditions_updown(
     transformer pre2 = pre;
 
     pre1 = transformer_add_condition_information_updown
-      (pre1, c1, TRUE, upwards);
+      (pre1, c1, context, TRUE, upwards);
     pre2 = transformer_add_condition_information_updown
-      (pre2, c2, TRUE, upwards);
+      (pre2, c2, context, TRUE, upwards);
     newpre = transformer_convex_hull(pre1, pre2);
-		      
-    /* free_transformer(pre1); */
-    /* free_transformer(pre2); */
 		      
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
       pips_debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
@@ -447,6 +457,9 @@ static transformer transformer_add_ored_conditions_updown(
 	    "newpre =\n");
       (void) (void) dump_transformer(newpre);
     }
+
+    free_transformer(pre1);
+    free_transformer(pre2);
   }
   else {
     /* might be possible to add a convex hull on the initial values
@@ -468,12 +481,14 @@ transformer_add_call_condition_information_updown(
     transformer pre,
     entity op,
     list args,
+    transformer context,
     bool veracity,
     bool upwards)
 {
   static transformer transformer_add_condition_information_updown(
     transformer,
     expression,
+    transformer,
     bool,
     bool);
   transformer newpre = transformer_undefined;
@@ -492,20 +507,20 @@ transformer_add_call_condition_information_updown(
   }
 
   if(ENTITY_RELATIONAL_OPERATOR_P(op)) {
-      newpre = transformer_add_any_relation_information(pre, op, c1, c2, 
-							veracity, upwards);
+    newpre = transformer_add_any_relation_information(pre, op, c1, c2, context,
+						      veracity, upwards);
   }
   else if(ENTITY_AND_P(op)) {
     newpre = transformer_add_anded_conditions_updown
-      (pre, c1, c2, veracity, upwards);
+      (pre, c1, c2, context, veracity, upwards);
   }
   else if(ENTITY_OR_P(op)) {
     newpre = transformer_add_ored_conditions_updown
-      (pre, c1, c2, veracity, upwards);
+      (pre, c1, c2, context, veracity, upwards);
   }
   else if(ENTITY_NOT_P(op)) {
     newpre = transformer_add_condition_information_updown
-      (pre, c1, !veracity, upwards);
+      (pre, c1, context, !veracity, upwards);
   }
   else if((ENTITY_TRUE_P(op) && !veracity) ||
 	  (ENTITY_FALSE_P(op) && veracity)) {
@@ -542,6 +557,7 @@ static transformer
 transformer_add_condition_information_updown(
     transformer pre,
     expression c,
+    transformer context,
     bool veracity,
     bool upwards)
 {
@@ -556,6 +572,8 @@ transformer_add_condition_information_updown(
     print_expression(c);
     (void) fprintf(stderr,"pre=%p\n", pre);
     dump_transformer(pre);
+    (void) fprintf(stderr,"and context=%p\n", context);
+    dump_transformer(context);
   }
 
   switch(syntax_tag(s)){
@@ -565,7 +583,7 @@ transformer_add_condition_information_updown(
       list args = call_arguments(syntax_call(s));
 
       newpre = transformer_add_call_condition_information_updown
-	(pre, f, args, veracity, upwards);
+	(pre, f, args, context, veracity, upwards);
       break;
     }
   case is_syntax_reference:
@@ -606,10 +624,11 @@ transformer
 transformer_add_condition_information(
     transformer pre,
     expression c,
+    transformer context,
     bool veracity)
 {
     transformer post = 
-	transformer_add_condition_information_updown(pre, c, veracity, TRUE);
+	transformer_add_condition_information_updown(pre, c, context, veracity, TRUE);
 
     post = transformer_temporary_value_projection(post);
     reset_temporary_value_counter();
@@ -617,19 +636,34 @@ transformer_add_condition_information(
     return post;
 }
 
+/* context might be derivable from pre as transformer_range(pre) but this
+   is sometimes very computationally intensive, e.g. in ocean. */
 transformer
 precondition_add_condition_information(
     transformer pre,
     expression c,
+    transformer context,
     bool veracity)
 {
-    transformer post = 
-	transformer_add_condition_information_updown(pre, c, veracity, FALSE);
+  transformer post = transformer_undefined;
 
-    post = transformer_temporary_value_projection(post);
-    reset_temporary_value_counter();
+  if(transformer_undefined_p(context)
+     || ENDP(transformer_arguments(context))) {
+    post = transformer_add_condition_information_updown
+      (pre, c, context, veracity, FALSE);
+  }
+  else {
+    transformer new_context = transformer_range(context);
 
-    return post;
+    post = transformer_add_condition_information_updown
+      (pre, c, new_context, veracity, FALSE);
+    free_transformer(new_context);
+  }
+
+  post = transformer_temporary_value_projection(post);
+  reset_temporary_value_counter();
+
+  return post;
 }
 
 /* INTEGER EXPRESSIONS */
@@ -754,7 +788,8 @@ static transformer modulo_to_transformer(entity e, /* assumed to be a value */
 
   debug(8, "modulo_to_transformer", "begin\n");
 
-  pips_assert("Precondition is unused", pre==pre);
+  /* Should be rewritten with expression_to_transformer */
+  /* pips_assert("Precondition is unused", pre==pre); */
   pips_assert("arg1 is unused, shut up the compiler", arg1==arg1);
   pips_assert("arg1 is unused, shut up the compiler", is_internal==is_internal);
     
@@ -782,32 +817,27 @@ static transformer modulo_to_transformer(entity e, /* assumed to be a value */
   return tf;
 }
 
-static transformer iabs_to_transformer(entity e, /* assumed to be a value */
+static transformer iabs_to_transformer(entity v, /* assumed to be a value */
 				       expression expr,
-				       transformer pre)
+				       transformer pre,
+				       bool is_internal)
 {
-  transformer tf = transformer_undefined;
-  normalized n = NORMALIZE_EXPRESSION(expr);
+  transformer tf = transformer_identity();
+  entity tv = make_local_temporary_value_entity(entity_type(v));
+  transformer etf = integer_expression_to_transformer(tv, expr, pre, is_internal);
+  Pvecteur vlb1 = vect_new((Variable) tv, VALUE_ONE);
+  Pvecteur vlb2 = vect_new((Variable) tv, VALUE_MONE);
 
   pips_debug(8, "begin\n");
 
-  pips_assert("Precondition is unused", transformer_undefined_p(pre));
 
-  if(normalized_linear_p(n)) {
-    Pvecteur vlb1 = vect_dup((Pvecteur) normalized_linear(n));
-    Pvecteur vlb2 = vect_multiply(vect_dup((Pvecteur) normalized_linear(n)), VALUE_MONE);
-    Pcontrainte clb1 = CONTRAINTE_UNDEFINED;
-    Pcontrainte clb2 = CONTRAINTE_UNDEFINED;
-    cons * tf_args = NIL;
+  vect_add_elem(&vlb1, (Variable) v, VALUE_MONE);
+  vect_add_elem(&vlb2, (Variable) v, VALUE_MONE);
 
-    vect_add_elem(&vlb1, (Variable) e, VALUE_MONE);
-    vect_add_elem(&vlb2, (Variable) e, VALUE_MONE);
-    clb1 = contrainte_make(vlb1);
-    clb2 = contrainte_make(vlb2);
-    clb1->succ = clb2;
-    tf = make_transformer(tf_args,
-			  make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb1)));
-  }
+  tf = transformer_inequality_add(tf, vlb1);
+  tf = transformer_inequality_add(tf, vlb2);
+  tf = transformer_safe_image_intersection(tf, etf);
+  free_transformer(etf);
 
   ifdebug(8) {
     pips_debug(8, "result:\n");
@@ -818,6 +848,8 @@ static transformer iabs_to_transformer(entity e, /* assumed to be a value */
   return tf;
 }
 
+/* More could be done along the line of
+   integer_multiply_to_transformer()... when need arises.*/
 static transformer 
 integer_divide_to_transformer(entity e,
 			      expression arg1,
@@ -864,6 +896,12 @@ integer_divide_to_transformer(entity e,
   return tf;
 }
 
+/* Assumes that e1 and e2 are integer expressions, i.e. explicit casting
+   is supposed to be used */
+/* Better results might be obtained when e1 is an affine function of e2 or
+   vice-versa as can occur when convex hulls generate coupling between
+   variables. See non_linear11.f, 22L1=9L2+40, 1<=L1<=10. The smallest
+   possible value is -2 and not -20. */
 static transformer 
 integer_multiply_to_transformer(entity v,
 				expression e1,
@@ -872,9 +910,99 @@ integer_multiply_to_transformer(entity v,
 				bool is_internal)
 {
   transformer tf = transformer_undefined;
+  entity v1 = make_local_temporary_value_entity(entity_type(v));
+  transformer t1 = integer_expression_to_transformer(v1, e1, pre, is_internal);
+  entity v2 = make_local_temporary_value_entity(entity_type(v));
+  transformer t2 = integer_expression_to_transformer(v2, e2, pre, is_internal);
 
-  pips_assert("Shut up the compiler",
-	      v==v && e1==e1 && e2==e2 && pre==pre && is_internal==is_internal);
+  pips_debug(8, "Begin\n");
+
+  if(!transformer_undefined_p(t1) && !transformer_undefined_p(t2)) {
+    int lb1 = 0;
+    int ub1 = 0;
+    int lb2 = 0;
+    int ub2 = 0;
+    expression ev1 = entity_to_expression(v1);
+    expression ev2 = entity_to_expression(v2);
+
+    t1 = transformer_safe_image_intersection(t1, pre);
+    t2 = transformer_safe_image_intersection(t2, pre);
+
+    expression_and_precondition_to_integer_interval(ev1, t1, &lb1, &ub1);
+    expression_and_precondition_to_integer_interval(ev2, t2, &lb2, &ub2);
+    free_expression(ev1);
+    free_expression(ev2);
+
+    if(lb1==ub1) {
+      /* The numerical value of expression e1 is known: v = lb1*v2 */
+      Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
+
+      vect_add_elem(&veq, (Variable) v2, (Value) lb1);
+      transformer_equality_add(t2, veq);
+      tf = t2;
+      free_transformer(t1);
+    }
+    else if(lb2==ub2) {
+      /* The numerical value of expression e2 is known: v = lb2*v1 */
+      Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
+
+      vect_add_elem(&veq, (Variable) v1, (Value) lb2);
+      tf = transformer_equality_add(t1, veq);
+      free_transformer(t2);
+    }
+    else {
+      /* Do we have range information? */
+      long long p1 = ((long long) lb1 )*((long long) lb2 );
+      long long p2 = ((long long) lb1 )*((long long) ub2 );
+      long long p3 = ((long long) ub1 )*((long long) lb2 );
+      long long p4 = ((long long) ub1 )*((long long) ub2 );
+      long long lb = (p2<p1)? p2 : p1;
+      long long ub = (p2>p1)? p2 : p1;
+
+      lb = (p3<lb)? p3 : lb;
+      lb = (p4<lb)? p4 : lb;
+
+      ub = (p3>ub)? p3 : ub;
+      ub = (p4>ub)? p4 : ub;
+
+      free_transformer(t1);
+      free_transformer(t2);
+
+      if(lb > INT_MIN || ub < INT_MAX)
+	tf = transformer_identity();
+
+      if(lb > INT_MIN) {
+	Pvecteur vineql = vect_new((Variable) v, VALUE_MONE);
+
+	vect_add_elem(&vineql, TCST, lb);
+	tf = transformer_inequality_add(transformer_identity(), vineql);
+      }
+      if(ub < INT_MAX) {
+	Pvecteur vinequ = vect_new((Variable) v, VALUE_ONE);
+
+	vect_add_elem(&vinequ, TCST, -ub);
+	tf = transformer_inequality_add(tf, vinequ);
+      }
+    }
+  }
+  else if(!transformer_undefined_p(t1)) {
+    free_transformer(t1);
+  }
+  else if(!transformer_undefined_p(t2)) {
+    free_transformer(t2);
+  }
+
+  if(transformer_undefined_p(tf)) {
+    /* let's assume no impact from side effects */
+    if(expression_equal_p(e1, e2)) {
+      Pvecteur vineq = vect_new((Variable) v, VALUE_MONE);
+      tf = transformer_identity();
+      tf = transformer_inequality_add(tf, vineq);
+    }
+  }
+
+  pips_debug(8, "End with tf=%p\n", tf);
+  ifdebug(8) (void) dump_transformer(tf);
 
   return tf;
 }
@@ -890,9 +1018,12 @@ integer_power_to_transformer(entity e,
   normalized n1 = NORMALIZE_EXPRESSION(arg1);
   normalized n2 = NORMALIZE_EXPRESSION(arg2);
 
-  debug(8, "integer_power_to_transformer", "begin\n");
+  pips_debug(8, "begin\n");
 
-  pips_assert("Precondition is unused", transformer_undefined_p(pre));
+  /* Should be rewritten using expression_to_transformer and expression
+     evaluation as in integer_multiply_to_transformer */
+  /* pips_assert("Precondition is unused", transformer_undefined_p(pre)); */
+  pips_assert("Shut up the compiler", pre==pre);
   pips_assert("Shut up the compiler", is_internal==is_internal);
 
   if(signed_integer_constant_expression_p(arg2) && normalized_linear_p(n1)) {
@@ -1030,62 +1161,35 @@ integer_power_to_transformer(entity e,
 }
 
 static transformer 
-integer_minmax_to_transformer(entity e,
+integer_minmax_to_transformer(entity v, /* value for minmax */
 			      list args,
 			      transformer pre,
 			      bool is_min,
 			      bool is_internal)
 {
-  transformer tf = transformer_undefined;
-  expression arg = expression_undefined;
-  normalized n = normalized_undefined;
+  transformer tf = transformer_identity();
   list cexpr;
-  Pcontrainte cl = CONTRAINTE_UNDEFINED;
 
   pips_debug(8, "begin for %s %s\n",
 	     is_min? "minimum" : "maximum",
 	     is_internal? "intraprocedural" : "interprocedural");
 
-  pips_assert("Precondition is unused", transformer_undefined_p(pre));
-
   for(cexpr = args; !ENDP(cexpr); POP(cexpr)) {
-    arg = EXPRESSION(CAR(cexpr));
-    n = NORMALIZE_EXPRESSION(arg);
+    expression arg = EXPRESSION(CAR(cexpr));
+    entity tv = make_local_temporary_value_entity(entity_type(v));
+    transformer etf = integer_expression_to_transformer(tv, arg, pre, is_internal);
+    Pvecteur vineq = vect_new((Variable) tv, (Value) VALUE_ONE);
 
-    if(normalized_linear_p(n)) {
-      Pvecteur v = vect_dup((Pvecteur) normalized_linear(n));
-      Pcontrainte cv = CONTRAINTE_UNDEFINED;
+    vect_add_elem(&vineq, (Variable) v, VALUE_MONE);
 
-      vect_add_elem(&v, (Variable) e, VALUE_MONE);
-
-      if(is_min) {
-	v = vect_multiply(v, VALUE_MONE);
-      }
-
-      cv = contrainte_make(v);
-      cv->succ = cl;
-      cl = cv;
-
+    if(is_min) {
+      vineq = vect_multiply(vineq, VALUE_MONE);
     }
-  }
 
-  if(CONTRAINTE_UNDEFINED_P(cl) || CONTRAINTE_NULLE_P(cl)) {
-    Psysteme sc = sc_make(CONTRAINTE_UNDEFINED, cl);
-
-    sc_base(sc) = base_add_variable(BASE_NULLE, (Variable) e);
-    sc_dimension(sc) = 1;
-    tf = make_transformer(NIL,
-			  make_predicate(sc));
+    tf = transformer_inequality_add(tf, vineq);
+    tf = transformer_safe_image_intersection(tf, etf);
+    free_transformer(etf);
   }
-  else {
-    /* A miracle occurs and the proper basis is derived from the
-       constraints ( I do not understand why the new and the old value
-       of e both appear... so it may not be necessary for the
-       consistency check... I'm lost, FI, 6 Jan. 1999) */
-    tf = make_transformer(NIL,
-			  make_predicate(sc_make(CONTRAINTE_UNDEFINED, cl)));
-  }
-
 
   ifdebug(8) {
     pips_debug(8, "result:\n");
@@ -1123,7 +1227,7 @@ integer_unary_operation_to_transformer(
 
   if(transformer_undefined_p(tf)) {
     if(ENTITY_IABS_P(op)) {
-      tf = iabs_to_transformer(e, e1, pre);
+      tf = iabs_to_transformer(e, e1, pre, is_internal);
     }
   }
 
@@ -1141,6 +1245,8 @@ integer_binary_operation_to_transformer(
 {
   transformer tf = transformer_undefined;
 
+  pips_debug(8, "Begin\n");
+
   if(ENTITY_PLUS_P(op) || ENTITY_MINUS_P(op)) {
     tf = addition_operation_to_transformer(e, e1, e2, pre, ENTITY_PLUS_P(op), is_internal);
   }
@@ -1157,6 +1263,8 @@ integer_binary_operation_to_transformer(
     tf = integer_power_to_transformer(e, e1, e2, pre, is_internal);
   }
 
+  pips_debug(8, "End with tf=%p\n", tf);
+
   return tf;
 }
 
@@ -1164,7 +1272,8 @@ static transformer
 integer_call_expression_to_transformer(
     entity e,
     expression expr, /* needed to compute effects for user calls */
-    transformer pre,
+    transformer pre, /* Predicate on current store assumed not modified by
+                        expr's side effects */
     bool is_internal)
 {
   syntax sexpr = expression_syntax(expr);
@@ -1174,7 +1283,7 @@ integer_call_expression_to_transformer(
   transformer tf = transformer_undefined;
   int arity = gen_length(args);
 
-  pips_debug(9, "Begin\n");
+  pips_debug(8, "Begin\n");
 
   /* tests are organized to trap 0-ary user-defined functions as well as
      binary min and max */
@@ -1209,7 +1318,7 @@ integer_call_expression_to_transformer(
     tf = integer_binary_operation_to_transformer(e, f, e1, e2, pre, is_internal);
   }
 
-  pips_debug(9, "End with tf=%p\n", tf);
+  pips_debug(8, "End with tf=%p\n", tf);
 
   return tf;
 }
@@ -1442,6 +1551,7 @@ static transformer logical_binary_function_to_transformer(entity v,
 								 op,
 								 expr1,
 								 expr2,
+								 pre,
 								 TRUE,
 								 TRUE);
 
@@ -1710,12 +1820,12 @@ transformer transformer_add_any_relation_information(
 	entity op,
 	expression e1, 
 	expression e2, 
+	transformer context,
 	bool veracity,   /* the relation is true or not */
 	bool upwards)    /* compute transformer or precondition */
 {
   basic b1 = basic_of_expression(e1);
   basic b2 = basic_of_expression(e2);
-  transformer context = transformer_undefined;
 
   pips_debug(8, "begin %s with pre=%p\n",
 	     upwards? "upwards" : "downwards", pre);
@@ -1726,7 +1836,7 @@ transformer transformer_add_any_relation_information(
      to-be-modified transformer */
 
   /* context = upwards? transformer_undefined : pre; */
-  context = pre;
+  /* context = transformer_range(pre); */
 
   if(basic_tag(b1)==basic_tag(b2)) {
 
@@ -1914,10 +2024,10 @@ bool eval_condition_wrt_precondition_p(expression c, transformer pre, bool verac
   transformer f = transformer_dup(pre);
 
   if(veracity) {
-    f = precondition_add_condition_information(f, c, FALSE);
+    f = precondition_add_condition_information(f, c, pre, FALSE);
   }
   else {
-    f = precondition_add_condition_information(f, c, TRUE);
+    f = precondition_add_condition_information(f, c, pre, TRUE);
   }
 
   result = transformer_empty_p(f);
