@@ -17,4 +17,5 @@ void gen_array_dupaddto(gen_array_t, int, char *);
 char **gen_array_pointer(gen_array_t);
 int gen_array_nitems(gen_array_t);
 int gen_array_size(gen_array_t);
+char * gen_array_item(gen_array_t, int);
 void gen_array_sort(gen_array_t);
