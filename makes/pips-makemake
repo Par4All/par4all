@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/06/29 14:00:54 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/06/29 14:17:36 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -202,6 +202,7 @@ ARCH=		$(${PART}_ARCH)
 #
 INSTALL_FILE_DIR= ${install_file_dir}
 INSTALL_LIB_DIR=  ${install_lib_dir}/$(ARCH)
+INSTALL_SHR_DIR=  ${install_exe_dir}
 INSTALL_EXE_DIR=  ${install_exe_dir}/$(ARCH)
 # (obsolete?)
 MAIN=		main
@@ -288,6 +289,7 @@ INC_TARGET=	$(TARGET).h
 #
 INSTALL_FILE=	$(INC_TARGET)
 INSTALL_LIB=	$(LIB_TARGET)
+INSTALL_SHR=	
 INSTALL_EXE=	`if [ $DIRTYPE = 'Passes' ] ; then echo '$(BIN_TARGET)' ; fi`
 #
 
@@ -321,7 +323,8 @@ all: $(RFILES)
 SOURCES=	$(SCRIPTS) $(FILES) $(SFILES) $(CONFIG_FILE) $(DOCS)
 INSTALL_FILE=	$(FILES)
 INSTALL_LIB=
-INSTALL_EXE=	$(SCRIPTS) $(RFILES)
+INSTALL_SHR=	$(SCRIPTS)
+INSTALL_EXE=	$(RFILES)
 
 .runable: $(SCRIPTS)
 	-[ "$(SCRIPTS)" ] && chmod a+x $(SCRIPTS)
@@ -471,9 +474,10 @@ check_os:
 	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
 	fi
 
-.quick-install: $(INSTALL_FILE) $(INSTALL_LIB) $(INSTALL_EXE)
+.quick-install: $(INSTALL_FILE) $(INSTALL_LIB) $(INSTALL_EXE) $(INSTALL_SHR)
 	@pips_install_file -f $(INSTALL_FILE_DIR) $(INSTALL_FILE)
 	@pips_install_file -l $(INSTALL_LIB_DIR) $(INSTALL_LIB)
+	@pips_install_file -x $(INSTALL_SHR_DIR) $(INSTALL_SHR)
 	@pips_install_file -x $(INSTALL_EXE_DIR) $(INSTALL_EXE)
 	touch .quick-install
 
