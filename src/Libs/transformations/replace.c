@@ -163,8 +163,11 @@ void CallReplaceReference(call c, reference ref, expression next)
 	/* nothing to replace */
 	break;
       case is_value_symbolic:
+	/* 
 	pips_error("CallReplaceReference", 
 		   "case is_value_symbolic: replacement not implemented\n");
+		   */
+	/* FI: I'd rather assume, nothing to replace for symbolic constants */
 	break;
       case is_value_intrinsic:
       case is_value_unknown:
