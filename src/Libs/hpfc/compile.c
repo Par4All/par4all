@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/03/29 18:22:03 $, )
+ * ($Date: 1996/06/13 21:15:13 $, )
  */
 
 #include "defines-local.h"
@@ -241,6 +241,14 @@ init_host_and_node_entities ()
 {
     entity current_module = get_current_module_entity();
 
+    ifdebug(3)
+    {
+	debug_on("PRETTYPRINT_DEBUG_LEVEL");
+	pips_debug(3, "old declarations:\n");
+	print_text(stderr, text_declaration(current_module));
+	debug_off();
+    }
+
     host_module = load_new_host(current_module);
     node_module = load_new_node(current_module);
 
@@ -292,18 +300,13 @@ init_host_and_node_entities ()
     ifdebug(3)
     {
 	debug_on("PRETTYPRINT_DEBUG_LEVEL");
-
-	fprintf(stderr,"[init_host_and_node_entities]\n old declarations:\n");
-	print_text(stderr, text_declaration(current_module));
-
-	fprintf(stderr,"node_module:\n");
+	pips_debug(3,"new declarations - node_module:\n");
 	(void) gen_consistent_p(node_module);
 	print_text(stderr, text_declaration(node_module));
 
-	fprintf(stderr, "new declarations,\nhost_module:\n");
+	pips_debug(3, "new declarations - host_module:\n");
 	(void) gen_consistent_p(host_module);
 	print_text(stderr, text_declaration(host_module));
-
 	debug_off();
     }
 }
