@@ -2,10 +2,12 @@
 # $RCSfile: config.makefile,v $ for dev
 #
 
-SCRIPTS = 	pips-makemake \
+UTILS=		pips-makemake \
 		install_pips_sources \
+		pips_install_file
+
+SCRIPTS = 	$(UTILS) \
 		make-tags \
-		pips_install_file \
 		analyze_libraries \
 		clean-pips \
 		grep_libraries \
@@ -40,7 +42,7 @@ INSTALL_INC=	$(MACROS)
 
 SOURCES	=	$(SCRIPTS) $(SRC_MACROS) forward_gnu_makefile
 
-quick-install: install_forward_makefiles install_macros 
+quick-install: install_forward_makefiles install_macros install_utils
 all: $(DDC_MACROS)
 
 auto-dash.h: auto.h
@@ -65,9 +67,17 @@ install_macros: $(DDC_MACROS)
 	#
 	# installing makefile macros for pips/newgen/linear
 	#
-	$(COPY) $(MACROS) $(PIPS_ROOT)/Include
-	$(COPY) $(MACROS) $(NEWGEN_ROOT)/Include
-	$(COPY) $(MACROS) $(LINEAR_ROOT)/Include
+	$(INSTALL) $(PIPS_ROOT)/Include $(MACROS) 
+	$(INSTALL) $(NEWGEN_ROOT)/Include $(MACROS) 
+	$(INSTALL) $(LINEAR_ROOT)/Include $(MACROS) 
+
+install_utils: 
+	#
+	# installing shared utils
+	#
+	$(INSTALL) $(PIPS_ROOT)/Utils $(UTILS)
+	$(INSTALL) $(NEWGEN_ROOT)/Utils $(UTILS)
+	$(INSTALL) $(LINEAR_ROOT)/Utils $(UTILS)
 
 #
 # where to install forward makefiles
@@ -85,7 +95,7 @@ install_forward_makefiles:
 	for d in $(DIRS) ; do \
 	  for s in $(SUBDIRS) ; do \
 	    test ! -d $$d/$$s || \
-		{ echo "copying forward makefile to $$d/$$s"; \
+	      { echo "copying forward makefile to $$d/$$s"; \
 		$(COPY) forward_gnu_makefile $$d/$$s/Makefile; } ; done; done;\
 
 # that is all
