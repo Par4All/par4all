@@ -6,7 +6,8 @@ YFLAGS+=	-v -d
 
 #
 LIB_MAIN	=	main_tpips.c
-LIB_CFILES	=	tpips.c
+LIB_CFILES	=	tpips.c \
+			wrapper.c
 LIB_HEADERS	=	tpips-local.h \
 			tp_lex.l \
 			tp_yacc.y \
