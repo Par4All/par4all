@@ -14,7 +14,6 @@
 
 #include <setjmp.h>
 
-
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
@@ -43,8 +42,8 @@
 #include "effects-generic.h"
 #include "effects-convex.h"
 
-/* from syntax.h */
-extern entity CreateIntrinsic(string /*name*/);
+extern entity CreateIntrinsic(string /*name*/); /* from syntax.h */
+extern bool get_bool_property(string);
 
 #define BACKWARD TRUE
 #define FORWARD FALSE
@@ -951,8 +950,42 @@ static Psysteme array_translation_sc(bool *p_exact_translation_p)
     return(trans_sc);
 }
 
+/* variables representing the same location in a common are simplified...
+ * this should/must exists somewhere?
+ * FC 21/06/2000
+ */
+static void simplify_common_variables(Pcontrainte c)
+{
+  boolean changed;
 
-
+  do 
+  {
+    Pvecteur v, vp;
+
+    changed = FALSE;
+    for (v=c->vecteur; v && !changed; v=v->succ)
+    {
+      entity var = (entity) var_of(v);
+      if (var) 
+      {
+	for (vp=v->succ; vp; vp=vp->succ)
+	{
+	  entity varp = (entity) var_of(vp);
+	  if (varp && entity_conflict_p(var, varp))
+	  {
+	    Value val = val_of(vp);
+	    changed = TRUE;
+	    vect_add_elem(& c->vecteur, (Variable) varp, value_uminus(val));
+	    vect_add_elem(& c->vecteur, (Variable) var, val);
+	    break;
+	  }
+	}
+      }
+    }
+
+  } while (changed);
+}
+
 /* static boolean arrays_same_ith_dimension_p(reference array_1_ref, 
  *                                            entity array_2, 
  *                                            int i)
@@ -990,8 +1023,8 @@ static boolean arrays_same_ith_dimension_p(int i)
 
     /* FIRST: check the offset with the current dimension */
 
-    /* If there is a reference, we must verify that the offset of this dimension
-     * is equal to the lower bound of the declaration.
+    /* If there is a reference, we must verify that the offset of this 
+     * dimension is equal to the lower bound of the declaration.
      */
     if (reference_p)
     {
@@ -1022,7 +1055,8 @@ static boolean arrays_same_ith_dimension_p(int i)
 	    }
 	}
 
-	pips_debug(6, "reference: %ssame lower bound.\n", same_dim? "" : "not ");
+	pips_debug(6, "reference: %ssame lower bound.\n",
+		   same_dim? "" : "not ");
     } 
     /* If we know the offset, we must verify that it is a multiple of the size
      * of the subarray of dimension i. Else, the dimensions must be considered
@@ -1087,6 +1121,7 @@ static boolean arrays_same_ith_dimension_p(int i)
     
     if ( same_dim && !((i==dim_1) && (i==dim_2)) )
     {
+      pips_debug(9, "checking size\n");
 	if (normalized_linear_p(ndl1) && normalized_linear_p(ndl2) &&
 	    normalized_linear_p(ndu1) && normalized_linear_p(ndu2)) 
 	{	
@@ -1105,6 +1140,19 @@ static boolean arrays_same_ith_dimension_p(int i)
 	    }
 	    
 	    c = contrainte_make(vect_substract(v1,v2));
+
+	    /* if dimensions are declared with common variables,
+	     * several entities represent the same value/location.
+	     * this must be dealt with somewhere! 
+	     * maybe this should be handled in some other place?
+	     */
+	    simplify_common_variables(c);
+
+	    ifdebug(9) {
+	      pips_debug(9, "linear case: ");
+	      egalite_debug(c);
+	    }
+
 	    same_dim = eq_redund_with_sc_p(get_translation_context_sc(), c);
 	    if (statistics_p && !same_dim)
 		common_dimension_stat.not_same_decl++;
@@ -1117,10 +1165,11 @@ static boolean arrays_same_ith_dimension_p(int i)
 	    same_dim = FALSE;
 	    if (statistics_p) common_dimension_stat.non_linear_decl++;
 	}
+	pips_debug(6, "size: %ssame %d dimension\n", same_dim? "": "not ", i);
     }
     
-    pips_debug(6, "%ssame dimension\n", same_dim? "" : "not ");
-    return(same_dim);    
+    pips_debug(6, "%ssame %d dimension\n", same_dim? "" : "not ", i);
+    return same_dim;
 }
 
 
