@@ -1,12 +1,13 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/02 19:40:33 $, 
+# $Date: 1996/07/08 16:39:48 $, 
 #
 # Newgen should be quite particular...
 
 YFLAGS+= -d -v
 
 all: $(ARCH)/newC $(ARCH)/libgenC.a
+recompile: all quick-install
 
 LIB_HEADERS=\
         genC.h \
@@ -56,7 +57,9 @@ DERIVED_FILES=
 CFILES=  $(LIB_CFILES) $(DERIVED_CFILES) $(OTHER_CFILES)
 LIB_OBJECTS= $(addprefix $(ARCH)/,$(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o))
 
-SOURCES= $(LIB_HEADERS) $(LIB_CFILES) $(OTHER_HEADERS) $(OTHER_CFILES)
+SOURCES= $(LIB_HEADERS) $(LIB_CFILES) \
+	$(OTHER_HEADERS) $(OTHER_CFILES) \
+	config.makefile
 
 INSTALL_FILE= $(LIB_HEADERS)
 INSTALL_LIB= $(ARCH)/libgenC.a
@@ -65,6 +68,8 @@ INSTALL_EXE= $(ARCH)/newC
 
 #
 # local rules
+
+$(ARCH)/libgenC.a: $(DERIVED_CFILES) $(DERIVED_HEADERS)
 
 $(ARCH)/libgenC.a: $(LIB_OBJECTS)
 	$(RM) $@
