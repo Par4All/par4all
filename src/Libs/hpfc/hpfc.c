@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/11/14 12:58:27 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/11/14 13:09:57 $, )
  * version $Revision$
  */
  
@@ -276,7 +276,7 @@ static void set_resources_for_module(entity module)
 
     /*   A IMPLEMENTER PLUS TARD */  
     
-    if (IN_OUT_REGIONS)  /*IN & OUT Regions are not used*/
+    if (!HPFC_IGNORE_IN_OUT_REGIONS)  /*IN & OUT Regions are not used*/
 	{
 	    set_bool_property("MUST_REGIONS", TRUE); 
 	    set_bool_property("EXACT_REGIONS", TRUE);	  
