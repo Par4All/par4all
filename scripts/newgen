@@ -11,6 +11,9 @@ VERSION='undefined'
 LISP=-lisp
 C=-c
 
+# CPP="/lib/cpp"
+CPP="gcc -E"
+
 define_base()
 {
 	base=$1
@@ -226,7 +229,7 @@ go () {
 			      d" >> $include
 		enter_package $base $include
 		(echo "--NEWGEN-START $start
---NEWGEN-INDEX $index" ; cat $i) | /lib/cpp | sed -e '/^#/d' | \
+--NEWGEN-INDEX $index" ; cat $i) | ${CPP} | sed -e '/^#/d' | \
 			$NEWGEN $base $base.spec >> $include
 		if [ $? != 0 ] ; then
 			echo "newgen: Error in specification"
