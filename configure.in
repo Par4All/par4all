@@ -67,8 +67,9 @@ case "$target" in
 	echo "setting sizes of int by hand:  int 4, long int 4, long long int 8 "
 	ac_cv_sizeof_int=4
 	ac_cv_sizeof_long_int=4
-	ac_cv_sizeof_long_long_int=8;;
+	ac_cv_sizeof_long_long_int=8
 	lib_type=int
+	;;
     *)
 	AC_CHECK_SIZEOF(int,1)
 	AC_CHECK_SIZEOF(long int,1)
