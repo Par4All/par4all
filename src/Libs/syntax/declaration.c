@@ -60,6 +60,35 @@ void InitAreas()
 
 /* functions for the SAVE declaration */
 
+void save_all_entities()
+{
+    entity mod = get_current_module_entity();
+    list vars = code_declarations(value_code(entity_initial(mod)));
+
+    pips_assert("save_all_entities", StaticArea != entity_undefined);
+    pips_assert("save_all_entities", DynamicArea != entity_undefined);
+
+    /* FI: all variables previously allocated should be reallocated */
+
+    MAP(ENTITY, e, {
+	storage s;
+	if((s=entity_storage(e))!= storage_undefined) {
+	    if(storage_ram_p(s) && ram_section(storage_ram(s)) == DynamicArea) {
+		free_storage(entity_storage(e));
+		entity_storage(e) =
+		    make_storage(is_storage_ram,
+				 (make_ram(mod,
+					   StaticArea, 
+					   CurrentOffsetOfArea(StaticArea ,e),
+					   NIL)));
+	    }
+	}
+    }, vars);
+
+    /* FI: This is pretty crude... Let's hope it works */
+    DynamicArea = StaticArea;
+}
+
 /* this function transforms a dynamic variable into a static one.  */
 
 void SaveEntity(e)
@@ -83,7 +112,7 @@ entity e;
 	    ram_offset(r) = CurrentOffsetOfArea(StaticArea, e);
 	}
 	else {
-	    FatalError("SaveEntity", "cannot save non dynamic variables\n");
+	    ParserError("SaveEntity", "cannot save non dynamic variables\n");
 	}
     }
     else {
