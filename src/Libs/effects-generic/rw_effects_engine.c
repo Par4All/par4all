@@ -33,9 +33,7 @@
 
 #include "effects-generic.h"
 
-/*********************************************************************************/
-/* TO CONTRACT PROPER EFFECTS                                                    */
-/*********************************************************************************/
+/************************************************ TO CONTRACT PROPER EFFECTS */
 
 static contract_p = TRUE;
 
@@ -46,9 +44,7 @@ set_contracted_rw_effects(bool b)
 }
 
 
-/*********************************************************************************/
-/* INTERPROCEDURAL COMPUTATION                                                   */
-/*********************************************************************************/
+/*********************************************** INTERPROCEDURAL COMPUTATION */
 
 bool 
 summary_rw_effects_engine(string module_name)
@@ -224,7 +220,7 @@ rw_effects_of_call(call c)
     transformer context = (*load_context_func)(current_stat);
     list le = NIL;
 
-    pips_debug(2, "begin\n");
+    pips_debug(2, "begin call to %s\n", entity_name(call_function(c)));
 
     if (!(*empty_context_test)(context))
     {
