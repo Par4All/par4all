@@ -209,27 +209,61 @@ void db_delete_resource(string rname, string oname)
  */
 bool db_update_time(string rname, string oname)
 {
-    db_resource r;
-    DB_OK;
-    pips_assert("displayable resource", displayable_file_p(rname));
-    r = get_real_db_resource(rname, oname);
-    db_resource_time(r) = db_get_logical_time();
-    db_resource_file_time(r) =
-	dbll_stat_local_file(db_resource_pointer(r), FALSE); 
-    /*dbll_stat_resource_file(rname, oname, TRUE); */
-    return TRUE;
+  db_resource r;
+  DB_OK;
+  pips_assert("displayable resource", displayable_file_p(rname));
+  r = get_real_db_resource(rname, oname);
+  db_resource_time(r) = db_get_logical_time();
+  db_resource_file_time(r) =
+    dbll_stat_local_file(db_resource_pointer(r), FALSE); 
+  /*dbll_stat_resource_file(rname, oname, TRUE); */
+  return TRUE;
+}
+
+void db_print_all_required_resources(FILE * file)
+{
+  DB_RESOURCES_MAP(os, or,
+  {
+    DB_OWNED_RESOURCES_MAP(rs, r,
+    {
+      string rn = db_symbol_name(rs);
+      string on = db_symbol_name(os);
+      pips_debug(8, "considering %s of %s (%p)\n", rn, on, (char*) r);
+
+      if (db_resource_required_p(r)) {
+	fprintf(file, "%s of %s is in 'required' status since %d\n", 
+		rn, on, db_resource_time(r));
+      }
+    },
+      or);
+  },
+		   get_pips_database());
 }
 
 /******************************************************* RESOURCE MANAGEMENT */
 
 /* from now on we must not know about the database internals? */
 
+/* TRUE if exists and in *ANY* state. */
 bool db_resource_required_or_available_p(string rname, string oname)
 {
   DB_OK;
   return !db_resource_undefined_p(get_db_resource(rname, oname));
 }
 
+/* TRUE if exists and in required state. */
+bool db_resource_is_required_p(string rname, string oname)
+{
+  db_resource r;
+  DB_OK;
+  r = get_db_resource(rname, oname);
+  if (db_resource_undefined_p(r))
+    return FALSE;
+  else
+    return db_resource_required_p(r);
+}
+
+/* TRUE if exists and in loaded or stored state. */
 bool db_resource_p(string rname, string oname)
 {
   db_resource r; 
@@ -238,7 +272,7 @@ bool db_resource_p(string rname, string oname)
   if (db_resource_undefined_p(r))
     return FALSE;
   else
-    return !db_resource_required_p(r);
+    return db_resource_loaded_p(r) || db_resource_stored_p(r);
 }
 
 int db_time_of_resource(string rname, string oname)
@@ -360,14 +394,27 @@ string db_get_memory_resource(string rname, string oname, bool pure)
     return result;
 }
 
-void db_set_resource_as_required_if_new(string rname, string oname)
+void db_set_resource_as_required(string rname, string oname)
 {
   db_resource r;
+  db_status s;
   DB_OK;
   r = find_or_create_db_resource(rname, oname);
-  if (db_status_undefined_p(db_resource_db_status(r)))
+  s = db_resource_db_status(r);
+  if (db_status_undefined_p(s))
     /* newly created db_resource... */
-    db_resource_db_status(r) = make_db_status(is_db_status_required, UU);
+    db_resource_db_status(r) = s = make_db_status(is_db_status_required, UU);
+  else
+  {
+    if (db_status_loaded_p(s) && !string_undefined_p(db_resource_pointer(r)))
+    {
+      dbll_free_resource(rname, oname, db_resource_pointer(r));
+      db_resource_pointer(r) = string_undefined;
+    }
+  }
+
+  db_status_tag(db_resource_db_status(r)) = is_db_status_required;
+  db_resource_time(r) = db_get_logical_time();
 }
 
 void db_put_or_update_memory_resource(
@@ -393,7 +440,7 @@ void db_put_or_update_memory_resource(
     }
     
     /* store data */
-    db_resource_pointer(r) = p;
+    db_resource_pointer(r) = p; /** ??? memory leak */
     db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
     db_resource_time(r) = db_get_logical_time();
 
