@@ -14,6 +14,12 @@
 #
 
 WS=${1:?"Please give me the workspace name to work with"}
+if [ `basename $WS` != "$WS" ]
+then
+	echo $0 can only be used on a local database
+	exit 1
+fi
+
 WDIR=${WS}.database
 CAT=${PAGER:-cat}
 
