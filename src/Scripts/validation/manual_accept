@@ -1,13 +1,15 @@
 #! /bin/sh
 #
 # $RCSfile: manual_accept,v $ (version $Revision$)
-# $Date: 1996/12/30 19:34:16 $, 
+# $Date: 1997/01/02 16:05:35 $, 
 #
 
 CD=$PWD
 
 for dir
 do
+  if test -d $dir
+  then 
     cd $dir
     for f in *.result/test.out
     do 
@@ -23,6 +25,7 @@ do
 	fi
     done
     cd $CD
+  fi
 done
 
 # end of $RCSfile: manual_accept,v $
