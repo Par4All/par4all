@@ -5,6 +5,7 @@
 #include "text.h"
 #include "text-util.h"
 #include "ri.h"
+#include "ri-util.h"
 #include "misc.h"
 #include "properties.h"
 #include "word_attachment.h"
@@ -327,6 +328,17 @@ output_an_attachment(attachment a)
 		    (unsigned int) l);
 	    break;
 	}
+	
+    case is_attachee_module_head:
+	{
+	    entity head = attachee_module_head(at);
+	    pips_debug(5, "\tmodule_head %#x\n", (unsigned int) head);
+	    fprintf(local_output_file,
+		    "face epips-face-module-head epips-module-head-name \"%s\"",
+		    module_local_name(head));
+	    break;
+	}
+
     default:
 	pips_assert("attachee_tag inconsistent", FALSE);
     }
