@@ -528,7 +528,7 @@ static char * skip_env_name(char * line, char** name)
     }
 }
 /* substitute environemnt variables in line. 
- * returns a newly allocated string
+ * returns a newly allocated string.
  */
 static char * substitute_variables(char * line)
 {
@@ -538,10 +538,10 @@ static char * substitute_variables(char * line)
 	if (*line!='$') {
 	    pos = add_sbuffer_char(pos, *line);
 	    line++;
-	} else {
+	} else { /* *line=='$' */
 	    char * name, * nl;
 	    nl = skip_env_name(line, &name);
-	    if (nl==line) {
+	    if (nl==line) { /* no name found */
 		pos = add_sbuffer_char(pos, *line);
 		line++;
 	    } else {
@@ -589,6 +589,11 @@ tpips_exec(char * line)
     jmp_buf pips_top_level;
 
     pips_debug(3, "considering line: %s\n", line? line: " --- empty ---");
+
+    if (signal_occured()) {
+	user_log("signal occured, closing workspace...\n");
+	close_workspace_if_opened();
+    }
 
     if (setjmp(pips_top_level)) 
     {
@@ -741,6 +746,12 @@ tpips_main(int argc, char * argv[])
 {
     debug_on("TPIPS_DEBUG_LEVEL");
     pips_log_handler = tpips_user_log;
+    {
+	string pid = (char*) malloc(sizeof(char)*20);
+	sprintf(pid, "PID=%d", getpid());
+	pips_assert("not too long", strlen(pid)<20);
+	putenv(pid);
+    }
     parse_arguments(argc, argv);
     fprintf(stdout, "\n");	/* for Ctrl-D terminations */
     tpips_close();
