@@ -239,6 +239,8 @@ case ${uname_s} in
 	ARCH=IBMAIX ;;
     Linux)
 	ARCH=LINUXI86 ;;
+    HP-UX)
+	ARCH=HPUXLL ;;
     *) 
 	ARCH=GNU ;;
 esac
