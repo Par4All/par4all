@@ -23,8 +23,8 @@ static matchTree patterns_tree = NULL;
 
 static matchTree make_tree()
 {
-   matchTree n = make_matchTree(NIL, make_matchTreeSons());
-
+   matchTreeSons sons = make_matchTreeSons();
+   matchTree n = make_matchTree(NIL, sons);
    return n;
 }
 
@@ -35,7 +35,10 @@ static void insert_tree_branch(matchTree t, int token, matchTree n)
 
 static matchTree select_tree_branch(matchTree t, int token)
 {
-   return apply_matchTreeSons(matchTree_sons(t), token);
+   if (bound_matchTreeSons_p(matchTree_sons(t), token))
+      return apply_matchTreeSons(matchTree_sons(t), token);
+   else
+      return matchTree_undefined;
 }
 
 /* Warning: list of arguments is built in reversed order
@@ -44,11 +47,11 @@ static matchTree match_call(call c, matchTree t, list *args)
 {
    if (!top_level_entity_p(call_function(c)) || 
         call_constant_p(c))
-      return NULL; /* no match */
+      return matchTree_undefined; /* no match */
 
    t = select_tree_branch(t, get_operator_id(call_function(c)));
-   if (t == NULL)
-      return NULL; /* no match */
+   if (t == matchTree_undefined)
+      return matchTree_undefined; /* no match */
 
    MAP(EXPRESSION,
        arg,
@@ -80,11 +83,11 @@ static matchTree match_call(call c, matchTree t, list *args)
 
 	 case is_syntax_range:
 	 default:
-	    return NULL; /* unexpected token !! -> no match */
+	    return matchTree_undefined; /* unexpected token !! -> no match */
       }
 
-      if (t == NULL)
-	 return NULL;
+      if (t == matchTree_undefined)
+	 return matchTree_undefined;
    },
        call_arguments(c));
 
@@ -139,7 +142,7 @@ list match_statement(statement s)
 
    /* find the matching patterns */
    t = match_call(statement_call(s), patterns_tree, &args);
-   if (t == NULL)
+   if (t == matchTree_undefined)
    {
       gen_free_list(args);
       return NIL;
@@ -190,7 +193,7 @@ void insert_opcodeClass(char * s, int nbArgs, list opcodes)
 opcodeClass get_opcodeClass(int kind)
 {
    return ((kind>=0) && (kind<nbOpcodeClasses)) ?
-      opcodeClasses[kind] : NULL;
+      opcodeClasses[kind] : opcodeClass_undefined;
 }
 
 char * get_opcodeClass_opcode(int kind, int vecSize, int subwordSize)
@@ -198,7 +201,7 @@ char * get_opcodeClass_opcode(int kind, int vecSize, int subwordSize)
    opcodeClass op = get_opcodeClass(kind);
    list opcodes;
 
-   if (!op)
+   if (op == opcodeClass_undefined)
       return NULL;
 
    for(opcodes = opcodeClass_opcodes(op); opcodes != NIL; opcodes = CDR(opcodes))
@@ -239,7 +242,7 @@ void insert_pattern(char * s, list tokens, list args)
       int token = INT(CAR(tokens));
       matchTree next = select_tree_branch(m, token);
 
-      if (next == NULL)
+      if (next == matchTree_undefined)
       {
 	 /* no such branch -> create a new branch */
 	 next = make_tree();
