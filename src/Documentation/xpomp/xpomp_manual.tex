@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/08/31 14:02:17 $, 
+%% $Date: 1996/09/01 18:15:26 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html}
@@ -9,7 +9,7 @@
 \newcommand{\HPFC}{\htmladdnormallink{\texttt{hpfc}}
   {http://www.cri.ensmp.fr/pips/hpfc.html}\xspace}
 \newcommand{\xPOMP}{\htmladdnormallink{\textbf{xPOMP}}
-  {http://www.cri.ensmp.fr/pips/xpomp_manual.html}\xspace}
+  {http://www.cri.ensmp.fr/pips/xpomp_manual/xpomp_manual.html}\xspace}
 \newcommand{\POMP}{\htmladdnormallink{\textbf{POMP}}
   {ftp://ftp.ens.fr/pub/pomp}\xspace}
 \newcommand{\POMPC}{\htmladdnormallink{\textbf{POMPC}}
@@ -531,21 +531,70 @@ Fortran:
 
 \section{Using the \xPOMP interface with \HPFC}
 
-%% fake functions
-%% header extensions
-%% linker added flags
-
 \HPFC is the HPF prototype compiler included in the \PIPS project.
 It is developped by \FC. In order to compile an HPF program which uses
 \xPOMP, convinient headers, functions and extensions are provided.
-First, as \PIPS is an interprocedural compiler, fake functions sources
-(\verb|xpomp_fake.f| file)
-that simply mimic their effects on arguments are provided. Secondly,
-so as \HPFC to figure out that these functions are I/O functions that must
-be called only by the \emph{host}, headers are provided
-(\verb|xpomp_graphic_F.h| file) that must be included. Finally,
-the generated code must is linked automatically to the \xPOMP library
-(thanks to not yet developped hacks:-).
+
+
+\subsection{XPOMP/HPFC headers}
+
+Firstly headers are provided (\verb"xpomp_graphics_F.h" file) that must be
+included by all user HPF functions or subroutines that make use of the
+\xPOMP library. This header file simply lists the subroutines and
+declares them as I/O routines to the \HPFC compiler through the special
+\verb"io" directive:
+\begin{verbatim}
+!fcd$ io xpomp_show_real4
+!fcd$ io xpomp_is_mouse
+\end{verbatim}
+%%
+The effect is that a special compilation scheme is
+used for handling these functions and subroutines: they are called
+by the \emph{host} processor only, after a collect of the needed data.
+Data modified within subroutine are updated on the node
+processors after the call. The compiler figures out these effects 
+thanks to the interprocedural analyses and the \emph{fake} routines
+provided, as described in the next section.
+
+
+\subsection{Fake functions}
+
+As \PIPS is an interprocedural compiler, fake functions sources
+for the \xPOMP routines (\verb|xpomp_fake.f| file)
+that simply mimic their effects on arguments are provided. 
+They must be compiled together with the HPF program through \PIPS in
+order to provide the compiler with the necessary information for
+using the \xPOMP display facilities. All \xPOMP functions are annoted
+as \verb"io" and\verb"fake" with special \verb"!fcd$" %% $
+(\FC directives). The first directive tells that the function or
+subroutine performs only I/O. 
+The second directive tells that the source provided are fake. The effect is
+that the compiler will not generate code by compiling the functions, but
+they will have to be provided at link-time.
+%%
+The \verb"hpfc" front end accepts
+a list of files for compilation, hence for compiling the \verb"fractal"
+exemple one must write:
+\begin{verbatim}
+    hpfc xpomp_fake.f fractal.f
+\end{verbatim}
+
+\subsection{Linker extensions}
+
+Since the source files for the functions are fake ones (the functions
+are actually written in C), these functions must be provided latter on
+at link-time. The \HPFC compiler allows to give this information
+with the \verb"!ldi$" %%$
+(Link eDitor I/o) special directive. This directive supplies aditionnal
+\verb"ld" options for linking the program with an I/O library (hence
+the library is just linked to the \emph{host} program.
+Assuming the \xPOMP library and executables being stored in
+a directory described by the \verb"$XPOMP_RUNTIME" environment
+variable, then the desired effect is achieved with: 
+\begin{verbatim}
+!ldi$ -L$XPOMP_RUNTIME -lxpomp
+\end{verbatim}
+Note that the variables are interpreted by a shell.
 
 \newpage
 \tableofcontents
