@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1999/01/04 16:55:50 $, 
+ * $Date: 1999/01/08 14:25:41 $, 
  */
 
 #include <stdio.h>
@@ -144,31 +144,40 @@ expression *pe;
     entity new_variable;
     statement stat;
     expression rhs;
+    basic tmp;
 
     assert(!syntax_range_p(expression_syntax(*pe)));
 
     /*  The index is computed
      */
-    new_variable = 
-	(*create_new_variable)(get_current_module_entity(), 
-			       suggest_basic_for_expression(*pe));
 
-    /*  The normalized field is kept as such, and will be used by
-     *  the overlap analysis! ??? just a horrible hack.
-     *
-     *  stat: Variable = Expression
-     *   *pe: Variable
-     */
-    rhs = make_expression(expression_syntax(*pe), normalized_undefined);
-    normalize_all_expressions_of(rhs);
+    tmp = basic_of_expression(*pe);
+    
+    /* Atomization is not valid with overloaded expressions */
+    if (!basic_overloaded_p(tmp)) {
+      new_variable = 
+	(*create_new_variable)(get_current_module_entity(),
+			       basic_tag(tmp));
+      
+      /*  The normalized field is kept as such, and will be used by
+       *  the overlap analysis! ??? just a horrible hack.
+       *
+       *  stat: Variable = Expression
+       *   *pe: Variable
+       */
+      rhs = make_expression(expression_syntax(*pe), normalized_undefined);
+      normalize_all_expressions_of(rhs);
 
-    stat = make_assign_statement(entity_to_expression(new_variable), rhs);
+      stat = make_assign_statement(entity_to_expression(new_variable), rhs);
 
-    *pe = make_expression(make_syntax(is_syntax_reference, 
-				      make_reference(new_variable, NIL)),
-			  expression_normalized(*pe));
+      *pe = make_expression(make_syntax(is_syntax_reference, 
+					make_reference(new_variable, NIL)),
+			    expression_normalized(*pe));
+      
+      insert_before_current_statement(stat);
+    }
+    free(tmp);
 
-    insert_before_current_statement(stat);
 }
 
 static void ref_rwt(r)
