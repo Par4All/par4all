@@ -18,12 +18,25 @@
   * the precondition would have to be processed by the node transformer
   * once for each arc. To avoid both problems the postconditions are
   * stored without the control information. It is added later according to
-  * the outgoing arc considered.
+  * the outgoing arc considered. But it is not satisfactory to apply a
+  * reverse transformer to retrieve the precondition or to re-apply a
+  * convex hull on the input after having taken care of the potential
+  * cycle. All in all, it would be easier to store preconditions...
   *
   * Transformers between the entry point and after the current node are
   * very similar to postcondition between the module entry point and the
   * current node. Transformers are obtained like precondition but without
   * a precondition at the CFG entry point.
+  *
+  * It is possible to store the star or the plus fix points. I first
+  * stored the star fix points. It is often needed. It is safe because it
+  * can be applied several times withtout impacting the result. However,
+  * it does not retain information about the cycle body
+  * transformer. Because the convex hull operator looses information, it
+  * is more accurate to use the plus fix point and to apply a convex hull
+  * to the direct precondition and to the cycle output. Thus, if the entry
+  * node is a test, its conditions can be added before the convex hull is
+  * performed.
   *
   * It might be useful to add a pseudo-node as predecessor of the CFG
   * entry node. This pseudo-node would simplify the algorithms and the
@@ -36,6 +49,15 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.13  2002/07/19 12:09:58  irigoin
+  * First draft of the new version of unstructured.c working for all
+  * Validation/unstrucnn.f with nn in[01-13]. Lots of memory leaks, code
+  * replications, not understood behavior, and redundant computations.
+  *
+  * Ideally, node preconditions and edge preconditions should be memoized
+  * (i.e. stored in hash tables) instead of postconditions. But edges do not
+  * really exist: I should use their corresponding CONS cells.
+  *
   * Revision 1.12  2002/07/15 16:46:25  irigoin
   * Intermediate state. Validation OK for unstruc01.f to unstruc06.f
   *
@@ -184,7 +206,7 @@ static transformer get_control_precondition(control c,
 {
   transformer pre = transformer_undefined;
   list preds = control_predecessors(c);
-  static transformer load_predecessor_postcondition(control, control, control_mapping);
+  static transformer load_arc_precondition(control, control, control_mapping);
 
   pips_assert("c is meaningfull", !meaningless_control_p(c));
 
@@ -203,12 +225,12 @@ static transformer get_control_precondition(control c,
     pre = copy_transformer(pre_entry);
   }
   else {
-    pre = load_predecessor_postcondition(CONTROL(CAR(preds)), c, control_postcondition_map);
+    pre = load_arc_precondition(CONTROL(CAR(preds)), c, control_postcondition_map);
     POP(preds);
   }
 
   MAP(CONTROL, pred, {
-    transformer npre = load_predecessor_postcondition(pred, c, control_postcondition_map);
+    transformer npre = load_arc_precondition(pred, c, control_postcondition_map);
     transformer lpre = pre;
 
     pips_assert("The predecessor's postcondition npre is defined",
@@ -525,7 +547,10 @@ static bool nodes_ready_to_be_processed_p(list l,
 
 /* A new postcondition may have to be allocated because a unique control
    may have two successors and hence two preconditions. To keep memory
-   management tractable, a new postcondition always is allocated. */
+   management tractable, a new postcondition always is allocated.
+
+   This assumes a deterministic CFG (unstructured). See
+   load_arc_precondition() to deal with non-deterministic CFG's.  */
 static transformer load_predecessor_postcondition_or_test_condition
 (control pred,
  control c,
@@ -589,6 +614,61 @@ static transformer load_predecessor_test_condition(control pred, control c,
     (pred, c, FALSE, control_postcondition_map);
   return post;
 }
+
+/* Returns the precondition of c associated to arc pred->c in a newly
+   allocated transformer. */
+static transformer load_arc_precondition(control pred, control c,
+ control_mapping control_postcondition_map)
+{
+  transformer pre =
+    transformer_dup(load_control_postcondition(pred, control_postcondition_map));
+  int i = gen_position(c, control_successors(pred));
+  int noo = gen_occurences(c, control_successors(pred));
+
+  pips_assert("c is a successor of pred", i!=0);
+  /* let's assume that Bourdoncle's restructuring does not clutter the
+     successor list too much. */
+  pips_assert("c does not appear more than twice in the successor list",
+	      noo<=2);
+
+  if(control_test_p(pred)) {
+    statement stmt = control_statement(pred);
+
+    pips_assert("stmt is a test", statement_test_p(stmt));
+
+    if(noo==2) {
+      /* Assume that the same node is in the true and false successor lists. */
+      /* Do not bother with the test condition... and FI loose the side effects. */
+      /* If side effects can be detected, perform a convex hull of the
+	 true and false branches as nothing else is available. */
+      ;
+    }
+    else {
+      /* add the test condition */
+      expression e = test_condition(statement_test(stmt));
+
+      if(i%2==1) { /* One of the true successors */
+	pre = precondition_add_condition_information(pre, e,
+						     transformer_undefined, TRUE);
+      
+      }
+      else{ /* One of the false successors */
+	pre = precondition_add_condition_information(pre, e,
+						     transformer_undefined, FALSE);
+      }
+    }
+  }
+
+  ifdebug(2) {
+    string msg = control_test_p(pred)? (i%2==1? "true" : "false"): "standard";
+    pips_debug(2, "End for %s arc of position %d between predecessor node pred=%p"
+	       " and node c=%p with precondition %p:\n",
+	       msg, i, pred, c, pre);
+    print_transformer(pre);
+  }
+
+  return pre;
+}
 
 /*
  * Handle the fix_point_map
@@ -643,7 +723,7 @@ static void process_ready_node(control c,
     pips_debug(5, "to process node %s\n", statement_identification(control_statement(c))); 
   }
 
-  /* Compute its precondition from the postconditions of its predecessor
+  /* Compute its precondition pre from the postconditions of its predecessor
      and from the entry precondition. Use arc pred->c information to deal
      with tests. */
 
@@ -655,18 +735,20 @@ static void process_ready_node(control c,
     pre = copy_transformer(pre_entry);
   }
   else {
-    pre = load_predecessor_postcondition(CONTROL(CAR(preds)), c, control_postcondition_map);
+    pre = load_arc_precondition(CONTROL(CAR(preds)), c, control_postcondition_map);
     POP(preds);
   }
 
   MAP(CONTROL, pred, {
-    transformer npre = load_predecessor_postcondition(pred, c, control_postcondition_map);
+    transformer npre = load_arc_precondition(pred, c, control_postcondition_map);
     transformer lpre = pre;
 
     pre = transformer_convex_hull(npre, lpre);
     /* memory leak with lpre. pre_entry and postconditions cannot be
        freed: lpre cannot be freed during the first iteration */
-    if(pred!=CONTROL(CAR(preds))) free_transformer(lpre);
+    /* if(pred!=CONTROL(CAR(preds))) free_transformer(lpre); */
+    free_transformer(lpre);
+    free_transformer(npre);
     lpre = pre;
   }, preds);
 
@@ -675,6 +757,8 @@ static void process_ready_node(control c,
 
   if(cycle_head_p(c, ancestor_map, scc_map)) {
     transformer fptf = load_control_fix_point(c, fix_point_map, ancestor_map);
+    transformer pre_cycle = transformer_undefined;
+    transformer pre_no_cycle = transformer_undefined;
 
     if(transformer_undefined_p(fptf)) {
       unstructured scc_u = cycle_head_to_scc(c, ancestor_map, scc_map);
@@ -689,7 +773,31 @@ static void process_ready_node(control c,
 	 control_postcondition_map, /* */
 	 FALSE); /* Compute transformers */
     }
-    pre = transformer_apply(fptf, pre);
+    /* The cycle is entered */
+    pre_cycle = transformer_apply(fptf, pre);
+    /* Or the cycle is not entered and the store is not in fptf's domain. */
+      pre_no_cycle = transformer_dup(pre);
+    if(control_test_p(c)) {
+      /* Have we followed a true or a false branch? We'll know later but
+         it is better to add this information before the convex hull is
+         performed. */
+      statement stmt = control_statement(c);
+      expression e = test_condition(statement_test(stmt));
+
+      /* FI: I do not know why an empty context is passed down. */
+      if(true_successors_only_p(c)) {
+	pre_no_cycle = precondition_add_condition_information(pre_no_cycle, e,
+							      transformer_undefined, TRUE);
+      }
+      else if(false_successors_only_p(c)) {
+	pre_no_cycle = precondition_add_condition_information(pre_no_cycle, e,
+							      transformer_undefined, FALSE);
+      }
+    }
+    free_transformer(pre);
+    pre = transformer_convex_hull(pre_cycle, pre_no_cycle);
+    free_transformer(pre_cycle);
+    free_transformer(pre_no_cycle);
   }
 
   /* Propagate the precondition thru the node to obtain a postcondition
@@ -829,7 +937,7 @@ static void remove_cycle_dependencies(control c, control_mapping cycle_dependenc
 }
 
 /* Some cycle may appear nowhere but in the DAG and have no entries in the
-   table. In thatcase, the have an empty dependency list. */
+   table. In that case, they have an empty dependency list. */
 static list get_cycle_dependencies(control d, control_mapping cycle_dependencies_map)
 {
   list dependencies = (list) hash_get((hash_table) cycle_dependencies_map,
@@ -860,7 +968,7 @@ void update_temporary_precondition(void * k,
   if(t_pre == (transformer) HASH_UNDEFINED_VALUE) {
     pips_debug(2, "No previous precondition. Current one %p:\n", pre);
     ifdebug(2) print_transformer(pre);
-    hash_put(precondition_map, k, (void *) pre);
+    hash_put(precondition_map, k, (void *) transformer_dup(pre));
   }
   else {
     transformer n_t_pre = transformer_convex_hull(pre, t_pre);
@@ -950,6 +1058,16 @@ static void cycle_to_flow_sensitive_preconditions
   control e = unstructured_control(c_u);
   statement es = control_statement(e);
   transformer post = transformer_undefined;
+
+  /* FI: Please the compiler complaining about useless parameters (and
+     remove them later!) */
+  pips_assert("Please the compiler", partition==partition);
+  pips_assert("Please the compiler", ancestor_map==ancestor_map);
+  pips_assert("Please the compiler", scc_map==scc_map);
+  pips_assert("Please the compiler", fix_point_map==fix_point_map);
+  pips_assert("Please the compiler",
+	      cycle_temporary_precondition_map==cycle_temporary_precondition_map);
+  pips_assert("Please the compiler", pre==pre);
   
   /* wide_forward_control_map_get_blocs(unstructured_control(u), &to_be_processed); */
   forward_control_map_get_blocs(unstructured_control(c_u), &to_be_processed);
@@ -993,7 +1111,9 @@ static void cycle_to_flow_sensitive_preconditions
 	    transformer pre = 
 	      get_control_precondition(c, control_postcondition_map, c_u, c_pre);
 	    transformer e_pre = transformer_undefined;
+	    transformer f_e_pre = transformer_undefined;
 
+	    /* Already done earlier
 	    if(cycle_head_p(c, ancestor_map, scc_map)) {
 	      transformer fp_tf =  load_control_fix_point(a, fix_point_map, ancestor_map);
 	      e_pre = transformer_apply(fp_tf, pre);
@@ -1003,11 +1123,25 @@ static void cycle_to_flow_sensitive_preconditions
 	    else {
 	      e_pre = transformer_dup(pre);
 	    }
+	    */
+	    e_pre = transformer_dup(pre);
+	    if(cycle_head_p(c, ancestor_map, scc_map)) {
+	      update_cycle_temporary_precondition
+		(a, e_pre, cycle_temporary_precondition_map);
+	    }
 	    update_statement_temporary_precondition
 	      (c_s, e_pre, statement_temporary_precondition_map);
 	    /* post = statement_to_postcondition(transformer_dup(e_pre), c_s); */
-	    post = transformer_apply(load_statement_transformer(c_s), e_pre);
+	    /* FI: you should use the really current precondition using
+               load_statement_temporary_precondition() */
+	    /* post = transformer_apply(load_statement_transformer(c_s), e_pre); */
 	    /* Hard to track memory leaks... */
+	    /* It is much too late to update the control postcondition! */
+	    /* update_control_postcondition(c, post, control_postcondition_map); */
+	    /* FI: just to see what happens, without any understanding of the process */
+	    f_e_pre = load_statement_temporary_precondition(c_s,
+							    statement_temporary_precondition_map);
+	    post = transformer_apply(load_statement_transformer(c_s), f_e_pre);
 	    update_control_postcondition(c, post, control_postcondition_map);
 	  }
 	  gen_remove(&still_to_be_processed, c);
@@ -1021,6 +1155,8 @@ static void cycle_to_flow_sensitive_preconditions
 		  FALSE);
     }
   }
+  /* The precondition for the entry node may be improved by now using the
+     precondition of its predecessors and the cycle entry. OK, but to what end? */
 }
 
 static void dag_to_flow_sensitive_preconditions
@@ -1068,7 +1204,37 @@ static void dag_to_flow_sensitive_preconditions
       if(cycle_head_p(c, ancestor_map, scc_map)) {
 	transformer fp_tf = load_control_fix_point(a, fix_point_map, ancestor_map);
 
-	e_pre = transformer_apply(fp_tf, pre);
+	/* DUPLICATED CODE */
+
+	/* The cycle is entered */
+	transformer pre_cycle = transformer_apply(fp_tf, pre);
+	/* Or the cycle is not entered and the store is not in fptf's domain. */
+	transformer pre_no_cycle = transformer_dup(pre);
+	if(control_test_p(c)) {
+	  /* Have we followed a true or a false branch? We'll know later but
+	     it is better to add this information before the convex hull is
+	     performed. */
+	  statement stmt = control_statement(c);
+	  expression e = test_condition(statement_test(stmt));
+
+	  /* FI: I do not know why an empty context is passed down. */
+	  if(true_successors_only_p(c)) {
+	    pre_no_cycle = precondition_add_condition_information(pre_no_cycle, e,
+								  transformer_undefined, TRUE);
+	  }
+	  else if(false_successors_only_p(c)) {
+	    pre_no_cycle = precondition_add_condition_information(pre_no_cycle, e,
+								  transformer_undefined, FALSE);
+	  }
+	}
+	/* free_transformer(pre); */
+	e_pre = transformer_convex_hull(pre_cycle, pre_no_cycle);
+	free_transformer(pre_cycle);
+	free_transformer(pre_no_cycle);
+ 
+	/* END OF DUPLICATED CODE */
+
+	/* e_pre = transformer_apply(fp_tf, pre); */
 	update_cycle_temporary_precondition(a, e_pre, cycle_temporary_precondition_map);
       }
       else {
@@ -1109,25 +1275,54 @@ static void dag_to_flow_sensitive_preconditions
    * */
 
   /* Build the cycle dependencies */
-  HASH_MAP(c, ndu, {
+  pips_debug(2, "Compute dependencies for %d cycle%s\n",
+	     hash_table_entry_count(scc_map),
+	     hash_table_entry_count(scc_map)>1? "s":"");
+  HASH_MAP(c, cndu, {
     /* control a = control_to_ancestor(c, ancestor_map); */
     /* unstructured scc_ u = cycle_head_to_scc(c, ancestor_map, scc_map); */
     list nl = NIL;
     list c_cc = list_undefined;
+    control head = unstructured_control((unstructured) cndu);
+    statement hs = control_statement(head);
 
-    control_map_get_blocs(e, &nl);
+    pips_debug(8, "Compute dependencies for cycle %p with statement %s\n",
+	       head, statement_identification(hs));
+
+    control_map_get_blocs(head, &nl);
+
     for(c_cc=nl; !ENDP(c_cc); POP(c_cc)) {
       control cc = CONTROL(CAR(c_cc));
 
-      if(!meaningless_control_p(cc) && cycle_head_p(cc, ancestor_map, scc_map)) {
-	/* then cc depends on c */
-	add_cycle_dependency(cc, (control) c, cycle_dependencies_map);
+      if(!meaningless_control_p(cc)
+	 && cycle_head_p(cc, ancestor_map, scc_map)) {
+	control aa = control_to_ancestor(cc, ancestor_map);
+	if(aa!=c) {
+	  /* then cc depends on c */
+	  add_cycle_dependency(aa, (control) c, cycle_dependencies_map);
+	}
       }
     }
 
     still_to_be_processed = CONS(CONTROL, (control) c, still_to_be_processed);
     gen_free_list(nl);
   }, scc_map);
+
+  ifdebug(2) {
+    if(hash_table_entry_count(cycle_dependencies_map)>0) {
+      pips_debug(2, "cycle dependencies:\n");
+      HASH_MAP(c, l, {
+	statement s = control_statement((control) c);
+	pips_debug(2, "Cycle %p with statement %s depends on:\n",
+		   c, statement_identification(s));
+	print_control_nodes((list) l);
+      }, cycle_dependencies_map);
+    }
+    else {
+      /* No cycles */
+      pips_assert("No cycles left to be processed", ENDP(still_to_be_processed));
+    }
+  }
 
   /* While some cycles still have to be processed. */
   while(!ENDP(still_to_be_processed)) {
@@ -1141,13 +1336,21 @@ static void dag_to_flow_sensitive_preconditions
 	list dep = get_cycle_dependencies(c, cycle_dependencies_map);
 	POP(l); /* right away because c's cdr might be modified */
 
+	ifdebug(8) {
+	  if(ENDP(dep)) {
+	    pips_debug(8, "Process cycle %p with statement %s\n",
+		       c, statement_identification(control_statement(c)));
+	  }
+	}
+
 	if(ENDP(dep)) {
 	  /* The precondition of cycle c is complete */
 	  control a = control_to_ancestor(c, ancestor_map);
 	  transformer c_pre = load_cycle_temporary_precondition(a, cycle_temporary_precondition_map);
 	  transformer fp_tf = load_control_fix_point(c, fix_point_map, ancestor_map);
 	  unstructured c_u = cycle_head_to_scc(c, ancestor_map, scc_map);
-	  transformer e_c_pre = transformer_apply(fp_tf, c_pre);
+	  transformer f_c_pre = transformer_apply(fp_tf, c_pre);
+	  transformer e_c_pre = transformer_convex_hull(f_c_pre, c_pre);
 
 	  cycle_to_flow_sensitive_preconditions
 	    (partition, c_u, ancestor_map, scc_map, fix_point_map,
@@ -1286,14 +1489,15 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
     list preds = control_predecessors(e);
     control pred = CONTROL(CAR(preds));
     transformer path_tf =
-      load_predecessor_postcondition(pred, e, control_postcondition_map);
+      load_arc_precondition(pred, e, control_postcondition_map);
     transformer fp_tf = transformer_undefined;
+    /* transformer fp_tf_plus = transformer_undefined; */
     control e_a = control_to_ancestor(e, ancestor_map);
 
     POP(preds);
     MAP(CONTROL, pred, {
       transformer pred_tf =
-	load_predecessor_postcondition(pred, e, control_postcondition_map);
+	load_arc_precondition(pred, e, control_postcondition_map);
       transformer old_path_tf = path_tf;
 
       pips_assert("Partial path transformer pred_tf is defined",
@@ -1303,6 +1507,21 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
     }, preds);
 
     fp_tf =  (*transformer_fix_point_operator)(path_tf);
+    /* If an entry range is known, do not use it as there may be more than
+       one occurence of the cycle and more than one entry range. Keep this
+       refinement to the precondition computation phase? It might be too
+       late. The the data structure should be change to store more than
+       one fix point per cycle.  */
+    /* Not convincing anyway: you should apply fp_tf_plus to e_pre for the
+       next two lines to make sense. */
+    /* Use the + fix point to preserve more information about the output
+       and do not forget to perform a convex hull when you need a * fix
+       point in process_ready_node() */
+    fp_tf = transformer_combine(fp_tf, path_tf);
+    /*
+    fp_tf = transformer_convex_hull(fp_tf_plus, e_pre);
+    */
+
     free_transformer(path_tf);
     /* e may have many synonyms */
     store_control_fix_point(e_a, fp_tf, fix_point_map);
@@ -1317,6 +1536,14 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
   still_to_be_processed = list_undefined;
   gen_free_list(already_processed);
   already_processed = list_undefined;
+
+  ifdebug(2) {
+    pips_debug(2, "End for %s of %s %p with entry node %s and with transformer %p\n", 
+	       postcondition_p? "postcondition" : "transformer",
+	       is_dag? "dag" : "cycle", ndu,
+	       statement_identification(control_statement(unstructured_control(ndu))), tf);
+    print_transformer(tf);
+  }
 
   return tf;
 }
