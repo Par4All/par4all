@@ -62,6 +62,31 @@ DEFINE_CURRENT_MAPPING(precondition, transformer)
 /* DEFINE_CURRENT_MAPPING(proper_effects, list)         a mettre dans les effects  */
 /* DEFINE_CURRENT_MAPPING(cumulated_effects, list)     idem  */
 
+transformer (* transformer_fix_point_operator)(transformer);
+
+static void
+select_fix_point_operator()
+{
+    if(get_bool_property(SEMANTICS_FIX_POINT)) {
+	string fp_name = get_string_property("SEMANTICS_FIX_POINT_OPERATOR");
+	if(strcmp(fp_name, "transfer")==0) {
+	    transformer_fix_point_operator = transformer_equality_fix_point;
+	}
+	else if(strcmp(fp_name, "pattern")==0) {
+	    transformer_fix_point_operator = transformer_pattern_fix_point;
+	}
+	else if(strcmp(fp_name, "derivative")==0) {
+	    transformer_fix_point_operator = transformer_derivative_fix_point;
+	}
+	else {
+	    user_error("select_fix_point_operator", "Value %s for property %s unknown\n",
+		       fp_name, "SEMANTICS_FIX_POINT_OPERATOR");
+	}
+    }
+    else {
+	transformer_fix_point_operator = NULL;
+    }
+}
 
 /* Functions to make transformers */
 
@@ -72,7 +97,7 @@ char * module_name;
     set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
     set_bool_property(SEMANTICS_FIX_POINT, FALSE);
-    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    select_fix_point_operator();
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_transformers(module_name);
@@ -85,7 +110,7 @@ char * module_name;
     set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
     set_bool_property(SEMANTICS_FIX_POINT, TRUE);
-    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    select_fix_point_operator();
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_transformers(module_name);
@@ -98,7 +123,7 @@ char * module_name;
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
     set_bool_property(SEMANTICS_FIX_POINT, FALSE);
-    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    select_fix_point_operator();
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_transformers(module_name);
@@ -111,7 +136,7 @@ char * module_name;
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
     set_bool_property(SEMANTICS_FIX_POINT, TRUE);
-    set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    select_fix_point_operator();
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_transformers(module_name);
@@ -416,12 +441,13 @@ char *module_name;
     /* if(call_site_count( get_current_module_entity() )<=1) */
     /* Let's assume static initializations (FI, 14 September 1993) */
 
-    if(entity_main_module_p(get_current_module_entity()))
+    if(entity_main_module_p(get_current_module_entity())) {
 	if (get_bool_property(SEMANTICS_INTERPROCEDURAL))
 	    pre = (transformer)
 		db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE);
 	else
 	    pre = data_to_precondition(get_current_module_entity());
+    }
     else
 	pre = transformer_identity();
 
