@@ -1007,7 +1007,7 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
 
    /* Clear all the 'Value' variables */
    for(j=0 ; j<k ; ++j) {
-     value_init(den[j]);
+     value_clear(den[j]);
    }  
    value_clear(x);  value_clear(gcd); value_clear(piv);
    value_clear(m1); value_clear(m2);
