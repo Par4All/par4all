@@ -377,10 +377,9 @@ bdt obj;
     crt_pred = schedule_predicate(crt_sched);
 
     /* PRINT */
-    /* Mod by AP, sep 13th 95: the number of the instruction is the
-       statement_number. */
-    fprintf(fp,"ins_%d:\n",
-	    statement_number(ordering_to_statement(adg_number_to_ordering(crt_stmt))));
+    /* Mod by AP, oct 6th 199595: the number of the instruction is the
+       vertex number minus BASE_NODE_NUMBER. */
+    fprintf(fp,"ins_%d:\n", crt_stmt-BASE_NODE_NUMBER);
 
     if(crt_pred != predicate_undefined) {
       Psysteme ps = (Psysteme) predicate_system(crt_pred);
