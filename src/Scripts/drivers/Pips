@@ -3,7 +3,7 @@
 #
 # SCCS stuff:
 #
-# $RCSfile: Pips,v $ ($Date: 1994/03/08 13:44:38 $) version $Revision$, got on %D%, %T%
+# $RCSfile: Pips,v $ ($Date: 1994/03/08 14:22:36 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 
@@ -281,7 +281,18 @@ error ()
   exit 1;
 }
 
-echo `which pips` $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM
+#
+# to avoid a which call, where ~/.cshrc is executed and so on!
+#
+# FC, Tue Mar  8 14:19:50 MET 1994
+#
+
+which_pips()
+{
+  type pips | sed -e 's,^pips is ,,'
+}
+
+echo `which_pips` $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM
 pips $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM || error
 
 # Build `modules'
