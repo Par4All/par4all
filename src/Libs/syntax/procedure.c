@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.60  2001/07/19 17:02:41  irigoin
+ * Cosmetics changes to MakeExternalFunction() and DeclareExternalFunction()
+ *
  * Revision 1.59  1999/05/11 12:27:24  irigoin
  * Improved error message
  *
@@ -1750,10 +1753,10 @@ MakeExternalFunction(
     entity fe = entity_undefined;
     type new_r = type_undefined;
 
-    debug(8, "MakeExternalFunction", "Begin for %s\n", entity_name(e));
+    pips_debug(8, "Begin for %s\n", entity_name(e));
 
     if(entity_blockdata_p(e)) {
-      debug(8, "MakeExternalFunction", "End for blockdata %s\n", entity_name(e));
+      pips_debug(8, "End for blockdata %s\n", entity_name(e));
       return e;
     }
 
@@ -1798,8 +1801,11 @@ MakeExternalFunction(
 
 entity 
 DeclareExternalFunction(
-    entity e /* entity to be turned into external function */)
+    entity e /* entity to be turned into external function or subroutine */)
 {
+  /* It might be better to declare an unknown type as result type but I
+     decided to fix the problem later. When a call is later encountered,
+     the result type is set to void. */
     entity fe = MakeExternalFunction(e, type_undefined);
 
     if(value_intrinsic_p(entity_initial(fe))) {
