@@ -288,7 +288,7 @@ void db_print_all_required_resources(FILE * file)
 		 rn, on, db_status_string(db_resource_db_status(r)));
 
       if (db_resource_required_p(r)) {
-	fprintf(file, "%s of %s is in 'required' status since %d\n", 
+	fprintf(file, "resource %s[%s] is in 'required' status since %d\n", 
 		rn, on, db_resource_time(r));
       }
     },
