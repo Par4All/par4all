@@ -265,7 +265,7 @@ int (*compare)(Pvecteur *, Pvecteur *);
 	*table,
 	*point;
 
-    if (n==0) return;
+    if ( n==0 || n==1 ) return;
 
     /*  the temporary table is created and initialized
      */
@@ -278,7 +278,7 @@ int (*compare)(Pvecteur *, Pvecteur *);
      */
     /* FI: I do not know how to cast compare() properly */
     /* qsort(table, n, sizeof(Pvecteur), int (* compare)()); */
-    qsort(table, n, sizeof(Pvecteur), compare);
+    qsort(table, n, sizeof(Pvecteur),(int (*)()) compare);
 
     /*  the vector is regenerated in order
      */
