@@ -39,7 +39,10 @@ static text alias_pairs_text(string module_name,string resource_name)
 
     pips_debug(8,"module %s resource %s\n",module_name,resource_name);
 
-    l_pairs = (list) db_get_memory_resource(resource_name, module_name, TRUE);
+/*    l_pairs = (list) db_get_memory_resource(resource_name, module_name, TRUE); */
+
+    l_pairs = effects_to_list((effects)
+			      db_get_memory_resource(resource_name, module_name, TRUE));
 
     pips_debug(8,"got pairs\n");
 
@@ -57,10 +60,13 @@ static text alias_pairs_text(string module_name,string resource_name)
 
     MAP(LIST,pair,
 	{
+	    pips_debug(9,"start 1st map\n");
+
 	    if (pair != (list) HASH_UNDEFINED_VALUE && pair != list_undefined) 
 	    {
 		MAP(EFFECT, reg,
 		    {
+			pips_debug(9,"start 2nd map\n");
 			MERGE_TEXTS(txt, text_region(reg));
 		    },
 			pair);
