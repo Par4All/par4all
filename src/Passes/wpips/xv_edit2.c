@@ -35,6 +35,9 @@ static Menu_item current_selection_mi,
                  edit, 
                  close;
 
+/* The menu "View" on the main panel: */
+Menu view_menu;
+
 
 void current_selection_notify(menu, menu_item)
 Menu menu;
@@ -317,11 +320,11 @@ wpips_execute_and_display_something(char * label)
 }
 
 
-void view_notify(menu, menu_item)
-Menu menu;
-Menu_item menu_item;
+void
+view_notify(Menu menu,
+            Menu_item menu_item)
 {
-   char *label = (char *) xv_get(menu_item, MENU_STRING);
+   char * label = (char *) xv_get(menu_item, MENU_STRING);
 
    wpips_execute_and_display_something(label);
 }
@@ -389,57 +392,55 @@ void create_edit_window()
 }
 
 
-
-void create_edit_menu()
+void
+create_edit_menu()
 {
-    Menu menu;
+   current_selection_mi = 
+      xv_create(NULL, MENUITEM, 
+                MENU_STRING, "No Selection",
+                MENU_NOTIFY_PROC, current_selection_notify,
+                MENU_INACTIVE, TRUE,
+                MENU_RELEASE,
+                NULL);
+   edit = 
+      xv_create(NULL, MENUITEM, 
+                MENU_STRING, "Edit",
+                MENU_NOTIFY_PROC, edit_notify,
+                MENU_RELEASE,
+                NULL);
 
-    current_selection_mi = 
-	xv_create(NULL, MENUITEM, 
-		  MENU_STRING, "No Selection",
-		  MENU_NOTIFY_PROC, current_selection_notify,
-		  MENU_INACTIVE, TRUE,
-		  MENU_RELEASE,
-		  NULL);
-    edit = 
-	xv_create(NULL, MENUITEM, 
-		  MENU_STRING, "Edit",
-		  MENU_NOTIFY_PROC, edit_notify,
-		  MENU_RELEASE,
-		  NULL);
+   close = 
+      xv_create(NULL, MENUITEM, 
+                MENU_STRING, "Close",
+                MENU_NOTIFY_PROC, edit_close_notify,
+                MENU_INACTIVE, TRUE,
+                MENU_RELEASE,
+                NULL);
 
-    close = 
-	xv_create(NULL, MENUITEM, 
-		  MENU_STRING, "Close",
-		  MENU_NOTIFY_PROC, edit_close_notify,
-		  MENU_INACTIVE, TRUE,
-		  MENU_RELEASE,
-		  NULL);
+   view_menu = 
+      xv_create(XV_NULL, MENU_COMMAND_MENU, 
+                MENU_GEN_PIN_WINDOW, main_frame, "View & Edit Menu",
+                MENU_APPEND_ITEM, current_selection_mi,
+                MENU_ACTION_ITEM, ARRAY_DFG_VIEW, view_notify,
+                MENU_ACTION_ITEM, CALLGRAPH_VIEW, view_notify,
+                MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
+                MENU_ACTION_ITEM, DISTRIBUTED_VIEW, view_notify,
+                MENU_APPEND_ITEM, edit,
+                MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
+                MENU_ACTION_ITEM, ICFG_VIEW, view_notify,
+                MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
+                MENU_ACTION_ITEM, PLACEMENT_VIEW, view_notify,
+                MENU_ACTION_ITEM, SEQUENTIAL_VIEW, view_notify,
+                MENU_ACTION_ITEM, TIME_BASE_VIEW, view_notify,
+                MENU_ACTION_ITEM, USER_VIEW, view_notify,
+                /* MENU_ACTION_ITEM, HPFC_VIEW, view_notify,*/
+                MENU_ACTION_ITEM, SEQUENTIAL_EMACS_VIEW, view_notify,
+                MENU_APPEND_ITEM, close,
+                NULL);
 
-    menu = 
-	xv_create(XV_NULL, MENU_COMMAND_MENU, 
-		  MENU_GEN_PIN_WINDOW, main_frame, "View & Edit Menu",
-		  MENU_APPEND_ITEM, current_selection_mi,
-		  MENU_ACTION_ITEM, ARRAY_DFG_VIEW, view_notify,
-		  MENU_ACTION_ITEM, CALLGRAPH_VIEW, view_notify,
-		  MENU_ACTION_ITEM, DEPENDENCE_GRAPH_VIEW, view_notify,
-		  MENU_ACTION_ITEM, DISTRIBUTED_VIEW, view_notify,
-		  MENU_APPEND_ITEM, edit,
-		  MENU_ACTION_ITEM, FLINT_VIEW, view_notify,
-		  MENU_ACTION_ITEM, ICFG_VIEW, view_notify,
-		  MENU_ACTION_ITEM, PARALLEL_VIEW, view_notify,
-		  MENU_ACTION_ITEM, PLACEMENT_VIEW, view_notify,
-		  MENU_ACTION_ITEM, SEQUENTIAL_VIEW, view_notify,
-		  MENU_ACTION_ITEM, TIME_BASE_VIEW, view_notify,
-		  MENU_ACTION_ITEM, USER_VIEW, view_notify,
-		  /* MENU_ACTION_ITEM, HPFC_VIEW, view_notify,*/
-		  MENU_ACTION_ITEM, SEQUENTIAL_EMACS_VIEW, view_notify,
-		  MENU_APPEND_ITEM, close,
-		  NULL);
-
-    (void) xv_create(main_panel, PANEL_BUTTON,
-		     PANEL_LABEL_STRING, "Edit/View",
-		     PANEL_ITEM_MENU, menu,
-		     NULL);
+   (void) xv_create(main_panel, PANEL_BUTTON,
+                    PANEL_LABEL_STRING, "Edit/View",
+                    PANEL_ITEM_MENU, view_menu,
+                    NULL);
 
 }
