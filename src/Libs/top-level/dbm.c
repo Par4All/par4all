@@ -59,6 +59,7 @@ void open_module(name)
 char *name;
 {
     db_set_current_module_name(name);
+    reset_unique_variable_numbers();
 
     user_log("Module %s selected\n", name);
 }
