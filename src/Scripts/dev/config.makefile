@@ -13,7 +13,9 @@ SCRIPTS = 	pips-makemake \
 		checked-out \
 		order_libraries \
 		pips-experiment \
-		pips_at_night
+		pips_at_night \
+		forward_gnu_makefile \
+		remove_from_sccs_file
 
 # that is all
 #
