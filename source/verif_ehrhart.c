@@ -21,7 +21,7 @@
 
 /* define this to print all the results */
 /* else, only a progress bar is printed */
-/* #define PRINT_ALL_RESULTS	*/
+/* #define PRINT_ALL_RESULTS	 */
 
 
 /* RANGE : normal range for evalutations (-RANGE -> RANGE) */
@@ -88,20 +88,24 @@ int check_poly(Polyhedron *S,Polyhedron *C,Enumeration *en,
 
       /* Count manually the number of points */
       cc=count_points(1,S,z);
+#ifdef PRINT_ALL_RESULTS
+	printf(", count = %d. ",cc);
+#endif
+
       value_set_si(tmp,cc);
       if(value_ne(tmp,c)) {
 	printf("\n"); 
 	fflush(stdout);
 	fprintf(stderr,"Error !\n");
 	fprintf(stderr,"EP( ");
-	value_print(stdout,VALUE_FMT,z[S->Dimension-nparam+1]);
+	value_print(stderr,VALUE_FMT,z[S->Dimension-nparam+1]);
 	for(k=S->Dimension-nparam+2;k<=S->Dimension;++k) {
 	  fprintf(stderr,", ");
-	  value_print(stdout,VALUE_FMT,z[k]);
+	  value_print(stderr,VALUE_FMT,z[k]);
 	}
 	fprintf(stderr," ) should be %d,",cc);
 	fprintf(stderr," while EP eval gives ");
-	value_print(stdout,VALUE_FMT,c);
+	value_print(stderr,VALUE_FMT,c);
 	fprintf(stderr,".\n");
 	value_clear(c); value_clear(tmp);
 	return(0);
