@@ -396,6 +396,7 @@ Variable var;
  * It wanders out of the array to be sorted. It's a pain to debug.
  * Let's play safe.
  */
+/* Version for equations */
 int
 vect_lexicographic_compare(Pvecteur v1, Pvecteur v2, 
 			   int (*compare)(Pvecteur*, Pvecteur*))
@@ -411,16 +412,58 @@ vect_lexicographic_compare(Pvecteur v1, Pvecteur v2,
     return cmp12;
 }
 
+/* Version for inequalities */
+int
+vect_lexicographic_compare2(Pvecteur v1, Pvecteur v2, 
+			    int (*compare)(Pvecteur*, Pvecteur*))
+{
+    int cmp12 = 0;
+    int cmp21 = 0;
+
+    cmp12 = vect_lexicographic_unsafe_compare2(v1, v2, compare);
+    cmp21 = vect_lexicographic_unsafe_compare2(v2, v1, compare);
+
+    assert(cmp12 == -cmp21);
+
+    return cmp12;
+}
+
+int
+vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2, 
+				  int (*compare)(Pvecteur*, Pvecteur*))
+{
+    int cmp = 0;
+
+    cmp = vect_lexicographic_unsafe_compare_generic(v1, v2, compare, TRUE);
+
+    return cmp;
+}
+
+int
+vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2, 
+			   int (*compare)(Pvecteur*, Pvecteur*))
+{
+    int cmp = 0;
+
+    cmp = vect_lexicographic_unsafe_compare_generic(v1, v2, compare, FALSE);
+
+    return cmp;
+}
+
 /* This function is a trade-off between a real lexicographic sort
  * and a prettyprinting function.
  *
  * A lot of problems arise because 0 is not represented. It's
  * hard to compare I==0 and I==1 because they do not have the
  * same numbers of sparse components.
+ *
+ * Furthermore, vectors representing equalities and inequalities must not
+ * be handled in the same way because only equalities can be multiplied by -1.
  */
 int
-vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2, 
-			   int (*compare)(Pvecteur*, Pvecteur*))
+vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2, 
+					  int (*compare)(Pvecteur*, Pvecteur*),
+					  boolean is_equation)
 {
     /* it is assumed that vectors v1 and v2 are already
        lexicographically sorted, according to the same lexicographic ordre.
@@ -439,24 +482,55 @@ vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2,
 	if(cmp==0) {
 	    /* if same coordinate, use coefficient, but only for
 	     the last coordinate */
-	    Value tmp = value_minus(value_abs(vecteur_val(pv1)),
-				    value_abs(vecteur_val(pv2)));
-	    cmp2 = value_sign(tmp);
+	    Value tmp = is_equation? 
+		value_minus(value_abs(vecteur_val(pv1)), value_abs(vecteur_val(pv2)))
+		:
+		value_minus(vecteur_val(pv1), vecteur_val(pv2));
+	    if(cmp2==0)
+		cmp2 = value_sign(tmp);
 	}
     }
 
-    if (cmp==0)
-	cmp = cmp2;
+    if((VECTEUR_UNDEFINED_P(pv1)||term_cst(pv1))
+       && (VECTEUR_UNDEFINED_P(pv2)||term_cst(pv2))) {
+	/* If there is no more information, let's use the lexicographic
+	 * order on values
+	 */
+	if (cmp==0 && is_equation) {
+	    /* The two equations have the same non-zero coefficients.
+	     * Let's use the values of these coefficients to perform
+	     * a second lexicographic sort.
+	     */
+	    cmp = cmp2;
+	}
+	/* else if(cmp==0 && VECTEUR_UNDEFINED_P(pv1) && VECTEUR_UNDEFINED_P(pv2)) { */
+	else if(cmp==0 && !is_equation) {
+	    /* Well, the choice should be much more sophisticated! We should
+	     * look for the -1 and 1 coefficients, the number negative coefficients,... */
+	    cmp = cmp2;
+	}
+    }
 
     if (VECTEUR_UNDEFINED_P(pv1))
 	if (VECTEUR_UNDEFINED_P(pv2)) {
-	    /* cmp is left unchanged */
+	    /* cmp is left unchanged since there is no more information
+	     * to make a decision!
+	     */
 	    ;
 	}
         else if(cmp==0) {
 	    if (term_cst(pv2)) 
 	    {
-		Value tmp = value_uminus(value_abs(val_of(pv2)));
+		/* This looks strange because you would expect cmp==-1 for
+		 * equations. Unless val_of(pv2)==0... which should never
+		 * occur!
+		 * 
+		 * Does it make sense for inequalities?
+		 */
+		Value tmp = is_equation?
+		    value_uminus(value_abs(val_of(pv2)))
+		    :
+		    value_uminus(val_of(pv2));
 		cmp = value_sign(tmp);
 	    }
 	    else
@@ -470,7 +544,10 @@ vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2,
 	    if (cmp==0) {
 		if (term_cst(pv1)) 
 		{
-		    Value tmp = value_abs(vecteur_val(pv1));
+		    Value tmp = is_equation?
+			value_abs(vecteur_val(pv1))
+			:
+			vecteur_val(pv1);
 		    cmp = value_sign(tmp);
 		}
 		else 
@@ -483,8 +560,10 @@ vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2,
 	else {
 	    if(cmp==0) {
 		if(term_cst(pv1) && term_cst(pv2)) {
-		    Value tmp = value_minus(value_abs(vecteur_val(pv1)),
-					    value_abs(vecteur_val(pv2)));
+		    Value tmp = is_equation?
+			value_minus(value_abs(vecteur_val(pv1)), value_abs(vecteur_val(pv2)))
+			:
+			value_minus(vecteur_val(pv1), vecteur_val(pv2));
 		    cmp = value_sign(tmp);
 		}
 		else if(term_cst(pv1) && !term_cst(pv2)) {
