@@ -205,10 +205,10 @@ Pvecteur vect;
 {
     for ( ; vect != NULL ; vect = vect->succ)
 	if (var_of(vect) == var) {
-	    assert(val_of(vect)!=0);
+	    assert(val_of(vect)!=VALUE_ZERO);
 	    return(val_of(vect));
 	}
-    return(0);
+    return VALUE_ZERO;
 }
 
 /* Value vect_coeff_sum(Pvecteur vect): coefficient sum
