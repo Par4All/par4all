@@ -240,6 +240,28 @@ void db_print_all_required_resources(FILE * file)
 		   get_pips_database());
 }
 
+void db_clean_all_required_resources(void)
+{
+  DB_RESOURCES_MAP(os, or,
+  {
+    DB_OWNED_RESOURCES_MAP(rs, r,
+    {
+      string rn = db_symbol_name(rs);
+      string on = db_symbol_name(os);
+      pips_debug(8, "considering %s of %s (%p)\n", rn, on, (char*) r);
+
+      if (db_resource_required_p(r))
+      {
+	pips_debug(1, "deleting %s of %s\n", rn, on);
+	db_delete_resource(rn, on);
+      }
+    },
+      or);
+  },
+		   get_pips_database());
+
+}
+
 /******************************************************* RESOURCE MANAGEMENT */
 
 /* from now on we must not know about the database internals? */
