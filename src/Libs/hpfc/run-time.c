@@ -4,14 +4,11 @@
  *
  * $Id$
  * $Log: run-time.c,v $
- * Revision 1.35  1997/06/10 09:15:52  coelho
- * *** empty log message ***
+ * Revision 1.36  1997/06/12 14:20:59  coelho
+ * functions reorder.
  *
  * Revision 1.34  1997/04/17 13:25:28  coelho
  * STRING buffer added.
- *
- * Revision 1.33  1997/04/17 11:47:29  coelho
- * *** empty log message ***
  *
  * Revision 1.32  1997/03/20 10:20:07  coelho
  * RCS headers.
@@ -341,8 +338,25 @@ statement st_compute_neighbour(int d)
 				       NIL));
 }
 
-/*
- * statement st_generate_packing_and_passing(array, content, bsend)
+/* entity make_packing_function(prefix, ndim, kind, base, nargs)
+ *
+ * find or create an entity for the packing function...
+ */
+static entity make_packing_function(ndim, kind, base, nargs)
+int ndim;
+bool kind;
+basic base;
+int nargs;
+{
+    char buffer[100], *buf = buffer;
+    sprintf(buf, "%s %s %d", 
+	    pvm_what_options(base), (kind ? "PACK" : "UNPACK"), ndim);
+    buf += strlen(buf);
+
+    return MakeRunTimeSupportSubroutine(buffer, nargs);
+}
+
+/* statement st_generate_packing_and_passing(array, content, bsend)
  *
  * dimension bounds are refered to as parameters, since we do not
  * know yet what is the lower and upper of each dimension...
@@ -480,24 +494,6 @@ array_lower_upper_bounds_list(entity array)
 	lb=lnb, lnb=lnb?CDR(lnb):NIL, lu=lnu, lnu=lnu?CDR(lnu):NIL);
 
     return l;
-}
-
-/* entity make_packing_function(prefix, ndim, kind, base, nargs)
- *
- * find or create an entity for the packing function...
- */
-static entity make_packing_function(ndim, kind, base, nargs)
-int ndim;
-bool kind;
-basic base;
-int nargs;
-{
-    char buffer[100], *buf = buffer;
-    sprintf(buf, "%s %s %d", 
-	    pvm_what_options(base), (kind ? "PACK" : "UNPACK"), ndim);
-    buf += strlen(buf);
-
-    return MakeRunTimeSupportSubroutine(buffer, nargs);
 }
 
 /************************************************* HPFC ENTITIES MANAGEMENT */
