@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.77  1997/11/27 13:16:18  coelho
+ * initialization of toprocess.
+ *
  * Revision 1.76  1997/11/27 12:52:44  coelho
  * does not core dump if .tpips file is not found.
  *
@@ -720,7 +723,7 @@ parse_arguments(int argc, char * argv[])
 	while (optind < argc)
 	{
 	    string tps = NULL, saved_srcpath = NULL;
-	    FILE * toprocess;
+	    FILE * toprocess = (FILE*) NULL;
 	    bool use_rl = FALSE;
 
 	    if (same_string_p(argv[optind], "-")) 
@@ -731,11 +734,11 @@ parse_arguments(int argc, char * argv[])
 	    }
 	    else
 	    {
-		/* the tpips dirname is appended to PIPS_SRCPATH */
 		tps = find_file_in_directories(argv[optind], 
 					       getenv("PIPS_SRCPATH"));
 		if (tps)
 		{
+		    /* the tpips dirname is appended to PIPS_SRCPATH */
 		    string dir = pips_dirname(tps);
 		    saved_srcpath = pips_srcpath_append(dir);
 		    free(dir), dir = NULL;
