@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: reader.c,v $
+ * Revision 1.32  2002/06/12 10:39:40  irigoin
+ * function dump_current_statement() added
+ *
  * Revision 1.31  2001/02/02 15:14:23  coelho
  * handle continuation on long DATA...
  *
@@ -1319,4 +1322,41 @@ NeedKeyword(void)
     return(-1); /* just to avoid a gcc warning */
 		  
     /*NOTREACHED*/
+}
+
+void dump_current_statement()
+{
+  int i;
+  FILE * syn_in = NULL;
+
+  /* Preprocessed statement: Spaces have been eliminated as well as
+     continuation lines, keyword have been emphasized and variables
+     capitalized. */
+  /*
+  for(i=0; i<lStmt; i++)
+    fprintf(stderr, "%c", (char) stmt_buffer[i]);
+  fprintf(stderr,"\n");
+  */
+
+  syn_in = safe_fopen(CurrentFN, "r");
+
+  /* Skip the initial lines */
+
+  /* line_b_I, line_e_I */
+  i = 1;
+  while(i<line_b_I) {
+    int c;
+    if((c = getc(syn_in))==(int) '\n') i++;
+    pips_assert("The end of file cannot be reached", c!=EOF);
+  }
+
+  /* Copy the data lines */
+  while(i<=line_e_I) {
+    int c;
+    if((c = getc(syn_in))==(int) '\n') i++;
+    pips_assert("The end of file cannot be reached", c!=EOF);
+    putc(c, stderr);
+  }
+
+  safe_fclose(syn_in, CurrentFN);
 }
