@@ -1,7 +1,7 @@
 !
 ! COMMON /HPFC PROCS/
 !
-! $RCSfile: hpfc_procs.m4h,v $ ($Date: 1996/09/07 17:15:16 $, )
+! $RCSfile: hpfc_procs.m4h,v $ ($Date: 1996/10/18 22:19:45 $, )
 ! version $Revision$
 ! got on %D%, %T%
 ! $Id$
@@ -16,7 +16,8 @@
      $     NB OF TASKS,
      $     SEND CHANNELS(MAX MAX SIZE OF PROCS),
      $     RECV CHANNELS(MAX MAX SIZE OF PROCS),
-     $     HOST CHANNEL,
+     $     HOST SND CHANNEL,
+     $     HOST RCV CHANNEL,
      $     MCAST HOST,
      $     MCAST NODES,
      $     HOST NODE MODEL,
@@ -34,7 +35,8 @@
 !
       integer 
      $     MY LID, MY TID, HOST TID, NODE TIDS, NB OF TASKS, MY POS,
-     $     SEND CHANNELS, RECV CHANNELS, HOST CHANNEL,
+     $     SEND CHANNELS, RECV CHANNELS, 
+     $     HOST SND CHANNEL, HOST RCV CHANNEL,
      $     MCAST HOST, MCAST NODES _CM5(`,
      $     CM HOST ID, CM MY ID, CM SIZE,
      $     CM NODE IDS(MAX MAX SIZE OF PROCS)')dnl
