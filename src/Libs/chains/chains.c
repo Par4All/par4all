@@ -1033,6 +1033,21 @@ unstructured u ;
     init_control( c ) ;
     inout_control( c ) ;
     usedef_control( c ) ;
+
+#define TABLE_FREE(t) \
+{HASH_MAP( k, v, {set_free( (set)v ) ;}, t ) ; hash_table_free(t);}
+
+    TABLE_FREE( Gen ) ;
+    TABLE_FREE( Ref ) ;
+    TABLE_FREE( Kill ) ;
+    TABLE_FREE( Def_in ) ;
+    TABLE_FREE( Def_out ) ;
+    TABLE_FREE( Ref_in ) ;
+    TABLE_FREE( Ref_out ) ;
+    TABLE_FREE( Defs ) ;
+
+    hash_table_free( Vertex_statement ) ;
+
     return( dg ) ;
 }
 
@@ -1068,21 +1083,6 @@ graph statement_dependence_graph(statement s)
     init_statement( s ) ;
     inout_statement( s ) ;
     usedef_statement( s ) ;
-
-#define TABLE_FREE(t) \
-{HASH_MAP( k, v, {set_free( (set)v ) ;}, t ) ; hash_table_free(t);}
-
-    TABLE_FREE( Gen ) ;
-    TABLE_FREE( Ref ) ;
-    TABLE_FREE( Kill ) ;
-    TABLE_FREE( Def_in ) ;
-    TABLE_FREE( Def_out ) ;
-    TABLE_FREE( Ref_in ) ;
-    TABLE_FREE( Ref_out ) ;
-    TABLE_FREE( Defs ) ;
-
-    hash_table_free( Vertex_statement ) ;
-
     return( dg ) ;
 }
 
