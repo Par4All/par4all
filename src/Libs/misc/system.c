@@ -1,5 +1,5 @@
 /* $RCSfile: system.c,v $ version $Revision$
- * ($Date: 1995/09/15 18:50:20 $, )
+ * ($Date: 1995/09/18 13:16:56 $, )
  *
  * a safe system call. abort if fails.
  * FC 09/95
@@ -11,13 +11,14 @@
 #include "genC.h"
 #include "misc.h"
 
-void safe_system(
-    string command) /* the command to be executed */
+int safe_system(string command) /* the command to be executed */
 {
     int status = system(command);
+    
+    if (status == 127)
+		pips_error("safe_system", "Could not execute : %s\n", command);
 
-    if (status) 
-	pips_error("safe_system", "failed (%d) for %s\n", status, command);
+    return (status / 256) & 255;
 }
 
 /* that is all
