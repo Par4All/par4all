@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.217  2002/05/03 08:42:52  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.216  2002/05/03 08:39:58  phamdat
  * *** empty log message ***
  *
@@ -490,7 +493,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.216 2002/05/03 08:39:58 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.217 2002/05/03 08:42:52 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2472,8 +2475,8 @@ text_statement(
 				statement_number(stmt));
     }
     /*************written by Dat**************/
-    /*print_text(stderr, temp);
-      found_filter = FALSE;*/
+    /*print_text(stderr, temp);*/
+    found_filter = FALSE;
     /*****************************************/
 
     /* note about comments: they are duplicated here, but I'm pretty
@@ -2490,7 +2493,7 @@ text_statement(
 						  strdup(comments)));
 	}
 	MERGE_TEXTS(r, temp);
-	/*found_filter = TRUE;*/
+	found_filter = TRUE;
       } else {
 	MERGE_TEXTS(r, temp);
       }
