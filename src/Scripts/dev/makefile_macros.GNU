@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.GNU,v $
+# Revision 1.31  1997/05/14 15:54:31  coelho
+# *** empty log message ***
+#
 # Revision 1.30  1997/05/14 08:33:54  coelho
 # use bsd files...
 #
@@ -17,11 +20,12 @@
 AR	= gar
 ARFLAGS	= rv
 CC	= gcc
-CFLAGS	= -g -O2 -ansi -pedantic-errors -Wall -pipe
+CANSI	= -ansi -pedantic-errors
+CFLAGS	= -g -O2 -Wall -pipe
 CMKDEP	= -M
 CPPFLAGS= \
-	-D__USE_FIXED_PROTOTYPES__ \
 	-D__USE_BSD \
+	-D__USE_FIXED_PROTOTYPES__ \
 	-I. \
 	-I$(NEWGEN_ROOT)/Include \
 	-I$(LINEAR_ROOT)/Include \
