@@ -21,39 +21,34 @@ static void delete_derived_resources();
 
 static list saved_active_phases = NIL;
 
-bool save_active_phases()
+void 
+save_active_phases(void)
 {
     makefile current_makefile = parse_makefile();
-    bool result = TRUE;
     
-    if (saved_active_phases != NIL)
-	result = FALSE;
-    else {
-	MAPL(pa, {
-	    saved_active_phases = gen_nconc(saved_active_phases, 
-					    CONS(STRING, 
-						 strdup(STRING(CAR(pa))),
-						 NIL));
-	}, makefile_active_phases(current_makefile));
-    }
+    if (saved_active_phases==NIL)
+    {
+	MAP(STRING, s, 
+	    saved_active_phases = CONS(STRING, strdup(s), saved_active_phases),
+	    makefile_active_phases(current_makefile));
 
-    return result;
+	saved_active_phases = gen_nreverse(saved_active_phases);
+    }
 }
 
-bool retrieve_active_phases()
+void
+retrieve_active_phases(void)
 {
     makefile current_makefile = parse_makefile();
-    bool result = TRUE;
 
     ifdebug(2) {
 	puts("----- BEFORE RETREIVING -----");
 	fprint_activated(stdout);
     }
 
-    if (saved_active_phases == NIL)
-	result = FALSE;
-    else {
-	gen_free_list (makefile_active_phases(current_makefile));
+    if (saved_active_phases != NIL)
+    {
+	gen_free_string_list(makefile_active_phases(current_makefile));
 	makefile_active_phases(current_makefile) = saved_active_phases;
 	saved_active_phases = NIL;
 
@@ -62,40 +57,30 @@ bool retrieve_active_phases()
 	    fprint_activated(stdout);
 	}
     }
-    return result;
 }
 
-bool active_phase_p(phase)
-string phase;
+bool 
+active_phase_p(string phase)
 {
     makefile current_makefile = parse_makefile();
 
-	MAPL(pa, {
-	    string s = STRING(CAR(pa));
-	    
-	    if (strcmp(s, phase) == 0)
-		return (TRUE);
-	}, makefile_active_phases(current_makefile));
-    return (FALSE);
+    MAP(STRING, s, 
+	if (same_string_p(s, phase)) return TRUE,
+	makefile_active_phases(current_makefile));
+
+    return FALSE;
 }
 
 
-void fprint_activated(fd)
-FILE *fd;
+void 
+fprint_activated(FILE *fd)
 {
     makefile m = parse_makefile();
-
-    MAPL(pa, {
-	string s = STRING(CAR(pa));
-
-	fprintf(fd, "%s\n", s);
-
-    }, makefile_active_phases(m));
+    MAP(STRING, s, fprintf(fd, "%s\n", s), makefile_active_phases(m));
 }
 
-
-string activate(phase)
-string phase;
+string 
+activate(string phase)
 {
     rule r;
     virtual_resource res;
