@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 21:40:50 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 21:51:40 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -632,10 +632,7 @@ $(TARGET)-local.h:
 # header file reconstruction should be required explicitely
 # with the header rule.
 
-$(INC_TARGET): $(TARGET)-local.h 
-	$(MAKE) --no-print-directory header
-
-.header: $(TARGET)-local.h $(DERIVED_HEADERS) $(INC_CFILES)
+build-header-file:
 	@$(COPY) $(TARGET)-local.h $(INC_TARGET);
 	{ \\
 	echo "/* header file built by $(PROTO) for $(HEADER_ARCH) */";\\
@@ -646,6 +643,10 @@ $(INC_TARGET): $(TARGET)-local.h
 	echo "#endif /* ${dir_simple_name}_header_included */";\\
 	} > $(INC_TARGET).tmp
 	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
+
+# .header carrie all dependencies for INC_TARGET:
+.header: $(TARGET)-local.h $(DERIVED_HEADERS) $(INC_CFILES) 
+	$(MAKE) --no-print-directory build-header-file
 	touch .header
 
 # checks for the header file, and build if necessary...
@@ -653,9 +654,9 @@ $(INC_TARGET): $(TARGET)-local.h
 # FILE* and so are not struct _iobuf or so.
 # if pips is exported, may you should consider HEADER_ARCH="". FC.
 header: .header
-	-@[ -f $(TARGET).h ] || \\
-	{ $(RM) .header ; \\
-	  $(MAKE) --no-print-directory $(HEADER_ARCH) .header ; }
+
+$(INC_TARGET): $(TARGET)-local.h 
+	$(MAKE) --no-print-directory build-header-file
 
 %
 
