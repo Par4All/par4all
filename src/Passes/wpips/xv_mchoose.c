@@ -68,7 +68,6 @@ Event *event;
 			RK, 21/05/1993.
 	*/
 	if (mchoices_length == 0 || item_is_in_the_list == FALSE) {
-		int result;
 		char *s;
 		s = mchoices_length == 0 ? "You have to select at least 1 item!" :
 			"You have selected an item not in the choice list!";
@@ -181,6 +180,8 @@ void create_mchoose_window()
 		   XV_X, 320,
 		   XV_Y, 40,
 		   0);
+	
+	xv_set(mchoose_panel, PANEL_DEFAULT_ITEM, ok, NULL);
 
     help = xv_create(mchoose_panel, PANEL_BUTTON,
 		   PANEL_LABEL_STRING, "HELP",
