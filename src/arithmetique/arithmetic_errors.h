@@ -20,7 +20,8 @@ extern int     global_exception_index;
 extern int     global_exception_thrown;
 
 extern int overflow_error;
-extern int  simplex_arithmetic_error;
+extern int simplex_arithmetic_error;
+extern int user_exception_error;
 
 /* declaration of "exception"  to keep  2 potential types:
    extern int or extern jmp_buf
