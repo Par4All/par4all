@@ -8,8 +8,10 @@
  * Comments :
  */
 
-#include <setjmp.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
+#include <setjmp.h>
 #include <string.h>
 #include <errno.h>
 
