@@ -234,11 +234,16 @@ i_delete:
 		    user_error ("yyparse","Workspace opened\n");
 		    $$ = FALSE;
 		} else {
-		    delete_workspace (t);
-		    /* In case of problem, user_error() has been
-		       called, so it is OK now !!*/
-		    user_log ("Workspace %s deleted.\n", t);
-		    $$ = TRUE;
+		    if(delete_workspace (t)) {
+			/* In case of problem, user_error() has been
+			   called, so it is OK now !!*/
+			user_log ("Workspace %s deleted.\n", t);
+			$$ = TRUE;
+		    }
+		    else {
+			user_error("yyparse",
+				   "Could not delete workspace %s\n", t);
+		    }
 		}
 	    }
 	}
@@ -300,6 +305,10 @@ i_apply:
 	    bool result = TRUE;
 
 	    debug(7,"yyparse","reduce rule i_apply\n");
+
+	    if(db_get_current_workspace()==database_undefined) {
+		user_error("tp_parse", "Open or create a workspace first!\n");
+	    }
 
 	    if (execution_mode) {
 		MAPL(e, {
@@ -363,6 +372,10 @@ i_activate:
 	opt_sep_list
 	{
 	    debug(7,"yyparse","reduce rule i_activate\n");
+
+	    if(db_get_current_workspace()==database_undefined) {
+		user_error("tp_parse", "Open or create a workspace first!\n");
+	    }
 
 	    if (execution_mode) {
 		activate ($3);
