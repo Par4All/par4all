@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: makefile_macros.GNULL,v $
+# Revision 1.24  1997/05/12 15:59:30  coelho
+# *** empty log message ***
+#
 # Revision 1.23  1997/03/26 17:28:48  coelho
 # simplified.
 #
@@ -9,6 +12,10 @@
 # this file contains macro definitions 
 
 include $(ROOT)/Include/makefile_macros.GNU
+
+# -petantic-errors and long long int is not a good idea.
+
+CFLAGS=-g -O2 -ansi -Wall -pipe
 
 CPPFLAGS+= \
 	-DLINEAR_VALUE_IS_LONGLONG \
