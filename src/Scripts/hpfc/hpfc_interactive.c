@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/04/24 16:31:46 $, 
+ * $Date: 1995/04/25 10:33:22 $, 
  */
 
 #include <stdio.h>
@@ -8,6 +8,8 @@
 extern int system();
 extern int fprintf();
 extern char *getenv();
+extern int malloc();
+extern void free();
 
 #include "readline/readline.h"
 #include "readline/history.h"
@@ -18,18 +20,21 @@ extern char *getenv();
 
 #define QUIT "qui"
 
+static char * default_full_file_name()
+{
+    char *home = getenv("HOME");
+    int    len = strlen(home) + strlen(DEFAULT_FILE_NAME) + 2;
+    char *name = (char*) malloc(sizeof(char)*len);
+
+    return(sprintf(name, "%s/%s", home, DEFAULT_FILE_NAME));
+}
+
 int main()
 {
     char 
 	*line,
 	buffer[BUFFER_SIZE],
-	*home = getenv("HOME"),
-	file_name[BUFFER_SIZE]="";
-
-    /*  default history file is ~/.hpfc.history
-     */
-    if ((strlen(home)+strlen(DEFAULT_FILE_NAME))<BUFFER_SIZE)
-	sprintf(file_name, "%s/%s", home, DEFAULT_FILE_NAME);
+	*file_name = default_full_file_name();
     
     /*  initialize history
      */
@@ -66,6 +71,7 @@ int main()
     history_truncate_file(file_name, 100);
 
     fprintf(stdout, "\n"); /* usefull for Ctrl-D terminations */
+    free(file_name);
     return(0);
 }
 
