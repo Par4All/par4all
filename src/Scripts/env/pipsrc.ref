@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/11 10:07:49 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/11 11:45:05 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -30,6 +30,8 @@ NEWGEN_SRCDIR="${NEWGEN_PRODDIR}/Src"
 NEWGEN_BINDIR="${NEWGEN_PRODDIR}/Bin"
 
 NEWGEN_LIBS='-lgenC'
+
+NEWGEN_ORDERED_LIBS="genC"
 
 PATH="${PATH}:${NEWGEN_BINDIR}"
 
