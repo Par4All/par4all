@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
+
 #include "arithmetique.h"
 #include "assert.h"
 #include "boolean.h"
@@ -24,22 +25,21 @@
  *
  * Ancien nom: init_systeme()
  */
-Psysteme sc_new()
+Psysteme sc_new(void)
 {
-    Psysteme p;
+    Psysteme p = (Psysteme) malloc(sizeof(Ssysteme));
 
-    p = (Psysteme) malloc(sizeof(Ssysteme));
-    if (p == NULL) {
-	(void) fprintf(stderr,"sc_new: Out of memory space\n");
-	exit(-1);
-    }
-    p->nb_eq = p->nb_ineq = p->dimension = 0;
+    assert(p);
+
+    p->nb_eq = 0;
+    p->nb_ineq = 0;
+    p->dimension = 0;
 	
-    p->egalites = (Pcontrainte ) NULL;
+    p->egalites = (Pcontrainte) NULL;
     p->inegalites = (Pcontrainte) NULL;
-    p->base = (Pbase) NULL;
+    p->base = BASE_NULLE;
 
-    return(p);
+    return p;
 }
 
 /* creation d'une base contenant toutes les variables
@@ -48,23 +48,34 @@ Psysteme sc_new()
  */
 Pbase sc_to_minimal_basis(Psysteme ps)
 {
-    Pbase b = BASE_NULLE;
-    Pcontrainte eq;
-    Pvecteur pv;
+  linear_hashtable_pt seen = linear_hashtable_make();
+  Pbase b = BASE_NULLE;
+  Pcontrainte c;
+  Pvecteur v;
+  
+  for (c = ps->egalites; c!=NULL; c=c->succ) {
+    for (v = c->vecteur; v!=VECTEUR_NUL; v=v->succ) {
+      Variable var = var_of(v);
+      if (var!=TCST && !linear_hashtable_isin(seen, var)) {
+	linear_hashtable_put_once(seen, var, var);
+	b = vect_chain(b, var, VALUE_ONE);
+      }	
+    }
+  }
 
-	for(eq = ps->egalites; eq!= NULL; eq=eq->succ) {
-	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
-		if (pv->var != TCST)
-		    vect_chg_coeff(&b,pv->var, VALUE_ONE);
-	}
+  for (c = ps->inegalites; c!=NULL; c=c->succ) {
+    for (v = c->vecteur; v!=VECTEUR_NUL; v=v->succ) {
+      Variable var = var_of(v);
+      if (var!=TCST && !linear_hashtable_isin(seen, var)) {
+	linear_hashtable_put_once(seen, var, var);
+	b = vect_chain(b, var, VALUE_ONE);
+      }	
+    }
+  }
 
-	for(eq = ps->inegalites; eq!= NULL; eq=eq->succ) {
-	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
-		if (pv->var != TCST)
-		    vect_chg_coeff(&b,pv->var, VALUE_ONE);
-	}
-
-    return b;
+  linear_hashtable_free(seen);
+  
+  return b;
 }
 
 /* void sc_creer_base(Psysteme ps): initialisation des parametres dimension
