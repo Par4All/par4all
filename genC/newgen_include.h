@@ -46,7 +46,7 @@
   struct type {\
     cartype carname ;\
     struct type *cdr ;\
-    }
+  }
 
 DEFLIST(namelist,char *,name) ;
 DEFLIST(intlist,int,val) ;
@@ -97,11 +97,11 @@ union domain {
 	set_type what ;
     } se ;
     struct {
-	int type ;
-	char *constructor ;
-	int persistant ;
-	struct gen_binding *element ;
-	struct intlist *dimensions ;
+	int type;
+	char *constructor;
+	int persistant;
+	struct gen_binding * element;
+	struct intlist * dimensions;
     } ar ;
     struct {
 	int type ;
@@ -186,30 +186,58 @@ extern int Current_index ;
 #define IS_FLOAT_TYPE(n)	((n)==4)
 #define IS_STRING_TYPE(n)	((n)==5)
 
+/*
+ * MACROS added for code checking
+ *
+ * Fabien COELHO 10/06/94
+ */
+#define check_domain(dom) \
+  message_assert("Consistant domain number",\
+		 (dom)>=0 && (dom)<MAX_DOMAIN)
+
+#define check_read_spec_performed() \
+  message_assert("gen_read_spec not performed prior to use", \
+		 Read_spec_performed);
+
+#define check_index(i) \
+  message_assert("valid tabulated index", (i)>=0 && (i)<MAX_TABULATED);
+
+#define newgen_free(p) (*((char*)(p))='\0',free(p)) /* just to hide bugs */
+
+/* inlined version of domain_index. what is done by optimizing compilers?
+ */
+#define quick_domain_index(obj) \
+  (((! (obj)) || ((obj)==gen_chunk_undefined) || \
+    ((obj)->i<0) || ((obj)->i>MAX_DOMAIN)) ? \
+   newgen_domain_index(obj) : (obj)->i) \
+  /* prints the error message or returns */
+
 /* External routines. */
-extern char *alloc() ;
 extern void user(char *, ...) ;
 
-extern void gencode() ;
-extern void fatal(char*, ...) ;
-extern char *itoa() ;
-extern void print_domains() ;
-extern void init() ;
-extern void compile() ;
-extern int gen_size();
-extern void print_domain();
+extern void gencode(string);
+extern void fatal(char *, ...) ;
+extern char *itoa(int);
+extern void print_domains(FILE *);
+extern void init(void) ;
+extern void compile(void) ;
+extern int gen_size(int);
+extern void print_domain(FILE *, union domain *);
 
 extern int genspec_parse(void);
 extern int genspec_lex(void);
 extern int genread_parse(void);
 extern int genread_lex(void);
 
-extern void gen_init_Gen_tabulated_names(void);
-extern void gen_close_Gen_tabulated_names(void);
-extern void gen_delete_tabulated_name(gen_chunk *);
-extern char * gen_get_tabulated_name_basic(int , char *);
-extern char * gen_get_tabulated_name(gen_chunk *);
-extern char * gen_get_tabulated_name_direct(char *);
-extern char * gen_build_unique_tabulated_name(int, char *);
-extern void gen_put_tabulated_name(int, char *, char *);
-extern void gen_put_tabulated_name_direct(char *, char *);
+extern void gen_init_gen_tabulated_names(void);
+extern void gen_lazy_init_gen_tabulated_names(void);
+extern void gen_close_gen_tabulated_names(void);
+
+extern gen_chunk * gen_enter_tabulated(int, char *, gen_chunk *, bool);
+extern gen_chunk * gen_do_enter_tabulated(int, char *, gen_chunk *, bool);
+
+extern void gen_init_all_tabulateds(void);
+extern void gen_init_tabulated_set_domain(int, int);
+
+extern gen_chunk * gen_tabulated_fake_object_hack(int);
+extern int newgen_domain_index(gen_chunk *);
