@@ -19,7 +19,6 @@ LINT	= lint
 LINTFLAGS= -habxu
 YACC	= yacc
 YFLAGS	=
-PROTO	= cproto
 PRFLAGS	= -evcf2
 ETAGS	= etags
 TAR	= tar
