@@ -1,19 +1,19 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/09/12 14:26:27 $, ) 
+ * ($Date: 1995/09/15 15:54:34 $, ) 
  */
 
 #include "defines-local.h"
-
-entity CreateIntrinsic(string name); /* in syntax */
+entity CreateIntrinsic(string); /* in syntax */
 
 /* builds a statement
  *   VAR_i = MYPOS(i, proc_number) // i=1 to proc dimension
  */
 statement 
-define_node_processor_id(entity proc,
-			 entity (*creation)(int))
+define_node_processor_id(
+    entity proc,
+    entity (*creation)(int))
 {
     int i, procn = load_hpf_number(proc);
     list /* of expression */ mypos_indices,
@@ -45,27 +45,17 @@ define_node_processor_id(entity proc,
  * be used to define the variable.
  */
 statement 
-generate_deducables(list le)
+generate_deducables(
+    list /* of expression */ le)
 {
     list rev = gen_nreverse(gen_copy_seq(le)), ls = NIL;
 
     MAP(EXPRESSION, e,
     {
 	entity var = reference_variable(expression_reference(e));
-	Pvecteur v = vect_dup(normalized_linear(expression_normalized(e)));
-	int coef = vect_coeff((Variable) var, v);
-	
-	assert(abs(coef)==1);
-	
-	vect_erase_var(&v, (Variable) var);
-	if (coef==1) vect_chg_sgn(v);
-	
-	 ls = CONS(STATEMENT,
-		   make_assign_statement(entity_to_expression(var),
-					 make_vecteur_expression(v)),
-		   ls);	
-	
-	vect_rm(v);
+	Pvecteur v = normalized_linear(expression_normalized(e));
+
+	ls = CONS(STATEMENT, Pvecteur_to_assign_statement(var, v), ls);
     },
 	rev);
 
@@ -74,7 +64,9 @@ generate_deducables(list le)
 }
 
 list /* of expression */
-hpfc_gen_n_vars_expr(entity (*creation)(), int number)
+hpfc_gen_n_vars_expr(
+    entity (*creation)(),
+    int number)
 {
     list result = NIL;
     assert(number>=0 && number<=7);
@@ -87,8 +79,9 @@ hpfc_gen_n_vars_expr(entity (*creation)(), int number)
 }
 
 expression 
-make_reference_expression(entity e,
-			  entity (*creation)(int))
+make_reference_expression(
+    entity e,
+    entity (*creation)(int))
 {
     return reference_to_expression(make_reference(e,
 	   hpfc_gen_n_vars_expr(creation, NumberOfDimension(e))));
@@ -98,7 +91,9 @@ make_reference_expression(entity e,
  * the I/O loop nest.
  */
 statement 
-set_logical(entity log, bool val)
+set_logical(
+    entity log, /* the logical variable to be assigned */
+    bool val)   /* the assigned truth value */
 {
     return make_assign_statement
 	(entity_to_expression(log),
@@ -107,8 +102,21 @@ set_logical(entity log, bool val)
 			      NIL));
 }
 
+statement
+set_integer(
+    entity var, /* the integer scalar variable to be assigned */
+    int val)    /* the assigned int value */
+{
+    return make_assign_statement(entity_to_expression(var),
+				 int_to_expression(val));
+}
+
+/* returns statement VAR = VAR + N
+ */
 statement 
-hpfc_add_n(entity var, int n)
+hpfc_add_n(
+    entity var, /* integer scalar variable */
+    int n)      /* added value */
 {
     return make_assign_statement
 	(entity_to_expression(var),
@@ -119,8 +127,8 @@ hpfc_add_n(entity var, int n)
 /* expr = expr + 2
  */
 statement 
-hpfc_add_2(exp)
-expression exp;
+hpfc_add_2(
+    expression exp)
 {
     entity plus = CreateIntrinsic(PLUS_OPERATOR_NAME);
     return(make_assign_statement
@@ -130,28 +138,33 @@ expression exp;
 }
 
 statement 
-hpfc_message(tid, channel, send)
-expression tid, channel;
-bool send;
+hpfc_message(
+    expression tid,
+    expression channel,
+    bool send)
 {
-    expression third = 
-	entity_to_expression(hpfc_name_to_entity(send ? INFO : BUFID));
-    entity pvmf = hpfc_name_to_entity(send ? PVM_SEND : PVM_RECV);
+    expression third;
+    entity pvmf;
 
-    return(make_block_statement
+    third = entity_to_expression(hpfc_name_to_entity(send ? INFO : BUFID));
+    pvmf = hpfc_name_to_entity(send ? PVM_SEND : PVM_RECV);
+
+    return make_block_statement
 	   (CONS(STATEMENT, hpfc_make_call_statement(pvmf,
 				   CONS(EXPRESSION, tid,
 				   CONS(EXPRESSION, channel,
 				   CONS(EXPRESSION, third,
 					NIL)))),
 	    CONS(STATEMENT, hpfc_add_2(copy_expression(channel)),
-		 NIL))));				    
+		 NIL)));
 }
 
 /* returns if (LAZY_{SEND,RECV}) then
  */
 statement 
-hpfc_lazy_guard(bool snd, statement then)
+hpfc_lazy_guard(
+    bool snd, 
+    statement then)
 {
     entity decision = hpfc_name_to_entity(snd ? LAZY_SEND : LAZY_RECV);
     return test_to_statement
@@ -164,9 +177,10 @@ hpfc_lazy_guard(bool snd, statement then)
  * ENDIF
  */
 static statement 
-hpfc_lazy_message(expression tid, 
-		  expression channel, 
-		  bool snd)
+hpfc_lazy_message(
+    expression tid, 
+    expression channel, 
+    bool snd)
 {
     entity decision = hpfc_name_to_entity(snd ? LAZY_SEND : LAZY_RECV);
     statement 
@@ -180,9 +194,10 @@ hpfc_lazy_message(expression tid,
 }
 
 statement 
-hpfc_generate_message(entity ld, 
-		      bool send, 
-		      bool lazy)
+hpfc_generate_message(
+    entity ld, 
+    bool send, 
+    bool lazy)
 {
     entity nc, nt;
     expression lid, tid, chn;
@@ -200,8 +215,8 @@ hpfc_generate_message(entity ld,
 }
 
 statement 
-hpfc_initsend(lazy)
-bool lazy;
+hpfc_initsend(
+    bool lazy)
 {
     statement init;
 
@@ -224,29 +239,237 @@ bool lazy;
 
 /* returns the buffer entity for array
  */
-entity 
-hpfc_buffer_entity(entity array)
+static entity 
+hpfc_buffer_entity(
+    entity array,
+    string suffix)
 {
     return hpfc_name_to_entity(concatenate
 			       (pvm_what_options(entity_basic(array)),
-				BUFFER_SUFFIX, NULL));
+				suffix, NULL));
 }
 
+/* returns a reference to the typed common hpfc_buffer buffer,
+ * that suits array basic type and with index as an index.
+ */
 expression
-hpfc_buffer_reference(entity array, entity index)
+hpfc_buffer_reference(
+    entity array, /* array to select the right typed buffer */
+    entity index) /* index variable */
 {
     return reference_to_expression
-	(make_reference(hpfc_buffer_entity(array),
+	(make_reference(hpfc_buffer_entity(array, BUFFER),
          CONS(EXPRESSION, entity_to_expression(index), 
 	      NIL)));
 }
 
+/* generates the condition for testing the buffer state:
+ * returns (BUFFER_INDEX.[eq|ne].BUFFER_[|RCV]SIZE) depending on swtiches.
+ */
+static expression 
+buffer_full_condition(
+    entity array, /* array for the typed buffer size */
+    bool is_send, /* while sending or receiving */
+    bool is_full) /* TRUE: is full, FALSE: is not empty */
+{
+    entity opera, bsize, index;
+
+    index = hpfc_name_to_entity(BUFFER_INDEX);
+    opera = is_full ? 
+	CreateIntrinsic(EQUAL_OPERATOR_NAME) :
+	CreateIntrinsic(NON_EQUAL_OPERATOR_NAME) ;
+    bsize = is_send ? is_full ?
+	hpfc_buffer_entity(array, BUFSZ) :
+        MakeConstant("0", is_basic_int) :
+	hpfc_name_to_entity(BUFFER_RCV_SIZE);
+
+    return MakeBinaryCall(opera,
+			  entity_to_expression(index),
+			  entity_to_expression(bsize));
+}
+
+/* array(creation) = buffer(current++) or reverse assignment...
+ */
+statement 
+hpfc_buffer_packing(
+    entity array,
+    entity (*creation)(), 
+    bool pack)
+{
+    entity index;
+    expression array_ref, buffer_ref;
+    statement increment, assignment;
+
+    index = hpfc_name_to_entity(BUFFER_INDEX);
+    array_ref = make_reference_expression(array, creation);
+    buffer_ref = hpfc_buffer_reference(array, index);
+    increment = hpfc_add_n(index, 1);
+    assignment = make_assign_statement(pack ? buffer_ref : array_ref,
+				       pack ? array_ref : buffer_ref);
+    
+    return make_block_statement(CONS(STATEMENT, increment,
+				CONS(STATEMENT, assignment,
+				     NIL)));
+}
+
+static entity
+hpfc_ith_broadcast_function(
+    int dim) /* number of dimensions of the broadcast */
+{
+    char buffer[20]; /* ??? static buffer size */
+    (void) sprintf(buffer, BROADCAST "%d", dim);
+    return MakeRunTimeSupportSubroutine(buffer, 2*dim+1);
+}
+
+/* send the buffer, possibly a broadcast.
+ * unconditional ? if non empty ?
+ * generates hpfc_broadcast_x as required.
+ */
+statement 
+hpfc_broadcast_buffers(
+    entity array, /* should be the target array */
+    entity lid,   /* broadcast base, maybe partial?! */
+    entity proc)  /* processor related to the array... (redundant!?) */
+{
+    Pcontrainte c;
+    int size, npdim, nreplicated;
+    list /* of expression */ args = NIL;
+
+    c = full_linearization(proc, (entity) NULL, &size, 
+			   get_ith_temporary_dummy, FALSE, 0);
+
+    npdim = NumberOfDimension(proc);
+    
+    for (nreplicated=0; npdim; npdim--)
+    {
+	if (processors_dim_replicated_p(proc, array, npdim))
+	{
+	    entity v;
+	    int number, step;
+	    
+	    nreplicated++;
+	    v = get_ith_temporary_dummy(npdim);
+	    step = (int) vect_coeff((Variable) v, contrainte_vecteur(c));
+	    number = SizeOfIthDimension(proc, npdim);
+
+	    args = CONS(EXPRESSION, int_to_expression(number),
+		   CONS(EXPRESSION, int_to_expression(step),
+			args));
+	}
+    }
+
+    args = CONS(EXPRESSION, entity_to_expression(lid), args);
+    contraintes_free(c);
+
+    return call_to_statement
+	(make_call(hpfc_ith_broadcast_function(nreplicated), args));
+}
+
+statement 
+hpfc_broadcast_if_necessary(
+    entity array,
+    entity lid,
+    entity proc,
+    bool is_lazy)
+{
+    expression not_empty;
+    statement send, pack;
+
+    not_empty = buffer_full_condition(array, TRUE, FALSE);
+    send = hpfc_broadcast_buffers(array, lid, proc);
+    pack = call_to_statement(make_call(hpfc_buffer_entity(array, BUFPCK), NIL));
+
+    if (is_lazy)
+	return test_to_statement
+	    (make_test(not_empty,
+	     make_block_statement(CONS(STATEMENT, pack,
+				  CONS(STATEMENT, send, NIL))),
+	     make_continue_statement(entity_undefined)));
+    else
+	return make_block_statement
+	    (CONS(STATEMENT, test_to_statement(make_test(not_empty, pack,
+			     make_continue_statement(entity_undefined))),
+	     CONS(STATEMENT, test_to_statement(make_test(not_expression
+                (entity_to_expression(hpfc_name_to_entity(SND_NOT_INIT))), send,
+			     make_continue_statement(entity_undefined))),
+		  NIL)));
+}
+
+/* lazy in actually sending or not the packed buffer immediatly...
+ */
+statement 
+hpfc_lazy_buffer_packing(
+    entity array, /* array being (un)packed */
+    entity lid,   /* local id for base target */
+    entity proc,  /* the processors, needed for broadcasts */
+    entity (*array_dim)(int), /* variables for array dimensions */
+    bool is_send, /* send or receive ? */
+    bool is_lazy) /* means you send the buffer directly, without packing... */
+{
+    statement packing, realpack, indexeq0, ifcond, optional;
+    expression condition;
+    list /* of statement */ l;
+
+    packing = hpfc_buffer_packing(array, array_dim, is_send);
+    condition = buffer_full_condition(array, is_send, TRUE);
+    realpack = call_to_statement
+	(make_call(hpfc_buffer_entity(array, is_send ? BUFPCK : BUFUPK), 
+	   is_send ? NIL : CONS(EXPRESSION, entity_to_expression(lid), NIL)));
+    indexeq0 = set_integer(hpfc_name_to_entity(BUFFER_INDEX), 0);
+    optional = is_lazy ? 
+	is_send ? hpfc_broadcast_buffers(array, lid, proc) :
+	          set_logical(hpfc_name_to_entity(RCV_NOT_PRF), TRUE) :
+	make_continue_statement(entity_undefined);
+			   
+    if (is_send)
+	l = CONS(STATEMENT, realpack,
+	    CONS(STATEMENT, optional,
+	    CONS(STATEMENT, indexeq0, NIL)));
+    else
+	l = CONS(STATEMENT, optional,
+	    CONS(STATEMENT, realpack,
+	    CONS(STATEMENT, indexeq0, NIL)));
+    
+    ifcond = test_to_statement
+	(make_test(condition, 
+		   make_block_statement(l),
+		   make_continue_statement(entity_undefined)));
+
+    return make_block_statement
+	(is_send ? CONS(STATEMENT, packing, CONS(STATEMENT, ifcond, NIL)) :
+	           CONS(STATEMENT, ifcond, CONS(STATEMENT, packing, NIL)));
+}
+
+statement
+hpfc_buffer_initialization(
+    bool is_send,
+    bool is_lazy)
+{
+    statement buffindex, msgstate, other;
+    list /* of statement */ l;
+
+    buffindex = set_integer(hpfc_name_to_entity(BUFFER_INDEX), 0);
+    msgstate = set_logical(hpfc_name_to_entity
+			   (is_send ? SND_NOT_INIT : RCV_NOT_PRF), TRUE);
+    other = set_integer
+	(hpfc_name_to_entity(is_send ? BUFFER_ENCODING : BUFFER_RCV_SIZE),
+	 is_send ? 1 : 0); /* PVMRAW, no PVM in place... */
+
+    l = CONS(STATEMENT, buffindex,
+        CONS(STATEMENT, msgstate, 
+	CONS(STATEMENT, other,
+	     NIL)));
+
+    return make_block_statement(l);
+}
+
 /* returns PVMF(un)pack(..., array(creation), 1, 1, HPFC_INFO)
  */
-static statement 
-hpfc_pvm_packing(entity array,
-		 entity (*creation)(int), 
-		 bool pack)
+statement 
+hpfc_pvm_packing(
+    entity array,
+    entity (*creation)(int), 
+    bool pack)
 
 {
     return hpfc_make_call_statement
@@ -256,42 +479,7 @@ hpfc_pvm_packing(entity array,
 	 CONS(EXPRESSION, int_to_expression(1),
 	 CONS(EXPRESSION, int_to_expression(1),
 	 CONS(EXPRESSION, entity_to_expression(hpfc_name_to_entity(INFO)),
-		   NIL))))));
-}
-
-/* array(creation) = buffer(current++) or inverse...
- */
-static statement 
-hpfc_buffer_packing(entity array,
-		    entity (*creation)(), 
-		    bool pack)
-
-{
-    entity index = hpfc_name_to_entity(BUFFER_INDEX);
-    expression
-	array_ref = make_reference_expression(array, creation),
-	buffer_ref = hpfc_buffer_reference(array, index);
-    statement
-	increment = hpfc_add_n(index, 1),
-	assignment = make_assign_statement(pack ? buffer_ref : array_ref,
-					   pack ? array_ref : buffer_ref);
-    
-    return make_block_statement(CONS(STATEMENT, increment,
-				CONS(STATEMENT, assignment,
-				     NIL)));
-				     
-}
-
-/* returns an packing call for hpfc, that (un)pack array(creation).
- */
-statement
-hpfc_packing(entity array,
-	     entity (*creation)(), 
-	     bool pack)
-{
-    return /* get_bool_property(HPFC_USE_BUFFERS) ?
-	hpfc_buffer_packing(array, creation, pack) : */
-        hpfc_pvm_packing(array, creation, pack);
+	      NIL))))));
 }
 
 /* the lazy issues.
@@ -299,12 +487,14 @@ hpfc_packing(entity array,
  * to generate the appropriate broadcast?
  */
 statement 
-hpfc_lazy_packing(array, lid, creation, pack, lazy)
-entity array, lid;
-entity (*creation)();
-bool pack, lazy;
+hpfc_lazy_packing(
+    entity array,
+    entity lid, 
+    entity (*creation)(int),
+    bool pack,
+    bool lazy)
 {
-    statement pack_stmt = hpfc_packing(array, creation, pack);
+    statement pack_stmt = hpfc_pvm_packing(array, creation, pack);
 
     return lazy ? (pack ? make_block_statement
        (CONS(STATEMENT, pack_stmt,
@@ -317,8 +507,9 @@ bool pack, lazy;
 }
 
 list /* of expression */
-make_list_of_constant(val, number)
-int val, number;
+make_list_of_constant(
+    int val,    /* the constant value */
+    int number) /* the length of the created list */
 {
     list l=NIL;
 
@@ -329,93 +520,56 @@ int val, number;
     return l;
 }
 
-#define psi(i) entity_to_expression(creation(i))
-
 /* statement st_compute_lid(proc)
  *
  *       T_LID=CMP_LID(pn, pi...)
  */
 statement 
-hpfc_compute_lid(entity lid,
-		 entity proc, 
-		 entity (*creation)(int))
+hpfc_compute_lid(
+    entity lid,               /* variable to be assigned to */
+    entity proc,              /* processor arrangement */
+    entity (*creation)(int),  /* individual variables */
+    bool partial,             /* whether a partial computation is expected */
+    entity array)             /* to be used for partial (broadcasts...) */
 {
-    int     ndim = NumberOfDimension(proc);
-
     if (!get_bool_property("HPFC_EXPAND_CMPLID"))
     {
+	int ndim = NumberOfDimension(proc);
 	entity cmp_lid = hpfc_name_to_entity(CMP_LID);
+
+	message_assert("not implemented", !partial);
 	
-	return(make_assign_statement
-   	       (entity_to_expression(lid),
-		make_call_expression
-		(cmp_lid,
-		 CONS(EXPRESSION, 
-		      int_to_expression(load_hpf_number(proc)),
-		      gen_nconc(hpfc_gen_n_vars_expr(creation, ndim),
-				make_list_of_constant(0, 7-ndim))))));
+	return make_assign_statement(entity_to_expression(lid),
+	  make_call_expression
+	    (cmp_lid, CONS(EXPRESSION,int_to_expression(load_hpf_number(proc)),
+			   gen_nconc(hpfc_gen_n_vars_expr(creation, ndim),
+				     make_list_of_constant(0, 7-ndim)))));
     }
     else
     {
-	int i = 0;
-	entity
-	    plus = CreateIntrinsic(PLUS_OPERATOR_NAME),
-	    minus = CreateIntrinsic(MINUS_OPERATOR_NAME),
-	    multiply = CreateIntrinsic(MULTIPLY_OPERATOR_NAME);
-	expression
-	    value = expression_undefined;
-	
-	/* if (NODIMP(pn).EQ.0) then
-	 *   lid = 1
-	 * else
-	 *   t = indp(1) - RANGEP(pn, 1, 1)
-	 *   do i=2, NODIMP(pn)
-	 *     t = (t * RANGEP(pn, i, 3)) + (indp(i) - RANGEP(pn, i, 1))
-	 *   enddo
-	 *   lid = t+1
-	 * endif
-	 */
-	
-	if (ndim==0) 
-	    return(make_assign_statement(entity_to_expression(lid),
-					 int_to_expression(1)));
-	
-	value = make_call_expression(minus,
-	    CONS(EXPRESSION, psi(1),
-	    CONS(EXPRESSION, 
-		 copy_expression(dimension_lower(FindIthDimension(proc, 1))),
-		 NIL)));
-	
-	for(i=2; i<=ndim; i++)
+	int size;
+	Pcontrainte c;
+	statement result;
+
+	c = full_linearization(proc, lid, &size, creation, FALSE, 1);
+
+	if (partial)
 	{
-	    dimension
-		dim = FindIthDimension(proc, i);
-	    expression
-		t1 = make_call_expression(minus,
-		     CONS(EXPRESSION, copy_expression(dimension_upper(dim)),
-		     CONS(EXPRESSION, copy_expression(dimension_lower(dim)),
-			  NIL))),
-		t2 = make_call_expression(plus,
-		     CONS(EXPRESSION, t1,
-		     CONS(EXPRESSION, int_to_expression(1),
-			  NIL))),
-		t3 = make_call_expression(multiply,
-		     CONS(EXPRESSION, t2,
-		     CONS(EXPRESSION, value,
-			  NIL))),
-		t4 = make_call_expression(minus,
-		     CONS(EXPRESSION, psi(i),
-		     CONS(EXPRESSION, copy_expression(dimension_lower(dim)),
-			  NIL)));
-	
-	    value = make_call_expression(plus,
-		    CONS(EXPRESSION, t3,
-		    CONS(EXPRESSION, t4,
-			 NIL)));
+	    /* remove distributed dimensions form the constraint
+	     */
+	    int npdim;
+	    assert(array && !entity_undefined_p(array));
+	    
+	    for(npdim = NumberOfDimension(proc); npdim; npdim--)
+		if (processors_dim_replicated_p(proc, array, npdim))
+		    vect_erase_var(&contrainte_vecteur(c), 
+				   (Variable)creation(npdim));
 	}
-    
-	value = MakeBinaryCall(plus, value, int_to_expression(1));
-	return(make_assign_statement(entity_to_expression(lid), value));
+
+	result = Pvecteur_to_assign_statement(lid, contrainte_vecteur(c));
+	contraintes_free(c);
+	
+	return result;
     }
 }
 
