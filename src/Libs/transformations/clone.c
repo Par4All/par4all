@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.14  1997/11/07 18:16:24  coelho
+ * text memory leak is back to avoid core dumps...
+ *
  * Revision 1.13  1997/11/07 16:40:31  coelho
  * parameters where not considered...
  *
@@ -202,7 +205,6 @@ build_a_clone_for(
 
     stat = build_statement_for_clone(cloned, argn, val);
     t = text_module(new_fun, stat);
-    free_statement(stat);
 
     entity_type(new_fun) = saved_t;
     entity_storage(new_fun) = saved_s;
@@ -228,7 +230,8 @@ build_a_clone_for(
 	     text_sentences(t));
 
     make_text_resource(new_name, DBR_INITIAL_FILE, ".f_initial", t);
-    free_text(t);
+    /* free_text(t); */
+    free_statement(stat);
 
     /* give the clonee a user file.
      */
