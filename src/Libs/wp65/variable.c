@@ -177,7 +177,7 @@ int ls;
     type tv = entity_type(v);
     basic bv = variable_basic(type_variable(tv));
     list ldv = variable_dimensions(type_variable(tv));
-
+    entity a;
     int number_of_elements = 1;
 
     dimension esvd1 = dimension_undefined;
@@ -192,12 +192,12 @@ int ls;
     pips_assert("make_emulated_shared_variable", esv == entity_undefined );
     pips_assert("make_emulated_shared_variable", type_variable_p(tv));
 
+    
+
     esv = make_entity(esv_name,
 		      type_undefined,	/* filled in the following */
-		      MakeStorageRom(),	/* FI->LZ: certainly not ROM!!! */
+		      storage_undefined,	/* FI->LZ: certainly not ROM!!! */
 		      value_undefined ); /* filled in the following */
-
-    add_variable_declaration_to_module(memory_module, esv);
 
     /* generate the proper type; basic is preserved but the array is made
        two dimensional */
@@ -239,6 +239,17 @@ int ls;
     }
 
     entity_initial(esv) = MakeValueUnknown();
+
+    a = global_name_to_entity(module_local_name(memory_module), 
+			      DYNAMIC_AREA_LOCAL_NAME);
+    entity_storage(esv)=make_storage(is_storage_ram,
+				     (make_ram(memory_module, 
+					       a,
+					       add_variable_to_area(a,
+								    esv),
+					       NIL)));
+    
+    add_variable_declaration_to_module(memory_module, esv);
 
     debug(8,"make_emulated_shared_variable", "esv_name=%s\n", entity_name(esv));
     ifdebug(8) print_sentence(stderr,sentence_variable(esv));
@@ -333,7 +344,8 @@ hash_table v_to_lllv;
 			 storage_undefined,
 			 value_undefined);
 
-	a = global_name_to_entity(module_local_name(compute_module), DYNAMIC_AREA_LOCAL_NAME);
+	a = global_name_to_entity(module_local_name(compute_module), 
+				  DYNAMIC_AREA_LOCAL_NAME);
 	pips_assert("make_new_local_variables",!entity_undefined_p(a));
 
 	entity_storage(lv) = make_storage(is_storage_ram,
