@@ -14,8 +14,7 @@ int     global_exception_thrown = 0;
 int overflow_error = 1;
 int simplex_arithmetic_error = 2;
 
-void throw_exception(what)
-int what;
+void throw_exception(int what)
 {
     int i=global_exception_index_decr;
     for (; i>=0 ;i--)
@@ -28,10 +27,21 @@ int what;
     abort();
 }
   
-void print_exception_stack_error(overflow)
-boolean overflow;
+void print_exception_stack_error(int error)
 {
-    overflow ? fprintf(stderr,"global exception stack overflow\n"):
+    switch (error) {
+    case 1: 
+	fprintf(stderr,"global exception stack overflow\n") ;
+	break;
+    case 0:
 	fprintf(stderr,"global exception stack underflow\n");
+	break;
+    case 2: 
+	fprintf(stderr, "non matching uncatch found\n");
+	break;
+    default: 
+	fprintf(stderr, "unexpected error tag %d\n", error);
+    }
+
     abort();
 }
