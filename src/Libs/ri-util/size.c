@@ -205,6 +205,18 @@ SizeOfIthDimension(entity e, int i)
 
 /* this function computes the size of a dimension. */
 
+int
+dimension_size(dimension d)
+{
+    int s = 0;
+
+    if(!SizeOfDimension(d, &s)) {
+	pips_error("dimension_size", "Probably varying size array\n");
+    }
+
+    return s;
+}
+
 bool
 SizeOfDimension(dimension d, int * s)
 {
