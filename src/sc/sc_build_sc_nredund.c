@@ -25,8 +25,8 @@ Pcontrainte ineq;
     contrainte_reverse(ineg);
     sc_add_inegalite(ps,ineg);
 
-    base_rm(sc_base(sc));
-    sc_base(sc) = BASE_NULLE;
+    base_rm(sc_base(ps));
+    sc_base(ps) = BASE_NULLE;
     sc_creer_base(ps);
 
     /* test de sc_faisabilite avec la nouvelle inegalite      */
