@@ -1,4 +1,8 @@
 #! /bin/csh -f
+#
+# $RCSfile: compile_wp65,v $ (version $Revision$)
+# $Date: 1995/08/09 08:38:13 $, 
+#
 
 if ($#argv == 0) then
 	cat << USAGE
@@ -36,7 +40,7 @@ endif
 
 if ($?erreur == 1) exit 1
 
-make -f $EXTEDIR/Makefile.compile_wp65 SOURCES.f="$argv" CIBLE.f="$1"
+make -f $PIPS_EXTEDIR/Makefile.compile_wp65 SOURCES.f="$argv" CIBLE.f="$1"
 
 if ($status == 0) then
 	cat << USAGE
