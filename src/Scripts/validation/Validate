@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/22 15:36:30 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/22 15:38:35 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -120,14 +120,14 @@ validate_usage()
 	  -p: parallel (default)
 	  -n: sequential
 	  -t: timing
-	  -a adress: mail sent to (defaut "$user" for you:-)
+	  -a adress: mail sent to (default "$user" for you:-)
 	  -r dir: run directory (default .)
 	  -i lines: max number of lines for sending a full message
 	  -l dir: lock directory (default .)
 	  -f file: what file in a module (use with -n)
 	  -x pips: pips to be used
 	  -y tpips: tpips to be used 
-	     default {,t}pips: . ./\$PIPS_ARCH \$PIPS_BINDIR/\$PIPS_ARCH type)
+	    default {,t}pips: . ./\$PIPS_ARCH \$PIPS_ROOT/Bin/\$PIPS_ARCH type)
 	  modules: if none, from file \$PIPS_VALIDDIR/defaults.\$PIPS_ARCH
 	           else from file \$PIPS_VALIDDIR/defaults
 EOF
