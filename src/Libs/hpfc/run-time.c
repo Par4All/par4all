@@ -4,7 +4,7 @@
  * Fabien Coelho, May and June 1993
  *
  * SCCS stuff:
- * $RCSfile: run-time.c,v $ ($Date: 1994/09/03 15:19:37 $, ) version $Revision$,
+ * $RCSfile: run-time.c,v $ ($Date: 1994/11/17 14:19:17 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -148,7 +148,7 @@ entity f;
 reference r;
 {
     return
-	(my_make_call_statement(f,
+	(hpfc_make_call_statement(f,
 	   CONS(EXPRESSION, pvm_what_option_expression(reference_variable(r)),
 	   CONS(EXPRESSION, reference_to_expression(r),
 		NIL))));
@@ -177,11 +177,11 @@ reference ref;
 			       NIL),
 			  gen_nconc(lUpdateExpr(node_module, linds), largs));
 	
-	return(my_make_call_statement(hpfc_name_to_entity(CMP_COMPUTER), 
+	return(hpfc_make_call_statement(hpfc_name_to_entity(CMP_COMPUTER), 
 				      largs));
     }
     else
-	return(my_make_call_statement(hpfc_name_to_entity(CMP_COMPUTER),
+	return(hpfc_make_call_statement(hpfc_name_to_entity(CMP_COMPUTER),
 		     CONS(EXPRESSION, reference_to_expression(ref),
 			  NIL)));
 }
@@ -203,11 +203,11 @@ reference ref;
 	largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), NIL),
 			  gen_nconc(lUpdateExpr(node_module,  linds), largs));
 	
-	return(my_make_call_statement(hpfc_name_to_entity(CMP_OWNERS), 
+	return(hpfc_make_call_statement(hpfc_name_to_entity(CMP_OWNERS), 
 				      largs));
     }
     else
-	return(my_make_call_statement(hpfc_name_to_entity(CMP_OWNERS),
+	return(hpfc_make_call_statement(hpfc_name_to_entity(CMP_OWNERS),
 		     CONS(EXPRESSION, reference_to_expression(ref),
 			  NIL)));
 }
@@ -348,15 +348,15 @@ expression expr;
 /******************************************************************************/
 
 /*
- * statement my_make_call_statement(e, l) 
+ * statement hpfc_make_call_statement(e, l) 
  * generate a call statement to function e, with expression list l 
  * as an argument. 
  */
-statement my_make_call_statement(e, l)
+statement hpfc_make_call_statement(e, l)
 entity e;
 list l;
 {
-    pips_assert("my_make_call_statement", !entity_undefined_p(e));
+    pips_assert("hpfc_make_call_statement", !entity_undefined_p(e));
 
     return(make_stmt_of_instr(make_instruction(is_instruction_call,
 					       make_call(e, l))));
@@ -394,7 +394,7 @@ statement *phs, *pns;
 statement st_compute_neighbour(d)
 int d;
 {
-    return(my_make_call_statement(hpfc_name_to_entity(CMP_NEIGHBOUR), 
+    return(hpfc_make_call_statement(hpfc_name_to_entity(CMP_NEIGHBOUR), 
 				  CONS(EXPRESSION,
 				       int_to_expression(d),
 				       NIL)));
@@ -458,7 +458,7 @@ bool bsend;
      * range [lower, upper, increment]*len
      */
 
-    return(my_make_call_statement
+    return(hpfc_make_call_statement
 	   (make_packing_function("HPFC", 
 				  len, 
 				  bsend, 
