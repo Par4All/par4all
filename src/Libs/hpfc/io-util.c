@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/06/12 21:42:19 $, )
+ * ($Date: 1996/06/12 21:48:39 $, )
  */
 
 #include "defines-local.h"
@@ -113,6 +113,8 @@ only_io_mapping(
     statement_mapping map)
 {
     stat_bool_map = map;
+
+    make_current_statement_stack();
     gen_multi_recurse(program, 
        statement_domain, current_statement_filter, current_statement_rewrite,
        loop_domain, gen_true, only_io_loop,
@@ -122,6 +124,7 @@ only_io_mapping(
        unstructured_domain, gen_true, only_io_unstructured,
        expression_domain, gen_false, gen_null,
        NULL);
+    free_current_statement_stack();
     return stat_bool_map;
 }
 
