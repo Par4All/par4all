@@ -841,7 +841,8 @@ void tpips_user_error(char * calling_function_name,
 			char * a_message_format,
 			va_list *some_arguments)
 {
-   extern jmp_buf pips_top_level;
+    /* extern jmp_buf pips_top_level; */
+    jmp_buf * ljbp = 0;
 
    /* print name of function causing error */
    (void) fprintf(stderr, "user error in %s: ", calling_function_name);
@@ -854,5 +855,7 @@ void tpips_user_error(char * calling_function_name,
       abort();
    }
    else
-      longjmp(pips_top_level, 2);
+       /* longjmp(pips_top_level, 2); */
+      ljbp = top_pips_context_stack();
+      longjmp(*ljbp, 2);
 }
