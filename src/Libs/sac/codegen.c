@@ -20,7 +20,6 @@ typedef struct {
       expression operand[2];
 } statement_arguments;
 
-
 /* Computes the optimal opcode for simdizing 'argc' statements of the
  * 'kind' operation, applied to the 'args' arguments
  */
@@ -454,109 +453,239 @@ static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
 	    real_entities = CONS(ENTITY, new_ent, real_entities);
 	 break;
       }
-      default:break;
+      default:
+	 break;
    }
    
    return new_ent;
 }
 
-static void pack_instructions(int kind, opcode oc, list* args, cons** instr)
-{
-   expression result;
-   expression * operands;
-   cons * argList;
-   int j, nbargs;
-   cons * iargs;
-
-   /* find out the number of arguments needed */
-   nbargs = get_operation(kind)->nbArgs-1;
-
-   /* allocated memory for the operands */
-   operands = (expression*)malloc(sizeof(expression) * nbargs);
-
-   /* build the variables */
-   for(j=nbargs-1; j>=0; j--)
-      operands[j] = entity_to_expression(make_new_simd_vector(oc->subwordSize,oc->vectorSize,TRUE));
-   result = entity_to_expression(make_new_simd_vector(oc->subwordSize,oc->vectorSize,TRUE));
-
-   /* make the save statement(s) */
-   argList = CONS(EXPRESSION, result, NIL);
-   iargs = argList;
-   for( j=0; j<oc->vectorSize; j++)
-   {
-      CDR(iargs) = CONS(EXPRESSION, 
-			copy_expression(EXPRESSION(CAR(args[j]))), 
-			NIL);
-      iargs = CDR(iargs);
-   }
-   *instr = CONS( STATEMENT, 
-		  make_save_statement(oc->vectorSize, argList),
-		  *instr);
-
-   /* make the calculation statement(s) */
-   argList = CONS(EXPRESSION, result, NIL);
-   iargs = argList;
-   for(j=0; j<nbargs; j++)
-   {
-      CDR(iargs) = CONS(EXPRESSION, operands[j], NIL);
-      iargs = CDR(iargs);
-   }
-   *instr = CONS( STATEMENT,
-		  make_exec_statement(oc, argList),
-		  *instr);
-
-   /* make the load instruction(s) */
-   {
-   list * pArgs = (list*)malloc(oc->vectorSize*sizeof(list));
-   int i;
-
-   for(i=0; i<oc->vectorSize; i++)
-      pArgs[i] = CDR(args[i]);
-
-   for( j=0; j<nbargs; j++)
-   {
-      argList = CONS(EXPRESSION, operands[j], NIL);
-      iargs = argList;
-      for( i=0; i<oc->vectorSize; i++)
-      {
-	 CDR(iargs) = CONS( EXPRESSION, 
-			    copy_expression(EXPRESSION(CAR(pArgs[i]))), 
-			    NIL);
-	 iargs = CDR(iargs);
-
-	 pArgs[i] = CDR(pArgs[i]);
-      }
-
-      *instr = CONS( STATEMENT,
-		     make_load_statement(oc->vectorSize, argList),
-		     *instr);
-   }
-
-   free(pArgs);
-   }
-
-   free(operands);
-}
-
 #define MAX_PACK 16
 
-cons* make_simd_statements(list kinds, cons* first, cons* last)
+typedef struct {
+      int expr;
+      list deps;
+} _simd_statement_arg, * simd_statement_arg;
+
+typedef struct {
+      opcode op;
+      int nbArgs;
+      entity * vectors;
+      simd_statement_arg arguments;    //2 dimensions array.
+      statement s;
+} _statement_info, *statement_info;
+#define STATEMENT_INFO(x) ((statement_info)((x).p))
+
+typedef struct {
+      expression e;
+      list places_available;
+} _argument_info, * argument_info;
+
+typedef struct {
+      statement_info ssi;
+      int vector;  //index of the vector
+      int element; //index of the element in the vector
+} _vector_element, * vector_element;
+#define VECTOR_ELEMENT(x) ((vector_element)((x).p))
+
+static argument_info arguments = NULL;
+static int nbArguments = 0;
+static int nbAllocatedArguments = 0;
+
+static void reset_argument_info()
 {
-   cons * i;
+   nbArguments = 0;
+}
+
+//Get id for this "class" of expression
+//If not, add the expression to the mapping.
+static int get_argument_id(expression e)
+{
+   int id;
+   argument_info ai;
+   int i;
+
+   //See if the expression has already been seen
+   for(i=0; i<nbArguments; i++)
+      if (same_expression_p(arguments[i].e, e))
+	 return i;
+
+   //Find an id for the operation
+   id = nbArguments++;
+
+   //Make room for the new operation if needed
+   if (nbArguments > nbAllocatedArguments)
+   {
+      nbAllocatedArguments += 10;
+
+      arguments = (argument_info)realloc((void*)arguments, 
+					 sizeof(_argument_info)*nbAllocatedArguments);
+
+      if (arguments == NULL)
+      {
+	 printf("Fatal error: could not allocate memory for arguments.\n");
+	 exit(-1);
+      }
+   }
+
+   //Initialize members
+   ai = arguments + id;
+   ai->e = e;
+   ai->places_available = NIL;
+
+   return id;
+}
+
+//Get info on argument with specified id
+static argument_info get_argument_info(int id)
+{
+   return ((id>=0) && (id<nbArguments)) ?
+      &arguments[id] : NULL;
+}
+
+static vector_element make_vector_element(statement_info ssi, int vector, int element)
+{
+   vector_element v = (vector_element)malloc(sizeof(_vector_element));
+   
+   v->ssi = ssi;
+   v->vector = vector;
+   v->element = element;
+
+   return v;
+}
+
+static statement_info make_statement_info(statement s)
+{
+   statement_info ssi;
+
+   /* allocate memory */
+   ssi = (statement_info)malloc(sizeof(_statement_info));
+
+   /* initialize members */
+   ssi->op = NULL;
+   ssi->nbArgs = 0;
+   ssi->vectors = NULL;
+   ssi->arguments = NULL;
+   ssi->s = copy_statement(s);
+
+   /* see if some expressions are modified.
+    * If that is the case, invalidate the list of its available places 
+    */
+   
+
+   return ssi;
+}
+
+static statement_info make_simd_statement_info(int kind, opcode oc, list* args)
+{
+   statement_info ssi;
+   int i,j, nbargs;
+
+   /* find out the number of arguments needed */
+   nbargs = get_operation(kind)->nbArgs;
+
+   /* allocate memory */
+   ssi = (statement_info)malloc(sizeof(_statement_info));
+   ssi->vectors = (entity *)malloc(sizeof(entity)*nbargs);
+   ssi->arguments = (simd_statement_arg)malloc(sizeof(_simd_statement_arg) *
+					       nbargs * oc->vectorSize);
+
+   /* initialize members */
+   ssi->op = oc;
+   ssi->nbArgs = nbargs;
+   ssi->s = NULL;
+
+   /* create the simd vector entities */
+   for(j=0; j<nbargs; j++)
+      ssi->vectors[j] = make_new_simd_vector(oc->subwordSize,oc->vectorSize,TRUE);
+
+   /* Fill the matrix of arguments */
+   for(j=0; j<oc->vectorSize; j++)
+   {
+      list l = args[j];
+
+      pips_assert("2", ssi->op);
+
+      for(i=nbargs-1; i>=0; i--)
+      {
+	 argument_info ai;
+	 int id;
+	 simd_statement_arg ssa;
+
+	 //Get the id of the argumet
+	 id = get_argument_id(EXPRESSION(CAR(l)));
+	 
+	 //Store it in the argument's matrix
+	 ssa = &(ssi->arguments[j + oc->vectorSize * i]);
+	 ssa->expr = id;
+	 l = CDR(l);
+
+	 //Build the dependance tree
+	 ai = get_argument_info(id);
+
+	 if (i == nbargs-1)
+	 {  //we write to this variable
+
+	    //Free the list of places available. Those places are
+	    //not relevant any more
+	    gen_free_list(ai->places_available);
+	    ai->places_available = NIL;
+	 }
+	 else
+	 {  //we read this variable
+	    list l;
+
+	    //ssi depends on all the places where the variable was
+	    //used before
+	    for(l = ai->places_available; l != NIL; l = CDR(l))
+	    {
+	       vector_element pVe = VECTOR_ELEMENT(CAR(l));
+	       
+	       ssa->deps = CONS(VECTOR_ELEMENT, pVe, ssa->deps);
+	    }
+	 }
+
+	 //Remember that this variable can be found here too
+	 ai->places_available = CONS(VECTOR_ELEMENT,
+				     make_vector_element(ssi, i, j),
+				     ai->places_available);
+      }
+   }
+
+   if (ssi->op == NULL)
+   {
+      printf("in the end....\n");
+      exit(-1);
+   }
+
+   return ssi;
+}
+
+list make_simd_statements(list kinds, cons* first, cons* last)
+{
+   list i;
    int index;
    list args[MAX_PACK];
    int type;
-   cons * instr; 
-   cons * all_instr;
+   list instr; 
+   list all_instr;
+
+   if (first == last)
+      return CONS(STATEMENT_INFO,
+		  make_statement_info(STATEMENT(CAR(first))),
+		  NIL);
+
+   reset_argument_info();
 
    i = first;
-   all_instr = NIL;
+   all_instr = CONS(STATEMENT_INFO, NULL, NIL);
+   instr = all_instr;
 
    type = INT(CAR(kinds));
    while(i != CDR(last))
    {
       opcode oc;
-      cons * j;
+      list j;
 
       /* get the variables */
       for( index = 0, j = i;
@@ -572,8 +701,16 @@ cons* make_simd_statements(list kinds, cons* first, cons* last)
 
       if (oc == NULL)
       {
-	 /* No optimized opcode found --> simply copy the statement... */
-	 ;
+	 /* No optimized opcode found... */
+	 for( index = 0, j = i;
+	      (index < MAX_PACK) && (j != CDR(last));
+	      index++, j = CDR(j) )
+	 {
+	    CDR(instr) = CONS(STATEMENT_INFO, 
+			      make_statement_info(STATEMENT(CAR(j))),
+			      NIL);
+	    instr = CDR(instr);
+	 }
       }
       else
       {
@@ -581,17 +718,136 @@ cons* make_simd_statements(list kinds, cons* first, cons* last)
 	 for(index = 0; (index<oc->vectorSize) && (i!=CDR(last)); index++)
 	    i = CDR(i);
 
-         /* generate the instructions */
-	 instr = NIL;
-	 pack_instructions(type, oc, args, &instr);
-
-	 /* insert the new statements */
-	 if (all_instr == NIL)
-	    all_instr = instr;
-	 else
-	    all_instr = gen_concatenate(all_instr, instr);
+         /* generate the statement information */
+	 CDR(instr) = CONS(STATEMENT_INFO, 
+			   make_simd_statement_info(type, oc, args),
+			   NIL);
+	 instr = CDR(instr);
       }
    }
 
-   return all_instr;
+   instr = CDR(all_instr);
+   CDR(all_instr) = NIL;
+   gen_free_list(all_instr);
+
+   return instr;
+}
+
+static statement generate_exec_statement(statement_info si)
+{
+   list args = NIL;
+   int i;
+
+   for(i = si->nbArgs-1; i >= 0; i--)
+   {
+      args = CONS(EXPRESSION,
+		  entity_to_expression(si->vectors[i]),
+		  args);
+   }
+
+   return make_exec_statement(si->op, args);
+}
+
+static statement generate_load_statement(statement_info si, int line)
+{
+   list args = NIL;
+   int i;
+   int offset = si->op->vectorSize * line;
+
+   for(i = si->op->vectorSize-1; i >= 0; i--)
+   {
+      argument_info ai = get_argument_info(si->arguments[i + offset].expr);
+      args = CONS(EXPRESSION,
+		  copy_expression(ai->e),
+		  args);
+   }
+
+   args = CONS(EXPRESSION,
+	       entity_to_expression(si->vectors[line]),
+	       args);
+
+   return make_load_statement(si->op->vectorSize, args);
+}
+
+static statement generate_save_statement(statement_info si)
+{
+   list args = NIL;
+   int i;
+   int offset = si->op->vectorSize * (si->nbArgs-1);
+
+   for(i = si->op->vectorSize-1; i >= 0; i--)
+   {
+      argument_info ai = get_argument_info(si->arguments[i + offset].expr);
+      args = CONS(EXPRESSION,
+		  copy_expression(ai->e),
+		  args);
+   }
+
+   args = CONS(EXPRESSION,
+	       entity_to_expression(si->vectors[si->nbArgs-1]),
+	       args);
+
+   return make_save_statement(si->op->vectorSize, args);
+}
+
+list generate_simd_code(list/* <statement_info> */ sil)
+{
+   list sl_begin; /* <statement> */
+   list sl; /* <statement> */
+
+   sl = sl_begin = CONS(STATEMENT, NULL, NIL);
+
+   printf("************************\n"
+	  "generating code:\n");
+   for(; sil != NIL; sil=CDR(sil))
+   {
+      statement_info si = STATEMENT_INFO(CAR(sil));
+
+      if (si->s != NULL)
+      {
+	 /* regular (non-SIMD) statement */
+	 sl = CDR(sl) = CONS(STATEMENT, si->s, NIL);
+	 print_statement(STATEMENT(CAR(sl)));
+      }
+      else
+      {
+	 /* SIMD statement (will generate more than one statement) */
+	 int i;
+
+	 printf("<there>");
+	 
+	 //First, the load statement(s)
+	 for(i = 0; i < si->nbArgs-1; i++)
+	 {
+	    statement s = generate_load_statement(si, i);
+
+	    if (s != NULL)
+	    {
+	       sl = CDR(sl) = CONS(STATEMENT, s, NIL);
+	       print_statement(s);
+	    }
+	 }
+
+	 printf("<then>");
+
+	 //Then, the exec statement
+	 sl = CDR(sl) = CONS(STATEMENT, generate_exec_statement(si), NIL);
+	 print_statement(STATEMENT(CAR(sl)));
+
+	 printf("<nowhere>");
+
+	 //Finally, the save statement (always generated. It is up to 
+	 //latter phases (USE-DEF elimination....) to remove it, if needed
+	 sl = CDR(sl) = CONS(STATEMENT, generate_save_statement(si), NIL);
+	 print_statement(STATEMENT(CAR(sl)));
+
+	 printf("<done>");
+      }
+   }
+
+   sl = CDR(sl_begin);
+   CDR(sl_begin) = NIL;
+   gen_free_list(sl_begin);
+   
+   return sl;
 }
