@@ -69,7 +69,46 @@ effects_to_transformer(list e) /* list of effects */
     s->dimension = vect_size(b);
     /* NewGen should generate proper cast for external types */
     /* predicate_system(transformer_relation(tf)) = (Psysteme) s; */
-    predicate_system_(transformer_relation(tf)) = (char *) s;
+    predicate_system_(transformer_relation(tf)) = /* (char *) */ s;
+    return tf;
+}
+
+
+transformer 
+filter_transformer(transformer t, list e) 
+{
+    /* algorithm: keep only information about integer scalar variables
+     * appearing in effects e and store it into a newly allocated transformer
+     */
+    transformer tf = transformer_identity();
+    Pbase b = VECTEUR_NUL;
+    Psysteme s = SC_UNDEFINED;
+    Psysteme sc = predicate_system(transformer_relation(t));
+    /* list args = dup_arguments(transformer_arguments(t)); */
+    list args = NIL;
+
+    MAPL(cef, { effect ef = EFFECT(CAR(cef));
+		reference r = effect_reference(ef);
+		/* action a = effect_action(ef); */
+		entity v = reference_variable(r);
+
+		if(/* action_write_p(a) && */ entity_has_values_p(v)) {
+		  /* I do not know yet if I should keep old values... */
+		    entity new_val = entity_to_new_value(v);
+		    b = vect_add_variable(b, (Variable) new_val);
+
+		    if(entity_is_argument_p(v, transformer_arguments(t))) {
+			args = arguments_add_entity(args, v);
+		    }
+		}
+    },
+ 	 e);
+
+    /* FI: I should check if sc is sc_empty but I haven't (yet) found a
+       cheap syntactic test */
+    s = sc_restricted_to_variables_transitive_closure(sc, b);
+    transformer_arguments(tf) = args;
+    predicate_system_(transformer_relation(tf)) = /* (char *)*/ s;
     return tf;
 }
 
