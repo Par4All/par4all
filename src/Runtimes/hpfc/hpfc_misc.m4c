@@ -3,9 +3,9 @@
  * Portability based on pvm m4 macros.
  *
  * $RCSfile: hpfc_misc.m4c,v $ version $Revision$
- * ($Date: 1996/09/13 12:50:05 $, )
+ * ($Date: 1996/10/17 14:27:35 $, )
  *
- * Fabien Coelho, 1993-1994-1995
+ * Fabien Coelho, 1993-1994-1995-1996
  */
 
 #include <stdio.h>
@@ -18,6 +18,9 @@
  *  - pvmhostinfo -> hostinfo
  *  - pvmtaskinfo -> taskinfo (also adds ti_pid)
  */
+
+ifdef(`_HPFC_NO_PVM_VERSION_',
+char * pvm_version() { return "special pvm on PVM_ARCH";} )
 
 /* quick checking of PVM function returns
  */
