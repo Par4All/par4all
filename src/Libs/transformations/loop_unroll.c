@@ -4,12 +4,11 @@
  * Bruno Baron
  */
 #include <stdio.h>
-extern int fprintf();
-extern int sscanf();
+extern int fprintf(FILE *, const char *, ...);
+extern int sscanf(const char *, const char *, ...);
 #include <string.h>
 
 #include "genC.h"
-#include "hash.h"
 #include "ri.h"
 #include "text.h"
 #include "database.h"
@@ -38,14 +37,12 @@ extern int sscanf();
  * This entity is used for each loop unroling in the programme. We
  * assume that loop unrolling can't be nested.
  */
-entity lu_nub_find()
+entity lu_nub_find(void)
 {
 }
 
 /* voir make_factor_expression() */
-expression make_ref_expr(ent,args)
-entity ent;
-cons *args;
+expression make_ref_expr(entity ent, cons *args)
 {
     return( make_expression(make_syntax(is_syntax_reference, 
 					make_reference(ent, args) ),
@@ -57,15 +54,14 @@ cons *args;
  */
 /* static string current_module_name = NULL; */
 
-void loop_unroll(loop_statement, rate)
-statement loop_statement;
-int rate;
+void loop_unroll(statement loop_statement, int rate)
 {
     debug(2, "loop_unroll", "unroll %d times\n", rate);
-
     pips_assert("loop_unroll", 
 		instruction_loop_p(statement_instruction(loop_statement)));
-    pips_assert("loop_unroll", rate > 0); 
+    /* "bad argument type\n"); */
+    pips_assert("loop_unroll", rate > 0);
+    /* "loop unrolling rate not strictly positive: %d\n", rate); */
 
 {
     loop il = instruction_loop(statement_instruction(loop_statement));
@@ -86,13 +82,16 @@ int rate;
     bool numeric_range_p = FALSE;
 
     pips_assert("loop_unroll", mod_ent != entity_undefined);
-
+    /* "module entity undefined\n"); */
     if(get_debug_level()==7) {
 	/* Start debug in Newgen */
 	gen_debug |= GEN_DBG_CHECK;
     }
     /* Validity of transformation should be checked */
     /* ie.: - pas d'effets de bords dans les expressions duplique'es */
+
+    /* get rid of labels in loop body */
+    (void) clear_labels (loop_body (il));
 
     /* Instruction block is created and will contain everything */
     block = make_instruction(is_instruction_block, NIL);
@@ -178,6 +177,7 @@ int rate;
     body = gen_copy_tree(loop_body(il));
     ifdebug(9) {
 	pips_assert("loop_unroll", gen_consistent_p(body));
+	/* "gen_copy_tree returns bad statement\n"); */
     }
     expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 			  MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME), 
@@ -186,6 +186,7 @@ int rate;
 			  gen_copy_tree(lb));
     ifdebug(9) {
 	pips_assert("loop_unroll", gen_consistent_p(expr));
+	    /* "gen_copy_tree returns bad expression(s)\n"); */
     }
     StatementReplaceReference(body,
 			      make_reference(ind,NIL),
@@ -346,8 +347,7 @@ int rate;
  *
  * FI: could be improved to handle symbolic lower bounds (18 January 1993)
  */
-void full_loop_unroll(loop_statement)
-statement loop_statement;
+void full_loop_unroll(statement loop_statement)
 {
     loop il = instruction_loop(statement_instruction(loop_statement));
     range lr = loop_range(il);
@@ -365,7 +365,7 @@ statement loop_statement;
 
     debug(2, "full_loop_unroll", "begin\n");
     pips_assert("full_loop_unroll", mod_ent != entity_undefined);
-
+    /* "module entity undefined\n"); */
     if(get_debug_level()==7) {
 	/* Start debug in Newgen */
 	gen_debug |= GEN_DBG_CHECK;
@@ -453,10 +453,7 @@ statement loop_statement;
  *
  * BB, 6.12.91
  */
-bool recursiv_loop_unroll(stmt, lb_ent, rate)
-statement stmt;
-entity lb_ent;
-int rate;
+bool recursiv_loop_unroll(statement stmt, entity lb_ent, int rate)
 {
     instruction inst = statement_instruction(stmt);
     bool not_done = TRUE;
@@ -531,8 +528,7 @@ int rate;
 /* Top-level function
  */
 
-void unroll(mod_name)
-char *mod_name;
+void unroll(char *mod_name)
 {
     statement mod_stmt;
     instruction mod_inst;
@@ -570,6 +566,7 @@ char *mod_name;
     mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
     mod_inst = statement_instruction(mod_stmt);
     pips_assert("unroll", instruction_unstructured_p(mod_inst));
+    /* "unstructured expected\n"); */
 
     /* go through unstructured and apply recursiv_loop_unroll */
     CONTROL_MAP(ctl, {
