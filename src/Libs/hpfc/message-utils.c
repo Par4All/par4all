@@ -1,7 +1,10 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1996/07/23 15:08:28 $, )
- * version $Revision$
+ * $Id$
+ * $Log: message-utils.c,v $
+ * Revision 1.18  1997/03/20 10:23:31  coelho
+ * RCS headers.
+ *
  *
  * Fabien Coelho, August 1993
  */
