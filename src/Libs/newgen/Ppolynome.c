@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
