@@ -1,10 +1,7 @@
 #include <stdio.h>
-extern int _filbuf();
-extern int _flsbuf();
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-extern char toupper(char c);
-extern char tolower(char c);
 
 #include "genC.h"
 #include "parser_private.h"
