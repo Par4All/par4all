@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1994/05/05 09:48:56 $, ) version $Revision$,
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1994/06/03 14:14:50 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -67,6 +67,9 @@ GENERIC_CURRENT_MAPPING(node_old, entity, entity);
 void store_new_node_variable(new, old)
 entity new, old;
 {
+    pips_assert("store_new_node_variable",
+		(!entity_undefined_p(new)) || (!entity_undefined_p(old)));
+
     store_entity_node_new(old, new);
     store_entity_node_old(new, old);
 }
@@ -74,6 +77,9 @@ entity new, old;
 void store_new_host_variable(new, old)
 entity new, old;
 {
+    pips_assert("store_new_host_variable",
+		(!entity_undefined_p(new)) || (!entity_undefined_p(old)));
+
     store_entity_host_new(old, new);
     store_entity_host_old(new, old);
 }
@@ -96,18 +102,13 @@ static entity_mapping
 entity_mapping hpfc_map_of_module(module)
 entity module;
 {
-    switch(module)
-    {
-    case node_module:
-	return(get_node_new_map());
-	break;
-    case host_module:
-	return(get_host_new_map());
-	break;
-    default:
-	pips_error("hpfc_map_of_module", "unexpected module\n");
-    }
+    if (module==node_module) return(get_node_new_map());
+    if (module==host_module) return(get_host_new_map());
 
+    /* else */
+
+    pips_error("hpfc_map_of_module", "unexpected module\n");
+    return(hash_table_undefined);
 }
 
 static void update_for_module_rewrite(ref)
@@ -350,8 +351,6 @@ statement UpdateStatementForModule(module, stat)
 entity module;
 statement stat;
 {
-    entity_mapping
-	map = hpfc_map_of_module(module);
     statement
 	updatedstat = statement_undefined;
     instruction 
