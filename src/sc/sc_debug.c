@@ -14,17 +14,42 @@
 
 #include "sc-private.h"
 
-/************************************************************* DEBUG LEVEL */
+/************************************************************* DEBUG */
 
 #define SC_DEBUG_LEVEL "SC_DEBUG_LEVEL"
+#define SC_PRINT_FLAG "SC_PRINT_FLAG"
+#define TIMEOUT_FOR_SIMPLEX "TIMEOUT_FOR_SIMPLEX"
+#define TIMEOUT_FOR_FM "TIMEOUT_FOR_FM"
+#define TIMEOUT_FOR_SC_CONVEX_HULL "TIMEOUT_FOR_SC_CONVEX_HULL"
 
 int sc_debug_level = 0;
+int sc_print_flag = 0;
+int timeout_for_S = 180;
+int timeout_for_FM = 180;
+int timeout_for_scCH = 180;
 
 void set_sc_debug_level(int l)
 { 
     sc_debug_level = l ;
 }
 
+void set_sc_print_flag(int l)
+{ 
+    sc_print_flag = l ;
+}
+void set_timeout_for_S(int l)
+{ 
+    timeout_for_S = l ;
+}
+
+void set_timeout_for_FM(int l)
+{ 
+   timeout_for_FM = l ;
+}
+void set_timeout_for_sc_convex_hull(int l)
+{ 
+   timeout_for_scCH = l ;
+}
 /***************************************************** VARIABLE NAME STACK */
 
 typedef char * (*var_name_t)(Variable);
@@ -71,14 +96,31 @@ char * default_variable_to_string(Variable v)
 
 void initialize_sc(char *(*var_to_string)(Variable))
 {
-  /* debug */
-  char * l = getenv(SC_DEBUG_LEVEL);
+  char * l;
+  char * f;
+
+  /* sc print */
+  f = getenv(SC_PRINT_FLAG);  
+  if (f) set_sc_print_flag(atoi(f));
+
+  /* sc debug */
+  l = getenv(SC_DEBUG_LEVEL);
   if (l) set_sc_debug_level(atoi(l));
-  
+
+  /* timeout */
+  l = getenv(TIMEOUT_FOR_SIMPLEX);
+  if (l) set_timeout_for_S(atoi(l));
+
+  l = getenv(TIMEOUT_FOR_FM);
+  if (l) set_timeout_for_FM(atoi(l));
+
+  l = getenv(TIMEOUT_FOR_SC_CONVEX_HULL);
+  if (l) set_timeout_for_sc_convex_hull(atoi(l));
+
   /* variable name stuff */
   sc_variable_name_init();
   sc_variable_name_push(var_to_string);
   
   ifscdebug(1)
-    fprintf(stderr, "[initialize_sc] Value: " LINEAR_VALUE_STRING "\n");
+    fprintf(stderr, "[initialize_sc] Value: " LINEAR_VALUE_STRING "\n");  
 }
