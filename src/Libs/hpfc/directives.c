@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/09/21 15:42:06 $, )
+ * ($Date: 1996/12/30 09:28:46 $, )
  */
 
 #include "defines-local.h"
@@ -309,6 +309,11 @@ static void initial_alignment(statement s)
 	    propagate_synonym(s, array, array, TRUE);
 	    update_renamings(s, CONS(RENAMING, make_renaming(array, array),
 				     load_renamings(s)));
+
+	    if (storage_formal_p(entity_storage(array)))
+		/* a formal is considered as used to force the remapping
+		 */
+		add_as_a_used_dynamic_to_statement(s, array);
 	}
     },
 	get_the_dynamics());
