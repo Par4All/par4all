@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.188  2002/04/26 14:04:02  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.187  2002/04/26 13:49:51  phamdat
  * *** empty log message ***
  *
@@ -403,7 +406,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.187 2002/04/26 13:49:51 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.188 2002/04/26 14:04:02 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2393,7 +2396,25 @@ text_statement(
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
 						  strdup(comments)));
 	}
+	{
+	string filename = "/users/tmp/phamdat/textout";
+	FILE * my_file = safe_fopen(filename, "w");
+	if (my_file) {
+		print_text(my_file, r);
+		safe_fclose(my_file, filename);
+	}
+	free(filename);
+	}
 	MERGE_TEXTS(r, temp);
+	{
+	string filename = "/users/tmp/phamdat/textout";
+	FILE * my_file = safe_fopen(filename, "w");
+	if (my_file) {
+		print_text(my_file, r);
+		safe_fclose(my_file, filename);
+	}
+	free(filename);
+	}
       } else {
 	free_text(t);
 	free_text(temp);
