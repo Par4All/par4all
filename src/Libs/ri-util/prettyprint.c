@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.109  1998/02/11 20:23:06  ancourt
+ * text_instruction deleting  the  static option
+ *
  * Revision 1.108  1997/12/12 15:03:20  coelho
  * leaks--
  *
@@ -147,7 +150,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.108 1997/12/12 15:03:20 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.109 1998/02/11 20:23:06 ancourt Exp $";
 #endif /* lint */
 
  /*
@@ -1545,7 +1548,7 @@ static string (*head_hook)(entity) = NULL;
 void set_prettyprinter_head_hook(string(*f)(entity)){ head_hook=f;}
 void reset_prettyprinter_head_hook(){ head_hook=NULL;}
 
-static text 
+text 
 text_instruction(
     entity module,
     string label,
