@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1997/04/24 13:04:35 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1997/04/28 17:31:06 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -167,6 +167,7 @@ extern void gen_clear_tabulated_element GEN_PROTO((gen_chunk *)) ;
 extern gen_chunk *gen_copy_tree GEN_PROTO((gen_chunk *)) ;
 extern gen_chunk *gen_copy_tree_with_sharing GEN_PROTO((gen_chunk *)) ;
 extern int gen_consistent_p GEN_PROTO(( gen_chunk * )) ;
+extern int gen_tabulated_consistent_p GEN_PROTO((int));
 extern int gen_allocated_memory GEN_PROTO((gen_chunk*));
 extern int gen_defined_p GEN_PROTO((gen_chunk *));
 extern int max_tabulated_elements GEN_PROTO((void));
