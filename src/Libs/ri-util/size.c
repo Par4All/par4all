@@ -29,7 +29,22 @@ entity e;
 	       NumberOfElements(variable_dimensions(a)));
 }
 
+Value 
+ValueSizeOfArray(entity e)
+{
+	variable a;
+	Value longueur, taille_elt;
 
+	assert(type_variable_p(entity_type(e)));
+	a = type_variable(entity_type(e));
+
+	taille_elt = (Value) SizeOfElements(variable_basic(a));
+	longueur = ValueNumberOfElements(variable_dimensions(a));
+	
+	return(value_mult(taille_elt,longueur));
+	
+}
+    
 
 
 /* this function returns the length in bytes of the fortran type
@@ -100,6 +115,19 @@ cons * ld;
     return(ne);
 }
 
+Value 
+ValueNumberOfElements(list ld)
+{
+    list pc;
+    Value ne = VALUE_ONE;
+
+    for (pc = ld; pc != NULL; pc = CDR(pc)) {
+	ne = value_mult(ne, ValueSizeOfDimension(DIMENSION(CAR(pc))));
+    }
+
+    return(ne);
+}
+
 
 
 /* this function returns the size of the ith dimension of a variable e. if
@@ -141,6 +169,17 @@ dimension d;
 {
     return(ExpressionToInt(dimension_upper(d))-
 	   ExpressionToInt(dimension_lower(d))+1);
+}
+
+
+Value 
+ValueSizeOfDimension(dimension d)
+{
+    Value dl, du;
+    du = (Value) ExpressionToInt(dimension_upper(d));
+    dl = (Value) ExpressionToInt(dimension_lower(d));
+    
+    return(value_plus(value_minus(du,dl), VALUE_ONE));
 }
 
 
