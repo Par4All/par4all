@@ -3,9 +3,8 @@
    Ronan Keryell, 17/5/1995. */
 
 #include <stdio.h>
-#include <strings.h>
-extern int fprintf();
-extern char *strdup();
+#include <string.h>
+#include <stdlib.h>
 
 #include "genC.h"
 #include "ri.h"
