@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/12/27 11:26:20 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/02/16 12:02:21 $, )
  * version $Revision$
  */
  
@@ -437,8 +437,12 @@ bool hpfc_directives(string name)
 	!hpf_directive_entity_p(module) &&
 	!fortran_library_entity_p(module))
     {
-	statement s = (statement)
-	    db_get_memory_resource(DBR_CODE, name, TRUE);
+	statement s;
+
+	s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
+	
+	set_proper_effects_map(effectsmap_to_listmap((statement_mapping) 
+            db_get_memory_resource(DBR_PROPER_EFFECTS, name, TRUE)));
 
 	set_current_module_entity(module);
 	set_current_module_statement(s);
@@ -454,8 +458,13 @@ bool hpfc_directives(string name)
 	save_hpfc_status();
 	reset_current_module_statement();
 	reset_current_module_entity();
+	free_proper_effects_map();
 	
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, s);
+
+	/* ??? should not be necessary, some bug in pipsmake
+	 */
+	db_unput_a_resource(DBR_PROPER_EFFECTS, name);
     }
 
     debug_off(); 
