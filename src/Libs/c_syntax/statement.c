@@ -41,6 +41,7 @@ expression CurrentSwitchController;
 
 void MakeCurrentModule(entity e)
 {
+  entity_storage(e) = make_storage_return(entity_undefined);
   entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL)));
   set_current_module_entity(e);
   init_c_areas(); 
@@ -110,7 +111,7 @@ statement MakeLabelledStatement(string label, statement s)
 			 string_undefined, 
 			 statement_instruction(s),
 			 NIL,string_undefined);
-      LabelledStatements = gen_nconc(LabelledStatements,CONS(STATEMENT,st,NIL));
+      LabelledStatements = CONS(STATEMENT,st,LabelledStatements);
     }
   else 
     {
@@ -136,7 +137,7 @@ statement MakeGotoStatement(string label)
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments, 
 			   MakeNullInstruction(),NIL,NULL);
-      LabelledStatements = gen_nconc(LabelledStatements,CONS(STATEMENT,s,NIL));
+      LabelledStatements = CONS(STATEMENT,s,LabelledStatements);
     }
   return instruction_to_statement(make_instruction(is_instruction_goto,s));
 }
