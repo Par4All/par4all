@@ -1,6 +1,10 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.14  1997/06/06 14:33:48  zory
+! inserting HPFC INIT MAIN, HOST AND NODE
+! (pvm specific subroutines)
+!
 ! Revision 1.13  1997/06/06 12:57:22  zory
 ! cleaned RCS headers...
 !
@@ -25,6 +29,321 @@
 
 
 !
+!-----------------
+!
+! HPFC INIT MAIN
+!
+! entry point in the library for a non differentiated host/node program.
+! 
+      subroutine HPFC INIT MAIN
+
+      include "hpfc_commons.h"
+      
+      _CRAY(integer my rank)
+      integer info, inum
+      logical host known
+
+      debug(print *, "[HPFC INIT MAIN] in")
+!
+! GLOBAL INITS
+! 
+      call HPFC CHECK
+
+      NB OF TASKS = MAX SIZE OF PROCS
+
+      HOST NODE MODEL = .false.
+      SPAWN PERFORMED = .false.
+      OUTSIDE SPAWN   = .false.
+
+      call HPFC INIT COMMON PARAM LIB
+
+      host known = .false.
+
+      call pvmfmytid(MY TID)
+
+      _getpe(
+! the CRAY T3D does not have spawn, but the spawning is automatic!
+      call pvmfgetpe(MY TID, my rank)
+      debug(print *, "[HPFC INIT MAIN] getting pe ", MY TID, "-", my rank)
+! mouais...
+      MY TID = my rank
+      MY LID = my rank
+      SPAWN PERFORMED = .true.
+      OUTSIDE SPAWN = .true.
+      host known = .true.
+      if (my rank.eq.0) then
+         MY LID = 0
+         HOST TID = MY TID
+      end if)
+      
+      call pvmfjoingroup(HPFC GROUP NAME, inum)
+      if (inum.lt.0) then
+         call pvmfperror("while joining group in HPFC INIT MAIN", info)
+         call pvmfexit(info)
+         stop
+      end if
+
+      debug(print *, "[HPFC INIT MAIN] group ", HPFC GROUP NAME, inum)
+
+      if (.not. host known) then
+! decide which process is the host
+         debug(print *, "[HPFC INIT MAIN] choosing host")
+         if (inum.eq.0) then
+            MY LID = 0
+            HOST TID = MY TID
+         else
+! the host is not know, but i am its child!
+            SPAWN PERFORMED = .true.
+            call pvmfparent(HOST TID)
+         end if
+         host known = .true.
+      end if
+ 
+      _spawn(
+      if (.not. SPAWN PERFORMED) then
+         debug(print *, "spawning ", NB OF TASKS, " ", MAIN PROGRAM NAME)
+         call pvmfspawn(
+     $        MAIN PROGRAM NAME,
+     $        PVM ARCH,
+     $        NODE ARCHITECTURE,
+     $        NB OF TASKS,
+     $        NODE TIDS(1),
+     $        info)
+
+! may think of an external spawning?
+         SPAWN PERFORMED = .true.
+         
+      end if)
+
+      debug(print *, "[HPFC INIT MAIN] exiting")
+
+      end
+
+!
+!-----------------
+!
+! HPFC INIT NODE
+!
+! this is the entry point in the hpfc runtime library for a node.
+!
+      subroutine HPFC INIT NODE
+      _CM5(include "cmmd_fort.h")
+      include "hpfc_commons.h"
+      integer i, bufid, info
+
+      HOST LID = 0
+
+      debug(print *, "[HPFC INIT NODE] in ")
+
+! in order to get the host tid 
+      if (.not.OUTSIDE SPAWN) then
+         call pvmfparent(HOST TID)
+      end if
+
+      _direct(call HPFC DIRECTROUTE IF POSSIBLE)
+
+      call HPFC INIT COMMON PROCS
+      call HPFC INIT COMMON BUFFER
+
+! receive from host global informations about the nodes implicated
+! in this run.
+      _spawn(
+! Should be a call to HPFC BCAST RECV, but NODETIDS is not yet available 
+!      call HPFC BCAST RECV(HOST LID, 1, bufid)
+      call pvmfrecv(HOSTTID, 1, bufid)
+      call HPFC UNPACK(INTEGER4, NODE TIDS, NB OF TASKS + 1, 1, info)
+      debug(if (info.lt.0) then
+         call HPFC PRINT ERROR MSG("[HPFC INIT NODE] node tids recv",
+     $     info)
+         call HPFC TERMINATE TASK(info)
+         stop
+      endif)
+
+      do i=1, NB OF TASKS
+         if (NODE TIDS(i).EQ.MYTID)
+     $        MYLID = i
+      enddo)
+
+      _getpe(
+      do i=0, NB OF TASKS
+         NODE TIDS(i) = i
+      enddo)
+
+      debug(print *, "[HPFC INIT NODE] lid: ", MY LID, " tid: ", MYTID)
+
+      do i=1, NB OF PROCESSORS
+         call HPFC CMPPOS(i, MY LID, MY POS(1, i))
+      enddo
+
+!
+! 1 sends node version key to host
+!
+      if (MY LID.eq.1) then
+      debug(print *, "[HPFC INIT NODE] sending key to ", HOSTLID)
+         call HPFC INIT SEND(PVMRAW, bufid)
+         call HPFC PACK(STRING, hpfc key, 64, 1, info)
+         call HPFC SEND(HOSTLID, 1, info)
+      endif
+
+_CM5(
+!
+! cm5 related id initializations
+!
+      CM HOST ID = cmmd_host_node()
+      CM MY ID   = cmmd_self_address()
+      CM SIZE    = cmmd_partition_size()
+!
+      call HPFC INIT SEND(PVMRAW, bufid)
+      call HPFC PACK(INTEGER4, CM MY ID, 1, 1, info)
+      call HPFC SEND(HOSTLID, 1, info)
+!
+      call HPFC RECEIVE(HOSTLID, 1, bufid)
+      call HPFC UNPACK(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
+!
+! end of cm5 related initializations
+!)
+
+!
+! insures that all nodes joined the group and are there
+!
+      call HPFC SYNCHRO
+
+      debug(print *, "[HPFC INIT NODE] out", MY LID)
+
+      end
+
+
+!
+!-----------------
+!
+! HPFC INIT HOST
+!
+! this is the entry point in the hpfc runtime library for a program.
+!
+      subroutine HPFC INIT HOST
+      _CM5(include "cmmd_fort.h")
+      include "hpfc_commons.h"
+      integer bufid, info
+      character*64 node key
+      
+      debug(print *, "[HPFC INIT HOST] in ")
+      
+      MYLID = 0
+      HOSTLID = 0
+      
+      _direct(call HPFC DIRECTROUTE IF POSSIBLE)
+
+      _spawn(
+      if (.not. SPAWN PERFORMED) then
+       debug(`print *,"[HPFCINITHOST] spawning",NB OF TASKS," ", 
+     $ NODE PROGRAM NAME')
+
+       call pvmfspawn(
+     $      NODE PROGRAM NAME, 
+     $      PVM ARCH, 
+     $      NODE ARCHITECTURE, 
+     $      NB OF TASKS, 
+     $      NODE TIDS(1), 
+     $      info)
+
+         if (info.lt.0) then
+            call HPFC PRINT ERROR MSG("initial spawning", info)
+            call HPFC TERMINATE TASK(info)
+            stop
+         endif
+
+         if (info.ne.NBOFTASKS) then
+            call HPFC PRINT ERROR MSG("not spawned", 0)
+            call HPFC TERMINATE TASK(0)
+            stop
+         endif
+
+        endif)
+
+      _getpe(
+! rather specific to CRAY T3D
+      debug(print *, "[HPFC INIT HOST] initializing NODE TIDS")
+      do i=0, NB OF TASKS
+         NODE TIDS(i)=i
+      end do)
+      
+      _spawn(
+! if not T3D and not MPI, the host sends the tids...
+      NODETIDS(0) = MY TID
+      call HPFC INIT SEND(PVMRAW, bufid)
+      call HPFC PACK(INTEGER4, NODETIDS, NBOFTASKS + 1, 1, info)
+      debug(if (info.lt.0) then
+         call HPFC PRINT ERROR MSG("initial pack", info)
+         call HPFC TERMINATE TASK(info)
+         stop
+      endif)
+      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS(1), 1, info)
+      debug(if (info.lt.0) then
+         call HPFC PRINT ERROR MSG("initial mcast", info)
+         call HPFC TERMINATE TASK(info)
+         stop
+      endif))
+
+      call HPFC INIT COMMON PROCS
+      call HPFC INIT COMMON BUFFER
+!
+! check version of host and node
+! to insure that both host and node where generated together...
+!
+      debug(print *, "[HPFC INIT HOST] receiving key")
+      call HPFC RECEIVE(1, 1, bufid)
+      call HPFC UNPACK(STRING, node key, 64, 1, info)
+      if (node key.ne.hpfc key) then
+         print *, "*** incompatible version keys!"
+         print *, "*** host: ", hpfc key
+         print *, "*** node: ", node key
+         call HPFC KILL ALLTASKS
+!the following line should be deleted ??          
+         call HPFC TERMINATE TASK(info)
+         stop
+      endif
+
+_CM5(
+!
+! cm5 related id initializations
+!
+      CM HOST ID = cmmd_self_address()
+      CM MY ID   = CM HOST ID
+      CM SIZE    = cmmd_partition_size()
+!
+      do i=1, NBOFTASKS
+         call HPFC RECEIVE(i, 1, info)
+         call HPFC UNPACK(INTEGER4, CM NODE IDS(i), 1, 1, info)
+      enddo
+!
+      call HPFC INIT SEND(PVMRAW, bufid)
+      call HPFC PACK(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
+      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS(1), 1, info)
+!
+! end of cm5 related initializations
+!)
+
+      demo(
+      call print host info
+      if (HOST NODE MODEL) then 
+         write (unit=0,fmt=*) " -- host node model"
+      else
+         write (unit=0,fmt=*) " -- single main program"
+      end if
+      call print task info(NBOFTASKS, NODETIDS(1), HOSTTID))
+
+!
+! insures that all nodes joined the group...
+!
+      call HPFC SYNCHRO
+
+      debug(print *, "[HPFC INIT HOST] out ", MY LID)
+
+      end
+
+
+
+!
 ! Reduce operation 
 !
 ! call pvmfreduce(func, data, count, datatype,msgtag, group, rootginst, info) 
@@ -37,14 +356,11 @@
 ! Give informations about the received message (or buffer) 
 ! (length, tag, source, info) 
 !
-! in mpi status(messageid) is an array of integers
-! INTEGER STATUS(MPI_STATUS_SIZE) 
-!
       subroutine HPFC MESSAGE INFO(messageid, length, tag, source, info)
       include "hpfc_commons.h"
       integer messageid, length, tag, source, info
       call pvmfbufinfo(messageid, length, tag, source, info)
-      debug(`print *, MYLID, "HPFC DEBUG INFO ", info, " length = ", 
+      debug(`print *, MYLID, "HPFC MESSAGE INFO ", info, " length = ", 
      $  length, " tag = ", tag , " source = ", source ')
       if (info.lt.0) then
          call pvmfperror("hpfc message info", info)
@@ -67,24 +383,6 @@
       integer error code
       character*(*) message
       call pvmfperror(message, error code)
-      end
-
-!-------------------- HPFC JOIN GROUP   -----------------
-!
-! Create a group of tasks called HPFC GROUP NAME
-!
-! MPI_COMM_DUP(integer comm,integer newcomm,integer ierror)
-! 
-      subroutine HPFC JOIN GROUP(inum)
-      include "hpfc_commons.h"
-      integer inum,info
-      call pvmfjoingroup(HPFC GROUP NAME, inum)
-      if (inum.lt.0) then
-         call pvmfperror("while joining group", info)
-         call pvmfexit(info)
-         stop
-      end if
-      debug(print *, MYLID, "[HPFC JOIN GROUP] ", HPFC GROUP NAME, inum)
       end
 
 !-------------------- HPFC TERMINATE TASK   -----------------
@@ -133,32 +431,6 @@
       debug(print *, MYLID, "[hpfc synchro] done")
       end
 
-
-!--------------------  HPFC GET PE -----------------
-!
-! Give the processor rank (only useful for MPI and PVM/CRAY T3D)
-!
-! MPI_COMM_RANK(integer comm, integer rank, integer ierror)
-!
-      subroutine HPFC GET PE (the tid, the rank)
-      include "hpfc_commons.h"
-      integer the tid, the rank
-      debug(print *, "HPFC GET PE - asking rank")
-      _getpe(
-      call pvmfgetpe(the tid, the rank))
-      debug(print *, "HPFC GET PE rank", the rank)
-      end
-
-
-!--------------------  HPFC ENROLL COMMUNICATION -----------------
-!       
-! Enroll the communication space (mpi/pvm) and return an id  
-! 
-! MPI_INIT(integer ierror)
-! MPI_COMM_RANK(integer comm,integer rank,integer ierror)
-! MPI_COMM_SIZE(integer comm,integer size,integer ierror)
-!
-!      subroutine HPFC ENROLL COMMUNICATION(thetid)
 
 
 !-------------------- HPFC INIT SEND  -----------------
@@ -286,7 +558,7 @@
       include "hpfc_commons.h"
       integer info
       debug(print *, "hcast - ", MCAST HOST)
-      call pvmfmcast(MAX SIZE OF PROCS, NODE TIDS(1), MCAST HOST, info)
+      call HPFC BCAST ROOT(MAX SIZE OF PROCS, NODE TIDS(1), MCAST HOST, info)
       MCAST HOST = MCAST HOST + 2
       debug(print *, "hcast done")
       end
@@ -298,7 +570,7 @@
       subroutine HPFC NCAST
       include "hpfc_commons.h"
       debug(print *, "ncast ", MY LID, " - ", MCAST HOST)
-      call pvmfrecv(NODETIDS(HOST LID), MCAST HOST, BUFFER ID)
+      call HPFC BCAST RECV(NODETIDS(HOST LID), MCAST HOST, BUFFER ID)
       MCAST HOST = MCAST HOST + 2
       debug(print *, "ncast done")
       end
@@ -311,7 +583,7 @@
       include "hpfc_commons.h"
       integer info
       debug(print *, "snd to host ", MYLID, " - ", HOST SND CHANNEL)
-      call pvmfsend(NODETIDS(HOST LID), HOST SND CHANNEL, info)
+      call HPFC SEND(NODETIDS(HOST LID), HOST SND CHANNEL, info)
       HOST SND CHANNEL = HOST SND CHANNEL+2
       debug(print *, "snd to host done")
       end
@@ -323,7 +595,7 @@
       subroutine HPFC RCV FROM HOST
       include "hpfc_commons.h"
       debug(print *, "rcv from host ", MY LID, " - ", HOST RCV CHANNEL)
-      call pvmfrecv(NODE TIDS(HOST LID), HOST RCV CHANNEL, BUFFER ID)
+      call HPFC RECEIVE(NODE TIDS(HOST LID), HOST RCV CHANNEL, BUFFER ID)
       HOST RCV CHANNEL = HOST RCV CHANNEL+2
       debug(print *, "rcv from host done")
       end
@@ -337,7 +609,7 @@
       integer lid
       integer info
       debug(print *, "snd to node ", lid, " - ", SEND CHANNELS(lid))
-      call pvmfsend(NODE TIDS(lid), SEND CHANNELS(lid), info)
+      call HPFC SEND(NODE TIDS(lid), SEND CHANNELS(lid), info)
       SEND CHANNELS(lid) = SEND CHANNELS(lid)+2
       debug(print *, "snd to node done")
       end
@@ -350,7 +622,7 @@
       include "hpfc_commons.h"
       integer lid
       debug(print *, "rcv from node ", lid, " - ", RECV CHANNELS(lid))
-      call pvmfrecv(NODE TIDS(lid), RECV CHANNELS(lid), BUFFER ID)
+      call HPFC RECEIVE(NODE TIDS(lid), RECV CHANNELS(lid), BUFFER ID)
       RECV CHANNELS(lid) = RECV CHANNELS(lid)+2
       debug(print *, "rcv from node done")
       end
