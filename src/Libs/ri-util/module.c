@@ -1,5 +1,10 @@
- /* $RCSfile: module.c,v $ (version $Revision$)
-  * $Date: 1997/10/27 16:48:14 $, 
+ /*
+  * $Id$
+  *
+  * $Log: module.c,v $
+  * Revision 1.23  1997/11/04 12:50:02  coelho
+  * bug--: cleaning declarations must not drop data of common...
+  *
   */
 #include <stdlib.h>
 #include <stdio.h>
@@ -246,9 +251,9 @@ mark_referenced_entities(gen_chunk * p)
  */
 void 
 insure_declaration_coherency(
-    entity module,
-    statement stat,
-    list /* of entity */ le) /* added entities, for includes... */
+    entity module,          /* the module whose declarations are considered */
+    statement stat,         /* the statement where to find references */
+    list /* of entity */ le /* added entities, for includes... */)
 {
     list decl = entity_declarations(module), new_decl = NIL;
 
@@ -269,6 +274,20 @@ insure_declaration_coherency(
     MAP(ENTITY, var, 
 	if (storage_formal_p(entity_storage(var)))
 	    store_this_entity(var),
+	decl);
+
+    /* common variables with associated data are considered referenced.
+     */
+    MAP(ENTITY, var,
+    { 
+	value v = entity_initial(var);
+	storage s = entity_storage(var);
+	if (type_variable_p(entity_type(var)) &&
+	    !value_undefined_p(v) && value_constant_p(v) &&
+	    !storage_undefined_p(s) && storage_ram_p(s) &&
+	    !SPECIAL_COMMON_P(ram_section(storage_ram(s))))
+	    store_this_entity(var);
+    },
 	decl);
 
     /* checks each declared variable for a reference
@@ -486,7 +505,8 @@ module_to_declaration_length(entity func)
 	    }
 	}
 	else {
-	    pips_internal_error("Entity %s is not a module", entity_module_name(func));
+	    pips_internal_error("Entity %s is not a module", 
+				entity_name(func));
 	}
     }
     else {
