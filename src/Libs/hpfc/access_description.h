@@ -1,5 +1,8 @@
 /* $Id$
- * $log$
+ * $Log: access_description.h,v $
+ * Revision 1.3  1997/03/20 10:13:33  coelho
+ * typo in RCS headers.
+ *
  */
 
 #ifndef ACCESS_DESCRIPTION_H
