@@ -3,9 +3,8 @@
     update_props() .
   */
 
+#include <stdlib.h>
 #include <stdio.h>
-extern int fclose();
-extern int fscanf();
 #include <string.h>
 #include <sys/param.h>
 /*#include <sys/wait.h>*/
@@ -16,10 +15,8 @@ extern int fscanf();
 #include <ctype.h>
 #include <setjmp.h>
 #include <stdlib.h>
-extern int system();
 #include <unistd.h>
 #include <errno.h>
-extern void perror(char *s);
 
 #include "genC.h"
 #include "ri.h"
@@ -48,49 +45,36 @@ extern void perror(char *s);
 
 #define LINE_LENGTH 128
 
-/* given li build argv, update *argc and free li */
-void list_to_arg(li, pargc, argv)
-list li;
-int *pargc;
-char *argv[];
-{
-    list l2=li;
 
-    *pargc = 0;
-    while(l2!=NIL) {
-	argv[(*pargc)++] = STRING(CAR(l2));
-	l2= CDR(l2);
-    }
-    gen_free_list(li);
-    li= NIL;
+/* Return a sorted arg list of workspace names. (For each name, there
+   is a name.database directory in the current directory): */
+void
+pips_get_program_list(int * pargc,
+                      char * argv[])
+{
+   int i;
+
+   /* Find all directories with name ending with ".database": */
+
+   list_files_in_directory(pargc, argv, ".",
+                           "^.*\\.database$", directory_exists_p);
+
+   /* Remove the ".database": */
+   for (i = 0; i < *pargc; i++) {
+      *strchr(argv[i], '.') = '\0';
+   }
 }
 
-void pips_get_program_list(pargc, argv)
-int *pargc;
-char *argv[];
+
+/* Select the true file with names ending in ".f" and return a sorted
+   arg list: */
+void
+pips_get_fortran_list(int * pargc,
+                      char * argv[])
 {
-    int i;
-    list lf;
-    /* directory_list(get_cwd(), pargc, argv, ".*\\.database$"); */
-
-    lf= list_files_in_directory(get_cwd(), "-d *.database");
-    list_to_arg(lf, pargc, argv);
-
-    for (i = 0; i < *pargc; i++) {
-	*strchr(argv[i], '.') = '\0';
-    }
+    list_files_in_directory(pargc, argv, ".", "^.*\\.f$", file_exists_p);
 }
 
-void pips_get_fortran_list(pargc, argv)
-int *pargc;
-char *argv[];
-{
-    list lf;
-    /* directory_list(get_cwd(), pargc, argv, ".*\\.f$"); */
-
-    lf= list_files_in_directory(get_cwd(), "*.f");
-    list_to_arg(lf, pargc, argv);
-}
 
 char *pips_change_directory(dir)
 char *dir;
