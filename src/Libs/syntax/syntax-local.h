@@ -1,18 +1,3 @@
-/*
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <assert.h>
-
-#include "debug.h"
-#include "genC.h"
-#include "ri.h"
-#include "parser_private.h"
-
-#include "ri-util.h"
-#include "misc.h"
-*/
-
 /* Legal characters to start a comment line */
 #define START_COMMENT_LINE "CcDd*!"
 
@@ -59,7 +44,3 @@ extern char * getenv();
 
 #define FatalError(f,m) \
 (pips_error(f,"Fatal error between lines %d and %d\n%s\n",line_b_I,line_e_I,m))
-
-#define ParserError(f,m) \
-(user_error(f,"Parser error between lines %d and %d\n%s\n",line_b_I,line_e_I,m))
-
