@@ -294,6 +294,11 @@ void dbll_save_and_free_resource(string rname, string oname,
 bool displayable_file_p(string name)
 {
     methods * m = get_methods(name);
+
+    /* Temporary fix, waiting for Fabien */
+    if(strcmp(name, "HEIGHT")==0) return FALSE;
+    if(strcmp(name, "DEPTH")==0) return FALSE;
+
     return m->write_function==writeln_string;
 }
 
