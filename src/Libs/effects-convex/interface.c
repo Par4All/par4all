@@ -177,157 +177,99 @@ out_regions(char *module_name)
 
 /************************************************************** PRETTYPRINT */
 
-bool
-print_code_proper_regions(char* module_name)
+#define is_rw 		(1)
+#define is_inout	(2)
+#define is_copyinout	(3)
+#define is_private	(4)
+
+static bool 
+print_code_any_regions(
+    string module_name,
+    int what_tag, 
+    bool is_user_view,
+    bool is_attached,
+    string resource_name,
+    string summary_resource_name,
+    string suffix)
 {
     bool ok;
     set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_rw_prettyprint;
-    effects_computation_reset_func = reset_convex_prettyprint;
+    switch(what_tag)
+    {
+    case is_rw: 
+	init_convex_rw_prettyprint(module_name);
+	break;
+    case is_inout:
+	init_convex_inout_prettyprint(module_name);
+	break;
+    default:
+	pips_internal_error("unexpected tag %d\n", what_tag);
+    }
 
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(FALSE);
+    set_is_user_view_p(is_user_view);
+    set_prettyprint_with_attachments(is_attached);
 
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_PROPER_REGIONS,
-						      string_undefined,
-						      ".preg");
+    ok = print_source_or_code_with_any_effects_engine
+	(module_name, resource_name, summary_resource_name, suffix);
+
     generic_effects_reset_all_methods();
     return ok;
+}
+
+bool
+print_code_proper_regions(string module_name)
+{
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+			  DBR_PROPER_REGIONS, string_undefined, ".preg");
 }
 
 bool
 print_source_proper_regions(char* module_name)
 {
-    bool ok;
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_rw_prettyprint;
-    effects_computation_reset_func = reset_convex_prettyprint;
-
-    set_is_user_view_p(TRUE);
-    set_prettyprint_with_attachments(FALSE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_PROPER_REGIONS,
-						      string_undefined,
-						      ".upreg");
-    generic_effects_reset_all_methods();
-    return ok;
-}
-
-
-bool
-print_code_regions(char* module_name)
-{
-    bool ok;
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_rw_prettyprint;
-    effects_computation_reset_func = reset_convex_prettyprint;
-
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(FALSE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_REGIONS,
-						      DBR_SUMMARY_REGIONS,
-						      ".reg");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_any_regions(module_name, is_rw, TRUE, FALSE, 
+			  DBR_PROPER_REGIONS, string_undefined, ".upreg");
 }
 
 bool
-print_source_regions(char* module_name)
+print_code_regions(string module_name)
 {
-    bool ok;
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_rw_prettyprint;
-    effects_computation_reset_func = reset_convex_prettyprint;
-
-    set_is_user_view_p(TRUE);
-    set_prettyprint_with_attachments(FALSE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_REGIONS,
-						      DBR_SUMMARY_REGIONS,
-						      ".ureg");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+			  DBR_REGIONS, DBR_SUMMARY_REGIONS, ".reg");
 }
 
 bool
-print_code_in_regions(char* module_name)
+print_source_regions(string module_name)
 {
-    bool ok;
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_inout_prettyprint;
-    effects_computation_reset_func = reset_convex_prettyprint;
-
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(FALSE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_IN_REGIONS,
-						      DBR_IN_SUMMARY_REGIONS,
-						      ".inreg");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_any_regions(module_name, is_rw, TRUE, FALSE, 
+			  DBR_REGIONS, DBR_SUMMARY_REGIONS, ".ureg");
 }
 
 bool
-print_source_in_regions(char* module_name)
+print_code_in_regions(string module_name)
 {
-    bool ok;
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_inout_prettyprint;
-    effects_computation_reset_func = reset_convex_prettyprint;
-
-    set_is_user_view_p(TRUE);
-    set_prettyprint_with_attachments(FALSE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_IN_REGIONS,
-						      DBR_IN_SUMMARY_REGIONS,
-						      ".uinreg");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_any_regions(module_name, is_inout, FALSE, FALSE, 
+			  DBR_IN_REGIONS, DBR_IN_SUMMARY_REGIONS, ".inreg");
 }
 
 bool
-print_code_out_regions(char* module_name)
+print_source_in_regions(string module_name)
 {
-    bool ok;
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_inout_prettyprint;
-    effects_computation_reset_func = reset_convex_prettyprint;
-
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(FALSE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_OUT_REGIONS,
-						      DBR_OUT_SUMMARY_REGIONS,
-						      ".outreg");
-    generic_effects_reset_all_methods();
-    return ok;
+    return print_code_any_regions(module_name, is_inout, TRUE, FALSE, 
+			  DBR_IN_REGIONS, DBR_IN_SUMMARY_REGIONS, ".uinreg");
 }
 
 bool
-print_source_out_regions(char* module_name)
+print_code_out_regions(string module_name)
 {
-    bool ok;
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_inout_prettyprint;
-    effects_computation_reset_func = reset_convex_prettyprint;
+    return print_code_any_regions(module_name, is_inout, FALSE, FALSE, 
+			  DBR_OUT_REGIONS, DBR_OUT_SUMMARY_REGIONS, ".outreg");
+}
 
-    set_is_user_view_p(TRUE);
-    set_prettyprint_with_attachments(FALSE);
-
-    ok = print_source_or_code_with_any_effects_engine(module_name,
-						      DBR_OUT_REGIONS,
-						      DBR_OUT_SUMMARY_REGIONS,
-						      ".uoutreg");
-    generic_effects_reset_all_methods();
-    return ok;
+bool
+print_source_out_regions(string module_name)
+{
+    return print_code_any_regions(module_name, is_inout, TRUE, FALSE, 
+		  DBR_OUT_REGIONS, DBR_OUT_SUMMARY_REGIONS, ".uoutreg");
 }
 
 
