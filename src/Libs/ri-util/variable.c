@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: variable.c,v $
+ * Revision 1.46  2003/06/17 11:46:05  irigoin
+ * Update functions for new RI
+ *
  * Revision 1.45  2002/06/21 13:43:12  irigoin
  * Bug fix for alternate returns when a parser error or a reparsing occurs
  *
@@ -937,11 +940,19 @@ entity generate_pseudo_formal_variable_for_formal_label(string p, int l)
     free(full_name);
     full_name = string_undefined;
 
-    /* Not so sure because CleanUpEntities() is called later */
+    /* Not so sure because CleanUpEntities() is called later, not
+       before. This function is cvalled by the parser before the module
+       declaration rule is reduced. */
+    /*
     pips_assert("The type, storage and value are undefined\n",
 		type_undefined_p(entity_type(fs))
 		&& storage_undefined_p(entity_storage(fs))
 		&& value_undefined_p(entity_initial(fs)));
+    */
+    /* Too bad for the memory leaks: they should not occur frequently */
+    entity_type(fs) = type_undefined;
+    entity_storage(fs) = storage_undefined;
+    entity_initial(fs) = value_undefined;
   }
 
   /* Too early because the current_module_entity is not yet fully defined. */
