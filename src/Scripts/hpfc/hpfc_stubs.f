@@ -7,6 +7,9 @@
 ! $Id$
 !
 ! $Log: hpfc_stubs.f,v $
+! Revision 1.12  1997/05/02 11:51:35  coelho
+! *** empty log message ***
+!
 ! Revision 1.11  1997/05/02 11:29:08  coelho
 ! more args to hpfc8 for regions.
 !
@@ -41,10 +44,10 @@
       print *, 'hpfc7: '
       end
 ! dead FC directive. one argument, why not...
-      subroutine hpfc8(x1,x2,x3,x4,x5,x6,x7,x8,x9,x0)
+      subroutine hpfc8(x)
 !!fcd$ fake
       integer x
-      print *, 'hpfc8: ', x1,x2,x3,x4,x5,x6,x7,x8,x9,x0
+      print *, 'hpfc8: ', x
       end
 !
 ! That is all
