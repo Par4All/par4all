@@ -18,7 +18,7 @@ typedef struct INFO_LOOP {
   Variable index;
   Value upper, lower;  
 } info_loop;
- 
+
 
 typedef struct NID { 
   entity tableau;
@@ -43,7 +43,7 @@ int depth_max=40,st_max=40;
 info_loop *merged_nest;
 loop loop1;
 bool overflow=FALSE;
-
+entity first_array;
 static int unique_integer_number = 0,
   unique_float_number = 0,
   unique_logical_number = 0,
@@ -59,10 +59,10 @@ static int *nbr_no_perf_nest_loop_of_depth, *nbr_perf_nest_loop_of_depth,
 static bool sequence_valide=TRUE, first_turn=FALSE;
 
 
-typedef enum {is_a_stencil, is_unknown, is_a_perf_nes_loop, is_a_no_perf_nes_loop, 
+static typedef enum {is_a_stencil, is_unknown, is_a_perf_nes_loop, is_a_no_perf_nes_loop, 
 	      is_a_no_perf_nes_loop_t, is_a_call, is_a_continue,
                 is_a_while, is_a_test,  is_a_no_stencil } contenu_t;
-typedef struct {
+static typedef struct {
   hash_table contenu;
   hash_table depth;
   stack statement_stack;
@@ -101,6 +101,7 @@ static bool loop_flt(loop l, context_p context )
   k2++; 
   return TRUE;
 } 
+
 static void loop_rwt(loop l, context_p context  ) 
 {  
   contenu_t contenu;
@@ -122,43 +123,34 @@ static void loop_rwt(loop l, context_p context  )
 	k2=0;
 	k1++;
       }
-    
 }
 static bool stmt_flt(statement s,context_p context )
 {  
-  
-   stack_push(s, context->statement_stack); 
-   return TRUE;
+  stack_push(s, context->statement_stack); 
+  return TRUE;
 }
 
 
 static void stmt_rwt( statement s, context_p context)
-{ int depth;
-  /*  pips_assert("information associated to statement",
-       hash_defined_p(context->contenu, s)         );  
-
-     pips_assert("information associated to statement",
-     hash_defined_p(context->depth, s)         );  */
+{  
+ stack_pop(context->statement_stack);   
+}
  
-       stack_pop(context->statement_stack);   
-   
-	 
-} 
 static bool seq_flt( sequence sq, context_p context  )
 {
   return TRUE;
 }
+
 static void seq_rwt(sequence sq, context_p context)
 {
-  
-  contenu_t contenu= is_unknown, contenu_loop=is_unknown ;
-  int depth1, depth2;
+  contenu_t contenu= is_unknown;
+  int depth1=0, depth2=0;
   int max=0;
   int i=0;
   list l= sequence_statements(sq);
   contenu=is_a_stencil;
   hash_put(context->contenu,
-	       stack_head(context->statement_stack), 
+	   stack_head(context->statement_stack), 
 	       (void *) contenu);
   MAP(STATEMENT, s,
   {
@@ -166,14 +158,13 @@ static void seq_rwt(sequence sq, context_p context)
     if (i==0) depth1 = (int ) hash_get(context->depth, s);
     if (contenu ==is_a_stencil)  
       {  
-      
 	depth2= (int ) hash_get(context->depth, s);
 	if (depth1!=depth2)
 	  {  
 	    contenu=is_a_no_stencil;
 	    hash_put(context->contenu,
-		   stack_head(context->statement_stack),
-		 (void *) contenu);
+		     stack_head(context->statement_stack),
+		     (void *) contenu);
 	  };
 	depth1 =  depth2;
       }
@@ -183,48 +174,52 @@ static void seq_rwt(sequence sq, context_p context)
 	  { 
 	    contenu=is_a_no_stencil;
 	    hash_put(context->contenu,
-		   stack_head(context->statement_stack),
+		     stack_head(context->statement_stack),
 		     (void *) contenu);
-	    
 	  };
       };
     if (depth2 > max) max=depth2;
     i++;
   };, l); 
-  
   hash_put(context->depth,
-	    stack_head(context->statement_stack), 
-	    (void *) max   );
+	   stack_head(context->statement_stack), 
+	   (void *) max   );
 } 
 
 static bool uns_flt(unstructured u, context_p context   )
 {
   return TRUE;
 }
+
 static void uns_rwt(unstructured u, context_p context)
-{ 
-   hash_put(context->contenu,
-	   stack_head(context->statement_stack), 
-	   (void *)contenu );
-  hash_put(context->depth,stack_head(context->statement_stack), 
-  ( void *) 0);  
-} 
-static bool test_flt(test t, context_p context)
-{
-  return TRUE;
-}
-static void test_rwt(test t, context_p context)
-{
+{  contenu_t contenu;
+
+  contenu=is_a_no_stencil; 
   hash_put(context->contenu,
 	   stack_head(context->statement_stack), 
 	   (void *)contenu );
   hash_put(context->depth,stack_head(context->statement_stack), 
-  ( void *) 0);   
+	   ( void *) 0);  
+}
+ 
+static bool test_flt(test t, context_p context)
+{
+  return TRUE;
+}
+
+static void test_rwt(test t, context_p context)
+{
+  contenu_t contenu;
+  contenu=is_a_no_stencil; 
+  hash_put(context->contenu,
+	   stack_head(context->statement_stack), 
+	   (void *)contenu );
+  hash_put(context->depth,stack_head(context->statement_stack), 
+	   ( void *) 0);   
 } 
 static bool call_flt( call  ca, context_p context)
 {
- 
-return TRUE ;
+  return TRUE ;
 }
 
 static void call_rwt(call  ca, context_p context)
@@ -240,18 +235,17 @@ static void call_rwt(call  ca, context_p context)
       if (  strcmp(  entity_name(  call_function(ca)),"TOP-LEVEL:=")==0)
 	{
 	  list lis;
-	  expression exp, gauche, droite;
+	  expression exp, gauche=NULL, droite=NULL;
 	  syntax stg,std;
           normalized norm;
 	  Pvecteur pv;       
-	  Value val;
 	  int i=0,j=0;
 	  lis =call_arguments(ca);
 	  exp=(expression )CHUNK(CAR(lis));
 	  MAP(EXPRESSION,exp,{  
 	    if (i==0)  gauche=exp;
 	    if (i==1)  droite=exp;
-      	  i++;
+	    i++;
 	  },lis) ; 
 	  stg= expression_syntax(gauche);
 	  std= expression_syntax(droite);
@@ -259,11 +253,10 @@ static void call_rwt(call  ca, context_p context)
 	    { 
 	      reference ref;
               list lis,lis2;
-	      Variable vt;
+	      Variable vt=NULL;
 	      Pvecteur pvt;
 	      Value v1;
 	      ref =syntax_reference(stg);
-             
 	      lis  =reference_indices(ref);
 	      i=1;
 	      sequen[k1].tableau=reference_variable(ref);
@@ -273,33 +266,30 @@ static void call_rwt(call  ca, context_p context)
 		}
                 else{
 		  contenu=is_a_no_stencil;
-                  
 		}
 		normalize_all_expressions_of(exp);
 		norm=expression_normalized(exp);
 		pv= normalized_linear(norm);
                 pvt = vect_make(VECTEUR_NUL, vt, VALUE_ONE,
-			    TCST,VALUE_ZERO);
-              
-                if (!vect_equal(pvt, pv))
+				TCST,VALUE_ZERO);
+		if (!vect_equal(pvt, pv))
 		  {
 		    contenu=is_a_no_stencil;
-		    
 		  } ;
 		i++;
-		 
 	      },lis) ;      
 	      if (i-1!=k2)
 		{
 		  contenu=is_a_no_stencil;
-		   
-		} ;
+		};
 	      lis  =call_arguments( syntax_call(std));
 	      j=0;
-        
+
 	      MAP(EXPRESSION,exp,{ 
 		ref =expression_reference(exp);
-		if (k1>=1)
+		if(k1==0)
+		  first_array=reference_variable(ref);
+		if(k1>0)
 		  {
 		    if (reference_variable(ref) !=sequen[k1-1].tableau)
 		      contenu=is_a_no_stencil;
@@ -316,21 +306,16 @@ static void call_rwt(call  ca, context_p context)
 		  norm=expression_normalized(exp2);
 		  pv= normalized_linear(norm);
 		  v1=vect_coeff(TCST,pv);
-                
 		  MATRIX_ELEM(sequen[k1].st[j],k2-i+1,1)=v1;
 		  pvt = vect_make(VECTEUR_NUL, vt, VALUE_ONE,
 				  TCST,v1);
- 
 		  if (!vect_equal(pvt, pv)){
 		    contenu=is_a_no_stencil;
 		  };
-		  
 		  i++; 
 		},lis2) ;  
-		
 		if (i-1!=k2){
 		  contenu=is_a_no_stencil; };
-		 
 		j++;
 	      },lis) ; 
 	      sequen[k1].nbr_stencil=j;
@@ -338,7 +323,6 @@ static void call_rwt(call  ca, context_p context)
 	  else
 	    {    
               contenu=is_a_no_stencil; 
-	       
 	    }; 
 	}
       else
@@ -350,143 +334,80 @@ static void call_rwt(call  ca, context_p context)
 	   stack_head(context->statement_stack), 
 	   (void *)contenu );
   hash_put(context->depth,stack_head(context->statement_stack), 
-  ( void *) 0);  
+	   ( void *) 0);  
   /* if  (contenu==is_a_stencil) */    sequen[k1].s= copy_statement( stack_head(context->statement_stack));
 }
+
+
 static void wl_rwt(whileloop w, context_p context)
 {  
   contenu_t contenu=is_a_while;
    hash_put(context->contenu,
-   stack_head(context->statement_stack), 
+	    stack_head(context->statement_stack), 
    (void *) contenu );
 } 
-static void initialize ()
-{
-    int i;
-    nbr_no_perf_nest_loop_of_depth =(int  *) malloc(100 * sizeof (int ));
-    nbr_perf_nest_loop_of_depth =(int  *) malloc(100* sizeof (int )) ;
-    for (i=0; i<=99;i++)
-       *( nbr_no_perf_nest_loop_of_depth+i) =0;
-    for (i=0; i<=99;i++)
-       *( nbr_perf_nest_loop_of_depth+i) =0;
-    cpt=0; 
-    nbr_perfectly_nested_loop=0; nbr_no_perfectly_nested_loop=0;
-    nbr_interested_loop=0;
-    nbr_nested_loop=0 ;  max_depth_perfect=0  ;
-    nbr_loop=0;max_depth_no_perfect=0;first_turn=TRUE;
-    first_turn = TRUE;
-} 
-static void put_result(string filename)
-{
-  int i;
-  FILE * file = safe_fopen(filename, "w");  
-  fprintf(file,
-          "loops: %d\n"
-	  "nested loops: %d\n"
-	  "perfectly nested loops: %d\n"
-	  "non perfectly nested loops: %d\n"
-	  "non perfectly nested loops which we can treat : %d\n",
-	  nbr_loop, nbr_nested_loop, nbr_perfectly_nested_loop,
-          nbr_no_perfectly_nested_loop, nbr_interested_loop);
-
-
-  for (i=1; i<= max_depth_perfect; i++)
-  if (*(nbr_perf_nest_loop_of_depth+i) !=0)
-  fprintf(file,"perfectly  nested loops of depth %d: %d \n", i, 
-  nbr_perf_nest_loop_of_depth[i]);
-  for (i=1; i<= max_depth_no_perfect; i++)
-  if (*(nbr_no_perf_nest_loop_of_depth+i) !=0)
-  fprintf(file,"non perfectly  nested loops of depth %d: %d \n", i, 
-  *(nbr_no_perf_nest_loop_of_depth+i));
- 
-  safe_fclose(file, filename);
-}
-
-
-
-
+  
 static bool lexi_sup(Pmatrix a, Pmatrix b)
-{
-  
-  int i;
-  
-  for (i=1;i<=depth;i++)
-    {
-      
-      if (MATRIX_ELEM(a,i,1) >MATRIX_ELEM(b,i,1))
-	  return TRUE;
-      if (MATRIX_ELEM(a,i,1) < MATRIX_ELEM(b,i,1))
-	  return FALSE;
+{int i;
+ for (i=1;i<=depth;i++)
+   {
+     if (MATRIX_ELEM(a,i,1) >MATRIX_ELEM(b,i,1))
+       return TRUE;
+     if (MATRIX_ELEM(a,i,1) < MATRIX_ELEM(b,i,1))
+       return FALSE;
     }
- 
 } 
-
-
 
 static void  trier(Pmatrix *st,int length)
-
 {
- Value    temp;
- int   i, j,k;
- 
+  Value    temp;
+  int   i, j,k;
   for (i=0;i<=length-2;i++)
     for(j=i+1;j<=length-1;j++)
       {
-	 
 	if (lexi_sup(st[i],st[j]))
 	  {
 	    for (k=1;k<=depth;k++)
 	      {   
-		 
 		temp= MATRIX_ELEM(st[j],k,1);
 		MATRIX_ELEM(st[j],k,1)=  MATRIX_ELEM(st[i],k,1);
 		MATRIX_ELEM(st[i],k,1)=temp;
-		 
 	      };
 	  };
       };
-
-} 
-
-
-void compute_delay ()
-    
+}
+ 
+static void compute_delay ()
 {
   int i;
   for (i=k1-1;i>=0;i--)
     {
-    
       sequen [i].delai=matrix_new(depth,1);
-     if (i==k1-1)  matrix_nulle(sequen [i].delai);
-     else
-       matrix_substract(sequen [i].delai, sequen [i+1].delai ,sequen[i+1].st[sequen[i+1].nbr_stencil-1]  );
+      if (i==k1-1)  matrix_nulle(sequen [i].delai);
+      else
+	matrix_substract(sequen [i].delai, sequen [i+1].delai ,sequen[i+1].st[sequen[i+1].nbr_stencil-1]  );
     }
-
+  
 }
 
-void compute_bound_merged_nest ()
+static void compute_bound_merged_nest ()
 {int i,j;
  merged_nest= (struct INFO_LOOP  *)malloc(depth *sizeof(struct INFO_LOOP));
  for(j=0;j<=depth-1;j++)
    {
-     
      merged_nest[j].lower =sequen[0].nd[j].lower+MATRIX_ELEM( sequen[0].delai,j+1,1);
      merged_nest[j].upper=sequen[0].nd[j].upper+MATRIX_ELEM( sequen[0].delai,j+1,1);
      for (i=1;i<=k1-1;i++)
        {
 	 if( merged_nest[j].lower > sequen[i].nd[j].lower+MATRIX_ELEM( sequen[i].delai,j+1,1)) 
-	    merged_nest[j].lower =sequen[i].nd[j].lower+MATRIX_ELEM( sequen[i].delai,j+1,1 );
+	   merged_nest[j].lower =sequen[i].nd[j].lower+MATRIX_ELEM( sequen[i].delai,j+1,1 );
 	 if( merged_nest[j].upper <sequen[i].nd[j].upper+MATRIX_ELEM( sequen[i].delai,j+1,1))
 	   merged_nest[j].upper=sequen[i].nd[j].upper+MATRIX_ELEM( sequen[i].delai,j+1,1);
        };
-      
    } 
 }
-
-statement body_of_merged_nest ()
-{
-}
-statement  fusion()
+ 
+static statement  fusion()
 { int i,j;
  list lis;
  instruction ins;
@@ -495,41 +416,32 @@ statement  fusion()
   normalized norm;
   Pvecteur pv;
   loop ls;
-/* calcul des delais des differents nis */
- 
+  /* calcul des delais des differents nis */
   compute_delay();
-  
   compute_bound_merged_nest ();
-  
- /* on construit la liste des instructions qui vont former le corps du nid fusionne */
-  
- normalize_all_expressions_of(expt);
- 
- for (i=k1-1;i>=0;i--)
-   {
-     expression e1,e2,e,exp,gauche,droite,delai_plus;
-     test t;
-     call c;
-     int m;
-     Pvecteur pv;
-
-     printf(" fff %d\n",i);
-      
+  /* on construit la liste des instructions qui vont former le corps du nid fusionne */
+  normalize_all_expressions_of(expt);
+  for (i=k1-1;i>=0;i--)
+    {
+      expression e1,e2,e,exp,gauche,droite,delai_plus;
+      test t;
+      call c;
+      int m;
+      Pvecteur pv;
       e1=ge_expression(entity_to_expression ((entity)sequen[i].nd[0].index),
 		       Value_to_expression( value_plus(sequen[i].nd[0].lower,MATRIX_ELEM( sequen[i].delai,1,1))));
       e2=le_expression(entity_to_expression ((entity)sequen[i].nd[0].index),
 		       Value_to_expression( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1))));
-
-     if (value_eq( value_plus(sequen[i].nd[0].lower,MATRIX_ELEM( sequen[i].delai,1,1)),merged_nest[0].lower))
+      if (value_eq( value_plus(sequen[i].nd[0].lower,MATRIX_ELEM( sequen[i].delai,1,1)),merged_nest[0].lower))
 	{
 	  if (value_eq( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)),merged_nest[0].upper)) 
-	     {
-	       e=NULL;
+	    {
+	      e=NULL;
 	     }
 	  else
-	     {
-	       e=e2;
-	     }
+	    {
+	      e=e2;
+	    }
 	}
       else
 	{
@@ -542,122 +454,93 @@ statement  fusion()
 	       e=and_expression(e1,e2);
 	     }
 	};
-
-
       
-
-
-
-     for(j=0;j<=depth-1;j++)
-       {
-	 if (j>=1) 
-	   {
-
-	     e1=ge_expression(entity_to_expression ((entity)sequen[i].nd[j].index),
-			      Value_to_expression( value_plus(sequen[i].nd[j].lower,MATRIX_ELEM( sequen[i].delai,j+1,1))));
-	     e2=le_expression(entity_to_expression ((entity)sequen[i].nd[j].index),
-			      Value_to_expression( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1))));
-	     
-
-	     if (value_eq( value_plus(sequen[i].nd[j].lower,MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].lower))
-	       {
-		 if (!value_eq( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].upper)) 
-		   {
-		     if (e==NULL)
-		       e=e2;
-		     else
-		       e=and_expression(e,e2);
-		   };
-	       }
-	     else
-	       {
-	     if (value_eq( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].upper)) 
-	       {
-		 if (e==NULL)
-		   e=e1;
-		 else
-		   e=and_expression(e,e1);
-	       }
-	     else
-	       {
-		 e1=and_expression(e1,e2);
-		 if(e==NULL)
-		   e=e1;
-		 else
-		   e=and_expression(e,e1);
-	       }
-	   };
-	 
-	     
-	   };
-	 c= instruction_call(statement_instruction((sequen[i].s )));
-	 m=0;
-	 
-	 MAP(EXPRESSION,exp,{  
-	   if (m==0)  gauche=exp;
-	   if (m==1)  droite=exp;
-	   m++;
-	 },call_arguments(c)) ;
-	 
-	 pv = vect_make(VECTEUR_NUL, sequen[i].nd[j].index, VALUE_ONE,
-			TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
-	 delai_plus=Pvecteur_to_expression(pv);
+      for(j=0;j<=depth-1;j++)
+	{
+	  if (j>=1) 
+	    {
+	      e1=ge_expression(entity_to_expression ((entity)sequen[i].nd[j].index),
+			       Value_to_expression( value_plus(sequen[i].nd[j].lower,MATRIX_ELEM( sequen[i].delai,j+1,1))));
+	      e2=le_expression(entity_to_expression ((entity)sequen[i].nd[j].index),
+			       Value_to_expression( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1))));
+	      if (value_eq( value_plus(sequen[i].nd[j].lower,MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].lower))
+		{
+		  if (!value_eq( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].upper)) 
+		    {
+		      if (e==NULL)
+			e=e2;
+		      else
+			e=and_expression(e,e2);
+		    };
+		}
+	      else
+		{
+		  if (value_eq( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].upper)) 
+		    {
+		      if (e==NULL)
+			e=e1;
+		      else
+			e=and_expression(e,e1);
+		    }
+		  else
+		    {
+		      e1=and_expression(e1,e2);
+		      if(e==NULL)
+			e=e1;
+		      else
+			e=and_expression(e,e1);
+		    }
+		};
+	    };
+	  c= instruction_call(statement_instruction((sequen[i].s )));
+	  m=0;
+	  MAP(EXPRESSION,exp,{  
+	    if (m==0)  gauche=exp;
+	    if (m==1)  droite=exp;
+	    m++;
+	  },call_arguments(c)) ;
+	  pv = vect_make(VECTEUR_NUL, sequen[i].nd[j].index, VALUE_ONE,
+			 TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
+	  delai_plus=Pvecteur_to_expression(pv);
 	  ExpressionReplaceReference(gauche,
 				     make_reference((entity*) sequen[i].nd[j].index,NIL),delai_plus);
-	  
 	  MAP(EXPRESSION,exp,{  
 	    ExpressionReplaceReference(exp,
 				       make_reference((entity*) sequen[i].nd[j].index,NIL),delai_plus);
-	    
-	 },call_arguments( syntax_call(expression_syntax(droite))));
-	  
-       };
-     
-     if (e==NULL)
+	  },call_arguments( syntax_call(expression_syntax(droite))));
+	};
+      if (e==NULL)
        s=sequen[i].s;
-     else
-       {
-	 t= make_test(e,sequen[i].s,make_block_statement(NIL));
-	 s=test_to_statement(t);
-       };
-     if(i==k1-1)   lis=CONS(STATEMENT,s,NIL);
-     else      lis=CONS(STATEMENT,s,lis);
-   };
- seq= make_sequence(lis);
- ins= make_instruction_sequence(seq);
- s= instruction_to_statement(ins);
- ls=loop1;
- for(j=0;j<=depth-1;j++)
+      else
+	{
+	  t= make_test(e,sequen[i].s,make_block_statement(NIL));
+	  s=test_to_statement(t);
+	};
+      if(i==k1-1)   lis=CONS(STATEMENT,s,NIL);
+      else      lis=CONS(STATEMENT,s,lis);
+    };
+  seq= make_sequence(lis);
+  ins= make_instruction_sequence(seq);
+  s= instruction_to_statement(ins);
+  ls=loop1;
+  for(j=0;j<=depth-1;j++)
     {
-    
       range range1;
       expression lower, upper;
-      
-      
       Pvecteur pv1,pv2;
-  
-     
       range1=loop_range(ls); 
       lower=range_lower(range1);  
       upper=range_upper(range1); 
-        
-     range_lower(range1)=
-	make_integer_constant_expression(merged_nest[j].lower);
-       
-     range_upper(range1)=
-       make_integer_constant_expression(merged_nest[j].upper);
-     
-     if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
+      range_lower(range1)=make_integer_constant_expression(merged_nest[j].lower);
+      range_upper(range1)= make_integer_constant_expression(merged_nest[j].upper);
+      if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
       else loop_body(ls)=s;
-      
     };
- 
- s=loop_to_statement(loop1);
- return s;
-   
+  s=loop_to_statement(loop1);
+  return s;
 } 
 
-void cons_coef(Pmatrix p, int nid)
+static void cons_coef(Pmatrix p, int nid)
 {
   int i;
   Value temp;
@@ -673,7 +556,7 @@ void cons_coef(Pmatrix p, int nid)
     }
 }
 
-Pvecteur buffer_acces(int nid )
+static Pvecteur buffer_acces(int nid )
 {
   Pvecteur pv,tmp;
   int j;
@@ -702,7 +585,7 @@ Pvecteur buffer_acces(int nid )
   return pv;
 }
 
-entity make_array_entity(name, module_name, base,lis)
+static entity make_array_entity(name, module_name, base,lis)
 string name;
 string module_name;
 basic base;
@@ -742,7 +625,7 @@ list lis;
   return(e);
 }
 
-entity make_new_array_variable_with_prefix(string prefix,
+static entity make_new_array_variable_with_prefix(string prefix,
 				     entity module,
 				     basic b,list lis)
 {
@@ -805,14 +688,13 @@ entity make_new_array_variable_with_prefix(string prefix,
   return e;
 }
 
-entity
-make_new_array_variable(entity module,
+static entity make_new_array_variable(entity module,
                          basic b,list lis)
 {
   
   return make_new_array_variable_with_prefix("B", module, b,lis);
 }
-statement fusion_buffer()
+static statement fusion_buffer()
 {
   call c;
   int m;
@@ -1018,17 +900,85 @@ statement fusion_buffer()
 
 }
 
+static bool array_overflow()
+{ int i,j,k;
+
+ for(i=0;i<=k1-1;i++)
+   {
+     trier (sequen[i].st,sequen[i].nbr_stencil);
+     if(i==0)
+       {
+	 int m=0;
+	 list lis;
+	 expression lower, upper;
+	 normalized norm1,norm2;
+	 Pvecteur pv1,pv2;
+	    Value v1,v2;
+	    lis= variable_dimensions(type_variable(entity_type(first_array)));
+	    MAP(DIMENSION,dim,{
+	      lower= dimension_lower(dim);
+	      upper=dimension_upper(dim);
+	      normalize_all_expressions_of(lower);
+	      norm1=expression_normalized(lower);
+	      pv1= normalized_linear(norm1);
+	      v1=vect_coeff(TCST,pv1);
+	      normalize_all_expressions_of(upper);
+	      norm2=expression_normalized(upper);
+	      pv2= normalized_linear(norm2);
+	      v2=vect_coeff(TCST,pv2);
+	      for(j=0;j<=sequen[i].nbr_stencil-1;j++)
+		{
+		  if (value_plus(MATRIX_ELEM(sequen[i].st[j],m+1,1), sequen[i].nd[m].lower)
+		      < v1 )
+		    {
+		      overflow=TRUE ;
+		      printf(" Debordement dans le   tableau: %s\n",entity_name(first_array));
+		    };
+		  if (value_plus(MATRIX_ELEM(sequen[i].st[j],m+1,1), sequen[i].nd[m].upper)> 
+		      v2 )
+		    {  
+		      overflow=TRUE ;
+		      printf(" Debordement dans le  tableau: %s\n",entity_name(first_array));
+		    };
+		}
+	      m++;
+	    },lis) ;
+       }
+     else
+       { 
+	 for(j=0;j<=sequen[i].nbr_stencil-1;j++)
+	   for(k=0;k<=depth-1;k++)
+		{
+		  if (value_plus(MATRIX_ELEM(sequen[i].st[j],k+1,1), sequen[i].nd[k].lower)
+		      <sequen[i-1].nd[k].lower )
+		    {
+		      overflow=TRUE ;
+		      printf(" Debordement dans le domaine du tableau: %s\n",entity_name(sequen[i-1].tableau));
+		    };
+		  if (value_plus(MATRIX_ELEM(sequen[i].st[j],k+1,1), sequen[i].nd[k].upper)> 
+		      sequen[i-1].nd[k].upper )
+		    {
+		      overflow=TRUE ;
+		      printf(" Debordement dans le domaine du tableau: %s\n",entity_name(sequen[i-1].tableau));
+		    };
+		  
+		};
+       };
+   };
+
+ return overflow;
+}
 bool tiling_sequence(string module)  
 {
   statement stat,s1;
-  int i,j,k;
+  int i,j,k,debordement;
   context_t context;
  
   contenu_t contenu;
   list lis;
   instruction ins;
   sequence seq;
-
+  
   debug_on("STATISTICS_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module);
   set_current_module_entity(local_name_to_top_level_entity(module));
@@ -1055,48 +1005,26 @@ bool tiling_sequence(string module)
      NULL); 
   contenu = (contenu_t) hash_get(context.contenu, stat); 
   depth = (int ) hash_get(context.depth, stat);
- 
   
-  if (contenu==is_a_stencil)
+  
+  if (contenu!=is_a_stencil)
     {
-      for(i=0;i<=k1-1;i++)
-	{
-	  trier (sequen[i].st,sequen[i].nbr_stencil);
-	  if(i==0) ;
-	  else
-	    { 
-	      for(j=0;j<=sequen[i].nbr_stencil-1;j++)
-		for(k=0;k<=depth-1;k++)
-		  {
-		    if (value_plus(MATRIX_ELEM(sequen[i].st[j],k+1,1), sequen[i].nd[k].lower)
-			<sequen[i-1].nd[k].lower )
-		    overflow=TRUE ;
-		    if (value_plus(MATRIX_ELEM(sequen[i].st[j],k+1,1), sequen[i].nd[k].upper)> 
-			sequen[i-1].nd[k].upper )
-		     overflow=TRUE ;  
-		  };
-	    };
-        };
-    };
-  if (overflow)
-    
-      printf(" debordement dans l'un des domaines \n");
-  
+      printf(" Le programme ne repond pas aux hypotheses  \n");
+      array_overflow();
+    }
   else
     {
-      if( contenu!=is_a_stencil)
-	printf(" LE PROGRAMME NE REPPOND PAS AUX HYPOTHESES \N");
-      else
+      if(!array_overflow())
 	{
+	  
 	  //s1=fusion(); 
 	  s1= fusion_buffer();
 	  
 	  module_reorder(s1); 
 	  
 	  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, s1);
-	  
-	};
-    };
+	} 
+    }
       
     reset_current_module_entity();
     //  reset_current_module_statement();
