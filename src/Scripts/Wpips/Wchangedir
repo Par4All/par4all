@@ -1,12 +1,18 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/13 19:55:10 $, 
+# $Date: 1996/09/14 13:08:29 $, 
 #
-# (c) FC September 1996
+# (c) Fabien COELHO, CRI, École des mines de Paris, September 1996.
+#     e-mail: coelho@cri.ensmp.fr
 #
-# this script allows to chose a directory interactively. 
-# wish is started without assumption on its location.
+# What: This script allows to chose a directory interactively. 
+#       the chosen directory (when clicking "Ok") is put on stdout.
+#
+# Usage: $RCSfile: Wchangedir,v $ [ -- default-start-directory ]
+#
+# Wish is started without assumption on its location.
+# (because here it is not in /usr/local/bin as usual).
 sed '1,/^###/d' $0 | wish "$@" 
 exit $?
 #
