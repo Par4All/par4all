@@ -820,7 +820,7 @@ transformer call_site_to_module_precondition(entity caller,
 		      FALSE) );
 
     /* load caller preconditions */
-    caller_prec = load_statement_semantic(s);
+    caller_prec = transformer_dup(load_statement_semantic(s));
 
     set_current_module_statement(s);
 
@@ -888,7 +888,8 @@ static bool process_call(call c)
     }
 
     /* add to call site preconditions the links to the callee formal params */
-    caller_prec = add_formal_to_actual_bindings (c, current_precondition);
+    caller_prec = add_formal_to_actual_bindings
+	(c, transformer_dup(current_precondition));
     ifdebug(8) {
 	debug(8,"process_call",
 	      "call site precondition with bindings %x:\n",
@@ -900,8 +901,9 @@ static bool process_call(call c)
     }
 
     /* transform the preconditions to make sense for the callee */
+    /* Beware: call_site_prec and caller_prec are synonymous */
     call_site_prec = 
-	precondition_intra_to_inter (current_callee,
+	precondition_intra_to_inter(current_callee,
 				     caller_prec,
 				     summary_effects_of_callee);
     
@@ -967,6 +969,8 @@ static bool process_call(call c)
 	else { 
 	    transformer new_current_summary_precondition = 
 		transformer_undefined;
+	    pips_assert("process_call", 
+			current_summary_precondition != call_site_prec);
 	    new_current_summary_precondition = 
 		transformer_convex_hull(current_summary_precondition,
 					call_site_prec);
