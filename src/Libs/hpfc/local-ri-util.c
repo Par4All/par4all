@@ -1,4 +1,4 @@
-/* $RCSfile: local-ri-util.c,v $ ($Date: 1995/04/14 15:54:53 $, )
+/* $RCSfile: local-ri-util.c,v $ ($Date: 1995/07/20 18:40:41 $, )
  * version $Revision$
  *
  * HPFC (c) Fabien Coelho May 1993
@@ -59,7 +59,7 @@ list expression_list_to_entity_list(l)
 list /* of expressions */ l;
 {
     list /* of entities */ n = NIL;
-    MAPL(ce, n = CONS(ENTITY, expression_to_entity(EXPRESSION(CAR(ce))), n), l);
+    MAP(EXPRESSION, e, n = CONS(ENTITY, expression_to_entity(e), n), l);
     return(gen_nreverse(n));		 
 }
 
@@ -67,10 +67,9 @@ list entity_list_to_expression_list(l)
 list /* of entities */ l;
 {
     list /* of expressions */ n = NIL;
-    MAPL(ce, n = CONS(EXPRESSION, entity_to_expression(ENTITY(CAR(ce))), n), l);
+    MAP(EXPRESSION, e, n = CONS(EXPRESSION, entity_to_expression(e), n), l);
     return(gen_nreverse(n));
 }
-
 
 /* that is all
  */
