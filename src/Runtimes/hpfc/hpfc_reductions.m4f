@@ -2,7 +2,7 @@
 !     Reductions management 
 !
 ! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1996/10/17 15:29:18 $, )
+! ($Date: 1996/10/18 21:42:21 $, )
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -64,7 +64,7 @@ COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
 _CM5(`      include "cmmd_fort.h"')
       include "hpfc_commons.h"
       include "hpfc_rtsupport.h"
-      integer
+      integer dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS')
       TYPE 
      $ a(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
