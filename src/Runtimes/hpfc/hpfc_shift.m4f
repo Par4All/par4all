@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-! ($Date: 1997/06/09 13:00:18 $, )
+! ($Date: 1997/07/03 11:10:04 $, )
 !
 !
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -219,7 +219,7 @@ define(`GENERIC_SHIFT',`dnl
 pushdef(`LEVEL',$1)dnl
 pushdef(`PVMTYPE',$2)dnl
 pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
-      subroutine build_name(HPFCSHIFT,PVMTYPE,LEVEL)(
+      subroutine build_name(PVMTYPE,SHIFT,LEVEL)(
      $  array, an, dim, sh, dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_SECTION')
@@ -274,8 +274,8 @@ SIMPLE_REPLICATE(LEVEL,`INIT_TABLE')dnl
 !
 ! the SHIFT is to another processor
 !
-            call HPFC INIT SEND(PVMDATARAW, bufid)
-            call build_name(HPFCPACK,PVMTYPE,LEVEL)
+            call HPFC INIT SEND(DATARAW ENCODING, bufid)
+            call build_name(PVMTYPE,PACK,LEVEL)
      $           (array, dnl
 COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
@@ -329,7 +329,7 @@ SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
              call HPFC RECEIVE(lid(j),
      $            RECVCHANNELS(lid(j)))
              RECV CHANNELS(lid(j))=RECV CHANNELS(lid(j))+2
-             call build_name(HPFCUNPACK,PVMTYPE,LEVEL)
+             call build_name(PVMTYPE,UNPACK,LEVEL)
      $            (array, dnl
 COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
@@ -345,13 +345,15 @@ popdef(`PVMTYPE')')dnl
 !
 !
 forloop(`_D_',1,_HPFC_DIMENSIONS_,`
-ifdef(`_HPFC_NO_BYTE1_',,`GENERIC_SHIFT(_D_,BYTE1)')
-ifdef(`_HPFC_NO_INTEGER2_',,`GENERIC_SHIFT(_D_,INTEGER2)')
-ifdef(`_HPFC_NO_INTEGER4_',,`GENERIC_SHIFT(_D_,INTEGER4)')
-ifdef(`_HPFC_NO_REAL4_',,`GENERIC_SHIFT(_D_,REAL4)')
-ifdef(`_HPFC_NO_REAL8_',,`GENERIC_SHIFT(_D_,REAL8)')
-ifdef(`_HPFC_NO_COMPLEX8_',,`GENERIC_SHIFT(_D_,COMPLEX8)')
-ifdef(`_HPFC_NO_COMPLEX16_',,`GENERIC_SHIFT(_D_,COMPLEX16)')')
+ifdef(`_HPFC_NO_BYTE1_',,`GENERIC_SHIFT(_D_,HPFC BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`GENERIC_SHIFT(_D_,HPFC INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`GENERIC_SHIFT(_D_,HPFC INTEGER4)')
+ifdef(`_HPFC_NO_STRING_',,`GENERIC_SHIFT(_D_,HPFC STRING)')
+ifdef(`_HPFC_NO_REAL4_',,`GENERIC_SHIFT(_D_,HPFC REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`GENERIC_SHIFT(_D_,HPFC REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`GENERIC_SHIFT(_D_,HPFC COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`GENERIC_SHIFT(_D_,HPFC COMPLEX16)')')
+
 !
 ! That is all
 !
