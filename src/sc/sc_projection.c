@@ -688,6 +688,9 @@ Pvecteur pv;
  *      *integer_combination_p is set to TRUE, if the Fourier Motzkin
  *      projection is equivalent to the "integer projection". 
  *      else, it is set to FALSE.
+ *
+ * Redundancy is checked using contrainte_reverse() and feasability
+ * checking. Non-redundant constraints in rational may be discarded.
  */
 Pcontrainte sc_integer_inequalities_combination_ofl_ctrl
   (sc,posit,negat,v, integer_combination_p, ofl_ctrl)	
