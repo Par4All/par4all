@@ -1,11 +1,13 @@
 #!/bin/sh
 #
 # SCCS STuff
-# $RCSfile: make-tags,v $ ($Date: 1994/12/09 11:35:48 $) version $Revision$, got on %D%, %T%
+# $RCSfile: make-tags,v $ ($Date: 1994/12/09 11:55:58 $, )
+# version $Revision$,
+# got on %D%, %T%
 # %A%
 #
 # Tags computation for the PIPS project, using the Development version.
-# To be run by cron for user pips on isatis
+# To be run by cron for user pips on cri
 
 # Remi Triolet
 
@@ -41,16 +43,16 @@ rm -f $FILES $TAGS
 
 for dir in $PATHNAME_LIST
 do
-  test -d $dir && ls $dir/*.[chly] >> $FILES
-done
+  test -d $dir && ls $dir/[!,]*.[chly] 
+done >> $FILES
 
 # tags generation
 
-${PIPS_ETAGS} -f ${TAGS} `sed '/,/d' ${FILES}` 2>/dev/null
+${PIPS_ETAGS} -f ${TAGS} `cat ${FILES}` 2>/dev/null
 
 cp ${TAGS} ${PIPSDIR}/Tags/TAGS
 
-rm -f ${TAGS} ${FILES}
+# rm -f ${TAGS} ${FILES}
 (cd $LINEARDIR/Development; rm -f TAGS; make TAGS)
 cat ${HOME}/C3/Linear/Development/TAGS >>${PIPSDIR}/Tags/TAGS
 
