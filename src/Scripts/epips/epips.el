@@ -120,7 +120,7 @@
 ;; All the command string that are used to name commands between Pips
 ;; and emacs:
 (setq
- epips-array-data-flow-graph-view-command-name "Array data flow graph View"
+ epips-array-data-flow-graph-view-command-name "Array Data Flow Graph"
  epips-available-modules-command-name "AVAILABLE_MODULES"
  epips-bank-view-command-name "BANK"
  epips-call-graph-view-command-name "Callgraph View"
@@ -135,9 +135,9 @@
  epips-module-command-name "MODULE_NAME"
  epips-new-daVinci-context-command-name "NEW_DAVINCI_CONTEXT"
  epips-parallel-view-command-name "Parallel View"
- epips-placement-view-command-name "Placement View"
+ epips-placement-view-command-name "Placement"
  epips-prompt-user-command-name "PROMPT_USER"
- epips-scheduling-view-command-name "Scheduling View"
+ epips-scheduling-view-command-name "Time stamps"
  epips-sequential-view-command-name "Sequential View"
  epips-user-error-command-name "USER_ERROR"
  epips-user-log-command-name "USER_LOG"
