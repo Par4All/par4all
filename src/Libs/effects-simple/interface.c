@@ -116,8 +116,9 @@ print_code_proper_effects(string module_name)
     set_methods_for_proper_simple_effects();
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(TRUE);
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_PROPER_EFFECTS,
 						      string_undefined,
@@ -133,8 +134,9 @@ print_code_cumulated_effects(char* module_name)
     set_methods_for_simple_effects();
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(TRUE);
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_CUMULATED_EFFECTS,
 						      DBR_SUMMARY_EFFECTS,
@@ -150,8 +152,9 @@ print_code_proper_references(char * module_name)
     set_methods_for_proper_references();
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(TRUE);
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_PROPER_REFERENCES,
 						      string_undefined,
@@ -167,8 +170,9 @@ print_code_cumulated_references(char * module_name)
     set_methods_for_cumulated_references();
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(TRUE);
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_CUMULATED_REFERENCES,
 						      string_undefined,
@@ -185,7 +189,9 @@ print_code_in_effects(string module_name)
     set_methods_for_simple_effects();
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
-    set_read_action_interpretation(READ_IS_IN);
+
+    set_action_interpretation(ACTION_IN, ACTION_UNDEFINED);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_IN_EFFECTS,
 						      DBR_IN_SUMMARY_EFFECTS,
@@ -201,7 +207,9 @@ print_code_out_effects(string module_name)
     set_methods_for_simple_effects();
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
-    set_write_action_interpretation(WRITE_IS_OUT);
+
+    set_action_interpretation(ACTION_UNDEFINED, ACTION_OUT);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_OUT_EFFECTS,
 						      DBR_OUT_SUMMARY_EFFECTS,
@@ -218,8 +226,9 @@ print_source_proper_effects(string module_name)
     set_methods_for_proper_simple_effects();
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(TRUE);
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_PROPER_EFFECTS,
 						      string_undefined,
@@ -235,8 +244,9 @@ print_source_cumulated_effects(char* module_name)
     set_methods_for_simple_effects();
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(TRUE);
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_CUMULATED_EFFECTS,
 						      DBR_SUMMARY_EFFECTS,
@@ -253,7 +263,9 @@ print_source_in_effects(string module_name)
     set_methods_for_simple_effects();
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
-    set_read_action_interpretation(READ_IS_IN);
+
+    set_action_interpretation(ACTION_IN, ACTION_UNDEFINED);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_IN_EFFECTS,
 						      DBR_IN_SUMMARY_EFFECTS,
@@ -269,7 +281,9 @@ print_source_out_effects(string module_name)
     set_methods_for_simple_effects();
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
-    set_write_action_interpretation(WRITE_IS_OUT);
+
+    set_action_interpretation(ACTION_UNDEFINED, ACTION_OUT);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_OUT_EFFECTS,
 						      DBR_OUT_SUMMARY_EFFECTS,
@@ -277,6 +291,9 @@ print_source_out_effects(string module_name)
     generic_effects_reset_all_methods();
     return ok;
 }
+
+
+/********************************************************** OTHER FUNCTIONS */
 
 text
 get_text_proper_effects(string module_name)
@@ -368,9 +385,7 @@ proper_effects_of_range(range r)
     return(le);
 }
 
-/****************************************************************/
-/* BACKWARD COMPATIBILITY                                       */
-/****************************************************************/
+/*************************************************** BACKWARD COMPATIBILITY */
 
 /* called from prettyprint CRAY */
 void 
@@ -422,7 +437,5 @@ statement s;
     reset_invariant_rw_effects();
     generic_effects_reset_all_methods();
 
-    return(l_eff);
+    return l_eff;
 }
-
-
