@@ -4,7 +4,6 @@
  *
  */
 #include <stdio.h>
-extern int fprintf(FILE *, const char *, ...);
 #include <string.h>
 
 #include "genC.h"
