@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: util.c,v $
+   Revision 1.11  2004/02/20 13:57:47  nguyen
+   Treat EXTERN entities
+
    Revision 1.10  2004/02/19 15:18:24  nguyen
    Bug related to "const void", qualifier for not variable type
 
@@ -113,7 +116,9 @@ entity get_current_compilation_unit_entity()
 void MakeCurrentCompilationUnitEntity(string name)
 {
   entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
-  entity_storage(e) = make_storage_rom();
+  /* Normally, the storage must be rom but in order to store the list of entities
+     declared with extern, we use the ram storage to put this list in ram_shared*/
+  entity_storage(e) = make_storage_ram(make_ram(entity_undefined,entity_undefined,0,NIL));
   entity_type(e) = make_type_functional(make_functional(NIL,make_type_unknown()));
   entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL)));
   pips_debug(4,"Set current module entity for compilation unit %s\n",name);
@@ -673,7 +678,17 @@ entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStac
   else
     {
       if (scope != NULL)
-	ent = find_or_create_entity(strdup(concatenate(scope,name,NULL)));
+	{
+	  ent = find_or_create_entity(strdup(concatenate(scope,name,NULL)));
+	  if (is_external && strstr(scope,TOP_LEVEL_MODULE_NAME) != NULL)
+	    {
+	      /* This entity is declared in a compilation unit with keyword EXTERN.
+		 Add it to the storage of the compilation unit to help code generation*/
+	      entity com_unit = get_current_compilation_unit_entity();
+	      ram_shared(storage_ram(entity_storage(com_unit))) = 
+		gen_nconc(ram_shared(storage_ram(entity_storage(com_unit))), CONS(ENTITY,ent,NIL));
+	    }
+	}
       else 
 	{
 	  if (is_formal)
