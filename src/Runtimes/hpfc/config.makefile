@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/30 14:29:33 $, )
+# ($Date: 1996/08/30 14:55:00 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -273,6 +273,9 @@ $(PVM_ARCH)/%.o: %.f
 	$(F77COMPILE) $< -o $@
 
 $(PVM_ARCH)/compilers.make:
+	#
+	# building $@
+	#
 	{ echo "FC=$(FC)"; \
 	  echo "FFLAGS=$(FFLAGS)";\
 	  echo "CC=$(CC)";\
