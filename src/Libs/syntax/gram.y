@@ -851,11 +851,11 @@ intrinsic_inst: TK_INTRINSIC global_entity_name
 external_inst: TK_EXTERNAL functional_entity_name
 	    {
 		CurrentType = type_undefined;
-		(void) MakeExternalFunction($2, type_undefined);
+		(void) DeclareExternalFunction($2);
 	    }
 	| external_inst TK_COMMA functional_entity_name
 	    {
-		(void) MakeExternalFunction($3, type_undefined);
+		(void) DeclareExternalFunction($3);
 	    }
 	;
 
@@ -1187,7 +1187,8 @@ parametre: entity_name TK_EQUALS expression
 entity_name: name
 	    {
                 /* malloc_verify(); */
-		$$ = SafeFindOrCreateEntity(CurrentPackage, $1);
+		/* $$ = SafeFindOrCreateEntity(CurrentPackage, $1); */
+		$$ = FindOrCreateEntity(CurrentPackage, $1);
 		free($1);
 	    }
 	;
