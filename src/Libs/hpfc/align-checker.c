@@ -9,7 +9,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1994/12/22 15:34:59 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1994/12/27 08:53:18 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -482,6 +482,12 @@ int *pi;
 {
     normalized 
 	n = expression_normalized(e);
+
+    ifdebug(9)
+    {
+	fprintf(stderr, "[hpfc_integer_constant_expression_p] dealing with:\n");
+	print_expression(e);
+    }
 
     if (normalized_undefined_p(n)) 
     {
