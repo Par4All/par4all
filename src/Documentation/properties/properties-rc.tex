@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/09 15:46:37 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/14 08:59:38 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -781,6 +781,14 @@ HPFC_IGNORE_IN_OUT_REGIONS TRUE
 \end{verbatim}
 
 \section{Program Transformations}
+
+
+\subsection{Control Flow Graph Restruturing}
+
+The following option enables the use of IF/THEN/ELSE:
+\begin{verbatim}
+UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
+\end{verbatim}
 
 
 \subsection{Dead code elimination}
