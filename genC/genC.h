@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1996/07/16 16:21:04 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1996/09/21 09:59:22 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -31,7 +31,8 @@
 /* #include <sys/stdtypes.h> */
 #include <stdio.h>
 #include <malloc.h>
-/* #include "malloc.h"    */                /* for debug with malloclib */
+extern char *strdup();
+
 #include "newgen_assert.h"
 
 #include "newgen_types.h"
@@ -55,16 +56,17 @@
  */
 
 typedef union gen_chunk {
-	unit u ;
-	bool b ;
-	char c ;
-	int i ;
-	float f ;
-	string s ;
-	struct cons *l ;
-	set t ;
-	hash_table h ;
-	union gen_chunk *p ;
+    unit u ;
+    bool b ;
+    char c ;
+    int i ;
+    float f ;
+    string s ;
+    char * e ; /* for externals */
+    struct cons *l ;
+    set t ;
+    hash_table h ;
+    union gen_chunk *p ;
 } gen_chunk, *gen_chunkp, chunk /* obsolete */;
 
 #define gen_chunk_undefined ((gen_chunk *)(-16))
