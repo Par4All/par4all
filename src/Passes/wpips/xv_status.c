@@ -94,6 +94,31 @@ show_module()
 
 
 void
+wpips_interrupt_button_blink()
+{
+   if ((Server_image) xv_get(status_window_pips_image, PANEL_LABEL_IMAGE) ==
+       wpips_negative_server_image)
+      xv_set(status_window_pips_image,
+             PANEL_LABEL_IMAGE, wpips_positive_server_image,
+             NULL);
+   else
+      xv_set(status_window_pips_image,
+             PANEL_LABEL_IMAGE, wpips_negative_server_image,
+             NULL);
+      
+}
+
+
+void
+wpips_interrupt_button_restore()
+{
+   xv_set(status_window_pips_image,
+          PANEL_LABEL_IMAGE, wpips_positive_server_image,
+          NULL);
+}
+
+
+void
 show_message(string message_buffer /*, ...*/)
 {
    /* va_list some_arguments;
