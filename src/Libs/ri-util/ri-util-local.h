@@ -326,7 +326,7 @@ typedef hash_table control_mapping;
 #define instruction_to_statement(i) \
    make_statement(entity_empty_label(),\
 		  STATEMENT_NUMBER_UNDEFINED, STATEMENT_ORDERING_UNDEFINED,\
-		  "", i)
+		  empty_comments, i)
 
 #define loop_to_instruction(l) make_instruction(is_instruction_loop, l)
 #define test_to_instruction(t) make_instruction(is_instruction_test, t)
