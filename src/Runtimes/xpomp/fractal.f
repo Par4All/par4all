@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/08/31 18:18:07 $, 
+! $Date: 1996/08/31 18:29:18 $, 
 !
       program fractal
 
@@ -76,7 +76,7 @@
  10   continue
 
 ! Compute a fractal image:
-!fcd$ time
+!!!fcd$ time
 !hpf$ independent, new(cr,ci,zr,zi,d,zrp)
       do x = 0, x_size - 1
          cr = xcenter + (x - x_size/2)*zoom/x_size
@@ -96,7 +96,7 @@
             image(x, y) = CHAR(k)
          enddo
       enddo
-!fcd$ end time ('Computation of one image')
+!!!fcd$ end time ('Computation of one image')
 
 ! Display the image:
       call xpomp_flash(display, image, x_size, y_size, 
