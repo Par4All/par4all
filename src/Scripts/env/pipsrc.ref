@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1994/06/07 11:55:52 $, ) version $Revision$, 
+# $RCSfile: pipsrc.ref,v $ ($Date: 1994/06/07 14:46:38 $, ) version $Revision$, 
 # got on %D%, %T%
 # $Id$
 #
@@ -147,3 +147,17 @@ PIPS_CURRENT_PROGRAM=".pipsprogram"
 # To start wpips without problem
 # xhost +`hostname`
 
+#
+# HPFC environment variables 
+#
+
+HPFC_DIR=$DEVEDIR/Lib/hpfc
+
+HPFC_INCLUDE=$EXTEDIR
+HPFC_LIBS=$EXTEDIR
+HPFC_TOOLS=$UTILDIR
+HPFC_EXPERIMENTS=$TMPDIR
+
+#
+# that is all
+#
