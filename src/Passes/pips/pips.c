@@ -31,13 +31,14 @@ extern void (*pips_warning_handler)();
 extern void set_bool_property();
 
 char *usage = 
-	"Usage: %s [-f F]* [-m M] [-s S]* [-p P] [-b B] [-(0|1) T]* wspace\n"
-	"\t-f F: source file F\n"
-	"\t-m M: module M\n"
-	"\t-s S: select rule S\n"
-	"\t-p P: perform rule P\n"
-	"\t-b B: build resource B\n"
-	"\t-(0|1) T: set boolean property T to FALSE or TRUE\n" ;
+  "Usage: %s [-v] [-f F]* [-m M] [-s S]* [-p P] [-b B] [-(0|1) T]* wspace\n"
+  "\t-v: pips version (which pips/ARCH)\n"
+  "\t-f F: source file F\n"
+  "\t-m M: module M\n"
+  "\t-s S: select rule S\n"
+  "\t-p P: perform rule P\n"
+  "\t-b B: build resource B\n"
+  "\t-(0|1) T: set boolean property T to FALSE or TRUE\n" ;
 
 static char *wspace = NULL;
 static char *module = NULL;
@@ -54,33 +55,31 @@ char * argv[];
     extern char *optarg;
     extern int optind;
 
-    if (argc < 2) {
-	fprintf(stderr, usage, argv[0]);
-	exit(1);
-    }
-
-    while ((c = getopt(argc, argv, "f:m:s:p:b:1:0:")) != -1)
+    while ((c = getopt(argc, argv, "vf:m:s:p:b:1:0:")) != -1)
 	switch (c) {
+	case 'v':
+	    fprintf(stderr, "pips: (ARCH=%s) %s\n", PIPS_ARCH, argv[0]);
+	    break;
 	case 'f':
-	    source_files= gen_nconc(source_files, 
-				    CONS(STRING, optarg, NIL));
+	    source_files = 
+		gen_nconc(source_files, CONS(STRING, optarg, NIL));
 	    break;
 	case 'm':
 	    module= optarg;
 	    break;
 	case 's':
-	    selected_rules= gen_nconc(selected_rules, 
-				      CONS(STRING, optarg, NIL));
+	    selected_rules = 
+		gen_nconc(selected_rules, CONS(STRING, optarg, NIL));
 	    break;
 	case 'p':
-	    performed_rule= optarg;
+	    performed_rule = optarg;
 	    break;
 	case 'b':
-	    build_resource_names = gen_nconc(build_resource_names,
-					     CONS(STRING, optarg, NIL));
+	    build_resource_names = 
+		gen_nconc(build_resource_names, CONS(STRING, optarg, NIL));
 	    break;
-	/*
-	 * next two added to deal with boolean properties directly
+
+	/* next two added to deal with boolean properties directly
 	 * FC, 27/03/95
 	 */
 	case '1':
@@ -95,6 +94,11 @@ char * argv[];
 	    ;
 	}
     
+    if (argc < 2) {
+	fprintf(stderr, usage, argv[0]);
+	exit(1);
+    }
+
     if (argc != optind + 1) {
 	user_warning("pips_parse_argument", 
 		     ((argc < (optind + 1)) ?
