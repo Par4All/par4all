@@ -24,19 +24,27 @@ MACROS	=	makefile_macros.. \
 		makefile_macros.GNULL \
 		makefile_macros.GNUSOL2LL
 
-FILES	=	forward_gnu_makefile \
-		$(MACROS)
-
 COPY	=	cp -f
+
+INSTALL_UTL=	$(SCRIPTS)
+INSTALL_INC=	$(MACROS)
+
+SOURCES	=	$(SCRIPTS) $(MACROS) forward_gnu_makefile config.makefile
 
 quick-install: install_forward_makefiles install_macros
 
 install_macros:
-	$(COPY) $(MACROS) $(PIPS_INCLUDEDIR)
+	#
+	# installing makefile macros for pips/newgen/linear
+	#
+	# $(COPY) $(MACROS) $(PIPS_INCLUDEDIR)
 	$(COPY) $(MACROS) $(NEWGEN_INCLUDEDIR)
 	$(COPY) $(MACROS) $(LINEAR_INCLUDEDIR)
 
 install_forward_makefiles: 
+	# 
+	# copying directory makefiles where required (and usefull)
+	#
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Lib/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Passes/Makefile
