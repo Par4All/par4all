@@ -1,14 +1,12 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/07 13:32:07 $, 
+ * $Date: 1996/08/07 13:34:56 $, 
  */
 
-/* test du simplex : ce test s'appelle par :
- *  programme fichier1.data fichier2.data ... fichiern.data
- * ou bien : programme<fichier.data
- * Si on compile grace a` "make sim" dans le directory
- *  /home/users/pips/C3/Linear/Development/polyedre.dir/test.dir
+/* test du simplex : 
+ * Si on compile grace a` "make simp" dans le repertoire
+ * /projects/C3/Linear/Development/polyedre/Tests
  * alors on peut tester l'execution dans le meme directory
- * en faisant : tests|more
+ * en faisant : make test_simp
  */
 
 #include <stdio.h>
@@ -352,6 +350,8 @@ static int NB_INEQ = 0;
 
 /* multiplies two Values of no arithmetic overflow, or throw exception.
  * this version is local to the simplex. 
+ * note that under some defined macros value_mult can expand to 
+ * value_protected_mult, which would be ok.
  */
 #undef value_protected_mult
 #define value_protected_mult(v,w) \
