@@ -150,6 +150,14 @@ void my_print(text t)
 }
 
 /***************written by Dat********************/
+static bool precedence_p = TRUE;
+static sentence 
+sentence_tail(void)
+{
+  return MAKE_ONE_WORD_SENTENCE(0, "END");
+}
+
+
 text my_text_named_module(entity module, statement stat)
 {
     text r = make_text(NIL);
@@ -165,7 +173,7 @@ text my_text_named_module(entity module, statement stat)
     if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
 	set_last_statement(stat);
 
-    /*precedence_p = !get_bool_property("PRETTYPRINT_ALL_PARENTHESES");*/
+    precedence_p = !get_bool_property("PRETTYPRINT_ALL_PARENTHESES");
 
     if (!same_string_p(s, ""))
         ADD_SENTENCE_TO_TEXT(r, 
