@@ -18,6 +18,7 @@
 #include "parser_private.h"
 
 #include "c_syntax.h"
+#include "syntax.h"
 
 #include "resources.h"
 #include "database.h"
@@ -26,7 +27,7 @@
 #include "misc.h"
 #include "pipsdbm.h"
 #include "text-util.h"
-#include "instrumentation.h"
+#include "properties.h"
 
 /* To avoid warnings */
 extern char *strdup(const char *s1);
@@ -35,7 +36,7 @@ extern statement ModuleStatement;
 
 stack BlockStack; /* BlockStack is used to handle block scope */
 
-list LabelledStatements; /* list of labelled statements of the current module*/
+list LabeledStatements; /* list of labeled statements of the current module*/
 
 stack SwitchGotoStack = stack_undefined;
 stack SwitchControllerStack = stack_undefined; 
@@ -53,7 +54,7 @@ void MakeCurrentModule(entity e)
   pips_debug(4,"Set current module entity %s\n",entity_user_name(e));
   set_current_module_entity(e);
   init_c_areas(); 
-  LabelledStatements = NIL;
+  LabeledStatements = NIL;
   SwitchGotoStack = stack_make(sequence_domain,0,0);
   SwitchControllerStack = stack_make(expression_domain,0,0);
   LoopStack = stack_make(basic_domain,0,0);
@@ -95,11 +96,11 @@ statement FindStatementFromLabel(entity l)
   {
     if (statement_label(s) == l)
       return s;
-  },LabelledStatements);
+  },LabeledStatements);
   return statement_undefined;
 }
 
-statement MakeLabelledStatement(string label, statement s)
+statement MakeLabeledStatement(string label, statement s)
 {
   entity l = MakeCLabel(label);
   statement smt = FindStatementFromLabel(l);
@@ -111,7 +112,7 @@ statement MakeLabelledStatement(string label, statement s)
 			 string_undefined, 
 			 statement_instruction(s),
 			 NIL,string_undefined);
-      LabelledStatements = CONS(STATEMENT,st,LabelledStatements);
+      LabeledStatements = CONS(STATEMENT,st,LabeledStatements);
     }
   else 
     {
@@ -137,7 +138,7 @@ statement MakeGotoStatement(string label)
 			 STATEMENT_ORDERING_UNDEFINED,
 			 empty_comments, 
 			 make_continue_instruction(),NIL,NULL);
-      LabelledStatements = CONS(STATEMENT,s,LabelledStatements);
+      LabeledStatements = CONS(STATEMENT,s,LabeledStatements);
     }
   return instruction_to_statement(make_instruction(is_instruction_goto,s));
 }
@@ -173,7 +174,7 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
   if (!statement_undefined_p(s1))
     {
       /* This loop has a continue statement which has been transformed to goto 
-	 Add the labelled statement at the end of loop body*/
+	 Add the labeled statement at the end of loop body*/
       insert_statement(s,s1,FALSE);
     }
   w  = make_whileloop(MakeCommaExpression(lexp),
@@ -183,7 +184,7 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
   if (!statement_undefined_p(s2))
     {
       /* This loop has a break statement which has been transformed to goto 
-	 Add the labelled statement after the loop */
+	 Add the labeled statement after the loop */
       insert_statement(smt,s2,FALSE);
     }
   pips_assert("While loop is consistent",whileloop_consistent_p(w));
@@ -207,7 +208,7 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
   if (!statement_undefined_p(s1))
     {
       /* This loop has a continue statement which has been transformed to goto 
-	 Add the labelled statement at the end of loop body*/
+	 Add the labeled statement at the end of loop body*/
       insert_statement(s,s1,FALSE);
     }
   f = make_forloop(e1,e2,e3,s);
@@ -215,7 +216,7 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
   if (!statement_undefined_p(s2))
     {
       /* This loop has a break statement which has been transformed to goto 
-	 Add the labelled statement after the loop */
+	 Add the labeled statement after the loop */
       insert_statement(smt,s2,FALSE);
     }
   pips_assert("For loop is consistent",forloop_consistent_p(f));
@@ -279,8 +280,8 @@ statement MakeSwitchStatement(statement s)
 
   if (!statement_undefined_p(smt))
     {
-      /* This switch has a break statement which has been tranformed to goto 
-	 Add the labelled statement after the switch */
+      /* This switch has a break statement which has been transformed to goto 
+	 Add the labeled statement after the switch */
       insert_statement(s,smt,FALSE);
     }  
   pips_assert("Switch is consistent",statement_consistent_p(s));
@@ -294,7 +295,7 @@ statement MakeSwitchStatement(statement s)
 
 statement MakeCaseStatement(expression e)
 {
-  /* Tranform 
+  /* Transform 
          case e: 
      to
          switch_xxx_case_e: ;
@@ -305,7 +306,7 @@ statement MakeCaseStatement(expression e)
   int i = basic_int((basic) stack_head(LoopStack));
   string lab = strdup(concatenate("switch_",int_to_string(i),
 				  "_case_",words_to_string(words_expression(e)),NULL));
-  statement s = MakeLabelledStatement(lab,make_continue_statement(entity_empty_label()));
+  statement s = MakeLabeledStatement(lab,make_continue_statement(entity_empty_label()));
   expression cond = eq_expression(stack_head(SwitchControllerStack),e);
   test t = make_test(cond,MakeGotoStatement(lab),make_continue_statement(entity_undefined));
   sequence CurrentSwitchGotoStack = stack_head(SwitchGotoStack);
@@ -316,14 +317,14 @@ statement MakeCaseStatement(expression e)
 
 statement MakeDefaultStatement()
 {
-  /* Return the labelled statement 
+  /* Return the labeled statement 
        switch_xxx_default: ; 
      and add 
        goto switch_xxx_default;
      to the switch header */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab = strdup(concatenate("switch_",int_to_string(i),"_default",NULL));
-  statement s = MakeLabelledStatement(lab,make_continue_statement(entity_empty_label()));
+  statement s = MakeLabeledStatement(lab,make_continue_statement(entity_empty_label()));
   sequence CurrentSwitchGoto = stack_head(SwitchGotoStack);
   sequence_statements(CurrentSwitchGoto) = gen_nconc(sequence_statements(CurrentSwitchGoto),
 							       CONS(STATEMENT,MakeGotoStatement(lab),NULL));
