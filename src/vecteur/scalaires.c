@@ -110,7 +110,7 @@ Value x;
 	vect_chg_sgn(v);
     else
 	for(coord = v; coord!=NULL; coord=coord->succ) 
-	    value_prod(val_of(coord), x);
+	    value_product(val_of(coord), x);
 
     return v;
 }
@@ -125,5 +125,5 @@ void vect_chg_sgn(v)
 Pvecteur v;
 {
     for( ;v != NULL; v = v->succ)
-	value_inv(val_of(v));
+	value_oppose(val_of(v));
 }
