@@ -263,44 +263,45 @@ static bool loop_executed_once_p(statement s, loop l)
   /* Vire aussi pv3 & pc3 : */
   sc_rm(ps);
 
-  if ((m3_positif ^ m3_negatif)
-      && normalized_linear_p(n_m1) && normalized_linear_p(n_m2)) {
+  if ((m3_positif ^ m3_negatif) && normalized_linear_p(n_m3)
+      && normalized_linear_p(n_m1) && normalized_linear_p(n_m2))
+  {
     /* Si l'incrément a un signe « connu » et différent de 0 et que
        les bornes sont connues : */
-    Pcontrainte pcA, pcB;
-    Pvecteur pv1, pv2, pv, pv_inc_moins_1;
+    Pvecteur pv1, pv2, pv3, pvx, pv;
 
     ps = sc_dup(precondition_ps);
-    pv1 = vect_dup(normalized_linear(n_m1));
-    pv2 = vect_dup(normalized_linear(n_m2));
-    pv_inc_moins_1 = vect_dup(normalized_linear(n_m3));
+    pv1 = normalized_linear(n_m1);
+    pv2 = normalized_linear(n_m2);
+    pv3 = normalized_linear(n_m3);
     
-    /* pv = m2 - m1 */
-    (void) vect_chg_sgn(pv1);
-    pv = vect_add(pv1,pv2);
-    /* m2 - m1 <= 0 */
-    pcA = contrainte_make(pv);
+    /* pv = m1 - m2 */
+    pv = vect_substract(pv1, pv2);
 
-    vect_add_elem(&pv_inc_moins_1, TCST, -1);
-    /* pv_inc_moins_1 = 1 - m3 */
-    (void) vect_chg_sgn(pv_inc_moins_1);
+    /* pv = m1 - m2 + m3 */
+    pvx = vect_add(pv, pv3);
 
-    /* pv = m2 - m1 - m3 <= -1 */
-    pcB = contrainte_make(vect_add(pv, pv_inc_moins_1));
-
-    if (m3_positif > 0) {
+    if (m3_positif) {
       /* L'incrément est positif. */
-      (void) vect_chg_sgn(contrainte_vecteur(pcA));
+       (void) vect_chg_sgn(pvx);
       /* m1 - m2 <= 0 && m2 - m1 - m3 <= -1 */
     }
-    else {
-      (void) vect_chg_sgn(contrainte_vecteur(pcB));
-      /* m2 - m1 >= 0 && -m2 + m1 + m3 <= 1 */
+
+    if (m3_negatif) {
+      (void) vect_chg_sgn(pv);
+      /* m2 - m1 >= 0 && -m2 + m1 + m3 <= -1 */
     }
-    sc_add_ineg(ps, pcB);
-    sc_add_ineg(ps, pcA);
+
+    vect_add_elem(&pvx, TCST, VALUE_ONE);
+
+    sc_add_ineg(ps, contrainte_make(pvx));
+    sc_add_ineg(ps, contrainte_make(pv));
+
+    /* ??? on overflows, should assume FALSE...
+     */
     retour = sc_faisabilite(ps);
-    if (get_debug_level() > 2) {
+
+    ifdebug(2) {
       sc_fprint(stderr, ps, entity_local_name);
       print_statement(s);
       pips_debug(2, "boucle exécutée une seule fois = %d\n\n", retour);
@@ -308,7 +309,7 @@ static bool loop_executed_once_p(statement s, loop l)
             vect_fprint(stderr, normalized_linear(n_m1)); */
     }
 
-    /* Vire du même coup pv, pv1, pv2, pv_inc_moins_1, pcA & pcB : */
+    /* Vire du même coup pv et pvx : */
     sc_rm(ps);
    }
 
