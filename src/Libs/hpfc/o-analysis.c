@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1996/07/23 15:08:30 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1996/11/19 18:36:46 $, )
  * version $Revision$
  */
 
@@ -42,6 +42,12 @@ static bool simple_indices_p(reference r)
     entity array = reference_variable(r);
     int	dim = 1;
 
+    ifdebug(6) {
+	pips_debug(6, "considering reference: ");
+	print_reference(r);
+	fprintf(stderr,"\n");
+    }
+
     MAP(EXPRESSION, e,
      {
 	 normalized  n = expression_normalized(e); 
@@ -57,26 +63,29 @@ static bool simple_indices_p(reference r)
 	 if (normalized_complex_p(n)) 
 	     /* cannot decide, so it is supposed to be FALSE */
 	 {
-	     debug(7, "simple_indices_p",
-		   "returning FALSE (complex) for ref to %s, dim %d\n",
-		   entity_name(reference_variable(r)), dim);
-	     return(FALSE); 
+	     pips_debug(7, "returning FALSE (complex)\n");
+	     return FALSE; 
 	 }
 	 else
 	 {
 	     Pvecteur v = (Pvecteur) normalized_linear(n);
 	     int s = vect_size(v);
 	     
-	     if (s>1) return(FALSE);
+	     if (s>1) 
+	     {
+		 ifdebug(7) {
+		     pips_debug(7, "returning FALSE, vect size %d>1\n", s);
+		     vect_debug(v);
+		 }
+		 return FALSE;
+	     }
 	     
 	     if ((s==1) && 
 		 (!entity_loop_index_p((entity)v->var)) &&
 		 (value_zero_p(vect_coeff(TCST, v))))
 	     {
-		 debug(7, "simple_indices_p",
-		   "returning FALSE (not simple) for ref to %s, dim %d\n",
-		   entity_name(reference_variable(r)), dim);
-		 return(FALSE);
+		 pips_debug(7, "returning FALSE (not simple)\n");
+		 return FALSE;
 	     }
 	     else
 	     if (entity_loop_index_p((entity)v->var))
@@ -90,9 +99,7 @@ static bool simple_indices_p(reference r)
 
 		 if (rate!=0 && rate!=1)
 		 {
-		     debug(7, "simple_indices_p",
-			   "returning FALSE (stride) for %s, dim %d\n",
-			   entity_name(reference_variable(r)), dim);
+		     pips_debug(7, "returning FALSE (stride)\n");
 		     return(FALSE);
 		 }
 	     }
@@ -103,10 +110,8 @@ static bool simple_indices_p(reference r)
      },
 	 reference_indices(r));
     
-    debug(7, "simple_indices_p",
-	  "returning TRUE for reference to %s\n",
-	  entity_name(reference_variable(r)));
-    return(TRUE);
+    pips_debug(7, "returning TRUE!\n");
+    return TRUE;
 }
 
 /* true if references are aligned or, for constants, on the same processor...
@@ -857,7 +862,8 @@ generate_optimized_code_for_loop_nest(
 /* must clear everything before returning in Overlap_Analysis...
  */
 #define RETURN(x) \
-{ gen_free_list(Wa); gen_free_list(lWa); gen_free_list(Ra);\
+{ pips_debug(9, "returning %d from line %d\n", x, __LINE__);\
+  gen_free_list(Wa); gen_free_list(lWa); gen_free_list(Ra);\
   gen_free_list(lRa); gen_free_list(Ro); gen_free_list(lRo);\
   gen_free_list(Rrt); gen_free_list(lblocks); gen_free_list(lloop);\
   gen_free_list(W); gen_free_list(R); gen_free_list(lw); gen_free_list(lr);\
@@ -905,6 +911,8 @@ statement stat, *pstat;
     },
 	lw);
 
+    pips_debug(9, "choosing computer\n");
+
     if (W) /* ok distributed variable written ! */
     {
 	the_computer_syntax = choose_one_syntax_in_references_list(&W);
@@ -934,7 +942,7 @@ statement stat, *pstat;
 	    Ra = CONS(SYNTAX, the_computer_syntax, NIL);
 	}
 	else
-	    RETURN(FALSE);       
+	    RETURN(FALSE); 
     }
 
     if (!align_check(the_computer_reference,
@@ -947,6 +955,8 @@ statement stat, *pstat;
     else
 	lRa = CONS(CONSP, CONS(CONSP, lkind,
 			  CONS(CONSP, lvect, NIL)), NIL);
+
+    pips_debug(9, "checking alignments\n");
 
     MAP(SYNTAX, s,
     {
