@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 2003/07/31 07:14:59 $, 
+ * $Date: 2003/09/08 09:43:43 $, 
  */
 
 #include <stdio.h>
@@ -39,7 +39,7 @@ Pcontrainte ineq;
   Pcontrainte ineg;
   boolean result = FALSE;  
  
-  if (CONTRAINTE_NULLE_P(ineq)) {return FALSE;}//nothing to test
+  if (CONTRAINTE_NULLE_P(ineq)) {return FALSE;}/*nothing to test*/
   ps = sc_copy(sc);
   ineg = contrainte_copy(ineq);
     
@@ -222,7 +222,7 @@ Psysteme *ps;
   if (!sc_rn_p(*ps) && !sc_empty_p(*ps))
     {
       Pbase b = base_copy(sc_base(*ps));
-      //  *ps = sc_sort_constraints_simplest_first(*ps, b);
+      /*  *ps = sc_sort_constraints_simplest_first(*ps, b); see version 1.16*/
       build_sc_nredund_1pass(ps);
       if (*ps == SC_EMPTY)
 	*ps = sc_empty(b);
@@ -389,7 +389,7 @@ int *rank_max;
  * because an integer constraint negation is used.
  *
  * Modifs: 
- *  - change _dup to _copy.DN
+ *  - change _dup to _copy.
  *  - the parameters of contrainte_dup, _copy, _reverse are not changed like base_dup, so it's ok.
  */
 
