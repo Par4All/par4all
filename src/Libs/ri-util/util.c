@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/14 13:38:42 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/10 19:44:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/14 13:38:42 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/10/10 19:44:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 char * vcid_ri_util_util_c=vcid;
 #endif /* lint */
 
@@ -66,7 +66,8 @@ string s;
     strncpy(local, s, MAXIMAL_MODULE_NAME_SIZE);
     local[MAXIMAL_MODULE_NAME_SIZE] = 0;
     if ((p_sep = strchr(local, MODULE_SEP)) == NULL) 
-	pips_error("module_name", "module name too long for %s\n", s);
+	pips_error("module_name", 
+		   "module name too long, or illegal: \"%s\"\n", s);
     else
 	*p_sep = '\0';
     return(local);
