@@ -238,6 +238,7 @@ static void db_clean_db_resources()
 {
   list lr = NIL, lo = NIL, lo_init = NIL, lr_init = NIL;
 
+  /* scan */
   DB_RESOURCES_MAP(os, or,
   {
     DB_OWNED_RESOURCES_MAP(rs, r,
@@ -248,7 +249,17 @@ static void db_clean_db_resources()
 
       if (db_resource_required_p(r))
       {
+	pips_debug(1, "resource %s[%s] in state required...", rn, on);
 	/* to be deleted later on */
+	lr = CONS(STRING, rn, lr);
+	lo = CONS(STRING, on, lo);
+      }
+      /* also if the file vanished...
+       * maybe on checkpoints where obsolete resources are not removed...
+       */
+      else if (dbll_stat_resource_file(rn, on, TRUE)==0)
+      {
+	pips_debug(1, "resource %s[%s] file vanished! (checkpoint?)", rn, on);
 	lr = CONS(STRING, rn, lr);
 	lo = CONS(STRING, on, lo);
       }
@@ -263,6 +274,7 @@ static void db_clean_db_resources()
       },
 		   get_pips_database());
 
+  /* delete */
   for (; lr && lo; lr = CDR(lr), lo = CDR(lo))
   {
     string rn = STRING(CAR(lr)), on = STRING(CAR(lo));
