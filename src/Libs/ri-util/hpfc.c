@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc.c,v $ (version $Revision$)
- * $Date: 1996/04/17 17:19:23 $, 
+ * $Date: 1996/04/17 17:35:43 $, 
  *
  * functions to test hpfc-related special entities. needed by syntax.
  * moved here from hpfc to break a cyclic dependence hpfc -> syntax.
@@ -43,6 +43,12 @@ bool redistribute_directive_p(entity f)
 {
     return top_level_entity_p(f) && 
 	same_string_p(HPF_PREFIX REDISTRIBUTE_SUFFIX, entity_local_name(f));
+}
+
+bool dead_fcd_directive_p(entity f)
+{
+    return top_level_entity_p(f) && 
+	same_string_p(HPF_PREFIX DEAD_SUFFIX, entity_local_name(f));
 }
 
 bool fcd_directive_string_p(string s)
