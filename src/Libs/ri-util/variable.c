@@ -178,16 +178,13 @@ string name;
 string module_name;
 tag base;
 {
-    entity 
-	e = entity_undefined;
-    string 
-	nom = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
+    entity e = entity_undefined;
+    string nom = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
 
     if ((e = gen_find_tabulated(nom, entity_domain)) != entity_undefined) 
     {
 	pips_assert("find_or_create_scalar_entity",
-		    (entity_scalar_p(e) && 
-		     entity_basic_p(e, base)));
+		    (entity_scalar_p(e) && entity_basic_p(e, base)));
 
 	return(e);
     }
@@ -195,6 +192,24 @@ tag base;
     return(make_scalar_entity(name, module_name, MakeBasic(base)));
 }
 
+entity 
+find_or_create_typed_entity(
+   string name,
+   string module_name,
+   tag base)
+{
+    entity e = entity_undefined;
+    string nom = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
+
+    if ((e = gen_find_tabulated(nom, entity_domain)) != entity_undefined) 
+    {
+	pips_assert("type is okay", entity_basic_p(e, base));
+
+	return(e);
+    }
+
+    return(make_scalar_entity(name, module_name, MakeBasic(base)));
+}
 
 entity make_scalar_integer_entity(name, module_name)
 char *name;
