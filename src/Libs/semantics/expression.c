@@ -4,6 +4,14 @@
   * $Id$
   *
   * $Log: expression.c,v $
+  * Revision 1.4  2001/07/24 13:16:53  irigoin
+  * Set of modifications:
+  *  1. side effect analysis moved into transformer library
+  *  2. bug fix for handling double or single quotes around character strings
+  *  3. test on integer type removed to handle more general tests
+  *  4. bug fix in handling side effects in test conditions
+  *  5. new handling of EQ and NEQ with LT and GT.
+  *
   * Revision 1.3  2001/07/19 17:54:31  irigoin
   * Lots of additional reformatting with an indentation factor of two instead
   * of four
@@ -197,37 +205,7 @@ static transformer addition_operation_to_transformer(entity v,
 
   pips_debug(9, "Begin officialy... but a lot has been done already!\n");
 
-  /* Intersection is not powerful enough to cope with side effects. But
-     side effects can be dealt with only if the operation order is known
-     when the standard is violated. We assume here a right to left evaluation. */
-  if(transformer_safe_affect_transformer_p(tf1, tf2)) {
-    pips_debug(9, "Side effects of tf2 on tf1\n");
-    pips_user_warning("Non standard compliant code: side effect in part\n"
-		      "of an expression affect variables used in a later part\n");
-    tf12 = transformer_combine(tf1, tf2);
-  }
-  else if (transformer_safe_affect_transformer_p(tf2, tf1)){
-    pips_debug(9, "Side effects of tf2 on tf1\n");
-    pips_user_warning("Non standard compliant code: side effect in part\n"
-		      "of an expression affect variables used in an earlier part\n");
-    tf12 = transformer_combine(tf1, tf2);
-  }
-  else {
-    pips_debug(9, "No adversary side effects\n");
-    if(transformer_undefined_p(tf1)
-       || transformer_undefined_p(tf2)
-       || (ENDP(transformer_arguments(tf1)) && ENDP(transformer_arguments(tf2)))) {
-      /* No side effects at all */
-      pips_debug(9, "No side effects at all\n");
-      tf12 = transformer_safe_intersection(tf1, tf2);
-      free_transformer(tf1);
-    }
-    else {
-    pips_debug(9, "Side effects on other variables\n");
-      tf12 = transformer_combine(tf1, tf2);
-    }
-  }
-
+  tf12 = transformer_safe_combine_with_warnings(tf1, tf2);
   tf = transformer_safe_image_intersection(tf12, tf_op);
 
   /*
@@ -288,7 +266,8 @@ static transformer constant_to_transformer(entity v,
 	    entity f1 = entity_undefined;
 
 	    n = strncpy(n, module_local_name(f), llhs+1);
-	    *(n+llhs+1) = '"';
+	    *(n+llhs+1) = *n;
+	    pips_assert("A simple or a double quote is used", *n=='"' || *n=='\'');
 	    *(n+llhs+2) = 0;
 	    f1 = make_constant_entity(n, is_basic_string, llhs);
 	    tf = simple_equality_to_transformer(v, f1, FALSE);
@@ -513,21 +492,8 @@ transformer_add_call_condition_information_updown(
   }
 
   if(ENTITY_RELATIONAL_OPERATOR_P(op)) {
-    cons * ef1 = expression_to_proper_effects(c1);
-    cons * ef2 = expression_to_proper_effects(c2);
-	
-    if(integer_scalar_read_effects_p(ef1) && integer_scalar_read_effects_p(ef2)) {
-      newpre = transformer_add_integer_relation_information(pre, op, c1, c2, 
-							    veracity, upwards);
-    }
-    else {
       newpre = transformer_add_any_relation_information(pre, op, c1, c2, 
-							veracity);
-    }
-
-    /* Help! I need a free_effects(ef) here */
-    //    free_effect(ef1);
-    //    free_effect(ef2);
+							veracity, upwards);
   }
   else if(ENTITY_AND_P(op)) {
     newpre = transformer_add_anded_conditions_updown
@@ -1476,6 +1442,7 @@ static transformer logical_binary_function_to_transformer(entity v,
 								 op,
 								 expr1,
 								 expr2,
+								 TRUE,
 								 TRUE);
 
       /* if the transformer is not feasible, return FALSE */
@@ -1743,12 +1710,23 @@ transformer transformer_add_any_relation_information(
 	entity op,
 	expression e1, 
 	expression e2, 
-	bool veracity)   /* the relation is true or not */
+	bool veracity,   /* the relation is true or not */
+	bool upwards)    /* compute transformer or precondition */
 {
   basic b1 = basic_of_expression(e1);
   basic b2 = basic_of_expression(e2);
+  transformer context = transformer_undefined;
 
-  pips_debug(8, "begin with pre=%p\n", pre);
+  pips_debug(8, "begin %s with pre=%p\n",
+	     upwards? "upwards" : "downwards", pre);
+
+  /* This is not satisfactory: when going upwards you might nevertheless
+     benefit from some precondition information. But you would then need
+     to pass two transformers as argument: a context transformer and a
+     to-be-modified transformer */
+
+  /* context = upwards? transformer_undefined : pre; */
+  context = pre;
 
   if(basic_tag(b1)==basic_tag(b2)) {
 
@@ -1768,19 +1746,58 @@ transformer transformer_add_any_relation_information(
            rel in pre! */
 	entity tmp1 = make_local_temporary_value_entity_with_basic(b1);
 	entity tmp2 = make_local_temporary_value_entity_with_basic(b2);
-	transformer tf1 = any_expression_to_transformer(tmp1, e1, pre, TRUE);
-	transformer tf2 = any_expression_to_transformer(tmp2, e2, pre, TRUE);
+	transformer tf1 = any_expression_to_transformer(tmp1, e1, context, TRUE);
+	transformer tf2 = any_expression_to_transformer(tmp2, e2, context, TRUE);
 	transformer rel = relation_to_transformer(op, tmp1, tmp2, veracity);
+	transformer cond = transformer_undefined;
+	transformer newpre = transformer_undefined;
 
-	/* Memory leak with successive pre values */
-	pre = transformer_safe_image_intersection(pre, tf1);
-	pre = transformer_safe_image_intersection(pre, tf2);
-	pre = transformer_safe_image_intersection(pre, rel);
+	/* tf1 disappears into cond */
+	cond = transformer_safe_combine_with_warnings(tf1, tf2);
+
+	if(transformer_undefined_p(rel) && !transformer_undefined_p(cond)) {
+	  /* try to break rel it into two convex components */
+	  if((ENTITY_NON_EQUAL_P(op) && veracity)
+	     || (ENTITY_EQUAL_P(op) && !veracity)) {
+	    entity lt = local_name_to_top_level_entity(LESS_THAN_OPERATOR_NAME);
+	    entity gt = local_name_to_top_level_entity(GREATER_THAN_OPERATOR_NAME);
+	    transformer rel1 = relation_to_transformer(lt, tmp1, tmp2, TRUE);
+	    transformer rel2 = relation_to_transformer(gt, tmp1, tmp2, TRUE);
+	    transformer full_cond1 = transformer_safe_image_intersection(cond, rel1);
+	    transformer full_cond2 = transformer_safe_image_intersection(cond, rel2);
+	    /* pre disappears into newpre2 */
+	    transformer newpre1 = transformer_combine(transformer_dup(pre), full_cond1);
+	    transformer newpre2 = transformer_combine(pre, full_cond2);
+
+	    free_transformer(rel1);
+	    free_transformer(rel2);
+
+	    newpre = transformer_convex_hull(newpre1, newpre2);
+
+	    free_transformer(full_cond1);
+	    free_transformer(full_cond2);
+	    free_transformer(newpre1);
+	    free_transformer(newpre2);
+	  }
+	}
+	else if (!transformer_undefined_p(cond)){
+	  transformer full_cond = transformer_safe_image_intersection(cond, rel);
+	  /* pre disappears into newpre */
+	  newpre = transformer_combine(pre, full_cond);
+	  free_transformer(full_cond);
+	}
+	else {
+	  /* newpre stays undefined or newpre is pre*/
+	  newpre = pre;
+	}
+
+	transformer_free(cond);
+	pre = newpre;
 
 	pips_assert("Pre is still consistent with tf1 and tf2 and rel",
 		    transformer_argument_consistency_p(pre));
 
-	free_transformer(tf1);
+	/* free_transformer(tf1); already gone */
 	free_transformer(tf2);
 	free_transformer(rel);
 	break;
