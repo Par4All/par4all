@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: eole_private.tex,v $
+%% Revision 1.4  1998/12/29 10:04:19  coelho
+%% hop...
+%%
 %% Revision 1.3  1998/12/29 09:46:59  zory
 %% nested sequence data structure
 %%
@@ -19,7 +22,7 @@
 \title{PIPS to EOLE data structures}
 \author{Julien Zory \and Fabien Coelho}
 \date{
-$Date: 1998/12/29 09:46:59 $
+$Date: 1998/12/29 10:04:19 $
 }
 
 \begin{document}
@@ -36,7 +39,7 @@ $Date: 1998/12/29 09:46:59 $
 
 \section{Nested sequence data structure}
 
-\domain{member = entity x ind:entity*}
-\domain{naryassign = lhs:member x oper:entity x rhs:member}
+\domain{function = op:entity x args:entity*}
+\domain{assignment = lhs:function x rhs:function}
 
 \end{document}
