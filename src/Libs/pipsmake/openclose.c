@@ -69,17 +69,17 @@ bool make_close_workspace()
 
 
     tmp_res = db_set_current_module_name(NULL);
-    if (tmp_res)
+    if (!tmp_res)
 	res = FALSE;
 
     name = db_get_current_workspace_name();
 
     tmp_res = close_makefile(name);
-    if (tmp_res)
+    if (!tmp_res)
 	res = FALSE;
 
     tmp_res = db_close_workspace();
-    if (tmp_res)
+    if (!tmp_res)
 	res = FALSE;
 
     user_log("Workspace %s closed\n\n", name);
