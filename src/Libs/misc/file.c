@@ -596,6 +596,8 @@ safe_link(char *topath, char *frompath)
     }
 }
 
+/* attempt shell substitutions to what. returns NULL on errors.
+ */
 char *
 safe_system_output(char * what)
 {
@@ -612,14 +614,18 @@ safe_system_output(char * what)
     result = safe_readfile(in);
 
     if (pclose(in)) {
+	/* on failures, do not stop it anyway...
+	 */
 	perror("[safe_system_output] ");
-	pips_internal_error("pclose failed: %s\n", what);
+	pips_user_warning("\n pclose failed: %s\n", what);
+	if (result) free(result), result = NULL;
     }
 
     return result;
 }
 
 /* returns what after variable, command and file substitutions.
+ * the returned string is newly allocated. it's NULL on errors.
  */
 char *
 safe_system_substitute(char * what)
