@@ -411,14 +411,12 @@ entity v;
     free_entity(v);
 }
 
-
-/* BEGIN_EOLE */ /* - please do not remove this line */
-/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
-   in the EOLE project (JZ - 11/98) */ 
-
 /* entity make_integer_constant_entity(int c)
  * make entity for integer constant c
  */
+
+/* WARNING : the basic integer size is fixed to sizeof(int) */
+
 entity 
 make_integer_constant_entity(c)
 int c;
@@ -447,152 +445,6 @@ int c;
 
     return(ce);
 }
-
-/* return a copy of a string <s> and replace all occurences of <c1> by
-   <c2> in the copy*/
-string 
-copy_and_replace_char_into_string(string s, char c1, char c2)
-{
-  string tmp = NULL;
-  string result = strdup(s);
-
-  tmp = strchr(result,c1);
-
-  while ( result && tmp ) {
-    // replace 
-    *tmp = c2;
-    // search next one 
-    tmp = strchr(tmp,c1);
-  } 
-
-  return result;
-}
-
-/** END_EOLE */
-
-/* convert a float value into a string with C-to-Fortran format
-   translation */
-static string 
-translate_float_from_C_to_Fortran(float c) 
-{
-  int test;
-  char buffer[100];
-  string result;
-
-  test = sprintf(buffer, "%g", c);
-  pips_assert("float to string translation", test);
-
-  /* C float conversion does not suit Fortran float format */
-  if (!strchr(buffer,'.') && !strchr(buffer,'e') && !strchr(buffer,'E'))
-    strcat(buffer,".");
-
-  result = copy_and_replace_char_into_string(buffer, 'e', 'E');
-
-  return result;
-}
-
-/** BEGIN_EOLE */ /* - please do not remove this line */
-/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
-   in the EOLE project (JZ - 11/98) */
-
-/* entity make_float_constant_entity(float c)
- * make entity for float constant c
- */
-entity 
-make_float_constant_entity(float c)
-{
-  entity ce;
-  string buffer;
-  string cn;
-  
-  // convert float into string (in Fortran format) 
-  buffer = translate_float_from_C_to_Fortran(c);
-
-  cn = strdup(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, buffer, NULL));
-  ce = gen_find_entity(cn);
-
-  if (ce==entity_undefined) {		/* make entity for the constant c */ 
-    functional cf = 
-      make_functional(NIL, 
-		      make_type(is_type_variable, 
-				make_variable(make_basic(is_basic_float,(void*)sizeof(float)),
-					      NIL)));
-    type ct = make_type(is_type_functional, cf);
-    ce = make_entity(cn, ct, MakeStorageRom(),
-		     make_value(is_value_constant, 
-				make_constant(is_constant_litteral, UU)));
-  }
-  else 
-    free(cn);
-  
-  free(buffer);
-
-  return ce;
-}
-
-/* END_EOLE */
-
-/* convert a double value into a string with C-to-Fortran format
-   translation */
-static string 
-translate_double_from_C_to_Fortran(double c) 
-{
-  int test;
-  char buffer[100];
-  string result;
-
-  test = sprintf(buffer,"%lg", c);
-  pips_assert("double to string translation", test);
-
-  /* C float conversion does not suit Fortran float format */ 
-  if (!strchr(buffer,'.') && !strchr(buffer,'e') && !strchr(buffer,'E'))
-    strcat(buffer,".");
-  
-  result = copy_and_replace_char_into_string(buffer, 'e', 'D');
-
-  printf (" result : %s \n", result);
-
-  return result;
-}
-
-
-/* entity make_double_constant_entity(double c)
- * make entity for double constant c
- */
-entity 
-make_double_constant_entity(double c)
-{
-  entity ce;
-  string buffer;
-  string cn;
-
-  // convert double into string (in Fortran format)   
-  buffer = translate_double_from_C_to_Fortran(c);
-
-  cn = strdup(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, buffer, NULL));
-  ce = gen_find_entity(cn);
-
-  if (ce==entity_undefined) {		/* make entity for the constant c */ 
-    functional cf = 
-      make_functional(NIL, 
-		      make_type(is_type_variable, 
-				make_variable(make_basic(is_basic_float,
-							 (void*)sizeof(double)),
-					      NIL)));
-    type ct = make_type(is_type_functional, cf);
-    ce = make_entity(cn, ct, MakeStorageRom(),
-		     make_value(is_value_constant, 
-				make_constant(is_constant_litteral, UU)));
-  }
-  else 
-    free(cn);
-  
-  free(buffer);
-
-  return ce;
-}
-
-
 
 /* 
  * This function computes the current offset of the area a passed as
