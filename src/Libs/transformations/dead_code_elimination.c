@@ -7,6 +7,9 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.22  2000/07/05 11:02:28  coelho
+  same branches special case handled.
+
   Revision 1.21  2000/07/05 08:46:16  coelho
   bug fixed:
   unstructured if with dead then or else... when branches where equal.
@@ -637,6 +640,21 @@ dead_recurse_unstructured(unstructured u)
 	      
 	    case nothing_about_test :
 	      pips_debug(3, "Nothing about this test...");
+
+	      /* same successor in both branches... remove one!
+	       * maybe unspaghettify should also be okay? it seems not.
+	       */
+	      if (true_control==false_control) 
+	      {
+		gen_remove_once(&control_successors(c), false_control);
+		gen_remove_once(&control_predecessors(false_control), c);
+		/* Replace the IF with nothing or its expression: */
+		remove_if_statement_according_to_write_effects
+		  (control_statement(c), TRUE /* unstructured if */);
+	      
+		some_unstructured_ifs_have_been_changed = TRUE;
+		dead_code_unstructured_if_false_branch_removed++;
+	      }
 	      break;
 	      
 	    default :
