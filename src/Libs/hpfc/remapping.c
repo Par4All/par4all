@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/12/20 08:50:05 $, ) 
+ * ($Date: 1995/12/27 11:57:55 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -14,12 +14,6 @@
 #include "conversion.h"
 #include "resources.h"
 #include "pipsdbm.h"
-
-/* for USAGE information
- */
-#include <sys/time.h>
-#include <sys/resource.h>
-extern int getrusage(int, struct rusage*); /* not found in any header! */
 
 /* linearize the processor arrangement on which array is distributed
  * or replicated (driven by distributed). The variables are those created 
@@ -754,58 +748,6 @@ generate_remapping_guard(
     return result;
 }
 
-
-/* to print the micros with leading and trailing 0s if needed
- */
-static char *
-string_micros(long micros)
-{
-    static char buffer[7];
-    int i;
-
-    sprintf(buffer, "%6ld", micros);
-
-    for (i=0; i<6; i++)
-	if (buffer[i]==' ') buffer[i]='0' ;
-
-    return buffer;
-}
-
-static void 
-print_rusage_delta(FILE * buffer,
-		   struct rusage *in, 
-		   struct rusage *out,
-		   char * format,
-		   ...)
-{
-    long u_seconds, u_micros, s_seconds, s_micros;
-
-    va_list args;
-    va_start(args, format);
-    if (buffer) vfprintf(buffer, format, args);
-    else user_log(format, args);
-    va_end(args);
-
-    u_seconds = out->ru_utime.tv_sec - in->ru_utime.tv_sec;
-    u_micros = out->ru_utime.tv_usec - in->ru_utime.tv_usec;
-    if (u_micros<0) u_seconds--, u_micros+=1000000;
-
-    s_seconds = out->ru_stime.tv_sec - in->ru_stime.tv_sec;
-    s_micros = out->ru_stime.tv_usec - in->ru_stime.tv_usec;
-    if (s_micros<0) s_seconds--, s_micros+=1000000;
-
-    if (buffer)
-    {
-        fprintf(buffer, "%ld.%suser ",  u_seconds, string_micros(u_micros));
-        fprintf(buffer, "%ld.%ssystem\n", s_seconds, string_micros(s_micros));
-    }
-    else
-    {
-        user_log("%ld.%suser ", u_seconds, string_micros(u_micros));
-        user_log("%ld.%ssystem\n", s_seconds, string_micros(s_micros));
-    }
-}
-
 /*  remaps src to trg.
  */
 static statement 
@@ -819,10 +761,9 @@ hpf_remapping(
     bool proc_distribution_p;
     list /* of entities */ l, lp, ll, lrm, ld, lo, left, scanners,
          /* of expressions */ lddc;
-    struct rusage start, stop;
     bool time_remapping = get_bool_property("HPFC_TIME_REMAPPINGS");
 
-    if (time_remapping) getrusage(RUSAGE_SELF, &start);
+    if (time_remapping) push_performance_spy();
 
     pips_debug(3, "%s -> %s\n", entity_name(src), entity_name(trg));
 
@@ -890,12 +831,11 @@ hpf_remapping(
 
     reset_information_for_code_optimizations();
     
-    if (time_remapping)
-    {
-	getrusage(RUSAGE_SELF, &stop);
-	print_rusage_delta((FILE*)NULL, &start, &stop, 
-	    "remapping %s -> %s: ", entity_name(src), entity_name(trg));
-    }
+    if (time_remapping) 
+	pop_performance_spy(stderr, 
+	concatenate("remapping ", 
+		    entity_name(src), " -> ",
+		    entity_name(trg), NULL));
 
     DEBUG_STAT(6, "result", s);
 
