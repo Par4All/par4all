@@ -482,6 +482,35 @@ bool db_module_exists_p(string name)
   return FALSE;
 }
 
+gen_array_t db_get_module_list_initial_order(void)
+{
+  list /* of db_symbol */ ls;
+  db_resources dbr;
+  gen_array_t a;
+
+  DB_OK;
+
+  /* the list returned is reversed... */
+  ls = gen_filter_tabulated(gen_true, db_symbol_domain);
+  a = gen_array_make(0);
+  dbr = get_pips_database();
+  
+  MAP(DB_SYMBOL, symbol, 
+  {
+    string name = db_symbol_name(symbol);
+
+    /* if it is a module, append... */
+    if (!string_undefined_p(name) &&
+	!same_string_p(name, "") && 
+	bound_db_resources_p(dbr, symbol))
+      gen_array_dupappend(a, name);
+  },
+      ls);
+
+  gen_free_list(ls);
+  return a;  
+}
+
 /* returns an allocated array a with the sorted list of modules. 
  * strings are duplicated.
  */
