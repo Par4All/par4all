@@ -4,6 +4,9 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.34  1998/04/11 13:14:16  coelho
+ * cr added.
+ *
  * Revision 1.33  1998/04/11 12:23:42  coelho
  * make based on gen_alloc on second thought.
  * forgotten special case of tabulated fixed.
@@ -603,7 +606,8 @@ void gencode(string file)
 	    "#include <stdio.h>\n"
 	    "#include <stdlib.h>\n"
 	    "#include \"genC.h\"\n"
-	    "#include \"%s.h\"\n",
+	    "#include \"%s.h\"\n"
+	    "\n",
 	    file);
 
     for (i=0; i<MAX_DOMAIN; i++)
