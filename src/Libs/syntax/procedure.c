@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.59  1999/05/11 12:27:24  irigoin
+ * Improved error message
+ *
  * Revision 1.58  1999/01/05 12:37:48  irigoin
  * MakeEntry() updated with a better warning when entry formal parameters are
  * illegally used
@@ -444,7 +447,8 @@ EndOfProcedure()
     /* Check the block stack */
     (void) PopBlock() ;
     if (!IsBlockStackEmpty())
-	    ParserError("EndOfProcedure", "bad program structure\n");
+	    ParserError("EndOfProcedure",
+			"bad program structure: missing ENDDO and/or ENDIF\n");
 
     /* are there undefined gotos ? */
     CheckAndInitializeStmt();
