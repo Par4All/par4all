@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.74  2003/06/17 13:51:35  coelho
+    hop.
+
     Revision 1.73  2003/06/17 13:51:07  nguyen
     new ri...
 
@@ -920,7 +923,7 @@ instruction i;
 }
 
 bool 
-instruction_return_p(i)
+instruction_is_return_p(i)
 instruction i;
 {
     return fortran_instruction_p(i, RETURN_FUNCTION_NAME);
