@@ -98,8 +98,7 @@ list *pl;
     expression
 	arg = EXPRESSION(CAR(call_arguments(c)));
 
-    pips_assert("reduction_parameters",
-		syntax_reference_p(expression_syntax(arg)));
+    assert(syntax_reference_p(expression_syntax(arg)));
 
     *pe   = reference_variable(syntax_reference(expression_syntax(arg)));
     *pl   = CDR(call_arguments(c));
@@ -113,7 +112,7 @@ int kind;
 {
     static char *reduction_names[] = {"MAX", "MIN", "SUM"};
 
-    pips_assert("reduction_name", (kind>=0) && (kind<3));
+    assert((kind>=0) && (kind<3));
 
     return(reduction_names[kind-1]);
 }
@@ -129,8 +128,7 @@ int ndim, kind;
 basic base;
 int nargs;
 {
-    char 
-	buffer[100];
+    char buffer[100];
 
     (void) sprintf(buffer, "%sRED_%d_%s_%s",
 		   prefix, ndim, pvm_what_options(base), reduction_name(kind));
@@ -168,25 +166,23 @@ statement initial, *phost, *pnode;
 	hostfunction = entity_undefined, 
 	nodefunction = entity_undefined;
 
-    pips_assert("compile_reduction",
-		(instruction_call_p(i) && 
-		 ENTITY_ASSIGN_P(call_function(instruction_call(i))) &&
-		 (gen_length(call_arguments(instruction_call(i)))==2)));
+    assert((instruction_call_p(i) && 
+	    ENTITY_ASSIGN_P(call_function(instruction_call(i))) &&
+	    (gen_length(call_arguments(instruction_call(i)))==2)));
 
     args = call_arguments(instruction_call(i));
     ref  = EXPRESSION(CAR(args));
     cll  = EXPRESSION(CAR(CDR(args)));
 
-    pips_assert("compile_reduction",
-		(syntax_reference_p(expression_syntax(ref)) &&
-		 syntax_call_p(expression_syntax(cll))));
+    assert((syntax_reference_p(expression_syntax(ref)) &&
+	    syntax_call_p(expression_syntax(cll))));
 
     reduction = syntax_call(expression_syntax(cll));
     
     debug(7, "compile_reduction", "call to %s\n",
 	  entity_name(call_function(reduction)));
 
-    pips_assert("compile_reduction", call_reduction_p(reduction));
+    assert(call_reduction_p(reduction));
 
     reduction_parameters(reduction, &red, &b, &dim, &array, &largs);
 
@@ -196,7 +192,6 @@ statement initial, *phost, *pnode;
      */
 
     if (!array_distributed_p(array) || 
-/*	array_replicated_p(array) || ??? (to be coded for every dimensions:-) */
 	(array_distributed_p
 	 (reference_variable(syntax_reference(expression_syntax(ref))))))
 	return(FALSE);
@@ -213,12 +208,8 @@ statement initial, *phost, *pnode;
 	    ((expression) gen_copy_tree(ref),
 	     make_call_expression
 	     (nodefunction,
-	      CONS(EXPRESSION,
-		   reference_to_expression
-		   (make_reference(array,
-				   array_lower_bounds_list(array))),
-	      CONS(EXPRESSION,
-		   int_to_expression(arraynum),
+	      CONS(EXPRESSION, entity_to_expression(array),
+	      CONS(EXPRESSION, int_to_expression(arraynum),
 		   gen_nconc(array_lower_upper_bounds_list(array),
 			     largs)))));
     
