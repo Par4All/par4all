@@ -118,6 +118,7 @@ typedef hash_table control_mapping;
 #define RETURN_LABEL_NAME 		"00000"
 
 #define IMPLIED_COMPLEX_NAME		"CMPLX_"
+#define IMPLIED_DCOMPLEX_NAME		"DCMPLX_"
 
 #define ASSIGN_OPERATOR_NAME 		"="
 #define PLUS_OPERATOR_NAME 		"+"
@@ -246,6 +247,7 @@ typedef hash_table control_mapping;
 #define ENTITY_FORMAT_P(e) ENTITY_NAME_P(e, "FORMAT")
 
 #define ENTITY_IMPLIED_CMPLX_P(e) ENTITY_NAME_P(e, IMPLIED_COMPLEX_NAME)
+#define ENTITY_IMPLIED_DCMPLX_P(e) ENTITY_NAME_P(e, IMPLIED_DCOMPLEX_NAME)
 
 #define ENTITY_FOUR_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
                                      ENTITY_MINUS_P(e) || \
