@@ -104,9 +104,7 @@ must_regions(char *module_name)
     return res1 && res2;
 }
 
-/*********************************************************************************/
-/* CONVEX IN REGIONS                                                             */
-/*********************************************************************************/
+/******************************************************** CONVEX IN REGIONS */
 
 
 /* bool in_summary_regions(char *module_name): 
@@ -148,9 +146,7 @@ in_regions(char *module_name)
 }
 
 
-/*********************************************************************************/
-/* CONVEX OUT REGIONS                                                            */
-/*********************************************************************************/
+/******************************************************* CONVEX OUT REGIONS */
 
 bool
 out_summary_regions(char * module_name)
@@ -179,9 +175,7 @@ out_regions(char *module_name)
 }
 
 
-/*********************************************************************************/
-/* PRETTYPRINT                                                                   */
-/*********************************************************************************/
+/************************************************************** PRETTYPRINT */
 
 bool
 print_code_proper_regions(char* module_name)
@@ -193,8 +187,9 @@ print_code_proper_regions(char* module_name)
 
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_PROPER_REGIONS,
 						      string_undefined,
@@ -213,8 +208,9 @@ print_source_proper_regions(char* module_name)
 
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_PROPER_REGIONS,
 						      string_undefined,
@@ -234,8 +230,9 @@ print_code_regions(char* module_name)
 
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_REGIONS,
 						      DBR_SUMMARY_REGIONS,
@@ -254,8 +251,9 @@ print_source_regions(char* module_name)
 
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
-    set_read_action_interpretation(READ_IS_READ);
-    set_write_action_interpretation(WRITE_IS_WRITE);
+
+    set_action_interpretation(ACTION_READ, ACTION_WRITE);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_REGIONS,
 						      DBR_SUMMARY_REGIONS,
@@ -274,8 +272,9 @@ print_code_in_regions(char* module_name)
 
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
-    set_read_action_interpretation(READ_IS_IN);
-    set_write_action_interpretation(WRITE_IS_OUT);
+
+    set_action_interpretation(ACTION_IN, ACTION_OUT);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_IN_REGIONS,
 						      DBR_IN_SUMMARY_REGIONS,
@@ -294,8 +293,9 @@ print_source_in_regions(char* module_name)
 
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
-    set_read_action_interpretation(READ_IS_IN);
-    set_write_action_interpretation(WRITE_IS_OUT);
+
+    set_action_interpretation(ACTION_IN, ACTION_OUT);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_IN_REGIONS,
 						      DBR_IN_SUMMARY_REGIONS,
@@ -314,8 +314,9 @@ print_code_out_regions(char* module_name)
 
     set_is_user_view_p(FALSE);
     set_prettyprint_with_attachments(FALSE);
-    set_read_action_interpretation(READ_IS_IN);
-    set_write_action_interpretation(WRITE_IS_OUT);
+
+    set_action_interpretation(ACTION_IN, ACTION_OUT);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_OUT_REGIONS,
 						      DBR_OUT_SUMMARY_REGIONS,
@@ -334,8 +335,9 @@ print_source_out_regions(char* module_name)
 
     set_is_user_view_p(TRUE);
     set_prettyprint_with_attachments(FALSE);
-    set_read_action_interpretation(READ_IS_IN);
-    set_write_action_interpretation(WRITE_IS_OUT);
+
+    set_action_interpretation(ACTION_IN, ACTION_OUT);
+
     ok = print_source_or_code_with_any_effects_engine(module_name,
 						      DBR_OUT_REGIONS,
 						      DBR_OUT_SUMMARY_REGIONS,
@@ -406,9 +408,5 @@ proper_regions_of_expressions(list l_exp, transformer context)
 	l_exp);
     return le;
 }
-
-/*********************************************************************************/
-/* END                                                                           */
-/*********************************************************************************/
 
 
