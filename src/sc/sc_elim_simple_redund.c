@@ -1,6 +1,13 @@
 /* package sc 
  * $RCSfile: sc_elim_simple_redund.c,v $ (version $Revision$)
- * $Date: 2001/10/22 16:09:39 $, 
+ * $Date: 2002/03/08 10:36:00 $, 
+ * $Log: sc_elim_simple_redund.c,v $
+ * Revision 1.6  2002/03/08 10:36:00  irigoin
+ * sc_elim_db_constraints() is restored and sc_elim_double_constraints() is
+ * added to provide the new functionalities. sc_elim_db_constraints is used
+ * in Linear by Arnauld Leservot on systems whose equations have been
+ * transformed into inequalities. The equations should not be restored!
+ *
  */
 
 #include <stdio.h>
@@ -261,23 +268,11 @@ boolean process_equalities;
  *
  * ou   c1/    0 == 0
  *
- * Si on a A=0 et b!=0, on detecte une non-faisabilite.
- *
- * Si on a Ax - b == 0 et Ax - b' == 0 et b!=b', on detecte une non-faisabilite.
- *
  * Pour les inegalites, on elimine une inequation si on a un systeme 
  * d'inegalites de la forme :
  *  
- *   a2/    Ax - b <= 0,             ou   b2/     0 <= const  (avec const >=0)
- *          Ax - b <= 0
- *
- * Une inegalite peut etre redondante ou incompatible avec une egalite:
- *
- *   a3/    Ax - b == 0,             ou   b3/     b - Ax == 0,
- *          Ax - c <= 0,                          Ax - c <= 0
- *          b - c <= 0                            b - c <= 0
- *
- * on detecte une non-faisabilite si b - c > 0.
+ *   a2/    Ax - b <= c,             ou   b2/     0 <= const  (avec const >=0)
+ *          Ax - b <= c             
  *
  *  resultat retourne par la fonction :
  *
@@ -303,6 +298,104 @@ boolean process_equalities;
 Psysteme sc_elim_db_constraints(ps)
 Psysteme ps;
 {
+    Pcontrainte
+	eq1 = NULL,
+	eq2 = NULL;
+
+    if (SC_UNDEFINED_P(ps)) 
+	return(NULL);
+
+    for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) 
+    {
+	if ((vect_size(eq1->vecteur) == 1) && 
+	    (eq1->vecteur->var == 0) && (eq1->vecteur->val != 0)) 
+	{
+	    /* b = 0 */
+	    sc_rm(ps);
+	    return(NULL);
+	}
+
+	for (eq2 = eq1->succ; eq2 != NULL;eq2 = eq2->succ)
+	    if (egalite_equal(eq1, eq2))
+		eq_set_vect_nul(eq2);
+    }
+
+    for (eq1 = ps->inegalites; eq1 != NULL;eq1 = eq1->succ) {
+      if ((vect_size(eq1->vecteur) == 1) && (eq1->vecteur->var == 0)) {
+	  if (value_negz_p(val_of(eq1->vecteur))) {
+	    vect_rm(eq1->vecteur);
+		eq1->vecteur = NULL;
+	  }
+	  else {
+	    /* 0 <= b < 0 */
+	    sc_rm(ps);
+	    return(NULL);
+	  }
+      }
+	for (eq2 = eq1->succ;eq2 != NULL;eq2 = eq2->succ)
+	    if (contrainte_equal(eq1,eq2))
+		eq_set_vect_nul(eq2);
+    }
+
+    sc_elim_empty_constraints(ps, TRUE);
+    sc_elim_empty_constraints(ps, FALSE);
+
+    return (ps);
+}
+
+/* Psysteme sc_elim_double_constraints(Psysteme ps):
+ * elimination des egalites et des inegalites identiques ou inutiles dans
+ * le systeme apres reduction par le gcd; plus precisemment:
+ *
+ * Pour les egalites, on elimine une equation si on a un systeme d'egalites 
+ * de la forme :
+ *
+ *   a1/    Ax - b == 0,            ou  b1/        Ax - b == 0,              
+ *          Ax - b == 0,                           b - Ax == 0,              
+ *
+ * ou   c1/    0 == 0
+ *
+ * Si on a A=0 et b!=0, on detecte une non-faisabilite.
+ *
+ * Si on a Ax - b == 0 et Ax - b' == 0 et b!=b', on detecte une non-faisabilite.
+ *
+ * Pour les inegalites, on elimine une inequation si on a un systeme 
+ * d'inegalites de la forme :
+ *  
+ *   a2/    Ax - b <= 0,             ou   b2/     0 <= const  (avec const >=0)
+ *          Ax - b <= 0
+ *
+ * Une inegalite peut etre redondante ou incompatible avec une egalite:
+ *
+ *   a3/    Ax - b == 0,             ou   b3/     b - Ax == 0,
+ *          Ax - c <= 0,                          Ax - c <= 0
+ *          b - c <= 0                            b - c <= 0
+ *
+ * on detecte une non-faisabilite si b - c > 0.
+ *
+ * Une paire d'inegalites est remplacee par une egalite:
+ *
+ *   a4/    Ax - b <= 0
+ *          -Ax + b <=0
+ *
+ * donne Ax - b == 0
+ *
+ *  resultat retourne par la fonction :
+ *
+ *  Psysteme   	    : Le systeme initial est modifie (si necessaire) et renvoye
+ *       	      Si le systeme est non faisable (0 <= const <0 ou
+ *                    0 = b), il est desalloue et NULL est
+ *                    renvoye.
+ *
+ * Notes:
+ *  - la representation interne des vecteurs est utilisee pour les tests;
+ * il faudrait tester la colinearite au vecteur de base representatif du
+ * terme constant
+ *
+ */
+Psysteme sc_elim_double_constraints(ps)
+Psysteme ps;
+{
   Pcontrainte
     eq1 = NULL,
     ineq1 = NULL,
@@ -311,6 +404,8 @@ Psysteme ps;
   if (SC_UNDEFINED_P(ps)) 
     return(SC_UNDEFINED);
 
+  /* Normalization by gcd's */
+
   for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) {
     vect_normalize(eq1->vecteur);
   }
@@ -318,6 +413,8 @@ Psysteme ps;
   for (ineq1 = ps->inegalites; ineq1 != NULL;ineq1 = ineq1->succ) {
     (void) contrainte_normalize(ineq1, FALSE);
   }
+
+  /* Detection of inconsistant equations: incompatible constant term */
 
   for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) {
     if ((vect_size(eq1->vecteur) == 1) && 
@@ -338,7 +435,13 @@ Psysteme ps;
     }
   }
 
+  /* Check redundancy and inconsistency between pair of inequalities */
+
   for (eq1 = ps->inegalites; eq1 != NULL;eq1 = eq1->succ) {
+
+    /* Detection of inconsistant or redundant inequalities: incompatible or
+       useless constant term */
+
     if ((vect_size(eq1->vecteur) == 1) && (eq1->vecteur->var == TCST)) {
       if (value_negz_p(val_of(eq1->vecteur))) {
 	vect_rm(eq1->vecteur);
@@ -351,6 +454,8 @@ Psysteme ps;
       }
     }
 	
+    /* Equal inequalities, redundant inequalities, equality detection */
+
     for (eq2 = eq1->succ;eq2 != NULL;eq2 = eq2->succ) {
       if (contrainte_equal(eq1,eq2)) {
 	eq_set_vect_nul(eq2);
@@ -389,6 +494,9 @@ Psysteme ps;
       }
     }
   }
+
+  /* Check redundancies and inconsistencies between equalities and
+     inequalities */
 
   for (ineq1 = ps->inegalites; ineq1 != NULL;ineq1 = ineq1->succ) {
     for (eq2 = ps->egalites; eq2 != NULL; eq2 = eq2->succ) {
