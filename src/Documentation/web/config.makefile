@@ -6,6 +6,7 @@
 HTML_AUTO = index.html \
 	bibliography.html \
 	current_team.html \
+	distribution.html \
 	history.html \
 	home.html \
 	man_pages.html \
