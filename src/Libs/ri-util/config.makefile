@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# ($Date: 1996/07/22 13:19:45 $, )
+# ($Date: 1997/01/31 18:24:24 $, )
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
@@ -15,6 +15,7 @@ LIB_CFILES=	Psc.c \
 		util.c \
 		ordering.c \
 		prettyprint.c \
+		unstructured.c \
 		attachment_pretty_print.c \
 		loop.c \
 		fortran90.c \
