@@ -712,6 +712,16 @@ bool bootstrap(string workspace)
      */
     CreateArrays();
 
+    /* Create the empty label */
+    (void) make_entity(strdup(concatenate(TOP_LEVEL_MODULE_NAME,
+					  MODULE_SEP_STRING, 
+					  LABEL_PREFIX,
+					  NULL)),
+		       MakeTypeStatement(),
+		       MakeStorageRom(),
+		       make_value(is_value_constant,
+					   MakeConstantLitteral()));
+
     /* FI: I suppress the owner filed to make the database moveable */
     /* FI: I guess no pointers to the resource is passed because it
        is a tabulated NewGen field. */
