@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/06/03 14:14:30 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/09/01 15:47:39 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -43,9 +43,8 @@ entity
     host_module,
     node_module;
 
-statement_mapping 
-    hostgotos,
-    nodegotos;
+GENERIC_CURRENT_MAPPING(host_gotos, statement, statement);
+GENERIC_CURRENT_MAPPING(node_gotos, statement, statement);
 
 /*
  * Compiler
@@ -129,8 +128,13 @@ statement *hoststatp,*nodestatp;
     pips_assert("hpfcompileblock",
 		(instruction_block_p(statement_instruction(stat))));
 
-    (*hoststatp)=MakeStatementLike(stat,is_instruction_block,hostgotos);
-    (*nodestatp)=MakeStatementLike(stat,is_instruction_block,nodegotos);
+    (*hoststatp)=MakeStatementLike(stat,
+				   is_instruction_block,
+				   get_host_gotos_map());
+
+    (*nodestatp)=MakeStatementLike(stat,
+				   is_instruction_block,
+				   get_node_gotos_map());
 
     MAPL(cs,
      {
@@ -169,8 +173,13 @@ statement *hoststatp,*nodestatp;
     the_test = instruction_test(statement_instruction(stat));
     condition = test_condition(the_test);
     
-    (*hoststatp)=MakeStatementLike(stat,is_instruction_test,hostgotos);
-    (*nodestatp)=MakeStatementLike(stat,is_instruction_test,nodegotos);
+    (*hoststatp)=MakeStatementLike(stat,
+				   is_instruction_test,
+				   get_host_gotos_map());
+
+    (*nodestatp)=MakeStatementLike(stat,
+				   is_instruction_test,
+				   get_node_gotos_map());
 
     /*
      * if it may happen that a condition modifies the value
@@ -252,7 +261,8 @@ statement *hoststatp, *nodestatp;
 	}
 	else
 	{
-	    debug(7,"hpfcompileloop","compiling a parallel loop sequential...\n");
+	    debug(7,"hpfcompileloop",
+		  "compiling a parallel loop sequential...\n");
 	    hpfcompilesequentialloop(stat, hoststatp, nodestatp);
 	}
     }
@@ -281,8 +291,12 @@ statement *hoststatp,*nodestatp;
      * code being compiled, and the link will be reduced later.
      */
     
-    (*hoststatp)=MakeStatementLike(stat,is_instruction_goto,hostgotos);
-    (*nodestatp)=MakeStatementLike(stat,is_instruction_goto,nodegotos);
+    (*hoststatp)=MakeStatementLike(stat,
+				   is_instruction_goto,
+				   get_host_gotos_map());
+    (*nodestatp)=MakeStatementLike(stat,
+				   is_instruction_goto,
+				   get_node_gotos_map());
     
     instruction_goto(statement_instruction(*hoststatp))=
 	instruction_goto(statement_instruction(stat));
@@ -337,8 +351,13 @@ statement *hoststatp,*nodestatp;
 	
 	debug(7,"hpfcompilecall","no reference to distributed variable\n");
 
-	(*hoststatp)=MakeStatementLike(stat, is_instruction_call, hostgotos);
-	(*nodestatp)=MakeStatementLike(stat, is_instruction_call, nodegotos);
+	(*hoststatp)=MakeStatementLike(stat,
+				       is_instruction_call,
+				       get_host_gotos_map());
+
+	(*nodestatp)=MakeStatementLike(stat,
+				       is_instruction_call,
+				       get_node_gotos_map());
 	
 	instruction_call(statement_instruction((*hoststatp)))=
 	    make_call(call_function(c),leh);
@@ -397,7 +416,8 @@ statement *hoststatp,*nodestatp;
 		    sn = statement_undefined;
 
 		if (!compile_reduction(stat, &sh, &sn))
-		    pips_error("hpfcompilecall", "reduction compilation failed\n");
+		    pips_error("hpfcompilecall", 
+			       "reduction compilation failed\n");
 
 		lh = CONS(STATEMENT, sh, NIL);
 		ln = CONS(STATEMENT, sn, NIL);
@@ -413,8 +433,12 @@ statement *hoststatp,*nodestatp;
 	    }
 	}
 
-	(*hoststatp) = MakeStatementLike(stat, is_instruction_block, hostgotos);
-	(*nodestatp) = MakeStatementLike(stat, is_instruction_block, nodegotos);
+	(*hoststatp) = MakeStatementLike(stat, 
+					 is_instruction_block, 
+					 get_host_gotos_map());
+	(*nodestatp) = MakeStatementLike(stat, 
+					 is_instruction_block,
+					 get_node_gotos_map());
 	
 	instruction_block(statement_instruction(*hoststatp)) = lh;
 	instruction_block(statement_instruction(*nodestatp)) = ln;
@@ -506,12 +530,16 @@ statement *hoststatp,*nodestatp;
 	 },
 	     blocks);
 
-	(*hoststatp)=MakeStatementLike(stat,is_instruction_unstructured,hostgotos);
+	(*hoststatp)=MakeStatementLike(stat,
+				       is_instruction_unstructured,
+				       get_host_gotos_map());
 	statement_instruction(instruction_unstructured(*hoststatp)) =
 	    make_unstructured((control) GET_CONTROL_MAPPING(hostmap,ct),
 			      (control) GET_CONTROL_MAPPING(hostmap,ce));
 
-	(*nodestatp)=MakeStatementLike(stat,is_instruction_unstructured,nodegotos);
+	(*nodestatp)=MakeStatementLike(stat,
+				       is_instruction_unstructured,
+				       get_node_gotos_map());
 	statement_instruction(instruction_unstructured(*nodestatp)) =
 	    make_unstructured((control) GET_CONTROL_MAPPING(nodemap,ct),
 			      (control) GET_CONTROL_MAPPING(nodemap,ce));
@@ -610,19 +638,23 @@ statement stat, *hoststatp, *nodestatp;
     }
     else
     {
-	(*hoststatp)=MakeStatementLike(stat,is_instruction_loop,hostgotos);
+	(*hoststatp)=MakeStatementLike(stat,
+				       is_instruction_loop,
+				       get_host_gotos_map());
 	instruction_loop(statement_instruction(*hoststatp))=
-	    make_loop(hindex,
-		      make_range(UpdateExpressionForModule(host_module,lower),
-				 UpdateExpressionForModule(host_module,upper),
-				 UpdateExpressionForModule(host_module,increment)),
-		      hostbody,
-		      label,
-		      make_execution(is_execution_sequential,UU),
-		      lNewVariableForModule(host_module,locals));
+	  make_loop(hindex,
+		    make_range(UpdateExpressionForModule(host_module,lower),
+			       UpdateExpressionForModule(host_module,upper),
+			    UpdateExpressionForModule(host_module,increment)),
+		    hostbody,
+		    label,
+		    make_execution(is_execution_sequential,UU),
+		    lNewVariableForModule(host_module,locals));
     }
     
-    (*nodestatp)=MakeStatementLike(stat,is_instruction_loop,nodegotos);
+    (*nodestatp)=MakeStatementLike(stat,
+				   is_instruction_loop,
+				   get_node_gotos_map());
     instruction_loop(statement_instruction(*nodestatp))=
 	make_loop(nindex,
 		  make_range(UpdateExpressionForModule(node_module,lower),
@@ -674,7 +706,9 @@ statement stat, *hoststatp, *nodestatp;
     }
     
     (*hoststatp) = make_continue_statement(entity_undefined);
-    (*nodestatp)=MakeStatementLike(stat,is_instruction_loop,nodegotos);
+    (*nodestatp)=MakeStatementLike(stat,
+				   is_instruction_loop,
+				   get_node_gotos_map());
     instruction_loop(statement_instruction(*nodestatp))=
 	make_loop(nindex,
 		  make_range(UpdateExpressionForModule(node_module,lower),
@@ -707,15 +741,9 @@ statement body, *hoststatp, *nodestatp;
     FindRefToDistArrayInStatement(body, &lw, &lr);
     li = AddOnceToIndicesList(lIndicesOfRef(lw), lIndicesOfRef(lr));
     ls = FindDefinitionsOf(body, li);
-/*
-    debug(7, "hpfcompileparallelloop", "new body:\n");
-    IFDBPRINT(7,"hpfcompileparallelloop",node_module,body);
-    MAPL(cs,{IFDBPRINT(7,"hpfcompileparallelloop",node_module,STATEMENT(CAR(cs)));},ls);
-*/
+
     generate_parallel_body(body, &lbs, lw, lr);
-/*
-    MAPL(cs,{IFDBPRINT(7,"hpfcompileparallelloop",node_module,STATEMENT(CAR(cs)));},lbs);
-*/
+
     (*hoststatp) = NULL;
     (*nodestatp) = make_block_statement(gen_nconc(ls, lbs));
 }
