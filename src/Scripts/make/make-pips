@@ -3,6 +3,9 @@
 # $Id$
 #
 # $Log: make-pips,v $
+# Revision 1.43  1997/07/08 12:18:26  coelho
+# more debug...
+#
 # Revision 1.42  1997/06/28 08:08:29  coelho
 # RCS headers improved.
 #
@@ -17,6 +20,7 @@ umask 2
 script=`basename $0`
 unset sides parts commands dirs libs pips newgen linear msg report where nodoc
 verb=':'
+dbg=':'
 job=${PIPS_MAKE:-gmake}
 
 #
@@ -61,6 +65,7 @@ usage()
 	usage: $script [options] [targets]
 	  -h: print this help and exit
 	  -v: verbose
+	  -g: debug
 	  -N: do nothing, print what would be done
 	 possible softs
 	  -p: Pips (default)
@@ -83,11 +88,12 @@ EOF
     exit $ret
 }
 
-while getopts hvNPDplnbirkd:o:m:w: opt
+while getopts hvgNPDplnbirkd:o:m:w: opt
 do
     case $opt in
 	h) usage 0 "here is some help!" ;;
 	v) verb=verbose ;;
+	g) dbg=verbose ;;
 	N) job="echo $PIPS_MAKE" ;;
 	P) sides="$sides ROOT/Src"; msg="P${msg}" ;;
 	D) sides="$sides DEVEDIR"; msg="D${msg}" ;;
@@ -181,11 +187,13 @@ for d in $dirs
 do
   $verb "dealing with $d"
   test -d $d || error 3 "no $d directory!" 
+  echo $job -C $d FWD_DIRS="$libs" FWD_REPORT=">> $report" FWD_MSG="$msg" \
+	FWD_OUT="$where" $commands
   $job -C $d FWD_DIRS="$libs" FWD_REPORT=">> $report" FWD_MSG="$msg" \
 	FWD_OUT="$where" $commands
 done
 
 $verb "done"
 
-# end of $RCSfile: make-pips,v $
+# end of it.
 #
