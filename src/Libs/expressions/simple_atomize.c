@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1995/05/19 19:52:25 $, 
+ * $Date: 1995/05/22 08:56:24 $, 
  */
 
 #include <stdio.h>
@@ -39,9 +39,9 @@ static void atomize_object(gen_chunk*);
 
 /* static functions used
  */
-static bool (*expr_breaking_decision)(/* ref r, expression e */) = NULL;
-static bool (*func_breaking_decision)(/* call c, expression e */)= NULL;
-static bool (*test_brk_decision)(/* expression e */) = NULL;
+static bool (*expr_atomize_decision)(/* ref r, expression e */) = NULL;
+static bool (*func_atomize_decision)(/* call c, expression e */)= NULL;
+static bool (*test_atomize_decision)(/* expression e */) = NULL;
 static entity (*create_new_variable)(/* entity m, tag t */) = NULL;
 
 /* the stack of the encoutered statements is maintained
@@ -88,13 +88,10 @@ statement s;
 static void insert_before_current_statement(s)
 statement s;
 {
-    statement
-	cs = current_statement_head();
-    control
-	cc = current_control_empty_p() ? 
-	     control_undefined : current_control_head() ;
-    instruction 
-	i = statement_instruction(cs);
+    statement   cs = current_statement_head();
+    instruction  i = statement_instruction(cs);
+    control     cc = current_control_empty_p() ? 
+	control_undefined : current_control_head() ;
 
     if (!control_undefined_p(cc) && control_statement(cc)==cs)
     {
@@ -190,7 +187,7 @@ reference r;
      {
 	 expression *pe = &EXPRESSION(CAR(ce));
 
-	 if ((*expr_breaking_decision)(r, *pe))
+	 if ((*expr_atomize_decision)(r, *pe))
 	 {
 	     syntax saved = expression_syntax(*pe);
 
@@ -207,13 +204,13 @@ static bool call_filter(c)
 call c;
 {
     if (same_string_p(entity_local_name(call_function(c)), IMPLIED_DO_NAME))
-	return(FALSE);
+	return(FALSE); /* (panic mode:-) */
 
     MAPL(ce, 
      {
 	 expression *pe = &EXPRESSION(CAR(ce));
 
-	 if ((*func_breaking_decision)(c, *pe))
+	 if ((*func_atomize_decision)(c, *pe))
 	 {
 	     syntax saved = expression_syntax(*pe);
 
@@ -231,7 +228,7 @@ test t;
 {
     expression *pe = &test_condition(t);
 
-    if ((*test_brk_decision)(*pe)) 
+    if ((*test_atomize_decision)(*pe)) 
     {
 	syntax saved = expression_syntax(*pe);
 
@@ -267,16 +264,16 @@ entity (*new)();
 {
     make_current_statement_stack();
     make_current_control_stack();
-    expr_breaking_decision = expr_decide;
-    func_breaking_decision = func_decide;
-    test_brk_decision = test_decide;
+    expr_atomize_decision = expr_decide;
+    func_atomize_decision = func_decide;
+    test_atomize_decision = test_decide;
     create_new_variable = new;
     
     atomize_object(stat);
 
-    expr_breaking_decision = NULL;
-    func_breaking_decision = NULL;
-    test_brk_decision = NULL;
+    expr_atomize_decision = NULL;
+    func_atomize_decision = NULL;
+    test_atomize_decision = NULL;
     create_new_variable = NULL;
     free_current_statement_stack();
     free_current_control_stack();
