@@ -579,6 +579,7 @@ int main(int argc, char * argv[])
 
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
+    initialize_signal_catcher();
 
     set_bool_property("ABORT_ON_USER_ERROR",FALSE);
     pips_log_handler = tpips_user_log;
