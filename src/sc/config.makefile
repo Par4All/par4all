@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/10 21:29:52 $, 
+# $Date: 1996/07/16 13:01:54 $, 
 
 LIB_CFILES=	sc_alloc.c \
 	        sc_projection.c \
@@ -40,7 +40,7 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 LIB_OBJECTS= $(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o) 
 
 sc_lex.c: sc_lex.l
-	$(SCAN) $< > $@
+	$(SCAN) $< | sed '/^FILE \*yyin =/d' > $@
 
 sc_gram.c y.tab.h: sc_gram.y
 	$(PARSE) -d $<
