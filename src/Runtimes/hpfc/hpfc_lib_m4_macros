@@ -21,6 +21,12 @@ ifelse($1, 0, ,`forloop(`_I_', 1, $1, `$2(_I_)')')')dnl
 define(`COMMA_REPLICATE',dnl
 `ifelse($1, 0, ,dnl
 `forloop(`_I_', 1, $1, `ifelse(_I_, 1, `$2(_I_)',`,$2(_I_)')')')')dnl
+define(`REVERSE_BUT_LAST_REPLICATE',dnl
+`ifelse($1, 0,, $1, 1,, `$2($1) dnl
+   REVERSE_BUT_LAST_REPLICATE(eval($1 - 1),`$2')')')dnl
+define(`REVERSE_REPLICATE',dnl
+`ifelse($1, 0,, `$2($1) dnl
+   REVERSE_REPLICATE(eval($1 - 1),`$2')')')dnl
 c
 c TO7 definition
 c
