@@ -363,7 +363,12 @@ list body;
 
 instruction make_instruction_block(list statements)
 {
+#ifdef is_instruction_sequence
+    return make_instruction(is_instruction_sequence,
+			    make_sequence(statements));
+#else
     return make_instruction(is_instruction_block, statements);
+#endif
 }
 
 statement make_return_statement()
