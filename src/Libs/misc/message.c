@@ -171,6 +171,28 @@ pips_user_warning_function(
     va_end(args);
 }
 
+void 
+pips_user_error_function(
+   char * format,
+   ...)
+{
+    va_list args;
+    va_start(args, format);
+    user_error("unknown", format, args);
+    va_end(args);
+}
+
+void 
+pips_internal_error_function(
+   char * format,
+   ...)
+{
+    va_list args;
+    va_start(args, format);
+    pips_error("unknown", format, args);
+    va_end(args);
+}
+
 /* make sure the user has noticed something */
 void default_prompt_user(s)
 char *s;
