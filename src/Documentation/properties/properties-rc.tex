@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/11/10 11:55:30 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/11/15 10:41:52 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -97,7 +97,11 @@ This is useful for use/def and semantics analysis (not used for regions).
 ONE_TRIP_DO FALSE
 \end{verbatim}
 
-Shall we print phase timings
+It is possible to display the amount of real, cpu and system times
+directly spent in each phase as well as the times spent reading/wirting data
+structures from/to PIPS database. The default value of this property is
+\verb+FALSE+. The computation of total time used to complete a
+\verb+pipsmake+ request is not implemented.
 
 \begin{verbatim}
 LOG_TIMINGS FALSE
