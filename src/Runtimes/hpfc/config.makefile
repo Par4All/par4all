@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1997/01/16 18:29:36 $, )
+# ($Date: 1997/03/27 18:11:50 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -247,6 +247,8 @@ INSTALL_INC =	$(CORE_HEADERS) \
 		$(LIB_FFILES) 
 
 INSTALL_LIB=	$(LIB_TARGET) $(MKI_TARGET)
+
+recompile: quick-install
 
 #
 # rules
