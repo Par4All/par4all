@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log: hpfc_compile,v $
+# Revision 1.51  1997/06/07 09:11:19  coelho
+# -T time option added.
+#
 # Revision 1.50  1997/03/19 17:50:00  coelho
 # better RCS headers.
 #
@@ -22,6 +25,7 @@ PIPSARGS='-s MUST_REGIONS'
 HPFC='-p HPFC_INSTALL'
 TIMEPROP=
 PIPSPROP=
+TIME=
 
 unset MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR \
 	REDIRECT FILES HPFFILES
@@ -56,7 +60,7 @@ default_module()
 usage()
 {
   cat <<-EOF
-	Usage: $sh [-vxDdhMqstirT] [-k K] [-p P] [-w W] [-m M] [-n N|file[.f]]
+	Usage: $sh [-vxDdhMqstTirT] [-k K] [-p P] [-w W] [-m M] [-n N|file[.f]]
 	  version is $Revision$
 	  -t: test (dump the resulting files)
 	  -i: no installation
@@ -70,6 +74,7 @@ usage()
 	  -M: make (compile and link) the generated codes
 	  -q: quiet  (stdout=/dev/null)
 	  -s: silent (stderr=/dev/null - for demonstations:-)
+	  -T: time pips
 	  -w W: workspace W is used for pips and hpfc
 	  -m M: module M is compiled (should be the main)
 	  -n N: source number n
@@ -86,6 +91,7 @@ while getopts rtivxDdMqsn:hm:w:p:k: OPT
 do
   case $OPT in
     t) DUMPFILES='1' ;;
+    T) TIME=time ;;
     i) NOINSTALL='1' ; HPFC='-p HPFC_CLOSE' ;;
     p) PIPS="$OPTARG" ;;
     r) REDIRECT=':' ;;
@@ -212,7 +218,8 @@ $debug "`type $PIPS`"
 
 [ "$debug" != : ] && set -x
 
-eval $PIPS $FILES $PIPSARGS $HPFC $PIPSPROP $TIMEPROP -m $MODULE $WORKSPACE \
+eval $TIME \
+     $PIPS $FILES $PIPSARGS $HPFC $PIPSPROP $TIMEPROP -m $MODULE $WORKSPACE \
 	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
 
 STATUS="$?"
