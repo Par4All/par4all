@@ -99,6 +99,8 @@ typedef hash_table control_mapping;
 #define MODULE_SEP_STRING ":"
 #define LABEL_PREFIX "@"
 #define MAIN_PREFIX "%"
+#define COMMON_PREFIX "~"
+#define BLOCKDATA_PREFIX "&"
 
 /*  constant names
  */
