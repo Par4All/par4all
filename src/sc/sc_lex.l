@@ -13,33 +13,46 @@
 #include "arithmetique.h"
 #include "vecteur.h"
 #include "y.tab.h"
+
+#define RETURN(x) /* fprintf(stderr, "lex: %d\n", x); */ return x
+
 %}
 
 %%
-<TEXT>VAR			{ return(VAR); }
-<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { return(IDENT); }
-<TEXT>[0-9]*			{ return(CONSTANTE); }
-<TEXT>"=="			{ return(EGAL); }
-<TEXT>","			{ return(VIRG); }
-<TEXT>"+"			{ return(PLUS); }
-<TEXT>"-"			{ return(MOINS); }
-<TEXT>">"			{ return(SUP); }
-<TEXT>">="			{ return(SUPEGAL); }
-<TEXT>"<"			{ return(INF); }
-<TEXT>"<="			{ return(INFEGAL); }
-<TEXT>"{"			{ return(ACCOUVR); }
-<TEXT>"}"			{ return(ACCFERM); }
+<TEXT>VAR			{ RETURN(VAR); }
+<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { RETURN(IDENT); }
+<TEXT>[0-9]*			{ RETURN(CONSTANTE); }
+<TEXT>"=="			{ RETURN(EGAL); }
+<TEXT>","			{ RETURN(VIRG); }
+<TEXT>"+"			{ RETURN(PLUS); }
+<TEXT>"-"			{ RETURN(MOINS); }
+<TEXT>">"			{ RETURN(SUP); }
+<TEXT>">="			{ RETURN(SUPEGAL); }
+<TEXT>"<"			{ RETURN(INF); }
+<TEXT>"<="			{ RETURN(INFEGAL); }
+<TEXT>"{"			{ RETURN(ACCOUVR); }
+<TEXT>"}"			{ RETURN(ACCFERM); }
 <TEXT>[ \t\n]*		;
 <TEXT>"#"                       {BEGIN COMMENT;}
 <COMMENT>\n                     {BEGIN TEXT;}
 <COMMENT>[^\n]*         ;
 %%
 
-int yywrap()
+#ifdef FLEX_SCANNER
+int yyinput()
 {
-	return -1;
+    return( input()) ;
 }
-
+#endif
+ 
+yywrap()
+{
+#ifdef FLEX_SCANNER
+    yy_init = 1 ;
+#endif
+    return( 1 ) ;
+}
+ 
 void sc_init_lex()
 {
         BEGIN TEXT;
