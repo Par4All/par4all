@@ -315,7 +315,8 @@ $pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM |
 # Build `modules' ???
 if [ "$SOURCE_FILES" ]
 then
-  cd $PGM.database
+  ### ??? cd on loreto somtimes outputs the dirname...
+  cd $PGM.database > /dev/null
   ls */*.f_initial | sed 's/\/.*//' | tr '[a-z]' '[A-Z]' > modules
   cd ..
 fi
