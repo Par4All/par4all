@@ -1,35 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <string.h>
-#include <values.h>
 
-#include "genC.h"
-
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "polyedre.h"
-
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-
-#include "misc.h"
-#include "ri-util.h"
-#include "properties.h"
-
-#include "constants.h"
-#include "ricedg.h"
-#include "rice.h"
-
-/* instantiation of the dependence graph */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
+#include "local.h"
 
 /*
 
