@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/12 12:47:51 $, 
+# $Date: 1996/09/12 12:51:18 $, 
 #
 # (c) FC September 1996
 #
@@ -175,11 +175,13 @@ proc changedir { root currentdir } {
     scrollbar $root.list.scroll -command "$root.list.dirs yview"
     bind $root.list.dirs <Double-1> { 
 	# update dir according to the clicked item
-	set newdir [%W get [%W curselection ]]
-	set changedir_dir [appenddir $changedir_dir $newdir]
-	# update display
-	filldirlist %W $changedir_dir
-        seeentryend $changedir_root.direct.entry
+	set i [%W curselection]
+	if {$i != ""} {
+	    set changedir_dir [appenddir $changedir_dir [%W get $i]]
+	    # update display
+	    filldirlist %W $changedir_dir
+	    seeentryend $changedir_root.direct.entry
+	}
     }
     pack $root.list.dirs -side left -fill both -expand true \
 	-padx 1m -pady 1m -ipadx 2 -ipady 2
@@ -202,8 +204,7 @@ proc changedir { root currentdir } {
 	focus $root
     }
   
-    #
-    # waits for changedir_result to be set, the returns...
+    # waits for changedir_result to be set, then returns...
     tkwait variable changedir_result
     destroy $root
     focus $old
@@ -214,7 +215,6 @@ proc changedir { root currentdir } {
 # default startpoint directory is .
 # may be specifyed by invoking "$RCSfile: Wchangedir,v $ -- some/directory"
 #
-
 if {$argc == 0} {
     set dir .
 } else {
@@ -227,4 +227,3 @@ if {$argc == 0} {
 puts [changedir "" $dir ]
 
 # end of $RCSfile: Wchangedir,v $
-#
