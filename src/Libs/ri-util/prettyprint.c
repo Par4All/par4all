@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/01/23 17:58:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/01/24 09:12:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/01/23 17:58:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/01/24 09:12:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1574,6 +1574,7 @@ hash_table labels;
 	    break ;
 	  /* Unless the first successor has been seen before, in which case
 	   * a GO TO was generated to reach it.
+	   * OK, but a *forward* GO TO may have been generated...
 	   */
 	  else if(set_belong_p(seens,
 			       (char *)CONTROL(CAR(control_successors(*previous)))))
