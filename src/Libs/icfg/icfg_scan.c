@@ -20,51 +20,56 @@
 #include "regions.h"
 #include "resources.h"
 #include "semantics.h"
+#include "prettyprint.h"
 #include "complexity_ri.h"
 #include "complexity.h"
 #include "pipsdbm.h"      /* DB_PUT_FILE_RESOURCE is defined there */
+#include "text-util.h"
 #include "icfg.h"
 
 #define ICFG_SCAN_INDENT 4
+#define MAX_LINE_LENGTH 256
 
-static bool CHECK = FALSE;
-static bool PRINT_OUT = FALSE;
 static int current_margin;
-static FILE *fp;
+
+static void append_icfg_file(text t,string module_name);
+
+typedef hash_table text_mapping;
+#ifndef bool_undefined
+#define bool_undefined ((bool) (-15))
+#define bool_undefined_p(b) ((b)==bool_undefined)
+#endif
 
 /* We want to keep track of the current statement inside the recurse */
 DEFINE_LOCAL_STACK(current_stmt, statement)
 
-#define MAX_LINE_LENGTH 256
+/* We store the text for all statement in a mapping 
+   in order to print afterwards */
+GENERIC_LOCAL_MAPPING(stmt_map, bool, text)
 
-static void print_icfg_file(string module_name)
+static bool statement_filter(statement s)
 {
-    string filename = NULL;
-    string localfilename = NULL;
-    FILE *f_called;
-    char buf[MAX_LINE_LENGTH];
+    bool res = TRUE;
+    text t = make_text (NIL);
 
-    /* create filename */
-    localfilename = strdup(concatenate
-			   (module_name,
-			    get_bool_property(ICFG_IFs) ? ".icfgc" :
-			    ( get_bool_property(ICFG_DOs) ? ".icfgl" : 
-			     ".icfg") ,
-			    NULL));
-    filename = strdup(concatenate
-		      (db_get_current_workspace_directory(), 
-		       "/", localfilename, NULL));
+    pips_debug (5,"going down\n");
 
-    pips_debug (2, "Inserting ICFG for module %s\n", module_name);
-
-    /* Get the Icfg from the callee */
-    f_called = safe_fopen (filename, "r");
-    while (fgets (buf, MAX_LINE_LENGTH, f_called))
-	fprintf(fp,"%*s%s", current_margin ,"",buf);
-    safe_fclose (f_called, filename);
+    store_text_stmt_map (s, t);
+    res = current_stmt_filter (s);
+    return res;
 }
 
-static bool call_filter(call c)
+static void statement_rewrite(statement s)
+{
+    pips_debug (5,"going up\n");
+    ifdebug(9) {
+	print_text(stderr,(text) load_text_stmt_map (s));
+    }
+    current_stmt_rewrite (s);
+    return;
+}
+
+static void call_filter(call c)
 {
     entity e_callee = call_function(c);
     string callee_name = module_local_name(e_callee);
@@ -74,7 +79,7 @@ static bool call_filter(call c)
 
     /* If this is a "real function" (defined in the code elsewhere) */
     if (value_code_p(entity_initial(e_callee))) {
-	text r = make_text(NIL);
+	text r = (text) load_text_stmt_map (current_stmt_head());
 
 	entity e_caller = get_current_module_entity();
 	reset_current_module_entity();
@@ -144,7 +149,6 @@ static bool call_filter(call c)
 	    reset_cumulated_effects_map();
 	    reset_semantic_map();
 
-
 	    break;
 	}
 	case ICFG_DECOR_PROPER_EFFECTS:
@@ -167,100 +171,272 @@ static bool call_filter(call c)
 		       "unknown ICFG decoration for module %s\n",
 		       callee_name);
 	}
-
+	/* retrieve the caller entity */
 	set_current_module_entity(e_caller);
-	print_text(fp, r);
-	print_icfg_file (callee_name);
-	free_text(r);
+	/* append the callee' icfg */
+	append_icfg_file (r, callee_name);
+	/* store it to the statement mapping */
+	update_text_stmt_map (current_stmt_head(), r);
     }
+    return;
+}
+
+static bool loop_filter (loopl)
+{
+    pips_debug (5, "Loop begin\n");
+    current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
-static bool loop_filter (loop l)
+static void loop_rewrite (loop l)
 {
-    pips_debug (5,"Loop begin\n");
+    text inside_the_loop = text_undefined;
+    text inside_the_do = text_undefined;
+    bool print_do = get_bool_property(ICFG_DOs);
+    text t = make_text (NIL);
+    char textbuf[MAX_LINE_LENGTH];
 
-    if (get_bool_property(ICFG_DOs)) {
-	fprintf(fp,"%*sDO\n", current_margin, "");
-	current_margin += ICFG_SCAN_INDENT;
-    }
-    return TRUE;
-}
-
-static bool loop_rewrite (loop l)
-{
     pips_debug (5,"Loop end\n");
 
-    if (get_bool_property(ICFG_DOs)) {
-	current_margin -= ICFG_SCAN_INDENT;
-	fprintf(fp,"%*sENDDO\n", current_margin, "");
+    current_margin -= ICFG_SCAN_INDENT;
+    inside_the_do = (text) load_text_stmt_map (current_stmt_head());
+    inside_the_loop = (text) load_text_stmt_map (loop_body (l));
+
+    /* Print the DO */
+    if ((inside_the_loop != text_undefined) ||
+	(inside_the_do   != text_undefined) ||
+	(print_do)) {
+	sprintf(textbuf, "%*sDO\n", current_margin, "");
+	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+					      strdup(textbuf)));
     }
-    return TRUE;
+
+    /* Print the text inside do expressions*/
+    if (inside_the_do != text_undefined) {
+	MERGE_TEXTS (t, inside_the_do);
+       	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+					      strdup("\n")));
+    }
+
+    /* Print the text inside */
+    if (inside_the_loop != text_undefined) {
+	MERGE_TEXTS (t, inside_the_loop);
+    }
+
+    /* Print the ENDDO */
+    if ((inside_the_loop != text_undefined) ||
+	(inside_the_do   != text_undefined) ||
+	(print_do)) {
+	sprintf(textbuf, "%*sENDDO\n", current_margin, "");
+	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+					      strdup(textbuf)));
+    }
+
+    /* store it to the statement mapping */
+    update_text_stmt_map (current_stmt_head(), t);
+    
+    return ;
+}
+
+static void instruction_rewrite (instruction i)
+{
+    text t = make_text (NIL);
+
+    pips_debug (5,"going up\n");
+    pips_debug (9,"instruction tag = %d\n", instruction_tag (i));
+
+    switch (instruction_tag (i)) {
+    case is_instruction_block:
+    {
+	pips_debug (5,"dealing with a block, appending texts\n");
+
+	MAPL(pm, {   
+	    statement s = STATEMENT(CAR(pm));
+	    MERGE_TEXTS(t, (text) load_text_stmt_map (s));
+	}, instruction_block (i));
+
+	/* store it to the statement mapping */
+	update_text_stmt_map (current_stmt_head (), t);
+	break;
+    }
+    case is_instruction_unstructured:
+    {
+	unstructured u = instruction_unstructured (i);
+	list blocs = NIL ;
+	control ct = unstructured_control(u) ;
+
+	pips_debug (5,"dealing with an unstructured, appending texts\n");
+
+	/* SHARING! Every statement gets a pointer to the same precondition!
+	   I do not know if it's good or not but beware the bugs!!! */
+	CONTROL_MAP(c, {
+	    statement st = control_statement(c) ;
+	    MERGE_TEXTS(t, (text) load_text_stmt_map (st));
+	}, ct, blocs) ;
+	
+	gen_free_list(blocs) ;
+	update_text_stmt_map (current_stmt_head (), t);
+	break;
+    }
+    }
 }
 
 static bool test_filter (test l)
 {
     pips_debug (5, "Test begin\n");
-
-    if (get_bool_property(ICFG_IFs)) {
-	fprintf(fp,"%*sIF\n", current_margin, "");
-	current_margin += ICFG_SCAN_INDENT;
-    }
+    current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
-static bool test_rewrite (test l)
+static void test_rewrite (test l)
 {
-    pips_debug (5, "Test end\n");
-
-    if (get_bool_property(ICFG_IFs)) {
-	current_margin -= ICFG_SCAN_INDENT;
-	fprintf(fp,"%*sENDIF\n", current_margin, "");
+    text inside_then = text_undefined;
+    text inside_else = text_undefined;
+    text inside_if = text_undefined;
+    text t = make_text (NIL);
+    char textbuf[MAX_LINE_LENGTH];
+    bool something_to_print = bool_undefined;
+    
+    pips_debug (5,"Test end\n");
+    
+    current_margin -= ICFG_SCAN_INDENT;
+    
+    inside_if = copy_text((text) load_text_stmt_map (current_stmt_head ()));
+    inside_then = copy_text((text) load_text_stmt_map (test_true (l)));
+    inside_else = copy_text((text) load_text_stmt_map (test_false (l)));
+    
+    something_to_print = ((inside_else != text_undefined) ||
+			  (inside_then != text_undefined) ||
+			  (inside_if   != text_undefined) ||
+			  get_bool_property (ICFG_IFs));
+    
+    /* Print the IF */
+    if (something_to_print) {
+	sprintf(textbuf, "%*sIF\n", current_margin, "");
+	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+					      strdup(textbuf)));
     }
-    return TRUE;
+    
+    /* print things in the if expression*/
+    if (inside_if != text_undefined)
+	MERGE_TEXTS (t, inside_if);
+
+    
+    /* print then statements */
+    if (inside_then != text_undefined) {
+	/* Print the THEN */
+	if (something_to_print) {
+	    sprintf(textbuf, "%*sTHEN\n", current_margin, "");
+	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+						  strdup(textbuf)));
+	}
+	MERGE_TEXTS (t, inside_then);
+    }    
+
+    /* print then statements */
+    if (inside_else != text_undefined) {
+	/* Print the ELSE */
+	if (something_to_print) {
+	    sprintf(textbuf, "%*sELSE\n", current_margin, "");
+	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+						  strdup(textbuf)));
+	}
+	MERGE_TEXTS (t, inside_else);
+    }    
+
+    /* Print the ENDIF */
+    if (something_to_print) {
+	sprintf(textbuf, "%*sENDIF\n", current_margin, "");
+	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+					      strdup(textbuf)));
+    }
+    
+    /* store it to the statement mapping */
+    update_text_stmt_map (current_stmt_head(), t);
+    
+    return;
 }
 
 void print_module_icfg(entity module)
 {
-    string filename = NULL;
-    string localfilename = NULL;
     string module_name = module_local_name(module);
     statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,TRUE);
+    text txt = make_text (NIL);
+    char buf[MAX_LINE_LENGTH];
 
     set_current_module_entity (module);
 
-    /* Build filename */
+    /* allocate the mapping  */
+    make_stmt_map_map();
+    make_current_stmt_stack();
+
+    sprintf(buf,"%s\n",module_name);
+    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+					    strdup(buf)));
+
+    current_margin = ICFG_SCAN_INDENT;
+
+    ifdebug(9) {
+	if ( gen_defined_p (s))
+	    pips_user_warning ("gen_defined_p failed\n");
+    }
+    
+    gen_multi_recurse
+	(s,
+	 statement_domain, statement_filter, statement_rewrite,
+	 call_domain     , call_filter     , gen_null,
+	 loop_domain     , loop_filter     , loop_rewrite,
+	 instruction_domain    , gen_null  , instruction_rewrite,
+	 test_domain     , test_filter     , test_rewrite,
+	 NULL);
+
+    pips_assert("stack is empty", current_stmt_empty_p());
+
+    MERGE_TEXTS (txt, (text) load_text_stmt_map (s));
+
+    make_text_resource(module_name, DBR_ICFG_FILE,
+		       get_bool_property(ICFG_IFs) ? ".icfgc" :
+		       (get_bool_property(ICFG_DOs) ? ".icfgl" : 
+			".icfg"),
+		       txt);
+    
+    free_text (txt);
+    free_stmt_map_map();
+    free_current_stmt_stack();
+    reset_current_module_entity();
+}
+
+static void append_icfg_file(text t,string module_name)
+{
+    string filename = NULL;
+    string localfilename = NULL;
+    FILE *f_called;
+    char buf[MAX_LINE_LENGTH];
+    char textbuf[MAX_LINE_LENGTH];
+
+    /* create filename */
     localfilename = strdup(concatenate
 			   (module_name,
 			    get_bool_property(ICFG_IFs) ? ".icfgc" :
-			    (get_bool_property(ICFG_DOs) ? ".icfgl" : 
+			    ( get_bool_property(ICFG_DOs) ? ".icfgl" : 
 			     ".icfg") ,
 			    NULL));
     filename = strdup(concatenate
 		      (db_get_current_workspace_directory(), 
 		       "/", localfilename, NULL));
 
-    fp = safe_fopen(filename, "w");
-    make_current_stmt_stack();
+    pips_debug (2, "Inserting ICFG for module %s\n", module_name);
 
-    fprintf(fp,"%s\n",module_name);
+    /* Get the Icfg from the callee */
+    f_called = safe_fopen (filename, "r");
 
-    current_margin = ICFG_SCAN_INDENT;
-
-    gen_multi_recurse
-	(s,
-	 statement_domain, current_stmt_filter, current_stmt_rewrite,
-	 call_domain,call_filter,gen_null,
-	 loop_domain,loop_filter, loop_rewrite,
-	 test_domain,test_filter, test_rewrite,
-	 NULL);
-
-    pips_assert("empty stack", current_stmt_empty_p());
+    while (fgets (buf, MAX_LINE_LENGTH, f_called)) {
+	/* add sentences ... */
+	sprintf(textbuf, "%*s%s", current_margin ,"",buf);
+	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+					      strdup(textbuf)));
+    }
     
-    safe_fclose(fp, filename);
-    free(filename);
-    DB_PUT_FILE_RESOURCE(strdup(DBR_ICFG_FILE),
-			 strdup(module_name), localfilename);
-    free_current_stmt_stack();
-    reset_current_module_entity();
+    /* push resulting text */
+    safe_fclose (f_called, filename);
 }
