@@ -1,10 +1,11 @@
 /* 
- *
- * 
+ * $Id$
  */
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "ri.h"
@@ -265,8 +266,7 @@ ValueSizeOfDimension(dimension d)
  */
 
 int 
-ExpressionToInt(e)
-expression e;
+ExpressionToInt(expression e)
 {
     value v;
     constant c;
@@ -289,7 +289,7 @@ expression e;
 	abort();
     }
 
-    gen_free(v);
+    free_value(v);
     return(i);
 }
 
