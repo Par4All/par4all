@@ -2,11 +2,15 @@
  * and in the static area and in the dynamic area. The heap area is left
  * aside.
  *
- * 	%A% ($Date: 2001/04/06 11:49:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+ * 	%A% ($Date: 2002/03/08 10:21:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: equivalence.c,v $
+ * Revision 1.24  2002/03/08 10:21:03  irigoin
+ * Upgrade to ComputeAddresses() to allocate left-over varying size arrays in
+ * stack area if PARSER_ACCEPT_ANSI_EXTENSIONS is set to true
+ *
  * Revision 1.23  2001/04/06 11:49:50  irigoin
  * Additional tests to detect conflicting EQUIVALENCE and DATA statements
  *
@@ -31,7 +35,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 2001/04/06 11:49:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 2002/03/08 10:21:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -43,6 +47,8 @@ char vcid_syntax_equivalence[] = "%A% ($Date: 2001/04/06 11:49:50 $, ) version $
 #include "ri.h"
 #include "ri-util.h"
 #include "parser_private.h"
+
+#include "properties.h"
 
 #include "misc.h"
 
@@ -674,6 +680,72 @@ ComputeAddresses()
 	}
     }
 
+    /* Varying size arrays must be stack allocated. This is an implicit
+       extension that is not compatible with EQUIVALENCE */
+
+    if(get_bool_property("PARSER_ACCEPT_ANSI_EXTENSIONS")) {
+      pips_debug(2, "Process stack variables\n");
+
+      for (pcv = code_declarations(EntityCode(get_current_module_entity())); pcv != NIL;
+	   pcv = CDR(pcv)) {
+	entity a = ENTITY(CAR(pcv));
+	int s;
+
+	/* This test will fail for stack allocatable varying length
+           character strings because of function SizeOfElements() which
+           cannot indicate failure. Let's wait for the problem... */
+	if(type_variable_p(entity_type(a))
+	   && !(!storage_undefined_p(entity_storage(a)) && storage_formal_p(entity_storage(a)))
+	   && !SizeOfArray(a, &s)) {
+	  /* Try to reallocate in stack area */
+	  s = 0;
+	  if(storage_undefined_p(entity_storage(a))) {
+	    entity_storage(a) = make_storage(is_storage_ram,
+					     make_ram(get_current_module_entity(),
+						      StackArea,
+						      UNKNOWN_RAM_OFFSET,
+						      NIL));
+
+	    pips_debug(8, "Variable %s allocated in stack\n", entity_local_name(a));
+	  }
+	  else if(storage_formal_p(entity_storage(a))) {
+	    /* Formal parameters can have varying sizes */
+	    ;
+	  }
+	  else if(storage_ram_p(entity_storage(a))) {
+	    entity sec = ram_section(storage_ram(entity_storage(a)));
+
+	    if(sec==DynamicArea) {
+	      ram_section(storage_ram(entity_storage(a)))=StackArea;
+	      pips_debug(8, "Variable %s reallocated in stack\n", entity_local_name(a));
+	    }
+	    else if(sec==HeapArea) {
+	      /* Allocatable arrays can have varying sizes */
+	      ;
+	    }
+	    else {
+	      /* Could be declared explicitly or implicitly STATIC or be
+                 EQUIVALENCEd with such a variable. It could be declared
+                 in a COMMON. */
+	      pips_user_warning("Variable %s with varying dimension cannot be reallocated"
+				" in stack because it has laready been allocated in %s\n",
+				entity_local_name(a), entity_local_name(sec));
+	      ParserError("SafeSizeOfArray", "Storage cannot be redefined to stack");
+	    }
+	  }
+	  else {
+	    pips_internal_error("Unexpected storage for entity %s\n",
+				entity_local_name(a));
+	  }
+	}
+	else {
+	  /* The array size is known at compile time. Allocate in synamic
+             area. */
+	  ;
+	}
+      }
+    }
+
     /* All declared variables are scanned and stored in the dynamic area if their
      * storage is still undefined or in the static area if their offsets are still
      * unkown.
@@ -683,7 +755,7 @@ ComputeAddresses()
      *
      */
 
-    debug(2, "ComputeAddresses", "Process left-over dynamic variables\n");
+    pips_debug(2, "Process left-over dynamic variables\n");
 
     for (pcv = code_declarations(EntityCode(get_current_module_entity())); pcv != NIL;
 	 pcv = CDR(pcv)) {
@@ -715,13 +787,22 @@ ComputeAddresses()
 		    ram_offset(r) = CurrentOffsetOfArea(StaticArea, e);
 		    /* area_layout(sa) = gen_nconc(area_layout(sa), CONS(ENTITY, e, NIL)); */
 		}
-		else {
+		else if(ram_section(r)==HeapArea) {
 		    area ha = type_area(entity_type(HeapArea));
 
 		    debug(2, "ComputeAddresses",
 			  "Ignore heap variable %s because its address cannot be computed\n",
 			  entity_local_name(e));
 		    area_layout(ha) = gen_nconc(area_layout(ha), CONS(ENTITY, e, NIL));
+		}
+		else {
+		  /* Must be stack area */
+		    area sa = type_area(entity_type(StackArea));
+
+		    debug(2, "ComputeAddresses",
+			  "Ignore stack variable %s because its address cannot be computed\n",
+			  entity_local_name(e));
+		    area_layout(sa) = gen_nconc(area_layout(sa), CONS(ENTITY, e, NIL));
 		}
 	    }
 	}
