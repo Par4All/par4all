@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log: hpfc_compile,v $
+# Revision 1.53  1997/06/26 08:50:03  coelho
+# path fixed to look for pips.
+#
 # Revision 1.52  1997/06/07 09:14:28  coelho
 # little fix.
 #
@@ -32,7 +35,13 @@ TIME=
 
 unset MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR \
 	REDIRECT FILES HPFFILES
+
 rm -f $TMP.*
+
+#
+# PATH fixed
+
+PATH=./${PIPS_ARCH}:.:${PIPS_ROOT}/Bin/${PIPS_ARCH}:${PATH}
 
 #
 # functions
