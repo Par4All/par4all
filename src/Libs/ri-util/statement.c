@@ -122,6 +122,69 @@ statement st;
     return(entity_empty_label_p(statement_label(st)));
 }
 
+/* Return true if the statement is an empty instruction block without
+   label or a continue without label or a recursive combination of
+   above. */
+bool
+empty_statement_or_labelless_continue_p(statement st)
+{
+   instruction i;
+
+   if (!entity_empty_label_p(statement_label(st)))
+      return FALSE;
+   if (continue_statement_p(st))
+      return TRUE;
+   i = statement_instruction(st);
+   if (instruction_block_p(i)) {
+      bool useless = TRUE;
+      MAPL(sts,
+           {
+              statement st = STATEMENT(CAR(sts)) ;
+              if (!empty_statement_p(st))
+                 if (!empty_statement_or_labelless_continue_p(st)) {
+                    /* Well there is at least one possibly usefull thing... */
+                    useless = FALSE;
+                    break;
+                 }
+           },
+              instruction_block(i));
+      if (useless)
+         return TRUE;
+   }
+   return FALSE;
+}
+
+
+/* Return true if the statement is an empty instruction block or a
+   continue or a recursive combination of above. */
+bool
+empty_statement_or_continue_p(statement st)
+{
+   instruction i;
+
+   if (continue_statement_p(st))
+      return TRUE;
+   i = statement_instruction(st);
+   if (instruction_block_p(i)) {
+      bool useless = TRUE;
+      MAPL(sts,
+           {
+              statement st = STATEMENT(CAR(sts)) ;
+              if (!empty_statement_p(st))
+                 if (!empty_statement_or_continue_p(st)) {
+                    /* Well there is at least one possibly usefull thing... */
+                    useless = FALSE;
+                    break;
+                 }
+           },
+              instruction_block(i));
+      if (useless)
+         return TRUE;
+   }
+   return FALSE;
+}
+
+
 bool statement_call_p(s)
 statement s;
 {
