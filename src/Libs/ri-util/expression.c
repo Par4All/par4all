@@ -22,8 +22,6 @@
 
 #include "ri-util.h"
 
-
-
 /*  a BASIC tag is returned for the expression
  *  this is a preliminary version. should be improved.
  *  was in HPFC.
@@ -31,8 +29,7 @@
 tag suggest_basic_for_expression(e)
 expression e;
 {
-    tag
-	result = basic_tag(expression_basic(e));
+    tag	result = basic_tag(expression_basic(e));
 
     if (result==is_basic_overloaded)
     {
@@ -48,122 +45,42 @@ expression e;
 	{
 	    /* else some clever analysis could be done
 	     */
-	    user_warning("suggest_basic_for_expression",
-			 "an overloaded is turned into an int...\n");
+	    pips_user_warning("an overloaded is turned into an int...\n");
 	    result = is_basic_int;
 	}
     }
 
-    return(result);
+    return result;
 }
 
-expression 
-expression_dup(expression ex)
+expression expression_dup(expression ex)
 {
-    syntax s;
-    normalized n;
-
-    if (expression_undefined_p(ex))
-	return expression_undefined;
-
-    s = expression_syntax(ex);
-    n = expression_normalized(ex);
-
-    return (n == normalized_undefined)?
-	make_expression(syntax_dup(s), normalized_undefined):
-	make_expression(syntax_dup(s), normalized_dup(n));
+    return copy_expression(ex);
 }
 
-syntax 
-syntax_dup(syntax s)
+syntax syntax_dup(syntax s)
 {
-    syntax new_s = syntax_undefined;
-
-    switch(syntax_tag(s)) {
-
-    case is_syntax_reference: 
-    { reference r = syntax_reference(s);
-      new_s = make_syntax(is_syntax_reference, reference_dup(r));
-      break;
-    }
-
-    case is_syntax_range:
-    { range r = syntax_range(s);
-      new_s = make_syntax(is_syntax_range, range_dup(r));
-      break;
-    }
-
-    case is_syntax_call: 
-    { call c = syntax_call(s);
-      new_s = make_syntax(is_syntax_call, call_dup(c));
-      break;
-    }
-
-    default:
-	pips_error("syntax_dup", "ill. tag\n");
-    }
-    return new_s;
+    return copy_syntax(s);
 }
 
-normalized normalized_dup(n)
-normalized n;
+normalized normalized_dup(normalized n)
 {
-    normalized new_n = normalized_undefined;
-
-    switch(normalized_tag(n)) {
-    case is_normalized_linear: { 
-	Pvecteur v = (Pvecteur) normalized_linear(n);
-	new_n = make_normalized(is_normalized_linear, (char *) vect_dup(v));
-	break;
-    }
-    case is_normalized_complex: { 
-	new_n = make_normalized(is_normalized_complex, UU);
-	break;
-    }
-    default:
-	pips_error("normalized_dup", "ill. tag\n");
-    }
-    return new_n;
+    return copy_normalized(n);
 }
 
-reference reference_dup(r)
-reference r;
+reference reference_dup(reference r)
 {
-    entity v = reference_variable(r);
-    list ind = reference_indices(r);
-    list new_ind = NIL;
-
-    MAPL(ce, { 
-	expression e = EXPRESSION(CAR(ce));
-	new_ind = gen_nconc(new_ind, 
-			    CONS(EXPRESSION, expression_dup(e), NIL)) ;
-    }, ind);
-
-    return make_reference(v, new_ind);
+    return copy_reference(r);
 }
 
-range range_dup(r)
-range r;
+range range_dup(range r)
 {
-    return make_range(expression_dup(range_lower(r)),
-		      expression_dup(range_upper(r)),
-		      expression_dup(range_increment(r))) ;
+    return copy_range(r);
 }
 
-call call_dup(c)
-call c;
+call call_dup(call c)
 {
-    entity f = call_function(c);
-    list args = call_arguments(c);
-    list new_args = NIL;
-
-    MAPL(ce, { 
-	expression e = EXPRESSION(CAR(ce));
-	new_args = gen_nconc(new_args, 
-			     CONS(EXPRESSION, expression_dup(e), NIL)) ;
-    }, args);
-
-    return make_call(f, new_args);
+    return copy_call(c);
 }
 
 expression expression_mult(ex)
