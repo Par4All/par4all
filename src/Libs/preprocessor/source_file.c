@@ -49,7 +49,7 @@
 /* Return a sorted arg list of workspace names. (For each name, there
    is a name.database directory in the current directory): */
 void
-pips_get_program_list(int * pargc,
+pips_get_workspace_list(int * pargc,
                       char * argv[])
 {
    int i;
@@ -225,16 +225,25 @@ string file;
 
     /* the new file is registered in the database */
     user_log("Registering file %s\n", file);
-    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, database_name(pgm), abspath);
+    /* FI: two problems here
+       - the successive calls to DB_PUT_FILE_RESOURCE erase each other...
+       - the wiring of the database_name prevents mv of the database (fixed)
+       */
+    /* DB_PUT_FILE_RESOURCE(DBR_USER_FILE, database_name(pgm), abspath); */
+    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, "", abspath);
 
     /* the new file is splitted according to Fortran standard */
     user_log("Splitting file    %s\n", file);
     cwd = strdup(get_cwd());
     chdir(database_directory(pgm));
     /* reverse sort because the list of modules is reversed later */
+    /* if two modules have the same name, the first splitted wins
+       and the other one is hidden by the call to "sed" since
+       fsplit gives it a zzz00n.f name */
+    /* Let's hope no user module is called zzz???.f */
     safe_system(concatenate("pips-split ", abspath,
-		       "| sed -e /zzz00[0-9].f/d | sort -r > ",
-		       tempfile, NULL));
+		       "| sed -e /zzz[0-9][0-9][0-9].f/d | sort -r > ",
+		       tempfile, "; /bin/rm -f zzz???.f", NULL));
     chdir(cwd);
     free(cwd);
 
@@ -255,14 +264,17 @@ string file;
 	modname = strdup(buffer);
 
 	user_log("  Module         %s\n", modname);
-	DB_PUT_FILE_RESOURCE(DBR_SOURCE_FILE, modname, modrelfilename);
+	if(DB_PUT_NEW_FILE_RESOURCE(DBR_SOURCE_FILE, 
+				    modname, modrelfilename)
+	   == resource_undefined) {
+	    user_warning("process_user_file", 
+			 "Two source codes for module %s."
+			 "The second occurence in file %s is ignored\n",
+			 modname, file);
+	}
     }
     safe_fclose(fd, tempfile);
 
-    /* Next two lines added by BB to remove tempfile. Could be done later, 
-     * as exiting the program.
-     * 22.03.91
-     */
     unlink(tempfile);
     tempfile = NULL;
     return TRUE;
