@@ -397,7 +397,7 @@ i_set:
 	SET_PROPERTY
 	sep_list
 	PROPNAME
-	{ $$ = (list) yylval.name; /* bof */}
+	{ $$ = (int) yylval.name; /* bof */}
 	sep_list
 	SETVALUE
 	opt_sep_list
