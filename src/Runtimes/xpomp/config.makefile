@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/09 08:44:30 $ 
+# $Date: 1996/09/09 08:45:09 $ 
 
 CPPFLAGS+=	$(PIPS_X11_ADDED_CPPFLAGS)
 LDFLAGS+=	$(PIPS_X11_ADDED_LDFLAGS)
@@ -80,7 +80,8 @@ $(ARCH)/wave : $(ARCH)/wave.o $(LIB)
 
 clean: local-clean
 local-clean:
-	$(RM) cgraphic.c $(ARCH)/*.o $(DRUN) xpomp_manual.dvi
+	$(RM) cgraphic.c $(ARCH)/*.o $(DRUN) \
+		xpomp_manual.dvi xpomp_stubs.direct 
 	$(RM) -r $(DDOC) 
 
 # that is all
