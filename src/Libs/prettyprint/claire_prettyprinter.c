@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.3  2004/03/24 16:02:03  hurbain
+   First version for claire pretty printer. Currently only manages (maybe :p) arrays declarations.
+
    Revision 1.2  2004/03/11 15:09:43  irigoin
    function print_claire_code() declared for the link but not programmed yet.
 
@@ -30,6 +33,7 @@
 
 #define EMPTY         ""
 #define NL            "\n"
+#define TAB           "\t"
 #define SEMICOLON     ";" NL
 #define SPACE         " "
 
@@ -231,6 +235,48 @@ int_to_string(int i)
   char buffer[50];
   sprintf(buffer, "%d", i);
   return strdup(buffer);
+}
+
+static string claire_dim_string(list ldim)
+{
+  string result = "";
+  int nbdim = 0;
+  string origins = "origins = list<integer>(";
+  string dimensions = "dimSizes = list<integer>(";
+
+  if (ldim)
+    {
+      result = strdup(contatenate("A_A", " :: ", "DATA_ARRAY(",
+				  "name = symbol!(" "\"A_A\"", ")", ",", NL));
+      result = strdup(concatenate(result, TAB, "dim = ");
+      MAP(DIMENSION, dim, {
+	nbdim++;
+	expression elow = dimension_lower(dim);
+	expression eup = dimension_upper(dim);
+	int low;
+	int up;
+	if (expression_integer_value(elow, &low)){
+	  if(nbdim != 1)
+	    origins = strdup(concatenate(origins, ",",int_to_string(low)));
+	  else
+	    origins = strdup(concatenate(origins, int_to_string(low)));
+	}
+	else pips_user_error("Array origins must be integer");
+
+	if (expression_integer_value(esup, &sup)){
+	  if(nbdim != 1)
+	    dimensions = strdup(concatenate(dimensions, ", ",int_to_string(sup-low+1)));
+	  else
+	    dimensions = strdup(concatenate(dimensions, int_to_string(sup-low+1)));
+	}
+	else pips_user_error("Array dimensions must be integer");
+      }, ldim);
+      result = strdup(concatenate(result, int_to_string(nbdim), ",", NL));
+      result = strdup(concatenate(result, TAB, origins, "),", NL));
+      result = strdup(concatenate(result, TAB, dimensions, "),", NL));
+      result = strdup(concatenate(result, TAB, "dataType = INTEGER)", NL, NL);
+    }
+  return result;
 }
 
 static string c_dim_string(list ldim)
@@ -473,6 +519,138 @@ static string this_entity_cdeclaration(entity var)
  
   return result? result: strdup("");
 }
+
+static string this_entity_clairedeclaration(entity var)
+{
+  string result = NULL;
+  string name = entity_local_name(var);
+  type t = entity_type(var);
+  storage s = entity_storage(var);
+  pips_debug(2,"Entity name : %s\n",entity_name(var));
+  /*  Many possible combinations */
+
+  if (strstr(name,TYPEDEF_PREFIX) != NULL)
+    /* This is a typedef name, what about typedef int myint[5] ???  */
+    return strdup(concatenate("typedef ", c_type_string(t),SPACE,c_entity_local_name(var),NULL));
+  
+  switch (storage_tag(s)) {
+  case is_storage_rom: 
+    {
+      value va = entity_initial(var);
+      if (!value_undefined_p(va))
+	{
+	  constant c = NULL;
+	  if (value_constant_p(va))
+	    c = value_constant(va);
+	  else if (value_symbolic_p(va))
+	    c = symbolic_constant(value_symbolic(va));
+	  if (c)
+	    {
+	      if (constant_int_p(c))
+		{
+		  string sval = int_to_string(constant_int(c));
+		  string svar = c_entity_local_name(var);
+		  result = strdup(concatenate(SHARPDEF, SPACE, svar,
+					      SPACE, sval, NL, NULL));
+		  
+		  free(svar);
+		  free(sval);
+		  return result;
+		}
+	      /*What about real, double, string, ... ?*/
+	    }
+	}
+      break;
+    }
+  case is_storage_ram: 
+    {
+      /*     ram r = storage_ram(s);
+      entity sec = ram_section(r);
+      if ((sec == CurrentSourceFileStaticArea) || (sec == CurrentStaticArea))
+      result = "static ";*/
+      break;
+    }
+  default: 
+  }
+
+  switch (type_tag(t)) {
+  case is_type_variable:
+    {
+      variable v = type_variable(t);  
+      string st, sd, svar, sq;
+      value val = entity_initial(var);
+      st = c_basic_string(variable_basic(v));
+      sd = claire_dim_string(variable_dimensions(v));
+      sq = c_qualifier_string(variable_qualifiers(v));
+      svar = c_entity_local_name(var);
+     
+      /* problems with order !*/
+      result = strdup(concatenate(sq, st, SPACE, svar, sd, NULL));
+      if (!value_undefined_p(val))
+	{
+	  if (value_expression_p(val))
+	    {
+	      expression exp = value_expression(val);
+	      if (brace_expression_p(exp))
+		result = strdup(concatenate(result,"=",c_brace_expression_string(exp),NULL));
+	      else 
+		result = strdup(concatenate(result,"=",words_to_string(words_expression(exp)),NULL));
+	    }
+	}
+      if (basic_bit_p(variable_basic(v)))
+	{
+	  int i = basic_bit(variable_basic(v));
+	  pips_debug(2,"Basic bit %d",i);
+	  result = strdup(concatenate(result,":",int_to_string(i),NULL));
+	}
+      free(st); free(sd); free(svar);
+      break;
+    }
+  case is_type_struct:
+    {
+      list l = type_struct(t);
+      result = strdup(concatenate("struct ",c_entity_local_name(var), "{", NL,NULL));
+      MAP(ENTITY,ent,
+      {
+	string s = this_entity_clairedeclaration(ent);	    
+	result = strdup(concatenate(result, s, SEMICOLON, NULL));
+	free(s);
+      },l);
+      result = strdup(concatenate(result,"}", NULL));
+      break;
+    }
+  case is_type_union:
+    {
+      list l = type_union(t);
+      result = strdup(concatenate("union ",c_entity_local_name(var), "{", NL,NULL));
+      MAP(ENTITY,ent,
+      {
+	string s = this_entity_clairedeclaration(ent);	    
+	result = strdup(concatenate(result, s, SEMICOLON, NULL));
+	free(s);
+      },l);
+      result = strdup(concatenate(result,"}", NULL));
+      break;
+    }
+  case is_type_enum:
+    {
+      list l = type_enum(t);
+      bool first = TRUE;
+      result = strdup(concatenate("enum ",c_entity_local_name(var), " {",NULL));
+      MAP(ENTITY,ent,
+      { 
+	result = strdup(concatenate(result,first?"":",",c_entity_local_name(ent),NULL));
+	first = FALSE;
+      },l);
+      result = strdup(concatenate(result,"}", NULL));
+      break;
+    }
+  default:
+  }
+ 
+  return result? result: strdup("");
+}
+
 
 static bool parameter_p(entity e)
 {
@@ -1189,6 +1367,124 @@ static string c_statement(statement s)
   return result;
 }
 
+static string claire_statement(statement s)
+{
+  string result;
+  instruction i = statement_instruction(s);
+  list l = statement_declarations(s);
+  printf("\nCurrent statement : \n");
+  print_statement(s);
+  switch (instruction_tag(i))
+    {
+    case is_instruction_test:
+      {
+	test t = instruction_test(i);
+	result = c_test(t);
+	break;
+      }
+    case is_instruction_sequence:
+      {
+	sequence seq = instruction_sequence(i);
+	result = c_sequence(seq);
+	break;
+      }
+    case is_instruction_loop:
+      {
+	loop l = instruction_loop(i);
+	result = c_loop(l);
+	break;
+      }
+    case is_instruction_whileloop:
+      {
+	whileloop w = instruction_whileloop(i);
+	result = c_whileloop(w);
+	break;
+      }
+    case is_instruction_forloop:
+      {
+	forloop f = instruction_forloop(i);
+	result = c_forloop(f);
+	break;
+      }
+    case is_instruction_call:
+      {
+	string scall = c_call(instruction_call(i));
+	result = strdup(concatenate(scall, SEMICOLON, NULL));
+	break;
+      }
+    case is_instruction_unstructured:
+      {
+	unstructured u = instruction_unstructured(i);
+	result = c_unstructured(u);
+	break;
+      }
+    case is_instruction_goto:
+      {
+	statement g = instruction_goto(i);
+	entity el = statement_label(g);
+	string l = entity_local_name(el) + strlen(LABEL_PREFIX);
+	result = strdup(concatenate("goto ",l, SEMICOLON, NULL));
+	break;
+      }
+      /* add switch, forloop break, continue, return instructions here*/
+    default:
+      result = strdup(concatenate(COMMENT, " Instruction not implemented" NL, NULL));
+      break;
+    }
+
+  if (!ENDP(l))
+    {
+      string decl = ""; 
+      MAP(ENTITY, var,
+      {
+	string svar;
+	debug(2, "\n In block declaration for variable :",c_entity_local_name(var));   
+	svar = this_entity_clairedeclaration(var);
+	decl = strdup(concatenate(decl, svar, SEMICOLON, NULL));
+	free(svar);
+      },l);
+      result = strdup(concatenate(decl,result,NULL));
+    }
+
+  return result;
+}
+
+
+static string claire_code_string(entity module, statement stat)
+{
+  string before_head, head, decls, body, result;
+
+  /* What about declarations that are external a module scope ?
+     Consider a source file as a module entity, put all declarations in it 
+     (external static + TOP-LEVEL) */
+
+  /* before_head only generates the constant declarations, such as #define*/
+  ifdebug(2)
+    {
+      printf("Module statement: \n");
+      print_statement(stat);
+      printf("and declarations: \n");
+      print_entities(statement_declarations(stat));
+    }
+
+  before_head = c_declarations(module, parameter_p, NL, TRUE);
+  head        = c_head(module);
+  /* What about declarations associated to statements */
+  decls       = c_declarations(module, variable_p, SEMICOLON, TRUE);
+  body        = claire_statement(stat);
+  
+  result = strdup(concatenate(before_head, head, OPENBRACE, NL, 
+			      decls, NL,
+			      body, CLOSEBRACE, NL, NULL));
+
+  free(before_head);
+  free(head);
+  free(decls);
+  free(body);
+
+  return result;
+}
+
 static string c_code_string(entity module, statement stat)
 {
   string before_head, head, decls, body, result;
@@ -1247,14 +1543,14 @@ bool print_claire_rough(string module_name)
   set_current_module_statement(stat);
 
   debug_on("CPRETTYPRINTER_DEBUG_LEVEL");
-  pips_debug(1, "Begin C prettyprrinter for %s\n", entity_name(module));
-  ppt = c_code_string(module, stat);
+  pips_debug(1, "Begin Claire prettyprrinter for %s\n", entity_name(module));
+  ppt = claire_code_string(module, stat);
   pips_debug(1, "end\n");
   debug_off();  
 
   /* save to file */
   out = safe_fopen(filename, "w");
-  fprintf(out, "/* C pretty print for module %s. */\n%s", module_name, ppt);
+  fprintf(out, "/* Claire pretty print for module %s. */\n%s", module_name, ppt);
   safe_fclose(out, filename);
 
   free(ppt);
