@@ -1,9 +1,13 @@
+%% 
+%% $Id$
+%%
+
 \documentstyle[a4]{article}
 
 \title{PIPS/SAC: SIMD Architecture Compiler}
 \author{Franc,ois Ferrand \\
 \\
-	ENST Bretagne}
+        ENST Bretagne}
 
 \newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{#2}}
 
@@ -51,7 +55,7 @@ arguments for the opcode.
 \domain{pattern = class:int x args:patternArg*}
 {}
 
-\domain{External hash\_table}
+%% NON (FC): \domain{External hash\_table}
 {}
 
 \verb+matchTree+ is a structure used to efficiently identify
