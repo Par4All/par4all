@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/10 15:22:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/17 16:34:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1995/10/10 15:22:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1995/10/17 16:34:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -88,7 +88,7 @@ end_directory_notify(char * dir)
       return FALSE;
    }
    else {
-      user_log("Directory %s selected\n", dir);
+      user_log("Directory \"%s\" selected\n", dir);
       show_directory();
       return TRUE;
    }
