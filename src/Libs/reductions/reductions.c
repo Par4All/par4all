@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/22 10:32:11 $, 
+ * $Date: 1996/09/27 14:02:02 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -341,7 +341,7 @@ bool proper_reductions(string module_name)
     set_current_module_statement
 	((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
     set_proper_effects_map(effectsmap_to_listmap((statement_mapping) 
-        db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE)));
+        db_get_memory_resource(DBR_PROPER_REFERENCES, module_name, TRUE)));
 
     /* do the job 
      */
@@ -524,7 +524,7 @@ bool cumulated_reductions(string module_name)
     set_current_module_statement((statement)
         db_get_memory_resource(DBR_CODE, module_name, TRUE));
     set_proper_effects_map(effectsmap_to_listmap((statement_mapping) 
-        db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE)));
+        db_get_memory_resource(DBR_PROPER_REFERENCES, module_name, TRUE)));
     set_cumulated_effects_map(effectsmap_to_listmap((statement_mapping) 
         db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
     set_proper_reductions((pstatement_reductions)
