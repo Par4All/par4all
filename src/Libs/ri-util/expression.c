@@ -399,6 +399,31 @@ expression e;
 	return FALSE;
 }
 
+bool signed_integer_constant_expression_p(e)
+expression e;
+{
+  if(!integer_constant_expression_p(e)) {
+    syntax s = expression_syntax(e);
+
+    if(syntax_call_p(s)) {
+	call c = syntax_call(s);
+	entity um = call_function(c);
+
+	if(um == gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+							 UNARY_MINUS_OPERATOR_NAME),
+				    entity_domain)) {
+	  expression e2 = EXPRESSION(CAR(call_arguments(c)));
+
+	  return integer_constant_expression_p(e2);
+	}
+    }
+    return FALSE;
+  }
+  else {
+    return TRUE;
+  }
+}
+
 bool modulo_expression_p(e)
 expression e;
 {
@@ -867,13 +892,20 @@ make_integer_constant_expression(int c)
 int 
 integer_constant_expression_value(expression e)
 {
+  pips_assert("is constant", integer_constant_expression_p(e));
+  return signed_integer_constant_expression_value(e);
+}
+
+int 
+signed_integer_constant_expression_value(expression e)
+{
     /* could be coded by geting directly the value of the constant entity... */
     /* also available as integer_constant_p() which has *two* arguments */
 
     normalized n = normalized_undefined;
     int val = 0;
 
-    pips_assert("is constant", integer_constant_expression_p(e));
+    pips_assert("is signed constant", signed_integer_constant_expression_p(e));
 
     n = NORMALIZE_EXPRESSION(e);
     if(normalized_linear_p(n)) {
