@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/10/10 11:30:16 $, ) 
+ * ($Date: 1995/10/17 11:16:22 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -97,8 +97,8 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* Constants
  */
-#define HOST_NAME "HOST"
-#define NODE_NAME "NODE"
+#define HOST_NAME "HPFC-HOST"
+#define NODE_NAME "HPFC-NODE"
 
 /* Overlap
  */
