@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-! ($Date: 1997/01/02 18:37:22 $, )
+! ($Date: 1997/01/07 11:51:09 $, )
 !
 !
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -228,7 +228,6 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_SECTION')
       TYPE
      $ array(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
-      include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       integer COMMA_REPLICATE(LEVEL, `INDEX_REF')
