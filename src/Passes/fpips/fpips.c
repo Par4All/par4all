@@ -15,6 +15,8 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 
 
@@ -41,6 +43,9 @@ extern int wpips_main(int, char**);
 #define WPIPS(c, v) wpips_main(c, v)
 #endif
 
+#define true  (1)
+#define false (0)
+
 #define same_string_p(s1, s2) (strcmp((s1),(s2))==0)
 
 
@@ -51,11 +56,12 @@ fpips_usage(int ret)
 {
     fprintf(stderr, 
 	    "Usage: fpips [-hPTW] (other options and arguments...)\n"
-	    "\t-h: help\n"
+	    "\t-h: this help...\n"
 	    "\t-P: pips\n"
 	    "\t-T: tpips\n"
 	    "\t-W: wpips\n"
 	    "\tdefault: tpips\n");
+
     return ret;
 }
 
@@ -72,11 +78,11 @@ static int
 name_end_p(char * name, char * ref)
 {
     int nlen = strlen(name), rlen = strlen(ref);
-    if (nlen<rlen) return 0;
+    if (nlen<rlen) return false;
     while (rlen>0) 
 	if (ref[--rlen]!=name[--nlen]) 
-	    return 0;
-    return 1;
+	    return false;
+    return true;
 }
 
 
@@ -85,6 +91,8 @@ name_end_p(char * name, char * ref)
 int 
 fpips_main(int argc, char **  argv)
 {
+    if (argc<1) return TPIPS(argc, argv); /* should not happen */
+
     if (name_end_p(argv[0],  "/pips")) return  PIPS(argc, argv);
     if (name_end_p(argv[0], "/tpips")) return TPIPS(argc, argv);
     if (name_end_p(argv[0], "/wpips")) return WPIPS(argc, argv);
