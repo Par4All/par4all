@@ -60,8 +60,11 @@ move public_GNUSOL2LL
 make_pips_release -P -rzf public_GNUSOL2LL PIPS ||
 	error 7 "ret $?"
 
+# IBM AIX:
 # make_pips_release -XCB IBMAIX -D Examples -pe -rzf pips_IBMAIX PIPS
-# make_pips_release -XCB LINUXI86 -D Examples -pe -rzf pips_LINUXI86 PIPS
+
+# Linux: extern is useless because Linux is GNU;-)
+# make_pips_release -XCB LINUXI86 -D Examples -p -rzf pips_LINUXI86 PIPS
 
 echo done
 
