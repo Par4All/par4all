@@ -292,7 +292,7 @@ attach_head_to_sentence(sentence s,
 }
 
 
-/* Attach a reference: */
+/* Attach a module usage (CALL or function call): */
 void
 attach_reference_to_word_list(string begin_word,
 			      string end_word,
@@ -303,6 +303,18 @@ attach_reference_to_word_list(string begin_word,
 			    end_word,
 			    make_attachee(is_attachee_reference, r));
 }
+
+
+/* Attach a reference: */
+void
+attach_regular_call_to_word(string word, call c)
+{
+  if (is_emacs_pretty_print_asked)
+    attach_to_word_list(word,
+			word,
+			make_attachee(is_attachee_call, c));
+}
+
 
 
 /* Attach a declaration to all the words of the given list: */
@@ -618,6 +630,16 @@ output_an_attachment(FILE * output_file,
 	    /* Evaluate the keymap: */
 	    fprintf(output_file, "face epips-face-reference mouse-face epips-mouse-face-reference local-map ,epips-reference-keymap epips-property-reference \"%p\" epips-property-reference-variable \"%p\"",
 		    r, reference_variable(r));
+	    break;
+	}
+	
+    case is_attachee_call:
+	{	    
+	    call c = attachee_call(at);
+	    pips_debug(5, "\treference %p\n", c);
+	    /* Evaluate the keymap: */
+	    fprintf(output_file, "face epips-face-call mouse-face epips-mouse-face-call local-map ,epips-call-keymap epips-property-call \"%p\"",
+		    c);
 	    break;
 	}
 	
