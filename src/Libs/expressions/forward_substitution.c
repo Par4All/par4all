@@ -22,6 +22,9 @@
  * and substitution are not performed.
  *
  * $Log: forward_substitution.c,v $
+ * Revision 1.9  2000/05/26 15:27:04  coelho
+ * hop.
+ *
  * Revision 1.8  1998/04/14 21:30:43  coelho
  * linear.h
  *
@@ -122,22 +125,33 @@ free_substitution(p_substitution subs)
 
 #define DEBUG_NAME "FORWARD_SUBSTITUTION_DEBUG_LEVEL"
 
+static bool no_write_effects_on_var(entity var, list le)
+{
+  MAP(EFFECT, e, 
+      if (effect_write_p(e) && entity_conflict_p(effect_variable(e), var))
+        return FALSE,
+      le);
+  return TRUE;  
+}
+
+static bool functionnal_on_effects(entity var, list /* of effect */ le)
+{
+  MAP(EFFECT, e, 
+      if ((effect_write_p(e) && effect_variable(e)!=var) ||
+	  (effect_read_p(e) && entity_conflict_p(effect_variable(e), var)))
+      return FALSE,
+      le);
+  return TRUE;  
+}
+
 /* returns whether there is other write proper effect than on var
  * or if some variable conflicting with var is read... (?) 
  * proper_effects must be available.
  */
-static bool
-functionnal_on(
-    entity var,
-    statement s)
+static bool functionnal_on(entity var, statement s)
 {
-    effects efs = load_proper_rw_effects(s);
-    MAP(EFFECT, e, 
-	if ((effect_write_p(e) && effect_variable(e)!=var) ||
-	    (effect_read_p(e) && entity_conflict_p(effect_variable(e), var)))
-	    return FALSE,
-	effects_effects(efs));
-    return TRUE;
+  effects efs = load_proper_rw_effects(s);
+  return functionnal_on_effects(var, effects_effects(efs));
 }
 
 /* Whether it is a candidate of a substitution operation. that is: 
@@ -145,49 +159,53 @@ functionnal_on(
  * (2) it is an assignment call
  * (3) the assigned variable is a scalar
  * (4) there are no side effects in the expression
+ * 
+ * Note: a substitution candidate might be one after substitutions...
+ *       but not before? So effects should be recomputed? or updated?
+ * eg: x = 1; x = x + 1;
  */
-static p_substitution
-substitution_candidate(statement s, bool only_scalar)
+static p_substitution substitution_candidate(statement s, bool only_scalar)
 {
-    list /* of expression */ args;
-    call c;
-    entity fun, var;
-    syntax svar;
-    instruction i = statement_instruction(s);
-
-    if (!instruction_call_p(i)) return NULL; /* CALL */
-    
-    c = instruction_call(i);
-    fun = call_function(c);
-
-    if (!ENTITY_ASSIGN_P(fun)) return NULL; /* ASSIGN */
-
-    ifdebug(7) {
-	pips_debug(7, "considering assignment statement:\n");
-	print_statement(s);
-    }
-
-    args = call_arguments(c);
-    pips_assert("2 args to =", gen_length(args)==2);
-    svar = expression_syntax(EXPRESSION(CAR(args)));
-    pips_assert("assign to a reference", syntax_reference_p(svar));
-    var = reference_variable(syntax_reference(svar));
-
-    if (only_scalar && !entity_scalar_p(var)) return NULL; /* SCALAR */
-
-    if (!functionnal_on(var, s)) return NULL; /* NO SIDE EFFECTS */
-
-    return make_substitution(s, var, EXPRESSION(CAR(CDR(args))));
+  list /* of expression */ args;
+  call c;
+  entity fun, var;
+  syntax svar;
+  instruction i = statement_instruction(s);
+  
+  if (!instruction_call_p(i)) return NULL; /* CALL */
+  
+  c = instruction_call(i);
+  fun = call_function(c);
+  
+  if (!ENTITY_ASSIGN_P(fun)) return NULL; /* ASSIGN */
+  
+  ifdebug(7) {
+    pips_debug(7, "considering assignment statement:\n");
+    print_statement(s);
+  }
+  
+  args = call_arguments(c);
+  pips_assert("2 args to =", gen_length(args)==2);
+  svar = expression_syntax(EXPRESSION(CAR(args)));
+  pips_assert("assign to a reference", syntax_reference_p(svar));
+  var = reference_variable(syntax_reference(svar));
+  
+  if (only_scalar && !entity_scalar_p(var)) return NULL; /* SCALAR */
+  
+  if (!functionnal_on(var, s)) return NULL; /* NO SIDE EFFECTS */
+  
+  return make_substitution(s, var, EXPRESSION(CAR(CDR(args))));
 }
 
-/* x = a(i) ; a(j) = x;
+/* x    = a(i) ; 
+ * a(j) = x ;
+ *
  * we can substitute x but it cannot be continued.
  * just a hack for this very case at the time. 
  * maybe englobing parallel loops or dependence information could be use for 
  * a better decision? I'll think about it on request only.
  */
-static bool
-cool_enough_for_a_last_substitution(statement s)
+static bool cool_enough_for_a_last_substitution(statement s)
 {
     p_substitution x = substitution_candidate(s, FALSE);
     bool ok = (x!=NULL);
@@ -195,43 +213,84 @@ cool_enough_for_a_last_substitution(statement s)
     return ok;
 }
 
+/* s = r ;
+ * s = s + w ; // read THEN write...
+ */
+static bool other_cool_enough_for_a_last_substitution(statement s, entity v)
+{
+  instruction i = statement_instruction(s);
+  call c;
+  list args;
+  syntax svar;
+  entity var;
+  list le;
+  bool cool;
+
+  if (!instruction_call_p(i)) 
+    return FALSE;
+
+  c = instruction_call(i);
+  if (!ENTITY_ASSIGN_P(call_function(c)))
+    return FALSE;
+
+  /* it is an assignment */
+  args = call_arguments(c);
+  pips_assert("2 args to =", gen_length(args)==2);
+  svar = expression_syntax(EXPRESSION(CAR(args)));
+  pips_assert("assign to a reference", syntax_reference_p(svar));
+  var = reference_variable(syntax_reference(svar));
+  
+  if (!entity_scalar_p(var)) return FALSE;
+  
+  le = proper_effects_of_expression(EXPRESSION(CAR(CDR(args))));
+  cool = no_write_effects_on_var(v, le);
+  gen_full_free_list(le);
+
+  return cool;
+}
+
 /* do perform the substution var -> val everywhere in s
  */
-static entity the_variable;
-static expression the_value;
-static bool
-expr_flt(expression e)
+static bool expr_flt(expression e, p_substitution subs)
 {
     syntax s = expression_syntax(e);
     reference r;
     if (!syntax_reference_p(s)) return TRUE;
     r = syntax_reference(s);
-    if (reference_variable(r)==the_variable)
+    if (reference_variable(r) == subs->var)
     {
-	expression_syntax(e) = copy_syntax(expression_syntax(the_value));
+	expression_syntax(e) = copy_syntax(expression_syntax(subs->val));
 	free_syntax(s);
 	return FALSE;
     }
     return TRUE;
 }
+
 static void
 perform_substitution(
     p_substitution subs, /* substitution to perform */
-    statement s /* where to do this */)
+    void * s /* where to do this */)
 {
-    ifdebug(8) {
-	pips_debug(8, "\n");
-	print_statement(subs->source);
-	print_statement(s);
-    }
-    the_variable = subs->var;
-    the_value = subs->val;
-    /* maybe should take care of exit nodes? */
-    gen_recurse(s, expression_domain, expr_flt, gen_null);
-    ifdebug(8) {
-	pips_debug(8, "result:\n");
-	print_statement(s);
-    }
+    gen_context_recurse(s, subs, expression_domain, expr_flt, gen_null);
+}
+
+static void
+perform_substitution_in_assign(p_substitution subs, statement s)
+{
+  instruction i = statement_instruction(s);
+  list args;
+  
+  /* special case */
+  pips_assert("assign call", 
+	      instruction_call_p(i) && 
+	      ENTITY_ASSIGN_P(call_function(instruction_call(i))));
+  
+  args = call_arguments(instruction_call(i));
+
+  perform_substitution(subs, EXPRESSION(CAR(CDR(args))));
+  MAP(EXPRESSION, e, perform_substitution(subs, e), 
+      reference_indices(syntax_reference
+	  (expression_syntax(EXPRESSION(CAR(args))))));
 }
 
 /* whether there are some conflicts between W cumulated in s2
@@ -243,81 +302,82 @@ perform_substitution(
 static bool 
 some_conflicts_between(statement s1, statement s2, bool only_written)
 {
-    effects efs1, efs2;
-    efs1 = load_proper_rw_effects(s1);
-    efs2 = load_cumulated_rw_effects(s2);
-
-    pips_debug(8, "looking for conflict %d/%d\n", 
-	       statement_number(s1), statement_number(s2));
-
-    MAP(EFFECT, e2,
+  effects efs1, efs2;
+  efs1 = load_proper_rw_effects(s1);
+  efs2 = load_cumulated_rw_effects(s2);
+  
+  pips_debug(8, "looking for conflict %d/%d\n", 
+	     statement_number(s1), statement_number(s2));
+  
+  MAP(EFFECT, e2,
+  {
+    if (effect_write_p(e2))
     {
-	if (effect_write_p(e2))
-	{
-	    entity v2 = effect_variable(e2);
-	    pips_debug(9, "written variable %s\n", entity_name(v2));
-	    MAP(EFFECT, e1,
-		if (entity_conflict_p(effect_variable(e1), v2) &&
-		    (!(only_written && effect_read_p(e1))))
-		{
-		    pips_debug(8, "conflict with %s\n",
-			       entity_name(effect_variable(e1)));
-		    return TRUE;
-		},
-		effects_effects(efs1));
-	}
-    },
-	effects_effects(efs2));
-
-    pips_debug(8, "no conflict\n");
-    return FALSE;
+      entity v2 = effect_variable(e2);
+      pips_debug(9, "written variable %s\n", entity_name(v2));
+      MAP(EFFECT, e1,
+	  if (entity_conflict_p(effect_variable(e1), v2) &&
+	      (!(only_written && effect_read_p(e1))))
+      {
+	pips_debug(8, "conflict with %s\n", entity_name(effect_variable(e1)));
+	return TRUE;
+      },
+	  effects_effects(efs1));
+    }
+  },
+      effects_effects(efs2));
+  
+  pips_debug(8, "no conflict\n");
+  return FALSE;
 }
 
 /* top-down forward substitution of scalars in SEQUENCE only.
  */
-static bool
-seq_flt(sequence s)
+static bool seq_flt(sequence s)
 {
-    MAPL(ls, 
+  MAPL(ls, 
+  {
+    statement first = STATEMENT(CAR(ls));
+    p_substitution subs = substitution_candidate(first, TRUE);
+    if (subs)
     {
-	statement first = STATEMENT(CAR(ls));
-	p_substitution subs = substitution_candidate(first, TRUE);
-	if (subs)
+      /* scan following statements and substitute while no conflicts.
+       */
+      MAP(STATEMENT, anext,
+      {
+	if (some_conflicts_between(subs->source, anext, FALSE))
 	{
-	    /* scan following statements and substitute while no conflicts.
-	     */
-	    MAP(STATEMENT, anext,
-	    {
-		if (some_conflicts_between(subs->source, anext, FALSE))
-		{
-		    /* for some special case the substitution is performed.
-		     */
-		    if (cool_enough_for_a_last_substitution(anext) &&
-			!some_conflicts_between(subs->source, anext, TRUE))
-			perform_substitution(subs, anext);
+	  /* for some special case the substitution is performed.
+	   * in some cases effects should be updated?
+	   */
+	  if (cool_enough_for_a_last_substitution(anext) &&
+	      !some_conflicts_between(subs->source, anext, TRUE))
+	    perform_substitution(subs, anext);
+	  else
+	    if (other_cool_enough_for_a_last_substitution(anext, subs->var))
+	      perform_substitution_in_assign(subs, anext);
 
-		    /* now STOP propagation!
-		     */
-		    break; 
-		}
-		else
-		    perform_substitution(subs, anext);
-	    },   
-		CDR(ls));
-
-	    free_substitution(subs);
+	  /* now STOP propagation!
+	   */
+	  break; 
 	}
-    },
-        sequence_statements(s));
-
-    return TRUE;
+	else
+	  perform_substitution(subs, anext);
+      },   
+	  CDR(ls));
+      
+      free_substitution(subs);
+    }
+  },
+       sequence_statements(s));
+  
+  return TRUE;
 }
 
 /* interface to pipsmake.
  * should have proper and cumulated effects...
  */
-bool 
-forward_substitute(string module_name)
+bool forward_substitute(string module_name)
 {
     statement stat;
 
