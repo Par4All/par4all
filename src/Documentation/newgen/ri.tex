@@ -314,6 +314,11 @@ sous-domaine \verb/intrinsic/ est utilise' pour toutes les entite's qui
 ne de'pendent que du langage, telles que les intrinsics Fortran, les
 ope'rateurs, les instructions, etc. Enfin le sous-domaine
 \verb/unknown/ est utilise' pour les valeurs initiales inconnues.
+
+Additional value kinds would be necessary to encode the initial value of
+an area, if the overloading of the \verb+unknown+ kind becomes a
+problem. Pierre Jouvelot suggested to give \verb+COMMON+ themselves as
+initial value since a common represented an address.
 }
 
 \subsubsection{Symbolic Value}
