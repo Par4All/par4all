@@ -232,24 +232,24 @@ char *mod_name;
 
     ifdebug(2) {
 	hash_warn_on_redefinition();
-	gen_consistent_p (chains);
+	graph_consistent_p (chains);
     }
 
     ifdebug(1) {
 	fprintf(stderr, "Space for chains: %d bytes\n", 
-		gen_allocated_memory(chains));
+		gen_allocated_memory((chunk *) chains));
 	fprintf(stderr, "Space for obj_table: %d bytes\n", 
 		current_shared_obj_table_size());
 	mem_spy_begin();
     }
     
     hash_warn_on_redefinition();
-    dg = gen_copy_tree (chains);
+    dg = copy_graph (chains);
 
     ifdebug(1) {
 	mem_spy_end("After DG copy");
 	fprintf(stderr, "Space for chains's copy: %d bytes\n", 
-		gen_allocated_memory(dg));	
+		gen_allocated_memory((chunk *) dg));	
 	fprintf(stderr, "Space for obj_table: %d bytes\n", 
 		current_shared_obj_table_size());
     }
@@ -730,7 +730,7 @@ rice_update_dependence_graph(
 			
 			conflict_source(c) = effect_undefined;
 			conflict_sink(c) = effect_undefined;
-			gen_free(c);
+			free_conflict(c);
 		    }
 		    else 
 		    {
@@ -775,7 +775,7 @@ rice_update_dependence_graph(
 				    successor_vertex(s2su) = vertex_undefined;
 				    successor_arc_label_(s2su) = (char *) 
 					dg_arc_label_undefined;
-				    gen_free(s2su);
+				    free_successor(s2su);
 				    ps2su = CDR(ps2su);
 				    if (ps2sus == NIL) {
 					vertex_successors(v2) = ps2su;
@@ -815,7 +815,7 @@ rice_update_dependence_graph(
 	    {
 		successor_vertex(su) = vertex_undefined;
 		successor_arc_label_(su) = (char *) dg_arc_label_undefined;
-		gen_free(su);
+		free_successor(su);
 		ps = CDR(ps);
 		if (pss == NIL) 
 		    vertex_successors(v1) = ps;
@@ -949,7 +949,7 @@ TestCoupleOfReferences(
 	user_warning("TestCoupleOfReferences",
 		     "Dependence between differents variables: "
 		     "%s and %s\nDependence assumed\n",
-		     entity_minimal_name(e1), entity_minimal_name(e2));
+		     entity_local_name(e1), entity_local_name(e2));
 	
     }
 	
