@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/08/31 12:39:29 $, )
+# ($Date: 1996/08/31 13:15:40 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -272,12 +272,8 @@ param_init.f: param_init.m4
 #
 # Link
 
-ADDED_LD_FLAGS=$(shell \
+ADDED_LD_FLAGS:=$(shell \
 	sed '/^![Ll][Dd][Ff]./!d;s/^![Ll][Dd][Ff].//' $(TARGET).f)
-
-print_added_ld_flags:
-	# $@:
-	@echo $(ADDED_LD_FLAGS)
 
 $(HOST):  $(HEADERS) $(COMMON_OFILES) $(HOST_OFILES)
 	$(FC) $(FFLAGS) -o $(HOST) \
