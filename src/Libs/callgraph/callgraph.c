@@ -149,12 +149,13 @@ int decor_type;
     }, entity_to_callees(module) );
 }
     
-void module_to_callgraph(module,decor_type)
+bool module_to_callgraph(module,decor_type)
 entity module;
 int decor_type;
 {
     string module_name = module_local_name(module);
-    statement s = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    statement s = (statement)db_get_memory_resource(DBR_CODE,
+						    module_name, TRUE);
     string filename;
     FILE *fp;
 
@@ -174,4 +175,5 @@ int decor_type;
 	DB_PUT_FILE_RESOURCE(DBR_CALLGRAPH_FILE, 
 			     strdup(module_name), filename);
     }
+    return TRUE;
 }
