@@ -117,79 +117,6 @@ block_to_postcondition(
 }
 
 static transformer 
-unstructured_to_postcondition(
-    transformer pre,
-    unstructured u,
-    transformer tf)
-{
-    transformer post;
-    control c;
-
-    debug(8,"unstructured_to_postcondition","begin\n");
-
-    pips_assert("unstructured_to_postcondition", u!=unstructured_undefined);
-
-    c = unstructured_control(u);
-    if(control_predecessors(c) == NIL && control_successors(c) == NIL) {
-	/* there is only one statement in u; no need for a fix-point */
-	debug(8,"unstructured_to_postcondition","unique node\n");
-	/* FI: pre should not be duplicated because
-	 * statement_to_postcondition() means that pre is not
-	 * going to be changed, just post produced.
-	 */
-	post = statement_to_postcondition(transformer_dup(pre),
-					  control_statement(c));
-    }
-    else {
-	/* Do not try anything clever! God knows what may happen in
-	   unstructured code. Postcondition post is not computed recursively
-	   from its components but directly derived from u's transformer.
-	   Preconditions associated to its components are then computed
-	   independently, hence the name unstructured_to_postconditionS
-	   instead of unstructured_to_postcondition */
-	/* propagate as precondition an invariant for the whole
-	   unstructured u assuming that all nodes in the CFG are fully
-	   connected, unless tf is not feasible because the unstructured
-	   is never exited or exited thru a call to STOP which invalidates
-	   the previous assumption. */
-      transformer tf_u = transformer_undefined;
-      transformer pre_u = transformer_undefined;
-
-	debug(8,"unstructured_to_postcondition",
-	      "complex: based on transformer\n");
-	if(transformer_empty_p(tf)) {
-	  tf_u = unstructured_to_global_transformer(u);
-	}
-	else {
-	  tf_u = tf;
-	}
-	pre_u = invariant_wrt_transformer(pre, tf_u);
-	ifdebug(8) {
-	  debug(8,"unstructured_to_postcondition",
-	      "filtered precondition pre_u:\n");
-	  (void) print_transformer(pre_u) ;
-	}
-	/* FI: I do not know if I should duplicate pre or not. */
-	/* FI: well, dumdum, you should have duplicated tf! */
-	/* FI: euh... why? According to comments about transformer_apply()
-	 * neither arguments are modified...
-	 */
-	/* post = unstructured_to_postconditions(pre_u, pre, u); */
-	post = unstructured_to_accurate_postconditions(pre_u, pre, u);
-	pips_assert("A valid postcondition is returned",
-		    !transformer_undefined_p(post));
-	if(transformer_undefined_p(post)) {
-	  post = transformer_apply(transformer_dup(tf), pre);
-	}
-	transformer_free(pre_u);
-    }
-
-    debug(8,"unstructured_to_postcondition","end\n");
-
-    return post;
-}
-
-static transformer 
 test_to_postcondition(
     transformer pre,
     test t,
@@ -253,19 +180,20 @@ test_to_postcondition(
 	}
 
 	ifdebug(DEBUG_TEST_TO_POSTCONDITION) {
-	    debug(DEBUG_TEST_TO_POSTCONDITION,"test_to_postcondition","pret=\n");
+	    pips_debug(DEBUG_TEST_TO_POSTCONDITION, "pret=%p\n", pret);
 	    (void) print_transformer(pret);
-	    debug(DEBUG_TEST_TO_POSTCONDITION,"test_to_postcondition","pref=\n");
+	    pips_debug(DEBUG_TEST_TO_POSTCONDITION, "pref=%p\n", pref);
 	    (void) print_transformer(pref);
 	}
 
 	postt = statement_to_postcondition(pret, st);
 	postf = statement_to_postcondition(pref, sf);
 	post = transformer_convex_hull(postt, postf);
-	transformer_free(postt);
-	transformer_free(postf);
+	free_transformer(postt);
+	free_transformer(postf);
     }
     else {
+      /* Be careful, pre is updated by statement_to_postcondition! */
 	(void) statement_to_postcondition(pre, st);
 	(void) statement_to_postcondition(pre, sf);
 	post = transformer_apply(tf, pre);
@@ -588,9 +516,10 @@ void transformer_add_reference_information(transformer tf, statement s)
   add_reference_information(tf, s, TRUE);
 }
 
-transformer 
-statement_to_postcondition(
-    transformer pre,
+/* Refine the precondition pre of s using side effects and compute its
+   postcondition post. Postcondition post is returned. */
+transformer statement_to_postcondition(
+    transformer pre, /* postcondition of predecessor */
     statement s)
 {
     transformer post = transformer_undefined;
@@ -626,11 +555,7 @@ statement_to_postcondition(
 	 * is a structural information, the precondition is just empty.
 	 */
       /* Psysteme s = predicate_system(transformer_relation(pre)); */
-
-      free_predicate(transformer_relation(pre));
-      gen_free_list(transformer_arguments(pre));
-      transformer_arguments(pre) = NIL;
-      transformer_relation(pre) = make_predicate(sc_empty(BASE_NULLE));
+      pre = empty_transformer(pre);
     }
 
     if (load_statement_precondition(s) == transformer_undefined) {
@@ -640,6 +565,7 @@ statement_to_postcondition(
 	list non_initial_values =
 	    arguments_difference(transformer_arguments(pre),
 				 get_module_global_arguments());
+	transformer foo = transformer_undefined;
 
 	MAPL(cv,
 	 {
@@ -672,10 +598,21 @@ statement_to_postcondition(
 	/* The double normalization could be avoided with a non-heuristics
            approach. For ocean, its overhead is 34s out of 782.97 to give
            816.62s: 5 %. The double normalization is also useful for some
-           exit conditions of WHILE loops (w05, w06, w07). */
+           exit conditions of WHILE loops (w05, w06, w07). It is not
+           powerful enough for preconditions containing equations with
+           three or more variables such as fraer01,...*/
+	foo = transformer_identity();
+	if(!transformer_consistency_p(pre)) {
+	  ;
+	}
 	pre = transformer_normalize(pre, 4);
+	foo = transformer_identity();
+	if(!transformer_consistency_p(pre)) {
+	  ;
+	}
 	pre = transformer_normalize(pre, 4);
 
+	foo = transformer_identity();
 	if(!transformer_consistency_p(pre)) {
 	    int so = statement_ordering(s);
 	    fprintf(stderr, "statement %03d (%d,%d), precondition %p end:\n",
@@ -693,7 +630,7 @@ statement_to_postcondition(
 	gen_free_list(non_initial_values);
     }
     else {
-	pips_debug(8,"precondition already available");
+	pips_debug(8,"precondition already available\n");
 	/* pre = statement_precondition(s); */
 	(void) print_transformer(pre);
 	pips_error("statement_to_postcondition",
