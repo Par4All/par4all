@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/05/30 14:24:20 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/06/20 14:59:56 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -52,12 +52,14 @@ have boolean, integer or string values.
 Casual users should not use them. Properties are modified for them by
 the user interface and/or the high-level functions.
 
-Experimented users can modify properties by inserting a file called
+Experienced users can modify properties by inserting a file called
 \verb+properties.rc+ in their local directory. Of course, they cannot
 declare new properties, since they would not be recognized by the PIPS
 system. The local property file is read {\em after} the default property
-file, \verb+Production/Lib/properties.rc+. Some user-specified property
-values may be ignored because it is modified by a PIPS function before
+file, \verb+$PIPS_ROOT/Share/properties.rc+.
+% $ emacs latex environment does not know about \verb
+Some user-specified property
+values may be ignored because they are modified by a PIPS function before
 it had a chance to have any effect. Unfortunately, there is no explicit
 indication of usefulness for the properties in this report.
 
@@ -72,6 +74,10 @@ exceptions). Theoretically these environment variables are also declared
 as properties, but this is generally forgotten by programmers. A debug
 level of 0 is equivalent to no tracing. The amount of tracing increases
 with the debug level. The maximum useful value is 9.
+
+Another Shell environment variable, \verb+NEWGEN_MAX_TABULATED_ELEMENTS+,
+is useful to analyze large programs. Its default value is 12,000 but it is
+not uncommon to have to set it up to 200,000.
 
 Properties are listed below on a source library basis. The outline is
 close the outline for pipsmake-rc\cite{}.  Properties used in more than
@@ -480,11 +486,15 @@ No property for this library.
 \subsection{Semantic Analysis}
 \label{subsection-semantic-analysis}
 
+\subsubsection{Flow sensitivity}
+
 Perform ``meet'' operations for semantics analysis.
 
 \begin{verbatim}
 SEMANTICS_FLOW_SENSITIVE FALSE
 \end{verbatim}
+
+\subsubsection{Interprocedural semantics analysis}
 
 To be refined later; basically, use callee\'s transformers instead of
 callee\'s effects when computing transformers bottom-up in the call graph;
@@ -495,19 +505,53 @@ call site and/or perform meet operation on call site preconditions ?
 SEMANTICS_INTERPROCEDURAL FALSE
 \end{verbatim}
 
-Go all the Halbwachs way, compute inequalities instead of sticking
-to equalities; implies SEMANTICS\_FIX\_POINT and SEMANTICS\_FLOW\_SENSITIVE.
+This property is used internally and is not user selectable.
+
+\subsubsection{Fix point operators}
+
+CPU time and memory space are cheap enough to compute loop fix points for
+{\em transformers}. This property implies SEMANTICS\_FLOW\_SENSITIVE and is not
+user-selectable. Its default value is {\em false}.
+
+\begin{verbatim}
+SEMANTICS_FIX_POINT FALSE
+\end{verbatim}
+
+The default fix point operator is good for induction variables but it is
+not good for all kinds of code. The default fix point operator is based on
+the transition function associated to a loop body. A computation of
+eigenvectors for eigenvalue 1 is used to detect loop invariants. This
+fails when no transition function but only a transition relation is
+available. Only equations can be found.
+
+The second fix point operator is based on a pattern matching of elementary
+equations and inequalities of the loop body transformer. Obvious
+invariants are detected. This fix point operator is not better than the
+previous one for induction variables but it can detect invariant equations
+and inequalities.
+
+This property is user selectable and its default value is FALSE.
+
+\begin{verbatim}
+SEMANTICS_PATTERN_MATCHING_FIX_POINT FALSE
+\end{verbatim}
+
+This property was defined to select one of Cousot-Halbwachs's heuristics
+and to compute fix points with inequalities and equalities for loops.
+These heuristics could be used to compute fix points for transformers
+and/or preconditions. This option implies SEMANTICS\_FIX\_POINT and
+SEMANTICS\_FLOW\_SENSITIVE.  It has not been implemented yet in
+PIPS\footnote{But some fix point functions are part of the C3 linear
+  library.} because its accuracy has not yet been required, but is now
+badly named because there is no direct link between {\em inequality} and
+{\em Halbwachs}. Its default value is {\em false} and it is not user
+selectable.
 
 \begin{verbatim}
 SEMANTICS_INEQUALITY_INVARIANT FALSE
 \end{verbatim}
 
-CPU time and memory space are cheap: compute loop fixpoint for
-transformers and preconditions; this implies SEMANTICS\_FLOW\_SENSITIVE.
-
-\begin{verbatim}
-SEMANTICS_FIX_POINT FALSE
-\end{verbatim}
+\subsubsection{Debugging}
 
 Output semantics results on stdout
 
