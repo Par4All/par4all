@@ -544,3 +544,42 @@ void replace_in_sequence_statement_with (statement old_stat,
   gen_remove (&stats_list, old_stat);
   
 }
+
+list references_for_regions (list l_regions)
+{
+  list l_ref = NIL;
+  
+  MAP (EFFECT, reg, {
+    cell c = effect_cell(reg);
+    reference ref = NULL;
+    if (cell_tag(c) == is_cell_preference) {
+      ref = preference_reference(cell_preference(c));
+    }
+    else if (cell_tag(c) == is_cell_reference) {
+      ref = cell_reference(c);
+    }
+    l_ref = CONS (REFERENCE, ref, l_ref);
+    print_reference(ref);
+    pips_debug(2,"Entity: %s\n", entity_local_name(reference_variable(ref)));
+  },l_regions);
+
+  return l_ref;
+}
+
+list union_references_for_regions (list l1, list l2)
+{
+  return NIL;
+}
+
+list intersection_references_for_regions (list l1, list l2)
+{
+  return NIL;
+}
+
+
+list differences_references_for_regions (list l1, list l2)
+{
+  return NIL;
+}
+
+
