@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/29 15:05:08 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/31 17:14:20 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -22,18 +22,18 @@ PIPS_TEMPDIR="/tmp"
 PIPS_HOSTS="chailly:episy:aiguebelette"
 
 # Pips project sources and binaries
-PIPSHOME=/home/users/pips
-PIPSDIR=/projects/Pips
+PIPS_HOME=/users/soft/pips
+PIPS_DIR=/projects/Pips
 
 # scripts and programs created to manage the project
-PIPS_UTILDIR="${PIPSDIR}/Utilities"
+PIPS_UTILDIR="${PIPS_DIR}/Utilities"
 
 # empty string if make can be run in this environment
 # (else: error message)
 PIPS_CHECK_OS="`${PIPS_UTILDIR}/check_os`"
 
 # current production version - sources and binaries
-PIPS_PRODDIR="${PIPSDIR}/Production"
+PIPS_PRODDIR="${PIPS_DIR}/Production"
 
 # binaries
 PIPS_BINDIR="${PIPS_PRODDIR}/Bin"
@@ -60,22 +60,22 @@ PIPS_RTSRCDIR="${PIPS_SRCDIR}/Runtime"
 PIPS_INCLUDEDIR="${PIPS_PRODDIR}/Include"
 
 # current development version - sources and binaries
-PIPS_DEVEDIR="${PIPSDIR}/Development"
+PIPS_DEVEDIR="${PIPS_DIR}/Development"
 
 # cri's libraries which are not part of Pips project
-PIPS_EXTEDIR="${PIPSDIR}/Externals"
+PIPS_EXTEDIR="${PIPS_DIR}/Externals"
 
 # current demo version - binaries only
-PIPS_RELEDIR="${PIPSDIR}/Release"
+PIPS_RELEDIR="${PIPS_DIR}/Release"
 
 # where documents are stored
-PIPS_DOCDIR="${PIPSDIR}/Documentation"
+PIPS_DOCDIR="${PIPS_DIR}/Documentation"
 
 # where Public software sources are stored
-PIPS_PUBLICDIR=${PIPSDIR}/Public
+PIPS_PUBLICDIR=${PIPS_DIR}/Public
 
 # Validation directory
-PIPS_VALIDDIR=${PIPSDIR}/Tests/Validation
+PIPS_VALIDDIR=${PIPS_DIR}/Tests/Validation
 
 MANPATH=${MANPATH}:${PIPS_DOCDIR}
 PATH=${PATH}:${PIPS_BINDIR}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
@@ -148,6 +148,7 @@ WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib -static'
 #           #    #          #    #             #
 #           #    #          #    #       #     #
 #           #    #         ###   #        #####
+#
 # Settings added for TPIPS (used for tpips and ttest)
 
 TPIPS_ADDED_LIBS='-lreadline -ltermcap'
@@ -216,6 +217,8 @@ PATH=${PATH}:${DAVINCI_DIR}
 
 [ `logname` != coelho ] && 
 {
+PIPSHOME=$PIPS_HOME
+PIPSDIR=$PIPS_DIR
 UTILDIR=$PIPS_UTILDIR
 PRODDIR=$PIPS_PRODDIR
 BINDIR=$PIPS_BINDIR
