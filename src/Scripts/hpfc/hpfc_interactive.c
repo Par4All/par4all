@@ -1,25 +1,23 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/05/17 14:16:00 $, 
+ * $Date: 1995/07/26 17:05:56 $, 
  *
  * interactive interface to hpfc, based on the GNU realine library.
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <strings.h>
 
 extern int system();
 extern int fprintf();
 extern int chdir();
-extern char *getenv();
-extern int malloc();
-extern void free();
 
 #include "readline/readline.h"
 #include "readline/history.h"
 
-#define HPFC_PROMPT "hpfc> "
-#define HPFC_PREFIX "hpfc"
-#define HIST ".hpfc.history"
+#define HPFC_PROMPT "hpfc> " /* prompt for readline  */
+#define HPFC_PREFIX "hpfc"   /* forked shell script  */
+#define HIST ".hpfc.history" /* default history file */
 
 #define SHELL_ESCAPE "! "
 #define CHANGE_DIR   "cd "
@@ -77,7 +75,7 @@ int main()
 	else
 	{
 	    /*   calls a script:-)
-	     *   All this stuff could be taken care of in the C, but shell
+	     *   All this stuff could be taken care of in C, but shell
 	     *   scripts are much easier to develop:-) 
 	     */
 	    char *shll = (char*)
