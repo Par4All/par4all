@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.323  1998/04/16 08:20:18  coelho
+# compilation macros reordered.
+#
 # Revision 1.322  1998/04/14 13:51:08  coelho
 # reordering of C* macros.
 #
@@ -435,7 +438,7 @@ CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
 # a typical interesting example is to put -pg in {C,LD}OPT
 #
 PREPROC=  \$(CC) -E \$(CANSI) \$(CPPOPT) \$(CPPFLAGS)
-COMPILE=  \$(CC) \$(CANSI) \$(CPPOPT) \$(CPPFLAGS) \$(CFLAGS) \$(COPT) -c
+COMPILE=  \$(CC) \$(CANSI)\ $(CFLAGS) \$(COPT) \$(CPPOPT) \$(CPPFLAGS) -c
 F77COMPILE=\$(FC) \$(FFLAGS) \$(FOPT) -c
 LINK=	  \$(LD) \$(LDFLAGS) \$(LDOPT) -o
 SCAN=	  \$(LEX) \$(LFLAGS) \$(LOPT) -t
@@ -444,7 +447,7 @@ PARSE=	  \$(YACC) \$(YFLAGS) \$(YOPT)
 ARCHIVE=  \$(AR) \$(ARFLAGS)
 PROTOIZE= \$(PROTO) \$(PRFLAGS) -E "\$(PREPROC) -DCPROTO_IS_PROTOTYPING"
 M4FILTER= \$(M4) \$(M4OPT) \$(M4FLAGS)
-MAKEDEP=  \$(CC) \$(CMKDEP) \$(CANSI) \$(CPPOPT) \$(CPPFLAGS) \$(CFLAGS) \$(COPT)
+MAKEDEP=  \$(CC) \$(CMKDEP) \$(CANSI) \$(CFLAGS) \$(COPT) \$(CPPOPT) \$(CPPFLAGS)
 #
 # for easy debugging... e.g. gmake ECHO='something' echo
 echo:; @echo \$(ECHO)
