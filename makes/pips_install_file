@@ -5,11 +5,14 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/08/13 15:19:33 $, )
+# ($Date: 1996/08/20 16:46:34 $, )
 #
 
 RUN=':'
 script=`basename $0`
+
+verb()
+{ echo $script: "$@" >&2 ;}
 
 usage()
 {
@@ -41,15 +44,24 @@ shift
 for file
 do
   target=$directory/`basename $file`
-  if test -f $target && cmp -s $file $target
+  if [ -d $file ] 
   then
-    echo "$script: skipping $file"
+    verb "recursing for directory $file"
+    test -d $target || mkdir $target
+    chmod a+rx,o-w $target
+    $0 $target $file/*
   else
-    echo "$script: copying $file"
-    rm -f $target
-    cp $file $directory
-    eval "$RUN $target"
-    test -x $file && chmod a+rx-w $target
+    if test -f $target && cmp -s $file $target
+    then
+	verb "skipping $file"
+    else
+	verb "copying $file"
+	rm -f $target
+	cp $file $directory
+	eval "$RUN $target"
+	chmod a+r $target
+	test -x $file && chmod a+rx-w $target
+    fi
   fi
 done
 
