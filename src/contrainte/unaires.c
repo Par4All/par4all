@@ -393,7 +393,7 @@ constraints_lexicographic_sort(Pcontrainte cl,
 
     /*  the temporary table is created and initialized
      */
-    table = (Pcontrainte*) malloc(sizeof(Pcontrainte *)*n);
+    table = (Pcontrainte*) malloc(sizeof(Pcontrainte)*n);
     assert(table!=NULL);
 
     for (ce=cl, elem=table; ce!=CONTRAINTE_UNDEFINED; ce=ce->succ, elem++)
@@ -401,7 +401,7 @@ constraints_lexicographic_sort(Pcontrainte cl,
 
     /*  sort!
      */
-    qsort(table, n, sizeof(Pcontrainte),
+    qsort((char *) table, n, sizeof(Pcontrainte),
 	  (int (*)()) internal_constraint_compare);
 
     /*  the vector is regenerated in order
