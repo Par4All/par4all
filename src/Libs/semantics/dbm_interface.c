@@ -84,8 +84,66 @@ select_fix_point_operator()
 	}
     }
     else {
-	transformer_fix_point_operator = NULL;
+	transformer_fix_point_operator = transformer_basic_fix_point;
     }
+}
+
+static void add_declaration_information(transformer pre, entity m, bool precondition_p)
+{
+  list decls = code_declarations(value_code(entity_initial(m)));
+
+  ifdebug(8) {
+      pips_debug(8, "Begin for module %s with precondition\n", module_local_name(m));
+      print_transformer(pre);
+  }
+
+  MAP(ENTITY, v, {
+    type t = entity_type(v);
+
+    if(type_variable_p(t)) {
+      variable tv = type_variable(t);
+
+      MAP(DIMENSION, d, {
+	normalized nl = NORMALIZE_EXPRESSION(dimension_lower(d));
+	normalized nu = NORMALIZE_EXPRESSION(dimension_upper(d));
+
+	if(normalized_linear_p(nl) && normalized_linear_p(nu)) {
+	  Pvecteur vl = normalized_linear(nl);
+	  Pvecteur vu = normalized_linear(nu);
+
+	  if(value_mappings_compatible_vector_p(vl) &&
+	     value_mappings_compatible_vector_p(vu)) {
+	    Pvecteur cv = vect_substract(vl, vu);
+
+	    if(!precondition_p) {
+	      upwards_vect_rename(cv, pre);
+	    }
+
+	    if(!vect_constant_p(cv) || vect_coeff(TCST, cv) > 0) {
+	      transformer_inequality_add(pre, cv);
+	    }
+	  }
+	}
+      }, variable_dimensions(tv));
+
+    }
+  }, decls);
+
+  ifdebug(8) {
+      pips_debug(8, "End for module %s with precondition\n", module_local_name(m));
+      print_transformer(pre);
+  }
+
+}
+
+static void transformer_add_declaration_information(transformer pre, entity m)
+{
+  add_declaration_information(pre, m, FALSE);
+}
+
+static void precondition_add_declaration_information(transformer pre, entity m)
+{
+  add_declaration_information(pre, m, TRUE);
 }
 
 /* Functions to make transformers */
@@ -150,6 +208,7 @@ bool preconditions_intra(char * module_name)
     set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
     set_bool_property(SEMANTICS_FIX_POINT, FALSE);
+    select_fix_point_operator();
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
@@ -161,6 +220,7 @@ bool preconditions_inter_fast(char * module_name)
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
     set_bool_property(SEMANTICS_FIX_POINT, FALSE);
+    select_fix_point_operator();
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
@@ -172,6 +232,7 @@ bool preconditions_inter_full(char * module_name)
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
     set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+    select_fix_point_operator();
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
@@ -327,6 +388,12 @@ bool module_name_to_transformers(char *module_name)
     /* compute intraprocedural transformer */
     t_intra = statement_to_transformer( get_current_module_statement() );
 
+    /* Add declaration information: arrays cannot be empty (Fortran
+       standard, Section 5.1.2) */
+    if(get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
+        transformer_add_declaration_information(t_intra, get_current_module_entity());
+    }
+
     DB_PUT_MEMORY_RESOURCE(DBR_TRANSFORMERS, module_name, 
 			   (char*) get_transformer_map() );  
 
@@ -381,6 +448,11 @@ bool module_name_to_preconditions(char *module_name)
     if(get_current_module_statement() == (statement) database_undefined)
 	pips_error("module_name_to_preconditions",
 		   "no statement for module %s\n", module_name);
+
+    /* Used to add reference information when it is trusted... which
+       should always be, at least for automatic parallelization. */
+    set_proper_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
 
     /* cumulated effects are used to compute the value mappings */
     set_cumulated_rw_effects((statement_effects) 
@@ -472,6 +544,12 @@ bool module_name_to_preconditions(char *module_name)
 	}
     }
 
+    /* Add declaration information: arrays cannot be empty (Fortran
+       standard, Section 5.1.2) */
+    if(get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
+        precondition_add_declaration_information(pre, get_current_module_entity());
+    }
+
     /* debug_on(SEMANTICS_DEBUG_LEVEL); */
 
     /* propagate the module precondition */
@@ -497,6 +575,7 @@ bool module_name_to_preconditions(char *module_name)
     reset_current_module_statement();
     reset_transformer_map();
     reset_precondition_map();
+    reset_proper_rw_effects();
     reset_cumulated_rw_effects();
 
     free_value_mappings();
