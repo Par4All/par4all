@@ -14,7 +14,9 @@
 
 extern double ceil();
 extern double log10();
-#include <values.h>
+
+/* #include <values.h> */
+#include <limits.h>
 #include <string.h>
 
 #include "genC.h"
@@ -686,9 +688,9 @@ int dimn;
 	  entity_name(rv));
 
     for( d = 1; !ENDP(rvld); POP(rvld), d++) {
-	int imax = -MAXINT;
-	int gmin = MAXINT;
-	int gmax = -MAXINT;
+	int imax = INT_MIN;
+	int gmin = INT_MAX;
+	int gmax = INT_MIN;
 	list cr = list_undefined;
 	dimension dimd = dimension_undefined;
 	
@@ -746,7 +748,7 @@ int dimn;
 		    pips_error("set_dimensions_of_local_variable_family",
 			       "empty domain for phi\n");
 
-		if((min == -MAXINT) || (max == MAXINT)) {
+		if((min == INT_MIN) || (max == INT_MAX)) {
 		    int divis= ACCESS(P,dimn,d,d);
 		    /* parameter ==> min = max = 1 */
 		    /*		pips_error("set_dimensions_of_local_variable_family",
