@@ -1,6 +1,6 @@
 /* Package sc 
  * $RCSfile: sc_transformation.c,v $ (version $Revision$)
- * $Date: 1997/04/09 19:25:19 $, .
+ * $Date: 1997/04/10 10:38:13 $, .
  */
 
 #include <string.h>
@@ -114,9 +114,6 @@ void sc_find_equalities(Psysteme * ps)
     Variable vtmp = (Variable) "local temporary variable";
     Pcontrainte eq;
 
-    /* first round
-     */
-
     /* FOR EACH EQUALITY
      */
     for (eq = sc_egalites(*ps); eq; eq = eq->succ)
@@ -130,15 +127,21 @@ void sc_find_equalities(Psysteme * ps)
 	c = vect_coeff(TCST, an);
 	vect_erase_var(&an, TCST);
 
+	/* the vector is sorted by increassing absolute coeffs.
+	 * the the m/an separation is performed on a per-abs(coeff) basis.
+	 */
 	vect_sort_in_place(&an, abscmp);
 	
 	/* BUILD POSSIBLE AN AND M (AN + M + C == 0)
 	 */
 	while (!VECTEUR_NUL_P(an))
 	{
-	    Value ref = value_abs(val_of(an)), coeff;
-	    Value vmin, vmax, d, r, dp, rp, delta, ma;
+	    Value refc, coeff, vmin, vmax, d, r, dp, rp, delta, ma;
 	    Psysteme ns;
+
+	    /* accumulate next absolute coeff in m 
+	     */
+	    refc = value_abs(val_of(an));
 
 	    do
 	    {
@@ -148,13 +151,16 @@ void sc_find_equalities(Psysteme * ps)
 		m->succ = v;
 		coeff = VECTEUR_NUL_P(an)? VALUE_ZERO: value_abs(val_of(an));
 	    } 
-	    while (value_eq(coeff, ref));
+	    while (value_eq(coeff, refc));
 
-	    /* WITH AN, COMPUTES A AND CHECK THE GCD CONDITION 
+	    /* WITH AN, COMPUTES A AND CHECK A "GCD" CONDITION ???
 	     */
-	    a = vect_pgcd_all(an);
-	    if (value_one_p(a)) 
-		continue;
+	    if (VECTEUR_NUL_P(an))
+		continue; /* break... */
+
+	    a = vect_pgcd_all(an); 
+	    if (value_ge(refc, a))
+		continue; /* to WHILE(an) */
 
 	    /* COMPUTE M BOUNDS, IF ANY
 	     */
@@ -163,7 +169,7 @@ void sc_find_equalities(Psysteme * ps)
 	    base_rm(sc_base(ns));
 	    sc_creer_base(ns);
 
-	    if (!sc_minmax_of_variable(ns, vtmp, &vmin, &vmax))
+	    if (!sc_minmax_of_variable(ns, vtmp, &vmin, &vmax)) /* kills ns */
 	    {
 		/* the system is not feasible. */
 		vect_rm(m); 
@@ -174,11 +180,14 @@ void sc_find_equalities(Psysteme * ps)
 	    }
 
 	    if (value_min_p(vmin) || value_max_p(vmax))
-		/* well, if it is not bounded, the latter tests won't 
-		 * be bounded either, thus we could shorten the loop
-		 * for this eq???
+	    {
+		/* well, if m is not bounded, the larger m won't be either,
+		 * thus we can shorten the an loop...
 		 */
-		continue;
+		vect_rm(an), an = VECTEUR_NUL;
+		vect_rm(m), m = VECTEUR_NUL;
+		continue; /* break... */
+	    }
 
 	    /* now, we must compute the shifts...
 	     *
@@ -186,7 +195,7 @@ void sc_find_equalities(Psysteme * ps)
 	     * c = a d + r,  0 <= r < a, 
 	     * a (n+d) + (m+r) == 0,   vmin+r <= m+r <= vmax+r,
 	     * (vmax+r) = a d' + r', 0 <= r' < a,
-	     * vmin+r-ad' <= m+r-ad' <= r' < a
+	     * vmin+r-ad' <= (m+r-ad') <= r' < a
 	     * 
 	     * question: -a < vmin+r-ad ?
 	     * if YES: m+r-ad'==0 and n+d+d'==0
@@ -217,7 +226,7 @@ void sc_find_equalities(Psysteme * ps)
 	    {
 		Value n_shift, m_shift;
 
-		Pvecteur n = vect_div(an, a); /* an is lost */
+		Pvecteur n = vect_div(an, a); /* an modified */
 		n_shift = value_plus(d,dp);
 		vect_add_elem(&n, TCST, n_shift);
 		
@@ -225,7 +234,7 @@ void sc_find_equalities(Psysteme * ps)
 		m_shift = value_plus(r, delta);
 		vect_add_elem(&m, TCST, m_shift);
 
-		/* INSERT m==0 and n==0 [in place of the old one]
+		/* INSERT m==0 [ahead] and n==0 [in place of the old one]
 		 */
 		sc_add_egalite(*ps, contrainte_make(m)); /* m pointed to */
 		
@@ -238,9 +247,9 @@ void sc_find_equalities(Psysteme * ps)
 		an = n;
 	    }
 	}
-	
+
+	/* an == VECTEUR_NUL */
 	vect_rm(m), m=VECTEUR_NUL;
-	vect_rm(an), an=VECTEUR_NUL;
     }
 
     /* second round
