@@ -21,6 +21,7 @@
 #include "makefile.h"
 
 #include "misc.h"
+#include "properties.h"
 
 #include "ri-util.h"
 #include "pipsdbm.h"
@@ -387,7 +388,7 @@ static void sort_file(string name)
     }
     safe_fclose(f, name);
 
-    qsort(lines, i, sizeof(char*), &cmp);
+    qsort(lines, i, sizeof(char*), cmp);
 
     f=safe_fopen(name, "w");
     while (i>0) {
@@ -461,6 +462,17 @@ static string process_thru_cpp(string name)
 
 /*************************************************** managing a user file */
 
+static void 
+check_fortran_syntax_before_pips(
+    string file_name)
+{
+    string pips_flint = getenv("PIPS_FLINT");
+    user_log("Checking Fortran syntax of %s\n", file_name);
+    safe_system(concatenate(
+	pips_flint? pips_flint: "f77 -c -ansi ", file_name, 
+	" -o ", file_name, ".pips.o ; rm ", file_name, ".pips.o", NULL));
+}
+
 bool process_user_file(
     string file)
 {
@@ -487,6 +499,10 @@ bool process_user_file(
 	return FALSE;
     }
 
+    /* Fortran compiler
+     */
+    if (get_bool_property("CHECK_FORTRAN_SYNTAX_BEFORE_PIPS"))
+	check_fortran_syntax_before_pips(file);
 
     /* CPP
      */
