@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 14:29:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 16:39:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 14:29:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 16:39:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -616,7 +616,18 @@ make_common_entity(entity e)
 {
     if (!entity_common_p(e))
     {
-	entity c = find_or_create_entity(concatenate
+	entity c;
+
+	if (!value_undefined_p(entity_initial(e)) && entity_module_p(e)) 
+	{
+	    pips_user_warning("name conflict (%s) module versus common\n",
+			      module_local_name(e));
+	    ParserError("make_common_entity",
+			"COMMON / ROUTINE name conflict, "
+			"rename the common or the routine!");
+	}
+
+	c = find_or_create_entity(concatenate
 	   (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, COMMON_PREFIX, 
 	    entity_local_name(e), 0));
 
