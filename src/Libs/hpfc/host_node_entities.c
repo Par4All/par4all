@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1994/11/17 14:19:21 $, ) version $Revision$,
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1994/11/28 14:45:02 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -132,17 +132,21 @@ entity module;
     return(hash_table_undefined);
 }
 
+static void update_for_module_rewrite(pe)
+entity *pe;
+{
+    entity
+	new = (entity) GET_ENTITY_MAPPING(current_entity_map, *pe);
+
+    if (new != (entity) HASH_UNDEFINED_VALUE) *pe = new;
+}
+
 /* shift the references to the right variable, in the module
  */
 static void update_reference_for_module_rewrite(ref)
 reference ref;
 {
-    entity
-	var = reference_variable(ref),
-	new = (entity) GET_ENTITY_MAPPING(current_entity_map, var);
-
-    if (new != (entity) HASH_UNDEFINED_VALUE)
-	reference_variable(ref) = new;
+    update_for_module_rewrite(&reference_variable(ref));
 }
 
 /* shift the calls to the right variable, in the module
@@ -150,12 +154,23 @@ reference ref;
 static void update_call_for_module_rewrite(c)
 call c;
 {
-    entity
-	fun = call_function(c),
-	new = (entity) GET_ENTITY_MAPPING(current_entity_map, fun);
+    update_for_module_rewrite(&call_function(c));
+}
 
-    if (new != (entity) HASH_UNDEFINED_VALUE)
-	call_function(c) = new;
+static void update_code_for_module_rewrite(c)
+code c;
+{
+    MAPL(ce,
+     {
+	 update_for_module_rewrite(&ENTITY(CAR(ce)));
+     },
+	 code_declarations(c));
+}
+
+static void update_loop_for_module_rewrite(l)
+loop l;
+{
+    update_for_module_rewrite(&loop_index(l));
 }
 
 void update_object_for_module(object, module)
@@ -168,12 +183,30 @@ entity module;
     current_entity_map = hpfc_map_of_module(module);
 
     gen_multi_recurse(object, 
+		      /* 
+		       *   REFERENCES
+		       */
 		      reference_domain, 
 		      gen_true, 
 		      update_reference_for_module_rewrite,
+		      /*
+		       *   LOOPS (indexes)
+		       */
+		      loop_domain,
+		      gen_true,
+		      update_loop_for_module_rewrite,
+		      /*
+		       *   CALLS
+		       */
 		      call_domain, 
 		      gen_true, 
 		      update_call_for_module_rewrite,
+		      /*
+		       *   CODES
+		       */
+		      code_domain,
+		      gen_true,
+		      update_code_for_module_rewrite,
 		      NULL);
 
     current_entity_map = saved;
