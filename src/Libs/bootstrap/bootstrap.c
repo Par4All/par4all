@@ -1,7 +1,8 @@
 /*
   $Id$
 
-  Symbol table initialization with Fortran operators, commands and intrinsics
+  Symbol table initialization with Fortran operators, commands and 
+  intrinsics
    
   More information is provided in effects/effects.c
    
@@ -45,31 +46,22 @@
 
 #define LOCAL static
 
-/* CLASSIFICATION OF BASIC */
-#define basic_numeric_simple_p(b) (basic_int_p(b) || basic_float_p(b))
-#define basic_numeric_p(b) (basic_numeric_simple_p(b) || basic_complex_p(b))
-#define basic_compatible_simple_p(b1, b2) (\
-                (basic_numeric_simple_p(b1) && basic_numeric_simple_p(b2)) ||\
-                (basic_string_p(b1) && basic_string_p(b2)) ||\
-                (basic_logical_p(b1) && basic_logical_p(b2)) ||\
-                (basic_overloaded_p(b1) && basic_overloaded_p(b2)) ||\
-                (basic_undefined_p(b1) && basic_undefined_p(b2)))
-#define basic_compatible_p(b1, b2) (\
-                (basic_numeric_p(b1) && basic_numeric_p(b2)) ||\
-                (basic_string_p(b1) && basic_string_p(b2)) ||\
-                (basic_logical_p(b1) && basic_logical_p(b2)) ||\
-                (basic_overloaded_p(b1) && basic_overloaded_p(b2)) ||\
-                (basic_undefined_p(b1) && basic_undefined_p(b2)))
-
 /* Working with hash_table of basic
  */
 #define GET_TYPE(h, e) ((basic)hash_get(h, (char*)(e)))
 #define PUT_TYPE(h, e, b) hash_put(h, (char*)(e), (char*)(b))
 
+/* Function in type_checker.c */
 extern expression 
 insert_cast(basic cast, basic from, expression exp, type_context_p);
 extern expression
-cast_constant(expression exp_constant, basic to_basic, type_context_p context);
+cast_constant(expression exp_constant, basic to_basic, 
+	      type_context_p context);
+extern bool
+check_loop_range(range, hash_table);
+extern void
+type_loop_range(basic, range, type_context_p);
+
 
 void 
 CreateAreas()
@@ -117,72 +109,72 @@ CreateArrays()
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 			       IO_EFFECTS_ARRAY_NAME),
-	      MakeTypeArray(make_basic_int(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
-			    CONS(DIMENSION,
-				 make_dimension
-				 (MakeIntegerConstantExpression("0"),
-				  /*
-				    MakeNullaryCall
-				    (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
-				  */
-				  MakeIntegerConstantExpression("2000")
-				  ),
-				 NIL)),
+	  MakeTypeArray(make_basic_int(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
+			CONS(DIMENSION,
+			     make_dimension
+			     (MakeIntegerConstantExpression("0"),
+				/*
+				  MakeNullaryCall
+				  (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+				*/
+			      MakeIntegerConstantExpression("2000")
+			      ),
+			     NIL)),
 	      /* make_storage(is_storage_ram,
 		 make_ram(entity_undefined, DynamicArea, 0, NIL))
 	      */
 	      make_storage(is_storage_ram,
 			   make_ram(ent,
-			       global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, 
-						     STATIC_AREA_LOCAL_NAME),
+			   global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, 
+						 STATIC_AREA_LOCAL_NAME),
 				    0, NIL)),
 	      make_value(is_value_unknown, UU));
   
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 			       IO_EOF_ARRAY_NAME),
-	  MakeTypeArray(make_basic_logical(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
-			    CONS(DIMENSION,
-				 make_dimension
-				 (MakeIntegerConstantExpression("0"),
-				  /*
-				    MakeNullaryCall
-				    (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
-				  */
-				  MakeIntegerConstantExpression("2000")
-				  ),
-				 NIL)),
+	MakeTypeArray(make_basic_logical(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
+		      CONS(DIMENSION,
+			   make_dimension
+			   (MakeIntegerConstantExpression("0"),
+			    /*
+			      MakeNullaryCall
+			      (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+			    */
+			    MakeIntegerConstantExpression("2000")
+			    ),
+			   NIL)),
 	      /* make_storage(is_storage_ram,
 		 make_ram(entity_undefined, DynamicArea, 0, NIL))
 	      */
 	      make_storage(is_storage_ram,
-			   make_ram(ent,
-				global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, 
-						      STATIC_AREA_LOCAL_NAME),
-				    0, NIL)),
+		    make_ram(ent,
+			     global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, 
+						   STATIC_AREA_LOCAL_NAME),
+			     0, NIL)),
 	      make_value(is_value_unknown, UU));
   
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 			       IO_ERROR_ARRAY_NAME),
-      MakeTypeArray(make_basic_logical(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
-			    CONS(DIMENSION,
-				 make_dimension
-				 (MakeIntegerConstantExpression("0"),
-				  /*
-				    MakeNullaryCall
-				    (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
-				  */
-				  MakeIntegerConstantExpression("2000")
-				  ),
-				 NIL)),
+	MakeTypeArray(make_basic_logical(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
+		      CONS(DIMENSION,
+			   make_dimension
+			   (MakeIntegerConstantExpression("0"),
+			    /*
+			      MakeNullaryCall
+			      (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+			    */
+			    MakeIntegerConstantExpression("2000")
+			    ),
+			   NIL)),
 	      /* make_storage(is_storage_ram,
 		 make_ram(entity_undefined, DynamicArea, 0, NIL))
 	      */
 	      make_storage(is_storage_ram,
 			   make_ram(ent,
-				global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, 
-						      STATIC_AREA_LOCAL_NAME),
+			   global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, 
+						 STATIC_AREA_LOCAL_NAME),
 				    0, NIL)),
 	      make_value(is_value_unknown, UU));
   
@@ -506,7 +498,8 @@ character_to_integer_type(int n)
   functional ft = functional_undefined;
   
   ft = make_functional(NIL, MakeIntegerResult());
-  functional_parameters(ft) = make_parameter_list(n, MakeCharacterParameter);
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakeCharacterParameter);
   t = make_type(is_type_functional, ft);
   
   return t;
@@ -519,7 +512,8 @@ character_to_logical_type(int n)
   functional ft = functional_undefined;
   
   ft = make_functional(NIL, MakeLogicalResult());
-  functional_parameters(ft) = make_parameter_list(n, MakeCharacterParameter);
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakeCharacterParameter);
   t = make_type(is_type_functional, ft);
   
   return t;
@@ -532,7 +526,8 @@ character_to_character_type(int n)
   functional ft = functional_undefined;
   
   ft = make_functional(NIL, MakeCharacterResult());
-  functional_parameters(ft) = make_parameter_list(n, MakeCharacterParameter);
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakeCharacterParameter);
   t = make_type(is_type_functional, ft);
   
   return t;
@@ -598,11 +593,13 @@ logical_to_logical_type(int n)
   return t;
 }
 
-/***************************************************** TYPE A CALL FUNCTIONS */
+/***************************** TYPE A CALL FUNCTIONS **********************/
 
-/* type check double complex? */
+/* Type check double complex? */
 extern bool get_bool_property(string);
-#define TC_DCOMPLEX get_bool_property("TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION")
+
+#define TC_DCOMPLEX \
+get_bool_property("TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION")
 
 /* Determine the longest basic among the arguments of c
  */
@@ -631,7 +628,7 @@ basic_union_arguments(call c, hash_table types)
   return b1==basic_undefined? b1: copy_basic(b1);
 }
 
-/**************** CHECK THE VALIDE OF ARGUMENTS BASIC OF FUNCTION ************/
+/************* CHECK THE VALIDE OF ARGUMENTS BASIC OF FUNCTION ************/
 /* Verify if all the arguments basic of function C are INTEGER
  * If there is no argument, I return TRUE
  */
@@ -703,7 +700,7 @@ arguments_are_dcomplex(call c, hash_table types)
   return check_if_basics_ok(call_arguments(c), types, is_basic_dcomplex_p);
 }
 
-/***************************************************************************** 
+/************************************************************************** 
  * Verify if all the arguments basic of function C are REAL and DOUBLE
  * If there is no argument, I return TRUE
  *
@@ -794,14 +791,17 @@ arguments_are_something(
 
     arg_double = arg_double || 
       (double_ok &&  basic_float_p(b) && basic_float(b)==8);
-
-    if (arg_cmplx && arg_double)
-    {
-      /* warning/error? */
-      okay = FALSE;
-    }
   }
       , args);
+
+  if (arg_cmplx && arg_double)
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats),
+		    "mixed complex and double arguments of '%s' forbidden",
+			    entity_local_name(call_function(c)));
+    context->number_of_error++;
+    okay = FALSE;
+  }
   
   return okay;
 }
@@ -843,8 +843,9 @@ arguments_are_IRD(call c, type_context_p context)
   return arguments_are_something
     (c, context, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE);
 }
-/***************************************************************************** 
- * Verify if all the arguments basic of function C are REAL, DOUBLE and COMPLEX
+/************************************************************************** 
+ * Verify if all the arguments basic of function C are REAL, DOUBLE 
+ * and COMPLEX
  * According to (ANSI X3.9-1978 FORTRAN 77, Table 2 & 3, Page 6-5 & 6-6),
  * it is prohibited an arithetic operator operaters on 
  * a pair of DOUBLE and COMPLEX, so that I return FALSE in that case.
@@ -858,7 +859,7 @@ arguments_are_RDC(call c, type_context_p context)
     (c, context, FALSE, TRUE, TRUE, TRUE, TC_DCOMPLEX, FALSE, FALSE);
 }
 
-/***************************************************************************** 
+/************************************************************************** 
  * Verification if all the arguments are compatible
  * PDSon: If #arguments <=1, I return true
  */
@@ -890,7 +891,7 @@ arguments_are_compatible(call c, hash_table types)
   return TRUE;
 }
 
-/***************************************************************************** 
+/************************************************************************** 
  * Typing all the arguments of c to basic b if their basic <> b
  */
 static void 
@@ -913,7 +914,7 @@ typing_arguments(call c, type_context_p context, basic b)
   }
 }
 
-/***************************************************************************** 
+/************************************************************************** 
  *                           TYPING THE INTRINSIC FUNCTIONS
  * Typing arithmetic operator (+, -, --, *, /), except **
  */
@@ -935,7 +936,7 @@ typing_arithmetic_operator(call c, type_context_p context)
   
   return b;    
 }
-/***************************************************************************** 
+/************************************************************************** 
  * Typing power operator (**)
  */
 static basic
@@ -979,7 +980,7 @@ typing_power_operator(call c, type_context_p context)
   }
   return copy_basic(b);
 }
-/***************************************************************************** 
+/************************************************************************** 
  * Typing relational operator (LT, LE, EQ, GT, GE) 
  */
 static basic
@@ -1001,7 +1002,7 @@ typing_relational_operator(call c, type_context_p context)
   free_basic(b);
   return make_basic_logical(4);
 }
-/***************************************************************************** 
+/************************************************************************** 
  * Typing logical operator (NOT, AND, OR, EQV, NEQV)
  */
 static basic
@@ -1014,7 +1015,7 @@ typing_logical_operator(call c, type_context_p context)
   }
   return make_basic_logical(4);
 }
-/***************************************************************************** 
+/************************************************************************** 
  * Typing concatenate operator (//)
  */
 static basic
@@ -1028,7 +1029,7 @@ typing_concat_operator(call c, type_context_p context)
   return make_basic_string(value_undefined);
 }
 
-/***************************************************************************** 
+/************************************************************************** 
  * Typing function C whose argument type is from_type and
  * whose return type is to_type
  */
@@ -1077,7 +1078,8 @@ typing_function_argument_type_to_return_type(call c, type_context_p context,
   /* UNEXPECTED */
   else
   {
-    pips_internal_error("Unexpected basic: %s \n", basic_to_string(from_type));
+    pips_internal_error("Unexpected basic: %s \n", 
+			basic_to_string(from_type));
   }
 
   /* ERROR: Invalide of argument type */
@@ -1155,8 +1157,9 @@ typing_function_int_to_char(call c, type_context_p context)
 {
   basic result, type_INT = make_basic_int(4);
   basic type_CHAR = make_basic_string(value_undefined);
-  result = typing_function_argument_type_to_return_type(c, context, type_INT, 
-						      type_CHAR);
+  result = typing_function_argument_type_to_return_type(c, context, 
+							type_INT, 
+							type_CHAR);
   free_basic(type_INT);
   free_basic(type_CHAR);
   return result;
@@ -1166,8 +1169,9 @@ typing_function_real_to_int(call c, type_context_p context)
 {
   basic result, type_INT = make_basic_int(4);
   basic type_REAL = make_basic_float(4);
-  result = typing_function_argument_type_to_return_type(c, context, type_REAL,
-						      type_INT);
+  result = typing_function_argument_type_to_return_type(c, context, 
+							type_REAL,
+							type_INT);
   free_basic(type_INT);
   free_basic(type_REAL);
   return result;
@@ -1177,8 +1181,9 @@ typing_function_int_to_real(call c, type_context_p context)
 {
   basic result, type_INT = make_basic_int(4);
   basic type_REAL = make_basic_float(4);
-  result = typing_function_argument_type_to_return_type(c, context, type_INT, 
-						      type_REAL);
+  result = typing_function_argument_type_to_return_type(c, context, 
+							type_INT, 
+							type_REAL);
   free_basic(type_INT);
   free_basic(type_REAL);
   return result;
@@ -1188,8 +1193,9 @@ typing_function_double_to_int(call c, type_context_p context)
 {
   basic result, type_INT = make_basic_int(4);
   basic type_DBLE = make_basic_float(8);
-  result = typing_function_argument_type_to_return_type(c, context, type_DBLE, 
-						      type_INT);
+  result = typing_function_argument_type_to_return_type(c, context, 
+							type_DBLE, 
+							type_INT);
   free_basic(type_INT);
   free_basic(type_DBLE);
   return result;
@@ -1199,8 +1205,9 @@ typing_function_real_to_double(call c, type_context_p context)
 {
   basic result, type_REAL = make_basic_float(4);
   basic type_DBLE = make_basic_float(8);
-  result = typing_function_argument_type_to_return_type(c, context, type_REAL, 
-						      type_DBLE);
+  result = typing_function_argument_type_to_return_type(c, context, 
+							type_REAL, 
+							type_DBLE);
   free_basic(type_REAL);
   free_basic(type_DBLE);
   return result;
@@ -1211,7 +1218,8 @@ typing_function_complex_to_real(call c, type_context_p context)
   basic result, type_REAL = make_basic_float(4);
   basic type_CMPLX = make_basic_complex(8);
   result = typing_function_argument_type_to_return_type(c, context, 
-							type_CMPLX, type_REAL);
+							type_CMPLX, 
+							type_REAL);
   free_basic(type_REAL);
   free_basic(type_CMPLX);
   return result;
@@ -1222,7 +1230,8 @@ typing_function_dcomplex_to_double(call c, type_context_p context)
   basic result, type_DBLE = make_basic_float(8);
   basic type_DCMPLX = make_basic_complex(16);
   result = typing_function_argument_type_to_return_type(c, context,
-						     type_DCMPLX, type_DBLE);
+							type_DCMPLX, 
+							type_DBLE);
   free_basic(type_DBLE);
   free_basic(type_DCMPLX);
   return result;
@@ -1232,14 +1241,15 @@ typing_function_char_to_logical(call c, type_context_p context)
 {
   basic result, type_LOGICAL = make_basic_logical(4);
   basic type_CHAR = make_basic_string(value_undefined);
-  result = typing_function_argument_type_to_return_type(c, context, type_CHAR, 
-						      type_LOGICAL);
+  result = typing_function_argument_type_to_return_type(c, context, 
+							type_CHAR, 
+							type_LOGICAL);
   free_basic(type_LOGICAL);
   free_basic(type_CHAR);
   return result;
 }
 
-/***************************************************************************** 
+/************************************************************************** 
  * Arguments are REAL (or DOUBLE); and the return is the same with argument
  */
 static basic
@@ -1279,7 +1289,7 @@ typing_function_RealDouble_to_Integer(call c, type_context_p context)
 }
 static basic
 typing_function_RealDoubleComplex_to_RealDoubleComplex(call c, 
-						       type_context_p context)
+						  type_context_p context)
 {
   basic b;
   
@@ -1297,7 +1307,7 @@ typing_function_RealDoubleComplex_to_RealDoubleComplex(call c,
 }
 static basic
 typing_function_IntegerRealDouble_to_IntegerRealDouble(call c, 
-						       type_context_p context)
+					           type_context_p context)
 {
   basic b;
   
@@ -1313,7 +1323,7 @@ typing_function_IntegerRealDouble_to_IntegerRealDouble(call c,
   
   return b;    
 }
-/***************************************************************************** 
+/************************************************************************** 
  * The arguments are INT, REAL, DOUBLE or COMPLEX. The return is the same 
  * with the argument except case argument are COMPLEX, return is REAL
  *
@@ -1321,7 +1331,7 @@ typing_function_IntegerRealDouble_to_IntegerRealDouble(call c,
  */
 static basic
 typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c, 
-						       type_context_p context)
+					            type_context_p context)
 {
   basic b;
   
@@ -1349,7 +1359,7 @@ typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c,
   return b;
 }
 
-/***************************************************************************** 
+/************************************************************************** 
  * Intrinsic conversion to a numeric
  *
  * Note: argument must be numeric
@@ -1391,18 +1401,32 @@ typing_function_conversion_to_double(call c, type_context_p context)
 static basic
 typing_function_conversion_to_complex(call c, type_context_p context)
 {
-  basic result, b =  make_basic_complex(8);
-  result = typing_function_conversion_to_numeric(c, context, b);
+  basic b;
+  if(!arguments_are_IRDC(c, context))
+  {
+    return make_basic_float(4); /* Just for return result */
+  }
+  /* Typing all arguments to REAL if necessary */
+  b = make_basic_float(4);
+  typing_arguments(c, context, b);
   free_basic(b);
-  return result;
+  
+  return make_basic_complex(8);
 }
 static basic
 typing_function_conversion_to_dcomplex(call c, type_context_p context)
 {
-  basic result, b =  make_basic_complex(16);
-  result = typing_function_conversion_to_numeric(c, context, b);
+  basic b;
+  if(!arguments_are_IRDC(c, context))
+  {
+    return make_basic_float(4); /* Just for return result */
+  }
+  /* Typing all arguments to DBLE if necessary */
+  b = make_basic_float(8);
+  typing_arguments(c, context, b);
   free_basic(b);
-  return result;
+  
+  return make_basic_complex(16);
 }
 /* CMPLX_ */
 static basic
@@ -1443,17 +1467,8 @@ typing_function_overloaded(call c, type_context_p context)
   return make_basic_overloaded();
 }
 
-/*
-static basic typing_function_error(call c, type_context_p context)
-{
-  add_one_line_of_comment((statement) stack_head(context->stats),
-			  "intrinsic '%s' used as a function?",
-			  entity_local_name(call_function(c)));
-  return make_basic_overloaded();
-}
-*/
-
-static basic typing_of_assign(call c, type_context_p context)
+static basic 
+typing_of_assign(call c, type_context_p context)
 {
   list args = call_arguments(c);
   basic b1, b2;
@@ -1461,7 +1476,7 @@ static basic typing_of_assign(call c, type_context_p context)
   if(!arguments_are_compatible(c, context->types))
   {
     add_one_line_of_comment((statement) stack_head(context->stats), 
-			    "Arguments of assignment '%s' are not compatible", 
+		       "Arguments of assignment '%s' are not compatible", 
 			    entity_local_name(call_function(c))); 
     /* Count the number of errors */
     context->number_of_error++;
@@ -1477,14 +1492,930 @@ static basic typing_of_assign(call c, type_context_p context)
       }
   }
 
-  return basic_undefined; /* should not be used... */
+  /* Here, we aren't interested in the type of return */
+  return basic_undefined;
 }
 
-/***************************************** SIMPLIFICATION DES EXPRESSIONS */
-/* Find the specific name from the specific argument
- */
+static basic 
+typing_substring(call c, type_context_p context)
+{
+  int count = 0;
 
-/************************************************************************ 
+  MAP(EXPRESSION, e,
+  {
+    count++;
+    switch (count)
+    {
+    case 1:
+      if( !basic_string_p(GET_TYPE(context->types, e)) ||
+	  !syntax_reference_p(expression_syntax(e)) )
+      {
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument #1 must be a reference to string");
+	/* Count the number of errors */
+	context->number_of_error++;
+      }
+      break;
+    case 2:
+    case 3:
+      if( !basic_int_p(GET_TYPE(context->types, e)))
+      {
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument #%d must be an integer expression",
+				count);
+	/* Count the number of errors */
+	context->number_of_error++;
+      }
+      break;
+    default: /* count > 3 */
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+		   "Too many of arguments for sub-string function");
+      /* Count the number of errors */
+      context->number_of_error++;
+      return make_basic_string(value_undefined);
+    }
+  },
+      call_arguments(c));
+  if (count < 3)
+  {
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+		   "Lack of %d argument(s) for sub-string function",
+			      3-count);
+      /* Count the number of errors */
+      context->number_of_error++;
+  }
+
+  return make_basic_string(value_undefined);
+}
+
+static basic
+typing_assign_substring(call c, type_context_p context)
+{
+  int count = 0;
+  MAP(EXPRESSION, e,
+  {
+    count++;
+    switch (count)
+    {
+    case 1:
+      if( !basic_string_p(GET_TYPE(context->types, e)) ||
+	  !syntax_reference_p(expression_syntax(e)) )
+      {
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument #1 must be a reference to string");
+	/* Count the number of errors */
+	context->number_of_error++;
+      }
+      break;
+    case 2:
+    case 3:
+      if( !basic_int_p(GET_TYPE(context->types, e)))
+      {
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument #%d must be an integer expression",
+				count);
+	/* Count the number of errors */
+	context->number_of_error++;
+      }
+      break;
+    case 4:
+      if( !basic_string_p(GET_TYPE(context->types, e)))
+      {
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument #4 must be a string expression");
+	/* Count the number of errors */
+	context->number_of_error++;
+      }
+      break;
+    default: /* count > 4 */
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+		   "Too many of arguments for assign sub-string function");
+      /* Count the number of errors */
+      context->number_of_error++;
+      return basic_undefined;
+    }
+  },
+      call_arguments(c));
+  if (count < 4)
+  {
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+		   "Lack of %d argument(s) for assign sub-string function",
+			      4-count);
+      /* Count the number of errors */
+      context->number_of_error++;
+  }
+  return basic_undefined;
+}
+
+static basic
+typing_buffer_inout(call c, type_context_p context)
+{
+  int count = 0;
+
+  MAP(EXPRESSION, e,
+  {
+    count++;
+    switch (count)
+    {
+    case 1:
+      if( !basic_int_p(GET_TYPE(context->types, e)) )
+      {
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument #1 must be an integer expression");
+	/* Count the number of errors */
+	context->number_of_error++;
+      }
+      break;
+    case 2:
+    case 3:
+    case 4:
+      /* PDSon: Nobody knows the type of 3 last arguments, I do nothing here */
+      break;
+    default: /* count > 4 */
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+			      "Too many of arguments for function '%s'",
+			      entity_local_name(call_function(c)));
+      /* Count the number of errors */
+      context->number_of_error++;
+      return basic_undefined;
+    }
+  },
+      call_arguments(c));
+
+  if (count < 4)
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats), 
+			    "Lack of %d argument(s) for function '%s'",
+			    4-count, entity_local_name(call_function(c)));
+    /* Count the number of errors */
+    context->number_of_error++;
+  }
+  return basic_undefined;
+}
+
+static basic
+typing_implied_do(call c, type_context_p context)
+{
+  int count = 0;
+
+  MAP(EXPRESSION, e,
+  {
+    count++;
+    switch (count)
+    {
+    case 1:
+      if( !basic_int_p(GET_TYPE(context->types, e)) ||
+	  !syntax_reference_p(expression_syntax(e)) )
+      {
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument #1 must be a reference to integer");
+	/* Count the number of errors */
+	context->number_of_error++;
+      }
+      break;
+      
+    case 2: /* range */
+      if(!syntax_range_p(expression_syntax(e)))
+      {
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Argument #2 must be a range of integer");
+	/* Count the number of errors */
+	context->number_of_error++;
+	return basic_undefined;
+      }
+      else
+      {
+	range r = syntax_range(expression_syntax(e));
+	if (!check_loop_range(r, context->types))
+	{
+	  add_one_line_of_comment((statement) stack_head(context->stats),
+				  "Range must be Integer, Real or Double!");
+	  context->number_of_error++;
+	}
+	else
+	{
+	  type_loop_range(GET_TYPE(context->types, e), r, context);
+	}
+      }
+      return basic_undefined;
+    }
+  },
+      call_arguments(c));
+
+  if (count < 2)
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats), 
+			    "Lack of %d argument(s) for function '%s'",
+			    2-count, entity_local_name(call_function(c)));
+    /* Count the number of errors */
+    context->number_of_error++;
+  }
+  return basic_undefined;
+}
+
+/******************* VERIFICATION SYNTAX FOR STATEMENTS ********************/
+/* Verify if an expression is a constant:
+ * YES : return TRUE; otherwise, return FALSE 
+ */
+static bool
+is_constant(expression exp)
+{
+  syntax s = expression_syntax(exp);
+  if (!syntax_call_p(s))
+  {
+    return FALSE;
+  }
+  return (entity_constant_p(call_function(syntax_call(s))));
+}
+
+/* Verify if an expression is a constant of basic b:
+ * YES : return TRUE; otherwise, return FALSE 
+ */
+static bool
+is_constant_of_basic(expression exp, basic b)
+{
+  type call_type, return_type;
+  basic bb;
+  if (!is_constant(exp))
+  {
+    return FALSE;
+  }
+  call_type = entity_type(call_function(syntax_call(expression_syntax(exp))));
+  return_type = functional_result(type_functional(call_type));
+  bb = variable_basic(type_variable(return_type));
+  if (basic_undefined_p(bb) || !basic_equal_p(b, bb))
+  {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static basic
+statement_without_argument(call c, type_context_p context)
+{
+  if (call_arguments(c) != NIL)
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats), 
+			    "Statement '%s' doesn't need any argument", 
+			    entity_local_name(call_function(c))); 
+    /* Count the number of errors */
+    context->number_of_error++;
+  }
+
+  /* Here, we are not interested in the basic returned */
+  return basic_undefined;
+}
+/***************************************************************************
+ * Statement with at most one argument: integer or character constant, 
+ * like PAUSE, STOP.
+ * Attention: Integer value must be <= 99999 (at most 5 digits)
+ * (According to ANSI X3.9-1978 FORTRAN 77; PAGE 11-9)
+ */
+static basic
+statement_with_at_most_one_integer_or_character(call c, 
+					       type_context_p context)
+{
+  basic b_int, b_char;
+  expression arg1;
+  entity en;
+  int l;
+  list args = call_arguments(c);
+  if (args != NIL)
+  {
+    b_int = make_basic_int(4);
+    b_char = make_basic_string(0);
+    arg1 = EXPRESSION(CAR(args));
+    if ( !is_constant_of_basic(arg1, b_int) &&
+	 !is_constant_of_basic(arg1, b_char))
+    {
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+	   "Argument #1 of '%s' must be an integer or character constant",
+			      entity_local_name(call_function(c))); 
+      /* Count the number of errors */
+      context->number_of_error++;
+    }
+    else if ( is_constant_of_basic(arg1, b_int) )
+    {
+      en = call_function(syntax_call(expression_syntax(arg1)));
+      l = strlen(entity_local_name(en));
+      if (l > 5)
+      {
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+	 "Argument must be an integer of at most 5 digits (instead of '%d')",
+				l); 
+      /* Count the number of errors */
+      context->number_of_error++;
+      }
+    }
+
+    if (CDR(args) != NIL)
+    {
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+			      "Statement '%s' needs at most an argument, " \
+			      "neight integer constant nor character constant",
+			      entity_local_name(call_function(c))); 
+      /* Count the number of errors */
+      context->number_of_error++;
+    }
+    free_basic(b_int);
+    free_basic(b_char);
+  }
+  /* Here, we are not interested in the basic returned */
+  return basic_undefined;
+}
+
+static basic
+statement_with_at_most_one_expression_integer(call c, 
+					     type_context_p context)
+{
+  basic b;
+  list args = call_arguments(c);
+  if (args != NIL)
+  {
+    expression arg1 = EXPRESSION(CAR(args));
+    b = GET_TYPE(context->types, arg1);
+
+    if ( !basic_int_p(b) )
+    {
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+			  "Argument #1 of '%s' must be an integer expression",
+			      entity_local_name(call_function(c))); 
+      /* Count the number of errors */
+      context->number_of_error++;
+    }
+
+    if (CDR(args) != NIL)
+    {
+      add_one_line_of_comment((statement) stack_head(context->stats), 
+			 "Statement '%s' needs at most an integer expression",
+			      entity_local_name(call_function(c))); 
+      /* Count the number of errors */
+      context->number_of_error++;
+    }
+  }
+
+  /* Here, we are not interested in the basic returned */
+  return basic_undefined;
+}
+
+/************************************************ VERIFICATION OF SPECIFIERS */
+
+static bool
+is_label_statement(expression exp)
+{
+  call c;
+  entity fc;
+  syntax s = expression_syntax(exp);
+  if (!syntax_call_p(s))
+  {
+    return FALSE;
+  }
+  c = syntax_call(s);
+  fc = call_function(c);
+  return entity_label_p(fc);
+}
+
+static bool 
+is_label_specifier(string s, expression e, type_context_p context)
+{
+  if (!is_label_statement(e))
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats), 
+			    "%s specifier must be a label statement", s);
+    
+    /* Count the number of errors */
+    context->number_of_error++;
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static bool 
+is_integer_specifier(string s, expression e, type_context_p context)
+{
+  basic b = GET_TYPE(context->types, e);
+
+  if (!basic_int_p(b))
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats), 
+			    "%s specifier must be an integer expression", s);
+    
+    /* Count the number of errors */
+    context->number_of_error++;
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static bool 
+is_string_specifier(string s,expression e, type_context_p context)
+{  
+  basic b = GET_TYPE(context->types, e);
+  if (!basic_string_p(b))
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats), 
+			    "%s specifier must be a character expression", s);
+    
+    /* Count the number of errors */
+    context->number_of_error++;
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static bool 
+is_label_integer_string_specifier(string s, expression e, 
+				  type_context_p context)
+{  
+  basic b = GET_TYPE(context->types, e);
+  if (!is_label_statement(e) && !basic_int_p(b) && !basic_string_p(b))
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats), 
+       "%s specifier must be a label, an integer or character expression", s);
+
+    /* Count the number of errors */
+    context->number_of_error++;
+    return FALSE;
+  }
+  
+  return TRUE;
+}
+
+static bool
+is_varibale_array_element_specifier(string s, expression e, basic b,
+				    type_context_p context)
+{
+  if (!basic_equal_p(GET_TYPE(context->types, e), b) ||
+      !syntax_reference_p(expression_syntax(e)))
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats), 
+     "%s specifier must be a variable or an array element of %s", s,
+			    basic_string_p(b)? "STRING":basic_to_string(b));
+
+    /* Count the number of errors */
+    context->number_of_error++;
+    return FALSE;
+  }
+  return TRUE;
+
+}
+/* This function verifies the unit specifier; that is integer positive 
+ * expression or character expression
+ * (According to ANSI X3.9-1978 FORTRAN 77; PAGE 12-7)
+ */
+static bool
+is_unit_specifier(expression exp, type_context_p context)
+{
+  basic b;
+  b = GET_TYPE(context->types, exp);
+  if (!basic_int_p(b) && !basic_string_p(b))
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats), 
+	    "UNIT specifier must be an integer or character expression");
+
+    /* Count the number of errors */
+    context->number_of_error++;
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static bool
+is_format_specifier(expression exp, type_context_p context)
+{
+  return is_label_integer_string_specifier("FORMAT", exp, context);
+}
+
+static bool
+is_record_specifier(expression exp, type_context_p context)
+{
+  basic b = GET_TYPE(context->types, exp);
+
+  return is_label_integer_string_specifier("RECORD", exp, context);
+}
+
+/* Integer variable or integer array element which is maybe modified
+ */
+static bool
+is_iostat_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_int(4);
+  bool r = is_varibale_array_element_specifier("IOSTAT", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+
+/* Error specifier is a label statement
+ */
+static bool
+is_err_specifier(expression exp, type_context_p context)
+{
+  return is_label_specifier("ERR", exp, context);
+}
+
+static bool
+is_end_specifier(expression exp, type_context_p context)
+{
+  return is_label_specifier("END", exp, context);
+}
+
+static bool
+is_file_specifier(expression exp, type_context_p context)
+{
+  return is_string_specifier("FILE", exp, context);
+}
+
+static bool
+is_status_specifier(expression exp, type_context_p context)
+{
+  return is_string_specifier("STATUS", exp, context);
+}
+
+static bool
+is_access_specifier(expression exp, type_context_p context)
+{
+  return is_string_specifier("ACCESS", exp, context);
+}
+
+static bool
+is_form_specifier(expression exp, type_context_p context)
+{
+  return is_string_specifier("FORM", exp, context);
+}
+
+static bool
+is_recl_specifier(expression exp, type_context_p context)
+{
+  return is_integer_specifier("RECL", exp, context);
+}
+
+static bool
+is_blank_specifier(expression exp, type_context_p context)
+{
+  return is_string_specifier("BLANK", exp, context);
+}
+
+static bool 
+is_exist_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_logical(4);
+  bool r = is_varibale_array_element_specifier("IOSTAT", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+static bool
+is_opened_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_logical(4);
+  bool r = is_varibale_array_element_specifier("OPENED", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+static bool
+is_number_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_int(4);
+  bool r = is_varibale_array_element_specifier("NUMBER", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+static bool
+is_named_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_logical(4);
+  bool r = is_varibale_array_element_specifier("NAMED", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+static bool
+is_name_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_string(0);
+  bool r = is_varibale_array_element_specifier("NAME", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+static bool
+is_sequential_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_string(0);
+  bool r = is_varibale_array_element_specifier("SEQUENTIAL", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+static bool
+is_direct_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_string(0);
+  bool r = is_varibale_array_element_specifier("DIRECT", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+static bool
+is_formated_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_string(0);
+  bool r = is_varibale_array_element_specifier("FORMATTED", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+static bool
+is_unformated_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_string(0);
+  bool r = is_varibale_array_element_specifier("UNFORMATTED", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+static bool
+is_nextrec_specifier(expression exp, type_context_p context)
+{
+  basic b = make_basic_int(4);
+  bool r = is_varibale_array_element_specifier("NEXTREC", exp, b, context);
+  free_basic(b);
+  return r;
+}
+
+static bool 
+check_spec (string name,
+	    bool allowed,
+	    string specifier,
+	    expression contents,
+	    type_context_p context,
+	    bool (*check_contents)(expression, type_context_p))
+{ 
+  if (same_string_p(name, specifier))
+  {
+    if (allowed)
+    {
+      if (check_contents(contents, context))
+      {
+	return TRUE;
+      }
+      /* else ok */
+    }
+    else /* not allowed */
+    {
+      add_one_line_of_comment((statement) stack_head(context->stats),
+			      "Specifier '%s' is not allowed", name);
+      context->number_of_error++;
+    }
+    return TRUE; /* checked! */
+  }
+  
+  return FALSE;
+}
+
+static bool 
+check_io_list(list /* of expression */ args,
+	      type_context_p ctxt,
+	      bool a_unit,			  
+	      bool a_fmt,
+	      bool a_rec,
+	      bool a_iostat,
+	      bool a_err,
+	      bool a_end,
+	      bool a_iolist,
+	      bool a_file,
+	      bool a_status,
+	      bool a_access,
+	      bool a_form,
+	      bool a_blank,
+	      bool a_recl,
+	      bool a_exist,
+	      bool a_opened,
+	      bool a_number,
+	      bool a_named,
+	      bool a_name,
+	      bool a_sequential,
+	      bool a_direct,
+	      bool a_formatted,
+	      bool a_unformatted,
+	      bool a_nextrec)
+{
+  string spec;
+  pips_assert("Even number of arguments", gen_length(args)%2==0);
+  
+  for (; args; args = CDR(CDR(args)))
+  {
+    expression specifier = EXPRESSION(CAR(args));
+    expression cont = EXPRESSION(CAR(CDR(args)));
+    
+    syntax s = expression_syntax(specifier);
+    pips_assert("Specifier must be a call with arguments", 
+		!syntax_call_p(s) || !call_arguments(syntax_call(s)));
+    
+    spec = entity_local_name(call_function(syntax_call(s)));
+    
+    /* specifier must be UNIT= FMT=... */
+    if (!check_spec("UNIT=", a_unit, spec, cont, ctxt, 
+		    is_unit_specifier) &&
+	!check_spec("FMT=", a_fmt, spec, cont, ctxt, 
+		    is_format_specifier) &&
+	!check_spec("IOSTAT=", a_iostat, spec, cont, ctxt, 
+		    is_iostat_specifier) &&
+	!check_spec("REC=", a_rec, spec, cont, ctxt, 
+		    is_record_specifier) &&
+	!check_spec("ERR=", a_err, spec, cont, ctxt, 
+		    is_err_specifier) &&
+	!check_spec("END=", a_end, spec, cont, ctxt, 
+		    is_end_specifier) &&
+	!check_spec("IOLIST=", a_iolist, spec, cont, ctxt, 
+		    gen_true) &&
+	!check_spec("FILE=", a_file, spec, cont, ctxt, 
+		    is_file_specifier) &&
+	!check_spec("STATUS=", a_status, spec, cont, ctxt, 
+		    is_status_specifier) &&
+	!check_spec("ACCESS=", a_access, spec, cont, ctxt, 
+		    is_access_specifier) &&
+	!check_spec("FORM=", a_form, spec, cont, ctxt, 
+		    is_form_specifier) &&
+	!check_spec("BLANK=", a_blank, spec, cont, ctxt, 
+		    is_blank_specifier) &&
+	!check_spec("RECL=", a_recl, spec, cont, ctxt, 
+		    is_recl_specifier) &&
+	!check_spec("EXIST=", a_exist, spec, cont, ctxt, 
+		    is_exist_specifier) &&
+	!check_spec("OPENED=", a_opened, spec, cont, ctxt, 
+		    is_opened_specifier) &&
+	!check_spec("NUMBER=", a_number, spec, cont, ctxt, 
+		    is_number_specifier) &&
+	!check_spec("NAMED=", a_named, spec, cont, ctxt, 
+		    is_named_specifier) &&
+	!check_spec("NAME=", a_name, spec, cont, ctxt, 
+		    is_name_specifier) &&
+	!check_spec("SEQUENTIAL=", a_sequential, spec, cont, ctxt, 
+		    is_sequential_specifier) &&
+	!check_spec("DIRECT=", a_direct, spec, cont, ctxt, 
+		    is_direct_specifier) &&
+	!check_spec("FORMATED=", a_formatted, spec, cont, ctxt, 
+		    is_formated_specifier) &&
+	!check_spec("UNFORMATED=", a_unformatted, spec, cont, ctxt, 
+		    is_unformated_specifier) &&
+	!check_spec("NEXTREC=", a_nextrec, spec, cont, ctxt, 
+		    is_nextrec_specifier))
+    {
+      add_one_line_of_comment((statement) stack_head(ctxt->stats),
+			      "Unexpected specifier '%s'", spec);
+      ctxt->number_of_error++;
+      return FALSE;
+    }
+  }
+  
+  return TRUE;
+}
+
+static basic 
+check_read_write(call c, type_context_p context)
+{
+  list args = call_arguments(c);
+  check_io_list(args, context,
+		/* UNIT FMT REC IOSTAT ERR END IOLIST */
+		TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+		/* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
+		FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
+		FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* UNFORMATTED NEXTREC */
+		FALSE, FALSE);
+
+  return basic_undefined;
+}
+
+static basic
+check_open(call c, type_context_p context)
+{
+  list args = call_arguments(c);
+  check_io_list(args, context,
+		/* UNIT FMT REC IOSTAT ERR END IOLIST */
+		TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+		/* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
+		TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE,
+		/* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
+		FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* UNFORMATTED NEXTREC */
+		FALSE, FALSE);
+  return basic_undefined;
+}
+
+static basic
+check_close(call c, type_context_p context)
+{
+  list args = call_arguments(c);
+
+  check_io_list(args, context,
+		/* UNIT FMT REC IOSTAT ERR END IOLIST */
+		TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+		/* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
+		FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
+		FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* UNFORMATTED NEXTREC */
+		FALSE, FALSE);
+  return basic_undefined;
+}
+
+static basic
+check_inquire(call c, type_context_p context)
+{
+  list args = call_arguments(c);
+  check_io_list(args, context,
+		/* UNIT FMT REC IOSTAT ERR END IOLIST */
+		FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+		/* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
+		FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+		/* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
+		TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+		/* UNFORMATTED NEXTREC */
+		TRUE, TRUE);
+  return basic_undefined;
+}
+
+static basic
+check_backspace(call c, type_context_p context)
+{
+  list args = call_arguments(c);
+  check_io_list(args, context,
+		/* UNIT FMT REC IOSTAT ERR END IOLIST */
+		TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+		/* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
+		FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
+		FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* UNFORMATTED NEXTREC */
+		FALSE, FALSE);
+  return basic_undefined;
+}
+
+static basic
+check_endfile(call c, type_context_p context)
+{
+  list args = call_arguments(c);
+  check_io_list(args, context,
+		/* UNIT FMT REC IOSTAT ERR END IOLIST */
+		TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+		/* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
+		FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
+		FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* UNFORMATTED NEXTREC */
+		FALSE, FALSE);
+  return basic_undefined;
+}
+
+static basic
+check_rewind(call c, type_context_p context)
+{
+  list args = call_arguments(c);
+  check_io_list(args, context,
+		/* UNIT FMT REC IOSTAT ERR END IOLIST */
+		TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+		/* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
+		FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
+		FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+		/* UNFORMATTED NEXTREC */
+		FALSE, FALSE);
+  return basic_undefined;
+}
+
+static basic
+check_format(call c, type_context_p context)
+{
+  list args = call_arguments(c);
+  if (args == NIL)
+  {
+    add_one_line_of_comment((statement) stack_head(context->stats),
+			    "FORMAT statement needs a format specification");
+    context->number_of_error++;    
+  }
+  else
+  {
+    expression exp = EXPRESSION(CAR(args));
+    if (!basic_string_p(GET_TYPE(context->types, exp)))
+    {
+      add_one_line_of_comment((statement) stack_head(context->stats),
+			      "Format specification must be a string");
+      context->number_of_error++;    
+    }
+  }
+  return basic_undefined;
+}
+
+/*********************** SIMPLIFICATION DES EXPRESSIONS **********************/
+/* Find the specific name from the specific argument
+ * ---
  * Each intrinsic of name generic have a function for switching to the
  * specific name correspondent with the argument
  */
@@ -1530,7 +2461,8 @@ switch_generic_to_specific(expression exp, type_context_p context,
   }
   
   /* Modify the (function:entity) of the call c if necessary
-   * NOTE: If specific_name == NULL: Invalid argument or argument basic unknown
+   * NOTE: If specific_name == NULL: Invalid argument or 
+   * argument basic unknown
    */
   if(specific_name != NULL && 
      strcmp(specific_name, entity_local_name(call_function(c))) != 0)
@@ -1733,7 +2665,7 @@ switch_specific_dcmplx(expression exp, type_context_p context)
   simplification_dcomplex(exp, context);
 }
 
-/***************************** SIMPLIFICATION THE CONVERSION CALL *************
+/************************* SIMPLIFICATION THE CONVERSION CALL *************
  * e.g: INT(INT(R)) -> INT(R)
  *      INT(2.9) -> 2
  *      INT(I) -> I
@@ -1743,7 +2675,7 @@ simplification_conversion(expression exp, basic to_basic,
 			  type_context_p context)
 {
   syntax s_arg;
-  expression arg, exp_tmp;
+  expression arg, exp_tmp = NULL;
   basic b;
   call c = syntax_call(expression_syntax(exp));
   arg = EXPRESSION(CAR(call_arguments(c)));
@@ -1751,16 +2683,10 @@ simplification_conversion(expression exp, basic to_basic,
   /* e.g: INT(I) -> I */
   if (syntax_reference_p(s_arg) &&
       basic_equal_p(to_basic, 
-		    entity_basic(reference_variable(syntax_reference(s_arg)))))
+	       entity_basic(reference_variable(syntax_reference(s_arg)))))
   {
     exp_tmp = copy_expression(arg);
-    free_syntax(expression_syntax(exp));
-    free_normalized(expression_normalized(exp));
-    expression_syntax(exp) = 
-      copy_syntax(expression_syntax(exp_tmp));
-    expression_normalized(exp) = 
-      copy_normalized(expression_normalized(exp_tmp));
-    free_expression(exp_tmp);
+
     context->number_of_simplication++;
   }
   else if(syntax_call_p(s_arg))
@@ -1770,26 +2696,37 @@ simplification_conversion(expression exp, basic to_basic,
     if (basic_equal_p(b, to_basic))
     {
       exp_tmp = copy_expression(arg);
-      free_syntax(expression_syntax(exp));
-      free_normalized(expression_normalized(exp));
-      expression_syntax(exp) = 
-	copy_syntax(expression_syntax(exp_tmp));
-      expression_normalized(exp) = 
-	copy_normalized(expression_normalized(exp_tmp));
-      free_expression(exp_tmp);
+
+      context->number_of_simplication++;
     }
     /* Cast constant if necessary */
-    /* e.g: INT(2.9) -> 2 */
-    else if ((exp_tmp = cast_constant(arg, to_basic, context)) != NULL)
+    /* Conversion: CMPLX, CMPLX_, DCMPLX, DCMPLX_ */
+    else if (ENTITY_IMPLIED_CMPLX_P(call_function(c)) ||
+	     ENTITY_CONVERSION_CMPLX_P(call_function(c)) ||
+	     ENTITY_IMPLIED_DCMPLX_P(call_function(c)) ||
+	     ENTITY_CONVERSION_DCMPLX_P(call_function(c)))
     {
-      free_syntax(expression_syntax(exp));
-      free_normalized(expression_normalized(exp));
-      expression_syntax(exp) = 
-	copy_syntax(expression_syntax(exp_tmp));
-      expression_normalized(exp) = 
-	copy_normalized(expression_normalized(exp_tmp));
-      free_expression(exp_tmp);
+      exp_tmp = cast_constant(exp, to_basic, context); 
+      /* Number of simplifications is already counted in cast_constant() */
     }
+    /* Conversion: INT (IFIX, ...), REAL (FLOAT, ...), DBLE 
+     * e.g: INT(2.9) -> 2
+     */
+    else
+    {
+      exp_tmp = cast_constant(arg, to_basic, context);
+      /* Number of simplifications is already counted in cast_constant() */
+    }
+  }
+  /* Update exp */
+  if (exp_tmp != NULL)
+  {
+    free_syntax(expression_syntax(exp));
+    free_normalized(expression_normalized(exp));
+    expression_syntax(exp) = copy_syntax(expression_syntax(exp_tmp));
+    expression_normalized(exp) = copy_normalized(
+					   expression_normalized(exp_tmp));
+    free_expression(exp_tmp);
   }
 }
 
@@ -1844,7 +2781,7 @@ typedef struct IntrinsicDescriptor
 } IntrinsicDescriptor;
 
 /* The table of intrinsic functions. this table is used at the begining
-   of linking to create Fortran operators, commands and intrinsic functions. 
+   of linking to create Fortran operators, commands and intrinsic functions.
 
    Functions with a variable number of arguments are declared with INT_MAX
    arguments.
@@ -1880,30 +2817,38 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {".NE.", 2, overloaded_to_logical_type, typing_relational_operator, 0},
   
   {"//", 2, character_to_character_type, typing_concat_operator, 0},
+
+  /* IO statement */
+  {"WRITE", (INT_MAX), default_intrinsic_type, check_read_write, 0},
+  {"REWIND", (INT_MAX), default_intrinsic_type, check_rewind, 0},
+  {"BACKSPACE", (INT_MAX), default_intrinsic_type, check_backspace, 0},
+  {"OPEN", (INT_MAX), default_intrinsic_type, check_open, 0},
+  {"CLOSE", (INT_MAX), default_intrinsic_type, check_close, 0},
+  {"READ", (INT_MAX), default_intrinsic_type, check_read_write, 0},
+  {"BUFFERIN", (INT_MAX), default_intrinsic_type, typing_buffer_inout, 0},
+  {"BUFFEROUT", (INT_MAX), default_intrinsic_type, typing_buffer_inout, 0},
+  {"ENDFILE", (INT_MAX), default_intrinsic_type, check_endfile, 0},
+  {"IMPLIED-DO", (INT_MAX), default_intrinsic_type, typing_implied_do, 0},
+  {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type, check_format, 0},
+  {"INQUIRE", (INT_MAX), default_intrinsic_type, check_inquire, 0},
   
-  {"WRITE", (INT_MAX), default_intrinsic_type, 0, 0}, /* ERROR ??? */
-  {"REWIND", (INT_MAX), default_intrinsic_type, 0, 0},
-  {"BACKSPACE", (INT_MAX), default_intrinsic_type, 0, 0},
-  {"OPEN", (INT_MAX), default_intrinsic_type, 0, 0},
-  {"CLOSE", (INT_MAX), default_intrinsic_type, 0, 0},
-  {"READ", (INT_MAX), default_intrinsic_type, 0, 0},
-  {"BUFFERIN", (INT_MAX), default_intrinsic_type, 0, 0},
-  {"BUFFEROUT", (INT_MAX), default_intrinsic_type, 0, 0},
-  {"ENDFILE", (INT_MAX), default_intrinsic_type, 0, 0},
-  {"IMPLIED-DO", (INT_MAX), default_intrinsic_type, 0, 0},
-  {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {"INQUIRE", (INT_MAX), default_intrinsic_type, 0, 0},
+
+  {SUBSTRING_FUNCTION_NAME, 3, substring_type, typing_substring, 0},
+  {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type, 
+   typing_assign_substring, 0},
+
+  /* Control statement */
+  {"CONTINUE", 0, default_intrinsic_type, statement_without_argument, 0},
+  {"ENDDO", 0, default_intrinsic_type, 0, 0},
+  {"PAUSE", 1, default_intrinsic_type,
+   statement_with_at_most_one_integer_or_character, 0},
+  {"RETURN", 0, default_intrinsic_type, 
+   statement_with_at_most_one_expression_integer, 0},
+  {"STOP", 0, default_intrinsic_type,
+   statement_with_at_most_one_integer_or_character, 0},
+  {"END", 0, default_intrinsic_type, statement_without_argument, 0},
   
-  {SUBSTRING_FUNCTION_NAME, 3, substring_type, 0, 0},
-  {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type, 0, 0},
-  
-  {"CONTINUE", 0, default_intrinsic_type, 0, 0},
-  {"ENDDO", 0, default_intrinsic_type, 0, 0}, /* ??? */
-  {"PAUSE", 1, default_intrinsic_type, 0, 0},
-  {"RETURN", 0, default_intrinsic_type, 0, 0},
-  {"STOP", 0, default_intrinsic_type, 0, 0},
-  {"END", 0, default_intrinsic_type, 0, 0},
-  
+
   {"INT", 1, overloaded_to_integer_type, 
    typing_function_conversion_to_integer, simplification_int},
   {"IFIX", 1, real_to_integer_type, typing_function_real_to_int, 
@@ -1979,21 +2924,25 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"MAX", (INT_MAX), default_intrinsic_type, 
    typing_function_IntegerRealDouble_to_IntegerRealDouble, 
    switch_specific_max},
-  {"MAX0", (INT_MAX), integer_to_integer_type, typing_function_int_to_int, 0},
+  {"MAX0", (INT_MAX), integer_to_integer_type, 
+   typing_function_int_to_int, 0},
   {"AMAX1", (INT_MAX), real_to_real_type, typing_function_real_to_real, 0},
   {"DMAX1", (INT_MAX), double_to_double_type, 
    typing_function_double_to_double, 0},
-  {"AMAX0", (INT_MAX), integer_to_real_type, typing_function_int_to_real, 0},
+  {"AMAX0", (INT_MAX), integer_to_real_type, 
+   typing_function_int_to_real, 0},
   {"MAX1", (INT_MAX), real_to_integer_type, typing_function_real_to_int, 0},
 
   {"MIN", (INT_MAX), default_intrinsic_type, 
    typing_function_IntegerRealDouble_to_IntegerRealDouble, 
    switch_specific_min},
-  {"MIN0", (INT_MAX), integer_to_integer_type, typing_function_int_to_int, 0},
+  {"MIN0", (INT_MAX), integer_to_integer_type, 
+   typing_function_int_to_int, 0},
   {"AMIN1", (INT_MAX), real_to_real_type, typing_function_real_to_real, 0},
   {"DMIN1", (INT_MAX), double_to_double_type, 
    typing_function_double_to_double, 0},
-  {"AMIN0", (INT_MAX), integer_to_real_type, typing_function_int_to_real, 0},
+  {"AMIN0", (INT_MAX), integer_to_real_type, 
+   typing_function_int_to_real, 0},
   {"MIN1", (INT_MAX), real_to_integer_type, typing_function_real_to_int, 0},
 
   {"LEN", 1, character_to_integer_type, typing_function_char_to_int, 0},
@@ -2003,7 +2952,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"DIMAG", 1, doublecomplex_to_double_type, 
    typing_function_dcomplex_to_double, 0},
 
-  {"CONJG", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CONJG", 1, complex_to_complex_type, 
+   typing_function_complex_to_complex, 0},
   {"DCONJG", 1, doublecomplex_to_doublecomplex_type, 
    typing_function_dcomplex_to_dcomplex, 0},
 
@@ -2011,7 +2961,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
    typing_function_RealDoubleComplex_to_RealDoubleComplex, 
    switch_specific_sqrt},
   {"DSQRT", 1, double_to_double_type, typing_function_double_to_double, 0},
-  {"CSQRT", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CSQRT", 1, complex_to_complex_type, 
+   typing_function_complex_to_complex, 0},
   {"CDSQRT", 1, doublecomplex_to_doublecomplex_type, 
                 typing_function_dcomplex_to_dcomplex, 0},
   
@@ -2019,7 +2970,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
    typing_function_RealDoubleComplex_to_RealDoubleComplex, 
    switch_specific_exp},
   {"DEXP", 1, double_to_double_type, typing_function_double_to_double, 0},
-  {"CEXP", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CEXP", 1, complex_to_complex_type, 
+   typing_function_complex_to_complex, 0},
   {"CDEXP", 1, doublecomplex_to_doublecomplex_type, 
                typing_function_dcomplex_to_dcomplex, 0},
 
@@ -2028,7 +2980,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
    switch_specific_log},
   {"ALOG", 1, real_to_real_type, typing_function_real_to_real, 0},
   {"DLOG", 1, double_to_double_type, typing_function_double_to_double, 0},
-  {"CLOG", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CLOG", 1, complex_to_complex_type, 
+   typing_function_complex_to_complex, 0},
   {"CDLOG", 1, doublecomplex_to_doublecomplex_type, 
                typing_function_dcomplex_to_dcomplex, 0},
 
@@ -2041,7 +2994,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
    typing_function_RealDoubleComplex_to_RealDoubleComplex, 
    switch_specific_sin},
   {"DSIN", 1, double_to_double_type, typing_function_double_to_double, 0},
-  {"CSIN", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CSIN", 1, complex_to_complex_type, 
+   typing_function_complex_to_complex, 0},
   {"CDSIN", 1, doublecomplex_to_doublecomplex_type, 
                typing_function_dcomplex_to_dcomplex, 0},
 
@@ -2049,7 +3003,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
    typing_function_RealDoubleComplex_to_RealDoubleComplex, 
    switch_specific_cos},
   {"DCOS", 1, double_to_double_type, typing_function_double_to_double, 0},
-  {"CCOS", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CCOS", 1, complex_to_complex_type, 
+   typing_function_complex_to_complex, 0},
   {"CDCOS", 1, doublecomplex_to_doublecomplex_type, 
                typing_function_dcomplex_to_dcomplex, 0},
 
@@ -2103,11 +3058,13 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
    typing_arithmetic_operator, 0},
   {EOLE_FMA_OPERATOR_NAME, 3, default_intrinsic_type , 
    typing_arithmetic_operator, 0},
+  {EOLE_FMS_OPERATOR_NAME, 3, default_intrinsic_type , 
+   typing_arithmetic_operator, 0},
   
   {NULL, 0, 0, 0, 0}
 };
 
-/***************************************************************************** 
+/************************************************************************** 
  * Get the function for typing the specified intrinsic
  *
  */
@@ -2134,7 +3091,7 @@ typing_function_t get_typing_function_for_intrinsic(string name)
   
   return (typing_function_t) hash_get(name_to_type_function, name);
 }
-/***************************************************************************** 
+/************************************************************************** 
  * Get the function for switching to specific name from generic name 
  *
  */
