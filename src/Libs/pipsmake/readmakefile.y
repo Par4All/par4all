@@ -2,7 +2,7 @@
  * pipsmake/readmakefile.y pipsmake.h )
  *
  * $RCSfile: readmakefile.y,v $ (version $Revision$)
- * $Date: 1997/03/26 17:20:41 $, 
+ * $Date: 1997/04/25 15:45:27 $, 
  *
  * They only occure between following tags: 
  *
@@ -250,9 +250,9 @@ makefile parse_makefile()
     extern int init_lex();
     extern int yyparse();
 
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
-
     if (pipsmakefile == makefile_undefined) {
+
+	debug_on("PIPSMAKE_DEBUG_LEVEL");
 
 	default_pipsmake_rc_file = getenv("PIPS_PIPSMAKERC");
 	if (default_pipsmake_rc_file)
@@ -270,9 +270,9 @@ makefile parse_makefile()
 	ifdebug(8) {
 	    fprint_makefile(stderr, pipsmakefile);
 	}
-    }
 
-    debug_off();
+	debug_off();
+    }
 
     return(pipsmakefile);
 }
