@@ -4,6 +4,9 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.54  2000/04/13 16:23:47  coelho
+ * ...
+ *
  * Revision 1.53  2000/04/13 08:47:15  coelho
  * initial shift fixed.
  *
@@ -91,8 +94,8 @@
 #define IS_TAB(x) ((x)==Tabulated_bp)
 
 /* non user domain must be taken care from outside? */
-#define FIRST_USER_DOMAIN (7)
-#define TYPE(bp) (bp-Domains-Number_imports-Current_start-FIRST_USER_DOMAIN)
+/* #define FIRST_USER_DOMAIN (7) */
+#define TYPE(bp) (bp-Domains-Number_imports-Current_start)
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
 
