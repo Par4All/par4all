@@ -150,27 +150,29 @@ statement atomize_this_expression(entity (*create)(entity, basic),
   if (syntax_range_p(expression_syntax(e))) return NULL;
   
   bofe = please_give_me_a_basic_for_an_expression(e);
-  if (!basic_overloaded_p(bofe))
-    {
-      entity newvar; 
-      expression rhs;
-      statement assign;
-      syntax ref;
+  if(!basic_undefined_p(bofe)) {
+    if (!basic_overloaded_p(bofe))
+      {
+	entity newvar; 
+	expression rhs;
+	statement assign;
+	syntax ref;
 
-      newvar = (*create)(get_current_module_entity(), bofe);
-      rhs = make_expression(expression_syntax(e), normalized_undefined);
-      normalize_all_expressions_of(rhs);
+	newvar = (*create)(get_current_module_entity(), bofe);
+	rhs = make_expression(expression_syntax(e), normalized_undefined);
+	normalize_all_expressions_of(rhs);
 
-      ref = make_syntax(is_syntax_reference, make_reference(newvar, NIL));
+	ref = make_syntax(is_syntax_reference, make_reference(newvar, NIL));
 
-      assign = make_assign_statement(
-        make_expression(copy_syntax(ref), normalized_undefined), rhs);
+	assign = make_assign_statement(
+				       make_expression(copy_syntax(ref), normalized_undefined), rhs);
 	
-      expression_syntax(e) = ref;
-      return assign;
-    }
+	expression_syntax(e) = ref;
+	return assign;
+      }
   
-  free_basic(bofe);
+    free_basic(bofe);
+  }
   return NULL;
 }
 
