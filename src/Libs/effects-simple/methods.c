@@ -273,7 +273,7 @@ set_methods_for_proper_references()
     vector_to_descriptor_func = effects_undefined_vector_to_descriptor;
 
     effects_backward_translation_op = simple_effects_backward_translation;
-/*  effects_forward_translation_op = ; */
+    effects_forward_translation_op = simple_effects_forward_translation;/*FC*/
     effects_local_to_global_translation_op = effects_dynamic_elim;
 
     load_context_func = load_undefined_context;
