@@ -251,7 +251,7 @@ make_diff()
   then
     report 1 "Cannot open result file $aspect/$name.result/$module"
     [ "$LOCKFILE" ] && echo "$aspect:$name:$module" > $LOCKFILE.$hostname
-    exit 1
+    return 1
   fi
 
   rm -f $refresult.out
