@@ -8,6 +8,7 @@ CFLAGS	+=	-m486
 AR	=	ar
 RANLIB	=	ranlib
 DIFF	=	diff
+M4	=	m4
 
 # end of it
 #
