@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/10/25 21:24:42 $, 
+# $Date: 1997/01/14 16:53:53 $, 
 
 sh=`basename $0`
 STATUS='0'
