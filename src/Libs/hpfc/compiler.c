@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/12/28 18:14:51 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/12/30 09:05:06 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -139,30 +139,6 @@ statement *hoststatp,*nodestatp;
 
     IFDBPRINT(9,"hpf_compiletest",host_module,(*hoststatp));
     IFDBPRINT(9,"hpf_compiletest",node_module,(*nodestatp));
-}
-
-static void hpf_compile_goto(stat,hoststatp,nodestatp)
-statement stat;
-statement *hoststatp,*nodestatp;
-{
-    assert(instruction_goto_p(statement_instruction(stat)));
-
-    /*
-     * nothing is done here, but the corresponding statement is to be
-     * found, by using two mappings of statements...
-     * the goto is let with a pointer to the statement of the 
-     * code being compiled, and the link will be reduced later.
-     */
-
-    pips_error("hpf_compile_goto", "should be empty\n");
-    
-    (*hoststatp) = MakeStatementLike(stat, is_instruction_goto);
-    (*nodestatp) = MakeStatementLike(stat, is_instruction_goto);
-    
-    instruction_goto(statement_instruction(*hoststatp))=
-	instruction_goto(statement_instruction(stat));
-    instruction_goto(statement_instruction(*nodestatp))=
-	instruction_goto(statement_instruction(stat));
 }
 
 static void hpf_compile_call(stat, hoststatp, nodestatp)
@@ -477,10 +453,7 @@ statement stat, *hoststatp, *nodestatp;
     
     if (hpfc_empty_statement_p(hostbody))
     {
-	/*
-	 * ???
-	 *
-	 * memory leak, hostbody is lost whatever it was.
+	/* ??? memory leak, hostbody is lost whatever it was.
 	 */
 	(*hoststatp)=make_continue_statement(entity_undefined);
     }
@@ -714,7 +687,7 @@ statement *hoststatp,*nodestatp;
 	hpf_compile_loop(stat, hoststatp, nodestatp);
 	break;
     case is_instruction_goto:
-	hpf_compile_goto(stat, hoststatp, nodestatp);
+	pips_error("hpf_compiler", "there should be no goto!\n");
 	break;
     case is_instruction_call:
 	hpf_compile_call(stat, hoststatp, nodestatp);
