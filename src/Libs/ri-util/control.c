@@ -9,7 +9,7 @@
  */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1998/11/09 16:29:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1998/12/08 12:40:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -88,6 +88,14 @@ is_control_in_list_p(control c,
     return FALSE;
 }
 
+/* Count the number of occurences of a control node in a list of control nodes */
+int
+occurences_in_control_list(control c,
+		     list cs)
+{
+    return gen_occurences((gen_chunk *) c, cs);
+}
+
 
 /* Test the coherency of a control network.
 
@@ -97,20 +105,43 @@ void
 check_control_coherency(control c)
 {
     list blocs = NIL;
+    int i1, i2;
+
     CONTROL_MAP(ctl, {
-	/* Test the coherency of the successors: */
+
+	/* Test the coherency of the successors */
 	MAP(CONTROL, cc, {	    
-	    if (!is_control_in_list_p(ctl, control_predecessors(cc))) {
-		pips_debug(0, "Control node %p not in the predecessor list of %p\n", ctl, cc);
-		ifdebug(9)
-		    pips_assert("Control incorrect", 0);
+	    /* if (!is_control_in_list_p(ctl, control_predecessors(cc))) { */
+	    if ((i1=occurences_in_control_list(ctl, control_predecessors(cc)))
+		!= (i2=occurences_in_control_list(cc, control_successors(ctl)))) {
+		if(i1==0) {
+		    pips_debug(0, "Control node %p not in the predecessor list of %p\n", ctl, cc);
+		}
+		else {
+		    pips_debug(0, "Control %p occurs %d times in the predecessor list of %p"
+			       " while control %p occurs %d times in the successor list of %p\n",
+			       ctl, i1, cc, cc, i2, ctl);
+		}
+		ifdebug(8)
+		    pips_assert("Control is correct", FALSE);
 	    }
 	}, control_successors(ctl));
+
+	/* Test the coherency of the predecessors */
 	MAP(CONTROL, cc, {
-	    if (!is_control_in_list_p(ctl, control_successors(cc))) {
-		pips_debug(0, "Control node %p not in the successor list of %p\n", ctl, cc);
-		ifdebug(9)
-		    pips_assert("Control incorrect", 0);
+	    /* if (!is_control_in_list_p(ctl, control_successors(cc))) { */
+	    if ((i1=occurences_in_control_list(ctl, control_successors(cc)))
+		!= (i2=occurences_in_control_list(cc, control_predecessors(ctl)))) {
+		if(i1==0) {
+		    pips_debug(0, "Control node %p not in the successor list of %p\n", ctl, cc);
+		}
+		else {
+		    pips_debug(0, "Control %p occurs %d times in the successor list of %p"
+			       " while control %p occurs %d times in the predecessor list of %p\n",
+			       ctl, i1, cc, cc, i2, ctl);
+		}
+		ifdebug(8)
+		    pips_assert("Control is correct", FALSE);
 	    }
 	}, control_predecessors(ctl));
     }, c, blocs);
