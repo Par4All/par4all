@@ -266,7 +266,7 @@ char * (*variable_name)();
 {
   Pvecteur v = NULL;
   short int debut = 1;
-  long int constante = 0;
+  Value constante = VALUE_ZERO;
 
   if (!CONTRAINTE_UNDEFINED_P(c)) v = contrainte_vecteur(c);
   else v = VECTEUR_NUL;
@@ -276,36 +276,43 @@ char * (*variable_name)();
   while (!VECTEUR_NUL_P(v)) {
     if (v->var!=TCST) {
       char signe = (char) NULL;
-      long int coeff = v->val;
+      Value coeff = v->val;
 
-      if (coeff != 0) {
-	if (coeff > 0) signe = (debut) ? ' ' : '+';
-	else { signe = '-'; coeff = -coeff; };
+      if (value_notzero_p(coeff)) {
+	if (value_pos_p(coeff)) signe = (debut) ? ' ' : '+';
+	else { signe = '-'; value_oppose(coeff); };
 	debut = 0;
-	if (coeff == 1) fprintf(fp,"%c %s ", signe, variable_name(v->var));
-	else fprintf(fp,"%c %ld %s ", signe, coeff, variable_name(v->var));
+	if (value_one_p(coeff)) 
+	    fprintf(fp,"%c %s ", signe, variable_name(v->var));
+	else 
+	    { fprintf(fp,"%c ", signe);
+	      fprint_Value(fp, coeff);
+	      fprintf(fp, " %s ", variable_name(v->var)); }
       }
     }
     /* on admet plusieurs occurences du terme constant!?! */
-    else constante += v->val;
+    else value_addto(constante, v->val);
     
     v = v->succ;
   }
-  if (is_what == IS_INEG) {
-    if (constante > 0) fprintf (fp,"+ %ld <= 0 ,", constante);
-    else if (constante < 0) fprintf (fp,"- %ld <= 0 ,", -constante);
-    else  fprintf (fp,"<= 0 ,");
-  }
-  else if(is_what == IS_EG) {
-    if (constante > 0) fprintf (fp,"+ %ld == 0 ,", constante);
-    else if (constante < 0) fprintf (fp,"- %ld == 0 ,", -constante);
-    else  fprintf (fp,"== 0 ,");
-  }
-  else /* IS_VEC */  {
-    if (constante > 0) fprintf (fp,"+ %ld ,", constante);
-    else if (constante < 0) fprintf (fp,"- %ld ,", -constante);
-    else  fprintf (fp," ,");
-  }
+  
+  /* sign */
+  if (value_pos_p(constante))
+      fprintf(fp, "+ ");
+  else if (value_neg_p(constante))
+      value_oppose(constante), fprintf(fp, "- ");
+
+  /* value */
+  if (value_notzero_p(constante))
+      fprint_Value(fp, constante);
+
+  /* trail */
+  if (is_what == IS_INEG)
+      fprintf (fp,"<= 0 ,");
+  else if(is_what == IS_EG) 
+      fprintf (fp,"== 0 ,");
+  else /* IS_VEC */ 
+      fprintf (fp," ,");
 }
 
 /*============================================================================*/
