@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/22 16:52:17 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/23 16:30:48 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -730,6 +730,8 @@ expression e;
 {
     normalized
 	n = expression_normalized(e);
+
+    ifdebug(8) print_expression(e);
 
     if ((n!=normalized_undefined) && (normalized_linear_p(n)))
     {
