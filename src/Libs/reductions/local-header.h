@@ -1,5 +1,5 @@
-/* $RCSfile: local-header.h,v $ (version $Revision$)
- * $Date: 1996/06/14 17:48:46 $, 
+/* 
+ * $Id$
  */
 
 #include <stdio.h>
@@ -13,10 +13,11 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 
 #include "reductions_private.h"
 #include "reductions.h"
 
-/* end of $RCSfile: local-header.h,v $
+/* end of it!
  */
