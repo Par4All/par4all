@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/02 17:12:10 $, 
+# $Date: 1996/09/02 18:07:42 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -54,11 +54,12 @@ shift `expr $OPTIND - 1`
 
 $verb going to $root
 cd $root || error 3 "cannot cd to $root"
+test -d $trgt || mkdir $trgt || error 4 "cannot mkdir $trgt"
 
 #
 # tmp files
 
-tmp="/tmp/$script.`whoami`.$$"
+tmp=$trft/$script.`whoami`.$$
 rm -f $tmp.*
 
 $verb in `pwd`
@@ -89,7 +90,6 @@ xargs $tar cvf $tmp.tar
 #
 # target 
 
-test -d $trgt || mkdir $trgt || error 4 "cannot mkdir $trgt"
 cd $trgt || error 5 "cannot cd to $trgt"
 
 $verb copying files in $trgt
