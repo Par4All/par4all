@@ -477,7 +477,7 @@ void print_module_icfg(entity module)
 
     pips_assert("stack is empty", current_stmt_empty_p());
 
-    /*MERGE_TEXTS (txt, (text) load_statement_icfg (s));*/
+    MERGE_TEXTS (txt, (text) load_statement_icfg (s));
 
     make_text_resource(module_name, DBR_ICFG_FILE,
 		       get_bool_property(ICFG_IFs) ? ".icfgc" :
