@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/02/28 09:05:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/02/28 09:19:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/02/28 09:05:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/02/28 09:19:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -691,7 +691,7 @@ text_hpf_directive(
 	},
 	     ln);
 	
-	for (; margin>0; margin--)
+	for (; margin>0; margin--) /* margin managed by hand:-) */
 	    ls = CONS(SENTENCE, make_sentence(is_sentence_formatted, 
 					    strdup(" ")), ls);
 
@@ -723,12 +723,16 @@ int n ;
          do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT"),
          all_private =  get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
 
+    /* small hack to show the initial label of the loop to name it...
+     */
     if(!structured_do && do_enddo_p)
     {
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 	  strdup(concatenate("C     INITIALLY: DO ", do_label, "\n", NULL))));
     }
 
+    /* quite ugly management of other prettyprints...
+     */
     switch(execution_tag(loop_execution(obj)) ) {
     case is_execution_sequential:
 	doall_loop_p = FALSE;
@@ -763,9 +767,13 @@ int n ;
 	pips_error("text_loop", "Unknown tag\n") ;
     }
 
+    /* HPF directives before the loop if required (INDEPENDENT and NEW)
+     */
     if (hpf_prettyprint)
 	MERGE_TEXTS(r, text_hpf_directive(obj, margin));
 
+    /* LOOP prologue.
+     */
     pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
 
     if(!structured_do && !doall_loop_p && !do_enddo_p) {
@@ -777,6 +785,8 @@ int n ;
     u = make_unformatted(strdup(label), n, margin, pc) ;
     ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
 
+    /* builds the PRIVATE scalar declaration if required
+     */
     if(!ENDP(loop_locals(obj)) && (doall_loop_p || all_private)
        && !hpf_prettyprint) 
     {
@@ -787,8 +797,12 @@ int n ;
 	        make_unformatted(NULL, 0, margin+INDENTATION, lp)));
     }
 
+    /* loop BODY
+     */
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
 
+    /* LOOP postlogue
+     */
     if(structured_do || doall_loop_p || do_enddo_p ||
        get_bool_property("PRETTYPRINT_CRAY") ||
        get_bool_property("PRETTYPRINT_CRAFT") ||
