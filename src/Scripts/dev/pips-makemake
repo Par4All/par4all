@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/08 16:22:50 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/09 08:57:03 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -12,6 +12,7 @@
 
 SCRIPT=`basename $0`
 USAGE="$SCRIPT [-h (HELP!)] [-l|p|s|r|i|n] [-D|P] [-c|a] (default -c)"
+VERBOSE=':'
 
 MAKEFILE=Makefile
 CONFIG_FILE=config.makefile
@@ -28,6 +29,7 @@ help()
 	  -D|P: for Development|Production directories
 	  -c|a: for the current|all directory(ies)
 	  -h: this help
+	  -v: verbose
 	  contextual defaults for first and second options.
 	Usefull macros in $CONFIG_FILE: DOCS and
 	 - libraries: LIB_{CFILES,HEADERS,OBJECTS}
@@ -40,6 +42,11 @@ help()
 	Many default macros are defined and may be overwritten.
 	Many rules are also defined.
 	END_OF_HELP
+}
+
+verbose()
+{
+    echo "$SCRIPT" "$@"
 }
 
 usage()
@@ -63,29 +70,31 @@ DIRS='.'
 ALL=''
 ALL_RULE_TARGET=''
 
-while getopts lpsrinDPcah opt
+while getopts lpsrinDPcahv opt
 do
   case $opt in
     l) DIRTYPE='Lib';
-       PIPSMKMK_OPTION="-l $PIPSMKMK_OPTION" ;;
+       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -l" ;;
     p) DIRTYPE='Passes';
-       PIPSMKMK_OPTION="-p $PIPSMKMK_OPTION" ;;
+       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -p" ;;
     s) DIRTYPE='Scripts';
-       PIPSMKMK_OPTION="-s $PIPSMKMK_OPTION" ;;
+       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -s" ;;
     r) DIRTYPE='Runtime';
-       PIPSMKMK_OPTION="-r $PIPSMKMK_OPTION" ;;
+       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -r" ;;
     i) DIRTYPE='Linear';
-       PIPSMKMK_OPTION="-i $PIPSMKMK_OPTION" ;;
+       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -i" ;;
     n) DIRTYPE='Newgen';
-       PIPSMKMK_OPTION="-n $PIPSMKMK_OPTION" ;;
+       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -n" ;;
     D) DIRSIDE="$PIPS_DEVEDIR" ;
-       PIPSMKMK_OPTION="-D $PIPSMKMK_OPTION";;
+       unset production ;
+       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -D" ;;
     P) DIRSIDE="$PIPS_SRCDIR"; 
        production='yes' ;
-       PIPSMKMK_OPTION="-P $PIPSMKMK_OPTION" ;;
+       PIPSMKMK_OPTION="$PIPSMKMK_OPTION -P" ;;
     c) DIRS='.';;
     a) ALL='1' ;;
     h) help ; exit 0 ;;
+    v) VERBOSE=verbose ;;
     *) usage 2 "invalid option ($opt)" ;;
   esac
 done
@@ -141,17 +150,20 @@ case $DIRTYPE in
            install_lib_dir='$(PIPS_EXTEDIR)' ;;
   Linear)  ALL_RULE_TARGET='' ;
            PART=LINEAR ;
-           install_file_dir='$(PIPS_EXTEDIR)' ;
-           install_exe_dir='$(PIPS_EXTEDIR)' ;
-           install_lib_dir='$(PIPS_EXTEDIR)' ;;
+	   install_src_dir='$(LINEAR_SRCDIR)';
+           install_file_dir='$(LINEAR_INCLUDEDIR)' ;
+           install_exe_dir='$(LINEAR_BINDIR)' ;
+           install_lib_dir='$(LINEAR_LIBDIR)' ;;
   Newgen)  ALL_RULE_TARGET='' ;
-	  # PART=NEWGEN ;
 	   install_src_dir='$(NEWGEN_SRCDIR)';
            install_file_dir='$(NEWGEN_INCLUDEDIR)' ;
            install_exe_dir='$(NEWGEN_BINDIR)' ;
            install_lib_dir='$(NEWGEN_LIBDIR)' ;;
   *) usage 5 "unexpected directory type $DIRTYPE"
 esac
+
+$VERBOSE "PART: ${PART}"
+$VERBOSE "DIRS: ${DIRS}"
 
 ### main loop
 for dir in $DIRS
@@ -178,7 +190,9 @@ do
 
 ##############################################################################
 
-  cat >> $MAKEFILE <<%
+    $VERBOSE "common part"
+
+    cat >> $MAKEFILE <<%
 #	---------------------------------------------------------------
 #	---------------------------------------------------------------
 #
@@ -214,7 +228,7 @@ TARGET_DIR=	${install_src_dir}/$(TARGET)
 # installation directories for quick-install
 #
 #
-ARCH=		$(${PART}_ARCH)
+ARCH=		$(PIPS_ARCH)
 #
 INSTALL_FILE_DIR= ${install_file_dir}
 INSTALL_LIB_DIR=  ${install_lib_dir}/$(ARCH)
@@ -231,15 +245,17 @@ MAIN=		main
 #
 # macros default and architecture dependent values...
 
+    $VERBOSE "all macros"
+
 for m in AR ARFLAGS CC CFLAGS CPPFLAGS LD LDFLAGS LEX LFLAGS LINT LINTFLAGS \
 		YACC YFLAGS TAR ZIP DIFF M4 PROTOIZE
 do
     echo "#"
     echo "# defining ${m} with \$(ARCH) or default"
-    echo "ifneq (\$(${PART}_${m}_\$(ARCH)),)"
-    echo "${m}=	$(${PART}_${m}_\$(ARCH))"
+    echo "ifneq (\$(PIPS_${m}_\$(ARCH)),)"
+    echo "${m}=	$(PIPS_${m}_\$(ARCH))"
     echo "else"
-    echo "${m}=	$(${PART}_${m})"
+    echo "${m}=	$(PIPS_${m})"
     echo "endif"
 done >> $MAKEFILE
 
@@ -247,7 +263,9 @@ done >> $MAKEFILE
 
 ##############################################################################
 
-  cat >> $MAKEFILE <<%
+    $VERBOSE "common 2"
+
+    cat >> $MAKEFILE <<%
 #
 # 
 #
@@ -298,7 +316,8 @@ PROTO=		$(PROTOIZE) -e -E "$(PREPROC)"
 
 ##############################################################################
 
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<% 
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Linear' ] && 
+cat >> $MAKEFILE <<% 
 #
 LIB_TARGET=	$(ARCH)/lib$(TARGET).a
 BIN_TARGET=	$(ARCH)/$(TARGET)
@@ -355,6 +374,19 @@ INSTALL_EXE=	$(RFILES)
 
 ##############################################################################
 
+[ $DIRTYPE = 'Linear' ] && cat >> $MAKEFILE <<% 
+
+CFILES=		$(LIB_CFILES)
+OBJECTS=	$(LIB_OBJECTS)
+INCLUDES=	$(LIB_HEADERS)
+SOURCES= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES) $(DOCS)
+#
+
+%
+
+
+##############################################################################
+
 [ $DIRTYPE = 'Lib' ] && cat >> $MAKEFILE <<% 
 #
 CFILES=		$(MAIN).c $(LIB_CFILES)
@@ -386,13 +418,19 @@ $(BIN_TARGET): $(LIB_TARGET) $(ARCH)/$(MAIN).o
 		$(LIB_TARGET) $(PIPS_LIBS) $(PIPS_MALLOC)
 	@echo 
 
+clobber: clean
+	-Delete *.database
+
+%
+
+#############################################################################
+
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Linear' ] && cat >> $MAKEFILE <<% 
+#
 clean: generate_makefile_if_necessary_and_possible
 	-$(RM) TAGS $(OBJECTS) $(INC_TARGET) $(LIB_TARGET) \\
 		$(BIN_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
 		$(DERIVED_FILES) *.~[0-9]~ $(LIB_IFILES)
-
-clobber: clean
-	-Delete *.database
 
 INC_CFILES = $(LIB_CFILES)
 
@@ -437,20 +475,20 @@ INC_CFILES = $(LIB_CFILES)
 
 ##############################################################################
 
-[ \( $DIRTYPE = 'Passes' -o $DIRTYPE = 'Lib' \) -a $DIRSIDE = $PIPS_SRCDIR ] &&
+[ \( $DIRTYPE = 'Passes' -o $DIRTYPE = 'Lib' -o $DIRTYPE = 'Linear' \) -a $DIRSIDE = $PIPS_SRCDIR ] &&
 cat >> $MAKEFILE <<%
 
-.PRECIOUS: $(PIPS_LIBDIR)/$(LIB_TARGET) $(PIPS_BINDIR)/$(BIN_TARGET)
+.PRECIOUS: $(${PART}_LIBDIR)/$(LIB_TARGET) $(${PART}_BINDIR)/$(BIN_TARGET)
 
-$(PIPS_INCLUDEDIR)/$(TARGET).h: header
-	@pips_install_file -f $(PIPS_INCLUDEDIR) $(TARGET).h
+$(${PART}_INCLUDEDIR)/$(TARGET).h: header
+	@pips_install_file -f $(${PART}_INCLUDEDIR) $(TARGET).h
 
-$(PIPS_LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
-	@pips_install_file -l $(PIPS_LIBDIR) $(LIB_TARGET)
+$(${PART}_LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
+	@pips_install_file -l $(${PART}_LIBDIR) $(LIB_TARGET)
 
 $(LIB_OBJECTS): $(TARGET).h
 
-recompile: $(PIPS_INCLUDEDIR)/$(TARGET).h $(PIPS_LIBDIR)/$(LIB_TARGET) 
+recompile: $(${PART}_INCLUDEDIR)/$(TARGET).h $(${PART}_LIBDIR)/$(LIB_TARGET) 
 
 %
 
@@ -545,7 +583,7 @@ check_sccs:
 	install_pips_sources \\
 		-rv -s \`pwd\` -t $(TARGET_DIR) -y "\$\$comments" \\
 		$(SOURCES)
-	-@cd $(TARGET_DIR) ; pips-makemake
+	-@cd $(TARGET_DIR) ; pips-makemake $PIPSMKMK_OPTION -P
 	touch .install
 	$(MAKE) quick-install
 
@@ -569,11 +607,12 @@ diff:
 #
 # La partie commune aux bibliotheques et aux passes :
 
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<%
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Linear' ] && 
+cat >> $MAKEFILE <<%
 #
 
-$(PIPS_LIBDIR):
-	mkdir $(PIPS_LIBDIR)
+$(${PART}_LIBDIR):
+	mkdir $(${PART}_LIBDIR)
 
 lint:
 	$(TYPECHECK) $(CFILES) | 
@@ -612,7 +651,7 @@ header: .header
 
 %
 
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Newgen' ] && cat >> $MAKEFILE <<%
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Newgen' -o $DIRTYPE = 'Linear' ] && cat >> $MAKEFILE <<%
 #
 
 # indirect depend bacause I do not trust make for the inclusion of
@@ -639,7 +678,7 @@ touch .makefile
 
 ### force dependence list generation
 
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Newgen' ] &&
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Newgen' -o $DIRTYPE = 'Linear' ] &&
 {
   rm -f $MAKEFILE.depend
   touch $MAKEFILE.depend
