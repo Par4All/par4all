@@ -204,6 +204,8 @@
 #define loop_to_statement(l) instruction_to_statement(loop_to_instruction(l))
 #define test_to_statement(t) instruction_to_statement(test_to_instruction(t))
 
+#define entity_constant_p(e) (type_functional_p(entity_type(e)) && \
+  storage_rom_p(entity_storage(e)) && value_constant_p(entity_initial(e)))
 
 /* For the control graph modifiers: */
 
