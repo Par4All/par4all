@@ -44,6 +44,9 @@ typedef dg_vertex_label vertex_label;
 #include "effects-simple.h"
 #include "effects-convex.h"
 
+#include "sc.h"
+#include "conversion.h"
+
 #include "phrase_distribution.h"
 
 /**
@@ -587,7 +590,7 @@ static void compute_region_variables (region reg,
     entity e = (entity) ps_base->var;
     if (e != NULL) {
       storage s = entity_storage(e);
-      pips_debug(3, "Variable: %s\n", entity_global_name(e));
+      pips_debug(7, "Variable: %s\n", entity_global_name(e));
       /* An entity in a system that has an undefined storage is
 	 necesseraly a PHI entity, not dynamic !! */
       if (s != storage_undefined) {
@@ -597,21 +600,93 @@ static void compute_region_variables (region reg,
 	    *l_reg_variables = CONS(ENTITY, e, *l_reg_variables);
 	  }
 	}
-      }
-      else {
-	*l_reg_params = CONS(ENTITY, e, *l_reg_params);
+	else {
+	  *l_reg_params = CONS(ENTITY, e, *l_reg_params);
+	}
       }
     }
   }
-  ifdebug(3) {
-    pips_debug(3, "Variables: \n");
-    print_arguments(*l_reg_variables);
-    pips_debug(3, "Parameters: \n");
-    print_arguments(*l_reg_params);
-  }
-  
   pips_debug(3, "END compute_region_variables: \n");
 }    
+
+/**
+ * Internally used for making communication module for non-scalar region
+ * and function
+ */
+static entity compute_region_communications (entity function,
+					     region reg) 
+
+{
+  list l_reg_params;
+  list l_reg_variables;
+  Psysteme ps_reg;
+  Pbase ps_base;
+  Pcontrainte ps_eg, ps_ineg;
+  entity equ, leq;
+
+  ps_reg = region_system(reg);
+  ps_base = ps_reg->base;
+  ps_eg = ps_reg->egalites;
+  ps_ineg = ps_reg->inegalites;
+
+  equ = entity_intrinsic(EQUAL_OPERATOR_NAME);
+  leq = entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME);
+
+  compute_region_variables(reg,&l_reg_params,&l_reg_variables);
+  
+  ifdebug(3) {
+    string variables_string = "Variables: ";
+    MAP (ENTITY, e, {variables_string=strdup(concatenate(variables_string, " ", entity_local_name(e), NULL));}, l_reg_variables);
+    variables_string=strdup(concatenate(variables_string, "\nParameters: ", NULL));
+    MAP (ENTITY, e, {variables_string=strdup(concatenate(variables_string, " ", entity_local_name(e), NULL));}, l_reg_params);
+    pips_debug(2, "Region variables:\n%s\n",variables_string);
+  }
+  
+  pips_debug(2, "Psysteme to expression:\n");
+  print_expression(Psysteme_to_expression(ps_reg));
+  
+  pips_debug(2, "Egalites:\n");
+  MAP(EXPRESSION, exp, {
+    print_expression(exp);
+  }, Pcontrainte_to_expression_list(ps_eg, equ));
+  
+  pips_debug(2, "Inegalites:\n");
+  MAP(EXPRESSION, exp, {
+    print_expression(exp);
+  }, Pcontrainte_to_expression_list(ps_ineg, leq));
+  
+  pips_debug(2, "loop nest:\n");
+  {
+    /* !!! WARNING !!!  This divide function has to be redefined here to
+     * have a positive remainder ! Use an other custom integer division
+     * operation ! */
+    entity divide = entity_intrinsic(DIVIDE_OPERATOR_NAME);
+    statement stat = systeme_to_loop_nest(ps_reg, l_reg_params, make_continue_statement(entity_empty_label()), divide);
+    print_statement(stat);
+  }
+
+  /* pips_debug(2, "elements_loop:\n");
+  {
+    list l_ind = CONS(ENTITY, make_scalar_integer_entity("IND",entity_local_name(get_current_module_entity())), NIL);
+    list l_scal = NIL;
+    statement stat = elements_loop (ps_reg, l_ind, l_scal, make_continue_statement(entity_empty_label()));
+    print_statement(stat);
+    }*/
+
+  /*  pips_debug(2, "Region AFTER region_dynamic_var_elim: ");
+      {
+      region reg2 = copy_region(reg);
+      region_dynamic_var_elim(reg2);
+      print_region(reg2);
+      }
+      pips_debug(2, "Region AFTER region_remove_phi_variables: ");
+      {
+      region reg2 = copy_region(reg);
+      region_remove_phi_variables(reg2);
+      print_region(reg2);
+      }  */
+  
+}
 
 /**
  * Internally used for making communication module for non-scalar region
@@ -637,25 +712,8 @@ static entity make_array_communication_module (entity function,
   pips_debug(2, "Region: ");
   print_region(reg);
 
-  {
-    list l_reg_params;
-    list l_reg_variables;
-    compute_region_variables(reg,&l_reg_params,&l_reg_variables);
+  compute_region_communications (function, reg);
 
-    pips_debug(2, "Region AFTER region_dynamic_var_elim: ");
-    {
-      region reg2 = copy_region(reg);
-      region_dynamic_var_elim(reg2);
-      print_region(reg2);
-    }
-    pips_debug(2, "Region AFTER region_remove_phi_variables: ");
-    {
-      region reg2 = copy_region(reg);
-      region_remove_phi_variables(reg2);
-      print_region(reg2);
-    }  
-  }
-  
   reset_current_module_entity();
   set_current_module_entity(new_module);
   if (number_of_deployment_units > 1) {
