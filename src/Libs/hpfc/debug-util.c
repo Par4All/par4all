@@ -166,13 +166,13 @@ entity module;
 statement stat;
 {
     text t;
-    debug_off();
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
 
     t = text_module(module, stat);
     print_text(file, t);
     free_text(t);
     
-    debug_on("HPFC_DEBUG_LEVEL");
+    debug_off();
 }
 
 void hpfc_print_common(file, module, common)
@@ -180,13 +180,13 @@ FILE *file;
 entity module, common;
 {
     text t;
-    debug_off();
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
 
     t = text_common_declaration(common, module);
     print_text(file, t);
     free_text(t);
     
-    debug_on("HPFC_DEBUG_LEVEL");
+    debug_off();
 }
 
 void hpfc_print_file(file_name)
