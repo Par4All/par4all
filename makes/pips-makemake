@@ -1,27 +1,39 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/04 14:49:08 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/04 16:58:25 $, )
 # version $Revision$
-
-# Automatic generation of Makefile for the PIPS project
 #
-# Options:
-#  -l: makes makefile(s) for *library(ies)*
-#  -p: makes makefile(s) for *pass(es)*
-#  -D: makes makefile(s) for *development*
-#  -P: makes makefile(s) for *production*
-#  -c: makes a makefile in *current* directory
-#  -a: makes one makefile in *all* possible directories according to other 
-#      options (ie. with options -lDa: all libraries in development)
+# Automatic generation of Makefile for the PIPS project
 #
 # Remi Triolet, Bruno Baron
 # Fabien Coelho, 08/95
 #
 
+SCRIPT=`basename $0`
+USAGE="$SCRIPT [-h (HELP!)] -l|p|s|r [-D|P] [-c|a] (Default: -D -c)"
+
+help()
+{
+  cat <<-END_OF_HELP
+	$USAGE
+	version $Revision$
+	builds a makefile from a config.makefile for pips
+	  -l: libraries
+	  -p: passes
+	  -s: scripts
+	  -r: runtime
+	  -D: for development directories
+	  -P: for production directories
+	  -c: for the current directory
+	  -a: for all directories if a given type
+	  -h: this help
+	END_OF_HELP
+}
+
 usage()
 {
-  echo "usage: `basename $0` -l|p|s|r [-D|P] [-c|a] (default -D -c)" >&2
+  echo "usage: $USAGE" >&2
   [ "$2" ] && echo "error: $2" >&2
   exit ${1:-1}
 }
@@ -33,8 +45,9 @@ PIPSMAKEMAKE_OPTION=''
 DIRSIDE="$DEVEDIR"
 DIRTYPE=''
 DIRS='.'
+ALL=''
 
-while getopts lpsrDPca opt
+while getopts lpsrDPcah opt
 do
   case $opt in
     l)	DIRTYPE='Lib' ; PIPSMAKEMAKE_OPTION='-l';;
@@ -44,14 +57,19 @@ do
     D)	DIRSIDE="$DEVEDIR" ;;
     P)	DIRSIDE="$PRODDIR/Src" ;;
     c)	DIRS='.';;
-    a)	DIRS=${DIRSIDE}/${DIRTYPE}/* ;;
+    a)	ALL='1' ;;
+    h)  help ;;
     *)	usage 2 "invalid option ($opt)" ;;
   esac
 done
 shift `expr $OPTIND - 1`
 
 [ $# -eq 0 ] || usage 3 "$# remaining parameters"
-[ "$DIRTYPE" ] || usage 4 "must specify -l|p|s|r"
+[ "${DIRTYPE}" ] || usage 4 "must specify -l|p|s|r"
+
+# delayed to ensure that DIRSIDE and DIRTYPE are available
+
+[ "$ALL" ] && DIRS=${DIRSIDE}/${DIRTYPE}/*
 
 ### main loop
 for dir in $DIRS
