@@ -355,22 +355,39 @@ expression e;
 instruction MakeGotoInst(n)
 string n;
 {
-    statement s;
-    entity l;
+    entity l = entity_undefined;
+    instruction i = instruction_undefined;
 
     l = MakeLabel(n);
-    s = LabelToStmt(entity_name(l));
 
-    if (s == statement_undefined) {
-	s = make_statement(l, 
-			   stat_num++,
-			   STATEMENT_ORDERING_UNDEFINED,
-			   string_undefined, 
-			   instruction_undefined);
-	NewStmt(l, s);
-    }
+    i = make_goto_instruction(l);
 
-    return(make_instruction(is_instruction_goto, s));
+    return i;
+}
+
+/* In a "go to" instruction, the label does not appear explictly.
+ * It is replaced by the statement to be jumped at.
+ * If the statement carrying the label has been encountered before,
+ * everything is fine. Else the target statement has to be synthesized
+ * blindly ahead of time.
+ */
+instruction make_goto_instruction(entity l)
+{
+  statement s = LabelToStmt(entity_name(l));
+  instruction g = instruction_undefined;
+
+  if (s == statement_undefined) {
+    s = make_statement(l, 
+		       stat_num++,
+		       STATEMENT_ORDERING_UNDEFINED,
+		       string_undefined, 
+		       instruction_undefined);
+    NewStmt(l, s);
+  }
+
+  g = make_instruction(is_instruction_goto, s);
+
+  return g;
 }
 
 
@@ -763,6 +780,23 @@ int token;
     return(name);
 }
 
+/* Generate a test to jump to l if flag f is not zero
+ * Used to implement control effects of IO's due to ERR= and END=.
+ */
+statement make_check_io_statement(string n, expression u, entity l)
+{
+  entity a = global_name_to_entity(IO_EFFECTS_PACKAGE_NAME, n);
+  reference r = make_reference(a, CONS(EXPRESSION, u, NIL));
+  expression c = reference_to_expression(r);
+  instruction b = make_goto_instruction(l);
+  instruction t = MakeLogicalIfInst(c, b);
+  statement check = instruction_to_statement(t);
+
+  gen_consistent_p(check);
+
+  return check;
+}
+
 /* this function creates a io statement. keyword indicates which io
 statement is to be built (READ, WRITE, ...).
 
@@ -777,7 +811,28 @@ int keyword;
 cons *lci;
 cons *lio;
 {
-    cons *l;
+  cons *l;
+  /* The composite IO with potential branches for ERR and END */
+  instruction io = instruction_undefined;
+  /* The pure io itself */
+  instruction io_call = instruction_undefined;
+  /* virtual tests to implement ERR= and END= clauses */
+  statement io_err = statement_undefined;
+  statement io_end = statement_undefined;
+  expression unit = expression_undefined;
+
+    for (l = lci; l != NULL; l = CDR(CDR(l))) {
+	syntax s1;
+	entity e1;
+
+	s1 = expression_syntax(EXPRESSION(CAR(l)));
+
+	e1 = call_function(syntax_call(s1));
+
+	if (strcmp(entity_local_name(e1), "UNIT=") == 0) {
+	  unit = copy_expression(EXPRESSION(CAR(CDR(l))));
+	}
+    }
 
     /* we scan the list of specifications to detect labels (such as in
        ERR=20, END=30, FMT=50, etc.), that were stored as integer constants
@@ -807,18 +862,47 @@ cons *lio;
 				MakeLabel(entity_local_name(e2));
 		    }
 		}
+		e2 = call_function(syntax_call(s2));
+		if (strcmp(entity_local_name(e1), "ERR=") == 0) {
+		  io_err = make_check_io_statement(IO_ERROR_ARRAY_NAME, unit, e2);
+		}
+		else if (strcmp(entity_local_name(e1), "END=") == 0) {
+		  io_end = make_check_io_statement(IO_EOF_ARRAY_NAME, unit, e2);
+		}
 	    }
 	}
     }
 
+    /*
     for (l = lci; CDR(l) != NULL; l = CDR(l)) ;
 
     CDR(l) = lio;
     l = lci;
+    */
 
-    return(make_instruction(is_instruction_call,
-			    make_call(CreateIntrinsic(NameOfToken(keyword)),
-				      l)));
+    lci = gen_nconc(lci, lio);
+
+    io_call = make_instruction(is_instruction_call,
+			       make_call(CreateIntrinsic(NameOfToken(keyword)),
+					 lci));
+
+    if(statement_undefined_p(io_err) && statement_undefined_p(io_end)) {
+      io = io_call;
+    }
+    else {
+      list ls = NIL;
+      if(!statement_undefined_p(io_err)) {
+	ls = CONS(STATEMENT, io_err, ls);
+      }
+      if(!statement_undefined_p(io_end)) {
+	ls = CONS(STATEMENT, io_end, ls);
+      }
+      ls = CONS(STATEMENT, instruction_to_statement(io_call), ls);
+      io = make_instruction(is_instruction_sequence, make_sequence(ls));
+      gen_consistent_p(io);
+    }
+    
+    return io;
 }
 
 
