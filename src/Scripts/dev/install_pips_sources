@@ -3,6 +3,9 @@
 # $Id$
 # 
 # $Log: install_pips_sources,v $
+# Revision 1.16  1997/05/22 08:49:34  coelho
+# *** empty log message ***
+#
 # Revision 1.15  1997/05/22 06:55:35  coelho
 # *** empty log message ***
 #
@@ -21,8 +24,8 @@ script=`basename $0`
 verb=':'
 debg=':'
 
-#verb='verbose'
-#debg='debug'
+verb='verbose'
+debg='debug'
 
 unset source_dir target_dir comment options clean_cs files 
 only_diff=':'
@@ -70,8 +73,8 @@ cs_tell()
 
 cs_all()
 {
-    is_sccs && { ls SCCS/s.* | sed 's,SCCS/s\.,,g' }
-    is_rcs && { ls RCS/*,v | sed 's/RCS\/\(.*\),v/\1/g' }
+    is_sccs && { ls SCCS/s.* | sed 's|SCCS/s\.||g' ;}
+    is_rcs && { ls RCS/*,v | sed 's|RCS/\(.*\),v|\1|g' ;}
 }
 
 move_old()
@@ -103,6 +106,7 @@ usage()
   exit ${1:-1}
 }
 
+echo 2
 
 #
 # get options
