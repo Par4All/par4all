@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.15  1997/06/06 14:44:15  zory
+! one line was too long :-(
+!
 ! Revision 1.14  1997/06/06 14:33:48  zory
 ! inserting HPFC INIT MAIN, HOST AND NODE
 ! (pvm specific subroutines)
@@ -595,7 +598,8 @@ _CM5(
       subroutine HPFC RCV FROM HOST
       include "hpfc_commons.h"
       debug(print *, "rcv from host ", MY LID, " - ", HOST RCV CHANNEL)
-      call HPFC RECEIVE(NODE TIDS(HOST LID), HOST RCV CHANNEL, BUFFER ID)
+      call HPFC RECEIVE(NODE TIDS(HOST LID), HOST RCV CHANNEL, 
+     $     BUFFER ID)
       HOST RCV CHANNEL = HOST RCV CHANNEL+2
       debug(print *, "rcv from host done")
       end
