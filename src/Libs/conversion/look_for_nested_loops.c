@@ -1,6 +1,6 @@
 /* Package generation (for the hyperplane transformation?)
  * $RCSfile: look_for_nested_loops.c,v $ version $Revision$, 
- * ($Date: 1998/10/13 07:13:58 $, ) 
+ * ($Date: 1999/07/05 15:30:42 $, ) 
  */
 
 #include <stdio.h>
@@ -83,9 +83,10 @@ bool (*loop_predicate)();
 
     case is_instruction_block:
 
-	b= instruction_block(i);
+	b = instruction_block(i);
+	if(ENDP(b)) break;
 	ss = STATEMENT(CAR(b));
-	look_for_nested_loop_statements(ss,loop_transformation, loop_predicate);
+	look_for_nested_loop_statements(ss, loop_transformation, loop_predicate);
 	for(b1 = CDR(b); !ENDP(b1); b1 = CDR(b1)) {
 	    ss = STATEMENT(CAR(b1));
 	    look_for_nested_loop_statements(ss,loop_transformation, loop_predicate);
