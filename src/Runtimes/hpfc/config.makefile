@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:31:17 $, )
+# ($Date: 1996/08/21 17:32:47 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -186,7 +186,7 @@ SOURCES = 	$(M4_MACROS) \
 
 LIB_TARGET = $(PVM_ARCH)/libhpfcruntime.a
 
-%(LIB_OBJECTS) $(LIB_TARGET): $(PVM_ARCH)
+$(LIB_OBJECTS) $(LIB_TARGET): $(PVM_ARCH)
 
 $(PVM_ARCH):; mkdir $@
 
