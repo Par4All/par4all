@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/03/22 18:42:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/04/02 13:20:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1998/03/22 18:42:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1998/04/02 13:20:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -362,7 +362,7 @@ ComputeAddresses()
 		/* FI: I do not understand why this assignment is not better guarded.
 		 * Maybe, because lc's later use *is* guarded.
 		 */
-		if ((l = SizeOfArray(e)) > lc-o)
+		if ((l = SafeSizeOfArray(e)) > lc-o)
 			lc = l+o;
 
 		if (entity_storage(e) != storage_undefined) {
@@ -466,7 +466,7 @@ ComputeAddresses()
 		     */
 		    if(top_level_entity_p(sc)) {
 			int s = common_to_size(sc);
-			int new_s = adr + SizeOfArray(e);
+			int new_s = adr + SafeSizeOfArray(e);
 			if(s < new_s) {
 			    (void) update_common_to_size(sc, new_s);
 			}
