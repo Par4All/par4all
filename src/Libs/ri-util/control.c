@@ -9,7 +9,7 @@
  */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 2000/10/30 08:14:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 2000/11/03 15:45:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -67,12 +67,11 @@ cons **l ;
 void
 backward_control_map_get_blocs_but(control c, control f, list * l )
 {
-    MAPL( cs, {if( CONTROL( CAR( cs )) == c 
-		   || CONTROL( CAR( cs )) == f) return ;}, *l ) ;
-    *l = CONS( CONTROL, c, *l ) ;
-    MAPL( cs,
-	  {backward_control_map_get_blocs( CONTROL( CAR( cs )), l );},
-	  control_predecessors( c )) ;
+  if(gen_in_list_p(c, *l) || c == f) return;
+  *l = CONS( CONTROL, c, *l ) ;
+  MAPL( cs, {
+    backward_control_map_get_blocs_but( CONTROL( CAR( cs )), f, l );
+  }, control_predecessors( c )) ;
 }
 
 /* Same as above, but follows successors only */
@@ -94,12 +93,11 @@ cons **l ;
 void
 forward_control_map_get_blocs_but(control c, control f, list * l )
 {
-    MAPL( cs, {if( CONTROL( CAR( cs )) == c 
-		   ||CONTROL( CAR( cs )) == f ) return ;}, *l ) ;
-    *l = CONS( CONTROL, c, *l ) ;
-    MAPL( cs,
-	  {forward_control_map_get_blocs( CONTROL( CAR( cs )), l );},
-	  control_successors( c )) ;
+  if(gen_in_list_p(c, *l) || c == f) return;
+  *l = CONS( CONTROL, c, *l ) ;
+  MAPL( cs, {
+    forward_control_map_get_blocs_but( CONTROL( CAR( cs )), f, l );
+  }, control_successors( c )) ;
 }
 
 /* Same as above, but follows successors by minimal path lengths. It is OK
