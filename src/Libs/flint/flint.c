@@ -29,11 +29,10 @@
 #include "flint-local.h"
 
 /* internal variables */
-static FILE    *flint_messages_file;
-static string   filename;
+static FILE    *flint_messages_file = NULL;
 static bool     no_message = TRUE;
 static int      number_of_messages = 0;
-statement       flint_current_statement;
+statement       flint_current_statement = statement_undefined;
 
 /* name of module being flinted */
 static char *flint_current_module_name;
@@ -46,11 +45,17 @@ char *module_name;
 {
     entity module = local_name_to_top_level_entity(module_name);
     statement module_stat;
+    string localfilename = NULL;
+    string filename = NULL;
     
+    /* user_error() is not used in flint, no need for an exception handler */
+
     debug_on("FLINT_DEBUG_LEVEL");
 
     flint_current_module_name = module_name;
     flint_current_statement = statement_undefined;
+    number_of_messages = 0;
+    no_message = TRUE;
 
     debug(1, "flinter", "flinting module %s\n", module_name);
     
@@ -59,9 +64,12 @@ char *module_name;
     module_stat = (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
+    localfilename = 
+	strdup(concatenate(module_name, ".flinted", NULL));
+
     filename = 
 	strdup(concatenate(db_get_current_workspace_directory(),
-			   "/", module_name, ".flinted", NULL));
+			   "/", localfilename, NULL));
     flint_messages_file = 
 	(FILE *) safe_fopen(filename, "w");
 
@@ -84,7 +92,14 @@ char *module_name;
     
     safe_fclose(flint_messages_file, filename);
     DB_PUT_FILE_RESOURCE(DBR_FLINTED, strdup(module_name),
-			 filename);
+			 localfilename);
+    free(filename);
+
+    flint_current_module_name = NULL;
+    flint_current_statement = statement_undefined;
+    number_of_messages = 0;
+    no_message = TRUE;
+
     debug_off();
 
     return TRUE;
