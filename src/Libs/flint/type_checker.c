@@ -690,8 +690,14 @@ type_this_call(expression exp, type_context_p context)
   pips_debug(2, "Call to %s; Its type is %s \n", entity_name(function_called), 
 	     type_to_string(entity_type(function_called)));
   
+  /* Labels */
+  if (entity_label_p(function_called))
+  {
+    b = make_basic_overloaded();
+  }
+
   /* Constants */
-  if (entity_constant_p(function_called))
+  else if (entity_constant_p(function_called))
   {
     b = basic_of_call(c);
   }
@@ -743,9 +749,9 @@ type_this_call(expression exp, type_context_p context)
 static void 
 type_this_instruction(instruction i, type_context_p context)
 {
-  basic b1, b2;
-  list args;
+  basic b1;
   call c;
+  typing_function_t dotype;
   
   if (instruction_call_p(i))
   {
@@ -773,35 +779,14 @@ type_this_instruction(instruction i, type_context_p context)
       return;
     }
 
-    /* type arguments of subroutine intrinsics such as FORMAT RETURN WRITE =...
+    /* Typing intrinsics: 
+     * Assignment, control statement, IO statement
      */
-    // ... 
-
-    
-    /* Here, we only do typing for assigment statement */
-    if (!ENTITY_ASSIGN_P(call_function(c)))
+    dotype = get_typing_function_for_intrinsic(
+				   entity_local_name(call_function(c)));
+    if (dotype != 0)
     {
-      return;
-    }
-
-    args = call_arguments(c);
-    
-    if(!arguments_are_compatible(c, context->types))
-    {
-      add_one_line_of_comment((statement) stack_head(context->stats), 
-			    "Arguments of assignment '%s' are not compatible", 
-			      entity_local_name(call_function(c))); 
-      context->number_of_error++;
-    }
-    else
-    {
-      b1 = GET_TYPE(context->types, EXPRESSION(CAR(args)));
-      b2 = GET_TYPE(context->types, EXPRESSION(CAR(CDR(args))));
-      if (!basic_equal_p(b1, b2))
-      {
-	EXPRESSION(CAR(CDR(args))) = 
-	  insert_cast(b1, b2, EXPRESSION(CAR(CDR(args))), context);
-      }
+      b1 = dotype(c, context);
     }
   }
 }
@@ -836,7 +821,7 @@ check_this_whileloop(whileloop w, type_context_p context)
  *
  * Return TRUE if type of range is correct, otherwise FALSE
  */
-static bool
+bool
 check_loop_range(range r, hash_table types)
 {
   basic lower, upper, incr;
@@ -855,7 +840,7 @@ check_loop_range(range r, hash_table types)
  * Typing range of loop to the type of index loop. 
  * This range is already verified 
  */
-static void
+void
 type_loop_range(basic index, range r, type_context_p context)
 {
   basic lower, upper, incr;
@@ -961,6 +946,24 @@ type_this_expression(expression e, type_context_p context)
   }
 }
 
+static void check_this_reference(reference r, type_context_p context)
+{
+  MAP(EXPRESSION, ind,
+  {
+    /* cast expressions to INT if not already an int... ? */
+    /* ??? maybe should update context->types ??? */
+    
+    basic b = GET_TYPE(context->types, ind);
+    if (!basic_int_p(b))
+    {
+      basic bint = make_basic_int(4);
+      insert_cast(bint, b, ind, context); /* and simplifies! */
+      free_basic(bint);
+    }
+  },
+      reference_indices(r));
+}
+
 static bool 
 stmt_flt(statement s, type_context_p context)
 {
@@ -977,19 +980,24 @@ stmt_rwt(statement s, type_context_p context)
 
 static void type_this_chunk(void * c, type_context_p context)
 {
-  gen_context_multi_recurse(c, context, 
-			    statement_domain, stmt_flt, stmt_rwt,
-			    expression_domain, gen_true, type_this_expression,
-			   instruction_domain, gen_true, type_this_instruction,
-			    test_domain, gen_true, check_this_test,
-			    whileloop_domain, gen_true, check_this_whileloop,
-			    loop_domain, gen_true, check_this_loop,
-			    NULL);
+  gen_context_multi_recurse
+    (c, context, 
+     statement_domain, stmt_flt, stmt_rwt,
+     instruction_domain, gen_true, type_this_instruction,
+     test_domain, gen_true, check_this_test,
+     whileloop_domain, gen_true, check_this_whileloop,
+     loop_domain, gen_true, check_this_loop,
+     expression_domain, gen_true, type_this_expression,
+     reference_domain, gen_true, check_this_reference,
+     NULL);
 }
 
 static void type_this_entity_if_needed(entity e, type_context_p context)
 {
   value v = entity_initial(e);
+
+  /* ??? TODO: type->variable->dimensions->dimension->expression */
+
   if (value_symbolic_p(v))
   {
     symbolic sy = value_symbolic(v);
