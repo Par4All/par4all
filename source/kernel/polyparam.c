@@ -1055,12 +1055,11 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
 
       /* Simplify D1 and C1 (remove the equalities) */
       D2 = DomainSimplify(D1,CEq1,ws);
-      C2 = DomainSimplify(C1,CEq1,ws);
       Polyhedron_Free(D1);
       Polyhedron_Free(C1);
       Polyhedron_Free(CEq1);
       D1 = D2;
-      C1 = C2;
+      C1 = NULL;
     }
   }
   else { /* if( CT  ) */
@@ -1099,7 +1098,6 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
 			(CEq1->Dimension+2-CEq1->NbEq));
     *CT = PreElim_Columns(CEq1,p,ref,CEqualities->Dimension);
     D2 = Elim_Columns(D1,CEq1,p,ref);
-    C2 = Elim_Columns(C1,CEq1,p,ref);
     if (p)
       free(p);
     free(ref);
@@ -1107,14 +1105,16 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
 #ifdef DEBUGPP3
     fprintf(stderr,"D2\t Dim = %3d\tNbEq = %3d\tLines = %3d\n",
 	    D2->Dimension,D2->NbEq,D2->NbBid);
+    C2 = Elim_Columns(C1,CEq1,p,ref);
     fprintf(stderr,"C2\t Dim = %3d\tNbEq = %3d\tLines = %3d\n",
 	    C2->Dimension,C2->NbEq,C2->NbBid);
+    Polyhedron_Free(C2);
 #endif
     
     Polyhedron_Free(D1);
     Polyhedron_Free(C1);
     D1 = D2;
-    C1 = C2;
+    C1 = NULL;
     *CEq = CEqualities;
     
 #ifdef DEBUGPP3
@@ -1224,7 +1224,6 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
     *Di = D1;
   else
     Domain_Free(D1);
-  Domain_Free(C1);
 
   res = (Param_Polyhedron *) malloc (sizeof(Param_Polyhedron));
   res->nbV = nbPV;
