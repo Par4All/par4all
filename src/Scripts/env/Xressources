@@ -1,5 +1,8 @@
+WPIPS.comment1: #	%A% ($Date: 1995/09/28 15:53:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
 !
-! Add some stuff to have a coherent WPips behaviour:
+WPIPS.comment2:
+WPIPS.comment3: Add some stuff to have a coherent WPips behaviour:
+WPIPS.comment4:
 !
 OpenWindows.Beep:	always
 OpenWindows.ColorTracksInputFocus:	true
@@ -20,14 +23,22 @@ OpenWindows.WindowColor:	LightSteelBlue1
 *FocusLenience:      True
 *SetInput:	followmouse
 *Input: True
-Text.AutoIndent:	True
-Text.InsertMakesCaretVisible:	Always
-Text.TabWidth:	4
-Text.Retained:	Yes
-Text.DisplayControlChars:	True
-! Attention ! Cette place est allouée en dur dès le départ ! :-(
-Text.MaxDocumentSize:	1000000
-Text.againLimit: 50
-*stringConversionWarnings:	on
+*Text.AutoIndent:	True
+*Text.InsertMakesCaretVisible:	Always
+*Text.TabWidth:	4
+*Text.Retained:	Yes
+*Text.DisplayControlChars:	True
+!
+WPIPS.comment5: Be careful ! This size is allocated for all the WPips text windows ! :-(
+*Text.MaxDocumentSize:	1000000
+*Text.againLimit: 50
 *boldFont:	-*-lucidatypewriter-bold-r-*-*-14-*-*-*-*-*-*-*
 *font:  -*-lucidatypewriter-medium-r-*-*-14-*-*-*-*-*-*-*
+!
+WPIPS.comment6: Some typical Wpips parameters:
+!
+WPIPS.comment7: To change the size of the LogWindow:
+!
+! Here are the default values used in WPips
+!Wpips.Logwindow.Width: 660
+!Wpips.Logwindow.Height: 250
