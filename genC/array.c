@@ -67,10 +67,22 @@ gen_array_addto(gen_array_t a, int i, char * what)
     if (a->array[i]) a->nitems++;
 }
 
+void 
+gen_array_append(gen_array_t a, char * what)
+{
+    gen_array_addto(a, a->nitems, what);
+}
+
 void
 gen_array_dupaddto(gen_array_t a, int i, char * what)
 {
     gen_array_addto(a, i, strdup(what));
+}
+
+void
+gen_array_dupappend(gen_array_t a, char * what)
+{
+    gen_array_append(a, strdup(what));
 }
 
 /* Observers...
