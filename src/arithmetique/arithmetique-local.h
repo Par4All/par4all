@@ -86,8 +86,8 @@ typedef float Value;
 typedef union { char *s; long l; int i; float f; double d;} Value;
 #define VALUE_FMT "%s"
 #define VALUE_CONST(val) ((Value)val)
-#define VALUE_MIN ((Value)0xdeadbeef)
-#define VALUE_MAX ((Value)0xfeedabee)
+#define VALUE_MIN ((Value)(long)0xdeadbeef)
+#define VALUE_MAX ((Value)(long)0xfeedabee)
 #define VALUE_ZERO ((Value)0)
 #define VALUE_ONE  ((Value)1)
 #define VALUE_MONE ((Value)-1)
