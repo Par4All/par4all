@@ -57,8 +57,7 @@ extern int count_tmp, count_aux;
 extern list integer_entities, real_entities, logical_entities, complex_entities,
             double_entities, char_entities;
 
-entity new_ent, mod_ent, dynamic_area;
-ram new_dynamic_ram;
+entity new_ent, mod_ent;
 char prefix[4], *name, *num;
 int number;
 
@@ -204,6 +203,8 @@ switch(syntax_tag(sy))
   case is_syntax_call : return(basic_of_call(syntax_call(sy)));
   case is_syntax_range : return(basic_of_expression(range_lower(syntax_range(sy))));
   default : pips_error("basic_of_expression", "Bad syntax tag");
+    /* Never go there... */
+    return make_basic(is_basic_overloaded, 4);
   }
 }
 
@@ -216,19 +217,21 @@ switch(syntax_tag(sy))
 basic basic_of_call(c)
 call c;
 {
-entity e = call_function(c);
-tag t = value_tag(entity_initial(e));
+  entity e = call_function(c);
+  tag t = value_tag(entity_initial(e));
 
-switch (t)
-  {
-  case is_value_code: return(basic_of_external(c));
-  case is_value_intrinsic: return(basic_of_intrinsic(c));
-  case is_value_symbolic: break;
-  case is_value_constant: return(basic_of_constant(c));
-  case is_value_unknown: pips_error("basic_of_call", "unknown function %s\n",
-				    entity_name(e));
-  default: pips_error("basic_of_call", "unknown tag %d\n", t);
-  }
+  switch (t)
+    {
+    case is_value_code: return(basic_of_external(c));
+    case is_value_intrinsic: return(basic_of_intrinsic(c));
+    case is_value_symbolic: break;
+    case is_value_constant: return(basic_of_constant(c));
+    case is_value_unknown: pips_error("basic_of_call", "unknown function %s\n",
+				      entity_name(e));
+    default: pips_error("basic_of_call", "unknown tag %d\n", t);
+      /* Never go there... */
+    }
+  return make_basic(is_basic_overloaded,4 );
 }
 
 
@@ -265,30 +268,37 @@ return(variable_basic(type_variable(return_type)));
 basic basic_of_intrinsic(c)
 call c;
 {
-basic rb;
-entity call_func;
+  basic rb;
+  entity call_func;
 
-debug(7, "basic_of_call", "Intrinsic call\n");
+  debug(7, "basic_of_call", "Intrinsic call\n");
 
-call_func = call_function(c);
+  call_func = call_function(c);
 
-if(ENTITY_LOGICAL_OPERATOR_P(call_func))
-  rb = make_basic(is_basic_logical, 4);
-else
-  {
-  list call_args = call_arguments(c);
-  expression arg1, arg2;
-
-  arg1 = EXPRESSION(CAR(call_args));
-  if(CDR(call_args) == NIL)
-    rb = basic_of_expression(arg1);
+  if(ENTITY_LOGICAL_OPERATOR_P(call_func))
+    rb = make_basic(is_basic_logical, 4);
   else
     {
-    arg2 = EXPRESSION(CAR(CDR(call_args)));
-    rb = basic_union(arg1, arg2);
-    }
-  }
-return(rb);
+      list call_args = call_arguments(c);
+      if (call_args == NIL)
+	/* I don't know the type since there is no arguments !
+	   Bug encountered with a FMT=* in a PRINT.
+	   RK, 21/02/1994 : */
+	rb = make_basic(is_basic_overloaded, 1);
+/*	rb = make_basic(is_basic_int, 4); */
+      else {
+      expression arg1, arg2;
+	arg1 = EXPRESSION(CAR(call_args));
+	if(CDR(call_args) == NIL)
+	  rb = basic_of_expression(arg1);
+	else
+	  {
+	    arg2 = EXPRESSION(CAR(CDR(call_args)));
+	    rb = basic_union(arg1, arg2);
+	  }
+
+      }}
+  return(rb);
 }
 
 
