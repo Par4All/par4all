@@ -8,7 +8,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1995/12/26 15:56:52 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1995/12/26 15:57:54 $, )
  * version $Revision$
  */
 
@@ -132,14 +132,16 @@ int *pi1, *pi2;
 
 	result = (entity_loop_index_p((entity)(vp->var)) && ((vp->val)!=1));
 
-	vect_rm(vp);
 	if (result) 
 	{
 	    *pe = (entity) (vp->var);
 	    *pi1 = vect_coeff(TCST, v);
 	    *pi2 = (int) (vp->val);
 	}
-	return(result);
+
+	vect_rm(vp);
+
+	return result;
 	break;
     }
     default:
