@@ -377,7 +377,7 @@ struct eformat partial_eval_reference(expression e, Psysteme ps, effects fx)
 			     "Not feasible system:"
 			     " module contains some dead code.\n");
 	    }
-	    if ( min == max ) {
+	    if ( value_eq(min,max) ) {
 		struct eformat ef;
 
 		/* var is constant and has to be replaced */
@@ -388,7 +388,7 @@ struct eformat partial_eval_reference(expression e, Psysteme ps, effects fx)
 		}
 
 		ef.icoef = 0;
-		ef.ishift = (int)min;
+		ef.ishift = VALUE_TO_INT(min);
 		ef.expr = expression_undefined;
 		ef.simpler = TRUE;
 		return(ef);
