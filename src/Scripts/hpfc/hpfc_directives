@@ -1,7 +1,7 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/25 10:22:17 $, )
-# version $Revision$
+# $RCSfile: hpfc_directives,v $ version $Revision$
+# $Date: 1996/04/25 10:43:56 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -31,6 +31,10 @@
 #   been defined as such.
 # - Ctrl-L, Ctrl-G, Ctrl-V and Ctrl-W are used as intermediate characters, 
 #   thus should not appear in the program, otherwise troubles...
+#   . Ctrl-G: replacement for CR
+#   . Ctrl-V: replacement for HPF directive origin
+#   . Ctrl-W: replacement for FCD directive origin
+#   . Ctrl-L: temporary substitution for marker call
 # - some default value is assigned to number of processors 
 #   (currently is should be 8, or some environment variable)
 # - some specific directives for HPFC are introduced by !FCD$
@@ -179,6 +183,10 @@ $SED '#
       //s,\*\([\,)]\),s()\1,g
       //s,number_of_processors(),#,g
       #
+      # obsolescent FC directives:
+      s, time *on,2,
+      s, time *off,3,
+      #
       # FC directives and hacks...
       #
       s, synchro,1,
@@ -190,11 +198,9 @@ $SED '#
       s, end *local,      enddo,
       s, io\(.*\),6(\1),
       s, kill\(.*\),8(\1),
-      # obsolescent:
-      s, timeon,2,
-      s, timeoff,3,
       #
       # host section: hack to build blocks...
+      # (two levels needed because of some unstructured...)
       #
       s, host,      if (.true.) then7if (.true.) then,
       s, end *host,      endifendif,
