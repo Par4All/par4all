@@ -97,7 +97,7 @@ debug()
 which_executable()
 {
   PATH="${PWD}/${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}:${PWD}:." \
-    type $1 | sed "s,.* is ,,"
+    type $1 | sed "s,.* is ,," | sed "s,.* est ,,"
 }
 
 usage()
