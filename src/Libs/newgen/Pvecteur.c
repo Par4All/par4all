@@ -12,8 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "boolean.h"
-#include "vecteur.h"
+#include "linear.h"
 
 #include "genC.h"
 #include "ri.h"
