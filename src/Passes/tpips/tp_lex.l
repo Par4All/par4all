@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.37  1998/05/05 08:49:43  coelho
+ * bye == quit
+ *
  * Revision 1.36  1998/04/29 08:24:27  coelho
  * "show" keyword added.
  *
@@ -127,6 +130,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 <KEY>pwd 		{ KEYWORD(TK_PWD); }
 <KEY>source		{ KEYWORD(TK_SOURCE); }
 <KEY>quit 		{ KEYWORD(TK_QUIT); }
+<KEY>bye 		{ KEYWORD(TK_QUIT); }
 <KEY>exit 		{ KEYWORD(TK_EXIT); }
 <KEY>help 		{ KEYWORD(TK_HELP); }
 <KEY>remove 		{ KEYWORD(TK_REMOVE); }
