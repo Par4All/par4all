@@ -8,7 +8,7 @@ echo "static char *tp_resource_names[]={"
 sed '/define/!d;s|.*\(".*"\).*|	\1 ,|;' $PIPS_ROOT/Include/resources.h
 echo "(char*)NULL};"
 
-echo "static char *tp_printablersc_names[]={"
+echo "static char *tp_file_rsc_names[]={"
 sed '/define/!d;s|.*\(".*"\).*|	\1 ,|;' \
     $PIPS_ROOT/Include/printable_resources.h
 echo "(char*)NULL};"
