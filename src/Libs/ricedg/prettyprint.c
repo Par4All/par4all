@@ -8,7 +8,7 @@ bool
 print_whole_dependence_graph(mod_name)
 string mod_name;
 {
-    variable_trace();
+    variable_trace(mod_name);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS",
 		      FALSE);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS",
