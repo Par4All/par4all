@@ -66,7 +66,7 @@ static char *keywords[] = {
     NULL
 } ;
 
-int Current_index, Current_op, Current_start ;
+int Current_op, Current_start ;
 
 /* Warning: this table knows about the actual values used for AND_OP 
    and OR_OP. */
@@ -168,9 +168,8 @@ void init(void)
     }
     
     Current_op = UNDEF_OP ;
-    error_seen = 0 ;
-    Current_index = 0 ;
     Current_start = -1 ;
+    error_seen = 0 ;
 }
 
 static int max_domain = -1 ;
