@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/04/09 08:19:21 $, ) 
+# ($Date: 1997/04/09 08:46:00 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -327,12 +327,13 @@ failed with $tpips_version" || \
      
      #
      # default case
-     echo "testing with none (parallelize)" >> $tmperr
+     echo "testing with none (parallelize) - Init" > $tmperr
      Init -f $file -d $name > $tmpout 2>> $tmperr
      report $? "Cannot initialize $file" || continue
      
      for module in `cat $name.database/modules` ; do
-       Display -m $module >> $tmpout 2>> $tmperr
+       echo "testing with none (parallelize) - Display" > $tmperr
+       Display -m $module > $tmpout 2>> $tmperr
        STATUS=$?
        [ -f core ] && rm -f core
 
@@ -343,7 +344,8 @@ failed with $tpips_version" || \
 
      
      rm -f $tmpout $tmperr
-     Delete $name > $tmpout 2> $tmperr
+     echo "testing with none (parallelize) - Delete" > $tmperr
+     Delete $name > $tmpout 2>> $tmperr
      report $? "Cannot delete workspace $name"
    done)
 }
