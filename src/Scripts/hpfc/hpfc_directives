@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1996/10/15 22:21:33 $, 
+# $Date: 1996/10/25 21:13:18 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -218,9 +218,10 @@ $SED "#
       s, fake\(.*\),9(\1),
       s, kill\(.*\),8(\1),
       #
-      # remove LD directives
+      # remove LD(IO|PURE) and STUBS directives
       #
       s, \(ld.*\),!ignored: \1,
+      s, \(stubs.*\),!ignored: \1,
       #
       # host section: hack to build blocks...
       # (two levels needed because of some unstructured...)
