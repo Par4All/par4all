@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.33  1997/12/12 12:28:39  coelho
+ * ! == shell.
+ *
  * Revision 1.32  1997/12/11 16:07:48  coelho
  * if unknow, and implicit shell is assumed.
  *
@@ -41,8 +44,8 @@ void yyrestart(FILE *f){ yyin = f;}
 
 #define YY_INPUT(buf,result,max_size) 			\
 { 							\
- int c = tpips_lex_input(); 				\
- result = (c == '\0') ? YY_NULL : (buf[0] = c, 1); 	\
+  int c = tpips_lex_input(); 				\
+  result = (c == '\0') ? YY_NULL : (buf[0] = c, 1); 	\
 }
 
 #endif
@@ -126,6 +129,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 <KEY>set		{ LITTERAL(TK_SET_PROPERTY); }
 <KEY>echo 		{ LITTERAL(TK_ECHO); }
 <KEY>shell 		{ LITTERAL(TK_SHELL); }
+<KEY>!			{ LITTERAL(TK_SHELL); }
 
 <KEY,INITIAL>[ \t]+	/* skip blanks... */
 
