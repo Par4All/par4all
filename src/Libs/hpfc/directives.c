@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/12/19 15:52:39 $, )
+ * ($Date: 1996/02/24 17:44:36 $, )
  */
 
 #include "defines-local.h"
@@ -640,6 +640,14 @@ HANDLER_PROTOTYPE(new)
     return; /* (that's indeed a first implementation:-) */
 }
 
+/* should I modify the IR so as to add the reduction protected scalars?
+ */
+HANDLER_PROTOTYPE(reduction)
+{
+    hpfc_warning("not implemented\n");
+    return;
+}
+
 HANDLER_PROTOTYPE(dynamic)
 {
     gen_map(new_dynamic, args); /* see new_dynamic */
@@ -754,6 +762,7 @@ static struct DirectiveHandler handlers[] =
   {HPF_PREFIX REDISTRIBUTE_SUFFIX,	HANDLER(redistribute) },
   {HPF_PREFIX INDEPENDENT_SUFFIX,	HANDLER(independent) },
   {HPF_PREFIX NEW_SUFFIX,		HANDLER(new) },
+  {HPF_PREFIX REDUCTION_SUFFIX,		HANDLER(reduction) }, 
   {HPF_PREFIX PROCESSORS_SUFFIX,	HANDLER(processors) },
   {HPF_PREFIX TEMPLATE_SUFFIX,		HANDLER(template) },
   {HPF_PREFIX DYNAMIC_SUFFIX,		HANDLER(dynamic) },
