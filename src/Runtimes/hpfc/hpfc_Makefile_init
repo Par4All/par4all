@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.64  1997/07/21 14:29:29  zory
+# paradyn action added (link with the good files)
+#
 # Revision 1.63  1997/07/03 10:51:41  zory
 # MPI runtime version is now available
 # The pvm one can be examinated with the paradyn performance tool
@@ -66,7 +69,6 @@ help:
 	#   install_{mainpvm,hostnode}: 
 	#     copies executables to the pvm directory (where spawn find them)
 	#   paradyn: in order to link with the paradyn object files
-	#	
 
 #
 # Other tools
@@ -169,7 +171,10 @@ mpibin	= $(MPI_ROOT)/bin
 mpilib  = $(MPI_ROOT)/lib
 mpiinc	= $(MPI_ROOT)/h
 
-
+ifeq ($(PVM_ARCH),RS6K)
+mpiinc		= $(MPI_ROOT)/include
+mpilib  	= /usr/lpp/ppe.poe/lib/
+endif
 
 LIBS_DIR	+= -L. -L$(pvmlib) -L$(RT_DIR)/$(RT_ARCH)
 LIBS_MPI_DIR	+= -L. -L$(mpilib) -L$(RT_DIR)/$(RT_ARCH)
@@ -194,15 +199,13 @@ pvmlib		= $(PVM_ROOT)/lib
 pvminc		= $(PVM_ROOT)/lib
 PVM_GLIB	=
 
-mpiinc		= $(MPI_ROOT)/include
-mpilib  	= $(MPI_ROOT)/lib/rs6000/ch_eui/
 
 #
 # two possible protocols: less efficient one used by default:-)
 # US (dedicated, 40MB/s) or IP (sharable, 15MB/s)
 # LIBS_DIR	+= -L/usr/lpp/ssp/css/libus
 LIBS_DIR	+= -L/usr/lpp/ssp/css/libip
-COMMON_LIBS	+= -lmpci -bI:$(pvmlib)/pvm3e.exp
+COMMON_PVM_LIBS	+= -lmpci -bI:$(pvmlib)/pvm3e.exp
 endif
 
 ifdef MIMD
@@ -447,8 +450,8 @@ $(MAINMPI): $(HEADERS_MPI) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OF
 		$(LDIO) $(LDPURE)
 	$(STRIP) $@
 
-$(MAINPARADYN):  $(HEADERS_PVM) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
-	$(FC) $(FFLAGS) -static -g $(FOPT) -o $@ \
+paradyn:  $(HEADERS_PVM) hpfc_main.o $(COMMON_OFILES) $(NODE_OFILES) $(HOST_OFILES)
+	$(FC) $(FFLAGS) -static -g $(FOPT) -o $(MAINPARADYN) \
 		$(PARADYN_START_OFILE) \
 		hpfc_main.o \
 		$(HOST_OFILES) \
