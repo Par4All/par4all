@@ -30,8 +30,11 @@
 #include "ri-util.h"
 #include "control.h"
 #include "prettyprint.h"
-#include "effects.h"
-#include "regions.h"
+
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
+
 #include "chains.h"
 #include "pipsdbm.h"
 
