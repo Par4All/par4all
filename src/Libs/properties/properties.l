@@ -1,10 +1,10 @@
+%{
 /* $RCSfile: properties.l,v $ (version $Revision$)
- * $Date: 1997/03/07 14:14:31 $, 
+ * $Date: 1997/07/17 12:29:33 $, 
  * 
  * - 01/96: PIPS_PROPERTIESRC added. FC.
  */
 
-%{
 /* The syntax of a property list. */
 
 #include <stdio.h>
