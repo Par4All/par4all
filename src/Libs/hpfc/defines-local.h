@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1996/10/17 10:50:33 $, ) 
+ * ($Date: 1996/10/18 22:22:51 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -223,17 +223,18 @@ void fprint_entity_list(FILE *fp, list l);
 
 /********************************************************* COMMON VARIABLES */
 
-#define MYPOS		"MYPOS"
-#define MYLID		"MYLID"
+#define MYPOS		"MY POS"
+#define MYLID		"MY LID"
 #define MSTATUS		"MSTATUS"  		/* remapping status */
-#define LIVEMAPPING	"LIVEMAPPING"
-#define NODETIDS	"NODETIDS"
-#define HOST_TID	"HOSTTID"
-#define NBTASKS		"MAXSIZEOFPROCS"
-#define MCASTHOST	"MCASTHOST"
-#define SEND_CHANNELS	"SENDCHANNELS"
-#define RECV_CHANNELS	"RECVCHANNELS"
-#define HOST_CHANNEL	"HOSTCHANNEL"
+#define LIVEMAPPING	"LIVE MAPPING"
+#define NODETIDS	"NODE TIDS"
+#define HOST_TID	"HOST TID"
+#define NBTASKS		"MAX SIZE OF PROCS"
+#define MCASTHOST	"MCAST HOST"
+#define SEND_CHANNELS	"SEND CHANNELS"
+#define RECV_CHANNELS	"RECV CHANNELS"
+#define HOST_SND_CHAN	"HOST SND CHANNEL"
+#define HOST_RCV_CHAN	"HOST RCV CHANNEL"
 
 /* common /hpfc_buffers/
  */
