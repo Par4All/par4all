@@ -14,8 +14,6 @@
 
 /* Newgen includes 	*/
 #include "genC.h"
-#include "list.h"
-#include "boolean.h"
 
 /* C3 includes 		*/
 #include "boolean.h"
