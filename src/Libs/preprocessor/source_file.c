@@ -348,8 +348,8 @@ static bool pips_process_file(string file_name)
 #endif
 
 static bool zzz_file_p(string s) /* zzz???.f */
-{ return strlen(s)==9 && s[0]=='z' && s[1]=='z' && s[2]=='z' &&
-      s[6]=='.' && s[7]=='f' && s[8]=='\n'; }
+{ return strlen(s)==8 && s[0]=='z' && s[1]=='z' && s[2]=='z' &&
+      s[6]=='.' && s[7]=='f'; }
 #define MAX_NLINES 1000
 static int cmp(char**x1, char**x2)
 { return strcmp(*x1, *x2);}
@@ -375,7 +375,7 @@ static void sort_file(string name)
 
     f=safe_fopen(name, "w");
     while (i>0) {
-	fprintf(f, "%s", lines[--i]);
+	fprintf(f, "%s\n", lines[--i]);
 	free(lines[i]);
     }
     safe_fclose(f, name);
