@@ -34,7 +34,7 @@
 #include <polylib/polylib.h>
 
 #ifdef __STDC__
-static void traite_m_face(Polyhedron *, int *);
+static void traite_m_face(Polyhedron *, unsigned int *);
 static void scan_m_face(int,int,Polyhedron *,unsigned int *);
 #else
 static void traite_m_face();
@@ -229,7 +229,7 @@ static SatMatrix *SMAlloc(int rows,int cols) {
 
 static void SMPrint (SatMatrix *matrix) {
   
-  int *p;
+  unsigned int *p;
   int i, j;
   unsigned NbRows, NbColumns;
   
@@ -318,7 +318,7 @@ static Polyhedron *Add_CEqualities(Polyhedron *D) {
 /* traite_m_face                                                        */
 /*       Given an m-face, compute the parameterized vertex              */
 /*----------------------------------------------------------------------*/
-static void traite_m_face(Polyhedron *D,int *mf) {
+static void traite_m_face(Polyhedron *D,unsigned int *mf) {
      /* D  - The entire domain */
      /* mf - Bit vector marking the lines/rays in the m-face */
 
@@ -802,7 +802,7 @@ Param_Polyhedron *GenParamPolyhedron(Polyhedron *Pol) {
   result->D=(Param_Domain *)malloc(sizeof(Param_Domain));
   result->D->next=NULL;
   result->D->Domain=Universe_Polyhedron(0);
-  result->D->F=(int *)malloc(size*sizeof(int));
+  result->D->F=(unsigned int *)malloc(size*sizeof(int));
   memset(&result->D->F[0],0xFF,size*sizeof(int));
   
   return result;
@@ -1381,7 +1381,7 @@ void Compute_PDomains(Param_Domain *PD,int nb_domains,int working_space) {
 #endif
 	   /* Create a new node for dx */
 	   PDNew = (Param_Domain *) malloc( sizeof(Param_Domain) );
-	   PDNew->F = (int *)malloc( nv*sizeof(int) );
+	   PDNew->F = (unsigned int *)malloc( nv*sizeof(int) );
 	   memset(PDNew->F,0,nv*sizeof(int));
 	   PDNew->Domain = dx;
 	   
