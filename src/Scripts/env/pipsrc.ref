@@ -1,3 +1,7 @@
+# $RCSfile: pipsrc.ref,v $ ($Date: 1994/03/09 15:56:41 $) version $Revision$, got on %D%, %T%
+# %A%
+#
+
 set -a
 # This file is used to set up *environment variables* for Pips.
 # Another set up file (pipsrc.csh) is automaticaly generated from this 
@@ -107,6 +111,8 @@ PIPS_YFLAGS=""
 # protoizer to be used by PIPS:
 PIPS_PROTOIZE="$UTILDIR/cproto"
 # to be switched to /usr5/gnu/bin-sparc/protoize...
+
+PIPS_ETAGS='/usr5/gnu/bin-sparc/etags'
 
 # list of PIPS libraries 
 
