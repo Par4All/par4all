@@ -6,7 +6,7 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/04/21 10:28:15 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/04/21 14:50:04 $, )
  * version $Revision$
  */
 
@@ -576,12 +576,8 @@ entity src, trg;
 		       NIL));
     }
 
-    ifdebug(7)
-    {
-	fprintf(stderr, "[generate_copy_loop_nest] %s to %s\n",
-		entity_name(src), entity_name(trg));
-	print_statement(current);
-    }
+    DEBUG_STAT(7, concatenate(entity_name(src), " -> ", entity_name(trg), NULL),
+	       current);
 
     return(current);
 }
