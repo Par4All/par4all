@@ -246,7 +246,7 @@ list li, lk, lv;
 	lr   = NIL,
 	ldom = NIL;
     entity
-	newarray = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, array);
+	newarray = load_entity_node_new(array);
 /*	proc = template_to_processors(array_to_template(array));*/
     Pvecteur
 	procv = VECTEUR_NUL;
@@ -328,26 +328,32 @@ list li, lk, lv;
 	    if (shift!=0)
 	    {
 		/* neighbour to send to */
-		procv = vect_add(procv, vect_new(procdim, (shift<0)?(1):(-1)));
+		procv = vect_add(procv, 
+				 vect_new((Variable) procdim, 
+					  (shift<0)?(1):(-1)));
 		
 		/* content, on the sender point of view... */
 		if (shift<0)
 		{
-		    lr = gen_nconc(lr,
-				   CONS(RANGE,
-					make_range(int_to_expression(arrayup+shift+1),
-						   int_to_expression(arrayup),
-						   int_to_expression(1)),
-					NIL));
+		    lr = 
+			gen_nconc
+			    (lr,
+			     CONS(RANGE,
+				  make_range(int_to_expression(arrayup+shift+1),
+					     int_to_expression(arrayup),
+					     int_to_expression(1)),
+				  NIL));
 		}
 		else /* (shift>0) */
 		{
-		    lr = gen_nconc(lr,
-				   CONS(RANGE,
-					make_range(int_to_expression(arraylo),
-						   int_to_expression(arraylo+shift-1),
-						   int_to_expression(1)),
-					NIL));
+		    lr = 
+			gen_nconc
+			    (lr,
+			     CONS(RANGE,
+				  make_range(int_to_expression(arraylo),
+					     int_to_expression(arraylo+shift-1),
+					     int_to_expression(1)),
+				  NIL));
 		}
 	    }
 	    else /* shift == 0 */
@@ -557,7 +563,8 @@ message m;
 	bool
 	    distributed = ith_dim_distributed_p(array, i, &procdim);
 	int
-	    neighbour = ((distributed)?((int) vect_coeff(procdim, v)):(0));
+	    neighbour = ((distributed)?
+			 ((int) vect_coeff((Variable) procdim, v)):(0));
 
 	debug(9, "atomize_one_message", "dimension %d\n", i);
 
@@ -792,10 +799,11 @@ message m;
 
     pips_assert("one_message_guards_and_neighbour", (procndim>=1));
 
-    t = (int) vect_coeff(1, v);
+    t = (int) vect_coeff((Variable) 1, v);
     for (i=2 ; i<=NumberOfDimension(processor) ; i++)
     {
-	t = t*SizeOfIthDimension(processor, i) + (int) vect_coeff(i, v);
+	t = t*SizeOfIthDimension(processor, i) + 
+	    (int) vect_coeff((Variable) i, v);
     }
 
     (Pvecteur) message_neighbour(m) = vect_add(v, vect_new(TCST, t));
@@ -882,7 +890,7 @@ bool bsend;
 	*buf = buffer;
     entity
 	array     = message_array(m),
-	processor = template_to_processors(array_to_template(array));
+	processor = array_to_processors(array);
     list
 	content = message_content(m),
 	domain  = message_dom(m);
