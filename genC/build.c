@@ -53,11 +53,7 @@ char *keywords[] = {
     NULL
 } ;
 
-int Current_index ;
-int Current_op ;
-
-int Current_start ;
-/* int Current_first ; // tag global setting*/
+int Current_index, Current_op, Current_start ;
 
 /* Warning: this table knows about the actual values used for AND_OP 
    and OR_OP. */
@@ -189,7 +185,7 @@ init()
 }
     Current_op = UNDEF_OP ;
     error_seen = 0 ;
-    Current_index = -1 ;
+    Current_index = 0 ;
     Current_start = -1 ;
     /* Current_first = -1 ; */
 }
