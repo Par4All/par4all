@@ -11,14 +11,16 @@ int     global_exception_type[MAX_STACKED_CONTEXTS];
 int     global_exception_index = 0;
 int     global_exception_thrown = 0;
 
-int overflow_error = 1;
-int simplex_arithmetic_error = 2;
+unsigned int overflow_error = 1;
+unsigned int simplex_arithmetic_error = 2;
+unsigned int user_exception_error = 4;
+unsigned int any_exception_error = ~0;
 
 void throw_exception(int what)
 {
     int i=global_exception_index_decr;
     for (; i>=0 ;i--)
-	if (global_exception_type[i]==what) 
+	if (global_exception_type[i]&what) 
 	{
 	    global_exception_index = i;
 	    longjmp(global_exception_stack[i],0);
