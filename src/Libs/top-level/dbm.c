@@ -14,6 +14,8 @@
 #include "pipsmake.h"
 #include "misc.h"
 
+#include "preprocessor.h"
+
 #include "top-level.h"
 
 void default_update_props() {}
