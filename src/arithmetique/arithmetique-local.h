@@ -12,11 +12,20 @@
 #define ARITHMETIQUE_PACKAGE
 
 /* valeur absolue */
+#ifndef ABS
 #define ABS(x) ((x)>=0 ? (x) : -(x))
+#endif
 
-/* minimum et maximum */
+/* minimum et maximum 
+ * if they are defined somewhere else, they are very likely 
+ * to be defined the same way. Thus the previous def is not overwritten.
+ */
+#ifndef MIN
 #define MIN(x,y) ((x)>=(y)?(y):(x))
+#endif
+#ifndef MAX
 #define MAX(x,y) ((x)>=(y)?(x):(y))
+#endif
 
 /* signe d'un entier: -1, 0 ou 1 */
 #define SIGN(x) ((x)>0? 1 : ((x)==0? 0 : -1))
