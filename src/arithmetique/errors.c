@@ -5,23 +5,12 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.27  2003/09/04 09:40:37  coelho
+  init added.
+  verbosity mask added.
+
   Revision 1.26  2003/09/03 14:05:20  coelho
   push/pop callbacks called.
-
-  Revision 1.25  2003/09/03 13:35:06  coelho
-  no more callback.
-
-  Revision 1.24  2003/08/18 14:56:14  coelho
-  *** empty log message ***
-
-  Revision 1.23  2003/08/18 14:55:15  coelho
-  better callback called on throw...
-
-  Revision 1.22  2003/08/18 14:35:30  coelho
-  callback commented out.
-
-  Revision 1.21  2003/08/18 14:15:17  coelho
-  callback added.
 
   Revision 1.20  2003/08/18 09:55:09  coelho
   get_exception_name added...
@@ -88,6 +77,9 @@ unsigned int user_exception_error = 4;
 unsigned int parser_exception_error = 8;
 unsigned int timeout_error = 16;
 
+/* catch all */
+unsigned int any_exception_error = ~0;
+
 char * get_exception_name(unsigned int exception)
 {
   if (exception==overflow_error)
@@ -100,12 +92,11 @@ char * get_exception_name(unsigned int exception)
     return "parser_exception_error exception";
   if (exception==timeout_error)
     return "timeout_error exception";
+  if (exception==any_exception_error)
+    return "all exceptions mask";
 
   return "unknown or mixed exception";
 }
-
-/* catch all */
-unsigned int any_exception_error = ~0;
 
 /* keep track of last thrown exception for RETHROW()
  */
@@ -113,8 +104,8 @@ unsigned int the_last_just_thrown_exception = 0;
 
 /* whether to run in debug mode (that is to trace catch/uncatch/throw)
  */
-static int linear_exception_debug_mode = 0;
-static int linear_exception_verbose_mode = 1;
+static boolean linear_exception_debug_mode = FALSE;
+static unsigned int linear_exception_verbose = 1 | 2 | 16 ;
 
 /* A structure for the exception stack.
  */
@@ -140,7 +131,7 @@ typedef struct
    maximum extension.
    current index (next available bucket)
  */
-#define MAX_STACKED_CONTEXTS 50
+#define MAX_STACKED_CONTEXTS 64
 static linear_exception_holder exception_stack[MAX_STACKED_CONTEXTS];
 static int exception_index = 0;
 
@@ -315,7 +306,8 @@ void throw_exception(
 		exception_stack[i].what,
 		i);
   
-      if (linear_exception_verbose_mode)
+      /* trace some exceptions... */
+      if (linear_exception_verbose & what)
 	fprintf(stderr, "exception %d/%d: %s(%s:%d) -> %s(%s:%d)\n",
 		what, exception_stack[i].what,
 		function, file, line,
@@ -336,3 +328,11 @@ void throw_exception(
   abort();
 }
 
+void linear_initialize_exception_stack(
+  unsigned int verbose_exceptions,
+  exception_callback_t push, 
+  exception_callback_t pop)
+{
+  linear_exception_verbose = verbose_exceptions;
+  set_exception_callbacks(push, pop);
+}
