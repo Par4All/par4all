@@ -4,7 +4,9 @@
  * of a module (over- and under-approximations.
  *
  */
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 /* #include <stdlib.h> */
 
