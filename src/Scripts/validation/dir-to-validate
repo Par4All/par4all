@@ -80,7 +80,7 @@ mkdir $PIPSDIR/Tests/Validation/$library
 
 for file in *.f 
 do
-        workspace=`basename $file .f | tr A-Z a-z`
+        workspace=`${PIPS_BASENAME:-basename} $file .f | tr A-Z a-z`
         module=`echo $workspace | tr a-z A-Z`
         echo file=$file module=$module workspace=$workspace library=$library
 
