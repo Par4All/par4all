@@ -69,10 +69,17 @@ string s;
  * true if a given call is a call to reduction function.
  * ??? a generic function name should be managed here?
  */
+
+bool hpfc_entity_reduction_p(e)
+entity e;
+{
+    return(find_reduction(module_local_name(e))!=NULL);
+}
+
 bool call_reduction_p(c)
 call c;
 {
-    return(find_reduction(module_local_name(call_function(c)))!=NULL);
+    return(hpfc_entity_reduction_p(call_function(c)));
 }
 
 /*
@@ -123,14 +130,12 @@ basic base;
 int nargs;
 {
     char 
-	buffer[100],
-	*buf = buffer;
+	buffer[100];
 
-    buf += strlen(sprintf(buf, "%sRED%d_", prefix, ndim));
-    buf += strlen(sprintf(buf, pvm_what_options(base)));
-    buf += strlen(sprintf(buf, "_%s", reduction_name(kind)));
+    (void) sprintf(buffer, "%sRED_%d_%s_%s",
+		   prefix, ndim, pvm_what_options(base), reduction_name(kind));
 
-    return(MakeRunTimeSupportFunction(buffer, nargs));
+    return(MakeRunTimeSupportFunction(buffer, nargs, basic_tag(base)));
 }
 
 /*
@@ -196,7 +201,7 @@ statement initial, *phost, *pnode;
 	 (reference_variable(syntax_reference(expression_syntax(ref))))))
 	return(FALSE);
 
-    arraynum = get_hpf_number(array);
+    arraynum = load_entity_hpf_number(array);
 
     hostfunction = make_reduction_function("H", dim, red->kind, b, 0);
     nodefunction = make_reduction_function("N", dim, red->kind, b, 4*dim+2);
