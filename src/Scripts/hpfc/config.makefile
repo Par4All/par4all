@@ -32,6 +32,7 @@ clean:
 	$(RM) hpfc_interactive.o hpfc_interactive *~
 
 web: hpfc_directives
+	$(RM) $(HOME)/public_html/hpfc_directives
 	cp hpfc_directives $(HOME)/public_html/
 	chmod a+r $(HOME)/public_html/hpfc_directives
 
