@@ -4,7 +4,7 @@
  * DECLARATIONS compilation
  *
  * SCCS stuff:
- * $RCSfile: declarations.c,v $ ($Date: 1994/06/03 14:14:51 $, ) version $Revision$,
+ * $RCSfile: declarations.c,v $ ($Date: 1994/09/01 15:48:13 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -326,9 +326,17 @@ entity array;
  */
 void NewDeclarationsOfDistributedArrays()
 {
+    entity array;
+
     MAPL(ce,
      {
-	 NewDeclarationOfDistributedArray(ENTITY(CAR(ce)));
+	 array = ENTITY(CAR(ce));
+	 
+	 if (entity_new_declaration_undefined_p(array))
+	     NewDeclarationOfDistributedArray(array);
+	 else
+	     debug(3, "NewDeclarationsOfDistributedArrays",
+		   "skipping array %s\n", entity_name(array));
      },
 	 list_of_distributed_arrays());
 }
