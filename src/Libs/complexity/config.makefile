@@ -46,10 +46,12 @@
 #######
 #
 
+SOURCES =	complexity_cost_tables
 LIB_CFILES=	comp_scan.c comp_expr_to_pnome.c comp_unstr.c\
 		comp_util.c comp_math.c comp_prettyprint.c polynome_ri.c\
 		comp_matrice.c
 LIB_HEADERS=	complexity-local.h
 LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
+
 ### End of config.makefile
 
