@@ -469,9 +469,9 @@ void init_cost_table()
     char *cost_data = strdup(COST_DATA);
     char *tmp=malloc(20);
 
-    if (!cost_dir) /* the default value: PIPS_ROOT/Share/complexity */
+    if (!cost_dir) /* the default value */
 	cost_dir = strdup(concatenate(getenv("PIPS_ROOT"),
-				      "/Share/complexity", NULL));
+				      "/Share/complexity_cost_tables", NULL));
     else
 	cost_dir = strdup(cost_dir);
 
