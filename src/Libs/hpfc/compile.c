@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/09/03 15:19:33 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/11/17 14:19:11 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -63,15 +63,15 @@ static string
 hpfc_find_a_not_compiled_module (void)
 {
     entity module;
-
+    
     MAPL(ce,
-     {
-	 module = ENTITY(CAR(ce));
-
-	 if (entity_hpfc_already_compiled_undefined_p(module))
-	     return(module_local_name(module));
-     },
-	 the_modules);
+	 {
+	     module = ENTITY(CAR(ce));
+	     
+	     if (entity_hpfc_already_compiled_undefined_p(module))
+		 return(module_local_name(module));
+	 },
+	     the_modules);
 
     return(string_undefined);
 }
@@ -325,7 +325,8 @@ put_generated_resources_for_module (statement stat, statement host_stat, stateme
 }
 
 void 
-put_generated_resources_for_program (void)
+put_generated_resources_for_program (program_name)
+string program_name;
 {
     FILE
 	*comm_file,
@@ -353,7 +354,9 @@ put_generated_resources_for_program (void)
     safe_fclose(init_file, init_filename);
     add_warning(init_filename);
 
-    system(concatenate("$HPFC_TOOLS/hpfc_generate_init ",
+    system(concatenate("$HPFC_TOOLS/hpfc_generate_init -n ",
+		       program_name,
+		       " ",
 		       db_get_current_program_directory(),
 		       NULL));
     
@@ -535,7 +538,7 @@ hpfcompile (char *module_name)
      },
 	 the_commons);
     
-    put_generated_resources_for_program();
+    put_generated_resources_for_program(module_name);
 
     close_hpfc_for_program();
 
