@@ -1,0 +1,350 @@
+#include <stdio.h>
+extern int fprintf();
+#include <string.h>
+#include <values.h>
+
+#include "genC.h"
+#include "ri.h"
+#include "text.h"
+#include "database.h"
+
+#include "misc.h"
+#include "properties.h"
+#include "text-util.h"
+#include "ri-util.h"
+#include "effects.h"
+#include "pipsdbm.h"
+#include "prettyprint.h"
+
+#include "constants.h"
+#include "resources.h"
+#include "control.h" /* for macro CONTROL_MAP() */
+
+#include "transformations.h"
+
+/* Global variables */
+static statement_mapping cumulated_effects_map;
+
+bool same_entity_name_p(e1, e2)
+entity e1, e2;
+{
+    return(strcmp(entity_name(e1), entity_name(e2))==0);
+}
+
+bool entity_in_list(ent, ent_l)
+entity ent;
+cons *ent_l;
+{
+    MAPL(ce, {
+	entity e = ENTITY(CAR(ce));
+
+/*	if (same_entity_name_p(ent, e) && !same_entity_p(ent, e)) {
+	    debug(3, "entity_in_list", "Same name, but no sharing\n");
+	}
+	if (same_entity_name_p(ent, e)) {
+*/
+	if (same_entity_p(ent, e)) {
+	    debug(9, "entity_in_list", "entity %s found\n",
+		  entity_local_name(ent));
+	    return(TRUE);
+	}
+    }, ent_l);
+
+    return(FALSE);
+}
+
+/* returns l1 after elements of l2 but not of l1 have been appended to l1. */
+/* l2 is freed */
+list concat_new_entities(l1,l2)
+list l1, l2;
+{
+    list new_l2=NIL;
+
+    MAPL(le, {
+	entity e = ENTITY(CAR(le));
+
+	if (!entity_in_list(e, l1)) {
+	    new_l2 = gen_nconc(new_l2, CONS(ENTITY, e, NIL));
+	}
+    }, l2);
+    gen_free_list(l2);
+    return(gen_nconc(l1, new_l2));
+}
+
+/* returns a list of all entities which:
+ * - are concerned with cumulated effects (cfx) of the loop_body
+ * - and are member of loop_locals(lp)
+ * makes sure the loop index is in the list
+ */
+list real_loop_locals(lp, cfx)
+loop lp;
+effects cfx;
+{
+    list rll= NIL;
+
+    MAPL(ce, { 
+	effect eff = EFFECT(CAR(ce));
+	entity ent = reference_variable(effect_reference(eff));
+
+	if (!entity_in_list(ent, rll)
+	    && entity_in_list(ent,loop_locals(lp)) ) {
+	    /* ent is a real loop local */
+	    debug(7, "real_loop_locals", "real loop local: %s",
+		  entity_local_name(ent));
+	    rll = CONS(ENTITY, ent, rll);
+	}
+    }, effects_effects(cfx));
+
+    if( !entity_in_list(loop_index(lp) ,rll) ) {
+	rll= CONS(ENTITY, loop_index(lp), rll);
+    }
+    return(rll);
+}
+
+/*
+ * recursively concatenates all real loop locals of all enclosed loops.
+ * filters redondant entities
+ */
+list all_enclosed_scope_variables(stmt)
+statement stmt;
+{
+    instruction instr = statement_instruction(stmt);
+    list ent_l= NIL;
+
+    switch(instruction_tag(instr)) {
+      case is_instruction_block :
+	MAPL(stmt_l, {
+	    statement st=STATEMENT(CAR(stmt_l));
+
+	    ent_l= concat_new_entities(ent_l, all_enclosed_scope_variables(st));
+	}, instruction_block(instr));
+	break;
+      case is_instruction_loop : {
+	  loop lp= instruction_loop(instr);
+	  statement lpb= loop_body(lp);
+	  effects cfx = stmt_to_fx(lpb, cumulated_effects_map);
+
+	  pips_assert("all_enclosed_scope_variables", cfx != effects_undefined);
+	  ent_l= concat_new_entities(real_loop_locals(lp, cfx),
+				     all_enclosed_scope_variables(lpb));
+	  break;
+      }
+      case is_instruction_test : {
+	  test tst= instruction_test(instr);
+	  list l1, l2;
+
+	  l1= all_enclosed_scope_variables(test_true(tst));
+	  l2= all_enclosed_scope_variables(test_false(tst));
+	  ent_l= concat_new_entities(l1, l2);
+
+	  break;
+      }
+      case is_instruction_unstructured : {
+	  list blocs;
+
+	  CONTROL_MAP(ctl, {
+	      statement st = control_statement(ctl);
+
+	      ent_l= concat_new_entities(all_enclosed_scope_variables(st), 
+					 ent_l);	
+	  }, unstructured_control(instruction_unstructured(instr)), blocs);
+
+	  gen_free_list(blocs);
+	  break;
+      }
+      case is_instruction_call :
+	break;
+      case is_instruction_goto :
+	default : 
+	pips_error("all_enclosed_scope_variables", 
+		   "Bad instruction tag");
+    }
+    return(ent_l);
+}
+
+/* lp_stt must be a loop statement */
+text text_microtasked_loop(module, margin, lp_stt)
+entity module;
+int margin;
+statement lp_stt;
+{
+    text txt;
+    unformatted u;
+    effects fx;
+    list wordl;
+    int np = 0;
+    loop lp = instruction_loop(statement_instruction(lp_stt));
+    cons *lp_shared = NIL;
+    list ent_l= all_enclosed_scope_variables(lp_stt);
+
+    /* initializations */
+    txt = empty_text(statement_undefined);
+
+    wordl = CHAIN_SWORD(NIL, "DO ALL ");
+
+    fx = stmt_to_fx(loop_body(lp), cumulated_effects_map);
+
+    /* generate arguments for PRIVATE */
+    /* nb: ent_l should contain entities only ones. */
+    wordl = CHAIN_SWORD(wordl, "PRIVATE(");
+    np=0;
+    MAPL( el, { 
+	entity ent = ENTITY(CAR(el));
+
+	/* What about arrays? nothing special?? */
+	/* if (!ENDP(reference_indices(effect_reference(eff)))) */
+
+	if (np>0)
+	    wordl = CHAIN_SWORD(wordl, ",");
+	wordl = CHAIN_SWORD(wordl, entity_local_name(ent)) ;
+	np++;
+    }, ent_l);
+
+    wordl = CHAIN_SWORD(wordl, ") ");
+
+    gen_free_list(ent_l);
+
+
+    /* generate arguments for SHARED */
+    wordl = CHAIN_SWORD(wordl, "SHARED(");
+    np=0;
+    MAPL(ce, { 
+	effect eff = EFFECT(CAR(ce));
+	entity ent = reference_variable(effect_reference(eff));
+
+/*	if(ENDP(ce)) user_log("ce is NIL !!\n");
+	if(ENDP(CDR(ce))) user_log("CDR(ce) is NIL\n");
+	else user_log("CDR(ce) is *not* NIL\n");
+ */
+	/* What about arrays? nothing special?? */
+	/* if (!ENDP(reference_indices(effect_reference(eff)))) */
+
+	if (!entity_in_list(ent,loop_locals(lp))
+	    && !entity_in_list(ent,lp_shared) ) {
+	    /* ent is a new shared entity */
+	    if (np>0)
+		wordl = CHAIN_SWORD(wordl, ",");
+	    lp_shared = CONS(ENTITY, ent, lp_shared);
+	    wordl = CHAIN_SWORD(wordl, entity_local_name(ent)) ;
+	    np++;
+	}
+	/* What to do when no shared? */
+	    
+    }, effects_effects(fx));
+
+    wordl = CHAIN_SWORD(wordl, ") ");
+
+    gen_free_list(lp_shared);
+
+    u = make_unformatted("CMIC$", 0, 0, wordl) ;
+
+    /* format u */
+
+
+    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_unformatted, u));
+    return(txt);
+}
+
+/* lp_stt must be a loop statement */
+text text_vectorized_loop(module, margin, lp_stt)
+entity module;
+int margin;
+statement lp_stt;
+{
+    text txt;
+    unformatted u;
+    list wordl;
+
+    txt = empty_text(statement_undefined);
+
+    wordl = CHAIN_SWORD(NIL, "IVDEP ");
+
+    u = make_unformatted("CDIR$", 0, 0, wordl) ;
+
+    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_unformatted, u));
+    return(txt);
+}
+
+
+text text_cray(module, margin, stat)
+entity module;
+int margin;
+statement stat;
+{
+    text txt;
+
+    if (instruction_loop_p(statement_instruction(stat))) {
+	loop lp = instruction_loop(statement_instruction(stat));
+	statement body = loop_body(lp);
+
+	switch(execution_tag(loop_execution(lp))) {
+	  case (is_execution_sequential):
+	    txt = empty_text(stat);
+	    break;
+	  case (is_execution_parallel):
+	    if(instruction_assign_p(statement_instruction(body))) {
+		/* vector loop */
+		txt = text_vectorized_loop(module, margin, stat);
+	    }
+	    else {
+		/* assumes that all loops are CMIC$ !! */
+		txt = text_microtasked_loop(module, margin, stat);
+	    }
+	    break;
+	}
+    }
+    else {
+	txt = empty_text(stat);
+    }
+
+    return(txt);
+}
+
+
+void print_parallelizedcray_code(mod_name)
+char *mod_name;
+{
+    entity module = local_name_to_top_level_entity(mod_name);
+    statement mod_stat;
+    statement_mapping proper_effects_map;
+    bool prettyprint_cray_p = get_bool_property("PRETTYPRINT_CRAY");
+
+    /* which properties? */
+    set_bool_property("PRETTYPRINT_CRAY", TRUE);
+    set_bool_property("PRETTYPRINT_PARALLEL", TRUE);
+    /* set_bool_property("PRETTYPRINT_FORTRAN90", FALSE); */
+    set_bool_property("PRETTYPRINT_SEQUENTIAL", FALSE);
+
+    mod_stat = (statement)
+	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, TRUE);
+    
+    /* We need to recompute proper effects and cumulated effects */
+    MAKE_STATEMENT_MAPPING(proper_effects_map);
+    /* FI: the last arg sems to be missing...
+       rproper_effects_of_statement(proper_effects_map, mod_stat)
+       */
+    rproper_effects_of_statement(proper_effects_map, mod_stat, NIL);
+
+    MAKE_STATEMENT_MAPPING(cumulated_effects_map);
+    rcumulated_effects_of_statement(cumulated_effects_map,
+				     proper_effects_map,
+				     mod_stat);
+
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+
+    init_prettyprint(text_cray);
+
+    make_text_resource(mod_name, 
+		       DBR_PARALLELPRINTED_FILE, 
+		       PARALLEL_FORTRAN_EXT, 
+		       text_module(module, mod_stat) );
+
+    /* free proper effects and cumulated effects */
+    free_effects_mapping(cumulated_effects_map);
+    free_effects_mapping(proper_effects_map);
+    
+    set_bool_property("PRETTYPRINT_CRAY", prettyprint_cray_p);
+
+    debug_off();
+}
+
