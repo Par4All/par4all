@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: epips,v $ (version $Revision$)
-# $Date: 1995/10/06 11:56:53 $, 
+# $Date: 1995/11/28 14:05:45 $, 
 #
 
 ${EPIPS_EMACS:-emacs} \
@@ -9,7 +9,7 @@ ${EPIPS_EMACS:-emacs} \
      -l ${EPIPS_LISP:-${PIPS_UTILDIR}/epips.el} \
      -iconic \
      -name epips \
-     -f epips
+     -f epips-launch-alone
 
 # that is all
 #
