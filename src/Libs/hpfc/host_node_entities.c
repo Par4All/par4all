@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1994/12/22 16:52:28 $, ) version $Revision$,
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1994/12/23 09:17:34 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -254,19 +254,6 @@ entity common;
 }
 
 /*
- * that is all
- */
-
-/*
- *
- *
- *    OLD FUNCTIONS TO BE CLEANED...
- *
- *
- *
- */
-
-/*
  * UpdateExpressionForModule
  *
  * this function creates a new expression using the mapping of
@@ -310,25 +297,24 @@ list l;
     return(new);
 }
 
-
-/* new
 list lNewVariableForModule(module, le)
 entity module;
 list le;
 {
+    list result, last;
 
-}
-*/
+    if (ENDP(le)) return(NIL);
 
-list lNewVariableForModule(module, le)
-entity module;
-list le;
-{
-    return((ENDP(le) ?
-	    (NIL) :
-	    CONS(ENTITY,
-		 NewVariableForModule(module, ENTITY(CAR(le))),
-		 lNewVariableForModule(module ,CDR(le)))));
+    for (result = CONS(ENTITY, 
+		       NewVariableForModule(module, ENTITY(CAR(le))),
+		       NIL),
+	 last = result, le = CDR(le);
+	 !ENDP(le);
+	 le = CDR(le), last = CDR(last))
+	CDR(last) = CONS(ENTITY, NewVariableForModule(module, ENTITY(CAR(le))),
+			 NIL);
+
+    return(result);
 }
 
 entity NewVariableForModule(module,e)
@@ -341,171 +327,17 @@ entity e;
     return((entity) GET_ENTITY_MAPPING(map,e));
 }
 
-
 statement UpdateStatementForModule(module, stat)
 entity module;
 statement stat;
 {
-    statement
-	updatedstat = statement_undefined;
-    instruction 
-	inst = statement_instruction(stat);
-
-    debug(7, "UpdateStatementForModule", "updating...\n");
-
-    switch(instruction_tag(inst))
-    {
-    case is_instruction_block:
-    {
-	list
-	    lstat = NIL;
-	
-	debug(8, "UpdateStatementForModule", "block\n");
-
-	MAPL(cs,
-	 {
-	     statement
-		 stmp = UpdateStatementForModule(module, STATEMENT(CAR(cs)));
-
-	     lstat = 
-		 gen_nconc(lstat, CONS(STATEMENT, stmp, NULL));
-	 },
-	     instruction_block(inst));
-
-	updatedstat = MakeStatementLike(stat, 
-					is_instruction_block, 
-					get_node_gotos_map());
-	instruction_block(statement_instruction(updatedstat)) = lstat;
-	break;
-    }
-    case is_instruction_test:
-    {
-	test
-	    t = instruction_test(inst);
-
-	debug(8, "UpdateStatementForModule", "test\n");
-
-	updatedstat = MakeStatementLike(stat, 
-					is_instruction_test, 
-					get_node_gotos_map());
-	instruction_test(statement_instruction(updatedstat)) = 
-	    make_test(UpdateExpressionForModule(module, test_condition(t)),
-		      UpdateStatementForModule(module, test_true(t)),
-		      UpdateStatementForModule(module, test_false(t)));
-	break;
-    }
-    case is_instruction_loop:
-    {
-	loop
-	    l = instruction_loop(inst);
-	range
-	    r = loop_range(l);
-	entity
-	    nindex = NewVariableForModule(node_module, loop_index(l));
-
-	debug(8, "UpdateStatementForModule", "loop\n");
-
-	updatedstat = MakeStatementLike(stat, 
-					is_instruction_loop, 
-					get_node_gotos_map());
-	instruction_loop(statement_instruction(updatedstat)) = 
-	    make_loop(nindex,
-		      make_range(UpdateExpressionForModule(module, 
-							   range_lower(r)),
-				 UpdateExpressionForModule(module, 
-							   range_upper(r)),
-				 UpdateExpressionForModule(module, 
-							   range_increment(r))),
-		      UpdateStatementForModule(module, loop_body(l)),
-		      loop_label(l),
-		      make_execution(is_execution_sequential,UU),
-		      NULL);
-	break;
-    }
-    case is_instruction_goto:
-    {
-	debug(8, "UpdateStatementForModule", "goto\n");
-
-	updatedstat = MakeStatementLike(stat, 
-					is_instruction_goto, 
-					get_node_gotos_map());
-	instruction_goto(statement_instruction(updatedstat)) = 
-	    instruction_goto(inst);
-
-	break;
-    }
-    case is_instruction_call:
-    {
-	call
-	    c = instruction_call(inst);
-
-	debug(8, "UpdateStatementForModule", 
-	      "call to %s\n", 
-	      entity_name(call_function(c)));
-
-	updatedstat = MakeStatementLike(stat,
-					is_instruction_call,
-					get_node_gotos_map());
-	instruction_call(statement_instruction(updatedstat)) = 
-	    make_call(call_function(c), lUpdateExpr(module, call_arguments(c)));
-
-	break;
-    }
-    case is_instruction_unstructured:
-    {
-	control_mapping 
-	    ctrmap = MAKE_CONTROL_MAPPING();
-	unstructured 
-	    u=instruction_unstructured(inst);
-	control 
-	    ct = unstructured_control(u),
-	    ce = unstructured_exit(u);
-	list 
-	    blocks = NIL;
-
-	debug(8, "UpdateStatementForModule", "unstructured\n");
-
-	CONTROL_MAP(c,
-		{
-		    statement
-			statc = control_statement(c);
-		    control
-			ctr;
-
-		    ctr = make_control(UpdateStatementForModule(module, statc),
-				       NULL,
-				       NULL);
-		    SET_CONTROL_MAPPING(ctrmap, c, ctr);
-		},
-		    ct,
-		    blocks);
-
-	MAPL(cc,
-	 {
-	     control
-		 c = CONTROL(CAR(cc));
-
-	     update_control_lists(c, ctrmap);
-	 },
-	     blocks);
-
-	updatedstat = MakeStatementLike(stat,
-					is_instruction_unstructured,
-					get_node_gotos_map());
-	statement_instruction(instruction_unstructured(updatedstat)) =
-	    make_unstructured((control) GET_CONTROL_MAPPING(ctrmap, ct),
-			      (control) GET_CONTROL_MAPPING(ctrmap, ce));
-
-	gen_free_list(blocks);
-	FREE_CONTROL_MAPPING(ctrmap);
-	break;
-    }
-    default:
-	pips_error("UpdateStatementForModule","unexpected instruction tag\n");
-	break;
-    }
+    statement 
+	new_stat = copy_statement(stat);
     
-    debug(7, "UpdateStatementForModule", "end of update\n");
-    return(updatedstat);
+    update_object_for_module(new_stat, module);
+
+    return(new_stat);
 }
 
+/*   That is all
+ */
