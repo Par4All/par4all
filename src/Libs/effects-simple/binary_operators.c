@@ -156,13 +156,13 @@ effect_must_union(effect eff1, effect eff2)
 
 
 static list
-effect_sup_difference(effect eff1, effect eff2)
+effect_sup_difference(/* const */ effect eff1, /* const */ effect eff2)
 {
     list l_res = NIL;
     if (effect_must_p(eff2))
 	l_res = NIL;
     else
-	l_res = effect_to_may_effect_list(eff1);
+	l_res = effect_to_may_effect_list(effect_dup(eff1));
     return(l_res);
 }
 
