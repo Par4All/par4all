@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.86  1997/12/12 17:35:07  coelho
+ * cleaner...
+ *
  * Revision 1.85  1997/12/12 17:33:41  coelho
  * leaks--
  *
@@ -786,7 +789,7 @@ tpips_exec(char * line)
 	push_pips_context(&pips_top_level);
 
 	if (use_readline && line)
-	    add_history(line);
+	    add_history(strdup(line));
 
 	pips_debug(2, "restarting tpips scanner\n");
 	tp_restart(tp_in);
@@ -803,7 +806,6 @@ tpips_exec(char * line)
 	    tpips_init();
 	
 	sline = tp_substitutions(line);
-	if (!use_readline && line) free(line), line=NULL;
 	handle(sline);
 	free(sline), sline = (char*) NULL;
     }
@@ -837,8 +839,10 @@ tpips_process_a_file(FILE * file, bool use_rl)
 
     /* interactive loop
      */
-    while ((line = tpips_read_a_line(TPIPS_PRIMARY_PROMPT)))
+    while ((line = tpips_read_a_line(TPIPS_PRIMARY_PROMPT))) {
 	tpips_exec(line);
+	free(line);
+    }
 
     /* pop globals */
     current_file = saved;
