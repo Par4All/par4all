@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/23 11:14:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/23 15:41:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1995/10/23 11:14:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1995/10/23 15:41:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -145,7 +145,7 @@ enable_change_directory()
 }
 
 
-void static
+void
 disable_change_directory()
 {
    xv_set(directory_menu_item, MENU_INACTIVE, TRUE, NULL);
@@ -778,8 +778,31 @@ generate_workspace_menu()
 void
 end_select_module_notify(string name)
 {
-   lazy_open_module(name);
+   char *module_list[ARGS_LENGTH];
+   int  module_list_length = 0;
 
+   db_get_module_list(&module_list_length, module_list);
+
+   if (module_list_length == 0)
+   {
+      prompt_user("No module available in this workspace.");
+   }
+   else {
+      bool module_found = FALSE;
+      int i;
+      
+      for(i = 0; i < module_list_length; i++)
+         if (strcmp(name, module_list[i]) == 0) {
+            module_found = TRUE;
+            break;
+         }
+      if (module_found)
+         lazy_open_module(name);
+      else
+         prompt_user("The module \"%s\" does not exist in this workspace.",
+                     name);
+   }
+   
    show_module();
    display_memory_usage();
 }
@@ -788,32 +811,32 @@ void cancel_select_module_notify()
 {
 }
 
-void select_module_notify(menu, menu_item)
-Menu menu;
-Menu_item menu_item;
+void
+select_module_notify(Menu menu,
+                     Menu_item menu_item)
 {
-    char *module_list[ARGS_LENGTH];
-    int  module_list_length = 0;
+   char *module_list[ARGS_LENGTH];
+   int  module_list_length = 0;
 
-    db_get_module_list(&module_list_length, module_list);
+   db_get_module_list(&module_list_length, module_list);
 
-	if (module_list_length == 0)
-	{
-		/* If there is no module... RK, 23/1/1993. */
-		prompt_user("No module available in this workspace");
-	}
-	else
-		schoose("Select Module", 
-			module_list_length,
-			module_list,
-			/* Affiche comme choix courant le module
-			   courant (c'est utile si on ferme la fenêtre
-			   module entre temps) : */
-			db_get_current_module_name(),
-			end_select_module_notify,
-			cancel_select_module_notify);
+   if (module_list_length == 0)
+   {
+      /* If there is no module... RK, 23/1/1993. */
+      prompt_user("No module available in this workspace.");
+   }
+   else
+      schoose("Select Module", 
+              module_list_length,
+              module_list,
+              /* Affiche comme choix courant le module
+                 courant (c'est utile si on ferme la fenêtre
+                 module entre temps) : */
+              db_get_current_module_name(),
+              end_select_module_notify,
+              cancel_select_module_notify);
 
-    args_free(&module_list_length, module_list);
+   args_free(&module_list_length, module_list);
 }
 
 
