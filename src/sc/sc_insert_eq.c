@@ -92,9 +92,9 @@ sc_constraint_add(Psysteme sc, Pcontrainte c, boolean equality)
     Pbase new_basis;
 
     if(equality)
-	sc_add_egalite(sc,c)
+      sc_add_egalite(sc,c);
     else
-	sc_add_inegalite(sc,c)
+      sc_add_inegalite(sc,c);
 
     /* maintain consistency, although it's expensive; how about a
        sc_update_base function? Or a proper sc_add_inegalite function? */
