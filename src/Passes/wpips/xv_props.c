@@ -63,7 +63,8 @@ string svp;
 }
 
 
-void update_options()
+void
+update_options()
 {
    string res_alias_n, res_true_n ,phase_alias_n ,phase_true_n;
    Menu menu_options, special_prop_m;
@@ -79,6 +80,11 @@ void update_options()
 
       /* find resource corresponding to the item */
       options_mi = (Menu_item) xv_get(menu_options, MENU_NTH_ITEM, i);
+
+      if ((bool) xv_get(options_mi, MENU_TITLE))
+         /* Skip the title item: */
+         break;
+      
       res_alias_n = (string) xv_get(options_mi, MENU_STRING);
       if (res_alias_n == NULL
           || strcmp(res_alias_n, display_options_panel) == 0
@@ -229,8 +235,20 @@ options_panel_notify(Panel_item item,
    options_select(aliased_phase);
 }
 
+
 void
-options_menu_notify(Menu menu, Menu_item menu_item)
+options_panel_to_view_menu_gateway(Panel_item item,
+                                   Event * event)
+{
+   char * label = (char *) xv_get(item, PANEL_LABEL_STRING);
+
+   wpips_execute_and_display_something(label);
+}
+
+
+void
+options_menu_notify(Menu menu,
+                    Menu_item menu_item)
 {
    string aliased_phase = (char *) xv_get(menu_item, MENU_STRING);
    options_select(aliased_phase);
@@ -250,16 +268,18 @@ compare_option_type_for_qsort(const void *x,
 
 /* Build the option menu by looking at the pipsmake.rc file and
    searching if there are several way to build a ressource: */
+/* The option panel use the definition of the edit menu and so needs
+       to be create after it: */
 void
 build_options_menu_and_panel(Menu menu_options,
                              Panel options_panel)
 {
    int i, j;
-   int max_length_of_all_the_options;
    option_type *all_the_options;
    makefile m = parse_makefile();
-   
-   int max_length_of_an_option = 0;
+   int max_item_width = 0;
+  
+   int max_length_of_all_the_options = 0;
    int number_of_options = 0;
    hash_table phase_by_made_htp = hash_table_make(hash_string, 0);
 
@@ -394,7 +414,6 @@ build_options_menu_and_panel(Menu menu_options,
    {
       Panel_item item;
 
-      int max_item_width = 0;
 #ifdef OPTION_PANEL_BUTTONS_ALIGNED
       /* If I want something with the buttons vertically aligned: */
       PANEL_EACH_ITEM(options_panel, item)
@@ -424,75 +443,70 @@ build_options_menu_and_panel(Menu menu_options,
       PANEL_END_EACH
 #endif
    }
-   
-#if 0
-   HASH_MAP(k, v, {
-      string alias1 = hash_get_key_by_value(aliases, k);
-      list l = (list) v;
 
-      if ((alias1 != HASH_UNDEFINED_VALUE) && (gen_length(l) >= 2)) {
+   /* According to a suggestion from Guillaume Oget, it should be nice
+      to be able to select a view also from the Option panel: */
+   {
+      Panel_item option_item;
+      char * option_item_label;
+      Panel_item * the_option_panel_items;
+      int number_of_options_to_link_with_the_view_menu;
+      int i = 0;
 
-         Menu_item mi_options;
-         Menu menu_special_prop;
-         Panel_item panel_choice_item;
+      /* A conservative allocation... */
+      the_option_panel_items = (Panel_item *) calloc(number_of_options,
+                                                     sizeof(Panel_item *));
+      
+      PANEL_EACH_ITEM(options_panel, option_item) 
+         {
+            Menu_item view_menu_item;
+            
+            option_item_label = (char *) xv_get(option_item,
+                                                PANEL_LABEL_STRING);
 
-         menu_special_prop=(Menu)xv_create(NULL, MENU_CHOICE_MENU,
-                                           MENU_NOTIFY_PROC, options_menu_notify,
-                                           NULL);
-
-         narg = 0;
-         MAPL(vrn, {
-            string alias2 = hash_get_key_by_value(aliases, 
-                                                  STRING(CAR(vrn)));
-            Menu_item mi_special_prop;
-
-            if (alias2!=HASH_UNDEFINED_VALUE) {
-               mi_special_prop = (Menu_item)xv_create(NULL, MENUITEM,
-                                                      MENU_STRING, 
-                                                      alias2,
-                                                      MENU_RELEASE,
-                                                      NULL);
-               xv_set(menu_special_prop, MENU_APPEND_ITEM, 
-                      mi_special_prop, NULL);
-               arg[narg++] = strdup(alias2);
+            /* Find if the View menu has an item with the same value: */
+            view_menu_item =
+               (Menu_item) xv_find(view_menu, MENUITEM,
+                                   MENU_STRING, option_item_label,
+                                /* Do not create the menu item if it
+                                   does not exist: */
+                                   XV_AUTO_CREATE, FALSE,
+                                   NULL);
+            if (view_menu_item != XV_NULL) {
+               /* OK, there is also a View menu with the same name. */
+               /* Put it in the array of panel items to create. We
+                  cannot create it directly since it would confuse
+                  PANEL_EACH_ITEM: */
+               the_option_panel_items[i++] = option_item;
             }
-         }, l);
+         }
+      PANEL_END_EACH
+         number_of_options_to_link_with_the_view_menu = i;
 
-         mi_options = (Menu_item)xv_create(NULL, MENUITEM,
-                                           MENU_STRING, alias1,
-                                           MENU_PULLRIGHT, menu_special_prop,
-                                           MENU_RELEASE,
-                                           NULL);
-         xv_set(menu_options, MENU_APPEND_ITEM, mi_options, NULL);
+      window_fit(options_panel);
+      window_fit(options_frame);
+   
+         for(i = 0; i < number_of_options_to_link_with_the_view_menu; i++) {
+               /* Overlay the label of an option item with a button
+                  with the same name to select the View item: */
+               xv_create(options_panel, PANEL_BUTTON,
+                         PANEL_NOTIFY_PROC, options_panel_to_view_menu_gateway,
+                         PANEL_LABEL_STRING, xv_get(the_option_panel_items[i],
+                                                    PANEL_LABEL_STRING),
+                         XV_X, xv_get(the_option_panel_items[i],
+                                      XV_X),
+                         XV_Y, xv_get(the_option_panel_items[i],
+                                      XV_Y),
+                         NULL);
 
-				/* PANEL_CLIENT_DATA is used to link the PANEL_CHOICE_STACK
-                                   to its dual MENU_PULLRIGHT. RK, 11/06/1993. */
-         panel_choice_item = xv_create(options_panel, PANEL_CHOICE_STACK,
-                                       PANEL_LAYOUT, PANEL_HORIZONTAL,
-                                       PANEL_LABEL_STRING, alias1,
-                                       PANEL_CLIENT_DATA, menu_special_prop,
-                                       PANEL_VALUE, 0,
-                                       PANEL_NOTIFY_PROC, options_panel_notify,
-                                       NULL);
-
-         for(i = 0; arg[i] != NULL; i ++)
-            xv_set(panel_choice_item,
-                   PANEL_CHOICE_STRING,
-                   i,
-                   arg[i],
-                   NULL);
-                        
-				/* Since PANEL_CHOICE_STRINGS copies the strings : */
-         args_free(&narg, arg);
-				/* The cross menu/panel reference : */
-				/* MENU_CLIENT_DATA is used for the link in the other
-                                   direction. 05/07/1993, RK. */
-         xv_set(menu_special_prop,
-                MENU_CLIENT_DATA, panel_choice_item,
-                NULL);
-      }
-   }, phase_by_made_htp);
-#endif
+               xv_set(the_option_panel_items[i],
+                      PANEL_LABEL_STRING, NULL,
+                      PANEL_LABEL_WIDTH, 0,
+                      PANEL_VALUE_X, xv_get(the_option_panel_items[i],
+                                            PANEL_VALUE_X),
+                      NULL);
+            }
+         }
 }
 
 
@@ -530,54 +544,60 @@ void build_aliases()
     }
 }
 
-void display_or_hide_options_panel(menu, menu_item)
-	Menu menu;
-	Menu_item menu_item;
+void
+display_or_hide_options_panel(Menu menu,
+                              Menu_item menu_item)
 {
-	char *message_string;
+   char *message_string;
 
 
-	/* Should be added : when the options panel is destroyed by the
-		window manager, toggle the menu. RK, 7/6/93. */
+   /* Should be added : when the options panel is destroyed by the
+      window manager, toggle the menu. RK, 7/6/93. */
 
-	message_string = (char *)xv_get(menu_item, MENU_STRING);
-	if (strcmp(message_string, display_options_panel) == 0)
-	{
-		unhide_window(options_frame);
-		xv_set(menu_item, MENU_STRING, hide_options_panel, NULL);
-	}
-	else
-	{
-		xv_set(options_frame, XV_SHOW, FALSE, NULL);
-		xv_set(menu_item, MENU_STRING, display_options_panel, NULL);
-	}
+   message_string = (char *) xv_get(menu_item, MENU_STRING);
+   if (strcmp(message_string, display_options_panel) == 0)
+   {
+      unhide_window(options_frame);
+      xv_set(menu_item, MENU_STRING, hide_options_panel, NULL);
+   }
+   else
+   {
+      xv_set(options_frame, XV_SHOW, FALSE, NULL);
+      xv_set(menu_item, MENU_STRING, display_options_panel, NULL);
+   }
 }
 
-void create_options_menu_and_window()
+void
+create_options_menu_and_window()
 {
-	options_panel = (Panel) xv_create(options_frame, PANEL,
-		PANEL_LAYOUT, PANEL_VERTICAL,
-			/* RK, 11/06/1993. There is no room : */
-		PANEL_ITEM_Y_GAP, 0,
-		PANEL_ITEM_X_GAP, 0,
-		NULL);
+   options_panel = (Panel) xv_create(options_frame, PANEL,
+                                     PANEL_LAYOUT, PANEL_VERTICAL,
+                                     /* RK, 11/06/1993. There is no room : */
+                                     PANEL_ITEM_Y_GAP, 0,
+                                     PANEL_ITEM_X_GAP, 0,
+                                     NULL);
 
-    options_menu = (Menu) xv_create(XV_NULL, MENU_COMMAND_MENU, 
-			MENU_GEN_PIN_WINDOW, main_frame, "Options Menu",
-			MENU_ITEM,
-				MENU_STRING, display_options_panel,
-				MENU_NOTIFY_PROC, display_or_hide_options_panel,
-				NULL,
-			NULL);
+   options_menu = (Menu) xv_create(XV_NULL, MENU_COMMAND_MENU,
+                                   MENU_TITLE_ITEM, "Selecting PIPS Options",
+                                   MENU_GEN_PIN_WINDOW, main_frame, "Options Menu",
+                                   MENU_ITEM,
+                                   MENU_STRING, display_options_panel,
+                                   MENU_NOTIFY_PROC, display_or_hide_options_panel,
+                                   NULL,
+                                   NULL);
 
-    build_aliases();
-    build_options_menu_and_panel(options_menu,options_panel);
+   build_aliases();
+   build_options_menu_and_panel(options_menu, options_panel);
 
-    (void) xv_create(main_panel, PANEL_BUTTON,
-		     PANEL_LABEL_STRING, "Options",
-		     PANEL_ITEM_MENU, options_menu,
-		     NULL);
+   (void) xv_create(main_panel, PANEL_BUTTON,
+                    PANEL_LABEL_STRING, "Options",
+                    PANEL_ITEM_MENU, options_menu,
+                    NULL);
 
-	window_fit(options_panel);
-	window_fit(options_frame);
+   /* The window fit is done now in build_options_menu_and_panel() to
+      leave unchanged the overlay buttons. */
+   /*
+   window_fit(options_panel);
+   window_fit(options_frame);
+   */
 }
