@@ -2,16 +2,16 @@
 
 #include <stdio.h>
 
+#include "boolean.h"
+#include "vecteur.h"
+#include "contrainte.h"
+#include "sc.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
 
 #include "misc.h"
-
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
 #include "semantics.h"
 
 #include "transformer.h"
@@ -135,7 +135,7 @@ transformer t2;
 
 /* eliminate (some) redundancy */
 transformer
-transformer_normalize(transformer t)
+transformer_normalize(transformer t, int level)
 {
     Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
 
@@ -146,11 +146,14 @@ transformer_normalize(transformer t)
 	 * enumerated by increasing speeds according to Beatrice
 	 */
 
-	/* Our best choice, but damned slow on ocean */
-	/*
-	r = sc_elim_redund(r);
-	*/
+	switch(level) {
 
+	case 0:
+	    /* Our best choice for accuracy, but damned slow on ocean */
+	    r = sc_elim_redund(r);
+	    break;
+
+	case 1:
 	/* Beatrice's best choice: does not deal with minmax2 (only)
 	 * but still requires 74 minutes of real time (55 minutes of CPU time)
 	 * for ocean preconditions, when applied to each precondition stored.
@@ -161,28 +164,64 @@ transformer_normalize(transformer t)
 	 * could always be detected in a trivial way after propagating
 	 * values from equations into inequalities.
 	 */
-	/*
-	sc_nredund(&r);	    predicate_system(transformer_relation(t)) = r;
-	*/
+	    sc_nredund(&r);
+	    predicate_system(transformer_relation(t)) = r;
+	    break;
 
-	/* Pretty lousy: equations are not even used to eliminate redundant 
-	 * inequalities!
-	 */
-	/* r = sc_normalize(r); */
+	case 2:
+	    /* Francois' own: does most of the easy stuff.
+	     * Fails on mimax2 and sum_prec, but it is somehow
+	     * more user-friendly because trivial preconditions are
+	     * not destroyed as redundant. It makes you feel safer.
+	     *
+	     * Result for full precondition normalization on ocean: 114 s
+	     * for preconditions, 4 minutes between split ocean.f and
+	     * OCEAN.prec
+	     */
+	    r = sc_strong_normalize(r);
+	    break;
 
-	/* Francois' own: does most of the easy stuff.
-	 * Fails on mimax2 and sum_prec, but it is somehow
-	 * more user-friendly because trivial preconditions are
-	 * not destroyed as redundant. It makes you feel safer.
-	 *
-	 * Result for full precondition normalization on ocean: 114 s
-	 * for preconditions, 4 minutes between split ocean.f and
-	 * OCEAN.prec
-	 */
-	/* r = sc_strong_normalize(r); */
+	case 5:
+	    /* Same plus a good feasibility test
+	     */
+	    r = sc_strong_normalize3(r);
+	    break;
 
-	/* Similar, but constants are actually propagated */
-	r = sc_strong_normalize2(r);
+	case 3:
+	    /* Similar, but variable are actually substituted
+	     * which is sometimes painful when a complex equations
+	     * is used to replace a simple variable in a simple
+	     * inequality.
+	     */
+	    r = sc_strong_normalize2(r);
+	    break;
+	case 6:
+	    /* Similar, but variables are substituted if they belong to
+	     * a more or less simple equation, and simpler equations
+	     * are processed first and a lexicographically minimal
+	     * variable is chosen when equivalent variables are
+	     * available.
+	     */
+	    r = sc_strong_normalize4(r, (char * (*)(Variable)) external_value_name);
+	    break;
+
+	case 7:
+	    /* Same plus a good feasibility test, plus variable selection for elimination,
+	     * plus equation selection for elimination
+	     */
+	    r = sc_strong_normalize5(r, (char * (*)(Variable)) external_value_name);
+	    break;
+
+	case 4:
+	    /* Pretty lousy: equations are not even used to eliminate redundant 
+	     * inequalities!
+	     */
+	    r = sc_normalize(r);
+	    break;
+
+	default:
+	    pips_error("transformer_normalize", "unknown level %d\n", level);
+	}
 
 	if (SC_EMPTY_P(r)) {
 	    r = sc_empty(b);
@@ -493,34 +532,34 @@ entity e2;
     return t;
 }
 
-/* Return true if a statement is feasible according to the precondition. */
+/* Return true if statement s is reachable according to its precondition. */
 bool statement_feasible_p(statement s)
 {
-  transformer pre;
-  Psysteme ps;
-  predicate pred;
+    transformer pre;
+    bool feasible_p;
 
-  pre = load_statement_precondition(s);
-  if (get_debug_level() >= 7) {
-     (void) printf("Precondition 0x%x\n", (unsigned int) pre);
-  }
-  
-  pred = transformer_relation(pre);
-  
-  ps = predicate_system(pred);
+    pre = load_statement_precondition(s);
 
-  if (get_debug_level() >= 6) {
-    (void) printf("C  %s\n", precondition_to_string(pre));
-    print_statement(s);
-    if (get_debug_level() >= 7) sc_dump(ps);
-    (void) printf("\"statement_feasible_p\" Faisabilite' = %d\n\n",
-		  sc_faisabilite(ps));
-  }
+    ifdebug(6) {
+	int so = statement_ordering(s);
+	debug(6, "statement_feasible_p",
+	      "Begin for statement %d (%d,%d) and precondition 0x%x\n",
+	      statement_number(s),
+	      ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
+	      (unsigned int) pre);
+    }
 
-  /* Renvoie l'utilite' : */  
-  return sc_faisabilite(ps);
+    feasible_p = !transformer_empty_p(pre);
+
+    debug(6, "statement_feasible_p", " End with feasible_p = %d\n",
+	  feasible_p);
+
+    return feasible_p;
 }
 
+/* If TRUE is returned, the transformer certainly is empty. If FALSE is returned,
+ * the transformer still might be empty, but it's not too likely...
+ */
 bool transformer_empty_p(transformer t)
 {
     /* FI: the arguments seem to have no impact on the emptiness
@@ -528,12 +567,25 @@ bool transformer_empty_p(transformer t)
      */
     predicate pred = transformer_relation(t);
     Psysteme ps = predicate_system(pred);
+    Psysteme new_ps = sc_dup (ps);
     bool empty_p = FALSE;
 
-    empty_p = !sc_faisabilite(ps);
-
     /* empty_p = !sc_faisabilite(ps); */
-    empty_p = !sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL, TRUE);
+    /* empty_p = !sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL, TRUE); */
+
+    /* Normalize the transformer, use all "reasonnable" equations to reduce the problem
+     * size, check feasibility on the projected system
+     */
+    new_ps = sc_strong_normalize_and_check_feasibility2
+	(new_ps, sc_normalize, (char * (*)(Variable)) external_value_name, 2);
+
+    if(SC_EMPTY_P(new_ps)) {
+	empty_p = TRUE;
+    }
+    else {
+	sc_rm(new_ps);
+	empty_p = FALSE;
+    }
 
     return empty_p;
 }
