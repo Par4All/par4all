@@ -1,7 +1,7 @@
 #! /bin/sh
 # 
 # $RCSfile: hpfc,v $ (version $Revision$)
-# $Date: 1997/01/14 16:54:09 $, 
+# $Date: 1997/01/18 10:32:25 $, 
 #
 # HPFC scripts very front-end.
 # just an easy way not to have to remember the name of some scripts.
@@ -18,7 +18,8 @@ script=`basename $0`
 usage()
 {
   cat >&2 <<-END
-	usage: $script [-vdqt] function [options] [arguments]
+	usage: $script [-vdqt] [-o name] [-D macros]
+	       function [options] [arguments]
 	  version is $Revision$, 
 	  OPTIONS:
 	    -v: verbose
@@ -26,12 +27,13 @@ usage()
 	    -q: quiet
 	    -t: timings
 	    -o name: name for the generated file (forwarded to compiler)
-	  function among (3 significant characters:-):
+	    -D macro: additionnal cpp macros
+	  function among (3 significant characters):
 	  COMPILATION:
 	    i|interactive: (thanks to GNU readline library) (\,cd)
 	    c|compile: compile
 	    m|make: compile and link
-	    r|run: run (not implemented yet:-)
+	    r|run: run 
 	    f|full: compile + make (shorthand for demos)
 	    d|delete: delete hpfc directory
 	    q|quit: does nothing
@@ -65,7 +67,7 @@ TIMING=void
 
 # options
 
-while getopts vdqto: OPT
+while getopts vdqto:D: OPT
 do
   case $OPT in
     v) HPFC_MODE=void ;;
@@ -73,6 +75,7 @@ do
     d) HPFC_MODE=debug ;;
     t) TIMING=timing ;;
     o) COPT="-w $OPTARG";;
+    D) PIPS_CPP_FLAGS="$PIPS_CPP_FLAGS -D $OPTARG" ;;
     *) usage 4
   esac
 done
@@ -100,6 +103,8 @@ else
 fi
 
 # The following should be coherent with the help...
+
+export PIPS_CPP_FLAGS
 
 case $key in
   h|hel*) usage 0 ;;
