@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1997/11/13 16:17:09 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1998/04/16 14:45:12 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1997/11/13 16:17:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1998/04/16 14:45:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -28,6 +28,7 @@ char vcid_emacs[] = "%A% ($Date: 1997/11/13 16:17:09 $, ) version $Revision$, go
 #include "string.h"
 #include "genC.h"
 #include "misc.h"
+#include "linear.h"
 #include "ri.h"
 #include "database.h"
 #include "ri-util.h"
