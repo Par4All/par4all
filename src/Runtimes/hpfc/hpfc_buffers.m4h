@@ -2,42 +2,82 @@ c
 c COMMON /HPFC_BUFFERS/ 
 c
 c $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-c ($Date: 1995/09/11 12:00:52 $, )
+c ($Date: 1995/09/15 15:57:05 $, )
 c
 c buffers to avoid small pvmf(un)pack calls...
 c and to sends buckets of messages if necessary...
 c
       common /HPFC_BUFFERS/
-     $     BYTE1_BUFF(MAXSIZEOFBUFFER),
+     $     DATA_BUFFER(MAXMAXSIZEOFBUFFER),
      $     BUFINDEX,
      $     SIZEOFBUFFER,
      $     SIZEOFRECEIVEDBUFFER,
+     $     BYTE1_BUFFSIZE,
+     $     INTEGER2_BUFFSIZE,
+     $     INTEGER4_BUFFSIZE,
+     $     REAL4_BUFFSIZE,
+     $     REAL8_BUFFSIZE,
+     $     COMPLEX8_BUFFSIZE,
+     $     COMPLEX16_BUFFSIZE,
+     $     BUFFER_ENCODING,
      $     LAZY_SEND,
-     $     LAZY_RECV
+     $     LAZY_RECV,
+     $     SEND_NOT_INITIALIZED,
+     $     RECEIVED_NOT_PERFORMED
       integer
      $     BUFINDEX,
      $     SIZEOFBUFFER,
-     $     SIZEOFRECEIVEDBUFFER
+     $     SIZEOFRECEIVEDBUFFER,
+     $     BYTE1_BUFFSIZE,
+     $     INTEGER2_BUFFSIZE,
+     $     INTEGER4_BUFFSIZE,
+     $     REAL4_BUFFSIZE,
+     $     REAL8_BUFFSIZE,
+     $     COMPLEX8_BUFFSIZE,
+     $     COMPLEX16_BUFFSIZE,
+     $     BUFFER_ENCODING
       logical
      $     LAZY_SEND,
-     $     LAZY_RECV
+     $     LAZY_RECV,
+     $     SEND_NOT_INITIALIZED,
+     $     RECEIVED_NOT_PERFORMED
       byte
-     $     BYTE1_BUFF
+     $     DATA_BUFFER
 c
-c buffer must be seen differently somehow...
+c buffer sizes
 c
-      integer*2 INTEGER2_BUFF(MAXSIZEOFBUFFER/2)
-      equivalence (BYTE1_BUFF, INTEGER2_BUFF)
-      integer*4 INTEGER4_BUFF(MAXSIZEOFBUFFER/4)
-      equivalence (BYTE1_BUFF, INTEGER4_BUFF)
-      real*4 REAL4_BUFF(MAXSIZEOFBUFFER/4)
-      equivalence (BYTE1_BUFF, REAL4_BUFF)
-      real*8 REAL8_BUFF(MAXSIZEOFBUFFER/8)
-      equivalence (BYTE1_BUFF, REAL8_BUFF)
-      complex*8 COMPLEX8_BUFF(MAXSIZEOFBUFFER/8)
-      equivalence (BYTE1_BUFF, COMPLEX8_BUFF)
-      complex*16 COMPLEX16_BUFF(MAXSIZEOFBUFFER/16)
-      equivalence (BYTE1_BUFF, COMPLEX16_BUFF)
+      integer 
+     $     BYTE1_MAXBUFFSIZE,
+     $     INTEGER2_MAXBUFFSIZE,
+     $     INTEGER4_MAXBUFFSIZE,
+     $     REAL4_MAXBUFFSIZE,
+     $     REAL8_MAXBUFFSIZE,
+     $     COMPLEX8_MAXBUFFSIZE,
+     $     COMPLEX16_MAXBUFFSIZE
+      parameter (BYTE1_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER)
+      parameter (INTEGER2_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/2)
+      parameter (INTEGER4_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
+      parameter (REAL4_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
+      parameter (REAL8_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/8)
+      parameter (COMPLEX8_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/8)
+      parameter (COMPLEX16_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/16)
+c
+c the buffer must be seen differently somehow...
+c
+      byte BYTE1_BUFF(BYTE1_MAXBUFFSIZE)
+      integer*2 INTEGER2_BUFF(INTEGER2_MAXBUFFSIZE)
+      integer*4 INTEGER4_BUFF(INTEGER4_MAXBUFFSIZE)
+      real*4 REAL4_BUFF(REAL4_MAXBUFFSIZE)
+      real*8 REAL8_BUFF(REAL8_MAXBUFFSIZE)
+      complex*8 COMPLEX8_BUFF(COMPLEX8_MAXBUFFSIZE)
+      complex*16 COMPLEX16_BUFF(COMPLEX16_MAXBUFFSIZE)
+      equivalence (DATA_BUFFER, BYTE1_BUFF)
+      equivalence (DATA_BUFFER, INTEGER2_BUFF)
+      equivalence (DATA_BUFFER, INTEGER4_BUFF)
+      equivalence (DATA_BUFFER, REAL4_BUFF)
+      equivalence (DATA_BUFFER, REAL8_BUFF)
+      equivalence (DATA_BUFFER, COMPLEX8_BUFF)
+      equivalence (DATA_BUFFER, COMPLEX16_BUFF)
 c
 c that is all
 c
