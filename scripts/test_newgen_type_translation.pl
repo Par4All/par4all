@@ -56,7 +56,7 @@ foreach $file (@ARGV)
     while (<IN>)
     {
 	s/^(\d+) /$tr[$1] /;
-	s/([EDRT])(\d+) /$1$tr[$2] /g;
+	s/([ERT\*])(\d+) /$1$tr[$2] /g;
 	print OUT;
     }
 
