@@ -119,12 +119,6 @@ meta_data_db_file_name(string data)
 }
 
 static void
-free_meta_data(void)
-{
-    gen_free_tabulated(db_symbol_domain);
-}
-
-static void
 save_meta_data(void)
 {
     string file_name;
@@ -141,6 +135,7 @@ save_meta_data(void)
     file_name = meta_data_db_file_name(DATABASE_SYMBOLS);
     file = safe_fopen(file_name, "w");
     gen_write_tabulated(file, db_symbol_domain);
+    gen_free_tabulated(db_symbol_domain);
     safe_fclose(file, file_name);
     free(file_name);
 
@@ -279,20 +274,20 @@ db_checkpoint_workspace(void)
     pips_debug(1, "Checkpointing workspace %s\n", 
 	       db_get_current_workspace_name());
     db_save_workspace("Saving");
+    load_meta_data();
+    /* load ENTITIES (since no one ask for them as they should;-) */
+    if (db_resource_p(DBR_ENTITIES, "")) 
+	(void) db_get_memory_resource(DBR_ENTITIES, "", TRUE);
     debug_off();
 }
 
 bool
 db_close_workspace(void)
 {
-    string name = db_get_current_workspace_name();
-
     debug_on(PIPSDBM_DEBUG_LEVEL);
-    pips_debug(1, "Closing workspace %s\n", name);
+    pips_debug(1, "Closing workspace %s\n", db_get_current_workspace_name());
 
     db_save_workspace("Closing");
-    free_meta_data();
-
     db_reset_current_workspace_name();
     
     pips_debug(1, "done\n");
