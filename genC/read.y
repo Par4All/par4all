@@ -452,19 +452,18 @@ gen_chunk *String, *Chunk ;
 /* MAKE_REF references the object of hash name STRING in the tabulation table
    INT. Forward references are dealt with here. */
 
-static gen_chunk *
-make_ref( Int, String )
-int Int ;
-gen_chunk *String ;
+static gen_chunk * make_ref(int Int, gen_chunk *String)
 {
     gen_chunk *hash ;
     gen_chunk *cp ;
-    int domain ;
+    int domain;
 
     if( Gen_tabulated_[ Int ] == (gen_chunk *)NULL ) {
 	user( "read: Unloaded tabulated domain %s\n", Domains[ Int ].name ) ;
     }
-    sscanf( String->s, "%d", &domain ) ;
+
+    sscanf(String->s, "%d", &domain);
+    domain = gen_type_translation_old_to_actual(domain);
 
     if( (hash=(gen_chunk *)gen_get_tabulated_name_direct(String->s))
 	== (gen_chunk *)HASH_UNDEFINED_VALUE ) {
