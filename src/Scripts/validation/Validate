@@ -59,9 +59,9 @@ PWD=`absolute_name \`pwd\``
 
 # defaults
 
-DEBUG=":"
-DEBUG2=":"
-VERBOSE=":"
+deb1=":"
+deb2=":"
+verb=":"
 parallel="1"
 # time between sub-validation return checks.
 update=10
@@ -104,7 +104,7 @@ remote()
 
     if [ $rhost = $hostname ]
     then
-      "$@" &
+      ( "$@" & ) ;
     else
       rsh $rhost "$@" &
     fi
@@ -117,7 +117,7 @@ alive()
 {
   for v_host in `echo $1 | tr ':' ' '`
   do
-    $DEBUG2 " | $ping $v_host"
+    $deb2 " | $ping $v_host"
     $ping $v_host > /dev/null 2>&1 && echo ":$v_host"
   done | tr -d '\012'
 }
@@ -173,9 +173,9 @@ EOF
 #
 prefix_file_exists()
 {
-  $DEBUG2 " | in prefix_file_exists for $1"
+  $deb2 " | in prefix_file_exists for $1"
   for f in $1.* ; do test -f $f && return 0 ; done
-  $DEBUG2 " | not found"
+  $deb2 " | not found"
   return 1
 }
 
@@ -204,15 +204,15 @@ available_host()
   #
   until prefix_file_exists $RESULT
   do
-    $DEBUG " | sleep" 
+    $deb1 " | sleep" 
     sleep $update
   done
-  $DEBUG " | ok"
+  $deb1 " | ok"
   #
   # get the result, hostname and remove the lock files
   #
   ah_file=`randomize $RESULT.*`
-  $DEBUG2 " | ah_file is $ah_file"
+  $deb2 " | ah_file is $ah_file"
   # failed="$failed-"`cat $ah_file`
   #
   # failures append
@@ -222,7 +222,7 @@ available_host()
   #
   # available host
   #
-  $DEBUG2 " | available host found: $ah_host"
+  $deb2 " | available host found: $ah_host"
   echo $ah_host
 }
 
@@ -239,13 +239,13 @@ send_validate()
   validate_module=$1
   validate_host=$2
 
-  $DEBUG " | remote $validate_host \ "
-  $DEBUG " | $VALID \ "
-  $DEBUG " |   -r $RUNDIR \ "
-  $DEBUG " |   -l $RESULT \ "
-  $DEBUG " |   -x $pips_version \ "
-  $DEBUG " |   -y $tpips_version \ "
-  $DEBUG " |   -u $valid_option $validate_module"
+  $deb1 " | remote $validate_host \ "
+  $deb1 " | $VALID \ "
+  $deb1 " |   -r $RUNDIR \ "
+  $deb1 " |   -l $RESULT \ "
+  $deb1 " |   -x $pips_version \ "
+  $deb1 " |   -y $tpips_version \ "
+  $deb1 " |   -u $valid_option $validate_module"
 
   remote $validate_host \
   $VALID -r $RUNDIR -l $RESULT -x "$pips_version" -y "$tpips_version" \
@@ -260,13 +260,13 @@ send_validate()
 while getopts DVdtsvpnhr:l:x:y:i:a: opt
 do
   case $opt in
-    d) DEBUG="debug" ;;
-    D) DEBUG="debug"; DEBUG2="debug";  valid_option="$valid_option -d" ;;
+    d) deb1="debug" ;;
+    D) deb1="debug"; deb2="debug";  valid_option="$valid_option -d" ;;
     t) performance="begin `local_date`"; valid_option="$valid_option -t";;
-    v) VERBOSE='verbose' ;;
-    V) VERBOSE='verbose' ; valid_option="$valid_option -v";;
+    v) verb='verbose' ;;
+    V) verb='verbose' ; valid_option="$valid_option -v";;
     i) valid_option="$valid_option -i $OPTARG" ;;
-    s) VERBOSE=':' ;;
+    s) verb=':' ;;
     p) parallel="1" ;;
     n) parallel="" ;;
     r) RUNDIR="$OPTARG" ;;
@@ -346,22 +346,22 @@ tpips_version=`absolute_name ${tpips_version:-\`which_executable tpips\`}`
 export pips_version
 export tpips_version
 
-$DEBUG " | $user on $hostname"
-$DEBUG2 " | real PIPSHOME: $REAL_PIPSHOME"
+$deb1 " | $user on $hostname"
+$deb2 " | real PIPSHOME: $REAL_PIPSHOME"
 
 #
 # modules to be checked by the validation
 
 case $# in
-  0) $VERBOSE "Taking default validation from $default_file" ;
+  0) $verb "Taking default validation from $default_file" ;
      MODULES=`sed /#/d < $default_file | tr -s '\012' ' '` ;;
   *) MODULES="$*"
 esac
 
-$DEBUG2 " | MODULES 1: $MODULES"
+$deb2 " | MODULES 1: $MODULES"
 MODULES=`unstammer "$MODULES" ' '`
 
-$VERBOSE "Modules: $MODULES"
+$verb "Modules: $MODULES"
 
 #
 # hosts to be used by the validation
@@ -373,25 +373,25 @@ then
   VALHOSTS="$VALHOSTS:${PIPS_HOSTS}"
 fi
 
-$DEBUG2 " | hosts before unstammering: $VALHOSTS"
+$deb2 " | hosts before unstammering: $VALHOSTS"
 VALHOSTS=`unstammer $VALHOSTS`
 
-$DEBUG2 " | hosts before checking ups: $VALHOSTS"
+$deb2 " | hosts before checking ups: $VALHOSTS"
 VALHOSTS=`alive $VALHOSTS`
 
-$VERBOSE "Hosts: $VALHOSTS"
+$verb "Hosts: $VALHOSTS"
 
 #
 # Sequential case
 
 [ ! "$parallel" ] && \
 {
-  $VERBOSE "sequential validation"
+  $verb "sequential validation"
 
-  $DEBUG "exec $VALID \ "
-  $DEBUG "   -r $RUNDIR \ "
-  $DEBUG "   -x $pips_version \ "
-  $DEBUG "   -u $valid_option $MODULES"
+  $deb1 "exec $VALID \ "
+  $deb1 "   -r $RUNDIR \ "
+  $deb1 "   -x $pips_version \ "
+  $deb1 "   -u $valid_option $MODULES"
 
   exec $VALID -r $RUNDIR -x "$pips_version" -u $valid_option $MODULES
 }
@@ -399,48 +399,48 @@ $VERBOSE "Hosts: $VALHOSTS"
 #
 # Parallel case
 
-$VERBOSE "parallel validation"
-$VERBOSE " - with $pips_version"
-$VERBOSE " - and  $tpips_version"
-$VERBOSE " - in $RUNDIR"
+$verb "parallel validation"
+$verb " - with $pips_version"
+$verb " - and  $tpips_version"
+$verb " - in $RUNDIR"
 
-$VERBOSE "creating initial locks"
+$verb "creating initial locks"
 
 touch $FAILED
 
 for h in `echo $VALHOSTS | tr ':' ' '`
 do
-  $DEBUG " | initial lock for $h"
+  $deb1 " | initial lock for $h"
   touch $WAITING.$h $RESULT.$h
 done
 
 #
 
-$VERBOSE "validating modules"
+$verb "validating modules"
 
 for m in $MODULES
 do
   h=`available_host`
-  $VERBOSE " - validate $m on $h at `date`"
+  $verb " - validate $m on $h at `date`"
   send_validate $m $h
 done
 
 #
 
-$VERBOSE "waiting for reports"
+$verb "waiting for reports"
 
 while available_host ; do : ; done > /dev/null
 
 #
 #
 
-$VERBOSE "generating final report at `date`"
+$verb "generating final report at `date`"
 
 failed=`tr '\012' '-' < $FAILED`
 
-$DEBUG2 " | failed 0: /$failed/"
+$deb2 " | failed 0: /$failed/"
 failed=`unstammer "$failed" '-'`
-$DEBUG " | failed : /$failed/"
+$deb1 " | failed : /$failed/"
 
 if [ "$failed" ]
 then
