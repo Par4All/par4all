@@ -29,8 +29,8 @@ static hash_table names_to_almost_everything_in_a_module = NULL;
 static int current_name_of_something = 1;
 #endif
 
-/* Just to keep the output file through the gen_recurse: */
-static FILE * local_output_file;
+/* To store the attachment before sorting: */
+list attachments_before_sorting = NIL;
 
 /* Declare the various mapping between the words and attachments: */
 GENERIC_LOCAL_FUNCTION(word_to_attachments_begin, word_to_attachments)
@@ -181,6 +181,17 @@ attach_to_word_list(string begin_word,
 }
 
 
+/* Attach something to all the words of the list given in argument: */
+static void
+attach_to_words(list l,
+		attachee a)
+{
+    attach_to_word_list(STRING(CAR(l)),
+			STRING(CAR(gen_last(l))),
+			a);
+}
+
+
 /* Attach something to a sentence list: */
 static void
 attach_to_sentence_list(sentence begin,
@@ -261,6 +272,50 @@ attach_reference_to_word_list(string begin_word,
 	attach_to_word_list(begin_word,
 			    end_word,
 			    make_attachee(is_attachee_reference, r));
+}
+
+
+/* Attach a declaration to all the words of the given list: */
+void
+attach_declaration_to_words(list l,
+			    entity e)
+{
+    if (is_emacs_pretty_print_asked)
+	attach_to_words(l,
+			make_attachee(is_attachee_declaration, e));
+}
+
+
+/* Attach a declaration type to all the words of the given list. No
+   need to use strdup(). May accept an empty list: */
+void
+attach_declaration_type_to_words(list l,
+				 string declaration_type)
+{
+    if (is_emacs_pretty_print_asked)
+	if (l != NIL)
+	    attach_to_words(l,
+			    make_attachee(is_attachee_type,
+					  strdup(declaration_type)));
+}
+
+
+/* Attach a declaration type with its size to all the words of the
+   given list. No need to use strdup(): */
+void
+attach_declaration_size_type_to_words(list l,
+				      string declaration_type,
+				      int size)
+{
+    if (is_emacs_pretty_print_asked) {
+	char * size_char = i2a(size);
+	attach_declaration_type_to_words(l,
+					 concatenate(declaration_type,
+						     "*",
+						     size_char,
+						     NIL));
+	free(size_char);
+    }
 }
 
 
@@ -366,8 +421,9 @@ deal_with_sentence_word_end(string a_word,
 
 
 /* Output an attachment to the output file: */
-static bool
-output_an_attachment(attachment a)
+static void
+output_an_attachment(const FILE * output_file,
+		     attachment a)
 {
     attachee at = attachment_attachee(a);
     int begin = attachment_begin(a);
@@ -380,7 +436,7 @@ output_an_attachment(attachment a)
 		begin != POSITION_UNDEFINED && end != POSITION_UNDEFINED);
 		
     /* Begin an Emacs Lisp properties: */
-    fprintf(local_output_file, "\n\t\t%d %d (", begin, end);
+    fprintf(output_file, "\n\t\t%d %d (", begin, end);
 
     switch(attachee_tag(at))
     {
@@ -390,26 +446,46 @@ output_an_attachment(attachment a)
 	    pips_debug(5, "\treference %#x\n", (unsigned int) r);
 	    /* Output the address as a string because Emacs cannot
                store 32-bit numbers: */
-	    fprintf(local_output_file, "face epips-face-reference epips-property-reference \"%#x\"",
-		    (unsigned int) r);
+	    fprintf(output_file, "face epips-face-reference mouse-face epips-mouse-face-reference local-map epips-reference-keymap epips-property-reference \"%#x\" epips-property-reference-variable \"%#x\"",
+		    (unsigned int) r, (unsigned int) reference_variable(r));
+	    break;
+	}
+	
+    case is_attachee_declaration:
+	{	    
+	    entity e = attachee_declaration(at);
+	    pips_debug(5, "\tdeclaration %#x\n", (unsigned int) e);
+	    /* Output the address as a string because Emacs cannot
+               store 32-bit numbers: */
+	    fprintf(output_file, "face epips-face-declaration epips-property-declaration \"%#x\"",
+		    (unsigned int) e);
+	    break;
+	}      
+	
+    case is_attachee_type: 
+	{	    
+	    string s = attachee_type(at);
+	    pips_debug(5, "\ttype \"%s\"\n", s);
+	    fprintf(output_file, "epips-property-type \"%s\"", s);
 	    break;
 	}
 	
     case is_attachee_loop: 
-	{	    
-	    loop l = attachee_loop(at);
-	    pips_debug(5, "\tloop %#x\n", (unsigned int) l);
-	    if (execution_parallel_p(loop_execution(l)))
-		fprintf(local_output_file, "face epips-face-parallel-loop epips-property-loop \"%#x\"",
-			(unsigned int) l);
-	    break;
-	}
+  	{	    
+ 	    loop l = attachee_loop(at);
+ 	    pips_debug(5, "\tloop %#x\n", (unsigned int) l);
+ 	    if (execution_parallel_p(loop_execution(l)))
+ 		fprintf(output_file, "face epips-face-parallel-loop ");
+	    fprintf(output_file, "epips-property-loop \"%#x\"",
+		    (unsigned int) l);
+  	    break;
+  	}
 	
     case is_attachee_module_head:
 	{
 	    entity head = attachee_module_head(at);
 	    pips_debug(5, "\tmodule_head %#x\n", (unsigned int) head);
-	    fprintf(local_output_file,
+	    fprintf(output_file,
 		    "face epips-face-module-head epips-module-head-name \"%s\"",
 		    module_local_name(head));
 	    break;
@@ -418,7 +494,7 @@ output_an_attachment(attachment a)
     case is_attachee_decoration:
 	{
 	    pips_debug(5, "\tdecoration\n");
-	    fprintf(local_output_file,
+	    fprintf(output_file,
 		    "invisible epips-invisible-decoration");
 	    break;
 	}
@@ -426,7 +502,7 @@ output_an_attachment(attachment a)
     case is_attachee_preconditions:
 	{
 	    pips_debug(5, "\tpreconditions\n");
-	    fprintf(local_output_file,
+	    fprintf(output_file,
 		    "face epips-face-preconditions invisible epips-invisible-preconditions");
 	    break;
 	}
@@ -434,7 +510,7 @@ output_an_attachment(attachment a)
     case is_attachee_transformers:
 	{
 	    pips_debug(5, "\ttransformers\n");
-	    fprintf(local_output_file,
+	    fprintf(output_file,
 		    "face epips-face-transformers invisible epips-invisible-transformers");
 	    break;
 	}
@@ -444,7 +520,70 @@ output_an_attachment(attachment a)
     }
 
     /* End an Emacs Lisp properties: */
-    fprintf(local_output_file, ")");
+    fprintf(output_file, ")");
+}
+
+
+/* The function used by qsort to compare 2 attachment structures: */
+static int
+compare_attachment_for_qsort(const void *xp,
+			     const void *yp)
+{
+    attachment x = *(attachment *) xp;
+    attachment y = *(attachment *) yp;
+
+    if (attachment_begin(x) != attachment_begin(y))
+	/* Sort according attachment x begins before y: */
+	return attachment_begin(x) - attachment_begin(y);
+
+    if (attachment_end(x) != attachment_end(y))
+	/* Sort according attachment x ends after y: */
+	return attachment_end(y) - attachment_begin(x);
+
+    /* If they have the same range, sort according to the type: */
+    return attachee_tag(attachment_attachee(x))
+	- attachee_tag(attachment_attachee(y));
+}
+
+
+/* Output the attachment in a sorted order with less precise property
+   first: */
+static void
+output_the_attachments_in_a_sorted_order(const FILE * output_file)
+{
+    attachment * as;
+    int i;
+    
+    int number_of_attachments = gen_length(attachments_before_sorting);
+    
+    as = (attachment *) malloc(number_of_attachments*sizeof(attachment));
+    i = 0;
+    MAP(ATTACHMENT, a, {
+	as[i++] = a;
+    }, attachments_before_sorting);
+
+    qsort((char *)as,
+	  number_of_attachments,
+	  sizeof(attachment),
+	  compare_attachment_for_qsort);
+
+    for(i = 0; i < number_of_attachments; i++) {
+	output_an_attachment(output_file, as[i]);
+    }
+
+    /* The attachments them self will be removed later: */
+    gen_free_list(attachments_before_sorting);
+    attachments_before_sorting = NIL;
+}
+
+
+/* Add the attachment to the intermediate list: */
+static bool
+put_an_attachment_in_the_list(attachment a)
+{
+    attachments_before_sorting = CONS(ATTACHMENT,
+				      a,
+				      attachments_before_sorting);
 
     /* We do not want to go on the recursion: */
     return FALSE;
@@ -470,20 +609,22 @@ init_output_the_attachments_for_emacs(FILE * output_file)
 /* Output the list of all the attachments found in the text file with
    Emacs Lisp syntax: */
 static void
-output_the_attachments_for_emacs(FILE * output_file)
+output_the_attachments_for_emacs(const FILE * output_file)
 {
     debug_on("ATTACHMENT_DEBUG_LEVEL");
 
-    local_output_file = output_file;
-    
     /* End the string part: */
-    fprintf(local_output_file, "\"");
+    fprintf(output_file, "\"");
 
     /* Enumerate all the attachments: */
     gen_recurse(get_word_to_attachments_begin(),
 		attachment_domain,
-		output_an_attachment,
+		put_an_attachment_in_the_list,
 		rewrite_an_attachment);
+
+    /* Now we try to output the stuff in a decent order: */
+    output_the_attachments_in_a_sorted_order(output_file);
+
     /* Just for fun, the previous gen_recurse will also recurse
        through the words of the mapping but it is not deep and thus it
        does not worth using a gen_multi_recurse with a string_domain
@@ -510,7 +651,7 @@ output_the_attachments_for_emacs(FILE * output_file)
 			    get_word_to_attachments_begin());
 
     /* End the property part: */
-    fprintf(local_output_file, "\n\t)\n)\n");
+    fprintf(output_file, "\n\t)\n)\n");
 
     debug_off();
 }
