@@ -4,7 +4,7 @@
 .\"
 .SH NAME
 epips \- Interprocedural Parallelizer of Scientific Programs, 
-Emacs interface.
+GNU-Emacs interface.
 .SH SYNOPSIS
 epips 
 .\"
@@ -18,10 +18,11 @@ parallelize real scientific codes for shared memory multi-processor
 machines, and to distribute automatically simple codes for processor networks.
 
 .B epips 
-is an Emacs-based window user interface of the PIPS project. All PIPS
+is an GNU-Emacs-based window user interface of the PIPS project. All PIPS
 functionalities are available through buttons and menus. Emacs display
 capabilities, extended with a PIPS interface written in Emacs-LISP, 
-are used to highlight relevant information.
+are used to highlight relevant information and to add hypertextual
+interaction.
 
 .B epips
 is a Shell script which launches 
@@ -29,7 +30,9 @@ is a Shell script which launches
 as main process and
 .B wpips
 as a sub-process. The log and display windows are Emacs windows
-instead of Textedit windows as for wpips, but the control panel still is
+instead of Textedit windows as for 
+.B wpips, 
+but the control panel still is
 an Xview object.
 
 .B epips
@@ -38,21 +41,40 @@ provides advanced display capabilities based on Emacs internal mechanisms. But i
 See
 .B wpips(1).
 
+An epips mode is also available for GNU-Emacs. Using this mode,
+.B epips
+can be launched from GNU-Emacs by 
+.B "M-X epips".
+
 .\"
 .SH EXAMPLE
+
+.B epips
+
+.B "M-X epips"
+
 .\"
 .SH ENVIRONMENT
 
-to use
+To use
 .B epips, 
 the PIPS root directory must be added to your command path and
-some PIPS-related Shell environment variables must be ser. Two
+some PIPS-related Shell environment variables must be set. Two
 shell scripts
 .B Pips/pipsrc.sh 
-for any sh compatible shell, e.g. ksh or
-bash, or 
+for any 
+.B sh 
+compatible shell, e.g. 
+.B ksh 
+or
+.B bash, 
+or 
 .B Pips/pipsrc.csh 
-for any csh compatible shell, e.g. tcsh, are provided to update your path 
+for any 
+.B csh 
+compatible shell, e.g. 
+.B tcsh, 
+are provided to update your path 
 and to set the necessary variables.
 
 .\"
@@ -91,11 +113,11 @@ On-line
 .B epips 
 html documentation is available:
 
-.B <http://www.cri.ensmp.fr/wpips_user_manual/wpips_user_manual/wpips_user_manual.html>. 
+.B <http://www.cri.ensmp.fr/pips/wpips-epips-user-manual/wpips-epips-user-manual.html>. 
 
 The entry point for the PIPS project is:
 
-.B <http://www.cri.ensmp.fr/~pips>.
+.B <http://www.cri.ensmp.fr/pips>.
 
 .\"
 .SH DIAGNOSTICS
