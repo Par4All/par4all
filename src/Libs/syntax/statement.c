@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.56  2003/06/05 09:23:03  irigoin
+ * MAXBLOCK redefined to accomodate higher levels of nesting due to IF/ELSEIF
+ * representation as nested IFs.
+ *
  * Revision 1.55  2001/07/20 11:33:14  irigoin
  * Upgrade of MakeAssignedOrComputedGotoInst() to cope with side effects in
  * selecting expression
@@ -241,10 +245,18 @@ from the stack when the corresponding end statement is encountered
 The block ending statements are ELSE, ENDIF,...
 
 There does not seem to be any limit on the nesting level in Fortran standard.
-MAXBLOCK is set to "large" value for our users.
+MAXBLOCK is set to "large" value for our users. The IF/THEN/ELSEIF construct is replaced by nested IF/ELSE statements which increases the nesting level observed by the source reader.
+
+Fabien Coelho suggests to refactor this part of the code with a Newgen stack automatically reallocated on overflow: 
+
+stack s = stack_make(statement_domain, 0, 0);
+stack_push(e, s);
+e = stack_pop(s);
+while (!stack_empty_p(s)) { ... }
+stack_free(s);
 */
 
-#define MAXBLOCK 100
+#define MAXBLOCK 200
 
 typedef struct block {
     instruction i; /* the instruction that contains this block */
