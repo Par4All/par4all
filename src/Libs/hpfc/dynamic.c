@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/12/26 11:14:21 $, )
+ * ($Date: 1996/12/26 11:41:14 $, )
  */
 
 #include "defines-local.h"
@@ -138,7 +138,13 @@ set_similar_mappings_for_updates(void)
 
     MAP(ENTITY, array,
     {
-	if (dynamic_entity_p(array) && bound_similar_mapping_p(array))
+	pips_debug(7, "considering array %s\n", entity_name(array));
+
+	/* ??? should not deal with the same array twice... 
+	 */
+	if (dynamic_entity_p(array) && 
+	    bound_similar_mapping_p(array) && 
+	    bound_new_node_p(array)) /* may be in another module */
 	{
 	    entity n = load_new_node(array);
 	    entity s = load_similar_mapping(array);
@@ -146,8 +152,10 @@ set_similar_mappings_for_updates(void)
 
 	    pips_debug(7, "array %s\n", entity_name(array));
 	    
-	    store_new_node_variable(ns, n);
-	    store_new_node_variable(ns, array);
+	    if (!bound_new_node_p(n)) {
+		store_new_node_variable(ns, n);
+		store_new_node_variable(ns, array);
+	    }
 	}
     },
         list_of_distributed_arrays());
