@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.1 2001/07/16 15:00:31 risset Exp $
+ * $Id: arithmetique.h,v 1.2 2002/06/20 14:40:26 loechner Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -33,7 +33,6 @@
 #ifdef GNUMP
 #include <gmp.h>
 #endif 
-
 
 /* 
    #        ####   #    #   ####           #        ####   #    #   ####
@@ -230,9 +229,11 @@ typedef int Value;
 #define LINEAR_VALUE_STRING "gmp"
 typedef mpz_t Value;
 #define VALUE_FMT "%s"
-#define VALUE_ZERO  0
-#define VALUE_ONE   1
-#define VALUE_MONE -1
+
+/* don't use these, use value_set_si instead ! */
+#undef VALUE_ZERO
+#undef VALUE_ONE
+#undef VALUE_MONE
 #define VALUE_TO_LONG(val) (mpz_get_si(val))
 #define VALUE_TO_INT(val) ((int)mpz_get_si(val))
 #define VALUE_TO_FLOAT(val) ((float)((int)mpz_get_si(val)))
@@ -253,13 +254,12 @@ typedef mpz_t Value;
 #define value_clear(val)       (mpz_clear((val)))
 #define value_read(val,str)    (mpz_set_str((val),(str),10))
 #define value_print(Dst,fmt,val)  {char *str; str = mpz_get_str(0,10,(val)); \
-                               fprintf((Dst),(fmt),str);\
+                               fprintf((Dst),(fmt),str); free(str); \
                               }
 #define value_swap(val1,val2)  {mpz_t tmp; mpz_init_set(tmp,(val1)); \
                                 mpz_set((val1),(val2)); mpz_set((val2),tmp); \
                                 mpz_clear(tmp); \
                                }
-
                                              
 /* Boolean operators on 'Value' */
 
@@ -314,7 +314,6 @@ typedef mpz_t Value;
 /* ************************************************************************* */
 
 #else /* 'Value' set to longlong|long|float|char *|int */                                     	
-
 /* Basic Macros */    				    
 
 #define value_init(val)            ((val) = 0)
@@ -322,7 +321,7 @@ typedef mpz_t Value;
 #define value_set_si(val,i)        ((val) = (Value)(i))   
 #define value_set_double(val,d)    ((val) = (Value)(d)) 
 #define value_clear(val)           ((val) = 0)
-#define value_read(val,str)        (sscanf((str),VALUE_FMT,&(val))) 
+#define value_read(val,str)        (sscanf((str),VALUE_FMT,&(val)))
 #define value_print(Dst,fmt,val)   (fprintf((Dst),(fmt),(val)))
 #define value_swap(v1,v2)          {Value tmp; tmp = v2; \
                                     v2 = v1; v1 = tmp;   \
@@ -609,7 +608,6 @@ extern void pop_exception_from_stack(int /*what*/, char * /*function*/, char * /
 extern void throw_exception(int /*what*/, char * /*function*/, char * /*file*/, int /*line*/);
 
 #endif /* arithmetique_header_included */
-
 
 
 
