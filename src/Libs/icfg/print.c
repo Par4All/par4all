@@ -69,10 +69,19 @@ string module_name;
 }
 
 bool print_icfg(string module_name)
-{return print_any_icfg(module_name,ICFG_DECOR_NONE);}
+{
+    return print_any_icfg(module_name,ICFG_DECOR_NONE);
+}
+
+bool print_icfg_with_complexities(string module_name)
+{
+    return print_any_icfg(module_name,ICFG_DECOR_COMPLEXITIES);
+}
 
 bool print_icfg_with_preconditions(string module_name)
-{return print_any_icfg(module_name,ICFG_DECOR_PRECONDITIONS);}
+{
+    return print_any_icfg(module_name,ICFG_DECOR_PRECONDITIONS);
+}
 
 bool print_icfg_with_transformers(string module_name)
 {
@@ -98,19 +107,34 @@ bool print_icfg_with_in_regions(string module_name)
 bool print_icfg_with_out_regions(string module_name)
 { return print_any_icfg(module_name,ICFG_DECOR_OUT_REGIONS);}
 
-/* ICFGs with loops */
+/*
+ * ICFGs with loops
+ */
 
 bool print_icfg_with_loops(string module_name)
-{ return print_any_icfg_with_loops(module_name,ICFG_DECOR_NONE);}
+{
+    return print_any_icfg_with_loops(module_name,ICFG_DECOR_NONE);
+}
+
+bool print_icfg_with_loops_complexities(string module_name)
+{
+    return print_any_icfg_with_loops(module_name,ICFG_DECOR_COMPLEXITIES);
+}
 
 bool print_icfg_with_loops_preconditions(string module_name)
-{ return print_any_icfg_with_loops(module_name,ICFG_DECOR_PRECONDITIONS);}
+{
+    return print_any_icfg_with_loops(module_name,ICFG_DECOR_PRECONDITIONS);
+}
 
 bool print_icfg_with_loops_transformers(string module_name)
-{ return print_any_icfg_with_loops(module_name,ICFG_DECOR_TRANSFORMERS);}
+{
+ return print_any_icfg_with_loops(module_name,ICFG_DECOR_TRANSFORMERS);
+}
 
 bool print_icfg_with_loops_proper_effects(string module_name)
-{ return print_any_icfg_with_loops(module_name,ICFG_DECOR_PROPER_EFFECTS);}
+{
+    return print_any_icfg_with_loops(module_name,ICFG_DECOR_PROPER_EFFECTS);
+}
 
 bool print_icfg_with_loops_cumulated_effects(string module_name)
 { return print_any_icfg_with_loops(module_name,ICFG_DECOR_CUMULATED_EFFECTS);}
@@ -124,13 +148,24 @@ bool print_icfg_with_loops_in_regions(string module_name)
 bool print_icfg_with_loops_out_regions(string module_name)
 { return print_any_icfg_with_loops(module_name,ICFG_DECOR_OUT_REGIONS);}
 
-/* ICFGs with controls */
+/* 
+ * ICFGs with controls
+ */
 
 bool print_icfg_with_control(string module_name)
-{ return print_any_icfg_with_control(module_name,ICFG_DECOR_NONE);}
+{
+    return print_any_icfg_with_control(module_name,ICFG_DECOR_NONE);
+}
+
+bool print_icfg_with_control_complexities(string module_name)
+{
+    return print_any_icfg_with_control(module_name,ICFG_DECOR_COMPLEXITIES);
+}
 
 bool print_icfg_with_control_preconditions(string module_name)
-{ return print_any_icfg_with_control(module_name,ICFG_DECOR_PRECONDITIONS);}
+{
+    return print_any_icfg_with_control(module_name,ICFG_DECOR_PRECONDITIONS);
+}
 
 bool print_icfg_with_control_transformers(string module_name)
 { return print_any_icfg_with_control(module_name,ICFG_DECOR_TRANSFORMERS);}
