@@ -142,15 +142,15 @@ bool give_code_p;
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     mod = get_current_module_entity();
 
-    set_current_module_statement( (statement)
+    set_current_module_statement((statement)
 				 db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     mod_stat = get_current_module_statement();
+
+    debug_on("SEMANTICS_DEBUG_LEVEL");
 
     if(is_user_view) {
 	user_stat =  (statement)
 	    db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
-
-	debug_on("SEMANTICS_DEBUG_LEVEL");
 
 	nts = allocate_number_to_statement();
 	nts = build_number_to_statement(nts, mod_stat);
@@ -188,8 +188,6 @@ bool give_code_p;
     }
 
     init_prettyprint(semantic_to_text);
-
-    debug_on("SEMANTICS_DEBUG_LEVEL");
 
     /* initial version; to be used again when prettyprint really prettyprints*/
     /* print_text(fd, text_statement(mod, 0, mod_stat)); */
