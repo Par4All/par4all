@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/31 11:15:20 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/09/04 10:50:06 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -78,7 +78,7 @@ cd_dirname=`dirname $current_directory`
 [ "${DIRTYPE}" ] || DIRTYPE=`basename $cd_dirname`
 [ "${DIRSIDE}" ] || 
 {
-  if expr $cd_dirname : '*/Development/*' > /dev/null
+  if [ "`echo $cd_dirname | sed 's,^.*/Production/.*$,,'`" ]
   then
     DIRSIDE="$PIPS_DEVEDIR" 
   else
@@ -139,9 +139,11 @@ do
 #	---------------------------------------------------------------
 #	---------------------------------------------------------------
 #
-#				    Warning
+#				    WARNING
 #
 #		  This makefile has been automatically generated
+#
+#                        ($RCSfile: pips-makemake,v $ version $Revision$)
 #
 #			       Do not modify it
 #
