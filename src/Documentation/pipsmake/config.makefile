@@ -53,7 +53,7 @@ resources.h: pipsmake.rc
 	# building $@
 	# 
 	sed '/>/!d;s/^.*MODULE\.//;s/^.*PROGRAM\.//;\
-		s/^.*CALLERS\.//;s/^.*ALL\.//;s/^.*MAIN\.//;' $< | \
+		s/^.*CALLERS\.//;s/^.*ALL\.//;s/^.*MAIN\.//;s/^.*COMPILATION_UNIT\.//;' $< | \
 	tr '[a-z]' '[A-Z]' | sort -u | sed 's/.*/#define DBR_& "&"/' | \
 	cat $(AUTO).h - > $@
 
