@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.94  1997/11/04 12:46:09  coelho
+ * unused function dropped.
+ *
  * Revision 1.93  1997/11/03 14:27:38  coelho
  * debug on/off prettyprint debug level.
  *
@@ -100,7 +103,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.93 1997/11/03 14:27:38 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.94 1997/11/04 12:46:09 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -260,12 +263,6 @@ words_reference(reference obj)
 				  obj);
 
     return(pc);
-}
-
-static list 
-words_label_name(string s)
-{
-    return(CHAIN_SWORD(NIL, local_name(s)+strlen(LABEL_PREFIX))) ;
 }
 
 list 
