@@ -12,6 +12,8 @@
 #define CONTROL_DATA_COMMON_NAME "CONTROL_DATA"
 #define FUNCTION_COMMON_NAME "%s_COMMON"
 #define COMMON_PARAM_NAME "%s_%s"
+#define DYN_VAR_PARAM_NAME "%s_DV_PARAM"
+#define REF_VAR_PARAM_NAME "%s_REF_PARAM"
 #define UNITS_NB_NAME "UNITS_NB"
 #define UNIT_ID_NAME "UNIT%d"
 #define FUNCTIONS_NB_NAME "FUNCTIONS_NB"
@@ -108,8 +110,7 @@ entity make_start_ru_module (hash_table ht_params,
  * Build and store new module WAIT_RU.
  * Create statement module_statement
  */
-entity make_wait_ru_module (hash_table ht_params, 
-			    statement* module_statement, 
+entity make_wait_ru_module (statement* module_statement, 
 			    int number_of_deployment_units,
 			    entity global_common,
 			    list l_commons);
@@ -165,6 +166,14 @@ list make_receive_array_params_modules (entity function,
 					entity global_common,
 					entity externalized_fonction_common,
 					int number_of_deployment_units);
+
+/**
+ * Creates a private variable in specified module
+ */
+entity create_private_variable_for_new_module (entity a_variable,
+					       string new_name, 
+					       string new_module_name,
+					       entity module);
 
 /**
  * Create new variable parameter for a newly created module
@@ -225,5 +234,34 @@ string get_in_param_id_name (entity variable, entity function);
  * Return OUT_PARAM_ID_NAME
  */
 string get_out_param_id_name (entity variable, entity function);
+
+/**
+ * Replaces all the references to entity pointed by old by references 
+ * created with new_variable.
+ * Update loop indexes by replacing index entity by new entity
+ */
+void replace_entity (statement stat, entity old, entity new_variable);
+
+ /**
+ * Replaces all the references to reference pointed by ref by references 
+ * created with new_variable.
+ * Update loop indexes by replacing index entity by new entity
+ */
+void replace_reference (statement stat, reference ref, entity new_variable);
+
+/**
+ * Build and return parameters (PHI1,PHI2) and dynamic variables for
+ * region reg.  
+ * NOT IMPLEMENTED: suppress unused dynamic variables !!!!
+ */
+void compute_region_variables (region reg,
+			       list* l_reg_params,
+			       list* l_reg_variables);
+
+/**
+ * Creates all the things that need to be created in order to declare common
+ * in module (all the variable are created)
+ */
+void declare_common_variables_in_module (entity common, entity module);
 
 #endif
