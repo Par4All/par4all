@@ -3,7 +3,6 @@
  * 
  */
 #include <stdio.h>
-extern int fprintf();
 #include <string.h>
 #include <ctype.h>
 
@@ -11,7 +10,6 @@ extern int fprintf();
 #include "ri.h"
 
 #include "ri-util.h"
-
 #include "misc.h"
 
 extern value EvalExpression();
