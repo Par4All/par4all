@@ -351,8 +351,6 @@ cons *n1, *n2;
     return(cl);
 }
 
-
-
 entity MakeLoopCounter()
 {
     entity e;
@@ -367,7 +365,7 @@ entity MakeLoopCounter()
 			lcn, (char*) NULL);
 
 	if ((e = gen_find_tabulated(s, entity_domain)) == entity_undefined) {
-	    debug(8, "MakeLoopCounter", "loop counter is %s\n", s);
+	    pips_debug(8, "loop counter is %s\n", s);
 	    return(make_entity(strdup(s), type_undefined, 
 			    storage_undefined, value_undefined));
 	}
@@ -376,7 +374,7 @@ entity MakeLoopCounter()
 	    break;
     }
 
-    pips_error("MakeLoopCounter", "too many loop counters");
+    pips_internal_error("too many loop counters");
     return(entity_undefined);
 }
 
