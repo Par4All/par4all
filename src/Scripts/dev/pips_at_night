@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/08/08 20:16:54 $, )
+# ($Date: 1996/08/09 11:38:46 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -24,6 +24,7 @@ test -x $mail || mail=mail
 
 arch=.
 user=`whoami`
+host=`hostname`
 email=${REPLYTO:-$user}
 script=`basename $0`
 verbose=:
@@ -118,8 +119,7 @@ shift `expr $OPTIND - 1`
 # Do the job and send reports
 
 {
-    $verbose Starting $script for $email 
-    $verbose date: `date`
+    $verbose "Starting $script for $email on $host (`date`)"
     
     #
     # CLEANING
@@ -127,8 +127,7 @@ shift `expr $OPTIND - 1`
     test "$no_cleaning" && {
 	$verbose Skipping Cleaning
     } || {
-	$verbose Cleaning pips
-	$verbose date: `date`
+	$verbose "Cleaning pips (`date`)"
 
 	$verbose - Deleting old workspaces...
 	find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +7 -print | 
@@ -154,8 +153,7 @@ shift `expr $OPTIND - 1`
     test "$no_newgen" && {
 	$verbose Skipping Newgen compilation
     } || {
-	$verbose Compiling Newgen/Production
-	$verbose date: `date`
+	$verbose "Compiling Newgen/Production (`date`)"
 	msg="${msg}N"
 	MAKE n newgen $report "clean-compiled recompile" $arch
     }
@@ -164,8 +162,7 @@ shift `expr $OPTIND - 1`
     test "$no_linear" && {
 	$verbose Skipping Linear compilation
     } || {
-	$verbose Compiling Linear/Production
-	$verbose date: `date`
+	$verbose "Compiling Linear/Production (`date`)"
 	msg="${msg}L"
 	MAKE l linear $report "clean-compiled recompile" $arch
     }
@@ -174,8 +171,7 @@ shift `expr $OPTIND - 1`
     test "$no_pips" && {
 	$verbose Skipping Pips compilation
     } || {
-	$verbose Compiling Pips/Production
-	$verbose date: `date`
+	$verbose "Compiling Pips/Production (`date`)"
 	msg="${msg}P"
 	MAKE p pips $report "clean-compiled recompile" $arch
     }
@@ -183,8 +179,7 @@ shift `expr $OPTIND - 1`
     # 4: SUMMARY
     test "$no_newgen$no_linear$no_pips" = '111' ||
     {
-	$verbose Generating recompile summary
-	$verbose date: `date`
+	$verbose "Generating recompile summary (`date`)"
 	summary=SUCCEEDED
 	grep 'failed$' $report > $report.failed && summary=FAILED
 	$mail -s "$script: compile ${msg} ($arch): ${summary}" $email \
@@ -198,13 +193,11 @@ shift `expr $OPTIND - 1`
     test "$no_validation" && {
 	$verbose Skipping Pips validation
     } || {
-	$verbose Validating PIPS
-	$verbose date: `date` 
+	$verbose "Validating PIPS (`date`)"
 	Validate -vti 50 -a ${email}
     }
 
-    $verbose Ending $script for $email 
-    $verbose date: `date`
+    $verbose "Ending $script for $email on $host (`date`)"
 } 2>&1 | $mail -s "$script: report" ${email}
 
 # That is all!
