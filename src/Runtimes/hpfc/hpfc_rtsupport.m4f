@@ -3,7 +3,7 @@ c Runtime Support Functions for the High Performance Fortran Compiler
 c by Fabien COELHO.
 c
 c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-c ($Date: 1996/06/08 15:01:16 $, )
+c ($Date: 1996/06/11 20:10:43 $, )
 c
 c-----------------
 c
@@ -1066,7 +1066,7 @@ _direct(`'
       if (nhost.ge.NBOFTASKS) then
          call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
       else
-         write (unit=0,fmt=*)
+         if (HOSTTID.eq.MYTID) write (unit=0,fmt=*)
      $        "Warning: no direct route (not enough processors)..."
       endif
       end
