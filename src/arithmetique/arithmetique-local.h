@@ -8,8 +8,16 @@
  *  - simplification de POSITIVE_DIVIDE par suppression d'un modulo
  */
 
-#ifndef ARITHMETIQUE_PACKAGE
-#define ARITHMETIQUE_PACKAGE
+/* We would like linear to be generic about the "integer" type used
+ * to represent integer values. Thus Value is defined here. It should
+ * be changed to "int" "long" or "long long". In an ideal world,
+ * any source modification should be limited to this package.
+ */
+#ifdef LONGLONG_VALUE
+typedef long long Value;
+#else
+typedef long Value;
+#endif
 
 /* valeur absolue */
 #ifndef ABS
@@ -64,8 +72,8 @@
 
 #define modulo(a,b) MODULO(a,b)
 
-typedef struct fract{long num, den, numero ; } frac ;
-
+typedef struct fract{Value num, den; int numero ; } frac ;
 typedef struct col{int taille, existe ; frac *colonne ;} tableau ;
 
-#endif /* ARITHMETIQUE_PACKAGE */
+/* end of $RCSfile: arithmetique-local.h,v $
+ */
