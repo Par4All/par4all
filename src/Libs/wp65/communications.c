@@ -7,25 +7,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "boolean.h"
-#include "arithmetique.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "polyedre.h"
-#include "sg.h"
-
 #include "genC.h"
 
 #include "linear.h"
 #include "ri.h"
-#include "graph.h"
+
+#include "matrice.h"
 #include "tiling.h"
 #include "database.h"
 #include "text.h"
+
 #include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
 
 #include "misc.h"
 #include "rice.h"
