@@ -2,7 +2,7 @@
 #! /bin/sh -vx
 #
 # SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1994/11/18 11:47:08 $, )
+# $RCSfile: make-pips,v $ ($Date: 1995/08/09 13:17:04 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -82,20 +82,20 @@ if [ -n "$PRODUCTION" ]
 then
 for lib in $LIBS ; do
 	echo; echo
-	(echo cd ${LIBSRCDIR}/${lib} ; cd ${LIBSRCDIR}/${lib}; 
-		echo "Making ${LIBDIR}/lib${lib}.a"
+	(echo cd ${PIPS_LIBSRCDIR}/${lib} ; cd ${PIPS_LIBSRCDIR}/${lib}; 
+		echo "Making ${PIPS_LIBDIR}/lib${lib}.a"
 		if [ -n "$RECOMPILE" ]
 		then
 			make $MAKE_OPTION clean >/dev/null
 			make $MAKE_OPTION production-depend >/dev/null
 		fi ;
-		make $MAKE_OPTION ${LIBDIR}/lib${lib}.a >/dev/null)
+		make $MAKE_OPTION ${PIPS_LIBDIR}/lib${lib}.a >/dev/null)
 	if [ $? -ne 0 ] ; then
 		echo "Failed in building library $lib in Production"
 		FAILURES="$FAILURES $lib (P),"
 #	else
-#	(echo cd ${LIBSRCDIR}/${lib} ; cd ${LIBSRCDIR}/${lib}; 
-#		echo "Quick-installing ${LIBDIR}/lib${lib}.a"
+#	(echo cd ${PIPS_LIBSRCDIR}/${lib} ; cd ${PIPS_LIBSRCDIR}/${lib}; 
+#		echo "Quick-installing ${PIPS_LIBDIR}/lib${lib}.a"
 #		make $MAKE_OPTION quick-install)
 	fi
 done
@@ -106,7 +106,7 @@ if [ -n "$DEVELOPMENT" ]
 then
 for lib in $LIBS ; do
 	echo; echo
-	(echo cd ${DEVEDIR}/Lib/${lib}; cd ${DEVEDIR}/Lib/${lib}; 
+	(echo cd ${PIPS_DEVEDIR}/Lib/${lib}; cd ${PIPS_DEVEDIR}/Lib/${lib}; 
 		echo "Making lib${lib}.a"
 		make $MAKE_OPTION lib${lib}.a >/dev/null)
 	if [ $? -ne 0 ] ; then
@@ -129,23 +129,23 @@ fi
 # build passes
 if [ -n "$PRODUCTION" ]
 then
-	if test ! -d ${BINDIR}
+	if test ! -d ${PIPS_BINDIR}
 	then
-		mkdir ${BINDIR}
+		mkdir ${PIPS_BINDIR}
 	fi
 for pass in $PASSES ; do
 	echo; echo
 #	printenv
-	(echo cd ${BINSRCDIR}/${pass}; cd ${BINSRCDIR}/${pass}; 
-		echo "Making ${BINDIR}/${pass}"
+	(echo cd ${PIPS_BINSRCDIR}/${pass}; cd ${PIPS_BINSRCDIR}/${pass}; 
+		echo "Making ${PIPS_BINDIR}/${pass}"
 		if [ -n "$RECOMPILE" ]
 		then
 			make $MAKE_OPTION clean >/dev/null
 			make $MAKE_OPTION production-depend >/dev/null
 		fi ;
-		make $MAKE_OPTION ${BINDIR}/${pass} >/dev/null)
+		make $MAKE_OPTION ${PIPS_BINDIR}/${pass} >/dev/null)
 	if [ $? -ne 0 ] ; then
-		echo " Failed in building ${BINDIR}/${pass}"
+		echo " Failed in building ${PIPS_BINDIR}/${pass}"
 		FAILURES="$FAILURES $pass (P),"
 #	else
 #	(echo cd ${BINSRCDIR}/${pass} ; cd ${BINSRCDIR}/${pass}; 
@@ -160,7 +160,7 @@ if [ -n "$DEVELOPMENT" ]
 then
 for pass in $PASSES ; do
 	echo; echo
-	(echo cd ${DEVEDIR}/Passes/${pass} ; cd ${DEVEDIR}/Passes/${pass};
+	(echo cd ${PIPS_DEVEDIR}/Passes/${pass} ; cd ${PIPS_DEVEDIR}/Passes/${pass};
 		echo "Making ${pass}"
 		make $MAKE_OPTION ${pass} >/dev/null)
 	if [ $? -ne 0 ] ; then
