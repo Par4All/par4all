@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.10  1997/09/11 13:42:10  coelho
+ * check consistency...
+ *
  * Revision 1.9  1997/09/11 12:34:16  coelho
  * duplicates instead of relying on pipsmake/pipsdbm...
  *
@@ -101,6 +104,10 @@ initial_precondition(string name)
 
     t = all_data_to_precondition(module);
 
+    ifdebug(1) 
+	pips_assert("consistent initial precondition", 
+		    transformer_consistency_p(t));
+
     DB_PUT_MEMORY_RESOURCE(DBR_INITIAL_PRECONDITION, strdup(name), (char*) t);
 
     reset_current_module_entity();
@@ -180,6 +187,10 @@ program_precondition(string name)
     }
 
     pred_debug(1, "resulting program precondition:\n", t);
+
+    ifdebug(1) 
+	pips_assert("consistent program precondition", 
+		    transformer_consistency_p(t));
 
     DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_PRECONDITION, strdup(name), t);
 
