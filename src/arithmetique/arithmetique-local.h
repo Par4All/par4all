@@ -22,6 +22,10 @@
  * Fabien COELHO
  */
 
+/* for FILE *
+ */
+#include <stdio.h>
+
 /* to be included for _MIN and _MAX: #include <limits.h>
  */
 #include <limits.h>
@@ -247,22 +251,22 @@ typedef int Value;
 
 /* assigments
  */
-#define value_assign(ref,val) 		ref=(val)
-#define value_addto(ref,val) 		ref+=(val)
-#define value_increment(ref) 		ref++
-#define value_direct_product(ref,val)	ref*=(val) /* direct! */
+#define value_assign(ref,val) 		(ref=(val))
+#define value_addto(ref,val) 		(ref+=(val))
+#define value_increment(ref) 		(ref++)
+#define value_direct_product(ref,val)	(ref*=(val)) /* direct! */
 #define value_multiply(ref,val)		value_assign(ref,value_mult(ref,val))
-#define value_substract(ref,val) 		ref-=(val)
-#define value_decrement(ref) 		ref--
-#define value_division(ref,val) 		ref/=(val)
-#define value_modulus(ref,val) 		ref%=(val)
-#define value_pdivision(ref,val)		value_assign(ref,value_pdiv(ref,val))
-#define value_oppose(ref) 			value_assign(ref,value_uminus(ref))
-#define value_absolute(ref)			value_assign(ref,value_abs(ref))
+#define value_substract(ref,val) 	(ref-=(val))
+#define value_decrement(ref) 		(ref--)
+#define value_division(ref,val) 	(ref/=(val))
+#define value_modulus(ref,val) 		(ref%=(val))
+#define value_pdivision(ref,val)	value_assign(ref,value_pdiv(ref,val))
+#define value_oppose(ref) 		value_assign(ref,value_uminus(ref))
+#define value_absolute(ref)		value_assign(ref,value_abs(ref))
 #define value_minimum(ref,val)		value_assign(ref,value_min(ref,val))
 #define value_maximum(ref,val)		value_assign(ref,value_max(ref,val))
-#define value_orto(ref,val)			ref |= (val)
-#define value_andto(ref,val)		ref &= (val)
+#define value_orto(ref,val)		(ref |= (val))
+#define value_andto(ref,val)		(ref &= (val))
 
 /* unary operators on values
  */
