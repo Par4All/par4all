@@ -1,5 +1,8 @@
 /* $Id$
    $Log: clex.l,v $
+   Revision 1.4  2003/08/13 08:00:33  nguyen
+   Correct the regular expressions for floating number, ...
+
    Revision 1.3  2003/08/06 14:12:44  nguyen
    Correct pragma comment
 
@@ -94,9 +97,9 @@ hexprefix (0[xX])
 intnum ({decdigit}+{intsuffix}?)
 octnum (0{octdigit}+{intsuffix}?)
 hexnum ({hexprefix}{hexdigit}+{intsuffix}?)
-exponent ([eE]["+""-"]?{decdigit}+)
-fraction ("."{decdigit}+)
-decfloat (({intnum}?{fraction})|({intnum}{exponent})|({intnum}?{fraction}{exponent})|({intnum}'.')|({intnum}'.'{exponent})) 
+exponent ([eE][\+\-]?{decdigit}+)
+fraction (\.{decdigit}+)
+decfloat (({intnum}?{fraction})|({intnum}{exponent})|({intnum}?{fraction}{exponent})|({intnum}\.)|({intnum}\.{exponent})) 
 hexfraction (({hexdigit}*"."{hexdigit}+)|({hexdigit}+))
 binexponent ([pP]["+""-"]?{decdigit}+)
 hexfloat (({hexprefix}{hexfraction}{binexponent})|({hexprefix}{hexdigit}+{binexponent}))
@@ -104,16 +107,16 @@ floatsuffix [fFlL]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
 ident ({letter}|"_")({letter}|{decdigit}|"_")* 
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
-blank [ \t\012\r]+
+blank [ \t\r]+
 escape ('\\'_)
 hex_escape ('\\'[xX]{hexdigit}+)
 oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?) 
 
 %%
-"/*"([^\*]|(\*+[^\/]))*"*/"	{ 
+"/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{ 
                                 pips_debug(5,"Comment %s\n",yytext);
                         }
-"//".*\n                { 
+"//"[^\n]*              { 
                                 pips_debug(5,"Comment %s\n",yytext);
                         }
 ^"#"[^\n]*              { 
