@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1997/01/14 16:53:53 $, 
+# $Date: 1997/01/18 16:58:01 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -146,7 +146,7 @@ done
 # special file that contains FC special fake subroutines...
 #
 
-FAKES="`egrep '^[Cc!\*][Ff][Cc][Dd]\\\$ [ 	]*([Ss][Yy][Nn][Cc][Hh][Rr][Oo]|[Tt][Ii][Mm][Ee]|[Hh][Oo][Ss][Tt]|[Kk][Ii][Ll][Ll])' $HPFFILES`"
+FAKES="`egrep '^[Cc!\*][Ff][Cc][Dd]\\\$ [ 	]*([Ss][Yy][Nn][Cc][Hh][Rr][Oo]|[Tt][Ii][Mm][Ee]|[Hh][Oo][Ss][Tt]|[Kk][Ii][Ll][Ll]|[Tt][Ee][Ll][Ll])' $HPFFILES`"
 
 dir=${HPFC_RUNTIME:-${PIPS_ROOT}/Share}
 
