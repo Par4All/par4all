@@ -690,14 +690,16 @@ void CheckParenthesis()
 	for (i=0; i < lStmt; i++)
 	    (void) putc((char) Stmt[i], stderr);
 	/* Warning("CheckParenthesis", */
-	pips_error("CheckParenthesis",
-		   "unbalanced paranthesis (too many ')')\n");
+	ParserError("CheckParenthesis",
+		    "unbalanced paranthesis (too many ')')\n"
+		    "Due to line truncation at column 72?\n");
     }
     if(parenthese > 0) {
 	for (i=0; i < lStmt; i++)
 	    (void) putc((char) Stmt[i], stderr);
-	pips_error("CheckParenthesis",
-		   "unbalanced paranthesis (too many '(')\n");
+	ParserError("CheckParenthesis",
+		    "unbalanced paranthesis (too many '(')\n"
+		    "Due to line truncation at column 72?\n");
     }
 }
 
