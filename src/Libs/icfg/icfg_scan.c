@@ -80,6 +80,15 @@ static list /* of entity */ list_vars_to_filter = NIL;
 static list /* of vertex */ verlist = NIL; /* to make graph daVinci */
 static vertex current_vertex = NULL; /* caller */
 
+static text safe_statement_to_text(statement s)
+{
+    text t;
+    set_current_module_statement(s);
+    t = statement_to_text(s);
+    reset_current_module_statement();
+    return t;
+}
+
 /* STATEMENT
  */
 static bool statement_flt(statement s)
@@ -104,6 +113,10 @@ static bool statement_flt(statement s)
 	if (l_effs_flt != NIL) {
 	    instruction i = statement_instruction(s);
 
+	    /* do not display comments in the decoration */
+	    if (!string_undefined_p(statement_comments(s)))
+	        statement_comments(s)[0] = NULL;
+
 	    if (instruction_call_p(i)) {
 	        call callee = instruction_call(i);
 		entity e_callee = call_function(callee);
@@ -111,17 +124,11 @@ static bool statement_flt(statement s)
 		/* the real function is processed in call_flt */
 		if (!value_code_p(entity_initial(e_callee))) {
 		    MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
-		    /* do not display comments in the decoration */
-		    if (!string_undefined_p(statement_comments(s)))
-		        statement_comments(s)[0] = NULL;
-		    MERGE_TEXTS(t, text_statement(entity_undefined, 0, s));
+		    MERGE_TEXTS(t, safe_statement_to_text(s));
 		}
 	    } else {
 	        MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
-		/* do not display comments in the decoration */
-		if (!string_undefined_p(statement_comments(s)))
-		    statement_comments(s)[0] = NULL;
-		MERGE_TEXTS(t, text_statement(entity_undefined, 0, s));
+		MERGE_TEXTS(t, safe_statement_to_text(s));
 	    }
 	}
     }
@@ -153,34 +160,24 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
         list_vars_to_filter = get_list_of_variable_to_filter();
     l_effs_flt = effects_filter(l_effs, list_vars_to_filter);
     
-    /* make the caller as the current module entity */
-    set_current_module_entity(e_caller);
-
     if (l_effs_flt != NIL) {
-
-        if (get_int_property(RW_FILTERED_EFFECTS) < READ_END) {//print the effects before all procedures
-	  
+        
+        if (get_int_property(RW_FILTERED_EFFECTS) < READ_END) {
+	    //print the effects before all procedures
 	    MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
-	    /* do not display comments in the decoration */
-	    if (!string_undefined_p(statement_comments(current_stmt_head())))
-	        statement_comments(current_stmt_head())[0] = NULL;
-	    MERGE_TEXTS(t, text_statement(e_caller, 0, current_stmt_head()));
-	    
-	} else { //print the effects before only the last procedure
-      
+	    MERGE_TEXTS(t, safe_statement_to_text(current_stmt_head()));
+	} else {
+	    //print the effects before only the last procedure
 	    MAP(EXPRESSION, exp, {
 	        syntax syn = expression_syntax(exp);
-	    
+
 		if (syntax_reference_p(syn)) {
 		    entity var = reference_variable(syntax_reference(syn));
-		
+
 		    MAP(ENTITY, e, {
 		        if (entity_conflict_p(e, var)) {
 			    MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
-			    /* do not display comments in the decoration */
-			    if (!string_undefined_p(statement_comments(current_stmt_head())))
-			        statement_comments(current_stmt_head())[0] = NULL;
-			    MERGE_TEXTS(t, text_statement(e_caller, 0, current_stmt_head()));
+			    MERGE_TEXTS(t, safe_statement_to_text(current_stmt_head()));
 			    break;
 			}
 		    }, list_vars_to_filter);
@@ -188,9 +185,6 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
 	    }, call_arguments(c));
 	}
     }
-
-    /* release the current module entity */
-    reset_current_module_entity();
 
     return t;
 }
@@ -216,7 +210,8 @@ static void call_flt(call c)
 	if (ver_child != vertex_undefined)
 	    verlist = safe_make_successor(current_vertex, ver_child, verlist);
 
-	reset_current_module_entity();
+	if (get_int_property(ICFG_DECOR) != ICFG_DECOR_FILTERED_PROPER_EFFECTS)
+	    reset_current_module_entity();
 
 	switch (get_int_property (ICFG_DECOR)) {
 	case ICFG_DECOR_NONE:
@@ -230,7 +225,7 @@ static void call_flt(call c)
 	case ICFG_DECOR_PRECONDITIONS:
 	    MERGE_TEXTS(r, call_site_to_module_precondition_text
 			(e_caller, e_callee, current_stmt_head(), c));
-	    break;
+ 	    break;
 	case ICFG_DECOR_PROPER_EFFECTS:
 	    MERGE_TEXTS(r,get_text_proper_effects(callee_name));
 	    break;
@@ -255,7 +250,8 @@ static void call_flt(call c)
 		       callee_name);
 	}
 	/* retrieve the caller entity */
-	set_current_module_entity(e_caller);
+	if (get_int_property(ICFG_DECOR) != ICFG_DECOR_FILTERED_PROPER_EFFECTS)
+	    set_current_module_entity(e_caller);
 	/* append the callee' icfg */
 	/*append_icfg_file (r, callee_name);*/
 	append_marged_text(r, current_margin, CALL_MARK, callee_name);
