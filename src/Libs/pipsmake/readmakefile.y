@@ -371,7 +371,7 @@ makefile open_makefile(string name)
 /**** Begin saved_makefile version ****/
 bool close_makefile(string name)
 {
-    bool status;
+    bool status = TRUE;
     FILE *fd;
 
     fd = safe_fopen(build_pgm_makefile(name), "w");
