@@ -1,36 +1,14 @@
-/*
- * Message Utilities
+/* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1995/03/23 16:54:33 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1995/04/10 18:49:37 $, )
  * version $Revision$
- * got on %D%, %T%
  *
  * Fabien Coelho, August 1993
  */
 
-/*
- * included files, from C libraries, newgen and pips libraries.
- */
-
-#include <stdio.h>
-#include <string.h>
-
-extern int      fprintf();
-
-#include "genC.h"
-
-#include "ri.h"
-#include "hpf.h"
-#include "hpf_private.h"
-#include "message.h"
-
-#include "misc.h"
-#include "ri-util.h"
-#include "hpfc.h"
 #include "defines-local.h"
 
-/*
- * Pvecteur the_index_of_vect(v0)
+/* Pvecteur the_index_of_vect(v0)
  *
  * returns the index of an affine vector
  */
@@ -52,8 +30,7 @@ Pvecteur v0;
     return(v4);
 }
 
-/*
- * list add_to_list_of_ranges_list(l, r)
+/* list add_to_list_of_ranges_list(l, r)
  */
 list add_to_list_of_ranges_list(l, r)
 list l;
@@ -77,8 +54,7 @@ range r;
     return(l);
 }
 
-/*
- * list dup_list_of_ranges_list(l)
+/* list dup_list_of_ranges_list(l)
  *
  * ??? the complexity of this function could be greatly improved
  */
@@ -115,8 +91,7 @@ list l;
     return(result);
 }
 
-/*
- * list dup_list_of_Pvecteur(l)
+/* list dup_list_of_Pvecteur(l)
  *
  * ??? the complexity of this function could be improved greatly...
  */
@@ -138,8 +113,7 @@ list l;
     return(result);
 }
 
-/*
- * list add_elem_to_list_of_Pvecteur(l, var, val)
+/* list add_elem_to_list_of_Pvecteur(l, var, val)
  *
  * caution, is initial list is destroied.
  */
@@ -178,8 +152,7 @@ int var, val;
 }
     
 
-/*
- * range complementary_range(array, dim, r)
+/* range complementary_range(array, dim, r)
  */
 range complementary_range(array, dim, r)
 entity array;
@@ -215,9 +188,7 @@ range r;
     return(range_undefined); /* just to avoid a gcc warning */
 }
 
-/*
- * list generate_message_from_3_lists(array, lcontent, lneighbour, ldomain)
- *
+/* list generate_message_from_3_lists(array, lcontent, lneighbour, ldomain)
  */
 list generate_message_from_3_lists(array, lcontent, lneighbour, ldomain)
 entity array;
@@ -246,9 +217,6 @@ list lcontent, lneighbour, ldomain;
     return(lm);
 }
 
-/*
- * bool empty_section_p(lr)
- */
 bool empty_section_p(lr)
 list lr;
 {
@@ -257,17 +225,13 @@ list lr;
 	   (empty_range_p(RANGE(CAR(lr))) || empty_section_p(CDR(lr))));
 }
 
-/*
- * bool empty_range_p(r)
- */
 bool empty_range_p(r)
 range r;
 {
-    int 
-	lo, up;
+    int lo, up;
 
-    /* if we cannot decide, the range is supposed not to be empty */
-
+    /*   if we cannot decide, the range is supposed not to be empty
+     */
     if (! (hpfc_integer_constant_expression_p(range_lower(r), &lo) &&
 	   hpfc_integer_constant_expression_p(range_upper(r), &up)))
 	return(FALSE); 
@@ -275,23 +239,16 @@ range r;
 	return(lo > up);
 }
 
-
-/*
- * void sprint_lrange(str, l)
- */
 char *sprint_lrange(str, l)
 string str;
 list l;
 {
-    string
-	s = str;
-    bool
-	firstrange = TRUE;
+    string s = str;
+    bool firstrange = TRUE;
 
     MAPL(cr,
      {
-	 range
-	     r = RANGE(CAR(cr));
+	 range r = RANGE(CAR(cr));
 
 	 if (!firstrange)
 	     s += strlen(sprintf(s, ", "));
@@ -304,16 +261,11 @@ list l;
     return(str);
 }
 
-
-/*
- * void sprint_range(s, r)
- */
 char *sprint_range(str, r)
 string str;
 range r;
 {
-    int
-	lo, up, in;
+    int lo, up, in;
     bool
 	blo = hpfc_integer_constant_expression_p(range_lower(r), &lo),
 	bup = hpfc_integer_constant_expression_p(range_upper(r), &up),
@@ -333,19 +285,13 @@ range r;
 	return(sprintf(str, "X"));
 }
 
-/*
- * list compute_receive_content(array, lr, v)
- */
 list compute_receive_content(array, lr, v)
 entity array;
 list lr;
 Pvecteur v;
 {
-    list
-	content = NIL,
-	l = lr;
-    int
-	i = 1;
+    list content = NIL, l = lr;
+    int i = 1;
 
     assert(NumberOfDimension(array)==gen_length(lr));
 
@@ -396,18 +342,12 @@ Pvecteur v;
     return(content);
 }
 
-/*
- * list compute_receive_domain(lr, v)
- */
 list compute_receive_domain(lr, v)
 list lr;
 Pvecteur v;
 {
-    list
-	l = lr,
-	domain = NIL;
-    int
-	i = 1;
+    list l = lr, domain = NIL;
+    int i = 1;
     
     for ( ; l!=NIL ; i++, l=CDR(l))
     {
@@ -437,9 +377,6 @@ Pvecteur v;
     return(domain);
 }
 
-/*
- * bool larger_message_in_list(m, l)
- */
 bool larger_message_in_list(m, l)
 message m;
 list l;
@@ -457,8 +394,7 @@ list l;
     return(FALSE);
 }
 
-/* 
- * bool message_larger_p(m1, m2)
+/* bool message_larger_p(m1, m2)
  *
  * true if m1>=m2... (caution, it is only a partial order)
  */
@@ -480,9 +416,6 @@ message m1, m2;
 	   lrange_larger_p(message_dom(m1), message_dom(m2)));
 }
 
-/*
- * bool lrange_larger_p(lr1, lr2)
- */
 bool lrange_larger_p(lr1, lr2)
 list lr1, lr2;
 {
@@ -534,3 +467,6 @@ list lr1, lr2;
 
     return(TRUE);
 }
+
+/*   That is all
+ */
