@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.61  1997/07/28 14:30:25  keryell
+ * Removed conflict in concatenate().
+ *
  * Revision 1.60  1997/07/25 22:26:16  keryell
  * Avoid to put comments on sequences.
  *
@@ -657,13 +660,15 @@ remapping_stats(
 	     CONS(STATEMENT, postl,
 		  NIL))));
 
-    /* comments are added to help understand the generated code
-     */
-    insert_comments_to_statement(result, concatenate
-	("! - ", (what & LZY) ? "lazy " : "",
+    {
+	/* comments are added to help understand the generated code
+	 */
+	string comment = strdup(concatenate("! - ", (what & LZY) ? "lazy " : "",
 	       t==CPY ? "copy" : t==SND ? "send" : t==RCV ? "receiv" :
 	       t==BRD ? "broadcast" : "?",  "ing\n", NULL));
-
+	insert_comments_to_statement(result, comment);
+	free(comment);
+    }
     return result;
 }
 
@@ -860,9 +865,13 @@ update_runtime_for_remapping(entity trg)
 {
     statement s = set_live_status(trg, TRUE);
 
-    insert_comments_to_statement(s, concatenate(
-	"! direct remapping for ", 
-	entity_local_name(load_primary_entity(trg)), "\n", NULL));
+    {
+	string comment =
+	    strdup(concatenate("! direct remapping for ", 
+			       entity_local_name(load_primary_entity(trg)), "\n", NULL));
+	insert_comments_to_statement(s, comment);
+	free(comment);
+    }
 
     return make_block_statement
 	(CONS(STATEMENT, s,
@@ -952,8 +961,13 @@ generate_all_liveness_but(
     /* commented result
      */
     result = make_block_statement(ls);
-    insert_comments_to_statement(result, concatenate("! all livenesss for ", 
-						     entity_local_name(primary), "\n", NULL));
+    {
+	string comment =
+	    strdup(concatenate("! all livenesss for ", 
+			       entity_local_name(primary), "\n", NULL));
+	insert_comments_to_statement(result, comment);
+	free(comment);
+    }
     return result;
 }
 
@@ -992,9 +1006,13 @@ generate_dynamic_liveness_for_primary(
     /* commented result
      */
     result = make_block_statement(ls);
-    if (ls)
-	insert_comments_to_statement(result, concatenate("! clean live set for ", 
+    if (ls) {
+	string comment =
+	    strdup(concatenate("! clean live set for ", 
 			       entity_local_name(primary), "\n", NULL));
+	insert_comments_to_statement(result, comment);
+	free(comment);
+    }
     return result;
 }
 
@@ -1007,7 +1025,12 @@ generate_dynamic_liveness_management(statement s)
          /* of statement */ ls;
     
     result = make_empty_statement();
-    insert_comments_to_statement(result, concatenate("! end of liveness management\n", NULL));
+    {
+	string comment =
+	    strdup(concatenate("! end of liveness management\n", NULL));
+	insert_comments_to_statement(result, comment);
+	free(comment);
+    }
     ls = CONS(STATEMENT, result, NIL);
 
     /* for each primary remapped at s, generate the management code.
@@ -1029,7 +1052,12 @@ generate_dynamic_liveness_management(statement s)
     /* commented result 
      */
     result = make_block_statement(ls);
-    insert_comments_to_statement(result, concatenate("! liveness management\n", NULL));
+    {
+	string comment =
+	    strdup(concatenate("! liveness management\n", NULL));
+	insert_comments_to_statement(result, comment);
+	free(comment);
+    }
     return result;
 }
 
@@ -1251,9 +1279,13 @@ generate_remapping_include(renaming r)
     statement result;
 
     result = make_empty_statement();
-    insert_comments_to_statement(result, concatenate
-        ("      include '", remapping_file_name(r), "'\n", NULL));
-
+    {
+	string comment =
+	    strdup(concatenate("      include '",
+			       remapping_file_name(r), "'\n", NULL));
+	insert_comments_to_statement(result, comment);
+	free(comment);
+    }
     return result;
 }
 
@@ -1317,7 +1349,11 @@ remapping_compile(
     /* comment at the end
      */
     tmp = make_empty_statement();
-    insert_comments_to_statement(tmp, concatenate("! end remappings\n", NULL));
+    {
+	string comment = strdup(concatenate("! end remappings\n", NULL));
+	insert_comments_to_statement(tmp, comment);
+	free(comment);
+    }
     l = CONS(STATEMENT, tmp, l);
 
     /* dynamic liveness management if required
@@ -1348,7 +1384,11 @@ remapping_compile(
     /* comment at the beginning
      */
     tmp = make_empty_statement();
-    insert_comments_to_statement(tmp, concatenate("! begin remappings\n", NULL));
+    {
+	string comment = strdup(concatenate("! begin remappings\n", NULL));
+	insert_comments_to_statement(tmp, comment);
+	free(comment);
+    }
     l = CONS(STATEMENT, tmp, l);
 
     *nsp = make_block_statement(l); /* block of remaps for the nodes */
