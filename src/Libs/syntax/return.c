@@ -8,6 +8,9 @@
  * $Id$
  *
  * $Log: return.c,v $
+ * Revision 1.14  2002/06/12 14:22:21  irigoin
+ * two calls to update_called_modules() had been forgotten for the HRC option
+ *
  * Revision 1.13  2002/06/12 10:43:24  irigoin
  * Ajout de l'option HRC, hidden return code.
  *
@@ -287,6 +290,7 @@ static statement make_get_rc_statement(expression rc_ref)
     */
     entity_storage(get_rc) = make_storage(is_storage_rom, UU);
     entity_initial(get_rc) = make_value(is_value_code, code_undefined);
+    update_called_modules(get_rc);
   }
   
   pips_assert("Function get_rc is defined", !entity_undefined_p(get_rc));
@@ -373,6 +377,7 @@ static entity set_rc_function()
 				make_type(is_type_void, UU)));
     entity_storage(set_rc) = make_storage(is_storage_rom, UU);
     entity_initial(set_rc) = make_value(is_value_code, code_undefined);
+    update_called_modules(set_rc);
   }
   
   pips_assert("Function set_rc is defined", !entity_undefined_p(set_rc));
