@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/12 18:16:55 $, 
+# $Date: 1996/09/13 16:42:33 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -11,6 +11,7 @@ tar=${PIPS_TAR:-gtar}
 taropt=cf
 zip=${PIPS_ZIP:-"gzip -v9"}
 verb=:
+cwd=`pwd`
 
 verbose()
 { echo "$RCSfile: make_pips_release,v $: $@" >&2;}
@@ -77,8 +78,7 @@ done
 shift `expr $OPTIND - 1 `
 
 # default: //"%H""%M""%S"
-name=${1:-${PIPS_DIR}/Release/pips_${name}_`date +"%y""%m""%d"`}
-base=`basename $name`
+name=${1:-pips_${name}_`date +"%y""%m""%d"`}
 
 $verb "target release name: $name"
 
@@ -92,10 +92,10 @@ do
     #
     # set the parameters
     case $p in
-	PIPS)   root=$PIPS_ROOT   ; trg=$name/Pips   ;;
-	NEWGEN) root=$NEWGEN_ROOT ; trg=$name/Newgen ;;
-	LINEAR) root=$LINEAR_ROOT ; trg=$name/Linear ;;
-	EXTERN) root=$EXTERN_ROOT ; trg=$name/Extern ;;
+	PIPS)   root=$PIPS_ROOT   ; trg=$cwd/$name/Pips   ;;
+	NEWGEN) root=$NEWGEN_ROOT ; trg=$cwd/$name/Newgen ;;
+	LINEAR) root=$LINEAR_ROOT ; trg=$cwd/$name/Linear ;;
+	EXTERN) root=$EXTERN_ROOT ; trg=$cwd/$name/Extern ;;
     esac
 
     #
@@ -119,9 +119,9 @@ done
 test "$install" &&
 {
     $verb "copying installation software and doc"
-    cp ${PIPS_ROOT}/Utils/install_pips $name/install_pips
-    cp ${PIPS_ROOT}/Utils/install.README $name/README
-    cp ${PIPS_ROOT}/Utils/install.INSTALL $name/INSTALL
+    cp ${PIPS_ROOT}/Utils/install_pips $cwd/$name/install_pips
+    cp ${PIPS_ROOT}/Utils/install.README $cwd/$name/README
+    cp ${PIPS_ROOT}/Utils/install.INSTALL $cwd/$name/INSTALL
 }
 
 #
@@ -129,7 +129,7 @@ test "$install" &&
 
 test "$tz" && 
 {
-    cd `dirname $name`
+    cd $cwd
     $verb "taring ($tar $taropt) and zipping ($zip)"
     $tar $taropt $base.tar $base
     $zip $base.tar
