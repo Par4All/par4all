@@ -183,6 +183,7 @@ dbll_unlink_resource_file(string rname, string oname, bool erroriffailed)
 	perror(full_name);
 	pips_internal_error("cannot unlink resource %s of %s\n", rname, oname);
     }
+    free(full_name);
 }
 
 /* returns 0 on errors (say no file).
