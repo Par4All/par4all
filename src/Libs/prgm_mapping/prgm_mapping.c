@@ -2037,6 +2037,8 @@ fprintf(stderr, "\n");
 if(get_debug_level() > 4) {
 fprintf(stderr, "[partial_broadcast_coefficients] A.L + D - P.M:\n");
 fprint_psysteme(stderr, new_ps);
+fprintf(stderr, "\t Var to eliminate : ");
+fprint_entity_list(stderr, var_l);
 fprintf(stderr, "\n");
 }
 
