@@ -51,5 +51,11 @@
  
 #define GRAPH_FILE_EXT "-graph"
 
+
+/* Some directory names... */
+
+/* Where is the output of HPFC in the workspace: */
+#define HPFC_COMPILED_FILE_DIR "hpfc"
+   
 /* say that's all
  */
