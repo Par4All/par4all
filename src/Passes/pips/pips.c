@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "graph.h"
@@ -14,6 +16,7 @@
 #include "properties.h"
 
 #include "misc.h"
+#include "newgen.h"
 #include "ri-util.h"
 #include "complexity_ri.h"
 
