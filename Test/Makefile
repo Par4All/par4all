@@ -5,7 +5,7 @@
 # OBJ_DIR and EXEC_EXTRA_SUFFIX must be set correctly
 
 # These may take a long time to compute...
-LONG_EHRHART_TESTS = g1 isnm2 c4
+LONG_EHRHART_TESTS = g1 isnm2 c4 alex1
 
 # These do not pass in 32 bits mode without GMP: c3 e10 e11 e15 isnm
 # uncomment the following line if you are not running with GMP.

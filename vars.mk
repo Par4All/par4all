@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.1 2001/07/16 15:00:31 risset Exp $
+# $Id: vars.mk,v 1.2 2001/09/10 13:12:08 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -75,10 +75,10 @@ LONG_BITS = 64
 GMP_BITS = gmp
 
 # Library type to construct
-INSTALL_LIB = install-static install-shared
+INSTALL_LIB = 
 
 # Commands used to install scripts and data
-INSTALL =		/usr/local/bin/gnu/ginstall -c
+INSTALL =		/usr/bin/install -c
 INSTALL_PROGRAM =	${INSTALL}
 INSTALL_DATA =		${INSTALL} -m 644
 
@@ -87,9 +87,9 @@ EXTRA_INCLUDES=
 EXTRA_LIBS=-lgmp 
 
 # Platform specific variables
-OSTYPE	= solaris2.7
-HOST    = sun
-BUILD   = sparc
+OSTYPE	= linux-gnu
+HOST    = pc
+BUILD   = i686
 
 
 EXEC_EXTRA_SUFFIX = 
@@ -104,9 +104,9 @@ DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
-EXEC_EXTRA_LIBS= -L${exec_prefix}/lib -lpolylib$(BITS) $(LIBS)
-SHAREDLIB_FLAG          = -G
-LDCONFIG = 
+EXEC_EXTRA_LIBS= -L$(OBJ_DIR) -lpolylib$(BITS) $(LIBS)
+SHAREDLIB_FLAG          = -shared
+LDCONFIG = ldconfig
 
 LIBS_TO_BUILD = 64
 EXEC_TO_BUILD = 64
