@@ -24,7 +24,8 @@ PIPS_HOSTS=${pips_hosts:-$PIPS_HOSTS}
 #
 # initialization of variables
 
-unset no_cleaning no_newgen no_linear no_pips no_validation validate_dir
+unset no_cleaning no_newgen no_linear no_pips no_validation no_general 
+unset validate_dir
 
 # use this mail (not /bin/mail...)
 mail=/usr/ucb/mail
@@ -72,6 +73,7 @@ usage()
 	  -d dir: change to directory
 	  -c arch: compile for (can be a list, default: \$PIPS_ARCH then .)
 	  -a email: address to report (default: \$REPLYTO else \`whoami\`)
+	  -G: skip general cleaning
 	  -C: skip cleaning
 	  -N: skip newgen
 	  -L: skip linear
@@ -131,6 +133,7 @@ do
 	L) no_linear=1 ;;
 	P) no_pips=1 ;;
 	V) no_validation=1 ;;
+	G) no_general=1 ;;
 	*) usage 2 "invalid option" ;;
     esac
 done
@@ -148,7 +151,7 @@ $debug "REPLYTO=$REPLYTO"
 $debug "email=$email"
 $debug "mail=$mail (`type mail`)"
 $debug "PIPS_HOSTS=$PIPS_HOSTS"
-$debug "CNLPV: $no_cleaning/$no_newgen/$no_linear/$no_pips/$no_validation"
+$debug "GCNLPV: $no_general/$no_cleaning/$no_newgen/$no_linear/$no_pips/$no_validation"
 $debug "report=$report"
 
 #
@@ -162,22 +165,10 @@ $debug "report=$report"
     #
     # CLEANING
 
-    test "$no_cleaning" && {
-	$verbose Skipping Cleaning
+    test "$no_general" && {
+	$verbose Skipping General
     } || {
-	$verbose "Cleaning pips"
-
-        for a in $arch ; 
-        do 
-	    name=PIPS_DIRECTORY_FOR_${a}_BINARIES
-	    test "`env | grep ${name}`" && {
-		dir=`eval echo \\\${$name}`
-		$verbose cleaning Deve files of ${a} [${name}: ${dir}]
-		find $dir/Deve \
-		    \( -name '*.[ao]' -o -name pips -o -name '[tw]pips' \) \
-		    -mtime +4 -print | xargs rm -rf
-	    }
-	done
+	$verbose "General cleaning of pips"
 
 	$verbose - Deleting old workspaces...
 	find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +4 -print | 
@@ -194,6 +185,24 @@ $debug "report=$report"
 	$verbose - Removing generated files in Production...
 	msg="${msg}C"
         makeit nlp cleaning $report full-clean .
+    }
+
+    test "$no_cleaning" && {
+	$verbose Skipping Cleaning
+    } || {
+	$verbose "Cleaning pips old binaries"
+
+        for a in $arch ; 
+        do 
+	    name=PIPS_DIRECTORY_FOR_${a}_BINARIES
+	    test "`env | grep ${name}`" && {
+		dir=`eval echo \\\${$name}`
+		$verbose cleaning files of ${a} [${name}: ${dir}]
+		find $dir \
+		    \( -name '*.[ao]' -o -name pips -o -name '[tw]pips' \) \
+		    -mtime +4 -print | xargs rm -rf
+	    }
+	done
     }
 
     #
