@@ -3,10 +3,10 @@
    Ronan Keryell, 1995.
    */
 
-/* 	%A% ($Date: 1995/09/19 09:44:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/19 17:04:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
- char vcid_unspaghettify[] = "%A% ($Date: 1995/09/19 09:44:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+ char vcid_unspaghettify[] = "%A% ($Date: 1995/09/19 17:04:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -268,6 +268,65 @@ fuse_sequences_in_unstructured(unstructured u)
 }
 
 
+/* Take the entry node out the unstructured if it is not useful, such
+   as not an IF or a node without predecessor.
+
+   Return TRUE if there is still un unstructured, FALSE if the
+   unstructured has been replaced by a structured statement.
+
+   If the first node is taked out, then * new_unstructured_statement
+   returns the new statement that own the unstructured, else s. */
+bool static
+take_out_the_entry_node_of_the_unstructured(statement s,
+                                            instruction i,
+                                            unstructured u,
+                                            statement * new_unstructured_statement)
+{
+   control entry_node = unstructured_control(u);
+   list entry_node_successors = control_successors(entry_node);
+   int entry_node_successors_length = gen_length(entry_node_successors);
+   *new_unstructured_statement = s;
+   
+   if (entry_node_successors_length == 2
+       || gen_length(control_predecessors(entry_node)) > 0)
+      /* Well, this node is useful here since it is an unstructured IF
+         or there is a GOTO on it. */
+      return TRUE;
+
+   if (entry_node_successors_length == 0) {
+      /* In fact the unstructured has only one control node! Transform
+         it in a structured statement: */
+      statement_instruction(s) =
+         make_instruction_block(CONS(STATEMENT,
+                                     control_statement(entry_node),
+                                     NIL));
+      /* Remove the unstructured: */
+      control_statement(entry_node) = statement_undefined;
+      gen_free(i);
+      /* No longer unstructured: */
+      return FALSE;
+   }
+   else {
+      /* Take out the entry node: */
+      *new_unstructured_statement = make_stmt_of_instr(i);
+      statement_instruction(s) =
+         make_instruction_block(CONS(STATEMENT,
+                                     control_statement(entry_node),
+                                     CONS(STATEMENT,
+                                          *new_unstructured_statement,
+                                          NIL)));
+      /* The entry node is now the second node: */
+      pips_assert("take_out_the_entry_node_of_the_unstructured",
+                  entry_node_successors_length == 1);
+      unstructured_control(u) = CONTROL(CAR(entry_node_successors));
+      
+      discard_a_control_sequence_without_its_statements(entry_node,
+                                                        entry_node);
+      return TRUE;
+   }
+}
+
+
 /* If the unstructured begin and/or end with a sequence, move the
    sequence(s) out of the unstructured and return a new statement with
    an equivalent but more structured code. It returns TRUE if the
@@ -275,6 +334,8 @@ fuse_sequences_in_unstructured(unstructured u)
 
    If the unstructured is still here, the statement directly owning it
    is returned in new_unstructured_statement: */
+
+/* Still buggy. No longer used. */
 static bool
 try_to_structure_the_unstructured(statement s,
                                   instruction i,
@@ -392,9 +453,6 @@ try_to_structure_the_unstructured(statement s,
             /* Update the entry node of the unstructured: */
             unstructured_control(u) =
                CONTROL(CAR(control_successors(end_of_first_sequence)));
-            /* Now this node has no longer this predecessor: */
-            gen_remove(&control_predecessors(unstructured_control(u)),
-                       end_of_first_sequence);
             
             /* Clean up the equivalent control sequence: */
             discard_a_control_sequence_without_its_statements(entry_node,
@@ -409,10 +467,8 @@ try_to_structure_the_unstructured(statement s,
             /* Update the exit node of the unstructured: */
             unstructured_exit(u) =
                CONTROL(CAR(control_predecessors(begin_of_last_sequence)));
-            /* Now this node has no longer this successor: */
-            gen_remove(&control_successors(unstructured_exit(u)),
-                       begin_of_last_sequence);
 
+            /* Clean up the equivalent control sequence: */
             discard_a_control_sequence_without_its_statements(begin_of_last_sequence, exit_node);
          }
 
@@ -484,41 +540,38 @@ unspaghettify_rewrite_unstructured(statement s, instruction i, unstructured u)
    remove_the_unreachable_controls_of_an_unstructured(u);
 
    if (get_debug_level() > 0) {
-      fprintf(stderr, "dead_rewrite_unstructured 0\n");
+      fprintf(stderr, "dead_rewrite_unstructured after remove_the_unreachable_controls_of_an_unstructured\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 
-   if (!try_to_structure_the_unstructured(s, i, u, &new_unstructured_statement)) {
-      /* If try_to_structure_the_unstructured() has not been able to
-         discard the unstructured, go on with some other
-         optimizations: */
-
-      /* From here we no longer have i = statement_instruction(s) but still
-         u = instruction_unstructured(i) */
-      if (get_debug_level() > 0) {
-         fprintf(stderr, "dead_rewrite_unstructured 1\n");
-         print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-      }
-      
-      remove_useless_continue_or_empty_code_in_unstructured(u);
+   remove_useless_continue_or_empty_code_in_unstructured(u);
    
-      if (get_debug_level() > 0) {
-         fprintf(stderr, "dead_rewrite_unstructured 2\n");
-         print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-      }
-      
-      fuse_sequences_in_unstructured(u);
+   if (get_debug_level() > 0) {
+      fprintf(stderr, "dead_rewrite_unstructured after remove_useless_continue_or_empty_code_in_unstructured\n");
+      print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+   }
+   
+   fuse_sequences_in_unstructured(u);
 
+   if (get_debug_level() > 0) {
+      fprintf(stderr, "dead_rewrite_unstructured after fuse_sequences_in_unstructured\n");
+      print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+   }
+
+   if (take_out_the_entry_node_of_the_unstructured(s, i, u, &new_unstructured_statement)) {
+      /* If take_out_the_entry_node_of_the_unstructured() has not been
+         able to discard the unstructured, go on with some other
+         optimizations: */
       if (get_debug_level() > 0) {
-         fprintf(stderr, "dead_rewrite_unstructured 3\n");
+         fprintf(stderr, "dead_rewrite_unstructured after take_out_the_entry_node_of_the_unstructured\n");
          print_text(stderr, text_statement(get_current_module_entity(), 0, s));
       }
 
       take_out_the_exit_node_if_not_a_continue(new_unstructured_statement, i, u);
    }
-   
+
    if (get_debug_level() > 0) {
-      fprintf(stderr, "dead_rewrite_unstructured 3\n");
+      fprintf(stderr, "dead_rewrite_unstructured exit:\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
 }
