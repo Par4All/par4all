@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/04/09 10:04:54 $, ) 
+# ($Date: 1997/04/10 11:33:45 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -72,7 +72,7 @@ test ! -x $MAIL && MAIL=mail
 MAX_NB_LINES='100'
 
 export MAX_NB_LINES
-unset UNIQDIR pips_version RUNDIR LOCKFILE PERFORMANCE
+unset UNIQDIR pips_version tpips_version RUNDIR LOCKFILE PERFORMANCE
 
 #
 # echos the pips to be run
@@ -443,8 +443,6 @@ else
 $aspects ${FILES:+($FILES)}
   
 $final
-   with $pips_version 
-   and $tpips_version
    on $HOSTNAME
 
 $PERFORMANCE
