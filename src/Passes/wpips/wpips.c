@@ -62,8 +62,8 @@ create_menus()
     /* Gone in create_menus_end():
        create_help_menu(); */
     /* In the Emacs mode, no XView log window: */
-    if (! wpips_emacs_mode)
-       create_log_menu();
+    /* In fact, create it but disabled to keep the same frame layout: */
+    create_log_menu();
     create_quit_button();
 }
 
