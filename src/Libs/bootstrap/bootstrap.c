@@ -117,8 +117,7 @@ CreateArrays()
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 			       IO_EFFECTS_ARRAY_NAME),
-	      MakeTypeArray(make_basic(is_basic_int,
-				     UUINT(IO_EFFECTS_UNIT_SPECIFIER_LENGTH)),
+	      MakeTypeArray(make_basic_int(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
 			    CONS(DIMENSION,
 				 make_dimension
 				 (MakeIntegerConstantExpression("0"),
@@ -142,8 +141,7 @@ CreateArrays()
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 			       IO_EOF_ARRAY_NAME),
-	      MakeTypeArray(make_basic(is_basic_logical,
-				     UUINT(IO_EFFECTS_UNIT_SPECIFIER_LENGTH)),
+	  MakeTypeArray(make_basic_logical(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
 			    CONS(DIMENSION,
 				 make_dimension
 				 (MakeIntegerConstantExpression("0"),
@@ -167,8 +165,7 @@ CreateArrays()
   /* GO: entity for io logical units: It is an array which*/
   make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 			       IO_ERROR_ARRAY_NAME),
-	      MakeTypeArray(make_basic(is_basic_logical,
-				     UUINT(IO_EFFECTS_UNIT_SPECIFIER_LENGTH)),
+      MakeTypeArray(make_basic_logical(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
 			    CONS(DIMENSION,
 				 make_dimension
 				 (MakeIntegerConstantExpression("0"),
@@ -1138,7 +1135,7 @@ static basic
 typing_function_char_to_int(call c, type_context_p context)
 {
   basic result, type_INT = make_basic_int(4);
-  basic type_CHAR = make_basic(is_basic_string, value_undefined);
+  basic type_CHAR = make_basic_string(value_undefined);
   result = typing_function_argument_type_to_return_type(c, context, type_CHAR, 
 						      type_INT);
   free_basic(type_INT);
@@ -1149,7 +1146,7 @@ static basic
 typing_function_int_to_char(call c, type_context_p context)
 {
   basic result, type_INT = make_basic_int(4);
-  basic type_CHAR = make_basic(is_basic_string, value_undefined);
+  basic type_CHAR = make_basic_string(value_undefined);
   result = typing_function_argument_type_to_return_type(c, context, type_INT, 
 						      type_CHAR);
   free_basic(type_INT);
@@ -1226,7 +1223,7 @@ static basic
 typing_function_char_to_logical(call c, type_context_p context)
 {
   basic result, type_LOGICAL = make_basic_logical(4);
-  basic type_CHAR = make_basic(is_basic_string, value_undefined);
+  basic type_CHAR = make_basic_string(value_undefined);
   result = typing_function_argument_type_to_return_type(c, context, type_CHAR, 
 						      type_LOGICAL);
   free_basic(type_LOGICAL);
