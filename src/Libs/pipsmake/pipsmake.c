@@ -1,4 +1,6 @@
- /* pipsmake: call by need (make), rule selection (activate), explicit call (apply)
+ /* pipsmake: call by need (make),
+  * rule selection (activate),
+  * explicit call (apply)
   *
   * Remi Triolet, Francois Irigoin, Pierre Jouvelot, Bruno Baron,
   * Arnauld Leservot, Guillaume Oget
@@ -842,9 +844,9 @@ string rn;
     db_unput_resources(rn);
 
     if (up_to_date_resources != set_undefined) {
-	/* In this case we are called from a Pips phase */
+	/* In this case we are called from a Pips phase 
 	user_warning ("delete_named_resources",
-		      "called within a phase (i.e. by activate())\n");
+		      "called within a phase (i.e. by activate())\n"); */
 	SET_MAP(res, {
 	    string res_rn = real_resource_resource_name((real_resource) res);
 	    string res_on = real_resource_owner_name((real_resource) res);
