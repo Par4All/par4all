@@ -27,8 +27,7 @@ HTMS =	$(HTML_AUTO) \
 	summary_hpfc.html \
 	window-interface.html \
 	wp65.html \
-	wp65_summary.html \
-	distribution.html
+	wp65_summary.html
 
 SOURCES= $(HTMS)
 
