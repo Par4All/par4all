@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1997/04/30 15:23:14 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1997/05/27 12:04:13 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1997/04/30 15:23:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1997/05/27 12:04:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -13,13 +13,14 @@ char vcid_emacs[] = "%A% ($Date: 1997/04/30 15:23:14 $, ) version $Revision$, go
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <sys/filio.h>
-#include <strings.h>  /* doubtful portability? */
+#include <string.h>
 
-/* write/... */
-#include <sys/types.h>
-#include <sys/uio.h>
- 
+#include <unistd.h>
+#include <sys/ioctl.h>
+#ifndef __linux
+#include <sys/filio.h>
+#endif
+
 #include <xview/xview.h>
 #include <xview/panel.h>
 #include <xview/notify.h>
@@ -308,7 +309,7 @@ epips_execute_command(char * command_buffer)
    char * command_name, * command_content;
    
    /* Separate the command name from the content with a ":" : */
-   char * separator_index = index(command_buffer, ':');
+   char * separator_index = (char*) index(command_buffer, ':');
    debug(2, "epips_execute_command", "Command: \"%s\"\n", command_buffer);
 
    if (separator_index == NULL) {
@@ -376,8 +377,9 @@ unframe_commands_from_emacs(char * entry_buffer, long int *length)
 {
    if (epips_input_automaton_state == epips_wait_for_begin) {
       /* Wait for a begin of command: */
-      char * epips_packet_begin_position = index(entry_buffer,
-                                                 epips_receive_begin_of_command_token[0]);
+      char * epips_packet_begin_position = 
+	  (char*) index(entry_buffer,
+			epips_receive_begin_of_command_token[0]);
       debug(8, "unframe_commands_from_emacs",
             "epips_packet_begin_position = %8X\n", epips_packet_begin_position);
       if (epips_packet_begin_position == NULL) {
@@ -403,8 +405,9 @@ unframe_commands_from_emacs(char * entry_buffer, long int *length)
    }
    else {
       /* Look for an end of command: */
-      char * epips_packet_end_position = index(entry_buffer,
-                                               epips_receive_end_of_command_token[0]);
+      char * epips_packet_end_position = 
+	  (char*) index(entry_buffer,
+			epips_receive_end_of_command_token[0]);
       debug(8, "unframe_commands_from_emacs",
             "epips_packet_end_position = %8X\n", epips_packet_end_position);
       if (epips_packet_end_position == NULL) {
