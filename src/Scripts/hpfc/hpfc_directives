@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/29 19:05:55 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/01 12:00:43 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -123,6 +123,7 @@ $SED '#
       # space normalization (pattern-matching is easier afterwards)
       #
       //s,[ 	][ 	]*, ,g;
+      //s, $,,;
       //s,\([0-9a-z]\) \([^0-9a-z]\),\1\2,g;
       //s,\([^0-9a-z]\) \([0-9a-z]\),\1\2,g;
       //s,\([^0-9a-z]\) \([^0-9a-z]\),\1\2,g;
@@ -150,13 +151,19 @@ $SED '#
       s, local\(.*\),      i(I_LOCAL)\1      do I_LOCAL = 0\, 0,
       s, end[ ]*local,      enddo,
       s, io\(.*\),      6(\1),
+      # io args shoud look like calls for pips
+      /6(/s,\,,()\,,g;
+      /6(/s,\([a-z0-9]\))$,\1()),;
       #
       # HPF declaration directives (well, pure is not)
       #
       s, dynamic \(.*\),      y(\1),
-      s, pure\(.*\),      u(\1),
       s, template \(.*\),      logical \1      t(\1),
       s, processors \(.*\),      logical \1      p(\1),
+      s, pure\(.*\),      u(\1),
+      # pure treated as io above.
+      /u(/s,\,,()\,,g;
+      /u(/s,\([a-z0-9]\))$,\1()),;
       #
       # HPF static and dynamic mapping directives
       #  - some simple free style is parsed.
