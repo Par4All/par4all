@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/07/20 18:40:46 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/09/22 13:19:36 $, )
  * version $Revision$
  */
 
@@ -52,9 +52,8 @@ statement stat, *hp, *np;
 	sn = statement_undefined;
 
     debug_on("HPFC_IO_DEBUG_LEVEL");
-    debug(1, "io_efficient_compile", "compiling!\n");
-    debug(2, "io_efficient_compile", "statement 0x%x, %d arrays\n",
-	  stat, gen_length(entities));
+    pips_debug(1, "compiling!\n");
+    pips_debug(2, "statement 0x%x, %d arrays\n", stat, gen_length(entities));
 
     MAP(EFFECT, e,
      {
@@ -62,16 +61,15 @@ statement stat, *hp, *np;
 	 action act = effect_action(e);
 	 approximation apr = effect_approximation(e);
 	 
-	 debug(3, "io_efficient_compile", "array %s\n", entity_name(array));
+	 pips_debug(3, "array %s\n", entity_name(array));
 
-	 message_assert("replicated array I/O not implemented", 
+	 message_assert("avoid replicated array I/O", /* not implemented */
 			!(array_distributed_p(array) && replicated_p(array)));
 
 	 if ((!array_distributed_p(array)) && action_read_p(act)) 
 	 {
-	     debug(7, "io_efficient_compile", 
-		   "skipping array %s movements - none needed\n", 
-		   entity_name(array));
+	     pips_debug(7, "skipping array %s movements - none needed\n", 
+			entity_name(array));
 	     continue;
 	 }
 
@@ -394,8 +392,8 @@ list *plvars;
 	     Pvecteur v = vect_new(var, 1);
 	     bool exact = TRUE;
 	     
-	     debug(7, "remove_variables_if_possible", 
-		   "removing variable %s\n", entity_local_name((entity) var));
+	     pips_debug(7, "removing variable %s\n", 
+			entity_local_name((entity) var));
 	     
 	     sc_projection_along_variables_with_test_ofl_ctrl
 		 (&syst, v, &exact, NO_OFL_CTRL);
@@ -423,9 +421,8 @@ tag move;
     list keep = NIL, try_keep = NIL, remove = NIL,
          try_remove = base_to_list(sc_base(syst));
 
-    debug(5, "clean_shared_io_system", "array %s, movement %s\n",
-	  entity_local_name(array), 
-	  (movement_collect_p(move))?"collect":"update");
+    pips_debug(5, "array %s, movement %s\n", entity_local_name(array), 
+	       (movement_collect_p(move))?"collect":"update");
 
     /* ALPHA_i's
      * PHI_i's
@@ -528,9 +525,8 @@ tag move;
 	remove = NIL,
 	try_remove = base_to_list(sc_base(syst));
 
-    debug(5, "clean_distributed_io_system", "array %s, movement %s\n",
-	  entity_local_name(array), 
-	  (movement_collect_p(move))?"collect":"update");
+    pips_debug(5, "array %s, movement %s\n", entity_local_name(array), 
+	       (movement_collect_p(move))?"collect":"update");
 
     assert(array_distributed_p(array));
     
@@ -614,8 +610,7 @@ list *plparam, *plproc, *plscan, *plrebuild;
 
     gen_remove(&all, (entity) TCST); /* just in case */
 
-    debug(5, "put_variables_in_ordered_lists",
-	  "considering %d variables\n", gen_length(all));
+    pips_debug(5, "considering %d variables\n", gen_length(all));
 
     /* parameters: those variables that are not dummies...
      */
