@@ -98,12 +98,11 @@ static double compute_enode(enode *p, Value *list_args) {
     res +=compute_evalue(&p->arr[0],list_args);
   }
   else if (p->type == periodic) {
-    value_assign(param,list_args[p->pos-1]);
+    value_assign(m,list_args[p->pos-1]);
     
     /* Choose the right element of the periodic */
-    value_absolute(m,param);
     value_set_si(param,p->size);
-    value_modulus(m,m,param);
+    value_pmodulus(m,m,param);
     res = compute_evalue(&p->arr[VALUE_TO_INT(m)],list_args);
   }
   value_clear(m);
