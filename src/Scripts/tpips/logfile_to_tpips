@@ -1,7 +1,16 @@
 #!/bin/sh
 
 #
+# Usage: logfile_to_tpips <workspacename>
 #
+#	Convert the logfile of the named workspace
+#	created by wpips to a tpips source.
+#
+# Known limitations:
+#
+#	- only one file per workspace is allowed
+#	- do not display all the resources for a
+#	  rule creating multiple resources.
 #
 
 WS=${1:?"Please give me the workspace name to work with"}
@@ -17,3 +26,4 @@ sed -n \
 -e 's/Options: phase \(.*\) (\(.*\)) set on./activate \2 # \1/p' \
 $WS.database/LOGFILE
 
+#end
