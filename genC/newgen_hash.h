@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 1995/03/20 14:33:07 $, )
+/* $RCSfile: newgen_hash.h,v $ ($Date: 1995/04/06 17:12:31 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -23,6 +23,10 @@
 #define HASH_INCLUDED
 #define HASH_DEFAULT_SIZE 17
 
+/* Some predefined values for the key 
+ */
+#define HASH_ENTRY_FREE (char *) 0
+#define HASH_ENTRY_FREE_FOR_PUT (char *) -1
 
 typedef enum hash_key_type { 
     hash_string, hash_int, hash_pointer, hash_chunk } hash_key_type;
@@ -50,26 +54,42 @@ typedef struct hash_table {
 
 #define HASH_UNDEFINED_VALUE ((char *) gen_chunk_undefined)
 
-#define hash_table_empty_p(htp) ((htp)->hash_entry_number == 0)
+#define hash_table_empty_p(htp) (hash_table_count(htp) == 0)
 
 #define HASH_MAP(k,v,code,h) \
     {\
     hash_table _map_hash_h = (h) ;\
-    register hash_entry *_map_hash_p = _map_hash_h->hash_array ;\
-    hash_entry *_map_hash_end = \
-	    _map_hash_h->hash_array+_map_hash_h->hash_size ;\
+    register hash_entry_pointer _map_hash_p = hash_table_array(_map_hash_h) ;\
+    hash_entry_pointer _map_hash_end = \
+	    hash_table_array(_map_hash_h)+hash_table_size(_map_hash_h) ;\
     for( ; _map_hash_p<_map_hash_end ; _map_hash_p++ ) { \
-	if( _map_hash_p->key!=(char *)0 && _map_hash_p->key!=(char *)-1) { \
-	    char *k = _map_hash_p->key ; \
-	    char *v = _map_hash_p->val ; \
+	if( hash_entry_key(_map_hash_p) !=HASH_ENTRY_FREE && \
+            hash_entry_key(_map_hash_p) !=HASH_ENTRY_FREE_FOR_PUT) { \
+	    char *k = hash_entry_key(_map_hash_p) ; \
+	    char *v = hash_entry_val(_map_hash_p) ; \
             code ; }}}
 #endif
 
+/* Let's define a new version of
+ * hash_put_or_update() using the warn_on_redefinition 
+ */
+
+#define hash_put_or_update(h, k, v)			\
+if (hash_warn_on_redefinition_p() == TRUE)		\
+{							\
+    hash_dont_warn_on_redefinition();			\
+    hash_put((hash_table)h, (char*)k, (char*)v);	\
+    hash_warn_on_redefinition();			\
+} else							\
+    hash_put((hash_table)h, (char*)k, (char*)v);
+
+/*
 #define hash_put_or_update(h, k, v)\
   if (hash_get((hash_table)h, (char*)k)==HASH_UNDEFINED_VALUE)\
     hash_put((hash_table)h, (char*)k, (char*)v);\
   else\
     hash_update((hash_table)h, (char*)k, (char*)v);
+*/
 
 /* functions declared in hash.c 
  */
@@ -82,11 +102,19 @@ extern void hash_put GEN_PROTO((hash_table, char *, char *));
 extern void hash_table_clear GEN_PROTO((hash_table));
 extern void hash_table_free GEN_PROTO((hash_table));
 extern hash_table hash_table_make GEN_PROTO((hash_key_type, int));
+extern void hash_table_print_header GEN_PROTO((hash_table, FILE *));
 extern void hash_table_print GEN_PROTO((hash_table));
 extern void hash_table_fprintf GEN_PROTO((FILE *, char *(*)(), 
 					  char *(*)(), hash_table));
-extern int hash_table_entry_count GEN_PROTO((hash_table));
 extern void hash_update GEN_PROTO((hash_table, char*, char*));
+
+extern int hash_table_entry_count GEN_PROTO((hash_table));
+extern int hash_table_size GEN_PROTO((hash_table));
+extern hash_key_type hash_table_type GEN_PROTO((hash_table));
+extern hash_entry_pointer hash_table_array GEN_PROTO((hash_table));
+extern char *hash_entry_val GEN_PROTO((hash_entry_pointer));
+extern char *hash_entry_key GEN_PROTO((hash_entry_pointer));
+
 
 /*  that is all
  */
