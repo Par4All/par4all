@@ -331,6 +331,6 @@ close OUTPUT || die "Cannot close \"$output_file_name\".";
 
 # If we have been asked to launch a daVinci process to display the graph : */
 if ($launch_daVinci) {
-    /* Be careful not to block stdout because it would block daVinci: */
+    # Be careful not to block stdout because it would block daVinci:
     system("daVinci $output_file_name &");
 }
