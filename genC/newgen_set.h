@@ -40,7 +40,7 @@ typedef struct {
     set_type type ;
 } set_chunk, *set ;
 
-#define set_undefined ((struct set *)(-16))
+#define set_undefined ((set)(-16))
 #define set_undefined_p(s) ((s)==set_undefined)
 
 #define SET_MAP(element,code,set) \
