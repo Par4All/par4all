@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.93  1998/07/10 20:42:56  irigoin
+ * Handling of complex constant commented out
+ *
  * Revision 1.92  1998/07/10 11:20:46  coelho
  * more comments about entries.
  *
@@ -491,8 +494,11 @@ static bool handle_file(FILE * out, FILE * f)
 	    else if (!regexec(&implicit_none_rx, line, 0, matches, 0))
 		    fprintf(out, 
 		      "! MIL-STD-1753 Fortran extension not in PIPS\n! ");
-	    else
-		handle_complex_constants(&line);
+	    else {
+		/* FI: test for parser */
+		/* handle_complex_constants(&line); */
+		;
+	    }
 	}
 	fprintf(out, "%s\n", line);
 	free(line);
