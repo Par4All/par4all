@@ -157,6 +157,9 @@ shift `expr $OPTIND - 1`
 
 RUNDIR=${RUNDIR:-$PWD}
 cd $RUNDIR || error 2 "cannot cd $RUNDIR ($?)"
+# clean it
+Delete -a
+rm -f core
 
 # COMDIR=${COMDIR:-${RUNDIR}}
 # test -d $COMDIR || error 2 "no communication dir $COMDIR"
@@ -468,6 +471,8 @@ fi
 # clean directory and files
 
 rm -f $tmpout $tmperr $diffout $diffout_e
+Delete -a
+rm -f core
 
 [ "$UNIQDIR" ] && { cd ..; rm -rf $UNIQDIR;}
 
