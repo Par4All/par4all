@@ -657,44 +657,23 @@ update_common_to_size(entity a, int new_size)
 /* updates the common entity if necessary with the common prefix
  */
 static entity
-make_common_entity(entity e)
+make_common_entity(entity c)
 {
-    if (!entity_common_p(e))
+    if (!entity_common_p(c))
     {
-	entity c;
-
-	if (!value_undefined_p(entity_initial(e)) && entity_module_p(e)) 
+	if (type_undefined_p(entity_type(c)))
 	{
-	    pips_user_warning("name conflict (%s) module versus common\n",
-			      module_local_name(e));
-	    ParserError("make_common_entity",
-			"COMMON / ROUTINE name conflict, "
-			"rename the common or the routine!");
-	}
-
-	c = find_or_create_entity(concatenate
-	   (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, COMMON_PREFIX, 
-	    entity_local_name(e), 0));
-
-	/* take care not to destroy some useful entity! */
-	if (value_undefined_p(entity_initial(e)) || !intrinsic_entity_p(e))
-	    add_ghost_variable_entities(e);
-
-	e = c;
-
-	if (type_undefined_p(entity_type(e)))
-	{
-	    entity_type(e) = make_type(is_type_area, make_area(0, NIL));
-            entity_storage(e) = 
+	    entity_type(c) = make_type(is_type_area, make_area(0, NIL));
+            entity_storage(c) = 
                 make_storage(is_storage_ram, 
                              (make_ram(get_current_module_entity(),
                                        StaticArea, 0, NIL)));
-            entity_initial(e) = MakeValueUnknown();
-            AddEntityToDeclarations(e, get_current_module_entity());
+            entity_initial(c) = MakeValueUnknown();
+            AddEntityToDeclarations(c, get_current_module_entity());
 	}
     }
 
-    return e;
+    return c;
 }
 
 /* MakeCommon:
@@ -729,6 +708,33 @@ MakeCommon(entity e)
 	set_common_to_size(e, 0);
 
     return e;
+}
+entity 
+NameToCommon(string n)
+{
+    string c_name = strdup(concatenate(COMMON_PREFIX, n, NULL));
+    entity c = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, c_name);
+    string prefixes[] = {"", MAIN_PREFIX, BLOCKDATA_PREFIX, NULL};
+    string nature[] = {"function or subroutine", "main", "block data"};
+    int i = 0;
+
+    c = MakeCommon(c);
+    free(c_name);
+
+    /* Check for potential conflicts */
+    for(i=0; prefixes[i]!=NULL; i++) {
+	string name = strdup(concatenate(prefixes[i], n, NULL));
+	entity ce = global_name_to_entity(TOP_LEVEL_MODULE_NAME, name);
+
+	if(!entity_undefined_p(ce)) {
+	    user_warning("NameToCommon", "Identifier %s used for a common and for a %s\n",
+			 n, nature[i]);
+	}
+
+	free(name);
+    }
+
+    return c;
 }
 
 /* 
@@ -1397,7 +1403,12 @@ fprint_environment(FILE * fd, entity m)
 		parameter p = PARAMETER(CAR(cp));
 		type ta = parameter_type(p);
 
-		pips_assert("fprint_environment", type_variable_p(ta));
+		pips_assert("Argument type is variable or varags:variable", type_variable_p(ta)
+			    || (type_varargs_p(ta) && type_variable_p(type_varargs(ta))));
+		if(type_varargs_p(ta)) {
+		    (void) fprintf(fd, " %s:", type_to_string(ta));
+		    ta = type_varargs(ta);
+		}
 		(void) fprintf(fd, "%s", basic_to_string(variable_basic(type_variable(ta))));
 		if(!ENDP(cp->cdr))
 		    (void) fprintf(fd, " x ");
@@ -1413,6 +1424,10 @@ fprint_environment(FILE * fd, entity m)
 		(void) fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(tr))));
 	    else if(type_void_p(tr))
 		(void) fprintf(fd, " %s\n", type_to_string(tr));
+	    else if(type_varargs_p(tr)) {
+		(void) fprintf(fd, " %s:%s", type_to_string(tr),
+			       basic_to_string(variable_basic(type_variable(type_varargs(tr)))));
+	    }
 	    else
 		pips_error("fprint_environment", "Ill. type %d\n", type_tag(tr));
 	}
