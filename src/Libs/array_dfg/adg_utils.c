@@ -8,6 +8,7 @@
  * Comments :
  */
 
+#define GRAPH_IS_DG
 #include "local.h"
 
 /* Global variables */
