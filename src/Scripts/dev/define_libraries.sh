@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.18  1997/08/18 09:56:23  coelho
+# *** empty log message ***
+#
 # Revision 1.17  1997/08/18 07:43:58  coelho
 # *_MAIN added.
 #
@@ -67,7 +70,7 @@ PIPS_X11_ADDED_LIBS='-lX11'
 #
 # PIPS
 
-PIPS_MAIN='pips_main.o'
+PIPS_MAIN='main_pips.o'
 
 #
 # WPIPS
@@ -76,7 +79,7 @@ WPIPS_ADDED_CPPFLAGS='-I$(OPENWINHOME)/include -Iicons'
 WPIPS_ADDED_LIBS='-lxview -lolgx -lX11'
 WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib'
 
-WPIPS_MAIN='wpips_main.o'
+WPIPS_MAIN='main_wpips.o'
 
 #
 # TPIPS
@@ -85,12 +88,12 @@ WPIPS_MAIN='wpips_main.o'
 
 TPIPS_ADDED_LIBS='-lreadline -ltermcap'
 
-TPIPS_MAIN='tpips_main.o'
+TPIPS_MAIN='main_tpips.o'
 
 #
 # FPIPS
 
-FPIPS_MAIN='fpips_main.o'
+FPIPS_MAIN='main_fpips.o'
 
 # end of it!
 #
