@@ -1,5 +1,4 @@
 #include <stdio.h>
-extern int fprintf();
 #include <types.h>
 #include <malloc.h>
 
@@ -24,12 +23,12 @@ extern int fprintf();
 
 #include "top-level.h"
 
-
+/*
 extern void(* pips_error_handler)();
 extern void(* pips_warning_handler)();
 extern void(* pips_log_handler)(char * fmt, va_list args);
 extern void(* pips_update_props_handler)();
-
+*/
 /* If we are in the Emacs mode, the log_frame is no longer really used: */
 Frame main_frame, 
     schoose_frame, 
@@ -252,6 +251,13 @@ char *argv[];
    
    display_memory_usage();
 
+   enable_workspace_create_or_open();
+   disable_workspace_close();
+   disable_module_selection();
+   disable_view_selection();
+   disable_transform_selection();
+   disable_option_selection();
+   
    xv_main_loop(main_frame);
 
    close_log_file();
