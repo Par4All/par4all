@@ -1,7 +1,10 @@
 /* Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1996/12/24 15:23:08 $, )
- * version $Revision$
+ * $Id$
+ * $Log: messages.c,v $
+ * Revision 1.17  1997/03/20 10:23:02  coelho
+ * RCS headers.
+ *
  * 
  * Fabien Coelho, August 1993
  */
