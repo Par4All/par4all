@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS STuff
-# $RCSfile: make-tags,v $ ($Date: 1994/05/31 13:53:15 $) version $Revision$, got on %D%, %T%
+# $RCSfile: make-tags,v $ ($Date: 1994/12/09 11:35:48 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 # Tags computation for the PIPS project, using the Development version.
@@ -30,32 +30,18 @@ FILES=/tmp/PIPS-FILES
 # only directories in this variable
 #
 
-PATHNAME_LIST="${DEVEDIR}/Lib/[a-z]* ${DEVEDIR}/Passes/[a-z]* ${INCLUDEDIR} ${EXTEDIR}"
-
-# On saute les SCCS, RK 28/9/93.
-# PATHNAME_LIST="${NEWGENDIR}/genClib.c ${NEWGENDIR}/hash.c \
-# ${NEWGENDIR}/list.c ${NEWGENDIR}/set.c ${DEVEDIR}/Lib/[a-z]* \
-# ${DEVEDIR}/Passes/[a-z]* ${INCLUDEDIR} ${EXTEDIR}"
-# find ${PATHNAME_LIST} -name '*.[cyhl]' -print \
-# | 	sed -e "/\/SCCS\//d;/\/,/d;/\/[Oo][Ll][Dd]\//d;/\/tmp\//d;" \
-# 		> ${FILES} 2>/dev/null
+PATHNAME_LIST="${DEVEDIR}/Lib/[a-z]* ${DEVEDIR}/Passes/[a-z]* ${INCLUDEDIR} ${EXTEDIR} ${NEWGENDIR}/C"
 
 rm -f $FILES $TAGS
 
 # mere files
-
-cat >> ${FILES} <<%
-${NEWGENDIR}/genClib.c
-${NEWGENDIR}/hash.c
-${NEWGENDIR}/list.c
-${NEWGENDIR}/set.c
-%
+# none
 
 # directories
 
 for dir in $PATHNAME_LIST
 do
-  ls $dir/*.[chly] >> $FILES
+  test -d $dir && ls $dir/*.[chly] >> $FILES
 done
 
 # tags generation
