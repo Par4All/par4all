@@ -32,48 +32,51 @@ bool callgraph(string name)
 	gen_array_addto(module_callers, i, (char*) make_callees(NIL));
 
     for(i=0; i<nmodules; i++) {
-	callees c = (callees)gen_array_item(module_callers, i);
+	callees c = (callees) gen_array_item(module_callers, i);
 	pips_assert("no callees", callees_callees(c)==NIL);
     }
 
-    for(i=0; i<nmodules; i++) {
+    for(i=0; i<nmodules; i++) 
+    {
 	string module_name = gen_array_item(modules, i);
-	callees module_callees = callees_undefined;
-	list cm;
+	callees module_callees;
 
 	module_callees = (callees)
 	    db_get_memory_resource(DBR_CALLEES, module_name, TRUE);
 
-	for(cm=callees_callees(module_callees); cm!=NIL; POP(cm))
+	MAP(STRING, module_called, 
 	{
-	    string module_called = STRING(CAR(cm));
 	    callees c;
-	    int r;
+	    bool found = FALSE;
 
-	    for(r=0; r<nmodules; r++) {
-		string rname = gen_array_item(modules, r);
-		if(strcmp(module_called, rname)==0)
-		    break;
-	    }
-	    if(r==nmodules)
-		user_error("callgraph",
-			   "no source file for module %s\n",
-			   module_called);
-	    pips_assert("valid module",0<=r && r<nmodules);
+	    GEN_ARRAY_MAP(rname, 
+			  if (same_string_p(module_called, rname))
+			  { found = TRUE; break; },
+			  modules);
+
+	    if(!found)
+		pips_user_error("no source file for module %s\n", 
+				module_called);
 
 	    c = (callees) gen_array_item(module_callers, r);
 	    callees_callees(c) =
 		gen_nconc(callees_callees(c), 
-			  CONS(STRING,strdup(module_name), NIL));
-	}
+			  CONS(STRING, strdup(module_name), NIL));
+	    
+	},
+	    callees_callees(module_callees));
     }
     
     for(i=0; i<nmodules; i++) 
     {
 	string module_name = gen_array_item(modules, i);
+	pips_debug(7, "adding for module %s\n", module_name);
 	DB_PUT_MEMORY_RESOURCE(DBR_CALLERS, module_name,
 			       (char*) gen_array_item(module_callers,i));
 
     }
+
+    gen_array_full_free(modules);
+    gen_array_free(module_callers);
     return TRUE;
 }
