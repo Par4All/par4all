@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: run-time.c,v $
+ * Revision 1.34  1997/04/17 13:25:28  coelho
+ * STRING buffer added.
+ *
  * Revision 1.33  1997/04/17 11:47:29  coelho
  * *** empty log message ***
  *
@@ -630,6 +633,7 @@ static RunTimeSupportDescriptor RTSTable[] =
     /* typed buffers 
      */
     { PVM_BYTE1 BUFFER,			1, is_var, no_basic, no_entity },
+    { PVM_STRING BUFFER,		1, is_var, no_basic, no_entity },
     { PVM_INTEGER2 BUFFER,		1, is_var, no_basic, no_entity },
     { PVM_INTEGER4 BUFFER,		1, is_var, no_basic, no_entity },
     { PVM_REAL4 BUFFER,			1, is_var, no_basic, no_entity },
@@ -640,6 +644,7 @@ static RunTimeSupportDescriptor RTSTable[] =
     /* typed buffer sizes
      */
     { PVM_BYTE1 BUFSZ,			1, is_var, no_basic, no_entity },
+    { PVM_STRING BUFSZ,			1, is_var, no_basic, no_entity },
     { PVM_INTEGER2 BUFSZ,		1, is_var, no_basic, no_entity },
     { PVM_INTEGER4 BUFSZ,		1, is_var, no_basic, no_entity },
     { PVM_REAL4 BUFSZ,			1, is_var, no_basic, no_entity },
@@ -650,6 +655,7 @@ static RunTimeSupportDescriptor RTSTable[] =
     /* typed pack/unpack hpfc functions, for buffer management.
      */
     { PVM_BYTE1 BUFPCK,			0, is_sub, no_basic, no_entity },
+    { PVM_STRING BUFPCK,		0, is_sub, no_basic, no_entity },
     { PVM_INTEGER2 BUFPCK,		0, is_sub, no_basic, no_entity },
     { PVM_INTEGER4 BUFPCK,		0, is_sub, no_basic, no_entity },
     { PVM_REAL4 BUFPCK,			0, is_sub, no_basic, no_entity },
@@ -658,6 +664,7 @@ static RunTimeSupportDescriptor RTSTable[] =
     { PVM_COMPLEX16 BUFPCK,		0, is_sub, no_basic, no_entity },
 
     { PVM_BYTE1 BUFUPK,			0, is_sub, no_basic, no_entity },
+    { PVM_STRING BUFUPK,		0, is_sub, no_basic, no_entity },
     { PVM_INTEGER2 BUFUPK,		0, is_sub, no_basic, no_entity },
     { PVM_INTEGER4 BUFUPK,		0, is_sub, no_basic, no_entity },
     { PVM_REAL4 BUFUPK,			0, is_sub, no_basic, no_entity },
