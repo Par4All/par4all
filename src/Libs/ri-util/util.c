@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/21 11:31:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/25 17:47:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char* vcid_ri_util_util_c = "%A% ($Date: 1995/11/21 11:31:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char* vcid_ri_util_util_c = "%A% ($Date: 1996/07/25 17:47:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -293,3 +293,13 @@ entity aire;
     return(strcmp(entity_local_name(aire), STATIC_AREA_LOCAL_NAME) == 0);
 }
 
+
+/* Test if a string can be a Fortran 77 comment: */
+bool
+comment_string_p(const string comment)
+{
+    char c = *comment;
+    /* If a line begins with a non-space character, claims it may be a
+       Fortran comment. Assume empty line are comments. */
+    return c != '\0' && c != ' ' && c != '\t';
+}
