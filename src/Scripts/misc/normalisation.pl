@@ -54,6 +54,7 @@ while (<>)
     
     $seen{"$module:$array"} = 1;
     
+    # only change if old declaration is :1) or :*)
     next if $old !~ /:[\*1]\)/;
     next if $new ne '*' and $old =~ /:$new\)/;
     
