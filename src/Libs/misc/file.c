@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/09/22 06:16:29 $, 
+ * $Date: 1997/09/30 06:56:14 $, 
  */
 
 #include <unistd.h>
@@ -31,11 +31,10 @@ int re_exec(char *);
  */
 extern char * sys_errlist[];
 
-FILE * safe_fopen( filename, what)
-char * filename, * what;
+FILE * 
+safe_fopen(string filename, string what)
 {
     FILE * f;
-
     if((f = fopen( filename, what)) == (FILE *) NULL) {
 	pips_error("safe_fopen","fopen failed on file %s\n%s\n",
 		   filename, sys_errlist[errno]);
@@ -43,39 +42,36 @@ char * filename, * what;
     return(f);
 }
 
-int safe_fclose( stream, filename)
-FILE * stream;
-char * filename;
+int 
+safe_fclose(FILE * stream, string filename)
 {
-	if(fclose(stream) == EOF) {
-	  if(errno==ENOSPC)
+    if(fclose(stream) == EOF) {
+	if(errno==ENOSPC)
 	    user_irrecoverable_error("safe_fclose",
 				     "fclose failed on file %s (%s)\n",
 				     filename,
 				     sys_errlist[errno]);
-	  else
+	else
 	    pips_error("safe_fclose","fclose failed on file %s (%s)\n",
 		       filename,
 		       sys_errlist[errno]);
-	}
-	return(0);
+    }
+    return(0);
 }
 
-int safe_fflush( stream, filename)
-FILE * stream;
-char * filename;
+int 
+safe_fflush(FILE * stream, string filename)
 {
-	if(fflush(stream) == EOF) {
-	    pips_error("safe_fflush","fflush failed on file %s (%s)\n",
-		       filename,
-		       sys_errlist[errno]);
-	}
-	return(0);
+    if(fflush(stream) == EOF) {
+	pips_error("safe_fflush","fflush failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(0);
 }
 
-FILE * safe_freopen( filename, what, stream)
-char * filename, * what;
-FILE * stream;
+FILE * 
+safe_freopen(string filename, string what, FILE * stream)
 {
     FILE *f;
 
@@ -87,11 +83,8 @@ FILE * stream;
     return(f);
 }
 
-int safe_fseek( stream, offset, wherefrom, filename)
-FILE * stream;
-long int offset;
-int wherefrom;
-char * filename;
+int 
+safe_fseek(FILE * stream, long int offset, int wherefrom, string filename)
 {
     if( fseek( stream, offset, wherefrom) != 0) {
 	pips_error("safe_fseek","fseek failed on file %s (%s)\n",
@@ -101,9 +94,8 @@ char * filename;
     return(0);
 }
 
-long int safe_ftell( stream, filename)
-FILE * stream;
-char * filename;
+long int 
+safe_ftell(FILE * stream, string filename)
 {
     long int pt;
     pt = ftell( stream);
@@ -115,9 +107,8 @@ char * filename;
     return(pt);
 }
 
-void safe_rewind( stream, filename)
-FILE * stream;
-char * filename;
+void 
+safe_rewind(FILE * stream, string filename)
 {
     rewind( stream );
     if(errno != 0) {
@@ -127,12 +118,10 @@ char * filename;
     }
 }
 
-int safe_fgetc( stream, filename)
-FILE * stream;
-char * filename;
+int 
+safe_fgetc(FILE * stream, string filename)
 {
     int value;
-    
     if((value = fgetc( stream)) == EOF) {
 	pips_error("safe_fgetc","fgetc failed on file %s (%s)\n",
 		   filename,
@@ -141,12 +130,10 @@ char * filename;
     return(value);
 }
 
-int safe_getc( stream, filename)
-FILE * stream;
-char * filename;
+int 
+safe_getc(FILE * stream, string filename)
 {
     int value;
-    
     if((value = getc( stream)) == EOF ) {
 	pips_error("safe_getc","getc failed on file %s (%s)\n",
 		   filename,
@@ -155,7 +142,8 @@ char * filename;
     return(value);
 }
 
-char * safe_fgets( s, n, stream, filename)
+char * 
+safe_fgets(s, n, stream, filename)
 char * s, * filename;
 int n;
 FILE * stream;
@@ -243,16 +231,16 @@ FILE * stream;
   Return 0 on success, -1 on directory openning error.
   */
 int
-safe_list_files_in_directory(int * pargc,
-                             char * argv[],
-                             char * dir,
-                             char * re,
-                             bool (* file_name_predicate)(char *))
+safe_list_files_in_directory(
+    gen_array_t files, /* an allocated array */
+    string dir, /* the directory we're interested in */
+    string re, /* regular expression */
+    bool (*file_name_predicate)(string) /* condition to list a file */)
 {
-   char * re_comp_message;
-   list dir_list = NIL;
+   string re_comp_message;
    DIR * dirp;
    struct dirent * dp;   
+   int index = 0;
 
    pips_assert("some dir", strcmp(dir, "") != 0);
 
@@ -271,7 +259,7 @@ safe_list_files_in_directory(int * pargc,
 		char * full_file_name = 
 		    strdup(concatenate(dir, "/", dp->d_name, NULL));
                if (file_name_predicate(full_file_name))
-		   dir_list = CONS(STRING, strdup(dp->d_name), dir_list);
+		   gen_array_dupaddto(files, index++, dp->d_name);
 	       free(full_file_name);
             }
          }
@@ -281,10 +269,7 @@ safe_list_files_in_directory(int * pargc,
          return -1;
    }
 
-   /* Now sort the file list: */
-   list_to_arg(dir_list, pargc, argv);
-   args_sort(*pargc, argv);
-
+   gen_array_sort(files);
    return 0;
 }
 
@@ -294,19 +279,19 @@ safe_list_files_in_directory(int * pargc,
    directory.
    */
 void
-list_files_in_directory(int * pargc,
-                        char * argv[],
-                        char * dir,
-                        char * re,
-                        bool (* file_name_predicate)(char *))
+list_files_in_directory(
+    gen_array_t files,
+    char * dir,
+    char * re,
+    bool (* file_name_predicate)(char *))
 {
-   int return_code = safe_list_files_in_directory
-       (pargc, argv, dir, re, file_name_predicate);
-   
-   if (return_code == -1)
-      user_error("list_files_in_directory",
-                 "opendir() failed on directory \"%s\", %s.\n",
-                 dir,  sys_errlist[errno]);
+    int return_code = safe_list_files_in_directory
+	(files, dir, re, file_name_predicate);
+    
+    if (return_code == -1)
+	user_error("list_files_in_directory",
+		   "opendir() failed on directory \"%s\", %s.\n",
+		   dir,  sys_errlist[errno]);
 }
 
 
@@ -341,7 +326,8 @@ bool create_directory(char *name)
     return success;
 }
 
-bool purge_directory(char *name)
+bool 
+purge_directory(string name)
 {
     bool success = TRUE;
 
