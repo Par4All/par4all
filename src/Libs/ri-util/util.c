@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/25 17:47:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/01/23 17:54:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char* vcid_ri_util_util_c = "%A% ($Date: 1996/07/25 17:47:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char* vcid_ri_util_util_c = "%A% ($Date: 1997/01/23 17:54:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -39,10 +39,22 @@ string s;
     return(strcmp(s, "") == 0);
 }
 
+bool return_local_label_name_p(s)
+string s;
+{
+    return(strcmp(s, RETURN_LABEL_NAME) == 0);
+}
+
 bool empty_label_p(s)
 string s;
 {
     return(empty_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
+}
+
+bool return_label_p(s)
+string s;
+{
+    return(return_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
 }
 
 entity find_label_entity(module_name, label_local_name)
