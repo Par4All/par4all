@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/12 01:46:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/29 13:34:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_mchoose[] = "%A% ($Date: 1995/11/12 01:46:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_mchoose[] = "%A% ($Date: 1995/11/29 13:34:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* Multiple choices handling */
@@ -22,7 +22,6 @@ char vcid_xv_mchoose[] = "%A% ($Date: 1995/11/12 01:46:58 $, ) version $Revision
 #include "wpips.h"
 
 static Panel_item mchoices, choices, ok, cancel, help;
-static char mchoices_notify_buffer[SMALL_BUFFER_LENGTH];
 
 static void (*apply_on_mchoices)(int *, char **) = NULL;
 static void (*cancel_on_mchoices)(void) = NULL;
@@ -39,27 +38,20 @@ void static
 mchoose_ok_notify(Panel_item item,
                   Event * event)
 {
-   char *mchoices_args[ARGS_LENGTH];
-   char buffer[SMALL_BUFFER_LENGTH];
+   char * mchoices_args[ARGS_LENGTH];
+   char * buffer, * mchoices_notify_buffer;
    int mchoices_length = 0;
    int i, nchoices, len;
    int item_is_in_the_list = FALSE;
-   char *p;
+   char * p;
 
    nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, NULL);
    mchoices_length = 0;
 
-   /*
-     for (i = 0; i < nchoices; i++) {
-     if ((int) xv_get(choices, PANEL_LIST_SELECTED, i) == TRUE) {
-     char *s = strdup(xv_get(choices, PANEL_LIST_STRING, i));
-     args_add(&mchoices_length, mchoices_args, s);		     
-     }
-     }
-     Read the text line instead, 1 word separated by ' '.
-     RK, 19/05/1993.
-     */
-   strcpy(mchoices_notify_buffer, (char *) xv_get(mchoices, PANEL_VALUE));
+   mchoices_notify_buffer = strdup((char *) xv_get(mchoices, PANEL_VALUE));
+   /* Upperbound size for the scanf buffer: */
+   buffer = (char *) malloc(strlen(mchoices_notify_buffer) + 1);
+   
    p = mchoices_notify_buffer;
    while(sscanf(p, "%s%n", buffer, &len) == 1) {
       args_add(&mchoices_length, mchoices_args, strdup(buffer));
@@ -74,6 +66,9 @@ mchoose_ok_notify(Panel_item item,
       p += len;
    }
 
+   free(mchoices_notify_buffer);
+   free(buffer);
+   
    /*	At least on item selected, and in the list.
         RK, 21/05/1993.
 	*/
@@ -170,23 +165,27 @@ mchoose_notify(Panel_item item,
      case PANEL_LIST_OP_SELECT:
      case PANEL_LIST_OP_DESELECT:
      {
-        int nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
-
-        mchoices_notify_buffer[0] = '\0';
+        int i;
+        int nchoices = (int) xv_get(choices, PANEL_LIST_NROWS);
 
 	/* Now it is mchoices_notify_buffer which is used for the selection.
            No size verification implemented yet... :-)
            RK, 19/05/1993. */
-
-        while (nchoices--) {
-           if ((int) xv_get(choices, PANEL_LIST_SELECTED, nchoices) == TRUE) {
-              strcat(mchoices_notify_buffer,
-                     (char *) xv_get(choices, PANEL_LIST_STRING, nchoices));
-              strcat(mchoices_notify_buffer, " ");
+        /* Make the PANEL_VALUE of mchoices a string that is all the
+           names of the selected files: */
+        xv_set(mchoices, PANEL_VALUE, "", NULL);
+        
+        for(i = 0; i < nchoices; i++) {
+           if ((int) xv_get(choices, PANEL_LIST_SELECTED, i) == TRUE) {
+              xv_set(mchoices, PANEL_VALUE,
+                     concatenate((char *) xv_get(mchoices, PANEL_VALUE),
+                                 (char *) xv_get(choices,
+                                                 PANEL_LIST_STRING, i),
+                                 " ",
+                                 NULL),
+                     NULL);
            }
         }
-
-        xv_set(mchoices, PANEL_VALUE, mchoices_notify_buffer, NULL);
         break;
      }
      
@@ -216,7 +215,6 @@ mchoose(char * title,
 
    apply_on_mchoices = function_ok;
    cancel_on_mchoices = function_cancel;
-   mchoices_notify_buffer[0] = '\0';
 
    xv_set(mchoose_frame, FRAME_LABEL, title, NULL);
 
@@ -229,7 +227,7 @@ mchoose(char * title,
           NULL);
 
    for (i = 0; i < argc; i++) {
-      xv_set(choices, PANEL_LIST_STRING, i, argv[i], 0);
+      xv_set(choices, PANEL_LIST_STRING, i, argv[i], NULL);
    }
 
    unhide_window(mchoose_frame);
@@ -239,21 +237,21 @@ mchoose(char * title,
 
    /* The OK button becomes active through RETURN: */
    xv_set(mchoose_panel, PANEL_DEFAULT_ITEM, ok, NULL);
-   xv_set(mchoices, PANEL_NOTIFY_PROC, mchoose_ok_notify);
+   xv_set(mchoices, PANEL_NOTIFY_PROC, mchoose_ok_notify, NULL);
 }
 
 
 void
 create_mchoose_window()
 {
-   mchoose_panel = xv_create(mchoose_frame, PANEL, 0);
+   mchoose_panel = xv_create(mchoose_frame, PANEL, NULL);
 
 /* Carriage return enable for "OK". RK, 19/05/1993. */
 
    mchoices = xv_create(mchoose_panel, PANEL_TEXT,
                         PANEL_LABEL_STRING, "Current choices",
                         PANEL_VALUE_DISPLAY_LENGTH, 30,
-                        PANEL_VALUE_STORED_LENGTH, 128,
+                        PANEL_VALUE_STORED_LENGTH, 12800,
                         /* PANEL_NOTIFY_PROC, mchoose_ok_notify, */
                         XV_X, xv_col(mchoose_panel, 0),
                         NULL);
@@ -265,7 +263,7 @@ create_mchoose_window()
                        PANEL_CHOOSE_ONE, FALSE,
                        XV_X, xv_col(mchoose_panel, 0),
                        XV_Y, xv_rows(mchoose_panel, 1),
-                       0);
+                       NULL);
 
    ok = xv_create(mchoose_panel, PANEL_BUTTON,
                   PANEL_LABEL_STRING, "OK",
