@@ -1,0 +1,29 @@
+#! /bin/sh
+#
+# to regenerate the distribution files:
+#
+
+echo SunOS4 binary version
+make_pips_release -CB GNU -pe -rsz pips_GNU
+
+echo all Sources (Pips, Newgen, Linear)
+make_pips_release -CS -pnle -rsz pips_sources
+
+echo Newgen Sources
+make_pips_release -CS -n -rsz newgen_sources
+
+echo Linear Sources
+make_pips_release -CS -l -rsz linear_sources
+
+echo Xpomp Sources
+make_pips_release -rz -D Doc/xpomp_manual.ps \
+	-D Include -D Src/Runtimes/xpomp -p -w -e xpomp_sources
+
+echo Solaris 2 binary version
+make_pips_release -CB GNUSOL2LL -pe -rz pips_GNUSOL2LL
+
+echo Solaris 2 binary version, including Public softs (big!)
+make_pips_release -CB GNUSOL2LL -peP -rz pips_Public_GNUSOL2LL
+
+echo done
+
