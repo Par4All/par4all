@@ -1,5 +1,5 @@
 # $RCSfile: install.INSTALL,v $ (version $Revision$)
-# $Date: 1996/09/03 13:12:53 $, 
+# $Date: 1996/09/03 19:03:09 $, 
 
 INSTALLATION INSTRUCTIONS:
 --------------------------
@@ -12,8 +12,7 @@ using PIPS. You can source, and eventually edit this file.
 
 The script also checks for useful softwares that may be needed
 for using or compiling PIPS. Additional information on how to
-obtain these sofwares can be found on 
+obtain these softwares can be found on 
 
-    http://www.cri.ensmp.fr/pips
-
+          http://www.cri.ensmp.fr/pips
 
