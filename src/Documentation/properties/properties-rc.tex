@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/03/21 13:38:45 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/03/21 13:40:07 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -644,6 +644,16 @@ GENERATE_NESTED_PARALLEL_LOOPS TRUE
 
 \begin{verbatim}
 WP65_DEBUG_LEVEL        0
+\end{verbatim}
+
+\section{Distribution}
+
+Partial distribution distributes the statements of a loop nest except
+ the isolated statements,that have no dependences at the common level l,
+ are gathered in the same l-th loop.
+
+\begin{verbatim}
+PARTIAL_DISTRIBUTION FALSE
 \end{verbatim}
 
 \section{HPFC {\em High Performance Fortran Compiler}}
