@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/03 11:24:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/03 22:26:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/02/03 11:24:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/02/03 22:26:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -152,30 +152,30 @@ cons *ldvr, *ldvl;
 {
     cons *pc;
 
-    debug(7, "", "[PrintData]\n");
+    debug(7, "PrintData", "Begin\n");
 
     for (pc = ldvr; pc != NIL; pc = CDR(pc)) {
 	datavar dvr = DATAVAR(CAR(pc));
 
-	debug(7, "", "(%s,%d), ", entity_name(datavar_variable(dvr)),
+	debug(7, "PrintData", "(%s,%d), ", entity_name(datavar_variable(dvr)),
 	      datavar_nbelements(dvr));
 
     }
-    debug(7, "", "\n");
+    debug(7, "PrintData", "\n");
 
     for (pc = ldvl; pc != NIL; pc = CDR(pc)) {
 	dataval dvl = DATAVAL(CAR(pc));
 
 	if (constant_int_p(dataval_constant(dvl))) {
-	    debug(7, "", "(%d,%d), ", constant_int(dataval_constant(dvl)),
+	    debug(7, "PrintData", "(%d,%d), ", constant_int(dataval_constant(dvl)),
 		  dataval_nboccurrences(dvl));
 	}
 	else {
-	    debug(7, "", "(x,%d), ", dataval_nboccurrences(dvl));
+	    debug(7, "PrintData", "(x,%d), ", dataval_nboccurrences(dvl));
 	}
 
     }
-    debug(7, "", "\n\n");
+    debug(7, "PrintData", "End\n\n");
 }
 
 
@@ -220,7 +220,7 @@ cons *ldvr, *ldvl;
 	      entity_initial(e) = make_value(is_value_constant, 
 					     dataval_constant(dvl));
 
-	      debug(1, "", "[AnalyzeData] %s %d\n", 
+	      debug(1, "AnalyzeData", "%s %d\n", 
 		    entity_name(e), constant_int(dataval_constant(dvl)));
 	    }
 	    else {
@@ -317,7 +317,7 @@ value v;
     type et = entity_type(e);
     list etd = list_undefined;
 
-    debug(8, "", "[DeclareVariable] %s\n", entity_name(e));
+    debug(8, "DeclareVariable", "%s\n", entity_name(e));
     pips_assert("DeclareVariable", t == type_undefined || type_variable_p(t));
 
     if(et == type_undefined)
