@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.17 2002/08/30 10:05:06 loechner Exp $
+# $Id: vars.mk,v 1.18 2002/08/30 13:20:49 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -107,10 +107,10 @@ DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 
-LIBS_TO_BUILD = 64
+LIBS_TO_BUILD = 32 64 gmp
 EXEC_TO_BUILD = 64
-BITS=64
-AFLAGS=-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
+BITS=32
+AFLAGS=-DLINEAR_VALUE_IS_INT
 
 
 OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)

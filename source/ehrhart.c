@@ -34,8 +34,7 @@
 /* #define EDEBUG11	*/		/* prints number of points */
 /* #define EDEBUG2	*/		/* prints domains */
 /* #define EDEBUG21	*/		/* prints more domains */
-/* #define EDEBUG3	*/		/* prints systems of equations that are
- solved */
+/* #define EDEBUG3	*/		/* prints systems of equations that are solved */
 /* #define EDEBUG4	*/		/* prints message for degree reduction */
 /* #define EDEBUG5	*/		/* prints result before simplification */
 /* #define EDEBUG6	*/		/* prints domains in Preprocess */
@@ -600,10 +599,12 @@ int cherche_min(Value *min,Polyhedron *D,int pos) {
   fprintf(stderr,"pos = %d\n",pos);
   fprintf(stderr,"current min = (");
   value_print(stderr,P_VALUE_FMT,min[0]);
+{int j;
   for(j=1;j<=D->Dimension ; j++) {
     fprintf(stderr,", ");
     value_print(stderr,P_VALUE_FMT,min[j]);
   }  
+}
   fprintf(stderr,")\n");
 #endif
 	
@@ -692,7 +693,7 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
   Matrix_Print(stderr,P_VALUE_FMT,M);
   fprintf(stderr,"\nsize == ");
   for( i=0 ; i<d ; i++ )
-    value_print(stderr,VALUE_FMT,size[i]);
+    value_print(stderr,P_VALUE_FMT,size[i]);
   fprintf(stderr,"\n");
 #endif
 
@@ -744,7 +745,7 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
   
 #ifdef EDEBUG6
   for(i=0;i<=(d+1);i++) {
-    value_print(stderr,VALUE_FMT,min[i]);
+    value_print(stderr,P_VALUE_FMT,min[i]);
     fprintf(stderr," ,");
   }
   fprintf(stderr,"\n");
@@ -782,18 +783,18 @@ Polyhedron *Polyhedron_Preprocess(Polyhedron *D,Value *size,unsigned MAXRAYS)
     value_set_si(M->p[2*i][i+1],1);
     value_oppose(M->p[2*i][d+1],min[i+1]);
     
-    /* Creates inequality  1 0..0 -1 0..0 min[i+1]+size */
+    /* Creates inequality  1 0..0 -1 0..0 min[i+1]+size -1 */
     value_set_si(M->p[2*i+1][0],1);
     for(j=1;j<=d;j++)
       value_set_si(M->p[2*i+1][j],0);
     value_set_si(M->p[2*i+1][i+1],-1);
     value_addto(M->p[2*i+1][d+1],min[i+1],size[i]);
+	 value_sub_int(M->p[2*i+1][d+1],M->p[2*i+1][d+1],1);
   }
   
 #ifdef EDEBUG6
   fprintf(stderr,"PolyhedronPreprocess: constraints H = ");
   Matrix_Print(stderr,P_VALUE_FMT,M);
-  fprintf(stderr,"\n %d", MAXRAYS);
 #endif
   
   H = Constraints2Polyhedron(M,MAXRAYS);
@@ -912,7 +913,9 @@ Polyhedron *Polyhedron_Preprocess2(Polyhedron *D,Value *size,Value *lcm,unsigned
       value_addto(tmp2,size[i],size[i]);
       if(value_le(s,tmp1)
 	 || value_le(s,tmp2)) {
-	
+
+	if( value_zero_p(lcm[i]) )
+		value_set_si(lcm[i],1);
 	/* lcm divides size... */
 	value_division(tmp1,size[i],lcm[i]);
 	
@@ -1146,7 +1149,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
 
   enode *res,*B,*C;
   int hdim,i,j,rank,flag;
-  Value n,g,nLB,nUB,nlcm,noff,nexp,k1,nm,hdv,k;
+  Value n,g,nLB,nUB,nlcm,noff,nexp,k1,nm,hdv,k,lcm_copy;
   Value tmp;
   Matrix *A;
 
@@ -1168,10 +1171,20 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   value_init(nUB); value_init(nlcm); value_init(noff);
   value_init(nexp); value_init(k1); value_init(nm);
   value_init(hdv); value_init(k); value_init(tmp);
+  value_init(lcm_copy);
 
-  /* hdim is the degree of the polynomial + 1 */
-  hdim = dim-nb_param+1;		/* homogenous dim w/o parameters */
-  
+  if( value_zero_p(lcm[pos-1]) )
+  {
+		hdim = 1;
+		value_set_si( lcm_copy, 1 );
+  }
+  else
+  {
+	  /* hdim is the degree of the polynomial + 1 */
+		hdim = dim-nb_param+1;		/* homogenous dim w/o parameters */
+		value_assign( lcm_copy, lcm[pos-1] );
+  }  
+
   /* code to limit generation of equations to valid parameters only */
   /*----------------------------------------------------------------*/
   flag = lower_upper_bounds(pos,LQ,&context[dim-nb_param],&nLB,&nUB);
@@ -1182,7 +1195,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       /* Compute nLB such that (nUB-nLB+1) >= (hdim*lcm) */
       value_sub_int(nLB,nUB,1);
       value_set_si(hdv,hdim);
-      value_multiply(tmp,hdv,lcm[pos-1]);
+      value_multiply(tmp,hdv,lcm_copy);
       value_substract(nLB,nLB,tmp);
       if(value_pos_p(nLB))
 	value_set_si(nLB,0);
@@ -1192,7 +1205,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       
       /* No upper nor lower limit: set lower limit to 0 */
       value_set_si(hdv,hdim);
-      value_multiply(nUB,hdv,lcm[pos-1]);
+      value_multiply(nUB,hdv,lcm_copy);
       value_add_int(nUB,nUB,1);
     }
   }
@@ -1227,14 +1240,14 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
     if(value_neg_p(n))
       i=0;
     else {
-      value_modulus(tmp,n,lcm[pos-1]);
+      value_modulus(tmp,n,lcm_copy);
       if(value_notzero_p(tmp)) {
-		  value_division(tmp,n,lcm[pos-1]);
+		  value_division(tmp,n,lcm_copy);
 		  value_increment(tmp,tmp);
 		  i = VALUE_TO_INT(tmp);
       }
       else {
-		  value_division(tmp,n,lcm[pos-1]);
+		  value_division(tmp,n,lcm_copy);
 		  i =   VALUE_TO_INT(tmp);	/* ceiling of n/lcm */
       }
     }
@@ -1254,7 +1267,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       fprintf(stdout," UB=");
       value_print(stdout,VALUE_FMT,nUB);
       fprintf(stdout," lcm=");
-      value_print(stdout,VALUE_FMT,lcm[pos-1]);
+      value_print(stdout,VALUE_FMT,lcm_copy);
       fprintf(stdout," degree reduced to %d\n",hdim-1);
 #endif
       
@@ -1267,7 +1280,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   res = new_enode(polynomial,hdim,pos);
   for (i=0;i<hdim;i++) {
     int l;
-    l = VALUE_TO_INT(lcm[pos-1]);
+    l = VALUE_TO_INT(lcm_copy);
     res->arr[i].x.p = new_enode(periodic,l,pos);
   }
   
@@ -1286,16 +1299,16 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   /*                                                                */
   /*----------------------------------------------------------------*/
   if(value_neg_p(nLB)) {
-    value_modulus(nlcm,nLB,lcm[pos-1]);
-    value_addto(nlcm,nlcm,lcm[pos-1]);
+    value_modulus(nlcm,nLB,lcm_copy);
+    value_addto(nlcm,nlcm,lcm_copy);
   }
   else {
-    value_modulus(nlcm,nLB,lcm[pos-1]);
+    value_modulus(nlcm,nLB,lcm_copy);
   }
   
   /* noff is a multiple of lcm */
   value_substract(noff,nLB,nlcm);
-  value_addto(tmp,lcm[pos-1],nlcm);
+  value_addto(tmp,lcm_copy,nlcm);
   for (value_assign(k,nlcm);value_lt(k,tmp);value_increment(k,k)) {
  
 #ifdef EDEBUG
@@ -1305,10 +1318,10 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
 #endif
 
     value_set_si(hdv,hdim);
-    value_multiply(nm,hdv,lcm[pos-1]);
+    value_multiply(nm,hdv,lcm_copy);
     value_addto(nm,nm,nLB);
     i=0;
-    for (value_addto(n,k,noff); value_lt(n,nm); value_addto(n,n,lcm[pos-1]),i++) {
+    for (value_addto(n,k,noff); value_lt(n,nm); value_addto(n,n,lcm_copy),i++) {
       
       /* n == i*lcm + k + noff;   */
       /* nlcm <= k < nlcm+lcm     */
@@ -1342,13 +1355,13 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
       fprintf(stderr,"%s = ",param_name[pos-1]);
       value_print(stderr,VALUE_FMT,n);
       fprintf(stderr," (hdim=%d, lcm[%d]=",hdim,pos-1);
-      value_print(stderr,VALUE_FMT,lcm[pos-1]);
+      value_print(stderr,VALUE_FMT,lcm_copy);
       fprintf(stderr,")\n");
 #else
       fprintf(stderr,"P%d = ",pos);
       value_print(stderr,VALUE_FMT,n);
       fprintf(stderr," (hdim=%d, lcm[%d]=",hdim,pos-1);
-      value_print(stderr,VALUE_FMT,lcm[pos-1]);
+      value_print(stderr,VALUE_FMT,lcm_copy);
       fprintf(stderr,")\n");      
 #endif
 #endif
@@ -1457,10 +1470,10 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
     /* if (rank < hdim) then set the last hdim-rank coefficients to ? */
     /* if (rank == 0) then set all coefficients to 0 */    
     /* copy result as k1-th element of periodic numbers */
-    if(value_lt(k,lcm[pos-1]))
+    if(value_lt(k,lcm_copy))
       value_assign(k1,k);
     else
-      value_substract(k1,k,lcm[pos-1]);
+      value_substract(k1,k,lcm_copy);
     
     for (i=0; i<rank; i++) {
       
@@ -1490,7 +1503,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
 #endif
       
     }
-    value_addto(tmp,lcm[pos-1],nlcm);
+    value_addto(tmp,lcm_copy,nlcm);
   }
   
 #ifdef EDEBUG
@@ -1514,7 +1527,8 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   value_clear(n); value_clear(g); value_clear(nLB);
   value_clear(nUB); value_clear(nlcm); value_clear(noff);
   value_clear(nexp); value_clear(k1); value_clear(nm);
-  value_clear(hdv); value_clear(k); value_clear(tmp); 
+  value_clear(hdv); value_clear(k); value_clear(tmp);
+  value_clear(lcm_copy);
   return res;
 } /* P_Enum */
 
@@ -1538,9 +1552,7 @@ static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
 
   value_init(k); value_init(m1);
   for( np=0 ; np<nbp ; np++ )
-    value_set_si( lcm[np], 1 );
-
-//  value_set_si(*lcm,1);
+    value_set_si( lcm[np], 0 );
 
 #ifdef EPRINT
   fprintf(stdout,"Vertices:\n");
@@ -1568,15 +1580,19 @@ static void Scan_Vertices(Param_Polyhedron *PP,Param_Domain *Q,Matrix *CT,
 				{
 					Gcd(V->Vertex->p[j][V->Vertex->NbColumns-1],V->Vertex->p[j][l], &m1);
 					value_division(k,V->Vertex->p[j][V->Vertex->NbColumns-1],m1);
-		//			value_absolute(k,k);
-		/*		Gcd(k,V->Vertex->p[j][l],&k );
-				value_division(k,V->Vertex->p[j][V->Vertex->NbColumns-1],k);
-		*/
-					/* lcm[l] = lcm[l] * k / gcd(k,lcm[l]) */
-					if (value_notzero_p(k) && value_notone_p(k)) {
-					  Gcd(lcm[l],k,&m1);
-					  value_division(k,k,m1);
-					  value_multiply(lcm[l],lcm[l],k);
+					if( value_notzero_p(lcm[l]) )
+					{
+						/* lcm[l] = lcm[l] * k / gcd(k,lcm[l]) */
+						if (value_notzero_p(k) && value_notone_p(k))
+						{
+						  Gcd(lcm[l],k,&m1);
+						  value_division(k,k,m1);
+						  value_multiply(lcm[l],lcm[l],k);
+						}
+					}
+					else
+					{
+						value_assign(lcm[l],k);
 					}
 				}
 			}
@@ -1812,7 +1828,7 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS)
 #ifdef EDEBUG2
     fprintf(stderr,"Denominator = ");
     for( np=0;np<nb_param;np++)
-      value_print(stderr,VALUE_FMT,lcm[np]);
+      value_print(stderr,P_VALUE_FMT,lcm[np]);
     fprintf(stderr," and hdim == %d \n",hdim);
 #endif
     
@@ -1826,12 +1842,17 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS)
     value_set_si(hdv,hdim-nb_param);
 
     for( np=0;np<nb_param;np++)
-      value_multiply(m1[np],hdv,lcm[np]);
+    {
+		if( value_notzero_p(lcm[np]) )
+			value_multiply(m1[np],hdv,lcm[np]);
+		else
+			value_set_si(m1[np],1);
+    }
 
 #ifdef EDEBUG2 
     fprintf(stderr,"m1 == ");
     for( np=0;np<nb_param;np++)
-      value_print(stderr,VALUE_FMT,m1[np]);
+      value_print(stderr,P_VALUE_FMT,m1[np]);
     fprintf(stderr,"\n");
 #endif 
 
