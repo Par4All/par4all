@@ -4,11 +4,10 @@
  *
  */
 #include <stdio.h>
-extern int fprintf();
+extern int fprintf(FILE *, const char *, ...);
 #include <string.h>
 
 #include "genC.h"
-#include "hash.h"
 #include "ri.h"
 #include "database.h"
 
@@ -22,8 +21,7 @@ extern int fprintf();
 
 #include "transformations.h"
 
-bool simple_ref_eq_p(r1, r2)
-reference r1, r2;
+bool simple_ref_eq_p(reference r1, reference r2)
 {
     entity ent1 = reference_variable(r1);
     entity ent2 = reference_variable(r2);
@@ -41,10 +39,7 @@ reference r1, r2;
  * This function can be used only if legality has been asserted
  * ref and next are only read, not written.
  */
-void StatementReplaceReference(s, ref, next)
-statement s;
-reference ref;
-expression next;
+void StatementReplaceReference(statement s, reference ref, expression next)
 {
     instruction inst = statement_instruction(s);
 
@@ -96,10 +91,7 @@ expression next;
  * e is the expression in which we replace the reference ref by 
  * the expression next.
  */
-void ExpressionReplaceReference(e, ref, next)
-expression e;
-reference ref;
-expression next;
+void ExpressionReplaceReference(expression e, reference ref, expression next)
 {
     syntax s = expression_syntax(e);
 
@@ -146,10 +138,7 @@ expression next;
 
 
 /* RangeReplaceReference() */
-void RangeReplaceReference(r, ref, next)
-range r;
-reference ref;
-expression next;
+void RangeReplaceReference(range r, reference ref, expression next)
 {
     expression rl = range_lower(r), ru = range_upper(r);
     expression ri = range_increment(r);
@@ -162,10 +151,7 @@ expression next;
 
 /* void CallReplaceReference()
  */
-void CallReplaceReference(c, ref, next)
-call c;
-reference ref;
-expression next;
+void CallReplaceReference(call c, reference ref, expression next)
 {
     value vin;
     entity f;
@@ -210,10 +196,7 @@ expression next;
  * Note that the module body is reordered. It is necessary in order to
  * reuse the generated code.
  */
-void ReplaceReference(mod_name, ref, next_expr)
-char *mod_name;
-reference ref;
-expression next_expr;
+void ReplaceReference(char *mod_name, reference ref, expression next_expr)
 {
     statement mod_stat;
     instruction mod_inst;
@@ -229,6 +212,7 @@ expression next_expr;
 
     mod_inst = statement_instruction(mod_stat);
     pips_assert("ReplaceReference", instruction_unstructured_p(mod_inst));
+    /* "unstructured expected\n"); */
 
     CONTROL_MAP(ctl, {
 	statement st = control_statement(ctl);
