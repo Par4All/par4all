@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1994/04/11 11:43:12 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1994/04/12 10:59:18 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -41,6 +41,8 @@ do
     *) usage
   esac
 done
+
+shift `expr $OPTIND - 1`
 
 [ $# -eq 0 ] || usage
 [ "$BASEDIR" ] || usage
