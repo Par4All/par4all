@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/02 13:45:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/09 16:29:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/10/02 13:45:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1995/10/09 16:29:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -200,9 +200,9 @@ hpfc_notify(Menu menu,
 
     label = (char *) xv_get(menu_item, MENU_STRING);
     if (same_string_p(label, HPFC_COMPILE))
-	(void) safe_apply(BUILDER_HPFC_INSTALL, modulename);
+	(void) safe_apply_outside_the_notifyer(BUILDER_HPFC_INSTALL, modulename);
     else if (same_string_p(label, HPFC_MAKE))
-	(void) safe_apply(BUILDER_HPFC_MAKE, modulename);
+	(void) safe_apply_outside_the_notifyer(BUILDER_HPFC_MAKE, modulename);
     else
 	pips_error("hpfc_notify", "Bad choice");
 }
