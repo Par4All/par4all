@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/05/05 09:47:35 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/06/03 13:53:02 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -41,18 +41,48 @@ MAIN=		main
 # Do not include the main program source file.
 PARSER_SRC= 
 
-LIB_CFILES=	parser.c parser-util.c debug-util.c hpfc-util.c \
-		norm-decl.c compile-decl.c compiler-util.c compiler.c \
-		compile.c run-time.c generate.c statement.c  norm-code.c \
-		io.c io-effects.c local-ri-util.c inits.c o-analysis.c \
-		align-checker.c messages.c overlap.c normalize.c guard.c \
-		ranges.c message-utils.c reduction.c build-system.c \
-		only-io.c new_io_generation.c io-compile.c sc_solve.c \
-		generate-io.c run-time-functions.c host_node_entities.c \
+LIB_CFILES=	parser.c \
+		parser-util.c \
+		debug-util.c \
+		hpfc-util.c \
+		hpf_declarations.c \
+		new_declarations.c \
+		compiler-util.c \
+		compiler.c \
+		compile.c \
+		run-time.c \
+		generate.c \
+		statement.c \
+		norm-code.c \
+		io.c \
+		io-effects.c \
+		local-ri-util.c \
+		inits.c \
+		o-analysis.c \
+		align-checker.c \
+		messages.c \
+		overlap.c \
+		normalize.c \
+		guard.c \
+		ranges.c \
+		message-utils.c \
+		reduction.c \
+		build-system.c \
+		only-io.c \
+		io-compile.c \
+		generate-io.c \
+		run-time-functions.c \
+		host_node_entities.c \
 		hpf_objects.c
 
-LIB_HEADERS=	f77keywords f77symboles hpfkeywords gram.y scanner.l \
-		warning.h hpfc-local.h defines-local.h compiler_parameters.h \
+LIB_HEADERS=	f77keywords \
+		f77symboles \
+		hpfkeywords \
+		gram.y \
+		scanner.l \
+		warning.h \
+		hpfc-local.h \
+		defines-local.h \
 		access_description.h 
 
 # headers made by some rule (except $INC_TARGET)
