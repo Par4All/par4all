@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.156  2001/11/30 15:00:56  nguyen
+%% Add new property for alias checking
+%%
 %% Revision 1.155  2001/11/27 12:36:36  nguyen
 %% Add new property ARRAY_RESIZING_USING_MAIN_PROGRAM
 %%
@@ -175,7 +178,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2001/11/27 12:36:36 $~$
+$~$Date: 2001/11/30 15:00:56 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1886,6 +1889,19 @@ top-down approach !
 \begin{verbatim}
 ARRAY_RESIZING_USING_MAIN_PROGRAM FALSE
 \end{verbatim}
+
+\subsection{Alias Checking}
+This is a property to tell the alias propagation and alias checking phase to use
+information from MAIN program or not. If the current module is never
+called by the main program, we do no alias propagation and alias checking
+for this module if the property is on. However, we can 
+do nothing with modules that have no callers at all, because this is a
+top-down approach ! 
+
+\begin{verbatim}
+ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
+\end{verbatim}
+
 
 
 %%
