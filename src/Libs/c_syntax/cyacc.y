@@ -1,5 +1,10 @@
 /* $Id$ 
    $Log: cyacc.y,v $
+   Revision 1.7  2004/02/18 10:34:25  nguyen
+   Rewrite code for declarators : UpdateEntity is done later, in declaration
+   level
+   Correct incomplete struct type declaration
+
    Revision 1.6  2003/12/05 17:15:26  nguyen
    Replace global variables by stacks to handle C recursive structures
 
@@ -80,6 +85,7 @@
 #include "ri-util.h"
 #include "misc.h"
 #include "transformations.h"
+#include "instrumentation.h"
   
 #include "c_parser_private.h"
 
@@ -100,8 +106,7 @@ static int CurrentMode = 0; /* to know the mode of the formal parameter: by valu
 static bool is_external = TRUE; /* to know if the variable is declared inside or outside a function, so its scope 
 				   is the current function or the compilation unit or TOP-LEVEL*/
 static int enum_counter = 0; /* to compute the enumerator value: val(i) = val(i-1) + 1*/
-
-static int number_dimensions = 0;
+static int abstract_counter = 1; /* to create temporary entities for abstract types*/
 
 extern int loop_counter; /* Global counter */
 extern int derived_counter;
@@ -121,8 +126,6 @@ extern stack ContextStack;
 extern stack FunctionStack; /* to know in which function the current formal arguments are declared */
 extern stack FormalStack; /* to know if the entity is a formal parameter or not */
 extern stack OffsetStack; /* to know the offset of the formal argument */
-
-
 
 static c_parser_context context;
 
@@ -250,7 +253,7 @@ c_parser_context CreateDefaultContext()
 %type <liste> initializer_list
 %type <liste> init_designators init_designators_opt
 
-%type <entity> type_spec
+%type <liste> type_spec
 %type <liste> struct_decl_list
 
 %type <parameter> parameter_decl
@@ -272,9 +275,9 @@ c_parser_context CreateDefaultContext()
 %type <entity> field_decl
 %type <liste> field_decl_list
 %type <entity> direct_decl
-%type <type> abs_direct_decl abs_direct_decl_opt
-%type <type> abstract_decl
-%type <integer> pointer pointer_opt 
+%type <entity> abs_direct_decl abs_direct_decl_opt
+%type <entity> abstract_decl
+%type <type> pointer pointer_opt 
 %type <void> location
 
 %type <string> id_or_typename
@@ -291,6 +294,7 @@ c_parser_context CreateDefaultContext()
 %type <liste> my_decl_spec_list 
 %type <liste> decl_spec_list_opt_no_named
 %type <liste> decl_spec_list_opt 
+%type <entity> old_proto_decl,direct_old_proto_decl
 %%
 
 interpret: file TK_EOF
@@ -340,18 +344,23 @@ global:
                         { 
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
 			  pips_debug(2,"Create function %s with old-style function prototype\n",$1);
-			  entity_storage(e) = make_storage_return(e);
-			  entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));
+			  if (storage_undefined_p(entity_storage(e))) 
+			    entity_storage(e) = make_storage_return(e);
+			  if (value_undefined_p(entity_initial(e)))
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));
 			  stack_push((char *) e, FunctionStack);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
 			} 
     old_parameter_list_ne TK_RPAREN old_pardef_list TK_SEMICOLON
                         { 
-			  list paras = MakeParameterList($4,$6);
-			  functional f = make_functional(paras,make_type_unknown());
 			  entity e = stack_head(FunctionStack);
-			  entity_type(e) = make_type_functional(f);
+			  if (type_undefined_p(entity_type(e)))
+			    {
+			      list paras = MakeParameterList($4,$6,FunctionStack);
+			      functional f = make_functional(paras,make_type_unknown());
+			      entity_type(e) = make_type_functional(f);
+			    }
 			  pips_assert("Current function entity is consistent",entity_consistent_p(e));
 			  stack_pop(FunctionStack);
 			  stack_pop(FormalStack);
@@ -362,11 +371,16 @@ global:
 |   TK_IDENT TK_LPAREN TK_RPAREN TK_SEMICOLON
                         {
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
-			  functional f = make_functional(NIL,make_type_unknown());
 			  pips_debug(2,"Create function %s with old-style prototype, without any argument\n",$1);
-			  entity_type(e) = make_type_functional(f); 
-			  entity_storage(e) = make_storage_return(e);
-			  entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));	 
+			  if (type_undefined_p(entity_type(e)))
+			    {
+			      functional f = make_functional(NIL,make_type_unknown());
+			      entity_type(e) = make_type_functional(f); 
+			    }
+			  if (storage_undefined_p(entity_storage(e))) 
+			    entity_storage(e) = make_storage_return(e);
+			  if (value_undefined_p(entity_initial(e)))
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));	 
 			  pips_assert("Current function entity is consistent",entity_consistent_p(e));
 			  $$ = NIL;
 			}
@@ -951,7 +965,7 @@ statement:
 			}
 |   TK_IDENT TK_COLON statement
                         {
-			  $$ = MakeLabelledStatement($1,$3);
+			  $$ = MakeLabeledStatement($1,$3);
 			}
 |   TK_CASE expression TK_COLON
                         {
@@ -1013,6 +1027,7 @@ for_clause:
 declaration:                               /* ISO 6.7.*/
     decl_spec_list init_declarator_list TK_SEMICOLON
                         {
+			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
 			  stack_pop(ContextStack);
 			  $$ = gen_nconc($1,$2);
 			}
@@ -1026,6 +1041,7 @@ declaration:                               /* ISO 6.7.*/
 init_declarator_list:                       /* ISO 6.7 */
     init_declarator
                         {
+	
 			  $$ = CONS(ENTITY,$1,NIL);
 			}
 |   init_declarator TK_COMMA init_declarator_list
@@ -1083,10 +1099,11 @@ my_decl_spec_list:                         /* ISO 6.7 */
                                         /* ISO 6.7.2 */
 |   type_spec decl_spec_list_opt_no_named
                         {
-			  if (!entity_undefined_p($1))
+			  /* if (!entity_undefined_p($1))
 			    $$ = CONS(ENTITY,$1,$2);
 			  else
-			    $$ = $2;
+			  $$ = $2;*/
+			  $$ = gen_nconc($1,$2);
 			}	
                                         /* ISO 6.7.4 */
 |   TK_INLINE decl_spec_list_opt
@@ -1136,19 +1153,19 @@ type_spec:   /* ISO 6.7.2 */
     TK_VOID             
                         {
 			  c_parser_context_type(context) = make_type_void();
-			  $$ = entity_undefined;
+			  $$ = NIL;
                         } 
 |   TK_CHAR          
                         {
 			  c_parser_context_type(context) = make_standard_integer_type(c_parser_context_type(context),
 										      DEFAULT_CHARACTER_TYPE_SIZE);
-			  $$ = entity_undefined;
+			  $$ = NIL;
 			}
 |   TK_SHORT      
                         {
 			  c_parser_context_type(context) = make_standard_integer_type(c_parser_context_type(context),
 										      DEFAULT_SHORT_INTEGER_TYPE_SIZE);
-			  $$ = entity_undefined;
+			  $$ = NIL;
 			}    
 |   TK_INT  
                         {
@@ -1157,24 +1174,24 @@ type_spec:   /* ISO 6.7.2 */
 			      variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);	
 			      c_parser_context_type(context) = make_type_variable(v);
 			    }
-			  $$ = entity_undefined;
+			  $$ = NIL;
 			}  
 |   TK_LONG
                         {
 			  c_parser_context_type(context) = make_standard_long_integer_type(c_parser_context_type(context));
-			  $$ = entity_undefined;
+			  $$ = NIL;
 			}   
 |   TK_FLOAT           
                         {
 			  variable v = make_variable(make_basic_float(DEFAULT_REAL_TYPE_SIZE),NIL,NIL);
 			  c_parser_context_type(context) = make_type_variable(v);
-			  $$ = entity_undefined;
+			  $$ = NIL;
 			}
 |   TK_DOUBLE           
                         {
 			  variable v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
 			  c_parser_context_type(context) = make_type_variable(v);
-			  $$ = entity_undefined;
+			  $$ = NIL;
 			}
 |   TK_SIGNED     
                         {
@@ -1182,14 +1199,14 @@ type_spec:   /* ISO 6.7.2 */
 			  variable v = make_variable(make_basic_int(DEFAULT_SIGNED_TYPE_SIZE*10+
 								    DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
 			  c_parser_context_type(context) = make_type_variable(v);
-			  $$ = entity_undefined;
+			  $$ = NIL;
 			}
 |   TK_UNSIGNED          
                         {
 			  variable v = make_variable(make_basic_int(DEFAULT_UNSIGNED_TYPE_SIZE*10+
 								    DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
 			  c_parser_context_type(context) = make_type_variable(v);
-			  $$ = entity_undefined;
+			  $$ = NIL;
 			}
 |   TK_STRUCT id_or_typename                           
                         {
@@ -1203,7 +1220,7 @@ type_spec:   /* ISO 6.7.2 */
 			  if (type_undefined_p(entity_type(ent)))
 			    entity_type(ent) = make_type_struct(NIL); 
 			  c_parser_context_type(context) = make_type_variable(v);
-			  $$ = entity_undefined;
+			  $$ = NIL;
 			}
 |   TK_STRUCT id_or_typename TK_LBRACE 
                         {
@@ -1216,9 +1233,11 @@ type_spec:   /* ISO 6.7.2 */
 			  entity ent = MakeDerivedEntity($2,$5,is_external,is_type_struct);
 			  /* Specify the type of the variable that follows this declaration specifier*/
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
+			  /* Take from $5 the struct/union entities */
+			  list le = TakeDeriveEntities($5);
+			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(context) = make_type_variable(v); 
 			  stack_pop(StructNameStack);
-			  $$ = ent;
 			}
 |   TK_STRUCT TK_LBRACE
                         {
@@ -1232,9 +1251,11 @@ type_spec:   /* ISO 6.7.2 */
 			  string s = code_decls_text((code) stack_head(StructNameStack));			 
 			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_struct);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
+			  /* Take from $4 the struct/union entities */
+			  list le = TakeDeriveEntities($4);
+			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(context) = make_type_variable(v);
 			  stack_pop(StructNameStack); 
-			  $$ = ent;
 			}
 |   TK_UNION id_or_typename 
                         {
@@ -1245,7 +1266,7 @@ type_spec:   /* ISO 6.7.2 */
 			  if (type_undefined_p(entity_type(ent)))
 			    entity_type(ent) = make_type_union(NIL); 
 			  c_parser_context_type(context) = make_type_variable(v); 
-			  $$ = entity_undefined;
+			  $$ = NIL;
 			}
 |   TK_UNION id_or_typename TK_LBRACE 
                         {
@@ -1256,9 +1277,11 @@ type_spec:   /* ISO 6.7.2 */
                         {
 			  entity ent = MakeDerivedEntity($2,$5,is_external,is_type_union);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
+			  /* Take from $5 the struct/union entities */
+			  list le = TakeDeriveEntities($5);
+			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(context) = make_type_variable(v);
 			  stack_pop(StructNameStack);
-			  $$ = ent;
 			}
 |   TK_UNION TK_LBRACE
                         { 
@@ -1272,9 +1295,11 @@ type_spec:   /* ISO 6.7.2 */
 			  string s = code_decls_text((code) stack_head(StructNameStack));			 
 			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_struct);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
+			  /* Take from $4 the struct/union entities */
+			  list le = TakeDeriveEntities($4);
+			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(context) = make_type_variable(v);
 			  stack_pop(StructNameStack);
-			  $$ = ent;
 			}
 |   TK_ENUM id_or_typename   
                         {
@@ -1285,7 +1310,7 @@ type_spec:   /* ISO 6.7.2 */
 			  if (type_undefined_p(entity_type(ent)))
 			    entity_type(ent) = make_type_enum(NIL); 
 			  c_parser_context_type(context) = make_type_variable(v);
-			  $$ = entity_undefined;  
+			  $$ = NIL;  
 			}
 |   TK_ENUM id_or_typename TK_LBRACE enum_list maybecomma TK_RBRACE
                         {
@@ -1293,7 +1318,7 @@ type_spec:   /* ISO 6.7.2 */
 			  entity ent = MakeDerivedEntity($2,$4,is_external,is_type_enum);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  c_parser_context_type(context) = make_type_variable(v);  
-			  $$ = ent;
+			  $$ = CONS(ENTITY,ent,NIL);
 			}                   
 |   TK_ENUM TK_LBRACE enum_list maybecomma TK_RBRACE
                         {
@@ -1302,7 +1327,7 @@ type_spec:   /* ISO 6.7.2 */
 			  entity ent = MakeDerivedEntity(s,$3,is_external,is_type_enum);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  c_parser_context_type(context) = make_type_variable(v);  
-			  $$ = ent;
+			  $$ = CONS(ENTITY,ent,NIL);
 			}
 |   TK_NAMED_TYPE  
                         {
@@ -1315,7 +1340,7 @@ type_spec:   /* ISO 6.7.2 */
 			      /* typedef T1 T2 => the type of T2 will be that of T1*/
 			      pips_debug(8,"typedef T1 T2 where T1 =  %s\n",entity_name(ent));
 			      c_parser_context_type(context) = entity_type(ent);
-			      $$ = ent;
+			      $$ = CONS(ENTITY,ent,NIL);
 			    }
 			  else
 			    {
@@ -1323,7 +1348,7 @@ type_spec:   /* ISO 6.7.2 */
 			      variable v = make_variable(make_basic_typedef(ent),NIL,NIL);
 			      pips_debug(8,"T1 var where T1 =  %s\n",entity_name(ent));
 			      c_parser_context_type(context) = make_type_variable(v);  
-			      $$ = entity_undefined;
+			      $$ = NIL;
 			    }
 			}
 |   TK_TYPEOF TK_LPAREN expression TK_RPAREN  
@@ -1354,6 +1379,11 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  pips_debug(5,"Member name: %s\n",entity_name(ent));
 			  entity_storage(ent) = make_storage_rom();
 			  entity_type(ent) = c_parser_context_type(context); 
+
+			  /* Temporally put the list of struct/union entities defined in $1 to 
+			     initial value of ent*/
+			  entity_initial(ent) = (value) $1;
+
 			  $$ = CONS(ENTITY,ent,$3); 
 			  
 			  stack_pop(ContextStack);
@@ -1368,9 +1398,14 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			}
     field_decl_list TK_SEMICOLON struct_decl_list
                         {
+			  /* Update the entity in field_decl_list with final type, storage, initial value*/
+
+			  UpdateDerivedEntities($1,$3,ContextStack); 
+
 			  /* Create the list of member entities */
 			  $$ = gen_nconc($3,$5);
 			  stack_pop(ContextStack);
+
 			  /* This code is not good ...
 			     I have problem with the global variable context and recursion: context is crushed 
 			     when this decl_spec_list in struct_decl_list is entered, so the scope and storage 
@@ -1401,8 +1436,6 @@ field_decl_list: /* (* ISO 6.7.2 *) */
 field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
     declarator         
                         {
-			  /* Reset the entity storage */
-			  entity_storage($1) = make_storage_rom(); 
 			}
 |   declarator TK_COLON expression   
                         {
@@ -1410,9 +1443,7 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 			  pips_assert("Width of bit-field must be a positive constant integer", 
 				      integer_constant_expression_p($3));
 			  /* Ignore for this moment if the bit is signed or unsigned */
-			  entity_type($1) = make_type_variable(v);
-			  /* Reset the entity storage */
-			  entity_storage($1) = make_storage_rom(); 
+			  entity_type($1) = make_type_variable(v); 
 			  $$ = $1;
 			}  
 |   TK_COLON expression 
@@ -1425,7 +1456,6 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 			  pips_assert("Width of bit-field must be a positive constant integer", 
 				      integer_constant_expression_p($2));
 			  entity_type(ent) = make_type_variable(v);
-			  entity_storage(ent) = make_storage_rom();
 			  $$ = ent;
 			}
 ;
@@ -1485,11 +1515,9 @@ enumerator:
 declarator:  /* (* ISO 6.7.5. Plus Microsoft declarators.*) */
     pointer_opt direct_decl attributes_with_asm
                         { 
-			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
- 			  /* What about attributes_with_asm ? Add it to $2*/
-			  /* Pop from the ContextStack the contexts added with pointer_opt
-			     because several declarators share the same context which is just after decl_spec_list*/
-			  NStackPop(ContextStack,$1);
+			  /* Update the type of the direct_decl entity with pointer_opt and attributes*/
+			  if (!type_undefined_p($1))
+			    UpdatePointerEntity($2,$1,$3);
 			  $$ = $2;
 			}
 ;
@@ -1500,13 +1528,22 @@ direct_decl: /* (* ISO 6.7.5 *) */
     id_or_typename
                         {
 			  $$ = FindOrCreateCurrentEntity($1,ContextStack,FormalStack,FunctionStack,is_external);
-			  number_dimensions = 0;
+			  /* Initialize the type stack and push the type of found/created entity to the stack. 
+			     It can be undefined if the entity has not been parsed, or a given type which is 
+			     used later to check if the declarations are the same for one entity. 
+			     This stack is put temporarily in the storage of the entity, not a global variable 
+			     for each declarator to avoid being erased by recursion */
+			  entity_storage($$) = (storage) stack_make(type_domain,0,0);
+			  stack_push((char *) entity_type($$), (stack) entity_storage($$));
+			  entity_type($$) = type_undefined;
 			}
 |   TK_LPAREN attributes declarator TK_RPAREN
                         {
 			  /* Add attributes such as const, restrict, ... to variable's qualifiers */
 			  UpdateParenEntity($3,$2);
 			  $$ = $3;
+			  stack_push((char *) entity_type($$),(stack) entity_storage($$));
+			  entity_type($$) = type_undefined;
 			}
 |   direct_decl TK_LBRACKET attributes comma_expression_opt TK_RBRACKET
                         { 
@@ -1516,8 +1553,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			     - Why comma_expression, it can be a list of expressions ?
                              - When the comma_expression is empty (corresponding to the first dimension), 
 			       the array is of unknown size => can be determined by the intialization ? TO BE DONE*/
-			  number_dimensions++;
-			  UpdateArrayEntity($1,$3,$4,ContextStack,number_dimensions);
+			  UpdateArrayEntity($1,$3,$4);
 			}
 |   direct_decl TK_LBRACKET attributes error TK_RBRACKET
                         {
@@ -1534,9 +1570,10 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  stack_pop(FunctionStack);
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);	
-
-			  if (!intrinsic_entity_p($1))
-			    UpdateFunctionEntity($1,$4,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
+			  /* Intrinsic functions in C such as printf, fprintf, ... are considered
+			     as entities with functional type ???
+			     if (!intrinsic_entity_p($1))*/
+			  UpdateFunctionEntity($1,$4);
 			}
 ;
 
@@ -1557,14 +1594,14 @@ rest_par_list:
 ;
 rest_par_list1: 
     /* empty */         { $$ = NIL; }
-|   TK_COMMA TK_ELLIPSIS 
+|   TK_COMMA 
+                        { 
+			  StackPush(OffsetStack); 
+			}
+    TK_ELLIPSIS 
                         {
-			  entity function = stack_head(FunctionStack);
-			  if (!intrinsic_entity_p(function))
-			    {
-			      /* Not an intrinsic function */
-			      CParserError("Variable parameter list not implemented\n");
-			    }
+			  $$ = CONS(PARAMETER,make_parameter(make_type_varargs(type_undefined),
+							     make_mode(CurrentMode,UU)),NIL); 
 			}
 |   TK_COMMA 
                         { 
@@ -1579,13 +1616,16 @@ rest_par_list1:
 parameter_decl: /* (* ISO 6.7.5 *) */
     decl_spec_list declarator 
                         {
+			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
 			  $$ = make_parameter(entity_type($2),make_mode(CurrentMode,UU));
 			  /* Set CurentMode where ???? */
 			  stack_pop(ContextStack);
 			}
 |   decl_spec_list abstract_decl 
                         {
-			  $$ = make_parameter($2,make_mode(CurrentMode,UU));
+			  UpdateAbstractEntity($2,ContextStack);
+			  $$ = make_parameter(copy_type(entity_type($2)),make_mode(CurrentMode,UU));
+			  free_entity($2);
 			  stack_pop(ContextStack);
 			}
 |   decl_spec_list              
@@ -1603,46 +1643,32 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 old_proto_decl:
     pointer_opt direct_old_proto_decl
                         {
-			  /* Pop from the ContextStack the contexts added with pointer_opt*/
-			  NStackPop(ContextStack,$1);
+			  if (!type_undefined_p($1))
+			    UpdatePointerEntity($2,$1,NIL);
+			  $$ = $2;
 			}
 ;
 
 direct_old_proto_decl:
     direct_decl TK_LPAREN
                         { 
-			  pips_debug(2,"Create current module %s with old-style function prototype\n",entity_name($1)); 
+			  if (value_undefined_p(entity_initial($1)))
+			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));
 			  stack_push((char *) $1, FunctionStack);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
-			  MakeCurrentModule($1);
 			} 
     old_parameter_list_ne TK_RPAREN old_pardef_list
                         { 
-			  c_parser_context context = stack_head(ContextStack);
-			  list paras = MakeParameterList($4,$6);
-			  functional f = make_functional(paras,c_parser_context_type(context));
-			  entity_type($1) = make_type_functional(f);
-			  /* Attention, $6 can be ... => to correct */
-			  
-			  ifdebug(3)
-			    {
-			      printf("List of formal parameters:\n");
-			      print_entities($6);
-			    }
+			  list paras = MakeParameterList($4,$6,FunctionStack);
 			  stack_pop(FunctionStack);
 			  stack_pop(FormalStack);
-			  StackPop(OffsetStack);	
+			  StackPop(OffsetStack);
+			  UpdateFunctionEntity($1,paras);
 			}
 |   direct_decl TK_LPAREN TK_RPAREN
                         { 
-			  c_parser_context context = stack_head(ContextStack);
-			  functional f = make_functional(NIL,c_parser_context_type(context));
-			  pips_debug(2,"Create current module %s with old-style prototype and without parameters\n",
-				     entity_name($1));
-			  MakeCurrentModule($1);
-			  entity_type($1) = make_type_functional(f);
-			  pips_assert("Current module entity is consistent\n",entity_consistent_p($1));
+                          UpdateFunctionEntity($1,NIL);
 			}
 ;
 
@@ -1661,6 +1687,7 @@ old_pardef_list:
     /* empty */         { $$ = NIL; }
 |   decl_spec_list old_pardef TK_SEMICOLON TK_ELLIPSIS
                         {
+			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
 			  stack_pop(ContextStack);  
 			  /* Can we have struct/union definition in $1 ?*/
 			  /*$$ = gen_nconc($1,$2);*/
@@ -1668,6 +1695,7 @@ old_pardef_list:
 			}
 |   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list  
                         {
+			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
 			  stack_pop(ContextStack);	  
 			  /* Can we have struct/union definition in $1 ?*/
 			  /*$$ = gen_nconc($1,gen_nconc($2,$4));*/
@@ -1693,25 +1721,21 @@ old_pardef:
 pointer: /* (* ISO 6.7.5 *) */ 
     TK_STAR attributes pointer_opt 
                         {
-			  c_parser_context context = stack_head(ContextStack);
-			  c_parser_context new_context = copy_c_parser_context(context);
-			  variable v = make_variable(make_basic_pointer(c_parser_context_type(context)),NIL,NIL);
-			  c_parser_context_type(new_context) = make_type_variable(v);
-			  c_parser_context_qualifiers(new_context) = gen_nconc(c_parser_context_qualifiers(new_context),$2);
-			  stack_push((char *)new_context,ContextStack);
-			  $$ = 1 + $3;
+			  $$ = make_type_variable(make_variable(make_basic_pointer($3),NIL,$2));
 			}
 ;
 
 pointer_opt:
-    /* empty */         { $$ = 0;}
-|   pointer             { $$ = $1;}
+    /* empty */         { $$ = type_undefined;}
+|   pointer             { }
 ;
 
 type_name: /* (* ISO 6.7.6 *) */
     decl_spec_list abstract_decl
                         {
-			  $$ = $2;
+			  UpdateAbstractEntity($2,ContextStack);
+			  $$ = copy_type(entity_type($2));
+			  free_entity($2);
 			  stack_pop(ContextStack);
 			}
 |   decl_spec_list      
@@ -1725,17 +1749,25 @@ type_name: /* (* ISO 6.7.6 *) */
 abstract_decl: /* (* ISO 6.7.6. *) */
     pointer_opt abs_direct_decl attributes  
                         {
-			  $$ = $2;
-			  /* Pop from the ContextStack the contexts added with pointer_opt*/
-			  NStackPop(ContextStack,$1);
-			 
+			  /* Update the type of the direct_decl entity with pointer_opt and attributes*/
+			  if (!type_undefined_p($1))
+			    UpdatePointerEntity($2,$1,$3);
+			  $$ = $2;		 
 			}
-|   pointer                     
-                        {
-			  c_parser_context context = stack_head(ContextStack);
-			  $$ = c_parser_context_type(context);  
-			  /* Pop from the ContextStack the contexts added with pointer_opt*/
-			  NStackPop(ContextStack,$1);
+|   pointer 
+                        { 
+			  $$ = FindOrCreateCurrentEntity(strdup(concatenate("PIPS_ABSTRACT_",
+									    int_to_string(abstract_counter++),NULL)),
+							 ContextStack,FormalStack,FunctionStack,is_external);
+			  UpdatePointerEntity($$,$1,NIL);
+			  /* Initialize the type stack and push the type of found/created entity to the stack. 
+			     It can be undefined if the entity has not been parsed, or a given type which is 
+			     used later to check if the declarations are the same for one entity. 
+			     This stack is put temporarily in the storage of the entity, not a global variable 
+			     for each declarator to avoid being erased by recursion */
+			  entity_storage($$) = (storage) stack_make(type_domain,0,0);
+			  stack_push((char *) entity_type($$), (stack) entity_storage($$));
+			  /*entity_type($$) = type_undefined;*/
 			}
 ;
 
@@ -1744,8 +1776,10 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
                      * discussion for declarator. *) */
     TK_LPAREN attributes abstract_decl TK_RPAREN
                         {
-			  UpdateParenAbstractType($3,$2);
+			  UpdateParenEntity($3,$2);
 			  $$ = $3;
+			  stack_push((char *) entity_type($$),(stack) entity_storage($$));
+			  entity_type($$) = type_undefined;
 			}
 |   TK_LPAREN error TK_RPAREN
                         {
@@ -1754,21 +1788,35 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
             
 |   abs_direct_decl_opt TK_LBRACKET comma_expression_opt TK_RBRACKET
                         {
-			  UpdateArrayAbstractType($1,$3,ContextStack);
+			  UpdateArrayEntity($1,NIL,$3);
 			}
 /*(* The next shoudl be abs_direct_decl_opt but we get conflicts *)*/
-|   abs_direct_decl_opt parameter_list_startscope rest_par_list TK_RPAREN
+|   abs_direct_decl_opt parameter_list_startscope 
                         {
+			  if (value_undefined_p(entity_initial($1)))
+			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));
+			  stack_push((char *) $1,FunctionStack);
+			}
+    rest_par_list TK_RPAREN
+                        {
+			  stack_pop(FunctionStack);
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);	
-			  UpdateFunctionAbstractType($1,$3,ContextStack);
+			  UpdateFunctionEntity($1,$4);
 			}  
 ;
 
 abs_direct_decl_opt:
     abs_direct_decl    
-                        {}
-|   /* empty */         { $$ = type_undefined; }
+                        { }
+|   /* empty */         {  
+			  $$ = FindOrCreateCurrentEntity(strdup(concatenate("PIPS_ABSTRACT_",
+									    int_to_string(abstract_counter++),NULL)),
+							 ContextStack,FormalStack,FunctionStack,is_external);
+			  entity_storage($$) = (storage) stack_make(type_domain,0,0);
+			  stack_push((char *) entity_type($$), (stack) entity_storage($$));
+			  entity_type($$) = type_undefined;
+    }
 ;
 
 function_def:  /* (* ISO 6.9.1 *) */
@@ -1789,6 +1837,7 @@ function_def:  /* (* ISO 6.9.1 *) */
 function_def_start:  /* (* ISO 6.9.1 *) */
     decl_spec_list declarator   
                         { 
+			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
 			  stack_pop(ContextStack);
 			  pips_debug(2,"Create current module %s\n",entity_user_name($2));
 			  MakeCurrentModule($2); 
@@ -1797,7 +1846,11 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 /* (* Old-style function prototype *) */
 |   decl_spec_list old_proto_decl 
                         { 
+			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external);
 			  stack_pop(ContextStack);
+			  pips_debug(2,"Create current module %s with old-style prototype\n",entity_user_name($2));
+			  MakeCurrentModule($2); 
+			  pips_assert("Module is consistent\n",entity_consistent_p($2));
 			}	
 /* (* New-style function that does not have a return type *) */
 |   TK_IDENT parameter_list_startscope 
@@ -1830,7 +1883,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			}
     TK_RPAREN old_pardef_list
                         { 
-			  list paras = MakeParameterList($3,$6);
+			  list paras = MakeParameterList($3,$6,FunctionStack);
 			  functional f = make_functional(paras,make_type_unknown());
 			  entity e = stack_head(FunctionStack);
 			  entity_type(e) = make_type_functional(f);
