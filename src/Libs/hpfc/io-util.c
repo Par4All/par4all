@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-util.c,v $ ($Date: 1995/04/24 18:23:21 $, )
+ * $RCSfile: io-util.c,v $ ($Date: 1995/08/01 09:13:47 $, )
  * version $Revision$,
  */
 
@@ -99,7 +99,7 @@ static statement NAME(array, move) entity array; tag move;\
  return((move==is_movement_collect) ? (COLLECT) : (UPDATE));}
 
 GENERATION(node_pre_io,
-	   hpfc_initsend(),
+	   hpfc_initsend(FALSE),
 	   hpfc_nrecv(FALSE));
 GENERATION(node_in_io,
 	   hpfc_packing(array, get_ith_local_dummy, TRUE),
@@ -109,7 +109,7 @@ GENERATION(node_post_io,
 	   make_empty_statement());
 GENERATION(host_pre_io,
 	   hpfc_hmessage(array_to_processors(array), FALSE),
-	   hpfc_initsend());
+	   hpfc_initsend(FALSE));
 GENERATION(host_in_io,
 	   hpfc_packing(array, get_ith_array_dummy, FALSE),
 	   hpfc_packing(array, get_ith_array_dummy, TRUE));
@@ -293,7 +293,7 @@ statement *psh, *psn;
     statement
 	h_cont = make_empty_statement(),
 	n_cont = make_empty_statement(),
-	h_pre = hpfc_initsend(),
+	h_pre = hpfc_initsend(FALSE),
 	h_rebuild = generate_deducables(rebuild),
 	h_pack = hpfc_packing(array, get_ith_array_dummy, TRUE),
 	h_cast = hpfc_hcast(),
