@@ -23,5 +23,6 @@ Frame frame;
 void unhide_window(frame)
 Frame frame;
 {
+    xv_set(frame, FRAME_CLOSED, FALSE, NULL);
     xv_set(frame, XV_SHOW, TRUE, NULL);
 }
