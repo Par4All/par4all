@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1994/12/30 09:05:07 $, ) version $Revision$,
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1994/12/30 16:49:15 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -171,7 +171,7 @@ loop l;
 }
 
 void update_object_for_module(obj, module)
-chunk *obj;
+gen_chunk *obj; /* loosely typed, indeed */
 entity module;
 {
     entity_mapping
