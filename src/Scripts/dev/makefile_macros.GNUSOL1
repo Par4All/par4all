@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL1,v $ (version $Revision$)
-# $Date: 1996/09/02 17:52:23 $, 
+# $Date: 1996/09/19 11:51:50 $, 
 #
 # this file contains macro definitions 
 
@@ -10,6 +10,7 @@ AR	= gar
 ARFLAGS	= rv
 CC	= gcc
 CFLAGS	= -g -O2 -msupersparc -ansi -pedantic -Wall -pipe
+CMKDEP	= -M
 CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC) 
 LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(EXTERN_ROOT)/Lib/$(ARCH)
