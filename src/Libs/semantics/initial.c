@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.15  2001/07/13 13:21:13  coelho
+ * hop.
+ *
  * Revision 1.14  1998/05/28 19:05:47  irigoin
  * Filtering by effects added to avoid spurious variables as in Spec/fppp.f
  * and data02.f
@@ -244,7 +247,7 @@ program_precondition(string name)
 	pips_assert("consistent program precondition", 
 		    transformer_consistency_p(t));
 
-    DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_PRECONDITION, strdup(name), t);
+    DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_PRECONDITION, "", t);
 
     reset_current_module_entity();
     reset_current_module_statement();
