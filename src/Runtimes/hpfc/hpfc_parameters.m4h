@@ -1,7 +1,7 @@
 c
 c parameters used to compile 
 c
-c $RCSfile: hpfc_parameters.m4h,v $ ($Date: 1994/09/21 17:23:05 $, )
+c $RCSfile: hpfc_parameters.m4h,v $ ($Date: 1995/09/07 11:30:13 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -13,7 +13,8 @@ c
      $     MAXNBOFARRAYS,
      $     MAXNBOFTEMPLATES,
      $     MAXNBOFPROCESSORS,
-     $     MAXMAXSIZEOFPROCS
+     $     MAXMAXSIZEOFPROCS,
+     $     MAXSIZEOFBUFFER
 
 c
 c parameters
@@ -23,6 +24,7 @@ c
       parameter(MAXNBOFTEMPLATES = 10)
       parameter(MAXNBOFPROCESSORS = 10)
       parameter(MAXMAXSIZEOFPROCS = 32)
+      parameter(MAXSIZEOFBUFFER = 3920)
 c
 c that s all
 c
