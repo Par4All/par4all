@@ -72,8 +72,6 @@ extern struct gen_binding Domains[], *Tabulated_bp ;
 /* The root of the gen_chunk read with READ_CHUNK. */
 extern gen_chunk *Read_chunk ;
 
-struct gen_binding ;
-
 /* A DOMAIN union describes the structure of a user type. 
 
    The (STRUCT BINDING *) are used either to point to strings (during
