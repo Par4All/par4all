@@ -1,3 +1,5 @@
+/* $Id$
+ */
 
 #include "ri.h"
 #include "ri-util.h"
@@ -19,7 +21,19 @@
 #define effect_exact_p(eff) \
         (approximation_tag(effect_approximation(eff)) == is_approximation_exact)
 
-/* Generic FUNCTIONS on lists of effects to be instanciated for specific 
+/* some string constants 
+ */
+
+#define ACTION_UNDEFINED 	string_undefined
+#define ACTION_READ 		"R"
+#define ACTION_WRITE 		"W"
+#define ACTION_IN    		"IN"
+#define ACTION_OUT		"OUT"
+#define ACTION_COPYIN		"COPYIN"
+#define ACTION_COPYOUT		"COPYOUT"
+#define ACTION_PRIVATE		"PRIVATE"
+
+/* GENERIC FUNCTIONS on lists of effects to be instanciated for specific 
    types of effects */
 
 /* initialisation and finalization */
