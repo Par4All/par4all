@@ -1,0 +1,127 @@
+#! /bin/sh
+#
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/02/28 11:29:29 $, )
+# version $Revision$
+# got on %D%, %T%
+#
+# Filter to switch from hpf directives to subroutine calls to be parsed
+# by a Fortran 77 parser. I guess some perl or awk might be much more nice 
+# and efficient, but I'm not very good at it:-)
+#
+# FC 02/95.
+#
+# HPF -> 
+# calls to HPFC subroutines and functions -> 
+# HPFC subs and functs analyzed and removed -> 
+# analyzes on the correct transformed code
+#
+
+#
+# _ is hpfc:
+#
+# _a: align
+# _b: realign
+# _c: cyclic
+# _d: distribute
+# _e: redistribute
+# _i: independent
+# _k: block 
+# _n: new
+# _o: overloaded (declaration)
+# _p: processors
+# _t: template
+# _y: dynamic
+#
+# move static directives AFTER declarations.
+#
+
+#
+# commands:
+#
+# the sed version should be able to handle very large lines... 
+# gnu sed is okay.
+
+SED=sed
+TR=tr
+RM=rm
+CAT=cat
+EXPR=expr
+
+#
+# temporary files prefix
+
+TMP=/tmp/hpfc_hpf.$$
+$RM -f $TMP.*
+
+#
+# directive normalization
+#
+$SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,chpf$\1,
+      s,^chpf\$[^ ], ,' | 
+#
+# and continuation handling:
+# put on one line
+#
+$TR '\012' '' | 
+#
+# remove not needed cr
+#
+$SED 's,,,g' | 
+#
+# and back to a normal file
+#
+$TR '' '\012' |
+#
+# massive transformations
+#
+$SED '/^chpf\$/s,[Bb][Ll][Oo][Cc][Kk],_k,g
+      /^chpf\$/s,_k\([\,)]\),_k(\*)\1,g
+      /^chpf\$/s,[Cc][Yy][Cc][Ll][Ii][Cc],_c,g
+      /^chpf\$/s,_c\([\,)]\),_c(1)\1,g
+      s,^chpf\$ [Dd][Yy][Nn][Aa][Mm][Ii][Cc] \(.*\),      _y(\1),
+      s,^chpf\$ [Tt][Ee][Mm][Pp][Ll][Aa][Tt][Ee] \(.*\),      _o \1      _t(\1),
+      s,^chpf\$ [Pp][Rr][Oo][Cc][Ee][Ss][Ss][Oo][Rr][Ss] \(.*\),      _o \1      _p(\1),
+      s,^chpf\$ [Aa][Ll][Ii][Gg][Nn] \(.*\) [Ww][Ii][Tt][Hh] \(.*\),      _a(\1\,\2),
+      s,^chpf\$ [Rr][Ee][Aa][Ll][Ii][Gg][Nn] \(.*\) [Ww][Ii][Tt][Hh] \(.*\),      _b(\1\,\2),
+      s,^chpf\$ [Dd][Ii][Ss][Tt][Rr][Ii][Bb][Uu][Tt][Ee] \(.*\) [Oo][Nn][Tt][Oo] \(.*\),      _d(\1\,\2),
+      s,^chpf\$ [Rr][Ee][Dd][Ii][Ss][Tt][Rr][Ii][Bb][Uu][Tt][Ee] \(.*\) [Oo][Nn][Tt][Oo] \(.*\),      _e(\1\,\2),
+      s,^chpf\$ [Ii][Nn][Dd][Ee][Pp][Ee][Nn][Dd][Ee][Nn][Tt][ 	]*\([^( ,][^()\,]*\),      _i(\1),
+      s,^chpf\$ [Ii][Nn][Dd][Ee][Pp][Ee][Nn][Dd][Ee][Nn][Tt][ 	]*\(.*\),      _i\1,
+      s,^      _i\,,      _i()\,,
+      s,^      _i(\([^)]*\))[ 	]*\,[ 	]*[Nn][Ee][Ww]\(.*\),      _i(\1)      _n\2,
+      s,_\([abdeintpy]\),call hpfc\1,g
+      s,_\([cko]\),hpfc\1,g' |
+#
+# handles multi lines breaking (independent with new...)
+#
+$TR '' '\012' |
+#
+# I should also break the created lines which are too long...
+#
+# separates static directives from others
+#
+$SED "/^      call hpfc[adptdy]/w $TMP.1
+      /^      call hpfc[adptdy]/d" > $TMP.0
+
+#
+# line before which the static directives will be inserted
+# i.e. last statement beginning with end.
+
+ENDLINE=`$SED -n "/ .... [ 	]*[Ee][ 	]*[Nn][ 	]*[Dd]/=" $TMP.0 | 
+         $SED -n '$p'`
+
+#
+# final output
+
+$SED -n "1,`$EXPR $ENDLINE - 1`p" $TMP.0
+$CAT $TMP.1
+$SED -n "$ENDLINE,\$p" $TMP.0
+
+#
+# clean temporary files
+
+$RM -f $TMP.*
+
+#
+# That is all
+#
