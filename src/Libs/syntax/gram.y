@@ -133,12 +133,15 @@
 
 #include "syntax.h"
 
+/* should not appear! */
+extern int yylex(void);
+
     /* local variables */
     int ici; /* to count control specifications in IO statements */
     type CurrentType = type_undefined; /* the type in a type or dimension
 					  or common statement */
     int CurrentTypeSize; /* number of bytes to store a value of that type */
-
+
 /* functions for DATA */
 
 /* this function creates a 'dataval'. it takes two expressions as
@@ -926,7 +929,7 @@ letter_letter: letter
 
 letter:	 TK_NAME
 	    {
-		$$ = yytext[0];
+		$$ = yylval.string[0]; free(yylval.string);
 	    }
 	;
 
@@ -952,7 +955,7 @@ entity_name: name
 	;
 
 name: TK_NAME
-	    { $$ = strdup(yytext); }
+	    { $$ = yylval.string; }
 
 module_name: global_name
             {
@@ -972,7 +975,7 @@ global_entity_name: global_name
 	;
 
 global_name: TK_NAME
-	    { $$ = strdup(yytext); }
+	    { $$ = yylval.string; }
         ;
 
 opt_lformalparameter:
@@ -1224,33 +1227,38 @@ unsigned_const_simple: TK_TRUE
 	    }
 	| TK_DCON
 	    {
-		    $$ = MakeConstant(yytext, is_basic_float);
+		    $$ = MakeConstant(yylval.string, is_basic_float);
+		    free(yylval.string);
 	    }
 	| TK_SCON
 	    {
-		    $$ = MakeConstant(yytext, is_basic_string);
+		    $$ = MakeConstant(yylval.string, is_basic_string);
+		    free(yylval.string);		    
 	    }
         | TK_RCON 
 	    {
-		    $$ = MakeConstant(yytext, is_basic_float);
+		    $$ = MakeConstant(yylval.string, is_basic_float);
+		    free(yylval.string);
 	    }
 	;
 
 icon: TK_ICON 
 	    {
-		    $$ = MakeConstant(yytext, is_basic_int);
+		    $$ = MakeConstant(yylval.string, is_basic_int);
+		    free(yylval.string);
 	    }
 	;
 
 label: TK_ICON 
 	    {
-		    $$ = strdup(yytext);
+		    $$ = yylval.string;
 	    }
 	;
 
 ival: TK_ICON 
 	    {
-		    $$ = atoi(yytext);
+		    $$ = atoi(yylval.string);
+		    free(yylval.string);
 	    }
 	;
 
@@ -1341,21 +1349,19 @@ opt_virgule:
 	;
 %%
 
+extern void yyerror_lex_part(char *);
+
 void yyerror(s)
 char * s;
 {
-	/* procedure minimum de recouvrement d'erreurs */
-	int c;
-	user_warning("parser"," error - %s near %s\n", s, yytext);
-
-	user_warning("parser", "Non analyzed source text stored in logfile\n");
-
-/* #ifdef LEXDEBUG */
-
-	while ((c = getc(yyin)) != EOF)
-		putc(c, stderr);
-/* #endif */
+    /* procedure minimum de recouvrement d'erreurs */
+    int c;
+    yyerror_lex_part(s);
+    user_warning("parser", "Non analyzed source text stored in logfile\n");
+    
+    while ((c = getc(yyin)) != EOF)
+	putc(c, stderr);
 	
-	/* pas de recouvrement d'erreurs */
-	ParserError("yyerror", "Syntax error\n");
+    /* pas de recouvrement d'erreurs */
+    ParserError("yyerror", "Syntax error\n");
 }
