@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 16:47:09 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 16:51:42 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1473,7 +1473,7 @@ gen_free_tabulated(int domain)
 {
     struct gen_binding *bp = &Domains[ domain ];
     gen_chunk * t = Gen_tabulated_[bp->index];
-    int i;
+    int i, size = max_tabulated_elements();
     
     check_read_spec_performed();
 
@@ -1486,7 +1486,7 @@ gen_free_tabulated(int domain)
 
     /* fprintf(stderr, " -- domain %d (%d allocated)\n", domain, bp->alloc); */
 
-    for (i=0; i<bp->alloc; i++)
+    for (i=0; i<size; i++)
     {
 	if (t[i].p && !gen_chunk_undefined_p(t[i].p)) {
 	    /* fprintf(stderr, "freeing [%d] (0x%x) %s \n", i,
@@ -1499,7 +1499,7 @@ gen_free_tabulated(int domain)
     hash_table_free(free_already_seen);
     free_already_seen = NULL;
 
-    bp->alloc = 0;
+    bp->alloc = 1; /* ??? */
     return domain;
 }
 
