@@ -82,7 +82,7 @@ YFLAGS+= -d -v
 
 all: $(ARCH)/newC $(ARCH)/libgenC.a
 
-recompile: all quick-install
+#recompile: all quick-install
 
 # dependences.
 
@@ -95,7 +95,7 @@ newgen_auto_%.h: %.c
 
 $(ARCH)/libgenC.a: $(LIB_OBJECTS)
 	$(RM) $@
-	$(ARCHIVE) $@ $+
+	$(ARCHIVE) $@ $(LIB_OBJECTS)
 	ranlib $@
 
 genread.h genread_yacc.c: read.y
@@ -121,13 +121,13 @@ genspec_lex.c: token.l
 	sed '/^FILE *\*/s,=[^,;]*,,g;s,YY,GENSPEC_,g;s,yy,genspec_,g' > $@
 
 $(ARCH)/newC:	$(ARCH)/new.o $(ARCH)/libgenC.a
-	$(LINK) $@ $+
+	$(LINK) $@ $(ARCH)/new.o $(ARCH)/libgenC.a
 
 $(ARCH)/newLisp: $(ARCH)/new.o $(ARCH)/build.o $(ARCH)/genLisp.o
-	$(LINK) $@ $+
+	$(LINK) $@ $(ARCH)/new.o $(ARCH)/build.o $(ARCH)/genLisp.o
 
 $(ARCH)/newSML:	$(ARCH)/new.o $(ARCH)/build.o $(ARCH)/genSML.o
-	$(LINK) $@ $+
+	$(LINK) $@ $(ARCH)/new.o $(ARCH)/build.o $(ARCH)/genSML.o
 
 clean-compiled:
 	$(RM) $(ARCH)/libgenC.a $(ARCH)/*.o $(ARCH)/newC 
