@@ -308,7 +308,7 @@ alias_pairs( string module_name, list l_reg )
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
     module_to_value_mappings(callee);
 
-    if_debug(9)
+    ifdebug(9)
 	{
 	    pips_debug(9,"list_regions_callee is: \n");
 	    print_regions(list_regions_callee);
