@@ -4,6 +4,9 @@
 %% PIPS faq
 %%
 %% $Log: faq.tex,v $
+%% Revision 1.8  1999/01/11 09:13:44  irigoin
+%% Because of EDF, section of code clean up added.
+%%
 %% Revision 1.7  1999/01/09 18:20:10  irigoin
 %% Two sections added about loop parallelization, following new results from
 %% the Perfect Club and the Spec CFP95 benchmarks.
@@ -121,7 +124,7 @@ not applied by default. The corresponding properties must be set (see \PROPERTIE
 
 \end{itemize}
 
-Formal functional are still unsupported ($Date: 1999/01/09 18:20:10 $) and
+Formal functional are still unsupported ($Date: 1999/01/11 09:13:44 $) and
 the internal representation of DATA statements is unsatisfactory.
 
 Recursivity, which is not in Fortran 77 standard, is not supported.
@@ -337,6 +340,46 @@ This is surprising for the user and we might change PIPS behavior so as
 not to parallelize useless loops. But this would require an extra
 feasibility test which will slow down PIPS and this would keep sequential
 trivially parallel loops which is another source of surprise!
+
+\section{How can I clean up my code?}
+\index{Declaration}
+\index{Use-def elimination}
+\index{Dead code elimination}
+\index{Constant propagation}
+\index{Partial evaluation}
+
+After several transformations, a piece of code may contain useless
+declarations and statements. PIPS does not offer a magic clean-up function
+because the process is iterative and lengthy. Four code transformations
+are available for cleanup:
+
+\begin{itemize}
+
+\item \verb/clean_declarations/: get rid of unreferenced variables
+
+\item \verb/use_def_elimination/: get rid of useless definitions
+
+\item \verb/suppress_dead_code/: dead code elimination
+
+\item \verb/partial_eval/: constant propagation
+
+\end{itemize}
+
+There is no best order of application but \verb/clean_declarations/ should
+be performed last. If many modules must be processed, it is necessary to
+perform a concurrent apply to avoid an unbearable number of recomputations
+(\verb/capply/ command for \TPIPS{}). Each time a module code is touched,
+effects, transformers and preconditions should be recomputed across the
+whole application to maintain a full consistency. Since these
+transformations do not modify the semantics of the modules, a relaxed
+consistency can be used and a concurrent application of the
+transformations is legal.
+
+Note that constant propagation can improve the preconditions by making
+some non-linear expressions linear. The best result is obtained with a fix
+point of these transformations. If a polynomial of degree $k$ can be
+replaced by an affine expression, no more than $k-1$ rounds of
+transformations are necessary.
 
 \newpage
 
