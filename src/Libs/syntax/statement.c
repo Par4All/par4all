@@ -1,6 +1,4 @@
 #include <stdio.h>
-extern int fprintf();
-extern int _filbuf();
 #include <string.h>
 #include <ctype.h>
 
