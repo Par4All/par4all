@@ -20,7 +20,7 @@ enum {ICON_TEXT_HEIGHT = 20};
 
 static Server_image pips_icon_server_image[LAST_ICON];
 
-static short pips_icons_data[LAST_ICON][256] = {
+static unsigned short int pips_icons_data[LAST_ICON][256] = {
   {
 #include "pips.icon"
   }, {
