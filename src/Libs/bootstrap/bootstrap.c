@@ -58,6 +58,8 @@
 #define GET_TYPE(h, e) ((basic)hash_get(h, (char*)(e)))
 #define PUT_TYPE(h, e, b) hash_put(h, (char*)(e), (char*)(b))
 
+/* This declaration is temporal. It will be moved to ri-util.h */
+extern expression insert_cast(basic cast, basic from, expression exp);
 
 void 
 CreateAreas()
@@ -901,6 +903,13 @@ typing_function_complex_to_real(call c, hash_table types)
     return typing_function_argument_type_to_return_type(c, types, type_CMPLX, type_REAL);
 }
 static basic
+typing_function_dcomplex_to_double(call c, hash_table types)
+{
+    basic type_DBLE = make_basic_float(8);
+    basic type_DCMPLX = make_basic_complex(16);
+    return typing_function_argument_type_to_return_type(c, types, type_DCMPLX, type_DBLE);
+}
+static basic
 typing_function_char_to_logical(call c, hash_table types)
 {
     basic type_LOGICAL = make_basic_logical(4);
@@ -1124,106 +1133,120 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"STOP", 0, default_intrinsic_type, 0},
     {"END", 0, default_intrinsic_type, 0},
 
-    {"INT", 1, overloaded_to_integer_type, 0},
-    {"IFIX", 1, real_to_integer_type, 0},
-    {"IDINT", 1, double_to_integer_type, 0},
-    {"REAL", 1, overloaded_to_real_type, 0},
-    {"FLOAT", 1, overloaded_to_real_type, 0},
-    {"DFLOAT", 1, overloaded_to_double_type, 0},
-    {"SNGL", 1, overloaded_to_real_type, 0},
-    {"DBLE", 1, overloaded_to_double_type, 0},
-    {"DREAL", 1, overloaded_to_double_type, 0}, /* Arnauld Leservot, code CEA */
-    {"CMPLX", (INT_MAX), overloaded_to_complex_type, 0},
-    {"DCMPLX", (INT_MAX), overloaded_to_doublecomplex_type, 0},
+    {"INT", 1, overloaded_to_integer_type, typing_function_conversion_to_integer},
+    {"IFIX", 1, real_to_integer_type, typing_function_real_to_int},
+    {"IDINT", 1, double_to_integer_type, typing_function_double_to_int},
+    {"REAL", 1, overloaded_to_real_type, typing_function_conversion_to_real},
+    {"FLOAT", 1, overloaded_to_real_type, typing_function_conversion_to_real},
+    {"DFLOAT", 1, overloaded_to_double_type, typing_function_conversion_to_real},
+    {"SNGL", 1, overloaded_to_real_type, typing_function_conversion_to_real},
+    {"DBLE", 1, overloaded_to_double_type, typing_function_conversion_to_double},
+    {"DREAL", 1, overloaded_to_double_type, 
+     typing_function_conversion_to_double}, /* Arnauld Leservot, code CEA */
+    {"CMPLX", (INT_MAX), overloaded_to_complex_type, 
+     typing_function_conversion_to_complex},
+    {"DCMPLX", (INT_MAX), overloaded_to_doublecomplex_type, 
+     typing_function_conversion_to_dcomplex},
 
     /* (0.,1.) -> switched to a function call...
      */
     { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type, 0},
     { IMPLIED_DCOMPLEX_NAME, 2, overloaded_to_doublecomplex_type, 0},
 
-    {"ICHAR", 1, default_intrinsic_type, 0},
-    {"CHAR", 1, default_intrinsic_type, 0},
-    {"AINT", 1, real_to_real_type, 0},
-    {"DINT", 1, double_to_double_type, 0},
-    {"ANINT", 1, real_to_real_type, 0},
-    {"DNINT", 1, double_to_double_type, 0},
-    {"NINT", 1, real_to_integer_type, 0},
-    {"IDNINT", 1, double_to_integer_type, 0},
-    {"IABS", 1, integer_to_integer_type, 0},
-    {"ABS", 1, real_to_real_type, 0},
-    {"DABS", 1, double_to_double_type, 0},
-    {"CABS", 1, complex_to_real_type, 0},
-    {"CDABS", 1, doublecomplex_to_double_type, 0},
+    {"ICHAR", 1, default_intrinsic_type, typing_function_char_to_int},
+    {"CHAR", 1, default_intrinsic_type, typing_function_int_to_char},
+    {"AINT", 1, real_to_real_type, typing_function_real_to_real},
+    {"DINT", 1, double_to_double_type, typing_function_double_to_double},
+    {"ANINT", 1, real_to_real_type, typing_function_real_to_real},
+    {"DNINT", 1, double_to_double_type, typing_function_double_to_double},
+    {"NINT", 1, real_to_integer_type, typing_function_real_to_int},
+    {"IDNINT", 1, double_to_integer_type, typing_function_double_to_int},
+    {"IABS", 1, integer_to_integer_type, typing_function_int_to_int},
+    {"ABS", 1, real_to_real_type, 
+     typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal},
+    {"DABS", 1, double_to_double_type, typing_function_double_to_double},
+    {"CABS", 1, complex_to_real_type, typing_function_complex_to_real},
+    {"CDABS", 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double},
 
-    {"MOD", 2, default_intrinsic_type, 0},
-    {"AMOD", 2, real_to_real_type, 0},
-    {"DMOD", 2, double_to_double_type, 0},
-    {"ISIGN", 2, integer_to_integer_type, 0},
-    {"SIGN", 2, default_intrinsic_type, 0},
-    {"DSIGN", 2, double_to_double_type, 0},
-    {"IDIM", 2, integer_to_integer_type, 0},
-    {"DIM", 2, default_intrinsic_type, 0},
-    {"DDIM", 2, double_to_double_type, 0},
-    {"DPROD", 2, real_to_double_type, 0},
-    {"MAX", (INT_MAX), default_intrinsic_type, 0},
-    {"MAX0", (INT_MAX), integer_to_integer_type, 0},
-    {"AMAX1", (INT_MAX), real_to_real_type, 0},
-    {"DMAX1", (INT_MAX), double_to_double_type, 0},
-    {"AMAX0", (INT_MAX), integer_to_real_type, 0},
-    {"MAX1", (INT_MAX), real_to_integer_type, 0},
-    {"MIN", (INT_MAX), default_intrinsic_type, 0},
-    {"MIN0", (INT_MAX), integer_to_integer_type, 0},
-    {"AMIN1", (INT_MAX), real_to_real_type, 0},
-    {"DMIN1", (INT_MAX), double_to_double_type, 0},
-    {"AMIN0", (INT_MAX), integer_to_real_type, 0},
-    {"MIN1", (INT_MAX), real_to_integer_type, 0},
-    {"LEN", 1, character_to_integer_type, 0},
-    {"INDEX", 2, character_to_integer_type, 0},
-    {"AIMAG", 1, complex_to_real_type, 0},
-    {"DIMAG", 1, doublecomplex_to_double_type, 0},
-    {"CONJG", 1, complex_to_complex_type, 0},
-    {"DCONJG", 1, doublecomplex_to_doublecomplex_type, 0},
-    {"SQRT", 1, default_intrinsic_type, 0},
-    {"DSQRT", 1, double_to_double_type, 0},
-    {"CSQRT", 1, complex_to_complex_type, 0},
+    {"MOD", 2, default_intrinsic_type, 
+     typing_function_IntegerRealDouble_to_IntegerRealDouble},
+    {"AMOD", 2, real_to_real_type, typing_function_real_to_real},
+    {"DMOD", 2, double_to_double_type, typing_function_double_to_double},
+    {"ISIGN", 2, integer_to_integer_type, typing_function_int_to_int},
+    {"SIGN", 2, default_intrinsic_type, 
+     typing_function_IntegerRealDouble_to_IntegerRealDouble},
+    {"DSIGN", 2, double_to_double_type, typing_function_double_to_double},
+    {"IDIM", 2, integer_to_integer_type, typing_function_int_to_int},
+    {"DIM", 2, default_intrinsic_type, 
+     typing_function_IntegerRealDouble_to_IntegerRealDouble},
+    {"DDIM", 2, double_to_double_type, typing_function_double_to_double},
+    {"DPROD", 2, real_to_double_type, typing_function_real_to_double},
+    {"MAX", (INT_MAX), default_intrinsic_type, 
+     typing_function_IntegerRealDouble_to_IntegerRealDouble},
+    {"MAX0", (INT_MAX), integer_to_integer_type, typing_function_int_to_int},
+    {"AMAX1", (INT_MAX), real_to_real_type, typing_function_real_to_real},
+    {"DMAX1", (INT_MAX), double_to_double_type, typing_function_double_to_double},
+    {"AMAX0", (INT_MAX), integer_to_real_type, typing_function_int_to_real},
+    {"MAX1", (INT_MAX), real_to_integer_type, typing_function_real_to_int},
+    {"MIN", (INT_MAX), default_intrinsic_type, 
+     typing_function_IntegerRealDouble_to_IntegerRealDouble},
+    {"MIN0", (INT_MAX), integer_to_integer_type, typing_function_int_to_int},
+    {"AMIN1", (INT_MAX), real_to_real_type, typing_function_real_to_real},
+    {"DMIN1", (INT_MAX), double_to_double_type, typing_function_double_to_double},
+    {"AMIN0", (INT_MAX), integer_to_real_type, typing_function_int_to_real},
+    {"MIN1", (INT_MAX), real_to_integer_type, typing_function_real_to_int},
+    {"LEN", 1, character_to_integer_type, typing_function_char_to_int},
+    {"INDEX", 2, character_to_integer_type, typing_function_char_to_int},
+    {"AIMAG", 1, complex_to_real_type, typing_function_complex_to_real},
+    {"DIMAG", 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double},
+    {"CONJG", 1, complex_to_complex_type, typing_function_complex_to_complex},
+    {"DCONJG", 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex},
+    {"SQRT", 1, default_intrinsic_type, 
+     typing_function_RealDoubleComplex_to_RealDoubleComplex},
+    {"DSQRT", 1, double_to_double_type, typing_function_double_to_double},
+    {"CSQRT", 1, complex_to_complex_type, typing_function_complex_to_complex},
 
-    {"EXP", 1, default_intrinsic_type, 0},
-    {"DEXP", 1, double_to_double_type, 0},
-    {"CEXP", 1, complex_to_complex_type, 0},
-    {"LOG", 1, default_intrinsic_type, 0},
-    {"ALOG", 1, real_to_real_type, 0},
-    {"DLOG", 1, double_to_double_type, 0},
-    {"CLOG", 1, complex_to_complex_type, 0},
-    {"LOG10", 1, default_intrinsic_type, 0},
-    {"ALOG10", 1, real_to_real_type, 0},
-    {"DLOG10", 1, double_to_double_type, 0},
-    {"SIN", 1, default_intrinsic_type, 0},
-    {"DSIN", 1, double_to_double_type, 0},
-    {"CSIN", 1, complex_to_complex_type, 0},
-    {"COS", 1, default_intrinsic_type, 0},
-    {"DCOS", 1, double_to_double_type, 0},
-    {"CCOS", 1, complex_to_complex_type, 0},
-    {"TAN", 1, default_intrinsic_type, 0},
-    {"DTAN", 1, double_to_double_type, 0},
-    {"ASIN", 1, default_intrinsic_type, 0},
-    {"DASIN", 1, double_to_double_type, 0},
-    {"ACOS", 1, default_intrinsic_type, 0},
-    {"DACOS", 1, double_to_double_type, 0},
-    {"ATAN", 1, default_intrinsic_type, 0},
-    {"DATAN", 1, double_to_double_type, 0},
-    {"ATAN2", 1, default_intrinsic_type, 0},
-    {"DATAN2", 1, double_to_double_type, 0},
-    {"SINH", 1, default_intrinsic_type, 0},
-    {"DSINH", 1, double_to_double_type, 0},
-    {"COSH", 1, default_intrinsic_type, 0},
-    {"DCOSH", 1, double_to_double_type, 0},
-    {"TANH", 1, default_intrinsic_type, 0},
-    {"DTANH", 1, double_to_double_type, 0},
+    {"EXP", 1, default_intrinsic_type, 
+     typing_function_RealDoubleComplex_to_RealDoubleComplex},
+    {"DEXP", 1, double_to_double_type, typing_function_double_to_double},
+    {"CEXP", 1, complex_to_complex_type, typing_function_complex_to_complex},
+    {"LOG", 1, default_intrinsic_type, 
+     typing_function_RealDoubleComplex_to_RealDoubleComplex},
+    {"ALOG", 1, real_to_real_type, typing_function_real_to_real},
+    {"DLOG", 1, double_to_double_type, typing_function_double_to_double},
+    {"CLOG", 1, complex_to_complex_type, typing_function_complex_to_complex},
+    {"LOG10", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble},
+    {"ALOG10", 1, real_to_real_type, typing_function_real_to_real},
+    {"DLOG10", 1, double_to_double_type, typing_function_double_to_double},
+    {"SIN", 1, default_intrinsic_type, 
+     typing_function_RealDoubleComplex_to_RealDoubleComplex},
+    {"DSIN", 1, double_to_double_type, typing_function_double_to_double},
+    {"CSIN", 1, complex_to_complex_type, typing_function_complex_to_complex},
+    {"COS", 1, default_intrinsic_type, 
+     typing_function_RealDoubleComplex_to_RealDoubleComplex},
+    {"DCOS", 1, double_to_double_type, typing_function_double_to_double},
+    {"CCOS", 1, complex_to_complex_type, typing_function_complex_to_complex},
+    {"TAN", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble},
+    {"DTAN", 1, double_to_double_type, typing_function_double_to_double},
+    {"ASIN", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble},
+    {"DASIN", 1, double_to_double_type, typing_function_double_to_double},
+    {"ACOS", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble},
+    {"DACOS", 1, double_to_double_type, typing_function_double_to_double},
+    {"ATAN", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble},
+    {"DATAN", 1, double_to_double_type, typing_function_double_to_double},
+    {"ATAN2", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble},
+    {"DATAN2", 1, double_to_double_type, typing_function_double_to_double},
+    {"SINH", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble},
+    {"DSINH", 1, double_to_double_type, typing_function_double_to_double},
+    {"COSH", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble},
+    {"DCOSH", 1, double_to_double_type, typing_function_double_to_double},
+    {"TANH", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble},
+    {"DTANH", 1, double_to_double_type, typing_function_double_to_double},
 
-    {"LGE", 2, character_to_logical_type, 0},
-    {"LGT", 2, character_to_logical_type, 0},
-    {"LLE", 2, character_to_logical_type, 0},
-    {"LLT", 2, character_to_logical_type, 0},
+    {"LGE", 2, character_to_logical_type, typing_function_char_to_logical},
+    {"LGT", 2, character_to_logical_type, typing_function_char_to_logical},
+    {"LLE", 2, character_to_logical_type, typing_function_char_to_logical},
+    {"LLT", 2, character_to_logical_type, typing_function_char_to_logical},
 
     {LIST_DIRECTED_FORMAT_NAME, 0, default_intrinsic_type, 0},
     {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type, 0},
@@ -1238,7 +1261,7 @@ multiply-add operators ( JZ - sept 98) */
     {NULL, 0, 0, 0}
 };
 
-typing_function_t get_type_function_for_intrinsic(string name)
+typing_function_t get_typing_function_for_intrinsic(string name)
 {
   static hash_table name_to_type_function = NULL;
 
@@ -1253,7 +1276,7 @@ typing_function_t get_type_function_for_intrinsic(string name)
       hash_put(name_to_type_function, (char*)pdt->name, (char*)pdt->type_function);
   }
 
-  if (!hash_bound_p(name_to_type_function, name))
+  if (!hash_defined_p(name_to_type_function, name))
     pips_internal_error("no type function for intrinsics %s", name);
 
   return (typing_function_t) hash_get(name_to_type_function, name);
