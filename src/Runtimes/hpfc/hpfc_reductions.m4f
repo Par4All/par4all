@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/09/08 10:50:39 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1994/09/21 17:23:10 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -37,7 +37,7 @@ c
 c      
 c----------
 c
-include(`m4_macros')dnl
+include(`hpfc_lib_m4_macros')dnl
 c
 c macros to generate the code
 c
@@ -90,6 +90,7 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
      & )
       include "fpvm3.h"
+_CM5(`      include "cmmd_fort.h"')
       include "hpfc_commons.h"
       include "hpfc_rtsupport.h"
       external HPFC_PROCDIM
@@ -111,10 +112,10 @@ DISJUNCTION(``
      $  COMMA_REPLICATE(TO7(LEVEL), `ZERO_REF'))
       if (HPFC_SENDERP()) then
 SIMPLE_REPLICATE(LEVEL, `COMPUTE_LOCALIND')
-         CALL HPFC_SNDTO_A(PVMTYPE, a(COMMA_REPLICATE(LEVEL, `TEMPO_REF')))
          result = a(COMMA_REPLICATE(LEVEL, `TEMPO_REF'))
+         call COM_PREFIX`'_SNDTO_A(PVMTYPE, result)
       else
-         CALL HPFC_RCVFR_mCS(PVMTYPE, result)
+         call COM_PREFIX`'_RCVFR_mCS(PVMTYPE, result)
       endif',``
       'result = ifelse(NAME, `SUM', 0, NAME, `MULT', 1, dnl
                       FATAL_ERROR(`unexpected name'))')
@@ -133,9 +134,20 @@ DISJUNCTION(``
 SIMPLE_REPLICATE(LEVEL, `ENDDO_LOOP')
 c
 c send partial result to host, and get the final result
-c      
-      CALL HPFC_SNDTO_H(PVMTYPE, result)
-      CALL HPFC_RCVFR_mCH(PVMTYPE, result)
+c
+ifelse(ARCHITECTURE,`CM5',`dnl
+      if (0.ne.CMMD_send(
+     $     CM_HOST_ID,
+     $     HOSTCHANNEL,
+     $     result,
+     $     M4_PVM_LENGTH(PVMTYPE))) then
+         print *, "hpfc reduction: send failed"
+         stop
+      endif
+      HOSTCHANNEL = HOSTCHANNEL+2
+      call CMMD_receive_bc_from_host(result, M4_PVM_LENGTH(PVMTYPE))',`
+      call HPFC_SNDTO_H(PVMTYPE, result)
+      call HPFC_RCVFR_mCH(PVMTYPE, result)')
       build_name(nred,LEVEL,PVMTYPE,NAME) = result
       return
       end
@@ -144,6 +156,7 @@ c HOST PART
 c
       TYPE function build_name(hred,LEVEL,PVMTYPE,NAME)()
       include "fpvm3.h"
+_CM5(`      include "cmmd_fort.h"')
       include "hpfc_commons.h"
       TYPE result(MAXMAXSIZEOFPROCS), final
       integer i
@@ -151,9 +164,18 @@ c
 c get partial results
 c
       do i=1, MAXSIZEOFPROCS
+ifelse(ARCHITECTURE,`CM5',`dnl
+         if (0.ne.CMMD_receive(
+     $     CM_NODE_IDS(i),
+     $     NODECHANNELS(i),
+     $     result(i),
+     $     M4_PVM_LENGTH(PVMTYPE))) then
+            print *, "hpfc reduction: reveive failed"
+         endif
+         NODECHANNELS(i) = NODECHANNELS(i)+2',`dnl
          SENDERTID = NODETIDS(i)
          SLID = i
-         CALL HPFC_RCVFR_S(PVMTYPE, result(i))
+         CALL HPFC_RCVFR_S(PVMTYPE, result(i))')
       enddo
 c
 c compute final result
@@ -168,7 +190,9 @@ DISJUNCTION(``
 c
 c send final result to nodes 
 c      
-      CALL HPFC_HSNDTO_A(PVMTYPE, final)
+ifelse(ARCHITECTURE,`CM5',`dnl
+      call CMMD_bc_from_host(final, M4_PVM_LENGTH(PVMTYPE))',`dnl 
+      call HPFC_HSNDTO_A(PVMTYPE, final)')
       build_name(hred,LEVEL,PVMTYPE,NAME) = final
       return
       end
