@@ -35,7 +35,8 @@ Frame main_frame,
     log_frame, 
     edit_frame[2], 
     help_frame, 
-    query_frame;
+    query_frame,
+	properties_frame;
 
 Panel main_panel,
     status_panel,
@@ -49,7 +50,7 @@ Panel main_panel,
 void create_menus()
 {
     create_select_menu();
-    create_props_menu();
+    create_props_menu_and_window();
     create_edit_menu();
 /*    create_analyze_menu();*/
     create_transform_menu();
@@ -66,10 +67,10 @@ Xv_Window window;
 Event *event;
 {
     if (first_mapping == TRUE && event_id(event)==32526) {
-	first_mapping = FALSE;
+		first_mapping = FALSE;
 
-	/* we place all frames */
-	place_frames();
+		/* we place all frames */
+		place_frames();
     };
 }
 
@@ -187,6 +188,9 @@ char *argv[];
     pips_log_handler = wpips_user_log;
     pips_update_props_handler = update_props;
 
+		/* Added for debug. RK, 8/06/93. */
+	malloc_debug(1);
+
     initialize_newgen();
 
     debug_on("WPIPS_DEBUG_LEVEL");
@@ -223,6 +227,8 @@ char *argv[];
 
     create_icon();
 
+		/* Call added. RK, 9/06/1993. */
+	place_frames();
 
     xv_main_loop(main_frame);
 
