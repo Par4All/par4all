@@ -317,5 +317,10 @@ entity get_ith_##lname##_prime(int i)\
 #define SETBOOL_SUFFIX		"4"
 #define SETINT_SUFFIX		"5"
 
+/* property prefix for ignoring FCD directives
+ * TIME, SYNCHRO and SET exists.
+ */
+#define FCD_IGNORE_PREFIX	"HPFC_IGNORE_FCD_"
+
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
