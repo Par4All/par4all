@@ -315,15 +315,12 @@ static void handle_file(FILE * f) /* process f for includes and nones */
 
 static void init_rx(void)
 {
+    static bool done=FALSE;
+    if (done) return;
+    done=TRUE;
     if (regcomp(&implicit_none_rx, IMPLICIT_NONE_RX, REG_ICASE) ||
 	regcomp(&include_file_rx, INCLUDE_FILE_RX, REG_ICASE))
 	abort();
-}
-
-static void close_rx(void)
-{    
-    regfree(&implicit_none_rx);
-    regfree(&include_file_rx);
 }
 
 static bool
@@ -340,7 +337,6 @@ pips_process_file(string file_name)
     output_file = safe_fopen(file_name, "w");
     init_rx();
     handle_file_name(origin, FALSE);
-    close_rx();
     safe_fclose(output_file, origin);
     free(origin);
 
@@ -349,6 +345,9 @@ pips_process_file(string file_name)
 
 #endif
 
+static bool zzz_file_p(string s) /* zzz???.f */
+{ return strlen(s)==9 && s[0]=='z' && s[1]=='z' && s[2]=='z' &&
+      s[6]=='.' && s[7]=='f' && s[8]=='\n'; }
 #define MAX_NLINES 1000
 #define MAX_LENGTH 100
 static int cmp(char**x1, char**x2)
@@ -365,7 +364,8 @@ static void sort_file(string name)
     {
 	string sg = fgets(line, MAX_LENGTH, f);
 	pips_assert("not too many lines", i<MAX_NLINES);
-	if (sg) lines[i++]=strdup(sg);
+	if (sg && !zzz_file_p(sg)) /* drop zzz* files */
+            lines[i++]=strdup(sg);
     }
     safe_fclose(f, name);
 
