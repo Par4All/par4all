@@ -173,7 +173,7 @@
 /* Misc files.
  */
 { DBR_CROUGH,			STRING_METHODS },
-{ DBR_C,			STRING_METHODS },
+{ DBR_C_PRINTED_FILE,		STRING_METHODS },
 { DBR_NEW_DECLARATIONS,		STRING_METHODS },
 
 /* The resource DBR_NEW_DECLARATIONS is used by top_down_array_resizing*/
