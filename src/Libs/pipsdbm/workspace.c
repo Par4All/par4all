@@ -199,6 +199,15 @@ workspace_exists_p(string name)
     return result;
 }
 
+bool
+workspace_ok_p(string name)
+{
+    string full_name = db_get_workspace_directory_name(name);
+    bool result = file_readable_p(full_name);
+    free(full_name);
+    return result;
+}
+
 bool 
 db_create_workspace(string name)
 {
