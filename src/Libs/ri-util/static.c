@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "linear.h"
+/* #include "linear.h" */
 
 #include "genC.h"
 
@@ -48,8 +48,15 @@ get_current_module_entity()
 void 
 reset_current_module_entity()
 {
-    /* pips_assert("current entity defined", 
-       !entity_undefined_p(current_module_entity)); */ /* too risky ;-) */
+    pips_assert("current entity defined", 
+		!entity_undefined_p(current_module_entity));
+    current_module_entity = entity_undefined;
+}
+
+/* To be called by an error management routine only */
+void 
+error_reset_current_module_entity()
+{
     current_module_entity = entity_undefined;
 }
 
@@ -90,5 +97,17 @@ get_current_module_statement()
 void 
 reset_current_module_statement()
 {
+    pips_assert("current module statement defined", 
+       !statement_undefined_p(current_module_statement));
+    current_module_statement = statement_undefined;
+}
+
+/* To be called by an error management routine only */
+
+void 
+error_reset_current_module_statement()
+{
+    pips_assert("current module statement defined", 
+       !statement_undefined_p(current_module_statement));
     current_module_statement = statement_undefined;
 }
