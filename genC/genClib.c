@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 14:59:04 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 15:00:21 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2025,7 +2025,10 @@ char *s ;
 /**************************************************** Type Translation Table */
 
 /* translation tables type...
-   BUG: tabulated domains are not translated properly, I guess.
+   BUGS: 
+   - tabulated domains are not translated properly, I guess.
+   - externals which appear several times as such, so are given
+     several domain number, may lead to unexpected behaviors.
  */
 typedef struct 
 {
