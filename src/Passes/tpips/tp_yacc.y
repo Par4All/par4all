@@ -58,7 +58,6 @@
 #include <sys/param.h>
 #include <unistd.h>
 
-
 #include "genC.h"
 
 #include "ri.h"
@@ -90,6 +89,14 @@ extern bool tpips_execution_mode;
 extern void tpips_set_line_to_parse(string);
 extern int yylex(void);
 extern void yyerror(char *);
+
+static string 
+strtoup(string init)
+{
+    string s = init;
+    while (*s) *s = toupper(*s);
+    return init;
+}
 
 static void
 free_owner_content(res_or_rule * pr)
@@ -761,9 +768,9 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 	;
 
 list_of_owner_name: TK_NAME
-	{ $$ = CONS(STRING, $1, NIL); }
+	{ $$ = CONS(STRING, strupper($1,$1), NIL); }
 	| list_of_owner_name TK_NAME
-	{ $$ = CONS(STRING, $2, $1); }
+	{ $$ = CONS(STRING, strupper($2,$2), $1); }
 	;
 
 propname: TK_NAME
