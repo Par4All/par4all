@@ -64,8 +64,11 @@ Value exp;
     else {
 	Pmonome pm = new_monome();
 	monome_coeff(pm) = coeff;
-	monome_term(pm) = vect_new((exp == 0 ? TCST : var),
-				   (exp == 0 ?    1 : exp));
+	if (value_zero_p(exp))
+	    monome_term(pm) = vect_new(TCST, VALUE_ONE);
+	else
+	    monome_term(pm) = vect_new(var, exp);
+
 	return(pm);
     }
 }
