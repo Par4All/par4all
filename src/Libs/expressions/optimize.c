@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.14  1998/11/18 22:46:52  coelho
+ * huffman included.
+ *
  * Revision 1.13  1998/11/18 22:43:06  coelho
  * switch_nary_to_binary and optimize_simplify_patterns are called.
  *
@@ -48,6 +51,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "linear.h"
 
@@ -294,6 +298,233 @@ get_eole_command
 			    " -o ", in, " ", out, NULL));
 }
 
+
+/************************************************************* SOME PATTERNS */
+
+/* look for some expressions in s and simplify some patterns.
+ */
+static void optimize_simplify_patterns(statement s)
+{
+  /* not implemented yet. */
+
+  /* a + (-b * c)   -> a - (b * c) */
+}
+
+
+/* forward substitute if only there once. not implemented.
+ */
+
+/*********************************************************** EXPRESSION COST */
+
+/* computes the expression weight.
+ */
+static double expression_weight(expression e)
+{
+  double cost = 0.0E0;
+  syntax s = expression_syntax(e);
+  if (syntax_call_p(s))
+  {
+    list args = call_arguments(syntax_call(s));
+    cost = gen_length(args) - 1.0E0;
+    MAP(EXPRESSION, e, cost += expression_weight(e), args);
+  }
+  return cost;
+}
+
+/* computes the expression depth.
+ */
+static double expression_depth(expression e)
+{
+  double cost = 0.0E0;
+  syntax s = expression_syntax(e);
+  if (syntax_call_p(s))
+  {
+    MAP(EXPRESSION, e, 
+	{ double w = expression_depth(e); cost = cost>w? cost: w; },
+	call_arguments(syntax_call(s)));
+    cost += 1.0E0; 
+    /* too simple... may depend on the function called. complexity tables? */
+  }
+  return cost;
+}
+
+/* WG */
+static double expression_gravity_rc(expression e, double depth)
+{
+  double cost = 0.0E0;
+  syntax s = expression_syntax(e);
+  if (syntax_call_p(s))
+  {
+    MAP(EXPRESSION, e, 
+	cost += expression_gravity_rc(e, depth+1.0E0), /* ? */
+	call_arguments(syntax_call(s)));
+    cost += 1.0E0; /* too simple? */
+  }
+  return cost;
+}
+
+static double expression_gravity(expression e)
+{
+  return expression_gravity_rc(e, 0.0E0);
+}
+
+
+/**************************************** HUFFMAN ALGORITHM ON AN EXPRESSION */
+
+/* switch nary to binary with huffman algorithm.
+ */ 
+static entity huffman_nary_operator = NULL;
+static entity huffman_binary_operator = NULL;
+static double (*huffman_cost)(expression) = NULL;
+
+typedef struct
+{
+  expression expr;
+  double cost;
+} cost_expression;
+
+/* comparison function for qsort. descending order.
+ */
+static int cost_expression_cmp(const void * v1, const void * v2)
+{
+  cost_expression * c1 = (cost_expression *) v1;
+  cost_expression * c2 = (cost_expression *) v2;
+  if (c1->cost==c2->cost) 
+    /* when they are equals another criterion may be used, so as 
+       to favor double loads (with neighbor references).
+     */
+    return 0;
+  return 2*(c1->cost<c2->cost) - 1;
+}
+
+/* build an cost_expression array from an expression list.
+ */
+static cost_expression * 
+list_of_expressions_to_array(list /* of expression */ le)
+{
+  int len = gen_length(le), i=0;
+  cost_expression * tce = malloc(len * sizeof(cost_expression));
+  pips_assert("enough memory", tce!=NULL);
+  
+  MAP(EXPRESSION, e, 
+  {
+    tce[i].expr = e;
+    tce[i].cost = huffman_cost(e);
+    i++;
+  },
+    le);
+
+  qsort(tce, len, sizeof(cost_expression), cost_expression_cmp);
+
+  return tce;
+}
+
+/* insert ce in tce[0..n-1] by decreassing order.
+ */
+static void 
+insert_sorted_into_array(cost_expression * tce, int n, cost_expression ce)
+{
+  int i=0;
+  while (i<n && ce.cost<tce[i].cost) i++; /* find where to insert. */
+  while (n>=i) tce[n]=tce[n-1], n--;      /* shift tail. */
+  tce[i] = ce;                            /* insert. */
+}
+
+/* apply huffman balancing algorithm if it is a call to 
+ * huffman_nary_operator.
+ *
+ * the prettyprint may only reflect this if the
+ * PRETTYPRINT_ALL_PARENTHESES property is set to TRUE.
+ */
+static void call_rwt(call c)
+{
+  if (call_function(c)==huffman_nary_operator) 
+  {
+    /* let us switch to a binary tree. */
+    list args = call_arguments(c);
+    int nargs = gen_length(args);
+    cost_expression * tce;
+
+    pips_debug(4, "dealing with operator %s\n", 
+	       entity_name(huffman_nary_operator));
+
+    pips_assert("several arguments to nary operator", nargs>=2);
+
+    if (nargs==2) /* the call is already binary. */
+    {
+      call_function(c) = huffman_binary_operator;
+      return;
+    }
+    /* else */
+
+    tce = list_of_expressions_to_array(args);
+    /* drop initial list: */
+    gen_free_list(args), args = NIL, call_arguments(c) = NIL;
+
+    while (nargs>2)
+    {
+      cost_expression ce;
+      ce.expr = MakeBinaryCall(huffman_binary_operator,
+			       tce[nargs-1].expr, tce[nargs-2].expr);
+      ce.cost = huffman_cost(ce.expr);
+
+      insert_sorted_into_array(tce, nargs-2, ce);
+      nargs--;
+    }
+
+    /* last one is done in place. */
+    call_function(c) = huffman_binary_operator;
+    call_arguments(c) = CONS(EXPRESSION, tce[0].expr,
+			     CONS(EXPRESSION, tce[1].expr, NIL));
+    free(tce), tce = NULL;
+  }
+}
+
+/* apply the huffman balancing on every call to nary_operator
+ * and build calls to binary_operator instead, with cost to chose.
+ */
+static void 
+build_binary_operators_with_huffman(
+    statement s,
+    entity nary_operator,
+    entity binary_operator,
+    double (*cost)(expression))
+{
+  huffman_nary_operator = nary_operator;
+  huffman_binary_operator = binary_operator;
+  huffman_cost = cost;
+
+  gen_multi_recurse(s,
+		    call_domain, gen_true, call_rwt,
+		    NULL);
+
+  huffman_nary_operator = NULL;
+  huffman_binary_operator = NULL;
+  huffman_cost = NULL;  
+}
+
+/* switch nary operators to binary ones.
+ * n+ -> +, n* -> *
+ * missing: & | and so on.
+ */
+static void
+switch_nary_to_binary(statement s)
+{
+  entity
+    plus = entity_intrinsic(PLUS_OPERATOR_NAME),
+    nplus = entity_intrinsic(EOLE_SUM_OPERATOR_NAME),
+    mult = entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+    nmult = entity_intrinsic(EOLE_PROD_OPERATOR_NAME);
+
+  /* options: another expression cost function could be used.
+   * for instance, defining -expression_gravity would build
+   * the most unbalanced possible expression tree wrt WG.
+   */
+  build_binary_operators_with_huffman(s, nplus, plus, expression_gravity);
+  build_binary_operators_with_huffman(s, nmult, mult, expression_gravity);
+}
+
+
 /*************************************************** INTERFACE FROM PIPSMAKE */
 
 /* pipsmake interface.
@@ -406,6 +637,3 @@ bool optimize_expressions(string module_name)
 
     return TRUE; /* okay ! */
 }
-
-
-
