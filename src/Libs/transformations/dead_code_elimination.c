@@ -7,6 +7,9 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.25  2000/11/28 15:10:46  nguyen
+  *** empty log message ***
+
   Revision 1.24  2000/11/08 07:47:00  nguyen
   assert added in dead_unstructured_test_filter()
 
@@ -177,7 +180,7 @@ dead_test_filter(statement true, statement false)
 
 /* Replace an instruction by an empty one. If there is a label on the
    statement, put it on a continue to be coherent with the PIPS RI. */
-static bool
+bool
 discard_statement_and_save_label_and_comment(statement s)
 {
 
@@ -429,7 +432,7 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
    this_test_is_unstructured_p is a hint for the statistics.
    TRUE means that you assert that the test is unstructured.
  */
-static void remove_if_statement_according_to_write_effects
+void remove_if_statement_according_to_write_effects
 (statement s, bool this_test_is_unstructured_p)
 {
    instruction i = statement_instruction(s);
@@ -589,7 +592,7 @@ dead_unstructured_test_filter(statement st)
 static void
 dead_recurse_unstructured(unstructured u)
 {
-    statement st;
+    statement st = statement_undefined;
     list blocs = NIL;
   
     CONTROL_MAP(c, {
@@ -931,23 +934,18 @@ suppress_dead_code(char * mod_name)
   ifdebug(1) {
     pips_debug(1, "Begin for %s\n", mod_name);
       pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
-      /* Value names are needed to print preconditions in debug messages */
-      set_cumulated_rw_effects((statement_effects)
-	      db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE));
-      module_to_value_mappings(get_current_module_entity());
   }
   
+  set_cumulated_rw_effects((statement_effects)
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE));
+  module_to_value_mappings(get_current_module_entity());
   initialize_dead_code_statistics();
   some_unstructured_ifs_have_been_changed = FALSE;
   suppress_dead_code_statement(mod_stmt);
   insure_return_as_last_statement(get_current_module_entity(), &mod_stmt);
   display_dead_code_statistics();
-  
-  ifdebug(1) {
-      reset_cumulated_rw_effects();
-      free_value_mappings();
-  }
-
+  free_value_mappings();
+  reset_cumulated_rw_effects();
 
   debug_off();
 
