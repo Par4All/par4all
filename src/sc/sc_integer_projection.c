@@ -261,7 +261,7 @@ Variable v;
  * projection of the system sc along all the variables contain in vecteur pv
  */ 
 
-void sc_integer_projection_along_variables(fsc,sc,index_base,pv,tab_info,dim,n)
+Psysteme sc_integer_projection_along_variables(fsc,sc,index_base,pv,tab_info,dim,n)
 Psysteme fsc,sc;
 Pbase index_base;
 Pvecteur pv;
@@ -272,10 +272,15 @@ int tab_info[][3],dim,n;
     for (pv1 = pv;!VECTEUR_NUL_P(pv1); pv1=pv1->succ) {
 
   	sc = sc_integer_projection_along_variable(fsc,sc,vecteur_var(pv1));
+	(void) fprintf(stderr," Domain after integer Projection :\n");
+	sc_dump(sc);  
 	sc= sc_normalize(sc);
 	sc_integer_projection_information(sc,index_base,tab_info,dim,n);
-	 sc=build_integer_sc_nredund(sc,index_base,tab_info,dim,dim,n);
+	sc=build_integer_sc_nredund(sc,index_base,tab_info,dim,dim,n);
+	(void) fprintf(stderr," Domain after integer redond.elim. :\n");
+	sc_dump(sc);  
     }
+    return(sc);
 }
 
 
