@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/04/23 13:42:14 $, )
+ * ($Date: 1996/06/06 18:26:20 $, )
  */
 
 #include "defines-local.h"
@@ -283,6 +283,11 @@ extract_the_align(
 	}
     }
 
+    /* for an alignment tree I should check here whether template is
+     * aligned to sg, and update accordingly. Also backtracking already
+     * built alignments when a "template" happens to be aligned would be
+     * useful. Some day...
+     */
     /* built align is returned. should be normalized?
      */
     return make_align(aligns, template);
@@ -625,6 +630,38 @@ HANDLER_PROTOTYPE(distribute)
     handle_distribute_and_redistribute_directive(f, args, FALSE);
 }
 
+/* I chose not to modify the ri to add reductions as private variables.
+ * the reason is the following: locals are not well placed (they should 
+ * be attached to statements?), I won't add one more misplaced sg.
+ * Also I would have to update *all* make_loop() within PIPS...
+ */
+HANDLER_PROTOTYPE(reduction)
+{
+    list /* of entity */ l = expression_list_to_entity_list(args);
+    statement s;
+
+    init_ctrl_graph_travel(current_stmt_head(), gen_true);
+    
+    while(next_ctrl_graph_travel(&s))
+    {
+	if (instruction_loop_p(statement_instruction(s)))
+	{
+	    if (!bound_hpf_reductions_p(s))
+		store_hpf_reductions(s, make_entities(l));
+	    else
+	    {
+		entities e = load_hpf_reductions(s);
+		entities_list(e) = gen_nconc(entities_list(e), l);
+	    }
+	    close_ctrl_graph_travel();
+	    return;
+	}
+    }
+
+    close_ctrl_graph_travel();
+    pips_user_error("some loop not found!\n");
+}
+
 /* ??? I wait for the next statements in a particular order, what
  * should not be necessary. Means I should deal with independent 
  * directives on the PARSED_CODE rather than after the CONTROLIZED.
@@ -687,14 +724,6 @@ HANDLER_PROTOTYPE(new)
 {
     hpfc_warning("not implemented\n");
     return; /* (that's indeed a first implementation:-) */
-}
-
-/* should I modify the IR so as to add the reduction protected scalars?
- */
-HANDLER_PROTOTYPE(reduction)
-{
-    hpfc_warning("not implemented\n");
-    return;
 }
 
 HANDLER_PROTOTYPE(dynamic)
