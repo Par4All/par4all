@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/01/14 13:24:01 $, )
+! ($Date: 1997/01/14 13:33:36 $, )
 !
 !-----------------
 !
@@ -1338,8 +1338,22 @@ _CM5(
       debug(print *, "[HPFC HOST END] ", MY LID)
       sync_exit(call HPFC SYNCHRO)
       call pvmfexit(info)
+!!      stop
+      end
+!
+!-----------------
+!
+! HPFC STOP
+!
+      subroutine HPFC STOP
+      integer info
+      include "hpfc_commons.h"
+      debug(print *, "[HPFC STOP] ", MY LID)
+      sync_exit(call HPFC SYNCHRO)
+      call pvmfexit(info)
       stop
       end
+      
 !
 !-----------------
 !
@@ -1351,7 +1365,7 @@ _CM5(
       debug(print *, "[HPFC NODE END] ", MY LID)
       sync_exit(call HPFC SYNCHRO)
       call pvmfexit(info)
-      stop
+!!      stop
       end
 !
 !-----------------
