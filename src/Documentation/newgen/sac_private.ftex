@@ -22,9 +22,13 @@ SIMD Architecture Compiler. SAC is a new PIPS phase, which allows to
 generate code optimized for architectures supporting multimedia
 instruction sets, such as MMX, SSE or VIS.
 
+\domain{import entity}{}
+\domain{import expression}{}
+\domain{import statement}{}
+
 \section*{Opcodes and opcode classes}
 
-\domain{opcode = name:string x vectorSize:int x subwordSize:int}
+\domain{opcodes = name:string x vectorSize:int x subwordSize:int}
 {}
 
 \domain{opcodeClass = nbArgs:int x opcodes*}
@@ -62,7 +66,8 @@ arguments for the opcode.
 patterns corresponding to a statement. When traversed, it can thus map
 a statement to a list of patterns that can be used.
 
-\domain{matchTree = pattern:pattern* x sons:hash\_table}
+%% x sons:hash_table
+\domain{matchTree = pattern:pattern*}
 {}
 
 A \verb+pattern+ can be translated into a \verb+match+ by mapping the
