@@ -51,7 +51,8 @@ statement s;
 
 
 /* static void
- * add_parameter_aliases_for_this_call_site(call call_site,transformer context)
+ * add_parameter_aliases_for_this_call_site(call call_site,
+ * transformer context, list real_args)
  * constructs the alias pairs for the effective parameters (but not for
  * COMMON regions) at this call site and adds them to the list
  * input    : parameters: a call site and the calling context
@@ -87,21 +88,25 @@ statement s;
  *    ENDFOR
  */
 static void
-add_parameter_aliases_for_this_call_site(call call_site, transformer context)
+add_parameter_aliases_for_this_call_site(call call_site,
+					 transformer context, list real_args)
 {
     list r_args;
     int arg_num;
-    list real_args;
 
     pips_debug(9, "begin\n");
 
-    real_args = call_arguments(call_site);
+/*    real_args = call_arguments(call_site); */
 
     for (r_args = real_args, arg_num = 1; r_args != NIL;
 	 r_args = CDR(r_args), arg_num++) 
     {
+	pips_debug(9,"formal parameter arg_num %d\n",arg_num);
+
 	MAP(EFFECT, callee_region,
 	 {
+	     pips_debug(9,"callee_region %s\n",region_to_string(callee_region));
+
 	     entity callee_ent = region_entity(callee_region);
 	     
 	     /* If the formal parameter corresponds to the real argument then
@@ -109,7 +114,12 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 	      */
 	     if (ith_parameter_p(callee, callee_ent, arg_num))
 	     {
+		 pips_debug(9,"match\n");
+
 		 expression real_exp = EXPRESSION(CAR(r_args));
+
+		 pips_debug(9,"get expression_syntax\n");
+
 		 syntax real_syn = expression_syntax(real_exp);
 		 
 		 /* If the real argument is a reference to an entity, then we
@@ -117,12 +127,17 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 		  */
 		 if (syntax_reference_p(real_syn)) 
 		 {
+		     pips_debug(9,"arg refers to entity\n");
+
 		    reference real_ref = syntax_reference(real_syn);
 		    entity real_ent = reference_variable(real_ref);
+
+		    pips_debug(9,"\t%s\n",entity_name(real_ent));
+
 		    region real_reg;
 		    list pair;
 
-	     pips_debug(8,"transl reg %s\n",region_to_string(callee_region));
+		    pips_debug(9,"region_translation is\n");
 
 		    real_reg =
 			region_translation(
@@ -135,7 +150,7 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 			    VALUE_ZERO,
 			    BACKWARD);
 		    
-		    pips_debug(8,"to %s\n",region_to_string(real_reg));
+		    pips_debug(9,"\t%s\n",region_to_string(real_reg));
 
 		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
 		    pair = gen_nconc(pair,CONS(EFFECT,real_reg,NIL));
@@ -185,7 +200,7 @@ add_alias_pairs_for_this_call_site(call call_site)
 
     set_backward_arguments_to_eliminate(callee);
 
-    add_parameter_aliases_for_this_call_site(call_site,context);
+    add_parameter_aliases_for_this_call_site(call_site,context,real_args);
 /*    add_common_aliases_for_this_call_site(); */
 
     reset_translation_context_sc();
