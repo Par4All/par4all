@@ -381,7 +381,7 @@ db_save_and_free_memory_resource_if_any(string rname, string oname)
 }
 
 /* FC: I added this function to clean all resources, hence avoiding
- * to save them. This speed uo hpfc at low cost;-).
+ * to save them. This speed up hpfc at low cost;-).
  */
 void
 db_delete_all_resources(void)
