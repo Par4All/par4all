@@ -372,9 +372,9 @@ graph                   dup_dg;
 	  
 	  if (renamed_l != NIL) indice1 = ENTITY(CAR(renamed_l));
 	  /* compute indice1 + indice2 + 1 */
-	  prov_pv = vect_add( vect_new(TCST, 1),
-			     vect_substract(vect_new((Variable) indice1,1),
-					    vect_new((Variable) indice2,1)) );
+	  prov_pv = vect_add( vect_new(TCST, VALUE_ONE),
+		  vect_substract(vect_new((Variable) indice1, VALUE_ONE),
+				 vect_new((Variable) indice2, VALUE_ONE)) );
 	  sou_ps = sc_append(sou_ps,
 			     sc_make(CONTRAINTE_UNDEFINED, contrainte_make( prov_pv )));
 	}
