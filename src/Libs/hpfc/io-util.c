@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/04/02 10:51:53 $, )
+ * ($Date: 1996/04/02 14:36:39 $, )
  */
 
 #include "defines-local.h"
@@ -60,9 +60,10 @@ only_io_rewrite(
     statement st)
 {
     instruction i = statement_instruction(st);
-    bool is_io = TRUE;
+    tag t = instruction_tag(i);
+    int is_io = 3;
 
-    switch (instruction_tag(i))
+    switch (t)
     {
     case is_instruction_block:
 	if (!host_section_p(instruction_block(i))) /* HOST SECTION => TRUE! */
@@ -83,9 +84,6 @@ only_io_rewrite(
     case is_instruction_loop:
 	is_io = Load(loop_body(instruction_loop(i)));
 	pips_debug(5, "loop 0x%x: %d\n", (unsigned int) st, is_io);
-        break;
-    case is_instruction_goto:
-	pips_internal_error("unexpected goto encountered");
         break;
     case is_instruction_call:
     {
@@ -110,15 +108,15 @@ only_io_rewrite(
 	control c = unstructured_control(instruction_unstructured(i));
 	list blocks = NIL;
 
-	CONTROL_MAP(ct, 
-		    is_io = is_io & Load(control_statement(ct)), 
+	CONTROL_MAP(ct, is_io = is_io & Load(control_statement(ct)), 
 		    c, blocks);
 	gen_free_list(blocks);
 	pips_debug(5, "unstructured 0x%x: %d\n", (unsigned int) st, is_io);
         break;
     }
+    case is_instruction_goto:
     default:
-        pips_internal_error("unexpected instruction tag\n");
+        pips_internal_error("unexpected instruction tag (%d)\n");
         break;
     }
 
