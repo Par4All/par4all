@@ -65,10 +65,22 @@ void ParserError(char * f, char * m)
 
     /* Get rid of partly declared variables... */
     if(mod!=entity_undefined) {
-	CleanLocalEntities(mod);
+	/* Callers may already have pointers towards this function.
+	 * The prettyprinter core dumps if entity_initial is
+	 * destroyed. Maybe, I should clean the declarations field
+	 * in code, as well as decls_text.
+	 */
+	/*
 	entity_type(mod) = type_undefined;
 	entity_storage(mod) = storage_undefined;
 	entity_initial(mod) = value_undefined;
+	*/
+	value v = entity_initial(mod);
+	code c = value_code(v);
+	code_declarations(c) = NIL;
+	code_decls_text(c) = string_undefined;
+
+	CleanLocalEntities(mod);
     }
 
     reset_current_module_entity();
