@@ -53,7 +53,7 @@ loop_interchange(string module_name)
 	sscanf(resp, "%s", lp_label);
 	selected_label = find_label_entity(module_name, lp_label);
 	if (selected_label==entity_undefined) {
-	    user_error("loop_interchange", "loop label `%s' does not exist\n", lp_label);
+	    pips_user_error("loop label `%s' does not exist\n", lp_label);
 	}
 
 	debug_on("LOOP_INTERCHANGE_DEBUG_LEVEL");
