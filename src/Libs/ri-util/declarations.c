@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.17  2002/06/17 13:46:40  irigoin
+ * IO_LIST_STRING_NAME replaces "IOLIST="
+ *
  * Revision 1.16  2002/06/12 09:44:54  irigoin
  * Use of property PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS added and reformatting
  *
@@ -960,7 +963,116 @@ text_equivalences(
     pips_debug(EQUIV_DEBUG, "end\n");
     return(t_equiv_class);
 }
+
+/* Prettyprint the initializations field of code */
+static sentence sentence_data_statement(statement is)
+{
+  unformatted u =
+    make_unformatted
+    (strdup(""),
+     STATEMENT_NUMBER_UNDEFINED, 0, 
+     CONS(STRING, strdup("DATA "), NIL));
+  sentence s = make_sentence(is_sentence_unformatted, u);
+  list wl = unformatted_words(u);
+  instruction ii = statement_instruction(is);
+  call ic = instruction_call(ii);
+  entity ife = entity_undefined;
+  list al = list_undefined;
+  
+  pips_assert("An initialization instruction is a call", instruction_call_p(ii));
+  ife = call_function(ic);
+  pips_assert("The static initialization function is called",
+	      strcmp(module_local_name(ife), STATIC_INITIALIZATION_NAME)==0);
+  al = call_arguments(ic);
 
+  /* Find all initialized variables */
+  for(al = call_arguments(ic); !ENDP(al); POP(al)){
+    expression eiolist = EXPRESSION(CAR(al));
+    entity iolist = call_function(syntax_call(expression_syntax(eiolist)));
+
+    pips_assert("eiolist is a call expression", expression_call_p(eiolist));
+
+    if(strcmp(entity_local_name(iolist), IO_LIST_STRING_NAME) == 0) {
+      expression ive = expression_undefined;
+      list ivwl = list_undefined;
+
+      if(al!=call_arguments(ic)) {
+	wl = CHAIN_SWORD(wl, strdup(", "));
+      }
+
+      /* odd arguments must be calls to IOLIST */
+      POP(al);
+      ive = EXPRESSION(CAR(al));
+      ivwl = words_expression(ive);
+      wl = gen_nconc(wl, ivwl);
+    }
+    else
+      break;
+  }
+
+  pips_assert("The value list is not empty", !ENDP(al));
+
+  /* Print all values */
+
+  wl = CHAIN_SWORD(wl, " /");
+
+  for(; !ENDP(al); POP(al)){
+    expression ve = EXPRESSION(CAR(al));
+    call vc = syntax_call(expression_syntax(ve));
+    list iwl = list_undefined;
+
+    pips_assert("Values are encoded as calls", expression_call_p(ve));
+
+    if(strcmp(module_local_name(call_function(vc)), REPEAT_VALUE_NAME)==0) {
+      expression rfe = expression_undefined;
+      expression rve = expression_undefined;
+      list rwl = list_undefined;
+
+      pips_assert("Pseudo-intrinsic REPEAT-VALUE must have two arguments",
+		  gen_length(call_arguments(vc))==2);
+
+      rfe = EXPRESSION(CAR(call_arguments(vc)));
+      rve = EXPRESSION(CAR(CDR(call_arguments(vc))));
+
+      if(!(integer_constant_expression_p(rfe) && expression_to_int(rfe)==1)) {
+	/* print out the repeat factor if it is not one */
+	rwl = words_expression(rfe);
+	wl = gen_nconc(wl, rwl);
+	wl = gen_nconc(wl, CONS(STRING, strdup("*"), NIL));
+      }
+      iwl = words_expression(rve);
+      wl = gen_nconc(wl, iwl);
+      if(!ENDP(CDR(al))) {
+	wl = gen_nconc(wl, CONS(STRING, strdup(", "), NIL));
+      }
+    }
+    else {
+      iwl = words_expression(ve);
+      wl = gen_nconc(wl, iwl);
+    }
+  }
+
+  wl = CHAIN_SWORD(wl, "/");
+
+  return s;
+}
+
+text text_initializations(entity m)
+{
+  text t = make_text(NIL);
+  list il = list_undefined;
+
+  pips_assert("m is a module", entity_module_p);
+
+  il = sequence_statements(code_initializations(value_code(entity_initial(m))));
+
+  MAP(STATEMENT, is, {
+    ADD_SENTENCE_TO_TEXT(t, sentence_data_statement(is));
+  }, il);
+
+  return t;
+}
+
 /* returns the DATA initializations.
  * limited to integers, because I do not know where is the value
  * for other types...
