@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.5  1997/11/28 14:35:24  coelho
+ * fixed empty EQUIVALENCE statement that could come out after code cleaning.
+ *
  * Revision 1.4  1997/11/10 10:22:59  coelho
  * only declared equivalenced are prettyprinted...
  *
@@ -625,9 +628,6 @@ text_equivalence_class(
     /* THEN, prettyprint the sorted list*/	
     pips_debug(EQUIV_DEBUG,"prettyprint of the sorted list\n");
 	
-    /* We are sure that there is at least one equivalence */
-    lw = CHAIN_SWORD(lw, "EQUIVALENCE");
-
     /* At each step of the next loop, we consider two entities
      * from the equivalence class. l1 points on the first entity list,
      * and l2 on the second one. If l2 is associated with l1, we compute
@@ -660,10 +660,10 @@ text_equivalence_class(
 	if (offset1 == offset2)
 	{
 	    pips_debug(EQUIV_DEBUG, "easiest case: offsets are the same\n");
-	    if (! first)
-		lw = CHAIN_SWORD(lw, ",");
-	    else
-		first = FALSE;
+
+	    if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
+	    else lw = CHAIN_SWORD(lw, ",");
+
 	    lw = CHAIN_SWORD(lw, " (");
 	    lw = CHAIN_SWORD(lw, entity_local_name(ent1));
 	    lw = CHAIN_SWORD(lw, ",");
@@ -715,11 +715,10 @@ text_equivalence_class(
 		pips_debug(EQUIV_DEBUG, 
 			   "offset=%d, dim_max=%d, size_elt_1=%d\n",
 			   offset, dim_max,size_elt_1);
-				
-		if (! first)
-		    lw = CHAIN_SWORD(lw, ",");
-		else
-		    first = FALSE;
+		
+		if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
+		else lw = CHAIN_SWORD(lw, ",");
+
 		lw = CHAIN_SWORD(lw, " (");
 		lw = CHAIN_SWORD(lw, entity_local_name(ent1));
 		lw = CHAIN_SWORD(lw, "(");
