@@ -98,7 +98,8 @@
 # - rajout d'un wtest. RK, 112/1994.
 # - "/lib/cpp $(CFLAGS)" moved to "$(PREPROC)" in production-depend target
 #   FC 21/02/94
-# - rm -f -> $(RM) or -$(RM)  FC 22/02/94
+# - rm -f -> $(RM) or -$(RM) FC 22/02/94
+# - PROTOIZE macro added, but this should be in config.makefile... FC 07/03/94
 #
 # wish:
 #
@@ -203,6 +204,7 @@ SCAN=		$(LEX) $(LFLAGS) -t
 TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
 PARSE=		$(YACC) $(YFLAGS)
 ARCHIVE=	$(AR) $(ARFLAGS)
+PROTOIZE=	$(PIPS_PROTOIZE) $(CPPFLAGS) $(INC_IFILES)
 #
 CONFIG_FILE=	$CONFIG_FILE
 MAKEFILE=	$MAKEFILE
@@ -423,7 +425,8 @@ $(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
 	for cfile in $(INC_CFILES) ; do \\
 		ifile=\`basename \$\$cfile .c\`;\\
 		$(PREPROC) \$\$cfile  > \$\$ifile.i; done
-	$(UTILDIR)/cproto $(CPPFLAGS) $(INC_IFILES) \\
+#	$(UTILDIR)/cproto $(CPPFLAGS) $(INC_IFILES) \\
+	$(PROTOIZE) \\
 		| sed -e 's/int __builtin_va_alist//' \\
 		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
 	$(RM) *.i
