@@ -1,6 +1,7 @@
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
+
 LIB_CFILES=	replace.c \
 		loop_unroll.c \
 		partial_eval.c \
@@ -17,7 +18,9 @@ LIB_CFILES=	replace.c \
 		simple_atomize.c \
 		standardize_structure.c \
 		use_def_elimination.c \
-		loop_normalize.c
+		loop_normalize.c 
+
 LIB_HEADERS=	transformations-local.h
+
 LIB_OBJECTS=	$(LIB_CFILES:%.c=%.o)
-#
+
