@@ -56,7 +56,7 @@ bool stf(char *mod_name)
 	pips_error("stf","unable to make a temporary file\n");
 
     status = safe_system_no_abort(concatenate("stf-module ",
-				db_get_current_program_directory(),
+				db_get_current_workspace_directory(),
 				"/",
 				tmpmod,
 				".f", 
