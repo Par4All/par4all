@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <polylib/polylib.h>
 
+#define WS 0
 
 char s[128];
 
@@ -19,7 +20,7 @@ int main() {
 
   for (i=0, A=last=(Polyhedron *)0; i<nbPol; i++) {
     a = Matrix_Read();
-    tmp = Constraints2Polyhedron(a,600);
+    tmp = Constraints2Polyhedron(a,WS);
     Matrix_Free(a);
     if (!last) A = last = tmp;
     else {
@@ -39,7 +40,7 @@ int main() {
 
     for (i=0, B=last=(Polyhedron *)0; i<nbPol; i++) {
       b = Matrix_Read();
-      tmp = Constraints2Polyhedron(b,200);
+      tmp = Constraints2Polyhedron(b,WS);
       Matrix_Free(b);
       if (!last) B = last = tmp;
       else {
@@ -57,8 +58,8 @@ int main() {
     
     switch (func) {
     case 1:
-      C = DomainUnion(A, B, 200);
-      D = DomainConvex(C, 200);
+      C = DomainUnion(A, B, WS);
+      D = DomainConvex(C, WS);
       d = Polyhedron2Constraints(D);
       Matrix_Print(stdout,P_VALUE_FMT,d);
       Matrix_Free(d);
@@ -66,7 +67,7 @@ int main() {
       Domain_Free(D);
       break;
     case 2:
-      D = DomainSimplify(A, B, 200);
+      D = DomainSimplify(A, B, WS);
       d = Polyhedron2Constraints(D);
       Matrix_Print(stdout,P_VALUE_FMT,d);
       Matrix_Free(d);
@@ -125,20 +126,20 @@ int main() {
       /* Polyhedron_Print(stdout,"%5d", A); */
       /* Matrix_Print(stdout,"%4d", b);     */
       
-      C = Polyhedron_Image(A, b, 400);
+      C = Polyhedron_Image(A, b, WS);
       Polyhedron_Print(stdout,P_VALUE_FMT,C);
       break;
     case 8:
       
       printf("%s\n",
-	     Polyhedron_Not_Empty(A,B,600) ? "Not Empty" : "Empty");
+	     Polyhedron_Not_Empty(A,B,WS) ? "Not Empty" : "Empty");
       break;
     case 9:
       
-      i = PolyhedronLTQ(A,B,1,0,600);
+      i = PolyhedronLTQ(A,B,1,0,WS);
       printf("%s\n",
 	     i==-1 ? "A<B" : i==1 ? "A>B" : i==0 ? "A><B" : "error");
-      i = PolyhedronLTQ(B,A,1,0,600);
+      i = PolyhedronLTQ(B,A,1,0,WS);
       printf("%s\n",
 	     i==-1 ? "A<B" : i==1 ? "A>B" : i==0 ? "A><B" : "error");
       break;

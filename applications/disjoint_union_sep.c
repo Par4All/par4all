@@ -16,7 +16,7 @@
 
 #include <polylib/polylib.h>
 
-#define WS 200
+#define WS 0
 
 
 /* Procedure to print constraints of a domain */

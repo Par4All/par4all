@@ -3,6 +3,8 @@
 
 #include <polylib/polylib.h>
 
+#define WS 0
+
 int main() {
 	
   Matrix *a, *b;
@@ -18,7 +20,7 @@ int main() {
     fprintf(stderr,"Input error: empty matrix\n");
     exit(0);
   }
-  A = Constraints2Polyhedron(a, 200);
+  A = Constraints2Polyhedron(a, WS);
   Matrix_Free(a);
   b = Matrix_Read();
   
@@ -26,12 +28,12 @@ int main() {
     fprintf(stderr, "Input error: empty matrix\n");
     exit(0);
   }
-  B = Constraints2Polyhedron(b, 200);
+  B = Constraints2Polyhedron(b, WS);
   Matrix_Free(b);
   
   /* Read the name of the parameters */
   param_name = Read_ParamNames(stdin, B->Dimension);
-  PA = Polyhedron2Param_Domain(A,B,200);
+  PA = Polyhedron2Param_Domain(A,B,WS);
   if(!PA || PA->D==NULL) {
     printf("---------------------------------------\n");
     printf("Empty polyhedron\n");

@@ -5,6 +5,8 @@ Z-polyhedra. */
 #include <stdio.h>
 #include <polylib/polylib.h>
 
+#define WS 0
+
 char s[128];
 
 int main() {
@@ -79,28 +81,28 @@ int main() {
   
   case 1:  
     g = Matrix_Read();
-    A = Constraints2Polyhedron(g,2000);
+    A = Constraints2Polyhedron(g,WS);
     Matrix_Free(g);
     break;
   
   case 2:         
     g = Matrix_Read();
-    A = Constraints2Polyhedron(g,2000);
+    A = Constraints2Polyhedron(g,WS);
     Matrix_Free(g);
     g = Matrix_Read();
-    B = Constraints2Polyhedron(g,2000);
+    B = Constraints2Polyhedron(g,WS);
     Matrix_Free(g);
     break;
   
   case 3:
     g = Matrix_Read();
-    A = Constraints2Polyhedron(g,2000);
+    A = Constraints2Polyhedron(g,WS);
     Matrix_Free(g);
     g = Matrix_Read();
-    B = Constraints2Polyhedron(g,2000);
+    B = Constraints2Polyhedron(g,WS);
     Matrix_Free(g);
     g = Matrix_Read();
-    C = Constraints2Polyhedron(g,2000);
+    C = Constraints2Polyhedron(g,WS);
     Matrix_Free(g);
     break;
   }

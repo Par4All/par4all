@@ -1,4 +1,4 @@
-#define WS 1000
+#define WS 0
 
 #include <polylib/polylib.h>
 

@@ -17,6 +17,8 @@
 
 #include <polylib/polylib.h>
 
+#define WS 0
+
 /** 
     
 define this to print all constraints on the validity domains if not
@@ -115,14 +117,14 @@ int main() {
         fprintf( stderr, "Not enough parameters !\n" );
         exit(0);
     }
-    P = Constraints2Polyhedron(P1,1024);
-    C = Constraints2Polyhedron(C1,1024);
+    P = Constraints2Polyhedron(P1,WS);
+    C = Constraints2Polyhedron(C1,WS);
     Matrix_Free(C1);
     Matrix_Free(P1);
   
     /* Read the name of the parameters */
     param_name = Read_ParamNames(stdin,C->Dimension);
-    en = Polyhedron_Enumerate(P,C,1024,param_name);
+    en = Polyhedron_Enumerate(P,C,WS,param_name);
 
 #ifdef EP_EVALUATION
     if( isatty(0) && C->Dimension != 0)

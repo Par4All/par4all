@@ -1,6 +1,8 @@
 /*       Rays 2 Polyhedron
  */
 
+#define WS 0
+
 #include <stdio.h>
 #include <polylib/polylib.h>
 
@@ -15,7 +17,7 @@ int main() {
     Matrix_Free(R);
     exit(1);
   }
-  P = Rays2Polyhedron(R,200);
+  P = Rays2Polyhedron(R,WS);
   Matrix_Free(R);
   Polyhedron_Print(stdout,P_VALUE_FMT,P);  
   Domain_Free(P);
