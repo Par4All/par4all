@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.119  1997/05/23 11:58:39  coelho
+# *** empty log message ***
+#
 # Revision 1.118  1997/05/23 09:59:36  coelho
 # *** empty log message ***
 #
@@ -152,6 +155,11 @@ PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
 # PIPS_DIRECTORY_FOR_BINARIES
 # where to put binaries (maybe on some other disk...)
 # default is directly in a subdirectory
+
+PIPS_DIRECTORY_FOR_LINUXI86_BINARIES=/usr/local/misc/pips/LINUXI86
+PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/usr/local/misc/pips/LINUXI86LL
+PIPS_DIRECTORY_FOR_GNUSOL2LL_BINARIES=/home/recanati/baraque1/pips/GNUSOL2LL
+PIPS_DIRECTORY_FOR_SOL2LL_BINARIES=/home/recanati/baraque1/pips/SOL2LL
 
 test "${PIPS_ARCH}" = LINUXI86 && \
 	PIPS_DIRECTORY_FOR_BINARIES=/usr/local/misc/pips/LINUXI86
