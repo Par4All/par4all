@@ -25,7 +25,7 @@ bool selected_loop_p(loop l)
     return loop_label(l) == selected_label;
 }
 
-void loop_interchange(string module_name)
+bool loop_interchange(string module_name)
 {
     char lp_label[6];
     entity module = local_name_to_top_level_entity(module_name);
@@ -36,13 +36,15 @@ void loop_interchange(string module_name)
 
     pips_assert("loop_interchange", entity_module_p(module));
 
-    /* DBR_CODE will be changed: argument "pure" should take FALSE but this would be useless
-       since there is only *one* version of code; a new version will be put back in the
-       data base after exchanging the loops */
+    /* DBR_CODE will be changed: argument "pure" should take FALSE but
+       this would be useless since there is only *one* version of code;
+       a new version will be put back in the data base after exchanging
+       the loops */
     s = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
     /* Get the loop label form the user */
-    resp= user_request("Which loop do you want to exchange?\n(give its label): ");
+    resp= user_request("Which loop do you want to exchange?\n"
+		       "(give its label): ");
     sscanf(resp, "%s", lp_label);
     selected_label = find_label_entity(module_name, lp_label);
     if (selected_label==entity_undefined) {
@@ -60,4 +62,5 @@ void loop_interchange(string module_name)
 			   strdup(module_name), 
 			   (char*) s);
 
+    return TRUE;
 }
