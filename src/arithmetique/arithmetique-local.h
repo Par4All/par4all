@@ -203,7 +203,7 @@ extern jmp_buf overflow_error;
  */
 #define CATCH(thrown) if (setjmp(thrown))
 #define TRY else
-#define THROW(thrown) longjmp(thrown,5)
+#define THROW(thrown) longjmp(thrown,__LINE__) /* why not!? */
 
 /* (|v| < MAX / |w|) => v*w is okay
  */
