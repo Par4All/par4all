@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
-/* #include <values.h> */
 #include <limits.h>
 #include <setjmp.h>
 
@@ -117,19 +116,16 @@ else{Value GDEN,AD,BD;AD=A.den,BD=B.den; \
 
 
 
-
-
 /* Le nombre de variables visibles est : compteur-2
  * La i-eme variable visible a le numero : variables[i+1]=i
  *   (0 <= i < compteur-2)
- * Le nombre de variables cachees est : nbvariables
+ * Le nombre de variables cachees est : nbvarables
  * La i-eme variable cachee a le numero : variablescachees[i+1]=MAX_VAR+i-1
  *   (0 <= i < nbvariables)
  */
-int nbvariables, variablescachees[MAX_VAR], variables[MAX_VAR] ; /* utilise'es par dump_tableau ; a rendre local */
-
-frac frac0={0,0,0} ;
-
+/* utilise'es par dump_tableau ; a rendre local */
+static int nbvariables, variablescachees[MAX_VAR], variables[MAX_VAR] ; 
+static frac frac0={0,0,0} ;
 
 static void printfrac(frac x) {
     printf(" ");
@@ -139,7 +135,7 @@ static void printfrac(frac x) {
     /* printf(" %3.1ld/%-3.1ld",x.num,x.den) ; */
 }
 
-void dump_tableau(tableau *t,int colonnes) {
+static void dump_tableau(tableau *t,int colonnes) {
     int i,j, k, w;
     int max=0;
     for(i=0;i<colonnes;i++) 
@@ -168,7 +164,8 @@ if(DEBUG){
         for(i=0;i<colonnes;i++) {
             w=1 ;
             for(k=0;k<t[i].taille;k++)
-                if(t[i].colonne[k].numero==j) printfrac(t[i].colonne[k]) , w=0 ;
+                if(t[i].colonne[k].numero==j)
+		    printfrac(t[i].colonne[k]) , w=0 ;
             if(w!=0)printfrac(frac0) ;
         }
     }
@@ -176,11 +173,9 @@ if(DEBUG){
 } /* dump_tableau */
 
 
-int hash(Variable s) ;
-                 
-
-int hash(Variable s) /* calcule le hashcode d'un pointeur
-			sous forme d'un nombre compris entre 0 et  MAX_VAR */
+/* calcule le hashcode d'un pointeur
+   sous forme d'un nombre compris entre 0 et  MAX_VAR */
+static int hash(Variable s) 
 { int i ;
   i=(long)s % MAX_VAR ;
   return (i) ;
