@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1996/12/26 16:07:07 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1996/12/27 09:17:15 $, )
  * version $Revision$,
  */
 
@@ -64,7 +64,9 @@ create_parameters_h(
 	/* formal parameters are passed the value by the caller
 	 * as far as overlapable dimensions are concerned.
 	 */
-	if (!dynamic_entity_p(array) || array==load_similar_mapping(array))
+	if (!dynamic_entity_p(array) || !bound_similar_mapping_p(array) ||
+	    (bound_similar_mapping_p(array) &&
+	     array==load_similar_mapping(array)))
 	    for (i=1 ; i<=andim ; i++)
 	    {
 		if (!is_argument || !ith_dim_overlapable_p(array, i))
