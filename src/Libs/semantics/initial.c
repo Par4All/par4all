@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.2  1997/09/08 08:51:14  coelho
+ * the code is not printed. name fixed.
+ *
  * Revision 1.1  1997/09/08 08:45:50  coelho
  * Initial revision
  *
@@ -52,14 +55,14 @@ program_transformer(string name)
 /*********************************************************** PRETTY PRINTERS */
 
 bool 
-print_code_initial_transformer(string name)
+print_initial_transformer(string name)
 {
     pips_internal_error("not implemented yet");
     return FALSE;
 }
 
 bool 
-print_code_program_transformer(string name)
+print_program_transformer(string name)
 {
     pips_internal_error("not implemented yet");
     return FALSE;
