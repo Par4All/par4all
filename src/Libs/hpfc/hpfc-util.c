@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/23 16:30:48 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/27 08:53:20 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -409,15 +409,26 @@ entity e, module;
 void AddEntityToHostAndNodeModules(e)
 entity e;
 {
+    entity
+	new_node = AddEntityToModule(e, node_module),
+	new_host = entity_undefined;
+
     if (entity_node_new_undefined_p(e))
-	store_new_node_variable(AddEntityToModule(e, node_module), e);
+	store_new_node_variable(new_node, e);
     else
 	AddEntityToDeclarations(load_entity_node_new(e), node_module);
     
     if (!array_distributed_p(e))
     {
+	new_host = AddEntityToModule(e, host_module);
+
 	if (entity_host_new_undefined_p(e))
-	    store_new_host_variable(AddEntityToModule(e, host_module), e);
+	    store_new_host_variable(new_host, e),
+	    /* 
+	     * added because of some entity errors.
+	     */
+	    store_entity_host_new(new_node, new_host),
+	    store_entity_node_new(new_host, new_node); 
 	else
 	    AddEntityToDeclarations(load_entity_host_new(e), host_module);
     }
