@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/08/30 14:34:34 $, ) 
+ * ($Date: 1995/09/12 14:26:27 $, ) 
  */
 
 #include "defines-local.h"
@@ -11,28 +11,30 @@ entity CreateIntrinsic(string name); /* in syntax */
 /* builds a statement
  *   VAR_i = MYPOS(i, proc_number) // i=1 to proc dimension
  */
-statement define_node_processor_id(proc, creation)
-entity proc;
-entity (*creation)(/* int */);
+statement 
+define_node_processor_id(entity proc,
+			 entity (*creation)(int))
 {
-    int i=0, procn = load_hpf_number(proc);
-    expression proce = int_to_expression(procn); /* ??? gonna be shared! */
-    entity dummy;
-    list mypos_indices, ls = NIL;
+    int i, procn = load_hpf_number(proc);
+    list /* of expression */ mypos_indices,
+         /* of statement */  ls = NIL;
     reference mypos;
+    entity dummy;
 
-    for(i=NumberOfDimension(proc); i>=1; i--)
-	dummy = creation(i),
+    for(i=NumberOfDimension(proc); i>0; i--)
+    {
+	dummy = creation(i);
 	mypos_indices = CONS(EXPRESSION, int_to_expression(i),
-			CONS(EXPRESSION, proce, 
-			     NIL)),
-	mypos = make_reference(hpfc_name_to_entity(MYPOS), mypos_indices),
+			CONS(EXPRESSION, int_to_expression(procn), 
+			     NIL));
+	mypos = make_reference(hpfc_name_to_entity(MYPOS), mypos_indices);
 	ls = CONS(STATEMENT,
 		  make_assign_statement(entity_to_expression(dummy),
 					reference_to_expression(mypos)),
 		  ls);
+    }
 				       
-    return(make_block_statement(ls));	
+    return make_block_statement(ls);
 }
 
 /* statement generate_deducables(list le)
@@ -42,8 +44,8 @@ entity (*creation)(/* int */);
  * the normalized field which is the expression that is going to
  * be used to define the variable.
  */
-statement generate_deducables(le)
-list le;
+statement 
+generate_deducables(list le)
 {
     list rev = gen_nreverse(gen_copy_seq(le)), ls = NIL;
 
@@ -68,7 +70,7 @@ list le;
 	rev);
 
     gen_free_list(rev);
-    return(make_block_statement(ls));
+    return make_block_statement(ls);
 }
 
 list /* of expression */
@@ -81,23 +83,22 @@ hpfc_gen_n_vars_expr(entity (*creation)(), int number)
 	result = CONS(EXPRESSION, entity_to_expression(creation(number)),
 		      result);
 
-    return(result);
+    return result;
 }
 
 expression 
-make_reference_expression(e, creation)
-entity e, (*creation)();
+make_reference_expression(entity e,
+			  entity (*creation)(int))
 {
-    return(reference_to_expression(make_reference(e,
-	   hpfc_gen_n_vars_expr(creation, NumberOfDimension(e)))));
+    return reference_to_expression(make_reference(e,
+	   hpfc_gen_n_vars_expr(creation, NumberOfDimension(e))));
 }
 
 /* the following functions generate the statements to appear in
  * the I/O loop nest.
  */
-statement set_logical(log, val)
-entity log;
-bool val;
+statement 
+set_logical(entity log, bool val)
 {
     return make_assign_statement
 	(entity_to_expression(log),
@@ -106,9 +107,19 @@ bool val;
 			      NIL));
 }
 
+statement 
+hpfc_add_n(entity var, int n)
+{
+    return make_assign_statement
+	(entity_to_expression(var),
+	 MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME),
+			entity_to_expression(var), int_to_expression(n)));
+}
+
 /* expr = expr + 2
  */
-statement hpfc_add_2(exp)
+statement 
+hpfc_add_2(exp)
 expression exp;
 {
     entity plus = CreateIntrinsic(PLUS_OPERATOR_NAME);
@@ -118,12 +129,13 @@ expression exp;
 
 }
 
-statement hpfc_message(tid, channel, send)
+statement 
+hpfc_message(tid, channel, send)
 expression tid, channel;
 bool send;
 {
-    expression 
-	third = entity_to_expression(hpfc_name_to_entity(send ? INFO : BUFID));
+    expression third = 
+	entity_to_expression(hpfc_name_to_entity(send ? INFO : BUFID));
     entity pvmf = hpfc_name_to_entity(send ? PVM_SEND : PVM_RECV);
 
     return(make_block_statement
@@ -136,9 +148,10 @@ bool send;
 		 NIL))));				    
 }
 
-statement hpfc_lazy_guard(snd, then)
-bool snd;
-statement then;
+/* returns if (LAZY_{SEND,RECV}) then
+ */
+statement 
+hpfc_lazy_guard(bool snd, statement then)
 {
     entity decision = hpfc_name_to_entity(snd ? LAZY_SEND : LAZY_RECV);
     return test_to_statement
@@ -150,9 +163,10 @@ statement then;
  *   LAZY_snd = FALSE // if receive
  * ENDIF
  */
-static statement hpfc_lazy_message(tid, channel, snd)
-expression tid, channel;
-bool snd;
+static statement 
+hpfc_lazy_message(expression tid, 
+		  expression channel, 
+		  bool snd)
 {
     entity decision = hpfc_name_to_entity(snd ? LAZY_SEND : LAZY_RECV);
     statement 
@@ -165,9 +179,10 @@ bool snd;
     return hpfc_lazy_guard(snd, then);
 }
 
-statement hpfc_generate_message(ld, send, lazy)
-entity ld;
-bool send, lazy;
+statement 
+hpfc_generate_message(entity ld, 
+		      bool send, 
+		      bool lazy)
 {
     entity nc, nt;
     expression lid, tid, chn;
@@ -184,7 +199,8 @@ bool send, lazy;
 	          hpfc_message(tid, chn, send);
 }
 
-statement hpfc_initsend(lazy)
+statement 
+hpfc_initsend(lazy)
 bool lazy;
 {
     statement init;
@@ -204,10 +220,34 @@ bool lazy;
 		  init ;
 }
 
-statement hpfc_packing(array, creation, pack)
-entity array;
-entity (*creation)();
-bool pack;
+/****************************************************************** PACKING */
+
+/* returns the buffer entity for array
+ */
+entity 
+hpfc_buffer_entity(entity array)
+{
+    return hpfc_name_to_entity(concatenate
+			       (pvm_what_options(entity_basic(array)),
+				BUFFER_SUFFIX, NULL));
+}
+
+expression
+hpfc_buffer_reference(entity array, entity index)
+{
+    return reference_to_expression
+	(make_reference(hpfc_buffer_entity(array),
+         CONS(EXPRESSION, entity_to_expression(index), 
+	      NIL)));
+}
+
+/* returns PVMF(un)pack(..., array(creation), 1, 1, HPFC_INFO)
+ */
+static statement 
+hpfc_pvm_packing(entity array,
+		 entity (*creation)(int), 
+		 bool pack)
+
 {
     return hpfc_make_call_statement
 	(hpfc_name_to_entity(pack ? PVM_PACK : PVM_UNPACK),
@@ -219,7 +259,47 @@ bool pack;
 		   NIL))))));
 }
 
-statement hpfc_lazy_packing(array, lid, creation, pack, lazy)
+/* array(creation) = buffer(current++) or inverse...
+ */
+static statement 
+hpfc_buffer_packing(entity array,
+		    entity (*creation)(), 
+		    bool pack)
+
+{
+    entity index = hpfc_name_to_entity(BUFFER_INDEX);
+    expression
+	array_ref = make_reference_expression(array, creation),
+	buffer_ref = hpfc_buffer_reference(array, index);
+    statement
+	increment = hpfc_add_n(index, 1),
+	assignment = make_assign_statement(pack ? buffer_ref : array_ref,
+					   pack ? array_ref : buffer_ref);
+    
+    return make_block_statement(CONS(STATEMENT, increment,
+				CONS(STATEMENT, assignment,
+				     NIL)));
+				     
+}
+
+/* returns an packing call for hpfc, that (un)pack array(creation).
+ */
+statement
+hpfc_packing(entity array,
+	     entity (*creation)(), 
+	     bool pack)
+{
+    return /* get_bool_property(HPFC_USE_BUFFERS) ?
+	hpfc_buffer_packing(array, creation, pack) : */
+        hpfc_pvm_packing(array, creation, pack);
+}
+
+/* the lazy issues.
+ * note that target processors should be known 
+ * to generate the appropriate broadcast?
+ */
+statement 
+hpfc_lazy_packing(array, lid, creation, pack, lazy)
 entity array, lid;
 entity (*creation)();
 bool pack, lazy;
@@ -236,17 +316,17 @@ bool pack, lazy;
 	     NIL)))) : pack_stmt ;
 }
 
-list make_list_of_constant(val, number)
+list /* of expression */
+make_list_of_constant(val, number)
 int val, number;
 {
     list l=NIL;
-    int i;
+
     assert(number>=0);
+    for(; number; number--)
+	l = CONS(EXPRESSION, int_to_expression(val), l);
 
-    for(i=1; i<=number; i++)
-	l = CONS(EXPRESSION, make_integer_constant_expression(val), l);
-
-    return(l);
+    return l;
 }
 
 #define psi(i) entity_to_expression(creation(i))
@@ -255,9 +335,10 @@ int val, number;
  *
  *       T_LID=CMP_LID(pn, pi...)
  */
-statement hpfc_compute_lid(lid, proc, creation)
-entity lid, proc;
-entity (*creation)();
+statement 
+hpfc_compute_lid(entity lid,
+		 entity proc, 
+		 entity (*creation)(int))
 {
     int     ndim = NumberOfDimension(proc);
 
