@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/07/18 19:42:05 $, 
+ * $Date: 1996/07/19 10:21:53 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -37,16 +37,21 @@ static int NB_INEQ = 0;
 #define DEBUG1(code) /* idem */
 #define DEBUG2(code) /* idem */
 
-#define PTR_NIL -32001
+#define PTR_NIL ((char*)0xdeadbeef)
 #define INFINI VALUE_MAX
+#define MAX_VAR 1971 /* nombre max de variables */
+
+/* seuil au dela duquel on se mefie d'un overflow
+ */
+#if defined(LINEAR_VALUE_IS_LONGLONG)
+#define MAXVAL 576
+#else
+#define MAXVAL 24  
+#endif
 
 #define DIMENSION sc->dimension
 #define NUMERO hashtable[h].numero
-
-#define MAX_VAR 1971 /* nombre max de variables */
-#define MAXVAL 24  /* seuil au dela duquel on se mefie d'un overflow */
 #define SOLUBLE(N) soluble=N;goto FINSIMPLEX ;
-
 #define CREVARVISIBLE variables[compteur-3]=compteur-2;
 #define CREVARCACHEE { variablescachees[nbvariables]=nbvariables + MAX_VAR ; \
 			 if (nbvariables ++ >= MAX_VAR) abort(); }
