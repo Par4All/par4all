@@ -159,8 +159,7 @@ c is a constant.
 
 n is an iteration count, i.e. a positive integer constant. */
 
-static dataval MakeDataVal(n, c)
-expression c, n;
+static dataval MakeDataVal(expression n, expression c)
 {
     int in;
     constant cc;
@@ -176,7 +175,7 @@ expression c, n;
     value_constant(vc) = constant_undefined;
     gen_free(vc);
 
-    return(make_dataval(cc, in));
+    return make_dataval(cc, in);
 }
 
 
@@ -188,9 +187,7 @@ undefined, in which case the whole variable s is initialized. remember that
 a scalar is represented by a zero dimension variable in our internal
 representation.  */ 
 
-static datavar MakeDataVar(s, r) 
-syntax s; 
-range r; 
+static datavar MakeDataVar(syntax s, range r)
 {
     entity e; 
     reference ref;
@@ -205,7 +202,7 @@ range r;
     if (r == range_undefined) {
 	if(reference_indices(ref)==NIL)
 	    d = make_datavar(e, 
-			     NumberOfElements(variable_dimensions(type_variable(entity_type(e)))));
+    NumberOfElements(variable_dimensions(type_variable(entity_type(e)))));
 	else
 	    d = make_datavar(e, 1);
     }
@@ -435,7 +432,7 @@ io_inst:  io_keyword io_f_u_id
 		case TK_REWIND:
 		case TK_ENDFILE:
 		  ParserError("Syntax",
-			      "Illegal syntax in IO statement, Parentheses are required");
+		  "Illegal syntax in IO statement, Parentheses are required");
 		default:
 		    ParserError("Syntax","Unexpected token in IO statement");
 		}
@@ -449,7 +446,8 @@ io_inst:  io_keyword io_f_u_id
 	;
 
 io_f_u_id: atom 
-        /* Should be an expression, but a conflict results for parentheses which may be
+        /* Should be an expression, but a conflict results for parentheses 
+	 * which may be
 	 * part of the expression or part of the IO statement (FI, 1/1/97)
 	 */
 	    { $$ = make_expression($1, normalized_undefined); }
@@ -479,10 +477,6 @@ ci: name TK_EQUALS expression
 		free($1);
 
 		if(strcmp(buffer,"END")==0||strcmp(buffer,"ERR")==0) {
-		  /*
-		  Warning("parser", 
-			  "Control effects of IO clauses END and ERR are ignored\n");
-			  */
 		  ;
 		}
 
@@ -509,7 +503,7 @@ ci: name TK_EQUALS expression
 		$$ = CONS(EXPRESSION, 
 			  MakeCharacterConstantExpression(buffer),
 			  CONS(EXPRESSION,
-			       MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME))
+		 MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME))
 			       , NULL));
 		ici += 1;
 	    }
@@ -766,7 +760,7 @@ dim_tableau: expression
 	| TK_STAR
 	    {
 		$$ = make_dimension(MakeIntegerConstantExpression("1"),
-		     MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME)));
+		  MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME)));
 	    }
 	| expression TK_COLON TK_STAR
 	    {
@@ -810,8 +804,6 @@ common: TK_COMMON
 
 common_name: TK_CONCAT
 	    {
-		/* $$ = MakeCommon(FindOrCreateEntity(CurrentPackage, 
-					   BLANK_COMMON_LOCAL_NAME)); */
 		$$ = MakeCommon(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
 					   BLANK_COMMON_LOCAL_NAME));
 	    }
@@ -920,11 +912,17 @@ dataconst: const_simple
 			       entity_local_name($1));
 		    if(strcmp("Z", entity_local_name($1))==0) {
 			user_warning("gram",
-				   "Might be a non supported hexadecimal constant\n");
+		       "Might be a non supported hexadecimal constant\n");
 		    }
 		    ParserError("gram", "Error in initializer");
 		}
 	    }
+	| entity_name TK_LPAR const_simple TK_COMMA const_simple TK_RPAR
+	{
+	    pips_assert("is implied complex", 
+			ENTITY_IMPLIED_CMPLX_P($1));
+	    $$ = MakeBinaryCall(CreateIntrinsic(IMPLIED_COMPLEX_NAME), $3, $5);
+	}
 	;
 
 datavar: atom
