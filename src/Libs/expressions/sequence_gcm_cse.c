@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.9  1999/05/27 14:47:26  ancourt
+   working combined association/atomization for ICM.
+
    Revision 1.8  1999/05/26 14:25:42  coelho
    emprunt...
 
@@ -47,6 +50,9 @@
 #include "resources.h"
 #include "pipsdbm.h"
 
+#include "effects-generic.h"
+#include "effects-simple.h"
+
 #include "transformations.h"
 
 #include "eole_private.h"
@@ -55,8 +61,6 @@
 
 #define NARY_ASSIGN EXPRESSION;
 #define nary_assign expression;
-
-
 
 /************************************************************** NESTING OKAY */
 
@@ -1307,6 +1311,8 @@ icm_cse_on_sequence(string module_name,
   close_is_nested();
 } 
 
+/*********************************************************** ICM ASSOCIATION */
+
 /*
         *******
         *          **    *****      *    ******  *    *
@@ -1317,9 +1323,6 @@ icm_cse_on_sequence(string module_name,
         *        *    *  *****      *    ******  *    *
  
  */
-
-/*********************************************************** ICM ASSOCIATION */
-
 /* assumes:
    - cumulated effects (as a dependence abstraction).
    - proper effects (?)
@@ -1331,45 +1334,408 @@ static list nesting = NIL;
 
 /* statement stack to current statement.
  */
-DEFINE_LOCAL_STACK(current_statement, statement)
+/* DEFINE_LOCAL_STACK(current_statement, statement) */
 
-GENERIC_LOCAL_FUNCTION(pexpr, persistant_expression_to_effects)
-
-GENERIC_LOCAL_FUNCTION(inserted, persistant_statement_to_statement)
-
-/* current instruction, available top-down.
+/* statements to be inserted as a sequence.
  */
-static instruction current_instruction = NULL;
-
-static bool ins_flt(instruction i)
-{
-  current_instruction = i;
-  return TRUE;
-}
-
-statit bool stmt_flt(statement s)
-{
-  current_statement_filter(s);
-  
-}
+GENERIC_LOCAL_FUNCTION(inserted, persistant_statement_to_statement)
 
 /* keep track of nesting.
  */
-static bool loop_flt(loop l)
+static void push_nesting(statement s)
 {
-  statement sofl = get_current_statement_head();
-  nesting = CONS(STATEMENT, soft, nesting);
-  return TRUE;
+  nesting = CONS(STATEMENT, s, nesting);
 }
 
-static void loop_rwt(loop l)
+static void pop_nesting(statement s)
 {
-  statement sofl = get_current_statement_head();
   list old = nesting;
-  pips_assert("same ", nesting && (sofl == LOOP(CAR(nesting)));
+  pips_assert("same ", nesting && (s == STATEMENT(CAR(nesting))));
   nesting = CDR(nesting);
   CDR(old) = NIL;
   gen_free_list(old);
+}
+
+static bool loop_flt_aaa(loop l)
+{
+  statement sofl = current_statement_head();
+  push_nesting(sofl);
+  return TRUE;
+}
+
+static void loop_rwt_aaa(loop l)
+{
+  statement sofl = current_statement_head();
+  pop_nesting(sofl);
+}
+
+/* there is a side effect if there is a W effect in the expression.
+ */
+static bool side_effects_p(expression e)
+{
+  effects ef = load_expr_prw_effects(e);
+  list /* of effect */ le = effects_effects(ef);
+  MAP(EFFECT, ef, if (effect_write_p(ef)) return TRUE, le);
+  return FALSE;
+}
+
+/* some effect in les interfere with var.
+ */
+static bool interference_on(entity var, list /* of effect */ les)
+{
+  MAP(EFFECT, ef, 
+      if (effect_write_p(ef) &&
+	  entity_conflict_p(var, reference_variable(effect_reference(ef))))
+        return TRUE,
+      les);
+  return FALSE;
+}
+
+/* whether sg with effects le can be moved up to s.
+ */
+static bool moveable_to(list /* of effects */ le, statement s)
+{
+  list les = load_cumulated_rw_effects_list(s);
+  MAP(EFFECT, ef,
+      if (interference_on(reference_variable(effect_reference(ef)), les))
+        return FALSE,
+      le);
+  return TRUE;
+}
+
+/* return the level of this expression, using the current nesting list.
+ * 0: before any statement!
+ * n: outside nth loop.
+ * and so on.
+ */
+static int level_of(list /* of effects */ le)
+{
+  list /* of statement */ up_nesting = gen_nreverse(gen_copy_seq(nesting));
+  int level = 0;
+  MAP(STATEMENT, s,
+      if (moveable_to(le, s))
+      {
+	gen_free_list(up_nesting);
+	return level;
+      }
+      else
+        level++,
+      up_nesting);
+  
+  gen_free_list(up_nesting);
+  return level;
+}
+
+static int expr_level_of(expression e)
+{
+  list le;
+  if (!bound_expr_prw_effects_p(e)) return -1; /* assigns... */
+  le = effects_effects(load_expr_prw_effects(e));
+  return level_of(le);
+}
+
+static int stat_level_of(statement s)
+{
+  list le = load_proper_rw_effects_list(s);
+  return level_of(le);
+}
+
+/* returns the statement of the specified level
+   should returns current_statement_head() to avoid ICM directly.
+ */
+static statement statement_of_level(int level)
+{
+  int n = gen_length(nesting)-1-level;
+  
+  if (n>=0)
+    return STATEMENT(gen_nth(n, nesting));
+  else
+    return current_statement_head();
+}
+
+static int current_level(void)
+{
+  return gen_length(nesting);
+}
+
+static void insert_before_statement(statement news, statement s)
+{
+  if (!bound_inserted_p(s))
+    {
+      store_inserted(s, make_block_statement(CONS(STATEMENT, news, NIL)));
+    }
+  else
+    {
+      statement sb = load_inserted(s);
+      instruction i = statement_instruction(sb);
+      pips_assert("inserted in block", statement_block_p(sb));
+
+      /* statements are stored in reverse order...
+	 this will have to be fixed latter on.
+       */
+      instruction_block(i) = CONS(STATEMENT, news, instruction_block(i));
+    }
+}
+
+/* atomizable if some computation.
+ */
+static bool atomizable_sub_expression_p(expression e)
+{
+  syntax s = expression_syntax(e);
+  switch (syntax_tag(s))
+    {
+    case is_syntax_range:
+    case is_syntax_reference:
+      return FALSE;
+    case is_syntax_call:
+      return !entity_constant_p(call_function(syntax_call(s)));
+    default:
+      pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
+      return FALSE;
+    }
+}
+
+extern entity hpfc_new_variable(entity, basic);
+
+static gen_array_t /* of list of expressions */
+group_expr_by_level(int nlevels, list le)
+{
+  gen_array_t result = gen_array_make(nlevels+1);
+  int i, lastlevel;
+  bool first_alone;
+
+  /* initialize chunks. */
+  for (i=0; i<=nlevels; i++)
+    gen_array_addto(result, i, list_undefined);
+  
+  /* put expressions in chunks. */
+  MAP(EXPRESSION, e,
+  {
+    int elevel = expr_level_of(e);
+    list eatlevel;
+    pips_assert("coherent level", elevel>=0 && elevel<=nlevels);
+    
+    if (side_effects_p(e))
+      elevel = nlevels;
+    
+    eatlevel = (list) gen_array_item(result, elevel);
+    if (eatlevel == list_undefined)
+      eatlevel = CONS(EXPRESSION, e, NIL);
+    else
+      eatlevel = CONS(EXPRESSION, e, eatlevel);
+    gen_array_addto(result, elevel, eatlevel);
+  },
+      le);
+
+  for (i=0; i<=nlevels; i++)
+    if (((list)gen_array_item(result, i)) != list_undefined)
+      lastlevel = i;
+
+  /* fix expressions by useful levels, with some operations.
+   */
+  first_alone = TRUE;
+  for (i=0; i<nlevels && first_alone; i++)
+    {
+      list lei = (list) gen_array_item(result, i);
+      if (lei != list_undefined)
+	{
+	  int lenlei = gen_length(lei);
+	  if (lenlei == 1)
+	    {
+	      list next = (list) gen_array_item(result, i+1);
+	      if (next == list_undefined)
+		next = lei;
+	      else
+		next = gen_nconc(next, lei);
+	      gen_array_addto(result, i+1, next);
+	      gen_array_addto(result, i, list_undefined);
+	    }
+	  else
+	    first_alone = FALSE;
+	}
+    }
+
+  return result;
+}
+
+static void atomize_call(call c, int level)
+{
+  list /* of expression */ args;
+  int lenargs;
+  
+  args = call_arguments(c);
+  lenargs = gen_length(args);
+
+  fprintf(stderr, "ATOMIZE %s (%d)\n", 
+	  entity_name(call_function(c)), lenargs);
+  {
+    expression tmp = call_to_expression(c);
+    print_expression(tmp);
+  }
+
+
+  if (lenargs>=2)
+    {
+      /* atomize sub expressions with 
+	 - lower level
+	 - not simple (references or constants)
+	 - no side effects.
+      */
+      
+      MAP(EXPRESSION, sube,
+      {
+	int subelevel = expr_level_of(sube);
+	if (subelevel != -1 &&
+	    subelevel < level &&
+	    atomizable_sub_expression_p(sube) &&
+	    !side_effects_p(sube))
+	  {
+	    statement atom = 
+	      atomize_this_expression(hpfc_new_variable, sube);
+	    if (atom)
+	      {
+		/* add a comment... */
+		statement_comments(atom) = 
+		  strdup(concatenate("! level: ", itoa(subelevel), "\n",
+				     NULL));
+		  insert_before_statement(atom, 
+					  statement_of_level(subelevel));
+	      }
+	  }
+      },
+	args);
+    }
+}
+
+static void atomize_instruction(instruction i)
+{
+  if (!nesting) return;
+  if (!instruction_call_p(i)) return;
+
+  fprintf(stderr, "call to %s (%d)\n", 
+	  entity_name(call_function(instruction_call(i))),
+	  gen_length(call_arguments(instruction_call(i))));
+
+  atomize_call(instruction_call(i), stat_level_of(current_statement_head()));
+}
+
+static void atomize_and_associate(expression e)
+{
+  syntax syn;
+  call c;
+  entity func;
+  list /* of expression */ args;
+  int lenargs;
+
+  /* some depth, otherwise no ICM needed!
+   * should be fixed if root statement is pushed?
+   */
+  if (!nesting) return;
+  
+  /* only a scalar expression can be atomized.
+   */
+
+
+
+  /* only do something with calls.
+   */
+  syn = expression_syntax(e);
+  if (!syntax_call_p(syn))
+    return;
+
+  /* something to icm 
+   */
+  c = syntax_call(syn);
+  func = call_function(c);
+  args = call_arguments(c);
+  lenargs = gen_length(args);
+
+  if (Is_Associatif_Commutatif(func) && lenargs>2)
+    {
+      /* reassociation + atomization maybe needed.
+	 code taken from JZ.
+       */
+      int exprlevel = expr_level_of(e), i, nlevels = current_level();
+      gen_array_t groups = group_expr_by_level(nlevels, args);
+      list lenl;
+
+      fprintf(stderr, "ASSOCIATE %s (%d)\n", entity_name(func), lenargs);
+      print_expression(e);
+
+      /* note: the last level of an expression MUST NOT be moved!
+	 indeed, there may be a side effects in another part of the expr.
+       */
+      for (i=0; i<nlevels; i++)
+	{
+	  list lei = (list) gen_array_item(groups, i);
+	  if (lei!=list_undefined)
+	    {
+	      int j;
+	      bool satom_inserted = FALSE;
+	      syntax satom = make_syntax(is_syntax_call, make_call(func, lei));
+	      expression eatom;
+	      statement atom;
+
+	      /* insert expression in upward expression, eventually in e!
+	       */
+	      for (j=i+1; j<=nlevels && !satom_inserted; j++)
+		{
+		  list lej = (list) gen_array_item(groups, j);
+		  if (lej!=list_undefined)
+		    {
+		      eatom = make_expression(satom, normalized_undefined);
+		      lej = CONS(EXPRESSION, eatom, lej);
+		      gen_array_addto(groups, j, lej);
+		      satom_inserted = TRUE;
+		    }
+		}
+	      if (!satom_inserted)
+		{
+		  expression_syntax(e) = satom;
+		  eatom = e;
+		}
+	      
+	      atom = atomize_this_expression(hpfc_new_variable, eatom);
+	      insert_before_statement(atom, statement_of_level(i));
+	    }
+	}
+
+      /* fix last level if necessary.
+       */
+      lenl = (list) gen_array_item(groups, nlevels);
+      if (lenl != list_undefined)
+	  call_arguments(c) = lenl;
+    }
+  else
+    {
+      atomize_call(c, expr_level_of(e));
+    }
+}
+
+/* insert in front if some inserted.
+ */
+static void insert_rwt(statement s)
+{
+  if (bound_inserted_p(s))
+    {
+      statement sblock = load_inserted(s);
+      instruction i = statement_instruction(sblock);
+      sequence seq;
+      pips_assert("it is a sequence", instruction_sequence_p(i));
+
+      /* reverse list */
+      seq = instruction_sequence(i);
+      sequence_statements(seq) = gen_nreverse(sequence_statements(seq));
+
+      /* insert */
+      sequence_statements(seq) = 
+	gen_append(sequence_statements(seq),
+		   CONS(STATEMENT,
+			instruction_to_statement(statement_instruction(s)),
+			NIL));
+
+      statement_instruction(s) = i;
+    }
 }
 
 /* perform ICM and association on operators.
@@ -1382,24 +1748,50 @@ perform_icm_association(
 {
   pips_assert("clean static structures on entry",
 	      (get_current_statement_stack() == stack_undefined) &&
-	      level_of_undefined_p() &&
-	      (current_instruction == NULL) &&
+	      inserted_undefined_p() &&
 	      (nesting==NIL));
+
+  /* set full (expr and statements) PROPER EFFECTS
+   */
+  full_simple_proper_effects(name, s);
+
+  /* GET CUMULATED EFFECTS
+   */
+  set_cumulated_rw_effects((statement_effects)
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, name, TRUE));
   
-  init_level_of();
+  init_inserted();
   make_current_statement_stack();
-  
+
+  /*???*/
+  /* push_nesting(s);*/
+
+  /* ATOMIZE and REASSOCIATE by level.
+   */
   gen_multi_recurse(s,
       statement_domain, current_statement_filter, current_statement_rewrite,
-      instruction_domain, ins_flt, gen_null,
-      loop_domain, loop_flt, loop_rwt,
+      instruction_domain, gen_true, atomize_instruction,
+      loop_domain, loop_flt_aaa, loop_rwt_aaa,
+		    /* could also push while loops... */
+      expression_domain, gen_true, atomize_and_associate,
+      /* do not atomize index computations... */     
+      reference_domain, gen_false, gen_null,
 		    NULL);
+
+  /* insert moved code. */
+  gen_multi_recurse(s, statement_domain, gen_true, insert_rwt, NULL);
+
+  /* pop_nesting(s); */
 
   pips_assert("clean static structure on exit",
 	      (nesting==NIL) &&
 	      (current_statement_size()==0));
 
-  current_instruction = NULL;
   free_current_statement_stack();
-  close_level_of();
+  close_inserted();
+
+  reset_cumulated_rw_effects();
+
+  close_expr_prw_effects();  /* no memory leaks? */
+  close_proper_rw_effects();
 }
