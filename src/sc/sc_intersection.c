@@ -1,4 +1,4 @@
- /* package sc */
+/* package sc */
 
 #include <stdlib.h>
 #include <string.h>
@@ -107,7 +107,7 @@ Psysteme s3;
 	       d'egalites et d'inegalites a condition d'avoir un sc_copy() */
 	    sc_rm(s1);
 	}
-	s1 = sc_dup(s2);
+	s1 = sc_copy(s2);
 	s1 = sc_append(s1,s3);
     }
     return(s1);
@@ -134,7 +134,7 @@ Psysteme s2;
 
     if(SC_RN_P(s1))
 	/* ne rien faire et renvoyer s2 */
-	s1 = sc_dup(s2);
+	s1 = sc_copy(s2);
     else if(SC_RN_P(s2))
 	/* ne rien faire et renvoyer s1 */
 	;
@@ -155,10 +155,10 @@ Psysteme s2;
 
 	/* ni s1 ni s2 ne sont des systemes particuliers */
 	for(c = sc_egalites(s2); c != (Pcontrainte) NULL; c = c->succ) {
-	    sc_add_egalite(s1,contrainte_dup(c));
+	    sc_add_egalite(s1,contrainte_copy(c));
 	}
 	for(c = sc_inegalites(s2); c != (Pcontrainte) NULL; c = c->succ) {
-	    sc_add_inegalite(s1,contrainte_dup(c));
+	    sc_add_inegalite(s1,contrainte_copy(c));
 	}
 
 	/* update s1 basis with s2's vectors */
@@ -210,7 +210,7 @@ Psysteme s3;
 	       d'egalites et d'inegalites a condition d'avoir un sc_copy() */
 	    sc_rm(s1);
 	}
-	s1 = sc_dup(s2);
+	s1 = sc_copy(s2);
 	s1 = sc_safe_append(s1,s3);
     }
     return(s1);
@@ -241,7 +241,7 @@ Psysteme s2;
     if(sc_rn_p(s1)) {
 	/* ne rien faire et renvoyer s2 apre`s mise a` jour de la base */
 	sc_rm(s1);
-	s1 = sc_dup(s2);
+	s1 = sc_copy(s2);
     }
     else if(sc_rn_p(s2))
 	/* ne rien faire et renvoyer s1 apre`s mise a` jour de la base */
@@ -252,16 +252,16 @@ Psysteme s2;
     else if(sc_empty_p(s2)) {
 	/* ne rien faire et renvoyer s2 apre`s mise a` jour de la base */
 	sc_rm(s1);
-	s1 = sc_dup(s2);
+	s1 = sc_copy(s2);
     }
     else {
 	/* ni s1 ni s2 ne sont des systemes particuliers :
 	 * on ajoute a` s1 les e'galite's et ine'galite's de s2 */
 	for(c = sc_egalites(s2); c != (Pcontrainte) NULL; c = c->succ) {
-	    sc_add_egalite(s1,contrainte_dup(c));
+	    sc_add_egalite(s1,contrainte_copy(c));
 	}
 	for(c = sc_inegalites(s2); c != (Pcontrainte) NULL; c = c->succ) {
-	    sc_add_inegalite(s1,contrainte_dup(c));
+	    sc_add_inegalite(s1,contrainte_copy(c));
 	}
     }
     
@@ -290,8 +290,8 @@ Psysteme ps1, ps2;
 {
     Psysteme ps = SC_UNDEFINED;
     boolean result;
-    ps1 = sc_dup(ps1);
-    ps2 = sc_dup(ps2);
+    ps1 = sc_copy(ps1);
+    ps2 = sc_copy(ps2);
     ps = sc_safe_intersection(ps,ps1,ps2);
     result = !(sc_faisabilite_ofl(ps));
     sc_rm(ps1);
