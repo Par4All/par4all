@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/07/22 14:01:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/29 15:51:32 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/07/22 14:01:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/07/29 15:51:32 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -1200,9 +1200,11 @@ control_graph_to_interval_graph_format(control entry_node)
 }
 
 
-/* Return the list of control node exiting an interval: */
+/* Return the list of control node exiting an interval. Note that if a
+   node of the control list is in fact the exit_note of a unstructure,
+   it is really an exit node at an upper level., */
 static list
-interval_exit_nodes(vertex interval)
+interval_exit_nodes(vertex interval, control exit_node)
 {
     list exit_controls = NIL;
     
@@ -1221,6 +1223,11 @@ interval_exit_nodes(vertex interval)
 		    exit_controls = CONS(CONTROL, successor, exit_controls);
 	    }
 	}, control_successors(c));
+	
+	if (c == exit_node)
+	    /* The current exit_node of the unstructured is clearly an
+               exit node even if it does not have any successor: */
+	    exit_controls = CONS(CONTROL, c, exit_controls);
     }, interval_vertex_label_controls(vertex_vertex_label(interval)));
 
     ifdebug(6) {
@@ -1380,7 +1387,8 @@ replace_control_related_to_a_list(control old_node,
 static void
 hierarchize_control_list(vertex interval,
 			 list controls,
-			 control exit_node)
+			 control exit_node,
+			 control * unstructured_exit_node)
 {
     control entry_node = CONTROL(CAR(controls));
     /* Create the new control nodes with the new unstructured: */
@@ -1417,6 +1425,10 @@ hierarchize_control_list(vertex interval,
     interval_vertex_label_controls(vertex_vertex_label(interval)) =
 	CONS(CONTROL, entry_node, NIL);
 
+    if (*unstructured_exit_node == exit_node)
+	/* The unstructured exit has changed: update it: */
+	*unstructured_exit_node == new_exit_node;
+    
     ifdebug(5) {
 	pips_debug(0, "Nodes from entry_node: ");
 	display_linked_control_nodes(entry_node);
@@ -1499,7 +1511,7 @@ control_graph_recursive_decomposition(unstructured u)
 				   (char *) interval_entry)
 		    != gen_length(controls))) {
 		/* Ok, at least this interval has not been hierarchized: */
-		list interval_exits = interval_exit_nodes(interval);
+		list interval_exits = interval_exit_nodes(interval, exit_node);
 		if (gen_length(interval_exits) <= 1
 		    && /* Useless to restructure the exit node... */
 		    interval_entry != exit_node) {
@@ -1510,7 +1522,12 @@ control_graph_recursive_decomposition(unstructured u)
                        to hierarchize the graph: */
 		    hierarchize_control_list(interval,
 					     controls,
-					     interval_exits == NIL ? control_undefined : CONTROL(CAR(interval_exits)));
+					     interval_exits == NIL ? control_undefined : CONTROL(CAR(interval_exits)),
+					     &unstructured_exit(u));
+			/* The exit of the unstructured may have
+                           changed: */
+			exit_node = unstructured_exit(u);
+						      
 		    /* Update control_already_hierarchized with the
                        new size (1 control) to avoid restructuring
                        again this interval: */
@@ -1677,11 +1694,12 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
    /* First, clean up easy things done by the controlizer: */
    gen_recurse(mod_stmt, statement_domain,
                gen_true, clean_up_control);
-/*   if (get_bool_property("HIERARCHIZE_CONTROL")) */
+   
+   if (TRUE || get_bool_property("UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION"))
        /* Then try to hierarchize the control flow: */
-/*   gen_recurse(mod_stmt, unstructured_domain,
-	       gen_true, control_graph_recursive_decomposition);
-	       */
+       gen_recurse(mod_stmt, unstructured_domain,
+		   gen_true, control_graph_recursive_decomposition);
+
    /* Now apply some local rule, such as if/then/else restructuring
       and so on: */
    gen_recurse(mod_stmt, statement_domain,
