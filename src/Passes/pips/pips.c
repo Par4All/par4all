@@ -174,7 +174,12 @@ char * argv[];
 	    /* Workspace must be created */
 	    db_create_workspace(wspace);
 
+	    /* FI: The next lines should be replaced by a call to 
+	     * create_workspace()
+	     */
+
 	    open_log_file();
+	    set_entity_to_size();
 
 	    MAPL(f_cp, {
 		debug(1, "main", "processing file %s\n", STRING(CAR(f_cp)));
@@ -265,10 +270,10 @@ char * argv[];
 	}
 
 	if (success) {
-	    make_close_workspace();
+	    close_workspace();
 	}
 	else {
-	    make_close_workspace();
+	    close_workspace();
 	}
     }
 
