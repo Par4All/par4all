@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/11/19 18:36:45 $, )
+ * ($Date: 1996/11/19 18:41:11 $, )
  */
 
 #include "defines-local.h"
@@ -628,9 +628,7 @@ static bool vect_in_p(Pvecteur vin, Pvecteur vref)
 bool expression_linear_p(expression e)
 {
     normalized n = expression_normalized(e);
-    if (!normalized_undefined_p(n) && normalized_linear_p(n))
-	return TRUE;
-    return FALSE;
+    return !normalized_undefined_p(n) && normalized_linear_p(n);
 }
 
 static bool expression_flt(expression e)
@@ -646,7 +644,7 @@ static bool expression_flt(expression e)
 	    Pvecteur vn = vect_substract(v,subs_pv);
 	    vect_add_elem(&vn, (Variable)subs_v, VALUE_ONE);
 	    vect_rm(v);
-	    normalized_linear_(n) = vn;
+	    normalized_linear_(n) = newgen_Pvecteur(vn);
 	}
     }
 
@@ -658,7 +656,7 @@ static bool expression_flt(expression e)
 	free_normalized(expression_normalized(e));
 	expression_normalized(e) = 
 	    make_normalized(is_normalized_linear,
-			    vect_new(subs_v, VALUE_ONE));
+			    vect_new((Variable)subs_v, VALUE_ONE));
 	return FALSE;
     }
     return TRUE;
