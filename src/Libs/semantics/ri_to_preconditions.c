@@ -119,90 +119,6 @@ block_to_postcondition(
     return post;
 }
 
-static transformer
-unstructured_to_postconditions(
-    transformer pre,
-    transformer pre_first,
-    unstructured u)
-{
-  list nodes = NIL ;
-  control entry_node = unstructured_control(u) ;
-  control exit_node = unstructured_exit(u) ;
-  transformer c_pre = transformer_undefined;
-  transformer post = transformer_undefined;
-  transformer exit_post = transformer_undefined;
-
-  debug(8,"unstructured_to_postconditions","begin\n");
-
-  /* SHARING! Every statement gets a pointer to the same precondition!
-   * I do not know if it's good or not but beware the bugs!!!
-   */
-  /* FI: changed to make free_transformer_mapping possible without 
-   * testing sharing.
-   *
-   * pre and pre_first can or not be used depending on the
-   * unstructured structure. They are always duplicated and
-   * the caller has to take care of their de-allocation.
-   */
-  CONTROL_MAP(c, {
-    statement st = control_statement(c) ;
-    if(c==entry_node && ENDP(control_predecessors(c)) && statement_test_p(st)) {
-      /* special case for the first node if it has no predecessor */
-      /* and if it is a test, as it always should, at least if */
-      /* unspaghettify has been applied... */
-      /* this is pretty useless and should be generalized to the
-	 DAG part of the CFG */
-      c_pre = transformer_dup(pre_first);
-      post = statement_to_postcondition(c_pre, st);
-      transformer_free(post);
-    }
-    else {
-      transformer c_pre_m = transformer_undefined;
-
-      c_pre = transformer_dup(pre);
-      c_pre_m = c_pre;
-
-      /* refine the precondition if the node has only one
-	 predecessor and if this predecessor is a test and if the
-	 test can be exploited */
-      if(gen_length(control_predecessors(c))==1 && c!=entry_node) {
-	control prev_c = CONTROL(CAR(control_predecessors(c)));
-	statement prev_st = control_statement(prev_c);
-
-	if(statement_test_p(prev_st)) {
-	  /* the condition is TRUE if c is the first successor of prev_c */
-	  bool true_false = (c==(CONTROL(CAR(control_successors(prev_c)))));
-	  expression e = test_condition(statement_test(prev_st));
-
-	  c_pre_m = precondition_add_condition_information(c_pre, e, true_false);
-	  /* If the free is performed, core dump guaranteed on some
-             examples: see unclear comments about the previously called
-             function:-( */
-	  /* free_transformer(c_pre); */
-	}
-      }
-
-      post = statement_to_postcondition(c_pre_m, st);
-      if(c==exit_node) {
-	exit_post = post;
-      }
-      else {
-	transformer_free(post);
-      }
-    }
-  }, entry_node, nodes);
-
-  gen_free_list(nodes) ;
-
-  ifdebug(8) {
-    debug(8,"unstructured_to_postconditions","exit postcondition:\n");
-    (void) print_transformer(exit_post) ;
-  }
-  debug(8,"unstructured_to_postconditions","end\n");
-
-  return exit_post;
-}
-
 static transformer 
 unstructured_to_postcondition(
     transformer pre,
@@ -263,6 +179,8 @@ unstructured_to_postcondition(
 	 */
 	/* post = unstructured_to_postconditions(pre_u, pre, u); */
 	post = unstructured_to_accurate_postconditions(pre_u, pre, u);
+	pips_assert("A valid postcondition is returned",
+		    !transformer_undefined_p(post));
 	if(transformer_undefined_p(post)) {
 	  post = transformer_apply(transformer_dup(tf), pre);
 	}
@@ -337,7 +255,7 @@ add_loop_skip_condition(transformer pre, loop l)
 
 	    ifdebug(8) {
 		debug(8,"add_loop_skip_condition","Skip condition:\n");
-		vect_fprint(stderr, v, external_value_name);
+		vect_fprint(stderr, v, (char * (*)(Variable)) external_value_name);
 	    }
 	}
 	else {
@@ -537,7 +455,7 @@ add_loop_index_initialization(transformer pre, loop l)
     expression init = range_lower(loop_range(l));
     transformer post = transformer_undefined;
     transformer t_init = transformer_undefined;
-    list lef = proper_effects_of_expression(init);
+    list lef = expression_to_proper_effects(init);
 
     t_init = expression_to_transformer(i, init, lef);
     if(t_init==transformer_undefined)
@@ -1229,7 +1147,7 @@ transformer_add_condition_information_updown(
     /* check first that c's effects are purely reads on integer scalar
        variable; I'm not sure I'm reusing Remi's function well... */
 
-    /*   cons * ef = proper_effects_of_expression(c); */
+    /*   cons * ef = expression_to_proper_effects(c); */
 
     ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
 	debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
@@ -1260,8 +1178,8 @@ transformer_add_condition_information_updown(
 	      EXPRESSION(CAR(call_arguments(syntax_call(s))));
 	    expression e2 = 
 	      EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
-	    cons * ef1 = proper_effects_of_expression(e1);
-	    cons * ef2 = proper_effects_of_expression(e2);
+	    cons * ef1 = expression_to_proper_effects(e1);
+	    cons * ef2 = expression_to_proper_effects(e2);
 	
 	    if(integer_scalar_read_effects_p(ef1) && integer_scalar_read_effects_p(ef2))  
 	      newpre = transformer_add_relation_information(pre, e, e1, e2, 
@@ -1480,6 +1398,26 @@ upwards_vect_rename(Pvecteur v, transformer post)
     }, modified_values);
 }
 
+/* replace variables by new values which is necessary for equivalenced
+   variables */
+static void variables_to_new_values(Pvecteur v)
+{
+  Pvecteur elem = VECTEUR_UNDEFINED;
+
+  for(elem = v; !VECTEUR_NUL_P(elem); elem = vecteur_succ(elem)) {
+    entity var = (entity) vecteur_var(elem);
+
+    if(vecteur_var(elem)!=TCST) {
+      entity v_new = entity_to_new_value(var);
+
+      if(v_new!=var) {
+	(void) vect_variable_rename(v, (Variable) var,
+				    (Variable) v_new);
+      }
+    }
+  }
+}
+
 transformer 
 transformer_add_relation_information(
     transformer pre,
@@ -1490,116 +1428,127 @@ transformer_add_relation_information(
     bool upwards)
 {
 #   define DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION 7
-    /* default: no change */
-    transformer newpre = pre;
-    /* both expressions e1 and e2 must be affine */
-    normalized n1 = NORMALIZE_EXPRESSION(e1);
-    normalized n2 = NORMALIZE_EXPRESSION(e2);
+  /* default: no change */
+  transformer newpre = pre;
+  /* both expressions e1 and e2 must be affine */
+  normalized n1 = NORMALIZE_EXPRESSION(e1);
+  normalized n2 = NORMALIZE_EXPRESSION(e2);
 
-    ifdebug(DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION) {
-	debug(DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION,"transformer_add_relation_information", 
-	      "begin upwards=%s veracity=%s relop=%s e1=", 
-	      bool_to_string(upwards), bool_to_string(veracity), entity_local_name(relop));
-	print_expression(e1);
-	(void) fprintf(stderr,"e2=");
-	print_expression(e2);
-	(void) fprintf(stderr,"pre=");
-	print_transformer(pre);
+  ifdebug(DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION) {
+    debug(DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION,"transformer_add_relation_information", 
+	  "begin upwards=%s veracity=%s relop=%s e1=", 
+	  bool_to_string(upwards), bool_to_string(veracity), entity_local_name(relop));
+    print_expression(e1);
+    (void) fprintf(stderr,"e2=");
+    print_expression(e2);
+    (void) fprintf(stderr,"pre=");
+    print_transformer(pre);
+  }
+
+  if(normalized_linear_p(n1) && normalized_linear_p(n2)
+     && value_mappings_compatible_vector_p((Pvecteur) normalized_linear(n1))
+     && value_mappings_compatible_vector_p((Pvecteur) normalized_linear(n2))) {
+    Pvecteur v1 = vect_dup((Pvecteur) normalized_linear(n1));
+    Pvecteur v2 = vect_dup((Pvecteur) normalized_linear(n2));
+
+    /* Make sure that new values only are used in v1 and v2 */
+    variables_to_new_values(v1);
+    variables_to_new_values(v2);
+
+    if((ENTITY_EQUAL_P(relop) && veracity) ||
+       (ENTITY_NON_EQUAL_P(relop) && !veracity)) {
+      /* v1 - v2 == 0 */
+      Pvecteur v = vect_substract(v1, v2);
+      if(upwards) {
+	upwards_vect_rename(v, pre);
+      }
+      newpre = transformer_equality_add(pre, v);
     }
-
-    if(normalized_linear_p(n1) && normalized_linear_p(n2)) {
-	Pvecteur v1 = (Pvecteur) normalized_linear(n1);
-	Pvecteur v2 = (Pvecteur) normalized_linear(n2);
-
-	if((ENTITY_EQUAL_P(relop) && veracity) ||
-	   (ENTITY_NON_EQUAL_P(relop) && !veracity)) {
-	    /* v1 - v2 == 0 */
-	    Pvecteur v = vect_substract(v1, v2);
-	    if(upwards) {
-		upwards_vect_rename(v, pre);
-	    }
-	    newpre = transformer_equality_add(pre, v);
-	}
-	else if((ENTITY_EQUAL_P(relop) && !veracity) ||
-	   (ENTITY_NON_EQUAL_P(relop) && veracity)) {
-	    /* v2 - v1 + 1 <= 0 ou v1 - v2 + 1 <= 0 */
-	    /* FI: I do not know if this is valid when your are moving upwards
-	     * variables in v2 and v1 may have to be renamed as #init values (i.e. old values)
-	     */
-	    transformer prea = transformer_dup(pre);
-	    transformer preb = pre;
-	    Pvecteur va = vect_substract(v2, v1);
-	    Pvecteur vb = vect_substract(v1, v2);
-	    vect_add_elem(&va, TCST, VALUE_ONE);
-	    vect_add_elem(&vb, TCST, VALUE_ONE);
-	    /* FI: I think that this should be programmed (see comment above)
-	     * but I'm waiting for a bug to occur... (6 July 1993)
-	     *
-	     * FI: Well, the bug was eventually seen:-) (8 November 1995)
-	     */
-	    if(upwards) {
-		upwards_vect_rename(va, pre);
-		upwards_vect_rename(vb, pre);
-	    }
-	    prea = transformer_inequality_add(prea, va);
-	    preb = transformer_inequality_add(preb, vb);
-	    newpre = transformer_convex_hull(prea, preb);
-	    /* free_transformer(prea); */
-	    /* free_transformer(preb); */
-	}
-	else if ((ENTITY_GREATER_THAN_P(relop) && veracity) ||
-		 (ENTITY_LESS_OR_EQUAL_P(relop) && !veracity)) {
-	    /* v2 - v1 + 1 <= 0 */
-	    Pvecteur v = vect_substract(v2, v1);
-	    vect_add_elem(&v, TCST, VALUE_ONE);
-	    if(upwards) {
-		upwards_vect_rename(v, pre);
-	    }
-	    newpre = transformer_inequality_add(pre, v);
-	}
-	else if ((ENTITY_GREATER_THAN_P(relop) && !veracity) ||
-		 (ENTITY_LESS_OR_EQUAL_P(relop) && veracity)) {
-	    /* v1 - v2 <= 0 */
-	    Pvecteur v = vect_substract(v1, v2);
-	    if(upwards) {
-		upwards_vect_rename(v, pre);
-	    }
-	    newpre = transformer_inequality_add(pre, v);
-	}
-	else if ((ENTITY_GREATER_OR_EQUAL_P(relop) && veracity) ||
-		 (ENTITY_LESS_THAN_P(relop) && !veracity)) {
-	    /* v2 - v1 <= 0 */
-	    Pvecteur v = vect_substract(v2, v1);
-	    if(upwards) {
-		upwards_vect_rename(v, pre);
-	    }
-	    newpre = transformer_inequality_add(pre, v);
-	}
-	else if ((ENTITY_GREATER_OR_EQUAL_P(relop) && !veracity) ||
-		 (ENTITY_LESS_THAN_P(relop) && veracity)) {
-	    /* v1 - v2 + 1 <= 0 */
-	    Pvecteur v = vect_substract(v1, v2);
-	    vect_add_elem(&v, TCST, VALUE_ONE);
-	    if(upwards) {
-		upwards_vect_rename(v, pre);
-	    }
-	    newpre = transformer_inequality_add(pre, v);
-	}
-	else
-	    /* do nothing... although Malik may have tried harder! */
-	    newpre = pre;
+    else if((ENTITY_EQUAL_P(relop) && !veracity) ||
+	    (ENTITY_NON_EQUAL_P(relop) && veracity)) {
+      /* v2 - v1 + 1 <= 0 ou v1 - v2 + 1 <= 0 */
+      /* FI: I do not know if this is valid when your are moving upwards
+       * variables in v2 and v1 may have to be renamed as #init values (i.e. old values)
+       */
+      transformer prea = transformer_dup(pre);
+      transformer preb = pre;
+      Pvecteur va = vect_substract(v2, v1);
+      Pvecteur vb = vect_substract(v1, v2);
+      vect_add_elem(&va, TCST, VALUE_ONE);
+      vect_add_elem(&vb, TCST, VALUE_ONE);
+      /* FI: I think that this should be programmed (see comment above)
+       * but I'm waiting for a bug to occur... (6 July 1993)
+       *
+       * FI: Well, the bug was eventually seen:-) (8 November 1995)
+       */
+      if(upwards) {
+	upwards_vect_rename(va, pre);
+	upwards_vect_rename(vb, pre);
+      }
+      prea = transformer_inequality_add(prea, va);
+      preb = transformer_inequality_add(preb, vb);
+      newpre = transformer_convex_hull(prea, preb);
+      /* free_transformer(prea); */
+      /* free_transformer(preb); */
     }
-    else
-	/* do nothing, although MODULO and INTEGER DIVIDE could be handled */
-	newpre = pre;
-
-    ifdebug(DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION) {
-	debug(DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION,
-	      "transformer_add_relation_information", "end newpre=\n");
-	print_transformer(newpre);
+    else if ((ENTITY_GREATER_THAN_P(relop) && veracity) ||
+	     (ENTITY_LESS_OR_EQUAL_P(relop) && !veracity)) {
+      /* v2 - v1 + 1 <= 0 */
+      Pvecteur v = vect_substract(v2, v1);
+      vect_add_elem(&v, TCST, VALUE_ONE);
+      if(upwards) {
+	upwards_vect_rename(v, pre);
+      }
+      newpre = transformer_inequality_add(pre, v);
     }
+    else if ((ENTITY_GREATER_THAN_P(relop) && !veracity) ||
+	     (ENTITY_LESS_OR_EQUAL_P(relop) && veracity)) {
+      /* v1 - v2 <= 0 */
+      Pvecteur v = vect_substract(v1, v2);
+      if(upwards) {
+	upwards_vect_rename(v, pre);
+      }
+      newpre = transformer_inequality_add(pre, v);
+    }
+    else if ((ENTITY_GREATER_OR_EQUAL_P(relop) && veracity) ||
+	     (ENTITY_LESS_THAN_P(relop) && !veracity)) {
+      /* v2 - v1 <= 0 */
+      Pvecteur v = vect_substract(v2, v1);
+      if(upwards) {
+	upwards_vect_rename(v, pre);
+      }
+      newpre = transformer_inequality_add(pre, v);
+    }
+    else if ((ENTITY_GREATER_OR_EQUAL_P(relop) && !veracity) ||
+	     (ENTITY_LESS_THAN_P(relop) && veracity)) {
+      /* v1 - v2 + 1 <= 0 */
+      Pvecteur v = vect_substract(v1, v2);
+      vect_add_elem(&v, TCST, VALUE_ONE);
+      if(upwards) {
+	upwards_vect_rename(v, pre);
+      }
+      newpre = transformer_inequality_add(pre, v);
+    }
+    else {
+      /* do nothing... although Malik may have tried harder! */
+      newpre = pre;
+    }
+    vect_rm(v1);
+    vect_rm(v2);
+  }
+  else
+    /* do nothing, although MODULO and INTEGER DIVIDE could be handled */
+    newpre = pre;
 
-    return newpre;
+  ifdebug(DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION) {
+    debug(DEBUG_TRANSFORMER_ADD_RELATION_INFORMATION,
+	  "transformer_add_relation_information", "end newpre=\n");
+    print_transformer(newpre);
+    pips_assert("Transformer is internally consistent", 
+		transformer_internal_consistency_p(newpre));
+  }
+
+  return newpre;
 }
 
 transformer 
@@ -1837,7 +1786,7 @@ statement_to_postcondition(
 
     debug(1,"statement_to_postcondition","begin\n");
 
-    pips_assert("statement_to_postcondition", pre != transformer_undefined);
+    pips_assert("The statement precondition is defined", pre != transformer_undefined);
 
     ifdebug(1) {
 	int so = statement_ordering(s);
@@ -1847,7 +1796,7 @@ statement_to_postcondition(
 	(void) print_transformer(pre) ;
     }
 
-    pips_assert("statement_to_postcondition", tf != transformer_undefined);
+    pips_assert("The statement transformer is defined", tf != transformer_undefined);
     ifdebug(1) {
 	int so = statement_ordering(s);
 	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %p:\n",
