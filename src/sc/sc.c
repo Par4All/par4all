@@ -215,6 +215,12 @@ Variable var;
  * in the base
  *
  * Francois Irigoin, 7 July 1993
+ *
+ * Note: 
+ *  - it also checks that every variable in the basis is used with a non-zero
+ * coefficient in at least one constraint (although there is no reason for that)
+ *  - there is no explicit check of TCST in the basis; TCST should *not* be in the
+ * basis
  */
 boolean sc_consistent_p(sc)
 Psysteme sc;
