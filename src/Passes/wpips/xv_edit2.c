@@ -22,6 +22,9 @@
 
 #include "wpips.h"
 
+/* Include the label names: */
+#include "wpips-labels.h"
+
 #define NO_TEXTSW_AVAILABLE -1 /* cannot be positive (i.e. a window number. */
 static Textsw edit_textsw[MAX_NUMBER_OF_WPIPS_WINDOWS];
 static Panel_item check_box[MAX_NUMBER_OF_WPIPS_WINDOWS];
@@ -56,26 +59,30 @@ void dont_touch_window_notify(Panel_item item, int value, Event *event)
 
 int alloc_first_initialized_window()
 {
-  static int next = 0;
-  int i, candidate;
+   static int next = 0;
+   int i, candidate;
 
-  for(i = next; i < next + number_of_wpips_windows; i++) {
-    candidate = i % number_of_wpips_windows;
-    /* Skip windows with modified text inside : */
-    if ((bool)xv_get(edit_textsw[candidate], TEXTSW_MODIFIED))
-      continue;
-    /* Skip windows with a retain attribute : */
-    /*
-    check_box = (Panel_item) xv_get(edit_textsw[candidate],
-				    XV_KEY_DATA, PANEL_CHECK_BOX,
-				    NULL);
-				    */
-    if ((bool)xv_get(check_box[candidate], PANEL_VALUE))
-      continue;
-    next = candidate + 1;
-    return candidate;
-  }
-  return(NO_TEXTSW_AVAILABLE);
+   for(i = next; i < next + number_of_wpips_windows; i++) {
+      candidate = i % number_of_wpips_windows;
+      if (! wpips_emacs_mode) {
+         /* Make sence only without Emacs yet: */
+         /* Skip windows with modified text inside : */
+         if ((bool)xv_get(edit_textsw[candidate], TEXTSW_MODIFIED))
+            continue;
+         /* Skip windows with a retain attribute : */
+         /*
+           check_box = (Panel_item) xv_get(edit_textsw[candidate],
+           XV_KEY_DATA, PANEL_CHECK_BOX,
+           NULL);
+           */
+         if ((bool)xv_get(check_box[candidate], PANEL_VALUE))
+            continue;
+      }
+    
+      next = candidate + 1;
+      return candidate;
+   }
+   return(NO_TEXTSW_AVAILABLE);
 }    
 
 void edit_notify(menu, menu_item)
@@ -138,131 +145,161 @@ char *compute_title_string(int window_number)
 }
 
 
+/* To display some Pips output with wpips or epips: */
+void
+wpips_execute_and_display_something(char * label)
+{
+   char string_modulename[SMALL_BUFFER_LENGTH], bank_view_name[SMALL_BUFFER_LENGTH];
+   char busy_label[SMALL_BUFFER_LENGTH];
+   char *busy_label_format = "*Computing %s * ...";
+   char *print_type, *print_type_2 = NULL;
+   char *modulename = db_get_current_module_name();
+   int win1, win2;
+   Icon icon_number, icon_number2;
+
+   if (modulename == NULL) {
+      prompt_user("No module selected");
+      return;
+   }
+
+   /* Is there an available edit_textsw ? */
+   if ( (win1=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
+      prompt_user("None of the text-windows is available");
+      return;
+   }
+   icon_number = icon_number2 = -1;
+   if (strcmp(label, USER_VIEW) == 0) {
+      print_type = DBR_PARSED_PRINTED_FILE;
+      icon_number = user_ICON;
+   }
+   else if (strcmp(label, SEQUENTIAL_VIEW) == 0) {
+      print_type = DBR_PRINTED_FILE;
+      icon_number = sequential_ICON;
+   }
+   else if (strcmp(label, PARALLEL_VIEW) == 0) {
+      print_type = DBR_PARALLELPRINTED_FILE;
+      icon_number = parallel_ICON;
+   }
+   else if (strcmp(label, CALLGRAPH_VIEW) == 0) {
+      print_type = DBR_CALLGRAPH_FILE;
+      icon_number = callgraph_ICON;
+   }
+   else if (strcmp(label, ICFG_VIEW) == 0) {
+      print_type = DBR_ICFG_FILE;
+      icon_number = ICFG_ICON;
+   }
+   else if (strcmp(label, DISTRIBUTED_VIEW) == 0) {
+      print_type = DBR_WP65_COMPUTE_FILE;
+      icon_number = WP65_PE_ICON;
+      print_type_2 = DBR_WP65_BANK_FILE;
+      icon_number2 = WP65_bank_ICON;
+   }
+   else if (strcmp(label, DEPENDENCE_GRAPH_VIEW) == 0) {
+      print_type = DBR_DG_FILE;
+   }
+   else if (strcmp(label, FLINT_VIEW) == 0) {
+      print_type = DBR_FLINTED;
+   }
+   else {
+      pips_error("view_notify", "bad label : %s\n", label);
+   }
+
+   if (! wpips_emacs_mode) {
+      (void) sprintf(busy_label, busy_label_format, label);
+      /* Display the file name and the module name. RK, 2/06/1993 : */
+      sprintf(string_modulename, "Module: %s", modulename);
+      xv_set(edit_frame[win1], FRAME_LABEL, compute_title_string(win1),
+             FRAME_SHOW_FOOTER, TRUE,
+             FRAME_LEFT_FOOTER, busy_label,
+             FRAME_RIGHT_FOOTER, string_modulename,
+             FRAME_BUSY, TRUE,
+             NULL);
+	
+      set_pips_icon(edit_frame[win1], icon_number, modulename);
+
+      xv_set(edit_textsw[win1], 
+             TEXTSW_FILE, build_view_file(print_type),
+             TEXTSW_BROWSING, TRUE,
+             TEXTSW_FIRST, 0,
+             NULL);
+
+      xv_set(edit_frame[win1],
+             FRAME_LEFT_FOOTER, label,
+             FRAME_BUSY, FALSE,
+             NULL);
+   }
+   else {
+      /* The Emacs mode equivalent: */
+      send_window_number_to_emacs(win1);
+      send_module_name_to_emacs(modulename);
+      /* send_icon_name_to_emacs(icon_number); */
+      send_view_to_emacs(label, build_view_file(print_type));
+   }
+   
+  
+   if ( print_type_2 != NULL ) {
+      /* Is there an available edit_textsw ? */
+      if ( (win2=alloc_first_initialized_window()) 
+           == NO_TEXTSW_AVAILABLE ) {
+         prompt_user("None of the 2 text-windows is available");
+         return;
+      }
+
+      if (! wpips_emacs_mode) {
+         /* Display the file name and the module name. RK, 2/06/1993 : */
+         (void) sprintf(bank_view_name, "%s (bank view)", label);
+         (void) sprintf(busy_label, busy_label_format, bank_view_name);
+         xv_set(edit_frame[win2], FRAME_LABEL, compute_title_string(win2),
+                FRAME_SHOW_FOOTER, TRUE,
+                FRAME_LEFT_FOOTER, busy_label,
+                FRAME_RIGHT_FOOTER, string_modulename,
+                FRAME_BUSY, TRUE,
+                NULL);
+    
+         set_pips_icon(edit_frame[win2], icon_number2, modulename);
+
+         xv_set(edit_textsw[win2], 
+                TEXTSW_FILE, build_view_file(print_type_2),
+                TEXTSW_BROWSING, TRUE,
+                TEXTSW_FIRST, 0,
+                NULL);
+    
+         xv_set(edit_frame[win2],
+                FRAME_LEFT_FOOTER, bank_view_name,
+                FRAME_BUSY, FALSE,
+                NULL);
+      }
+      else {
+         /* The Emacs mode equivalent: */
+         send_window_number_to_emacs(win2);
+         /* Should be the same, nevertheless...: */
+         send_module_name_to_emacs(modulename);
+         /* send_icon_name_to_emacs(icon_number2); */
+         send_view_to_emacs("BANK", build_view_file(print_type_2));
+      }
+   }
+
+   xv_set(current_selection_mi, 
+          MENU_STRING, "Lasts",
+          MENU_INACTIVE, FALSE, NULL);
+   xv_set(close, MENU_INACTIVE, FALSE, NULL);
+
+   if (! wpips_emacs_mode) {
+      unhide_window(edit_frame[win1]);
+      if ( print_type_2 != NULL ) {
+         unhide_window(edit_frame[win2]);
+      }
+   }
+}
+
+
 void view_notify(menu, menu_item)
 Menu menu;
 Menu_item menu_item;
 {
-  char string_modulename[SMALL_BUFFER_LENGTH], bank_view_name[SMALL_BUFFER_LENGTH];
-  char busy_label[SMALL_BUFFER_LENGTH];
-  char *busy_label_format = "*Computing %s * ...";
-  char *print_type, *print_type_2 = NULL;
-  char *label = (char *) xv_get(menu_item, MENU_STRING);
-  char *modulename = db_get_current_module_name();
-  int win1, win2;
-  Icon icon_number, icon_number2;
+   char *label = (char *) xv_get(menu_item, MENU_STRING);
 
-  if (modulename == NULL) {
-    prompt_user("No module selected");
-    return;
-  }
-
-  /* Is there an available edit_textsw ? */
-  if ( (win1=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
-    prompt_user("None of the text-windows is available");
-    return;
-  }
-  icon_number = icon_number2 = -1;
-  if (strcmp(label, USER_VIEW) == 0) {
-    print_type = DBR_PARSED_PRINTED_FILE;
-    icon_number = user_ICON;
-  }
-  else if (strcmp(label, SEQUENTIAL_VIEW) == 0) {
-    print_type = DBR_PRINTED_FILE;
-    icon_number = sequential_ICON;
-  }
-  else if (strcmp(label, PARALLEL_VIEW) == 0) {
-    print_type = DBR_PARALLELPRINTED_FILE;
-    icon_number = parallel_ICON;
-  }
-  else if (strcmp(label, CALLGRAPH_VIEW) == 0) {
-    print_type = DBR_CALLGRAPH_FILE;
-    icon_number = callgraph_ICON;
-  }
-  else if (strcmp(label, ICFG_VIEW) == 0) {
-    print_type = DBR_ICFG_FILE;
-    icon_number = ICFG_ICON;
-  }
-  else if (strcmp(label, DISTRIBUTED_VIEW) == 0) {
-    print_type = DBR_WP65_COMPUTE_FILE;
-    icon_number = WP65_PE_ICON;
-    print_type_2 = DBR_WP65_BANK_FILE;
-    icon_number2 = WP65_bank_ICON;
-  }
-  else if (strcmp(label, DEPENDENCE_GRAPH_VIEW) == 0) {
-    print_type = DBR_DG_FILE;
-  }
-  else if (strcmp(label, FLINT_VIEW) == 0) {
-    print_type = DBR_FLINTED;
-  }
-  else {
-    pips_error("view_notify", "bad label : %s\n", label);
-  }
-
-  (void) sprintf(busy_label, busy_label_format, label);
-  /* Display the file name and the module name. RK, 2/06/1993 : */
-  sprintf(string_modulename, "Module: %s", modulename);
-  xv_set(edit_frame[win1], FRAME_LABEL, compute_title_string(win1),
-	 FRAME_SHOW_FOOTER, TRUE,
-	 FRAME_LEFT_FOOTER, busy_label,
-	 FRAME_RIGHT_FOOTER, string_modulename,
-	 FRAME_BUSY, TRUE,
-	 NULL);
-	
-  set_pips_icon(edit_frame[win1], icon_number, modulename);
-
-  xv_set(edit_textsw[win1], 
-	 TEXTSW_FILE, build_view_file(print_type),
-	 TEXTSW_BROWSING, TRUE,
-	 TEXTSW_FIRST, 0,
-	 NULL);
-
-  xv_set(edit_frame[win1],
-	 FRAME_LEFT_FOOTER, label,
-	 FRAME_BUSY, FALSE,
-	 NULL);
-	 
-  if ( print_type_2 != NULL ) {
-    /* Is there an available edit_textsw ? */
-    if ( (win2=alloc_first_initialized_window()) 
-	== NO_TEXTSW_AVAILABLE ) {
-      prompt_user("None of the 2 text-windows is available");
-      return;
-    }
-
-
-    /* Display the file name and the module name. RK, 2/06/1993 : */
-    (void) sprintf(bank_view_name, "%s (bank view)", label);
-    (void) sprintf(busy_label, busy_label_format, bank_view_name);
-    xv_set(edit_frame[win2], FRAME_LABEL, compute_title_string(win2),
-	   FRAME_SHOW_FOOTER, TRUE,
-	   FRAME_LEFT_FOOTER, busy_label,
-	   FRAME_RIGHT_FOOTER, string_modulename,
-	   FRAME_BUSY, TRUE,
-	   NULL);
-    
-    set_pips_icon(edit_frame[win2], icon_number2, modulename);
-
-    xv_set(edit_textsw[win2], 
-	   TEXTSW_FILE, build_view_file(print_type_2),
-	   TEXTSW_BROWSING, TRUE,
-	   TEXTSW_FIRST, 0,
-	   NULL);
-    
-    xv_set(edit_frame[win2],
-	   FRAME_LEFT_FOOTER, bank_view_name,
-	   FRAME_BUSY, FALSE,
-	   NULL);
-  }
-
-  xv_set(current_selection_mi, 
-	 MENU_STRING, "Lasts",
-	 MENU_INACTIVE, FALSE, NULL);
-  xv_set(close, MENU_INACTIVE, FALSE, NULL);
-
-  unhide_window(edit_frame[win1]);
-  if ( print_type_2 != NULL ) {
-    unhide_window(edit_frame[win2]);
-  }
+   wpips_execute_and_display_something(label);
 }
 
 void edit_close_notify(menu, menu_item)
