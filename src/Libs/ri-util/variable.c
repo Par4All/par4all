@@ -532,7 +532,7 @@ variable_in_common_p(
 {
     return type_variable_p(entity_type(v)) &&
 	storage_ram_p(entity_storage(v)) &&
-	!SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(v)))) ;
+	!SPECIAL_AREA_P(ram_section(storage_ram(entity_storage(v)))) ;
 }
 
 /* true if v appears in a SAVE statement, or in a DATA statement */
