@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1997/04/11 16:01:17 $, 
+ * $Date: 1997/04/15 11:50:44 $, 
  */
 
 #include <stdio.h>
@@ -43,8 +43,8 @@
 /*********************************************************************************/
 
 /* global static variable local_regions_map, and its access functions */
-DEFINE_CURRENT_MAPPING(private_regions, list)
-DEFINE_CURRENT_MAPPING(copy_out_regions, list)
+GENERIC_GLOBAL_FUNCTION(private_effects, statement_effects)
+GENERIC_GLOBAL_FUNCTION(copy_out_effects, statement_effects)
 
 /* statement stack */
 DEFINE_LOCAL_STACK(current_stmt, statement)
@@ -134,16 +134,16 @@ static bool privatizer(char *module_name)
 	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
 
     /* Get the READ, WRITE, IN and OUT regions of the module */
-    set_local_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_REGIONS, module_name, TRUE) ) );
-    set_inv_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE) ) );
-    set_in_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE) ) );
-    set_inv_in_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_INV_IN_REGIONS, module_name, TRUE) ) );
-    set_out_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE) ) );
+    set_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+    set_invariant_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE));
+    set_in_effects((statement_effects) 
+	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
+    set_invariant_in_effects((statement_effects) 
+	db_get_memory_resource(DBR_INV_IN_REGIONS, module_name, TRUE));
+    set_out_effects((statement_effects) 
+	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
 
     /* predicates defining summary regions from callees have to be 
        translated into variables local to module */
@@ -158,8 +158,8 @@ static bool privatizer(char *module_name)
     /* initialisation of private maps */
     if (store_as_regions)
     {
-	set_private_regions_map( MAKE_STATEMENT_MAPPING() );
-	set_copy_out_regions_map( MAKE_STATEMENT_MAPPING() );
+	init_private_effects();
+	init_copy_out_effects();
     }
 
     debug_on("ARRAY_PRIVATIZATION_DEBUG_LEVEL");
@@ -176,13 +176,11 @@ static bool privatizer(char *module_name)
     {
 	DB_PUT_MEMORY_RESOURCE(DBR_PRIVATIZED_REGIONS, 
 			       strdup(module_name),
-			       (char*) listmap_to_effectsmap
-			       (get_private_regions_map()) );
+			       (char*) get_private_effects());
 	
 	DB_PUT_MEMORY_RESOURCE(DBR_COPY_OUT_REGIONS, 
 			       strdup(module_name),
-			       (char*) listmap_to_effectsmap
-			       (get_copy_out_regions_map()));
+			       (char*) get_copy_out_effects());
 	
     }
 
@@ -193,15 +191,15 @@ static bool privatizer(char *module_name)
     reset_transformer_map();
     reset_precondition_map();
     free_cumulated_effects_map();
-    free_local_regions_map();
-    free_inv_regions_map();
-    free_in_regions_map();
-    free_inv_in_regions_map();
-    free_out_regions_map();
+    reset_rw_effects();
+    reset_invariant_rw_effects();
+    reset_in_effects();
+    reset_invariant_in_effects();
+    reset_out_effects();
     if (store_as_regions)
     {
-	free_private_regions_map();
-	free_copy_out_regions_map();
+	reset_private_effects();
+	reset_copy_out_effects();
     }
 
     return(TRUE);
@@ -232,8 +230,8 @@ statement module_stat;
     
     if (store_as_regions)
     {
-	store_statement_private_regions(module_stat, l_priv);
-	store_statement_copy_out_regions(module_stat, NIL);
+	store_private_effects(module_stat, make_effects(l_priv));
+	store_copy_out_effects(module_stat, make_effects(NIL));
     }
     
     pips_debug(1,"end\n");
@@ -269,7 +267,7 @@ static void private_regions_of_module_loops(statement module_stat)
     free_current_stmt_stack();
 
 }
-
+ 
 
 static bool stmt_filter(s)
 statement s;
@@ -286,11 +284,11 @@ statement s;
 {
     pips_debug(1, "statement %03d\n", statement_number(s));
 
-    if (store_as_regions && statement_private_regions_undefined_p(s))
+    if (store_as_regions && !bound_private_effects_p(s))
     {
 	pips_debug(6, "non-loop body statement, storing NIL regions.\n");
-	store_statement_private_regions(s, NIL);
-	store_statement_copy_out_regions(s,NIL);
+	store_private_effects(s, make_effects(NIL));
+	store_copy_out_effects(s, make_effects(NIL));
     }
 
     current_stmt_pop();
@@ -573,8 +571,8 @@ loop l;
 
     if (store_as_regions)
     {
-	store_statement_private_regions(b, l_cand);
-	store_statement_copy_out_regions(b,l_out_priv);
+	store_private_effects(b, make_effects(l_cand));
+	store_copy_out_effects(b,make_effects(l_out_priv));
     }
     
     pips_debug(1, "end\n");
@@ -641,11 +639,11 @@ static text get_privatized_regions_text(string module_name,
 
     debug_on("ARRAY_PRIVATIZATION_DEBUG_LEVEL");
 
-    set_private_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_PRIVATIZED_REGIONS, module_name, TRUE) ));
+    set_private_effects((statement_effects) 
+	db_get_memory_resource(DBR_PRIVATIZED_REGIONS, module_name, TRUE));
 
-    set_copy_out_regions_map(  effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_COPY_OUT_REGIONS, module_name, TRUE) ));
+    set_copy_out_effects( (statement_effects) 
+	db_get_memory_resource(DBR_COPY_OUT_REGIONS, module_name, TRUE) );
 
 
     set_current_module_entity( local_name_to_top_level_entity(module_name));
@@ -696,8 +694,8 @@ static text get_privatized_regions_text(string module_name,
 
     debug_off();
 
-    free_private_regions_map();
-    free_copy_out_regions_map();
+    reset_private_effects();
+    reset_copy_out_effects();
     reset_current_module_entity();
     reset_current_module_statement();
     free_cumulated_effects_map();
@@ -724,17 +722,11 @@ statement stat;
     s = is_user_view_p? 
 	(statement) hash_get(nts, (char *) statement_number(stat)) :
 	stat;
-
-    if (is_user_view_p)
-    {
-	s = (statement) hash_get(nts, (char *) statement_number(stat));
-    }
-
     
     if (s != (statement) HASH_UNDEFINED_VALUE)
     {
-	l_priv = load_statement_private_regions(s);
-	l_out = load_statement_copy_out_regions(s);
+	l_priv = effects_effects(load_private_effects(s));
+	l_out = effects_effects(load_copy_out_effects(s));
     }
     else
     {
@@ -742,9 +734,6 @@ statement stat;
 	l_out = (list) HASH_UNDEFINED_VALUE;
     }
     
-
-    
-
     return text_privatized_array_regions(l_priv, l_out);
 }
 
@@ -951,12 +940,12 @@ declarations_privatizer(char *mod_name)
      * If we want to privatize regions, we can use the ressource PRIVATE_REGIONS.
      */
      /* Get the READ, WRITE, IN and OUT regions of the module */
-    set_local_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_REGIONS, mod_name, TRUE) ) );
-    set_in_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_IN_REGIONS, mod_name, TRUE) ) );
-    set_out_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_OUT_REGIONS, mod_name, TRUE) ) );
+    set_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_REGIONS, mod_name, TRUE));
+    set_in_effects((statement_effects) 
+	db_get_memory_resource(DBR_IN_REGIONS, mod_name, TRUE));
+    set_out_effects((statement_effects) 
+	db_get_memory_resource(DBR_OUT_REGIONS, mod_name, TRUE));
    
     l_write = regions_dup
 	(regions_write_regions(load_statement_local_regions(module_stat))); 
@@ -1001,9 +990,9 @@ declarations_privatizer(char *mod_name)
     reset_current_module_entity();
     reset_current_module_statement();
     free_cumulated_effects_map();
-    free_local_regions_map();
-    free_in_regions_map();
-    free_out_regions_map();
+    reset_rw_effects();
+    reset_in_effects();
+    reset_out_effects();
     return( TRUE );
 }
 
