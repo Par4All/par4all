@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: defines-local.h,v $ ($Date: 1994/03/25 17:46:01 $, ) version $Revision$, got on %D%, %T%
+ * $RCSfile: defines-local.h,v $ ($Date: 1994/04/11 17:01:23 $, ) version $Revision$, got on %D%, %T%
  * $Id$
  */
 
@@ -14,25 +14,32 @@
 
 #define PVECTOR(v) ((Pvecteur)CHUNK(v))
 
+/*
+ * ??? very beurk!
+ */
 #define DELTAV        12345
 #define TEMPLATEV     12346
 #define TSHIFTV       12347
 
+/*
+ * Newgen short sentences
+ */
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
 #define statement_block_p(stat) instruction_block_p(statement_instruction(stat))
 
+#define one_statement_unstructured(u) \
+    ((control_predecessors(unstructured_control(u)) == NIL) && \
+     (control_successors(unstructured_control(u)) == NIL))
+
 #define effect_system(e) \
   (predicate_system(transformer_relation(effect_context(e))))
+
 
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
 
 /* integer ceiling function */
 #define iceil(a,b) (((a-1)/b)+1)
-
-#define one_statement_unstructured(u) \
-    ((control_predecessors(unstructured_control(u)) == NIL) && \
-     (control_successors(unstructured_control(u)) == NIL))
 
 /*
  * Constants
@@ -131,3 +138,13 @@
 	       func,entity_name(module));                           \
        print_text(stderr,text_statement(module,0,stat));            \
     }
+
+/*
+ * Efficient I/O tags
+ */
+
+#define is_movement_collect 0
+#define is_movement_update 1
+#define movement_collect_p(t) ((t)==(is_movement_collect))
+#define movement_update_p(t) ((t)==(is_movement_update))
+
