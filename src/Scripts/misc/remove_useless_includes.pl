@@ -53,8 +53,8 @@ sub get_identificators($)
     # comments
     return () if $line =~ /^[!Cc\*]/;
 
-    # continuations
-    $line =~ s/^      \S//;
+    # continuations 6e colonne
+    $line =~ s/^     \S//;
     # string constants
     $line =~ s/^([^\']*)\'[^\']*\'/$1/g;
     # numeric constants
