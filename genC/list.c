@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1998/04/14 13:23:31 $, )
+ * $RCSfile: list.c,v $ ($Date: 1998/12/08 09:23:37 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -67,7 +67,12 @@
    . GEN_NTH returns the N-th (beginning at 0) car of L.
      CAR(L) = GEN_NTH(0,L).
    . GEN_SORT_LIST(L, compare) sorts L in place with compare (see man qsort)
-   . GEN_ONCE(item, l) add item to l if not already there.
+   . GEN_ONCE(ITEM, L) adds ITEM to L if not already there.
+   . GEN_IN_LIST_P(ITEM, L) checks that item ITEM appears in list L
+   . GEN_ONCE_P(L) checks that each item in list L appears only once
+   . GEN_CLOSURE()
+   . GEN_MAKE_LIST(DOMAIN, ...) makes an homogeneous list of the varargs (but
+     homogeneity is not checked)
 */
 
 #include <stdio.h>
@@ -468,6 +473,18 @@ bool gen_in_list_p(void * vo, list l)
 	if (CHUNK(CAR(l))==item) return(TRUE); /* found! */
 
     return(FALSE); /* else no found */
+}
+
+bool gen_once_p(list l)
+{
+    list c;
+    for(c=l; c!=NIL && CDR(c)!=NIL; c=CDR(c)) {
+	gen_chunk * item = CHUNK(CAR(c));
+	if(gen_in_list_p(item , CDR(c)))
+	    return FALSE;
+    }
+
+    return TRUE;
 }
 
 /* Sorts a list of gen_chunks in place, to avoid mallocs. 
