@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/19 11:07:36 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/03/19 12:51:37 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -25,7 +25,8 @@
 #   thus should not appear in the program, otherwise troubles...
 # - some default value is assigned to number of processors...
 # - some specific directives for HPFC.
-# - simple management of descriptive interfaces.
+# - simple management of descriptive interfaces: 
+#   they are switched to prescriptive ones!:-)
 #
 # (c) Fabien Coelho, February 95 and later.
 # don't expect anything from this script.
@@ -131,9 +132,9 @@ $SED '#
       //s,)with\([\* ]\),) with\1,;
       //s,)onto ,) onto ,;
       #
-      # descriptive mappings: the first element is a star-call...
-      //s, align \(.*\) with\*, align s()\,\1 with ,;
-      //s, distribute \([a-z0-9_]*\)\*, distribute s()\,\1,;
+      # descriptive mappings: switched to prescriptive!
+      //s, align \(.*\) with\*, align \1 with ,;
+      //s, distribute \([a-z0-9_]*\)\*, distribute \1,;
       #
       # indirect reserved words: block, cyclic, *, nop
       #
