@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_generate_init,v $ ($Date: 1996/12/26 15:43:28 $, )
+# $RCSfile: hpfc_generate_init,v $ ($Date: 1996/12/27 15:15:58 $, )
 # version $Revision$
 #
 # generate the initialization file
@@ -28,7 +28,7 @@ shift `expr $OPTIND - 1`
 [ "$#" -eq 1 ] || usage
 
 dirname=$1
-init=$dirname/param_init.m4
+init=$dirname/hpfc_initialize_runtime.m4
 
 NAME="${NAME:-`basename $dirname .database`}"
 NAME=`echo $NAME | tr '[A-Z]' '[a-z]'`
