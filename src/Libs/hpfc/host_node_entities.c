@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: host_node_entities.c,v $
+ * Revision 1.30  1998/04/14 20:41:08  coelho
+ * *** empty log message ***
+ *
  * Revision 1.29  1997/11/22 16:32:15  coelho
  * assert, and debug function added... ('bout mappings...)
  *
@@ -179,7 +182,7 @@ static void update_loop_for_module_rewrite(loop l)
 }
 
 void update_object_for_module(
-    gen_chunk *obj, /* loosely typed, indeed */
+    void * obj, /* loosely typed, indeed */
     entity module)
 {
     bool (*saved_bound)(entity);
