@@ -14,10 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1998/12/30 15:49:55 $, )
- * version $Revision$
- * got on %D%, %T%
- *
+/* $Id$
  *  These are the functions defined in the Newgen list library. 
  */
 
@@ -112,6 +109,7 @@ extern gen_chunk gen_nth GEN_PROTO(( int, list )) ;
 extern list gen_nthcdr GEN_PROTO(( int, list )) ;
 extern char *gen_reduce GEN_PROTO(( char *, char *(*)(), list )) ;
 extern void gen_remove GEN_PROTO(( list *, void * )) ;
+extern void gen_remove_once GEN_PROTO(( list *, void * )) ;
 extern list gen_some  GEN_PROTO(( bool(*)(), list )) ;
 extern void gen_insert_after GEN_PROTO((void *, void *, list )) ;
 extern list gen_insert_before GEN_PROTO((void * no, void * o, list l)) ;
