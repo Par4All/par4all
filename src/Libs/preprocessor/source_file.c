@@ -176,25 +176,12 @@ get_dont_build_view_file(char * print_type)
 
 /*************************** MODULE PROCESSING (INCLUDES and IMPLICIT NONE) */
 
-static string real_file_dir = NULL;
-static void reset_real_file_dir(void)
-{
-    free(real_file_dir);
-    real_file_dir = NULL;
-}
-static void set_real_file_dir(string path)
-{
-    int l = strlen(path);
-    if (real_file_dir) reset_real_file_dir();
-    real_file_dir = strdup(path);
-    while (l>0 && real_file_dir[l]!='/') l--;
-    real_file_dir[l]= '\0';
-}
+static string user_file_directory = NULL;
 
 #ifdef NO_RX_LIBRARY
 
 static bool
-pips_process_file(string file_name)
+pips_process_file(string file_name/*, string new_name*/)
 {
     int err = safe_system_no_abort(concatenate
        ("trap 'exit 123' 2; pips-process-module ", file_name, NULL));
@@ -244,35 +231,35 @@ static regex_t
     complex_cst2_rx,
     dcomplex_cst_rx,
     dcomplex_cst2_rx;
-static FILE * output_file;
 
 static void
 insert_at(
-    char line[LINE_LENGTH], /* string to be modified */
+    string * line, /* string to be modified (may be reallocated) */
     int offset, /* where to insert */
     string what /* to be inserted */)
 {
-    int i, len=strlen(line), shift=strlen(what);
-    pips_assert("line large enough", len+shift<LINE_LENGTH);
+    int i, len=strlen(*line), shift=strlen(what);
+    *line = (char*) realloc(*line, sizeof(char)*(len+shift+1));
+    if (!*line) pips_internal_error("realloc failed\n");
 
     for (i=len; i>=offset; i--)
-	line[i+shift]=line[i];
+	(*line)[i+shift]=(*line)[i];
 
     for (shift--; shift>=0; shift--)
-	line[offset+shift]=what[shift];
+	(*line)[offset+shift]=what[shift];
 }
 
 #define CONTINUATION "\n     x "
 
 static void
-add_continuation_if_needed(char line[LINE_LENGTH])
+add_continuation_if_needed(string * line)
 {
-    int len = strlen(line);
+    int len = strlen(*line);
     if (len<=73) return; /* nothing to do */
     /* else let us truncate */
     {
 	int i = 71;
-	while (i>5 && (isalnum(line[i]) || line[i]=='_')) 
+	while (i>5 && (isalnum((*line)[i]) || (*line)[i]=='_')) 
 	    i--;
 	pips_assert("still in line", i>5);
 	insert_at(line, i, CONTINUATION);
@@ -284,17 +271,17 @@ add_continuation_if_needed(char line[LINE_LENGTH])
 static bool
 try_this_one(
     regex_t * prx, 
-    string line,
+    string * line,
     string replacement, 
     bool was_modified)
 {
     bool modified = FALSE;
     regmatch_t matches[2]; /* matched strings */
 
-    while (!regexec(prx, line, 2, matches, 0)) {
-	if (!was_modified && !modified && strlen(line)>73) {
+    while (!regexec(prx, *line, 2, matches, 0)) {
+	if (!was_modified && !modified && strlen(*line)>73) {
 	    pips_user_warning("line truncated in complex constant handling");
-	    line[72] = '\n', line[73] = '\0';
+	    (*line)[72] = '\n', (*line)[73] = '\0';
 	}
 	modified = TRUE;
 	insert_at(line, matches[1].rm_so, replacement);
@@ -304,7 +291,7 @@ try_this_one(
 }
 
 static void
-handle_complex_constants(string line)
+handle_complex_constants(string * line)
 {
     bool diff = FALSE;
 
@@ -323,7 +310,7 @@ find_file(string name)
 {
     string other;
 
-    other = strdup(concatenate(real_file_dir, "/", name, NULL));
+    other = strdup(concatenate(user_file_directory, "/", name, 0));
     if (file_exists_p(other))
 	return other;
     free(other);
@@ -338,9 +325,55 @@ find_file(string name)
     return NULL;
 }
 
-static bool handle_file(FILE*);
+/* cache of preprocessed includes
+ */
+static hash_table processed_cache = hash_table_undefined;
+void 
+init_processed_include_cache(void)
+{
+    pips_assert("undefined cache", hash_table_undefined_p(processed_cache));
+    processed_cache = hash_table_make(hash_string, 100);
+}
+void
+close_processed_include_cache(void)
+{
+    pips_assert("defined cache", !hash_table_undefined_p(processed_cache));
+    HASH_MAP(k, v, { unlink(v); free(v); free(k); }, processed_cache);
+    hash_table_free(processed_cache);
+    processed_cache = hash_table_undefined;
+}
+
+/* returns the processed cached file name, or null if none.
+ */
+static string
+get_cached(string s)
+{
+    string res;
+    pips_assert("cache initialized", !hash_table_undefined_p(processed_cache));
+    res = hash_get(processed_cache, s);
+    return res==HASH_UNDEFINED_VALUE? NULL: res;
+}
+/* return an allocated unique cache file name.
+ */
+static string
+get_new_cache_file_name(void)
+{
+    static int unique = 0;
+    string dir_name, file_name;
+    int len;
+    dir_name = db_get_directory_name_for_module("Tmp");
+    len = strlen(dir_name)+20;
+    file_name = (char*) malloc(sizeof(char)*len);
+    if (!file_name) pips_internal_error("malloc failed\n");
+    sprintf(file_name, "%s/cached.%d", dir_name, unique++);
+    pips_assert("not too long", strlen(file_name)<len);
+    free(dir_name);
+    return file_name;
+}
+
+static bool handle_file(FILE*, FILE*);
 static bool 
-handle_file_name(char * file_name, bool comment)
+handle_file_name(FILE * out, char * file_name, bool included)
 {
     FILE * f;
     string found = find_file(file_name);
@@ -351,34 +384,51 @@ handle_file_name(char * file_name, bool comment)
       /* Do not raise a user_error exception,
 	 because you are not in the right directory */
 	pips_user_warning("include file %s not found\n", file_name);
-	fprintf(output_file, "! include \"%s\" not found\n", file_name);
+	fprintf(out, "! include \"%s\" not found\n", file_name);
 	return FALSE;
     }
 
     pips_debug(2, "including file \"%s\"\n", found);
-
-    if (comment)
-	fprintf(output_file, "! include \"%s\"\n", file_name);
+    if (included) fprintf(out, "! include \"%s\"\n", file_name);
 
     f=safe_fopen(found, "r");
-    ok = handle_file(f);
+    ok = handle_file(out, f);
     safe_fclose(f, found);
 
-    if (comment)
-	fprintf(output_file, "! end include \"%s\"\n", file_name);
-
+    if (included) fprintf(out, "! end include \"%s\"\n", file_name);
     free(found);
+    return ok;
+}
 
+static bool
+handle_include_file(FILE * out, char * file_name)
+{
+    FILE * in;
+    bool ok = TRUE;
+    string cached = get_cached(file_name);
+    if (!cached)
+    {
+	FILE * tmp_out;
+	cached = get_new_cache_file_name();
+	tmp_out = safe_fopen(cached, "w");
+	ok = handle_file_name(tmp_out, file_name, TRUE);
+	safe_fclose(tmp_out, cached);
+	hash_put(processed_cache, strdup(file_name), cached);
+    }
+
+    in = safe_fopen(cached, "r");
+    safe_cat(out, in);
+    safe_fclose(in, cached);
     return ok;
 }
 
 static bool 
-handle_file(FILE * f) /* process f for includes and nones */
+handle_file(FILE * out, FILE * f) /* process f for includes and nones */
 {
-    char line[LINE_LENGTH];
+    string line;
     regmatch_t matches[2]; /* matched strings */
 
-    while (fgets(line, LINE_LENGTH, f))
+    while ((line = safe_readline(f)))
     {
 	if (!skip_line_p(line))
 	{
@@ -387,19 +437,20 @@ handle_file(FILE * f) /* process f for includes and nones */
 		char c = line[matches[1].rm_eo];
 		line[matches[1].rm_eo]='\0';
 		
-		if (!handle_file_name(&line[matches[1].rm_so], TRUE))
-		    return FALSE;
+		if (!handle_include_file(out, &line[matches[1].rm_so]))
+		    return FALSE; /* error? */
 
 		line[matches[1].rm_eo]=c;
-		fprintf(output_file, "! ");
+		fprintf(out, "! ");
 	    }
 	    else if (!regexec(&implicit_none_rx, line, 0, matches, 0))
-		    fprintf(output_file, 
-			    "! MIL-STD-1753 Fortran extension not in PIPS\n! ");
+		    fprintf(out, 
+		      "! MIL-STD-1753 Fortran extension not in PIPS\n! ");
 	    else
-		handle_complex_constants(line);
+		handle_complex_constants(&line);
 	}
-	fprintf(output_file, "%s", line);
+	fprintf(out, "%s\n", line);
+	free(line);
     }
     return TRUE;
 }
@@ -420,30 +471,59 @@ init_rx(void)
 }
 
 static bool 
-pips_process_file(string file_name)
+pips_process_file(string file_name, string new_name)
 {
-    string origin = strdup(concatenate(file_name, ".origin", 0));
     bool ok = FALSE;
-
+    FILE * out;
     pips_debug(2, "processing file %s\n", file_name);
-    
-    if (rename(file_name, origin)) {
-	perror("pips_process_file");
-	pips_user_warning("error while renaming %s as %s\n",
-			  file_name, origin);
-	return FALSE;
-    }
-
-    output_file = safe_fopen(file_name, "w");
     init_rx();
-    ok = handle_file_name(origin, FALSE);
-    safe_fclose(output_file, origin);
-    free(origin);
-
+    out = safe_fopen(new_name, "w");
+    ok = handle_file_name(out, file_name, FALSE);
+    safe_fclose(out, new_name);
     return ok;
 }
 
 #endif
+
+bool
+filter_file(string mod_name)
+{
+    int len;
+    string name, new_name, dir_name, abs_name, abs_new_name;
+    name = db_get_memory_resource(DBR_INITIAL_FILE, mod_name, TRUE);
+
+    /* directory is set for finding includes. */
+    user_file_directory = 
+	strdup(db_get_memory_resource(DBR_USER_FILE, mod_name, TRUE));
+    len = strlen(user_file_directory);
+    while (len-->=0) {
+	if (user_file_directory[len]=='/') {
+	    user_file_directory[len]='\0';
+	    break;
+	}
+    }
+    
+    new_name = db_build_file_resource_name(DBR_SOURCE_FILE, mod_name, ".f");
+    
+    dir_name = db_get_current_workspace_directory();
+    abs_name = strdup(concatenate(dir_name, "/", name, 0));
+    abs_new_name = strdup(concatenate(dir_name, "/", new_name, 0));
+    free(dir_name);
+    
+    if (!pips_process_file(abs_name, abs_new_name)) {
+	pips_user_warning("initial file filtering of %s failed\n", mod_name);
+	free(abs_new_name); free(abs_name);
+	return FALSE;
+    }
+    free(abs_new_name); free(abs_name);
+    free(user_file_directory), user_file_directory = NULL;
+
+    DB_PUT_NEW_FILE_RESOURCE(DBR_SOURCE_FILE, mod_name, new_name);
+    return TRUE;
+}
+
+
+/******************************************************************** SPLIT */
 
 static bool zzz_file_p(string s) /* zzz???.f */
 { return strlen(s)==8 && s[0]=='z' && s[1]=='z' && s[2]=='z' &&
@@ -597,7 +677,7 @@ process_user_file(string file)
 {
     FILE *fd;
     bool success_p = FALSE, cpp_processed_p;
-    string cwd, abspath = NULL, initial_file, tempfile = NULL, nfile, name;
+    string cwd, abspath, initial_file, tempfile = NULL, nfile, name;
     int err;
 
     static int number_of_files = 0;
@@ -630,42 +710,30 @@ process_user_file(string file)
     {
 	user_log("Preprocessing file %s\n", initial_file);
 	nfile = process_thru_cpp(initial_file);
-	
     }
 
-    if (tempfile == NULL) {
+    if (tempfile == NULL)
 	tempfile = tmpnam(NULL);
-    }
-
-    /* the absolute path of file is calculated
-     */
-    abspath = strdup((*nfile == '/') ? nfile : 
-		     concatenate(get_cwd(), "/", nfile, NULL));
-
-    set_real_file_dir(abspath);
 
     /* the new file is registered in the database
      */
     user_log("Registering file %s\n", file);
 
-    /* FI: two problems here
-     * - the successive calls to DB_PUT_FILE_RESOURCE erase each other...
-     */
-    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, "", abspath);
-
     /* the new file is splitted according to Fortran standard */
 
     user_log("Splitting file    %s\n", nfile);
 
+    /* the absolute path of file is calculated
+     */
+    abspath = strdup((*nfile == '/') ? nfile : 
+		     concatenate(get_cwd(), "/", nfile, NULL));
     cwd = strdup(get_cwd());
     chdir(db_get_current_workspace_directory());
 
-    /* reverse sort because the list of modules is reversed later */
     /* if two modules have the same name, the first splitted wins
        and the other one is hidden by the call to "sed" since
        fsplit gives it a zzz00n.f name */
     /* Let's hope no user module is called zzz???.f */
-
     err = pips_split_file(abspath, tempfile);
 
     /* Go back unconditionnally to regular directory for execution
@@ -673,7 +741,6 @@ process_user_file(string file)
      */
     chdir(cwd);
     free(cwd);
-
     if (err) return FALSE;
 
     /* the newly created module files are registered in the database */
@@ -695,28 +762,29 @@ process_user_file(string file)
 
 	user_log("  Module         %s\n", mod_name);
 
-	res_name = db_build_file_resource_name(DBR_SOURCE_FILE,mod_name, ".f");
+	res_name = db_build_file_resource_name
+	    (DBR_INITIAL_FILE, mod_name, ".f_initial");
 
-        /* Apply a cleaning procedure on each module: */
-        cwd = strdup(get_cwd());
-        chdir(db_get_current_workspace_directory());
+	{
+	    string abs_file, abs_res, dir_name;
+	    dir_name = db_get_current_workspace_directory();
+	    abs_file = strdup(concatenate(dir_name, "/", file_name, 0));
+	    abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
+	    free(dir_name);
 
-	if (rename(file_name, res_name)) {
-	    perror("process_user_file");
-	    chdir(cwd); free(cwd); 
-	    pips_internal_error("mv %s %s failed in %s\n", 
-				file_name, res_name, get_cwd());
+	    if (rename(abs_file, abs_res)) {
+		perror("process_user_file");
+		pips_internal_error("mv %s %s failed\n", 
+				    file_name, res_name);
+	    }
+
+	    DB_PUT_NEW_FILE_RESOURCE(DBR_INITIAL_FILE, mod_name, res_name);
+	    /* from which file the initial source was derived.
+	     * absolute path to the file so that db moves should be ok...
+	     */
+	    DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(abspath));
+	    free(file_name); free(abs_file); free(abs_res);
 	}
-	free(file_name);
-
-        if (!pips_process_file(res_name)) { /* should be a pass... */
-	    chdir(cwd); free(cwd); 
-	    return FALSE;
-	}
-
-        chdir(cwd); free(cwd);
-
-	DB_PUT_NEW_FILE_RESOURCE(DBR_SOURCE_FILE, mod_name, res_name);
     }
     safe_fclose(fd, tempfile);
 
@@ -729,10 +797,8 @@ process_user_file(string file)
 
     if(!success_p)
 	pips_user_warning("No module was found when splitting file %s.\n",
-			  abspath);
-
-    reset_real_file_dir();
+			  nfile);
     free(nfile);
-
+    free(abspath);
     return success_p;
 }
