@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 /* PiPs specific headers */
 #include "genC.h"
@@ -36,9 +37,6 @@ statement       flint_current_statement;
 
 /* name of module being flinted */
 static char *flint_current_module_name;
-
-/* external functions */
-extern char    *getenv();
 
 /*************************************************************/
 /* Routine of  global module verification                    */
