@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.126  1998/07/24 16:15:35  irigoin
+%% More comments about property PARSER_EXPAND_STATEMENT_FUNCTIONS
+%%
 %% Revision 1.125  1998/07/24 16:13:54  irigoin
 %% Default value for PARSER_EXPAND_STATEMENT_FUNCTIONS set to TRUE. Comments
 %% are modified.
@@ -83,7 +86,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/07/24 16:13:54 $~$
+$~$Date: 1998/07/24 16:15:35 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -546,11 +549,14 @@ However most statement functions do not require these extra-steps and it
 is legal to perform the textual substitution. For user convenience, the
 default option is textual substitution.
 
-Note that the parser does not have enoug information to check the validity
-of the transformation, but a warning is issued if legality is doubtful. A
-better method would be to represent them somehow a local functions in the
-internal representation, but the implications for \texttt{pipsmake} and
-other issues are clearly not all foreseen\ldots (Fabien Coelho).
+Note that the parser does not have enough information to check the validity
+of the transformation, but a warning is issued if legality is doubtful. If
+strange results are obtained when executing codes transformed with PIPS,
+his property should be set to false.
+
+A better method would be to represent them somehow a local functions in
+the internal representation, but the implications for \texttt{pipsmake}
+and other issues are clearly not all foreseen\ldots (Fabien Coelho).
 
 \begin{verbatim}
 PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
