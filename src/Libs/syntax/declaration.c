@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.59  2001/04/05 08:25:43  irigoin
+ * Comments improved for function OffsetOfReference()
+ *
  * Revision 1.58  1999/05/21 12:02:12  irigoin
  * Function DeclareIntrinsic() added
  *
@@ -1299,8 +1302,10 @@ value v;
     return(MakeTypeVariable(b, NIL));
 }
 
-/* this function computes the offset of a variable element from the
-begining of the variable. */
+/* This function computes the numerical offset of a variable element from
+the begining of the variable. The variable must have numerical bounds for
+this function to work. It core dumps for adjustable arrays such as formal
+parameters. */
 
 int 
 OffsetOfReference(r)
