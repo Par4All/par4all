@@ -1,5 +1,8 @@
 /* $Id$
    $Log: clex.l,v $
+   Revision 1.5  2003/09/05 14:19:52  nguyen
+   Modify pips debug levels
+
    Revision 1.4  2003/08/13 08:00:33  nguyen
    Correct the regular expressions for floating number, ...
 
@@ -114,263 +117,263 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 
 %%
 "/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{ 
-                                pips_debug(5,"Comment %s\n",yytext);
+                                pips_debug(9,"Comment %s\n",yytext);
                         }
 "//"[^\n]*              { 
-                                pips_debug(5,"Comment %s\n",yytext);
+                                pips_debug(9,"Comment %s\n",yytext);
                         }
 ^"#"[^\n]*              { 
-                                pips_debug(5,"Pragma comment %s\n",yytext);
+                                pips_debug(9,"Pragma comment %s\n",yytext);
                         }
 {blank}			{ 
                                 /* Eat up whitespaces */
                         }
 \n                      { 
-                                pips_debug(5,"New line\n");
+                                pips_debug(9,"New line\n");
                         }
 
 "_Pragma" 	        { 
-                                pips_debug(5,"Pragma not implemented %s\n",yytext);
+                                pips_debug(9,"Pragma not implemented %s\n",yytext);
 				return(TK_PRAGMA);
                         }
 \'([^\']|(\'\')|(\\\'))*\'	{ 
                                 /* Attention, the regular expression is not true*/
-                                pips_debug(5,"TK_CHARCON: %s\n",yytext);
+                                pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
 L\'([^\']|(\'\')|(\\\'))*\'	{ 
                                 /* Attention, the regular expression is not true*/
-                                pips_debug(5,"TK_CHARCON wide character constant: %s\n",yytext);
+                                pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
 \"([^\"]|(\"\")|(\\\"))*\"	{ 
-                                pips_debug(5,"TK_STRINGCON regular or wide string: %s\n",yytext);
+                                pips_debug(9,"TK_STRINGCON regular or wide string: %s\n",yytext);
                                 /* the "world" in L"Hello, " "world" should be treated as 
                                    wide even though there's no L immediately preceding it */
                                 yylval.string = strdup(yytext);
 				return(TK_STRINGCON);
                         }
 L\"([^\"]|(\"\")|(\\\"))*\"	{ 
-                                pips_debug(5,"TK_WSTRINGCON wide string: %s\n",yytext);
+                                pips_debug(9,"TK_WSTRINGCON wide string: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_WSTRINGCON);
                         }
 {floatnum}		{ 
-                                pips_debug(5,"TK_FLOATCON %s\n",yytext);
+                                pips_debug(9,"TK_FLOATCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_FLOATCON);
                         }
 {hexnum}		{ 
-                                pips_debug(5,"Hexnum TK_INTCON %s\n",yytext);
+                                pips_debug(9,"Hexnum TK_INTCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_INTCON);
                         }
 {octnum}		{ 
-                                pips_debug(5,"Octnum TK_INTCON %s\n",yytext);
+                                pips_debug(9,"Octnum TK_INTCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_INTCON);
                         }
 {intnum}		{ 
-                                pips_debug(5,"TK_INTCON %s\n",yytext);
+                                pips_debug(9,"TK_INTCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_INTCON);
                         }
 "!quit!"		{
-				pips_debug(5,"TK_EOF %s\n",yytext);
+				pips_debug(9,"TK_EOF %s\n",yytext);
 				yyterminate();
 			}
 "..."			{
-				pips_debug(5,"TK_ELLIPSIS %s\n",yytext);
+				pips_debug(9,"TK_ELLIPSIS %s\n",yytext);
 				return(TK_ELLIPSIS);
 			}
 "+="			{
-				pips_debug(5,"TK_PLUS_EQ %s\n",yytext);
+				pips_debug(9,"TK_PLUS_EQ %s\n",yytext);
 				return(TK_PLUS_EQ);
 			}
 "-="			{
-				pips_debug(5,"TK_MINUS_EQ %s\n",yytext);
+				pips_debug(9,"TK_MINUS_EQ %s\n",yytext);
 				return(TK_MINUS_EQ);
 			}
 "*="			{
-				pips_debug(5,"TK_STAR_EQ %s\n",yytext);
+				pips_debug(9,"TK_STAR_EQ %s\n",yytext);
 				return(TK_STAR_EQ);
 			}
 "/="			{
-				pips_debug(5,"TK_SLASH_EQ %s\n",yytext);
+				pips_debug(9,"TK_SLASH_EQ %s\n",yytext);
 				return(TK_SLASH_EQ);
 			}
 "%="			{
-				pips_debug(5,"TK_PERCENT_EQ %s\n",yytext);
+				pips_debug(9,"TK_PERCENT_EQ %s\n",yytext);
 				return(TK_PERCENT_EQ);
 			}
 "|="			{
-				pips_debug(5,"TK_PIPE_EQ %s\n",yytext);
+				pips_debug(9,"TK_PIPE_EQ %s\n",yytext);
 				return(TK_PIPE_EQ);
 			}
 "&="			{
-				pips_debug(5,"TK_AND_EQ %s\n",yytext);
+				pips_debug(9,"TK_AND_EQ %s\n",yytext);
 				return(TK_AND_EQ);
 			}
 "^="			{
-				pips_debug(5,"TK_CIRC_EQ %s\n",yytext);
+				pips_debug(9,"TK_CIRC_EQ %s\n",yytext);
 				return(TK_CIRC_EQ);
 			}
 "<<="			{
-				pips_debug(5,"TK_INF_INF_EQ %s\n",yytext);
+				pips_debug(9,"TK_INF_INF_EQ %s\n",yytext);
 				return(TK_INF_INF_EQ);
 			}
 ">>="			{
-				pips_debug(5,"TK_SUP_SUP_EQ %s\n",yytext);
+				pips_debug(9,"TK_SUP_SUP_EQ %s\n",yytext);
 				return(TK_SUP_SUP_EQ);
 			}
 "<<"			{
-				pips_debug(5,"TK_INF_INF %s\n",yytext);
+				pips_debug(9,"TK_INF_INF %s\n",yytext);
 				return(TK_INF_INF);
 			}
 ">>"			{
-				pips_debug(5,"TK_SUP_SUP %s\n",yytext);
+				pips_debug(9,"TK_SUP_SUP %s\n",yytext);
 				return(TK_SUP_SUP);
 			}
 "=="			{
-				pips_debug(5,"TK_EQ_EQ %s\n",yytext);
+				pips_debug(9,"TK_EQ_EQ %s\n",yytext);
 				return(TK_EQ_EQ);
 			}
 "!="			{
-				pips_debug(5,"TK_EXCLAM_EQ %s\n",yytext);
+				pips_debug(9,"TK_EXCLAM_EQ %s\n",yytext);
 				return(TK_EXCLAM_EQ);
 			}
 "<="			{
-				pips_debug(5,"TK_INF_EQ %s\n",yytext);
+				pips_debug(9,"TK_INF_EQ %s\n",yytext);
 				return(TK_INF_EQ);
 			}
 ">="			{
-				pips_debug(5,"TK_SUP_EQ %s\n",yytext);
+				pips_debug(9,"TK_SUP_EQ %s\n",yytext);
 				return(TK_SUP_EQ);
 			}
 "="			{
-				pips_debug(5,"TK_EQ %s\n",yytext);
+				pips_debug(9,"TK_EQ %s\n",yytext);
 				return(TK_EQ);
 			}
 "<"			{
-				pips_debug(5,"TK_INF %s\n",yytext);
+				pips_debug(9,"TK_INF %s\n",yytext);
 				return(TK_INF);
 			}
 ">"			{
-				pips_debug(5,"TK_SUP %s\n",yytext);
+				pips_debug(9,"TK_SUP %s\n",yytext);
 				return(TK_SUP);
 			}
 "++"			{
-				pips_debug(5,"TK_PLUS_PLUS %s\n",yytext);
+				pips_debug(9,"TK_PLUS_PLUS %s\n",yytext);
 				return(TK_PLUS_PLUS);
 			}
 "--"			{
-				pips_debug(5,"TK_MINUS_MINUS %s\n",yytext);
+				pips_debug(9,"TK_MINUS_MINUS %s\n",yytext);
 				return(TK_MINUS_MINUS);
 			}
 "->"			{
-				pips_debug(5,"TK_ARROW %s\n",yytext);
+				pips_debug(9,"TK_ARROW %s\n",yytext);
 				return(TK_ARROW);
 			}
 "+"			{
-				pips_debug(5,"TK_PLUS %s\n",yytext);
+				pips_debug(9,"TK_PLUS %s\n",yytext);
 				return(TK_PLUS);
 			}
 "-"			{
-				pips_debug(5,"TK_MINUS %s\n",yytext);
+				pips_debug(9,"TK_MINUS %s\n",yytext);
 				return(TK_MINUS);
 			}
 "*"			{
-				pips_debug(5,"TK_STAR %s\n",yytext);
+				pips_debug(9,"TK_STAR %s\n",yytext);
 				return(TK_STAR);
 			}
 "/"			{
-				pips_debug(5,"TK_SLASH %s\n",yytext);
+				pips_debug(9,"TK_SLASH %s\n",yytext);
 				return(TK_SLASH);
 			}
 "%"			{
-				pips_debug(5,"TK_PERCENT %s\n",yytext);
+				pips_debug(9,"TK_PERCENT %s\n",yytext);
 				return(TK_PERCENT);
 			}
 "!"			{
-				pips_debug(5,"TK_EXCLAM %s\n",yytext);
+				pips_debug(9,"TK_EXCLAM %s\n",yytext);
 				return(TK_EXCLAM);
 			}
 "&&"			{
-				pips_debug(5,"TK_AND_AND %s\n",yytext);
+				pips_debug(9,"TK_AND_AND %s\n",yytext);
 				return(TK_AND_AND);
 			}
 "||"			{
-				pips_debug(5,"TK_PIPE_PIPE %s\n",yytext);
+				pips_debug(9,"TK_PIPE_PIPE %s\n",yytext);
 				return(TK_PIPE_PIPE);
 			}
 "&"			{
-				pips_debug(5,"TK_AND %s\n",yytext);
+				pips_debug(9,"TK_AND %s\n",yytext);
 				return(TK_AND);
 			}
 "|"			{
-				pips_debug(5,"TK_PIPE %s\n",yytext);
+				pips_debug(9,"TK_PIPE %s\n",yytext);
 				return(TK_PIPE);
 			}
 "^"			{
-				pips_debug(5,"TK_CIRC %s\n",yytext);
+				pips_debug(9,"TK_CIRC %s\n",yytext);
 				return(TK_CIRC);
 			}
 "?"			{
-				pips_debug(5,"TK_QUEST %s\n",yytext);
+				pips_debug(9,"TK_QUEST %s\n",yytext);
 				return(TK_QUEST);
 			}
 ":"			{
-				pips_debug(5,"TK_COLON %s\n",yytext);
+				pips_debug(9,"TK_COLON %s\n",yytext);
 				return(TK_COLON);
 			}
 "~"			{
-				pips_debug(5,"TK_TILDE %s\n",yytext);
+				pips_debug(9,"TK_TILDE %s\n",yytext);
 				return(TK_TILDE);
 			}	
 "\{"                    {
-				pips_debug(5,"TK_LBRACE %s\n",yytext);
+				pips_debug(9,"TK_LBRACE %s\n",yytext);
 				return(TK_LBRACE);
 			}
 "\}"			{
-				pips_debug(5,"TK_RBRACE %s\n",yytext);
+				pips_debug(9,"TK_RBRACE %s\n",yytext);
 				return(TK_RBRACE);
 			}
 "["			{
-				pips_debug(5,"TK_LBRACKET %s\n",yytext);
+				pips_debug(9,"TK_LBRACKET %s\n",yytext);
 				return(TK_LBRACKET);
 			}
 "]"			{
-				pips_debug(5,"TK_RBRACKET %s\n",yytext);
+				pips_debug(9,"TK_RBRACKET %s\n",yytext);
 				return(TK_RBRACKET);
 			}
 "("			{
-				pips_debug(5,"TK_LPAREN %s\n",yytext);
+				pips_debug(9,"TK_LPAREN %s\n",yytext);
 				return(TK_LPAREN);
 			}
 ")"			{
-				pips_debug(5,"TK_RPAREN %s\n",yytext);
+				pips_debug(9,"TK_RPAREN %s\n",yytext);
 				return(TK_RPAREN);
 			}
 ";"			{
-				pips_debug(5,"TK_SEMICOLON %s\n",yytext);
+				pips_debug(9,"TK_SEMICOLON %s\n",yytext);
 				return(TK_SEMICOLON);
 			}
 ","			{
-				pips_debug(5,"TK_COMMA %s\n",yytext);
+				pips_debug(9,"TK_COMMA %s\n",yytext);
 				return(TK_COMMA);
 			}
 "."			{
-				pips_debug(5,"TK_DOT %s\n",yytext);
+				pips_debug(9,"TK_DOT %s\n",yytext);
 				return(TK_DOT);
 			}
 "sizeof"		{
-				pips_debug(5,"TK_SIZEOF %s\n",yytext);
+				pips_debug(9,"TK_SIZEOF %s\n",yytext);
 				return(TK_SIZEOF);
 			}
 "__asm"                 {
-				pips_debug(5,"TK_ASM %s\n",yytext);
+				pips_debug(9,"TK_ASM %s\n",yytext);
 				return(TK_ASM);
 			} 
 {ident}			{ 
@@ -378,19 +381,19 @@ L\"([^\"]|(\"\")|(\\\"))*\"	{
 				int t = is_c_keyword_typedef(yytext);
                                 if (t>0) 
 				   { 
-				       pips_debug(5,"Keyword or typedef name: %s\n",yytext);
+				       pips_debug(9,"Keyword or typedef name: %s\n",yytext);
                                        yylval.string = strdup(yytext);
 				       return (t);
 				   }
 				else
 				   {
-				       pips_debug(5,"Identifier: %s\n",yytext);
+				       pips_debug(9,"Identifier: %s\n",yytext);
                                        yylval.string = strdup(yytext);
 				       return(TK_IDENT); 
 				   }
 			}
 <<EOF>>			{
-				pips_debug(5,"TK_EOF %s\n",yytext);
+				pips_debug(9,"TK_EOF %s\n",yytext);
 				return(TK_EOF);
 			}
 .			{
