@@ -30,13 +30,16 @@ Are only a list of {\tt attachment}s:
 
 Here is what we can attach to a word:
 
-\domain{attachment = entity + unknown:unit}
+\domain{attachment = entity + unknown:unit x begin x end}
+
+{\tt begin} is the position of the attachment begin in the output
+file and {\tt end} the position of its end.
 
 
 \section{The mapping used to attach various internal informations}
 
-Each attachment point to a word of the code:
-\domain{attachment_to_word = attachment->string}
+%Each attachment point to a word of the code:
+%\domain{attachment_to_word = attachment->string}
 
 Each word can have a list of attachments:
 \domain{word_to_attachments = string->attachments}
