@@ -215,7 +215,7 @@ test_to_postcondition(
 	 * but test information should always be propagated 
 	 */
 	transformer pret =
-	    precondition_add_condition_information(transformer_dup(pre),e,
+	  precondition_add_condition_information(transformer_dup(pre),e, pre,
 						  TRUE);
 	transformer pref = transformer_undefined;
 
@@ -241,7 +241,7 @@ test_to_postcondition(
 	if(!empty_statement_p(sf)||TRUE) {
 	  
 	    pref = precondition_add_condition_information(transformer_dup(pre),e,
-							  FALSE);
+							  pre, FALSE);
 	    /* transformer_normalize(pref, 3); */
 	    transformer_normalize(pref, 7);
 	}
@@ -272,7 +272,8 @@ test_to_postcondition(
     }
 
     ifdebug(DEBUG_TEST_TO_POSTCONDITION) {
-	debug(DEBUG_TEST_TO_POSTCONDITION,"test_to_postcondition","end post=\n");
+	debug(DEBUG_TEST_TO_POSTCONDITION,"test_to_postcondition",
+	      "end post=\n");
 	(void) print_transformer(post);
     }
 
@@ -297,7 +298,26 @@ call_to_postcondition(
 	   well handled intrinsic */
 	pips_debug(5, "intrinsic function %s\n",
 	      entity_name(e));
-	post = transformer_apply(tf, pre);
+	if(get_bool_property("SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS")
+	   && ENTITY_ASSIGN_P(call_function(c))) {
+	  entity f = call_function(c);
+	  list args = call_arguments(c);
+	  /* impredance problem: build an expression from call c */
+	  expression expr = make_expression(make_syntax(is_syntax_call, c),
+					    normalized_undefined);
+	  list ef = expression_to_proper_effects(expr);
+	  transformer pre_r = transformer_range(pre);
+	  transformer new_tf = intrinsic_to_transformer(f, args, pre_r, ef);
+
+	  post = transformer_apply(new_tf, pre);
+	  syntax_call(expression_syntax(expr)) = call_undefined;
+	  free_expression(expr);
+	  free_transformer(new_tf);
+	  free_transformer(pre_r);
+	}
+	else {
+	  post = transformer_apply(tf, pre);
+	}
 	/* propagate precondition pre as summary precondition 
 	   of user functions */
 	/* FI: don't! Summary preconditions are computed independently*/
@@ -637,7 +657,9 @@ statement_to_postcondition(
 	 */
 	/* pre = transformer_normalize(pre, 3); */
 
-	pre = transformer_normalize(pre, 6);
+	/* pre = transformer_normalize(pre, 6); */
+	/* pre = transformer_normalize(pre, 7); */
+	pre = transformer_normalize(pre, 4);
 
 	if(!transformer_consistency_p(pre)) {
 	    int so = statement_ordering(s);
