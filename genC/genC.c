@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1995/03/22 17:48:14 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1995/03/28 15:05:32 $, )
  * version $Revision$
  */
 
@@ -131,10 +131,37 @@ union domain *dp ;
     return( buffer ) ;
 }
 
+static char *
+primitive_type(dp)
+union domain *dp;
+{
+    static char buffer[1024];
+    
+    switch( dp->ba.type )
+    {
+    case BASIS: 
+	sprintf(buffer, dp->ba.constructand->name);
+	break;
+    case ARRAY: 
+    case EXTERNAL:
+    case IMPORT:
+	sprintf(buffer, "(I don't know what to generate - FC:-)");
+	break;
+    case LIST:
+	sprintf(buffer, "list");
+	break;
+    case SET:
+	sprintf(buffer, "set");
+	break;
+    default:
+    }
+    
+    return(buffer);
+}
+
 /* PRIMITIVE_CAST returns the appropriate casting to access an object in BP.
    This is mainly for multidimensional arrays and external (thus the 
    NAME). */
-
 static char *
 primitive_cast( dp )
 union domain *dp ;
@@ -316,7 +343,7 @@ void
 gen_arrow( bp )
 struct gen_binding *bp ;
 {
-    char *name = bp->name ;
+    char *s, *name = bp->name ;
     union domain *dom = bp->domain ;
     union domain *image, *start ;
     int data = GEN_HEADER + IS_TABULATED( bp ) ;
@@ -341,9 +368,25 @@ struct gen_binding *bp ;
     (void) printf(",%s,((hash)+%d)->h,(var),(val)))\n",
 		  primitive_field(image), data ) ;
 
+    /* key and value types
+     */
+    (void) printf("#define %s_key_type %s\n", name, primitive_type(start));
+    (void) printf("#define %s_value_type %s\n", name, primitive_type(image));
+
+    /* bound_XX_p
+     */
     (void) printf("#define bound_%s_p(hash, var) (HASH_BOUND_P(%s,",
 		  name, primitive_field(start));
     (void) printf("%s,(hash+%d)->h, (var)))\n", primitive_field(image), data);
+    
+    /* XX_MAP
+     */
+    for( (void) printf( "#define " ), s=name ; *s ; s++ ) /* beurk */
+	    (void) printf( "%c", UPPER( *s )) ;
+
+    (void) printf("_MAP(k, v, code, fun) FUNCTION_MAP(%s, ", name);
+    (void) printf("%s, ", primitive_field(start));
+    (void) printf("%s, k, v, code, fun)\n", primitive_field(image));
 }
 
 
