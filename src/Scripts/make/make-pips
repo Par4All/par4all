@@ -1,0 +1,166 @@
+#! /bin/sh
+#! /bin/sh -vx
+
+# make-pips: global remake of PIPS libraries and passes to be used after
+# changes in data structures or global installation of sources.
+#
+# recompile-pips replaced by make-pips -r (bb, 16.10.91)
+
+# Options are available:
+#  -n: do nothing but show what would be done
+#  -p: take care of Production (default)
+#  -d: take care of Development
+#  -a: do everything (Production + Development)
+#  -r: recompile (for global installation of sources)
+
+# X, Francois Irigoin, Corinne Ancourt
+
+# Modifications:
+#  - variable FAILURES is added to check the happy ending (FI, 18/07/92)
+
+USAGE="Usage: $0 [-p|d|a|r] [-n]"
+
+MAKE_OPTION=""
+DEVELOPMENT=""
+PRODUCTION=TRUE
+RECOMPILE=""
+FAILURES=""
+
+while getopts dnpar opt
+do
+	case $opt in
+	d)	DEVELOPMENT=TRUE
+		PRODUCTION="";;
+	n)	MAKE_OPTION="-n";;
+	p)	PRODUCTION=TRUE;;
+	a)	DEVELOPMENT=TRUE
+		PRODUCTION=TRUE;;
+	r)	RECOMPILE=TRUE;;
+	\?)	echo $USAGE >&2
+		exit 2;;
+	esac
+done
+
+#echo PRODUCTION="$PRODUCTION"
+#echo DEVELOPMENT="$DEVELOPMENT"
+#echo MAKE_OPTION="$MAKE_OPTION"
+
+# Pips project libraries:
+# Libs have to be topologically ordered to generate header files before
+# they are needed; 
+# Library order does usualy not matter. In order not to forget any:
+LIBS=`(cd $LIBSRCDIR; ls)`
+
+#LIBS="misc properties text-util ri-util pipsdbm syntax effects sdfi control dg-util rice ricedg transformer semantics regions privatize prettyprint generation conversion complexity chains callgraph bootstrap loop_normalize atomizer transformations movements wp65 reductions pipsmake top-level"
+
+# obsolete (use "make bottom-up" instead)
+#LIBS=`analyze_libraries -p;order_libraries -b; sed 's/^lib//;s/.a$//' </tmp/libs.b`
+
+#LIBS=`(cd $UTILDIR; make bottom-up >/dev/null 2>/dev/null); sed 's/^lib//;s/.a$//' < $TEMPDIR/libs.b`
+
+echo LIBS=$LIBS
+
+# Pips project passes
+# PASSES="pips wpips tpips parser linker parallelize "
+# Explicit definition of passes to avoid obsolete ones
+PASSES="pips wpips"
+
+# build internal representation
+# echo "Making internal representation"
+# (cd ${INCLUDEDIR} ; make internal_representation)
+
+# build .a file for all libraries in Production
+if [ -n "$PRODUCTION" ]
+then
+for lib in $LIBS ; do
+	echo; echo
+	(echo cd ${LIBSRCDIR}/${lib} ; cd ${LIBSRCDIR}/${lib}; 
+		echo "Making ${LIBDIR}/lib${lib}.a"
+		if [ -n "$RECOMPILE" ]
+		then
+			make $MAKE_OPTION clean >/dev/null
+			make $MAKE_OPTION production-depend >/dev/null
+		fi ;
+		make $MAKE_OPTION ${LIBDIR}/lib${lib}.a >/dev/null)
+	if [ $? -ne 0 ] ; then
+		echo "Failed in building library $lib in Production"
+		FAILURES="$FAILURES $lib (P),"
+#	else
+#	(echo cd ${LIBSRCDIR}/${lib} ; cd ${LIBSRCDIR}/${lib}; 
+#		echo "Quick-installing ${LIBDIR}/lib${lib}.a"
+#		make $MAKE_OPTION quick-install)
+	fi
+done
+fi
+
+# build .a file for all libraries in Development
+if [ -n "$DEVELOPMENT" ]
+then
+for lib in $LIBS ; do
+	echo; echo
+	(echo cd ${DEVEDIR}/Lib/${lib}; cd ${DEVEDIR}/Lib/${lib}; 
+		echo "Making lib${lib}.a"
+		make $MAKE_OPTION lib${lib}.a >/dev/null)
+	if [ $? -ne 0 ] ; then
+		echo "Failed in building library $lib in Development"
+		FAILURES="$FAILURES $lib (D),"
+	fi
+done
+fi
+
+# test programs in libraries are now obsolete
+# build test program for all libraries
+# for lib in $LIBS ; do
+#	echo; echo; echo; echo "Making ${lib}"
+#	(cd ${LIBSRCDIR}/${lib} ; pwd; make ${BINDIR}/${lib})
+#	if [ $? -ne 0 ] ; then
+#		echo "Failed in building test program for librairies"
+#	fi
+# done
+
+# build passes
+if [ -n "$PRODUCTION" ]
+then
+	if test ! -d ${BINDIR}
+	then
+		mkdir ${BINDIR}
+	fi
+for pass in $PASSES ; do
+	echo; echo
+#	printenv
+	(echo cd ${BINSRCDIR}/${pass}; cd ${BINSRCDIR}/${pass}; 
+		echo "Making ${BINDIR}/${pass}"
+		if [ -n "$RECOMPILE" ]
+		then
+			make $MAKE_OPTION clean >/dev/null
+			make $MAKE_OPTION production-depend >/dev/null
+		fi ;
+		make $MAKE_OPTION ${BINDIR}/${pass} >/dev/null)
+	if [ $? -ne 0 ] ; then
+		echo " Failed in building ${BINDIR}/${pass}"
+		FAILURES="$FAILURES $pass (P),"
+#	else
+#	(echo cd ${BINSRCDIR}/${pass} ; cd ${BINSRCDIR}/${pass}; 
+#		echo "Quick-installing ${BINDIR}/${pass}"
+#		make $MAKE_OPTION quick-install)
+	fi
+done
+fi
+
+# build passes
+if [ -n "$DEVELOPMENT" ]
+then
+for pass in $PASSES ; do
+	echo; echo
+	(echo cd ${DEVEDIR}/Passes/${pass} ; cd ${DEVEDIR}/Passes/${pass};
+		echo "Making ${pass}"
+		make $MAKE_OPTION ${pass} >/dev/null)
+	if [ $? -ne 0 ] ; then
+		echo " Failed in building pass $pass in Development"
+		FAILURES="$FAILURES $pass (D),"
+	fi
+done
+fi
+
+echo Failures: $FAILURES
+
