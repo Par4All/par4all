@@ -4,7 +4,7 @@
  * normalization of HPF declarations.
  *
  * $RCSfile: declarations.c,v $ version $Revision$
- * ($Date: 1995/10/05 11:32:37 $, )
+ * ($Date: 1995/12/19 15:52:38 $, )
  */
  
 #include "defines-local.h"
@@ -25,10 +25,9 @@ bool expression_constant_p(expression); /* in static_controlize */
 static list name = NIL;\
 int number_of_##name(){return(gen_length(name));}\
 list list_of_##name(){return(name);}\
-bool pred_name(e)entity e;{return(gen_in_list_p(e, name));}\
-void set_name(e)entity e;{\
-    if (!gen_in_list_p(e, name)){\
-	name = CONS(ENTITY, e, name); normalize_hpf_object(e);}}
+bool pred_name(entity e){return(gen_in_list_p(e, name));}\
+void set_name(entity e){ if (!gen_in_list_p(e, name)){\
+ name = CONS(ENTITY, e, name); normalize_hpf_object(e);}}
 
 STATIC_LIST_OF_HPF_OBJECTS(distributed_arrays, set_array_as_distributed, 
 			   array_distributed_p)
@@ -139,10 +138,7 @@ void close_hpf_number_status()
     init_currents();
 }
 
-/*
- * GiveToHpfObjectsTheirNumber
- *
- * give to hpf objects listed in distributedarrays, templates and processors
+/* give to hpf objects listed in distributedarrays, templates and processors
  * their number for the code generation...
  */
 void GiveToHpfObjectsTheirNumber()
@@ -201,16 +197,17 @@ entity e;
 
 /****************************************************** ALIGN and DISTRIBUTE */
 
-GENERIC_CURRENT_MAPPING(align, align, entity)
-GENERIC_CURRENT_MAPPING(distribute, distribute, entity)
+GENERIC_GLOBAL_FUNCTION(hpf_alignment, alignmap)
+GENERIC_GLOBAL_FUNCTION(hpf_distribution, distributemap)
 
 /********************************************************** NEW DECLARATIONS */
 
-GENERIC_CURRENT_MAPPING(new_declaration, hpf_newdecls, entity) /* static */
+GENERIC_LOCAL_FUNCTION(new_declaration, newdeclmap)
 
-tag new_declaration(array, dim)
-entity array;
-int dim;
+tag 
+new_declaration_tag(
+    entity array,
+    int dim)
 {
     tag t;
 
@@ -219,15 +216,16 @@ int dim;
 
     t = hpf_newdecl_tag
 	(HPF_NEWDECL(gen_nth(dim-1, 
-	 hpf_newdecls_dimensions(load_entity_new_declaration(array)))));
+	 hpf_newdecls_dimensions(load_new_declaration(array)))));
 
     pips_debug(1, "%s[%d]: %d\n", entity_name(array), dim, t);
 
     return(t);
 }
 
-static void create_new_declaration(e)
-entity e;
+static void 
+create_new_declaration(
+    entity e)
 {
     type t = entity_type(e);
     list l = NIL;
@@ -240,10 +238,11 @@ entity e;
     for(; ndim>0; ndim--)
 	l = CONS(HPF_NEWDECL, make_hpf_newdecl(is_hpf_newdecl_none, UU), l);
 
-    store_entity_new_declaration(e, make_hpf_newdecls(l));
+    store_new_declaration(e, make_hpf_newdecls(l));
 }
 
-void store_new_declaration(array, dim, what)
+static void 
+store_a_new_declaration(array, dim, what)
 entity array;
 int dim;
 tag what;
@@ -253,11 +252,11 @@ tag what;
     pips_assert("valid dimension and distributed array",
 		dim>0 && dim<=7 && array_distributed_p(array));
 
-    if (entity_new_declaration_undefined_p(array))
+    if (!bound_new_declaration_p(array))
 	create_new_declaration(array);
 
     n = HPF_NEWDECL(gen_nth(dim-1, 
-	    hpf_newdecls_dimensions(load_entity_new_declaration(array))));
+	    hpf_newdecls_dimensions(load_new_declaration(array))));
 
     hpf_newdecl_tag(n) = what;
 }
@@ -279,23 +278,19 @@ int i, *pmin, *pmax;
 
 void init_data_status()
 {
-    make_new_declaration_map();
-    make_align_map();
-    make_distribute_map();
+    init_new_declaration();
+    init_hpf_alignment();
+    init_hpf_distribution();
     reset_hpf_object_lists();
 }
 
 data_status get_data_status()
 {
-    newdeclmap n = make_newdeclmap();
-    alignmap a = make_alignmap();
-    distributemap d = make_distributemap();
-
-    function_mapping(n) = get_new_declaration_map(); /* memory leaks ??? */
-    function_mapping(a) = get_align_map();
-    function_mapping(d) = get_distribute_map();
-
-    return(make_data_status(n, a, d,			    
+    /* ??? previsous data_status lost: memory leak
+     */
+    return(make_data_status(get_new_declaration(),
+			    get_hpf_alignment(), 
+			    get_hpf_distribution(),			    
 			    list_of_distributed_arrays(),
 			    list_of_templates(),
 			    list_of_processors()));
@@ -303,18 +298,18 @@ data_status get_data_status()
 
 void reset_data_status()
 {
-    reset_new_declaration_map();
-    reset_align_map();
-    reset_distribute_map();
+    reset_new_declaration();
+    reset_hpf_alignment();
+    reset_hpf_distribution();
     reset_hpf_object_lists();
 }
 
 void set_data_status(s)
 data_status s;
 {
-    set_new_declaration_map(function_mapping(data_status_newdeclmap(s)));
-    set_align_map(function_mapping(data_status_alignmap(s)));
-    set_distribute_map(function_mapping(data_status_distributemap(s)));
+    set_new_declaration(data_status_newdeclmap(s));
+    set_hpf_alignment(data_status_alignmap(s));
+    set_hpf_distribution(data_status_distributemap(s));
     distributed_arrays = data_status_arrays(s);
     templates = data_status_templates(s);
     processors = data_status_processors(s);
@@ -322,14 +317,11 @@ data_status s;
 
 void close_data_status()
 {
-    free_new_declaration_map();
-    free_align_map();
-    free_distribute_map();
+    close_new_declaration();
+    close_hpf_alignment();
+    close_hpf_distribution();
     free_hpf_object_lists();
 }
-
-/*   that is all
- */
 
 
 /********************************************************* Normalizations */
@@ -447,9 +439,9 @@ ComputeNewSizeOfIthDimension(
     entity array,
     tag *newdeclp)
 {
-    align a = load_entity_align(array);
+    align a = load_hpf_alignment(array);
     entity t = align_template(a);
-    distribute d = load_entity_distribute(t);
+    distribute d = load_hpf_distribution(t);
     alignment al = alignment_undefined;
     distribution di = distribution_undefined;
     int rate, param, pdim = 1, asize = SizeOfDimension(dim);
@@ -641,10 +633,10 @@ NewDeclarationOfDistributedArray(
 	    pips_debug(8, "dimension %d isn't touched\n", ithdim);
 	    
 	    newdecl = is_hpf_newdecl_none;
-	    ld = gen_nconc(ld, CONS(DIMENSION, dim, NIL)); /* sharing ! */
+	    ld = gen_nconc(ld, CONS(DIMENSION, copy_dimension(dim), NIL));
 	}
 	
-	store_new_declaration(array, ithdim, newdecl);
+	store_a_new_declaration(array, ithdim, newdecl);
 	
 	ithdim++;
     },
@@ -662,7 +654,7 @@ void NewDeclarationsOfDistributedArrays()
 {
     MAP(ENTITY, array,
     {
-	if (entity_new_declaration_undefined_p(array))
+	if (!bound_new_declaration_p(array))
 	    NewDeclarationOfDistributedArray(array);
 	else
 	    pips_debug(3, "skipping array %s\n", entity_name(array));
@@ -674,8 +666,8 @@ void NewDeclarationsOfDistributedArrays()
 
 GENERIC_GLOBAL_FUNCTION(overlap_status, overlapsmap)
 
-static void create_overlaps(e)
-entity e;
+static void 
+create_overlaps(entity e)
 {
     type t = entity_type(e);
     list o=NIL;
@@ -691,9 +683,7 @@ entity e;
     pips_assert("overlap stored", bound_overlap_status_p(e));
 }
 
-/* set_overlap(ent, dim, side, width)
- *
- * set the overlap value for entity ent, on dimension dim,
+/* set the overlap value for entity ent, on dimension dim,
  * dans side side to width, which must be a positive integer.
  * if necessary, the overlap is updates with the value width.
  */
@@ -721,9 +711,7 @@ int dim, side, width;
     }
 }
 
-/* int get_overlap(ent, dim, side)
- *
- * returns the overlap for a given entity, dimension and side,
+/* returns the overlap for a given entity, dimension and side,
  * to be used in the declaration modifications
  */
 int get_overlap(ent, dim, side)
@@ -741,9 +729,7 @@ int dim, side;
     return(side ? overlap_upper(o) : overlap_lower(o));
 }
 
-/* static void overlap_redefine_expression(pexpr, ov)
- *
- * redefine the bound given the overlap which is to be included
+/* redefines the bound given the overlap which is to be included
  */
 static void overlap_redefine_expression(pexpr, ov)
 expression *pexpr;
