@@ -86,6 +86,10 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
 	(void) fprintf(stderr, "sizem1 = ");
 	print_expression(sizem1);
     }
+    
+    /* make sure that the outer loop do not use a continue */
+    /* that will fall in the inner loop body */
+    loop_label(l)=entity_empty_label();
 
     /* derive a new loop index (FI: only *one* name :-( */
     new_index=make_scalar_integer_entity(
