@@ -38,7 +38,19 @@
    - either ri-util.h must be included, as well as all underlaying libraries
    - or vect_gen_read() and vect_gen_write() must be locally declared,
    at the risk of a future inconsistency
-   */
+*/
+
+/* sigh no more, lady, sigh no more,
+ * man, who decieves ever,
+ * one foot in sea, and one on shore,
+ * to one thing, constant never.
+ * so sigh not so, 
+ * but let them go,
+ * and be your blith
+ * ...
+ * 
+ * - I forgot some part of it I guess. FC
+ */
 
 extern Pvecteur vect_gen_read();
 extern void vect_gen_write();
@@ -170,30 +182,11 @@ Psysteme s;
     return(sc_dup(s));
 }
 
-/* previously in /rice/debug.c */
 void syst_debug(s)
 Psysteme s;
 {
     sc_fprint(stderr, s, entity_local_name);
 }
 
-
-
-void sc_sort(sc, sort_base)
-Psysteme sc;
-Pbase sort_base;
-{
-    sc_vect_sort(sc, compare_Pvecteur);
-    sc->inegalites = 
-	contrainte_sort(sc->inegalites, sc->base, sort_base, TRUE, TRUE);
-    sc->egalites = 
-	contrainte_sort(sc->egalites, sc->base, sort_base, TRUE, TRUE);
-}
-
-
-
 /*   That is all
  */
-
-
-
