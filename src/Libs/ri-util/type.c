@@ -72,7 +72,8 @@ int the_tag;
 	return(make_basic(is_basic_string, string_undefined));
 	break;
     default:
-	pips_error("MakeBasic", "unexpected basic tag\n");
+	pips_error("MakeBasic", "unexpected basic tag: %d\n",
+                   the_tag);
 	break;
     }
     
