@@ -228,10 +228,10 @@
 #define call_to_statement(c) instruction_to_statement(call_to_instruction(c))
 
 #define unary_intrinsic_statement(name, e)\
- call_to_expression(make_call(CreateIntrinsic(name), CONS(EXPRESSION, e, NIL)))
+ call_to_expression(make_call(entity_instrinsic(name),CONS(EXPRESSION,e,NIL)))
 
 #define binary_intrinsic_statement(name, e1, e2)\
- call_to_expression(make_call(CreateIntrinsic(name),\
+ call_to_expression(make_call(entity_instrinsic(name),\
  CONS(EXPRESSION, e1, CONS(EXPRESSION, e2, NIL))))
   
 #define not_expression(e) \
