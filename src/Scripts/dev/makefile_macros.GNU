@@ -1,17 +1,33 @@
 #
-# $RCSfile: makefile_macros.GNU,v $ (version $Revision$)
-# $Date: 1996/09/19 11:51:51 $, 
+# $Id$
+#
+# $Log: makefile_macros.GNU,v $
+# Revision 1.28  1997/03/26 17:25:59  coelho
+# simply GNU softwares.
+#
 #
 # this file contains macro definitions 
 
 AR	= gar
 ARFLAGS	= rv
 CC	= gcc
-CFLAGS	= -O2 -ansi -g -pedantic -Wall -msupersparc -pipe
+CFLAGS	= -O2 -ansi -g -pedantic -Wall -pipe
 CMKDEP	= -M
-CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include 
+CPPFLAGS= \
+	-D__USE_FIXED_PROTOTYPES__ \
+	-I. \
+	-I$(NEWGEN_ROOT)/Include \
+	-I$(LINEAR_ROOT)/Include \
+	-I$(PIPS_ROOT)/Include \
+	-I$(EXTERN_ROOT)/Include 
 LD	= $(CC) 
-LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(EXTERN_ROOT)/Lib/$(ARCH)
+LDFLAGS	= \
+	-g \
+	-L./$(ARCH) \
+	-L$(PIPS_ROOT)/Lib/$(ARCH) \
+	-L$(NEWGEN_ROOT)/Lib/$(ARCH) \
+	-L$(LINEAR_ROOT)/Lib/$(ARCH) \
+	-L$(EXTERN_ROOT)/Lib/$(ARCH)
 RANLIB	= granlib
 LEX	= flex
 LFLAGS	= 
@@ -37,5 +53,5 @@ RMAN	= rman
 MAKEIDX	= makeindex
 DVIPS	= dvips
 
-# end of $RCSfile: makefile_macros.GNU,v $
+# end of it!
 #
