@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: manual_accept,v $ (version $Revision$)
-# $Date: 1996/12/27 14:51:17 $, 
+# $Date: 1996/12/30 19:34:16 $, 
 #
 
 CD=$PWD
@@ -11,13 +11,16 @@ do
     cd $dir
     for f in *.result/test.out
     do 
-	ref="`dirname $f`/`basename $f .out`"
-	echo CONSIDERING $ref and $f
-        diff $ref $f | less
-	echo 
-        echo "accept (y|n)?"
-	read answer
-	[ "$answer" = 'y' -o "$answer" = 'Y' ] && mv $f $ref
+        if [ "$f" != "*.result/test.out" ] 
+        then
+	    ref="`dirname $f`/`basename $f .out`"
+	    echo CONSIDERING $ref and $f
+	    diff $ref $f | less
+	    echo 
+	    echo "accept (y|n)?"
+	    read answer
+	    [ "$answer" = 'y' -o "$answer" = 'Y' ] && mv $f $ref
+	fi
     done
     cd $CD
 done
