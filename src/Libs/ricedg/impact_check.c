@@ -10,10 +10,10 @@ static entity current_mod = entity_undefined;
 static graph dg = NULL; /* data dependance graph */
 static entity alias_ent1 = entity_undefined;
 static entity alias_ent2 = entity_undefined;
-static statement stat_read1 = statement_undefined;
-static statement stat_write1 = statement_undefined;
-static statement stat_read2 = statement_undefined;
-static statement stat_write2 = statement_undefined;
+static list stat_reads1 = NIL; /* list of statements */
+static list stat_writes1 = NIL; /* list of statements */
+static list stat_reads2 = NIL; /* list of statements */
+static list stat_writes2 = NIL; /* list of statements */
 static list current_path = NIL;
 static int statement_in_caller_ordering = 0;
 static statement statement_in_caller = statement_undefined;
@@ -241,57 +241,220 @@ static void print_impact_description(statement s1, statement s2, int dep_type)
     return;
 }
 
-static bool check_new_arc_by_statement_flt(statement s)
+list union_list(list l1, list l2) {
+    MAP(STATEMENT, s, {
+        if (!gen_in_list_p(s, l1))
+	  ADD_ELEMENT_TO_LIST(l1, STATEMENT, s);
+    }, l2);
+    return l1;
+}
+
+static bool check_new_arc_for_unstructured_statement(statement s)
 {
     instruction i = statement_instruction(s);
-    if (instruction_sequence_p(i) || instruction_test_p(i)
+    if (instruction_block_p(i) || instruction_sequence_p(i) || instruction_test_p(i)
 	|| instruction_whileloop_p(i) || instruction_loop_p(i))
       return TRUE;
-
+    
     MAP(EFFECT, eff, {
         entity e = reference_variable(effect_reference(eff));
 	action act = effect_action(eff);
 
 	if (entity_conflict_p(e, alias_ent1)) {
 	    if (action_read_p(act)) {
-	        stat_read1 = s;
-		if (!statement_undefined_p(stat_write2)) { /* new flow-dependance created */
-		    if (!check_way_between_two_statements(stat_write2, s, dg))
-		      print_impact_description(stat_write2, s, DEP_FLOW);
-		}
+	        gen_free_list(stat_reads1);
+		stat_reads1 = CONS(STATEMENT, s, NIL);
+		MAP(STATEMENT, sw2, {
+		    if (!statement_undefined_p(sw2)) { /* new flow-dependance created */
+		        if (!check_way_between_two_statements(sw2, s, dg))
+			    print_impact_description(sw2, s, DEP_FLOW);
+		    }
+		}, stat_writes2);
 	    } else {
-	        stat_write1 = s;
-		if (!statement_undefined_p(stat_read2)) { /* new anti-dependance created */
-		    if (!check_way_between_two_statements(stat_read2, s, dg))
-		      print_impact_description(stat_read2, s, DEP_ANTI);
-		}
-		if (!statement_undefined_p(stat_write2)) { /* new output-dependance created */
-		    if (!check_way_between_two_statements(stat_write2, s, dg))
-		      print_impact_description(stat_write2, s, DEP_OUTP);
-		}
+	        gen_free_list(stat_writes1);
+		stat_writes1 = CONS(STATEMENT, s, NIL);
+		MAP(STATEMENT, sr2, {
+		    if (!statement_undefined_p(sr2)) { /* new anti-dependance created */
+		        if (!check_way_between_two_statements(sr2, s, dg))
+			    print_impact_description(sr2, s, DEP_ANTI);
+		    }
+		}, stat_reads2);
+		MAP(STATEMENT, sw2, {
+		    if (!statement_undefined_p(sw2)) { /* new output-dependance created */
+		        if (!check_way_between_two_statements(sw2, s, dg))
+			    print_impact_description(sw2, s, DEP_OUTP);
+		    }
+		}, stat_writes2);
 	    }
 	}
 	if (entity_conflict_p(e, alias_ent2)) {
 	    if (action_read_p(act)) {
-	        stat_read2 = s;
-		if (!statement_undefined_p(stat_write1)) { /* new flow-dependance created */
-		    if (!check_way_between_two_statements(stat_write1, s, dg))
-		      print_impact_description(stat_write1, s, DEP_FLOW);
-		}
+	        gen_free_list(stat_reads2);
+		stat_reads2 = CONS(STATEMENT, s, NIL);
+		MAP(STATEMENT, sw1, {
+		    if (!statement_undefined_p(sw1)) { /* new flow-dependance created */
+		        if (!check_way_between_two_statements(sw1, s, dg))
+			    print_impact_description(sw1, s, DEP_FLOW);
+		    }
+		}, stat_writes1);
 	    } else {
-	        stat_write2 = s;
-		if (!statement_undefined_p(stat_read1)) { /* new anti-dependance created */
-		    if (!check_way_between_two_statements(stat_read1, s, dg))
-		      print_impact_description(stat_read1, s, DEP_ANTI);
-		}
-		if (!statement_undefined_p(stat_write1)) { /* new output-dependance created */
-		    if (!check_way_between_two_statements(stat_write1, s, dg))
-		      print_impact_description(stat_write1, s, DEP_OUTP);
-		}
+	        gen_free_list(stat_writes2);
+		stat_writes2 = CONS(STATEMENT, s, NIL);
+		MAP(STATEMENT, sr1, {
+		    if (!statement_undefined_p(sr1)) { /* new anti-dependance created */
+		        if (!check_way_between_two_statements(sr1, s, dg))
+			    print_impact_description(sr1, s, DEP_ANTI);
+		    }
+		}, stat_reads1);
+		MAP(STATEMENT, sw1, {
+		    if (!statement_undefined_p(sw1)) { /* new output-dependance created */
+		        if (!check_way_between_two_statements(sw1, s, dg))
+			    print_impact_description(sw1, s, DEP_OUTP);
+		    }
+		}, stat_writes1);
 	    }
 	}
     }, statement_to_effects(s));
     return TRUE;
+}
+
+static void check_new_arc_for_structured_statement(statement s)
+{
+    instruction istat;
+    if ((statement_undefined_p(s)) || (s == NULL)) return;
+    istat = statement_instruction(s);
+
+    switch(instruction_tag(istat)) {
+    case is_instruction_block:
+        MAP(STATEMENT, s, check_new_arc_for_structured_statement(s), instruction_block(istat));
+	break;
+    case is_instruction_test:
+      {
+	list stat_reads1_true = NIL;
+	list stat_reads2_true = NIL;
+	list stat_writes1_true = NIL;
+	list stat_writes2_true = NIL;
+
+	list stat_reads1_old = NIL;
+	list stat_reads2_old = NIL;
+	list stat_writes1_old = NIL;
+	list stat_writes2_old = NIL;
+
+	/* save the old read, write statements */
+        stat_reads1_old = gen_full_copy_list(stat_reads1);
+	stat_reads2_old = gen_full_copy_list(stat_reads2);
+	stat_writes1_old = gen_full_copy_list(stat_writes1);
+	stat_writes2_old = gen_full_copy_list(stat_writes2);
+
+	/* read, write statements may be modified after the line below */
+        check_new_arc_for_structured_statement(test_true(instruction_test(istat)));
+
+	/* store the new version */
+	stat_reads1_true = stat_reads1;
+	stat_reads2_true = stat_reads2;
+	stat_writes1_true = stat_writes1;
+	stat_writes2_true = stat_writes2;
+
+	/* restore the old version */
+	stat_reads1 = stat_reads1_old;
+	stat_reads2 = stat_reads2_old;
+	stat_writes1 = stat_writes1_old;
+	stat_writes2 = stat_writes2_old;
+
+	stat_reads1_old = NIL;
+	stat_reads2_old = NIL;
+	stat_writes1_old = NIL;
+	stat_writes2_old = NIL;
+
+	/* read, write statements may be modified after the line below */
+	check_new_arc_for_structured_statement(test_false(instruction_test(istat)));
+	
+	stat_reads1 = union_list(stat_reads1, stat_reads1_true);
+	stat_reads2 = union_list(stat_reads2, stat_reads2_true);
+	stat_writes1 = union_list(stat_writes1, stat_writes1_true);
+	stat_writes2 = union_list(stat_writes2, stat_writes2_true);
+	
+	gen_free_list(stat_reads1_true);
+	gen_free_list(stat_reads2_true);
+	gen_free_list(stat_writes1_true);
+	gen_free_list(stat_writes2_true);
+
+	break;
+      }
+    case is_instruction_loop:
+        check_new_arc_for_structured_statement(loop_body(instruction_loop(istat)));
+	break;
+    case is_instruction_whileloop:
+    case is_instruction_goto:
+        break;
+    case is_instruction_unstructured:
+        check_new_arc_for_structured_statement(instruction_unstructured(istat));
+	break;
+    case is_instruction_call:
+        MAP(EFFECT, eff, {
+	    entity e = reference_variable(effect_reference(eff));
+	    action act = effect_action(eff);
+
+	    if (entity_conflict_p(e, alias_ent1)) {
+	        if (action_read_p(act)) {
+		    gen_free_list(stat_reads1);
+		    stat_reads1 = CONS(STATEMENT, s, NIL);
+		    MAP(STATEMENT, sw2, {
+		        if (!statement_undefined_p(sw2)) { /* new flow-dependance created */
+			    if (!check_way_between_two_statements(sw2, s, dg))
+			        print_impact_description(sw2, s, DEP_FLOW);
+			}
+		    }, stat_writes2);
+		} else {
+		    gen_free_list(stat_writes1);
+		    stat_writes1 = CONS(STATEMENT, s, NIL);
+		    MAP(STATEMENT, sr2, {
+		        if (!statement_undefined_p(sr2)) { /* new anti-dependance created */
+			    if (!check_way_between_two_statements(sr2, s, dg))
+			        print_impact_description(sr2, s, DEP_ANTI);
+			}
+		    }, stat_reads2);
+		    MAP(STATEMENT, sw2, {
+		        if (!statement_undefined_p(sw2)) { /* new output-dependance created */
+			    if (!check_way_between_two_statements(sw2, s, dg))
+			        print_impact_description(sw2, s, DEP_OUTP);
+			}
+		    }, stat_writes2);
+		}
+	    }
+	    if (entity_conflict_p(e, alias_ent2)) {
+	        if (action_read_p(act)) {
+		    gen_free_list(stat_reads2);
+		    stat_reads2 = CONS(STATEMENT, s, NIL);
+		    MAP(STATEMENT, sw1, {
+		        if (!statement_undefined_p(sw1)) { /* new flow-dependance created */
+			    if (!check_way_between_two_statements(sw1, s, dg))
+			        print_impact_description(sw1, s, DEP_FLOW);
+			}
+		    }, stat_writes1);
+		} else {
+		    gen_free_list(stat_writes2);
+		    stat_writes2 = CONS(STATEMENT, s, NIL);
+		    MAP(STATEMENT, sr1, {
+		        if (!statement_undefined_p(sr1)) { /* new anti-dependance created */
+			    if (!check_way_between_two_statements(sr1, s, dg))
+			        print_impact_description(sr1, s, DEP_ANTI);
+			}
+		    }, stat_reads1);
+		    MAP(STATEMENT, sw1, {
+		        if (!statement_undefined_p(sw1)) { /* new output-dependance created */
+			    if (!check_way_between_two_statements(sw1, s, dg))
+			        print_impact_description(sw1, s, DEP_OUTP);
+			}
+		    }, stat_writes1);
+		}
+	    }
+	}, statement_to_effects(s));
+	break;
+    default:
+	/*pips_error("check_new_arc_statement", "case default reached\n");*/
+        break;
+    }
 }
 
 static void impact_check_two_scalar_variables_in_path(entity e1, entity e2, expression off1, expression off2, list path)
@@ -310,14 +473,23 @@ static void impact_check_two_scalar_variables_in_path(entity e1, entity e2, expr
         return;
     else {
         /* alias */
+
         alias_ent1 = e1;
 	alias_ent2 = e2;
 	current_path = path;
-        gen_recurse(mod_stat, statement_domain, check_new_arc_by_statement_flt, gen_null);
-	stat_read1 = statement_undefined;
-	stat_read2 = statement_undefined;
-	stat_write1 = statement_undefined;
-	stat_write2 = statement_undefined;
+	
+        check_new_arc_for_structured_statement(mod_stat);
+	/*gen_recurse(mod_stat, statement_domain, check_new_arc_for_unstructured_statement, gen_null);*/
+
+	gen_free_list(stat_reads1);
+	gen_free_list(stat_reads2);
+	gen_free_list(stat_writes1);
+	gen_free_list(stat_writes2);
+	stat_reads1 = NIL;
+	stat_reads2 = NIL;
+	stat_writes1 = NIL;
+	stat_writes2 = NIL;
+
 	alias_ent1 = entity_undefined;
 	alias_ent2 = entity_undefined;
 	current_path = NIL;
@@ -351,7 +523,7 @@ static bool variable_is_written_by_statement_flt(statement s)
 			fprintf(stderr,"\n Current entity %s :\n",entity_name(current_entity));
 		    }
 		    written = TRUE;
-		    //gen_recurse_stop(NULL);
+		    /* gen_recurse_stop(NULL); */
 		    return FALSE;
 		}
 	    }
@@ -363,12 +535,12 @@ static bool variable_is_written_by_statement_flt(statement s)
 
 static bool variable_is_written_p(entity ent)
 {
-  written = FALSE;
-  current_entity = ent;
-  gen_recurse(mod_stat,statement_domain,
-	      variable_is_written_by_statement_flt,gen_null);
-  current_entity = entity_undefined;
-  return written;
+    written = FALSE;
+    current_entity = ent;
+    gen_recurse(mod_stat,statement_domain,
+		variable_is_written_by_statement_flt,gen_null);
+    current_entity = entity_undefined;
+    return written;
 }
 
 static void impact_check_two_variables(entity e1, entity e2, expression off1, expression off2, list path)
@@ -542,21 +714,6 @@ bool impact_check(char * module_name)
 
     return TRUE; 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
