@@ -77,6 +77,7 @@ install_forward_makefiles:
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Passes/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Scripts/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Runtime/Makefile
+	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Documentation/Makefile
 	$(COPY) forward_gnu_makefile ${NEWGEN_DEVEDIR}/Makefile
 	$(COPY) forward_gnu_makefile ${LINEAR_DEVEDIR}/Makefile
 
