@@ -360,6 +360,8 @@ bool print_parallelizedcray_code(char *mod_name)
 		       PARALLEL_FORTRAN_EXT, 
 		       text_module(module, mod_stat) );
 
+    close_prettyprint();
+
     /* free proper effects and cumulated effects */
     free_list_effects_mapping( get_cumulated_effects_map() );
     free_list_effects_mapping( get_proper_effects_map() );
