@@ -99,10 +99,10 @@ int dim, side, width;
 	hi = get_int_hash_table(ent);
     int
 	key = 2*dim+side,
-	i = (int) hash_get(hi, key);
+	i = (int) hash_get(hi, (char *)key);
 
     if ((i == (int) HASH_UNDEFINED_VALUE) || (i < width))
-	hash_put(hi, key, width);
+	hash_put(hi, (char *)key, (char *)width);
 }
 
 /*
@@ -119,7 +119,7 @@ int dim, side;
 	hi = get_int_hash_table(ent);
     int
 	key = 2*dim+side,
-	i = (int) hash_get(hi, key);
+	i = (int) hash_get(hi, (char *)key);
 
     if (i == (int) HASH_UNDEFINED_VALUE)
 	return(0);
