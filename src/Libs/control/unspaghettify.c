@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/05/29 15:34:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/06/11 18:47:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/05/29 15:34:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/06/11 18:47:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -925,16 +925,344 @@ restructure_if_then_else(statement s)
 }
 
 
+/* *** Warning ***
+
+   We use the NewGen graph structure in reverse order since we need
+   predecessor graph and not successor graph.
+
+   Let us lay down this cpp lie for programmer's sake...
+   */
+#define vertex_predecessors vertex_successors
+
+
+/* Test if a interval node is in another interval: */
+bool
+is_node_in_interval_p(vertex node,
+		      vertex interval)
+{
+}
+
+
+/* Add the interval from (node, old_intervals) to interval graph
+   intervals and update selected_nodes accordingly: */
+void
+add_interval(vertex node,
+	     vertex old_intervals,
+	     vertex intervals,
+	     set selected_nodes)
+{
+    bool a_node_has_been_added;
+    entry_node = VERTEX(CAR(old_intervals));
+    /* Create a new interval: */
+    vertex interval = make_vertex(vertex_label, NIL);
+    /* The entry node will be added by the following line, so we can
+       remove the test against the entry node afterwars: */
+    add_node_to_interval(node, interval, selected_nodes);
+    do {
+	a_node_has_been_added = FALSE;
+	MAP(VERTEX, candidate, {
+	    if (!set_belong_p(selected_nodes, (char *) candidate)) {
+		bool all_predecessors_are_in_current_interval = TRUE;
+		/* Test that the candidate has all its predecessors in
+		   the interval we are building: */
+		MAP(VERTEX, predecessor, {
+		    if (!is_node_in_interval_p(predecessor, interval)) {
+			all_predecessors_are_in_current_interval = FALSE;
+			break;
+		    }
+		}, vertex_predecessors(candidate));
+		if (all_predecessors_are_in_current_interval) {
+		    /* Ok, this node belong to the new interval: */
+		    add_node_to_interval(candidate, interval, selected_nodes);
+		    /* Look for the next appliant: */
+		    a_node_has_been_added = TRUE;
+		    break;
+		}
+	    } graph_vertex(old_intervals));
+	} while(a_node_has_been_added);
+    }
+    /* Add the new interval to the graph: */
+    graph_vertices(intervals) = gen_nconc(graph_vertices(intervals),
+					  CONS(VERTEX, interval, NIL));
+}
+
+
+/* Build an interval graph from an other interval graph.
+
+   Algorithm can be found on page 665 of:
+
+@book{dragon-1986,
+    author = {Alfred V. Aho and Ravi Sethi and Jeffrey D. Ullman},
+    title = {Compilers Principles, Techniques and Tools},
+    publisher = {Addison-Wesley Publishing Company},
+    year = 1986
+    }
+*/
+bool
+interval_graph(old_intervals,
+	       &intervals,
+	       &intervals_to_control_nodes)
+{
+    bool a_node_has_been_selected;
+    set selected_nodes = set_make(set_pointer);
+
+    /* According to the vertex ordering, the algorithm should pick the
+       entry node first. */
+    do {
+    /* First select nodes not already selected but with at least 1
+       selected predecessor and build a new interval from it: */
+	a_node_has_been_selected = FALSE;
+	MAP(VERTEX, node, {
+	    if (!set_belong_p(selected_nodes, (char *) nodes)) {
+		MAP(VERTEX, predecessor, {
+		    if (set_belong_p(selected_nodes, (char *) predecessor)) {
+			add_interval(node, old_intervals, intervals, selected_nodes);
+			/* Let's go to find a new interval nest: */
+			a_node_has_been_selected = TRUE;
+			break;
+		    }
+		}, vertex_predecessors(node));
+		if (a_node_has_been_selected)
+		    /* Begin a new selection process: */
+		    break;
+	    }
+	}, graph_vertices(old_intervals));
+    } while (a_node_has_been_selected);
+}
+
+
+/* Duplicate the control graph in a format suitable to deal with
+   intervals later: */
+control
+control_to_interval_format(control entry_node,
+			   hash_map intervals_to_control_nodes)
+{
+    list blocs = NIL;
+    hash_table intervals_to_control_nodes = hash_table_make(hash_pointer, 0);
+    /* A bovine approach :-( */
+    control new_control = copy_control(entry_node);
+    CONTROL_MAP(c, {
+	free_statement(control_statement(c));
+	control_statement(c) = statement_undefined;
+	/* The plain initial interval graph is itself: */
+	hash_put(intervals_to_control_nodes...);
+    }, new_control, blocs);
+    gen_free_list(blocs);
+}
+
+
+/* Return the list of control node exiting an interval: */
+list
+interval_exit_nodes(interval_vertex_label interval)
+{
+    list exit_controls = NIL;
+    
+    MAP(CONTROL, c, {
+	MAP(CONTROL, successor, {	    
+	    if (!gen_in_list_p(successor,
+			       interval_vertex_label_controls(interval))) {
+		/* A successor that is not in the interval is an exit
+                   node... Add it to the exit nodes list if not
+                   already in it: */
+		if (!gen_in_list_p(successor, exit_controls))
+		    exit_controls = CONS(CONTROL, successor, exit_controls);
+	    }
+	}, control_successors(c));
+    }, interval_vertex_label_controls(interval));
+
+    return exit_controls;
+}
+
+
+/* Replace all the reference to x in list l by a reference to y: */
+void
+gen_list_patch(cons * l,
+	       gen_chunk * x,
+	       gen_chunk * y)
+{
+    MAPL(pc, {
+	 if (CAR(pc).p == x)
+	     CAR(pc).p = y;
+     }, l);
+}
+
+
+/* Transfer the control node c as a predecessor from old_node to
+   new_node: */
+void
+transfer_control_predecessor(control old_node,
+			     control new_node,
+			     control c)
+{
+    MAP(CONTROL, predecessor, {
+	if (predecessor == c)
+	    /* Add c as a predecessor of new_node: */
+	    control_predecessors(new_node) =
+		gen_nconc(control_predecessors(new_node),
+			  CONS(CONTROL, c, NIL));
+    }, control_predecessors(old_node));
+    /* Remove c as a predecessor of old_node: */
+    gen_remove(&control_predecessors(old_node), c);
+    /* Correct the reverse link c->old_node to c->new_node: */
+    gen_list_patch(control_successors(c), old_node, new_node);
+}
+
+
+/* Transfer the control node c as a successor from old_node to
+   new_node: */
+void
+transfer_control_successor(control old_node,
+			   control new_node,
+			   control c)
+{
+    MAP(CONTROL, successor, {
+	if (successor == c)
+	    /* Add c as a predecessor of new_node: */
+	    control_successors(new_node) =
+		gen_nconc(control_successors(new_node),
+			  CONS(CONTROL, c, NIL));
+    }, control_successors(old_node));
+    /* Remove c as a successor of old_node: */
+    gen_remove(&control_successors(old_node), c);
+    /* Correct the reverse link c->old_node to c->new_node: */
+    gen_list_patch(control_predecessors(c), old_node, new_node);
+}
+
+
+/* Replace all the references to old_node by new_node in the
+   successors & predeccessors of the controls in the control node
+   list: */
+void
+replace_control_related_to_a_list(control old_node,
+				  control new_node,
+				  list controls)
+{
+    /* Since we need to keep successors order (to avoid for example
+       IF/THEN/ELSE transformed in IF/ELSE/THEN), iterate directly on
+       the links of old_node instead of on controls: */
+    /* First transfer the predecessors in controls from old_node to
+       new_node: */
+    MAP(CONTROL, c, {
+	if (gen_in_list_p(c, controls))
+	    transfer_control_predecessor(old_node, new_node, c);
+    }, control_predecessors(old_node));
+    /* And then transfer the successors in controls from old_node to
+       new_node: */
+    MAP(CONTROL, c, {
+	if (gen_in_list_p(c, controls))
+	    transfer_control_successor(old_node, new_node, c);
+    }, control_successors(old_node));
+}
+
+
+/* Detach the controls from the interval to avoid removing them later
+   since they are not persistent... */
+bool
+clean_up_interval_controls(interval_vertex_label i)
+{
+    gen_free_list(interval_vertex_label_controls(i));
+    interval_vertex_label_controls(i) = NIL;
+
+    /* Stop the recursion to avoid leaping in outer space... */
+    return FALSE;
+}
+
+
+/* Put all the controls in their own unstructured to hierarchize the
+   graph and link the unstructured to the outer unstructured: */
+void
+hierarchize_control_list(list controls,
+			 control exit_node)
+{
+    control entry_node = CONTROL(CAR(controls));
+    /* Create the new control nodes with the new unstructured: */
+    control new_entry_node = make_control(control_statement(entry_node),
+					  NIL, NIL);
+    control new_exit_node = make_control(make_nop_statement(),
+					 NIL, NIL);
+    unstructured new_unstructured = make_unstructured(new_entry_node,
+						      new_exit_node);
+    control_statement(entry_node) =
+	make_stmt_of_instr(make_instruction(is_instruction_unstructured,
+					    new_unstructured));
+    /* Now the hard work: replace carefully the old control nodes by
+       new one in the spaghetti plate... */
+    replace_control_related_to_a_list(entry_node, new_entry_node, controls);
+    replace_control_related_to_a_list(exit_node, new_exit_node, controls);
+}
+
+
 /* Use an interval graph partitionning method to recursively
    decompose the control graph: */
 void
 control_graph_recursive_decomposition(statement s)
 {
-  /*
-    graph interval = interval_graph(entry_node);
-    */
-}
+    /* An interval graph is represented by a graph with
+       interval_vertex_label decorations. The first interval of the
+       graph is the entry interval of the interval graph and the first
+       control node of an interval is the entry control node of the
+       interval: */
+    graph intervals;
+    bool modified;
+    instruction i = statement_instruction(s);
+    unstructured u = instruction_unstructured(i);
+    control entry_node = unstructured_control(u);
+    /* To record the entry node of intervals that have been
+       hierarchized: */
+    set control_already_hierarchized = set_make(set_pointer);
 
+    /* The seed interval graph is indeed the control graph itself: */
+    graph old_intervals = control_to_interval_format(entry_node);
+    /* To be able to clean up all the interval graphs later: */
+    list all_the_intervals = CONS(GRAPH, old_intervals, NIL);
+
+    /* Apply recursively interval graph decomposition: */
+    do {
+	list blocs = NIL;
+	/* Construct the interval graph from the previous one: */
+	modified = interval_graph(old_intervals, &intervals);
+	all_the_intervals = CONS(GRAPH, intervals, all_the_intervals);
+
+	/* For all intervals of the graph: */
+	MAP(interval, {
+	    list interval_exits = interval_exit_nodes(interval);
+	    if (gen_length(interval_exits) == 1) {
+		/* If an interval has only one exit, the underlaying
+                   control graph can be hierachized by an
+                   unstructured: */
+		list controls = interval_vertex_label_controls(interval);
+		if (!set_belong_p(control_already_hierarchized,
+				  (char *) CONTROL(CAR(controls)))) {
+		    /* Put all the controls in their own unstructured
+                       to hierarchize the graph: */
+		    hierarchize_control_list(controls,
+					     CONTROL(CAR(interval_exits)));
+		    set_add_element(control_already_hierarchized,
+				    control_already_hierarchized,
+				    (char *) CONTROL(CAR(controls)));
+		}
+	    }
+	    gen_free_list(interval_exits);
+	}, graph_vertices(intervals), blocs);
+	old_intervals = intervals;
+	/* Stop if the interval graph does no longer changed : it is
+           only one node or an irreductible graph: */
+    } while (modified);
+
+
+    /* Remove the links from interval to controls to avoid havoc later
+       (in fact I would need a way to express controls:persistent
+       control* but NewGen cannot yet... :-( ) */
+    MAP(GRAPH, intervals, {
+	gen_recurse(intervals,
+		    interval_vertex_label_domain,
+		    clean_up_interval_controls,
+		    gen_null);
+    }, all_the_intervals);
+    gen_full_free_list(all_the_intervals);
+
+    set_free(control_already_hierarchized);
+}
 
 
 /* Try to recursively restructure the unstructured: */
@@ -946,7 +1274,7 @@ recursively_restructure_an_unstructured(statement s)
     statement new_unstructured_statement;
     instruction i = statement_instruction(s);
     if (!instruction_unstructured_p(i))
-	/* Just stop, it is no longer an unstructured. */	
+	/* Just stop, it is not or no longer an unstructured. */	
 	return;
 
     /* Replace control sequences by simple nodes: */
@@ -992,75 +1320,47 @@ recursively_restructure_an_unstructured(statement s)
 }
 
 
-/* All optimizations for unstructured during the bottom-up phase */
-void
-unspaghettify_rewrite_unstructured(statement s)
-{
-    instruction i = statement_instruction(s);
-    unstructured u = instruction_unstructured(i);
- 
-    clean_up_exit_node(u);
-   
-    remove_the_unreachable_controls_of_an_unstructured(u);
-
-    ifdebug(5) {
-	pips_debug(0, "after remove_the_unreachable_controls_of_an_unstructured\n");
-	pips_debug(0, "Accessible nodes from entry:\n");
-	display_linked_control_nodes(unstructured_control(u));
-	pips_debug(0, "Accessible nodes from exit:\n");
-	display_linked_control_nodes(unstructured_exit(u));
-	print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-    }
-
-    remove_useless_continue_or_empty_code_in_unstructured(u);
-   
-    ifdebug(5) {
-	pips_debug(5, "after remove_useless_continue_or_empty_code_in_unstructured\n");
-	print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-    }
-   
-    recursively_restructure_an_unstructured(s);
-       
-    ifdebug(5) {
-	pips_debug(5, "End.\n");
-	print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-    }
-}
-
-
 /* This is the function that is applied on each statement of the code
-   in a bottom-up way. Even if we deal with the control graph, that is
-   the "unstructured" instruction, we need to deal with the statement
-   over the unstructured since the restructuration can move some code
+   in a bottom-up way to clean up easy things after the
+   controlizer. Even if we deal with the control graph, that is the
+   "unstructured" instruction, we need to deal with the statement over
+   the unstructured since the restructuration can move some code
    outside of the unstructured in the statement. */
 static void
-unspaghettify_rewrite(statement s)
+clean_up_control(statement s)
 {
-   instruction i = statement_instruction(s);
+    instruction i = statement_instruction(s);
 
-   pips_debug(2, "enter\n");
-   ifdebug (3) {
-      fprintf(stderr, "[ The current statement : ]\n");
-      print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-   }
+    if (instruction_unstructured_p(i)) {
+	unstructured u = instruction_unstructured(i);
+ 
+	pips_debug(2, "enter\n");
+	ifdebug (3) {
+	    fprintf(stderr, "[ The current statement : ]\n");
+	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+	}
 
-   if (instruction_unstructured_p(i)) {
-      unspaghettify_rewrite_unstructured(s);
-      ifdebug (5) {
-         fprintf(stderr, "After dead_rewrite_unstructured:\n");
-         print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-         fprintf(stderr, "-----\n");
-      }
-   }
-   pips_debug(2, "exit\n");
-}
+	clean_up_exit_node(u);
+   
+	remove_the_unreachable_controls_of_an_unstructured(u);
 
+	ifdebug(5) {
+	    pips_debug(0, "after remove_the_unreachable_controls_of_an_unstructured\n");
+	    pips_debug(0, "Accessible nodes from entry:\n");
+	    display_linked_control_nodes(unstructured_control(u));
+	    pips_debug(0, "Accessible nodes from exit:\n");
+	    display_linked_control_nodes(unstructured_exit(u));
+	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+	}
 
-/* Always go down in the module before doing something: */
-static bool
-unspaghettify_filter(statement s)
-{
-   return TRUE;
+	remove_useless_continue_or_empty_code_in_unstructured(u);
+   
+	ifdebug(5) {
+	    pips_debug(5, "after remove_useless_continue_or_empty_code_in_unstructured\n");
+	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+	}
+	pips_debug(2, "exit\n");
+    }
 }
 
 
@@ -1082,8 +1382,18 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
       pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
 
    initialize_unspaghettify_statistics();
+   /* Split the recursion in three parts to fit in my brain: */
+   /* First, clean up easy things done by the controlizer: */
    gen_recurse(mod_stmt, statement_domain,
-               unspaghettify_filter, unspaghettify_rewrite);
+               gen_true, clean_up_control);
+   if (get_bool_property("HIERARCHIZE_CONTROL"))
+       /* Then try to hierarchize the control flow: */
+       gen_recurse(mod_stmt, unstructured_domain,
+		   gen_true, control_graph_recursive_decomposition);
+   /* Now apply some local rule, such as if/then/else restructuring
+      and so on: */
+   gen_recurse(mod_stmt, statement_domain,
+               gen_true, recursively_restructure_an_unstructured);
    display_unspaghettify_statistics();
 
    /* End by removing parasitic sequences: */
