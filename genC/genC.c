@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1995/10/02 13:52:29 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1996/07/16 09:19:06 $, )
  * version $Revision$
  */
 
@@ -352,7 +352,7 @@ void
 gen_arrow( bp )
 struct gen_binding *bp ;
 {
-    char *s, *name = bp->name ;
+    char *name = bp->name ;
     union domain *dom = bp->domain ;
     union domain *image, *start ;
     int data = GEN_HEADER + IS_TABULATED( bp ) ;
