@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/23 22:21:50 $, 
+# $Date: 1996/09/02 09:13:50 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -15,13 +15,11 @@ DERIVED_INC=	resources.h \
 		wpips_transform_menu_layout.h
 
 INSTALL_INC=	$(DERIVED_INC)
-
 INSTALL_DOC=	pipsmake-rc.ps
+INSTALL_HTM=	pipsmake-rc 
 
-INSTALL_HTM=	pipsmake-rc.html \
-		pipsmake-rc 
-
-DERIVED_FILES=	$(INSTALL_SHR) $(DERIVED_INC) $(INSTALL_DOC) $(INSTALL_HTM)
+DERIVED_FILES=	$(INSTALL_SHR) $(DERIVED_INC) $(INSTALL_DOC) $(INSTALL_HTM) \
+		pipsmake-rc.html
 
 all: $(DERIVED_FILES)
 
