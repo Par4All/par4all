@@ -50,6 +50,11 @@ void query_canvas_event_proc(window, event)
 Xv_Window window;
 Event *event;
 {
+  debug_on("WPIPS_EVENT_DEBUG_LEVEL");
+  debug(2,"query_canvas_event_proc",
+	"Event_id %d, event_action %d\n",
+	event_id(event), event_action(event));
+  debug_off();
     switch(event_id(event)) {
         case LOC_WINENTER :
 	  /* enter_window(window); */
@@ -73,26 +78,49 @@ Event *event;
       }
 }
 
-Xv_opaque end_query_notify(item, event)
+/* Pour debug seulement : */
+void end_query_pad_notify(Panel_item item, Event *event)
+{
+  debug_on("WPIPS_EVENT_DEBUG_LEVEL");
+  debug(2,"find_dead_code",
+	"end_query_pad_notify: Event_id %d, event_action %d\n",
+	event_id(event), event_action(event));
+  debug_off();
+}
+
+
+void end_query_notify(item, event)
 Panel_item item;
 Event *event;
 {
     
     char *s = (char *) xv_get(query_pad, PANEL_VALUE);
 
+    /* Dans le cas ou` on vient d'un retour charriot dans le texte : */
+/* Cela ne peut bien entendu pas marcher... :-( */
+/*
+    xv_set(xv_get(query_panel, PANEL_DEFAULT_ITEM, NULL),
+	   PANEL_BUSY, FALSE,
+	   NULL);
+*/    
     if (apply_on_query(s)) {
 	hide_window(query_frame);
+	/* Remet le bouton OK a l'e'tat normal : */
+/*	xv_set(xv_get(query_panel, PANEL_DEFAULT_ITEM, NULL),
+	       PANEL_BUSY, FALSE,
+	       NULL);
+*/
     }
 }
 
-Xv_opaque help_query_notify(item, event)
+void help_query_notify(item, event)
 Panel_item item;
 Event *event;
 {
     display_help(query_help_topic);
 }
 
-Xv_opaque cancel_query_notify(item, event)
+void cancel_query_notify(item, event)
 Panel_item item;
 Event *event;
 {
@@ -103,8 +131,9 @@ void create_query_window()
 {
     query_panel = xv_create(query_frame, PANEL, NULL);
 
+/* Semble ne servir a` rien. RK, 9/11/93. */
     xv_set(canvas_paint_window(query_panel), 
-	   WIN_CONSUME_EVENT, LOC_WINENTER, 
+	   WIN_CONSUME_EVENT, LOC_WINENTER, NULL, 
 /*	   WIN_IGNORE_X_EVENT_MASK, KeyReleaseMask, */
 	   WIN_EVENT_PROC, query_canvas_event_proc, 
 	   NULL);
@@ -113,6 +142,7 @@ void create_query_window()
     query_pad = xv_create(query_panel, PANEL_TEXT, 
 			  PANEL_VALUE_DISPLAY_LENGTH, 20,
 			  PANEL_VALUE_STORED_LENGTH, 128,
+			  PANEL_NOTIFY_PROC, end_query_notify,
 			  NULL);
 
     xv_set(query_panel, PANEL_DEFAULT_ITEM,
