@@ -84,37 +84,37 @@ rule:   	phase deps
 
 deps:		deps dir virtuals
 		{
-			if ($2 == REQUIRED) {
-				rule_required($1) = 
-					gen_nconc(rule_required($1), $3);
-							 
-			}
-			else if ($2 == PRODUCED) {
-				rule_produced($1) = 
-					gen_nconc(rule_produced($1), $3);
-							 
-			}
-			else if ($2 == PRESERVED) {
-				rule_preserved($1) = 
-					gen_nconc(rule_preserved($1), $3);
-			}
-			else if ($2 == MODIFIED) {
-				rule_modified($1) = 
-					gen_nconc(rule_modified($1), $3);
-							 
-			}
-			else if ($2 == PRE_TRANSFORMATION) {
-				rule_pre_transformation($1) = 
-					gen_nconc(rule_pre_transformation($1), $3);
-							 
-			}
-			else {	
-				fprintf(stderr, 
-				        "[readmakefile] unknown dir: %d\n", $2);
-				abort();
-			}
-
-			$$ = $1;
+		    if ($2 == REQUIRED) {
+			rule_required($1) = 
+			    gen_nconc(rule_required($1), $3);
+			
+		    }
+		    else if ($2 == PRODUCED) {
+			rule_produced($1) = 
+			    gen_nconc(rule_produced($1), $3);
+			
+		    }
+		    else if ($2 == PRESERVED) {
+			rule_preserved($1) = 
+			    gen_nconc(rule_preserved($1), $3);
+		    }
+		    else if ($2 == MODIFIED) {
+			rule_modified($1) = 
+			    gen_nconc(rule_modified($1), $3);
+			
+		    }
+		    else if ($2 == PRE_TRANSFORMATION) {
+			rule_pre_transformation($1) = 
+			    gen_nconc(rule_pre_transformation($1), $3);
+			
+		    }
+		    else {	
+			fprintf(stderr, 
+				"[readmakefile] unknown dir: %d\n", $2);
+			abort();
+		    }
+		    
+		    $$ = $1;
 		}
 				
 	|
@@ -344,27 +344,27 @@ void add_rule(rule r)
 makefile 
 open_makefile(string name)
 {
-    FILE *fd;
+    FILE * fd;
     char * mkf_name;
 
-    if ( pipsmakefile!=makefile_undefined ) {
-	    free_makefile(pipsmakefile);
-	    pipsmakefile= makefile_undefined;
-	    debug(1, "open_makefile", "current makefile erased\n");
-	}
+    if (!makefile_undefined_p(pipsmakefile)) 
+    {
+	free_makefile(pipsmakefile);
+	pipsmakefile = makefile_undefined;
+	pips_debug(1, "current makefile erased\n");
+    }
 
     mkf_name = build_pgm_makefile(name);
+    fd = fopen(mkf_name, "r");
 
-    if ((fd = fopen(mkf_name, "r")) == (FILE *)NULL ) {
-	pipsmakefile = makefile_undefined;
-    }
-    else {
+    if (fd)
+    {
 	pipsmakefile = read_makefile(fd);
 	safe_fclose(fd, mkf_name);
     }
 
     free(mkf_name);
-    return (pipsmakefile);
+    return pipsmakefile;
 }
 
 void 
