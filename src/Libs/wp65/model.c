@@ -18,6 +18,7 @@
 
 #include "genC.h"
 #include "misc.h"
+#include "top-level.h" /* ??? */
 
 void model_fprint(FILE * fd, int pn, int bn, int ls)
 {
