@@ -34,6 +34,7 @@ usage()
 	    -s: strip binaries
 	    -t: tar
 	    -z: tar and zip
+	    -d dir: cd to dir to do the job (eg thru rsh)
 	    -f: tar-file name prefix (default name)
 	    -w: additional options for make_release
 	        (e.g. -w -e to enable manual editing of the list of files)
@@ -59,9 +60,10 @@ usage()
 #
 # get options
 
-while getopts hvrstzw:CSB:L:D:F:f:pnlePX opt
+while getopts d:hvrstzw:CSB:L:D:F:f:pnlePX opt
 do
     case $opt in
+	d) cd $OPTARG ;;
 	h) usage 0 some help ;;
 	v) verb=verbose ; what="$what -v" ; taropt=cvf ;;
 	r) install='1' ;;
