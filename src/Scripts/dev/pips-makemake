@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/24 10:03:20 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/24 10:10:00 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -135,7 +135,7 @@ install_bin_dir='$(ROOT)/Bin';
 install_src_dir='$(ROOT)/Src';
 install_shr_dir='$(ROOT)/Share';
 install_doc_dir='$(ROOT)/Doc';
-install_htm_dir='$(ROOT)/Doc/Html';
+install_htm_dir='$(ROOT)/Html';
 install_rtm_dir='$(ROOT)/Runtime' ;
 install_utl_dir='$(ROOT)/Utils';
 
@@ -143,10 +143,8 @@ case $PART in
   PIPS) ;;
   NEWGEN)
     # ??? the html doc is installed with pips
-    install_htm_dir='$(PIPS_ROOT)/Doc/Html';
     install_utl_dir='$(ROOT)/Share' ;;
   LINEAR)
-    install_htm_dir='$(PIPS_ROOT)/Doc/Html';
     install_utl_dir='$(ROOT)/Share' ;;
   *) usage 6 "unexpected PART=$PART" ;;
 esac
