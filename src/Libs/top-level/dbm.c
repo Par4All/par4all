@@ -4,6 +4,7 @@
 
 #include "database.h"
 #include "ri.h"
+#include "ri-util.h"
 #include "pipsdbm.h"
 #include "makefile.h"
 #include "pipsmake.h"
