@@ -281,6 +281,7 @@ typedef hash_table control_mapping;
  */
 #define STATEMENT_NUMBER_UNDEFINED (-1)
 #define STATEMENT_ORDERING_UNDEFINED (-1)
+#define UNKOWN_RAM_OFFSET (-1)
 
 /* On devrait utiliser Newgen pour cela, mais comme on ne doit pas
    les utiliser directement (mais via statement_less_p), cela devrait
