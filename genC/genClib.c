@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/22 13:00:34 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 12:51:37 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -848,14 +848,6 @@ void (*others)() ;
     }
 }
 
-/* SHARED_GO is like GO except that it doesn't ask for continuation if
-   the node OBJ has already been seen. */
-
-static int shared_go( obj )
-gen_chunk *obj ;
-{
-    return( !shared_obj( obj, gen_null, gen_null )) ;
-}
 
 
 /********************************************************************* FREE */
@@ -1002,7 +994,7 @@ free_obj_in(
 	    /* freed here because the name is freed before free_obj_out
 	     */
 	    if (hash_del(Gen_tabulated_names, local)==HASH_UNDEFINED_VALUE)
-		user("free_tabulated: clearing unexisting \"%s\"\n", local);
+		fatal("free_obj_in: clearing unexisting \"%s\"\n", local);
 	
 	    (Gen_tabulated_[bp->index]+abs((obj+1)->i))->p=gen_chunk_undefined;
 	}
@@ -1465,6 +1457,18 @@ gen_copy_tree_with_sharing(
 }
 
 
+/* FREE_TABULATED */
+
+static int 
+free_tabulated_obj_in( obj )
+gen_chunk *obj ;
+{
+    if( shared_obj( obj, gen_null, gen_null )) {
+	return( !GO) ;
+    }
+    return( GO ) ;
+}
+
 /* FREE_TABULATED_LEAF_IN frees tabulated leaf OBJ of domain BP only once. */
 
 static int
@@ -1473,14 +1477,32 @@ gen_chunk *obj ;
 struct gen_binding *bp ;
 {
     if ( IS_TABULATED( bp )) {
+	char local[1024];
+
 	if ( obj->p == gen_chunk_undefined ) {
 	    return( !GO) ;
 	}
+	{
+	int dom = quick_domain_index(obj->p);
+	sprintf(local, "%d%c%s", dom, HASH_SEPAR, (obj->p+HASH_OFFSET)->s) ;
+
+	if (!Gen_tabulated_names) 
+	    fatal("free_obj_out: Null tabulated names for %s\n", bp->name);
+	
+	/* freed here because the name is freed before free_obj_out
+	 */
+	if (hash_del(Gen_tabulated_names, local)==HASH_UNDEFINED_VALUE)
+	    fatal("free_tabulated_leaf_in: clearing unexisting \"%s\"\n", 
+		 local);
+
+	return( GO ) ;
+	}
+/*
 	free_obj_out( obj->p, bp ) ;
 	obj->p = gen_chunk_undefined ;
-	return( !GO) ;
+	return( !GO) ;*/
     }
-    return( free_leaf_in( obj, bp )) ;
+    return( GO ) ;
 }
 
 /* GEN_FREE_TABULATED frees all the elements of the tabulated table of
@@ -1503,13 +1525,15 @@ int domain ;
 
     Tabulated_bp->domain->ar.element = bp ;
     dr.null = gen_null ;
-    dr.leaf_out = free_leaf_out ;
+
+    dr.obj_in = free_tabulated_obj_in ;
+    dr.simple_in = persistant_simple_in ;
     dr.leaf_in = free_tabulated_leaf_in ;
-    dr.obj_in = shared_go ;
-    dr.simple_in = gen_true ;
-    dr.array_leaf = gen_array_leaf ;
-    dr.simple_out = free_simple_out ;
+
     dr.obj_out = free_obj_out ;
+    dr.simple_out = free_simple_out ;
+    dr.array_leaf = gen_array_leaf ;
+    dr.leaf_out = free_leaf_out ;
 
     push_gen_trav_env() ;
 
@@ -1559,9 +1583,11 @@ gen_chunk *obj  ;
 		  bp->name ) ;
 	}
 	if( hash_del( Gen_tabulated_names, local ) == HASH_UNDEFINED_VALUE ) {
-	    user( "clear_tabulated: clearing unexisting %s\n", local ) ;
+	    fatal( "gen_clear_tabulated_element: clearing unexisting %s\n", 
+		  local ) ;
 	}
-	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = gen_chunk_undefined ;
+	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = 
+	    gen_chunk_undefined ;
     }
     else {
 	user( "clear_tabulated: not a tabulated element\n" ) ;
