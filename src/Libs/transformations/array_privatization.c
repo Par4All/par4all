@@ -293,7 +293,7 @@ loop l;
     transformer loop_trans = load_statement_transformer(current_stmt_head());
     list l_cand, l_loc, l_out_priv, l_out_priv_tmp, l_locals, 
          l_loc_i, l_loc_i_prime;
-    list l_write, l_in, l_out, l_tmp;
+    list l_write, l_in, l_out, l_tmp, l_cand_tmp;
     entity i = loop_index(l);
     entity i_prime = entity_to_intermediate_value(i);
     Psysteme sc_loop_prec;
@@ -484,17 +484,64 @@ loop l;
     }
 
 
+    /* remove variables in commons not declared in current module */
+    l_cand_tmp = l_cand;
+    while(!ENDP(l_cand_tmp))
+    {
+	region reg = REGION(CAR(l_cand_tmp));
+	entity reg_ent = region_entity(reg);
+	entity ccommon;
+	list l_tmp;
+	list l_com_ent;
+	bool found= FALSE; 
 
+	l_cand_tmp = CDR(l_cand_tmp);
+	    
+	/* First, we search if the common is declared in the current module;
+	 * if not, the variable cannot be privatized, and a warning is issued.
+	 */
+	if(storage_ram_p(entity_storage(reg_ent)))
+	{
+	    ccommon = ram_section(storage_ram(entity_storage(reg_ent)));
+	    l_com_ent = area_layout(type_area(entity_type(ccommon)));
+	    
+	    for( l_tmp = l_com_ent; !ENDP(l_tmp) && !found; l_tmp = CDR(l_tmp) )
+	    {
+		entity com_ent = ENTITY(CAR(l_tmp));
+		if (strcmp(entity_module_name(com_ent),
+			   module_local_name(get_current_module_entity())) == 0)
+		{
+		    found = TRUE;
+		}
+	    }
+	    if (!found)	    
+	    {
+		pips_user_warning("\nCOMMON %s not declared in subroutine %s:\n\t"
+				  "variable %s cannot be privatized in loop "
+				  "number %03d\n",
+				  entity_name(ccommon),
+				  module_local_name(get_current_module_entity()),
+				  entity_name(reg_ent),
+			      statement_number(current_stmt_head()));
+		gen_remove(&l_cand, reg);
+		
+	    }
+	}
+    }
+
+    l_out_priv = RegionsEntitiesInfDifference(l_out_priv, regions_dup(l_cand),
+					      w_w_combinable_p);
+        
     /* compute loop_locals from l_cand */
     if (store_as_loop_locals)
     {
 	gen_free_list(loop_locals(l));
 	l_locals = NIL;
 	MAP(EFFECT, reg,
-	{
-	    l_locals = CONS(ENTITY, region_entity(reg), l_locals);
-	},
-	l_cand);
+	    {		
+		l_locals = CONS(ENTITY, region_entity(reg), l_locals);		
+	    },
+	    l_cand);
 	loop_locals(l) = l_locals;   
 	
 	/* add the loop index */
