@@ -34,12 +34,38 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
+
+/*****duong - set timeout with signal and alarm*****/
+#include <signal.h>
+
+#define EXCEPTION_PRINT_PROJECTION TRUE
+
+#ifdef FILTERING
+
+#define FILTERING_DIMENSION_PROJECTION filtering_dimension_projection
+#define FILTERING_NUMBER_CONSTRAINTS_PROJECTION filtering_number_constraints_projection
+#define FILTERING_DENSITY_PROJECTION filtering_density_projection
+#define FILTERING_MAGNITUDE_PROJECTION (Value) filtering_magnitude_projection
+
+#define FILTERING_TIMEOUT_PROJECTION filtering_timeout_projection
+
+static boolean PROJECTION_timeout = FALSE;
+
+static void 
+catch_alarm_projection (int sig)
+{ 
+  alarm(0); //clear the alarm
+  PROJECTION_timeout = TRUE;
+}
+#endif
+/*****duong*****/
 
 /* void sc_projection_along_variable_ofl_ctrl(Psysteme *psc, Variable v, 
  *                                            int ofl_ctrl)
@@ -66,16 +92,18 @@
  *    de PIPS pour T(2*i+4*j) vs T(2*i+2*j+1) donnant 2*j + 2*di + 2*dj + 1 =0;
  *    la projection de j faisait perdre la non-faisabilite; Francois Irigoin,
  *    8 novembre 1991
- *
+ * - Added timeout control in sc_fourier_motzkin_variable_elimination_ofl_ctrl. 
+ *   Better use sc_projection_along_variable_ofl_ctrl_timeout_ctrl. DN 29/10/02
  */
 void sc_projection_along_variable_ofl_ctrl(psc, v, ofl_ctrl) 
 Psysteme *psc;
 Variable v;
 int ofl_ctrl;
 {
+
     Pcontrainte eq;
     Value coeff;
-    Pbase base_init = base_dup((*psc)->base);
+    Pbase base_init = base_copy((*psc)->base);
 
     /* trouver une egalite ou v a un coeff. minimal en valeur absolu */
     eq = contrainte_var_min_coeff((*psc)->egalites, v, &coeff, FALSE);
@@ -83,7 +111,7 @@ int ofl_ctrl;
     if (eq != NULL) {		
 	if(!egalite_normalize(eq)) {
 	    sc_rm(*psc);
-	    *psc = sc_empty(base_init);
+	    *psc = sc_empty(base_init);	   
 	    return;
 	}
 	else 
@@ -104,12 +132,14 @@ int ofl_ctrl;
 	if (fm_int_exact_p == FALSE) {
 	    /* detection de la non faisabilite du Psysteme */
 	    sc_rm(*psc);
-	    *psc = sc_empty(base_init);
+	    *psc = sc_empty(base_init);	    
 	    return;
 	}
 	(*psc)->nb_ineq = nb_elems_list((*psc)->inegalites);
     }
+   
     base_rm(base_init);
+   
 }
 
 
@@ -154,7 +184,7 @@ Pvecteur pv;
 int ofl_ctrl;
 {
     Pvecteur pv1;
-    Pbase scbase = base_dup((*psc)->base); 
+    Pbase scbase = base_copy((*psc)->base); 
 
     if (!VECTEUR_NUL_P(pv)) {
 	for (pv1 = pv;!VECTEUR_NUL_P(pv1) && !SC_UNDEFINED_P(*psc); pv1=pv1->succ) {
@@ -212,9 +242,9 @@ int ofl_ctrl;
     Variable v;
     Value coeff;
     Psysteme sc = *psc;
-    Pbase base_sc = base_dup(sc->base);
+    Pbase base_sc = base_copy(sc->base);
     
-    pve = vect_dup(pv);
+    pve = vect_copy(pv);
 
     /* elimination of variables with the equations of sc */
 
@@ -371,7 +401,7 @@ int ofl_ctrl;
 {
     Pcontrainte pr;
     Pcontrainte current_eq;
-    Pbase b_dup = base_dup(sc->base);
+    Pbase b_copy = base_copy(sc->base);
   
     pr = NULL;
     current_eq = sc->egalites;
@@ -395,7 +425,7 @@ int ofl_ctrl;
 	case 0 : 
 		/* the substitution found that the system is not feasible */
 		sc_rm(sc);
-		sc = sc_empty(b_dup);
+		sc = sc_empty(b_copy);
 		eq = contrainte_free(eq);		
 		return(sc); 
 		break;
@@ -430,7 +460,7 @@ int ofl_ctrl;
 	case 0 : 
 	    /* the substitution found that the system is not feasible */
 	    sc_rm(sc);
-	    sc = sc_empty(b_dup);
+	    sc = sc_empty(b_copy);
 	    eq = contrainte_free(eq);
 	    return(sc);
 	    break;
@@ -458,7 +488,7 @@ int ofl_ctrl;
     eq = contrainte_free(eq);
     sc->nb_eq = nb_elems_list(sc->egalites);
     sc->nb_ineq = nb_elems_list(sc->inegalites);
-    base_rm(b_dup);
+    base_rm(b_copy);
     return(sc);
 }
 
@@ -521,7 +551,8 @@ int ofl_ctrl;
  *            *integer_test_res_p must be initialized.
  *            
  */
-boolean sc_fourier_motzkin_variable_elimination_ofl_ctrl(sc,v, integer_test_p, 
+
+boolean sc_fourier_motzkin_variable_elimination_ofl_ctrl(sc,v, integer_test_p,
 						integer_test_res_p, ofl_ctrl)
 Psysteme sc;
 Variable v;
@@ -535,10 +566,34 @@ int ofl_ctrl;
     Value c;
     int nnul;
 
-    if ((pc = sc->inegalites) == NULL) 
-	return(TRUE);
+    if ((pc = sc->inegalites) == NULL) {
+      return(TRUE);
+    }
 
-    if (integer_test_p) sc1 = sc_dup(sc);
+    CATCH(timeout_error|overflow_error){
+
+      ifscdebug(5) {
+	fprintf(stderr,"\nWARNING: LINEAR_SC_PROJECTION: [sc_fourier_motzkin_variable_elimination_ofl_ctr] overflow or timeoutl!!!\n");}
+      
+#ifdef FILTERING
+      alarm(0);
+#endif
+      if (ofl_ctrl==FWD_OFL_CTRL) {
+	THROW(overflow_error);
+      }
+      else {
+	ifscdebug(5) {
+	  fprintf(stderr,"\nWARNING: LINEAR_SC_PROJECTION: [fourier_motzkin_variable_elimination_ofl_ctrl]: ofl_ctrl <> FWD_OFL_CTRL \n");}
+	//return FALSE means system non feasible. return TRUE, mean ok => both wrong		
+      }
+    }
+    TRY 
+    {
+#ifdef FILTERING
+	signal(SIGALRM, catch_alarm_projection);   
+	alarm(FILTERING_TIMEOUT_PROJECTION);
+#endif      
+    if (integer_test_p) sc1 = sc_copy(sc);
 
     pos = neg = nul = NULL;
     nnul = 0;
@@ -590,6 +645,10 @@ int ofl_ctrl;
 		    contraintes_free(nul);
 		    contraintes_free(pcnew);
 		    if (integer_test_p) sc_rm(sc1);
+#ifdef FILTERING
+alarm(0);
+#endif
+		    UNCATCH(timeout_error|overflow_error);
 		    return(FALSE);
 		}
 	    }
@@ -609,12 +668,16 @@ int ofl_ctrl;
     sc->inegalites = nul;
     sc->nb_ineq = nnul;
     if (integer_test_p) sc_rm(sc1);
+    }//of TRY
+
+#ifdef FILTERING
+alarm(0);
+//clear the alarm
+#endif
+    UNCATCH(timeout_error|overflow_error);
 
     return TRUE;
 }
-
-
-
 
 /* Psysteme sc_projection_on_variables
  *    (Psysteme sc, Pbase index_base, Pvecteur pv)
@@ -638,9 +701,9 @@ Pvecteur pv;
     Variable var;
 
     if (!VECTEUR_NUL_P(pv)) {
-	lvar_proj = vect_dup(pv);
+	lvar_proj = vect_copy(pv);
 	for (pv1 = index_base;!VECTEUR_NUL_P(pv1); pv1=pv1->succ) {
-	    sc2 = sc_dup(sc);
+	    sc2 = sc_copy(sc);
 	    var = vecteur_var(pv1);
 	    vect_erase_var(&lvar_proj,var);
 	    for (pv2 = lvar_proj;!VECTEUR_NUL_P(pv2); pv2=pv2->succ) {
@@ -655,7 +718,7 @@ Pvecteur pv;
 		}
 		sc2 = sc_normalize(sc2);
 		if (SC_EMPTY_P(sc2)) {
-		    sc2 = sc_empty(base_dup(sc->base));
+		    sc2 = sc_empty(base_copy(sc->base));
 		    break;
 		}
 		else {
@@ -666,7 +729,7 @@ Pvecteur pv;
 	    sc1 = sc_intersection(sc1,sc1,sc2);
 	    sc1 = sc_normalize(sc1);
 	    if (SC_EMPTY_P(sc1)) {
-		sc1 = sc_empty(base_dup(sc->base));
+		sc1 = sc_empty(base_copy(sc->base));
 		break;
 	    }
 	}
@@ -726,12 +789,15 @@ int ofl_ctrl;
 		value_le(vect_coeff(TCST, ineg->vecteur), value_uminus(tmp)))
 		*integer_combination_p = TRUE;
 	    else {
-		Pcontrainte ineg_test = contrainte_dup(ineg);
-		Psysteme sc_test = sc_dup(sc);
+		Pcontrainte ineg_test = contrainte_copy(ineg);
+		Psysteme sc_test = sc_copy(sc);
 		
 		vect_add_elem(&(ineg_test->vecteur), TCST, tmp);
 		
 		contrainte_reverse(ineg_test);
+
+		//DN: any impact with the differences between _copy and _dup versions ?
+ 
 		sc_add_inegalite(sc_test,ineg_test);
 		
 		if (!sc_rational_feasibility_ofl_ctrl(sc_test, OFL_CTRL, TRUE))
@@ -862,7 +928,7 @@ Psysteme sc_projection_optim_along_vecteur(sc,pv)
 Psysteme sc;
 Pvecteur pv;
 {
-    Psysteme sc1 = sc_dup(sc);
+    Psysteme sc1 = sc_copy(sc);
     CATCH(overflow_error) {
 	/* sc_rm(sc1); */
 	sc1=NULL;
@@ -918,7 +984,7 @@ Variable v;
  */
 #define SUBS(s,e,v) \
   sc_simple_variable_substitution_with_eq_ofl_ctrl(s,e,v,OFL_CTRL)
-/* sc_variable_substitution_with_eq_ofl_ctrl(s,contrainte_dup(e),v,OFL_CTRL) */
+/* sc_variable_substitution_with_eq_ofl_ctrl(s,contrainte_copy(e),v,OFL_CTRL) */
 
 void sc_extract_exact_common_equalities
   (Psysteme cl, Psysteme common, Psysteme s1, Psysteme s2)
@@ -969,4 +1035,158 @@ void sc_project_very_simple_equalities(Psysteme s)
     Variable v = contrainte_simple_equality(e);
     if (v) SUBS(s, e, v);
   }
+}
+
+/* void sc_projection_along_variable_ofl_ctrl_timeout_ctrl(psc, v ofl_ctrl)
+ *
+ * See (void) sc_projection_along_variable_ofl_ctrl(psc, v, ofl_ctrl).
+ *
+ * We need a function that returns nothing, modifies the input systeme, 
+ * but can print the original system of constraints only in case of failure, it means we have to 
+ * catch overflow_error from sc_fourier_motzkin_variable_elimination_ofl_ctrl, 
+ * in order to print the systems only in Linear.
+ * This function will make a copy of the system, and print it to stderr if there is an exception.
+ * Surely the copy will be removed afterward. (DN 17/7/02)
+ * add SIZE CONTROL
+*/
+
+void sc_projection_along_variable_ofl_ctrl_timeout_ctrl(psc, v, ofl_ctrl)
+Psysteme *psc;
+Variable v;
+int ofl_ctrl;
+{
+  static boolean DN = FALSE;
+  Psysteme sc; 
+  Pbase base_saved;
+  static projection_sc_counter = 0;
+  
+  sc= sc_copy(*psc);
+  base_saved = base_copy((*psc)->base);
+
+  if (sc==NULL) {
+    sc_rm(*psc);
+    sc_rm(sc);
+    *psc = sc_empty(base_saved);	   
+    return;// sc_empty(base_saved) will use memory pointed by base_saved
+  }
+  
+  ifscdebug(5) {projection_sc_counter ++;}
+
+
+  //We can put the size filters here! filtering timeout is integrated in the methods themself
+  //size filtering: dimension,number_constraints, density, magnitude
+
+#ifdef FILTERING
+
+  PROJECTION_timeout = FALSE;
+  //Begin size filters 
+  
+  if (TRUE) {
+    Value magnitude;
+    int dimens, nb_cont_eq = 0, nb_ref_eq = 0, nb_cont_in = 0, nb_ref_in = 0;
+
+    dimens = sc->dimension; value_assign(magnitude,VALUE_ZERO);
+    decision_data(sc_egalites(sc), &nb_cont_eq, &nb_ref_eq, &magnitude, 1);
+    decision_data(sc_inegalites(sc), &nb_cont_in, &nb_ref_in, &magnitude, 1);
+  
+    if (dimens>=FILTERING_DIMENSION_PROJECTION) {
+      char *directory_name = "projection_dimension_filtering_SC_OUT";
+      sc_default_dump_to_files(sc,projection_sc_counter,directory_name);
+    }
+    if ((nb_cont_eq + nb_cont_in) >= FILTERING_NUMBER_CONSTRAINTS_PROJECTION) {
+      char *directory_name = "projection_number_constraints_filtering_SC_OUT";
+      sc_default_dump_to_files(sc,projection_sc_counter,directory_name);  
+    } 
+    if ((nb_ref_eq + nb_ref_in) >= FILTERING_DENSITY_PROJECTION) {
+      char *directory_name = "projection_density_filtering_SC_OUT";
+      sc_default_dump_to_files(sc,projection_sc_counter,directory_name);  
+    }
+    if (value_gt(magnitude,FILTERING_MAGNITUDE_PROJECTION)) {
+      char *directory_name = "projection_magnitude_filtering_SC_OUT";
+      sc_default_dump_to_files(sc,projection_sc_counter,directory_name);
+    }
+  }
+  //End size filters
+#endif
+
+  CATCH(overflow_error) {
+
+    if (EXCEPTION_PRINT_PROJECTION) {
+      char *directory_name = "projection_fail_SC_OUT";
+      sc_default_dump_to_files(sc,projection_sc_counter,directory_name);
+    }
+    sc_rm(sc);
+
+    if (ofl_ctrl==FWD_OFL_CTRL) {
+      base_rm(base_saved);
+      //The modified sc is returned to the calling function, so we can see why the projection fails
+      RETHROW();
+    } else {
+      ifscdebug(5) {
+	fprintf(stderr,"\nWARNING: LINEAR_SC_PROJECTION: OFL_CTRL: projection failed, return sc_empty(base_saved)\n");
+      }
+      sc_rm(*psc);
+      *psc = sc_empty(base_saved);
+      return;// sc_empty(base_saved) will use memory pointed by base_saved
+    }    
+  }
+  TRY {
+    //Shouldn't use timeout for sc_fourier_motzkin_variable_elimination_ofl_ctrl, 
+    //but control the size of the sc before and after the projection. 
+    //using a static variable DN may prevent 2 consecutive projections from explosion. 
+    //it's often happned that calls of this function made by a list of variables to project on a
+    //only one system of constraints. That's why the static variable makes sense  DN 19/1/2003
+    //should we define a MAX_nb_constraints that the function can process?
+    ifscdebug(5) {
+      if (DN) {
+	if (sc->nb_ineq>=250) {
+      
+	  //Should be here a test of variable to project??? How it will be projected?
+	  //Should we continue the projection? DN 19/1/2003
+
+	  //if the sc contains the variable to project has some characteristics like:
+	  //- the variable only appears in a few inequations
+	  //- the variable appears in many inequations with same sign coefficents
+	  //then we can continue the projection. 
+	  //if the variable appears in many inequations with opposite sign coefficents
+	  //then there's a great possibility of an explosion, we must stop it.
+
+	  int nb_var_pos=0;
+	  int nb_var_neg=0;
+	  Pcontrainte c;
+
+	  for(c=sc->inegalites;c!=NULL;c=c->succ) {
+
+	    if (value_gt(vect_coeff(v, c->vecteur),VALUE_ZERO)) nb_var_pos++;
+	    if (value_lt(vect_coeff(v, c->vecteur),VALUE_ZERO)) nb_var_neg++;
+	  }
+
+	  if ((nb_var_pos==0)||(nb_var_neg==0)) {
+	    //continue the projection with DN=TRUE. There's no explosion for this projection.
+	  }else if ((nb_var_pos <=10)&&(nb_var_neg<=10)) {
+	    //continue the projection with DN=TRUE. Maybe an explosion, but it's worth trying
+	  } else {
+	    DN=FALSE;
+	    fprintf(stderr,"\n DN: Great possibility of an explosion\n");
+	    fprintf(stderr,"\n nb_var_pos=%d nb_var_neg=%d\n",nb_var_pos,nb_var_neg);
+	    THROW(overflow_error);
+	  }
+	} else {
+	  if (sc->nb_ineq<40) {DN=FALSE;}//case of nb_ineq reduced
+	}
+      } else if (sc->nb_ineq>= 40) {
+	DN=TRUE;
+      }
+    }//of ifscdebug(5)
+    sc_projection_along_variable_ofl_ctrl(psc, v, ofl_ctrl);
+    UNCATCH(overflow_error);
+  }//of TRY
+#ifdef FILTERING
+  if (PROJECTION_timeout) {
+    char * directory_name = "projection_timeout_filtering_SC_OUT";
+    sc_default_dump_to_files(sc,projection_sc_counter,directory_name);
+  }
+#endif
+  sc_rm(sc);
+  base_rm(base_saved);
 }
