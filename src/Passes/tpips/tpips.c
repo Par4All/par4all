@@ -417,7 +417,8 @@ char * current_file_name = (char *) NULL;
 static void 
 parse_arguments(int argc, char * argv[])
 {
-    if (!argc) return;
+    if (argc<1 || !argv[1]) return;
+
     current_file_name = argv[1];
     safe_fclose(stdin, "stdin !");
     (void) safe_freopen(argv[1], "r", 0);
@@ -435,8 +436,7 @@ read_a_line(char * prompt)
     if (use_readline)
 	return readline(prompt);
     
-    return safe_fgets(line, MAX_LINE_LENGTH, 
-		      stdin, current_file_name);
+    return safe_fgets(line, MAX_LINE_LENGTH, stdin, current_file_name);
 }
 
 /* MAIN: interactive loop and history management.
