@@ -1,12 +1,13 @@
 c
 c COMMON /HPFC_PROCS/
 c
-c $RCSfile: hpfc_procs.m4h,v $ ($Date: 1994/09/07 11:21:19 $, )
+c $RCSfile: hpfc_procs.m4h,v $ ($Date: 1994/09/21 17:23:08 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
 c
+include(`hpfc_lib_m4_macros')dnl
       common /HPFC_PROCS/
      $     MYLID,
      $     MYTID,
@@ -20,11 +21,19 @@ c
      $     MCASTNODES,
      $     NODE_PROGRAM_NAME,
      $     NODE_ARCHITECTURE,
-     $     HPFC_GROUP_NAME
+     $     HPFC_GROUP_NAME _CM5(`,
+     $     CM_HOST_ID,
+     $     CM_MY_ID,
+     $     CM_SIZE,
+     $     CM_NODE_IDS(MAXMAXSIZEOFPROCS)')dnl
+
 c
       integer 
      $     MYLID, MYTID, HOSTTID, NODETIDS, NBOFTASKS, MYPOS,
-     $     NODECHANNELS, HOSTCHANNEL,  MCASTHOST, MCASTNODES
+     $     NODECHANNELS, HOSTCHANNEL,  MCASTHOST, MCASTNODES _CM5(`,
+     $     CM_HOST_ID, CM_MY_ID, CM_SIZE,
+     $     CM_NODE_IDS(MAXMAXSIZEOFPROCS)')dnl
+
       character*32 
      $     NODE_PROGRAM_NAME, 
      $     NODE_ARCHITECTURE,
