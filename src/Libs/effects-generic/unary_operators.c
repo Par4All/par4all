@@ -103,10 +103,11 @@ effects_write_effects_dup(list l_eff)
 {
     list l_new = NIL;
     MAP(EFFECT, eff,
-	{
-	    if (effect_write_p(eff))
-		l_new =
-		    gen_nconc(l_new, CONS(EFFECT, (*effect_dup_func)(eff), NIL));},
+    {
+	if (effect_write_p(eff))
+	    l_new = gen_nconc(l_new, 
+			      CONS(EFFECT, (*effect_dup_func)(eff), NIL));
+    },
 	l_eff);
     return l_new;
 }
