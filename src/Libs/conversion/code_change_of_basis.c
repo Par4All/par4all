@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
