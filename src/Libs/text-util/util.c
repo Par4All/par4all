@@ -117,9 +117,7 @@ add_to_current_line(
     text txt,          /* where to append complete lines. */
     bool first_line    /* rather useless??? */)
 {
-    int lcrt_line=0;
-    int ladd_string=0;
-    int last_virg=0;
+    int lcrt_line, ladd_string, last_virg;
     bool divide=FALSE;
 
     if((lcrt_line = strlen(crt_line)) + (ladd_string=strlen(add_string)) 
@@ -164,9 +162,23 @@ add_to_current_line(
     }
 
     if(strlen(crt_line) + strlen(add_string) > MAX_LINE_LENGTH-2)
-	/* this may happen the truncation is not large enough for add_string? */
+    /* this may happen the truncation is not large enough for add_string? */
 	pips_internal_error("line buffer too small");
 
     strcat(crt_line, add_string);
     return first_line;
+}
+
+void
+close_current_line(
+    string crt_line,
+    text txt)
+{
+    if (strlen(crt_line)!=0)
+    {
+	strcat(crt_line, LINE_SUFFIX); /* should be large enough. */
+	ADD_SENTENCE_TO_TEXT
+	    (txt, make_sentence(is_sentence_formatted, strdup(crt_line)));
+	crt_line[0] = '\0';
+    }
 }
