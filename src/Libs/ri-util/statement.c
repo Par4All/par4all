@@ -1169,12 +1169,14 @@ find_first_statement_comment(statement s)
 {
     instruction i = statement_instruction(s);
     if (instruction_sequence_p(i)) {
-	list sts = sequence_statements(instruction_sequence(statement_instruction(s)));
-	if (sts == NIL)
-	    /* An empty sequence: return an empty comment: */
-	    return empty_comments;
-	else
-	    return find_first_statement_comment(STATEMENT(CAR(sts)));
+	MAP(STATEMENT, st, {
+	    string comment = find_first_statement_comment(st);
+	    if (!empty_comments_p(comment))
+		/* We've found it! */
+		return comment;
+	}, sequence_statements(instruction_sequence(statement_instruction(s))));
+	/* No comment found: */
+	return empty_comments;
     }
     else
 	/* Ok, plain statement: */
