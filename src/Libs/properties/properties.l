@@ -333,14 +333,14 @@ fprint_property(FILE * fd, string pname)
 void 
 fprint_properties(FILE * fd)
 {
-    if (pl) { /* dump all sorted properties in fd. */
-	int n = hash_table_entry_count(pl), i=0;
+    if (pl) 
+    { /* dump all sorted properties in fd. */
 	gen_array_t array = gen_array_make(0);
 	fprintf(fd, "# PIPS PROPERTIES\n");
-	HASH_MAP(name, p, gen_array_append(array, name), pl);
+	HASH_MAP(name, p, gen_array_dupappend(array, name), pl);
 	gen_array_sort(array);
-	for (i=0; i<n; i++) fprint_property(fd, gen_array_item(array, i));
-	gen_array_free(array);
+	GEN_ARRAY_MAP(name, fprint_property(fd, name), array);
+	gen_array_full_free(array);
     } else fprintf(fd, "# NO PIPS PROPERTIES...\n");
 }
 
