@@ -30,7 +30,7 @@ entity e;
 }
 
 
-
+/* Useful when the user edit a source file and parse it again */
 void CleanLocalEntities(function)
 entity function;
 {
@@ -56,6 +56,8 @@ entity function;
 	entity e = ENTITY(CAR(pe));
 	storage s = entity_storage(e);
 
+	pips_debug(8, "Clean up %s\n", entity_local_name(e));
+
 	if(!storage_undefined_p(s) && storage_ram_p(s)) {
 	    entity sec = ram_section(storage_ram(s));
 	    type t = entity_type(sec);
@@ -73,5 +75,31 @@ entity function;
 	    entity_storage(e) = storage_undefined;
 	    entity_initial(e) = value_undefined;
 	}
+
+	if(!type_undefined_p(entity_type(e))) {
+	  free_type(entity_type(e));
+	  entity_type(e) = type_undefined;
+	}
     }
+}
+
+/* Useful for ParserError()? */
+void RemoveLocalEntities(function)
+entity function;
+{
+    list function_local_entities;
+    list pe;
+
+    set_current_function(function);
+
+    function_local_entities =
+	gen_filter_tabulated(local_entity_of_current_function_p, 
+			     entity_domain);
+
+    /* FI: dangling pointers? Some variables may be referenced in area_layouts of
+       global common entities! */
+    /* gen_full_free_list(function_local_entities); */
+    /* A gen_multi_recurse would be required but it's hard to be at the
+       list level to remove the elements?!? */
+    pips_assert("implemented", FALSE);
 }
