@@ -75,26 +75,6 @@ typedef Scontrainte Sinegalite, * Pinegalite;
 #define egalite_print(eg) egalite_fprint(stdout,eg)
 #define inegalite_print(ineg) inegalite_fprint(stdout,ineg)
 
-/* Anciennes macros de Malik Imadache: elles sont conservees pour permettre
- * les mises a jour de vieux programmes */
-/* #define ch_sgn(c) contrainte_chg_sgn(c) */
-/* #define init_eq() contrainte_new() */
-/* #define eq_dup(eq) contrainte_dup(eq) */
-/* #define cp_eq(eq) contrainte_dup(eq) */
-/* #define eq_rm(eq) contrainte_free(eq) */
-/* #define eq_print(fd,c,b,v) contrainte_fprint(fd,c,b,v) */
-/* #define ss_var(c) contrainte_constante_p(c) */
-/* #define eqts_rm(pc) contraintes_free(pc) */
-
-/* le code des fonctions suivantes a disparu... FI, 28/07/89
- * #define print_eq(eq) egalite_fprint(stdout,eq)
- * #define print_leq(leq) egalites_fprint(stdout,leq)
- * #define print_ineq(ineq) inegalite_fprint(stdout,ineq)
- * #define print_lineq(lineq) inegalites_fprint(stdout,lineq)
- * #define print_eq1(eq) fprint_eq1(stdout,eq)
- * #define print_ineq1(ineq) fprint_ineq1(stdout,ineq)
- */
-
 /* passage au champ vecteur d'une contrainte "a la  Newgen" */
 #define contrainte_vecteur(c) ((c)->vecteur)
 
@@ -104,12 +84,6 @@ typedef Scontrainte Sinegalite, * Pinegalite;
 #define CONTRAINTE_UNDEFINED ((Pcontrainte) NULL)
 
 #define CONTRAINTE_UNDEFINED_P(c) ((c)==CONTRAINTE_UNDEFINED)
-
-/* Pcontrainte creer_eq(): allocation d'un descripteur de contrainte 
- * Voir contrainte_new()
- * #define creer_eq \
- *        (Pcontrainte)MALLOC(sizeof (Scontrainte),CONTRAINTE,"creer_eq")
- */
 
 /* int COEFF_CST(Pcontrainte c): terme constant d'une contrainte */
 #define COEFF_CST(c) vect_coeff(TCST,(c)->vecteur)
@@ -123,14 +97,6 @@ typedef Scontrainte Sinegalite, * Pinegalite;
 #else
 #define CONTRAINTE_RM(rd,f) contrainte_rm(rd)
 #endif
-
-/* macros obsoletes de Malik:
- * #define prem_eg(syst) ((syst).egalites)
- * #define prem_ineg(syst) ((syst).inegalites)
- * #define prem_couple(eg) (eg->vecteur)
- * #define une_var(eq) \
- *       (eq->vecteur->var == 0 ? eq->vecteur->succ->var : eq->vecteur->var)
- */
 
 
 #endif CONTRAINTE
