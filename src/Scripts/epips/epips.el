@@ -53,12 +53,13 @@
 			 begin-position
 			 end-position
 			 a-process)
+  (pop-to-buffer (process-buffer a-process))
   (epips-debug 'epips-raw-insert)
   (epips-debug begin-position)
   (epips-debug end-position)
   (epips-debug (substring a-string
-		     begin-position
-		     end-position))
+			  begin-position
+			  end-position))
   (insert (substring a-string
 		     begin-position
 		     end-position))
@@ -67,6 +68,7 @@
 
 ; A function that insert some text with a property list :
 (defun epips-insert-with-properties (some-text property-list)
+  (pop-to-buffer (process-buffer a-process))
   (let ((old-point (point)))
     (insert some-text)
     (add-text-properties old-point
@@ -135,7 +137,8 @@
   "Define a filter to interpret the standard output of xtree"
   (let*
       (
-       (inhibit-quit nil)		; Allow interruption inside the filter
+					; Allow interruption inside the filter
+       (inhibit-quit nil)
 					; Get the old output string of
 					; this process:
        (epips-this-process-old-output
@@ -146,43 +149,66 @@
 				   an-output-string))
        (epips-xtree-output-filter-newline nil)
        )
-    (
-					; Each new line is a module
+    					; Each new line is a module
 					; name:
-     (while (setq epips-xtree-output-filter-newline
-		  (string-match "\n" full-output-string))
-					; Select the module:
-       (epips-user-error
-	(substring full-output-string
-		   0
-		   (1- epips-xtree-output-filter-newline))
-	)
+    (while (setq epips-xtree-output-filter-newline
+		   (string-match "\n" full-output-string))
+					; Ok, we received something up
+					; a newline from xtree.
+      (let* (
+	     (one-line-from-xtree
+	      (substring full-output-string
+			 0
+			 epips-xtree-output-filter-newline)
+	      )
+					; In fact, only the leaf name
+					; is needed up to now:
+	     (point-place (string-match "[^.]*$" one-line-from-xtree))
+	     )
+					; Apply a command with the
+					; module name clicked with the
+					; mouse:
+	
+					; For exemple, display the
+					; code of the module:
+      (epips-send-sequential-view-command
+       (substring one-line-from-xtree point-place nil))
+      )
+       
 					; Discard the part that is
 					; already executed:
-       (setq full-output-string
-	     (substring full-output-string
-			(1+ epips-xtree-output-filter-newline)
-			nil))
-       )
-     (setcdr epips-this-process-old-output full-output-string)
-     )
+      (setq full-output-string
+	    (substring full-output-string
+		       (1+ epips-xtree-output-filter-newline)
+		       nil))
+      )
+					; To remind the output of this
+					; process:
+    (setcdr epips-this-process-old-output full-output-string)
     )
   )
+
   
 (defun epips-ICFG-view-command (epips-command-name
 				epips-command-content)
   "Display a graph with xtree"
   (let*
       (
-       (process-connection-type nil) ; Use a pipe to communicate
+					; Do not use a pipe to
+					; communicate since it looks
+					; like a flush is lacking
+					; somewhere and the output is
+					; sent to emacs only when
+					; xtree exits if so... No
+					; (process-connection-type
+					; nil)
        (epips-xtree-process
 					; Do not use intermediate shell:
 	(start-process "xtree"
 		       "Pips-Xtree-Log"
-		       "xtree" "-separator" "    " "-oformat" "resource"
+		       "xtree" "-name" "ICFG" "-title" "Titre"
+		       "-bg" "LightSteelBlue1" "-fg" "purple4" "-separator" "    " "-oformat" "resource"
 		       )
-;			 (format "sed 's/    /./g' < %s | xtree -separator . -oformat resource"
-;				 epips-command-content)
 	)
 					; That mean that we can not a
 					; file through stdin and need
@@ -472,32 +498,40 @@
 (defun epips-output-filter (a-process an-output-string)
   "Define a filter to interpret the standard output of wpips:
    The outline come from the E-Lisp manual about \"Process Filter Function\"."
-  
   (let
       (
-       (inhibit-quit nil) ; Allow interruption inside the filter
+       (old-buffer (current-buffer))
+       (inhibit-quit nil)		; Allow interruption inside the filter
        )
-    (save-excursion
+    (unwind-protect
+	(let (moving)
 					; By default, go to the end of
 					; the buffer controling the
 					; process:
-      (set-buffer (process-buffer a-process))
-      (goto-char (point-max))
+	  (set-buffer (process-buffer a-process))
+	  (setq moving (= (point) (process-mark a-process)))
+	  (save-excursion
+	    (goto-char (process-mark a-process))
 					; Parse the output of wpips to
 					; see if there are some
 					; commands inside:
-      (while (progn
+	    (while (progn
 					; Loop on each semantical
 					; piece
-	       (setq an-output-string (epips-analyse-output
-				       a-process
-				       an-output-string))
-	       (epips-debug "Return of epips-analyse-output:")
-	       (epips-debug an-output-string)
+		     (setq an-output-string (epips-analyse-output
+					     a-process
+					     an-output-string))
+		     (epips-debug "Return of epips-analyse-output:")
+		     (epips-debug an-output-string)
 					; Until it returns an empty
 					; string:
-	       (not (equal an-output-string ""))))
+		     (not (equal an-output-string ""))))
 
+	    (set-marker (process-mark a-process) (point))
+	    )
+	  (if moving (goto-char (process-mark a-process)))
+	  (set-buffer old-buffer)
+	  )
       )
     )
   )
@@ -619,15 +653,23 @@
 ; Launch the wpips process from Emacs:
 (let
     (
-     (process-connection-type nil) ; Use a pipe to communicate
+     (process-connection-type nil)	; Use a pipe to communicate
      )
   (setq epips-process (start-process "wpips" "Pips-Log" "wpips" "-emacs"))
-  ;(setq epips-process (start-process "wpips" "epips" "ls" "-lag"))
+					;(setq epips-process (start-process "wpips" "epips" "ls" "-lag"))
 					;(goto-char (process-mark epips-process))
-  (set-process-filter epips-process 'epips-output-filter)
   (setq epips-process-buffer (process-buffer epips-process))
+  (set-process-filter epips-process 'epips-output-filter)
   (pop-to-buffer epips-process-buffer)
-				;(switch-to-buffer epips-process-buffer)
+					;(switch-to-buffer
+					; epips-process-buffer) Hum, I
+					; do not know why I need to
+					; initialize (process-mark
+					; epips-process) if I do not
+					; want a rude #<marker in no
+					; buffer>. It used to work, but...
+  (goto-char (point-max))
+  (set-marker (process-mark epips-process) (point))
   (epips-add-keymaps-and-menu)
   )
 
@@ -636,7 +678,7 @@
   (let
       (
        (old-buffer (current-buffer))
-       (inhibit-quit nil) ; Allow interrupion inside the filter
+       (inhibit-quit nil)		; Allow interrupion inside the filter
        )
     (unwind-protect
 	(let (moving)
