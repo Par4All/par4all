@@ -206,7 +206,7 @@ runtime. For a given module name, resources <b>owner</b> may be:
 <br>
 
 <UL>
-	<LI><b>PROGRAM</b>: the complete program (i.e. the source file)
+	<LI><b>PROGRAM</b>: the complete program (i.e. all modules in the source files)
 	<LI><b>MODULE</b>: the module itself
 	<LI><b>MAIN</b>: the main module (if any)
 	<LI><b>ALL</b>: all the modules
@@ -231,7 +231,11 @@ resources</b>.
 
 <P>
 
-You may want to see the <A HREF="pipsmake-rc/pipsmake-rc.html">complete description of the rules</A>.
+You may want to see the <A HREF="pipsmake-rc/pipsmake-rc.html">complete
+description of the rules</A> for PIPS. Note that a consistent subset of
+these rules could be defined to derive automatically a tool with a
+subset of PIPS capabilities. For instance, PIPS could be restricted to
+program analyses or to parallelization for shared-memory machines.
 
 </P>
 <h3>2.3) Up to date resources</h3>
