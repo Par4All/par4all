@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.145  1998/12/30 17:32:06  irigoin
+# Modification of PIPS_CPP initialization for Solaris 2 with SUN Workshop: use fpp
+#
 # Revision 1.144  1998/11/18 12:21:36  coelho
 # unset EPIPS_EMACS.
 #
@@ -243,7 +246,9 @@ LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PIPS_ROOT}/Lib/${PIPS_ARCH}"
 #
 # to get some determinism...
 
-PIPS_CPP='gcc -E'
+PIPS_CPP='gcc -E -C'
+test "${PIPS_ARCH}" = GNUSOL2LL && \
+	PIPS_CPP="fpp"
 
 # Additional options to pass to cpp for .F files:
 # default: PIPS_CPP_FLAGS=""
