@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/06/11 13:27:01 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/07/23 15:08:32 $, )
  * version $Revision$
  */
 
@@ -158,13 +158,13 @@ remove_variables_if_possible(
     MAP(ENTITY, e, 
     {
 	Variable var = (Variable) e;
-	int coeff = -1;
+	Value coeff = VALUE_MONE;
 	
 	(void) contrainte_var_min_coeff(sc_egalites(syst), var, &coeff, FALSE);
 	
-	if (coeff==1)
+	if (value_one_p(coeff))
 	{
-	    Pvecteur v = vect_new(var, 1);
+	    Pvecteur v = vect_new(var, VALUE_ONE);
 	    bool exact = TRUE;
 	    
 	    pips_debug(7, "removing variable %s\n", 
@@ -476,10 +476,10 @@ simplify_deducable_variables(
     MAP(ENTITY, dummy,
     {
 	Pcontrainte eq = CONTRAINTE_UNDEFINED;
-	int coeff = 0;
-
+	Value coeff = VALUE_ZERO;
+	
 	 if (eq = eq_v_min_coeff(sc_egalites(syst), (Variable) dummy, &coeff),
-	     (coeff == 1))
+	     value_one_p(coeff))
 	 {
 	     result = 
 		 CONS(EXPRESSION,
@@ -627,7 +627,7 @@ list l;
 	
     MAP(ENTITY, e,
     {
-	Pbase new = (Pbase) vect_new((Variable) e, (Value) 1);
+	Pbase new = (Pbase) vect_new((Variable) e, VALUE_ONE);
 	new->succ = result;
 	result = new;
     },
@@ -824,7 +824,7 @@ add_declaration_to_host_and_link(
      */
     s = entity_storage(host_array);
     if (storage_formal_p(s))
-	formal_offset(storage_formal(s)) = MAXINT;
+	formal_offset(storage_formal(s)) = INT_MAX;
 }
 
 /*   compile an io statement
