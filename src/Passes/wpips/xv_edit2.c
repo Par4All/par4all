@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/12 15:40:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/10/11 17:20:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1996/07/12 15:40:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1996/10/11 17:20:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -285,6 +285,32 @@ wpips_file_view(char * file_name,
 }
 
 
+void
+display_graph_with_daVinci(string file_name)
+{
+    char a_buffer[SMALL_BUFFER_LENGTH];
+    /* Exploit some parallelism between daVinci/Emacs and PIPS
+       itself: */
+    if (wpips_emacs_mode)
+	ask_emacs_to_open_a_new_daVinci_context();
+
+    file_name = build_view_file(DBR_GRAPH_PRINTED_FILE);
+
+    user_log("Displaying in a \"daVinci\" window...\n");
+
+    /* Preprocess the graph to be understandable by daVinci : */
+    if (wpips_emacs_mode) {
+	sprintf(a_buffer, "pips_graph2daVinci %s", file_name);
+	system(a_buffer);
+	ask_emacs_to_display_a_graph(file_name);
+    }
+    else {
+	sprintf(a_buffer, "pips_graph2daVinci -launch_daVinci %s", file_name);
+	system(a_buffer);
+    }
+}
+
+
 /* To execute something and display some Pips output with wpips or
    epips, called outside the notifyer: */
 void
@@ -295,17 +321,9 @@ execute_wpips_execute_and_display_something_outside_the_notifyer()
 
    string label = execute_wpips_execute_and_display_something_outside_the_notifyer_view_name;
    
-   if (strcmp(label, SEQUENTIAL_GRAPH_VIEW) == 0) {
-      /* Use some graph viewer to display the resource: */
-      char system_buffer[300];
-      
-      file_name = build_view_file(DBR_GRAPH_PRINTED_FILE);
-
-      user_log("Launching a \"daVinci\" process in background...\n");
-
-      (void) sprintf(system_buffer, "display_pips_daVinci %s &", file_name);
-      system(system_buffer);
-   }
+   if (strcmp(label, SEQUENTIAL_GRAPH_VIEW) == 0)
+       /* Use some graph viewer to display the resource: */
+       display_graph_with_daVinci(file_name);
    else {
       /* Use some text viewer to display the resource: */
       char * print_type = NULL;
