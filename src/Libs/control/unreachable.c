@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: unreachable.c,v $
+ * Revision 1.2  1997/11/10 18:19:52  coelho
+ * typos fixed...
+ *
  * Revision 1.1  1997/11/10 18:12:15  coelho
  * Initial revision
  *
@@ -20,11 +23,13 @@
 
 /******************************************************** REACHED STATEMENTS */
 
-GENERIC_LOCAL_FUNCTION(reached, statement_int);
-GENERIC_LOCAL_FUNCTION(continued, statement_int);
+GENERIC_LOCAL_FUNCTION(reached, persistant_statement_to_int);
+GENERIC_LOCAL_FUNCTION(continued, persistant_statement_to_int);
 
-#defined reached_p(s)  (bound_reached_p(s))
+#define reached_p(s)   (bound_reached_p(s))
 #define continued_p(s) (load_continued(s))
+
+static bool propagate(statement);
 
 static bool
 control_propagate(control c)
@@ -73,7 +78,7 @@ propagate(statement s)
     {
     case is_instruction_sequence:
     {
-	list l = instruction_sequence(i);
+	list l = sequence_statements(instruction_sequence(i));
 	while (l && (continued=propagate(STATEMENT(CAR(l)))))
 	    POP(l);
 	break;
