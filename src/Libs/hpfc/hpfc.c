@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/05/15 10:39:52 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/07/19 13:30:53 $, )
  * version $Revision$
  */
  
@@ -401,9 +401,12 @@ string name;
 	reset_current_module_entity();
 	save_hpfc_status();
     }
-    else
+    else /* fake */
     {
-	DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, strdup(name), NO_FILE);/* fake */
+	DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, strdup(prefix), NO_FILE);
+	DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, strdup(prefix), NO_FILE);
+	DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, strdup(prefix), NO_FILE);
+	DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, strdup(prefix), NO_FILE);
     }
 
     debug_off();
