@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.143  1998/09/22 08:54:09  coelho
+# eole added.
+#
 # Revision 1.142  1998/08/22 08:22:40  coelho
 # new Ultra 5  machines added as GNUSOL2LL hosts.
 #
@@ -168,7 +171,24 @@ PATH="${PATH}:${LINEAR_ROOT}/Bin/${PIPS_ARCH}"
 
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${LINEAR_ROOT}/Lib/${PIPS_ARCH}"
 
+#
+#         ######   ####   #       ######
+#         #       #    #  #       #
+#         #####   #    #  #       #####
+#         #       #    #  #       #
+#         #       #    #  #       #
+#         ######   ####   ######  ######
+#
+# Evaluation Optimization for Loops and Expressions
+#
+# Julien ZORY Stuff based on CAVEAT and STORM.
+#
 
+eole_dir=/projects/Eole
+
+EOLE_ROOT=${eole_dir}
+
+PATH="${PATH}:${eole_dir}/Bin/${PIPS_ARCH}"
 
 # 
 #         #####      #    #####    ####
