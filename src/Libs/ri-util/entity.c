@@ -286,9 +286,36 @@ entity entity_empty_label()
 bool top_level_entity_p(e)
 entity e;
 {
+    /* This code is wrong because it only checks that entity_module_name(e)
+     * is a prefix of TOP_LEVEL_MODULE_NAME. So it returns TRUE for variables
+     * of a subroutine called TOP!
+     *
+     * The MODULE_SEP_STRING should be added to TOP_LEVEL_MODULE_NAME?
+     *
+     * To return FALSE quickly, TOP_LEVEL_MODULE_NAME should begin with
+     * a special character never appearing in standrad identifier, for
+     * instance * (star).
+     */
+    /*
     return(strncmp(TOP_LEVEL_MODULE_NAME, 
 		   entity_name(e),
 		   strlen(entity_module_name(e))) == 0);
+		   */
+
+    /* FI: It's late, I cannot think of anything better */
+    /*
+    int l = strlen(entity_module_name(e));
+    bool top = FALSE;
+
+    if(l==strlen(TOP_LEVEL_MODULE_NAME)) {
+	top = (strncmp(TOP_LEVEL_MODULE_NAME, 
+		   entity_name(e), l) == 0);
+    }
+    */
+
+    bool top = (strcmp(TOP_LEVEL_MODULE_NAME, entity_module_name(e)) == 0);
+
+    return top;
 }
 
 bool io_entity_p(e)
