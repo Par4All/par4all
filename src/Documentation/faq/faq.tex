@@ -4,6 +4,10 @@
 %% PIPS faq
 %%
 %% $Log: faq.tex,v $
+%% Revision 1.7  1999/01/09 18:20:10  irigoin
+%% Two sections added about loop parallelization, following new results from
+%% the Perfect Club and the Spec CFP95 benchmarks.
+%%
 %% Revision 1.6  1998/10/21 08:20:12  irigoin
 %% Some information added about the input language
 %%
@@ -117,7 +121,7 @@ not applied by default. The corresponding properties must be set (see \PROPERTIE
 
 \end{itemize}
 
-Formal functional are still unsupported ($Date: 1998/10/21 08:20:12 $) and
+Formal functional are still unsupported ($Date: 1999/01/09 18:20:10 $) and
 the internal representation of DATA statements is unsatisfactory.
 
 Recursivity, which is not in Fortran 77 standard, is not supported.
@@ -278,6 +282,61 @@ The complexity analysis, which is automatic like all analyses because they
 cannot degrade performance, provides some static symbolic information
 about the impact of a given code transformation on the number of executed
 operations.
+
+\section{This loop should be parallelized!}
+\index{Parallelization}
+
+Many conditions must be met for a loop to be declared parallel and PIPS,
+as a research tool, offers (too) many options. By default, the simplest
+algorithms are used but this may be changed by customizing
+\verb/pipsmake.rc/ and \verb/properties.rc/.
+
+Is your loop pretty simple and legal for Allen\&Kennedy parallelization
+algorithm? This means no test, no branch within its body, and no label on
+the DO statement because the parallel code generation ignores control
+dependences and regenerates the loops around each strongly-connected
+component (SCC) of the dependence graph.
+
+If your loop body is not a simple sequence of assignments, you should
+select another parallelization algorithm such as
+\verb/coarse_grain_parallelization/ (explore the option menus of \verb/jpips/ and
+wpips or use the \verb/activate/ command with \verb/tpips/).
+
+Some trivial dependences may require a preliminary privatization. For
+temporary scalars, apply the code transformation
+\verb/privatize_module/. If temporary arrays are used, an array
+privatization is necessary. The privatization information is based on IN
+and OUT regions which are computed using MUST READ and MUST WRITE
+regions... PIPS does not offer compound commands and, regardless of the
+PIPS user interface you are used to, several commands are necessary to
+perform a scalar or array privatization followed by a parallelization.
+
+Finally, dependence tests use more or less information. If contextual
+information is necessary to find out that a loop is parallel, a dependence
+test using preconditions (\verb/rice_semantics_dependence_graph/) or
+regions (\verb/rice_regions_dependence_graph/) should be
+selected. Furthermore, regions depend on transformers which, like
+preconditions, may be computed in different ways. The most accurate
+information is gathered with the two selections
+\verb/transformers_inter_full/
+and \verb/preconditions_inter_full/.
+
+\section{This loop should not be parallelized!}
+\index{Parallelization}
+
+A sequential loop may be parallelized by PIPS if it is never executed
+because it is part of some dead code. The information is carried by the
+preconditions or by the loop bounds and used in the dependence systems. As
+a result, no dependence is found because there are no iterations and the
+loop is declared parallel.
+
+A loop with only one iteration also is always parallel, regardless of the
+references in its body.
+
+This is surprising for the user and we might change PIPS behavior so as
+not to parallelize useless loops. But this would require an extra
+feasibility test which will slow down PIPS and this would keep sequential
+trivially parallel loops which is another source of surprise!
 
 \newpage
 
