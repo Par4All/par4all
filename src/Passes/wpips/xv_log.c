@@ -182,7 +182,7 @@ char error_buffer[];
 		XFlush((Display *) xv_get(main_frame, XV_DISPLAY));
 		xv_set(clear, MENU_INACTIVE, FALSE, 0);
 
-		longjmp(pips_top_level);
+		longjmp(pips_top_level, 1);
     }
 
     (void) exit(1);
