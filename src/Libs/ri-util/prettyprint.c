@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/05 15:18:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/05 18:22:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/05 15:18:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/09/05 18:22:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -25,7 +25,6 @@ static char vcid[] = "%A% ($Date: 1995/09/05 15:18:00 $, ) version $Revision$, g
   *    Alexis Platonoff, Nov. 18, 1994
   */
 #include <stdlib.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -886,31 +885,11 @@ string control_slabel() ;
 
 
 void
-add_one_unformated_printf_to_text(text r,
-                                  string a_format, ...)
-{
-   char buffer[200];
-   
-   va_list some_arguments;
-
-   va_start(some_arguments, a_format);
-   
-   (void) vsprintf(buffer, a_format, some_arguments);
-   ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-                                         strdup(buffer)));
-
-   va_end(some_arguments);
-}
-
-
-void
 output_a_graph_view_of_the_unstructured_successors(text r,
                                                    entity module,
                                                    int margin,
                                                    control c)
 {                  
-   char buffer[200];
-
    add_one_unformated_printf_to_text(r, "%s %#x\n",
                                      PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER,
                                      (unsigned int) c);
@@ -951,7 +930,6 @@ output_a_graph_view_of_the_unstructured(text r,
                                         unstructured u,
                                         int num)
 {
-   char buffer[200];
    list blocs = NIL;
    control begin_control = unstructured_control(u);
    control end_control = unstructured_exit(u);
