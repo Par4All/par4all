@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <signal.h>
+#include <setjmp.h>
 
 #include "genC.h"
 
