@@ -24,6 +24,16 @@
  */
 #include <limits.h>
 
+/* 
+   #        ####   #    #   ####           #        ####   #    #   ####
+   #       #    #  ##   #  #    #          #       #    #  ##   #  #    #
+   #       #    #  # #  #  #               #       #    #  # #  #  #
+   #       #    #  #  # #  #  ###          #       #    #  #  # #  #  ###
+   #       #    #  #   ##  #    #          #       #    #  #   ##  #    #
+   ######   ####   #    #   ####           ######   ####   #    #   ####
+
+   */
+
 /* gnu and sun do not have the same conventions for "long long"
  */
 #ifndef LONG_LONG_MAX
@@ -44,8 +54,7 @@ typedef long long int Value;
 #define VALUE_ZERO 0LL
 #define VALUE_ONE  1LL
 #define VALUE_MONE -1LL
-/* I cannot trust gcc for this...
- * some faster checks with 0x7ffffff000 sg and so ? 
+/* I can just trust myself for this...
  */
 #define VALUE_TO_LONG(val) \
     ((long)((val)>=(Value)LONG_MIN&&(val)<=(Value)LONG_MAX)?\
@@ -55,8 +64,20 @@ typedef long long int Value;
      (val):(abort(), VALUE_NAN))
 #define VALUE_TO_DOUBLE(val) ((double)(val))
 #define VALUE_TO_FLOAT(val) ((float)(val))
+
 /* end LINEAR_VALUE_IS_LONGLONG
  */
+
+/* 
+   #        ####   #    #   ####
+   #       #    #  ##   #  #    #
+   #       #    #  # #  #  #
+   #       #    #  #  # #  #  ###
+   #       #    #  #   ##  #    #
+   ######   ####   #    #   ####
+
+   */
+
 #elif defined(LINEAR_VALUE_IS_LONG)
 #define LINEAR_VALUE_STRING "long int"
 typedef long Value;
@@ -72,8 +93,19 @@ typedef long Value;
 #define VALUE_TO_INT(val) ((int)(val))
 #define VALUE_TO_FLOAT(val) ((float)(val))
 #define VALUE_TO_DOUBLE(val) ((double)(val))
+
 /* end LINEAR_VALUE_IS_LONG
  */
+
+/* 
+   ######  #        ####     ##     #####
+   #       #       #    #   #  #      #
+   #####   #       #    #  #    #     #
+   #       #       #    #  ######     #
+   #       #       #    #  #    #     #
+   #       ######   ####   #    #     #
+ 
+   */
 /*
 #elif defined(LINEAR_VALUE_IS_FLOAT)
 #define LINEAR_VALUE_STRING "float"
@@ -90,8 +122,20 @@ typedef float Value;
 #define VALUE_TO_FLOAT(val) ((float)(val))
 #define VALUE_TO_DOUBLE(val) ((double)(val))
 */
+
 /* end LINEAR_VALUE_IS_FLOAT
  */
+
+/*
+   ####   #    #    ##    #####           #   #
+  #    #  #    #   #  #   #    #           # #
+  #       ######  #    #  #    #         #######
+  #       #    #  ######  #####            # #
+  #    #  #    #  #    #  #   #           #   #
+   ####   #    #  #    #  #    #
+  
+   */
+
 /* the purpose of the chars version is to detect invalid assignments
  */
 #elif defined(LINEAR_VALUE_IS_CHARS)
@@ -109,15 +153,26 @@ typedef union { char *s; long l; int i; float f; double d;} Value;
 #define VALUE_TO_INT(val) (val.i)
 #define VALUE_TO_FLOAT(val) (val.f)
 #define VALUE_TO_DOUBLE(val) (val.d)
+
 /* end LINEAR_VALUE_IS_CHARS
  */
+
+/*
+    #    #    #   #####
+    #    ##   #     #
+    #    # #  #     #
+    #    #  # #     #
+    #    #   ##     #
+    #    #    #     #
+
+    */
 #else /* default: LINEAR_VALUE_IS_INT */
 #define LINEAR_VALUE_STRING "int"
 typedef int Value;
 #define VALUE_FMT "%d"
 #define VALUE_CONST(val) (val)
 #define VALUE_NAN INT_MIN
-#define VALUE_MIN INT_MIN
+#define VALUE_MIN (INT_MIN+1)
 #define VALUE_MAX INT_MAX
 #define VALUE_ZERO 0
 #define VALUE_ONE  1
@@ -130,6 +185,10 @@ typedef int Value;
  */
 #endif 
 
+/************************** ************ MACROS FOR MANIPULATING VALUES... */
+
+/* cast to value
+ */
 #define int_to_value(i) ((Value)(i))
 #define long_to_value(l) ((Value)(l))
 #define float_to_value(f) ((Value)(f))
@@ -234,12 +293,19 @@ typedef int Value;
 #define value_mult(v,w) value_protected_mult(v,w)
 #define value_product(v,w) value_protected_product(v,w)
 #else
-#define value_mult(v,w) value_protected_multiply(v,w,abort())
-#define value_product(v,w) v=value_protected_multiply(v,w,abort())
 
-/* #define value_mult(v,w) value_direct_multiply(v,w)
-   #define value_product(v,w) value_direct_product(v,w)
-*/
+/* I do enforce the protection whatever requested:-)
+ */
+#define value_mult(v,w) 					\
+  value_protected_multiply(v,w,					\
+    (fprintf(stderr,"[value_mult] value overflow!\n"),abort()))
+#define value_product(v,w) v=value_mult(v,w)
+
+/* was:
+ * #define value_mult(v,w) value_direct_multiply(v,w)
+ * #define value_product(v,w) value_direct_product(v,w)
+ * could be: protected versions...
+ */
 #endif
 
 /******************************************************* STATIC VALUE DEBUG */
