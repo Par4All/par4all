@@ -94,7 +94,11 @@ Pvecteur *lvbase;
     sc_fprint(stdout,ps1,*variable_default_name);
     printf (" -- variables de base :");
     for (pvec = *lvbase;pvec!= NULL;pvec=pvec->succ)
-	printf(" (%d,%d), ",pvec->var,pvec->val);
+    {
+	printf(" (0x%x,", (unsigned int) pvec->var);
+	print_Value(pvec->val);
+	printf("), ");
+    }
     printf("\n");
     sc_rm(ps1);
 
@@ -152,7 +156,7 @@ Pbase *b;
 		    lvbase_add(nv,nb_som,lvbase);
 		    *(ineg->eq_sat) = 1;
 		    *b = vect_add_variable(*b,nv);
-		    *nbvars ++;
+		    (*nbvars)++; 
 		}
 		nb_som --;
 	    }
@@ -160,7 +164,11 @@ Pbase *b;
 #ifdef TRACE
 	    printf (" -- variables de base :");
 	    for (pvec = *lvbase;pvec!= NULL;pvec=pvec->succ)
-		printf(" (%s,%d), ",pvec->var,pvec->val);
+	    {
+		printf(" (0x%x,",(unsigned int)pvec->var);
+		print_Value(pvec->val);
+		printf("), ");
+	    }
 	    printf("\n");
 	    ps1 = som_sys_conv(sys2);
 	    sc_fprint(stdout,ps1,*variable_default_name);
@@ -202,7 +210,7 @@ Psommet fonct;
 		    nv = creat_new_var(ps1);
 		    vect_add_elem(&(ineg->vecteur),nv,1);
 		    *b = vect_add_variable(*b,nv);
-		    *nbvars ++;
+		    (*nbvars) ++;
 		    if (vect_coeff(TCST,ineg->vecteur) > 0) {
 			nv = creat_new_var(ps1);
 			vect_add_elem(&(ineg->vecteur),nv,-1);
@@ -213,7 +221,7 @@ Psommet fonct;
 
 		    *(ineg->eq_sat) = 1;
 		    *b = vect_add_variable(*b,nv);
-		    *nbvars ++;
+		    (*nbvars) ++;
 		}
 		nb_som --;
 	    }
@@ -221,7 +229,11 @@ Psommet fonct;
 #ifdef TRACE
 	    printf (" -- variables de base :");
 	    for (pvec = *lvbase;pvec!= NULL;pvec=pvec->succ)
-		printf(" (%s,%d), ",pvec->var,pvec->val);
+	    {
+		printf(" (0x%x,",(unsigned int)pvec->var);
+		print_Value(pvec->val);
+		printf("), ");
+	    }
 	    printf("\n");
 	    ps1 = som_sys_conv(sys2);
 	    sc_fprint(stdout,ps1,*variable_default_name);
