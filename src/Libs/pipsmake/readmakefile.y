@@ -232,6 +232,8 @@ makefile m;
 makefile parse_makefile()
 {
     string default_pipsmake_rc_file;
+    extern int init_lex();
+    extern int yyparse();
 
     debug_on("PIPSMAKE_DEBUG_LEVEL");
 
