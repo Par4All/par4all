@@ -164,12 +164,12 @@ cons *la;
 
 	if (EvalNormalized(nd, &val)) {
 	    FreeNormalized(nd);
-	    normalized_linear(n = ng) = 
+	    normalized_linear_(n = ng) = 
 		(char *) vect_multiply(normalized_linear(ng), val);
 	}
 	else if (EvalNormalized(ng, &val)) {
 	    FreeNormalized(ng);
-	    normalized_linear(n = nd) = 
+	    normalized_linear_(n = nd) = 
 		(char *) vect_multiply(normalized_linear(nd), val);
 	}
 	else {
@@ -305,7 +305,7 @@ normalized n;
     /* FI: theoretically, free_normalized() performs the next three lines... */
     if (normalized_linear_p(n)) {
 	vect_rm(normalized_linear(n));
-	normalized_linear(n) = NULL;
+	normalized_linear_(n) = NULL;
     }
 
     free_normalized(n);
