@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/03 14:36:08 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/03 16:28:10 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -278,7 +278,7 @@ evaluate_divide_if_possible(
 	    min+=coef, max+=coef;
 	else
 	{
-	    if (range_of_variable(var, &lb, &ub))
+	    if (!range_of_variable(var, &lb, &ub))
 		return FALSE;
 
 	    if (coef>0)
