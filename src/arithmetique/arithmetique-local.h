@@ -32,7 +32,7 @@
 #endif
 
 #if defined(LINEAR_VALUE_IS_LONGLONG)
-typedef long long Value;
+typedef long long int Value;
 #define VALUE_FMT "%lld"
 #define VALUE_CONST(val) (val##LL)
 #define VALUE_MIN LONG_LONG_MIN
@@ -46,9 +46,11 @@ typedef long long Value;
  * some faster checks with 0x7ffffff000 sg and so ? 
  */
 #define VALUE_TO_LONG(val) \
-    ((long)((val)>=(Value)LONG_MIN&&(val)<=(Value)LONG_MAX)?(val):abort())
+    ((long)((val)>=(Value)LONG_MIN&&(val)<=(Value)LONG_MAX)?\
+     (val):(abort(), VALUE_NAN))
 #define VALUE_TO_INT(val) \
-    ((int)((val)>=(Value)INT_MIN&&(val)<=(Value)INT_MAX)?(val):abort())
+    ((int)((val)>=(Value)INT_MIN&&(val)<=(Value)INT_MAX)?\
+     (val):(abort(), VALUE_NAN))
 #define VALUE_TO_DOUBLE(val) ((double)(val))
 #define VALUE_TO_FLOAT(val) ((float)(val))
 /* end LINEAR_VALUE_IS_LONGLONG
