@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1997/01/18 11:51:29 $, )
+# ($Date: 1997/02/17 16:51:05 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a NAME macro is expected somewhere...
@@ -269,7 +269,12 @@ install_hostnode: install_node install_host
 install_host: $(pvmbin)/$(HOST)
 install_node: $(pvmbin)/$(NODE)
 
-install:; $(RM) $(pvmbin)/$(MAIN); $(MAKE) install_main;
+install_main_forced:; $(RM) $(pvmbin)/$(MAIN); $(MAKE) install_main;
+
+# install in PVM directory what can be
+install:
+	-test -f $(MAIN) && $(MAKE) install_main_forced
+	-test -f $(HOST) && $(MAKE) install_hostnode
 
 run: install pvm
 	$(pvmbin)/$(HOST)
