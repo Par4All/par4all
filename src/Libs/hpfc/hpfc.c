@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: hpfc.c,v $ ($Date: 1995/03/27 16:28:36 $, ) version $Revision$,
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/03/28 16:24:44 $, ) version $Revision$,
  * got on %D%, %T%
  */
  
@@ -310,6 +310,7 @@ string name;
 
     debug_on("HPFC_DEBUG_LEVEL");
     debug(1, "hpfc_directives", "considering module %s\n", name);
+    debug_on("HPFC_DIRECTIVES_DEBUG_LEVEL");
 
     if (!hpfc_entity_reduction_p(module) &&
 	!hpf_directive_entity_p(module) &&
@@ -323,7 +324,7 @@ string name;
 	build_full_ctrl_graph(s);
 	handle_hpf_directives(s);
 
-	reset_ctrl_graph();            /* memory leak ??? */
+	clean_ctrl_graph();
 	/* free_update_common_map(); */
 	reset_current_module_entity();
 
@@ -334,11 +335,10 @@ string name;
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_DIRECTIVES, strdup(name), NO_FILE); /* fake */
 
-    debug_off();
+    debug_off(); debug_off();
 }
 
-/* should compile MODULE name.
- * should skip reductions and so...
+/* compiles MODULE name.
  */
 void hpfc_compile(name)
 string name;
@@ -372,6 +372,8 @@ string name;
 
 /* close the hpf compiler execution.
  * must deal with the commons, which are global to the program.
+ * no way to tell the database/make that the HPFC_STATUS is destroyed.
+ * the NO_FILE hack does not seem to work.
  */
 void hpfc_close(name)
 string name;
@@ -381,10 +383,10 @@ string name;
  
     load_hpfc_status();
     
-    set_bool_property("PRETTYPRINT_COMMONS", TRUE); 
-
+    set_bool_property("PRETTYPRINT_COMMONS", TRUE); /* commons compilation */
     gen_map(compile_common, get_the_commons());
-    put_generated_resources_for_program(name);
+
+    put_generated_resources_for_program(name);      /* global informations */
 
     close_hpfc_status();
     DB_PUT_FILE_RESOURCE(DBR_HPFC_STATUS, strdup(name), NO_FILE); /* fake */
