@@ -367,13 +367,20 @@ bool simdizer(char * module_name)
 	 printf("The Great Wizard can go to bed and do nothing, too...\n");
    }
    
-   debug_off();
+   pips_assert("Statement is consistent after SIMDIZER", 
+	       statement_consistent_p(mod_stmt));
    
+   /* Reorder the module, because new statements have been added */  
+   /* module_reorder(mod_stmt); */
+   DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+ 
    /* update/release resources */
    reset_current_module_statement();
    reset_current_module_entity();
    reset_proper_rw_effects();
    reset_precondition_map();
+
+   debug_off();
 
    return TRUE;
 }
