@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: makefile_macros.LINUXI86LL,v $
+# Revision 1.7  1998/01/23 18:45:01  coelho
+# .nowpips added
+#
 # Revision 1.6  1998/01/23 09:09:25  coelho
 # .pentium included.
 #
@@ -17,6 +20,9 @@
 include $(ROOT)/Include/makefile_macros.GNULL
 include $(ROOT)/Include/makefile_macros.linux
 include $(ROOT)/Include/makefile_macros.pentium
+
+# no wpips on loreto...
+include $(ROOT)/Include/makefile_macros.nowpips
 
 # end of it!
 #
