@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/25 17:16:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/05/27 11:47:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/04/25 17:16:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/05/27 11:47:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -2390,15 +2390,14 @@ int precedence;
 	}
 
 	c = syntax_call(s);
-
 	if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
 	   good_fmt = strcmp
-	       (words_to_string(fmt_words = words_expression(arg)), "*")==0;
+	       (STRING(CAR(fmt_words = words_expression(arg))), "*")==0;
 	   pio_write = CDR(CDR(pio_write));
 	}
 	else if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
 	    good_unit = strcmp
-		(words_to_string(unit_words = words_expression(arg)), "*")==0;
+		(STRING(CAR(unit_words = words_expression(arg))), "*")==0;
 	    pio_write = CDR(CDR(pio_write));
 	}
 	else if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
