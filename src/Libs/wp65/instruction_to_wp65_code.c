@@ -2,7 +2,7 @@
   *
   * Higher level functions
   *
-  * File: wp65.c
+  * File: $RCSfile: instruction_to_wp65_code.c,v $
   *
   * PUMA, ESPRIT contract 2701
   *
@@ -47,7 +47,7 @@ typedef dg_vertex_label vertex_label;
 static list implied_do_range_list=NIL;
 static int loop_nest_dim =0;
 static list loops_of_nest=NIL;
-
+
 static void 
 add_range_in_list(range r)
 {
@@ -448,22 +448,46 @@ io_loop_nest_p(statement st)
 
 
 void 
-loop_nest_movement_generation(entity module, statement loop_nest, int
-			      pn, int bn, int ls, int pd, entity proc_id, 
-			      entity proc_id_mm, Pbase bank_indices, 
-			      hash_table v_to_esv, hash_table v_to_nlv, 
-			      entity compute_module, statement computational, 
-			      entity memory_module, statement emulator, 
-			      statement_mapping fetch_map,statement_mapping store_map,
-			      statement mod_stat,boolean fully_parallel, Psysteme sc_tile, 
-			      Pbase initial_basis, Pbase local_basis,Pbase local_basis2, 
-			      Pbase tile_basis_in_tile_basis, Pbase tile_basis_in_tile_basis2,
-			      Pbase loop_body_indices, list lpv,list * lb,list *blb,list *sb,
-			      list *bsb,int first_parallel_level, int last_parallel_level,
-			      hash_table llv_to_lcr,  hash_table r_to_llv, 
-			      hash_table v_to_lllv,hash_table r_to_ud) 
+loop_nest_movement_generation(
+    entity module,
+    statement loop_nest,
+    int pn,
+    int bn,
+    int ls,
+    int pd,
+    entity proc_id, 
+    entity proc_id_mm,
+    Pbase bank_indices, 
+    hash_table v_to_esv,
+    hash_table v_to_nlv, 
+    entity compute_module,
+    statement computational, 
+    entity memory_module,
+    statement emulator, 
+    statement_mapping fetch_map,
+    statement_mapping store_map,
+    statement mod_stat,
+    boolean fully_parallel,
+    Psysteme sc_tile, 
+    Pbase initial_basis,
+    Pbase local_basis,
+    Pbase local_basis2, 
+    Pbase tile_basis_in_tile_basis,
+    Pbase tile_basis_in_tile_basis2,
+    Pbase loop_body_indices,
+    list lpv,
+    list * lb,
+    list *blb,
+    list *sb,
+    list *bsb,
+    int first_parallel_level,
+    int last_parallel_level,
+    hash_table llv_to_lcr,
+    hash_table r_to_llv, 
+    hash_table v_to_lllv,
+    hash_table r_to_ud) 
 { 
-
+    
     list fetch_data_list =NIL; 
     list store_data_list = NIL; 
     list fetch_reference_list = NIL; 
@@ -478,13 +502,14 @@ loop_nest_movement_generation(entity module, statement loop_nest, int
 		     loop_nest,store_map,fully_parallel);   
     MAPL(r1,{  entity rv = (entity) reference_variable(REFERENCE(CAR(r1)));
 	       if(!entity_is_argument_p(rv, lpv))
-		   make_all_movement_blocks(module,compute_module,memory_module,
-					    rv,fetch_reference_list,
-					    llv_to_lcr, v_to_lllv,r_to_ud, v_to_esv,
-					    pn,bn, ls,
-					    sc_tile, initial_basis, local_basis,
-					    proc_id, bank_indices,loop_body_indices,
-					    lb, blb,is_action_read,first_parallel_level,
+		   make_all_movement_blocks(
+		       module,compute_module,memory_module,
+		       rv,fetch_reference_list,
+		       llv_to_lcr, v_to_lllv,r_to_ud, v_to_esv,
+		       pn,bn, ls,
+		       sc_tile, initial_basis, local_basis,
+		       proc_id, bank_indices,loop_body_indices,
+		       lb, blb,is_action_read,first_parallel_level,
 					    last_parallel_level);
 	   },
 	 fetch_data_list);
@@ -502,24 +527,36 @@ loop_nest_movement_generation(entity module, statement loop_nest, int
 				     pn,bn, ls,
 				     sc_tile, initial_basis, local_basis,
 				     proc_id, bank_indices, loop_body_indices,
-				     sb, bsb, is_action_write, first_parallel_level,
+				     sb, bsb, is_action_write, 
+				     first_parallel_level,
 				     last_parallel_level);
     },
 	 store_data_list);
     debug_off();
 }
 
-
-void 
-loop_nest_to_wp65_code(entity module, statement loop_nest, graph dg, 
-			    int pn, int bn, int ls, int pd, 
-			    entity proc_id, entity proc_id_mm, Pbase bank_indices,
-			    hash_table v_to_esv, hash_table v_to_nlv,
-			    entity compute_module, statement computational, 
-			    entity memory_module, statement emulator,
-			    statement_mapping fetch_map,statement_mapping store_map,
-                            statement mod_stat)
 
+void 
+loop_nest_to_wp65_code(
+    entity module,
+    statement loop_nest,
+    graph dg, 
+    int pn,
+    int bn,
+    int ls,
+    int pd, 
+    entity proc_id,
+    entity proc_id_mm,
+    Pbase bank_indices,
+    hash_table v_to_esv,
+    hash_table v_to_nlv,
+    entity compute_module,
+    statement computational, 
+    entity memory_module,
+    statement emulator,
+    statement_mapping fetch_map,
+    statement_mapping store_map,
+    statement mod_stat)
 {
 
     Psysteme iteration_domain = sc_new();  
@@ -651,11 +688,10 @@ loop_nest_to_wp65_code(entity module, statement loop_nest, graph dg,
 					 tile_basis_in_tile_basis, 
 					 local_basis);
   
-    ifdebug(8) { fprintf(stderr,"loop body \n");
-		 MAPL(lsb, {        
-		     print_text(stderr,text_statement(module, 2, 
-						      STATEMENT(CAR(lsb)))); 
-		 }, list_statement_block); 
+    ifdebug(8) { 
+	fprintf(stderr,"loop body \n");
+	MAP(STATEMENT, s, wp65_debug_print_text(module, s), 
+	    list_statement_block); 
 	     }
     if (list_of_calls_p(list_statement_block)) {
 	body = perfectly_nested_loop_to_body(loop_nest);
@@ -706,11 +742,11 @@ loop_nest_to_wp65_code(entity module, statement loop_nest, graph dg,
 	     statement stmp =  STATEMENT(CAR(lsb)); 
 	     if (!continue_statement_p(stmp)) {
 		 instruction_block(binst) = CONS(STATEMENT,stmp,NIL);
-ifdebug(8) 
-	 {
-	 fprintf(stderr,"generation des transferts pour \n");
-		 print_text(stderr,text_statement(module, 2, loop_nest));
-       }
+		 ifdebug(8) 
+		 {
+		     fprintf(stderr,"generation des transferts pour \n");
+		     wp65_debug_print_text(module, loop_nest);
+		 }
 		 body =  perfectly_nested_loop_to_body(loop_nest);
 		 find_iteration_domain(loop_nest,&iteration_domain2,
 				       &initial_basis2,&nested_level2,
@@ -754,16 +790,17 @@ ifdebug(8)
 		 ifdebug(4) fprint_wp65_hash_tables(stderr, llv_to_lcr, 
 						    r_to_llv, v_to_lllv, 
 						    r_to_ud, v_to_esv);
-		 loop_nest_movement_generation(module,stmp,pn,bn, ls, pd,proc_id,
-					       proc_id_mm, bank_indices,v_to_esv,
-					       v_to_nlv,compute_module, computational,
-					       memory_module,emulator,fetch_map,
-					       store_map, mod_stat,fully_parallel,
-					       sc_tile2,initial_basis2,lba5,lba6,tbtl5,
-					       tbtl6,loop_body_indices,lpv,&lb,&blb,&sb,
-					       &bsb,first_parallel_level, 
-					       last_parallel_level, llv_to_lcr, 
-					       r_to_llv, v_to_lllv,r_to_ud ); 
+		 loop_nest_movement_generation(
+		     module,stmp,pn,bn, ls, pd,proc_id,
+		     proc_id_mm, bank_indices,v_to_esv,
+		     v_to_nlv,compute_module, computational,
+		     memory_module,emulator,fetch_map,
+		     store_map, mod_stat,fully_parallel,
+		     sc_tile2,initial_basis2,lba5,lba6,tbtl5,
+		     tbtl6,loop_body_indices,lpv,&lb,&blb,&sb,
+		     &bsb,first_parallel_level, 
+		     last_parallel_level, llv_to_lcr, 
+		     r_to_llv, v_to_lllv,r_to_ud ); 
 		 reduce_loop_bound_for_st(stmp);
 	     } 
 		
@@ -790,11 +827,12 @@ ifdebug(8)
 	instruction_block(binst)= new_compute_lst;
 	body = instruction_to_statement(binst);
 
-	ifdebug(8) { fprintf(stderr,"loop body \n");
-		     print_text(stderr,text_statement(module, 2, body)); 
-		     fprintf(stderr,"base_initiale 1\n");
-		     vect_fprint(stderr,initial_basis,entity_local_name);
-		 }
+	ifdebug(8) {
+	    fprintf(stderr,"loop body \n");
+	    wp65_debug_print_text(module, body); 
+	    fprintf(stderr,"base_initiale 1\n");
+	    vect_fprint(stderr,initial_basis,entity_local_name);
+	}
 	
     sc_variables_rename(sc_tile,local_basis,local_basis2, entity_local_name);
     sc_variables_rename(sc_tile, tile_basis_in_tile_basis, 
@@ -819,10 +857,11 @@ ifdebug(8)
 					 last_parallel_level);
 	new_bank_lst = CONS(STATEMENT,bs,NIL);
     }
-	/*put together the different pieces of code as two lists of statements*/
+	/* put together the different pieces of code as two lists of
+	   statements */
 	cbl = gen_nconc(lb, gen_nconc(cb ,sb));
-	bsb = gen_nconc(new_bank_lst,bsb);
-	embl =gen_nconc(blb,bsb);
+	bsb = gen_nconc(new_bank_lst, bsb);
+	embl =gen_nconc(blb, bsb);
 	
 	/* add the scanning over the tiles around them to build a proper stmt */
 	cs = make_scanning_over_tiles(compute_module, cbl, proc_id, pn,tile, 
@@ -892,12 +931,12 @@ ifdebug(8)
    depending on use_def */
 void 
 make_all_movement_blocks(initial_module,compute_module,memory_module, v,map,
-			      llv_to_lcr, v_to_lllv,r_to_ud, v_to_esv,
-			      pn,bn, ls,
-			      iteration_domain, initial_basis, local_basis,
-			      proc_id, bank_indices,  loop_body_indices,
-			      pmb, pbmb,
-			      use_def,first_parallel_level,last_parallel_level)
+			 llv_to_lcr, v_to_lllv,r_to_ud, v_to_esv,
+			 pn,bn, ls,
+			 iteration_domain, initial_basis, local_basis,
+			 proc_id, bank_indices,  loop_body_indices,
+			 pmb, pbmb,
+			 use_def,first_parallel_level,last_parallel_level)
 entity initial_module;
 entity compute_module;
 entity memory_module;
@@ -943,23 +982,39 @@ int first_parallel_level,last_parallel_level;
 		proper_tag = TRUE;
 		switch(use_def) {
 		case is_action_read:
-		    make_load_blocks(initial_module,compute_module,memory_module, v, esv, lv,
-				     lr, r_to_ud, iteration_domain, initial_basis, bank_indices,
-				     local_basis, loop_body_indices,proc_id, pn,bn, ls, 
-				     &mbs, &bmbs,first_parallel_level,last_parallel_level);
+		    make_load_blocks(initial_module,compute_module,
+				     memory_module, v, esv, lv,
+				     lr, r_to_ud, iteration_domain,
+				     initial_basis, bank_indices,
+				     local_basis, loop_body_indices,
+				     proc_id, pn,bn, ls, 
+				     &mbs, &bmbs,first_parallel_level,
+				     last_parallel_level);
 
 		    break;
 		case is_action_write:
-		    make_store_blocks(initial_module,compute_module,memory_module, v, esv, lv,
-				      lr, r_to_ud, iteration_domain, initial_basis, 
-				      bank_indices,local_basis, loop_body_indices,
+		    make_store_blocks(initial_module,compute_module,
+				      memory_module, v, esv, lv,
+				      lr, r_to_ud, iteration_domain,
+				      initial_basis, 
+				      bank_indices,local_basis,
+				      loop_body_indices,
 				      proc_id, pn,bn, ls, 
-				      &mbs, &bmbs,first_parallel_level,last_parallel_level);
+				      &mbs, &bmbs,first_parallel_level,
+				      last_parallel_level);
 		    break;
 		default:
 		    pips_error("make_all_movement_blocks",
 			       "unexpected use-def = %d\n", use_def);
 		}
+
+		ifdebug(9) {
+		    pips_debug(9, "mbs=\n");
+		    wp65_debug_print_text(compute_module, mbs);
+		    pips_debug(9, "bmbs=\n");
+		    wp65_debug_print_text(compute_module, mbs);
+		}
+
 		*pmb = gen_nconc(*pmb, CONS(STATEMENT, mbs, NIL));
 		*pbmb = gen_nconc(*pbmb, CONS(STATEMENT, bmbs, NIL));
 	    }
