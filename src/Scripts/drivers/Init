@@ -43,9 +43,17 @@ if [ "$DELETE" ]
 then
 	if Delete "$1"
 	then
+		# echo directory removed
 		true
 	else
-		exit 2
+		if [ $? -eq 2 ]
+		then
+			# echo directory did not exist
+			true
+		else
+			# echo directory could not be removed
+			exit 2
+		fi
 	fi
 fi
 
