@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.14  2000/07/27 14:59:59  coelho
+  trace added.
+
   Revision 1.13  2000/07/26 08:41:23  coelho
   the_last_just_thrown_exception management added.
 
@@ -54,7 +57,8 @@ unsigned int the_last_just_thrown_exception = 0;
 
 /* whether to run in debug mode (that is to trace catch/uncatch/throw)
  */
-int linear_exception_debug_mode = 0;
+static int linear_exception_debug_mode = 0;
+static int linear_exception_verbose_mode = 1;
 
 /* A structure for the exception stack.
  */
@@ -226,6 +230,14 @@ void throw_exception(
 		exception_stack[i].what,
 		i);
   
+      if (linear_exception_verbose_mode)
+	fprintf(stderr, "[%s:%d in %s = %d -> %s:%d in %s = %d]\n",
+		file, line, function, what,
+		exception_stack[i].file,
+		exception_stack[i].line,
+		exception_stack[i].function,
+		exception_stack[i].what);
+
       longjmp(exception_stack[i].where,0);
     }
   }
