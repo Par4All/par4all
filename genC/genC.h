@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1995/03/14 18:09:07 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1995/08/28 17:29:47 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -123,12 +123,12 @@ extern void gen_free GEN_PROTO(( gen_chunk * )) ;
 extern int gen_free_tabulated GEN_PROTO(( int )) ;
 extern void gen_write GEN_PROTO(( FILE *, gen_chunk * )) ;
 extern int gen_write_tabulated GEN_PROTO(( FILE *, int )) ;
-extern void gen_read_spec GEN_PROTO(()) ; /* instead of ... */
+extern void gen_read_spec GEN_PROTO((char *, ...)) ;
 extern gen_chunk *gen_read GEN_PROTO(( FILE * )) ;
 extern int gen_read_tabulated GEN_PROTO(( FILE *, int )) ;
 extern int gen_read_and_check_tabulated GEN_PROTO(( FILE *, int )) ;
 extern gen_chunk *gen_make_array GEN_PROTO(( int )) ;
-extern gen_chunk *gen_alloc GEN_PROTO(()) ; /* was ... */
+extern gen_chunk *gen_alloc GEN_PROTO((int, int, int, ...)) ; 
 extern void gen_init_external GEN_PROTO((int, 
 					 char *(*)(), void (*)(), 
 					 void (*)(), char *(*)() )) ;
@@ -142,12 +142,12 @@ extern char *alloc GEN_PROTO ((int )) ;
 
 /*  recursion and utilities
  */
-extern bool gen_true GEN_PROTO((gen_chunk *)) ; /* was ... */
+extern bool gen_true GEN_PROTO((gen_chunk *)) ;
 extern bool gen_false GEN_PROTO((gen_chunk *)) ;
-extern void gen_null GEN_PROTO((gen_chunk *)) ; /* was ... */
+extern void gen_null GEN_PROTO((gen_chunk *)) ;
 
 extern void gen_recurse_stop GEN_PROTO((gen_chunk *));
-extern void gen_multi_recurse GEN_PROTO(()); /* was ... */
+extern void gen_multi_recurse GEN_PROTO((gen_chunk *, ...));
 extern void gen_recurse GEN_PROTO((gen_chunk *,
 				   int, 
 				   bool (*)( gen_chunk * ), 
