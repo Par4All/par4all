@@ -1,0 +1,20 @@
+#
+# $Id$
+# 
+# $Log: makefile_macros.LINUXI86,v $
+# Revision 1.1  1997/05/12 21:20:53  coelho
+# Initial revision
+#
+#
+# this file contains macro definitions 
+
+include $(ROOT)/Include/makefile_macros.GNU
+
+CFLAGS	+=	-m486
+
+AR	=	ar
+RANLIB	=	ranlib
+DIFF	=	diff
+
+# end of it!
+#
