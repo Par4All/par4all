@@ -198,10 +198,10 @@ void db_delete_resource(string rname, string oname)
     if (!db_resource_undefined_p(r))
     { /* let us do it! */
 	db_symbol rs = find_or_create_db_symbol(rname);
-	char * p = db_resource_pointer(r);
-	if (db_resource_loaded_p(r) && !string_undefined_p(p))
+	void * p = db_resource_pointer(r);
+	if (db_resource_loaded_p(r) && p)
 	    dbll_free_resource(rname, oname, p);
-	db_resource_pointer(r) = string_undefined;
+	db_resource_pointer(r) = NULL;
 	free_db_resource(r);
 	delete_db_owned_resources(or, rs);
     }
@@ -217,7 +217,7 @@ bool db_update_time(string rname, string oname)
   r = get_real_db_resource(rname, oname);
   db_resource_time(r) = db_get_logical_time();
   db_resource_file_time(r) =
-    dbll_stat_local_file(db_resource_pointer(r), FALSE); 
+    dbll_stat_local_file((char*) db_resource_pointer(r), FALSE); 
   /*dbll_stat_resource_file(rname, oname, TRUE); */
   return TRUE;
 }
@@ -230,7 +230,7 @@ void db_print_all_required_resources(FILE * file)
     {
       string rn = db_symbol_name(rs);
       string on = db_symbol_name(os);
-      pips_debug(8, "considering %s of %s (%p)\n", rn, on, (char*) r);
+      pips_debug(8, "considering %s of %s (%p)\n", rn, on, (void*) r);
 
       if (db_resource_required_p(r)) {
 	fprintf(file, "%s of %s is in 'required' status since %d\n", 
@@ -250,7 +250,7 @@ void db_clean_all_required_resources(void)
     {
       string rn = db_symbol_name(rs);
       string on = db_symbol_name(os);
-      pips_debug(8, "considering %s of %s (%p)\n", rn, on, (char*) r);
+      pips_debug(8, "considering %s of %s (%p)\n", rn, on, (void*) r);
 
       if (db_resource_required_p(r))
       {
@@ -412,7 +412,7 @@ string db_get_resource_id(string rname, string oname)
 string db_get_memory_resource(string rname, string oname, bool pure)
 {
     db_resource r;
-    char * result;
+    void * result;
     DB_OK;
 
     debug_on("PIPSDBM_DEBUG_LEVEL");
@@ -471,7 +471,7 @@ void db_set_resource_as_required(string rname, string oname)
 }
 
 void db_put_or_update_memory_resource(
-    string rname, string oname, char * p, bool update_is_ok)
+    string rname, string oname, void * p, bool update_is_ok)
 {
     db_resource r;
     DB_OK;
@@ -576,7 +576,7 @@ void db_reset_current_module_name(void)
 
 /***************************************************************** CLEANING */
 
-void db_switch_not_stored_as_stored(void)
+void db_clean_db_resources(db_resources dbres)
 {
   DB_OK;
 
@@ -588,14 +588,15 @@ void db_switch_not_stored_as_stored(void)
     {
       if (!db_resource_stored_p(r)) 
       {
-	pips_debug(5, "resource %s[%s] set as store\n",
+	pips_debug(5, "resource %s[%s] set as stored\n",
 		   db_symbol_name(os), db_symbol_name(rs));
 	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
+	db_resource_pointer(r) = string_undefined;
       }
     },
 			   or)
       },
-		   get_pips_database());
+		   dbres);
 }
 
 /* delete all obsolete resources before a close.
@@ -615,7 +616,7 @@ int db_delete_obsolete_resources(bool (*keep_p)(string, string))
       {
 	string rn = db_symbol_name(rs);
 	string on = db_symbol_name(os);
-	pips_debug(8, "considering %s of %s (%p)\n", rn, on, (char*) r);
+	pips_debug(8, "considering %s of %s (%p)\n", rn, on, (void *) r);
 	if (!keep_p(rn, on)) {
 	  pips_debug(8, "to be destroyed: %s of %s\n", rn, on);
 	  ndeleted++;
