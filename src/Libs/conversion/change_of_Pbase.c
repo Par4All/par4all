@@ -42,7 +42,7 @@ entity old_index;
 {
     entity new_index;
     string old_name;
-    char *new_name = malloc(16);
+    char *new_name = (char*) malloc(16);
 
     old_name = entity_name(old_index);
     for (sprintf(new_name, "%s%s", old_name, "p");
