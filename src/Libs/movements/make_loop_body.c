@@ -15,29 +15,14 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "constants.h"
-#include "boolean.h"
-#include "arithmetique.h"
 #include "matrice.h"
 #include "tiling.h"
 #include "movements.h"
 #include "misc.h"
 #include "text-util.h"
-#include "graph.h"
 #include "parser_private.h"
 #include "syntax.h"
-#include "graph.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
 #include "polyedre.h"
-
-
-#include "dg.h"
-
-#include "ricedg.h" 
-
-#include "rice.h"
-
 
 void wp65_debug_print_text(entity m, statement s)
 {
