@@ -45,7 +45,7 @@ rule ru;
     string run = rule_phase(ru);
 
     start_dotting(stdout, '.', 
-		  "  %-20.20s building   %s(%s)", 
+		  "  %-20.20s building   %s(%s)\n", 
 		  run, rname, oname);
 
     for (pbm = builder_maps; pbm->builder_name != NULL; pbm++) {
@@ -222,7 +222,7 @@ string pname, oname;
 
     rname = virtual_resource_name(VIRTUAL_RESOURCE(CAR(rule_produced(ru))));
     start_dotting(stdout, '.', 
-		  "  %-20.20s building   %s(%s)", 
+		  "  %-20.20s building   %s(%s)\n", 
 		  pname, rname, oname);
 
     for (pbm = builder_maps; pbm->builder_name != NULL; pbm++) {
