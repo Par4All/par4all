@@ -1,3 +1,7 @@
+/*
+ * $Id$
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <values.h>
@@ -450,10 +454,6 @@ statement body;
     if (rice_distribute_only)
 	seq_or_par = is_execution_sequential;
 
-    if(seq_or_par == is_execution_parallel)
-        Nbrdoall++;
-
-    
     if (get_bool_property("PARTIAL_DISTRIBUTION")) {
 	entity looplabel =   make_new_label(module_name);
 	statement cs = make_continue_statement(looplabel);
