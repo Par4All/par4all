@@ -1,5 +1,5 @@
 # $RCSfile: install.README,v $ (version $Revision$)
-# $Date: 1996/09/03 13:12:53 $, 
+# $Date: 1996/12/05 12:03:43 $, 
 
 USUAL DISCLAIMER:
 -----------------
@@ -31,3 +31,13 @@ You may consult the online documentation about PIPS and related sofwares
 on http://www.cri.ensmp.fr/pips
 
 Read the local INSTALL file for installation instructions.
+
+
+GETTING STARTED:
+----------------
+
+Go in one of the example directories in Pips/Examples/SC95 and launch epips
+(for a full-fledged version) or wpips (without Emacs).
+Begin with a workspace creation that asks for one or more Fortran files you
+are interested in to study.
+Select a module, view the code, apply some transformations and so on...
