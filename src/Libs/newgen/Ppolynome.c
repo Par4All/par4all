@@ -21,7 +21,7 @@ extern int sscanf();
 #include "vecteur.h"
 #include "polynome.h"
 
-#include "ri-util.h"
+/*#include "ri-util.h"*/
 
 void monome_gen_write(fd,pm)
 FILE *fd;
