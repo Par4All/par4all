@@ -23,7 +23,8 @@
 
 #include "ricedg.h" 
 
-extern bool ignore_this_conflict(vertex v1, vertex v2, conflict c, int l);
+extern bool 
+ignore_this_conflict(vertex v1, vertex v2, conflict c, int l);
  
 /* instantiation of the dependence graph */
 typedef dg_arc_label arc_label;
@@ -35,14 +36,16 @@ vertex v. This information is kept in a static hash_table named
 OrderingToStatement. See ri-util/ordering.c for more information.
 */
 
-statement vertex_to_statement(v)
+statement 
+vertex_to_statement(v)
 vertex v;
 {
     dg_vertex_label dvl = (dg_vertex_label) vertex_vertex_label(v);
     return(ordering_to_statement(dg_vertex_label_statement(dvl)));
 }
 
-int vertex_to_ordering(v)
+int 
+vertex_to_ordering(v)
 vertex v;
 {
     dg_vertex_label dvl = (dg_vertex_label) vertex_vertex_label(v);
@@ -74,8 +77,8 @@ compute_ordering_to_dg_mapping(graph dependance_graph)
    return ordering_to_dg_mapping;
 }
 
-
-    static string dependence_graph_banner[8] = {
+
+static string dependence_graph_banner[8] = {
 	"\n *********************** Use-Def Chains *********************\n",
 	"\n **************** Effective Dependence Graph ****************\n",
 	"\n ********* Dependence Graph (ill. option combination) *******\n",
@@ -86,8 +89,9 @@ compute_ordering_to_dg_mapping(graph dependance_graph)
 	"\n **** Loop Carried Dependence Graph with Dependence Cones ***\n"
     };
 
-/* a` renommer print_dependence_graph ? */
-void print_graph(fd, mod_stat, mod_graph)
+/* Print all edges and arcs */
+void 
+prettyprint_dependence_graph(fd, mod_stat, mod_graph)
 FILE *fd;
 statement mod_stat;
 graph mod_graph;
@@ -95,16 +99,23 @@ graph mod_graph;
     cons *pv1, *ps, *pc;
     Ptsg gs;
     int banner_number = 0;
+    bool sru_format_p = get_bool_property("PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT");
 
-    banner_number =
-	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") +
-	    2*get_bool_property
-		("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS") +
-		    4*get_bool_property
-			("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES");
-
-    fprintf(fd, "%s\n", dependence_graph_banner[banner_number]);
     debug_on("RICEDG_DEBUG_LEVEL");
+
+    if(sru_format_p) {
+	/* compute line numbers for statements */
+    }
+    else {
+	banner_number =
+	    get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") +
+	    2*get_bool_property
+	    ("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS") +
+	    4*get_bool_property
+	    ("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES");
+	fprintf(fd, "%s\n", dependence_graph_banner[banner_number]);
+    }
+
     for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {
 	vertex v1 = VERTEX(CAR(pv1));
 	statement s1 = vertex_to_statement(v1);
@@ -115,8 +126,11 @@ graph mod_graph;
 	    statement s2 = vertex_to_statement(v2);
 	    dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
 
-	    fprintf(fd, "\t%02d --> %02d with conflicts\n", 
-		    statement_number(s1), statement_number(s2));
+	    if(!sru_format_p) {
+		/* factorize line numbers */
+		fprintf(fd, "\t%02d --> %02d with conflicts\n", 
+			statement_number(s1), statement_number(s2));
+	    }
 
 	    for (pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc)) {
 		conflict c = CONFLICT(CAR(pc));
@@ -124,44 +138,94 @@ graph mod_graph;
 		/* if (!entity_scalar_p(reference_variable
 		   (effect_reference(conflict_source(c))))) {
 		   */
-		fprintf(fd, "\t\tfrom ");
-		print_words(fd, words_effect(conflict_source(c)));
+		if(sru_format_p) {
+		    fprintf(fd, "%d,%d ", 
+		    statement_number(s1), statement_number(s2));
+		    fprintf(fd, "%c,%c ", 
+			    action_read_p(effect_action(conflict_source(c)))? 'R' : 'W',
+			    action_read_p(effect_action(conflict_sink(c)))? 'R' : 'W');
+		    fprintf(fd, "<");
+		    print_words(fd, effect_words_reference(effect_reference(conflict_source(c))));
+		    fprintf(fd, "> - <");
+		    print_words(fd, effect_words_reference(effect_reference(conflict_sink(c))));
+		    fprintf(fd, ">");
+		}
+		else {
+		    fprintf(fd, "\t\tfrom ");
+		    print_words(fd, words_effect(conflict_source(c)));
 
-		fprintf(fd, " to ");
-		print_words(fd, words_effect(conflict_sink(c)));
+		    fprintf(fd, " to ");
+		    print_words(fd, words_effect(conflict_sink(c)));
+		}
 
 		if(conflict_cone(c) != cone_undefined){
-		    fprintf(fd, " at levels ");
-		    MAPL(pl, {
-			fprintf(fd, " %d", INT(CAR(pl)));
-		    }, cone_levels(conflict_cone(c)));
-		
-		    fprintf(fd, "\n");
+		    if(sru_format_p) {
+			fprintf(fd, " levels(");
+			MAPL(pl, {
+			    fprintf(fd, pl==cone_levels(conflict_cone(c))? "%d" : ",%d",
+				    INT(CAR(pl)));
+			}, cone_levels(conflict_cone(c)));
+			fprintf(fd, ") ");
+		    }
+		    else {
+			fprintf(fd, " at levels ");
+			MAPL(pl, {
+			    fprintf(fd, " %d", INT(CAR(pl)));
+			}, cone_levels(conflict_cone(c)));
+			fprintf(fd, "\n");
+		    }
+
 		    if(get_bool_property
 		       ("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES")) {
 			gs = (Ptsg)cone_generating_system(conflict_cone(c));
 			if (!SG_UNDEFINED_P(gs)) {
-			    /* sg_fprint(fd,gs,entity_local_name); */
-			    /* FI: almost print_dependence_cone:-( */
-			    sg_fprint_as_dense(fd, gs, gs->base);
-			    ifdebug(2) {
-				Psysteme sc1 = sc_new();
-				sc1 = sg_to_sc_chernikova(gs);
-				(void) fprintf(fd,"syst. lin. correspondant au syst. gen.:\n");
-				sc_fprint(fd,sc1,entity_local_name);
+			    if(sru_format_p) {
+				if(sg_nbre_sommets(gs)==1 && sg_nbre_rayons(gs)==0
+				   && sg_nbre_droites(gs)==0) {
+				    /* uniform dependence */
+				    fprintf(fd, "uniform");
+				    fprint_lsom_as_dense(fd, sg_sommets(gs), gs->base);
+				}
+				else {
+				    fprintf(fd, "ddv()");
+				}
+			    }
+			    else {
+				/* sg_fprint(fd,gs,entity_local_name); */
+				/* FI: almost print_dependence_cone:-( */
+				sg_fprint_as_dense(fd, gs, gs->base);
+				ifdebug(2) {
+				    Psysteme sc1 = sc_new();
+				    sc1 = sg_to_sc_chernikova(gs);
+				    (void) fprintf(fd,"syst. lin. correspondant au syst. gen.:\n");
+				    sc_fprint(fd,sc1,entity_local_name);
+				}
 			    }
 			} 
 		    }
+		}
+		else {
+		    if(sru_format_p) 
+			fprintf(fd, "levels()");
 		}
 		fprintf(fd, "\n");
 	    }
 	}
     } 
+
+    if(!sru_format_p) {
+	fprintf(fd, "\n****************** End of Dependence Graph ******************\n");
+    }
+
     debug_off();
-    fprintf(fd, "\n****************** End of Dependence Graph ******************\n");
 }
 
-void print_graph_with_reduction(fd, mod_stat, mod_graph)
+
+/* Do not print vertices and arcs ignored by the parallelization algorithms.
+ * At least, hopefully...
+ */
+void 
+prettyprint_dependence_graph_view(fd, mod_stat, mod_graph)
 FILE *fd;
 statement mod_stat;
 graph mod_graph;
@@ -263,8 +327,10 @@ graph mod_graph;
     debug_off();
     fprintf(fd, "\n****************** End of Dependence Graph ******************\n");
 }
-		    
-void print_vect_in_vertice_val(fd,v,b)
+
+		    
+void 
+print_vect_in_vertice_val(fd,v,b)
 FILE *fd;
 Pvecteur v;
 Pbase b;
@@ -278,7 +344,8 @@ Pbase b;
     fprintf(fd," )");
 }
 
-void print_dependence_cone(fd,dc,basis)
+void 
+print_dependence_cone(fd,dc,basis)
 FILE *fd;
 Ptsg dc;
 Pbase basis;
@@ -311,6 +378,7 @@ Pbase basis;
     }
 }
 
+
 /* for an improved dependence test (Beatrice Creusillet)
  *
  * The routine name says it all. Only constraints transitively connected
@@ -334,7 +402,8 @@ Pbase basis;
  * not as strong as one could wish, it gets lots of stuff...
  */
 
-Psysteme sc_restricted_to_variables_transitive_closure(sc, variables)
+Psysteme 
+sc_restricted_to_variables_transitive_closure(sc, variables)
 Psysteme sc;
 Pbase variables;
 {
@@ -448,3 +517,5 @@ Pbase variables;
 
     return(sc_res);
 }
+
+/* That's all */
