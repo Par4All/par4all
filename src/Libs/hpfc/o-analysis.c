@@ -3,7 +3,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1994/11/21 15:32:08 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1994/12/02 15:01:05 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -38,35 +38,6 @@ static list
     lblocks = NIL,
     lloop  = NIL;
 
-range loop_index_to_range(index)
-entity index;
-{
-    MAPL(cl,
-     {
-	 loop
-	     l = LOOP(CAR(cl));
-
-	 if (loop_index(l)==index)
-	     return(loop_range(l));
-     },
-	 lloop);
-    
-    /* ??? other (sequential) loops may be added, and not only lloop... */
-    return(range_undefined);
-}
-
-bool entity_loop_index_p(e)
-entity e;
-{
-    MAPL(cl,
-     {
-	 if (e == loop_index(LOOP(CAR(cl)))) return(TRUE);
-     },
-	 lloop);
-
-    return(FALSE);
-}
-
 /*
  * Overlap_Analysis
  *
@@ -99,6 +70,9 @@ statement stat, *pstat;
 	newloopnest;
 
     set_hpfc_current_statement(stat);
+
+    reset_current_loops();   /* ??? should be on exit */
+    set_current_loops(stat);
 
     lblocks = NIL,
     lloop = NIL;
