@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/04/11 17:00:42 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/04/14 18:10:47 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -35,11 +35,11 @@ TARGET= 	hpfc
 #
 # Name of the main program to test or use the library
 MAIN=		main
-#
+# (obsolete)
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
-PARSER_SRC= \
+PARSER_SRC= 
 
 LIB_CFILES=	parser.c parser-util.c debug-util.c hpfc-util.c \
 		norm-decl.c compile-decl.c compiler-util.c compiler.c \
@@ -55,27 +55,17 @@ LIB_HEADERS=	f77keywords f77symboles hpfkeywords gram.y scanner.l \
 
 # headers made by some rule (except $INC_TARGET)
 DERIVED_HEADERS=toklex.h keywtbl.h tokyacc.h
-LIB_OBJECTS= y.tab.o scanner.o $(LIB_CFILES:.c=.o) 
+DERIVED_CFILES= y.tab.c scanner.c
+LIB_OBJECTS= $(DERIVED_CFILES:.c=.o)  $(LIB_CFILES:.c=.o) 
 
-# parser.o y.tab.o scanner.o parser-util.o debug-util.o hpfc-util.o \
-# norm-decl.o compile-decl.o compiler-util.o compiler.o compile.o \
-# run-time.o generate.o statement.o  norm-code.o io.o io-effects.o \
-# local-ri-util.o inits.o o-analysis.o align-checker.o messages.o \
-# overlap.o normalize.o guard.o ranges.o message-utils.o reduction.o
-
-todo: init
+# todo: init
+# init: toklex.h keywtbl.h scanner.c y.tab.c
 
 sccs_close:
 	@echo "closing the sccs session"
 	@echo "Description of changes:"
 	@read comments
 	sccs delget -y"$comments" `sccs tell -u`
-
-# RUNABLES= Run RunHpfcTest add-includes filter-hpf
-# 
-# .runables: $(RUNABLES)
-# 	-chmod ug+x $(RUNABLES)
-# 	touch .runables
 
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
 # filtred here.
@@ -86,10 +76,9 @@ y.tab.c: tokyacc.h gram.y
 	  grep -v "#line" > s.tab.c
 	mv s.tab.c y.tab.c
 
-init: toklex.h keywtbl.h scanner.c y.tab.c
+# For gcc: lex generated array initializations are reformatted with sed to
+# avoid lots of gcc warnings; the two calls to sed are *not* mandatory;
 
-# For gcc: lex generated array initializations are reformatted with sed to avoid lots
-#	of gcc warnings; the two calls to sed are *not* mandatory;
 scanner.c: scanner.l
 	$(SCAN) scanner.l | sed -e 's/YY/HH/g;s/yy/hh/g' | \
 	sed -e '/hhcrank\[\]/,/^0,0};/s/^/{/;/hhcrank\[\]/,/^{0,0};$$/s/,$$/},/;/hhcrank\[\]/,/^{0,0};$$/s/,	$$/},/;/hhcrank\[\]/,/^{0,0};$$/s/,	/},	{/g;s/^{0,0};$$/{0,0}};/;/hhcrank\[\]/s/{//' | \
