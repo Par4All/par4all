@@ -38,6 +38,7 @@ typedef dg_vertex_label vertex_label;
 #include "polyedre.h"
 
 #include "ricedg.h"
+#include "transformations.h"
 
 static bool quick_privatize_loop(statement /*stat*/, list /*successors*/);
 static bool quick_privatize_statement_pair(statement /*s1*/, statement /*s2*/, 
@@ -147,6 +148,11 @@ list conflicts;
 		debug(3, "quick_privatize_statement_pair", 
 		      "the arc goes outside the loop body.\n");
 
+		if ( is_implied_do_index(e1,statement_instruction(s2)))
+		  {
+		    debug(3,"quick_privatize_statement_pair","s2 is an implied loop\n");
+		    return(TRUE);
+		  }
 		if (! statement_loop_p(s2)) 
 		{
 		    debug(3, "quick_privatize_statement_pair", "s2 not a loop\n"); 
