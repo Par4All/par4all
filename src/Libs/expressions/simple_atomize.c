@@ -1,5 +1,5 @@
-/* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1999/05/12 14:54:57 $, 
+/* 
+ * $Id$
  */
 
 #include <stdio.h>
@@ -22,7 +22,7 @@
  * bool (*test_decide)(test t, expression e);
  * bool (*range_decide)(range r, expression e), 
  * bool (*while_decide)(whileloop w, expression e), 
- * entity (*new)(entity m, tag t);
+ * entity (*new)(entity m, basic b);
  *
  * atomizes the given statement as driven by the given functions.
  * ??? does not care of any side effect and so.
@@ -156,8 +156,7 @@ expression *pe;
     /* Atomization is not valid with overloaded expressions */
     if (!basic_overloaded_p(tmp)) {
       new_variable = 
-	(*create_new_variable)(get_current_module_entity(),
-			       basic_tag(tmp));
+	(*create_new_variable)(get_current_module_entity(), tmp);
       
       /*  The normalized field is kept as such, and will be used by
        *  the overlap analysis! ??? just a horrible hack.
@@ -247,8 +246,7 @@ static void range_rwt(range r)
 }
 
 
-static void test_rwt(t)
-test t;
+static void test_rwt(test t)
 {
     expression *pe = &test_condition(t);
 
@@ -308,7 +306,7 @@ void atomize_as_required(
   bool (*test_decide)(test, expression), /* test */
   bool (*range_decide)(range, expression), /* range */
   bool (*while_decide)(whileloop, expression), /* whileloop */
-  entity (*new)())
+  entity (*new)(entity, basic))
 {
     make_current_statement_stack();
     make_current_control_stack();
