@@ -1,5 +1,5 @@
 ! $RCSfile: xpomp_graphic_F.h,v $ (version $Revision$)
-! $Date: 1996/09/02 10:43:23 $, 
+! $Date: 1996/09/03 18:12:00 $, 
 !
 !  The fortran headers for the XPOMP graphical library.
 !
@@ -50,6 +50,12 @@
 ! If min_value = max_value = 0, automatically scale the colors.
 !fcd$ io xpomp_show_real4
 !fcd$ io xpomp_show_real8
+
+! Scroll a window:
+!fcd$ io xpomp_scroll
+
+! Draw a frame from corner (X0,Y0) to corner (X1,Y1) and add a title:
+!fcd$ io xpomp_draw_frame
 
 ! Print out a small help about keyboard usage in xPOMP:
 !fcd$ io xpomp_show_usage
