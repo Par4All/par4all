@@ -2,13 +2,14 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/07 10:56:27 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/08 13:10:49 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
 ifdef(`DEBUG',`define(`debug',`$@')',`define(`debug')')dnl
 ifdef(`DEMO',`define(`demo',`$@')',`define(`demo')')dnl
+ifdef(`DIRECT',`define(`direct',`$@')',`define(`direct')')dnl
 c-----------------
 c
 c HPFC_TEMPLATE
@@ -825,7 +826,7 @@ c
       call hpfc_check()
       call pvmfmytid(MYTID)
       call pvmfparent(HOSTTID)
-c      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
+      direct(`call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)')
       NBOFTASKS = MAXSIZEOFPROCS
 
       call HPFC_INIT_COMMON_PROCS()
@@ -841,6 +842,7 @@ c      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
          call HPFC_CMPPOS(i, MYLID, MYPOS(1, i))
       enddo
       debug(`print *, "lid: ", MYLID, " tid: ", MYTID')
+
       call pvmfjoingroup(HPFC_GROUP_NAME, inum)
       debug(`call HPFC_SYNCHRO()')
       end
@@ -880,12 +882,15 @@ c
       integer bufid, info, inum
       call hpfc_check()
       call pvmfmytid(MYTID)
-c      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
+      direct(`call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)')
       MYLID = 0
       HOSTTID = MYTID
       NBOFTASKS = MAXSIZEOFPROCS
 
       call HPFC_INIT_COMMON_PARAM()
+
+      debug(`print *, "spawning ", NODE_PROGRAM_NAME
+      print *, "   on ", NBOFTASKS, " ", NODE_ARCHITECTURE')
 
       call pvmfspawn(
      $     NODE_PROGRAM_NAME, 
@@ -911,6 +916,12 @@ c      call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
       call HPFC_INIT_COMMON_PROCS()
 
       call pvmfjoingroup(HPFC_GROUP_NAME, inum)
+      if (inum.lt.0) then
+         call pvmfperror("while joining group", info)
+         call pvmfexit(info)
+         stop
+      endif
+
       debug(`call HPFC_SYNCHRO()')
 
       end
@@ -1019,12 +1030,14 @@ c
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
+      debug(`print *, "[hpfc_synchro] waiting"')
       call pvmfbarrier(HPFC_GROUP_NAME, NBOFTASKS+1, info)
       if (info.lt.0) then
          call pvmfperror("hpfc_synchro", info)
          call pvmfexit(info)
          stop
       endif
+      debug(`print *, "[hpfc_synchro] done"')
       end
 c
 c-----------------
