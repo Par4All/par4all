@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 20:07:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/16 08:20:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 20:07:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/16 08:20:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -98,8 +98,8 @@ save_all_entities()
     DynamicArea = StaticArea;
 }
 
-/* This function transforms a dynamic variable into a static one. 
- * It is called to handle SAVE and DATA statements.
+/* These two functions transform a dynamic variable into a static one. 
+ * They are called to handle SAVE and DATA statements.
  */
 
 void 
@@ -157,6 +157,37 @@ entity e;
 				       StaticArea, 
 				       CurrentOffsetOfArea(StaticArea ,e),
 				       NIL)));
+    }
+}
+
+void
+ProcessSave(entity v)
+{
+    if(entity_storage(v) == storage_undefined) {
+	SaveEntity(v);
+    }
+    else if(storage_ram_p(entity_storage(v))) {
+	entity a = ram_section(storage_ram(entity_storage(v)));
+	    if(a==DynamicArea) {
+		SaveEntity(v);
+	    }
+	    else if(a==StaticArea) {
+		/* v may have become static because of a DATA statement (OK)
+		 * or because of another SAVE (NOK)
+		 */
+	    }
+	    else {
+		user_warning("ProcessSave", "Variable %s has already been declared static "
+			     "by appearing in Common %s\n",
+			     entity_local_name(v), module_local_name(a));
+		ParserError("parser", "SAVE statement incompatible with previous"
+			    " COMMON declaration\n");
+	    }
+    }
+    else {
+	user_warning("parser", "Variable %s cannot be declared static "
+		     "be cause of its storage class (tag=%d)\n",
+		     entity_local_name(v), storage_tag(entity_storage(v)));
     }
 }
 
