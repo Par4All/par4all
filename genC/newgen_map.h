@@ -23,11 +23,16 @@
  * These are the functions defined in the Newgen map library. 
  */
 
-#define HASH_GET(start,image,h,k) ((gen_chunk*)hash_map_get((h), (k))->image)
-#define HASH_BOUND_P(start, image, h, k) hash_map_defined_p((h), (k))
-#define HASH_UPDATE(start,image,h,k,v) hash_map_update((h), (k), (v))
-#define HASH_EXTEND(start,image,h,k,v) hash_map_put((h), (k), (v))
-#define HASH_DELETE(start,image,h,k) hash_map_del((h), (k))
+#define HASH_GET(start,image,h,k) \
+        hash_map_get((h), (void*)(k))
+#define HASH_BOUND_P(start, image, h, k) \
+        hash_map_defined_p((h), (void*)(k))
+#define HASH_UPDATE(start,image,h,k,v) \
+        hash_map_update((h), (void*)(k), (void*)(v))
+#define HASH_EXTEND(start,image,h,k,v) \
+        hash_map_put((h), (void*)(k), (void*)(v))
+#define HASH_DELETE(start,image,h,k) \
+        hash_map_del((h), (void*)(k))
 
 #define FUNCTION_MAP(typename, start, image, k, v, code, fun) \
     { hash_table _map_hash_h = ((gen_chunk*)fun+1)->h ;\
