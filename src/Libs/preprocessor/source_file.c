@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.99  2000/03/24 11:37:18  coelho
+ * ordering dropped.
+ *
  * Revision 1.98  1999/01/08 16:19:15  coelho
  * error in fsplit...
  *
@@ -597,7 +600,7 @@ static bool zzz_file_p(string s) /* .../zzz???.f */
       s[len-5]=='#' && s[len-1]=='.' && s[len]=='f'; }
 static int cmp(const void * x1, const void * x2)
 { return strcmp(*(char**)x1, *(char**)x2);}
-static void sort_file(string name)
+static void clean_file(string name)
 {
     FILE *f;
     string line;
@@ -625,7 +628,8 @@ static void sort_file(string name)
     }
     safe_fclose(f, name);
 
-    qsort(lines, i, sizeof(char*), cmp);
+    /* keep order for unsplit. */
+    /* qsort(lines, i, sizeof(char*), cmp); */
 
     f=safe_fopen(name, "w");
     while (i>0) {
@@ -644,7 +648,7 @@ static bool pips_split_file(string name, string tempfile)
   err = fsplit(dir, name, out);
   free(dir);
   safe_fclose(out, tempfile);
-  sort_file(tempfile);
+  clean_file(tempfile); 
   if (err) fprintf(stderr, "split error: %s\n", err);
   return err? TRUE: FALSE;
 }
