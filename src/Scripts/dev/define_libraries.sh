@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.33  2000/04/19 09:23:01  boucheba
+# statistics added.
+#
 # Revision 1.32  2000/03/16 09:13:41  coelho
 # instrumentation lib added.
 #
@@ -94,12 +97,12 @@ LINEAR_LIBS='-lmatrice -lunion -lpolyedre -lpolylib -lsparse_sc -lsc -lcontraint
 # many doc dirs are skipped (would be long?)
 PIPS_DOCS='Documentation constants help manl newgen'
 
-PIPS_ORDERED_LIBS='xpomp text-util properties misc ri-util newgen conversion movements pipsdbm comp_sections transformer bootstrap control hyperplane flint syntax prettyprint static_controlize effects effects-generic effects-simple semantics complexity continuation reductions regions effects-convex alias-classes callgraph icfg paf-util pip ricedg array_dfg prgm_mapping scheduling reindexing chains rice hyperplane transformations instrumentation hpfc atomizer wp65 preprocessor pipsmake top-level pips tpips wpips fpips'
+PIPS_ORDERED_LIBS='xpomp text-util properties misc ri-util newgen conversion movements pipsdbm comp_sections transformer bootstrap control hyperplane flint syntax prettyprint static_controlize effects effects-generic effects-simple semantics complexity continuation reductions regions effects-convex alias-classes callgraph icfg paf-util pip ricedg array_dfg prgm_mapping scheduling reindexing chains rice hyperplane transformations statistics instrumentation hpfc atomizer wp65 preprocessor pipsmake top-level pips tpips wpips fpips'
 
 paf_libs='-lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lpip'
 
 # all libraires for pips
-PIPS_LIBS='-ltop-level -lpipsmake -lwp65 -lhpfc -lhyperplane -linstrumentation -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lsyntax -leffects-simple -leffects-convex -leffects-generic -lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer -lpreprocessor -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lnewgen $(NEWGEN_LIBS) $(LINEAR_LIBS) -lm -lrx'
+PIPS_LIBS='-ltop-level -lpipsmake -lwp65 -lhpfc -lhyperplane -linstrumentation -lstatistics -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lsyntax -leffects-simple -leffects-convex -leffects-generic -lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer -lpreprocessor -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lnewgen $(NEWGEN_LIBS) $(LINEAR_LIBS) -lm -lrx'
 
 
 #
