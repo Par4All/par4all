@@ -1,6 +1,6 @@
 # PROJET PIPS: EXPLOITATION DE LA DOCUMENTATION
 # ---------------------------------------------
-# $RCSfile: old_documentation_makefile,v $ ($Date: 1996/02/23 15:31:23 $, )
+# $RCSfile: old_documentation_makefile,v $ ($Date: 1996/08/22 22:48:14 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -282,67 +282,6 @@ dret146.ind: dret146.idx
 	makeindex dret146.idx
 
 dret146.dvi: dret146.f.tex dret146.ind 
-
-$(LIBDIR)/pipsmake.rc: pipsmake-rc
-	@echo 'building pipsmake.rc'
-	@cp pipsmake-rc $(LIBDIR)/pipsmake.rc
-	@echo 'building resources.h'
-	@/lib/cpp $(LIBDIR)/pipsmake.rc | grep '>' | \
-		sed 's/^.*MODULE\.//' | sed 's/^.*PROGRAM\.//' | \
-		sed 's/^.*ALL\.//' | sed 's/^.*MAIN\.//' | \
-		sort | uniq | tr a-z A-Z | \
-		sed 's/.*/#define DBR_& "&"/' | \
-		cat $(INCLUDEDIR)/auto.h - > $(INCLUDEDIR)/resources.h
-	@echo 'building phases.h'
-	@/lib/cpp $(LIBDIR)/pipsmake.rc | grep '^[a-z]' | \
-		sed 's/ .*//' |	sort | uniq | tr a-z A-Z | \
-		sed 's/.*/#define BUILDER_& "&"/' | \
-		cat $(INCLUDEDIR)/auto.h - > $(INCLUDEDIR)/phases.h
-	@echo 'building builder_map.h'
-	@$(UTILDIR)/make-builder-map
-
-$(LIBDIR)/properties.rc: properties-rc.tex
-	@echo 'building properties.rc'
-	@sed 's/^[\/ ]\*\/*/# /' $(INCLUDEDIR)/auto.h > $(LIBDIR)/properties.rc
-	@expand properties-rc.tex | sed 's/ *$$//' | sed '/^alias /d' | \
-	$(UTILDIR)/filter_verbatim >> $(LIBDIR)/properties.rc
-
-pipsmake-rc: pipsmake-rc.tex
-	@echo making pipsmake-rc
-	@expand pipsmake-rc.tex | \
-	sed 's/ *$$//;/^alias /d' | \
-	$(UTILDIR)/filter_verbatim | \
-	cat $(INCLUDEDIR)/auto.h - > pipsmake-rc
-
-pipsmake-rc.idx: pipsmake-rc.tex
-	latex pipsmake-rc.tex
-
-pipsmake-rc.ind: pipsmake-rc.idx
-	makeindex pipsmake-rc.idx
-	/bin/rm -f public_html/pipsmake-rc.ind
-	ln -s $(DOCDIR)/pipsmake-rc.ind public_html
-
-pipsmake-rc.dvi: pipsmake-rc.tex pipsmake-rc.ind 
-	latex pipsmake-rc.tex
-	latex pipsmake-rc.tex
-	/bin/rm -f public_html/pipsmake-rc.html
-
-pipsmake-rc.ps: pipsmake-rc.dvi
-	dvips -o pipsmake-rc.ps pipsmake-rc.dvi
-
-# properties-rc: properties-rc.tex
-# 	@expand properties-rc.tex | sed 's/ *$$//' | sed '/^alias /d' | \
-#		cat $(INCLUDEDIR)/auto.h - > properties-rc
-
-$(LIBDIR)/wpips.rc: pipsmake-rc.tex
-	@echo 'building wpips.rc'
-	@sed 's/^[\/ ]\*\/*/--/' $(INCLUDEDIR)/auto.h > $(LIBDIR)/wpips.rc
-	@expand pipsmake-rc.tex | sed 's/ *$$//' | sed '/^alias /!d' \
-		>> $(LIBDIR)/wpips.rc
-
-$(INCLUDEDIR)/wpips_transform_menu_layout.h :  pipsmake-rc.tex
-	@echo 'Building wpips_transform_menu_layout.h from pipsmake-rc.tex:'
-	make-pips-menu < pipsmake-rc.tex
 
 # *.aux is needed by latex2html
 clean:
