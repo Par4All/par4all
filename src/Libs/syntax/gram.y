@@ -939,7 +939,7 @@ letter_letter: letter
 
 letter:	 TK_NAME
 	    {
-		$$ = yylval.string[0]; free(yylval.string);
+		$$ = $1[0]; free($1);
 	    }
 	;
 
@@ -965,7 +965,7 @@ entity_name: name
 	;
 
 name: TK_NAME
-	    { $$ = yylval.string; }
+	    { $$ = $1; }
 
 module_name: global_name
             {
@@ -985,7 +985,7 @@ global_entity_name: global_name
 	;
 
 global_name: TK_NAME
-	    { $$ = yylval.string; }
+	    { $$ = $1; }
         ;
 
 opt_lformalparameter:
@@ -1237,38 +1237,38 @@ unsigned_const_simple: TK_TRUE
 	    }
 	| TK_DCON
 	    {
-		    $$ = MakeConstant(yylval.string, is_basic_float);
-		    free(yylval.string);
+		    $$ = MakeConstant($1, is_basic_float);
+		    free($1);
 	    }
 	| TK_SCON
 	    {
-		    $$ = MakeConstant(yylval.string, is_basic_string);
-		    free(yylval.string);		    
+		    $$ = MakeConstant($1, is_basic_string);
+		    free($1);		    
 	    }
         | TK_RCON 
 	    {
-		    $$ = MakeConstant(yylval.string, is_basic_float);
-		    free(yylval.string);
+		    $$ = MakeConstant($1, is_basic_float);
+		    free($1);
 	    }
 	;
 
 icon: TK_ICON 
 	    {
-		    $$ = MakeConstant(yylval.string, is_basic_int);
-		    free(yylval.string);
+		    $$ = MakeConstant($1, is_basic_int);
+		    free($1);
 	    }
 	;
 
 label: TK_ICON 
 	    {
-		    $$ = yylval.string;
+		    $$ = $1;
 	    }
 	;
 
 ival: TK_ICON 
 	    {
-		    $$ = atoi(yylval.string);
-		    free(yylval.string);
+		    $$ = atoi($1);
+		    free($1);
 	    }
 	;
 
