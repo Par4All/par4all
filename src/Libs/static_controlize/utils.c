@@ -871,6 +871,10 @@ list *swfl;
  * This is a strict copy of entity_to_formal_integer_parameters
  * from semantics/interprocedural.c . This function is copied
  * here to keep locality of local functions to each pass.
+ *
+ * FI: Well, but it was modified to handle all integer scalar variables
+ * and a bug was added because a COMMON has a RAM storage (OK, this could
+ * be discussed). I add a test on type_variable_p()
  */
 list sc_entity_to_formal_integer_parameters(f)
 entity f;
@@ -883,8 +887,11 @@ entity f;
     decl = code_declarations(entity_code(f));
     MAPL(ce, {entity e = ENTITY(CAR(ce));
 	      storage sto = entity_storage(e);
-              if( (storage_formal_p(sto) || storage_ram_p(sto)) &&
-                 entity_integer_scalar_p(e))
+	      type t = entity_type(e);
+
+              if( type_variable_p(t)
+		  && (storage_formal_p(sto) || storage_ram_p(sto))
+		  && entity_integer_scalar_p(e))
                   formals_or_ram_integer = CONS(ENTITY, e, 
 						formals_or_ram_integer);},
          decl);
