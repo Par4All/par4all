@@ -1,10 +1,13 @@
 /* local definitions
  * 
- * $RCSfile: hpfc-local.h,v $ ($Date: 1995/04/14 08:54:49 $, )
- * version $Revision$
+ * $Id$
+ * $Log: hpfc-local.h,v $
+ * Revision 1.15  1997/03/20 10:12:25  coelho
+ * better RCS headers.
+ *
  */
 
 #define HPFC_PACKAGE "HPFC-PACKAGE"
 
-/*  end of $RCSfile: hpfc-local.h,v $
+/* end of it
  */
