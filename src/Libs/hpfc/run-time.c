@@ -53,14 +53,6 @@ entity
     e_HostEnd,
     e_NodeEnd,
     e_LoopBounds,
-    e_Pack1,
-    e_Pack2,
-    e_Pack3,
-    e_Pack4,
-    e_Unpack1,
-    e_Unpack2,
-    e_Unpack3,
-    e_Unpack4,
     e_SendToNeighb,
     e_ReceiveFromNeighb;
 
@@ -100,16 +92,6 @@ entity
 #define HOST_END	"HPFC_HOST_END"
 
 #define LOOP_BOUNDS	"HPFC_LOOP_BOUNDS"
-
-#define PACK_1		"HPFC_PACK_1"
-#define PACK_2		"HPFC_PACK_2"
-#define PACK_3		"HPFC_PACK_3"
-#define PACK_4		"HPFC_PACK_4"
-
-#define UNPACK_1	"HPFC_UNPACK_1"
-#define UNPACK_2	"HPFC_UNPACK_2"
-#define UNPACK_3	"HPFC_UNPACK_3"
-#define UNPACK_4	"HPFC_UNPACK_4"
 
 #define SND_TO_N	"HPFC_SNDTO_N"
 #define RCV_FR_N	"HPFC_RCVFR_N"
@@ -166,16 +148,6 @@ void init_pvm_based_intrinsics()
 
     e_LoopBounds	= MakeRunTimeSupportSubroutine(LOOP_BOUNDS, 7);
 
-    e_Pack1		= MakeRunTimeSupportSubroutine(PACK_1, 7);
-    e_Pack2		= MakeRunTimeSupportSubroutine(PACK_2, 12);
-    e_Pack3		= MakeRunTimeSupportSubroutine(PACK_3, 17);
-    e_Pack4		= MakeRunTimeSupportSubroutine(PACK_4, 22);
-
-    e_Unpack1		= MakeRunTimeSupportSubroutine(UNPACK_1, 7);
-    e_Unpack2		= MakeRunTimeSupportSubroutine(UNPACK_2, 12);
-    e_Unpack3		= MakeRunTimeSupportSubroutine(UNPACK_3, 17);
-    e_Unpack4		= MakeRunTimeSupportSubroutine(UNPACK_4, 22);
-
     e_SendToNeighb	= MakeRunTimeSupportSubroutine(SND_TO_N, 0);
     e_ReceiveFromNeighb = MakeRunTimeSupportSubroutine(RCV_FR_N, 0);
 
@@ -183,39 +155,43 @@ void init_pvm_based_intrinsics()
 }
 
 /*
+ * entity MakeRunTimeSupportSubroutine(local_name, number_of_arguments)
  *
+ * modify 27/09/93, in order not to attempt to redeclare an already declared
+ * subroutine. 
  */
 entity MakeRunTimeSupportSubroutine(local_name, number_of_arguments)
 string local_name;
 int number_of_arguments;
 {
-    /* make_empty_subroutine or MakeExternalFunction? */
-/*
-    MakeIntrinsic(local_name, number_of_arguments);
-    return(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, local_name));
-*/
-    return(make_empty_subroutine(local_name));
+    string 
+	full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
+				MODULE_SEP_STRING, local_name, NULL);
+    entity
+	e = gen_find_tabulated(full_name, entity_domain);
+
+    return((e==entity_undefined) ? make_empty_module(full_name) : e);
 }
 
 /*
+ * entity MakeRunTimeSupportFunction(local_name, number_of_arguments)
  *
+ * this function can be used even if the function is already declared
+ * ??? an integer shouldn't always be returned
  */
 entity MakeRunTimeSupportFunction(local_name, number_of_arguments)
 string local_name;
 int number_of_arguments;
 {
-    /* make_empty_subroutine or MakeExternalFunction? */
-/*
-    MakeIntrinsic(local_name, number_of_arguments);
-    return(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, local_name));
-*/
     return(MakeExternalFunction(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
 						   local_name),
 				MakeIntegerResult()));
 }
 
 /*
+ * string pvm_what_options(b)
  *
+ * the pvm what option is given back as a string, fellowing the basic given.
  */
 string pvm_what_options(b)
 basic b;
@@ -830,7 +806,6 @@ list content;
 bool bsend;
 {
     int
-	i = 1,
 	len = gen_length(content);
     list
 	larg = NIL,
@@ -841,17 +816,8 @@ bool bsend;
 
     pips_assert("st_generate_packing_and_passing", ((len<=4) && (len>=1)));
 
-    for (i=1 ; i<=len ; i++)
-    {
-	expression
-	    lo = MakeCharacterConstantExpression
-		(bound_parameter_name(array, LOWER, i)),
-	    up = MakeCharacterConstantExpression
-		(bound_parameter_name(array, UPPER, i));
-
-	lind = gen_nconc(lind, CONS(EXPRESSION, lo, NIL));
-	larg = gen_nconc(larg, CONS(EXPRESSION, lo, CONS(EXPRESSION, up, NIL)));
-    }
+    lind = array_lower_bounds_list(array);
+    larg = array_lower_upper_bounds_list(array);
 
     MAPL(cr,
      {
@@ -869,48 +835,27 @@ bool bsend;
      },
 	 content);
 
-    larg = CONS(EXPRESSION,
+/*    larg = CONS(EXPRESSION,
 		MakeCharacterConstantExpression
-		(pvm_what_options(entity_basic(array))),
-	   CONS(EXPRESSION,
+		(pvm_what_options(entity_basic(array))), ...) */
+
+    larg = CONS(EXPRESSION,
 		reference_to_expression(make_reference(array, lind)),
-		larg));
+		larg);
     
     /*
      * larg content:
      *
-     * what, 
+     * // what, 
      * array([dimension lower]*len), 
      * dimension [lower, upper]*len, 
      * range [lower, upper, increment]*len
      */
 
-    if (bsend) /* send => pack */
-    {
-	switch (len)
-	{
-	case 1: return(my_make_call_statement(e_Pack1, larg));
-	case 2: return(my_make_call_statement(e_Pack2, larg));
-	case 3: return(my_make_call_statement(e_Pack3, larg));
-	case 4: return(my_make_call_statement(e_Pack4, larg));
-	default: pips_error("st_generate_packing_and_passing",
-			    "len not welcomed here (%d)", len);
-	}
-    }
-    else /* receive => unpack */
-    {
-	switch (len)
-	{
-	case 1: return(my_make_call_statement(e_Unpack1, larg));
-	case 2: return(my_make_call_statement(e_Unpack2, larg));
-	case 3: return(my_make_call_statement(e_Unpack3, larg));
-	case 4: return(my_make_call_statement(e_Unpack4, larg));
-	default: pips_error("st_generate_packing_and_passing",
-			    "len not welcomed here (%d)", len);
-	}
-    }
+    return(my_make_call_statement
+	   (make_packing_function("HPFC", len, bsend, entity_basic(array), 1+5*len),
+	    larg));
 
-    return(statement_undefined); /* just to avoid a gcc warning */
 }
 
 /*
@@ -931,3 +876,89 @@ int side, dim;
 			  (side)?("UP"):("LO"),
 			  dim)));
 }
+
+/*
+ * list array_lower_bounds_list(array)
+ */
+list array_lower_bounds_list(array)
+entity array;
+{
+    int
+	i = -1,
+	ndim = NumberOfDimension(array);
+    list
+	result = NIL;
+
+    for (i=ndim ; i>=1 ; i--)
+    {
+	char
+	    *buf = bound_parameter_name(array, LOWER, i);
+
+	result = 
+	    CONS(EXPRESSION,
+		 MakeCharacterConstantExpression(buf),
+		 result);
+
+	free(buf);
+    }
+
+    return(result);
+}
+
+/*
+ * list array_lower_upper_bounds_list(array)
+ */
+list array_lower_upper_bounds_list(array)
+entity array;
+{
+    int
+	i = -1,
+	ndim = NumberOfDimension(array);
+    list
+	result = NIL;
+
+    for (i=ndim ; i>=1 ; i--)
+    {
+	char
+	    *lbuf = bound_parameter_name(array, LOWER, i),
+	    *ubuf = bound_parameter_name(array, UPPER, i);
+
+	result = 
+	    CONS(EXPRESSION,
+		 MakeCharacterConstantExpression(lbuf),
+	    CONS(EXPRESSION,
+		 MakeCharacterConstantExpression(ubuf),
+		 result));
+
+	free(ubuf);
+	free(lbuf);
+    }
+
+    return(result);
+}
+	
+/*
+ * entity make_packing_function(prefix, ndim, kind, base, nargs)
+ *
+ * find or create an entity for the packing function...
+ */
+entity make_packing_function(prefix, ndim, kind, base, nargs)
+string prefix;
+int ndim;
+bool kind;
+basic base;
+int nargs;
+{
+    char 
+	buffer[100],
+	*buf = buffer;
+
+    buf += strlen(sprintf(buf, "%s_%s_%s_%d", 
+			  prefix, 
+			  (kind ? "PACK" : "UNPACK"),
+			  pvm_what_options(base),
+			  ndim));
+
+    return(MakeRunTimeSupportSubroutine(buffer, nargs));
+}
+
