@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.164  2002/04/25 12:22:49  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.163  2002/04/25 12:14:29  phamdat
  * *** empty log message ***
  *
@@ -331,7 +334,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.163 2002/04/25 12:14:29 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.164 2002/04/25 12:22:49 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2538,24 +2541,24 @@ text my_text_named_module(entity module, statement stat)
         MERGE_TEXTS(r, text_statement(module, 0, stat));
     }
 
-    {
+    /*{
 	string filename = "/users/tmp/phamdat/textout";
 	FILE * my_file = safe_fopen(filename, "w");
 	print_text(my_file, r);
 	safe_fclose(my_file, filename);
 	free(filename);
-	}
+	}*/
 
 
     ADD_SENTENCE_TO_TEXT(r, sentence_tail());
 
-    {
+    /*{
 	string filename = "/users/tmp/phamdat/textout";
 	FILE * my_file = safe_fopen(filename, "w");
 	print_text(my_file, r);
 	safe_fclose(my_file, filename);
 	free(filename);
-	}
+	}*/
 
 
     if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
