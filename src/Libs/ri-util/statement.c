@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.66  2000/05/09 14:52:36  nguyen
+    2 functions added
+
     Revision 1.65  2000/03/14 10:56:28  nguyen
     Function : statement make_stop_statement(string message) added
     	   void insert_statement(statement s1, statement s2, bool before) added
@@ -667,11 +670,11 @@ entity module;
 
 /* adds a RETURN statement to *ps if necessary
  */
-/*-------------------------------------------------------------------------------------------------
+/*----------------------------
 
   This function returns a stop statement with an error message
 
--------------------------------------------------------------------------------------------------*/
+------------------------------*/
 
 statement make_stop_statement(string message)
 {
@@ -1986,48 +1989,56 @@ statement_to_line_number(statement s)
     return s_to_l;
 }
 
-/*--------------------------------------------------------------------------------------------------- 
-
- * NOT TESTED !!!
- * insert statement s2 before or after statement s1
+/* insert statement s1 before or after statement s
+ *  
+ * If statement s is a sequence, simply insert s1 at the begining
+ * or at the end of the sequence s.
  *
- * If statement s2 is a sequence, simply insert s1 at the begining
- * or at the end of the sequence.
+ * If not, create a new statement s2 with s's fields and update
+ * s as a sequence with no comments and undefined number and ordering.
+ * The sequence is either "s1;s2" if "before" is TRUE or "s2;s1" else.
  *
- * If not, create a new statement s3 with s1's fields and update
- * s1 as a sequence with no comments and undefined number and ordering.
- * The sequence is either "s2;s3" if "before" is TRUE or "s3;s2" else.
- 
---------------------------------------------------------------------------------------------------- */
+ *
+ * ATTENTION !!! : this version is not for unstructured case
+ *
+ */
 
-void insert_statement(statement s1, statement s2, bool before)
-{
+void insert_statement(statement s,
+		      statement s1,
+		      bool before)
+{  
   list ls;
-  instruction i2 = statement_instruction(s2);
-  if (instruction_sequence_p(i2))
+  instruction i = statement_instruction(s);
+  if (instruction_sequence_p(i))
     {
-      ls = instruction_block(i2);
+      ls = instruction_block(i);
       if (before)	
-	ls = gen_nconc(ls,CONS(STATEMENT,s1,NIL));
+	ls = CONS(STATEMENT,s1,ls);
       else
-	ls = gen_nconc(CONS(STATEMENT,s1,NIL),ls);
-      sequence_statements(instruction_sequence(i2)) = ls;
+	ls = gen_nconc(ls,CONS(STATEMENT,s1,NIL));    
+      instruction_block(i) = ls;
     }
   else
     {
-      statement s3 = copy_statement(s1);      
+      statement s2 = copy_statement(s);   
       if (before)  
-	ls = CONS(STATEMENT,s2,CONS(STATEMENT,s3,NIL));
+	ls = CONS(STATEMENT,s1,CONS(STATEMENT,s2,NIL));
       else
-	ls = CONS(STATEMENT,s3,CONS(STATEMENT,s2,NIL));	
-
-      s1 = update_statement_instruction(s1,make_instruction(is_instruction_sequence,make_sequence(ls)));
-    }
- 
+	ls = CONS(STATEMENT,s2,CONS(STATEMENT,s1,NIL));	
+      
+      statement_comments(s) = empty_comments;
+      statement_label(s)= entity_empty_label();
+      statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+      statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
+      
+      free_instruction(statement_instruction(s));
+      statement_instruction(s) = make_instruction(is_instruction_sequence,
+						  make_sequence(ls));
+    } 
 }
-/*--------------------------------------------------------------------------------------------------- 
 
- * Replace the instruction in statement s by instruction i.
+
+/* Replace the instruction in statement s by instruction i.
  *
  * Free the old instruction. 
  *
@@ -2048,9 +2059,13 @@ void insert_statement(statement s1, statement s2, bool before)
  *
  * Be careful with the label and the comments too: they may have
  * been reused.
+ *
+ *
+ * ATTENTION !!! :  this version is not for unstructured case
+ *
+ *
+ */
 
-
---------------------------------------------------------------------------------------------------- */
 statement update_statement_instruction(statement s,instruction i)
 {
   list seq = NIL;
@@ -2060,7 +2075,8 @@ statement update_statement_instruction(statement s,instruction i)
   statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
   statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
 
-  if (instruction_sequence_p(i) && ((!statement_with_empty_comment_p(s)) || (!unlabelled_statement_p(s))))
+  if (instruction_sequence_p(i) && 
+      ((!statement_with_empty_comment_p(s)) || (!unlabelled_statement_p(s))))
     {
       cs = make_call_statement(CONTINUE_FUNCTION_NAME,
 			       NIL,
@@ -2087,3 +2103,17 @@ statement update_statement_instruction(statement s,instruction i)
 
 
 /* That's all folks */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
