@@ -109,7 +109,7 @@ int check_poly(Polyhedron *S,Polyhedron *C,Enumeration *en,
 	  fprintf(stderr,", ");
 	  value_print(stderr,VALUE_FMT,z[k]);
 	}
-	fprintf(stderr," ) should be");
+	fprintf(stderr," ) should be ");
 	value_print(stderr,VALUE_FMT,tmp);
 	fprintf(stderr,", while EP eval gives ");
 	value_print(stderr,VALUE_FMT,c);
