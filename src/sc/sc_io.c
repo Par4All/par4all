@@ -1,4 +1,4 @@
- /* package sc */
+/* package sc */
 
 #include <stdio.h>
 
@@ -105,20 +105,93 @@ Psysteme * ps;
  * fonction sc_fprint d'un profil different)
  *
  */
+
 void sc_dump(sc)
 Psysteme sc;
 {
     if(!SC_UNDEFINED_P(sc)) {
-	(void) fprintf(stderr,"DIMENSION: %d\n",sc->dimension);
+
+      (void) fprintf(stderr,"Better use sc_default_name(/*Psysteme*/) "); 
+      (void) fprintf(stderr,"Or sc_default_dump_to_file(...) \n");
+      	(void) fprintf(stderr,"DIMENSION: %d  ",sc->dimension);
+	(void) fprintf(stderr,"INEGALITES (%d)  ",sc_nbre_inegalites(sc));
+	(void) fprintf(stderr,"EGALITES (%d)  ",sc_nbre_egalites(sc));
+	(void) fprintf(stderr,"\nVAR ");
+	
 	base_fprint(stderr,sc->base, variable_dump_name);
-	(void) fprintf(stderr,"INEGALITES (%d)\n",sc_nbre_inegalites(sc));
-	inegalites_fprint(stderr,sc->inegalites,variable_dump_name);
-	(void) fprintf(stderr,"EGALITES (%d)\n",sc_nbre_egalites(sc));
-	egalites_fprint(stderr,sc->egalites,variable_dump_name);
+	(void) fprintf(stderr,"  {\n ");
+	inegalites_fprint(stderr,sc->inegalites, variable_dump_name);
+	egalites_fprint(stderr,sc->egalites, variable_dump_name);
+	
+	(void) fprintf(stderr,"  }\n");
     }
     else
 	(void) fprintf(stderr, "SC_RN ou SC_EMPTY ou SC_UNDEFINED\n");
 }
+//sc_default_dump is now more compatible as possible with sc_fscan
+//print with name of variables from default_variable_to_string
+//print to stderr
+
+void sc_default_dump(sc)
+Psysteme sc;
+{
+    if(!SC_UNDEFINED_P(sc)) {
+	(void) fprintf(stderr,"DIMENSION: %d  ",sc->dimension);
+	(void) fprintf(stderr,"INEGALITES (%d)  ",sc_nbre_inegalites(sc));
+	(void) fprintf(stderr,"EGALITES (%d)  ",sc_nbre_egalites(sc));
+	(void) fprintf(stderr,"\nVAR ");
+	
+	base_fprint(stderr,sc->base, default_variable_to_string);
+	(void) fprintf(stderr,"  {\n ");
+	inegalites_fprint(stderr,sc->inegalites, default_variable_to_string);
+	egalites_fprint(stderr,sc->egalites, default_variable_to_string);
+	
+	(void) fprintf(stderr,"  }\n");
+    }
+    else
+	(void) fprintf(stderr, "SC_RN ou SC_EMPTY ou SC_UNDEFINED\n");
+}
+// Print all the system of constraints into one output file named sc_dump.out
+// If the file doesn't exist, create then. duong
+// Print with a label and name (maybe by number) of the system explaining the reason why
+void sc_default_dump_to_file(sc, label, sc_nb,filename)
+Psysteme sc;
+char * label;
+int sc_nb;
+char * filename;
+{
+  FILE * f;
+
+    if (filename == NULL) filename = "noname.out";
+   
+    if ((f = fopen(filename,"a")) != NULL) {
+      
+      (void) fprintf(f,"%s %d th \n",label,sc_nb);
+      
+      if(!SC_UNDEFINED_P(sc)) {
+	(void) fprintf(f,"DIMENSION: %d  ",sc->dimension);
+	(void) fprintf(f,"INEGALITES (%d)  ",sc_nbre_inegalites(sc));
+	(void) fprintf(f,"EGALITES (%d)  ",sc_nbre_egalites(sc));
+	(void) fprintf(f,"\nVAR ");
+	
+	base_fprint(f,sc->base, default_variable_to_string);
+	(void) fprintf(f,"  {\n ");
+	inegalites_fprint(f,sc->inegalites, default_variable_to_string);
+	egalites_fprint(f,sc->egalites, default_variable_to_string);
+	
+	(void) fprintf(f,"  }\n");
+      }
+      else {
+	(void) fprintf(f, "SC_RN ou SC_EMPTY ou SC_UNDEFINED\n");
+      }
+      fclose(f);
+    }
+    else {
+      fprintf(stderr,"Ouverture du fichier %s impossible\n",
+		    filename);
+    }    
+}
+
 
 /* void sc_print() */
 void sc_print(ps, nom_var)
