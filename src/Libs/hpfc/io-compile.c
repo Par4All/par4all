@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/09/01 15:47:56 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/09/03 15:19:36 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -307,11 +307,22 @@ statement *psh, *psn;
 
 	hpfc_simplify_condition(&condition, stat, move);
 
-	generate_io_statements_for_distributed_arrays
-	    (array, move, 
-	     condition, proc_echelon, tile_echelon,
-	     parameters, processors, scanners, rebuild,
-	     psh, psn);
+	if (!sc_empty_p(proc_echelon) && !sc_empty_p(tile_echelon))
+	{
+	    generate_io_statements_for_distributed_arrays
+		(array, move, 
+		 condition, proc_echelon, tile_echelon,
+		 parameters, processors, scanners, rebuild,
+		 psh, psn);
+	}
+	else
+	{
+	    user_warning("generate_io_collect_or_update",
+			 "empty operation for array %s\n", 
+			 entity_name(array));
+	    *psh = make_continue_statement(entity_undefined);
+	    *psn = make_continue_statement(entity_undefined);
+	}
     }
     else
     {
@@ -335,11 +346,22 @@ statement *psh, *psn;
 
 	hpfc_simplify_condition(&condition, stat, move);
 
-	generate_io_statements_for_shared_arrays
-	    (array, move,
-	     condition, row_echelon,
-	     parameters, scanners, rebuild,
-	     psh, psn);
+	if (!sc_empty_p(row_echelon))
+	{
+	    generate_io_statements_for_shared_arrays
+		(array, move,
+		 condition, row_echelon,
+		 parameters, scanners, rebuild,
+		 psh, psn);
+	}
+	else
+	{
+	    user_warning("generate_io_collect_or_update",
+			 "empty operation for array %s\n", 
+			 entity_name(array));
+	    *psh = make_continue_statement(entity_undefined);
+	    *psn = make_continue_statement(entity_undefined);
+	}
     }
 
     ifdebug(8)
@@ -785,6 +807,20 @@ tag move;
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, try_keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, remove);
 
+    ifdebug(7)
+    {
+	fprintf(stderr, 
+		"[clean_distributed_io_system] list of variables:\nkeep: ");
+	fprint_entity_list(stderr, keep);
+	fprintf(stderr, "\ntry_keep: ");
+	fprint_entity_list(stderr, try_keep);
+	fprintf(stderr, "\ntry_remove: ");
+	fprint_entity_list(stderr, try_remove);
+	fprintf(stderr, "\nremove: ");
+	fprint_entity_list(stderr, remove);
+	fprintf(stderr, "\n");
+    }
+
     /*
      * Remove variables that have to be removed
      */
@@ -817,6 +853,12 @@ tag move;
     }
     
     return(syst);
+}
+
+void XXX(syst)
+Psysteme syst;
+{
+    sc_fprint(stderr, syst, entity_local_name);
 }
 
 /* void put_variables_in_ordered_lists
