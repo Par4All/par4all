@@ -46,6 +46,7 @@ LIB_CFILES=	replace.c \
 		array_privatization.c \
 		simple_atomize.c \
 		standardize_structure.c \
+		use_def_elimination.c \
 		loop_normalize.c
 LIB_HEADERS=	transformations-local.h
 LIB_OBJECTS=	$(LIB_CFILES:%.c=%.o)
