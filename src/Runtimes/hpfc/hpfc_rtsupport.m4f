@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/05 15:56:18 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/05 16:35:22 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -885,7 +885,7 @@ c
       call pvmfspawn(
      $     NODE_PROGRAM_NAME, 
      $     PVMARCH, 
-     $     NDE_ARCHITECTURE, 
+     $     NODE_ARCHITECTURE, 
      $     NBOFTASKS, 
      $     NODETIDS, 
      $     info)
