@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1995/09/27 15:48:25 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1995/11/27 16:43:33 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1995/09/27 15:48:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1995/11/27 16:43:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -448,5 +448,8 @@ initialize_emacs_mode()
 
       /* The user query is redirected to Emacs: */
       /* pips_request_handler = epips_user_request; */
+
+      /* Initialize the epips.el epips-window-number variable: */
+      send_window_number_to_emacs(INITIAL_NUMBER_OF_WPIPS_WINDOWS);
    }
 }
