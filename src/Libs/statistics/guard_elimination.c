@@ -23,11 +23,46 @@
 Psysteme sc_newbase;
 Ptsg sg;
 bool if1=FALSE,if2=FALSE; 
+int ordering;
+
+void matrice_sscan(s,a,n,m)
+char *s;
+matrice	* a;
+int * n;			/* column size */
+int * m;			/* row size */
+{
+    int n_read;
+    *a = matrice_new(*n,*m);
+    n_read = sscanf(s,"%d%d%lld%lld%lld%lld%lld" ,
+		    n, m,&(DENOMINATOR(*a)),&ACCESS(*a,*n,1,1),
+		    &ACCESS(*a,*n,1,2),&ACCESS(*a,*n,2,1),&ACCESS(*a,*n,2,2));
+    assert(n_read==7);
+    assert(1 <= *n && 1 <= *m);
+    
+    /*
+    n_read = sscan_Value(s+3,&(DENOMINATOR(*a)));
+    assert(n_read == 1);
+   
+    assert(value_notzero_p(DENOMINATOR(*a)));
+   
+    assert(value_pos_p(DENOMINATOR(*a)));
+    indice=4;
+      for(r = 1; r <= *n; r++) 
+      for(c = 1; c <= *m; c++) {
+	n_read = sscan_Value(s+6,&ACCESS(*a,*n,r,c));
+
+
+	assert(n_read == 1);
+	indice++;
+	} */
+}
 
 typedef struct 
 {
   stack statement_stack;
 } * context_p, context_t;
+
+   
 
 static Value myceil( k,m)
      Value  k,m; 
@@ -94,11 +129,15 @@ static bool stmt_flt(statement s,context_p context)
   stack_push(s, context->statement_stack); 
   return TRUE; 
 }
+
+ 
 static void  stmt_rwt(statement s,context_p context)
 {  
   stack_pop(context->statement_stack);
 }
    
+
+ 
 static bool loop_flt(loop l, context_p context)
 { 
                    /*DECLARATION */
@@ -312,6 +351,7 @@ static bool loop_flt(loop l, context_p context)
 	    t1= make_test(eq_expression (copyindex,copylower),s1, 
 			  make_block_statement(NIL));
 	    s1=test_to_statement(t1);
+	    if1=TRUE;
 	  };
 	if (gen_length(lis2)!=0)  
 	  { 
@@ -321,6 +361,7 @@ static bool loop_flt(loop l, context_p context)
 	    t2= make_test(eq_expression (copyindex,copyupper) ,s2,
 			  make_block_statement(NIL));
 	    s2=test_to_statement(t2);
+	    if2=TRUE;
 	  };
 	if (gen_length(lis2)!=0)
 	  lis=CONS(STATEMENT , s2,NIL);
@@ -440,8 +481,14 @@ static bool loop_flt(loop l, context_p context)
 statement unimodular(s)
      statement s    ;
 {
-  FILE *infp;
-  char *name_file;
+  Psysteme loop_iteration_domaine_to_sc();
+  void change_of_base_index();
+  void  scanning_base_to_vect();
+  expression expression_to_expression_newbase();
+  Pvecteur vect_change_base();
+  statement  code_generation();
+  Psysteme sc_change_baseindex();
+  char * st;
   cons *lls=NULL;
   Psysteme sci;			/* sc initial */
   Psysteme scn;			/* sc nouveau */
@@ -453,33 +500,36 @@ statement unimodular(s)
   matrice AG; 
   matrice G_inv;
   int n;				/* number of index */
-  int m ;				/* number of constraints */
+  int m ;	
   statement s_lhyp;
   Pvecteur *pvg;
   Pbase pb;  
   expression lower, upper;
   Pvecteur pv1, pv2;
   loop l;
+
   while(instruction_loop_p(statement_instruction (s))) {
     lls = CONS(STATEMENT,s,lls);
     s = loop_body(instruction_loop(statement_instruction(s)));
   }
   sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
-  sc_dump(sci);
   n = base_dimension(base_oldindex);
   m = sci->nb_ineq;
   A = matrice_new(m,n);
   sys_matrice_index(sci, base_oldindex, A, n, m);
-  name_file = user_request("nom du fichier pour la matrice T");
-  infp = safe_fopen(name_file,"r");
-  matrice_fscan(infp,&G,&n,&n); 
-  safe_fclose(infp, name_file);
-  free(name_file);
+
+  /*  name_file = user_request("nom du fichier pour la matrice T");
+      infp = safe_fopen(name_file,"r"); */
+
+
+  st = user_request("Entrer la matrice T :");
+  matrice_sscan(st,&G,&n,&n); 
+  /*   safe_fclose(infp, name_file);
+       free(name_file); */
   G_inv = matrice_new(n,n);
   matrice_general_inversion(G,G_inv,n);
   AG = matrice_new(m,n);
   matrice_multiply(A,  G_inv, AG, m, n, n);
-  printf( " tototototo \n");
   /* create the new system of constraintes (Psysteme scn) with  
      AG and sci */
   scn = sc_dup(sci);
@@ -493,10 +543,7 @@ statement unimodular(s)
   change_of_base_index(base_oldindex, &base_newindex);
   
   sc_newbase = sc_change_baseindex(sc_dup(sc_row_echelon), base_oldindex, base_newindex);
-
-  
-  sc_syst_debug(sc_newbase);
-  sc_dump(sc_newbase);
+  /* sc_syst_debug(sc_newbase); */
   sg= sc_to_sg_chernikova(sc_newbase);  
   /* generation of hyperplane  code */
   /*  generation of bounds */
@@ -512,7 +559,6 @@ statement unimodular(s)
   lower = range_upper(loop_range(l));
   upper= expression_to_expression_newbase(lower, pvg, base_oldindex);
   s_lhyp = code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase);
-  printf(" finn  \n");
   return(s_lhyp);
 }
 statement  free_guards( s)
@@ -537,8 +583,6 @@ statement  free_guards( s)
   int nbr_vertice;
   Variable indice1,indice2;
   range range_i,range1,range2,range3;
-  /* sg_dump(sg);  */
-  /* fprint_lsom(stderr, vertice,variable_dump_name ); */
   ins =statement_instruction(s);
   loop1=instruction_loop(ins);
   body1=loop_body(instruction_loop(ins));
@@ -563,7 +607,6 @@ statement  free_guards( s)
   lisjcopy= gen_full_copy_list(lisj);
   first= (statement )CHUNK( CAR(lisj));
   nbr_vertice=sg_nbre_sommets(sg);
-  printf(" le nombre de sommet est %d \n",  nbr_vertice);
   vertice= sg_sommets(sg); 
   for (e = vertice; e != NULL; e = e->succ) {
     pv1=e->vecteur;
@@ -853,6 +896,7 @@ statement  free_guards( s)
 	};
       };
     }; 
+ 
     body1=loop_body( tab_loop[i]);
     ins =statement_instruction(body1);
     seqi=instruction_sequence(ins);
@@ -1033,7 +1077,7 @@ statement  free_guards( s)
 	  expression exp1,exp2;
 	  Pvecteur pv;
 	  Value val;
-	  statement s,s1;
+	  statement s;
 	  pv=vect_dup (pvif2);
 	  val=vect_coeff(indice2,pvif2);
 	  vect_erase_var( &pv,indice2);
@@ -1049,7 +1093,7 @@ statement  free_guards( s)
 	    exp2=make_integer_constant_expression(0);
 	    exp1=eq_expression(exp1,exp2); 
 	      test_condition(instruction_test(statement_instruction(s)))=exp1;    
-		test_true(instruction_test(statement_instruction(s)))=copy_statement (sif1);   
+	      test_true(instruction_test(statement_instruction(s)))=copy_statement(sif1);  
 	    lisi=CONS(STATEMENT,s,lisi);
 	      sequence_statements(seqi)=lisi; 
 	};
@@ -1178,12 +1222,26 @@ statement  free_guards( s)
      return(  instruction_to_statement(ins)); 
 }
 
+
+
+static bool stmt_fltp(statement s)
+{
+  statement s1;
+  statement unimodular(),free_guards(); 
+  if (statement_ordering(s)==ordering)
+    {
+      s1=unimodular(s); 
+      s1= free_guards(s1);  
+      statement_instruction(s) =statement_instruction(s1); 
+      return FALSE;
+    }
+  return TRUE;
+}
 bool guard_elimination(string module)
 {
-
+  int atoi();
   statement stat,s1;
-  string str ;
-  int ordering ; 
+  string str ; 
   instruction ins;
   sequence seq;
   list lis;        
@@ -1194,49 +1252,36 @@ bool guard_elimination(string module)
   stat = (statement) db_get_memory_resource(DBR_CODE, module, TRUE); 
   set_current_module_statement(stat);
   context.statement_stack = stack_make(statement_domain, 0, 0);
-  
-  // user_request
-  // recherche le statement dans stat
-  // appliquer...
-  
-  /* initialize_ordering_to_statement(stat); */
   ins=statement_instruction(stat);
   seq=instruction_sequence(ins);
   lis =sequence_statements(seq); 
-  /* MAP(STATEMENT,s,{printf("%d \n",statement_ordering(s));},lis) */
-  
   str = user_request("Which nid do you want to treat?\n"
 		     "(give its ordering): ");
-  ordering=atoi(str);  
-  
-  
+  ordering=atoi(str); 
+  free(str); 
   s1=ordering_to_statement(ordering);
-  
   gen_context_multi_recurse(s1, &context,
 			    statement_domain, stmt_flt, stmt_rwt,
 			    loop_domain, loop_flt, gen_null,
 			    NULL);  
+  module_reorder(stat);
+  pips_assert("statement is ok", statement_consistent_p(stat));
   str = user_request("for Which nid do you want apply unimodular 
                       transformation ?\n" "(give its ordering): ");
   ordering=atoi(str); 
-  	      
-  s1=ordering_to_statement(ordering);
-  MAP(STATEMENT,s,{if (statement_ordering(s)==ordering){
-    s1=unimodular(s1); ; s1= free_guards(s1);  
-    CHUNK(CAR(lis))= (gen_chunk *) s1;}
-  ;lis=CDR(lis) ;},lis) 
-    
-    
-    
+  free(str);
   
-    /*  gen_recurse(stat, statement_domain, gen_true,);  */
-    module_reorder(stat); 
+  s1 = ordering_to_statement(ordering);
   
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, stat);
-    reset_current_module_entity();
-    reset_current_module_statement();
-    debug_off();
-    return TRUE;  
+  gen_context_multi_recurse (s1, NULL,
+     statement_domain, stmt_fltp,gen_false,
+			     NULL);
+  module_reorder(stat); 
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, stat);
+  reset_current_module_entity();
+  reset_current_module_statement();
+  debug_off();
+  return TRUE;  
 }
 
 
