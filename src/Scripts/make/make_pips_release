@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1997/03/27 15:14:40 $, 
+# $Date: 1997/03/27 15:23:37 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -150,9 +150,13 @@ test "$install" &&
 [ "$dotar" ] && 
 {
     cd $cwd
+
     $verb "taring ($tar $taropt)..."
     $tar $taropt $name.tar $name || error 3 "$tar returned $?"
+
+    $verb "removing distribution tree"
     rm -rf $name || error 4 "rm returned $?"
+
     [ "$dozip" ] && 
     {
 	$verb "zipping ($zip)..."
