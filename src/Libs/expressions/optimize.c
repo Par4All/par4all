@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.8  1998/10/20 14:51:23  zory
+ * move the free statement for all strings inside the if statement
+ *
  * Revision 1.7  1998/10/20 14:48:47  zory
  * free the list of unoptimized expressions only when there are some
  * expressions in the module ! (if statement)
@@ -280,14 +283,16 @@ bool optimize_expressions(string module_name)
       /* free the list and destroy all unoptimized expressions */
       gen_free_list(ln), ln=NIL;
 
+
+      /* free strings */
+      free(out), out = NULL;
+      free(in), in = NULL;
+      free(cmd), cmd = NULL;
+
     }
     else 
       pips_debug(3,"no expression for module %s \n", module_name);
 
-    /* free strings */
-    free(out), out = NULL;
-    free(in), in = NULL;
-    free(cmd), cmd = NULL;
 
     pips_debug(3,"EOLE transformations ... Done for module %s \n", module_name);
 
