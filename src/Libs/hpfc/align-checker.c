@@ -8,24 +8,53 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1995/12/19 15:52:31 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1995/12/20 08:50:03 $, )
  * version $Revision$
  */
 
 #include "defines-local.h"
 #include "access_description.h"
+#include "regions.h"
 
-#include "effects.h"
+GENERIC_STATIC_OBJECT(/**/, hpfc_current_statement, statement)
 
-/* bool align_check(r1, r2, plint, pkind, pindx)
- *
- * computes the shift vector that links the two references,
+#define REGION_TYPE EFFECT_TYPE
+
+static bool 
+write_on_entity_p(
+    entity e)
+{
+    MAP(REGION, r,
+	if (region_entity(r)==e && region_write_p(r)) return TRUE,
+	load_statement_local_regions(hpfc_current_statement));
+
+    return FALSE;
+}
+
+/* true is the expression is locally constant, that is in the whole loop nest,
+ * the reference is not written. ??? not very portable thru pips...
+ */
+bool 
+local_integer_constant_expression(
+    expression e)
+{
+    syntax s = expression_syntax(e);
+
+    if ((syntax_reference_p(s)) &&
+	(normalized_linear_p(expression_normalized(e))))
+    {
+	entity ent = reference_variable(syntax_reference(s));
+	if (write_on_entity_p(ent)) return FALSE;
+    }
+    
+    return TRUE;
+}
+
+/* computes the shift vector that links the two references,
  * TRUE if every thing is ok, i.e. the vector is ok for the
  * distributed dimensions...
  * The vector considered here is just a list of integers.
- *
- * conditions:
- * - same template
+ * conditions: same template
  */
 bool 
 align_check(
@@ -512,57 +541,4 @@ int n;
 list l;
 {
     return((n==0)?(EXPRESSION(CAR(l))):(nth_expression(n-1, CDR(l))));
-}
-
-/* true is the expression is locally constant, that is in the whole loop nest,
- * the reference is not written.
- */
-bool local_integer_constant_expression(e)
-expression e;
-{
-    bool result = FALSE;
-    syntax s = expression_syntax(e);
-
-    if ((syntax_reference_p(s)) &&
-	(normalized_linear_p(expression_normalized(e))))
-    {
-	entity ent = reference_variable(syntax_reference(s));
-
-	result =
-	  (!effects_write_entity_p(get_hpfc_current_statement_effects(), ent));
-
-	pips_debug(7, "looking for effects on %s reference, result %d\n",
-		   entity_name(ent), result);
-    }
-    
-    return(result);
-}
-
-/* hmmm...
- */
-static statement hpfc_current_statement = statement_undefined;
-static list hpfc_current_statement_effects = NIL;
-
-void set_hpfc_current_statement(stat)
-statement stat;
-{
-    hpfc_current_statement = stat;
-    hpfc_current_statement_effects = statement_to_effects(stat);
-}
-
-statement get_hpfc_current_statement()
-{
-    return hpfc_current_statement;
-}
-
-list get_hpfc_current_statement_effects()
-{
-    return hpfc_current_statement_effects;
-}
-
-void reset_hpfc_current_statement()
-{
-    hpfc_current_statement = statement_undefined;
-    gen_free_list(hpfc_current_statement_effects);
-    hpfc_current_statement_effects = NIL;
 }
