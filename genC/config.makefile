@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/16 15:21:01 $, 
+# $Date: 1996/08/08 10:49:15 $, 
 #
 # Newgen should be quite particular...
 
@@ -30,8 +30,8 @@ OTHER_HEADERS=\
         token.l
 
 DERIVED_HEADERS=\
-	x.tab.h \
-	z.tab.h
+	genread.h \
+	genspec.h
 
 LIB_CFILES=\
         build.c \
@@ -48,10 +48,10 @@ OTHER_CFILES=\
 	genSML.c
 
 DERIVED_CFILES=\
-	x.tab.c \
-	lex.xx.c \
-	z.tab.c \
-	lex.zz.c
+	genread.c \
+	genread_lex.c \
+	genspec.c \
+	genspec_lex.c
 
 DERIVED_FILES=
 
@@ -75,23 +75,23 @@ $(ARCH)/libgenC.a: $(LIB_OBJECTS)
 	$(ARCHIVE) $@ $+
 	ranlib $@
 
-x.tab.h x.tab.c: read.y
+genread.h genread.c: read.y
 	$(PARSE) $< 
-	sed 's,YY,XX,g;s,yy,xx,g' < y.tab.c > x.tab.c
-	sed 's,YY,XX,g;s,yy,xx,g' < y.tab.h > x.tab.h
+	sed 's,YY,GENREAD_,g;s,yy,genread_,g' < y.tab.c > genread.c
+	sed 's,YY,GENREAD_,g;s,yy,genread_,g' < y.tab.h > genread.h
 
-lex.xx.o: x.tab.h
-lex.xx.c: read.l 
-	$(SCAN) $< | sed 's,YY,XX,g;s,yy,xx,g;s,\([^<]string\),\1_flex,' > $@
+genread_lex.o: genread.h
+genread_lex.c: read.l 
+	$(SCAN) $< | sed 's,YY,GENREAD_,g;s,yy,genread_,g;' > $@
 
-z.tab.h z.tab.c: gram.y
+genspec.h genspec.c: gram.y
 	$(PARSE) $< 
-	sed 's,YY,ZZ,g;s,yy,zz,g' < y.tab.c > z.tab.c
-	sed 's,YY,ZZ,g;s,yy,zz,g' < y.tab.h > z.tab.h
+	sed 's,YY,GENSPEC_,g;s,yy,genspec_,g' < y.tab.c > genspec.c
+	sed 's,YY,GENSPEC_,g;s,yy,genspec_,g' < y.tab.h > genspec.h
 
-lex.zz.o: z.tab.h
-lex.zz.c: token.l
-	$(SCAN) $< | sed 's,YY,ZZ,g;s,yy,zz,g' > $@
+genspec_lex.o: genspec.h
+genspec_lex.c: token.l
+	$(SCAN) $< | sed 's,YY,GENSPEC_,g;s,yy,genspec_,g' > $@
 
 $(ARCH)/newC:	$(ARCH)/new.o $(ARCH)/libgenC.a
 	$(LINK) $@ $+
