@@ -92,6 +92,7 @@ ParserError(char * f, char * m)
     reset_common_size_map_on_error();
     parser_reset_all_reader_buffers();
     parser_reset_StmtHeap_buffer();
+    safe_fclose(syn_in, CurrentFN);
     AbortOfProcedure();
 
     /* FI: let catch_error() take care of this in pipsmake since debug_on()
