@@ -12,19 +12,19 @@ move()
 # SOURCES
 #
 
-echo all Sources (Pips, Newgen, Linear)
+echo "all sources *Pips, Newgen, Linear)"
 move pips_sources
 make_pips_release -CS -pnle -rsz pips_sources
 
-echo Newgen Sources
+echo "Newgen sources"
 move newgen_sources
 make_pips_release -CS -n -rsz newgen_sources
 
-echo Linear Sources
+echo "Linear sources"
 move linear_sources
 make_pips_release -CS -l -rsz linear_sources
 
-echo Xpomp Sources
+echo "Xpomp sources"
 move xpomp_sources
 make_pips_release -rz -D Doc/xpomp_manual.ps \
 	-D Include -D Src/Runtimes/xpomp -p -w -e xpomp_sources
@@ -34,15 +34,15 @@ make_pips_release -rz -D Doc/xpomp_manual.ps \
 # BINARIES
 #
 
-echo SunOS4 binary version
+echo "SunOS4 binary version"
 move pips_GNU
 make_pips_release -CB GNU -pe -rsz pips_GNU
 
-echo Solaris 2 binary version
+echo "Solaris 2 binary version"
 move pips_GNUSOL2LL
 make_pips_release -CB GNUSOL2LL -pe -rz pips_GNUSOL2LL
 
-echo Solaris 2 binary version, including Public softs (big!)
+echo "Solaris 2 binary version, including Public softs (big!)"
 move pips_Public_GNUSOL2LL
 make_pips_release -CB GNUSOL2LL -peP -rz pips_Public_GNUSOL2LL
 
