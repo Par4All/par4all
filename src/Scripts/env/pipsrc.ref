@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.144  1998/11/18 12:21:36  coelho
+# unset EPIPS_EMACS.
+#
 # Revision 1.143  1998/09/22 08:54:09  coelho
 # eole added.
 #
@@ -349,8 +352,7 @@ test ${uname_s} = Linux && \
 # you may change the default by defining this variable
 # default: EPIPS_EMACS='emacs'
 
-test ${uname_s} = SunOS && \
-	EPIPS_EMACS='Emacs'
+#test ${uname_s} = SunOS && EPIPS_EMACS='Emacs'
 
 
 #
