@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/03/20 11:17:55 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/04/06 17:13:24 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1221,7 +1221,7 @@ struct driver *dr ;
 	bool cp_domain = (COPYABLE_DOMAIN( dlp->domain )) ;
 	bool cp_codomain = (COPYABLE_DOMAIN( dlp->cdr->domain )) ;
 	
-	(new_obj+data)->h = hash_table_make( (obj+data)->h->hash_type, 0) ;
+	(new_obj+data)->h = hash_table_make( hash_table_type((obj+data)->h), 0) ;
 
 	HASH_MAP( k, v, {
 	    k =  (cp_domain ? (char *)copy_hsearch( (gen_chunk *)k ) : k) ;
