@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/09/07 16:56:18 $, )
+# ($Date: 1996/09/07 17:16:29 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -137,7 +137,7 @@ M4FLAGS	+= -D SYNC_EXIT
 #
 endif
 
-M4FLAGS += -D ARCHITECTURE=$(PVM_ARCH) hpfc_lib_m4_macros
+M4FLAGS += -D PVM_ARCH=$(PVM_ARCH) hpfc_lib_m4_macros
 
 COPY		= cp
 MOVE 		= mv
