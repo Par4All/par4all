@@ -10,6 +10,7 @@
 #include <malloc.h>
 
 #include "boolean.h"
+#include "arithmetique.h"
 #include "vecteur.h"
 #include "ray_dte.h"
 #include "sommet.h"
