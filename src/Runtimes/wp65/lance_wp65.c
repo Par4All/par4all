@@ -281,8 +281,8 @@ main(int argc, char *argv[])
   }
   
   /* Pour une fin synchrone : */
-  testerreur("pvm_joingroup",
-	     pvm_joingroup(groupe_final));
+  /*testerreur("pvm_joingroup",
+	     pvm_joingroup(groupe_final));*/
   
   if (get_debug_level() >= 2)
     for(i = 0; i <= nb_taches - 1; i++)
@@ -315,8 +315,8 @@ main(int argc, char *argv[])
   /* Rajout d'une barrière car il semble que PVM puisse perdre des émissions
      finales si on fait un pvm_exit trop tôt. */
   debug(2, "main", "Attente de la barrière finale pour terminer.\n");
-  testerreur("pvm_barrier",
-	     pvm_barrier(groupe_final, nb_taches));
+  /* testerreur("pvm_barrier",
+	     pvm_barrier(groupe_final, nb_taches));*/
 
   debug_off();
   pvm_exit();
