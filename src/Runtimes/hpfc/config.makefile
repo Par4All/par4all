@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1997/01/14 15:50:52 $, )
+# ($Date: 1997/01/14 18:38:40 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -22,8 +22,10 @@ _HPFC_USE_GNU_ = 1
 endif
 
 PVM_ENCODING_OPTION =	PvmDataInPlace
+HPFC_MAX_NPES	=	32
 
 M4FLAGS+= -D _HPFC_DIMENSIONS_=3
+M4FLAGS+= -D _HPFC_MAX_NPES_=$(HPFC_MAX_NPES)
 M4FLAGS+= -D _HPFC_ENCODING_=$(PVM_ENCODING_OPTION)
 
 M4FLAGS	+= -D _HPFC_DEMO_
@@ -164,6 +166,7 @@ M4FLAGS	+= 	-D _HPFC_NO_PVM_VERSION_ \
 		-D _HPFC_NO_REAL4_ \
 		-D _HPFC_NO_COMPLEX8_
 PVM_ENCODING_OPTION =	PvmDataRaw
+HPFC_MAX_NPES =		128
 endif
 
 #
@@ -185,9 +188,9 @@ LIB_FFILES =	hpfc_check.f \
 		hpfc_main_node.f
 
 M4_HEADERS 	= hpfc_procs.m4h \
-		  hpfc_buffers.m4h 
+		  hpfc_buffers.m4h \
+		  hpfc_parameters.m4h
 CORE_HEADERS	= hpfc_commons.h \
-		  hpfc_parameters.h \
 		  hpfc_param.h \
 		  hpfc_globs.h \
 		  hpfc_misc.h
