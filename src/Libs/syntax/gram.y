@@ -94,6 +94,7 @@
 %type <instruction>	call_inst
 %type <instruction>	return_inst
 %type <instruction>	io_inst
+%type <instruction>	entry_inst
 %type <integer>		io_keyword
 %type <integer>		ival
 %type <integer>		opt_signe
@@ -321,6 +322,15 @@ begin_inst: opt_fortran_type psf_keyword module_name
             }
 	;
 
+entry_inst: TK_ENTRY entity_name opt_lformalparameter
+	    { 
+	      /* In case the entry is a FUNCTION, you want to recover its type.
+	       * You cannot use entity_functional_name as second rule element.
+	       */
+                 $$ = MakeEntry($2, $3);
+            }
+	;
+
 end_inst: TK_END TK_EOS
             { EndOfProcedure(); }
 	;
@@ -406,6 +416,8 @@ inst_exec: assignment_inst
 	    { $$ = $1; }
 	| io_inst
 	    { $$ = $1; }
+        | entry_inst
+            { $$ = $1; }
 	;
 
 return_inst: TK_RETURN opt_expression
