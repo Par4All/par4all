@@ -227,6 +227,17 @@ int keywidx[26];
 LOCAL int tmp_b_I, tmp_e_I, tmp_b_C, tmp_e_C;
 LOCAL char tmp_lab_I[6];
 
+/* memoization des properties */
+
+#include "properties.h"
+
+static bool parser_warn_for_columns_73_80 = TRUE;
+
+void init_parser_reader_properties()
+{
+  parser_warn_for_columns_73_80 = get_bool_property("PARSER_WARN_FOR_COLUMNS_73_80");
+}
+
 
 /*-------------------------------------------------------------------------*/
 /*
@@ -398,9 +409,17 @@ FILE * fp;
     while (ibuffer >= lbuffer && c != EOF) {
 	int EmptyBuffer = TRUE;
 	int LineTooLong = FALSE;
+	bool first_column = TRUE;
+	bool in_comment = FALSE;
+
 	ibuffer = lbuffer = 0;
 
 	while ((c = getc(fp)) != '\n' && c != EOF) {
+
+	  if(first_column) {
+	    in_comment = (strchr(START_COMMENT_LINE, (char) c)!= NULL);
+	    first_column = FALSE;
+	  }
 
 	    /* Fortran has a limited character set. See standard section 3.1.
 	       This cannot be handled here as you do not know if you are
@@ -426,7 +445,7 @@ FILE * fp;
 	    }
 	    else {
 		col += 1;
-		if(col > 72 && !LineTooLong) {
+		if(col > 72 && !LineTooLong && !in_comment && parser_warn_for_columns_73_80) {
 		    user_warning("GetChar",
 				 "Line %d truncated, col=%d and lbuffer=%d\n",
 				 LineNumber, col, lbuffer);
@@ -434,7 +453,8 @@ FILE * fp;
 		}
 		/* buffer[lbuffer++] = (col > 72) ? ' ' : c; */
 		/* buffer[lbuffer++] = (col > 72) ? '\n' : c; */
-		if(col <= 72) {
+		if(col <= 72 || in_comment) {
+		  /* last columns cannot be copied because we might be inside a character string */
 		  buffer[lbuffer++] = c;
 		}
 		if (c != ' ')
