@@ -14,25 +14,7 @@ OPTEMPTY (([ \\t\\n])*)
 #include <string.h>
 
 #include "genC.h"
-
-
 #include "misc.h"
-
-/*
-#include "ri.h"
-#include "database.h"
-#include "makefile.h"
-#include "pipsdbm.h"
-#include "resources.h"
-#include "phases.h"
-#include "builder_map.h"
-#include "properties.h"
-#include "pipsmake.h"
-#include "ri-util.h"
-#include "top-level.h"
-*/
-
-#include "list.h"
 #include "tpips.h"
 #include "y.tab.h"
 
