@@ -158,12 +158,15 @@ void create_icon()
    
    The problem is that the -emacs option need to be known early but
    the workspace and other typical PIPS options need to be evaluate
-   later... */
+   later... 
+   
+   Should add a help and version option.
+*/
 void static
 wpips_parse_arguments(int argc,
                       char * argv[])
 {
-   int iarg = 1;
+   int iarg = optind;
 
    while (iarg < argc) {
       if (same_string_p(argv[iarg], "-emacs")) {
