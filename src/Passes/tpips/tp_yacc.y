@@ -487,9 +487,9 @@ i_get: GET_PROPERTY propname
 
 i_source: SOURCE filename_list
 	{
-	    int n = gen_array_nitems($2);
-	    for(n--; n>=0; n--) { /* filenames are stored in reverse order. */
-		string name = gen_array_item($2, n);
+	    int n = gen_array_nitems($2), i=0;
+	    for(; i<n; i++) { 
+		string name = gen_array_item($2, i);
 		FILE * sourced = fopen(name, "r");
 		if (!sourced) {
 		    perror("while sourcing");
