@@ -736,7 +736,7 @@ int ofl_ctrl;
 		contrainte_reverse(ineg_test);
 		sc_add_inegalite(sc_test,ineg_test);
 		
-		if (!sc_rational_feasibility_ofl_ctrl(sc_test, ofl_ctrl, TRUE))
+		if (!sc_rational_feasibility_ofl_ctrl(sc_test, OFL_CTRL, TRUE))
 		    *integer_combination_p = TRUE;
 		else 
 		   *integer_combination_p = FALSE; 
