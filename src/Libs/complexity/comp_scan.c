@@ -13,10 +13,10 @@
 #include "complexity_ri.h"
 #include "database.h"
 
+#include "ri-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"
-#include "ri-util.h"
 #include "text-util.h"
 #include "misc.h"
 #include "matrice.h"
