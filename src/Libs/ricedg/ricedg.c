@@ -232,7 +232,8 @@ static boolean TestDiCnst(Psysteme /*ps*/, int /*cl*/, statement /*s1*/,
 
 /* The supplementary call to init_ordering_to_statement should be 
    avoided if ordering.c were more clever. */
-static bool rice_dependence_graph(mod_name)
+static bool 
+rice_dependence_graph(mod_name)
 char *mod_name;
 {
     FILE *fp;
@@ -263,6 +264,8 @@ char *mod_name;
 
     chains = (graph)
 	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
+
+    ResetLoopCounter();
 
     debug_on("RICEDG_DEBUG_LEVEL");
 
