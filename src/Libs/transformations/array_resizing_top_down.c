@@ -1,27 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "genC.h"
-#include "linear.h"
-#include "ri.h"
-#include "ri-util.h"
-#include "database.h"
-#include "pipsdbm.h"
-#include "resources.h"
-#include "misc.h"
-#include "control.h"
-#include "properties.h"
-#include "semantics.h"
-
-#include "transformer.h"
-#include "text-util.h" /* for words_to_string*/
-
-#include "instrumentation.h"
-#include "transformations.h"
-
-/* Top down Array Declaration Normalization  
-
- An example : 
+/****************************************************************** *
+ *
+ *		     TOP DOWN ARRAY RESIZING
+ *
+ *
+*******************************************************************/
+/* Example : 
       PROGRAM MAIN
       PARAMETER (N=10,M=20)
       REAL A(N,M)
@@ -58,14 +41,54 @@
   * correspond lower bounds (column-major order), we have (2) is equivalent with:
   *
   * size_from_position(dummy_array,k+1) = size_from_position(actual_array,k+1) +1 
-  *                     - subscript_value_from_position(array_element,k+1)*/
+  *                     - subscript_value_from_position(array_element,k+1)
+
+  ATTENTION : FORTRAN standard (15.9.3) says that an association of dummy and actual 
+  arguments is valid only if the type of the actual argument is the same as the type 
+  of the corresponding dummy argument. But in practice, not much program respect this 
+  rule , so we have to multiply the array size by its element size in order to find out
+  new value.
+  
+  For example : SPEC95, benchmark 125.turb3d : 
+  SUBROUTINE TURB3D
+  IMPLICIT REAL*8 (A-H,O-Z)
+  COMMMON /ALL/ U(IXPP,IY,IZ)
+
+  CALL TGVEL(U,V,W)
+
+  SUBROUTINE TGVEL(U,V,W)
+  COMPLEX*16 U(NXHP,NY,*)
+ 
+  SUBROUTINE FOO(U,V,W)
+  REAL*8 U(2,NXHP,NY,*)
+
+  If we take into account the different types, as we have NXHP=IXPP/2, IY=NY, NZ=IZ => *=NZ  
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "genC.h"
+#include "linear.h"
+#include "ri.h"
+#include "ri-util.h"
+#include "database.h"
+#include "pipsdbm.h"
+#include "resources.h"
+#include "misc.h"
+#include "control.h"
+#include "properties.h"
+#include "semantics.h"
+#include "transformer.h"
+#include "text-util.h" /* for words_to_string*/
+#include "instrumentation.h"
+#include "transformations.h"
 
 #define PREFIX_DEC  "$DEC"
 #define NEW_DECLARATIONS  ".new_declarations"
 
 /* Define a static stack and related functions to remember the current
    statement and then get the current precondition for top_down_adn_flt(): */
-
 DEFINE_LOCAL_STACK(current_statement, statement)
 
 static list l_current_caller_values = NIL;
@@ -79,14 +102,13 @@ static int number_of_one_and_assumed_array_declarations_but_no_caller = 0;
 bool unbounded_expression_p(expression e)
 {
   syntax s = expression_syntax(e);
-  boolean res = FALSE;
   if (syntax_call_p(s)) 
     {
       string n = entity_local_name(call_function(syntax_call(s)));
       if (same_string_p(n, UNBOUNDED_DIMENSION_NAME))
-	res = TRUE;
+	return TRUE;
     }
-  return(res);  
+  return FALSE;  
 }
  
 expression make_unbounded_expression()
@@ -104,14 +126,13 @@ bool array_entity_p(entity e)
   return FALSE;
 }
 
-
-bool array_argument_p(expression actual_arg)
+bool array_argument_p(expression e)
 {
-  if (expression_reference_p(actual_arg))
+  if (expression_reference_p(e))
     {
-      reference actual_ref = expression_reference(actual_arg);
-      entity actual_ent = reference_variable(actual_ref);
-      if (array_entity_p(actual_ent)) return TRUE;
+      reference ref = expression_reference(e);
+      entity ent = reference_variable(ref);
+      if (array_entity_p(ent)) return TRUE;
     }
   return FALSE;
 }
@@ -163,15 +184,12 @@ bool unnormalized_array_p(entity e)
   return FALSE;
 }
 
-
-void my_print_array_declaration(entity e)
+void print_array_declaration(entity e)
 {
   /* This function prints only the dimensions of an array 
    => to use the script $PIPS_ROOT/Src/Script/misc/normalization.pl*/
-  //  string array_name = entity_local_name(e);
   variable v = type_variable(entity_type(e));   
   list l_dims = variable_dimensions(v);
-  // user_log("\t%s(",array_name);
   user_log("(");
   while (!ENDP(l_dims)) 
     {
@@ -185,37 +203,20 @@ void my_print_array_declaration(entity e)
     }
 }
 
-void my_print_list_entities(list l)
+void print_entities(list l)
 {
-    MAP(ENTITY, e, { 
-	fprintf(stderr, "%s ", entity_name(e));
-    }, l);
-}
-
-static void print_list_expressions(list l)
-{
-    MAP(EXPRESSION, e, { 
-      print_expression(e);
-    }, l);
+  MAP(ENTITY, e, { 
+    fprintf(stderr, "%s ", entity_name(e));
+  }, l);
 }
 
 list words_dimension(dimension obj)
-{
-   
-    list pc;
-    pc = words_expression(dimension_lower(obj));
-    pc = CHAIN_SWORD(pc,":");
-    pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
-    return(pc);
-    /*   list pc=NIL;
-	 expression low = dimension_lower(obj);
-	 if (!expression_equal_integer_p(low,1))
-	 {
-	 pc = words_expression(low);
-	 pc = CHAIN_SWORD(pc,":");
-	 }
-	 pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
-	 return(pc);*/
+{   
+  list pc;
+  pc = words_expression(dimension_lower(obj));
+  pc = CHAIN_SWORD(pc,":");
+  pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
+  return(pc);
 }
 
 static list my_list_intersection(list l1, list l2)
@@ -225,17 +226,17 @@ static list my_list_intersection(list l1, list l2)
   if (l1 != NIL) 
     {
       list l_tmp = NIL;
-      while (!ENDP(l1))
-	{
-	  expression e1 = EXPRESSION(CAR(l1));
-	  if (same_expression_in_list_p(e1,l2))
-	    l_tmp = gen_nconc(l_tmp,CONS(EXPRESSION,e1,NIL));
-	  l1 = CDR(l1);
-	}
+      MAP(EXPRESSION,e1,
+      {
+	if (same_expression_in_list_p(e1,l2))
+	  l_tmp = gen_nconc(l_tmp,CONS(EXPRESSION,e1,NIL));
+      },
+	  l1);
       return l_tmp;
     }
   return l2;
 }
+
 static list my_list_division(list l, expression e)
 {
   list l_tmp = NIL;
@@ -280,36 +281,96 @@ static list my_list_combination(list l1, list l2, entity op)
   return l;
 }
 
-static bool variable_of_the_caller_p(Variable var)
+list entity_to_formal_integer_parameters(entity f )
 {
-  entity e = (entity)(var);
-  string caller_name = entity_local_name(current_caller);
-  if (strcmp(entity_module_name(e), caller_name)==0)
-    return TRUE;
-  return FALSE;
+  /* get unsorted list of formal integer parameters for f by declaration
+     filtering; these parameters may not be used by the callee's
+     semantics analysis, but we have no way to know it because
+     value mappings are not available */
+  
+  list formals = NIL;
+  list decl = list_undefined;
+  
+  pips_assert("entity_to_formal_parameters",entity_module_p(f));
+  
+  decl = code_declarations(entity_code(f));
+  MAPL(ce, {entity e = ENTITY(CAR(ce));
+  if(storage_formal_p(entity_storage(e)) &&
+     entity_integer_scalar_p(e))
+    formals = CONS(ENTITY, e, formals);},
+       decl);
+  
+  return formals;
 }
 
-static bool formal_agument_of_callee_p(Variable var)
+
+/* formal_and_actual_parameters_association(call c, transformer pre):
+ * Add equalities between actual and formal parameters binding by call c
+ * to pre 
+ * pre := pre  U  {f  = expr }
+ *                  i       i
+ * for all i such that formal fi is an integer scalar variable and 
+ * expression expr-i is affine
+ */
+transformer formal_and_actual_parameters_association(call c, transformer pre)
 {
-  entity e = (entity)(var);
-  string callee_name = entity_local_name(current_callee);
-  if (strcmp(entity_module_name(e), callee_name)==0)
-    {
-      storage s = entity_storage(e);
-      if (storage_formal_p(s)) return TRUE;
+  entity f = call_function(c);
+  list pc = call_arguments(c);
+  list formals = entity_to_formal_integer_parameters(f);
+  cons * ce;
+  
+  ifdebug(6) {
+    debug(6,"formal_and_actual_parameters_association",
+	  "begin for call to %s pre=%x\n", module_local_name(f), pre);
+    dump_transformer(pre);
+  }
+  
+  pips_assert("formal_and_actual_parameters_association", 
+	      entity_module_p(f));
+  pips_assert("formal_and_actual_parameters_association", 
+	      pre != transformer_undefined);
+  
+  /* let's start a long, long, long MAPL, so long that MAPL is a pain */
+  for( ce = formals; !ENDP(ce); POP(ce)) {
+    entity e = ENTITY(CAR(ce));
+    int r = formal_offset(storage_formal(entity_storage(e)));
+    expression expr;
+    normalized n;
+    
+    if((expr = find_ith_argument(pc, r)) == expression_undefined)
+      user_error("formal_and_actual_parameters_association",
+		 "not enough args for formal parm. %d\n", r);
+    
+    n = NORMALIZE_EXPRESSION(expr);
+    if(normalized_linear_p(n)) {
+      Pvecteur v = vect_dup((Pvecteur) normalized_linear(n));
+      entity e_new = external_entity_to_new_value(e);
+      
+      vect_add_elem(&v, (Variable) e_new, -1);
+      pre = transformer_equality_add(pre, v);
     }
-  return FALSE;
+  }
+  
+  free_arguments(formals);
+  
+  ifdebug(6) {
+    debug(6,"formal_and_actual_parameters_association",
+	  "new pre=%x\n", pre);
+    dump_transformer(pre);
+    debug(6,"formal_and_actual_parameters_association","end for call to %s\n",
+	  module_local_name(f));
+  }  
+  return pre;
 }
 
 
-static bool equal_expression_in_context_p(expression e1, expression e2, transformer current_context)
+bool expression_equal_in_context_p(expression e1, expression e2, transformer context)
 {
   /* Fast checks : 
      + e1 and e2 are same expressions 
      + e1 and e2 are equivalent because they are same common variables 
      Slow check:
      If NOT(e1=e2) + prec = infeasible, we have e1=e2 is always true*/
-
   normalized n1;
   normalized n2;
   if (same_expression_p(e1,e2)) return TRUE;
@@ -325,15 +386,14 @@ static bool equal_expression_in_context_p(expression e1, expression e2, transfor
   clean_all_normalized(e2);
   n1 = NORMALIZE_EXPRESSION(e1);
   n2 = NORMALIZE_EXPRESSION(e2);
-  
   ifdebug(3) 
     {	  
-      fprintf(stderr, "\n first expression : ");    
+      fprintf(stderr, "\n First expression : ");    
       print_expression(e1);	
-      fprintf(stderr, "\n second expression : ");    
+      fprintf(stderr, "\n Second expression : ");    
       print_expression(e2);
-      fprintf(stderr, " \n equal in the context: Precondition + Association : ");
-      fprint_transformer(stderr,current_context, entity_local_name);
+      fprintf(stderr, " \n equal in the context ?");
+      fprint_transformer(stderr,context, entity_local_name);
     }
   if (normalized_linear_p(n1) && normalized_linear_p(n2))
     {
@@ -355,7 +415,7 @@ static bool equal_expression_in_context_p(expression e1, expression e2, transfor
 	  Pvecteur v_not_e = vect_add(v_init,v_one);
 	  Pvecteur v_temp = vect_multiply(v_init,-1);
 	  Pvecteur v_not_e_2 = vect_add(v_temp,v_one);
-	  Psysteme ps = predicate_system(transformer_relation(current_context));
+	  Psysteme ps = predicate_system(transformer_relation(context));
 	  if (!efficient_sc_check_inequality_feasibility(v_not_e,ps) && 
 	      !efficient_sc_check_inequality_feasibility(v_not_e_2,ps))
 	    {
@@ -368,21 +428,23 @@ static bool equal_expression_in_context_p(expression e1, expression e2, transfor
   return FALSE;
 }
   
-bool same_dimension_p 
-(entity actual_array, entity dummy_array, list l_actual_ref, int i, transformer current_context)
+bool same_dimension_p(entity actual_array, entity dummy_array, 
+		      list l_actual_ref, int i, transformer context)
 {
   /* This function returns TRUE if the actual array and the dummy array
-   * have the same dimension number i, with respect to the current context (precondition+association)
-   * In case if the actual argument is an array element, we have to add the following condition:
-   * the i-th subscript of the array element is equal to its correspond lower bound.*/
- 
+   * have the same dimension number i, with respect to the current context 
+   * (precondition + association)
+   * In case if the actual argument is an array element, we have to add 
+   * the following condition: the i-th subscript of the array element 
+   * is equal to its correspond lower bound.*/
+
   variable actual_var = type_variable(entity_type(actual_array));
   variable dummy_var = type_variable(entity_type(dummy_array));
   list l_actual_dims = variable_dimensions(actual_var);
   list l_dummy_dims = variable_dimensions(dummy_var);
   
-  /*The following test is necessary in case of array reshaping*/
-  if ((i <= gen_length(l_actual_dims)) && (i <= gen_length(l_dummy_dims)))
+  /* The following test is necessary in case of array reshaping */
+  if ((i <= gen_length(l_actual_dims)) && (i < gen_length(l_dummy_dims)))
     {
       dimension dummy_dim = find_ith_dimension(l_dummy_dims,i);
       expression dummy_lower = dimension_lower(dummy_dim);
@@ -404,7 +466,7 @@ bool same_dimension_p
 	  actual_size = binary_intrinsic_expression(MINUS_OPERATOR_NAME,
 						    actual_upper,actual_lower);
 	}
-      if (equal_expression_in_context_p(actual_size, dummy_size, current_context))
+      if (expression_equal_in_context_p(actual_size, dummy_size, context))
 	{
 	  if (l_actual_ref == NIL)
 	    /* case : array name */
@@ -422,40 +484,8 @@ bool same_dimension_p
   return FALSE;
 }
 
-static expression size_of_unnormalized_dummy_array(entity dummy_array,int i)
-{
-  variable dummy_var = type_variable(entity_type(dummy_array));
-  list l_dummy_dims = variable_dimensions(dummy_var);
-  int num_dim = gen_length(l_dummy_dims),j;
-  expression e = expression_undefined;
-  for (j=i+1; j<= num_dim-1; j++)
-    {
-      dimension dim_j = find_ith_dimension(l_dummy_dims,j);
-      expression lower_j = dimension_lower(dim_j);
-      expression upper_j = dimension_upper(dim_j);
-      expression size_j;
-      if (expression_constant_p(lower_j) && (expression_to_int(lower_j)==1))
-	size_j = copy_expression(upper_j);
-      else 
-	{
-	  size_j = binary_intrinsic_expression(MINUS_OPERATOR_NAME,upper_j,lower_j);
-	  size_j =  binary_intrinsic_expression(PLUS_OPERATOR_NAME,
-						copy_expression(size_j),int_to_expression(1));
-	}
-      if (expression_undefined_p(e))
-	e = copy_expression(size_j);
-      else
-	e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,e,size_j);  
-    }
-  ifdebug(2)
-    {
-      fprintf(stderr, "\n size of unnormalized dummy array: \n");
-      print_expression(e);
-    }
-  return e;
-}
 
-static list translate_to_callee_frame(expression e, transformer current_context)
+static list translate_to_callee_frame(expression e, transformer context)
 {
   /* Check if the expression e can be translated to  the frame of the callee or not.      
      Return list of all possible translated expressions.
@@ -484,11 +514,6 @@ static list translate_to_callee_frame(expression e, transformer current_context)
   list l= NIL;
   syntax syn = expression_syntax(e);
   tag t = syntax_tag(syn);
-  ifdebug(2)
-    {
-      fprintf(stderr, "\n Expression to be translated: \n");
-      print_expression(e);
-    } 
   switch(t){  
   case is_syntax_reference: 
     {
@@ -496,7 +521,6 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 	 Precondition : M =10
 	 Association : M = FOO::N -1
 	 Common variable : CALLER::M = CALLEE::M or M'*/
-      
       reference ref = syntax_reference(syn);
       entity en = reference_variable(ref);
       normalized ne;
@@ -508,42 +532,37 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 
 	   * Another way : looking for a variable in the declaration of the callee
 	   * that has the same offset in the same common block */
-	  
 	  list l_callee_decl = code_declarations(entity_code(current_callee));
-	  /* search for equivalent variable in the list */
-	  
-	  while(!ENDP(l_callee_decl))
-	    {
-	      entity enti = ENTITY(CAR(l_callee_decl));
-	      if (same_scalar_location_p(en, enti))
-		{
-		  expression expr;
-		  /* ATTENTION : enti may be an array, such as A(2):
-		     COMMON C1,C2,C3,C4,C5
-		     COMMON C1,A(2,2)
-		     we must return A(1,1), not A */
-		  if (array_entity_p(enti))
-		    {
-		      variable varenti = type_variable(entity_type(enti));   		      
-		      int len =  gen_length(variable_dimensions(varenti));
-		      list l_inds = make_list_of_constant(1,len);
-		      reference refer = make_reference(enti,l_inds);
-		      expr = reference_to_expression(refer);
-		    }
-		  else 
-		    expr = entity_to_expression(enti);
-		  ifdebug(2)
-		    {
-		      fprintf(stderr, "\n Common variable, add to list: \n");
-		      print_expression(expr);
-		    } 
-		  l = gen_nconc(l,CONS(EXPRESSION,copy_expression(expr),NIL));
-		  break;
-		}
-	      l_callee_decl = CDR(l_callee_decl);
-	    }
-	}
-      
+	  /* search for equivalent variable in the list */	  
+	  MAP(ENTITY, enti,
+	  {
+	    if (same_scalar_location_p(en, enti))
+	      {
+		expression expr;
+		/* ATTENTION : enti may be an array, such as A(2):
+		   COMMON C1,C2,C3,C4,C5
+		   COMMON C1,A(2,2)
+		   we must return A(1,1), not A */
+		if (array_entity_p(enti))
+		  {
+		    variable varenti = type_variable(entity_type(enti));   		      
+		    int len =  gen_length(variable_dimensions(varenti));
+		    list l_inds = make_list_of_constant(1,len);
+		    reference refer = make_reference(enti,l_inds);
+		    expr = reference_to_expression(refer);
+		  }
+		else 
+		  expr = entity_to_expression(enti);
+		ifdebug(2)
+		  {
+		    fprintf(stderr, "\n Common variable, add to list: \n");
+		    print_expression(expr);
+		  } 
+		l = gen_nconc(l,CONS(EXPRESSION,copy_expression(expr),NIL));
+		break;
+	      }
+	  },  l_callee_decl);
+	}      
       /* Use the precondition + association of the call site:
 	 Take only the equalities.
 	 Project all variables belonging the the caller, except the current variable (from e)
@@ -566,7 +585,7 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 	{
 	  Pvecteur ve = normalized_linear(ne);
 	  Variable vare = var_of(ve); 
-	  Psysteme ps_tmp = predicate_system(transformer_relation(current_context));
+	  Psysteme ps_tmp = predicate_system(transformer_relation(context));
 	  Pbase b_tmp = ps_tmp->base;
 	  /* Attention :   here the transformer current_con text is consistent 
 	     but not the system ps_tmp. I do not understand why ?
@@ -580,12 +599,13 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 	      ifdebug(3)
 		{
 		  fprintf(stderr, "\n Reference : using precondition + association \n");
-		  fprint_transformer(stderr,current_context,entity_local_name);
+		  fprint_transformer(stderr,context,entity_local_name);
 		}
 	      for(; !VECTEUR_NUL_P(b); b = b->succ) 
 		{
 		  Variable var = vecteur_var(b);
-		  if ((variable_of_the_caller_p(var)) && (var!=vare))
+		  if ((strcmp(module_local_name(current_caller),entity_module_name((entity)var))==0)
+		      && (var!=vare))
 		    vect_add_elem(&pv_var, var, VALUE_ONE); 
 		}
 	      ps->inegalites = contraintes_free(ps->inegalites);
@@ -600,7 +620,7 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 		    {
 		      fprintf(stderr, "\n Check if e can be translated by using precondition + association: \n");
 		      print_expression(e);
-		      fprint_transformer(stderr,current_context, entity_local_name);
+		      fprint_transformer(stderr,context, entity_local_name);
 		    } 
 		  for (egal = ps->egalites; egal != NULL; egal = egal1) 
 		    {
@@ -623,7 +643,7 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 			      for (v = newv; (v !=NULL) && (check); v = v->succ)
 				{ 
 				  Variable var = v->var;
-				  if ((var != TCST) && (! formal_agument_of_callee_p(var)) )
+				  if ((var != TCST) && (!variable_is_a_module_formal_parameter_p((entity)var,current_callee)) )
 				    check = FALSE;
 				}
 			      if (check)
@@ -646,10 +666,8 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 	      ifdebug(3)
 		{
 		  fprintf(stderr, "\n Reference : using precondition + association \n");
-		  fprint_transformer(stderr,current_context, entity_local_name);
+		  fprint_transformer(stderr,context, entity_local_name);
 		}
-	      //    fprintf(stderr, "consistent psystem ps_tmp after");
-	      // pips_assert("consistent psystem ps_tmp", sc_consistent_p(ps_tmp));
 	    }
 	}
       break;
@@ -695,14 +713,14 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 		     
 		     Attention : bug in PerfectClub/mdg :
 		     looking for formal parameter equal to 1 in system: {==-1} */
-		  Psysteme ps_tmp = predicate_system(transformer_relation(current_context));
+		  Psysteme ps_tmp = predicate_system(transformer_relation(context));
 		  Psysteme ps = sc_dup(ps_tmp);
 		  Pbase b = ps->base;
 		  Pvecteur pv_var = VECTEUR_NUL; 
 		  for(; !VECTEUR_NUL_P(b); b = b->succ) 
 		    {
 		      Variable var = vecteur_var(b);
-		      if (!formal_agument_of_callee_p(var))
+		      if (!variable_is_a_module_formal_parameter_p((entity)var,current_callee))
 			vect_add_elem(&pv_var, var, VALUE_ONE); 
 		    }
 		  ps->inegalites = contraintes_free(ps->inegalites);
@@ -717,7 +735,7 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 		      ifdebug(3)
 			{
 			  fprintf(stderr, "\n Call : using Precondition + Association to find formal parameter equal to %d \n", i);
-			  fprint_transformer(stderr,current_context, entity_local_name);
+			  fprint_transformer(stderr,context, entity_local_name);
 			}
 		      for (egal = ps->egalites; egal != NULL; egal = egal1) 
 			{
@@ -761,7 +779,7 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 	  if (gen_length(l_args)==1)
 	    {
 	      expression e1 = EXPRESSION(CAR(l_args));
-	      list l1 = translate_to_callee_frame(e1, current_context);
+	      list l1 = translate_to_callee_frame(e1, context);
 	      l1 = my_list_change(l1,fun);
 	      l = gen_nconc(l,l1);
 	    }
@@ -769,8 +787,8 @@ static list translate_to_callee_frame(expression e, transformer current_context)
 	    {
 	      expression e1 = EXPRESSION(CAR(l_args));
 	      expression e2 = EXPRESSION(CAR(CDR(l_args)));
-	      list l1 = translate_to_callee_frame(e1, current_context);
-	      list l2 = translate_to_callee_frame(e2, current_context);
+	      list l1 = translate_to_callee_frame(e1, context);
+	      list l2 = translate_to_callee_frame(e2, context);
 	      list l3 = my_list_combination(l1,l2,fun);
 	      l = gen_nconc(l,l3);
 	    } 
@@ -784,13 +802,70 @@ static list translate_to_callee_frame(expression e, transformer current_context)
   return l;
 }
 
+/*****************************************************************************
 
+ This function returns the size of an unnormalized array, from position i+1, 
+ multiplied by array element size: (D(i+1)*...*D(n-1))* element_size    
+ 
+*****************************************************************************/
+
+static expression size_of_unnormalized_dummy_array(entity dummy_array,int i)
+{
+  variable dummy_var = type_variable(entity_type(dummy_array));
+  list l_dummy_dims = variable_dimensions(dummy_var);
+  int num_dim = gen_length(l_dummy_dims),j;
+  expression e = expression_undefined;
+  basic b = variable_basic(type_variable(entity_type(dummy_array)));
+  expression e_size = int_to_expression(SizeOfElements(b));
+  for (j=i+1; j<= num_dim-1; j++)
+    {
+      dimension dim_j = find_ith_dimension(l_dummy_dims,j);
+      expression lower_j = dimension_lower(dim_j);
+      expression upper_j = dimension_upper(dim_j);
+      expression size_j;
+      if (expression_constant_p(lower_j) && (expression_to_int(lower_j)==1))
+	size_j = copy_expression(upper_j);
+      else 
+	{
+	  size_j = binary_intrinsic_expression(MINUS_OPERATOR_NAME,upper_j,lower_j);
+	  size_j =  binary_intrinsic_expression(PLUS_OPERATOR_NAME,
+						copy_expression(size_j),int_to_expression(1));
+	}
+      if (expression_undefined_p(e))
+	e = copy_expression(size_j);
+      else
+	e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(e),size_j);  
+    }
+  if (!expression_undefined_p(e))
+    e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(e),e_size);
+  else 
+    /* A(..,Di,*), as the size of actual array is multiplied by its element size,
+       we have to mutilply the dummy array size by its element size also*/
+    e = copy_expression(e_size);
+  ifdebug(2)
+    {
+      fprintf(stderr, "\n Size of unnormalized dummy array: \n");
+      print_expression(e);
+    }
+  return e;
+}
+
+/*****************************************************************************
+
+ This function returns the size of an array, from position i+1, minus the 
+ subscript value of array reference from position i+1, multiplied by array 
+ element size : 
+ (D(i+1)*...*Dn - (1+ s(i+1)-l(i+1) + (s(i+2)-l(i+2))*d(i+1)+...-1))* element_size   
+ 
+*****************************************************************************/
 expression size_of_actual_array(entity actual_array,list l_actual_ref,int i)
 {
   expression e = expression_undefined;
   variable actual_var = type_variable(entity_type(actual_array));   
   list l_actual_dims = variable_dimensions(actual_var);
   int num_dim = gen_length(l_actual_dims),j;
+  basic b = variable_basic(type_variable(entity_type(actual_array)));
+  expression e_size = int_to_expression(SizeOfElements(b));
   for (j=i+1; j<= num_dim; j++)
     {
       dimension dim_j = find_ith_dimension(l_actual_dims,j);
@@ -806,30 +881,21 @@ expression size_of_actual_array(entity actual_array,list l_actual_ref,int i)
 						copy_expression(size_j),int_to_expression(1));
 	}
       if (expression_undefined_p(e))
-	{
-	  e = copy_expression(size_j);
-	  ifdebug(2)
-	    {
-	      fprintf(stderr, "\n size of actual array (dim): \n");
-	      print_expression(e);
-	    }
-	}
+	e = copy_expression(size_j);
       else
-	{
-	  e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(e),size_j);  
-	  ifdebug(2)
-	    {
-	      fprintf(stderr, "\n size of actual array (dim*dim): \n");
-	      print_expression(e);
-	    }  
-	}
+	e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(e),size_j);  
     }
+  ifdebug(3)
+    {
+      fprintf(stderr, "\n Size of actual array without subscript value \n");
+      print_expression(e);
+    }  
   if (l_actual_ref!=NIL)
     {
       /* the actual argument is an array element name, 
-       * we have to calculate the subscript value also*/
+       * we have to compute the subscript value also*/
       expression sum = expression_undefined, prod = expression_undefined;
-      ifdebug(2)
+      ifdebug(3)
 	fprintf(stderr, "\n actual argument is an array element name:");
       for (j=i+1; j<= num_dim; j++)
 	{
@@ -867,7 +933,7 @@ expression size_of_actual_array(entity actual_array,list l_actual_ref,int i)
 	  else
 	    prod = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,
 					       prod,size_j);
-	  ifdebug(2)
+	  ifdebug(4)
 	    {
 	      fprintf(stderr, "\n j = %d \n",j);
 	      fprintf(stderr, "\n prod : \n");
@@ -882,10 +948,19 @@ expression size_of_actual_array(entity actual_array,list l_actual_ref,int i)
 					   copy_expression(e),sum);
 	  ifdebug(2)
 	    {
-	      fprintf(stderr, "\n Return size of actual array - subscript value : \n");
+	      fprintf(stderr, "\n Size of actual array - subscript value : \n");
 	      print_expression(e);
 	    }
 	}
+    }
+  if (!expression_undefined_p(e))
+    e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(e),e_size);
+  else 
+    e = copy_expression(e_size);
+  ifdebug(2)
+    {
+      fprintf(stderr, "\n Size of actual array:\n");
+      print_expression(e);
     }
   return e;
 }
@@ -911,7 +986,7 @@ static bool top_down_adn_call_flt(call c)
 	      list l_new_caller_values = NIL;
 	      int same_dim = 0;
 	      list l_actual_ref = reference_indices(actual_ref);
-	      transformer current_context;
+	      transformer context;
 	      if (statement_weakly_feasible_p(stmt))
 		{
 		  transformer prec = load_statement_precondition(stmt); 
@@ -920,8 +995,8 @@ static bool top_down_adn_call_flt(call c)
 		      fprintf(stderr, " \n Does the precondition is modified ? Before \n");
 		      fprint_transformer(stderr,prec, entity_local_name);
 		    }
-		  // current_context = add_formal_to_actual_bindings(c,prec);
-		  current_context = add_formal_to_actual_bindings(c,transformer_dup(prec));
+		  // context = formal_and_actual_parameters_association(c,prec);
+		  context = formal_and_actual_parameters_association(c,transformer_dup(prec));
 
 		  ifdebug(3) 
 		    {	  
@@ -930,9 +1005,8 @@ static bool top_down_adn_call_flt(call c)
 		    }
 		}
 	      else 
-		current_context = add_formal_to_actual_bindings(c,transformer_identity());
-	     
-	      while (same_dimension_p(actual_array,current_dummy_array,l_actual_ref,same_dim+1,current_context))
+		context = formal_and_actual_parameters_association(c,transformer_identity());	     
+	      while (same_dimension_p(actual_array,current_dummy_array,l_actual_ref,same_dim+1,context))
 		same_dim ++;
 	      ifdebug(2)
 		fprintf(stderr, "\n Number of same dimensions : %d \n",same_dim);
@@ -942,26 +1016,24 @@ static bool top_down_adn_call_flt(call c)
 		  fprintf(stderr, "\n Size of actual array before translation : \n");
 		  print_expression(actual_array_size);
 		}  
-	      if (!expression_undefined_p(actual_array_size))
-		l_new_caller_values = translate_to_callee_frame(actual_array_size,current_context);
+	      l_new_caller_values = translate_to_callee_frame(actual_array_size,context);
 	      ifdebug(2)
 		{
 		  fprintf(stderr, "\n List of values after translation : \n");
-		  print_list_expressions(l_new_caller_values);
+		  print_expressions(l_new_caller_values);
 		}  
 	      if (l_new_caller_values != NIL)
 		{
 		  /* we have a list of translated actual array size expressions 
 		     (in the frame of callee)*/
 		  expression dummy_array_size = size_of_unnormalized_dummy_array(current_dummy_array,same_dim);
-		  if (!expression_undefined_p(dummy_array_size))
-		    l_new_caller_values = my_list_division(l_new_caller_values,dummy_array_size);  
+		  l_new_caller_values = my_list_division(l_new_caller_values,dummy_array_size);  
 		  l_current_caller_values = my_list_intersection(l_current_caller_values,
 								 l_new_caller_values); 
 		  ifdebug(2)
 		    {
 		      fprintf(stderr, "\n List after intersection (new caller + current caller) : \n");
-		      print_list_expressions(l_new_caller_values);
+		      print_expressions(l_new_caller_values);
 		    }  
 		  if (l_current_caller_values == NIL)
 		    /* There is no same values for different call sites => STOP  
@@ -973,14 +1045,10 @@ static bool top_down_adn_call_flt(call c)
 		}
 	    }
 	  else
-	    {
-	      pips_user_warning(" The array declaration of the caller is *\n"); 
-	    }
+	    pips_user_warning(" The array declaration of the caller is *\n"); 
 	}
       else 
-	{
-	  pips_user_warning("The actual and formal argument lists do not have the same number of arguments OR arguments are not corresponding !!! \n"); 
-	}
+	pips_user_warning("The actual and formal argument lists do not have the same number of arguments OR arguments are not corresponding !!! \n"); 
       l_current_caller_values = NIL;
       return FALSE;
     }
@@ -991,31 +1059,24 @@ static bool top_down_adn_call_flt(call c)
 static list top_down_adn_caller_array()
 {
   string caller_name = module_local_name(current_caller);
-  statement caller_statement = (statement) db_get_memory_resource
-    (DBR_CODE,caller_name , TRUE);
-  
+  statement caller_statement = (statement) db_get_memory_resource(DBR_CODE,caller_name,TRUE);  
   l_current_caller_values = NIL;
-
   make_current_statement_stack();
   set_precondition_map((statement_mapping)
-		       db_get_memory_resource(DBR_PRECONDITIONS,caller_name,TRUE));
-  
+		       db_get_memory_resource(DBR_PRECONDITIONS,caller_name,TRUE));  
   gen_multi_recurse(caller_statement,
 		    statement_domain, current_statement_filter,current_statement_rewrite,
 		    call_domain, top_down_adn_call_flt, gen_null,
-		    NULL);
-  
+		    NULL);  
   reset_precondition_map();
-  free_current_statement_stack();
- 
+  free_current_statement_stack(); 
   ifdebug(2)
     {
       fprintf(stderr, "\n Current list of values of the caller is :\n ");
-      print_list_expressions(l_current_caller_values);
+      print_expressions(l_current_caller_values);
     }
   return l_current_caller_values;
 }
-
 
 static void top_down_adn_callers_arrays(list l_arrays,list callers)
 {
@@ -1024,8 +1085,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list callers)
      parameters if it is possible. So :
 
      For all call sites in all callers, we have a list of possible values. If this list is NIL, 
-     the value can not be translated into the callee's frame => STOP
-     */
+     the value can not be translated into the callee's frame => STOP */
 
   string callee_name = entity_local_name(current_callee);
   while (!ENDP(l_arrays))
@@ -1053,9 +1113,9 @@ static void top_down_adn_callers_arrays(list l_arrays,list callers)
 	  ifdebug(2)
 	    {
 	      fprintf(stderr, "\n List of new values :\n ");
-	      print_list_expressions(l_new_values);
+	      print_expressions(l_new_values);
 	      fprintf(stderr, "\n List of old values (before intersection):\n ");
-	      print_list_expressions(l_old_values);
+	      print_expressions(l_old_values);
 	    }
 	  if (l_new_values == NIL)
 	    flag = FALSE;
@@ -1065,7 +1125,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list callers)
 	      ifdebug(2)
 		{
 		  fprintf(stderr, "\n List of old values (after intersection):\n ");
-		  print_list_expressions(l_old_values);
+		  print_expressions(l_old_values);
 		}
 	      if (l_old_values == NIL)
 		flag = FALSE;
@@ -1075,8 +1135,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list callers)
 	}
       user_log("%s\t%s\t%s\t%s\t%d\t", PREFIX_DEC, 
 	       db_get_memory_resource(DBR_USER_FILE,callee_name,TRUE), 
-	       callee_name,entity_local_name(e),length);
-     
+	       callee_name,entity_local_name(e),length);     
       if (flag && (l_old_values!=NIL))
 	{
 	  /* We have l_old_values is the list of same values for different callers 
@@ -1113,7 +1172,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list callers)
 	  // print new bound
 	  user_log("%s\t",words_to_string(words_expression(exp)));
 	  // print old declaration
-	  my_print_array_declaration(e);
+	  print_array_declaration(e);
 	  dimension_upper(last_dim) = exp;
 	  if (!unbounded_expression_p(exp))
 	    number_of_right_array_declarations++;
@@ -1126,13 +1185,11 @@ static void top_down_adn_callers_arrays(list l_arrays,list callers)
 	  // print new bound
 	  user_log("%s\t",words_to_string(words_expression(make_unbounded_expression())));
 	  // print old declaration
-	  my_print_array_declaration(e);
+	  print_array_declaration(e);
 	  dimension_upper(last_dim) = make_unbounded_expression(); 
-	}
-      
+	}      
       user_log("\n");
       user_log("---------------------------------------------------------------------------------------\n");
-      
       current_dummy_array = entity_undefined;
       l_arrays = CDR(l_arrays);
     }
@@ -1148,13 +1205,9 @@ top_down_array_declaration_normalization         > MODULE.new_declarations
         < CALLERS.new_declarations
 
 Algorithm : For each module: 
-
 - Take the declaration list. 
-
-- Take list of unnormalized array declarations, if this list is not nil 
-     
+- Take list of unnormalized array declarations, if this list is not nil      
   - Take the list of unnormalized array that are formal variable 
-    
        - save the offset of each array in the formal argument list
        - get the list of callers of the module 
        - for each caller, get the list of call sites 
@@ -1172,15 +1225,11 @@ Algorithm : For each module:
        - if the normalized bounds for one array are different for different call sites and different caller 
          =>  it will become *
        - if they are all the same => take the new value
-
        - Modify the upper bound of the last dimension of the unnormalized declared array entity 
          by the new value or the *.
-
        - Put MODULE.new_declarations = "Okay, normalization has been done with right value"
            or "Okay, normalization has been done with * value" (for the case of *)
-
    - Take other unnormalized array => what to do with ? 
-
 - If the list is nil => put MODULE.new_declarations, "Okay, there is nothing to normalize"*/
 
 bool array_resizing_top_down(char *module_name)
@@ -1188,15 +1237,12 @@ bool array_resizing_top_down(char *module_name)
   FILE * out;
   string new_declarations = db_build_file_resource_name(DBR_NEW_DECLARATIONS, 
 							module_name, NEW_DECLARATIONS);
-
   string dir = db_get_current_workspace_directory();
   string filename = strdup(concatenate(dir, "/", new_declarations, NULL));
   current_callee = local_name_to_top_level_entity(module_name);
-
-  debug_on("TOP_DOWN_ARRAY_DECLARATION_NORMALIZATION_DEBUG_LEVEL");
+  debug_on("ARRAY_RESIZING_TOP_DOWN_DEBUG_LEVEL");
   ifdebug(1)
-    fprintf(stderr, " \n Begin top down adn for %s \n", module_name); 
-   
+    fprintf(stderr, " \n Begin top down array resizing for %s \n", module_name); 
   if (!entity_main_module_p(current_callee))
     {
       list l_callee_decl = NIL, l_formal_unnorm_arrays = NIL, l_other_unnorm_arrays = NIL;
@@ -1204,42 +1250,33 @@ bool array_resizing_top_down(char *module_name)
       l_callee_decl = code_declarations(entity_code(current_callee));
    
       /* search for unnormalized array declarations in the list */
-      
-      while(!ENDP(l_callee_decl))
-	{
-	  entity e = ENTITY(CAR(l_callee_decl));
-	  if (unnormalized_array_p(e))
-	    {
-	      storage s = entity_storage(e);
-	      if (storage_formal_p(s))
-		l_formal_unnorm_arrays = gen_nconc(l_formal_unnorm_arrays,CONS(ENTITY,e,NIL));
-	      else
-		/* it can not be return or rom storage 
-		 * it can be ram storage ( local variables,  COMMON A(1) => i.e PerfectClub/SPICE)*/
-		l_other_unnorm_arrays = gen_nconc(l_other_unnorm_arrays,CONS(ENTITY,e,NIL));
-	    }
-	  l_callee_decl = CDR(l_callee_decl);
-	}
-      
+      MAP(ENTITY, e,
+      {
+	if (unnormalized_array_p(e))
+	  {
+	    if (formal_parameter_p(e))
+	      l_formal_unnorm_arrays = gen_nconc(l_formal_unnorm_arrays,CONS(ENTITY,e,NIL));
+	    else
+	      /* it can not be return or rom storage 
+	       * it can be ram storage ( local variables,  COMMON A(1) => i.e PerfectClub/SPICE)*/
+	      l_other_unnorm_arrays = gen_nconc(l_other_unnorm_arrays,CONS(ENTITY,e,NIL));
+	  }
+      }, l_callee_decl);     
       ifdebug(2)
 	{
 	  fprintf(stderr," \n The formal unnormalized arrays list :");
-	  my_print_list_entities(l_formal_unnorm_arrays);
+	  print_entities(l_formal_unnorm_arrays);
 	  fprintf(stderr," \n The other unnormalized arrays list :");
-	  my_print_list_entities(l_other_unnorm_arrays);
+	  print_entities(l_other_unnorm_arrays);
 	}
       if (l_formal_unnorm_arrays != NIL)
 	{
 	  /* Look for all call sites in the callers */
-	  callees callers = (callees) db_get_memory_resource(DBR_CALLERS,
-							     module_name,
-							     TRUE);
+	  callees callers = (callees) db_get_memory_resource(DBR_CALLERS,module_name,TRUE);
 	  list l_callers = callees_callees(callers); 
-	
 	  user_log("\n-------------------------------------------------------------------------------------\n");
 	  user_log("Prefix \tFile \tModule \tArray \tNdim \tNew declaration\tOld declaration\n");
 	  user_log("---------------------------------------------------------------------------------------\n");
-	
 	  ifdebug(2)
 	    {
 	      fprintf(stderr," \n There is/are %d callers : ",
@@ -1248,24 +1285,20 @@ bool array_resizing_top_down(char *module_name)
 		(void) fprintf(stderr, "%s, ", caller_name);
 	      }, l_callers);
 	      (void) fprintf(stderr, "\n");	
-	    }
-	  
+	    }	  
 	  top_down_adn_callers_arrays(l_formal_unnorm_arrays,l_callers);  
 	}
       reset_current_module_entity();
     }
-
    /* save to file */
   out = safe_fopen(filename, "w");
-  fprintf(out, "/* Normalize array declaration for module %s. */\n", module_name);
+  fprintf(out, "/* Top down array resizing for module %s. */\n", module_name);
   safe_fclose(out, filename);
-
   free(dir);
   free(filename);
   current_callee = entity_undefined;
   user_log("\n The total number of right array declarations replaced: %d \n"
 	  ,number_of_right_array_declarations );
-
   user_log(" \n The total number of unnormalized declarations without calller: %d \n"
 	  ,number_of_one_and_assumed_array_declarations_but_no_caller );
   DB_PUT_FILE_RESOURCE(DBR_NEW_DECLARATIONS, module_name, new_declarations);
