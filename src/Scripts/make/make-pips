@@ -1,12 +1,13 @@
 #! /bin/sh
 #
 # $RCSfile: make-pips,v $ version $Revision$
-# $Date: 1996/07/11 11:59:41 $, 
+# $Date: 1996/07/11 12:51:30 $, 
 #
-# (c) Fabien COELHO 07/96
+# (c) Fabien COELHO July 1996
 #
 # changed a lot. it happens that -r does what you expect from it...
 # for building pips on installation, do make-pips -b
+# type '$RCSfile: make-pips,v $ -h' for help.
 
 umask 2
 script=`basename $0`
@@ -33,8 +34,8 @@ usage()
 	  -R: Release
 	  -D: Development
 	 misc
-	  -b: build pips (Production, Pips+Linear+Newgen, recompile)
-	  -r: full recompile (Production, Pips+Linear+Newgen, clean+recompile)
+	  -b: build (Production, Pips+Linear+Newgen, recompile)
+	  -r: recompile (Production, Pips, clean+recompile)
 	  -d dir: specifies a directory
 	  -o file: log file to report to (default is /dev/tty)
 	 targets: make targets to require (e.g. clean all recompile diff...)
@@ -53,7 +54,7 @@ do
 	h) usage 0 "here is some help!" ;;
 	v) verb=verbose ;;
 	N) job="echo $PIPS_MAKE" ;;
-	R) sides="$sides RELEASE" ;;
+	R) sides="$sides RELEASEDIR" ;;
 	P) sides="$sides SRCDIR" ;;
 	D) sides="$sides DEVEDIR" ;;
 	p) parts="$parts PIPS" ; pips='1' ;;
@@ -64,7 +65,7 @@ do
 	   sides="SRCDIR" ;
 	   pips='1' ; linear='1' ; newgen='1' ;;
 	r) commands="$commands clean recompile" ;
-	   parts="NEWGEN LINEAR PIPS" ;
+	   parts="PIPS" ;
 	   sides="SRCDIR" ;
 	   pips='1' ; linear='1' ; newgen='1' ;;
 	o) commands="FWD_REPORT=$OPTARG $commands" ;;
@@ -104,8 +105,8 @@ done
 #
 # do the job here
 
-$verb "commands=$commands"
 $verb "dirs=$dirs"
+$verb "commands=$commands"
 
 for d in $dirs
 do
@@ -113,7 +114,7 @@ do
     $job -C $d $libs $commands
 done
 
-#verb "done"
+$verb "done"
 
 # end of $RCSfile: make-pips,v $
 #
