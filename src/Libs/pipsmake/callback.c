@@ -4,29 +4,29 @@
 typedef bool (*pipsmake_callback_handler_type)();
 
 static pipsmake_callback_handler_type callback = (pipsmake_callback_handler_type) NULL ;
-static bool set = FALSE;
+static bool callback_set_p = FALSE;
 
 void set_pipsmake_callback(pipsmake_callback_handler_type p)
 {
-    message_assert("callback is already set", set == FALSE);
+    message_assert("callback is already set", callback_set_p == FALSE);
     
-    set = TRUE;
+    callback_set_p = TRUE;
     callback = p;
 }
 
 void reset_pipsmake_callback()
 {
-    message_assert("callback not set", set == TRUE);
+    message_assert("callback not set", callback_set_p == TRUE);
     
-    set = FALSE;
-    callback = (pipsmake_callback_handler_type) NULL 
+    callback_set_p = FALSE;
+    callback = (pipsmake_callback_handler_type) NULL;
 }
 
 bool run_pipsmake_callback()
 {
     bool result = TRUE;
 
-    if (set)
+    if (callback_set_p)
 	result = (*callback)();
 
     return result;
