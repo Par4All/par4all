@@ -64,14 +64,11 @@ load_list_icfg(statement_effects m, statement s) {
 list /* of effect */ effects_filter(list l_effs, entity e_flt)
 {
   list l_flt = NIL;
-  MAP(EFFECT, eff, 
-  {
+  MAPL(l, {
+    effect eff = EFFECT(CAR(l));
     action ac = effect_action(eff);
-    reference ref;
-    entity ent;
-    ref = effect_reference(eff);
-    ent = reference_variable(ref);
-
+    reference ref = effect_reference(eff);
+    entity ent = reference_variable(ref);
     fprintf(stderr, entity_local_name(ent));
     if (entity_conflict_p(e_flt, ent) && !action_read_p(ac))
       l_flt = CONS(EFFECT, eff, l_flt);
@@ -83,7 +80,7 @@ static text
 resource_text_flt(entity module, int margin, statement stat, p_icfgpe_print_stuff ips)
 {
   list l_eff = load_list_icfg(ips->resource, stat);
-  entity e_flt = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, "KMAX");
+  entity e_flt = global_name_to_entity(TOP_LEVEL_MODULE_NAME, "KMAX");
   list l_eff_flt = effects_filter(l_eff, e_flt);
   text l_eff_text = (*(ips->get_text))(l_eff_flt);
   gen_free_list(l_eff_flt);
