@@ -61,7 +61,7 @@ string add_flash_newline_to_string(string s)
 {
     string r;
     int l = strlen(s);
-    if (l == 0)
+    if (l == 0) /* if empty, do nothing */
         return s;
     else if (*(s + l - 1) == '\n') {
         r = (string)malloc(l + 1);
@@ -191,23 +191,17 @@ void print_marged_text_from_starting_node(FILE *fd, int margin, vertex start_ver
 {
     if (!vertex_undefined_p(start_ver)) {
         text txt = (text)vertex_vertex_label(start_ver);
-	bool first_sen = TRUE; /* the name of module is stored in the first sentence */
+	/*bool first_sen = TRUE; the name of module is stored in the first sentence */
 	MAP(SENTENCE, sen, {
-            string s = remove_newline_of_string(sentence_to_string(sen));
-	    if(strstr(s, CALL_MARK)) {
-	        vertex ver_child = get_vertex_by_string(s + strlen(CALL_MARK), l_of_vers);
-		print_marged_text_from_starting_node(fd, margin + ICFG_SCAN_INDENT, ver_child, l_of_vers);
+            string s = sentence_to_string(sen);
+	    string call_mark;
+	    if(call_mark = strstr(s, CALL_MARK)) {
+	        vertex ver_child = get_vertex_by_string(call_mark + strlen(CALL_MARK), l_of_vers);
+		print_marged_text_from_starting_node(fd, margin + (call_mark - s), ver_child, l_of_vers);
 	    } else {
-	        if (strlen(s) != 0) {
-		    if (first_sen) {
-		        fprintf(fd, "%*s%s\n", margin, "", s);
-			first_sen = FALSE;
-		    } else {
-		      fprintf(fd, "%*s%s\n", margin + ICFG_SCAN_INDENT, "", s);
-		    }
-		}
+	      /*if (first_sen) first_sen = FALSE;*/
+		fprintf(fd, "%*s%s", margin, "", s);
 	    }
-	    free(s);
 	}, text_sentences(txt));
     }
     return;
