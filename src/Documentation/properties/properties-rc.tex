@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/08/28 15:00:00 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/08/31 10:36:42 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -116,7 +116,7 @@ CHAINS_DATAFLOW_DEPENDENCE_ONLY FALSE
 
 Added for homogeneity reason; could be (easily) reduced to one?  In
 fact, with many target machines in mind, we should have an integer flag
-``architecture", with two basic architectures, sequential and parallel.
+``architecture'', with two basic architectures, sequential and parallel.
 Useless values: re-initialized in the C code.
 
 \begin{verbatim}
@@ -275,9 +275,16 @@ To deal specifically with the prettyprint for hpfc
 PRETTYPRINT_HPFC FALSE
 \end{verbatim}
 
+To output a code with a hierarchical view of the control graph with
+markers instead of a flat one. It purposes a display with a graph
+browser such as daVinci:
+\begin{verbatim}
+PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH FALSE
+\end{verbatim}
+
 \section{Semantic Analysis}
 
-Perform ``meet" operations for semantics analysis.
+Perform ``meet'' operations for semantics analysis.
 
 \begin{verbatim}
 SEMANTICS_FLOW_SENSITIVE FALSE
