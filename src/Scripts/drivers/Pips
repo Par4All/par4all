@@ -1,19 +1,27 @@
 #! /bin/sh
 
+#
+# SCCS stuff:
+#
+# $RCSfile: Pips,v $ ($Date: 1994/03/08 13:29:48 $) version $Revision$, got on %D%, %T%
+# %A%
+#
+
 # Test function
 check () { 
-FOO=
-#foo $1
+  FOO=	
+  #foo $1
 }
-foo () {
-echo $1
-echo PGM=$PGM
-echo SOURCE_FILES=$SOURCE_FILES
-echo SELECT_RULES=$SELECT_RULES
-echo MOD=$MOD
-echo USING_RULE=$USING_RULE
-echo BUILD_RES=$BUILD_RES
-echo 
+foo ()
+{
+  echo $1
+  echo PGM=$PGM
+  echo SOURCE_FILES=$SOURCE_FILES
+  echo SELECT_RULES=$SELECT_RULES
+  echo MOD=$MOD
+  echo USING_RULE=$USING_RULE
+  echo BUILD_RES=$BUILD_RES
+  echo 
 }
 
 #
@@ -23,44 +31,47 @@ echo
 #				[-b build_resource]
 #
 
-usage () {
-echo "Usage: Pips [-w wspace] [-f source_file[,source_file]...]"
-echo "                        [-s selected_rule[,selected_rule]...]"
-echo "                        [-m module] [-p performed_rule]"
-echo "                                    [-b build_resource]"
+usage () 
+{
+  echo "Usage: Pips [-w wspace] [-f source_file[,source_file]...]"
+  echo "                        [-s selected_rule[,selected_rule]...]"
+  echo "                        [-m module] [-p performed_rule]"
+  echo "                                    [-b build_resource]"
 }
 
 if [ $# -eq 0 ]
-then	usage >&2
-	exit 1
+then	
+  usage >&2
+  exit 1
 fi
 
 while getopts w:f:s:m:p:b: opt
 do
-	case $opt in
-	w)	OPT_PGM=$OPTARG;;
-	f)	SOURCE_FILES="$SOURCE_FILES $OPTARG";;
-	s)	SELECT_RULES="$SELECT_RULES $OPTARG";;
-	m)	OPT_MOD=$OPTARG;;
-	p)	USING_RULE=$OPTARG;;
-	b)	BUILD_RES=$OPTARG;;
-	\?)	usage >&2
-		exit 1;;
-	esac
+  case $opt in
+    w)	OPT_PGM=$OPTARG;;
+    f)	SOURCE_FILES="$SOURCE_FILES $OPTARG";;
+    s)	SELECT_RULES="$SELECT_RULES $OPTARG";;
+    m)	OPT_MOD=$OPTARG;;
+    p)	USING_RULE=$OPTARG;;
+    b)	BUILD_RES=$OPTARG;;
+    \?)	usage >&2
+	exit 1;;
+  esac
 done
 shift `expr $OPTIND - 1`
+
 if [ $# -ge 1 ]
 then
-	usage >&2
-	exit 1
+  usage >&2
+  exit 1
 fi
 
 
 # Check environment
 if [ -z "$PIPS_CURRENT_PROGRAM" ]
 then
-echo PIPS environment not set. >&2
-exit 1
+  echo PIPS environment not set. >&2
+  exit 1
 fi
 
 # Get PGM
@@ -68,25 +79,27 @@ BAD_WORKSPACE="Unknown workspace"
 
 if [ ! -x $PIPS_CURRENT_PROGRAM ]
 then
-	if [ -z "$OPT_PGM" ]
-	then
-		echo $BAD_WORKSPACE >&2
-		exit 1
-	else	PGM=$OPT_PGM
-	fi
+  if [ -z "$OPT_PGM" ]
+  then
+    echo $BAD_WORKSPACE >&2
+    exit 1
+  else	PGM=$OPT_PGM
+  fi
 else	
-	. $PIPS_CURRENT_PROGRAM
-	if [ "$OPT_PGM" ]
-	then	if [ "$OPT_PGM" != "$PGM" ]
-		then	MOD=""
-			PGM=$OPT_PGM
-		fi
-	else
-		echo Workspace $PGM \(default\)
-		if [ -z "$OPT_MOD" ]
-		then echo Module $MOD \(default\)
-		fi
-	fi
+  . $PIPS_CURRENT_PROGRAM
+  if [ "$OPT_PGM" ]
+  then	
+    if [ "$OPT_PGM" != "$PGM" ]
+    then
+      MOD=""
+      PGM=$OPT_PGM
+    fi
+  else
+    echo Workspace $PGM \(default\)
+    if [ -z "$OPT_MOD" ]
+    then echo Module $MOD \(default\)
+    fi
+  fi
 fi
 
 if [ "$OPT_MOD" ]
