@@ -4,7 +4,7 @@
  * Fabien Coelho, May and June 1993
  *
  * SCCS stuff:
- * $RCSfile: run-time.c,v $ ($Date: 1994/11/17 14:19:17 $, ) version $Revision$,
+ * $RCSfile: run-time.c,v $ ($Date: 1994/12/22 11:27:11 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -66,7 +66,7 @@ tag return_type;
 expression pvm_what_option_expression(v)
 entity v;
 {
-    pips_assert("pvm_what_option_expression", entity_variable_p(v));
+    assert(entity_variable_p(v));
 
     return(MakeCharacterConstantExpression
 	       (strdup(pvm_what_options(entity_basic(v)))));
@@ -356,7 +356,7 @@ statement hpfc_make_call_statement(e, l)
 entity e;
 list l;
 {
-    pips_assert("hpfc_make_call_statement", !entity_undefined_p(e));
+    assert(!entity_undefined_p(e));
 
     return(make_stmt_of_instr(make_instruction(is_instruction_call,
 					       make_call(e, l))));
@@ -414,48 +414,30 @@ bool bsend;
     int
 	len = gen_length(content);
     list
-	larg = NIL,
-	lind = NIL;
+	larg = NIL;
 
-    pips_assert("st_generate_packing_and_passing",
-		(len==NumberOfDimension(array)));
+    assert(len==NumberOfDimension(array) && (len<=4) && (len>=1));
 
-    pips_assert("st_generate_packing_and_passing", ((len<=4) && (len>=1)));
-
-    lind = array_lower_bounds_list(array);
     larg = array_lower_upper_bounds_list(array);
 
     MAPL(cr,
      {
-	 range
-	     r = RANGE(CAR(cr));
+	 range r = RANGE(CAR(cr));
 
 	 larg = gen_nconc(larg,
-			  CONS(EXPRESSION,
-			       range_lower(r),
-			  CONS(EXPRESSION,
-			       range_upper(r),
-			  CONS(EXPRESSION,
-			       range_increment(r),
+			  CONS(EXPRESSION, range_lower(r),
+			  CONS(EXPRESSION, range_upper(r),
+			  CONS(EXPRESSION, range_increment(r),
 			       NIL))));
      },
 	 content);
 
-/*    larg = CONS(EXPRESSION,
-		MakeCharacterConstantExpression
-		(pvm_what_options(entity_basic(array))), ...) */
-
-    larg = CONS(EXPRESSION,
-		reference_to_expression(make_reference(array, lind)),
+    larg = CONS(EXPRESSION, entity_to_expression(array),
 		larg);
     
-    /*
-     * larg content:
+    /* larg content:
      *
-     * // what, 
-     * array([dimension lower]*len), 
-     * dimension [lower, upper]*len, 
-     * range [lower, upper, increment]*len
+     * array, dim [lower, upper]*len, range [lower, upper, increment]*len
      */
 
     return(hpfc_make_call_statement
@@ -482,7 +464,7 @@ entity e;
     ram 
 	r = (in_ram ? storage_ram(s) : ram_undefined);
 
-    pips_assert("hpfc_main_entity", !storage_rom_p(s));
+    assert(!storage_rom_p(s));
 
     return(in_ram ?
 	   (in_common ? ram_section(r) : ram_function(r)):
