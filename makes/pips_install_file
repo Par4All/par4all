@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/08/26 11:39:54 $, )
+# ($Date: 1996/08/26 11:59:05 $, )
 #
 
 RUN=':'
@@ -55,7 +55,7 @@ do
     else
       verb "recursing for directory $file"
       test -d $target || { mkdir $target; chmod a+rx,ug+w,o-w $target; }
-      $0 $target $file/*
+      $0 $target `ls -d $file/* | sed '/OLD/d;/SCCS/d'`
     fi
   else
     if test -f $target && cmp -s $file $target
