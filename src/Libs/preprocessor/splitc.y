@@ -1,5 +1,8 @@
 /* $Id$
    $Log: splitc.y,v $
+   Revision 1.4  2003/08/04 16:53:07  irigoin
+   Intermediate version. A few more rules to derive signatures thanks to SPEC2000.
+
    Revision 1.3  2003/08/01 16:42:39  irigoin
    Intermediate version, compatible with the C-syntax Validation, coupled
    with the parser and the controlizer, if not yet the C prettyprinter.
@@ -77,7 +80,7 @@
 #include "c_syntax.h"
 #include "preprocessor.h"
 
-extern string strdup(string);
+extern char * strdup(const char *);
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 
@@ -87,6 +90,14 @@ extern int csplit_line_number;
 extern string splitc_text;
 
 extern hash_table keyword_typedef_table;
+ void keep_track_of_typedef(string type_name)
+   {
+     hash_put(keyword_typedef_table, type_name,(void *) TK_NAMED_TYPE);
+     pips_debug(2,"Add typedef name %s to hash table\n", type_name);
+     if(strcmp(type_name, "v1")==0) {
+       pips_debug(1, "v1 added as typedef\n");
+     }
+   }
 
 /* The following global variables are used to store the information such as 
    the scope, type and storage of an entity, given by the decl_spec_list, 
@@ -149,61 +160,6 @@ static bool current_function_is_static_p = FALSE;
 /* All the following global variables must be replaced by functions, once we have the preprocessor for C */
 
 static int csplit_is_typedef = 0; /* to know if this is a typedef name or not */
-
-/* Beware of the free: no constant strings in signature! */
-static string new_empty()
-   {
-     return strdup("");
-   }
-static string new_comma()
-   {
-     return strdup(",");
-   }
-static string new_eq()
-   {
-     return strdup("=");
-   }
-static string new_star()
-   {
-     return strdup("*");
-   }
-static string new_semicolon()
-   {
-     return strdup(";");
-   }
-static string new_colon()
-   {
-     return strdup(":");
-   }
-
-static string new_lbrace()
-   {
-     return strdup("{");
-   }
-static string new_rbrace()
-   {
-     return strdup("}");
-   }
-static string new_lparen()
-   {
-     return strdup("(");
-   }
-static string new_rparen()
-   {
-     return strdup(")");
-   }
-static string new_lbracket()
-   {
-     return strdup("[");
-   }
-static string new_rbracket()
-   {
-     return strdup("]");
-   }
-static string new_ellipsis()
-   {
-     return strdup("...");
-   }
 
 /* If any of the strings is undefined, we are in trouble. If not,
    concatenate them with separator into a new string and free all input
@@ -377,6 +333,61 @@ static string safe_build_signature(string s1, ...)
      }
      return imbalance;
    }
+
+/* Beware of the free: no constant strings in signature! */
+static string new_empty()
+   {
+     return new_signature("");
+   }
+static string new_comma()
+   {
+     return new_signature(",");
+   }
+static string new_eq()
+   {
+     return new_signature("=");
+   }
+static string new_star()
+   {
+     return new_signature("*");
+   }
+static string new_semicolon()
+   {
+     return new_signature(";");
+   }
+static string new_colon()
+   {
+     return new_signature(":");
+   }
+
+static string new_lbrace()
+   {
+     return new_signature("{");
+   }
+static string new_rbrace()
+   {
+     return new_signature("}");
+   }
+static string new_lparen()
+   {
+     return new_signature("(");
+   }
+static string new_rparen()
+   {
+     return new_signature(")");
+   }
+static string new_lbracket()
+   {
+     return new_signature("[");
+   }
+static string new_rbracket()
+   {
+     return new_signature("]");
+   }
+static string new_ellipsis()
+   {
+     return new_signature("...");
+   }
 %}
 
 /* Bison declarations */
@@ -493,7 +504,7 @@ static string safe_build_signature(string s1, ...)
 %type <> opt_expression
 %type <> init_expression
 %type <string> comma_expression
-%type <> paren_comma_expression
+%type <string> paren_comma_expression
 %type <> arguments
 %type <> bracket_comma_expression
 %type <> string_list 
@@ -507,7 +518,7 @@ static string safe_build_signature(string s1, ...)
 %type <string> struct_decl_list
 
 
-%type <> old_proto_decl
+%type <string> old_proto_decl direct_old_proto_decl
 %type <string> parameter_decl
 %type <string> enumerator
 %type <string> enum_list
@@ -517,7 +528,7 @@ static string safe_build_signature(string s1, ...)
 %type <string> type_name
 %type <> block
 %type <> local_labels local_label_names
-%type <> old_parameter_list_ne
+%type <string> old_parameter_list_ne
 
 %type <string> init_declarator
 %type <string> init_declarator_list
@@ -548,6 +559,8 @@ static string safe_build_signature(string s1, ...)
 %type <string> maybecomma 
 %type <string> parameter_list_startscope
 %type <string> paren_attr_list_ne
+%type <string> old_pardef_list
+%type <string> old_pardef
 %%
 
 interpret: file TK_EOF
@@ -668,13 +681,15 @@ expression:
                         }
 |   TK_SIZEOF expression
 		        {
-			  free_partial_signature($2);
-			  $$ = string_undefined;
+			  /* Can be used to dimemsion an argument */
+			  $$ = safe_build_signature(new_signature("sizeof"),
+						    $2, NULL);
                         }
 |   TK_SIZEOF TK_LPAREN type_name TK_RPAREN
 		        {
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature(new_signature("sizeof"),
+						    new_lparen(), $3, new_rparen(),
+						    NULL);
                         }
 |   TK_ALIGNOF expression
 		        { 
@@ -688,13 +703,11 @@ expression:
 			}
 |   TK_PLUS expression
 		        {
-			  free_partial_signature($2);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature(new_signature("+"), $2, NULL);
 			}
 |   TK_MINUS expression
 		        {
-			  free_partial_signature($2);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature(new_signature("-"), $2, NULL);
 			}
 |   TK_STAR expression
 		        {
@@ -751,10 +764,11 @@ expression:
 |   TK_LPAREN block TK_RPAREN
 		        {
 			  $$ = string_undefined;
+			  /* $$ = new_signature("block"); */
 			}
 |   paren_comma_expression
 		        {
-			  $$ = string_undefined;
+			  $$ = $1;
 			}
 |   expression TK_LPAREN arguments TK_RPAREN
 			{
@@ -783,33 +797,23 @@ expression:
 			}
 |   expression TK_PLUS expression
 			{ 
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("+"), $3, NULL);
 			}
 |   expression TK_MINUS expression
 			{ 
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("-"), $3, NULL);
 			}
 |   expression TK_STAR expression
 			{ 
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("*"), $3, NULL);
 			}
 |   expression TK_SLASH expression
 			{ 
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("/"), $3, NULL);
 			}
 |   expression TK_PERCENT expression
 			{ 
-			  free_partial_signature($1);
-			  free_partial_signature($3);
-			  $$ = string_undefined;
+			  $$ = safe_build_signature($1, new_signature("%"), $3, NULL);
 			}
 |   expression TK_AND_AND expression
 			{
@@ -1137,9 +1141,13 @@ comma_expression_opt:
 paren_comma_expression:
     TK_LPAREN comma_expression TK_RPAREN
                         {
+			  $$ = safe_build_signature(new_lparen(), $2,
+						    new_rparen(), NULL);
 			}
 |   TK_LPAREN error TK_RPAREN                         
                         {
+			  csplit_parser_error("Error within parenthesized expression.\n");
+			  $$ = string_undefined;
 			}
 ;
 
@@ -1653,6 +1661,10 @@ enumerator:
 declarator:  /* (* ISO 6.7.5. Plus Microsoft declarators.*) */
     pointer_opt direct_decl attributes_with_asm
                         {
+			  /* Type and identifier information are mixed
+                             here. Instead of trying to retrieve the type
+                             only, it might be easier to postprocess the
+                             signature for Rule 2. */
 			  if(!string_undefined_p($3) && strlen($3)>0) {
 			    pips_user_warning("attributes_with_asm=", $3);
 			    csplit_parser_warning("attributes_with_asm not supported\n");
@@ -1670,8 +1682,11 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			 if (csplit_is_typedef)
 			   {
 			     /* Tell the lexer about the new type names : add to keyword_typedef_table */
+			     /*
 			     hash_put(keyword_typedef_table,new_signature($1),(void *) TK_NAMED_TYPE);
-			     pips_debug(2,"Add typedef name %s to hash table\n",$1);
+			     */
+			     keep_track_of_typedef(new_signature($1));
+			     csplit_is_typedef = FALSE;
 			   }
 			 $$ = $1;
 		       }
@@ -1767,45 +1782,71 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 old_proto_decl:
     pointer_opt direct_old_proto_decl 
                         {
+			  $$ = build_signature($1, $2, NULL);
 			}
 ;
 direct_old_proto_decl:
     direct_decl TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list
                         { 
+			  /* You do not need the formal parameter list */
+			  /*
+			  $$ = build_signature($1, new_lparen(), $3, new_rparen(),
+					       $5, NULL);
+			  */
+			  free_partial_signature($3);
+			  $$ = build_signature($1, new_lparen(), new_rparen(), $5, NULL);
 			}
 |   direct_decl TK_LPAREN TK_RPAREN
                         {
+			  $$ = build_signature($1, new_lparen(), new_rparen(), NULL);
 			}
 ;
 
 old_parameter_list_ne:
     TK_IDENT            
                         {
+			  $$ = new_signature($1);
 			}
 |   TK_IDENT TK_COMMA old_parameter_list_ne   
                         {
+			  $$ = build_signature($1, new_comma(), $3, NULL);
 			}
 ;
 
 old_pardef_list: 
-    /* empty */         {}
+    /* empty */         { $$ = new_empty(); }
 |   decl_spec_list old_pardef TK_SEMICOLON TK_ELLIPSIS
                         {
+			  /* You want a comma-separated list of types, but... */
+			  /* bad news: "int * pj" is broken as "int" for
+                             decl_spec_list and "* pj" for old_pardef */
+			  $$ = build_signature($1, $2, new_semicolon(),
+					       new_ellipsis(), NULL);
+			  /*
+			  $$ = build_signature($1, $2, new_comma(),
+					       new_ellipsis(), NULL);
+			  */
 			}
 |   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list  
                         {
+			  $$ = build_signature($1, $2, new_semicolon(),
+					       $4, NULL);
 			} 
 ;
 
 old_pardef: 
     declarator            
                         {
+			  $$ = $1;
 			}
 |   declarator TK_COMMA old_pardef   
                         {
+			  $$ = build_signature($1, new_comma(), $3, NULL);
 			}
 |   error       
                         {
+			  csplit_parser_error("In old parameter definition\n");
+			  $$ = string_undefined;
 			}
 ;
 
@@ -1897,17 +1938,34 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  csplit_is_static_p = FALSE;
 			  csplit_definite_function_signature
 			    = simplify_signature(build_signature($1, $2, NULL));
-			  pips_debug(1, "Signature for function %s:%s\n\n",
+			  pips_debug(1, "Signature for function \"%s\": \"%s\"\n\n",
 				     csplit_definite_function_name,
 				     csplit_definite_function_signature);
 			}	
 /* (* Old-style function prototype *) */
 |   decl_spec_list old_proto_decl 
                         { 
+			  /* The signature obtained here must be
+                             post-processed. The declaration list after
+                             the empty parameter list could be entirely
+                             dropped or converted into a type list. But
+                             beware of parameters declared together or
+                             declared in another order. Note that we could
+                             keep the parameter list between the
+                             parentheses and fetch the associated
+                             types. */
 			  pips_debug(5, "decl_spec_list old_proto_decl->function_def_start");
+			  csplit_definite_function_name
+			    = strdup(csplit_current_function_name);
 			  pips_debug(5, "Rule 2: Function declaration is located between line %d and line %d\n", get_csplit_current_beginning(), csplit_line_number);
 			  csplit_is_function = 1; /* function's declaration */
-			  pips_internal_error("Not implemented yet");
+			  current_function_is_static_p = csplit_is_static_p;
+			  csplit_is_static_p = FALSE;
+			  csplit_definite_function_signature
+			    = simplify_signature(build_signature($1, $2, NULL));
+			  pips_debug(1, "Signature for function \"%s\": \"%s\"\n\n",
+				     csplit_definite_function_name,
+				     csplit_definite_function_signature);
 			}	
 /* (* New-style function that does not have a return type *) */
 |   TK_IDENT parameter_list_startscope rest_par_list TK_RPAREN 
