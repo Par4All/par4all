@@ -8,6 +8,8 @@
 
 #include "ri-util.h"
 
+#include "operator.h"
+
 /* this function shouldn't be called. 
  * Use macro NORMALIZE_EXPRESSION(e) instead.
  */
@@ -104,6 +106,7 @@ reference r;
     return(n);
 }
 
+
 normalized NormalizeIntrinsic(e, la)
 entity e;
 cons *la;
@@ -175,12 +178,112 @@ cons *la;
 	    return(make_normalized(is_normalized_complex, UU));
 	}
     }
+    else if(ENTITY_MIN_P(e) || ENTITY_MIN0_P(e)) {
+	n = binary_to_normalized(la, MINIMUM);
+    }
+    else if(ENTITY_MAX_P(e) || ENTITY_MAX0_P(e)) {
+	n = binary_to_normalized(la, MAXIMUM);
+    }
+    else if(ENTITY_MODULO_P(e)) {
+	n = binary_to_normalized(la, MOD);
+    }
+    else if(ENTITY_DIVIDE_P(e)) {
+	n = binary_to_normalized(la, SLASH);
+    }
+    else if(ENTITY_POWER_P(e)) {
+	n = binary_to_normalized(la, POWER);
+    }
     else {
 	return(make_normalized(is_normalized_complex, UU));
     }
 
     return(n);
 }
+
+normalized binary_to_normalized(list la, int op)
+{
+    normalized ng;
+    normalized nd;
+    normalized n;
+    int val1;
+    int val2;
+    int val = 0; /* initialized to please gcc */
+
+    pips_assert("binary_to_normalize", gen_length(la) == 2);
+
+    ng = NormalizeExpression(EXPRESSION(CAR(la)));
+    if (normalized_complex_p(ng))
+	return(ng);
+
+    nd = NormalizeExpression(EXPRESSION(CAR(CDR(la))));
+    if (normalized_complex_p(nd)) {
+	FreeNormalized(ng);
+	return(nd);
+    }
+
+    if (EvalNormalized(nd, &val2) && EvalNormalized(ng, &val1)) {
+	bool succeed = TRUE;
+
+	FreeNormalized(nd);
+	FreeNormalized(ng);
+	switch(op) {
+	case MINIMUM:
+	    val = MIN(val1, val2);
+	    break;
+	case MAXIMUM:
+	    val = MAX(val1, val2);
+	    break;
+	case MOD:
+	    /* FI: the C operator is different from the Fortran operator
+	     * for non-positive arguments.
+	     */
+	    if(val2==0) {
+		user_error("binary_to_normalize",
+			   "0 divide in modulo evaluation\n");
+	    }
+	    else {
+		val = val1%val2;
+	    }
+	    break;
+	case SLASH:
+	    /* FI: the C operator is different from the Fortran operator
+	     * for non-positive arguments.
+	     */
+	    if(val2==0) {
+		user_error("binary_to_normalize",
+			   "0 divide\n");
+	    }
+	    else {
+		val = val1/val2;
+	    }
+	    break;
+	case POWER:
+	    if(val2<0) {
+		succeed = FALSE;
+	    }
+	    else {
+		val = ipow(val1,val2);
+	    }
+	    break;
+	default:
+	    pips_error("", "Unknown binary operator %d\n", op);
+	}
+	if(succeed) {
+	    n = make_normalized(is_normalized_linear,
+				vect_new(TCST, val));
+	}
+	else {
+	    n = make_normalized(is_normalized_complex, UU);
+	}
+    }
+    else {
+	FreeNormalized(ng);
+	FreeNormalized(nd);
+	n = make_normalized(is_normalized_complex, UU);
+    }
+    return n;
+}
+
 
 bool EvalNormalized(n, pv)
 normalized n;
