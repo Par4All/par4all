@@ -1,12 +1,6 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/06 10:55:56 $ 
+# $Date: 1996/09/08 21:52:07 $ 
 
-# expected from makefile macros
-ifeq ($(FC),g77)
-CPPFLAGS+=	-DCOMPILE_FOR_G77
-endif
-
-# expected from defines...
 CPPFLAGS+=	$(PIPS_X11_ADDED_CPPFLAGS)
 LDFLAGS+=	$(PIPS_X11_ADDED_LDFLAGS)
 X11LIB+=	$(PIPS_X11_ADDED_LIBS)
@@ -19,7 +13,7 @@ EXPORT_HEADERS=	xpomp_graphic.h xpomp_graphic_F.h
 CFILES=		xpomp.c 
 M4CFILES=	cgraphic.m4c
 DEMO=		test_xpomp.c fractal.f wave.f wave_parameters.h
-HPFC=		xpomp_fake.f
+HPFC=		xpomp_stubs.f
 DOC=		xpomp_manual.tex xPOMP_window_explained.eps
 
 SOURCES=	$(LOCAL_HEADERS) \
