@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNU,v $ (version $Revision$)
-# $Date: 1996/07/24 14:07:38 $, 
+# $Date: 1996/07/24 14:07:57 $, 
 #
 # this file contains macro definitions 
 
@@ -10,7 +10,7 @@ GCCDIR	= $(GCC_EXEC_PREFIX)sparc-sun-sunos4.1.4/2.7.2.f.1
 AR	= gar
 ARFLAGS	= rv
 CC	= gcc
-# flex generated code and -ansi are not compatible:-(
+# flex/bison generated code and -ansi are not compatible:-(
 CFLAGS	= -O2 -g -pedantic -Wall -msupersparc -pipe
 CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -nostdinc -I$(NEWGEN_INCDIR) -I$(LINEAR_INCDIR) -I$(PIPS_INCDIR) -I$(PIPS_EXTEDIR) -I$(GLIBC)/include -I$(GCCDIR)/include -I/usr/include 
 LD	= $(CC) 
