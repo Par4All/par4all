@@ -10,18 +10,18 @@
 
 #include "sac.h"
 
-extern entity get_function_entity(char * name);
-
 static list transformations = NIL; /* <transformation> */
 
-void insert_transformation(char * name, int vectorLength, int subwordSize, int nbArgs, int * mapping)
+void insert_transformation(char * name, int vectorLengthOut, int subwordSizeOut, int vectorLengthIn, int subwordSizeIn, int nbArgs, int * mapping)
 {
    transformation t = make_transformation(strdup(name),
-					  vectorLength,
-					  subwordSize,
+					  vectorLengthOut,
+					  subwordSizeOut,
+					  vectorLengthIn,
+					  subwordSizeIn,
 					  nbArgs,
-					  (int*)malloc(sizeof(int)*vectorLength));
-   memcpy(transformation_mapping(t), mapping, sizeof(int)*vectorLength);
+					  (int*)malloc(sizeof(int)*vectorLengthOut));
+   memcpy(transformation_mapping(t), mapping, sizeof(int)*vectorLengthOut);
 
    transformations = CONS(TRANSFORMATION, t, transformations);
 }
@@ -52,8 +52,8 @@ statement generate_transformation_statement(simdStatementInfo si, int line)
 
    list t;
    transformation bestTr = transformation_undefined;
-   entity bestFirstArg;
-   entity bestSecArg;
+   entity bestFirstArg = entity_undefined;
+   entity bestSecArg = entity_undefined;
 
    //Look up all the registered transformations to find the 
    //best one
@@ -67,8 +67,8 @@ statement generate_transformation_statement(simdStatementInfo si, int line)
 
       //Dismiss transformation that do not have the right kind of
       //arguments
-      if ((transformation_vectorLength(tr) != vectorLength) ||
-	  (transformation_subwordSize(tr) != subwordSize))
+      if ((transformation_vectorLengthOut(tr) != vectorLength) ||
+	  (transformation_subwordSizeOut(tr) != subwordSize))
 	 continue;
 
       //Find out if some vectors may be used, based on the first element
@@ -78,6 +78,10 @@ statement generate_transformation_statement(simdStatementInfo si, int line)
 	  l = CDR(l))
       {
 	 vectorElement ve = VECTORELEMENT(CAR(l));
+
+	 if ( (vectorElement_vectorLength(ve) != transformation_vectorLengthIn(tr)) ||
+	      (vectorElement_subwordSize(ve) != transformation_subwordSizeIn(tr)) )
+	    continue;
 
 	 if (vectorElement_element(ve) == transformation_mapping(tr)[0])
 	    firstArg = CONS(ENTITY, vectorElement_vector(ve), firstArg);
@@ -133,8 +137,8 @@ statement generate_transformation_statement(simdStatementInfo si, int line)
    }
 
    //No appliable transformation found, so exit now: can't do anything!
-   if (bestTr == NULL)
-      return NULL;
+   if (bestTr == transformation_undefined)
+      return statement_undefined;
 
    //We found out if there is some appliable transformation, and we even 
    //have chosen the best one. Now is time to generate the actual 
