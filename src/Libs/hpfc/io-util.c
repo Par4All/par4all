@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/06/12 21:48:39 $, )
+ * ($Date: 1996/07/23 15:08:26 $, )
  */
 
 #include "defines-local.h"
