@@ -471,19 +471,39 @@ char *module_name;
 transformer load_summary_transformer(e)
 entity e;
 {
+    /* FI: I had to add a guard db_resource_p() on Nov. 14, 1995.
+     * I do not understand why the problem never occured before,
+     * although it should each time the intra-procedural option
+     * is selected.
+     *
+     * This may partially be explained because summary transformers
+     * are implicitly computed with transformers instead of using
+     * an explicit call to summary_transformer (I guess I'm going
+     * to change that).
+     *
+     * I think it would be better not to call load_summary_transformer()
+     * at all when no interprocedural options are selected. I should
+     * change that too.
+     */
+
     /* memoization could be used to improve efficiency */
-    transformer t;
+    transformer t = transformer_undefined;
 
     pips_assert("load_summary_transformer", entity_module_p(e));
 
-    t = (transformer) 
-	db_get_memory_resource(DBR_SUMMARY_TRANSFORMER, 
-			       entity_local_name(e), 
-			       TRUE);
+    if(db_resource_p(DBR_SUMMARY_TRANSFORMER, module_local_name(e))) {
+	t = (transformer) 
+	    db_get_memory_resource(DBR_SUMMARY_TRANSFORMER, 
+				   entity_local_name(e), 
+				   TRUE);
 
-    /* db_get_memory_resource never returns database_undefined or
-       resource_undefined */
-    pips_assert("load_summary_transformer", t != transformer_undefined);
+	/* db_get_memory_resource never returns database_undefined or
+	   resource_undefined */
+	pips_assert("load_summary_transformer", t != transformer_undefined);
+    }
+    else {
+	t = transformer_undefined;
+    }
 
     return t;
 }
