@@ -499,7 +499,7 @@ text my_get_any_effect_type_text(string module_name, string resource_name)
 {
   text txt;
   push_prettyprints(resource_name, string_undefined);
-  txt = my_get_any_effects_text(module_name, TRUE);
+  txt = my_get_any_effects_text(module_name);
   reset_generic_prettyprints();
   return txt;
 }
