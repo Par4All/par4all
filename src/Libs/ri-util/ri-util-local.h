@@ -20,6 +20,7 @@
 #include "sc.h"
 #include "polynome.h"
 #include "matrice.h"
+#include "word_attachment.h"
 
 #include "text.h"
 
