@@ -9,6 +9,10 @@
 #include "misc.h"
 #include "properties.h"
 #include "word_attachment.h"
+#include "top-level.h"
+
+/* To store the fact a prettyprinter ask for Emacs attachments: */
+static bool is_emacs_pretty_print_asked;
 
 enum {POSITION_UNDEFINED = -1};
 
@@ -90,17 +94,21 @@ free_names_of_almost_everything_in_a_module()
 
 /* The translation functions between unique names and objects: */
 
-/* Initialize some things related with the attachment of properties: */
+/* Initialize some things related with the attachment of propertie. To
+   be conservative, if a prettyprinter does not call
+   begin_attachment_prettyprint(), all the attachment stuff is
+   disable. Thus, old prettyprinter can go on without Emacs mode: */
 void
 begin_attachment_prettyprint()
 {
     if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {
-      /*word_text_attachment_mapping = hash_table_make(hash_pointer, 0);*/
-      /* Initialize the local mapings: */
-      init_word_to_attachments_begin();
-      init_word_to_attachments_end();
-      /*name_almost_everything_in_a_module(mod_stat);*/
-   }
+	is_emacs_pretty_print_asked = TRUE;
+	/*word_text_attachment_mapping = hash_table_make(hash_pointer, 0);*/
+	/* Initialize the local mapings: */
+	init_word_to_attachments_begin();
+	init_word_to_attachments_end();
+	/*name_almost_everything_in_a_module(mod_stat);*/
+    }
 }
 
 
@@ -108,19 +116,20 @@ begin_attachment_prettyprint()
 void
 end_attachment_prettyprint()
 {
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {
-      /* Strings in attachments should already have been freed by
-         print_sentence and attachement it-self (witout "s") by
-         output_an_attachment(): */
+    if (is_emacs_pretty_print_asked) {
+	is_emacs_pretty_print_asked = FALSE;
 
-     close_word_to_attachments_begin();
-      /* Should be OK since output_the_attachments_for_emacs() has
-         already unlinked the attachment from
-         ord_to_attachments_begin: */
-      close_word_to_attachments_end();
+	/* Strings in attachments should already have been freed by
+	   print_sentence and attachement it-self (witout "s") by
+	   output_an_attachment(): */
+	close_word_to_attachments_begin();
+	/* Should be OK since output_the_attachments_for_emacs() has
+	   already unlinked the attachment from
+	   ord_to_attachments_begin: */
+	close_word_to_attachments_end();
 
-      /*free_names_of_almost_everything_in_a_module();*/
-   }
+	/*free_names_of_almost_everything_in_a_module();*/
+    }
 }
 
 
@@ -148,28 +157,26 @@ attach_to_word_list(string begin_word,
 		    string end_word,
 		    attachee at) 
 {
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {
-	/* We do not know the position of the attachement in the output
-	   file yet: */
-	attachment a = make_attachment(at,
-				       POSITION_UNDEFINED,
-				       POSITION_UNDEFINED);
+    /* We do not know the position of the attachement in the output
+       file yet: */
+    attachment a = make_attachment(at,
+				   POSITION_UNDEFINED,
+				   POSITION_UNDEFINED);
 
-	debug_on("ATTACHMENT_DEBUG_LEVEL");
-	debug(6, "attach_to_word_list",
-	      "Attach attachment %#x (attachee %#x) from \"%s\" (%#x) to \"%s\" (%#x)\n",
-	      (unsigned int) a, (unsigned int) at,
-	      begin_word, (unsigned int) begin_word,
-	      end_word, (unsigned int)end_word);
-	ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
-				       begin_word,
-				       word_to_attachments_begin);
+    debug_on("ATTACHMENT_DEBUG_LEVEL");
+    debug(6, "attach_to_word_list",
+	  "Attach attachment %#x (attachee %#x) from \"%s\" (%#x) to \"%s\" (%#x)\n",
+	  (unsigned int) a, (unsigned int) at,
+	  begin_word, (unsigned int) begin_word,
+	  end_word, (unsigned int)end_word);
+    ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
+				   begin_word,
+				   word_to_attachments_begin);
 
-	ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
-				       end_word,
-				       word_to_attachments_end);
-	debug_off();
-    }   
+    ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
+				   end_word,
+				   word_to_attachments_end);
+    debug_off();
 }
 
 
@@ -224,7 +231,7 @@ attach_loop_to_sentence_up_to_end_of_text(sentence s,
 				    text t,
 				    loop l)
 {
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+    if (is_emacs_pretty_print_asked)
 	attach_to_sentence_up_to_end_of_text(s, t,
 					     make_attachee(is_attachee_loop,
 							   l));
@@ -236,7 +243,7 @@ sentence
 attach_head_to_sentence(sentence s,
 			entity module)
 {
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+    if (is_emacs_pretty_print_asked)
 	attach_to_sentence(s, make_attachee(is_attachee_module_head, module));
 
     return s;
@@ -249,7 +256,7 @@ attach_reference_to_word_list(string begin_word,
 			      string end_word,
 			      reference r)
 {
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+    if (is_emacs_pretty_print_asked)
 	attach_to_word_list(begin_word,
 			    end_word,
 			    make_attachee(is_attachee_reference, r));
@@ -260,7 +267,7 @@ attach_reference_to_word_list(string begin_word,
 void
 attach_decoration_to_text(text t)
 {
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+    if (is_emacs_pretty_print_asked)
 	attach_to_text(t, make_attachee(is_attachee_decoration, UU));
 }
 
@@ -269,7 +276,7 @@ attach_decoration_to_text(text t)
 void
 attach_preconditions_decoration_to_text(text t)
 {
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+    if (is_emacs_pretty_print_asked)
 	attach_to_text(t, make_attachee(is_attachee_preconditions, UU));
 }
 
@@ -278,7 +285,7 @@ attach_preconditions_decoration_to_text(text t)
 void
 attach_transformers_decoration_to_text(text t)
 {
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+    if (is_emacs_pretty_print_asked)
 	attach_to_text(t, make_attachee(is_attachee_transformers, UU));
 }
 
@@ -289,7 +296,7 @@ void
 deal_with_sentence_word_begin(string a_word,
 			      int position_in_the_output)
 {
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {	    
+    if (is_emacs_pretty_print_asked) {	    
 	debug_on("ATTACHMENT_DEBUG_LEVEL");
 
 	debug(8, "deal_with_sentence_word_begin",
@@ -326,7 +333,7 @@ void
 deal_with_sentence_word_end(string a_word,
 			    int position_in_the_output)
 {
-    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {	    
+    if (is_emacs_pretty_print_asked) {	    
 	debug_on("ATTACHMENT_DEBUG_LEVEL");
 
 	debug(8, "deal_with_sentence_word_end",
@@ -451,7 +458,7 @@ rewrite_an_attachment(attachment a)
 
 
 /* Begin the Emacs Lisp file: */
-void
+static void
 init_output_the_attachments_for_emacs(FILE * output_file)
 {
     /* Begin a string with Emacs Lisp properties: */
@@ -461,7 +468,7 @@ init_output_the_attachments_for_emacs(FILE * output_file)
 
 /* Output the list of all the attachments found in the text file with
    Emacs Lisp syntax: */
-void
+static void
 output_the_attachments_for_emacs(FILE * output_file)
 {
     debug_on("ATTACHMENT_DEBUG_LEVEL");
@@ -505,4 +512,37 @@ output_the_attachments_for_emacs(FILE * output_file)
     fprintf(local_output_file, "\n\t)\n)\n");
 
     debug_off();
+}
+
+
+    /* Add the attachment in Emacs mode by creating a twin file that
+       is decorated with Emacs properties: */
+void
+write_an_attachment_file(string file_name)
+{
+    if (is_emacs_pretty_print_asked) {
+	FILE * file_stream;
+	char * emacs_file_name = strdup(concatenate(file_name, EMACS_FILE_EXT, NULL));
+	FILE * emacs_file_stream = safe_fopen(emacs_file_name, "w");
+	init_output_the_attachments_for_emacs(emacs_file_stream);
+	/* Now include the original plain file: */
+	file_stream = safe_fopen(file_name, "r");
+	for(;;) {
+	    char c = getc(file_stream);
+	    /* Strange semantics: must have read the character first: */
+	    if (feof(file_stream))
+		break;
+	    
+	    /* Just backslashify the '"' and '\': */
+	    if (c == '"' || c == '\\')
+		(void) putc('\\', file_stream);
+	    
+	    (void) putc(c, emacs_file_stream);	  
+	}
+	safe_fclose(file_stream, file_name);
+	/* Actually add the interesting stuff: */
+	output_the_attachments_for_emacs(emacs_file_stream);
+	safe_fclose(emacs_file_stream, emacs_file_name);
+	free(emacs_file_name);
+    }
 }
