@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/12/10 16:22:16 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1998/04/14 13:29:14 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2659,34 +2659,11 @@ gen_allocated_memory(
  *  - when the filter is always yes
  *  - when it is false, to stop the recursion on some types
  */
-void
-gen_null(gen_chunk * p)
-{
-}
-
-bool
-gen_true(gen_chunk * p)
-{
-    return TRUE;
-}
-
-bool
-gen_false(gen_chunk * p)
-{
-    return FALSE;
-}
-
-gen_chunk *
-gen_identity(gen_chunk * x)
-{
-    return(x);
-}
-
-void 
-gen_core(gen_chunk *p)
-{
-    abort();
-}
+void gen_null(void * p) { return; }
+bool gen_true(void * p) { return TRUE; }
+bool gen_false(void * p) { return FALSE; }
+void * gen_identity(void * x) { return x; }
+void gen_core(void * p) { abort(); }
 
 /* GLOBAL VARIABLES: to deal with decision tables
  *
@@ -3070,8 +3047,7 @@ union domain *dp ;
  *  if obj is NULL, the whole recursion is stopped !
  */
 void 
-gen_recurse_stop(obj)
-gen_chunk *obj;
+gen_recurse_stop(void * obj)
 {
     if (obj)
 	hash_put(current_mrc->seen, (char *)obj, (char *)TRUE);
@@ -3093,8 +3069,9 @@ gen_chunk *obj;
  * ??? bug : you can't visit domain 0 if any... 
  * I can't remember what it is used for.
  */
-void gen_multi_recurse(gen_chunk * obj, ...)
+void gen_multi_recurse(void * o, ...)
 {
+    gen_chunk * obj = (gen_chunk*) o;
     va_list pvar;
     int i, domain;
     GenFilterTableType new_filter_table;
@@ -3105,7 +3082,7 @@ void gen_multi_recurse(gen_chunk * obj, ...)
 
     check_read_spec_performed();
 
-    va_start(pvar, obj);
+    va_start(pvar, o);
 
     /*  the object must be a valid newgen object
      */
@@ -3176,12 +3153,11 @@ void gen_multi_recurse(gen_chunk * obj, ...)
 #undef gen_recurse
 #endif
 
-void 
-gen_recurse(obj, domain, filter, rewrite)
-gen_chunk *obj;
-int domain;
-bool (*filter)();
-void (*rewrite)();
+void gen_recurse(
+    void * obj,
+    int domain,
+    bool (*filter)(),
+    void (*rewrite)())
 {
     gen_multi_recurse(obj, domain, filter, rewrite, NULL);
 }
