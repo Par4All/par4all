@@ -123,11 +123,15 @@ Pbase base;
 {
     Pvecteur pb;
     int j;
+    Value v;
 
-    for (pb = base, j=1; !VECTEUR_NUL_P(pb) && j< mat->NbColumns-1; 
-	 mat->p[i][j] = 
-	    VALUE_TO_IRINT(vect_coeff(vecteur_var(pb),pr->vecteur)),
-	 pb = pb->succ,j++); 
+    for (pb = base, j=1; 
+	 !VECTEUR_NUL_P(pb) && j< mat->NbColumns-1; 
+	 pb = pb->succ,j++)
+    {
+	v = vect_coeff(vecteur_var(pb),pr->vecteur);
+	mat->p[i][j] = VALUE_TO_IRINT(v),
+    }
 }
 
 
@@ -142,12 +146,16 @@ Pbase base;
 {
     Pvecteur pv;
     int j;
-    
-    for (pv=base,j=1;!VECTEUR_NUL_P(pv);
-	 mat->p[i][j]= 
-	 VALUE_TO_IRINT(value_uminus(vect_coeff(vecteur_var(pv),pc->vecteur))),
-	 pv=pv->succ,j++);
-    mat->p[i][j]= VALUE_TO_IRINT(value_uminus(vect_coeff(TCST,pc->vecteur)));
+    Value v;
+
+    for (pv=base,j=1; !VECTEUR_NUL_P(pv); pv=pv->succ,j++)
+    {
+	v = value_uminus(vect_coeff(vecteur_var(pv),pc->vecteur));
+	mat->p[i][j] = VALUE_TO_IRINT(v);
+    }
+
+    v = value_uminus(vect_coeff(TCST,pc->vecteur));
+    mat->p[i][j]= VALUE_TO_IRINT(v);
 }
 
 
