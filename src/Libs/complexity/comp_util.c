@@ -173,7 +173,7 @@ boolean print_stats_p, print_local_names_p;
 		                             ifcount_halfhalf(ic));
 
 
-	    s = strchr(s, NULL);
+	    s = strchr(s, '\0');
 	}
 	p = polynome_sprint(complexity_polynome(comp),
 			    (print_local_names_p ? variable_local_name 
