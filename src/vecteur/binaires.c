@@ -53,7 +53,7 @@ Pvecteur v1,v2;
     Pvecteur v = vect_dup (v1);
 
     for (; v2 != NULL; v2 = v2->succ)
-	 vect_add_elem (&v,var_of(v2),-val_of(v2));
+	 vect_add_elem (&v,var_of(v2),value_uminus(val_of(v2)));
 
     return (v);
 }
@@ -79,7 +79,7 @@ Pvecteur v1,v2;
  *    to (uselessly) slow down dependence tests since overflows occur
  *    only (?) in code generation phases; (Francois Irigoin, 17 December 1991)
  */
-Pvecteur vect_cl_ofl_ctrl(v,lambda,u, ofl_ctrl)
+Pvecteur vect_cl_ofl_ctrl(v, lambda, u, ofl_ctrl)
 Pvecteur v;
 Value lambda;
 Pvecteur u;
@@ -96,38 +96,33 @@ int ofl_ctrl;
 	 *   v = vect_chain(v,var_of(u),lambda*val_of(u));
 	 */
 	v = vect_dup(u);
-	switch(lambda) {
-	case VALUE_ONE: break;
-	case VALUE_MONE: vect_chg_sgn(v);
-	    break;
-	default: v = vect_multiply(v, lambda);
-	}
+	if (value_notone_p(lambda))
+	    if (value_mone_p(lambda))
+		vect_chg_sgn(v);
+	    else 
+		v = vect_multiply(v, lambda);
     }
     else
-	switch(lambda) {
-	case 1: 
+	if (value_one_p(lambda)) /* == 1 */
 	    for(cu=u ;cu!=NULL;cu=cu->succ) 
-		vect_add_elem(&v,var_of(cu), val_of(cu));
-	    break;
-	case -1: 
+		vect_add_elem(&v, var_of(cu), val_of(cu));
+	else if (value_mone_p(lambda)) /* == -1 */
 	    for(cu=u ;cu!=NULL;cu=cu->succ) 
-		vect_add_elem(&v,var_of(cu), -val_of(cu));
-	    break;
-	default: 
+		vect_add_elem(&v, var_of(cu), value_uminus(val_of(cu)));
+	else
 	    for(cu=u ;cu!=NULL;cu=cu->succ) {
-		if (ofl_ctrl == NO_OFL_CTRL) {
-		    assert(ABS(lambda)<VALUE_MAX/ABS(val_of(cu)));
-		}
-		else {
-		    if (!(ABS(lambda)<VALUE_MAX/ABS(val_of(cu))))
+		/* this could/should be in value_mult!
+		 */
+		if (ofl_ctrl != NO_OFL_CTRL) 
+		    if (!value_lt(value_abs(lambda),
+				  value_div(VALUE_MAX,
+					    value_abs(val_of(cu)))))
 			longjmp(overflow_error, 5);
-		}
 
-		vect_add_elem(&v,var_of(cu),lambda*val_of(cu));
+		vect_add_elem(&v, var_of(cu), value_mult(lambda,val_of(cu)));
 	    }
-	}
-
-    return(v);
+    
+    return v;
 }
 
 
@@ -137,7 +132,7 @@ Pvecteur v;
 Value lambda;
 Pvecteur u;
 {
- return(vect_cl_ofl_ctrl(v,lambda,u,FWD_OFL_CTRL));
+    return vect_cl_ofl_ctrl(v, lambda, u, FWD_OFL_CTRL);
 }
 
 Pvecteur vect_cl(v,lambda,u)
@@ -145,7 +140,7 @@ Pvecteur v;
 Value lambda;
 Pvecteur u;
 {
- return(vect_cl_ofl_ctrl(v,lambda,u,NO_OFL_CTRL));
+    return vect_cl_ofl_ctrl(v, lambda, u, NO_OFL_CTRL);
 }
 
 /* Pvecteur vect_cl2_ofl(Value x1, Pvecteur v1, Value x2, Pvecteur v2):
@@ -163,7 +158,7 @@ Pvecteur u;
  * return v;
  *
  */
-Pvecteur vect_cl2_ofl_ctrl(x1,v1,x2,v2, ofl_ctrl)
+Pvecteur vect_cl2_ofl_ctrl(x1, v1, x2, v2, ofl_ctrl)
 Value x1;
 Pvecteur v1;
 Value x2;
@@ -262,11 +257,11 @@ Pvecteur v2;
     }
     else {
 	if (cv_v1<VALUE_ZERO) {
-	    v3 = vect_cl2(-cv_v1,v2,cv_v2,v1);
-	    vect_chg_coeff(&v3,v,-cv_v2);
+	    v3 = vect_cl2(value_uminus(cv_v1),v2,cv_v2,v1);
+	    vect_chg_coeff(&v3,v,value_uminus(cv_v2));
 	}
 	else {
-	    v3 = vect_cl2(cv_v1,v2,-cv_v2,v1);
+	    v3 = vect_cl2(cv_v1,v2,value_uminus(cv_v2),v1);
 	    vect_chg_coeff(&v3,v,cv_v2);
 	}
 	vect_rm(v2);
