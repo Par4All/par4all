@@ -126,12 +126,16 @@ static SatMatrix *SMAlloc(int rows,int cols) {
  * Free the memory space occupied by saturation matrix. 
  */ 
 static void SMFree (SatMatrix **matrix) {
+  SatMatrix *SM = *matrix;
 
-  if (matrix[0]){ 
-  free ((char *) matrix[0]->p_init);
-  free ((char *) matrix[0]->p);
-  free ((char *) matrix[0]);
-  matrix[0]=NULL;}
+  if (SM) { 
+    if (SM->p) {
+      free ((char *) SM->p_init);
+      free ((char *) SM->p);
+    }
+    free ((char *) SM);
+    *matrix = NULL;
+  }
 } /* SMFree */
 
 /*
