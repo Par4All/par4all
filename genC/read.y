@@ -382,13 +382,12 @@ enter_tabulated_def(
 }
 
 /* MAKE_DEF defines the object CHUNK of name STRING to be in the tabulation 
-   table INT.
+   table INT. domain translation is handled before in Chunk.
  */
 static gen_chunk * make_def(gen_chunk * gc)
 {
   int domain = gc->i;
   char * id = strdup((gc+2)->s);
-  domain = gen_type_translation_old_to_actual(domain);
   message_assert("domain is tabulated", Domains[domain].index!=-1);
   return enter_tabulated_def(Domains[domain].index, domain, id, gc, 
 			     allow_forward_ref) ;
