@@ -1,7 +1,9 @@
 /* -- privatize.c 
 
    This algorithm introduces local definitions into loops that are
-   kennedizable. */
+   kennedizable.
+
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -135,10 +137,13 @@ static list loop_prefix(list l1, list l2)
 
 static void update_locals(list prefix, list ls, entity e)
 {
+  debug(1, "update_locals", "Begin\n");
+
     if( ENDP( prefix )) {
-	if( get_debug_level() > 0 ) {
-	    fprintf( stderr, "Removing %s", entity_name( e )) ;
-	    fprintf( stderr, " from " ) ;
+      if(ENDP(ls)) {
+	ifdebug(1) {
+	    debug(1, "update_locals", "Removing %s", entity_name( e )) ;
+	    fprintf( stderr, " from locals of " ) ;
 	    MAPL( sts, {statement st = STATEMENT( CAR( sts )) ;
 			
 			fprintf( stderr, "%d ", statement_number( st )) ;},
@@ -151,12 +156,21 @@ static void update_locals(list prefix, list ls, entity e)
 		    pips_assert( "remove_local", instruction_loop_p( i )) ;
 		    gen_remove( &loop_locals( instruction_loop( i )), e );},
 	      ls ) ;
+      }
+      else {
+	debug(1, "update_locals", "ls is empty, end of recursion\n");
+      }
     }
     else {
 	pips_assert( "update_locals", 
 		     STATEMENT( CAR( prefix )) == STATEMENT( CAR( ls ))) ;
+
+	debug(1, "update_locals", "Recurse on common prefix\n");
+
 	update_locals( CDR( prefix ), CDR( ls ), e ) ;
     }
+
+  debug(1, "update_locals", "End\n");
 }
 
 /* expression_implied_do_index_p
@@ -223,11 +237,17 @@ static bool expression_implied_do_index_p(expression exp,entity e)
 bool is_implied_do_index(entity e, instruction ins)
 {
   bool li = FALSE;
-  debug(5,"is_implied_do_index","entity name: %s\n", entity_name( e )) ;
+
+  debug(5,"is_implied_do_index","entity name: %s ", entity_name( e )) ;
+
   if (instruction_call_p(ins))
     MAP(EXPRESSION,exp,{
       if (expression_implied_do_index_p(exp,e)) li=TRUE;
     },call_arguments( instruction_call( ins ) ));
+
+  ifdebug(5)
+    fprintf(stderr, "%s\n", bool_to_string(li));
+
   return li;
 }
 
@@ -242,11 +262,15 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
     if( !entity_scalar_p( e )) {
 	return ;
     }
+
     ls = load_statement_enclosing_loops(st);
-    if( get_debug_level() > 0 ) {
-	fprintf( stderr, "Trying to privatize %s in statement %d\n", 
-		entity_name( e ), statement_number( st )) ;
+
+    ifdebug(1) {
+      debug(1, "try_privatize", "Trying to privatize %s in statement %d with local(s) ",
+	    entity_local_name( e ), statement_number( st )) ;
+      print_arguments(loop_locals(statement_loop(st)));
     }
+
     MAPL( succs, {
 	successor succ = SUCCESSOR( CAR( succs )) ;
 	vertex succ_v = successor_vertex( succ ) ;
@@ -279,7 +303,10 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 	       is_implied_do_index( e, succ_i))) {
 		continue ;
 	    }
-	    debug(5,"try_privatize","update...\n");
+	    debug(5,"try_privatize","Conflict for %s between statements %d and %d\n",
+		  entity_local_name(e), statement_number(st), statement_number(succ_st));
+	    debug(5,"try_privatize","remove %s from locals in enclosing loops\n",
+		  entity_local_name(e));
 	    prefix = loop_prefix( ls, succ_ls ) ;
 	    update_locals( prefix, ls, e ) ;
 	    update_locals( prefix, succ_ls, e ) ;
@@ -288,6 +315,8 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 	     dg_arc_label_conflicts( arc_l )) ;
     },
 	 vertex_successors( v )) ;
+
+    debug(1, "try_privatize", "End\n");
 }
 
 /* PRIVATIZE_DG looks for definition of entities that are locals to the loops
@@ -326,9 +355,12 @@ bool privatize_module(char *mod_name)
 	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
 
     debug_on("PRIVATIZE_DEBUG_LEVEL");
+
+    /* Build maximal lists of private variables in loop locals */
     /* scan_unstructured(instruction_unstructured(mod_inst), NIL); */
     scan_statement(mod_stat, NIL);
 
+    /* remove non private variables from locals */
     MAPL( vs, {
 	vertex v = VERTEX( CAR( vs )) ;
 	dg_vertex_label vl = (dg_vertex_label) vertex_vertex_label( v ) ;
