@@ -1,6 +1,6 @@
 /* package sc 
  * $RCSfile: sc_elim_simple_redund.c,v $ (version $Revision$)
- * $Date: 1996/08/07 13:41:37 $, 
+ * $Date: 2001/10/22 16:09:39 $, 
  */
 
 #include <stdio.h>
@@ -261,11 +261,23 @@ boolean process_equalities;
  *
  * ou   c1/    0 == 0
  *
+ * Si on a A=0 et b!=0, on detecte une non-faisabilite.
+ *
+ * Si on a Ax - b == 0 et Ax - b' == 0 et b!=b', on detecte une non-faisabilite.
+ *
  * Pour les inegalites, on elimine une inequation si on a un systeme 
  * d'inegalites de la forme :
  *  
- *   a2/    Ax - b <= c,             ou   b2/     0 <= const  (avec const >=0)
- *          Ax - b <= c             
+ *   a2/    Ax - b <= 0,             ou   b2/     0 <= const  (avec const >=0)
+ *          Ax - b <= 0
+ *
+ * Une inegalite peut etre redondante ou incompatible avec une egalite:
+ *
+ *   a3/    Ax - b == 0,             ou   b3/     b - Ax == 0,
+ *          Ax - c <= 0,                          Ax - c <= 0
+ *          b - c <= 0                            b - c <= 0
+ *
+ * on detecte une non-faisabilite si b - c > 0.
  *
  *  resultat retourne par la fonction :
  *
@@ -291,49 +303,135 @@ boolean process_equalities;
 Psysteme sc_elim_db_constraints(ps)
 Psysteme ps;
 {
-    Pcontrainte
-	eq1 = NULL,
-	eq2 = NULL;
+  Pcontrainte
+    eq1 = NULL,
+    ineq1 = NULL,
+    eq2 = NULL;
 
-    if (SC_UNDEFINED_P(ps)) 
-	return(NULL);
+  if (SC_UNDEFINED_P(ps)) 
+    return(SC_UNDEFINED);
 
-    for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) 
-    {
-	if ((vect_size(eq1->vecteur) == 1) && 
-	    (eq1->vecteur->var == 0) && (eq1->vecteur->val != 0)) 
-	{
-	    /* b = 0 */
+  for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) {
+    vect_normalize(eq1->vecteur);
+  }
+
+  for (ineq1 = ps->inegalites; ineq1 != NULL;ineq1 = ineq1->succ) {
+    (void) contrainte_normalize(ineq1, FALSE);
+  }
+
+  for (eq1 = ps->egalites; eq1 != NULL; eq1 = eq1->succ) {
+    if ((vect_size(eq1->vecteur) == 1) && 
+	(eq1->vecteur->var == 0) && (eq1->vecteur->val != 0)) {
+      /* b = 0 */
+      sc_rm(ps);
+      return(SC_EMPTY);
+    }
+
+    for (eq2 = eq1->succ; eq2 != NULL;eq2 = eq2->succ) {
+      if (egalite_equal(eq1, eq2))
+	eq_set_vect_nul(eq2);
+      else if(vect_equal_except(eq1->vecteur,eq2->vecteur, TCST)) {
+	/* deux equations ne differant que par leurs termes constants */
+	sc_rm(ps);
+	return(SC_EMPTY);
+      }
+    }
+  }
+
+  for (eq1 = ps->inegalites; eq1 != NULL;eq1 = eq1->succ) {
+    if ((vect_size(eq1->vecteur) == 1) && (eq1->vecteur->var == TCST)) {
+      if (value_negz_p(val_of(eq1->vecteur))) {
+	vect_rm(eq1->vecteur);
+	eq1->vecteur = NULL;
+      }
+      else {
+	/* 0 <= b < 0 */
+	sc_rm(ps);
+	return(SC_EMPTY);
+      }
+    }
+	
+    for (eq2 = eq1->succ;eq2 != NULL;eq2 = eq2->succ) {
+      if (contrainte_equal(eq1,eq2)) {
+	eq_set_vect_nul(eq2);
+      }
+      else if(eq_smg(eq1,eq2)) {
+	if(vect_coeff(TCST, contrainte_vecteur(eq1))
+	   > vect_coeff(TCST, contrainte_vecteur(eq2)))
+	  eq_set_vect_nul(eq2);
+	else
+	  /* opposite STRICT inequality or contrainte_equal() would have
+             caught it */
+	  eq_set_vect_nul(eq1);
+      }
+      else {
+	Pvecteur sum = vect_add(contrainte_vecteur(eq1),
+				contrainte_vecteur(eq2));
+
+	if(VECTEUR_NUL_P(sum)) {
+	  /* inequalities eq1 and eq2 define an equality */
+	  Pcontrainte eq = contrainte_make(vect_dup(contrainte_vecteur(eq1)));
+
+	  /* No need to update the basis since it used to be an inequality */
+	  sc_add_egalite(ps, eq);
+	  eq_set_vect_nul(eq1);
+	  eq_set_vect_nul(eq2);
+	}
+	else if(vect_constant_p(sum)) {
+	  if(value_pos_p(vect_coeff(TCST, sum))) {
+	    /* These inequalities are incompatible and the system is not satisfiable */
+	    vect_rm(sum);
+	    sc_rm(ps);
+	    return(SC_EMPTY);
+	  }
+	}
+	vect_rm(sum);
+      }
+    }
+  }
+
+  for (ineq1 = ps->inegalites; ineq1 != NULL;ineq1 = ineq1->succ) {
+    for (eq2 = ps->egalites; eq2 != NULL; eq2 = eq2->succ) {
+      Pvecteur diff1 = vect_add(contrainte_vecteur(ineq1), contrainte_vecteur(eq2));
+
+      if (VECTEUR_NUL_P(diff1)) {
+	  vect_rm(ineq1->vecteur);
+	  ineq1->vecteur = NULL;
+      }
+      else if(vect_constant_p(diff1)) {
+	if (value_neg_p(vecteur_val(diff1))) {
+	  vect_rm(ineq1->vecteur);
+	  ineq1->vecteur = NULL;
+	}
+	else {
+	  /* 0 < b <= 0 */
+	  vect_rm(diff1);
+	  sc_rm(ps);
+	  return(NULL);
+	}
+      }
+      else {
+	Pvecteur diff2 = vect_substract(contrainte_vecteur(ineq1), contrainte_vecteur(eq2));
+
+	if (vect_constant_p(diff2)) {
+	  if (VECTEUR_NUL_P(diff2) || value_neg_p(vecteur_val(diff2))) {
+	    vect_rm(ineq1->vecteur);
+	      ineq1->vecteur = NULL;
+	  }
+	  else {
+	    /* 0 < b <= 0 */
+	    vect_rm(diff2);
 	    sc_rm(ps);
 	    return(NULL);
+	  }
 	}
-
-	for (eq2 = eq1->succ; eq2 != NULL;eq2 = eq2->succ)
-	    if (egalite_equal(eq1, eq2))
-		eq_set_vect_nul(eq2);
+	vect_rm(diff2);
+      }
+      vect_rm(diff1);
     }
+  }
+  sc_elim_empty_constraints(ps, TRUE);
+  sc_elim_empty_constraints(ps, FALSE);
 
-    for (eq1 = ps->inegalites; eq1 != NULL;eq1 = eq1->succ)
-    {
-	if ((vect_size(eq1->vecteur) == 1) && (eq1->vecteur->var == 0))
-	    if (value_negz_p(val_of(eq1->vecteur)))
-		vect_rm(eq1->vecteur),
-		eq1->vecteur = NULL;
-	    else
-	    {
-		/* 0 <= b < 0 */
-		sc_rm(ps);
-		return(NULL);
-	    }
-	
-	for (eq2 = eq1->succ;eq2 != NULL;eq2 = eq2->succ)
-	    if (contrainte_equal(eq1,eq2))
-		eq_set_vect_nul(eq2);
-    }
-
-    sc_elim_empty_constraints(ps, TRUE);
-    sc_elim_empty_constraints(ps, FALSE);
-
-    return (ps);
+  return (ps);
 }
-
