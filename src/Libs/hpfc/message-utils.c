@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1995/07/20 18:40:41 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1995/09/15 15:54:17 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -88,18 +88,17 @@ list l;
 list dup_list_of_Pvecteur(l)
 list l;
 {
-    list
-	result = NIL;
+    list result = NIL;
 
     MAPL(cv,
      {
-	 Pvecteur v = PVECTOR(CAR(cv));
-
-	 result = gen_nconc(result, CONS(PVECTOR, vect_dup(v), NIL));
+	 Pvecteur v = (Pvecteur) PVECTOR(CAR(cv));
+	 
+	 result = gen_nconc(result, CONS(PVECTOR, (VECTOR) vect_dup(v), NIL));
      },
 	 l);
 
-    return(result);
+    return result;
 }
 
 /* list add_elem_to_list_of_Pvecteur(l, var, val)
@@ -110,34 +109,31 @@ list add_elem_to_list_of_Pvecteur(l, var, val)
 list l;
 int var, val;
 {
-    list
-	result = NIL;
+    list result = NIL;
 
     if (ENDP(l)) 
-	return(CONS(PVECTOR, vect_new((Variable) var, val), NIL));
+	return CONS(PVECTOR, (VECTOR) vect_new((Variable) var, val), NIL);
 
     if ((var==0) || (val==0))
-	return(l);
+	return l;
 
     /* else */
 
     MAPL(cv,
      {
-	 Pvecteur
-	     v = PVECTOR(CAR(cv));
+	 Pvecteur v = (Pvecteur) PVECTOR(CAR(cv));
 
-	 debug(9, "add_elem_to_list_of_Pvecteur",
-	       "size of vector %x is %d\n", (int) v, vect_size(v));
+	 pips_debug(9, "size of vector %x is %d\n", (int) v, vect_size(v));
 
 	 vect_add_elem(&v, (Variable) var, val);
 	 
-	 result = gen_nconc(result, CONS(PVECTOR, v, NIL));
+	 result = gen_nconc(result, CONS(PVECTOR, (VECTOR) v, NIL));
      },
 	 l);
 
     gen_free_list(l);
 
-    return(result);
+    return result;
 }
     
 
@@ -148,10 +144,8 @@ entity array;
 int dim;
 range r;
 {
-    entity
-	newarray = load_new_node(array);
-    dimension
-	d = FindIthDimension(newarray, dim);
+    entity newarray = load_new_node(array);
+    dimension d = FindIthDimension(newarray, dim);
     int
 	rlo = HpfcExpressionToInt(range_lower(r)),
 	rup = HpfcExpressionToInt(range_upper(r)),
