@@ -414,6 +414,7 @@ char *module_name;
     /* should be the dynamic call site count...*/
     /* if(call_site_count( get_current_module_entity() )<=1) */
     /* Let's assume static initializations (FI, 14 September 1993) */
+
     if(entity_main_module_p(get_current_module_entity()))
 	if (get_bool_property(SEMANTICS_INTERPROCEDURAL))
 	    pre = (transformer)
@@ -428,7 +429,8 @@ char *module_name;
     /* DRET demo: I cancel top-down propagation - missing binding
        take away FALSE in below test later, 23/4/90 */
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	transformer ip = load_summary_precondition( get_current_module_entity() );
+	transformer ip = 
+	    load_summary_precondition(get_current_module_entity());
 	if( ip == transformer_undefined) {
 	    /* that might be because we are at the call tree root
 	       or because no information is available;
@@ -440,12 +442,14 @@ char *module_name;
 	    ;
 	}
 	else {
-	    /* convert global variables in the summary precondition in the local frame
-	     * as defined by value mappings (FI, 31 January 1994) */
+	    /* convert global variables in the summary precondition in the
+	     * local frame as defined by value mappings (FI, 31 January 1994) 
+	     */
 	    translate_global_values(get_current_module_entity(), ip);
 	    ifdebug(8) {
-		(void) fprintf(stderr,"module_name_to_preconditions\n");
-		(void) fprintf(stderr,"\t summary_precondition %p after translation:\n",
+		(void) fprintf(stderr,
+			     "module_name_to_preconditions\n"
+			     "\t summary_precondition %p after translation:\n",
 			       ip);
 		(void) print_transformer(ip);
 	    }
@@ -469,11 +473,10 @@ char *module_name;
 			   strdup(module_name), 
 			   (char*) get_precondition_map() );
 
-    debug(8, "module_name_to_preconditions",
-	  "postcondition computed for %s\n", 
+    pips_debug(8, "postcondition computed for %s\n", 
 	  entity_local_name( get_current_module_entity() ));
     ifdebug(8) (void) print_transformer(post);
-    debug(1, "module_to_preconditions", "end\n");
+    debug(1, "module_name_to_preconditions", "end\n");
 
     reset_current_module_entity();
     reset_current_module_statement();
