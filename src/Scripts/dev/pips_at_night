@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/08/07 09:08:59 $, )
+# ($Date: 1996/08/07 09:17:06 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -51,8 +51,8 @@ usage()
 	  This shell script checks pips sources and functionalities.
 	  It is intended to be run from cron at night, hence its name.
 	  It cleans pips directories, recompiles newgen, linear and pips
-	  for various "architectures" and validates. Reports about success
-	  and failures are sent. 
+	  for various "architectures" and validates. Reports about 
+	  successes or failures are sent. 
 	Summary of options:
 	  -h: this help
 	  -v: verbose
