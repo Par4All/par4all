@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1997/02/18 10:07:51 $, ) 
+ * ($Date: 1997/02/18 10:42:05 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -815,8 +815,14 @@ set_live_status(
 static statement 
 update_runtime_for_remapping(entity trg)
 {
+    statement s = set_live_status(trg, TRUE);
+
+    statement_comments(s) = strdup(concatenate(
+	"! direct remapping for ", 
+	entity_local_name(load_primary_entity(trg)), "\n", NULL));
+
     return make_block_statement
-	(CONS(STATEMENT, set_live_status(trg, TRUE),
+	(CONS(STATEMENT, s,
          CONS(STATEMENT, set_array_status_to_target(trg), NIL)));
 }
 
@@ -1210,7 +1216,7 @@ root_statement_remapping_inits(
     /* LIVENESS(...) = .FALSE.
      */
     MAP(ENTITY, array,
-	if (primary_entity_p(array))
+	if (bound_dynamic_hpf_p(array) && primary_entity_p(array))
 	    ls = CONS(STATEMENT, generate_all_liveness(array, FALSE), ls),
 	le);
 
