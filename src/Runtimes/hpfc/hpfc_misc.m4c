@@ -1,9 +1,10 @@
 /* a set a functions to print the host and node status in PVM,
- * called from a Fortran subroutine.
+ * called from a Fortran subroutine. Plus some timer functions.
+ * Portability based on pvm m4 macros.
  *
  * also include functions for timings...
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/01 15:33:09 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/04 17:18:28 $, )
  * version $Revision$
  *
  * Fabien Coelho, June 1993
@@ -54,7 +55,7 @@ which_task(int ti_tid, int ntask, struct pvmtaskinfo *taskp)
 }
 
 void 
-print_host_info_ ()
+FUNCTION(print_host_info) ARGS(`')
 {
     int i, info, nhost, narch;
     struct pvmhostinfo *hostp;
@@ -75,7 +76,8 @@ print_host_info_ ()
 }
 
 void 
-print_task_info_ (int *number, int *tids, int *hosttid)
+FUNCTION(print_task_info) ARGS(`number, tids, hosttid')
+int *number, int *tids, int *hosttid;
 {
     int i, info, nhost, narch, ntask;
     struct pvmtaskinfo *taskp;
@@ -118,30 +120,26 @@ static struct timeval initial;
 static int is_timer_on = 0;
 
 void
-hpfc_timeon_()
+FUNCTION(hpfc_timeon) ARGS(`')
 {
     assert(!is_timer_on);
-    if (!gettimeofday(&initial, (struct timezone *) NULL))
-	fprintf(stderr, "gettimeofday error");
+    if (gettimeofday(&initial, (struct timezone *) NULL))
+	fprintf(stderr, "gettimeofday error\n");
     is_timer_on = 1;
 }
 
 void 
-hpfc_timeoff_()
+FUNCTION(hpfc_timeoff) ARGS(`STRING_ARG(comment)')
+STRING_ARG_DECL(comment);
 {
     struct timeval current;
-    long seconds, micros;
 
     assert(is_timer_on);
-    if (!gettimeofday(&current, (struct timezone *) NULL))
-	fprintf(stderr, "gettimeofday error");
+    if (gettimeofday(&current, (struct timezone *) NULL))
+	fprintf(stderr, "gettimeofday error\n");
 
-    seconds = current.tv_sec-initial.tv_sec;
-    micros  = current.tv_usec-initial.tv_usec;
-
-    fprintf(stderr, "wall clock time: %ld.%6ld\n",
-	    current.tv_sec-initial.tv_sec,
-	    current.tv_usec-initial.tv_usec);
+    fprintf(stderr, "%s (wall clock time): %ld.%6ld\n", comment,
+	    current.tv_sec-initial.tv_sec, current.tv_usec-initial.tv_usec);
 
     is_timer_on = 0;
 }
