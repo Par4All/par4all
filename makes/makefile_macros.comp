@@ -15,8 +15,11 @@ FC	= f77
 FFLAGS	= -O -g
 LINT	= lint
 LINTFLAGS= -habxu
-YACC	= yacc
-YFLAGS	=
+
+# The parser can no longer be compiled with yacc...
+YACC	= bison
+YFLAGS	= -y
+
 PROTO   = cproto
 PRFLAGS    = -evcf2
 
