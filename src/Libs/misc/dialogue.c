@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <varargs.h>
+#include <setjmp.h>
 
 /*VARARGS0*/
 void dialogue(va_alist)
