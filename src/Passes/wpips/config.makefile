@@ -15,7 +15,8 @@
 CPPFLAGS +=	-DLARGE_FONTS \
 		$(WPIPS_ADDED_CPPFLAGS) \
 		$(PIPS_X11_ADDED_CPPFLAGS) \
-		-DUTC_DATE='"$(UTC_DATE)"'
+		-DUTC_DATE='"$(UTC_DATE)"' \
+		-DOWTOOLKIT_WARNING_DISABLED
 
 # Current version of XView is not quite ANSI... :-)
 # CANSI = -pedantic
