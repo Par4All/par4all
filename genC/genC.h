@@ -130,7 +130,11 @@ extern void gen_clear_tabulated_element GEN_PROTO(( chunk * )) ;
 extern chunk *gen_copy_tree GEN_PROTO(( chunk * )) ;
 extern int gen_consistent_p GEN_PROTO(( chunk * )) ;
 extern char *alloc GEN_PROTO ((int )) ;
-extern bool gen_true GEN_PROTO((chunk *)) ; /* instead of previous ... */
+
+/*  recursion and utilities
+ */
+extern bool gen_true GEN_PROTO((chunk *)) ; /* was ... */
+extern bool gen_false GEN_PROTO((chunk *)) ;
 extern void gen_null GEN_PROTO((chunk *)) ; /* was ... */
 
 extern void gen_recurse_stop GEN_PROTO((chunk *));
