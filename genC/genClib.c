@@ -132,7 +132,7 @@ void gen_close_Gen_tabulated_names(void)
 #define check_Gen_tabulated_names() \
   message_assert("Gen_tabulated_names defined", Gen_tabulated_names)
 
-static char * build_unique_tabulated_name(int domain, char * name)
+char * gen_build_unique_tabulated_name(int domain, char * name)
 {
     int len = strlen(name);
 
@@ -155,7 +155,7 @@ static char * build_unique_tabulated_name_for_obj(gen_chunk * obj)
 {
     char * name = (obj+HASH_OFFSET)->s;
     int domain = quick_domain_index(obj);
-    return build_unique_tabulated_name(domain, name);
+    return gen_build_unique_tabulated_name(domain, name);
 }	
 
 /* deletes obj from the tabulated names...
@@ -175,7 +175,7 @@ void gen_delete_tabulated_name(gen_chunk * obj)
 
 char * gen_get_tabulated_name_basic(int domain, char * id)
 {
-    char * key = build_unique_tabulated_name(domain, id);
+    char * key = gen_build_unique_tabulated_name(domain, id);
     check_Gen_tabulated_names();
     return hash_get(Gen_tabulated_names, key);
 }
@@ -195,7 +195,7 @@ char * gen_get_tabulated_name_direct(char * key)
 
 void gen_put_tabulated_name(int domain, char * name, char * val)
 {
-    char * key = build_unique_tabulated_name(domain, name);
+    char * key = gen_build_unique_tabulated_name(domain, name);
     check_Gen_tabulated_names();
     hash_put(Gen_tabulated_names, strdup(key), val);
 }
@@ -1828,7 +1828,7 @@ union domain *dp ;
 	putc('A', user_file);
 	return !GO;
       }
-      (void) fprintf(user_file, "$%d ", array_size(dp->ar.dimensions));
+      fputci('$', array_size(dp->ar.dimensions), user_file);
       break ;
     }
     return GO;
@@ -2612,8 +2612,7 @@ gen_chunk *obj ;
     return( error_seen  == 0 ) ;
 }
 
-int
-gen_tabulated_consistent_p(int domain)
+int gen_tabulated_consistent_p(int domain)
 {
     struct gen_binding *bp = &Domains[ domain ];
     gen_chunk * t = Gen_tabulated_[bp->index];
@@ -2621,34 +2620,25 @@ gen_tabulated_consistent_p(int domain)
 
     for (i=0; i<size; i++)
     {
-	if (t[i].p && !gen_chunk_undefined_p(t[i].p)) {
-	    /* fprintf(stderr, "consistence of [%d] (0x%x) %s \n", i,
-		    (unsigned int) t[i].p, ((t[i].p)+2)->s); */
-	    
-	    gen_consistent_p(t[i].p);
-	}
+      if (t[i].p && !gen_chunk_undefined_p(t[i].p))
+	gen_consistent_p(t[i].p);
     }
-
+    
     return 1;
 }
 
 /* GEN_DEFINED_P checks that the OBJect is fully defined 
 */
-static void
-defined_null( bp )
-struct gen_binding *bp ;
+static void defined_null(struct gen_binding * bp)
 {
     union domain *dp = bp->domain ;
-
     user( "", (char *)NULL ) ;
     (void) fprintf( stderr, "gen_defined_p: Undefined object of type < " );
     print_domain( stderr, dp ) ;
     (void) fprintf( stderr, "> found\n" ) ;
 }
   
-int
-gen_defined_p( obj )
-gen_chunk *obj ;
+int gen_defined_p(gen_chunk * obj)
 {
     struct driver dr ;
 
@@ -2990,14 +2980,10 @@ static gen_tables
     DirectDomainsTable, 
     DecisionTables;
 
-static void
-print_decision_table(t)
-GenDecisionTableType t;
+static void print_decision_table(GenDecisionTableType t)
 {
     int i;
-    
     fprintf(stderr, "[print_decision_table] %p\n", t);
-
     for (i=0; i<MAX_DOMAIN; i++)
 	if (t[i]) fprintf(stderr, "  go through %s\n", Domains[i].name);
 }
@@ -3010,9 +2996,7 @@ GenDecisionTableType t;
  * worst case complexity if O(n^2) for each requested domain.
  * the closure is shorten because already computed tables are used.
  */
-static void 
-initialize_domain_DecisionTables(domain)
-int domain;
+static void initialize_domain_DecisionTables(int domain)
 {
     GenDecisionTableType not_used;
     int i, j;
