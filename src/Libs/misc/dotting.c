@@ -13,12 +13,15 @@
   * (Francois Irigoin, Bruno Baron, ?? ???? 1990)
   */
 
+#include <stdlib.h>
 #include <stdio.h>
+/*
 extern int fflush();
 extern int _flsbuf();
 extern int vfprintf(FILE *stream, char *format, ...);
 extern unsigned int alarm(unsigned int seconds);
-#include <varargs.h>
+*/
+#include <stdarg.h>
 #include <signal.h>
 
 #include "genC.h"
@@ -28,6 +31,7 @@ extern unsigned int alarm(unsigned int seconds);
 static FILE * dotting_file;
 static char dotting_character;
 
+/*
 static void print_dot()
 {
     if (dotting_file == stdout) 
@@ -38,6 +42,7 @@ static void print_dot()
     }
     alarm(1);
 }
+*/
 
 /* start_dotting: the profile should be changed and varargs used so as
  * to let user emit the initial message as with a fprintf
@@ -47,31 +52,30 @@ static void print_dot()
  */
 
 /*VARARGS3*/
-void start_dotting(va_alist)
-va_dcl
+void
+start_dotting(FILE * dotting_file,
+              char dotting_character,
+              char * fmt,
+              ...)
 {
-    char *fmt;
-    va_list args;
+   va_list args;
 
-    va_start(args);
-    dotting_file = va_arg(args, FILE *);
-    dotting_character = (char) va_arg(args, int);
-    fmt= va_arg(args, char *);
+   va_start(args, fmt);
 
-    if (dotting_file == stdout) 
-	(* pips_log_handler)(fmt, args);
-    else {
-	vfprintf(dotting_file, fmt, args);
-	if(dotting_file!=stderr) fflush(dotting_file);
-    }
-    va_end(args);
+   if (dotting_file == stdout) 
+      (* pips_log_handler)(fmt, args);
+   else {
+      vfprintf(dotting_file, fmt, args);
+      if(dotting_file!=stderr) fflush(dotting_file);
+   }
+   va_end(args);
 /*
-    if((int) signal(SIGALRM, print_dot)==-1) {
-	pips_error("start_dotting", "signal error\n");
-	exit(1);
-    }
-    alarm(1);
-*/
+  if((int) signal(SIGALRM, print_dot)==-1) {
+  pips_error("start_dotting", "signal error\n");
+  exit(1);
+  }
+  alarm(1);
+  */
 }
 
 void stop_dotting()
