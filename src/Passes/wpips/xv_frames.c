@@ -7,6 +7,7 @@
 #include <types.h>
 
 #include "genC.h"
+#include "misc.h"
 #include "wpips.h"
 #include "xv_sizes.h"
 
