@@ -298,12 +298,9 @@ static void handle_file(FILE * f) /* process f for includes and nones */
 {
     char line[LINE_LENGTH];
     regmatch_t matches[2]; /* matched strings */
-    int nline = 0;
 
     while (fgets(line, LINE_LENGTH, f))
     {
-	nline++;
-	
 	if (!regexec(&include_file_rx, line, 2, matches, 0))
 	{
 	    line[matches[1].rm_eo]='\0';
