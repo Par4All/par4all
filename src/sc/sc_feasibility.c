@@ -8,13 +8,13 @@
  * 
  * - s or sc is the system of constraints.
  * - ofl_ctrl is the way overflow errors are handled
- *     ofl_error == NO_OFL_CTRL
+ *     ofl_ctrl == NO_OFL_CTRL
  *               -> overflow errors are not handled
- *     ofl_error == OFL_CTRL
+ *     ofl_ctrl == OFL_CTRL
  *               -> overflow errors are handled in the called function
- *     ofl_error == FWD_OFL_CTRL
+ *     ofl_ctrl == FWD_OFL_CTRL
  *               -> overflow errors must be handled by the calling function
- * - ofl_res is the result of the feasibility test when ofl_error == OFL_CTRL
+ * - ofl_res is the result of the feasibility test when ofl_ctrl == OFL_CTRL
  *   and there is an overflow error.
  * - integer_p (low_level function only) is a boolean :
  *     integer_p == TRUE to test if there exists at least one integer point 
