@@ -12,6 +12,10 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.146  2000/10/11 14:44:56  irigoin
+%% Properties SEMANTICS_TRUST_ARRAY_DECLARATIONS and
+%% SEMANTICS_TRUST_ARRAY_REFERENCES added.
+%%
 %% Revision 1.145  2000/09/22 11:16:45  nguyen
 %% *** empty log message ***
 %%
@@ -143,7 +147,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2000/09/22 11:16:45 $~$
+$~$Date: 2000/10/11 14:44:56 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -961,6 +965,34 @@ No property for this library.
 \index{Precondition}
 \index{Transformer}
 
+
+\subsubsection{Array declarations and accesses}
+\index{SEMANTICS\_TRUST\_ARRAY\_DECLARATIONS}
+\index{SEMANTICS\_TRUST\_ARRAY\_REFERENCES}
+
+For every module, array declaration are assumed to be correct with respect
+to the standard: the upper bound must be greater than or equal to the
+lower bound. 
+
+This property is turned off by default because it might slow down PIPS
+quite a lot.
+
+\begin{verbatim}
+SEMANTICS_TRUST_ARRAY_DECLARATIONS FALSE
+\end{verbatim}
+
+For every module, array references are assumed to be correct with respect
+to the declarations: the subscript expressions must have values lower than
+or equal to the upper bound and greater than or equal to the lower bound.
+
+This property is turned off by default because it might slow down PIPS
+quite a lot.
+
+It is not implemented yet.
+
+\begin{verbatim}
+SEMANTICS_TRUST_ARRAY_REFERENCES FALSE
+\end{verbatim}
 
 \subsubsection{Flow Sensitivity}
 \index{Flow Sensitivity}
