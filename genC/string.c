@@ -138,6 +138,22 @@ char *s1, *s2;
     return(r);
 }
 
+char *strlower(s1, s2)
+char *s1, *s2;
+{
+    char *r = s1;
+
+    while (*s2) {
+	*s1 = (isupper(*s2)) ? tolower(*s2) : *s2;
+	s1++;
+	s2++;
+    }
+
+    *s1 = '\0';
+	
+    return(r);
+}
+
 string bool_to_string(b)
 bool b;
 {
