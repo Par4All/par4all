@@ -10,6 +10,9 @@
 #include "effects-simple.h"
 
 
+#define NB_SIMPLIFY_PASSES 2
+
+
 #define FLOW_DEPENDANCE 1
 #define ANTI_DEPENDANCE 2
 #define OUTPUT_DEPENDANCE 4
@@ -19,23 +22,20 @@
 /*
  * Definition of local variables
  */
-GENERIC_LOCAL_FUNCTION(has_level, persistant_statement_to_int)
-GENERIC_LOCAL_MAPPING(has_indices, list, statement)
-
-static list indices = NIL;    
-static int depth = 0;
 static int reference_level=0;
 static string current_module_name; /* Bad hack to avoid an argument 
 				      in icm_codegen.... */
 
+static bool expression_invariant = FALSE; 
+static set /* of entity */ invariant_entities = set_undefined;
+static set /* of statement */ statements_partialy_invariant = set_undefined;
 
+/*********************************************************** PRINT FUNCTIONS */
 
 
 /*
- * Utilities function
+ * Print a statement_to_effect table.
  */
-
-
 void 
 dump_sef(statement_effects se)
 {
@@ -57,6 +57,9 @@ dump_sef(statement_effects se)
 }
 
 
+/*
+ * Print a conflict.
+ */
 static void 
 prettyprint_conflict(FILE *fd, conflict c)
 {
@@ -74,6 +77,9 @@ prettyprint_conflict(FILE *fd, conflict c)
 }
 
 
+/*
+ * Print a successor.
+ */
 static void 
 prettyprint_successor(FILE *fd, successor su)
 {
@@ -88,6 +94,9 @@ prettyprint_successor(FILE *fd, successor su)
 }
 
 
+/*
+ * Print a vertex.
+ */
 static void 
 prettyprint_vertex(FILE *fd, vertex v)
 {
@@ -100,10 +109,122 @@ prettyprint_vertex(FILE *fd, vertex v)
 }
 
 
-
-static bool
-action_dependance_p(action s, action k, int dependance_type) 
+/*
+ * Print a entities list.
+ */
+void
+print_list_entities(list /* of entity */ l)
 {
+    MAP(ENTITY, e, { 
+	fprintf(stderr, "%s ", entity_name(e));
+    }, l);
+}
+
+
+/*********************************************************** MISC FUNCTIONS */
+
+
+/*
+ * Add statements from the vertex list to the statements set.
+ */
+static set /* of statement */
+vertices_to_statements(list /* of vertex */ vl, 
+		       set /* of statement */ss)
+{
+    MAP(VERTEX, v, {
+	ss = set_add_element(ss, ss, (char *) vertex_to_statement(v));
+    }, vl);
+
+    return ss;
+}
+
+
+static set /* of entity */
+invariant_vertex_to_invariant_entities(vertex v,
+				       set /* of entity */ rs)
+{
+    statement st = vertex_to_statement(v);
+    list /* of effect */ le = load_proper_rw_effects_list(st);
+
+    MAP(EFFECT, ef, {
+	if (effect_write_p(ef)) {
+	    entity e = reference_variable(effect_reference(ef));
+
+	    if (!set_belong_p(rs, (char *) v)) {
+		rs = set_add_element(rs, rs, (char *) e);
+	    }
+	}
+    }, le);
+
+    return rs;
+}
+
+
+/************************************************************ MAPPING TOOLS */
+
+
+GENERIC_LOCAL_FUNCTION(has_level, persistant_statement_to_int)
+GENERIC_LOCAL_MAPPING(has_indices, list, statement)
+
+static list indices = NIL;    
+static int depth = 0;
+
+
+/*
+ * Gen_multi_recurse hook.
+ * Set the depth and the indices list of the statement.
+ */
+static bool
+statement_mark(statement s)
+{
+     store_has_level(s, depth);
+     store_statement_has_indices(s, gen_nreverse(gen_copy_seq(indices)));
+     
+     return TRUE;
+}
+
+
+/*
+ * Gen_multi_recurse hook.
+ * Update the depth and the indices list when enter a loop.
+ */
+static bool
+loop_level_in (loop l) 
+{
+    entity index = loop_index(l);
+    indices = CONS(ENTITY, index, indices);
+    ++depth;
+
+    return TRUE;
+}
+
+
+/*
+ * Gen_multi_recurse hook.
+ * Update the depth and the indices list when exit a loop.
+ */
+static void
+loop_level_out (loop l) 
+{
+    list new_indices = CDR(indices);
+    free(indices);
+    indices = new_indices;
+    --depth;
+}
+
+
+/***************************************************** DEPENDANCES FUNCTIONS */
+
+
+/*
+ * Test if the conflict correspond to the given dependance type.
+ */
+static bool
+action_dependance_p(conflict c, int dependance_type) 
+{
+    action s = effect_action(conflict_source(c)) ;
+    action k = effect_action(conflict_sink(c)) ;
+
     return (((dependance_type & FLOW_DEPENDANCE) && 
 	     ((action_write_p(s) && action_read_p(k)))) ||
 	    ((dependance_type & ANTI_DEPENDANCE) && 
@@ -115,30 +236,18 @@ action_dependance_p(action s, action k, int dependance_type)
 }
 
 
-static set /* of statement */
-verticies_to_statements(list /* of vertex */ vl, 
-			set /* of statement */ss)
-{
-    MAP(VERTEX, v, {
-	ss = set_add_element(ss, ss, (char *) vertex_to_statement(v));
-    }, vl);
-
-    return ss;
-}
-
-
-
-/* This fonction test the existance of a dependances between 
- * two verticies v1, v2
- *  
- *  dependance_type is a bitfield which contains the kind of dependances
- *  level is the minimum level wanted
+/* 
+ * Test the existance of a given dependance between two vertices v1, v2. 
+ * 
+ * Note: 
+ * - dependance_type is a bitfield which contains the kind of dependance,
+ * - level is the minimum level wanted.
  */
 static bool
-dependance_verticies_p(vertex v1, vertex v2, int dependance_type, int level)
+dependance_vertices_p(vertex v1, vertex v2, int dependance_type, int level)
 {    
     ifdebug(9) {
-	debug(9, "dependance_verticies_p", "");
+	debug(9, "dependance_vertices_p", "");
 	
 	if (dependance_type & FLOW_DEPENDANCE) fprintf(stderr, "F ");
 	if (dependance_type & ANTI_DEPENDANCE) fprintf(stderr, "A ");
@@ -151,7 +260,6 @@ dependance_verticies_p(vertex v1, vertex v2, int dependance_type, int level)
 		statement_number(vertex_to_statement(v2))); 
     }
 
-
     MAP(SUCCESSOR, su, {
 	vertex s = successor_vertex(su);
 	if (s == v2) {
@@ -159,10 +267,7 @@ dependance_verticies_p(vertex v1, vertex v2, int dependance_type, int level)
 		if (conflict_cone(c) != cone_undefined) {
 		    MAP(INT, l, {
 			if (l >= level) {
-			    action s = effect_action(conflict_source(c)) ;
-			    action k = effect_action(conflict_sink(c)) ;
-
-			    if (action_dependance_p(s, k, dependance_type))
+			    if (action_dependance_p(c, dependance_type))
 			    {
 				ifdebug(9) { fprintf(stderr, "yes\n"); }
 				return TRUE;
@@ -179,6 +284,29 @@ dependance_verticies_p(vertex v1, vertex v2, int dependance_type, int level)
 }
 
 
+/*
+ * Test the existance of a given dependance from the vertex v with any other 
+ * vertices than v. 
+ */
+static bool
+exist_non_self_dependance_from_vertex_p(vertex v, 
+					int dependance_type, 
+					int level)
+{
+    MAP(SUCCESSOR, su, {
+	vertex y = successor_vertex(su);
+	if (v != y) {
+	    if (dependance_vertices_p(v, y, dependance_type, level))
+		return TRUE;
+	}
+    }, vertex_successors(v));
+
+    return FALSE;
+}
+
+/*
+ * Remove all levels between level_min and level_max from the list of levels.
+ */
 static list /* of level */
 remove_dependance_from_levels(list /* of level */ levels, 
 			      int level_min, 
@@ -192,18 +320,16 @@ remove_dependance_from_levels(list /* of level */ levels,
 	}
     }, levels);
 
-    /* supprime la liste *SANS* supprimer les element de la liste!!!!!!!!
-     * si la fonction gen_free_list() libere les elements, alors on va 
-     * droit au plantage.
-     
-     gen_free_list(levels);
-
-     */
+    /* memory leak : levels */
 
     return new_levels;
 }
 
 
+/*
+ * Remove all conflicts matching the dependance_type for a level 
+ * between level_min and level_max.
+ */
 static list /* of conflict */
 remove_dependance_from_conflicts(list /* of conflict */ conflicts, 
 				 int dependance_type, 
@@ -222,10 +348,7 @@ remove_dependance_from_conflicts(list /* of conflict */ conflicts,
 
     MAP(CONFLICT, c, {
 	if(conflict_cone(c) != cone_undefined) {
-	    action s = effect_action (conflict_source(c)) ;
-	    action k = effect_action (conflict_sink(c)) ;
-
-	    if (action_dependance_p(s, k, dependance_type))
+	    if (action_dependance_p(c, dependance_type))
 	    {
 		list /* of level */ levels = cone_levels(conflict_cone(c));
 
@@ -239,11 +362,7 @@ remove_dependance_from_conflicts(list /* of conflict */ conflicts,
 		    new_conflicts = CONS(CONFLICT, c, new_conflicts);
 		}
 
-		/* Liberer l'ancienne liste...
-
-		 gen_free_list(levels);
-
-		 */
+		/* memory leak : levels */
 	    }
 	    else {
 		new_conflicts = CONS(CONFLICT, c, new_conflicts);
@@ -255,14 +374,7 @@ remove_dependance_from_conflicts(list /* of conflict */ conflicts,
 
     }, conflicts);
 
-
-    /* supprime la liste *SANS* supprimer les element de la liste!!!!!!!!
-     * si la fonction gen_free_list() libere les elements, alors on va 
-     * droit au plantage
-
-    gen_free_list(conflicts);
-
-     */
+    /* memory leak : conflicts */
 
     ifdebug(7) 
     {
@@ -276,13 +388,15 @@ remove_dependance_from_conflicts(list /* of conflict */ conflicts,
 }
 
 
+/*
+ * Remove all successors matching the given parameters.
+ */
 static list /* of successor */
-remove_dependances_from_successors(successors, v2, dependance_type, level_min, level_max)
-list successors;
-vertex v2;
-int dependance_type;
-int level_min;
-int level_max;
+remove_dependances_from_successors(list successors, 
+				   vertex v2, 
+				   int dependance_type, 
+				   int level_min, 
+				   int level_max)
 {
     list /* of successor */ new_successors = NIL;
 
@@ -312,11 +426,7 @@ int level_max;
 		new_successors = CONS(SUCCESSOR, su, new_successors);
 	    }
 
-	    /* Liberer l'ancienne liste...
-
-	       gen_free_list(lc);
-
-	     */
+	    /* memory leak : lc */
 	}
 	else {
 	    new_successors = CONS(SUCCESSOR, su, new_successors);
@@ -324,13 +434,7 @@ int level_max;
 
     }, successors);
 
-    /* supprime la liste *SANS* supprimer les element de la liste!!!!!!!!
-     * si la fonction gen_free_list() libere les elements, alors on va 
-     * droit au plantage
-
-     gen_free_list(successors);
-
-     */
+    /* memory leak : successors */
 
     ifdebug(7) 
     {
@@ -344,8 +448,11 @@ int level_max;
 }
 
 
+/*
+ * Remove all dependances between v1 and v2 matching the given parameters.
+ */
 static void
-remove_dependance(vertex v1, /* The list of this vertex sucessors is updated */
+remove_dependance(vertex v1, /* Successors of this vertex are updated */
 		  vertex v2, 
 		  int dependance_type, 
 		  int level_min, 
@@ -353,8 +460,7 @@ remove_dependance(vertex v1, /* The list of this vertex sucessors is updated */
 {
     list /* of successor */ v1_successors = vertex_successors(v1);
 
-    ifdebug(3)
-    {
+    ifdebug(3) {
 	debug(3, "remove_dependance", "Remove ");
 	
 	if (dependance_type & FLOW_DEPENDANCE) fprintf(stderr, "F ");
@@ -386,6 +492,13 @@ remove_dependance(vertex v1, /* The list of this vertex sucessors is updated */
 }
 
 
+/************************************************************ SCCS FUNCTIONS */
+
+
+/*
+ * FindAndTopSortSccs hook.
+ * Test if the vertex belong to the region.
+ */
 static bool 
 common_ignore_this_vertex(set /* of statement */ region, vertex v)
 {
@@ -393,6 +506,10 @@ common_ignore_this_vertex(set /* of statement */ region, vertex v)
 }
 
 
+/*
+ * FindAndTopSortSccs hook.
+ * Test if exist any dependance with a level >= 'level'. 
+ */
 static bool 
 icm_ignore_this_successor(vertex v, 
 			  set /* of statement */ region, 
@@ -402,16 +519,20 @@ icm_ignore_this_successor(vertex v,
     if (common_ignore_this_vertex(region, successor_vertex(su)))
 	return(TRUE);
 
-    if (!dependance_verticies_p(v, 
-				successor_vertex(su), 
-				ALL_DEPENDANCES, 
-				level))
+    if (!dependance_vertices_p(v, 
+			       successor_vertex(su), 
+			       ALL_DEPENDANCES, 
+			       level))
 	return (TRUE);
 
-  return FALSE;
+    return FALSE;
 }
 
 
+/*
+ * FindAndTopSortSccs hook.
+ * Test if exist a flow dependance with a level >= 'level'. 
+ */
 static bool 
 invariant_ignore_this_successor(vertex v, 
 				set /* of statement */ region, 
@@ -421,8 +542,7 @@ invariant_ignore_this_successor(vertex v,
     if (common_ignore_this_vertex(region, successor_vertex(su)))
 	return(TRUE);
 
-    /* Keep only flow dependances. */
-    if (!dependance_verticies_p(v, 
+    if (!dependance_vertices_p(v, 
 				successor_vertex(su), 
 				FLOW_DEPENDANCE, 
 				level))
@@ -432,21 +552,25 @@ invariant_ignore_this_successor(vertex v,
 }
 
 
-void
-print_list_entities(list /* of entity */ l)
-{
-    MAP(ENTITY, e, { 
-	fprintf(stderr, "%s ", entity_name(e));
-    }, l);
-}
+/********************************************************* DG SIMPLIFICATION */
 
 
+/*
+ * Test if a statement depend of any indicies.
+ * The 'level' first indicies are not used.
+ */
 static bool
 statement_depend_of_indices_p(statement st, 
 			      list /* of entity */ indices, 
 			      int level)
 {
-    list /* of eftfect */ le = load_proper_rw_effects_list(st);
+    list /* of effect */ le = load_proper_rw_effects_list(st);
+
+    ifdebug(6) {
+	debug(6, "statement_depend_of_indices_p", "");
+	fprintf(stderr, "Statement %02d depend of ", statement_number(st));
+	print_list_entities(indices);
+    }
 
     /* Ignore the first indicies... */
     for(; level > reference_level; --level) {
@@ -456,78 +580,482 @@ statement_depend_of_indices_p(statement st,
     MAP(ENTITY, index, {
 	MAP(EFFECT, ef, {
 	    entity e = reference_variable(effect_reference(ef));
-	    if (e == index)
+	    if (e == index) {
+
+		ifdebug(6) {
+		    fprintf(stderr,": yes\n");
+		}
+
 		return TRUE;
+	    }
 	}, le);
     }, indices);
+
+    ifdebug(6) {
+	fprintf(stderr,": no\n");
+    }
 
     return FALSE;
 }
 
 
-bool
-vertex_variant_p(vertex v, 
-		 graph g, 
-		 int level, 
-		 set /* of statement */ variant)
+static bool
+inv_entity_filter(entity e)
+{
+    expression_invariant &= set_belong_p(invariant_entities, (char *) e);
+    if (!expression_invariant) gen_recurse_stop(NULL);
+    return TRUE;
+}
+
+
+static bool
+expressions_invariant_p(list /* of expression */ le)
+{
+    MAP(EXPRESSION, exp, {
+	expression_invariant = TRUE;
+
+	gen_recurse(exp, entity_domain, inv_entity_filter, gen_null);
+
+	if (!expression_invariant) {
+	    return FALSE;
+	}
+    }, le);
+
+    return TRUE;
+}
+
+
+/*
+ * Test if the vertex is partially invariant.
+ */
+static bool
+vertex_partially_invariant_p(vertex v, 
+			     graph g, 
+			     int level,
+			     set /* of statement */ invariant)
 {
     statement st = vertex_to_statement(v);
 
+    MAP(EFFECT, ef, {
+	reference ref = effect_reference(ef);
+
+	/* Looking for write effects only */
+	if (effect_write_p(ef)) {
+	    
+	    /* Which kind of reference we have ? */
+	    if (reference_indices(ref) != NIL) {
+		/* An array access with well known indices */
+		if (expressions_invariant_p(reference_indices(ref))) {
+		    ifdebug(6) {
+			debug(6, "vertex_partially_invariant_p", "");
+			fprintf(stderr, 
+				"statement %02d is partially invariant "
+				"(known array access).\n", 
+				statement_number(st));
+		    }
+		    return TRUE;
+		} 
+		else {
+		    ifdebug(6) {
+			debug(6, "vertex_partially_invariant_p", "");
+			fprintf(stderr, 
+				"statement %02d is not partially invariant "
+				"(known array access).\n", 
+				statement_number(st));
+		    }
+		    return FALSE;
+		}
+	    }
+	    else {
+		if(variable_entity_dimension(reference_variable(ref)) != 0) {
+		    /* An array access with unknow indices */
+
+		    ifdebug(6) {
+			debug(6, "vertex_partially_invariant_p", "");
+			fprintf(stderr, 
+				"statement %02d is not partially invariant "
+				"(UNKNOWN array access).\n", 
+				statement_number(st));
+
+		    }
+		    return FALSE;
+		}
+		else {
+		    /* A scalar variable */
+
+		    ifdebug(6) {
+			debug(6, "vertex_partially_invariant_p", "");
+			fprintf(stderr, 
+				"statement %02d is partially invariant "
+				"(scalar access).\n", 
+				statement_number(st));
+		    }
+		    return TRUE;
+		}
+	    }
+	}        
+    }, load_proper_rw_effects_list(st));
+
     ifdebug(6) {
-    debug(6, "vertex_variant_p", "test ");
-    fprintf(stderr, "statement %02d : ", statement_number(st));
+	debug(6, "vertex_partially_invariant_p", "");
+	fprintf(stderr, 
+		"statement %02d is not partially invariant.\n",
+		statement_number(st));
     }
+    
+    return FALSE;
+}
+
+
+/*
+ * Test if the vertex is invariant.
+ */
+bool
+vertex_invariant_p(vertex v, 
+		   graph g, 
+		   int level, 
+		   set /* of statement */ region,
+		   set /* of statement */ invariant)
+{
+    statement st = vertex_to_statement(v);
 
     /* Test if the statement is depandant of ALL loop indexes >= level */
     if (statement_depend_of_indices_p(st,
 				      load_statement_has_indices(st),        
 				      level)) {
-	ifdebug(6) { 
-	    fprintf(stderr, "variant (depend of indices)\n"); 
-	}
-	return TRUE;
+//	ifdebug(6) { 
+	    debug(6, "vertex_invariant_p", "");
+	    fprintf(stderr, 
+		    "statement %02d is not invariant (depend of indices).\n",
+		    statement_number(st));
+//	}
+
+	return FALSE;
     }
 
-    /* If there is a flow dependance from v to v, then v is variant */
-    if (dependance_verticies_p(v, v, FLOW_DEPENDANCE, level)) {
-	ifdebug(6) { 
-	    fprintf(stderr, "variant (self flow dep)\n"); 
-	}
-	return TRUE;
+    /* If there is a flow dependance from v to v, then v is not variant */
+    if (dependance_vertices_p(v, v, FLOW_DEPENDANCE, level)) {
+//	ifdebug(6) { 
+	    debug(6, "vertex_invariant_p", "");
+	    fprintf(stderr, 
+		    "statement %02d is not invariant (self flow dep).\n",
+		    statement_number(st));
+//	}
+	return FALSE;
     }
 
-    /* If there is a flow dependance from y to v and if y is variant, 
-       then v is variant */
+    /* If there is a flow dependance from y to v and if y is not invariant, 
+       then v is not invariant */
     MAP(VERTEX, y, {
-	if (dependance_verticies_p(y, v, FLOW_DEPENDANCE, level)) {
-	    statement st = vertex_to_statement(y);
+	if (dependance_vertices_p(y, v, FLOW_DEPENDANCE, level)) {
+	    statement y_st = vertex_to_statement(y);
 
-	    if (set_belong_p(variant, (char *) st)) {
+	    if (!set_belong_p(invariant, (char *) y_st) &&
+		set_belong_p(region, (char *) y_st)) {
 
-		ifdebug(6) { 
+//		ifdebug(6) { 
+		    debug(6, "vertex_invariant_p", "");
 		    fprintf(stderr, 
-			    "depend of variant stat %02d\n", 
-			    statement_number(st)); 
-		}
+			    "statement %02d is not invariant "
+			    "(dep. of %02d).\n",
+			    statement_number(st), 
+			    statement_number(y_st)); 
+//		}
 	    
-		return TRUE;
+		return FALSE;
 	    }
 	}
+    }, graph_vertices(g));
 
-    },  graph_vertices(g));
+//    ifdebug(6) { 
+	debug(6, "vertex_invariant_p", "");
+	fprintf(stderr, 
+		"statement %02d is invariant.\n",
+		statement_number(st));
+//    }
 
-    ifdebug(6) { 
-	fprintf(stderr, "invariant\n"); 
-    }
-
-    return FALSE;
+    return TRUE;
 }
 
 
+/*
+ * Simplify a invariant vertex 'v' using the following rule:
+ *
+ * if 
+ *   exist output(v, v, <= level)
+ *   not exist output(v, z, <= level) v != z
+ * then 
+ *   remove output(v, v, <= level)
+ *   foreach y saitisy
+ *     exist flow(v -> y, infiny)
+ *     exist anti(y -> v, <= level)
+ *   do remove anti(y -> v, <= level)
+ */
+static void
+SimplifyInvariantVertex(vertex v, /* Successors of this vertex are updated */
+			set /* of statement */ region, 
+			int level)
+{
+    set /* of vertex */ matching_vertices = set_make(set_pointer);
+    statement st = vertex_to_statement(v);
+
+    if (dependance_vertices_p(v, v, OUTPUT_DEPENDANCE, level) &&
+	!exist_non_self_dependance_from_vertex_p(v, 
+						 OUTPUT_DEPENDANCE, level)) {
+	MAP(SUCCESSOR, su, {
+	    vertex y = successor_vertex(su);
+	    if (!common_ignore_this_vertex(region, y) && 
+		dependance_vertices_p(v, y, FLOW_DEPENDANCE, level) && 
+		dependance_vertices_p(y, v, ANTI_DEPENDANCE, level)) {
+
+		matching_vertices = set_add_element(matching_vertices, 
+						    matching_vertices, 
+						    (char *) y);
+	    }
+	}, vertex_successors(v));
+
+	remove_dependance(v, v, OUTPUT_DEPENDANCE, 0, load_has_level(st));
+		    
+	if (!set_empty_p(matching_vertices)) {
+	    SET_MAP(y, {
+		remove_dependance((vertex) y, v, ANTI_DEPENDANCE, 
+				  0, load_has_level(st));
+	    }, matching_vertices);
+	}
+    }
+
+    set_free(matching_vertices);
+}
+
+
+/*
+ * Find and simplify invariants statements.
+ */
+static graph
+DoInvariantsStatements(list /* of scc */ lsccs, 
+		       graph g, 
+		       set /* of statement */ region, 
+		       int level,
+		       set /* of statement */ partially_invariant)
+{
+    set /* of statement */ invariant = set_make(set_pointer);
+
+    MAP(SCC, s, {
+	list /* of vertex */ lv = scc_vertices(s);
+
+	if (gen_length(lv) > 1) {
+	    /* Group of vertices : all are variants */
+	}
+	else {
+	    /* One statement... */
+	    vertex v = VERTEX(CAR(lv));
+	    statement st = vertex_to_statement(v);
+
+	    if (vertex_invariant_p(v, g, level, region, invariant)) {
+		/* which is invariant */
+		SimplifyInvariantVertex(v, region, level);
+
+		/* Added to the list */
+		invariant = set_add_element(invariant, 
+					    invariant, 
+					    (char *) st);
+
+		/* Invariant is partially invariant... */
+		partially_invariant = set_add_element(partially_invariant,
+						      partially_invariant, 
+						      (char *) st);
+
+		invariant_entities = 
+		    invariant_vertex_to_invariant_entities(v,
+							   invariant_entities);
+
+	    }
+	    else if (vertex_partially_invariant_p(v, g, level, invariant)) {
+		partially_invariant = 
+		    set_add_element(partially_invariant,
+				    partially_invariant, 
+				    (char *) st);
+	    }
+	}
+    }, lsccs); 
+
+    set_free(invariant);
+
+    return g;
+}
+
+
+/*
+ * Test if the vertex is redundant.
+ */
+bool
+vertex_redundant_p(vertex v, 
+		   graph g, 
+		   int level,
+		   set /* of statement */ region,
+		   set /* of statement */ partially_invariant,
+		   set /* of statement */ redundant)
+{
+    statement st = vertex_to_statement(v);
+
+    /* Test if the statement is depandant of ALL loop indexes >= level */
+    /* This condition is not required, but putting a statement depending 
+       of indicies after the loop is tiedous (setting the value to 
+       the bound+1...) */
+/*
+    if (statement_depend_of_indices_p(st, 
+				      load_statement_has_indices(st),
+				      level)) {
+	ifdebug(6) { 
+	    debug(6, "vertex_redundant_p", "");
+	    fprintf(stderr, 
+		    "statement %02d is not redundant (depend of indices).\n",
+		    statement_number(st));
+	}
+
+	return FALSE;
+    }
+*/
+
+    /* Test if we are not always writing at the same adress 
+       ie. is not partially_invariant. */
+    if (!set_belong_p(partially_invariant, (char *) st)) {
+	ifdebug(6) {
+	    debug(6, "vertex_redundant_p", "");
+	    fprintf(stderr, 
+		    "statement %02d is not redundant (variable address).\n", 
+		    statement_number(st));
+	}
+	return FALSE;
+    }
+	
+    /* If there is a flow dependance from v to y and if y is not redundant, 
+       then v is not redundant */
+    MAP(SUCCESSOR, su, {
+	vertex y = successor_vertex(su);
+	if (dependance_vertices_p(v, y, FLOW_DEPENDANCE, level)) {
+	    statement y_st = vertex_to_statement(y);
+
+	    if (!set_belong_p(redundant, (char *) y_st) &&
+		set_belong_p(region, (char *) y_st)) {
+
+		ifdebug(6) { 
+		    debug(6, "vertex_redundant_p", "");
+		    fprintf(stderr, 
+			    "statement %02d is not redundant "
+			    "(dep. of %02d).\n", 
+			    statement_number(st),
+			    statement_number(y_st)); 
+		}
+		return FALSE;
+	    }
+	}
+    }, vertex_successors(v));
+
+    ifdebug(6) {
+	debug(6, "vertex_redundant_p", "");
+	fprintf(stderr, 
+		"statement %02d is redundant.\n", 
+		statement_number(st));
+    }
+
+    return TRUE;
+}
+
+
+/*
+ * Simplify a redundant vertex 'v' using the following rule:
+ */
+static void
+SimplifyRedundantVertex(vertex v, /* Successors of this vertex are updated */
+			set /* of statement */ region, 
+			int level)
+{
+    set /* of vertex */ matching_vertices = set_make(set_pointer);
+    statement st = vertex_to_statement(v);
+
+    if (dependance_vertices_p(v, v, OUTPUT_DEPENDANCE, level) &&
+	!exist_non_self_dependance_from_vertex_p(v, 
+						 OUTPUT_DEPENDANCE, level)) {
+	MAP(SUCCESSOR, su, {
+	    vertex y = successor_vertex(su);
+	    if (!common_ignore_this_vertex(region, y) && 
+		dependance_vertices_p(y, v, FLOW_DEPENDANCE, level) && 
+		dependance_vertices_p(v, y, ANTI_DEPENDANCE, level)) {
+
+		matching_vertices = set_add_element(matching_vertices, 
+						    matching_vertices, 
+						    (char *) y);
+	    }
+	}, vertex_successors(v));
+
+	remove_dependance(v, v, OUTPUT_DEPENDANCE, 0, load_has_level(st));
+		    
+	if (!set_empty_p(matching_vertices)) {
+	    SET_MAP(y, {
+		remove_dependance(v, (vertex)y, ANTI_DEPENDANCE, 
+				  0, load_has_level(st));
+	    }, matching_vertices);
+	}
+    }
+
+    set_free(matching_vertices);
+}
+
+
+/*
+ * Find and simplify redundants statements.
+ */
+static graph
+DoRedundantsStatements(list /* of scc */ lsccs, 
+		       graph g, 
+		       set /* of statement */ region, 
+		       int level,
+		       set /* of statement */ partially_invariant)
+{
+    set /* of statement */ redundant = set_make(set_pointer);
+
+    MAP(SCC, s, {
+	list /* of vertex */ lv = scc_vertices(s);
+
+	if (gen_length(lv) > 1) {
+	    /* Group of vertices : all are no redundants */
+	}
+	else {
+	    /* One statement... */
+	    vertex v = VERTEX(CAR(lv));
+	    statement st = vertex_to_statement(v);
+
+	    if (set_belong_p(partially_invariant, (char *) st)) {
+		if (vertex_redundant_p(v, g, level, 
+				       region, 
+				       partially_invariant,
+				       redundant)) {
+		    /* which is redundant */
+		    SimplifyRedundantVertex(v, region, level);
+
+		    redundant = set_add_element(redundant, 
+						redundant, 
+						(char *) st);
+		}
+	    }
+	}
+    }, lsccs); 
+
+    set_free(redundant);
+
+    return g;
+}
+
+
+/*
+ * Simplify the dependance graph.
+ */
 graph
 SimplifyGraph(graph g, 
 	      set /* of statement */ region, 
-	      int level)
+	      int level,
+	      unsigned int count)
 {  
     list /* of scc */ lsccs;
     
@@ -538,61 +1066,63 @@ SimplifyGraph(graph g,
     reset_sccs_drivers();
 
     MAP(SCC, elmt, {
-	list /* of vertex */ lv = scc_vertices(elmt);
-
-	if (gen_length(lv) > 1) {
+	/* Check if the component is strongly connected */
+	if (strongly_connected_p(elmt, level)) {
 	    set new_region = set_make(set_pointer);
-	    new_region = verticies_to_statements(lv, new_region);
-	    g = SupressDependances(g, new_region, level);
+	    new_region = vertices_to_statements(scc_vertices(elmt), 
+						 new_region);
+
+	    g = SupressDependances(g, new_region, level, count);
+
 	    set_free(new_region);
 	}
     }, lsccs); 
+
+    /* memory leak : lsccs */
 
     return g;
 }
 
 
-
-
-
-/* We looking for all vertex y which satisfy :
- * output(v -> v, <= level)
- * flow(v -> y, infiny)
- * anti(y -> v, <= level)
- */ 
-
-static set /* of vertex */
-gather_matching_vertices(graph g, 
-			 vertex v,
-			 set /* of statement */ region, 
-			 int level,
-			 set /* of vertex */ result)
-{
-    if (dependance_verticies_p(v, v, OUTPUT_DEPENDANCE, level)) {
-	MAP(SUCCESSOR, su, {
-	    vertex y = successor_vertex(su);
-	    if (!common_ignore_this_vertex(region, y)) {
-		if (dependance_verticies_p(v, y, FLOW_DEPENDANCE, level) && 
-		    dependance_verticies_p(y, v, ANTI_DEPENDANCE, level)) {
-		    result = set_add_element(result, result, (char *) y);
-		}
-	    }
-	}, vertex_successors(v));
-    }
-
-    return result;
-}
-
-
-
-
+/*
+ * Supress unneeded dependances.
+ */
 graph
 SupressDependances(graph g, 
 		   set /* of statement */ region, 
-		   int level)
+		   int level,
+		   unsigned int count)
 {
+    /*
+     * Il y a un probleme avec l'exemple suivant :
+     *
+     *    DO I = 1, 100
+     *       A(I) = 10
+     *       T = A(1)
+     *       B(I) = T
+     *    ENDDO
+     *
+     * En effet apres la passe arriere (recherche des redondant), on arrive
+     * a separer la premiere instruction des deux suivantes.
+     *
+     *    DO I = 1, 100
+     *       A(I) = 10 
+     *    ENDDO
+     *    DO I = 1, 100
+     *       T = A(1)
+     *       B(I) = T
+     *    ENDDO 
+     *
+     * Mais si on applique a nouveau une passe avant (recherche des invariants)
+     * on n'est pas capable de trouver que T=A(1) est invariant, car l'on se 
+     * trouve dans la meme region... 
+     *
+     * Je pense qu'il faut limiter la recherche des invariant la la 
+     * composante conexe.
+     */
+
     list /* of scc */ lsccs;
-    set /* of statement */ variant = set_make(set_pointer);
+    set /* of statement */ partially_invariant = set_make(set_pointer);
 
     /* Find sccs considering only flow dependances */
     set_sccs_drivers(&common_ignore_this_vertex, 
@@ -600,170 +1130,162 @@ SupressDependances(graph g,
     lsccs = FindAndTopSortSccs(g, region, level);
     reset_sccs_drivers();
 
-    printf("Parcours des sccs\n");
 
-    MAP(SCC, s, {
-	list /* of vertex */ lv = scc_vertices(s);
+    /* Forward simplification */
+    fprintf(stderr, "\nFORWARD\n");
+    g = DoInvariantsStatements(lsccs, g, region, level, partially_invariant);
 
-	if (gen_length(lv) > 1) {
-	    /* Group of vertices : all are variants */
-	    variant = verticies_to_statements(lv, variant);
-	}
-	else {
-	    /* One statement... */
-	    vertex v = VERTEX(CAR(lv));
-	    statement st = vertex_to_statement(v);
+    /* Backward simplification */
+    fprintf(stderr, "\nBACKWARD\n");
+    lsccs = gen_nreverse(lsccs);
 
-	    if (vertex_variant_p(v, g, level, variant)) {
-		/* which is variant : added to the list */
-		variant = set_add_element(variant, variant, (char *) st);
-	    }
-	    else {
-		/* which is invariant */
-		set /* of vertex */ matching_vertices = set_make(set_pointer);
-
-		matching_vertices = 
-		    gather_matching_vertices(g,  v,
-					     region, 
-					     level,
-					     matching_vertices);
-
-		if (!set_empty_p(matching_vertices)) {
-		    remove_dependance(v, v, 
-				      OUTPUT_DEPENDANCE, 
-				      0, load_has_level(st));
-
-		    SET_MAP(y, {
-			remove_dependance((vertex) y, v, 
-					  ANTI_DEPENDANCE, 
-					  0, load_has_level(st));
-		    }, matching_vertices);
-		}
-
-		set_free(matching_vertices);
-	    }
-	}
-    }, lsccs); 
-
-    set_free(variant);
-
-    return SimplifyGraph(g, region, level+1);
-}
-
-
-static bool
-statement_mark(statement s)
-{
-     store_has_level(s, depth);
-     store_statement_has_indices(s, gen_nreverse(gen_copy_seq(indices)));
-     
-     return TRUE;
-}
-
-
-static bool
-loop_level_in (loop l) 
-{
-    entity index = loop_index(l);
-    indices = CONS(ENTITY, index, indices);
+    g = DoRedundantsStatements(lsccs, g, region, level, partially_invariant);
     
-    ++depth;
+    /* memory leak : lsccs */
+    set_free(partially_invariant);
 
-    return TRUE;
+    if (count > 1) {
+	return SimplifyGraph(g, region, level, count-1);
+    }
+    else{
+	return SimplifyGraph(g, region, level+1, NB_SIMPLIFY_PASSES);
+    }
 }
 
-
-static bool
-loop_level_out (loop l) 
-{
-    list new_indices = CDR(indices);
-    free(indices);
-    indices = new_indices;
-
-    --depth;
-
-    return TRUE;
-}
 
 /******************************************************** REMOVE DUMMY LOOPS */
+
 
 DEFINE_LOCAL_STACK(stmt, statement)
 
 static list /* of entity */ depending_indices;
 static bool it_depends;
 
-/* set whether s depends from enclosing indices
+
+/* 
+ * Set whether s depends from enclosing indices
  */
-static void does_it_depend(statement s)
+static bool does_it_depend(statement s)
 {
-  it_depends |= statement_depend_of_indices_p(s, depending_indices, 0);
-  if (it_depends) gen_recurse_stop(NULL);
+    it_depends |= statement_depend_of_indices_p(s, depending_indices, 0);
+    if (it_depends) gen_recurse_stop(NULL);
+    return TRUE;
 }
+
 
 static bool push_depending_index(loop l)
 {
-  depending_indices = CONS(ENTITY, loop_index(l), depending_indices);
-  return TRUE;
+    depending_indices = CONS(ENTITY, loop_index(l), depending_indices);
+    return TRUE;
 }
+
 
 static void pop_depending_index(loop l)
 {
-  list tmp = depending_indices;
-  pips_assert("current loop index is poped", 
-	      loop_index(l)==ENTITY(CAR(depending_indices)));
-  depending_indices = CDR(depending_indices);
-  CDR(tmp) = NIL;
-  free(tmp);
+    list tmp = depending_indices;
+    pips_assert("current loop index is poped", 
+		loop_index(l)==ENTITY(CAR(depending_indices)));
+    depending_indices = CDR(depending_indices);
+    CDR(tmp) = NIL;
+    free(tmp);
 }
 
-static bool stmt_filter_and_check(statement s)
-{
-  stmt_push(s);
-  does_it_depend(s);
-  return TRUE;
-}
 
 static bool drop_it(loop l)
 {
-  if (execution_parallel_p(loop_execution(l)))
-  {
-    depending_indices = NIL;
-    it_depends = FALSE;
-    gen_multi_recurse(l,
-		      statement_domain, stmt_filter_and_check, stmt_rewrite,
-		      loop_domain, push_depending_index, pop_depending_index,
-		      NULL);
-    depending_indices = NIL; /* assert? */
-    return it_depends;
-  }
+
+//    remove_dead_loop();
+
+    if (execution_parallel_p(loop_execution(l)))
+    {
+	depending_indices = NIL;
+	it_depends = FALSE;
+	gen_multi_recurse(l,
+			  statement_domain, 
+			      does_it_depend, gen_null,
+			  loop_domain, 
+			      push_depending_index, pop_depending_index,
+			  NULL);
+	depending_indices = NIL; /* assert? */
+	return !it_depends;
+    }
   
-  return FALSE;
+    return FALSE;
 }
 
-static void loop_rwt(loop l)
+
+static bool icm_loop_rwt(loop l)
 {
-  if (drop_it(l))
-  {
     statement head = stmt_head();
-    statement_instruction(head) = statement_instruction(loop_body(l));
-    /* memory leak... */
-  }
+
+    ifdebug(5) {
+	fprintf(stderr, "TEST : loop on %s (statement %02d):\n", 
+		entity_name(loop_index(l)),
+		statement_number(head));
+    }
+
+    if (drop_it(l))
+    {
+	ifdebug(5) {
+	    fprintf(stderr, "-> loop on %s removed (statement %02d)\n", 
+		    entity_name(loop_index(l)),
+		    statement_number(head));
+	}
+
+	statement_instruction(head) = statement_instruction(loop_body(l));
+	statement_number(head) = statement_number(loop_body(l));
+
+	/* memory leak... */
+    }
+    else {
+	ifdebug(5) {
+	    fprintf(stderr, "-> loop on %s NOT removed (statement %02d)\n", 
+		    entity_name(loop_index(l)),
+		    statement_number(head));
+	}
+    }
+
+    return TRUE;
 }
 
+
+/*
+ * Drop all loops l  matching the pattern:
+ *   l is parallel
+ *   the body of l doesn't use indicies of the loop l.
+ *
+ * WARNING : the pattern is correct ????????
+ */
 void drop_dummy_loops(statement s)
 {
-  make_stmt_stack();
+    /* WARNING :
+     * We must recompute proper_effects for the program !!!
+     * So we directly call the pass !!!!!
+     */
+    set_methods_for_proper_simple_effects();
+    init_proper_rw_effects();
+    proper_effects_of_module_statement(s);
 
-  gen_multi_recurse(s,
-		    statement_domain, stmt_filter, stmt_rewrite,
-		    loop_domain, gen_true, loop_rwt,
-		    NULL);
 
-  free_stmt_stack();
+    make_stmt_stack();
+
+    gen_multi_recurse(s,
+		      statement_domain, stmt_filter, stmt_rewrite,
+		      loop_domain, icm_loop_rwt, gen_null,
+		      NULL);
+
+    free_stmt_stack();
+    reset_proper_rw_effects();
+    generic_effects_reset_all_methods();
 }
+
 
 /*********************************************************** REGENERATE CODE */
 
+
+/*
+ * Simplify the dependance graph and regenerate the code.
+ */
 statement
 icm_codegen(statement stat, 
 	    graph g, 
@@ -795,7 +1317,7 @@ icm_codegen(statement stat,
     gen_multi_recurse
 	(stat,
 	 loop_domain, loop_level_in, loop_level_out, /* LOOP */	 
-	 statement_domain, statement_mark, gen_true, /* STATEMENT */
+	 statement_domain, statement_mark, gen_null, /* STATEMENT */
 	 NULL);
 
     gen_free_list(indices);
@@ -803,15 +1325,29 @@ icm_codegen(statement stat,
     /* Simplify the dependance graph */
 
     simplyfied_graph = copy_graph(g);
-    simplyfied_graph = SimplifyGraph(simplyfied_graph, 
-				     region, 
-				     level);
 
-    ifdebug(4) {
+//    ifdebug(4) {
+	fprintf(stderr, "Original graph:\n");
 	prettyprint_dependence_graph(stderr, 
 				     statement_undefined, 
 				     simplyfied_graph);    
-    }
+//    }
+
+    invariant_entities = set_make(set_pointer);
+
+    simplyfied_graph = SimplifyGraph(simplyfied_graph, 
+				     region, 
+				     level,
+				     NB_SIMPLIFY_PASSES);
+
+    set_free(invariant_entities);
+
+//    ifdebug(4) {
+	fprintf(stderr, "Simplified graph:\n");
+	prettyprint_dependence_graph(stderr, 
+				     statement_undefined, 
+				     simplyfied_graph);    
+//    }
 
     close_has_level();
     free_has_indices_map();
@@ -824,29 +1360,33 @@ icm_codegen(statement stat,
 
     /* Generate the code (CodeGenerate don't use the first
        parameter...) */
-
     result =  CodeGenerate(/* big hack */ statement_undefined,
 			   simplyfied_graph, 
 			   region, 
 			   level, 
 			   task_parallelize_p); 
-
     free_graph(simplyfied_graph);
+
+//    ifdebug(4) {
+	printf("\nIntermediate code:\n");
+	print_statement(result);
+//    }
+
+	abort();
 
     /* Remove dummy loops. */
     drop_dummy_loops(result);
-
-    /* Print debugginf information : statement */
-    print_statement(result);
 
     return result;
 }
 
 
+/*************************************************************** ENTRY POINT */
+
+
 /*
-  Entry point for the zory invariant code motion :)
-  OA
-*/ 
+ * Prepare some stuffs and call icm_codegen...
+ */
 bool
 invariant_code_motion(string module_name)
 {
@@ -870,14 +1410,15 @@ invariant_code_motion(string module_name)
 
     ifdebug(7)
     {
-	fprintf(stderr, "\nTesting NewGen consistency for initial code %s:\n",
+	fprintf(stderr, 
+		"\nTesting NewGen consistency for initial code %s:\n",
 		module_name);
 	if (statement_consistent_p((statement)mod_stat))
 	    fprintf(stderr," NewGen consistent statement\n");
     }
 
     ifdebug(1) {
-	debug(1, "do_it", "original sequential code:\n\n");
+	debug(0, "invariant_code_motion", "original sequential code:\n\n");
 	print_statement(mod_stat);
     }
 
@@ -885,34 +1426,25 @@ invariant_code_motion(string module_name)
 	dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
     }
     else {
-	pips_error("do_it", "dg should be undefined\n");
+	pips_error("invariant_code_motion", "dg should be undefined\n");
     }
 
     enclosing = 0;
     rice_statement(mod_stat, 1, &icm_codegen);   
 
-    ifdebug(7)
-    {
-	fprintf(stderr, "\nparallelized code %s:",module_name);
+    ifdebug(7) {
+ 	fprintf(stderr, "\ntransformed code %s:",module_name);
 	if (statement_consistent_p((statement)mod_stat))
 	    fprintf(stderr," gen consistent ");
     }
 
-    debug_off();
 
-
-    /* 
-     * Je pense qu'il serait souhaitable de ranger le resultat dans la 
-     * base... Mais comment et ou ?
-     */
-
-//    DB_PUT_MEMORY_RESOURCE(what, module_name, (char*) mod_stat);
-
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, mod_stat);
 
     dg = graph_undefined;
     reset_current_module_statement();
     reset_current_module_entity();
+
+    debug_off();
     return TRUE;
 }
-
-
