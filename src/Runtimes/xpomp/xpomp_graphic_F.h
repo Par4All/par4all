@@ -1,5 +1,5 @@
 ! $RCSfile: xpomp_graphic_F.h,v $ (version $Revision$)
-! $Date: 1996/10/25 21:30:56 $, 
+! $Date: 1996/10/25 21:40:56 $, 
 !
 !  The fortran headers for the XPOMP graphical library.
 !
@@ -12,8 +12,7 @@
 !
 
 ! Tells HPFC where to link (Link eDitor I/O):
-!fcd$ ld io -L$XPOMP_RUNTIME/$PIPS_ARCH 
-!fcd$ ld io -L$PIPS_ROOT/Runtime/xpomp/$PIPS_ARCH -lxpomp
+!fcd$ ld io -L$XPOMP_RUNTIME/$PIPS_ARCH -L$PIPS_ROOT/Runtime/xpomp/$PIPS_ARCH -lxpomp
 
 ! To open a new display:
 !fcd$ io xpompf open display
