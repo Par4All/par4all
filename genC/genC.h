@@ -35,6 +35,7 @@ extern char *strdup();
 
 #include "newgen_types.h"
 #include "newgen_set.h"
+#include "newgen_string.h"
 
 /* The size of the management information inside each Newgen object (in
  *  gen_chunks) 
