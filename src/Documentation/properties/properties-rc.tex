@@ -12,6 +12,10 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.125  1998/07/24 16:13:54  irigoin
+%% Default value for PARSER_EXPAND_STATEMENT_FUNCTIONS set to TRUE. Comments
+%% are modified.
+%%
 %% Revision 1.124  1998/07/24 16:01:02  irigoin
 %% property PARSER_SUBSTITUTE_ENTRIES added
 %%
@@ -79,7 +83,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/07/24 16:01:02 $~$
+$~$Date: 1998/07/24 16:13:54 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -530,17 +534,26 @@ PARSER_DUMP_SYMBOL_TABLE FALSE
 \subsubsection{Statement Function}
 \index{Statement Function}
 
-Whether to attempt to support fortran statement functions by cold
-substitution in the parser. Otherwise there is no support at all.
-The default is not to perform this unchecked replacement, which might 
-change the semantics of the program\ldots For most uses of macros I've
-seen, it is legal to perform the substitution, however. Note that the
-parser does not have the information necessary to check for the validity
-of the transformation. A better method would be to represent them somehow
-a local functions in the IR, but the implications with \texttt{pipsmake} 
-and other issues are not clearly all foreseen\ldots (FC).
+This property controls the processing of Fortran statement functions by text
+substitution in the parser. No other processing is available and the
+parser stops with an error message when a statement function declaration
+is encountered.
+
+The default used to be not to perform this unchecked replacement, which might 
+change the semantics of the program because type coercion is not enforced
+and actual parameters are not assigned to intermediate variables.
+However most statement functions do not require these extra-steps and it
+is legal to perform the textual substitution. For user convenience, the
+default option is textual substitution.
+
+Note that the parser does not have enoug information to check the validity
+of the transformation, but a warning is issued if legality is doubtful. A
+better method would be to represent them somehow a local functions in the
+internal representation, but the implications for \texttt{pipsmake} and
+other issues are clearly not all foreseen\ldots (Fabien Coelho).
+
 \begin{verbatim}
-PARSER_EXPAND_STATEMENT_FUNCTIONS FALSE
+PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
 \end{verbatim}
 
 
