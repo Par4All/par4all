@@ -259,7 +259,7 @@ text t;
 string words_to_string(lw)
 cons *lw;
 {
-    static char buffer[2048];
+    static char buffer[2048]; /* SNIF */
 
     buffer[0] = '\0';
     MAPL(pw, {
