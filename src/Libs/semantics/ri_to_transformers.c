@@ -10,6 +10,9 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.51  2000/07/20 14:25:26  coelho
+  * leaks--
+  *
   * Revision 1.50  2000/07/20 13:55:40  irigoin
   * cleaning...
   *
@@ -57,72 +60,67 @@
 
 extern Psysteme sc_projection_by_eq(Psysteme sc, Pcontrainte eq, Variable v);
 
-transformer 
-effects_to_transformer(list e) /* list of effects */
+transformer effects_to_transformer(list e) /* list of effects */
 {
-    /* algorithm: keep only write effects on integer scalar variable */
-    transformer tf = transformer_identity();
-    cons * args = transformer_arguments(tf);
-    Pbase b = VECTEUR_NUL;
-    Psysteme s = sc_new();
+  /* algorithm: keep only write effects on integer scalar variable */
+  list args = NIL;
+  Pbase b = VECTEUR_NUL;
+  Psysteme s = sc_new();
 
-    MAPL(cef, { effect ef = EFFECT(CAR(cef));
-		reference r = effect_reference(ef);
-		action a = effect_action(ef);
-		entity v = reference_variable(r);
+  MAP(EFFECT, ef, 
+  {
+    reference r = effect_reference(ef);
+    action a = effect_action(ef);
+    entity v = reference_variable(r);
+    
+    if(action_write_p(a) && entity_has_values_p(v)) 
+    {
+      entity new_val = entity_to_new_value(v);
+      args = arguments_add_entity(args, new_val);
+      b = vect_add_variable(b, (Variable) new_val);
+    }
+  },
+      e);
+  
+  s->base = b;
+  s->dimension = vect_size(b);
 
-		if(action_write_p(a) && entity_has_values_p(v)) {
-		    entity new_val = entity_to_new_value(v);
-		    args = arguments_add_entity(args, new_val);
-		    b = vect_add_variable(b, (Variable) new_val);}},
- 	 e);
-
-    transformer_arguments(tf) = args;
-    s->base = b;
-    s->dimension = vect_size(b);
-    /* NewGen should generate proper cast for external types */
-    /* predicate_system(transformer_relation(tf)) = (Psysteme) s; */
-    predicate_system_(transformer_relation(tf)) = /* (char *) */ s;
-    return tf;
+  return make_transformer(args, make_predicate(s));
 }
 
-
-transformer 
-filter_transformer(transformer t, list e) 
+transformer filter_transformer(transformer t, list e) 
 {
-    /* algorithm: keep only information about integer scalar variables
-     * appearing in effects e and store it into a newly allocated transformer
-     */
-    transformer tf = transformer_identity();
-    Pbase b = VECTEUR_NUL;
-    Psysteme s = SC_UNDEFINED;
-    Psysteme sc = predicate_system(transformer_relation(t));
-    /* list args = dup_arguments(transformer_arguments(t)); */
-    list args = NIL;
+  /* algorithm: keep only information about integer scalar variables
+   * appearing in effects e and store it into a newly allocated transformer
+   */
+  Pbase b = VECTEUR_NUL;
+  Psysteme s = SC_UNDEFINED;
+  Psysteme sc = predicate_system(transformer_relation(t));
+  list args = NIL;
+  
+  MAP(EFFECT, ef, 
+  {
+    reference r = effect_reference(ef);
+    /* action a = effect_action(ef); */
+    entity v = reference_variable(r);
+    
+    if(/* action_write_p(a) && */ entity_has_values_p(v)) {
+      /* I do not know yet if I should keep old values... */
+      entity new_val = entity_to_new_value(v);
+      b = vect_add_variable(b, (Variable) new_val);
+      
+      if(entity_is_argument_p(v, transformer_arguments(t))) {
+	args = arguments_add_entity(args, v);
+      }
+    }
+  },
+      e);
+  
+  /* FI: I should check if sc is sc_empty but I haven't (yet) found a
+     cheap syntactic test */
+  s = sc_restricted_to_variables_transitive_closure(sc, b);
 
-    MAPL(cef, { effect ef = EFFECT(CAR(cef));
-		reference r = effect_reference(ef);
-		/* action a = effect_action(ef); */
-		entity v = reference_variable(r);
-
-		if(/* action_write_p(a) && */ entity_has_values_p(v)) {
-		  /* I do not know yet if I should keep old values... */
-		    entity new_val = entity_to_new_value(v);
-		    b = vect_add_variable(b, (Variable) new_val);
-
-		    if(entity_is_argument_p(v, transformer_arguments(t))) {
-			args = arguments_add_entity(args, v);
-		    }
-		}
-    },
- 	 e);
-
-    /* FI: I should check if sc is sc_empty but I haven't (yet) found a
-       cheap syntactic test */
-    s = sc_restricted_to_variables_transitive_closure(sc, b);
-    transformer_arguments(tf) = args;
-    predicate_system_(transformer_relation(tf)) = /* (char *)*/ s;
-    return tf;
+  return make_transformer(args, make_predicate(s));
 }
 
 
@@ -170,23 +168,23 @@ block_to_transformer(list b)
 static void 
 unstructured_to_transformers(unstructured u)
 {
-    cons *blocs = NIL ;
-    control ct = unstructured_control(u) ;
-
-    debug(8,"unstructured_to_transformers","begin\n");
-
-    /* There is no need to compute transformers for unreachable code,
-     * using CONTROL_MAP, but this may create storage and prettyprinter
-     * problems because of the data structure inconsistency.
-     */
-    CONTROL_MAP(c, {
-	statement st = control_statement(c) ;
-	(void) statement_to_transformer(st) ;
-    }, ct, blocs) ;
-
-    gen_free_list(blocs) ;
-
-    debug(8,"unstructured_to_transformers","end\n");
+  list blocs = NIL ;
+  control ct = unstructured_control(u) ;
+  
+  pips_debug(8,"begin\n");
+  
+  /* There is no need to compute transformers for unreachable code,
+   * using CONTROL_MAP, but this may create storage and prettyprinter
+   * problems because of the data structure inconsistency.
+   */
+  CONTROL_MAP(c, {
+    statement st = control_statement(c) ;
+    (void) statement_to_transformer(st) ;
+  }, ct, blocs) ;
+  
+  gen_free_list(blocs) ;
+  
+  pips_debug(8,"end\n");
 }
 
 /* This function is also used when computing preconditions if the exit
@@ -273,43 +271,43 @@ unstructured_to_transformer(unstructured u, list e) /* effects */
     transformer tf;
     control c;
 
-    debug(8,"unstructured_to_transformer","begin\n");
+    pips_debug(8,"begin\n");
 
     pips_assert("unstructured_to_transformer", u!=unstructured_undefined);
 
     c = unstructured_control(u);
     if(control_predecessors(c) == NIL && control_successors(c) == NIL) {
 	/* there is only one statement in u; no need for a fix-point */
-	debug(8,"unstructured_to_transformer","unique node\n");
+	pips_debug(8,"unique node\n");
 	ctf = statement_to_transformer(control_statement(c));
 	tf = transformer_dup(ctf);
     }
     else {
-	/* Do not try anything clever! God knows what may happen in
-	   unstructured code. Transformer tf is not computed recursively
-	   from its components but directly derived from effects e.
-	   Transformers associated to its components are then computed
-	   independently, hence the name unstructured_to_transformerS
-	   instead of unstructured_to_transformer */
-	statement exit = control_statement(unstructured_exit(u));
-
-	debug(8,"unstructured_to_transformer", "complex: based on effects\n");
-
-	(void) unstructured_to_transformers(u);
-
-	if(load_statement_transformer(exit)!=transformer_undefined) {
-	    /* The exit node has been reached */
-	  /* tf = effects_to_transformer(e); */
-	  tf = unstructured_to_global_transformer(u);
-	}
-	else {
-	    /* Never ending loop in unstructured... unless a call to STOP
-               occurs */
-	    tf = transformer_empty();
-	}
+      /* Do not try anything clever! God knows what may happen in
+	 unstructured code. Transformer tf is not computed recursively
+	 from its components but directly derived from effects e.
+	 Transformers associated to its components are then computed
+	 independently, hence the name unstructured_to_transformerS
+	 instead of unstructured_to_transformer */
+      statement exit = control_statement(unstructured_exit(u));
+      
+      pips_debug(8,"complex: based on effects\n");
+      
+      unstructured_to_transformers(u);
+      
+      if(load_statement_transformer(exit)!=transformer_undefined) {
+	/* The exit node has been reached */
+	/* tf = effects_to_transformer(e); */
+	tf = unstructured_to_global_transformer(u);
+      }
+      else {
+	/* Never ending loop in unstructured... unless a call to STOP
+	   occurs */
+	tf = transformer_empty();
+      }
     }
 
-    debug(8,"unstructured_to_transformer","end\n");
+    pips_debug(8,"end\n");
 
     return tf;
 }
