@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/04/28 11:47:33 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/06/23 14:12:59 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -644,6 +644,15 @@ GENERATE_NESTED_PARALLEL_LOOPS TRUE
 
 \begin{verbatim}
 WP65_DEBUG_LEVEL        0
+\end{verbatim}
+
+\section{Partial Atomizer}
+
+This transformation only atomizes indirect reference of array access functions.
+
+
+\begin{verbatim}
+ATOMIZE_INDIRECT_REF_ONLY FALSE
 \end{verbatim}
 
 \section{Distribution}
