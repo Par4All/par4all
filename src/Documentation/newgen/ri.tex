@@ -481,37 +481,65 @@ tableau, c'est-a`-dire un couple borne infe'rieure -- sous-domaine
 
 \domain{Functional = parameters:parameter* x result:type}{}
 
+Type {\tt functional} is used for objects representing the explicit
+syntactic type of a module, function, subroutine or main
+program. Effects on global variables are not taken into account. Field
+{\tt parameters} contains the type of each formal parameter, and the
+in/out information. Field {\ttt result} contains the result type. Type
+{\tt void} is used for subroutines and main programs.
+
+\iffalse
 Le domaine \verb/functional/ repre'sente le type d'un module,
 c'est-a`-dire une fonction, une subroutine ou un programme principal. Le
 sous-domaine \verb/parameters/ donne le type et le mode de passage de
 chaque parame`tre, et le sous-domaine \verb/result/ donne le type du
 re'sultat. Ce dernier type vaut \verb/void/ pour les subroutines et les
 programmes principaux.
+\fi
 
+There is no provision to represent functions or subroutines with varying
+number of formal parameters. This facility is not supported by Fortran
+for programmer-defined modules, but it is used for intrinsics such as
+\verb+MIN0+ which expects a {\em list} of integer parameters, and for
+Fortran primitives\footnote{Fortran primitives are encoded like
+intrinsics and called {\em intrinsics} in PIPS.} such as {\tt WRITE}
+which is highly polymorphic.
+
+\iffalse
 Il n'y a pas de moyens simples pour repre'senter les fonctions ou
 sous-programmes a` nombre variable de parame`tres. Bien que ce soit
 interdit pour les modules de'finis par le programmeur, de nombreux
 intrinse`ques comme \verb+MIN0+ ou \verb+WRITE+ n'ont pas un profil
 unique.
+\fi
 
 \subsubsection{Parameter Type and Mode}
 \label{subsubsection-parameter}
 \index{Parameter}
 
-\domain{Parameter = type x mode}
-{
+\domain{Parameter = type x mode}{}
+
+Objects of type {\tt parameter} represents type and inout information
+for formal parameters.
+
+\iffalse
 Le domaine \verb/parameter/ repre'sente le type et le mode de passage d'un
 parame`tre formel de module. 
-}
+fi
 
 \index{Mode}
-\domain{Mode = value:unit + reference:unit}
-{
+\domain{Mode = value:unit + reference:unit}{}
+
+Type {\tt mode} is used to carry inout information for formal
+parameters. Member {\tt value} is used for calling by value. Member {\tt
+reference} is used for calling by reference. Fortran uses calls by reference.
+
+\iffalse
 Le domaine \verb/mode/ repre'sente le mode de passage d'un parame`tre
 formel de module. Le domaine contient un objet du domaine \verb/value/
 pour le mode de passage par valeur et \verb/reference/ pour le passage
 par adresse.
-}
+\fi
 
 \subsection{Storage}
 \label{subsection-storage}
