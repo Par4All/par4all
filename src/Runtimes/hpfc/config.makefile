@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/22 14:51:03 $, )
+# ($Date: 1996/08/22 14:52:39 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -220,8 +220,8 @@ INSTALL_INC =	$(CORE_HEADERS) \
 		$(HPFC_MAKEFILES) \
 		$(M4_MACROS) \
 		$(SCRIPTS) \
-		$(LIB_FFILES)
-
+		hpfc_check.f
+INSTALL_SHR=	hpfc_fake.f
 INSTALL_LIB=	$(LIB_TARGET)
 
 #
