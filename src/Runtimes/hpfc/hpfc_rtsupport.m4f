@@ -1067,8 +1067,8 @@ _direct(`'
 !
       subroutine HPFC RCVFR N
       include "hpfc_commons.h"
-      integer info
-      call HPFC RECEIVE(NEIGHBORLID, RECVCHANNELS(NEIGHBORLID), info)
+      integer bufid
+      call HPFC RECEIVE(NEIGHBORLID, RECVCHANNELS(NEIGHBORLID), bufid)
       end
 !
 !-----------------
