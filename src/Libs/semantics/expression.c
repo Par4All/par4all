@@ -4,6 +4,9 @@
   * $Id$
   *
   * $Log: expression.c,v $
+  * Revision 1.8  2003/07/24 10:02:09  irigoin
+  * Warning avoided for modulo_to_transformer()
+  *
   * Revision 1.7  2003/07/24 09:02:26  irigoin
   * Better handling of absolute value intrinsic, more debugging statements,
   * more filtering to decide if integer variables should be analyzed or not.
@@ -825,12 +828,12 @@ affine_increment_to_transformer(entity e, Pvecteur a)
 static transformer modulo_to_transformer(entity e, /* assumed to be a value */
 					 expression arg1,
 					 expression arg2,
-					 transformer pre,
+					 transformer pre, /* not used yet */
 					 bool is_internal)
 {
   transformer tf = transformer_undefined;
 
-  debug(8, "modulo_to_transformer", "begin\n");
+  pips_debug(8, "begin with pre=%p\n", pre);
 
   /* Should be rewritten with expression_to_transformer */
   /* pips_assert("Precondition is unused", pre==pre); */
