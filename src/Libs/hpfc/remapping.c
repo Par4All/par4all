@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/09/15 15:54:30 $, ) 
+ * ($Date: 1995/09/18 13:23:29 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -261,6 +261,7 @@ processor_loop(
     entity psi,
     entity oth,
     entity lid, 
+    entity array,
     entity (*create_psi)(int),
     entity (*create_oth)(int),
     statement body,
@@ -275,7 +276,7 @@ processor_loop(
     /* the lid computation is delayed in the body for diffusions
      */
     compute_lid = (lid) ?
-	hpfc_compute_lid(lid, oth, create_oth, FALSE, NULL) : 
+	hpfc_compute_lid(lid, oth, create_oth, array) : 
 	make_empty_statement(); 
 
     /* simplifies the processor arrangement for the condition
@@ -381,7 +382,7 @@ broadcast(
 {
     statement cmp_lid, body, nest;
 
-    cmp_lid = hpfc_compute_lid(lid, proc, get_ith_processor_prime, FALSE, NULL);
+    cmp_lid = hpfc_compute_lid(lid, proc, get_ith_processor_prime, NULL);
     body = make_block_statement
 	(CONS(STATEMENT, cmp_lid,
 	 CONS(STATEMENT, if_different_pe
@@ -487,11 +488,13 @@ gen(int what,
 
     case SND+INL+BUF:
     case SND+INL+LZY+BUF:
-	ret(hpfc_lazy_buffer_packing(src, lid, proc, create_src,
+    case BRD+INL+BUF:
+    case BRD+INL+LZY+BUF:
+	ret(hpfc_lazy_buffer_packing(src, trg, lid, proc, create_src,
 				     TRUE /* send! */, is_lazy));
     case RCV+INL+BUF:
     case RCV+INL+LZY+BUF:
-	ret(hpfc_lazy_buffer_packing(trg, lid, proc, create_trg,
+	ret(hpfc_lazy_buffer_packing(trg, trg, lid, proc, create_trg,
 				     FALSE /* receive! */, is_lazy));
     case RCV+INL:
     case RCV+INL+LZY:
@@ -507,15 +510,19 @@ gen(int what,
 
     case SND+PST+BUF:
     case SND+PST+LZY+BUF:
-	ret(hpfc_broadcast_if_necessary(src, lid, proc, is_lazy));
+    case BRD+PST+BUF:
+    case BRD+PST+LZY+BUF:
+	ret(hpfc_broadcast_if_necessary(src, trg, lid, proc, is_lazy));
 
 	/* snd/rcv pre buf
 	 */
-    case SND+PRE+LZY+BUF:
     case SND+PRE+BUF:
+    case SND+PRE+LZY+BUF:
+    case BRD+PRE+BUF:
+    case BRD+PRE+LZY+BUF:
 	ret(hpfc_buffer_initialization(TRUE /* send! */, is_lazy));
-    case RCV+PRE+LZY+BUF:
     case RCV+PRE+BUF:
+    case RCV+PRE+LZY+BUF:
 	ret(hpfc_buffer_initialization(FALSE /* receive! */, is_lazy));
 	
 	/* default is a forgotten case, I guess
@@ -547,8 +554,12 @@ remapping_stats(
 {
     entity proc = array_to_processors(trg);
     statement inner, prel, postl, result;
-    int what = (get_bool_property(LAZY_MESSAGES) ? LZY : NLZ) + 
-	       (get_bool_property(USE_BUFFERS) ? BUF : NBF) + t;
+    bool is_buffer, is_lazy;
+    int what;
+
+    is_lazy = get_bool_property(LAZY_MESSAGES);
+    is_buffer = get_bool_property(USE_BUFFERS);
+    what = (is_lazy ? LZY : NLZ) + (is_buffer ? BUF : NBF) + t;
     
     prel  = gen(what+PRE, src, trg, lid, proc, 
 		get_ith_local_dummy, get_ith_local_prime, sr, ldiff);
@@ -599,6 +610,7 @@ bool dist_p; /* true if must take care of lambda */
            lambda = get_ith_temporary_dummy(3),
            primary = load_primary_entity(src);
     statement copy, recv, send, receive, cont, result;
+    bool is_buffer = get_bool_property(USE_BUFFERS);
 
     pips_debug(3, "%s taking care of processor cyclic distribution\n", 
 	       dist_p ? "actually" : "not");
@@ -618,7 +630,7 @@ bool dist_p; /* true if must take care of lambda */
 	    remapping_stats(SND, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
     
 	send = processor_loop
-	    (procs, l, lp, p_src, p_trg, lid,
+	    (procs, l, lp, p_src, p_trg, lid, NULL,
 	     get_ith_processor_dummy, get_ith_processor_prime,
 	     if_different_pe(lid, rp_send, make_empty_statement()), FALSE);
     }
@@ -641,7 +653,7 @@ bool dist_p; /* true if must take care of lambda */
 	diff = remapping_stats(BRD, locals, sr, ll, ldiff, ld, lid, src, trg);
 
 	send = processor_loop
-	    (sd, l, lpproc, p_src, p_trg, NULL,
+	    (sd, l, lpproc, p_src, p_trg, lid, is_buffer ? trg : NULL,
 	     get_ith_processor_dummy, get_ith_processor_prime,
 	     diff, FALSE);
 
@@ -655,7 +667,7 @@ bool dist_p; /* true if must take care of lambda */
     }
 
     receive = processor_loop
-	(procs, lp, l, p_trg, p_src, lid,
+	(procs, lp, l, p_trg, p_src, lid, NULL,
 	 get_ith_processor_prime, get_ith_processor_dummy,
 	 if_different_pe(lid, recv, copy), TRUE);
 
