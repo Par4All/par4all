@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.14  2000/06/28 14:16:17  coelho
+   CSE not inverted?
+
    Revision 1.13  1999/07/15 20:35:46  coelho
    temporary working version of AC-CSE...
 
@@ -1244,7 +1247,7 @@ void perform_ac_cse(string name, statement s)
   gen_recurse(s, sequence_domain, seq_flt, gen_null);
 
   /* insert moved code in statement. */
-  insert_reverse_order = FALSE;
+  insert_reverse_order = TRUE;
   gen_multi_recurse(s, statement_domain, gen_true, insert_rwt, NULL);
 
   close_inserted();
