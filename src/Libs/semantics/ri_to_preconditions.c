@@ -296,11 +296,19 @@ transformer tf;
 	/* propagate as precondition an invariant for the whole 
 	   unstructured u */
 	transformer pre_u = 
-	    invariant_wrt_transformer(transformer_dup(pre),tf);
+	    invariant_wrt_transformer(pre,tf);
 	debug(8,"unstructured_to_postcondition",
 	      "complex: based on transformer\n");
+	ifdebug(8) {
+	  debug(8,"unstructured_to_postcondition",
+	      "filtered precondition pre_u:\n");
+	  (void) print_transformer(pre_u) ;
+	}
 	/* FI: I do not know if I should duplicate pre or not. */
 	/* FI: well, dumdum, you should have duplicated tf! */
+	/* FI: euh... why? According to comments about transformer_apply()
+	 * neither arguments are modified...
+	 */
 	(void) unstructured_to_postconditions(pre_u, pre, u) ;
 	post = transformer_apply(transformer_dup(tf), pre);
 	transformer_free(pre_u);
