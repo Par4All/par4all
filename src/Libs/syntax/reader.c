@@ -561,7 +561,7 @@ int
 GetChar(FILE * fp)
 {
     int c = UNDEF;
-    static col = 0;
+    static int col = 0;
     static FILE * previous_fp = NULL;
 
     init_getchar_buffer();
@@ -624,6 +624,9 @@ GetChar(FILE * fp)
 		    col += 1;
 		    getchar_buffer[l_getchar++] = ' ';
 		}
+	    } else if (c == '\r') {
+		/* Ignore carriage returns introduced by VMS, MSDOS or MACOS...*/
+		;
 	    }
 	    else {
 		col += 1;
@@ -820,13 +823,14 @@ ReadLine(FILE * fp)
 
 	while ((c = GetChar(fp)) != '\n') {
 	    if (c == '\'' || c == '"') {
-		if (EtatQuotes == INQUOTES)
+		if (EtatQuotes == INQUOTES) {
 		    if(c == QuoteChar)
 		        EtatQuotes = INQUOTEQUOTE;
 		    else {
 		        if (EtatQuotes == INQUOTEQUOTE)
 			    EtatQuotes = NONINQUOTES;
 		    }
+		}
 		else if(EtatQuotes == INQUOTEBACKSLASH) 
 		    EtatQuotes = INQUOTES;
 		else {
