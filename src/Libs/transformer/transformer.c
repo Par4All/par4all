@@ -338,9 +338,8 @@ transformer_projection_with_redundancy_elimination(
 	/* get rid of unwanted values in the relation r and in the basis */
 	for (cea = args ; !ENDP(cea); POP(cea)) {
 	    entity e = ENTITY(CAR(cea));
-	    Pbase b = base_dup(sc_base(r));
             pips_assert("base contains variable to project...",
-                        base_contains_variable_p(b, (Variable) e));
+                        base_contains_variable_p(sc_base(r), (Variable) e));
             
 	    CATCH(overflow_error) 
 	    {
@@ -358,8 +357,10 @@ transformer_projection_with_redundancy_elimination(
 	    }
 
 	    sc_base_remove_variable(r,(Variable) e);
-	    /* Eliminate redundancy at each projection stage
-	     * to avoid explosion of the constraint number
+	 
+	    /* could eliminate redundancy at each projection stage
+	     * to avoid explosion of the constraint number...
+	     * however it is pretty expensive to do so.
 	     */
 	    /*
 	    if (!sc_empty_p(r) {
@@ -391,13 +392,15 @@ transformer_projection_with_redundancy_elimination(
 	r->dimension = vect_size(r->base);
 
 	/* compute new_args */
-	MAPL(ce, { entity e = ENTITY(CAR(ce));
-		   if((entity) gen_find_eq(e, args) ==
-		      (entity) chunk_undefined) {
-		       /* e must be kept if it is not in args */
-		       new_args = arguments_add_entity(new_args, e);
-		   }},
-	     transformer_arguments(t));
+	MAP(ENTITY, e, 
+	{ 
+	  if((entity) gen_find_eq(e, args) == (entity) chunk_undefined)
+	  {
+	    /* e must be kept if it is not in args */
+	    new_args = arguments_add_entity(new_args, e);
+	  }
+	},
+	    transformer_arguments(t));
 
 	/* update the relation and the arguments field for t */
 
@@ -409,6 +412,7 @@ transformer_projection_with_redundancy_elimination(
 	gen_free_list(transformer_arguments(t));
 	transformer_arguments(t) = new_args;
     } 
+
     return t;
 }
 
@@ -418,31 +422,29 @@ transformer_projection_with_redundancy_elimination(
  * There is (should be!) no sharing between pre and tf. No sharing is
  * introduced between pre or tf and post. Neither pre nor tf are modified.
  */
-transformer 
-transformer_apply(tf, pre)
-transformer tf;
-transformer pre;
+transformer transformer_apply(transformer tf, transformer pre)
 {
     transformer post;
     transformer copy_pre;
 
-    debug(8,"transformer_apply","begin\n");
-    pips_assert("transformer_apply", tf!=transformer_undefined);
-    debug(8,"transformer_apply","tf=%x\n", tf);
+    pips_debug(8,"begin\n");
+    pips_assert("tf is not undefined", tf!=transformer_undefined);
+    pips_debug(8,"tf=%x\n", tf);
     ifdebug(8) (void) print_transformer(tf);
-    pips_assert("transformer_apply", pre!=transformer_undefined);
-    debug(8,"transformer_apply","pre=%x\n", pre);
+    pips_assert("pre is not undefined", pre!=transformer_undefined);
+    pips_debug(8,"pre=%x\n", pre);
     ifdebug(8) (void) print_transformer(pre);
 
     /* post = tf o pre ; pre would be modified by transformer_combine */
     copy_pre = transformer_dup(pre);
     post = transformer_combine(copy_pre, tf);
 
-    pips_assert("transformer_apply", post!=transformer_undefined);
-    debug(8,"transformer_apply","post=%x\n", post);
+    pips_assert("post is not undefined", post!=transformer_undefined);
+    pips_debug(8,"post=%x\n", post);
     ifdebug(8) (void) print_transformer(post);
-    pips_assert("transformer_apply: unexpected sharing:",post != pre);
-    debug(8,"transformer_apply","end\n");
+    pips_assert("unexpected sharing",post != pre);
+    pips_debug(8,"end\n");
+
     return post;
 }
 
