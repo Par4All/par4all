@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
-extern   int fprintf();
+
 #include "assert.h"
 #include "arithmetique.h"
 #include "boolean.h"
