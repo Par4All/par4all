@@ -1,7 +1,7 @@
 /* MEM_SPY : Package to track memory usage.
  * Beatrice Creusillet - August 1995 
  * $RCSfile: mem_spy.c,v $ (version $Revision$)
- * $Date: 1996/09/21 16:25:22 $, .
+ * $Date: 1997/07/18 12:03:19 $, .
  */
 /* Usage:
  *
@@ -38,6 +38,7 @@
  *  - new function mem_spy_info() to print mallinfo
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
