@@ -1,13 +1,13 @@
-c
-c $RCSfile: hpfc_bufmgr.m4f,v $ (version $Revision$)
-c $Date: 1996/09/07 15:47:07 $, 
-c
-c First routines to fake the pack/unpack of data.
-c The issue is to allow quite simply to measure the different
-c overheads in the enumaration/packing/message stuff.
-c Counts the number of calls, say for some statistics.
-c The the routines for doing the job...
-c
+!
+! $RCSfile: hpfc_bufmgr.m4f,v $ (version $Revision$)
+! $Date: 1996/10/17 13:55:13 $, 
+!
+! First routines to fake the pack/unpack of data.
+! The issue is to allow quite simply to measure the different
+! overheads in the enumaration/packing/message stuff.
+! Counts the number of calls, say for some statistics.
+! The the routines for doing the job...
+!
 define(`GENERIC_BUFFER_PACK',`dnl
 pushdef(`PVMTYPE',$1)dnl
 fake_buffers(dnl
@@ -73,13 +73,15 @@ popdef(`PVMTYPE')')dnl
 define(`GENERIC_BUFFER',`
 GENERIC_BUFFER_PACK($1)
 GENERIC_BUFFER_UPCK($1)')
-dnl GENERIC_BUFFER(BYTE1)
-dnl GENERIC_BUFFER(INTEGER2)
-GENERIC_BUFFER(INTEGER4)
-GENERIC_BUFFER(REAL4)
-GENERIC_BUFFER(REAL8)
-dnl GENERIC_BUFFER(COMPLEX8)
-dnl GENERIC_BUFFER(COMPLEX16)
-c
-c that is all
-c
+
+ifdef(`_HPFC_NO_BYTE1_',,`GENERIC_BUFFER(BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`GENERIC_BUFFER(INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`GENERIC_BUFFER(INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`GENERIC_BUFFER(REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`GENERIC_BUFFER(REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`GENERIC_BUFFER(COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`GENERIC_BUFFER(COMPLEX16)')
+
+!
+! that is all
+!
