@@ -8,13 +8,12 @@
 
 
 
-The PIPS software is distributed both in an executable form (for SUNOS4
-and for SOLARIS2) and source code. Note that the source code is not
-bullet-proof and is large (200,000 lines of C code). Its compilation
-requires many public-domain tools to be installed, thus we recommend that
-you download the compiled version if you do not plan to use <a
-href=http://www.cri.ensmp.fr/pips>PIPS</a> as a base for developing new
-analysis or transformation phases. <p>
+The PIPS software is distributed both in an executable form and source
+code. Note that the source code is not bullet-proof and is large (200,000
+lines of C code). Its compilation requires many public-domain tools to be
+installed, thus we recommend that you download the compiled version if you
+do not plan to use <a href=http://www.cri.ensmp.fr/pips>PIPS</a> as a base
+for developing new analysis or transformation phases. <p>
 
 When installing PIPS on your system, please read the README and INSTALL
 files at the root directory of the distribution for further instructions
@@ -31,13 +30,14 @@ requires 10-20MB.
 
 <ul>
 <li> <a href=distribution/pips_GNUSOL2LL.tar.gz>PIPS for Solaris 2</a>
-     (Ultra Sparc <code>long long</code> integers version)  (4MB)
+     (Ultra Sparc <code>long long</code> integers version)  (3.9MB)
 <li> <a href=distribution/pips_GNUSOL1.tar.gz>PIPS for SunOS 4</a> (3.5MB)
-<li> <a href=distribution/pips_IBMAIX.tar.gz>PIPS for IBM AIX4</a> (6MB)
+<li> <a href=distribution/pips_IBMAIX.tar.gz>PIPS for IBM AIX 4</a> (3.7MB)
      (does not include wpips and epips, but only basic intefaces). 
 <li> <a href=distribution/pips_LINUXI86.tar.gz>PIPS for i86/Linux</a> (3MB))
 <li><a href=distribution/public_GNUSOL2LL.tar.gz>Public parts for Solaris 2</a>
-     (toolpack 1.2 and daVinci 2) (caution! 10MB!)
+     (toolpack 1.2 and daVinci 2, pips can be run without these, just download
+     if you really need these functionalities) (caution! 10MB!)
 </ul>
 
 
@@ -51,17 +51,19 @@ public license (GPL) that you may find quite easily on the net. <p>
 
 GNU make, cproto, flex, bison and some other tools are required to build
 PIPS. See the next section for pointers on how to find and download these
-tools which are not included in the basic distribution.
+tools which are not included in the basic distribution. 
 
 <ul> 
 <li><a href=distribution/pips_sources.tar.gz>PIPS sources</a>
-	(includes Newgen and Linear, the docs...) (4MB)
+	(includes Newgen, Linear and Pips) (3.9MB)
+<li><a href=distribution/pips_valid.tar.gz>PIPS validation</a>
+	(for non regression tests, to be added to the sources) (1.2MB)
 <li><a href=distribution/newgen_sources.tar.gz>NEWGEN</a>
-	(software engineering tool) (0.3MB)
+	(standalone software engineering tool) (0.3MB)
 <li><a href=distribution/linear_sources.tar.gz>LINEAR C3 library</a> 
-	(integer linear programming modules) (0.5MB)
+	(standalone integer linear programming modules) (0.5MB)
 <li><a href=distribution/xpomp_sources.tar.gz>XPOMP</a>
-	 (X-based 2D data graphical display) (0.2MB)
+	 (standalone X-based 2D data graphical display) (0.2MB)
 </ul>
 
 
