@@ -105,7 +105,7 @@ typedef long Value;
 
 #define modulo(a,b) MODULO(a,b)
 
-typedef struct fract{Value num, den; int numero ; } frac ;
+typedef struct {Value num, den; int numero ; } frac ;
 typedef struct col{int taille, existe ; frac *colonne ;} tableau ;
 
 /* end of $RCSfile: arithmetique-local.h,v $
