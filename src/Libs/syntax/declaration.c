@@ -1258,30 +1258,36 @@ entity m;
 void 
 print_common_layout(FILE * fd, entity c)
 {
-    list members = area_layout(type_area(entity_type(c)));
+    entity mod = get_current_module_entity();
+    /* list members = area_layout(type_area(entity_type(c))); */
+    list members = common_members_of_module(c, mod , TRUE);
     list equiv_members = NIL;
 
     (void) fprintf(fd,"\nLayout for common /%s/ of size %d:\n",
 		   module_local_name(c), area_size(type_area(entity_type(c))));
 
     if(ENDP(members)) {
+	pips_assert("An empty area has size 0", area_size(type_area(entity_type(c)))==0);
 	(void) fprintf(fd, "\t* empty area *\n\n");
     }
     else {
+	pips_assert("A non-empty area has size greater than 0",
+		    area_size(type_area(entity_type(c)))>0);
 	/* Look for variables declared in this common by *some* procedures
 	 * which declares it. The procedures involved depend on the ordering
 	 * of the parser steps by pipsmake and the user. Maybe, the list should
-	 * be filtered and restricted to the current module
+	 * be filtered and restricted to the current module: YES!
 	 */
 	MAP(ENTITY, m, 
 	    {
 		pips_assert("RAM storage",
 			    storage_ram_p(entity_storage(m)));
-		(void) fprintf(fd,
-			       "\tVariable %s,\toffset = %d,\tsize = %d\n", 
-			       entity_name(m),
-			       ram_offset(storage_ram(entity_storage(m))),
-			       SizeOfArray(m));
+		if(ram_function(storage_ram(entity_storage(m)))==mod)
+		    (void) fprintf(fd,
+				   "\tVariable %s,\toffset = %d,\tsize = %d\n", 
+				   entity_name(m),
+				   ram_offset(storage_ram(entity_storage(m))),
+				   SizeOfArray(m));
 	    }, 
 		members);
 	(void) fprintf(fd, "\n");
@@ -1317,6 +1323,7 @@ print_common_layout(FILE * fd, entity c)
 	    gen_free_list(equiv_members);
 	}
     }
+    gen_free_list(members);
 }
 
 bool 
