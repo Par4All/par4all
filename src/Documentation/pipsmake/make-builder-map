@@ -15,7 +15,7 @@ cat >map$$ <<EOF
 
 static struct builder_map {
     char *builder_name;
-    bool (*builder_func)();
+    bool (*builder_func)(char *);
 } builder_maps[] = {
 
 EOF
@@ -24,7 +24,7 @@ for func in $functions
 do
 #	echo $func
 	FUNC=`echo $func | tr a-z A-Z`
-	echo "extern bool $func();" >>decl$$
+	echo "extern bool $func(char *);" >>decl$$
 	echo "    { BUILDER_$FUNC, $func }," >>map$$
 done
 
