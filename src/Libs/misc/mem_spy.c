@@ -1,7 +1,8 @@
-/*********************************************************************************/
-/* MEM_SPY : Package to track memory usage. - Beatrice Creusilllet - August 1995 */
-/*********************************************************************************/
-
+/* MEM_SPY : Package to track memory usage.
+ * Beatrice Creusillet - August 1995 
+ * $RCSfile: mem_spy.c,v $ (version $Revision$)
+ * $Date: 1995/12/19 10:55:13 $, .
+ */
 /* Usage:
  *
  *  ~ mem_spy_init() allocates and initializes all that is needed.
@@ -120,24 +121,20 @@ void mem_spy_reset()
 static int 
 current_memory_size()
 {
-    struct mallinfo heap_info = mallinfo();
+    struct mallinfo heap_info;
     int memory_size;
     
+    heap_info = mallinfo();
+
     switch(measurement) {
     case SBRK_MEASURE: 
 	memory_size = sbrk(0) - etext;
 	break;
     case NET_MEASURE: 
-	memory_size = heap_info.uordblks+heap_info.usmblks ;
-/*	fprintf(stderr, 
-		"[current_memory_size] %d (%d/%d/%d) small blocks.\n",
-		heap_info.usmblks,
-		heap_info.mxfast,
-		heap_info.nlblks,
-		heap_info.grain);*/
+	memory_size = heap_info.uordblks-8*heap_info.ordblks;
 	break;
     case GROSS_MEASURE: 
-	memory_size = heap_info.uordbytes+heap_info.usmblks ;
+	memory_size = heap_info.uordbytes;
 	break;
     default:
 	abort();
