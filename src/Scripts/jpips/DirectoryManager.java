@@ -2,6 +2,9 @@
   $Id$
  
   $Log: DirectoryManager.java,v $
+  Revision 1.6  1999/02/15 14:19:43  coelho
+  *** empty log message ***
+
   Revision 1.5  1998/10/17 12:20:50  coelho
   border++.
 
@@ -25,9 +28,9 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import com.sun.java.swing.*;
-//import com.sun.java.swing.preview.*;
-import com.sun.java.swing.border.*;
+import javax.swing.*;
+//import javax.swing.preview.*;
+import javax.swing.border.*;
 
 import JPips.Pawt.*;
 
