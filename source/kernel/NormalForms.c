@@ -608,7 +608,7 @@ static Matrix *ConvertDarMattoPolMat (Value *A, int NbRows, int NbCols) {
 /**
 *** Smith : This function takes a Matrix A of dim n * l as its input 
 ***         and returns the three matrices U, V and Product such that
-***         Product = U * A * V, where U is an unimodular matrix of dimension
+***         A = U * Product * V, where U is an unimodular matrix of dimension
 ***         n * n and V is an unimodular matrix of dimension l * l.
 ***         Product is a diagonal matrix of dimension n * l.
 ***     
