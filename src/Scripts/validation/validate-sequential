@@ -284,17 +284,10 @@ test_aspect()
   export PIPS_SRCPATH
   
   (
-   for file in ${FILES:-`ls $aspect/*.[cfF]`} ; do
-     if [ "$OSTYPE" = "solaris2.8" ]; then
-	 name=`${PIPS_BASENAME:-basename} $file '\.f'`
-	 name=`${PIPS_BASENAME:-basename} $name '\.F'`
-	 name=`${PIPS_BASENAME:-basename} $name '\.c'`
-     else 
-     #linux-gnu
-	 name=`${PIPS_BASENAME:-basename} $file '.f'`
-	 name=`${PIPS_BASENAME:-basename} $name '.F'`
-	 name=`${PIPS_BASENAME:-basename} $name '.c'`
-     fi     
+   for file in ${FILES:-`ls $aspect/*.[cfF]`} ; do     
+     name=`${PIPS_BASENAME:-basename} $file '.f'`
+     name=`${PIPS_BASENAME:-basename} $name '.F'`
+     name=`${PIPS_BASENAME:-basename} $name '.c'`  
      u_name=`echo $name | tr [a-z] [A-Z]`
      program=$name
 
