@@ -11,6 +11,7 @@ LDFLAGS+=	-L/usr/5lib
 # The following macros define your library.
 #
 # List of other libraries used to build the test main program
+
 MAIN_LIBS= 	$(PIPS_LIBS)
 
 LIB_CFILES=	array_dfg.c \
@@ -19,5 +20,7 @@ LIB_CFILES=	array_dfg.c \
 		adg_predicate.c \
 		adg_graph.c \
 		adg_summary.c
-LIB_HEADERS=	array_dfg-local.h
+
+LIB_HEADERS=	array_dfg-local.h local.h
+
 LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
