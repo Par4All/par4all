@@ -41,8 +41,11 @@ expression CurrentSwitchController;
 
 void MakeCurrentModule(entity e)
 {
-  entity_storage(e) = make_storage_return(entity_undefined);
-  entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL)));
+  entity_storage(e) = make_storage_return(e); /* This must be changed later, the storage is of type return and we have to create a new entity*/
+  if (value_undefined_p(entity_initial(e)))
+    entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL)));
+  /* code_declaration to be updated : only need formal parameters, because the others are added in
+     block statement declaration ? */
   set_current_module_entity(e);
   init_c_areas(); 
   LabelledStatements = NIL;
@@ -63,13 +66,14 @@ void InitializeBlock()
 }
 
 statement MakeBlock(list decls, list stms)
-{
+{ 
   statement s = make_statement(entity_empty_label(), 
 			       STATEMENT_NUMBER_UNDEFINED, 
 			       STATEMENT_ORDERING_UNDEFINED, 
 			       string_undefined,
 			       make_instruction_sequence(make_sequence(stms)),
-			       decls,NULL);
+			       decls,string_undefined);
+  pips_assert("Block statement is consistent",statement_consistent_p(s));
   return s;
 }
 
@@ -149,14 +153,14 @@ entity MakeCLabel(string s)
   entity l = FindOrCreateEntity(get_current_module_name(),strdup(concatenate(LABEL_PREFIX,s,NULL)));
   if (entity_type(l) == type_undefined) 
     {
-      pips_debug(5,"Label %s\n", s);
+      pips_debug(7,"Label %s\n", s);
       entity_type(l) = MakeTypeStatement();
       entity_storage(l) = MakeStorageRom();
       entity_initial(l) = make_value(is_value_constant,
 				     MakeConstantLitteral());
     }
   else 
-    pips_debug(5, "Label %s already exists\n", s);
+    pips_debug(7, "Label %s already exists\n", s);
   return(l);
 }
 
@@ -186,7 +190,7 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
       insert_statement(smt,s2,FALSE);
     }
   pips_assert("While loop is consistent",statement_consistent_p(smt));
-  ifdebug(2) 
+  ifdebug(5) 
     {
       printf("While loop statement: \n");
       print_statement(smt);
@@ -217,7 +221,7 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
       insert_statement(smt,s2,FALSE);
     }
   pips_assert("For loop is consistent",statement_consistent_p(smt));
-  ifdebug(2) 
+  ifdebug(5) 
     {
       printf("For loop statement: \n");
       print_statement(smt);
@@ -282,7 +286,7 @@ statement MakeSwitchStatement(statement s)
       insert_statement(s,smt,FALSE);
     }  
   pips_assert("Switch is consistent",statement_consistent_p(s));
-  ifdebug(2) 
+  ifdebug(5) 
     {
       printf("Switch statement: \n");
       print_statement(s);
