@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/09/30 08:03:23 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1997/01/10 15:23:21 $, )
  * version $Revision$
  */
 
@@ -277,10 +277,10 @@ entity model;
     entity new = gen_find_tabulated(new_name, entity_domain);
     area tmp_area = area_undefined;
 
-    pips_debug(3, "entity %s to be made after %s\n",
+    pips_debug(8, "entity %s to be made after %s\n",
 	       new_name, entity_name(model));
 
-    ifdebug(5)
+    ifdebug(9)
 	pips_assert("consistent model", gen_consistent_p(model));
 
     return(!entity_undefined_p(new) ? new :
