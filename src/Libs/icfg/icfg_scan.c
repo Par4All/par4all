@@ -65,13 +65,22 @@ static bool
     print_ifs = FALSE;
 static text (*decoration)(string) = NULL;
 
+text my_get_any_effect_type_text(string module_name, string resource_name, string summary_resource_name)
+{
+  text txt;
+  push_prettyprints(resource_name, summary_resource_name);
+  txt = get_any_effects_text(module_name, TRUE);
+  reset_generic_prettyprints();
+  return txt;
+}
+
 text my_get_text_proper_effects(string module_name)
 {
   text t;
 
   set_is_user_view_p(FALSE);
   set_methods_for_rw_effects_prettyprint(module_name);
-  t = get_any_effect_type_text(module_name, DBR_PROPER_EFFECTS, string_undefined, TRUE);
+  t = my_get_any_effect_type_text(module_name, DBR_PROPER_EFFECTS, string_undefined);
   reset_methods_for_effects_prettyprint(module_name);
   return t;
 }
