@@ -200,8 +200,7 @@ pips_process_file(string file_name)
        ("trap 'exit 123' 2; pips-process-module ", file_name, NULL));
 
     if(err==123) {
-	user_warning("process_user_file",
-		     "pips-process-module interrupted by control-C\n");
+	pips_user_warning("pips-process-module interrupted by control-C\n");
 	return FALSE;
     }
     else if(err!=0) 
@@ -420,20 +419,18 @@ init_rx(void)
 	pips_internal_error("invalid regular expression\n");
 }
 
-static bool pips_process_file(string file_name)
+static bool 
+pips_process_file(string file_name)
 {
-    string origin = strdup(concatenate(file_name, ".origin", NULL));
+    string origin = strdup(concatenate(file_name, ".origin", 0));
     bool ok = FALSE;
 
     pips_debug(2, "processing file %s\n", file_name);
     
     if (rename(file_name, origin)) {
-      /* Do not raise an exception after a chdir!
-	pips_internal_error("error while renaming %s as %s\n",
-			    file_name, origin);
-			    */
-	user_warning("pips_process_file", "error while renaming %s as %s\n",
-			    file_name, origin);
+	perror("pips_process_file");
+	pips_user_warning("error while renaming %s as %s\n",
+			  file_name, origin);
 	return FALSE;
     }
 
@@ -600,8 +597,7 @@ process_user_file(string file)
 {
     FILE *fd;
     bool success_p = FALSE, cpp_processed_p;
-    char *cwd, buffer[MAXNAMLEN];
-    string abspath = NULL, initial_file, tempfile = NULL, nfile;
+    string cwd, abspath = NULL, initial_file, tempfile = NULL, nfile, name;
     int err;
 
     static int number_of_files = 0;
@@ -682,41 +678,45 @@ process_user_file(string file)
 
     /* the newly created module files are registered in the database */
     fd = safe_fopen(tempfile, "r");
-    while (fscanf(fd, "%s", buffer) != EOF) {
-	char *modname;
-	char * modrelfilename = NULL;
+    while ((name=safe_readline(fd))) 
+    {
+	string mod_name, file_name, res_name;
 
 	number_of_modules++;
-	pips_debug(2, "module %s (number %d)\n", buffer, number_of_modules);
+	pips_debug(2, "module %s (number %d)\n", name, number_of_modules);
 
 	success_p = TRUE;
+	file_name = strdup(name);
 
-	modrelfilename = strdup(buffer);
+	*strchr(name, '.') = '\0'; /* there MUST be one one dot... */
+	mod_name = strdup(name);
+	(void) strupper(mod_name, mod_name);
+	free(name);
 
-	*strchr(buffer, '.') = '\0';
-	(void) strupper(buffer, buffer);
-	modname = strdup(buffer);
+	user_log("  Module         %s\n", mod_name);
 
-	user_log("  Module         %s\n", modname);
+	res_name = db_build_file_resource_name(DBR_SOURCE_FILE,mod_name, ".f");
 
         /* Apply a cleaning procedure on each module: */
         cwd = strdup(get_cwd());
         chdir(db_get_current_workspace_directory());
-        if (!pips_process_file(modrelfilename)) {
-	  chdir(cwd);
-	  free(cwd);
-	  return FALSE;
+
+	if (rename(file_name, res_name)) {
+	    perror("process_user_file");
+	    chdir(cwd); free(cwd); 
+	    pips_internal_error("mv %s %s failed in %s\n", 
+				file_name, res_name, get_cwd());
 	}
-        chdir(cwd);
-        free(cwd);
+	free(file_name);
 
-	DB_PUT_NEW_FILE_RESOURCE(DBR_SOURCE_FILE, modname, modrelfilename);
+        if (!pips_process_file(res_name)) { /* should be a pass... */
+	    chdir(cwd); free(cwd); 
+	    return FALSE;
+	}
 
-	/* ignored at the time... */
-	/* user_warning("process_user_file", 
-			 "Two source codes for module %s."
-			 "The second occurence in file %s is ignored\n",
-			 modname, file); */
+        chdir(cwd); free(cwd);
+
+	DB_PUT_NEW_FILE_RESOURCE(DBR_SOURCE_FILE, mod_name, res_name);
     }
     safe_fclose(fd, tempfile);
 
