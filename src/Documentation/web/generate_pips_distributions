@@ -1,6 +1,6 @@
 #! /bin/sh
 # 
-# $RCSfile$ (version $Revision$)
+# $Id$
 #
 # to regenerate the distribution files:
 #
@@ -37,6 +37,11 @@ make_pips_release -rz -D Doc/xpomp_manual.ps \
 	-D Include -w "-s Src/Runtimes/xpomp" -p -w -e xpomp_sources || 
 	    error 4 "ret $?"
 
+echo "Hpfc Runtime sources"
+move hpfc_runtime
+make_pips_release -rz \
+	-D Include -w "-s Src/Runtimes/hpfc" -p -w -e hpfc_runtime ||
+		error 8 "ret $?"
 
 #
 # BINARIES
