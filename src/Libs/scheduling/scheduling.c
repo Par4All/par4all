@@ -59,6 +59,8 @@ extern bdt search_graph_bdt();
 jmp_buf overflow_error;
 jmp_buf pips_top_level;
 
+#define BDT_EXT ".bdt_file"
+
 /*==================================================================*/
 /* void print_bdt(module_name): print the bdt of module name
  *
