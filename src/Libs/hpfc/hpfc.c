@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/09/21 17:58:28 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/09/22 17:54:33 $, )
  * version $Revision$
  */
  
@@ -571,8 +571,7 @@ void hpfc_install(string name)
  * how: system call to $HPFC_MAKE
  * input: the workspace name (which is not used)
  * output: none.
- * side effects:
- *  - may generate a core if the make fails...
+ * side effects: may stop if can't execute
  * bugs or features:
  */
 void hpfc_make(string name)
@@ -582,7 +581,7 @@ void hpfc_make(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
 
-    safe_system(concatenate("cd ", dir, "/hpfc ; $HPFC_MAKE ", NULL));
+    safe_system(concatenate("cd ", dir, "/hpfc ; $HPFC_MAKE make &", NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_CONSTRUCTION, strdup(name), NO_FILE);
 
