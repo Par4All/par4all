@@ -410,11 +410,10 @@ add_index_range_conditions(
 	else if(incr_ub<=-1) {
 	    incr = -1;
 	}
-	else
+	else {
+	    /* incr == 0 is used below as a give-up condition */
 	    incr = 0;
-
-	/* incr == 0 is used below as a give-up condition */
-
+	}
 
 	/* find the real upper and lower bounds */
 	if(incr<0) {
@@ -904,11 +903,12 @@ whileloop_to_postcondition(
 	    post = precondition_add_condition_information(post, c, FALSE);
 	}
 	else {
-	    /* Assume the loop is entered or not and perform
+	    /* Assume the loop is entered, post_al, or not, post_ne, and perform
 	     * the convex hull of both
 	     */
 	    transformer post_ne = transformer_dup(pre);
 	    transformer post_al = transformer_undefined;
+	    transformer tb = load_statement_transformer(s);
 
 	    debug(8, "whileloop_to_postcondition", "The loop may be executed or not\n");
 
@@ -916,9 +916,14 @@ whileloop_to_postcondition(
 	    precondition_add_condition_information(preb, c, TRUE);
 	    (void) statement_to_postcondition(preb, s);
 
-	    post_al = transformer_apply(tf, preb);
+	    /* The loop is executed at least once: let's execute the last iteration */
+	    post_al = transformer_apply(tb, preb);
+	    post_al = precondition_add_condition_information(post_al, c, FALSE);
+
+	    /* The loop is never executed */
+	    post_ne = precondition_add_condition_information(post_ne, c, FALSE);
+
 	    post = transformer_convex_hull(post_ne, post_al);
-	    post = precondition_add_condition_information(post, c, FALSE);
 	    transformer_free(post_ne);
 	    transformer_free(post_al);
 	}
