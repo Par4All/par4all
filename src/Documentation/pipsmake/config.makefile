@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/20 15:59:05 $, 
+# $Date: 1996/08/20 16:55:09 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -10,16 +10,24 @@ SOURCES=	pipsmake-rc.tex \
 INSTALL_SHR=	pipsmake.rc \
 		wpips.rc
 
-INSTALL_INC=	resources.h \
+DERIVED_INC=	resources.h \
 		phases.h \
 		builder_map.h \
 		wpips_transform_menu_layout.h
 
-INSTALL_DOC=	pipsmake-rc.dvi
+INSTALL_INC=	auto.h \
+		$(DERIVED_INC)
 
-DERIVED_FILES=	$(INSTALL_SHR) $(INSTALL_INC) $(INSTALL_DOC)
+INSTALL_DOC=	pipsmake-rc.dvi \
+		pipsmake-rc.html \
+		pipsmake-rc 
+
+DERIVED_FILES=	$(INSTALL_SHR) $(DERIVED_INC) $(INSTALL_DOC)
 
 all: $(DERIVED_FILES)
+
+# just in case...
+pipsmake-rc:; mkdir $@
 
 pipsmake.rc: pipsmake-rc.tex
 	#
@@ -62,12 +70,12 @@ builder_map.h: pipsmake.rc
 wpips_transform_menu_layout.h:  pipsmake-rc.tex
 	# 
 	# building wpips_transform_menu_layout.h
-	sh ./make-pips-menu < pipsmake-rc.tex
+	sh ./make-pips-menu < $< > $@
 
 clean: local-clean
 
 local-clean:
-	$(RM) $(DERIVED_FILES) *.aux *.log *.ind *.idx
+	$(RM) -r $(DERIVED_FILES) *.aux *.log *.ind *.idx *.toc *.ilg
 
 # end of $RCSfile: config.makefile,v $
 #
