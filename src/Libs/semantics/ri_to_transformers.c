@@ -88,16 +88,15 @@ statement s;
 	int so = statement_ordering(s);
 	transformer stf = load_statement_transformer(s);
 
-	(void) fprintf(stderr, "statement %03d (%d,%d), transformer 0x%x:\n",
+	(void) fprintf(stderr, "statement %03d (%d,%d), transformer %#p:\n",
 		       statement_number(s),
 		       ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-		       (unsigned int) stf);
+		       stf);
 	(void) print_transformer(stf);
 	pips_assert("statement_to_transformer", stf==t);
     }
 
-    debug(8,"statement_to_transformer","end with t=%x\n",
-	  (unsigned int) t);
+    debug(8,"statement_to_transformer","end with t=%#p\n", t);
 
     return(t);
 }
@@ -369,7 +368,7 @@ cons * e; /* effects of loop l */
 		eq = neq;
 	    }
 
-	    /* FI" I hope that inequalities will be taken care of some day! */
+	    /* FI: I hope that inequalities will be taken care of some day! */
 	    /* Well, in June 1997.. */
 
 	    sc_egalites(fsc) = CONTRAINTE_UNDEFINED;
@@ -717,7 +716,7 @@ list ef;
 	}
     }
 
-    pips_debug(8, "end with tf=%x\n", (unsigned int) tf);
+    pips_debug(8, "end with tf=%#p\n", tf);
 
     return tf;
 }
@@ -755,8 +754,8 @@ transformer user_function_call_to_transformer(
 	t_caller = user_call_to_transformer(f, pc, ef);
 
 	ifdebug(8) {
-	    pips_debug(8, "Transformer 0x%x for callee %s:\n",
-		       (unsigned int) t_caller, entity_local_name(f));
+	    pips_debug(8, "Transformer %#p for callee %s:\n",
+		       t_caller, entity_local_name(f));
 	    dump_transformer(t_caller);
 	}
 
@@ -785,8 +784,8 @@ transformer user_function_call_to_transformer(
 
 	ifdebug(8) {
 	    debug(8, "user_function_call_to_transformer", 
-		  "Transformer 0x%x for assignment of %s with %s:\n",
-		  (unsigned int) t_assign, entity_local_name(e), entity_name (rv));
+		  "Transformer %#p for assignment of %s with %s:\n",
+		  t_assign, entity_local_name(e), entity_name (rv));
 	    dump_transformer(t_assign);
 	}
 
@@ -802,8 +801,8 @@ transformer user_function_call_to_transformer(
 
 	ifdebug(8) {
 	    debug(8, "user_function_call_to_transformer", 
-		  "Final transformer 0x%x for assignment of %s with %s:\n",
-		  (unsigned int) t_caller, entity_local_name(e), entity_name (rv));
+		  "Final transformer %#p for assignment of %s with %s:\n",
+		  t_caller, entity_local_name(e), entity_name(rv));
 	    dump_transformer(t_caller);
 	}
 
@@ -830,7 +829,7 @@ transformer user_function_call_to_transformer(
     }
 
     debug(8, "user_function_call_to_transformer",
-	  "end with t_caller=%x\n", (unsigned int) t_caller);
+	  "end with t_caller=%#p\n", t_caller);
 
     return t_caller;
 }
@@ -1082,8 +1081,8 @@ list ef;
 
     ifdebug(8) {
 	debug(8, "user_call_to_transformer", 
-	      "End: after taking non-integer scalar effects %x\n",
-	      (unsigned int) t_caller);
+	      "End: after taking non-integer scalar effects %#p\n",
+	      t_caller);
 	dump_transformer(t_caller);
     }
 
