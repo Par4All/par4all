@@ -8,6 +8,7 @@
 #include <assert.h>
 
 #include "boolean.h"
+#include "arithmetique.h"
 #include "vecteur.h"
 
 /* PRIVATE: introduit du sharing, ne garantit pas l'unicite de chaque
