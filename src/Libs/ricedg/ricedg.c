@@ -899,18 +899,18 @@ Ptsg *gs,*gsop;
     case DG_FAST :
     {
 	/* use region information if some is available */
-	transformer t1 = effect_context(e1);
-	transformer t2 = effect_context(e2);
+	descriptor d1 = effect_descriptor(e1);
+	descriptor d2 = effect_descriptor(e1);
 	
-	if(t1 != transformer_undefined) {
-	    sc1 = (Psysteme) predicate_system(transformer_relation(t1));
+	if(descriptor_convex_p(d1)) {
+	    sc1 = descriptor_convex(d1);
 	}
 	else {
 	    sc1 = SC_UNDEFINED;
 	}
 	
-	if(t2 != transformer_undefined) {
-	    sc2 = (Psysteme) predicate_system(transformer_relation(t2));
+	if(descriptor_convex_p(d2)) {
+	    sc1 = descriptor_convex(d2);
 	}
 	else {
 	    sc2 = SC_UNDEFINED;
