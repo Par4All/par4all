@@ -7,6 +7,9 @@
  * generated, they should also be stored there. 
  * 
  * $Log: unsplit.c,v $
+ * Revision 1.8  2003/08/18 14:18:53  coelho
+ * warns--
+ *
  * Revision 1.7  2000/03/24 11:37:35  coelho
  * use initial order.
  *
@@ -81,6 +84,8 @@ unsplit(string name)
 	(DBR_USER_FILE, PROGRAM_RESOURCE_OWNER, ".txt"), 
 	summary_full_name, dir_name;
     FILE * summary;
+
+    pips_assert("unused argument", name==name);
 
     user_files = hash_table_make(hash_string, 2*n);
 
