@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/08/10 13:05:27 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/08/28 15:00:00 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -440,7 +440,7 @@ RICEDG_STATISTICS_ALL_ARRAYS FALSE
 
 Only take into account true flow dependences (Def -- Use) during the computation of
 SCC?  Note that this is different from the
-CHAINS_DATAFLOW_DEPENDENCE_ONLY option which doesn't compute the whole
+CHAINS\_DATAFLOW\_DEPENDENCE\_ONLY option which doesn't compute the whole
 graph.  Warning: this option potentially yields incorrect parallel code.
 
 \begin{verbatim}
@@ -491,10 +491,10 @@ EFFECTS_PRINT_SDFI TRUE
 
 \section{Regions}
 
-if {\tt MUST_REGIONS} is true, then it computes regions using the algorithm
+if {\tt MUST\_REGIONS} is true, then it computes regions using the algorithm
 described in report E/181/CRI, called {\em $T^{-1}$ algorithm}. It provides more
 accurate regions, and preserve MUST approximations more often. But it is less
-efficient. Its default value is FALSE. EXACT_REGIONS is true for the moment for
+efficient. Its default value is FALSE. EXACT\_REGIONS is true for the moment for
 backward compatibility only.
 
 \begin{verbatim}
@@ -569,8 +569,8 @@ COMPLEXITY_PRINT_STATISTICS 0
 \end{verbatim}
 
 In order to change cost table easily, I added this property.
-It means that unit cost can be found under this directory. We have all_1
-that means all operation cost is 1 , fp_1 that means only floating
+It means that unit cost can be found under this directory. We have all\_1
+that means all operation cost is 1 , fp\_1 that means only floating
 point operation is taken into account and has cost unit 1.
 In the future, we will add ``sparc-2'' and ``cray-ymp'',etc.
 The cost filenames are stored in the complexity-local.h, they are operation,
@@ -614,7 +614,7 @@ ex: if A calls B twice, in callgraph, we only have ONCE A calls B;
 while in icfg, we have twice B called by A.
 So there is no option on the so-called callgraph except the debugging.
 
-debugging level (should be CALLGRAPH_DEBUG_LEVEL and numeric)
+debugging level (should be CALLGRAPH\_DEBUG\_LEVEL and numeric)
 
 \begin{verbatim}
 CALLGRAPH_DEBUG FALSE
@@ -652,7 +652,7 @@ ICFG_DECOR 0
 ICFG_DRAW TRUE
 \end{verbatim}
 
-debugging level (should be ICFG_DEBUG_LEVEL and numeric)
+debugging level (should be ICFG\_DEBUG\_LEVEL and numeric)
 
 \begin{verbatim}
 ICFG_DEBUG FALSE
