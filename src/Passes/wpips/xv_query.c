@@ -172,6 +172,8 @@ string
 wpips_user_request(char * a_printf_format,
                    va_list args)
 {
+   char * the_answer;
+   
    static char message_buffer[SMALL_BUFFER_LENGTH];
 
    (void) vsprintf(message_buffer, a_printf_format, args);
@@ -183,8 +185,16 @@ wpips_user_request(char * a_printf_format,
                /* It is not possible to interrupt wpips_user_request: */
                NULL);
 
+   user_log("User Request...\n");
+
    /* Loop on the Query window: */
-   return (string) xv_window_loop(query_frame);
+   the_answer = (string) xv_window_loop(query_frame);
+
+   /* Log the answer for possible rerun through tpips: */
+   user_log("%s\n\"%s\"\nEnd User Request\n",
+            message_buffer, the_answer);
+   
+   return the_answer;
 }
 
 
