@@ -53,6 +53,10 @@ ParserError(char * f, char * m)
 {
     entity mod = get_current_module_entity();
 
+    uses_alternate_return(FALSE);
+    ResetReturnCodeVariable();
+    SubstituteAlternateReturns(FALSE);
+
     syn_reset_lex();
 
     ResetBlockStack();
