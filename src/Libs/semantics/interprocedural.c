@@ -1051,6 +1051,17 @@ static bool process_call(call c)
 	dump_transformer(current_summary_precondition);
     }
 
+    /* FI: Let's put the summary_precondition in the callee's frame..
+     * Well, it's an illusion because translate_global_values() is
+     * not symmetrical. It only can import global values. The summary
+     * precondition is left in the last caller's frame. It will
+     * have to be translated in callee's frame when used.
+     */
+    /*
+    translate_global_values(current_callee, 
+			    current_summary_precondition);
+			    */
+
     return TRUE;
 }
 
