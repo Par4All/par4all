@@ -1,8 +1,45 @@
+/* 	$Id$	 */
+
+#ifndef lint
+char vcid_pip_tab[] = "$Id$";
+#endif /* lint */
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "pip__type.h"
-#include "pip__tab.h"
+/* Newgen includes 	*/
+#include "genC.h"
+
+/* C3 includes 		*/
+#include "boolean.h"
+#include "arithmetique.h"
+#include "vecteur.h"
+#include "contrainte.h"
+#include "ray_dte.h"
+#include "sommet.h"
+#include "sg.h"
+#include "sc.h"
+#include "polyedre.h"
+#include "matrix.h"
+
+/* Pips includes 	*/
+#include "ri.h"
+#include "constants.h"
+#include "ri-util.h"
+#include "misc.h"
+#include "bootstrap.h"
+#include "complexity_ri.h"
+#include "database.h"
+#include "graph.h"
+#include "dg.h"
+#include "makefile.h"
+#include "paf_ri.h"
+#include "parser_private.h"
+#include "property.h"
+#include "reduction.h"
+#include "text.h"
+#include "paf-util.h"
+#include "pip.h"
 
 
 #define max(x,y) (x>y? x : y)
