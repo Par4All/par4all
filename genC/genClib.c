@@ -285,7 +285,7 @@ gen_chunk * gen_alloc(int size, int gen_check_p, int dom, ...)
 
     va_start(ap, dom);
 
-    cp = (gen_chunk *)alloc(size) ;
+    cp = (gen_chunk *) alloc(size) ;
     cp->i = dom;
 
     bp = &Domains[dom];
@@ -847,6 +847,7 @@ gen_chunk *obj ;
 struct gen_binding *bp ;
 {
     if( IS_INLINABLE(bp )) {
+      /* is it a string with some allocated value? */
 	if( *bp->name == 's' && obj->s && !string_undefined_p(obj->s))
 		newgen_free(obj->s); 
 	return ;
@@ -866,45 +867,42 @@ struct gen_binding *bp ;
    (according to the type DP). The components are (obviously ?) freed by the
    recursive traversal functions (I said it once ... and for all). */
 
-static void
-free_simple_out( obj, dp )
-     gen_chunk *obj ;
-     union domain *dp ;
+static void free_simple_out(gen_chunk *obj, union domain *dp)
 {
-    switch( dp->ba.type ) {
-    case LIST_DT:
-	gen_free_list( obj->l ) ;
-	break ;
-    case SET_DT:
-	set_free( obj->t ) ;
-	break ;
-    case ARRAY_DT:
-	newgen_free( (char *) obj->p ) ;
-	break ;
-    }
+  switch( dp->ba.type ) {
+  case LIST_DT:
+    gen_free_list( obj->l ) ;
+    break ;
+  case SET_DT:
+    set_free( obj->t ) ;
+    break ;
+  case ARRAY_DT:
+    /* ??? where is the size of the array? */
+    newgen_free( (char *) obj->p ) ;
+    break ;
+  }
 }
 
 /* FREE_OBJ_OUT just frees the object OBJ. */
 /* static gen_chunk freed_gen_chunk ; */
 
-static void
-free_obj_out( obj, bp, dr )
-gen_chunk *obj ;
-struct gen_binding *bp ;
-struct driver *dr ;
+static void free_obj_out(
+	 gen_chunk *obj, struct gen_binding *bp, struct driver *dr)
 {
     union domain *dp ;
 
     if((dp=bp->domain)->ba.type == CONSTRUCTED_DT && dp->co.op == ARROW_OP) {
 	hash_table h = (obj+1 + IS_TABULATED( bp ))->h ;
 
+	/* shouldn't this be done by hash_table_free ? */
 	HASH_MAP( k, v, {
 	    newgen_free( (void *)k ) ;
 	    newgen_free( (void *)v ) ;
 	}, h ) ;
 	hash_table_free( h ) ;
     }
-    obj->p = (gen_chunk *)0 ;
+    next was: obj->p = (gen_chunk *)0 ;
+    /* gen_free_area(obj->p, SIZE NOT DIRECTLY AVAILABLE); */
     newgen_free((void *) obj) ;
 }
 
