@@ -1,5 +1,5 @@
 /* $RCSfile: properties.l,v $ (version $Revision$)
- * $Date: 1997/01/22 10:01:42 $, 
+ * $Date: 1997/03/07 14:14:31 $, 
  * 
  * - 01/96: PIPS_PROPERTIESRC added. FC.
  */
@@ -24,6 +24,47 @@
 
 static hash_table pl = (hash_table) NULL;
 
+#ifdef FLEX_SCANNER
+
+/* We may parse strings or files...
+ */
+static char * string_to_parse = (char*) 0; /* shared pointer! */
+
+#define YY_INPUT(buffer, result, max_size)		\
+{							\
+    int i=0;						\
+    if (string_to_parse) /* we're parsing a string */	\
+    {							\
+	while(i<max_size && *string_to_parse)		\
+	    buffer[i++]=*string_to_parse++;		\
+    }							\
+    else /* it's a file */				\
+    {							\
+	int c;						\
+	while (i<max_size && (c=getc(yyin))!=EOF)	\
+	    buffer[i++]=(char) c;			\
+    }							\
+    result = i==0? YY_NULL: i;				\
+}
+
+static void parse_properties(void);
+
+void parse_properties_string(char *s) 
+{
+    string_to_parse = s;
+    parse_properties();
+    string_to_parse = (char *) 0;
+}
+
+#else /* ATT/POSIX just seem to like parsing yyin... */
+
+void parse_properties_string(char *s)
+{
+    pips_internal_error("cannot parse string (%s) without flex\n", s);
+}
+
+#endif /* FLEX_SCANNER */
+
 %}
 
 %%
@@ -34,16 +75,18 @@ FALSE			{return(TFALSE);}
 \"[^\"]*\"		{return(TSTRING);}
 ^[ \t]*#.*$		;
 [ \t\n]*		;
+=			; /* ignore an = */
 .                       {fprintf(stderr, 
 			         "[read_properties] unknown char %c (%d)\n", 
 				 *yytext, *yytext);
 			 exit(1);
 			}
 %%
-int yywrap()
+
+int yywrap(void)
 { return 1;}
 
-static void parse_properties()
+static void parse_properties(void)
 {
     int tok;
     property pr;
