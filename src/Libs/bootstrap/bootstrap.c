@@ -21,6 +21,9 @@
   - intrinsics are not properly typed
 
   $Log: bootstrap.c,v $
+  Revision 1.77  2003/07/28 15:07:42  coelho
+  INVERSE operator name...
+
   Revision 1.76  2003/07/28 15:06:55  nguyen
   Add new intrinsics for C language
 
@@ -35,6 +38,9 @@
 
   Revision 1.72  2002/06/10 12:00:37  irigoin
   $Log: bootstrap.c,v $
+  Revision 1.77  2003/07/28 15:07:42  coelho
+  INVERSE operator name...
+
   Revision 1.76  2003/07/28 15:06:55  nguyen
   Add new intrinsics for C language
 
@@ -3731,7 +3737,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"**", 2, default_intrinsic_type, typing_power_operator, 0},
 
   /* internal inverse operator... */
-  {"INV", 1, real_to_real_type, 
+  { INVERSE_OPERATOR_NAME, 1, real_to_real_type, 
    typing_function_RealDoubleComplex_to_RealDoubleComplex, 0},
   
   {"=", 2, default_intrinsic_type, typing_of_assign, 0},
