@@ -27,7 +27,8 @@ HTML_OTHERS =	\
 	summary_hpfc.html \
 	window-interface.html \
 	wp65.html \
-	wp65_summary.html
+	wp65_summary.html \
+	home_content.html
 
 
 HTMS =	$(HTML_AUTO:.cpp.html=.html) $(HTML_OTHERS)
