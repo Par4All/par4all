@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL1,v $ (version $Revision$)
-# $Date: 1996/07/15 14:01:47 $, 
+# $Date: 1996/07/15 14:10:20 $, 
 #
 # this file contains macro definitions 
 
@@ -10,7 +10,7 @@ CC	= gcc
 CFLAGS	= -O2 -g -ansi -pedantic -Wall -msupersparc -pipe
 CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR)
 LD	= $(CC) 
-LDFLAGS	= -g -nostdlib /usr/lib/crt0.o -L/usr/lib -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)
+LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)
 RANLIB	= granlib
 LEX	= lex
 LFLAGS	=
