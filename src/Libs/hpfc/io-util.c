@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-util.c,v $ ($Date: 1995/09/12 21:06:03 $, )
+ * $RCSfile: io-util.c,v $ ($Date: 1995/09/15 15:54:36 $, )
  * version $Revision$,
  */
 
@@ -21,21 +21,23 @@ static statement hpfc_hmessage(proc, send)
 entity proc;
 boolean send;
 {
-    entity
-	ld = hpfc_name_to_entity(T_LID),
-	nc = hpfc_name_to_entity(send ? SEND_CHANNELS : RECV_CHANNELS),
-	nt = hpfc_name_to_entity(NODETIDS);
-    expression
-	lid = entity_to_expression(ld),
-	tid = reference_to_expression
-	    (make_reference(nt, CONS(EXPRESSION, lid, NIL))),
-	chn = reference_to_expression
-	    (make_reference(nc, CONS(EXPRESSION, copy_expression(lid), NIL)));
+    entity ld, nc, nt;
+    expression lid, tid, chn;
+    statement cmp_lid, msg;
 
-    return(make_block_statement
-         (CONS(STATEMENT, hpfc_compute_lid(ld, proc, get_ith_processor_dummy),
-	  CONS(STATEMENT, hpfc_message(tid, chn, send),
-	       NIL))));
+    ld = hpfc_name_to_entity(T_LID);
+    nc = hpfc_name_to_entity(send ? SEND_CHANNELS : RECV_CHANNELS);
+    nt = hpfc_name_to_entity(NODETIDS);
+    lid = entity_to_expression(ld);
+    tid = reference_to_expression
+	(make_reference(nt, CONS(EXPRESSION, lid, NIL)));
+    chn = reference_to_expression
+	(make_reference(nc, CONS(EXPRESSION, copy_expression(lid), NIL)));
+    cmp_lid = hpfc_compute_lid(ld, proc, get_ith_processor_dummy, FALSE, NULL);
+    msg = hpfc_message(tid, chn, send);
+
+    return make_block_statement
+	(CONS(STATEMENT, cmp_lid, CONS(STATEMENT, msg, NIL)));
 }
 
 /*       PVM_RECV(HOST_TID, {HOST_CHANNEL, MCASTHOST}, BUFID)
@@ -100,22 +102,22 @@ static statement NAME(array, move) entity array; tag move;\
 
 GENERATION(node_pre_io,
 	   hpfc_initsend(FALSE),
-	   hpfc_nrecv(FALSE));
+	   hpfc_nrecv(FALSE))
 GENERATION(node_in_io,
 	   hpfc_pvm_packing(array, get_ith_local_dummy, TRUE),
-	   hpfc_pvm_packing(array, get_ith_local_dummy, FALSE));
+	   hpfc_pvm_packing(array, get_ith_local_dummy, FALSE))
 GENERATION(node_post_io,
 	   hpfc_nsend(),
-	   make_empty_statement());
+	   make_empty_statement())
 GENERATION(host_pre_io,
 	   hpfc_hmessage(array_to_processors(array), FALSE),
-	   hpfc_initsend(FALSE));
+	   hpfc_initsend(FALSE))
 GENERATION(host_in_io,
 	   hpfc_pvm_packing(array, get_ith_array_dummy, FALSE),
-	   hpfc_pvm_packing(array, get_ith_array_dummy, TRUE));
+	   hpfc_pvm_packing(array, get_ith_array_dummy, TRUE))
 GENERATION(host_post_io,
 	   make_empty_statement(),
-	   hpfc_hmessage(array_to_processors(array), TRUE));
+	   hpfc_hmessage(array_to_processors(array), TRUE))
 
 /* generate_io_statements_for_distributed_arrays
  *
