@@ -164,9 +164,9 @@ bool (*loop_predicate)();
 	false_s= test_false(tt);
 	look_for_nested_loop_statements(true_s,loop_transformation, loop_predicate);
 	look_for_nested_loop_statements(false_s,loop_transformation, loop_predicate);
-	debug_off();
+	debug_on("ZERO_DEBUG_LEVEL");
 	new_s = (*loop_transformation)(sl,loop_predicate);
-	debug_on("GENERATION_DEBUG_LEVEL");
+	debug_off();
 	return(new_s);
 	break;
 
@@ -175,9 +175,9 @@ bool (*loop_predicate)();
 	pips_error("look_for_inner_loop","unexpected goto");
 
     case is_instruction_call:
-	debug_off();
+	debug_on("ZERO_DEBUG_LEVEL");
 	new_s = (*loop_transformation)(sl,loop_predicate);
-	debug_on("GENERATION_DEBUG_LEVEL");
+	debug_off();
 
 	return(new_s);
 	break;
@@ -193,9 +193,9 @@ bool (*loop_predicate)();
 	    new_s = look_for_inner_loops(li,sl,loop_transformation, loop_predicate);
 	}
 	else {
-	    debug_off();
+	    debug_on("ZERO_DEBUG_LEVEL");
 	    new_s = (*loop_transformation)(sl,loop_predicate);
-	    debug_on("GENERATION_DEBUG_LEVEL");
+	    debug_off();
 	    break;
 	}
 	return(new_s);
