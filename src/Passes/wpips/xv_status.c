@@ -21,19 +21,21 @@
 
 #define DECALAGE_STATUS 100
 
-static Panel_item directory_name, program_name, module_name,
+static Panel_item directory_name, program_name,
 memory_name, message, window_number;
+Panel_item module_name_panel_item;
 
-/* Strange, man end says that end is a function! */
+
+/* Strange, "man end" says that end is a function! */
 extern etext, edata, end;
 
 void
 display_memory_usage()
 {
-   char memory_string[20];
+   char memory_string[17];
 
    /* Well, the memory usage is quite approximate in my brain... */
-   sprintf(memory_string, "%10.3f MB", (sbrk(0) - etext)/(double)(1 << 20));
+   sprintf(memory_string, "%10.3f", (sbrk(0) - etext)/(double)(1 << 20));
    
    /* printf("_text %x, _data %x, _end %x, _brk %x\n",
           etext, edata, end, sbrk(0)); */
@@ -69,7 +71,6 @@ show_program()
 }
 
 
-
 void
 show_module()
 {
@@ -79,31 +80,9 @@ show_module()
    if (module_name_content == NULL)
       module_name_content = none;
 
-   xv_set(module_name, PANEL_VALUE, module_name_content, 0);
+   xv_set(module_name_panel_item, PANEL_VALUE, module_name_content, 0);
 }
 
-
-
-/*VARARGS0*/
-/*
-void show_message(va_alist)
-va_dcl
-{
-    static char message_buffer[SMALL_BUFFER_LENGTH];
-    va_list args;
-    char *fmt;
-
-    va_start(args, char *);
-
-    fmt = va_arg(args, char *);
-
-    (void) vsprintf(message_buffer, fmt, args);
-
-    va_end(args);
-
-    xv_set(message, PANEL_VALUE, message_buffer, 0);
-}
-*/
 
 void show_message(string message_buffer /*, ...*/)
 {
@@ -151,38 +130,23 @@ void create_status_subwindow()
                                                      xv_rows(main_panel, 3),
                                                      generate_workspace_menu,
                                                      open_or_create_workspace);
-     /*
-    xv_create(main_panel, PANEL_TEXT,
-	      PANEL_VALUE_X, DECALAGE_STATUS,
-	      PANEL_VALUE_Y, xv_rows(main_panel, 3),
-	      PANEL_LABEL_STRING, "Workspace:",
-	      PANEL_VALUE_DISPLAY_LENGTH, 20,
-	      PANEL_READ_ONLY, TRUE, 
-	      NULL);*/
 
-  module_name = schoose_create_abbrev_menu_with_text(main_panel,
-                                                     "Module:",
-                                                     20,
-                                                     DECALAGE_STATUS,
-                                                     xv_rows(main_panel, 4),
-                                                     generate_module_menu,
-                                                     end_select_module_notify);
-     /*
-    xv_create(main_panel, PANEL_TEXT, 
-	      PANEL_VALUE_X, DECALAGE_STATUS,
-	      PANEL_VALUE_Y, xv_rows(main_panel, 4),
-	      PANEL_LABEL_STRING, "Module:",
-	      PANEL_READ_ONLY, TRUE,
-	      PANEL_VALUE_DISPLAY_LENGTH, 20,
-	      NULL);*/
+  module_name_panel_item =
+     schoose_create_abbrev_menu_with_text(main_panel,
+                                          "Module:",
+                                          20,
+                                          DECALAGE_STATUS,
+                                          xv_rows(main_panel, 4),
+                                          generate_module_menu,
+                                          end_select_module_notify);
 
   memory_name = 
     xv_create(main_panel, PANEL_TEXT,
 	      PANEL_ITEM_X_GAP, DECALAGE_STATUS,
               PANEL_VALUE_X, xv_col(main_panel, 60),
               PANEL_VALUE_Y, xv_rows(main_panel, 3),
-	      PANEL_LABEL_STRING, "Memory:",
-	      PANEL_VALUE_DISPLAY_LENGTH, 13,
+	      PANEL_LABEL_STRING, "Memory (MB):",
+	      PANEL_VALUE_DISPLAY_LENGTH, 9,
 	      PANEL_READ_ONLY, TRUE,
 	      NULL);
 
