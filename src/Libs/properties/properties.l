@@ -345,7 +345,8 @@ open_properties(void)
     free(file_name);
 }
 
-/* on close, save the properties.
+/* on close, save the properties in the current workspace.
+ * this is called from close_workspace, so there is some current one.
  */
 void
 close_properties(void)
