@@ -61,23 +61,18 @@ static int NB_INEQ = 0;
 #define DEBUG3(code) { code }
 #endif
 
-/*****duong - set timeout with signal and alarm*****/
+#ifdef CONTROLING
+
 #include <signal.h>
-#define SIMPLEX_TIMEOUT timeout_for_S
-//get timeout from environment by extern variable timeout_for_S. default 3 minutes
+#define CONTROLING_TIMEOUT_SIMPLEX 
 
-boolean S_timeout = FALSE;
-
-void 
-catch_alarm_Simplex (int sig)
-{ 
+static void 
+control_catch_alarm_Simplex (int sig)
+{
   alarm(0); //clear the alarm 
-  DEBUG(fprintf(stderr,"CATCH ALARM sc_simplexe_feasibility_ofl_ctrl !!!\n");)  
-  S_timeout = TRUE;
-  THROW(timeout_error);
-
 }
-/*****duong*****/
+
+#endif
 
 /*************************************************************** CONSTANTS */
 
@@ -598,9 +593,8 @@ sc_simplexe_feasibility_ofl_ctrl(
     frac rapport1, rapport2, min1, min2, pivot, cc ;
 
     
-    static int duong = 0;// count number of calls of this function (at the beginning)       
-    //char * label;// label to print sc in a file sc_default_dump.out
-    
+    DEBUG(static int simplex_sc_counter = 0;)
+      // count number of calls of this function (at the beginning)       
 
     soluble=1;// int soluble = 1;
 
@@ -632,8 +626,9 @@ sc_simplexe_feasibility_ofl_ctrl(
     /* DEBUG(fprintf(stdout, "\n\n IN sc_simplexe_feasibility_ofl_ctrl:\n");
        sc_fprint(stdout, sc, default_variable_to_string);)*/
 
-    duong++;
-    DEBUG(fprintf(stderr,"BEGIN SIMPLEX : %d th\n",duong);
+    
+    DEBUG(simplex_sc_counter ++;
+	  fprintf(stderr,"BEGIN SIMPLEX : %d th\n",simplex_sc_counter);
 	  sc_default_dump(sc);//sc_default_dump_to_file(); print to file	  
     )
 
@@ -659,11 +654,11 @@ sc_simplexe_feasibility_ofl_ctrl(
     
     CATCH(simplex_arithmetic_error|timeout_error)
     {
-      ifscdebug(2) {
+      /*      ifscdebug(2) {
 	fprintf(stderr,"[sc_simplexe_feasibility_ofl_ctrl] arithmetic error\n");
-      }
-
-      DEBUG(fprintf(stdout, "arithmetic error or timeout in simplex\n");)
+	}
+      */
+      DEBUG(fprintf(stderr, "arithmetic error or timeout in simplex\n");)
       
       for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
 	hashtable[i].nom = 0 ;
@@ -673,9 +668,6 @@ sc_simplexe_feasibility_ofl_ctrl(
 	free(eg);
       }
       
-      /* I have noticed that when pips core dumps here, it is because
-       * a CATCH(overflow_error) has been forgotten. bc.
-       */
       for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)  
 	free(t[i].colonne); 
       free(t); 
@@ -685,34 +677,17 @@ sc_simplexe_feasibility_ofl_ctrl(
       base_rm(sc_base(sc));
       sc_base(sc) = saved_base;
       sc_dimension(sc) = saved_dimension;
-      
+
+#ifdef CONTROLING
       alarm(0); //clear the alarm
+#endif
 
-      //only print sc when timeout, not when exception (too many)
-      if (S_timeout) {
-	S_timeout = FALSE;
-	//fprintf(stderr,"System of constraints given to Simplex that timeout printed to sc_default_dump.out: \n");
-	//duong. it's might be different from sc that comes from internal_sc_feasibility
-	//because of projection, normalization, ...
-	//label = "LABEL - System given to sc_simplex_feasibility_ofl_ctrl :";
-	//sc_default_dump_to_file(sc,label,duong);//print to file
-	//sc_default_dump(sc);// print on the stderr
-
-	DEBUG(fprintf(stderr,"END SIMPLEX by timeout: %d th\n",duong);)	  
-      }
-      else {
-	DEBUG(fprintf(stderr,"END SIMPLEX by overflow: %d th\n",duong);)
-      }
-
-      if (ofl_ctrl == FWD_OFL_CTRL) {
-	ifscprintexact(2) {
-	  fprintf(stderr,"\nThis is an exception rethrown from sc_simplexe_feasibility_ofl_ctrl(): \n");
-	}
+      if (ofl_ctrl == FWD_OFL_CTRL) {	
 	RETHROW(); //rethrow whatever the exception is
       }
       //THROW(user_exception_error);
       // need CATCH(user_exception_error) before calling sc_simplexe_feasibility)
-
+      ifscdebug(5) {fprintf(stderr,"DNDNDN WARNING: Exception not treated, return feasible!");}
       return TRUE; /* if don't catch exception, then default is feasible */
 
       //if (ofl_ctrl == FWD_OFL_CTRL)  
@@ -721,10 +696,15 @@ sc_simplexe_feasibility_ofl_ctrl(
       //return TRUE; /* default is feasible */
     }// of CATCH(simplex_arithmetic_error)
 
+    //begin of TRY
+
+#ifdef CONTROLING
     //start the alarm
-    signal(SIGALRM, catch_alarm_Simplex);   
-    alarm(SIMPLEX_TIMEOUT);
-    S_timeout = FALSE;
+    if (CONTROLING_TIMEOUT_SIMPLEX) {
+      signal(SIGALRM, controling_catch_alarm_Simplex);   
+      alarm(CONTROLING_TIMEOUT_SIMPLEX);    
+    } //else nothing
+#endif
 
     if(NB_EQ != 0)
     {
@@ -1440,7 +1420,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     DEBUG1(dump_tableau("fin simplexe", t, compteur);)
     DEBUG(fprintf(stderr, "soluble = %d\n", soluble);)
 
-    DEBUG(fprintf(stderr,"END SIMPLEX: %d th\n",duong);)
+    DEBUG(fprintf(stderr,"END SIMPLEX: %d th\n",simplex_sc_counter);)
 
     for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
       hashtable[i].nom = 0 ;
@@ -1456,8 +1436,9 @@ sc_simplexe_feasibility_ofl_ctrl(
     free(t);
     free(nlle_colonne);
 
+#ifdef CONTROLING
     alarm(0); //clear the alarm
-
+#endif
     UNCATCH(simplex_arithmetic_error|timeout_error);
     
     /* restore initial base */
