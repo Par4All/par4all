@@ -1,6 +1,6 @@
 c
 c $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-c ($Date: 1996/09/07 16:09:44 $, )
+c ($Date: 1996/09/07 16:42:21 $, )
 c
 c
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -136,7 +136,7 @@ c The dual use is to compute the area written and the relative senders.
 c
 c If one of the delta processes is zero, it means that the shift is local.
 c
-      subroutine hpfc shift(array, dim, lb, ub, sh, 
+      subroutine hpfcshift(array, dim, lb, ub, sh, 
      $                      lb1, ub1, lid1, lb2, ub2, lid2)
       integer array, dim, lb, ub, sh,
      $     lb1, ub1, lid1, lb2, ub2, lid2
@@ -219,7 +219,7 @@ define(`GENERIC_SHIFT',`dnl
 pushdef(`LEVEL',$1)dnl
 pushdef(`PVMTYPE',$2)dnl
 pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
-      subroutine build_name(HPFC SHIFT,PVMTYPE,LEVEL)(
+      subroutine build_name(HPFCSHIFT,PVMTYPE,LEVEL)(
      $  array, an, dim, sh, dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_SECTION')
@@ -280,7 +280,7 @@ c
 c the SHIFT is to another processor
 c
                call pvmfinitsend(PVMDATARAW, bufid)
-               call build_name(HPFC PACK,PVMTYPE,LEVEL)
+               call build_name(HPFCPACK,PVMTYPE,LEVEL)
      $            (array, dnl
 COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
@@ -310,7 +310,7 @@ c the SHIFT is to another processor
 c
              call pvmfrecv(NODETIDS(lid(j)),RECVCHANNELS(lid(j)),info)
              RECV CHANNELS(lid(j))=RECV CHANNELS(lid(j))+2
-             call build_name(HPFC UNPACK,PVMTYPE,LEVEL)
+             call build_name(HPFCUNPACK,PVMTYPE,LEVEL)
      $            (array, dnl
 COMMA_REPLICATE(LEVEL,`LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL,`LIST_NEW_SECTION'))
