@@ -441,6 +441,19 @@ void print_expressions(list le)
 
 }
 
+void print_syntax_expressions(list le)
+{
+
+  MAP(EXPRESSION, e , {
+    print_syntax(expression_syntax(e));
+    if(!ENDP(CDR(le))) {
+	(void) fprintf(stderr, ", ");
+    }
+      },
+    le);
+
+}
+
 void print_syntax(s)
 syntax s;
 {
