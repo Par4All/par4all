@@ -1,6 +1,6 @@
 dnl
 dnl $RCSfile: hpfc_architecture_m4_macros,v $ version $Revision$
-dnl ($Date: 1995/09/26 21:32:35 $, )
+dnl ($Date: 1995/09/27 12:44:45 $, )
 dnl
 dnl DEFAULT ARCHITECTURE
 dnl
@@ -20,6 +20,7 @@ dnl
 ifelse(ARCHITECTURE,`CM5', `define(`MIMD',`$@')',
        ARCHITECTURE,`PGON',`define(`MIMD',`$@')')dnl
 ifelse(ARCHITECTURE,`SUN4',`define(`NETWORK',`$@')',
+       ARCHITECTURE,`ALPHA',`define(`NETWORK',`$@')',
        ARCHITECTURE,`RS6K',`define(`NETWORK',`$@')')dnl
 dnl
 dnl PECULIAR DEFINITIONS
