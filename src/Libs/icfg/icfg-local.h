@@ -27,3 +27,5 @@
 #define ICFG_DECOR_OUT_REGIONS 8
 #define ICFG_DECOR_COMPLEXITIES 9
 #define ICFG_DECOR_TOTAL_PRECONDITIONS 10
+
+typedef text get_text_function(list);
