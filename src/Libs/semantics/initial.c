@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.8  1997/09/11 12:00:10  coelho
+ * none.
+ *
  * Revision 1.7  1997/09/10 09:43:30  irigoin
  * Explicit free_value_mappings() added. Context set for
  * program_precondition() and the prettyprinter modules.
@@ -186,7 +189,8 @@ program_precondition(string name)
     debug_off();
     return TRUE;
 }
-
+
+
 /*********************************************************** PRETTY PRINTERS */
 
 bool 
