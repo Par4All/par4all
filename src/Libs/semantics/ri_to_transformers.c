@@ -664,6 +664,7 @@ cons * le;
     ifdebug(8) (void) dump_transformer(ftf);
 
     /* get rid of local read variables */
+
     /* FI: why not use this loop to get rid of *all* local variables, read or written? */
 
     sc = (Psysteme) predicate_system(transformer_relation(ftf));
@@ -674,8 +675,9 @@ cons * le;
 	if(e != (entity) TCST) {
 	    entity v = value_to_variable(e);
 
-	    if( ! effects_read_or_write_entity_p(le, v))
+	    if( ! effects_read_or_write_entity_p(le, v)) {
 		lost_args = arguments_add_entity(lost_args, e);
+	    }
 	}
     }
 
@@ -821,6 +823,15 @@ list ef;
     /* take care of global variables */
     caller = get_current_module_entity();
     translate_global_values(caller, t_caller);
+
+    /* FI: are invisible variables taken care of by translate_global_values()? 
+     * Yes, now.
+     * A variable may be invisible because its location is reached
+     * thru an array or thru a non-integer scalar variable in the
+     * current module, for instance because a COMMON is defined
+     * differently. A variable whose location is not reachable
+     * in the current module environment is considered visible.
+     */
 
     ifdebug(8) {
 	debug(8, "user_call_to_transformer", 
