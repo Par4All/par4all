@@ -61,7 +61,9 @@ void print_host_info_ ()
      */
     fprintf(stdout, "%d machines:\n", nhost);
     for( i=0 ; i<nhost ; i++ )
-	fprintf(stdout, "%s\n", hostp[i].hi_name);
+	fprintf(stdout, "%s (%s)\n", 
+		hostp[i].hi_name,
+		hostp[i].hi_arch);
     fprintf(stdout, "\n");
 }
 
