@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.119  2003/08/04 09:33:53  irigoin
+ * Warning amplified to provide a possibly useful clue to the user
+ *
  * Revision 1.118  2003/06/16 13:25:50  coelho
  * is_quit
  *
@@ -974,7 +977,8 @@ static string tp_substitutions(string line)
 	}
 	if (line_with_substitutions(substituted))
 	{
-	  pips_user_warning("maybe error in substituted lines:\n\t%s\n", 
+	  pips_user_warning("maybe error in substituted lines:\n\t%s\n"
+			    "For instance, check location of your source files.\n", 
 			    substituted);
 	}
     }
