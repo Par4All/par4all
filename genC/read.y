@@ -146,12 +146,6 @@ Contents: Chunk { $$ = $1; }
         }
 	;
 
-/* no list is built as it is not needed */
-Datas2 : Datas2 Data { }
-       | Data { }
-       ;
-
-
 Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP 
           {
 	    int i, size = Domains[$3].size;
@@ -198,6 +192,12 @@ Type	: Int
 Datas	: Datas Data { $$ = CONS( CHUNK, $2.p, $1 ); }
 	| { $$ = NIL; }
 	;
+
+/* no list is built as it is not needed */
+Datas2 : Datas2 Data { }
+       | Data { }
+       ;
+
 
 Sparse_Datas: Sparse_Datas Int Data { /* index, value */
 	        $$ = CONS(CONSP, CONS(INT, $2, CONS(CHUNK, $3.p, NIL)), $1);
