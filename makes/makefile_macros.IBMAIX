@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.IBMAIX,v $ (version $Revision$)
-# $Date: 1996/09/20 17:15:14 $, 
+# $Date: 1996/09/21 17:48:01 $, 
 #
 # this file contains macro definitions 
 
@@ -9,7 +9,7 @@
 AR	= ar
 ARFLAGS	= rv
 CC	= xlc
-CFLAGS	= -O2 -g 
+CFLAGS	= -O2 -g -qmaxmem=8192
 CMKDEP	= -M
 CPPFLAGS= -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC) 
