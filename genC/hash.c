@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/12/18 14:06:38 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/12/22 10:41:24 $, )
  * version $Revision$
  */
 
@@ -221,8 +221,8 @@ hash_table htp;
 void hash_table_free(htp)
 hash_table htp;
 {
-    assert(free(htp->hash_array)==1);
-    assert(free(htp)==1);
+  free(htp->hash_array);
+  free(htp);
 }
 
 /* This functions stores a couple (key,val) in the hash table pointed to
@@ -451,7 +451,7 @@ hash_table htp;
 	    htp->hash_array[rank] = he;
 	}
     }
-    assert(free(old_array)==1);
+    free(old_array);
 }
 
 static int hash_string_rank(key, size)
@@ -462,73 +462,57 @@ int size;
     char *s;
 
     v = 0;
-    for (s = key; *s; s++) {
- 
-	/* This is the old version:
-	 * v += *s;
-	 * v <<= 2;
-	 * Now the first two bits are significant
-	 */
-	v <<= 2 ;
-	v += *s;
-    }
-    v = abs( v ) ;
+    for (s = key; *s; s++)
+ 	v <<= 2, v += *s;
+    v = abs(v) ;
     v %= size ;
 
-    return(v);
+    return v;
 }
 
 static int hash_int_rank(key, size)
 char *key;
 int size;
 {
-/*
-    int v;
-
-    v = abs((int)key) ;
-    v %= size;
-
-    return(v);
-*/
-    return(HASH_FUNCTION(key, size));
+    return HASH_FUNCTION(key, size);
 }
 
 static int hash_pointer_rank(key, size)
 char *key;
 int size;
 {
-    return(HASH_FUNCTION(key, size));
+    return HASH_FUNCTION(key, size);
 }
 
 static int hash_chunk_rank(key, size)
 char *key;
 int size;
 {
-    return(HASH_FUNCTION(((chunk *)key)->i, size));
+    return HASH_FUNCTION(((chunk *)key)->i, size);
 }
 
 static int hash_string_equal(key1, key2)
 char *key1, *key2;
 {
-    return(strcmp(key1, key2) == 0);
+    return strcmp(key1, key2)==0;
 }
 
 static int hash_int_equal(key1, key2)
 char *key1, *key2;
 {
-    return( (int)key1 == (int)key2 );
+    return (int)key1 == (int)key2;
 }
 
 static int hash_pointer_equal(key1, key2)
 char *key1, *key2;
 {
-    return( key1 == key2);
+    return key1 == key2;
 }
 
 static int hash_chunk_equal(key1, key2)
 gen_chunk *key1, *key2;
 {
-    return(memcmp(key1, key2, sizeof(gen_chunk)) == 0) ;
+    return memcmp(key1, key2, sizeof(gen_chunk))==0;
 }
 
 static char *hash_print_key(t, key)
