@@ -2,8 +2,8 @@
 %% $Id$
 %%
 
-\documentstyle{article}
-%% \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+\documentclass[a4paper]{article}
+\usepackage{psfig,verbatim,comment,newgen_domain}
 
 \title{PIPS: Dependence Graph}
 \author{Fran\c{c}ois Irigoin \\
@@ -13,7 +13,7 @@
 \\
     CRI, \'Ecole des mines de Paris}
 
-\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{#2}}
+% \newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{#2}}
 
 \begin{document}
 \maketitle
@@ -39,7 +39,7 @@ generic as could be hoped. They take into account the graph hierarchy
 implied by the dependence levels of the Allen \& Kennedy parallelization
 algorithm. This explains why the SCC related data structures are declared
 here and not with data structure
-\htmladdnormallink{\verb+graph+}{http://www.cri.ensmp.fr/pips/graph}.
+\htmladdnormallink{{\tt graph}}{http://www.cri.ensmp.fr/pips/graph}.
 
 \begin{comment}
 Les structures de donne'es suivantes sont utilise'es par la phase de
