@@ -1,13 +1,19 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/06/14 14:15:52 $, 
+# $Date: 1996/06/14 16:22:56 $, 
 # Source, header and object files used to build the library.
 
-LIB_CFILES=	stub.c 
+LIB_CFILES=	stub.c \
+		reductions.c \
+		utils.c \
+		transformations.c \
+		prettyprint.c
 
 # should have LIB_LISPFILES
 # they sould be put somewhere for execution
-LIB_HEADERS=	eval.cl \
+LIB_HEADERS=	reductions-local.h \
+		local-header.h \
+		eval.cl \
 		match.cl \
 		reduc.cl \
 		top.cl \
