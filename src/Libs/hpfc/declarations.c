@@ -4,7 +4,7 @@
  * DECLARATIONS compilation
  *
  * SCCS stuff:
- * $RCSfile: declarations.c,v $ ($Date: 1994/05/17 14:04:36 $, ) version $Revision$,
+ * $RCSfile: declarations.c,v $ ($Date: 1994/06/03 14:14:51 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -303,7 +303,8 @@ entity array;
 	     debug(8, "NewDeclarationOfDistributedArray",
 		   "dimension %d isn't touched\n", ithdim);
 
-	     ld = gen_nconc(ld, CONS(DIMENSION, dim, NULL)); /* sharing ! */
+	     newdecl = NO_NEW_DECLARATION;
+	     ld = gen_nconc(ld, CONS(DIMENSION, dim, NIL)); /* sharing ! */
 	 }
 	 
 	 store_new_declaration(array, ithdim, newdecl);
