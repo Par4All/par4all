@@ -473,11 +473,19 @@ use_def_elimination(char * module_name)
       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
    /* Get the data dependence graph: */
-   /* The dg is more precise than the chains, so I guess I should
+   /* The dg is more precise than the chains, so I (RK) guess I should
       remove more code with the dg, specially with array sections and
       so on. */
+   /* FI: it's much too expensive; and how can you gain something
+    * with scalar variables?
+    */
+   /*
    dependence_graph =
       (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+      */
+
+   dependence_graph =
+      (graph) db_get_memory_resource(DBR_CHAINS, module_name, TRUE);
 
    /* The proper effect to detect the I/O operations: */
    the_proper_effects = effectsmap_to_listmap((statement_mapping)
