@@ -1,3 +1,8 @@
+/* 	$Id$	 */
+
+#ifndef lint
+char vcid_prgm_mapping_utils[] = "$Id$";
+#endif /* lint */
 
 /* Name     : utils.c
  * Package  : prgm_mapping
@@ -15,7 +20,9 @@
  */
 
 /* Ansi includes 	*/
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 
 /* Newgen includes 	*/
