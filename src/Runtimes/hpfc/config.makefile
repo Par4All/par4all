@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.54  1997/05/28 15:47:49  zory
+# -ansi added to g77.
+#
 # Revision 1.53  1997/04/17 11:54:47  coelho
 # better RCS headers.
 #
@@ -132,7 +135,7 @@ ifdef _HPFC_USE_GNU_
 #
 FC	= g77
 # -Wall -pedantic
-FFLAGS	= -O2 -Wimplicit -pipe
+FFLAGS	= -O2 -pipe -ansi -Wall -Wimplicit 
 CC	= gcc
 CFLAGS	= -O2 -pipe -ansi -Wall -pedantic
 CPPFLAGS= -D__USE_FIXED_PROTOTYPES__
