@@ -1,18 +1,19 @@
- /* package sc */
+/* package sc 
+ * $RCSfile: sc_elim_simple_redund.c,v $ (version $Revision$)
+ * $Date: 1996/07/18 19:15:54 $, 
+ */
 
 #include <stdio.h>
 #include <string.h>
 #include <setjmp.h>
+
 #include "arithmetique.h"
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
 
-
 jmp_buf overflow_error;
-
-
 
 /* boolean sc_elim_simple_redund_with_eq(Psysteme ps, Pcontrainte eg):
  * elimination en place des contraintes d'un systeme ps, qui sont redondantes
@@ -66,7 +67,7 @@ Pcontrainte eg;
     /* cas des inegalites     */
     for (eq = ps->inegalites; eq != NULL; eq = eq->succ) {
 	if (eq_smg(eq,eg) && eq->vecteur!= NULL) {
-	    if (eq_diff_const(eq, eg) <= 0) 
+	    if (value_negz_p(eq_diff_const(eq, eg)))
 		eq_set_vect_nul(eq);
 	    else
 		return(FALSE);
@@ -109,7 +110,7 @@ Pcontrainte ineg;
 {
     Pcontrainte eq=NULL;
     boolean result = TRUE;
-    long int b =0;
+    Value b = VALUE_ZERO;
  
     if (SC_UNDEFINED_P(ps) || sc_rn_p(ps))
 	return(TRUE);
@@ -119,7 +120,7 @@ Pcontrainte ineg;
 	 eq = eq->succ)
 	if (eq_smg(eq,ineg)) {
 	    b = eq_diff_const(ineg,eq);
-	    if (b <= 0)
+	    if (value_negz_p(b))
 		/* inegalite redondante avec l'egalite  
 		   ==> elimination de inegalite */
 		eq_set_vect_nul(ineg);
@@ -132,7 +133,7 @@ Pcontrainte ineg;
 	if (eq != ineg)
 	    if (eq_smg(eq,ineg)) {
 		b = eq_diff_const(eq,ineg);
-		if(b <= 0)
+		if(value_negz_p(b))
 		    eq_set_vect_nul(eq);
 		else
 		    eq_set_vect_nul(ineg);
@@ -158,11 +159,11 @@ int sc_check_inequality_redundancy(Pcontrainte ineq, Psysteme ps)
 	c = contrainte_succ(c)) {
 
 	if(c!=ineq) {
-	    int b;
+	    Value b;
 
 	    if(eq_smg(c, ineq)) {
 		b = eq_diff_const(c, ineq);
-		if(b < 0) {
+		if(value_neg_p(b)) {
 		    /* c is redundant with ineq */
 		    ;
 		}
@@ -173,7 +174,7 @@ int sc_check_inequality_redundancy(Pcontrainte ineq, Psysteme ps)
 	    }
 	    else if (inequalities_opposite_p(c, ineq)) {
 		b = eq_sum_const(c, ineq);
-		if(b <= 0) {
+		if(value_negz_p(b)) {
 		    /* c and ineq define a non-empty interval */
 		    ;
 		}
@@ -318,7 +319,7 @@ Psysteme ps;
     for (eq1 = ps->inegalites; eq1 != NULL;eq1 = eq1->succ)
     {
 	if ((vect_size(eq1->vecteur) == 1) && (eq1->vecteur->var == 0))
-	    if (eq1->vecteur->val <= 0)
+	    if (value_negz_p(val_of(eq1->vecteur)))
 		vect_rm(eq1->vecteur),
 		eq1->vecteur = NULL;
 	    else
