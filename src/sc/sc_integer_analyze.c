@@ -1,3 +1,7 @@
+/* $RCSfile: sc_integer_analyze.c,v $ (version $Revision$
+ * $Date: 1996/07/18 19:15:55 $, 
+ */
+
 #include <stdio.h>
 
 #include "boolean.h"
@@ -5,7 +9,6 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-
 
 extern Variable variable_of_rank();
 extern Variable search_var_of_higher_rank();
@@ -16,45 +19,32 @@ extern Variable search_var_of_higher_rank();
  * That's mean that the FM projection can be used without problem on 
  * integer domain
 */
-boolean var_with_unity_coeff_p(sc,var)
+boolean var_with_unity_coeff_p(sc, var)
 Psysteme sc;
 Variable var;
 {
-
-    int nb_coeff_pos = 0;
-    int nb_coeff_neg = 0;
     register Pcontrainte pc;
 
     if (!var_in_sc_p(sc,var))
-	return(FALSE);
+	return FALSE;
 
-    for (pc = sc->inegalites; 
-	 !CONTRAINTE_UNDEFINED_P(pc)
-	 && ((nb_coeff_pos==0) || (nb_coeff_neg==0)); 
-	 pc = pc->succ) {
-	int coeff = vect_coeff(var,pc->vecteur);
-	if (ABS(coeff) >1) { 
-	    if (coeff >0) nb_coeff_pos++; 
-	    else nb_coeff_neg++;
-	}
+    for (pc = sc->inegalites; !CONTRAINTE_UNDEFINED_P(pc); pc = pc->succ) 
+    {
+	Value coeff = vect_coeff(var,pc->vecteur);
+	if (value_gt(coeff, VALUE_ONE) ||
+	    value_lt(coeff, VALUE_MONE))
+	    return FALSE;
     }
-    for (pc = sc->egalites; 
-	 !CONTRAINTE_UNDEFINED_P(pc)
-	 && ((nb_coeff_pos==0) || (nb_coeff_neg==0)); 
-	 pc = pc->succ) {
-	int coeff = vect_coeff(var,pc->vecteur);
-	if (ABS(coeff) >1) { 
-	    nb_coeff_pos++; 
-	    nb_coeff_neg++;
-	}
+    for (pc = sc->egalites; !CONTRAINTE_UNDEFINED_P(pc); pc = pc->succ) 
+    {
+	Value coeff = vect_coeff(var,pc->vecteur);
+	if (value_gt(coeff, VALUE_ONE) ||
+	    value_lt(coeff, VALUE_MONE))
+	    return FALSE;
     }
-    if (nb_coeff_pos >= 1 && nb_coeff_neg >= 1 ) 
-	return( FALSE);
-    else return( TRUE);
-   
+
+    return TRUE;
 }
-
-
 
 /* This function gives information about the variables and the constraints of
  * the system. These informations are stored in the array sc_info. 
@@ -79,8 +69,9 @@ int dim_h,n;
 
     Pcontrainte ineq,pc;
     Variable var_hr,hvr1,hvr2,right_var,left_var;
-    int rank_hr,right_coeff,right_rank,left_coeff,left_rank;
-    int sign1,sign2,coeff1,coeff2;
+    int rank_hr,right_rank,left_rank;
+    int sign1,sign2;
+    Value coeff1,coeff2,right_coeff,left_coeff;
     boolean find_one = FALSE;
     register int i;
     register int j;
@@ -112,15 +103,15 @@ int dim_h,n;
 
 	    var_hr=variable_of_rank(index_base,rank_hr);
 	    coeff1 = vect_coeff(var_hr,ineq->vecteur);
-	    sign1 = (coeff1 >0)? 1 :-1;
+	    sign1 = value_sign(coeff1);
 
 	    for (pc = ineq;
 		 !CONTRAINTE_UNDEFINED_P(pc) && !find_one;
 		 pc = pc->succ) {
 
 		coeff2 = vect_coeff(var_hr,pc->vecteur);
-		sign2 = (coeff2 >0) ? 1:-1;	
-		if (coeff2 !=0 && sign1 == -sign2) {
+		sign2 = value_sign(coeff2);	
+		if (value_notzero_p(coeff2) && sign1 == -sign2) {
 		    hvr1 =search_var_of_higher_rank(ineq->vecteur,
 						    index_base,var_hr);
 		    hvr2 =search_var_of_higher_rank(pc->vecteur,
@@ -151,34 +142,39 @@ int dim_h,n;
 		    /* If the variable is a loop index then the constraint 
 		       ineq gives an upper or a lower bound directly */
 
-		    if (coeff1 >0) sc_info[rank_hr][2] ++;
+		    if (value_pos_p(coeff1)) sc_info[rank_hr][2] ++;
 		    else sc_info[rank_hr][3] ++;
 		}
 		else {
 
 		    /* If the variable is not a loop index then the constraint 
-		       ineq combined with another constraint pc gives an upper or 
-		       a lower bound for another variable  */
+		       ineq combined with another constraint pc gives an upper
+		       or  a lower bound for another variable  */
 
 		    for (pc = ineq;
 			 !CONTRAINTE_UNDEFINED_P(pc);
 			 pc = pc->succ) {
 	
 			coeff2 = vect_coeff(var_hr,pc->vecteur);
-			sign2 = (coeff2 >0) ? 1:-1;
-			sign1 = (coeff1 >0) ? 1:-1;	
+			sign2 = value_sign(coeff2);
+			sign1 = value_sign(coeff1);	
 		    
-			if (coeff2 !=0 && sign1 == -sign2) {
-			    constraint_integer_combination(index_base,ineq,pc,rank_hr,
-					   &right_var,&right_rank,&right_coeff,
-					   &left_var,&left_rank,&left_coeff);
+			if (value_notzero_p(coeff2) && sign1 == -sign2) {
+			    constraint_integer_combination
+				(index_base, ineq, pc, rank_hr,
+				 &right_var, &right_rank, &right_coeff,
+				 &left_var, &left_rank, &left_coeff);
 			    if (right_rank>left_rank) { 
-				if  (right_coeff >0) sc_info[right_rank][2]++;
-				else sc_info[right_rank][3]++;
+				if  (value_pos_p(right_coeff))
+				    sc_info[right_rank][2]++;
+				else
+				    sc_info[right_rank][3]++;
 			    }
 			    else   if (right_rank<left_rank){
-				if  (left_coeff>0) sc_info[left_rank][2]++;   
-				else sc_info[left_rank][3]++;
+				if (value_pos_p(left_coeff))
+				    sc_info[left_rank][2]++;   
+				else
+				    sc_info[left_rank][3]++;
 			    }
 			}   
 		    }
@@ -188,12 +184,12 @@ int dim_h,n;
 		/* If the variable is a loop index then the constraint 
 		   ineq gives an upper or a lower bound directly */
 
-		if (vect_coeff(var_hr,ineq->vecteur) < 0) 
+		if (value_neg_p(vect_coeff(var_hr,ineq->vecteur)))
 		    sc_info[rank_hr][3] ++;
-		else sc_info[rank_hr][2] ++;
+		else 
+		    sc_info[rank_hr][2] ++;
 
 	}
-
     }
 }
 
@@ -210,14 +206,18 @@ int dim_h,n;
  *   left_var = X1, left_rank=rank(X10, left_coeff=coefficient of X1 in E1
 */
 
-void constraint_integer_combination(index_base,ineq1,ineq2,rank,right_var,right_rank,right_coeff,left_var,left_rank,left_coeff)
-Pbase index_base;
-Pcontrainte ineq1,ineq2;
-int rank;
-Variable *right_var;
-int *right_rank,*right_coeff;
-Variable *left_var;
-int *left_rank,*left_coeff;
+void 
+constraint_integer_combination(
+  Pbase index_base,
+  Pcontrainte ineq1,
+  Pcontrainte ineq2,
+  int rank,
+  Variable *right_var, /* RIGHT */
+  int *right_rank,
+  Value *right_coeff,
+  Variable *left_var,  /* LEFT */
+  int *left_rank,
+  Value *left_coeff)
 {
 
 
@@ -225,12 +225,12 @@ int *left_rank,*left_coeff;
     Pcontrainte left_ineg = CONTRAINTE_UNDEFINED;
     Variable el_var= variable_of_rank(index_base,rank);
 
-    if (vect_coeff(el_var,ineq1->vecteur)>0) {
+    if (value_pos_p(vect_coeff(el_var,ineq1->vecteur))) {
 	right_ineg = ineq1;
 	left_ineg = ineq2;			
     }
     else { 
-	if (vect_coeff(el_var,ineq2->vecteur)>0) {
+	if (value_pos_p(vect_coeff(el_var,ineq2->vecteur))) {
 	    right_ineg = ineq2;
 	    left_ineg = ineq1;
 	} 
