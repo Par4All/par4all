@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1994/12/29 18:51:31 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1994/12/30 10:30:34 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -36,25 +36,24 @@
 #include "newgen_types.h"
 #include "newgen_set.h"
 
-/*
- * The size of the management information inside each Newgen object (in chunks)
+/* The size of the management information inside each Newgen object (in
+ *  gen_chunks) 
  */
 
-#define HEADER 1
-#define HEADER_SIZE (sizeof( chunk )*HEADER)
+#define GEN_HEADER 1
+#define GEN_HEADER_SIZE (sizeof(gen_chunk)*HEADER)
 
-/*
- * A chunk is used to store every object. It has to be able to store, at least,
- * a (CHUNK *) and every inlinable value. To use a union is a trick to enable
- * the assignment opereator and the ability of passing and returning them as
- * values (for function): this requires a sufficiently clever compiler !
- *
- * Note that the field name of inlinable types have to begin with the same
- * letter as the type itself (this can be fixed if necessary but why bother).
- * This characteristic is used by the Newgen code generator.
+/* A gen_chunk is used to store every object. It has to be able to store,
+ * at least, a (CHUNK *) and every inlinable value. To use a union is a
+ * trick to enable the assignment opereator and the ability of passing and
+ * returning them as values (for function): this requires a sufficiently
+ * clever compiler !  * Note that the field name of inlinable types have
+ * to begin with the same letter as the type itself (this can be fixed if
+ * necessary but why bother).  This characteristic is used by the Newgen
+ * code generator.
  */
 
-typedef union chunk {
+typedef union gen_chunk {
 	unit u ;
 	bool b ;
 	char c ;
@@ -64,11 +63,11 @@ typedef union chunk {
 	struct cons *l ;
 	set t ;
 	hash_table h ;
-	union chunk *p ;
-} chunk, *newgen_object ;
+	union gen_chunk *p ;
+} gen_chunk, *gen_chunkp;
 
-#define chunk_undefined ((chunk *)(-16))
-#define chunk_undefined_p(c) ((c)==chunk_undefined)
+#define gen_chunk_undefined ((gen_chunk *)(-16))
+#define gen_chunk_undefined_p(c) ((c)==gen_chunk_undefined)
 
 #define UNIT(x) "You don't want to take the value of a unit type, do you !"
 #define BOOL(x) ((x).b)
@@ -85,22 +84,22 @@ typedef union chunk {
 
 /* The implementation of tabulated domains */
 
-extern chunk *Gen_tabulated_[] ;
-extern struct binding Domains[], *Tabulated_bp ;
+extern gen_chunk *Gen_tabulated_[] ;
+extern struct gen_binding Domains[], *Tabulated_bp ;
 
 
 #define TABULATED_MAP(_x,_code,_dom) \
 	{int _tabulated_map_i=0 ; \
-	 chunk *_tabulated_map_t = Gen_tabulated_[Domains[_dom].index] ; \
-         chunk *_x ; \
+	 gen_chunk *_tabulated_map_t = Gen_tabulated_[Domains[_dom].index] ; \
+         gen_chunk *_x ; \
 	 for(;_tabulated_map_i<max_tabulated_elements();_tabulated_map_i++) {\
 		if( (_x=(_tabulated_map_t+_tabulated_map_i)->p) != \
-		     chunk_undefined ) \
+		     gen_chunk_undefined ) \
 			_code ;}}
 
-/* The root of the chunk read with READ_CHUNK. */
+/* The root of the gen_chunk read with READ_CHUNK. */
 
-extern chunk *Read_chunk ;
+extern gen_chunk *Read_gen_chunk ;
 
 /* Function interface for user applications. */
 
@@ -115,39 +114,39 @@ extern int gen_debug ;
 #define GEN_DBG_TRAV \
      (GEN_DBG_TRAV_LEAF|GEN_DBG_TRAV_SIMPLE|GEN_DBG_TRAV_OBJECT)
 
-extern void gen_free GEN_PROTO(( chunk * )) ;
+extern void gen_free GEN_PROTO(( gen_chunk * )) ;
 extern int gen_free_tabulated GEN_PROTO(( int )) ;
-extern void gen_write GEN_PROTO(( FILE *, chunk * )) ;
+extern void gen_write GEN_PROTO(( FILE *, gen_chunk * )) ;
 extern int gen_write_tabulated GEN_PROTO(( FILE *, int )) ;
 extern void gen_read_spec GEN_PROTO(()) ; /* instead of ... */
-extern chunk *gen_read GEN_PROTO(( FILE * )) ;
+extern gen_chunk *gen_read GEN_PROTO(( FILE * )) ;
 extern int gen_read_tabulated GEN_PROTO(( FILE *, int )) ;
 extern int gen_read_and_check_tabulated GEN_PROTO(( FILE *, int )) ;
-extern chunk *gen_make_array GEN_PROTO(( int )) ;
-extern chunk *gen_alloc GEN_PROTO(()) ; /* was ... */
+extern gen_chunk *gen_make_array GEN_PROTO(( int )) ;
+extern gen_chunk *gen_alloc GEN_PROTO(()) ; /* was ... */
 extern void gen_init_external GEN_PROTO((int, 
 					 char *(*)(), void (*)(), 
 					 void (*)(), char *(*)() )) ;
-extern chunk *gen_check GEN_PROTO(( chunk *, int )) ;
-extern int gen_type GEN_PROTO((chunk *)) ;
+extern gen_chunk *gen_check GEN_PROTO(( gen_chunk *, int )) ;
+extern int gen_type GEN_PROTO((gen_chunk *)) ;
 extern char *gen_domain_name GEN_PROTO((int)) ;
-extern void gen_clear_tabulated_element GEN_PROTO(( chunk * )) ;
-extern chunk *gen_copy_tree GEN_PROTO(( chunk * )) ;
-extern int gen_consistent_p GEN_PROTO(( chunk * )) ;
+extern void gen_clear_tabulated_element GEN_PROTO(( gen_chunk * )) ;
+extern gen_chunk *gen_copy_tree GEN_PROTO(( gen_chunk * )) ;
+extern int gen_consistent_p GEN_PROTO(( gen_chunk * )) ;
 extern char *alloc GEN_PROTO ((int )) ;
 
 /*  recursion and utilities
  */
-extern bool gen_true GEN_PROTO((chunk *)) ; /* was ... */
-extern bool gen_false GEN_PROTO((chunk *)) ;
-extern void gen_null GEN_PROTO((chunk *)) ; /* was ... */
+extern bool gen_true GEN_PROTO((gen_chunk *)) ; /* was ... */
+extern bool gen_false GEN_PROTO((gen_chunk *)) ;
+extern void gen_null GEN_PROTO((gen_chunk *)) ; /* was ... */
 
-extern void gen_recurse_stop GEN_PROTO((chunk *));
+extern void gen_recurse_stop GEN_PROTO((gen_chunk *));
 extern void gen_multi_recurse GEN_PROTO(()); /* was ... */
-extern void gen_recurse GEN_PROTO((chunk *,
+extern void gen_recurse GEN_PROTO((gen_chunk *,
 				   int, 
-				   bool (*)( chunk * ), 
-				   void (*)( chunk * ))) ;
+				   bool (*)( gen_chunk * ), 
+				   void (*)( gen_chunk * ))) ;
 
 /* Since C is not-orthogonal (chunk1 == chunk2 is prohibited),
  * this one is needed.
