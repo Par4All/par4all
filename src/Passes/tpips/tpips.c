@@ -547,6 +547,12 @@ static char * get_next_line(char * prompt)
     char * tmp = use_readline? 
 	readline(prompt): fgets(line, MAX_LINE_LENGTH, current_file);
 
+    if (tmp==line) /* fgets puts an \n where readline puts a \0 */
+    {
+	int len = strlen(tmp);
+	if (tmp[len-1]=='\n') tmp[len-1]='\0';
+    }
+
     return tmp && !use_readline? strdup(tmp): tmp;
 }
 
@@ -573,6 +579,8 @@ static char * tpips_read_a_line(void)
 
     if (logfile && line)
 	fprintf(logfile,"%s\n",line);
+
+    pips_debug(7, "line is --%s--\n", line);
 
     return line;
 }
