@@ -10,6 +10,9 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.48  1999/01/07 16:44:14  irigoin
+  * Bug fix in user_call_to_transformer() to handle aliasing between two formal parameters. See spice02.f in Validation.
+  *
   * Revision 1.47  1999/01/07 07:52:32  irigoin
   * Bug fix in minmax_to_transformer()
   *
@@ -967,12 +970,27 @@ user_call_to_transformer(
 			
 		      }
 		      else {
-			a_new = entity_to_new_value((entity) vecteur_var(v));
-			a_old = entity_to_old_value((entity) vecteur_var(v));
-			t_caller = transformer_value_substitute
-			  (t_caller, e_new, a_new);
-			t_caller = transformer_value_substitute
-			  (t_caller, e_old, a_old);
+			  Psysteme s = (Psysteme) predicate_system(transformer_relation(t_caller));
+			  a_new = entity_to_new_value((entity) vecteur_var(v));
+			  a_old = entity_to_old_value((entity) vecteur_var(v));
+
+			  if(base_contains_variable_p(s->base, (Variable) a_new)) {
+			      user_error("user_call_to_transformer",
+					 "Variable %s seems to be aliased thru variable %s"
+					 " at a call site to %s in %s\n"
+					 "PIPS semantics analysis assumes no aliasing as"
+					 " imposed by the Fortran standard.\n",
+					 entity_name(e),
+					 entity_name((entity) vecteur_var(v)),
+					 module_local_name(f),
+					 get_current_module_name());
+			  }
+			  else {
+			      t_caller = transformer_value_substitute
+				  (t_caller, e_new, a_new);
+			      t_caller = transformer_value_substitute
+				  (t_caller, e_old, a_old);
+			  }
 			
 		      }
 		    }
