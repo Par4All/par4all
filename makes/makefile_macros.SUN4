@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.SUN4,v $ (version $Revision$)
-# $Date: 1996/08/20 17:22:28 $, 
+# $Date: 1996/08/20 18:50:29 $, 
 #
 # this file contains macro definitions 
 
@@ -29,6 +29,7 @@ DIFF	= diff
 M4	= gm4
 LX2HTML	= latex2html
 LATEX	= latex
+BIBTEX	= bibtex
 MAKEIDX	= makeindex
 DVIPS	= dvips
 
