@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.6  1997/05/15 15:07:38  zory
+! add new communication subroutines
+!
 ! Revision 1.5  1997/05/14 15:19:50  zory
 ! Insert hpfc init, send, recv, pack, unpack (only in pvm)
 !
@@ -18,6 +21,36 @@
 !
 
 !
+! Return an error string associated with the error code 
+! plus additional information to the error message 
+!
+
+      subroutine HPFC PRINT ERROR MSG(message, error code)
+      include "hpfc_commons.h"
+      integer error code
+      character*(*) message
+      call pvmfperror(message, error code)
+! in mpi MPI_ERROR_STRING
+      end
+
+!
+! Create a group of tasks called HPFC GROUP NAME
+!
+      subroutine HPFC JOIN GROUPE(inum)
+      include "hpfc_commons.h"
+      integer inum,info
+      call pvmfjoingroup(HPFC GROUP NAME, inum)
+      if (inum.lt.0) then
+         call pvmfperror("while joining group", info)
+         call pvmfexit(info)
+         stop
+      end if
+
+! in mpi we only have to duplicate MPI_COMM_WORLD
+
+      end
+
+!
 ! Terminate the current task 
 !
 
@@ -26,6 +59,62 @@
       integer info
       debug(print *, "hpfc terminate task")
       call pvmfexit(info)
+      end
+
+!
+! Kill all the tasks
+!
+      subroutine HPFC KILL ALLTASKS
+      include "hpfc_commons.h"
+      integer info,i
+      do i=1, NBOFTASKS
+         call pvmfkill(NODETIDS(i), info)
+      enddo
+
+! in mpi call MPI_Abort          
+
+      end
+
+
+!
+! HPFC SYNCHRO
+!
+      subroutine HPFC SYNCHRO
+      include "hpfc_commons.h"
+      integer info
+      debug(print *, "[hpfc synchro] ", MYLID, " waiting ", NBOFTASKS+1)
+      call pvmfbarrier(HPFC GROUP NAME, NBOFTASKS+1, info)
+      if (info.lt.0) then
+         call pvmfperror("hpfc synchro", info)
+         call HPFC TERMINATE TASK(info)
+         stop
+      endif
+      debug(print *, "[hpfc synchro] done")
+      end
+
+
+
+!
+! Give the processor rank (only useful for MPI and PVM/CRAY T3D)
+!
+      subroutine HPFC GET PE(the tid, the rank)
+      include "hpfc_commons.h"
+      integer the tid, the rank
+      debug(print *, "HPFC GET PE - asking rank")
+      _getpe(call pvmfgetpe(the tid, the rank))
+      debug(print *, "HPFC GET PE rank", the rank)
+      end
+
+      
+!
+! Return the processor id 
+!
+      subroutine HPFC GET MYTID(the tid)
+      include "hpfc_commons.h"
+      integer the tid
+      debug(print *, "hpfc get mytid - asking tid")
+      call pvmfmytid(MY TID)
+      debug(print *, "hpfc get mytid - ", the tid)
       end
 
 
@@ -85,6 +174,29 @@
       call pvmfrecv(source, tag, bufid)
       debug(print *, "message received")
       end
+
+!
+! Root initiate a broadcast communication 
+!
+      subroutine HPFC BCAST ROOT(ntask, listoftids, tag, info )
+      include "hpfc_commons.h"
+      integer ntask, tag, info
+      integer listoftids(MAX MAX SIZE OF PROCS)
+      debug(print *, "broadcast a message (root)")
+      call pvmfmcast(ntask, listoftids, tag, info)
+      debug(print *, "broadcast performed (root)")
+      end
+!
+! Receive from a broadcast communication 
+!
+      subroutine HPFC BCAST RECV(source, tag, bufid)
+      include "hpfc_commons.h"
+      integer source, tag, bufid
+      debug(print *, "broadcast a message (recv)")
+      call pvmfrecv(source, tag, bufid)
+      debug(print *, "broadcast performed (recv)")
+      end 
+
 
 !
 ! The host send a message to every node.
