@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/09/15 15:54:13 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/10/05 11:32:29 $, )
  * version $Revision$
  */
 
@@ -74,7 +74,7 @@ bool replicated_p(entity e)
     entity template;
     distribute d;
 
-    assert(array_distributed_p(e));
+    pips_assert("distributed array", array_distributed_p(e));
 
     a = load_entity_align(e);
     la = align_alignment(a);    
@@ -252,7 +252,8 @@ entity model;
     pips_debug(3, "entity %s to be made after %s\n",
 	       new_name, entity_name(model));
 
-    assert(gen_consistent_p(model));
+    ifdebug(5)
+	pips_assert("consistent model", gen_consistent_p(model));
 
     return(!entity_undefined_p(new) ? new :
 	   make_entity(copy_string(new_name),
@@ -401,7 +402,7 @@ int dim, *pdim;
     list l = ldi;
     int i, procdim = 1;
 
-    assert(dim>=1 && dim<=gen_length(ldi));
+    pips_assert("valid dimension", dim>=1 && dim<=gen_length(ldi));
 
     for (i=1; i<dim; i++) 
     {
@@ -435,8 +436,7 @@ int dim, *tdim;
     },
 	ldi);
 
-    pips_error("FindDistributionOfProcessorDim",
-	       "dimension %d not found\n", dim);
+    pips_internal_error("dimension %d not found\n", dim);
 
     return(distribution_undefined);
 }    
@@ -551,7 +551,7 @@ int dim, acell;
     alignment a = FindArrayDimAlignmentOfArray(array, dim);
     int rate, constant;
 
-    assert(a!=alignment_undefined);
+    pips_assert("aligned", a!=alignment_undefined);
 
     rate     = HpfcExpressionToInt(alignment_rate(a));
     constant = HpfcExpressionToInt(alignment_constant(a));
@@ -582,7 +582,7 @@ expression e;
     if (expression_integer_constant_p(e))
 	return ExpressionToInt(e);
     else
-	pips_error("HpfcExpressionToInt", "can't return anything, sorry\n");
+	pips_internal_error("can't return anything, sorry\n");
 
     return -1; /* just to avoid a gcc warning */
 }
@@ -600,20 +600,19 @@ int dim, *ptdim, *pa, *pb;
     align al = load_entity_align(array);
     alignment a;
     
-    assert(array_distributed_p(array));
+    pips_assert("distributed array", array_distributed_p(array));
     
     *ptdim = template_dimension_of_array_dimension(array, dim);
     a = FindAlignmentOfTemplateDim(align_alignment(al), *ptdim);
 
     if (a==alignment_undefined)
     {
-	assert(*ptdim==0);
-	*pa = 0;
-	*pb = 0;
+	pips_assert("not aligned", *ptdim==0);
+	*pa = 0; *pb = 0;
     }
     else
     {
-	assert(*ptdim>=1);
+	pips_assert("aligned", *ptdim>=1);
 	*pa = HpfcExpressionToInt(alignment_rate(a));
 	*pb = HpfcExpressionToInt(alignment_constant(a));
     }
@@ -638,7 +637,8 @@ int dim, *plow, *pup;
 {
     dimension d = dimension_undefined;
 
-    assert(entity_variable_p(e) && dim>0 && dim<=7);
+    pips_assert("valid variable and dimension",
+		entity_variable_p(e) && dim>0 && dim<=7);
 
     d = entity_ith_dimension(e, dim),
     *plow = ExpressionToInt(dimension_lower(d)),
