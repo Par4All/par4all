@@ -7,9 +7,11 @@
  * FC.
  */
 
+extern char * pips_thanks(char *, char *);
 extern int fpips_main(int, char**);
 
 int main(int argc, char ** argv)
 {
+    pips_thanks("fpips", argv[0]);
     return fpips_main(argc, argv);
 }
