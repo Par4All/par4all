@@ -201,7 +201,7 @@ check_range_wrt_precondition(range r, transformer p, bool check_empty)
 		ifdebug(8) {
 		    debug(8, "check_range_wrt_precondition",
 			  "Test feasibility for system:\n");
-		    sc_fprint(stderr, s, dump_value_name);
+		    sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
 		}
 
 		/* s = sc_strong_normalize4(s, (char * (*)(Variable)) entity_local_name); */
@@ -210,7 +210,7 @@ check_range_wrt_precondition(range r, transformer p, bool check_empty)
 		ifdebug(8) {
 		    debug(8, "check_range_wrt_precondition",
 			  "System after normalization:\n");
-		    sc_fprint(stderr, s, dump_value_name);
+		    sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
 		}
 
 		if(SC_EMPTY_P(s)) {
