@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: OptionParser.java,v $
+ * Revision 1.4  1998/07/03 08:12:45  coelho
+ * tip line added.
+ *
  * Revision 1.3  1998/07/01 15:54:45  coelho
  * jpips.menus used for chosing the menus file.
  *
@@ -35,6 +38,7 @@ public class OptionParser
 
   public String		title;		//title of the menu
   public String		title2;		//title of the frame
+
   public PFrame		frame;		//generated frame
   public PMenu		menu;		//generated menu
   
@@ -63,6 +67,7 @@ public class OptionParser
 			MENU			= "MENU",
 			RADIOBUTTONGROUP	= "RADIOBUTTONGROUP",
 			RADIOBUTTON		= "RADIOBUTTON",
+			GROUP			= "GROUP",
 			CLOSE			= "CLOSE";
 			
   public final String	image 			= "DownArrow.gif",
@@ -114,10 +119,9 @@ public class OptionParser
       parseCommand(null, null, null, null, null);
 
       //line and close button
-      PButton b = new PButton();
-      b.setEnabled(false);
-      Dimension bDim = new Dimension(1,2);
-      b.setPreferredSize(bDim);
+      PLabel b = new PLabel();
+      b.setPreferredSize(new Dimension(1,2));
+
       add((Container)optionPanel,b,
 	  0,position++,3,1,1,1,0.0,0.0,5,GridBagConstraints.HORIZONTAL,c);
       close = new PButton(closeButton);
@@ -167,34 +171,44 @@ public class OptionParser
     * @param bg1 is the current buttongroup in optionPanel
     * @param bg2 is the current buttongroup in menu
     */
-  public void parseCommand
-  	(PMenu m1, PMenu m2, PLabel l, PButtonGroup bg1, PButtonGroup bg2)
+  public void parseCommand(PMenu m1, PMenu m2, PLabel l, 
+			   PButtonGroup bg1, PButtonGroup bg2)
     {
       String s = p.nextNonEmptyLine();
-      while(s != null && s.compareTo(CLOSE) != 0)
+      
+      while(s != null && !s.equals(CLOSE))
         {
-          if(s.compareTo(SINGLE_BUTTON) == 0)
-	      addSingleButton();
-          else if(s.compareTo(SINGLE_CHECKBOX) == 0)
-	      addSingleCheckBox();
-          else if(s.compareTo(SEPARATOR) == 0)
-	      addSeparator();
-          else if(s.compareTo(BUTTON_WITH_TEXT) == 0)
-	      addButtonWithText();
-          else if(s.compareTo(BUTTON_WITH_MENU) == 0)
-	      addButtonWithMenu();
-          else if(s.compareTo(LABEL_WITH_MENU) == 0)
-	      addLabelWithMenu();
-          else if(s.compareTo(BUTTON_WITH_CHOICE) == 0)
-	      addButtonWithChoice();
-          else if(s.compareTo(LABEL_WITH_CHOICE) == 0)
-	      addLabelWithChoice();
-          else if(s.compareTo(MENU) == 0)
-	      addMenu(m1, m2, l, bg1, bg2);
-          else if(s.compareTo(RADIOBUTTONGROUP) == 0)
-	      addRadioButtonGroup(m1, m2, l, bg1, bg2);
-          else if(s.compareTo(RADIOBUTTON) == 0)
-	      addRadioButtonMenuItem(m1, m2, l, bg1, bg2);
+          if(s.equals(SINGLE_BUTTON))
+	    addSingleButton();
+          else if(s.equals(SINGLE_CHECKBOX))
+	    addSingleCheckBox();
+          else if(s.equals(SEPARATOR))
+	    addSeparator();
+          else if(s.equals(BUTTON_WITH_TEXT))
+	    addButtonWithText();
+          else if(s.equals(BUTTON_WITH_MENU))
+	    addButtonWithMenu();
+          else if(s.equals(LABEL_WITH_MENU))
+	    addLabelWithMenu();
+          else if(s.equals(BUTTON_WITH_CHOICE))
+	    addButtonWithChoice();
+          else if(s.equals(LABEL_WITH_CHOICE))
+	    addLabelWithChoice();
+          else if(s.equals(RADIOBUTTON))
+	    addRadioButtonMenuItem(m1, m2, l, bg1, bg2);
+
+	  // recursion...
+          else if(s.equals(MENU))
+	    addMenu(m1, m2, l, bg1, bg2);
+          else if(s.equals(RADIOBUTTONGROUP))
+	    addRadioButtonGroup(m1, m2, l, bg1, bg2);
+	  else if (s.equals(GROUP))
+	    addGroup(m1, m2, l, bg1, bg2);
+
+	  // error...
+	  else
+	    System.err.println("unexpected: " + s);
+
 	  s = p.nextNonEmptyLine();
 	}
     }
@@ -202,8 +216,9 @@ public class OptionParser
 
   /** A short add method for a GridBagLayout.
     */
-  public void add(Container cont, Component comp, int x, int y, int w, int h,
-  		  int px, int py, double wex, double wey, int in,
+  public void add(Container cont, Component comp,
+		  int x, int y, int w, int h,
+		  int px, int py, double wex, double wey, int in,
 		  int f, GridBagConstraints c)
     {
       c.anchor = GridBagConstraints.EAST;
@@ -228,10 +243,12 @@ public class OptionParser
     */
   public void addSingleButton()
     {
-      String name = p.nextNonEmptyLine(),
-             command = p.nextNonEmptyLine();
+      String 
+	  name = p.nextNonEmptyLine(),
+	  command = p.nextNonEmptyLine(),
+	  tip = p.nextNonEmptyLine();
 
-      PButton b = new PButton(name,command);
+      PButton b = new PButton(name, command, tip);
       add((Container)optionPanel,b,
 	  0,position++,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
@@ -249,11 +266,13 @@ public class OptionParser
     */
   public void addSingleCheckBox()
     {
-      String name = p.nextNonEmptyLine(),
-             command = p.nextNonEmptyLine(),
-	     checking = p.nextNonEmptyLine();
+      String
+	  name = p.nextNonEmptyLine(),
+	  command = p.nextNonEmptyLine(),
+	  checking = p.nextNonEmptyLine(),
+	  tip = p.nextNonEmptyLine();
 
-      PCheckBox cb = new PCheckBox(name,command,checking);
+      PCheckBox cb = new PCheckBox(name,command,checking,tip);
       add((Container)optionPanel,cb,
 	  0,position++,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
@@ -272,10 +291,9 @@ public class OptionParser
     */
   public void addSeparator()
     {
-      PButton b = new PButton();
-      b.setEnabled(false);
-      Dimension bDim = new Dimension(1,2);
-      b.setPreferredSize(bDim);
+      PLabel b = new PLabel();
+      b.setPreferredSize(new Dimension(1,2));
+
       add((Container)optionPanel,b,
 	  0,position++,3,1,1,1,0.0,0.0,5,GridBagConstraints.HORIZONTAL,c);
 
@@ -289,11 +307,14 @@ public class OptionParser
     */
   public void addButtonWithText()
     {
-      String name = p.nextNonEmptyLine(),
-             command = p.nextNonEmptyLine();
+      String 
+	  name = p.nextNonEmptyLine(),
+	  command = p.nextNonEmptyLine(),
+	  tip = p.nextNonEmptyLine();
 	     
       PTextField tf = new PTextField();
-      PButton b = new PButton(name,command,tf);
+      PButton b = new PButton(name, command, tip, tf, null);
+      
       add((Container)optionPanel,b,
 	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
@@ -330,10 +351,13 @@ public class OptionParser
     */
   public void addButtonWithMenu()
     {
-      String name = p.nextNonEmptyLine(),
-             command = p.nextNonEmptyLine();
+      String name, command, tip;
 
-      PButton b = new PButton(name,command);
+      name = p.nextNonEmptyLine();
+      command = p.nextNonEmptyLine();
+      tip = p.nextNonEmptyLine();
+
+      PButton b = new PButton(name,command,tip);
       add((Container)optionPanel,b,
 	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
@@ -366,9 +390,11 @@ public class OptionParser
     */
   public void addLabelWithMenu()
     {
-      String name = p.nextNonEmptyLine();
+      String name, tip;
+      name = p.nextNonEmptyLine();
+      tip = p.nextNonEmptyLine();
 
-      PLabel l1 = new PLabel(name);
+      PLabel l1 = new PLabel(name, tip);
       add((Container)optionPanel,l1,
 	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
@@ -399,11 +425,14 @@ public class OptionParser
     */
   public void addButtonWithChoice()
     {
-      String name = p.nextNonEmptyLine(),
-             command = p.nextNonEmptyLine(),
-	     checking = p.nextNonEmptyLine();
+      String name, command, checking, tip;
 
-      PButton b = new PButton(name,command);
+      name = p.nextNonEmptyLine();
+      command = p.nextNonEmptyLine();
+      checking = p.nextNonEmptyLine();
+      tip = p.nextNonEmptyLine();
+
+      PButton b = new PButton(name, command, tip, null, null);
       add((Container)optionPanel,b,
 	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
@@ -413,7 +442,7 @@ public class OptionParser
       menu.add(mi);
 
       name = p.nextNonEmptyLine();
-      while(name.compareTo(CLOSE) != 0)
+      while(!name.equals(CLOSE))
         {
 	  cob.addItem(name);
 	  cob.vCommand.addElement(p.nextNonEmptyLine());
@@ -436,12 +465,14 @@ public class OptionParser
     */
   public void addLabelWithChoice()
     {
-      String name = p.nextNonEmptyLine(),
-             command,
-             checking = p.nextNonEmptyLine(),
-	     mark = p.nextNonEmptyLine();
+      String name, checking, mark, tip;
 
-      PLabel l = new PLabel(name);
+      name = p.nextNonEmptyLine();
+      checking = p.nextNonEmptyLine();
+      mark = p.nextNonEmptyLine();
+      tip = p.nextNonEmptyLine();
+
+      PLabel l = new PLabel(name, tip);
       add((Container)optionPanel,l,
 	  0,position,1,1,1,1,0.0,0.0,2,GridBagConstraints.NONE,c);
 
@@ -453,9 +484,9 @@ public class OptionParser
       ButtonGroup bg = new ButtonGroup();
 
       name = p.nextNonEmptyLine();
-      while(name.compareTo(CLOSE) != 0)
+      while(!name.equals(CLOSE))
         {
-	  command = p.nextNonEmptyLine();
+	  String command = p.nextNonEmptyLine();
 	  checking = p.nextNonEmptyLine();
 	  
 	  cob.addItem(name);
@@ -487,32 +518,42 @@ public class OptionParser
     * Adds a menu to menu.
     * This method can only be called in a menu of the tree structure.
     */
-  public void addMenu
-              (PMenu m1, PMenu m2, PLabel l, PButtonGroup bg1, PButtonGroup bg2)
+  public void addMenu(PMenu m1, PMenu m2, PLabel l, 
+		      PButtonGroup bg1, PButtonGroup bg2)
     {
+      PMenu newm1, newm2;
       String name = p.nextNonEmptyLine();
-
-      PMenu newm1 = new PMenu(name);
-      PMenu newm2 = new PMenu(name);
+      
+      newm1 = new PMenu(name);
+      newm2 = new PMenu(name);
 
       parseCommand(newm1, newm2, l, bg1, bg2);
-
+      
       m1.add(newm1);
       if(m2 != null) m2.add(newm2);
     }
     
+  public void addGroup(PMenu m1, PMenu m2, PLabel l, 
+		       PButtonGroup bg1, PButtonGroup bg2)
+    {
+      String name = p.nextNonEmptyLine();
+      parseCommand(m1, m2, l, bg1, bg2);
+    }
 
   /** Sets the beggining of a button group.
     * This method can only be called in a menu of the tree structure.
     */
-  public void addRadioButtonGroup
-              (PMenu m1, PMenu m2, PLabel l, PButtonGroup bg1, PButtonGroup bg2)
+  public void addRadioButtonGroup(PMenu m1, PMenu m2, PLabel l, 
+				  PButtonGroup bg1, PButtonGroup bg2)
     {
       String checking = p.nextNonEmptyLine();
+
       PButtonGroup newbg1 = new PButtonGroup(checking);
       PButtonGroup newbg2 = new PButtonGroup(checking);
+
       parseCommand(m1,m2,l,newbg1,newbg2);
       
+      // select first menu
       PRadioButtonMenuItem rbmi
         = (PRadioButtonMenuItem)(newbg1.getElements().nextElement());
       rbmi.setSelected(true);
@@ -520,6 +561,7 @@ public class OptionParser
       PMenu m = (PMenu)pm.getInvoker();
       rbmi.label.setText(m.getText()+" / "+rbmi.getText());
       
+      // also.
       rbmi = (PRadioButtonMenuItem)(newbg2.getElements().nextElement());
       rbmi.setSelected(true);
       pm = (JPopupMenu)rbmi.getParent();
@@ -532,34 +574,40 @@ public class OptionParser
   /** Adds a radiobutton on its own.
     * This method can only be called in a menu of the tree structure.
     */
-  public void addRadioButtonMenuItem
-              (PMenu m1, PMenu m2, PLabel l, PButtonGroup bg1, PButtonGroup bg2)
+  public void addRadioButtonMenuItem(PMenu m1, PMenu m2, PLabel l, 
+				     PButtonGroup bg1, PButtonGroup bg2)
     {
-      String name = p.nextNonEmptyLine(),
-             command = p.nextNonEmptyLine(),
-             checking = p.nextNonEmptyLine();
+      String name, command, checking;
+
+      name = p.nextNonEmptyLine();
+      command = p.nextNonEmptyLine();
+      checking = p.nextNonEmptyLine();
+
+      if (bg1==null) 
+	  throw new Error("unexpected RadioButton (no group)! " +
+			  name + "/" + command + "/" + checking);
 
       if(bg2 != null && m2 != null)
 	{
-          PRadioButtonMenuItem rbmi1 = new PRadioButtonMenuItem
-	                                     (name,command,l,null,checking);
-          PRadioButtonMenuItem rbmi2 = new PRadioButtonMenuItem
-	                                     (name,command,l,rbmi1,checking);
+	  PRadioButtonMenuItem rbmi1 = 
+	    new PRadioButtonMenuItem(name,command,l,null,checking);
+	  PRadioButtonMenuItem rbmi2 =
+	    new PRadioButtonMenuItem(name,command,l,rbmi1,checking);
 	  rbmi1.rbmi = rbmi2;
-          rbmi1.addActionListener(getRBMILListener());
-          rbmi2.addActionListener(getRBMILListener());
-          bg1.add(rbmi1);
+	  rbmi1.addActionListener(getRBMILListener());
+	  rbmi2.addActionListener(getRBMILListener());
+	  bg1.add(rbmi1);
 	  bg2.add(rbmi2);
-          m1.add(rbmi1);
-          m2.add(rbmi2);
+	  m1.add(rbmi1); 
+	  m2.add(rbmi2);
 	}
       else
 	{
-          PRadioButtonMenuItem rbmi1 = new PRadioButtonMenuItem
-	                                     (name,command,l,null);
-          rbmi1.addActionListener(getSingleRBMILListener());
-          bg1.add(rbmi1);
-          m1.add(rbmi1);
+	  PRadioButtonMenuItem rbmi1 = 
+	    new PRadioButtonMenuItem(name,command,l,null);
+	  rbmi1.addActionListener(getSingleRBMILListener());
+	  bg1.add(rbmi1);
+	  m1.add(rbmi1);
 	}     
     }
 
@@ -743,7 +791,7 @@ public class OptionParser
 	       rbmi.rbmi.setSelected(true);
 	       JPopupMenu pm = (JPopupMenu)rbmi.getParent();
 	       PMenu m = (PMenu)pm.getInvoker();
-	       rbmi.label.setText(m.getText()+" / "+rbmi.getText());
+	       rbmi.label.setText(m.getText() + " / " + rbmi.getText());
                tpips.sendCommand(rbmi.command);
              } 
 	 };
