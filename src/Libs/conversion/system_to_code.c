@@ -4,7 +4,7 @@
  *
  * SCCS stuff:
  * $RCSfile: system_to_code.c,v $ version $Revision$, 
- * ($Date: 1996/11/20 13:59:20 $, ) 
+ * ($Date: 1997/04/10 22:22:56 $, ) 
  */
 
 /* Standard includes
@@ -512,7 +512,7 @@ bounds_equal_p(
 			    value_div(the_ppcm,val_upper));
 
     sum = vect_add(v_lower, v_upper);
-    vect_add_ele m(&sum, TCST, value_minus(the_ppcm,VALUE_ONE));
+    vect_add_elem(&sum, TCST, value_minus(the_ppcm,VALUE_ONE));
     vect_normalize(sum);
 
     result = VECTEUR_NUL_P(sum) || 
