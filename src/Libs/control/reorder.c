@@ -58,6 +58,10 @@ int un, sn;
 	debug(5, "statement_reorder", "loop\n");
 	sn = statement_reorder(loop_body(instruction_loop(i)), un, sn);
 	break;
+      case is_instruction_whileloop:
+	debug(5, "statement_reorder", "whileloop\n");
+	sn = statement_reorder(whileloop_body(instruction_whileloop(i)), un, sn);
+	break;
       case is_instruction_goto:
       case is_instruction_call:
 	debug(5, "statement_reorder", "goto or call\n");
