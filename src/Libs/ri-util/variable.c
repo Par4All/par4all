@@ -226,6 +226,7 @@ char *module_name;
 	  name, module_name);
 
     full_name = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
+    hash_warn_on_redefinition();
     e = make_entity(strdup(full_name),
 		    type_undefined, 
 		    storage_undefined, 
