@@ -17,16 +17,22 @@ extern value EvalExpression();
 /* this function computes the total size of a variable, ie. the product of
 the number of elements and the size of each element. */
 
-int SizeOfArray(e)
-entity e;
+bool
+SizeOfArray(entity e, int * s)
 {
 	variable a;
+	bool ok = TRUE;
+	int se = 0;
+	int ne = 0;
 
 	assert(type_variable_p(entity_type(e)));
 	a = type_variable(entity_type(e));
 
-	return(SizeOfElements(variable_basic(a))*
-	       NumberOfElements(variable_dimensions(a)));
+	se = SizeOfElements(variable_basic(a));
+	ok = NumberOfElements(variable_dimensions(a), &ne);
+	* s = ne * se;
+
+	return ok;
 }
 
 Value 
@@ -50,7 +56,8 @@ ValueSizeOfArray(entity e)
 /* this function returns the length in bytes of the fortran type
 represented by a basic. */
 
-int SizeOfElements(b)
+int 
+SizeOfElements(b)
 basic b;
 {
   int e = -1;
@@ -102,17 +109,21 @@ basic b;
 /* this function computes the number of elements of a variable. ld is the
 list of dimensions of the variable */
 
-int NumberOfElements(ld)
-cons * ld;
+bool
+NumberOfElements(list ld, int * n)
 {
-    cons *pc;
+    list pc;
     int ne = 1;
+    bool ok = TRUE;
 
-    for (pc = ld; pc != NULL; pc = CDR(pc)) {
-	ne *= SizeOfDimension(DIMENSION(CAR(pc)));
+    for (pc = ld; pc != NULL && ok; pc = CDR(pc)) {
+	int s;
+	ok = SizeOfDimension(DIMENSION(CAR(pc)), &s);
+	ne *= s;
     }
 
-    return(ne);
+    *n = ne;
+    return ok;
 }
 
 Value 
@@ -133,11 +144,11 @@ ValueNumberOfElements(list ld)
 /* this function returns the size of the ith dimension of a variable e. if
 called for the 0th dimension, it returns the variable element size. */
 
-int SizeOfIthDimension(e, i)
-entity e;
-int i;
+int 
+SizeOfIthDimension(entity e, int i)
 {
-    cons * pc;
+    list pc = NIL;
+    int s = 0;
 
     if (!type_variable_p(entity_type(e))) {
 	fprintf(stderr, "[SizeOfIthDimension] not a variable\n");
@@ -157,27 +168,51 @@ int i;
 	abort();
     }
 
-    return(SizeOfDimension(DIMENSION(CAR(pc))));
+    if(!(SizeOfDimension(DIMENSION(CAR(pc)), &s))) {
+	fprintf(stderr, "[SizeOfIthDimension] Non constant %dth dimension\n", i);
+	abort();
+    }
+
+    return s;
 }
 
 
 
 /* this function computes the size of a dimension. */
 
-int SizeOfDimension(d)
-dimension d;
+bool
+SizeOfDimension(dimension d, int * s)
 {
-    return(ExpressionToInt(dimension_upper(d))-
-	   ExpressionToInt(dimension_lower(d))+1);
+    int l = 0;
+    int u = 0;
+    bool ok = TRUE;
+	
+    ok = expression_integer_value(dimension_upper(d), &u) &&
+	   expression_integer_value(dimension_lower(d), &l);
+    *s = u - l + 1;
+    return ok;
 }
 
+
+/* FI: I do not understand the "Value" cast */
 
 Value 
 ValueSizeOfDimension(dimension d)
 {
     Value dl, du;
-    du = (Value) ExpressionToInt(dimension_upper(d));
-    dl = (Value) ExpressionToInt(dimension_lower(d));
+    int l = 0 ;
+    int u = 0;
+    bool ok;
+
+    ok = expression_integer_value(dimension_upper(d), &u);
+    du = (Value) u;
+    ok = ok && expression_integer_value(dimension_lower(d), &l);
+    dl = (Value) l;
+
+    if(!ok) {
+	fprintf(stderr, "[ValueSizeOfIthDimension] Non constant dimension\n");
+	abort();
+    }
     
     return(value_plus(value_minus(du,dl), VALUE_ONE));
 }
@@ -186,10 +221,14 @@ ValueSizeOfDimension(dimension d)
 
 
 /* this function computes the value of an integer constant expression
-and returns it to the calling function. it aborts if the expression is
-not constant. */
+ * and returns it to the calling function. it aborts if the expression is
+ * not constant.
+ *
+ * See expression_integer_value() to check before aborting
+ */
 
-int ExpressionToInt(e)
+int 
+ExpressionToInt(e)
 expression e;
 {
     value v;
@@ -278,7 +317,8 @@ void reset_entity_to_size()
     }
 }
 
-int storage_space_of_variable(entity v)
+int 
+storage_space_of_variable(entity v)
 {
     /* Storage size is expressed in bytes */
     int l;
@@ -291,7 +331,10 @@ int storage_space_of_variable(entity v)
 
     if ((l = (int) hash_get(entity_to_size, (char *) v))
 	== (int) HASH_UNDEFINED_VALUE) {
-	l = SizeOfArray(v);
+	if(!SizeOfArray(v, &l)) {
+	    fprintf(stderr, "[storage_space_of_variable] Non constant array size\n");
+	    abort();
+	}
 	hash_put(entity_to_size, (char *) v, (char *) l);
     }
 
@@ -304,7 +347,8 @@ int storage_space_of_variable(entity v)
 this function returns TRUE if e1 and e2 have some memory locations in common
 */
 
-bool entity_conflict_p(e1, e2)
+bool 
+entity_conflict_p(e1, e2)
 entity e1, e2;
 {
     bool intersect_p = FALSE;
