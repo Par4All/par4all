@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.105  1997/10/27 09:02:26  coelho
+ * PRETTYPRINT_COMMONS bool -> string
+ *
  * Revision 1.104  1997/10/08 08:41:07  coelho
  * hop. cleaner common prettyprint control.
  *
@@ -700,7 +703,7 @@ bool hpfc_compile(string name)
 
     if (do_compile)
     {
-	set_bool_property("PRETTYPRINT_COMMONS", FALSE); 
+	set_string_property("PRETTYPRINT_COMMONS", "none"); 
 
 	if (hpfc_special_io(module))
 	    compile_a_special_io_function(module);
@@ -757,7 +760,7 @@ bool hpfc_common(string name)
 
     load_hpfc_status();
 
-    set_bool_property("PRETTYPRINT_COMMONS", TRUE);
+    set_string_property("PRETTYPRINT_COMMONS", "declaration");
     compile_common(local_name_to_top_level_entity(name));
 
     save_hpfc_status();
@@ -784,7 +787,7 @@ bool hpfc_close(string name)
  
     load_hpfc_status();
     
-    set_bool_property("PRETTYPRINT_COMMONS", TRUE); /* commons compilation */
+    set_string_property("PRETTYPRINT_COMMONS", "declaration"); 
     set_string_property("PIPSDBM_RESOURCES_TO_DELETE", "all");
     gen_map(compile_common, get_the_commons());
 
