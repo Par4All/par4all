@@ -1,5 +1,16 @@
 /* 
  * $Id$
+ *
+ * $Log: size.c,v $
+ * Revision 1.15  1999/01/12 20:39:02  irigoin
+ * Performance improvements for entity_conflict_p(). Instead of gathering all
+ * information and making a final test, partial tests are performed as soon
+ * as possible. Function storage_space_of_variable() is expensive and should
+ * not be called unless necessary. It might be possible to speed up
+ * entity_conflict_p() some more by checking scalar variables and by avoiding
+ * the call to storage_space_of_variable().
+ *
+ *
  */
 #include <stdio.h>
 #include <string.h>
@@ -397,28 +408,38 @@ entity e1, e2;
     int o1, o2, l1, l2;
     entity f1, f2, a1, a2;
 
-    if(same_entity_p(e1, e2)) return(TRUE);
+    if(same_entity_p(e1, e2)) return TRUE;
 
     s1 = entity_storage(e1);
     s2 = entity_storage(e2);
 
     if (! (storage_ram_p(s1) && storage_ram_p(s2)))
-	return intersect_p;
-
-    l1 = storage_space_of_variable(e1);
+	return FALSE;
 
     r1 = storage_ram(s1);
-    f1 = ram_function(r1);
+    r2 = storage_ram(s2);
+
     a1 = ram_section(r1);
+    a2 = ram_section(r2);
+
+    if(a1!=a2) return FALSE;
+
     o1 = ram_offset(r1);
+    o2 = ram_offset(r2);
+
+    if(o1==o2) return TRUE;
+
+    f1 = ram_function(r1);
+    f2 = ram_function(r2);
+
+    if(f1==f2 && (ENDP(ram_shared(r1)) || ENDP(ram_shared(r2))))
+       return FALSE;
+
+    l1 = storage_space_of_variable(e1);
     l1 = l1+o1-1;
 
-    l2 = storage_space_of_variable(e2);
 
-    r2 = storage_ram(s2);
-    f2 = ram_function(r2);
-    a2 = ram_section(r2);
-    o2 = ram_offset(r2);
+    l2 = storage_space_of_variable(e2);
     l2 = l2+o2-1;
 	    
     /* return(r1 != ram_undefined && r2 != ram_undefined && 
