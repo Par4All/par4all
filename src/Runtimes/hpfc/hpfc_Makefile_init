@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.59  1997/05/03 17:10:23  coelho
+# diff does not need host and node executables, main and out are enough.
+#
 # Revision 1.58  1997/05/03 16:46:44  coelho
 # *** empty log message ***
 #
@@ -305,7 +308,7 @@ install:
 run: install pvm
 	$(pvmbin)/$(HOST)
 
-diff: $(RUNABLES) install pvm
+diff: $(MAIN) $(RTEST) install pvm
 	$(pvmbin)/$(MAIN) > parallel.out 2> parallel.err
 	$(RTEST) > sequential.out 2> sequential.err
 	@if cmp -s parallel.out sequential.out ; \
