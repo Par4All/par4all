@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.96  1998/05/22 13:33:32  coelho
+ * some fixes for jpips. -j option added.
+ *
  * Revision 1.95  1998/05/05 17:40:49  coelho
  * help update about "info".
  *
@@ -119,16 +122,17 @@ extern void tp_restart( FILE * ); /* tp_lex.c */
 /*************************************************************** Some Macros */
 
 #define tpips_usage							\
-  "Usage: %s [-nscvh?] "						\
+  "Usage: %s [-nscvh?j] "						\
   "[-l logfile] [-r rcfile] [-e tpips-cmds] tpips-scripts\n"		\
   "\t-n: no execution mode. just to check a script for syntax errors\n"	\
   "\t-s: behaves like a shell. tpips commands simply extend a shell.\n"	\
   "\t-c: behaves like a command, not a shell (it is the default).\n"	\
   "\t-h: this help. (also -?)\n"					\
   "\t-v: display version and architecture informations.\n"		\
-  "\t-l logfile: log to logfile.\n"					\
-  "\t-r rcfile: tpips rc file to source. (default ~/.tpipsrc)\n"	\
-  "\t-e tpips-cmds: here tpips commands.\n"
+  "\t-l  logfile: log to logfile.\n"					\
+  "\t-r  rcfile: tpips rc file to source. (default ~/.tpipsrc)\n"	\
+  "\t-e  tpips-cmds: here tpips commands.\n"				\
+  "\t-j: jpips special mode.\n"
 
 #define SEPARATOR_P(c) (index (" \t", c))
 
@@ -156,6 +160,62 @@ tpips_behaves_like_a_shell(void)
 {
     return tpips_is_a_shell || get_bool_property(TPIPS_IS_A_SHELL) ||
 	string_is_true(getenv(TPIPS_IS_A_SHELL));
+}
+
+/********************************************************************* JPIPS */
+/* jpips specials.
+ *
+ * #jpips: modules MAIN FOO BLA...
+ * #jpips: prop ...
+ * #jpips: done
+ * #jpips: begin_user_error
+ * ...
+ * #jpips: end_user_error
+ * #jpips: show ...
+ * #jpips: {begin,end}_user_request
+ * #jpips: 
+ */
+
+#define JPIPS_TAG	"#jpips:"
+static bool it_is_jpips = FALSE;
+
+bool jpips_is_running(void)
+{
+    return it_is_jpips;
+}
+
+void jpips_begin_tag(string s)
+{
+    fprintf(stdout, JPIPS_TAG " %s", s);
+}
+
+void jpips_add_tag(string s)
+{
+    fprintf(stdout, " %s", s);
+}
+
+void jpips_end_tag(void)
+{
+    fprintf(stdout, "\n");
+    fflush(stdout);
+}
+
+void jpips_tag(string s)
+{
+    jpips_begin_tag(s);
+    jpips_end_tag();
+}
+
+void jpips_tag2(string s1, string s2)
+{
+    jpips_begin_tag(s1);
+    jpips_add_tag(s2);
+    jpips_end_tag();
+}
+
+void jpips_done(void)
+{
+    jpips_tag("done");
 }
 
 /********************************************************** TPIPS COMPLETION */
@@ -465,6 +525,10 @@ tpips_user_log(char *fmt, va_list args)
 }
 
 /* Tpips user request */
+
+#define BEGIN_RQ	"begin_user_request"
+#define END_RQ		"end_user_request"
+
 static string 
 tpips_user_request(string fmt, va_list args)
 {
@@ -472,7 +536,14 @@ tpips_user_request(string fmt, va_list args)
 
     debug_on("TPIPS_DEBUG_LEVEL");
 
-    if (use_readline) {
+    if (jpips_is_running())
+    {
+	jpips_tag(BEGIN_RQ);
+	vfprintf(stdout, fmt, args); /* ??? */
+	jpips_tag(END_RQ);
+    }
+    else if (use_readline)
+    {
 	(void) fprintf(stdout,"\nWaiting for your response: ");
 	(void) vfprintf(stdout, fmt, args);
 	fflush(stdout);
@@ -488,6 +559,8 @@ tpips_user_request(string fmt, va_list args)
 }
 
 /* Tpips user error */
+#define BEGIN_UE	"begin_user_error"
+#define END_UE		"end_user_error"
 
 static void 
 tpips_user_error(string calling_function_name,
@@ -497,21 +570,30 @@ tpips_user_error(string calling_function_name,
     /* extern jmp_buf pips_top_level; */
     jmp_buf * ljbp = 0;
 
-   /* print name of function causing error */
-   (void) fprintf(stderr, "user error in %s: ", calling_function_name);
+   /* print name of function causing error and
+    * print out remainder of message 
+    */
+    fprintf(stderr, "user error in %s: ", calling_function_name);
+    vfprintf(stderr, a_message_format, * some_arguments);
 
-   /* print out remainder of message */
-   (void) vfprintf(stderr, a_message_format, * some_arguments);
+    if (jpips_is_running())
+    {
+	jpips_tag(BEGIN_UE);
+	fprintf(stdout, "user error in %s: ", calling_function_name);
+	vfprintf(stdout, a_message_format, * some_arguments);
+	jpips_tag(END_UE);
+    }
+    
+    /* terminate PIPS request */
+    if (get_bool_property("ABORT_ON_USER_ERROR")) {
+	pips_user_warning("Abort on user error requested!\n");
+	abort();
+    }
+    else
+	/* longjmp(pips_top_level, 2); */
+	ljbp = top_pips_context_stack();
 
-   /* terminate PIPS request */
-   if (get_bool_property("ABORT_ON_USER_ERROR")) {
-       user_warning("tpips_user_error", "Abort on user error requested!\n");
-       abort();
-   }
-   else
-       /* longjmp(pips_top_level, 2); */
-      ljbp = top_pips_context_stack();
-      longjmp(*ljbp, 2);
+    longjmp(*ljbp, 2);
 }
 
 /*  returns the allocated full tpips history file name, i.e.
@@ -872,7 +954,8 @@ tpips_exec(char * line)
     pop_pips_context();
 }
 
-/* processing command line per line. might be called recursively thru source.
+/* processing command line per line. 
+ * might be called recursively thru source.
  */
 void 
 tpips_process_a_file(FILE * file, bool use_rl)
@@ -898,6 +981,7 @@ tpips_process_a_file(FILE * file, bool use_rl)
     while ((line = tpips_read_a_line(TPIPS_PRIMARY_PROMPT))) {
 	tpips_exec(line);
 	free(line);
+	if (jpips_is_running() && file==stdin) jpips_done();
     }
 
     /* pop globals */
@@ -921,7 +1005,7 @@ parse_arguments(int argc, char * argv[])
     int c;
     string tpipsrc = default_tpipsrc();
 
-    while ((c = getopt(argc, argv, "ne:l:h?vscr:")) != -1) {
+    while ((c = getopt(argc, argv, "ne:l:h?vscr:j")) != -1) {
 	switch (c)
 	{
 	case 's':
@@ -951,6 +1035,12 @@ parse_arguments(int argc, char * argv[])
 	    free(tpipsrc);
 	    tpipsrc = strdup(optarg);
 	    break;
+	case 'j':
+	    it_is_jpips = TRUE;
+	    break;
+	default: 
+	    fprintf(stderr, tpips_usage, argv[0]);
+	    exit(1);
 	}
     }
 
