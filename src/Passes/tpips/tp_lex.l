@@ -122,7 +122,7 @@ static int tpips_lex_input (void)
 "$CALLERS"		{ RETURN(OWNER_CALLERS); }
 "$CALLEES"		{ RETURN(OWNER_CALLEES); }
 
-[/\.0-9A-Za-z_-:]+ 	{ yylval.name = strdup(yytext); RETURN(NAME);}
+[/\.0-9A-Za-z_:-]+ 	{ yylval.name = strdup(yytext); RETURN(NAME);}
 [ \t]+			/* skip blanks... */
 .			{ pips_user_error("unexpected char %c\n", *yytext); }
 
