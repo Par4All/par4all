@@ -28,7 +28,6 @@
 #include "icfg.h"
 
 #define ICFG_SCAN_INDENT 4
-#define MAX_LINE_LENGTH 256 /* hmmm... (never checked I guess:-) */
 
 static int current_margin;
 
@@ -59,13 +58,22 @@ static bool
     print_ifs = FALSE;
 static text (*decoration)(string) = NULL;
 
+static void
+append_marged_text(text t, int margin, string what1, string what2)
+{
+    int len = margin + strlen(what1) + strlen(what2) + 2;
+    char * buffer = (char*) malloc(sizeof(char)*len);
+    pips_assert("malloc ok", buffer);
+    sprintf(buffer, "%*s%s%s\n", margin, "", what1, what2);
+    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted, buffer));
+}
+
 static void 
 append_icfg_file(text t, string module_name)
 {
     string filename, localfilename, dir;
-    FILE *f_called;
+    FILE * f_called;
     string buf;
-    char textbuf[MAX_LINE_LENGTH]; /* argh... */
        
     localfilename = db_get_memory_resource(DBR_ICFG_FILE, module_name, TRUE);
     dir = db_get_current_workspace_directory();
@@ -77,14 +85,10 @@ append_icfg_file(text t, string module_name)
     /* Get the Icfg from the callee */
     f_called = safe_fopen (filename, "r");
 
-    while ((buf=safe_readline(f_called))) {
-	/* add sentences ... */
-        pips_assert("static buf length", 
-                    current_margin+strlen(buf)+1<MAX_LINE_LENGTH);
-	sprintf(textbuf, "%*s%s\n", current_margin ,"",buf);
+    while ((buf=safe_readline(f_called))) 
+    {
+	append_marged_text(t, current_stmt, buf, "");
         free(buf);
-	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-					      strdup(textbuf)));
     }
     
     /* push resulting text */
@@ -192,11 +196,10 @@ loop_filter (loop l)
 static void 
 loop_rewrite (loop l)
 {
-    text inside_the_loop = text_undefined;
-    text inside_the_do = text_undefined;
+    text inside_the_loop = text_undefined, 
+	inside_the_do = text_undefined,
+	t = make_text (NIL);
     bool text_in_do_p, text_in_loop_p;
-    text t = make_text (NIL);
-    char textbuf[MAX_LINE_LENGTH];
 
     pips_debug (5,"Loop end\n");
 
@@ -220,15 +223,13 @@ loop_rewrite (loop l)
      */
     if ((text_in_loop_p || text_in_do_p) && print_do_loops) 
     {
-	sprintf(textbuf, "%*s" st_DO " %s\n", current_margin, "",
-		entity_local_name(loop_index(l)));
-	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-					      strdup(textbuf)));
+	append_marged_text(t, current_margin, st_DO " ", 
     }
 
     /* Print the text inside the loop
      */
-    if (text_in_loop_p) {
+    if (text_in_loop_p) 
+    {
 	pips_debug(9, "something inside_the_loop\n");
 	MERGE_TEXTS (t, inside_the_loop);
     }
@@ -237,9 +238,7 @@ loop_rewrite (loop l)
      */
     if ((text_in_loop_p || text_in_do_p) && print_do_loops) 
     {
-	sprintf(textbuf, "%*s" st_ENDDO "\n", current_margin, "");
-	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-					      strdup(textbuf)));
+	append_marged_text(t, current_margin, st_ENDDO, "");
     }
 
     /* store it to the statement mapping */
@@ -265,7 +264,6 @@ static void
 instruction_rewrite (instruction i)
 {
     text t = make_text (NIL);
-    char textbuf[MAX_LINE_LENGTH];
     bool text_in_unstructured_p = FALSE;
 
     pips_debug (5,"going up\n");
@@ -315,9 +313,7 @@ instruction_rewrite (instruction i)
 	if(print_do_loops && while_p) {
 	    current_margin -= ICFG_SCAN_INDENT;
 	    if(text_in_unstructured_p) {
-		sprintf(textbuf, "%*s" st_WHILE "\n", current_margin, "");
-		ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-						      strdup(textbuf)));
+		append_marged_text(t, current_margin, st_WHILE, "");
 	    }
 	}
 
@@ -332,9 +328,7 @@ instruction_rewrite (instruction i)
 	 */
 	if (text_in_unstructured_p && print_do_loops && while_p) 
 	{
-	    sprintf(textbuf, "%*s" st_ENDWHILE "\n", current_margin, "");
-	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-						  strdup(textbuf)));
+	    append_marged_text(t, current_margin, st_ENDWHILE, "");
 	}
 
 	update_statement_icfg (current_stmt_head (), t);
@@ -382,7 +376,6 @@ test_rewrite (test l)
     text inside_else = text_undefined;
     text inside_if = text_undefined;
     text t = make_text (NIL);
-    char textbuf[MAX_LINE_LENGTH];
     bool something_to_print;
     
     pips_debug (5,"Test end\n");
@@ -399,9 +392,7 @@ test_rewrite (test l)
     
     /* Print the IF */
     if (something_to_print && print_ifs) {
-	sprintf(textbuf, "%*s" st_IF "\n", current_margin, "");
-	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-					      strdup(textbuf)));
+	append_marged_text(t, current_margin, st_IF, "");
     }
     
     /* print things in the if expression*/
@@ -413,9 +404,7 @@ test_rewrite (test l)
     if (some_text_p(inside_then)) {
 	/* Print the THEN */
 	if (something_to_print && print_ifs) {
-	    sprintf(textbuf, "%*s" st_THEN "\n", current_margin, "");
-	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-						  strdup(textbuf)));
+	    append_marged_text(t, current_margin, st_THEN, "");
 	}
 	MERGE_TEXTS (t, inside_then);
     }    
@@ -424,18 +413,14 @@ test_rewrite (test l)
     if (some_text_p(inside_else)){
 	/* Print the ELSE */
 	if (something_to_print && print_ifs) {
-	    sprintf(textbuf, "%*s" st_ELSE "\n", current_margin, "");
-	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-						  strdup(textbuf)));
+	    append_marged_text(t, current_margin, st_ELSE, "");
 	}
 	MERGE_TEXTS (t, inside_else);
     }    
 
     /* Print the ENDIF */
     if (something_to_print && print_ifs) {
-	sprintf(textbuf, "%*s" st_ENDIF "\n", current_margin, "");
-	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-					      strdup(textbuf)));
+	append_marged_text(t, current_margin, st_ENDIF, "");
     }
     
     /* store it to the statement mapping */
@@ -450,7 +435,6 @@ print_module_icfg(entity module)
     string module_name = module_local_name(module);
     statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,TRUE);
     text txt = make_text (NIL);
-    char buf[MAX_LINE_LENGTH];
 
     set_current_module_entity (module);
 
@@ -458,9 +442,8 @@ print_module_icfg(entity module)
     make_icfg_map();
     make_current_stmt_stack();
 
-    sprintf(buf,"%s\n",module_name);
     ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					    strdup(buf)));
+					    strdup(module_name)));
 
     current_margin = ICFG_SCAN_INDENT;
 
