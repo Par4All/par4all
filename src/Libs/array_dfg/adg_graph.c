@@ -311,6 +311,21 @@ vertex in_ver;
   return order;
 }
 
+
+/*============================================================================*/
+boolean integer_in_list_p(i, l)
+int i;
+list l;
+{
+ boolean is_in_list = FALSE;
+
+ for( ; (l != NIL) && (! is_in_list); l = CDR(l))
+    if(i == INT(CAR(l)))
+       is_in_list = TRUE;
+
+ return(is_in_list);
+}
+
 /*=======================================================================*/
 /* void adg_reorder_statement_number( (graph) in_dfg )		AL 21/10/93
  * Input  : A dfg graph with different vertices pointing on the same
@@ -320,27 +335,37 @@ vertex in_ver;
  * Output : Nothing. Each vertex has a new and distinct number for
  * 		the statement tag of it dfg_vertex_label tag. 
  * PRIVATE to this pass !!
+ *
+ * AP, oct 6th 1995: I change the way to choose the new numbers used to
+ * reorder
  */
 void adg_reorder_statement_number( in_dfg )
 graph in_dfg;
 {
-  list	verl = NIL;
-  int	count = 1000;	/* Begins at 1000 because entry node is 0 */
-  int	order = (int) NULL;
+  list	verl, l_num;
+  int	order, num;
+  
+  l_num = NIL;
+  Gvertex_number_to_statement = hash_table_make( hash_int, 0 );
 
   debug(7, "adg_reorder_statement_number", "begin\n");
-  Gvertex_number_to_statement = hash_table_make( hash_int, 0 );
+
   verl = graph_vertices( in_dfg );
   for(; !ENDP(verl); POP(verl)) {
-    dfg_vertex_label vl = (dfg_vertex_label) vertex_vertex_label(VERTEX(CAR(verl)));
+    vertex v = VERTEX(CAR(verl));
+    dfg_vertex_label vl = (dfg_vertex_label) vertex_vertex_label(v);
     if (vl !=  dfg_vertex_label_undefined ) {
-      count++;
       order = dfg_vertex_label_statement( vl );
-      dfg_vertex_label_statement( vl ) = count;
-      hash_put( Gvertex_number_to_statement, (char *) count, (char *) order );
+      num =
+	BASE_NODE_NUMBER + 10*statement_number(ordering_to_statement(order));
+      while(integer_in_list_p(num, l_num))
+	num++;
+      l_num = CONS(INT, num, l_num);
+      dfg_vertex_label_statement( vl ) = num;
+      hash_put( Gvertex_number_to_statement, (char *) num, (char *) order );
       debug(9, "adg_reorder_statement_number",
-	    "  Vertex-Statement count : %d Ordering of Statement  : %d\n",
-	    count, order );
+	    "  Vertex-Statement : %d Ordering of Statement  : %d\n",
+	    num, order );
     }
   }
     
