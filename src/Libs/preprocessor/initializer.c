@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: initializer.c,v $
+ * Revision 1.16  2003/12/30 14:41:03  irigoin
+ * ask_a_missing_file() made more robust when the required module is not
+ * found in the user-specified file
+ *
  * Revision 1.15  2003/08/14 08:48:04  irigoin
  * Compatibility with LINUX for strdup() declaration
  *
@@ -220,7 +224,9 @@ ask_a_missing_file(string module)
     bool ok, cont;
     
     do {
-	file = user_request("please enter a file for module %s\n", module);
+	file = user_request("Please enter a file for module %s\n", module);
+	if(file && strcmp(file, "quit")==0)
+	  break;
 	if (file)
 	  {
 	    if (same_string_p(file, "generate"))
@@ -230,6 +236,9 @@ ask_a_missing_file(string module)
 	  }
 	cont = file && !same_string_p(file, "quit") &&
 	    !db_resource_p(DBR_INITIAL_FILE, module);
+	if(cont)
+	  pips_user_warning("Module \"%s\" not found in \"%s\".\n"
+			    "Please type \"quit\" or another file name.\n", module, file);
 	if (file) free(file);
     } while (cont);
     return db_resource_p(DBR_INITIAL_FILE, module);
