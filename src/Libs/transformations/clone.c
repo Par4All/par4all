@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.9  1997/11/04 13:41:29  coelho
+ * version names are formed in exa instead of decimal...
+ *
  * Revision 1.8  1997/11/04 13:25:13  coelho
  * more comments.
  *
@@ -100,7 +103,7 @@ build_new_top_level_entity_name(string prefix)
     string name = (string) malloc(sizeof(char)*(strlen(prefix)+20)), res;
     int version = 0;
 
-    do { sprintf(name, "%s_%d", prefix, version++); }
+    do { sprintf(name, "%s_%x", prefix, version++); }
     while (local_name_to_top_level_entity(name)!=entity_undefined);
 
     res = strdup(name); 
