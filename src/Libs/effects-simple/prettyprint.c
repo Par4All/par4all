@@ -14,6 +14,7 @@
 #include "genC.h"
 
 #include "properties.h"
+#include "linear.h"
 #include "ri.h"
 
 #include "misc.h"
