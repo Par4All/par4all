@@ -199,6 +199,12 @@ MakeComplexResult()
 }
 
 type 
+MakeDoublecomplexResult()
+{
+    return MakeAnyScalarResult(is_basic_complex, DEFAULT_COMPLEX_TYPE_SIZE);
+}
+
+type 
 MakeCharacterResult()
 {
   return MakeTypeArray(make_basic(is_basic_string, 
