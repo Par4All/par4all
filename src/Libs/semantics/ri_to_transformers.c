@@ -122,7 +122,11 @@ unstructured_to_transformers(unstructured u)
 
     debug(8,"unstructured_to_transformers","begin\n");
 
-    CONTROL_MAP(c, {
+    /* There is no need to compute transformers for unreachable code,
+     * using CONTROL_MAP, but this may create storage and prettyprinter
+     * problems because of the data structure inconsistency.
+     */
+    FORWARD_CONTROL_MAP(c, {
 	statement st = control_statement(c) ;
 	(void) statement_to_transformer(st) ;
     }, ct, blocs) ;
@@ -156,9 +160,20 @@ unstructured_to_transformer(unstructured u, list e) /* effects */
 	   Transformers associated to its components are then computed
 	   independently, hence the name unstructured_to_transformerS
 	   instead of unstructured_to_transformer */
-	debug(8,"unstructured_to_transformer","complex: based on effects\n");
-	(void) unstructured_to_transformers(u) ;
-	tf = effects_to_transformer(e);
+	statement exit = control_statement(unstructured_exit(u));
+
+	debug(8,"unstructured_to_transformer", "complex: based on effects\n");
+
+	(void) unstructured_to_transformers(u);
+
+	if(load_statement_transformer(exit)!=transformer_undefined) {
+	    /* The exit node has been reached */
+	    tf = effects_to_transformer(e);
+	}
+	else {
+	    /* Never ending loop in transformer */
+	    tf = transformer_empty();
+	}
     }
 
     debug(8,"unstructured_to_transformer","end\n");
