@@ -8,65 +8,12 @@
  * Comments :
  */
 
-/* Ansi includes 	*/
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-/* Newgen includes 	*/
-#include "genC.h"
-
-/* C3 includes 		*/
-#include "boolean.h"
-#include "arithmetique.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "sc.h"
-#include "polyedre.h"
-#include "matrice.h"
-#include "matrix.h"
-#include "union.h"
-
-/* Pips includes 	*/
-#include "parser_private.h"
-#include "graph.h"
-#include "dg.h"
-#include "database.h"
-#include "ri.h"
-#include "paf_ri.h"
-#include "ri-util.h"
-#include "text-util.h"
-#include "control.h"
-#include "constants.h"
-#include "misc.h"
-#include "transformer.h"
-#include "semantics.h"
-
-#include "effects-generic.h"
-#include "effects-simple.h"
-#include "effects-convex.h"
-
-#include "pipsdbm.h"
-#include "resources.h"
-#include "static_controlize.h"
-#include "ricedg.h"
-#include "paf-util.h"
-#include "pip.h"
-#include "array_dfg.h"
-#include "syntax.h"
+#include "local.h"
 
 /* Global variables */
 extern	int			Gcount_re;
 extern  statement_mapping	Gstco_map;
 extern	boolean			PATH_METHOD;
-
-/* Local defines */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
 
 /*=======================================================================*/
 /*			USEFULL FUNCTIONS				 */
@@ -133,7 +80,7 @@ int	in_i;
 			       MODULE_SEP_STRING, name, NULL ));
     new_ent = make_entity(name2,
 			  make_type(is_type_variable,
-			       make_variable(make_basic(is_basic_int,4),NIL)),
+			 make_variable(make_basic(is_basic_int,UUINT(4)),NIL)),
 			  make_storage(is_storage_ram, ram_undefined),
 			  make_value(is_value_unknown, UU));
   }
@@ -1183,7 +1130,7 @@ hash_table fst;
 				 MODULE_SEP_STRING, name, NULL ));
       new_ent = make_entity(name2,
 			    make_type(is_type_variable,
-				make_variable(make_basic(is_basic_int,4),NIL)),
+		      make_variable(make_basic(is_basic_int,UUINT(4)),NIL)),
 			    make_storage(is_storage_ram, ram_undefined),
 			    make_value(is_value_unknown, UU));
     }
