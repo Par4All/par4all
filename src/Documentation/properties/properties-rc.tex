@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/08/31 10:36:42 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/01 11:57:20 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -731,10 +731,18 @@ HPFC_SYNCHRONIZE_IO FALSE
 HPFC_IGNORE_MAY_IN_IO FALSE
 \end{verbatim}
 
-  Wether to use lazy or non-lazy communications
+  Whether to use lazy or non-lazy communications
 
 \begin{verbatim}
 HPFC_LAZY_MESSAGES TRUE
+\end{verbatim}
+
+Whether to ignore FCD (Fabien Coelho Directives\ldots) or not. These
+directives are used to instrument the code for testing purposes.
+
+\begin{verbatim}
+HPFC_IGNORE_FCD_SYNCHRO FALSE
+HPFC_IGNORE_FCD_TIME FALSE
 \end{verbatim}
 
 % \begin{thebibliography}{99}
