@@ -69,10 +69,8 @@ void newgen_start_lexer(FILE * in)
 
 void newgen_lexer_position(FILE * out)
 {
-    fprintf(out, "newgen lexer at line %d (column %d, char %d)\n", 
-	    newgen_line_number,
-	    newgen_col_number,
-	    newgen_char_number);
+  fprintf(out, "newgen lexer at line %d (column %d, char %d)\n", 
+	  newgen_line_number, newgen_col_number, newgen_char_number);
 }
 
 %}
@@ -80,43 +78,40 @@ void newgen_lexer_position(FILE * out)
 %Start a_string
 
 %%
-<a_string>\\\\          {append_to_literal("\\");}
-<a_string>\\\"		{append_to_literal("\"");}
-<a_string>[^\\"\n]*     {append_to_literal(yytext);} /* " */
-<a_string>[ \t\n]*      {append_to_literal(yytext);}
+<a_string>\\\\          { append_to_literal("\\"); }
+<a_string>\\\"		{ append_to_literal("\""); }
+<a_string>[^\\"\n]*     { append_to_literal(yytext); } /* " */
+<a_string>[ \t\n]*      { append_to_literal(yytext); }
 <a_string>\"		{
 			  BEGIN 0 ;
 			  yylval.s = strdup(literal);
 			  free(literal); literal=(char*)NULL; literal_size=0;
 			  return READ_STRING ;
 			}
-
-\[                      {return LB ;}
-\#\(\#\]type            {return CHUNK_BEGIN ;}
-\#\(			{return VECTOR_BEGIN ;}
-\#\]arrow               {return ARROW_BEGIN ;}
-\(		        {return LP ;}
-\)			{return RP ;}
-\{		        {return LC ;}
-\}			{return RC ;}
-\#\]shared              {return SHARED_POINTER  ;}
-\#\]unit		{return READ_UNIT ;}
-\#\]bool		{return READ_BOOL ;}
-\#\]external 		{return READ_EXTERNAL ;}
-\#\]def			{return READ_DEF ;}
-\#\]ref			{return READ_REF ;}
-\#\]null		{return READ_NULL ;}
-\#\]list                {return READ_LIST_UNDEFINED ;}
-\#\]set                 {return READ_SET_UNDEFINED ;}
-\#\]array               {return READ_ARRAY_UNDEFINED ;}
-\#\\.			{ yylval.c=*(yytext+2); return READ_CHAR ;}
-[+-]?[ \t]*[0-9]+       { yylval.val=atoi(yytext); return READ_INT ;}
-[+-]?[ \t]*[0-9]+\.[0-9]+ { yylval.d=atof(yytext);
-                        return READ_FLOAT ;}
-\"			{
-			  BEGIN a_string ;
-			  append_to_literal("");
-			}
+_			{ yylval.s = NULL; return READ_STRING; }
+!			{ yylval.s = string_undefined; return READ_STRING; }
+\[                      { return LB; }
+T			{ return CHUNK_BEGIN; }
+\$			{ return VECTOR_BEGIN; }
+%			{ return ARROW_BEGIN; }
+\(		        { return LP; }
+\)			{ return RP; }
+\{		        { return LC; }
+\}			{ return RC; }
+H			{ return SHARED_POINTER ; }
+U			{ return READ_UNIT; }
+B			{ return READ_BOOL; }
+E	 		{ return READ_EXTERNAL; }
+D			{ return READ_DEF; }
+R			{ return READ_REF; }
+N			{ return READ_NULL; }
+L	                { return READ_LIST_UNDEFINED; }
+S	                { return READ_SET_UNDEFINED; }
+A			{ return READ_ARRAY_UNDEFINED; }
+\#\\.			{ yylval.c=*(yytext+2); return READ_CHAR; }
+[+-]?[ \t]*[0-9]+       { yylval.val=atoi(yytext); return READ_INT; }
+[+-]?[ \t]*[0-9]+\.[0-9]+ { yylval.d=atof(yytext); return READ_FLOAT; }
+\"			{ BEGIN a_string ; append_to_literal(""); }
 [ \t]*	                ;
 \n 			{ newgen_line_number++; newgen_col_number=0; }
 .                       { fatal("gen_read: Unknown character %x\n", 
