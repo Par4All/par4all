@@ -231,7 +231,7 @@ void FindIf();
 void FindAutre();
 void FindPoints();
 
-int sswrap()
+int syn_wrap()
 {
 	return(1);
 }
