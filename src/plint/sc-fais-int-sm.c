@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <malloc.h>
 
+#include "assert.h"
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
@@ -53,7 +54,7 @@ int nbl;
     Pcontrainte pc=NULL;
     Pcontrainte cp = NULL;
     int i,j;
-    int den = 1;
+    Value den = VALUE_ONE;
     int sgn_den;
     ps->dimension = 0;
     ps->base = NULL;
@@ -62,17 +63,23 @@ int nbl;
 	(void) creat_new_var(ps);
 
     den =MATRIX_DENOMINATOR(B);
-    sgn_den = (den >= 0) ? 1 : -1;
+    sgn_den = value_sign(den);
     if (den) {
 	for (i=1;i<=m; i++) {
 	    Pbase b = ps->base;
+	    Value tmp = MATRIX_ELEM(B,i,1);
 
 	    cp = contrainte_new();
-	    pv = vect_new(TCST,-sgn_den * MATRIX_ELEM(B,i,1));
+
+	    if (sgn_den==1) value_oppose(tmp);
+	    pv = vect_new(TCST,tmp);
 
 	    for (j=1;j<=nbl && b!=VECTEUR_NUL;j++, b = b->succ)
-		vect_chg_coeff(&pv, vecteur_var(b),
-			       -1 * sgn_den * MATRIX_ELEM(B,i,j+1));
+	    {
+		tmp = MATRIX_ELEM(B,i,j+1);
+		if (sgn_den==1) value_oppose(tmp);
+		vect_chg_coeff(&pv, vecteur_var(b), tmp);
+	    }
 	    assert(j>nbl);
 
 	    cp->vecteur = pv;
@@ -118,7 +125,7 @@ Psysteme ps;
     Pmatrix QN2=MATRIX_UNDEFINED;
     Pmatrix B=MATRIX_UNDEFINED;
     Pmatrix B2=MATRIX_UNDEFINED;
-    int den=1;
+    Value den=VALUE_ONE;
     int nbl;
     int nblg = sys->nb_eq;     /* nombre de lignes du systeme   */
     int nbv = sys->dimension;     /* nombre de variables du systeme */
@@ -128,7 +135,6 @@ Psysteme ps;
 				  au plus petit entier non nul appartenant a la 
 				  partie triangulaire superieure de la matrice   */
     int level = 0;
-    int sgn = 1;
     boolean trouve = FALSE;
     boolean stop = FALSE;
     boolean infaisab = FALSE;
@@ -167,8 +173,8 @@ Psysteme ps;
 	    contraintes_free(sys->egalites);
 	sys->egalites = NULL;
 
-	MATRIX_DENOMINATOR(B)=1;
-	MATRIX_DENOMINATOR(MAT) = 1;
+	MATRIX_DENOMINATOR(B)= VALUE_ONE;
+	MATRIX_DENOMINATOR(MAT) = VALUE_ONE;
 
 	matrix_nulle(B);
 
@@ -288,10 +294,11 @@ Psysteme ps;
 	for (i=1;i<=n && i<=m && !infaisab;i++)	{
 	    /* Division de chaque terme non nul de B par le terme
 	       correspondant de la diagonale de la matrice D */
-	    if (MATRIX_ELEM(MAT,i,i) != 0) {
-		if ((MATRIX_ELEM(B,i,1) % MATRIX_ELEM(MAT,i,i)) == 0)
-		    MATRIX_ELEM(B,i,1) = 
-			sgn * MATRIX_ELEM(B,i,1)/(MATRIX_ELEM(MAT,i,i));
+	    if (value_notzero_p(MATRIX_ELEM(MAT,i,i))) {
+		if (value_zero_p(value_mod(MATRIX_ELEM(B,i,1),
+					   MATRIX_ELEM(MAT,i,i))))
+		    value_division(MATRIX_ELEM(B,i,1),
+				   MATRIX_ELEM(MAT,i,i));
 		else 
 		    infaisab = TRUE;
 	    }
@@ -303,7 +310,7 @@ Psysteme ps;
 
 		   En effet, l'equation "0 * x = 0"  ==> 
 		                   "la variable x est non contrainte" */
-		if (MATRIX_ELEM(B,i,1) == 0) {
+		if (value_zero_p(MATRIX_ELEM(B,i,1))) {
 		    MATRIX_ELEM(B,i,nbl) = den;
 		    nbl++;
 		}
