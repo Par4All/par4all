@@ -10,6 +10,9 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.58  2001/07/24 13:18:00  irigoin
+  * Cleanup of test_to_transformer() to handle side effects in test conditions
+  *
   * Revision 1.57  2001/07/19 17:58:09  irigoin
   * Two bug fixes + reformatting with a smaller indent
   *
@@ -601,63 +604,41 @@ test_to_transformer(test t, list ef) /* effects of t */
   statement sf = test_false(t);
   transformer tf;
 
-  debug(8,"test_to_transformer","begin\n");
-
-  /* the test condition cannot be used to improve transformers
-     it may be used later when propagating preconditions 
-     Francois Irigoin, 15 April 1990 
-
-     Why?
-     Francois Irigoin, 31 July 1992
-
-     Well, you can benefit from STOP statements.
-     But you do not know if the variable values in
-     the condition are the new or the old values...
-     Francois Irigoin, 8 November 1995
-
-  */
+  pips_debug(8,"begin\n");
 
   if(pips_flag_p(SEMANTICS_FLOW_SENSITIVE)) {
-    /*
-      tft = statement_to_transformer(st);
-      tff = statement_to_transformer(sf);
-      tf = transformer_convex_hull(tft, tff);
-    */
     expression e = test_condition(t);
-    transformer tftwc;
-    transformer tffwc;
+    /* Ideally, they should be initialized with the current best
+       precondition, intraprocedural if nothing else better is
+       available. This function's profile as well as most function
+       profiles in ri_to_transformers should be modifed. */
+    transformer tftwc = transformer_identity();
+    transformer tffwc = transformer_identity();
+    transformer post_tftwc = transformer_undefined;
+    transformer post_tffwc = transformer_undefined;
     list ta = NIL;
     list fa = NIL;
 
+    /*
     tftwc = transformer_dup(statement_to_transformer(st));
     tffwc = transformer_dup(statement_to_transformer(sf));
-
-    /* Look for variables modified in one branch only */
-    /* This is performed in transformer_convex_hull
-       ta = arguments_difference(transformer_arguments(tftwc),
-       transformer_arguments(tffwc));
-       fa = arguments_difference(transformer_arguments(tffwc),
-       transformer_arguments(tftwc));
-
-       MAPL(ca, {
-       entity v = ENTITY(CAR(ca));
-
-       tffwc = transformer_add_identity(tffwc, v);
-       }, ta);
-
-       MAPL(ca, {
-       entity v = ENTITY(CAR(ca));
-
-       tftwc = transformer_add_identity(tftwc, v);
-       }, fa);
     */
 
-    tftwc = transformer_add_condition_information(tftwc, e, TRUE);
-    tffwc = transformer_add_condition_information(tffwc, e, FALSE);
+    tftwc = precondition_add_condition_information(tftwc, e, TRUE);
+    tftwc = transformer_temporary_value_projection(tftwc);
+    reset_temporary_value_counter();
+    post_tftwc = transformer_apply(statement_to_transformer(st), tftwc);
 
-    tf = transformer_convex_hull(tftwc, tffwc);
+    tffwc = precondition_add_condition_information(tffwc, e, FALSE);
+    tffwc = transformer_temporary_value_projection(tffwc);
+    reset_temporary_value_counter();
+    post_tffwc = transformer_apply(statement_to_transformer(sf), tffwc);
+
+    tf = transformer_convex_hull(post_tftwc, post_tffwc);
     transformer_free(tftwc);
     transformer_free(tffwc);
+    transformer_free(post_tftwc);
+    transformer_free(post_tffwc);
     free_arguments(ta);
     free_arguments(fa);
   }
