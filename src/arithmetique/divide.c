@@ -1,4 +1,8 @@
-/* package arithmetique */
+/* package arithmetique 
+ *
+ * $RCSfile: divide.c,v $ (version $Revision$)
+ * $Date: 1996/07/13 12:22:53 $, 
+ */
 
 /*LINTLIBRARY*/
 
@@ -20,8 +24,7 @@
  *     de signe du resultat
  *  5. a==0: 0
  */
-int divide_fast(a,b)
-int a,b;
+Value divide_fast(Value a, Value b)
 {
     /* definition d'une look-up table pour les valeurs de a appartenant
        a [-DIVIDE_MAX_A..DIVIDE_MAX_A] et pour les valeurs de b
@@ -32,9 +35,11 @@ int a,b;
 
        Serait-il utile de tester b > a pour renvoyer 0 ou -1 tout de suite?
        */
+
 #define DIVIDE_MAX_A 7
 #define DIVIDE_MAX_B 8
-    static int divide_look_up[2*DIVIDE_MAX_A+1][DIVIDE_MAX_B]= {
+
+    static Value divide_look_up[2*DIVIDE_MAX_A+1][DIVIDE_MAX_B]= {
 	/* b ==         1   2   3   4   5   6   7   8 */
 	{/* a == - 7 */ -7, -4, -3, -2, -2, -2, -1, -1},
 	{/* a == - 6 */ -6, -3, -2, -2, -2, -1, -1, -1},
@@ -54,25 +59,25 @@ int a,b;
     };
     /* translation de a pour acces a la look-up table par indice positif:
        la == a + DIVIDE_MAX_A >= 0 */
-    int la;
-    /* valeur du quotient C */
-    int quotient;
+    Value la;
+    Value quotient;     /* valeur du quotient C */
 
-    assert(b!=0);
+    assert(VALUE_NOTZERO_P(b));
 
     /* serait-il utile d'optimiser la division de a=0 par b? Ou bien
        cette routine n'est-elle jamais appelee avec a=0 par le package vecteur?
        */
 
-    if(b>0) {
-	if((la=a+DIVIDE_MAX_A) >= 0 && a <= DIVIDE_MAX_A && 
+    if(b>VALUE_CONST(0)) {
+	if((la=a+DIVIDE_MAX_A) >= VALUE_ZERO && 
+	   a <= DIVIDE_MAX_A && 
 	   b <= DIVIDE_MAX_B) {
 	    /* acceleration par une look-up table */
 	    quotient = divide_look_up[la][b-1];
 	}
 	else {
 	    /* calcul effectif du quotient: attention, portabilite douteuse */
-	    if(a > 0) 
+	    if(VALUE_POS_P(a)) 
 		quotient = a / b;
 	    else
 		quotient = (a-b+1) / b;
@@ -81,23 +86,28 @@ int a,b;
     else {
 	/* b est negatif, on prend l'oppose et on corrige le resultat */
 	b = -b;
-	if((la=a+DIVIDE_MAX_A) >= 0 && a <= DIVIDE_MAX_A && 
+	if((la=a+DIVIDE_MAX_A) >= VALUE_ZERO && 
+	   a <= DIVIDE_MAX_A && 
 	   b <= DIVIDE_MAX_B) {
 	    /* acceleration par une look-up table */
 	    quotient = -divide_look_up[la][b-1];
 	}
 	else {
 	    /* calcul effectif du divide: attention, portabilite douteuse */
-	    if(a > 0) 
+	    if(a > VALUE_ZERO) 
 		quotient = - (a / b);
 	    else
 		quotient = - ((a-b+1) / b);
 	}
     }
-    return(quotient);
+
+    return quotient;
 }
 
-int divide_slow(a,b)
-int a;
-int b;
-{ return(DIVIDE(a,b));}
+Value divide_slow(Value a, Value b)
+{
+    return DIVIDE(a, b);
+}
+
+/* end of $RCSfile: divide.c,v $
+ */
