@@ -139,7 +139,7 @@ create_transform_menu()
    
    edit_menu_item = 
       xv_create(NULL, MENUITEM, 
-                MENU_STRING, "Edit",
+                MENU_STRING, EDIT_VIEW,
                 MENU_NOTIFY_PROC, edit_notify,
                 MENU_RELEASE,
                 NULL);
