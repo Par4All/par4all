@@ -16,7 +16,7 @@ more=
 
 function usage()
 {
-    echo "$0 [-gvn] [-a user] (usual|long|short|compile|validate)";
+    echo "$0 [-gvn] [-a user] (usual|long|short|compile|validate|debug)";
     exit ${1:-1}
 }
 
@@ -122,6 +122,9 @@ case ${job} in
 	covalid chailly 	/projects/Pips . ;
 	covalid coulommiers 	/tmp LINUXI86 ;
 	covalid recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;;
+    debug)
+	${verb} "DEBUG stuff..." ;
+	validate chailly 	/projects/Pips . ;;
     *)
 	${verb} "unexpected job=${job}" ;
 	usage 2 ;;
