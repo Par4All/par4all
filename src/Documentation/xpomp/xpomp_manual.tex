@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/01 21:53:25 $, 
+%% $Date: 1996/09/01 21:56:02 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html}
@@ -595,7 +595,8 @@ variable, then the desired effect is achieved with:
 !ldi$ -L$XPOMP_RUNTIME -lxpomp
 \end{verbatim}
 Note that the variables are interpreted by a shell. This directive
-is incorporated in the fake sources file for \xPOMP.
+is incorporated in the header file for \xPOMP{} so that the user should
+not need to care about it. Isn't it marvellous?
 
 \newpage
 \tableofcontents
