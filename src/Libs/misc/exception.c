@@ -14,6 +14,8 @@
  * interface such as wpips, tpips or pips
  */
 
+#if defined(I_REALLY_WANT_THIS_OLD_EXCEPTION_STUFF)
+
 #include <stdio.h>
 #include <setjmp.h>
 	
@@ -83,4 +85,5 @@ void print_pips_context_stack()
     }
 }
 
+#endif /* I_REALLY_WANT_THIS_OLD_EXCEPTION_STUFF */
 /* That's all */
