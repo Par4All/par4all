@@ -1,12 +1,9 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1995/11/02 17:10:26 $, 
+ * $Date: 1995/11/17 11:51:37 $, 
  */
 
-/* hmmm...
- */
 #ifndef _STDARG_H
-/* If we have already used stdarg.h do not include: */
-#include <varargs.h>
+#include <stdarg.h>
 #endif
 #include <setjmp.h>
 
