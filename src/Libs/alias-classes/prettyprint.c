@@ -194,8 +194,10 @@ aliases_text(string module_name, string resource_name)
 
 /*    set_action_interpretation(ACTION_IN,ACTION_OUT); */
 
-    MAP(LIST,alias_list,
+    MAP(EFFECTS,alias_list_effects,
 	{
+	    list alias_list = effects_effects(alias_list_effects);
+
 	    pips_debug(9,"make text for alias list\n");
 
 	    if (alias_list != (list) HASH_UNDEFINED_VALUE
@@ -218,8 +220,7 @@ aliases_text(string module_name, string resource_name)
 
 		pips_debug(9,"made text for alias list\n");
 	    }
-	},
-	    alias_lists);
+	},alias_lists);
 
     pips_debug(4,"end\n");
 
