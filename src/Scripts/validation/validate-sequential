@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1995/09/22 11:25:02 $, ) 
+# ($Date: 1995/10/06 10:09:19 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -33,6 +33,7 @@
 #  - source environment if necessary
 
 [ "$PIPS_HOME" ] || . /home/users/pips/Pips/pipsrc.sh
+umask 002
 
 pips_test_directory=${PIPS_VALIDDIR}
 default_file=defaults
@@ -198,7 +199,10 @@ make_diff()
     [ "$LOCKFILE" ] && echo "$aspect:$name:$module" > $LOCKFILE.$HOSTNAME
     exit 1
   fi
+
+  rm -f $aspect/$name.result/$module.out
   cp $tmpout $aspect/$name.result/$module.out
+
   # diff -e $aspect/$name.result/$module $tmpout > $diffout_e
   diff $aspect/$name.result/$module $tmpout > $diffout
   status=$?
@@ -214,11 +218,6 @@ make_diff()
   echo Differences for $module in $file : ;\
   cat $diffout ;\
   echo ; `"
-  # echo ;
-  # echo Diff Commands for $module in $file : ;\
-  # cat $diffout_e | sed -e 's/^/X/' ;\
-  # echo Xw ;\
-  # echo Xq`"
 }
 
 test_aspect()
