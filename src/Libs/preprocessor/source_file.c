@@ -1,7 +1,11 @@
- /* procedures used in both PIPS top-level, wpips and tpips */
- /* problems to use those procedures with wpips: show_message() and 
-    update_props() .
-  */
+/* 
+ * $Id$
+ *
+ * procedures used in both PIPS top-level, wpips and tpips.
+ *
+ * problems to use those procedures with wpips: show_message() and 
+ * update_props() .
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,7 +39,10 @@
 
 #include "top-level.h"
 
-#define LINE_LENGTH 128
+#define LINE_LENGTH 240
+
+#define skip_line_p(s) \
+  ((*(s))=='\0' || (*(s))=='!' || (*(s))=='*' || (*(s))=='c' || (*(s))=='C')
 
 
 /* Return a sorted arg list of workspace names. (For each name, there
@@ -235,18 +242,51 @@ pips_process_file(string file_name)
 #include "rxposix.h"
 
 #define IMPLICIT_NONE_RX "^[ \t]*implicit[ \t]*none"
-#define INCLUDE_FILE_RX "^[ \t]*include[ \t]*['\"]\\([^'\"]*\\)['\"]"
-#define BLOCK_DATA_RX "^[ \t]*block[ \t]*data[ \t]*\\([a-zA-Z0-9_ \t]*\\)"
+#define INCLUDE_FILE_RX  "^[ \t]*include[ \t]*['\"]\\([^'\"]*\\)['\"]"
+
+/* print *, "i = ", (0.,1.)
+ * to avoid modifying a character constant...
+ * this stuff should be done by hand in split...
+ * also the generated lines may be too long...
+ */
+#define COMPLEX_CST_RX \
+    "^[^\"']*[^a-zA-Z0-9_][ \t]*\\((\\)[-0-9\\. \t]*,[-0-9\\. \t]*)"
 
 static regex_t 
     implicit_none_rx, 
-    include_file_rx /*,
-    block_data_rx*/;
-static FILE *output_file;
+    include_file_rx,
+    complex_cst_rx;
+static FILE * output_file;
+
+static void
+insert_at(
+    char line[LINE_LENGTH], /* string to be modified */
+    int offset, /* where to insert */
+    string what /* to be inserted */)
+{
+    int i, len=strlen(line), shift=strlen(what);
+    pips_assert("line large enough", len+shift<LINE_LENGTH);
+
+    for (i=len; i>=offset; i--)
+	line[i+shift]=line[i];
+
+    for (shift--; shift>=0; shift--)
+	line[offset+shift]=what[shift];
+}
+
+static void
+handle_complex_constants(string line)
+{
+    regmatch_t matches[2]; /* matched strings */
+    
+    while (!regexec(&complex_cst_rx, line, 2, matches, 0))
+	insert_at(line, matches[1].rm_so, IMPLIED_COMPLEX_NAME);
+}
 
 /* tries several path for a file to include...
  */
-static string find_file(string name)
+static string 
+find_file(string name)
 {
     string other;
 
@@ -266,7 +306,8 @@ static string find_file(string name)
 }
 
 static bool handle_file(FILE*);
-static bool handle_file_name(char * file_name, bool comment)
+static bool 
+handle_file_name(char * file_name, bool comment)
 {
     FILE * f;
     string found = find_file(file_name);
@@ -298,49 +339,48 @@ static bool handle_file_name(char * file_name, bool comment)
     return ok;
 }
 
-static bool handle_file(FILE * f) /* process f for includes and nones */
+static bool 
+handle_file(FILE * f) /* process f for includes and nones */
 {
     char line[LINE_LENGTH];
     regmatch_t matches[2]; /* matched strings */
-    bool ok = TRUE;
 
     while (fgets(line, LINE_LENGTH, f))
     {
-	if (!regexec(&include_file_rx, line, 2, matches, 0))
+	if (!skip_line_p(line))
 	{
-	    line[matches[1].rm_eo]='\0';
-	    ok = handle_file_name(&line[matches[1].rm_so], TRUE);
-	    if (!ok) return ok;
+	    if (!regexec(&include_file_rx, line, 2, matches, 0))
+	    {
+		char c = line[matches[1].rm_eo];
+		line[matches[1].rm_eo]='\0';
+		
+		if (!handle_file_name(&line[matches[1].rm_so], TRUE))
+		    return FALSE;
+
+		line[matches[1].rm_eo]=c;
+		fprintf(output_file, "! ");
+	    }
+	    else if (!regexec(&implicit_none_rx, line, 0, matches, 0))
+		    fprintf(output_file, 
+			    "! MIL-STD-1553 Fortran not in PIPS\n! ");
+	    else
+		handle_complex_constants(line);
 	}
-	else /* if (!regexec(&block_data_rx, line, 2, matches, 0))
-	{
-	    fprintf(output_file, 
-		    "! block data converted to subroutine by PIPS\n!");
-	    fprintf(output_file, "%s", line);
-	    line[matches[1].rm_eo+1] = '\0';
-	    fprintf(output_file, "      SUBROUTINE %s", 
-		    &line[matches[1].rm_so]);
-	}
-	else */
-	{
-	    if (!regexec(&implicit_none_rx, line, 0, matches, 0))
-		fprintf(output_file, "! MIL-STD-1553 Fortran not in PIPS\n! ");
-	    
-	    fprintf(output_file, "%s", line);
-	}
+	fprintf(output_file, "%s", line);
     }
-    return ok;
+    return TRUE;
 }
 
-static void init_rx(void)
+static void 
+init_rx(void)
 {
     static bool done=FALSE;
     if (done) return;
     done=TRUE;
     if (regcomp(&implicit_none_rx, IMPLICIT_NONE_RX, REG_ICASE) ||
-	regcomp(&include_file_rx, INCLUDE_FILE_RX, REG_ICASE) /* ||
-	regcomp(&block_data_rx, BLOCK_DATA_RX, REG_ICASE)*/)
-	pips_internal_error("invalid regular expression");
+	regcomp(&include_file_rx, INCLUDE_FILE_RX, REG_ICASE)   ||
+	regcomp(&complex_cst_rx, COMPLEX_CST_RX, REG_ICASE))
+	pips_internal_error("invalid regular expression\n");
 }
 
 static bool pips_process_file(string file_name)
