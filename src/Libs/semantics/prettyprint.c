@@ -209,3 +209,103 @@ statement stmt;
     return txt; 
 }
 
+
+
+/* ---------------------------------------------------------------- */
+/* to convert strings containing predicates to text of commentaries */
+/* BA, april 1994                                                   */
+/* ---------------------------------------------------------------- */
+
+#define MAX_PRED_COMMENTARY_STRLEN 70
+#define MAX_PRED_STRLEN (MAX_PRED_COMMENTARY_STRLEN - 3)
+
+
+/* text words_predicate_to_commentary(list w_pred)
+ * input    : a list of strings, one of them representing a predicate.
+ * output   : a text of several lines of commentaries containing 
+ *            this list of strings.
+ * modifies : nothing.
+ */
+text words_predicate_to_commentary(w_pred)
+list w_pred ;
+{
+    text t_pred = make_text(NIL);
+    string str_pred, str_suiv;
+    char str_tmp[MAX_PRED_STRLEN];
+    int len, new_str_pred_len, longueur_max;
+    sentence sent_pred;
+    boolean premiere_ligne = TRUE;
+    
+    longueur_max = MAX_PRED_STRLEN;
+
+    /* str_pred is the string corresponding to the concatenation
+     * of the strings in w_pred */
+    str_pred = words_to_string(w_pred);
+    
+    /* if str_pred is too long, it must be splitted in several lines; 
+     * the hyphenation must be done only between the constraints of the
+     * predicate, when there is a ",". A space is added at the beginning
+     * of extra lines, for indentation. */
+    while((len = strlen(str_pred)) > 0) {
+	if (len > longueur_max) {
+
+	    /* search the maximal substring which length 
+	     * is less than longueur_max */
+	    str_tmp[0] = '\0';
+	    (void) strncat(str_tmp, str_pred, longueur_max);
+
+	    str_suiv = strrchr(str_tmp, ',');
+	    new_str_pred_len = (strlen(str_tmp) - strlen(str_suiv)) + 1;
+	    str_suiv = strdup(&(str_pred[new_str_pred_len]));
+
+	    str_tmp[0] = '\0';
+	    if (!premiere_ligne)
+		(void) strcat(str_tmp, " "); 
+	    (void) strncat(str_tmp, str_pred, new_str_pred_len);
+
+	    /* add it to the text */
+	    ADD_SENTENCE_TO_TEXT(t_pred, sent_pred = make_pred_commentary_sentence(strdup(str_tmp)));
+	    str_pred =  str_suiv;
+	}
+	else {
+	    /* if the remaining string fits in one line */
+	    str_tmp[0] = '\0';
+	    if (!premiere_ligne)
+		(void) strcat(str_tmp, " "); 
+	    (void) strcat(str_tmp, str_pred);
+
+	    ADD_SENTENCE_TO_TEXT(t_pred, make_pred_commentary_sentence(str_tmp));
+	    str_pred[0] = '\0';
+	}
+	
+	if (premiere_ligne) {
+	    premiere_ligne = FALSE;
+	    longueur_max = longueur_max - 1;
+	}
+    }
+    
+    return(t_pred);
+}
+
+
+/* sentence make_pred_commentary_sentence(string str_pred) 
+ * input    : a substring formatted to be a commentary
+ * output   : a sentence, containing the commentary form of this string.
+ * modifies : nothing
+ */
+sentence make_pred_commentary_sentence(str_pred)
+string str_pred;
+{
+    char str_tmp[MAX_PRED_COMMENTARY_STRLEN + 1];
+    sentence sent_pred;
+
+    str_tmp[0] = '\0';
+    (void) strcat(str_tmp, "C  "); 
+    (void) strcat(str_tmp, str_pred);
+    (void) strcat(str_tmp, "\n"); 
+
+    sent_pred = make_sentence(is_sentence_formatted, strdup(str_tmp));
+    free(str_tmp);
+    return(sent_pred);
+}
+
