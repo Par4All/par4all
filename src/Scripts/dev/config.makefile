@@ -12,7 +12,8 @@ SCRIPTS = 	pips-makemake \
 		search-pips \
 		checked-out \
 		order_libraries \
-		pips-experiment
+		pips-experiment \
+		pips_at_night
 
 # that is all
 #
