@@ -1199,7 +1199,7 @@ unstructured u ;
 
 
 /* STATEMENT_DEPENDENCE_GRAPH computes, from the statement s, the dependency 
- * graph. Statement s is assumed "controlized, i.e. GOTO have been replaced
+ * graph. Statement s is assumed "controlized", i.e. GOTO have been replaced
  * by unstructured.
  *
  * FI: this function is bugged. As Pierre said, you have to start with
@@ -1261,7 +1261,10 @@ statement st;
     case is_instruction_loop: 
     case is_instruction_goto: 
     case is_instruction_unstructured:
-	le = load_statement_proper_effects(st);
+	if (!rgch && !iorgch)
+	    le = load_statement_proper_effects(st);
+	else
+	    le = load_proper_rw_effects_list(st);
 	break ;
     default:
 	pips_error( "load_statement_effects", "Unknown tag %d\n", t ) ;
@@ -1296,24 +1299,24 @@ int use;
     case USE_REGIONS: 
 	rgch = TRUE;
 	iorgch = FALSE;
-	set_proper_effects_map(
-              effectsmap_to_listmap( (statement_mapping) 
-	       db_get_memory_resource(DBR_PROPER_REGIONS, module_name, TRUE) ));
+	set_proper_rw_effects(
+              (statement_effects) 
+	       db_get_memory_resource(DBR_PROPER_REGIONS, module_name, TRUE));
 	break;
 
 	/* For experimental purpose only */
     case USE_IN_OUT_REGIONS: 
 	rgch = FALSE;
 	iorgch = TRUE;
-	set_proper_effects_map(
-              effectsmap_to_listmap( (statement_mapping) 
-	       db_get_memory_resource(DBR_PROPER_REGIONS, module_name, TRUE) ));
-	set_in_regions_map( 
-              effectsmap_to_listmap( (statement_mapping) 
-	       db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE) ));
-	set_out_regions_map( 
-              effectsmap_to_listmap( (statement_mapping) 
-	       db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE) ));
+	set_proper_rw_effects(
+              (statement_effects) 
+	       db_get_memory_resource(DBR_PROPER_REGIONS, module_name, TRUE));
+	set_in_effects( 
+              (statement_effects) 
+	       db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
+	set_out_effects( 
+               (statement_effects) 
+	       db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
 
 	break;    
 
@@ -1325,10 +1328,13 @@ int use;
 
 static void reset_effects()
 {
-    free_proper_effects_map();
+    if (!rgch && !iorgch)
+	free_proper_effects_map();
+    else
+	reset_proper_rw_effects();
     if (iorgch) {
-	free_in_regions_map();
-	free_out_regions_map();
+	reset_in_effects();
+	reset_out_effects();
     }
 }
 
