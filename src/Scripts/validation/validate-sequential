@@ -1,0 +1,187 @@
+#!/bin/sh
+#
+# SCCS Stuff:
+# $RCSfile: validate-sequential,v $ ($Date: 1994/03/08 15:14:26 $) version $Revision$, got on %D%, %T%
+# %A%
+#
+# A small Validation Suite test program for PIPS.
+#
+# Validate without arguments takes the contents of the default_file file,
+# else arguments are subdirectories D in pips_test_directory. For each
+# D, one applies test_aspect that checks every file .f F. If a file
+# F.test exists, it is executed and its output is compared to
+# $F.result/test. Otherwise, every module M in F.database/modules is
+# parallelized and its output is compared with $F.result/M (which is
+# assumed to have been created by the user).
+#
+# A mail report is sent to the person running validate (see accept).
+# 
+# Mail problems to jouvelot@cri.ensmp.fr
+#
+# Modifications
+#  - validate used to perform cd's and to execute where the validation
+#    files are; the Production version of pips was used by default,
+#    unless special links were created from Validation towards the
+#    versions to be tested; now validate execute in the current directory
+#    and the databases are created in the current directory; the version
+#    of pips which is used is also reported back to the user;
+#
+#    Mainly, the $aspect variable was changed from a relative directory name
+#    into an absolute directory name
+
+pips_test_directory=$PIPSDIR/Tests/Validation
+default_file=defaults
+user=`whoami`
+subject="PIPS Validation Suite Report"
+failed=""
+
+#
+# to avoid a which call, where ~/.cshrc is executed and so on!
+#
+# FC, Tue Mar  8 14:19:50 MET 1994
+#
+
+which_pips()
+{
+  type pips | sed -e 's,^pips is ,,'
+}
+
+if [ -x pips ] ; 
+then
+  pips_version=$PWD/`ls -F pips`
+else
+  pips_version=`which_pips`
+fi
+
+tmpout=/tmp/validate.$$
+diffout_e=/tmp/diff_e.$$
+diffout=/tmp/diff.$$
+errors=/tmp/errors.$$
+shell=/bin/sh
+
+report()
+{
+	result=$1
+	message=$2
+
+	if [ $result -ne 0 ] ; then
+		echo "$message" | mail -s "$subject" $user
+		int=`cat $errors`
+		echo `expr $int + 1` > $errors
+		return 1
+	fi
+	return 0 
+}
+
+make_diff()
+{
+	aspect=$1
+	name=$2
+	module=$3
+
+	if [ ! -f $aspect/$name.result/$module ] ; then
+		report 1 "Cannot open result file $aspect/$name.result/$module"
+		exit 1
+	fi
+	cp $tmpout $aspect/$name.result/$module.out
+	diff -e $aspect/$name.result/$module $tmpout > $diffout_e
+	diff $aspect/$name.result/$module $tmpout > $diffout
+	report $? "`echo Run accept on mail message to resynchronize for $pips_version. ;\
+		    echo Differences for $module in $file : ;\
+		    cat $diffout ;\
+		    echo ;\
+		    echo Diff Commands for $module in $file : ;\
+		    cat $diffout_e | sed -e 's/^/X/' ;\
+		    echo Xw ;\
+		    echo Xq`"
+}
+
+test_aspect()
+{
+	aspect=$1
+
+	(for file in `ls $aspect/*.f` ; do
+		name=`basename $file .f`
+		u_name=`echo $name | tr a-z A-Z`
+
+		if [ -f $aspect/$name.test ] ; then
+			$shell $aspect/$name.test > $tmpout
+			report $? "Execution of $aspect/$name.test failed with $pips_version" || continue
+
+			make_diff $aspect $name test
+			continue
+		fi
+		if [ -f $aspect/default_test ] ; then
+			sed "s/tested_file/$name/g;s/TESTED_FILE/$u_name/g" \
+				$aspect/default_test > $aspect/$name.test
+			$shell $aspect/$name.test > $tmpout
+			report $? "Execution of $aspect/default_test on $name.f failed with $pips_version" || continue
+		
+			make_diff $aspect $name test
+			continue
+		fi
+		Init -f $file -d $name
+		report $? "Cannot initialize $file" || continue
+
+		for module in `cat $name.database/modules` ; do
+			Display -m $module > $tmpout
+			report $? "Cannot parallelize module $module in $file with $pips_version" || continue
+
+			make_diff $aspect $name $module
+		done
+
+		Delete $name
+		report $? "Cannot delete workspace $name"
+	done)
+}
+
+# validate command itself
+
+case $# in
+0 ) 	aspects=`sed -e '/^#/d' $pips_test_directory/${default_file}` ;;
+* ) 	aspects="$*" ;;
+esac
+
+if [ -f pipsmake.rc ] ; then
+	report 2 "validate cannot be run with a local pipsmake.rc."
+	exit 4
+elif [ -f properties.rc ] ; then
+	report 3 "validate cannot be run with a local properties.rc."
+	exit 5
+fi
+
+echo 0 > $errors 
+
+for i in $aspects ; do
+	old_errors=`cat $errors`
+
+	if [ ! -d "$pips_test_directory/$i" ] ; then
+		report 1 "$i is not a directory in $pips_test_directory"
+	elif [ -f $pips_test_directory/$i/pipsmake.rc ] ; then
+		report 2 "validate should not be run with a pipsmake.rc in $pips_test_directory/$i."
+	elif [ -f $pips_test_directory/$i/properties.rc ] ; then
+		report 3 "validate should not be run with a properties.rc in $pips_test_directory/$i."
+	else
+		test_aspect $pips_test_directory/$i
+	fi
+	if [ `cat $errors` -ne $old_errors ] ; then
+		failed="$i-$failed"
+	fi
+done
+
+if [ `cat $errors` = 0 ] ; then
+	final="succeeded"
+else
+	final="failed (-$failed)"
+fi
+
+report	1 \
+	"Your Validation Suite Test for
+
+$aspects
+
+$final with $pips_version.
+
+In case of problems, contact <jouvelot@cri.ensmp.fr>."
+
+rm -f $tmpout $diffout $diffout_e $errors
