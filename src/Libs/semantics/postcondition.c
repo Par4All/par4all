@@ -1,6 +1,6 @@
 /* by Fabien COELHO
  *
- * $RCSfile: postcondition.c,v $ ($Date: 1997/07/21 12:21:47 $, )
+ * $RCSfile: postcondition.c,v $ ($Date: 1998/04/14 21:25:27 $, )
  * version $Revision$,
  */
 
@@ -22,6 +22,7 @@
  */
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h" 
 
 /* PIPS stuff
