@@ -4,8 +4,7 @@
 
 G= faq
 
-SOURCES=	$(G).tex \
-		$(G).bib
+SOURCES=	$(G).tex
 
 INSTALL_DOC=	$(G).ps
 
