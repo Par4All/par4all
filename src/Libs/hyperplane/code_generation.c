@@ -34,15 +34,16 @@ Pbase base_oldindex;
 Pbase base_newindex;
 Psysteme sc_newbase;
 {
-    statement state_lhyp;
-    instruction instr_lhyp;
-    loop l_old;
-    loop l_hyp;
-    range rl;
-    expression lower,upper;
-    statement bl; 
-    statement s_loop;
-    Pbase pb;
+    statement state_lhyp = statement_undefined;
+    instruction instr_lhyp = instruction_undefined;
+    loop l_old = loop_undefined;
+    loop l_hyp = loop_undefined;
+    range rl = range_undefined;
+    expression lower = expression_undefined;
+    expression upper = expression_undefined;
+    statement bl = statement_undefined; 
+    statement s_loop = statement_undefined;
+    Pbase pb = BASE_UNDEFINED;
 
     bl = loop_body(instruction_loop(statement_instruction(STATEMENT(CAR(lls)))));
     statement_newbase(bl,pvg,base_oldindex);
