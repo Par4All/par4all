@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
-  * Revision 1.136  2000/05/29 13:00:42  coelho
+ * Revision 1.136  2000/05/29 13:00:42  coelho
  * fms added.
  *
  * Revision 1.135  2000/05/16 11:19:19  coelho
@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.218 2002/05/03 15:20:34 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.219 2002/05/03 15:23:17 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2231,7 +2231,6 @@ text_statement(
 				statement_number(stmt));
     }
     /*************written by Dat**************/
-    /*print_text(stderr, temp);*/
     found_filter = FALSE;
     /*****************************************/
 
@@ -2425,21 +2424,17 @@ text_named_module(
     }
     else 
     {
-      /*********written by Dat**********/
-      /*ADD_SENTENCE_TO_TEXT(r, 
+        ADD_SENTENCE_TO_TEXT(r, 
             attach_head_to_sentence(make_sentence(is_sentence_formatted, 
 						  strdup(s)),
 						  module));*/
-      /*********************************/
     }
 
     if (stat != statement_undefined) {
         MERGE_TEXTS(r, text_statement(module, 0, stat));
     }
     
-    /************written by Dat********/
-    /*ADD_SENTENCE_TO_TEXT(r, sentence_tail());*/
-    /**********************************/
+    ADD_SENTENCE_TO_TEXT(r, sentence_tail());
 
     if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
 	reset_last_statement();
