@@ -87,7 +87,8 @@ install_forward_makefiles:
 	    test ! -d $$d/$$s || \
 		{ echo "copying forward makefile to $$d/$$s"; \
 		$(COPY) forward_gnu_makefile $$d/$$s/Makefile; } ; done; done;\
-	$(RM) $(PIPS_ROOT)/Runtime/Makefile $(PIPS_ROOT)/Lib/Makefile
+	$(RM) $(PIPS_ROOT)/Runtime/Makefile $(PIPS_ROOT)/Lib/Makefile \
+		$(NEWGEN_ROOT)/Lib/Makefile $(LINEAR_ROOT)/Lib/Makefile
 
 # that is all
 #
