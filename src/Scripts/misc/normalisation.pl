@@ -17,11 +17,17 @@ if ($opt_help) {
 	"Usage: normalisation.pl [-d dir] [-s suf] [-h] Logfile\n" .
 	"\t-d dir: directory of sources\n" .
 	"\t-s suffix: suffix for old file (default 'old')\n" .
-	"\t-h: this help\n";
+	"\t-h: this help\n" .
+	"format: prefixed tab-separated list\n" .
+	"\$DEC file module array ndim new old incs...\n";
     exit;
 }
 
+# file being filtered
 $current_file = '';
+
+# already seen new declarations SUBROUTINE:ARRAY
+#   also SUBROUTINE:COMMON
 %seen = ();
 
 while (<>)
@@ -31,7 +37,9 @@ while (<>)
 
     chomp;
 
-    ($file, $module, $array, $ndim, $new, $old) = (split /\t/)[1..6];
+    @split = split /\t/;
+    shift(@split); 
+    ($file, $module, $array, $ndim, $new, $old, $incs) = @split;
     
     # fix file with source directory if appropriate
     $file = "$opt_directory/$file" if $opt_directory;
@@ -75,6 +83,7 @@ while (<>)
     $n = @fortran;
     $done = 0;
     $insub = 0;
+    $nlincs = 0;
     
     for ($i = 0; $i < $n and not $done; $i++)
     {
@@ -89,6 +98,10 @@ while (<>)
 	    if $ligne =~ /^[^Cc\*!].*(function|subroutine)[ \t]*$module/i;
 	
 	next if not $insub;
+
+	# line number of last include
+	$nlincs = $i
+	    if $ligne =~ /^[^Cc\*!][ \t]*include/i;
 	
 	# first occurence of ARRAY( 
 	#   is supposed to be its dimension declaration!
@@ -99,11 +112,11 @@ while (<>)
 	    
 	    if ($ndim>1) 
 	    {
-		if ($ligne !~ s/($array\([^()]*),[^,()]*\)/$1,$new\)/i) {
+		if ($ligne !~ s/($array *\([^()]*),[^,()]*\)/$1,$new\)/i) {
 		    failed('cannot fix last dim', $ligne);
 		}
 	    } else {
-		if ($ligne !~ s/($array\()[^()]*\)/$1$new\)/i) {
+		if ($ligne !~ s/($array *\()[^()]*\)/$1$new\)/i) {
 		    failed('cannot fix dim', $ligne);
 		}
 	    }
@@ -111,6 +124,16 @@ while (<>)
 	    print STDERR "! $array(in $module): $ligne";
 	    
 	    $fortran[$i] = $ligne;
+	}
+    }
+
+    if (defined($incs) and not exists $seen{"$module:$incs"})
+    {
+	if (! $nlincs) {
+	    failed("includes not found for $incs", '');
+	} else {
+	    $fortran[$nlincs] .= "      INCLUDE \"$incs\"\n";
+	    $seen{"$module:$incs"} = 1;
 	}
     }
     
