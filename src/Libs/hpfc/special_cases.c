@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1996/02/15 14:17:26 $, 
+ * $Date: 1996/06/06 18:26:21 $, 
  */
 
 #include "defines-local.h"
@@ -204,6 +204,36 @@ statement initial, *phost, *pnode;
 			     largs)))));
     
     return(TRUE);
+}
+
+/******************************************** REDUCTION DIRECTIVE HANDLING */
+
+list /* of hpfc_reductions */
+handle_hpf_reduction(statement s)
+{
+    /* list le = entities_list(load_hpf_reductions(s)); */
+
+    return NIL;
+}
+
+/* replacement = identity
+ */
+list /* of statement */ 
+compile_hpf_reduction_prolog(
+    list /* of reduction */ lr,
+    bool host)
+{
+    return NIL;
+}
+
+/* variable = OPERATOR(variable, PVM_operator(replacement))
+ */
+list /* of statement */
+compile_hpf_reduction_postlog(
+    list /* of reduction */ lr,
+    bool host)
+{
+    return NIL;
 }
 
 /******************************************************** SUB ARRAY SHIFTS */
