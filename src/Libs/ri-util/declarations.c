@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.16  2002/06/12 09:44:54  irigoin
+ * Use of property PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS added and reformatting
+ *
  * Revision 1.15  2002/03/08 10:11:23  irigoin
  * checks with stack_area_p() added for StackArea management
  *
@@ -112,27 +115,32 @@ words_value(value obj)
 static list 
 words_parameters(entity e)
 {
-    list pc = NIL;
-    type te = entity_type(e);
-    functional fe;
-    int nparams, i;
+  list pc = NIL;
+  type te = entity_type(e);
+  functional fe;
+  int nparams, i;
 
-    pips_assert("is functionnal", type_functional_p(te));
+  pips_assert("is functionnal", type_functional_p(te));
 
-    fe = type_functional(te);
-    nparams = gen_length(functional_parameters(fe));
+  fe = type_functional(te);
+  nparams = gen_length(functional_parameters(fe));
 
-    for (i = 1; i <= nparams; i++) {
-	entity param = find_ith_parameter(e, i);
+  for (i = 1; i <= nparams; i++) {
+    entity param = find_ith_parameter(e, i);
 
-	if (pc != NIL) {
-	    pc = CHAIN_SWORD(pc, ",");
-	}
-
-	pc = CHAIN_SWORD(pc, entity_local_name(param));
+    if (pc != NIL) {
+      pc = CHAIN_SWORD(pc, ",");
     }
 
-    return(pc);
+    /* If prettyprint alternate returns... Property to be added. */
+    if(get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
+       && formal_label_replacement_p(param))
+      pc = CHAIN_SWORD(pc, "*");
+    else
+      pc = CHAIN_SWORD(pc, entity_local_name(param));
+  }
+
+  return(pc);
 }
 
 static list 
@@ -158,6 +166,7 @@ words_declaration(
     bool prettyprint_common_variable_dimensions_p)
 {
     list pl = NIL;
+
     pl = CHAIN_SWORD(pl, entity_local_name(e));
 
     if (type_variable_p(entity_type(e)))
@@ -999,200 +1008,206 @@ text_entity_declaration(
     list /* of entity */ ldecl,
     bool force_common)
 {
-    string how_common = get_string_property("PRETTYPRINT_COMMONS");
-    bool print_commons = !same_string_p(how_common, "none");
-    list before = NIL, area_decl = NIL, ph = NIL,
-	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, 
-	pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL;
-    text r, t_chars = make_text(NIL), t_area = make_text(NIL); 
-    string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
-    bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
+  string how_common = get_string_property("PRETTYPRINT_COMMONS");
+  bool print_commons = !same_string_p(how_common, "none");
+  list before = NIL, area_decl = NIL, ph = NIL,
+    pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, 
+    pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL;
+  text r, t_chars = make_text(NIL), t_area = make_text(NIL); 
+  string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
+  bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
      
-    /* where to put the dimensionn information.
-     */
-    if (same_string_p(pp_var_dim, "type"))
-	pp_in_type = TRUE, pp_in_common = FALSE;
-    else if (same_string_p(pp_var_dim, "common"))
-	pp_in_type = FALSE, pp_in_common = TRUE;
-    else 
-	pips_internal_error("PRETTYPRINT_VARIABLE_DIMENSIONS=\"%s\""
-			    " unexpected value\n", pp_var_dim);
+  /* where to put the dimensionn information.
+   */
+  if (same_string_p(pp_var_dim, "type"))
+    pp_in_type = TRUE, pp_in_common = FALSE;
+  else if (same_string_p(pp_var_dim, "common"))
+    pp_in_type = FALSE, pp_in_common = TRUE;
+  else 
+    pips_internal_error("PRETTYPRINT_VARIABLE_DIMENSIONS=\"%s\""
+			" unexpected value\n", pp_var_dim);
 
-    /* prettyprint common in include if possible... 
-     */
-    pp_cinc = same_string_p(how_common, "include") && !force_common;
+  /* prettyprint common in include if possible... 
+   */
+  pp_cinc = same_string_p(how_common, "include") && !force_common;
 
-    MAP(ENTITY, e,
-    {
-	type te = entity_type(e);
-	bool func = 
-	    type_functional_p(te) && storage_rom_p(entity_storage(e));
-	value v = entity_initial(e);
-	bool param = func && value_symbolic_p(v);
-	bool external =     /* subroutines won't be declared */
-	    (func && 
-	     (value_code_p(v) || value_unknown_p(v) /* not parsed callee */) &&
-	     !(type_void_p(functional_result(type_functional(te))) ||
-	       (type_variable_p(functional_result(type_functional(te))) &&
-		basic_overloaded_p(variable_basic(type_variable
-		    (functional_result(type_functional(te))))))));
-	bool area_p = type_area_p(te);
-	bool var = type_variable_p(te);
-	bool in_ram = storage_ram_p(entity_storage(e));
-	bool in_common = in_ram &&
-	    !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e))));
-	bool skip_it = same_string_p(entity_local_name(e),
-				     entity_local_name(module));
+  MAP(ENTITY, e,
+  {
+    type te = entity_type(e);
+    bool func = 
+      type_functional_p(te) && storage_rom_p(entity_storage(e));
+    value v = entity_initial(e);
+    bool param = func && value_symbolic_p(v);
+    bool external =     /* subroutines won't be declared */
+      (func && 
+       (value_code_p(v) || value_unknown_p(v) /* not parsed callee */) &&
+       !(type_void_p(functional_result(type_functional(te))) ||
+	 (type_variable_p(functional_result(type_functional(te))) &&
+	  basic_overloaded_p(variable_basic(type_variable
+					    (functional_result(type_functional(te))))))));
+    bool area_p = type_area_p(te);
+    bool var = type_variable_p(te);
+    bool in_ram = storage_ram_p(entity_storage(e));
+    bool in_common = in_ram &&
+      !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e))));
+    bool skip_it = same_string_p(entity_local_name(e),
+				 entity_local_name(module));
 	
-	pips_debug(3, "entity name is %s\n", entity_name(e));
+    pips_debug(3, "entity name is %s\n", entity_name(e));
 
-	if (!print_commons && area_p && !SPECIAL_COMMON_P(e) && !pp_cinc)
-	{
-	    area_decl = 
-		CONS(SENTENCE, make_sentence(is_sentence_formatted,
-					     common_hook(module, e)),
-		     area_decl);
-	}
+    /* Do not declare variables used to replace formal labels */
+    if(storage_formal_p(entity_storage(e))
+       && get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
+       && formal_label_replacement_p(e))
+      continue;
 
-	if (skip_it)
-	{
-	    pips_debug(5, "skipping function %s\n", entity_name(e));
-	}
-	else if (!print_commons && (area_p || (var && in_common && pp_cinc)))
-	{
-	    pips_debug(5, "skipping entity %s\n", entity_name(e));
-	}
-	else if (param)
-	{
-	    /*        PARAMETER
-	     */
-	    pips_debug(7, "considered as a parameter\n");
-	    lparam = CONS(ENTITY, e, lparam);
-	} 
-	else if (external)
-	{
-	    /*        EXTERNAL
-	     */
-	    pips_debug(7, "considered as an external\n");
-	    before = CONS(SENTENCE, sentence_basic_declaration(e), before);
-	    before = CONS(SENTENCE, sentence_external(e), before);
-	}
-	else if (area_p && !dynamic_area_p(e) && !heap_area_p(e) && !stack_area_p(e) && !empty_static_area_p(e))
-	{
-	    /*            AREAS: COMMONS and SAVEs
-	     */	     
-	    pips_debug(7, "considered as a regular common\n");
-	    if (pp_cinc && !SPECIAL_COMMON_P(e))
-	    {
-		text t = text_area_included(e, module);
-		MERGE_TEXTS(t_area, t);
-	    }
-	    else
-		area_decl = CONS(SENTENCE, 
-				 sentence_area(e, module, pp_in_common), 
-				 area_decl);
-	}
-	else if (var && !(in_common && pp_cinc))
-	{
-	    basic b = variable_basic(type_variable(te));
-	    bool pp_dim = pp_in_type || variable_static_p(e);
+    if (!print_commons && area_p && !SPECIAL_COMMON_P(e) && !pp_cinc)
+      {
+	area_decl = 
+	  CONS(SENTENCE, make_sentence(is_sentence_formatted,
+				       common_hook(module, e)),
+	       area_decl);
+      }
 
-	    pips_debug(7, "is a variable...\n");
+    if (skip_it)
+      {
+	pips_debug(5, "skipping function %s\n", entity_name(e));
+      }
+    else if (!print_commons && (area_p || (var && in_common && pp_cinc)))
+      {
+	pips_debug(5, "skipping entity %s\n", entity_name(e));
+      }
+    else if (param)
+      {
+	/*        PARAMETER
+	 */
+	pips_debug(7, "considered as a parameter\n");
+	lparam = CONS(ENTITY, e, lparam);
+      } 
+    else if (external)
+      {
+	/*        EXTERNAL
+	 */
+	pips_debug(7, "considered as an external\n");
+	before = CONS(SENTENCE, sentence_basic_declaration(e), before);
+	before = CONS(SENTENCE, sentence_external(e), before);
+      }
+    else if (area_p && !dynamic_area_p(e) && !heap_area_p(e) && !stack_area_p(e) && !empty_static_area_p(e))
+      {
+	/*            AREAS: COMMONS and SAVEs
+	 */	     
+	pips_debug(7, "considered as a regular common\n");
+	if (pp_cinc && !SPECIAL_COMMON_P(e))
+	  {
+	    text t = text_area_included(e, module);
+	    MERGE_TEXTS(t_area, t);
+	  }
+	else
+	  area_decl = CONS(SENTENCE, 
+			   sentence_area(e, module, pp_in_common), 
+			   area_decl);
+      }
+    else if (var && !(in_common && pp_cinc))
+      {
+	basic b = variable_basic(type_variable(te));
+	bool pp_dim = pp_in_type || variable_static_p(e);
+
+	pips_debug(7, "is a variable...\n");
 	    
-	    switch (basic_tag(b)) 
+	switch (basic_tag(b)) 
+	  {
+	  case is_basic_int:
+	    /* simple integers are moved ahead...
+	     */
+	    pips_debug(7, "is an integer\n");
+	    if (variable_dimensions(type_variable(te)))
+	      {
+		pi = CHAIN_SWORD(pi, pi==NIL ? "INTEGER " : ",");
+		pi = gen_nconc(pi, words_declaration(e, pp_dim)); 
+	      }
+	    else
+	      {
+		ph = CHAIN_SWORD(ph, ph==NIL ? "INTEGER " : ",");
+		ph = gen_nconc(ph, words_declaration(e, pp_dim)); 
+	      }
+	    break;
+	  case is_basic_float:
+	    pips_debug(7, "is a float\n");
+	    switch (basic_float(b))
+	      {
+	      case 4:
+		pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : ",");
+		pf4 = gen_nconc(pf4, words_declaration(e, pp_dim));
+		break;
+	      case 8:
+	      default:
+		pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : ",");
+		pf8 = gen_nconc(pf8, words_declaration(e, pp_dim));
+		break;
+	      }
+	    break;			
+	  case is_basic_complex:
+	    pips_debug(7, "is a complex\n");
+	    switch (basic_complex(b))
+	      {
+	      case 8:
+		pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : ",");
+		pc8 = gen_nconc(pc8, words_declaration(e, pp_dim));
+		break;
+	      case 16:
+	      default:
+		pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : ",");
+		pc16 = gen_nconc(pc16, words_declaration(e, pp_dim));
+		break;
+	      }
+	    break;
+	  case is_basic_logical:
+	    pips_debug(7, "is a logical\n");
+	    pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ",");
+	    pl = gen_nconc(pl, words_declaration(e, pp_dim));
+	    break;
+	  case is_basic_overloaded:
+	    /* nothing! some in hpfc I guess...
+	     */
+	    break; 
+	  case is_basic_string:
 	    {
-	    case is_basic_int:
-		 /* simple integers are moved ahead...
-		  */
-		pips_debug(7, "is an integer\n");
-		if (variable_dimensions(type_variable(te)))
-		{
-		    pi = CHAIN_SWORD(pi, pi==NIL ? "INTEGER " : ",");
-		    pi = gen_nconc(pi, words_declaration(e, pp_dim)); 
-		}
-		else
-		{
-		    ph = CHAIN_SWORD(ph, ph==NIL ? "INTEGER " : ",");
-		    ph = gen_nconc(ph, words_declaration(e, pp_dim)); 
-		}
-		break;
-	    case is_basic_float:
-		pips_debug(7, "is a float\n");
-		switch (basic_float(b))
-		{
-		case 4:
-		    pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : ",");
-		    pf4 = gen_nconc(pf4, words_declaration(e, pp_dim));
-		    break;
-		case 8:
-		default:
-		    pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : ",");
-		    pf8 = gen_nconc(pf8, words_declaration(e, pp_dim));
-		    break;
-		}
-		break;			
-	    case is_basic_complex:
-		pips_debug(7, "is a complex\n");
-		switch (basic_complex(b))
-		{
-		case 8:
-		    pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : ",");
-		    pc8 = gen_nconc(pc8, words_declaration(e, pp_dim));
-		    break;
-		case 16:
-		default:
-		    pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : ",");
-		    pc16 = gen_nconc(pc16, words_declaration(e, pp_dim));
-		    break;
-		}
-		break;
-	    case is_basic_logical:
-		pips_debug(7, "is a logical\n");
-		pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ",");
-		pl = gen_nconc(pl, words_declaration(e, pp_dim));
-		break;
-	    case is_basic_overloaded:
-		/* nothing! some in hpfc I guess...
-		 */
-		break; 
-	    case is_basic_string:
-	    {
-		value v = basic_string(b);
-		pips_debug(7, "is a string\n");
+	      value v = basic_string(b);
+	      pips_debug(7, "is a string\n");
 		
-		if (value_constant_p(v) && constant_int_p(value_constant(v)))
+	      if (value_constant_p(v) && constant_int_p(value_constant(v)))
 		{
-		    int i = constant_int(value_constant(v));
+		  int i = constant_int(value_constant(v));
 		    
-		    if (i==1)
+		  if (i==1)
 		    {
-			ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
-			ps = gen_nconc(ps, words_declaration(e, pp_dim));
+		      ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
+		      ps = gen_nconc(ps, words_declaration(e, pp_dim));
 		    }
-		    else
+		  else
 		    {
-			list chars=NIL;
-			chars = CHAIN_SWORD(chars, "CHARACTER*");
-			chars = CHAIN_IWORD(chars, i);
-			chars = CHAIN_SWORD(chars, " ");
-			chars = gen_nconc(chars, 
-					  words_declaration(e, pp_dim));
-			attach_declaration_size_type_to_words
-			    (chars, "CHARACTER", i);
-			ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		      list chars=NIL;
+		      chars = CHAIN_SWORD(chars, "CHARACTER*");
+		      chars = CHAIN_IWORD(chars, i);
+		      chars = CHAIN_SWORD(chars, " ");
+		      chars = gen_nconc(chars, 
+					words_declaration(e, pp_dim));
+		      attach_declaration_size_type_to_words
+			(chars, "CHARACTER", i);
+		      ADD_WORD_LIST_TO_TEXT(t_chars, chars);
 		    }
 		}
-		else if (value_unknown_p(v))
+	      else if (value_unknown_p(v))
 		{
-		    list chars=NIL;
-		    chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
-		    chars = gen_nconc(chars, 
-				      words_declaration(e, pp_dim));
-		    attach_declaration_type_to_words
-			(chars, "CHARACTER*(*)");
-		    ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		  list chars=NIL;
+		  chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
+		  chars = gen_nconc(chars, 
+				    words_declaration(e, pp_dim));
+		  attach_declaration_type_to_words
+		    (chars, "CHARACTER*(*)");
+		  ADD_WORD_LIST_TO_TEXT(t_chars, chars);
 		}
-		else if (value_symbolic_p(v))
+	      else if (value_symbolic_p(v))
 		{
 		  list chars = NIL;
 		  symbolic s = value_symbolic(v);
@@ -1206,60 +1221,60 @@ text_entity_declaration(
 		    (chars, "CHARACTER*(*)");
 		  ADD_WORD_LIST_TO_TEXT(t_chars, chars);
 		}
-		else
-		    pips_internal_error("unexpected value\n");
-		break;
+	      else
+		pips_internal_error("unexpected value\n");
+	      break;
 	    }
-	    default:
-		pips_internal_error("unexpected basic tag (%d)\n",
-				    basic_tag(b));
-	    }
-	}
-    }, ldecl);
+	  default:
+	    pips_internal_error("unexpected basic tag (%d)\n",
+				basic_tag(b));
+	  }
+      }
+  }, ldecl);
     
-    /* usually they are sorted in order, and appended backwards,
-     * hence the reversion.
-     */
-    r = make_text(gen_nreverse(before));
+  /* usually they are sorted in order, and appended backwards,
+   * hence the reversion.
+   */
+  r = make_text(gen_nreverse(before));
 
-    MERGE_TEXTS(r, text_of_parameters(lparam));
-    gen_free_list(lparam), lparam = NIL;
+  MERGE_TEXTS(r, text_of_parameters(lparam));
+  gen_free_list(lparam), lparam = NIL;
 
-    ADD_WORD_LIST_TO_TEXT(r, ph);
-    attach_declaration_type_to_words(ph, "INTEGER");
-    ADD_WORD_LIST_TO_TEXT(r, pi);
-    attach_declaration_type_to_words(pi, "INTEGER");
-    ADD_WORD_LIST_TO_TEXT(r, pf4);
-    attach_declaration_type_to_words(pf4, "REAL*4");
-    ADD_WORD_LIST_TO_TEXT(r, pf8);
-    attach_declaration_type_to_words(pf8, "REAL*8");
-    ADD_WORD_LIST_TO_TEXT(r, pl);
-    attach_declaration_type_to_words(pl, "LOGICAL");
-    ADD_WORD_LIST_TO_TEXT(r, pc8);
-    attach_declaration_type_to_words(pc8, "COMPLEX*8");
-    ADD_WORD_LIST_TO_TEXT(r, pc16);
-    attach_declaration_type_to_words(pc16, "COMPLEX*16");
-    ADD_WORD_LIST_TO_TEXT(r, ps);
-    attach_declaration_type_to_words(ps, "CHARACTER");
-    MERGE_TEXTS(r, t_chars);
+  ADD_WORD_LIST_TO_TEXT(r, ph);
+  attach_declaration_type_to_words(ph, "INTEGER");
+  ADD_WORD_LIST_TO_TEXT(r, pi);
+  attach_declaration_type_to_words(pi, "INTEGER");
+  ADD_WORD_LIST_TO_TEXT(r, pf4);
+  attach_declaration_type_to_words(pf4, "REAL*4");
+  ADD_WORD_LIST_TO_TEXT(r, pf8);
+  attach_declaration_type_to_words(pf8, "REAL*8");
+  ADD_WORD_LIST_TO_TEXT(r, pl);
+  attach_declaration_type_to_words(pl, "LOGICAL");
+  ADD_WORD_LIST_TO_TEXT(r, pc8);
+  attach_declaration_type_to_words(pc8, "COMPLEX*8");
+  ADD_WORD_LIST_TO_TEXT(r, pc16);
+  attach_declaration_type_to_words(pc16, "COMPLEX*16");
+  ADD_WORD_LIST_TO_TEXT(r, ps);
+  attach_declaration_type_to_words(ps, "CHARACTER");
+  MERGE_TEXTS(r, t_chars);
 
-    /* all about COMMON and SAVE declarations
-     */
-    MERGE_TEXTS(r, make_text(area_decl));
-    MERGE_TEXTS(r, t_area);
+  /* all about COMMON and SAVE declarations
+   */
+  MERGE_TEXTS(r, make_text(area_decl));
+  MERGE_TEXTS(r, t_area);
 
-    /* and EQUIVALENCE statements... - BC 
-     */
-    MERGE_TEXTS(r, text_equivalences(module, ldecl, 
-				     pp_cinc || !print_commons));
+  /* and EQUIVALENCE statements... - BC 
+   */
+  MERGE_TEXTS(r, text_equivalences(module, ldecl, 
+				   pp_cinc || !print_commons));
 
-    /* what about DATA statements! FC 
-     */
-    if(get_bool_property("PRETTYPRINT_DATA_STATEMENTS")) {
-	MERGE_TEXTS(r, text_data(module, ldecl));
-    }
+  /* what about DATA statements! FC 
+   */
+  if(get_bool_property("PRETTYPRINT_DATA_STATEMENTS")) {
+    MERGE_TEXTS(r, text_data(module, ldecl));
+  }
 
-    return r;
+  return r;
 }
 
 /* exported for hpfc.
