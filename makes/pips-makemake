@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.288  1997/06/03 06:28:31  coelho
+# *** empty log message ***
+#
 # Revision 1.287  1997/05/29 16:27:24  coelho
 # *** empty log message ***
 #
@@ -364,7 +367,7 @@ PARSE=	  \$(YACC) \$(YFLAGS) \$(YOPT)
 ARCHIVE=  \$(AR) \$(ARFLAGS)
 PROTOIZE= \$(PROTO) \$(PRFLAGS) -E "\$(PREPROC)"
 M4FILTER= \$(M4) \$(M4OPT) \$(M4FLAGS)
-MAKEDEP=  \$(CC) \$(CMKDEP) \$(CPPFLAGS) \$(CPPOPT) \$(CANSI) \$(CFLAGS) \$(COPT)
+MAKEDEP=  \$(CC) \$(CMKDEP) \$(CANSI) \$(CPPFLAGS) \$(CPPOPT) \$(CFLAGS) \$(COPT)
 #
 # for easy debugging... e.g. gmake ECHO='something' echo
 echo:; @echo \$(ECHO)
