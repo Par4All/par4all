@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.82  2002/10/04 09:29:41  irigoin
+ * Check on stack area added in macro SPECIAL_AREA_P
+ *
  * Revision 1.81  2002/06/17 15:29:57  irigoin
  * IO_LIST_STRING_NAME replaces "IOLIST=", duplicate names used for implied
  * do, repeat value and static initialization. DATA_LIST_FUNCTION_NAME added
@@ -300,6 +303,7 @@ typedef hash_table control_mapping;
 #define SPECIAL_AREA_P(e) \
     ((same_string_p(module_local_name(e), DYNAMIC_AREA_LOCAL_NAME)) || \
      (same_string_p(module_local_name(e), STATIC_AREA_LOCAL_NAME)) || \
+     (same_string_p(module_local_name(e), STACK_AREA_LOCAL_NAME)) || \
      (same_string_p(module_local_name(e), HEAP_AREA_LOCAL_NAME)))
 
 #define SPECIAL_COMMON_P(e) SPECIAL_AREA_P(e)
