@@ -1,4 +1,5 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1994/11/24 13:54:23 $, ) version $Revision$, 
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/03/20 09:14:05 $, )
+# version $Revision$, 
 # got on %D%, %T%
 # $Id$
 #
@@ -27,8 +28,8 @@ OPENWINHOME="/usr/openwin"
 PIPS_HOSTS=":chailly:episy"
 
 # home directories for external softwares
-LINEARDIR=/home/users/pips/C3/Linear
-NEWGENDIR=/home/users/pips/Newgen
+LINEARDIR=/projects/C3/Linear
+NEWGENDIR=/projects/Newgen
 
 # An absolute file name is necessary for LISP
 LISP=/usr/local/bin/cl
@@ -36,8 +37,8 @@ LISP=/usr/local/bin/cl
 NEWGEN_MAX_TABULATED_ELEMENTS=12007
 
 # Pips project sources and binaries
-PIPSHOME='/home/users/pips'
-PIPSDIR="$PIPSHOME/Pips"
+PIPSHOME=/home/users/pips
+PIPSDIR=/projects/Pips
 
 # scripts and programs created to manage the project
 UTILDIR="${PIPSDIR}/Utilities"
