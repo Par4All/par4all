@@ -5,6 +5,10 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.90  2003/12/09 16:01:35  nguyen
+ * Change FILE_SEP_STRING to "!", UNION_PREFIX to "'" and BLOCK_SEP_STRING to
+ * "`" to avoid confusion with other prefixes
+ *
  * Revision 1.89  2003/08/14 09:32:49  irigoin
  * COMPILATION_UNIT_PREFIX removed
  *
@@ -138,11 +142,11 @@ typedef hash_table control_mapping;
 #define COMMON_PREFIX 			"~"
 #define BLOCKDATA_PREFIX 		"&"
 
-#define FILE_SEP_STRING 		"%"
-#define BLOCK_SEP_STRING 		"~"
+#define FILE_SEP_STRING 		"!"
+#define BLOCK_SEP_STRING 		"`"
 #define MEMBER_SEP_STRING 		"^"
 #define STRUCT_PREFIX 			"#"
-#define UNION_PREFIX 			"*"
+#define UNION_PREFIX 			"'"
 #define ENUM_PREFIX 			"?"
 #define TYPEDEF_PREFIX 			"$"
 
