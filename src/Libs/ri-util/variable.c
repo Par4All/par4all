@@ -384,7 +384,7 @@ entity make_integer_constant_entity(c)
 int c;
 {
     entity ce;
-    char *num = malloc(32);
+    char *num = (char*) malloc(32);
     string cn;
 
     sprintf(num, "%d", c);
@@ -657,7 +657,7 @@ int kind;
     }
 
   mod_ent = get_current_module_entity();
-  num = malloc(32);
+  num = (char*) malloc(32);
   (void) sprintf(num, "%d", number);
 
   /* The first part of the full name is the concatenation of the define
