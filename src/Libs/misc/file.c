@@ -562,3 +562,13 @@ safe_symlink(string topath, string frompath)
 	pips_internal_error("symlink(%s, %s) failed\n", topath, frompath);
     }
 }
+
+void
+safe_link(string topath, string frompath)
+{
+    if (link(frompath, topath))
+    {
+	perror("[safe_link] ");
+	pips_internal_error("link(%s,%s) failed\n", frompath, topath);
+    }
+}
