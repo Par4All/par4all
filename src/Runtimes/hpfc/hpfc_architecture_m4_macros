@@ -1,6 +1,6 @@
 dnl
 dnl $RCSfile: hpfc_architecture_m4_macros,v $ version $Revision$
-dnl ($Date: 1995/09/27 12:44:45 $, )
+dnl ($Date: 1995/10/18 22:55:18 $, )
 dnl
 dnl DEFAULT ARCHITECTURE
 dnl
@@ -10,6 +10,7 @@ dnl MACHINE TYPE
 dnl
 define(`COM_PREFIX',`HPFC')dnl
 define(`_SUN4')dnl
+define(`_SUNMP')dnl
 define(`_PGON')dnl
 define(`_CM5')dnl
 define(`_RS6K')dnl
@@ -20,6 +21,7 @@ dnl
 ifelse(ARCHITECTURE,`CM5', `define(`MIMD',`$@')',
        ARCHITECTURE,`PGON',`define(`MIMD',`$@')')dnl
 ifelse(ARCHITECTURE,`SUN4',`define(`NETWORK',`$@')',
+       ARCHITECTURE,`SUNMP',`define(`NETWORK',`$@')',
        ARCHITECTURE,`ALPHA',`define(`NETWORK',`$@')',
        ARCHITECTURE,`RS6K',`define(`NETWORK',`$@')')dnl
 dnl
@@ -27,6 +29,7 @@ dnl PECULIAR DEFINITIONS
 dnl 
 ifelse(ARCHITECTURE,`CM5',`define(`COM_PREFIX',`CM')')dnl
 ifelse(ARCHITECTURE,`SUN4',`define(`_SUN4',`$@')',
+       ARCHITECTURE,`SUNMP',`define(`_SUNMP',`$@')', 
        ARCHITECTURE,`PGON',`define(`_PGON',`$@')',
        ARCHITECTURE,`CM5',`define(`_CM5',`$@')',
        ARCHITECTURE,`ALPHA',`define(`_ALPHA',`$@')',
