@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/09/13 17:45:05 $, 
+# $Date: 1996/10/25 21:07:11 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -162,6 +162,21 @@ then
 else
     $debug "no fake file needed"
 fi
+
+#
+# STUBS directive may specify a stub file...
+#
+
+STUBS="`sed -n 's,^[Cc!\*][Ff][Cc][Dd]\$ [ 	]*[Ss][Tt][Uu][Bb][Ss],,p' $HPFFILES | sort -u`"
+STUBS="`eval echo $STUBS`"
+
+$debug "stubs: $STUBS"
+
+HPFFILES="$HPFFILES $STUBS"
+
+#
+#
+#
 
 $verbose "applying hpfc on file(s):"
 for f in $HPFFILES
