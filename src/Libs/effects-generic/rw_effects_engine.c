@@ -6,6 +6,12 @@
  * This File contains the generic functions necessary for the computation of 
  * all types of read and write effects and cumulated references.
  *
+ * $Id$
+ *
+ * $Log: rw_effects_engine.c,v $
+ * Revision 1.11  2002/03/06 16:02:56  irigoin
+ * Check that loop bodies do not define the loop indices
+ *
  */
 #include <stdio.h>
 #include <string.h>
@@ -228,7 +234,15 @@ static void rw_effects_of_loop(loop l)
     ifdebug(4){
 	pips_debug(4, "rw effects of loop body:\n");
 	(*effects_prettyprint_func)(l_body);
-    }   
+    }
+    /* Loop body must not have a write effect on the loop index */
+    MAP(EFFECT, ef, {
+      if(effect_entity(ef)==i && action_write_p(effect_action(ef)))
+	pips_user_error("Index %s of loop %s defined in loop body. "
+			"Fortran 77 standard violation, see Section 11.10.5.\n",
+			entity_local_name(i),
+			label_local_name(loop_label(l)));
+    }, l_body);
 
     /* effects on locals are unconditionnaly masked */
     l_body = effects_dup_without_variables(l_body, loop_locals(l));
