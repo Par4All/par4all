@@ -31,20 +31,6 @@
 
 #include "effects-generic.h"
 
-/*****************Written by phamdat**********************/
-/*text my_text_statement_any_effect_type(entity module, int margin, statement stat)
-{
-  text result = make_text(NIL);
-  list l;
-  for (l=lp; l; POP(l)) {
-    p_prettyprint_stuff pps = (p_prettyprint_stuff) STRING(CAR(l));
-    MERGE_TEXTS(result, resource_text(module, margin, stat, pps));
-  }
-  return result;
-}*/
-
-/*********************************************************/
-
 /***************************************************** ACTION INTERPRETATION */
 
 static string read_action_interpretation = "read";
