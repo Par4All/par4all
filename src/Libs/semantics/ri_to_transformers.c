@@ -853,10 +853,14 @@ user_call_to_transformer(
 
 	/* formal new and old values left over are eliminated */
 	MAPL(ce,{entity e = ENTITY(CAR(ce));
-		 entity e_new = external_entity_to_new_value(e);
-		 entity e_old = external_entity_to_old_value(e);
+		 entity e_new = external_entity_to_new_value(e); 
 		 formals_new = CONS(ENTITY, e_new, formals_new);
-		 formals_new = CONS(ENTITY, e_old, formals_new);},
+		 /* test to insure that entity_to_old_value exists */
+		 if(entity_is_argument_p(e_new, 
+					 transformer_arguments(t_caller))) {
+		     entity e_old = external_entity_to_old_value(e);
+		     formals_new = CONS(ENTITY, e_old, formals_new);
+		 }},
 	     formals);
 		 
 	t_caller = transformer_filter(t_caller, formals_new);
