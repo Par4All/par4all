@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.4  1998/07/02 17:47:01  coelho
+# dependencies updated.
+#
 # Revision 1.3  1998/07/02 15:02:01  coelho
 # also cleans jar and zip files.
 #
@@ -153,4 +156,4 @@ $(d)/ModuleManager: $(d)/TPips $(d)/Pawt $(d)/JPipsComponent
 $(d)/WorkspaceManager: $(d)/TPips $(d)/Pawt $(d)/JPipsComponent
 
 $(d)/JPips: $(d)/DirectoryManager $(d)/ModuleManager $(d)/WorkspaceManager \
-		$(d)/TPips $(d)/TextDisplayer
+		$(d)/TPips $(d)/TextDisplayer $(d)/OptionParser
