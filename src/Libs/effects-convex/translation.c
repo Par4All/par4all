@@ -1926,13 +1926,13 @@ entity val;
 
 	sc = region_system(reg); 
 	b = sc_base(sc);
-	if(base_contains_variable_p(b, (Variable) e)) 
+	if(base_contains_variable_p(b, (Variable) e) ) 
 	{
 	    /* e has already been introduced and val eliminated; this happens 
 	     * when a COMMON variable is also passed as real argument */
 	    pips_debug(8, "%s has already been translated into %s\n", 
 		       entity_name(val), entity_name(e));
-	    sc_base_remove_variable(sc,(Variable) val);
+	    /*  sc_base_remove_variable(sc,(Variable) val);*/
 	    base_rm(sc->base);
 	    sc->base = BASE_NULLE;
 	    sc_creer_base(sc);
