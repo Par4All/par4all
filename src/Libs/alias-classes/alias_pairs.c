@@ -115,29 +115,23 @@ add_parameter_aliases_for_this_call_site(call call_site,
 	      */
 	     if (ith_parameter_p(callee, callee_ent, arg_num))
 	     {
-		 pips_debug(9,"match\n");
-
 		 expression real_exp = EXPRESSION(CAR(r_args));
-
-		 pips_debug(9,"get expression_syntax\n");
-
 		 syntax real_syn = expression_syntax(real_exp);
 		 
+		 pips_debug(9,"match\n");
+
 		 /* If the real argument is a reference to an entity, then we
 		  * translate the regions of the corresponding formal parameter
 		  */
 		 if (syntax_reference_p(real_syn)) 
 		 {
-		     pips_debug(9,"arg refers to entity\n");
-
 		    reference real_ref = syntax_reference(real_syn);
 		    entity real_ent = reference_variable(real_ref);
-
-		    pips_debug(9,"\t%s\n",entity_name(real_ent));
-
 		    region real_reg;
 		    list pair;
 
+		    pips_debug(9,"arg refers to entity\n");
+		    pips_debug(9,"\t%s\n",entity_name(real_ent));
 		    pips_debug(9,"region_translation is\n");
 
 		    real_reg =
