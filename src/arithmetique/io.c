@@ -1,12 +1,12 @@
 /* package arithmetic
  *
  * $RCSfile: io.c,v $ (version $Revision$)
- * $Date: 1996/07/13 16:02:32 $, 
+ * $Date: 1996/07/25 14:02:58 $, 
  *
  * IO on a Value
  */
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 
 #include "arithmetique.h"
 
@@ -18,6 +18,12 @@ void print_Value(Value v)
 void fprint_Value(FILE *f, Value v)
 {
     (void) fprintf(f, VALUE_FMT, v);
+}
+
+void fprint_string_Value(FILE *f, char * blah, Value v)
+{
+    fprintf(f, blah);
+    fprint_Value(f, v);
 }
 
 char *sprint_Value(char *s, Value v)
