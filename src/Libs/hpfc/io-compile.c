@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/12/29 14:05:26 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/12/30 16:49:13 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -652,7 +652,7 @@ tag move;
 	 try_remove);
 
     /* others */
-    gen_remove(&try_remove, (chunk*) TCST);
+    gen_remove(&try_remove, (entity) TCST);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, try_keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, remove);
@@ -785,7 +785,7 @@ tag move;
 	 try_remove);
 
     /* others */
-    gen_remove(&try_remove, (chunk*) TCST);
+    gen_remove(&try_remove, (entity) TCST);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, try_keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, remove);
@@ -876,7 +876,7 @@ list *plparam, *plproc, *plscan, *plrebuild;
 	lscan = NIL,
 	lrebuild = NIL;
 
-    gen_remove(&all, (chunk*) TCST); /* just in case */
+    gen_remove(&all, (entity) TCST); /* just in case */
 
     debug(5, "put_variables_in_ordered_lists",
 	  "considering %d variables\n", gen_length(all));
