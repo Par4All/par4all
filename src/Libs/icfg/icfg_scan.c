@@ -62,7 +62,7 @@ static text (*decoration)(string) = NULL;
 static void 
 append_icfg_file(text t, string module_name)
 {
-    string filename = NULL, localfilename = NULL, prefix;
+    string filename, localfilename, prefix, dir;
     FILE *f_called;
     string buf;
     char textbuf[MAX_LINE_LENGTH]; /* argh... */
@@ -73,9 +73,9 @@ append_icfg_file(text t, string module_name)
     /* should ask it to pipsdbm... */
     localfilename = 
         db_build_file_resource_name(DBR_ICFG_FILE, module_name, prefix);
-    filename = 
-	strdup(concatenate(db_get_current_workspace_directory(), 
-			   "/", localfilename, NULL));
+    dir = db_get_current_workspace_directory();
+    filename = strdup(concatenate(dir, "/", localfilename, 0));
+    free(dir);
     
     pips_debug (2, "Inserting ICFG for module %s\n", module_name);
 
