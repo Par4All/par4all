@@ -826,7 +826,7 @@ static void parse_arguments(int argc, char * argv[])
 
 /* MAIN: interactive loop and history management.
  */
-int main(int argc, char * argv[])
+int pips_main(int argc, char * argv[])
 {
     debug_on("TPIPS_DEBUG_LEVEL");
 
