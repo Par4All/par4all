@@ -19,6 +19,8 @@
 #include "genC.h"
 #include "ri.h"
 
+#include "ri-util.h"
+
 
 /* Flint specific header */
 #include "flint.h"
