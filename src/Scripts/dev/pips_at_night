@@ -183,8 +183,8 @@ $debug "report=$report"
 	    xargs rm -rf
 
 	$verbose - Removing .pips executables in Validation...
-	find ${PIPS_ROOT}/Validation -name '[twf]pips' -o -name pips -print |
-	    xargs rm -f
+	find ${PIPS_ROOT}/Validation -type f \( -name '[twf]pips' \
+	    -o -name pips \) -print | xargs rm -f
 
 	$verbose - Removing generated files in Production...
 	msg="${msg}C"
@@ -205,7 +205,8 @@ $debug "report=$report"
 		$verbose cleaning files of ${a} [${name}: ${dir}]
 		find $dir \
 		    \( -name '*.[ao]' -o -name pips -o -name '[tw]pips' \) \
-		    -mtime +4 -print -o -name EXTERN -prune | xargs rm -rf
+		    -mtime +4 -type f -print -o -name EXTERN -prune | \
+			xargs rm -rf
 		}
 	    }
 	done
