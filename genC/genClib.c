@@ -15,10 +15,13 @@
 */
 
 
-/* genClib.c
-
-   The file has all the generic functions to manipulate C objects implemented
-   by chunks (see genC.c). */
+/* $RCSfile: genClib.c,v $ ($Date: 1994/12/28 15:45:56 $, )
+ * version $Revision$
+ * got on %D%, %T%
+ *
+ * The file has all the generic functions to manipulate C objects
+ * implemented by chunks (see genC.c).
+ */
 
 /*LINTLIBRARY*/
 
@@ -70,18 +73,15 @@ static int disallow_undefined_tabulated = TRUE ;
  *
  * Fabien COELHO 10/06/94
  */
-
 #define check_domain(domain) \
   message_assert("Inconsistant domain number",\
 		 (domain)>=0 && (domain)<MAX_DOMAIN)
-
 #define check_read_spec_performed() \
   message_assert("gen_read_spec not performed prior to use", \
 		 Read_spec_performed);
 
 /* DOMAIN_INDEX returns the index in the Domain table for object OBJ.
  */
-
 static int domain_index( obj )
 chunk *obj ;
 {
@@ -91,13 +91,11 @@ chunk *obj ;
     return(obj->i) ;
 }
 
-
 /* inlined version of domain_index. what is done by optimizing compilers?
  */
 #define quick_domain_index(obj) \
   (((! obj) || (obj==chunk_undefined) || (obj->i<0) || (obj->i>MAX_DOMAIN)) ? \
    domain_index(obj) : obj->i) /* prints the error message or returns */
-
 
 /* dangerous version that assumes a consistent object?
  */
@@ -105,8 +103,8 @@ chunk *obj ;
   (((! obj) || (obj==chunk_undefined)) ? (abort(), -1) : obj->i)
 
 
-/* FPRINTF_SPACES prints NUMBER spaces on the FD file descriptor. */
-
+/* FPRINTF_SPACES prints NUMBER spaces on the FD file descriptor.`
+ */
 static void
 fprintf_spaces( fd, number )
 FILE *fd ;
@@ -117,9 +115,9 @@ int number ;
 }
 
 #ifdef DBG_READ
-/* WRITE_CHUNK prints on the FILE stream a succession of L chunks (beginning
-   at OBJ). This is used for debugging purposes. */
-
+/* WRITE_CHUNK prints on the FILE stream a succession of L chunks
+ * (beginning at OBJ). This is used for debugging purposes. 
+ */
 void
 write_chunk( file, obj, l )
      FILE *file ;
@@ -138,8 +136,8 @@ write_chunk( file, obj, l )
 #endif
 
 /* ARRAY_SIZE returns the number of elements in the array whose dimension
-   list is DIM. */
-
+ * list is DIM. 
+ */
 static int
 array_size( dim )
      struct intlist *dim ;
@@ -153,8 +151,8 @@ array_size( dim )
 }
 
 /* INIT_ARRAY returns a freshly allocated array initialized according to
-   the information in its domain DP. */
-
+ * the information in its domain DP.
+ */
 static chunk *
 init_array( dp )
      union domain *dp ;
@@ -308,12 +306,9 @@ va_dcl
     int gen_check_p ;
     int data ;
 
+    check_read_spec_performed();
+
     va_start( ap ) ;
-    /*NOSTRICT*/
-    if( !Read_spec_performed ) {
-	user( "gen_read_spec not performed prior to allocation\n", "" ) ;
-	exit( 1 ) ;
-    }
     cp = (chunk *)alloc( va_arg( ap, int )) ;
     gen_check_p = va_arg( ap, int ) ;
     bp = &Domains[ cp->i = va_arg( ap, int ) ] ;
@@ -545,7 +540,7 @@ gen_trav_obj( obj, dr )
      chunk *obj ;
      struct driver *dr ;
 {
-    CHECK_NULL( obj, (struct binding *)NULL, dr ) ;
+    CHECK_NULL(obj, (struct binding *)NULL, dr);
 
     if ((*dr->obj_in)(obj, dr))
     {
@@ -578,22 +573,6 @@ gen_trav_obj( obj, dr )
 	(*dr->obj_out)(obj, bp, dr);
     }
     if( gen_debug & GEN_DBG_TRAV_OBJECT ) gen_debug_indent--;
-}
-
-/* Useful functions
- */
-
-void
-gen_null(p)
-chunk *p;
-{
-}
-    
-bool
-gen_true(c)
-chunk *c;
-{
-    return(TRUE);
 }
 
 static int
@@ -632,7 +611,8 @@ static hash_table obj_table = (hash_table)NULL ;
 static int shared_number = 0 ;
 
 /* GEN_TRAV_ENVS are stacked to allow recursive calls to GEN_TRAV_OBJ 
-   (cf. GEN_RECURSE) */
+ * (cf. GEN_RECURSE)
+ */
 
 #define MAX_GEN_TRAV_ENV 100
 
@@ -2224,14 +2204,41 @@ chunk *obj1, *obj2 ;
   
 /* -------------------------------------------------------------
  *
- *    Quick and Intelligent Recursion Thru Gen_Quick_Recurse
+ *    Quick and Intelligent Recursion Thru Gen_Multi_Recurse
  *
- *    Fabien COELHO, 10 June 94
+ *    Fabien COELHO, Jun-Sep-Dec 94
  *
  */
 
+/* Useful functions
+ *
+ * they may be used by some recursion
+ *  - when no rewrite is needed
+ *  - when the filter is always yes
+ *  - when it is false, to stop the recursion on some types
+ */
+void
+gen_null(p)
+chunk *p;
+{
+}
+    
+bool
+gen_true(c)
+chunk *c;
+{
+    return(TRUE);
+}
+
+bool
+gen_false(c)
+chunk *c;
+{
+    return(FALSE);
+}
+
 /*
- * GLOBAL VARIABLES: 
+ * GLOBAL VARIABLES: to deal with decision tables
  *
  *   number_of_domains: 
  *     the number of domains managed by newgen, max is MAX_DOMAIN.
@@ -2270,13 +2277,13 @@ GenDecisionTableType t;
 	if (t[i]) fprintf(stderr, "  go through %s\n", Domains[i].name);
 }
 
-
 /* demand driven computation of the decision table to scan domain.
  * this table is computed by a closure from the initial type matrix
  *
  * the algorithm is straightforward. 
  * tabulated domains are skipped.
  * worst case complexity if O(n^2) for each requested domain.
+ * the closure is shorten because already computed tables are used.
  */
 static void 
 initialize_domain_DecisionTables(domain)
@@ -2429,9 +2436,8 @@ initialize_DecisionTables()
 {
     int i;
 
-    for (i=0; 
-	 i<MAX_DOMAIN; 
-	 *DecisionTables[i]=decision_table_undefined, i++);
+    for(i=0; i<MAX_DOMAIN; i++)
+	*DecisionTables[i]=decision_table_undefined;
 }
 
 /*    called by gen_read_spec, should be called by a gen_init()
@@ -2440,6 +2446,8 @@ static void
 init_gen_quick_recurse_tables()
 {
     int i;
+
+    check_read_spec_performed();
 
     /*   number_of_domains is first set
      */
@@ -2493,7 +2501,7 @@ typedef GenRewriteType GenRewriteTableType[MAX_DOMAIN];
  *   not to walk twice thru them. The previous implementation
  *   used 2 recursions, one to mark the obj to visit, with an
  *   associated number, and the other was the actual recursion.
- *   This version is lazy, and just mark the encountered nodes,
+ *   This version is lazy, and just marks the encountered nodes,
  *   thus allowing the full benefit of the decision table to avoid
  *   walking thru the whole data structure.
  * - the visited domains are marked true in domains.
@@ -2650,8 +2658,6 @@ va_dcl
     struct driver
 	dr;
 
-    /*  Initial check
-     */
     check_read_spec_performed();
 
     va_start(pvar);
@@ -2659,33 +2665,30 @@ va_dcl
 
     /*  the object must be a valid newgen object
      */
-    assert(obj!=(chunk*)NULL && obj!=chunk_undefined);
+    message_assert("null or undefined object to visit",
+		   obj!=(chunk*)NULL && obj!=chunk_undefined);
 
     /*    initialize the new tables
      */
-    for(i=0; 
-	i<MAX_DOMAIN; 
+    for(i=0; i<MAX_DOMAIN; i++)
 	new_domain_table[i]=FALSE,
 	new_decision_table[i]=FALSE,
 	new_filter_table[i]=NULL,
-	new_rewrite_table[i]=NULL,
-	i++);
-
+	new_rewrite_table[i]=NULL;
+    
     /*    read the arguments
      */
     while((domain=va_arg(pvar, int))!=(int)NULL)
     {
-	/*  a domain should be specified only once
-	 */
-	assert(!new_domain_table[domain]);
+	message_assert("domain specified more than once",
+		       !new_domain_table[domain]);
 
 	new_domain_table[domain]  = TRUE;
 	new_filter_table[domain]  = va_arg(pvar, GenFilterType);
 	new_rewrite_table[domain] = va_arg(pvar, GenRewriteType);
 
-	for(i=0, p_table = get_decision_table(domain); 
-	    i<number_of_domains;
-	    new_decision_table[i] |= (*p_table)[i], i++);
+	for(i=0, p_table=get_decision_table(domain); i<number_of_domains; i++)
+	    new_decision_table[i] |= (*p_table)[i];
     }
 
     va_end(pvar);
@@ -2705,7 +2708,7 @@ va_dcl
     dr.obj_in 		= quick_multi_recurse_obj_in,
     dr.obj_out 		= quick_multi_recurse_obj_out;
 
-    /*    push & save the current context
+    /*    push the current context
      */
     saved_mrc = current_mrc, current_mrc = &new_mrc;
 
@@ -2713,13 +2716,13 @@ va_dcl
      */
     gen_trav_obj(obj, &dr);
     
-    /*  restore environment
+    /*  restore the previous context
      */
     hash_table_free(new_mrc.seen);
     current_mrc = saved_mrc;
 }
 
-/*  compatibility, old gen_recurse function.
+/*  upward compatibility, old gen_recurse function syntax
  */
 void 
 gen_recurse(obj, domain, filter, rewrite)
