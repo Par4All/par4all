@@ -1,13 +1,13 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/04/25 11:56:20 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/01 10:26:13 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by a Fortran 77 parser. I guess some perl or awk might be much nicer
 # and more efficient, but I'm not very good at it:-) Looks like an exercice
-# of style, "yes I can do it with seds and trs";-) It may be thought as
-# clever or stupid:-)
+# of style, "yes I can do it with seds and trs";-)
+# It may be thought as clever or stupid:-)
 # Only one subroutine or function should be put in the pipe. 
 # ??? I do not deal with "R E A L" like Fortran lexical problems.
 # ??? There may be problems with if and do instructions...
@@ -21,7 +21,7 @@
 #
 
 #
-# _ is hpfc:
+# HPF directives:
 #
 # _a: align
 # _b: realign
@@ -41,16 +41,23 @@
 #
 # missing: inherit
 #
-# move static directives AFTER declarations, since I need to parse them
-# as statements.
+# static directives are moved AFTER declarations, 
+# since I need to parse them as statements.
+#
+# HPFC directives: (FCD, Fabien Coelho Directives:-)
+#
+# _1: synchro
+# _2: timeon
+# _3: timeoff
+#
+# (_ is hpfc)
 #
 
 #
 # commands:
 #
 # the sed version should be able to handle very large lines... 
-# gnu sed is okay.
-# idem tr.
+# gnu sed is okay. idem tr.
 
 SED=${HPFC_SED:-sed}
 TR=${HPFC_TR:-tr}
@@ -67,8 +74,20 @@ $RM -f $TMP.*
 
 #
 # directive normalization
+# FCD are simply translated into hpf-like prefixed directives.
 #
-$SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,chpf$\1,' |
+$SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,chpf$\1,;
+      s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,chpf$\1,' |
+#
+# lower case letters for directives
+#
+$SED '/^chpf$/s,A,a,g;/^chpf$/s,B,b,g;/^chpf$/s,C,c,g;/^chpf$/s,D,d,g;
+      /^chpf$/s,E,e,g;/^chpf$/s,F,f,g;/^chpf$/s,G,g,g;/^chpf$/s,H,h,g;
+      /^chpf$/s,I,i,g;/^chpf$/s,J,j,g;/^chpf$/s,K,k,g;/^chpf$/s,L,l,g;
+      /^chpf$/s,M,m,g;/^chpf$/s,N,n,g;/^chpf$/s,O,o,g;/^chpf$/s,P,p,g;
+      /^chpf$/s,Q,q,g;/^chpf$/s,R,r,g;/^chpf$/s,S,s,g;/^chpf$/s,T,t,g;
+      /^chpf$/s,U,u,g;/^chpf$/s,V,v,g;/^chpf$/s,W,w,g;/^chpf$/s,X,x,g;
+      /^chpf$/s,Y,y,g;/^chpf$/s,Z,z,g;' |
 #
 # and continuation handling:
 # put on one line
@@ -77,7 +96,7 @@ $TR '\012' '' |
 #
 # remove not desired cr (& and 6 column styles)
 #
-$SED 's,&[ 	]*chpf\$., ,g
+$SED 's,&[ 	]*chpf\$., ,g;
       s,chpf\$[^ ], ,g' | 
 #
 # and back to a normal file
@@ -86,26 +105,29 @@ $TR '' '\012' |
 #
 # massive transformations
 #
-$SED '/^chpf\$/s,\([ 	\,(]\)[Bb][Ll][Oo][Cc][Kk]\([ 	\,()]\),\1_k\2,g
-      /^chpf\$/s,\([ 	\,(]\)[Bb][Ll][Oo][Cc][Kk]\([ 	\,()]\),\1_k\2,g
+$SED '/^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1_k\2,g
+      /^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1_k\2,g
       /^chpf\$/s,_k\([\,)]\),_k()\1,g
-      /^chpf\$/s,\([ 	\,(]\)[Cc][Yy][Cc][Ll][Ii][Cc]\([ 	\,()]\),\1_c\2,g
-      /^chpf\$/s,\([ 	\,(]\)[Cc][Yy][Cc][Ll][Ii][Cc]\([ 	\,()]\),\1_c\2,g
+      /^chpf\$/s,\([ 	\,(]\)cyclic\([ 	\,()]\),\1_c\2,g
+      /^chpf\$/s,\([ 	\,(]\)cyclic\([ 	\,()]\),\1_c\2,g
       /^chpf\$/s,_c\([\,)]\),_c(1)\1,g
       /^chpf\$/s,\*\([\,)]\),_s()\1,g
-      s,^chpf\$ [Dd][Yy][Nn][Aa][Mm][Ii][Cc] \(.*\),      _y(\1),
-      s,^chpf\$ [Pp][Uu][Rr][Ee] \(.*\),      _u(\1),
-      s,^chpf\$ [Tt][Ee][Mm][Pp][Ll][Aa][Tt][Ee] \(.*\),      _o \1      _t(\1),
-      s,^chpf\$ [Pp][Rr][Oo][Cc][Ee][Ss][Ss][Oo][Rr][Ss] \(.*\),      _o \1      _p(\1),
-      s,^chpf\$ [Aa][Ll][Ii][Gg][Nn] \(.*\) [Ww][Ii][Tt][Hh] \(.*\),      _a(\1\,\2),
-      s,^chpf\$ [Rr][Ee][Aa][Ll][Ii][Gg][Nn] \(.*\) [Ww][Ii][Tt][Hh] \(.*\),      _b(\1\,\2),
-      s,^chpf\$ [Dd][Ii][Ss][Tt][Rr][Ii][Bb][Uu][Tt][Ee] \(.*\) [Oo][Nn][Tt][Oo] \(.*\),      _d(\1\,\2),
-      s,^chpf\$ [Rr][Ee][Dd][Ii][Ss][Tt][Rr][Ii][Bb][Uu][Tt][Ee] \(.*\) [Oo][Nn][Tt][Oo] \(.*\),      _e(\1\,\2),
-      s,^chpf\$ [Ii][Nn][Dd][Ee][Pp][Ee][Nn][Dd][Ee][Nn][Tt][ 	]*\([^( ,][^()\,]*\),      _i(\1),
-      s,^chpf\$ [Ii][Nn][Dd][Ee][Pp][Ee][Nn][Dd][Ee][Nn][Tt][ 	]*\(.*\),      _i\1,
+      s,^chpf\$ synchro,      _1,
+      s,^chpf\$ timeon,      _2,
+      s,^chpf\$ timeoff,      _3,
+      s,^chpf\$ dynamic \(.*\),      _y(\1),
+      s,^chpf\$ pure \(.*\),      _u(\1),
+      s,^chpf\$ template \(.*\),      _o \1      _t(\1),
+      s,^chpf\$ processors \(.*\),      _o \1      _p(\1),
+      s,^chpf\$ align \(.*\) with \(.*\),      _a(\1\,\2),
+      s,^chpf\$ realign \(.*\) with \(.*\),      _b(\1\,\2),
+      s,^chpf\$ distribute \(.*\) onto \(.*\),      _d(\1\,\2),
+      s,^chpf\$ redistribute \(.*\) onto \(.*\),      _e(\1\,\2),
+      s,^chpf\$ independent[ 	]*\([^( ,][^()\,]*\),      _i(\1),
+      s,^chpf\$ independent[ 	]*\(.*\),      _i\1,
       s,^      _i\,,      _i()\,,
-      s,^      _i(\([^)]*\))[ 	]*\,[ 	]*[Nn][Ee][Ww][ 	]*(\([^)]*\)),      _i(\1)      _n(\2),
-      s,_\([abdeintpyou]\),call hpfc\1,g
+      s,^      _i(\([^)]*\))[ 	]*\,[ 	]*new[ 	]*(\([^)]*\)),      _i(\1)      _n(\2),
+      s,_\([123abdeintpyou]\),call hpfc\1,g
       s,_\([cks]\),hpfc\1,g' |
 #
 # handles multi lines breaking (independent with new...)
