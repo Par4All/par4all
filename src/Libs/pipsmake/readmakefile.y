@@ -4,8 +4,6 @@
  *
  * Bruno Baron
  */
-/**** Begin saved_makefile version ****/
-/**** End saved_makefile version ****/
 
 %token PROGRAM
 %token MODULE
@@ -21,7 +19,7 @@
 %token PRESERVED
 %token PRE_TRANSFORMATION
 %token DOT
-%token NAME
+%token <name> NAME
 
 %type <name>		phase
 %type <name>		resource
@@ -48,9 +46,8 @@
 
 extern void add_rule(rule);
 extern int yyerror(char *);
-extern int yylex();
+extern int yylex(void);
 
-extern char yytext[];
 extern FILE * yyin; 
 
 static makefile pipsmakefile = makefile_undefined;
@@ -163,25 +160,28 @@ owner:		PROGRAM
 	;
 
 phase:		NAME
-		{ char *s = strdup(yytext); $$ = strupper(s, s); }
+		{ $$ = strupper($1, $1); }
 	;
 
 resource:	NAME
-		{ char *s = strdup(yytext); $$ = strupper(s, s); }
+		{ $$ = strupper($1, $1); }
 	;
 %%
+
+void yyerror_lex_part(char *);
 
 int yyerror(s)
 char * s;
 {
-	int c;
-	fprintf(stderr, "[readmakefile] %s near %s\n", s, yytext);
-	fprintf(stderr, "[readmakefile] unparsed text:\n");
-	while ((c = getc(yyin)) != EOF)
-		putc(c, stderr);
-
-	exit(1);
-	return 1;
+    int c;
+    
+    yyerror_lex_part(s);
+    fprintf(stderr, "[readmakefile] unparsed text:\n");
+    while ((c = getc(yyin)) != EOF)
+	putc(c, stderr);
+    
+    exit(1);
+    return 1;
 }
 
 void fprint_virtual_resources(fd, dir, lrv)
