@@ -78,6 +78,7 @@ typedef struct polyhedron {
   Value **Constraint;
   Value **Ray;
   Value *p_Init;
+  int p_Init_size;
   struct polyhedron *next;
 } Polyhedron;
 

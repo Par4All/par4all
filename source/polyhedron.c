@@ -1712,6 +1712,7 @@ Polyhedron* Polyhedron_Alloc(unsigned Dimension,unsigned NbConstraints,unsigned 
       value_init(*(p+j));
     p += NbColumns;
   }
+  Pol->p_Init_size   = NbRows*NbColumns;
   return Pol;
 } /* Polyhedron_Alloc */
 
@@ -1721,14 +1722,11 @@ Polyhedron* Polyhedron_Alloc(unsigned Dimension,unsigned NbConstraints,unsigned 
 void Polyhedron_Free(Polyhedron *Pol) {
   
   int i,size;
-  int NbRows, NbColumns;
   Value *p;
   
   if(!Pol)
     return;
-  NbRows = Pol->NbConstraints + Pol->NbRays;
-  NbColumns = Pol->Dimension+2;
-  size = (NbRows * NbColumns);
+  size = Pol->p_Init_size;
   p = Pol->p_Init;
   for(i=0;i<size;i++)
     value_clear(p[i]); 
@@ -2653,9 +2651,11 @@ Polyhedron *Polyhedron_Copy(Polyhedron *Pol) {
     errormsg1("Polyhedron_Copy", "outofmem", "out of memory space");
     return 0;
   }
-  Vector_Copy(Pol->Constraint[0], Pol1->Constraint[0],
+  if( Pol->NbConstraints )
+    Vector_Copy(Pol->Constraint[0], Pol1->Constraint[0],
 	      Pol->NbConstraints*(Pol->Dimension+2));
-  Vector_Copy(Pol->Ray[0], Pol1->Ray[0],
+  if( Pol->NbRays )
+    Vector_Copy(Pol->Ray[0], Pol1->Ray[0],
 	      Pol->NbRays*(Pol->Dimension+2));
   Pol1->NbBid = Pol->NbBid;
   Pol1->NbEq = Pol->NbEq;

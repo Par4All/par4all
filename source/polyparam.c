@@ -1042,8 +1042,13 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
     /* if CT is not NULL, the constraints are eliminated                */
     /* *CT will contain the transformation matrix to come back to the   */
     /* original dimension (for a polyhedron, in the parameter space)    */
-    m -= CEq1->NbEq;
-    p = (int *)malloc(sizeof(int)*(CEq1->NbEq));
+    if( CEq1->NbEq )
+    {
+      m -= CEq1->NbEq;
+      p = (int *)malloc(sizeof(int)*(CEq1->NbEq));
+    }
+    else
+      p = NULL;
     ref = (int*) malloc(sizeof(int)*
 			(CEq1->Dimension+2-CEq1->NbEq));
     *CT = PreElim_Columns(CEq1,p,ref,CEqualities->Dimension);
