@@ -1,3 +1,18 @@
+;;;; epips.el : Emacs mode for (W)PIPS
+;;;; Version 1.0
+;;;;
+;;;; Ronan.Keryell@cri.ensmp.fr
+
+;;; Bug with 19.31:
+;;  (make-variable-buffer-local 'x-sensitive-text-pointer-shape)
+;;  (setq x-sensitive-text-pointer-shape x-pointer-hand2)
+;; Then make-frame -> error in process filter: can't set cursor shape: BadValue (integer parameter out of range for operation)
+;;
+;; When on sensitive text, if we mask some text with
+;; buffer-invisibility-spec and the cursor is no longer on a sensitive
+;; text, the cursor shape is still x-sensitive-text-pointer-shape
+
+
 ;; To store the module name in a buffer:
 (make-variable-buffer-local 'epips-local-module-name)
 
@@ -26,7 +41,8 @@
      (copy-face 'default 'epips-face-parallel-loop)
      (set-face-background 'epips-face-parallel-loop "lemonchiffon")
 
-     (copy-face 'epips-face-user-warning 'epips-face-declaration)
+     (copy-face 'default 'epips-face-declaration)
+     (set-face-foreground 'epips-face-declaration "magenta")
 
      (make-face 'epips-face-reference)
      (set-face-underline-p 'epips-face-reference t)
@@ -127,6 +143,19 @@
 (defun epips-debug (something)
   "To print some messages during the epips debugging"
   (print something (get-buffer "*Messages*"))
+  )
+
+
+(defun epips-clean-up-fortran-expression (a-string)
+  "Remove surrounding blanks, double blanks near to ',', LF, 
+continuation mark, etc."
+  ;; Remove the leading and trailing blanks:
+  (while (string-match "\\`[ \n\t]+\\|[ \n\t]+\\'" a-string)
+    (setq a-string (replace-match "" nil nil a-string)))
+  ;; Remove continuation marks:
+  (while (string-match "\n     &" a-string)
+    (setq a-string (replace-match "" nil nil a-string)))
+  a-string
   )
 
 
@@ -417,6 +446,9 @@ If no buffer can be found, just return nil."
   "Executed from send_view_to_emacs() in emacs.c.
 epips-command-content contains the name of the file to display."
   (epips-debug 'epips-sequential-view-command)
+  (message "Displaying \"%s\" for module \"%s\"..."
+	   epips-command-name
+	   epips-current-module-name)
   (save-excursion
 					; Switch to a new buffer:
     (let (
@@ -445,22 +477,18 @@ epips-command-content contains the name of the file to display."
 	     (insert-file-contents epips-command-content)
 	     )
 	   (goto-char (point-min))
-	   ;; Do not hide any information:
-	   (setq buffer-invisibility-spec nil)
 	   (epips-fortran-mode-and-hilit)
-					; Add the file name, for a
-					; possible future user edit
-					; and save:
+	   ;; Add the file name, for a possible future user edit and
+	   ;; save:
 	   (set-visited-file-name epips-command-content)
-					; Restore the original
-					; "Emacs-PIPS-<n>" name
-					; instead of the file name:
+	   ;; Restore the original "Emacs-PIPS-<n>" name instead of
+	   ;; the file name:
 	   (rename-buffer old-buffer-name)
 	   
 	   (epips-initialize-current-buffer-stuff)
-					; No modification yet:
+	   ;; No modification yet:
 	   (set-buffer-modified-p nil)
-					; Change the window and icon headers:
+	   ;; Change the window and icon headers:
 	   (modify-frame-parameters
 	    (selected-frame)
 	    `((name . ,(format "%s - %s: %s"
@@ -473,6 +501,9 @@ epips-command-content contains the name of the file to display."
 					    epips-current-module-name))
 	      )
 	    )
+	   (message "Displaying \"%s\" for module \"%s\" done."
+		    epips-command-name
+		    epips-current-module-name)
 	   )
 	(epips-user-warning-command " No more buffer available... Unprotect or save some or increase the number of windows.\n")
 	)
@@ -572,20 +603,23 @@ epips-command-content contains the name of the file to display."
 					    (length epips-command-separator))
 					 nil))
   (epips-debug epips-command-content)
-  (if (equal epips-command-name epips-module-command-name)
-      (epips-module-name-command epips-command-content)
-    (if (equal epips-command-name epips-prompt-user-command-name)
-	(epips-prompt-user-command epips-command-content)
-      (if (equal epips-command-name epips-user-error-command-name)
-	  (epips-user-error-command epips-command-content)
-	(if (equal epips-command-name epips-user-log-command-name)
-	    (epips-user-log-command epips-command-content)
-	  (if (equal epips-command-name epips-user-warning-command-name)
-	      (epips-user-warning-command epips-command-content)
-	    (if (equal epips-command-name epips-window-number-command-name)
-		(epips-window-number-command epips-command-content)
-	      ; It may be a view command:
-	      (epips-view-command epips-command-name epips-command-content)
+  (if (equal epips-command-name epips-available-modules-command-name)
+      (epips-set-available-module-list-command epips-command-content)
+    (if (equal epips-command-name epips-module-command-name)
+	(epips-module-name-command epips-command-content)
+      (if (equal epips-command-name epips-prompt-user-command-name)
+	  (epips-prompt-user-command epips-command-content)
+	(if (equal epips-command-name epips-user-error-command-name)
+	    (epips-user-error-command epips-command-content)
+	  (if (equal epips-command-name epips-user-log-command-name)
+	      (epips-user-log-command epips-command-content)
+	    (if (equal epips-command-name epips-user-warning-command-name)
+		(epips-user-warning-command epips-command-content)
+	      (if (equal epips-command-name epips-window-number-command-name)
+		  (epips-window-number-command epips-command-content)
+					; It may be a view command:
+		(epips-view-command epips-command-name epips-command-content)
+		)
 	      )
 	    )
 	  )
@@ -843,12 +877,21 @@ epips-command-content contains the name of the file to display."
   )
 
 
-(defvar epips-select-module-history nil
-  "Store the history of previously selected modules")
-
-
 (defvar epips-available-module-list '("A" "B" "TRUC")
   "Store the name of the modules available in the current workspace")
+
+
+(defun epips-set-available-module-list-command (list-of-module)
+  "Receive a string that is a list of the names of the available
+modules in the current workspace and set the
+variable epips-available-module-list accordingly"
+  (setq epips-available-module-list
+	(car (read-from-string list-of-module)))
+  )
+
+
+(defvar epips-select-module-history nil
+  "Store the history of previously selected modules")
 
 
 (defun epips-select-module (module-name)
@@ -977,6 +1020,28 @@ such as the preconditions, the regions, etc."
   "Insert a string with some properties.
 The properties can merge (that is not the case for read symtax '#(...)').
 The format is
+ (\"the string\" b1 e1 p1 b2 e2 b3 ...)"
+  trucmuche
+  (let ((old-point (point))
+        (length-of-properties (length a-string-with-some-properties))
+	(i 1))
+    (insert (elt (a-string-with-some-properties) 0))
+    (while (< i number-of-properties)
+      (add-text-properties (elt a-string-with-some-properties
+				i)
+			   (elt a-string-with-some-properties
+				(1+ i))
+			   (elt a-string-with-some-properties
+				(+ i 2)))
+      (setq (+ i 3)))
+    )
+  )
+
+
+(defun vieux-epips-insert-with-properties-read-syntax-like (a-string-with-some-properties)
+  "Insert a string with some properties.
+The properties can merge (that is not the case for read symtax '#(...)').
+The format is
 (\"the string\" b1 e1 p1 b2 e2 b3 ...)"
   (let ((old-point (point)))
     (insert (car a-string-with-some-properties))
@@ -984,7 +1049,6 @@ The format is
                                       (cdr a-string-with-some-properties))
     )
   )
-
 
 
 (defun epips-show-property ()
@@ -1049,8 +1113,9 @@ If not, barf and return nil."
 				    (get-text-property (car property-place)
 						       'epips-property-type)
 				    ;; And its name:
-				    (buffer-substring (car property-place)
-						      (car (cdr property-place))))))	
+				    (epips-clean-up-fortran-expression
+				     (buffer-substring (car property-place)
+						       (car (cdr property-place)))))))
 	    (progn
 	      (epips-user-warning "Cannot find the declaration here!")
 	      nil)
@@ -1086,7 +1151,7 @@ of the reference variable we are clicking on"
 	  ;; Modify the mark to be able to come back later:
 	  (push-mark (point) nil nil)
 	  (message (substitute-command-keys
-		    "Jumped to \"%s\". To go back to the reference, type \\[exchange-point-and-mark]")
+		    "Jumped to \"%s\". To go back to the reference, type C-u \\[set-mark-command]")
 		   (elt declaration 2))          
           ;; Go to the variable declaration:
           (goto-char (car declaration)))
@@ -1102,8 +1167,10 @@ of the reference variable we are clicking on"
   (epips-mode 1)
   ;; To store the module name in a buffer:
   (make-variable-buffer-local 'epips-local-module-name)
+  ;; Do not hide any information:
+  (setq buffer-invisibility-spec nil)
   ;; Set the active area mouse pointer:
-  (make-variable-buffer-local 'x-sensitive-text-pointer-shape)
+;;;;  (make-variable-buffer-local 'x-sensitive-text-pointer-shape)
   ;;(setq x-sensitive-text-pointer-shape x-pointer-question-arrow)
   ;;(setq x-sensitive-text-pointer-shape x-pointer-target)
   ;;(setq x-sensitive-text-pointer-shape x-pointer-rtl-logo)
