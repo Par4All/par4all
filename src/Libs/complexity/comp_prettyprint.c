@@ -31,7 +31,7 @@ entity module;
 int margin;
 statement stat;
 {
-    complexity stat_comp = load_statement_complexity(stat);
+    complexity stat_comp = complexity_undefined;
     int print_stats_level = get_int_property("COMPLEXITY_PRINT_STATISTICS");
     bool print_stats_p = ((print_stats_level == 2) ||
 			  ((print_stats_level == 1) &&
@@ -51,31 +51,45 @@ statement stat;
 		ORDERING_STATEMENT(statement_ordering(stat)));
     }
 
-    complexity_check_and_warn("text_complexity", stat_comp);
-    pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, print_stats_p,
-					    PRINT_LOCAL_NAMES));
-    r = words_to_string(pc);
-    nblanks = 65-strlen(r);
+    if(is_user_view) {
+	statement i = apply_number_to_statement(nts, statement_number(stat));
 
-    if (nblanks<1) 
-	nblanks = 1;
-    if ( instruction_block_p(ins) )
-	sprintf(s, "C    %*s%s (BLOCK)\n", nblanks, "", r);
-    else if ( instruction_test_p(ins) )
-	sprintf(s, "C    %*s%s (TEST) \n", nblanks, "", r);
-    else if ( instruction_loop_p(ins) )
-	sprintf(s, "C    %*s%s (DO)   \n", nblanks, "", r);
-    else if ( instruction_call_p(ins) )
-	sprintf(s, "C    %*s%s (STMT) \n", nblanks, "", r);
-    else if ( instruction_unstructured_p(ins) )
-	sprintf(s, "C    %*s%s (UNSTR)\n", nblanks, "", r);
+	if(!statement_undefined_p(i)) {
+	    stat_comp = load_statement_complexity(i);
+	}
+	else
+	    stat_comp = (complexity) HASH_UNDEFINED_VALUE;
+    }
     else
-	pips_error("text_complexity", "Never occur!");
+	stat_comp = load_statement_complexity(stat);
 
-    pips_assert("text_complexity", strlen(s) < TEXT_COMPLEXITY_BUFFER_SIZE);
+    if(stat_comp != (complexity) HASH_UNDEFINED_VALUE) {
+	complexity_check_and_warn("text_complexity", stat_comp);
+	pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, print_stats_p,
+						PRINT_LOCAL_NAMES));
+	r = words_to_string(pc);
+	nblanks = 65-strlen(r);
 
-    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-					  strdup(s)));
+	if (nblanks<1) 
+	    nblanks = 1;
+	if ( instruction_block_p(ins) )
+	    sprintf(s, "C    %*s%s (BLOCK)\n", nblanks, "", r);
+	else if ( instruction_test_p(ins) )
+	    sprintf(s, "C    %*s%s (TEST) \n", nblanks, "", r);
+	else if ( instruction_loop_p(ins) )
+	    sprintf(s, "C    %*s%s (DO)   \n", nblanks, "", r);
+	else if ( instruction_call_p(ins) )
+	    sprintf(s, "C    %*s%s (STMT) \n", nblanks, "", r);
+	else if ( instruction_unstructured_p(ins) )
+	    sprintf(s, "C    %*s%s (UNSTR)\n", nblanks, "", r);
+	else
+	    pips_error("text_complexity", "Never occur!");
+
+	pips_assert("text_complexity", strlen(s) < TEXT_COMPLEXITY_BUFFER_SIZE);
+
+	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+					      strdup(s)));
+    }
 
     return (t);
 }
@@ -133,7 +147,7 @@ char *module_name;
     init_prettyprint(text_complexity);
 
     MERGE_TEXTS(txt, text_summary_complexity( get_current_module_entity() ));
-    MERGE_TEXTS(txt, text_module(mod,get_current_module_statement()));
+    MERGE_TEXTS(txt, text_module(mod, is_user_view ? user_stat : mod_stat));
 
     close_prettyprint();
 
