@@ -21,7 +21,7 @@ letter [A-Za-z_]
 symboles {letter}({letter}|{chiffre})*
 
 %%
-"list"         {return (LIST);}
+"list"         {return (LST);}
 "#"            {return (DIES);}
 "["            {return (LCRO);}
 "]"            {return (RCRO);}
