@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.122  1998/09/17 12:06:49  keryell
+ * Added attachment support for module call.
+ *
  * Revision 1.121  1998/09/09 15:50:40  irigoin
  * Proper prettyprinting of ranges in expressions. Function text_loop() had
  * to be splitted into text_loop() and text_loop_default(). The later is
@@ -201,7 +204,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.121 1998/09/09 15:50:40 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.122 1998/09/17 12:06:49 keryell Exp $";
 #endif /* lint */
 
  /*
@@ -469,6 +472,24 @@ words_regular_call(call obj)
     }
     return(pc);
 }
+
+
+/* To deal with attachment on user module usage. */
+list 
+words_genuine_regular_call(call obj)
+{
+  entity f = call_function(obj);
+  type t = entity_type(f);
+  list pc = words_regular_call(obj);
+  /* The module name is the first one except if it is a procedure CALL. */
+  if (type_void_p(functional_result(type_functional(t))))
+    attach_regular_call_to_word(STRING(CAR(CDR(pc))), obj);
+  else
+    attach_regular_call_to_word(STRING(CAR(pc)), obj);
+
+  return pc;
+}
+
 
 static list 
 words_assign_op(call obj, int precedence, bool leftmost)
@@ -1006,7 +1027,7 @@ words_call(
 			     (precedence_p||precedence<=1)? precedence : MAXIMAL_PRECEDENCE,
 			     leftmost))
 	: 
-	words_regular_call(obj);
+	words_genuine_regular_call(obj);
     return pc;
 }
 
