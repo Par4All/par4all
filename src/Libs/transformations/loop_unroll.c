@@ -3,6 +3,9 @@
   $Id$
 
   $Log: loop_unroll.c,v $
+  Revision 1.22  2000/03/16 14:03:59  irigoin
+  Comments added to find_unroll_pragma_and_fully_unroll()
+
   Revision 1.21  2000/03/16 09:28:13  irigoin
   Full loop unrolling with pragma added. Draft version installed because
   Fabien needs it!
@@ -745,7 +748,15 @@ static int number_of_requested_unrollings = 0;
 
 /* Trailing spaces and tabs are not accepted. C must be a capital C... but
    it does not have to be in column 1! This should be improved with
-   regular expressions. */
+   regular expressions.
+
+   Furthermore, people want to unroll only loops that are designated or
+   all loops but those that are designated.
+
+   Loops can be tagged by the loop index, the loop label or a pragma.
+
+   A lot of improvement ahead before we can think of matching TSF
+   flexibility... */
 #define FULL_UNROLL_PRAGMA "Cxxx\n"
 
 bool find_unroll_pragma_and_fully_unroll(statement s)
