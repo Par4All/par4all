@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.3  1997/09/08 09:35:29  coelho
+ * transformer -> precondition.
+ *
  * Revision 1.2  1997/09/08 08:51:14  coelho
  * the code is not printed. name fixed.
  *
@@ -39,14 +42,14 @@
 /* Compute an initial transformer.
  */
 bool 
-initial_transformer(string name)
+initial_precondition(string name)
 {
     pips_internal_error("not implemented yet");
     return FALSE;
 }
 
 bool
-program_transformer(string name)
+program_precondition(string name)
 {
     pips_internal_error("not implemented yet");
     return FALSE;
@@ -55,14 +58,14 @@ program_transformer(string name)
 /*********************************************************** PRETTY PRINTERS */
 
 bool 
-print_initial_transformer(string name)
+print_initial_precondition(string name)
 {
     pips_internal_error("not implemented yet");
     return FALSE;
 }
 
 bool 
-print_program_transformer(string name)
+print_program_precondition(string name)
 {
     pips_internal_error("not implemented yet");
     return FALSE;
