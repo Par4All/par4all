@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 19:11:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 20:07:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 19:11:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 20:07:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -98,7 +98,9 @@ save_all_entities()
     DynamicArea = StaticArea;
 }
 
-/* this function transforms a dynamic variable into a static one.  */
+/* This function transforms a dynamic variable into a static one. 
+ * It is called to handle SAVE and DATA statements.
+ */
 
 void 
 SaveEntity(e)
@@ -124,15 +126,21 @@ entity e;
 
 	    r = storage_ram(entity_storage(e));
 
-	    if (ram_section(r) != DynamicArea) {
-		user_warning("SaveEntity", "Variable %s has already been declared static "
-			     "by SAVE or by appearing in a common declaration\n",
-			     entity_local_name(e));
-		ParserError("SaveEntity", "Cannot save non dynamic variables\n");
+	    if (ram_section(r) == DynamicArea) {
+		ram_section(r) = StaticArea;
+		ram_offset(r) = CurrentOffsetOfArea(StaticArea, e);
 	    }
-
-	    ram_section(r) = StaticArea;
-	    ram_offset(r) = CurrentOffsetOfArea(StaticArea, e);
+	    else {
+		/* Not much can be said. Maybe it is redundant, but... */
+		/* Maybe the standard claims that you are not allowed
+		 * to save a common variable?
+		 */
+		/*
+		user_warning("SaveEntity", "Variable %s has already been declared static "
+			     "by SAVE, by DATA or by appearing in a common declaration\n",
+			     entity_local_name(e));
+			     */
+	    }
 	}
 	else {
 	    user_warning("SaveEntity",
