@@ -4,6 +4,10 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.85  1998/05/25 06:45:13  coelho
+ * fixed nesting in tp_system.
+ * tpips_is_interactive ok in "source".
+ *
  * Revision 1.84  1998/05/22 14:52:34  coelho
  * missing cr added.
  *
@@ -281,11 +285,16 @@ static void tp_system(string s)
     fflush(stdout);
 
     if (status) 
+    {
 	pips_user_warning("shell returned status (%d.%d)\n", 
-			  status%256, status/256);
+			  status/256, status%256);
 
-    if (!tpips_is_interactive)
-	pips_user_error("shell error (%d) in tpips script\n", status);
+	/* generate user error if not interactive,
+	 * so as to abort quickly in scripts...
+	 */
+	if (!tpips_is_interactive)
+	    pips_user_error("shell error (%d) in tpips script\n", status);
+    }
 }
 
 static bool tp_close_the_workspace(string s)
@@ -764,7 +773,9 @@ i_get: TK_GET_PROPERTY propname TK_ENDOFLINE
 i_source: TK_SOURCE filename_list TK_ENDOFLINE
 	{
 	    int n = gen_array_nitems($2), i=0;
-	    for(; i<n; i++) { 
+	    bool saved_tpips_is_interactive = tpips_is_interactive;
+	    tpips_is_interactive = FALSE;
+	    for(; i<n; i++) {
 		string name = gen_array_item($2, i);
 		FILE * sourced = fopen(name, "r");
 		if (!sourced) {
@@ -777,6 +788,7 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 	    }
 	    gen_array_full_free($2);
 	    tpips_set_line_to_parse(""); /* humm... */
+	    tpips_is_interactive = saved_tpips_is_interactive;
 	}
 
 rulename: phasename
