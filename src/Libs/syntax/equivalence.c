@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/11/01 10:00:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/11/03 10:19:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1997/11/01 10:00:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1997/11/03 10:19:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -304,13 +304,19 @@ ComputeAddresses()
 	for (pcc = equivalences_chains(FinalEquivSet); pcc != NIL; 
 	     pcc = CDR(pcc)) {
 	    chain c = CHAIN(CAR(pcc));
+
 	    /* the default section for variables with no address is the dynamic
-	       area.
-	      */
+	     * area.
+	     */
 	    sc = DynamicArea;
 	    lc = 0;
 	    ac = 0;
 
+	    /* Try to locate the area for the current equivalence chain.
+	     * Only one variable should have a well-defined storage.
+	     * Or no variables have one because the equivalence chain 
+	     * is located in the dynamic area
+	     */
 	    for (pca = chain_atoms(c); pca != NIL; pca = CDR(pca)) {
 		entity e;
 		int o;
@@ -318,8 +324,11 @@ ComputeAddresses()
 		e = atom_equivar(ATOM(CAR(pca)));
 		o = atom_equioff(ATOM(CAR(pca)));
 
-		if ((l = SizeOfArray(e)) > lc)
-			lc = l;
+		/* FI: I do not understand why this assignment is not better guarded.
+		 * Maybe, because lc's later use *is* guarded.
+		 */
+		if ((l = SizeOfArray(e)) > lc-o)
+			lc = l+o;
 
 		if (entity_storage(e) != storage_undefined) {
 		    if (storage_ram_p(entity_storage(e))) {
@@ -355,6 +364,9 @@ ComputeAddresses()
 		}
 	    }
 
+	    /* Compute the offset and set the storage information for each
+	     * variable in the equivalence chain that has no storage yet.
+	     */
 	    for (pca = chain_atoms(c); pca != NIL; pca = CDR(pca)) {
 		entity e;
 		int o, adr;
@@ -366,6 +378,7 @@ ComputeAddresses()
 		    ac = area_size(type_area(entity_type(sc)));
 		}
 
+		/* check that the offset is positive */
 		if ((adr = ac+o) < 0) {
 		    user_warning("ComputeAddresses", "Offset %d for %s in common /%s/.\n",
 				 ac+o, entity_local_name(e), entity_local_name(sc));
@@ -400,11 +413,11 @@ ComputeAddresses()
 		     */
 		    pips_assert("Entity e is not yet in sc's layout", 
 				!entity_is_argument_p(e,area_layout(a)));
-		    if(sc == DynamicArea) {
+		    if(sc == DynamicArea && pca != chain_atoms(c)) {
 			/* Dynamic aliases cannot be added right away because
 			 * implicitly declared dynamic variables still have to
 			 * be added whereas aliased variables are assumed to be
-			 * put behind in the layout list
+			 * put behind in the layout list. Except the first one.
 			 */
 			dynamic_aliases = arguments_add_entity(dynamic_aliases, e);
 		    }
