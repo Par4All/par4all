@@ -92,80 +92,71 @@ last_word_of_sentence(sentence s)
 
 /******************************************************** LINE MANAGEMENT */
 
-#define FORESYS_CONTINUATION_PREFIX "C$&"
-
 #define LINE_SUFFIX "\n"
 
+/* returns a possible index where to cut the string. 0 if none.
+ */
 static int
-last_comma_or_clopar(string s )
+last_comma_or_clopar(string s)
 {
-    int last = 0;
-    int i = strlen(s)-1;
-    for (; i>0 && !last; i--)
+    int last = 0, i;
+    for (i=strlen(s)-1; i>0 && !last; i--)
 	if (s[i] == ',' || s[i]==')') 
 	    last = i;
-
     return last;
 }
 
-bool 
+void
 add_to_current_line(
-    string crt_line,   /* current line being processed. */
-    string add_string, /* string to add to this line. */
-    string str_prefix, /* prefix when breaking a line. */
-    text txt,          /* where to append complete lines. */
-    bool first_line    /* rather useless??? */)
+    string crt_line,     /* current line being processed */
+    string add_string,   /* string to add to this line */
+    string continuation, /* prefix when breaking a line */
+    text txt             /* where to append completed lines */)
 {
-    int lcrt_line, ladd_string, last_virg;
-    bool divide=FALSE;
+    int lcrt_line, ladd_string;
 
-    if((lcrt_line = strlen(crt_line)) + (ladd_string=strlen(add_string)) 
-       > MAX_LINE_LENGTH-2)
+    lcrt_line = strlen(crt_line);
+    ladd_string = strlen(add_string);
+
+    if (lcrt_line + ladd_string + 2 > MAX_LINE_LENGTH) /* 2 = strlen("\n\0") */
     {   
+	/* cannot append the string. must go next line.
+	 */
+	bool divide;
 	char tmp[MAX_LINE_LENGTH];
+	int last_cut = last_comma_or_clopar(crt_line);
 
-	if(first_line)
-	{
-	    first_line = FALSE;
-	    if(get_bool_property("PRETTYPRINT_FOR_FORESYS")) /* ??? */
-	    {
-		str_prefix = FORESYS_CONTINUATION_PREFIX; /* ??? */
-	    }
-	}
-
-	last_virg = last_comma_or_clopar(crt_line);
-	divide = (last_virg > 0)
-	    && (last_virg !=lcrt_line-1) 
-	    &&  (lcrt_line -last_virg +ladd_string < MAX_LINE_LENGTH-2);
+	divide = (last_cut > 0)
+	    && (last_cut != lcrt_line-1) 
+	    &&  (lcrt_line - last_cut + ladd_string < MAX_LINE_LENGTH - 2);
 
 	if (divide) 
 	{
 	    /* only to remain coherent with the last validation. CA.
 	     */
-	    if (crt_line[last_virg+1]==' ')
-		last_virg++;
+	    if (crt_line[last_cut+1]==' ')
+		last_cut++;
 
-	    strcpy(tmp, crt_line+last_virg+1); /* save the end of the line */
-	    crt_line[last_virg+1] = '\0';      /* trunc! */
+	    strcpy(tmp, crt_line+last_cut+1); /* save the end of the line */
+	    crt_line[last_cut+1] = '\0';      /* trunc! */
 	}
 	
+	/* happend new line. */
 	strcat(crt_line, LINE_SUFFIX);
 	ADD_SENTENCE_TO_TEXT
 	    (txt, make_sentence(is_sentence_formatted, strdup(crt_line)));
 
-	/* now regenera the beginning of the line */
-	strcpy(crt_line, str_prefix);
-	strcat(crt_line, "    "); /* ??? should be in str_prefix... */
-	if (divide) 
-	    strcat(crt_line, tmp); /* get back saved part */
+	/* now regenerate the beginning of the line */
+	strcpy(crt_line, continuation);
+	if (divide) strcat(crt_line, tmp); /* get back saved part */
     }
 
-    if(strlen(crt_line) + strlen(add_string) > MAX_LINE_LENGTH-2)
-    /* this may happen the truncation is not large enough for add_string? */
-	pips_internal_error("line buffer too small");
+    if (strlen(crt_line) + ladd_string + 2 > MAX_LINE_LENGTH)
+	/* this shouldn't happen. 
+	 */
+	pips_internal_error("something got wrong...");
 
     strcat(crt_line, add_string);
-    return first_line;
 }
 
 void
