@@ -257,6 +257,12 @@ typedef hash_table control_mapping;
 #define ENTITY_IMPLIEDDO_P(e) ENTITY_NAME_P(e, "IMPLIED-DO")
 #define ENTITY_FORMAT_P(e) ENTITY_NAME_P(e, "FORMAT")
 
+#define ENTITY_FOUR_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
+                                     ENTITY_MINUS_P(e) || \
+				     ENTITY_UNARY_MINUS_P(e) || \
+                                     ENTITY_MULTIPLY_P(e) || \
+                                     ENTITY_DIVIDE_P(e) )
+
 #define IO_CALL_P(call) io_intrinsic_p(call_function(call))
 
 /*  constant sizes
@@ -427,18 +433,12 @@ entity get_ith_##lname##_prime(int i)\
 #define HPFCIO_SUFFIX		"6"
 #define HOSTSECTION_SUFFIX	"7"
 #define DEAD_SUFFIX		"8"
+#define FAKE_SUFFIX		"9"
 
 /* property prefix for ignoring FCD directives
  * TIME, SYNCHRO and SET exists.
  */
 #define FCD_IGNORE_PREFIX	"HPFC_IGNORE_FCD_"
-
-
-#define ENTITY_FOUR_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
-                                     ENTITY_MINUS_P(e) || \
-				     ENTITY_UNARY_MINUS_P(e) || \
-                                     ENTITY_MULTIPLY_P(e) || \
-                                     ENTITY_DIVIDE_P(e) )
 
 /* soft block->sequence transition
  */
