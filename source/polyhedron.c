@@ -1754,7 +1754,7 @@ void Domain_Free(Polyhedron *Pol)  {
 
   NbRows = Pol->NbConstraints + Pol->NbRays;
   NbColumns = Pol->Dimension+2;
-  size = (NbRows * NbColumns);
+  size = Pol->p_Init_size;
   p = Pol->p_Init;
   for(i=0;i<size;i++)
     value_clear(p[i]);  
