@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/04/21 15:06:54 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/07/20 18:40:45 $, )
  * version $Revision$
  */
 
@@ -66,23 +66,19 @@ statement stat, *pstat;
      * and indices simple enough (=> normalization of loops may be usefull).
      * ??? bug: should also search for A(i,i) things that are forbidden...
      */
-    MAPL(cs,
-     {
-	 syntax
-	     s = SYNTAX(CAR(cs));
-	 reference 
-	     r = syntax_reference(s);
-	 entity
-	     array = reference_variable(r);
-
-	 if ((block_distributed_p(array)) && 
-	     (simple_indices_p(r)) &&
-	     (!replicated_p(array)))
-	     W = CONS(SYNTAX, s, W);
-	 else
-	     Wrt = CONS(SYNTAX, s, Wrt);
-     },
-	 lw);
+    MAP(SYNTAX, s,
+    {
+	reference r = syntax_reference(s);
+	entity array = reference_variable(r);
+	
+	if ((block_distributed_p(array)) && 
+	    (simple_indices_p(r)) &&
+	    (!replicated_p(array)))
+	    W = CONS(SYNTAX, s, W);
+	else
+	    Wrt = CONS(SYNTAX, s, Wrt);
+    },
+	lw);
 
     gen_free_list(lw);
     if (W==NIL) /* no ok distributed variable written ! */
@@ -104,12 +100,9 @@ statement stat, *pstat;
     lWa = CONS(CONSP, CONS(CONSP, lkind,
 		      CONS(CONSP, lvect, NIL)), NIL);
 
-    MAPL(cs,
-     {
-	 syntax
-	     s = SYNTAX(CAR(cs));
-	 reference 
-	     r = syntax_reference(s);
+    MAP(SYNTAX, s,
+    {
+	reference r = syntax_reference(s);
 
 	 if (align_check(the_written_reference, r, &lvect, &lkind))
 	 {
@@ -157,14 +150,10 @@ statement stat, *pstat;
      *
      * Wa: set of aligned written references, the first of which is ``the'' ref.
      */
-    MAPL(cs,
+    MAP(SYNTAX, s,
      {
-	 syntax
-	     s = SYNTAX(CAR(cs));
-	 reference 
-	     r = syntax_reference(s);
-	 entity
-	     array = reference_variable(r);
+	 reference r = syntax_reference(s);
+	 entity array = reference_variable(r);
 	 list lvect = NIL;
 	 list lkind = NIL;
 
@@ -314,18 +303,13 @@ reference r;
     int
 	dim = 1;
 
-    MAPL(ce,
+    MAP(EXPRESSION, e,
      {
-	 expression
-	     e = EXPRESSION(CAR(ce));
 	 normalized /* must be normalized somewhere! */
 	     n = expression_normalized(e); 
-	 int 
-	     p;
-	 bool
-	     b1 = ith_dim_distributed_p(array, dim, &p);
-	 bool
-	     b2 = ((!b1) ? local_integer_constant_expression(e) : FALSE);
+	 int p;
+	 bool b1 = ith_dim_distributed_p(array, dim, &p);
+	 bool b2 = ((!b1) ? local_integer_constant_expression(e) : FALSE);
 
 	 debug(7, "simple_indices_p",
 	       "array %s, dim %d, distributed %d, locally constant %d\n",
@@ -731,12 +715,11 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
 	lb, ub;
     entity
 	index, newindex, newlobnd, newupbnd, oldidxvl;
-    loop l, nl;
+    loop nl;
     int p, dim;
 
-    MAPL(cl,
+    MAP(LOOP, l,
      {
-	 l = LOOP(CAR(cl));
 	 index = loop_index(l);
 	 dim = which_array_dimension(the_written_reference, index);
 
@@ -895,18 +878,17 @@ entity e;
     Variable
 	v = (Variable) e;
 
-    MAPL(ce,
-     {
-	 normalized
-	     n = expression_normalized(EXPRESSION(CAR(ce)));
-
-	 if (normalized_linear_p(n) &&
-	     (vect_coeff(v, (Pvecteur)normalized_linear(n)) != 0))
-	     return(dim);
-
-	 dim++;
-     },
-	 li);
+    MAP(EXPRESSION, e,
+    {
+	normalized n = expression_normalized(e);
+	
+	if (normalized_linear_p(n) &&
+	    (vect_coeff(v, (Pvecteur)normalized_linear(n)) != 0))
+	    return(dim);
+	
+	dim++;
+    },
+	li);
 
     return(-1);
 }
@@ -1089,15 +1071,9 @@ statement stat;
 void initialize_variable_used_map_for_current_loop_nest(inner_body)
 statement inner_body;
 {
-    list
-	ll=lloop, 
-	lb=lblocks;
-    statement
-	s;
-    instruction
-	i;
-    loop
-	l;
+    list ll=lloop, lb=lblocks;
+    instruction i;
+    loop l;
 
     make_variable_used_map();     
     current_variable_used_statement = inner_body;
@@ -1111,19 +1087,18 @@ statement inner_body;
     {
 	l = LOOP(CAR(ll));
 
-	MAPL(cs,
-	 {
-	     s = STATEMENT(CAR(cs));
-	     i = statement_instruction(s);
-	     
-	     if (!(instruction_loop_p(i) && l==i))
-		 gen_recurse(s,
-			     reference_domain,
-			     gen_true,
-			     variable_used_rewrite);
-
-	 },
-	     CONSP(CAR(lb)));
+	MAP(STATEMENT, s,
+	{
+	    i = statement_instruction(s);
+	    
+	    if (!(instruction_loop_p(i) && l==i))
+		gen_recurse(s,
+			    reference_domain,
+			    gen_true,
+			    variable_used_rewrite);
+	    
+	},
+	    CONSP(CAR(lb)));
     }
 }
 
@@ -1165,14 +1140,12 @@ list *pls;
 	    number_of_distributed_dimensions
 		(reference_variable(syntax_reference(chosen)));
 
-    MAPL(cs,
-     {
-	 syntax
-	     current = SYNTAX(CAR(cs));
-	 int
-	     current_distribution = 
-		 number_of_distributed_dimensions
-		     (reference_variable(syntax_reference(current)));
+    MAP(SYNTAX, current,
+    {
+	int
+	    current_distribution = 
+		number_of_distributed_dimensions
+		    (reference_variable(syntax_reference(current)));
 
 	 if (current_distribution > chosen_distribution)
 	 {
