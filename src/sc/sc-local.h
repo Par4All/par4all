@@ -119,7 +119,7 @@ typedef struct Ssysteme {
 
 #define get_sc_debug_level() sc_debug_level
 #define ifscdebug(l) if (get_sc_debug_level()>=l)
-#define sc_default_dump(s) sc_fprint(stderr, sc, default_variable_to_string)
+#define sc_default_dump(s) sc_fprint(stderr, s, default_variable_to_string)
 
 /* MACROS */
 
