@@ -127,8 +127,12 @@ typedef hash_table control_mapping;
 #define MODULO_OPERATOR_NAME 		"MOD"
 #define MIN_OPERATOR_NAME 		"MIN"
 #define MIN0_OPERATOR_NAME 		"MIN0"
+#define AMIN1_OPERATOR_NAME 		"AMIN1"
+#define DMIN1_OPERATOR_NAME 		"DMIN1"
 #define MAX_OPERATOR_NAME 		"MAX"
 #define MAX0_OPERATOR_NAME 		"MAX0"
+#define AMAX1_OPERATOR_NAME 		"AMAX1"
+#define DMAX1_OPERATOR_NAME 		"DMAX1"
 #define IABS_OPERATOR_NAME 		"IABS"
 
 /* generic conversion names.
@@ -222,6 +226,10 @@ typedef hash_table control_mapping;
 #define ENTITY_MAX_P(e) entity_an_operator_p(e, MAX)
 #define ENTITY_MIN0_P(e) entity_an_operator_p(e, MIN0)
 #define ENTITY_MAX0_P(e) entity_an_operator_p(e, MAX0)
+#define ENTITY_AMIN1_P(e) entity_an_operator_p(e, AMIN1)
+#define ENTITY_AMAX1_P(e) entity_an_operator_p(e, AMAX1)
+#define ENTITY_DMIN1_P(e) entity_an_operator_p(e, DMIN1)
+#define ENTITY_DMAX1_P(e) entity_an_operator_p(e, DMAX1)
 #define ENTITY_MIN_OR_MAX_P(e) (ENTITY_MIN_P(e) || ENTITY_MAX_P(e) )
 #define ENTITY_IABS_P(e) entity_an_operator_p(e, IABS)
 
