@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.136  2000/05/29 13:00:42  coelho
+ * fms added.
+ *
  * Revision 1.135  2000/05/16 11:19:19  coelho
  * fixed prettypring of wrong codes (function/subroutine).
  *
@@ -247,7 +250,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.135 2000/05/16 11:19:19 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.136 2000/05/29 13:00:42 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -949,8 +952,6 @@ words_inverse_op(call obj, int precedence, bool leftmost)
   return(pc);
 }
 
-
-
 list /* of string */
 words_goto_label(string tlabel)
 {
@@ -965,10 +966,9 @@ words_goto_label(string tlabel)
     return pc;
 }
 
-/* EOLE : The multiply-add operator is used within the optimize
-   transformation ( JZ - sept 98) - fma(a,b,c) -> ((a*b)+c) */
-list /* of string */ 
-eole_fma_specific_op(call obj, int precedence, bool leftmost){
+static list 
+eole_fmx_specific_op(call obj, int precedence, bool leftmost, bool isadd)
+{
   list /* of strings */ pc = NIL;
   list /* of expressions */ args = call_arguments(obj);
 
@@ -999,8 +999,8 @@ eole_fma_specific_op(call obj, int precedence, bool leftmost){
   /* get precedence for add operator */
   prec = intrinsic_precedence("+");
 
-  /* add operator */
-  pc = CHAIN_SWORD(pc,"+");
+  /* add/sub operator */
+  pc = CHAIN_SWORD(pc, isadd? "+": "-");
 
   /* third argument */
   args = CDR(args);
@@ -1010,6 +1010,22 @@ eole_fma_specific_op(call obj, int precedence, bool leftmost){
   pc = CHAIN_SWORD(pc,")");
 
   return pc;
+}
+
+/* EOLE : The multiply-add operator is used within the optimize
+   transformation ( JZ - sept 98) - fma(a,b,c) -> ((a*b)+c)
+ */
+list /* of string */ 
+eole_fma_specific_op(call obj, int precedence, bool leftmost)
+{
+  return eole_fmx_specific_op(obj, precedence, leftmost, TRUE);
+}
+
+/* MULTIPLY-SUB operator */
+list /* of string */ 
+eole_fms_specific_op(call obj, int precedence, bool leftmost)
+{
+  return eole_fmx_specific_op(obj, precedence, leftmost, FALSE);
 }
 
 /* Check if the given operator is associated with a special
@@ -1235,7 +1251,10 @@ static struct intrinsic_handler {
     /* These operators are used within the optimize transformation in
 order to manipulate operators such as n-ary add and multiply or
 multiply-add operators ( JZ - sept 98) */
-    {EOLE_FMA_OPERATOR_NAME, eole_fma_specific_op , MINIMAL_ARITHMETIC_PRECEDENCE},
+    {EOLE_FMA_OPERATOR_NAME, eole_fma_specific_op, 
+                             MINIMAL_ARITHMETIC_PRECEDENCE },
+    {EOLE_FMS_OPERATOR_NAME, eole_fms_specific_op, 
+                             MINIMAL_ARITHMETIC_PRECEDENCE }, 
     {EOLE_SUM_OPERATOR_NAME, words_infix_nary_op, 20},
     {EOLE_PROD_OPERATOR_NAME, words_infix_nary_op, 21},
     {NULL, null, 0}
