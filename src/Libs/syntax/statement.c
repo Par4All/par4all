@@ -660,7 +660,10 @@ MakeAssignInst(syntax l, expression e)
 		       entity_local_name(call_function(syntax_call(l))));
 		   ParserError("MakeAssignInst",
 			       "bad lhs (function call or undeclared array)"
-			       " or PIPS unsupported Fortran macro\n");
+			       " or PIPS unsupported Fortran macro\n"
+			       "you might consider switching the "
+			       "PARSER_EXPAND_STATEMENT_FUNCTIONS property,\n"
+			       "in the latter, at your own risk...\n");
 	       }
 	   }
 	   else {
