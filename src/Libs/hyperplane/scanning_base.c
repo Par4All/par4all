@@ -34,21 +34,20 @@
  *             
  */
 void scanning_base_hyperplane(h,n,G)
-int h[];
+Value h[];
 int n;
 matrice G;
 {
     int k=1;
 
-   
-    if (h[0] == 0){ 
+    if (value_zero_p(h[0])){ 
 	/* search the first k / h[k]!=0 */
-	while(k<n && h[k]==0)
+	while(k<n && value_zero_p(h[k]))
 	    k++;
 	if (k==n) pips_error("scanning_base_hyperplane","h null");
 	else{ /* permution de h[0] et h[k] */
 	    h[0] = h[k];
-	    h[k] = 0;
+	    h[k] = VALUE_ZERO;
 	    base_G_h1_unnull(h,n,G);
 	    matrice_swap_rows(G,n,n,1,k+1);
 	}
@@ -56,21 +55,21 @@ matrice G;
     else 
 	base_G_h1_unnull(h,n,G);    
 }
- 	    
 	    
 /*void base_G_h1_unnull(int h[],int n,matrice G)	
  */
 void base_G_h1_unnull(h, n, G)	
-int h[];
+Value h[];
 int n;
 matrice G;
 {
     matrice U = matrice_new(n,n);
     matrice G1 = matrice_new(n,n);
-    int det_Ui = 0;
-    int det_Ui1 = 0;			/* determinant of Ui and Ui-1*/
-    int Xi,Yi;
-    int i,j,r;
+    Value det_Ui = VALUE_ZERO;
+    Value det_Ui1 = VALUE_ZERO;	/* determinant of Ui and Ui-1*/
+    Value Xi,Yi;
+    int i,j;
+    Value r;
    
     /* computation of matrix U */
     assert(n>0);
@@ -84,22 +83,22 @@ matrice G;
 	/* computation of Xi,Yi / Xi.det(Ui-1) - Yi.hi  = GCD(det(Ui-1),hi) */
 	det_Ui = bezout_grl(det_Ui1,h[i-1],&Xi,&Yi);
 	if (i ==2 || i%2 != 0)
-	    Yi = -Yi;
-	/* make  Ui - the i-th line: U[i,1]=h[i-1],U[i,2..n-1] =0,U[i,n] = Xi */
+	    value_oppose(Yi);
+	/* make  Ui - the i-th line: U[i,1]=h[i-1],U[i,2..n-1] =0,U[i,n] = Xi*/
 	ACCESS(U,n,i,1) = h[i-1];
 	ACCESS(U,n,i,i) = Xi;
         /*                                            ->i-1 */
 	/* the i-th column:U[1..n-1] = Yi/det(Ui-1) . h      */
 	for (j=1; j<=i-1; j++){
-	    r = h[j-1]/det_Ui1;
-	    ACCESS(U,n,j,i) = Yi * r;
+	    r = value_div(h[j-1],det_Ui1);
+	    ACCESS(U,n,j,i) = value_mult(Yi,r);
 	}
 	det_Ui1 = det_Ui;
     }
     for (i=1; i<=n; i++)
-        /*         ->         ->*/
+	/*         ->         ->*/
 	/* divide U1 par GCD(h) */
-	ACCESS(U,n,i,1) /= det_Ui;
+	value_division(ACCESS(U,n,i,1),det_Ui);
 
     /* computation of  matrix G */
     matrice_general_inversion(U,G1,n);
