@@ -212,6 +212,7 @@ FILE *fd;
 bool process_user_file(file)
 string file;
 {
+    bool success_p = FALSE;
     database pgm;
     FILE *fd;
     char *cwd;
@@ -254,7 +255,6 @@ string file;
     /* the new file is splitted according to Fortran standard */
     user_log("Splitting file    %s\n", file);
     cwd = strdup(get_cwd());
-    chdir(database_directory(pgm));
     /* chdir(database_directory(pgm)); */
     chdir(db_get_current_workspace_directory());
     /* reverse sort because the list of modules is reversed later */
@@ -275,6 +275,7 @@ string file;
 	/* char *modfullfilename; */
 	char * modrelfilename = NULL;
 
+	success_p = TRUE;
 	/*
 	modfullfilename = strdup(concatenate(database_directory(pgm), 
 					     "/", buffer, NULL)); */
@@ -298,5 +299,11 @@ string file;
 
     unlink(tempfile);
     tempfile = NULL;
-    return TRUE;
+
+    if(!success_p) {
+	user_warning("", "No module was found when splitting file %s.\n",
+		     abspath);
+    }
+
+    return success_p;
 }
