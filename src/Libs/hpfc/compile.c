@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/12/28 18:21:18 $, )
+ * ($Date: 1995/12/29 15:33:31 $, )
  */
 
 #include "defines-local.h"
@@ -261,18 +261,10 @@ statement stat, host_stat, node_stat;
     hpfc_print_code(host_file, host_module, host_stat);
     hpfc_fclose(host_file, host_filename);
 
-    safe_system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
-			    host_filename, " host ", 
-			    module_local_name(module), NULL));
-
     node_filename = generate_file_name(prefix, "_node.f");
     node_file = hpfc_fopen(node_filename);
     hpfc_print_code(node_file, node_module, node_stat);
     hpfc_fclose(node_file, node_filename);
-
-    safe_system(concatenate("$HPFC_TOOLS/hpfc_add_includes ", 
-			    node_filename, " node ", 
-			    module_local_name(module), NULL));
 
     parm_filename = generate_file_name(prefix, "_parameters.h");
     parm_file = hpfc_fopen(parm_filename);
@@ -301,12 +293,10 @@ statement stat, host_stat, node_stat;
     DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, strdup(prefix), node_filename);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, strdup(prefix), init_filename);
 
-    /* no! 
-    free(parm_filename),
-    free(init_filename),
-    free(host_filename),
-    free(node_filename);
-    */
+    /* no! given to the resource manager just above!
+     * free(parm_filename), free(init_filename),
+     * free(host_filename), free(node_filename);
+     */
 }
 
 void 
