@@ -25,6 +25,9 @@
 #include "pipsmake.h"
 #include "misc.h"
 
+extern makefile open_makefile();
+extern void close_makefile();
+
 /**** Begin saved_makefile version ****/
 static char pgm_makefile[MAXPATHLEN]="";
 
