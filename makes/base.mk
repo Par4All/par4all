@@ -48,6 +48,7 @@ RTM.d	= $(INSTALL_DIR)/Runtime
 MAKE.d	= $(INSTALL_DIR)/makes
 
 include $(MAKE.d)/$(ARCH).mk
+include $(MAKE.d)/svn.mk
 
 all: $(ARCH)
 
