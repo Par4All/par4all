@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/01/05 22:09:50 $, 
+ * $Date: 1997/05/22 12:38:33 $, 
  */
 
 #include <stdlib.h>
@@ -335,8 +335,8 @@ char *name;
     }
 
     if (mkdir(name, 0777) == -1) {
-	user_warning("create_directory", "cannot create directory : %s\n",
-		     name);
+	user_warning("create_directory", "cannot create directory : %s\n (%s)",
+		     name, sys_errlist[errno]);
 	success = FALSE;
     }
     else {
