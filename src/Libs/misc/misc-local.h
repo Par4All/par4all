@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1995/10/05 13:09:32 $, 
+ * $Date: 1995/10/12 13:33:14 $, 
  */
 
 /* hmmm...
@@ -20,6 +20,8 @@
  * Fabien.
  */
 #ifdef __GNUC__
+#define debug_on(env) debug_on_function(env, __FUNCTION__, __FILE__, __LINE__)
+#define debug_off() debug_off_function(__FUNCTION__, __FILE__, __LINE__)
 #define pips_debug(level, format, args...)\
  ifdebug(level) fprintf(stderr, "[%s] " format, __FUNCTION__ , ##args);
 #define pips_user_warning(format, args...)\
@@ -34,6 +36,8 @@
 		   "[%s] (%s:%d) assertion failed\n\n '%s' not verified\n\n", \
 		   __FUNCTION__ , __FILE__ , __LINE__ , what); abort();}
 #else
+#define debug_on(env) debug_on_function(env, "unknown", __FILE__, __LINE__)
+#define debug_off() debug_off_function("unknown", __FILE__, __LINE__)
 #define pips_debug pips_debug_function
 #define pips_user_warning pips_user_warning_function
 #define pips_user_error pips_user_error_function
