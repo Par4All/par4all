@@ -1,5 +1,5 @@
-/* $RCSfile: pipsmake.c,v $ (version $Revision$)
- * $Date: 1997/09/26 10:20:43 $, 
+/* $Id$
+ * 
  * pipsmake: call by need (make),
  *
  * rule selection (activate),
@@ -621,13 +621,13 @@ make_pre_transformation(string oname, rule ru)
 	    if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
 		success_p = FALSE;
 	    
-	}, reals);
-
-	/* now we must drop the up_to_date cache */
-	if (reals) {
+	    /* now we must drop the up_to_date cache.
+	     * maybe not that often? Or one should perform the transforms
+	     * Top-down to avoid recomputations, with ALL...
+	     */
 	    reset_make_cache();
 	    init_make_cache();
-	}
+	}, reals);
     }
     return TRUE;
 }
@@ -812,17 +812,27 @@ check_physical_resource_up_to_date(string rname, string oname)
 
 /* this is quite ugly, but I wanted to put the enumeration down to pipsdbm.
  */
-int 
-delete_obsolete_resources(void)
+void
+delete_some_resources(void)
 {
-    int ndeleted;
+    string what = get_string_property("PIPSDBM_RESOURCES_TO_DELETE");
     dont_interrupt_pipsmake_asap();
-    pips_assert("undefined", set_undefined_p(up_to_date_resources));
-    up_to_date_resources = set_make(set_pointer);
-    ndeleted =db_delete_obsolete_resources(check_physical_resource_up_to_date);
-    set_free(up_to_date_resources);
-    up_to_date_resources = set_undefined;
-    return ndeleted;
+
+    user_log("Deleting %s resources\n", what);
+
+    if (same_string_p(what, "obsolete")) {
+	int ndeleted;
+	init_make_cache();
+	ndeleted = 
+	    db_delete_obsolete_resources(check_physical_resource_up_to_date); 
+	reset_make_cache();
+	user_log("%d obsolete resource%s destroyed\n",
+		 ndeleted, ndeleted>1? "s": "");
+    } else if (same_string_p(what, "all")) {
+	db_delete_all_resources();
+	user_log("all resources destroyed\n");
+    } else
+	pips_internal_error("unexpected delete request %s\n", what);
 }
 
 
