@@ -31,7 +31,7 @@ extern int iPrevComm;
 #define FORMATLENGTH (4096)
 #define LOCAL static
 
-#ifndef
+#ifndef abs
 #define abs(v) (((v) < 0) ? -(v) : (v))
 #endif
 
