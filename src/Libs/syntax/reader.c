@@ -483,27 +483,47 @@ FILE * fp;
 	PrevComm[0] = '\0';
     }
     while (strchr(START_COMMENT_LINE,(c = GetChar(fp))) != NULL) {
-	/* old version:
-	  Comm[iComm++] = c;
-	  if (tmp_b_C == UNDEF)
-	  tmp_b_C = LineNumber;
+      /* old version:
+	 Comm[iComm++] = c;
+	 if (tmp_b_C == UNDEF)
+	 tmp_b_C = LineNumber;
+	 
+	 while ((c = GetChar(fp)) != '\n')
+	 Comm[iComm++] = c;
 	  
-	  while ((c = GetChar(fp)) != '\n')
-	  Comm[iComm++] = c;
-	  
-	  Comm[iComm++] = '\n';
-	  */
-	if (tmp_b_C == UNDEF)
-	    tmp_b_C = LineNumber;
+	 Comm[iComm++] = '\n';
+	 */
+      if (tmp_b_C == UNDEF)
+	tmp_b_C = LineNumber;
 
+      /* OLD VERSION
 	do {
-	    Comm[iComm++] = c;
+	  Comm[iComm++] = c;
 	} while((c = GetChar(fp)) != '\n' && iComm < COMMLENGTH-2);
-	if(iComm == COMMLENGTH-2)
-	    ParserError("ReadLine", 
-			"Too many comments. Comment buffer overflow");
-	Comm[iComm++] = c;
+      	if(iComm == COMMLENGTH-2)
+	  ParserError("ReadLine", 
+		      "Too many comments. Comment buffer overflow");
+        Comm[iComm++] = c;
+      */
+      /* Modif by AP: oct 18th 1995
+
+       	 Deals with comment buffer overflow. If the buffer is full, we
+       	 just skip everything else. */
+      if(iComm >= COMMLENGTH-2)
+	while((c = GetChar(fp)) != '\n') {continue;}
+      else {
+	do {
+	  Comm[iComm++] = c;
+	} while((c = GetChar(fp)) != '\n' && iComm < COMMLENGTH-2);
+	if(iComm >= COMMLENGTH-2)
+	  while((c = GetChar(fp)) != '\n') {continue;}
+	else
+	  Comm[iComm++] = c;
+      }
     }
+    if(iComm >= COMMLENGTH-2)
+      user_warning("ReadLine", 
+		   "Too many comments. Comment buffer overflow\n");
 
     if (c != EOF) {
 	/*
