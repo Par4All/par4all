@@ -817,3 +817,17 @@ if (instruction_tag(statement_instruction(stmt)) != is_instruction_block)
   }
 return (stmt);
 }
+
+string statement_identification(statement s)
+{
+    static char buffer[50];
+    int so = statement_ordering(s);
+
+    sprintf(buffer, "%d (%d, %d) at 0x%x\n",
+	    ORDERING_NUMBER(so),
+	    ORDERING_STATEMENT(so),
+	    statement_number(s),
+	    (unsigned int) s);
+
+    return buffer;
+}
