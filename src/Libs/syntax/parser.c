@@ -1,3 +1,12 @@
+/* Pre-parser for Fortran syntax idiosyncrasy
+ *
+ * $Id$
+ *
+ * $Log: parser.c,v $
+ * Revision 1.36  2002/03/08 10:21:53  irigoin
+ * StackArea added and some reformatting
+ *
+ */
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -17,7 +26,7 @@
 
 #include "misc.h"
 #include "pipsdbm.h"
-
+
 /*
  * declarations of extern variables
  */
@@ -33,12 +42,17 @@ cons *FormalParameters = NIL;
 /* the name of the current package, i.e. TOP-LEVEL or a module name? */
 char *CurrentPackage = NULL; 
 
-/* two areas used to allocate variables which are not stored in 
-   a common. These two areas are just like commons, but the dynamic 
-   area is the only non-static area. */
+/* Four areas used to allocate variables which are not stored in a
+   common. These areas are just like commons, but the dynamic area is the
+   only non-static area according to Fortran standard. The heap and the
+   stack area are used to deal with ANSI extensions, pointers and
+   allocatable arrays, and adjustable arrays. The dynamic area is stack
+   allocated by most compilers but could be statically allocated since the
+   array sizes are known. */
 entity DynamicArea = entity_undefined;
 entity StaticArea = entity_undefined;
 entity HeapArea = entity_undefined;
+entity StackArea = entity_undefined;
 
 /* Indicates where the current instruction (in fact statement) starts and
    ends in the input file and gives its label. Temporary versions of these
@@ -49,7 +63,7 @@ entity HeapArea = entity_undefined;
    consistent. */
 int line_b_I, line_e_I, line_b_C, line_e_C;
 char lab_I[6];
-
+
 void
 reset_current_label_string()
 {
