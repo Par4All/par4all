@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: install_pips_sources,v $ ($Date: 1995/10/04 11:41:16 $, )
+# $RCSfile: install_pips_sources,v $ ($Date: 1996/08/26 11:41:54 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -80,7 +80,7 @@ $DEBUG "target directory is $TARGET_DIR"
 
 $VERBOSE "entering directory $TARGET_DIR"
 
-[ -d "$TARGET_DIR" ] || mkdir $TARGET_DIR $TARGET_DIR/SCCS
+[ -d "$TARGET_DIR" ] || mkdir $TARGET_DIR 
 cd $TARGET_DIR
 [ -d OLD ] || mkdir OLD
 [ -d SCCS ] || mkdir SCCS
@@ -114,7 +114,7 @@ do
   then
     $VERBOSE "directory, recursing"
     $0 $OPTIONS -y "$COMMENT" -s "$src_item" -t "$trg_item" \
-    	`cd $src_item ; find * -type d -prune -o -type f ! -name '*~' -print`
+    	`cd $src_item ; echo * | sed '/~/d;/SCCS/d;/OLD/d'`
     $DEBUG "end of recursion"
     continue
   fi
