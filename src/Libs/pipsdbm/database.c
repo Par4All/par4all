@@ -57,6 +57,9 @@ void db_create_pips_database(void)
     DB_UNDEF; init_pips_database(); DB_OK;
 }
 
+/* latter */
+static void db_clean_db_resources(db_resources);
+
 /* @return whether okay.
  */
 bool db_open_pips_database(FILE * fd)
@@ -64,6 +67,10 @@ bool db_open_pips_database(FILE * fd)
     db_resources rs;
     DB_UNDEF; 
     rs = read_db_resources(fd);
+
+    /* coredump in copy if done on save in next function ???. */
+    db_clean_db_resources(rs);
+
     if (db_resources_undefined_p(rs)) return FALSE;
     set_pips_database(rs); 
     DB_OK;
@@ -72,9 +79,15 @@ bool db_open_pips_database(FILE * fd)
 
 void db_save_pips_database(FILE * fd)
 {
-    DB_OK; 
-    /* ??? check for required resources left over? */
-    write_db_resources(fd, get_pips_database());
+  /* db_resources dbres; */
+  DB_OK; 
+  /* ??? check for required resources left over? */
+
+  /* save a cleaned COPY with status artificially set as STORED... */
+  /* dbres = copy_db_resources(get_pips_database());
+     db_clean_db_resources(dbres);*/
+  write_db_resources(fd, get_pips_database());
+  /* free_db_resources(dbres); */
 }
 
 void db_close_pips_database(void)
@@ -180,10 +193,31 @@ static db_resource find_or_create_db_resource(string rname, string oname)
     if (db_resource_undefined_p(r))
     { /* create it */
 	db_symbol rs = find_or_create_db_symbol(rname); 
-	r = make_db_resource(string_undefined, db_status_undefined, 0, 0);
+	r = make_db_resource(NULL, db_status_undefined, 0, 0);
 	extend_db_owned_resources(or, rs, r);
     }
     return r;
+}
+
+/* on checkpoints, status may be "loaded", but is is not true!
+ */
+static void db_clean_db_resources(db_resources dbres)
+{
+  DB_RESOURCES_MAP(os, or,
+  {
+    DB_OWNED_RESOURCES_MAP(rs, r,
+    {
+      if (!db_resource_stored_p(r)) 
+      {
+	pips_debug(5, "resource %s[%s] set as stored\n",
+		   db_symbol_name(os), db_symbol_name(rs));
+	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
+	db_resource_pointer(r) = NULL;
+      }
+    },
+			   or)
+      },
+		   dbres);
 }
 
 void db_delete_resource(string rname, string oname)
@@ -383,7 +417,7 @@ static void db_save_and_free_resource(
 				    db_resource_pointer(r), do_free);
 	if (do_free)
 	{
-	  db_resource_pointer(r) = string_undefined;
+	  db_resource_pointer(r) = NULL;
 	  db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
 	  db_resource_file_time(r) = 
 	    dbll_stat_resource_file(rname, oname, TRUE);
@@ -392,7 +426,7 @@ static void db_save_and_free_resource(
       if (do_free)
       {
         dbll_free_resource(rname, oname, db_resource_pointer(r));
-        db_resource_pointer(r) = string_undefined;
+        db_resource_pointer(r) = NULL;
 	db_delete_resource(rname, oname);
       }
     }
@@ -437,8 +471,8 @@ string db_get_memory_resource(string rname, string oname, bool pure)
     {
 	if (dbll_storable_p(rname)) {
             /* make as stored now... */
-	    db_resource_pointer(r) = string_undefined;
-	    db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
+	  db_resource_pointer(r) = NULL;
+	  db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
 	} else /* lost */
 	    db_delete_resource(rname, oname);
     }
@@ -459,11 +493,10 @@ void db_set_resource_as_required(string rname, string oname)
   if (db_status_undefined_p(s))
     /* newly created db_resource... */
     db_resource_db_status(r) = make_db_status(is_db_status_required, UU);
-  else if (db_status_loaded_p(s) && 
-	   !string_undefined_p(db_resource_pointer(r)))
+  else if (db_status_loaded_p(s) && db_resource_pointer(r))
   {
     dbll_free_resource(rname, oname, db_resource_pointer(r));
-    db_resource_pointer(r) = string_undefined;
+    db_resource_pointer(r) = NULL;
   }
 
   db_status_tag(db_resource_db_status(r)) = is_db_status_required;
@@ -576,28 +609,6 @@ void db_reset_current_module_name(void)
 
 /***************************************************************** CLEANING */
 
-void db_clean_db_resources(db_resources dbres)
-{
-  DB_OK;
-
-  /* on checkpoints, status may be "loaded", but is is not true!
-   */
-  DB_RESOURCES_MAP(os, or,
-  {
-    DB_OWNED_RESOURCES_MAP(rs, r,
-    {
-      if (!db_resource_stored_p(r)) 
-      {
-	pips_debug(5, "resource %s[%s] set as stored\n",
-		   db_symbol_name(os), db_symbol_name(rs));
-	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
-	db_resource_pointer(r) = string_undefined;
-      }
-    },
-			   or)
-      },
-		   dbres);
-}
 
 /* delete all obsolete resources before a close.
  * return the number of resources destroyed.
