@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1996/08/21 15:19:47 $, ) 
+# ($Date: 1996/09/17 19:18:19 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -33,6 +33,10 @@
 #  - source environment if necessary
 
 [ "$PIPS_ROOT" ] || . /projects/Pips/pipsrc.sh
+
+[ "$PIPS_VALIDDIR" ] || PIPS_VALIDDIR=$PIPS_ROOT/Validation
+export PIPS_VALIDDIR
+
 umask 002
 
 vdir=${PIPS_VALIDDIR}
