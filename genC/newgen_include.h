@@ -206,7 +206,7 @@ extern hash_table Gen_tabulated_names ;
 /* External routines. */
 extern char *alloc() ;
 extern void user() ;
-#ifdef flex_scanner
+#ifdef FLEX_SCANNER
 extern char *genspec_text ;
 extern char *genread_text ;
 #else
