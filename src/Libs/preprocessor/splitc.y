@@ -1,5 +1,8 @@
 /* $Id$
    $Log: splitc.y,v $
+   Revision 1.10  2003/12/16 13:37:06  irigoin
+   Explicit reference to character '%' replaced by an occurence of FILE_SEP_STRING
+
    Revision 1.9  2003/09/01 15:00:40  irigoin
    Small bug for Rule 4 fixed.
 
@@ -122,7 +125,7 @@ extern hash_table keyword_typedef_table;
    which are used later by direct_decl to create the entity. 
 
    For the moment, block scope is not considered. CurrentScope can be File, 
-   Module, File%Module or TOP-LEVEL*/
+   Module, File'FILE_SEP_STRING'Module or TOP-LEVEL*/
 
 /* static string CurrentScope = NULL; */
 /*
