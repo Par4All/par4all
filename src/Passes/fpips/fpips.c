@@ -8,16 +8,19 @@
  * be exported, reducing the size of binary distributions.
  * The execution depends on the name of the executable, or the first option.
  *
- * C macros of interest: FPIPS_WITHOUT_{,T,W}PIPS
+ * C macros of interest: FPIPS_WITHOUT_{,T,W}PIPS to disable some versions.
  *
  * FC, Mon Aug 18 09:09:32 GMT 1997
  *
  * $Log: fpips.c,v $
+ * Revision 1.12  1998/07/25 09:35:52  coelho
+ * more comments.
+ * verbose when default chosen.
+ *
  * Revision 1.11  1998/07/21 17:46:06  coelho
  * options with getopt. -v option added.
  *
  */
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,20 +53,30 @@ extern int wpips_main(int, char**);
 #define WPIPS(c, v) wpips_main(c, v)
 #endif
 
+#define USAGE							\
+    "Usage: fpips [-hvPTW] (other options and arguments...)\n"	\
+    "\t-h: this help...\n"					\
+    "\t-v: version\n"						\
+    "\t-P: pips\n"						\
+    "\t-T: tpips\n"						\
+    "\t-W: wpips\n"						\
+    "\tdefault: run as tpips\n\n"
 
 /******************************************************************** UTILS */
 
+/* print out usage informations.
+ */
 static int fpips_usage(int ret)
 {
-    fprintf(stderr, 
-	    "Usage: fpips [-hvPTW] (other options and arguments...)\n"
-	    "\t-h: this help...\n"
-	    "\r-v: version\n"
-	    "\t-P: pips\n"
-	    "\t-T: tpips\n"
-	    "\t-W: wpips\n"
-	    "\tdefault: tpips\n");
+    fprintf(stderr, USAGE);
+    return ret;
+}
 
+/* print out fpips version.
+ */
+static int fpips_version(int ret)
+{
+    fprintf(stderr, "[fpips] (ARCH=" SOFT_ARCH ", DATE=" UTC_DATE ")\n\n");
     return ret;
 }
 
@@ -75,7 +88,7 @@ int fpips_error(char * what, int argc, char ** argv)
     return fpips_usage(1);
 }
 
-/* returns wether name ends with ref 
+/* returns whether name ends with ref 
  */
 static int name_end_p(char * name, char * ref)
 {
@@ -85,12 +98,6 @@ static int name_end_p(char * name, char * ref)
 	if (ref[--rlen]!=name[--nlen]) 
 	    return FALSE;
     return TRUE;
-}
-
-static int fpips_version(int ret)
-{
-    fprintf(stderr, "fpips: (ARCH=" SOFT_ARCH ", DATE=" UTC_DATE ")\n");
-    return ret;
 }
 
 /********************************************************************* MAIN */
@@ -114,12 +121,7 @@ int fpips_main(int argc, char **  argv)
     if (name_end_p(argv[0], "/pips") || same_string_p(argv[0], "pips"))
 	return  PIPS(argc, argv);
 
-    /* else look for the first option, if any.
-     */
-    if (argc<2) TPIPS(argc, argv);
-
-    /* options.
-     * parsing may be continuate by called version.
+    /* parsing of options may be continuate by called version.
      */
     while ((opt = getopt(argc, argv, "hvPTW"))!=-1)
     {
@@ -136,5 +138,6 @@ int fpips_main(int argc, char **  argv)
 
     /* else try tpips...
      */
+    fprintf(stderr, "[fpips] default: running as tpips\n\n");
     return TPIPS(argc, argv);
 }
