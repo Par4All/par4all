@@ -341,8 +341,8 @@ reference r;
      {
 	 expression
 	     e = EXPRESSION(CAR(ce));
-	 normalized
-	     n = expression_normalized(e);
+	 normalized /* must be normalized somewhere! */
+	     n = expression_normalized(e); 
 	 int 
 	     p;
 	 bool
@@ -356,10 +356,11 @@ reference r;
 
 	 if (!b2)
 	 {
-	 if (normalized_complex_p(n)) /* cannot decide, so it is supposed to be FALSE */
+	 if (normalized_complex_p(n)) 
+	     /* cannot decide, so it is supposed to be FALSE */
 	 {
 	     debug(7, "simple_indices_p",
-		   "returning FALSE because complex for reference to %s, dim %d\n",
+		   "returning FALSE (complex) for ref to %s, dim %d\n",
 		   entity_name(reference_variable(r)), dim);
 	     return(FALSE); 
 	 }
@@ -377,7 +378,7 @@ reference r;
 		 ((int) vect_coeff(TCST, v)==0))
 	     {
 		 debug(7, "simple_indices_p",
-		   "returning FALSE because not simple for reference to %s, dim %d\n",
+		   "returning FALSE (not simple) for ref to %s, dim %d\n",
 		   entity_name(reference_variable(r)), dim);
 		 return(FALSE);
 	     }
@@ -397,7 +398,7 @@ reference r;
 		 if (rate!=0 && rate!=1)
 		 {
 		     debug(7, "simple_indices_p",
-			   "returning FALSE because no simple alignment for %s, dim %d\n",
+			   "returning FALSE (stride) for %s, dim %d\n",
 			   entity_name(reference_variable(r)), dim);
 		     return(FALSE);
 		 }
