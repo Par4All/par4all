@@ -1,5 +1,5 @@
 /* $RCSfile: pipsmake.c,v $ (version $Revision$)
- * $Date: 1997/03/29 10:20:01 $, 
+ * $Date: 1997/04/16 14:24:13 $, 
  * pipsmake: call by need (make),
  *
  * rule selection (activate),
@@ -199,6 +199,12 @@ void reset_make_cache()
     up_to_date_resources = set_undefined;
 }
 
+void init_make_cache()
+{
+    pips_assert("not set", set_undefined_p(up_to_date_resources));
+    up_to_date_resources = set_make(set_pointer);
+}
+
 static bool make(rname, oname)
 string rname, oname;
 {
@@ -207,21 +213,19 @@ string rname, oname;
     debug_on("PIPSMAKE_DEBUG_LEVEL");
     debug(1, "make", "%s(%s) - requested\n", rname, oname);
 
-    pips_assert("make", set_undefined_p(up_to_date_resources));
-    up_to_date_resources = set_make(set_pointer);
+    init_make_cache();
+
     dont_interrupt_pipsmake_asap();
     save_active_phases();
 
     success_p = rmake(rname, oname);
 
-    set_free(up_to_date_resources);
-    up_to_date_resources = set_undefined;
+    reset_make_cache();
     retrieve_active_phases();
 
-    if (success_p)
-	debug(1, "make", "%s(%s) - made\n", rname, oname);
-    else
-	debug(1, "make", "%s(%s) - could not be made\n", rname, oname);
+    pips_debug(1, "%s(%s) - %smade\n", 
+	       rname, oname, success_p? "": "could not be ");
+
     debug_off();
 
     return success_p;
