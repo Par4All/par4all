@@ -2,12 +2,17 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1995/09/12 14:26:10 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1995/10/04 10:54:03 $, )
  * version $Revision$,
  */
 
 #include "defines-local.h"
 #include "bootstrap.h"
+
+#include "control.h"
+#include "regions.h"
+#include "semantics.h"
+#include "effects.h"
 
 extern entity CreateIntrinsic(string name);                 /* in syntax.h */
 extern entity MakeExternalFunction(entity e, type r);       /* idem */
@@ -115,16 +120,10 @@ basic b;
 }
 
 
-/******************************************************************************/
-/*
- *                       mere statements generation
- */
+/****************************************************** STATEMENTS GENERATION */
 
-/******************************************************************************/
-/*
- * Sends
+/* Sends
  */
-
 statement st_call_send_or_receive(f, r)
 entity f;
 reference r;
@@ -136,13 +135,7 @@ reference r;
 		NIL)));
 }
 
-/******************************************************************************/
-/*
- * Computes
- */
-
-/*
- *
+/* Computes
  */
 statement st_compute_current_computer(ref)
 reference ref;
@@ -166,9 +159,6 @@ reference ref;
 			  NIL));
 }
 
-/*
- * statement st_compute_current_owners(ref)
- */
 statement st_compute_current_owners(ref)
 reference ref;
 {
@@ -423,9 +413,7 @@ string hpfc_main_entity_name(entity e)
     return(module_local_name(hpfc_main_entity(e)));
 }
 
-/* string bound_parameter_name(array, side, dim)
- *
- * returns a name for the bound of the declaration 
+/* returns a name for the bound of the declaration 
  * of array array, side side and dimension dim.
  */
 string bound_parameter_name(array, side, dim)
@@ -433,7 +421,7 @@ entity array;
 string side;
 int dim;
 {
-    char buffer[100];
+    char buffer[100]; /* ??? */
 
     return strdup(sprintf(buffer, "%s_%s_%s%d",
 			  hpfc_main_entity_name(array),
@@ -503,7 +491,262 @@ int nargs;
     return(MakeRunTimeSupportSubroutine(buffer, nargs));
 }
 
-/*
- * that is all
+/************************************************* HPFC ENTITIES MANAGEMENT */
+
+/* this file stores the table that describes run time functions and
+ * variables that may be called or referenced by the generated code.
+ * the information needed (name, arity, type...) is stored in a static
+ * table here. The table is scanned to create the corresponding entities
+ * for once. Then the entities are quickly returned on demand thru the
+ * hpfc_name_to_entity function. It was inspired to me by some static
+ * table here around in PIPS, that deal with intrinsics for instance.
  */
 
+/*  local defines
+ */
+
+#define is_end 0
+#define is_sub 1
+#define is_fun 2
+#define is_var 3
+#define is_int 4
+#define is_ifn 5 /* intrinsic like function */
+#define is_iof 6 /* I/O like function */
+
+#define no_basic	is_basic_overloaded
+#define no_entity	entity_undefined
+
+typedef struct 
+{
+    char    name[30];
+    int     arity;
+    int     what; /* function or subroutine or variable or ...*/
+    tag     basic;/* basic tag if necessary */
+    entity  object;
+} RunTimeSupportDescriptor;
+
+static RunTimeSupportDescriptor RTSTable[] =
+{
+    { SND_TO_C,		2, is_sub, no_basic, no_entity },
+    { SND_TO_H,		2, is_sub, no_basic, no_entity },
+    { SND_TO_A,		2, is_sub, no_basic, no_entity },
+    { SND_TO_A_BY_H, 	2, is_sub, no_basic, no_entity },
+    { SND_TO_O,		2, is_sub, no_basic, no_entity },
+    { SND_TO_OS, 	2, is_sub, no_basic, no_entity },
+    { SND_TO_OOS, 	2, is_sub, no_basic, no_entity },
+    { SND_TO_HA, 	2, is_sub, no_basic, no_entity },
+    { SND_TO_NO, 	2, is_sub, no_basic, no_entity },
+    { SND_TO_HNO, 	2, is_sub, no_basic, no_entity },
+    { RCV_FR_S,		2, is_sub, no_basic, no_entity },
+    { RCV_FR_H,		2, is_sub, no_basic, no_entity },
+    { RCV_FR_C,		2, is_sub, no_basic, no_entity },
+    { RCV_FR_mCS, 	2, is_sub, no_basic, no_entity },
+    { RCV_FR_mCH, 	2, is_sub, no_basic, no_entity },
+/*    { CMP_COMPUTER, 	1, is_sub, no_basic, no_entity },*/
+    { CMP_COMPUTER, 	8, is_sub, no_basic, no_entity },
+/*    { CMP_OWNERS, 	1, is_sub, no_basic, no_entity }, */
+    { CMP_OWNERS, 	8, is_sub, no_basic, no_entity },
+    { CMP_NEIGHBOUR, 	1, is_sub, no_basic, no_entity },
+    { CMP_LID,		8, is_fun, no_basic, no_entity },
+    { CND_SENDERP, 	0, is_fun, no_basic, no_entity },
+    { CND_OWNERP, 	0, is_fun, no_basic, no_entity },
+    { CND_COMPUTERP, 	0, is_fun, no_basic, no_entity },
+    { CND_COMPINOWNP, 	0, is_fun, no_basic, no_entity },
+    { LOCAL_IND, 	3, is_fun, no_basic, no_entity },
+    { LOCAL_IND_GAMMA, 	3, is_fun, no_basic, no_entity },
+    { LOCAL_IND_DELTA, 	3, is_fun, no_basic, no_entity },
+    { IDIVIDE,		2, is_fun, no_basic, no_entity },
+    { INIT_HOST, 	0, is_sub, no_basic, no_entity },
+    { INIT_NODE, 	0, is_sub, no_basic, no_entity },
+    { HOST_END, 	0, is_sub, no_basic, no_entity },
+    { NODE_END, 	0, is_sub, no_basic, no_entity },
+    { LOOP_BOUNDS, 	0, is_sub, no_basic, no_entity },
+    { SYNCHRO, 		0, is_sub, no_basic, no_entity },
+    { SND_TO_N, 	0, is_sub, no_basic, no_entity },
+    { RCV_FR_N, 	0, is_sub, no_basic, no_entity },
+
+/*  PVM 3 stuff
+ */
+    { PVM_INITSEND,	2, is_sub, no_basic, no_entity },
+    { PVM_SEND,		3, is_sub, no_basic, no_entity },
+    { PVM_RECV,		3, is_sub, no_basic, no_entity },
+    { PVM_CAST,		4, is_sub, no_basic, no_entity },
+    { PVM_PACK,		5, is_sub, no_basic, no_entity },
+    { PVM_UNPACK,	5, is_sub, no_basic, no_entity },
+
+/*  Variables: the overloaded ones *must* be kept overloaded, otherwise
+ *             they may be added in the declarations, while there are 
+ *             in the included commons...
+ */
+    { MYPOS,		2, is_var, no_basic, no_entity },
+    { MYLID,		0, is_var, no_basic, no_entity },
+    { MSTATUS,		0, is_var, no_basic, no_entity },
+    { INFO,		0, is_var, is_basic_int, 	no_entity },
+    { BUFID,		0, is_var, is_basic_int,	no_entity },
+    { NBTASKS, 		0, is_var, no_basic, no_entity },
+    { T_LID,		0, is_var, is_basic_int, 	no_entity },
+    { T_LIDp,		0, is_var, is_basic_int, 	no_entity },
+    { NODETIDS, 	1, is_var, no_basic, no_entity },
+    { SEND_CHANNELS, 	1, is_var, no_basic, no_entity },
+    { RECV_CHANNELS, 	1, is_var, no_basic, no_entity },
+    { MCASTHOST, 	0, is_var, no_basic, no_entity },
+    { HOST_TID, 	0, is_var, no_basic, no_entity },
+    { HOST_CHANNEL, 	0, is_var, no_basic, no_entity },
+
+/* common /hpfc_buffers/
+ */
+    { LAZY_SEND, 	0, is_var, no_basic, no_entity },
+    { LAZY_RECV,	0, is_var, no_basic, no_entity },
+    { SND_NOT_INIT,	0, is_var, no_basic, no_entity },
+    { RCV_NOT_PRF,	0, is_var, no_basic, no_entity },
+    { BUFFER_SIZE,	0, is_var, no_basic, no_entity },
+    { BUFFER_INDEX, 	0, is_var, no_basic, no_entity },
+    { BUFFER_RCV_SIZE,	0, is_var, no_basic, no_entity },
+    { BUFFER_ENCODING,	0, is_var, no_basic, no_entity },
+  
+    /* typed buffers 
+     */
+    { PVM_BYTE1 BUFFER,			1, is_var, no_basic, no_entity },
+    { PVM_INTEGER2 BUFFER,		1, is_var, no_basic, no_entity },
+    { PVM_INTEGER4 BUFFER,		1, is_var, no_basic, no_entity },
+    { PVM_REAL4 BUFFER,			1, is_var, no_basic, no_entity },
+    { PVM_REAL8 BUFFER,			1, is_var, no_basic, no_entity },
+    { PVM_COMPLEX8 BUFFER,		1, is_var, no_basic, no_entity },
+    { PVM_COMPLEX16 BUFFER,		1, is_var, no_basic, no_entity },
+
+    /* typed buffer sizes
+     */
+    { PVM_BYTE1 BUFSZ,			1, is_var, no_basic, no_entity },
+    { PVM_INTEGER2 BUFSZ,		1, is_var, no_basic, no_entity },
+    { PVM_INTEGER4 BUFSZ,		1, is_var, no_basic, no_entity },
+    { PVM_REAL4 BUFSZ,			1, is_var, no_basic, no_entity },
+    { PVM_REAL8 BUFSZ,			1, is_var, no_basic, no_entity },
+    { PVM_COMPLEX8 BUFSZ,		1, is_var, no_basic, no_entity },
+    { PVM_COMPLEX16 BUFSZ,		1, is_var, no_basic, no_entity },
+
+    /* typed pack/unpack hpfc functions, for buffer management.
+     */
+    { PVM_BYTE1 BUFPCK,			0, is_sub, no_basic, no_entity },
+    { PVM_INTEGER2 BUFPCK,		0, is_sub, no_basic, no_entity },
+    { PVM_INTEGER4 BUFPCK,		0, is_sub, no_basic, no_entity },
+    { PVM_REAL4 BUFPCK,			0, is_sub, no_basic, no_entity },
+    { PVM_REAL8 BUFPCK,			0, is_sub, no_basic, no_entity },
+    { PVM_COMPLEX8 BUFPCK,		0, is_sub, no_basic, no_entity },
+    { PVM_COMPLEX16 BUFPCK,		0, is_sub, no_basic, no_entity },
+
+    { PVM_BYTE1 BUFUPK,			0, is_sub, no_basic, no_entity },
+    { PVM_INTEGER2 BUFUPK,		0, is_sub, no_basic, no_entity },
+    { PVM_INTEGER4 BUFUPK,		0, is_sub, no_basic, no_entity },
+    { PVM_REAL4 BUFUPK,			0, is_sub, no_basic, no_entity },
+    { PVM_REAL8 BUFUPK,			0, is_sub, no_basic, no_entity },
+    { PVM_COMPLEX8 BUFUPK,		0, is_sub, no_basic, no_entity },
+    { PVM_COMPLEX16 BUFUPK,		0, is_sub, no_basic, no_entity },
+
+/* special FCD target calls.
+ */
+    { HOST_TIMEON,	0, is_sub, no_basic, no_entity },
+    { NODE_TIMEON,	0, is_sub, no_basic, no_entity },
+    { HOST_TIMEOFF,	0, is_sub, no_basic, no_entity },
+    { NODE_TIMEOFF,	0, is_sub, no_basic, no_entity },
+
+/* special FCD calls needed for translation...
+ */
+    { HPF_PREFIX SYNCHRO_SUFFIX, 0, is_sub, no_basic, no_entity },
+    { HPF_PREFIX TIMEON_SUFFIX,  0, is_sub, no_basic, no_entity },
+    { HPF_PREFIX TIMEOFF_SUFFIX, 0, is_sub, no_basic, no_entity },
+
+/* End
+ */
+    { "", 0, is_end, -1, NULL },
+};
+
+/* to be seen from outside of this file
+ */
+void hpfc_init_run_time_entities()
+{
+    RunTimeSupportDescriptor *current;
+    int i=0;
+    list l=NIL;
+
+    for(current=RTSTable;
+	current->what!=is_end;
+	current++)
+    {
+	pips_debug(6, "initializing %s, %d\n", current->name, current->arity);
+
+	switch(current->what)
+	{
+	case is_fun:
+	    current->object = MakeRunTimeSupportFunction(current->name, 
+							 current->arity,
+							 current->basic);
+	    break;
+	case is_sub:
+	    current->object = MakeRunTimeSupportSubroutine(current->name, 
+							   current->arity);
+	    break;
+	case is_ifn: /* they are declared as variables to avoid redefinitions */
+	case is_iof:
+	case is_var:
+	    current->object = 
+		make_scalar_entity(current->name,
+				   HPFC_PACKAGE, /* why not */
+				   MakeBasic(current->basic));
+	    l = NIL;
+	    for(i=1; i<=current->arity; i++)
+		l = CONS(DIMENSION,
+			 make_dimension(int_to_expression(1),
+					int_to_expression(1)),
+			 l);
+	    variable_dimensions
+		(type_variable(entity_type(current->object))) =	l;
+	    break;
+	default:
+	    pips_error("hpfc_init_run_time_entities",
+		       "unexpected what field in Descriptor\n");
+	}    
+    }
+}
+
+static RunTimeSupportDescriptor *find_entry_by_name(name)
+string name;
+{
+    RunTimeSupportDescriptor *current;
+
+    for(current=RTSTable; current->what!=is_end; current++)
+	if (!strcmp(current->name, name)) 
+	    return current;
+    
+    return (RunTimeSupportDescriptor *) NULL;
+}
+
+entity hpfc_name_to_entity(name)
+string name;
+{
+    RunTimeSupportDescriptor *entry = find_entry_by_name(name);
+
+    if (entry) return entry->object;
+
+    pips_error("hpfc_name_to_entity", "%s not found\n", name);
+    
+    return entity_undefined; /* just to avoid a gcc warning */
+}
+
+bool hpfc_intrinsic_like_function(e)
+entity e;
+{
+    RunTimeSupportDescriptor *entry = find_entry_by_name(entity_local_name(e));
+
+    return entry ? entry->what==is_ifn : FALSE;
+}
+
+bool hpfc_io_like_function(e)
+entity e;
+{
+    RunTimeSupportDescriptor *entry = find_entry_by_name(entity_local_name(e));
+
+    return entry ? entry->what==is_iof : FALSE;
+}
+
+/* that is all
+ */
