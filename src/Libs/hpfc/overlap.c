@@ -2,7 +2,7 @@
  * Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1994/09/01 15:47:54 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1994/12/22 16:52:23 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -174,8 +174,7 @@ list l;
 	 int 
 	     i;
 
-	 pips_assert("perform_declaration_corrections",
-		     type_variable_p(entity_type(ent)));
+	 assert(type_variable_p(entity_type(ent)));
 
 	 for (i=1 ; i<=ndim ; i++)
 	 {
