@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/03/21 08:51:31 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/03/21 15:56:02 $, )
  * version $Revision$
  *
  * Compiler
@@ -104,6 +104,50 @@ statement *hoststatp,*nodestatp;
 
     DEBUG_STAT(9, entity_name(host_module), *hoststatp);
     DEBUG_STAT(9, entity_name(node_module), *nodestatp);
+}
+
+/* return the list of bounds
+ */
+static list /* of expression */ 
+caller_list_of_bounds(
+    entity fun,
+    list /* of expression */ le)
+{
+    list /* of expression */ lneeded = NIL;
+    int len = gen_length(le);
+
+    for (; len>=1; len--)
+    {
+	expression e = EXPRESSION(gen_nth(len-1, le));
+	syntax s = expression_syntax(e);
+
+	if (syntax_reference_p(s)) 
+	{
+	    entity var, old;
+
+	    var = reference_variable(syntax_reference(s));
+	    old = load_old_node(var);
+	    pips_debug(8, "considering %s\n", entity_name(var));
+
+	    if (array_distributed_p(old))
+	    {
+		int dim = NumberOfDimension(var);
+
+		for (; dim>=1; dim--)
+		{
+		    if (ith_dim_overlapable_p(old, dim))
+		    {
+			lneeded = 
+			    CONS(EXPRESSION, hpfc_array_bound(var, FALSE, dim),
+			    CONS(EXPRESSION, hpfc_array_bound(var, TRUE, dim),
+				 lneeded));
+		    }
+		}
+	    }
+	}
+    }
+
+    return lneeded;
 }
 
 static void 
@@ -229,7 +273,7 @@ hpf_compile_call(
 	    make_call(fun, leh);
 
 	instruction_call(statement_instruction((*nodestatp)))=
-	    make_call(fun, len);
+	    make_call(fun, gen_nconc(len, caller_list_of_bounds(fun, args)));
 
 	DEBUG_STAT(8, entity_name(host_module), *hoststatp);
 	DEBUG_STAT(8, entity_name(node_module), *nodestatp);
