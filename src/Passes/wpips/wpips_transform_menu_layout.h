@@ -45,3 +45,6 @@
 {
    STF_TRANSFORM, BUILDER_STF
       },
+{
+   "Use-Def elimination", BUILDER_USE_DEF_ELIMINATION
+      },
