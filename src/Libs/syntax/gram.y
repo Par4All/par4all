@@ -1293,6 +1293,11 @@ fortran_basic_type: TK_INTEGER
 		    $$ = is_basic_complex; 
 		    CurrentTypeSize = DEFAULT_COMPLEX_TYPE_SIZE;
 	    }
+        | TK_DOUBLECOMPLEX
+            {
+	            $$ = is_basic_complex;
+		    CurrentTypeSize = DEFAULT_DOUBLECOMPLEX_TYPE_SIZE;
+	    }
 	| TK_CHARACTER
 	    {
 		    $$ = is_basic_string; 
