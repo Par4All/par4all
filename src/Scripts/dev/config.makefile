@@ -26,6 +26,7 @@ SRC_MACROS =	auto.h \
 		makefile_macros.flags \
 		makefile_macros.gnu \
 		makefile_macros.gnutools \
+		makefile_macros.linux \
 		makefile_macros.ll \
 		makefile_macros.misc \
 		makefile_macros.. \
