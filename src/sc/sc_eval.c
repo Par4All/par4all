@@ -1,6 +1,6 @@
 /* package sc
  * $RCSfile: sc_eval.c,v $ (version $Revision$)
- * $Date: 1996/08/06 19:51:36 $, 
+ * $Date: 1997/07/22 11:04:18 $, 
  */
 
 #include <string.h>
@@ -330,8 +330,8 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 	if_debug_sc_minmax_of_variable2 {
 	    fprintf(stderr,
 		    "[sc_minmax_of_variable2]: After call to sc_normalize\n");
-	    fprintf(stderr, "[sc_minmax_of_variable2]: Input system %x\n",
-		    (unsigned int) ps);
+	    fprintf(stderr, "[sc_minmax_of_variable2]: Input system %p\n",
+		    ps);
 	    sc_dump(ps);
 	}
 
@@ -531,8 +531,8 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 	    if_debug_sc_minmax_of_variable2 {
 		fprintf(stderr,
 			"Print the two systems at each nvar=%d step:\n", nvar);
-		fprintf(stderr, "[sc_minmax_of_variable2]: Input system %x\n",
-			(unsigned int) ps);
+		fprintf(stderr, "[sc_minmax_of_variable2]: Input system %p\n",
+			ps);
 		sc_dump(ps);
 	    }
 	}
@@ -553,8 +553,8 @@ sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 	    if_debug_sc_minmax_of_variable2 {
 		fprintf(stderr,
 			"Print System ps after projection and normalization:\n");
-		fprintf(stderr, "[sc_minmax_of_variable2]: Input system ps %x\n",
-			(unsigned int) ps);
+		fprintf(stderr, "[sc_minmax_of_variable2]: Input system ps %p\n",
+			ps);
 		sc_dump(ps);
 	    }
 
