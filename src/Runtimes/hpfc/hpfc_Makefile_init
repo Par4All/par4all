@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/10/17 14:27:35 $, )
+# ($Date: 1996/10/17 15:46:53 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -117,8 +117,8 @@ ifeq ($(PVM_ARCH),CRAY)
 #
 # the CRAY T3D does not require any library
 #
-PVM_NLIB =
 PVM_FLIB =
+PVM_GLIB =
 PVM_HLIB =
 PVM_NLIB =
 endif
