@@ -94,13 +94,18 @@ statement gener_DOSEQ(cons *lls, Pvecteur *pvg, Pbase base_oldindex, Pbase base_
 }
 
 /* void interchange(cons *lls)
- *  Implementation of the loops interchange method
- * "lls" is the list of nested loops
+ *
+ * Implementation of the loops interchange method. The outer most loop
+ * is exchanged with the inner most one.
+ *
+ * "lls" is the list of nested loops. The user selection loop is used to
+ * build lls
  *
  * FI: should be replaced by interchange_two_loops(lls, 1, n)
  */
 
-statement interchange(cons *lls)
+statement 
+interchange(cons *lls)
 {
     Psysteme sci;			/* sc initial */
     Psysteme scn;			/* sc nouveau */
@@ -120,10 +125,11 @@ statement interchange(cons *lls)
     Pvecteur pv1, pv2;
     loop l;
 
+    debug_on("LOOP_INTERCHANGE_DEBUG_LEVEL");
+    debug(8," interchange","begin:\n");
 
     /* make the  system "sc" of constraints of iteration space */
     sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
-    debug(8," interchange","\n begin :");
     
     /* create the  matrix A of coefficients of  index in (Psysteme)sci */
     n = base_dimension(base_oldindex);
@@ -140,7 +146,6 @@ statement interchange(cons *lls)
     AG = matrice_new(m,n);
     matrice_multiply(A,G,AG,m,n,n);
 
-
     /* create the new system of constraintes (Psysteme scn) with  
        AG and sci */
     scn = sc_dup(sci);
@@ -149,9 +154,10 @@ statement interchange(cons *lls)
     /* computation of the new iteration space in the new basis G */
     sc_row_echelon = new_loop_bound(scn,base_oldindex);
 
-    /* changeof basis for index */
+    /* change of basis for index */
     change_of_base_index(base_oldindex,&base_newindex);
-    sc_newbase=sc_change_baseindex(sc_dup(sc_row_echelon),base_oldindex,base_newindex);
+    sc_newbase=sc_change_baseindex(sc_dup(sc_row_echelon),
+				   base_oldindex,base_newindex);
     
     /* generation of interchange  code */
     /*  generation of bounds */
@@ -171,6 +177,9 @@ statement interchange(cons *lls)
 
 
     s_lhyp = gener_DOSEQ(lls,pvg,base_oldindex,base_newindex,sc_newbase);
+
+    debug(8," interchange","end\n");
+    debug_off();
 
     return(s_lhyp);
 }
@@ -195,6 +204,7 @@ statement interchange_two_loops(cons *lls, int n1, int n2)
     Pvecteur pv1, pv2;
     loop l;
 
+    debug_on("LOOP_INTERCHANGE_DEBUG_LEVEL");
     debug(8,"interchange_two_loops","\n begin: n1=%d, n2=%d\n", n1, n2);
 
     /* make the  system "sc" of constraints of iteration space */
@@ -215,7 +225,6 @@ statement interchange_two_loops(cons *lls, int n1, int n2)
     AG = matrice_new(m,n);
     matrice_multiply(A,G,AG,m,n,n);
 
-
     /* create the new system of constraintes (Psysteme scn) with  
        AG and sci */
     scn = sc_dup(sci);
@@ -248,6 +257,7 @@ statement interchange_two_loops(cons *lls, int n1, int n2)
     s_lhyp = gener_DOSEQ(lls,pvg,base_oldindex,base_newindex,sc_newbase);
 
     debug(8, "interchange_two_loops", "end\n");
+    debug_off();
 
     return(s_lhyp);
 }
