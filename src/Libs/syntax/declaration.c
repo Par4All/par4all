@@ -24,6 +24,7 @@
  *    each time an array element was initialized; a check for subscripts
  *    was added; FI, 18 February 1992
  *  - check_common_layouts() : added to fix bug 1; FI, 1 December 1993
+ *    renamed update_user_common_layouts(), FI, 25 September 1998
  * 
  * Bugs:
  *  - layout for commons are wrong if type and/or dimension declarations
@@ -69,12 +70,14 @@ InitAreas()
     entity_storage(DynamicArea) = MakeStorageRom();
     entity_initial(DynamicArea) = MakeValueUnknown();
     AddEntityToDeclarations(DynamicArea, get_current_module_entity());
+    set_common_to_size(DynamicArea, 0);
 
     StaticArea = FindOrCreateEntity(CurrentPackage, STATIC_AREA_LOCAL_NAME);
     entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
     entity_storage(StaticArea) = MakeStorageRom();
     entity_initial(StaticArea) = MakeValueUnknown();
     AddEntityToDeclarations(StaticArea, get_current_module_entity());
+    set_common_to_size(StaticArea, 0);
 }
 
 /* functions for the SAVE declaration */
@@ -111,6 +114,12 @@ save_all_entities()
 
 /* These two functions transform a dynamic variable into a static one. 
  * They are called to handle SAVE and DATA statements.
+ *
+ * Because equivalence chains have not yet been processed, it is not
+ * possible to assign an offset or to chain the variable to the static
+ * area layout. These two updates are performed by ComputeAddresses()
+ * only called by EndOfProcedure() to make sure that all non-declared
+ * variables have been taken into account.
  */
 
 void 
@@ -142,8 +151,14 @@ entity e;
 	    r = storage_ram(entity_storage(e));
 
 	    if (ram_section(r) == DynamicArea) {
+		/* This cannot be done before the equivalences have been processed */
+		/*
+		area a = type_area(entity_type(StaticArea));
+		area_layout(a) = gen_nconc(area_layout(a),
+					   CONS(ENTITY, e, NIL));
+		*/
 		ram_section(r) = StaticArea;
-		ram_offset(r) = CurrentOffsetOfArea(StaticArea, e);
+		ram_offset(r) = UNKOWN_RAM_OFFSET; /* CurrentOffsetOfArea(StaticArea, e); */
 	    }
 	    else {
 		/* Not much can be said. Maybe it is redundant, but... */
@@ -151,10 +166,10 @@ entity e;
 		 * to save a common variable?
 		 */
 		/*
-		user_warning("SaveEntity", "Variable %s has already been declared static "
-			     "by SAVE, by DATA or by appearing in a common declaration\n",
-			     entity_local_name(e));
-			     */
+		  user_warning("SaveEntity", "Variable %s has already been declared static "
+		  "by SAVE, by DATA or by appearing in a common declaration\n",
+		  entity_local_name(e));
+		*/
 	    }
 	}
 	else {
@@ -167,11 +182,13 @@ entity e;
     }
     else {
 	entity_storage(e) =
-		make_storage(is_storage_ram,
-			     (make_ram(get_current_module_entity(), 
-				       StaticArea, 
-				       CurrentOffsetOfArea(StaticArea ,e),
-				       NIL)));
+	    make_storage(is_storage_ram,
+			 (make_ram(get_current_module_entity(), 
+				   StaticArea, 
+				   /* The type and dimensions are still unknown */
+				   /* CurrentOffsetOfArea(StaticArea ,e), */
+				   UNKOWN_RAM_OFFSET,
+				   NIL)));
     }
 }
 
@@ -294,7 +311,7 @@ AnalyzeData(list ldvr, list ldvl)
 		make_storage(is_storage_ram,
 			     (make_ram(get_current_module_entity(),
 				       StaticArea, 
-				       CurrentOffsetOfArea(StaticArea ,e),
+				       UNKOWN_RAM_OFFSET,
 				       NIL)));
 	}
 	else if(storage_ram_p(entity_storage(e))) {
@@ -830,7 +847,11 @@ NameToCommon(string n)
 
 /* 
  * This function adds a variable v to a common block c. v's storage must be
- * undefined. c's size is indirectly updated by CurrentOffsetOfArea().
+ * undefined. 
+ *
+ * c's size used to be indirectly updated by CurrentOffsetOfArea() but this
+ * is meaningless because v's type and dimensions are unknown. The layouts of
+ * commons are updated later by update_common_sizes() called from EndOfProcedure().
  *
  */ 
 void 
@@ -838,6 +859,8 @@ AddVariableToCommon(c, v)
 entity c, v;
 {
     entity new_v = entity_undefined;
+    type ct = entity_type(c);
+    area ca = type_area(ct);
 
     if (entity_storage(v) != storage_undefined) {
 	if(intrinsic_entity_p(v)) {
@@ -872,15 +895,19 @@ entity c, v;
 		    NIL, 
 		    (make_storage(is_storage_ram,
 				  (make_ram(get_current_module_entity(), c, 
-					    CurrentOffsetOfArea(c, new_v), 
+					    /* CurrentOffsetOfArea(c, new_v), */
+					    0,
 					    NIL)))),
 		    value_undefined);
+
+    area_layout(ca) = gen_nconc(area_layout(ca), CONS(ENTITY, v, NIL));
 }
 
 /* 
  * This function computes the current offset of the area a passed as
  * argument. The length of the variable v is also computed and then added
  * to a's offset. The initial offset is returned to the calling function.
+ * The layout of the common is updated.
  *
  * Note FI: this function is called too early because a DIMENSION or a Type
  * statement can modify both the basic type and the dimensions of variable v.
@@ -941,8 +968,8 @@ update_common_sizes()
 		       "set size %d for common %s\n", s, entity_name(c));
 	}
 	else if (area_size(ac) != s) {
-	    /* I'm afraid this wwarning might be printed because area_size is given
-	     * a wrong value by CurrentOffsetOfArea()
+	    /* I'm afraid this warning might be printed because area_size is given
+	     * a wrong value by CurrentOffsetOfArea().
 	     */
 	    user_warning("update_common_sizes",
 			 "inconsistent size (%d and %d) for common /%s/ in %s\n"
@@ -1023,7 +1050,7 @@ entity e;
     if (s[0] == '_')
 	    s++;
 
-    if (!(IS_UPPER(s[0]))) {
+    if (!(IS_UPPER((int)s[0]))) {
 	pips_error("ImplicitType", "[ImplicitType] bad name: %s\n", s);
 	FatalError("ImplicitType", "\n");
     }
@@ -1075,7 +1102,7 @@ implicit_type_p(entity e)
 
     if (s[0] == '_')
 	    s++;
-    if (!(IS_UPPER(s[0]))) {
+    if (!(IS_UPPER((int)s[0]))) {
 	pips_internal_error("bad name: %s\n", s);
 	FatalError("implicit_type_p", "\n");
     }
@@ -1340,13 +1367,13 @@ entity e;
  */
 
 void 
-check_common_layouts(m)
+update_user_common_layouts(m)
 entity m;
 {
     list decls = NIL;
     list sorted_decls = NIL;
 
-    pips_assert("check_common_layouts", entity_module_p(m));
+    pips_assert("update_user_common_layouts", entity_module_p(m));
 
     decls = code_declarations(value_code(entity_initial(m)));
     sorted_decls = gen_append(decls, NIL);
@@ -1374,11 +1401,21 @@ entity m;
     MAP(ENTITY, e, {
 	if(type_area_p(entity_type(e))) {
 	    ifdebug(1) {
-		print_common_layout(stderr, e);
+		print_common_layout(stderr, e, TRUE);
 	    }
-	    if(update_common_layout(m, e)) {
-		ifdebug(1) {
-		    print_common_layout(stderr, e);
+	    if(!SPECIAL_AREA_P(e)) {
+		/* User declarations of commons imply the offset and
+		   cannot conflict with equivalences, whereas static and
+		   dynamic variables must first comply with
+		   equivalences. Hence the layouts of user commons must be
+		   updated before equivalences are satisfied whereas
+		   layouts of the static and dynamic areas must be
+		   satisfied after the equiavelences have been
+		   processed. */
+		if(update_common_layout(m, e)) {
+		    ifdebug(1) {
+			print_common_layout(stderr, e, TRUE);
+		    }
 		}
 	    }
 	}
@@ -1391,7 +1428,7 @@ entity m;
 }
 
 void 
-print_common_layout(FILE * fd, entity c)
+print_common_layout(FILE * fd, entity c, bool debug_p)
 {
     entity mod = get_current_module_entity();
     /* list members = area_layout(type_area(entity_type(c))); */
@@ -1408,9 +1445,19 @@ print_common_layout(FILE * fd, entity c)
 	(void) fprintf(fd, "\t* empty area *\n\n");
     }
     else {
-	pips_assert("A non-empty area has size greater than 0",
-		    area_size(type_area(entity_type(c)))>0 ||
-		    common_to_size(c)>0);
+	if(area_size(type_area(entity_type(c)))==0
+	   && common_to_size(c)==0) {
+	    if(debug_p) {
+		user_warning("print_common_layout",
+			     "Non-empty area %s should have a final size greater than 0\n",
+			     entity_module_name(c));
+	    }
+	    else {
+		pips_error("print_common_layout",
+			   "Non-empty area %s should have a size greater than 0\n",
+			   entity_module_name(c));
+	    }
+	}
 	/* Look for variables declared in this common by *some* procedures
 	 * which declares it. The procedures involved depend on the ordering
 	 * of the parser steps by pipsmake and the user. Maybe, the list should
@@ -1442,23 +1489,25 @@ print_common_layout(FILE * fd, entity c)
 	if(!ENDP(equiv_members)){
 
 	    equiv_members = arguments_difference(equiv_members, members);
-	    sort_list_of_entities(equiv_members);
+	    if(!ENDP(equiv_members)) {
+		sort_list_of_entities(equiv_members);
 
-	    (void) fprintf(fd, "\tVariables aliased to this common:\n");
+		(void) fprintf(fd, "\tVariables aliased to this common:\n");
 
-	    MAP(ENTITY, m, 
-		{
-		    pips_assert("RAM storage",
-				storage_ram_p(entity_storage(m)));
-		    (void) fprintf(fd,
-				   "\tVariable %s,\toffset = %d,\tsize = %d\n", 
-				   entity_name(m),
-				   ram_offset(storage_ram(entity_storage(m))),
-				   SafeSizeOfArray(m));
-		}, 
-		    equiv_members);
-	    (void) fprintf(fd, "\n");
-	    gen_free_list(equiv_members);
+		MAP(ENTITY, m, 
+		    {
+			pips_assert("RAM storage",
+				    storage_ram_p(entity_storage(m)));
+			(void) fprintf(fd,
+				       "\tVariable %s,\toffset = %d,\tsize = %d\n", 
+				       entity_name(m),
+				       ram_offset(storage_ram(entity_storage(m))),
+				       SafeSizeOfArray(m));
+		    }, 
+			equiv_members);
+		(void) fprintf(fd, "\n");
+		gen_free_list(equiv_members);
+	    }
 	}
     }
     gen_free_list(members);
@@ -1469,8 +1518,13 @@ print_common_layout(FILE * fd, entity c)
  * set of modules in the current workspace. As a consequence, warning messages
  * unfortunately depend on the parsing order.
  *
- * Offsets are computed a first time when the common declaration is
+ * Offsets used to be computed a first time when the common declaration is
  * encountered, but the variables may be typed or dimensionned *later*.
+ *
+ * This function is correct only if no equivalenced variables have been
+ * added to the layout. It should not be used for the static and dynamic
+ * areas (see below).
+ *
  */
 
 bool 
@@ -1491,6 +1545,13 @@ entity c;
     list members = area_layout(type_area(entity_type(c)));
     entity previous = entity_undefined;
     bool updated = FALSE;
+    list cm = list_undefined;
+
+    ifdebug(8) {
+	debug(8, "update_common_layout",
+	      "Begin for common /%s/ with members\n", module_local_name(c));
+	print_arguments(members);
+    }
 
     /* the layout field does not seem to be filled in for STATIC and DYNAMIC */
     if(!ENDP(members)) {
@@ -1505,39 +1566,21 @@ entity c;
 	    POP(members);
 	} while(!ENDP(members) && !variable_in_module_p(previous, m));
 
-	MAPL(cm, {
+	for(cm = members; !ENDP(cm); POP(cm)) {
 	    entity current = ENTITY(CAR(cm));
         
 	    pips_assert("update_common_layout",
 			storage_ram_p(entity_storage(current)));
 
 	    if(!variable_in_module_p(current, m)) {
-		/* If c really is a common, check its size because it may have increased.
-		 * Note that decreases are not taken into account although they might
-		 * occur as well.
-		 */
-		/* This piece of code might be useful if we were not dealing with the
-		 * last parsed module.
-		if(top_level_entity_p(c)) {
-		    int s = common_to_size(c);
-		    int new_s = ram_offset(storage_ram(entity_storage(previous)))
-			+SafeSizeOfArray(previous);
-		    if(s < new_s) {
-			(void) update_common_to_size(c, new_s);
-		    }
-		}
-		updated = TRUE;
-		*/
 		break;
 	    }
 
 	    if(ram_offset(storage_ram(entity_storage(previous)))+SafeSizeOfArray(previous) >
 	       ram_offset(storage_ram(entity_storage(current)))) {
-		ifdebug(1) {
-		    user_warning("update_common_layout", 
-				 "entity %s must have been typed after it was allocated in common /%s/\n",
-				 entity_local_name(previous), module_local_name(c));
-		}
+		/* This should now always be the case. The offset within the common is
+		 * no longer computed on the fly.
+		 */
 		ram_offset(storage_ram(entity_storage(current))) =
 		    ram_offset(storage_ram(entity_storage(previous)))+SafeSizeOfArray(previous);
 
@@ -1549,7 +1592,7 @@ entity c;
 		 * has not been entered at all if we are dealing wih te last parsed
 		 * module... which is always the case up to now!
 		 */
-		if(top_level_entity_p(c)) {
+		if(top_level_entity_p(c) || SPECIAL_AREA_P(c)) {
 		    int s = common_to_size(c);
 		    int new_s = ram_offset(storage_ram(entity_storage(current)))
 			+SafeSizeOfArray(current);
@@ -1559,9 +1602,15 @@ entity c;
 		}
 		updated = TRUE;
 	    }
+	    else {
+		/* Variables declared in the static and dynamic areas were
+                   assigned offsets dynamically. The result may be
+                   ok. */
+		pips_assert("Offsets should always be updated",SPECIAL_AREA_P(c));
+	    }
 
 	    previous = current;
-	} , members);
+	}
 
 
 	/* Special case: only one element in the common for the current procedure
@@ -1586,6 +1635,9 @@ entity c;
 	  }
 	}
     }
+	debug(8, "update_common_layout",
+	      "End for common /%s/: updated=%s\n",
+	      module_local_name(c), bool_to_string(updated));
 
     return updated;
 }
@@ -1704,7 +1756,7 @@ fprint_environment(FILE * fd, entity m)
 
     MAP(ENTITY, e, {
 	if(type_area_p(entity_type(e))) {
-	    print_common_layout(fd, e);
+	    print_common_layout(fd, e, FALSE);
 	}
     }, 
 	decls);
