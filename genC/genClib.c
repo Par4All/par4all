@@ -41,12 +41,6 @@ extern FILE *genspec_in, *genspec_out;
 
 #define GO (1)
 
-cons *Gen_cp_[ MAX_NESTED_CONS ] ;
-cons **gen_cp_ = (cons**) NULL ; 
-
-gen_chunk Gen_hash_[ MAX_NESTED_HASH ] ;
-gen_chunk *gen_hash_ = (gen_chunk*) NULL ; 
-
 struct gen_binding *Tabulated_bp ;
 
 int Read_spec_mode ;
