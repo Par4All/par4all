@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/03/20 13:19:22 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/03/20 19:09:47 $, )
  * version $Revision$
  */
  
@@ -428,9 +428,7 @@ bool hpfc_filter(string name)
     return TRUE;
 }
 
-/* bool hpfc_directives(string name)
- *
- * what: deals with directives. to be called by pipsmake.
+/* what: deals with directives. to be called by pipsmake.
  * input: the name of the module.
  * output: none.
  * side effects: (many)
@@ -453,7 +451,6 @@ static bool hpfc_directives_handler(string name, bool dyn)
 	!fortran_library_entity_p(module))
     {
 	statement s;
-
 	s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
 
 	if (dyn)
@@ -464,6 +461,7 @@ static bool hpfc_directives_handler(string name, bool dyn)
 	set_current_module_statement(s);
 	load_hpfc_status();
 	make_update_common_map(); 
+	hpfc_init_run_time_entities();
 
 	if (!dyn)
 	    NormalizeCommonVariables(module, s);
