@@ -1,4 +1,4 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/10/02 15:50:45 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1996/06/15 12:58:55 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -9,17 +9,17 @@
 /* some _hack to avoid warnings if some functions are not used 
  */
 #define GENERIC_STATIC_OBJECT(PREFIX, name, type)\
-static type name = type##_undefined;\
-PREFIX bool name##_undefined_p() { return name==type##_undefined;}\
+static type name##_object = type##_undefined;\
+PREFIX bool name##_undefined_p() { return name##_object==type##_undefined;}\
 PREFIX void reset_##name() \
 { message_assert("must reset sg defined", !name##_undefined_p());\
-  name=type##_undefined;}\
-PREFIX void set_##name(type o);\
+  name##_object=type##_undefined;}\
+PREFIX void set_##name(type o)\
 { message_assert("must set sg undefined", name##_undefined_p());\
-  name=o;}\
+  name##_object=o;}\
 PREFIX type get_##name() \
 { message_assert("must get sg defined", !name##_undefined_p());\
-  return name;}\
+  return name##_object;}\
 static int name##_generic_static_status_hack()\
 { return (int) reset_##name & (int) set_##name & \
       (int) reset_##name & (int) get_##name & \
@@ -29,10 +29,10 @@ static int name##_generic_static_status_hack()\
 GENERIC_STATIC_OBJECT(PREFIX, name, type)\
 PREFIX void init_##name() \
 { message_assert("must init sg undefined", name##_undefined_p());\
-  name = init;}\
+  name##_object = init;}\
 PREFIX void close_##name()\
 { message_assert("must close sg defined", !name##_undefined_p());\
-  close(name); name = type##_undefined;}
+  close(name##_object); name##_object = type##_undefined;}
 
 /* The idea here is to have a static function the name of which is
  * name, and which is a newgen function (that is a ->).
@@ -50,15 +50,15 @@ PREFIX void close_##name()\
 #define GENERIC_FUNCTION(PREFIX, name, type)\
 GENERIC_STATIC_STATUS(PREFIX, name, type, make_##type(), free_##type)\
 PREFIX void store_##name(k,v) type##_key_type k; type##_value_type v;\
-       { extend_##type(name, k, v);}\
+       { extend_##type(name##_object, k, v);}\
 PREFIX void update_##name(k,v) type##_key_type k; type##_value_type v;\
-       { update_##type(name, k, v);}\
+       { update_##type(name##_object, k, v);}\
 PREFIX type##_value_type load_##name(k) type##_key_type k;\
-       { return(apply_##type(name, k));}\
+       { return(apply_##type(name##_object, k));}\
 PREFIX type##_value_type delete_##name(k) type##_key_type k;\
-       { return(delete_##type(name, k));}\
+       { return(delete_##type(name##_object, k));}\
 PREFIX bool bound_##name##_p(k) type##_key_type k; \
-       { return(bound_##type##_p(name, k));}
+       { return(bound_##type##_p(name##_object, k));}
 
 /* plus a non good looking hack to avoid gcc warnings about undefined statics.
  * init, close and store are NOT put in the hack because they MUST be used.
