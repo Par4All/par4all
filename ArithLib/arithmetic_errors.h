@@ -1,5 +1,5 @@
 /* 
- * $Id: arithmetic_errors.h,v 1.1 2001/07/16 15:00:31 risset Exp $
+ * $Id: arithmetic_errors.h,v 1.2 2002/01/22 16:15:58 olaru Exp $
  *
  * managing arithmetic errors...
  * detecting and managing arithmetic errors on Values should be
@@ -9,8 +9,11 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
- * Revision 1.1  2001/07/16 15:00:31  risset
- * Initial revision
+ * Revision 1.2  2002/01/22 16:15:58  olaru
+ * cygwin variable added
+ *
+ * Revision 1.1.1.1  2001/07/16 15:00:31  risset
+ * initial import into CVS
  *
  * Revision 1.29  2000/07/27 15:01:55  coelho
  * hop.
@@ -73,6 +76,19 @@ const unsigned int any_exception_error = ~0;
 
 #define EXCEPTION extern const unsigned int
 
+#ifdef cygwin
+
+#define THROW(what) \
+ (fprintf(stdout,"exception thrown %d, function %s, file %s, line %d", \
+  what,__CURRENT_FUNCTION_NAME__,__FILE__,__LINE__))
+
+#define CATCH(what) 	if (0)
+
+#define UNCATCH(what)
+
+#else
+
+
 #define THROW(what) \
    (throw_exception(what, __CURRENT_FUNCTION_NAME__, __FILE__, __LINE__))
 
@@ -83,6 +99,8 @@ const unsigned int any_exception_error = ~0;
 #define UNCATCH(what)						\
      (pop_exception_from_stack(what, __CURRENT_FUNCTION_NAME__,	\
 			       __FILE__, __LINE__))
+
+#endif 
 
 #define TRY else
 
