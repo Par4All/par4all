@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL2LL,v $ (version $Revision$)
-# $Date: 1996/09/02 17:35:05 $, 
+# $Date: 1996/09/19 11:51:50 $, 
 #
 # this file contains macro definitions 
 
@@ -8,6 +8,7 @@ AR	= ar
 ARFLAGS	= rv
 CC	= gcc
 CFLAGS	= -O2 -g -Wall -msupersparc -pipe
+CMKDEP	= -M
 CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -D__USE_FIXED_PROTOTYPES__ -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC) 
 # gdb comes with some readline lib... but different headers...
