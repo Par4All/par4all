@@ -4,10 +4,10 @@
    Ronan Keryell.
    */
 
-/* 	%A% ($Date: 1998/03/19 16:54:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/04/02 14:45:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1998/03/19 16:54:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1998/04/02 14:45:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -42,6 +42,20 @@ cons **l ;
     control_successors( c )) ;
     MAPL( ps, {control_map_get_blocs( CONTROL( CAR( ps )), l );},
     control_predecessors( c )) ;
+}
+
+/* Same as above, but follows predecessors only */
+
+void
+backward_control_map_get_blocs( c, l )
+control c ;
+cons **l ;
+{
+    MAPL( cs, {if( CONTROL( CAR( cs )) == c ) return ;}, *l ) ;
+    *l = CONS( CONTROL, c, *l ) ;
+    MAPL( cs,
+	  {backward_control_map_get_blocs( CONTROL( CAR( cs )), l );},
+	  control_predecessors( c )) ;
 }
 
 /* Same as above, but follows successors only */
