@@ -332,12 +332,16 @@ int dim_h;
     Pbase var_id;
     int dim_h2= dim_h;
     unsigned	space;
-    int sc_info[sc_image->dimension+1][3]; /* this is NOT ANSI C */
+#define maxscinfosize 100
+    /* int sc_info[sc_image->dimension+1][3]; // this is NOT ANSI C */
+    int sc_info[maxscinfosize][3];
     int i;
     Pvecteur pv1= NULL;
     Pbase btmp = BASE_NULLE;
     debug_on("MOVEMENT_DEBUG_LEVEL");
     debug(3,"movement_computation","begin\n");
+
+    assert(sc_image->dimension<maxscinfosize); /* added */
 
     /* Translate each entity in its appropriated entity full name 
        for generating module code */
