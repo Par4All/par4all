@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <strings.h>
 #include <string.h>
-extern int fprintf();
 
 #include "genC.h"
 #include "ri.h"
