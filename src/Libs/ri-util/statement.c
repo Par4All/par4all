@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.68  2002/06/10 15:17:50  irigoin
+    function safe_statement_identification() added
+
     Revision 1.67  2000/05/09 14:54:50  phamdinh
     add_one_line_of_comment function added.
 
@@ -1364,6 +1367,20 @@ statement_identification(statement s)
 
     return buffer;
 }
+
+string 
+safe_statement_identification(statement s)
+{
+  if(statement_undefined_p(s)) {
+    return "undefined statement\n";
+  }
+  else if(instruction_undefined_p(statement_instruction(s))) {
+    return "statement with undefined intruction\n";
+  }
+  else
+    return statement_identification(s);
+}
+
 
 
 /* Return true if the statement has an empty statement: */
