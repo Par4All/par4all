@@ -17,6 +17,7 @@
 */
 
 #include <stdio.h>
+#include <ctype.h>
 
 #include "genC.h"
 #include "linear.h"
@@ -47,6 +48,11 @@
 
 /* forward declaration. */
 static string c_expression(expression);
+
+/**************************************************************** MISC UTILS */
+
+#define current_module_is_a_function() \
+  (entity_function_p(get_current_module_entity()))
 
 /************************************************************** DECLARATIONS */
 
@@ -112,11 +118,18 @@ c_dim_string(list /* of dimension */ ldim)
     {
       MAP(DIMENSION, dim,
       {
-	int low = expression_to_int(dimension_lower(dim));
-	int up = expression_to_int(dimension_upper(dim));
-	int size = up - low + 1;
-	string oldresult = result;
-	string ssize = int_to_string(size);
+	int low;
+	int up;
+	int size;
+	string oldresult;
+	string ssize;
+
+	expression_integer_value(dimension_lower(dim), &low);
+	expression_integer_value(dimension_upper(dim), &up);
+
+	size = up - low + 1;
+	oldresult = result;
+	ssize = int_to_string(size);
 
 	result = 
 	  strdup(concatenate(OPENBRACKET, ssize, CLOSEBRACKET, result, NULL));
@@ -132,44 +145,85 @@ c_dim_string(list /* of dimension */ ldim)
   return result;
 }
 
+#define RESULT_NAME	"result"
+
+/* the local name in C: lower case, special handling possible...
+ */
+static string 
+c_entity_local_name(entity var)
+{
+  string name;
+  char * car;
+
+  if (current_module_is_a_function() &&
+      var != get_current_module_entity() &&
+      same_string_p(entity_local_name(var), 
+		    entity_local_name(get_current_module_entity())))
+    {
+      name = strdup(RESULT_NAME);
+    }
+  else
+    {
+      name = strdup(entity_local_name(var));
+    }
+
+  /* switch to lower cases... */
+  for (car = name; *car; car++)
+    *car = (char) tolower(*car);
+
+  return name;
+}
+
 static string 
 this_entity_cdeclaration(entity var)
 {
   string result = NULL;
   storage s = entity_storage(var);
-  type t;
-  variable v;
 
   /* fprintf(stderr, "-- %s\n", entity_name(var)); */
-
-  t = entity_type(var);
-  pips_assert("it is a variable", type_variable_p(t));
-  v = type_variable(t);
   
   if (storage_rom_p(s))
     {
       value va = entity_initial(var);
+      constant c = NULL;
+
       if (value_constant_p(va))
+	c = value_constant(va);
+      else if (value_symbolic_p(va))
+	c = symbolic_constant(value_symbolic(va));
+      
+      if (c)
 	{
-	  constant c = value_constant(va);
 	  if (constant_int_p(c))
 	    {
 	      string sval = int_to_string(constant_int(c));
-	      result = strdup(concatenate(SHARPDEF, SPACE, 
-		       entity_local_name(var), SPACE, sval, NL, NULL));
+	      string svar = c_entity_local_name(var);
+
+	      result = strdup(concatenate(SHARPDEF, SPACE, svar,
+					  SPACE, sval, NL, NULL));
+
+	      free(svar);
 	      free(sval);
 	    }
 	}
     }
   else
     {
-      string st = c_basic_string(variable_basic(v));
-      string sd = c_dim_string(variable_dimensions(v));
+      type t;
+      variable v;
+      string st, sd, svar;
       
-      result = strdup(concatenate(st, SPACE, entity_local_name(var), sd, 
-				  SEMICOLON, NULL));
+      t = entity_type(var);
+      pips_assert("it is a variable", type_variable_p(t));
+      v = type_variable(t);
+  
+      st = c_basic_string(variable_basic(v));
+      sd = c_dim_string(variable_dimensions(v));
+      svar = c_entity_local_name(var);
+      
+      result= strdup(concatenate(st, SPACE, svar, sd, NULL));
 
-      free(st); free(sd);
+      free(st); free(sd); free(svar);
     }
 
   return result? result: strdup("");
@@ -179,13 +233,14 @@ static bool parameter_p(entity e)
 {
   return storage_rom_p(entity_storage(e)) && 
     value_symbolic_p(entity_initial(e)) &&
-    type_variable_p(entity_type(e));
+    type_functional_p(entity_type(e));
 }
 
 static bool variable_p(entity e)
 {
+  storage s = entity_storage(e);
   return type_variable_p(entity_type(e)) &&
-    storage_ram_p(entity_storage(e));
+    (storage_ram_p(s) || storage_return_p(s));
 }
 
 static bool argument_p(entity e)
@@ -197,10 +252,12 @@ static bool argument_p(entity e)
 static string 
 c_declarations(entity module,
 	       bool (*consider_this_entity)(entity),
-	       string separator)
+	       string separator,
+	       bool lastsep)
 {
   string result = strdup("");
   code c;
+  bool first = TRUE;
 
   pips_assert("it is a code", value_code_p(entity_initial(module)));
 
@@ -211,9 +268,11 @@ c_declarations(entity module,
       {
 	string old = result;
 	string svar = this_entity_cdeclaration(var);
-	result = strdup(concatenate(old, svar, separator, NULL));
+	result = strdup(concatenate(old, !first && !lastsep? separator: "",
+				    svar, lastsep? separator: "", NULL));
 	free(old);
 	free(svar);
+	first = FALSE;
       }
   },
     code_declarations(c));
@@ -240,7 +299,7 @@ static string c_head(entity module)
     }
   else
     {
-      string head, args;
+      string head, args, svar;
       functional f = type_functional(entity_type(module));
 
       /* define type head. */
@@ -260,18 +319,21 @@ static string c_head(entity module)
       /* define args. */
       if (functional_parameters(f))
 	{
-	  args = c_declarations(module, argument_p, ", ");
+	  args = c_declarations(module, argument_p, ", ", FALSE);
 	}
       else
 	{
 	  args = strdup("void");
 	}
 
-      result = strdup(concatenate(head, SPACE, entity_local_name(module),
+      svar = c_entity_local_name(module);
+
+      result = strdup(concatenate(head, SPACE, svar,
 				  OPENPAREN, args, CLOSEPAREN, NL, NULL));
 
       free(head); 
       free(args);
+      free(svar);
     }
 
   return result;
@@ -340,9 +402,10 @@ static string ppt_call(string in_c, list le)
   {
     string arg = c_expression(e);
     old = scall;
-    scall = strdup(concatenate(old, first? ", ": "", arg, NULL));
+    scall = strdup(concatenate(old, first? "": ", ", arg, NULL));
     free(arg);
     free(old);
+    first = FALSE;
   },
       le);
 
@@ -360,15 +423,15 @@ static struct s_ppt fortran_to_c[] =
   { "+", "+", ppt_binary  },
   { "-", "-", ppt_binary },
   { "/", "/", ppt_binary },
-  { ".eq.", "==", ppt_binary },
-  { ".ne.", "!=", ppt_binary },
-  { ".le.", "<=", ppt_binary },
-  { ".lt.", "<", ppt_binary },
-  { ".ge.", ">=", ppt_binary },
-  { ".gt.", ">", ppt_binary },
-  { ".and.", "&&", ppt_binary },
-  { ".or.", "||", ppt_binary },
-  { ".not.", "!", ppt_unary },
+  { ".EQ.", "==", ppt_binary },
+  { ".NE.", "!=", ppt_binary },
+  { ".LE.", "<=", ppt_binary },
+  { ".LT.", "<", ppt_binary },
+  { ".GE.", ">=", ppt_binary },
+  { ".GT.", ">", ppt_binary },
+  { ".AND.", "&&", ppt_binary },
+  { ".OR.", "||", ppt_binary },
+  { ".NOT.", "!", ppt_unary },
   { NULL, NULL, ppt_call }
 };
 
@@ -403,20 +466,33 @@ static bool expression_needs_parenthesis_p(expression e)
     }
 }
 
+#define RET	"return"
+
 static string c_call(call c)
 {
   entity called = call_function(c);
   struct s_ppt * ppt = get_ppt(called);
   string result;
 
-  if (call_constant_p(c))
+  /* special case... */
+  if (same_string_p(entity_local_name(called), "RETURN"))
     {
-      result = strdup(entity_local_name(called));
+      if (entity_main_module_p(get_current_module_entity()))
+	result = strdup(RET " 0");
+      else if (current_module_is_a_function())
+	result = strdup(RET SPACE RESULT_NAME);
+      else
+	result = strdup(RET);
+    }
+  else if (call_constant_p(c))
+    {
+      result = c_entity_local_name(called);
     }
   else
     {
-      result = ppt->ppt(ppt->c? ppt->c: entity_local_name(called), 
-			call_arguments(c));
+      string s = c_entity_local_name(called);
+      result = ppt->ppt(ppt->c? ppt->c: s, call_arguments(c));
+      free(s);
     }
 
   return result;
@@ -426,7 +502,7 @@ static string c_call(call c)
  */
 static string c_reference(reference r)
 {
-  string result = strdup(EMPTY), old;
+  string result = strdup(EMPTY), old, svar;
   MAP(EXPRESSION, e, 
   {
     string s = c_expression(e);
@@ -438,9 +514,10 @@ static string c_reference(reference r)
       reference_indices(r));
 
   old = result;
-  result = strdup(concatenate(entity_local_name(reference_variable(r)),
-			      old, NULL));
+  svar = c_entity_local_name(reference_variable(r));
+  result = strdup(concatenate(svar, old, NULL));
   free(old);
+  free(svar);
   return result;
 }
 
@@ -517,18 +594,20 @@ static string c_statement(statement s)
 	 */
 	loop l = instruction_loop(i);
 	string body = c_statement(loop_body(l));
-	string index = entity_local_name(loop_index(l));
+	string index = c_entity_local_name(loop_index(l));
 	range r = loop_range(l);
 	string low = c_expression(range_lower(r));
 	string up = c_expression(range_upper(r));
 	
 	result = strdup(concatenate("for (", index, "=", low, "; ",
 				    index, "<=", up, "; ",
-				    index, "++)", NULL));
+				    index, "++)", SPACE, OPENBRACE, NL, 
+				    body, CLOSEBRACE, NL, NULL));
 
 	free(body);
 	free(low);
 	free(up);
+	free(index);
 
 	break;
       }
@@ -569,9 +648,9 @@ static string c_code_string(entity module, statement stat)
 {
   string before_head, head, decls, body, result;
 
-  before_head = c_declarations(module, parameter_p, NL);
+  before_head = c_declarations(module, parameter_p, NL, TRUE);
   head        = c_head(module);
-  decls       = c_declarations(module, variable_p, SEMICOLON);
+  decls       = c_declarations(module, variable_p, SEMICOLON, TRUE);
   body        = c_statement(stat);
   
   result = strdup(concatenate(before_head, head, OPENBRACE, NL, 
