@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/07/08 16:41:28 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/08/08 10:49:12 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -33,7 +33,7 @@
 
 #include "newgen_include.h"
 #include "genC.h"
-#include "x.tab.h"
+#include "genread.h"
 
 #define GO (1)
 
@@ -1965,7 +1965,7 @@ void
 gen_read_spec(char * spec, ...)
 {
     va_list ap ;
-    extern FILE *zzin ;
+    extern FILE *genspec_in ;
     gen_chunk **cpp ;
     struct gen_binding *bp ;
     char *mktemp(), *tmp ;
@@ -1979,19 +1979,19 @@ gen_read_spec(char * spec, ...)
 
     while(spec)
     {
-	if( (zzin = fopen( tmp, "w" )) == NULL ) {
+	if( (genspec_in = fopen( tmp, "w" )) == NULL ) {
 	    user( "Cannot open temp spec file in write mode\n" ) ;
 	    return ;
 	}
-	fprintf( zzin, "%s", spec ) ;
-	fclose( zzin ) ;
+	fprintf( genspec_in, "%s", spec ) ;
+	fclose( genspec_in ) ;
 
-	if( (zzin = fopen( tmp, "r" )) == NULL ) {
+	if( (genspec_in = fopen( tmp, "r" )) == NULL ) {
 	    user( "Cannot open temp spec file in read mode\n" ) ;
 	    return ;
 	}
-	zzparse() ;
-	fclose( zzin ) ;
+	genspec_parse() ;
+	fclose( genspec_in ) ;
 
 	spec = va_arg( ap, char *);
     }
@@ -2095,10 +2095,10 @@ gen_chunk *
 gen_read( file )
      FILE *file ;
 {
-  extern FILE *xxin ;
+  extern FILE *genread_in ;
   
-  xxin = file ;
-  xxparse() ;
+  genread_in = file ;
+  genread_parse() ;
   return( Read_chunk ) ;
 }
 
@@ -2110,28 +2110,28 @@ gen_read_tabulated( file, create_p )
 FILE *file ;
 int create_p ;
 {
-    extern FILE *xxin ;
+    extern FILE *genread_in ;
     /* gen_chunk *cp ; */
     int domain, index, max ;
     int i ;
     extern int allow_forward_ref ;
     char buffer[ 1024 ] ;
 
-    xxin = file ;
+    genread_in = file ;
 #ifdef flex_scanner
-    if( (i=xxlex()) != READ_INT ) {
+    if( (i=genread_lex()) != READ_INT ) {
 	(void) sprintf( buffer, "%d", i ) ;
 	user( "Incorrect data for gen_read_tabulated: %s\n", buffer ) ;
 	exit( 1 ) ;
     }
-    domain = atoi( xxtext ) ;
+    domain = atoi( genread_text ) ;
 
-    if( (i=xxlex()) != READ_INT ) {
+    if( (i=genread_lex()) != READ_INT ) {
 	(void) sprintf( buffer, "%d", i ) ;
 	user( "Incorrect second data for gen_read_tabulated: %s\n", buffer ) ;
 	exit( 1 ) ;
     }
-    max = atoi( xxtext ) ;
+    max = atoi( genread_text ) ;
 #else
     (void) fscanf( file, "%d %d", &domain, &max ) ;
 #endif
@@ -2153,7 +2153,7 @@ int create_p ;
 	}
     }
     allow_forward_ref = TRUE ;
-    xxparse() ;
+    genread_parse() ;
     allow_forward_ref = FALSE ;
 
     free((char *) ((Read_chunk+1)->p) ) ;
