@@ -184,7 +184,7 @@ void partial_eval_expression_and_regenerate(expression *ep, Psysteme ps, effects
 {
     struct eformat ef;
 
-    ef= partial_eval_expression(*ep, ps, fx);
+    ef = partial_eval_expression(*ep, ps, fx);
 
     if (get_debug_level()>=5)
 	print_eformat(ef, "before regenerate");
@@ -760,7 +760,9 @@ static struct perform_switch {
     {DIVIDE_OPERATOR_NAME, partial_eval_div_operator},
     {MODULO_OPERATOR_NAME, partial_eval_mod_operator},
     {MIN0_OPERATOR_NAME, partial_eval_min_operator},
+    {MIN_OPERATOR_NAME, partial_eval_min_operator},
     {MAX0_OPERATOR_NAME, partial_eval_max_operator},
+    {MAX_OPERATOR_NAME, partial_eval_max_operator},
     {0 , 0}
 };
 
