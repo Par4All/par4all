@@ -6,10 +6,12 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1997/04/28 16:44:36 $, 
+ * $Date: 1997/07/21 13:09:02 $, 
  */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 #include "genC.h"
 #include "ri.h"
