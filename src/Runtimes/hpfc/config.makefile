@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1997/03/27 18:11:50 $, )
+# ($Date: 1997/04/17 08:52:55 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -186,7 +186,8 @@ LIB_M4CFILES =	hpfc_misc.m4c
 LIB_FFILES =	hpfc_check.f \
 		hpfc_main.f \
 		hpfc_main_host.f \
-		hpfc_main_node.f
+		hpfc_main_node.f \
+		hpfc_communication.f
 
 M4_HEADERS 	= hpfc_procs.m4h \
 		  hpfc_buffers.m4h \
