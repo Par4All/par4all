@@ -1,0 +1,27 @@
+% $Id $Log 
+
+
+\documentclass{article}
+
+\usepackage{newgen_domain}
+
+\title{C Parser Global Context}
+\author{Nga Nguyen}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+The C parser context is used to store the information such as 
+the scope, type and storage of the current entity, given by the decl\_spec\_list, 
+which are used later by declarator to create the entity. 
+
+\domain{import entity from "ri.newgen"}
+
+\domain{import type from "ri.newgen"}
+
+\domain{import storage from "ri.newgen"}
+
+\domain{c\_parser\_context = current\_scope:string x current\_type:type x current\_storage:storage x current\_qualifiers:list x is\_typedef:bool x is\_static:bool}
+
+\end{document}
