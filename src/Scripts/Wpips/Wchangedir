@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/12 10:52:19 $, 
+# $Date: 1996/09/12 10:55:21 $, 
 #
 # (c) FC September 1996
 #
@@ -59,7 +59,8 @@ proc appenddir { dir newdir } {
 	set last [lindex $ldir [expr $len-1]]
 	if {($last != "..") && ($last != ".") } {
 	    set ldir [lrange $ldir 0 [expr $len-2]]
-	    if {$len == 2 && [lindex $ldir 0] == {}} { return / }
+
+	    	    if {$len == 2 && [lindex $ldir 0] == {}} { return / }
 	} else {
 	    lappend ldir $newdir
 	}
@@ -150,12 +151,13 @@ proc changedir { root currentdir } {
     bind  $root.direct.entry <Configure> {
 	set l [winfo width $changedir_root.direct.lab]
         set d [winfo width $changedir_root.direct]
-	# well, the formula is not convincing...
+	# ??? well, the next formula is not convincing...
 	# it is not sure to be stable if sg is changed...
 	set n [expr ($d-$l-24)/7]
 	set w [%W cget -width]
 	if {$n!=$w} {
-	    $changedir_root.direct.entry configure -width $n
+	    %W configure -width $n
+	    seeentryend %W
 	}
     }
 
