@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/05/03 16:33:34 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/05/05 09:18:16 $, ), version $Revision$,
 #
 
 #
@@ -28,7 +28,7 @@ else
   REAL_PIPSHOME=
 fi
 
-echo "--$REAL_PIPSHOME--$PIPS_HOME--"
+# echo "--$REAL_PIPSHOME--$PIPS_HOME--"
 
 #
 # to avoid nfs problems
