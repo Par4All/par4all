@@ -38,7 +38,7 @@ SOURCES= $(HTML_AUTO) $(HTML_OTHERS) $(SCRIPTS)
 
 # Ask to make the html files:
 all: $(HTML_AUTO)
-clean: local_clean
+clean: local-clean
 
 INSTALL_HTM= $(HTMS)
 INSTALL_UTL= $(SCRIPTS)
