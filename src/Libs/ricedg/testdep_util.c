@@ -43,7 +43,7 @@
 extern jmp_buf overflow_error; /* to deal with overflow errors occuring during the projection 
                          * of a Psysteme along a variable */
 
-
+
 /* the tables of di variables, li variables and ds variables.
  *
  * variable DiVars[i-1] or LiVars[i-1] is associated to the loop at nesting
@@ -64,7 +64,8 @@ parallelized by pips.
 
 l is the nesting level of the variable to create
 */
-entity MakeDiVar(l)
+entity 
+MakeDiVar(l)
 int l;
 {
     entity e;
@@ -86,7 +87,8 @@ int l;
 this functions looks up a di variable of nesting level l in table
 DiVars. di variables are created if they do not exist.
 */
-entity GetDiVar(l)
+entity 
+GetDiVar(l)
 int l;
 {
     entity e;
@@ -111,7 +113,8 @@ li variables which means that programs with more than MAXDEPTH nested loops cann
 parallelized by pips.
 l is the nesting level of the variable to create
 */
-entity MakeLiVar(l)
+entity 
+MakeLiVar(l)
 int l;
 {
     entity e;
@@ -133,7 +136,8 @@ int l;
 this functions looks up a li variable of nesting level l in table
 LiVars. li variables are created if they do not exist.
 */
-entity GetLiVar(l)
+entity 
+GetLiVar(l)
 int l;
 {
     entity e;
@@ -159,7 +163,8 @@ parallelized by pips.
 
 l means to create Dsi[l] variable
 */
-entity MakeDsiVar(l)
+entity 
+MakeDsiVar(l)
 int l;
 {
     entity e;
@@ -181,7 +186,8 @@ int l;
 this functions looks up a dsi variable of the lth varable in table
 DsiVars. dsi variables are created if they do not exist.
 */
-entity GetDsiVar(l)
+entity 
+GetDsiVar(l)
 int l;
 {
     entity e;
@@ -203,7 +209,8 @@ int l;
 /* 
 this function returns the nesting level of a given di variable e.
 */
-int DiVarLevel(e)
+int 
+DiVarLevel(e)
 entity e;
 {
     int i;
@@ -216,7 +223,7 @@ entity e;
 }
 
 
-
+
 /*
 this function replaces each occurrence of variable e in system s by
 (e+dl) where dl is the di variable of nesting level l.
@@ -229,7 +236,8 @@ s is the system where replacements are to be done.
 
 li is the numerical value of the loop increment expression.
 */
-void sc_add_di(l, e, s, li)
+void 
+sc_add_di(l, e, s, li)
 int l;
 entity e;
 Psysteme s;
@@ -262,7 +270,8 @@ e is the variable to replace.
 
 s is the system where replacements are to be done.
 */
-void sc_add_dsi(l, e, s)
+void 
+sc_add_dsi(l, e, s)
 int l;
 entity e;
 Psysteme s;
@@ -294,7 +303,8 @@ cl is the common nesting level.
 s is the system to project. s is modified.
 */
 
-int sc_proj_on_di(cl, s)
+int 
+sc_proj_on_di(cl, s)
 int cl;
 Psysteme s;
 {
@@ -323,7 +333,8 @@ Psysteme s;
 /* Pbase MakeDibaseinorder(int n) make a base of D#1 ... D#n in order of 
  * D#1-> D#2, ...-> D#n.
  */
-Pbase MakeDibaseinorder(n)
+Pbase 
+MakeDibaseinorder(n)
 int n;
 {
     Pbase Dibase = BASE_NULLE;
@@ -335,7 +346,8 @@ int n;
     return(Dibase);
 }
 
-int FindMaximumCommonLevel(n1, n2)
+int 
+FindMaximumCommonLevel(n1, n2)
 cons *n1, *n2;
 {
     int cl = 0;
@@ -351,12 +363,25 @@ cons *n1, *n2;
     return(cl);
 }
 
-entity MakeLoopCounter()
+
+/* Management of loop counters */
+
+#define ILCMAX 10000
+
+static int ilc = ILCMAX;
+
+void
+ResetLoopCounter()
+{
+    ilc = 0;
+}
+
+entity 
+MakeLoopCounter()
 {
     entity e;
     string s;
     static char lcn[] = "lc#XXXX";
-    static int ilc = 0;
 
     while (1) {
 	sprintf(lcn+3, "%04d", ilc);
@@ -370,14 +395,14 @@ entity MakeLoopCounter()
 			    storage_undefined, value_undefined));
 	}
 
-	if ((ilc += 1) == 10000)
+	if ((ilc += 1) == ILCMAX)
 	    break;
     }
 
     pips_internal_error("too many loop counters");
     return(entity_undefined);
 }
-
+
 /* int dep_type(action ac1,action ac2) 
  * This function test the type of the dependence. ac1, ac2 are the action of 
  * two references.The representations of the result are as follows.
@@ -390,7 +415,8 @@ entity MakeLoopCounter()
  * ignored for parallelization, but not for tiling or cache optimization
  */
 
-int dep_type(ac1,ac2)
+int 
+dep_type(ac1,ac2)
 action ac1,ac2;
 {
     if (action_write_p(ac1)&&action_read_p(ac2))
@@ -430,7 +456,8 @@ action ac1,ac2;
  * The value returned is TRUE if the system is feasible, FALSE otherwise.
  */
 
-int sc_proj_optim_on_di_ofl(cl, psc)
+int 
+sc_proj_optim_on_di_ofl(cl, psc)
 int cl;
 Psysteme *psc;
 {   
@@ -493,7 +520,8 @@ Psysteme *psc;
  *    returns sc_empty; necessary to have a consistent interface: when FALSE
  *    is returned, sc always has been freed.
  */
-boolean sc_faisabilite_optim(sc)
+boolean 
+sc_faisabilite_optim(sc)
 Psysteme sc;
 {
     debug(6, "sc_faisabilite_optim", "begin\n");
@@ -538,7 +566,8 @@ Psysteme sc;
  * combination. 
  * It returns TRUE if exact
  */
-static boolean combiner_ofl_with_test(sc,v)
+static boolean 
+combiner_ofl_with_test(sc,v)
 Psysteme sc;
 Variable v;
 {
@@ -645,7 +674,8 @@ Variable v;
  * Fourier-Motzkin.
  * If the system sc is not faisable, SC_EMPTY is return
  */
-Psysteme sc_projection_optim_along_vecteur_ofl(sc,pv)
+Psysteme 
+sc_projection_optim_along_vecteur_ofl(sc,pv)
 Psysteme sc;
 Pvecteur pv;
 {
@@ -899,7 +929,8 @@ Pvecteur pv;
  * le systeme ps est detruit.
  * 
  */
-boolean sc_minmax_of_variable_optim(ps, var, pmin, pmax)
+boolean 
+sc_minmax_of_variable_optim(ps, var, pmin, pmax)
 Psysteme ps;
 Variable var;
 Value *pmin, *pmax;
@@ -983,7 +1014,8 @@ Value *pmin, *pmax;
  * pour chaque element b dans le base initial, remplace b par -b dans 
  * le systeme initial.  
  */
-Psysteme sc_invers(ps)
+Psysteme 
+sc_invers(ps)
 Psysteme ps;
 {
     Pbase b;
@@ -1004,7 +1036,8 @@ Psysteme ps;
 /* void vect_chg_var_sign(Pvecteur *ppv, Variable var)
  * changement de signe de la coordonnee var du vecteur *ppv 
  */
-void vect_chg_var_sign(ppv,var)
+void 
+vect_chg_var_sign(ppv,var)
 Pvecteur  *ppv;
 Variable var;
 {
@@ -1031,7 +1064,8 @@ Variable var;
  * Il faudrait traiter proprement les cas particuliers SC_RN et SC_EMPTY
  */
 /*
-Ppoly sc_poly_enveloppe(s1, s2)
+Ppoly 
+sc_poly_enveloppe(s1, s2)
 Psysteme s1;
 Psysteme s2;
 {
