@@ -204,7 +204,8 @@ $debug "report=$report"
 		test "${dir}" -a -d "${dir}" && {
 		$verbose cleaning files of ${a} [${name}: ${dir}]
 		find $dir \
-		    \( -name '*.[ao]' -o -name pips -o -name '[tw]pips' \) \
+		    \( -name '*.[ao]' -o -name '*.so' -o \
+		       -name pips -o -name '[twf]pips' \) \
 		    -mtime +4 -type f -print -o -name EXTERN -prune | \
 			xargs rm -rf
 		}
