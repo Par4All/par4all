@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/08/30 15:15:51 $, )
+# ($Date: 1996/08/30 15:23:20 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -259,12 +259,12 @@ param_init.f: param_init.m4
 #
 # Link
 
-ADDED_HOST_LD_FLAGS=$(shell \
+ADDED_LD_FLAGS=$(shell \
 	sed '/^![Ll][Dd][Ff]./!d;s/^![Ll][Dd][Ff].//' $(TARGET).f)
 
-print_added_host_ld_flags:
+print_added_ld_flags:
 	# $@:
-	@echo $(ADDED_HOST_LD_FLAGS)
+	@echo $(ADDED_LD_FLAGS)
 
 $(HOST):  $(HEADERS) $(COMMON_OFILES) $(HOST_OFILES)
 	$(FC) $(FFLAGS) -o $(HOST) \
@@ -272,7 +272,7 @@ $(HOST):  $(HEADERS) $(COMMON_OFILES) $(HOST_OFILES)
 		$(COMMON_OFILES) \
 		$(LIBS_DIR) \
 		$(ALL_HLIBS) \
-		$(ADDED_HOST_LD_FLAGS)
+		$(ADDED_LD_FLAGS)
 	$(STRIP) $(HOST)
 
 $(NODE):  $(HEADERS) $(COMMON_OFILES) $(NODE_OFILES) 
@@ -304,7 +304,7 @@ $(NODE): $(HOST_OFILES)
 endif
 
 $(RTEST):  $(FTEST)
-	$(FC) $(FFLAGS) -o $(RTEST) $(FTEST)
+	$(FC) $(FFLAGS) -o $(RTEST) $(FTEST) $(ADDED_LD_FLAGS)
 	$(STRIP) $(RTEST)
 
 #
