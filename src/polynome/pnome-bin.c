@@ -23,7 +23,7 @@ void polynome_monome_add(ppp, pm)
 Ppolynome *ppp;
 Pmonome pm;
 {
-    Ppolynome prevpp = NIL;
+    Ppolynome prevpp = POLYNOME_NUL;
     float coeff;
 
     if (POLYNOME_NUL_P(*ppp)) {
@@ -37,7 +37,7 @@ Pmonome pm;
     }
     else if (!MONOME_NUL_P(pm)) {
 	Ppolynome curpp;
-	for(curpp = *ppp; curpp != NIL; prevpp = curpp,curpp = polynome_succ(curpp)) {
+	for(curpp = *ppp; curpp != POLYNOME_NUL; prevpp = curpp,curpp = polynome_succ(curpp)) {
 	    if (monome_colin(polynome_monome(curpp), pm)) {
 		coeff = monome_coeff(polynome_monome(curpp)) + monome_coeff(pm);
 		if ((coeff < PNOME_MACH_EPS) && (coeff > -PNOME_MACH_EPS)) {
@@ -46,10 +46,10 @@ Pmonome pm;
 			*ppp = polynome_succ(*ppp);
 		    else 
 			polynome_succ(prevpp) = polynome_succ(curpp);
-		    polynome_succ(curpp) = NIL;
+		    polynome_succ(curpp) = POLYNOME_NUL;
 		    polynome_rm(&curpp);
-		    curpp = ( prevpp==NIL ? *ppp : prevpp );
-		    if ( curpp == NIL ) /* no element in polynome */
+		    curpp = ( prevpp==POLYNOME_NUL ? *ppp : prevpp );
+		    if ( curpp == POLYNOME_NUL ) /* no element in polynome */
 			*ppp = POLYNOME_NUL;
 		}
 		else            /* Save new value of monomial coefficient. */
@@ -58,10 +58,10 @@ Pmonome pm;
 	    }
 	}
 
-	if ( curpp == NIL && !POLYNOME_NUL_P(*ppp) ) { 
+	if ( curpp == POLYNOME_NUL && !POLYNOME_NUL_P(*ppp) ) { 
 	    /* Add a copy of the monomial at the end */
 	    good_polynome_assert("polynome_monome_add about prevpp before",prevpp);
-	    if ( polynome_succ(prevpp) == NIL ) {
+	    if ( polynome_succ(prevpp) == POLYNOME_NUL ) {
 		if ( MONOME_NUL_P(pm) || MONOME_UNDEFINED_P(pm) )
 		    printf("monome is poor\n");
 		else 
@@ -98,7 +98,7 @@ Pmonome pm;
     }
     else if (!MONOME_NUL_P(pm)) {
 	Ppolynome curpp;
-	for(curpp = pp; curpp != NIL; prevpp = curpp,curpp = polynome_succ(curpp)) {
+	for(curpp = pp; curpp != POLYNOME_NUL; prevpp = curpp,curpp = polynome_succ(curpp)) {
 	    if (monome_colin(polynome_monome(curpp), pm)) {
 		float coeff = monome_coeff(polynome_monome(curpp)) + monome_coeff(pm);
 
@@ -108,10 +108,10 @@ Pmonome pm;
 			pp = polynome_succ(pp);
 		    else 
 			polynome_succ(prevpp) = polynome_succ(curpp);
-		    polynome_succ(curpp) = NIL;
+		    polynome_succ(curpp) = POLYNOME_NUL;
 		    polynome_rm(&curpp);
-		    curpp = ( prevpp==NIL ? pp : prevpp );
-		    if ( curpp == NIL ) /* no element in polynome */
+		    curpp = ( prevpp==POLYNOME_NUL ? pp : prevpp );
+		    if ( curpp == POLYNOME_NUL ) /* no element in polynome */
 			pp = POLYNOME_NUL;
 		}
 		else            /* Save new value of monomial coefficient. */
@@ -120,10 +120,10 @@ Pmonome pm;
 	    }
 	}
 
-	if ( curpp == NIL && !POLYNOME_NUL_P(pp) ) { 
+	if ( curpp == POLYNOME_NUL && !POLYNOME_NUL_P(pp) ) { 
 	    /* Add a copy of the monomial at the end */
 	    good_polynome_assert("polynome_monome_add about prevpp before",prevpp);
-	    if ( polynome_succ(prevpp) == NIL ) {
+	    if ( polynome_succ(prevpp) == POLYNOME_NUL ) {
 		if ( MONOME_NUL_P(pm) || MONOME_UNDEFINED_P(pm) )
 		    printf("monome is poor\n");
 		else 
@@ -154,7 +154,7 @@ Ppolynome *ppp,pp2;
 	*ppp = POLYNOME_UNDEFINED;
     }
     else if (!POLYNOME_UNDEFINED_P(*ppp)) {
-	for (;pp2 != NIL; pp2 = polynome_succ(pp2)) {
+	for (;pp2 != POLYNOME_NUL; pp2 = polynome_succ(pp2)) {
 	    polynome_monome_add(ppp, polynome_monome(pp2));
 	}
     }
@@ -181,7 +181,7 @@ Ppolynome pp,pp2;
     }
     else if (!POLYNOME_UNDEFINED_P(pp)) {
 	newpp = pp;
-	for (;pp2 != NIL; pp2 = polynome_succ(pp2)) {
+	for (;pp2 != POLYNOME_NUL; pp2 = polynome_succ(pp2)) {
 	    newpp = polynome_monome_addition(newpp, polynome_monome(pp2));
 	}
     }
@@ -246,7 +246,7 @@ Pmonome pm;
 	return (POLYNOME_NUL);
     else {
 	ppdup = polynome_dup(pp);
-	for (curpp = ppdup ; curpp != NIL; curpp = polynome_succ(curpp))
+	for (curpp = ppdup ; curpp != POLYNOME_NUL; curpp = polynome_succ(curpp))
 	    monome_monome_mult(&(polynome_monome(curpp)), pm);
 	return (ppdup);
     }
@@ -268,7 +268,7 @@ Ppolynome pp1, pp2;
     else {
 	Ppolynome pppartiel, ppresult = POLYNOME_NUL;
 
-	for (mp2 = pp2 ; mp2 != NIL; mp2 = polynome_succ(mp2)) {
+	for (mp2 = pp2 ; mp2 != POLYNOME_NUL; mp2 = polynome_succ(mp2)) {
 	    pppartiel = polynome_monome_mult(pp1, polynome_monome(mp2));
 	    polynome_add(&ppresult, pppartiel);
 	    polynome_rm(&pppartiel);
@@ -338,7 +338,7 @@ Pmonome pm;
 	Ppolynome curpp, ppdup;
 	ppdup = polynome_dup(pp);
 
-	for (curpp = ppdup ; curpp != NIL; curpp = polynome_succ(curpp)) {
+	for (curpp = ppdup ; curpp != POLYNOME_NUL; curpp = polynome_succ(curpp)) {
 	    Pmonome pmtmp = monome_monome_div(polynome_monome(curpp), pm);
 	    polynome_monome_add(&ppresult,pmtmp);
 	}
