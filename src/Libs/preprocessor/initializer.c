@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initializer.c,v $
+ * Revision 1.14  2003/08/01 06:00:01  irigoin
+ * Dummy c_initializer added to fit pipsmake.rc
+ *
  * Revision 1.13  2003/06/05 09:09:26  irigoin
  * Two additional steps in missing_file_initializer() to survive partially
  * corrupted databases, when new resources are present in the database but
@@ -11,6 +14,8 @@
  */
 #include <stdio.h>
 #include <string.h>
+
+extern char * strdup(char *);
 
 #include "genC.h"
 #include "text.h"
@@ -251,4 +256,11 @@ initializer(string module_name)
 			missing);
 
     return success_p;
+}
+
+bool c_initializer(string module_name)
+{
+  pips_user_error("We do not know how to synthesize C source code for function %s\n",
+		  module_name);
+  return TRUE;
 }
