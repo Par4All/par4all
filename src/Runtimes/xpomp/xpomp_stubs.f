@@ -1,5 +1,5 @@
 ! $RCSfile: xpomp_stubs.f,v $ (version $Revision$)
-! $Date: 1996/09/07 16:37:49 $, 
+! $Date: 1996/09/09 08:44:42 $, 
 !
 ! List of fake functions to have PIPS happy with 
 ! the same « effects » as the xPOMP graphical library.
