@@ -24,14 +24,15 @@
 Pvecteur vect_dup(v_in)
 Pvecteur v_in;
 {
-    Pvecteur v_out;
-    Pvecteur v;
-
-    v_out = NULL;
-    for(v=v_in; v!=NULL; v=v->succ) {
-	v_out = vect_chain(v_out,var_of(v),val_of(v));
-    }
-    return(v_out);
+  Pvecteur v_out;
+  Pvecteur v;
+  
+  v_out = NULL;
+  for(v=v_in; v!=NULL; v=v->succ) {
+    v_out = vect_chain(v_out,var_of(v),val_of(v));
+  }
+  
+  return v_out;
 }
 
 /* void vect_rm(Pvecteur v): desallocation des couples de v;
@@ -161,14 +162,19 @@ vect_make(Pvecteur v, ...)
     return(v);
 }
 
-
-Pbase base_dup( b )
-Pbase b;
+/* direct duplication. The initial Pbase is assumed to be valid.
+ */
+Pbase base_dup(Pbase b)
 {
-    Pvecteur v1, v2;
-    
-    v2 = vect_dup((Pvecteur) b);
-    v1 = base_reversal(v2);
-    vect_rm(v2);                
-    return(v1);
+  Pbase n = BASE_NULLE, p = BASE_NULLE, r = BASE_NULLE;
+
+  for (; b!=BASE_NULLE; b=b->succ)
+  {
+    n = vect_new(var_of(b), val_of(b));
+    if (r==BASE_NULLE) r = n;
+    if (p!=BASE_NULLE) p->succ = n;
+    p = n;
+  }
+
+  return r;
 }
