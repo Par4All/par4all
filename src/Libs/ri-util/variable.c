@@ -113,39 +113,55 @@ void reset_unique_variable_numbers()
     unique_complex_number=0;
 }
 
-#define TMPINTPREFIX 		"I_"
-#define TMPFLOATPREFIX 		"F_"
-#define TMPLOGICALPREFIX 	"L_"
-#define TMPCOMPLEXPREFIX	"C_"
+/* Default prefixes */
+#define DEFAULTINTPREFIX 	"I_"
+#define DEFAULTFLOATPREFIX 	"F_"
+#define DEFAULTLOGICALPREFIX 	"L_"
+#define DEFAULTCOMPLEXPREFIX	"C_"
 
 entity
-make_new_scalar_variable(entity module,
-                         basic b)
+make_new_scalar_variable_with_prefix(string prefix,
+				     entity module,
+				     basic b)
 {
-   string module_name = module_local_name(module);
-   char buffer[20];
-   entity e;
-   
-   do
-   {
-       switch(basic_tag(b))
-       {
-       case is_basic_int:
-	   sprintf(buffer,"%s%d", TMPINTPREFIX, unique_integer_number++);
-	   break;
-       case is_basic_float:
-	   sprintf(buffer,"%s%d", TMPFLOATPREFIX, unique_float_number++);
-	   break;
-       case is_basic_logical:
-	   sprintf(buffer,"%s%d", TMPLOGICALPREFIX, unique_logical_number++);
-	   break;
-       case is_basic_complex:
-	   sprintf(buffer,"%s%d", TMPCOMPLEXPREFIX, unique_complex_number++);
-	   break;
-       default:
-	   pips_error("make_new_scalar_variable", "unknown basic tag: %d\n",
-		      basic_tag(b));
-	   break;
+    string module_name = module_local_name(module);
+    char buffer[20];
+    entity e;
+    int number = 0;
+    bool empty_prefix = (strlen(prefix) == 0);
+
+    /* let's assume positive int stored on 4 bytes */
+    pips_assert("make_new_scalar_variable_with_prefix", strlen(prefix)<=10);
+
+    do {
+       if (empty_prefix) {
+	   switch(basic_tag(b)) {
+	   case is_basic_int:
+	       sprintf(buffer,"%s%d", DEFAULTINTPREFIX, 
+		       unique_integer_number++);
+	       break;
+	   case is_basic_float:
+	       sprintf(buffer,"%s%d", DEFAULTFLOATPREFIX, 
+		       unique_float_number++);
+	       break;
+	   case is_basic_logical:
+	       sprintf(buffer,"%s%d", DEFAULTLOGICALPREFIX, 
+		       unique_logical_number++);
+	       break;
+	   case is_basic_complex:
+	       sprintf(buffer,"%s%d", DEFAULTCOMPLEXPREFIX, 
+		       unique_complex_number++);
+	       break;
+	   default:
+	       pips_error("make_new_scalar_variable_with_prefix", 
+			  "unknown basic tag: %d\n",
+			  basic_tag(b));
+	       break;
+	   }
+       }
+       else {
+	   /* There should be a check on b */
+	   sprintf(buffer,"%s%d", prefix, number++);
        }
    }
    while(gen_find_tabulated(concatenate(module_name,
@@ -160,6 +176,13 @@ make_new_scalar_variable(entity module,
    AddEntityToDeclarations(e, module);
    
    return e;
+}
+
+entity
+make_new_scalar_variable(entity module,
+                         basic b)
+{
+    return make_new_scalar_variable_with_prefix("", module, b);
 }
 
 
