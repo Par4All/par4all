@@ -1122,6 +1122,11 @@ void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
    
     Value LB, UB, k, c;
 
+    if (emptyQ(P)) {
+	value_set_si(*res, 0);
+	return;
+    }
+
     value_init(LB); value_init(UB); value_init(k);
     value_set_si(LB,0);
     value_set_si(UB,0);
