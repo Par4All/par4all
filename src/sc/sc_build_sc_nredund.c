@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 2003/07/28 09:06:41 $, 
+ * $Date: 2003/07/31 07:14:59 $, 
  */
 
 #include <stdio.h>
@@ -192,14 +192,10 @@ int ofl_ctrl;
 	   linear_number_of_exception_thrown-init_exception_thrown<7;
 	 ineq=ineq->succ) 
     {
-	ineg = contrainte_dup(ineq);
+	ineg = contrainte_copy(ineq);
 	contrainte_reverse(ineg); 
 	
 	sc_add_inegalite(sc,ineg);
-
-//DN: I'd like to change call of _dup by _copy, which can speed up the operation (as _dup and _reverse 
-//do the same thing: copy and change the order). But I'm not sure that I understand why we need to call 
-//contrainte_reverse(ineg) as below. So I leave it as as before. It's no good at all
 
 	if (sc_rational_feasibility_ofl_ctrl(sc,ofl_ctrl,TRUE))
 	    contrainte_reverse(ineg);		
@@ -393,7 +389,7 @@ int *rank_max;
  * because an integer constraint negation is used.
  *
  * Modifs: 
- *  - change _dup to _copy, did take care of call of _reverse.DN
+ *  - change _dup to _copy.DN
  *  - the parameters of contrainte_dup, _copy, _reverse are not changed like base_dup, so it's ok.
  */
 
@@ -450,36 +446,36 @@ int n;
 		       eliminated (the rank of variable is greater the
 		       number of loops) */
 
-		  //		    contrainte_reverse(ineg);
-		    CATCH(overflow_error) {
-			pred = pred->succ;
-			//			contrainte_reverse(ineg);
+		  contrainte_reverse(ineg);
+		  CATCH(overflow_error) {
+		    pred = pred->succ;
+		    contrainte_reverse(ineg);
+		  }
+		  TRY {
+		    /* test de sc_faisabilite avec la nouvelle 
+		       inegalite */
+		    if (!sc_rational_feasibility_ofl_ctrl(sc,OFL_CTRL,TRUE)) { 
+		      
+		      /* si le systeme est non faisable ==>
+			 inegalite redondante ==> elimination de
+			 cette inegalite */
+		      sc->inegalites = sc->inegalites->succ;
+		      ineg->succ = NULL;
+		      contrainte_rm(ineg);
+		      sc->nb_ineq -=1;
+		      pred->succ = ineq->succ;
+		      
+		      /* mise a jour du nombre de contraintes restantes 
+			 contraingnant la variable  de rang rank_hr */
+		      if (sign >0) tab_info[rank_hr][2] --;
+		      else if (sign <0) tab_info[rank_hr][3]--; 
 		    }
-		    TRY {
-			/* test de sc_faisabilite avec la nouvelle 
-			   inegalite */
-			if (!sc_rational_feasibility_ofl_ctrl(sc,OFL_CTRL,TRUE)) { 
-			
-			    /* si le systeme est non faisable ==>
-			       inegalite redondante ==> elimination de
-			       cette inegalite */
-			    sc->inegalites = sc->inegalites->succ;
-			    ineg->succ = NULL;
-			    contrainte_rm(ineg);
-			    sc->nb_ineq -=1;
-			    pred->succ = ineq->succ;
-
-			    /* mise a jour du nombre de contraintes restantes 
-			       contraingnant la variable  de rang rank_hr */
-			    if (sign >0) tab_info[rank_hr][2] --;
-			    else if (sign <0) tab_info[rank_hr][3]--; 
-			}
-
-			else { pred = pred->succ;
-			// contrainte_reverse(ineg);
+		    
+		    else { pred = pred->succ;
+		    contrainte_reverse(ineg);
 			   }
-			UNCATCH(overflow_error);
-		    }
+		    UNCATCH(overflow_error);
+		  }
 		}
 	    }
 	}
