@@ -325,7 +325,9 @@ int predicate;
      * create a core file for debug 
      */
     if(!predicate) 
-	(void) fprintf(stderr, "pips assertion failed in %s: ", function),
+	(void) fprintf(stderr, "pips assertion failed"
+		       " in function %s at line %d of file %s\n",
+		       function, __LINE__, __FILE__),
 	(void) abort();
 }
 
