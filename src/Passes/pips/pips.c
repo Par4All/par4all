@@ -150,6 +150,8 @@ char * argv[];
 {
     bool success = TRUE;
 
+    pips_checks();
+
     initialize_newgen();
     initialize_sc((char*(*)(Variable)) entity_local_name); 
 
