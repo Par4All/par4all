@@ -140,6 +140,58 @@ static bool call_flt(call c)
 }
 
 /******written by Dat***********************/
+
+text my_get_any_effects_text(string module_name)
+{
+entity module;
+    statement module_stat;
+    text txt = make_text(NIL);
+
+    /* current entity
+     */
+    set_current_module_entity( local_name_to_top_level_entity(module_name));
+    module = get_current_module_entity();
+
+    /* current statement
+     */
+    set_current_module_statement((statement) db_get_memory_resource
+				 (DBR_CODE, module_name, TRUE));
+    module_stat = get_current_module_statement();
+
+    /* resources to be prettyprinted...
+     */
+    load_resources(module_name);
+
+    debug_on("EFFECTS_DEBUG_LEVEL");
+
+    /* prepare the prettyprinting */
+    init_prettyprint(text_statement_any_effect_type);
+
+    /* summary regions first */
+    /*MERGE_TEXTS(txt, text_summary_any_effect_type(module));*/
+
+    /* then code with effects, using text_statement_any_effect_type */
+    MERGE_TEXTS(txt, my_text_named_module(module, module_stat));
+    
+    close_prettyprint();
+
+    debug_off();
+
+    reset_current_module_entity();
+    reset_current_module_statement();
+
+    return txt;
+}
+
+text my_get_any_effect_type_text(string module_name, string resource_name)
+{
+  text txt;
+  push_prettyprints(resource_name, string_undefined);
+  txt = my_get_any_effects_text(module_name);
+  reset_generic_prettyprints();
+  return txt;
+}
+
 text my_get_text_proper_effects(string module_name)
 {
     text t;
