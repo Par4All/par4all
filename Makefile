@@ -104,7 +104,7 @@ install-shared: lib-shared
 	$(INSTALL) $(OBJ_DIR)/$(PSHARED) $(LIBDIR)/
 	$(RM) $(LIBDIR)/libpolylib$(BITS).$(SHEXT)
 	$(LN_S) $(LIBDIR)/$(PSHARED) $(LIBDIR)/libpolylib$(BITS).$(SHEXT)
-	$(LDCONFIG)
+	- $(LDCONFIG)
 install-static: lib-static
 	$(mkinstalldirs) $(LIBDIR)
 	$(INSTALL) $(OBJ_DIR)/$(PSTATIC) $(LIBDIR)/
