@@ -1046,6 +1046,8 @@ unstructured u ;
  * an unstructured for the use-def chain computation to be correct.
  */
 
+
+
 graph statement_dependence_graph(statement s)
 {
     one_trip_do = get_bool_property( "ONE_TRIP_DO" ) ;
@@ -1061,10 +1063,26 @@ graph statement_dependence_graph(statement s)
     Ref_out = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
     Defs = hash_table_make( hash_pointer, INIT_ENTITY_SIZE ) ;
     Vertex_statement = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
+
     dg = make_graph( NIL ) ;
     init_statement( s ) ;
     inout_statement( s ) ;
     usedef_statement( s ) ;
+
+#define TABLE_FREE(t) \
+{HASH_MAP( k, v, {set_free( (set)v ) ;}, t ) ; hash_table_free(t);}
+
+    TABLE_FREE( Gen ) ;
+    TABLE_FREE( Ref ) ;
+    TABLE_FREE( Kill ) ;
+    TABLE_FREE( Def_in ) ;
+    TABLE_FREE( Def_out ) ;
+    TABLE_FREE( Ref_in ) ;
+    TABLE_FREE( Ref_out ) ;
+    TABLE_FREE( Defs ) ;
+
+    hash_table_free( Vertex_statement ) ;
+
     return( dg ) ;
 }
 
