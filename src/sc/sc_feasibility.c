@@ -306,7 +306,7 @@ boolean ofl_res;
 {
   int
     method = 0,
-    n_var = sc->dimension,
+    n_var,
     n_cont_eq = 0, n_ref_eq = 0,
     n_cont_in = 0, n_ref_in = 0;
   boolean 
@@ -315,7 +315,8 @@ boolean ofl_res;
 
   if (sc_rn_p(sc)) /* shortcut */
     return TRUE;
-
+  
+  n_var = sc->dimension,
   decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, 1);
   decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, 1);
 
