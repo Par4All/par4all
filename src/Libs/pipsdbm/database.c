@@ -467,6 +467,21 @@ int db_delete_obsolete_resources(bool (*keep_p)(string, string))
     return ndeleted;
 }
 
+/* returns whether name is a valid module.
+ */
+bool db_module_exists_p(string name)
+{
+  if (pips_database_undefined_p()) 
+    return FALSE;
+
+  DB_RESOURCES_MAP(os, or, 
+		   if (same_string_p(db_symbol_name(os), name)) 
+		       return TRUE,
+		   get_pips_database());
+
+  return FALSE;
+}
+
 /* returns an allocated array a with the sorted list of modules. 
  * strings are duplicated.
  */
