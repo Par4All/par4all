@@ -121,13 +121,13 @@ graph mod_graph;
 			    ifdebug(2) {
 				Psysteme sc1 = sc_new();
 				sc1 = sg_to_sc_chernikova(gs);
-				(void) fprintf(fd,"syst. lin. correspondantau syst. gen.:\n");
+				(void) fprintf(fd,"syst. lin. correspondant au syst. gen.:\n");
 				sc_fprint(fd,sc1,entity_local_name);
 			    }
 			} 
 		    }
-		    fprintf(fd, "\n");
 		}
+		fprintf(fd, "\n");
 	    }
 	}
     } 
