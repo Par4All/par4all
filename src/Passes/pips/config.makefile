@@ -15,6 +15,9 @@
 #
 # Source, header and object files used to build the target
 #
+
+CPPFLAGS	+= -DUTC_DATE='"$(UTC_DATE)"'
+
 LIB_CFILES	= pips.c
 LIB_HEADERS	= pips-local.h 
 LIB_OBJECTS	= $(LIB_CFILES:.c=.o)
