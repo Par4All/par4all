@@ -82,7 +82,7 @@ execute_safe_apply_outside_the_notifyer()
 }
 
 
-void static
+void
 safe_apply_outside_the_notifyer(string transformation_name_to_apply,
                                 string module_name)
 {
