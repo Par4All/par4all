@@ -2,10 +2,10 @@
    chooser. */
 
 
-/* 	%A% ($Date: 1997/05/27 12:05:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* $Id$ */
 
 #ifndef lint
-char vcid_directory_menu[] = "%A% ($Date: 1997/05/27 12:05:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_directory_menu[] = "%A% ($Date: 1997/09/20 12:13:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <xview/xview.h>
@@ -126,7 +126,7 @@ generate_a_directory_menu(char * directory)
    debug(2, "generate_a_directory_menu", "menu = %#x (%s)\n",
          menu, directory);
 
-   if (db_get_current_workspace() != database_undefined) {
+   if (db_get_current_workspace_name()) {
       xv_set(menu, MENU_APPEND_ITEM,
              xv_create(XV_NULL, MENUITEM,
                        MENU_STRING,
