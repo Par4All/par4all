@@ -6,6 +6,8 @@
 #
 # $Id$
 #
+# should be rewriten, for instance in perl...
+#
 
 VERSION='undefined'
 LISP=-lisp
@@ -94,8 +96,8 @@ update_first()
 	# INIT_OFFSET takes into accounts the intrinsic domains + Tabulated_bp
 	# to compute initial domain number offsets.
 	
-	INIT_OFFSET=7
-	start=`expr $start + $INIT_OFFSET`
+	#INIT_OFFSET=7
+	#start=`expr $start + $INIT_OFFSET`
 	
 	case $VERSION in
 	$LISP )
@@ -146,55 +148,24 @@ go () {
 	DEP=/tmp/dep$$
 	ORDER=/tmp/order$$
 	OK=/tmp/result$$
-	FILES=/tmp/files$$
 
 	PATH=$PATH:$NEWGEN_ROOT/Bin/$NEWGEN_ARCH:$NEWGEN_ROOT/Bin/$PIPS_ARCH
 
 	shift 3
-	> $FILES
 
-	for i in $* 
+	# level 1 transitive closure...
+	for i in `{ echo $* | tr ' ' '\012' ; 
+          sed -n 's/^import .* from "\(.*\)".*$/\1/p;' $*; } | sort -u`
 	do
-		echo $i >> $FILES
-		awk '
-		BEGIN		{
-				quote=sprintf( "%c", 34 )
-				}
-		/^import/	{
-				file=substr( $4, 2, length( $4 )-2 )
-	
-				if(substr(file,length( file ),1) == quote) {
-					file=substr(file, 1, length( file )-1)
-				}
-				printf "%s\n", file >> "'$FILES'"
-				}' < $i
+	    include=`basename $i .newgen`$POSTFIX
+	    echo "$i $i" >> $DEP
+	    sed -n "s/^import .* from \"\(.*\)\".*/$i \1/p" $i >> $DEP
+	    domain=`egrep '^([a-zA-Z_]* =|external)' $i | wc -l | tr -cd '0-9'`
+	    index=`grep '^tabulated' $i | wc -l | tr -cd '0-9'`
+	    test ! "$index" && index=0
+	    echo "$domain $index" > $include
 	done
 
-	for i in `sort $FILES | uniq`
-	do
-		include=`basename $i .newgen`$POSTFIX
-		awk '
-		BEGIN		{
-				printf "%s %s\n", "'$i'", "'$i'" >> "'$DEP'"
-				quote=sprintf( "%c", 34 )
-				}
-		/^import/	{
-				file=substr( $4, 2, length( $4 )-2 )
-	
-				if( substr(file, length( file ),1) == quote) {
-					file=substr(file, 1, length( file )-1)
-				}
-				printf "%s %s\n", file, "'$i'" >> "'$DEP'"
-				domain++ ; 
-				}
-		/^.*=/		{domain++;}
-		/^external/	{domain++;}
-		/^tabulated/	{indx++;}
-		END		{
-				printf "%d %d", domain, indx > "'$include'"
-				}' < $i
-	done
-	
 	tsort $DEP 1>$ORDER 2>$OK
 	
 	if [ -s $OK ] ; then
@@ -203,7 +174,8 @@ go () {
 		exit 1
 	fi
 	
-	start=0
+	# INITIAL NEWGEN OFFSET...
+	start=7
 	index=0
 	
 	echo -n "" > $DEP
@@ -212,37 +184,30 @@ go () {
 	
 	for i in `cat $ORDER`
 	do
-		base=`basename $i .newgen`
-		include=$base$POSTFIX
-		rm -f $base.spec
-		echo ${base}_spec
-		numbers=`cat $include`
-		domains=`expr "$numbers" : "\([0-9]*\) "`
-		tabulateds=`expr "$numbers" : "[0-9]* \([0-9]*\)"`
-		> $include
-		define_base $base $include
-		pat=`pattern`
-		cat $i | sed "/^#define/{
-					s/#define\(.*\)\$/$pat/
-					q
-					}
-			      d" >> $include
-                rm -f $i.tmp.c
-		enter_package $base $include
-		{
-		    echo "--NEWGEN-START $start";
-		    echo "--NEWGEN-INDEX $index" ; 
-		    cat $i
-		} > $i.tmp.c
-		${CPP} $i.tmp.c |
-		$NEWGEN $base $base.spec >> $include
-                rm -f $i.tmp.c
+	  base=`basename $i .newgen`
+	  include=$base$POSTFIX
+	  rm -f $base.spec
+	  echo ${base}_spec
+	  read domains tabulateds < $include
+	  rm $include
+	  touch $include
+	  define_base $base $include
+	  pat=`pattern`
+	  sed -n "/^#define/{s/#define\(.*\)\$/$pat/p;q;}" $i >> $include
 
-		if [ $? != 0 ] ; then
-			echo "newgen: Error in specification"
-			exit 1
-		fi
-		ed -s $base.spec <<!
+	  enter_package $base $include
+	  {
+	    echo "--NEWGEN-START $start";
+	    echo "--NEWGEN-INDEX $index"; 
+	    cat $i;
+	   } | ${CPP} - | $NEWGEN $base $base.spec >> $include
+
+	  if [ $? != 0 ] ; then
+	     echo "newgen: Error in specification"
+	     exit 1
+	  fi
+
+	  ed -s $base.spec <<!
 0a
 --NEWGEN-START $start
 --NEWGEN-INDEX $index
@@ -250,9 +215,10 @@ go () {
 w
 q
 !
-		exit_package $include $base
-		start=`expr $start + $domains`
-		index=`expr $index + $tabulateds`
+	    # echo "$start $index $domains $tabulateds" >&2
+	    exit_package $include $base
+	    start=`expr $start + $domains`
+	    sindex=`expr $index + $tabulateds`
 	done
 	
 	update_first $start `head -1 $ORDER` $POSTFIX
