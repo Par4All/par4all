@@ -178,10 +178,14 @@ approx_convert(region reg)
     }
     else
     {
-	if ( effect_exact_p(reg) )
+	if ( effect_exact_p(reg) || effect_must_p(reg) )
 	    new_reg = convert_exact_to_exact_may(reg);
 	else
+	  {
+	    if (!effect_may_p(reg))
+	      pips_debug(4,"unknown approximation tag\n");
 	    new_reg = approx_convert_may_to_approx_may(reg);
+	  }
     }
     pips_debug(4,"end\n");
 
