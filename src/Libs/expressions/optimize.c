@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.11  1998/11/04 09:42:57  coelho
+ * use properties for eole and its options.
+ *
  * Revision 1.10  1998/11/04 08:59:06  zory
  * double and float format updated
  *
@@ -234,12 +237,32 @@ swap_syntax_in_expression(  list /* of expression */ lcode,
     }
 }
 
+/************************************************************** EOLE PROCESS */
+
+/* file name prefixes to deal with eole.
+ * /tmp should be fast (may be mapped into memory).
+ */
 #define OUT_FILE_NAME 	"/tmp/pips_to_eole"
 #define IN_FILE_NAME	"/tmp/eole_to_pips"
 
-#define PIPS_EOLE	"newgen_eole"
-#define PIPS_EOLE_FLAGS	"-nfmdg"
+/* property names.
+ */
+#define EOLE		"EOLE"		/* eole binary */
+#define EOLE_FLAGS	"EOLE_FLAGS"	/* default options */
+#define EOLE_OPTIONS	"EOLE_OPTIONS"	/* additionnal options */
 
+/* returns the eole command to be executed in an allocated string.
+ */
+static string 
+get_eole_command
+  (string in, /* input file from eole. */
+   string out /* output file to eole. */)
+{
+  return strdup(concatenate(get_string_property(EOLE), " ", 
+			    get_string_property(EOLE_FLAGS), " ", 
+			    get_string_property(EOLE_OPTIONS), 
+			    " -o ", in, " ", out, NULL));
+}
 
 /*************************************************** INTERFACE FROM PIPSMAKE */
 
@@ -249,7 +272,6 @@ bool optimize_expressions(string module_name)
 {
     statement s;
     list /* of expression */ le, ln;
-    string in, out, cmd;
 
     ln = NIL;
 
@@ -269,15 +291,17 @@ bool optimize_expressions(string module_name)
     /* Could perform more optimizations here...
      */
 
-
     /* check consistency before optimizations */
-    pips_assert("consistency checking before optimizations \n",statement_consistent_p(s));
+    pips_assert("consistency checking before optimizations",
+		statement_consistent_p(s));
 
     /* begin EOLE stuff
      */
     le = get_list_of_rhs(s);
-    if (gen_length(le)) { /* not empty list */
-      
+    if (gen_length(le)) /* not empty list */
+    {
+      string in, out, cmd;
+
       /* create temporary files */
       in = safe_new_tmp_file(IN_FILE_NAME);
       out = safe_new_tmp_file(OUT_FILE_NAME);
@@ -288,9 +312,7 @@ bool optimize_expressions(string module_name)
       /* run eole (Evaluation Optimization for Loops and Expressions) 
        * as a separate process.
        */
-      cmd = strdup(concatenate(
-			       PIPS_EOLE " " PIPS_EOLE_FLAGS
-			       " -o ", in, " ", out, NULL));
+      cmd = get_eole_command(in, out);
 
       pips_debug(2, "executing: %s\n", cmd);
       
