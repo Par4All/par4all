@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/12/07 18:43:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/12/29 15:24:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/12/07 18:43:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/12/29 15:24:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -101,8 +101,7 @@ entity e;
     if (type_void_p(tr)) 
     {
 	/* the condition was ENDP(args) */
-	pc = CHAIN_SWORD(pc, 
-			 entity_main_module_p(e) ? 
+	pc = CHAIN_SWORD(pc, entity_main_module_p(e) ? 
 			 "PROGRAM " : "SUBROUTINE ");
     }
     else if (type_variable_p(tr)) {
@@ -342,68 +341,56 @@ entity e;
  *
  * updated to fully control the list to be used.
  */
+/* hook for commons, when not generated...
+ */
+static string default_common_hook(entity module, entity common)
+{
+    return strdup(concatenate
+        ("common to include: ", entity_local_name(common), "\n", NULL));
+}
+
+static string (*common_hook)(entity, entity) = default_common_hook; 
+void set_prettyprinter_common_hook(string(*f)(entity,entity)){ common_hook=f;}
+void reset_prettyprinter_common_hook(){ common_hook=default_common_hook;}
+
 static text text_entity_declaration(module, ldecl)
 entity module;
 list ldecl;
 {
-    bool
-	print_commons = get_bool_property("PRETTYPRINT_COMMONS");
-    text 
-	r = text_undefined;
-    list
-	before = NIL,
-	after_before = NIL,
-	pi = NIL,  
-	pf4 = NIL, 
-	pf8 = NIL, 
-	pl = NIL, 
-	pc = NIL,
-	ps = NIL;
+    bool print_commons = get_bool_property("PRETTYPRINT_COMMONS");
+    text r = text_undefined;
+    list before = NIL, after_before = NIL,
+	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, pc = NIL, ps = NIL;
 
-    MAPL(p,
+    MAP(ENTITY, e,
      {
-	 entity 
-	     e = ENTITY(CAR(p));
-	 type 
-	     te = entity_type(e);
-	 bool
-	     func = 
+	 type te = entity_type(e);
+	 bool func = 
 		 type_functional_p(te) && storage_rom_p(entity_storage(e));
-	 bool
-	     param = func && value_symbolic_p(entity_initial(e));
-	 bool
-	     external =     /* subroutines won't be declared */
+	 bool param = func && value_symbolic_p(entity_initial(e));
+	 bool external =     /* subroutines won't be declared */
 		 (func && 
 		  value_code_p(entity_initial(e)) &&
 		  !type_void_p(functional_result(type_functional(te))));
-	 bool
-	     common = type_area_p(te);
-	 bool 
-	     var = type_variable_p(te);
-	 bool 
-	     in_ram = storage_ram_p(entity_storage(e));
+	 bool common = type_area_p(te);
+	 bool var = type_variable_p(te);
+	 bool in_ram = storage_ram_p(entity_storage(e));
 	 
-	 debug(3, "text_declaration", "entity name is %s\n", entity_name(e));
+	 pips_debug(3, "entity name is %s\n", entity_name(e));
 
 	 if (!print_commons && common && !SPECIAL_COMMON_P(e))
 	 {
 	     after_before = 
-		 CONS(SENTENCE,
-		      make_sentence(is_sentence_formatted,
-				    strdup(concatenate("common to include: ",
-						       entity_local_name(e),
-						       "\n",
-						       NULL))),
+		 CONS(SENTENCE, make_sentence(is_sentence_formatted,
+					      common_hook(module, e)),
 		      after_before);
 	 }
 
 	 if (!print_commons && 
-	     (common || 
-	      (var && in_ram && 
-	       !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e)))))))
+	     (common || (var && in_ram && 
+             !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e)))))))
 	 {
-	     debug(5, "text_declaration", 
-		   "skipping entity %s\n", entity_name(e));
+	     pips_debug(5, "skipping entity %s\n", entity_name(e));
 	 }
 	 else if (param || external)
 	 {
@@ -900,9 +887,16 @@ int n;
 
     return(r);
 }
-
-/*
- * function text text_module(module, stat)
+
+/* hook for adding something in the head. used by hpfc.
+ * done so to avoid hpfc->prettyprint dependence in the libs. 
+ * FC. 29/12/95.
+ */
+static string (*head_hook)(entity) = NULL;
+void set_prettyprinter_head_hook(string(*f)(entity)){ head_hook=f;}
+void reset_prettyprinter_head_hook(){ head_hook=NULL;}
+
+/* function text text_module(module, stat)
  *
  * carefull! the original text of the declarations is used
  * if possible. Otherwise, the function text_declaration is called.
@@ -918,6 +912,10 @@ statement stat;
    if ( strcmp(s,"") == 0 
 	|| get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") ) {
       ADD_SENTENCE_TO_TEXT(r, sentence_head(module));
+      if (head_hook) 
+	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+						head_hook(module)));
+					  
       MERGE_TEXTS(r, text_declaration(module));
    }
    else {
