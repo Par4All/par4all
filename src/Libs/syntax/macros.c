@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: macros.c,v $
+ * Revision 1.2  1997/09/18 16:56:55  coelho
+ * warn if non safe.
+ *
  * Revision 1.1  1997/09/18 16:01:17  coelho
  * Initial revision
  *
@@ -121,6 +124,33 @@ parser_add_a_macro(call c, expression e)
 }
 
 
+/* is there a call to some untrusted function?
+ */
+static bool some_call;
+
+static bool 
+call_flt(call c)
+{
+    value v = entity_initial(call_function(c));
+    if (value_intrinsic_p(v) || value_constant_p(v) || value_symbolic_p(v))
+	return TRUE;
+    /* else untrusted!
+     */
+    some_call = TRUE;
+    gen_recurse_stop(NULL);
+    return FALSE;
+}
+
+static bool
+untrusted_call_p(expression e)
+{
+    some_call = FALSE;
+    gen_recurse(e, call_domain, call_flt, gen_null);
+    return some_call;
+}
+
+
+
 /****************************************************** MACRO SUBSTITUTION */
 
 static expression s_init, s_repl;
@@ -150,7 +180,7 @@ substitute_expression_in_expression(
 	print_expression(replacement);
     }
 
-    s_init = initial;
+    s_init = initial; 
     s_repl = replacement;
 
     gen_recurse(tree, expression_domain, gen_true, expr_rwt);
@@ -160,6 +190,7 @@ substitute_expression_in_expression(
 void
 parser_macro_expansion(expression e)
 {
+    bool warned = FALSE;
     macro_t * def;
     call c, lhs;
     entity macro;
@@ -187,13 +218,32 @@ parser_macro_expansion(expression e)
     
     lformals = call_arguments(lhs);
 
-    pips_assert("same # args", gen_length(lactuals)==gen_length(lformals));
+    pips_assert("same #args", gen_length(lactuals)==gen_length(lformals));
 
     /* replace each formal by its actual.
      */
     for (; !ENDP(lactuals); POP(lactuals), POP(lformals))
-	substitute_expression_in_expression
-	    (rhs, EXPRESSION(CAR(lformals)), EXPRESSION(CAR(lactuals)));
+    {
+	expression actu, form;
+
+	form = EXPRESSION(CAR(lformals)); /* MUST be a simple reference */
+	pips_assert("dummy arg ok", 
+		    expression_reference_p(form) &&
+	  ENDP(reference_indices(syntax_reference(expression_syntax(form)))));
+
+	/* if the replacement is a constant, or a reference without
+	 * calls to external functions, it should be safe 
+	 */
+	actu = EXPRESSION(CAR(lactuals));
+
+	if (!warned && untrusted_call_p(actu)) {
+	    pips_user_warning("maybe non safe substitution of macro %s!\n",
+			      module_local_name(macro));
+	    warned = TRUE;
+	}
+
+	substitute_expression_in_expression(rhs, form, actu);
+    }
 
     /* it is important to keep the same expression, for gen_recurse use.
      */
@@ -209,6 +259,4 @@ parser_substitute_all_macros(statement s)
 {
     if (get_bool_property("PARSER_EXPAND_STATEMENT_FUNCTIONS"))
 	gen_recurse(s, expression_domain, gen_true, parser_macro_expansion);
-
-    /* free all stuff? */
 }
