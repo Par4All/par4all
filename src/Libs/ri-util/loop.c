@@ -269,5 +269,5 @@ static void loop_rwt(loop l)
 
 void sort_all_loop_locals(statement s)
 {
-    gen_recurse(s, loop_domain, gen_true, loop_rwt);
+    gen_multi_recurse(s, loop_domain, gen_true, loop_rwt, NULL);
 }
