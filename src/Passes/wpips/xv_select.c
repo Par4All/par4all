@@ -681,7 +681,7 @@ close_workspace_notify(Menu menu,
 {
    success return_value;
    
-   return_value = close_workspace();
+   return_value = close_workspace(FALSE);
    debug(1, "close_workspace_notify", "return_value = %d\n", return_value);
 
    if (return_value ) {
