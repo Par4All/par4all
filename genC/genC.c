@@ -4,6 +4,10 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.51  2000/04/12 12:22:31  coelho
+ * tag numbering per type.
+ * additionnal typed constructors to avoid void* direct use...
+ *
  * Revision 1.50  1998/09/10 16:56:47  coelho
  * bug fix for read/write of tabulated.
  *
@@ -351,6 +355,30 @@ static void generate_make(
     }
 
     fprintf(code, "); }\n");
+
+    /* additionnal constructors for OR,
+       so as to improve type checking.
+     */
+    if (domain_type==CONSTRUCTED_DT && operator==OR_OP)
+    {
+	for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr)
+	{
+	  string field = dlp->domain->ba.constructor;
+	  string typen = newgen_argument_type_name(dlp->domain);
+	  
+	  /* header */
+	  fprintf(header, "extern %s make_%s_%s(%s);\n",
+		  name, name, field, typen);
+
+	  /* code */
+	  fprintf(code, 
+		  "%s make_%s_%s(%s _field_)"
+		  " { return make_%s(is_%s_%s, (void*) _field_);}\n",
+		  name, name, field, typen,
+		  name, name, field);
+	}
+    }
+
 }
 
 /* generate the struct for bp.
@@ -395,25 +423,24 @@ static void generate_struct_members(
 		newgen_type_name(dom), bp->name);
 
     if (domain_type==CONSTRUCTED_DT && operator!=ARROW_OP)
-	for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr)
-	    fprintf(out, "%s" INDENT "%s%s _%s_%s_" FIELD "; /* %s:%s%s */\n",
-		    offset,
-		    newgen_type_name(dlp->domain),
-		    newgen_type_name_close(dlp->domain),
-		    bp->name, dlp->domain->ba.constructor,
-		    dlp->domain->ba.constructor,
-		    dlp->domain->ba.constructand->name,
-		    newgen_kind_label(dlp->domain));
+    {
+      /* generate struct fields */
+      for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr)
+	fprintf(out, "%s" INDENT "%s%s _%s_%s_" FIELD "; /* %s:%s%s */\n",
+		offset,
+		newgen_type_name(dlp->domain),
+		newgen_type_name_close(dlp->domain),
+		bp->name, dlp->domain->ba.constructor,
+		dlp->domain->ba.constructor,
+		dlp->domain->ba.constructand->name,
+		newgen_kind_label(dlp->domain));
+    }
 
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) 
 	fprintf(out, INDENT "} _%s_union_;\n", bp->name);
     
     fprintf(out, "};\n\n");
 }
-
-/* the current tag. each tag for "or" is different on a per-file basis.
- */
-static int gen_current_tag = 0;
 
 /* access to members are managed thru macros.
  * cannot be functions because assign would not be possible.
@@ -429,6 +456,7 @@ static void generate_access_members(
     struct domainlist * dlp;
     bool in_between;
     string name=bp->name;
+    int gen_current_tag = 0; /* tag numbers? */
 
     fprintf(out, 
 	    "#define %s_domain_number(x) ((x)->_type_%s)\n", 
@@ -456,17 +484,22 @@ static void generate_access_members(
 		name, dom->ba.constructor);
     
     if (domain_type==CONSTRUCTED_DT && operator!=ARROW_OP)
+    {
 	for (dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr)
 	{
 	    char c;
 	    if (operator==OR_OP)
-		fprintf(out, 
-			"#define is_%s_%s (%d)\n"
-			"#define %s_%s_p(x) (%s_tag(x)==is_%s_%s)\n",
-			name, dlp->domain->ba.constructor, 
-			gen_current_tag++,
-			name, dlp->domain->ba.constructor, 
-			name, name, dlp->domain->ba.constructor);
+	    {
+	      string field = dlp->domain->ba.constructor;
+
+	      fprintf(out, 
+		      "#define is_%s_%s (%d)\n"
+		      "#define %s_%s_p(x) (%s_tag(x)==is_%s_%s)\n",
+		      name, field, gen_current_tag++,
+		      name, field, name, name, field);
+	    }
+
+	    /* accesses... */
 	    fprintf(out, 
 		    "#define %s_%s_(x) %s_%s(x) /* old hack compatible */\n"
 		    "#define %s_%s(x) ((x)->",
@@ -480,6 +513,7 @@ static void generate_access_members(
 		fprintf(out, ".%c", c);
 	    fprintf(out, ")\n");
 	}
+    }
 }
 
 /* constructed types: + x (and ->...)
@@ -794,9 +828,6 @@ void gencode(string file)
     /* header = fopen_suffix(file, ".h"); */
     header = stdout;
     code = fopen_suffix(file, ".c");
-
-    /* tag generation is on a per-file basis. */
-    gen_current_tag = 0;
 
     fprintf(header, DONT_TOUCH);
     fprintf(code, DONT_TOUCH);
