@@ -2,6 +2,9 @@
   */
 
 #include <stdio.h>
+#include <malloc.h>
+#include <assert.h>
+#include <stdlib.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -349,6 +352,71 @@ boolean rm_if_not_first_p;
 }
 
 
+int
+contrainte_lexicographic_compare(Pcontrainte c1, Pcontrainte c2, 
+				 int (*compare)(Pvecteur*, Pvecteur*))
+{
+    /* it is assumed that constraints c1 and c2 are already
+       lexicographically sorted */
+    int cmp = 0;
+
+    cmp = vect_lexicographic_compare(c1->vecteur, c2->vecteur, compare);
+
+    return cmp;
+}
+
+static int (* lexicographic_compare)(Pvecteur *, Pvecteur *) = NULL;
+
+static int
+internal_constraint_compare(Pcontrainte * pc1, Pcontrainte * pc2)
+{
+    int cmp = contrainte_lexicographic_compare(*pc1, *pc2, 
+					       lexicographic_compare);
+    return cmp;
+}
+
+
+Pcontrainte 
+constraints_lexicographic_sort(Pcontrainte cl,
+			       int (*compare)(Pvecteur*, Pvecteur*))
+{
+    int n = nb_elems_list(cl);
+    Pcontrainte result = CONTRAINTE_UNDEFINED;
+    Pcontrainte * table = NULL;
+    Pcontrainte * elem = NULL;
+    Pcontrainte ce;
+
+    if ( n==0 || n==1 )
+	return cl;
+
+    lexicographic_compare = compare;
+
+    /*  the temporary table is created and initialized
+     */
+    table = (Pcontrainte*) malloc(sizeof(Pcontrainte *)*n);
+    assert(table!=NULL);
+
+    for (ce=cl, elem=table; ce!=CONTRAINTE_UNDEFINED; ce=ce->succ, elem++)
+	*elem=ce;
+
+    /*  sort!
+     */
+    qsort(table, n, sizeof(Pcontrainte),
+	  (int (*)()) internal_constraint_compare);
+
+    /*  the vector is regenerated in order
+     */
+    for (elem=table; n>1; elem++, n--)
+	(*elem)->succ=*(elem+1);
+
+    (*elem)->succ= CONTRAINTE_UNDEFINED;
+    
+    /*  clean and return
+     */
+    result = *table;
+    free(table);
+    return result;
+}
 
 /*    that is all
  */
