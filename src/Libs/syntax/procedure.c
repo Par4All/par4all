@@ -203,7 +203,7 @@ EndOfProcedure()
 
     uses_alternate_return(FALSE);
     ResetReturnCodeVariable();
-    SubstituteAlternateReturns(FALSE);
+    SubstituteAlternateReturns("NO");
 
     /* Check the block stack */
     (void) PopBlock() ;
@@ -487,7 +487,7 @@ MakeCurrentFunction(
      * or substituted.
      */
     SubstituteAlternateReturns
-	(get_bool_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"));
+	(get_string_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"));
     ScanFormalParameters(add_formal_return_code(lfp));
 
     if (msf == TK_FUNCTION) {
