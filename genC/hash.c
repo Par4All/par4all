@@ -30,8 +30,8 @@
 /* Some predefined values for the key 
  */
 
-#define HASH_ENTRY_FREE (void *) 0
-#define HASH_ENTRY_FREE_FOR_PUT (void *) -1
+#define HASH_ENTRY_FREE ((void *) 0)
+#define HASH_ENTRY_FREE_FOR_PUT ((void *) -1)
 
 typedef struct __hash_entry hash_entry;
 
@@ -57,11 +57,6 @@ struct __hash_table {
 /* Constant to find the end of the prime numbers table 
  */
 #define END_OF_SIZE_TABLE ((int) 0)
-
-/* 50 percent limit : ((size)>>1)
- * 75 percent limit : (((size)>>1)+((size)>>2))
- */
-#define HASH_SIZE_LIMIT(size) ((size)>>1)
 
 /* Hash function to get the index of the array from the key 
  */
@@ -124,6 +119,17 @@ static int prime_list[] = {
     END_OF_SIZE_TABLE
 };
 
+/* returns the maximum number of things to hold in a table
+ */
+static int hash_size_limit(int current_size)
+{
+  /* 50.0% : ((size)>>1)
+   * 62.5% : (((size)>>1)+((size)>>3))
+   * 75.0% : (((size)>>1)+((size)>>2))
+   */
+  return current_size>>1;
+}
+
 /* Now we need the table size to be a prime number.
  * So we need to retrieve the next prime number in a list.
  */
@@ -176,7 +182,7 @@ hash_table hash_table_make(hash_key_type key_type, int size)
     htp->hash_type = key_type;
     htp->hash_size = size;
     htp->hash_entry_number = 0;
-    htp->hash_size_limit = HASH_SIZE_LIMIT(size);
+    htp->hash_size_limit = hash_size_limit(size);
     htp->hash_array = (hash_entry_pointer) alloc(size*sizeof(hash_entry));
 
     /* initialize statistics */
@@ -463,7 +469,7 @@ hash_enlarge_table(hash_table htp)
   htp->hash_size = get_next_hash_table_size(htp->hash_size);
   htp->hash_array = (hash_entry_pointer) 
     alloc(htp->hash_size* sizeof(hash_entry));
-  htp->hash_size_limit = HASH_SIZE_LIMIT(htp->hash_size);
+  htp->hash_size_limit = hash_size_limit(htp->hash_size);
   
   for (i = 0; i < htp->hash_size ; i++)
     htp->hash_array[i].key = HASH_ENTRY_FREE;
