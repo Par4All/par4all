@@ -1,5 +1,5 @@
 /* 
- * $RCSfile: generate.c,v $ ($Date: 1994/12/22 16:52:16 $, )
+ * $RCSfile: generate.c,v $ ($Date: 1994/12/28 18:14:52 $, )
  * version $Revision$
  * got on %D%, %T%
  * 
@@ -629,11 +629,11 @@ list *lstatp, lw, lr;
 	lnotcomp = NIL,
 	lnotcompr = NIL,
 	lnotcompw = NIL;
-    syntax
-	comp = SYNTAX(CAR(lw));
+    syntax comp;
 
     assert(gen_length(lw)>0);
 
+    comp = SYNTAX(CAR(lw));
     statcc = st_compute_current_computer(syntax_reference(comp));
 
     MAPL(cs,
