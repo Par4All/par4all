@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/06/26 19:39:04 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/07/20 18:40:40 $, )
  * version $Revision$
  */
 
@@ -34,19 +34,15 @@ bool written_effect_p(var, le)
 entity var;
 list le;
 {
-    effect e;
+    MAP(EFFECT, e,
+    {
+	if (reference_variable(effect_reference(e))==var &&
+	    action_write_p(effect_action(e)))
+	    return TRUE;
+    },
+	le);
 
-    MAPL(ce,
-     {
-	 e = EFFECT(CAR(ce));
-
-	 if (reference_variable(effect_reference(e))==var &&
-	     action_write_p(effect_action(e)))
-	     return(TRUE);
-     },
-	 le);
-
-    return(FALSE);
+    return FALSE;
 }
 
 bool written_effects_to_dist_arrays_p(expr)
@@ -117,12 +113,12 @@ distribution dist;
     /* select the relevent alignment if exists.
      * could be some kind of gen_find_if()...
      */
-    MAPL(ca,
-     {
-	 if (alignment_templatedim(ALIGNMENT(CAR(ca)))==i)
-	     return(FALSE);
-     },
-	 la);
+    MAP(ALIGNMENT, a,
+    {
+	if (alignment_templatedim(a)==i)
+	    return(FALSE);
+    },
+	la);
 
     return(TRUE);
 }
@@ -206,13 +202,11 @@ expression expr;
 	le=proper_effects_of_expression(expr,is_action_read),
 	lde=NULL;
 
-    MAPL(ce,
-     {
-	 effect e=EFFECT(CAR(ce));
-
-	 if(array_distributed_p(e)) lde=CONS(EFFECT,e,lde);
-     },
-	 le);
+    MAP(EFFECT, e,
+    {
+	if(array_distributed_p(e)) lde=CONS(EFFECT,e,lde);
+    },
+	le);
     
     gen_free_list(le);
     return(lde);
@@ -227,7 +221,7 @@ list FindRefToDistArrayFromList(lexpr)
 list lexpr;
 {
     list l=NIL;
-    MAPL(ce,{l=gen_nconc(FindRefToDistArray(EXPRESSION(CAR(ce))),l);},lexpr);
+    MAP(EXPRESSION, e,{l=gen_nconc(FindRefToDistArray(e),l);},lexpr);
     return(l);
 }
 
@@ -431,25 +425,22 @@ string suffix;
     /* The layout list must be updated to the right entities
      */
 
-    MAPL(ce,
-     {
-	 entity 
-	     e = ENTITY(CAR(ce));
-	 entity
-	     new_e;
-
-	 if (local_entity_of_module_p(e, common)) /* !!! not in current  */
-	 {
-	     new_e = AddEntityToModule(e, new_common);
-
-	     if (gen_find_eq(new_e, lold)==entity_undefined)
-	     {
-		 lnew = CONS(ENTITY, new_e, lnew);
-		 update(new_e, e);
-	     }
-	 }
-     },
-	 lref);
+    MAP(ENTITY, e,
+    {
+	entity new_e;
+	
+	if (local_entity_of_module_p(e, common)) /* !!! not in current  */
+	{
+	    new_e = AddEntityToModule(e, new_common);
+	    
+	    if (gen_find_eq(new_e, lold)==entity_undefined)
+	    {
+		lnew = CONS(ENTITY, new_e, lnew);
+		update(new_e, e);
+	    }
+	}
+    },
+	lref);
 
     AddEntityToDeclarations(new_common, module);
 
@@ -521,23 +512,20 @@ int dim, *tdim;
 	i = 1,
 	procdim = 0;
     
-    MAPL(cd,
-     {
-	 distribution 
-	     d = DISTRIBUTION(CAR(cd));
-
-	 if (!style_none_p(distribution_style(d)))
-	     procdim++;
-
-	 if (procdim==dim)
-	 {
-	     (*tdim) = i;
-	     return(d);
-	 }
-	 
-	 i++;
-     },
-	 ldi);
+    MAP(DISTRIBUTION, d,
+    {
+	if (!style_none_p(distribution_style(d)))
+	    procdim++;
+	
+	if (procdim==dim)
+	{
+	    (*tdim) = i;
+	    return(d);
+	}
+	
+	i++;
+    },
+	ldi);
 
     pips_error("FindDistributionOfProcessorDim",
 	       "dimension %d not found\n", dim);
