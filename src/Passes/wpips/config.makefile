@@ -44,6 +44,9 @@ LIB_CFILES=	emacs.c \
 		xv_transform.c \
 		xv_utils.c \
 		vararg.c 
+
+LIB_MAIN =	wpips_main.c
+
 #
 # Rajoute le directory icons :
 #
