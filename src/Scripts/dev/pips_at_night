@@ -1,15 +1,20 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/07/22 18:53:37 $, )
+# ($Date: 1996/08/07 09:04:43 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
 #
 
+#
 # source environment if needed (as from cron)
+
 test -r $HOME/.profile && . $HOME/.profile
 test "$PIPS_DIR" || . /projects/Pips/pipsrc.sh
+
+#
+# initialization of variables
 
 unset no_cleaning no_newgen no_linear no_pips no_validation
 
@@ -22,6 +27,14 @@ user=`whoami`
 email=${REPLYTO:-$user}
 script=`basename $0`
 verbose=:
+msg=
+
+# for temporary files
+report=/tmp/${script}.${user}.$$
+rm -f ${report}*
+
+#
+# Functions
 
 verb()
 {
@@ -33,7 +46,14 @@ usage()
     ret=$1
     shift
     cat <<-EOF
-	$script (version $Revision$) - $@
+	$script (version $Revision$): $@
+	Description
+	  This shell script checks pips sources and functionalities.
+	  It is intended to be run from cron at night, hence its name.
+	  It cleans pips directories, recompiles newgen, linear and pips
+	  for various "architectures" and validates. Reports about success
+	  and failures are sent. 
+	Summary of options:
 	  -h: this help
 	  -v: verbose
 	  -c arch: compile for arch (may be a list, default is .)
@@ -43,7 +63,7 @@ usage()
 	  -L: skip linear
 	  -P: skip pips
 	  -V: skip validation
-EOF
+	EOF
     exit $ret
 }
 
@@ -74,13 +94,17 @@ compile()
     rm -f $detailed $summary
 }
 
+#
+# Get command line options
+
 while getopts hvCNLPVc:a: OPT
 do
     case $OPT in
 	h) usage 0 "some help" ;;
+	v) verbose=verb ;;
 	a) email=$OPTARG ;;
 	c) arch="$OPTARG" ;;
-	v) verbose=verb ;;
+    # skipping parts:
 	C) no_cleaning=1 ;;
 	N) no_newgen=1 ;;
 	L) no_linear=1 ;;
@@ -90,11 +114,12 @@ do
     esac
 done
 
-report=/tmp/${script}.${user}.$$
-rm -f ${report}*
+shift `expr $OPTIND - 1`
+
+[ $# -eq 0 ] || usage 3 "unexpected args: $@" 
 
 #
-# do the job
+# Do the job and send reports
 
 {
     $verbose starting $script for $email 
@@ -103,8 +128,9 @@ rm -f ${report}*
     #
     # CLEANING
 
-    test "$no_cleaning" ||
-    {
+    test "$no_cleaning" && {
+	$verbose Skipping Cleaning
+    } || {
 	$verbose cleaning pips
 	$verbose date: `date`
 
@@ -123,52 +149,55 @@ rm -f ${report}*
 
     #
     # COMPILE
-    $verbose recompiling Production
-    msg=""
 
     # 1: NEWGEN
-    test "$no_newgen" ||
-    {
-	$verbose recompiling NEWGEN - Production
+    test "$no_newgen" && {
+	$verbose Skipping Newgen compilation
+    } || {
+	$verbose Compiling Newgen/Production
 	$verbose date: `date`
-	msg="${msg} newgen"
+	msg="${msg} N"
 	compile n newgen $report $arch
     }
     
     # 2: LINEAR
-    test "$no_linear" ||
-    {
-	$verbose recompiling LINEAR - Production
+    test "$no_linear" && {
+	$verbose Skipping Linear compilation
+    } || {
+	$verbose Compiling Linear/Production
 	$verbose date: `date`
-	msg="${msg} linear"
+	msg="${msg} L"
 	compile l linear $report $arch
     }
 
     # 3: PIPS
-    test "$no_pips" ||
-    {
-	$verbose recompiling PIPS - Production
+    test "$no_pips" && {
+	$verbose Skipping Pips compilation
+    } || {
+	$verbose Compiling Pips/Production
 	$verbose date: `date`
-	msg="${msg} pips"
+	msg="${msg} P"
 	compile p pips $report $arch
     }
 
     # 4: SUMMARY
-    test "$no_newgen$no_linear$no_pips" -eq 111 ||
+    test "$no_newgen$no_linear$no_pips" = '111' ||
     {
 	$verbose generating recompile summary
 	$verbose date: `date`
 	summary=SUCCEEDED
 	grep 'failed$' $report > $report.failed && summary=FAILED
-	$mail -s "$script: recompile${msg}: ${summary}" $email \
+	$mail -s "$script: compile${msg}: ${summary}" $email \
 	    < $report.failed > /dev/null 2>&1
 	rm -f $report*
     }
 
     #
     # VALIDATE Pips
-    test "$no_validation" || 
-    {
+
+    test "$no_validation" && {
+	$verbose Skipping Pips validation
+    } || {
 	$verbose Validating PIPS
 	$verbose date: `date` 
 	Validate -vti 50 -a ${email}
@@ -176,4 +205,4 @@ rm -f ${report}*
 
     $verbose end of  $script for $email 
     $verbose date: `date`
-} 2>&1 | $mail -s "$script: night report" ${email}
+} 2>&1 | $mail -s "$script: report" ${email}
