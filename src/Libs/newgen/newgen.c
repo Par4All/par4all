@@ -1,9 +1,9 @@
-/* %A% ($Date: 1995/12/15 18:17:56 $, ) 
+/* %A% ($Date: 1995/12/15 19:24:35 $, ) 
     version $Revision$, got on %D%, %T% [%P%].
    Copyright (c) - École des Mines de Paris Proprietary.  */
 
 #ifndef lint
-char top_level_newgen_c_vcid[] = "%A% ($Date: 1995/12/15 18:17:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char top_level_newgen_c_vcid[] = "%A% ($Date: 1995/12/15 19:24:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 #include <stdio.h>
 
@@ -35,8 +35,13 @@ void initialize_newgen()
  * not define for System V I guess.
  */
 #ifdef M_MXFAST
-    mallopt(M_MXFAST, 32);
-    mallopt(M_GRAIN, 4);
+    /* it seems not to be implemented...
+     */
+    if (mallopt(M_MXFAST, 48))
+	fprintf(stderr, "mallopt mxfast failed\n");
+
+    if (mallopt(M_GRAIN, 8))
+	fprintf(stderr, "XX mallopt grain failed\n");
 #endif    
 
     /* lecture specifications NewGen */
