@@ -127,7 +127,7 @@ statement make_shared_statement(ae, serial, news)
   statement    stat;
   int i;
 
-  comment = malloc(64);
+  comment = (char*) malloc(64);
   sprintf(comment,"CDIR$ SHARED %s(", entity_local_name(ae));
   for(i = 0; i < serial; i++) { 
     sprintf(comment, "%s:", comment); 
