@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/11/03 10:19:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/03/22 18:42:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1997/11/03 10:19:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1998/03/22 18:42:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -277,6 +277,41 @@ chain c;
 	(void) fprintf(stderr, "\n");
 	debug(9, "PrintChain", "\n");
     }
+}
+
+bool 
+entity_in_equivalence_chains_p(entity e)
+{
+    equivalences equiv = TempoEquivSet;
+    list pcc;
+    bool is_in_p = FALSE;
+
+    /* Apparently, TempoEquivSet stays undefined when there are no equivalences */
+    if(!equivalences_undefined_p(equiv)) {
+	for (pcc = equivalences_chains(equiv); !ENDP(pcc) && !is_in_p; POP(pcc)) {
+	    is_in_p = entity_in_equivalence_chain_p(e, CHAIN(CAR(pcc)));
+	}
+    }
+
+    return is_in_p;
+}
+
+bool
+entity_in_equivalence_chain_p(entity e, chain c)
+{
+    cons *pca;
+    atom a;
+    bool is_in_p = FALSE;
+
+    debug(9, "entity_in_equivalence_chain_p", "Begin for entity %s \n", entity_name(e));
+
+    for (pca = chain_atoms(c); !ENDP(pca) && !is_in_p; POP(pca)) {
+	a = ATOM(CAR(pca));
+
+	is_in_p = (atom_equivar(a) == e);
+    }
+    debug(9, "PrintChain", "End\n");
+    return is_in_p;
 }
 
 /* This function computes an address for each variable. All common
