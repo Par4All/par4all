@@ -23,7 +23,7 @@
 #include "matrice.h"
 
 #include "transformer.h"
-
+/*
 transformer transformer_fix_point(t1, t2)
 transformer t1;
 transformer t2;
@@ -35,7 +35,6 @@ transformer t2;
 
     debug(8,"transformer_fix_point","begin\n");
 
-    /* set arguments field: the two transformers are assumed compatible */
     pips_assert("transformer_convex_hull",
 		arguments_equal_p(transformer_arguments(t1),
 				  transformer_arguments(t2)));
@@ -45,13 +44,13 @@ transformer t2;
     r2 = (Psysteme) predicate_system(transformer_relation(t2));
     r = sc_elarg(r1, r2);
 
-    /* set relation field */
     predicate_system(transformer_relation(t)) = (char *) r;
 
     debug(8,"transformer_fix_point","end\n");
 
     return t;
 }
+*/
 
 transformer transformer_halbwachs_fix_point(tf)
 transformer tf;
@@ -122,7 +121,8 @@ transformer tf;
     }
 
     /* fix-point */
-    tf_star = transformer_fix_point(tf12, tf23);
+    /* should be done again based on Chenikova */
+    /* tf_star = transformer_fix_point(tf12, tf23); */
 
     ifdebug(8) {
 	(void) fprintf(stderr,"%s: %s\n","loop_to_transformer", "tf_star =");
