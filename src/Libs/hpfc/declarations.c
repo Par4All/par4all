@@ -3,8 +3,11 @@
  * new declarations compilation.
  * normalization of HPF declarations.
  *
- * $RCSfile: declarations.c,v $ version $Revision$
- * ($Date: 1996/03/21 15:56:05 $, )
+ * $Id$
+ * $Log: declarations.c,v $
+ * Revision 1.16  1997/03/20 10:18:42  coelho
+ * RCS headers.
+ *
  */
  
 #include "defines-local.h"
