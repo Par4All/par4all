@@ -442,6 +442,7 @@ entity get_ith_##lname##_prime(int i)\
  * these directives are used to instrument the code. 
  * must be used carefully. may be ignore with some properties.
  */
+#define TELL_SUFFIX		"0"
 #define SYNCHRO_SUFFIX		"1"
 #define TIMEON_SUFFIX		"2"
 #define TIMEOFF_SUFFIX		"3"
