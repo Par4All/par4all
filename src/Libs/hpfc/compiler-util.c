@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compiler-util.c,v $ ($Date: 1995/04/10 18:49:31 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1995/07/20 18:40:36 $, )
  * version $Revision$
  */
 
@@ -51,15 +51,11 @@ list updated_control_list(lc, map)
 list lc;
 control_mapping map;
 {
-    list
-	lc_result = NIL;
-    control
-	current = control_undefined,
-	new_c = control_undefined;
+    list lc_result = NIL;
+    control new_c = control_undefined;
 
-    MAPL(cc,
+    MAP(CONTROL, current,
      {
-	 current = CONTROL(CAR(cc));
 	 new_c = (control) GET_CONTROL_MAPPING(map, current);
 
 	 assert(!control_undefined_p(current) ||
@@ -157,15 +153,13 @@ list lsyn;
 list IndicesOfRef(syn)
 syntax syn;
 {
-    list 
-	l = NIL;
+    list l = NIL;
 
     assert(syntax_reference_p(syn));
 
-    MAPL(ce,
+    MAP(EXPRESSION, e,
      {
-	 syntax
-	     s = expression_syntax(EXPRESSION(CAR(ce)));
+	 syntax s = expression_syntax(e);
 
 	 switch (syntax_tag(s))
 	 {
@@ -191,15 +185,10 @@ syntax syn;
 list AddOnceToIndicesList(l, lsyn)
 list l, lsyn;
 {
-    MAPL(cs,
-     {
-	 syntax
-	     s = SYNTAX(CAR(cs));
-
-	 if (!is_in_syntax_list(reference_variable(syntax_reference(s)), lsyn))
-	     lsyn = CONS(SYNTAX, s, lsyn);
-     },
-	 l);
+    MAP(SYNTAX, s,
+	if (!is_in_syntax_list(reference_variable(syntax_reference(s)), lsyn))
+	     lsyn = CONS(SYNTAX, s, lsyn),
+	l);
 
     gen_free_list(l);
     return(lsyn);
@@ -209,12 +198,9 @@ bool is_in_syntax_list(e, l)
 entity e;
 list l;
 {
-    MAPL(cs,
-     {
-	 if (e==reference_variable(syntax_reference(SYNTAX(CAR(cs)))))
-	     return(TRUE);
-     },
-	 l);
+    MAP(SYNTAX, s,
+	if (e==reference_variable(syntax_reference(s))) return(TRUE),
+	l);
 
     return(FALSE);
 }
@@ -439,11 +425,9 @@ void reset_current_loops()
 bool entity_loop_index_p(e)
 entity e;
 {
-    MAPL(cl,
-     {
-	 if (e == loop_index(LOOP(CAR(cl)))) return(TRUE);
-     },
-	 current_loop_list);
+    MAP(LOOP, l,
+	if (e == loop_index(l)) return(TRUE),
+	current_loop_list);
 
     return(FALSE);
 }
@@ -451,15 +435,9 @@ entity e;
 range loop_index_to_range(index)
 entity index;
 {
-    loop l;
-
-    MAPL(cl,
-     {
-	 l = LOOP(CAR(cl));
-
-	 if (loop_index(l)==index) return(loop_range(l));
-     },
-	 current_loop_list);
+    MAP(LOOP, l,
+	if (loop_index(l)==index) return(loop_range(l)),
+	current_loop_list);
     
     return(range_undefined);
 }
