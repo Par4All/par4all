@@ -8,7 +8,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1995/12/20 08:50:03 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1995/12/22 16:06:08 $, )
  * version $Revision$
  */
 
@@ -48,6 +48,106 @@ local_integer_constant_expression(
     }
     
     return TRUE;
+}
+
+/* true if the expression is shift function
+ * of a loop nest index.
+ */
+static bool shift_expression_of_loop_index_p(e, pe, pi)
+expression e;
+entity *pe;
+int *pi;
+{
+    normalized n = expression_normalized(e);
+
+    pips_assert("normalized", !normalized_undefined_p(n));
+
+    switch (normalized_tag(n))
+    {
+    case is_normalized_complex:
+	return(FALSE);
+	break;
+    case is_normalized_linear:
+    {
+	Pvecteur
+	    v = (Pvecteur) normalized_linear(n),
+	    vp = vect_del_var(v, TCST);
+	int
+	    s = vect_size(vp);
+	bool
+	    result;
+
+	if (s!=1) return(FALSE);
+
+	result = ((entity_loop_index_p((entity)(vp->var)) && ((vp->val)==1)));
+
+	vect_rm(vp);
+	if (result) 
+	{
+	    *pe = (entity) (vp->var);
+	    *pi = vect_coeff(TCST, v);
+	}
+	return(result);
+	break;
+    }
+    default:
+	pips_internal_error("unexpected normalized tag\n");
+	break;
+    }
+    
+    return(FALSE); /* just to avoid a gcc warning */
+}
+
+/* true if the expression is an affine function
+ * of a loop nest index.
+ */
+static bool affine_expression_of_loop_index_p(e, pe, pi1, pi2)
+expression e;
+entity *pe;
+int *pi1, *pi2;
+{
+    normalized n = expression_normalized(e);
+
+    ifdebug(6)
+    {
+	fprintf(stderr, "[affine_expression_of_loop_index_p]\nexpression:\n");
+	print_expression(e);
+    }
+	    
+    pips_assert("normalized", !normalized_undefined_p(n));
+
+    switch (normalized_tag(n))
+    {
+    case is_normalized_complex:
+	return(FALSE);
+	break;
+    case is_normalized_linear:
+    {
+	Pvecteur v = (Pvecteur) normalized_linear(n),
+	    vp = vect_del_var(v, TCST);
+	int s = vect_size(vp);
+	bool result;
+
+	if (s!=1) return(FALSE);
+
+	result = (entity_loop_index_p((entity)(vp->var)) && ((vp->val)!=1));
+
+	vect_rm(vp);
+	if (result) 
+	{
+	    *pe = (entity) (vp->var);
+	    *pi1 = vect_coeff(TCST, v);
+	    *pi2 = (int) (vp->val);
+	}
+	return(result);
+	break;
+    }
+    default:
+	pips_internal_error("unexpected normalized tag\n");
+	break;
+    }
+    
+    return(FALSE); /* just to avoid a gcc warning */
 }
 
 /* computes the shift vector that links the two references,
@@ -131,7 +231,7 @@ align_check(
 	      "considering dimension %d of %s\n",
 	      i, entity_name(e2));
 
-	indice2 = nth_expression(i-1, li2);
+	indice2 = EXPRESSION(gen_nth(i-1, li2));
 
 	baffin2 = affine_expression_of_loop_index_p(indice2, &index2, &shft2, &affr2);
 	bshift2 = shift_expression_of_loop_index_p(indice2, &index2, &shft2);
@@ -201,7 +301,7 @@ align_check(
 	    }
 	    else
 	    {
-		indice1 = nth_expression(dim1-1, li1);
+		indice1 = EXPRESSION(gen_nth(dim1-1, li1));
 
 		rate1   = HpfcExpressionToInt(alignment_rate(a1));
 		cnst1   = HpfcExpressionToInt(alignment_constant(a1));
@@ -375,137 +475,15 @@ align_check(
     return(ok);
 }
 
-
-/*
- * bool shift_expression_of_loop_index_p(e, pe, pi)
- *
- * true if the expression is shift function
- * of a loop nest index.
- */
-bool shift_expression_of_loop_index_p(e, pe, pi)
-expression e;
-entity *pe;
-int *pi;
-{
-    normalized
-	n = expression_normalized(e);
-
-    pips_assert("normalized", !normalized_undefined_p(n));
-
-    switch (normalized_tag(n))
-    {
-    case is_normalized_complex:
-	return(FALSE);
-	break;
-    case is_normalized_linear:
-    {
-	Pvecteur
-	    v = (Pvecteur) normalized_linear(n),
-	    vp = vect_del_var(v, TCST);
-	int
-	    s = vect_size(vp);
-	bool
-	    result;
-
-	if (s!=1) return(FALSE);
-
-	result = ((entity_loop_index_p((entity)(vp->var)) && ((vp->val)==1)));
-
-	vect_rm(vp);
-	if (result) 
-	{
-	    *pe = (entity) (vp->var);
-	    *pi = vect_coeff(TCST, v);
-	}
-	return(result);
-	break;
-    }
-    default:
-	pips_internal_error("unexpected normalized tag\n");
-	break;
-    }
-    
-    return(FALSE); /* just to avoid a gcc warning */
-}
-
-/*
- * bool affine_expression_of_loop_index_p(e, pe, pi1, pi2)
- *
- * true if the expression is an affine function
- * of a loop nest index.
- */
-bool affine_expression_of_loop_index_p(e, pe, pi1, pi2)
-expression e;
-entity *pe;
-int *pi1, *pi2;
-{
-    normalized n = expression_normalized(e);
-
-    ifdebug(6)
-    {
-	fprintf(stderr, "[affine_expression_of_loop_index_p]\nexpression:\n");
-	print_expression(e);
-    }
-	    
-    pips_assert("normalized", !normalized_undefined_p(n));
-
-    switch (normalized_tag(n))
-    {
-    case is_normalized_complex:
-	return(FALSE);
-	break;
-    case is_normalized_linear:
-    {
-	Pvecteur v = (Pvecteur) normalized_linear(n),
-	    vp = vect_del_var(v, TCST);
-	int s = vect_size(vp);
-	bool result;
-
-	if (s!=1) return(FALSE);
-
-	result = (entity_loop_index_p((entity)(vp->var)) && ((vp->val)!=1));
-
-	vect_rm(vp);
-	if (result) 
-	{
-	    *pe = (entity) (vp->var);
-	    *pi1 = vect_coeff(TCST, v);
-	    *pi2 = (int) (vp->val);
-	}
-	return(result);
-	break;
-    }
-    default:
-	pips_internal_error("unexpected normalized tag\n");
-	break;
-    }
-    
-    return(FALSE); /* just to avoid a gcc warning */
-}
-
-/*
- * bool hpfc_integer_constant_expression_p(e, pi)
- *
- * 
- * 
- */
 bool hpfc_integer_constant_expression_p(e, pi)
 expression e;
 int *pi;
 {
-    normalized 
-	n = expression_normalized(e);
-
-    ifdebug(9)
-    {
-	fprintf(stderr, "[hpfc_integer_constant_expression_p] dealing with:\n");
-	print_expression(e);
-    }
+    normalized n = expression_normalized(e);
 
     if (normalized_undefined_p(n)) 
     {
 	n = NORMALIZE_EXPRESSION(e);
-	/* expression_normalized(e) = n; */
     }
 
     switch (normalized_tag(n))
@@ -534,11 +512,4 @@ int *pi;
     }
     
     return(FALSE); /* just to avoid a gcc warning */
-}
-
-expression nth_expression(n, l)
-int n;
-list l;
-{
-    return((n==0)?(EXPRESSION(CAR(l))):(nth_expression(n-1, CDR(l))));
 }
