@@ -89,7 +89,7 @@ transformer t2;
     if( get_debug_level() >= 9) {
 	(void) fprintf(stderr, "%s: %s", "transformer_combine",
 		       "global linear system r1 before projection\n");
-	sc_fprint(stderr, r1, external_value_name);
+	sc_fprint(stderr, r1, dump_value_name);
 	sc_dump(r1);
     }
 
@@ -114,7 +114,7 @@ transformer t2;
     if( get_debug_level() >= 9) {
 	(void) fprintf(stderr, "%s: %s", "transformer_combine",
 		       "global linear system r1 after projection\n");
-	sc_fprint(stderr, r1, external_value_name);
+	sc_fprint(stderr, r1, dump_value_name);
 	sc_dump(r1);
     }
 
