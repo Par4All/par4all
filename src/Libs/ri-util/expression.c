@@ -708,22 +708,16 @@ Pvecteur pv;
     Pvecteur
 	v_sorted = vect_sort(pv, compare_Pvecteur),
 	v = v_sorted;
-    expression 
-	factor1, factor2;
-    entity 
-	op_add = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-							 PLUS_OPERATOR_NAME), 
-				    entity_domain),
-	op_sub = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-							 MINUS_OPERATOR_NAME), 
-				    entity_domain);
+    expression 	factor1, factor2;
+    entity op_add, op_sub;
+
+    op_add = CreateIntrinsic(PLUS_OPERATOR_NAME);
+    op_sub = CreateIntrinsic(MINUS_OPERATOR_NAME);
 
     assert(!entity_undefined_p(op_add) && !entity_undefined_p(op_sub));
     
     if (VECTEUR_NUL_P(v)) 
-	/* do not vect_rm(v_sorted), since it is also NULL ! 
-	 */
-	return(make_integer_constant_expression(0));
+	return make_integer_constant_expression(0);
 
     factor1 = make_factor_expression((int) vecteur_val(v), 
 				     (entity) vecteur_var(v));
@@ -742,7 +736,35 @@ Pvecteur pv;
 
     vect_rm(v_sorted);
 
-    return(factor1);
+    return factor1;
+}
+
+/* generates var = linear expression 
+ * from the Pvecteur. var is removed if necessary.
+ * ??? should manage an (positive remainder) integer divide ?
+ */
+statement
+Pvecteur_to_assign_statement(
+    entity var,
+    Pvecteur v)
+{
+    statement result;
+    Pvecteur vcopy;
+    int coef;
+    
+    coef = vect_coeff((Variable) var, v);
+    assert(abs(coef)<=1);
+
+    vcopy = vect_dup(v);
+	
+    if (coef) vect_erase_var(&vcopy, (Variable) var);
+    if (coef==1) vect_chg_sgn(vcopy);
+	
+    result = make_assign_statement(entity_to_expression(var),
+				   make_vecteur_expression(vcopy));
+    vect_rm(vcopy);
+
+    return result;
 }
 
 reference expression_reference(e)
