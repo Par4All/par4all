@@ -1,14 +1,15 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# ($Date: 1995/11/14 18:22:00 $, )
+# ($Date: 1996/07/22 13:19:45 $, )
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
 #
+# old: matrice.c 
+
 LIB_CFILES=	Psc.c \
 		Ppolynome.c \
 		Pvecteur.c \
 		Pcontrainte.c \
-		matrice.c \
 		eval.c \
 		size.c \
 		util.c \
