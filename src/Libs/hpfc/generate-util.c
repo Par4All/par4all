@@ -1,10 +1,23 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/10/10 11:38:24 $, ) 
+ * ($Date: 1995/11/30 16:54:01 $, ) 
  */
 
 #include "defines-local.h"
+
+static expression 
+pvm_encoding_option(int n)
+{
+    static const string option[] = 
+    {
+	"PvmDataDefault",
+	"PvmDataRaw",
+	"PvmDataInPlace"
+    };
+
+    return MakeCharacterConstantExpression(option[n]);
+}
 
 /* builds a statement
  *   VAR_i = MYPOS(i, proc_number) // i=1 to proc dimension
@@ -84,30 +97,6 @@ make_reference_expression(
 {
     return reference_to_expression(make_reference(e,
 	   hpfc_gen_n_vars_expr(creation, NumberOfDimension(e))));
-}
-
-/* the following functions generate the statements to appear in
- * the I/O loop nest.
- */
-statement 
-set_logical(
-    entity log, /* the logical variable to be assigned */
-    bool val)   /* the assigned truth value */
-{
-    return make_assign_statement
-	(entity_to_expression(log),
-	 make_call_expression(MakeConstant
-	      (val ? ".TRUE." : ".FALSE.", is_basic_logical),
-			      NIL));
-}
-
-statement
-set_integer(
-    entity var, /* the integer scalar variable to be assigned */
-    int val)    /* the assigned int value */
-{
-    return make_assign_statement(entity_to_expression(var),
-				 int_to_expression(val));
 }
 
 /* returns statement VAR = VAR + N
@@ -223,7 +212,7 @@ hpfc_initsend(
      */
     init = hpfc_make_call_statement
 	     (hpfc_name_to_entity(PVM_INITSEND), 
-	      CONS(EXPRESSION, MakeCharacterConstantExpression("PVMRAW"),
+	      CONS(EXPRESSION, pvm_encoding_option(1),
 	      CONS(EXPRESSION, entity_to_expression(hpfc_name_to_entity(BUFID)),
 		   NIL)));
 
@@ -452,9 +441,9 @@ hpfc_buffer_initialization(
     buffindex = set_integer(hpfc_name_to_entity(BUFFER_INDEX), 0);
     msgstate = set_logical(hpfc_name_to_entity
 			   (is_send ? SND_NOT_INIT : RCV_NOT_PRF), TRUE);
-    other = set_integer
+    other = set_expression
 	(hpfc_name_to_entity(is_send ? BUFFER_ENCODING : BUFFER_RCV_SIZE),
-	 is_send ? 1 : 0); /* PVMRAW, no PVM in place... */
+	 is_send ? pvm_encoding_option(2) : int_to_expression(0)); 
 
     l = CONS(STATEMENT, buffindex,
         CONS(STATEMENT, msgstate, 
