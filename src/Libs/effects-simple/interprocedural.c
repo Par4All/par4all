@@ -6,6 +6,7 @@
  * This File contains functions for the interprocedural computation of simple
  * effects.
  *
+ * $Id$
  */
 
 #include <stdio.h>
@@ -20,23 +21,26 @@
 #include "text-util.h"
 #include "ri-util.h"
 
+#include "flint.h" /* for find_ith_formal_parameter() */
+
 #include "effects-generic.h"
 #include "effects-simple.h"
-
 
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
 
 list /* of effects */
-simple_effects_backward_translation(entity func, list real_args,
-				    list l_eff, transformer context)
+simple_effects_backward_translation(
+    entity func, 
+    list real_args,
+    list l_eff, 
+    transformer context)
 {
-    list l_res = NIL;
-    
-    l_res = summary_to_proper_effects(func, real_args, l_eff);
-    
-    return l_res;
+    return summary_to_proper_effects(func, real_args, l_eff);
 }
+
+
+/****************************************************************************/
 
 /* list effects_dynamic_elim(list l_reg)
  * input    : a list of effects.
@@ -78,7 +82,8 @@ effects_dynamic_elim(list l_eff)
 	    ram r = storage_ram(eff_s);
 	    if (dynamic_area_p(ram_section(r)))
 	    {
-		pips_debug(5, "dynamic var ignored (%s)\n", entity_name(eff_ent));
+		pips_debug(5, "dynamic var ignored (%s)\n", 
+			   entity_name(eff_ent));
 		ignore_this_effect = TRUE;
 	    }
 	    break;
@@ -86,7 +91,8 @@ effects_dynamic_elim(list l_eff)
 	case is_storage_formal:
 	    break;
 	case is_storage_rom:
-	    pips_internal_error("bad tag for %s (rom)\n", entity_name(eff_ent));
+	    pips_internal_error("bad tag for %s (rom)\n", 
+				entity_name(eff_ent));
 	default:
 	    pips_internal_error("case default reached\n");
         }
@@ -96,14 +102,16 @@ effects_dynamic_elim(list l_eff)
 	    effect eff_res = make_sdfi_effect(eff);
 	    ifdebug(4)
 	    {
-		pips_debug(4, "effect kept : \n\t %s\n", effect_to_string(eff_res));
+		pips_debug(4, "effect kept : \n\t %s\n", 
+			   effect_to_string(eff_res));
 	    }
             l_res = effects_add_effect(l_res, eff_res);
         }
 	else 
 	    ifdebug(4)
 	    {
-		pips_debug(4, "effect removed : \n\t %s\n", effect_to_string(eff));
+		pips_debug(4, "effect removed : \n\t %s\n", 
+			   effect_to_string(eff));
 	    }
     },
 	l_eff);
@@ -228,7 +236,7 @@ offset_of_reference(reference ref, int n)
 
 
 /* list global_effect_translation(effect ef, entity func)
- * input    : a global or static effect from subroutine func.
+ * input    : a global or static effect from/to subroutine func.
  * output   : a list of effect, translation of effect ef into effects in
  *            the current subroutine name space.
  * modifies : nothing.
@@ -237,40 +245,38 @@ offset_of_reference(reference ref, int n)
  *            variables of the first module found in the common variable list.
  *            BC, october 1995.
  */
-static list 
-global_effect_translation(effect ef, entity func)
+static list /* of effect */ 
+global_effect_translation(
+    effect ef, 
+    entity source_func,
+    entity target_func)
 {
     list l_com_ent, l_tmp, l_new_eff = NIL;
     entity eff_ent = effect_entity(ef);
-    entity target_func = get_current_module_entity();
     entity ccommon; /* current common */
     int eff_ent_size, total_size, eff_ent_begin_offset, eff_ent_end_offset;
     effect new_eff;
     boolean found = FALSE;
 
+    pips_debug(5, "target function: %s (local name: %s)\n",
+	       entity_name(target_func), module_local_name(target_func));
+    pips_debug(5,"input effect: \n%s\n", effect_to_string(ef));
+
+    /* If the entity is a top-level entity, no translation;
+     * It is the case for variables dexcribing I/O effects (LUNS).
+     */
     if (top_level_entity_p(eff_ent))
 	return ( CONS(EFFECT, make_sdfi_effect(ef), NIL) );
 
     if (io_entity_p(eff_ent))
 	return ( CONS(EFFECT, make_sdfi_effect(ef), NIL) );
 
-
-    ifdebug(5)
-    {
-	pips_debug(5, "target function: %s (local name: %s)\n",
-		   entity_name(target_func), module_local_name(target_func));
-	pips_debug(5,"input effect: \n%s\n", effect_to_string(ef));
-    }
-
-    /* If the entity is a top-level entity, no translation;
-     * It is the case for variables dexcribing I/O effects (LUNS).
-     */
-
     /* First, we search if the common is declared in the target function;
      * if not, we have to deterministically choose an arbitrary function
      * in which the common is declared. It will be our reference.
      * By deterministically, I mean that this function shall be chosen whenever
-     * we try to translate from this common to a routine where it is not declared.
+     * we try to translate from this common to a routine where it is not 
+     * declared.
      */
     ccommon = ram_section(storage_ram(entity_storage(eff_ent)));
     l_com_ent = area_layout(type_area(entity_type(ccommon)));
@@ -294,11 +300,13 @@ global_effect_translation(effect ef, entity func)
     if(!found)
     {
 	entity ent = ENTITY(CAR(l_com_ent));	
-	target_func = local_name_to_top_level_entity(module_name(entity_name(ent)));
+	target_func = local_name_to_top_level_entity(
+	    module_name(entity_name(ent)));
 	ifdebug(5)
 	{
-	    pips_debug(5, "common not declared in caller,\n\t using %s declarations "
-		       "instead\n", entity_name(target_func));
+	    pips_debug(5, "common not declared in caller,\n"
+		       "\t using %s declarations instead\n", 
+		       entity_name(target_func));
 	}
     }
     
@@ -307,7 +315,8 @@ global_effect_translation(effect ef, entity func)
     eff_ent_begin_offset = ram_offset(storage_ram(entity_storage(eff_ent)));
     eff_ent_end_offset = eff_ent_begin_offset + eff_ent_size - 1;
 
-    pips_debug(6, "\n\t eff_ent: size = %d, offset_begin = %d, offset_end = %d \n",
+    pips_debug(6, "\n\t eff_ent: size = %d, offset_begin = %d,"
+	       " offset_end = %d \n",
 	      eff_ent_size, eff_ent_begin_offset, eff_ent_end_offset); 
 
     /* then, we perform the translation */
@@ -328,19 +337,20 @@ global_effect_translation(effect ef, entity func)
 
 	    pips_debug(6, "\n\t new_ent: size = %d, "
 		       "offset_begin = %d, offset_end = %d \n",
-		       new_ent_size, new_ent_begin_offset, new_ent_end_offset); 
+		       new_ent_size, new_ent_begin_offset, new_ent_end_offset);
 	    
 	    if ((new_ent_begin_offset <= eff_ent_end_offset) && 
 		(eff_ent_begin_offset <= new_ent_end_offset ))
 		/* these entities have elements in common */
 	    {				
-		/* if the new entity is entirely contained in the original one */
+		/* if the new entity is entirely contained in the original one
+		 */
 		if ((new_ent_begin_offset >= eff_ent_begin_offset) && 
 		    (new_ent_end_offset <= eff_ent_end_offset)) 
 		{
 		    new_eff = 
 			make_simple_effect
-			(make_reference(new_ent, NIL), 
+			(make_reference(new_ent, NIL), /* ??? memory leak */
 			 make_action(action_tag(effect_action(ef)), UU), 
 			 make_approximation
 			 (approximation_tag(effect_approximation(ef)), UU));
@@ -350,15 +360,15 @@ global_effect_translation(effect ef, entity func)
 		{						
 		    new_eff = 
 			make_simple_effect
-			(make_reference(new_ent, NIL), 
+			(make_reference(new_ent, NIL), /* ??? memory leak */
 			 make_action(action_tag(effect_action(ef)), UU), 
-			 make_approximation(is_approximation_may, UU));		    
+			 make_approximation(is_approximation_may, UU));
 		}
 
 		total_size += min (eff_ent_begin_offset,new_ent_end_offset) 
 		    - max(eff_ent_begin_offset, new_ent_begin_offset) + 1;
 						
-		l_new_eff = gen_nconc(l_new_eff, CONS(EFFECT, new_eff, NIL));	
+		l_new_eff = gen_nconc(l_new_eff, CONS(EFFECT, new_eff, NIL));
 	    }
 	}
     }
@@ -451,7 +461,8 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
      * is not compatible with the binding equations 
      */
     bad_reshaping = TRUE;
-    if (size_formal != NULL && size_real != NULL && offset != (Pvecteur) -1) {
+    if (size_formal != NULL && size_real != NULL && offset != (Pvecteur) -1) 
+    {
 	ineq = size_real;
 	vect_add_elem(&ineq,  TCST, VALUE_ONE);
 	ineq = vect_cl(ineq, VALUE_MONE, size_formal);
@@ -499,28 +510,33 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
 	if (reference_indices(real_ref) != NIL) {
 
 	    for (i = formal_ndims+1; i <= real_ndims; i++) {
-		pdims = gen_nconc(pdims, CONS(EXPRESSION, 
-					      reference_ith_index(real_ref, i), 
-					      NIL));
+		pdims = gen_nconc(pdims, 
+				  CONS(EXPRESSION, 
+				       reference_ith_index(real_ref, i), 
+				       NIL));
 	    }
 	}
-	else { /* Il faudrait recuperer la declaration du tableau. (03/93,yi-qing) */ 
+	else { /* Il faudrait recuperer la declaration du tableau.
+		* (03/93,yi-qing) */ 
 	     for (i = formal_ndims+1; i <= real_ndims; i++) {
-		pdims = gen_nconc(pdims, CONS(EXPRESSION, int_to_expression(1), 					      
+		pdims = gen_nconc(pdims, CONS(EXPRESSION, 
+					      int_to_expression(1),
 					      NIL));
 	    }
 	 }    
 
-	real_effect = make_simple_effect(make_reference(real_var, pdims), 
-				  make_action(formal_tac, UU), 
-				  make_approximation(formal_tap, UU));
+	real_effect = make_simple_effect(
+	    make_reference(real_var, pdims), /* ??? memory leak */
+	    make_action(formal_tac, UU), 
+	    make_approximation(formal_tap, UU));
 	debug(5, "translate_array_effect",
 	      "good reshaping between %s and %s\n",
 	      entity_name(real_var), entity_name(formal_var));
     }
     else {
-	user_warning("translate_array_effect", "bad reshaping between %s and %s\n",
-		entity_name(real_var), entity_name(formal_var));
+	user_warning("translate_array_effect", 
+		     "bad reshaping between %s and %s\n",
+		     entity_name(real_var), entity_name(formal_var));
     }
 
     return(real_effect);
@@ -548,27 +564,30 @@ translate_effect(entity called_func, list real_args, reference real_ref,
     {
 	pips_debug(8, "Scalar formal variable.\n");
 	if (entity_scalar_p(real_var) || !ENDP(reference_indices(real_ref)))
-	    real_effect = make_simple_effect(real_ref, 
-					     make_action(formal_tac, UU), 
-					     make_approximation(formal_tap, UU));
+	    real_effect = make_simple_effect
+		(real_ref, 
+		 make_action(formal_tac, UU), 
+		 make_approximation(formal_tap, UU));
 	else
 	{
 	    reference eff_ref;
 	    list eff_ref_indices = NIL;
 	    
 	    MAP(DIMENSION, dim,
-		{
-		    expression lo_exp = dimension_lower(dim);
-		    
-		    eff_ref_indices =
-			gen_nconc(eff_ref_indices, CONS(EXPRESSION, lo_exp, NIL));
-		    
-		}, 
-		    variable_dimensions(type_variable(entity_type(real_var))));
+	    {
+		expression lo_exp = dimension_lower(dim);
+		
+		eff_ref_indices =
+		    gen_nconc(eff_ref_indices, 
+			      CONS(EXPRESSION, lo_exp, NIL));
+		
+	    }, 
+		variable_dimensions(type_variable(entity_type(real_var))));
 	    eff_ref = make_reference(real_var, eff_ref_indices);
-	    real_effect = make_simple_effect(eff_ref, 
-					     make_action(formal_tac, UU), 
-					     make_approximation(formal_tap, UU));
+	    real_effect = make_simple_effect(
+		eff_ref, 
+		make_action(formal_tac, UU), 
+		make_approximation(formal_tap, UU));
 	}
     }
     else {
@@ -580,9 +599,10 @@ translate_effect(entity called_func, list real_args, reference real_ref,
     if (real_effect == effect_undefined) {
 	pips_debug(8," translation failed\n");
         /* translation failed; returns the whole real arg */
-        real_effect = make_simple_effect(make_reference(real_var, NIL), 
-                                  make_action(formal_tac, UU), 
-                                  make_approximation(is_approximation_may, UU));				  
+        real_effect = make_simple_effect
+	    (make_reference(real_var, NIL), /* ??? memory leak */
+	     make_action(formal_tac, UU), 
+	     make_approximation(is_approximation_may, UU));				  
     }
 
     ifdebug(8)
@@ -623,7 +643,8 @@ summary_effect_to_proper_effect(
     else if (storage_ram_p(st))
     {
 	list le;
-	le = global_effect_translation(e, call_function(c));
+	le = global_effect_translation
+	    (e, call_function(c), get_current_module_entity());
 	/* le = proper_effects_contract(le); */
 	return le;
     }
@@ -757,7 +778,8 @@ summary_to_proper_effects(
 	MAP(EFFECT, ef,
 	{
 	    if (storage_ram_p(entity_storage(effect_entity(ef)))) 
-		le = gen_nconc(le, global_effect_translation(ef, func));
+		le = gen_nconc(le, global_effect_translation
+			       (ef, func, get_current_module_entity()));
 	},
 	    func_sdfi);
     }
@@ -775,3 +797,122 @@ summary_to_proper_effects(
     return(le);
 }
 
+
+/****************************************************** FORWARD TRANSLATION */
+
+#define make_translated_effect(entity,action,approximation)\
+    make_effect(make_cell(is_cell_reference, make_reference((entity), NIL)),\
+		make_action(action, UU),\
+		make_approximation(approximation, UU),\
+		make_descriptor(is_descriptor_none,UU))
+
+/* I'm responsible for this piece of code for out simple effects. 
+ * I have been inspired by the corresponding function in convex effects.
+ *
+ * FC. August 1997.
+ */
+
+/* actual/formal arguments forward translation:
+ *
+ * CALL FOO(A(*)), SUBROUTINE FOO(B(*)): effect on A => effect on B
+ */
+static list /* of effect */
+real_simple_effects_forward_translation(
+    entity func, 
+    list /* of expression */ real_args,
+    list /* of effect */ l_eff)
+{
+    list /* of effect */ l_fwd_translated = NIL; /* what is being built */
+    int arg_num = 1;
+
+    MAP(EXPRESSION, e,
+    {
+	if (expression_reference_p(e))
+	{
+	    /* something to translate */
+	    entity actu = reference_variable(expression_reference(e));
+	    entity form = find_ith_formal_parameter(func, arg_num);
+
+	    pips_assert("ith formal is defined", !entity_undefined_p(form));
+	    
+	    /* look for an effect on actu or equivalenced
+	     */
+	    MAP(EFFECT, ef,
+	    {
+		/* ??? should be "may interfere" */
+		if (same_entity_p(effect_variable(ef),actu))
+		{
+		    /* approximation: 
+		     * Actual is array => MAY(formal);
+		     * Actual is scalar => actual(formal);
+		     */
+		    tag approx = entity_scalar_p(actu)?
+			is_approximation_may:
+		        approximation_tag(effect_approximation(ef));
+		    
+		    effect fef = make_translated_effect
+			(form, action_tag(effect_action(ef)), approx);
+
+		    /* better union not needed, all different ??? bof. */
+		    l_fwd_translated = CONS(EFFECT, fef, l_fwd_translated);
+		}
+	    },
+		l_eff);
+	}
+	/* else could checks sg */
+
+	arg_num++;
+    },
+        real_args);
+
+    return l_fwd_translated;
+}
+
+/* translation of global effects (i.e. variables in commons.
+ */
+static list /* of effect */
+common_simple_effects_forward_translation(
+    entity callee, 
+    list /* of effect */ l_eff)
+{
+    list l_fwd_translated = NIL;
+
+    MAP(EFFECT, e,
+    {
+	entity a = effect_variable(e);
+	storage s = entity_storage(a);
+	if (storage_ram_p(e) && !dynamic_area_p(ram_section(storage_ram(s))))
+	{
+	    pips_debug(5, "considering common variable %s\n", entity_name(a));
+
+	    /* some better union??? */
+	    l_fwd_translated = gen_nconc(
+		global_effect_translation
+		(e, get_current_module_entity(), callee), l_fwd_translated);
+	}
+    },
+        l_eff);
+
+    return l_fwd_translated;
+}
+
+/* OUT effects are translated forward to a call. 
+ */
+list /* of effect */ 
+simple_effects_forward_translation(
+    entity callee, 
+    list /* of expression */ real_args,
+    list /* of effect */ l_eff, 
+    transformer context)
+{
+    list /* of effect */ lr, lc;
+
+    pips_debug(4, "forward translation of %s call to %s\n",
+	       entity_name(get_current_module_entity()),
+	       callee);
+
+    lr = real_simple_effects_forward_translation(callee, real_args, l_eff);
+    lc = common_simple_effects_forward_translation(callee, l_eff);
+
+    return gen_nconc(lr, lc);
+}
