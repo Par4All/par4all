@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.35  1997/12/15 13:49:14  coelho
+ * new syntax. () -> [] and $ALL -> %ALL
+ *
  * Revision 1.34  1997/12/12 22:17:06  coelho
  * order fix for lonely comments.
  *
@@ -30,9 +33,6 @@
 #include "misc.h"
 #include "tpips.h"
 #include "tp_yacc.h"
-
-#define skip_blanks(str) \
-  while (*str && (*str==' ' || *str=='\t' || *str=='\n')) str++
 
 /* now get the characters from a string, not from a file */
 #ifndef FLEX_SCANNER
@@ -146,6 +146,10 @@ static char unk[2]; /* one char lines are not implicit shells */
 
 <INITIAL>\(		{ RETURN(TK_OPENPAREN); }
 <INITIAL>\)		{ RETURN(TK_CLOSEPAREN); }
+
+<INITIAL>\[		{ RETURN(TK_OPENPAREN); }
+<INITIAL>\]		{ RETURN(TK_CLOSEPAREN); }
+
 <INITIAL>\,		{ RETURN(TK_COMMA); }
 <INITIAL>= 		{ RETURN(TK_EQUAL); }
 
@@ -163,6 +167,13 @@ static char unk[2]; /* one char lines are not implicit shells */
 <INITIAL>"$MODULE"	{ RETURN(TK_OWNER_MODULE); }
 <INITIAL>"$CALLERS"	{ RETURN(TK_OWNER_CALLERS); }
 <INITIAL>"$CALLEES"	{ RETURN(TK_OWNER_CALLEES); }
+
+<INITIAL>"%ALL"		{ RETURN(TK_OWNER_ALL); }
+<INITIAL>"%PROGRAM"	{ RETURN(TK_OWNER_PROGRAM); }
+<INITIAL>"%MAIN"	{ RETURN(TK_OWNER_MAIN); }
+<INITIAL>"%MODULE"	{ RETURN(TK_OWNER_MODULE); }
+<INITIAL>"%CALLERS"	{ RETURN(TK_OWNER_CALLERS); }
+<INITIAL>"%CALLEES"	{ RETURN(TK_OWNER_CALLEES); }
 
 <INITIAL>[/\.0-9A-Za-z_:-]+ 	{ yylval.name=strdup(yytext); RETURN(TK_NAME);}
 
