@@ -1247,12 +1247,8 @@ statement st;
     
     switch( t ) {
     case is_instruction_call: 
-	call_t = value_tag(entity_initial(call_function( instruction_call( inst ))));
-	if (rgch && (call_t == is_value_code)) 
-	{
-	    le = load_statement_local_regions(st);
-	    break;
-	}
+	call_t =
+	    value_tag(entity_initial(call_function( instruction_call( inst ))));
 	if ( iorgch && (call_t == is_value_code)) 
 	{
 	    list l_in = load_statement_in_regions(st); 
@@ -1289,17 +1285,23 @@ int use;
                db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE) ));
 	break;
 
+	/* In fact, we use proper regions only; proper regions of calls are 
+         * similar to regions, except for expressions given as arguments,
+	 * whose regions are simply appended to the list (non convex hull).
+	 * For simple statements (assignments), proper regions contain the list 
+	 * elementary regions (there is no summarization, i.e no convex hull).
+	 * For loops and tests, proper regions contain the elements accessed in
+	 * the tests and loop range. BC. 
+	 */
     case USE_REGIONS: 
 	rgch = TRUE;
 	iorgch = FALSE;
 	set_proper_effects_map(
               effectsmap_to_listmap( (statement_mapping) 
 	       db_get_memory_resource(DBR_PROPER_REGIONS, module_name, TRUE) ));
-	set_local_regions_map(effectsmap_to_listmap( (statement_mapping) 
-	       db_get_memory_resource(DBR_REGIONS, module_name, TRUE) ));
-			      
 	break;
 
+	/* For experimental purpose only */
     case USE_IN_OUT_REGIONS: 
 	rgch = FALSE;
 	iorgch = TRUE;
