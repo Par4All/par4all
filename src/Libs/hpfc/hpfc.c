@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/10/26 15:06:55 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/11/12 14:17:04 $, )
  * version $Revision$
  */
  
@@ -270,6 +270,14 @@ static void set_resources_for_module(entity module)
     set_local_regions_map
 	(effectsmap_to_listmap((statement_mapping)
 	 db_get_memory_resource(DBR_REGIONS, module_name, TRUE)));
+    set_in_regions_map  /*IN REGIONS*/
+	(effectsmap_to_listmap( (statement_mapping) 
+	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE)));
+    set_out_regions_map  /* OUT REGIONS */
+	(effectsmap_to_listmap( (statement_mapping) 
+	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE)));
+
+
 
     /* REFERENCES...
      */
