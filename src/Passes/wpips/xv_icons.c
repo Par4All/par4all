@@ -63,7 +63,7 @@ void create_icons()
 				 NULL);
     }
 
-    set_pips_icon(main_frame, PIPS_ICON, "main window");
+    set_pips_icon(main_frame, PIPS_ICON, "Wpips");
 }
 
 
