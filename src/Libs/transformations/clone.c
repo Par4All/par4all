@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.20  2000/12/11 15:41:02  ancourt
+ * compute_callees from static to non static function
+ *
  * Revision 1.19  1998/12/26 20:24:40  irigoin
  * error_handler added
  *
@@ -90,10 +93,9 @@
 
 /************************************************************ UPDATE CALLEES */
 
-static callees current_callees = callees_undefined;
 
-static void 
-callees_rwt(call c)
+void 
+callees_rwt(call c, callees *current_callees)
 {
     entity called = call_function(c);
     pips_assert("defined entity", !entity_undefined_p(called));
@@ -106,21 +108,22 @@ callees_rwt(call c)
 	string name = entity_local_name(called);
 	MAP(STRING, s, 
 	    if (same_string_p(name, s)) return, 
-	    callees_callees(current_callees));
-	callees_callees(current_callees) = 
-	    CONS(STRING, strdup(name), callees_callees(current_callees));
+	    callees_callees(*current_callees));
+	callees_callees(*current_callees) = 
+	    CONS(STRING, strdup(name), callees_callees(*current_callees));
     }
 }
 
-static callees
+callees
 compute_callees(statement stat)
 {
-    callees result;
-    current_callees = make_callees(NIL);
-    gen_recurse(stat, call_domain, gen_true, callees_rwt);
-    result = current_callees;
-    current_callees = callees_undefined;
-    return result;
+
+  callees result;
+  callees current_callees = make_callees(NIL);
+  gen_context_recurse(stat, &current_callees, call_domain, gen_true, callees_rwt);
+  result = current_callees;
+  current_callees = callees_undefined;
+  return result;
 }
 
 
