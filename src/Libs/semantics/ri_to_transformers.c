@@ -703,7 +703,9 @@ list ef;
     /* interprocedural transformer for funtion f */
     transformer t_callee = load_summary_transformer(f);
     transformer t_caller = transformer_undefined;
+    transformer t_effects = transformer_undefined;
     entity caller = entity_undefined;
+    list all_args = list_undefined;
 
     pips_assert("user_call_to_transformer", entity_module_p(f));
 
@@ -825,7 +827,7 @@ list ef;
     translate_global_values(caller, t_caller);
 
     /* FI: are invisible variables taken care of by translate_global_values()? 
-     * Yes, now.
+     * Yes, now...
      * A variable may be invisible because its location is reached
      * thru an array or thru a non-integer scalar variable in the
      * current module, for instance because a COMMON is defined
@@ -836,6 +838,23 @@ list ef;
     ifdebug(8) {
 	debug(8, "user_call_to_transformer", 
 	      "After replacing global variables\n");
+	dump_transformer(t_caller);
+    }
+
+    /* Callee f may have read/write effects on caller's scalar
+     * integer variables thru an array and/or non-integer variables.
+     */
+    t_effects = effects_to_transformer(ef);
+    all_args = arguments_union(transformer_arguments(t_caller),
+			       transformer_arguments(t_effects));
+    free_transformer(t_effects);
+    gen_free_list(transformer_arguments(t_caller));
+    transformer_arguments(t_caller) = all_args;
+    
+
+    ifdebug(8) {
+	debug(8, "user_call_to_transformer", 
+	      "After taking non-integer scalar effects\n");
 	dump_transformer(t_caller);
     }
 
