@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/01/07 11:44:29 $, )
+! ($Date: 1997/01/07 14:12:16 $, )
 !
 !-----------------
 !
@@ -435,6 +435,7 @@
 ! HPFC PVMLENGTH
 !
       integer function HPFC PVMLENGTH(what)
+      include "fpvm3.h"
       integer what
       if (what.eq.INTEGER4.or.what.eq.REAL4) then
          HPFC PVMLENGTH=4
