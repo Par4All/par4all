@@ -31,11 +31,16 @@
  * where it should be communicated  (this statement is often external to the call)
 */
 
-void call_instruction_to_communications(statement s,statement st_level1,statement st_level2,
-					list *lwr, list *lwr_local, 
-					statement_mapping *fetch_map,
-					statement_mapping *store_map, 
-					hash_table r_to_ud, list *lpv) 
+void call_instruction_to_communications(
+    statement s,
+    statement st_level1,
+    statement st_level2,
+    list *lwr,
+    list *lwr_local, 
+    statement_mapping *fetch_map,
+    statement_mapping *store_map, 
+    hash_table r_to_ud,
+    list *lpv) 
 {
     if(assignment_statement_p(s)) {
 	reference r;
@@ -243,10 +248,33 @@ void compute_communications(list l, statement_mapping *fetch_map,statement_mappi
     },l);
 
 }
-
-void include_constant_symbolic_communication(entity compute_or_memory_module,list lrefs,
-				  boolean load_code,statement computational_or_emulator,
-				  entity var_id) 
+
+static list 
+constant_symbolic_communication(
+    entity compute_or_memory_module,list lrefs,
+    boolean load_code,entity var_id) 
+{
+    /* boolean load_code  is TRUE if the generated computational code 
+       must be a RECEIVE, FALSE if it  must be a SEND*/
+
+    list lrs;
+    list ccode = NIL; /* movements for the scalar variables 
+			 for the compute module or  the memory module */
+    for (lrs =lrefs ; !ENDP(lrs) ; POP(lrs)) {
+	reference r = REFERENCE(CAR(lrs));
+	statement sblock=
+	    make_movement_scalar_wp65(compute_or_memory_module,load_code,
+				      r,var_id);
+	ccode = gen_nconc(ccode,CONS(STATEMENT, sblock, NIL));
+    } 
+    return ccode;
+}
+
+void 
+include_constant_symbolic_communication(
+    entity compute_or_memory_module,list lrefs,
+    boolean load_code,statement computational_or_emulator,
+    entity var_id) 
 { 
     instruction i;
     list ccode = constant_symbolic_communication(compute_or_memory_module,lrefs, 
@@ -256,29 +284,20 @@ void include_constant_symbolic_communication(entity compute_or_memory_module,lis
     instruction_block(i) = gen_nconc(instruction_block(i), ccode);
 }
 
-list constant_symbolic_communication(entity compute_or_memory_module,list lrefs,
-			  boolean load_code,entity var_id) 
-{
-    /* boolean load_code  is TRUE if the generated computational code 
-       must be a RECEIVE, FALSE if it  must be a SEND*/
-
-    list lrs;
-    list ccode = NIL;			/* movements for the scalar variables 
-					   for the compute module or  the memory module */
-    for (lrs =lrefs ; !ENDP(lrs) ; POP(lrs)) {
-	reference r = REFERENCE(CAR(lrs));
-	statement sblock=make_movement_scalar_wp65(compute_or_memory_module,load_code,
-						   r,var_id);
-	ccode = gen_nconc(ccode,CONS(STATEMENT, sblock, NIL));
-    } 
-    return ccode;
-}
-
-list array_indices_communication(entity compute_or_memory_module,Pbase bank_indices, 
-				 int bn,int ls,list lrefs,
-				 boolean load_code,entity var_id,
-				 Pbase loop_indices,tiling tile, Pvecteur tile_delay, 
-				 Pvecteur tile_indices,  Pvecteur tile_local_indices)
+static list 
+array_indices_communication(
+    entity compute_or_memory_module,
+    Pbase bank_indices, 
+    int bn,
+    int ls,
+    list lrefs,
+    boolean load_code,
+    entity var_id,
+    Pbase loop_indices,
+    tiling tile, 
+    Pvecteur tile_delay, 
+    Pvecteur tile_indices, 
+    Pvecteur tile_local_indices)
 {
     list gcode =NIL;
     list icode = NIL;
@@ -287,7 +306,8 @@ list array_indices_communication(entity compute_or_memory_module,Pbase bank_indi
     statement stat;
     Pbase bas_var[2];
     Pvecteur pv1,pv2,pv,pvi;
-    int i,j,coef;
+    int i,j;
+    Value coef;
    
     /* movements for the scalar variables 
        for the compute module or  the memory module */
@@ -298,7 +318,7 @@ list array_indices_communication(entity compute_or_memory_module,Pbase bank_indi
 	expression exp1,exp2,exp3,exp4;
 	list lex2;
 	type t; 
-	int ms=0;
+	Value ms=VALUE_ZERO;
 	for(ind= reference_indices(r),i=1 ; !ENDP(ind);POP(ind),i++) { 
 	    expression e = EXPRESSION(CAR(ind));
 	    normalized norm = NORMALIZE_EXPRESSION(e);
@@ -319,26 +339,29 @@ list array_indices_communication(entity compute_or_memory_module,Pbase bank_indi
 	    normalized norm1 = NORMALIZE_EXPRESSION(lower);
 	    expression upper= dimension_upper(dim1);
 	    normalized norm2 = NORMALIZE_EXPRESSION(upper);
-	    int min_ms =0;
-	    int max_ms=0;
+	    Value min_ms = VALUE_ZERO;
+	    Value max_ms = VALUE_ZERO;
 	    if (normalized_linear_p(norm1) && normalized_linear_p(norm2)) {
 		min_ms = vect_coeff(TCST,(Pvecteur) normalized_linear(norm1));
 		max_ms = vect_coeff(TCST,(Pvecteur) normalized_linear(norm2));
 	    }
-	    ms = max_ms - min_ms +1;
+	    ms = value_minus(max_ms,min_ms);
+	    value_increment(ms);
 	}
 	vbank = (Variable) var_id;
 	vligne = vecteur_var(bank_indices->succ);
 	vofs = vecteur_var(bank_indices->succ->succ);
 	if (VECTEUR_NUL_P(bas_var[2]))
-	    bas_var[2] = vect_new(TCST,1);
+	    bas_var[2] = vect_new(TCST,VALUE_ONE);
 
 	for (i=1;i<=2;i++) {	
-	    for (pvi = loop_indices,j=1; !VECTEUR_NUL_P(pvi); pvi = pvi->succ,j++) {
-		if ((coef = vect_coeff(pvi->var,bas_var[i]))) {
-		    pv = make_loop_indice_equation(loop_indices,tile, tile_delay,
-						   tile_indices,tile_local_indices,j);
-		    vect_add_elem(&bas_var[i],pvi->var,-coef);
+	    for (pvi = loop_indices,j=1; !VECTEUR_NUL_P(pvi); 
+		 pvi = pvi->succ,j++) {
+		if (value_notzero_p(coef = vect_coeff(pvi->var,bas_var[i]))) {
+		    pv = make_loop_indice_equation
+			(loop_indices,tile, tile_delay,
+			 tile_indices,tile_local_indices,j);
+		    vect_add_elem(&bas_var[i],pvi->var,value_uminus(coef));
 		    bas_var[i] =vect_add(bas_var[i],vect_multiply(pv,coef));
 		}
 	    }
@@ -349,12 +372,12 @@ list array_indices_communication(entity compute_or_memory_module,Pbase bank_indi
 	pv1 = vect_multiply(pv1,ms);
 	pv2 = vect_dup(bas_var[1]);
 	pv2 = vect_add(pv2,pv1);
-	vect_add_elem(&pv2,TCST,-ms-1);
+	vect_add_elem(&pv2,TCST,value_plus(value_uminus(ms),VALUE_MONE));
 	exp1= make_vecteur_expression(pv2);
 	exp2 = make_integer_constant_expression(bn*ls);
 	lex2 =CONS(EXPRESSION,exp2,NIL);
 	exp3 = make_div_expression(exp1,lex2);	
-	exp4 = make_vecteur_expression(vect_new(vligne,1));
+	exp4 = make_vecteur_expression(vect_new(vligne,VALUE_ONE));
 	stat = make_assign_statement(exp4,exp3);
 
 	icode = CONS(STATEMENT,stat,NIL);
@@ -364,13 +387,13 @@ list array_indices_communication(entity compute_or_memory_module,Pbase bank_indi
 	pv1 = vect_multiply(pv1,ms);
 	pv2 = vect_dup(bas_var[1]);
 	pv2 = vect_add(pv2,pv1);
-	vect_add_elem(&pv2,vligne,-bn*ls);
-	vect_add_elem(&pv2,TCST,-ms-1);
+	vect_add_elem(&pv2,vligne,int_to_value((-bn*ls)));
+	vect_add_elem(&pv2,TCST,value_plus(value_uminus(ms),VALUE_MONE));
 	exp1= make_vecteur_expression(pv2);
 	exp2 = make_integer_constant_expression(ls);
 	lex2 =CONS(EXPRESSION,exp2,NIL);
 	exp3 = make_div_expression(exp1,lex2);	
-	exp4 = make_vecteur_expression(vect_new(vbank,1));
+	exp4 = make_vecteur_expression(vect_new(vbank,VALUE_ONE));
 	stat = make_assign_statement(exp4,exp3);
 	icode = CONS(STATEMENT,stat,NIL);
 	gcode = gen_nconc(gcode,icode);
@@ -379,11 +402,11 @@ list array_indices_communication(entity compute_or_memory_module,Pbase bank_indi
 	pv1 = vect_multiply(pv1,ms);
 	pv2 = vect_dup(bas_var[1]);
 	pv2 = vect_add(pv2,pv1);
-	vect_add_elem(&pv2,vligne,-bn*ls);
-	vect_add_elem(&pv2,vbank,-ls);
-	vect_add_elem(&pv2,TCST,-ms-1);
+	vect_add_elem(&pv2,vligne,int_to_value((-bn*ls)));
+	vect_add_elem(&pv2,vbank,int_to_value((-ls)));
+	vect_add_elem(&pv2,TCST,value_plus(value_uminus(ms),VALUE_MONE));
 	exp1= make_vecteur_expression(pv2);
-	exp4 = make_vecteur_expression(vect_new(vofs,1));
+	exp4 = make_vecteur_expression(vect_new(vofs,VALUE_ONE));
 	stat = make_assign_statement(exp4,exp1);
 	icode = CONS(STATEMENT,stat,NIL);
 	gcode = gen_nconc(gcode,icode);
@@ -393,14 +416,14 @@ list array_indices_communication(entity compute_or_memory_module,Pbase bank_indi
 }
 
 
-
-
-list array_scalar_access_to_compute_communication(entity compute_module,Pbase bank_indices,
-						  int bn,int ls,list lt,
-						  boolean load_code,entity proc_id, 
-						  entity var_id,boolean fully_sequential,
-						  Pbase loop_indices,tiling tile,Pvecteur tile_delay, 
-						  Pvecteur tile_indices,Pvecteur tile_local_indices)
+static list 
+array_scalar_access_to_compute_communication(
+    entity compute_module,Pbase bank_indices,
+    int bn,int ls,list lt,
+    boolean load_code,entity proc_id, 
+    entity var_id,boolean fully_sequential,
+    Pbase loop_indices,tiling tile,Pvecteur tile_delay, 
+    Pvecteur tile_indices,Pvecteur tile_local_indices)
 {
    
     list icode  = array_indices_communication(compute_module,bank_indices,bn,ls,lt,
