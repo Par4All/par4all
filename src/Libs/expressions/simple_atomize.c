@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1999/01/08 14:25:41 $, 
+ * $Date: 1999/05/12 14:54:57 $, 
  */
 
 #include <stdio.h>
@@ -151,7 +151,7 @@ expression *pe;
     /*  The index is computed
      */
 
-    tmp = basic_of_expression(*pe);
+    tmp = please_give_me_a_basic_for_an_expression(*pe);
     
     /* Atomization is not valid with overloaded expressions */
     if (!basic_overloaded_p(tmp)) {
