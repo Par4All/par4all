@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/04 10:02:40 $ 
+# $Date: 1996/09/04 11:52:57 $ 
 
 # expected from makefile macros
 ifeq ($(FC),g77)
@@ -21,6 +21,7 @@ M4CFILES=	cgraphic.m4c
 DEMO=		test_xpomp.c fractal.f wave.f wave_parameters.h
 HPFC=		xpomp_fake.f
 DOC=		xpomp_manual.tex xPOMP_window_explained.eps
+
 SOURCES=	$(LOCAL_HEADERS) \
 		$(EXPORT_HEADERS) \
 		$(CFILES) \
@@ -52,7 +53,7 @@ all: run doc
 run: $(DRUN)
 doc: $(DDOC)
 
-xpomp_manual/fractal.f: xpomp_manual.html
+xpomp_manual/fractal.f: xpomp_manual.html fractal.f
 	cp fractal.f xpomp_manual
 
 # cproto:; $(PROTOIZE) xpomp.c
