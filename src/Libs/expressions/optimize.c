@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.10  1998/11/04 08:59:06  zory
+ * double and float format updated
+ *
  * Revision 1.9  1998/10/22 11:30:29  zory
  * double type for const values added
  *
@@ -75,12 +78,12 @@ static bool call_filter(call c)
 }
 
 /* other expressions may be found in loops and so?
- *//*
+ */
 static bool expr_filter(expression e)
 {
     rhs = CONS(EXPRESSION, e, rhs);
     return FALSE;
-}*/
+}
 
 static list /* of expression */ 
 get_list_of_rhs(statement s)
@@ -89,7 +92,7 @@ get_list_of_rhs(statement s)
 
     rhs = NIL;
     gen_multi_recurse(s,
-		      expression_domain, gen_false, gen_null,
+		      expression_domain, expr_filter, gen_null,
 		      call_domain, call_filter, gen_null,
 		      NULL);
     
@@ -235,7 +238,7 @@ swap_syntax_in_expression(  list /* of expression */ lcode,
 #define IN_FILE_NAME	"/tmp/eole_to_pips"
 
 #define PIPS_EOLE	"newgen_eole"
-#define PIPS_EOLE_FLAGS	"-nfmd"
+#define PIPS_EOLE_FLAGS	"-nfmdg"
 
 
 /*************************************************** INTERFACE FROM PIPSMAKE */
