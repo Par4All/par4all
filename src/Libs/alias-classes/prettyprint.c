@@ -139,14 +139,6 @@ aliases_text(string module_name, string resource_name)
 
     pips_debug(4,"module %s resource %s\n",module_name,resource_name);
 
-/*alias_lists = (list) db_get_memory_resource(resource_name,module_name,TRUE);
-*/
-
-/*    alias_lists = effects_to_list(
-	(effects)
-	db_get_memory_resource(resource_name, module_name, TRUE));
-*/
-
     alias_lists = effects_classes_classes(
 	(effects_classes)
 	db_get_memory_resource(resource_name, module_name, TRUE));
