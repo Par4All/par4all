@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1995/12/13 22:55:18 $, 
+ * $Date: 1996/07/27 11:24:48 $, 
  */
 
 #ifndef _STDARG_H
@@ -41,8 +41,9 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 		   __FUNCTION__ , __FILE__ , __LINE__ , what); \
     pips_user_error("this is a USER ERROR, I guess\n");}
 #else
-#define debug_on(env) debug_on_function(env, "unknown", __FILE__, __LINE__)
-#define debug_off() debug_off_function("unknown", __FILE__, __LINE__)
+#define not_known "Unknown Name"
+#define debug_on(env) debug_on_function(env, not_known, __FILE__, __LINE__)
+#define debug_off() debug_off_function(not_known, __FILE__, __LINE__)
 #define pips_debug pips_debug_function
 #define pips_user_warning pips_user_warning_function
 #define pips_user_error pips_user_error_function
