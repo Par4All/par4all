@@ -346,6 +346,8 @@ int
 main(int argc,
      char * argv[])
 {
+    pips_checks();
+
    pips_warning_handler = wpips_user_warning;
    pips_error_handler = wpips_user_error;
    pips_log_handler = wpips_user_log;
