@@ -139,12 +139,12 @@ typedef int Value;
 /* assigments
  */
 #define value_assign(ref,val) ref=(val)
-#define value_add(ref,val) ref+=(val)
-#define value_prod(ref,val) ref*=(val)
-#define value_sub(ref,val) ref-=(val)
+#define value_addto(ref,val) ref+=(val)
+#define value_product(ref,val) ref*=(val)
+#define value_substract(ref,val) ref-=(val)
 #define value_division(ref,val) ref/=(val)
 #define value_pdivision(ref,val) value_assign(ref,value_pdiv(ref,val))
-#define value_inv(ref) ref=value_uminus(ref)
+#define value_oppose(ref) ref=value_uminus(ref)
 
 /* unary operators on values
  */
