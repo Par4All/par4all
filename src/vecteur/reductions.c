@@ -60,8 +60,8 @@ Pvecteur v1, v2;
     for(; v1!=NULL; v1 = v1->succ)
     {
 	Value tmp = vect_coeff(var_of(v1),v2);
-	value_prod(tmp, val_of(v1));
-	value_add(result, tmp);
+	value_product(tmp, val_of(v1));
+	value_addto(result, tmp);
     }
 
     return result;
@@ -234,7 +234,7 @@ Value vect_sum(Pvecteur v)
     Value sum = VALUE_ZERO;
 
     for (v; v!=NULL; v=v->succ)
-	value_add(sum, val_of(v));
+	value_addto(sum, val_of(v));
 
     return sum;
 }
@@ -444,7 +444,7 @@ Pvecteur v1,v2;
 	{
 	    Value tmp1 = vect_coeff(var_of(t1),v2), tmp2;
 
-	    value_prod(tmp1,c1);
+	    value_product(tmp1,c1);
 	    tmp2 = value_mult(c2,val_of(t1));
 	    prop = value_eq(tmp1,tmp2);
 	}
@@ -453,7 +453,7 @@ Pvecteur v1,v2;
 	{
 	    Value tmp1 = vect_coeff(var_of(t2),v1), tmp2;
 
-	    value_prod(tmp1,c2);
+	    value_product(tmp1,c2);
 	    tmp2 = value_mult(c1,val_of(t2));
 	    prop = value_eq(tmp1,tmp2);
 	}
