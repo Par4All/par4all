@@ -66,7 +66,7 @@ void CheckAndInitializeStmt()
 	statement s = StmtHeap[i].s;
 	if (statement_instruction(s) == instruction_undefined) {
 	    MustStop = TRUE;
-	    user_log("CheckAndInitializeStmt", "%s ", entity_name(statement_label(s)));
+	    user_log("CheckAndInitializeStmt %s\n", entity_name(statement_label(s)));
 	}
     }
 
@@ -87,8 +87,10 @@ void NewStmt(e, s)
 entity e;
 statement s;
 {
-    if (LabelToStmt(entity_name(e)) != statement_undefined)
-	    ParserError("NewStmt", "duplicate label\n");
+  if (LabelToStmt(entity_name(e)) != statement_undefined) {
+    user_log("NewStmt: duplicate label: %s\n", entity_name(e));
+    ParserError("NewStmt", "duplicate label\n");
+  }
 
     if (CurrentStmt == MAXSTMT)
 	    ParserError("NewStmt", "statement heap full\n");
@@ -243,8 +245,14 @@ instruction i;
 	    if(statement_instruction(s) != instruction_undefined) {
 		user_warning("MakeStatement", "Label %s may be used twice\n",
 			     entity_local_name(l));
+		/* FI: commented out to avoid useless user triggered core dumps */
+		/*
 		pips_assert("MakeStatement", 
 			    statement_instruction(s) == instruction_undefined);
+			    */
+		if(statement_instruction(s) != instruction_undefined) {
+		  ParserError("MakeStatement", "Same label used twice\n");
+		}
 	    }
 	    statement_instruction(s) = i;
 	}
@@ -276,7 +284,19 @@ instruction i;
     if (IsBlockStackEmpty())
 	    ParserError("LinkInstToCurrentBlock", "no current block\n");
 
-    s = MakeStatement(MakeLabel(strdup(lab_I)), i);
+    if(instruction_block_p(i)) {
+      /* a CONTINUE instruction must be added to carry the label,
+         because blocks cannot be labelled */
+      list l = instruction_block(i);
+      statement c = MakeStatement(MakeLabel(strdup(lab_I)), 
+				  make_continue_instruction());
+
+      instruction_block(i) = CONS (STATEMENT, c, l);
+      s = MakeStatement(entity_empty_label(), i);
+    }
+    else {
+      s = MakeStatement(MakeLabel(strdup(lab_I)), i);
+    }
 
     if (iPrevComm != 0) {
 	statement_comments(s) = strdup(PrevComm);
@@ -362,6 +382,10 @@ entity i;
     list cs = NIL;
     int l = 0;
     list cl = list_undefined;
+
+    /* Warning: the desugaring of a computed goto generates a
+     * block... wich cannot be labelled when a stament is made later
+     */
 
     DeclareVariable(i, type_undefined, NIL, storage_undefined, value_undefined);
 
