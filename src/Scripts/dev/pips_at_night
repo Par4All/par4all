@@ -84,9 +84,9 @@ usage()
 # MAKE nlp(=what) name file(=report) 'targets' arch...
 # make 'target' for all specified arch.
 # the detailed report is sent only on failures.
-MAKE()
+makeit()
 {
-    ${debug} MAKE: "$@"
+    ${debug} makeit: "$@"
 
     what=$1; name=$2; report=$3; targets="$4"; shift 4
     detailed=$report.detailed
@@ -94,12 +94,13 @@ MAKE()
 
     touch ${detailed} ${summary}
 
-    ${debug} MAKE: "$@"
+    ${debug} makeit: "$@"
 
     for a in "$@" ; do
-	${debug} "Making $targets in $name ARCH=$a"
-	make-pips -k${vopt} -$what -o $summary -m $a ARCH=$a $targets \
-	    2>> $detailed > /dev/null
+	${debug} "makeit: Making $targets in $name ARCH=$a (`pwd`)"
+	echo make-pips -gk${vopt} -$what -o $summary -m $a ARCH=$a $targets 
+	$PIPS_DEVEDIR/Scripts/make/make-pips -gk${vopt} -$what -o $summary -m $a ARCH=$a $targets 
+#	    2>> $detailed > /dev/null
     done
 
     cat $summary >> $report
@@ -193,7 +194,7 @@ $debug "report=$report"
 
 	$verbose - Removing generated files in Production...
 	msg="${msg}C"
-        MAKE nlp cleaning $report full-clean .
+        makeit nlp cleaning $report full-clean .
     }
 
     #
@@ -205,7 +206,7 @@ $debug "report=$report"
     } || {
 	$verbose "Compiling Newgen/Production"
 	msg="${msg}N"
-	MAKE n newgen $report "clean recompile" $arch
+	makeit n newgen $report "clean recompile" $arch
     }
     
     # 2: LINEAR
@@ -214,7 +215,7 @@ $debug "report=$report"
     } || {
 	$verbose "Compiling Linear/Production"
 	msg="${msg}L"
-	MAKE l linear $report "clean recompile" $arch
+	makeit l linear $report "clean recompile" $arch
     }
 
     # 3: PIPS
@@ -223,7 +224,7 @@ $debug "report=$report"
     } || {
 	$verbose "Compiling Pips/Production"
 	msg="${msg}P"
-	MAKE p pips $report "clean recompile" $arch
+	makeit p pips $report "clean recompile" $arch
     }
 
     # 4: SUMMARY
