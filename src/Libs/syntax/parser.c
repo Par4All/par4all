@@ -40,10 +40,42 @@ entity DynamicArea = entity_undefined;
 entity StaticArea = entity_undefined;
 entity HeapArea = entity_undefined;
 
-/* where the current instruction starts and ends. its label */
+/* Indicates where the current instruction (in fact statement) starts and
+   ends in the input file and gives its label. Temporary versions of these
+   variables are used because of the pipeline existing between the reader
+   and the actual parser. The names of the temporary variables are
+   prefixed with "tmp_". The default and reset values of these variables
+   and their temporary versions (declared in reader.c) must be
+   consistent. */
 int line_b_I, line_e_I, line_b_C, line_e_C;
 char lab_I[6];
 
+void
+reset_current_label_string()
+{
+    strcpy(lab_I, "");
+}
+
+string
+get_current_label_string()
+{
+    return lab_I;
+}
+
+void
+set_current_label_string(string ln)
+{
+    pips_assert("Label name is at most 5 characters long", strlen(ln)<=5);
+    strcpy(lab_I, ln);
+}
+
+bool
+empty_current_label_string_p()
+{
+    bool empty_p = same_string_p(lab_I, "");
+
+    return empty_p;
+}
 /* a string that will contain the value of the format in case of format
 statement */
 char FormatValue[FORMATLENGTH];
