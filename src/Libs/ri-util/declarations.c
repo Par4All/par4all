@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.22  2003/08/06 13:43:45  nguyen
+ * Modify and add functions for C prettyprinter
+ *
  * Revision 1.21  2003/05/21 08:05:07  irigoin
  * text_entity_declaration(): size of integers taken into account. I'm not
  * proud of the code, but I did not do any refactoring.
@@ -90,22 +93,24 @@
 #include "properties.h"
 #include "prettyprint.h"
 
+/*===================== Variables and Function prototypes for C ===========*/
+
+extern int is_fortran;
+
 /********************************************************************* WORDS */
 
 static list 
 words_constant(constant obj)
 {
-    list pc;
-
-    pc=NIL;
+    list pc=NIL;
 
     if (constant_int_p(obj)) {
 	pc = CHAIN_IWORD(pc,constant_int(obj));
     }
     else {
 	pips_internal_error("unexpected tag");
-    }
-
+    }   
+    /*What about real, double, string constants ... ?*/
     return(pc);
 }
 
@@ -145,7 +150,7 @@ words_parameters(entity e)
     entity param = find_ith_parameter(e, i);
 
     if (pc != NIL) {
-      pc = CHAIN_SWORD(pc, ",");
+      pc = CHAIN_SWORD(pc, ", ");
     }
 
     /* If prettyprint alternate returns... Property to be added. */
@@ -162,10 +167,25 @@ words_parameters(entity e)
 static list 
 words_dimension(dimension obj)
 {
-    list pc;
-    pc = words_expression(dimension_lower(obj));
-    pc = CHAIN_SWORD(pc,":");
-    pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
+    list pc = NIL;
+    if (is_fortran)
+      {
+	pc = words_expression(dimension_lower(obj));
+	pc = CHAIN_SWORD(pc,":");
+	pc = gen_nconc(pc, words_expression(dimension_upper(obj)));
+      }
+    else
+      {
+	/* The lower bound of array in C is always equal to 0, 
+	   we only need to print (upper dimension + 1) */
+	expression eup = dimension_upper(obj);
+	int up;
+	if (expression_integer_value(eup, &up))
+	  pc = CHAIN_IWORD(pc,up+1);
+	else
+	  /* to be refined here to make more beautiful expression */
+	  pc = words_expression(MakeBinaryCall(CreateIntrinsic("+"),eup,int_to_expression(1)));
+      }
     return(pc);
 }
 
@@ -183,7 +203,7 @@ words_declaration(
 {
     list pl = NIL;
 
-    pl = CHAIN_SWORD(pl, entity_local_name(e));
+    pl = CHAIN_SWORD(pl, entity_user_name(e));
 
     if (type_variable_p(entity_type(e)))
     {
@@ -194,59 +214,168 @@ words_declaration(
 	    {
 		list dims = variable_dimensions(type_variable(entity_type(e)));
 	
-		pl = CHAIN_SWORD(pl, "(");
-
-		MAPL(pd, 
-		{
-		    pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
-		    if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, ",");
-		}, 
-		    dims);
-	
-		pl = CHAIN_SWORD(pl, ")");
+		if (is_fortran)
+		  {
+		    pl = CHAIN_SWORD(pl, "(");		    
+		    MAPL(pd, 
+		    {
+		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
+		      if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, ", ");
+		    }, dims);
+		    pl = CHAIN_SWORD(pl, ")");
+		  }
+		else
+		  {
+		    MAPL(pd, 
+		    {
+		      pl = CHAIN_SWORD(pl, "[");
+		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
+		      pl = CHAIN_SWORD(pl, "]");
+		    }, dims);
+		  }      
 	    }
 	}
     }
-    
     attach_declaration_to_words(pl, e);
-
     return(pl);
 }
 
 /* what about simple DOUBLE PRECISION, REAL, INTEGER... */
-static list 
-words_basic(basic obj)
+static list words_basic(basic obj)
 {
     list pc = NIL;
-
-    if (basic_int_p(obj)) {
-	pc = CHAIN_SWORD(pc,"INTEGER*");
-	pc = CHAIN_IWORD(pc,basic_int(obj));
-    }
-    else if (basic_float_p(obj)) {
-	pc = CHAIN_SWORD(pc,"REAL*");
-	pc = CHAIN_IWORD(pc,basic_float(obj));
-    }
-    else if (basic_logical_p(obj)) {
-	pc = CHAIN_SWORD(pc,"LOGICAL*");
-	pc = CHAIN_IWORD(pc,basic_logical(obj));
-    }
-    else if (basic_overloaded_p(obj)) {
-      /* should be a user error ? */
-	pc = CHAIN_SWORD(pc,"OVERLOADED");
-    }
-    else if (basic_complex_p(obj)) {
-	pc = CHAIN_SWORD(pc,"COMPLEX*");
-	pc = CHAIN_IWORD(pc,basic_complex(obj));
-    }
-    else if (basic_string_p(obj)) {
-	pc = CHAIN_SWORD(pc,"CHARACTER*");
-	pc = gen_nconc(pc, words_value(basic_string(obj)));
-    }
-    else {
+    /* 31/07/2003 Nga Nguyen : add more cases for C*/
+    switch (basic_tag(obj)) {
+      case is_basic_int: 
+	{
+	  if (is_fortran)
+	    {
+	      pc = CHAIN_SWORD(pc,"INTEGER*");
+	      pc = CHAIN_IWORD(pc,basic_int(obj));
+	    }
+	  else 
+	    {
+	      switch (basic_int(obj)) {
+		case 1: pc = CHAIN_SWORD(pc,"char "); 
+		  break;
+		case 2: pc = CHAIN_SWORD(pc,"short "); 
+		  break;
+		case 4: pc = CHAIN_SWORD(pc,"int "); 
+		  break;
+		case 6: pc = CHAIN_SWORD(pc,"long "); 
+		  break;
+		case 8: pc = CHAIN_SWORD(pc,"long long "); 
+		  break;
+		case 11: pc = CHAIN_SWORD(pc,"unsigned char ");
+		  break;
+		case 12: pc = CHAIN_SWORD(pc,"unsigned short ");
+		  break;
+		case 14: pc = CHAIN_SWORD(pc,"unsigned int ");
+		  break;
+		case 16: pc = CHAIN_SWORD(pc,"unsigned long ");
+		  break;
+		case 18: pc = CHAIN_SWORD(pc,"unsigned long long ");
+		  break;
+		case 21: pc = CHAIN_SWORD(pc,"signed char ");
+		  break;
+		case 22: pc = CHAIN_SWORD(pc,"signed short ");
+		  break;
+		case 24: pc = CHAIN_SWORD(pc,"signed int ");
+		  break;
+		case 26: pc = CHAIN_SWORD(pc,"signed long ");
+		  break;
+		case 28: pc = CHAIN_SWORD(pc,"signed long long ");
+		  break;
+		}
+	    }
+	  break;
+	}
+      case is_basic_float:
+	{
+	  if (is_fortran)
+	    {
+	      pc = CHAIN_SWORD(pc,"REAL*");
+	      pc = CHAIN_IWORD(pc,basic_float(obj));
+	    }
+	  else 
+	    {
+	      switch (basic_float(obj)) {
+		case 4: pc = CHAIN_SWORD(pc,"float ");
+		  break;
+		case 8: pc = CHAIN_SWORD(pc,"double ");
+		  break;
+		}
+	    }
+	  break;
+	}
+      case is_basic_logical:
+	{
+	   if (is_fortran)
+	     {
+	       pc = CHAIN_SWORD(pc,"LOGICAL*");
+	       pc = CHAIN_IWORD(pc,basic_logical(obj));
+	     }
+	   else 
+	     pc = CHAIN_SWORD(pc,"int ");
+	   break;
+	}
+      case is_basic_overloaded:
+	{
+	  /* should be a user error ? */
+	  pc = CHAIN_SWORD(pc,"OVERLOADED ");
+	  break;
+	}
+      case is_basic_complex:
+	{
+	  pc = CHAIN_SWORD(pc,"COMPLEX*");
+	  pc = CHAIN_IWORD(pc,basic_complex(obj));
+	  break;
+	}
+      case is_basic_string:
+	{
+	  if (is_fortran)
+	    {
+	      pc = CHAIN_SWORD(pc,"CHARACTER*");
+	      pc = gen_nconc(pc, words_value(basic_string(obj)));
+	    }
+	  else 
+	    pc = CHAIN_SWORD(pc,"char ");
+	  break;
+	}
+      case is_basic_bit:
+	{
+	  int i = basic_bit(obj);
+	  pips_debug(7,"Bit field basic: %d\n",i);
+	  pc = CHAIN_SWORD(pc,"int "); /* ignore if it is signed or unsigned */
+	  break;
+	}
+      case is_basic_pointer:
+	{
+	  type t = basic_pointer(obj);
+	  pips_debug(7,"Basic pointer\n");
+	  pc = gen_nconc(pc,words_type(t));
+	  pc = CHAIN_SWORD(pc,"*");
+	  break;
+	}
+      case is_basic_derived:
+	{
+	  entity ent = basic_derived(obj);
+	  type t = entity_type(ent);
+	  pc = gen_nconc(pc,words_type(t));
+	  pc = CHAIN_SWORD(pc,entity_user_name(ent));
+	  pc = CHAIN_SWORD(pc," ");
+	  break;
+	}
+      case is_basic_typedef:
+	{
+	  entity ent = basic_typedef(obj);
+	  pc = CHAIN_SWORD(pc,entity_user_name(ent));
+	  pc = CHAIN_SWORD(pc," ");
+	  break;
+	}  
+      default:
 	pips_error("words_basic", "unexpected tag");
-    }
-
+    }   
     return(pc);
 }
 
@@ -294,34 +423,51 @@ sentence_head(entity e)
     fe = type_functional(te);
     tr = functional_result(fe);
     
-    if (type_void_p(tr)) 
-    {
-	if (entity_main_module_p(e))
-	    pc = CHAIN_SWORD(pc, "PROGRAM ");
-	else
-	{
-	    if (entity_blockdata_p(e))
-		pc = CHAIN_SWORD(pc, "BLOCKDATA ");
+    switch (type_tag(tr)) {
+    case is_type_void: 
+      {
+	if (is_fortran)
+	  {
+	    if (entity_main_module_p(e))
+	      pc = CHAIN_SWORD(pc,"PROGRAM ");
 	    else
-		pc = CHAIN_SWORD(pc, "SUBROUTINE ");
-	}
-    }
-    else if (type_variable_p(tr)) {
+	      {
+		if (entity_blockdata_p(e))
+		  pc = CHAIN_SWORD(pc, "BLOCKDATA ");
+		else
+		  pc = CHAIN_SWORD(pc,"SUBROUTINE ");
+	      }
+	  }
+	else
+	  pc = CHAIN_SWORD(pc,"void ");
+	break;
+      }
+    case is_type_variable:
+      {
 	pc = gen_nconc(pc, words_basic(variable_basic(type_variable(tr))));
-	pc = CHAIN_SWORD(pc, " FUNCTION ");
+	pc = CHAIN_SWORD(pc,is_fortran? " FUNCTION ":"");
+	break;
+      }
+    case is_type_unknown:
+      {
+	/* For C functions with no return type. 
+	   It can be treated as of type int, but we keep it unknown for 
+	   the moment, to make the differences and to regenerate initial code*/
+	break;
+      }
+    default: 
+      pips_internal_error("unexpected type for result\n");
     }
-    else {
-	pips_internal_error("unexpected type for result\n");
-    }
+      
     pc = CHAIN_SWORD(pc, module_local_name(e));
-
+    
     if (!ENDP(args)) {
-	pc = CHAIN_SWORD(pc, "(");
-	pc = gen_nconc(pc, args);
-	pc = CHAIN_SWORD(pc, ")");
+      pc = CHAIN_SWORD(pc, "(");
+      pc = gen_nconc(pc, args);
+      pc = CHAIN_SWORD(pc, ")");
     }
-    else if (type_variable_p(tr)) {
-	pc = CHAIN_SWORD(pc, "()");
+    else if (type_variable_p(tr) || type_unknown_p(tr)) {
+      pc = CHAIN_SWORD(pc, "()");
     }
 
     return(make_sentence(is_sentence_unformatted, 
@@ -383,7 +529,7 @@ sentence_area(entity e, entity module, bool pp_dimensions)
 	    
 	    MAP(ENTITY, ee, 
 	     {
-		 if (comma) pc = CHAIN_SWORD(pc, ",");
+		 if (comma) pc = CHAIN_SWORD(pc, ", ");
 		 else comma = TRUE;
 		 pc = gen_nconc(pc, 
 			words_declaration(ee, !is_save && pp_dimensions));
@@ -727,11 +873,11 @@ text_equivalence_class(
 	    pips_debug(EQUIV_DEBUG, "easiest case: offsets are the same\n");
 
 	    if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
-	    else lw = CHAIN_SWORD(lw, ",");
+	    else lw = CHAIN_SWORD(lw, ", ");
 
 	    lw = CHAIN_SWORD(lw, " (");
 	    lw = CHAIN_SWORD(lw, entity_local_name(ent1));
-	    lw = CHAIN_SWORD(lw, ",");
+	    lw = CHAIN_SWORD(lw, ", ");
 	    lw = CHAIN_SWORD(lw, entity_local_name(ent2));
 	    lw = CHAIN_SWORD(lw, ")");		
 	    POP(l2);
@@ -782,7 +928,7 @@ text_equivalence_class(
 			   offset, dim_max,size_elt_1);
 		
 		if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
-		else lw = CHAIN_SWORD(lw, ",");
+		else lw = CHAIN_SWORD(lw, ", ");
 
 		lw = CHAIN_SWORD(lw, " (");
 		lw = CHAIN_SWORD(lw, entity_local_name(ent1));
@@ -819,7 +965,7 @@ text_equivalence_class(
 		    sprintf(buffer+strlen(buffer), "%d", new_decl);		 
 		    lw = CHAIN_SWORD(lw,strdup(buffer));			
 		    if (current_dim < dim_max)
-			lw = CHAIN_SWORD(lw, ",");
+			lw = CHAIN_SWORD(lw, ", ");
 		    
 		    POP(l_tmp);
 		    current_dim++;
@@ -827,7 +973,7 @@ text_equivalence_class(
 		} /* while */
 		
 		lw = CHAIN_SWORD(lw, ")");	
-		lw = CHAIN_SWORD(lw, ",");
+		lw = CHAIN_SWORD(lw, ", ");
 		lw = CHAIN_SWORD(lw, entity_local_name(ent2));
 		lw = CHAIN_SWORD(lw, ")");	
 		POP(l2);
@@ -1250,18 +1396,17 @@ text_entity_declaration(
 	switch (basic_tag(b)) 
 	  {
 	  case is_basic_int:
-	    /* simple integers are moved ahead...
-	     */
+	    /* simple integers are moved ahead... */
+
 	    pips_debug(7, "is an integer\n");
 	    if (variable_dimensions(type_variable(te)))
 	      {
 		string s;
-
 		switch (basic_int(b))
 		  {
 		  case 4: ppi = &pi4;
 		    s = "INTEGER ";
-		    break;
+		    break;  
 		  case 2: ppi = &pi2;
 		    s = "INTEGER*2 ";
 		    break;
@@ -1271,9 +1416,10 @@ text_entity_declaration(
 		  case 1: ppi = &pi1;
 		    s = "INTEGER*1 ";
 		    break;
+		
 		  default: pips_internal_error("Unexpected integer size");
 		  }
-		*ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : ",");
+		*ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : ", ");
 		*ppi = gen_nconc(*ppi, words_declaration(e, pp_dim)); 
 	      }
 	    else
@@ -1296,7 +1442,7 @@ text_entity_declaration(
 		    break;
 		  default: pips_internal_error("Unexpected integer size");
 		  }
-		*pph = CHAIN_SWORD(*pph, *pph==NIL ? s : ",");
+		*pph = CHAIN_SWORD(*pph, *pph==NIL ? s : ", ");
 		*pph = gen_nconc(*pph, words_declaration(e, pp_dim)); 
 	      }
 	    break;
@@ -1305,12 +1451,12 @@ text_entity_declaration(
 	    switch (basic_float(b))
 	      {
 	      case 4:
-		pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : ",");
+		pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : ", ");
 		pf4 = gen_nconc(pf4, words_declaration(e, pp_dim));
 		break;
 	      case 8:
 	      default:
-		pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : ",");
+		pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : ", ");
 		pf8 = gen_nconc(pf8, words_declaration(e, pp_dim));
 		break;
 	      }
@@ -1320,19 +1466,19 @@ text_entity_declaration(
 	    switch (basic_complex(b))
 	      {
 	      case 8:
-		pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : ",");
+		pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : ", ");
 		pc8 = gen_nconc(pc8, words_declaration(e, pp_dim));
 		break;
 	      case 16:
 	      default:
-		pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : ",");
+		pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : ", ");
 		pc16 = gen_nconc(pc16, words_declaration(e, pp_dim));
 		break;
 	      }
 	    break;
 	  case is_basic_logical:
 	    pips_debug(7, "is a logical\n");
-	    pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ",");
+	    pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ", ");
 	    pl = gen_nconc(pl, words_declaration(e, pp_dim));
 	    break;
 	  case is_basic_overloaded:
@@ -1350,7 +1496,7 @@ text_entity_declaration(
 		    
 		  if (i==1)
 		    {
-		      ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
+		      ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ", ");
 		      ps = gen_nconc(ps, words_declaration(e, pp_dim));
 		    }
 		  else
@@ -1487,3 +1633,269 @@ text_common_declaration(
     gen_free_list(l);
     return result;
 }
+
+/* ================C prettyprinter functions================= */
+
+static list words_qualifier(list obj)
+{
+  list pc = NIL;
+  MAP(QUALIFIER,q,
+  {
+    switch (qualifier_tag(q)) {
+    case is_qualifier_register:
+      pc = CHAIN_SWORD(pc,"register ");
+      break; 
+    case is_qualifier_const:
+      pc = CHAIN_SWORD(pc,"const ");
+      break;
+    case is_qualifier_restrict:
+      pc = CHAIN_SWORD(pc,"restrict ");
+      break;  
+    case is_qualifier_volatile:
+      pc = CHAIN_SWORD(pc,"volatile ");
+      break;
+    default : 
+      pips_error("words_qualifier", "unexpected tag");
+    }
+  },obj);
+  return pc;
+}
+
+list words_type(type obj)
+{
+  list pc = NIL;
+  switch (type_tag(obj))
+    {
+    case is_type_variable:
+      {
+	basic b = variable_basic(type_variable(obj));
+	pc = words_basic(b);
+	break;
+      }
+    case is_type_void:
+      {
+	pc = CHAIN_SWORD(pc,"void ");
+	break;
+      }
+    case is_type_struct:
+      {
+	pc = CHAIN_SWORD(pc,"struct ");
+	break;
+      }
+    case is_type_union:
+      {
+	pc = CHAIN_SWORD(pc,"union ");
+	break;
+      }
+    case is_type_enum:
+      {
+	pc = CHAIN_SWORD(pc,"enum ");
+	break;
+      }
+    default:
+    }
+  return pc;
+}
+
+static bool brace_expression_p(expression e)
+{
+  if (expression_call_p(e))
+    {
+      entity f = call_function(syntax_call(expression_syntax(e)));
+      if (ENTITY_BRACE_INTRINSIC_P(f))
+	return TRUE;
+    }
+  return FALSE;
+}
+
+
+static list words_brace_expression(expression exp)
+{
+  list pc = NIL;
+  list args = call_arguments(syntax_call(expression_syntax(exp)));
+  bool first = TRUE;
+  pc = CHAIN_SWORD(pc,"{");
+  MAP(EXPRESSION,e,
+  {
+    pc = CHAIN_SWORD(pc,first?"":", ");
+    if (brace_expression_p(e))
+      pc = gen_nconc(pc,words_brace_expression(e));
+    else
+      pc = gen_nconc(pc,words_expression(e));
+    first = FALSE;
+  },args);
+  pc = CHAIN_SWORD(pc,"}");
+  return pc;
+}
+
+static list words_dimensions(list dims)
+{
+  list pc = NIL;
+  if (is_fortran)
+    {
+      pc = CHAIN_SWORD(pc, "(");		    
+      MAPL(pd, 
+      {
+	pc = gen_nconc(pc, words_dimension(DIMENSION(CAR(pd))));
+	if (CDR(pd) != NIL) pc = CHAIN_SWORD(pc, ", ");
+      }, dims);
+      pc = CHAIN_SWORD(pc, ")");
+    }
+  else
+    {
+      MAPL(pd, 
+      {
+	pc = CHAIN_SWORD(pc, "[");
+	pc = gen_nconc(pc, words_dimension(DIMENSION(CAR(pd))));
+	pc = CHAIN_SWORD(pc, "]");
+      }, dims);
+    }  
+  return pc; 
+}
+ 
+text c_text_entity_declaration(list ldecl, int margin)
+{
+  text r = make_text(NIL);
+  MAP(ENTITY,e,
+  {
+    string name = entity_user_name(e);
+    type t = entity_type(e);
+    storage s = entity_storage(e);
+    list pc = NIL;
+    pips_debug(5,"Print declaration for entity: %s\n",name);
+    /*  Many possible combinations */
+
+    if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
+      {
+	/* This is a typedef name, what about typedef int myint[5] ??? */
+	pc = CHAIN_SWORD(pc,"typedef ");
+	pc = gen_nconc(pc,words_type(t));
+	pc = CHAIN_SWORD(pc,name);    
+	pc = CHAIN_SWORD(pc,";");
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+					      make_unformatted(NULL,0,margin,pc)));
+      }
+    else 
+      {
+	switch (storage_tag(s)) {
+	case is_storage_rom: 
+	  {
+	    value va = entity_initial(e);
+	    if (!value_undefined_p(va))
+	      {
+		/* prettyprint something like: #define e 50 */
+		pc = CHAIN_SWORD(pc,"#define ");
+		pc = CHAIN_SWORD(pc,name);  
+		pc = gen_nconc(pc,words_value(va));
+		ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+						      make_unformatted(NULL,0,margin,pc)));
+	      }
+	    break;
+	  }
+	case is_storage_ram: 
+	  {
+	    ram r = storage_ram(s);
+	    entity sec = ram_section(r);
+	    if (static_area_p(sec))
+	      pc = CHAIN_SWORD(pc,"static ");
+	    break;
+	  }
+	default: 
+	}
+	
+	switch (type_tag(t)) {
+	case is_type_variable:
+	  {
+	    variable v = type_variable(t);  
+	    value val = entity_initial(e);
+	    
+	    /* problems with order: qualifier, basic, ... !*/
+	    
+	    pc = gen_nconc(pc,words_qualifier(variable_qualifiers(v)));
+	    pc = gen_nconc(pc,words_basic(variable_basic(v)));
+	    pc = CHAIN_SWORD(pc,name);
+	    pc = gen_nconc(pc,words_dimensions(variable_dimensions(v)));
+	    
+	    if (!value_undefined_p(val))
+	      {
+		if (value_expression_p(val))
+		  {
+		    expression exp = value_expression(val);
+		    pc = CHAIN_SWORD(pc," = ");
+		    if (brace_expression_p(exp))
+		      pc = gen_nconc(pc,words_brace_expression(exp));
+		    else 
+		      pc = gen_nconc(pc,words_expression(exp));
+		  }
+	      }
+	    if (basic_bit_p(variable_basic(v)))
+	      {
+		int i = basic_bit(variable_basic(v));
+		pips_debug(7,"Basic bit %d",i);
+		pc = CHAIN_SWORD(pc,":");
+		pc = CHAIN_IWORD(pc,i);
+	      }
+	    pc = CHAIN_SWORD(pc,";");
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+						  make_unformatted(NULL,0,margin,pc)));
+	    break;
+	  }
+	case is_type_struct:
+	  {
+	    list l = type_struct(t);
+	    text fields = c_text_entity_declaration(l,margin+INDENTATION);
+	    pc = CHAIN_SWORD(pc,"struct ");
+	    pc = CHAIN_SWORD(pc,name);
+	    pc = CHAIN_SWORD(pc," {");
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+						  make_unformatted(NULL,0,margin,pc)));
+	    MERGE_TEXTS(r,fields);
+	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
+	    break;
+	  }
+	case is_type_union:
+	  {
+	    list l = type_union(t);
+	    text fields = c_text_entity_declaration(l,margin+INDENTATION);
+	    pc = CHAIN_SWORD(pc,"union ");
+	    pc = CHAIN_SWORD(pc,name);
+	    pc = CHAIN_SWORD(pc," {");
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+						  make_unformatted(NULL,0,margin,pc)));
+	    MERGE_TEXTS(r,fields);
+	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
+	    break;
+	  }
+	case is_type_enum:
+	  {
+	    list l = type_enum(t);
+	    bool first = TRUE;
+	    pc = CHAIN_SWORD(pc,"enum ");
+	    pc = CHAIN_SWORD(pc,name);
+	    pc = CHAIN_SWORD(pc," {");
+	    MAP(ENTITY,ent,
+	    { 
+	      pc = CHAIN_SWORD(pc,first?"":", ");
+	      pc = CHAIN_SWORD(pc,entity_user_name(ent));
+	      first = FALSE;
+	    },l);
+	    pc = CHAIN_SWORD(pc,"};");
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+						  make_unformatted(NULL,0,margin,pc)));
+	    break;
+	  }
+	default:
+	}
+      }
+  },ldecl);
+  
+  return r; 
+}
+
+
+
+
+
+
+
+
