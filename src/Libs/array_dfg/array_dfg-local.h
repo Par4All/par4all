@@ -2,7 +2,8 @@
 #define RETURN( _debug, _function, _ret_obj ) \
    { debug((_debug), (_function), "returning \n"); return( (_ret_obj) ); }
 #define ADFG_MODULE_NAME        "ADFG"
-#define EXPRESSION_PVECTEUR(e)  normalized_linear(NORMALIZE_EXPRESSION( e ))
+#define EXPRESSION_PVECTEUR(e) \
+    newgen_Pvecteur(normalized_linear(NORMALIZE_EXPRESSION( e )))
 #define ENTRY_ORDER     300000  /* Hard to have a non illegal number for hash_put !!! */
 #define EXIT_ORDER      100000
 #define TAKE_LAST	TRUE
