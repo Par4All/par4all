@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.315  1997/08/27 11:42:36  coelho
+# *** empty log message ***
+#
 # Revision 1.314  1997/08/27 09:47:32  coelho
 # *** empty log message ***
 #
@@ -495,7 +498,7 @@ endif
 	  ln -s \$@ index.html ; \
 	  chmod -R a+r-wx * ; \
 	  chmod a+rx,ug+w,o-w . ; } 
-	echo "<html><href=\$*/index.html>index</href></html>" > \$@
+	echo "<html><a href=\$*/index.html>index</a></html>" > \$@
 #
 %.newgen: %.tex
 	# building \$@ from \$<
