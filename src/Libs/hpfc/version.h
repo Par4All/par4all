@@ -1,7 +1,7 @@
 /* This file is part of HPFC within PIPS.
  *
  * $RCSfile: version.h,v $ version $Revision$
- * %D%, $Date: 1996/02/26 11:26:50 $
+ * %D%, $Date: 1996/03/01 15:58:26 $
  *
  * (c) Fabien COELHO
  */
@@ -14,9 +14,10 @@
  * 4.0 (Dec 94): commons/preocedures
  * 5.0 (Jun 95): remappings
  * 5.1 (Feb 96): dynamic live copies
+ * 5.2 (Mar 96): io and pure directives
  */
 
-#define HPFC_CURRENT_VERSION "5.1"
+#define HPFC_CURRENT_VERSION "5.2"
 
 /* that is all
  */
