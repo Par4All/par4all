@@ -366,21 +366,23 @@ static void db_check_time(string rname, string oname, db_resource r)
   {
     int its_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
     if (its_time > db_resource_file_time(r))
+    {
       pips_user_warning("file resource %s[%s] updated!\n", rname, oname);
 
-    /* update time of actual resource if appropriate
-     */
-    if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) && 
-	dbll_database_managed_file_p(db_resource_pointer(r)))
-    {
-      pips_user_warning("file '%s' for %s[%s] edited (%d -> %d)\n", 
-			db_resource_pointer(r), rname, oname,
-			db_resource_file_time(r), its_time);
-      db_resource_file_time(r) = its_time;
-      
-      db_inc_logical_time();
-      db_resource_time(r) = db_get_logical_time();
-      db_inc_logical_time();
+      /* update time of actual resource if appropriate
+       */
+      if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) && 
+	  dbll_database_managed_file_p(db_resource_pointer(r)))
+      {
+	pips_user_warning("file '%s' for %s[%s] edited (%d -> %d)\n", 
+			  db_resource_pointer(r), rname, oname,
+			  db_resource_file_time(r), its_time);
+	db_resource_file_time(r) = its_time;
+	
+	db_inc_logical_time();
+	db_resource_time(r) = db_get_logical_time();
+	db_inc_logical_time();
+      }
     }
   }
   else
