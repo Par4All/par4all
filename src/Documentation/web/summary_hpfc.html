@@ -12,9 +12,9 @@ by <a href="/~coelho">Fabien COELHO</a>.
 
 <h2>Input language</h2>
 <ul>
-  <li> Fortran 77 (PIPS restriction)
-  <li> static and dynamic mapping directives (no array syntax) 
-  <li> independent and dynamic directives
+  <li> Fortran 77
+  <li> HPF <b>static</b> and <b>dynamic</b> mapping directives (no array syntax) 
+  <li> HPF independent and dynamic directives
   <li> assumes a number of processors known at compile time
   <li> distributed arrays cannot be passed as arguments
        (but commons can be used)
@@ -22,38 +22,38 @@ by <a href="/~coelho">Fabien COELHO</a>.
 
 <h2>Output language</h2>
 <ul>
-  <li> host and SPMD node model
+  <li> host and SPMD node model (2 programs are generated).
   <li> Fortran 77 + HPFC Runtime support + PVM 3
 </ul>
 
 <h2>Implementation</h2>
 <ul>
-  <li> data structures based on NEWGEN
-  <li> Linear/C3 library (polyhedrons...)
+  <li> data structures based on NEWGEN. Linear/C3 library for linear techniques.
   <li> 17,000 lines of C for the compiler (HPFC, a PIPS module) 
   <li> 1,000 lines of shell and C for the driver and other utilities
   <li> 3,000 lines of m4/fortran for the runtime support library
        (expanded to +8,000)
-  <li> 2 programs (host/nodes) are generated.
 </ul>
 
 <h2>Standard Optimizations</h2>
 <ul>
   <li> on top of a basic run-time resolution scheme:
   <li> reduced allocation of distributed arrays on nodes.
-  <li> overlaps, subarray shifts and reductions (by name) <br>
+  <li> overlaps, shifts and reductions
        for block-distributed stride-1 aligned arrays.
 </ul>
 
 <h2>Advanced  Optimizations</h2>
 <ul>
-  <li> linear algebra-based techniques...
   <li> I/O-related communications
        (<a href="/~coelho/doc/A-264.abstract">abstract</a>,
         <a href="/~coelho/doc/A-264.ps.gz">paper</a>)
   <li> remapping-related communications and optimizations
        (<a href="/~coelho/doc/A-277.abstract">abstract</a>,
         <a href="/~coelho/doc/A-277.ps.gz">paper</a>)
+  <li> and more  linear algebra-based techniques to come
+       (<a href="/~coelho/doc/A-278.abstract">abstract</a>,
+        <a href="/~coelho/doc/A-278.ps.gz">paper</a>).
 </ul>
 
 <h2>Experiments</h2>
@@ -64,15 +64,7 @@ by <a href="/~coelho">Fabien COELHO</a>.
        (<a href="/~coelho/doc/A-257.abstract">abstract</a>,
         <a href="/~coelho/doc/A-257.ps.gz">paper</a>).
   <li> wave propagation code from IFP on the SEH/ETCA CM5.
-  <li> matrix transpose on a DEC Alpha farm.
-</ul>
-
-<h2>Future work</h2>
-<ul>
-  <li> implementation of a linear algebra based technique
-       (<a href="/~coelho/doc/A-278.abstract">abstract</a>,
-        <a href="/~coelho/doc/A-278.ps.gz">paper</a>)
-  <li> more experiments
+  <li> matrix transpose on a DEC Alpha farm (see paper about remappings).
 </ul>
 
 <b>URL: </b>http://www.cri.ensmp.fr/pips/$RCSfile$
