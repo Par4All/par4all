@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.116  2002/03/29 14:19:27  coelho
+ * tentative de debug de la substitution de ~, mais il faudrait
+ * utiliser bash et non sh dans la substitution...
+ *
  * Revision 1.115  2001/04/06 16:10:49  coelho
  * hop.
  *
@@ -925,14 +929,14 @@ static void handle(string line)
  */
 static bool line_with_substitutions(string line)
 {
-    while (*line) 
-    {
-	if ((line[0]=='$' && line[1]=='{') || 
-	    line[0]=='`' || line[0]=='*' || line[0]=='?'/* || line[0]=='['*/)
-	    return TRUE;
-	line++;
-    }
-    return FALSE;
+  static char SHELL_CHARS[] = "${`*?"; /* autres : ~ ??? */
+  while (*line) 
+  {
+    if (strchr(SHELL_CHARS, *line))
+      return TRUE;
+    line++;
+  }
+  return FALSE;
 }
 
 /* returns an allocated string after shell substitutions.
