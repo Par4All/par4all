@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.63  1997/12/08 14:51:14  coelho
+ * free_text added.
+ *
  * Revision 1.62  1997/10/27 17:03:47  coelho
  * switched to Src
  *
@@ -1267,9 +1270,10 @@ generate_hpf_remapping_file(renaming r)
     free(dir);
 
     f = hpfc_fopen(file_name);
-    print_text(f, t); /* frees t as a side effect... */
+    print_text(f, t);
     hpfc_fclose(f, file_name);
 
+    free_text(t);
     free(file_name);
     free_statement(remap);
     gen_free_list(l);
