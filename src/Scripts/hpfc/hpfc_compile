@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/04/18 09:18:33 $, 
+# $Date: 1996/06/10 19:17:02 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -155,12 +155,13 @@ else
    $DEBUG "no fake file needed"
 fi
 
+$VERBOSE "applying hpfc on file(s):"
 for f in $HPFFILES
 do
+  $VERBOSE " - $f"
   FILES="$FILES -f $f"
 done
 
-$VERBOSE "applying hpfc on file(s) $HPFFILES"
 $DEBUG "`type $PIPS`"
 
 #
