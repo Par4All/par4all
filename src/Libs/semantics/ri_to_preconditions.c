@@ -96,9 +96,9 @@ statement s;
     pips_assert("statement_to_postcondition", pre != transformer_undefined);
     ifdebug(1) {
 	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %x:\n",
-		       statement_number(s), ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-		       (unsigned int) pre);
+	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %#p:\n",
+		       statement_number(s), ORDERING_NUMBER(so),
+		       ORDERING_STATEMENT(so), pre);
 	(void) print_transformer(pre) ;
     }
 
@@ -140,9 +140,9 @@ statement s;
 
 	if(!transformer_consistency_p(pre)) {
 	    int so = statement_ordering(s);
-	    (void) fprintf(stderr, "statement %03d (%d,%d), precondition %x end:\n",
-			   statement_number(s), ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-			   (unsigned int) pre);
+	    (void) fprintf(stderr, "statement %03d (%d,%d), precondition %#p end:\n",
+			   statement_number(s), ORDERING_NUMBER(so),
+			   ORDERING_STATEMENT(so), pre);
 	    (void) print_transformer(pre);
 	    pips_error("statement_to_postcondition", "Non-consistent precondition after update\n");
 	}
@@ -164,17 +164,17 @@ statement s;
 
     ifdebug(1) {
 	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %x end:\n",
-		       statement_number(s), ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-		       (unsigned int) load_statement_precondition(s));
+	(void) fprintf(stderr, "statement %03d (%d,%d), precondition %#p end:\n",
+		       statement_number(s), ORDERING_NUMBER(so),
+		       ORDERING_STATEMENT(so), load_statement_precondition(s));
 	(void) print_transformer(load_statement_precondition(s)) ;
     }
 
     ifdebug(1) {
 	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d), postcondition %x:\n",
-		       statement_number(s), ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-		       (unsigned int) post);
+	(void) fprintf(stderr, "statement %03d (%d,%d), postcondition %#p:\n",
+		       statement_number(s), ORDERING_NUMBER(so),
+		       ORDERING_STATEMENT(so), post);
 	(void) print_transformer(post) ;
     }
 
