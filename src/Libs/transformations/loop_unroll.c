@@ -83,7 +83,7 @@ void loop_unroll(statement loop_statement, int rate)
     (void) clear_labels (loop_body (il));
 
     /* Instruction block is created and will contain everything */
-    block = make_instruction(is_instruction_block, NIL);
+    block = make_instruction_block(NIL);
 
     /* Entity LU_NUB is created and initializing statement is created
      * LU_NUB = ((UB - LB) + INC)/INC 
@@ -390,7 +390,7 @@ void full_loop_unroll(statement loop_statement)
     }
 
     /* Instruction block is created and will contain everything */
-    block = make_instruction(is_instruction_block, NIL);
+    block = make_instruction_block(NIL);
 
     /* get rid of labels in loop body (don't worry, useful labels have
        been transformed into arcs by controlizer, you just loose loop
