@@ -27,7 +27,7 @@
  *
  * FC, Feb 21, 1994
  *
- * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1995/05/05 15:40:00 $, )
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1995/10/12 18:32:33 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -51,6 +51,8 @@
  */
 #define GENERIC_MAPPING(PREFIX, name, result, type)\
 static type##_mapping name##_map = hash_table_undefined;\
+PREFIX bool name##_undefined_p()\
+{ return name##_map == hash_table_undefined;}\
 PREFIX void set_##name##_map(m) type##_mapping m;\
 { assert(name##_map == hash_table_undefined); name##_map = m;}\
 PREFIX type##_mapping get_##name##_map() \
