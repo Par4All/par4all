@@ -390,8 +390,8 @@ boolean ofl_res;
 	/* STATS 
 	   get_string_timers(&t1, &t2);
 	   fprintf(stderr, "FEASIBILITY %d %d %d %d %d %d %s",
-	   n_cont_eq, n_ref_eq, n_cont_in, n_ref_in, method, ok, t1); */
-      }
+	   n_cont_eq, n_ref_eq, n_cont_in, n_ref_in, method, ok, t1); } */
+
     }
   }
 
