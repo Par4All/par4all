@@ -21,11 +21,17 @@
   - intrinsics are not properly typed
 
   $Log: bootstrap.c,v $
+  Revision 1.74  2002/06/13 13:47:26  irigoin
+  Pseudo-intrinsic STATIC-INITIALIZATION() added
+
   Revision 1.73  2002/06/13 13:13:13  irigoin
   Pseudo-intrinsic REPEAT-VALUE added
 
   Revision 1.72  2002/06/10 12:00:37  irigoin
   $Log: bootstrap.c,v $
+  Revision 1.74  2002/06/13 13:47:26  irigoin
+  Pseudo-intrinsic STATIC-INITIALIZATION() added
+
   Revision 1.73  2002/06/13 13:13:13  irigoin
   Pseudo-intrinsic REPEAT-VALUE added
  added to keep track of changes
@@ -3569,6 +3575,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"ENDFILE", (INT_MAX), default_intrinsic_type, check_endfile, 0},
   {IMPLIED_DO_NAME, (INT_MAX), default_intrinsic_type, typing_implied_do, 0},
   {REPEAT_VALUE_NAME, 2, default_intrinsic_type, no_typing, 0},
+  {STATIC_INITIALIZATION_NAME, (INT_MAX) , default_intrinsic_type, no_typing, 0},
   {FORMAT_FUNCTION_NAME, 1, default_intrinsic_type, check_format, 0},
   {"INQUIRE", (INT_MAX), default_intrinsic_type, check_inquire, 0},
   
