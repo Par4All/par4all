@@ -267,16 +267,19 @@ static string find_file(string name)
     return NULL;
 }
 
-static void handle_file(FILE*);
-static void handle_file_name(char * file_name, bool comment)
+static bool handle_file(FILE*);
+static bool handle_file_name(char * file_name, bool comment)
 {
     FILE * f;
     string found = find_file(file_name);
+    bool ok = FALSE;
 
     if (!found)
     {
-	pips_user_error("include file %s not found\n", file_name);
+      /* Do not raise a user_error exception because you are not in the right directory */
+	pips_user_warning("include file %s not found\n", file_name);
 	fprintf(output_file, "! include \"%s\" not found\n", file_name);
+	return FALSE;
     }
 
     pips_debug(2, "including file \"%s\"\n", found);
@@ -285,26 +288,31 @@ static void handle_file_name(char * file_name, bool comment)
 	fprintf(output_file, "! include \"%s\"\n", file_name);
 
     f=safe_fopen(found, "r");
-    handle_file(f);
+    ok = handle_file(f);
     safe_fclose(f, found);
 
     if (comment)
 	fprintf(output_file, "! end include \"%s\"\n", file_name);
 
     free(found);
+
+    return ok;
 }
 
-static void handle_file(FILE * f) /* process f for includes and nones */
+static bool handle_file(FILE * f) /* process f for includes and nones */
 {
     char line[LINE_LENGTH];
     regmatch_t matches[2]; /* matched strings */
+    bool ok = TRUE;
 
     while (fgets(line, LINE_LENGTH, f))
     {
 	if (!regexec(&include_file_rx, line, 2, matches, 0))
 	{
 	    line[matches[1].rm_eo]='\0';
-	    handle_file_name(&line[matches[1].rm_so], TRUE);
+	    ok = handle_file_name(&line[matches[1].rm_so], TRUE);
+	    if(!ok)
+	      return ok;
 	}
 	else 
 	{
@@ -314,6 +322,7 @@ static void handle_file(FILE * f) /* process f for includes and nones */
 	    fprintf(output_file, "%s", line);
 	}
     }
+    return ok;
 }
 
 static void init_rx(void)
@@ -329,20 +338,27 @@ static void init_rx(void)
 static bool pips_process_file(string file_name)
 {
     string origin = strdup(concatenate(file_name, ".origin", NULL));
-    
-    if (rename(file_name, origin))
-	pips_internal_error("error while renaming %s as %s\n",
-			    file_name, origin);
+    bool ok = FALSE;
 
     pips_debug(2, "processing file %s\n", file_name);
+    
+    if (rename(file_name, origin)) {
+      /* Do not raise an exception after a chdir!
+	pips_internal_error("error while renaming %s as %s\n",
+			    file_name, origin);
+			    */
+	user_warning("pips_process_file", "error while renaming %s as %s\n",
+			    file_name, origin);
+	return FALSE;
+    }
 
     output_file = safe_fopen(file_name, "w");
     init_rx();
-    handle_file_name(origin, FALSE);
+    ok = handle_file_name(origin, FALSE);
     safe_fclose(output_file, origin);
     free(origin);
 
-    return TRUE;
+    return ok;
 }
 
 #endif
@@ -541,8 +557,11 @@ bool process_user_file(
         /* Apply a cleaning procedure on each module: */
         cwd = strdup(get_cwd());
         chdir(db_get_current_workspace_directory());
-        if (!pips_process_file(modrelfilename))
-	    return FALSE;
+        if (!pips_process_file(modrelfilename)) {
+	  chdir(cwd);
+	  free(cwd);
+	  return FALSE;
+	}
         chdir(cwd);
         free(cwd);
 
