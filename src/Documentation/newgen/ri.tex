@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/06/20 10:59:01 $, 
+%% $Date: 1997/07/24 11:18:39 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
@@ -1055,6 +1055,15 @@ Le sous-domaine \verb/instruction/ contient
 l'instruction proprement dite.
 \end{comment}
 
+\index{Statement}\index{Instruction}\index{Sequence}%
+\label{Statement/Instruction/Sequence}Note
+that if the instruction of the statement is in fact a \verb|sequence|
+of other statement (see~\ref{subsection-instruction} and \ref, the
+\verb|label|, \verb|number|, \verb|ordering|, and \verb|comment|
+should be empty. If some information of this kind is needed, it should
+be attached to the first statement of the sequence or on a CONTINUE
+(for an empty sequence) instead.
+
 \paragraph{Mappings from statement to statement}
 
 \domain{persistant\_statement\_to\_statement = persistant statement -> persistant statement}
@@ -1115,12 +1124,16 @@ nous étudierons la nature plus loin.
 Several PIPS contributors have asked for a \verb/while/ construct.
 
 \subsubsection{Sequence}
-
+\label{subsubsection-sequence}
+\index{Sequence}
 \domain{Sequence = statements:statement*}
 
 Type {\tt sequence} is self-explanatory. This is the standard sequence
 constructor. The empty sequence is used to represent an instruction with
 no effect, a NOP. See {\tt empty\_statement\_p()}.
+
+Note that the statement owning the sequence cannot have information
+such as \verb|comment|, etc. on it. See~\ref{}
 
 \subsubsection{Control Flow Graph (a.k.a. Unstructured)}
 \label{subsubsection-unstructured}
