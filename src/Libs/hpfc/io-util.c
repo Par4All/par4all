@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1995/10/05 11:32:31 $, )
+ * ($Date: 1996/02/29 18:18:40 $, )
  */
 
 #include "defines-local.h"
@@ -30,6 +30,8 @@ static statement_mapping
 #define Store(stat, val) \
     (hash_put(stat_bool_map, (char*) (stat), (char*) (val)))
 
+/* ??? neglect expression side effects...
+ */
 static void 
 only_io_rewrite(
     statement st)
@@ -57,11 +59,17 @@ only_io_rewrite(
 	pips_internal_error("unexpected goto encountered");
         break;
     case is_instruction_call:
+    {
+	entity f = call_function(instruction_call(i));
+
 	/* ??? something else should be done?
 	 * other kind of statements should not modify this status?
 	 */
-	is_io = IO_CALL_P(instruction_call(i));
+	is_io = io_intrinsic_p(f) ||     /* intrinsics */
+	        hpfc_special_io(f) ||    /* declared with FCD */
+		hpfc_io_like_function(f);/* runtime managed */
         break;
+    }
     case is_instruction_unstructured:
     {
 	control c = unstructured_control(instruction_unstructured(i));
