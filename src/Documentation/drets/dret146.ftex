@@ -1,7 +1,7 @@
 %
 % Documentation de l'environnement de de'veloppement PIPS
 %
-% $RCSfile: dret146.ftex,v $ ($Date: 1994/05/20 17:38:04 $) version $Revision$, got on %D%, %T%
+% $RCSfile: dret146.ftex,v $ ($Date: 1994/11/21 09:10:56 $) version $Revision$, got on %D%, %T%
 % %A%
 %
 
@@ -12,22 +12,22 @@
 \newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
 
 \newcommand{\titre}{PROJET PIPS \\
-		ENVIRONNEMENT DE DE'VELOPPEMENT\\
-		{\em Version $Revision$}
+                ENVIRONNEMENT DE DE'VELOPPEMENT\\
+                {\em Version $Revision$}
 }
 
 \newcommand{\auteur}{
-        	Franc,ois IRIGOIN \\ 
-        	Pierre JOUVELOT \\
-			Re'mi TRIOLET \\
-			Arnauld LESERVOT \\
-			Alexis PLATONOFF \\
-			Ronan KERYELL \\
-			Fabien COELHO \\
-			Be'atrice APVRILLE 
+                Franc,ois IRIGOIN \\ 
+                Pierre JOUVELOT \\
+                        Re'mi TRIOLET \\
+                        Arnauld LESERVOT \\
+                        Alexis PLATONOFF \\
+                        Ronan KERYELL \\
+                        Fabien COELHO \\
+                        Be'atrice APVRILLE 
 }
 %\newcommand{\docdate}{7 octobre 1993}
-\newcommand{\docdate}{$Date: 1994/05/20 17:38:04 $}
+\newcommand{\docdate}{$Date: 1994/11/21 09:10:56 $}
 
 \begin{document}
 
@@ -193,88 +193,88 @@ et Linear.
   \item \verb+recompile-pips(newgen, linear)+: cf. section Modification...
 
   \item \verb+search-pips+: recherche et, e'ventuellement, destruction
-	 de fichiers auxiliaires comme les \verb+database+; exemple:
-	destruction de toutes les bases non utilise'es depuis un
-	mois:
-	\begin{quote}
-	\verb+search-pips -w -m -D+
-	\end{quote}
+         de fichiers auxiliaires comme les \verb+database+; exemple:
+        destruction de toutes les bases non utilise'es depuis un
+        mois:
+        \begin{quote}
+        \verb+search-pips -w -m -D+
+        \end{quote}
 
   \item \verb+fetch-linear+: put in Externals the linear library and
-	the related headers
+        the related headers
 
   \item \verb+fetch-newgen+: put in Externals the NewGen library
-	and its related headers
+        and its related headers
 
   \item \verb+analyze_libraries+: cf. section De'pendance entre Bibliothe`ques
 
   \item \verb+order_libraries+: cf. section De'pendance entre Bibliothe`ques
 
   \item \verb+tape-pips+: extraction d'une partie des fichiers de pips pour
-	effectuer une installation ou une demonstration a` l'exterieur; les
-	fichiers sont naturellement pris dans \verb+Production+; ne pas
-	oublier de faire les installations ne'cessaires auparavant. Voir aussi:
-	\verb+bar+, \verb+eject+, \verb+fdformat+ et \verb+tar+. Pour utiliser
-	le floppy: \verb+/dev/rfd0+.
+        effectuer une installation ou une demonstration a` l'exterieur; les
+        fichiers sont naturellement pris dans \verb+Production+; ne pas
+        oublier de faire les installations ne'cessaires auparavant. Voir aussi:
+        \verb+bar+, \verb+eject+, \verb+fdformat+ et \verb+tar+. Pour utiliser
+        le floppy: \verb+/dev/rfd0+.
 
   \item \verb+make-pipsrc.csh+: derivation de \verb+pipsrc.csh+ a` partir
-	de \verb+pipsrc.sh+. Ce shell-script est appele' dans
-	\verb+$PIPSDIR/Makefile+.
+        de \verb+pipsrc.sh+. Ce shell-script est appele' dans
+        \verb+$PIPSDIR/Makefile+.
 
-  \item	\verb+make-pipsrc.sh+: derivation de \verb+pipsrc.sh+ a` partir
-	de \verb+pipsrc.ref+. Ce shell-script est appele' dans
-	\verb+$PIPSDIR/Makefile+.
+  \item \verb+make-pipsrc.sh+: derivation de \verb+pipsrc.sh+ a` partir
+        de \verb+pipsrc.ref+. Ce shell-script est appele' dans
+        \verb+$PIPSDIR/Makefile+.
 
   \item \verb+Validate+: non-regression test; see ?!?;
 
-	The arguments are names of subdirectories in
-	\verb+Pips/Tests/Validation+.
+        The arguments are names of subdirectories in
+        \verb+Pips/Tests/Validation+.
 
-	Tests are organized on a library basis in \verb+Pips/Tests/Validation+
-	while bugs are reported in the same way in \verb+Pips/Tests/Bugs+.
-	Bugs and non-regression tests are characterized by one or more Fortran
-	programs which either core dump (for bugs) or must have a known
-	result (tests).
+        Tests are organized on a library basis in \verb+Pips/Tests/Validation+
+        while bugs are reported in the same way in \verb+Pips/Tests/Bugs+.
+        Bugs and non-regression tests are characterized by one or more Fortran
+        programs which either core dump (for bugs) or must have a known
+        result (tests).
 
-	set
-	\verb+PIPSDBM_DEBUG_LEVEL+ to 5 to check data structures when they are
-	stored and to 9 to check them when they are delivered; some data
-	structures are not checked, among them, all that contain external
-	types;
+        set
+        \verb+PIPSDBM_DEBUG_LEVEL+ to 5 to check data structures when they are
+        stored and to 9 to check them when they are delivered; some data
+        structures are not checked, among them, all that contain external
+        types;
 
-	use \verb+accept+ to update reference files for validation; can be
-	used with \verb+/usr/ucb/mail+: \verb+| xx accept+ where \verb+xx+
-	is the message number;
+        use \verb+accept+ to update reference files for validation; can be
+        used with \verb+/usr/ucb/mail+: \verb+| xx accept+ where \verb+xx+
+        is the message number;
 
-	To run it in background, redirect stderr on /dev/null. Example:
-	\begin{quote}
-	\verb+Validate DemoStd 2>/dev/null &+
-	\end{quote}
+        To run it in background, redirect stderr on /dev/null. Example:
+        \begin{quote}
+        \verb+Validate DemoStd 2>/dev/null &+
+        \end{quote}
 
-	When a bug is corrected, run \verb+bug-to-validate+ to move the
-	bug case from \verb+Bugs/xxx+ to \verb+Validation/xxx+.
+        When a bug is corrected, run \verb+bug-to-validate+ to move the
+        bug case from \verb+Bugs/xxx+ to \verb+Validation/xxx+.
 
-	Do not forget to update \verb+Documentation/pips-bugs.f.tex+.
+        Do not forget to update \verb+Documentation/pips-bugs.f.tex+.
 
   \item \verb+Init, Select, Perform, Display, Pips+: batch interface
-	for PIPS; it is described in ???
+        for PIPS; it is described in ???
 
   \item \verb+stf-workspace+: calls Toolpack restructurer \verb+stf+ on each
-	Fortran file in a workspace;
+        Fortran file in a workspace;
 
   \item \verb+pips-experiment+: runs the same analyses and
-	transformations on each module in a workspace
+        transformations on each module in a workspace
 
   \item \verb+print-dg-statistics+: exploits some of the statistics
-	generated by the dependence graph computation when a specific
-	property is true (\verb+RICE_DG_PROVIDE_STATISTICS+);
+        generated by the dependence graph computation when a specific
+        property is true (\verb+RICE_DG_PROVIDE_STATISTICS+);
 
 \end{itemize}
 
   \item \verb+Experiments+ is a large piece of disk space to be used
-	temporarily to analyze large programs and to core dump large
-	pips processes; no permanent, non-deductible information should
-	be stored there;
+        temporarily to analyze large programs and to core dump large
+        pips processes; no permanent, non-deductible information should
+        be stored there;
 
 \end{itemize}
 
@@ -326,48 +326,48 @@ Plusieurs fonctionalite's sont utiles lors de la mise au point:
 \begin{itemize}
 
   \item \verb+gen_consistent_p()+ permet de verifier qu'une structure
-	de donne'es NewGen existante est (re'cursivement) bien construite;
+        de donne'es NewGen existante est (re'cursivement) bien construite;
 
   \item \verb+gen_defined_p()+ permet de verifier qu'une structure
-	de donne'es NewGen existante est (re'cursivement) comple`tement de'finie;
+        de donne'es NewGen existante est (re'cursivement) comple`tement de'finie;
 
   \item \verb+gen_debug+ est une variable externe qui permet de ve'rifier
-	dynamiquement lors de leur construction et lors de leur
-	parcours re'cursif que les structures de donne'es NewGen
-	sont cohe'rentes. Activation:
-	\begin{quote}
-	\verb+ gen_debug |= GEN_DBG_CHECK;+
-	\end{quote}
-	Arre^t:
-	\begin{quote}
-	\verb+ gen_debug &= ~GEN_DBG_CHECK;+
-	\end{quote}
-	En desespoir de cause:
-	\begin{quote}
-	\verb+ gen_debug = GEN_TRAV_OBJ+
-	\end{quote}
+        dynamiquement lors de leur construction et lors de leur
+        parcours re'cursif que les structures de donne'es NewGen
+        sont cohe'rentes. Activation:
+        \begin{quote}
+        \verb+ gen_debug |= GEN_DBG_CHECK;+
+        \end{quote}
+        Arre^t:
+        \begin{quote}
+        \verb+ gen_debug &= ~GEN_DBG_CHECK;+
+        \end{quote}
+        En desespoir de cause:
+        \begin{quote}
+        \verb+ gen_debug = GEN_TRAV_OBJ+
+        \end{quote}
 
   \item pour imprimer le nume'ro du type NewGen d'un objet
-	\verb+obj+, faire sous \verb+dbx+:
-	\begin{quote}
-	\verb|(dbx) print obj->i|
-	\end{quote}
+        \verb+obj+, faire sous \verb+dbx+:
+        \begin{quote}
+        \verb|(dbx) print obj->i|
+        \end{quote}
 
   \item pour imprimer le nom d'une entite' \verb+e+, faire:
-	\begin{quote}
-	\verb|(dbx) print (e+2)->s|
-	\end{quote}
+        \begin{quote}
+        \verb|(dbx) print (e+2)->s|
+        \end{quote}
 
   \item pour imprimer l'e'tiquette d'un statement \verb+stmt+, faire:
-	\begin{quote}
-	\verb|(dbx) print ((stmt+1)->p+2)->s|
-	\end{quote}
+        \begin{quote}
+        \verb|(dbx) print ((stmt+1)->p+2)->s|
+        \end{quote}
 
   \item pour imprimer le domaine d'un objet Newgen par partie de son
-	numero (\verb+obj->i+):
-	\begin{quote}
-	\verb|(dbx) print Domains[obj->i].name|
-	\end{quote}
+        numero (\verb+obj->i+):
+        \begin{quote}
+        \verb|(dbx) print Domains[obj->i].name|
+        \end{quote}
 
 \end{itemize}
 
@@ -424,38 +424,38 @@ Voici un exemple typique de config.makefile:
 
 \begin{verbatim}
 ...
-AR=		$(PIPS_AR)
-ARFLAGS=	$(PIPS_ARFLAGS)
-CC=		$(PIPS_CC)
-CFLAGS=		$(PIPS_CFLAGS)
-CPPFLAGS=	$(PIPS_CPPFLAGS)
-LD=		$(PIPS_LD)
-LDFLAGS=	$(PIPS_LDFLAGS)
-LEX=		$(PIPS_LEX)
-LFLAGS=		$(PIPS_LFLAGS)
-LINT=		$(PIPS_LINT)
-LINTFLAGS=	$(PIPS_LINTFLAGS)
-YACC=		$(PIPS_YACC)
-YFLAGS=		$(PIPS_YFLAGS)
+AR=             $(PIPS_AR)
+ARFLAGS=        $(PIPS_ARFLAGS)
+CC=             $(PIPS_CC)
+CFLAGS=         $(PIPS_CFLAGS)
+CPPFLAGS=       $(PIPS_CPPFLAGS)
+LD=             $(PIPS_LD)
+LDFLAGS=        $(PIPS_LDFLAGS)
+LEX=            $(PIPS_LEX)
+LFLAGS=         $(PIPS_LFLAGS)
+LINT=           $(PIPS_LINT)
+LINTFLAGS=      $(PIPS_LINTFLAGS)
+YACC=           $(PIPS_YACC)
+YFLAGS=         $(PIPS_YFLAGS)
 #
 # The following macros define your pass.
 #
 # Name of the target
-TARGET= 	parallelize
+TARGET=         parallelize
 #
 # Source, header and object files used to build the target
-TARGET_CFILES=	kennedy.c scan.c util.c dependence.c algebre.c \
-		divar.c debug.c codegen.c scc.c
-TARGET_HEADERS=	includes.h
-TARGET_OBJECTS=	kennedy.o scan.o util.o dependence.o algebre.o \
-		divar.o debug.o codegen.o scc.o
+TARGET_CFILES=  kennedy.c scan.c util.c dependence.c algebre.c \
+                divar.c debug.c codegen.c scc.c
+TARGET_HEADERS= includes.h
+TARGET_OBJECTS= kennedy.o scan.o util.o dependence.o algebre.o \
+                divar.o debug.o codegen.o scc.o
 #
 # List of libraries used to build the target
-TARGET_LIBS=	-lprivatize -lusedef -lprettyprint -lsemantics -ltransformer \
-		 -lcontrol -leffects -lnormalize \
-		-lsc -lcontrainte -lvecteur -larithmetique \
-		-lri-util -lmisc -lproperties -lgenC /usr/lib/debug/malloc.o \
-		-lproperties
+TARGET_LIBS=    -lprivatize -lusedef -lprettyprint -lsemantics -ltransformer \
+                 -lcontrol -leffects -lnormalize \
+                -lsc -lcontrainte -lvecteur -larithmetique \
+                -lri-util -lmisc -lproperties -lgenC /usr/lib/debug/malloc.o \
+                -lproperties
 
 \end{verbatim}
 
@@ -711,7 +711,7 @@ phase                            > MODULE.myres
         < PROGRAM.entities
         < MODULE.une_autre_res
 \end{verbatim}
-On suppose que la fonction {\tt void phase(char *module_name)} a de'ja` e'te'
+On suppose que la fonction {\tt void phase(char *module\_name)} a de'ja` e'te'
 de'clare'e dans une des bibliothe`ques.
 
 \item exe'cuter la commande {\tt make all} pour de'river de ce fichier de 
@@ -736,8 +736,8 @@ ressources a` de'charger lors de la fermeture d'un module.
 
 {
 \begin{verbatim}
-{DBR_MYRES,(chunk *(*)()) undefined_method, undefined_method,
-     undefined_method, (bool (*)()) undefined_check},
+{DBR_MYRES,(chunk *(*)()) undefined\_method, undefined\_method,
+     undefined\_method, (bool (*)()) undefined\_check},
 \end{verbatim}
 }
 
@@ -1001,12 +1001,12 @@ qu'il faut utiliser:
 \begin{verbatim}
 ...
 # List of libraries used to build the target
-TARGET_LIBS=	-lprivatize -lusedef -lprettyprint -lsemantics -ltransformer \
-		 -lcontrol -leffects -lnormalize \
-		-lsc -lcontrainte -lvecteur -larithmetique \
-		-lri-util ../../Libs/libmisc.a \
-		-lproperties -lgenC /usr/lib/debug/malloc.o \
-		-lproperties
+TARGET_LIBS=    -lprivatize -lusedef -lprettyprint -lsemantics -ltransformer \
+                 -lcontrol -leffects -lnormalize \
+                -lsc -lcontrainte -lvecteur -larithmetique \
+                -lri-util ../../Libs/libmisc.a \
+                -lproperties -lgenC /usr/lib/debug/malloc.o \
+                -lproperties
 
 $(TARGET): ../Lib/misc/misc.a
 \end{verbatim}
@@ -1177,7 +1177,7 @@ Validate kludge
 If there is any problem, you will get a mail message that tells you want
 the problem is. You can also type
 
-	Validate
+        Validate
 
 to check everything.
 
