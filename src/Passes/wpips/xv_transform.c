@@ -5,13 +5,13 @@
 #include <xview/xview.h>
 #include <xview/panel.h>
 #include <xview/text.h>
-#include <types.h>
 
 #include "genC.h"
 
 #include "constants.h"
 #include "misc.h"
 #include "ri.h"
+#include "ri-util.h"
 #include "top-level.h"
 #include "database.h"
 #include "makefile.h"
