@@ -723,9 +723,12 @@ statement loop_nest;
     instruction ins = statement_instruction(loop_nest);
 
     switch(instruction_tag(ins)) {
+
     case is_instruction_call:
+    case is_instruction_whileloop:
+    case is_instruction_test:
         return loop_nest;
-        
+
     case is_instruction_block: {
 	list lb = instruction_block(ins);
 	statement first_s = STATEMENT(CAR(lb));
@@ -888,6 +891,8 @@ statement s;
     case is_instruction_test:
 	break;
     case is_instruction_loop:
+	break;
+    case is_instruction_whileloop:
 	break;
     case is_instruction_goto:
 	pips_error("assignment_block_p", "unexpected GO TO\n");
@@ -1205,7 +1210,10 @@ statement_identification(statement s)
     switch (instruction_tag(statement_instruction(s)))
     {
     case is_instruction_loop:
-	instrstring="LOOP";
+	instrstring="DO LOOP";
+	break;
+    case is_instruction_whileloop:
+	instrstring="WHILE LOOP";
 	break;
     case is_instruction_test:
 	instrstring="TEST";
@@ -1513,6 +1521,7 @@ statement_to_label(statement s)
     case is_instruction_call:
     case is_instruction_test:
     case is_instruction_loop:
+    case is_instruction_whileloop:
     case is_instruction_goto:
       break;
     default:
@@ -1540,55 +1549,56 @@ statement_to_label(statement s)
 bool
 statement_does_return(statement s)
 {
-  bool returns = TRUE;
-  instruction i = statement_instruction(s);
-  test t = test_undefined;
+    bool returns = TRUE;
+    instruction i = statement_instruction(s);
+    test t = test_undefined;
 
-  switch(instruction_tag(i)) {
-  case is_instruction_sequence:
-      MAPL(sts,
-           {
-	     statement st = STATEMENT(CAR(sts)) ;
-	     if (!statement_does_return(st)) {
-	       returns = FALSE;
-	       break;
-	     }
-	   },
-	     sequence_statements(instruction_sequence(i)));
+    switch(instruction_tag(i)) {
+    case is_instruction_sequence:
+	MAPL(sts,
+	     {
+		 statement st = STATEMENT(CAR(sts)) ;
+		 if (!statement_does_return(st)) {
+		     returns = FALSE;
+		     break;
+		 }
+	     },
+		 sequence_statements(instruction_sequence(i)));
 
-      break;    
+	break;    
     case is_instruction_unstructured:
-      returns = unstructured_does_return(instruction_unstructured(i));
-      break;
+	returns = unstructured_does_return(instruction_unstructured(i));
+	break;
     case is_instruction_call:
-      /* the third condition is due to a bug/feature of unspaghettify */
-      returns = !stop_statement_p(s) && !return_statement_p(s) &&
-	!(continue_statement_p(s) && entity_return_label_p(statement_label(s)));
-      break;
+	/* the third condition is due to a bug/feature of unspaghettify */
+	returns = !stop_statement_p(s) && !return_statement_p(s) &&
+	    !(continue_statement_p(s) && entity_return_label_p(statement_label(s)));
+	break;
     case is_instruction_test:
-      t = instruction_test(i);
-      returns = statement_does_return(test_true(t)) ||
-	statement_does_return(test_false(t));
-      break;
+	t = instruction_test(i);
+	returns = statement_does_return(test_true(t)) ||
+	    statement_does_return(test_false(t));
+	break;
     case is_instruction_loop:
-      /* No precise answer, unless you can prove the loop executes at
-       * least one iteration.
-       */
-      returns = TRUE;
-      break;
+    case is_instruction_whileloop:
+	/* No precise answer, unless you can prove the loop executes at
+	 * least one iteration.
+	 */
+	returns = TRUE;
+	break;
     case is_instruction_goto:
-      /* returns = statement_does_return(instruction_goto(i)); */
-      returns = FALSE;
-      break;
+	/* returns = statement_does_return(instruction_goto(i)); */
+	returns = FALSE;
+	break;
     default:
-      pips_error("statement_does_return", "Ill. tag %d for instruction",
-		  instruction_tag(i));
-  }
+	pips_error("statement_does_return", "Ill. tag %d for instruction",
+		   instruction_tag(i));
+    }
 
-  debug(8, "statement_does_return", "stmt %s, does return= %d\n",
-	statement_identification(s), returns);
+    debug(8, "statement_does_return", "stmt %s, does return= %d\n",
+	  statement_identification(s), returns);
 
-  return returns;
+    return returns;
 }
 
 bool
