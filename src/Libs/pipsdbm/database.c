@@ -284,7 +284,8 @@ void db_print_all_required_resources(FILE * file)
     {
       string rn = db_symbol_name(rs);
       string on = db_symbol_name(os);
-      pips_debug(8, "considering %s of %s (%p)\n", rn, on, (void*) r);
+      pips_debug(8, "resource %s[%s] is %s\n", 
+		 rn, on, db_status_string(db_resource_db_status(r)));
 
       if (db_resource_required_p(r)) {
 	fprintf(file, "%s of %s is in 'required' status since %d\n", 
