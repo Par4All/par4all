@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: reader.c,v $
+ * Revision 1.30  1998/12/28 12:37:02  coelho
+ * bug--
+ *
  * Revision 1.29  1998/12/28 09:55:45  coelho
  * simpler.
  *
@@ -257,14 +260,17 @@ resize_line_buffer(void)
 
 static int iLine = 0, lLine = 0; 
 
-void 
-append_data_current_stmt_buffer_to_declarations(void)
+void append_data_current_stmt_buffer_to_declarations(void)
 {
     int i=0;
     char * tmp = (char*) malloc(lStmt+1), * ndecls, * odecls;
     code c = EntityCode(get_current_module_entity());
 
-    strncpy(tmp, stmt_buffer, lStmt);
+    for (; i<lStmt; i++)
+      tmp[i] = (char) stmt_buffer[i]; /* int[] */
+    stmt_buffer[i]='\0';
+    tmp[i] = '\0';
+
     odecls = code_decls_text(c);
     ndecls = strdup(concatenate(odecls, "! moved up...\n      DATA ", 
 				tmp+4, 0));
@@ -273,8 +279,7 @@ append_data_current_stmt_buffer_to_declarations(void)
     code_decls_text(c) = ndecls;
 }
 
-void
-parser_reset_all_reader_buffers(void)
+void parser_reset_all_reader_buffers(void)
 {
     iLine = 0, lLine = 0;
     iStmt = 0, lStmt = 0;
