@@ -11,7 +11,7 @@
 #
 #  Check command line validity.
 
-set echo_err = /home/users/pips/Toolpack/toolpack1.2/util/echoerr
+set echo_err = $TOOLPACK_DIR/util/echoerr
 
 if ( $#argv < 1 ) then
 	$echo_err Invocation:
@@ -56,14 +56,14 @@ set symb = _.ypsymb
 set indx = _.lyindx
 
 #  Create the interprocess file IST.CMD and append parameters for ISTLY.
-/home/users/pips/Toolpack/toolpack1.2/util/mkipf \
+$TOOLPACK_DIR/util/mkipf \
 $src $cmt $tree $symb $indx
 
 #
 #  Invoke ISTLY.
 #
 
-/home/users/pips/Toolpack/toolpack1.2/exec/istly.u
+$TOOLPACK_DIR/exec/istly.u
 if ($status != 0) then
 	$echo_err "Unable to run istly.u"
 	/bin/rm -rf _.TOOLPACK
@@ -83,14 +83,14 @@ if ( `cat _.TOOLPACK/_.info` == -1 ) then
 endif
 
 #  Create the interprocess file IST.CMD and append parameters for ISTST.
-/home/users/pips/Toolpack/toolpack1.2/util/mkipf \
+$TOOLPACK_DIR/util/mkipf \
 $tree $symb $indx $cmt \#1 -
 
 #
 #  Invoke ISTST.
 #
 
-/home/users/pips/Toolpack/toolpack1.2/exec/istst.u
+$TOOLPACK_DIR/exec/istst.u
 if ($status != 0) then
 	echo "Unable to run istst.u"
 	/bin/rm -rf _.TOOLPACK
