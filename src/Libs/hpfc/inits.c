@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1995/09/13 17:25:07 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1995/09/15 15:54:15 $, )
  * version $Revision$,
  */
 
@@ -17,7 +17,7 @@ FILE* file;
 	    "     $     REALNBOFARRAYS,\n"
 	    "     $     REALNBOFTEMPLATES,\n"
 	    "     $     REALNBOFPROCESSORS,\n"
-	    "     $     REALMAXSIZEOFPROCS\n"
+	    "     $     REALMAXSIZEOFPROCS,\n"
 	    "     $     REALMAXSIZEOFBUFFER\n\n"
 	    "c\nc parameters\nc\n"
 	    "      parameter(REALNBOFARRAYS = %d)\n"
