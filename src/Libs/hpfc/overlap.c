@@ -1,7 +1,7 @@
 /* Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1995/04/10 18:56:51 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1995/07/20 18:40:45 $, )
  * version $Revision$
  */
 
@@ -103,13 +103,12 @@ int ov;
 static void declaration_with_overlaps(l)
 list l;
 {
-    entity oldent, ent;
+    entity ent;
     int ndim, i, lower_overlap, upper_overlap;
     dimension the_dim;
 
-    MAPL(ce,
+    MAP(ENTITY, oldent,
      {
-	 oldent = ENTITY(CAR(ce));
 	 ent = load_new_node(oldent);
 	 ndim = variable_entity_dimension(ent);
 
