@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.2 2002/06/20 14:40:26 loechner Exp $
+ * $Id: arithmetique.h,v 1.3 2002/08/19 12:14:50 loechner Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -28,7 +28,6 @@
 
 #include <stdio.h>
 #include <limits.h>   /* Included for getting constants: INT_MAX, etc.. */
-#include "boolean.h"
 
 #ifdef GNUMP
 #include <gmp.h>

@@ -25,17 +25,17 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.12 2002/08/19 12:13:02 loechner Exp $
+# $Id: vars.mk,v 1.13 2002/08/19 12:14:50 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
-VERSION = 5.08beta
+VERSION = 5.08
 
 # NOTE: Don't edit this file if it is called vars.mk, instead
 # edit vars.mk.in, which is read by configure
 
 # Default top-level directory.
-prefix =	/usr/local
+prefix =	/usr
 
 # Usually the same as prefix. 
 # exec_prefix is part of the autoconf standard.
@@ -97,7 +97,7 @@ BUILD   = i686
 EXEC_EXTRA_SUFFIX = 
 
 ## make install puts everything here: relays on --prefix 
-INSTALLDIR = /usr/local
+INSTALLDIR = /usr
 BINDIR = $(INSTALLDIR)/bin
 LIBDIR = $(INSTALLDIR)/lib
 INCLUDEDIR = $(INSTALLDIR)/include
@@ -110,10 +110,10 @@ EXEC_EXTRA_LIBS= -L${exec_prefix}/lib -lpolylib$(BITS) $(LIBS)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 
-LIBS_TO_BUILD = 32 64 gmp
-EXEC_TO_BUILD = 32 64 gmp
-BITS=32
-AFLAGS=-DLINEAR_VALUE_IS_INT
+LIBS_TO_BUILD = 64
+EXEC_TO_BUILD = 64
+BITS=64
+AFLAGS=-DLINEAR_VALUE_PROTECT_MULTIPLY 		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -DLINEAR_VALUE_IS_LONGLONG
 
 
 OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)
