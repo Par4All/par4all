@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.24  1998/10/26 14:37:48  coelho
+ * constants moved out.
+ *
  * Revision 1.23  1998/10/26 14:36:13  coelho
  * constants explicitely defined in .h.
  *
@@ -36,12 +39,13 @@
 
 /* the index points to the first available chunck for a new context...
  */
+/*
 const unsigned int overflow_error = 1;
 const unsigned int simplex_arithmetic_error = 2;
 const unsigned int user_exception_error = 4;
 const unsigned int parser_exception_error = 8;
 const unsigned int any_exception_error = ~0;
-
+*/
 /* use gnu cpp '__FUNCTION__' extension if possible.
  */
 #if defined(__GNUC__)
