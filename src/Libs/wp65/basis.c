@@ -19,11 +19,15 @@
 
 #include "linear.h"
 #include "ri.h"
-#include "graph.h"
-#include "tiling.h"
 #include "dg.h"
-#include "ri-util.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
+
 #include "matrice.h"
+#include "tiling.h"
+#include "ri-util.h"
 #include "wp65.h"
 
 entity create_local_index(entity module, Pvecteur pv, string st)
