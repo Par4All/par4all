@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/25 22:31:57 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/26 10:52:28 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -8,6 +8,11 @@
 # and more efficient, but I'm not very good at it:-) Looks like an exercice
 # of style, "yes I can do it with seds and trs";-)
 # It may be thought as clever or stupid:-)
+#
+# F77 and HPF directives -> 
+# calls to HPFC special subroutines and functions -> 
+# HPFC subs and functs analyzed and removed -> 
+# analyzes on the correct transformed code
 #
 # Notes:
 #
@@ -19,13 +24,11 @@
 # - Ctrl-L, Ctrl-G and Ctrl-V are used as intermediate characters, 
 #   thus should not appear in the program, otherwise troubles...
 # - some default value is assigned to number of processors...
+# - some specific directives for HPFC.
+# - * for descriptive mappings at subroutine interface are not managed.
 #
 # (c) Fabien Coelho, February 95 and later.
-#
-# F77 and HPF directives -> 
-# calls to HPFC special subroutines and functions -> 
-# HPFC subs and functs analyzed and removed -> 
-# analyzes on the correct transformed code
+# don't expect anything from this script.
 #
 
 #
@@ -54,9 +57,9 @@
 # static directives are moved AFTER declarations, 
 # since I need to parse them as statements.
 #
-# HPFC directives: (FCD, Fabien Coelho Directives:-)
+# HPFC directives: (FCD = Fabien Coelho Directives:-)
 #
-# local/endlocal (hack for localized computations:-)
+# local/endlocal (hack for localized computations, cannot be nested)
 # _1: synchro
 # _2: timeon
 # _3: timeoff
@@ -75,14 +78,12 @@
 SED=${HPFC_SED:-sed}
 TR=${HPFC_TR:-tr}
 RM=rm
-BASENAME=basename
 
 # number of processors:
 NOP=${1:-${HPFC_NUMBER_OF_PROCESSORS:-8}}
 
 # temporary files prefix:
-SCRIPT=`$BASENAME $0`
-TMP=/tmp/$SCRIPT.$$
+TMP=/tmp/hpfc_directives.$$
 $RM -f $TMP.*
 
 #
@@ -90,43 +91,45 @@ $RM -f $TMP.*
 # FCD are simply translated into hpf-like prefixed directives
 # ??? maybe should I add some option to avoid this translation?
 #
-$SED '# HPF and FC directive origins to Ctrl-V
+$SED '#
+      # HPF and FC directive origins to Ctrl-V
+      #
       s,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,\1,;
       s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,;
-      # switch to lower case letters
-      //s,A,a,g;//s,B,b,g;//s,C,c,g;//s,D,d,g;
-      //s,E,e,g;//s,F,f,g;//s,G,g,g;//s,H,h,g;
-      //s,I,i,g;//s,J,j,g;//s,K,k,g;//s,L,l,g;
-      //s,M,m,g;//s,N,n,g;//s,O,o,g;//s,P,p,g;
-      //s,Q,q,g;//s,R,r,g;//s,S,s,g;//s,T,t,g;
-      //s,U,u,g;//s,V,v,g;//s,W,w,g;//s,X,x,g;
+      #
+      # switch to lower case letters the directives *only*
+      #
+      //s,A,a,g;//s,B,b,g;//s,C,c,g;//s,D,d,g;//s,E,e,g;//s,F,f,g;
+      //s,G,g,g;//s,H,h,g;//s,I,i,g;//s,J,j,g;//s,K,k,g;//s,L,l,g;
+      //s,M,m,g;//s,N,n,g;//s,O,o,g;//s,P,p,g;//s,Q,q,g;//s,R,r,g;
+      //s,S,s,g;//s,T,t,g;//s,U,u,g;//s,V,v,g;//s,W,w,g;//s,X,x,g;
       //s,Y,y,g;//s,Z,z,g;' |
 #
-# and continuation handling:
-# put the whole file on one line:-)
+# continuation handling:
+# - put the whole file on one line:-)
+# - then we can pattern-match on carriage returns!
+# - remove not desired cr (& and 6 column styles)
+# - and back to a normal file
 #
 $TR '\012' '' | 
-#
-# then we can pattern-match on carriage returns!
-# remove not desired cr (& and 6 column styles)
-#
 $SED 's,&[ 	]*., ,g;s, *[^ ], ,g' | 
-#
-# and back to a normal file
-#
 $TR '' '\012' | 
 #
-# massive pattern-matching transformations.
+# massive pattern-matching transformations:
 # directives are switched to hpfc specials calls.
 #
-$SED '# space normalization
+$SED '#
+      # space normalization (pattern-matching is easier afterwards)
+      #
       //s,[ 	][ 	]*, ,g;
       //s,\([0-9a-z]\) \([^0-9a-z]\),\1\2,g;
       //s,\([^0-9a-z]\) \([0-9a-z]\),\1\2,g;
       //s,\([^0-9a-z]\) \([^0-9a-z]\),\1\2,g;
       //s,)with ,) with ,;
       //s,)onto ,) onto ,;
+      #
       # indirect reserved words: block, cyclic, *, nop
+      #
       //s,\([\,(]\)block\([\,()]\),\1k\2,g
       //s,\([\,(]\)block\([\,()]\),\1k\2,g
       //s,k\([\,)]\),k()\1,g
@@ -135,20 +138,27 @@ $SED '# space normalization
       //s,c\([\,)]\),c(1)\1,g
       //s,\*\([\,)]\),s()\1,g
       //s,number_of_processors(),#,g
-      # FC directives...
+      #
+      # FC directives and hacks...
+      #
       s, synchro,      1,
       s, timeon,      2,
       s, timeoff,      3,
       s, setbool,      4,
       s, setint,      5,
-      s, local,      i(I_LOCAL)      do I_LOCAL = 0\, 0,
-      s, endlocal,      enddo,
-      # HPF declaration directives
+      s, local\(.*\),      i(I_LOCAL)\1      do I_LOCAL = 0\, 0,
+      s, end[ ]*local,      enddo,
+      #
+      # HPF declaration directives (well, pure is not)
+      #
       s, dynamic \(.*\),      y(\1),
       s, pure \(.*\),      u(\1),
       s, template \(.*\),      logical \1      t(\1),
       s, processors \(.*\),      logical \1      p(\1),
-      # HPF mapping directives
+      #
+      # HPF static and dynamic mapping directives
+      #  - some simple free style is parsed.
+      #
       s, align \(.*\) with \(.*\),      a(\1\,\2),
       s, align with \(.*\)::\(.*\),      a(\2\,\1),
       s, realign \(.*\) with \(.*\),      b(\1\,\2),
@@ -159,17 +169,26 @@ $SED '# space normalization
       s, redistribute \(.*\) onto \(.*\),      e(\1\,\2),
       s, redistribute onto \(.*\)::\(.*\),      d(\2\,\1),
       s, redistribute \(.*\),      e(\1\,hpfcX),
+      #
       # HPF parallelism directives
+      #
+      # list of directives are managed orthogonaly... (see A-284)
+      # independent must be handles with and without arguments.
       //s,\,new(, new(,g
       //s,\,reduction(, reduction(,g
       //s,\,independent\([(\,]\), independent\1,g
       //s,\,independent *$, independent,
+      # specific handling
       s, new,      n,g
       s, reduction,      r,g
       s, independent,      i,g
+      #
       # on errors...
+      #
       s,, syntax error:,
+      #
       # switch to special hpfc functions...
+      #
       s,\([12345abdeintpryu]\),call hpfc\1,g
       s,\([ck#s]\),hpfc\1,g' | 
 #
@@ -202,9 +221,9 @@ $SED -n '/^[^Cc\*!].... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
          /^[^Cc\*!].... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	]/=
          /^[^Cc\*!].... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
          /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
-         /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=
 	 /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Mm][Oo][Nn][ 	\*]/=
-	 /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	\*]/=' $TMP.0 |
+	 /^[^Cc\*!].... [ 	]*[Ff][Uu][Nn][Cc][Tt][Ii][Oo][Nn][ 	\*]/=
+         /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 |
 $SED -n '$p'`
 
 [ "$LINE" ] || LINE=0
