@@ -1233,6 +1233,7 @@ Ptsg *gs,*gsop;
     
     dep_syst1 = sc_dup(dep_syst);
     b = MakeDibaseinorder(cl);
+    base_rm(dep_syst1->base);
     dep_syst1->base = b; 
     dep_syst1->dimension = cl;
     
@@ -1277,6 +1278,7 @@ Ptsg *gs,*gsop;
 	
 	dep_syst2 = sc_dup(dep_syst_op);    
 	b = MakeDibaseinorder(cl);
+	base_rm(dep_syst2->base);
 	dep_syst2->base = b;
 	dep_syst2->dimension = cl;
 
