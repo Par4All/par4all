@@ -540,7 +540,8 @@ bool recursiv_loop_unroll(statement stmt, entity lb_ent, int rate)
 /* Top-level functions
  */
 
-bool unroll(char *mod_name)
+bool
+unroll(char *mod_name)
 {
     statement mod_stmt;
     instruction mod_inst;
@@ -549,79 +550,93 @@ bool unroll(char *mod_name)
     entity lb_ent;
     int rate;
     string resp;
+    bool return_status;
 
     debug_on("UNROLL_DEBUG_LEVEL");
 
     /* Get the loop label form the user */
-    resp= user_request("Which loop do you want to unroll?\n(give its label): ");
-    sscanf(resp, "%s", lp_label);
-    lb_ent = find_label_entity(mod_name, lp_label);
-    if (lb_ent==entity_undefined) {
-	user_error("unroll", "loop label `%s' does not exist\n", lp_label);
-    }
+    resp = user_request("Which loop do you want to unroll?\n(give its label): ");
+    if (resp[0] == '\0')
+	/* User asked to cancel: */
+	return_status = FALSE;
+    else {    
+	sscanf(resp, "%s", lp_label);
+	lb_ent = find_label_entity(mod_name, lp_label);
+	if (lb_ent == entity_undefined)
+	    user_error("unroll", "loop label `%s' does not exist\n", lp_label);
 
-    /* Get the unrolling factor from the user */
-    resp= user_request("How many times do you want to unroll?\n(choose integer greater or egal to 2): ");
-    if(sscanf(resp, "%d", &rate)!=1 || rate <= 1) {
-	user_error("unroll", "unroll factor should be greater than 2\n");
-    }
+	/* Get the unrolling factor from the user */
+	resp = user_request("How many times do you want to unroll?\n(choose integer greater or egal to 2): ");
+	if (resp[0] == '\0')
+	    /* User asked to cancel: */
+	    return_status = FALSE;
+	else {
+	    if(sscanf(resp, "%d", &rate)!=1 || rate <= 1) {
+		user_error("unroll", "unroll factor should be greater than 2\n");
+	    }
 
-    debug(1,"unroll","Unroll %d times loop %s in module %s\n",
-	  rate, lp_label, mod_name);
+	    debug(1,"unroll","Unroll %d times loop %s in module %s\n",
+		  rate, lp_label, mod_name);
 
-    /* Sets the current module to "mod_name". */
-    /* current_module(local_name_to_top_level_entity(mod_name)); */
+	    /* Sets the current module to "mod_name". */
+	    /* current_module(local_name_to_top_level_entity(mod_name)); */
 
-    /* DBR_CODE will be changed: argument "pure" should take FALSE 
-       but this would be useless
-       since there is only *one* version of code; a new version 
-       will be put back in the
-       data base after unrolling */
-    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
-    mod_inst = statement_instruction(mod_stmt);
-    /* FI: not necessarily the case anymore */
-    if(!instruction_unstructured_p(mod_inst)) {
-	user_warning ("unroll", "Non-standard instruction tag %d\n",
-		      instruction_tag (mod_inst));
-    }
-    /* pips_assert("unroll", instruction_unstructured_p(mod_inst)); */
-    /* "unstructured expected\n"); */
+	    /* DBR_CODE will be changed: argument "pure" should take FALSE 
+	       but this would be useless
+	       since there is only *one* version of code; a new version 
+	       will be put back in the
+	       data base after unrolling */
+	    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+	    mod_inst = statement_instruction(mod_stmt);
+	    /* FI: not necessarily the case anymore */
+	    if(!instruction_unstructured_p(mod_inst)) {
+		user_warning ("unroll", "Non-standard instruction tag %d\n",
+			      instruction_tag (mod_inst));
+	    }
+	    /* pips_assert("unroll", instruction_unstructured_p(mod_inst)); */
+	    /* "unstructured expected\n"); */
 
-    switch (instruction_tag (mod_inst)) {
+	    switch (instruction_tag (mod_inst)) {
 
-    case is_instruction_block:
-	MAP(STATEMENT, stmt, {recursiv_loop_unroll (stmt, lb_ent, rate);}, 
-	    instruction_block (mod_inst));
-	break;
+	    case is_instruction_block:
+		MAP(STATEMENT, stmt, {recursiv_loop_unroll (stmt, lb_ent, rate);}, 
+		    instruction_block (mod_inst));
+		break;
 
-    case is_instruction_unstructured:
+	    case is_instruction_unstructured:
 
-	/* go through unstructured and apply recursiv_loop_unroll */
-	CONTROL_MAP(ctl, {
-	    statement st = control_statement(ctl);
+		/* go through unstructured and apply recursiv_loop_unroll */
+		CONTROL_MAP(ctl, {
+		    statement st = control_statement(ctl);
 
-	    debug(5, "unroll", "will replace in statement %d\n",
-		  statement_number(st));
-	    recursiv_loop_unroll(st, lb_ent, rate);	
-	}, unstructured_control(instruction_unstructured(mod_inst)), blocs);
+		    debug(5, "unroll", "will replace in statement %d\n",
+			  statement_number(st));
+		    recursiv_loop_unroll(st, lb_ent, rate);	
+		}, unstructured_control(instruction_unstructured(mod_inst)), blocs);
 	
-	gen_free_list(blocs);
-	break;
+		gen_free_list(blocs);
+		break;
 
-    default:
-	user_warning ("unroll", "Non-acceptable instruction tag %d\n",
-		      instruction_tag (mod_inst));
+	    default:
+		user_warning ("unroll", "Non-acceptable instruction tag %d\n",
+			      instruction_tag (mod_inst));
+	    }
+
+	    /* Reorder the module, because new statements have been generated. */
+	    module_reorder(mod_stmt);
+
+	    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+	    return_status = TRUE;
+	}
     }
-
-    /* Reorder the module, because new statements have been generated. */
-    module_reorder(mod_stmt);
-
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
-
+    
     debug(2,"unroll","done for %s\n", mod_name);
     debug_off();
 
-    return TRUE;
+    if (return_status == FALSE)
+	user_log("Loop unrolling has been cancelled.\n");
+    
+    return return_status;
 }
 
 static entity searched_loop_label = entity_undefined;
@@ -650,43 +665,53 @@ bool find_loop_and_fully_unroll(statement s)
     return go_on;
 }
 
-bool full_unroll(char *mod_name)
+
+bool
+full_unroll(char * mod_name)
 {
     statement mod_stmt;
     char lp_label[6];
     string resp;
     entity lb_ent = entity_undefined;
+    bool return_status;
 
     debug_on("FULL_UNROLL_DEBUG_LEVEL");
 
     /* Get the loop label form the user */
-    resp= user_request("Which loop do you want to unroll fully?\n"
-		       "(give its label): ");
-    sscanf(resp, "%s", lp_label);
-    lb_ent = find_label_entity(mod_name, lp_label);
-    if (lb_ent==entity_undefined) {
-	user_error("unroll", "loop label `%s' does not exist\n", lp_label);
+    resp = user_request("Which loop do you want to unroll fully?\n"
+			"(give its label): ");
+    if (resp[0] == '\0') {
+	user_log("Full loop unrolling has been cancelled.\n");
+	return_status = FALSE;
     }
+    else {    
+	sscanf(resp, "%s", lp_label);
+	lb_ent = find_label_entity(mod_name, lp_label);
+	if (lb_ent == entity_undefined) {
+	    user_error("unroll", "loop label `%s' does not exist\n", lp_label);
+	}
 
-    debug(1,"full_unroll","Fully unroll loop %s in module %s\n",
-	  lp_label, mod_name);
+	debug(1,"full_unroll","Fully unroll loop %s in module %s\n",
+	      lp_label, mod_name);
 
-    searched_loop_label = lb_ent;
+	searched_loop_label = lb_ent;
 
-    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+	mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
-    gen_recurse (mod_stmt, statement_domain, 
-		 find_loop_and_fully_unroll, gen_null);
+	gen_recurse (mod_stmt, statement_domain, 
+		     find_loop_and_fully_unroll, gen_null);
 
-    /* Reorder the module, because new statements have been generated. */
-    module_reorder(mod_stmt);
+	/* Reorder the module, because new statements have been generated. */
+	module_reorder(mod_stmt);
 
-    searched_loop_label = entity_undefined;
+	searched_loop_label = entity_undefined;
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+	return_status = TRUE;
+    }
 
     debug(2,"unroll","done for %s\n", mod_name);
     debug_off();
 
-    return TRUE;
+    return return_status;
 }
