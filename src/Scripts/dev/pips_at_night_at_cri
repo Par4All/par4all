@@ -23,7 +23,7 @@ add=
 sun4="chailly  /projects/Pips/Experiments"
 sol2="recanati /projects/Pips/Experiments2"
 i386="tirnanog /projects/Pips/Experiments3"
-
+i586="loreto   /projects/Pips/Experiments3"
 
 #
 # FUNCTIONS
@@ -144,33 +144,37 @@ case ${job} in
 	general ${sun4} GNUSOL1 ;
 	covalid ${sol2} GNUSOL2LL ;
 	covalid ${i386} LINUXI86 ;
-	compile ${sun4} GNUSOL1 ;;
+	compile ${sun4} GNUSOL1 ;
+        compile ${i586} LINUXI86LL ;;
 
     long)
 	${verb} "LONG stuff (more compilations and validations)" ;
 	general ${sun4} GNUSOL1 ;
 	covalid ${sun4} GNUSOL1 ;
 	covalid ${sol2} GNUSOL2LL ;
-	covalid ${i386} LINUXI86 ;
+	covalid ${i586} LINUXI86LL ;
 	compile ${sol2} SOL2LL ;
-	compile ${sun4} "GNU SUN4 GPROF" ;;
+	compile ${sun4} "GNU SUN4 GPROF" ;
+	compile ${i386} "LINUXI86" ;;
 
     short)
 	${verb} "SHORT stuff (one validation)" ;
 	covalid ${i386} LINUXI86 ;
+	compile ${i586} LINUXI86LL ;
 	compile ${sol2} GNUSOL2LL ;
 	compile ${sun4} GNUSOL1 ;;
 
     compile)
 	${verb} "COMPILE stuff" ;
-	compile ${i386} LINUXI86 ;
+	compile ${i386} "LINUXI86" ;
+	compile ${i586} "LINUXI86LL" ;
 	compile ${sun4} "GNU GNUSOL1 SUN4 GPROF" ;
 	compile ${sol2} "GNUSOL2LL SOL2LL" ;;
 
     validate)
 	${verb} "VALIDATE stuff (with necessary compilations)" ;
 	covalid ${sun4} GNUSOL1 ;
-	covalid ${i386} LINUXI86 ;
+	covalid ${i586} LINUXI86LL ;
 	covalid ${sol2} GNUSOL2LL ;;
 
     debug)
