@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/04/24 18:23:41 $, ) 
+ * ($Date: 1995/04/25 11:02:28 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -80,23 +80,17 @@ list *pl, 	/* P */
 
     /*   others.
      */
-    *plo = base_to_list(sc_base(s)),
-    gen_remove(plo, (entity) TCST);
+    *plo = base_to_list(sc_base(s)), gen_remove(plo, (entity) TCST);
     MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *pl);
     MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *plp);
     MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *plrm);
     MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *pll);
 
-    ifdebug(7)
-    {
-	fprintf(stderr, "[remapping_variables] list of variables:");
-	fprintf(stderr, "\nP: "); fprint_entity_list(stderr, *pl);
-	fprintf(stderr, "\nP': "); fprint_entity_list(stderr, *plp);
-	fprintf(stderr, "\nRM: "); fprint_entity_list(stderr, *plrm);
-	fprintf(stderr, "\nLOCALS: "); fprint_entity_list(stderr, *pll);
-	fprintf(stderr, "\nOTHERS: "); fprint_entity_list(stderr, *plo);
-	fprintf(stderr, "\n");
-    }
+    DEBUG_ELST(7, "P", *pl);
+    DEBUG_ELST(7, "P'", *plp);
+    DEBUG_ELST(7, "RM", *plrm);
+    DEBUG_ELST(7, "LOCALS", *pll);
+    DEBUG_ELST(7, "OTHERS", *plo);
 }
 
 /* to be generated:
@@ -213,17 +207,17 @@ bool send;
  * 1 is send
  * 2 is receive
  */
+#define tag_switch(t, zero, one, two, other)\
+  ((t)==0 ? (zero) : (t)==1 ? (one) : (t)==2 ? (two) : \
+    (pips_error("tag_switch", "invalid tag"), other))
+
 static statement pre(t, lid)
 int t;
 entity lid;
 {
-    switch(t)
-    {
-    case 0: return(make_empty_statement());
-    case 1: return(hpfc_initsend());
-    case 2: return(msg(lid, FALSE));
-    default: return(pips_error("pre", "invalid tag"), statement_undefined);
-    }
+    return(tag_switch(t,
+           make_empty_statement(), hpfc_initsend(), msg(lid, FALSE),
+	   statement_undefined));
 }
 
 static statement in(t, src, trg, create_src, create_trg)
@@ -231,28 +225,22 @@ int t;
 entity src, trg;
 entity (*create_src)(), (*create_trg)();
 {
-    switch(t)
-    {
-    case 0: return(make_assign_statement
+    return(tag_switch(t,
+	   make_assign_statement
 		   (make_reference_expression(trg, create_trg),
-		    make_reference_expression(src, create_src)));
-    case 1: return(hpfc_packing(src, create_src, TRUE));
-    case 2: return(hpfc_packing(trg, create_trg, FALSE));
-    default: return(pips_error("in", "invalid tag"), statement_undefined);
-    }
+		    make_reference_expression(src, create_src)),
+	   hpfc_packing(src, create_src, TRUE),
+	   hpfc_packing(trg, create_trg, FALSE),
+	   statement_undefined));
 }
 
 static statement post(t, lid)
 int t;
 entity lid;
 {
-    switch(t)
-    {
-    case 0: return(make_empty_statement());
-    case 1: return(msg(lid, TRUE));
-    case 2: return(make_empty_statement());
-    default: return(pips_error("post", "invalid tag"), statement_undefined);
-    }
+    return(tag_switch(t,
+           make_empty_statement(), msg(lid, TRUE), make_empty_statement(),
+	   statement_undefined));
 }
 
 static statement 
@@ -271,8 +259,8 @@ entity lid, src, trg;
 		  NIL))));
 
     statement_comments(result) = 
-	strdup(concatenate("c - ", t==0 ? "copy" : t==1 ? "send" :
-			   t==2 ? "receiv" : "?", "ing\n", NULL));
+	strdup(concatenate("c - ", tag_switch(t, "copy", "send", "receiv", "?"),
+			   "ing\n", NULL));
 
     return(result);
 }
@@ -304,7 +292,7 @@ list /* of entities */ l, lp, ll, /* of expressions */ ld;
 				      CONS(STATEMENT, cont,
 					   NIL))));
 
-    /*   some comments are generated to help understand the generated code
+    /*   some comments to help understand the generated code
      */
     statement_comments(result) =
 	strdup(concatenate("c remapping ", entity_local_name(src), 
@@ -318,7 +306,8 @@ list /* of entities */ l, lp, ll, /* of expressions */ ld;
     return(result);
 }
 
-/*  remaps src to trg
+/*  remaps src to trg.
+ *  ??? should check that none of these variables are replicated.
  */
 statement hpf_remapping(src, trg)
 entity src, trg;
@@ -329,12 +318,12 @@ entity src, trg;
          /* of expressions */ lddc;
 
     debug(3, "hpf_remapping", "%s -> %s\n", entity_name(src), entity_name(trg));
-    
+
+    /*   builds and simplifies the systems.
+     */
     p = generate_remapping_system(src, trg);
     remapping_variables(p, src, trg, &l, &lp, &ll, &lrm, &lo);
-
     clean_the_system(&p, &lrm, &lo);
-
     lddc = simplify_deducable_variables(p, ll, &left);
     gen_free_list(ll);
     scanners = gen_nconc(lo, left);
@@ -342,13 +331,23 @@ entity src, trg;
     DEBUG_SYST(4, "cleaned system", p);
     DEBUG_ELST(4, "scanners", scanners);
 
+    /*   processors/array elements separation.
+     */
     hpfc_algorithm_row_echelon(p, scanners, &proc, &enume);
     sc_rm(p);
 
     DEBUG_SYST(3, "proc", proc);
     DEBUG_SYST(3, "enum", enume);
 
+    /*   generates the code.
+     */
     s = generate_remapping_code(src, trg, proc, enume, l, lp, scanners, lddc);
+
+    /*   clean.
+     */
+    sc_rm(proc), sc_rm(enume);
+    gen_free_list(scanners), gen_free_list(l), gen_free_list(lp);
+    gen_map(gen_free, lddc), gen_free_list(lddc); 
     
     return(s);
 }
