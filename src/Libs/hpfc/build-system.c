@@ -105,7 +105,7 @@ extern fprintf();
 GENERIC_CURRENT_MAPPING(declaration_constraints, Psysteme, entity);
 GENERIC_CURRENT_MAPPING(hpf_constraints, Psysteme, entity);
 
-void hpfc_reset_static_mappings()
+void reset_hpfc_static_mappings()
 {
     reset_declaration_constraints_map();
     reset_hpf_constraints_map();
