@@ -2,7 +2,7 @@
 ! COMMON /HPFC BUFFERS/ 
 !
 ! $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-! ($Date: 1996/10/17 14:32:19 $, )
+! ($Date: 1996/10/17 14:44:07 $, )
 !
 ! buffers to avoid small pvmf(un)pack calls...
 ! and to sends buckets of messages if necessary...
@@ -45,37 +45,37 @@
 ! buffer sizes
 !
 ifdef(`_HPFC_NO_BYTE1_',,`
-      integer BYTE1 MAXBUFFSIZE,
+      integer BYTE1 MAXBUFFSIZE
       parameter (BYTE1 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER)
       byte BYTE1 BUFF(BYTE1 MAXBUFFSIZE)
       equivalence (DATA BUFFER, BYTE1 BUFF)')dnl
 
 ifdef(`_HPFC_NO_INTEGER2_',,`
-      integer INTEGER2 MAXBUFFSIZE,
+      integer INTEGER2 MAXBUFFSIZE
       parameter (INTEGER2 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/2)
       integer*2 INTEGER2 BUFF(INTEGER2 MAXBUFFSIZE)
       equivalence (DATA BUFFER, INTEGER2 BUFF)')dnl
 
 ifdef(`_HPFC_NO_INTEGER4_',,`
-      integer INTEGER4 MAXBUFFSIZE,
+      integer INTEGER4 MAXBUFFSIZE
       parameter (INTEGER4 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
       integer*4 INTEGER4 BUFF(INTEGER4 MAXBUFFSIZE)
       equivalence (DATA BUFFER, INTEGER4 BUFF)')dnl
 
 ifdef(`_HPFC_NO_REAL4_',,`
-      integer REAL4 MAXBUFFSIZE,
+      integer REAL4 MAXBUFFSIZE
       parameter (REAL4 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
       real*4 REAL4 BUFF(REAL4 MAXBUFFSIZE)
       equivalence (DATA BUFFER, REAL4 BUFF)')dnl
 
 ifdef(`_HPFC_NO_REAL8_',,`
-      integer REAL8 MAXBUFFSIZE,
+      integer REAL8 MAXBUFFSIZE
       parameter (REAL8 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/8)
       real*8 REAL8 BUFF(REAL8 MAXBUFFSIZE)
       equivalence (DATA BUFFER, REAL8 BUFF)')dnl
 
 ifdef(`_HPFC_NO_COMPLEX8_',,`
-      integer COMPLEX8 MAXBUFFSIZE,
+      integer COMPLEX8 MAXBUFFSIZE
       parameter (COMPLEX8 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/8)
       complex*8 COMPLEX8 BUFF(COMPLEX8 MAXBUFFSIZE)
       equivalence (DATA BUFFER, COMPLEX8 BUFF)')dnl
