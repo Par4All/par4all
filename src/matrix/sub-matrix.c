@@ -11,6 +11,7 @@
  */
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -447,7 +448,28 @@ int i1, i2, j1, j2;
     
 }
 
+/* void insert_sub_matrix(A, A_sub, i1, i2, j1, j2)
+ * input: matrix A and smaller A_sub
+ * output: nothing
+ * modifies: A_sub is inserted in A at the specified position
+ * comment: A must be pre-allocated
+ */
+void insert_sub_matrix(
+    Pmatrix A,
+    Pmatrix A_sub,
+    int i1, int i2,
+    int j1, int j2)
+{
+    int i,j,i_sub,j_sub;
 
+    assert(i1>=1 && j1>=1 && 
+	   i2<=MATRIX_NB_LINES(A) && j2<=MATRIX_NB_COLUMNS(A) &&
+	   i2-i1<MATRIX_NB_LINES(A_sub) && j2-j1<MATRIX_NB_COLUMNS(A_sub));
 
+    for (i = i1, i_sub = 1; i <= i2; i++, i_sub ++)
+	for(j = j1, j_sub = 1; j <= j2; j++, j_sub ++)
+	    MATRIX_ELEM(A,i,j) = MATRIX_ELEM(A_sub,i_sub,j_sub) ;
+}
 
-
+/* that is all
+ */
