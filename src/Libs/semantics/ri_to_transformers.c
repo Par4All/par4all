@@ -126,7 +126,7 @@ unstructured_to_transformers(unstructured u)
      * using CONTROL_MAP, but this may create storage and prettyprinter
      * problems because of the data structure inconsistency.
      */
-    FORWARD_CONTROL_MAP(c, {
+    CONTROL_MAP(c, {
 	statement st = control_statement(c) ;
 	(void) statement_to_transformer(st) ;
     }, ct, blocs) ;
