@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.34  1997/12/12 22:17:06  coelho
+ * order fix for lonely comments.
+ *
  * Revision 1.33  1997/12/12 12:28:39  coelho
  * ! == shell.
  *
@@ -133,13 +136,13 @@ static char unk[2]; /* one char lines are not implicit shells */
 
 <KEY,INITIAL>[ \t]+	/* skip blanks... */
 
-<KEY>.			{ unk[0]=yytext[0]; unk[1]='\0'; BEGIN UNK; }
 <UNK>[^\n]*		{ yylval.name = strdup(concatenate(unk, yytext, 0));
 			  KEYWORD(TK_UNKNOWN); }
 
 <LIT>[^\n]* 		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }
 <INITIAL,KEY>#[^\n]*	{ BEGIN INITIAL;
 			  /* skip comments... (not for echo, shell set). */}
+<KEY>.			{ unk[0]=yytext[0]; unk[1]='\0'; BEGIN UNK; }
 
 <INITIAL>\(		{ RETURN(TK_OPENPAREN); }
 <INITIAL>\)		{ RETURN(TK_CLOSEPAREN); }
