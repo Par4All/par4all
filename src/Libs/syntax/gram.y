@@ -670,17 +670,29 @@ goto_inst: TK_GOTO label
 	    {
 		$$ = MakeGotoInst($2);
 	    }
-	| TK_GOTO TK_LPAR licon TK_RPAR opt_virgule entity_name
+	| TK_GOTO TK_LPAR licon TK_RPAR opt_virgule expression
 	    {
 		$$ = MakeComputedGotoInst($3, $6);
 	    }
 	| TK_GOTO entity_name opt_virgule TK_LPAR licon TK_RPAR
 	    {
-		ParserError("parser", "assigned goto statement prohibited\n");
+                if(get_bool_property("PARSER_SUBSTITUTE_ASSIGNED_GOTO")) {
+		    $$ = MakeAssignedGotoInst($5, $2);
+		}
+		else {
+		    ParserError("parser", "assigned goto statement prohibited"
+				" unless property PARSER_SUBSTITUTE_ASSIGNED_GOTO is set\n");
+		}
 	    }
 	| TK_GOTO entity_name
 	    {
-		ParserError("parser", "assigned goto statement prohibited\n");
+                if(get_bool_property("PARSER_SUBSTITUTE_ASSIGNED_GOTO")) {
+		    ParserError("parser", "assigned goto statement cannot be"
+				" desugared without a target list\n");
+		}
+		else {
+		    ParserError("parser", "assigned goto statement prohibited\n");
+		}
 	    }
 	;
 
@@ -696,7 +708,14 @@ licon: label
 
 assignment_inst: TK_ASSIGN icon TK_TO atom
             {
-		ParserError("parser", "assign statement prohibited by PIPS\n");
+                if(get_bool_property("PARSER_SUBSTITUTE_ASSIGNED_GOTO")) {
+		    expression e = entity_to_expression($2);
+		    $$ = MakeAssignInst($4, e);
+		}
+		else {
+		    ParserError("parser", "ASSIGN statement prohibited by PIPS"
+				" unless property PARSER_SUBSTITUTE_ASSIGNED_GOTO is set\n");
+		}
 	    }
 	| atom TK_EQUALS expression
 	    {
