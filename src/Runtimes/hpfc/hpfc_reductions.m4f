@@ -140,11 +140,11 @@ ifelse(PVM_ARCH,`CM5',`dnl
             write (unit=0, fmt=*)  "hpfc reduction: reveive failed"
          endif
          RECV CHANNELS(i) = RECV CHANNELS(i)+2',`dnl
-         SENDER TID = NODE TIDS(i)
-         SLID = i
-         debug(print *, "get partial results from ", SENDERTID)
+c         SENDER TID = NODE TIDS(i)
+         SENDERLID = i
+         debug(print *, "get partial results from ", SENDERLID)
          CALL HPFC RCVFR S(PVMTYPE, result(i))')
-         debug(print *, "partial result received from", SENDERTID)
+         debug(print *, "partial result received from", SENDERLID)
       enddo
 !
 ! compute final result
@@ -274,7 +274,7 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
 !
 ! get final result 
 !      
-      call HPFC BCAST RECV(HOSTTID, MCASTHOST, bufid)
+      call HPFC BCAST RECV(HOSTLID, MCASTHOST, bufid)
       call HPFC UNPACK(PVMTYPE, val, size, 1, info)
       MCASTHOST = MCASTHOST + 2
       end
