@@ -170,80 +170,110 @@ proper_effects_contract(list l_effects)
  * output   : a list of effects, in which the selected elements have been 
  *            merged.
  * modifies : the input list.
- * comment  : the algorithm is in (n^2)/2...
+ * comment  : the algorithm is in O(n) (was in (n^2)/2)
  * 
  * we need "entity/action" -> consp to check for the
  * condition in the second loop directly.
  * or to simplify the hash management, two entity -> consp?
  * a generic multi key combination hash would help.
+ * the list is modified IN PLACE, storing on the first effect encountered...
  */
 list 
 proper_effects_combine(list l_effects, bool scalars_only_p)
 {
-  list base, current, pred;
+  list cur, pred = NIL;
+  /* entity name -> consp in effect list. */
+  hash_table all_read_effects, all_write_effects;
   
   ifdebug(6) {
     pips_debug(6, "proper effects: \n");
     (*effects_prettyprint_func)(l_effects);	
-  } 
+  }
   
-  base = l_effects;
-  /* scan the list of effects */
-  while(!ENDP(base))
+  all_read_effects = hash_table_make(hash_string, 0);
+  all_write_effects = hash_table_make(hash_string, 0);
+
+  cur = l_effects;
+  /* scan the list of effects... the list is modified in place */
+  while(!ENDP(cur))
   {
-    /* the list is modified in place */
-    EFFECT(CAR(base))= (*proper_to_summary_effect_func)(EFFECT(CAR(base)));
-    
-    /* ARGH... 
-     * scan the next elements to find effects combinable
-     * with the effects of the base element.
-     */
-    current = CDR(base);
-    pred = base;
-    while (!ENDP(current))
+    effect current = EFFECT(CAR(cur));
+    string n;
+    tag a;
+    bool do_combine = FALSE;
+    list do_combine_item = NIL;
+    list next = CDR(cur); /* now, as 'cur' may be removed... */
+
+    current = (*proper_to_summary_effect_func)(current);
+    n = entity_name(effect_entity(current));
+    a = effect_action_tag(current);
+
+    /* do we have to combine ? */
+    if (!scalars_only_p || effect_scalar_p(current))
     {
-      effect eff_base = EFFECT(CAR(base));	    
-      effect eff_current = EFFECT(CAR(current));
-      
-      /* Both effects are about the same scalar variable, 
-	 with the same action 
-      */ 
-      if ((!scalars_only_p || effect_scalar_p(eff_base)) &&
-	  effects_same_action_p(eff_base, eff_current) )  
-      {
-	list tmp;
-	effect new_eff_base;
-	
-	/* compute their union */
-	new_eff_base = (*effect_union_op)
-	  (eff_base, (*proper_to_summary_effect_func)(eff_current));
-	
-	/* free the original effects: no memory leak */
-	free_effect(eff_base);
-	free_effect(eff_current);
-	
-	/* replace the base effect by the new effect */
-	EFFECT(CAR(base)) = new_eff_base;
-	
-	/* remove the current list element from the global list */
-	tmp = current;	    
-	current = CDR(current);
-	CDR(pred) = current;
-	free(tmp);	    
-      }
-      else
-      {
-	pred = current;
-	current = CDR(current);
+      switch (a) {
+      case is_action_write:
+	if (hash_defined_p(all_write_effects, n))
+	{
+	  do_combine = TRUE;
+	  do_combine_item = hash_get(all_write_effects, n); 
+	}
+	break;
+      case is_action_read:
+	if (hash_defined_p(all_read_effects, n))
+	{
+	  do_combine = TRUE;
+	  do_combine_item = hash_get(all_read_effects, n);
+	}
+	break;
+      default: pips_internal_error("unexpected action tag %d", a);
       }
     }
-    base = CDR(base);
+
+    if (do_combine)
+    {
+      effect base = EFFECT(CAR(do_combine_item));
+      /* compute their union */
+      effect combined = (*effect_union_op)(base, current);
+	
+      /* free the original effects: no memory leak */
+      free_effect(base);
+      free_effect(current);
+	
+      /* replace the base effect by the new effect */
+      EFFECT(CAR(do_combine_item)) = combined;
+	
+      /* remove the current list element from the global list */
+      /* pred!=NIL as on the first items hash's are empty */
+      CDR(pred) = next; /* pred is not changed! */
+      free(cur);
+    }
+    else
+    {
+      /* no, just store... */
+      EFFECT(CAR(cur)) = current;
+      switch (a) {
+      case is_action_write:
+	hash_put(all_write_effects, n, cur);
+	break;
+      case is_action_read:
+	hash_put(all_read_effects, n, cur);
+	break;
+      default: pips_internal_error("unexpected action tag %d", a);
+      }
+      pred = cur;
+    }
+
+    cur = next;
   }
   
   ifdebug(6){
     pips_debug(6, "summary effects: \n"); 
     (*effects_prettyprint_func)(l_effects);	
   }
+
+  hash_table_free(all_write_effects);
+  hash_table_free(all_read_effects);
 
   return l_effects;
 }
@@ -363,7 +393,9 @@ list
 effects_undefined_binary_operator(list l1, list l2,
 				  bool (*effects_combinable_p)(effect, effect))
 {
-    return list_undefined;
+  pips_assert("unused arguments", l1==l1 && l2==l2 &&
+	      effects_combinable_p==effects_combinable_p);
+  return list_undefined;
 }
 
 
@@ -380,7 +412,8 @@ effects_undefined_binary_operator(list l1, list l2,
 static list 
 effect_entities_intersection(effect eff1, effect eff2)
 {
-    return(CONS(EFFECT, (*effect_dup_func)(eff1), NIL));
+  pips_assert("unused argument", eff2==eff2);
+  return CONS(EFFECT, (*effect_dup_func)(eff1), NIL);
 }
 
 /* list effects_entities_intersection(list l1, list l2, 
