@@ -66,7 +66,7 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 	  echo "FWD_MSG=$(FWD_MSG)"; \
 	  echo "FWD_ROOT=$(FWD_ROOT)"; \
 	  echo "FWD_REPORT=$(FWD_REPORT)"; \
-	  echo "FWD_OUT=$(FWD_OUT)"; 
+	  echo "FWD_OUT=$(FWD_OUT)"; \
 	fi;\
 	for d in $(FWD_DIRS) ; do \
 	  if test -d $$d ; \
@@ -75,5 +75,5 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 	    if $(MAKE) -C $$d $(FWD_MKFLAGS) FWD_ROOT="$(FWD_ROOT)/$$d" $@ ;\
 	    then report=succeeded ; else report=failed ; fi ;\
 	    echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ $$report" $(FWD_REPORT);\
-	   fi ; \
+	  fi ; \
 	 done $(FWD_OUT)
