@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/10/15 18:11:02 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/10/26 15:06:55 $, )
  * version $Revision$
  */
  
@@ -549,13 +549,6 @@ static bool hpfc_directives_handler(string name, bool dyn)
 
     debug_off(); 
     debug_off();
-    return TRUE;
-}
-
-bool hpfc_directives(string name)
-{
-    hpfc_static_directives(name);
-    hpfc_dynamic_directives(name);
     return TRUE;
 }
 
