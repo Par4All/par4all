@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1995/08/07 13:52:19 $, )
+# ($Date: 1995/08/07 13:53:47 $, )
 #
 
 RUN=':'
@@ -37,17 +37,14 @@ shift
 
 for file
 do
-  test -f $file && cmp -s $file $directory/$file && 
-  {
+  if test -f $file && cmp -s $file $directory/$file
+  then
     echo "$1 was not modified" 
-    exit 0
-  }
-
-  # else
-  
-  echo "copying $1"
-  cp $file $directory
-  eval $RUN $directory/$file
+  else
+    echo "copying $1"
+    cp $file $directory
+    eval $RUN $directory/$file
+  fi
 done
 
 # that is all
