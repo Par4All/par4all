@@ -185,3 +185,62 @@ Pbase base_dup(Pbase b)
 
   return r;
 }
+
+/* direct duplication. 
+ * vect_dup() and vect_reversal() do the same thing : 
+ * duplicate the vector with the reversal order.
+ * vect_copy duplicate the vector with the same order.
+ * in use of sc_copy. (DN,24/6/02)
+ * Does not change parameter b (DN,28/06/02)
+ */
+Pbase vect_copy(Pvecteur b)
+{
+  Pvecteur n = VECTEUR_NUL, p = VECTEUR_NUL, r = VECTEUR_NUL, tmp = b;
+
+  for (; tmp!=VECTEUR_NUL; tmp=tmp->succ)
+  {
+    n = (Pvecteur) MALLOC(sizeof(Svecteur),VECTEUR,"vect_copy");
+    if (n == NULL) {
+      fprintf(stderr,"[vect_copy] out of memory space\n");
+      abort();
+    }
+    var_of(n) = var_of(tmp);
+    val_of(n) = val_of(tmp);
+    n->succ = NULL;
+    if (r==VECTEUR_NUL) r = n;
+    if (p!=VECTEUR_NUL) p->succ = n;
+    p = n;
+  }
+
+  return r;
+}
+
+/* Direct duplication. The initial Pbase is assumed to be valid.
+ * Absolutely the same with base_dup, but base_up is the only function
+ * that maintains the old order.
+ * So recopy here for use with copy version including 
+ * vect_copy, contrainte_copy, contraintes_copy, sc_copy (DN,24/6/02)
+ * Does not change the parameter. Did have a look at all copy version (DN,1/7/2002)
+ */
+Pbase base_copy(Pbase b)
+{
+  Pbase n = BASE_NULLE, p = BASE_NULLE, r = BASE_NULLE, tmp = b;
+
+  for (; tmp!=BASE_NULLE; tmp=tmp->succ)
+  {
+    n = (Pvecteur) MALLOC(sizeof(Svecteur),VECTEUR,"base_copy");
+    if (n == NULL) {
+      fprintf(stderr,"[base_copy] out of memory space\n");
+      abort();
+    }
+    var_of(n) = var_of(tmp);
+    val_of(n) = VALUE_ONE;
+    n->succ = NULL;
+    if (r==BASE_NULLE) r = n;
+    if (p!=BASE_NULLE) p->succ = n;
+    p = n;
+  }
+
+  return r;
+}
+   
