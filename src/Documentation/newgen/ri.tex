@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1996/12/26 11:29:03 $, 
+%% $Date: 1997/01/03 11:02:22 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,newgen_domain}
@@ -1037,7 +1037,7 @@ statements when the mapping is freed. See NewGen documentation in
 \label{subsection-instruction}
 \index{Instruction}
 
-\domain{Instruction = sequence + test + loop + goto:statement + call + unstructured}
+\domain{Instruction = sequence + test + loop + + whileloop + goto:statement + call + unstructured}
 
 Type {\tt instruction} is used to represent the command associated to a
 statement. An instruction can either be a sequence, a test, a loop,
@@ -1277,6 +1277,19 @@ This field should be factored out in the \verb/statement/ type in order
 to declare variables local to a block, as in C. However, the two levels,
 statement and instruction, would make coding more difficult.
 
+\subsubsection{While Loop}
+\label{subsubsection-whileloop}
+\index{While}
+
+\domain{Whileloop = condition:expression x body:statement x label:entity}
+
+Here is a while loop. It is not the \verb|while| domain because it would
+interfere with C keywords. The content is similar to the \verb|loop|
+domain. Possible parallel while loops are considered unimportant, hence no
+execution part was added. No locals are attached, because this should be
+rather done at the \verb|statement| level, not within the
+\verb|instruction| itself. 
+
 \subsubsection{Function Call}
 \label{subsubsection-call}
 \index{Call}\index{Intrinsic}\index{Assignment}\index{RETURN}
@@ -1307,7 +1320,7 @@ comme + et *, les intrinse`ques comme {\tt MOD} ou {\tt SIN} et surtout
 les commandes (i.e. instructions) Fortran, a` commencer par
 l'assignation et en continuant avec {\tt READ, WRITE, PAUSE, OPEN,
 CLOSE, RETURN, CALL, FORMAT,}
-etc..., sont représentées comme les appels de fonctions définies par
+etc., sont représentées comme les appels de fonctions définies par
 l'utilisateur. Le nombre d'arguments de chaque pseudo-fonction varie: 0
 pour les constantes, 1 ou 2 pour les opérateurs, etc. Les commandes
 Fortran, les opérateurs et les intrinse`ques sont caractérisés par
