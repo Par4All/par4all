@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/04 08:48:43 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/04 08:51:12 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -365,8 +365,13 @@ production-depend: $(DERIVED_HEADERS) $(EXTERN)
 %
 
 # Supprime le mode silencieux -s :
-[ $DIRTYPE = 'Lib' ] && make -f $MAKEFILE depend
-[ $DIRTYPE = 'Passes' ] && make -f $MAKEFILE production-depend
+#
+if [ $DIRSIDE = $DEVEDIR ]
+then 
+  make -f $MAKEFILE depend
+else
+  make -f $MAKEFILE production-depend
+fi
 
 ### end good case
 
