@@ -38,8 +38,13 @@ static opcode get_optimal_opcode(int kind, int argc, list* args)
 	  arg,
       {
 	 int width;
-	 type t = entity_type(reference_variable(expression_reference(arg)));
+	 type t;
 	 basic b;
+
+	 if (!expression_reference_p(arg))
+	    continue;
+
+	 t = entity_type(reference_variable(expression_reference(arg)));
 	    
 	 switch(basic_tag(b = variable_basic(type_variable(t))))
 	 {
