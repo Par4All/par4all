@@ -1011,6 +1011,7 @@ int Matrix_Inverse(Matrix *Mat,Matrix *MatInv ) {
    }  
    value_clear(x);  value_clear(gcd); value_clear(piv);
    value_clear(m1); value_clear(m2);
+   free(den);
    
    return 1;
 } /* Matrix_Inverse */
