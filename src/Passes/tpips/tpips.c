@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.105  1998/07/03 08:00:57  coelho
+ * fixed typo in tpips_usage string.
+ *
  * Revision 1.104  1998/06/25 22:05:54  keryell
  * Added an "&" in tpips_user_requestfor DEC/OSF1. It was wrong anyway...
  *
@@ -158,7 +161,7 @@ extern void tp_restart( FILE * ); /* tp_lex.c */
   "\t-r  rcfile: tpips rc file to source. (default ~/.tpipsrc)\n"	\
   "\t-e  tpips-cmds: here tpips commands.\n"				\
   "\t-j: jpips special mode.\n"						\
-  "\r-w: starts with a wrapper (jpips special again)...\n"
+  "\t-w: starts with a wrapper (jpips special again)...\n"
 
 #define SEPARATOR_P(c) (index (" \t", c))
 
