@@ -109,14 +109,14 @@ void ExpressionReplaceReference(expression e, reference ref, expression next)
 	      if ( simple_ref_eq_p(syntax_reference(s), ref)) {
 		  syntax new_syn;
 		  /* s replaced by expression_syntax(next) */
-		  new_syn = gen_copy_tree(expression_syntax(next));
+		  new_syn = copy_syntax(expression_syntax(next));
 		  if(get_debug_level()>=5) {
 		      fprintf(stderr, 
 			      "Field syntax of replacing expression: ");
 		      print_syntax(new_syn);
 		      fprintf(stderr, "\n");
 		  }
-		  gen_free(s);
+		  free_syntax(s);
 		  expression_syntax(e) = new_syn;
 		  /* ?? What should happen to expression_normalized(e)? */
 	      }
