@@ -1,0 +1,133 @@
+#! /bin/sh
+#
+# $RCSfile: install_pips_sources,v $ ($Date: 1994/12/09 09:04:13 $, )
+# version $Revision$
+# got on %D%, %T%
+#
+
+script=`basename $0`
+VERBOSE=':'
+DEBUG=':'
+
+unset SOURCE_DIR TARGET_DIR COMMENT OPTIONS
+
+verbose()
+{
+  echo "$script:" "$@" 
+}
+
+debug()
+{
+  echo "$script:" "$@" 1>&2
+}
+
+error()
+{
+  echo "$script:" "$@" 1>&2
+  exit 2
+}
+
+usage()
+{
+  cat 1>&2 <<-EOM
+	Usage: $script [-hvD] [-y comment] [-t dir] [-s dir] files
+	  version $Revision$
+	  -h: help
+	  -v: verbose
+	  -D: debug
+	  -t dir: target directory (default image of source in \$PRODDIR)
+	  -s dir: source directory (default .)
+	  -y comment: comment for the installation
+	EOM
+  exit ${1:-1}
+}
+
+while getopts hvDt:s:y: OPT
+do
+  case $OPT in
+    h) usage 0 ;;
+    v) VERBOSE='verbose' ; OPTIONS="$OPTIONS -v" ;;
+    D) DEBUG='debug' ; OPTIONS="$OPTIONS -D" ;;
+    t) TARGET_DIR="$OPTARG" ;;
+    s) SOURCE_DIR="$OPTARG" ;;
+    y) COMMENT="$OPTARG" ;;
+    *) usage 1 ;;
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+#
+# default values
+
+[ "$COMMENT" ] || COMMENT='none'
+[ "$SOURCE_DIR" ] || SOURCE_DIR=`pwd`
+[ "$TARGET_DIR" ] || 
+  TARGET_DIR=$SRCDIR/`echo "$SOURCE_DIR" | sed 's,.*/\([^/]*/[^/]*\)$,\1,'`
+
+$DEBUG "source directory is $SOURCE_DIR"
+$DEBUG "target directory is $TARGET_DIR"
+
+#
+# main loop
+
+$VERBOSE "entering directory $TARGET_DIR"
+
+[ -d "$TARGET_DIR" ] || mkdir "$TARGET_DIR" "$TARGET_DIR"/SCCS
+cd "$TARGET_DIR"
+
+sccs edit SCCS
+rm -f `sccs tell`
+
+for item
+do
+  $VERBOSE "dealing with $item"
+  src_item="$SOURCE_DIR/$item"
+  trg_item="$TARGET_DIR/$item"
+
+  if [ "`echo $item | sed 's,[^/],,g'`" ] 
+  then
+    $VERBOSE "something in a directory, recursing"
+    $0 $OPTIONS -y "$COMMENT" \
+    	-s "`dirname $src_item`" -t "`dirname $trg_item`" \
+	"`basename $item`"
+    $DEBUG "end of recursion"
+    continue
+  fi
+
+  # else
+  if [ -d "$src_item" ]
+  then
+    $VERBOSE "directory, recursing"
+    $0 $OPTIONS -y "$COMMENT" -s "$src_item" -t "$trg_item" \
+    	`cd $src_item ; find * -type d -prune -o -type f ! -name '*~' -print`
+    $DEBUG "end of recursion"
+    continue
+  fi
+
+  #else
+  if [ -f "$src_item" ] 
+  then
+    cp $src_item $trg_item
+    if [ -f "$TARGET_DIR/SCCS/s.$item" ]
+    then
+      sccs delget -y"$COMMENT" "$item"
+    else
+      sccs create "$item"
+      cmp -s $item ,$item || error "$item file not properly created"
+      rm -f ,$item
+    fi
+  else
+    error "$item is neither a file nor a directory"
+  fi
+done
+
+LOST_FILES="`sccs tell`"
+[ "$LOST_FILES" ] &&
+{
+  $VERBOSE "no more $LOST_FILES"
+  sccs unedit $LOST_FILES
+  rm -f $LOST_FILES
+}
+
+$VERBOSE "done"
