@@ -28,6 +28,13 @@
 #include "text-util.h"
 #include "icfg.h"
 
+/* Graph is defined here, for making daVinci graph */
+#include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
+#include "icfg-local.h"
+
 #define ICFG_SCAN_INDENT 4
 
 static int current_margin;
@@ -105,60 +112,9 @@ static void append_icfg_file(text t, string module_name)
     free(filename); 
 }
 
-/*written by Dat*/
-static list /* of entity */ list_variables_to_filter;
-
-static void get_list_of_variable_to_filter() {
-    /* get the list of variables to filter if it is not set*/
-    if (list_variables_to_filter == NIL) {
-        string variables_names = strdup(get_string_property("EFFECTS_FILTER_ON_VARIABLE"));
-	string saved = variables_names, s;
-	entity var = NULL;
-
-	for (s = variables_names; *s; s++) {
-	    if (*s == ',') {
-	        *s = '\0';
-		var = gen_find_tabulated(variables_names, entity_domain);
-
-		if (!var || entity_undefined_p(var))
-		    pips_user_warning("reference variable '%s' not found\n", variables_names);
-		else
-		    list_variables_to_filter = CONS(ENTITY, var, list_variables_to_filter);
-		*s = ',';
-		variables_names = s+1;
-	    }
-	}
-	
-	var = gen_find_tabulated(variables_names, entity_domain);
-	
-	if (!var || entity_undefined_p(var))
-	    pips_user_warning("reference variable '%s' not found\n", variables_names);
-	else
-	    list_variables_to_filter = CONS(ENTITY, var,list_variables_to_filter );
-
-	free(saved);
-	saved = NULL;
-    }
-    return;
-}
-
-static list /* of effect */ effects_filter(list l_effs)
-{
-    list l_flt = NIL;
-    get_list_of_variable_to_filter();
-    MAP(EFFECT, eff, {
-        action ac = effect_action(eff);
-	reference ref = effect_reference(eff);
-	entity ent = reference_variable(ref);
-	MAP(ENTITY, e_flt, {
-	    if (entity_conflict_p(e_flt, ent) && !action_read_p(ac)) {
-	        l_flt = CONS(EFFECT, eff, l_flt);
-		break;
-	    }
-	}, list_variables_to_filter);
-    }, l_effs);
-    return l_flt;
-}
+static list /* of entity */ list_vars_to_filter = NIL;
+static list /* of vertex */ verlist = NIL; /* to make graph daVinci */
+static vertex current_vertex = NULL; /* caller */
 
 /* STATEMENT
  */
@@ -176,7 +132,10 @@ static bool statement_flt(statement s)
 	statement_effects m = (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, TRUE);
 	
 	list l_effs = effects_effects(apply_statement_effects(m, s));
-	list l_effs_flt = effects_filter(l_effs);
+	list l_effs_flt;
+	if (list_vars_to_filter == NIL)
+	    list_vars_to_filter = get_list_of_variable_to_filter();
+	l_effs_flt = effects_filter(l_effs, list_vars_to_filter);
 	
 	if (l_effs_flt != NIL) {
 	    instruction i = statement_instruction(s);
@@ -189,13 +148,15 @@ static bool statement_flt(statement s)
 		if (!value_code_p(entity_initial(e_callee))) {
 		    MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
 		    /* do not display comments in the decoration */
-		    free(statement_comments(s));
+		    if (!string_undefined_p(statement_comments(s)))
+		        free(statement_comments(s));
 		    MERGE_TEXTS(t, text_statement(entity_undefined, 0, s));
 		}
 	    } else {
 	        MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
 		/* do not display comments in the decoration */
-		free(statement_comments(s));
+		if (!string_undefined_p(statement_comments(s)))
+		  free(statement_comments(s));
 		MERGE_TEXTS(t, text_statement(entity_undefined, 0, s));
 	    }
 	}
@@ -223,13 +184,16 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
     statement_effects m = (statement_effects) db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, TRUE);
 
     list l_effs = effects_effects(apply_statement_effects(m, current_stmt_head()));
-    list l_effs_flt = effects_filter(l_effs);
+    list l_effs_flt;
+    if (list_vars_to_filter == NIL)
+        list_vars_to_filter = get_list_of_variable_to_filter();
+    l_effs_flt = effects_filter(l_effs, list_vars_to_filter);
     
     /* make the caller as the current module entity */
     set_current_module_entity(e_caller);
 
     if (l_effs_flt != NIL) {
-        expression * exps = call_arguments(c);
+        expression * exps = (expression *)call_arguments(c);
 
 	MAP(EXPRESSION, exp, {
 	    syntax syn = expression_syntax(exp);
@@ -241,11 +205,12 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
 		    if (entity_conflict_p(e, var)) {
 		        MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
 			/* do not display comments in the decoration */
-			free(statement_comments(current_stmt_head()));
+			if (!string_undefined_p(statement_comments(current_stmt_head())))
+			    free(statement_comments(current_stmt_head()));
 			MERGE_TEXTS(t, text_statement(e_caller, 0, current_stmt_head()));
 			break;
 		    }
-		}, list_variables_to_filter);
+		}, list_vars_to_filter);
 	    }
 	}, exps);
     }
@@ -272,6 +237,11 @@ static void call_flt(call c)
 
 	/* hum... pushes the current entity... */
 	entity e_caller = get_current_module_entity();
+	/* written by Dat */
+	vertex ver_child = get_vertex_by_string(callee_name, verlist);
+	if (ver_child != vertex_undefined)
+	    verlist = safe_make_successor(current_vertex, ver_child, verlist);
+
 	reset_current_module_entity();
 
 	switch (get_int_property (ICFG_DECOR)) {
@@ -316,7 +286,7 @@ static void call_flt(call c)
 	/* retrieve the caller entity */
 	set_current_module_entity(e_caller);
 	/* append the callee' icfg */
-	append_icfg_file (r, callee_name);
+	/*append_icfg_file (r, callee_name);*/
 	/* store it to the statement mapping */
 	update_statement_icfg(current_stmt_head(), r);
     }
@@ -580,14 +550,14 @@ void print_module_icfg(entity module)
     string module_name = module_local_name(module);
     statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,TRUE);
     text txt = make_text (NIL);
+    append_marged_text(txt, 0, module_name, "");
+    current_vertex = make_vertex((vertex_label)txt, NIL);
 
     set_current_module_entity (module);
 
     /* allocate the mapping  */
     make_icfg_map();
     make_current_stmt_stack();
-
-    fprintf(stderr, "%d", get_int_property(ICFG_DECOR));
 
     current_margin = ICFG_SCAN_INDENT;
 
@@ -608,10 +578,15 @@ void print_module_icfg(entity module)
     pips_assert("stack is empty", current_stmt_empty_p());
 
     /* print the name of module in some case */
-    if (get_int_property(ICFG_DECOR) != ICFG_DECOR_FILTERED_PROPER_EFFECTS)
-        append_marged_text(txt, 0, module_name, "");
-    else if (text_sentences((text)load_statement_icfg(s)) != NIL)
-        append_marged_text(txt, 0, module_name, "");
+    if (get_int_property(ICFG_DECOR) != ICFG_DECOR_FILTERED_PROPER_EFFECTS) {
+      /*append_marged_text(txt, 0, module_name, "");*/
+    } else if ((text_sentences((text)load_statement_icfg(s)) != NIL) || (vertex_successors(current_vertex) != NIL)) {
+      /*append_marged_text(txt, 0, module_name, "");*/
+	verlist = safe_add_vertex_to_list(current_vertex, verlist);
+    } else {
+        safe_free_vertex(current_vertex, verlist);
+	current_vertex = vertex_undefined;
+    }
 
     MERGE_TEXTS (txt, (text) load_statement_icfg (s));
 
@@ -620,11 +595,23 @@ void print_module_icfg(entity module)
 		       (get_bool_property(ICFG_DOs) ? ".icfgl" : 
 			".icfg"),
 		       txt);
-    
-    free_text (txt);
+
+    /*free_text (txt);*/
     free_icfg_map();
     free_current_stmt_stack();
     reset_current_module_entity();
+
+    if (!vertex_undefined_p(current_vertex)) {
+        FILE * fd;
+        string localfilename = db_build_file_resource_name(DBR_ICFG_FILE, module_name, ".daVinci");
+	string dir = db_get_current_workspace_directory();
+	string filename = strdup(concatenate(dir, "/", localfilename, NULL));
+	free(dir);
+	fd = safe_fopen(filename, "w");
+	print_graph_daVinci_with_starting_node(fd, current_vertex);
+	safe_fclose(fd, filename);
+	free(filename);
+    }
 }
 
 /* parametrized by the decoration...
