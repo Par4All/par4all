@@ -1,12 +1,19 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/08/30 15:23:20 $, )
+# ($Date: 1996/08/30 19:12:37 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
 # Makefile for PVM and HPFC, Fabien COELHO, 08/06/94
 
 ARCH=$(PVM_ARCH)
+
+ifdef PIPS_ARCH
+RTARCH=$(ARCH)-$(PIPS_ARCH)
+else
+RTARCH=$(ARCH)-.
+endif
+
 all:
 
 ifdef HPFC_RUNTIME
@@ -16,7 +23,7 @@ RT_DIR= $(PIPS_ROOT)/Runtime/hpfc
 endif
 
 # the default is to use the same compilers and options as the library.
-include $(HPFC_RUNTIME)/$(ARCH)/compilers.make
+include $(HPFC_RUNTIME)/$(RTARCH)/compilers.make
 
 ifdef HPFC_M4
 M4	= $(HPFC_M4)
@@ -106,7 +113,7 @@ PVMe_DIR	= /usr/lpp/ssp/css/libus)
 LIBS_DIR	+= -L$(PVMe_DIR)
 endif
 
-LIBS_DIR	+= -L. -L$(PVM_LIB_DIR) -L$(RT_DIR)/$(ARCH)
+LIBS_DIR	+= -L. -L$(PVM_LIB_DIR) -L$(RT_DIR)/$(RTARCH)
 
 #
 # Libraries
