@@ -40,7 +40,7 @@ do
 		exit 2
 	else
 		# echo rm -r $WS
-		if /bin/rm -f -r $WS
+		if /bin/rm -r $WS
 		then
 			true
 		else
