@@ -45,15 +45,7 @@ void tpips_set_line_to_parse(char * line)
     cr_not_returned = TRUE;
 
     /* cut line at the beginning of comments */
-    while (*line)
-    {
-	if ((*line) == TPIPS_COMMENT_PREFIX)
-	{
-	    *line = 0;
-	    break;
-	}
-	line++;
-    }
+    if ((*line) == TPIPS_COMMENT_PREFIX) *line = '\0';
 }
 
 char * tpips_get_line_to_parse(void)
