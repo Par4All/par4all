@@ -5,7 +5,7 @@
 /* $Id$ */
 
 #ifndef lint
-char vcid_directory_menu[] = "%A% ($Date: 1997/09/30 06:56:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_directory_menu[] = "%A% ($Date: 1998/04/16 14:45:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <xview/xview.h>
@@ -28,6 +28,7 @@ char vcid_directory_menu[] = "%A% ($Date: 1997/09/30 06:56:27 $, ) version $Revi
 #include "genC.h"
 #include "misc.h"
 #include "database.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
