@@ -1349,6 +1349,15 @@ expression: sous_expression
 	    { $$ = $1; }
         | TK_LPAR expression TK_RPAR
             { $$ = $2; }
+        | TK_LPAR expression TK_COMMA expression TK_RPAR
+            {
+                    expression c = MakeComplexConstantExpression($2, $4);
+
+                    if(expression_undefined_p(c))
+		        ParserError("Syntax", "Illegal complex constant\n");
+
+		    $$ = c;
+            }
         ;
 
 sous_expression: atom
