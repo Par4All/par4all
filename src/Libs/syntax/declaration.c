@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.62  2001/07/13 13:07:44  coelho
+ * non integer DATA are considered when setting the initial value.
+ *
  * Revision 1.61  2001/07/13 12:00:06  coelho
  * debug -> pips_debug
  *
@@ -336,139 +339,149 @@ AnalyzeData(list ldvr, list ldvl)
 
     pcl = ldvl;
     dvl = DATAVAL(CAR(pcl));
-    for (pcr = ldvr; pcr != NIL && pcl != NIL; pcr = CDR(pcr)) {
-	datavar dvr = DATAVAR(CAR(pcr));
-	entity e = datavar_variable(dvr);
-	int i = datavar_nbelements(dvr);
+    for (pcr = ldvr; pcr != NIL && pcl != NIL; pcr = CDR(pcr)) 
+    {
+      datavar dvr = DATAVAR(CAR(pcr));
+      entity e = datavar_variable(dvr);
+      int i = datavar_nbelements(dvr);
+      
+      pips_debug(8, "Storage for entity %s must be static or made static\n",
+		 entity_name(e));
+      
+      if(storage_undefined_p(entity_storage(e))) {
+	entity_storage(e) =
+	  make_storage(is_storage_ram,
+		       (make_ram(get_current_module_entity(),
+				 StaticArea, 
+				 UNKNOWN_RAM_OFFSET,
+				 NIL)));
+      }
+      else if(storage_ram_p(entity_storage(e))) {
+	entity s = ram_section(storage_ram(entity_storage(e)));
+	entity m = get_current_module_entity();
 	
-	pips_debug(8, "Storage for entity %s must be static or made static\n",
-		   entity_name(e));
-
-	if(storage_undefined_p(entity_storage(e))) {
-	    entity_storage(e) =
-		make_storage(is_storage_ram,
-			     (make_ram(get_current_module_entity(),
-				       StaticArea, 
-				       UNKNOWN_RAM_OFFSET,
-				       NIL)));
-	}
-	else if(storage_ram_p(entity_storage(e))) {
-	  entity s = ram_section(storage_ram(entity_storage(e)));
-	  entity m = get_current_module_entity();
-
-	    if(dynamic_area_p(s)) {
-	      if(entity_blockdata_p(m)) {
-		pips_user_warning
-		  ("Variable %s is declared dynamic in a BLOCKDATA\n",
-		   entity_local_name(e));
-		ParserError("AnalyzeData",
-			    "No dynamic variables in BLOCKDATA\n");
-	      }
-	      else {
-		SaveEntity(e);
-	      }
-	    }
-	    else {
-	      /* Variable is in static area or in a user declared common */
-	      if(entity_blockdata_p(m)) {
-		/* Variable must be in a user declared common */
-		if(static_area_p(s)) {
-		  pips_user_warning
-		    ("DATA for variable %s declared is impossible:"
-		     " it should be declared in a COMMON instead\n",
-		     entity_local_name(e));
-		  ParserError("AnalyzeData",
-			      "Improper DATA declaration in BLOCKDATA");
-		}
-	      }
-	      else {
-		/* Variable must be in static area */
-		if(!static_area_p(s)) {
-		  pips_user_warning
-		    ("DATA for variable %s declared in COMMON %s:"
-		     " not standard compliant,"
-		     " use a BLOCKDATA\n",
-		     entity_local_name(e), module_local_name(s));
-		  if(!get_bool_property("PARSER_ACCEPT_ANSI_EXTENSIONS")) {
-		    ParserError("AnalyzeData",
-				"Improper DATA declaration, use a BLOCKDATA"
-				" or set property PARSER_ACCEPT_ANSI_EXTENSIONS");
-		  }
-		}
-	      }
-	    }
+	if(dynamic_area_p(s)) {
+	  if(entity_blockdata_p(m)) {
+	    pips_user_warning
+	      ("Variable %s is declared dynamic in a BLOCKDATA\n",
+	       entity_local_name(e));
+	    ParserError("AnalyzeData",
+			"No dynamic variables in BLOCKDATA\n");
+	  }
+	  else {
+	    SaveEntity(e);
+	  }
 	}
 	else {
-	    user_warning("AnalyzeData",
-			 "DATA initialization for non RAM variable %s "
-			 "(storage tag = %d)\n",
-			entity_name(e), storage_tag(entity_storage(e)));
-	    ParserError("AnalyzeData", 
-			"DATA statement initializes non RAM variable\n");
-	}
-
-	pips_debug(8, "needs %d elements for entity %s\n", 
-		   i, entity_name(e));
-
-	pips_assert("AnalyzeData", dataval_nboccurrences(dvl) > 0);
-
-	if (IsIntegerScalar(e)) {
-	    pips_assert("AnalyzeData", i == 1);
-
-	    if(constant_int_p(dataval_constant(dvl))) {
-	      if(value_undefined_p(entity_initial(e)) ||
-		 value_unknown_p(entity_initial(e))) {
-		entity_initial(e) = make_value(is_value_constant, 
-					       dataval_constant(dvl));
-
-		pips_debug(1, "%s %d\n", 
-		      entity_name(e), constant_int(dataval_constant(dvl)));
-	      }
-	      else {
-		pips_user_warning("Conflicting initial values for variable %s\n",
-				  entity_local_name(e));
-		ParserError("AnalyzeData", "Too many intial values");
+	  /* Variable is in static area or in a user declared common */
+	  if(entity_blockdata_p(m)) {
+	    /* Variable must be in a user declared common */
+	    if(static_area_p(s)) {
+	      pips_user_warning
+		("DATA for variable %s declared is impossible:"
+		 " it should be declared in a COMMON instead\n",
+		 entity_local_name(e));
+	      ParserError("AnalyzeData",
+			  "Improper DATA declaration in BLOCKDATA");
+	    }
+	  }
+	  else {
+	    /* Variable must be in static area */
+	    if(!static_area_p(s)) {
+	      pips_user_warning
+		("DATA for variable %s declared in COMMON %s:"
+		 " not standard compliant,"
+		 " use a BLOCKDATA\n",
+		 entity_local_name(e), module_local_name(s));
+	      if(!get_bool_property("PARSER_ACCEPT_ANSI_EXTENSIONS")) {
+		ParserError("AnalyzeData",
+			    "Improper DATA declaration, use a BLOCKDATA"
+			    " or set property PARSER_ACCEPT_ANSI_EXTENSIONS");
 	      }
 	    }
-	    else {
-	      Warning("AnalyzeData", 
-		      "Integer scalar variable initialized "
-		      "with non-integer constant");
-	    }
+	  }
 	}
+      }
+      else {
+	user_warning("AnalyzeData",
+		     "DATA initialization for non RAM variable %s "
+		     "(storage tag = %d)\n",
+		     entity_name(e), storage_tag(entity_storage(e)));
+	ParserError("AnalyzeData", 
+		    "DATA statement initializes non RAM variable\n");
+      }
+      
+      pips_debug(8, "needs %d elements for entity %s\n", 
+		 i, entity_name(e));
+      
+      pips_assert("AnalyzeData", dataval_nboccurrences(dvl) > 0);
+      
+      /* entity e initial field is set here with the data information. 
+       */
+      if (entity_scalar_p(e))
+      {
+	constant cst = dataval_constant(dvl);
 
-	while (i > 0 && pcl != NIL) {
-	    if (i <= dataval_nboccurrences(dvl)) {
-		pips_debug(8, "uses %d values out of %d\n",
-		      i, dataval_nboccurrences(dvl));
-		dataval_nboccurrences(dvl) -= i;
-		i = 0;
-	    }
-	    else {
-		debug(8, "AnalyzeData", "satisfies %d references out of %d\n",
-		      dataval_nboccurrences(dvl), i);
-		i -= dataval_nboccurrences(dvl);
-		dataval_nboccurrences(dvl) = 0;
-	    }
-
-	    if (dataval_nboccurrences(dvl) == 0) {
-		if ((pcl = CDR(pcl)) != NIL) {
-			dvl = DATAVAL(CAR(pcl));
-
-			pips_debug(8, "use next dataval\n");
-		    }
-	    }
-	    datavar_nbelements(dvr) = i;
+	pips_assert("AnalyzeData", i == 1);
+	
+	if (constant_int_p(cst) || constant_call_p(cst)) 
+	{
+	  if(value_undefined_p(entity_initial(e)) ||
+	     value_unknown_p(entity_initial(e))) 
+	  {
+	    value old = entity_initial(e);
+	    entity_initial(e) = make_value(is_value_constant, 
+					   copy_constant(cst));
+	    free_value(old);
+	  }
+	  else 
+	  {
+	    pips_user_warning("Conflicting initial values for variable %s\n",
+			      entity_local_name(e));
+	    ParserError("AnalyzeData", "Too many initial values");
+	  }
 	}
+	else 
+	{
+	  Warning("AnalyzeData", 
+		  "Integer scalar variable initialized "
+		  "with non-integer constant");
+	}
+      }
+      
+      while (i > 0 && pcl != NIL) 
+      {
+	if (i <= dataval_nboccurrences(dvl)) {
+	  pips_debug(8, "uses %d values out of %d\n",
+		     i, dataval_nboccurrences(dvl));
+	  dataval_nboccurrences(dvl) -= i;
+	  i = 0;
+	}
+	else {
+	  pips_debug(8, "satisfies %d references out of %d\n",
+		     dataval_nboccurrences(dvl), i);
+	  i -= dataval_nboccurrences(dvl);
+	  dataval_nboccurrences(dvl) = 0;
+	}
+	
+	if (dataval_nboccurrences(dvl) == 0) {
+	  if ((pcl = CDR(pcl)) != NIL) {
+	    dvl = DATAVAL(CAR(pcl));
+	    
+	    pips_debug(8, "use next dataval\n");
+	  }
+	}
+	datavar_nbelements(dvr) = i;
+      }
     }
-
+    
     if (pcl != NIL) {
-	Warning("AnalyzeData", "too many initializers\n");
+      Warning("AnalyzeData", "too many initializers\n");
     }
-
+    
     if (pcr != NIL && 
 	(datavar_nbelements(DATAVAR(CAR(pcr))) != 0 || CDR(pcr) != NIL)) {
-	ParserError("AnalyzeData", "too few initializers\n");
+      ParserError("AnalyzeData", "too few initializers\n");
     }
 }
 
