@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.42  2001/07/20 10:43:47  irigoin
+ * Warning added to type_equal_p() for string basics
+ *
  * Revision 1.41  2001/07/19 12:03:31  irigoin
  * Improvement in string_type_size()
  *
@@ -267,6 +270,9 @@ MakeAnyScalarResult(tag t, int size)
 }
 
 
+/* Warning: the lengths of string basics are not checked!!!
+ * string_type_size() could be used but it is probably not very robust.
+ */
 bool 
 type_equal_p(t1, t2)
 type t1;
