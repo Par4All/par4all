@@ -5,10 +5,10 @@
 
    */
 
-/* 	%A% ($Date: 1998/03/10 20:32:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/03/19 21:07:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 1998/03/10 20:32:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_clean_up_sequences[] = "%A% ($Date: 1998/03/19 21:07:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -74,7 +74,7 @@ clean_up_sequences_filter(statement s)
 
 
 /* Add a couple (statement -> GOTO) to the map statement_to_goto_table: */
-boolean
+bool
 compute_statement_to_goto_table_filter(instruction i)
 {
     if (instruction_goto_p(i)) {
