@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/09/15 15:54:34 $, ) 
+ * ($Date: 1995/09/18 13:23:30 $, ) 
  */
 
 #include "defines-local.h"
@@ -367,16 +367,17 @@ hpfc_broadcast_buffers(
 
 statement 
 hpfc_broadcast_if_necessary(
-    entity array,
-    entity lid,
-    entity proc,
-    bool is_lazy)
+    entity array, /* remapped source array */
+    entity trg,   /* remapped target array */
+    entity lid,   /* lid for target processor(s) */
+    entity proc,  /* target processor */
+    bool is_lazy) /* lazy or not... */
 {
     expression not_empty;
     statement send, pack;
 
     not_empty = buffer_full_condition(array, TRUE, FALSE);
-    send = hpfc_broadcast_buffers(array, lid, proc);
+    send = hpfc_broadcast_buffers(trg, lid, proc);
     pack = call_to_statement(make_call(hpfc_buffer_entity(array, BUFPCK), NIL));
 
     if (is_lazy)
@@ -400,6 +401,7 @@ hpfc_broadcast_if_necessary(
 statement 
 hpfc_lazy_buffer_packing(
     entity array, /* array being (un)packed */
+    entity trg,   /* target array */
     entity lid,   /* local id for base target */
     entity proc,  /* the processors, needed for broadcasts */
     entity (*array_dim)(int), /* variables for array dimensions */
@@ -417,7 +419,7 @@ hpfc_lazy_buffer_packing(
 	   is_send ? NIL : CONS(EXPRESSION, entity_to_expression(lid), NIL)));
     indexeq0 = set_integer(hpfc_name_to_entity(BUFFER_INDEX), 0);
     optional = is_lazy ? 
-	is_send ? hpfc_broadcast_buffers(array, lid, proc) :
+	is_send ? hpfc_broadcast_buffers(trg, lid, proc) :
 	          set_logical(hpfc_name_to_entity(RCV_NOT_PRF), TRUE) :
 	make_continue_statement(entity_undefined);
 			   
@@ -523,13 +525,14 @@ make_list_of_constant(
 /* statement st_compute_lid(proc)
  *
  *       T_LID=CMP_LID(pn, pi...)
+ *
+ * if array is not NULL, partial according to array.
  */
 statement 
 hpfc_compute_lid(
     entity lid,               /* variable to be assigned to */
     entity proc,              /* processor arrangement */
     entity (*creation)(int),  /* individual variables */
-    bool partial,             /* whether a partial computation is expected */
     entity array)             /* to be used for partial (broadcasts...) */
 {
     if (!get_bool_property("HPFC_EXPAND_CMPLID"))
@@ -537,7 +540,7 @@ hpfc_compute_lid(
 	int ndim = NumberOfDimension(proc);
 	entity cmp_lid = hpfc_name_to_entity(CMP_LID);
 
-	message_assert("not implemented", !partial);
+	message_assert("not implemented", !array);
 	
 	return make_assign_statement(entity_to_expression(lid),
 	  make_call_expression
@@ -553,7 +556,7 @@ hpfc_compute_lid(
 
 	c = full_linearization(proc, lid, &size, creation, FALSE, 1);
 
-	if (partial)
+	if (array)
 	{
 	    /* remove distributed dimensions form the constraint
 	     */
