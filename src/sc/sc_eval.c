@@ -34,41 +34,58 @@ Value *pval;
     if (SC_UNDEFINED_P(ps))
 	return(FALSE);
 
-    for (pc = ps->egalites; pc != NULL; pc = pc->succ) {
+    for (pc = ps->egalites; pc != NULL; pc = pc->succ) 
+    {
 	Pvecteur pv = pc->vecteur;
-
-	if (! VECTEUR_NUL_P(pv)) {
-	    if (pv->succ == NULL) {
-		if (pv->var == var) {
+	
+	if (! VECTEUR_NUL_P(pv)) 
+	{
+	    if (pv->succ == NULL)
+	    {
+		if (pv->var == var)
+		{
 		    /* equation de la forme: k*var == 0 */
 		    *pval = 0;
 		    return(TRUE);
 		}
 	    }
-	    else if (pv->succ->succ == NULL) {
-		if ((pv->var == var) && (pv->succ->var == TCST)) {
+	    else if (pv->succ->succ == NULL)
+	    {
+		if ((pv->var == var) && (pv->succ->var == TCST))
+		{
 		    /* equation de la forme: k*var - c == 0 */
-		    if(pv->succ->val%pv->val==0) {
+		    if(pv->succ->val%pv->val==0)
+		    {
 			*pval = -pv->succ->val/pv->val;
 			return(TRUE);
 		    }
 		    else
-			sc_error("sc_value_of_variable","systeme infaisable");
-		}
-		else if ((pv->var == TCST) && (pv->succ->var == var)) {
-		    /* equation de la forme: c - k*var == 0 */
-		    if(pv->val%pv->succ->val==0) {
-			*pval = - pv->val/pv->succ->val;
-			return(TRUE);
+		    {
+			/* sc_error("sc_value_of_variable","systeme infaisable"); */
+			return(FALSE);
 		    }
-		    else
-			sc_error("sc_value_of_variable",
-				 "system is not feasible");
+		}
+		else
+		{
+		    if ((pv->var == TCST) && (pv->succ->var == var))
+		    {
+			/* equation de la forme: c - k*var == 0 */
+			if(pv->val%pv->succ->val==0) {
+			    *pval = - pv->val/pv->succ->val;
+			    return(TRUE);
+			}
+			else
+			{
+			    /* sc_error("sc_value_of_variable",
+				     "system is not feasible"); */
+			    return(FALSE);
+			}
+		    }
 		}
 	    }
 	}
     }
-
+    
     return(FALSE);
 }
 
