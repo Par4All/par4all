@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1995/09/12 16:30:53 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1995/09/22 11:19:23 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -106,7 +106,8 @@ which_executable()
 validate_usage()
 {
   {
-    echo "Usage: $0 [-dsvpnhtVD] [-u xx] [-r dir] [-l dir] [-x pips] [-f file] [Modules]"
+    echo "Usage: $0 [-dsvpnhtVD] [-u xx] [-r dir] [-l dir] "
+    echo "          [-x/y pips/tpips] [-i lines] [-f file] [Modules]"
     echo "   -d: debug"
     echo "   -D: more debug"
     echo "   -s: silent (default)"
@@ -118,6 +119,7 @@ validate_usage()
     echo "   -t: timing"
     echo "   -u xx: update time (default 30)"
     echo "   -r dir: run directory (default .)"
+    echo "   -i lines: max number of lines for sending a full message"
     echo "   -l dir: lock directory (default .)"
     echo "   -f file: what file in a module (use with -n)"
     echo "   -x pips: pips to be used (default . then Production)"
@@ -214,7 +216,7 @@ send_validate()
 #
 # get options
 
-while getopts DVudtsvpnhr:l:x:y: opt
+while getopts DVudtsvpnhr:l:x:y:i: opt
 do
   case $opt in
     d) DEBUG="debug" ;;
@@ -222,6 +224,7 @@ do
     t) PERFORMANCE="begin `local_date`"; VALIDOPT="$VALIDOPT -t";;
     v) VERBOSE='verbose' ;;
     V) VERBOSE='verbose' ; VALIDOPT="$VALIDOPT -v";;
+    i) VALIDOPT="$VALIDOPT -i $OPTARG" ;;
     s) VERBOSE=':' ;;
     p) PARALLEL="1" ;;
     n) PARALLEL="" ;;
