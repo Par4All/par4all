@@ -5,9 +5,30 @@
 
 LIB_CFILES =	util.c contexts.c testdep_util.c \
 		ricedg.c prettyprint.c quick_privatize.c \
-		trace.c
+		trace.c impact_check.c
 
 LIB_HEADERS =	ricedg-local.h local.h
 
 LIB_OBJECTS =	$(LIB_CFILES:.c=.o)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
