@@ -1,3 +1,14 @@
+/* Functions closely related to the entity class, constructors, predicates,...
+ *
+ * $Id$
+ *
+ * $Log: entity.c,v $
+ * Revision 1.37  1998/10/09 11:31:18  irigoin
+ * common_members_of_module() updated because of the new heap area. RCS
+ * fields added.
+ *
+ *
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -659,9 +670,14 @@ common_members_of_module(
 	    int offset = ram_offset(r);
 	    int size = 0;
 
-	    if(!SizeOfArray(v, &size)) {
-		pips_error("common_members_of_module",
-			   "Varying size array \"%s\"\n", entity_name(v));
+	    if(heap_area_p(ram_section(r))) {
+		size = 0;
+	    }
+	    else {
+		if(!SizeOfArray(v, &size)) {
+		    pips_error("common_members_of_module",
+			       "Varying size array \"%s\"\n", entity_name(v));
+		}
 	    }
 
 	    if (cumulated_offset==offset || !only_primary)
@@ -670,7 +686,7 @@ common_members_of_module(
 		break; /* drop equivalenced that come hereafter... */
 
 	    cumulated_offset+=size;
-	}
+	    }
     },
         area_layout(type_area(entity_type(common))));
 
