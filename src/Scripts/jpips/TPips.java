@@ -2,6 +2,9 @@
   * $Id$
   *
   * $Log: TPips.java,v $
+  * Revision 1.2  1998/06/30 17:35:33  coelho
+  * last version of FD.
+  *
   * Revision 1.1  1998/06/30 16:42:54  coelho
   * Initial revision
   *
@@ -13,15 +16,17 @@ import java.lang.*;
 import java.util.*;
 import java.io.*;
 import java.awt.swing.*;
-import JPips.Pawt.*;
 import java.applet.*;
+
+import JPips.Pawt.*;
 
 /** A class that creates a tpips process.
   * It defines the methods to interact with the process.  
   * 
   * @author Francois Didry
   */
-public class TPips implements JPipsDialog
+public class TPips 
+  implements Requestable
 {
 
 
@@ -296,12 +301,13 @@ public class TPips implements JPipsDialog
     {
       for(int i=0; i<optionVector.size(); i++)
         {
-	  Option op = (Option)optionVector.elementAt(i);
-	  if(op.state != null)
+	  Stateable op = (Stateable) optionVector.elementAt(i);
+	  Vector state = op.getState();
+	  if (state != null)
 	    {
-              for(int j=0; j<op.state.size(); j++)
+              for(int j=0; j<state.size(); j++)
 	        {
-	          PComboBox cob = (PComboBox)op.state.elementAt(j);
+	          PComboBox cob = (PComboBox) state.elementAt(j);
 	          if(cob.marker.equals(marker))
 	            {
 	              int index = cob.getSelectedIndex();
