@@ -2,7 +2,7 @@
 #! /bin/sh -vx
 #
 # SCCS stuff:
-# $RCSfile: make-pips,v $ ($Date: 1995/09/19 08:49:00 $, )
+# $RCSfile: make-pips,v $ ($Date: 1995/09/25 13:08:00 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -40,7 +40,8 @@ do
 	d)	DEVELOPMENT=TRUE
 		PRODUCTION="";;
 	n)	MAKE_OPTION="-n";;
-	p)	PRODUCTION=TRUE;;
+	p)	PRODUCTION=TRUE
+		DEVELOPMENT="";;
 	a)	DEVELOPMENT=TRUE
 		PRODUCTION=TRUE;;
 	r)	RECOMPILE=TRUE;;
