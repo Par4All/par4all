@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/11/14 14:51:25 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/12/26 10:51:32 $, )
  * version $Revision$
  */
  
@@ -386,6 +386,7 @@ compile_module(entity module)
 
     declaration_with_overlaps_for_module(module);
 
+    set_similar_mappings_for_updates();
     update_object_for_module(node_stat, node_module);
     update_object_for_module(entity_code(node_module), node_module);
     insure_declaration_coherency(node_module, node_stat,
