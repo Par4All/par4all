@@ -1,5 +1,5 @@
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/07/11 18:29:34 $, 
+# $Date: 1996/07/11 18:46:13 $, 
 # (c) Fabien COELHO July 1996
 #
 # this makefile forwards make targets to sub-directories...
@@ -27,7 +27,7 @@ FWD_ROOT=.
 
 # forward any command to the specified directories
 %::
-	@echo Forwarding $@ to $(FWD_DIRS)
+	@echo Forwarding $@ to $(FWD_DIRS) >&2
 	-@for d in $(FWD_DIRS) ; do \
 	  if test -d $$d ; then \
 	  if $(MAKE) -C $$d FWD_ROOT="$(FWD_ROOT)/$$d" $@ ;\
