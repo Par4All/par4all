@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1995/08/28 17:29:47 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1995/10/02 13:52:35 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -64,7 +64,7 @@ typedef union gen_chunk {
 	set t ;
 	hash_table h ;
 	union gen_chunk *p ;
-} gen_chunk, chunk /* obsolete */;
+} gen_chunk, *gen_chunkp, chunk /* obsolete */;
 
 #define gen_chunk_undefined ((gen_chunk *)(-16))
 #define gen_chunk_undefined_p(c) ((c)==gen_chunk_undefined)
@@ -74,7 +74,7 @@ typedef union gen_chunk {
 #define chunk_undefined gen_chunk_undefined 
 #define chunk_undefined_p(c) gen_chunk_undefined_p(c)
 
-#define UNIT(x) "You don't want to take the value of a unit type, do you !"
+#define UNIT(x) "You don't want to take the value of a unit type, do you!"
 #define BOOL(x) ((x).b)
 #define CHAR(x) ((x).c)
 #define INT(x) ((x).i)
@@ -83,6 +83,29 @@ typedef union gen_chunk {
 #define CONSP(x) ((x).l)
 #define SETP(x) ((x).t)
 #define CHUNK(x) ((x).p)
+
+/* added on 02/10/95, FC 
+ */
+#define HASH(x) ((x).h)
+#define CHUNKP(x) ((x).p)
+#define LIST(x) ((x).l) 
+#define SET(c) ((x).t)
+
+/* for the MAP macro to handle simple types correctly. FC.
+ */
+#define UNIT_TYPE "You don't want a unit type, do you!"
+#define BOOL_TYPE bool
+#define CHAR_TYPE char
+#define INT_TYPE int
+#define FLOAT_TYPE float
+#define STRING_TYPE string
+#define CONSP_TYPE list
+#define LIST_TYPE list
+#define SETP_TYPE set
+#define SET_TYPE set
+#define CHUNK_TYPE gen_chunkp
+#define CHUNKP_TYPE gen_chunkp
+#define HASH_TYPE hash_table
 
 #include "newgen_list.h"
 #include "newgen_stack.h"
