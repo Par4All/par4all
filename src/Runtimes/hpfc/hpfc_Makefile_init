@@ -1,9 +1,9 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1997/01/17 09:32:33 $, )
+# ($Date: 1997/01/17 11:08:45 $, )
 #
 # This is the initial makefile for HPFC compilation
-# a TARGET macro is expected somewhere...
+# a NAME macro is expected somewhere...
 # Makefile for PVM and HPFC, Fabien COELHO, 08/06/94
 
 SHELL=/bin/sh
@@ -19,11 +19,11 @@ help:
 	#
 	# COMPILATION and INSTALLATION
 	#
-	#   out: generates $(TARGET)_out sequential executable 
-	#   main: generates $(TARGET)_main paralle PVM executable 
+	#   out: generates $(NAME)_out sequential executable 
+	#   main: generates $(NAME)_main paralle PVM executable 
 	#     (one SPMD executable which insures both I/O and computations)
-	#   install: insures that $(TARGET)_main is copied in the PVM directory
-	#   hostnode: generates $(TARGET)_{host,node} PVM executables
+	#   install: insures that $(NAME)_main is copied in the PVM directory
+	#   hostnode: generates $(NAME)_{host,node} PVM executables
 	#     (two executables, one for I/Os and a SPMD one for the nodes)
 	#
 	# OTHERS
@@ -140,7 +140,7 @@ ifdef _HPFC_USE_PVMe_
 PVM=pvme
 # for requesting nodes on the SP2: pvmd3e -ip -share cpu 8 &
 # load leveller command files:
-all:	$(TARGET).cmd
+all:	$(NAME).cmd
 # the directory organization is fun with IBM: 
 # e.g. headers are in /lib (I guess this is IBM standard:-)
 pvmlib		= $(PVM_ROOT)/lib
@@ -181,12 +181,12 @@ STRIP	= :
 #
 # QSUB...
 #
-all:	$(TARGET).qsub
+all:	$(NAME).qsub
 endif
 
 # LoadLeveller...
-$(TARGET).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(TARGET)
-$(TARGET).qsub:; $(RT_DIR)/hpfc_qsub $(TARGET) > $@
+$(NAME).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(NAME)
+$(NAME).qsub:; $(RT_DIR)/hpfc_qsub $(NAME) > $@
 
 RUNTIME_LIBS	+= -lhpfcruntime
 
@@ -211,16 +211,16 @@ COMMON_OFILES	=	$(COMMON_FFILES:.f=.o)
 HOST_OFILES 	= 	$(HOST_FFILES:.f=.o) 
 NODE_OFILES 	= 	$(NODE_FFILES:.f=.o)
 
-FTEST	=	$(TARGET).f
-OTEST	=	$(TARGET).o
+FTEST	=	$(NAME).f
+OTEST	=	$(NAME).o
 
 #
 # Executables
 
-RTEST	=	$(TARGET)_out
-HOST 	= 	$(TARGET)_host
-NODE 	= 	$(TARGET)_node
-MAIN	=	$(TARGET)_main
+RTEST	=	$(NAME)_out
+HOST 	= 	$(NAME)_host
+NODE 	= 	$(NAME)_node
+MAIN	=	$(NAME)_main
 
 RUNABLES = $(HOST) $(NODE) $(RTEST) $(MAIN)
 DEDUCED = $(PVM_HEADERS) $(RT_INIT) $(RT_SRC_FILES)
@@ -259,7 +259,7 @@ $(pvmbin)/%: % $(pvmbin); $(COPY) $< $@
 hostnode: host node
 host: $(HOST) 
 node: $(NODE)
-main: $(MAIN) $(TARGET).qsub
+main: $(MAIN) $(NAME).qsub
 out: $(RTEST)
 
 install_main: $(pvmbin)/$(MAIN)
@@ -296,7 +296,7 @@ fpvm3.h:$(pvminc)/fpvm3.h
 #
 # Compilation
 
-$(RT_INIT:.f=.m4):;	$(RT_DIR)/hpfc_generate_init -n $(TARGET) .
+$(RT_INIT:.f=.m4):;	$(RT_DIR)/hpfc_generate_init -n $(NAME) .
 
 $(RT_INIT): $(RT_INIT:.f=.m4)
 	$(M4) -D PVM_ARCH=$(PVM_ARCH) $< > $@
@@ -314,10 +314,10 @@ $(RT_INIT): $(RT_INIT:.f=.m4)
 
 LDIO:=$(shell \
   sed -n 's,^[Cc!\*][Ff][Cc][Dd]$$[ 	][ 	]*[Ll][Dd][ 	]*[Ii][Oo],,p'\
-		$(TARGET).f | sort -u)
+		$(NAME).f | sort -u)
 LDPURE:=$(shell \
   sed -n 's,^[Cc!\*][Ff][Cc][Dd]$$[ 	][ 	]*[Ll][Dd][ 	]*[Pp][Uu][Rr][Ee],,p'\
-		$(TARGET).f | sort -u)
+		$(NAME).f | sort -u)
 
 $(HOST):  $(HEADERS) hpfc_main_host.o $(COMMON_OFILES) $(HOST_OFILES)
 	$(FC) $(FFLAGS) -o $@ hpfc_main_host.o \
@@ -377,7 +377,7 @@ $(RTEST):  $(FTEST)
 
 clean:;	$(RM) *.o *~ *.trace $(RT_INIT:.f=.m4) $(DEDUCED) core
 clobber: clean; $(RM) $(RUNABLES) $(pvmbin)/$(HOST) $(pvmbin)/$(NODE) \
-	run.out run.err $(TARGET).qsub 
+	run.out run.err $(NAME).qsub 
 
 echo:; @echo $(ECHO)
 
@@ -390,8 +390,8 @@ ZIP =	gzip -v9
 tar: clean
 	# taring the sources, maybe for export
 	cd .. ;\
-	$(TAR) cf $(TARGET).tar $(TARGET).hpfc ;\
-	$(ZIP) $(TARGET).tar
+	$(TAR) cf $(NAME).tar $(NAME).hpfc ;\
+	$(ZIP) $(NAME).tar
 
 
 # that is all
