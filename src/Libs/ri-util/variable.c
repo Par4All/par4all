@@ -359,6 +359,33 @@ entity e;
 }
 
 
+    
+/* boolean array_with_numerical_bounds_p(entity a)
+ * input    : an array entity
+ * output   : TRUE if all bounds of all dimensions are numerical
+ *            FALSE otherwise (adjustable arrays, formal parameters).
+ * modifies : nothing
+ * comment  : 
+ */
+bool array_with_numerical_bounds_p(entity a)
+{
+    int nb_dim = NumberOfDimension(a);
+    int d;
+    bool numerical_bounds_p = TRUE;
+
+    for(d=1; d <= nb_dim && numerical_bounds_p; d++) {
+      dimension dd = entity_ith_dimension(a, nb_dim);
+      expression l = dimension_lower(dd);
+      expression u = dimension_upper(dd);
+
+      numerical_bounds_p = expression_with_constant_signed_integer_value_p(l)
+	&& expression_with_constant_signed_integer_value_p(u);
+    }
+
+    return numerical_bounds_p;
+}
+
+
 
 /* variable_entity_dimension(entity v): returns the dimension of variable v;
  * scalar have dimension 0
