@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/26 12:08:13 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/31 11:46:18 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -326,6 +326,9 @@ PARSE=	  \$(YACC) \$(YFLAGS) \$(YOPT)
 ARCHIVE=  \$(AR) \$(ARFLAGS)
 PROTOIZE= \$(PROTO) \$(PRFLAGS) -E "\$(PREPROC)"
 M4FILTER= \$(M4) \$(M4FLAGS) \$(M4OPT)
+#
+# for easy debugging...
+echo:; @echo $(ECHO)
 #
 # Default rules
 #
