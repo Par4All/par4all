@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/09/15 19:12:34 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/09/18 15:14:39 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -193,6 +193,7 @@ TAR=		$(PIPS_TAR)
 ZIP=		$(PIPS_ZIP)
 DIFF= 		$(PIPS_DIFF)
 M4=		$(PIPS_M4)
+PROTO=		$(PIPS_PROTOIZE)
 # 
 #
 CONFIG_FILE=	${CONFIG_FILE}
@@ -223,7 +224,7 @@ SCAN=		$(LEX) $(LFLAGS) -t
 TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
 PARSE=		$(YACC) $(YFLAGS)
 ARCHIVE=	$(AR) $(ARFLAGS)
-PROTOIZE=	$(PIPS_PROTOIZE) -e -E "$(PREPROC)"
+PROTOIZE=	$(PROTO) -e -E "$(PREPROC)"
 #
 LIB_TARGET=	lib$(TARGET).a
 BIN_TARGET=	$(TARGET)
@@ -453,19 +454,16 @@ TAGS: $(INCLUDES) $(CFILES)
 $(TARGET)-local.h:
 	[ -f $(TARGET)-local.h ] || touch $(TARGET)-local.h
 
-# Ici commence la partie parametree en lib/passe :
+# headers are not generated automatically, bacause it should be
+# done each time a c file is touched, which is too much...
+# thus it does depend only of the -local.h.
+# header file reconstruction should be required explicitely
+# with the header rule.
 
-# Pour eviter trop de compilations, $(INC_TARGET) ne depend pas 
-#	de $(TARGET_CFILES) tout le temps :
-# Work around the /*...*/ for protoize with stdarg.h. RK, 14/06/1995.
-# protection against multiple reads. FC, 02/08/95
-# header entry added to allow forcing the .h generation with make header
-# without having to touch the sources.
-
-$(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
+$(INC_TARGET): $(TARGET)-local.h 
 	$(MAKE) header
 	
-.header: $(TARGET)-local.h $(INC_CFILES)
+.header: $(TARGET)-local.h $(DERIVED_HEADERS) $(INC_CFILES)
 	{ \\
 	echo "#ifndef ${dir_simple_name}_header_included";\\
 	echo "#define ${dir_simple_name}_header_included";\\
@@ -478,34 +476,28 @@ $(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
 
 header: .header
 
-depend: $(INC_TARGET) production-depend $(MAKEFILE)
+# indirect depend bacause I do not trust make for the inclusion of
+# Makefile.depend if that very file does not exist.
 
-# Relance une compilation de $(INC_TARGET) en rajoutant la dependance sur les
-#	fichiers C :
-	PIPS_MAKE_DEPEND_CFILES="$(INC_CFILES)" $(MAKE) $(INC_TARGET)
+.depend: $(CFILES)
+	$(PREPROC) -M $(CFILES) > $(MAKEFILE).depend
+	touch .depend
 
+depend: $(INC_TARGET) $(MAKEFILE) .depend
 
-# Quand on cree le Makefile, il faut toujours le completer avec
-#	les dependances d'include :
-production-depend: $(DERIVED_HEADERS) $(EXTERN)
-	{ sed -n 's/^		*\$\$//; 1,/^### DO NOT DELETE THIS LINE./p;' \\
-		$(MAKEFILE) ;\\
-	$(PREPROC) -M $(CFILES) ;\\
-	} > $(MAKEFILE).new
-	$(RM) $(MAKEFILE) ; mv $(MAKEFILE).new $(MAKEFILE)
-
-### DO NOT DELETE THIS LINE. USED FOR MAKE DEPEND
+#
+# dependences are stored in another file which is simply included.
+include $MAKEFILE.depend
 %
 
 # Supprime le mode silencieux -s :
 #
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] &&
-if [ $DIRSIDE = $PIPS_DEVEDIR ]
-then 
+[ \( $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' \) \
+  -a  $DIRSIDE = $PIPS_DEVEDIR ] &&
+{
+  touch $MAKEFILE.depend
   make -f $MAKEFILE depend
-else
-  make -f $MAKEFILE production-depend
-fi
+}
 
 ### end good case
 
