@@ -55,7 +55,7 @@ fpips_usage(int ret)
 	    "\t-P: pips\n"
 	    "\t-T: tpips\n"
 	    "\t-W: wpips\n"
-	    "\t\t(default is to try tpips)\n");
+	    "\tdefault: tpips\n");
     return ret;
 }
 
