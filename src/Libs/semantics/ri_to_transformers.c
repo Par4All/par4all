@@ -392,7 +392,14 @@ cons * ef; /* effects of t */
        Francois Irigoin, 15 April 1990 
 
        Why?
-       Francois Irigoin, 31 July 1992 */
+       Francois Irigoin, 31 July 1992
+
+       Well, you can benefit from STOP statements.
+       But you do not know if the variable values in
+       the condition are the new or the old values...
+       Francois Irigoin, 8 November 1995
+
+       */
 
     if(pips_flag_p(SEMANTICS_FLOW_SENSITIVE)) {
 	/*
