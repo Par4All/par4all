@@ -1,5 +1,8 @@
 /* $Id$
    $Log: splitc.y,v $
+   Revision 1.9  2003/09/01 15:00:40  irigoin
+   Small bug for Rule 4 fixed.
+
    Revision 1.8  2003/08/14 16:12:36  irigoin
    Simplified signature with fewer useless SPACES, failed attempt at retrieving
    multiple names types declared with one typedef statement, additional
@@ -2091,7 +2094,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  free_partial_signature($5);
 			  csplit_definite_function_signature
 			    = simplify_signature
-			    (build_signature($1, new_rparen(), new_lparen(), NULL));
+			    (build_signature($1, new_lparen(), new_rparen(), NULL));
 			  pips_debug(1, "Signature for function %s: %s\n\n",
 				     csplit_current_function_name,
 				     csplit_definite_function_signature);
