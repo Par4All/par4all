@@ -621,82 +621,6 @@ basic *pargsbasic;
   return (STRING_INTRINSICS_COST); 
 }
 
-/* boolean is_inferior_basic(basic1, basic2)
- * return TRUE if basic1 is less complex than basic2
- * ex:  int is less complex than float*4,
- *      float*4 is less complex than float*8, ...
- * - overloaded is inferior to any basic.
- * - logical is inferior to any other but overloaded.
- * - string is inferior to any other but overloaded and logical.
- * Used to decide that the sum of an int and a float
- * is a floating-point addition (for ex.)
- */
-boolean is_inferior_basic(b1, b2)
-basic b1, b2;
-{
-    if ( b1 == basic_undefined ) 
-	pips_error("is_inferior_basic", "first  basic_undefined\n");
-    else if ( b2 == basic_undefined )
-	pips_error("is_inferior_basic", "second basic_undefined\n");
-
-    if (basic_overloaded_p(b1))
-	return (TRUE);
-    else if (basic_overloaded_p(b2))
-	return (FALSE);
-    else if (basic_logical_p(b1))
-	return (TRUE);
-    else if (basic_logical_p(b2))
-	return (FALSE);
-    else if (basic_string_p(b1))
-	return (TRUE);
-    else if (basic_string_p(b2))
-	return (FALSE);
-    else if (basic_int_p(b1)) {
-	if (basic_int_p(b2))
-	    return (basic_int(b1) <= basic_int(b2));
-	else
-	    return (TRUE);
-    }
-    else if (basic_float(b1)) {
-	if (basic_int_p(b2))
-	    return (FALSE);
-	else if (basic_float_p(b2))
-	    return (basic_float(b1) <= basic_float(b2));
-	else
-	    return (TRUE);
-    }
-    else if (basic_complex_p(b1)) {
-	if (basic_int_p(b2) || basic_float_p(b2))
-	    return (FALSE);
-	else if (basic_complex(b2))
-	    return (basic_complex(b1) <= basic_complex(b2));
-	else
-	    return (TRUE);
-    }
-    else
-	pips_error("is_inferior_basic", "Case never occurs.\n");
-    return (TRUE);
-}
-
-basic simple_basic_dup(b)
-basic b;
-{
-    /* basic_int, basic_float, basic_logical, basic_complex are all int's */
-    /* so we duplicate them the same manner: with basic_int. */
-    if (basic_int_p(b)     || basic_float_p(b) || 
-	basic_logical_p(b) || basic_complex_p(b))
-	return(make_basic(basic_tag(b), basic_int(b)));
-    else if (basic_overloaded_p(b))
-	return(make_basic(is_basic_overloaded, UU));
-    else {
-	user_warning("simple_basic_dup",
-		     "(tag %d) isn't that simple\n", basic_tag(b));
-	if (basic_string_p(b))
-	    fprintf(stderr, "string: value tag = %d\n", 
-		             value_tag(basic_string(b)));
-	return (make_basic(basic_tag(b), basic_int(b))); 
-    }
-}
 
 /* Return if possible the value of e in a float.
  * it is supposed to be an int or a float.
