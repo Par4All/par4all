@@ -3,6 +3,7 @@
  * Francois Irigoin, Mai 1989
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
 
