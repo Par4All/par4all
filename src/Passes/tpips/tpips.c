@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.100  1998/05/27 10:31:20  coelho
+ * -w option added.
+ *
  * Revision 1.99  1998/05/25 17:16:07  coelho
  * signal handling fixed...
  *
@@ -142,7 +145,8 @@ extern void tp_restart( FILE * ); /* tp_lex.c */
   "\t-l  logfile: log to logfile.\n"					\
   "\t-r  rcfile: tpips rc file to source. (default ~/.tpipsrc)\n"	\
   "\t-e  tpips-cmds: here tpips commands.\n"				\
-  "\t-j: jpips special mode.\n"
+  "\t-j: jpips special mode.\n"						\
+  "\r-w: starts with a wrapper (jpips special again)...\n"
 
 #define SEPARATOR_P(c) (index (" \t", c))
 
@@ -173,6 +177,7 @@ tpips_behaves_like_a_shell(void)
 }
 
 /********************************************************************* JPIPS */
+
 /* jpips specials.
  *
  * #jpips: modules MAIN FOO BLA...
@@ -187,22 +192,37 @@ tpips_behaves_like_a_shell(void)
  */
 
 #define JPIPS_TAG	"#jpips:"
+
 bool jpips_is_running = FALSE;
+
+/* Ronan suggested a signal driven handling of jpips requests,
+ * so as to let the prompt available for direct commands.
+ * This seems great, but is not implemented at the time. 
+ * This would mean interruption driven tpips execution from jpips.
+ * The executions should not interfere...
+ * SIGIO handling on in_from_jpips...
+ * forward to readline maybe...
+ * a new -J option?
+ * how to link C FILE* to unix file descriptors?
+ * ? f = fopen(); dup2(..., fileno(f)); OR freopen()...
+ */ 
+static FILE * in_from_jpips = stdin;
+static FILE * out_to_jpips = stdout;
 
 void jpips_begin_tag(string s)
 {
-    fprintf(stdout, JPIPS_TAG " %s", s);
+    fprintf(out_to_jpips, JPIPS_TAG " %s", s);
 }
 
 void jpips_add_tag(string s)
 {
-    fprintf(stdout, " %s", s);
+    fprintf(out_to_jpips, " %s", s);
 }
 
 void jpips_end_tag(void)
 {
-    fprintf(stdout, "\n");
-    fflush(stdout);
+    fprintf(out_to_jpips, "\n");
+    fflush(out_to_jpips);
 }
 
 void jpips_tag(string s)
@@ -1013,7 +1033,7 @@ parse_arguments(int argc, char * argv[])
     int c;
     string tpipsrc = default_tpipsrc();
 
-    while ((c = getopt(argc, argv, "ne:l:h?vscr:j")) != -1) {
+    while ((c = getopt(argc, argv, "ne:l:h?vscr:jw")) != -1) {
 	switch (c)
 	{
 	case 's':
@@ -1043,6 +1063,8 @@ parse_arguments(int argc, char * argv[])
 	    free(tpipsrc);
 	    tpipsrc = strdup(optarg);
 	    break;
+	case 'w':            /* -w => -j */
+	    tpips_wrapper(); /* the wrapper process will never return */
 	case 'j':
 	    jpips_is_running = TRUE;
 	    break;
@@ -1054,10 +1076,13 @@ parse_arguments(int argc, char * argv[])
 
     /* sources ~/.tpipsrc or the like, if any.
      */
-    if (tpipsrc) {
-	if (file_exists_p(tpipsrc)) {
+    if (tpipsrc)
+    {
+	if (file_exists_p(tpipsrc))
+	{
 	    FILE * rc = fopen(tpipsrc, "r");
-	    if (rc) {
+	    if (rc) 
+	    {
 		user_log("sourcing tpips rc file: %s\n", tpipsrc);
 		tpips_process_a_file(rc, FALSE);
 		fclose(rc);
