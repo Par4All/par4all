@@ -190,23 +190,16 @@ string rname, oname;
     debug(1, "make", "%s(%s) - requested\n", rname, oname);
 
     pips_assert("make", set_undefined_p(up_to_date_resources));
-
     up_to_date_resources = set_make(set_pointer);
-
     dont_interrupt_pipsmake_asap();
+    save_active_phases();
 
     success_p = rmake(rname, oname);
 
-    /*
-       if ( signal_occured() ) {
-       accounting_signal();
-       make_close_program();
-       exit(1);
-       }
-       */
 
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
+    retrieve_active_phases();
 
     if (success_p)
 	debug(1, "make", "%s(%s) - made\n", rname, oname);
@@ -301,17 +294,17 @@ string pname, oname;
     debug(1, "apply", "%s.%s - requested\n", oname, pname);
 
     pips_assert("apply", set_undefined_p(up_to_date_resources));
-
     up_to_date_resources = set_make(set_pointer);
-
     dont_interrupt_pipsmake_asap();
+    save_active_phases();
 
     success_p = apply_without_reseting_up_to_date_resources (pname,oname);
 
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
+    retrieve_active_phases();
 
-    debug(1, "apply", "%s.%s - done", oname, pname);
+    debug(1, "apply", "%s.%s - done\n", oname, pname);
     debug_off();
 
     return success_p;
