@@ -310,10 +310,6 @@ Pbase basis;
     }
 }
 
-
-
-
-
 /* for an improved dependence test */
 
 Psysteme sc_restricted_to_variables_transitive_closure(sc, variables)
