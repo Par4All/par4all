@@ -3,6 +3,9 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.66  1997/06/10 09:15:30  coelho
+ * *** empty log message ***
+ *
  * Revision 1.65  1997/06/10 08:56:30  coelho
  * *** empty log message ***
  *
@@ -205,8 +208,8 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* hpfc packing and unpacking
  */
-#define BUFPCK		" HPFC BUFPCK"
-#define BUFUPK		" HPFC BUFUPK"
+#define BUFPCK		" BUFPCK"
+#define BUFUPK		" BUFUPK"
 
 #define BROADCAST	"HPFC BROADCAST "
 #define GUARDED_BRD	"HPFC REMAPBRD "
