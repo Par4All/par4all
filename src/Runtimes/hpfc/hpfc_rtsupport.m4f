@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/05/29 12:50:04 $, )
+! ($Date: 1997/05/29 13:22:50 $, )
 !
 !-----------------
 !
@@ -1518,7 +1518,7 @@ _CM5(
       if (i.ge.0) then
          HPFC DIVIDE = i/j
       else
-         HPFC DIVIDE = -(-i+j-1)/j
+         HPFC DIVIDE = -((-i+j-1)/j)
       endif
       end
 !
