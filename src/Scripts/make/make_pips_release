@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/02 23:06:11 $, 
+# $Date: 1996/09/03 12:46:09 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -30,7 +30,7 @@ usage()
 	    -v: verbose
 	    -s: strip binaries
 	    -z: tar and zip
-	    -w: additional what options for make_release
+	    -w: additional options for make_release
 	  release content:
 	    -S: include sources (Include, Src, Utils)
 	    -B arch: include executables for arch
