@@ -42,6 +42,13 @@ vertex v;
     return(ordering_to_statement(dg_vertex_label_statement(dvl)));
 }
 
+int vertex_to_ordering(v)
+vertex v;
+{
+    dg_vertex_label dvl = (dg_vertex_label) vertex_vertex_label(v);
+    return dg_vertex_label_statement(dvl);
+}
+
 
 /* a` renommer print_dependence_graph ? */
 void print_graph(fd, mod_stat, mod_graph)
@@ -52,7 +59,7 @@ graph mod_graph;
     cons *pv1, *ps, *pc;
     Ptsg gs;
 
-    fprintf(fd, "\n ************************ Dependence graph ************************\n");
+    fprintf(fd, "\n ************************ Dependence Graph ************************\n");
   debug_on("RICEDG_DEBUG_LEVEL");
     for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {
 	vertex v1 = VERTEX(CAR(pv1));
@@ -70,7 +77,9 @@ graph mod_graph;
 	    for (pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc)) {
 		conflict c = CONFLICT(CAR(pc));
 		     
-	/* if (!	entity_scalar_p(reference_variable(effect_reference(conflict_source(c))))) { */
+		/* if (!entity_scalar_p(reference_variable
+		   (effect_reference(conflict_source(c))))) {
+		   */
 		fprintf(fd, "\t\tfrom ");
 		print_words(fd, words_effect(conflict_source(c)));
 
@@ -83,28 +92,29 @@ graph mod_graph;
 			fprintf(fd, " %d", INT(CAR(pl)));
 		    }, cone_levels(conflict_cone(c)));
 		
-		fprintf(fd, "\n");
-		gs = (Ptsg)cone_generating_system(conflict_cone(c));
-		if (!SG_UNDEFINED_P(gs)) {
-		    /* sg_fprint(fd,gs,entity_local_name); */
-		    /* FI: almost print_dependence_cone:-( */
-		    sg_fprint_as_dense(fd, gs, gs->base);
-		    ifdebug(2) {
-			Psysteme sc1 = sc_new();
-			sc1 = sg_to_sc_chernikova(gs);
-			(void) fprintf(fd,"syst. lin. correspondantau syst. gen.:\n");
-			sc_fprint(fd,sc1,entity_local_name);
-			
+		    fprintf(fd, "\n");
+		    if(get_bool_property
+		       ("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES")) {
+			gs = (Ptsg)cone_generating_system(conflict_cone(c));
+			if (!SG_UNDEFINED_P(gs)) {
+			    /* sg_fprint(fd,gs,entity_local_name); */
+			    /* FI: almost print_dependence_cone:-( */
+			    sg_fprint_as_dense(fd, gs, gs->base);
+			    ifdebug(2) {
+				Psysteme sc1 = sc_new();
+				sc1 = sg_to_sc_chernikova(gs);
+				(void) fprintf(fd,"syst. lin. correspondantau syst. gen.:\n");
+				sc_fprint(fd,sc1,entity_local_name);
+			    }
+			} 
 		    }
-		   } 
+		    fprintf(fd, "\n");
 		}
-		fprintf(fd, "\n");
-	    
 	    }
 	}
     } 
-debug_off();
-    fprintf(fd, "\n******************** End of Dependence graph ********************\n");
+    debug_off();
+    fprintf(fd, "\n******************** End of Dependence Graph ********************\n");
 }
 
 void print_graph_with_reduction(fd, mod_stat, mod_graph)
@@ -149,7 +159,8 @@ graph mod_graph;
 				}
 			    }
 			    else {
-				if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS")) {
+				if (get_bool_property
+				    ("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS")) {
 				    continue;
 				}
 				else llsred = gen_nconc(llsred, CONS(INT, level, NIL));
@@ -158,7 +169,8 @@ graph mod_graph;
 		    }
 		    if (llsred == NIL) continue;
 		    else {
-			/*if (!	entity_scalar_p(reference_variable(effect_reference(conflict_source(c))))) { */
+			/*if (!	entity_scalar_p(reference_variable
+			  (effect_reference(conflict_source(c))))) { */
 
 			fprintf(fd, "\t%02d --> %02d with conflicts\n", 
 				statement_number(s1), statement_number(s2));
@@ -175,21 +187,22 @@ graph mod_graph;
 			}, llsred);
 
 			fprintf(fd, "\n");
-			gs = (Ptsg)cone_generating_system(conflict_cone(c));
-			if (!SG_UNDEFINED_P(gs)) {
-			    /* sg_fprint(fd,gs,entity_local_name); */
-			    sg_fprint_as_dense(fd, gs, gs->base);
-			    ifdebug(2) {
-				Psysteme sc1 = sc_new();
-				sc1 = sg_to_sc_chernikova(gs);
-				(void) fprintf(fd,"syst. lin. correspondant au  syst. gen.:\n");
-				sc_fprint(fd,sc1,entity_local_name);
-			
+			if(get_bool_property
+			   ("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES")) {
+			    gs = (Ptsg)cone_generating_system(conflict_cone(c));
+			    if (!SG_UNDEFINED_P(gs)) {
+				/* sg_fprint(fd,gs,entity_local_name); */
+				sg_fprint_as_dense(fd, gs, gs->base);
+				ifdebug(2) {
+				    Psysteme sc1 = sc_new();
+				    sc1 = sg_to_sc_chernikova(gs);
+				    (void) fprintf(fd,"syst. lin. correspondant au  syst. gen.:\n");
+				    sc_fprint(fd,sc1,entity_local_name);
+				}
 			    }
+			    fprintf(fd, "\n");
 			}
-			fprintf(fd, "\n");
 		    }
-		    	
 		}
 	    }
 	}
