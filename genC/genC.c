@@ -4,6 +4,9 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.43  1998/04/15 10:53:41  coelho
+ * compilation fix.
+ *
  * Revision 1.42  1998/04/15 10:51:58  coelho
  * tag numbering fixed.
  *
@@ -379,8 +382,8 @@ static void generate_access_members(
 
     if (domain_type==ARRAY_DT)
 	fprintf(out, "#define %s_%s(x) ((x)->_%s_%s_" FIELD "\n",
-		name, dlp->domain.ba.constructor,
-		name, dlp->domain.ba.constructor);
+		name, dom->ba.constructor,
+		name, dom->ba.constructor);
     
     if (domain_type==CONSTRUCTED_DT && operator!=ARROW_OP)
 	for (i=0, dlp=dom->co.components; dlp!=NULL; dlp=dlp->cdr, i++)
