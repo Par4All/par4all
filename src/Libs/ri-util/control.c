@@ -4,15 +4,19 @@
    Ronan Keryell.
    */
 
-/* 	%A% ($Date: 1998/04/02 14:45:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 
+ * $Id$
+ */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1998/04/02 14:45:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1998/04/14 15:20:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
 #include <stdio.h> 
 #include <string.h> 
+
+#include "linear.h"
 
 #include "genC.h"
 #include "ri.h"
@@ -358,7 +362,7 @@ remove_a_control_from_an_unstructured(control c)
                                            source_is_successor_and_dest_is_predecessor);
    
    /* Remove the control node: */
-   gen_free(c);
+   free_control(c);
 }
 
 
@@ -380,7 +384,7 @@ discard_an_unstructured_without_its_statements(unstructured u)
    gen_free_list(blocs);
 
    /* And then free the discard the unstructured: */
-   gen_free(u);
+   free_unstructured(u);
 }
 
 
@@ -420,7 +424,7 @@ discard_a_control_sequence_without_its_statements(control begin,
       control_successors(c) = NIL;
       control_predecessors(c) = NIL;
 
-      gen_free(c);
+      free_control(c);
 
       if (c == end)
          break;
