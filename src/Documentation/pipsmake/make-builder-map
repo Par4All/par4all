@@ -1,15 +1,13 @@
 #!/bin/sh
 #
 # $RCSfile: make-builder-map,v $ (version $Revision$)
-# $Date: 1996/08/20 15:52:18 $, 
+# $Date: 1996/09/02 10:24:43 $, 
 
 # Derivation of builder_map.h (stdout) from pipsmake.rc (stdin)
 
 functions=`/lib/cpp | grep '^[a-z]' | sed 's/ .*//' | sort -u`
 
 # echo $functions >/dev/tty
-
-cat auto.h 
 
 for f in $functions
 do
