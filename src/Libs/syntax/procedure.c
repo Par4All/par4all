@@ -1,5 +1,16 @@
 /*
  * $Id$
+ *
+ * $Log: procedure.c,v $
+ * Revision 1.52  1998/10/07 15:57:20  irigoin
+ * Proper substitution of ghost variables to avoid dangling pointers. Profile
+ * of remove_ghost_variables() modified and body updated. New function
+ * AbortEntries() added to avoid dangling entities in case of a call to
+ * ParserError(). Update of MakeEntryCommon() whose call is postponed wrt the
+ * previous implementation. Also, it is safer wrt PIPS acceptable
+ * inputs. Entry processing has been made safe (or safer) wrt to calls to
+ * ParserError(). Also, duplicate DATA statements between entries are avoided.
+ *
  */
 
 #include <stdlib.h>
@@ -42,8 +53,138 @@ init_ghost_variable_entities()
     ghost_variable_entities = NIL;
 }
 
+void
+substitute_ghost_variable_in_expression(
+    expression expr, 
+    entity v,
+    entity f)
+{
+    /* It is assumed that v and f are defined entities and that v is of
+       type variable and f of type functional. */
+    syntax s = expression_syntax(expr);
+    reference ref = reference_undefined;
+    range rng = range_undefined;
+    call c = call_undefined;
+
+    ifdebug(8) {
+	debug(8, "", "Begin for expression: ");
+	print_expression(expr);
+    }
+
+    switch(syntax_tag(s)) {
+    case is_syntax_reference:
+	ref = syntax_reference(s);
+	if(reference_variable(ref)==v) {
+	    debug(1, "substitute_ghost_variable_in_expression",
+		  "Reference to formal functional entity %s to be substituted\n",
+		  entity_name(f));
+	    /* ParserError() is going to request ghost variable
+               substitution recursively and we do not want this to happen
+               because it is going to fail again. Well, substitution won't be
+	       tried from AbortOfProcedure()... */
+	    /* ghost_variable_entities = NIL; */
+	    user_warning("substitute_ghost_variable_in_expression",
+			 "Functional variable %s is used as a functional argument\n",
+			 module_local_name(f));
+	    ParserError("substitute_ghost_variable_in_expression",
+			"Functional parameters are not (yet) supported by PIPS\n");
+	}
+	MAP(EXPRESSION, e, {
+	    substitute_ghost_variable_in_expression(e, v, f);
+	}, reference_indices(ref));
+	break;
+    case is_syntax_range:
+	rng = syntax_range(s);
+	substitute_ghost_variable_in_expression(range_lower(rng), v, f);
+	substitute_ghost_variable_in_expression(range_upper(rng), v, f);
+	substitute_ghost_variable_in_expression(range_increment(rng), v, f);
+	break;
+    case is_syntax_call:
+	c = syntax_call(s);
+	pips_assert("Called entities are not substituted", call_function(c)!= v);
+	MAP(EXPRESSION, e, {
+	    substitute_ghost_variable_in_expression(e, v, f);
+	}, call_arguments(c));
+	break;
+    default:
+    }
+
+    ifdebug(8) {
+	debug(8, "", "End for expression: ");
+	print_expression(expr);
+    }
+}
+
+void
+substitute_ghost_variable_in_statement(
+    statement stmt, 
+    entity v,
+    entity f)
+{
+    /* It is assumed that v and f are defined entities and that v is of
+       type variable and f of type functional. */
+
+    /* gen_recurse() is not used to control the context better */
+
+    entity sl = statement_label(stmt);
+    instruction i = statement_instruction(stmt);
+    loop l = loop_undefined;
+    whileloop w = whileloop_undefined;
+    test t = test_undefined;
+    call c = call_undefined;
+    /* unstructured u = unstructured_undefined; */
+
+    pips_assert("Labels are not substituted", sl!= v);
+
+    switch(instruction_tag(i)) {
+    case is_instruction_sequence:
+	MAP(STATEMENT, s, {
+	    substitute_ghost_variable_in_statement(s, v, f);
+	}, instruction_block(i));
+	break;
+    case is_instruction_loop:
+	l = instruction_loop(i);
+	pips_assert("Loop indices are not substituted", loop_index(l)!= v);
+	pips_assert("Loop labels are not substituted", loop_label(l)!= v);
+	substitute_ghost_variable_in_expression(range_lower(loop_range(l)), v, f);
+	substitute_ghost_variable_in_expression(range_upper(loop_range(l)), v, f);
+	substitute_ghost_variable_in_expression(range_increment(loop_range(l)), v, f);
+	substitute_ghost_variable_in_statement(loop_body(l), v, f);
+	/* Local variables should also be checked */
+	break;
+    case is_instruction_whileloop:
+	w = instruction_whileloop(i);
+	pips_assert("WHILE loop labels are not substituted", whileloop_label(w)!= v);
+	substitute_ghost_variable_in_expression(whileloop_condition(w), v, f);
+	substitute_ghost_variable_in_statement(whileloop_body(w), v, f);
+	/* Local variables should also be checked */
+	break;
+    case is_instruction_test:
+	t = instruction_test(i);
+	substitute_ghost_variable_in_expression(test_condition(t), v, f);
+	substitute_ghost_variable_in_statement(test_true(t), v, f);
+	substitute_ghost_variable_in_statement(test_false(t), v, f);
+	break;
+    case is_instruction_goto:
+	/* nothing to do */
+	break;
+    case is_instruction_call:
+	c = instruction_call(i);
+	pips_assert("Called entities are not substituted", call_function(c)!= v);
+	MAP(EXPRESSION, e, {
+	    substitute_ghost_variable_in_expression(e, v, f);
+	}, call_arguments(c));
+	break;
+    case is_instruction_unstructured:
+	pips_assert("The parser should not have to know about unstructured\n", FALSE);
+	break;
+    default:
+	FatalError("substitute_ghost_variable_in_statement", "Unexpected instruction tag");
+    }
+}
+
 void 
-remove_ghost_variable_entities()
+remove_ghost_variable_entities(bool substitute_p)
 {
     pips_assert("defined list", !list_undefined_p(ghost_variable_entities));
     MAP(ENTITY, e, 
@@ -51,6 +192,10 @@ remove_ghost_variable_entities()
 	/* The debugging message must use the variable name before it is freed
 	 */
 	pips_debug(1, "entity '%s'\n", entity_name(e));
+	pips_assert("Entity e is defined and has type \"variable\" if substitution is required\n",
+		    !substitute_p 
+		    || (!entity_undefined_p(e)
+			&& (type_undefined_p(entity_type(e)) || type_variable_p(entity_type(e)))));
 	if(entity_in_equivalence_chains_p(e)) {
 	    user_warning("remove_ghost_variable_entities",
 		     "Entity \"%s\" does not really exist but appears"
@@ -64,6 +209,45 @@ remove_ghost_variable_entities()
 	    }
 	}
 	else {
+	    entity fe = local_name_to_top_level_entity(entity_local_name(e));
+	    type t = type_undefined;
+
+	    if(entity_undefined_p(fe)) {
+		pips_assert("Entity fe cannot be undefined", FALSE);
+	    }
+	    else if(type_undefined_p(entity_type(fe))) {
+		t = entity_type(fe);
+		pips_assert("Type for entity fe cannot be undefined", FALSE);
+	    }
+	    else if(type_functional_p(entity_type(fe))) {
+		statement stmt = function_body;
+
+		t = entity_type(fe);
+
+		/*
+		if(intrinsic_entity_p(fe)) {
+		    user_warning("remove_ghost_variable_entities",
+				 "Intrinsic %s is probably declared in a strange useless way\n",
+				 module_local_name(fe));
+		}
+		*/
+
+
+		if(substitute_p) {
+		    debug(1, "remove_ghost_variable_entities",
+			  "Start substitution of variable %s by module %s\n",
+			  entity_name(e), entity_name(fe));
+		    substitute_ghost_variable_in_statement(stmt, e, fe);
+		    debug(1, "remove_ghost_variable_entities",
+			  "End for substitution of variable %s by module %s\n",
+			  entity_name(e), entity_name(fe));
+		}
+	    }
+	    else {
+		t = entity_type(fe);
+		pips_assert("Type t for entity fe should be functional", FALSE);
+	    }
+
 	    remove_variable_entity(e);
 	}
 	pips_debug(1, "destroyed\n");
@@ -194,7 +378,7 @@ AbortOfProcedure()
 {
     /* get rid of ghost variable entities */
     if (!list_undefined_p(ghost_variable_entities))
-	remove_ghost_variable_entities();
+	remove_ghost_variable_entities(FALSE);
 
     (void) ResetBlockStack() ;
 }
@@ -214,8 +398,8 @@ EndOfProcedure()
     debug(8, "EndOfProcedure", "Begin for module %s\n",
 	  entity_name(CurrentFunction));
 
-    /* get rid of ghost variable entities */
-    remove_ghost_variable_entities();
+    /* get rid of ghost variable entities and substitute them if necessary */
+    remove_ghost_variable_entities(TRUE);
 
     /* we generate the last statement to carry a label or a comment */
     if (strlen(lab_I) != 0 /* || iPrevComm != 0 */ ) {
@@ -248,25 +432,21 @@ EndOfProcedure()
     UpdateFunctionalType(CurrentFunction,
 			 FormalParameters);
 
-    check_common_layouts(CurrentFunction);
+    /* Must be performed before equivalence resolution, for user declared
+       commons whose declarations are stronger than equivalences */
+    update_user_common_layouts(CurrentFunction);
 
     ComputeEquivalences();
-    /* Use equivalence chains to update storages of equivalenced and
-       implicitly declared variables */
+    /* Use equivalence chains to update storages of equivalenced and of
+       variables implicitly declared in DynamicArea, or implicitly thru
+       DATA or explicitly thru SAVE declared in StaticArea */
     ComputeAddresses();
 
     /* Initialize the shared field in ram storage */
     SaveChains();
 
-    /* Update offsets in commons (and static and dynamic areas?)
-     * according to latest type and dimension declarations
-     */
-    /* check_common_layouts(CurrentFunction); */
-
     /* Now that retyping and equivalences have been taken into account: */
     update_common_sizes();
-
-    reset_common_size_map();
 
     code_declarations(EntityCode(CurrentFunction)) =
 	    gen_nreverse(code_declarations(EntityCode(CurrentFunction))) ;
@@ -314,14 +494,14 @@ EndOfProcedure()
 	reset_current_module_statement();
     }
 
+    reset_common_size_map();
+
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, 
 			   module_local_name(CurrentFunction), 
 			   (char*) make_callees(called_modules));
     
-    ifdebug(5) {
-	fprintf(stderr, "Parser: checking code consistency = %d\n",
+    pips_debug(5, "checking code consistency = %d\n",
 		statement_consistent_p( function_body )) ;
-    }
 
     DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE, 
 			   module_local_name(CurrentFunction), 
@@ -333,6 +513,9 @@ EndOfProcedure()
     DynamicArea = entity_undefined;
     StaticArea = entity_undefined;
     reset_current_module_entity();
+
+    pips_debug(5, "checking code consistency after resettings = %d\n",
+		statement_consistent_p( function_body )) ;
 
     pips_debug(8, "End for module %s\n", entity_name(CurrentFunction));
 }
@@ -368,7 +551,7 @@ UpdateFunctionalType(
     ft = type_functional(t);
 
     /* FI: I do not understand this assert... at least now that
-     * functions are typed at call sites. I do not understand why this
+     * functions may be typed at call sites. I do not understand why this
      * assert has not made more damage. Only OVL in APSI (Spec-cfp95)
      * generates a core dump. To be studied more!
      *
@@ -534,7 +717,14 @@ MakeCurrentFunction(
     }
 
     /* set ghost variable entities to NIL */
-    init_ghost_variable_entities();
+    /* This procedure is called when the whole module declaration
+       statement has been parsed. The formal parameters have already been
+       declared and the ghost variables checked. The call was moved in
+       gram.y, reduction rule for psf_keyword. */
+    /* init_ghost_variable_entities(); */
+
+    /* initialize equivalence chain lists to NIL */
+    SetChains();
 
     if (msf == TK_FUNCTION) {
 	if (t == type_undefined) {
@@ -580,11 +770,11 @@ MakeCurrentFunction(
 
     set_current_module_entity(cf);
 
-    /* two global areas are created */
-    InitAreas();
-
     /* No common has yet been declared */
     initialize_common_size_map();
+
+    /* two global areas are created */
+    InitAreas();
 
     /* Formal parameters are created. Alternate returns can be ignored
      * or substituted.
@@ -645,13 +835,50 @@ void
 ResetEntries()
 {
     gen_free_list(entry_labels);
-    gen_free_list(entry_targets);
-    gen_free_list(entry_entities);
-    gen_free_list(effective_formal_parameters);
     entry_labels = NIL;
+
+    gen_free_list(entry_targets);
     entry_targets = NIL;
+
+    gen_free_list(entry_entities);
     entry_entities = NIL;
+
+    gen_free_list(effective_formal_parameters);
     effective_formal_parameters = NIL;
+}
+
+void
+AbortEntries()
+{
+    /* Useless entities should be reset */
+
+    MAP(ENTITY, el, {
+	free_entity(el);
+    }, entry_labels);
+    gen_free_list(entry_labels);
+    entry_labels = NIL;
+
+    MAP(ENTITY, et, {
+	free_entity(et);
+    }, entry_targets);
+    gen_free_list(entry_targets);
+    entry_targets = NIL;
+
+    MAP(ENTITY, ee, {
+	CleanLocalEntities(ee);
+	free_entity(ee);
+    }, entry_entities);
+    gen_free_list(entry_entities);
+    entry_entities = NIL;
+
+    MAP(ENTITY, efp, {
+	free_entity(efp);
+    }, entry_targets);
+    gen_free_list(effective_formal_parameters);
+    effective_formal_parameters = NIL;
+
+    /* the current module statement is used when processing entries */
+    reset_current_module_statement();
 }
 
 bool
@@ -738,9 +965,48 @@ MakeEntryCommon(
     entity c = local_name_to_top_level_entity(c_name);
     area aa = type_area(entity_type(a));
     area ac = area_undefined;
+    list members = list_undefined;
 
     pips_debug(1, "Begin for static area %s in module %s\n",
 	       entity_name(a), entity_name(m));
+
+    if(ENDP(area_layout(aa))) {
+	pips_debug(1, "End: no static variables in module %s\n",
+		   entity_name(m));
+	return;
+    }
+
+    members = common_members_of_module(a, m, FALSE);
+    if(ENDP(members)) {
+	pips_error("MakeEntryCommon", "No local static variables in module %s: impossible!\n",
+		   entity_name(m));
+    }
+    gen_free_list(members);
+
+    ifdebug(1) {
+	pips_debug(1, "Static area %s without aliasing in module %s\n",
+	       entity_name(a), entity_name(m));
+	print_common_layout(stderr, a, TRUE);
+	pips_debug(1, "Static area %s with aliasing in module %s\n",
+	       entity_name(a), entity_name(m));
+	print_common_layout(stderr, a, FALSE);
+    }
+
+    /* Make sure that no static variables are aliased because this special
+       cases has not been implemented */
+    MAP(ENTITY, v, {
+	storage vs = entity_storage(v);
+
+	pips_assert("storage is ram", storage_ram_p(vs));
+	pips_assert("storage is static", ram_section(storage_ram(vs)) == a);
+	if(!ENDP(ram_shared(storage_ram(vs)) )) {
+	    pips_user_warning("Static variable %s is aliased with ",
+			      entity_local_name(v));
+	    print_arguments(ram_shared(storage_ram(vs)));
+	    ParserError("MakeEntryCommon",
+			"Entries with aliased static variables not yet supported by PIPS\n");
+	}
+    }, area_layout(aa));
 
     if(entity_undefined_p(c)) {
 	c = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, c_name);
@@ -758,13 +1024,23 @@ MakeEntryCommon(
     MAP(ENTITY, v, {
 	storage vs = entity_storage(v);
 
-	pips_assert("storage is ram", storage_ram_p(vs));
-	pips_assert("storage is static", ram_section(storage_ram(vs)) == a);
+	if(value_constant(entity_initial(v))) {
+	    debug(1, "MakeEntryCommon",
+		  "Initialized variable %s\n", entity_local_name(v));
+	    /* A variable in a common cannot be initialized more than once */
+	    /*
+	    free_value(entity_initial(v));
+	    entity_initial(v) = make_value(is_value_unknown, UU);
+	    */
+	}
+
 	ram_section(storage_ram(vs)) = c;
     }, area_layout(aa));
 
     /* Copy a's area in c's area */
     area_layout(ac) = area_layout(aa);
+    /* Do not sort by name or the offset increasing implicit rule is
+       broken: sort_list_of_entities(area_layout(ac)); */
     area_size(ac) = area_size(aa);
 
     /* Reset a's area */
@@ -774,7 +1050,7 @@ MakeEntryCommon(
     ifdebug(1) {
 	pips_debug(1, "New common %s for static area %s in module %s\n",
 	       entity_name(c), entity_name(a), entity_name(m));
-	print_common_layout(stderr, c);
+	print_common_layout(stderr, c, TRUE);
     }
 
     pips_debug(1, "End for static area %s in module %s\n",
@@ -822,10 +1098,11 @@ MakeEntry(
 	/* Check if the static area is empty and define a specific common
 	 * if not.
 	 */
+	/* Too early: StaticArea is not defined yet. Postpone to ProcessEntry.
 	if(area_size(type_area(entity_type(StaticArea)))!=0) {
 	    MakeEntryCommon(cm, StaticArea);
-	    /* pips_internal_error("static variables are not handled for entries"); */
 	}
+	*/
     }
 
     /* Compute the result type and make sure a functional entity is being
@@ -850,12 +1127,34 @@ MakeEntry(
     TypeFunctionalEntity(fe, rt);
     UpdateFunctionalType(fe, lefp);
 
+    /* This depends on what has been done in LocalToGlobal and SafeLocalToGlobal */
     if(storage_undefined_p(entity_storage(fe))) {
 	entity_storage(fe) = MakeStorageRom();
     }
+    else {
+	pips_assert("storage must be rom", storage_rom_p(entity_storage(fe)));
+    }
 
+    /* This depends on what has been done in LocalToGlobal and SafeLocalToGlobal */
     if(value_undefined_p(entity_initial(fe))) {
 	entity_initial(fe) = make_value(is_value_code, make_code(lefp, strdup("")));
+    }
+    else {
+	value val = entity_initial(fe);
+	code c = code_undefined;
+
+	pips_assert("value is code", value_code_p(val));
+	c = value_code(entity_initial(fe));
+	if(code_undefined_p(c)) {
+	    value_code(entity_initial(fe)) = make_code(lefp, strdup(""));
+	}
+	else if(ENDP(code_declarations(c))) {
+	    /* Should now be the normal case... */
+	    code_declarations(c) = lefp;
+	}
+	else {
+	    pips_error("MakeEntry", "Code should not (yet) be defined for entry fe...");
+	}
     }
 
     /* The entry formal parameters should be removed if they are not
@@ -900,7 +1199,11 @@ MakeEntry(
     AddEntryTarget(s);
     AddEntryEntity(fe);
 
-    /* pips_error("MakeEntry", "not implemented yet\n"); */
+    ifdebug(2) {
+      (void) fprintf(stderr, "Declarations of formal parameters for entry %s:\n",
+		     entity_name(fe));
+      dump_arguments(entity_declarations(fe));
+    }
 
     debug(1, "MakeEntry", "End for entry %s\n", entity_name(fe));
 
@@ -939,7 +1242,7 @@ BuildStatementForEntry(
     pips_assert("s consistent", statement_consistent_p(s));
     pips_assert("es consistent", statement_consistent_p(es));
 
-    /* Let's get rid of s without destroying cms: d not forget the goto t! */
+    /* Let's get rid of s without destroying cms: do not forget the goto t! */
     l = instruction_block(statement_instruction(s));
     pips_assert("cms is the second statement of the block", STATEMENT(CAR(CDR(l))) == cms);
     STATEMENT(CAR(CDR(l))) = statement_undefined;
@@ -949,7 +1252,7 @@ BuildStatementForEntry(
     pips_assert("es is still consistent", statement_consistent_p(es));
     pips_assert("cms is still consistent", statement_consistent_p(cms));
 
-    debug(1, "BuildStatementForEntry", "Begin for entry %s in module %s\n",
+    debug(1, "BuildStatementForEntry", "End for entry %s in module %s\n",
 	  entity_name(e), entity_name(cm));
 
     return es;
@@ -975,11 +1278,17 @@ ProcessEntry(
     debug(1, "ProcessEntry", "Begin for entry %s of module %s\n",
 	  entity_name(e), module_local_name(cm));
 
+    if(area_size(type_area(entity_type(StaticArea)))!=0) {
+	MakeEntryCommon(cm, StaticArea);
+    }
+
     es = BuildStatementForEntry(cm, e, t);
 
     /* Compute the proper declaration list, without formal parameters from cm
      * and with formal parameters from e
      */
+
+    /* Collect local and global variables of cm that may be visible from entry e */
     MAP(ENTITY, v, {
 	if(!storage_formal_p(entity_storage(v))) {
 	    decls = arguments_add_entity(decls, v);
@@ -991,12 +1300,6 @@ ProcessEntry(
 		     module_local_name(cm));
       dump_arguments(entity_declarations(cm));
       (void) fprintf(stderr, "Declarations of formal parameters for entry %s:\n",
-		     module_local_name(e));
-      dump_arguments(entity_declarations(e));
-    }
-
-    ifdebug(2) {
-      (void) fprintf(stderr, "Declarations of all variables for entry %s:\n",
 		     module_local_name(e));
       dump_arguments(entity_declarations(e));
     }
@@ -1015,14 +1318,23 @@ ProcessEntry(
     unspaghettify_statement(ces);
 
     /* Compute an external representation of entry statement es for entry e.
-     * Cheat with the declarations because of text_names_module().
+     * Cheat with the declarations because of text_named_module().
      */
     entity_declarations(e) = gen_nconc(entity_declarations(e), decls);
+
+    ifdebug(2) {
+      (void) fprintf(stderr, "Declarations of all variables for entry %s:\n",
+		     module_local_name(e));
+      dump_arguments(entity_declarations(e));
+    }
+
     decls = entity_declarations(cm);
     entity_declarations(cm) = entity_declarations(e);
+
     ifdebug(1) {
       fprint_environment(stderr, cm);
     }
+
     line_numbering_p = get_bool_property("PRETTYPRINT_STATEMENT_NUMBER");
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
     txt = text_named_module(e, cm, ces);
@@ -1064,7 +1376,8 @@ ProcessEntries()
     list cl = NIL;
     list ct = NIL;
     text txt = text_undefined;
-    bool line_numbering_p = FALSE;
+    bool line_numbering_p = get_bool_property("PRETTYPRINT_STATEMENT_NUMBER");
+    bool data_statements_p = get_bool_property("PRETTYPRINT_DATA_STATEMENTS");
 
     /* The declarations for cm are likely to be incorrect. They must be
      * synthesized by the prettyprinter.
@@ -1072,11 +1385,14 @@ ProcessEntries()
     free(code_decls_text(c));
     code_decls_text(c) = strdup("");
     /* Regenerate a SOURCE_FILE .f without entries for the module itself */
-    line_numbering_p = get_bool_property("PRETTYPRINT_STATEMENT_NUMBER");
+    /* To avoid warnings about column 73 when the code is parsed again */
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
     txt = text_named_module(cm, cm, get_current_module_statement());
-    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", line_numbering_p);
     make_text_resource_and_free(module_local_name(cm), DBR_SOURCE_FILE, ".f", txt);
+
+    /* Not ot duplicate DATA statements for static variables and common variables
+       in every entry */
+    set_bool_property("PRETTYPRINT_DATA_STATEMENTS", FALSE);
 
     /* Process each entry */
     for(ce = entry_entities, cl = entry_labels, ct = entry_targets;
@@ -1089,6 +1405,8 @@ ProcessEntries()
 
 	ProcessEntry(cm, e, l, t);
     }
+    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", line_numbering_p);
+    set_bool_property("PRETTYPRINT_DATA_STATEMENTS", data_statements_p);
     /* Postponed to the_actual_parser() which needs to know entries were
        encountered */
     /* ResetEntries(); */
@@ -1203,6 +1521,17 @@ SafeLocalToGlobal(entity e, type r)
 
 	    fe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
 				    entity_local_name(e));
+	    if(storage_undefined_p(entity_storage(fe))) {
+		entity_storage(fe) = make_storage(is_storage_rom, UU);
+	    }
+	    else if(!storage_rom_p(entity_storage(fe))) {
+		FatalError("SafeLocalToGlobal",
+			   "Unexpected storage class for top level entity\n");
+	    }
+	    if(value_undefined_p(entity_initial(fe))) {
+		entity_initial(fe) = make_value(is_value_code,
+						make_code(NIL, strdup("")));
+	    }
 
 	    pips_debug(1, "external function %s re-declared as %s\n",
 		       entity_name(e), entity_name(fe));
@@ -1395,6 +1724,25 @@ MakeExternalFunction(
     AddEntityToDeclarations(fe, get_current_module_entity());
 
     debug(8, "MakeExternalFunction", "End for %s\n", entity_name(fe));
+
+    return fe;
+}
+
+entity 
+DeclareExternalFunction(
+    entity e /* entity to be turned into external function */)
+{
+    entity fe = MakeExternalFunction(e, type_undefined);
+
+    if(value_intrinsic_p(entity_initial(fe))) {
+	pips_user_warning(
+	    "Name conflict between user declared module %s and intrinsic %s\n",
+	    module_local_name(fe), module_local_name(fe));
+	ParserError("DeclareExternalFunction",
+		    "Name conflict with intrinsic because PIPS does not support"
+		    " a specific name space for intrinsics. "
+		    "Please change your function or subroutine name.");
+    }
 
     return fe;
 }
