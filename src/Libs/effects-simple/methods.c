@@ -27,9 +27,7 @@
 static statement_effects
 db_get_proper_references(char *mod_name)
 {
-    statement_effects eff_map;
-    
-    eff_map =
+    statement_effects eff_map =
 	(statement_effects) db_get_memory_resource(DBR_PROPER_REFERENCES,
 						   mod_name, TRUE);
     return(eff_map);
@@ -46,9 +44,7 @@ db_put_proper_references(char *mod_name, statement_effects eff_map)
 static list
 db_get_summary_references(char *mod_name)
 {
-    list l_res = NIL;
-    
-    l_res = effects_to_list(
+    list l_res = effects_to_list(
 	(effects) db_get_memory_resource(DBR_SUMMARY_EFFECTS, mod_name, TRUE));
     return l_res;
 }
@@ -417,7 +413,7 @@ set_methods_for_proper_simple_effects()
     db_put_proper_rw_effects_func = db_put_simple_proper_rw_effects;
     db_get_summary_rw_effects_func = db_get_simple_summary_rw_effects; /* FC */
 
-    set_contracted_proper_effects(PROPER_EFFECTS_CONTRACT);
+    set_contracted_proper_effects(TRUE);
     set_descriptor_range_p(FALSE);
 }
 
@@ -489,7 +485,7 @@ set_methods_for_simple_effects()
     db_get_summary_in_effects_func = db_get_simple_summary_in_effects;
     db_put_summary_in_effects_func = db_put_simple_summary_in_effects;
 
-    set_contracted_rw_effects(FALSE);
+    set_contracted_rw_effects(TRUE);
     set_descriptor_range_p(FALSE);
 }
 
