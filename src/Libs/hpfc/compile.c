@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.65  1997/08/04 13:53:30  coelho
+ * new generic effects.
+ *
  * Revision 1.64  1997/07/22 13:21:04  keryell
  * %x -> %p formats.
  *
@@ -17,9 +20,10 @@
 
 #include "pipsdbm.h"
 #include "resources.h"
-#include "effects.h"
 #include "semantics.h"
-#include "regions.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 #include "callgraph.h"
 #include "transformations.h"
 
