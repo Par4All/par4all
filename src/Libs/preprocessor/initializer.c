@@ -10,6 +10,7 @@
 #include "text-util.h"
 #include "misc.h"
 #include "properties.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
