@@ -2364,7 +2364,7 @@ char*   module_name;
     reset_current_stco_map();
     reset_current_module_entity();
     debug_off();
-    return;
+    return(TRUE);
   }
 
   /* Computation of the weight of each dataflow of the DFG. */
