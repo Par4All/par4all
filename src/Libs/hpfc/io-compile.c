@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/06/03 14:14:40 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/06/07 12:02:17 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -139,13 +139,16 @@ statement stat, *hp, *np;
 
     /*
      * no array to deal with: the old function should work!
+     * not needed!
      */
+    /*
     if ENDP(entities)
     {
 	debug(5, "io_efficient_compile", "old stuff used\n");
 	hpfcompileIO(stat, hp, np);
 	return;
     }
+    */
 
     MAPL(ce,
      {
@@ -161,8 +164,14 @@ statement stat, *hp, *np;
 	 debug(3, "io_efficient_compile", 
 	       "array %s\n", entity_local_name(array));
 
-	 if (!array_distributed_p(array) && !action_write_p(act)) 
+	 if ((!array_distributed_p(array)) && action_read_p(act)) 
+	 {
+	     debug(7, 
+		   "io_efficient_compile", 
+		   "skipping array %s movements - none needed\n", 
+		   entity_local_name(array));
 	     continue;
+	 }
 
 	 /*
 	  * add array declaration on host if necessary
