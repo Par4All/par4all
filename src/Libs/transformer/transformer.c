@@ -55,11 +55,15 @@ transformer_combine(
 
     debug(8,"transformer_combine","arg. t1=%x\n",t1);
     ifdebug(8) (void) dump_transformer(t1);
-    ifdebug(9) pips_assert("consistent t1", transformer_consistency_p(t1));
+    /* The consistencies of transformers t1 and t2 cannot be checked with
+       respect to the current environment because t1 or t2 may be relative
+       to a callee as in user_function_call_to_transformer(). Hence a
+       debug level of 10. */
+    ifdebug(10) pips_assert("consistent t1", transformer_consistency_p(t1));
 
     debug(8,"transformer_combine","arg. t2=%x\n",t2);
     ifdebug(8) (void) dump_transformer(t2);
-    ifdebug(9) pips_assert("consistent t2", transformer_consistency_p(t2));
+    ifdebug(10) pips_assert("consistent t2", transformer_consistency_p(t2));
 
     /* build new argument list and rename old and intermediate values,
        as well as new (i.e. unmodified) variables in t1 */
