@@ -12,27 +12,29 @@
 USAGE="Usage: $0 module"
 
 if [ $# -eq 0 ]
-then	echo $USAGE >&2
-	exit 2
+then
+	exit 1
 fi
 
 source=$1
 
-echo source="$source"
 stf $source >$source$$ 2>$source.$$.log
+
 if grep '_.TOOLPACK' $source.$$.log
 then
-	echo clean up with toolpack command "discard"
-	exit 1
+	rm $source.$$.log
+	exit 2
 fi
+
 if grep ERROR $source.$$.log
 then
-	echo stf failed for file $source
+	rm $source.$$.log
 	exit 1
 else
 	rm $source
 	sed -e '/\[ISTLY Normal Termination\]/d' <$source$$ >$source
 	rm $source$$
+	rm $source.$$.log
+	exit 0
 fi
-rm $source.$$.log
-exit 0
+exit 1 # should never be here...
