@@ -15,12 +15,12 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1994/12/30 09:03:31 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1994/12/30 13:58:38 $, )
  * version $Revision$
  * got on %D%, %T%
  *
  * The file has all the generic functions to manipulate C objects
- * implemented by chunks (see genC.c).
+ * implemented by gen_chunks (see genC.c).
  */
 
 /*LINTLIBRARY*/
@@ -41,10 +41,10 @@ extern int fclose();
 #define GO (1)
 
 extern int max_tabulated_elements();
-extern chunk *enter_tabulated_def();
+extern gen_chunk *enter_tabulated_def();
 
 cons *Gen_cp_[ MAX_NESTED_CONS ] ;
-chunk Gen_hash_[ MAX_NESTED_HASH ] ;
+gen_chunk Gen_hash_[ MAX_NESTED_HASH ] ;
 
 /* GEN_TABULATED maps any bp->index to the tabulation table. TABULATED_BP is
  * the fake domain that helps writing tabulation tables. GEN_TABULATED_NAMES
@@ -52,8 +52,8 @@ chunk Gen_hash_[ MAX_NESTED_HASH ] ;
  * of the domain number.
  */
 
-chunk *Gen_tabulated_[ MAX_TABULATED ] ;
-struct binding *Tabulated_bp ;
+gen_chunk *Gen_tabulated_[ MAX_TABULATED ] ;
+struct gen_binding *Tabulated_bp ;
 hash_table Gen_tabulated_names ;
 
 int Read_spec_mode ;
@@ -83,10 +83,10 @@ static int disallow_undefined_tabulated = TRUE ;
 /* DOMAIN_INDEX returns the index in the Domain table for object OBJ.
  */
 static int domain_index( obj )
-chunk *obj ;
+gen_chunk *obj ;
 {
     message_assert("Trying to use a NULL object", obj!=NULL);
-    message_assert("Trying to use an undefined object", obj!=chunk_undefined);
+    message_assert("Trying to use an undefined object", obj!=gen_chunk_undefined);
     check_domain(obj->i);
     return(obj->i) ;
 }
@@ -94,7 +94,7 @@ chunk *obj ;
 /* inlined version of domain_index. what is done by optimizing compilers?
  */
 #define quick_domain_index(obj) \
-  (((! (obj)) || ((obj)==chunk_undefined) || \
+  (((! (obj)) || ((obj)==gen_chunk_undefined) || \
     ((obj)->i<0) || ((obj)->i>MAX_DOMAIN)) ? \
    domain_index(obj) : (obj)->i) /* prints the error message or returns */
 
@@ -110,13 +110,13 @@ int number ;
 }
 
 #ifdef DBG_READ
-/* WRITE_CHUNK prints on the FILE stream a succession of L chunks
+/* WRITE_CHUNK prints on the FILE stream a succession of L gen_chunks
  * (beginning at OBJ). This is used for debugging purposes. 
  */
 void
-write_chunk( file, obj, l )
+write_gen_chunk( file, obj, l )
      FILE *file ;
-     chunk *obj ;
+     gen_chunk *obj ;
      int l ;
 {
   int i ;
@@ -148,16 +148,16 @@ array_size( dim )
 /* INIT_ARRAY returns a freshly allocated array initialized according to
  * the information in its domain DP.
  */
-static chunk *
+static gen_chunk *
 init_array( dp )
      union domain *dp ;
 {
   int sizarray = array_size( dp->ar.dimensions ) ;
   /*NOSTRICT*/
-  chunk *ar = (chunk *)alloc( sizeof( chunk )*sizarray ) ;
+  gen_chunk *ar = (gen_chunk *)alloc( sizeof( gen_chunk )*sizarray ) ;
 
   for( ; sizarray ; sizarray-- )
-    ar[ sizarray-1 ].p = chunk_undefined ;
+    ar[ sizarray-1 ].p = gen_chunk_undefined ;
 
   return( ar ) ;
 }
@@ -167,11 +167,11 @@ init_array( dp )
 
 int
 find_free_tabulated( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     int i ;
 
-    if( Gen_tabulated_[ bp->index ] == chunk_undefined ) {
+    if( Gen_tabulated_[ bp->index ] == gen_chunk_undefined ) {
 	fatal( "find_free_tabulated: Uninitialized %s\n", bp->name ) ;
     }
     i = ((bp->alloc == max_tabulated_elements()-1) ? 1 : bp->alloc)+1 ;
@@ -181,26 +181,26 @@ struct binding *bp ;
 	    user( "Too many elements in tabulated domain %s\n", bp->name ) ;
 	    abort();
 	}
-	if( (Gen_tabulated_[ bp->index ]+i)->p == chunk_undefined ) {
+	if( (Gen_tabulated_[ bp->index ]+i)->p == gen_chunk_undefined ) {
 	    return( bp->alloc = i ) ;
 	}
     }
 }
 
-/* GEN_ALLOC_COMPONENT updates the chunk CP from the arg list AP according
+/* GEN_ALLOC_COMPONENT updates the gen_chunk CP from the arg list AP according
    to the domain DP. */
 
 /*VARARGS2*/
 void
 gen_alloc_component( dp, cp, ap, gen_check_p )
 union domain *dp ;
-chunk *cp ;
+gen_chunk *cp ;
 va_list *ap ;
 int gen_check_p ;
 {
     switch( dp->ba.type ) {
     case ARRAY :
-	if( (cp->p = va_arg( *ap, chunk * )) == NULL )
+	if( (cp->p = va_arg( *ap, gen_chunk * )) == NULL )
 	    cp->p =  init_array( dp ) ;
 	break ;
     case LIST:
@@ -227,7 +227,7 @@ int gen_check_p ;
 	    cp->s = va_arg( *ap, char * ) ;
 	}
 	else {
-	    cp->p = va_arg( *ap, chunk * ) ;
+	    cp->p = va_arg( *ap, gen_chunk * ) ;
 
 	    if( gen_debug & GEN_DBG_CHECK || gen_check_p ) {
 		(void) gen_check( cp->p, dp->ba.constructand-Domains ) ;
@@ -246,9 +246,9 @@ int gen_check_p ;
 void
 gen_alloc_constructed( ap, bp, dp, cp, data, gen_check_p )
 va_list ap ;
-struct binding *bp ;
+struct gen_binding *bp ;
 union domain *dp ;
-chunk *cp ;
+gen_chunk *cp ;
 int data ;
 int gen_check_p ;
 {
@@ -256,7 +256,7 @@ int gen_check_p ;
 
     switch( dp->co.op ) {
     case AND_OP : {
-	chunk *cpp ;	
+	gen_chunk *cpp ;	
 
 	for( dlp=dp->co.components, cpp=cp+data ;
 	    dlp != NULL ; 
@@ -290,21 +290,21 @@ int gen_check_p ;
 }
 
 /*VARARGS*/
-chunk *
+gen_chunk *
 gen_alloc( va_alist )
 va_dcl
 {
     va_list ap ;
     union domain *dp ;
-    struct binding *bp ;
-    chunk *cp ;
+    struct gen_binding *bp ;
+    gen_chunk *cp ;
     int gen_check_p ;
     int data ;
 
     check_read_spec_performed();
 
     va_start( ap ) ;
-    cp = (chunk *)alloc( va_arg( ap, int )) ;
+    cp = (gen_chunk *)alloc( va_arg( ap, int )) ;
     gen_check_p = va_arg( ap, int ) ;
     bp = &Domains[ cp->i = va_arg( ap, int ) ] ;
     data = 1 + IS_TABULATED( bp );
@@ -317,7 +317,7 @@ va_dcl
 	(cp+data)->t = va_arg( ap, set) ;
 	break ;
     case ARRAY: 
-	if( ((cp+data)->p = va_arg( ap, chunk *)) == NULL ) {
+	if( ((cp+data)->p = va_arg( ap, gen_chunk *)) == NULL ) {
 	    (cp+data)->p = init_array( dp ) ;
 	}
 	break ;
@@ -358,7 +358,7 @@ struct driver {
  */
 
 #define CHECK_NULL(obj,bp,dr) \
-  if((obj)==chunk_undefined) {(*(dr)->null)(bp) ; return ;}
+  if((obj)==gen_chunk_undefined) {(*(dr)->null)(bp) ; return ;}
 
 static void gen_trav_obj() ;
 
@@ -367,8 +367,8 @@ static void gen_trav_obj() ;
 
 static void
 gen_trav_leaf( bp, obj, dr )
-struct binding *bp ;
-chunk *obj ;
+struct gen_binding *bp ;
+gen_chunk *obj ;
 struct driver *dr ;
 {
     CHECK_NULL(obj, bp, dr) ;
@@ -411,10 +411,10 @@ struct driver *dr ;
 static void
 gen_trav_simple( dp, obj, dr )
 union domain *dp ;
-chunk *obj ;
+gen_chunk *obj ;
 struct driver *dr ;
 {
-    CHECK_NULL(obj, (struct binding *)NULL, dr);
+    CHECK_NULL(obj, (struct gen_binding *)NULL, dr);
 
     if( gen_debug & GEN_DBG_TRAV_SIMPLE ) 
     {
@@ -442,7 +442,7 @@ struct driver *dr ;
 	case SET:
 	    SET_MAP(elt,
 		{
-		    gen_trav_leaf(dp->se.element, (chunk *)&elt, dr);
+		    gen_trav_leaf(dp->se.element, (gen_chunk *)&elt, dr);
 		}, 
 		    obj->t) ;
 	    break ;
@@ -471,9 +471,9 @@ struct driver *dr ;
 
 static void
 gen_array_leaf(bp, i, obj, dr)
-struct binding *bp ;
+struct gen_binding *bp ;
 int i ;
-chunk *obj ;
+gen_chunk *obj ;
 struct driver *dr ;
 {
     gen_trav_leaf( bp, obj, dr ) ;
@@ -485,9 +485,9 @@ struct driver *dr ;
 
 static void 
 gen_trav_obj_constructed(obj, bp, dp, data, dr)
-chunk *obj ;
+gen_chunk *obj ;
 struct driver *dr ;
-struct binding *bp ;
+struct gen_binding *bp ;
 union domain *dp ;
 int data ;
 {
@@ -497,7 +497,7 @@ int data ;
     {
     case AND_OP: 
     {
-	chunk *cp ;
+	gen_chunk *cp ;
 
 	for(cp = obj+data ; dlp != NULL ; cp++, dlp = dlp->cdr)
 	    gen_trav_simple(dlp->domain, cp, dr) ;
@@ -520,8 +520,8 @@ int data ;
     case ARROW_OP: 
 	HASH_MAP(k, v, 
 	     {
-		 gen_trav_simple( dlp->domain, (chunk *)k, dr ) ;
-		 gen_trav_simple( dlp->cdr->domain, (chunk *)v, dr ) ;
+		 gen_trav_simple( dlp->domain, (gen_chunk *)k, dr ) ;
+		 gen_trav_simple( dlp->cdr->domain, (gen_chunk *)v, dr ) ;
 	     }, 
 		 (obj+data)->h ) ;
 	break ;
@@ -532,14 +532,14 @@ int data ;
 
 static void
 gen_trav_obj( obj, dr )
-     chunk *obj ;
+     gen_chunk *obj ;
      struct driver *dr ;
 {
-    CHECK_NULL(obj, (struct binding *)NULL, dr);
+    CHECK_NULL(obj, (struct gen_binding *)NULL, dr);
 
     if ((*dr->obj_in)(obj, dr))
     {
-	struct binding *bp = &Domains[quick_domain_index(obj)] ;
+	struct gen_binding *bp = &Domains[quick_domain_index(obj)] ;
 	union domain *dp = bp->domain ;
 	int data = 1+IS_TABULATED( bp ) ;
 
@@ -572,8 +572,8 @@ gen_trav_obj( obj, dr )
 
 static int
 tabulated_leaf_in( obj, bp )
-chunk *obj ;
-struct binding *bp ;
+gen_chunk *obj ;
+struct gen_binding *bp ;
 {
     return(!IS_TABULATED(bp));
 }
@@ -663,7 +663,7 @@ static int shared_obj_in() ;
 
 static int
 shared_obj_in( obj, dr )
-chunk *obj ;
+gen_chunk *obj ;
 struct driver *dr ;
 {
     char *seen ;
@@ -687,7 +687,7 @@ struct driver *dr ;
 
 static int
 shared_simple_in( obj, dp )
-chunk *obj ;
+gen_chunk *obj ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
@@ -726,7 +726,7 @@ union domain *dp ;
 
 void
 shared_pointers( obj, keep )
-chunk *obj ;
+gen_chunk *obj ;
 bool keep ;
 {
   struct driver dr ;
@@ -757,7 +757,7 @@ bool keep ;
 
 static int
 shared_obj( obj, first, others )
-chunk *obj ;
+gen_chunk *obj ;
 void (*first)() ;
 void (*others)() ;
 {
@@ -788,7 +788,7 @@ void (*others)() ;
    the node OBJ has already been seen. */
 
 static int shared_go( obj )
-chunk *obj ;
+gen_chunk *obj ;
 {
     return( !shared_obj( obj, gen_null, gen_null )) ;
 }
@@ -802,8 +802,8 @@ chunk *obj ;
 
 static int
 free_leaf_in( obj, bp )
-chunk *obj ;
-struct binding *bp ;
+gen_chunk *obj ;
+struct gen_binding *bp ;
 {
     return( !IS_TABULATED( bp ) && !shared_obj( obj, gen_null, gen_null )) ;
 }
@@ -812,8 +812,8 @@ struct binding *bp ;
 
 static void
 free_leaf_out( obj, bp ) 
-chunk *obj ;
-struct binding *bp ;
+gen_chunk *obj ;
+struct gen_binding *bp ;
 {
     if( IS_INLINABLE( bp )) return ;
 
@@ -833,7 +833,7 @@ struct binding *bp ;
 
 static void
 free_simple_out( obj, dp )
-     chunk *obj ;
+     gen_chunk *obj ;
      union domain *dp ;
 {
     switch( dp->ba.type ) {
@@ -850,13 +850,13 @@ free_simple_out( obj, dp )
 }
 
 /* FREE_OBJ_OUT just frees the object OBJ. */
-/* static chunk freed_chunk ; */
+/* static gen_chunk freed_gen_chunk ; */
 
 /*ARGSUSED*/
 static void
 free_obj_out( obj, bp, dr )
-chunk *obj ;
-struct binding *bp ;
+gen_chunk *obj ;
+struct gen_binding *bp ;
 struct driver *dr ;
 {
     union domain *dp ;
@@ -873,7 +873,7 @@ struct driver *dr ;
 	if( hash_del( Gen_tabulated_names, local ) == HASH_UNDEFINED_VALUE ) {
 	    user( "free_tabulated: clearing unexisting %s\n", local ) ;
 	}
-	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = chunk_undefined; 
+	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = gen_chunk_undefined; 
     }
     if((dp=bp->domain)->ba.type == CONSTRUCTED && dp->co.op == ARROW_OP) {
 	hash_table h = (obj+1 + IS_TABULATED( bp ))->h ;
@@ -884,7 +884,7 @@ struct driver *dr ;
 	}, h ) ;
 	hash_table_free( h ) ;
     }
-    obj->p = (chunk *)0 ;
+    obj->p = (gen_chunk *)0 ;
     free((void *) obj ) ;
 }
 
@@ -892,7 +892,7 @@ struct driver *dr ;
 
 static int
 persistant_simple_in( obj, dp )
-chunk *obj ;
+gen_chunk *obj ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
@@ -913,7 +913,7 @@ union domain *dp ;
 
 static void
 gen_local_free( obj, keep )
-chunk *obj ;
+gen_chunk *obj ;
 bool keep ;
 {
     struct driver dr ;
@@ -939,7 +939,7 @@ bool keep ;
 
 void
 gen_free( obj )
-chunk *obj ;
+gen_chunk *obj ;
 {
     gen_local_free( obj, FALSE ) ;
 }
@@ -948,7 +948,7 @@ chunk *obj ;
 
 void
 gen_free_with_sharing( obj )
-chunk *obj ;
+gen_chunk *obj ;
 {
     gen_local_free( obj, TRUE ) ;
 }
@@ -960,16 +960,16 @@ chunk *obj ;
 
 static hash_table copy_table;		/* maps an object on its copy */
 
-chunk *copy_hsearch(key)
-chunk *key;
+gen_chunk *copy_hsearch(key)
+gen_chunk *key;
 {
-    chunk *p ;
+    gen_chunk *p ;
 
-    if( key == (chunk *)NULL || key == (chunk *)HASH_UNDEFINED_VALUE) {
+    if( key == (gen_chunk *)NULL || key == (gen_chunk *)HASH_UNDEFINED_VALUE) {
 	return( key ) ;
     }
-    if ((p=(chunk *)hash_get( copy_table, (char *)key ))==
-	(chunk *)HASH_UNDEFINED_VALUE) {
+    if ((p=(gen_chunk *)hash_get( copy_table, (char *)key ))==
+	(gen_chunk *)HASH_UNDEFINED_VALUE) {
 	fatal( "[copy_hsearch] bad key: %s\n", itoa( (int) key ));
     }
     return(p);
@@ -990,19 +990,19 @@ char *k, *v ;
 */
 
 static int copy_obj_in(obj, dr)
-chunk *obj ;
+gen_chunk *obj ;
 struct driver *dr ;
 {
     int size;
-    chunk *new_obj;
-    struct binding *bp = &Domains[quick_domain_index( obj ) ] ;
+    gen_chunk *new_obj;
+    struct gen_binding *bp = &Domains[quick_domain_index( obj ) ] ;
 
     if (shared_obj( obj, gen_null, gen_null ))
 	    return 0;
 
     /* memory is allocated to duplicate the object referenced by obj */
-    size = gen_size(bp)*sizeof(chunk);
-    new_obj = (chunk *)alloc(size);
+    size = gen_size(bp)*sizeof(gen_chunk);
+    new_obj = (gen_chunk *)alloc(size);
 
     /* the object obj is copied into the new one */
     (void) memcpy((char *) new_obj, (char *) obj, size);
@@ -1016,7 +1016,7 @@ struct driver *dr ;
 /* Just check for defined simple domains. */
 
 static int copy_simple_in( obj, dp )
-chunk *obj ;
+gen_chunk *obj ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
@@ -1038,8 +1038,8 @@ union domain *dp ;
    IS_EXTERNAL cannot be applied on an inlined sub-domain */
 
 static void copy_leaf_out(obj,bp) 
-chunk *obj ;
-struct binding *bp ;
+gen_chunk *obj ;
+struct gen_binding *bp ;
 {
     if (IS_INLINABLE(bp))
 	    return;
@@ -1097,19 +1097,19 @@ union domain *dp ;
    contained in the old array. the second argument is the domain pointer of
    the old array */
 
-chunk *gen_copy_array(old_a, dp)
-chunk *old_a;
+gen_chunk *gen_copy_array(old_a, dp)
+gen_chunk *old_a;
 union domain *dp ;
 {
     int i, size, inlinable;
-    chunk *new_a;
+    gen_chunk *new_a;
 
     size = array_size(dp->ar.dimensions);
     inlinable = IS_INLINABLE(dp->ar.element);
-    new_a = (chunk *) alloc( sizeof(chunk)*size ) ;
+    new_a = (gen_chunk *) alloc( sizeof(gen_chunk)*size ) ;
 
     if (inlinable) {
-	(void) memcpy((char *) new_a, (char *) old_a, size*sizeof(chunk));
+	(void) memcpy((char *) new_a, (char *) old_a, size*sizeof(gen_chunk));
     }
     else {
 	for (i = 0; i < size; i++) {
@@ -1133,7 +1133,7 @@ union domain *dp ;
     }
     else {
 	SET_MAP( elt, {
-	  chunk *new = copy_hsearch( (chunk *)elt );
+	  gen_chunk *new = copy_hsearch( (gen_chunk *)elt );
 
 	  set_add_element( new_s, new_s, (char *)new ) ;
 	}, old_s ) ;
@@ -1146,7 +1146,7 @@ union domain *dp ;
    traversal functions */
 
 static void copy_simple_out(obj,dp)
-chunk *obj ;
+gen_chunk *obj ;
 union domain *dp ;
 {
     switch (dp->ba.type) {
@@ -1178,8 +1178,8 @@ union domain *dp ;
 
 static void
 copy_obj_out_constructed( obj, bp, dp, data, new_obj, dr ) 
-chunk *obj, *new_obj ;
-struct binding *bp ;
+gen_chunk *obj, *new_obj ;
+struct gen_binding *bp ;
 union domain *dp ;
 int data ;
 struct driver *dr ;
@@ -1188,7 +1188,7 @@ struct driver *dr ;
 
     switch( dp->co.op ) {
     case AND_OP: {
-	chunk *cp ;
+	gen_chunk *cp ;
 
 	for( cp = obj+data ; dlp != NULL ; cp++, dlp = dlp->cdr ) {
 	    if(COPYABLE_DOMAIN( dlp->domain)) {
@@ -1218,8 +1218,8 @@ struct driver *dr ;
 	(new_obj+data)->h = hash_table_make( (obj+data)->h->hash_type, 0) ;
 
 	HASH_MAP( k, v, {
-	    k =  (cp_domain ? (char *)copy_hsearch( (chunk *)k ) : k) ;
-	    v =  (cp_codomain ? (char *)copy_hsearch( (chunk *)v ) : v) ;
+	    k =  (cp_domain ? (char *)copy_hsearch( (gen_chunk *)k ) : k) ;
+	    v =  (cp_codomain ? (char *)copy_hsearch( (gen_chunk *)v ) : v) ;
 	    hash_put((new_obj+data)->h, k, v ) ;
 	}, (obj+data)->h ) ;
 	break ;
@@ -1231,13 +1231,13 @@ struct driver *dr ;
 
 
 static void copy_obj_out(obj,bp,dr)
-chunk *obj ;
-struct binding *bp ;
+gen_chunk *obj ;
+struct gen_binding *bp ;
 struct driver *dr ;
 {
     union domain *dp = bp->domain ;
     int data = 1+IS_TABULATED( bp ) ;
-    chunk *new_obj = copy_hsearch(obj) ;
+    gen_chunk *new_obj = copy_hsearch(obj) ;
 
     switch( dp->ba.type ) {
     case LIST: 
@@ -1255,10 +1255,10 @@ struct driver *dr ;
 
 /* GEN_COPY_TREE makes a copy of the object OBJ */ 
 
-chunk *gen_copy_tree( obj )
-chunk *obj ;
+gen_chunk *gen_copy_tree( obj )
+gen_chunk *obj ;
 {
-    chunk *copy;
+    gen_chunk *copy;
     struct driver dr ;
 
     check_read_spec_performed();
@@ -1305,15 +1305,15 @@ chunk *obj ;
 
 static int
 free_tabulated_leaf_in( obj, bp )
-chunk *obj ;
-struct binding *bp ;
+gen_chunk *obj ;
+struct gen_binding *bp ;
 {
     if ( IS_TABULATED( bp )) {
-	if ( obj->p == chunk_undefined ) {
+	if ( obj->p == gen_chunk_undefined ) {
 	    return( !GO) ;
 	}
 	free_obj_out( obj->p, bp ) ;
-	obj->p = chunk_undefined ;
+	obj->p = gen_chunk_undefined ;
 	return( !GO) ;
     }
     return( free_leaf_in( obj, bp )) ;
@@ -1326,9 +1326,9 @@ int
 gen_free_tabulated( domain )
 int domain ;
 {
-    struct binding *bp = &Domains[ domain ] ;
+    struct gen_binding *bp = &Domains[ domain ] ;
     int index = bp->index ;
-    chunk *fake_obj = gen_alloc(HEADER_SIZE+sizeof( chunk ),
+    gen_chunk *fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof( gen_chunk ),
 				0,
 			        Tabulated_bp-Domains,
 			        Gen_tabulated_[ index ] ) ;
@@ -1365,10 +1365,10 @@ int domain ;
 
     bp->alloc = 1 ;
     Gen_tabulated_[ bp->index ] = 
-	    (chunk *)alloc( max_tabulated_elements()*sizeof( chunk )) ;
+	    (gen_chunk *)alloc( max_tabulated_elements()*sizeof( gen_chunk )) ;
     
     for( i=0 ; i<max_tabulated_elements() ; i++ ) {
-	(Gen_tabulated_[ bp->index ]+i)->p = chunk_undefined ;
+	(Gen_tabulated_[ bp->index ]+i)->p = gen_chunk_undefined ;
     }
     return( domain ) ;
 }
@@ -1378,9 +1378,9 @@ int domain ;
 
 void
 gen_clear_tabulated_element( obj )
-chunk *obj  ;
+gen_chunk *obj  ;
 {
-    struct binding *bp = &Domains[ quick_domain_index( obj ) ] ;
+    struct gen_binding *bp = &Domains[ quick_domain_index( obj ) ] ;
 
     if( IS_TABULATED( bp )) {
 	static char local[ 1024 ] ;
@@ -1397,7 +1397,7 @@ chunk *obj  ;
 	if( hash_del( Gen_tabulated_names, local ) == HASH_UNDEFINED_VALUE ) {
 	    user( "clear_tabulated: clearing unexisting %s\n", local ) ;
 	}
-	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = chunk_undefined ;
+	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = gen_chunk_undefined ;
     }
     else {
 	user( "clear_tabulated: not a tabulated element\n" ) ;
@@ -1430,7 +1430,7 @@ write_shared_node( n )
 
 static void
 write_null( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     (void) fprintf( user_file, "#]null\n" ) ;
 }
@@ -1441,10 +1441,10 @@ struct binding *bp ;
 
 static int
 write_obj_in( obj, dr ) 
-chunk *obj ;
+gen_chunk *obj ;
 struct driver *dr ;
 {
-    struct binding *bp = &Domains[ quick_domain_index( obj ) ] ;
+    struct gen_binding *bp = &Domains[ quick_domain_index( obj ) ] ;
     union domain *dp = bp->domain ;
     int data = 1+IS_TABULATED( bp ) ;
 
@@ -1479,8 +1479,8 @@ struct driver *dr ;
 /*ARGSUSED*/
 static void
 write_obj_out( obj, bp, dr )
-chunk *obj ;
-struct binding *bp ;
+gen_chunk *obj ;
+struct gen_binding *bp ;
 struct driver *dr ;
 {
     union domain *dp = bp->domain ;
@@ -1511,11 +1511,11 @@ string init, s, end ;
 
 static int
 write_leaf_in( obj, bp )
-chunk *obj ;
-struct binding *bp ;
+gen_chunk *obj ;
+struct gen_binding *bp ;
 {
     if( IS_TABULATED( bp )) {
-	if( obj->p == chunk_undefined ) {
+	if( obj->p == gen_chunk_undefined ) {
 	    if( disallow_undefined_tabulated ) {
 		user("gen_write: writing undefined tabulated object\n",
 		     NULL) ;
@@ -1564,7 +1564,7 @@ struct binding *bp ;
 
 static int
 write_simple_in( obj, dp )
-chunk *obj ;
+gen_chunk *obj ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
@@ -1598,15 +1598,15 @@ union domain *dp ;
 
 static void
 write_array_leaf( bp, i, obj, dr )
-struct binding *bp ;
+struct gen_binding *bp ;
 int i ;
-chunk *obj ;
+gen_chunk *obj ;
 struct driver *dr ;
 {
     if( IS_INLINABLE( bp ) || IS_EXTERNAL( bp )) {
 	gen_trav_leaf( bp, obj, dr ) ;
     }
-    else if( obj->p != chunk_undefined ) {
+    else if( obj->p != gen_chunk_undefined ) {
 	fprintf( user_file, "%d ", i ) ;
 	    
 	gen_trav_leaf( bp, obj, dr ) ;
@@ -1619,7 +1619,7 @@ struct driver *dr ;
 /*ARGSUSED*/
 static void
 write_simple_out( obj, dp )
-chunk *obj ;
+gen_chunk *obj ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
@@ -1639,7 +1639,7 @@ union domain *dp ;
 void
 gen_write( fd, obj )
 FILE *fd ;
-chunk *obj ;
+gen_chunk *obj ;
 {
     struct driver dr ;
 
@@ -1670,7 +1670,7 @@ chunk *obj ;
 void
 gen_write_without_sharing( fd, obj )
 FILE *fd ;
-chunk *obj ;
+gen_chunk *obj ;
 {
     struct driver dr ;
 
@@ -1702,13 +1702,13 @@ chunk *obj ;
 
 static int
 write_tabulated_leaf_in( obj, bp )
-chunk *obj ;
-struct binding *bp ;
+gen_chunk *obj ;
+struct gen_binding *bp ;
 {
     if( IS_TABULATED( bp )) {
 	int number ;
 
-	if( obj->p == chunk_undefined ) {
+	if( obj->p == gen_chunk_undefined ) {
     	    write_null( bp ) ;
 	    return( !GO) ;
 	}
@@ -1736,7 +1736,7 @@ FILE *fd ;
 int domain ;
 {
     int index =  Domains[ domain ].index ;
-    chunk *fake_obj = gen_alloc(HEADER_SIZE+sizeof( chunk ),
+    gen_chunk *fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof( gen_chunk ),
 				0,
 				Tabulated_bp-Domains,
 			        Gen_tabulated_[ index ] ) ;
@@ -1792,8 +1792,8 @@ va_dcl
     va_list ap ;
     extern FILE *zzin ;
     char *spec ;
-    chunk **cpp ;
-    struct binding *bp ;
+    gen_chunk **cpp ;
+    struct gen_binding *bp ;
     char *mktemp(), *tmp ;
     extern int unlink();
 
@@ -1825,7 +1825,7 @@ va_dcl
     for( cpp= &Gen_tabulated_[0] ; 
 	 cpp<&Gen_tabulated_[MAX_TABULATED] ; 
 	 cpp++ ) {
-	*cpp = chunk_undefined ;
+	*cpp = gen_chunk_undefined ;
     }
     for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
 	if( bp->name != NULL &&
@@ -1839,10 +1839,10 @@ va_dcl
 
 	    bp->alloc = 1 ;
 	    Gen_tabulated_[ bp->index ] = 
-		    (chunk *)alloc( max_tabulated_elements()*sizeof( chunk )) ;
+		    (gen_chunk *)alloc( max_tabulated_elements()*sizeof( gen_chunk )) ;
 	    
 	    for( i=0 ; i<max_tabulated_elements() ; i++ ) {
-		(Gen_tabulated_[ bp->index ]+i)->p = chunk_undefined ;
+		(Gen_tabulated_[ bp->index ]+i)->p = gen_chunk_undefined ;
 	    }
 	    if( Gen_tabulated_names == NULL ) {
 		Gen_tabulated_names = 
@@ -1876,7 +1876,7 @@ void (*write)() ;
 void (*free)() ;
 char *(*copy)() ;
 {
-	struct binding *bp = &Domains[ which ] ;
+	struct gen_binding *bp = &Domains[ which ] ;
 	union domain *dp = bp->domain ;
 
 	if( dp->ba.type != EXTERNAL ) {
@@ -1894,18 +1894,18 @@ char *(*copy)() ;
 	dp->ex.copy = copy ;
 }
 
-/* GEN_MAKE_ARRAY allocates an initialized array of NUM chunks. */
+/* GEN_MAKE_ARRAY allocates an initialized array of NUM gen_chunks. */
 
-chunk *
+gen_chunk *
 gen_make_array( num )
      int num ;
 {
   int i ;
   /*NOSTRICT*/
-  chunk *ar = (chunk *)alloc( sizeof( chunk )) ;
+  gen_chunk *ar = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
 
   for( i=0 ; i<num ; i++ ) 
-    ar[ i ].p = chunk_undefined ;
+    ar[ i ].p = gen_chunk_undefined ;
 
   return( ar ) ;
 }
@@ -1913,7 +1913,7 @@ gen_make_array( num )
 /* GEN_READ reads any object from the FILE stream. Sharing is restored.
  */
 
-chunk *
+gen_chunk *
 gen_read( file )
      FILE *file ;
 {
@@ -1933,7 +1933,7 @@ FILE *file ;
 int create_p ;
 {
     extern FILE *xxin ;
-    /* chunk *cp ; */
+    /* gen_chunk *cp ; */
     int domain, index, max ;
     int i ;
     extern int allow_forward_ref ;
@@ -1971,7 +1971,7 @@ int create_p ;
 	Domains[ domain ].alloc = 1 ;
 
 	for( i = 0 ; i < max_tabulated_elements() ; i++ ) {
-	    (Gen_tabulated_[ index ]+i)->p = chunk_undefined ;
+	    (Gen_tabulated_[ index ]+i)->p = gen_chunk_undefined ;
 	}
     }
     allow_forward_ref = TRUE ;
@@ -1995,7 +1995,7 @@ int create_p ;
     domain = gen_read_tabulated( file, create_p ) ;
 
     HASH_MAP( k, v, {
-	chunk *hash = (chunk *)v ;
+	gen_chunk *hash = (gen_chunk *)v ;
 
         if( hash->i < 0 ) {
             user( "Tabulated element not defined: %s\n", k ) ;
@@ -2004,11 +2004,11 @@ int create_p ;
     return( domain ) ;
 }
 
-/* GEN_CHECK checks that the chunk received OBJ is of the appropriate TYPE.
+/* GEN_CHECK checks that the gen_chunk received OBJ is of the appropriate TYPE.
  */ 
-chunk *
+gen_chunk *
 gen_check( obj, t )
-chunk *obj ;
+gen_chunk *obj ;
 int t ;
 {
     char buffer[ 1024 ] ;
@@ -2019,7 +2019,7 @@ int t ;
 		    Domains[ t ].name) ;
 	abort() ;
     }
-    if( obj != chunk_undefined && t != obj->i ) {
+    if( obj != gen_chunk_undefined && t != obj->i ) {
 	(void) sprintf( buffer, 
 		"gen_check: Type clash (expecting %s, getting %s)\n",
 		Domains[ t ].name, Domains[ obj->i ].name ) ;
@@ -2035,12 +2035,12 @@ int t ;
  */
 int
 gen_type(obj)
-chunk *obj;
+gen_chunk *obj;
 {
     int dom;
 
-    message_assert("no domain for NULL object", obj!=(chunk*)NULL);
-    message_assert("no domain for undefined object", !chunk_undefined_p(obj));
+    message_assert("no domain for NULL object", obj!=(gen_chunk*)NULL);
+    message_assert("no domain for undefined object", !gen_chunk_undefined_p(obj));
 
     dom = obj->i; check_domain(dom);
 
@@ -2074,7 +2074,7 @@ static void open_black_hole()
  */
 int
 gen_consistent_p( obj )
-chunk *obj ;
+gen_chunk *obj ;
 {
     int old_gen_debug = gen_debug ;
 
@@ -2092,7 +2092,7 @@ chunk *obj ;
 */
 static void
 defined_null( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     union domain *dp = bp->domain ;
 
@@ -2104,7 +2104,7 @@ struct binding *bp ;
   
 int
 gen_defined_p( obj )
-chunk *obj ;
+gen_chunk *obj ;
 {
     struct driver dr ;
 
@@ -2156,7 +2156,7 @@ char *type ;
 
 static int
 sharing_obj_in( obj, dr )
-chunk *obj ;
+gen_chunk *obj ;
 struct driver *dr ;
 { 
     /* char *seen ; */
@@ -2173,7 +2173,7 @@ struct driver *dr ;
 
 static int
 sharing_simple_in( obj, dp )
-chunk *obj ;
+gen_chunk *obj ;
 union domain *dp ;
 {
   cons *p ;
@@ -2192,7 +2192,7 @@ union domain *dp ;
 
 bool
 gen_sharing_p( obj1, obj2 )
-chunk *obj1, *obj2 ;
+gen_chunk *obj1, *obj2 ;
 {
   struct driver dr ;
   bool found ;
@@ -2244,20 +2244,20 @@ chunk *obj1, *obj2 ;
  */
 void
 gen_null(p)
-chunk *p;
+gen_chunk *p;
 {
 }
     
 bool
 gen_true(c)
-chunk *c;
+gen_chunk *c;
 {
     return(TRUE);
 }
 
 bool
 gen_false(c)
-chunk *c;
+gen_chunk *c;
 {
     return(FALSE);
 }
@@ -2431,7 +2431,7 @@ initialize_DirectDomainsTable()
 
     for (i=0; i<number_of_domains; i++)
     {
-	struct binding *bp = &Domains[i];
+	struct gen_binding *bp = &Domains[i];
 
 	if (gen_debug & GEN_DBG_RECURSE)
 	    fprintf(stderr, 
@@ -2564,7 +2564,7 @@ static struct multi_recurse
  */
 static bool 
 quick_multi_already_seen_p(obj)
-chunk * obj;
+gen_chunk * obj;
 {
     if (hash_get(current_mrc->seen, (char *)obj)==(char*)TRUE)
 	return(TRUE);
@@ -2575,7 +2575,7 @@ chunk * obj;
 
 static int
 quick_multi_recurse_obj_in(obj, dr)
-chunk *obj;
+gen_chunk *obj;
 struct driver *dr;
 {
     int dom = obj->i;
@@ -2609,8 +2609,8 @@ struct driver *dr;
 
 static void
 quick_multi_recurse_obj_out(obj, bp, dr)
-chunk *obj;
-struct binding *bp;
+gen_chunk *obj;
+struct gen_binding *bp;
 struct driver *dr;
 {
     int dom = obj->i;
@@ -2621,7 +2621,7 @@ struct driver *dr;
 
 static int
 quick_multi_recurse_simple_in(obj, dp)
-chunk *obj ;
+gen_chunk *obj ;
 union domain *dp ;
 {
     int t;
@@ -2642,7 +2642,7 @@ union domain *dp ;
  */
 void 
 gen_recurse_stop(obj)
-chunk *obj;
+gen_chunk *obj;
 {
     hash_put(current_mrc->seen, (char *)obj, (char *)TRUE);
 }
@@ -2665,8 +2665,8 @@ void gen_multi_recurse(va_alist)
 va_dcl
 {
     va_list pvar;
-    chunk 
-	*obj = chunk_undefined;
+    gen_chunk 
+	*obj = gen_chunk_undefined;
     int 
 	i,
 	domain;
@@ -2687,12 +2687,12 @@ va_dcl
     check_read_spec_performed();
 
     va_start(pvar);
-    obj = va_arg(pvar, chunk*);
+    obj = va_arg(pvar, gen_chunk*);
 
     /*  the object must be a valid newgen object
      */
     message_assert("null or undefined object to visit",
-		   obj!=(chunk*)NULL && obj!=chunk_undefined);
+		   obj!=(gen_chunk*)NULL && obj!=gen_chunk_undefined);
 
     /*    initialize the new tables
      */
@@ -2752,7 +2752,7 @@ va_dcl
  */
 void 
 gen_recurse(obj, domain, filter, rewrite)
-chunk *obj;
+gen_chunk *obj;
 int domain;
 bool (*filter)();
 void (*rewrite)();
