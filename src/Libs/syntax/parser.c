@@ -48,6 +48,23 @@ statement */
 char FormatValue[FORMATLENGTH];
 
 extern void syn_reset_lex(void);
+
+static bool parser_recursive_call = FALSE;
+
+/* Safety for recursive calls of parser required to process entries */
+static void
+reset_parser_recursive_call()
+{
+    parser_recursive_call = FALSE;
+}
+
+static void
+set_parser_recursive_call()
+{
+    parser_recursive_call = FALSE;
+}
+
+/* Parser error handling */
 
 bool InParserError = FALSE;
 
@@ -108,6 +125,8 @@ ParserError(char * f, char * m)
     reset_common_size_map_on_error();
     parser_reset_all_reader_buffers();
     parser_reset_StmtHeap_buffer();
+    reset_parser_recursive_call();
+    ResetEntries();
     AbortOfProcedure();
 
     InParserError = FALSE;
@@ -155,6 +174,7 @@ extern void syn_parse();
 
 /* parse "module.dbr_file"
  */
+
 static bool 
 the_actual_parser(
     string module,
@@ -187,10 +207,30 @@ the_actual_parser(
     free(CurrentFN);
     CurrentFN = NULL;
 
+    /* Handle the special case for entries without looping forever */
+    if(!parser_recursive_call) {
+	if(!EmptyEntryListsP()) {
+	    /* The requested parsed code may have been an entry code. Then it
+	     * is not yet computed because the parsed code for the module was
+	     * produced and only a file resource was produced for the entry code.
+	     */
+	    ResetEntries();
+	    if(!db_resource_p(DBR_PARSED_CODE, module)) {
+		set_parser_recursive_call();
+		the_actual_parser(module, dbr_file);
+		reset_parser_recursive_call();
+	    }
+	}
+    }
+    else {
+	if(!EmptyEntryListsP()) {
+	    pips_internal_error("Unexpected entry handling in parser recursive call\n");
+	}
+    }
+
     /* This debug_off() occurs too late since pipsdbm has been called
      * before. Initially, the parser was designed to parse more than
-     * one subroutine/function/program at a time.
-     */
+     * one subroutine/function/program at a time.  */
     debug_off();
 
     return TRUE;
