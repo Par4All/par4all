@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1996/10/17 11:08:42 $, 
+ * $Date: 1996/10/17 11:09:31 $, 
  */
 
 #include <stdio.h>
@@ -914,9 +914,8 @@ declarations_privatizer(char *module_name)
 
     if (get_bool_property("ARRAY_SECTION_PRIV_COPY_OUT"))
     {
-	pips_user_error("property ARRAY_SECTION_PRIV_COPY_OUT set to TRUE ; " 
-			" not implemented.\n" ); 
-	return(FALSE);
+	pips_user_warning("property ARRAY_SECTION_PRIV_COPY_OUT set to TRUE ; " 
+			" COPY OUT not implemented.\n" ); 
     }
 
     /* set and get the current properties concerning regions */
