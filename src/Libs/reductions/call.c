@@ -1,5 +1,5 @@
 /* $RCSfile: call.c,v $ (version $Revision$)
- * $Date: 1996/06/21 11:47:52 $, 
+ * $Date: 1996/06/22 10:32:12 $, 
  *
  * Fabien COELHO
  */
@@ -23,16 +23,22 @@ summary_to_proper_reference(
     reference r)
 {
     effect e = make_effect(r, /* persistent! */
-			   make_action(is_action_read, UU),
+			   make_action(is_action_write, UU),
 			   make_approximation(is_approximation_must, UU),
 			   make_transformer(NIL, make_predicate(NULL)));
-    list /* of effect */ le = CONS(EFFECT, e, NIL), lef, lref = NIL;
+    list /* of effect */ lef, /* of reference */ lref = NIL;
     
-    lef = summary_to_proper_effects(call_function(c), call_arguments(c), le);
+    pips_debug(7, "reference to %s\n", entity_name(reference_variable(r)));
+
+    debug_on("EFFECTS_DEBUG_LEVEL");
+    lef = summary_effect_to_proper_effect(c, e);
+    debug_off();
     
-    MAP(EFFECT, ef, lref = CONS(REFERENCE, effect_reference(ef), lref), lef);
+    MAP(EFFECT, ef, 
+	lref = CONS(REFERENCE, effect_reference(ef), lref),
+	lef);
     
-    gen_map(gen_free, lef); gen_free_list(lef);
+    gen_map(gen_free, lef), gen_free_list(lef);
     return lref;
 }
 
@@ -42,19 +48,41 @@ translate_reduction(
     reduction external_red)
 {
     reference ref = reduction_reference(external_red);
+    entity var = reference_variable(ref);
     list /* of reference */ lref = summary_to_proper_reference(c, ref),
          /* of reduction */ lrds = NIL;
+
+    pips_debug(7, "reduction %s[%s] (%d reductions)\n", 
+	       reduction_name(external_red),
+	       entity_name(var), gen_length(lref));
 
     MAP(REFERENCE, r, 
     {
 	reduction red = copy_reduction(external_red);
+
 	free_reference(reduction_reference(red));
-	reduction_reference(red) = copy_reference(r); /* ??? */
+	reduction_reference(red) = copy_reference(r);
+
+	gen_free_list(reduction_dependences(red));
+	reduction_dependences(red) = NIL;
+
+	gen_map(gen_free, reduction_trusted(red));
+	gen_free_list(reduction_trusted(red)); 
+	reduction_trusted(red) = NIL;
+
+	/* ??? what about effects on commons hidden in the call?
+	 * I do not know the reference to trust in the effects...
+	 */
+	reduction_trusted(red) = CONS(PREFERENCE, make_preference(r), NIL);
+	
+	pips_debug(7, "reduction on %s translated on %s\n", 
+		   entity_name(var), entity_name(reduction_variable(red)));
+
 	lrds = CONS(REDUCTION, red, lrds);
     },
 	lref);
 
-    gen_free_list(lref); /* just the backbone, refs are pointed to now */
+    gen_free_list(lref); /* just the backbone, refs are real in the code? */
     return lrds;
 }
 
@@ -63,20 +91,16 @@ translate_reductions(
     call c)
 {
     entity fun = call_function(c);
+    list /* of reduction */ lr = NIL;
 
-    if (entity_module_p(fun))
-    {
-	reductions rs = load_summary_reductions(fun);
-	list lr = NIL;
+    if (!entity_module_p(fun))
+	return NIL;
 
-	MAP(REDUCTION, r, 
-	    lr = gen_nconc(translate_reduction(c, r), lr),
-	    reductions_list(rs));
-	
-	return lr;
-    }
+    MAP(REDUCTION, r, 
+	lr = gen_nconc(translate_reduction(c, r), lr),
+	reductions_list(load_summary_reductions(fun)));
 
-    return NIL;
+    return lr;
 }
    
 
