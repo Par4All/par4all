@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.299  1997/08/18 09:48:52  coelho
+# forgotten protection.
+#
 # Revision 1.298  1997/08/18 09:44:09  coelho
 # fixes to ftest.
 #
@@ -536,7 +539,7 @@ SOURCES+= 	\$(INCLUDES) \$(CFILES) \$(DOCS) \$(LIB_MAIN)
 
 clean-compiled:
 	\$(RM) \$(OBJECTS) \$(LIB_TARGET) \$(BIN_TARGET) \\
-		$(ARCH)/\$(LIB_MAIN:.c=.o) \$(ARCH)/pips \$(ARCH)/[tw]pips
+		\$(ARCH)/\$(LIB_MAIN:.c=.o) \$(ARCH)/pips \$(ARCH)/[tw]pips
 
 clean: generate_makefile_if_necessary_and_possible clean-compiled
 	-\$(RM) TAGS \$(BIN_TARGET) \$(DERIVED_HEADERS) \$(DERIVED_CFILES) \\
