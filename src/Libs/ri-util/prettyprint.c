@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/05 21:18:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/06 17:43:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/02/05 21:18:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/02/06 17:43:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1140,9 +1140,9 @@ int n;
 	r = text_logical_if(module, label, margin, obj, n);
     }
     else if(statement_test_p(fb) &&
-       entity_empty_label_p(statement_label(fb)) &&
-	    empty_comments_p(statement_comments(fb))) {
-
+	    empty_comments_p(statement_comments(fb)) &&
+	    entity_empty_label_p(statement_label(fb)) &&
+	    !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")) {
 	r = text_block_ifthen(module, label, margin, obj, n);
 	MERGE_TEXTS(r, text_block_elseif(module, label, margin, statement_test(fb), n));
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
