@@ -230,4 +230,4 @@ les anciens noms des fonctions */
 #define integer_projection(sci,sc,v) \
  sc_integer_projection_along_variable((sci),(sc),(v))
 
-#endif SYSTEME
+#endif /* SYSTEME */
