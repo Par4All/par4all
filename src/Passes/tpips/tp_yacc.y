@@ -47,6 +47,8 @@
 %type <status> i_activate
 %type <status> i_display
 %type <status> i_get
+%type <status> i_setenv
+%type <status> i_getenv
 %type <name> rulename
 %type <name> filename
 %type <args> filename_list
@@ -142,7 +144,27 @@ instruction:
 	| i_display
 	| i_activate
 	| i_get
+	| i_getenv
+	| i_setenv
 	| error {$$ = FALSE;}
+	;
+
+i_getenv: GET_ENVIRONMENT IDENT
+	{
+	    string val = getenv($2);
+	    user_log("getenv %s\n", $2);
+	    if (val) fprintf(stdout, "%s=%s\n", $2, val);
+	    else fprintf(stdout, "%s is not defined\n", $2);
+	    free($2);
+	}
+	;
+
+i_setenv: SET_ENVIRONMENT IDENT IDENT
+	{
+	    setenv($2, $3, 1);
+	    user_log("setenv %s %s\n", $2, $3);
+	    free($2); free($3);
+	}
 	;
 
 i_open:
