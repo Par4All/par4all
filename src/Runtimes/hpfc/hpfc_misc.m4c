@@ -3,7 +3,7 @@
  * Portability based on pvm m4 macros.
  *
  * $RCSfile: hpfc_misc.m4c,v $ version $Revision$
- * ($Date: 1996/09/07 16:56:17 $, )
+ * ($Date: 1996/09/13 12:50:05 $, )
  *
  * Fabien Coelho, 1993-1994-1995
  */
@@ -63,12 +63,11 @@ which_task(
     return (struct pvmtaskinfo *) NULL;
 }
 
-
 /* Function called by the RUNTIME under the DEMO compilation option. 
  * Prints the hosts that compose the Parallel Virtual Machine.
  */
 void 
-FUNCTION(printhostinfo) ARGS(`')
+FUNCTION(printhostinfo) ARGS(`') /* `' */
 {
     int i, info, nhost, narch;
     struct pvmhostinfo *hostp;
@@ -87,12 +86,11 @@ FUNCTION(printhostinfo) ARGS(`')
     fprintf(stderr, "\n");
 }
 
-
 /* Function called by the RUNTIME under the DEMO compilation option.
  * Called the the host. Prints the tasks and the machine they are running on.
  */
 void 
-FUNCTION(printtaskinfo) ARGS(`number, tids, hosttid')
+FUNCTION(printtaskinfo) ARGS(`number, tids, hosttid') /* `' */
 int *number, *tids, *hosttid;
 {
     int i, info, nhost, narch, ntask;
@@ -133,11 +131,9 @@ int *number, *tids, *hosttid;
  */
 #include <sys/time.h>
 
-
-/* gettimeofday is not declared anywhere! 
+/* gettimeofday is not declared anywhere! (on sunos at least)
  */
-extern int gettimeofday(struct timeval *, struct timezone *);
-
+/* extern int gettimeofday(struct timeval *, struct timezone *); */
 
 /* static stack of timings...
  */
@@ -145,9 +141,8 @@ extern int gettimeofday(struct timeval *, struct timezone *);
 static struct timeval initial[TIMER_STACK_SIZE];
 static int timer_index=0;
 
-
 void
-FUNCTION(hpfctimeon) ARGS(`')
+FUNCTION(hpfctimeon) ARGS(`') /* `' */
 {
     assert(timer_index<TIMER_STACK_SIZE);
 
@@ -159,7 +154,6 @@ FUNCTION(hpfctimeon) ARGS(`')
     /* I could diplay some message, maybe with the level.
      */
 }
-
 
 /* to print the micros with leading and trailing 0s if needed.
  * ??? static buffer... I could not find any way to do that with formats.
@@ -178,11 +172,10 @@ print_micros(long micros)
     return buffer;
 }
 
-
 #define MAX_COMMENT_LENGTH 63
 
 void 
-FUNCTION(hpfctimeoff) ARGS(`STRING_ARG(comment)')
+FUNCTION(hpfctimeoff) ARGS(`STRING_ARG(comment)') /* `' */
 STRING_ARG_DECL(comment);
 {
     char buffer[ MAX_COMMENT_LENGTH + 1 ];
