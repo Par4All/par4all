@@ -1,6 +1,10 @@
 /*
  * Message Utilities
  * 
+ * $RCSfile: message-utils.c,v $ ($Date: 1994/12/22 16:52:19 $, )
+ * version $Revision$
+ * got on %D%, %T%
+ *
  * Fabien Coelho, August 1993
  */
 
@@ -39,7 +43,7 @@ Pvecteur v0;
 	v3 = vect_del_var(v2, TEMPLATEV),
 	v4 = vect_del_var(v3, TSHIFTV);
 
-    pips_assert("the_index_of_vect", (vect_size(v4)==1));
+    assert(vect_size(v4)==1);
 
     vect_rm(v1);
     vect_rm(v2);
@@ -64,7 +68,7 @@ range r;
 	 list
 	     lr = CONSP(CAR(cc));
 
-	 pips_assert("add_to_list_of_ranges_list", (!ENDP(lr)));
+	 assert(!ENDP(lr));
 
 	 lr = gen_nconc(lr, CONS(RANGE, r, NIL));
      },
@@ -100,15 +104,13 @@ list l;
 	  },
 	      lr);
 
-	 pips_assert("dup_list_of_ranges_list",
-		     gen_length(lrp)==gen_length(lr));
+	 assert(gen_length(lrp)==gen_length(lr));
 
 	 result = gen_nconc(result, CONS(CONSP, lrp, NIL));
      },
 	 l);
 
-    pips_assert("dup_list_of_ranges_list", 
-		gen_length(l)==gen_length(result));
+    assert(gen_length(l)==gen_length(result));
 
     return(result);
 }
@@ -195,7 +197,7 @@ range r;
 	dlo = HpfcExpressionToInt(dimension_lower(d)),
 	dup = HpfcExpressionToInt(dimension_upper(d));
 
-    pips_assert("complementary_range", (rin==1));
+    assert(rin==1);
 
     if (dup==rup)
 	return(make_range(int_to_expression(dlo),
@@ -229,8 +231,7 @@ list lcontent, lneighbour, ldomain;
     int
 	len = gen_length(lcontent);
 
-    pips_assert("generate_message_from_3_lists",
-		((len==gen_length(lneighbour)) && (len==gen_length(ldomain))));
+    assert(len==gen_length(lneighbour) && len==gen_length(ldomain));
 
     for ( ; lc!=NIL ; lc=CDR(lc), ln=CDR(ln), ld=CDR(ld))
     {
@@ -346,8 +347,7 @@ Pvecteur v;
     int
 	i = 1;
 
-    pips_assert("compute_receive_content",
-		(NumberOfDimension(array)==gen_length(lr)));
+    assert(NumberOfDimension(array)==gen_length(lr));
 
     for ( ; l!=NIL ; i++, l=CDR(l))
     {
@@ -490,7 +490,7 @@ list lr1, lr2;
 	l1 = lr1,
 	l2 = lr2;
 
-    pips_assert("lrange_larger_p", gen_length(lr1) == gen_length(lr2));
+    assert(gen_length(lr1) == gen_length(lr2));
     
     for ( ; l1!=NIL ; l1=CDR(l1), l2=CDR(l2))
     {
