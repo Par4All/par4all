@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.8  1999/05/26 14:25:42  coelho
+   emprunt...
+
    Revision 1.7  1999/05/25 13:14:50  zory
    fixes for new atomize_as_required.
 
@@ -1304,6 +1307,99 @@ icm_cse_on_sequence(string module_name,
   close_is_nested();
 } 
 
+/*
+        *******
+        *          **    *****      *    ******  *    *
+        *         *  *   *    *     *    *       **   *
+        *****    *    *  *****      *    *****   * *  *
+        *        ******  *    *     *    *       *  * *
+        *        *    *  *    *     *    *       *   **
+        *        *    *  *****      *    ******  *    *
+ 
+ */
 
+/*********************************************************** ICM ASSOCIATION */
 
+/* assumes:
+   - cumulated effects (as a dependence abstraction).
+   - proper effects (?)
+ */
 
+/* current nesting of code, bottom-up order, to determine level.
+ */
+static list nesting = NIL;
+
+/* statement stack to current statement.
+ */
+DEFINE_LOCAL_STACK(current_statement, statement)
+
+GENERIC_LOCAL_FUNCTION(pexpr, persistant_expression_to_effects)
+
+GENERIC_LOCAL_FUNCTION(inserted, persistant_statement_to_statement)
+
+/* current instruction, available top-down.
+ */
+static instruction current_instruction = NULL;
+
+static bool ins_flt(instruction i)
+{
+  current_instruction = i;
+  return TRUE;
+}
+
+statit bool stmt_flt(statement s)
+{
+  current_statement_filter(s);
+  
+}
+
+/* keep track of nesting.
+ */
+static bool loop_flt(loop l)
+{
+  statement sofl = get_current_statement_head();
+  nesting = CONS(STATEMENT, soft, nesting);
+  return TRUE;
+}
+
+static void loop_rwt(loop l)
+{
+  statement sofl = get_current_statement_head();
+  list old = nesting;
+  pips_assert("same ", nesting && (sofl == LOOP(CAR(nesting)));
+  nesting = CDR(nesting);
+  CDR(old) = NIL;
+  gen_free_list(old);
+}
+
+/* perform ICM and association on operators.
+   this is kind of an atomization.
+ */
+void 
+perform_icm_association(
+    string name, /* of the module */
+    statement s  /* of the module */)
+{
+  pips_assert("clean static structures on entry",
+	      (get_current_statement_stack() == stack_undefined) &&
+	      level_of_undefined_p() &&
+	      (current_instruction == NULL) &&
+	      (nesting==NIL));
+  
+  init_level_of();
+  make_current_statement_stack();
+  
+  gen_multi_recurse(s,
+      statement_domain, current_statement_filter, current_statement_rewrite,
+      instruction_domain, ins_flt, gen_null,
+      loop_domain, loop_flt, loop_rwt,
+		    NULL);
+
+  pips_assert("clean static structure on exit",
+	      (nesting==NIL) &&
+	      (current_statement_size()==0));
+
+  current_instruction = NULL;
+  free_current_statement_stack();
+  close_level_of();
+}
