@@ -689,7 +689,9 @@ Psysteme sc1,sc2;
 	A = Rays2Polyhedron(a, 20000);
 /*	Polyhedron_Print(stderr, "%4d",A);
 */
-	a= Polyhedron2Constraints(A);    
+
+	Matrix_Free(a);
+	a = Polyhedron2Constraints(A);    
 	Polyhedron_Free(A);
     }
 
