@@ -1,0 +1,19 @@
+# $RCSfile: install.INSTALL,v $ (version $Revision$)
+# $Date: 1996/09/03 13:12:53 $, 
+
+INSTALLATION INSTRUCTIONS:
+--------------------------
+
+Run the install_pips script in this directory.
+
+This script first generates "pipsrc.{sh,csh}" files that
+contain reasonnable environment variable settings for
+using PIPS. You can source, and eventually edit this file.
+
+The script also checks for useful softwares that may be needed
+for using or compiling PIPS. Additional information on how to
+obtain these sofwares can be found on 
+
+    http://www.cri.ensmp.fr/pips
+
+
