@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1996/07/23 15:08:35 $, ) 
+ * ($Date: 1996/09/14 17:53:13 $, ) 
  */
 
 #include "defines-local.h"
@@ -415,9 +415,15 @@ hpfc_lazy_buffer_packing(
     array = is_send ? src : trg;
     packing = hpfc_buffer_packing(array, array_dim, is_send);
     condition = buffer_full_condition(array, is_send, TRUE);
+
+    /* CALL HPFC PACK/UNPACK
+     */
     realpack = call_to_statement
 	(make_call(hpfc_buffer_entity(array, is_send ? BUFPCK : BUFUPK), 
 	   is_send ? NIL : CONS(EXPRESSION, entity_to_expression(lid), NIL)));
+
+    /* BUF INDEX=0
+     */
     indexeq0 = set_integer(hpfc_name_to_entity(BUFFER_INDEX), 0);
     optional = is_lazy ? 
 	is_send ? hpfc_broadcast_buffers(array, trg, lid, proc) :
@@ -427,7 +433,10 @@ hpfc_lazy_buffer_packing(
     if (is_send)
 	l = CONS(STATEMENT, realpack,
 	    CONS(STATEMENT, optional,
-	    CONS(STATEMENT, indexeq0, NIL)));
+	    CONS(STATEMENT, indexeq0,
+		 is_lazy? 
+		 CONS(STATEMENT, set_logical(hpfc_name_to_entity(SND_NOT_INIT),
+					     TRUE), NIL): NIL)));
     else
 	l = CONS(STATEMENT, optional,
 	    CONS(STATEMENT, realpack,
