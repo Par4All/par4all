@@ -8,7 +8,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1996/07/23 15:08:21 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1996/09/21 15:35:01 $, )
  * version $Revision$
  */
 
@@ -16,7 +16,7 @@
 #include "access_description.h"
 #include "regions.h"
 
-GENERIC_STATIC_OBJECT(/**/, hpfc_current_statement, statement)
+GENERIC_STATIC_OBJECT(auto, hpfc_current_statement, statement)
 
 #define REGION_TYPE EFFECT_TYPE
 
