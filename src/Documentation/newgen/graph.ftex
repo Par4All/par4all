@@ -1,0 +1,68 @@
+\documentstyle{article}
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\title{PIPS: Graphe Oriente' Ge'ne'rique}
+\author{Franc,ois Irigoin \\
+	Pierre Jouvelot \\
+	Re'mi Triolet\\
+\\
+	CRI, Ecole des Mines de Paris}
+
+% \newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{\em #2}}
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{#2}}
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section*{Introduction}
+
+La structure de donne'es suivante imple'mente un graphe oriente'. Cette
+structure est ge'ne'rique, mais elle peut e^tre adapte'e aux besoins de
+chacun gra^ce aux deux domaines externes {\tt vertex\_label} et {\tt
+arc\_label} qui sont attache's respectivement aux n{\oe}uds et aux arcs du
+graphe.
+
+Cette structure est utilise'e pour le graphe des de'pendances et aurait
+du^ l'e^tre pour le graphe de contro^le d'un module.
+
+\section*{De'corations du graphe}
+
+\domain{External vertex\_label}
+{
+Le domaine {\tt vertex\_label} porte l'information attache'e aux sommets
+du graphe.
+}
+
+\domain{External arc\_label}
+{
+Le domaine {\tt arc\_label} porte l'information attache'e aux n{\oe}udes
+du graphe.
+}
+
+\section*{Structure du graphe}
+
+\domain{Graph = vertices:vertex*}
+{Un graphe se compose tout simplement de l'ensemble de tous ses n{\oe}uds,
+chacun d'eux e'tant repre'sente's par le domaine {\tt vertex}. Les arcs
+du graphe
+sont directement attache's aux n{\oe}uds}
+
+\domain{Vertex = vertex\_label x successors:successor*}
+{Chaque n{\oe}ud d'un graphe est repre'sente' par un {\tt vertex}. Le
+sous-domaine {\tt successors} donne la liste des successeurs du n{\oe}ud. Le
+sous-domaine {\tt vertex\_label} doit e^tre utilise' pour les informations
+attache'es a` chaque n{\oe}ud et dont la nature de'pend de l'application
+utilisant le graphe; voir par exemple le domaine {\tt dg\_vertex\_label}
+dans le fichier {\tt dg.f.tex}.}
+
+\domain{Successor = arc\_label x vertex}
+{Chaque arc d'un graphe est repre'sente' par un {\tt successor}. Le
+sous-domaine {\tt vertex} contient le n{\oe}ud vers lequel l'arc pointe. Le
+sous-domaine {\tt arc\_label} doit e^tre utilise' pour contenir les
+informations attache'es a` chaque arc{,} et dont la nature de'pend de
+l'application utilisant le graphe; voir par exemple le domaine {\tt
+dg\_arc\_label} dans le fichier {\tt dg.f.tex}.}
+
+\end{document}
+\end
