@@ -462,6 +462,29 @@ static string process_thru_cpp(string name)
 
 /*************************************************** managing a user file */
 
+/* Fortran compiler triggerred from the environment (PIPS_CHECK_FORTRAN) 
+ * or a property (CHECK_FORTRAN_SYNTAX_BEFORE_PIPS)
+ */
+static int
+pips_check_fortran(void)
+{
+    string v = getenv("PIPS_CHECK_FORTRAN");
+
+    if (v && (same_string_p(v, "on")   || same_string_p(v, "ON")   ||
+	      same_string_p(v, "yes")  || same_string_p(v, "YES")  || 
+	      same_string_p(v, "y")    || same_string_p(v, "Y")    || 
+	      same_string_p(v, "oui")  || same_string_p(v, "OUI")  || 
+	      same_string_p(v, "o")    || same_string_p(v, "O")    || 
+	      same_string_p(v, "TRUE") || same_string_p(v, "true") ||
+	      same_string_p(v, "T")    || same_string_p(v, "t")    ||
+	      same_string_p(v, "vrai") || same_string_p(v, "VRAI") ||
+	      same_string_p(v, "V")    || same_string_p(v, "v")    ||
+	      same_string_p(v, "1")))
+	return TRUE;
+
+    return get_bool_property("CHECK_FORTRAN_SYNTAX_BEFORE_PIPS");
+}
+
 #define suffix ".pips.o"
 
 static void 
@@ -507,9 +530,9 @@ bool process_user_file(
 	return FALSE;
     }
 
-    /* Fortran compiler
+    /* Fortran compiler.
      */
-    if (get_bool_property("CHECK_FORTRAN_SYNTAX_BEFORE_PIPS"))
+    if (pips_check_fortran()) 
 	check_fortran_syntax_before_pips(file);
 
     /* CPP
