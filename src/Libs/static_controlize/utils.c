@@ -89,10 +89,15 @@ statement 		in_s, in_s2;
  * Input  : A statement in_st and a begin count number in_ct.
  * Output : Renumber statement_number in an textual order and return
  *		the last number attributed.
+
+ * I've removed many renumbering since it is done by a deeper call to
+ * stco_renumber_code() and renumbering sequences kill an assert in
+ * the prettyprinter...
+
  */
-int stco_renumber_code( in_st, in_ct )
-statement in_st;
-int	  in_ct;
+int
+stco_renumber_code(statement in_st,
+		   int in_ct)
 {
 	int		count;
 	instruction	inst;
@@ -101,11 +106,17 @@ int	  in_ct;
 	count = in_ct;
 	inst = statement_instruction( in_st );
 
+	/* Renumber all the statement but the sequence: */
+	if (instruction_tag(inst) != is_instruction_block)
+	    statement_number(in_st) = count++;    
+	    
 	switch(instruction_tag(inst)) {
   		case is_instruction_block : {
 			MAPL( stmt_ptr, {
         			statement st = STATEMENT(CAR( stmt_ptr ));
-				statement_number( st ) = count++;
+				/*
+				   statement_number( st ) = count++;
+				   */
         			count = stco_renumber_code( st, count );
         		}, instruction_block( inst ) );
 			break;
@@ -116,8 +127,10 @@ int	  in_ct;
 
 			tt = test_true( t );
 			tf = test_false( t );
-			statement_number( tt ) = count++;
-			statement_number( tf ) = count++;
+			/*
+			   statement_number( tt ) = count++;
+			   statement_number( tf ) = count++;
+			   */
 			count = stco_renumber_code( tt, count );
 			count = stco_renumber_code( tf, count );
 			break;
@@ -133,7 +146,9 @@ int	  in_ct;
     		}
   		case is_instruction_goto : {
 			statement gs = instruction_goto( inst );
-			statement_number( gs ) = count++;
+			/*
+			   statement_number( gs ) = count++;
+			   */
 			count = stco_renumber_code( gs, count );
     			break;
     		}
@@ -146,7 +161,9 @@ int	  in_ct;
         		MAPL( ctl_ptr,  {
                 		statement stmt = control_statement(
 						     CONTROL(CAR( ctl_ptr )));
-				statement_number( stmt ) = count++;
+				/*
+				   statement_number( stmt ) = count++;
+				   */
                 		count = stco_renumber_code( stmt, count );
                 	}, blocs);
         		gen_free_list(blocs);
