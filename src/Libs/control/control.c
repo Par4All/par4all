@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/23 22:26:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/18 15:20:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/04/23 22:26:06 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/07/18 15:20:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -269,9 +269,8 @@ hash_table used_labels;
     bool controlized=FALSE;
 
     ifdebug(5) {
-	pips_debug(1, "(st = %#x, pred = %#x, succ = %#x, c_res = %#x)\nst at entry:\n",
-		   (unsigned int) st, (unsigned int) pred,
-		   (unsigned int) succ, (unsigned int) c_res);
+	pips_debug(1, "(st = %#p, pred = %#p, succ = %#p, c_res = %#p)\nst at entry:\n",
+		   st, pred, succ, c_res);
 	print_statement(st);
 	pips_debug(1, "Successors of c_res:\n");
 	display_linked_control_nodes(c_res);
@@ -365,9 +364,8 @@ hash_table used_labels;
 
     stop = FALSE ;
 
-    pips_debug(5, "(st = %#x, pred = %#x, succ = %#x, c_res = %#x)\n",
-	       (unsigned int) st, (unsigned int) pred,
-	       (unsigned int) succ, (unsigned int) c_res);
+    pips_debug(5, "(st = %#p, pred = %#p, succ = %#p, c_res = %#p)\n",
+	       st, pred, succ, c_res);
         
     UPDATE_CONTROL(c_res, st,
 		    ADD_PRED(pred, c_res), 
@@ -474,9 +472,8 @@ hash_table used_labels;
     control c_test = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
     bool controlized;
 
-    pips_debug(5, "(st = %#x, pred = %#x, succ = %#x, c_res = %#x)\n",
-	       (unsigned int) st, (unsigned int) pred,
-	       (unsigned int) succ, (unsigned int) c_res);
+    pips_debug(5, "(st = %#p, pred = %#p, succ = %#p, c_res = %#p)\n",
+	       st, pred, succ, c_res);
     
     controlize(loop_body(l), c_test, c_inc, c_body, loop_used_labels);
 
@@ -674,8 +671,7 @@ hash_table used_labels;
 	bool unreachable;
 
 	ifdebug(5) {
-	    pips_debug(0, "Nodes linked with pred %#x:\n",
-		       (unsigned int) pred);
+	    pips_debug(0, "Nodes linked with pred %#p:\n", pred);
 	     display_linked_control_nodes(pred);
 	}
 
@@ -714,14 +710,13 @@ hash_table used_labels;
 	check_control_coherency(pred);
 	check_control_coherency(succ);
 	check_control_coherency(c_res);
-	pips_debug(5, "(pred = %#x, succ = %#x, c_res = %#x)\n",
-		   (unsigned int) pred,
-		   (unsigned int) succ, (unsigned int) c_res);
-	pips_debug(5, "Nodes from pred %#x\n", (unsigned int) pred);
+	pips_debug(5, "(pred = %#p, succ = %#p, c_res = %#p)\n",
+		   pred, succ, c_res);
+	pips_debug(5, "Nodes from pred %#p\n", pred);
 	display_linked_control_nodes(pred);
-	pips_debug(5, "Nodes from succ %#x\n", (unsigned int) succ);
+	pips_debug(5, "Nodes from succ %#p\n", succ);
 	display_linked_control_nodes(succ);
-	pips_debug(5, "Nodes from c_res %#x\n", (unsigned int) c_res);
+	pips_debug(5, "Nodes from c_res %#p\n", c_res);
 	display_linked_control_nodes(c_res);
     }
     
@@ -751,9 +746,8 @@ hash_table used_labels;
     list ctls;
     bool controlized;
 
-    pips_debug(5, "(st = %#x, pred = %#x, succ = %#x, c_res = %#x)\n",
-	       (unsigned int) st, (unsigned int) pred,
-	       (unsigned int) succ, (unsigned int) c_res);
+    pips_debug(5, "(st = %#p, pred = %#p, succ = %#p, c_res = %#p)\n",
+	       st, pred, succ, c_res);
     ifdebug(1) {
 	check_control_coherency(pred);
 	check_control_coherency(succ);
@@ -764,9 +758,9 @@ hash_table used_labels;
     c_last = compact_list(ctls, c_end);
 
     ifdebug(5) {
-	pips_debug(0, "Nodes from c_block %#x\n", (unsigned int) c_block);
+	pips_debug(0, "Nodes from c_block %#p\n", c_block);
 	display_linked_control_nodes(c_block);
-	pips_debug(0, "Nodes from c_last %#x\n", (unsigned int) c_last);
+	pips_debug(0, "Nodes from c_last %#p\n", c_last);
 	display_linked_control_nodes(c_last);
     }
     
@@ -862,9 +856,8 @@ hash_table used_labels;
     statement s_f = test_false(t);
     bool controlized;
 
-    pips_debug(5, "(st = %#x, pred = %#x, succ = %#x, c_res = %#x)\n",
-	       (unsigned int) st, (unsigned int) pred,
-	       (unsigned int) succ, (unsigned int) c_res);
+    pips_debug(5, "(st = %#p, pred = %#p, succ = %#p, c_res = %#p)\n",
+	       st, pred, succ, c_res);
     
     ifdebug(5) {
 	pips_debug(1, "THEN at entry:\n");
@@ -1112,7 +1105,7 @@ statement st;
 	ifdebug(2) {
 	    pips_debug(0, "Unreachable statements:\n");
 	    MAP(STATEMENT, s, {
-		pips_debug(0, "Statement %#x:\n", (unsigned int) s);
+		pips_debug(0, "Statement %#p:\n", s);
 		print_statement(s);
 	    }, Unreachable);
 	}
@@ -1123,10 +1116,8 @@ statement st;
     u = simplified_unstructured(top, bottom, result);
 
     if( get_debug_level() > 5) {
-	pips_debug(1, "Nodes in unstructured %x (entry %x, exit %x) from entry:\n",
-		   (unsigned int) u,
-		   (unsigned int) unstructured_control(u),
-		   (unsigned int) unstructured_exit(u));
+	pips_debug(1, "Nodes in unstructured %#p (entry %#p, exit %#p) from entry:\n",
+		   u, unstructured_control(u), unstructured_exit(u));
 	display_linked_control_nodes(unstructured_control(u));
 	pips_debug(1, "Accessible nodes from exit:\n");
 	display_linked_control_nodes(unstructured_exit(u));
