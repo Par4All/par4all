@@ -3,7 +3,7 @@
  *
  * DECLARATIONS compilation
  *
- * $RCSfile: declarations.c,v $ ($Date: 1995/04/10 18:49:50 $, )
+ * $RCSfile: declarations.c,v $ ($Date: 1995/07/20 18:40:52 $, )
  * version $Revision$
  */
  
@@ -210,10 +210,8 @@ entity array;
      * then update the dimensions of the newarray. remember
      * that the dimensions are shared between the old and new arrays.
      */
-    MAPL(cd,
+    MAP(DIMENSION, dim,
      {
-	 dimension dim = DIMENSION(CAR(cd));
-
 	 if (ith_dim_distributed_p(array, ithdim, &p))
 	 {
 	     newsize = ComputeNewSizeOfIthDimension(dim, 
@@ -260,12 +258,8 @@ entity array;
  */
 void NewDeclarationsOfDistributedArrays()
 {
-    entity array;
-
-    MAPL(ce,
+    MAP(ENTITY, array,
      {
-	 array = ENTITY(CAR(ce));
-	 
 	 if (entity_new_declaration_undefined_p(array))
 	     NewDeclarationOfDistributedArray(array);
 	 else
