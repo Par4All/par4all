@@ -91,8 +91,7 @@ new_atomizer_create_a_new_entity(entity module_entity, tag variable_type)
 }
 */
 
-void
-new_atomizer(char * mod_name)
+boolean new_atomizer(char * mod_name)
 {
    statement mod_stat;
    entity module;
@@ -128,4 +127,6 @@ new_atomizer(char * mod_name)
       user_log("\n\n *** ATOMIZER done\n");
 
    debug_off();
+
+   return(TRUE);
 }
