@@ -9,14 +9,14 @@
 Last update: $Date$, .<p>
 
 HPFC is a prototype High Performance Fortran Compiler which is being
-developped within the <a href="/~pips">PIPS</a> project by
+developed within the <a href="/~pips">PIPS</a> project by
 <a href="/~coelho">Fabien COELHO</a>.
 
 <h2>Input language</h2>
 <ul>
   <li> Fortran 77 (PIPS restriction)
   <li> static and dynamic mapping directives
-       (only syntax based on dummy variables) 
+       (but no array syntax) 
   <li> independent and dynamic directives
   <li> assumes a number of processors known at compile time
   <li> distributed arrays cannot be passed as arguments
@@ -26,82 +26,84 @@ developped within the <a href="/~pips">PIPS</a> project by
 <h2>Output language</h2>
 <ul>
   <li> Fortran 77
-  <li> PVM 3.3
   <li> runtime support library
+  <li> PVM 3.3
 </ul>
 
 <h2>Implementation</h2>
 <ul>
   <li> data structures based on NEWGEN
   <li> polyhedron manipulations based on the Linear/C3 library
-  <li> 16,000 lines of C for the compiler
+  <li> 17,000 lines of C for the compiler (HPFC, a PIPS module) 
   <li> 1,000 lines of shell and C for the driver and other utilities
-  <li> 2,000 lines of m4/fortran for the runtime support library
+  <li> 3,000 lines of m4/fortran for the runtime support library
        (expanded to +8,000)
 </ul>
 
-<h2>Optimizations</h2>
+<h2>Standard Optimizations</h2>
 <ul>
   <li> on top of a basic run-time resolution scheme:
-  <li> declarations of distributed arrays on the nodes are reduced
-       (but static)
+  <li> reduced allocation of distributed arrays on nodes.
   <li> overlapping accesses of block distributed stride-1 aligned arrays
        (overlapping declarations, vector messages, iteration set...)
   <li> subarray shifts of block distributed stride-1 aligned arrays
   <li> reductions on block distributed stride-1 aligned arrays
-       (recognized by name)
+       (by name)
+</ul>
+
+<h2>Advanced  Optimizations</h2>
+<ul>
+  <li> linear algebra-based techniques...
   <li> I/O-related communications
        (<a href="doc/A-264.abstract">abstract</a>,
         <a href="doc/A-264.ps.gz">paper</a>)
   <li> remapping-related communications and optimizations
-       (<a href="doc/A-274.abstract">abstract</a>,
-        <a href="doc/A-274.ps.gz">paper</a>)
+       (<a href="doc/A-277.abstract">abstract</a>,
+        <a href="doc/A-277.ps.gz">paper</a>)
 </ul>
 
 <h2>Implementation overview</h2>
 <ul>
   <li> <b>hpfc</b> is the compiler driver shell.
-  <li> HPF directives are transformed into fake Fortran call
-       to reuse the PIPS parser. Done thru a sed script that handles
-       continuations...
-  <li> These calls are filtered out of the parsed code and analysed to set
+  <li> HPF directives are translated into fake Fortran calls
+       to reuse the PIPS parser. 
+  <li> These calls are filtered out of the parsed code and analyzed to set
        internal data structures that describe array mappings and so.
-  <li> New declarations are computed for the distributed arrays,
-       depending on their mapping.
-  <li> The input code is analysed by PIPS, which computes array regions and
-       preconditions. 
+  <li> New declarations are computed for the distributed arrays.
+  <li> The input code is analyzed by PIPS (array regions, preconditions).
   <li> Then 2 codes are generated for each subroutine. One for the host
-       and an SPMD code for the nodes. This is implemented as a double
-       rewriting of the AST of the initial program.
+       and an SPMD code for the nodes. Implemented as a double rewriting of the
+       AST.  
   <li> Initialization codes for the runtime data structures are also generated.
-  <li> Finally the new declarations for the commons are generated
-       (delayed because overlaps are only known after compiling all subroutines)
-  <li> All the generated codes are put in a separate directory together
-       with header files and Makefile.
-  <li> A make in this directory compiles the 2 executables
-       (host and nodes). They are linked to the
-       pvm and hpfc runtime libraries
-  <li> The host code can be launched. It spawns the nodes. 
+  <li> Finally common declarations are dealt with, plus global initializations.
+  <li> The generated codes are compiled and linked to PVM and the HPFC Runtime
+       library. 2 executables are built (host and nodes). The host spawns the
+       nodes. 
 </ul>
 
 <h2>Experiments</h2>
 <ul>
-  <li> The compiler is validated on +70 small or medium size codes
+  <li> The compiler is validated on +100 small or medium size codes
        for non regression testing every night.
   <li> SOR on a network of SUN workstations
        (<a href="doc/A-257.abstract">abstract</a>,
         <a href="doc/A-257.ps.gz">paper</a>)
   <li> wave propagation code from IFP on the SEH/ETCA CM5:
        problems with arithmetic exceptions and PVM (was 3.3.2).
+  <li> matrix transpose on a DEC Alpha farm.
 </ul>
 
 <h2>Future work</h2>
 <ul>
   <li> implementation of a linear algebra based technique
-       (<a href="doc/A-267.abstract">abstract</a>,
-        <a href="doc/A-267.ps.gz">paper</a>)
+       (<a href="doc/A-278.abstract">abstract</a>,
+        <a href="doc/A-278.ps.gz">paper</a>)
   <li> more experiments
 </ul>
+
+<hr>
+<pre>http://www.cri.ensmp.fr/pips/$RCSfile$</pre>
+
 
 </body>
 </html>
