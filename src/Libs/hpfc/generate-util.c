@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/09/19 18:33:31 $, ) 
+ * ($Date: 1995/09/22 13:16:18 $, ) 
  */
 
 #include "defines-local.h"
@@ -542,7 +542,7 @@ hpfc_compute_lid(
 	int ndim = NumberOfDimension(proc);
 	entity cmp_lid = hpfc_name_to_entity(CMP_LID);
 
-	message_assert("not implemented", !array);
+	message_assert("implemented", !array);
 	
 	return make_assign_statement(entity_to_expression(lid),
 	  make_call_expression
