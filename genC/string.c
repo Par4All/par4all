@@ -5,6 +5,9 @@
   $Id$
   
   $Log: string.c,v $
+  Revision 1.16  1998/09/16 14:36:28  coelho
+  added cast.
+
   Revision 1.15  1998/09/16 14:27:24  coelho
   header added.
 
@@ -108,10 +111,10 @@ void init_the_buffer(void)
      */
     if (buffer_size==0)
     {
-	pips_assert("NULL buffer", buffer==NULL);
+	message_assert("NULL buffer", buffer==NULL);
 	buffer_size = BUFFER_SIZE_INCREMENT;
 	buffer = (string) malloc(buffer_size);
-	if (!buffer) pips_exit(1, "memory exhausted\n");
+	message_assert("enough memory", buffer);
     }
     current = 0;
     buffer[0] = '\0';
@@ -127,7 +130,7 @@ string append_to_the_buffer(string s) /* what to append to the buffer */
     {
 	buffer_size = MAX(current+len+1, buffer_size+BUFFER_SIZE_INCREMENT);
 	buffer = realloc(buffer, buffer_size);
-	if (!buffer) pips_exit(1, "memory exhausted\n");
+	message_assert("enough memory", buffer);
     }
 
     (void) memcpy(&buffer[current], s, len);
@@ -177,7 +180,7 @@ string strupper(string s1, string s2)
     char *r = s1;
 
     while (*s2) {
-	*s1 = (islower(*s2)) ? toupper(*s2) : *s2;
+	*s1 = (islower((int)*s2)) ? toupper(*s2) : *s2;
 	s1++;
 	s2++;
     }
@@ -192,7 +195,7 @@ string strlower(string s1, string s2)
     char *r = s1;
 
     while (*s2) {
-	*s1 = (isupper(*s2)) ? tolower(*s2) : *s2;
+	*s1 = (isupper((int)*s2)) ? tolower(*s2) : *s2;
 	s1++;
 	s2++;
     }
