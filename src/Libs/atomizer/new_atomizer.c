@@ -95,6 +95,8 @@ boolean new_atomizer(char * mod_name)
                        new_atomizer_expr_decide,
                        new_atomizer_func_decide,
                        new_atomizer_test_decide,
+		       gen_false, /* range */
+		       gen_false, /* whileloop */
                        /*new_atomizer_create_a_new_entity*/
                        hpfc_new_variable);
 
