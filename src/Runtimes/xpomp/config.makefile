@@ -1,12 +1,15 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/30 22:11:06 $ 
+# $Date: 1996/08/31 13:16:18 $ 
 
+# expected from makefile macros
 ifeq ($(FC),g77)
 CPPFLAGS+=	-DCOMPILE_FOR_G77
 endif
 
+# expected from defines...
 CPPFLAGS+=	$(PIPS_X11_ADDED_CPPFLAGS)
 LDFLAGS+=	$(PIPS_X11_ADDED_LDFLAGS)
+X11LIB+=	$(PIPS_X11_ADDED_LIBS)
 
 LIB=		$(ARCH)/libxpomp.a
 BIN=		$(ARCH)/xpomp
@@ -40,22 +43,23 @@ INSTALL_HTM=	xpomp_manual.html xpomp_manual
 # 
 # compilation and so
 
-all: $(LIB) $(ARCH)/xpomp test_xpomp fractal $(INSTALL_DOC) $(INSTALL_HTM)
+all: run doc
+run: $(LIB) $(BIN) fractal test_xpomp
+doc: $(INSTALL_DOC) $(INSTALL_HTM)
 
-cproto :
-	$(PROTOIZE) xpomp.c
+# cproto:; $(PROTOIZE) xpomp.c
 
 xpomp: $(ARCH)/xpomp.o
-	$(LINK) $@ $+ $(PIPS_X11_ADDED_LIBS)
+	$(LINK) $@ $+ $(X11LIB)
 
 $(LIB):	$(OFILES)
 	$(AR) $(ARFLAGS) $(LIB) $(OFILES)
 	ranlib $(LIB)
 
-$(ARCH)/test_xpomp : $(ARCH)/test_xpomp.o $(LIB)
+$(ARCH)/test_xpomp : $(ARCH)/test_xpomp.o $(LIB) 
 	$(LINK) $@ $+ -lm $(LIB)
 
-$(ARCH)/fractal : $(ARCH)/fractal.o $(LIB)
+$(ARCH)/fractal : $(ARCH)/fractal.o $(LIB) 
 	$(FC) $(FFLAGS) $(LDFLAGS) -o $@ $+ -lm $(LIB)
 
 clean: local-clean
