@@ -918,7 +918,8 @@ int use;
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     module_stat = get_current_module_statement();
-    
+    set_current_module_entity(local_name_to_top_level_entity(module_name));
+   
     debug(1, "chains", "finding enclosing loops ...\n");
     set_enclosing_loops_map( loops_mapping_of_statement(module_stat) );
 
@@ -950,6 +951,7 @@ int use;
     reset_cumulated_effects_map();
     reset_enclosing_loops_map();
     reset_current_module_statement();
+    reset_current_module_entity();
 }
 
 
