@@ -3,7 +3,7 @@
 #
 # SCCS stuff:
 #
-# $RCSfile: Pips,v $ ($Date: 1994/03/21 18:22:55 $) version $Revision$, got on %D%, %T%
+# $RCSfile: Pips,v $ ($Date: 1994/03/28 08:40:24 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 
@@ -36,10 +36,10 @@ foo ()
 
 usage () 
 {
-  echo "Usage: Pips [-w wspace] [-f source_file[,source_file]...]"
-  echo "                        [-s selected_rule[,selected_rule]...]"
-  echo "                        [-m module] [-p performed_rule]"
-  echo "                                    [-b build_resource]"
+  echo "Usage: Pips -q [-w wspace] [-f source_file[,source_file]...]"
+  echo "                          [-s selected_rule[,selected_rule]...]"
+  echo "                          [-m module] [-p performed_rule]"
+  echo "                                      [-b build_resource]"
 }
 
 if [ $# -eq 0 ]
@@ -48,9 +48,12 @@ then
   exit 1
 fi
 
-while getopts w:f:s:m:p:b: opt
+VERBOSE='echo'
+
+while getopts qw:f:s:m:p:b: opt
 do
   case $opt in
+    q)  VERBOSE=':';;
     w)	OPT_PGM=$OPTARG;;
     f)	SOURCE_FILES="$SOURCE_FILES $OPTARG";;
     s)	SELECT_RULES="$SELECT_RULES $OPTARG";;
@@ -297,8 +300,17 @@ which_pips()
   type pips | sed -e 's,^pips is ,,'
 }
 
-echo `which_pips` $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM
-pips $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM || error
+#
+# pips_version is taken from the environment if possible...
+# just to be able to use Validate not in the current directory
+# funny bug for my parallel validation stuff:-)
+#
+
+pips_version=${pips_version:-`which_pips`}
+
+$VERBOSE $pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM
+
+$pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM || error
 
 # Build `modules'
 if [ "$SOURCE_FILES" ]
