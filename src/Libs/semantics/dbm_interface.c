@@ -413,8 +413,11 @@ char *module_name;
     /* if(call_site_count( get_current_module_entity() )<=1) */
     /* Let's assume static initializations (FI, 14 September 1993) */
     if(entity_main_module_p(get_current_module_entity()))
-	pre = /* data_to_precondition( get_current_module_entity() ); */
-	    db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE);
+	if (get_bool_property(SEMANTICS_INTERPROCEDURAL))
+	    pre = (transformer)
+		db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE);
+	else
+	    pre = data_to_precondition(get_current_module_entity());
     else
 	pre = transformer_identity();
 
