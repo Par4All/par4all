@@ -31,18 +31,13 @@ extern int yyinput(void);
 extern void yyerror(char*);
 extern int check_not_keyword(char *); /* in build.c */
 
-/* #define YYMAXDEPTH 100000 */
-
-struct gen_binding Domains[ MAX_DOMAIN ] ;
+struct gen_binding Domains[MAX_DOMAIN];
 int Number_imports ;
 
 /* UPDATE_OP checks whether the just read OPerator is compatible with
    the current one. If not, an ERROR_MSG is signaled. */
 
-void
-update_op( op, error_msg )
-int op ;	
-char *error_msg ;
+void update_op(int op, char * error_msg)
 {
     if( Current_op == UNDEF_OP ) {
 	Current_op = op ;
@@ -142,25 +137,15 @@ Definitions
 	;
 
 Definition
-	: Tabulated Name EQUAL Domain SEMI_COLUMN {
-		struct gen_binding *bp = new_binding( $2, $4 ) ;
-
-		if( $1 ) {
-		    if( Current_index == MAX_TABULATED ) {
-			user( "Too many tabulated domains\n" ) ;
-			}
-		    else bp->index = Current_index++ ;
-		}
-		}
+	: Tabulated Name EQUAL Domain SEMI_COLUMN { 
+            struct gen_binding * bp = new_binding($2, $4); 
+	    if ($1) bp->tabulated = gen_init_tabulated(bp-Domains);
+        }
 	;
 
 Tabulated
-	: TABULATED {
-		$$ = 1 ;
-		}
-	|	{
-		$$ = 0 ;
-		}
+	: TABULATED { $$ = 1; }
+	| { $$ = 0 ; }
 	;
 
 Domain	: Simple Constructed {
