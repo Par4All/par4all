@@ -15,21 +15,16 @@
 */
 
 /* $Id$
- *  These are the functions defined in the Newgen list library. 
+ * These are the functions defined in the Newgen list library. 
  */
 
-#ifndef LIST_INCLUDED
-#define LIST_INCLUDED
-
-/* for size_t, used in malloc.h from malloclib */
-/* #include <sys/stdtypes.h> */
-/* #include "malloc.h" */
+#ifndef newgen_list_included
+#define newgen_list_included
 
 typedef struct cons { 
   gen_chunk car; 
   struct cons *cdr ;
-} cons ;
-typedef cons *list ;
+} cons, * list ;
 
 #define NIL ((cons *)NULL)
 #define POP(l) ((l)=(l)->cdr)
@@ -38,30 +33,11 @@ typedef cons *list ;
 #define list_undefined ((cons *)-3)
 #define list_undefined_p(c) ((c)==list_undefined)
 
-#define MAX_NESTED_CONS 10
-
-extern list Gen_cp_[] ;
-extern list *gen_cp_ ;
-
 #define CAR(pcons) ((pcons)->car)
 #define CDR(pcons) ((pcons)->cdr)
 #define REFCAR(pc) (&(CAR(pc).p))
 
-#define IN_STACK(i,s,e,res) \
-(((i++)>=(s))? \
- (fprintf(stderr,"Newgen: Too deeply nested IN_STACK\n"),exit(-1),(res)): \
- (e))
-
-#define IN_HEAP(i,s,e,res) ((i)=(s *)alloc( sizeof(s)), (e))
- 	    
-#define CONS(type,x,l) \
-IN_STACK(gen_cp_, &Gen_cp_[MAX_NESTED_CONS], \
-	 IN_HEAP(*(gen_cp_-1), struct cons, \
-		 (type((*(gen_cp_-1))->car)=(x),\
-		  (*(gen_cp_-1))->cdr=(l),\
-		  (*--gen_cp_)), \
-		 *gen_cp_), \
-	 *gen_cp_)
+#define CONS(type,x,l) gen_cons(x, l)
 
 #define MAPL(_map_list_cp,_code,_l) \
 	{cons* _map_list_cp = (_l) ; \
@@ -120,7 +96,8 @@ extern bool gen_once_p GEN_PROTO((list));
 extern void gen_sort_list GEN_PROTO((list, int (*)())) ;
 extern void gen_closure GEN_PROTO((list (*)(), list));
 extern list gen_make_list GEN_PROTO((int, ...));
-extern list gen_copy_string_list(list);
-extern void gen_free_string_list(list);
+extern list gen_copy_string_list GEN_PROTO((list));
+extern void gen_free_string_list GEN_PROTO((list));
+extern list gen_cons GEN_PROTO((void *, list));
 
-#endif
+#endif /* newgen_list_included */
