@@ -1,5 +1,5 @@
 /* $RCSfile: prettyprint.c,v $ (version $Revision$)
- * $Date: 1997/07/21 12:39:34 $, 
+ * $Date: 1997/12/10 14:25:25 $, 
  *
  * (pretty)print of reductions.
  *
@@ -186,10 +186,7 @@ print_any_reductions(
 	MERGE_TEXTS(p, t); t=p;
     }
 
-    (void) make_text_resource(module_name, DBR_PRINTED_FILE, file_suffix, t);
-
-    /* make_text_resource calls print_text which calls free_text on t!
-     */
+    make_text_resource_and_free(module_name, DBR_PRINTED_FILE, file_suffix, t);
 
     reset_current_module_entity();
     reset_current_module_statement();
