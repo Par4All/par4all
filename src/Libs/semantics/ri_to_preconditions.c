@@ -625,10 +625,12 @@ transformer tf;
 	      entity_name(e));
 	if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
 	    list args = call_arguments(c);
+	    /*
 	    transformer pre_callee = transformer_dup(pre);
 	    pre_callee = 
 		add_formal_to_actual_bindings(c, pre_callee);
 	    add_module_call_site_precondition(e, pre_callee);
+	    */
 	    expressions_to_summary_precondition(pre, args);
 	}
 	post = transformer_apply(tf, pre);
