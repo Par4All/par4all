@@ -169,13 +169,6 @@ pour que l'elimination des redondances en nombres ENTIERS s'effectue en
 un temps raisonnable */
 #define NB_INEQ_MAX2  50
 
-/*  Nombre de contraintes au dela duquel l'algorithme du simplexe
-    est preferable a l'algorithme de Fourier-Motzkin:
-    (However, the average optimal is lower, or another decision
-    procedure should be investigated)
-*/
-#define NB_CONSTRAINTS_MAX_FOR_FM 20
-
 /* ensemble de macros permettant de compiler les programmes utilisant
 les anciens noms des fonctions */
 
