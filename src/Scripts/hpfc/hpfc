@@ -3,6 +3,9 @@
 # $Id$
 # 
 # $Log: hpfc,v $
+# Revision 1.27  1997/05/03 15:36:53  coelho
+# *** empty log message ***
+#
 # Revision 1.26  1997/05/03 15:32:46  coelho
 # more help.
 #
@@ -43,7 +46,8 @@ usage()
 	    -D macro: additionnal cpp macros
 	    -E var=val: additional environment variables
 	
-	  typical example: hpfc -D NPES=4 -D SIZE=1000 -o adi adi2d.F
+	  typical example: "hpfc -D NPES=4 -D SIZE=1000 -o adi adi2d.F"
+	  to generate an "adi.hpfc" directory with everything in it...
 	
 	  also some function among (3 significant characters):
 	  COMPILATION:
