@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: special_cases.c,v $
+ * Revision 1.29  1998/04/14 20:43:28  coelho
+ * generic void *.
+ *
  * Revision 1.28  1998/04/02 20:37:47  irigoin
  * Call to NumberOfElements() replaced by call to element_number()
  *
@@ -574,7 +577,7 @@ static bool call_filter(call c)
     return FALSE;
 }
 
-static bool cannot_be_a_shift(gen_chunk* x)
+static bool cannot_be_a_shift(void * x)
 {
     return subarray_shift_ok = FALSE;
 }
@@ -754,7 +757,7 @@ static statement simple_found;
 static bool ok;
 DEFINE_LOCAL_STACK(current_stmt, statement)
 
-static bool not_simple(gen_chunk * x)
+static bool not_simple(void * x)
 {
     ok = FALSE;
     gen_recurse_stop(NULL);
