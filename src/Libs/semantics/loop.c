@@ -3,6 +3,9 @@
   * $Id$
   *
   * $Log: loop.c,v $
+  * Revision 1.4  2001/12/05 17:16:24  irigoin
+  * Reformatting + additions to compute total preconditions
+  *
   * Revision 1.3  2001/10/22 15:44:38  irigoin
   * Code reformatting. Exploits expression transformers.
   *
@@ -1145,7 +1148,7 @@ transformer loop_to_postcondition(
   debug(8,"loop_to_postcondition","begin\n");
 
   if(pips_flag_p(SEMANTICS_FIX_POINT) && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
-    pips_error("loop_to_postcondition","Halbwachs not implemented\n");
+    pips_internal_error("Halbwachs not implemented\n");
   }
   else {
     /* pips_error("loop_to_postcondition",
@@ -1310,6 +1313,123 @@ transformer loop_to_postcondition(
   return post;
 }
 
+transformer loop_to_total_precondition(
+    transformer t_post,
+    loop l,
+    transformer tf,
+    transformer context)
+{
+  transformer t_pre = transformer_undefined;
+  statement b = loop_body(l);
+  range r = loop_range(l);
+
+  pips_debug(8,"begin\n");
+
+  if(get_bool_property("SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS")) {
+    transformer new_tf = transformer_undefined;
+    transformer preb  = transformer_dup(context);
+
+    preb = transformer_combine(preb, tf);
+
+    /* Triolet's good loop algorithm */
+    preb = add_good_loop_conditions(preb, l);
+
+    new_tf = recompute_loop_transformer(l, preb);
+
+    free_transformer(preb);
+    /* preb = transformer_dup(pre); */
+    preb = transformer_combine(preb, new_tf);
+    preb = add_good_loop_conditions(preb, l);
+  }
+
+  if(empty_range_wrt_precondition_p(r, context)) { /* The loop is never executed */
+    transformer tf_init = loop_initialization_to_transformer(l, context);
+    transformer tf_empty = transformer_empty();
+    transformer b_t_pre = transformer_undefined;
+
+    pips_debug(8, "The loop is never executed\n");
+
+    b_t_pre = statement_to_total_precondition(tf_empty, b);
+    pips_assert("The body total precondition is consistent",
+		transformer_consistency_p(b_t_pre));
+
+    /* impact of loop index initialization, i.e. I = IT(J),.. or I = K/L,.. */
+    t_pre = transformer_inverse_apply(tf_init, t_post);
+    t_pre = transformer_to_domain(t_pre);
+
+    free_transformer(tf_empty);
+    free_transformer(tf_init);
+  }
+  else /* the loop may be entered for sure, or entered or not */ {
+
+    transformer t_pre_ne = transformer_undefined;
+    transformer t_pre_al = transformer_undefined;
+    /* We need a fix_point without the initial condition but with the exit
+       condition */
+    transformer btf = transformer_dup(load_statement_transformer(b));
+    transformer ltf = transformer_undefined;
+    transformer b_t_post = transformer_undefined;
+    transformer b_t_pre = transformer_undefined;
+    transformer tf_init = loop_initialization_to_transformer(l, context);
+
+    btf = transformer_add_loop_index_incrementation(btf, l, context);
+    ltf =  (* transformer_fix_point_operator)(btf);
+    ltf = add_loop_index_exit_value(ltf, l, context); /* Also performs
+                                                         last
+                                                         incrementation */
+    b_t_post = transformer_inverse_apply(ltf, t_post);
+    b_t_post = transformer_to_domain(b_t_post);
+    b_t_pre = statement_to_total_precondition(b_t_post, b);
+    pips_assert("The body total precondition is consistent",
+		transformer_consistency_p(b_t_pre));
+    t_pre_al = transformer_inverse_apply(tf_init, b_t_pre);
+    t_pre_al = transformer_to_domain(t_pre_al);
+
+    /* free_transformer(b_t_pre); it is associated to the loop body!*/
+    free_transformer(b_t_post);
+    free_transformer(btf);
+    free_transformer(ltf);
+
+    if(non_empty_range_wrt_precondition_p(r, context)) {
+      /* The loop is always entered */ 
+      t_pre = t_pre_al;
+
+      pips_debug(8, "The loop certainly is executed\n");
+    }
+    else /* The loop may be skipped or entered */ {
+
+      pips_debug(8, "The loop may be executed or not\n");
+      
+      /* skipped case computed here too */
+      t_pre_ne = transformer_inverse_apply(tf_init, t_post);
+      t_pre_ne = transformer_to_domain(t_pre_ne);
+      t_pre_ne = add_loop_skip_condition(t_pre_ne, l, context);
+
+
+      ifdebug(8) {
+	(void) fprintf(stderr,"%s: %s\n","[loop_to_postcondition]",
+		       "Never executed: t_pre_ne =");
+	(void) print_transformer(t_pre_ne);
+	(void) fprintf(stderr,"%s: %s\n","[loop_to_postcondition]",
+		       "Always executed: post_al =");
+	(void) print_transformer(t_pre_al);
+      }
+      
+      t_pre = transformer_convex_hull(t_pre_ne, t_pre_al);
+      transformer_free(t_pre_ne);
+      transformer_free(t_pre_al);
+    }
+    free_transformer(tf_init);
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "resultat t_pre =%p", t_pre);
+    (void) print_transformer(t_pre);
+    pips_debug(8,"end\n");
+  }
+  return t_pre;
+}
+
 transformer whileloop_to_postcondition(
     transformer pre,
     whileloop l,
@@ -1322,7 +1442,7 @@ transformer whileloop_to_postcondition(
   debug(8,"whileloop_to_postcondition","begin\n");
 
   if(pips_flag_p(SEMANTICS_FIX_POINT) && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
-    pips_error("whileloop_to_postcondition","Halbwachs not implemented\n");
+    pips_internal_error("Halbwachs not implemented\n");
   }
   else {
     transformer preb = transformer_dup(pre);
@@ -1396,4 +1516,95 @@ transformer whileloop_to_postcondition(
   }
   debug(8,"whileloop_to_postcondition","end\n");
   return post;
+}
+
+transformer whileloop_to_total_precondition(
+    transformer t_post,
+    whileloop l,
+    transformer tf,
+    transformer context)
+{
+  transformer t_pre = transformer_undefined;
+  statement s = whileloop_body(l);
+  expression c = whileloop_condition(l);
+
+  pips_assert("not implemented yet", FALSE);
+
+  pips_debug(8,"begin\n");
+
+  if(pips_flag_p(SEMANTICS_FIX_POINT) && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
+    pips_internal_error("Halbwachs not implemented\n");
+  }
+  else {
+    transformer preb /*= transformer_dup(pre)*/ ;
+
+    /* Apply the loop fix point transformer T* to obtain the set of stores
+     * for any number of iteration, including 0.
+     */
+    preb = transformer_combine(preb, tf);
+
+    if(false_condition_wrt_precondition_p(c, context)) {
+      debug(8, "whileloop_to_postcondition", "The loop is never executed\n");
+
+      /* propagate an impossible precondition in the loop body */
+      (void) statement_to_postcondition(transformer_empty(), s);
+      /* The loop body precondition is not useful any longer */
+      free_transformer(preb);
+      /* do not add the exit condition since it is redundant with pre */
+      /* post = transformer_dup(pre); */
+    }
+    else if(true_condition_wrt_precondition_p(c, context)) {
+      /* At least one iteration is executed. The transformer of
+       * the loop body is useful.
+       */
+      transformer tb = load_statement_transformer(s);
+      transformer ntl = transformer_undefined;
+
+      pips_debug(8, "The loop certainly is executed\n");
+
+      /* propagate preconditions in the loop body */
+      preb = precondition_add_condition_information(preb, c, preb, TRUE);
+      (void) statement_to_postcondition(preb, s);
+
+      /* ntl = transformer_apply(tf, pre); */
+      /* Let's execute the last iteration since it certainly exists */
+      ntl = precondition_add_condition_information(ntl, c, ntl, TRUE);
+      /* post = transformer_apply(tb, ntl); */
+      free_transformer(ntl);
+      /* post = precondition_add_condition_information(post, c, post, FALSE); */
+    }
+    else {
+      /* Assume the loop is entered, post_al, or not, post_ne, and perform
+       * the convex hull of both
+       */
+      transformer post_ne /* = transformer_dup(pre) */ ;
+      transformer post_al = transformer_undefined;
+      transformer tb = load_statement_transformer(s);
+
+      debug(8, "whileloop_to_postcondition", "The loop may be executed or not\n");
+
+      /* propagate preconditions in the loop body */
+      precondition_add_condition_information(preb, c, preb, TRUE);
+      (void) statement_to_postcondition(preb, s);
+
+      /* The loop is executed at least once: let's execute the last iteration */
+      post_al = transformer_apply(tb, preb);
+      post_al = precondition_add_condition_information(post_al, c, post_al, FALSE);
+
+      /* The loop is never executed */
+      post_ne = precondition_add_condition_information(post_ne, c, post_ne, FALSE);
+
+      /* post = transformer_convex_hull(post_ne, post_al); */
+      transformer_free(post_ne);
+      transformer_free(post_al);
+    }
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "resultat t_pre=%p\n", t_pre);
+    (void) print_transformer(t_pre);
+    pips_debug(8,"end\n");
+  }
+
+  return t_pre;
 }
