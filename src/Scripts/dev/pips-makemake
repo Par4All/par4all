@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.303  1997/08/18 10:45:45  coelho
+# ...
+#
 # Revision 1.302  1997/08/18 10:41:48  coelho
 # fixed ftest, again;-) (wpips LD added args...)
 #
@@ -598,7 +601,7 @@ ftest: all
 	\$(LINK) \$(ARCH)/fpips \$(WPIPS_ADDED_LDFLAGS) \\
 	    \$(ROOT)/Lib/\$(ARCH)/\$(FPIPS_MAIN) \\
 	    -lfpips -lpips -ltpips -lwpips \$(PIPS_LIBS) \\
-	    \$(TPIPS_ADDED_LIBS) \$(WPIPS_ADDED_LIBS) \$(PIPS_X11_ADDED_LIBS)
+	    \$(TPIPS_ADDED_LIBS) \$(WPIPS_ADDED_LIBS)
 	#
 	# creating links
 	#
