@@ -220,6 +220,7 @@ string file;
     string abspath = NULL;
     /* string relpath = NULL; */
     static char *tempfile = NULL;
+    int err;
 
     if (! file_exists_p(file)) {
 	user_warning("process_user_file", "Cannot open file : %s\n", file);
@@ -262,11 +263,32 @@ string file;
        and the other one is hidden by the call to "sed" since
        fsplit gives it a zzz00n.f name */
     /* Let's hope no user module is called zzz???.f */
-    safe_system(concatenate("pips-split ", abspath,
-		       "| sed -e /zzz[0-9][0-9][0-9].f/d | sort -r > ",
-		       tempfile, "; /bin/rm -f zzz???.f", NULL));
+    err = safe_system_no_abort
+	(concatenate("trap 'exit 123' 2;",
+		     "pips-split ", abspath,
+		     "| sed -e /zzz[0-9][0-9][0-9].f/d | sort -r > ",
+		     tempfile, "; /bin/rm -f zzz???.f", NULL));
+
+    /* Go back unconditionnally to regular directory for execution
+     * or you are heading for trouble when the database is closed
+     */
     chdir(cwd);
     free(cwd);
+
+    if(err==123) {
+	/* Are we or not allowed to use user_error() in top-level? */
+	/* 
+	user_error("process_user_file",
+		   "File splitting interrupted by control-C\n");
+		   */
+	user_warning("process_user_file",
+		     "File splitting interrupted by control-C\n");
+	return FALSE;
+    }
+    else if(err!=0) {
+	pips_error("process_user_file",
+		   "Unexpected return code from pips-split: %d\n", err);
+    }
 
     /* the newly created module files are registered in the database */
     fd = safe_fopen(tempfile, "r");
