@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1995/05/05 15:30:01 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1995/08/10 11:32:51 $, )
  * version $Revision$
  */
 
@@ -36,9 +36,9 @@
      */
 
 #include <stdio.h>
-extern int printf();
 #include <ctype.h>
 #include <string.h>
+
 #include "newgen_include.h"
 #include "genC.h"
 
