@@ -142,16 +142,9 @@ static void call_filter(call c)
 	    MERGE_TEXTS(r,get_text_transformers(callee_name));
 	    break;
 	case ICFG_DECOR_PRECONDITIONS:
-	{
-	    transformer call_site_prec = call_site_to_module_precondition
-		(e_caller, e_callee, current_stmt_head(), c);
-
-	    /* Then print the text for the caller preconditions */
-	    set_current_module_entity(e_caller);
-	    MERGE_TEXTS(r,text_transformer(call_site_prec));
-	    reset_current_module_entity();
+	    MERGE_TEXTS(r, call_site_to_module_precondition_text
+			(e_caller, e_callee, current_stmt_head(), c));
 	    break;
-	}
 	case ICFG_DECOR_PROPER_EFFECTS:
 	    MERGE_TEXTS(r,get_text_proper_effects(callee_name));
 	    break;
