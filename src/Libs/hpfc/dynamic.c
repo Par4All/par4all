@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/12/30 09:28:54 $, )
+ * ($Date: 1996/12/30 15:44:55 $, )
  */
 
 #include "defines-local.h"
@@ -179,6 +179,19 @@ static entity new_synonym(entity e)
     pips_debug(5, "building entity %s\n", new_name);
 
     new_e = FindOrCreateEntityLikeModel(module, new_name, primary);
+
+    if (storage_formal_p(entity_storage(new_e)))
+    { /* the new entity is rather local! */
+	storage s = entity_storage(new_e);
+	entity sub = get_current_module_entity();
+	entity_storage(new_e) = 
+	    make_storage(is_storage_ram,
+	      make_ram(sub,
+	        global_name_to_entity(entity_local_name(sub),
+				      DYNAMIC_AREA_LOCAL_NAME), 0, NIL));
+	free_storage(s);
+    }
+
     AddEntityToDeclarations(new_e, get_current_module_entity());
 
     add_dynamic_synonym(new_e, e);
