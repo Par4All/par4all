@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.53  2003/07/22 09:56:24  irigoin
+ * function entity_global_name() added
+ *
  * Revision 1.52  2002/06/27 14:44:07  irigoin
  * Function label_string_defined_in_statement_p() added
  *
@@ -256,6 +259,14 @@ entity_local_name(entity e)
     string null_name = "null";
     pips_assert("entity is defined", !entity_undefined_p(e));
     return e==NULL ? null_name : local_name(entity_name(e));
+}
+
+/* Used instead of the macro to pass as formal argument */
+string entity_global_name(entity e)
+{
+    string null_name = "null";
+    pips_assert("entity is defined", !entity_undefined_p(e));
+    return entity_name(e);
 }
 
 string 
