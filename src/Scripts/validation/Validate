@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/11 21:19:13 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/12 08:53:03 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -11,7 +11,7 @@
 #
 # get the environment if necessary
 
-[ "$PIPS_DIR" ] || . /users/soft/pips/Pips/pipsrc.sh
+[ "$PIPS_DIR" ] || . /projects/Pips/pipsrc.sh
 
 #
 # should be in the environment
@@ -25,17 +25,17 @@ REAL_PIPSHOME=`(cd $PIPS_HOME/../pips;pwd)`
 
 script=`basename $0`
 
-unset UPDATE VALIDOPT PERFORMANCE
+unset update VALIDOPT PERFORMANCE
 
 VALDIR="$PIPS_VALIDDIR"
 VALID="$PIPS_UTILDIR/validate-sequential"
 
-PING='/usr/etc/ping'
-MAIL='/usr/ucb/mail'
-DATE='/usr/bin/date'
+ping='/usr/etc/ping'
+mail='/usr/ucb/mail'
+date='/usr/bin/date'
 
-HOSTNAME=`hostname`
-USER=`whoami`
+hostname=`hostname`
+user=`whoami`
 PWD=`pwd`
 
 # defaults
@@ -84,7 +84,7 @@ alive()
 {
   for v_host in `echo $1 | tr ':' ' '`
   do
-    $PING $v_host > /dev/null 2>&1 && echo -n ":$v_host"
+    $ping $v_host > /dev/null 2>&1 && echo -n ":$v_host"
   done
 }
 
@@ -94,7 +94,7 @@ alive()
 which_executable()
 {
   PATH="$PWD:$PWD/$PIPS_ARCH:$PIPS_BINDIR/$PIPS_ARCH:$PATH" \
-  type $1 | sed "s,.* is ,,"
+    type $1 | sed "s,.* is ,,"
 }
 
 #
@@ -114,7 +114,7 @@ validate_usage()
     echo "   -n: sequential"
     echo "   -h: help"
     echo "   -t: timing"
-    echo "   -a adress: mail sent to (defaut $USER)"
+    echo "   -a adress: mail sent to (defaut $user)"
     echo "   -u xx: update time (default 30)"
     echo "   -r dir: run directory (default .)"
     echo "   -i lines: max number of lines for sending a full message"
@@ -154,7 +154,7 @@ available_host()
   while [ ! "`prefix_file_exists $RESULT`" ]
   do
     $DEBUG " | sleep" 
-    sleep ${UPDATE:-30}
+    sleep ${update:-30}
   done
   #
   # get the result, hostname and remove the lock files
@@ -178,7 +178,7 @@ available_host()
 #
 local_date()
 {
-  $DATE +"%h %d %y, %T"
+  $date +"%h %d %y, %T"
 }
 
 #
@@ -232,8 +232,8 @@ do
     x) pips_version="$OPTARG" ;;
     y) tpips_version="$OPTARG" ;;
     h) validate_usage 0 ;;
-    u) UPDATE="$OPTARG" ;;
-    a) USER="$OPTARG" ; VALIDOPT="$VALIDOPT -a $USER" ;;
+    u) update="$OPTARG" ;;
+    a) user="$OPTARG" ; VALIDOPT="$VALIDOPT -a $user" ;;
     *) echo  ; validate_usage 1
   esac
 done
@@ -249,10 +249,10 @@ LOCKDIR=`absolute_name ${LOCKDIR:-$RUNDIR}`
 #
 # lock names
 
-WAITING="$LOCKDIR/.validate_waiting.$HOSTNAME.$$"
-RESULT="$LOCKDIR/.validate_result.$HOSTNAME.$$"
-FAILED="$LOCKDIR/.validate_failed.$HOSTNAME.$$"
-MSG="$LOCKDIR/.validate_msg.$HOSTNAME.$$"
+WAITING="$LOCKDIR/.validate_waiting.$hostname.$$"
+RESULT="$LOCKDIR/.validate_result.$hostname.$$"
+FAILED="$LOCKDIR/.validate_failed.$hostname.$$"
+MSG="$LOCKDIR/.validate_msg.$hostname.$$"
 
 #
 # the working directory
@@ -262,7 +262,13 @@ cd $RUNDIR
 #
 # variables
 
-default_file="$VALDIR/defaults"
+if test -r $VALDIR/defaults.$PIPS_ARCH
+then
+    default_file="$VALDIR/defaults.$PIPS_ARCH"
+else
+    default_file="$VALDIR/defaults"
+fi
+
 default_test="default_test"
 subject="PIPS Validation"
 
@@ -272,14 +278,15 @@ tpips_version=`absolute_name ${tpips_version:-\`which_executable tpips\`}`
 export pips_version
 export tpips_version
 
-$DEBUG " | $USER on $HOSTNAME"
+$DEBUG " | $user on $hostname"
 $DEBUG2 " | real PIPSHOME: $REAL_PIPSHOME"
 
 #
 # modules to be checked by the validation
 
 case $# in
-  0) MODULES=`sed /#/d < $default_file | tr -s '\012' ' '` ;;
+  0) $VERBOSE "Taking default validation from $default_file" ;
+     MODULES=`sed /#/d < $default_file | tr -s '\012' ' '` ;;
   *) MODULES="$*"
 esac
 
@@ -291,7 +298,7 @@ $VERBOSE "Modules: $MODULES"
 #
 # hosts to be used by the validation
 
-VALHOSTS=$HOSTNAME
+VALHOSTS=$hostname
 
 if [ "$PARALLEL" ]
 then
@@ -393,7 +400,7 @@ $PERFORMANCE
 In case of problems, contact coelho@cri.ensmp.fr
 %
 
-$MAIL -s "$finalsubject" $USER < $MSG
+$mail -s "$finalsubject" $user < $MSG
 
 rm -f $FAILED $MSG
 
