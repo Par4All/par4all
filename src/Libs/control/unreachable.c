@@ -4,6 +4,9 @@
  * $Id$
  *
  * $Log: unreachable.c,v $
+ * Revision 1.6  1997/11/14 09:29:50  keryell
+ * Removed 2 nasty ";".
+ *
  * Revision 1.5  1997/11/13 08:07:05  coelho
  * statement_continued_p added...
  *
@@ -31,8 +34,8 @@
 
 /******************************************************** REACHED STATEMENTS */
 
-GENERIC_LOCAL_FUNCTION(reached, persistant_statement_to_int);
-GENERIC_LOCAL_FUNCTION(continued, persistant_statement_to_int);
+GENERIC_LOCAL_FUNCTION(reached, persistant_statement_to_int)
+GENERIC_LOCAL_FUNCTION(continued, persistant_statement_to_int)
 
 #define reached_p(s)   (bound_reached_p(s))
 #define continued_p(s) (load_continued(s))
