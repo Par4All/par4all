@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 15:00:21 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 2000/04/14 15:42:27 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2227,13 +2227,8 @@ static void gtt_write(string filename, gtt_p table)
   message_assert("open file", file);
 
   for (i=0; i<MAX_DOMAIN; i++)
-  {
-    if (table->actual_to_old[i]!=-1)
-    {
-      message_assert("some name to domain", Domains[i].name);
+    if (table->actual_to_old[i]!=-1 && Domains[i].name)
       fprintf(file, "%s %d *\n", Domains[i].name, table->actual_to_old[i]);
-    }
-  }
   
   fclose(file);
 }
