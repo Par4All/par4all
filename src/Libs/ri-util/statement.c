@@ -1364,7 +1364,7 @@ statement_to_label(statement s)
       }, sequence_statements(instruction_sequence(i)));
       break;    
     case is_instruction_unstructured:
-      l = statement_to_label(unstructured_control(instruction_unstructured(i)));
+      l = statement_to_label(control_statement(unstructured_control(instruction_unstructured(i))));
       break;
     case is_instruction_call:
     case is_instruction_test:
