@@ -1,7 +1,7 @@
 /* $Id$ */
 
 #ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 1998/04/16 14:55:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "%A% ($Date: 2002/03/14 16:51:59 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -662,7 +662,8 @@ build_aliases()
       sscanf(buffer, "alias%s '%[^']", true_name, alias_name);
 
       if (hash_get(aliases, alias_name) != HASH_UNDEFINED_VALUE) {
-         pips_error("build_aliases", "Aliases must not be ambiguous\n");
+         pips_internal_error("Aliases must not be ambiguous\n"
+			     "\talias '%s' seems ambiguous!\n", true_name);
       }
       else {
          char upper[128];
