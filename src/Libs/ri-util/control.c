@@ -4,10 +4,10 @@
    Ronan Keryell.
    */
 
-/* 	%A% ($Date: 1997/09/26 15:20:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/03/19 16:54:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1997/09/26 15:20:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1998/03/19 16:54:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -166,6 +166,7 @@ remove_unreachable_following_control(control c,
 	gen_remove(&control_predecessors(a_successor), c);
     }, control_successors(c));
     /* Discard the control node itself: */
+    pips_debug(7, "Discarding control node %p.\n", c);
     gen_free_list(control_predecessors(c));
     control_predecessors(c) = NIL;
     gen_free_list(control_successors(c));
@@ -185,6 +186,11 @@ remove_the_unreachable_controls_of_an_unstructured(unstructured u)
     control entry_node = unstructured_control(u);
     control exit_node = unstructured_exit(u);
     bool exit_node_has_been_seen = FALSE;
+    pips_debug(7, "From control %p, exit %p.\n", entry_node, exit_node);
+    ifdebug(7) {
+	display_linked_control_nodes(entry_node);
+    }
+
     CONTROL_MAP(c,
 		{
 		    if (c != entry_node)
@@ -193,6 +199,7 @@ remove_the_unreachable_controls_of_an_unstructured(unstructured u)
 			if (control_predecessors(c) == NIL) {
 			    /* A control without predecessor is
 			       unreachable, so it is dead code: */
+			    pips_debug(7, "Want to discard control %p.\n", c);
 			    control_remove_list = CONS(CONTROL,
 						       c,
 						       control_remove_list);
