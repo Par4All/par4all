@@ -133,16 +133,61 @@ transformer t2;
     return t1;
 }
 
+/* eliminate (some) redundancy */
+transformer
+transformer_normalize(transformer t)
+{
+    Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
+
+    if (!sc_empty_p(r)) {
+	Pbase b = base_dup(sc_base(r));
+
+	r = sc_elim_redund(r);
+
+	if (SC_EMPTY_P(r)) {
+	    r = sc_empty(b);
+	}
+	else 
+	    base_rm(b);
+
+	r->dimension = vect_size(r->base);
+    }
+    return t;
+}
+
 /* transformer transformer_projection(transformer t, cons * args):
  * projection of t along the hyperplane defined by entities in args;
  * this generate a projection and not a cylinder based on the projection
  *
- * args is not modified
+ * use the most complex/complete redundancy elimination in Linear
+ *
+ * args is not modified. t is modified by side effects.
  */
 transformer transformer_projection(t, args)
 transformer t;
 cons * args;
 {
+    t = transformer_projection_with_redundancy_elimination(t, args, 
+							   sc_elim_redund);
+    return t;
+}
+
+Psysteme no_elim(Psysteme ps)
+{
+    return ps;
+}
+
+transformer transformer_projection_with_redundancy_elimination(t, args, elim)
+transformer t;
+cons * args;
+Psysteme (*elim)(Psysteme);
+{
+    /* Library Linear/sc contains several reundancy elimination functions:
+     *  sc_elim_redund()
+     *  build_sc_nredund_2pass_ofl_ctrl() --- if it had the same profile...
+     *  ...
+     * no_elim() is provided here to obtain the fastest possible projection
+     */
     cons * new_args = NIL;
     Psysteme r = (Psysteme) predicate_system(transformer_relation(t));
 
@@ -158,17 +203,35 @@ cons * args;
             
 	    sc_projection_along_variable_ofl_ctrl(&r,(Variable) e, NO_OFL_CTRL);
 	    sc_base_remove_variable(r,(Variable) e);
-	    if (!sc_empty_p(r))
-	    {
-		r = sc_elim_redund(r);
+	    /* Eliminate redundancy at each projection stage
+	     * to avoid explosion of the constraint number
+	     */
+	    /*
+	    if (!sc_empty_p(r) {
+		r = elim(r);
 		if (SC_EMPTY_P(r)) {
 		    r = sc_empty(b);
 		    sc_base_remove_variable(r,(Variable) e);
 		}
 		else base_rm(b);
 	    }
+	    */
 	}
 
+	/* Eliminate redundancy only once projections have all
+	 * been performed because redundancy elimination is
+	 * expensive and because most variables are exactly 
+	 * projected because they appear in at least one equation
+	 */
+	if (!sc_empty_p(r)) {
+	    Pbase b = base_dup(sc_base(r));
+	    r = elim(r);
+	    if (SC_EMPTY_P(r)) {
+		r = sc_empty(b);
+	    }
+	    else 
+		base_rm(b);
+	}
 
 	r->dimension = vect_size(r->base);
 
