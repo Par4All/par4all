@@ -18,36 +18,80 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
-static entity get_variable_to_filter()
+static list /* of entity */ get_variables_to_filter()
 {
-  string reference_variable_name = 
-    get_string_property("EFFECTS_FILTER_ON_VARIABLE");
-  entity reference_variable;
+  string names = strdup(get_string_property("EFFECTS_FILTER_ON_VARIABLE"));
+  list le = NIL;
+  entity var;
+  string saved = names, s;
 
   pips_assert("property EFFECTS_FILTER_ON_VARIABLE is defined",
-	      !same_string_p(reference_variable_name, ""));
+	      !same_string_p(names, ""));
 
-  reference_variable = 
-    gen_find_tabulated(reference_variable_name, entity_domain);
-
-  if (entity_undefined_p(reference_variable))
+  for (s=names; *s; s++)
   {
-    pips_user_warning("reference variable '%s' not found\n",
-		      reference_variable_name);
-    return NULL;
+    var = NULL;
+    if (*s==',')
+    {
+      *s = '\0';
+      var = gen_find_tabulated(names, entity_domain);
+    
+      if (!var || entity_undefined_p(var))
+      {
+	pips_user_warning("reference variable '%s' not found\n", names);
+      }
+      else
+      {
+	le = CONS(ENTITY, var, le);
+      }
+      *s = ',';
+      names = s+1;
+    }
   }
 
-  return reference_variable;
+  var = gen_find_tabulated(names, entity_domain);
+
+  if (!var || entity_undefined_p(var))
+  {
+    pips_user_warning("reference variable '%s' not found\n", names);
+  }
+  else
+  {
+    le = CONS(ENTITY, var, le);
+  }
+
+  free(saved), saved = NULL;
+
+  return le;
 }
 
 /************************************** CHECK WHETHER A CONFLICTING W EFFECT */
 
-static bool direct_reference_found = FALSE;
-static entity variable_to_filter = NULL;
+static list /* of entity */ variables_to_filter = NIL;
 
+static bool there_is_a_conflict(entity var)
+{
+  MAP(ENTITY, v,
+  {
+    if (entity_conflict_p(var, v))
+      return TRUE;
+  },
+      variables_to_filter);
+  return FALSE;
+}
+
+/***************************** (should) CHECK WHETHER A REFERENCE IS WRITTEN */
+
+static bool direct_reference_found = FALSE;
+static entity a_variable = NULL;
+
+/* it should be a check on call arguments, whether they are W + ref 
+ * for user define functions, use summary effects
+ * for intrinsics? =, implied-do, read...
+ */
 static void reference_rwt(reference r)
 {
-  if (entity_conflict_p(reference_variable(r), variable_to_filter))
+  if (entity_conflict_p(reference_variable(r), a_variable))
   {
     direct_reference_found = TRUE;
     gen_recurse_stop(NULL);
@@ -59,10 +103,12 @@ static void check_if_direct_reference(void * x)
   gen_recurse(x, reference_domain, gen_true, reference_rwt);
 }
 
-static bool direct_reference_in_call(statement s)
+static bool direct_written_reference(statement s, entity var)
 {
   instruction i = statement_instruction(s);
   direct_reference_found = FALSE;
+  a_variable = var;
+
   switch (instruction_tag(i))
   {
   case is_instruction_call:
@@ -72,8 +118,7 @@ static bool direct_reference_in_call(statement s)
     {
       loop l = instruction_loop(i);
       check_if_direct_reference(loop_range(l));
-      if (!direct_reference_found &&
-	  entity_conflict_p(loop_index(l), variable_to_filter))
+      if (!direct_reference_found && entity_conflict_p(loop_index(l), var))
 	direct_reference_found = TRUE;
       break;
     }
@@ -87,6 +132,8 @@ static bool direct_reference_in_call(statement s)
     /* should not happen on a statement with proper effects */
     pips_internal_error("unexpected instruction tag...");
   }
+
+  a_variable = NULL;
   return direct_reference_found;
 }
 
@@ -97,14 +144,14 @@ static bool stmt_flt(statement s)
   list /* of effect */ lpe = load_proper_rw_effects_list(s);
   MAP(EFFECT, e,
   {
-    if (effect_write_p(e) && 
-	entity_conflict_p(effect_variable(e), variable_to_filter))
+    entity var = effect_variable(e);
+    if (effect_write_p(e) && there_is_a_conflict(var))
     {
-      if (direct_reference_in_call(s))
+      if (direct_written_reference(s, var))
       {
 	user_log("## %s %s o=%d/n=%d\n", 
 		 entity_name(get_current_module_entity()),
-		 entity_name(effect_variable(e)),
+		 entity_name(var),
 		 statement_ordering(s),
 		 statement_number(s));
       }
@@ -129,13 +176,14 @@ boolean filter_proper_effects(string module_name)
   set_proper_rw_effects((statement_effects)
 	    db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
  
-  variable_to_filter = get_variable_to_filter();
+  variables_to_filter = get_variables_to_filter();
 
-  if (variable_to_filter)
+  if (variables_to_filter)
     gen_recurse(get_current_module_statement(),
 		statement_domain, stmt_flt, gen_null);
 
-  variable_to_filter = NULL;
+  gen_free_list(variables_to_filter);
+  variables_to_filter = NIL;
   
   /* returns the result to the DBM... */
   DB_PUT_MEMORY_RESOURCE
