@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/09/09 10:42:50 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/09/22 11:08:14 $, )
  * version $Revision$
  */
  
@@ -438,7 +438,7 @@ static bool directive_in_file_p(string name)
     f = safe_fopen(name, "r");
     c='\n';
     no_directive = TRUE;
-    while (c!=EOF && no_directive)
+    while (!feof(f) && no_directive)
     {
 	if (c=='\n') /* beginning a line */
 	{ 
