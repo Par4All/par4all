@@ -1,7 +1,6 @@
 #!/bin/sh
 #
-# $RCSfile: make-tags,v $ version $Revision$,
-# ($Date: 1996/09/07 11:30:23 $, )
+# $Id$
 #
 # Tags computation for the PIPS project, using the Development version.
 # To be run by cron for user pips on cri
@@ -15,7 +14,7 @@
 #  - awk -> cut
 #  - NEWGENDIR used
 #  - find removed, to disallow the recursive enumeration of files
-#    (I haven't found a way to do it thru -prune) FC 10/03/94
+
 
 [ "$HOME" ] || HOME=`ypcat passwd | egrep '^pips:' | cut -d: -f 6`
 
@@ -46,7 +45,7 @@ done >> $FILES
 # tags generation
 
 etags -o ${TAGS} `cat ${FILES}` 2>/dev/null
-cp ${TAGS} ${PIPS_DIR}/Tags/TAGS
+cp ${TAGS} ${pips_dir}/Tags/TAGS
 rm -f ${TAGS} ${FILES}
 
 # that's all
