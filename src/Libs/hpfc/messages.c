@@ -1,9 +1,8 @@
 /*
  * Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1995/03/22 10:56:59 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1995/03/23 16:54:33 $, )
  * version $Revision$
- * got on %D%, %T%
  * 
  * Fabien Coelho, August 1993
  */
@@ -32,38 +31,6 @@ extern int      fprintf();
 
 entity CreateIntrinsic(string name); /* in syntax.h */
 
-/*
-static expression make_addition(e1, e2)
-expression e1, e2;
-{
-    expression
-	e = MakeBinaryCall(CreateIntrinsic(PLUS_OPERATOR_NAME), e1, e2);
-
-    return(e);
-}
-
-static expression add_to(e, i)
-expression e;
-int i;
-{
-    int val=-1;
-    expression result = expression_undefined;
-
-    if (i==0) return(copy_expression(e));
-
-    if (hpfc_integer_constant_expression_p(e, &val))
-	result = int_to_expression(val+i);
-    else
-    {
-	result = make_addition(copy_expression(e), int_to_expression(i));
-	expression_normalized(result) = 
-	    normalize_call(syntax_call(expression_syntax(result)));
-    }
-
-    return(result);
-}
-*/
-
 /*  ????
  */
 static expression safe_static_domain_bound(array, dim, e, shift, lower)
@@ -87,11 +54,9 @@ bool lower;
     return(result);
 }
 
-/*
- * message generate_one_message(array, li, lk, lv)
+/* message generate_one_message(array, li, lk, lv)
  *
  * generate one message after the reference given,
- * 
  */
 static message generate_one_message(array, li, lk, lv)
 entity array;
@@ -107,7 +72,7 @@ list li, lk, lv;
 	lr   = NIL,
 	ldom = NIL;
     entity
-	newarray = load_entity_node_new(array);
+	newarray = load_new_node(array);
     Pvecteur
 	procv = VECTEUR_NUL;
     
@@ -135,8 +100,7 @@ list li, lk, lv;
 	{
 	case aligned_constant:
 	{
-	    /*
-	     * I think I don't need to store the to where value...
+	    /* I think I don't need to store the to where value...
 	     * that's rather interesting since I do not know where I could
 	     * put it...
 	     */
@@ -370,8 +334,7 @@ list li, lk, lv;
     return(make_message(array, lr, procv, ldom));
 }
 
-/*
- * list messages_generation(Ro, lRo)
+/* list messages_generation(Ro, lRo)
  *
  * first kind of messages generation 
  * (the overlap management is handled in message_manageable_p())
@@ -408,9 +371,6 @@ list Ro, lRo;
     return(lm);
 }
 
-/*
- * list atomize_one_message(m)
- */
 static list atomize_one_message(m)
 message m;
 {
@@ -511,9 +471,6 @@ list lm1;
     return(lm2);
 }
 
-/*
- * list keep_non_empty_messages_with_destination(l)
- */
 static list keep_non_empty_messages_with_destination(l)
 list l;
 {
@@ -535,9 +492,6 @@ list l;
     return(result);
 }
 
-/*
- * list keep_non_empty_domain_messages
- */
 static list keep_non_empty_domain_messages(l)
 list l;
 {
@@ -558,8 +512,7 @@ list l;
     return(result);
 }
 
-/*
- * message shape_one_message(m)
+/* message shape_one_message(m)
  *
  * caution, rate==1 is assumed.
  */
@@ -663,8 +616,7 @@ message m;
 
     message_dom(m) = lrp;
 
-    /* 
-     * now the neighbour computation in the linearized processor
+    /* now the neighbour computation in the linearized processor
      * arrangment named NODETIDS() of common /HPFC_PARAM/.
      * the code is similar to the runtime support function HPFC_PROCLID().
      */
@@ -717,8 +669,7 @@ message send;
     return(make_message(array, content, neighbour, domain));
 }
 
-/*
- * list receive_messages_generation(lms)
+/* list receive_messages_generation(lms)
  *
  * this function must warranty that all messages send will be received,
  * so the messages are symetric.
@@ -743,8 +694,7 @@ list lms;
     return(lmr);
 }
 
-/*
- * statement st_one_message(m, bsend)
+/* statement st_one_message(m, bsend)
  *
  * this function will have to be modified in order to include 
  * message coalescing and aggregation. Here, a direct call to
@@ -780,8 +730,7 @@ bool bsend;
 					    processor,
 					    domain);
     
-    /*
-     * comment generation to improve readibility of the code
+    /* comment generation to improve readibility of the code
      */
     
     buf += strlen(sprintf(buf, "c %s(", entity_local_name(processor)));
@@ -816,8 +765,7 @@ bool bsend;
     return(l);
 }
 
-/*
- * list remove_stammering_messages(lm)
+/* list remove_stammering_messages(lm)
  *
  * remove messages that are contained in another message
  */
@@ -841,10 +789,7 @@ list lm;
     return(kept);
 }
 
-/*
- *
- *
- * every required conditions are supposed to be verified in this function.
+/* every required conditions are supposed to be verified in this function.
  */
 statement messages_handling(Ro, lRo)
 list Ro, lRo;
@@ -975,3 +920,6 @@ list Ro, lRo;
 
     return(make_block_statement(gen_nconc(lsend, lreceive)));    
 }
+
+/*   that is all
+ */
