@@ -183,7 +183,7 @@ rule ru;
  * This new functionality is extremely useful when old databases
  * are re-opened.
  *
- * apply(), which calls make many times, does not fully benefit from
+ * apply(), which calls make() many times, does not fully benefit from
  * this memoization scheme.
  */
 static set up_to_date_resources = set_undefined;
@@ -730,6 +730,48 @@ string rname, oname;
     
     return result;
 }
+
+void check_resources(list * pobso, list * pupto)
+{
+    list obso = NIL;
+    list upto = NIL;
+
+    debug_on("PIPSMAKE_DEBUG_LEVEL");
+
+    pips_assert("check_resources",
+		set_undefined_p(up_to_date_resources));
+
+    up_to_date_resources = set_make(set_pointer);
+
+    dont_interrupt_pipsmake_asap();
+    /* For all the resources of the current workspace */
+    MAP(RESOURCE, r, {
+	string rn = resource_name(r);
+	string on = resource_owner_name(r);
+	if (status_memory_p(resource_status(r))
+	    && !check_physical_resource_up_to_date(r)) {
+	    /* Add this resource to the list of useless ones: */
+	    obso = CONS(RESOURCE, r, obso);
+	    debug(2, "free_any_non_up_to_date_resource_in_memory",
+		  "mark %s(%s) as non up to date\n", rn, on);
+	}
+	else {
+	    upto = CONS(RESOURCE, r, upto);
+	    debug(2, "free_any_non_up_to_date_resource_in_memory",
+		  "keep %s(%s) as up to date resource or on disk\n", rn, on);
+	}
+    }, database_resources(db_get_current_workspace()));
+
+    set_free(up_to_date_resources);
+    up_to_date_resources = set_undefined;
+
+    debug_off();
+    
+    *pobso = obso;
+    *pupto = upto;
+
+    return;
+}
 
 /* To be used in a rule. use and update the up_to_dat list
  * created by makeapply 
@@ -738,8 +780,6 @@ bool check_resource_up_to_date(rname, oname)
 string rname, oname;
 {
     resource res;
-    list reals;
-    rule ru;
     bool result = TRUE;
 
     res = db_find_resource(rname, oname);
@@ -748,108 +788,121 @@ string rname, oname;
     if (res == resource_undefined)
 	return FALSE;
 
-    /* Maybe is has already been proved true */
-    if(set_belong_p(up_to_date_resources, (char *) res))
-	return TRUE;
+    result = check_physical_resource_up_to_date(res);
 
-    /* We get the active rule to build this resource */
-    if ((ru = find_rule_by_resource(rname)) == rule_undefined) {
-	pips_error("check_resource_up_to_date",
-		   "could not find a rule for %s\n", rname);
-    }
-
-    /* we build the list of required real_resources */
-    /* Here we are sure (thanks to find_rule_by_resource) that the rule does not
-       use a resource it produces */
-
-    reals = build_real_resources(oname, rule_required(ru));
-
-    /* we are going to check if the required resources are 
-       - in the database or in the rule_modified list
-       - proved up to date (recursively)
-       - have timestamps older than the tested one
-       */
-    MAPL(prr, {
-	real_resource rr = REAL_RESOURCE(CAR(prr));
-
-	string rron = real_resource_owner_name(rr);
-	string rrrn = real_resource_resource_name(rr);
-
-	bool res_in_modified_list_p = FALSE;
-	    
-	/* we build the list of modified real_resources */
-	list virtuals = rule_modified(ru);
-	list reals2 = build_real_resources(oname, virtuals);
-
-	MAPL(mod_prr, {
-	    real_resource mod_rr = REAL_RESOURCE(CAR(mod_prr));
-	    string mod_rron = real_resource_owner_name(mod_rr);
-	    string mod_rrrn = real_resource_resource_name(mod_rr);
-
-	    if ((same_string_p(mod_rron, rron)) &&
-		(same_string_p(mod_rrrn, rrrn))) {
-		/* we found it */
-		res_in_modified_list_p = TRUE;
-		debug(3, "check_resource_up_to_date",
-		      "resource %s(%s) is in the rule_modified list",
-		      rrrn, rron);
-		break;
-	    }
-	}, reals2);
-
-	gen_free_list (virtuals);
-	gen_free_list (reals2);
-
-	/* If the rule is in the modified list, then
-	   don't check anything */
-	if (res_in_modified_list_p == FALSE) {
-
-	    resource resp = db_find_resource(rrrn, rron);
-
-	    if (resp == resource_undefined) {
-		debug(5, "check_resource_up_to_date",
-		      "resource %s(%s) is not present and not in the rule_modified list",
-		      rrrn, rron);
-		result = FALSE;
-		break;
-	    } else {
-		/* Check if this resource is up to date */
-		if (check_resource_up_to_date(rrrn, rron)
-		    == FALSE) {
-		    debug(5, "check_resource_up_to_date",
-			  "resource %s(%s) is not up to date", rrrn, rron);
-		    result = FALSE;
-		    break;
-		}
-		/* Check if the timestamp is OK */
-		if (resource_time(res) < resource_time(resp)) {
-		    debug(5, "check_resource_up_to_date",
-			  "resource %s(%s) with time stamp %ld is newer "
-			  "than resource %s(%s) with time stamp %ld\n",
-			  rrrn, rron,
-			  (long) resource_time(resp),
-			  resource_name(res),
-			  resource_owner_name(res),
-			  (long) resource_time(res));
-		    result = FALSE;
-		    break;
-		}
-	    }
-	}
-    }, reals);
-
-    gen_free_list (reals);
-
-    /* If the resource is up to date then add it in the set */
-    if (result == TRUE) {
-	debug(5, "check_resource_up_to_date",
-	      "resource %s(%s) added to up_to_date "
-	      "with time stamp %d\n",
-	      rname, oname, resource_time(res));
-	set_add_element(up_to_date_resources,
-			up_to_date_resources, (char *) res);
-    }
     return result;
+}
+
+bool check_physical_resource_up_to_date(resource res)
+{
+  string rname = resource_name(res);
+  string oname = resource_owner_name(res);
+  list reals = NIL;
+  rule ru = rule_undefined;
+  bool result = TRUE;
+
+  /* Maybe is has already been proved true */
+  if(set_belong_p(up_to_date_resources, (char *) res))
+    return TRUE;
+
+  /* We get the active rule to build this resource */
+  if ((ru = find_rule_by_resource(rname)) == rule_undefined) {
+    pips_error("check_resource_up_to_date",
+	       "could not find a rule for %s\n", rname);
+  }
+
+  /* we build the list of required real_resources */
+  /* Here we are sure (thanks to find_rule_by_resource) that the rule does not
+     use a resource it produces */
+
+  reals = build_real_resources(oname, rule_required(ru));
+
+  /* we are going to check if the required resources are 
+     - in the database or in the rule_modified list
+     - proved up to date (recursively)
+     - have timestamps older than the tested one
+     */
+  MAPL(prr, {
+    real_resource rr = REAL_RESOURCE(CAR(prr));
+
+    string rron = real_resource_owner_name(rr);
+    string rrrn = real_resource_resource_name(rr);
+
+    bool res_in_modified_list_p = FALSE;
+	    
+    /* we build the list of modified real_resources */
+    list virtuals = rule_modified(ru);
+    list reals2 = build_real_resources(oname, virtuals);
+
+    MAPL(mod_prr, {
+      real_resource mod_rr = REAL_RESOURCE(CAR(mod_prr));
+      string mod_rron = real_resource_owner_name(mod_rr);
+      string mod_rrrn = real_resource_resource_name(mod_rr);
+
+      if ((same_string_p(mod_rron, rron)) &&
+	  (same_string_p(mod_rrrn, rrrn))) {
+	/* we found it */
+	res_in_modified_list_p = TRUE;
+	debug(3, "check_resource_up_to_date",
+	      "resource %s(%s) is in the rule_modified list",
+	      rrrn, rron);
+	break;
+      }
+    }, reals2);
+
+    gen_free_list (virtuals);
+    gen_free_list (reals2);
+
+    /* If the rule is in the modified list, then
+       don't check anything */
+    if (res_in_modified_list_p == FALSE) {
+
+      resource resp = db_find_resource(rrrn, rron);
+
+      if (resp == resource_undefined) {
+	debug(5, "check_resource_up_to_date",
+	      "resource %s(%s) is not present and not in the rule_modified list",
+	      rrrn, rron);
+	result = FALSE;
+	break;
+      } else {
+	/* Check if this resource is up to date */
+	if (check_resource_up_to_date(rrrn, rron)
+	    == FALSE) {
+	  debug(5, "check_resource_up_to_date",
+		"resource %s(%s) is not up to date", rrrn, rron);
+	  result = FALSE;
+	  break;
+	}
+	/* Check if the timestamp is OK */
+	if (resource_time(res) < resource_time(resp)) {
+	  debug(5, "check_resource_up_to_date",
+		"resource %s(%s) with time stamp %ld is newer "
+		"than resource %s(%s) with time stamp %ld\n",
+		rrrn, rron,
+		(long) resource_time(resp),
+		resource_name(res),
+		resource_owner_name(res),
+		(long) resource_time(res));
+	  result = FALSE;
+	  break;
+	}
+      }
+    }
+  }, reals);
+
+  gen_free_list (reals);
+
+  /* If the resource is up to date then add it in the set */
+  if (result == TRUE) {
+    debug(5, "check_resource_up_to_date",
+	  "resource %s(%s) added to up_to_date "
+	  "with time stamp %d\n",
+	  rname, oname, resource_time(res));
+    set_add_element(up_to_date_resources,
+		    up_to_date_resources, (char *) res);
+  }
+  return result;
 }
 
 
