@@ -137,6 +137,7 @@ char *module_name;
 	fprintf(stderr,"After   ------- COMPLEXITIES; module %s\n",module_name);
     }
 
+    hash_callee_to_complexity = free_callees_complexities(hash_callee_to_complexity);
     reset_precondition_map();
     reset_cumulated_effects_map();
     reset_complexity_map();
@@ -178,6 +179,8 @@ char *module_name;
 	fprintf(stderr,"\n");
 	fprintf(stderr,"Before ======== SUMMARY ; module %s\n",module_name);
     }
+
+    debug_off();
 
     DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_COMPLEXITY,
 			   strdup(module_name),
