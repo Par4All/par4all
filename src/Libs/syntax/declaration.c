@@ -423,13 +423,22 @@ value v;
  * either set if yet unknown, or compared for equality with
  * a pre-defined size.
  */
-static hash_table common_size_map = (hash_table) NULL;
+static hash_table common_size_map = hash_table_undefined;
 
 void initialize_common_size_map()
 {
     pips_assert("initialize_common_size_map", 
-		common_size_map == (hash_table) NULL);
+		common_size_map == hash_table_undefined);
     common_size_map = hash_table_make(hash_pointer, 0);
+}
+
+void
+reset_common_size_map()
+{
+   if (common_size_map != hash_table_undefined) {
+      hash_table_free(common_size_map);
+      common_size_map = hash_table_undefined;
+   }
 }
 
 /* MakeCommon:
@@ -555,8 +564,7 @@ void update_common_sizes()
 	}
     },
 	     common_size_map);
-    hash_table_free(common_size_map);
-    common_size_map = (hash_table) NULL;
+    reset_common_size_map();
 }
 
 /* local variables for implicit type implementation */
