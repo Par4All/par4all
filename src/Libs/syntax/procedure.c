@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 16:39:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 19:11:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/15 16:39:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/15 19:11:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -474,9 +474,9 @@ MakeCurrentFunction(
  */
 
 entity 
-MakeExternalFunction(e, r)
-entity e;
-type r; /* type of result */
+MakeExternalFunction(
+    entity e, /* entity to be turned an external function */
+    type r /* type of result */)
 {
     type te;
     entity fe = entity_undefined;
@@ -487,25 +487,24 @@ type r; /* type of result */
 	if (type_variable_p(te)) {
 	    /* e is a function that was implicitly declared as a variable. 
 	       this may happen in Fortran. */
-	    debug(2, "MakeExternalFunction", "variable --> fonction\n");
-	    pips_assert("MakeExternalFunction", r == type_undefined);
+	    pips_debug(2, "variable --> fonction\n");
+	    pips_assert("undefined type", r == type_undefined);
 	    r = te;
 	}
     }
 
-    debug(9, "MakeExternalFunction", " external function %s declared\n",
-	  entity_name(e));
+    pips_debug(9, "external function %s declared\n", entity_name(e));
 
     if(!top_level_entity_p(e)) {
 	storage s = entity_storage(e);
 	if(s == storage_undefined || storage_ram_p(s)) {
 	    extern list arguments_add_entity(list a, entity e);
 
-	    fe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, entity_local_name(e));
+	    fe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
+				    entity_local_name(e));
 
-	    debug(1, "MakeExternalFunction",
-		  "external function %s re-declared as %s\n",
-		  entity_name(e), entity_name(fe));
+	    pips_debug(1, "external function %s re-declared as %s\n",
+		       entity_name(e), entity_name(fe));
 	    /* FI: I need to destroy a virtual entity which does not
 	     * appear in the program and wich was temporarily created by
 	     * the parser when it recognized a name; however, I've no way
@@ -516,9 +515,8 @@ type r; /* type of result */
 	     */
 	    /* remove_variable_entity(e); */
 	    add_ghost_variable_entities(e);
-	    debug(1, "MakeExternalFunction",
-		  "entity %s to be destroyed\n",
-		  entity_name(e));
+	    pips_debug(1, "entity %s to be destroyed\n", entity_name(e));
+
 	    if(r!=type_undefined) {
 		/* r is going to be re-used to build the functional type
 		 * which is going to be freed later with e
@@ -529,18 +527,16 @@ type r; /* type of result */
 	    }
 	}
 	else if(storage_formal_p(s)){
-	    user_warning("MakeExternalFunction", 
-			 "entity %s is a formal functional parameter\n",
-			 entity_name(e));
+	    pips_user_warning("entity %s is a formal functional parameter\n",
+			      entity_name(e));
 	    ParserError("MakeExternalFunction",
 			"Formal functional parameters are not supported "
 			"by PIPS.\n");
 	    fe = e;
 	}
 	else {
-	    pips_error("MakeExternalFunction", 
-		       "entity %s has an unexpected storage %d\n",
-		       entity_name(e), storage_tag(s));
+	    pips_internal_error("entity %s has an unexpected storage %d\n",
+				entity_name(e), storage_tag(s));
 	}
     }
     else
@@ -566,35 +562,36 @@ type r; /* type of result */
     {
 	type tr = functional_result(type_functional(tfe));
 	if(r != type_undefined && !type_equal_p(tr, r)) {
+
 	    /* a bug is detected here: MakeExternalFunction, as its name
 	       implies, always makes a FUNCTION, even when the symbol
 	       appears in an EXTERNAL statement; the result type is
 	       infered from ImplicitType() - see just above -;
 	       let's use implicit_type_p() again, whereas the unknown type
-	    should have been used */
+	       should have been used 
+	    */
 	    if(intrinsic_entity_p(fe)) {
 		/* ignore r */
-	    }
-	    else if(implicit_type_p(fe) || overloaded_type_p(tr)) {
+	    } else if (type_void_p(tr)) {
+		/* someone used a subroutine as a function.
+		 * this happens in hpfc for declaring "pure" routines.
+		 * thus I make this case being ignored. warning? FC.
+		 */		
+	    } else if (implicit_type_p(fe) || overloaded_type_p(tr)) {
 		/* memory leak of tr */
 		functional_result(type_functional(tfe)) = r;
-	    }
-	    else  {
-		user_warning("MakeExternalFunction",
-			     "Type redefinition for %s.\n", entity_name(fe));
+	    } else  {
+		pips_user_warning("Type redefinition for %s\n", 
+				  entity_name(fe));
 		ParserError("MakeExternalFunction",
 			    "Functional type redefinition.\n");
 	    }
 	}
-    }
-    else if (type_variable_p(tfe)) {
-	pips_error("MakeExternalFunction",
-		   "Fortran does not support global variables\n");
-	}
-    else {
-	pips_error("MakeExternalFunction",
-		   "Unexpected type for a global name %s\n",
-		   entity_name(fe));
+    } else if (type_variable_p(tfe)) {
+	pips_internal_error("Fortran does not support global variables\n");
+    } else {
+	pips_internal_error("Unexpected type for a global name %s\n",
+			    entity_name(fe));
     }
 
     /* a function has a rom storage, except for formal functions */
@@ -604,8 +601,7 @@ type r; /* type of result */
 	if (! storage_formal_p(entity_storage(e)))
 	    entity_storage(fe) = MakeStorageRom();
 	else {
-	    user_warning("MakeExternalFunction",
-			 "unsupported formal function %s\n", 
+	    pips_user_warning("unsupported formal function %s\n", 
 			 entity_name(fe));
 	    ParserError("MakeExternalFunction",
 			"Formal functions are not supported by PIPS.\n");
