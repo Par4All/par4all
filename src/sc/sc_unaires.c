@@ -132,7 +132,8 @@ void sc_sort(
  *
  * Francois Irigoin
  */
-void sc_lexicographic_sort(
+void 
+sc_lexicographic_sort(
     Psysteme sc,
     int (*compare)(Pvecteur*, Pvecteur*))
 {
@@ -145,8 +146,8 @@ void sc_lexicographic_sort(
     contrainte_vect_sort(sc_inegalites(sc), compare);
 
     /* sort equalities and inequalities */
-    sc->egalites = constraints_lexicographic_sort(sc->egalites, compare);
-    sc->inegalites = constraints_lexicographic_sort(sc->inegalites, compare);
+    sc->egalites = equations_lexicographic_sort(sc->egalites, compare);
+    sc->inegalites = inequalities_lexicographic_sort(sc->inegalites, compare);
 }
 
 /*   That is all
