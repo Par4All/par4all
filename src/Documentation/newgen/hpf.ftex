@@ -1,0 +1,51 @@
+\documentstyle{article}
+
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\title{HPFC \\ (High Performance Fortran Compiler) \\ datastructure}
+\author{Fabien Coelho\\
+                \\
+        CRI, E'cole des mines de Paris}
+
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{{#2}}}
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section*{Introduction}
+  Ce document pre'sente tre`s bre`vement les domaines Newgen utilise's
+par le prototype de compilateur {\tt hpfc} pour de'crire les directives
+de placement d'un programme HPF.
+
+\domain{import entity from "ri.newgen"}
+\domain{import expression from "ri.newgen"}
+
+\section{Directives}
+  Les directives HPF conside're'es sont l'alignement et la distribution.
+L'alignement d'un tableau a lieu sur un {\tt template}, et la
+distribution d'un {\em template} est faite sur un {\tt processors}.
+
+\domain{align =  alignment* x template:entity}
+\domain{distribute = distribution* x processors:entity}
+
+\section{Alignements et Distributions}
+  L'alignement d'une dimension de tableau sur une dimension de {\em
+template} est de'crit au moyen du domaine Newgen {\tt alignment}~:
+
+\domain{alignment = arraydim:int x templatedim:int x rate:expression x constant:expression}
+
+  la dimension du tableau {\tt arraydim} est aligne'e avec la dimension
+de {\em template} {\tt templatedim} avec pour parame`tres {\tt rate} et
+{\tt constant}.
+
+  La distribution d'une dimension de {\em template} sur une dimension de
+{\em processors} est de'crite au moyen du domaine {\tt distribution},
+qui permet de retrouver le parame`tre de distribution d'une part ({\tt
+parameter}, et le {\tt style} de la distribution, nulle, par blocks ou
+cyclique.
+
+\domain{distribution = style x parameter:expression}
+\domain{style = \{ none , block , cyclic \}}
+
+\end{document}
