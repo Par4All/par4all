@@ -44,9 +44,9 @@
 
 \domain{data\_status = newdeclmap x alignmap x distributemap x arrays:entity* x templates:entity* x processors:entity*}
 
-\domain{numbers\_status = numbermap:entity_int x arrays:int x templates:int x processors:int}
+\domain{numbers\_status = numbermap:entity\_int x arrays:int x templates:int x processors:int}
 
-\domain{dynamic\_status = dynamics:entity_entities x primary:entitymap x renamings:statement_renamings}
+\domain{dynamic\_status = dynamics:entity_entities x primary:entitymap x renamings:statement\_renamings x tokeep:statement\_entities}
 
 \domain{remapping = renaming x referenced:entity*}
 
