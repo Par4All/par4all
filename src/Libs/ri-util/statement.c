@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.76  2003/08/06 13:45:40  nguyen
+    Correct function insert_statement
+
     Revision 1.75  2003/07/23 13:51:13  irigoin
     New debugging function all_statements_defined_p() added
 
@@ -2109,7 +2112,7 @@ void insert_statement(statement s,
       statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
       statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
       
-      free_instruction(statement_instruction(s));
+      /* free_instruction(statement_instruction(s));*/
       statement_instruction(s) = make_instruction(is_instruction_sequence,
 						  make_sequence(ls));
     } 
