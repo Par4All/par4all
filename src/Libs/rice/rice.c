@@ -294,8 +294,13 @@ int l ;
     }
 
     if ((region = distributable_loop(stat)) == set_undefined) {
+	int so = statement_ordering(stat);
 	user_warning("rice_loop", 
-		     "Can't apply kennedy's algorithm on this loop\n");
+		     "Cannot apply Allen & Kennedy's algorithm on "
+		     "Loop %d at Statement %d (%d, %d)\n",
+		     label_local_name(loop_index(instruction_loop(istat))),
+		     statement_number(stat),
+		     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
 
 	enclosing++ ;
 	loop_body(instruction_loop(istat)) = 
