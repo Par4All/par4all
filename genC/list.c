@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/09/16 21:46:56 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/12/14 17:26:52 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -90,6 +90,14 @@ int gen_length( cp )
   for( i=0; cp != NIL ; cp = cp->cdr, i++ )
     ;
   return( i ) ;
+}
+
+
+int
+list_own_allocated_memory(
+    list l)
+{
+    return gen_length(l)*sizeof(cons);
 }
 
 /*   MAP
