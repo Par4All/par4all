@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: reader.c,v $
+ * Revision 1.29  1998/12/28 09:55:45  coelho
+ * simpler.
+ *
  * Revision 1.28  1998/10/07 16:04:03  irigoin
  * Reset of variable EofSeen added in paser_reset_all_reader_buffers(). This
  * fixes a bug in Parsererror() when its call occured after EofSeen had been set.
@@ -261,10 +264,7 @@ append_data_current_stmt_buffer_to_declarations(void)
     char * tmp = (char*) malloc(lStmt+1), * ndecls, * odecls;
     code c = EntityCode(get_current_module_entity());
 
-    for (; i<lStmt; i++)
-	tmp[i] = (char) stmt_buffer[i];
-    stmt_buffer[i]='\0';
-
+    strncpy(tmp, stmt_buffer, lStmt);
     odecls = code_decls_text(c);
     ndecls = strdup(concatenate(odecls, "! moved up...\n      DATA ", 
 				tmp+4, 0));
