@@ -19,7 +19,6 @@ LINT	= lint
 LINTFLAGS= -habxu
 YACC	= yacc
 YFLAGS	=
-PRFLAGS	= -evcf2
 ETAGS	= etags
 TAR	= tar
 ZIP	= compress
