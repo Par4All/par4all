@@ -158,6 +158,19 @@ user_warning(char * calling_function_name,
    va_end(some_arguments);
 }
 
+/* if not GNU C
+ */
+void 
+pips_user_warning_function(
+   char * format,
+   ...)
+{
+    va_list args;
+    va_start(args, format);
+    user_warning("unknown", format, args);
+    va_end(args);
+}
+
 /* make sure the user has noticed something */
 void default_prompt_user(s)
 char *s;
