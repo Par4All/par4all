@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.241 2004/02/19 14:02:41 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.242 2004/02/20 13:56:10 nguyen Exp $";
 #endif /* lint */
 
  /*
@@ -2604,7 +2604,7 @@ text_statement(
     /* 31/07/2003 Nga Nguyen : This code is added for C, because a statement can have its own declarations */
     list l = statement_declarations(stmt);
     if (!ENDP(l))
-      MERGE_TEXTS(r,c_text_entities(l,margin));
+      MERGE_TEXTS(r,c_text_entities(module,l,margin));
 
     pips_debug(2, "Begin for statement %s\n", statement_identification(stmt));
     pips_debug(9, "statement_comments: --%s--\n", 
