@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.321  1998/01/23 11:46:32  coelho
+# __inline__ dropped out of cproto.
+#
 # Revision 1.320  1997/10/09 14:17:20  coelho
 # rm file before linking.
 #
@@ -982,7 +985,7 @@ build-header-file:
 	echo "#define ${dir_simple_name}_header_included";\\
 	cat \$(TARGET)-local.h;\\
 	\$(PROTOIZE) \$(INC_CFILES) | \\
-	  sed 's/struct _iobuf/FILE/g;s/__const/const/g;/_BUFFER_STATE/d;' ;\\
+	  sed 's/struct _iobuf/FILE/g;s/__const/const/g;/_BUFFER_STATE/d;/__inline__/d;' ;\\
 	echo "#endif /* ${dir_simple_name}_header_included */";\\
 	} > \$(INC_TARGET).tmp
 	\$(MOVE) \$(INC_TARGET).tmp \$(INC_TARGET)
