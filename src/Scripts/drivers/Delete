@@ -40,7 +40,13 @@ do
 		exit 2
 	else
 		# echo rm -r $WS
-		rm -r $WS
+		if /bin/rm -f -r $WS
+		then
+			true
+		else
+			echo Cannot remove $WS >/dev/tty
+			exit 3
+		fi
 	fi
 	done
 	shift
