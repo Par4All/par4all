@@ -1,5 +1,7 @@
 #
 # Generate various files for the User Manual:
+# 
+# Transformations are taken from a menu in the .tex file.
 #
 # $Id$
 #
