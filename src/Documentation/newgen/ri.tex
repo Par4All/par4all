@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/07/24 17:03:52 $, 
+%% $Date: 1997/07/24 17:15:24 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
@@ -46,7 +46,7 @@ more information about NewGen see \cite{JT89,JT90}.
 
 This document is part of PIPS documentation and its Latex version is
 located in \verb+$PIPS_ROOT/Src/Documentation/newgen/ri.tex+\footnote{The
-  development version is located in \verb+$PIPS_DIR/Development/Documentation/newgen/ri.tex+.} (\verb+ri+
+  development version is located in \texttt{\$PIPS\_DIR/Development/Documentation/newgen/ri.tex}.} (\verb+ri+
 stands for Internal Representation, {\em représentation interne} in
 French). It is used to generate a PIPS include file called
 \verb+$PIPS_ROOT/Include/ri.h+. The functions available to manipulate
@@ -1854,7 +1854,7 @@ to a sub-array since a \verb/range/ can be used as subscript expression
 of a reference. This facility is used when the cumulated effects of a
 callee are translated into proper effects of the CALL site in the caller
 scope. For regions, field \verb/reference/ defines the accessed variable
-as well as pseudo-variables, known as \ver/PHI/ variables. There is one
+as well as pseudo-variables, known as \verb/PHI/ variables. There is one
 \verb/PHI/ variable per array dimension.
 
 \begin{comment}
