@@ -30,7 +30,7 @@ Psysteme sc_fusion(Psysteme s1, Psysteme s2)
       return s2;
 
     if (sc_rn_p(s1)) {
-      free(s2);
+      free(s1);
       return s2;
     }
 
@@ -38,7 +38,7 @@ Psysteme sc_fusion(Psysteme s1, Psysteme s2)
       return s1;
 
     if (sc_rn_p(s2)) {
-      free(s1);
+      free(s2);
       return s1;
     }
 
