@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 1997/08/01 11:17:00 $, )
+/* $RCSfile: newgen_hash.h,v $ ($Date: 2000/04/20 18:50:07 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -52,7 +52,7 @@ typedef struct __hash_table *hash_table;
    called HASH_KEY_NOT_FOUND, but it's semantically a value; this bottom
    value will be user-definable in a future release of NewGen */
 
-#define HASH_UNDEFINED_VALUE ((char *) gen_chunk_undefined)
+#define HASH_UNDEFINED_VALUE ((void *) gen_chunk_undefined)
 
 #define hash_table_empty_p(htp) (hash_table_entry_count(htp) == 0)
 
@@ -60,7 +60,7 @@ typedef struct __hash_table *hash_table;
     {\
     hash_table _map_hash_h = (h) ; \
     register hash_entry_pointer _map_hash_p = NULL; \
-    char *k, *v; \
+    void *k, *v; \
     while ((_map_hash_p = hash_table_scan(_map_hash_h,_map_hash_p,&k,&v))) { \
             code ; }}
 #endif
@@ -73,20 +73,20 @@ typedef struct __hash_table *hash_table;
 if (hash_warn_on_redefinition_p() == TRUE)		\
 {							\
     hash_dont_warn_on_redefinition();			\
-    hash_put((hash_table)h, (char*)k, (char*)v);	\
+    hash_put((hash_table)h, (void*)k, (void*)v);	\
     hash_warn_on_redefinition();			\
 } else							\
-    hash_put((hash_table)h, (char*)k, (char*)v);
+    hash_put((hash_table)h, (void*)k, (void*)v);
 
 /* functions declared in hash.c 
  */
 extern void hash_warn_on_redefinition GEN_PROTO((void));
 extern void hash_dont_warn_on_redefinition GEN_PROTO((void));
-extern char * hash_delget GEN_PROTO((hash_table, char *, char **));
-extern char * hash_del GEN_PROTO((hash_table, char *));
-extern char * hash_get GEN_PROTO((hash_table, char *));
-extern bool hash_defined_p GEN_PROTO((hash_table, char *));
-extern void hash_put GEN_PROTO((hash_table, char *, char *));
+extern void * hash_delget GEN_PROTO((hash_table, void *, void **));
+extern void * hash_del GEN_PROTO((hash_table, void *));
+extern void * hash_get GEN_PROTO((hash_table, void *));
+extern bool hash_defined_p GEN_PROTO((hash_table, void *));
+extern void hash_put GEN_PROTO((hash_table, void *, void *));
 extern void hash_table_clear GEN_PROTO((hash_table));
 extern void hash_table_free GEN_PROTO((hash_table));
 extern hash_table hash_table_make GEN_PROTO((hash_key_type, int));
@@ -94,7 +94,7 @@ extern void hash_table_print_header GEN_PROTO((hash_table, FILE *));
 extern void hash_table_print GEN_PROTO((hash_table));
 extern void hash_table_fprintf GEN_PROTO((FILE *, char *(*)(), 
 					  char *(*)(), hash_table));
-extern void hash_update GEN_PROTO((hash_table, char*, char*));
+extern void hash_update GEN_PROTO((hash_table, void *, void*));
 extern bool hash_warn_on_redefinition_p GEN_PROTO((void));
 
 extern int hash_table_entry_count GEN_PROTO((hash_table));
@@ -103,8 +103,8 @@ extern int hash_table_own_allocated_memory GEN_PROTO((hash_table));
 extern hash_key_type hash_table_type GEN_PROTO((hash_table));
 extern hash_entry_pointer hash_table_scan GEN_PROTO((hash_table,
 						     hash_entry_pointer,
-						     char **,
-						     char **));
+						     void **,
+						     void **));
 
 /*  that is all
  */
