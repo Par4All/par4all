@@ -52,9 +52,7 @@
 extern Pvecteur vect_gen_read();
 extern void vect_gen_write();
 
-void sc_gen_write(fd, s)
-FILE *fd;
-Psysteme s;
+void sc_gen_write(FILE *fd, Psysteme s)
 {
     Pcontrainte c;
     Psysteme stored_s;
@@ -111,9 +109,7 @@ Psysteme s;
 
 }
 
-Psysteme sc_gen_read(fd, f)
-FILE *fd; /* ignored */
-int (*f)();
+Psysteme sc_gen_read(FILE * fd /* ignored */, int (*f)())
 {
     Psysteme s = sc_new();
     int c;
@@ -172,33 +168,22 @@ int (*f)();
     return s;
 }
 
-void sc_gen_free(s)
-Psysteme s;
+void sc_gen_free(Psysteme s)
 {
     sc_rm(s);
-    s = SC_UNDEFINED;
 }
 
-Psysteme sc_gen_copy_tree(s)
-Psysteme s;
+Psysteme sc_gen_copy_tree(Psysteme s)
 {
-    return(sc_dup(s));
+    return sc_dup(s);
 }
 
-int
-sc_gen_allocated_memory(
-    Psysteme s)
+int sc_gen_allocated_memory(Psysteme s)
 {
     return contrainte_gen_allocated_memory(sc_egalites(s)) 
 	 + contrainte_gen_allocated_memory(sc_inegalites(s)) 
 	 + vect_gen_allocated_memory(sc_base(s)) 
 	 + sizeof(Ssysteme) ;
-}
-
-void sc_syst_debug(s)
-Psysteme s;
-{
-    sc_fprint(stderr, s, entity_local_name);
 }
 
 /*   That is all
