@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.69  1997/10/28 09:36:16  coelho
+ * nope.
+ *
  * Revision 1.68  1997/10/27 16:49:26  coelho
  * db put updated to Src.
  *
@@ -86,19 +89,17 @@ make_host_and_node_modules (entity module)
 		var_name = concatenate(name, MODULE_SEP_STRING, name, NULL),
 		tmp_name;
 	    entity
-		var = gen_find_tabulated(var_name, entity_domain), nev;
+		var = gen_find_tabulated(var_name, entity_domain), neh, nen;
 
 	    pips_assert("defined", !entity_undefined_p(var));
 
 	    tmp_name = entity_local_name(host);
-	    nev = find_or_create_scalar_entity(tmp_name, tmp_name, 
+	    neh = find_or_create_scalar_entity(tmp_name, tmp_name, 
 					       is_basic_overloaded);
-	    store_new_host_variable(nev, var);
-
 	    tmp_name = entity_local_name(node);
-	    nev = find_or_create_scalar_entity(tmp_name, tmp_name, 
+	    nen = find_or_create_scalar_entity(tmp_name, tmp_name, 
 					       is_basic_overloaded);
-	    store_new_node_variable(nev, var);
+	    store_new_host_node_variable(neh, nen, var);
 	}		
     }
 
@@ -605,11 +606,8 @@ hpfcompile (string module_name)
 static bool expression_simple_nondist_p(expression e)
 {
     reference r;
-
     if (!expression_reference_p(e)) return(FALSE);
-
     r = syntax_reference(expression_syntax(e));
-
     return !array_distributed_p(reference_variable(r)) &&
 	    ENDP(reference_indices(r));
 }
@@ -623,9 +621,10 @@ static bool hpfc_decision(reference r, expression e)
 	   !expression_simple_nondist_p(e);
 }
 
-entity hpfc_new_variable(module, t)
-entity module;
-tag t;
+entity 
+hpfc_new_variable(
+    entity module,
+    tag t)
 {
     return make_new_scalar_variable(module, MakeBasic(t));
 }
