@@ -6,7 +6,7 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/04/21 14:50:04 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/04/25 18:56:32 $, )
  * version $Revision$
  */
 
@@ -85,7 +85,7 @@ entity e;
 	store_dynamic_hpf(e, make_entities(CONS(ENTITY, e, NIL)));
 	store_primary_entity(e, e);
     }
-    /* else the entity was already declared as dynamic */
+    /* else the entity was already declared as dynamic... */
 }
 
 /*  as expected, TRUE if entity e is dynamic. 
@@ -228,10 +228,8 @@ align a1, a2;
     if (align_template(a1)!=align_template(a2)) return(FALSE);
 
     MAPL(ca,
-     {
 	 if (!same_alignment_in_list_p(ALIGNMENT(CAR(ca)), l2))
-	     return(FALSE);
-     },
+	     return(FALSE),
 	 l1);
 
     return(TRUE);
@@ -317,6 +315,360 @@ distribute d;
     return(new_synonym_template(temp, d));
 }
 
+/* void propagate_synonym(s, old, new)
+ * statement s;
+ * entity old, new;
+ *
+ * what: propagates a new array/template synonym (old->new) from statement s.
+ * how: travels thru the control graph till the next remapping.
+ * input: the starting statement, plus the two entities.
+ * output: none.
+ * side effects:
+ *  - uses the crtl_graph travelling.
+ *  - set some static variables for the continuation decisions and switch.
+ * bugs or features:
+ *  - not very efficient. Could have done something to deal with 
+ *    several synonyms at the same time...
+ *  - what is done on an "incorrect" code is not clear.
+ */
+GENERIC_LOCAL_FUNCTION(alive_synonym, statement_entities);
+GENERIC_LOCAL_FUNCTION(used_dynamics, statement_entities);
+GENERIC_LOCAL_FUNCTION(remapping_graph, controlmap);
+
+void init_dynamic_locals()
+{
+    init_alive_synonym();
+    init_remapping_graph();
+    init_used_dynamics();
+}
+
+void close_dynamic_locals()
+{
+    close_alive_synonym();
+    close_used_dynamics();
+
+    /*  can't close it directly...
+     */
+    CONTROLMAP_MAP(s, c, 
+      {
+	  debug(9, "close_dynamic_locals", "statement 0x%x\n",
+		(unsigned int) s);
+
+	  control_statement(c) = statement_undefined;
+	  gen_free_list(control_successors(c)); control_successors(c) = NIL;
+	  gen_free_list(control_predecessors(c)); control_predecessors(c) = NIL;
+      },
+		   get_remapping_graph());
+
+    close_remapping_graph();
+}
+
+static entity 
+    old_variable = entity_undefined, /* entity to be replaced */
+    new_variable = entity_undefined; /* replacement */
+static bool 
+    array_propagation, /* TRUE if an array is propagated, FALSE if template */
+    array_used;        /* TRUE if the array was actually used */
+static statement 
+    initial_statement = statement_undefined; /* starting point */
+
+/*  initialize both the remapping graph and the used dynamics for s
+ */
+static void lazy_initialize_for_statement(s)
+statement s;
+{
+    if (!bound_remapping_graph_p(s))
+	store_remapping_graph(s, make_control(s, NIL, NIL));
+
+    if (!bound_used_dynamics_p(s))
+	store_used_dynamics(s, make_entities(NIL));
+}
+
+static void add_as_a_closing_statement(s)
+statement s;
+{
+    control c = load_remapping_graph(initial_statement);
+    lazy_initialize_for_statement(s);
+    control_successors(c) = 
+	gen_once(load_remapping_graph(s), control_successors(c));
+}
+
+static void add_as_a_used_variable(e)
+entity e;
+{
+    entities es = load_used_dynamics(initial_statement);
+    entities_list(es) = gen_once(load_primary_entity(e), entities_list(es));
+}
+
+static void add_alive_synonym(s, a)
+statement s;
+entity a;
+{
+    entities es;
+
+    /*   lazy initialization 
+     */
+    if (!bound_alive_synonym_p(s))
+	store_alive_synonym(s, make_entities(NIL));
+
+    es = load_alive_synonym(s);
+    entities_list(es) = gen_once(a, entities_list(es));
+}
+
+static void ref_rwt(r)
+reference r;
+{
+    if (reference_variable(r)==old_variable)
+	reference_variable(r) = new_variable,
+	array_used = TRUE;
+}
+
+static void simple_switch_old_to_new(s)
+statement s;
+{
+    gen_multi_recurse
+	(statement_instruction(s),
+	 statement_domain,    gen_false, gen_null, /* STATEMENT */
+	 unstructured_domain, gen_false, gen_null, /* UNSTRUCTURED ? */
+	 reference_domain,    gen_true,  ref_rwt,  /* REFERENCE */
+	 NULL);
+}
+
+/*  TRUE if not a remapping for old. 
+ *  if it is a remapping, operates the switch.
+ *  ??? just check for realign right now.
+ */
+static bool continue_propagation_p(s)
+statement s;
+{
+    instruction i = statement_instruction(s);
+
+    if (!instruction_call_p(i)) 
+	return(TRUE);
+    else
+    {
+	call c = instruction_call(i);
+	entity fun = call_function(c);
+
+	if (realign_directive_p(fun) && array_propagation)
+	{
+	    DEBUG_STAT(8, "realign directive", s);
+
+	    MAPL(ce,
+	     {
+		 reference r = expression_to_reference(EXPRESSION(CAR(ce)));
+
+		 if (load_primary_entity(reference_variable(r))==old_variable)
+		 {
+		     /*  the variable is realigned.
+		      */
+		     reference_variable(r) = new_variable;
+		     add_as_a_closing_statement(s);
+		     return(FALSE);
+		 }
+	     },
+		 call_arguments(c));
+	}
+	else if (redistribute_directive_p(fun))
+	{
+	    entity t = array_propagation ?
+		align_template(load_entity_align(new_variable)) : old_variable;
+	    expression e;
+		
+	    MAPL(ce,
+	     {
+		 e = EXPRESSION(CAR(ce));
+
+		 /*   if template t is redistributed...
+		  */
+		 if (load_primary_entity(expression_to_entity(e))==t)
+		 {
+		     if (array_propagation)
+			 /*  then the new_variable is the alive one.
+			  */
+			 add_alive_synonym(s, new_variable);
+		     else
+			 reference_variable
+			     (syntax_reference(expression_syntax(e))) = 
+				 new_variable;
+		     
+		     add_as_a_closing_statement(s);
+		     return(FALSE);
+		 }
+	     },
+		 call_arguments(c));
+	}
+
+	return(TRUE);
+    }
+}
+
+void propagate_synonym(s, old, new)
+statement s;
+entity old, new;
+{
+    statement current;
+
+    debug(3, "propagate_array_synonym", "%s -> %s from statement 0x%x\n",
+	  entity_name(old), entity_name(new), (unsigned int) s);
+
+    old_variable = load_primary_entity(old), new_variable = new, 
+    array_propagation = array_distributed_p(old),
+    array_used = FALSE,
+    initial_statement = s;
+
+    lazy_initialize_for_statement(s);
+
+    init_ctrl_graph_travel(s, continue_propagation_p);
+
+    while (next_ctrl_graph_travel(&current))
+	simple_switch_old_to_new(current);
+
+    if (array_used) add_as_a_used_variable(old);
+
+    old_variable = entity_undefined, new_variable = entity_undefined;
+    close_ctrl_graph_travel();
+}
+
+/* void simplify_remapping_graph()
+ *
+ * what: simplifies the current remapping graph.
+ * how: remove unusefull (not used) remappings.
+ * input: none.
+ * output: none.
+ * side effects:
+ *  - the current remapping graph is used.
+ *  - the current renamings are modified.
+ * bugs or features:
+ *  - ??? the convergence is not actually proved. 
+ *    I guess it is ok only if the dynamic code is "static"...
+ */
+static list /* of statements */ list_of_remapping_statements()
+{
+    list /* of statements */ l = NIL;
+
+    CONTROLMAP_MAP(s, c, 
+	{
+	    debug(10, "list_of_remapping_statements", 
+		  "statement 0x%x, control 0x%x\n", 
+		  (unsigned int) s, (unsigned int) c);
+	    
+	    l = CONS(STATEMENT, s, l);
+	}, get_remapping_graph());
+
+    return(l);
+}
+
+/* each successor of s is looked for a renaming new_var -> X,
+ * and new_var is switched to old_var if so.
+ */
+static void change_renaming(s, old_var, new_var, pm)
+statement s;
+entity old_var, new_var;
+list /* of statements */ *pm; /* the list is modified */
+{
+    MAPL(cc,
+     {
+	 statement succ = control_statement(CONTROL(CAR(cc)));
+
+	 MAPL(cr,
+	  {
+	      renaming r = RENAMING(CAR(cr));
+	      
+	      if (renaming_old(r)==new_var)
+	      {
+		  renaming_old(r) = old_var;
+		  *pm = gen_once(succ, *pm);
+	      }
+	  },
+	      load_renamings(succ));
+     },
+	 control_successors(load_remapping_graph(s)));
+}
+
+/* the statement is looked for unusefull remappings.
+ * those found are propagated and the touch remapping statements are returned.
+ */
+static void simplify_remapping_for_statement(s, pmodified)
+statement s;
+list /* of statements */ *pmodified; /* the list is modified */
+{
+    list /* of renamings */ lr = load_renamings(s),
+         /* of entities */  le = entities_list(load_used_dynamics(s));
+
+    MAPL(cr,
+     {
+	 renaming r = RENAMING(CAR(cr));
+	 entity new_var = renaming_new(r);
+	 entity old_var = renaming_old(r);
+	 entity primary = load_primary_entity(new_var);
+
+	 if (!gen_in_list_p(primary, le) && old_var!=new_var)
+	 {
+	     /* something to change 
+	      */
+	     debug(3, "simplify_remapping_for_statement",
+		   "forwarding unused %s -> %s\n",
+		   entity_local_name(old_var), entity_local_name(new_var));
+
+	     change_renaming(s, old_var, new_var, pmodified);
+	     renaming_new(r) = old_var;
+	 }	     
+     },
+	 lr);
+}
+
+/* 1/ A -> A' (not used) and A' -> A''  =>  A -> A and A -> A''.
+ * 2/ A -> A  =>  (void).
+ */
+void simplify_remapping_graph()
+{
+    list /* of statements */
+	to_check = list_of_remapping_statements(),
+	to_clean = gen_copy_seq(to_check);
+
+    /*  transitive simplification if the intermediate array is not used.
+     *  in the code section. 
+     *  propagate unused remappings till remapping graph stability.
+     *  the convergence should be proved. I guess it is okay if the code
+     *  is static, but a formal proof would be nice...
+     */
+    while (to_check!=NIL)
+    {
+	list /* of statements */ modified = NIL;
+
+	MAPL(cs,
+	     simplify_remapping_for_statement(STATEMENT(CAR(cs)), &modified), 
+	     to_check);
+	     
+	gen_free_list(to_check), to_check = modified;
+    }
+
+    /* remove A -> A
+     */
+    MAPL(cs,
+     {
+	 statement s = STATEMENT(CAR(cs));
+	 list /* of renamings */ lr = load_renamings(s);
+	 list /* of renamings */ ln = NIL;
+
+	 MAPL(cr,
+	  {
+	      renaming r = RENAMING(CAR(cr));
+	      if (renaming_old(r)!=renaming_new(r))
+		  ln = CONS(RENAMING, r, ln);
+	      else 
+		  free_renaming(r);
+	  },
+	      lr);
+
+	 gen_free_list(lr); update_renamings(s, ln);
+     },
+	 to_clean);
+
+    gen_free_list(to_clean);
+}
+
 /* list alive_arrays(s, t);
  * statement s;
  * entity t;
@@ -368,148 +720,6 @@ entity t;
 	 list_of_distributed_arrays());
 
     gen_free_list(lseens); return(l);
-}
-
-/* void propagate_synonym(s, old, new)
- * statement s;
- * entity old, new;
- *
- * what: propagates a new array/template synonym (old->new) from statement s.
- * how: travels thru the control graph till the next remapping.
- * input: the starting statement, plus the two entities.
- * output: none.
- * side effects:
- *  - uses the crtl_graph travelling.
- *  - set some static variables for the continuation decisions and switch.
- * bugs or features:
- *  - not very efficient. Could have done something to deal with 
- *    several synonyms at the same time...
- *  - what is done on an "incorrect" code is not clear.
- */
-GENERIC_GLOBAL_FUNCTION(alive_synonym, statement_entities);
-
-static entity 
-    old_variable = entity_undefined,
-    new_variable = entity_undefined;
-static bool array_propagation;
-
-static void add_alive_synonym(s, a)
-statement s;
-entity a;
-{
-    entities es;
-
-    /*   lazy initialization 
-     */
-    if (!bound_alive_synonym_p(s))
-	store_alive_synonym(s, make_entities(NIL));
-
-    es = load_alive_synonym(s);
-    entities_list(es) = gen_once(a, entities_list(es));
-}
-
-static void ref_rwt(r)
-reference r;
-{
-    if (reference_variable(r)==old_variable)
-	reference_variable(r) = new_variable;
-}
-
-static void simple_switch_old_to_new(s)
-statement s;
-{
-    gen_multi_recurse
-	(statement_instruction(s),
-	 statement_domain,    gen_false, gen_null, /* STATEMENT */
-	 unstructured_domain, gen_false, gen_null, /* UNSTRUCTURED ? */
-	 reference_domain,    gen_true,  ref_rwt,  /* REFERENCE */
-	 NULL);
-}
-
-/*  TRUE if not a remapping for old. 
- *  if it is a remapping, operates the switch.
- *  ??? just check for realign right now.
- */
-static bool continue_propagation_p(s)
-statement s;
-{
-    instruction i = statement_instruction(s);
-
-    if (!instruction_call_p(i)) 
-	return(TRUE);
-    else
-    {
-	call c = instruction_call(i);
-	entity fun = call_function(c);
-
-	if (realign_directive_p(fun) && array_propagation)
-	{
-	    MAPL(ce,
-	     {
-		 reference r = expression_to_reference(EXPRESSION(CAR(ce)));
-
-		 if (reference_variable(r)==old_variable)
-		 {
-		     /*  the variable is realigned.
-		      */
-		     reference_variable(r) = new_variable;
-		     return(FALSE);
-		 }
-	     },
-		 call_arguments(c));
-	}
-	else if (redistribute_directive_p(fun))
-	{
-	    entity t = array_propagation ?
-		align_template(load_entity_align(new_variable)) : old_variable;
-	    expression e;
-		
-	    MAPL(ce,
-	     {
-		 e = EXPRESSION(CAR(ce));
-
-		 /*   if template t is redistributed...
-		  */
-		 if (expression_to_entity(e)==t)
-		 {
-		     if (array_propagation)
-			 /*  then the new_variable is the alive one.
-			  */
-			 add_alive_synonym(s, new_variable);
-		     else
-			 reference_variable
-			     (syntax_reference(expression_syntax(e))) = 
-				 new_variable;
-		     
-		     return(FALSE);
-		 }
-	     },
-		 call_arguments(c));
-	}
-
-	return(TRUE);
-    }
-}
-
-void propagate_synonym(s, old, new)
-statement s;
-entity old, new;
-{
-    statement current;
-
-    debug(3, "propagate_array_synonym", "%s -> %s from statement 0x%x\n",
-	  entity_name(old), entity_name(new), (unsigned int) s);
-
-    old_variable = old, new_variable = new, 
-    array_propagation = array_distributed_p(old);
-
-    init_ctrl_graph_travel(s, continue_propagation_p);
-
-    while (next_ctrl_graph_travel(&current))
-	simple_switch_old_to_new(current);
-
-    old_variable = entity_undefined, new_variable = entity_undefined;
-    close_ctrl_graph_travel();
 }
 
 /* statement generate_copy_loop_nest(src, trg)
