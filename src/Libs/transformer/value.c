@@ -312,7 +312,9 @@ entity e;
 	    s = hash_get(hash_value_to_name, (char *) a);
 	}
 	else {
-	    pips_internal_error("unexpected value %s\n", entity_name(e));
+	    pips_user_warning("strange value %s for current module\n", 
+			      entity_name(e));
+	    return entity_name(e);
 	}
     }
 	    
