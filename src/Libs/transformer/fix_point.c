@@ -467,7 +467,7 @@ Pvecteur eq;
 {
     Pvecteur t;
     int n_new = 0;
-    int coeff;
+    int coeff = 0; /* for gcc */
 
     for(t=eq; !VECTEUR_UNDEFINED_P(t) && n_new <= 1; t = t->succ) {
 	entity e = (entity) vecteur_var(t);
@@ -486,7 +486,7 @@ Pvecteur eq;
 {
     Pvecteur t;
     int n_new = 0;
-    int coeff;
+    int coeff = 0; /* for gcc */
     entity new_value = entity_undefined;
 
     for(t=eq; !VECTEUR_UNDEFINED_P(t) && n_new <= 1; t = t->succ) {
