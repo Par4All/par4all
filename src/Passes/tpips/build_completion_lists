@@ -10,3 +10,7 @@ nawk 'BEGIN{print "static char *tp_resource_names[]={";}
 {print "\t",$3,",";}
 END{print "(char*)NULL};"}'
 
+grep -v \# $PIPS_LIBDIR/properties.rc | \
+nawk 'BEGIN{print "static char *tp_property_names[]={";}
+{if ($1) printf "\t\"%s\",\n",$1;}
+END{print "(char*)NULL};"}'
