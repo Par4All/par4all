@@ -90,8 +90,3 @@ extern list effect_to_sdfi_list(effect /*eff*/);
 extern void simple_effects_descriptor_normalize(list /*l_eff*/);
 #endif /* effects_simple_header_included */
 
-/***********written by Dat*************/
-extern text my_get_text_proper_effects(string module_name);
-/**************************************/
-
-
