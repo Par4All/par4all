@@ -4,10 +4,10 @@
    Ronan Keryell.
    */
 
-/* 	%A% ($Date: 1997/09/25 20:23:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/26 15:20:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1997/09/25 20:23:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1997/09/26 15:20:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -138,25 +138,29 @@ display_linked_control_nodes(control c) {
    when there is an unreachable sequence pointing on it.
 
    If a control node contains a FORMAT, assume that it is useful and
-   stop removing. */
+   stop removing.
+
+   The do_not_delete_node is expected to be the entry or the exit node
+   for example in order not to delete them. */
 void
 remove_unreachable_following_control(control c,
-				     control entry_node)
+				     control do_not_delete_node)
 {
-    /* If this is the entry node: stop deleting: */
-    if (c == entry_node)
+    /* If this is the do_not_delete_node node: stop deleting: */
+    if (c == do_not_delete_node)
 	return;
     /* If this is not or no more a sequence, stop deleting: */
-    if (gen_length(control_predecessors(c)) <= 1)
+    if (gen_length(control_predecessors(c)) > 1)
 	return;
     /* If there is a FORMAT inside a control node, just stop deleting
-       the control nodes: */
+       the control nodes since we cannot decide locally if the FORMAT
+       is useful or not: */
     if (format_inside_statement_p(control_statement(c)))
 	return;
     
     /* Ok, we can delete. For each successor of c: */
     MAP(CONTROL, a_successor, {
-	remove_unreachable_following_control(a_successor, entry_node);
+	remove_unreachable_following_control(a_successor, do_not_delete_node);
 	/* Remove any predecessor reference of itself in this
 	   successor: */
 	gen_remove(&control_predecessors(a_successor), c);
@@ -174,36 +178,70 @@ remove_unreachable_following_control(control c,
 void
 remove_the_unreachable_controls_of_an_unstructured(unstructured u)
 {
-   list blocs = NIL;
-   list control_remove_list = NIL;
+    list blocs = NIL;
+    list control_remove_list = NIL;
    
-   /* The entry point of the unstructured: */
-   control entry_node = unstructured_control(u);
+    /* The entry point of the unstructured: */
+    control entry_node = unstructured_control(u);
+    control exit_node = unstructured_exit(u);
+    bool exit_node_has_been_seen = FALSE;
+    CONTROL_MAP(c,
+		{
+		    if (c != entry_node)
+			/* Well, the entry node is guessed as
+			   reachable... :-) */
+			if (control_predecessors(c) == NIL) {
+			    /* A control without predecessor is
+			       unreachable, so it is dead code: */
+			    control_remove_list = CONS(CONTROL,
+						       c,
+						       control_remove_list);
+			}
+		    if (c == exit_node)
+			/* Note that we could have entry_node ==
+			   exit_node... */
+			exit_node_has_been_seen = TRUE;
+		},
+		entry_node,
+		blocs);
+    gen_free_list(blocs);
 
-   CONTROL_MAP(c,
-               {
-                  if (c != entry_node)
-                     /* Well, the entry node is guessed as
-                        reachable... :-) */
-                     if (control_predecessors(c) == NIL) {
-                        /* A control without predecessor is
-                           unreachable, so it is dead code: */
-                        control_remove_list = CONS(CONTROL,
-                                                   c,
-                                                   control_remove_list);
-                     }
-               },
-                  entry_node,
-                  blocs);
-   gen_free_list(blocs);
+    /* Now remove all the marqued sequences from the entry_node: */
+    MAP(CONTROL, c,
+	{
+	    remove_unreachable_following_control(c, entry_node);
+	},
+	control_remove_list);
+    gen_free_list(control_remove_list);
 
-   /* Now remove all the marqued sequences: */
-   MAP(CONTROL, c,
-       {
-          remove_unreachable_following_control(c, entry_node);
-       },
-          control_remove_list);
-   gen_free_list(control_remove_list);
+    if (!exit_node_has_been_seen) {
+	/* Do not forget the unreachable exit part if it is not connex
+           to the entry_node: */
+	blocs = NIL;
+	control_remove_list = NIL;
+	CONTROL_MAP(c,
+		    {
+			if (c != exit_node)
+			    /* Do not remove the exit_node... */
+			    if (control_predecessors(c) == NIL) {
+				/* A control without predecessor is
+				   unreachable, so it is dead code: */
+				control_remove_list = CONS(CONTROL,
+							   c,
+							   control_remove_list);
+			    }
+		    },
+		    exit_node,
+		    blocs);
+	gen_free_list(blocs);      
+	/* Now remove all the marqued sequences from the entry_node: */
+	MAP(CONTROL, c,
+	    {
+		remove_unreachable_following_control(c, exit_node);
+	    },
+	    control_remove_list);
+	gen_free_list(control_remove_list);
+    }   
 }
 
 
