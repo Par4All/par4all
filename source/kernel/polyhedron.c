@@ -1964,11 +1964,17 @@ Polyhedron *Universe_Polyhedron(unsigned Dimension) {
   return Pol;
 } /* Universe_Polyhedron */
 
-/*
- * Given a matrix of constraints ('Constraints'), construct and return a 
- * polyhedron. 'NbMaxRays' is the maximum allowed rays in the ray matrix
- * of the polyhedron. 
- */ 
+/**
+
+Given a matrix of constraints ('Constraints'), construct and return a 
+polyhedron.
+
+@param Constraints Constraints (may be modified!)
+@param NbMaxRays Estimated number of rays in the ray matrix of the
+polyhedron.
+@return newly allocated Polyhedron
+
+*/ 
 Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
   
   Polyhedron *Pol = NULL;
@@ -2084,11 +2090,15 @@ Matrix *Polyhedron2Constraints(Polyhedron *Pol) {
   return Mat;
 } /* Polyhedron2Constraints */
 
-/* 
- * Given a matrix of rays 'Ray', create and return a polyhedron. 
- * 'NbMaxConstrs' is the maximum allowed constraints in the new 
- * polyhedron. 
- */
+/** 
+
+Given a matrix of rays 'Ray', create and return a polyhedron. 
+
+@param Ray Rays (may be modified!)
+@param NbMaxRays Estimated number of constraints in the polyhedron.
+@return newly allocated Polyhedron
+
+*/ 
 Polyhedron *Rays2Polyhedron(Matrix *Ray,unsigned NbMaxConstrs) {
   
   Polyhedron *Pol = NULL;
