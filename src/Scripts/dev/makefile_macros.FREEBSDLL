@@ -1,0 +1,15 @@
+#
+# $Id$
+# 
+# this file contains macro definitions 
+
+include $(ROOT)/Include/makefile_macros.GNU
+
+AR	=	ar
+RANLIB	=	ranlib
+DIFF	=	diff
+M4	=	m4
+
+
+# end of it!
+#
