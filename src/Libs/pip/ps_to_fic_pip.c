@@ -25,10 +25,6 @@
 #include "pip.h"
 #include "list.h"
 
-extern int fprintf();
-extern int fseek();
-extern int fclose();
-
 #define PIP_IN_FILE "pip_in"
 
 #define OK 0
