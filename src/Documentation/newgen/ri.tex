@@ -2,6 +2,11 @@
 %% $Id$
 %%
 %% $Log: ri.tex,v $
+%% Revision 1.72  2003/11/05 15:33:53  nguyen
+%% Add new kind of syntax, application, to handle function calls in C
+%% where the first field can be any expression that denotes the called
+%% function, not necessary an entity.
+%%
 %% Revision 1.71  2003/09/12 12:01:39  nguyen
 %% Add expression to instruction to handle C language
 %%
@@ -1639,7 +1644,7 @@ field set to {\tt normalized\_undefined}.
 \label{subsection-syntax}
 \index{Syntax}
 
-\domain{Syntax = reference + range + call + cast + sizeofexpression + subscript}
+\domain{Syntax = reference + range + call + cast + sizeofexpression + subscript + application}
 {}
 
 Type \verb/syntax/ is used to represent expressions as they are
@@ -1653,11 +1658,14 @@ element\footnote{Scalar variables are represented as 0-dimensional
 definitions\footnote{This explains why type \texttt{range} is defined
   in the {\em Instruction} section.} and array declarations.
 
-New kinds of syntax are added to handle C language. They are cast
-expressions, sizeof expressions and subscripting array expressions. The last
-one is an extension of reference expressions, because they include other
-more complicated array objects which can be a pointer, a function, a
-structure or union member, ...   
+New kinds of syntax are added to handle C language. They are {\it cast},
+ {\it sizeof}, {\it subscripting array} and
+{\it function application} expressions. The subscripting array expression
+is an extension of the reference expression, which includes other
+more complicated array objects such as pointer, function, 
+structure or union member, ... The same extension is made to call
+expression, named function application, because the called function is
+not necessarily an entity but can be any expression that denotes a function.   
 
 \begin{comment}
 Le domaine \verb/syntax/ permet de représenter les expressions telles
@@ -1735,6 +1743,14 @@ with side effect. See Section~\ref{subsubsection-call}.
 
 \domain{Subscript = array:expression x indices:expression*}
 {}
+
+\subsubsection{Application}
+\label{subsubsection-application}
+\index{Application}
+
+\domain{Application = function:expression x arguments:expression*}
+{}
+
 \subsection{Affine Representation of an Expression}
 \label{subsection-normalized}
 \index{Normalized}
