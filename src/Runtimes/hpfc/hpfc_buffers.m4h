@@ -1,81 +1,81 @@
 c
-c COMMON /HPFC_BUFFERS/ 
+c COMMON /HPFC BUFFERS/ 
 c
 c $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-c ($Date: 1995/11/21 23:09:40 $, )
+c ($Date: 1996/09/07 15:45:51 $, )
 c
 c buffers to avoid small pvmf(un)pack calls...
 c and to sends buckets of messages if necessary...
 c
-      common /HPFC_BUFFERS/
-     $     DATA_BUFFER(MAXMAXSIZEOFBUFFER),
+      common /HPFC BUFFERS/
+     $     DATA BUFFER(MAXMAXSIZEOFBUFFER),
      $     BUFINDEX,
      $     SIZEOFRECEIVEDBUFFER,
-     $     BYTE1_BUFFSIZE,
-     $     INTEGER2_BUFFSIZE,
-     $     INTEGER4_BUFFSIZE,
-     $     REAL4_BUFFSIZE,
-     $     REAL8_BUFFSIZE,
-     $     COMPLEX8_BUFFSIZE,
-     $     COMPLEX16_BUFFSIZE,
-     $     BUFFER_ENCODING,
-     $     LAZY_SEND,
-     $     LAZY_RECV,
-     $     SEND_NOT_INITIALIZED,
-     $     RECEIVED_NOT_PERFORMED
+     $     BYTE1 BUFFSIZE,
+     $     INTEGER2 BUFFSIZE,
+     $     INTEGER4 BUFFSIZE,
+     $     REAL4 BUFFSIZE,
+     $     REAL8 BUFFSIZE,
+     $     COMPLEX8 BUFFSIZE,
+     $     COMPLEX16 BUFFSIZE,
+     $     BUFFER ENCODING,
+     $     LAZY SEND,
+     $     LAZY RECV,
+     $     SEND NOT INITIALIZED,
+     $     RECEIVED NOT PERFORMED
       integer
      $     BUFINDEX,
      $     SIZEOFRECEIVEDBUFFER,
-     $     BYTE1_BUFFSIZE,
-     $     INTEGER2_BUFFSIZE,
-     $     INTEGER4_BUFFSIZE,
-     $     REAL4_BUFFSIZE,
-     $     REAL8_BUFFSIZE,
-     $     COMPLEX8_BUFFSIZE,
-     $     COMPLEX16_BUFFSIZE,
-     $     BUFFER_ENCODING
+     $     BYTE1 BUFFSIZE,
+     $     INTEGER2 BUFFSIZE,
+     $     INTEGER4 BUFFSIZE,
+     $     REAL4 BUFFSIZE,
+     $     REAL8 BUFFSIZE,
+     $     COMPLEX8 BUFFSIZE,
+     $     COMPLEX16 BUFFSIZE,
+     $     BUFFER ENCODING
       logical
-     $     LAZY_SEND,
-     $     LAZY_RECV,
-     $     SEND_NOT_INITIALIZED,
-     $     RECEIVED_NOT_PERFORMED
+     $     LAZY SEND,
+     $     LAZY RECV,
+     $     SEND NOT INITIALIZED,
+     $     RECEIVED NOT PERFORMED
       _NOGNU(byte)_GNU(character)
-     $     DATA_BUFFER
+     $     DATA BUFFER
 c
 c buffer sizes
 c
       integer 
-     $     BYTE1_MAXBUFFSIZE,
-     $     INTEGER2_MAXBUFFSIZE,
-     $     INTEGER4_MAXBUFFSIZE,
-     $     REAL4_MAXBUFFSIZE,
-     $     REAL8_MAXBUFFSIZE,
-     $     COMPLEX8_MAXBUFFSIZE,
-     $     COMPLEX16_MAXBUFFSIZE
-      parameter (BYTE1_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER)
-      parameter (INTEGER2_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/2)
-      parameter (INTEGER4_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
-      parameter (REAL4_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
-      parameter (REAL8_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/8)
-      parameter (COMPLEX8_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/8)
-      parameter (COMPLEX16_MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/16)
+     $     BYTE1 MAXBUFFSIZE,
+     $     INTEGER2 MAXBUFFSIZE,
+     $     INTEGER4 MAXBUFFSIZE,
+     $     REAL4 MAXBUFFSIZE,
+     $     REAL8 MAXBUFFSIZE,
+     $     COMPLEX8 MAXBUFFSIZE,
+     $     COMPLEX16 MAXBUFFSIZE
+      parameter (BYTE1 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER)
+      parameter (INTEGER2 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/2)
+      parameter (INTEGER4 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
+      parameter (REAL4 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/4)
+      parameter (REAL8 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/8)
+      parameter (COMPLEX8 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/8)
+      parameter (COMPLEX16 MAXBUFFSIZE=MAXMAXSIZEOFBUFFER/16)
 c
 c the buffer must be seen differently somehow...
 c
-      _GNU(character)_NOGNU(byte) BYTE1_BUFF(BYTE1_MAXBUFFSIZE)
-_NOGNU(`      integer*2 INTEGER2_BUFF(INTEGER2_MAXBUFFSIZE)')
-      integer*4 INTEGER4_BUFF(INTEGER4_MAXBUFFSIZE)
-      real*4 REAL4_BUFF(REAL4_MAXBUFFSIZE)
-      real*8 REAL8_BUFF(REAL8_MAXBUFFSIZE)
-      complex*8 COMPLEX8_BUFF(COMPLEX8_MAXBUFFSIZE)
-      complex*16 COMPLEX16_BUFF(COMPLEX16_MAXBUFFSIZE)
-      equivalence (DATA_BUFFER, BYTE1_BUFF)
-_NOGNU(`      equivalence (DATA_BUFFER, INTEGER2_BUFF)')
-      equivalence (DATA_BUFFER, INTEGER4_BUFF)
-      equivalence (DATA_BUFFER, REAL4_BUFF)
-      equivalence (DATA_BUFFER, REAL8_BUFF)
-      equivalence (DATA_BUFFER, COMPLEX8_BUFF)
-      equivalence (DATA_BUFFER, COMPLEX16_BUFF)
+      _GNU(character)_NOGNU(byte) BYTE1 BUFF(BYTE1 MAXBUFFSIZE)
+_NOGNU(`      integer*2 INTEGER2 BUFF(INTEGER2 MAXBUFFSIZE)')
+      integer*4 INTEGER4 BUFF(INTEGER4 MAXBUFFSIZE)
+      real*4 REAL4 BUFF(REAL4 MAXBUFFSIZE)
+      real*8 REAL8 BUFF(REAL8 MAXBUFFSIZE)
+      complex*8 COMPLEX8 BUFF(COMPLEX8 MAXBUFFSIZE)
+      complex*16 COMPLEX16 BUFF(COMPLEX16 MAXBUFFSIZE)
+      equivalence (DATA BUFFER, BYTE1 BUFF)
+_NOGNU(`      equivalence (DATA BUFFER, INTEGER2 BUFF)')
+      equivalence (DATA BUFFER, INTEGER4 BUFF)
+      equivalence (DATA BUFFER, REAL4 BUFF)
+      equivalence (DATA BUFFER, REAL8 BUFF)
+      equivalence (DATA BUFFER, COMPLEX8 BUFF)
+      equivalence (DATA BUFFER, COMPLEX16 BUFF)
 c
 c that is all
 c
