@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.53  1998/11/27 14:54:23  irigoin
+ * debug statement added in EndOfProcedure()
+ *
  * Revision 1.52  1998/10/07 15:57:20  irigoin
  * Proper substitution of ghost variables to avoid dangling pointers. Profile
  * of remove_ghost_variables() modified and body updated. New function
@@ -397,6 +400,9 @@ EndOfProcedure()
 
     debug(8, "EndOfProcedure", "Begin for module %s\n",
 	  entity_name(CurrentFunction));
+    
+    pips_debug(8, "checking code consistency = %d\n",
+	       statement_consistent_p( function_body )) ;
 
     /* get rid of ghost variable entities and substitute them if necessary */
     remove_ghost_variable_entities(TRUE);
