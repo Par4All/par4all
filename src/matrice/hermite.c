@@ -1,7 +1,6 @@
  /* package matrice */
 
 #include <stdio.h>
-#include <sys/stdtypes.h> /*for debug with dbmalloc */
 #include <malloc.h>
 
 #include "assert.h"
@@ -49,18 +48,18 @@
  *  - suppression des copies entre H, P, Q et NH, PN, QN
  */
 void matrice_hermite(MAT,n,m,P,H,Q,det_p,det_q)
-int *MAT;
+Value *MAT;
 int n,m;
-int *P;
-int *H;
-int *Q;
-int *det_p;
-int *det_q;
+Value *P;
+Value *H;
+Value *Q;
+Value *det_p;
+Value *det_q;
 
 {
-    int *PN=NULL;
-    int *QN=NULL;
-    int *HN = NULL;
+    Value *PN=NULL;
+    Value *QN=NULL;
+    Value *HN = NULL;
 
     /* indice de la ligne et indice de la colonne correspondant
        au plus petit element de la sous-matrice traitee */
@@ -69,16 +68,16 @@ int *det_q;
     /* niveau de la sous-matrice traitee */
     int level = 0;    
     
-    int ALL;           /* le plus petit element sur la diagonale                  */
-    int x;             /* la rest de la division par ALL                          */
+    register Value ALL; /* le plus petit element sur la diagonale */
+    register Value x;    /* la rest de la division par ALL */
     boolean stop = FALSE;
     int i;
     
-    *det_p = *det_q = 1;
+    *det_p = *det_q = VALUE_ONE;
 
     /* if ((n>0) && (m>0) && MAT) */
     assert(n >0 && m > 0);
-    assert(DENOMINATOR(MAT)==1);
+    assert(value_one_p(DENOMINATOR(MAT)));
 
     HN = matrice_new(n, m);
     PN = matrice_new(n, n);
@@ -113,19 +112,20 @@ int *det_q;
 	    if (ind_n > level + 1) {
 		matrice_swap_rows(H,n,m,level+1,ind_n);
 		matrice_swap_rows(PN,n,n,level+1,ind_n);
-		*det_p = *det_p * (-1);
+		value_oppose(*det_p);
 	    }
 
 	    if (ind_m > level+1) {
 		matrice_swap_columns(H,n,m,level+1,ind_m);
 		matrice_swap_columns(QN,m,m,level+1,ind_m);	
-		*det_q = *det_q * (-1);
+		value_oppose(*det_q);
 	    }
 
 	    if(mat_lig_el(H,n,m,level) != 0) {
 		ALL = ACC_ELEM(H,n,1,1,level);
 		for (i=level+2; i<=m; i++) {
-		    x = ACCESS(H,n,level+1,i)/ALL;
+		    x = ACCESS(H,n,level+1,i);
+		    value_division(x,ALL);
 		    matrice_soustraction_colonne(H,n,m,i,level+1,x);
 		    matrice_soustraction_colonne(QN,m,m,i,level+1,x);
 		}
@@ -155,7 +155,7 @@ int m;
     int r = 0;
 
     for(i=1; i<=n; i++, r++)
-	if(ACCESS(a, n, i, i) == 0) break;
+	if(value_zero_p(ACCESS(a, n, i, i))) break;
 
     return r;
 }
@@ -168,8 +168,8 @@ int m;
  */
 
 
-dim_H (H,n,m)
-int *H;
+int dim_H (H,n,m)
+matrice H;
 int n,m;
 {
 
@@ -179,7 +179,7 @@ int n,m;
     int res=0;
 
     for (j = 1; j<=m && !trouve_j;j++) {
-	for (i=1; i<= n && ACCESS(H,n,i,j) == 0; i++);
+	for (i=1; i<= n && value_zero_p(ACCESS(H,n,i,j)); i++);
 	if (i>n) {
 	    trouve_j = TRUE;
 	    res= j-1;
