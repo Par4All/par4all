@@ -125,7 +125,7 @@ transformer t2;
     /* update t1 */
     transformer_arguments(t1) = a1;
     /* predicate_system(transformer_relation(t1)) = (Psysteme) r1; */
-    predicate_system(transformer_relation(t1)) = (char *) r1;
+    predicate_system_(transformer_relation(t1)) = (char *) r1;
 
     debug(8,"transformer_combine","res. t1=%x\n",t1);
     ifdebug(8) (void) dump_transformer(t1);
@@ -165,7 +165,7 @@ transformer_normalize(transformer t, int level)
 	 * values from equations into inequalities.
 	 */
 	    sc_nredund(&r);
-	    predicate_system(transformer_relation(t)) = r;
+	    predicate_system_(transformer_relation(t)) = r;
 	    break;
 
 	case 2:
@@ -230,7 +230,7 @@ transformer_normalize(transformer t, int level)
 	    base_rm(b);
 
 	r->dimension = vect_size(r->base);
-	predicate_system(transformer_relation(t)) = r;
+	predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
     }
     return t;
 }
@@ -326,8 +326,9 @@ Psysteme (*elim)(Psysteme);
 
 	/* update the relation and the arguments field for t */
 
-	/* the relation is updated by side effect FI ? Maybe not if SC_EMPTY(r) 1 Feb. 94 */
-	predicate_system(transformer_relation(t)) = r;
+	/* the relation is updated by side effect FI ?
+	 * Maybe not if SC_EMPTY(r) 1 Feb. 94 */
+	predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
 
 	/* replace the old arguments by the new one */
 	gen_free_list(transformer_arguments(t));
@@ -428,7 +429,7 @@ cons * args;
 	 * Yes, in general. No if the system is non feasible
 	 */
 
-	predicate_system(transformer_relation(t)) = r;
+	predicate_system_(transformer_relation(t)) = newgen_Psysteme(r);
 
 	/* replace the old arguments by the new one */
 	free_arguments(transformer_arguments(t));
