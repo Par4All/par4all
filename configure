@@ -541,7 +541,7 @@ fi
 
 
 
-VERSION=5.11
+VERSION=5.11.1
 
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do

@@ -4321,7 +4321,6 @@ Polyhedron *Disjoint_Domain( Polyhedron *P, int flag, unsigned NbMaxRays )
 			lR = prec->next;
 		} /* end for result */
 
-printf("0x%08x\n", dx);
 		  /* if there is something left, add it to Result : */
 		if(reste)
 		{
