@@ -156,4 +156,6 @@ extern void prettyprint_graph_daVinci(FILE */*out_f*/, list /*l_of_vers*/);
 extern graph make_filtered_dependence_graph(graph /*mod_graph*/);
 extern list make_filtered_dg_or_dvdg(statement /*mod_stat*/, graph /*mod_graph*/);
 extern bool print_filtered_dg_or_dvdg(string /*mod_name*/, bool /*is_dv*/);
+/* impact.c */
+extern bool impact_check(string /*module_name*/);
 #endif /* ricedg_header_included */
