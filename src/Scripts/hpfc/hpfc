@@ -1,7 +1,11 @@
 #! /bin/sh
 # 
 # $Id$
+# 
 # $Log: hpfc,v $
+# Revision 1.26  1997/05/03 15:32:46  coelho
+# more help.
+#
 # Revision 1.25  1997/04/15 09:46:54  coelho
 # -E option (not tested...)
 #
@@ -24,10 +28,13 @@ script=`basename $0`
 usage()
 {
   cat >&2 <<-END
-	usage: $script [-vdqt] [-o name] [-D macros]
+	
+	$script is the HPF Compiler driver in front of pips.
+	
+	usage: $script [-hvdqt] [-o name] [-D cpp-macros]
 	       function [options] [arguments]
-	  version is $Revision$, 
 	  OPTIONS:
+	    -h: this help
 	    -v: verbose
 	    -d: demo (default)
 	    -q: quiet
@@ -35,7 +42,10 @@ usage()
 	    -o name: name for the generated file (forwarded to compiler)
 	    -D macro: additionnal cpp macros
 	    -E var=val: additional environment variables
-	  function among (3 significant characters):
+	
+	  typical example: hpfc -D NPES=4 -D SIZE=1000 -o adi adi2d.F
+	
+	  also some function among (3 significant characters):
 	  COMPILATION:
 	    i|interactive: (thanks to GNU readline library) (\,cd)
 	    c|compile: compile
@@ -53,6 +63,7 @@ usage()
 	    p|pvm: pvm control
 	    h|help: gives this help (but nothing more:-)
 	    validate: used by the validation...
+	
 	END
   exit ${1:-1}
 }
@@ -74,7 +85,7 @@ TIMING=void
 
 # options
 
-while getopts vdqto:D:E: OPT
+while getopts hvdqto:D:E: OPT
 do
   case $OPT in
     v) HPFC_MODE=void ;;
@@ -82,6 +93,7 @@ do
     d) HPFC_MODE=debug ;;
     t) TIMING=timing ;;
     o) COPT="-w $OPTARG";;
+    h) usage 0 ;;
     D) PIPS_CPP_FLAGS="$PIPS_CPP_FLAGS -D$OPTARG" ;;
     E) export $OPTARG ;;
     *) usage 4
