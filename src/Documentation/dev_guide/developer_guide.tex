@@ -1,6 +1,6 @@
 %
 %% $RCSfile: developer_guide.tex,v $ (version $Revision$)
-%% $Date: 1997/04/02 13:22:18 $, 
+%% $Date: 1997/04/10 13:30:33 $, 
 % PIPS development environment documentation; translated and updated from 
 % dret146.f.tex
 %
@@ -20,8 +20,8 @@
   Arnauld & LESERVOT \\
   Alexis & PLATONOFF \\
   Ronan & KERYELL \\
-  Fabien & COELHO \\
   Béatrice & CREUSILLET \\
+  Fabien & COELHO \\
   Corinne & ANCOURT
 \end{tabular}
 }
@@ -365,8 +365,13 @@ pips (as opposed to \emph{running} it).
   corresponding \texttt{.test} file, and executes it. If none is found, it
   looks for a \texttt{.tpips} file which is executed as a tpips script.
   If none is found, it looks for a \verb|default_test| file as a template
-  for a \texttt{.test} file, performs some substitutions and executes the
-  test file. Finally if none of these case apply, the scripts parallelize
+  for a \texttt{.test} file, performs some substitutions
+  (\verb|tested_file| and \verb|TESTED_FILE| are substituted by the file
+  name prefix in lower or upper case) and executes the generated
+  test file. Otherwise it looks for a \verb|default_tpips| file and runs
+  it with tpips. The environment variables \texttt{FILE} and
+  \texttt{WSPACE} contain the full-path file name and the file name prefix.
+  Finally if none of these cases apply, the scripts parallelize
   all modules.
 
   For maintenance purposes, the \verb|default_file| approach is the
