@@ -405,19 +405,20 @@ i_display:
 		    pager = CAT_COMMAND;
 		
 		MAPL(e, {
-		    string file;
 		    string mod_name = STRING(CAR(e));
 		    
 		    if (mod_name != NULL)
 		    {
+			string fname;
 			lazy_open_module (mod_name);
-			file = build_view_file($3.the_name);
-			if (file == NULL)
+			fname = build_view_file($3.the_name);
+			if (fname == NULL)
 			    user_error("display",
 				       "Cannot build view file %s\n",
 				       $3.the_name);
 		    
-			safe_system(concatenate(pager, " ", file, NULL));
+			safe_system(concatenate(pager, " ", fname, NULL));
+			free(fname);
 		    }
 		    else
 		    {
