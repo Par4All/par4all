@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1995/04/21 23:18:35 $, 
+ * $Date: 1995/05/19 17:23:12 $, 
  */
 
 #include <stdio.h>
@@ -14,9 +14,10 @@ extern int fprintf();
 #include "misc.h"
 #include "control.h" /* for CONTROL_MAP() */
 
-/* void atomize_as_required(stat, expr_decide, test_decide, new)
+/* void atomize_as_required(stat, expr_decide, func_decide, test_decide, new)
  * statement stat;
  * bool (*expr_decide)(ref r, expression e);
+ * bool (*func_decide)(ref r, expression e);
  * bool (*test_decide)(expression e);
  * entity (*new)(entity m, tag t);
  *
@@ -26,6 +27,8 @@ extern int fprintf();
  * - expr_decide tells whether or not to atomize for reference r
  *   and expression indice e of this reference. If yes, expression e
  *   is computed outside.
+ * - func_decide tells whether or not to atomize for call c
+ *   and argument expression e...
  * - test_decide tells whether expression condition e of a test
  *   should be atomized or not.
  * - new creates a new entity in the current module, the basic type
@@ -37,7 +40,8 @@ static void compute_all_indices_in_simple_obj(gen_chunk *);
 
 /* static functions used
  */
-static bool (*breaking_decision)(/* ref r, expression e */) = NULL;
+static bool (*expr_breaking_decision)(/* ref r, expression e */) = NULL;
+static bool (*func_breaking_decision)(/* call c, expression e */)= NULL;
 static bool (*test_brk_decision)(/* expression e */) = NULL;
 static entity (*create_new_variable)(/* entity m, tag t */) = NULL;
 
@@ -187,7 +191,7 @@ reference r;
      {
 	 expression *pe = &EXPRESSION(CAR(ce));
 
-	 if ((*breaking_decision)(r, *pe))
+	 if ((*expr_breaking_decision)(r, *pe))
 	 {
 	     syntax saved = expression_syntax(*pe);
 
@@ -203,8 +207,22 @@ reference r;
 static bool call_filter(c)
 call c;
 {
-    return(!same_string_p(entity_local_name(call_function(c)),
-                          IMPLIED_DO_NAME));
+    if (same_string_p(entity_local_name(call_function(c)), IMPLIED_DO_NAME))
+	return(FALSE);
+
+    MAPL(ce, 
+     {
+	 expression *pe = &EXPRESSION(CAR(ce));
+
+	 if ((*func_breaking_decision)(c, *pe))
+	 {
+	     syntax saved = expression_syntax(*pe);
+
+	     compute_before_current_statement(pe);
+	     compute_all_indices_in_simple_obj(saved);
+	 }
+     },
+	 call_arguments(c));
 }
 
 static bool test_filter(t)
@@ -245,21 +263,24 @@ statement stat;
 	 NULL);
 }
 
-void atomize_as_required(stat, expr_decide, test_decide, new)
+void atomize_as_required(stat, expr_decide, func_decide, test_decide, new)
 statement stat;
 bool (*expr_decide)();
+bool (*func_decide)();
 bool (*test_decide)();
 entity (*new)();
 {
     make_current_statement_stack();
     make_current_control_stack();
-    breaking_decision = expr_decide;
+    expr_breaking_decision = expr_decide;
+    func_breaking_decision = func_decide;
     test_brk_decision = test_decide;
     create_new_variable = new;
     
     compute_all_indices_in_statement(stat);
 
-    breaking_decision = NULL;
+    expr_breaking_decision = NULL;
+    func_breaking_decision = NULL;
     test_brk_decision = NULL;
     create_new_variable = NULL;
     free_current_statement_stack();
