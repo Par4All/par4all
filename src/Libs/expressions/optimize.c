@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.7  1998/10/20 14:48:47  zory
+ * free the list of unoptimized expressions only when there are some
+ * expressions in the module ! (if statement)
+ *
  * Revision 1.6  1998/09/17 12:08:43  zory
  * taking into account new entity from eole
  *
@@ -226,6 +230,8 @@ bool optimize_expressions(string module_name)
     list /* of expression */ le, ln;
     string in, out, cmd;
 
+    ln = NIL;
+
     debug_on(DEBUG_NAME);
 
     /* get needed stuff.
@@ -271,14 +277,19 @@ bool optimize_expressions(string module_name)
       safe_unlink(out);
       safe_unlink(in);
 
+      /* free the list and destroy all unoptimized expressions */
+      gen_free_list(ln), ln=NIL;
+
     }
     else 
       pips_debug(3,"no expression for module %s \n", module_name);
 
-    gen_free_list(ln), ln=NIL;
+    /* free strings */
     free(out), out = NULL;
     free(in), in = NULL;
     free(cmd), cmd = NULL;
+
+    pips_debug(3,"EOLE transformations ... Done for module %s \n", module_name);
 
     /* end EOLE stuff.
      */
@@ -295,5 +306,8 @@ bool optimize_expressions(string module_name)
 
     debug_off();
 
-    return TRUE; /* okay! */
+    return TRUE; /* okay ! */
 }
+
+
+
