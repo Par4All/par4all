@@ -1,8 +1,10 @@
- /* package sc */
+/* package sc
+ * $RCSfile: sc_eval.c,v $ (version $Revision$)
+ * $Date: 1996/07/18 19:15:53 $, 
+ */
 
 #include <string.h>
 #include <stdio.h>
-/* #include <values.h> */
 #include <limits.h>
 #include <assert.h>
 
@@ -26,9 +28,9 @@
  *    dont le coefficient est nul ne doit pas etre materialisee
  *  - ce n'est pas une fonction sur les systemes mais sur les listes d'egalites
  *  - la valeur FALSE peut signifer que le systeme d'egalites de ps n'est pas
- *    faisable ou qu'il n'y a pas d'equation satisfaisante; l'arret par sc_error()
- *    en cas de non-faisabilite n'etait pas satisfaisant pour les procedures
- *    appelantes
+ *    faisable ou qu'il n'y a pas d'equation satisfaisante; l'arret par 
+ *    sc_error() en cas de non-faisabilite n'etait pas satisfaisant pour les 
+ *    procedures appelantes
  */
 boolean sc_value_of_variable(ps, var, pval)
 Psysteme ps;
@@ -59,15 +61,15 @@ Value *pval;
 	    {
 		if ((pv->var == var) && (pv->succ->var == TCST))
 		{
+		    Value vs = val_of(pv->succ), v = val_of(pv);
 		    /* equation de la forme: k*var - c == 0 */
-		    if(pv->succ->val%pv->val==0)
+		    if(value_zero_p(value_mod(vs,v)))
 		    {
-			*pval = -pv->succ->val/pv->val;
+			*pval = value_uminus(value_div(vs,v));
 			return(TRUE);
 		    }
 		    else
 		    {
-			/* sc_error("sc_value_of_variable","systeme infaisable"); */
 			return(FALSE);
 		    }
 		}
@@ -75,15 +77,14 @@ Value *pval;
 		{
 		    if ((pv->var == TCST) && (pv->succ->var == var))
 		    {
+		    Value vs = val_of(pv->succ), v = val_of(pv);
 			/* equation de la forme: c - k*var == 0 */
-			if(pv->val%pv->succ->val==0) {
-			    *pval = - pv->val/pv->succ->val;
+			if(value_zero_p(value_mod(v,vs))) {
+			    *pval = value_uminus(value_div(v,vs));
 			    return(TRUE);
 			}
 			else
 			{
-			    /* sc_error("sc_value_of_variable",
-				     "system is not feasible"); */
 			    return(FALSE);
 			}
 		    }
@@ -113,7 +114,7 @@ Value *pmin, *pmax;
     Pcontrainte pc;
     Pbase b;
 
-    *pmax =  VALUE_MAX;
+    *pmax = VALUE_MAX;
     *pmin = VALUE_MIN;
 
     if (sc_value_of_variable(ps, var, &val) == TRUE) {
@@ -142,23 +143,23 @@ Value *pmin, *pmax;
     }
 
     for (pc = ps->inegalites; pc != NULL; pc = pc->succ) {
-	int cv = vect_coeff(var, pc->vecteur);
-	int cc = - vect_coeff(TCST, pc->vecteur);
+	Value cv = vect_coeff(var, pc->vecteur);
+	Value cc = value_uminus(vect_coeff(TCST, pc->vecteur));
 
-	if (cv > 0) {
+	if (value_pos_p(cv)) {
 	    /* cette contrainte nous donne une borne max */
-	    int bs = DIVIDE(cc,cv);
-	    if (bs < *pmax) 
+	    Value bs = value_div(cc,cv);
+	    if (value_lt(bs,*pmax))
 		*pmax = bs;
 	}
-	else if (cv < 0) {
+	else if (value_neg_p(cv)) {
 	    /* cette contrainte nous donne une borne min */
-	    int bi = DIVIDE(cc,cv);
-	    if (bi > *pmin) 
+	    Value bi = value_div(cc,cv);
+	    if (value_gt(bi,*pmin))
 		*pmin = bi;
 	}
     }
-    if(*pmax < *pmin)
+    if (value_lt(*pmax,*pmin)) 
 	return FALSE;
 
     sc_rm(ps);
@@ -180,21 +181,21 @@ Pbase b;
     for (pv = b; !VECTEUR_NUL_P(pv); pv = pv->succ) {
 	Variable var1 = vecteur_var(pv);
 	Psysteme sc = sc_dup(ps1);
-	int min,max;
+	Value min,max;
 	Pvecteur pv2;
 	Pcontrainte pc;
 	boolean faisable =  sc_minmax_of_variable(sc,var1, &min, &max);
 
 	if (faisable ) {
-	    if (min != VALUE_MIN) {
-		pv2 = vect_new(var1,-1);
-		pv2 = vect_add(pv2,vect_new(TCST,min));
+	    if (value_ne(min,VALUE_MIN)) {
+		pv2 = vect_new(var1, VALUE_MONE);
+		pv2 = vect_add(pv2,vect_new(TCST, min));
 		pc = contrainte_make(pv2);
 		sc_add_ineg(ps2,pc);
 	    }
-	    if (max != VALUE_MAX) {
-		pv2 = vect_new(var1,1);
-		pv2 = vect_add(pv2,vect_new(TCST,-max));
+	    if (value_ne(max,VALUE_MAX)) {
+		pv2 = vect_new(var1,VALUE_ONE);
+		pv2 = vect_add(pv2,vect_new(TCST, value_uminus(max)));
 		pc = contrainte_make(pv2);
 		sc_add_ineg(ps2,pc);
 	    }
@@ -288,7 +289,8 @@ Variable var;
  *    trivial mais pas forcement justifie, ce test est laisse a la charge
  *    de l'appelant.
  */
-boolean sc_minmax_of_variable2(Psysteme ps, Variable var, int * pmin, int * pmax)
+boolean 
+sc_minmax_of_variable2(Psysteme ps, Variable var, Value *pmin, Value *pmax)
 {
 /* Maximum number of variables in an equation used for the projection */
 #define level (2)
@@ -380,13 +382,19 @@ boolean sc_minmax_of_variable2(Psysteme ps, Variable var, int * pmin, int * pmax
 			    if(d==1) {
 				if(!VECTEUR_UNDEFINED_P(pv->succ)) {
 				    /* remember eq was normalized... */
-				    if ((pv->var == var) && (pv->succ->var == TCST)) {
-					*pmin = - vecteur_val(vecteur_succ(pv))/vecteur_val(pv);
+				    if ((pv->var == var) &&
+					(pv->succ->var == TCST)) {
+					*pmin = value_uminus
+					   (value_div(val_of(vecteur_succ(pv)),
+						      val_of(pv)));
 					*pmax = *pmin;
 					value_found_p = TRUE;
 				    }
-				    else if ((pv->succ->var == var) && (pv->var == TCST)) {
-					*pmin = - vecteur_val(pv)/vecteur_val(vecteur_succ(pv));
+				    else if ((pv->succ->var == var) &&
+					     (pv->var == TCST)) {
+					*pmin = value_uminus
+					    (value_div(val_of(pv),
+					        val_of(vecteur_succ(pv))));
 					*pmax = *pmin;
 					value_found_p = TRUE;
 				    }
@@ -396,7 +404,7 @@ boolean sc_minmax_of_variable2(Psysteme ps, Variable var, int * pmin, int * pmax
 				}
 				else {
 				    if (pv->var == var) {
-					*pmin = 0;
+					*pmin = VALUE_ZERO;
 					*pmax = *pmin;
 					value_found_p = TRUE;
 				    }
@@ -443,7 +451,7 @@ boolean sc_minmax_of_variable2(Psysteme ps, Variable var, int * pmin, int * pmax
 				 */
 				if(nv!=TCST && (nv!=var||value_found_p)) {
 				    v2 = (v2==TCST)? nv : v2;
-				    if(vecteur_val(pv)==1) {
+				    if(value_one_p(vecteur_val(pv))) {
 					if(v1==TCST) {
 					    v1 = nv;
 					    break;
@@ -574,9 +582,11 @@ boolean sc_minmax_of_variable2(Psysteme ps, Variable var, int * pmin, int * pmax
 
     if_debug_sc_minmax_of_variable2 {
 	fprintf(stderr,
-		"[sc_minmax_of_variable2]: feasible=%d, min=%d, max=%d\n",
-		feasible_p, *pmin, *pmax);
-	fprintf(stderr, "[sc_minmax_of_variable2]: End\n");
+		"[sc_minmax_of_variable2]: feasible=%d, min=", feasible_p);
+	fprint_Value(stderr, *pmin);
+	fprintf(stderr, ", max=");
+	fprint_Value(stderr, *pmax);
+	fprintf(stderr, "\n[sc_minmax_of_variable2]: End\n");
     }
 
     return feasible_p;
