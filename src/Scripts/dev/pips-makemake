@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/10/02 16:22:56 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/10/03 15:12:05 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -529,7 +529,7 @@ header: .header
 # Makefile.depend if that very file does not exist.
 
 .depend: $(CFILES) $(DERIVED_CFILES)
-	$(PREPROC) -M $(CFILES) > $(MAKEFILE).depend
+	$(PREPROC) -M $(CFILES) $(DERIVED_CFILES) > $(MAKEFILE).depend
 	touch .depend
 
 depend: $(INC_TARGET) $(MAKEFILE) .depend
