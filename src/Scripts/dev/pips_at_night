@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/08/12 11:25:32 $, )
+# ($Date: 1996/08/12 14:35:23 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -89,6 +89,7 @@ MAKE()
     summary=$report.summary
 
     for a in "$@"; do
+	$verbose "Making $targets in $name ARCH=$a"
 	make-pips -$what -o $summary -m $a ARCH=$a $targets
     done 2> $detailed > /dev/null
 
