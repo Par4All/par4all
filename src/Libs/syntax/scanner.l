@@ -239,12 +239,14 @@ DCON (({MANT}|{UICON}){DEXP}?)
 				pips_debug(9, "TK_EOS\n");
 				return(TK_EOS);
 			}
-
 .			{
-   pips_user_warning("illegal character %c (hex %x)\n",
-                yytext[0], yytext[0]);
-   ParserError("Lexical Analysis", 
-               "Check standard Fortran character set.\n");
+                                /* Ignore carriage return from VMS and Microsoft and Apple?
+                                 * Not here! It must have been done earlier in the processing.
+                                 */
+                                pips_user_warning("illegal character %c (hex %X)\n",
+                                                  yytext[0], yytext[0]);
+                                ParserError("Lexical Analysis", 
+                                "Check standard Fortran character set.\n");
 			}
 %%
 
