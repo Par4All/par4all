@@ -1,9 +1,8 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/18 08:52:45 $, 
+# $Date: 1996/08/08 14:05:46 $, 
 
 LEX=		flex
-LFLAGS=         -l
 YFLAGS+=	-v -d
 #
 LIB_CFILES=	tpips.c
@@ -20,7 +19,7 @@ ana_lex_completed.l:	ana_lex.l \
 			$(PIPS_INCLUDEDIR)/resources.h \
 			$(PIPS_INCLUDEDIR)/phases.h \
 			$(PIPS_LIBDIR)/properties.rc
-	$(PIPS_UTILDIR)/build_tpips_lex <ana_lex.l > ana_lex_completed.l
+	$(PIPS_UTILDIR)/build_tpips_lex ana_lex.l > ana_lex_completed.l
 
 lex.yy.c: ana_lex_completed.l y.tab.h
 	$(SCAN) ana_lex_completed.l | sed -e 's/YY/TP_/g;s/yy/tp_/g' > lex.yy.c
