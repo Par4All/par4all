@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/08/28 17:29:57 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/09/25 18:34:21 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -299,9 +299,9 @@ gen_alloc(int size, int gen_check_p, int dom, ...)
     gen_chunk *cp ;
     int data ;
 
-    check_read_spec_performed();
-
     va_start(ap, dom);
+
+    check_read_spec_performed();
 
     cp = (gen_chunk *)alloc(size) ;
     bp = &Domains[ cp->i = dom ] ;
