@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/07/15 11:48:26 $, )
+# ($Date: 1996/07/15 13:15:02 $, )
 #
 
 RUN=':'
@@ -21,7 +21,8 @@ while getopts flx opt
 do
   case $opt in
     f) RUN=':' ;;
-    l) RUN=`type -p granlib` ; [ "$RUN" ] || RUN=ranlib ;;
+    l) if test "`type granlib|grep 'not found'`" ; 
+       then RUN=ranlib; else RUN=granlib; fi;;
     x) RUN='chmod a+x' ;;
     *) usage 4 "unexpected option ($opt)" ;;
   esac
