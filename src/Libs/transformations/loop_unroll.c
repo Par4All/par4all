@@ -333,6 +333,10 @@ void loop_unroll(statement loop_statement, int rate)
      * is destroyed (18 January 1993) */
     /* gen_free(statement_instruction(loop_statement)); */
     statement_instruction(loop_statement) = block;
+    /* Do not forget to move forbidden information associated with
+       block: */
+    fix_label_and_comment_in_empty_block(loop_statement);
+    
     ifdebug(9) {
 	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
 	pips_assert("loop_unroll", gen_consistent_p(loop_statement));
@@ -443,7 +447,11 @@ void full_loop_unroll(statement loop_statement)
      * with its actual parameter; if the free is executed, Pvecteur normalized_linear
      * is destroyed (18 January 1993) */
     free_instruction(statement_instruction(loop_statement));
-    statement_instruction(loop_statement) = block;
+    statement_instruction(loop_statement) = block;    
+    /* Do not forget to move forbidden information associated with
+       block: */
+    fix_label_and_comment_in_empty_block(loop_statement);
+    
     ifdebug(9) {
 	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
 	pips_assert("full_loop_unroll", gen_consistent_p(loop_statement));
@@ -588,13 +596,6 @@ unroll(char *mod_name)
 	       data base after unrolling */
 	    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 	    mod_inst = statement_instruction(mod_stmt);
-	    /* FI: not necessarily the case anymore */
-	    if(!instruction_unstructured_p(mod_inst)) {
-		user_warning ("unroll", "Non-standard instruction tag %d\n",
-			      instruction_tag (mod_inst));
-	    }
-	    /* pips_assert("unroll", instruction_unstructured_p(mod_inst)); */
-	    /* "unstructured expected\n"); */
 
 	    switch (instruction_tag (mod_inst)) {
 
