@@ -229,7 +229,7 @@ char *module_name;
 
     /* cumulated_effects_map_print(); */
 
-    e_inter = effects_to_list(
+    e_inter = effects_to_list( (effects)
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
 
     set_transformer_map( MAKE_STATEMENT_MAPPING() ); 
@@ -505,7 +505,7 @@ entity e;
 
     pips_assert("load_summary_effects", entity_module_p(e));
 
-    t = effects_to_list( 
+    t = effects_to_list( (effects) 
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_local_name(e), 
 			       TRUE));
 
