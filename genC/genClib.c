@@ -1,0 +1,2860 @@
+/*
+
+	-- NewGen Project
+
+	The NewGen software has been designed by Remi Triolet and Pierre
+	Jouvelot (Ecole des Mines de Paris). This prototype implementation
+	has been written by Pierre Jouvelot.
+
+	This software is provided as is, and no guarantee whatsoever is
+	provided regarding its appropriate behavior. Any request or comment
+	should be sent to newgen@isatis.ensmp.fr.
+
+	(C) Copyright Ecole des Mines de Paris, 1989
+
+*/
+
+
+/* genClib.c
+
+   The file has all the generic functions to manipulate C objects implemented
+   by chunks (see genC.c). */
+
+/*LINTLIBRARY*/
+
+#include <stdio.h>
+extern int fprintf();
+extern int fscanf();
+extern int fclose();
+#include <string.h>
+#include <varargs.h>
+#include <stdlib.h>
+#include <setjmp.h>
+
+#include "newgen_include.h"
+#include "genC.h"
+#include "x.tab.h"
+
+#define GO (1)
+
+extern int max_tabulated_elements();
+extern chunk *enter_tabulated_def();
+
+cons *Gen_cp_[ MAX_NESTED_CONS ] ;
+chunk Gen_hash_[ MAX_NESTED_HASH ] ;
+
+/* GEN_TABULATED maps any bp->index to the tabulation table. TABULATED_BP is
+   the fake domain that helps writing tabulation tables. GEN_TABULATED_NAMES
+   maps any name <domain_number|name> to its offset in the Gen_tabulated
+   of the domain number. */
+
+chunk *Gen_tabulated_[ MAX_TABULATED ] ;
+struct binding *Tabulated_bp ;
+hash_table Gen_tabulated_names ;
+
+int Read_spec_mode ;
+bool Read_spec_performed = FALSE ;
+
+/* The debug flag can be changed by the user to check genClib code. */
+
+int gen_debug = 0 ;
+static int gen_debug_indent = 0 ;
+
+/* Default option in GEN_WRITE. */
+
+static int disallow_undefined_tabulated = TRUE ;
+
+/*
+ * MACROS added for code checking
+ *
+ * Fabien COELHO 10/06/94
+ */
+
+#define check_domain(function, domain) \
+    if ((domain)<0 || (domain)>=MAX_DOMAIN) \
+	fprintf(stderr, "%s: Inconsistent domain number %d\n", \
+		function, domain), \
+	abort();
+
+#define check_read_spec_performed(function) \
+    if(! Read_spec_performed) \
+	user("%s: gen_read_spec not performed prior to use\n", function ), \
+	exit(1) ;
+
+/* DOMAIN_INDEX returns the index in the Domain table for object OBJ. */
+
+static int domain_index( obj )
+chunk *obj ;
+{
+    int i ;
+
+    if( obj == NULL ) {
+	user( "domain_index: Trying to use a NULL object\n", "" ) ;
+	exit( 1 ) ;
+    }
+    if( obj == chunk_undefined ) {
+	user( "domain_index: Trying to use an undefined object\n", "" ) ;
+	exit( 1 ) ;
+    }
+    if( (i=obj->i) < 0 || i >= MAX_DOMAIN ) {
+	user( "domain_index: Inconsistant domain number %s\n", itoa( i )) ;
+	abort() ;
+    }
+    return( i ) ;
+}
+
+
+/* inlined version of domain_index. what is done by optimizing compilers?
+ */
+#define quick_domain_index(obj) \
+  (((! obj) || (obj==chunk_undefined) || (obj->i<0) || (obj->i>MAX_DOMAIN)) ? \
+   domain_index(obj) : obj->i) /* prints the error message or returns */
+
+
+/* dangerous version that assumes a consistent object?
+ */
+#define very_quick_domain_index(obj) \
+  (((! obj) || (obj==chunk_undefined)) ? (abort(), -1) : obj->i)
+
+
+/* FPRINTF_SPACES prints NUMBER spaces on the FD file descriptor. */
+
+static void
+fprintf_spaces( fd, number )
+FILE *fd ;
+int number ;
+{
+    for( ; number ; number-- )
+	    (void) fprintf( fd, " " ) ;
+}
+
+#ifdef DBG_READ
+/* WRITE_CHUNK prints on the FILE stream a succession of L chunks (beginning
+   at OBJ). This is used for debugging purposes. */
+
+void
+write_chunk( file, obj, l )
+     FILE *file ;
+     chunk *obj ;
+     int l ;
+{
+  int i ;
+
+  (void) fprintf( file, "Chunk %x on %d:", obj, l ) ;
+  
+  for( i=0 ; i<l ; i++ )
+    (void) fprintf( file, "%d ", *(obj+i)) ;
+
+  (void) fprintf( file, "\n" ) ;
+}
+#endif
+
+/* ARRAY_SIZE returns the number of elements in the array whose dimension
+   list is DIM. */
+
+static int
+array_size( dim )
+     struct intlist *dim ;
+{
+  int sz = 1 ;
+
+  for( ; dim != NULL ; dim = dim->cdr )
+    sz *= dim->val ;
+
+  return( sz ) ;
+}
+
+/* INIT_ARRAY returns a freshly allocated array initialized according to
+   the information in its domain DP. */
+
+static chunk *
+init_array( dp )
+     union domain *dp ;
+{
+  int sizarray = array_size( dp->ar.dimensions ) ;
+  /*NOSTRICT*/
+  chunk *ar = (chunk *)alloc( sizeof( chunk )*sizarray ) ;
+
+  for( ; sizarray ; sizarray-- )
+    ar[ sizarray-1 ].p = chunk_undefined ;
+
+  return( ar ) ;
+}
+
+/* FIND_FREE_TABULATED finds a free slot for the tabulated domain BP.
+   The slot 0 is unused (see write_tabulated_leaf_in) */
+
+int
+find_free_tabulated( bp )
+struct binding *bp ;
+{
+    int i ;
+
+    if( Gen_tabulated_[ bp->index ] == chunk_undefined ) {
+	fatal( "find_free_tabulated: Uninitialized %s\n", bp->name ) ;
+    }
+    i = ((bp->alloc == max_tabulated_elements()-1) ? 1 : bp->alloc)+1 ;
+
+    for( ; ; i = (i == max_tabulated_elements()-1) ? 1 : i+1 ) {
+	if( i == bp->alloc ) {
+	    user( "Too many elements in tabulated domain %s\n", bp->name ) ;
+	    abort();
+	}
+	if( (Gen_tabulated_[ bp->index ]+i)->p == chunk_undefined ) {
+	    return( bp->alloc = i ) ;
+	}
+    }
+}
+
+/* GEN_ALLOC_COMPONENT updates the chunk CP from the arg list AP according
+   to the domain DP. */
+
+/*VARARGS2*/
+void
+gen_alloc_component( dp, cp, ap, gen_check_p )
+union domain *dp ;
+chunk *cp ;
+va_list *ap ;
+int gen_check_p ;
+{
+    switch( dp->ba.type ) {
+    case ARRAY :
+	if( (cp->p = va_arg( *ap, chunk * )) == NULL )
+	    cp->p =  init_array( dp ) ;
+	break ;
+    case LIST:
+	cp->l = va_arg( *ap, cons * ) ; 
+	break ;
+    case SET:
+	cp->t = va_arg( *ap, set ) ; 
+	break ;
+    case BASIS:
+	if( IS_INLINABLE( dp->ba.constructand )) {
+	    switch( *dp->ba.constructand->name ) {
+	    case 'u': cp->u = va_arg( *ap, unit ) ; break ;
+	    case 'b': cp->b = va_arg( *ap, bool ) ; break ;
+	    case 'c': cp->c = va_arg( *ap, int ) ; break ;
+	    case 'i': cp->i = va_arg( *ap, int ) ; break ;
+	    case 'f': cp->f = va_arg( *ap, double ) ; break ;
+	    case 's': cp->s = va_arg( *ap, string ) ; break ;
+	    default:
+		fatal( "gen_alloc: unknown inlinable %s\n",
+		       dp->ba.constructand->name ) ;
+	    }
+	}
+	else if( IS_EXTERNAL( dp->ba.constructand )) {
+	    cp->s = va_arg( *ap, char * ) ;
+	}
+	else {
+	    cp->p = va_arg( *ap, chunk * ) ;
+
+	    if( gen_debug & GEN_DBG_CHECK || gen_check_p ) {
+		(void) gen_check( cp->p, dp->ba.constructand-Domains ) ;
+	    }
+	}
+	break ;
+    default:
+	fatal( "gen_alloc_component: unknown type %s\n", itoa( dp->ba.type )) ;
+    }
+}
+
+/* GEN_ALLOC allocates SIZE bytes to implement an object whose TYPE is
+   the index in the Domains table. A fairly sophisticated initialization
+   process is run, namely arrays are filled with undefineds. */
+
+void
+gen_alloc_constructed( ap, bp, dp, cp, data, gen_check_p )
+va_list ap ;
+struct binding *bp ;
+union domain *dp ;
+chunk *cp ;
+int data ;
+int gen_check_p ;
+{
+    struct domainlist *dlp ;
+
+    switch( dp->co.op ) {
+    case AND_OP : {
+	chunk *cpp ;	
+
+	for( dlp=dp->co.components, cpp=cp+data ;
+	    dlp != NULL ; 
+	    dlp=dlp->cdr, cpp++ ) {
+	    gen_alloc_component( dlp->domain, cpp, &ap, gen_check ) ;
+	}
+	break ;
+    }
+    case OR_OP: {
+	int which ;
+
+	(cp+data)->i = va_arg( ap, int ) ;
+	which = (cp+data)->i - dp->co.first ;
+
+	for( dlp=dp->co.components; dlp!=NULL && which ;dlp=dlp->cdr ){
+	    which-- ;
+	}
+	if( dlp == NULL ) {
+	    user( "gen_alloc: unknown tag for type %s\n", bp->name ) ;
+	}
+	gen_alloc_component( dlp->domain, cp+data+1, &ap, gen_check_p ) ;
+	break ;
+    }
+    case ARROW_OP: {
+	(cp+data)->h = hash_table_make( hash_chunk, 0 ) ;
+	break ;
+    }
+    default:
+	fatal( "gen_alloc: Unknown op %s\n", itoa( dp->co.op )) ;
+    }
+}
+
+/*VARARGS*/
+chunk *
+gen_alloc( va_alist )
+va_dcl
+{
+    va_list ap ;
+    union domain *dp ;
+    struct binding *bp ;
+    chunk *cp ;
+    int gen_check_p ;
+    int data ;
+
+    va_start( ap ) ;
+    /*NOSTRICT*/
+    if( !Read_spec_performed ) {
+	user( "gen_read_spec not performed prior to allocation\n", "" ) ;
+	exit( 1 ) ;
+    }
+    cp = (chunk *)alloc( va_arg( ap, int )) ;
+    gen_check_p = va_arg( ap, int ) ;
+    bp = &Domains[ cp->i = va_arg( ap, int ) ] ;
+    data = 1 + IS_TABULATED( bp );
+
+    switch( (dp = bp->domain)->ba.type ) {
+    case LIST: 
+	(cp+data)->l = va_arg( ap, cons *) ;
+	break ;
+    case SET: 
+	(cp+data)->t = va_arg( ap, set) ;
+	break ;
+    case ARRAY: 
+	if( ((cp+data)->p = va_arg( ap, chunk *)) == NULL ) {
+	    (cp+data)->p = init_array( dp ) ;
+	}
+	break ;
+    case CONSTRUCTED:
+	gen_alloc_constructed( ap, bp, dp, cp, data, gen_check_p ) ;
+	break ;
+    default:
+	fatal( "gen_alloc: Unknown type %s\n", itoa( dp->ba.type )) ;
+    }
+    if( IS_TABULATED( bp )) {
+	enter_tabulated_def(bp->index, bp-Domains, 
+			    (cp+HASH_OFFSET)->s, cp, 0) ;
+    }
+    va_end( ap ) ;
+
+    return( cp ) ;
+}
+
+/* The DRIVER structure is used to monitor the general function which
+   traverses objects. NULL is called whenver an undefined pointer is found.
+   <sort>_IN is called whenever an object of <sort> is entered. If the
+   returned value is TRUE, then recursive calls are made and, at the end,
+   the <sort>_OUT function is called. */
+
+struct driver {
+  void (*null)() ;
+  int (*leaf_in)() ;
+  void (*leaf_out)() ;
+  int (*simple_in)() ;
+  void (*array_leaf)() ;
+  void (*simple_out)() ;
+  int (*obj_in)() ;
+  void (*obj_out)() ;
+} ;
+
+/* To be called on any object pointer. */
+
+#define CHECK_NULL(obj,bp,dr) \
+  if( (obj) == chunk_undefined ) {(*(dr)->null)(bp) ; return ;}
+
+static void gen_trav_obj() ;
+
+/* GEN_TRAV_LEAF manages an OBJ value of type BP according to the current
+   driver DR. A leaf is an object (inlined or not). */
+
+static void
+gen_trav_leaf( bp, obj, dr )
+struct binding *bp ;
+chunk *obj ;
+struct driver *dr ;
+{
+    CHECK_NULL( obj, bp, dr ) ;
+
+    if( gen_debug & GEN_DBG_TRAV_LEAF ) {
+	fprintf_spaces( stderr, gen_debug_indent++ ) ;
+	(void) fprintf( stderr, "trav_leaf dealing with " ) ;
+
+	if( IS_INLINABLE( bp ))
+		(void) fprintf( stderr, "inlined %s\n", bp->name ) ;
+	else if( IS_EXTERNAL( bp ))
+		(void) fprintf( stderr, "external %s\n", bp->name ) ;
+	else if( IS_TABULATED( bp ))
+		(void) fprintf( stderr, "tabulated %s\n", bp->name ) ;
+	else (void) fprintf( stderr, "constructed %s\n", bp->name ) ;
+    }
+    if( (*dr->leaf_in)( obj, bp )) {
+	if( !IS_INLINABLE( bp ) && !IS_EXTERNAL( bp )) {
+	    if( gen_debug & GEN_DBG_CHECK ) {
+		(void) gen_check( obj->p, bp-Domains ) ;
+	    }
+	    CHECK_NULL( obj->p, bp, dr ) ;
+	    gen_trav_obj( obj->p, dr ) ;
+	}
+	(*dr->leaf_out)( obj, bp ) ;
+    }
+    if( gen_debug & GEN_DBG_TRAV_LEAF ) 
+	    gen_debug_indent-- ;
+}
+
+/* GEN_TRAV_SIMPLE traverses a simple OBJ (which is a (CONS *) for a list
+   or points to the first element of an array) of type DP according to the
+   driver DR. */
+
+static void
+gen_trav_simple( dp, obj, dr )
+union domain *dp ;
+chunk *obj ;
+struct driver *dr ;
+{
+    CHECK_NULL( obj, (struct binding *)NULL, dr ) ;
+
+    if( gen_debug & GEN_DBG_TRAV_SIMPLE ) {
+	fprintf_spaces( stderr, gen_debug_indent++ ) ;
+	(void) fprintf( stderr, "trav_simple dealing with " ) ;
+	print_domain( stderr, dp ) ;
+	(void) fprintf( stderr, "\n" ) ;
+    }
+    if( (*dr->simple_in)( obj, dp )) {
+	switch( dp->ba.type ) {
+	case BASIS: 
+	    gen_trav_leaf( dp->ba.constructand, obj, dr ) ;
+	    break ;
+	case LIST: {
+	    cons *p ;
+
+	    for( p = obj->l ; p != NULL ; p = p->cdr ) {
+		gen_trav_leaf( dp->li.element, &p->car, dr ) ;
+	    }
+	    break ;
+	}
+	case SET: {
+	    SET_MAP( elt, {
+		gen_trav_leaf( dp->se.element, (chunk *)&elt, dr );
+	    }, obj->t ) ;
+	    break ;
+	}
+	case ARRAY: {
+	    int i ;
+	    int size = array_size( dp->ar.dimensions ) ;
+
+	    for( i=0 ; i<size ; i++ )
+		    (*dr->array_leaf)( dp->ar.element, i, obj->p+i, dr ) ;
+
+	    break ;
+	}
+	default:
+	    fatal( "gen_trav_simple: Unknown type %s\n", itoa( dp->ba.type )) ;
+	}
+	(*dr->simple_out)( obj, dp ) ;
+    }
+    if( gen_debug & GEN_DBG_TRAV_SIMPLE ) 
+	    gen_debug_indent-- ;
+}
+
+/* GEN_ARRAY_LEAF is the default recursive call to gen_trav_leaf. */
+
+static void
+gen_array_leaf( bp, i, obj, dr )
+struct binding *bp ;
+int i ;
+chunk *obj ;
+struct driver *dr ;
+{
+    gen_trav_leaf( bp, obj, dr ) ;
+}
+
+
+/* GEN_TRAV_OBJ (the root function) traverses the object OBJ according to
+   the driver DR. */
+
+static void 
+gen_trav_obj_constructed( obj, bp, dp, data, dr )
+chunk *obj ;
+struct driver *dr ;
+struct binding *bp ;
+union domain *dp ;
+int data ;
+{
+    struct domainlist *dlp = dp->co.components ;
+
+    switch( dp->co.op ) {
+    case AND_OP: {
+	chunk *cp ;
+
+	for( cp = obj+data ; dlp != NULL ; cp++, dlp = dlp->cdr ) {
+	    gen_trav_simple( dlp->domain, cp, dr ) ;
+	}
+	break ;
+    }
+    case OR_OP: {
+	int which = (obj+data)->i - dp->co.first ;
+
+	for( ; dlp!=NULL && which ; which--,dlp=dlp->cdr ) {
+	    ;
+	}
+	if( dlp == NULL ) {
+	    fatal( "gen_trav_obj: Unknown tag %s\n", itoa( (obj+data)->i )) ;
+	}
+	gen_trav_simple( dlp->domain, obj+data+1, dr ) ;
+	break ;
+    }
+    case ARROW_OP: 
+	HASH_MAP( k, v, {
+	    gen_trav_simple( dlp->domain, (chunk *)k, dr ) ;
+	    gen_trav_simple( dlp->cdr->domain, (chunk *)v, dr ) ;
+	}, (obj+data)->h ) ;
+	break ;
+    default:
+	fatal( "gen_trav_obj: Unknown op %s\n", itoa( dp->co.op )) ;
+    }
+}
+
+static void
+gen_trav_obj( obj, dr )
+     chunk *obj ;
+     struct driver *dr ;
+{
+    CHECK_NULL( obj, (struct binding *)NULL, dr ) ;
+
+    if( !Read_spec_performed ) {
+	user( "gen_read_spec not performed prior to use\n", "" ) ;
+	exit( 1 ) ;
+    }
+    if( (*dr->obj_in)( obj, dr )) {
+	struct binding *bp = &Domains[ domain_index( obj ) ] ;
+	union domain *dp = bp->domain ;
+	int data = 1+IS_TABULATED( bp ) ;
+
+	if( gen_debug & GEN_DBG_TRAV_OBJECT ) {
+	    fprintf_spaces( stderr, gen_debug_indent++ ) ;
+	    (void) fprintf( stderr, "trav_obj dealing with " ) ;
+	    print_domain( stderr, dp ) ;
+	    (void) fprintf( stderr, "\n" ) ;
+	}
+	switch( dp->ba.type ) {
+	case LIST: 
+	case SET:
+	case ARRAY:
+	    gen_trav_simple( dp, obj+data, dr ) ;
+	    break ;
+	case CONSTRUCTED: 
+	    gen_trav_obj_constructed( obj, bp, dp, data, dr ) ;
+	    break ;
+	default:
+	    fatal( "gen_trav_obj: Unknown type %s\n", itoa( dp->ba.type )) ;
+	}
+	(*dr->obj_out)( obj, bp, dr ) ;
+    }
+    if( gen_debug & GEN_DBG_TRAV_OBJECT )  {
+	gen_debug_indent-- ;
+    }
+}
+
+/* Useful functions */
+
+void
+gen_null(p)
+chunk *p;
+{
+}
+
+static int
+tabulated_leaf_in( obj, bp )
+chunk *obj ;
+struct binding *bp ;
+{
+    return( !IS_TABULATED( bp )) ;
+}
+
+
+
+/* These functions computes an hash table of object pointers (to be used
+   to manage sharing when dealing with objects). */
+
+#define MAX_SHARED_OBJECTS 10000
+
+static char *first_seen = (char *)NULL ;
+static char *seen_once = (char *)NULL ;
+
+#define FIRST_SEEN(s) (s>=first_seen && s<first_seen+MAX_SHARED_OBJECTS)
+
+/* The OBJ_TABLE maps objects to addresses within the arrays FIRST_SEEN
+   and SEEN_ONCE. In the first case, if the address is FIRST_SEEN, then
+   this is the first occurence of the object; if it has a non-zero
+   offset i, then it is the i-th shared object seen so far. This offset
+   is used in SHARED_OBJ to decide which number to print and update the
+   OBJ_TABLE to associate the object to SEEN_ONCE+i so that latter
+   references can be correctly generated. */
+
+static hash_table obj_table = (hash_table)NULL ;
+
+/* The running counter of shared objects number. */
+
+static int shared_number = 0 ;
+
+/* GEN_TRAV_ENVS are stacked to allow recursive calls to GEN_TRAV_OBJ 
+   (cf. GEN_RECURSE) */
+
+#define MAX_GEN_TRAV_ENV 100
+
+static int gen_trav_env_top = 0 ;
+
+struct gen_trav_env {
+    char *first_seen ;
+    char *seen_once ;
+    hash_table obj_table ;
+    int shared_number ;
+} gen_trav_envs[ MAX_GEN_TRAV_ENV ] ;
+
+static void push_gen_trav_env() 
+{
+    struct gen_trav_env *env ;
+
+    if( gen_trav_env_top == MAX_GEN_TRAV_ENV ) {
+	fatal( "push_gen_trav_env: Too many recursive gen_trav\n", "" ) ;
+    }
+    env = &gen_trav_envs[gen_trav_env_top++] ;
+    env->first_seen = first_seen ;
+    env->seen_once = seen_once ;
+    env->obj_table = obj_table ;
+    env->shared_number = shared_number ;
+
+    first_seen = (char *)alloc( MAX_SHARED_OBJECTS ) ;
+    seen_once = (char *)alloc( MAX_SHARED_OBJECTS ) ;
+    obj_table = hash_table_make( hash_pointer, 0 ) ;
+    shared_number = 0 ;
+}
+
+static void pop_gen_trav_env() 
+{
+    struct gen_trav_env *env ;
+
+    if( gen_trav_env_top < 0 ) {
+	fatal( "pop_gen_trav_env: Too many pops\n", "" ) ;
+    }
+    free( first_seen ) ;
+    free( seen_once ) ;
+    hash_table_free( obj_table ) ;
+
+    first_seen = (env = &gen_trav_envs[--gen_trav_env_top])->first_seen ;
+    seen_once = env->seen_once ;
+    obj_table = env->obj_table ;
+    shared_number = env->shared_number ;
+}
+
+static int shared_obj_in() ;
+
+/* SHARED_OBJ_IN introduces an object OBJ in the OBJ_TABLE. If it is
+   already in the table, don't recurse (at least, if you want to avoid an
+   infinite loop) and give it a number. Else recurse. */
+
+static int
+shared_obj_in( obj, dr )
+chunk *obj ;
+struct driver *dr ;
+{
+    char *seen ;
+
+    if( (seen=hash_get( obj_table, (char *)obj )) != HASH_UNDEFINED_VALUE ) {
+	if( seen == first_seen ) {
+	    hash_del( obj_table, (char *)obj ) ;
+
+	    if( ++shared_number >= MAX_SHARED_OBJECTS ) {
+		fatal( "shared_obj_in: Too many shared objects\n", "" ) ;
+	    }
+	    hash_put( obj_table, (char *)obj, first_seen+shared_number ) ;
+	}
+	return( !GO) ;
+    }
+    hash_put( obj_table, (char *)obj, first_seen ) ;
+    return( GO) ;
+}
+
+static int
+shared_simple_in( obj, dp )
+chunk *obj ;
+union domain *dp ;
+{
+    switch( dp->ba.type ) {
+    case BASIS:
+	return( !dp->ba.persistant ) ;
+    case LIST: {
+	cons *p ;
+
+	if( obj->l == list_undefined ) {
+	    return( !GO) ;
+	}
+	for( p=obj->l ; p!=NIL ; p=p->cdr ) {
+	    if( hash_get( obj_table, (char *)p ) != HASH_UNDEFINED_VALUE ) {
+		user( "shared_simpl_in: Sharing of cons\n" ) ;
+		abort () ;
+	    }
+	    else {
+		hash_put( obj_table, (char *)p, (char *)p ) ;
+	    }
+	}
+        return( !dp->li.persistant ) ;
+    }
+    case SET:
+	return( !dp->se.persistant ) ;
+    case ARRAY:
+	return( !dp->ar.persistant ) ;
+    }
+    fatal( "shared_simple_in: unknown type %s\n", itoa( dp->ba.type )) ;
+
+    return(-1); /* just to avoid a gcc warning */
+}
+
+/* SHARED_POINTERS creates (in OBJ_TABLE) the association between objects
+   and their numbers (!= 0 if sharing). Inlined values are NOT considered
+   to be shared (neither list and arrays), just objects (i.e. objects which
+   have a user name, a spec in Domains). KEEP says whether the previous
+   sharing table is preserved. */
+
+void
+shared_pointers( obj, keep )
+chunk *obj ;
+bool keep ;
+{
+  struct driver dr ;
+
+  dr.null = dr.leaf_out = dr.simple_out = dr.obj_out = gen_null ;
+  dr.obj_in = shared_obj_in ;
+  dr.simple_in = shared_simple_in ;
+  dr.array_leaf = gen_array_leaf ;
+  dr.leaf_in = tabulated_leaf_in ;
+
+  if( obj_table == (hash_table)NULL ) {
+    fatal( "shared_pointers: NULL obj_table\n" ) ;
+  }
+  if( !keep ) {
+      hash_table_clear( obj_table ) ;
+      shared_number = 0 ;
+  } 
+  else {
+    fatal( "shared_pointers: keep = TRUE, not implemented\n" ) ;
+  }
+  gen_trav_obj( obj, &dr ) ;
+}
+
+/* SHARED_OBJ manages the OBJect modulo sharing (the OBJ_TABLE has to be
+   set first, see above). If the object isn't shared, don't do nothing.
+   else, if that's the first appearance, call FIRST and go on, else 
+   call OTHERS. If the obj_table isn't defined, recurse. */
+
+static int
+shared_obj( obj, first, others )
+chunk *obj ;
+void (*first)() ;
+void (*others)() ;
+{
+    char *shared ;
+    int shared_number ;
+
+    if( obj_table == (hash_table)NULL ) {
+	fatal( "shared_obj: Undefined obj_table\n", "" ) ;
+	/*NOTREACHED*/
+    }
+    if((shared=hash_get( obj_table, (char *)obj)) == HASH_UNDEFINED_VALUE) {
+	return( !GO) ;
+    }
+    if( shared == first_seen ) {
+	return( !GO) ;
+    }
+    else if( FIRST_SEEN( shared )) {
+	(*first)( shared_number = shared-first_seen ) ;
+	hash_del( obj_table, (char *)obj ) ;
+	hash_put( obj_table, (char *)obj, seen_once+shared_number ) ;
+	return( !GO) ;
+    }
+    else {
+	(*others)( shared - seen_once ) ;
+	return( GO) ;
+    }
+}
+
+/* SHARED_GO is like GO except that it doesn't ask for continuation if
+   the node OBJ has already been seen. */
+
+static int shared_go( obj )
+chunk *obj ;
+{
+    return( !shared_obj( obj, gen_null, gen_null )) ;
+}
+
+
+
+/* These functions are used to implement the freeing of objects. A
+   tabulated constructor has to stop recursive freeing. */
+
+/* A tabulated domain BP prohibits its OBJ to be recursively freed. */
+
+static int
+free_leaf_in( obj, bp )
+chunk *obj ;
+struct binding *bp ;
+{
+    return( !IS_TABULATED( bp ) && !shared_obj( obj, gen_null, gen_null )) ;
+}
+
+/* FREE_LEAF_OUT manages external types */
+
+static void
+free_leaf_out( obj, bp ) 
+chunk *obj ;
+struct binding *bp ;
+{
+    if( IS_INLINABLE( bp )) return ;
+
+    if( IS_EXTERNAL( bp )) {
+	if( bp->domain->ex.free == NULL ) {
+	    user( "gen_free: uninitialized external type %s\n",
+		 bp->name ) ;
+	    return ;
+	}
+	(*(bp->domain->ex.free))( obj->s ) ;
+    }
+}
+
+/* FREE_SIMPLE_OUT frees the spine of the list OBJ or the whole array
+   (according to the type DP). The components are (obviously ?) freed by the
+   recursive traversal functions (I said it once ... and for all). */
+
+static void
+free_simple_out( obj, dp )
+     chunk *obj ;
+     union domain *dp ;
+{
+    switch( dp->ba.type ) {
+    case LIST:
+	gen_free_list( obj->l ) ;
+	break ;
+    case SET:
+	set_free( obj->t ) ;
+	break ;
+    case ARRAY:
+	free( (char *) obj->p ) ;
+	break ;
+    }
+}
+
+/* FREE_OBJ_OUT just frees the object OBJ. */
+/* static chunk freed_chunk ; */
+
+/*ARGSUSED*/
+static void
+free_obj_out( obj, bp, dr )
+chunk *obj ;
+struct binding *bp ;
+struct driver *dr ;
+{
+    union domain *dp ;
+
+    if( IS_TABULATED( bp )) {
+	static char local[ 1024 ] ;
+	    
+	(void) sprintf( local, "%d%c%s", 
+		 domain_index( obj ), HASH_SEPAR, (obj+HASH_OFFSET)->s ) ;
+
+	if( Gen_tabulated_names == (hash_table)NULL ) {
+	    fatal( "free_obj_out: Null tabulated names for %s\n", bp->name ) ;
+	}
+	if( hash_del( Gen_tabulated_names, local ) == HASH_UNDEFINED_VALUE ) {
+	    user( "free_tabulated: clearing unexisting %s\n", local ) ;
+	}
+	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = chunk_undefined; 
+    }
+    if((dp=bp->domain)->ba.type == CONSTRUCTED && dp->co.op == ARROW_OP) {
+	hash_table h = (obj+1 + IS_TABULATED( bp ))->h ;
+
+	HASH_MAP( k, v, {
+	    free( (void *)k ) ;
+	    free( (void *)v ) ;
+	}, h ) ;
+	hash_table_free( h ) ;
+    }
+    obj->p = (chunk *)0 ;
+    free((void *) obj ) ;
+}
+
+/* GEN_LOCAL_FREE frees the object OBJ with or withou KEEPing the sharing. */ 
+
+static int
+persistant_simple_in( obj, dp )
+chunk *obj ;
+union domain *dp ;
+{
+    switch( dp->ba.type ) {
+    case BASIS:
+	return( !dp->ba.persistant ) ;
+    case LIST:
+	return( !dp->li.persistant && obj->l != list_undefined ) ;
+    case SET:
+	return( !dp->se.persistant && obj->t != set_undefined ) ;
+    case ARRAY:
+	return( !dp->ar.persistant && obj->p != array_undefined ) ;
+    }
+    fatal( "persistant_simple_in: unknown type %s\n", itoa( dp->ba.type )) ;
+
+    return(-1); /* just to avoid a gcc warning */
+}
+
+
+static void
+gen_local_free( obj, keep )
+chunk *obj ;
+bool keep ;
+{
+    struct driver dr ;
+
+    dr.null = gen_null ;
+    dr.leaf_out = free_leaf_out ;
+    dr.leaf_in = free_leaf_in ;
+    dr.obj_in = shared_go ;
+    dr.simple_in = persistant_simple_in ;
+    dr.array_leaf = gen_array_leaf ;
+    dr.simple_out = free_simple_out ;
+    dr.obj_out = free_obj_out ;
+
+    push_gen_trav_env() ;
+
+    if( !keep ) {
+	shared_pointers( obj, FALSE ) ;
+    }
+    gen_trav_obj( obj, &dr ) ;
+
+    pop_gen_trav_env() ;
+}
+
+/* GEN_FREE frees the object OBJ. */ 
+
+void
+gen_free( obj )
+chunk *obj ;
+{
+    gen_local_free( obj, FALSE ) ;
+}
+
+/* GEN_FREE_WITH_SHARING frees the object OBJ. */ 
+
+void
+gen_free_with_sharing( obj )
+chunk *obj ;
+{
+    gen_local_free( obj, TRUE ) ;
+}
+
+
+
+/* These functions are used to implement the copying of objects. A
+   tabulated constructor has to stop recursive duplication. */
+
+static hash_table copy_table;		/* maps an object on its copy */
+
+chunk *copy_hsearch(key)
+chunk *key;
+{
+    chunk *p ;
+
+    if( key == (chunk *)NULL || key == (chunk *)HASH_UNDEFINED_VALUE) {
+	return( key ) ;
+    }
+    if ((p=(chunk *)hash_get( copy_table, (char *)key ))==
+	(chunk *)HASH_UNDEFINED_VALUE) {
+	fatal( "[copy_hsearch] bad key: %s\n", itoa( (int) key ));
+    }
+    return(p);
+}
+    
+void copy_hput( t, k, v )
+hash_table t ;
+char *k, *v ;
+{
+    if( k != (char *) HASH_UNDEFINED_VALUE && k != (char *) NULL)
+	hash_put( t, k, v ) ;
+}
+
+
+/* COPY_OBJ_IN duplicates an object if it has not already been seen
+   (this migth happen with shared objects). inlined sub-domains are copied
+   by the call to memcpy. remaining sub-domains require further processing
+*/
+
+static int copy_obj_in(obj, dr)
+chunk *obj ;
+struct driver *dr ;
+{
+    int size;
+    chunk *new_obj;
+    struct binding *bp = &Domains[ domain_index( obj ) ] ;
+
+    if (shared_obj( obj, gen_null, gen_null ))
+	    return 0;
+
+    /* memory is allocated to duplicate the object referenced by obj */
+    size = gen_size(bp)*sizeof(chunk);
+    new_obj = (chunk *)alloc(size);
+
+    /* the object obj is copied into the new one */
+    (void) memcpy((char *) new_obj, (char *) obj, size);
+
+    /* hash table copy_table is updated */
+    copy_hput(copy_table, (char *)obj, (char *)new_obj);
+    
+    return 1;
+}
+
+/* Just check for defined simple domains. */
+
+static int copy_simple_in( obj, dp )
+chunk *obj ;
+union domain *dp ;
+{
+    switch( dp->ba.type ) {
+    case BASIS:
+	return( GO) ;
+    case LIST:
+	return( obj->l != list_undefined ) ;
+    case SET:
+	return( obj->t != set_undefined ) ;
+    case ARRAY:
+	return( obj->p != array_undefined ) ;
+    }
+    fatal( "copy_simple_in: unknown type %s\n", itoa( dp->ba.type )) ;
+
+    return(-1); /* just to avoid a gcc warning */
+}
+
+/* COPY_LEAF_OUT manages external sub-domains. warning: the test
+   IS_EXTERNAL cannot be applied on an inlined sub-domain */
+
+static void copy_leaf_out(obj,bp) 
+chunk *obj ;
+struct binding *bp ;
+{
+    if (IS_INLINABLE(bp))
+	    return;
+		
+    if (IS_EXTERNAL(bp)) {
+	if (bp->domain->ex.copy == NULL) {
+	    user("gen_copy_tree: uninitialized external type %s\n",
+		 bp->name) ;
+	    return ;
+	}
+	copy_hput(copy_table, obj->s, (*(bp->domain->ex.copy))(obj->s)) ;
+    }
+}
+
+/* GEN_COPY_LIST duplicates cons cells. if list elements are inlinable,
+   the old cell CARs are copied into the new ones. if not, the new cells
+   must contain the objects that copy_table provides for the old objects
+   contained in old cells. the second argument is the domain pointer of old
+   list */
+
+cons *gen_copy_list(old_l, dp)
+cons *old_l;
+union domain *dp ;
+{
+    cons *old_p, *new_p = NIL, *new_l, *pc;
+    int inlinable;
+
+    inlinable = IS_INLINABLE(dp->li.element);
+    new_l = NIL;
+
+    for (old_p = old_l ; old_p != NIL ; old_p = old_p->cdr) {
+	pc = (cons *)alloc( sizeof(struct cons) ) ;
+
+	/* the cons cell is updated */
+	if (inlinable)
+		pc->car = old_p->car;
+	else {
+	    pc->car.p = copy_hsearch( old_p->car.p ) ;
+	}
+	pc->cdr = NIL;
+	
+	/* pc is linked to the new list */
+	if (new_l == NIL)
+		new_l = pc;
+	else
+		new_p->cdr = pc;
+	new_p = pc;
+    }
+    return(new_l);
+}
+
+/* GEN_COPY_ARRAY duplicates an array. if array elements are inlinable,
+   the old array is copied into the new one. if not, the new array must
+   contain the objects that copy_table provides for the old objects
+   contained in the old array. the second argument is the domain pointer of
+   the old array */
+
+chunk *gen_copy_array(old_a, dp)
+chunk *old_a;
+union domain *dp ;
+{
+    int i, size, inlinable;
+    chunk *new_a;
+
+    size = array_size(dp->ar.dimensions);
+    inlinable = IS_INLINABLE(dp->ar.element);
+    new_a = (chunk *) alloc( sizeof(chunk)*size ) ;
+
+    if (inlinable) {
+	(void) memcpy((char *) new_a, (char *) old_a, size*sizeof(chunk));
+    }
+    else {
+	for (i = 0; i < size; i++) {
+	    new_a[i].p = copy_hsearch( old_a[i].p ) ;
+	}
+    }
+    return(new_a);
+}	
+
+/* GEN_COPY_SET duplicates a set. */
+
+set
+gen_copy_set( old_s, dp )
+set old_s;
+union domain *dp ;
+{
+    set new_s = set_make( dp->se.what ) ;
+
+    if( IS_INLINABLE( dp->se.element )) {
+	set_assign( new_s, old_s ) ;
+    }
+    else {
+	SET_MAP( elt, {
+	  chunk *new = copy_hsearch( (chunk *)elt );
+
+	  set_add_element( new_s, new_s, (char *)new ) ;
+	}, old_s ) ;
+    }
+    return( new_s );
+}	
+
+/* COPY_SIMPLE_OUT copies the spine of the list OBJ or the whole array
+   (according to the type DP). The components are copied by the recursive
+   traversal functions */
+
+static void copy_simple_out(obj,dp)
+chunk *obj ;
+union domain *dp ;
+{
+    switch (dp->ba.type) {
+    case LIST:
+	/* spine of the list is duplicated and  hash table copy_table
+	   is updated */
+	copy_hput(copy_table, (char *) (obj->l), 
+		 (char *) gen_copy_list(obj->l, dp));
+	break ;
+    case SET:
+	copy_hput(copy_table, (char *) (obj->t), 
+		 (char *) gen_copy_set(obj->t, dp));
+	break ;
+    case ARRAY:
+	/* array  is duplicated and  hash table copy_table is updated */
+	copy_hput(copy_table, (char *)obj->p,
+		 (char *)gen_copy_array(obj->p, dp));
+	break ;
+    }
+}
+
+/* COPY_OBJ_OUT achieves to update the new object (copy of the old one)
+   once all sub-domains have been recursively copied */
+
+#define COPYABLE_DOMAIN(d) \
+( d->ba.type != BASIS || \
+ (!IS_INLINABLE( d->ba.constructand ) && \
+  !IS_TABULATED( d->ba.constructand )))
+
+static void
+copy_obj_out_constructed( obj, bp, dp, data, new_obj, dr ) 
+chunk *obj, *new_obj ;
+struct binding *bp ;
+union domain *dp ;
+int data ;
+struct driver *dr ;
+{
+    struct domainlist *dlp = dp->co.components ;
+
+    switch( dp->co.op ) {
+    case AND_OP: {
+	chunk *cp ;
+
+	for( cp = obj+data ; dlp != NULL ; cp++, dlp = dlp->cdr ) {
+	    if(COPYABLE_DOMAIN( dlp->domain)) {
+		(new_obj+(cp-obj))->p = copy_hsearch(cp->p);
+	    }
+	}
+	break ;
+    }
+    case OR_OP: {
+	int which = (obj+data)->i - dp->co.first ;
+
+	for( ; dlp!=NULL && which ; which--,dlp=dlp->cdr ) {
+	    ;
+	}
+	if( dlp == NULL ){
+	    fatal("[copy_obj_out] Unknown tag %s\n", itoa( (obj+data)->i )) ;
+	}
+	if( COPYABLE_DOMAIN( dlp->domain )) {
+	    (new_obj+data+1)->p = copy_hsearch((obj+data+1)->p);
+	}
+	break ;
+    }
+    case ARROW_OP: {
+	bool cp_domain = (COPYABLE_DOMAIN( dlp->domain )) ;
+	bool cp_codomain = (COPYABLE_DOMAIN( dlp->cdr->domain )) ;
+	
+	(new_obj+data)->h = hash_table_make( (obj+data)->h->hash_type, 0) ;
+
+	HASH_MAP( k, v, {
+	    k =  (cp_domain ? (char *)copy_hsearch( (chunk *)k ) : k) ;
+	    v =  (cp_codomain ? (char *)copy_hsearch( (chunk *)v ) : v) ;
+	    hash_put((new_obj+data)->h, k, v ) ;
+	}, (obj+data)->h ) ;
+	break ;
+    }
+    default:
+	fatal( "[copy_obj_out] Unknown op %s\n", itoa( dp->co.op )) ;
+    }
+}
+
+
+static void copy_obj_out(obj,bp,dr)
+chunk *obj ;
+struct binding *bp ;
+struct driver *dr ;
+{
+    union domain *dp = bp->domain ;
+    int data = 1+IS_TABULATED( bp ) ;
+    chunk *new_obj = copy_hsearch(obj) ;
+
+    switch( dp->ba.type ) {
+    case LIST: 
+    case SET:
+    case ARRAY:
+	(new_obj+data)->p = copy_hsearch((obj+data)->p);
+	break ;
+    case CONSTRUCTED:
+	copy_obj_out_constructed( obj, bp, dp, data, new_obj, dr ) ;
+	break ;
+    default:
+	fatal( "[copy_obj_out] Unknown type %s\n", itoa( dp->ba.type )) ;
+    }
+}
+
+/* GEN_COPY_TREE makes a copy of the object OBJ */ 
+
+chunk *gen_copy_tree( obj )
+chunk *obj ;
+{
+    chunk *copy;
+    struct driver dr ;
+
+    dr.null = gen_null ;
+    dr.leaf_out = copy_leaf_out ;
+    dr.leaf_in = tabulated_leaf_in ;
+    dr.obj_in = copy_obj_in ;
+    dr.simple_in = copy_simple_in ;
+    dr.array_leaf = gen_array_leaf ;
+    dr.simple_out = copy_simple_out ;
+    dr.obj_out = copy_obj_out;
+
+    push_gen_trav_env() ;
+
+    /* sharing is computed */
+    shared_pointers( obj, FALSE ) ;
+
+    /* the copy_table is initialized */
+    if (copy_table == (hash_table) NULL) {
+	copy_table = hash_table_make( hash_pointer, 0 ) ;
+    }
+
+    /* recursive travel thru data structures begins ... */
+    gen_trav_obj(obj,&dr) ;
+
+    pop_gen_trav_env() ;
+
+    /* the result is extracted from the copy_table */
+    copy = copy_hsearch( (char *)obj ) ;
+
+    /* the copy_table is cleared */
+    hash_table_clear(copy_table);	
+
+    return(copy); 
+}
+
+
+/* FREE_TABULATED_LEAF_IN frees tabulated leaf OBJ of domain BP only once. */
+
+static int
+free_tabulated_leaf_in( obj, bp )
+chunk *obj ;
+struct binding *bp ;
+{
+    if ( IS_TABULATED( bp )) {
+	if ( obj->p == chunk_undefined ) {
+	    return( !GO) ;
+	}
+	free_obj_out( obj->p, bp ) ;
+	obj->p = chunk_undefined ;
+	return( !GO) ;
+    }
+    return( free_leaf_in( obj, bp )) ;
+}
+
+/* GEN_FREE_TABULATED frees all the elements of the tabulated table of
+   BINDING. */
+
+int
+gen_free_tabulated( domain )
+int domain ;
+{
+    struct binding *bp = &Domains[ domain ] ;
+    int index = bp->index ;
+    chunk *fake_obj = gen_alloc(HEADER_SIZE+sizeof( chunk ),
+				0,
+			        Tabulated_bp-Domains,
+			        Gen_tabulated_[ index ] ) ;
+    struct driver dr ;
+    int i ;
+
+    Tabulated_bp->domain->ar.element = bp ;
+    dr.null = gen_null ;
+    dr.leaf_out = free_leaf_out ;
+    dr.leaf_in = free_tabulated_leaf_in ;
+    dr.obj_in = shared_go ;
+    dr.simple_in = gen_true ;
+    dr.array_leaf = gen_array_leaf ;
+    dr.simple_out = free_simple_out ;
+    dr.obj_out = free_obj_out ;
+
+    push_gen_trav_env() ;
+
+    shared_pointers( fake_obj, FALSE ) ;
+#ifdef DBG_HASH
+    (void) fprintf( stderr, "Gen_freeing_tabulated\n" ) ;
+    hwrite( Gen_tabulated_names ) ;
+#endif
+    gen_trav_obj( fake_obj, &dr ) ;
+
+    pop_gen_trav_env() ;
+
+#ifdef DBG_HASH
+    (void) fprintf( stderr, "After gen_free_tabulated\n" ) ;
+    hwrite( Gen_tabulated_names ) ;
+#endif
+
+    bp->alloc = 1 ;
+    Gen_tabulated_[ bp->index ] = 
+	    (chunk *)alloc( max_tabulated_elements()*sizeof( chunk )) ;
+    
+    for( i=0 ; i<max_tabulated_elements() ; i++ ) {
+	(Gen_tabulated_[ bp->index ]+i)->p = chunk_undefined ;
+    }
+    return( domain ) ;
+}
+
+/* GEN_CLEAR_TABULATED_ELEMENT only clears the entry for object OBJ in the
+   Gen_tabulated_ and Gen_tabulated_names tables. */
+
+void
+gen_clear_tabulated_element( obj )
+chunk *obj  ;
+{
+    struct binding *bp = &Domains[ domain_index( obj ) ] ;
+
+    if( IS_TABULATED( bp )) {
+	static char local[ 1024 ] ;
+	    
+	(void) sprintf(local, "%d%c%s", 
+		       domain_index( obj ),
+		       HASH_SEPAR, 
+		       (obj+HASH_OFFSET)->s ) ;
+
+	if( Gen_tabulated_names == (hash_table)NULL ) {
+	    fatal( "clear_tabulated: Null tabulated names for %s\n", 
+		  bp->name ) ;
+	}
+	if( hash_del( Gen_tabulated_names, local ) == HASH_UNDEFINED_VALUE ) {
+	    user( "clear_tabulated: clearing unexisting %s\n", local ) ;
+	}
+	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = chunk_undefined ;
+    }
+    else {
+	user( "clear_tabulated: not a tabulated element\n" ) ;
+    }
+}
+
+/* These functions implements the writing of objects. */
+
+/* USER_FILE is used by driver functions (sorry, no closure in C). */
+
+static FILE *user_file ;
+
+/* WRITE_DEFINE_SHARED_NODE defines the node whose number is N. */
+
+void
+write_define_shared_node( n )
+     int n ;
+{
+  (void) fprintf( user_file, "[%d ", n ) ;
+}
+
+/* WRITE_SHARED_NODE references a shared node N. */
+
+void
+write_shared_node( n ) 
+     int n ;
+{
+  (void) fprintf( user_file, "#]shared %d ", n ) ;
+}
+
+static void
+write_null( bp )
+struct binding *bp ;
+{
+    (void) fprintf( user_file, "#]null\n" ) ;
+}
+
+/* WRITE_OBJ_IN writes the OBJect of type BP. We first prints its type
+   (its index in the Domains table), its tag (for OR_OP types) and then
+   ... let's do the recursion. */
+
+static int
+write_obj_in( obj, dr ) 
+chunk *obj ;
+struct driver *dr ;
+{
+    struct binding *bp = &Domains[ domain_index( obj ) ] ;
+    union domain *dp = bp->domain ;
+    int data = 1+IS_TABULATED( bp ) ;
+
+    if( shared_obj( obj, write_define_shared_node, write_shared_node ))
+	    return( !GO) ;
+
+    (void) fprintf( user_file, "#(#]type %d ", bp-Domains ) ;
+
+    if( IS_TABULATED( bp )) {
+	(void) fprintf( user_file, "%d ", abs( (obj+1)->i )) ;
+    }
+    switch( dp->ba.type ) {
+    case EXTERNAL:
+	fatal( "write_obj_in: Don't know how to write an EXTERNAL: %s\n", 
+	      bp->name ) ;
+	break ;
+    case CONSTRUCTED:
+	if( dp->co.op == OR_OP ) {
+	    (void) fprintf( user_file, "%d ", (obj+data)->i ) ;
+	} 
+	else if( dp->co.op == ARROW_OP ) {
+	    (void) fprintf(user_file, "#]arrow ") ;
+	}
+	break ;
+    }
+    return( GO) ;
+}
+
+/* WRITE_OBJ_OUT is done when the OBJect (of type BP) has been printed. Just
+   close the opening parenthese. */
+
+/*ARGSUSED*/
+static void
+write_obj_out( obj, bp, dr )
+chunk *obj ;
+struct binding *bp ;
+struct driver *dr ;
+{
+    union domain *dp = bp->domain ;
+
+    switch( dp->ba.type ) {
+    case CONSTRUCTED:
+	if( dp->co.op == ARROW_OP ) {
+	    (void) fprintf(user_file, ")") ;
+	}
+	break ;
+    }
+    (void) fprintf( user_file, ")\n" ) ;
+}
+  
+static void
+write_string( init, s, end )
+string init, s, end ;
+{
+    assert(s!=NULL);
+    for( (void) fprintf( user_file, init ) ; *s != '\0' ; s++ ) {
+	(void) fprintf( user_file, (*s=='"' || *s=='\\') ? "\\%c" : "%c", *s ) ;
+    }
+    (void) fprintf( user_file, end ) ;
+}
+
+/* WRITE_LEAF_IN prints the OBJect of type BP. If it is inlined, prints it
+   according to the format, else recurse. */
+
+static int
+write_leaf_in( obj, bp )
+chunk *obj ;
+struct binding *bp ;
+{
+    if( IS_TABULATED( bp )) {
+	if( obj->p == chunk_undefined ) {
+	    if( disallow_undefined_tabulated ) {
+		user("gen_write: writing undefined tabulated object\n",
+		     NULL) ;
+	    }
+	    else {
+		(void) fprintf( user_file, "#]null " ) ;
+	    }
+	}
+	else {
+	    (void) fprintf( user_file ,"#]ref %d \"%d%c", 
+		     bp->index, bp-Domains, HASH_SEPAR ) ;
+	    write_string( "", (obj->p+HASH_OFFSET)->s, "\" " ) ;
+	}
+	return( !GO) ;
+    }
+    else if( IS_INLINABLE( bp )) {
+	char *format = bp->inlined->C_format ;
+
+	if( strcmp( bp->name, UNIT_TYPE ) == 0 ) 
+		(void) fprintf( user_file, format ) ;
+	else if( strcmp( bp->name, "bool" ) == 0 )
+		(void) fprintf( user_file, format, obj->b ) ;
+	else if( strcmp( bp->name, "int" ) == 0 ) 
+		(void) fprintf( user_file, format, obj->i ) ;
+	else if( strcmp( bp->name, "float" ) == 0 )
+		(void) fprintf( user_file, format, obj->f ) ;
+	else if( strcmp( bp->name, "string" ) == 0 )
+		write_string( "\"", obj->s, "\"" ) ;
+	else fatal( "write_leaf_in: Don't know how to print %s\n", bp->name ) ;
+	(void) fprintf( user_file, " " ) ;
+    }
+    else if( IS_EXTERNAL( bp )) {
+	if( bp->domain->ex.write == NULL ) {
+	    user( "gen_write: uninitialized external type %s\n",
+		 bp->name ) ;
+	    return( !GO) ;
+	}
+	(void) fprintf( user_file, "#]external %d ", bp-Domains ) ;
+	(*(bp->domain->ex.write))( user_file, obj->s ) ;
+    }
+    return( GO) ;
+}
+
+/* WRITE_SIMPLE_IN is done before printing a simple OBJect of type DP. The
+   sharing of basis objects will be done later. */
+
+static int
+write_simple_in( obj, dp )
+chunk *obj ;
+union domain *dp ;
+{
+    switch( dp->ba.type ) {
+    case LIST:
+	if( obj->l == list_undefined ) {
+	    (void) fprintf( user_file, "#]list " ) ;
+	    return( !GO) ;
+	}
+	(void) fprintf( user_file, "(" ) ;
+	break ;
+    case SET:
+	if( obj->t == set_undefined ) {
+	    (void) fprintf( user_file, "#]set " ) ;
+	    return( !GO) ;
+	}
+	(void) fprintf( user_file, "{ %d ", dp->se.what ) ;
+	break ;
+    case ARRAY:
+	if( obj->p == array_undefined ) {
+	    (void) fprintf( user_file, "#]array " ) ;
+	    return( !GO) ;
+	}
+	(void) fprintf(user_file, "#( %d ", 
+		       array_size( dp->ar.dimensions )) ;
+	break ;
+    }
+    return( GO) ;
+}
+
+/* WRITE_ARRAY_LEAF only writes non-null elements, in a sparse way. */
+
+static void
+write_array_leaf( bp, i, obj, dr )
+struct binding *bp ;
+int i ;
+chunk *obj ;
+struct driver *dr ;
+{
+    if( IS_INLINABLE( bp ) || IS_EXTERNAL( bp )) {
+	gen_trav_leaf( bp, obj, dr ) ;
+    }
+    else if( obj->p != chunk_undefined ) {
+	fprintf( user_file, "%d ", i ) ;
+	    
+	gen_trav_leaf( bp, obj, dr ) ;
+    }
+}
+
+/* WRITE_LEAF_OUT prints the closing parenthesis of (non-basis) simple OBJect
+   of type DP. */
+
+/*ARGSUSED*/
+static void
+write_simple_out( obj, dp )
+chunk *obj ;
+union domain *dp ;
+{
+    switch( dp->ba.type ) {
+    case SET:
+	(void) fprintf( user_file, "}" ) ;
+	break ;
+    case LIST:
+    case ARRAY:
+	(void) fprintf( user_file, ")" ) ;
+	break ;
+    }
+}
+
+/* GEN_WRITE writes the OBJect on the stream FD. Sharing is managed (the 
+   number of which is printed before the object.) */
+
+void
+gen_write( fd, obj )
+FILE *fd ;
+chunk *obj ;
+{
+    struct driver dr ;
+
+    dr.null = write_null ;
+    dr.leaf_out = gen_null ;
+    dr.leaf_in = write_leaf_in ;
+    dr.simple_in = write_simple_in ;
+    dr.array_leaf = write_array_leaf ;
+    dr.simple_out = write_simple_out ;
+    dr.obj_in = write_obj_in ;
+    dr.obj_out = write_obj_out ;
+    user_file = fd ;
+
+    push_gen_trav_env() ;
+
+    shared_pointers( obj, FALSE ) ;
+    (void) fprintf( fd, "%d ", shared_number ) ;
+    gen_trav_obj( obj, &dr ) ;
+
+    pop_gen_trav_env() ;
+}
+
+/* GEN_WRITE_WITHOUT_SHARING writes the OBJect on the stream FD. Sharing
+   is NOT managed.*/
+
+void
+gen_write_without_sharing( fd, obj )
+FILE *fd ;
+chunk *obj ;
+{
+    struct driver dr ;
+
+    dr.null = write_null ;
+    dr.leaf_out = gen_null ;
+    dr.leaf_in = write_leaf_in ;
+    dr.simple_in = write_simple_in ;
+    dr.array_leaf = gen_array_leaf ;
+    dr.simple_out = write_simple_out ;
+    dr.obj_in = write_obj_in ;
+    dr.obj_out = write_obj_out ;
+    user_file = fd ;
+    if( obj_table != (hash_table)NULL ) {
+	hash_table_free( obj_table ) ;
+    }
+    obj_table = (hash_table)NULL ;
+    (void) fprintf( fd, "0 " ) ;
+    gen_trav_obj( obj, &dr ) ;
+}
+
+/* WRITE_TABULATED_LEAF_IN prints the OBJect of type BP. If it is tabulated,
+   then recurse. */
+
+static int
+write_tabulated_leaf_in( obj, bp )
+chunk *obj ;
+struct binding *bp ;
+{
+    if( IS_TABULATED( bp )) {
+	int number ;
+
+	if( obj->p == chunk_undefined ) {
+    	    write_null( bp ) ;
+	    return( !GO) ;
+	}
+	if( (number = (obj->p+1)->i) == 0 ) {
+	    fatal( "write_tabulated_leaf_in: Zero index in domain %s\n", 
+		   bp->name ) ;
+	}
+	if( number >= 0 ) {
+	    (void) fprintf( user_file ,"#]def %d \"%d%c", 
+		     bp->index, bp-Domains, HASH_SEPAR ) ;
+	    write_string( "", (obj->p+HASH_OFFSET)->s, "\" " ) ;
+	    (obj->p+1)->i = - (obj->p+1)->i ;
+	    return( GO) ;
+	}
+    }
+    return( write_leaf_in( obj, bp )) ;
+}
+
+/* GEN_WRITE_TABULATED writes the tabulated object TABLE on FD. Sharing is 
+   managed */
+
+int
+gen_write_tabulated( fd, domain )
+FILE *fd ;
+int domain ;
+{
+    int index =  Domains[ domain ].index ;
+    chunk *fake_obj = gen_alloc(HEADER_SIZE+sizeof( chunk ),
+				0,
+				Tabulated_bp-Domains,
+			        Gen_tabulated_[ index ] ) ;
+    struct driver dr ;
+
+    Tabulated_bp->domain->ar.element = &Domains[ domain ] ;
+    dr.null = write_null ;
+    dr.leaf_out = gen_null ;
+    dr.leaf_in = write_tabulated_leaf_in ;
+    dr.simple_in = write_simple_in ;
+    dr.array_leaf = write_array_leaf ;
+    dr.simple_out = write_simple_out ;
+    dr.obj_in = write_obj_in ;
+    dr.obj_out = write_obj_out ;
+    user_file = fd ;
+
+    push_gen_trav_env() ;
+
+    shared_pointers( fake_obj, FALSE ) ;
+    (void) fprintf(fd, "%d %d %d ", 
+		   domain, max_tabulated_elements(), shared_number ) ;
+    gen_trav_obj( fake_obj, &dr ) ;
+
+    pop_gen_trav_env() ;
+
+    free((char *) fake_obj ) ;
+    return( domain ) ;
+}
+
+#ifdef BSD
+static char *strdup( s )
+char *s ;
+{
+    char *new = alloc( strlen( s )+1 ) ;
+
+    strcpy( new, s ) ;
+    return( new ) ;
+}
+#endif
+
+/* GEN_READ_SPEC reads the specifications. This has to be used
+   -- before -- any utilization of manipulation functions. */
+
+static void init_gen_quick_recurse_tables();
+
+/*VARARGS0*/
+void
+gen_read_spec( va_alist )
+va_dcl
+{
+    va_list ap ;
+    extern FILE *zzin ;
+    char *spec ;
+    chunk **cpp ;
+    struct binding *bp ;
+    char *mktemp(), *tmp ;
+    extern int unlink();
+
+    va_start( ap ) ;
+    init() ;
+    Read_spec_mode = 1 ;
+    tmp = mktemp(strdup("/tmp/newgen.XXXXXX")) ;
+
+    while((spec = va_arg( ap, char *))) {
+	if( (zzin = fopen( tmp, "w" )) == NULL ) {
+	    user( "Cannot open temp spec file in write mode\n" ) ;
+	    return ;
+	}
+	fprintf( zzin, "%s", spec ) ;
+	fclose( zzin ) ;
+
+	if( (zzin = fopen( tmp, "r" )) == NULL ) {
+	    user( "Cannot open temp spec file in read mode\n" ) ;
+	    return ;
+	}
+	zzparse() ;
+	fclose( zzin ) ;
+    }
+    if( unlink( tmp )) {
+	fatal( "Cannot unlink tmp file %s\n", tmp ) ;
+    }
+    compile() ;
+
+    for( cpp= &Gen_tabulated_[0] ; 
+	 cpp<&Gen_tabulated_[MAX_TABULATED] ; 
+	 cpp++ ) {
+	*cpp = chunk_undefined ;
+    }
+    for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
+	if( bp->name != NULL &&
+	   !IS_INLINABLE( bp ) && !IS_EXTERNAL( bp ) &&
+	   bp->domain->ba.type == IMPORT ) {
+	    user( "Cannot run with imported domains: %s\n", bp->name ) ;
+	    return ;
+	}
+	if( IS_TABULATED( bp )) {
+	    int i ;
+
+	    bp->alloc = 1 ;
+	    Gen_tabulated_[ bp->index ] = 
+		    (chunk *)alloc( max_tabulated_elements()*sizeof( chunk )) ;
+	    
+	    for( i=0 ; i<max_tabulated_elements() ; i++ ) {
+		(Gen_tabulated_[ bp->index ]+i)->p = chunk_undefined ;
+	    }
+	    if( Gen_tabulated_names == NULL ) {
+		Gen_tabulated_names = 
+			hash_table_make( hash_string,
+					 MAX_TABULATED*
+					max_tabulated_elements() ) ;
+	    }
+
+	}
+    }
+    gen_cp_ = &Gen_cp_[ 0 ] ;
+    gen_hash_ = &Gen_hash_[ 0 ] ;
+    Read_spec_mode = 0 ;
+    Read_spec_performed = TRUE ;
+    va_end( ap ) ;
+
+    /*
+     * quick recurse decision tables initializations
+     */
+    init_gen_quick_recurse_tables();
+}
+
+/* GEN_INIT_EXTERNAL defines entry points for free, read and write functions 
+   of external types */
+
+void
+gen_init_external( which, read, write, free, copy )
+int which ;
+char *(*read)() ;
+void (*write)() ;
+void (*free)() ;
+char *(*copy)() ;
+{
+	struct binding *bp = &Domains[ which ] ;
+	union domain *dp = bp->domain ;
+
+	if( dp->ba.type != EXTERNAL ) {
+		user( "gen_init_external: %s isn't external\n", bp->name ) ;
+		return ;
+	}
+	if( dp->ex.read != NULL ) {
+		user( "gen_init_external: redefinition of %s skipped\n",
+		      bp->name ) ;
+		return ;
+	}
+	dp->ex.read = read ;
+	dp->ex.write = write ;
+	dp->ex.free = free ;
+	dp->ex.copy = copy ;
+}
+
+/* GEN_MAKE_ARRAY allocates an initialized array of NUM chunks. */
+
+chunk *
+gen_make_array( num )
+     int num ;
+{
+  int i ;
+  /*NOSTRICT*/
+  chunk *ar = (chunk *)alloc( sizeof( chunk )) ;
+
+  for( i=0 ; i<num ; i++ ) 
+    ar[ i ].p = chunk_undefined ;
+
+  return( ar ) ;
+}
+
+/* GEN_READ reads any object from the FILE stream. Sharing is restored. */
+
+chunk *
+gen_read( file )
+     FILE *file ;
+{
+  extern FILE *xxin ;
+  
+  xxin = file ;
+  xxparse() ;
+  return( Read_chunk ) ;
+}
+
+/* GEN_READ_TABULATED reads FILE to update the Gen_tabulated_ table. Creates
+   if CREATE_P is true. */
+
+int
+gen_read_tabulated( file, create_p )
+FILE *file ;
+int create_p ;
+{
+    extern FILE *xxin ;
+    /* chunk *cp ; */
+    int domain, index, max ;
+    int i ;
+    extern int allow_forward_ref ;
+    char buffer[ 1024 ] ;
+
+    xxin = file ;
+#ifdef flex_scanner
+    if( (i=xxlex()) != READ_INT ) {
+	(void) sprintf( buffer, "%d", i ) ;
+	user( "Incorrect data for gen_read_tabulated: %s\n", buffer ) ;
+	exit( 1 ) ;
+    }
+    domain = atoi( xxtext ) ;
+
+    if( (i=xxlex()) != READ_INT ) {
+	(void) sprintf( buffer, "%d", i ) ;
+	user( "Incorrect second data for gen_read_tabulated: %s\n", buffer ) ;
+	exit( 1 ) ;
+    }
+    max = atoi( xxtext ) ;
+#else
+    (void) fscanf( file, "%d %d", &domain, &max ) ;
+#endif
+
+    if( max != max_tabulated_elements()) {
+	(void) sprintf(buffer, "Getting %d, expecting %d elements\n",
+		       max,  max_tabulated_elements()) ;
+	user( "gen_read_tabulated: %s\n", buffer ) ;
+    }
+    if( create_p ) {
+	if( Gen_tabulated_[ index = Domains[ domain ].index ] == NULL ) {
+	    user( "gen_read_tabulated: Trying to read untabulated domain %s\n",
+		  Domains[ domain ].name ) ;
+	}
+	Domains[ domain ].alloc = 1 ;
+
+	for( i = 0 ; i < max_tabulated_elements() ; i++ ) {
+	    (Gen_tabulated_[ index ]+i)->p = chunk_undefined ;
+	}
+    }
+    allow_forward_ref = TRUE ;
+    xxparse() ;
+    allow_forward_ref = FALSE ;
+
+    free((char *) ((Read_chunk+1)->p) ) ;
+    free((char *) Read_chunk ) ;
+    return( domain ) ;
+}
+
+int
+gen_read_and_check_tabulated( file, create_p )
+FILE *file ;
+int create_p ;
+{
+    /* int i ; */
+    extern hash_table Gen_tabulated_names ;
+    int domain ;
+
+    domain = gen_read_tabulated( file, create_p ) ;
+
+    HASH_MAP( k, v, {
+	chunk *hash = (chunk *)v ;
+
+        if( hash->i < 0 ) {
+            user( "Tabulated element not defined: %s\n", k ) ;
+        }
+    }, Gen_tabulated_names ) ;
+    return( domain ) ;
+}
+
+/* GEN_CHECK checks that the chunk received OBJ is of the appropriate TYPE. */ 
+
+chunk *
+gen_check( obj, t )
+chunk *obj ;
+int t ;
+{
+    char buffer[ 1024 ] ;
+
+    if( obj == NULL ) {
+	(void) user("gen_check: NULL pointer, expecting type %s\n",
+		    Domains[ t ].name) ;
+	abort() ;
+    }
+    if( obj != chunk_undefined && t != obj->i ) {
+	(void) sprintf( buffer, 
+		"gen_check: Type clash (expecting %s, getting %s)\n",
+		Domains[ t ].name, Domains[ obj->i ].name ) ;
+	user( buffer, (char *)NULL ) ;
+	abort() ;
+    }
+    return( obj ) ;
+}
+
+extern int error_seen ;
+
+/* GEN_CONSISTENT_P dynamically checks the type correctness of OBJ. */
+
+int
+gen_consistent_p( obj )
+chunk *obj ;
+{
+    static FILE *black_hole = NULL ;
+    int old_gen_debug = gen_debug ;
+
+    if( black_hole == NULL ) {
+	if( (black_hole=fopen( "/dev/null", "r")) == NULL ) {
+	    fatal( "Cannot open /dev/null !", "" ) ;
+	    /*NOTREACHED*/
+	}
+    }
+    error_seen = 0 ;
+    gen_debug = GEN_DBG_CHECK ;
+    gen_write( black_hole, obj ) ;
+    gen_debug = old_gen_debug ;
+    return( error_seen  == 0 ) ;
+}
+	    
+/* GEN_DEFINED_P checks that the OBJect is fully defined */
+
+static void
+defined_null( bp )
+struct binding *bp ;
+{
+    union domain *dp = bp->domain ;
+
+    user( "", (char *)NULL ) ;
+    (void) fprintf( stderr, "gen_defined_p: Undefined object of type < " );
+    print_domain( stderr, dp ) ;
+    (void) fprintf( stderr, "> found\n" ) ;
+}
+  
+int
+gen_defined_p( obj )
+chunk *obj ;
+{
+    struct driver dr ;
+    static FILE *black_hole = NULL ;
+
+    if( black_hole == NULL ) {
+	if( (black_hole=fopen( "/dev/null", "r")) == NULL ) {
+	    fatal( "Cannot open /dev/null !", "" ) ;
+	    /*NOTREACHED*/
+	}
+    }
+    error_seen = 0  ;
+    dr.null = defined_null ;
+    dr.leaf_out = gen_null ;
+    dr.leaf_in = write_leaf_in ;
+    dr.simple_in = write_simple_in ;
+    dr.array_leaf = gen_array_leaf ;
+    dr.simple_out = write_simple_out ;
+    dr.obj_in = write_obj_in ;
+    dr.obj_out = write_obj_out ;
+    user_file = black_hole ;
+
+    push_gen_trav_env() ;
+
+    shared_pointers( obj, FALSE ) ;
+    gen_trav_obj( obj, &dr ) ;
+
+    pop_gen_trav_env() ;
+
+    return( error_seen == 0 ) ;
+}
+
+/* GEN_RECURSE is a limited version of CommonLISP NEWGEN:RPM.  The OBJ is
+   recursively walked through and, for any node of DOMAIN that returns true
+   when FILTER is applied to it, the REWRITE function is applied. 
+
+   The preservation of the OBJ_TABLE is required in case some recursive
+   call to GEN_RECURSE is performed in FILTER or REWRITE. */
+
+struct recurse {
+    int domain ;
+    bool (*filter)() ;
+    void (*rewrite)() ;
+} ;
+
+static struct recurse 
+    *current_rec = (struct recurse *)NULL ;
+
+static int
+recurse_obj_in( obj, dr )
+chunk *obj ;
+struct driver *dr ;
+{ 
+    if( shared_obj( obj, gen_null, gen_null )) {
+	return( !GO ) ;
+    }
+    if( IS_TABULATED( &Domains[ domain_index( obj ) ] )) {
+	return( !GO ) ;
+    }
+    if( obj->i == current_rec->domain ) {
+	return( (*current_rec->filter)( obj )) ;
+    }
+    return( GO) ;
+}
+
+static void
+recurse_obj_out( obj, bp, dr )
+chunk *obj ;
+struct binding *bp ;
+struct driver *dr ;
+{ 
+    if( obj->i == current_rec->domain ) {
+	(*current_rec->rewrite)( obj ) ;
+    }
+}
+
+void
+gen_slow_recurse( obj, domain, filter, rewrite )
+chunk *obj ;
+int domain ;
+bool (*filter)( chunk * ) ;
+void (*rewrite)( chunk * ) ;
+{
+    struct driver dr;
+    struct recurse rec, *saved_rec ;
+
+    rec.domain = domain ;
+    rec.filter = filter ;
+    rec.rewrite = rewrite ;
+
+    dr.null = dr.leaf_out = dr.simple_out = gen_null ;
+    dr.obj_out = recurse_obj_out ;
+    dr.obj_in = recurse_obj_in ;
+    dr.simple_in = persistant_simple_in ;
+    dr.array_leaf = gen_array_leaf ;
+    dr.leaf_in = tabulated_leaf_in ;
+
+    saved_rec = current_rec;
+    current_rec = &rec;
+    push_gen_trav_env() ;
+
+    shared_pointers( obj, FALSE ) ;
+    gen_trav_obj( obj, &dr ) ;
+
+    pop_gen_trav_env() ;
+    current_rec = saved_rec;
+}    
+    
+bool
+gen_true(c)
+chunk *c;
+{
+    return(TRUE) ;
+}
+
+/* GEN_SHARING_P checks whether OBJ1 uses objects (except tabulated) or
+   CONS cells that appear in OBJ2. */
+
+static hash_table pointers = (hash_table)NULL;
+static jmp_buf env  ;
+
+static bool
+check_sharing( p, type )
+char *p ;
+char *type ;
+{
+  static char msg[ 1024 ] ;
+
+  if( hash_get( pointers, p ) != HASH_UNDEFINED_VALUE ) {
+    sprintf( msg, "Sharing of %s detected on 0x%x", type, (int) p ) ;
+    user( msg, (char *)NULL ) ;
+    longjmp( env, 1 ) ;
+    /* NOTREACHED*/
+  }
+  return( FALSE ) ;
+}
+
+static int
+sharing_obj_in( obj, dr )
+chunk *obj ;
+struct driver *dr ;
+{ 
+    /* char *seen ; */
+
+  if( shared_obj( obj, gen_null, gen_null )) {
+    return( !GO ) ;
+  }
+  if( IS_TABULATED( &Domains[ domain_index( obj ) ] )) {
+    return( !GO ) ;
+  }
+  check_sharing( (char *)obj, "CHUNK *" ) ;
+  return( GO ) ;
+}
+
+static int
+sharing_simple_in( obj, dp )
+chunk *obj ;
+union domain *dp ;
+{
+  cons *p ;
+
+  switch( dp->ba.type ) {
+  case LIST:
+    if( obj->l == list_undefined ) {
+      return( !GO) ;
+    }
+    for( p=obj->l ; p!=NIL ; p=p->cdr ) {
+      check_sharing( (char *)p, "CONS *" ) ;
+    }
+  }
+  return( persistant_simple_in( obj, dp )) ;
+}
+
+bool
+gen_sharing_p( obj1, obj2 )
+chunk *obj1, *obj2 ;
+{
+  struct driver dr ;
+  bool found ;
+
+  if( pointers == (hash_table)NULL ) {
+    pointers = hash_table_make( hash_pointer, 0 ) ;
+  }
+  else {
+    hash_table_clear( pointers ) ;
+  }
+  dr.null = dr.leaf_out = dr.simple_out = dr.obj_out =  gen_null ;
+  dr.obj_in = sharing_obj_in ;
+  dr.simple_in = sharing_simple_in ;
+  dr.array_leaf = gen_array_leaf ;
+  dr.leaf_in = tabulated_leaf_in ;
+
+  push_gen_trav_env() ;;
+  shared_pointers( obj2, FALSE ) ;
+
+  HASH_MAP( k, v, {
+    hash_put( pointers, k, v ) ;
+  }, obj_table ) ;
+
+  shared_pointers( obj1, FALSE ) ;
+
+  if( (found=setjmp( env )) == 0 ) {
+    gen_trav_obj( obj1, &dr ) ;
+  }
+  pop_gen_trav_env() ;
+
+  return( found ) ;
+}
+  
+/* -------------------------------------------------------------
+ *
+ *    Quick and Intelligent Recursion Thru Gen_Quick_Recurse
+ *
+ *    Fabien COELHO, 10 June 94
+ *
+ */
+
+/*
+ * GLOBAL VARIABLES: 
+ *
+ *   number_of_domains: 
+ *     the number of domains managed by newgen, max is MAX_DOMAIN.
+ *
+ *   current_decision_table:
+ *     contains the decision to be taken when a domain is considered,
+ *     whether to go on or not. It is a bool[MAX_DOMAIN] table.
+ *
+ *   DirectDomainsTable:
+ *     DirectDomainsTable[domain_1, domain_2] is TRUE if domain_2
+ *     may contains *directly* a domain_1 field.
+ *
+ *   DecisionTables:
+ *     DecisionTables[domain] is the decision table to scan domain.
+ *     They are to be computed/set up after specifications' load.
+ *     A demand driven approach can be implemented.
+ *
+ */
+
+#define decision_table_undefined ((bool)-25)
+typedef bool GenDecisionTableType[MAX_DOMAIN];
+typedef GenDecisionTableType gen_tables[MAX_DOMAIN];
+
+static int 
+    number_of_domains = -1;
+
+static GenDecisionTableType
+    *current_decision_table = NULL;
+
+static gen_tables 
+    DirectDomainsTable, 
+    DecisionTables;
+
+static void
+print_decision_table(t)
+GenDecisionTableType t;
+{
+    int i;
+    
+    fprintf(stderr, "[print_decision_table] 0x%x\n", (int) t);
+
+    for (i=0; i<MAX_DOMAIN; i++)
+	if (t[i]) fprintf(stderr, "  go through %s\n", Domains[i].name);
+}
+
+
+/* demand driven computation of the decision table to scan domain.
+ * this table is computed by a closure from the initial type matrix
+ *
+ * the algorithm is straightforward. 
+ * tabulated domains are skipped.
+ * worst case complexity if O(n^2) for each requested domain.
+ */
+static void 
+initialize_domain_DecisionTables(domain)
+int domain;
+{
+    GenDecisionTableType not_used;
+    int i, j;
+ 
+    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	fprintf(stderr,
+		"[initialize_domain_DecisionTables] domain %s (%d)\n",
+		Domains[domain].name, domain);
+
+    for (i=0; i<number_of_domains; i++) 
+	not_used[i] = TRUE; 
+
+    /*   init with direct inclusions
+     */
+    for (i=0; i<number_of_domains; i++) 
+	DecisionTables[domain][i]=DirectDomainsTable[domain][i];
+
+    not_used[domain]=FALSE;
+
+    /*   now the closure is computed
+     */
+    
+    while(1)
+    {
+	/*   look for the next domain to include
+	 */
+	for (i=0; i<number_of_domains; i++)
+	    if (DecisionTables[domain][i] & not_used[i])
+		break;
+	
+	if (i>=number_of_domains) break; /* none */
+
+	not_used[i] = FALSE;
+
+	/*   cannot come from tabulated domains...
+	 *   this should be discussed, or put as a parameter...
+	 */
+	if (IS_TABULATED(&Domains[i])) continue;
+
+	if (*DecisionTables[i]!=decision_table_undefined)
+	{
+	    /* shorten */
+	    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	    fprintf(stderr, 
+		    " - shortening with already computed %s (%d)\n", 
+		    Domains[i].name, i);
+
+	    for (j=0; j<number_of_domains; j++)
+		DecisionTables[domain][j] |= DecisionTables[i][j],
+		not_used[j] &= !DecisionTables[i][j] /*? FALSE : not_used[j] */;
+	}
+	else
+	{
+	    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+		fprintf(stderr, 
+			" - including %s (%d)\n", 
+			Domains[i].name, i);
+
+	    for (j=0; j<number_of_domains; j++)
+		DecisionTables[domain][j] |= DirectDomainsTable[i][j];
+	}
+    }
+
+    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	fprintf(stderr, " - computed table is\n"),
+	print_decision_table(DecisionTables[domain]);
+}
+
+/*   walks thru the domain to tag all types for target.
+ */
+static void 
+initialize_domain_DirectDomainsTable(target, dp)
+int target;
+union domain *dp;
+{
+    if (dp==NULL) return; /* some domains are NULL */
+
+    switch(dp->ba.type)
+    {
+    case EXTERNAL:
+	break; /* obvious: don't go inside externals! */
+    case BASIS:
+    case LIST:
+    case ARRAY:
+    case SET:
+	if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	    fprintf(stderr,
+		    " - setting %s (%d) contains %s (%d)\n",
+		    Domains[target].name, target,
+		    dp->se.element->name, dp->se.element-Domains);
+	DirectDomainsTable[dp->se.element-Domains][target] = TRUE;
+	break;
+    case CONSTRUCTED:
+    {
+	struct domainlist *l=dp->co.components;
+
+	for (; l!=NULL; l=l->cdr)
+	    initialize_domain_DirectDomainsTable(target, l->domain);
+    }
+    case IMPORT:
+	break; /* abort() ? TRUE (safe) ? */
+    case UNDEF:
+	break; /* nothing is done */
+    default: 
+	fprintf(stderr, "newgen: unexpected domain type (%d)\n", dp->ba.type),
+	abort();
+    }
+} 
+
+static void 
+initialize_DirectDomainsTable()
+{
+    int i,j;
+
+    check_read_spec_performed("initialize_DirectDomainsTable");
+
+    for (i=0; i<number_of_domains; i++)
+    {
+	struct binding *bp = &Domains[i];
+
+	if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	    fprintf(stderr, 
+		    "[initialized_DirectDomainsTable] analysing %s\n",
+		    bp->name);
+
+	if( bp->name == NULL || bp == Tabulated_bp ) continue ; /* ? */
+
+	/*   first put falses 
+	 */
+	for (j=0; j<number_of_domains; j++) 
+	    DirectDomainsTable[j][i]=FALSE;
+
+	initialize_domain_DirectDomainsTable(i, bp->domain);
+    }
+
+    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	for (i=0; i<number_of_domains; i++)
+	    fprintf(stderr, "[initialized_DirectDomainsTable] %s (%d)\n", 
+		    Domains[i].name, i),
+	    print_decision_table(DirectDomainsTable[i]);
+
+}
+
+static void 
+initialize_DecisionTables()
+{
+    int i;
+
+    for (i=0; 
+	 i<MAX_DOMAIN; 
+	 *DecisionTables[i]=decision_table_undefined, i++);
+}
+
+/*    called by gen_read_spec, should be called by a gen_init()
+ */
+static void 
+init_gen_quick_recurse_tables()
+{
+    int i;
+
+    /*   number_of_domains is first set
+     */
+    for (number_of_domains=-1, i=0; i<MAX_DOMAIN; i++) 
+	if (Domains[i].domain!=NULL && Domains[i].domain->ba.type != UNDEF) 
+	    number_of_domains = i;
+    number_of_domains++;
+
+    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	fprintf(stderr, 
+		"[init_gen_quick_recurse_tables] %d domains\n",
+		number_of_domains);
+
+    initialize_DirectDomainsTable();
+    initialize_DecisionTables();   
+}
+
+/* returns a decision table for the given domain.
+ * demand driven definition of the table.
+ */
+static GenDecisionTableType
+*get_decision_table(domain)
+int domain;
+{
+    check_domain("set_decision_table", domain);
+
+    if (*DecisionTables[domain]==decision_table_undefined) 
+	initialize_domain_DecisionTables(domain);
+
+    return(&DecisionTables[domain]);
+}
+
+/* set the current table as requested.
+ */
+static void 
+set_decision_table(domain)
+int domain;
+{
+    current_decision_table = get_decision_table(domain);
+}
+
+static int
+quick_recurse_obj_in(obj, dr)
+chunk *obj;
+struct driver *dr;
+{
+    /* don't walk twice thru the same object:
+     */
+    if (shared_obj(obj, gen_null, gen_null) || 
+    /* 
+     * temporarily, tabulated objects are not walked thru.
+     * the decision could be managed by the table, or *after* the
+     * filtering: the current status implied that you cannot enumerate 
+     * tabulated elements for instance. 
+     *
+     * these features/bugs/limitations are compatible with gen_slow_recurse.
+     *
+     * FI told me that only persistant edges shouldn't be followed.
+     */
+	IS_TABULATED(&Domains[quick_domain_index(obj)]))
+	return(!GO);
+
+    /*
+     * filter case
+     */
+    if (obj->i==current_rec->domain) return((*current_rec->filter)(obj));
+
+    /*
+     * else, here is the *maybe* intelligent decision to be made.
+     */
+    return((*current_decision_table)[obj->i]);
+}
+
+static void
+quick_recurse_obj_out(obj, bp, dr)
+chunk *obj;
+struct binding *bp;
+struct driver *dr;
+{
+    if (obj->i==current_rec->domain) (*current_rec->rewrite)(obj);
+}
+
+static int
+quick_recurse_simple_in(obj, dp)
+chunk *obj ;
+union domain *dp ;
+{
+    int t;
+
+    return((*current_decision_table)[dp->se.element-Domains] &&
+	   (!dp->se.persistant) &&               /* stay at a given level */
+	   ((t=dp->ba.type)==BASIS ? TRUE :
+	     t==LIST               ? obj->l != list_undefined :
+	     t==SET                ? obj->t != set_undefined :
+	     t==ARRAY              ? obj->p != array_undefined : 
+	    (fatal("persistant_simple_in: unknown type %s\n", 
+		   itoa(dp->ba.type)), FALSE))); 
+}
+
+void 
+gen_recurse(obj, domain, filter, rewrite)
+chunk *obj;
+int domain;
+bool (*filter)();
+void (*rewrite)();
+{
+    GenDecisionTableType *saved_decision_table;
+    struct recurse rc, *saved_rc;
+    struct driver dr;
+
+    /*  driver's definition
+     */
+    dr.null 		= gen_null,
+    dr.leaf_in 		= tabulated_leaf_in,
+    dr.leaf_out  	= gen_null,
+    dr.simple_in 	= quick_recurse_simple_in,
+    dr.array_leaf 	= gen_array_leaf,
+    dr.simple_out 	= gen_null,
+    dr.obj_in 		= quick_recurse_obj_in,
+    dr.obj_out 		= quick_recurse_obj_out;
+
+    /*  recurse's definition
+     */
+    rc.domain 	= domain,
+    rc.filter 	= filter,
+    rc.rewrite 	= rewrite;
+
+    /*  save environment 
+     */
+    saved_decision_table = current_decision_table, 
+    set_decision_table(domain);
+    saved_rc = current_rec, current_rec = &rc;
+    push_gen_trav_env();
+
+    /*  recurse!
+     */
+    shared_pointers(obj, FALSE);
+    gen_trav_obj(obj, &dr);
+    
+    /*  restore environment
+     */
+    pop_gen_trav_env();
+    current_rec = saved_rc;
+    current_decision_table = saved_decision_table;
+}
+
+/*******************************************************************
+ *
+ *            GENERALIZED VERSION: GEN MULTI RECURSE
+ *
+ *       Fabien COELHO, Wed Sep  7 21:39:47 MET DST 1994
+ *
+ */
+
+typedef bool (*GenFilterType)();
+typedef void (*GenRewriteType)();
+
+typedef GenFilterType GenFilterTableType[MAX_DOMAIN];
+typedef GenRewriteType GenRewriteTableType[MAX_DOMAIN];
+
+/* the current data needed for a multi recursion are 
+ * stored in a multi recurse struct. 
+ *
+ * - the visited domains are marked true in domains.
+ *   I could have checked that the filter is not NULL,
+ *   but it is clearer this way, I think, for the one who 
+ *   will try to understand, if any:-)
+ * - the decision table used is in decisions. It is computed
+ *   as the logical sum of the decision tables for the domains 
+ *   to be walked thru
+ * - filters and rewrites store the user decision functions 
+ *   for each domain.
+ */
+struct multi_recurse 
+{
+    GenDecisionTableType *domains;
+    GenDecisionTableType *decisions;
+    GenFilterTableType   *filters;
+    GenRewriteTableType  *rewrites;
+};
+
+/* the current multi recurse driver.
+ * it is cleaner than the gen_recurse version since I added 
+ * the decisions table without modifying Pierre code, while here
+ * I redefined a current status struct that stores everything 
+ * needed. 
+ */
+static struct multi_recurse
+    *current_mrc = (struct multi_recurse *) NULL;
+
+/* MULTI RECURSE FUNCTIONS
+ *
+ * these functions are made after the equivalent quick_recurse functions
+ * see the comments in these functions...
+ */
+
+static int
+quick_multi_recurse_obj_in(obj, dr)
+chunk *obj;
+struct driver *dr;
+{
+    int 
+	dom = obj->i;
+
+    if (shared_obj(obj, gen_null, gen_null) || 
+	IS_TABULATED(&Domains[quick_domain_index(obj)]))
+	return(!GO);
+
+    if ((*(current_mrc->domains))[dom]) 
+	return((*((*(current_mrc->filters))[dom]))(obj));
+
+    return((*(current_mrc->decisions))[dom]);
+}
+
+static void
+quick_multi_recurse_obj_out(obj, bp, dr)
+chunk *obj;
+struct binding *bp;
+struct driver *dr;
+{
+    int dom = obj->i;
+
+    if ((*(current_mrc->domains))[dom])
+	(*((*(current_mrc->rewrites))[dom]))(obj);
+}
+
+static int
+quick_multi_recurse_simple_in(obj, dp)
+chunk *obj ;
+union domain *dp ;
+{
+    int t;
+
+    return((*(current_mrc->decisions))[dp->se.element-Domains] &&
+	   (!dp->se.persistant) &&               /* stay at a given level */
+	   ((t=dp->ba.type)==BASIS ? TRUE :
+	     t==LIST               ? obj->l != list_undefined :
+	     t==SET                ? obj->t != set_undefined :
+	     t==ARRAY              ? obj->p != array_undefined : 
+	    (fatal("persistant_simple_in: unknown type %s\n", 
+		   itoa(dp->ba.type)), FALSE))); 
+}
+
+/*  MULTI RECURSION FUNCTION
+ *
+ *  gen_multi_recurse(obj,
+ *                   [domain, filter, rewrite,]*
+ *                    NULL);
+ *
+ *  recurse from object obj,
+ *  applies filter_i on encountered domain_i objects,
+ *  if true, recurses down from the domain_i object, 
+ *       and applies rewrite_i on exit from the object.
+ */
+void gen_multi_recurse(va_alist)
+va_dcl
+{
+    va_list pvar;
+    chunk 
+	*obj = chunk_undefined;
+    int 
+	i,
+	domain;
+    GenFilterTableType
+	new_filter_table;
+    GenRewriteTableType
+	new_rewrite_table;
+    GenDecisionTableType
+	new_decision_table,
+        new_domain_table,
+	*p_table;
+    struct multi_recurse
+	*saved_mrc,
+	new_mrc;
+    struct driver
+	dr;
+
+    va_start(pvar);
+    obj = va_arg(pvar, chunk*);
+
+    /*  the object must be a valid newgen object
+     */
+    assert(obj!=(chunk*)NULL && obj!=chunk_undefined);
+
+    /*    initialize the new tables
+     */
+    for(i=0; 
+	i<MAX_DOMAIN; 
+	new_domain_table[i]=FALSE,
+	new_decision_table[i]=FALSE,
+	new_filter_table[i]=NULL,
+	new_rewrite_table[i]=NULL,
+	i++);
+
+    /*    read the arguments
+     */
+    while((domain=va_arg(pvar, int))!=(int)NULL)
+    {
+	/*  a domain should be specified only once
+	 */
+	assert(!new_domain_table[domain]);
+
+	new_domain_table[domain]  = TRUE;
+	new_filter_table[domain]  = va_arg(pvar, GenFilterType);
+	new_rewrite_table[domain] = va_arg(pvar, GenRewriteType);
+
+	for(i=0, p_table = get_decision_table(domain); 
+	    i<number_of_domains;
+	    new_decision_table[i] |= (*p_table)[i], i++);
+    }
+
+    va_end(pvar);
+
+    new_mrc.domains   = &new_domain_table,
+    new_mrc.decisions = &new_decision_table,
+    new_mrc.filters   = &new_filter_table,
+    new_mrc.rewrites  = &new_rewrite_table;
+
+    dr.null 		= gen_null,
+    dr.leaf_in 		= tabulated_leaf_in,
+    dr.leaf_out  	= gen_null,
+    dr.simple_in 	= quick_multi_recurse_simple_in,
+    dr.array_leaf 	= gen_array_leaf,
+    dr.simple_out 	= gen_null,
+    dr.obj_in 		= quick_multi_recurse_obj_in,
+    dr.obj_out 		= quick_multi_recurse_obj_out;
+
+    /*    push & save the current context
+     */
+    saved_mrc = current_mrc, current_mrc = &new_mrc;
+    push_gen_trav_env();
+
+    /*  recurse!
+     */
+    shared_pointers(obj, FALSE);
+    gen_trav_obj(obj, &dr);
+    
+    /*  restore environment
+     */
+    pop_gen_trav_env();
+    current_mrc = saved_mrc;
+}
+
+/*  could replace gen_recurse
+ *  could be a macro
+ */
+/*
+void 
+gen_one_recurse(obj, domain, filter, rewrite)
+chunk *obj;
+int domain;
+bool (*filter)();
+void (*rewrite)();
+{
+    gen_multi_recurse(obj, domain, filter, rewrite, NULL);
+}
+*/
+
+/*
+ *    that is all
+ */
