@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1996/09/09 14:12:26 $, 
+ * $Date: 1996/10/09 17:02:26 $, 
  */
 
 #include <stdio.h>
@@ -18,6 +18,8 @@
 #include "control.h"
 #include "constants.h"
 #include "misc.h"
+#include "parser_private.h"
+#include "syntax.h"
 #include "top-level.h"
 #include "text-util.h"
 #include "text.h"
@@ -30,7 +32,11 @@
 #include "resources.h"
 #include "prettyprint.h"
 
-
+/*********************************************************************************/
+/*********************************************************************************/
+/* 1-  PRIVATIZABILITY DETECTION  && LOOP PRIVATISATION                          */
+/*********************************************************************************/
+/*********************************************************************************/
 
 /*********************************************************************************/
 /* USEFUL VARIABLES AND ACCESS FUNCTIONS                                         */
@@ -211,11 +217,11 @@ statement module_stat;
 
     pips_debug(2, "CAND = W -inf IN \n");       
     l_cand = RegionsInfDifference(l_write, l_in, w_r_combinable_p);
-    
+
     pips_debug(2, "OUT_CAND = CAND inter OUT\n");
     l_out_cand = RegionsIntersection(regions_dup(l_cand), l_out, w_w_combinable_p);
 
-    pips_debug(2, "PRIV = CAND - inf OUT_CAND\n");
+    pips_debug(2, "PRIV = CAND -inf OUT_CAND\n");
     l_priv = RegionsInfDifference(l_cand, l_out_cand, w_w_combinable_p);
     
     if (store_as_regions)
@@ -802,3 +808,162 @@ static text text_privatized_array_regions(list l_priv, list l_out)
 
     return(reg_text);
 }
+
+/*********************************************************************************/
+/*********************************************************************************/
+/* 2-  MODULE PRIVATISATION (VARIABLE REDECLARATION)                             */
+/*********************************************************************************/
+/*********************************************************************************/
+
+
+
+#define PRIVATE_VARIABLE_SUFFIX "_P"
+static entity current_old_entity = entity_undefined;
+static entity current_new_entity = entity_undefined;
+
+static void
+set_current_entities(entity e_old, entity e_new)
+{
+  current_old_entity = e_old;
+  current_new_entity = e_new; 
+}
+
+static entity
+get_current_old_entity()
+{
+    return current_old_entity;
+}
+
+static entity
+get_current_new_entity()
+{
+    return current_new_entity;
+}
+
+static void
+reset_current_entities()
+{
+  current_old_entity = entity_undefined;
+  current_new_entity = entity_undefined;
+}
+
+
+static bool
+reference_filter(reference ref)
+{
+    entity e_old = get_current_old_entity();
+    entity e_new = get_current_new_entity();
+
+    if (reference_variable(ref) == e_old)
+	reference_variable(ref) = e_new;
+
+    return(TRUE);
+}
+
+static void 
+privatize_entity(entity ent)
+{
+    entity new_ent;
+    string new_ent_name;
+    storage ent_storage = entity_storage(ent);
+    storage new_ent_storage;
+    entity module = get_current_module_entity();
+
+    /* We do not need to privatize local variables */
+    if (!storage_ram_p(ent_storage))
+    {
+
+	/* Make a new ram entity, similar to the previous one, 
+	   but with a new name */
+	new_ent_name = copy_string(concatenate(entity_name(ent),
+					       PRIVATE_VARIABLE_SUFFIX, NULL));
+	
+	
+	new_ent = make_entity(new_ent_name, 
+			      copy_type(entity_type(ent)),
+			      storage_undefined,
+			      copy_value(entity_initial(ent)));
+			      
+	
+	new_ent_storage = make_storage(is_storage_ram,
+				       make_ram(module,
+						DynamicArea,
+						CurrentOffsetOfArea(DynamicArea,
+								    new_ent),
+						NIL));
+	entity_storage(new_ent) = new_ent_storage;
+
+	/* add this entity to the declarations of the module */
+	AddEntityToDeclarations(new_ent, module);
+	
+	/* replace all references to this entity by a reference to the new entity 
+	 */
+	set_current_entities(ent, new_ent);
+	gen_multi_recurse(get_current_module_statement(),
+			  reference_domain, reference_filter, gen_null, NULL);
+	reset_current_entities();
+    }
+}
+
+bool 
+declarations_privatizer(char *module_name)
+{
+    list l_priv = NIL, l_in, l_out, l_write; 
+    statement module_stat;
+
+    if (get_bool_property("ARRAY_SECTION_PRIV_COPY_OUT"))
+    {
+	pips_user_error("property ARRAY_SECTION_PRIV_COPY_OUT set to TRUE ; " 
+			" not implemented.\n" ); 
+	return(FALSE);
+    }
+
+    /* set and get the current properties concerning regions */
+    set_bool_property("MUST_REGIONS", TRUE);
+    set_bool_property("EXACT_REGIONS", TRUE);
+    get_regions_properties();
+
+    /* Get the code of the module. */
+    set_current_module_statement( (statement)
+	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    module_stat = get_current_module_statement();
+    
+
+    /* Privatizable array regions */
+    /* For the moment, we only want to privatize whole variables;
+     * Thus we only keep those variables which are absolutely not imported 
+     * nor exported. 
+     * If we want to privatize regions, we can use the ressource PRIVATE_REGIONS.
+     */
+     /* Get the READ, WRITE, IN and OUT regions of the module */
+    set_local_regions_map( effectsmap_to_listmap( (statement_mapping) 
+	db_get_memory_resource(DBR_REGIONS, module_name, TRUE) ) );
+    set_in_regions_map( effectsmap_to_listmap( (statement_mapping) 
+	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE) ) );
+    set_out_regions_map( effectsmap_to_listmap( (statement_mapping) 
+	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE) ) );
+   
+    l_write = regions_dup
+	(regions_write_regions(load_statement_local_regions(module_stat))); 
+    l_in = regions_dup(load_statement_in_regions(module_stat));
+    l_out = regions_dup(load_statement_out_regions(module_stat));
+    
+    l_priv = RegionsEntitiesInfDifference(l_write, l_in, w_r_combinable_p);
+    l_priv = RegionsEntitiesInfDifference(l_priv, l_out, w_w_combinable_p);
+
+
+    /* We effectively perform the privatization */
+    MAP(REGION, reg,
+	{
+	    privatize_entity(region_entity(reg));
+	},
+	l_priv);
+
+    /* Then we need to clean the declarations */
+    /* to be done later */
+
+    free_local_regions_map();
+    free_private_regions_map();
+    return( TRUE );
+}
+
