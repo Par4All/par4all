@@ -31,7 +31,8 @@ LIB_CFILES=	contrainte_to_text.c \
 		cmfortran.c \
 		craft.c \
 		control.c \
-		hpfc.c
+		hpfc.c \
+		misc_paf_utils.c
 
 LIB_HEADERS=	ri-util-local.h operator.h
 
