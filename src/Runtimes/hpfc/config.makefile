@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.60  1997/06/03 08:06:56  coelho
+# *** empty log message ***
+#
 # Revision 1.59  1997/05/30 09:32:20  coelho
 # *** empty log message ***
 #
@@ -254,7 +257,7 @@ MKI_TARGET = $(RT_ARCH)/compilers.make
 
 # $(LIBOBJECTS) $(LIB_TARGET): $(RT_ARCH)
 
-$(RT_ARCH): $(PIPS_ARCH) ; mkdir $@
+$(RT_ARCH): $(PIPS_ARCH) ; -test -d $@ || mkdir $@
 
 #
 # Installation:
