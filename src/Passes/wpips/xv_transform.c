@@ -36,8 +36,9 @@ apply_on_each_transform_item(void (* function_to_apply_on_each_menu_item)(Menu_i
    for (i = (int) xv_get(transform_menu, MENU_NITEMS); i > 0; i--) {
       Menu_item menu_item = (Menu_item) xv_get(transform_menu,
                                                MENU_NTH_ITEM, i);
-
-      function_to_apply_on_each_menu_item(menu_item);
+      /* Skip the title item: */
+      if (!(bool) xv_get(menu_item, MENU_TITLE))
+          function_to_apply_on_each_menu_item(menu_item);
    }
 }
 
@@ -116,20 +117,22 @@ transform_notify(Menu menu,
 void
 create_transform_menu()
 {
-   transform_menu = xv_create(XV_NULL, MENU_COMMAND_MENU, 
-                    MENU_GEN_PIN_WINDOW, main_frame, "Transform Menu",
-                    MENU_ACTION_ITEM, ATOMIZER_TRANSFORM, transform_notify,
-                    MENU_ACTION_ITEM, SUPPRESS_DEAD_CODE_TRANSFORM, transform_notify,
-                    MENU_ACTION_ITEM, DISTRIBUTE_TRANSFORM, transform_notify,
-                    MENU_ACTION_ITEM, LOOP_INTERCHANGE_TRANSFORM, transform_notify,
-                    MENU_ACTION_ITEM, NEW_ATOMIZER_TRANSFORM, transform_notify,
-                    MENU_ACTION_ITEM, PARTIAL_EVAL_TRANSFORM, transform_notify,
-                    MENU_ACTION_ITEM, PRIVATIZE_TRANSFORM, transform_notify,
-                    MENU_ACTION_ITEM, REDUCTIONS_TRANSFORM, transform_notify,
-                    MENU_ACTION_ITEM, STRIP_MINE_TRANSFORM, transform_notify,
-                    MENU_ACTION_ITEM, UNROLL_TRANSFORM, transform_notify,
-                    MENU_ACTION_ITEM, UNSPAGHETTIFY_TRANSFORM, transform_notify,
-                    NULL);
+   transform_menu =
+      xv_create(XV_NULL, MENU_COMMAND_MENU, 
+                MENU_GEN_PIN_WINDOW, main_frame, "Transform Menu",
+                MENU_TITLE_ITEM, "Apply a program transformation to a module ",
+                MENU_ACTION_ITEM, ATOMIZER_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, SUPPRESS_DEAD_CODE_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, DISTRIBUTE_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, LOOP_INTERCHANGE_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, NEW_ATOMIZER_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, PARTIAL_EVAL_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, PRIVATIZE_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, REDUCTIONS_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, STRIP_MINE_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, UNROLL_TRANSFORM, transform_notify,
+                MENU_ACTION_ITEM, UNSPAGHETTIFY_TRANSFORM, transform_notify,
+                NULL);
 
    (void) xv_create(main_panel, PANEL_BUTTON,
                     PANEL_LABEL_STRING, "Transform",
