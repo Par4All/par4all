@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.87  1997/10/27 15:31:03  coelho
+ * drop overloaded externals...
+ *
  * Revision 1.86  1997/10/24 16:29:11  coelho
  * bug-- : external declaration if not yet parsed.
  *
@@ -75,7 +78,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.86 1997/10/24 16:29:11 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.87 1997/10/27 15:31:03 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1697,7 +1700,8 @@ text_data(entity module, list /* of entity */ ldecl)
 static text 
 text_entity_declaration(entity module, list ldecl)
 {
-    bool print_commons = get_bool_property("PRETTYPRINT_COMMONS");
+    string how_common = get_string_property("PRETTYPRINT_COMMONS");
+    bool print_commons = same_string_p(how_common, "declaration");
     list before = NIL, area_decl = NIL, ph = NIL,
 	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, 
 	pc8 = NIL, pc16 = NIL, ps = NIL;
@@ -1725,7 +1729,10 @@ text_entity_declaration(entity module, list ldecl)
 	bool external =     /* subroutines won't be declared */
 	    (func && 
 	     (value_code_p(v) || value_unknown_p(v) /* not parsed callee */) &&
-	     !type_void_p(functional_result(type_functional(te))));
+	     !(type_void_p(functional_result(type_functional(te))) ||
+	       (type_variable_p(functional_result(type_functional(te))) &&
+		basic_overloaded_p(variable_basic(type_variable
+		    (functional_result(type_functional(te))))))));
 	bool area_p = type_area_p(te);
 	bool var = type_variable_p(te);
 	bool in_ram = storage_ram_p(entity_storage(e));
