@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/03/20 13:19:24 $, )
+ * ($Date: 1996/03/20 13:37:31 $, )
  */
 
 #include "defines-local.h"
@@ -808,9 +808,9 @@ static struct DirectiveHandler handlers[] =
     {HPF_PREFIX DISTRIBUTE_SUFFIX,	1,	HANDLER(distribute) },
     {HPF_PREFIX PROCESSORS_SUFFIX,	1,	HANDLER(processors) },
     {HPF_PREFIX TEMPLATE_SUFFIX,	1,	HANDLER(template) },
-    {HPF_PREFIX DYNAMIC_SUFFIX,		1,	HANDLER(dynamic) },
     {HPF_PREFIX PURE_SUFFIX,		1,	HANDLER(pure) },
 
+    {HPF_PREFIX DYNAMIC_SUFFIX,		3,	HANDLER(dynamic) },
     {HPF_PREFIX REALIGN_SUFFIX,		3,	HANDLER(realign) },
     {HPF_PREFIX REDISTRIBUTE_SUFFIX,	3,	HANDLER(redistribute) },
     {HPF_PREFIX INDEPENDENT_SUFFIX,	3,	HANDLER(independent) },
@@ -904,8 +904,6 @@ void handle_hpf_directives(statement s, bool dyn)
     /* INITIALIZE needed static stuff
      */
     make_current_stmt_stack();
-    init_dynamic_locals();
-    init_the_dynamics();
     to_be_cleaned = NIL;
 
     if (!dyn)
@@ -924,6 +922,8 @@ void handle_hpf_directives(statement s, bool dyn)
     {
     /* PHASE 2
      */
+    init_dynamic_locals();
+    init_the_dynamics();
     store_renamings(s, NIL);
 
     pips_debug(1, "starting phase 2\n");
@@ -955,6 +955,8 @@ void handle_hpf_directives(statement s, bool dyn)
     simplify_remapping_graph();
     clean_ctrl_graph();
 
+    close_dynamic_locals();
+    close_the_dynamics();
     }
 
     /* CLEAN
@@ -963,8 +965,6 @@ void handle_hpf_directives(statement s, bool dyn)
     pips_assert("empty stack", current_stmt_empty_p());
     gen_free_list(to_be_cleaned), to_be_cleaned=NIL;
     free_current_stmt_stack();
-    close_dynamic_locals();
-    close_the_dynamics();
 
     DEBUG_CODE(5, "resulting code", get_current_module_entity(), s);
 }
