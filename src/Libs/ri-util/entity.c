@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.54  2003/08/06 13:44:26  nguyen
+ * Add entity_user_name() function
+ *
  * Revision 1.53  2003/07/22 09:56:24  irigoin
  * function entity_global_name() added
  *
@@ -975,3 +978,59 @@ list /* of entity */ string_to_entity_list(string module, string names)
     }
   return le;
 }
+
+/* 01/08/2003 Nga Nguyen - 
+   Since entity_local_name may contain PIPS special characters 
+   such as prefixes (label, common, struct, union, typedef, ...), 
+   this entity_user_name function is created to return the 
+   initial entity/variable name, as viewed by the user in his code.
+
+   In addition, all possible seperators (file, module, block, member)
+   are taken into account. 
+   Function strstr locates the occurence of the last special character 
+   which can appear just before the initial name, so the order of test is
+   important.*/
+
+string entity_user_name(entity e)
+{
+  string global_name = entity_name(e);
+  
+  /* All possible prefixes first */
+
+  if (strstr(global_name,STRUCT_PREFIX) != NULL)
+    return strdup(strstr(global_name,STRUCT_PREFIX) + 1);
+  if (strstr(global_name,UNION_PREFIX) != NULL)
+    return strdup(strstr(global_name,UNION_PREFIX) + 1);
+  if (strstr(global_name,ENUM_PREFIX) != NULL)
+    return strdup(strstr(global_name,ENUM_PREFIX) + 1);      
+  if (strstr(global_name,TYPEDEF_PREFIX) != NULL)
+    return strdup(strstr(global_name,TYPEDEF_PREFIX) + 1);
+
+  if (strstr(global_name,MEMBER_SEP_STRING) != NULL)
+    return strdup(strstr(global_name,MEMBER_SEP_STRING) + 1);
+
+  if (strstr(global_name,LABEL_PREFIX) != NULL)
+    return strdup(strstr(global_name,LABEL_PREFIX) + 1);
+  if (strstr(global_name,COMMON_PREFIX) != NULL)
+    return strdup(strstr(global_name,COMMON_PREFIX) + 1);
+  if (strstr(global_name,BLOCKDATA_PREFIX) != NULL)
+    return strdup(strstr(global_name,BLOCKDATA_PREFIX) + 1);
+  if (strstr(global_name,MAIN_PREFIX) != NULL)
+    return strdup(strstr(global_name,MAIN_PREFIX) + 1);
+
+  /* Then block seperator */
+  if (strstr(global_name,BLOCK_SEP_STRING) != NULL)
+    return strdup(strstr(global_name,BLOCK_SEP_STRING) + 1);
+
+  /* Then module seperator */
+  if (strstr(global_name,MODULE_SEP_STRING) != NULL)
+    return strdup(strstr(global_name,MODULE_SEP_STRING) + 1);
+
+  /* Then file seperator */
+  if (strstr(global_name,FILE_SEP_STRING) != NULL)
+    return strdup(strstr(global_name,FILE_SEP_STRING) + 1);
+
+  pips_error("entity_user_name", "no seperator ?\n");
+}
+
+
