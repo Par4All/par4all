@@ -48,20 +48,17 @@
 /* Return a sorted arg list of workspace names. (For each name, there
    is a name.database directory in the current directory): */
 void
-pips_get_workspace_list(
-    int * pargc,
-    char * argv[])
+pips_get_workspace_list(gen_array_t array)
 {
-   int i;
-
+   int i, n;
+   
    /* Find all directories with name ending with ".database": */
 
-   list_files_in_directory(pargc, argv, ".",
-                           "^.*\\.database$", directory_exists_p);
-
+   list_files_in_directory(array, ".", "^.*\\.database$", directory_exists_p);
+   n = gen_array_nitems(array);
    /* Remove the ".database": */
-   for (i = 0; i < *pargc; i++) {
-      *strchr(argv[i], '.') = '\0';
+   for (i = 0; i < n; i++) {
+      *strchr(gen_array_item(array, i), '.') = '\0';
    }
 }
 
@@ -69,10 +66,9 @@ pips_get_workspace_list(
 /* Select the true file with names ending in ".[fF]" and return a sorted
    arg list: */
 void
-pips_get_fortran_list(int * pargc,
-                      char * argv[])
+pips_get_fortran_list(gen_array_t array)
 {
-    list_files_in_directory(pargc, argv, ".", "^.*\\.[fF]$", file_exists_p);
+    list_files_in_directory(array, ".", "^.*\\.[fF]$", file_exists_p);
 }
 
 
@@ -81,18 +77,16 @@ pips_get_fortran_list(int * pargc,
 char *
 hpfc_generate_path_name_of_file_name(char * file_name)
 {
-   return concatenate(build_pgmwd(db_get_current_workspace_name()),
-                      "/",
-                      HPFC_COMPILED_FILE_DIR,
-                      "/",
-                      file_name,
-                      NULL);
+    string dir_name = db_get_current_workspace_directory(),
+	name = strdup(concatenate(
+	    dir_name, "/", HPFC_COMPILED_FILE_DIR, "/", file_name, 0));
+    free(dir_name);
+    return name;
 }
 
 
 int
-hpfc_get_file_list(int * file_number,
-                   char * file_names[],
+hpfc_get_file_list(gen_array_t file_names,
                    char ** hpfc_directory_name)
 {
     /* some static but dynamic buffer.
@@ -115,14 +109,11 @@ hpfc_get_file_list(int * file_number,
    /* Get the HPFC file name list: */
    sprintf(hpfc_dir, "%s/%s", dir, HPFC_COMPILED_FILE_DIR);
    
-   return_code = safe_list_files_in_directory(file_number,
-                                              file_names,
-                                /* Where is the output of HPFC: */
-                                              hpfc_dir,
-                                /* generated files start with upercases */
-                                              "^[A-Z].*\\.[fh]$",
-                                /* Plain files only: */
-                                              file_exists_p);
+   return_code = safe_list_files_in_directory(
+       file_names,
+       hpfc_dir, /* Where is the output of HPFC: */
+       "^[A-Z].*\\.[fh]$", /* generated files start with upercases */
+       file_exists_p /* Plain files only: */);
    *hpfc_directory_name = hpfc_dir;
 
    return return_code;
