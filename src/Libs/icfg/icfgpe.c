@@ -31,7 +31,7 @@ typedef struct
   get_text_function get_text;
 } icfgpeprint_stuff, * p_icfgpeprint_stuff;
 
-static list lp;
+static list lp = NIL;
 
 text get_any_effect_type_text_flt(string module_name, string resource_name, entity e_flt)
 {
