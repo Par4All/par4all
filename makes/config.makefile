@@ -1,5 +1,5 @@
 #
-# $Id: config.makefile,v 1.60 2003/07/03 11:14:59 coelho Exp $
+# $Id$
 #
 
 UTILS=		pips-makemake \
