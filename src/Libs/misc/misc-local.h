@@ -84,5 +84,6 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 #endif
 
 #define PIPS_CATCH(what) \
-   if (setjmp(*push_exception_on_stack(what, __CURRENT_FUNCTION_NAME__, \
+   if (push_debug_status(), \
+       setjmp(*push_exception_on_stack(what, __CURRENT_FUNCTION_NAME__, \
       	                    __FILE__, __LINE__, pop_debug_status)))
