@@ -1,4 +1,10 @@
-/* $Id$
+/*
+ * $Id$
+ *
+ * $Log: newgen_array.h,v $
+ * Revision 1.4  1997/12/04 17:24:14  coelho
+ * GEN_ARRAY_MAP added.
+ *
  */
 
 struct _gen_array_chunk_t;
@@ -21,3 +27,13 @@ int gen_array_nitems(gen_array_t);
 int gen_array_size(gen_array_t);
 char * gen_array_item(gen_array_t, int);
 void gen_array_sort(gen_array_t);
+
+#define GEN_ARRAY_MAP(s, code, array)			\
+  {							\
+      int _i, _nitems = gen_array_nitems(array);	\
+      for(_i=0; _i<_nitems; _i++)			\
+      {							\
+	  string s = gen_array_item(array, _i);		\
+	  code;						\
+      }							\
+  }
