@@ -10,7 +10,8 @@ INSTALL_SHR =	pips-deal-with-include \
 		normalisation.pl \
 		replace_file_name.pl \
 		insert_alias_checks_in_source.pl \
-		remove_useless_includes.pl
+		remove_useless_includes.pl \
+		check_for_recursions.pl
 
 
 UTL_SCRIPTS = 	filter_verbatim \
