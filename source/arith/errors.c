@@ -1,10 +1,13 @@
 /*
-  $Id: errors.c,v 1.3 2004/02/08 21:53:27 kienhuis Exp $
+  $Id: errors.c,v 1.4 2004/02/11 10:19:54 verdoolaege Exp $
 
   Exception management.
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.4  2004/02/11 10:19:54  verdoolaege
+  add const qualifier
+
   Revision 1.3  2004/02/08 21:53:27  kienhuis
   Update from Fabien Coelho, via Bart Kienhuis
 
@@ -301,8 +304,8 @@ pop_exception_from_stack(
 */
 void throw_exception(
     int what,
-    char * function,
-    char * file,
+    const char * function,
+    const char * file,
     int line)
 {
   int i;

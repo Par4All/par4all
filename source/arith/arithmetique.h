@@ -4,7 +4,7 @@
 
 /* package arithmetique
  *
- * $Id: arithmetique.h,v 1.2 2002/10/15 10:02:06 kienhuis Exp $
+ * $Id: arithmetique.h,v 1.3 2004/02/11 10:19:54 verdoolaege Exp $
  *
  * Francois Irigoin, mai 1989
  *
@@ -604,7 +604,7 @@ extern void dump_exception_stack_to_file(FILE * /*f*/);
 extern void dump_exception_stack(void);
 extern jmp_buf *push_exception_on_stack(int /*what*/, char * /*function*/, char * /*file*/, int /*line*/);
 extern void pop_exception_from_stack(int /*what*/, char * /*function*/, char * /*file*/, int /*line*/);
-extern void throw_exception(int /*what*/, char * /*function*/, char * /*file*/, int /*line*/);
+extern void throw_exception(int /*what*/, const char * /*function*/, const char * /*file*/, int /*line*/);
 
 #endif /* arithmetique_header_included */
 
