@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/21 11:31:29 $, 
+# $Date: 1996/08/21 11:33:36 $, 
 #
 # Newgen documention
 
@@ -15,7 +15,7 @@ PS =	$(FTEX:.ftex=.ps) $(ETEX:.tex=.ps)
 INSTALL_DOC =	$(PS)
 INSTALL_HTM =	$(PS:.ps=.html) $(PS:.ps=)
 
-all: $(INSTALL_DOC) $(INSTALL_HTM)
+all: $(INSTALL_DOC) $(PS:.ps=.html) 
 ps: $(PS)
 dvi: $(PS:.ps=.dvi)
 
