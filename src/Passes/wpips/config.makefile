@@ -1,4 +1,4 @@
-# $RCSfile: config.makefile,v $ ($Date: 1995/11/12 00:51:02 $, ) 
+# $RCSfile: config.makefile,v $ ($Date: 1995/11/27 17:16:59 $, ) 
 # version $Revision$
 # got on %D%, %T%
 # [%P%].
@@ -36,6 +36,7 @@ LDFLAGS=	$(PIPS_LDFLAGS) $(WPIPS_ADDED_LDFLAGS)
 # Source, header and object files used to build the target
 # xv_icons.c
 TARGET_CFILES=	emacs.c \
+		directory_menu.c \
 		wpips.c \
 		xv_compile.c \
 		xv_log.c \
