@@ -1,16 +1,14 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1995/08/03 14:05:11 $, )
+# ($Date: 1995/08/04 13:57:27 $, )
 #
 
-.INIT: Makefile
+.INIT: Makefile.include
 
-Makefile: $RCSfile: config.makefile,v $ Makefile.m4 
-	{ \
-	  cat $RCSfile: config.makefile,v $ ; \
-	  m4 -DARCHITECTURE=$(PVM_ARCH) Makefile.m4 ;\
-	} > Makefile.new
-	mv Makefile.new Makefile
+Makefile.include: Makefile.m4 
+	m4 -DARCHITECTURE=$(PVM_ARCH) Makefile.m4 > Makefile.include
+
+include ./Makefile.include
 
 # that is all
 #
