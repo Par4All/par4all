@@ -26,7 +26,7 @@ Pvecteur vect_div(v,x)
 Pvecteur v;
 Value x;
 {
-    if(x==0) {
+    if(value_zero_p(x)) {
 	vect_error("vect_div","vector zero divide\n");
     }
     else if (value_one_p(x))
@@ -37,7 +37,7 @@ Value x;
 	Pvecteur coord;
 
 	for (coord = v ;coord!=NULL;coord=coord->succ) {
-	    val_of(coord) = value_div(val_of(coord),x);
+	    value_pdivide(val_of(coord),x); 
 	}
     }
     return vect_clean(v);
