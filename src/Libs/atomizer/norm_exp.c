@@ -19,8 +19,7 @@
  * For more information about NLCs, see loop_normalize package.
  */
 #include <stdio.h>
-extern int fprintf();
-extern int atoi(char * c);
+#include <stdlib.h>
 #include <string.h>
 
 #include "genC.h"
