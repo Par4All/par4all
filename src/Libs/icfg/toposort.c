@@ -90,7 +90,7 @@ int n;
     int depth = (int) hash_get(hash_module_to_depth, (char *) mod);
     list callees_list = module_to_callees(mod);
 
-    if ((depth == ICFG_NOT_FOUND) || (depth < n))
+    if ((depth == (int) ICFG_NOT_FOUND) || (depth < n))
 	hash_put(hash_module_to_depth, (char *) mod, (char *) n);
 	      
     if ( callees_list != NIL ) {
