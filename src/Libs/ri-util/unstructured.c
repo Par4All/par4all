@@ -1,11 +1,12 @@
-/* 	%A% ($Date: 1997/10/23 11:37:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/10/23 11:37:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
-
  /*
+  * $Id$
+  *
   * Prettyprint unstructured
+  *
+  * $Log: unstructured.c,v $
+  * Revision 1.7  1997/11/11 10:32:47  coelho
+  * clearer assert in text_control.
+  *
   */
 
 #include <stdlib.h>
@@ -533,7 +534,7 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	    text r1 = make_text(NIL);
 	    bool no_endif = FALSE;
 
-	    pips_assert("text_control", instruction_test_p(i));
+	    pips_assert("must be a test", instruction_test_p(i));
 
 	    MERGE_TEXTS(r, init_text_statement(module, margin, st)) ;
 	    if (! string_undefined_p(comments)) {
