@@ -37,9 +37,7 @@
 #include "ri-util.h"
 #include "constants.h"
 #include "misc.h"
-#include "hash.h"
 #include "control.h"
-#include "list.h"
 #include "text.h" 
 #include "text-util.h"
 #include "paf-util.h"
@@ -1227,7 +1225,7 @@ int *Gcount_nlc;
 
 	debug( 7, "make_nlc_entity", "doing\n");
 	(*Gcount_nlc)++;
-	num = malloc(32);
+	num = (char*) malloc(32);
 	(void) sprintf(num, "%d", *Gcount_nlc);
 
 	mod_ent = get_current_module_entity();
@@ -1270,7 +1268,7 @@ entity make_nsp_entity()
 
 	debug( 7, "make_nsp_entity", "doing\n");
 	Gcount_nsp++;
-	num = malloc(32);
+	num = (char*) malloc(32);
 	(void) sprintf(num, "%d", Gcount_nsp);
 
 	mod_ent = get_current_module_entity();
@@ -1314,7 +1312,7 @@ entity make_nub_entity()
 
 	debug( 7, "make_nub_entity", "doing\n");
 	Gcount_nub++;
-	num = malloc(32);
+	num = (char*) malloc(32);
 	(void) sprintf(num, "%d", Gcount_nub);
 
 	mod_ent = get_current_module_entity();
