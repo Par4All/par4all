@@ -22,7 +22,12 @@
 #include "conversion.h"
 /* #include "generation.h" */
 
-#include "loops_interchange.h"
+/* #include "loops_interchange.h" */
+#define INTERCHANGE_OPTIONS "X"
+extern void global_parallelization();
+extern statement gener_DOSEQ();
+extern statement interchange();
+extern int set_interchange_parameters();
 
 /* statement gener_DOSEQ(cons *lls,Pvecteur pvg[], Pbase base_oldindex,
  * Pbase base_newindex)
