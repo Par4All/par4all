@@ -157,7 +157,7 @@ void my_effects_filter(list l_effs, string str_filter)
     string t = effect_words_reference(effect_reference(eff));
     if (!same_string_p(t, str_filter))
       gen_remove(l_effs, eff);
-    free(t)
+    free(t);
   }, l_effs); 
   return;
 }
