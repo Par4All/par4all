@@ -3,6 +3,10 @@
  * $Id$
  *
  * $Log: interprocedural.c,v $
+ * Revision 1.32  2000/11/23 17:13:01  irigoin
+ * New function for normalization, sc_safe_normalize(), to always retrieve a
+ * consistent system of constraints
+ *
  * Revision 1.31  1999/01/16 21:20:52  irigoin
  * Bug fix in intra_to_inter_precondition(): even non-feasible system must be
  * projected because of their possibly non-empty basis.
@@ -393,7 +397,7 @@ cons * le;
 
     /* get rid of old_values */
     pre = transformer_projection_with_redundancy_elimination
-	(pre, lost_values, /* sc_elim_redund */ no_elim);
+      (pre, lost_values, /* sc_elim_redund */ /* no_elim */ sc_safe_normalize);
 
     gen_free_list(lost_values);
 
@@ -514,7 +518,7 @@ cons * le;
     }
     else {
 	pre = transformer_projection_with_redundancy_elimination
-	    (pre, lost_values, /* sc_elim_redund */ no_elim);
+	  (pre, lost_values, /* sc_elim_redund */ /* no_elim */ sc_safe_normalize);
     }
     
     /* free the temporary list of entities */
