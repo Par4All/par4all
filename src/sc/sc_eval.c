@@ -1,13 +1,13 @@
 /* package sc
  * $RCSfile: sc_eval.c,v $ (version $Revision$)
- * $Date: 1996/08/06 13:00:46 $, 
+ * $Date: 1996/08/06 13:06:20 $, 
  */
 
 #include <string.h>
 #include <stdio.h>
 #include <limits.h>
-#include <assert.h>
 
+#include "assert.h"
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
