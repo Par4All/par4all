@@ -1,5 +1,11 @@
 %{
 
+/* UICON and ICON must be distinguished from RCON and DCON:
+      REAL*8 D1
+      REAL*8 E2
+   Should not be parsed as real constants!
+*/
+
 #ifdef FLEX_SCANNER
 
 /* flex incompatible way of playing with input characters:-)
@@ -151,6 +157,7 @@ DCON (({MANT}|{UICON}){DEXP}?)
 				pips_debug(9, "TK_NAME %s %d\n", 
 					   yytext, yyleng);
                                 yylval.string = strdup(yytext);
+                                BEGIN INITIAL;
 				return(TK_NAME); 
 			}
 
