@@ -139,8 +139,8 @@ graph dg;
     if(! ENTITY_ASSIGN_P(call_function(assign_call)))
 	pips_error("defs_elim_of_assign_call", "Call must be an ASSIGN");
 
-    debug(5, "defs_elim_of_assign_call", "begin ASSIGN : %s\n",
-	  words_to_string(words_call(assign_call, 0, TRUE)));
+    pips_debug(5, "begin ASSIGN : %s\n",
+	       words_to_string(words_call(assign_call, 0, TRUE, TRUE)));
 
     lhs_exp = EXPRESSION(CAR(call_arguments(assign_call)));
     if(syntax_tag(expression_syntax(lhs_exp)) != is_syntax_reference)
