@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/01/04 19:01:11 $, 
+ * $Date: 1997/01/04 19:07:45 $, 
  *
  * adapted from whta can be seen by FC 31/12/96
  * 
@@ -179,7 +179,8 @@ static int lend()
 	if (buf[1]=='\t')
 	    p = &buf[2];
 	else
-	    if (buf[1] && buf[2] && buf[3] && buf[4] && buf[5])
+	    if (buf[1] && buf[2] && buf[3] && buf[4] && 
+		buf[5]==' ' /* must not be a continuation! */)
 		p = &buf[6];
 	    else
 		return 0;
