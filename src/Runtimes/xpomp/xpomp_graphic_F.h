@@ -1,5 +1,5 @@
 ! $RCSfile: xpomp_graphic_F.h,v $ (version $Revision$)
-! $Date: 1996/08/31 13:16:18 $, 
+! $Date: 1996/09/01 21:45:21 $, 
 !
 !  The fortran headers for the XPOMP graphical library.
 !
@@ -10,6 +10,10 @@
 !     Centre de Recherche en Informatique,
 !     École des mines de Paris.
 !
+
+! Tells HPFC where to link (Link eDitor I/o):
+!ldi$ -L$XPOMP_RUNTIME/. -L$PIPS_ROOT/Runtime/xpomp -lxpomp
+
 ! To open a new display:
 !fcd$ io xpomp_open_display
 
