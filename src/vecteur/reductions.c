@@ -337,6 +337,48 @@ Pvecteur v1,v2;
     return(result);
 }
 
+/* boolean vect_opposite_except(Pvecteur v1, Pvecteur v2, Variable var):
+ * test a egalite des projections selon la coordonnees var de deux vecteurs
+ *      ->
+ * Soit e un vecteur de base quelconque:
+ *         ->   ->     ->   ->
+ * return <v1 . e> == - <v2 . e>;
+ *                e!=var
+ */
+boolean vect_opposite_except(v1,v2,var)
+Pvecteur v1,v2;
+Variable var;
+{
+    Pvecteur pv;
+    /*
+     * Note: le test n'est pas optimal puisque v2 est parcouru et compare
+     * a v1 meme si ces coefficients ont ete deja ete compare lors du
+     * parcours de v1; mais cela evite le "marquage" des coefficients vus;
+     */
+    boolean result;
+
+    if(v1==NULL && v2==NULL)
+	result = TRUE;
+    else if(v1==NULL)
+	result = v2->succ==NULL && var_of(v2)==var;
+    else if(v2 == NULL)
+	result = v1->succ==NULL && var_of(v1)==var;
+    else {
+	result = TRUE;
+
+	for (pv = v1; pv != NULL && result == TRUE; pv = pv->succ)
+	    if (var_of(pv) != var)
+		result = (val_of(pv) == -vect_coeff(var_of(pv), v2));
+
+	for (pv = v2; pv != NULL && result == TRUE; pv = pv->succ)
+	    if (var_of(pv) != var)
+		result = (val_of(pv) == -vect_coeff(var_of(pv), v1));
+
+    }
+
+    return result;
+}
+
 /* int vect_proport(Pvecteur v1, Pvecteur v2): test de la colinearite
  * de deux vecteurs et de leur direction.
  * 
