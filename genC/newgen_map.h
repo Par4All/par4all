@@ -18,7 +18,7 @@
 #ifndef MAP_INCLUDED
 #define MAP_INCLUDED
 
-/* $RCSfile: newgen_map.h,v $ ($Date: 1995/03/20 14:33:08 $, ) 
+/* $RCSfile: newgen_map.h,v $ ($Date: 1995/03/28 15:06:42 $, ) 
  * version $Revision$
  * got on %D%, %T%
  *
@@ -72,7 +72,16 @@ IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 		 (h)), \
 	 (h))
 
-#define FUNCTION_MAP(k, v, code, fun) \
-        HASH_MAP(k, v, code, (fun+1)->h)
+#define FUNCTION_MAP(typename, start, image, k, v, code, fun) \
+    {\
+    hash_table _map_hash_h = (fun+1)->h ;\
+    register hash_entry *_map_hash_p = _map_hash_h->hash_array ;\
+    hash_entry *_map_hash_end = \
+	    _map_hash_h->hash_array+_map_hash_h->hash_size ;\
+    for( ; _map_hash_p<_map_hash_end ; _map_hash_p++ ) { \
+	if( _map_hash_p->key!=(char *)0 && _map_hash_p->key!=(char *)-1) { \
+	    typename##_key_type k = ((gen_chunk*)(_map_hash_p->key))->start ; \
+	    typename##_value_type v = ((gen_chunk*)(_map_hash_p->val))->image;\
+            code ; }}}
 
 #endif
