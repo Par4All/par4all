@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-util.c,v $
+ * Revision 1.38  1997/08/04 13:58:09  coelho
+ * new generic effects includes.
+ *
  * Revision 1.37  1997/07/28 14:29:47  keryell
  * Removed conflict in concatenate().
  *
@@ -25,10 +28,11 @@
 #include "defines-local.h"
 
 #include "control.h"
-#include "regions.h"
 #include "semantics.h"
-#include "effects.h"
 #include "conversion.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 
 /************************************************** ONLY_IO MAP DEFINITION */
 
