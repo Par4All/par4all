@@ -5,8 +5,11 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1997/02/18 18:51:52 $, )
+ * $Id$
+ * $Log: dynamic.c,v $
+ * Revision 1.42  1997/03/20 10:14:41  coelho
+ * better RCS headers.
+ *
  */
 
 #include "defines-local.h"
