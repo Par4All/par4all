@@ -1120,8 +1120,7 @@ polyhedron
 */
 void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
    
-    Value LB, UB, k;
-    int CNT,result;
+    Value LB, UB, k, c;
 
     value_init(LB); value_init(UB); value_init(k);
     value_set_si(LB,0);
