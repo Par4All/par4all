@@ -2,7 +2,7 @@
 !     Reductions management 
 !
 ! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1997/01/07 11:50:55 $, )
+! ($Date: 1997/03/03 14:46:56 $, )
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -203,8 +203,11 @@ ifdef(`_HPFC_NO_REAL8_',,`REDUCTIONS(REAL8)')
 ifdef(`_HPFC_NO_COMPLEX8_',,`CUMULATE_REDUCTIONS(COMPLEX8)')
 ifdef(`_HPFC_NO_COMPLEX16_',,`CUMULATE_REDUCTIONS(COMPLEX16)')
 
+dnl
 dnl 
 dnl Runtime for the REDUCTION DIRECTIVE
+dnl
+dnl
 dnl
 dnl pvm_reduce does not allow all members to get the result:-(
 dnl
@@ -213,37 +216,48 @@ define(`identity',`ifelse($1,`SUM',0,$1,`PROD',1,$2)')dnl
 define(`HPFC_REDUCTIONS',`dnl
 pushdef(`NAME',$1)dnl
 pushdef(`PVMTYPE',$2)dnl
-pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
+pushdef(`LEVEL',$3)dnl
 !-----
 !
 ! Functions for NAME reduction on TYPE scalars:
 !
-      subroutine build_name(hpre,NAME,PVMTYPE)(val)
-      TYPE val
+      subroutine build_name(hpre,NAME,PVMTYPE)(val, size)
+      integer size
+      TYPE val(size)
       end
-      subroutine build_name(npre,NAME,PVMTYPE)(val)
-      TYPE val
-      val = identity(NAME,val)
+      subroutine build_name(npre,NAME,PVMTYPE)(val, size)
+      integer size
+      TYPE val(size)
+      integer i
+      do i=1, size
+         val(i) = identity(NAME,val)
+      enddo
       end
-      subroutine build_name(hpost,NAME,PVMTYPE)(val)
-      TYPE val
+      subroutine build_name(hpost,NAME,PVMTYPE)(val, size)
+      integer size
+      TYPE val(size)
       include "hpfc_commons.h"
       external pvm_opname(NAME)
-      integer info
+      integer info, bufid
 !
 ! performs the reduction to the host
 !
       call pvmfreduce(pvm_opname(NAME),
-     x      val,1,PVMTYPE,MCAST HOST,HPFCGROUPNAME,0,info)
+     x      val,size,PVMTYPE,MCAST HOST,HPFCGROUPNAME,0,info)
       MCAST HOST = MCAST HOST+2
 
 !
 ! send final result to nodes 
 !      
-      call HPFC HSNDTO A(PVMTYPE, val)
+      call pvmf initsend(PvmDataRaw, bufid)
+      call pvmf pack(PVMTYPE, val, size, 1, info)
+      call pvmf mcast(NBOFTASKS, NODETIDS, MCASTHOST, info)
+      MCASTHOST = MCASTHOST + 2
+
       end 
-      subroutine build_name(npost,NAME,PVMTYPE)(val)
-      TYPE val
+      subroutine build_name(npost,NAME,PVMTYPE)(val, size)
+      integer size
+      TYPE val(size)
       include "hpfc_commons.h"
       external pvm_opname(NAME)
       integer info
@@ -257,7 +271,9 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
 !
 ! get final result 
 !      
-      call HPFC RCVFR mCH(PVMTYPE, val)
+      call pvmfrecv(HOSTTID, MCASTHOST, bufid)
+      call pvmfunpack(PVMTYPE, val, size, 1, info)
+      MCASTHOST = MCASTHOST + 2
       end
 !
 popdef(`NAME')dnl
