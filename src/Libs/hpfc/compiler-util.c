@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compiler-util.c,v $ ($Date: 1995/03/22 10:56:55 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1995/03/27 16:25:58 $, )
  * got on %D%, %T%
  * $Id$
  *
@@ -23,10 +23,8 @@ extern int fprintf();
 #include "control.h"
 #include "hpfc.h"
 #include "defines-local.h"
+#include "properties.h"
 
-/*
- * hpfc_empty_statement_p 
- */
 bool hpfc_empty_statement_p(stat)
 statement stat;
 {
@@ -39,9 +37,6 @@ statement stat;
 	   (empty_statement_p(stat)));
 }
 
-/*
- * bool hpfc_empty_statement_list_p(l)
- */
 bool hpfc_empty_statement_list_p(l)
 list l;
 {
@@ -51,9 +46,6 @@ list l;
 	   hpfc_empty_statement_list_p(CDR(l)));
 }
 
-/*
- * update_control_lists
- */
 void update_control_lists(c, map)
 control c;
 control_mapping map;
@@ -70,9 +62,6 @@ control_mapping map;
 	updated_control_list(control_successors(c), map);
 }
 
-/*
- * updated_control_list
- */
 list updated_control_list(lc, map)
 list lc;
 control_mapping map;
@@ -98,8 +87,7 @@ control_mapping map;
     return(gen_nreverse(lc_result));
 }
 
-/*
- * FindRefToDistArrayInStatement
+/* FindRefToDistArrayInStatement
  *
  * everything may be quite false regarding to the real effects of
  * the functions called, but it seems to me that the pips effect analysis
@@ -108,7 +96,6 @@ control_mapping map;
  * ??? these stupid functions assume no indirections on distributed arrays
  * ??? also that they are not written by a function other than assign
  */
-
 static list
    found_written = NIL,
    found_read = NIL;
@@ -171,10 +158,7 @@ list *lwp, *lrp;
 }
 
 
-/*
- * lIndicesOfRef
- *
- * computes the list of indices of the list of ref that are variables...
+/* computes the list of indices of the list of ref that are variables...
  */
 list lIndicesOfRef(lsyn)
 list lsyn;
@@ -185,9 +169,6 @@ list lsyn;
 				 lIndicesOfRef(CDR(lsyn)))));
 }
 
-/*
- * IndicesOfRef
- */
 list IndicesOfRef(syn)
 syntax syn;
 {
@@ -222,9 +203,6 @@ syntax syn;
     return(l);	 
 }
 
-/*
- * AddOnceToIndicesList
- */
 list AddOnceToIndicesList(l, lsyn)
 list l, lsyn;
 {
@@ -256,13 +234,9 @@ list l;
     return(FALSE);
 }
 
-/*
- * FindDefinitionsOf
- *
- * ??? False!
+/* ??? False!
  * The definition looked for must be an assignment call...
  */
-
 static list
   syntax_list=NIL,
   found_definitions=NIL;
@@ -505,6 +479,5 @@ entity index;
     return(range_undefined);
 }
 
-/*
- * that is all
+/* that is all
  */
