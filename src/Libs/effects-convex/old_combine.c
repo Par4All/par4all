@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <setjmp.h>
 
 #include "genC.h"
 #include "ri.h"
@@ -42,9 +41,6 @@
 
 #define SUPER TRUE
 #define SUB FALSE
-
-jmp_buf overflow_error;
-
 
 /****************************************** STATISTICS FOR BINARY OPERATORS */
 
@@ -493,12 +489,12 @@ effect regions_must_convex_hull(region r1, region r2)
      /* otherwise, we have to compute the convex-hull of the two predicates */
     if (op_statistics_p()) nb_umust++;
 
-    if (setjmp(overflow_error))
+    CATCH(overflow_error)
     {
 	pips_debug(1, "overflow error\n");
 	sr = sc_rn(base_dup(s1->base));
     }
-    else 
+    TRY
     {
 	sr = region_sc_convex_hull(s1, s2);
 	sc_nredund(&sr);
@@ -923,13 +919,13 @@ region_intersection(region reg1, region reg2)
     reg = region_dup(reg1);
     region_sc_append_and_normalize(reg,sc2,2); /* could be some other level? */
 
-    if (setjmp(overflow_error))
+    CATCH(overflow_error)
     {	
 	pips_debug(3, "overflow error \n");
 	feasible = TRUE;
 	debug_region_consistency(reg);
     }
-    else
+    TRY
     {    
 	 feasible = sc_integer_feasibility_ofl_ctrl(region_system(reg), 
 						    FWD_OFL_CTRL, TRUE);
@@ -988,7 +984,7 @@ list region_sup_difference(region reg1, region reg2)
     tag app2 = region_approximation_tag(reg2);
 
     /* approximation of the resulting regions if the difference is exact */    
-    tag app; 
+    tag app = -1; 
     region reg;
     list l_reg = NIL;
 
@@ -1053,13 +1049,13 @@ list region_sup_difference(region reg1, region reg2)
 	}
 	else 
 	    app = is_approximation_may;
-	if (setjmp(overflow_error))
+	CATCH (overflow_error)
 	{
 	    pips_debug(1, "overflow error\n");
 	    app = app1;
 	    l_reg = region_to_may_region_list(region_dup(reg1));
 	}
-	else 
+	TRY
 	{
 	    Pdisjunct disjonction;
 	    disjonction = sc_difference(sc1,sc2);
@@ -1075,12 +1071,12 @@ list region_sup_difference(region reg1, region reg2)
 	break;
 
     case is_approximation_may :
-	if (setjmp(overflow_error))
+	CATCH(overflow_error)
 	{
 	    pips_debug(1, "overflow error\n");
 	    app = is_approximation_may;
 	}
-	else 
+	TRY
 	{
 	    if (app1 == is_approximation_must) 
 	    {
@@ -1167,7 +1163,7 @@ list region_inf_difference(region reg1, region reg2)
 	if (app == is_approximation_must) nb_dinf_pot_must++;
     }
 
-    if (setjmp(overflow_error))
+    CATCH(overflow_error)
     {
 	/* We cannot compute the under-approximation of the difference:
 	 *  we must assume that it is the empty set
@@ -1176,7 +1172,7 @@ list region_inf_difference(region reg1, region reg2)
 	app = is_approximation_may;
 	l_res = NIL;
     }
-    else 
+    TRY
     {
 	Pdisjunct disjonction;
 	disjonction = sc_difference(sc1,sc2);
@@ -1446,7 +1442,7 @@ static list list_of_regions_generic_binary_op(
     
     debug_off();
     
-    return(l_res);
+    return l_res;
 }
 
 /*************************************** PROPER REGIONS TO SUMMARY REGIONS */
@@ -1465,7 +1461,7 @@ static list list_of_regions_generic_binary_op(
  */
 list proper_to_summary_regions(list l_reg)
 {
-        return(proper_regions_combine(l_reg, FALSE));
+    return proper_regions_combine(l_reg, FALSE);
 }
 
 /* list proper_regions_contract(list l_reg)
@@ -1478,14 +1474,15 @@ list proper_to_summary_regions(list l_reg)
 
 list proper_regions_contract(list l_reg)
 {
-    return(proper_regions_combine(l_reg, TRUE));
+    return proper_regions_combine(l_reg, TRUE);
 }
 
 
 /* list proper_regions_combine(list l_reg, bool scalars_only_p)
  * input    : a list of proper regions, and a boolean to know on which
  *            elements to perform the union.
- * output   : a list of regions, in which the selected elements have been merged.
+ * output   : a list of regions, in which the selected elements 
+ *            have been merged.
  * modifies : the input list.
  * comment  :
  */
