@@ -12,6 +12,7 @@
  * suffixes */
 #define OLD_VALUE_PREFIX "o#"
 #define INTERMEDIATE_VALUE_PREFIX "i#"
+#define TEMPORARY_VALUE_PREFIX "t#"
 
 /* external suffixes (NEW_VALUE_SUFFIX is not used, new values are represented
  * by the variable itself, i.e. new value suffix is the empty string "")
