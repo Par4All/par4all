@@ -94,6 +94,23 @@ XPOMP_show_double(XPOMP_display screen,
 		  double min_value,
 		  double max_value);
 
+/* Scroll a window: */
+int
+XPOMP_scroll(XPOMP_display screen,
+	     int delta_Y);
+
+/* Draw a frame from corner (X0,Y0) to corner (X1,Y1) and add a title: */
+int
+XPOMP_draw_frame(XPOMP_display screen,
+		 char * title,
+		 int title_color,
+		 int background_color,
+		 int X0,
+		 int Y0,
+		 int X1,
+		 int Y1,
+		 int color);
+
 /* Print out a small help about keyboard usage in xPOMP: */
 extern void
 XPOMP_show_usage(void);
