@@ -1,7 +1,7 @@
 /* MEM_SPY : Package to track memory usage.
  * Beatrice Creusillet - August 1995 
  * $RCSfile: mem_spy.c,v $ (version $Revision$)
- * $Date: 1996/07/25 15:06:46 $, .
+ * $Date: 1996/09/21 16:25:22 $, .
  */
 /* Usage:
  *
@@ -43,7 +43,9 @@
 #include <malloc.h>
 #include <assert.h>
 
-extern int etext;
+/* this is **not** portable */
+/* use wait3 sys call or whatever */
+/* extern int etext; */
 
 #include "misc-local.h"
 
@@ -128,7 +130,7 @@ current_memory_size()
 
     switch(measurement) {
     case SBRK_MEASURE: 
-	memory_size = sbrk(0) - etext;
+	memory_size = /* sbrk(0) - etext*/ -1;
 	break;
     case NET_MEASURE: 
 	/* memory_size = heap_info.uordblks-8*heap_info.ordblks; */
