@@ -68,6 +68,23 @@ string module_name;
     return TRUE;
 }
 
+/* I would have prefered something like that... FC 
+ * or even no properties at all? 
+ */
+bool 
+parametrized_print_icfg(
+    string module_name,
+    bool print_ifs,
+    bool print_dos,
+    text (*deco)(string))
+{
+    entity module = local_name_to_top_level_entity(module_name);
+    set_bool_property(ICFG_IFs, print_ifs);
+    set_bool_property(ICFG_DOs, print_dos);
+    print_module_icfg_with_decoration(module, deco);
+    return TRUE;
+}
+
 bool print_icfg(string module_name)
 {
     return print_any_icfg(module_name,ICFG_DECOR_NONE);
