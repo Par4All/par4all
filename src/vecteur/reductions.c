@@ -491,20 +491,32 @@ Variable var;
  *
  * Ces conditions ne sont pas verifiees par Corinne dans ses routines
  * du package "sommet".
+ *
+ * new version to test linear_hashtable. better for large vectors,
+ * but much worse for small ones I guess. FC.
  */
-boolean vect_check(v)
-Pvecteur v;
+boolean vect_check(Pvecteur v)
 {
-    Pvecteur base = (Pvecteur) NULL;
-    boolean consistent = TRUE;
-    boolean in_base;
+  register boolean 
+    consistent = TRUE, 
+    tcst_seen = FALSE;
+  linear_hashtable_pt seen = linear_hashtable_make();
 
-    for(; v!=NULL && consistent; v=v->succ) {
-	consistent = value_notzero_p(val_of(v));
-	in_base = base_contains_variable_p(base, vecteur_var(v));
-	consistent &= !in_base;
-	base = vect_add_variable(base, vecteur_var(v));
+  for(; v!=NULL && consistent; v=v->succ) 
+  {
+    consistent = value_notzero_p(val_of(v));
+    if (var_of(v)) 
+    {
+      if (linear_hashtable_isin(seen, var_of(v)))
+	consistent = FALSE;
+      linear_hashtable_put(seen, var_of(v), (void*) 1);
     }
-    vect_rm(base);
-    return consistent;
+    else {
+      if (tcst_seen) consistent = FALSE;
+      tcst_seen = TRUE;
+    }
+  }
+
+  linear_hashtable_free(seen);
+  return consistent;
 }
