@@ -5,6 +5,8 @@
 /* #include <stdlib.h> */
 
 #include "genC.h"
+
+
 #include "ri.h"
 #include "ri-util.h"
 
@@ -291,11 +293,13 @@ cons * le;
     Pbase b;
     cons * ca;
 
-    ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
+    ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
+    {
 	debug(DEBUG_PRECONDITION_INTRA_TO_INTER,"precondition_intra_to_inter",
-	      "begin for call to %s\nwith precondition:\n", module_local_name(callee));
-	/* precondition cannot be printed because equations linking formal parameters
-	 * have been added to the real precondition
+	      "begin for call to %s\nwith precondition:\n", 
+	      module_local_name(callee));
+	/* precondition cannot be printed because equations linking formal 
+	 * parameters have been added to the real precondition
 	 */
 	dump_transformer(pre);
     }
@@ -303,12 +307,14 @@ cons * le;
     r = (Psysteme) predicate_system(transformer_relation(pre));
 
     /* make sure you do not export a (potentially) meaningless old value */
-    for( ca = transformer_arguments(pre); !ENDP(ca); POP(ca) ) {
+    for( ca = transformer_arguments(pre); !ENDP(ca); POP(ca) ) 
+    {
 	entity e = ENTITY(CAR(ca));
 
 	/* Thru DATA statements, old values of other modules may appear */
 	if(/* FI */ TRUE || same_string_p(entity_module_name(e), 
-			 module_local_name(get_current_module_entity()))) {
+			 module_local_name(get_current_module_entity()))) 
+	{
 	    entity e_old = entity_to_old_value(e);
 
 	    if(base_contains_variable_p(sc_base(r), (Variable) e_old))
@@ -317,7 +323,8 @@ cons * le;
 	}
     }
 
-    ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
+    ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
+    {
 	debug(DEBUG_PRECONDITION_INTRA_TO_INTER, "precondition_intra_to_inter",
 	      "meaningless old value(s):\n");
 	dump_arguments(lost_values);
@@ -327,6 +334,7 @@ cons * le;
     pre = transformer_projection(pre, lost_values);
     gen_free_list(lost_values);
 
+    
     translate_global_values(callee, pre);
 
     /* get rid of pre's variables that do not appear in effects le */
@@ -348,9 +356,10 @@ cons * le;
       else if(e_callee != e) {
 	  pre = transformer_value_substitute(pre, e, e_callee);
 	  ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
-	      debug(DEBUG_PRECONDITION_INTRA_TO_INTER, "precondition_intra_to_inter",
-		    "value %s substituted by %s according to effect list le:\n", entity_name(e),
-		    entity_name(e_callee));
+	      debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+		    "precondition_intra_to_inter",
+		    "value %s substituted by %s according to effect list le:\n", 
+		    entity_name(e), entity_name(e_callee));
 	      dump_arguments(lost_values);
 	  }
       }
@@ -365,6 +374,7 @@ cons * le;
 
     /* get rid of them */
     pre = transformer_projection(pre, lost_values);
+    
 
     /* free the temporary list of entities */
     gen_free_list(lost_values);
@@ -375,10 +385,16 @@ cons * le;
     gen_free_list(transformer_arguments(pre));
     transformer_arguments(pre) = NIL;
 
-    debug(DEBUG_PRECONDITION_INTRA_TO_INTER,"precondition_intra_to_inter","return pre=%x\n",pre);
     ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
+    {
+	debug(DEBUG_PRECONDITION_INTRA_TO_INTER,"precondition_intra_to_inter",
+	      "return pre=%x\n",pre);
 	(void) dump_transformer(pre);
-    debug(DEBUG_PRECONDITION_INTRA_TO_INTER,"precondition_intra_to_inter","end\n");
+	
+	debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
+	      "precondition_intra_to_inter","end\n");
+    }
+    
 
     return pre;
 }
@@ -400,6 +416,7 @@ transformer tf;
 
     for(bv = b; bv != NULL; bv = bv->succ) {
 	translate_global_value(m, tf, (entity) vecteur_var(bv));
+
     }
 
     base_rm(b);
@@ -431,6 +448,7 @@ entity v;
 	      entity_name(v));
 	dump_transformer(tf);
     }
+
 
     if(v == NULL) {
 	pips_error("translate_global_value", "Trying to translate TCST\n");
