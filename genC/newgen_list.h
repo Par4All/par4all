@@ -14,19 +14,15 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1995/04/14 09:00:03 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1995/04/14 10:58:44 $, )
  * version $Revision$
  * got on %D%, %T%
+ *
+ *  These are the functions defined in the Newgen list library. 
  */
 
 #ifndef LIST_INCLUDED
 #define LIST_INCLUDED
-
-/* -- list.h
-
-   These are the functions defined in the Newgen list library. 
-
-*/
 
 #include <sys/stdtypes.h>   /* for size_t, used in malloc.h from malloclib */
 #include "malloc.h"
@@ -47,7 +43,7 @@ typedef cons *list ;
 #define MAX_NESTED_CONS 10
 
 extern cons *Gen_cp_[] ;
-static cons **gen_cp_ ;
+extern cons **gen_cp_ ;
 
 #define CAR(pcons) ((pcons)->car)
 #define CDR(pcons) ((pcons)->cdr)
@@ -70,7 +66,7 @@ IN_STACK(gen_cp_, &Gen_cp_[MAX_NESTED_CONS], \
 
 #define MAPL(_map_list_cp,_code,_l) \
 	{cons* _map_list_cp = (_l) ; \
-	for(;_map_list_cp!=NIL;_map_list_cp=CDR(_map_list_cp)) _code;}
+	for(;!ENDP(_map_list_cp);POP(_map_list_cp)) _code;}
 
 /* Fonctions de list.c 
  */
