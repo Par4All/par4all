@@ -27,8 +27,11 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "ri-util.h"
+/*
 #include "text.h"
 #include "text-util.h"
+*/
 #include "properties.h"
 
 #include "misc.h"
@@ -211,7 +214,10 @@ hash_table used_labels;
 {
     if( get_debug_level() >= 5 ) {
 	fprintf(stderr, "Statement %d: \n ", statement_number( st )) ;
+	/*
 	print_text(stderr, text_statement(entity_undefined,0, st)) ;
+	*/
+	print_statement(st);
     }
     HASH_MAP(name, sts, {
 	cons *stats = (cons *)sts;
@@ -302,9 +308,11 @@ hash_table used_labels;
 	cons *blocs = NIL ;
 	CONTROL_MAP(ctl, {
 	    pips_debug(1, "\n");
-	    print_text(stderr, text_statement(get_current_module_entity(), 0, st));
+	    print_statement(st);
+	    /* print_text(stderr, text_statement(get_current_module_entity(), 0, st)); */
 	    fprintf(stderr, "---\n");
-	    print_text(stderr, text_statement(get_current_module_entity(), 0, control_statement(ctl)));
+	    print_statement(control_statement(ctl));
+	    /* print_text(stderr, text_statement(get_current_module_entity(), 0, control_statement(ctl))); */
 	}, c_res, blocs);
 	gen_free_list(blocs);
     }
