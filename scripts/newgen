@@ -60,7 +60,7 @@ enter_package()
 exit_package()
 {
 	include=$1 
-	ubase=`echo $2 | tr -cd [_A-Z][a-z]`
+	ubase=`echo $2 | tr -cd '[_A-Za-z]'`
 
 	(case $VERSION in
 	 $LISP )
@@ -164,7 +164,7 @@ go () {
 	    # however it depends on newgen renumerotation
 	    # so as to keep the synchronization right?
 	    # Let's try without...
-	    dom=`egrep '^([a-zA-Z_ ]* =|external)' $i | wc -l | tr -cd '0-9'`
+	    dom=`egrep '^([a-zA-Z_ ]* =|external)' $i | wc -l | tr -cd '[0-9]'`
 	    echo "$dom" > $include
 	done
 
