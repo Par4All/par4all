@@ -269,7 +269,7 @@ c      NTID = NODETIDS(NEIGHBORLID)
 !
 ! where should I put it?
 !
-      call HPFC INIT SEND(PVMRAW, bufid)
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
       end
 !
 !-----------------
@@ -363,7 +363,7 @@ c      NTID = NODETIDS(NEIGHBORLID)
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC INIT SEND(PVMRAW, bufid)
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       call HPFC SEND(COMPUTERLID, SENDCHANNELS(COMPUTERLID), info)
       SENDCHANNELS(COMPUTERLID) = SENDCHANNELS(COMPUTERLID) + 2
@@ -379,7 +379,7 @@ c      NTID = NODETIDS(NEIGHBORLID)
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC INIT SEND(PVMRAW, bufid)
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       call HPFC SEND(HOSTLID, HOST SND CHANNEL, info)
       HOST SND CHANNEL = HOST SND CHANNEL + 2
@@ -396,69 +396,12 @@ c      NTID = NODETIDS(NEIGHBORLID)
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "sending to ", OWNERLID)
-      call HPFC INIT SEND(PVMRAW, bufid)
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       call HPFC SEND(OWNERLID, SENDCHANNELS(OWNERLID), info)
       SENDCHANNELS(OWNERLID) = SENDCHANNELS(OWNERLID) + 2
       end
-!
-!-----------------
-!
-! HPFC SNDTO A
-!
-! send to all nodes (with a BROADCAST) 
-!
-      subroutine HPFC SNDTO A(what, val)
-      integer what, val
-      include "hpfc_commons.h"
-      integer bufid, info
-      call HPFC INIT SEND(PVMRAW, bufid)
-      call HPFC PACK(what, val, 1, 1, info)
-      if (MYLID.GT.1)
-     $     call HPFC BCAST ROOT(
-     $     MYLID-1, 
-     $     NODETIDS(1), 
-     $     MCASTNODES, 
-     $     info)
-      if (MYLID.LT.NBOFTASKS)
-     $     call HPFC BCAST ROOT(
-     $     NBOFTASKS-MYLID, 
-     $     NODETIDS(MYLID+1), 
-     $     MCASTNODES, 
-     $     info)
-      MCASTNODES = MCASTNODES + 2
-      end
-!
-!-----------------
-!
-! HPFC PVMLENGTH
-!
-      integer function HPFC PVMLENGTH(what)
-      include "fpvm3.h"
-      integer what
-      if (what.eq.INTEGER4.or.what.eq.REAL4) then
-         HPFC PVMLENGTH=4
-         return
-      endif
-      if (what.eq.REAL8.or.what.eq.COMPLEX8) then
-         HPFC PVMLENGTH=8
-         return
-      endif
-      if (what.eq.BYTE1.or.what.eq.STRING) then
-         HPFC PVMLENGTH=1
-         return
-      endif
-      if (what.eq.INTEGER2) then
-         HPFC PVMLENGTH=2
-         return
-      endif
-      if (what.eq.COMPLEX16) then
-         HPFC PVMLENGTH=16
-         return
-      endif
-      write (unit=0,fmt=*) "[HPFC PVMLENGTH] unexpected tag ", what
-      stop
-      end
+
 !
 _CM5(
 !-----------------
@@ -512,52 +455,7 @@ _CM5(
       MCASTNODES = MCASTNODES + 2
       end
 !)
-!-----------------
-!
-! HPFC HSNDTO A
-!
-! host send to all nodes
-!
-      subroutine HPFC HSNDTO A(what, val)
-      integer what, val
-      include "hpfc_commons.h"
-      integer bufid, info
-      debug(print *, "sending to all nodes")
-      call HPFC INIT SEND(PVMRAW, bufid)
-      call HPFC PACK(what, val, 1, 1, info)
-      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS(1), MCASTHOST, info)
-      MCASTHOST = MCASTHOST + 2
-      debug(print *, "sent!")
-      end
-!
-!-----------------
-!
-! HPFC SNDTO HA
-!
-! send to host and all nodes, but not the sender.
-!    (with a BROADCAST)
-      subroutine HPFC SNDTO HA(what, val)
-      integer what, val
-      include "hpfc_commons.h"
-      integer bufid, info
-      call HPFC INIT SEND(PVMRAW, bufid)
-      call HPFC PACK(what, val, 1, 1, info)
-      if (MYLID.GT.1)
-     $     call HPFC BCAST ROOT(
-     $     MYLID-1, 
-     $     NODETIDS(1), 
-     $     MCASTNODES, 
-     $     info)
-      if (MYLID.LT.NBOFTASKS)
-     $     call HPFC BCAST ROOT(
-     $     NBOFTASKS-MYLID, 
-     $     NODETIDS(MYLID+1), 
-     $     MCASTNODES, 
-     $     info)
-      MCASTNODES = MCASTNODES + 2
-      call HPFC SEND(HOSTLID, HOST SND CHANNEL, info)
-      HOST SND CHANNEL = HOST SND CHANNEL + 2
-      end
+
 !
 !-----------------
 !
@@ -587,7 +485,7 @@ _CM5(
             lb(i) = 1
             ub(i) = 1
          enddo
-         call HPFC INIT SEND(PVMRAW, bufid)
+         call HPFC INIT SEND(DATARAW ENCODING, bufid)
          call HPFC PACK(what, val, 1, 1, info)
          do i7=lb(7), ub(7)
             indp(7) = i7
@@ -655,7 +553,7 @@ _CM5(
          lb(i) = 1
          ub(i) = 1
       enddo
-      call HPFC INIT SEND(PVMRAW, bufid)
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       do i7=lb(7), ub(7)
          indp(7) = i7
@@ -704,7 +602,7 @@ _CM5(
       include "hpfc_commons.h"
       integer bufid, info, i, indp(7), ndim, lid
       logical result
-      call HPFC INIT SEND(PVMRAW, bufid)
+      call HPFC INIT SEND(DATARAW ENCODING, bufid)
       call HPFC PACK(what, val, 1, 1, info)
       ndim = NODIMP(OPN)
       do lid=1, NBOFTASKS
@@ -779,34 +677,7 @@ _CM5(
       HOST RCV CHANNEL = HOST RCV CHANNEL + 2
       debug(print *, MYLID, " receiving from host")
       end
-!
-!-----------------
-!
-! HPFC RCVFR mCS    (Receive from BROADCAST)
-!
-      subroutine HPFC RCVFR mCS(what, goal)
-      integer what, goal
-      include "hpfc_commons.h"
-      integer info
-      call HPFC BCAST RECV(SENDERLID, MCASTNODES)
-      call HPFC UNPACK(what, goal, 1, 1, info)
-      MCASTNODES = MCASTNODES + 2
-      end
-!
-!-----------------
-!
-! HPFC RCVFR mCH    (Receive from BROADCAST Host) 
-!
-      subroutine HPFC RCVFR mCH(what, goal)
-      integer what, goal
-      include "hpfc_commons.h"
-      integer info
-      debug(print *, "receiving from host")
-      call HPFC BCAST RECV(HOSTLID, MCASTHOST)
-      call HPFC UNPACK(what, goal, 1, 1, info)
-      MCASTHOST = MCASTHOST + 2
-      debug(print *, "received!")
-      end
+
 !
 !-----------------
 !
@@ -915,37 +786,7 @@ _CM5(
       endif
       end
 
-! 
-!-----------------
-!
-! HPFC INIT HOST NODE
-!
-      subroutine HPFC INIT HOST NODE
-      include "hpfc_commons.h"
 
-      integer  inum
-
-      call HPFC CHECK
-
-      HOST NODE MODEL = .true.
-      SPAWN PERFORMED = .false.
-      OUTSIDE SPAWN = .false.
-      
-      NB OF TASKS = MAX SIZE OF PROCS
-
-      call HPFC INIT COMMON PARAM LIB
-
-      call pvmfmytid(MY TID)
-
-!
-! done before the spawn so host is (group, 0)
-!
-      call pvmfjoingroup(inum)
-
-      if (inum.ne.0) then
-         SPAWN PERFORMED = .true.
-      endif
-      end
 
 !
 !-----------------
@@ -973,14 +814,14 @@ _CM5(
 ! HPFC INIT COMMON BUFFER
       subroutine HPFC INIT COMMON BUFFER
       include "hpfc_commons.h"
-      BYTE1 BUFFSIZE = SIZEOFBUFFER
-      STRING BUFFSIZE = SIZEOFBUFFER
-      INTEGER2 BUFFSIZE = SIZEOFBUFFER/2
-      INTEGER4 BUFFSIZE = SIZEOFBUFFER/4
-      REAL4 BUFFSIZE = SIZEOFBUFFER/4
-      REAL8 BUFFSIZE = SIZEOFBUFFER/8
-      COMPLEX8 BUFFSIZE = SIZEOFBUFFER/8
-      COMPLEX16 BUFFSIZE = SIZEOFBUFFER/16
+      HPFC BYTE1 BUFFSIZE = SIZEOFBUFFER
+      HPFC STRING BUFFSIZE = SIZEOFBUFFER
+      HPFC INTEGER2 BUFFSIZE = SIZEOFBUFFER/2
+      HPFC INTEGER4 BUFFSIZE = SIZEOFBUFFER/4
+      HPFC REAL4 BUFFSIZE = SIZEOFBUFFER/4
+      HPFC REAL8 BUFFSIZE = SIZEOFBUFFER/8
+      HPFC COMPLEX8 BUFFSIZE = SIZEOFBUFFER/8
+      HPFC COMPLEX16 BUFFSIZE = SIZEOFBUFFER/16
       SEND NOT INITIALIZED = .TRUE.
       RECEIVED NOT PERFORMED = .TRUE.
       end
@@ -1000,25 +841,7 @@ _CM5(
 !
       call HPFC INIT COMMON PARAM
       end
-!
-!-----------------
-!
-! HPFC DIRECTROUTE IF POSSIBLE
-!
-_direct(`'
-      subroutine HPFC DIRECTROUTE IF POSSIBLE
-      include "hpfc_commons.h"
-      integer nhost, narch, dtid, speed, info
-      character host(50), arch(20)
-      call pvmfconfig(nhost, narch, dtid, host, arch, speed, info)
-      if (nhost.ge.NB OF TASKS) then
-         call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
-      else
-         if (HOSTTID.eq.MYTID) write (unit=0,fmt=*)
-     $        "Warning: no direct route (not enough processors)..."
-      endif
-      end
-)dnl
+
 !
 !
 !-----------------
@@ -1248,32 +1071,6 @@ _direct(`'
       return
       end
 
-!--------------------  HPFC HCAST  -----------------
-!
-! The host send a message to every node.
-!
-      subroutine HPFC HCAST
-      include "hpfc_commons.h"
-      integer info
-      debug(print *, "hcast - ", MCAST HOST)
-      call HPFC BCAST ROOT(MAX SIZE OF PROCS, NODE TIDS(1), MCAST HOST,
-     $     info)
-      MCAST HOST = MCAST HOST + 2
-      debug(print *, "hcast done")
-      end
-
-!--------------------  HPFC NCAST  -----------------
-!
-! every node receive a broadcast from host.
-!
-      subroutine HPFC NCAST
-      include "hpfc_commons.h"
-      debug(print *, "ncast ", MY LID, " - ", MCAST HOST)
-      call HPFC BCAST RECV(HOST LID, MCAST HOST)
-      MCAST HOST = MCAST HOST + 2
-      debug(print *, "ncast done")
-      end
-
 !-------------------- HPFC SND TO HOST   -----------------
 !
 ! a node sends a message to host
@@ -1283,8 +1080,8 @@ _direct(`'
       integer info
       debug(print *, "snd to host ", MYLID, " - ", HOST SND CHANNEL)
       call HPFC SEND(HOST LID, HOST SND CHANNEL, info)
-      HOST SND CHANNEL = HOST SND CHANNEL+2
       debug(print *, "snd to host done")
+      HOST SND CHANNEL = HOST SND CHANNEL+2
       end
 
 !-------------------- HPFC RCV FROM HOST  -----------------
@@ -1320,6 +1117,7 @@ _direct(`'
       subroutine HPFC RCV FROM NODE(lid)
       include "hpfc_commons.h"
       integer lid
+
       debug(print *, "rcv from node ", lid, " - ", RECV CHANNELS(lid))
       call HPFC RECEIVE(lid, RECV CHANNELS(lid))
       RECV CHANNELS(lid) = RECV CHANNELS(lid)+2
