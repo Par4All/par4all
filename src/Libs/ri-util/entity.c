@@ -103,8 +103,7 @@ char * module_name;
 			value_undefined);
     entity_type(l) = (type) MakeTypeStatement();
     entity_storage(l) = (storage) MakeStorageRom();
-    entity_initial(l) = make_value(is_value_constant,
-				   MakeConstantLitteral());
+    entity_initial(l) = make_value(is_value_constant, MakeConstantLitteral());
  
     return(l);
 
@@ -141,7 +140,7 @@ module_local_name(entity e)
     string name = local_name(entity_name(e));
     return name 
 	+ strspn(name, MAIN_PREFIX)
-	+ strspn(name, BLOCKDATA_PREFIX),
+	+ strspn(name, BLOCKDATA_PREFIX)
 	+ strspn(name, COMMON_PREFIX);
 }
 
@@ -458,7 +457,7 @@ static string prefixes[] = {
     BLOCKDATA_PREFIX,
     MAIN_PREFIX,
     ""
-}
+};
 
 entity 
 local_name_to_top_level_entity(string n)
@@ -507,39 +506,29 @@ global_name_to_entity(string m, string n)
  *    benchmarks; variables DIMS conflicts with intrinsics DIMS;
  *    (Francois Irigoin, ?? ???? 1991)
  */
+
+entity 
+find_or_create_entity(string full_name)
+{
+    entity e;
+    
+    if ((e = gen_find_tabulated(full_name, entity_domain)) 
+	!= entity_undefined) {
+	return e;
+    }
+
+    return make_entity(strdup(full_name),
+		       type_undefined, storage_undefined, value_undefined);
+
+}
+
 entity 
 FindOrCreateEntity(
     string package, /* le nom du package */
     string name /* le nom de l'entite */)
 {
-    entity e;
-    string nom;
-
-    nom = concatenate(package, MODULE_SEP_STRING, name, NULL);
-    if ((e = gen_find_tabulated(nom, entity_domain)) != entity_undefined) {
-	return(e);
-    }
-
-    /* Francois Irigoin (FI): the following optimization, partial link at parse
-       time is dangerous for COMMONs; their size is incremented as many
-       times as they are encountered in the whole program;
-
-       It also catches variables named like intrinsic, e.g. DIM */
-
-    /*
-    nom = concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, name, NULL);
-    if ((e = gen_find_tabulated(nom, entity_domain)) != entity_undefined) {
-	-- if(!type_area_p(entity_type(e))) --
-	if(type_functional_p(entity_type(e)) && 
-	   value_intrinsic_p(entity_initial(e)))
-	    return(e);
-    }
-    */
-
-
-    nom = concatenate(package, MODULE_SEP_STRING, name, NULL);
-    return(make_entity(strdup(nom), type_undefined, storage_undefined, 
-			value_undefined));
+    return find_or_create_entity
+	(concatenate(package, MODULE_SEP_STRING, name, 0));
 }
 
 /* FIND_MODULE returns entity. Argument is module_name */
