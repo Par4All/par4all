@@ -154,7 +154,7 @@ Wolfe};
 \end{description}
 }
 
-\domain{Owner = \{ program , module , main , callees , callers , all , select \}}
+\domain{Owner = \{ program , module , main , callees , callers , all ,  select , compilation_unit \}}
 {Le domaine {\tt owner} permet de pre'ciser dans une re`gle de
 de'pendances a quels modules sont rattache'es les ressources lues,
 e'crites, produites ou pre'serve'es. Ce peut e^tre le module lui-me^me
