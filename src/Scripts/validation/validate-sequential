@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/04/10 13:21:14 $, ) 
+# ($Date: 1997/05/02 09:00:18 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -86,7 +86,7 @@ which_executable()
 usage()
 {
   {
-    echo "Usage: $0 [-uvdsth] [-a address] [-l file] [-x pips] [-r dir] [-f file] [modules]"
+    echo "Usage: $0 [-uvdsth] [-a address] [-[lf] file] [-x pips] [-r dir] [modules]"
     echo "  -u: uniq directory to be used"
     echo "  -t: timing"
     echo "  -h: help"
@@ -99,6 +99,7 @@ usage()
     echo "  -x pips: pips to be used (default as Validate)"
     echo "  -y tpips: tpips to be used (idem)"
     echo "  -r dir: directory where to run (default .)"
+    # echo "  -c dir: directory where to communicate (default -r then .)"
     echo "  -i lines: max number of lines for sendig a full message"
     echo "  -p file: properties.rc file"
     echo "  -m file: pipsmake.rc file"
@@ -125,6 +126,7 @@ do
     x) pips_version="$OPTARG" ;;
     y) tpips_version="$OPTARG" ;;
     r) RUNDIR="$OPTARG" ;;
+    # c) COMDIR="$OPTARG" ;;
     f) FILES="$FILES $OPTARG" ;;
     l) LOCKFILE="$OPTARG" ;;
     h) usage 0 ;;
@@ -145,12 +147,13 @@ shift `expr $OPTIND - 1`
 #
 
 debug()
-{
-  echo "$@" >&2
-}
+{ echo "$@" >&2;}
 
 RUNDIR=${RUNDIR:-$PWD}
 cd $RUNDIR || error 2 "cd $RUNDIR returned $?"
+
+# COMDIR=${COMDIR:-${RUNDIR}}
+# test -d $COMDIR || error 2 "no communication dir $COMDIR"
 
 pips_version=${pips_version:-`which_executable pips`}
 tpips_version=${tpips_version:=`which_executable tpips`}
