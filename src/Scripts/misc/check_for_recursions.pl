@@ -132,15 +132,24 @@ foreach my $module (keys %indirect_callees)
 }
 
 print "\nVERTEX COUNT\n";
-for my $module (sort(sub { $vertex_count{$a} <=> $vertex_count{$b}; },
-                     keys %vertex_count))
+
+sub vertex_cmp
+{ 
+    $vertex_count{$b} <=> $vertex_count{$a};
+}
+
+for my $module (sort(vertex_cmp (keys %vertex_count)))
 {
     print STDOUT "$module count is $vertex_count{$module}\n";
 }
 
+sub edge_cmp
+{
+    $edge_count{$b} <=> $edge_count{$a};
+}
+
 print "\nEDGE COUNT\n";
-for my $edge (sort(sub { $edge_count{$a} <=> $edge_count{$b}; }, 
-                   keys %edge_count))
+for my $edge (sort(edge_cmp (keys %edge_count)))
 {
     print "$edge: $edge_count{$edge}\n";
 }
