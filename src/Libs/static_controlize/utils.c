@@ -50,7 +50,7 @@ extern	list		Gscalar_written_forward;
 extern 	list		Gstructure_parameters;
 extern  list		Genclosing_loops;
 extern  list		Genclosing_tests;
-extern  hash_table	Gforward_substitute_table;
+/* extern  hash_table	Gforward_substitute_table; */
 
 
 /*=======================================================================*/
