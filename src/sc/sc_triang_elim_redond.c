@@ -1,6 +1,7 @@
  /* package sc*/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
 extern int fprintf();
@@ -30,7 +31,6 @@ typedef struct
   int      n_other; /* the number of parameters in the system (TCST included) */
   Pvecteur v;       /* the vector to deal with */
 } sort_info, *Psort_info;
-
 
 static Psort_info compute_sort_info(v, b, psi)
 Pvecteur v;
@@ -85,8 +85,7 @@ Psort_info psi;
     return(psi);
 }
 
-/*
- * a constraint is complex if: 
+/* a constraint is complex if: 
  *    |coef|!=1,
  *    the more sort variables,
  *    the more other variables,
@@ -126,6 +125,17 @@ int n_sort_vars, n_vars, inner_first, complex_first;
     return(result);
 }
 
+static float *the_table = (float*) NULL;
+
+static int compare_constraints_with_table(pi1, pi2)
+int *pi1, *pi2;
+{
+    float delta;
+
+    delta = the_table[*pi2] - the_table[*pi1];
+    return(delta==0.0 ? 0 : delta>0.0 ? +1 : -1);
+}
+
 Pcontrainte contrainte_sort_info(c, base, sort_base, 
 				 inner_first, complex_first, info)
 Pcontrainte c;
@@ -138,23 +148,26 @@ int info[][2];
 	nb_of_constraints = nb_elems_list(c),
 	nb_of_variables = vect_size(base)+1,   /* TCST included */
 	nb_of_sort_vars = vect_size(sort_base),
-	*perm   = (int*) malloc(sizeof(int)*nb_of_constraints);    
+	*perm;
     float
-	*values = (float*) malloc(sizeof(float)*nb_of_constraints);
+	*values;
     Pcontrainte
 	pc = CONTRAINTE_UNDEFINED,
-	*tc = (Pcontrainte*) malloc(sizeof(Pcontrainte)*nb_of_constraints);
+	*tc;
     sort_info si;
     
-    if (nb_of_constraints==0)
-    {
-	free(tc), free(values), free(perm);
-	return(c);
-    }
+    if (nb_of_constraints==0) return(c);
+
+    perm   = (int*) malloc(sizeof(int)*nb_of_constraints);
+    values = (float*) malloc(sizeof(float)*nb_of_constraints);
+    tc = (Pcontrainte*) malloc(sizeof(Pcontrainte)*nb_of_constraints);
 
     for (i=0; i<nb_of_sort_vars; i++)
 	info[i][0]=0,
 	info[i][1]=0;
+
+    for (i=0; i<nb_of_constraints; i++)
+	perm[i]=i;
 
     /*  each constraint is given its value for sorting
      */
@@ -174,7 +187,9 @@ int info[][2];
     
     /*   now the table is sorted by decreasing order
      */
-    merge_sort(nb_of_constraints, values, perm, TRUE);
+    the_table = values;
+    qsort(perm, nb_of_constraints, sizeof(int), compare_constraints_with_table);
+    the_table = (float*) NULL;
 
     /*  the permutation given back by the sorting phase is used to
      *  generate again a list of constraints
