@@ -713,7 +713,7 @@ broadcast_conditions(lambda, df_l, sigma)
 
     if (get_debug_level() > 4) {
       fprintf(stderr, "[broadcast_conditions] \t\t\tDF: ");
-      fprint_dataflow(stderr, 0, df, 0);
+      fprint_dataflow(stderr, 0, df);
       fprintf(stderr, "\n");
     }
     if (is_broadcast_p(df)) {
