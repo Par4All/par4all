@@ -316,7 +316,7 @@ $pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM |
 if [ "$SOURCE_FILES" ]
 then
   cd $PGM.database
-  ls */*.f | sed 's/.f$//' | tr '[a-z]' '[A-Z]' > modules
+  ls */*.f_initial | sed 's/.f$//' | tr '[a-z]' '[A-Z]' > modules
   cd ..
 fi
 
