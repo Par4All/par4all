@@ -66,15 +66,16 @@ entity m;
 
     pips_assert("get_module_precondition",entity_module_p(m));
 
-    /*
     if(db_resource_p(DBR_SUMMARY_PRECONDITION, module_local_name(m)))
        p = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION,
 						module_local_name(m),
 						TRUE);
     else
 	p = transformer_undefined;
-	*/
 
+    /* FI: this does not work because the summary preconditions is reset
+       each time it should be accumulated */
+    /*
     if(check_resource_up_to_date(DBR_SUMMARY_PRECONDITION,
 				 module_local_name(m))) {
 	p = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION,
@@ -84,6 +85,7 @@ entity m;
     else {
 	p = transformer_undefined;
     }
+    */
 
     return p;
 }
@@ -792,3 +794,258 @@ call c;
     debug(8,"call_to_summary_precondition","end\n");
 
 }
+
+transformer call_site_to_module_precondition(entity caller, 
+					     entity callee, 
+					     statement s,
+					     call c)
+{
+    /* summary effects for the callee */
+    list seffects_callee = load_summary_effects(callee);
+    /* caller preconditions */
+    transformer caller_prec = transformer_undefined;
+    /* callee preconditions */
+    transformer call_site_prec = transformer_undefined;
+	    
+    set_cumulated_effects_map
+	(effectsmap_to_listmap((statement_mapping)
+			       db_get_memory_resource
+			       (DBR_CUMULATED_EFFECTS,
+				module_local_name(caller), TRUE)));
+
+    set_semantic_map((statement_mapping)
+		     db_get_memory_resource
+		     (DBR_PRECONDITIONS,
+		      module_local_name(caller),
+		      FALSE) );
+
+    /* load caller preconditions */
+    caller_prec = load_statement_semantic(s);
+
+    set_current_module_statement(s);
+
+    /* first, we deal with the caller */
+    set_current_module_entity(caller);
+    /* create htable for old_values ... */
+    module_to_value_mappings(caller);
+    /* add to preconditions the links to the callee formal params */
+    caller_prec = add_formal_to_actual_bindings (c, caller_prec);
+    /* transform the preconditions to make sense for the callee */
+    call_site_prec = precondition_intra_to_inter (callee,
+						  caller_prec,
+						  seffects_callee);
+    /* translate_global_values(e_caller, call_site_prec); */
+    reset_current_module_entity();
+
+    /* Now deal with the callee */
+    set_current_module_entity(callee);
+    /* Set the htable with its variables because now we work
+       in this frame */
+    module_to_value_mappings(callee); 
+    reset_current_module_entity();
+
+    reset_current_module_statement();
+    reset_cumulated_effects_map();
+    reset_semantic_map();
+
+    return call_site_prec;
+}
+
+/* Context to compute summary preconditions */
+
+static entity current_caller = entity_undefined;
+static transformer current_precondition = transformer_undefined;
+
+static entity current_callee = entity_undefined;
+static list summary_effects_of_callee = list_undefined;
+static transformer current_summary_precondition = transformer_undefined;
+
+static bool memorize_precondition(statement s)
+{
+    current_precondition = load_statement_semantic(s);
+
+    return TRUE;
+}
+
+static bool process_call(call c)
+{
+    transformer caller_prec = transformer_undefined;
+    transformer call_site_prec = transformer_undefined;
+
+    if(call_function(c) != current_callee) {
+	return TRUE;
+    }
+
+    ifdebug(8) {
+	debug(8,"process_call","begin\n");
+	debug(8,"Process_call","for module %s\n",
+	      module_local_name(current_callee));
+	debug(8,"process_call",
+	      "call site precondition %x:\n", current_precondition);
+	/* p might not be printable; it may (should!) contain formal parameters
+	   of module m */
+	dump_transformer(current_precondition);
+    }
+
+    /* add to call site preconditions the links to the callee formal params */
+    caller_prec = add_formal_to_actual_bindings (c, current_precondition);
+    ifdebug(8) {
+	debug(8,"process_call",
+	      "call site precondition with bindings %x:\n",
+	      caller_prec);
+	/* caller_prec should not be printable; it should contain
+	 * formal parameters of module callee
+	 */
+	dump_transformer(caller_prec);
+    }
+
+    /* transform the preconditions to make sense for the callee */
+    call_site_prec = 
+	precondition_intra_to_inter (current_callee,
+				     caller_prec,
+				     summary_effects_of_callee);
+    
+    ifdebug(8) {
+	debug(8,"process_call",
+	      "call site precondition with filtered actual parameters:\n");
+	dump_transformer(call_site_prec);
+    }
+
+    translate_global_values(current_caller, call_site_prec);
+
+    ifdebug(8) {
+	debug(8,"process_call",
+	      "new call site precondition in caller's frame:\n");
+	dump_transformer(call_site_prec);
+    }
+    
+    /* Provoque initialization with an undefined transformer... */
+    /*pips_assert("process_call", !transformer_undefined_p(call_site_prec)); */
+
+    if (!transformer_undefined_p(current_summary_precondition)) {
+
+	/* convert global variables in the summary precondition in the
+	 * caller's frame as defined by value mappings (FI, 1 February 1994)
+	 */
+
+	/* p is returned in the callee's frame; there is no need for 
+	 * a translation; the caller's frame should always contain 
+	 * the callee's frame by definition of effects;
+	 *
+	 * Unfortunately, I do not remember *why* I added this translation;
+	 * It was linked to a problem encountered with transformer
+	 * and "invisible" variables, i.e. global variables which
+	 * are indirectly changed by a procedure which does not see them;
+	 * such variables receive an arbitrary existing 
+	 * global name; they may receive different names in different context,
+	 * because there is no canonical name; each time, summary_precondition
+	 * and summary_transformer are used, they must be converted in a 
+	 * unique frame, which can only be the frame of the current module.
+	 * In other words, you have to be in the same environment to
+	 * be allowed to combine preconditions.
+	 *
+	 * FI, 9 February 1994
+	 *
+	 * This may be now useless...
+	 */
+	translate_global_values(current_caller, 
+				current_summary_precondition);
+	ifdebug(8) {
+	    debug(8,"process_call",
+		  "old module precondition in current frame:\n");
+	    dump_transformer(current_summary_precondition);
+	}
+	
+
+	if(transformer_identity_p(current_summary_precondition)) {
+	    /* the former precondition represents the entire space :
+	     * the new precondition must also represent the entire space
+	     * BC, november 1994.
+	     */
+	    transformer_free(call_site_prec);
+	}
+	else { 
+	    transformer new_current_summary_precondition = 
+		transformer_undefined;
+	    new_current_summary_precondition = 
+		transformer_convex_hull(current_summary_precondition,
+					call_site_prec);
+	    transformer_free(current_summary_precondition);
+	    current_summary_precondition = new_current_summary_precondition;
+	
+	}
+    }
+    else {
+	/* the former precondition is undefined. The new precondition
+	 * is defined by the current call site precondition
+	 * BC, november 1994.
+	 */
+	current_summary_precondition = call_site_prec;
+    }
+	
+    ifdebug(8) {
+	debug(8,"add_module_call_site_precondition",
+	      "new module precondition in current frame:\n");
+	dump_transformer(current_summary_precondition);
+    }
+
+    return TRUE;
+}
+
+transformer update_precondition_with_call_site_preconditions(transformer t, 
+							     entity caller,
+							     entity callee)
+{
+    statement caller_statement = (statement) db_get_memory_resource
+	(DBR_CODE, module_local_name(caller), TRUE);
+    /* summary effects for the callee */
+    summary_effects_of_callee = load_summary_effects(callee);
+
+    pips_assert("update_precondition_with_call_site_preconditions",
+		get_current_module_entity() == callee);
+
+    reset_current_module_entity();
+    set_current_module_entity(caller);
+    set_current_module_statement(caller_statement);
+    current_summary_precondition = t;
+    current_caller = caller;
+    current_callee = callee;
+	    
+    set_cumulated_effects_map
+	(effectsmap_to_listmap((statement_mapping)
+			       db_get_memory_resource
+			       (DBR_CUMULATED_EFFECTS,
+				module_local_name(caller), TRUE)));
+
+    set_semantic_map((statement_mapping)
+		     db_get_memory_resource
+		     (DBR_PRECONDITIONS,
+		      module_local_name(caller),
+		      FALSE) );
+
+    module_to_value_mappings(caller);
+
+    gen_multi_recurse(caller_statement,
+		      statement_domain, memorize_precondition, gen_null,
+		      call_domain, process_call, gen_null,
+		      NULL);
+
+    free_value_mappings();
+    reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_effects_map();
+    reset_semantic_map();
+    set_current_module_entity(callee);
+
+    current_caller = entity_undefined;
+    current_callee = entity_undefined;
+    current_precondition = transformer_undefined;
+    summary_effects_of_callee = list_undefined;
+    pips_assert("update_precondition_with_call_site_preconditions",
+		t == transformer_undefined || 
+		t == current_summary_precondition);
+    t = current_summary_precondition;
+    current_summary_precondition = transformer_undefined;
+    return t;
+}
+
