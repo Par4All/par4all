@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.78  1997/09/17 13:47:58  coelho
+ * complex 8/16 distinction.
+ *
  * Revision 1.77  1997/09/17 12:56:57  coelho
  * implicit DCMPLX ignored.
  *
@@ -47,7 +50,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.77 1997/09/17 12:56:57 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.78 1997/09/17 13:47:58 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1668,7 +1671,8 @@ text_entity_declaration(entity module, list ldecl)
          from_hpfc = get_bool_property("PRETTYPRINT_HPFC");
     text r, t_chars;
     list before = NIL, area_decl = NIL, ph = NIL,
-	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, pc = NIL, ps = NIL;
+	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, 
+	pc8 = NIL, pc16 = NIL, ps = NIL;
     /* equivalence_decl = NIL; */
 
     t_chars = make_text(NIL); 
@@ -1762,6 +1766,21 @@ text_entity_declaration(entity module, list ldecl)
 		    break;
 		}
 		break;			
+	    case is_basic_complex:
+		pips_debug(7, "is a complex\n");
+		switch (basic_complex(b))
+		{
+		case 8:
+		    pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : ",");
+		    pc8 = gen_nconc(pc8, words_declaration(e, !from_hpfc));
+		    break;
+		case 16:
+		default:
+		    pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : ",");
+		    pc16 = gen_nconc(pc16, words_declaration(e, !from_hpfc));
+		    break;
+		}
+		break;
 	    case is_basic_logical:
 		pips_debug(7, "is a logical\n");
 		pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ",");
@@ -1771,11 +1790,6 @@ text_entity_declaration(entity module, list ldecl)
 		/* nothing! some in hpfc I guess...
 		 */
 		break; 
-	    case is_basic_complex:
-		pips_debug(7, "is a complex\n");
-		pc = CHAIN_SWORD(pc, pc==NIL ? "COMPLEX " : ",");
-		pc = gen_nconc(pc, words_declaration(e, !from_hpfc));
-		break;
 	    case is_basic_string:
 	    {
 		value v = basic_string(b);
@@ -1834,14 +1848,15 @@ text_entity_declaration(entity module, list ldecl)
     ADD_WORD_LIST_TO_TEXT(r, pi);
     attach_declaration_type_to_words(pi, "INTEGER");
     ADD_WORD_LIST_TO_TEXT(r, pf4);
-    /* Could use attach_declaration_size_type_to_words(): */
     attach_declaration_type_to_words(pf4, "REAL*4");
     ADD_WORD_LIST_TO_TEXT(r, pf8);
     attach_declaration_type_to_words(pf8, "REAL*8");
     ADD_WORD_LIST_TO_TEXT(r, pl);
     attach_declaration_type_to_words(pl, "LOGICAL");
-    ADD_WORD_LIST_TO_TEXT(r, pc);
-    attach_declaration_type_to_words(pc, "COMPLEX");
+    ADD_WORD_LIST_TO_TEXT(r, pc8);
+    attach_declaration_type_to_words(pc8, "COMPLEX*8");
+    ADD_WORD_LIST_TO_TEXT(r, pc16);
+    attach_declaration_type_to_words(pc16, "COMPLEX*16");
     ADD_WORD_LIST_TO_TEXT(r, ps);
     attach_declaration_type_to_words(ps, "CHARACTER");
     MERGE_TEXTS(r, t_chars);
