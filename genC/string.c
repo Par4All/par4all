@@ -119,7 +119,7 @@ concatenate(string next, ...)
 
 	/* reallocates if needed
 	 */
-	if (current+len > buffer_size)
+	if (current+len >= buffer_size)
 	{
 	    int size = MAX(current+len, buffer_size+BUFFER_SIZE_INCREMENT);
 	    string new_buffer = (string) malloc(size);
