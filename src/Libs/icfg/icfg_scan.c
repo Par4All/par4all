@@ -20,6 +20,8 @@
 #include "regions.h"
 #include "resources.h"
 #include "semantics.h"
+#include "complexity_ri.h"
+#include "complexity.h"
 #include "pipsdbm.h"      /* DB_PUT_FILE_RESOURCE is defined there */
 #include "icfg.h"
 
@@ -43,25 +45,31 @@ entity module;
     string module_name = module_local_name(module);
     statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,TRUE);
     string filename = NULL;
+    string localfilename = NULL;
     text r = make_text(NIL);
 
     if ( s == statement_undefined )
 	pips_error("module_to_icfg","statement for module %s\n",module_name);
     else {
 	if (margin==0) {
+	    localfilename = strdup(concatenate
+				   (module_name,
+				    get_bool_property(ICFG_IFs) ? ".icfgc" :
+				    ( get_bool_property(ICFG_DOs) ? ".icfgl" : 
+				     ".icfg") ,
+				    NULL));
 	    filename = strdup(concatenate
-			      (db_get_current_program_directory(), 
-			       "/", module_name,
-			       get_bool_property(ICFG_IFs) ? ".icfgc" :
-			       ( get_bool_property(ICFG_DOs) ? ".icfgl" : 
-				".icfg") ,
-			       NULL));
+			      (db_get_current_workspace_directory(), 
+			       "/", localfilename, NULL));
 
 	    fp = safe_fopen(filename, "w");
 	}
 
 	switch (get_int_property (ICFG_DECOR)) {
 	case ICFG_DECOR_NONE:
+	    break;
+	case ICFG_DECOR_COMPLEXITIES:
+	    MERGE_TEXTS(r,get_text_complexities(module_name));
 	    break;
 	case ICFG_DECOR_TRANSFORMERS:
 	    MERGE_TEXTS(r,get_text_transformers(module_name));
@@ -112,8 +120,9 @@ entity module;
 
 	if (margin == 0 ) {
 	    safe_fclose(fp, filename);
+	    free(filename);
 	    DB_PUT_FILE_RESOURCE(strdup(DBR_ICFG_FILE),
-				 strdup(module_name), filename);
+				 strdup(module_name), localfilename);
 	}
     }
 }
