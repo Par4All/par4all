@@ -1427,6 +1427,8 @@ list l;
  *	V = c*var + Vaux
  *      p = gcd(val,c)
  *      Vnew = (c/p)*pv_elim + (val/p)*Vaux
+ *
+ * BUG: reuse of freed memory.
  */
 Psysteme elim_var_with_eg(ps, init_l, elim_l)
 Psysteme ps;
@@ -1443,41 +1445,46 @@ list *init_l, *elim_l;
 	/* This elimination works only on equalities. While there remains
 	 * equalities, we can eliminate variables.  */
 	eqs = ps->egalites;
-	while(eqs != NULL) {
-	    boolean coeff_one_not_found, var_not_found;
+	while(eqs != NULL)
+	{
+	    boolean coeff_one_not_found, var_found;
 	    entity var = entity_undefined;
 	    Value val = VALUE_ZERO;
 	    Pvecteur init_vec, pv_elim;
+	    Pcontrainte next = eqs->succ;
 
-	    init_vec = eqs->vecteur;
+	    init_vec = vect_dup(eqs->vecteur);
 
 	    /* We look, in vl (i.e. init_l), for a variable that we can
 	     * eliminate in init_vec, i.e. with a coefficient not equal to
 	     * 0. We prefer a coefficient * equal to 1 or -1, so we scan
 	     * all the equality. We take the first * variable of "init_l"
 	     * that has a coeff of 1 or -1. If there is no such *
-	     * variable, we take the first with a coeff not equal to zero.  */
-	    var_not_found = TRUE;
+	     * variable, we take the first with a coeff not equal to zero.
+	     */
+	    var_found = FALSE;
 	    coeff_one_not_found = TRUE;
-	    for(l = vl ; (l != NIL) && coeff_one_not_found; l = CDR(l)) {
+
+	    for(l = vl ; (l != NIL) && coeff_one_not_found; l = CDR(l)) 
+	    {
 		entity crt_var = ENTITY(CAR(l));
 		Value crt_val = vect_coeff((Variable) crt_var, init_vec);
 		
 		if(value_one_p(crt_val) || value_mone_p(crt_val)) {
 		    coeff_one_not_found = FALSE;
-		    var_not_found = FALSE;
+		    var_found = TRUE;
 		    var = crt_var;
 		    val = crt_val;
 		}
-		else if((crt_val != 0) && var_not_found) {
+		else if((value_notzero_p(crt_val)) && !var_found) {
 		    var_not_found = FALSE;
 		    var = crt_var;
 		    val = crt_val;
 		}
 	    }
 	    
-	    /* If we get such a variable, we eliminate it. */
-	    if(! var_not_found) {
+	    if(var_found) /* If we get such a variable, we eliminate it. */
+	    {
 		/* First, we remove it from "vl". */
 		gen_remove(&vl, (chunk *) var);
 		
@@ -1494,20 +1501,20 @@ list *init_l, *elim_l;
 		 * So, we have: pv_elim = -Vaux, with: Vaux = V - val*var
 		 *
 		 * So: pv_elim = val*var - V
-		 * */
-		pv_elim = vect_cl2_ofl_ctrl(VALUE_MONE, vect_dup(init_vec),
-					    VALUE_ONE,
-					    vect_new((Variable) var, val),
-					    NO_OFL_CTRL);
+		 *
+		 * ??? memory leak...
+		 */
+		pv_elim = vect_cl2_ofl_ctrl
+		    (VALUE_MONE, vect_dup(init_vec),
+		     VALUE_ONE,  vect_new((Variable) var, val),
+		     NO_OFL_CTRL);
 		
-		/* We substitute "val*var" by its value (pv_elim) in the
-                   systeme. */
+		/* substitute "val*var" by its value (pv_elim) in the system */
 		substitute_var_with_vec(ps, var, val, vect_dup(pv_elim));
 		/*ps = sc_normalize(ps);*/
 		ps = sc_elim_db_constraints(ps);
 		
-		/* We substitute var by its value (pv_elim) in
-                   "sc_elim". */
+		/* We substitute var by its value (pv_elim) in "sc_elim". */
 		substitute_var_with_vec(sc_elim, var, val, vect_dup(pv_elim));
 		
 		/* The initial equality is added to "sc_elim". */
@@ -1518,7 +1525,9 @@ list *init_l, *elim_l;
 	    }
 	    /* Else, we try on the next equality. */
 	    else
-		eqs = eqs->succ;
+		eqs = next;
+
+	    vect_rm(init_vec);
 	}
     }
     *init_l = vl;
