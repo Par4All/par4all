@@ -18,6 +18,8 @@
 
 #include "wpips.h"
 
+#define DECALAGE_STATUS 100
+
 static Panel_item directory_name, program_name, module_name, memory_name, message;
 
 void show_directory()
@@ -77,72 +79,69 @@ va_dcl
 void show_message(m)
 string m;
 {
-    static char message_buffer[SMALL_BUFFER_LENGTH];
+  static char message_buffer[SMALL_BUFFER_LENGTH];
 
-    (void) vsprintf(message_buffer, m);
+  (void) vsprintf(message_buffer, m);
 
-    xv_set(message, PANEL_VALUE, message_buffer, 0);
+  xv_set(message, PANEL_VALUE, message_buffer, 0);
 }
 
 
 void create_status_subwindow()
 {
-  window_fit(main_panel);
-
-  status_panel = (Panel) xv_create(main_frame, PANEL,
-				   WIN_X, 0,
-				   WIN_BELOW, main_panel,
-				   /* Corrige un bug de peinture en
-				      couleur. */
-				   PANEL_ITEM_X_GAP, 200,
-				   /*				     PANEL_LAYOUT, PANEL_VERTICAL,*/
-				   NULL);
-
-  /* PANEL_VALUE_Y used to be unset before we shifted to xview.3, Apr. 92 */
+  /* Maintenant on n'utilise plus qu'un seul panel pour la fene^tre
+     principale.  En effet, sinon il y a des proble`mes de retrac,age
+     sur e'cran couleur. RK, 15/03/1994. */
+  
   message = 
-    xv_create(status_panel, PANEL_TEXT, 
+    xv_create(main_panel, PANEL_TEXT, 
+	      PANEL_VALUE_X, DECALAGE_STATUS,
+	      PANEL_VALUE_Y, xv_rows(main_panel, 1),
 	      PANEL_LABEL_STRING, "Message:",
 	      PANEL_READ_ONLY, TRUE,
 	      PANEL_VALUE_DISPLAY_LENGTH, 64,
 	      NULL);
 
   directory_name = 
-    xv_create(status_panel, PANEL_TEXT,
-	      PANEL_NEXT_ROW, -1,
+    xv_create(main_panel, PANEL_TEXT, 
+	      PANEL_VALUE_X, DECALAGE_STATUS,
+	      PANEL_VALUE_Y, xv_rows(main_panel, 2),
 	      PANEL_LABEL_STRING, "Directory:",
 	      PANEL_READ_ONLY, TRUE,
 	      PANEL_VALUE_DISPLAY_LENGTH, 64,
 	      NULL);
 
   program_name = 
-    xv_create(status_panel, PANEL_TEXT,
-	      PANEL_NEXT_ROW, -1,
+    xv_create(main_panel, PANEL_TEXT,
+	      PANEL_VALUE_X, DECALAGE_STATUS,
+	      PANEL_VALUE_Y, xv_rows(main_panel, 3),
 	      PANEL_LABEL_STRING, "Workspace:",
-	      PANEL_VALUE_DISPLAY_LENGTH, 10,
+	      PANEL_VALUE_DISPLAY_LENGTH, 20,
 	      PANEL_READ_ONLY, TRUE, 
 	      NULL);
 
   module_name = 
-    xv_create(status_panel, PANEL_TEXT, 
-	      PANEL_NEXT_ROW, -1,
+    xv_create(main_panel, PANEL_TEXT, 
+	      PANEL_VALUE_X, DECALAGE_STATUS,
+	      PANEL_VALUE_Y, xv_rows(main_panel, 4),
 	      PANEL_LABEL_STRING, "Module:",
 	      PANEL_READ_ONLY, TRUE,
-	      PANEL_VALUE_DISPLAY_LENGTH, 10,
+	      PANEL_VALUE_DISPLAY_LENGTH, 20,
 	      NULL);
 
   memory_name = 
-    xv_create(status_panel, PANEL_TEXT, 
-	      /*		  PANEL_VALUE_X, xv_col(status_panel, 2), */
+    xv_create(main_panel, PANEL_TEXT,
+	      PANEL_ITEM_X_GAP, DECALAGE_STATUS,
+	      PANEL_VALUE_Y, xv_rows(main_panel, 4),
 	      PANEL_LABEL_STRING, "Memory:",
 	      PANEL_READ_ONLY, TRUE,
 	      PANEL_VALUE_DISPLAY_LENGTH, 10,
 	      NULL);
 
-  window_fit(status_panel);
+  window_fit(main_panel);
   window_fit(main_frame);
 
   show_directory();
   show_program();
   show_module();
-
 }
