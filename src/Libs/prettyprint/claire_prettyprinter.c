@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.18  2004/08/04 07:19:17  irigoin
+   Better handling of comments. CONTINUE are ignored.
+
    Revision 1.17  2004/08/03 09:47:04  hurbain
    Bugs corrections
 
@@ -269,7 +272,7 @@ static string claire_dim_string(list ldim, string name)
 	  else
 	    origins = strdup(concatenate(origins, int_to_string(low), NULL));
 	}
-	else pips_user_error("Array origins must be integer");
+	else pips_user_error("Array origins must be integer\n");
 
 	if (expression_integer_value(eup, &up)){
 	  if(nbdim != 1)
@@ -277,7 +280,7 @@ static string claire_dim_string(list ldim, string name)
 	  else
 	    dimensions = strdup(concatenate(dimensions, int_to_string(up-low+1), NULL));
 	}
-	else pips_user_error("Array dimensions must be integer");
+	else pips_user_error("Array dimensions must be integer\n");
       }, ldim);
       *nbdimptr = nbdim;
       gen_array_append(array_dims, nbdimptr);
@@ -300,7 +303,7 @@ static string this_entity_clairedeclaration(entity var)
   /*  Many possible combinations */
 
   if (strstr(name,TYPEDEF_PREFIX) != NULL)
-    pips_user_error("Structs not supported");
+    pips_user_error("Structs not supported\n");
 
   switch (type_tag(t)) {
   case is_type_variable:
@@ -314,21 +317,21 @@ static string this_entity_clairedeclaration(entity var)
     }
   case is_type_struct:
     {
-      pips_user_error("Struct not allowed");
+      pips_user_error("Struct not allowed\n");
       break;
     }
   case is_type_union:
     {
-      pips_user_error("Union not allowed");
+      pips_user_error("Union not allowed\n");
       break;
     }
   case is_type_enum:
     {
-      pips_user_error("Enum not allowed");
+      pips_user_error("Enum not allowed\n");
       break;
     }
   default:
-    pips_user_error("Something not allowed here");
+    pips_user_error("Something not allowed here\n");
   }
  
   return result;
@@ -393,7 +396,7 @@ static string claire_call_from_assignation(call c, int task_number, bool * input
       break;
     }
     default:{
-      pips_user_error("only call and references allowed here");
+      pips_user_error("only call and references allowed here\n");
     }
     }
   }, arguments);
@@ -458,12 +461,12 @@ static void claire_call_from_indice(call c, string * offset_array, string paving
 	  claire_call_from_indice(syntax_call(args[1]), offset_array, paving_array, fitting_array);
 	}
 	else {
-	  pips_user_error("APOTRES doesn't allow negative coefficients in paving and fitting matrices");
+	  pips_user_error("APOTRES doesn't allow negative coefficients in paving and fitting matrices\n");
 	}
       }
       else if(same_string_p(funname, "*")){
 	if(syntax_tag(args[0]) != is_syntax_call || syntax_tag(args[1]) != is_syntax_reference || gen_length(call_arguments(syntax_call(args[0])))!=0 ){
-	  pips_user_error("Only scalar * reference are allowed here. Please develop expressions.");
+	  pips_user_error("Only scalar * reference are allowed here. Please develop expressions.\n");
 	}
 	else {
 	  int intern_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(syntax_reference(args[1]))));
@@ -479,14 +482,14 @@ static void claire_call_from_indice(call c, string * offset_array, string paving
       }
     }
     else{
-      pips_user_error("only linear expression of indices allowed");
+      pips_user_error("only linear expression of indices allowed\n");
     }
   }
   else if(gen_length(arguments) == 0){
     *offset_array = funname;
   }
   else{
-    pips_user_error("only +, -, * and constants allowed");
+    pips_user_error("only +, -, * and constants allowed\n");
   }
 }
 
@@ -540,7 +543,7 @@ static string claire_array_in_task(reference r, bool first, int task_number){
       break;
     }
     default:{
-      pips_user_error("Only call and reference allowed in indices");
+      pips_user_error("Only call and reference allowed in indices.\n");
       break;
     }
     }
@@ -624,14 +627,14 @@ static string claire_call_from_loopnest(call c, int task_number){
   string name = claire_entity_local_name(called);
 
   if(!same_string_p(name, "="))
-    pips_user_error("only assignation allowed here");
+    pips_user_error("Only assignation allowed here.\n");
   
   MAP(EXPRESSION, e, {
     s = expression_syntax(e);
     switch(syntax_tag(s)){
     case is_syntax_call:{
       if(first)
-	pips_user_error("call not allowed in left-hand side argument of assignation");
+	pips_user_error("Call not allowed in left-hand side argument of assignation.\n");
       else
 	result = strdup(concatenate(result, claire_call_from_assignation(syntax_call(s), task_number, &input_provided), NULL));
       break;
@@ -669,6 +672,53 @@ static string claire_call_from_loopnest(call c, int task_number){
 }
 
 
+static call sequence_call(sequence seq)
+{
+  call mc = call_undefined; /* meaningful call */
+  int nc = 0; /* number of calls */
+
+  MAP(STATEMENT, s, {
+    if(continue_statement_p(s))
+      ;
+    else if(statement_call_p(s)) {
+      mc = instruction_call(statement_instruction(s));
+      nc++;
+    }
+    else {
+      nc = 0;
+      break;
+    }
+  }, sequence_statements(seq));
+
+  if(nc!=1)
+    mc = call_undefined;
+
+  return mc;
+}
+
+static loop sequence_loop(sequence seq)
+{
+  call ml = loop_undefined; /* meaningful loop */
+  int nl = 0; /* number of loops */
+
+  MAP(STATEMENT, s, {
+    if(continue_statement_p(s))
+      ;
+    else if(statement_loop_p(s)) {
+      ml = instruction_loop(statement_instruction(s));
+      nl++;
+    }
+    else {
+      nl = 0;
+      break;
+    }
+  }, sequence_statements(seq));
+
+  if(nl!=1)
+    ml = loop_undefined;
+
+  return ml;
+}
 
 static call claire_loop_from_loop(loop l, string * result, int task_number){
   
@@ -698,17 +748,27 @@ static call claire_loop_from_loop(loop l, string * result, int task_number){
     return claire_loop_from_loop(l, result, task_number);
     break;
   }
-  case is_instruction_call:{
+  case is_instruction_call: {
     call c = instruction_call(i);
     return c;
   }
-  default:
-    pips_user_error("only loops and calls allowed in a loop");
+  case is_instruction_sequence: {
+    /* The sequence should contain only one meaningful call or one meaningful loop. */
+    call c = sequence_call(instruction_sequence(i));
+    loop l = sequence_loop(instruction_sequence(i));
+    if(!call_undefined_p(c))
+      return c;
+    if(!loop_undefined_p(l))
+      return claire_loop_from_loop(l, result, task_number);
+    }
+    default:
+    pips_user_error("Only loops and calls allowed in a loop.\n");
   }
+return call_undefined;
 }
 
 
-/* we enter a loopnest. the first loop is obligatory an extern loop */
+/* We enter a loop nest. The first loop must be an extern loop. */
 static string claire_loop_from_sequence(loop l, int task_number){
   statement s = loop_body(l);
   call c;
@@ -739,7 +799,7 @@ static string claire_loop_from_sequence(loop l, int task_number){
   //*up = claire_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
 
   if((*name)[0] == 'M'){
-    pips_user_error("At least one extern loop is needed");
+    pips_user_error("At least one extern loop is needed.\n");
   }
   else{
     gen_array_append(extern_indices_array, name);
@@ -758,11 +818,20 @@ static string claire_loop_from_sequence(loop l, int task_number){
       c = instruction_call(ins);
     }
     break;
+  case is_instruction_sequence:
+    /* The sequence should contain only one meaningful call */
+    if(!call_undefined_p(c=sequence_call(instruction_sequence(ins))))
+      break;
+    if(!loop_undefined_p(l=sequence_loop(instruction_sequence(ins)))) {
+      c = claire_loop_from_loop(l, &result, task_number);
+      break;
+    }
+    ;
   default:
-    pips_user_error("only loops and calls allowed in a loop");
+    pips_user_error("Only loops and one significant call allowed in a loop.\n");
   }
 
-  /* External loopnest depth*/
+  /* External loop nest depth */
   result = strdup(concatenate(result, int_to_string(gen_array_nitems(extern_indices_array)), ",", NL, TAB, TAB, NULL));
   /* add external upperbounds */
   result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));
@@ -795,6 +864,7 @@ static string claire_statement_from_sequence(statement s, int task_number){
   string result = "";
   int j;
   instruction i = statement_instruction(s);
+
   switch(instruction_tag(i)){
   case is_instruction_loop:{
     loop l = instruction_loop(i);
@@ -802,15 +872,13 @@ static string claire_statement_from_sequence(statement s, int task_number){
     break;
   }
   case is_instruction_call:{
-    call c = instruction_call(i);
-    entity called = call_function(c);
-    string name = claire_entity_local_name(called);
-    if(!same_string_p(name, "RETURN"))
-      pips_user_error("Only RETURN call allowed here");
+    /* RETURN should only be allowed as the last statement in the sequence */
+    if(!return_statement_p(s) && !continue_statement_p(s))
+      pips_user_error("Only RETURN and CONTINUE allowed here.\n");
     break;
   }
   default:{
-    pips_user_error("Only loops and calls allowed here");
+    pips_user_error("Only loops and calls allowed here.\n");
   }
   }
 
@@ -827,10 +895,18 @@ static string claire_sequence_from_task(sequence seq){
   MAP(STATEMENT, s,
   {
     string oldresult = result;
-    string current = claire_statement_from_sequence(s, task_number++);
-    result = strdup(concatenate(oldresult, current, NULL));
-    free(current);
-    free(oldresult);
+    string current = claire_statement_from_sequence(s, task_number);
+
+    if(strlen(current)==0) {
+      free(current);
+      result = oldresult;
+    }
+    else {
+      result = strdup(concatenate(oldresult, current, NULL));
+      free(current);
+      free(oldresult);
+      task_number++;
+    }
   }, sequence_statements(seq));
   return result;
 }
