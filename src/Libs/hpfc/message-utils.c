@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1995/09/15 15:54:17 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1995/10/03 15:52:33 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -15,19 +15,15 @@
 Pvecteur the_index_of_vect(v0)
 Pvecteur v0;
 {
-    Pvecteur
-	v1 = vect_del_var(v0, TCST),
-	v2 = vect_del_var(v1, DELTAV),
-	v3 = vect_del_var(v2, TEMPLATEV),
-	v4 = vect_del_var(v3, TSHIFTV);
+    Pvecteur v1 = vect_del_var(v0, TCST);
 
-    assert(vect_size(v4)==1);
+    vect_erase_var(&v1, DELTAV);
+    vect_erase_var(&v1, TEMPLATEV);
+    vect_erase_var(&v1, TSHIFTV);
 
-    vect_rm(v1);
-    vect_rm(v2);
-    vect_rm(v3);
+    assert(vect_size(v1)==1);
 
-    return(v4);
+    return v1;
 }
 
 /* list add_to_list_of_ranges_list(l, r)
@@ -60,8 +56,7 @@ range r;
 list dup_list_of_ranges_list(l)
 list l;
 {
-    list
-	result = NIL;
+    list result = NIL;
     
     MAPL(cc,
      {
@@ -276,28 +271,20 @@ Pvecteur v;
 
     assert(NumberOfDimension(array)==gen_length(lr));
 
-    for ( ; l!=NIL ; i++, l=CDR(l))
+    for (; l; i++, POP(l))
     {
-	int 
-	    procdim = 0;
-	bool
-	    distributed_dim = ith_dim_distributed_p(array, i, &procdim);
-	int 
-	    neighbour = ((distributed_dim)?
+	int procdim = 0;
+	bool distributed_dim = ith_dim_distributed_p(array, i, &procdim);
+	int neighbour = ((distributed_dim)?
 			 ((int) vect_coeff((Variable) procdim, v)):(0));
-	range
-	    r = RANGE(CAR(l));
+	range r = RANGE(CAR(l));
 
 	if (neighbour!=0)
 	{
-	    entity
-		newarray = load_new_node(array);
-	    dimension
-		nadim = FindIthDimension(newarray, i);
-	    expression
-		incr  = range_increment(r);
-	    int
-		lom1  = HpfcExpressionToInt(dimension_lower(nadim))-1,
+	    entity newarray = load_new_node(array);
+	    dimension nadim = FindIthDimension(newarray, i);
+	    expression incr  = range_increment(r);
+	    int lom1  = HpfcExpressionToInt(dimension_lower(nadim))-1,
 		upp1  = HpfcExpressionToInt(dimension_upper(nadim))+1,
 		width = (HpfcExpressionToInt(range_upper(r)) -
 			 HpfcExpressionToInt(range_lower(r)));
@@ -332,17 +319,14 @@ Pvecteur v;
     
     for ( ; l!=NIL ; i++, l=CDR(l))
     {
-	range
-	    r = RANGE(CAR(l));
-	int
-	    neighbour = (int) vect_coeff((Variable) i, v);
+	range r = RANGE(CAR(l));
+	int neighbour = (int) vect_coeff((Variable) i, v);
 
 	if (neighbour==0)
 	    domain = gen_nconc(domain, CONS(RANGE, r, NIL)); /* shared! */
 	else
 	{
-	    int
-		lo = HpfcExpressionToInt(range_lower(r)),
+	    int lo = HpfcExpressionToInt(range_lower(r)),
 		up = HpfcExpressionToInt(range_upper(r));
 
 	    domain = 
@@ -391,24 +375,14 @@ message m1, m2;
 bool lrange_larger_p(lr1, lr2)
 list lr1, lr2;
 {
-    list
-	l1 = lr1,
-	l2 = lr2;
+    list l1 = lr1, l2 = lr2;
 
     assert(gen_length(lr1) == gen_length(lr2));
     
-    for ( ; l1!=NIL ; l1=CDR(l1), l2=CDR(l2))
+    for ( ; l1; POP(l1), POP(l2))
     {
-	range
-	    r1 = RANGE(CAR(l1)),
-	    r2 = RANGE(CAR(l2));
-	int
-	    lo1 = -1, 
-	    up1 = -1, 
-	    in1 = -1, 
-	    lo2 = -1, 
-	    up2 = -1, 
-	    in2 = -1;
+	range r1 = RANGE(CAR(l1)), r2 = RANGE(CAR(l2));
+	int lo1, up1, in1, lo2, up2, in2;
 	bool
 	    blo1 = hpfc_integer_constant_expression_p(range_lower(r1), &lo1),
 	    bup1 = hpfc_integer_constant_expression_p(range_upper(r1), &up1),
@@ -435,9 +409,9 @@ list lr1, lr2;
 	    return(FALSE);
     }
 
-    debug(7, "lrange_larger_p", "returning TRUE\n");
+    pips_debug(7, "returning TRUE\n");
 
-    return(TRUE);
+    return TRUE;
 }
 
 /*   That is all
