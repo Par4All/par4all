@@ -300,24 +300,40 @@ bool db_resource_p(string rname, string oname)
     return db_resource_loaded_p(r) || db_resource_stored_p(r);
 }
 
-/*
-void db_check_time_of_all_resources(string rname, string oname)
+static void db_load_resource(string rname, string oname, db_resource r)
 {
-  pips_debug(2, "checking time of all resources...");
+  int current_time;
+  pips_debug(7, "loading %s of %s\n", rname, oname);
+  pips_assert("resource stored", db_resource_stored_p(r));
+  db_resource_pointer(r) = dbll_load_resource(rname, oname);
+  db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
 
-  DB_RESOURCES_MAP(os, or,
+  if (displayable_file_p(rname)) /* time the resource, not the stored */
   {
-    DB_OWNED_RESOURCES_MAP(rs, r,
+    current_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
+    if (current_time!=db_resource_file_time(r)) 
     {
-      string rn = db_symbol_name(rs);
-      string on = db_symbol_name(os);
-      db_time_of_resource(rn, on);
-    },
-			   or);
-  },
-		   get_pips_database());
+      pips_user_warning("resource file %s[%s] changed %d to %d!\n", 
+			rname, oname, db_resource_file_time(r), current_time);
+      db_resource_file_time(r) = current_time;
+
+      /* we update the logical time for this new resource... 
+       */
+      db_inc_logical_time();
+      db_resource_time(r) = db_get_logical_time();
+      db_inc_logical_time();
+    }
+  }
+  else
+  {
+    current_time = dbll_stat_resource_file(rname, oname, FALSE);
+    if (current_time != db_resource_file_time(r)) {
+      pips_user_warning("file of internal resource %s[%s] changed!\n", 
+			rname, oname);
+      db_resource_file_time(r) = current_time;
+    }
+  }
 }
-*/
 
 int db_time_of_resource(string rname, string oname)
 {
@@ -325,8 +341,15 @@ int db_time_of_resource(string rname, string oname)
     if (db_resource_undefined_p(r) || db_resource_required_p(r))
 	return -1;
 
-    /* loaded or stored */
-    if ((db_resource_loaded_p(r) || db_resource_stored_p(r)) && 
+    /* we load the resource if it is a simple file name...
+     * so as to be able to check it next.
+     */
+    if (db_resource_stored_p(r) && displayable_file_p(rname)) {
+	db_load_resource(rname, oname, r); /* does it unlink the file? */
+    }
+
+    /* loaded */
+    if (db_resource_loaded_p(r) && 
 	displayable_file_p(rname) &&
 	dbll_database_managed_file_p(db_resource_pointer(r)))
     {
@@ -344,6 +367,7 @@ int db_time_of_resource(string rname, string oname)
 	    db_inc_logical_time();
 	}
     }
+
     return db_resource_time(r);
 }
 
@@ -373,18 +397,6 @@ static void db_save_and_free_resource(
         db_resource_pointer(r) = string_undefined;
 	db_delete_resource(rname, oname);
     }
-}
-
-static void db_load_resource(string rname, string oname, db_resource r)
-{
-    pips_debug(7, "loading %s of %s\n", rname, oname);
-    pips_assert("resource stored", db_resource_stored_p(r));
-    db_resource_pointer(r) = dbll_load_resource(rname, oname);
-    db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
-    db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, FALSE);
-    if (displayable_file_p(rname)) /* time the resource, not the stored */
-	db_resource_file_time(r) =
-	    dbll_stat_local_file(db_resource_pointer(r), FALSE);
 }
 
 /* some way to identify a resource... count be an id...
