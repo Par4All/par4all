@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/23 09:02:35 $, 
+# $Date: 1997/10/21 06:29:24 $, 
 
 YFLAGS+=	-d
 
@@ -12,7 +12,8 @@ LIB_CFILES=	pipsmake.c \
 		initializer.c \
 		callgraph.c \
 		openclose.c \
-		callback.c
+		callback.c \
+		unsplit.c
 
 LIB_HEADERS=	readmakefile.l \
 		readmakefile.y \
