@@ -45,6 +45,8 @@ typedef long Value;
 #define VALUE_NEGZ_P(val) (val<=VALUE_ZERO)
 #define VALUE_ZERO_P(val) (val==VALUE_ZERO)
 #define VALUE_NOTZERO_P(val) (val!=VALUE_ZERO)
+#define VALUE_ONE_P(val) (val==VALUE_ONE)
+#define VALUE_MONE_P(val) (val==VALUE_MONE)
 
 /* valeur absolue */
 #ifndef ABS
