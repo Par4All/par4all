@@ -10,6 +10,9 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.55  2001/02/07 18:14:21  irigoin
+  * New C format + support for recomputing loop fixpoints with precondition information
+  *
   * Revision 1.54  2000/11/23 17:17:31  irigoin
   * Function moved into unstructured.c, typing in debugging statement,
   * consistency checks
@@ -251,6 +254,112 @@ effects_to_arguments(list fx) /* list of effects */
     return args;
 }
 
+/* The loop initialization is performed before tf */
+transformer transformer_add_loop_index_initialization(transformer tf, loop l)
+{
+  entity i = loop_index(l);
+  range r = loop_range(l);
+  normalized nlb = NORMALIZE_EXPRESSION(range_lower(r));
+
+  if(entity_has_values_p(i) && normalized_linear_p(nlb)) {
+    Psysteme sc = (Psysteme) predicate_system(transformer_relation(tf));
+    Pcontrainte eq = CONTRAINTE_UNDEFINED;
+    Pvecteur v_lb = vect_dup(normalized_linear(nlb));
+    Pbase b_tmp, b_lb = make_base_from_vect(v_lb); 
+    entity i_init = entity_to_old_value(i);
+
+    vect_add_elem(&v_lb, (Variable) i_init, VALUE_MONE);
+    eq = contrainte_make(v_lb);
+    /* The new variables in eq must be added to sc; otherwise,
+     * further consistency checks core dump. bc.
+     */
+    /* sc_add_egalite(sc, eq); */
+    /* The call to sc_projection_with_eq frees eq */
+    sc = sc_projection_by_eq(sc, eq, (Variable) i_init);
+    b_tmp = sc_base(sc);
+    sc_base(sc) = base_union(b_tmp, b_lb);
+    sc_dimension(sc) = base_dimension(sc_base(sc));
+    base_rm(b_tmp);
+    base_rm(b_lb);
+    if(SC_RN_P(sc)) {
+      /* FI: a NULL is not acceptable; I assume that we cannot
+       * end up with a SC_EMPTY...
+       */
+      predicate_system_(transformer_relation(tf)) =
+	newgen_Psysteme
+	(sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED));
+    }
+    else
+      predicate_system_(transformer_relation(tf)) = 
+	newgen_Psysteme(sc);
+  }
+  else if(entity_has_values_p(i)) {
+    /* Get rid of the initial value since it is unknowable */
+    entity i_init = entity_to_old_value(i);
+    list l_i_init = CONS(ENTITY, i_init, NIL);
+
+    tf = transformer_projection(tf, l_i_init);
+  }
+
+return tf;
+}
+
+transformer transformer_add_loop_index_incrementation(transformer tf, loop l)
+{
+  entity i = loop_index(l);
+  range r = loop_range(l);
+  expression incr = range_increment(r);
+  Pvecteur v_incr = VECTEUR_UNDEFINED;
+
+  pips_assert("Transformer tf is consistent before update",
+	      transformer_consistency_p(tf));
+
+  /* it does not contain the loop index update
+     the loop increment expression must be linear to find inductive 
+     variables related to the loop index */
+  if(!VECTEUR_UNDEFINED_P(v_incr = expression_to_affine(incr))) {
+    if(entity_has_values_p(i)) {
+      if(value_mappings_compatible_vector_p(v_incr)) {
+	tf = transformer_add_variable_incrementation(tf, i, v_incr);
+      }
+      else {
+	entity i_old = entity_to_old_value(i);
+	entity i_new = entity_to_new_value(i);
+	Psysteme sc = predicate_system(transformer_relation(tf));
+	Pbase b = sc_base(sc);
+	
+	transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), i);
+	b = base_add_variable(b, (Variable) i_old);
+	b = base_add_variable(b, (Variable) i_new);
+	sc_base(sc) = b;
+	sc_dimension(sc) = base_dimension(sc_base(sc));
+      }
+    }
+    else {
+      pips_user_warning("non-integer or equivalenced loop index %s?\n",
+			entity_local_name(i));
+    }
+  }
+  else {
+    if(entity_has_values_p(i)) {
+      entity i_old = entity_to_old_value(i);
+      entity i_new = entity_to_new_value(i);
+      Psysteme sc = predicate_system(transformer_relation(tf));
+      Pbase b = sc_base(sc);
+
+      transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), i);
+      b = base_add_variable(b, (Variable) i_old);
+      b = base_add_variable(b, (Variable) i_new);
+      sc_base(sc) = b;
+      sc_dimension(sc) = base_dimension(sc_base(sc));
+    }
+  }
+
+  pips_assert("Transformer tf is consistent after update",
+	      transformer_consistency_p(tf));
+
+  return tf;
+}
 
 /* The transformer associated to a DO loop does not include the exit 
  * condition because it is used to compute the precondition for any 
@@ -261,181 +370,131 @@ effects_to_arguments(list fx) /* list of effects */
  */
 
 static transformer 
-loop_to_transformer(loop l, list e) /* effects of loop l */
+loop_to_transformer(loop l)
 {
-    /* loop transformer tf = tfb* or tf = tfb+ or ... */
-    transformer tf;
-    /* loop body transformer */
-    transformer tfb;
+  /* loop transformer tf = tfb* or tf = tfb+ or ... */
+  transformer tf;
+  /* loop body transformer */
+  transformer tfb;
+  range r = loop_range(l);
+  statement s = loop_body(l);
 
-    entity i = loop_index(l);
-    range r = loop_range(l);
-    expression incr = range_increment(r);
-    Pvecteur v_incr = VECTEUR_UNDEFINED;
-    statement s = loop_body(l);
+  pips_debug(8,"begin\n");
 
-    debug(8,"loop_to_transformer","begin\n");
+  /* compute the loop body transformer */
+  tfb = transformer_dup(statement_to_transformer(s));
+  tfb = transformer_add_loop_index_incrementation(tfb, l);
 
-    if(pips_flag_p(SEMANTICS_FIX_POINT)) {
-	/* compute the loop body transformer */
-	tfb = transformer_dup(statement_to_transformer(s));
-	/* it does not contain the loop index update
-	   the loop increment expression must be linear to find inductive 
-	   variables related to the loop index */
-	if(!VECTEUR_UNDEFINED_P(v_incr = expression_to_affine(incr))) {
-	    if(entity_has_values_p(i))
-		tfb = transformer_add_loop_index(tfb, i, v_incr);
-	    else
-		user_warning("loop_to_transformer", 
-			     "non-integer loop index %s?\n",
-			     entity_local_name(i));
-	}
+  /* compute tfb's fix point according to pips flags */
+  tf = (* transformer_fix_point_operator)(tfb);
 
-	/* compute tfb's fix point according to pips flags */
-	if(pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
-	    tf = transformer_halbwachs_fix_point(tfb);
-	}
-	else {
-	    /* FI: it might have been easier to pass tf as an argument to
-	     * transformer_equality_fix_point() and to update it with
-	     * new equations...
-	     */
-	    /* transformer ftf = transformer_equality_fix_point(tfb); */
-	    transformer ftf = (* transformer_fix_point_operator)(tfb);
-	    normalized nlb = NORMALIZE_EXPRESSION(range_lower(r));
+  ifdebug(8) {
+    pips_debug(8, "intermediate fix-point tf=\n");
+    fprint_transformer(stderr, tf, external_value_name);
+  }
 
-	    if(*transformer_fix_point_operator==transformer_equality_fix_point) {
-		/* The result must be fixed... because
-                   transformer_equality_fix_point() looses some vital
-                   information */
-		Psysteme fsc = predicate_system(transformer_relation(ftf));
-		Psysteme sc = SC_UNDEFINED;
-		Pcontrainte eq = CONTRAINTE_UNDEFINED;
-		Pbase new_b = BASE_UNDEFINED;
-	    
-		tf = effects_to_transformer(e);
-		sc = (Psysteme) predicate_system(transformer_relation(tf));
+  /* add initialization for the unconditional initialization of the loop
+     index variable */
+  tf = transformer_add_loop_index_initialization(tf, l);
 
-		/* compute the basis for tf and ftf */
+  ifdebug(8) {
+    debug(8, "loop_to_transformer", "full fix-point tf=\n");
+    fprint_transformer(stderr, tf, external_value_name);
+    debug(8, "loop_to_transformer", "end\n");
+  }
 
-		/* FI: just in case.
-		 * I do not understand why sc_base(fsc) is not enough.
-		 * I do not understand why I used effects_to_transformer() instead
-		 * of transformer_indentity()...
-		 */
-		new_b = base_union(sc_base(fsc), sc_base(sc));
-		base_rm(sc_base(sc));
-		sc_base(sc) = new_b;
-		sc_dimension(sc) = base_dimension(new_b);
+  /* we have a problem here: to compute preconditions within the
+     loop body we need a tf using private variables; to return
+     the loop transformer, we need a filtered out tf; only
+     one hook is available in the ri..; let'a assume there
+     are no private variables and that if they are privatizable
+     they are not going to get in our way */
 
-		/* add equations from ftf to tf */
-		for(eq = sc_egalites(fsc); !CONTRAINTE_UNDEFINED_P(eq); ) {
-		    Pcontrainte neq;
-
-		    neq = eq->succ;
-		    eq->succ = NULL;
-		    sc_add_egalite(sc, eq);
-		    eq = neq;
-		}
-
-		/* add inequalities from ftf to tf */
-		for(eq = sc_inegalites(fsc); !CONTRAINTE_UNDEFINED_P(eq); ) {
-		    Pcontrainte neq;
-		    
-		    neq = eq->succ;
-		    eq->succ = NULL;
-		    sc_add_inegalite(sc, eq);
-		    eq = neq;
-		}
-
-		/* FI: I hope that inequalities will be taken care of some day! */
-		/* Well, in June 1997.. */
-
-		sc_egalites(fsc) = CONTRAINTE_UNDEFINED;
-		sc_inegalites(fsc) = CONTRAINTE_UNDEFINED;
-		free_transformer(ftf);
-	    }
-	    else {
-		tf = ftf;
-	    }
-
-	    ifdebug(8) {
-		pips_debug(8, "intermediate fix-point tf=\n");
-		fprint_transformer(stderr, tf, external_value_name);
-	    }
-
-	    /* add initialization for the loop index variable */
-	    /* FI: this seems to be all wrong because a transformer cannot
-	     * state anything about its initial state...
-	     *
-	     * Also, sc basis should be updated!
-	     *
-	     * I change my mind: let's use the lower bound anyway since it
-	     * make sense as soon as i_init is eliminated in the transformer
-	     */
-	    if(entity_has_values_p(i) && normalized_linear_p(nlb)) {
-		Psysteme sc = (Psysteme) predicate_system(transformer_relation(tf));
-		Pcontrainte eq = CONTRAINTE_UNDEFINED;
-		Pvecteur v_lb = vect_dup(normalized_linear(nlb));
-		Pbase b_tmp, b_lb = make_base_from_vect(v_lb); 
-		entity i_init = entity_to_old_value(i);
-
-		vect_add_elem(&v_lb, (Variable) i_init, VALUE_MONE);
-		eq = contrainte_make(v_lb);
-		/* The new variables in eq must be added to sc; otherwise,
-		 * further consistency checks core dump. bc.
-		 */
-		/* sc_add_egalite(sc, eq); */
-		/* The call to sc_projection_with_eq frees eq */
-		sc = sc_projection_by_eq(sc, eq, (Variable) i_init);
-		b_tmp = sc_base(sc);
-		sc_base(sc) = base_union(b_tmp, b_lb);
-		sc_dimension(sc) = base_dimension(sc_base(sc));
-		base_rm(b_tmp);
-		base_rm(b_lb);
-		if(SC_RN_P(sc)) {
-		    /* FI: a NULL is not acceptable; I assume that we cannot
-		     * end up with a SC_EMPTY...
-		     */
-		    predicate_system_(transformer_relation(tf)) =
-			newgen_Psysteme
-			(sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED));
-		}
-		else
-		    predicate_system_(transformer_relation(tf)) = 
-			newgen_Psysteme(sc);
-	    }
-
-	    ifdebug(8) {
-		debug(8, "loop_to_transformer", "full fix-point tf=\n");
-		fprint_transformer(stderr, tf, external_value_name);
-		debug(8, "loop_to_transformer", "end\n");
-	    }
-
-	}
-	/* we have a problem here: to compute preconditions within the
-	   loop body we need a tf using private variables; to return
-	   the loop transformer, we need a filtered out tf; only
-	   one hook is available in the ri..; let'a assume there
-	   are no private variables and that if they are privatizable
-	   they are not going to get in our way */
-    }
-    else {
-	/* basic cheap version: do not use the loop body transformer and
-	   avoid fix-points; local variables do not have to be filtered out
-	   because this was already done while computing effects */
-
-	(void) statement_to_transformer(s);
-	tf = effects_to_transformer(e);
-    }
-
-    ifdebug(8) {
-	(void) fprintf(stderr,"%s: %s\n","loop_to_transformer",
-		       "resultat tf =");
-	(void) (void) print_transformer(tf);
-    }
+  ifdebug(8) {
+    (void) fprintf(stderr,"%s: %s\n","loop_to_transformer",
+		   "resultat tf =");
+    (void) (void) print_transformer(tf);
     debug(8,"loop_to_transformer","end\n");
-    return tf;
+  }
+
+  return tf;
+}
+
+/* The index variable is always initialized and then the loop is either
+   entered and exited or not entered */
+transformer 
+refine_loop_transformer(transformer t, loop l)
+{
+  transformer tf = transformer_undefined;
+  transformer t_enter = transformer_undefined;
+  transformer t_skip = transformer_undefined;
+  transformer pre = transformer_undefined;
+  /* loop body transformer */
+  transformer tfb = transformer_undefined;
+  range r = loop_range(l);
+  statement s = loop_body(l);
+
+  pips_debug(8,"begin\n");
+
+  /* compute the loop body transformer */
+  tfb = transformer_dup(load_statement_transformer(s));
+  tfb = transformer_add_loop_index_incrementation(tfb, l);
+
+  /* compute the transformer when the loop is entered */
+  t_enter = transformer_combine(tfb, t);
+
+  /* add the entry condition */
+  /* but it seems to be in t already */
+  /* t_enter = transformer_add_loop_index_initialization(t_enter, l); */
+
+  /* add the exit condition, without any information pre to estimate the
+     increment */
+  pre = transformer_identity();
+  t_enter = add_loop_index_exit_value(t_enter, l, pre, NIL);
+
+  ifdebug(8) {
+    pips_debug(8, "entered loop transformer t_enter=\n");
+    fprint_transformer(stderr, t_enter, external_value_name);
+  }
+
+  /* add initialization for the unconditional initialization of the loop
+     index variable */
+  t_skip = transformer_identity();
+  t_skip = add_loop_index_initialization(t_skip, l);
+  t_skip = add_loop_skip_condition(t_skip, l);
+
+  ifdebug(8) {
+    pips_debug(8, "skipped loop transformer t_skip=\n");
+    fprint_transformer(stderr, t_skip, external_value_name);
+  }
+
+  /* It might be better not to compute useless transformer, but it's more
+     readbale that way. Since pre is information free, only loops with
+     constant lower and upper bound and constant increment can benefit
+     from this. */
+  if(empty_range_wrt_precondition_p(r, pre)) {
+    tf = t_skip;
+    free_transformer(t_enter);
+  }
+  else if(non_empty_range_wrt_precondition_p(r, pre)) {
+    tf = t_enter;
+    free_transformer(t_skip);
+  }
+  else {
+    tf = transformer_convex_hull(t_enter, t_skip);
+    free_transformer(t_enter);
+    free_transformer(t_skip);
+  }
+
+  free_transformer(pre);
+
+  ifdebug(8) {
+    pips_debug(8, "full refined loop transformer tf=\n");
+    fprint_transformer(stderr, tf, external_value_name);
+    pips_debug(8, "end\n");
+  }
+
+  return tf;
 }
 
 /* This function computes the effect of K loop iteration, with K positive.
@@ -1463,11 +1522,16 @@ expression expr;
       if(normalized_linear_p(n2)) {
 	Pvecteur v2 = vect_dup(normalized_linear(n2));
 	Pcontrainte c2 = CONTRAINTE_UNDEFINED;
+	Pvecteur v3 = vect_multiply(vect_dup(normalized_linear(n2)), (Value) d);
+	Pcontrainte c3 = CONTRAINTE_UNDEFINED;
 
 	vect_add_elem(&v2, TCST, VALUE_ONE);
 	vect_add_elem(&v2, (Variable) e_new, VALUE_MONE);
 	c2 = contrainte_make(v2);
 	contrainte_succ(c1) = c2;
+	vect_add_elem(&v3, (Variable) e_new, VALUE_MONE);
+	c3 = contrainte_make(v3);
+	contrainte_succ(c2) = c3;
       }
 
       tf = make_transformer(tf_args,
@@ -1747,7 +1811,7 @@ cons * e; /* effects associated to instruction i */
 	break;
       case is_instruction_loop:
 	l = instruction_loop(i);
-	tf = loop_to_transformer(l, e);
+	tf = loop_to_transformer(l);
 	break;
       case is_instruction_whileloop:
 	wl = instruction_whileloop(i);
@@ -1782,6 +1846,7 @@ statement s;
     instruction i = statement_instruction(s);
     list e = NIL;
     transformer t;
+    transformer te;
 
     pips_debug(8,"begin for statement %03d (%d,%d)\n",
 	       statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
@@ -1834,7 +1899,22 @@ statement s;
 	pips_assert("same pointer", stf==t);
     }
 
+
+    /* If i is a loop, the expected transformer can be more complex (see
+       nga06) because the stores transformer is later used to compute the
+       loop body precondition. It cannot take into account the exit
+       condition. */
+    if(instruction_loop_p(i)) {
+      /* likely memory leak:-(. te should be allocated in both test
+         branches and freed at call site but I program everything under
+         the opposite assumption */
+      te = refine_loop_transformer(t, instruction_loop(i));
+    }
+    else {
+      te = t;
+    }
+
     pips_debug(8,"end with t=%p\n", t);
 
-    return(t);
+    return te;
 }
