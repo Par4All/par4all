@@ -102,8 +102,7 @@ Psysteme s;
 Variable v_old;
 Variable v_new;
 {
-    Pcontrainte e;
-    Pcontrainte i;
+    Pcontrainte e, i;
 
     if(!SC_UNDEFINED_P(s)) {
 
@@ -122,6 +121,42 @@ Variable v_new;
 	assert(vect_check(s->base));
     }
     return s;
+}
+
+/* Psysteme sc_rename_variables(s, renamed_p, new_variable)
+ * Psysteme s;
+ * boolean (*renamed_p)(Variable);
+ * Variable (*new_variable)(Variable);
+ *
+ * what: driven renaming of variables in s.
+ * how: scans, decides and replaces.
+ * input: Psysteme s, plus the decision and replacement functions
+ * output: s is returned.
+ * side effects:
+ *  - the system is modified in place.
+ * bugs or features:
+ *  - was written by FC...
+ */
+Psysteme sc_rename_variables(s, renamed_p, new_variable)
+Psysteme s;
+boolean (*renamed_p)(/*Variable*/);
+Variable (*new_variable)(/*Variable*/);
+{
+    Pcontrainte c;
+
+    if(SC_UNDEFINED_P(s)) return(s);
+
+    for(c=sc_egalites(s); c!=NULL; c=c->succ)
+	(void) vect_rename_variables(contrainte_vecteur(c),
+				     renamed_p, new_variable);
+
+    for(c=sc_inegalites(s); c!=NULL; c=c->succ)
+	(void) vect_rename_variables(contrainte_vecteur(c),
+				     renamed_p, new_variable);
+
+    (void) vect_rename_variables(sc_base(s), renamed_p, new_variable);
+
+    return(s);
 }
 
 /* Psysteme sc_variables_rename(Psysteme s, Pvecteur pv_old, Pvecteur pv_new):
