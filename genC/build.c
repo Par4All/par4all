@@ -28,7 +28,7 @@
 #include "newgen_include.h"
 
 struct inlinable Inline[] = {
-  {UNIT_TYPE, "#]unit", "#]unit", ":unit", "#]unit"},
+  {UNIT_TYPE_NAME, "#]unit", "#]unit", ":unit", "#]unit"},
   {"bool", "1", "#]bool %d", "newgen:gen-true", "~S"},
   {"char", "#\\a", "#\\%c", "#\\space", "~C"},
   {"int", "0", "%d", "0", "~D"},
@@ -168,7 +168,7 @@ init()
 
     bp->name = "Name for tabulated domain" ;
     bp->domain = &d ;
-    d.ba.type = ARRAY ;
+    d.ba.type = ARRAY_DT ;
     d.ar.constructor = "Constructor for tabulated domain" ;
     d.ar.element = (struct gen_binding *)NULL ;
     d.ar.dimensions = &il ;
@@ -231,7 +231,7 @@ union domain *val ;
 {
     struct gen_binding *bp ;
 
-    if( Read_spec_mode && val->ba.type ==  IMPORT ) {
+    if( Read_spec_mode && val->ba.type ==  IMPORT_DT ) {
 	bp = lookup( name, OLD_BINDING ) ;
     }
     else {
@@ -245,8 +245,8 @@ union domain *val ;
 	bp->domain = val ;
 	bp->name = name ;
     }
-    else if( val->ba.type == IMPORT || 
-	     (Read_spec_mode && val->ba.type == EXTERNAL )) {
+    else if( val->ba.type == IMPORT_DT || 
+	     (Read_spec_mode && val->ba.type == EXTERNAL_DT )) {
 	free( (char *)val ) ;
     }
     else user( "Redeclaration skiped: <%s>\n", name ) ;
@@ -293,12 +293,12 @@ FILE *out ;
 union domain *dp ;
 {
     switch( dp->ba.type ) {
-    case EXTERNAL:
+    case EXTERNAL_DT:
 	break ;
-    case IMPORT:
+    case IMPORT_DT:
 	(void)fprintf( out, " from \"%s\"", dp->im.filename ) ;
 	break ;
-    case BASIS:
+    case BASIS_DT:
 	(void)print_persistant( out, dp ) ;
 #ifdef DBG_DOMAINS
 	(void)fprintf( out, "%s:%s (%d)", 
@@ -309,17 +309,17 @@ union domain *dp ;
 		      dp->ba.constructor, dp->ba.constructand->name );
 #endif
 	break ;
-    case LIST:
+    case LIST_DT:
 	print_persistant( out, dp ) ;
 	(void)fprintf(out, "%s:%s*", 
 		      dp->li.constructor, dp->li.element->name ) ;
 	break ;
-    case SET:
+    case SET_DT:
 	print_persistant( out, dp ) ;
 	(void)fprintf(out, "%s:%s{}", 
 		      dp->se.constructor, dp->se.element->name ) ;
 	break ;
-    case ARRAY: {
+    case ARRAY_DT: {
 	struct intlist *ilp ;
 
 	print_persistant( out, dp ) ;
@@ -331,7 +331,7 @@ union domain *dp ;
 
 	break ;
     }
-    case CONSTRUCTED:
+    case CONSTRUCTED_DT:
 	print_domainlist( out, dp->co.components, dp->co.op ) ;
 	break ;
     default:
@@ -353,7 +353,8 @@ FILE *out ;
 	if( bp->name == NULL || bp == Tabulated_bp ) continue ;
 
 	if( !IS_INLINABLE( bp )) {
-	    if( (dp=bp->domain)->ba.type == CONSTRUCTED && dp->co.op == OR_OP )
+	    if( (dp=bp->domain)->ba.type == CONSTRUCTED_DT
+	       && dp->co.op == OR_OP )
 		    (void)fprintf( out, "--NEWGEN-FIRST %d\n", dp->co.first ) ;
 
 	    (void)fprintf( out, 
@@ -386,22 +387,22 @@ union domain *dp ;
     if( op == OR_OP ) current_first++ ;
 
     switch( dp->ba.type ) {
-    case EXTERNAL:
-    case IMPORT:
+    case EXTERNAL_DT:
+    case IMPORT_DT:
 	return ;
-    case BASIS:
+    case BASIS_DT:
 	dp->ba.constructand = lookup( (char *)dp->ba.constructand, OLD_BINDING ) ;
 	break;
-    case LIST:
+    case LIST_DT:
 	dp->li.element = lookup( (char *)dp->li.element, OLD_BINDING ) ;
 	break ;
-    case SET:
+    case SET_DT:
 	dp->se.element = lookup( (char *)dp->se.element, OLD_BINDING ) ;
 	break ;
-    case ARRAY:
+    case ARRAY_DT:
 	dp->ar.element = lookup( (char *)dp->ar.element, OLD_BINDING ) ;
 	break ;
-    case CONSTRUCTED: 
+    case CONSTRUCTED_DT: 
 	if( dp->co.op == OR_OP && !Read_spec_mode ) 
 		dp->co.first = current_first ;
 
@@ -429,13 +430,13 @@ compile()
 		continue ;
 
 	reconnect( -1, bp->domain ) ;
-	bp->compiled = (bp->domain->ba.type != EXTERNAL ) ;
+	bp->compiled = (bp->domain->ba.type != EXTERNAL_DT ) ;
 
 	if( IS_TABULATED( bp )) {
 	    union domain *dp = NULL;
 
-	    if( !(bp->domain->ba.type == CONSTRUCTED &&
-		  (dp=bp->domain->co.components->domain)->ba.type == BASIS &&
+	    if( !(bp->domain->ba.type == CONSTRUCTED_DT &&
+		  (dp=bp->domain->co.components->domain)->ba.type == BASIS_DT &&
 		  strcmp( dp->ba.constructand->name, "string" ) == 0)) {
 		user( "compile: tabulated first %s domain isn't string\n",
 		      dp->ba.constructand->name ) ;
