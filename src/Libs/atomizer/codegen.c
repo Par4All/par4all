@@ -10,13 +10,13 @@
 #include <string.h>
 
 #include "genC.h"
+
 #include "ri.h"
 #include "database.h"
 
 #include "ri-util.h"
 #include "constants.h"
 #include "misc.h"
-#include "list.h"
 
 #include "graph.h"
 #include "dg.h"
