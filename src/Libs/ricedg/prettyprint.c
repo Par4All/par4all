@@ -91,9 +91,7 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
 
 bool print_dependence_graph(string name)
 {
-    printf("HERE1");
     return print_dependence_or_chains_graph(name, TRUE);
-    printf("HERE2");
 }
 
 bool print_chains_graph(string name)
