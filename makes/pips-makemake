@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/10 16:44:14 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/10 16:45:36 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -181,13 +181,7 @@ do
     
   echo making $DIRTYPE $MAKEFILE in $dir_real_name
 
-  [ -f $MAKEFILE ] && 
-  {
-    rm -f $MAKEFILE.old ;
-    mv $MAKEFILE $MAKEFILE.old;
-  }
-
-
+  rm -f $MAKEFILE
 
 ##############################################################################
 
