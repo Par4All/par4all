@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/10/02 08:37:42 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/10/02 08:39:55 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -430,6 +430,15 @@ $MAKEFILE:
 
 count:
 	@wc -l $(SOURCES)
+
+#
+# some quick entries for SCCS:
+info:
+	@sccs info
+
+# try to delta all checked out files
+delta:
+	@sccs delget `sccs tell`
 
 %
 
