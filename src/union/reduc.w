@@ -574,7 +574,7 @@ Psysteme in_ps1, in_ps2;
 int      ofl_ctrl;
 {
   Psysteme    ps1; 
-  Pcontrainte eq, tail = NULL;
+  Pcontrainte prev_eq = NULL, eq, tail = NULL;
   Pbase       pb;
 
   /* Return on special cases */
@@ -622,9 +622,10 @@ int      ofl_ctrl;
   });
 
   /* Normalize 2 inputs systems */
-  for (eq = ps1->inegalites; eq != NULL; eq=eq->succ) 
-    vect_normalize(eq->vecteur);
-  
+  for (eq = ps1->inegalites; eq != NULL; eq=eq->succ)
+  {
+      vect_normalize(eq->vecteur);
+  }
   /* returns if there is no intersection */
   if (!sc_rational_feasibility_ofl_ctrl(ps1, ofl_ctrl, TRUE)) { 
     tail->succ = NULL;  ps1 = sc_free(ps1); 
@@ -635,16 +636,40 @@ int      ofl_ctrl;
 
   /* We run over in_ps2 constraints (shared by ps1) 
    * and detect redundance */
-  for (eq = tail->succ; eq != NULL; eq = eq->succ) {
-    contrainte_reverse(eq);	
-    if (sc_rational_feasibility_ofl_ctrl(ps1, ofl_ctrl, TRUE))
-        {  contrainte_reverse(eq); }
-    else{  
-	eq_set_vect_nul(eq);	
-	sc_elim_empty_constraints(in_ps2, FALSE);
-	tail->succ = in_ps2->inegalites;
-    }
+  assert(sc_weak_consistent_p(in_ps2));
+  assert(sc_weak_consistent_p(ps1));
+  for (eq = tail->succ, prev_eq = tail; eq != NULL; eq = eq->succ)
+  {
+      contrainte_reverse(eq);	
+      assert(sc_weak_consistent_p(ps1));
+      C3_DEBUG("sc_elim_redund_with_first", {
+	  fprintf(stderr, "\nps1:\n");  
+	  fprintf(stderr, "nb_eq= %d, nb_ineq= %d, dimension= %d\n", 
+		  ps1->nb_eq, ps1->nb_ineq, ps1->dimension);
+	  sc_fprint( stderr, ps1, union_variable_name );
+      });
+
+      if (sc_rational_feasibility_ofl_ctrl(ps1, ofl_ctrl, TRUE))
+      {
+	  contrainte_reverse(eq);
+	  prev_eq = prev_eq->succ;
+      }
+      else{  
+	  /* eliminate the constraint from in_ps2, and thus from ps1 */	
+	  eq_set_vect_nul(eq);	
+	  if (in_ps2->inegalites == eq)
+	      in_ps2->inegalites = eq->succ;
+	  prev_eq->succ = eq->succ;
+	  eq->succ = CONTRAINTE_UNDEFINED;
+	  eq = contrainte_free(eq);
+	  eq = prev_eq;
+	  in_ps2->nb_ineq--;
+	  ps1->nb_ineq--;
+	  assert(sc_weak_consistent_p(ps1));
+	  assert(sc_weak_consistent_p(in_ps2));
+      }
   }
+
 
   if ( in_ps2->inegalites == NULL ) 
     { in_ps2 = sc_free(in_ps2);  in_ps2 = sc_full(); }
@@ -888,7 +913,7 @@ int   ofl_ctrl;
     if (ps == SC_UNDEFINED) 
       { sl_free(lcomp); C3_RETURN( IS_DJ, DJ_UNDEFINED ); }
 
-    ps = sc_elim_redund_with_first( systeme, ps );
+    ps = sc_elim_redund_with_first_ofl_ctrl( systeme, ps, ofl_ctrl );
 
     if (sc_empty_p( ps )) { ps = sc_free(ps); continue; }
     if (sc_full_p ( ps ))  
