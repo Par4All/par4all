@@ -1,9 +1,9 @@
-! testing Xpomp display facilities in fortran
+! testing Xpomp display facilities in Fortran 77 / HPF
 !
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/09/04 11:48:12 $, 
+! $Date: 1996/09/04 11:51:10 $, 
 !
       program fractal
 
