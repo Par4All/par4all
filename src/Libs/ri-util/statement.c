@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.62  1998/12/03 15:46:06  coelho
+    flatten hack added.
+
     Revision 1.61  1998/10/15 16:20:18  irigoin
     Function instruction_identification() added to improve debug messages
 
@@ -77,6 +80,29 @@ empty_code_list_p(list l)
     return TRUE;
 }
 
+/**************************************************************** FLATTENING */
+
+/* flatten if necessary. 
+   detects sequences of sequences and reorder as one sequence.
+   some memory leaks.
+ */
+void flatten_block_if_necessary(instruction i)
+{
+  if (instruction_block_p(i))
+  {
+    list ls = NIL;
+    MAP(STATEMENT, s, {
+      instruction ib = statement_instruction(s);
+      if (instruction_block_p(ib))
+	ls = gen_nconc(ls, instruction_block(ib));
+      else
+	ls = gen_nconc(ls, CONS(STATEMENT, s, NIL));
+    },
+      instruction_block(i));
+    gen_free_list(instruction_block(i));
+    instruction_block(i) = ls;
+  }
+}
 
 /*************************************************************** COUNT LOOPS */
 
