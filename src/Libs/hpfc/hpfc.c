@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/10/06 14:17:10 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/10/06 21:45:10 $, )
  * version $Revision$
  */
  
@@ -143,7 +143,7 @@ static void reset_hpfc_status()
 
 static void save_hpfc_status() /* GET them */
 {
-    string name = db_get_current_workspace_name();
+    /* string name = db_get_current_workspace_name(); */
     hpfc_status s = 
 	make_hpfc_status(get_overlap_status(),
 			 get_data_status(),
@@ -154,16 +154,16 @@ static void save_hpfc_status() /* GET them */
 			 get_the_pures(),
 			 get_computed_remaps());    
 
-    DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, strdup(name), s);
+    DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, "", s);
 
     reset_hpfc_status(); /* cleaned! */
 }
 
 static void load_hpfc_status() /* SET them */
 {
-    string name = db_get_current_workspace_name();
+    /* string name = db_get_current_workspace_name(); */
     hpfc_status	s = (hpfc_status) 
-	db_get_memory_resource(DBR_HPFC_STATUS, name, TRUE);
+	db_get_memory_resource(DBR_HPFC_STATUS, "", TRUE);
 
     set_entity_status(hpfc_status_entity_status(s));
     set_overlap_status(hpfc_status_overlapsmap(s));
@@ -382,17 +382,11 @@ bool hpfc_filter(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
 
-    /* to be modified... */
     safe_system(concatenate("$HPFC_TOOLS/hpfc_filter ", 
 			    dir_name, "/", file_name, " ",
-			    dir_name, "/", new_name, 
-			    " ; cp ", dir_name, "/", new_name, " ",
-			    dir_name, "/", file_name, NULL));
+			    dir_name, "/", new_name, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_FILTERED_FILE, strdup(name), new_name);
-
-    /* to be removed... */
-    DB_PUT_FILE_RESOURCE(DBR_SOURCE_FILE, strdup(name), file_name);
 
     debug_off();
     return TRUE;
@@ -566,13 +560,16 @@ bool hpfc_close(string name)
  */
 bool hpfc_install(string name)
 {
-    string dir = db_get_current_workspace_directory();
+    string dir, wks;
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
 
+    dir = db_get_current_workspace_directory();
+    wks = db_get_current_workspace_name();
+
     safe_system(concatenate("$HPFC_TOOLS/hpfc_install -iob ", dir, 
-			    " -n ", name, NULL));
+			    " -n ", wks, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, strdup(name), NO_FILE);
 
