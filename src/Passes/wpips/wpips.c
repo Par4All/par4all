@@ -17,7 +17,6 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
-#include "properties.h"
 #include "constants.h"
 #include "resources.h"
 #include "pipsmake.h"
@@ -173,8 +172,6 @@ wpips_parse_arguments(int argc,
          argv[iarg] = NULL;
          /* Wpips is called from emacs. RK. */
          wpips_emacs_mode = 1;
-	 /* Ask for Emacs prettyprint: */
-	 set_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES", TRUE);	
       }
       else if (same_string_p(argv[iarg], "-workspace")) {
          argv[iarg] = NULL;
