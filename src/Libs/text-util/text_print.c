@@ -100,14 +100,16 @@ print_sentence(FILE * fd,
 	
 	/* first 6 columns (0-5)
 	 */
+	/* 05/08/2003 - Nga Nguyen - Add code for C prettyprinter */
+
 	if (label != (char *) NULL && !string_undefined_p(label)) {
 	    /* Keep track of the attachment against the padding: */
 	    deal_with_attachments_in_this_string(label,
 						 position_in_the_output);
-	    fprintf_sentence(fd, "%-5s ", label);
+	    fprintf_sentence(fd,get_bool_property("PRETTYPRINT_C_CODE")?"%s":"%-5s ", label);
 	}
 	else {
-	    fprintf_sentence(fd, "      ");
+	    fprintf_sentence(fd,get_bool_property("PRETTYPRINT_C_CODE")?"":"      ");
 	}
 	
 	/* FI: do not indent too much (9 June 1995) */
