@@ -37,7 +37,8 @@
 
 #define LOCAL static
 
-void CreateAreas()
+void 
+CreateAreas()
 {
     make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME, 
 				 DYNAMIC_AREA_LOCAL_NAME),
@@ -53,7 +54,8 @@ void CreateAreas()
 		make_value(is_value_unknown, UU));
 }
 
-void CreateArrays()
+void 
+CreateArrays()
 {
     /* First a dummy function - close to C one "crt0()" - in order to
        - link the next entity to its ram
@@ -154,360 +156,351 @@ void CreateArrays()
     reset_current_module_entity();
 }
 
+static list
+make_parameter_list(int n, parameter (* mkprm)(void))
+{
+    list l = NIL;
+
+    if (n < (INT_MAX)) {
+	int i = n;
+	while (i-- > 0) {
+	    l = CONS(PARAMETER, mkprm(), l);
+	}
+    }
+    return l;
+}
+
 /* The default intrinsic type is a functional type with n overloaded
  * arguments returning an overloaded result if the arity is known.
  * If the arity is unknown, the default intrinsic type is a 0-ary
  * functional type returning an overloaded result.
  */
 
-static type default_intrinsic_type(int n)
+static type 
+default_intrinsic_type(int n)
 {
-type t = type_undefined;
-functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeOverloadedResult());
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeOverloadedResult());
+    t = make_type(is_type_functional, ft);
 
-  if (n < (INT_MAX)) {
-    int i = n;
-    while (i-- > 0) {
+    /*
+      if (n < (INT_MAX)) {
+      int i = n;
+      while (i-- > 0) {
       functional_parameters(ft) = 
-	CONS(PARAMETER, MakeOverloadedParameter(),
-	     functional_parameters(ft));
-    }
-  }
-  return t;
-}
-
-static type overloaded_to_integer_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-
-  ft = make_functional(NIL, MakeIntegerResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeOverloadedParameter(), NIL);
-  t = make_type(is_type_functional, ft);
-
-  return t;
-}
-
-static type overloaded_to_double_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-
-  ft = make_functional(NIL, MakeIntegerResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeOverloadedParameter(), NIL);
-  t = make_type(is_type_functional, ft);
-
-  return t;
-}
-
-static type overloaded_to_complex_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-
-  ft = make_functional(NIL, MakeComplexResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeOverloadedParameter(), NIL);
-  t = make_type(is_type_functional, ft);
-
-  return t;
-}
-
-static type overloaded_to_logical_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  int i = 0;
-
-  ft = make_functional(NIL, MakeLogicalResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeOverloadedParameter(), NIL);
-  for(i=1;i<n;i++) {
-    functional_parameters(ft) = 
       CONS(PARAMETER, MakeOverloadedParameter(),
-	   functional_parameters(ft));
-  }
-  t = make_type(is_type_functional, ft);
+      functional_parameters(ft));
+      }
+      }
+    */
 
-  return t;
+    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    return t;
 }
 
-static type integer_to_integer_type(int n)
+static type 
+overloaded_to_integer_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeIntegerResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeIntegerParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeIntegerResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type integer_to_real_type(int n)
+static type 
+overloaded_to_double_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeRealResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeIntegerParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeIntegerResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type integer_to_double_type(int n)
+static type 
+overloaded_to_complex_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeDoubleprecisionResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeIntegerParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeComplexResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type real_to_integer_type(int n)
+static type 
+overloaded_to_logical_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeIntegerResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeRealParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeLogicalResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeOverloadedParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type real_to_real_type(int n)
+static type 
+integer_to_integer_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeRealResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeRealParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeIntegerResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeIntegerParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type real_to_double_type(int n)
+static type 
+integer_to_real_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeDoubleprecisionResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeRealParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeRealResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeIntegerParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type double_to_integer_type(int n)
+static type 
+integer_to_double_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeIntegerResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeDoubleprecisionParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeDoubleprecisionResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeIntegerParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type double_to_real_type(int n)
+static type 
+real_to_integer_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeRealResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeDoubleprecisionParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeIntegerResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeRealParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type double_to_double_type(int n)
+static type 
+real_to_real_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeDoubleprecisionResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeDoubleprecisionParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeRealResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeRealParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type complex_to_real_type(int n)
+static type 
+real_to_double_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeRealResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeComplexParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeDoubleprecisionResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeRealParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type doublecomplex_to_double_type(int n)
+static type 
+double_to_integer_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeDoubleprecisionResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeComplexParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeIntegerResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeDoubleprecisionParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type complex_to_complex_type(int n)
+static type 
+double_to_real_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeComplexResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeComplexParameter(), NIL);
-  t = make_type(is_type_functional, ft);
+    ft = make_functional(NIL, MakeRealResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeDoubleprecisionParameter);
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type character_to_integer_type(int n)
+static type 
+double_to_double_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  int i = 0;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeIntegerResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeCharacterParameter(), NIL);
-  for(i=1; i<n; i++) {
+    ft = make_functional(NIL, MakeDoubleprecisionResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeDoubleprecisionParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
+}
+
+static type 
+complex_to_real_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeRealResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeComplexParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
+}
+
+static type 
+doublecomplex_to_double_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeDoubleprecisionResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeComplexParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
+}
+
+static type 
+complex_to_complex_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeComplexResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeComplexParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
+}
+
+static type 
+character_to_integer_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeIntegerResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeCharacterParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
+}
+
+static type 
+character_to_logical_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeLogicalResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeCharacterParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
+}
+
+static type 
+character_to_character_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeCharacterResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeCharacterParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
+}
+
+static type 
+substring_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeCharacterResult());
     functional_parameters(ft) = 
-      CONS(PARAMETER, MakeCharacterParameter(), 
-	   functional_parameters(ft));
-  }
-  t = make_type(is_type_functional, ft);
-
-  return t;
-}
-
-static type character_to_logical_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  int i = 0;
-
-  ft = make_functional(NIL, MakeLogicalResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeCharacterParameter(), NIL);
-  for(i=1; i<n; i++) {
+	CONS(PARAMETER, MakeIntegerParameter(), NIL);
     functional_parameters(ft) = 
-      CONS(PARAMETER, MakeCharacterParameter(),
-	   functional_parameters(ft));
-  }
-  t = make_type(is_type_functional, ft);
-
-  return t;
-}
-
-static type character_to_character_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  int i = 0;
-
-  ft = make_functional(NIL, MakeCharacterResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeCharacterParameter(), NIL);
-  for(i=1; i<n; i++) {
+	CONS(PARAMETER, MakeIntegerParameter(),
+	     functional_parameters(ft));
     functional_parameters(ft) = 
-      CONS(PARAMETER, MakeCharacterParameter(),
-	   functional_parameters(ft));
-  }
-  t = make_type(is_type_functional, ft);
+	CONS(PARAMETER, MakeCharacterParameter(),
+	     functional_parameters(ft));
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
 }
 
-static type substring_type(int n)
+static type 
+assign_substring_type(int n)
 {
-  type t = type_undefined;
-  functional ft = functional_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeCharacterResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeIntegerParameter(), NIL);
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeIntegerParameter(),
-	 functional_parameters(ft));
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeCharacterParameter(),
-	 functional_parameters(ft));
-  t = make_type(is_type_functional, ft);
-
-  return t;
-}
-
-static type assign_substring_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-
-  ft = make_functional(NIL, MakeCharacterResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeCharacterParameter(), NIL);
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeIntegerParameter(),
-	 functional_parameters(ft));
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeIntegerParameter(),
-	 functional_parameters(ft));
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeCharacterParameter(),
-	 functional_parameters(ft));
-  t = make_type(is_type_functional, ft);
-
-  return t;
-}
-
-static type logical_to_logical_type(int n)
-{
-  type t = type_undefined;
-  functional ft = functional_undefined;
-  int i = 0;
-
-  ft = make_functional(NIL, MakeLogicalResult());
-  functional_parameters(ft) = 
-    CONS(PARAMETER, MakeLogicalParameter(), NIL);
-  for(i=1; i<n; i++) {
+    ft = make_functional(NIL, MakeCharacterResult());
     functional_parameters(ft) = 
-      CONS(PARAMETER, MakeLogicalParameter(),
-	 functional_parameters(ft));
-  }
-  t = make_type(is_type_functional, ft);
+	CONS(PARAMETER, MakeCharacterParameter(), NIL);
+    functional_parameters(ft) = 
+	CONS(PARAMETER, MakeIntegerParameter(),
+	     functional_parameters(ft));
+    functional_parameters(ft) = 
+	CONS(PARAMETER, MakeIntegerParameter(),
+	     functional_parameters(ft));
+    functional_parameters(ft) = 
+	CONS(PARAMETER, MakeCharacterParameter(),
+	     functional_parameters(ft));
+    t = make_type(is_type_functional, ft);
 
-  return t;
+    return t;
+}
+
+static type 
+logical_to_logical_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeLogicalResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeCharacterParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
 }
 
 /* the following data structure describes an intrinsic function: its
@@ -686,7 +679,8 @@ functional type whose result and arguments have an overloaded basic
 type. The number of arguments is given by the IntrinsicDescriptorTable
 data structure. */
 
-void MakeIntrinsic(name, n, intrinsic_type)
+void 
+MakeIntrinsic(name, n, intrinsic_type)
 string name;
 int n;
 type (*intrinsic_type)(int);
@@ -703,7 +697,8 @@ type (*intrinsic_type)(int);
 /* this function is called one time (at the very beginning) to create
 all intrinsic functions. */
 
-void CreateIntrinsics()
+void 
+CreateIntrinsics()
 {
     IntrinsicDescriptor *pid;
 
@@ -712,7 +707,8 @@ void CreateIntrinsics()
     }
 }
 
-bool bootstrap(string workspace)
+bool 
+bootstrap(string workspace)
 {
     CreateIntrinsics();
 
@@ -746,13 +742,15 @@ bool bootstrap(string workspace)
     return TRUE;
 }
 
-value MakeValueLitteral()
+value 
+MakeValueLitteral()
 {
     return(make_value(is_value_constant, 
 		      make_constant(is_constant_litteral, UU)));
 }
 
-string MakeFileName(prefix, base, suffix)
+string 
+MakeFileName(prefix, base, suffix)
 char *prefix, *base, *suffix;
 {
     char *s;
@@ -769,7 +767,8 @@ char *prefix, *base, *suffix;
 /* this function creates a fortran operator parameter, i.e. a zero
 dimension variable with an overloaded basic type. */
 
-char *AddPackageToName(p, n)
+char *
+AddPackageToName(p, n)
 string p, n;
 {
     string ps;
