@@ -10,6 +10,9 @@
 # $id$
 #
 # $Log: pips_set_directory_for_binaries,v $
+# Revision 1.2  1997/05/22 20:07:43  coelho
+# *** empty log message ***
+#
 # Revision 1.1  1997/05/22 19:53:44  coelho
 # Initial revision
 #
@@ -59,15 +62,18 @@ shift `expr $OPTIND - 1`
 dir=${1:-`pwd`}
 arch=${2:-${PIPS_ARCH}}
 
+#
+# check arch
+
 test "${arch}" || 
 	error 4 "some architecture expected"
-expr ${arch} : '^[A-Z]*$' > /dev/null || 
+expr ${arch} : '^[A-Z0-9]*$' > /dev/null || 
 	error 5 "invalid ${arch} architecture"
 
 #
 # make directories
 
-verb Making directories
+verb "Making directories"
 
 md 	${dir} \
 	${dir}/${arch} 
@@ -88,24 +94,24 @@ done
 
 test "${group}" && {
 
-    verb Group ${group}
+    verb "Group ${group}"
     find ${dir}/${arch} -type d -print | chgrp ${group}
 
-    verb Rights rwxrwsr-x
+    verb "Rights rwxrwsr-x"
     find ${dir}/${arch} -type d -print | xargs chmod ug+rwx,g+s,o+rx-w 
 }
 
 #
 # make links
 
-verb Making links
+verb "Making links"
 
 # ml dir link
 ml()
 {
    d=${1}
    lnk=${2}
-   test -d ${d} || error 3 "no ${d} directory"
+   test -d ${d} || error 3 "[ml] no ${d} directory"
    test -d ${lnk} && { mv ${lnk}/* ${d}; rmdir ${lnk}; }
    ln -s ${d} ${lnk}
 }
@@ -127,4 +133,14 @@ make_all_links ${dir}/${arch}/Prod/EXTERN ${EXTERN_ROOT}
 #
 # cleaning sources
 
-verb Clening sources from ${arch} direct
+verb "Cleaning sources from ${arch} direct"
+
+find 	${PIPS_ROOT}/Src   ${PIPS_DEVEDIR} \
+	${LINEAR_ROOT}/Src ${LINEAR_DEVEDIR} \
+	${NEWGEN_ROOT}/Src ${NEWGEN_DEVEDIR} \
+	-name "${arch}" -print |
+xargs rm -rf 
+
+#
+# that is all
+#
