@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1996/10/14 11:34:39 $, 
+ * $Date: 1996/10/14 11:35:51 $, 
  */
 
 #include <stdio.h>
@@ -910,6 +910,7 @@ declarations_privatizer(char *module_name)
 {
     list l_priv = NIL, l_in, l_out, l_write; 
     statement module_stat;
+    entity module;
 
     if (get_bool_property("ARRAY_SECTION_PRIV_COPY_OUT"))
     {
