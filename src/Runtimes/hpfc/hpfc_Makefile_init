@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/10/19 11:36:54 $, )
+# ($Date: 1996/10/19 11:40:43 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -103,7 +103,8 @@ pvmlib		= $(PVM_ROOT)/lib
 pvminc		= $(PVM_ROOT)/lib
 PVM_GLIB	=
 #
-# two possible protocols: US (dedicated, 40MB/s) or IP (sharable, 15MB/s)
+# two possible protocols: less efficient one used by default:-)
+# US (dedicated, 40MB/s) or IP (sharable, 15MB/s)
 # LIBS_DIR	+= -L/usr/lpp/ssp/css/libus
 LIBS_DIR	+= -L/usr/lpp/ssp/css/libip
 COMMON_LIBS	+= -lmpci -bI:$(pvmlib)/pvm3e.exp
