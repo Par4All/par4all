@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/02/26 16:11:45 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/04/19 15:38:10 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -128,7 +128,7 @@ PIPS_CURRENT_PROGRAM=".pipsprogram"
 
 PIPS_PASSES='pips wpips tpips'
 
-PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcontrol -lsemantics -lcontinuation -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lgenC -lplint -lmatrice  -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique -lreductions -lflint -lm"
+PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcomp_sections -lcontrol -lsemantics -lcontinuation -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lgenC -lplint -lmatrice  -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique -lreductions -lflint -lm"
 
 PIPS_MALLOC='/usr/lib/debug/malloc.o'
 
