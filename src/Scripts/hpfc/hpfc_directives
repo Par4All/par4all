@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1996/08/31 18:11:31 $, 
+# $Date: 1996/09/02 10:27:34 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -95,6 +95,9 @@
 # _9: fake // tells that the function is fake.
 #
 # (_ is hpfc)
+#
+# removed:
+# ld {io,pure}: addition of a linker option
 #
 
 #
@@ -203,6 +206,10 @@ $SED "#
       s, io\(.*\),6(\1),
       s, fake\(.*\),9(\1),
       s, kill\(.*\),8(\1),
+      #
+      # remove LD directives
+      #
+      s, \(ld.*\),!ignored: \1,
       #
       # host section: hack to build blocks...
       # (two levels needed because of some unstructured...)
