@@ -7,6 +7,9 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.19  2000/07/04 16:09:51  coelho
+  hop.
+
   Revision 1.18  2000/07/03 12:17:31  nguyen
   Modify function discard_statement_and_save_label_and_comment(statement s):
   to avoid bug if both inner and outer loops of a nested loop have the same
@@ -128,27 +131,27 @@ display_dead_code_statistics()
 static dead_test
 dead_test_filter(statement true, statement false)
 {
-    debug(5, "dead_test_filter", "Begin\n");
+  pips_debug(5, "Begin\n");
 
-   ifdebug(9) {
-      fprintf(stderr, "dead_test_filter, then branch: %p\n", true);
-      print_text(stderr, text_statement(get_current_module_entity(), 0, true));
-      fprintf(stderr, "dead_test_filter, false branch: %p\n", false);
-      print_text(stderr, text_statement(get_current_module_entity(), 0, false));
-   }
+  ifdebug(9) {
+    fprintf(stderr, "dead_test_filter, then branch: %p\n", true);
+    print_statement(true);
+    fprintf(stderr, "dead_test_filter, false branch: %p\n", false);
+    print_statement(false);
+  }
 
-   if (!statement_feasible_p(true)) {
-      debug(5, "dead_test_filter", "End: then_is_dead\n");
-      return then_is_dead;
-   }
-
-   if (!statement_feasible_p(false)) {
-      debug(5, "dead_test_filter", "End: else_is_dead\n");
-      return else_is_dead;
-   }
-
-   debug(5, "dead_statement_filter", "End: nothing_about_test\n");
-   return nothing_about_test;
+  if (!statement_feasible_p(true)) {
+    pips_debug(5, "End: then_is_dead\n");
+    return then_is_dead;
+  }
+  
+  if (!statement_feasible_p(false)) {
+    pips_debug(5, "End: else_is_dead\n");
+    return else_is_dead;
+  }
+  
+  pips_debug(5, "End: nothing_about_test\n");
+  return nothing_about_test;
 }
 
 /* Replace an instruction by an empty one. If there is a label on the
@@ -249,8 +252,8 @@ remove_loop_statement(statement s, instruction i, loop l)
   statement_label(s) = entity_empty_label();
   fix_sequence_statement_attributes(s);
 
-  if (get_debug_level() >= 4) {
-    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+  ifdebug(4) {
+    print_statement(s);
   }
 
   loop_body(l) = make_empty_statement();
@@ -395,8 +398,8 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
   fix_sequence_statement_attributes(s);
 
   ifdebug(9) {
-      debug(9, "remove_dead_loop", "New value of statement\n");
-      print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+    pips_debug(9, "New value of statement\n");
+    print_statement(s);
   }
 
   free_instruction(i);
@@ -573,9 +576,8 @@ dead_recurse_unstructured(unstructured u)
     CONTROL_MAP(c, {
 	int number_of_successors = gen_length(control_successors(c));
                   
-	debug(3, "dead_recurse_unstructured",
-	      "(gen_length(control_successors(c)) = %d)\n",
-	      number_of_successors);     
+	pips_debug(3, "(gen_length(control_successors(c)) = %d)\n",
+		   number_of_successors);     
 	st = control_statement(c);
                   
 	if (number_of_successors == 0 || number_of_successors == 1) {
@@ -597,8 +599,7 @@ dead_recurse_unstructured(unstructured u)
 
 	    switch (dead_unstructured_test_filter(st)) {
 		case then_is_dead :
-		debug(3, "dead_recurse_unstructured",
-		      "\"Then\" is dead...");
+		  pips_debug(3, "\"Then\" is dead...");
 		/* Remove the link to the THEN control
 		   node. Rely on unspaghettify() to remove
 		   down this path later: */
@@ -612,8 +613,7 @@ dead_recurse_unstructured(unstructured u)
 		break;
                          
 	    case else_is_dead :
-		debug(3, "dead_recurse_unstructured",
-		      "\"Else\" is dead...");
+	      pips_debug(3, "\"Else\" is dead...");
 		/* Remove the link to the ELSE control
 		   node. Rely on unspaghettify() to remove
 		   down this path later: */
@@ -627,8 +627,7 @@ dead_recurse_unstructured(unstructured u)
 		break;
                          
 	    case nothing_about_test :
-		debug(3, "dead_recurse_unstructured",
-		      "Nothing about this test...");
+	      pips_debug(3, "Nothing about this test...");
 		break;
                          
 	    default :
@@ -658,15 +657,14 @@ dead_statement_rewrite(statement s)
    instruction i = statement_instruction(s);
    tag t = instruction_tag(i);
 
-   debug(2, "dead_statement_rewrite", "Begin for statement %d (%d, %d)\n",
-	 statement_number(s),
-	 ORDERING_NUMBER(statement_ordering(s)),
-	 ORDERING_STATEMENT(statement_ordering(s)));
+   pips_debug(2, "Begin for statement %d (%d, %d)\n",
+	      statement_number(s),
+	      ORDERING_NUMBER(statement_ordering(s)),
+	      ORDERING_STATEMENT(statement_ordering(s)));
 
    ifdebug(8) {
-       /* print_statement(s); */
-       fprintf(stderr, "[ The current statement : ]\n");
-       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+     fprintf(stderr, "[ The current statement : ]\n");
+     print_statement(s);
    }
 
    switch(t) {
@@ -684,7 +682,7 @@ dead_statement_rewrite(statement s)
        statement true, false;
        test te;
 
-       debug(2, "dead_statement_rewrite", "is_instruction_test\n", "\n");
+       pips_debug(2, "is_instruction_test\n\n");
        ifdebug(9) {
            print_statement(s);
        }
@@ -696,7 +694,7 @@ dead_statement_rewrite(statement s)
 	   && empty_statement_or_continue_p(false)) {
            /* Even if there is a label, it is useless since it is not
               an unstructured. */
-           debug(2, "dead_statement_rewrite", "test deletion", "\n");
+	 pips_debug(2, "test deletion\n");
 
            ifdebug(9) {
 	       print_statement(s);
@@ -723,11 +721,10 @@ dead_statement_rewrite(statement s)
    /* If we have now a sequence, clean it up: */
    clean_up_sequences_internal(s);
    
-   debug(2, "dead_statement_rewrite",
-	 "End for statement %d (%d, %d)\n",
-	 statement_number(s),
-	 ORDERING_NUMBER(statement_ordering(s)),
-	 ORDERING_STATEMENT(statement_ordering(s)));
+   pips_debug(2, "End for statement %d (%d, %d)\n",
+	      statement_number(s),
+	      ORDERING_NUMBER(statement_ordering(s)),
+	      ORDERING_STATEMENT(statement_ordering(s)));
 }
 
 
@@ -738,14 +735,14 @@ dead_statement_filter(statement s)
    bool retour;
 
    i = statement_instruction(s);
-   debug(2, "dead_statement_filter", "Begin for statement %d (%d, %d)\n",
-	 statement_number(s),
-	 ORDERING_NUMBER(statement_ordering(s)),
-	 ORDERING_STATEMENT(statement_ordering(s)));
+   pips_debug(2, "Begin for statement %d (%d, %d)\n",
+	      statement_number(s),
+	      ORDERING_NUMBER(statement_ordering(s)),
+	      ORDERING_STATEMENT(statement_ordering(s)));
 
    ifdebug(9) {
-       debug(9, "dead_statement_filter", "The current statement:\n");
-       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+     pips_debug(9, "The current statement:\n");
+     print_statement(s);
    }
 
    /* Pour permettre un affichage du code de retour simple : */
@@ -753,10 +750,9 @@ dead_statement_filter(statement s)
        if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
 	   /* Well, it is likely some unreachable code that should be
               removed later by an unspaghettify: */
-	   debug(2, "dead_statement_filter",
-		 "This statement is likely unreachable. Skip...\n");
-	   retour = FALSE;
-	   break;
+	 pips_debug(2, "This statement is likely unreachable. Skip...\n");
+	 retour = FALSE;
+	 break;
        }
 
       /* Vire de'ja` (presque) tout statement dont la pre'condition est
@@ -775,11 +771,10 @@ dead_statement_filter(statement s)
 	* test for that last case.
 	*/
       if (!statement_weakly_feasible_p(s)) {
-	  debug(2, "dead_statement_filter",
-		"Dead statement %d (%d, %d)\n",
-		statement_number(s),
-		ORDERING_NUMBER(statement_ordering(s)),
-		ORDERING_STATEMENT(statement_ordering(s)));
+	pips_debug(2, "Dead statement %d (%d, %d)\n",
+		   statement_number(s),
+		   ORDERING_NUMBER(statement_ordering(s)),
+		   ORDERING_STATEMENT(statement_ordering(s)));
 
 	  retour = discard_statement_and_save_label_and_comment(s);
 	  dead_code_statement_removed++;
@@ -789,12 +784,11 @@ dead_statement_filter(statement s)
       if (instruction_loop_p(i)) {
          loop l = instruction_loop(i);
          if (dead_loop_p(l)) {
-	     debug(2, "dead_statement_filter",
-		   "Dead loop %d at statement %d (%d, %d)\n",
-		   label_local_name(loop_label(l)),
-		   statement_number(s),
-		   ORDERING_NUMBER(statement_ordering(s)),
-		   ORDERING_STATEMENT(statement_ordering(s)));
+	   pips_debug(2, "Dead loop %d at statement %d (%d, %d)\n",
+		      label_local_name(loop_label(l)),
+		      statement_number(s),
+		      ORDERING_NUMBER(statement_ordering(s)),
+		      ORDERING_STATEMENT(statement_ordering(s)));
 	     
 	     retour = remove_dead_loop(s, i, l);
 	     dead_code_loop_removed++;
@@ -804,28 +798,22 @@ dead_statement_filter(statement s)
 	     /* This piece of code is not ready yet */
 	     statement body = loop_body(l);
 	     ifdebug(2) {
-		 debug(2,"dead_statement_filter",
-		       "loop %d at %d (%d, %d) executed once and only once\n",
+	       pips_debug(2, "loop %d at %d (%d, %d) executed once and only once\n",
 		label_local_name(loop_label(l)),
 		statement_number(s),
 		ORDERING_NUMBER(statement_ordering(s)),
 		ORDERING_STATEMENT(statement_ordering(s)));
 
 		 ifdebug(9) {
-		     print_text(stderr,
-				text_statement(get_current_module_entity(),
-					       0, s));
+		   print_statement(s);
 		 }
 	     }
 
 	     remove_loop_statement(s, i, l);
 	     dead_code_loop_executed_once++;
 	     ifdebug(9) {
-		 debug(9,"dead_statement_filter",
-		       "After remove_loop_statement\n"); 
-		 print_text(stderr,
-			    text_statement(get_current_module_entity(),
-					   0, s));
+	       pips_debug(9, "After remove_loop_statement\n"); 
+	       print_statement(s);
 	     }
 
 	     suppress_dead_code_statement(body);
@@ -868,8 +856,7 @@ dead_statement_filter(statement s)
       dead_statement_rewrite(s);
   }
 
-   debug(2, "dead_statement_filter",
-	 "End for statement %d (%d, %d): %s going down\n",
+   pips_debug(2, "End for statement %d (%d, %d): %s going down\n",
 	 statement_number(s),
 	 ORDERING_NUMBER(statement_ordering(s)),
 	 ORDERING_STATEMENT(statement_ordering(s)),
@@ -923,7 +910,7 @@ suppress_dead_code(char * mod_name)
   debug_on("DEAD_CODE_DEBUG_LEVEL");
 
   ifdebug(1) {
-      debug(1,"dead_code_elimination", "Begin for %s\n", mod_name);
+    pips_debug(1, "Begin for %s\n", mod_name);
       pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
       /* Value names are needed to print preconditions in debug messages */
       set_cumulated_rw_effects((statement_effects)
@@ -958,7 +945,7 @@ suppress_dead_code(char * mod_name)
       free_value_mappings();
   }
 
-  debug(1,"dead_code_elimination", "End for %s\n", mod_name);
+  pips_debug(1, "End for %s\n", mod_name);
   
   if (some_unstructured_ifs_have_been_changed)
      /* Now call the unspaghettify() function to remove some unreachable
@@ -966,7 +953,8 @@ suppress_dead_code(char * mod_name)
      unspaghettify(mod_name);
 
   ifdebug(1)
-      pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
+      pips_assert("Statements inconsistants...", 
+		  statement_consistent_p(mod_stmt));
   
   return TRUE;
 }
