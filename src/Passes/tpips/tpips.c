@@ -766,7 +766,7 @@ parse_arguments(int argc, char * argv[])
     extern char *optarg;
     extern int optind;
 
-    while ((c = getopt(argc, argv, "nl:h?v")) != -1)
+    while ((c = getopt(argc, argv, "nl:h?v")) != -1) {
 	switch (c)
 	{
 	case 'l':
@@ -778,23 +778,28 @@ parse_arguments(int argc, char * argv[])
 	    return;
 	    break;
 	case 'n':
-	    /* set_bool_property ("TPIPS_NO_EXECUTION_MODE", TRUE); */
 	    tpips_execution_mode = FALSE;
 	    break;
 	case 'v': 
 	    fprintf(stderr, "tpips: (ARCH=%s) %s\n", SOFT_ARCH, argv[0]);
             break;
 	}
+    }
 
-    if (argc == optind) {
+    if (argc == optind)
+    {
+	/* no arguments, parses stdin. */
 	use_readline = isatty(0);
 	pips_debug(1, "reading from stdin, which %s a tty\n",
 		   use_readline ? "is" : "is not");
 	current_file = stdin;
 	process_a_file();
     }
-    else {
-	while (optind < argc ) {
+    else 
+    {
+	/* process file arguments. */
+	while (optind < argc )
+	{
 	    if (same_string_p(argv[optind], "-")) {
 		current_file = stdin;
 		use_readline = isatty(0);
