@@ -1,13 +1,3 @@
-EMPTY (([ \t\n])+)
-OPTEMPTY (([ \t\n])*)
-
-%e 100000
-%p 100000
-%n 100000
-%k 100000
-%a 100000
-%o 100000
-
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,15 +18,14 @@ OPTEMPTY (([ \t\n])*)
 #define input() tpips_lex_input()
 #undef unput()
 #define unput(c) tpips_lex_unput(c)
-
 void yyrestart(FILE *f){ yyin = f;}
 
 #else
 
-#define YY_INPUT(buf,result,max_size) \
-{ \
- int c = tpips_lex_input(); \
- result = (c == '\0') ? YY_NULL : (buf[0] = c, 1); \
+#define YY_INPUT(buf,result,max_size) 			\
+{ 							\
+ int c = tpips_lex_input(); 				\
+ result = (c == '\0') ? YY_NULL : (buf[0] = c, 1); 	\
 }
 
 #endif
@@ -68,12 +57,14 @@ char * tpips_get_line_to_parse(void)
     return line_to_parse;
 }
 
+/*
 static void tpips_lex_unput(int c)
 {
     pips_debug(9,"unput char '%c'(0x%2x)\n", c,c);
     pips_assert("some place to unput a char", line_parsed<line_to_parse);
     *(--line_to_parse) = (char) c;
 }
+*/
 
 static void tpips_lex_print_pos(FILE* fout)
 {
@@ -89,203 +80,50 @@ static int tpips_lex_input (void)
     return (int) c;
 }
 
+#define KEYWORD(x) BEGIN INITIAL; return x
+
 %}
 
-%s KEY FNAME WNAME RES PHASE PROP SVAL OWN MISC
+%s KEY STR
 
 %%
-<KEY>{OPTEMPTY}"setenv" {
-    pips_debug(8, "read token SETENV");
-    BEGIN MISC;
-    return SET_ENVIRONMENT;
-}
-<KEY>{OPTEMPTY}"getenv" {
-    pips_debug(8, "read token GETENV");
-    BEGIN MISC;
-    return GET_ENVIRONMENT;
-}
 
-<MISC>[a-zA-Z0-9_]+	{
-    yylval.name = strdup(yytext);
-    return IDENT;
-}
-<MISC>[= 	]+	{ }
-<KEY>{OPTEMPTY}"open" {
-    pips_debug(8,"read token OPEN\n");
-    BEGIN WNAME;
-    return OPEN;
-}
+<KEY>setenv		{ KEYWORD(SET_ENVIRONMENT); }
+<KEY>getenv		{ KEYWORD(GET_ENVIRONMENT); }
+<KEY>open		{ KEYWORD(OPEN); }
+<KEY>create		{ KEYWORD(CREATE); }
+<KEY>close		{ KEYWORD(CLOSE); }
+<KEY>delete		{ KEYWORD(DELETE); }
+<KEY>module		{ KEYWORD(MODULE); }
+<KEY>make		{ KEYWORD(MAKE); }
+<KEY>apply		{ KEYWORD(APPLY); }
+<KEY>display 		{ KEYWORD(DISPLAY); }
+<KEY>activate 		{ KEYWORD(ACTIVATE); }
+<KEY>getproperty	{ KEYWORD(GET_PROPERTY); }
+<KEY>get		{ KEYWORD(GET_PROPERTY); }
+<KEY>info		{ KEYWORD(INFO); }
+<KEY>cd 		{ KEYWORD(CDIR); }
+<KEY>pwd 		{ KEYWORD(PWD); }
 
-<KEY>{OPTEMPTY}"create" {
-    pips_debug(8,"read token CREATE\n");
-    BEGIN WNAME;
-    return CREATE;
-}
+\(			{ return OPENPAREN; }
+\)			{ return CLOSEPAREN; }
+\,			{ return COMMA; }
+= 			{ return EQUAL; }
 
-<KEY>{OPTEMPTY}"close" {
-    pips_debug(8,"read token CLOSE\n");
-    BEGIN WNAME;
-    return CLOSE;
-}
+<STR>[^\"]*\"		{ yylval.name = strdup(concatenate("\"", yytext, 0));
+		  	  BEGIN INITIAL; return A_STRING;}
+\"			{ BEGIN STR;} /* " */
 
-<KEY>{OPTEMPTY}"delete" {
-    pips_debug(8,"read token DELETE\n");
-    BEGIN WNAME;
-    return DELETE;
-}
+"$ALL"			{ return OWNER_ALL; }
+"$PROGRAM"		{ return OWNER_PROGRAM; }
+"$MAIN"			{ return OWNER_MAIN; }
+"$MODULE"		{ return OWNER_MODULE; }
+"$CALLERS"		{ return OWNER_CALLERS; }
+"$CALLEES"		{ return OWNER_CALLEES; }
 
-<KEY>{OPTEMPTY}"module"	{
-    pips_debug(8,"read token MODULE\n");
-    BEGIN WNAME;
-    return MODULE;
-}
-
-<KEY>{OPTEMPTY}"make" {
-    pips_debug(8,"read token MAKE\n");
-    BEGIN RES;
-    return MAKE;
-}
-
-<KEY>{OPTEMPTY}"apply" {
-    pips_debug(8,"read token APPLY\n");
-    BEGIN PHASE;
-    return APPLY;
-}
-
-<KEY>{OPTEMPTY}"display" {
-    pips_debug(8,"read token DISPLAY\n");
-    BEGIN RES;
-    return DISPLAY;
-}
-
-<KEY>{OPTEMPTY}"activate" {
-    pips_debug(8,"read token ACTIVATE\n");
-    BEGIN PHASE;
-    return ACTIVATE;
-}
-
-<KEY>{OPTEMPTY}"getproperty" {
-    pips_debug(8,"read token GET_PROPERTY\n");
-    BEGIN PROP;
-    return GET_PROPERTY;
-}
-
-<KEY>{OPTEMPTY}"get" {
-    pips_debug(8,"read token GET_PROPERTY\n");
-    BEGIN PROP;
-    return GET_PROPERTY;
-}
-
-<KEY>{OPTEMPTY}"info" {
-    pips_debug(8,"read token INFO\n");
-    BEGIN WNAME;
-    return INFO;
-}
-
-<KEY,FNAME,WNAME,RES,PHASE,PROP,SVAL,OWN>{EMPTY} {
-    pips_debug(8,"read token SEPARATOR\n");
-    return SEPARATOR;
-}
-
-<FNAME>[/\.0-9A-Za-z_-]+ {
-    pips_debug(8,"read token FILE_NAME\n");
-    yylval.name = strdup(yytext);
-    return FILE_NAME;
-}
-
-<WNAME>[0-9A-Za-z_-]+ {
-    pips_debug(8,"read token WORKSPACE\n");
-    BEGIN FNAME;
-    yylval.name = strdup(yytext);
-    return WORKSPACE;
-}
-
-<RES,PHASE>\( {
-    pips_debug(8,"read token OPENPAREN\n");
-    BEGIN OWN;
-    return OPENPAREN;
-}
-
-<OWN>\) {
-    pips_debug(8,"read token CLOSEPAREN\n");
-    return CLOSEPAREN;
-}
-
-<OWN>\, {
-    pips_debug(8,"read token COMMA\n");
-    return COMMA;
-}
-
-<OWN>"$ALL" {
-    pips_debug(8,"read token OWNER_ALL\n");
-    return OWNER_ALL;
-}
-
-<OWN>"$PROGRAM" {
-    pips_debug(8,"read token OWNER_PROGRAM\n");
-    return OWNER_PROGRAM;
-}
-
-<OWN>"$MAIN" {
-    pips_debug(8,"read token OWNER_MAIN\n");
-    return OWNER_MAIN;
-}
-
-<OWN>"$MODULE" {
-    pips_debug(8,"read token OWNER_MODULE\n");
-    return OWNER_MODULE;
-}
-
-<OWN>"$CALLERS" {
-    pips_debug(8,"read token OWNER_CALLERS\n");
-    return OWNER_CALLERS;
-}
-
-<OWN>"$CALLEES" {
-    pips_debug(8,"read token OWNER_CALLEES\n");
-    return OWNER_CALLEES;
-}
-
-%%%%%%%%%%
-<OWN>[0-9A-Za-z_-]+ {
-    pips_debug(8,"read token OWNER_NAME\n");
-    yylval.name =strdup(yytext);
-    return OWNER_NAME;
-}
-
-<KEY,PROP>[a-zA-Z0-9_]+ {
-    pips_debug(8,"read token UNKNOWN_CHAR\n");
-    return UNKNOWN_CHAR;
-}
-
-<SVAL>"TRUE" {
-    pips_debug(8,"read token SETVALUE\n");
-    yylval.name = strdup(yytext);
-    return SETVALUE;
-}
-
-<SVAL>"FALSE" {
-    pips_debug(8,"read token SETVALUE\n");
-    yylval.name = strdup(yytext);
-    return SETVALUE;
-}
-
-<SVAL>[0-9]+ {
-    pips_debug(8,"read token SETVALUE\n");
-    yylval.name = strdup(yytext);
-    return SETVALUE;
-}
-
-<SVAL>\"[^\"]*\" {
-    pips_debug(8,"read token SETVALUE\n");
-    yylval.name = strdup(yytext);
-    return SETVALUE;
-}
-
-<KEY,FNAME,WNAME,RES,PHASE,PROP,OWN>. {
-    pips_debug(8,"read token UNKNOWN_CHAR\n");
-    return UNKNOWN_CHAR;
-}
+[/\.0-9A-Za-z_-]+ { yylval.name = strdup(yytext); return NAME;}
+[ \t\n]+		/* skip blanks */
+.			{ pips_user_error("unexpected char %c\n", *yytext); }
 
 %%
 
@@ -298,12 +136,6 @@ void yyinit_lex()
 	yy_init = 1;
 #endif
 }
-
-void yybegin_key()
-{BEGIN KEY;}
-
-void yybegin_fname()
-{BEGIN FNAME;}
 
 void yyerror(char * s)
 {
