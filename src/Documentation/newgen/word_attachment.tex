@@ -13,7 +13,7 @@
 
 \section*{Introduction}
 
-This report present the data structures used to attavh some
+This report present the data structures used to attach some
 information to some word of text, mainly to use in the hypertext Emacs
 interface.
 
@@ -31,5 +31,14 @@ Are only a list of {\tt attachment}s:
 Here is what we can attach to a word:
 
 \domain{attachment = entity + unknown:unit}
+
+
+\section{The mapping used to attach various internal informations}
+
+Each attachment point to a word of the code:
+\domain{attachment_to_word = attachment->string}
+
+Each word can have a list of attachments:
+\domain{word_to_attachments = string->attachments}
 
 \end{document}
