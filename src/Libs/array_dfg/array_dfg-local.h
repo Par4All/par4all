@@ -7,9 +7,7 @@
 #define EXIT_ORDER      100000
 #define TAKE_LAST	TRUE
 #define TAKE_FIRST	FALSE
-#define BASE_NODE_NUMBER 1000
-
-/* Structure for return of a possible source */
+#define BASE_NODE_NUMBER 1000/* Structure for return of a possible source */
 typedef struct Sposs_source {
         quast   *qua;
         Ppath   pat;
