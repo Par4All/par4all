@@ -2,7 +2,7 @@ c
 c     Reductions management 
 c
 c $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-c ($Date: 1996/09/07 16:11:59 $, )
+c ($Date: 1996/09/07 16:15:37 $, )
 c
 c     it is supposed that the reduction is computed on a full
 c     array, which is nor replicated anyway. If used on a part,
@@ -243,13 +243,13 @@ c
 c performs the reduction to the host
 c
       call pvmfreduce(pvm_opname(NAME),
-     x      val,1,PVMTYPE,MCASTHOST,HPFC_GROUP_NAME,0,info)
-      MCASTHOST=MCASTHOST+2
+     x      val,1,PVMTYPE,MCAST HOST,HPFC GROUP NAME,0,info)
+      MCAST HOST = MCAST HOST+2
 
 c
 c send final result to nodes 
 c      
-      call HPFC_HSNDTO_A(PVMTYPE, val)
+      call HPFC HSNDTO A(PVMTYPE, val)
       end 
       subroutine build_name(npost,NAME,PVMTYPE)(val)
       TYPE val
@@ -261,13 +261,13 @@ c
 c performs the reduction to the host
 c
       call pvmfreduce(pvm_opname(NAME),
-     x      val,1,PVMTYPE,MCASTHOST,HPFC_GROUP_NAME,0,info)
-      MCASTHOST=MCASTHOST+2
+     x      val,1,PVMTYPE,MCASTHOST,HPFC GROUP NAME,0,info)
+      MCAST HOST=MCAST HOST+2
 
 c
 c get final result 
 c      
-      call HPFC_RCVFR_mCH(PVMTYPE, val)
+      call HPFC RCVFR mCH(PVMTYPE, val)
       end
 c
 popdef(`NAME')dnl
