@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.175  2004/06/21 15:35:40  irigoin
+%% Property PARSER_ACCEPT_ARRAY_RANGE_EXTENSION added, FALSE by default
+%%
 %% Revision 1.174  2004/01/12 16:48:30  guerin
 %% Adding new property for FSM generation in PHRASE project
 %%
@@ -237,7 +240,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2004/01/12 16:48:30 $~$
+$~$Date: 2004/06/21 15:35:40 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -610,6 +613,18 @@ PARSER_ACCEPT_ANSI_EXTENSIONS TRUE
 
 Currently, this property is not used often enough in PIPS parser which let
 go many mistakes... as expected by real users!
+
+\subsubsection{Array range extension}
+\index{PARSER\_ACCEPT\_ARRAY\_RANGE\_EXTENSION}
+\index{Fortran 90}
+
+PIPS has been developed to parse correct Fortran-77 compliant programs
+only. Array ranges are used to improve readability. They can be generated
+by PIPS prettyprinter. They are not parsed as correct input by default.
+
+\begin{verbatim}
+PARSER_ACCEPT_ARRAY_RANGE_EXTENSION FALSE
+\end{verbatim}
 
 \subsubsection{Type Checking}
 \index{Type Checking}
