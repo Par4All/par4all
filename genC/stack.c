@@ -113,7 +113,7 @@ gen_stack s;
     return(s->size);
 }
 
-bool gen_stack_empy_p(s)
+bool gen_stack_empty_p(s)
 gen_stack s;
 {
     return(s->size==0);
