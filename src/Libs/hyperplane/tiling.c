@@ -3,6 +3,9 @@
  * $Id$
  * 
  * $Log: tiling.c,v $
+ * Revision 1.3  1998/10/12 17:00:37  ancourt
+ * essai ca code generation
+ *
  * Revision 1.2  1998/10/12 16:25:51  ancourt
  * *** empty log message ***
  *
@@ -220,6 +223,7 @@ tiling( list lls)
     Pbase initial_basis = NULL;
     Pbase tile_basis = NULL;
     Pbase local_basis = NULL;
+    Pbase new_basis = NULL;
     matrice B; /* Constraints for loop bounds */
     matrice P; /* Partitioning matrix */
     matrice HT; /* Transposed matrix of the inverse of P */
@@ -308,13 +312,20 @@ tiling( list lls)
 	(void) fprintf(stderr,"Tile domain in echelon format:\n");
 	sc_fprint(stderr, sc_tile_scan, entity_local_name);
     }
-
+    /* Build the new basis (tile_basis+initial_basis)*/
+    /* base It, Jt, I, J  pour notre exemple */ 
+    new_basis = vect_add(vect_dup(initial_basis),vect_dup(tile_basis)
+			 );
+ ifdebug(8) {
+	(void) fprintf(stderr,"new_basis\n");
+	vect_fprint(stderr, new_basis, entity_local_name);
+    }
     /* Build the code to scan any one tile */
     ifdebug(8) {
 	(void) fprintf(stderr,"sc_B_second:\n");
 	sc_fprint(stderr, sc_B_second, entity_local_name);
     }
-    sc_tile = new_loop_bound(sc_B_second, initial_basis);
+    sc_tile = new_loop_bound(sc_B_second, new_basis);
     ifdebug(8) {
 	(void) fprintf(stderr,"Iteration domain for one tile:\n");
 	sc_fprint(stderr, sc_tile, entity_local_name);
@@ -340,15 +351,17 @@ tiling( list lls)
     
     /* generation of code for scanning all tiles */
     /*  generation of bounds */
+    /* est completement inutile 
     for (pb = tile_basis; pb!=NULL; pb=pb->succ) {
 	make_bound_expression(pb->var, tile_basis, sc_tile_scan, &lower, &upper);
-    }
+    } */ 
     
     /* generation of code for scanning one tile */
-    /*  generation of bounds */
+    /*  generation of bounds */ 
+    /* est completement inutile 
     for (pb = initial_basis; pb!=NULL; pb=pb->succ) {
-	make_bound_expression(pb->var, initial_basis, sc_tile, &lower, &upper);
-    }
+	make_bound_expression(pb->var, initial_basis, sc_tile, &lower, &upper); 
+    } */
   
     /* loop body generation */
 
@@ -366,10 +379,11 @@ tiling( list lls)
     upper= expression_to_expression_newbase(lower, pvg, initial_basis);
 
 
-    s_lhyp = code_generation(lls, pvg, initial_basis, tile_basis, sc_tile_scan);
-
-    s_lhyp = code_generation(lls, pvg, initial_basis, tile_basis, sc_tile);
-
+   s_lhyp = code_generation(lls, pvg, initial_basis, tile_basis, sc_tile_scan);
+/* essai avec new-basis au lieu de tile basis mais ne marche pas car itere 2 fois uniquement 
+ tu as maintenant le parcours de l'interieur et des tiles mais plus celui des tiles*/
+    s_lhyp = code_generation(lls, pvg, initial_basis, new_basis, sc_tile);
+    
     debug(8," tiling","End\n");
 
     debug_off();
