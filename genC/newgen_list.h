@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1996/07/16 15:33:29 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1996/10/15 13:41:00 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -105,6 +105,7 @@ extern void gen_map GEN_PROTO(( void (*)(), list )) ;
 extern void gen_mapl GEN_PROTO(( void (*)(), list )) ;
 extern void gen_mapc_tabulated GEN_PROTO(( void (*)(), int )) ;
 extern list gen_nconc GEN_PROTO(( list , list )) ;
+extern list gen_full_copy_list GEN_PROTO((list)) ;
 extern list gen_nreverse GEN_PROTO(( list )) ;
 extern gen_chunk gen_nth GEN_PROTO(( int, list )) ;
 extern list gen_nthcdr GEN_PROTO(( int, list )) ;
