@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/12/26 16:07:56 $, )
+ * ($Date: 1996/12/30 09:28:54 $, )
  */
 
 #include "defines-local.h"
@@ -794,6 +794,13 @@ static void add_as_a_used_variable(entity e)
     entities_list(es) = gen_once(load_primary_entity(e), entities_list(es));
 }
 
+void 
+add_as_a_used_dynamic_to_statement(statement s, entity e)
+{
+    entities es = load_used_dynamics(s);
+    entities_list(es) = gen_once(load_primary_entity(e), entities_list(es));
+}
+
 static void add_as_a_modified_variable(entity e)
 {
     entities es = load_modified_dynamics(initial_statement);
@@ -1188,7 +1195,10 @@ static void remove_unused_remappings(statement s)
 
     MAP(ENTITY, primary,
     {
-	if (!gen_in_list_p(primary, lu))
+	pips_debug(5, "considering array %s\n", entity_name(primary));
+
+	if (!storage_formal_p(entity_storage(primary)) &&
+	    !gen_in_list_p(primary, lu))
 	{
 	    remove_from_entities(primary, remapped);
 	    remove_from_entities(primary, reaching);
@@ -1299,7 +1309,7 @@ static void dump_remapping_graph_info(statement s)
  *    map: O(n*vertex_operation)
  *    C = n^2 q m r
  */
-void simplify_remapping_graph()
+void simplify_remapping_graph(void)
 {
     list /* of statements */ ls = list_of_remapping_statements();
     statement root = get_current_module_statement();
