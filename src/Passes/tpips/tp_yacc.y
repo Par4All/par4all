@@ -67,16 +67,14 @@
 
 #include "misc.h"
 
-#include "pipsdbm.h"
 #include "ri-util.h"
+#include "pipsdbm.h"
 #include "resources.h"
 #include "phases.h"
 #include "builder_map.h"
 #include "properties.h"
 #include "pipsmake.h"
 
-#include "list.h"
-#include "ri-util.h"
 #include "top-level.h"
 #include "tpips.h"
 
