@@ -6,6 +6,8 @@
 
 #include <stdio.h>
 #include <string.h>
+extern char *strdup(const char *);
+
 #include <assert.h>
 #include <ctype.h>
 #include <malloc.h>
@@ -113,7 +115,7 @@ char * (*variable_name)();
 	    if (vect_coeff(TCST, monome_term(pm)) == 0) {
 		if (x != 1) {
 		    sprintf(r, "%s%s", u, MONOME_COEFF_MULTIPLY_SYMBOL);
-		    r = strchr(r, NULL);
+		    r = strchr(r, '\0');
 		}
 		s = vect_sprint_as_monome(monome_term(pm), pb,
 					  variable_name, MONOME_VAR_MULTIPLY_SYMBOL);
@@ -187,9 +189,10 @@ boolean (*is_inferior_var)();
 	pp = polynome_sort(&pp, is_inferior_var);
 
 	while (!POLYNOME_NUL_P(pp)) {
-	    s =	monome_sprint(polynome_monome(pp), pb, print_plus_sign, variable_name);
+	    s =	monome_sprint(polynome_monome(pp), pb, 
+			      print_plus_sign, variable_name);
 	    strcpy(r, s);
-	    r = strchr(r, NULL);
+	    r = strchr(r, '\0');
 	    pp = polynome_succ(pp);
 	    print_plus_sign = TRUE;
 	    if (!POLYNOME_NUL_P(pp)) *(r++) = ' ';
@@ -330,7 +333,7 @@ Variable (*name_to_variable)();
     boolean constructing_monome = FALSE;
     float coeff = 0.;
     char *varname;
-    int power;
+    Value power;
     char *s;
 
     s = strdup(sp);
@@ -339,15 +342,14 @@ Variable (*name_to_variable)();
     while (*s != '\0')
     {
 	/*fprintf(stderr, "\ns='%s'\n", s);*/
-	power = 1;
+	power = VALUE_ONE;
 	if (!constructing_monome) { coeff = parse_coeff(&s);
-				    /*fprintf(stderr, "coeff = %f\n", coeff); */
 				}
 	varname = parse_var_name(&s);
 	if (strlen(varname)!=0) {
 	    if (*s == '^') {
 		s++;
-		power = parse_coeff(&s);
+		power = float_to_value(parse_coeff(&s));
 	    }
 	    else 
 		while ((*s == '.') || (*s == '*')) s++;
@@ -355,37 +357,19 @@ Variable (*name_to_variable)();
 	else varname = strdup("TCST");
 
 	if (constructing_monome) {
-	    vect_add_elem(&(monome_term(curpm)), name_to_variable(varname), power);
-
-	    /*
-	      fprintf(stderr, "vect_add_elem  '%s' : #%d               --> monome ", varname, (int) name_to_variable(varname));
-	      monome_fprint(stderr, curpm, BASE_NULLE, FALSE, default_variable_name);
-	      fprintf(stderr, "\n");
-	      */
+	    vect_add_elem(&(monome_term(curpm)), 
+			  name_to_variable(varname), 
+			  power);
 	}
 	else {
 	    curpm = make_monome(coeff, name_to_variable(varname), power);
-	    /*
-	      fprintf(stderr, "new monome: ");
-	      monome_fprint(stderr, curpm, BASE_NULLE, FALSE, default_variable_name);
-	      fprintf(stderr, "\n");
-	      */
             constructing_monome = TRUE;
 	}
 	/*fprintf(stderr, "au milieu: s='%s'\n", s);*/
 
 	if ((*s == '+') || (*s == '-'))
 	{
-	    /*
-	      fprintf(stderr, "adding monome ");
-	      monome_fprint(stderr, curpm, BASE_NULLE, FALSE, default_variable_name);
-	      */
 	    polynome_monome_add(&pp, curpm);
-	    /*
-	      fprintf(stderr, "\n--> polynome ");
-	      polynome_fprint(stderr, pp, default_variable_name, default_is_inferior_var);
-	      fprintf(stderr, "\n");
-	      */
 	    monome_rm(&curpm);
             constructing_monome = FALSE;
 	}
