@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.13  1997/04/19 07:46:21  coelho
+# *** empty log message ***
+#
 # Revision 1.12  1997/03/27 14:28:14  coelho
 # *** empty log message ***
 #
@@ -27,7 +30,9 @@ NEWGEN_LIBS='-lgenC'
 # C3/LINEAR
 
 LINEAR_DOCS=''
-LINEAR_ORDERED_LIBS='arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre plint sparse_sc union'
+
+# plint
+LINEAR_ORDERED_LIBS='arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre sparse_sc union'
 
 # removed because not used by pips: plint
 
