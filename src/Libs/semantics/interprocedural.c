@@ -310,17 +310,23 @@ cons * le;
     for( ca = transformer_arguments(pre); !ENDP(ca); POP(ca) ) 
     {
 	entity e = ENTITY(CAR(ca));
+	entity e_old;
 
 	/* Thru DATA statements, old values of other modules may appear */
-	if(/* FI */ TRUE || same_string_p(entity_module_name(e), 
-			 module_local_name(get_current_module_entity()))) 
-	{
-	    entity e_old = entity_to_old_value(e);
-
-	    if(base_contains_variable_p(sc_base(r), (Variable) e_old))
-		lost_values = arguments_add_entity(lost_values,
-						   e_old);
+	if(!same_string_p(entity_module_name(e), 
+			  module_local_name(get_current_module_entity()))) {
+	    debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
+		  "precondition_intra_to_inter",
+		  "entitiy %s not belonging from module %s\n",
+		  entity_name(e),
+		  module_local_name(get_current_module_entity()));
 	}
+
+	e_old  = entity_to_old_value(e);
+	
+	if(base_contains_variable_p(sc_base(r), (Variable) e_old))
+	    lost_values = arguments_add_entity(lost_values,
+					       e_old);
     }
 
     ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) 
@@ -351,9 +357,13 @@ cons * le;
     MAPL(ca, 
      {entity e = ENTITY(CAR(ca));
       entity e_callee = entity_undefined;
-      if((e_callee = effects_conflict_with_entity(le, e)) == entity_undefined)
+      if((e_callee = effects_conflict_with_entity(le, e)) == entity_undefined) {
 	  lost_values = arguments_add_entity(lost_values, e);
-      else if(e_callee != e) {
+	  debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
+		"precondition_intra_to_inter",
+		"value %s lost according to effect list\n",
+		entity_name(e));
+      } else if(e_callee != e) {
 	  pre = transformer_value_substitute(pre, e, e_callee);
 	  ifdebug(DEBUG_PRECONDITION_INTRA_TO_INTER) {
 	      debug(DEBUG_PRECONDITION_INTRA_TO_INTER, 
