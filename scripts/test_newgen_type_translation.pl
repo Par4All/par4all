@@ -37,7 +37,7 @@ for ($i=7; $i<$size; $i++)
 # output new stuff...
 for ($i=0; $i<$size; $i++)
 {
-    print "$name[$i]\t$tr[$i]\t*\n";
+    print "$name[$i]\t$tr[$i]\t*\n" if $tr[$i] && $name[$i];
 }
 
 # changes files...
@@ -51,6 +51,8 @@ foreach $file (@ARGV)
     open(IN, "< $file.old");
     open(OUT, "> $file");
 
+    # filter file contents. rather rough indeed...
+    # may change some entity names... 
     while (<IN>)
     {
 	s/^(\d+) /$tr[$1] /;
