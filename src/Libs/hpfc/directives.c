@@ -3,7 +3,7 @@
  * these functions deal with HPF directives.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/07/21 16:32:47 $, )
+ * ($Date: 1995/07/31 16:25:17 $, )
  */
 
 #include "defines-local.h"
@@ -13,24 +13,29 @@
 #include "bootstrap.h"
 #include "control.h"
 
-/*  directive names encoding: HPF_PREFIX + one character
+/* directive names encoding: HPF_PREFIX + one character This encoding is
+ * achieved thru a sed script that transforms directives into calls that
+ * can be parsed by PIPS F77 parser. It's a hack but it greatly reduced
+ * the number of lines for the directive analysis, and it allowed quite
+ * simply to figure out where a executable directive is in the code.
  */
-#define HPF_PREFIX     "HPFC"
 
-#define BLOCK_SUFFIX   "K"
-#define CYCLIC_SUFFIX  "C"
-#define STAR_SUFFIX    "S"
+#define HPF_PREFIX "HPFC"
 
-#define ALIGN_SUFFIX   "A"
-#define REALIGN_SUFFIX "B"
-#define DIST_SUFFIX    "D"
-#define REDIST_SUFFIX  "E"
-#define INDEP_SUFFIX   "I"
-#define NEW_SUFFIX     "N"
-#define PROC_SUFFIX    "P"
-#define TEMPL_SUFFIX   "T"
-#define PURE_SUFFIX    "U"
-#define DYNA_SUFFIX    "Y"
+#define BLOCK_SUFFIX		"K"
+#define CYCLIC_SUFFIX		"C"
+#define STAR_SUFFIX		"S"
+
+#define ALIGN_SUFFIX		"A"
+#define REALIGN_SUFFIX		"B"
+#define DISTRIBUTE_SUFFIX	"D"
+#define REDISTRIBUTE_SUFFIX	"E"
+#define INDEPENDENT_SUFFIX	"I"
+#define NEW_SUFFIX		"N"
+#define PROCESSORS_SUFFIX	"P"
+#define TEMPLATE_SUFFIX		"T"
+#define PURE_SUFFIX		"U"
+#define DYNAMIC_SUFFIX		"Y"
 
 /*-----------------------------------------------------------------
  *
@@ -59,29 +64,28 @@ DEFINE_LOCAL_STACK(current_stmt, statement);
 bool hpf_directive_string_p(s)
 string s;
 {
-    int len = strlen(HPF_PREFIX);
-    return(strncmp(HPF_PREFIX, s, len)==0);
+    return strncmp(HPF_PREFIX, s, strlen(HPF_PREFIX))==0;
 }
 
 bool hpf_directive_entity_p(e)
 entity e;
 {
-    return(top_level_entity_p(e) && 
-	   hpf_directive_string_p(entity_local_name(e)));
+    return top_level_entity_p(e) && 
+	hpf_directive_string_p(entity_local_name(e));
 }
 
 bool realign_directive_p(f)
 entity f;
 {
-    return(top_level_entity_p(f) && 
-	   same_string_p(HPF_PREFIX REALIGN_SUFFIX, entity_local_name(f)));
+    return top_level_entity_p(f) && 
+	same_string_p(HPF_PREFIX REALIGN_SUFFIX, entity_local_name(f));
 }
 
 bool redistribute_directive_p(f)
 entity f;
 {
-    return(top_level_entity_p(f) && 
-	   same_string_p(HPF_PREFIX REDIST_SUFFIX, entity_local_name(f)));
+    return top_level_entity_p(f) && 
+	same_string_p(HPF_PREFIX REDISTRIBUTE_SUFFIX, entity_local_name(f));
 }
 
 /*-----------------------------------------------------------------
@@ -91,7 +95,8 @@ entity f;
  * just change the basic type to overloaded and 
  * store the entity as a processor or a template.
  */
-static void switch_basic_type_to_overloaded(e)
+static void 
+switch_basic_type_to_overloaded(e)
 entity e;
 {
     basic b = entity_basic(e);
@@ -136,7 +141,8 @@ expression e;
 /*  TRUE if the template dimension subscript is an alignment.
  *  FALSE if the dimension is replicated. 
  */
-static bool alignment_p(align_src, subscript, padim, prate, pshift)
+static bool 
+alignment_p(align_src, subscript, padim, prate, pshift)
 list /* of expressions */ align_src;
 expression subscript;
 int *padim;
@@ -146,8 +152,7 @@ Value *prate, *pshift;
     Pvecteur v, v_src;
     int size, array_dim;
 
-    if (normalized_complex_p(n))
-	return(FALSE);
+    if (normalized_complex_p(n)) return FALSE;
 
     /*  else the subscript is affine
      */
@@ -165,7 +170,7 @@ Value *prate, *pshift;
     if (size==0 || (*pshift!=0 && size==1))
     {
 	*padim = 0, *prate = 0;
-	return(TRUE);
+	return TRUE;
     }
 
     /*   affine alignment case
@@ -185,7 +190,7 @@ Value *prate, *pshift;
 	    if (*prate!=0) 
 	    {
 		*padim = array_dim;
-		return(TRUE);   /* alignment ok */
+		return TRUE;   /* alignment ok */
 	    }
 	}
     }
@@ -193,13 +198,14 @@ Value *prate, *pshift;
     /*   matching array dimension not found, replicated!
      */
     *padim = 0, *prate = 0;
-    return(FALSE);
+    return FALSE;
 }
 
 /*  builds an align from the alignee and template references.
  *  used by both align and realign management.
  */
-static align extract_the_align(alignee, temp)
+static align 
+extract_the_align(alignee, temp)
 reference alignee, temp;
 {
     list
@@ -228,7 +234,7 @@ reference alignee, temp;
 
     /* built align is returned. should be normalized?
      */
-    return(make_align(aligns, template));
+    return make_align(aligns, template);
 }
 
 /* handle s as the initial alignment...
@@ -249,7 +255,8 @@ statement s;
 	get_the_dynamics());
 }
 
-static void one_align_directive(alignee, temp, dynamic)
+static void 
+one_align_directive(alignee, temp, dynamic)
 reference alignee, temp;
 bool dynamic;
 {
@@ -285,7 +292,8 @@ bool dynamic;
     }       
 }
 
-static void handle_align_and_realign_directive(f, args, dynamic)
+static void 
+handle_align_and_realign_directive(f, args, dynamic)
 entity f;
 list /* of expressions */ args;
 bool dynamic;
@@ -334,22 +342,23 @@ list /* of expressions */ *pl;
     name = entity_local_name(function);
     
     if (same_string_p(name, HPF_PREFIX BLOCK_SUFFIX))  /* BLOCK() */
-	return(is_style_block);
+	return is_style_block;
     else 
     if (same_string_p(name, HPF_PREFIX CYCLIC_SUFFIX)) /* CYCLIC() */
-	return(is_style_cyclic);
+	return is_style_cyclic;
     else
     if (same_string_p(name, HPF_PREFIX STAR_SUFFIX))   /* * [star] */
-	return(is_style_none);
+	return is_style_none;
     else
 	user_error("distribution_format", "invalid");
 
-    return(-1); /* just to avoid a gcc warning */
+    return 0; /* just to avoid a gcc warning */
 }
 
 /*  builds the distribute from the distributee and processor references.
  */
-static distribute extract_the_distribute(distributee, proc)
+static distribute 
+extract_the_distribute(distributee, proc)
 reference distributee, proc;
 {
     expression parameter = expression_undefined;
@@ -389,19 +398,19 @@ reference distributee, proc;
 		     ldist);
     }
     
-    return(make_distribute(gen_nreverse(ldist), processor));
+    return make_distribute(gen_nreverse(ldist), processor);
 }
 
 /*  handles a simple (one template) distribute or redistribute directive.
  */
-static void one_distribute_directive(distributee, proc, dynamic)
+static void 
+one_distribute_directive(distributee, proc, dynamic)
 reference distributee, proc;
 bool dynamic;
 {
     entity processor = reference_variable(proc),
            template  = reference_variable(distributee);
-    distribute
-	d = extract_the_distribute(distributee, proc);
+    distribute d = extract_the_distribute(distributee, proc);
 
     assert(ENDP(reference_indices(proc))); /* no ... ONTO P(something) */
     
@@ -441,7 +450,8 @@ bool dynamic;
 
 /*  handles a full distribute or redistribute directive.
  */
-static void handle_distribute_and_redistribute_directive(f, args, dynamic)
+static void 
+handle_distribute_and_redistribute_directive(f, args, dynamic)
 entity f;
 list /* of expressions */ args;
 bool dynamic;
@@ -643,7 +653,7 @@ list /* of expressions */ args;
  *
  * DIRECTIVE HANDLING
  *
- *   find the handler for a given entity.
+ *   finds the handler for a given entity.
  */
 struct DirectiveHandler 
 {
@@ -653,20 +663,20 @@ struct DirectiveHandler
 
 static struct DirectiveHandler handlers[] =
 { 
-  {HPF_PREFIX BLOCK_SUFFIX,   handle_unexpected_directive },
-  {HPF_PREFIX CYCLIC_SUFFIX,  handle_unexpected_directive },
-  {HPF_PREFIX STAR_SUFFIX,    handle_unexpected_directive },
-  {HPF_PREFIX ALIGN_SUFFIX,   handle_align_directive },
-  {HPF_PREFIX REALIGN_SUFFIX, handle_realign_directive },
-  {HPF_PREFIX DIST_SUFFIX,    handle_distribute_directive },
-  {HPF_PREFIX REDIST_SUFFIX,  handle_redistribute_directive },
-  {HPF_PREFIX INDEP_SUFFIX,   handle_independent_directive },
-  {HPF_PREFIX NEW_SUFFIX,     handle_new_directive },
-  {HPF_PREFIX PROC_SUFFIX,    handle_processors_directive },
-  {HPF_PREFIX TEMPL_SUFFIX,   handle_template_directive },
-  {HPF_PREFIX DYNA_SUFFIX,    handle_dynamic_directive },
-  {HPF_PREFIX PURE_SUFFIX,    handle_pure_directive },
-  { (string) NULL,            handle_unexpected_directive }
+  {HPF_PREFIX BLOCK_SUFFIX,		handle_unexpected_directive },
+  {HPF_PREFIX CYCLIC_SUFFIX,		handle_unexpected_directive },
+  {HPF_PREFIX STAR_SUFFIX,		handle_unexpected_directive },
+  {HPF_PREFIX ALIGN_SUFFIX,		handle_align_directive },
+  {HPF_PREFIX REALIGN_SUFFIX,		handle_realign_directive },
+  {HPF_PREFIX DISTRIBUTE_SUFFIX,	handle_distribute_directive },
+  {HPF_PREFIX REDISTRIBUTE_SUFFIX,	handle_redistribute_directive },
+  {HPF_PREFIX INDEPENDENT_SUFFIX,	handle_independent_directive },
+  {HPF_PREFIX NEW_SUFFIX,		handle_new_directive },
+  {HPF_PREFIX PROCESSORS_SUFFIX,	handle_processors_directive },
+  {HPF_PREFIX TEMPLATE_SUFFIX,		handle_template_directive },
+  {HPF_PREFIX DYNAMIC_SUFFIX,		handle_dynamic_directive },
+  {HPF_PREFIX PURE_SUFFIX,		handle_pure_directive },
+  { (string) NULL,			handle_unexpected_directive }
 };
 
 /* returns the handler for directive name.
@@ -677,7 +687,7 @@ string name;
 {
     struct DirectiveHandler *x=handlers;
     while (x->name!=(string) NULL && strcmp(name,x->name)!=0) x++;
-    return(x->handler);
+    return x->handler;
 }
 
 /* list of statements to be cleaned. the operation is delayed because
@@ -703,16 +713,11 @@ statement s;
 	list /* of renamings */  lr = load_renamings(s),
 	     /* of statements */ block = NIL;
 	
-	debug(4, "clean_statement",
-	      "remapping statement 0x%x\n", (unsigned int) s);
-
 	MAP(RENAMING, r,
 	{
 	    entity o = renaming_old(r);
 	    entity n = renaming_new(r);
 	    
-	    debug(5, "clean_statement", 
-		  "%s -> %s\n", entity_name(o), entity_name(n));
 	    block = CONS(STATEMENT, generate_copy_loop_nest(o, n), block);
 	},
 	    lr);
@@ -746,14 +751,14 @@ call c;
 	to_be_cleaned = CONS(STATEMENT, current_stmt_head(), to_be_cleaned);
     }
     
-    return(FALSE); /* no instructions within a call! */
+    return FALSE; /* no instructions within a call! */
 }
 
 static bool stmt_filter(s)
 statement s;
 {
     current_stmt_push(s);
-    return(TRUE);
+    return TRUE;
 }
 
 static void stmt_rewrite(s)
