@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/10 12:03:29 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1995/11/24 15:01:42 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -158,7 +158,7 @@ store_an_upper(
     entity var,
     int val)
 {
-    pips_debug(5, "%s <= %d\n", entity_local_name(var), val);
+    pips_debug(9, "%s <= %d\n", entity_local_name(var), val);
 
     if (bound_uppers_p(var))
     {
@@ -174,7 +174,7 @@ store_a_lower(
     entity var,
     int val)
 {
-    pips_debug(5, "%s >= %d\n", entity_local_name(var), val);
+    pips_debug(9, "%s >= %d\n", entity_local_name(var), val);
 
     if (bound_lowers_p(var))
     {
