@@ -102,6 +102,11 @@ bool print_icfg_with_preconditions(string module_name)
     return print_any_icfg(module_name,ICFG_DECOR_PRECONDITIONS);
 }
 
+bool print_icfg_with_total_preconditions(string module_name)
+{
+    return print_any_icfg(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
+}
+
 bool print_icfg_with_transformers(string module_name)
 {
     return print_any_icfg(module_name,ICFG_DECOR_TRANSFORMERS);
@@ -145,6 +150,11 @@ bool print_icfg_with_loops_preconditions(string module_name)
     return print_any_icfg_with_loops(module_name,ICFG_DECOR_PRECONDITIONS);
 }
 
+bool print_icfg_with_loops_total_preconditions(string module_name)
+{
+    return print_any_icfg_with_loops(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
+}
+
 bool print_icfg_with_loops_transformers(string module_name)
 {
  return print_any_icfg_with_loops(module_name,ICFG_DECOR_TRANSFORMERS);
@@ -184,6 +194,11 @@ bool print_icfg_with_control_complexities(string module_name)
 bool print_icfg_with_control_preconditions(string module_name)
 {
     return print_any_icfg_with_control(module_name,ICFG_DECOR_PRECONDITIONS);
+}
+
+bool print_icfg_with_control_total_preconditions(string module_name)
+{
+    return print_any_icfg_with_control(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
 }
 
 bool print_icfg_with_control_transformers(string module_name)
