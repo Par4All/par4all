@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/22 11:42:47 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/22 13:00:34 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -945,22 +945,6 @@ struct driver *dr ;
 {
     union domain *dp ;
 
-    if( IS_TABULATED( bp ))
-    {
-	char local[512];
-	    
-	(void) sprintf(local, "%d%c%s", 
-		quick_domain_index(obj), HASH_SEPAR, (obj+HASH_OFFSET)->s) ;
-
-	if (!Gen_tabulated_names) 
-	    fatal("free_obj_out: Null tabulated names for %s\n", bp->name) ;
-	
-	if (hash_del(Gen_tabulated_names, local)==HASH_UNDEFINED_VALUE)
-	    user("free_tabulated: clearing unexisting \"%s\"\n", local);
-	
-	(Gen_tabulated_[bp->index]+abs((obj+1)->i))->p=gen_chunk_undefined;
-    }
-
     if((dp=bp->domain)->ba.type == CONSTRUCTED_DT && dp->co.op == ARROW_OP) {
 	hash_table h = (obj+1 + IS_TABULATED( bp ))->h ;
 
@@ -1001,7 +985,30 @@ free_obj_in(
     gen_chunk *obj,
     struct driver *dr)
 {
-    return !free_already_seen_p(obj);
+    int notseen = !free_already_seen_p(obj);
+
+    if (notseen) {
+	int dom = quick_domain_index(obj);
+	struct gen_binding *bp = &Domains[dom] ;
+
+	if( IS_TABULATED( bp )) 
+	{
+	    char local[512];
+	    sprintf(local, "%d%c%s", dom, HASH_SEPAR, (obj+HASH_OFFSET)->s) ;
+
+	    if (!Gen_tabulated_names) 
+		fatal("free_obj_out: Null tabulated names for %s\n", bp->name);
+	
+	    /* freed here because the name is freed before free_obj_out
+	     */
+	    if (hash_del(Gen_tabulated_names, local)==HASH_UNDEFINED_VALUE)
+		user("free_tabulated: clearing unexisting \"%s\"\n", local);
+	
+	    (Gen_tabulated_[bp->index]+abs((obj+1)->i))->p=gen_chunk_undefined;
+	}
+    }
+    
+    return notseen;
 }
 
 /* version withouy shared_pointers.
