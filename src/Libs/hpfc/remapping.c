@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/07/11 22:10:42 $, ) 
+ * ($Date: 1995/07/20 18:40:47 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -236,10 +236,10 @@ list *pl, 	/* P */
     *plo = base_to_list(sc_base(s)); 
     gen_remove(plo, (entity) TCST);
 
-    MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *pl);
-    MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *plp);
-    MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *plrm);
-    MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *pll);
+    MAP(ENTITY, e, gen_remove(plo, e), *pl);
+    MAP(ENTITY, e, gen_remove(plo, e), *plp);
+    MAP(ENTITY, e, gen_remove(plo, e), *plrm);
+    MAP(ENTITY, e, gen_remove(plo, e), *pll);
 
     DEBUG_ELST(7, "P", *pl);
     DEBUG_ELST(7, "P'", *plp);
@@ -533,7 +533,7 @@ bool dist_p; /* true if must take care of lambda */
 	    sd /* distributed */, 
 	    sr /* replicated */;
 
-	MAPL(ce, gen_remove(&lpproc, ENTITY(CAR(ce))), ldiff);
+	MAP(ENTITY, e, gen_remove(&lpproc, e), ldiff);
 
 	/* polyhedron separation to extract the diffusions.
 	 */
@@ -665,12 +665,10 @@ statement s, *hsp /* Host Statement Pointer */, *nsp /* idem Node */;
 
     *hsp = make_empty_statement(); /* nothing for host */
 
-    MAPL(cr,
+    MAP(RENAMING, r,
      {
-	 renaming r = RENAMING(CAR(cr));
-
-	 l = CONS(STATEMENT, hpf_remapping(renaming_old(r), renaming_new(r)),
-		  l);
+	 l = CONS(STATEMENT, 
+		  hpf_remapping(renaming_old(r), renaming_new(r)), l);
      },
 	 load_renamings(s));
 
