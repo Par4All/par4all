@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.148  2000/11/29 14:59:57  irigoin
+%% Three properties added: PRETTYPRINT_INDENTATION, SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS and SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS
+%%
 %% Revision 1.147  2000/10/11 15:23:22  irigoin
 %% property PARSER_LINEARIZE_LOOP_BOUNDS added
 %%
@@ -150,7 +153,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2000/10/11 15:23:22 $~$
+$~$Date: 2000/11/29 14:59:57 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -984,10 +987,12 @@ No property for this library.
 
 For every module, array declaration are assumed to be correct with respect
 to the standard: the upper bound must be greater than or equal to the
-lower bound. 
+lower bound. When implicit, the lower bound is one. The star upper bound
+is neglected.
 
 This property is turned off by default because it might slow down PIPS
-quite a lot.
+quite a lot without adding any useful information because loop bounds are
+usually different from array bounds.
 
 \begin{verbatim}
 SEMANTICS_TRUST_ARRAY_DECLARATIONS FALSE
@@ -998,9 +1003,7 @@ to the declarations: the subscript expressions must have values lower than
 or equal to the upper bound and greater than or equal to the lower bound.
 
 This property is turned off by default because it might slow down PIPS
-quite a lot.
-
-It is not implemented yet.
+quite a lot without adding any useful information.
 
 \begin{verbatim}
 SEMANTICS_TRUST_ARRAY_REFERENCES FALSE
@@ -1016,6 +1019,32 @@ managed by \PIPSMAKE{}.
 \begin{verbatim}
 SEMANTICS_FLOW_SENSITIVE FALSE
 \end{verbatim}
+
+
+\subsubsection{Transformers for expressions}
+\index{Expression}
+\index{Transformer}
+\index{}
+
+Without preconditions, transformers can be precise only for affine
+expressions. Approximate transformers can sometimes be derived for other
+expressions, involving for instance products of variables or divisions.
+
+However, a precondition of an expression can be used to refine the
+approximation. For instance, some non-linear expressions can become affine
+because some of the variables have constant values, and some non-linear
+expressions can be better approximated because the variables signs or
+ranges are known.
+
+To be backward compatible and to be conservative for PIPS execution time,
+the default value is false.
+
+Not implemented yet.
+
+\begin{verbatim}
+SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS FALSE
+\end{verbatim}
+
 
 
 \subsubsection{Interprocedural Semantics Analysis}
@@ -1038,6 +1067,7 @@ This property is used internally and is not user selectable.
 \index{SEMANTICS\_FIX\_POINT}
 \index{SEMANTICS\_FIX\_POINT\_OPERATOR}
 \index{SEMANTICS\_INEQUALITY\_INVARIANT}
+\index{SEMANTICS\_RECOMPUTE\_FIX\_POINTS\_WITH\_PRECONDITIONS}
 
 CPU time and memory space are cheap enough to compute loop fix points for
 {\em transformers}. This property implies SEMANTICS\_FLOW\_SENSITIVE and is not
@@ -1095,6 +1125,18 @@ selectable.
 
 \begin{verbatim}
 SEMANTICS_INEQUALITY_INVARIANT FALSE
+\end{verbatim}
+
+Because of convexity, some fix points may be improved by using some of the
+information carried by the preconditions. Hence, it may be profitable to
+recompute loop fix point transformer when preconditions are being
+computed.
+
+The default value is false because this option slows down PIPS and does
+not seem to add much useful information in general.
+
+\begin{verbatim}
+SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS FALSE
 \end{verbatim}
 
 \subsubsection{Prettyprint}
@@ -1749,6 +1791,7 @@ PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
 \index{Analysis}
 \index{PRETTYPRINT\_LOOSE}
 \index{PRETTYPRINT\_STATEMENT\_NUMBER}
+\index{PRETTYPRINT\_INDENTATION}
 \index{Statement number}
 
 When prettyprinting semantic information (preconditions, transformers and
@@ -1773,6 +1816,13 @@ numbers. A multiline statement only has one number. See \Pri{}.
 
 \begin{verbatim}
 PRETTYPRINT_STATEMENT_NUMBER TRUE 
+\end{verbatim}
+
+The structured control structure is shown by using an indentation. The
+default value is 3.
+
+\begin{verbatim}
+PRETTYPRINT_INDENTATION 3
 \end{verbatim}
 
 
