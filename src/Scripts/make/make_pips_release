@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/03 12:56:46 $, 
+# $Date: 1996/09/03 15:23:22 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -11,6 +11,9 @@ tar=${PIPS_TAR:-gtar}
 taropt=cf
 zip=${PIPS_ZIP:-"gzip -v9"}
 verb=:
+
+# having the full Doc is too much for binary releases?
+what="-d Share -d Doc -d Runtime -d Examples" 
 
 verbose()
 { echo "$RCSfile: make_pips_release,v $: $@" >&2;}
@@ -33,9 +36,10 @@ usage()
 	    -z: tar and zip
 	    -w: additional options for make_release
 	  release content:
-	    -S: include sources (Include, Src, Utils)
-	    -B arch: include executables for arch
-	    -L arch: include libraries for this arch
+	    default: Share Doc Runtime Examples
+	    -S: add sources (Include, Src, Utils, Validation)
+	    -B arch: add binaries for arch (Bin/arch)
+	    -L arch: add libraries for arch (Lin/arch)
 	  software:
 	    -p: Pips
 	    -n: Newgen
@@ -46,9 +50,6 @@ usage()
     exit $ret
 }
 
-# having the full Doc is too much for binary releases?
-what="-d Share -d Doc -d Runtime -d Examples" 
-
 while getopts hvrszw:SB:L:pnle opt
 do
     case $opt in
@@ -58,7 +59,8 @@ do
 	s) strip='strip' ;;
 	z) tz='1' ;;
 	w) what="$what $OPTARG" ;;
-	S) what="$what -s Src -d Include -d Utils" ; name="${name}S" ;;
+	S) what="$what -s Src -d Include -d Utils -d Validation" ; 
+	   name="${name}S" ;;
 	B) what="$what -d Bin/$OPTARG" ;
 	   name="${name}B$OPTARG" ;
 	   tostrip="$tostrip Bin/$OPTARG" ;;
