@@ -9,7 +9,8 @@ ETEXF =	ri.tex \
 	compsec.tex \
 	word_attachment.tex \
 	reductions_private.tex \
-	interval_graph.tex
+	interval_graph.tex \
+	pipsdbm_private.tex
 
 FTEXF =	complexity_ri.ftex \
 	database.ftex \
