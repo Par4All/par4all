@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.61  2002/03/08 10:28:25  irigoin
+ * debug() replaced by pips_debug()
+ *
  * Revision 1.60  2001/07/19 17:02:41  irigoin
  * Cosmetics changes to MakeExternalFunction() and DeclareExternalFunction()
  *
@@ -92,7 +95,7 @@ substitute_ghost_variable_in_expression(
     call c = call_undefined;
 
     ifdebug(8) {
-	debug(8, "", "Begin for expression: ");
+	pips_debug(8, "Begin for expression: ");
 	print_expression(expr);
     }
 
@@ -100,7 +103,7 @@ substitute_ghost_variable_in_expression(
     case is_syntax_reference:
 	ref = syntax_reference(s);
 	if(reference_variable(ref)==v) {
-	    debug(1, "substitute_ghost_variable_in_expression",
+	    pips_debug(1,
 		  "Reference to formal functional entity %s to be substituted\n",
 		  entity_name(f));
 	    /* ParserError() is going to request ghost variable
@@ -135,7 +138,7 @@ substitute_ghost_variable_in_expression(
     }
 
     ifdebug(8) {
-	debug(8, "", "End for expression: ");
+	pips_debug(8, "End for expression: ");
 	print_expression(expr);
     }
 }
@@ -259,11 +262,11 @@ remove_ghost_variable_entities(bool substitute_p)
 
 
 		if(substitute_p) {
-		    debug(1, "remove_ghost_variable_entities",
+		    pips_debug(1,
 			  "Start substitution of variable %s by module %s\n",
 			  entity_name(e), entity_name(fe));
 		    substitute_ghost_variable_in_statement(stmt, e, fe);
-		    debug(1, "remove_ghost_variable_entities",
+		    pips_debug(1,
 			  "End for substitution of variable %s by module %s\n",
 			  entity_name(e), entity_name(fe));
 		}
@@ -420,7 +423,7 @@ EndOfProcedure()
 {
     entity CurrentFunction = get_current_module_entity();
 
-    debug(8, "EndOfProcedure", "Begin for module %s\n",
+    pips_debug(8, "Begin for module %s\n",
 	  entity_name(CurrentFunction));
     
     pips_debug(8, "checking code consistency = %d\n",
@@ -575,7 +578,7 @@ UpdateFunctionalType(
     type t = entity_type(CurrentFunction);
 
     ifdebug(8) {
-	debug(8, "UpdateFunctionalType", "Begin for %s with type ",
+	pips_debug(8, "Begin for %s with type ",
 	      module_local_name(CurrentFunction));
 	fprint_functional(stderr, type_functional(t));
 	(void) fprintf(stderr, "\n");
@@ -614,7 +617,7 @@ UpdateFunctionalType(
     }
 
     ifdebug(8) {
-	debug(8, "UpdateFunctionalType", "End for %s with type ",
+	pips_debug(8, "End for %s with type ",
 	      module_local_name(CurrentFunction));
 	fprint_functional(stderr, type_functional(t));
 	(void) fprintf(stderr, "\n");
@@ -643,7 +646,7 @@ remove_module_entity(entity m)
 		if(!code_undefined_p(c)) {
 		    ifdebug(1) {
 			if(gen_in_list_p(m, code_declarations(c))) {
-			    debug(1, "remove_module_entity",
+			    pips_debug(1,
 				  "Declaration of module %s removed from %s's declarations",
 				  entity_name(m), entity_name(om));
 			}
@@ -726,8 +729,9 @@ MakeCurrentFunction(
       }
       else {
 	/* A block data may be declared in an EXTERNAL statement, see Standard 8-9 */
-	debug(1, "MakeCurrentFunction", "Entity \"%s\" does not really exist."
-	      " A blockdata is declared in an EXTERNAL statement.");
+	pips_debug(1, "Entity \"%s\" does not really exist."
+	      " A blockdata is declared in an EXTERNAL statement.",
+		   entity_name(ce));
 	/* remove_variable_entity(ce); */
 	remove_module_entity(ce);
       }
@@ -969,7 +973,7 @@ TranslateEntryFormals(
     list lefp = NIL; /* list of effective formal parameters lefp for entry e */
 
     ifdebug(1) {
-	debug(1, "TranslateEntryFormals", "Begin with lfp = ");
+	pips_debug(1, "Begin with lfp = ");
 	dump_arguments(lfp);
     }
 
@@ -982,7 +986,7 @@ TranslateEntryFormals(
     }, lfp);
 
     ifdebug(1) {
-	debug(1, "TranslateEntryFormals", "\nEnd with lefp = ");
+	pips_debug(1, "\nEnd with lefp = ");
 	dump_arguments(lefp);
     }
 
@@ -1066,7 +1070,7 @@ MakeEntryCommon(
 	storage vs = entity_storage(v);
 
 	if(value_constant(entity_initial(v))) {
-	    debug(1, "MakeEntryCommon",
+	    pips_debug(1,
 		  "Initialized variable %s\n", entity_local_name(v));
 	    /* A variable in a common cannot be initialized more than once */
 	    /*
@@ -1122,7 +1126,7 @@ MakeEntry(
     list cc = list_undefined; /* current chunk (temporary) */
     list lefp = list_undefined; /* list of effective formal parameters */
 
-    debug(1, "MakeEntry", "Begin for entry %s\n", entity_name(e));
+    pips_debug(1, "Begin for entry %s\n", entity_name(e));
 
     /* Name conflicts could be checked here as in MakeCurrentFunction() */
 
@@ -1241,7 +1245,7 @@ MakeEntry(
 		  arguments_rm_entity(entity_declarations(cm), fp);
 		*/
 		if(entity_is_argument_p(fp,entity_declarations(cm))) {
-		    debug(1, "MakeEntry", "Entity %s removed from declarations for %s\n",
+		    pips_debug(1, "Entity %s removed from declarations for %s\n",
 			  entity_name(fp), module_local_name(cm));
 		    gen_remove(&entity_declarations(cm), fp);
 		    pips_user_warning("Variable %s seems to be used before it is declared"
@@ -1276,7 +1280,7 @@ MakeEntry(
 	dump_arguments(entity_declarations(cm));
     }
 
-    debug(1, "MakeEntry", "End for entry %s\n", entity_name(fe));
+    pips_debug(1, "End for entry %s\n", entity_name(fe));
 
     return i;
 }
@@ -1298,7 +1302,7 @@ BuildStatementForEntry(
     statement es = statement_undefined; /* statement for entry e */
     list l = NIL; /* temporary statement list */
 
-    debug(1, "BuildStatementForEntry", "Begin for entry %s in module %s\n",
+    pips_debug(1, "Begin for entry %s in module %s\n",
 	  entity_name(e), entity_name(cm));
 
     pips_assert("jump consistent", statement_consistent_p(jump));
@@ -1323,7 +1327,7 @@ BuildStatementForEntry(
     pips_assert("es is still consistent", statement_consistent_p(es));
     pips_assert("cms is still consistent", statement_consistent_p(cms));
 
-    debug(1, "BuildStatementForEntry", "End for entry %s in module %s\n",
+    pips_debug(1, "End for entry %s in module %s\n",
 	  entity_name(e), entity_name(cm));
 
     return es;
@@ -1346,7 +1350,7 @@ ProcessEntry(
     extern unstructured control_graph(statement);
     extern void make_text_resource_and_free(string, string, string, text);
 
-    debug(1, "ProcessEntry", "Begin for entry %s of module %s\n",
+    pips_debug(1, "Begin for entry %s of module %s\n",
 	  entity_name(e), module_local_name(cm));
 
     if(area_size(type_area(entity_type(StaticArea)))!=0) {
@@ -1433,7 +1437,7 @@ ProcessEntry(
     pips_assert("statement for cm is consistent",
 		statement_consistent_p(get_current_module_statement()));
 
-    debug(1, "ProcessEntry", "End for entry %s of module %s\n",
+    pips_debug(1, "End for entry %s of module %s\n",
 	  entity_name(e), module_local_name(cm));
 
 }
@@ -1794,7 +1798,7 @@ MakeExternalFunction(
     /* fe is added to CurrentFunction's entities */
     AddEntityToDeclarations(fe, get_current_module_entity());
 
-    debug(8, "MakeExternalFunction", "End for %s\n", entity_name(fe));
+    pips_debug(8, "End for %s\n", entity_name(fe));
 
     return fe;
 }
