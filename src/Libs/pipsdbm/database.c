@@ -122,7 +122,7 @@ get_db_resource(string rname, string oname)
     db_owned_resources or;
     or = get_db_owned_resources(oname);
     if (db_owned_resources_undefined_p(or)) { /* lazy... */ 
-	pips_user_warning("creating or for %s...\n", oname);
+	pips_debug(1, "creating or for %s...\n", oname);
 	init_owned_resources_if_necessary(oname);
 	or = get_db_owned_resources(oname);
     } /* pips_internal_error("no owned resources for %s\n", oname, rname);*/
