@@ -291,7 +291,7 @@ void create_log_window()
     /* Xv_Window window; */
 
 
-    log_textsw = xv_create(log_frame, TEXTSW, 0);
+    log_textsw = (Xv_Window) xv_create(log_frame, TEXTSW, 0);
 /* recuperation d'event ne fonctionne pas -> installer TEXTSW_NOTIFY_PROC, */
 /* autre suggestion: mettre un masque X */
 
