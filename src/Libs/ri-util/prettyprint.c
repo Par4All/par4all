@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.100  1997/11/20 16:05:44  keryell
+ * Forgotten that there is IO instruction without any format...
+ *
  * Revision 1.99  1997/11/20 14:11:45  keryell
  * Modified words_io_inst() to avoid using unnecessary word builders that
  * leads to memory leaks and Epips core dumps...
@@ -120,7 +123,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.99 1997/11/20 14:11:45 keryell Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.100 1997/11/20 16:05:44 keryell Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -585,17 +588,19 @@ words_io_inst(call obj,
 	}
 	pcio = pio_write;
     }	
-    else if(!complex_io_control_list) {
-	list fmt_words = words_expression(fmt_arg);
+    else if (!complex_io_control_list) {
 	list unit_words = words_expression(unit_arg);
 	pips_assert("A unit must be defined", !ENDP(unit_words));
 	pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
 	pc = CHAIN_SWORD(pc, " (");
 	pc = gen_nconc(pc, unit_words);
-	if(!ENDP(fmt_words)) {
+	
+	if (!expression_undefined_p(fmt_arg)) {
+	    /* There is a FORMAT: */
 	    pc = CHAIN_SWORD(pc, ", ");
-	    pc = gen_nconc(pc, fmt_words);
+	    pc = gen_nconc(pc, words_expression(fmt_arg));
 	}
+
 	pc = CHAIN_SWORD(pc, ") ");
 	pcio = pio_write;
     }
