@@ -205,7 +205,7 @@ reference my_build_new_ref(kind, n, subscripts, old_r)
   /* we duplicate this list */
   sl = subscripts;
 
-  num = malloc(32);
+  num = (string) malloc(32);
   (void) sprintf(num, "%d", n-BASE_NODE_NUMBER);
   if(kind == IS_TEMP)
     name = strdup(concatenate(SA_MODULE_NAME, MODULE_SEP_STRING,
@@ -1169,7 +1169,7 @@ char    *typ;
   string  f_name;
 
   /* Create the entity */
-  name = malloc(32);
+  name = (char*) malloc(32);
   sprintf(name,"%s%d%s%d", STAT_SYM, st, typ, nb);
 
   /* f_name = concatenate(RE_MODULE_NAME, MODULE_SEP_STRING, name, NULL); */
