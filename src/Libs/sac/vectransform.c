@@ -12,8 +12,10 @@
 
 static list transformations = NIL; /* <transformation> */
 
-void insert_transformation(char * name, int vectorLengthOut, int subwordSizeOut, int vectorLengthIn, int subwordSizeIn, int nbArgs, int * mapping)
+void insert_transformation(char * name, int vectorLengthOut, int subwordSizeOut, int vectorLengthIn, int subwordSizeIn, int nbArgs, list mapping)
 {
+   int i;
+   list l;
    transformation t = make_transformation(strdup(name),
 					  vectorLengthOut,
 					  subwordSizeOut,
@@ -21,7 +23,9 @@ void insert_transformation(char * name, int vectorLengthOut, int subwordSizeOut,
 					  subwordSizeIn,
 					  nbArgs,
 					  (int*)malloc(sizeof(int)*vectorLengthOut));
-   memcpy(transformation_mapping(t), mapping, sizeof(int)*vectorLengthOut);
+
+   for(i = vectorLengthOut-1, l=mapping; (i>=0) && (l!=NIL); i--, l=CDR(l))
+      transformation_mapping(t)[i] = INT(CAR(l));
 
    transformations = CONS(TRANSFORMATION, t, transformations);
 }
