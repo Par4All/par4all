@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.18  2003/07/30 14:14:13  ferrand
+%% Add single_assignment and simd_remove_reductions phases for SAC.
+%%
 %% Revision 1.17  2003/07/22 15:37:20  irigoin
 %% Double occurence of section about program_precondition
 %%
@@ -533,7 +536,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/07/22 15:37:20 $~$
+$~$Date: 2003/07/30 14:14:13 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -3041,9 +3044,44 @@ simdizer_auto_unroll        > MODULE.code
         < MODULE.code
 \end{verbatim}
 
+%%@UserManualDocumentation: simd_remove_reductions
+This phase tries to pre-process reductions, so that they can be
+vectorized efficiently by the \verb+simdizer+ phase. When multiple
+reduction statements operating on the same variable with the same
+operation are detected inside a loop body, each ``instance'' of the
+reduction is renamed, and some code is added before and after the loop
+to initialize the new variables and compute the final result.
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+alias simd_remove_reductions 'SIMD Remove Reductions'
+
+simd_remove_reductions      > MODULE.code
+	< PROGRAM.entities
+	< MODULE.cumulated_reductions
+	< MODULE.code
+	< MODULE.dg
+\end{verbatim}
+
+%%@UserManualDocumentation: single_assignment
+This phase tries to minimize dependencies in the code by transforming
+it into single-assignment form.
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+alias single_assignment 'Single Assignment Form'
+
+alias single_assignment     > MODULE.code
+	< PROGRAM.entities
+	< MODULE.code
+	< MODULE.dg
+\end{verbatim}
+
 %%@UserManualDocumentation: simdizer
 Function \verb+simdizer+ is an attempt at generating SIMD code for SIMD
-multimedia instruction set such as MMX, SSE2, VIS,...
+multimedia instruction set such as MMX, SSE2, VIS,... This
+transformation performs the core vectorization, transforming sequences
+of similar statements into vector operations.
 %%ÿUserManualDocumentation
 
 \begin{verbatim}
