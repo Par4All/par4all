@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: genC.c,v $ ($Date: 1996/08/12 12:50:20 $, )
+/* $RCSfile: genC.c,v $ ($Date: 1996/08/21 11:53:22 $, )
  * version $Revision$
  */
 
@@ -184,9 +184,9 @@ union domain *dp ;
   {
       struct gen_binding *bp = dp->ba.constructand ;
       
-      if (IS_INLINABLE(bp))     sprintf( buffer, " ");
+      if (IS_INLINABLE(bp))     sprintf( buffer, "");
       else if (IS_EXTERNAL(bp)) sprintf( buffer, "(%s)", bp->name ) ;
-      else                      sprintf( buffer, " ");
+      else                      sprintf( buffer, "");
 
       break ;
   }
@@ -290,9 +290,9 @@ char *args ;
     printf("#define %s_domain (%s+%d)\n",
 		  bp->name, start, TYPE( bp )) ;
     printf("#define make_%s(%s) ", bp->name, args ) ;
-    printf("(%s)gen_alloc(%ld+%d*sizeof(gen_chunk),%s,%s_domain%s%s)\n", 
-	   bp->name, GEN_HEADER_SIZE, size+IS_TABULATED( bp ), 
-	   "GEN_CHECK_ALLOC", bp->name, (strlen(args)==0)? "": ",",  args);
+    printf("(%s)gen_alloc(%ld+%ld*sizeof(gen_chunk),%s,%s_domain%s%s)\n", 
+	   bp->name, (long) GEN_HEADER_SIZE, (long) (size+IS_TABULATED(bp)), 
+	   "GEN_CHECK_ALLOC", bp->name, (strlen(args)==0)? "": ",", args);
 }
 
 /* GEN_AND generates the manipulation functions for an AND type BP. */
