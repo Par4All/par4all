@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/12/27 12:55:38 $, )
+# ($Date: 1996/12/27 13:23:04 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -36,7 +36,19 @@ help:
 	#     copies executables to the pvm directory (where spawn find them)
 	#
 
+#
+# Other tools
+
+STRIP	=	strip
+COPY 	= 	cp
+
+#
+# PVM interactive command
+
 PVM=pvm
+
+#
+# architecture
 
 ifndef PIPS_ARCH
 PIPS_ARCH=.
@@ -56,6 +68,12 @@ RT_DIR=	$(HPFC_RUNTIME)
 else
 RT_DIR= $(PIPS_ROOT)/Runtime/hpfc
 endif
+
+# source files from the runtime needed to compile a spmd program
+RT_SRC_FILES =	$RT_DIR/hpfc_check.f \
+		$RT_DIR/hpfc_*.h \
+		$RT_DIR/hpfc_main*.f \
+		$RT_DIR/hpfc_architecture_m4_macros
 
 # the default is to use the same compilers and options as the library.
 include $(RT_DIR)/$(RT_ARCH)/compilers.make
@@ -157,6 +175,10 @@ PVM_NLIB =
 # 
 pvminc  = /usr/include/mpp
 pvmlib	=
+#
+# cannot strip MPP executables?
+#
+STRIP	= :
 endif
 
 RUNTIME_LIBS	+= -lhpfcruntime
@@ -165,12 +187,6 @@ COMMON_LIBS	+= $(RUNTIME_LIBS) $(PVM_FLIB) $(PVM_GLIB)
 
 HOST_LIBS	+= $(PVM_HLIB)
 NODE_LIBS 	+= $(PVM_NLIB) 
-
-#
-# Other tools
-
-STRIP	=	strip
-COPY 	= 	cp
 
 #
 # Files (the wildcards are GNU make extensions:-)
@@ -203,7 +219,7 @@ DEDUCED = $(PVM_HEADERS) param_init.f
 #
 # Rules
 
-all:	$(DEDUCED)
+all:	$(DEDUCED) hpfc_files
 
 .SUFFIXES:	.f .o .m4
 
@@ -234,9 +250,9 @@ $(pvmbin):; mkdir -p $(pvmbin)
 $(pvmbin)/%: % $(pvmbin); $(COPY) $< $@
 
 hostnode: host node
-host: $(pvmbin)/$(HOST) 
-node: $(pvmbin)/$(NODE)
-main: $(pvmbin)/$(MAIN)
+host: $(HOST) 
+node: $(NODE)
+main: $(MAIN)
 out: $(RTEST)
 
 install_main: $(pvmbin)/$(MAIN)
@@ -262,7 +278,8 @@ diff: $(RUNABLES) install pvm
 # Headers
 
 hpfc_files:
-	$(COPY) $(RT_DIR)/hpfc_*.h .
+	$(COPY) $(RT_SRC_FILES) .
+	touch $@
 
 pvm3.h:	$(pvminc)/pvm3.h
 	$(COPY) $(pvminc)/pvm3.h .
