@@ -164,6 +164,9 @@ static void simdize_simple_statements(statement s)
 {
    cons * i;
    list seq;
+   list sinfo; /* <statement_info> */
+   list sinfo_begin;
+   list newseq;
 
    if (!instruction_sequence_p(statement_instruction(s)))
       /* not much we can do with a single statement, or with
@@ -174,6 +177,8 @@ static void simdize_simple_statements(statement s)
    seq = sequence_statements(instruction_sequence(statement_instruction(s)));
    init_statement_matches_map(seq);
    init_statement_successors_map(seq);
+
+   sinfo = sinfo_begin = CONS(NULL, NULL, NIL);
 
    /* Traverse to list to group isomorphic statements */
    for( i = seq;
@@ -203,8 +208,6 @@ static void simdize_simple_statements(statement s)
       {
 	 statement sj = STATEMENT(CAR(j));
 	 list m_sj;
-
-	 print_statement(sj);
 
 	 /* if this is not a recognized statement (ie, no match), skip it */
 	 m_sj = get_statement_matching_types(sj);
@@ -236,50 +239,30 @@ static void simdize_simple_statements(statement s)
       }
 
       /* the previous group of isomorphic statements is complete. 
-       * we can now generate SIMD code.
+       * we can now generate SIMD statement info.
        * group is delimited by group_first and group_last (included)
        */
-      if (group_first != group_last)
-      {
-	 cons * tmp;
-	 cons * statements = make_simd_statements(group_matches, group_first, group_last);
-
-	 /* replace the first element */
-	 free_statement(STATEMENT(CAR(group_first)));
-	 tmp = CDR(group_first);
-	 CAR(group_first) = CAR(statements);
-	 CDR(group_first) = CDR(statements);
-	 free(statements); /* free the first node of the list, as we do not 
-			    * use it anymore */
-	 statements = group_first;
-	 
-	 /* bind the end of the list to the remaining of the statements */
-	 while(CDR(statements) != NIL)
-	    statements = CDR(statements);
-	 CDR(statements) = CDR(group_last);
-
-	 /* free the original statements */
-	 group_first = tmp;
-	 CDR(group_last) = NIL;
-	 while(group_first != NIL)
-	 {
-	    cons * next = CDR(group_first);
-	    free_statement(STATEMENT(CAR(group_first)));
-	    free(group_first);
-	    group_first = next;
-	 }
-
-	 /* Maybe this is useful */
-	 fix_sequence_statement_attributes(s);
-
-	 group_first = NIL;
-	 group_last = statements;
-      }
+      CDR(sinfo) = make_simd_statements(group_matches, 
+					group_first, 
+					group_last);
+      sinfo = CDR(sinfo);
 
       /* skip what has already been matched */
       i = group_last;
    }
-   
+
+   /* Now, based on the statement information gathered, 
+    * generate the actual code (new sequence of statements)
+    */
+   newseq = generate_simd_code(CDR(sinfo_begin));
+
+   /* Free the list of statements info */
+   gen_free_list(sinfo_begin);
+
+   /* Set the new list as the statements' instructions */
+   sequence_statements(instruction_sequence(statement_instruction(s))) = newseq;
+   gen_free_list(seq);
+
    free_statement_matches_map();
    free_statement_successors_map();
 }
@@ -346,4 +329,3 @@ bool simdizer(char * mod_name)
 
    return TRUE;
 }
-
