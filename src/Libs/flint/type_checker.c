@@ -656,8 +656,16 @@ type_this_instruction(instruction i, type_context_p context)
     if (ENTITY_EXTERNAL_P(call_function(c)))
     {
       b1 = typing_arguments_of_user_function(c, context);
-      /* b1 should be void??? */
-      free_basic(b1);
+
+      if (!basic_undefined_p(b1)) 
+      {
+	add_one_line_of_comment((statement) stack_head(context->stats), 
+				"Ignored %s value returned by '%s'",
+				basic_to_string(b1), 
+				entity_local_name(call_function(c)));
+	free_basic(b1);
+      }
+
       return;
     }
 
@@ -673,7 +681,7 @@ type_this_instruction(instruction i, type_context_p context)
     if(!arguments_are_compatible(c, context->types))
     {
       add_one_line_of_comment((statement) stack_head(context->stats), 
-			   "Arguments of assignement '%s' are not compatible", 
+			    "Arguments of assignment '%s' are not compatible", 
 			      entity_local_name(call_function(c))); 
       /* Count the number of errors */
       context->number_of_error++;
