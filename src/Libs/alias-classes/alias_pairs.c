@@ -86,7 +86,8 @@ statement s;
  */
 static void
 add_parameter_aliases_for_this_call_site(call call_site,
-					 transformer context, list real_args)
+					 transformer context,
+					 list real_args)
 {
     list r_args;
     int arg_num;
@@ -126,6 +127,7 @@ add_parameter_aliases_for_this_call_site(call call_site,
 		    entity real_ent = reference_variable(real_ref);
 		    region real_reg;
 		    list pair;
+		    /* list new_pair; */
 
 		    pips_debug(9,"arg refers to entity\n");
 		    pips_debug(9,"\t%s\n",entity_name(real_ent));
@@ -142,11 +144,37 @@ add_parameter_aliases_for_this_call_site(call call_site,
 			    BACKWARD);
 
 		    pair = CONS(EFFECT,real_reg,NIL);
+
 		    ifdebug(9)
 			{
 			    pips_debug(9,"region translated to:\n\t");
 			    print_inout_regions(pair);
 			}
+
+		    /* the actual parameter must be expressed relative to
+		       the store at the point of entry of the caller, so
+		       that it can be compared to other regions */
+		    /* pair =
+			convex_regions_inverse_transformer_compose(pair,
+								   context);*/
+		    pair =
+			convex_regions_transformer_compose(pair,context);
+
+		    ifdebug(9)
+			{
+			    pips_debug(9,"relative to initial store:\n\t");
+			    print_inout_regions(pair);
+			}
+
+		    /* express in global variables only
+		    pair = regions_dynamic_elim(pair);
+
+		    ifdebug(9)
+			{
+			    pips_debug(9,"with local variables removed:\n\t");
+			    print_inout_regions(pair);
+			}*/
+
 		    pair = CONS(EFFECT,region_dup(callee_region),pair);
 
 		    list_pairs = CONS(EFFECTS,make_effects(pair),list_pairs);
@@ -223,7 +251,7 @@ add_alias_pairs_for_this_caller( entity caller )
     set_current_module_entity(caller);
     caller_name = module_local_name(caller);
     pips_debug(4,"begin for caller: %s\n", caller_name);
-    
+
     /* ATTENTION: we must do ALL this before calling 
      * set_interprocedural_translation_context_sc
      * (in add_alias_pairs_for_this_call_site
@@ -243,6 +271,12 @@ add_alias_pairs_for_this_caller( entity caller )
      * but we musn't forget to reset it all again below !
      */
 
+    /* need this for regions_dynamic_elim?
+    set_transformer_map( (statement_mapping)
+	db_get_memory_resource(DBR_TRANSFORMERS, caller_name, TRUE) );
+		       */
+
+    
     caller_statement = get_current_module_statement();
 
 
@@ -270,6 +304,9 @@ add_alias_pairs_for_this_caller( entity caller )
     free_value_mappings();
     reset_precondition_map();
     regions_end();
+
+    /* need this for regions_dynamic_elim?
+    reset_transformer_map(); */
 
     reset_current_module_entity();
     set_current_module_entity(callee);    
