@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.87  2003/08/06 13:44:54  nguyen
+ * Add intrinsics for C
+ *
  * Revision 1.86  2003/07/28 15:07:01  coelho
  * INV -> _INV_
  *
@@ -163,6 +166,7 @@ typedef hash_table control_mapping;
 
 
 #define BRACE_INTRINSIC                 "BRACE_INTRINSIC"
+#define NULL_STATEMENT_INTRINSIC        "NULL_STATEMENT_INTRINSIC"
 
 #define IMPLIED_COMPLEX_NAME		"CMPLX_"
 #define IMPLIED_DCOMPLEX_NAME		"DCMPLX_"
