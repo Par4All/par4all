@@ -1,5 +1,9 @@
 /* $Id$ 
    $Log: cyacc.y,v $
+   Revision 1.8  2004/02/19 14:07:30  nguyen
+   Correct some small bugs (struct vs union, forgetten MakeTenaryCall, order
+   of qualifiers)
+
    Revision 1.7  2004/02/18 10:34:25  nguyen
    Rewrite code for declarators : UpdateEntity is done later, in declaration
    level
@@ -522,7 +526,7 @@ expression:
 			}
 |   expression TK_QUEST opt_expression TK_COLON expression
 			{
-			  MakeTernaryCallExpr(CreateIntrinsic("?"), $1, $3, $5);
+			  $$ = MakeTernaryCallExpr(CreateIntrinsic("?"), $1, $3, $5);
 			}
 |   expression TK_PLUS expression
 			{ 
@@ -1113,8 +1117,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			}	 
 |   attribute decl_spec_list_opt        
                         { 
-			  c_parser_context_qualifiers(context) = gen_nconc(c_parser_context_qualifiers(context), 
-									   CONS(QUALIFIER,$1,NIL));
+			  c_parser_context_qualifiers(context) = CONS(QUALIFIER,$1,c_parser_context_qualifiers(context));
 			  $$ = $2;
 			}	
 /* specifier pattern variable (must be last in spec list) */
@@ -1293,7 +1296,7 @@ type_spec:   /* ISO 6.7.2 */
                         {
 			  /* Create the union entity with unique name */
 			  string s = code_decls_text((code) stack_head(StructNameStack));			 
-			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_struct);
+			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_union);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $4 the struct/union entities */
 			  list le = TakeDeriveEntities($4);
