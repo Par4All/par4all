@@ -28,7 +28,7 @@
  * FC, Feb 21, 1994
  *
  * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1996/09/21 15:42:18 $, )
- * version $Revision$
+ * version $Revision: 815 $
  * got on %D%, %T%
  */
 

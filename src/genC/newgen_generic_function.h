@@ -1,5 +1,5 @@
 /* $RCSfile: newgen_generic_function.h,v $ ($Date: 1998/12/02 13:42:51 $, )
- * version $Revision$
+ * version $Revision: 815 $
  * got on %D%, %T%
  */
 

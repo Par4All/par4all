@@ -15,7 +15,7 @@
 */
 
 /* $RCSfile: newgen_hash.h,v $ ($Date: 2003/07/04 10:54:20 $, )
- * version $Revision$
+ * version $Revision: 815 $
  * got on %D%, %T%
  */
 

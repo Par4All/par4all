@@ -3,7 +3,7 @@
  * message_assert prints a message before aborting
  *
  * $RCSfile: newgen_assert.h,v $ ($Date: 1995/09/22 13:09:23 $, )
- * version $Revision$
+ * version $Revision: 815 $
  * got on %D%, %T%
  */
 

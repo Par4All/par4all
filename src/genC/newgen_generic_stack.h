@@ -1,7 +1,7 @@
 /* Made after the generic current mappings
  * Fabien COELHO, 05/12/94
  * 
- * $RCSfile: newgen_generic_stack.h,v $ verison $Revision$
+ * $RCSfile: newgen_generic_stack.h,v $ verison $Revision: 815 $
  * $Date: 1999/05/27 15:10:35 $, 
  * got on %D%, %T%
  */
