@@ -72,6 +72,10 @@ static gen_chunk * make_def(gen_chunk *);
 static gen_chunk * make_ref(int, gen_chunk *);
 static gen_chunk * chunk_for_domain(int);
 
+static stack current_chunk;
+static stack current_chunk_index;
+static stack current_chunk_size;
+
 %}
 
 %token CHUNK_BEGIN
@@ -114,14 +118,24 @@ static gen_chunk * chunk_for_domain(int);
 %type <chunkp> Chunk String Contents
 %type <consp> Sparse_Datas Datas
 %type <val> Int Shared_chunk Type
-%type <void> Datas2
+%type <void> Datas2 Datas3
 
 %%
 Read	: Nb_of_shared_pointers Contents
           { 
 	    Read_chunk = $2;
+
 	    free(shared_table);
-	    /* return */ YYACCEPT;
+
+	    message_assert("stacks are emty",
+			   stack_size(current_chunk)==0 &&
+			   stack_size(current_chunk_index)==0 &&
+			   stack_size(current_chunk_size)==0);
+
+	    stack_free(&current_chunk);
+	    stack_free(&current_chunk_index);
+	    stack_free(&current_chunk_size);
+	    YYACCEPT;
 	  }
 	;
 
@@ -134,57 +148,66 @@ Nb_of_shared_pointers
 	  shared_table = (gen_chunk **)alloc($1*sizeof(gen_chunk*)); 
 	  for (i=0; i<shared_size; i++)
 	    shared_table[i] = gen_chunk_undefined;
+
+	  current_chunk = stack_make(0, 0, 0);
+	  current_chunk_index = stack_make(0, 0, 0);
+	  current_chunk_size = stack_make(0, 0, 0);
         }
 	;
 
-Contents: Chunk { $$ = $1; }
+Contents: Chunk 
+        { 
+	  $$ = $1; 
+	}
 	| TABULATED_BEGIN Type Datas2 RP
         { 
 	   $$ = (gen_chunk*) alloc(sizeof(gen_chunk));
 	   $$->i = $2;
-	   /* gen_free_list($3); */
         }
 	;
 
-Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP 
+Chunk 	: Shared_chunk CHUNK_BEGIN Type
           {
-	    int i, size = Domains[$3].size;
-	    cons *cp ;
+	    gen_chunk * x = chunk_for_domain($3);
+	    stack_push((void*)(Domains[$3].size), current_chunk_size);
 
-	    /* see HACK bellow. */
-	    $$ = $1? shared_table[$1-1]: chunk_for_domain($3);
-	    
-	    /* copy contents. */
-	    $$->i = $3;
-	    for(i=size-1, cp=$4; i>0 && cp; i--, cp=cp->cdr)
-	      *($$+i) = cp->car;
-
+	    if ($1) 
+	    {
+	      shared_table[$1-1] = x;
+	      stack_push(x, current_chunk);
+	    }
+	    else
+	    {
+	      stack_push(x, current_chunk);
+	    }
+	    x->i = $3;
+	    if (Domains[$3].tabulated)
+	    {
+	      (x+1)->i = 0; /* tabulated number */
+	      stack_push((void*)2, current_chunk_index);
+	    }
+	    else
+	    {
+	      stack_push((void*)1, current_chunk_index);
+	    }
+          }
+	  Datas3 RP 
+          {
+	    $$ = stack_pop(current_chunk);
 	    message_assert("all data copied", 
-			   !cp && (i==0 || (i==1 && Domains[$3].tabulated)));
-
-	    if (i==1) ($$+1)->i = 0; /* tabulated number... */
-	    gen_free_list($4);
+			   (int) stack_pop(current_chunk_index) ==
+			   (int) stack_pop(current_chunk_size));
 	  }
 	;
 
-Shared_chunk /* see HACK bellow */
-	: LB Int { $$ = shared_number = $2; }
-	|        { $$ = shared_number = 0; }
+Shared_chunk
+	: LB Int { $$ = $2; }
+	|        { $$ = 0; }
 	;
 
 Type	: Int 
         { 
 	  $$ = gen_type_translation_old_to_actual($1); 
-
-	  /* HACK: the first type after a  shared handles allocation.
-	   * it MUST be performed here so that references to this
-	   * can be valid even if its parsing is not finished yet.
-	   */
-	  if (shared_number) 
-	  {
-	    shared_table[shared_number-1] = chunk_for_domain($$);
-	    shared_number = 0;
-	  }
 	}
 	;
 
@@ -195,9 +218,20 @@ Datas	: Datas Data { $$ = CONS( CHUNK, $2.p, $1 ); }
 
 /* no list is built as it is not needed */
 Datas2 : Datas2 Data { }
-       | Data { }
+       | { }
        ;
 
+Datas3 : Datas3 Data 
+         { 
+	   int i = (int) stack_pop(current_chunk_index);
+	   int size = (int) stack_head(current_chunk_size);
+	   gen_chunk * current = stack_head(current_chunk); 
+	   message_assert("index ok", i<size);
+	   *(current+i) = $2;
+	   stack_push((void*) (i+1), current_chunk_index);
+	 }
+       | { }
+       ;
 
 Sparse_Datas: Sparse_Datas Int Data { /* index, value */
 	        $$ = CONS(CONSP, CONS(INT, $2, CONS(CHUNK, $3.p, NIL)), $1);
@@ -207,7 +241,7 @@ Sparse_Datas: Sparse_Datas Int Data { /* index, value */
 
 Data	: Basis	{ $$ = $1; }
         | READ_LIST_UNDEFINED { $$.l = list_undefined; }
-	| LP Datas RP {	$$.l = gen_nreverse($2); }
+        | LP Datas RP {	$$.l = gen_nreverse($2); } /* list */
         | READ_SET_UNDEFINED { $$.t = set_undefined; }
         | LC Int Datas RC 
         {
