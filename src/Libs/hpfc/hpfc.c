@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.102  1997/09/26 10:50:56  coelho
+ * resource deletion thru a property.
+ *
  * Revision 1.101  1997/09/26 10:30:08  coelho
  * delete_all_resources moved to pipsmake.
  *
@@ -781,6 +784,7 @@ bool hpfc_close(string name)
     load_hpfc_status();
     
     set_bool_property("PRETTYPRINT_COMMONS", TRUE); /* commons compilation */
+    set_string_property("PIPSDBM_RESOURCES_TO_DELETE", "all");
     gen_map(compile_common, get_the_commons());
 
     put_generated_resources_for_program(name);      /* global informations */
