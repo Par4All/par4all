@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/10 14:23:18 $m 
+# $Date: 1996/08/10 15:57:05 $m 
 #
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
@@ -9,9 +9,7 @@ else
 CFLAGS=	-g
 endif
 
-# bison does not like this pips grammar for Fortran, it reports errors:-)
-# idem flex:-)
-YACC=yacc
+# I wanna the header file for the lexer
 YFLAGS+=-d
 
 PARSER_SRC= 
