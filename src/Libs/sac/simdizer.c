@@ -69,7 +69,7 @@ list get_statement_matches(statement s)
    return (m == HASH_UNDEFINED_VALUE) ? NIL : m; 
 }
 
-match get_statement_match_of_kind(statement s, int kind)
+match get_statement_match_of_kind(statement s, opcodeClass kind)
 {
    list l = get_statement_matches(s);
 
@@ -89,7 +89,7 @@ list get_statement_matching_types(statement s)
    list k = NIL;
 
    for( ; m != NIL; m = CDR(m))
-      k = CONS(INT, match_type(MATCH(CAR(m))), k);
+      k = CONS(OPCODECLASS, match_type(MATCH(CAR(m))), k);
 
    return k;
 }
