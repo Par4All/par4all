@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/04/26 14:03:58 $, 
+ * $Date: 1995/04/26 17:17:27 $, 
  *
  * interactive interface to hpfc, based on the GNU realine library.
  */
@@ -18,22 +18,27 @@ extern void free();
 
 #define HPFC_PROMPT "hpfc> "
 #define HPFC_PREFIX "hpfc"
-#define DEFAULT_HIST ".hpfc.history"
+#define HIST ".hpfc.history"
 
 #define QUIT "qui"
 
 /*  returns the full hpfc history file name, i.e.
  *  - $HPFC_HISTORY (if any)
- *  - $HOME/.hpfc.history
+ *  - $HOME/"HIST"
  */
-static char * default_hist_file_name()
+static char *default_hist_file_name()
 {
-    char *home = getenv("HOME");
-    char *hist = getenv("HPFC_HISTORY");
-    int    len = strlen(home) + strlen(DEFAULT_HIST) + 2;
+    char 
+	*hist = getenv("HPFC_HISTORY"),
+	*home;
 
-    return(hist ? hist : sprintf((char*) malloc(sizeof(char)*len),
-				 "%s/%s", home, DEFAULT_HIST));
+    if (hist) return(hist);
+
+    /* else builds the default name.
+     */
+    home = getenv("HOME");
+    return(sprintf((char*) malloc(sizeof(char)*(strlen(home)+strlen(HIST)+2)),
+		   "%s/%s", home, HIST));
 }
 
 /* main: interactive loop and history management.
@@ -78,13 +83,13 @@ int main()
 	    
     }
 
+    if (!line) fprintf(stdout, "\n"); /* for Ctrl-D terminations */
+
     /*   close history
      */
     write_history(file_name);
     history_truncate_file(file_name, 100);
 
-    if (!line) fprintf(stdout, "\n"); /* for Ctrl-D terminations */
-    free(file_name);
     return(0);
 }
 
