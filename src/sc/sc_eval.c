@@ -2,7 +2,8 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <values.h>
+/* #include <values.h> */
+#include <limits.h>
 #include <assert.h>
 
 #include "boolean.h"
@@ -112,8 +113,8 @@ Value *pmin, *pmax;
     Pcontrainte pc;
     Pbase b;
 
-    *pmax =  MAXINT;
-    *pmin = -MAXINT;
+    *pmax =  INT_MAX;
+    *pmin = INT_MIN;
 
     if (sc_value_of_variable(ps, var, &val) == TRUE) {
 	*pmin = val;
@@ -185,13 +186,13 @@ Pbase b;
 	boolean faisable =  sc_minmax_of_variable(sc,var1, &min, &max);
 
 	if (faisable ) {
-	    if (min != -MAXINT) {
+	    if (min != INT_MIN) {
 		pv2 = vect_new(var1,-1);
 		pv2 = vect_add(pv2,vect_new(TCST,min));
 		pc = contrainte_make(pv2);
 		sc_add_ineg(ps2,pc);
 	    }
-	    if (max != MAXINT) {
+	    if (max != INT_MAX) {
 		pv2 = vect_new(var1,1);
 		pv2 = vect_add(pv2,vect_new(TCST,-max));
 		pc = contrainte_make(pv2);
@@ -552,15 +553,15 @@ boolean sc_minmax_of_variable2(Psysteme ps, Variable var, int * pmin, int * pmax
 		ps = SC_UNDEFINED;
 	    }
 	    else {
-		*pmin = -MAXINT;
-		*pmax = MAXINT;
+		*pmin = INT_MIN;
+		*pmax = INT_MAX;
 	    }
 	}
     }
 
     if(!feasible_p) {
-	*pmin = -MAXINT;
-	*pmax = MAXINT;
+	*pmin = INT_MIN;
+	*pmax = INT_MAX;
     }
     else {
 	/* I'm afraid of sc_minmax_of_variable() behavior... 
