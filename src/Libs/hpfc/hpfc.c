@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/04/14 15:55:17 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/04/18 12:08:27 $, )
  * version $Revision$
  */
  
@@ -37,6 +37,22 @@ entity c;
     put_generated_resources_for_common(c);
 }
 
+GENERIC_STATIC_STATUS(/**/, the_pures, list, NIL, gen_free_list)
+
+void add_a_pure(f)
+entity f;
+{
+    the_pures = gen_once(f, the_pures);
+}
+
+/* ??? some intrinsics should also be considered as pure. all of them ?
+ */
+bool hpf_pure_p(f)
+entity f;
+{
+    return(gen_in_list_p(f, the_pures));
+}
+
 /*---------------------------------------------------------------------
  *
  *  COMPILER STATUS MANAGEMENT
@@ -50,6 +66,8 @@ static void init_hpfc_status()
     init_hpf_number_status();
     init_overlap_status();
     init_the_commons();
+    init_dynamic_status();
+    init_the_pures();
 }
 
 static void reset_hpfc_status()
@@ -59,6 +77,8 @@ static void reset_hpfc_status()
     reset_hpf_number_status();
     reset_overlap_status();
     reset_the_commons();
+    reset_dynamic_status();
+    reset_the_pures();
 }
 
 static void save_hpfc_status() /* GET them */
@@ -69,7 +89,9 @@ static void save_hpfc_status() /* GET them */
 			 get_data_status(),
 			 get_hpf_number_status(),
 			 get_entity_status(),
-			 get_the_commons());    
+			 get_the_commons(),
+			 get_dynamic_status(),
+			 get_the_pures());    
 
     DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, strdup(name), s);
 
@@ -87,6 +109,8 @@ static void load_hpfc_status() /* SET them */
     set_data_status(hpfc_status_data_status(s));
     set_hpf_number_status(hpfc_status_numbers_status(s));
     set_the_commons(hpfc_status_commons(s));
+    set_dynamic_status(hpfc_status_dynamic_status(s));
+    set_the_pures(hpfc_status_pures(s));
 }
 
 static void close_hpfc_status()
@@ -96,6 +120,8 @@ static void close_hpfc_status()
     close_hpf_number_status();
     close_overlap_status();
     close_the_commons();
+    close_dynamic_status();
+    close_the_pures();
 
     reset_hpfc_status();
 }
@@ -260,11 +286,6 @@ string name;
     (void) make_empty_program(HPFC_PACKAGE);
     make_update_common_map(); /* ?????? */
 
-    /*  to be put in the compiler status.
-     */
-    init_dynamic_hpf();
-    init_primary_entity();
-
     init_hpfc_status();
     save_hpfc_status();
 
@@ -422,11 +443,6 @@ string name;
     gen_map(compile_common, get_the_commons());
 
     put_generated_resources_for_program(name);      /* global informations */
-
-    /*  to be put in the compiler status.
-     */
-    close_dynamic_hpf();
-    close_primary_entity();
 
     close_hpfc_status();
     db_unput_resources(DBR_HPFC_STATUS);            /* destroy hpfc status */
