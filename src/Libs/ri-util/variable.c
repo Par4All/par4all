@@ -461,8 +461,13 @@ entity a, v;
     }
     else {
 	/* the local areas are StaticArea and DynamicArea */
+	int s = 0;
 	OldOffset = area_size(aa);
-	area_size(aa) = OldOffset+SizeOfArray(v);
+	if(!SizeOfArray(v, &s)) {
+	    pips_error("add_variable_to_area",
+		       "Varying size array \"%s\"\n", entity_name(v));
+	}
+	area_size(aa) = OldOffset+s;
     }
 
     area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
