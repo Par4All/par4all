@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/09/20 18:46:17 $, )
+ * ($Date: 1996/10/14 22:10:20 $, )
  */
 
 #include "defines-local.h"
@@ -559,8 +559,160 @@ tag t;
     return make_new_scalar_variable(module, MakeBasic(t));
 }
 
+
+/********************* EXTRACT NON VARIANT TERMS ON DISTRIBUTED DIMENSIONS */
+
+DEFINE_LOCAL_STACK(c_stmt, statement)
+
+/* true if no written effect on any variables of e in loe 
+ */
+static bool invariant_expression_p(
+    expression e,
+    list /* of effect */ loe,
+    list /* of entity */ le)
+{
+    list /* of effect */ l = proper_effects_of_expression(e);
+
+    ifdebug(3) {
+	pips_debug(3, "considering expression:");
+	print_expression(e);
+    }
+
+    MAP(EFFECT, ef1,
+	MAP(EFFECT, ef2,
+	{
+	    variable v = effect_variable(ef1);
+	    if ((v==effect_variable(ef2) && effect_write_p(ef2)) ||
+		gen_in_list_p(v, le))
+	    {
+		gen_free_list(l);
+		pips_debug(3, "variant\n");
+		return FALSE;
+	    }
+	},
+	    loe),
+	l);
+
+    gen_free_list(l);
+    pips_debug(3, "invariant\n");
+    return TRUE;
+}
+
+/* substitute all occurences of expression e in statement s by variable v
+ */
+static entity subs_v;
+static expression subs_e;
+static bool expression_flt(expression e)
+{
+    if (expression_equal_p(e, subs_e))
+    {
+	/* ??? memory leak, but how to deal with effect references? */
+	expression_syntax(e) = 
+	    make_syntax(is_syntax_reference, make_reference(subs_v, NIL));
+	return FALSE;
+    }
+    return TRUE;
+}
+static void substitute_and_create(statement s, entity v, expression e)
+{
+    instruction i;
+
+    ifdebug(3) {
+	pips_debug(3, "variable %s substituted for\n", entity_name(v));
+	print_expression(e);
+    }
+
+    subs_v = v;
+    subs_e = e;
+    gen_recurse(s, expression_domain, expression_flt, gen_null);
+    
+    i = loop_to_instruction
+	(make_loop(v, 
+		   make_range(copy_expression(e),
+			      copy_expression(e),
+			      int_to_expression(1)),
+		   instruction_to_statement(statement_instruction(s)),
+		   entity_empty_label(),
+		   make_execution(is_execution_parallel, UU),
+		   NIL));
+
+    statement_instruction(s) = i;
+}
+
+static bool loop_flt(loop l)
+{
+    statement s;
+    list /* of effect */ loce;
+    list /* of entity */ lsubs = NIL;
+
+    if (execution_sequential_p(loop_execution(l)))
+	return TRUE;
+
+    s = c_stmt_head();
+    loce = load_statement_cumulated_references(s);
+
+    MAP(EFFECT, e,
+    {
+	reference r = effect_reference(e);
+	entity v = reference_variable(r);
+
+	if (array_distributed_p(v) && effect_write_p(e))
+	{
+	    int dim = 0;
+	    int p;
+	    entity n;
+
+	    pips_debug(3, "considering reference to %s[%d]\n", 
+		       entity_name(v), gen_length(reference_indices(r)));
+
+	    MAP(EXPRESSION, x,
+	    {
+		dim++;
+		ifdebug(3) {
+		    pips_debug(3, "considering on dim. %d:\n", dim);
+		    print_expression(x);
+		}
+		if (ith_dim_distributed_p(v, dim, &p) &&
+		    invariant_expression_p(x, loce, lsubs) &&
+		    !expression_integer_constant_p(x))
+		{
+		    n = hpfc_new_variable(get_current_module_entity(),
+					  is_basic_int);
+		    substitute_and_create(s, n, x);
+		    lsubs = CONS(ENTITY, n, lsubs);
+		}
+	    },
+	        reference_indices(r));
+	}
+    },
+        loce);
+
+    return FALSE;
+}
+
+/* transformation: DOALL I,J ... A(I,J,e) -> DOALL E=e,e,1 ,I,J A(I,J,E)
+ */
+static void 
+extract_distributed_non_constant_terms(
+    statement s)
+{
+    DEBUG_STAT(2, "in", s);
+
+    make_c_stmt_stack();
+    gen_multi_recurse(s, 
+		      statement_domain, c_stmt_filter, c_stmt_rewrite, 
+		      loop_domain, loop_flt, gen_null,
+		      NULL);
+    free_c_stmt_stack();	
+
+    DEBUG_STAT(2, "out", s);
+}
+
+/*
+ */
 void NormalizeCodeForHpfc(statement s)
 {
+    extract_distributed_non_constant_terms(s);
     normalize_all_expressions_of(s);
     atomize_as_required(s, 
 			hpfc_decision,      /* reference test */
