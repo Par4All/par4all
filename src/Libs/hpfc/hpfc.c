@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/12/01 14:54:14 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/12/01 16:43:51 $, )
  * version $Revision$
  */
  
@@ -118,6 +118,8 @@ add_remapping_as_used(
 /* ??? some memory leaks in the hpfc_status management...
  */
 
+static hpfc_status chs = (hpfc_status) NULL; /* current hpfc status */
+
 /* initialization of data that belongs to the hpf compiler status
  */
 static void init_hpfc_status()
@@ -130,6 +132,15 @@ static void init_hpfc_status()
     init_dynamic_status();
     init_the_pures();
     init_computed_remaps();
+
+    chs = make_hpfc_status(get_overlap_status(),
+			   get_data_status(),
+			   get_hpf_number_status(),
+			   get_entity_status(),
+			   get_the_commons(),
+			   get_dynamic_status(),
+			   get_the_pures(),
+			   get_computed_remaps());    
 }
 
 static void reset_hpfc_status()
@@ -142,47 +153,48 @@ static void reset_hpfc_status()
     reset_dynamic_status();
     reset_the_pures();
     reset_computed_remaps();
+
+    chs = (hpfc_status) NULL;
 }
 
 static void save_hpfc_status() /* GET them */
 {
-    /* string name = db_get_current_workspace_name(); */
-    hpfc_status s = 
-	make_hpfc_status(get_overlap_status(),
-			 get_data_status(),
-			 get_hpf_number_status(),
-			 get_entity_status(),
-			 get_the_commons(),
-			 get_dynamic_status(),
-			 get_the_pures(),
-			 get_computed_remaps());    
+    pips_assert("some current hpfc status", chs);
+    
+    hpfc_status_entity_status(chs) = get_entity_status();
+    hpfc_status_overlapsmap(chs) = get_overlap_status();
+    hpfc_status_data_status(chs) = get_data_status();
+    hpfc_status_numbers_status(chs) = get_hpf_number_status();
+    hpfc_status_commons(chs) = get_the_commons() ;
+    hpfc_status_dynamic_status(chs) = get_dynamic_status();
+    hpfc_status_pures(chs) = get_the_pures();
+    hpfc_status_computed(chs) = get_computed_remaps();
 
-    DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, "", s);
+    DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, "", chs);
 
     reset_hpfc_status(); /* cleaned! */
 }
 
 static void load_hpfc_status() /* SET them */
 {
-    /* string name = db_get_current_workspace_name(); */
-    hpfc_status	s = (hpfc_status) 
-	db_get_memory_resource(DBR_HPFC_STATUS, "", TRUE);
+    chs = (hpfc_status) db_get_memory_resource(DBR_HPFC_STATUS, "", TRUE);
 
-    set_entity_status(hpfc_status_entity_status(s));
-    set_overlap_status(hpfc_status_overlapsmap(s));
-    set_data_status(hpfc_status_data_status(s));
-    set_hpf_number_status(hpfc_status_numbers_status(s));
-    set_the_commons(hpfc_status_commons(s));
-    set_dynamic_status(hpfc_status_dynamic_status(s));
-    set_the_pures(hpfc_status_pures(s));
-    set_computed_remaps(hpfc_status_computed(s));
+    set_entity_status(hpfc_status_entity_status(chs));
+    set_overlap_status(hpfc_status_overlapsmap(chs));
+    set_data_status(hpfc_status_data_status(chs));
+    set_hpf_number_status(hpfc_status_numbers_status(chs));
+    set_the_commons(hpfc_status_commons(chs));
+    set_dynamic_status(hpfc_status_dynamic_status(chs));
+    set_the_pures(hpfc_status_pures(chs));
+    set_computed_remaps(hpfc_status_computed(chs));
 }
 
 /* never called... memory to be freed by pipsdbm...
  */
-/*
 static void close_hpfc_status()
 {
+    int i = (int) close_hpfc_status ; i = i & i ; /* just to avoid a warning */
+
     close_entity_status();
     close_data_status();
     close_hpf_number_status();
@@ -192,7 +204,6 @@ static void close_hpfc_status()
     close_the_pures();
     close_computed_remaps();
 }
-*/
 
 /************************************************************** COMPILATION */
 
