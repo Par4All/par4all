@@ -17,7 +17,7 @@
 #include "database.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
-#include "regions.h"
+#include "effects-convex.h"
 #include "resources.h"
 #include "semantics.h"
 #include "prettyprint.h"
