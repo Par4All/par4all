@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/20 14:38:23 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/21 09:28:34 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -304,7 +304,6 @@ int gen_check_p ;
     }
 }
 
-/*VARARGS*/
 gen_chunk *
 gen_alloc(int size, int gen_check_p, int dom, ...)
 {
@@ -778,7 +777,7 @@ union domain *dp ;
    have a user name, a spec in Domains). KEEP says whether the previous
    sharing table is preserved. */
 
-void
+static void
 shared_pointers( obj, keep )
 gen_chunk *obj ;
 bool keep ;
@@ -1011,7 +1010,7 @@ gen_free(
     dr.null = gen_null ;
     dr.leaf_out = free_leaf_out ;
     dr.leaf_in = free_leaf_in ;
-    dr.obj_in = free_obj_in ; /* shared_go */
+    dr.obj_in = free_obj_in ;
     dr.simple_in = persistant_simple_in ;
     dr.array_leaf = gen_array_leaf ;
     dr.simple_out = free_simple_out ;
@@ -1185,9 +1184,10 @@ struct gen_binding *bp ;
    contained in old cells. the second argument is the domain pointer of old
    list */
 
-cons *gen_copy_list(old_l, dp)
-cons *old_l;
-union domain *dp ;
+static list 
+gen_copy_list(
+    list old_l,
+    union domain *dp)
 {
     list old_p, new_p = NIL, new_l, pc;
     bool inlinable, persistant, tabulated;
@@ -1227,7 +1227,7 @@ union domain *dp ;
    contained in the old array. the second argument is the domain pointer of
    the old array */
 
-gen_chunk *
+static gen_chunk *
 gen_copy_array(old_a, dp)
 gen_chunk *old_a;
 union domain *dp ;
@@ -1252,7 +1252,7 @@ union domain *dp ;
 
 /* GEN_COPY_SET duplicates a set. */
 
-set
+static set
 gen_copy_set( old_s, dp )
 set old_s;
 union domain *dp ;
@@ -1413,18 +1413,15 @@ gen_local_copy_tree(
     {
 	old_copy_table = copy_table;
 	copy_table = hash_table_make( hash_pointer, 0 ) ;
-	/* push_gen_trav_env() ; */
     }
 
-    /* actual job. First sharing is computed, then the recursion.
-     */
-    /* shared_pointers(obj, keep); */
     gen_trav_obj(obj, &dr) ;
     copy = copy_hsearch(obj) ;
 
+    /* restore copy environment if needed
+     */
     if (!keep)
     {	
-	/* pop_gen_trav_env() ; */
 	hash_table_free(copy_table);
 	copy_table = old_copy_table;
     }
@@ -1440,7 +1437,7 @@ gen_copy_tree(
 }
 
 /* for re-entry only in gen_copy_tree... 
- * ??? FC.
+ * ??? because externals are internals... FC.
  */
 gen_chunk *
 gen_copy_tree_with_sharing(
