@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/01/02 22:45:45 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/03/28 13:17:37 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -84,7 +84,7 @@ static int disallow_undefined_tabulated = TRUE ;
  * Fabien COELHO 10/06/94
  */
 #define check_domain(dom) \
-  message_assert("Inconsistant domain number",\
+  message_assert("Consistant domain number",\
 		 (dom)>=0 && (dom)<MAX_DOMAIN)
 
 #define check_read_spec_performed() \
@@ -2928,6 +2928,7 @@ gen_chunk *obj;
 struct driver *dr;
 {
     int dom = obj->i;
+    check_domain(dom);
 
     /* don't walk twice thru the same object:
      */
@@ -2963,6 +2964,7 @@ struct gen_binding *bp;
 struct driver *dr;
 {
     int dom = obj->i;
+    check_domain(dom);
 
     if ((*(current_mrc->domains))[dom])
 	(*((*(current_mrc->rewrites))[dom]))(obj);
