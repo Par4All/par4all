@@ -1,7 +1,7 @@
-/* 	$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.14 1997/09/08 14:52:36 ancourt Exp $ \n Copyright (c) École des Mines de Paris Proprietary	 */
+/* 	$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.15 2003/08/18 09:43:21 coelho Exp $ \n Copyright (c) École des Mines de Paris Proprietary	 */
 
 #ifndef lint
-char vcid_scheduling_scheduling[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.14 1997/09/08 14:52:36 ancourt Exp $ \n Copyright (c) École des Mines de Paris Proprietary";
+char vcid_scheduling_scheduling[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.15 2003/08/18 09:43:21 coelho Exp $ \n Copyright (c) École des Mines de Paris Proprietary";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -61,8 +61,6 @@ extern int fflush();
 extern int printf();*/
 extern sccs dfg_find_sccs();
 extern bdt search_graph_bdt();
-
-jmp_buf pips_top_level;
 
 #define BDT_EXT ".bdt_file"
 
