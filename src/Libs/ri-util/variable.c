@@ -496,3 +496,197 @@ int i;
     (void) sprintf(buffer, "%s%d", suffix, i);
     return(find_or_create_scalar_entity(buffer, prefix, is_basic_int));
 }
+
+
+entity make_new_module_variable(entity module,int d)	       
+{ 
+
+    static char name[ 64 ];
+    string name1;
+    entity ent1=entity_undefined;
+    string full_name;
+    static int num = 1;
+    name[0] = 'X';
+    if (d != 0) {
+	(void) sprintf(&name[1],"%d",d);
+	num = d;
+    }
+    else { (void) sprintf(&name[1],"%d",num);
+	   num++;}
+	
+    name1 = strdup(name);
+    full_name=strdup(concatenate(module_local_name(module), 
+				 MODULE_SEP_STRING,
+				 name1,
+				 NULL));
+    while ((ent1 = gen_find_tabulated(full_name,entity_domain)) 
+	   != entity_undefined) {
+	free(name1);
+	free(full_name);
+	name[0] = 'X';
+	(void) sprintf(&name[1],"%d",num);
+	num++;
+	name1 = strdup(name);
+	full_name=strdup(concatenate(module_local_name(module), 
+				     MODULE_SEP_STRING,
+				     name1,
+				     NULL));
+    }
+    ent1 = make_scalar_integer_entity(name1,
+				      module_local_name(module));
+    free(full_name);
+    return ent1;
+}
+
+/* These globals variables count the number of temporary and auxiliary
+ * entities. Each time such a variable is created, the corresponding
+ * counter is incremented.
+ */
+static int count_tmp = 0;
+static int count_aux = 0;
+
+
+/*============================================================================*/
+/* entity make_new_entity(basic ba, int kind): Returns a new entity.
+ * This entity is either a new temporary or a new auxiliary variable.
+ * The parameter "kind" gives the kind of entity to produce.
+ * "ba" gives the basic (ie the type) of the entity to create.
+ *
+ * The number of the temporaries is given by a global variable named
+ * "count_tmp".
+ * The number of the auxiliary variables is given by a global variable named
+ * "count_aux".
+ *
+ * Called functions:
+ *       _ current_module() : loop_normalize/utils.c
+ *       _ FindOrCreateEntity() : syntax/declaration.c
+ *       _ CurrentOffsetOfArea() : syntax/declaration.c
+ */
+entity make_new_entity(ba, kind)
+basic ba;
+int kind;
+{
+  extern int count_tmp, count_aux;
+  extern list integer_entities, real_entities, logical_entities, complex_entities,
+  double_entities, char_entities;
+
+  entity new_ent, mod_ent;
+  char prefix[4], *name, *num;
+  int number = 0;
+  entity dynamic_area;
+  
+  /* The first letter of the local name depends on the basic:
+   *       int --> I
+   *     real  --> F (float single precision)
+   *    others --> O
+   */
+  switch(basic_tag(ba))
+    {
+    case is_basic_int: { (void) sprintf(prefix, "I"); break;}
+    case is_basic_float:
+      {
+	if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
+	  (void) sprintf(prefix, "O");
+	else
+	  (void) sprintf(prefix, "F");
+	break;
+      }
+    default: (void) sprintf(prefix, "O");
+    }
+
+  /* The three following letters are whether "TMP", for temporaries
+   * or "AUX" for auxiliary variables.
+   */
+  switch(kind)
+    {
+    case TMP_ENT:
+      {
+	number = (++count_tmp);
+	(void) sprintf(prefix+1, "TMP");
+	break;
+      }
+    case AUX_ENT:
+      {
+	number = (++count_aux);
+	(void) sprintf(prefix+1, "AUX");
+	break;
+      }
+    default: user_error("make_new_entity", "Bad kind of entity: %d", kind);
+    }
+
+  mod_ent = get_current_module_entity();
+  num = malloc(32);
+  (void) sprintf(num, "%d", number);
+
+  /* The first part of the full name is the concatenation of the define
+   * constant ATOMIZER_MODULE_NAME and the local name of the module
+   * entity.
+   */
+  /* ATOMIZER_MODULE_NAME discarded : it is a bug ! RK, 31/05/1994.
+     name = strdup(concatenate(ATOMIZER_MODULE_NAME, entity_local_name(mod_ent),
+     MODULE_SEP_STRING, prefix, num, (char *) NULL));
+     */
+  name = strdup(concatenate(entity_local_name(mod_ent),
+			    MODULE_SEP_STRING, prefix, num, (char *) NULL));
+  /*
+     new_ent = make_entity(name,
+     make_type(is_type_variable,
+     make_variable(ba,
+     NIL)),
+     make_storage(is_storage_rom, UU),
+     make_value(is_value_unknown, UU));
+     */
+  /* Create a true dynamic variable. RK, 31/05/1994 : */
+  new_ent = make_entity(name,
+			make_type(is_type_variable,
+				  make_variable(ba,
+						NIL)),
+			storage_undefined,
+			make_value(is_value_unknown, UU));
+  dynamic_area = global_name_to_entity(module_local_name(mod_ent),
+			    DYNAMIC_AREA_LOCAL_NAME);
+  entity_storage(new_ent) = make_storage(is_storage_ram,
+					 make_ram(mod_ent,
+						  dynamic_area,
+						  add_variable_to_area(dynamic_area, new_ent),
+						  NIL));
+  add_variable_declaration_to_module(mod_ent, new_ent);
+
+  /* Is the following useless : */
+  
+  /* The new entity is stored in the list of entities of the same type. */
+  switch(basic_tag(ba))
+    {
+    case is_basic_int:
+      {
+	integer_entities = CONS(ENTITY, new_ent, integer_entities);
+	break;
+      }
+    case is_basic_float:
+      {
+	if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
+	  double_entities = CONS(ENTITY, new_ent, double_entities);
+	else
+	  real_entities = CONS(ENTITY, new_ent, real_entities);
+	break;
+      }
+    case is_basic_logical:
+      {
+	logical_entities = CONS(ENTITY, new_ent, logical_entities);
+	break;
+      }
+    case is_basic_complex:
+      {
+	complex_entities = CONS(ENTITY, new_ent, complex_entities);
+	break;
+      }
+    case is_basic_string:
+      {
+	char_entities = CONS(ENTITY, new_ent, char_entities);
+	break;
+      }
+    default:break;
+    }
+
+  return new_ent;
+}
