@@ -2,7 +2,7 @@
 !     Reductions management 
 !
 ! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1997/03/03 15:00:31 $, )
+! ($Date: 1997/03/03 15:25:01 $, )
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -265,7 +265,7 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
 ! performs the reduction to the host
 !
       call pvmfreduce(pvm_opname(NAME),
-     x      val,1,PVMTYPE,MCASTHOST,HPFCGROUPNAME,0,info)
+     x      val,size,PVMTYPE,MCASTHOST,HPFCGROUPNAME,0,info)
       MCAST HOST=MCAST HOST+2
 
 !
