@@ -5,14 +5,15 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1995/08/08 08:40:56 $, )
+# ($Date: 1995/08/10 18:08:58 $, )
 #
 
 RUN=':'
+SCRIPT=`basename $0`
 
 usage()
 {
-  echo "usage: `basename $0` [-flx] directory files ($2)";
+  echo "usage: $SCRIPT [-flx] directory files ($2)";
   exit ${1:-1}
 }
 
@@ -39,9 +40,9 @@ for file
 do
   if test -f $file && cmp -s $file $directory/$file
   then
-    echo "$file was not modified" 
+    echo "$SCRIPT: skipping $file"
   else
-    echo "copying $file"
+    echo "$SCRIPT: copying $file"
     rm -f $directory/$file
     cp $file $directory
     eval $RUN $directory/$file
