@@ -11,7 +11,8 @@
  */
 
 #include <stdio.h>
-#include <assert.h>
+
+#include "assert.h"
 
 #include "boolean.h"
 #include "arithmetique.h"
