@@ -462,6 +462,19 @@ formal_parameter_p(entity v)
     return formal_p;
 }
 
+
+/* True if a variable is the pseudo-variable used to store value
+   returned by a function: */
+bool
+variable_return_p(entity v)
+{
+    storage s = entity_storage(v);
+    bool return_p = storage_return_p(s);
+
+    return return_p;
+}
+
+
 bool
 variable_is_a_module_formal_parameter_p(entity a_variable,
                                         entity a_module)
