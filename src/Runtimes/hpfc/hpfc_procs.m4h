@@ -1,13 +1,12 @@
 c
 c COMMON /HPFC_PROCS/
 c
-c $RCSfile: hpfc_procs.m4h,v $ ($Date: 1995/04/21 17:01:51 $, )
+c $RCSfile: hpfc_procs.m4h,v $ ($Date: 1995/09/07 13:59:49 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
 c
-include(`hpfc_lib_m4_macros')dnl
       common /HPFC_PROCS/
      $     MYLID,
      $     MYTID,
