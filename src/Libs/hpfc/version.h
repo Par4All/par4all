@@ -1,7 +1,7 @@
 /* This file is part of HPFC within PIPS.
  *
  * $RCSfile: version.h,v $ version $Revision$
- * $Date: 1996/03/19 14:46:03 $, 
+ * $Date: 1996/03/20 19:41:03 $, 
  *
  * (c) Fabien COELHO
  */
@@ -15,7 +15,7 @@
  * 5.0 (Jun 95): remappings
  * 5.1 (Feb 96): dynamic live copies
  * 5.2 (Mar 96): io and pure directives
- * 5.3 (Mar 96): descriptive mappings
+ * 5.3 (Mar 96): prescriptive (descriptive!) mappings
  */
 
 #define HPFC_CURRENT_VERSION "5.3"
