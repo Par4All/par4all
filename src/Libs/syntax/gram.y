@@ -597,7 +597,7 @@ licon: label
 
 assignment_inst: TK_ASSIGN icon TK_TO atom
             {
-		FatalError("parser", "assign statement prohibited\n");
+		ParserError("parser", "assign statement prohibited by PIPS\n");
 	    }
 	| atom TK_EQUALS expression
 	    {
