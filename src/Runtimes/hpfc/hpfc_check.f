@@ -1,7 +1,7 @@
 c
 c Checks run-time library version
 c
-c $RCSfile: hpfc_check.f,v $ ($Date: 1994/08/29 13:56:27 $, )
+c $RCSfile: hpfc_check.f,v $ ($Date: 1994/09/21 17:23:02 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
