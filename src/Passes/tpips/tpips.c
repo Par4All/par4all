@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.117  2002/04/24 10:01:49  coelho
+ * initialization fixed for jpips I/O streams.
+ * stdin and stdout are not constants under linux.
+ *
  * Revision 1.116  2002/03/29 14:19:27  coelho
  * tentative de debug de la substitution de ~, mais il faudrait
  * utiliser bash et non sh dans la substitution...
@@ -255,8 +259,8 @@ bool jpips_is_running = FALSE;
  * how to link C FILE* to unix file descriptors?
  * ? f = fopen(); dup2(..., fileno(f)); OR freopen()...
  */ 
-static FILE * in_from_jpips = stdin;
-static FILE * out_to_jpips = stdout;
+static FILE * in_from_jpips;
+static FILE * out_to_jpips;
 
 FILE * jpips_out_file(void)
 {
@@ -972,10 +976,15 @@ static string tp_substitutions(string line)
     return substituted;
 }
 
+/* variable globale, utilisee par le parser helas */
 bool tpips_init_done = FALSE;
+
 void tpips_init(void)
 {
     if (tpips_init_done) return;
+
+    in_from_jpips = stdin;
+    out_to_jpips = stdout;
 
     pips_checks();
 
