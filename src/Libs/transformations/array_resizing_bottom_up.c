@@ -380,7 +380,7 @@ extract_constraint_from_inequalities(Psysteme ps, Variable var, Psysteme ps_prec
     de la variable var dans le système de contraintes ps. Ces valeurs sont des Pvecteurs.
   Cette fonction contient les appels aux fonctions sc_egalites_of_variable() et sc_inegalites_of_variable()
   pour traiter les égalités et les inégalités du système ps.  */
-static bool
+bool
 sc_min_max_of_variable(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *min, Pvecteur *max)
 {
   Pbase b;
