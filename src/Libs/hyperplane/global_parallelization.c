@@ -12,6 +12,7 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "control.h"
+#include "conversion.h"
 
 /* to cope with Yi-qing explicit handling of Psysteme */
 #include "boolean.h"
