@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.125  1997/08/19 19:48:44  coelho
+# suggested (in comment) addition to LD_LIBRARY_PATH
+#
 # Revision 1.124  1997/08/06 08:01:54  coelho
 # default arch . -> GNUSOL1; some variables switched to lower case.
 #
@@ -115,6 +118,8 @@ PIPS_ROOT="${pips_dir}/Production"
 # man pages?
 MANPATH="${MANPATH}:${PIPS_ROOT}/Doc"
 PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
+
+# LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${NEWGEN_ROOT}/Lib/${PIPS_ARCH}:${LINEAR_ROOT}/Lib/${PIPS_ARCH}:${PIPS_ROOT}/Lib/${PIPS_ARCH}"
 
 #
 # The properties.rc file to use: PIPS_PROPERTIESRC
