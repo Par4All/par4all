@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/05/17 12:26:02 $, 
+ * $Date: 1995/05/17 14:16:00 $, 
  *
  * interactive interface to hpfc, based on the GNU realine library.
  */
@@ -90,11 +90,10 @@ int main()
 
 	/*   add to history if not the same as the last one (in this session)
 	 */
-	if ((last && line && strcmp(last, line)!=0) || (line && !last))
+	if (line && *line && ((last && strcmp(last, line)!=0) || (!last)))
 	    add_history(line), last = line; 
 	else
-	    free(line), line = NULL;
-	    
+	    line = (line) ? (free(line), NULL) : NULL;
     }
 
     if (!line) fprintf(stdout, "\n"); /* for Ctrl-D terminations */
