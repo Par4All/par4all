@@ -2297,8 +2297,11 @@ int PolyhedronIncludes(Polyhedron *Pol1,Polyhedron *Pol2) {
 	p1++; p2++;
       }
       
-      /* If (p3 < 0) or (p3 > 0 and constraint(k) is equality, return 0 */
-      if(value_neg_p(p3) || (value_notzero_p(p3) && value_zero_p(Pol1->Constraint[k][0]))) {
+      /* If (p3 < 0) or (p3 > 0 and (constraint(k) is equality
+                                     or ray(i) is a line)), return 0 */
+      if(value_neg_p(p3) ||
+          (value_notzero_p(p3)
+             && (value_zero_p(Pol1->Constraint[k][0] || value_zero_p(Pol2->Ray[i][0]))))) {
 	value_clear(p3); value_clear(tmp);
 	return 0;
       }
@@ -3434,6 +3437,8 @@ Polyhedron *DomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRay
 	      "diffdim", "operation on different dimensions");
     return (Polyhedron*) 0;
   }
+  if (emptyQ(Pol2))
+    return Pol1;
   d = (Polyhedron *)0;
   for (p2=Pol2; p2; p2=p2->next) {
     for (p1=Pol1; p1; p1=p1->next) {

@@ -25,17 +25,17 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.2 2001/09/10 13:12:08 loechner Exp $
+# $Id: vars.mk,v 1.3 2001/11/19 13:24:10 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
-VERSION = 4.20
+VERSION = 5.0
 
 # NOTE: Don't edit this file if it is called vars.mk, instead
 # edit vars.mk.in, which is read by configure
 
 # Default top-level directory.
-prefix =	/usr/local
+prefix =	/usr
 
 # Usually the same as prefix. 
 # exec_prefix is part of the autoconf standard.
@@ -84,7 +84,7 @@ INSTALL_DATA =		${INSTALL} -m 644
 
 ## GNU-MP stuff
 EXTRA_INCLUDES=
-EXTRA_LIBS=-lgmp 
+EXTRA_LIBS=
 
 # Platform specific variables
 OSTYPE	= linux-gnu
@@ -95,7 +95,7 @@ BUILD   = i686
 EXEC_EXTRA_SUFFIX = 
 
 ## make install puts everything here: relays on --prefix 
-INSTALLDIR = /usr/local
+INSTALLDIR = /usr
 BINDIR = $(INSTALLDIR)/bin
 LIBDIR = $(INSTALLDIR)/lib
 INCLUDEDIR = $(INSTALLDIR)/include

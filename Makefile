@@ -1,14 +1,21 @@
 ################################################
-## PolyLib Makefile.  Version : 4.20          ##
+## PolyLib Makefile.  Version : 5.0           ##
 ## Vincent Loechner, 1998/99/00.              ##
 ################################################
+## Main targets of this makefile are :
+## all, libs, install-libs, exec, install[-exec], uninstall, 
+## 32ln-exec, 64ln-exec (to link executables without the extra suffix)
+## Other targets : 32, 64, typecheck.
 
 include vars.mk
 
 ############################################################
+### IMPORTANT NOTE : The defines below should no longer be used:
+### They are done by the configure script generating the file vars.mk
+
+############################################################
 ### Which variants to build : 32 bits, 64 bits, or both.
 ### recommanded: both 32 and 64 libs, 64 executables.
-############################################################
 ##LIBS_TO_BUILD=32
 ##LIBS_TO_BUILD=64
 #LIBS_TO_BUILD=32 64
@@ -24,7 +31,6 @@ include vars.mk
 #
 ############################################################
 ### Type of integer to use (see ./ArithLib/ for details)
-############################################################
 ### ------------------64 bits integers----------------------
 #LONG_BITS= 64
 #
@@ -52,7 +58,6 @@ include vars.mk
 #
 ############################################################
 ### GNU-MP stuff
-############################################################
 #
 ### Define these 4 lines if you want to use the GNU-mp (multiple precision)
 ### library when there is an overflow in Ehrhart
@@ -68,7 +73,6 @@ include vars.mk
 # 
 ############################################################
 ### Compiler stuff
-############################################################
 #CC = /soft/purify/purify -best-effort -cache-dir=/tmp/purify gcc
 #CC = gcc
 #CFLAGS = -O4 -Wall -g 
@@ -90,7 +94,6 @@ include vars.mk
 #
 ############################################################
 ### Installation directories, name of executables.
-############################################################
 #
 ### make install puts everything here:
 ### (if you choose method 2. 3. or 4. below)
@@ -103,7 +106,6 @@ include vars.mk
 #
 ############################################################
 ### Installing the library
-############################################################
 #
 ### Choose one of these 4 installation methods:
 ### 1. don't install the lib (just test the polylib)
@@ -165,11 +167,6 @@ mkinstalldirs = $(SHELL) ./mkinstalldirs
 #############################################################
 ##  you shouldn't need to change anything below this line  ##
 #############################################################
-
-## Main targets of this makefile are :
-## all, libs, install-libs, exec, install[-exec], uninstall, 
-## 32ln-exec, 64ln-exec (to link executables without the extra suffix)
-## Other targets : 32, 64, typecheck.
 
 #############################################################
 ## more defines
