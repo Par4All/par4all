@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.148  2002/04/22 09:02:19  silber
+# Mise en commentaire de LINUXI86*
+#
 # Revision 1.147  2000/03/21 15:26:15  coelho
 # maj PIPS_HOSTS.
 #
@@ -271,8 +274,8 @@ test "${PIPS_ARCH}" = GNUSOL2LL && \
 # default is directly in a subdirectory
 
 # should be links...
-PIPS_DIRECTORY_FOR_LINUXI86_BINARIES=/home/tirnanog/calice1/pips/LINUXI86
-PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/home/loreto/burette2/pips/LINUXI86LL
+#PIPS_DIRECTORY_FOR_LINUXI86_BINARIES=/home/tirnanog/calice1/pips/LINUXI86
+#PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/home/loreto/burette2/pips/LINUXI86LL
 
 # see in /home/deauville/flacon2
 PIPS_DIRECTORY_FOR_GNUSOL2LL_BINARIES=/projects/Pips/Links/GNUSOL2LL
