@@ -362,7 +362,7 @@ Pbase b;
 
     /* un sommet a l'origine */
     (sg->soms_sg).nb_s = 1;
-    (sg->soms_sg).ssg = sommet_make(1, VECTEUR_NUL);
+    (sg->soms_sg).ssg = sommet_make(VALUE_ONE, VECTEUR_NUL);
 
     /* il n'y a aucun rayon */
     (sg->rays_sg).nb_v = 0;
@@ -372,7 +372,7 @@ Pbase b;
     (sg->dtes_sg).nb_v = base_dimension(b);
     (sg->dtes_sg).vsg = NULL;
     for (;!VECTEUR_NUL_P(b); b = b->succ) {
-	d = ray_dte_make(vect_new(vecteur_var(b), 1));
+	d = ray_dte_make(vect_new(vecteur_var(b), VALUE_ONE));
 	d->succ = (sg->dtes_sg).vsg;
 	(sg->dtes_sg).vsg = d;
     }
@@ -395,7 +395,7 @@ Variable v;
     /* creation */
 
     dte = (Pray_dte ) MALLOC(sizeof(Sray_dte),RAY_DTE,"ajout_dte");
-    dte->vecteur = vect_new(v,1);
+    dte->vecteur = vect_new(v, VALUE_ONE);
 
     /* ajout */
 
