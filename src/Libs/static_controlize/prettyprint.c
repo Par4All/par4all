@@ -93,6 +93,8 @@ string module_name;
 				 CODE_WITH_STATIC_CONTROLIZE_EXT,
 				 txt);
 
+    close_prettyprint();
+
     debug_off();
     
     return(success);
