@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/09/08 13:58:20 $, )
+ * ($Date: 1995/09/12 21:42:24 $, )
  */
 
 #include "defines-local.h"
@@ -635,9 +635,6 @@ HANDLER_PROTOTYPE(redistribute)
 }
 
 /*********************************************** handlers for FCD directives */
-/* keep the mapping of FCD specials in the hpfc status.
- * 
- */
 
 HANDLER_PROTOTYPE(synchro)
 {
@@ -651,6 +648,46 @@ HANDLER_PROTOTYPE(time)
 {
     if (get_bool_property(FCD_IGNORE_PREFIX "TIME"))
 	add_statement_to_clean(current_stmt_head());
+}
+
+/* for both setbool and setint
+ * ??? looks like a hack:-)
+ */
+HANDLER_PROTOTYPE(set)
+{
+    if (!get_bool_property(FCD_IGNORE_PREFIX "SET"))
+    {
+	expression arg1, arg2;
+	string property;
+	int val, i;
+	
+	message_assert("two args expected", gen_length(args)==2);
+	arg1 = EXPRESSION(CAR(args));
+	arg2 = EXPRESSION(CAR(CDR(args)));
+	message_assert("constant args expected",
+		       expression_is_constant_p(arg1) &&
+		       expression_is_constant_p(arg2));
+
+	/* property name.
+	 * ??? moved to uppers because hpfc_directives put lowers.
+	 * ??? plus having to deal with quotes that are put in the name!
+	 */
+	property = strdup(entity_local_name
+	    (call_function(syntax_call(expression_syntax(arg1)))));
+	for (i=0; property[i]; i++) property[i]=toupper(property[i]);
+	property[i-1]='\0';
+
+	val = HpfcExpressionToInt(arg2);
+
+	if (same_string_p(entity_local_name(f), HPF_PREFIX SETBOOL_SUFFIX))
+	    set_bool_property(property+1, val);
+	else
+	    set_int_property(property+1, val);
+
+	free(property);
+    }
+    
+    add_statement_to_clean(current_stmt_head());
 }
 
 /******************************************************** DIRECTIVE HANDLING */
@@ -693,6 +730,8 @@ static struct DirectiveHandler handlers[] =
   {HPF_PREFIX SYNCHRO_SUFFIX,		HANDLER(synchro) },
   {HPF_PREFIX TIMEON_SUFFIX,		HANDLER(time) },
   {HPF_PREFIX TIMEOFF_SUFFIX,		HANDLER(time) },
+  {HPF_PREFIX SETBOOL_SUFFIX,		HANDLER(set) },
+  {HPF_PREFIX SETINT_SUFFIX,		HANDLER(set) },
 
   /* default issues an error
    */
