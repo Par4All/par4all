@@ -144,7 +144,7 @@ char *print_type;
     char *module_name = db_get_current_module_name();
 
     if(module_name != NULL) {
-	if ( safe_make_p(print_type, module_name) ) {
+	if ( safe_make(print_type, module_name) ) {
 	    char * file_name = db_get_file_resource(print_type, module_name, TRUE);
 	    return file_name;
 	}
