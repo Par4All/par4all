@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log: hpfc_install,v $
+# Revision 1.33  1997/03/20 09:48:43  coelho
+# *_both.f files also copied.
+#
 # Revision 1.32  1997/03/19 17:51:37  coelho
 # better RCS headers
 #
@@ -99,7 +102,7 @@ then
   rm -f $tdir/*
   
   # if there is no common...
-  touch $basedir/_host.h $basedir/_node.h
+  touch $basedir/_host.h $basedir/_node.h $basedir/_both.f
 
   $verb "copying files in $tdir"
 
@@ -112,11 +115,12 @@ then
      $basedir/*_host.h \
      $basedir/*_node.f \
      $basedir/*_node.h \
+     $basedir/*_both.f \
      $basedir/*_parameters.h \
      $basedir/*_init.h \
      $tdir
 
-  rm -f $tdir/_host.h $tdir/_node.h
+  rm -f $tdir/_host.h $tdir/_node.h $tdir/_both.f
 
   [ "$unsplit" ] && set $basedir/[a-z]*.f 
   [ "$reffiles" ] && set `echo "$reffiles" | cut -d " " -f 2`
