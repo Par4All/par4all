@@ -77,53 +77,64 @@ static int tpips_lex_input (void)
     return (int) c;
 }
 
-#define RETURN(x) pips_debug(8, "init %d\n", x); return x
+#define RETURN(x)  pips_debug(8, "init %d\n", x); return x
 #define KEYWORD(x) pips_debug(8, "key %d\n", x); BEGIN INITIAL; return x
+#define SPECIAL(x) pips_debug(8, "spe %d\n", x); BEGIN SPEC; return x
 
 %}
 
-%s KEY STR
+%s KEY STR SPEC
 
 %%
 
-<KEY>setenv		{ KEYWORD(SET_ENVIRONMENT); }
-<KEY>getenv		{ KEYWORD(GET_ENVIRONMENT); }
-<KEY>open		{ KEYWORD(OPEN); }
-<KEY>create		{ KEYWORD(CREATE); }
-<KEY>close		{ KEYWORD(CLOSE); }
-<KEY>delete		{ KEYWORD(DELETE); }
-<KEY>module		{ KEYWORD(MODULE); }
-<KEY>make		{ KEYWORD(MAKE); }
-<KEY>apply		{ KEYWORD(APPLY); }
-<KEY>display 		{ KEYWORD(DISPLAY); }
-<KEY>activate 		{ KEYWORD(ACTIVATE); }
-<KEY>getproperty	{ KEYWORD(GET_PROPERTY); }
-<KEY>get		{ KEYWORD(GET_PROPERTY); }
-<KEY>info		{ KEYWORD(INFO); }
-<KEY>cd 		{ KEYWORD(CDIR); }
-<KEY>pwd 		{ KEYWORD(PWD); }
-<KEY>source		{ KEYWORD(SOURCE); }
+<KEY>setenv		{ KEYWORD(TK_SET_ENVIRONMENT); }
+<KEY>getenv		{ KEYWORD(TK_GET_ENVIRONMENT); }
+<KEY>open		{ KEYWORD(TK_OPEN); }
+<KEY>create		{ KEYWORD(TK_CREATE); }
+<KEY>close		{ KEYWORD(TK_CLOSE); }
+<KEY>delete		{ KEYWORD(TK_DELETE); }
+<KEY>module		{ KEYWORD(TK_MODULE); }
+<KEY>make		{ KEYWORD(TK_MAKE); }
+<KEY>apply		{ KEYWORD(TK_APPLY); }
+<KEY>display 		{ KEYWORD(TK_DISPLAY); }
+<KEY>activate 		{ KEYWORD(TK_ACTIVATE); }
+<KEY>getproperty	{ KEYWORD(TK_GET_PROPERTY); }
+<KEY>get		{ KEYWORD(TK_GET_PROPERTY); }
+<KEY>info		{ KEYWORD(TK_INFO); }
+<KEY>cd 		{ KEYWORD(TK_CDIR); }
+<KEY>pwd 		{ KEYWORD(TK_PWD); }
+<KEY>source		{ KEYWORD(TK_SOURCE); }
+<KEY>quit 		{ KEYWORD(TK_QUIT); }
+<KEY>exit 		{ KEYWORD(TK_EXIT); }
+<KEY>help 		{ KEYWORD(TK_HELP); }
 
-\(			{ RETURN(OPENPAREN); }
-\)			{ RETURN(CLOSEPAREN); }
-\,			{ RETURN(COMMA); }
-= 			{ RETURN(EQUAL); }
+<KEY>setproperty	{ SPECIAL(TK_SET_PROPERTY); }
+<KEY>set		{ SPECIAL(TK_SET_PROPERTY); }
+<KEY>echo 		{ SPECIAL(TK_ECHO); }
+<KEY>shell 		{ SPECIAL(TK_SHELL); }
 
-\n			{ RETURN(ENDOFLINE); }
+<SPEC>[^\n]* 		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }
+
+\(			{ RETURN(TK_OPENPAREN); }
+\)			{ RETURN(TK_CLOSEPAREN); }
+\,			{ RETURN(TK_COMMA); }
+= 			{ RETURN(TK_EQUAL); }
+
+<SPEC,INITIAL>\n	{ RETURN(TK_ENDOFLINE); }
 
 <STR>[^\"]*\"		{ yylval.name = strdup(concatenate("\"", yytext, 0));
-		  	  BEGIN INITIAL; RETURN(A_STRING);}
+		  	  BEGIN INITIAL; RETURN(TK_A_STRING);}
 \"			{ BEGIN STR;} /* " */
 
-"$ALL"			{ RETURN(OWNER_ALL); }
-"$PROGRAM"		{ RETURN(OWNER_PROGRAM); }
-"$MAIN"			{ RETURN(OWNER_MAIN); }
-"$MODULE"		{ RETURN(OWNER_MODULE); }
-"$CALLERS"		{ RETURN(OWNER_CALLERS); }
-"$CALLEES"		{ RETURN(OWNER_CALLEES); }
+"$ALL"			{ RETURN(TK_OWNER_ALL); }
+"$PROGRAM"		{ RETURN(TK_OWNER_PROGRAM); }
+"$MAIN"			{ RETURN(TK_OWNER_MAIN); }
+"$MODULE"		{ RETURN(TK_OWNER_MODULE); }
+"$CALLERS"		{ RETURN(TK_OWNER_CALLERS); }
+"$CALLEES"		{ RETURN(TK_OWNER_CALLEES); }
 
-[/\.0-9A-Za-z_:-]+ 	{ yylval.name = strdup(yytext); RETURN(NAME);}
-[ \t]+			/* skip blanks... */
+[/\.0-9A-Za-z_:-]+ 	{ yylval.name = strdup(yytext); RETURN(TK_NAME);}
+<KEY,INITIAL>[ \t]+	/* skip blanks... */
 .			{ pips_user_error("unexpected char %c\n", *yytext); }
 
 %%
