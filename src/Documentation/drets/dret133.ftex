@@ -1,9 +1,10 @@
 \documentstyle[12pt,figfonts]{article}
 %\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
 
-\newcommand{\titre}{PIPSMAKE ET PIPSDBM \\
-			MOTIVATIONS ET FONCTIONALITES
-}
+%\newcommand{\titre}{PIPSMAKE ET PIPSDBM \\
+%			MOTIVATIONS ET FONCTIONALITES
+%}
+
 \author{Re'mi TRIOLET}
 \title{PIPSMAKE ET PIPSDBM \\
 			MOTIVATIONS ET FONCTIONALITES\\
@@ -11,7 +12,7 @@ TR EMP E133}
 \date{Septembre 1990}
 
 
-\newcommand{\numero}{E133}
+%\newcommand{\numero}{E133}
 
 \setlength{\parindent}{0cm}
 
