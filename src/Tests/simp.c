@@ -1,5 +1,5 @@
 /* $RCSfile: simp.c,v $ (version $Revision$)
- * $Date: 1996/08/06 15:16:45 $, 
+ * $Date: 1996/08/07 13:13:39 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -13,9 +13,6 @@
 
 #include <stdio.h>
 #include <malloc.h>
-#include <setjmp.h>
-
-extern jmp_buf overflow_error;
 
 #include "boolean.h"
 #include "assert.h"
@@ -24,16 +21,12 @@ extern jmp_buf overflow_error;
 #include "contrainte.h"
 #include "sc.h"
 
-#define NB_INEQ sc->nb_ineq
-#define NB_EQ sc->nb_eq
-#define DIMENSION sc->dimension
-
 static void
 test_system(Psysteme sc)
 {
-    if (setjmp(overflow_error))
+    CATCH(overflow_error) 
 	fprintf(stdout, "*** Arithmetic error occured in simplex\n");
-    else
+    TRY
 	if (sc_simplexe_feasibility_ofl_ctrl(sc,FWD_OFL_CTRL))
 	    printf("Systeme faisable (soluble) en rationnels\n") ;
 	else
@@ -50,7 +43,7 @@ test_file(FILE * f, char * name)
 	printf("syntaxe correcte dans %s\n",name);
 	sc_fprint(stdout, sc, *variable_default_name);
 	printf("Nb_eq %d , Nb_ineq %d, dimension %d\n",
-	       NB_EQ, NB_INEQ, DIMENSION) ;
+	       sc->nb_eq, sc->nb_ineq, sc->dimension) ;
 	test_system(sc);
     }
     else
