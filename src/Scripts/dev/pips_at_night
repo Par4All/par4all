@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/07/19 10:51:34 $, )
+# ($Date: 1996/07/19 11:00:52 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -13,12 +13,9 @@ test "$PIPS_DIR" || . /projects/Pips/pipsrc.sh
 
 unset no_cleaning no_newgen no_linear no_pips no_validation
 
-if test -x /usr/openwin/bin/mail
-then 
-  mail=/usr/openwin/bin/mail
-else
-  mail=mail
-fi
+# use this mail (not /bin/mail...)
+mail=/usr/openwin/bin/mail
+test -x $mail || mail=mail
 
 arch=.
 user=`whoami`
