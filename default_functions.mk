@@ -40,7 +40,7 @@ $(OBJDIR)/%.o : %.c
 		$(ROOT)/lib/$(STATIC_LIB) $(EXTRA_LIBS) 
 
 # Recursively, construct all packages
-all: package
+all: execs
 
 # In each package construct the library components
 library: $(LIBRARY)
@@ -50,12 +50,16 @@ $(LIBRARY): $(OBJS)
 	ar cr $(OBJDIR)/$(PSTATIC) $(OBJS)
 	ranlib $(OBJDIR)/$(PSTATIC)
 
+$(ROOT)/lib/$(STATIC_LIB):
+	$(RM) $@
+	$(LN_S) $(OBJDIR)/$(PSTATIC) $@
+
 ########################################################################
 ## Recursive rules
 ########################################################################
 
 # Compile subpackages
-package:
+package: $(ROOT)/vars.mk
 	@if [ "x$(SUBDIRS)" != "x" ]; then \
 		set $(SUBDIRS) ; \
 		for x do \
@@ -69,7 +73,7 @@ package:
 	make library
 
 # Compiles the applications to executables
-execs:
+execs: package
 	@if [ "x$(APPDIRS)" != "x" ]; then \
 		set $(APPDIRS) ; \
 		for x do \
@@ -98,7 +102,7 @@ tests:
 
 # To construct an executable, compile the 'c' file and link with the
 # library
-exe: $(OBJS) $(POLY_EXEC)
+exe: $(ROOT)/lib/$(STATIC_LIB) $(POLY_EXEC)
 
 # Remove classes from this directory then subdirectories
 clean:
@@ -124,9 +128,9 @@ document:
 ## Install/UnInstall rules
 ###########################################################
 # main target
-install:: install-static install-include install-man install-docs
+install:: install-static install-include install-man install-docs install-exec
 
-# not functional yet...
+# not functional...
 #install-shared:
 #	$(mkinstalldirs) $(LIBDIR)
 #	$(INSTALL) $(OBJ_DIR)/$(PSHARED) $(LIBDIR)/

@@ -1,6 +1,6 @@
 
 # @Author: Bart Kienhuis
-# $Id: vars.mk.in,v 1.7 2002/10/15 08:21:20 kienhuis Exp $
+# $Id: vars.mk.in,v 1.8 2002/10/18 14:03:06 loechner Exp $
 
 VERSION = @VERSION@
 
@@ -95,9 +95,10 @@ DOXYGEN = @DOXYGEN@
 ############################################################
 
 STATIC_LIB = libpolylib$(BITS).a
-SHARED_LIB = libpolylib$(BITS).$(SHEXT)
+PSTATIC = $(STATIC_LIB).$(VERSION)
 
-PSTATIC = $(SHARED_LIB).$(VERSION)
+# !not used
+SHARED_LIB = libpolylib$(BITS).$(SHEXT)
 PSHARED = $(SHARED_LIB).$(VERSION)
 
 ############################################################

@@ -1,6 +1,6 @@
 #
 # @author Bart Kienhuis
-# $Id: makefile,v 1.1 2002/10/14 14:08:18 olaru Exp $
+# $Id: makefile,v 1.2 2002/10/18 14:03:06 loechner Exp $
 #
 # Top-level makefile for polylib. 
 
@@ -12,6 +12,7 @@ APPDIRS = applications
 
 TESTDIRS = Test
 
-package: vars.mk
+# default: build the executables
+.PHONY: execs
 
 include $(ROOT)/default_functions.mk
