@@ -70,11 +70,12 @@ function compile()
     doit GV "$@" ;
 }
 
-# VALIDATE: host dir archs
+# VALIDATE (in background): host dir archs
 function validate()
 {
     ${verb} "[validate] $@"
-    doit GCNLP "$@" ;
+    doit GCNLP "$@" &
+    ${verb} "[validate] background pid: $!"
 }
 
 # COmpile and VALIDate: host dir arch
@@ -82,7 +83,7 @@ function covalid()
 {
     ${verb} "[covalid] $@"
     compile "$@" ;
-    validate "$@" &
+    validate "$@" ;
 }
 
 #
