@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: OptionParser.java,v $
+ * Revision 1.3  1998/07/01 15:54:45  coelho
+ * jpips.menus used for chosing the menus file.
+ *
  * Revision 1.2  1998/07/01 07:08:01  coelho
  * cleaner.
  *
@@ -62,9 +65,9 @@ public class OptionParser
 			RADIOBUTTON		= "RADIOBUTTON",
 			CLOSE			= "CLOSE";
 			
-  public final String	image = "DownArrow.gif",
-  			displayButton = "Display Frame",
-			closeButton = "Close";
+  public final String	image 			= "DownArrow.gif",
+  			displayButton 		= "Display Frame",
+			closeButton 		= "Close";
 
 
   /** Defines frame, menu, and optionPanel.
@@ -72,7 +75,7 @@ public class OptionParser
     * Launches the parsing that fills menu and optionPanel.
     * Adds a "close" button at the end of optionPanel.
     */
-  public OptionParser(Parser p, String source, TPips tpips)
+  public OptionParser(Parser p, TPips tpips)
     {
       this.p = p;
       this.tpips = tpips;
@@ -304,6 +307,21 @@ public class OptionParser
       mi.addActionListener(getMITListener());
     }
     
+  /** @return the down arrow file name.
+    */
+  private String getDownArrowImageFileName()
+    {
+      String down = System.getProperty("jpips.downarrow");
+
+      File f = new File(down);
+      if (f.exists()) return down;
+
+      // default
+      f = new File(image);
+      if (f.exists()) return image;
+
+      return null;      
+    }
 
   /** Adds a button, a label, and a single menu menubar to optionPanel.
     * The selection of the menu is displayed in the label.
@@ -325,7 +343,7 @@ public class OptionParser
 
       PMenuBar mb = new PMenuBar();
       PMenu m1 = new PMenu();
-      ImageIcon icon = new ImageIcon(image);
+      ImageIcon icon = new ImageIcon(getDownArrowImageFileName());
       m1.setIcon(icon);
       
       parseCommand(m1, null, l, null, null);
@@ -360,7 +378,7 @@ public class OptionParser
 
       PMenuBar mb = new PMenuBar();
       PMenu m1 = new PMenu();
-      ImageIcon icon = new ImageIcon("DownArrow.gif");
+      ImageIcon icon = new ImageIcon(image);
       m1.setIcon(icon);      
 
       PMenu m2 = new PMenu(name);
