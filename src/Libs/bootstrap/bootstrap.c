@@ -346,7 +346,7 @@ static type double_to_double_type(int n)
   type t = type_undefined;
   functional ft = functional_undefined;
 
-  ft = make_functional(NIL, MakeRealResult());
+  ft = make_functional(NIL, MakeDoubleprecisionResult());
   functional_parameters(ft) = 
     CONS(PARAMETER, MakeDoubleprecisionParameter(), NIL);
   t = make_type(is_type_functional, ft);
@@ -360,6 +360,19 @@ static type complex_to_real_type(int n)
   functional ft = functional_undefined;
 
   ft = make_functional(NIL, MakeRealResult());
+  functional_parameters(ft) = 
+    CONS(PARAMETER, MakeComplexParameter(), NIL);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
+static type doublecomplex_to_double_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeDoubleprecisionResult());
   functional_parameters(ft) = 
     CONS(PARAMETER, MakeComplexParameter(), NIL);
   t = make_type(is_type_functional, ft);
@@ -612,6 +625,7 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"LEN", 1, character_to_integer_type},
     {"INDEX", 2, character_to_integer_type},
     {"AIMAG", 1, complex_to_real_type},
+    {"DIMAG", 1, doublecomplex_to_double_type},
     {"CONJG", 1, complex_to_complex_type},
     {"SQRT", 1, default_intrinsic_type},
     {"DSQRT", 1, double_to_double_type},
