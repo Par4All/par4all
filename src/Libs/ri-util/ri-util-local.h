@@ -222,9 +222,11 @@ typedef hash_table control_mapping;
 					 ENTITY_NON_EQUAL_P(e) || \
 					 ENTITY_EQUAL_P(e) )
 
-#define SPECIAL_COMMON_P(e) \
-    ((same_string_p(entity_local_name(e), DYNAMIC_AREA_LOCAL_NAME)) || \
-     (same_string_p(entity_local_name(e), STATIC_AREA_LOCAL_NAME)))
+#define SPECIAL_AREA_P(e) \
+    ((same_string_p(module_local_name(e), DYNAMIC_AREA_LOCAL_NAME)) || \
+     (same_string_p(module_local_name(e), STATIC_AREA_LOCAL_NAME)))
+
+#define SPECIAL_COMMON_P(e) SPECIAL_AREA_P(e)
 
 /* IO Management
  */
