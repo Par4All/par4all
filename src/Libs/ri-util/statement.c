@@ -444,8 +444,8 @@ string c; /* comments, default string_undefined */
 					   make_call(called_function,NIL)));
 
     ifdebug(8) {
-	fputs("[make_call_statement] ", stderr);
-	print_text(stderr, text_statement(entity_undefined, 0, cs));
+	pips_debug(8, "cs is\n");
+	print_statement(cs);
     }
 
     return cs;
@@ -608,10 +608,13 @@ set r;
     fprintf(fd, "\n");
 }
 
-void print_statement(s)
-statement s;
+/* (the text is not freed, massive memory leak:-) 
+ */ 
+void print_statement(statement s)
 {
+    debug_on("TEXT_DEBUG_LEVEL");
     print_text(stderr, text_statement(entity_undefined,0,s));
+    debug_off();
 }
 
 static hash_table number_to_statement = hash_table_undefined;
@@ -821,7 +824,7 @@ return (stmt);
 string statement_identification(statement s)
 {
     static char buffer[50];
-    char *instrstring;
+    char *instrstring = NULL;
     int so = statement_ordering(s);
 
     switch (instruction_tag(statement_instruction(s)))
