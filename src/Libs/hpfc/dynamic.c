@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/06/08 18:01:19 $, )
+ * ($Date: 1996/06/12 17:15:55 $, )
  */
 
 #include "defines-local.h"
@@ -480,8 +480,8 @@ hpfc_translate_call_with_distributed_args(
 	},
 	    lr);
 
-	statement_instruction(s) =
-	    make_instruction(is_instruction_block, gen_nconc(lpre, lpos));
+	statement_instruction(s) = 
+	    make_instruction_block(gen_nconc(lpre, lpos));
 
 	DEBUG_STAT(3, "out", s);
     }
