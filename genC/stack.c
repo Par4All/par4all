@@ -11,7 +11,7 @@
  * More thoughts needed. 
  *
  * $RCSfile: stack.c,v $ version $Revision$
- * $Date: 1997/07/22 12:58:36 $, 
+ * $Date: 2000/02/23 13:36:58 $, 
  * got on %D%, %T%
  */
 
@@ -71,8 +71,7 @@ typedef struct __stack_iterator
 }
     _stack_iterator; /* and also *stack_iterator (in headers) */
 
-static void update_iterator_upward(i)
-stack_iterator i;
+static void update_iterator_upward(stack_iterator i)
 {
     _stack_ptr x=i->list;
 
@@ -99,9 +98,7 @@ stack_iterator i;
   else\
   { i->index++; UPDATE_ITERATOR_UPWARD(i); }
 
-stack_iterator stack_iterator_init(s, down)
-stack s;
-int down;
+stack_iterator stack_iterator_init(stack s, int down)
 {
     stack_iterator i=(stack_iterator) malloc(sizeof(_stack_iterator));
 
@@ -126,9 +123,7 @@ int down;
     return(i);
 }
 
-int stack_iterator_next_and_go(i, pitem)
-stack_iterator i;
-char **pitem;
+int stack_iterator_next_and_go(stack_iterator i, char ** pitem)
 {
     if (STACK_ITERATOR_END_P(i))
     {
@@ -143,14 +138,12 @@ char **pitem;
     }
 }
 
-int stack_iterator_end_p(i)
-stack_iterator i;
+int stack_iterator_end_p(stack_iterator i)
 {
     return(STACK_ITERATOR_END_P(i));
 }
 
-void stack_iterator_end(pi)
-stack_iterator *pi;
+void stack_iterator_end(stack_iterator * pi)
 {
     free(*pi), *pi=(stack_iterator) NULL;
 }
@@ -162,8 +155,7 @@ stack_iterator *pi;
 
 /* allocates a bucket of size size
  */
-static _stack_ptr allocate_bucket(size)
-int size;
+static _stack_ptr allocate_bucket(int size)
 {
     _stack_ptr x = (_stack_ptr) malloc(sizeof(_stack_bucket));
     
@@ -178,8 +170,7 @@ int size;
 /* search for a new bucket, first in the available list,
  * if none are available, a new bucket is allocated
  */
-static _stack_ptr find_or_allocate(s)
-stack s;
+static _stack_ptr find_or_allocate(stack s)
 {
     if (!STACK_PTR_NULL_P(s->avail))
     {
@@ -198,8 +189,7 @@ stack s;
 
 /* ALLOCATEs a new stack of type
  */
-stack stack_make(type, bucket_size, policy)
-int type, bucket_size, policy;
+stack stack_make(int type, int bucket_size, int policy)
 {
     stack s = (stack) malloc(sizeof(_stack_head));
 
@@ -320,9 +310,7 @@ stack s;
  * the size it the same than the initial bucket size. 
  * Other policies may be considered.
  */
-void stack_push(item, s)
-char *item;
-stack s;
+void stack_push(char * item, stack s)
 {
     _stack_ptr x = s->stack;
 
@@ -349,8 +337,7 @@ stack s;
  * the empty buckets are not freed here. 
  * stack_free does the job.
  */
-char *stack_pop(s)
-stack s;
+char *stack_pop(stack s)
 {
     _stack_ptr x = s->stack;
 
@@ -372,8 +359,7 @@ stack s;
 
 /* returns the item on top of stack s
  */
-char *stack_head(s)
-stack s;
+char *stack_head(stack s)
 {
     _stack_ptr x = s->stack;
 
@@ -387,9 +373,7 @@ stack s;
 
 /* REPLACEs the item on top of stack s, and returns the old item
  */
-char *stack_replace(item, s)
-char *item;
-stack s;
+char *stack_replace(char * item, stack s)
 {
     _stack_ptr x = s->stack;
     char *old;
