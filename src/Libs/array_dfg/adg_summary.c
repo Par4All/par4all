@@ -68,6 +68,8 @@ extern	hash_table		Gforward_substitute_table;
 extern	statement_mapping	Gstco_map;
 extern  list			Gstructural_parameters;
 
+extern int my_pip_count;
+
 /*=======================================================================*/
 /* Pentity_vertices pev_new()                                      AL 15/02/94
  * Allocates a Pentity_vertices.
@@ -558,6 +560,7 @@ graph                   dup_dg;
 			   	sou_q = pip_integer_max( sou_ps , 
 						loc_context ,
 						prov_pv);
+my_pip_count++;
 
 			   	if (get_debug_level() > 4) 
 					imprime_special_quast( stderr, sou_q );
@@ -897,6 +900,7 @@ if (get_debug_level() > 0) fprint_dfg(stderr, make_graph(ret_verl));
 				 sou_q = pip_integer_max( sou_ps , 
 						 loc_context ,
 						 prov_pv);
+my_pip_count++;
 
 				 if (get_debug_level() > 4) 
 					 imprime_special_quast( stderr, sou_q );
