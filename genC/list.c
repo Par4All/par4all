@@ -60,6 +60,7 @@
    . GEN_LAST returns the last cons of a list.
    . GEN_REMOVE updates the list (pointer) CPP by removing (and freeing) any
      ocurrence of the gen_chunk OBJ.
+   . GEN_REMOVE_ONCE : Remove the first occurence of obj in list l.
    . GEN_NTHCDR returns the N-th (beginning at 1) CDR element of L.
      CDR(L) = GEN_NTHCDR(1,L).
    . GEN_NTH returns the N-th (beginning at 0) car of L.
@@ -424,6 +425,7 @@ void gen_remove(list * cpp, void * o)
   gen_remove_from_list(cpp, o, FALSE);
 }
 
+/* Remove the first occurence of o in list pl: */
 void gen_remove_once(list * pl, void * o)
 {
   gen_remove_from_list(pl, o, TRUE);
@@ -637,12 +639,12 @@ gen_list_and_not(list * a,
 /* Replace all the reference to x in list l by a reference to y: */
 void
 gen_list_patch(list l,
-	       gen_chunk * x,
-	       gen_chunk * y)
+	       void * x,
+	       void * y)
 {
     MAPL(pc, {
-	 if (CAR(pc).p == x)
-	     CAR(pc).p = y;
+	 if (CAR(pc).p == (gen_chunk *) x)
+	     CAR(pc).p = (gen_chunk *) y;
      }, l);
 }
 
