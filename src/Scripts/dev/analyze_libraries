@@ -1,29 +1,37 @@
 #! /bin/sh
-
+#
+# $RCSfile: analyze_libraries,v $ (version $Revision$)
+# $Date: 1995/08/08 17:10:15 $, 
+#
 # create couples (function library) of uses and definitions for all libraries
 # used in PIPS (default option -a), including Linear and NewGen, or for
 # all PIPS libraries (option -p)
 
-# Remi Triolet, Francois Irigoin, Corinne Ancourt
+# Remi Triolet, Francois Irigoin, Corinne Ancourt, Fabien Coelho
 
 USAGE="Usage: $0 [-p|a]"
 
-LIBS="$LIBDIR/*.a $EXTEDIR/*.a"
+LIBS=
 
 while getopts ap opt
 do
-	case $opt in
-	p)	LIBS="$LIBDIR/*.a";;
-	a)	LIBS="$LIBDIR/*.a $EXTEDIR/*.a";;
-	\?)	echo $USAGE >&2
-		exit 2;;
-	esac
+  case $opt in
+    p)	LIBS="$PIPS_LIBDIR/*.a";;
+    a)	LIBS="$PIPS_LIBDIR/*.a $PIPS_EXTEDIR/*.a";;
+    \?)	echo $USAGE >&2
+	exit 2;;
+  esac
 done
 
-nm -go $LIBS | fgrep " T " | sed 's/:.* / /' | sed 's/^\/.*\///' | 
-	awk '{ print $2 , $1}' | sort > $TEMPDIR/libs.d
+[ "$LIBS" ] || LIBS="$PIPS_LIBDIR/*.a $PIPS_EXTEDIR/*.a"
 
-nm -go $LIBS | fgrep " U " | sed 's/:.* / /' | sed 's/^\/.*\///' | 
-	awk '{ print $2 , $1}' | sort > $TEMPDIR/libs.u
+nm -go $LIBS | fgrep " T " | sed 's/:.* / /;s/^\/.*\///' | 
+	awk '{ print $2 , $1}' | sort > $PIPS_TEMPDIR/libs.d
 
-join $TEMPDIR/libs.u $TEMPDIR/libs.d > $TEMPDIR/libs.j
+nm -go $LIBS | fgrep " U " | sed 's/:.* / /;s/^\/.*\///' | 
+	awk '{ print $2 , $1}' | sort > $PIPS_TEMPDIR/libs.u
+
+join $PIPS_TEMPDIR/libs.u $PIPS_TEMPDIR/libs.d > $PIPS_TEMPDIR/libs.j
+
+# that is all
+#
