@@ -438,8 +438,8 @@ char *module_name;
 	    translate_global_values(get_current_module_entity(), ip);
 	    ifdebug(8) {
 		(void) fprintf(stderr,"module_name_to_preconditions\n");
-		(void) fprintf(stderr,"\t summary_precondition %x after translation:\n",
-			       (unsigned int) ip);
+		(void) fprintf(stderr,"\t summary_precondition %p after translation:\n",
+			       ip);
 		(void) print_transformer(ip);
 	    }
 	    /* pre = ip o pre */
