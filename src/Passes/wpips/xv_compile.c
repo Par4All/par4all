@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/12 15:25:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/30 00:42:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1996/07/12 15:25:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1997/04/30 00:42:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -12,12 +12,12 @@ char wpips_xv_compile_c_vcid[] = "%A% ($Date: 1996/07/12 15:25:51 $, ) version $
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "misc.h"
 #include "makefile.h"
-#include "pipsmake.h"
 #include "phases.h"
 #include "database.h"
-#include "misc.h"
 #include "pipsdbm.h"
+#include "pipsmake.h"
 #include "top-level.h"
 #include "wpips.h"
 
@@ -63,7 +63,7 @@ notify_hpfc_file_view(Menu menu,
       (void) alloc_first_initialized_window(FALSE);
    }
    
-   wpips_file_view(path_name, file_name, "HPFC File", -1, "HPFC");
+   wpips_file_view(path_name, file_name, "HPFC File", "HPFC", "HPFC");
    user_log("HPFC View of \"%s\" done.\n", file_name);
 }
 
