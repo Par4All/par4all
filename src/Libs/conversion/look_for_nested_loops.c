@@ -25,7 +25,8 @@
  * search  the  nested  loops  in the statement s
  *  
 */
-void look_for_nested_loop_statements(s,loop_transformation, loop_predicate)
+void 
+look_for_nested_loop_statements(s,loop_transformation, loop_predicate)
 statement s;
 statement (*loop_transformation)();
 bool (*loop_predicate)();
@@ -46,13 +47,26 @@ bool (*loop_predicate)();
 
 	if ((*loop_predicate)(l)) {
 	    list_loop_statement = CONS (STATEMENT,s,NIL);
+
+	    ifdebug(9) {
+		debug(9, "look_for_nested_loop_statements",
+		      "Before transformation:\n");
+		debug_on("ZERO_DEBUG_LEVEL");
+		print_text(stderr,text_statement(entity_undefined, 0, s));
+		debug_off();
+	    }
+
 	    new_s = look_for_inner_loops(l,list_loop_statement,
 					 loop_transformation, 
 					 loop_predicate);
 	    
-	    if(get_debug_level()>=9) {
-		print_text(stderr,text_statement(entity_undefined,0,new_s));
+	    ifdebug(9) {
+		debug(9, "look_for_nested_loop_statements",
+		      "After transformation:\n");
 		pips_assert("look_for_nested_loop_statement", gen_consistent_p(new_s));
+		debug_on("ZERO_DEBUG_LEVEL");
+		print_text(stderr,text_statement(entity_undefined,0,new_s));
+		debug_off();
 	    }
 	    if (new_s != statement_undefined) {
 		i = statement_instruction(s);
