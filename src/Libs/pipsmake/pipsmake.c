@@ -895,7 +895,7 @@ get_first_main_module(void)
 	   ("sed -n 's, ,,g;s,	,,g;s,^[pP][rR][oO][gG][rR][aA][mM]"
 	    "\\([0-9a-zA-Z\\-_]*\\).*$,\\1,p' ",
 	    db_get_current_workspace_directory(),
-	    "/*.f > ", /**/ tmp_file_name, 0));
+	    "/*/*.f_initial > ", /**/ tmp_file_name, 0));
 
     tmp_file = safe_fopen(tmp_file_name, "r");
     name = safe_readline(tmp_file);
