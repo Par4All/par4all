@@ -261,7 +261,8 @@ unstructured_to_postcondition(
 	/* FI: euh... why? According to comments about transformer_apply()
 	 * neither arguments are modified...
 	 */
-	post = unstructured_to_postconditions(pre_u, pre, u) ;
+	/* post = unstructured_to_postconditions(pre_u, pre, u); */
+	post = unstructured_to_accurate_postconditions(pre_u, pre, u);
 	if(transformer_undefined_p(post)) {
 	  post = transformer_apply(transformer_dup(tf), pre);
 	}
@@ -287,7 +288,12 @@ add_loop_skip_condition(transformer pre, loop l)
     int incr_lb = 0;
     int incr_ub = 0;
 
-    debug(8,"add_loop_skip_condition","begin\n");
+    debug(8,"add_loop_skip_condition","begin with pre\n");
+    ifdebug(8) {
+	(void) fprintf(stderr,"%s: %s\n","[add_loop_skip_condition]",
+		       "input pre =");
+	(void) print_transformer(pre);
+    }
 
     /* is the loop increment numerically known? Is its sign known? */
     expression_and_precondition_to_integer_interval(e_incr, pre, &incr_lb, &incr_ub);
@@ -342,7 +348,12 @@ add_loop_skip_condition(transformer pre, loop l)
 	debug(8,"add_loop_skip_condition","increment sign unknown or non-affine bound\n");
     }
 
-    debug(8,"add_loop_skip_condition","end\n");
+    debug(8,"add_loop_skip_condition","end with pre\n");
+    ifdebug(8) {
+	(void) fprintf(stderr,"%s: %s\n","[add_loop_skip_condition]",
+		       "new pre =");
+	(void) print_transformer(pre);
+    }
 
     return pre;
 }
@@ -623,7 +634,8 @@ add_loop_index_exit_value(
     }
     if(t_incr==transformer_undefined)
 	t_incr = args_to_transformer(li);
-    post = transformer_apply(t_body, post);
+    /* Do not apply an extra iteration! */
+    /* post = transformer_apply(t_body, post); */
     post = transformer_apply(t_incr, post);
     transformer_free(t_incr);
 
@@ -832,10 +844,14 @@ loop_to_postcondition(
 	else if(non_empty_range_wrt_precondition_p(r, pre)) {
 	    debug(8, "loop_to_postcondition", "The loop certainly is executed\n");
 
-	    /* propagate preconditions in the loop body */
-	    (void) statement_to_postcondition(preb, s);
+	    /* propagate preconditions in the loop body and compute its postcondition... */
+	    post = statement_to_postcondition(preb, s);
 
-	    post = transformer_apply(tf, pre);
+	    /* ... or compute directly the postcondition using the loop body transformer.
+	     * This second approach is slightly less precise because the transformer
+	     * cannot use preconditions to avoid some convex approximations. */
+	    /* post = transformer_apply(tf, pre); */
+
 	    /* The loop body effects should be passed as fourth argument
 	     * to check that the value of the upper bound expression is
 	     * not modified when the body is executed. But it is not available
@@ -864,12 +880,13 @@ loop_to_postcondition(
 	     * (should be checked on Validation/Semantics/induc1.f)
 	     */
 	    transformer post_ne = transformer_dup(pre);
-	    transformer post_al = transformer_apply(tf, pre);
+	    transformer post_al = transformer_undefined;
 
 	    debug(8, "loop_to_postcondition", "The loop may be executed or not\n");
 
 	    /* propagate preconditions in the loop body */
-	    (void) statement_to_postcondition(preb, s);
+	    post_al =  statement_to_postcondition(preb, s);
+	    /* post_al = transformer_apply(tf, pre); */
 
 	    /* We should add (when possible) the non-entry condition in post_ne!
 	     * For instance, DO I = 1, N leads to N <= 0
@@ -878,6 +895,14 @@ loop_to_postcondition(
 
 	    post_ne = add_loop_index_initialization(post_ne, l);
 	    post_al = add_loop_index_exit_value(post_al, l, pre, NIL);
+	    ifdebug(8) {
+	      (void) fprintf(stderr,"%s: %s\n","[loop_to_postcondition]",
+			     "Never executed: post_ne =");
+	      (void) print_transformer(post_ne);
+	      (void) fprintf(stderr,"%s: %s\n","[loop_to_postcondition]",
+			     "Always executed: post_al =");
+	      (void) print_transformer(post_al);
+	    }
 	    post = transformer_convex_hull(post_ne, post_al);
 	    transformer_free(post_ne);
 	    transformer_free(post_al);
@@ -1439,7 +1464,7 @@ precondition_add_condition_information(
  * be used in v
  */
 
-static void
+void
 upwards_vect_rename(Pvecteur v, transformer post)
 {
     /* FI: it would probably ne more efficient to
@@ -1723,6 +1748,82 @@ instruction_to_postcondition(
     return post;
 }
 
+/* Assume that all references are legal. Assume that variables used in
+   array declarations are not modified in the module. */
+static void add_reference_information(transformer pre, statement s, bool renaming)
+{
+  list efs = load_proper_rw_effects_list(s);
+
+  MAP(EFFECT, e, {
+    reference r = effect_reference(e);
+    list li = reference_indices(r);
+
+    if(!ENDP(li)){
+      entity v = reference_variable(r);
+      variable tv = type_variable(entity_type(v));
+      list ld = NIL;
+
+      pips_assert("Variable must be of type 'variable'",
+		  type_variable_p(entity_type(v)));
+      ld = variable_dimensions(tv);
+      pips_assert("Reference dimension = array dimension",
+		  gen_length(li)==gen_length(ld));
+      MAP(EXPRESSION, i, {
+	normalized ni = NORMALIZE_EXPRESSION(i);
+	if(normalized_linear_p(ni)) {
+	  Pvecteur vi = normalized_linear(ni);
+	  dimension d = DIMENSION(CAR(ld));
+	  normalized nl = NORMALIZE_EXPRESSION(dimension_lower(d));
+	  normalized nu = NORMALIZE_EXPRESSION(dimension_upper(d));
+	  if(normalized_linear_p(nl) && normalized_linear_p(nu)) {
+	    Pvecteur vl = normalized_linear(nl);
+	    Pvecteur vu = normalized_linear(nu);
+
+	    if(value_mappings_compatible_vector_p(vi)) {
+	      if(value_mappings_compatible_vector_p(vl)) {
+		Pvecteur cv = vect_substract(vl, vi);
+
+		if(renaming)
+		  upwards_vect_rename(cv, pre);
+		if(!vect_constant_p(cv) || vect_coeff(TCST, cv) > 0) {
+		  transformer_inequality_add(pre, cv);
+		}
+		else {
+		  vect_rm(cv);
+		}
+	      }
+
+	      if(value_mappings_compatible_vector_p(vu)) {
+		Pvecteur cv = vect_substract(vi, vu);
+
+		if(renaming)
+		  upwards_vect_rename(cv, pre);
+		if(!vect_constant_p(cv) || vect_coeff(TCST, cv) > 0) {
+		  transformer_inequality_add(pre, cv);
+		}
+		else {
+		  vect_rm(cv);
+		}
+	      }
+	    }
+
+	  }
+	}
+	POP(ld);
+      }, li);
+    }
+  }, efs);
+}
+void precondition_add_reference_information(transformer pre, statement s)
+{
+  add_reference_information(pre, s, FALSE);
+}
+
+void transformer_add_reference_information(transformer tf, statement s)
+{
+  add_reference_information(tf, s, TRUE);
+}
+
 transformer 
 statement_to_postcondition(
     transformer pre,
@@ -1782,6 +1883,11 @@ statement_to_postcondition(
 	   ENTITY(CAR(cv)) = entity_to_old_value(v);
 	 },
 	     non_initial_values);
+
+	/* add array references information */
+	if(get_bool_property("SEMANTICS_TRUST_ARRAY_REFERENCES")) {
+	    precondition_add_reference_information(pre, s);
+	}
 
 	post = instruction_to_postcondition(pre, i, tf);
 
