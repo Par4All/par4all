@@ -3,9 +3,8 @@
 #
 # SCCS stuff:
 #
-# $RCSfile: Pips,v $ ($Date: 1996/08/21 14:41:50 $) version $Revision$, got on %D%, %T%
-# %A%
-#
+# $RCSfile: Pips,v $ (version $Revision$)
+# $Date: 1996/08/22 10:08:41 $, 
 
 # Test function
 
@@ -287,7 +286,7 @@ check 60
 #
 error () 
 {
-  echo "Exit code for pips: $?; exiting $0"
+  echo "Exit code for pips: $?; exiting $RCSfile: Pips,v $"
   exit 1;
 }
 
@@ -318,7 +317,7 @@ $pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM |
 if [ "$SOURCE_FILES" ]
 then
   cd $PGM.database
-  ls *.f | sed 's/.f$//' | tr a-z A-Z > modules
+  ls *.f | sed 's/.f$//' | tr '[a-z]' '[A-Z]' > modules
   cd ..
 fi
 
