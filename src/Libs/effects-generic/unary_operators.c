@@ -322,10 +322,12 @@ effects_undefined_vector_to_descriptor(Pvecteur v)
 
 list 
 effects_undefined_loop_normalize(list l_eff, entity index, range r,
-				 entity *new_index, descriptor range_descriptor,
+				 entity *new_index, 
+				 descriptor range_descriptor,
 				 bool descriptor_update_p)
 {
-    return list_undefined; 
+  *new_index = entity_undefined;
+  return list_undefined; 
 }
 
 list 
