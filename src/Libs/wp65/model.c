@@ -18,33 +18,17 @@
 
 #include "genC.h"
 #include "misc.h"
-#include "top-level.h"
-/* #include "wp65.h" */
 
-extern void model_fscan();
-
-void get_model(ppn, pbn, pls)
-int * ppn;
-int * pbn;
-int * pls;
+void model_fprint(FILE * fd, int pn, int bn, int ls)
 {
-    FILE * fd;
-
-    if ((fd = fopen(MODEL_RC, "r")) == NULL) {
-	if ((fd = fopen(DEFAULT_MODEL_RC, "r")) == NULL) {
-	    pips_error("get_module", "no default model\n");
-	}
-    }
-
-    model_fscan(fd, ppn, pbn, pls);
-
+    fprintf(fd, 
+	    "Target Machine:\n"
+	    "Processor number: %d\n"
+	    "Memory bank number: %d\n"
+	    "Bank width (i.e. line size): %d\n\n", pn, bn ls);
 }
 
-void model_fscan(fd, ppn, pbn, pls)
-FILE * fd;
-int * ppn;
-int * pbn;
-int * pls;
+void model_fscan(FILE * fd, int * ppn, int * pbn, int * pls)
 {
     int i1, i2, i3, i4;
     i1 = fscanf(fd, "Target Machine:\n");
@@ -56,14 +40,14 @@ int * pls;
     }
 }
 
-void model_fprint(fd, pn, bn, ls)
-FILE * fd;
-int pn;
-int bn;
-int ls;
+void get_model(int * ppn, int * pbn, int * pls)
 {
-    (void) fprintf(fd, "Target Machine:\n");
-    (void) fprintf(fd, "Processor number: %d\n", pn);
-    (void) fprintf(fd, "Memory bank number: %d\n", bn);
-    (void) fprintf(fd, "Bank width (i.e. line size): %d\n\n", ls);
+    FILE * fd;
+    if ((fd = fopen(MODEL_RC, "r")) == NULL) {
+	if ((fd = fopen(DEFAULT_MODEL_RC, "r")) == NULL) {
+	    pips_error("get_module", "no default model\n");
+	}
+    }
+
+    model_fscan(fd, ppn, pbn, pls);
 }
