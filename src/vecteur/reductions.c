@@ -201,6 +201,23 @@ Pvecteur v;
     }
 }
 
+/* Value vect_sum(Pvecteur v): somme des coefficients d'un vecteur
+ * (i.e. produit scalaire avec le vecteur 1)
+ *
+ *   sum   v[i]
+ *    i
+ */
+Value vect_sum(Pvecteur v)
+{
+    Pvecteur e = VECTEUR_UNDEFINED;
+    Value sum = 0;
+
+    for (e=v; e!= NULL; e= e->succ) {
+	sum += vecteur_val(e);
+    }
+    return sum;
+}
+
 /* boolean vect_equal(Pvecteur v1, Pvecteur v2): test a egalite de
  * deux vecteurs
  * 
