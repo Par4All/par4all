@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/25 18:28:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/28 18:06:11 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/04/25 18:28:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/04/28 18:06:11 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -121,6 +121,9 @@ void EndOfProcedure()
     code_declarations(EntityCode(CurrentFunction)) =
 	    gen_nreverse(code_declarations(EntityCode(CurrentFunction))) ;
 
+    if (get_bool_property("PARSER_DUMP_SYMBOL_TABLE"))
+	fprint_environment(stderr, CurrentFunction);
+
     ifdebug(5){
 	fprintf(stderr, "Parser: checking callees consistency = %d\n",
 		gen_consistent_p( make_callees( called_modules ))) ;
@@ -165,6 +168,8 @@ void EndOfProcedure()
     /* the current package is re-initialized */
     CurrentPackage = TOP_LEVEL_MODULE_NAME;
     ResetChains();
+    DynamicArea = entity_undefined;
+    StaticArea = entity_undefined;
     reset_current_module_entity();
 }
 
