@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: o-analysis.c,v $
+ * Revision 1.38  1997/04/17 18:48:30  coelho
+ * hash_put warnings--
+ *
  * Revision 1.37  1997/04/17 15:29:00  coelho
  * entity_mapping -> entity_int
  *
@@ -591,8 +594,8 @@ static bool variable_used_in_statement_p(ent, stat)
 entity ent;
 statement stat;
 {
-    assert(stat == current_variable_used_statement);
-    return !entity_variable_used_undefined_p(ent);
+    message_assert("current statement", stat==current_variable_used_statement);
+    return bound_entity_variable_used_p(ent);
 }
 
 static int number_of_distributed_dimensions(a)
