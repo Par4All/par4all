@@ -1601,3 +1601,108 @@ format_inside_statement_p(statement s)
 
     return format_inside_statement_has_been_found;
 }
+
+
+/* Number of comment line *directly* attached to a statement.
+ * Should be zero for sequences.
+ */
+int
+statement_to_comment_length(statement stmt)
+{
+    int length = 0;
+    string cmt = statement_comments(stmt);
+
+    if(string_undefined_p(cmt)) {
+	/* Is it allowed? Should be the empty string... */
+	length = 0;
+    }
+    else {
+	char c;
+	while((c=*cmt++)!= '\0')
+	    if(c=='\n')
+		length++;
+    }
+
+    return length;
+}
+
+
+/* Poor attempt at associating physical line numbers to statement.
+ * 
+ * Lines used for declarations are counted elsewhere: see
+ * module_to_declaration_length()
+ *
+ * It is assumed that each statement fits on one physical line,
+ * excepts sequences which require 0 line. Non statement such as
+ * ENDIF, ELSE, ENDDO,... must be taken care of too.
+ */
+
+static current_line = -1;
+static persistant_statement_to_int stmt_to_line = persistant_statement_to_int_undefined;
+
+static void
+down_counter(statement s);
+{
+    instruction i = statement_instruction(s);
+
+    current_line += statement_to_comment_length(s);
+
+    /* Is it printable on one line? */
+    if(instruction_sequence_p(i)) {
+	current_line += 0;
+    }
+    else if(empty_statement_or_labelless_continue_p(s)) {
+	/* Must be an unlabelled CONTINUE */
+	current_line += 0;
+    }
+    else {
+	current_line += 1;
+    }
+
+    extend_persistant_statement_to_int(stmt_to_line, s, current_line);
+}
+
+static void
+up_counter(statement s);
+{
+    instruction i = statement_instruction(s);
+
+    if(instruction_loop_p(i)) {
+	loop l = instruction_loop(i);
+
+	if(empty_label_p(loop_label(l))) {
+	    /* There must be an ENDDO here */
+	    current_line += 1;
+	}
+    }
+    else if(instruction_test_p(i) 
+	    && statement_number(s) != STATEMENT_NUMBER_UNDEFINED) {
+	/* There must be an ENDIF here */
+	/* I doubt it's a real good way to detect synthetic IFs */
+	    current_line += 1;
+    }
+    /* What could be done for ELSE and ELSEIF? */
+    /* An else stack should be built. Use
+     * DEFINE_LOCAL_STACK(name, type)
+     * DEFINE_LOCAL_STACK(else_stack, statement)
+     * Note that it should be pushed and poped in the down_counter() function
+     */
+}
+
+persistant_statement_to_int
+statement_to_line_number(statement s)
+{
+    persistant_statement_to_int s_to_l = persistant_statement_to_int_undefined;
+
+    stmt_to_line = make_persistant_statement_to_int();
+
+    current_line = 0;
+
+    gen_recurse(s, statement_domain, down_counter, up_counter);
+
+    s_to_l = stmt_to_line;
+    stmt_to_line = persistant_statement_to_int_undefined;
+    return s_to_l;
+}
+
+/* That's all folks */
