@@ -1,2 +1,10 @@
+#
+# $RCSfile: config.makefile,v $ (version $Revision$)
+
 SCRIPTS= 	epips
-FILES=		epips.el 
+
+SOURCES =	$(SCRIPTS) epips.el 
+
+INSTALL_SHR=	$(SOURCES)
+
+#
