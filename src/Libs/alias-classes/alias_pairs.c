@@ -132,7 +132,6 @@ add_parameter_aliases_for_this_call_site(call call_site,
 
 		    pips_debug(9,"arg refers to entity\n");
 		    pips_debug(9,"\t%s\n",entity_name(real_ent));
-		    pips_debug(9,"region_translation is\n");
 
 		    real_reg =
 			region_translation(
@@ -144,15 +143,22 @@ add_parameter_aliases_for_this_call_site(call call_site,
 			    real_ref,
 			    VALUE_ZERO,
 			    BACKWARD);
-		    
-		    ifdebug(9)
-			{
-			    pips_debug(9,"complete\n");
-/*			    print_region(real_reg);*/
-			}
 
+/* was (changed just for debug)
 		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
 		    pair = gen_nconc(pair,CONS(EFFECT,real_reg,NIL));
+		    */
+
+		    pair = CONS(EFFECT,real_reg,NIL);
+		    ifdebug(9)
+			{
+			    pips_debug(9,"region translated to:\n\t");
+			    print_inout_regions(pair);
+			}
+		    pair = gen_nconc(
+			CONS(EFFECT,region_dup(callee_region),NIL),
+			pair);
+
 		    list_pairs = gen_nconc(list_pairs,CONS(LIST,pair,NIL));
 		}
 	     }
@@ -179,7 +185,9 @@ add_alias_pairs_for_this_call_site(call call_site)
 
     pips_debug(9,"begin\n");
 
-    pips_debug(9,"try load_statement_precondition for statement %03d\n",statement_number(current_caller_stmt));
+    pips_debug(9,
+	       "try load_statement_precondition for statement %03d\n",
+	       statement_number(current_caller_stmt));
 
     context = load_statement_precondition(current_caller_stmt);
 
@@ -231,7 +239,7 @@ add_alias_pairs_for_this_caller( entity caller )
      * (in add_alias_pairs_for_this_call_site
      * called by the gen_multi_recurse below) !!!
      */
-
+    /* the current module becomes the caller */
     regions_init();
     get_in_out_regions_properties();
     set_current_module_statement( (statement)
@@ -298,27 +306,40 @@ alias_pairs( string module_name, list l_reg )
     callee = get_current_module_entity();
     list_regions_callee = l_reg;
 
-/* may enable us to print regions for debug */
-    set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
-    set_precondition_map( (statement_mapping) 
-	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
-
-    set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-    module_to_value_mappings(callee);
-
     ifdebug(9)
 	{
+	    /* ATTENTION: we have to do ALL this
+	     * just to call print_inout_regions for debug !!
+	     */
+
+	    set_current_module_statement( (statement)
+					  db_get_memory_resource(DBR_CODE,
+								 module_name,
+								 TRUE) );
+
+	    set_precondition_map( (statement_mapping) 
+				  db_get_memory_resource(DBR_PRECONDITIONS,
+							 module_name,
+							 TRUE) );
+
+	    set_cumulated_rw_effects((statement_effects)
+				     db_get_memory_resource(
+					 DBR_CUMULATED_EFFECTS,
+					 module_name,
+					 TRUE));
+
+	    module_to_value_mappings(callee);
+
+	    /* that's it, but we musn't forget to reset everything below */
+
 	    pips_debug(9,"list_regions_callee is: \n");
-	    print_regions(list_regions_callee);
+	    print_inout_regions(list_regions_callee);
+
+	    reset_current_module_statement();
+	    reset_precondition_map();
+
+	    reset_cumulated_rw_effects();
 	}
-
-    reset_current_module_statement();
-    reset_precondition_map();
-
-    reset_cumulated_rw_effects();
-/* */
 
     /* we need the callers of the current module  */
     callers = (callees) db_get_memory_resource(DBR_CALLERS,
