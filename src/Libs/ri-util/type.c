@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.47  2003/12/05 17:11:06  nguyen
+ * Add more basic cases for C
+ *
  * Revision 1.46  2003/07/28 15:42:44  irigoin
  * Comment improved for basic_of_expression()
  *
@@ -712,80 +715,8 @@ string
 basic_to_string(b)
 basic b;
 {
-  static char char_decl[20]; /* ??? hummm... */
-  int lng = 0;
-
-  switch (basic_tag(b)) {
-  case is_basic_int:
-    switch(basic_int(b)) {
-    case 1: pips_user_warning("Non-standard one-byte integer\n");
-      return("INTEGER*1") ;
-    case 2: return("INTEGER*2") ;
-    case 4: return("INTEGER*4") ;
-    case 8: return("INTEGER*8") ;
-    default: pips_error("basic_to_string",
-			"Unexpected integer size %d\n", basic_int(b));
-    }
-    break;
-  case is_basic_float:
-    switch(basic_float(b))
-      {
-      case 4: return("REAL*4") ;
-      case 8: return("REAL*8") ;
-      default: pips_error("basic_to_string",
-			  "Unexpected float size %d\n", basic_float(b));
-      }
-    break;
-  case is_basic_logical:
-    switch(basic_logical(b))
-      {
-      case 1: return("LOGICAL*1") ;
-      case 2: return("LOGICAL*2") ;
-      case 4: return("LOGICAL*4") ;
-      case 8: return("LOGICAL*8") ;
-      default: pips_error("basic_to_string",
-			  "Unexpected logical size %d\n", basic_logical(b));
-      }
-    break;
-  case is_basic_complex:
-    switch(basic_complex(b))
-      {
-      case 8: return("COMPLEX*8") ;
-      case 16: return("COMPLEX*16") ;
-      default: pips_error("basic_to_string",
-			  "Unexpected complex size %d\n", basic_complex(b));
-      }
-    break;
-  case is_basic_string:
-    if(value_constant_p(basic_string(b))
-       && constant_int_p(value_constant(basic_string(b)))) {
-      lng = constant_int(value_constant(basic_string(b)));
-      sprintf(&char_decl[0],"CHARACTER*%d", lng);
-    }
-    else if(value_symbolic_p(basic_string(b))
-	    && constant_int_p(symbolic_constant(value_symbolic(basic_string(b))))) 
-      {
-	lng = constant_int(symbolic_constant(value_symbolic(basic_string(b))));
-	sprintf(&char_decl[0],"CHARACTER*%d", lng);
-      }
-    else {
-      lng = -1;
-      sprintf(&char_decl[0],"CHARACTER**");
-    }
-    pips_assert("basic_to_string", strlen(char_decl)<20);
-    return(char_decl);
-    break;
-  case is_basic_overloaded:
-    return("OVERLOADED");
-  default: break;
-  }
-
-  pips_error("basic_to_string", 
-	     "unexpected basic: 0x%x (tag=%d)\n",
-	     b,
-	     basic_tag(b));
-
-  return(string_undefined); /* just to avoid a gcc warning */
+  /* Nga Nguyen, 19/09/2003: To not rewrite the same thing, I use the words_basic() function*/
+  return list_to_string(words_basic(b));
 }
 
 
@@ -828,9 +759,38 @@ basic_of_expression(expression exp)
 	/* Well, let's assume range are well formed... */
 	b = basic_of_expression(range_lower(syntax_range(sy)));
 	break;
+    case is_syntax_cast: 
+      {
+	type t = cast_type(syntax_cast(sy));
+	if (type_tag(t) != is_type_variable)
+	  pips_error("basic_of_expression", "Bad reference type tag %d\n",type_tag(t));
+	b = copy_basic(variable_basic(type_variable(t)));
+	break;
+      }
+    case is_syntax_sizeofexpression: 
+      {
+	sizeofexpression se = syntax_sizeofexpression(sy);
+	if (sizeofexpression_type_p(se))
+	  {
+	    type t = sizeofexpression_type(se);
+	    if (type_tag(t) != is_type_variable)
+	      pips_error("basic_of_expression", "Bad reference type tag %d\n",type_tag(t));
+	    b = copy_basic(variable_basic(type_variable(t)));
+	  }
+	else
+	  {
+	    b = basic_of_expression(sizeofexpression_expression(se));
+	  }
+	break;
+      }
+    case is_syntax_subscript: 
+      {
+	b = basic_of_expression(subscript_array(syntax_subscript(sy)));
+	break;
+      }
     default: pips_error("basic_of_expression", "Bad syntax tag");
-	/* Never go there... */
-	b = make_basic(is_basic_overloaded, UUINT(4));
+      /* Never go there... */
+      b = make_basic(is_basic_overloaded, UUINT(4));
     }
 
     debug(6, "basic_of_expression", "returns with %s\n", basic_to_string(b));
@@ -1088,7 +1048,7 @@ basic_maximum(basic b1, basic b2)
       if(basic_complex_p(b2) || basic_float_p(b2)) {
 	int s1 = SizeOfElements(b1);
 	int s2 = SizeOfElements(b2);
-
+	
 	b = make_basic(basic_tag(b2), UUINT(s1>s2?s1:s2));
       }
       else if(basic_int_p(b2)) {
@@ -1100,7 +1060,13 @@ basic_maximum(basic b1, basic b2)
       else
 	b = make_basic(is_basic_overloaded, UU);
       break;
-
+      /* NN: More cases are added for C. To be refined  */
+    case is_basic_bit:
+    case is_basic_pointer:
+    case is_basic_derived:
+    case is_basic_typedef:
+      b = make_basic(is_basic_overloaded, UU);
+      break;
     default: pips_error("basic_union", "Ill. basic tag %d\n", basic_tag(b1));
     }
   }
