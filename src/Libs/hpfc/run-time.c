@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: run-time.c,v $
+ * Revision 1.39  1997/10/20 19:58:29  irigoin
+ * Typo fixed
+ *
  * Revision 1.38  1997/10/20 19:54:00  irigoin
  * Calls to MakeExternalFunction() and make_empty_module() replaced.
  *
@@ -65,7 +68,7 @@ tag return_type;
 				   (return_type==is_basic_int ? /* ??? rough */
 				    MakeIntegerResult() :
 				    MakeOverloadedResult()));
-    return f;				 MakeOverloadedResult()));
+    return f;
 }
 
 expression 
