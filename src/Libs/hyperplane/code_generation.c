@@ -1,5 +1,13 @@
- /* package hyperplane
-  */
+/* package hyperplane
+ *
+ * $Id$
+ *
+ * $Log: code_generation.c,v $
+ * Revision 1.4  1998/10/09 15:53:20  irigoin
+ * Typing improved and better integration with RCS
+ *
+ *
+ */
 
 #include  <stdio.h>
 /* #include <sys/stdtypes.h> */  /* for debug with dbmalloc */
@@ -75,10 +83,10 @@ Psysteme sc_newbase;
 
 	make the last loop which is sequential */
    
-	l_hyp = make_loop(pb->var,rl,bl,loop_label(l_old),
+	l_hyp = make_loop((entity) pb->var,rl,bl,loop_label(l_old),
 		      make_execution(is_execution_sequential,UU),
 		      loop_locals(l_old));
-	bl = makeloopbody(l_hyp,s_loop);
+	bl = makeloopbody(l_hyp, s_loop);
 	pb=pb->succ;
     }
     
