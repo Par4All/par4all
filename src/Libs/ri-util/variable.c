@@ -551,6 +551,9 @@ variable_dynamic_p(entity v)
 	   dynamic_area_p(ram_section(storage_ram(entity_storage(v)))));
 }
 
+/* This test can only be applied to variables, not to functions, subroutines or
+ * commons visible from a module.
+ */
 bool
 variable_in_module_p(entity v,
                      entity m)
