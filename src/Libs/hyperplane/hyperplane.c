@@ -10,7 +10,6 @@
 #include "ri.h"
 #include "misc.h"
 #include "text.h"
-#include "prettyprint.h"
 
 #include "boolean.h"
 #include "vecteur.h"
@@ -21,6 +20,7 @@
 
 #include "sparse_sc.h"
 #include "ri-util.h"
+#include "prettyprint.h"
 #include "conversion.h"
 
 #include "hyperplane.h"
