@@ -83,6 +83,8 @@ Variable index;
 
 }
 
+typedef char * (*variable_name_type)(Variable);
+
 /* void make_bound_expression(variable index, Pbase base, Psysteme sc,
  * expression *lower, expression *upper)
  * make the  expression of the  lower and  upper bounds of  "index"
@@ -119,7 +121,8 @@ expression *upper;
 	if (ABS(i)==rank_index){	/* found */
 	    if (get_debug_level()>=7) {
 		fprintf(stderr, "\n constraint before :");
-		contrainte_fprint(stderr, pc, TRUE, entity_local_name);
+		contrainte_fprint(stderr, pc, TRUE, 
+				  (variable_name_type) entity_local_name);
 	    }
 	    ex = make_contrainte_expression(pc, (Variable) index);
 	    ifdebug(7){
