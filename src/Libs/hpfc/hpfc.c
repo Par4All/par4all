@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/08/31 16:45:34 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/09/09 10:42:50 $, )
  * version $Revision$
  */
  
@@ -426,24 +426,62 @@ bool hpfc_init(string name)
  */
 #define HPFC_FILTERED_SUFFIX ".hpfc_filtered"
 
+static bool directive_in_file_p(string name)
+{
+    FILE * f;
+    bool no_directive;
+    char c;
+
+    /* checks for any directive before calling the filter...
+     * looks for /^[!Cc*]([Hh][Pp][Ff]|[Ff][Cc][Ff])$/
+     */
+    f = safe_fopen(name, "r");
+    c='\n';
+    no_directive = TRUE;
+    while (c!=EOF && no_directive)
+    {
+	if (c=='\n') /* beginning a line */
+	{ 
+	    c = getc(f);
+	    if (c=='!' || c=='C' || c=='c' || c=='*') /* starting a comment */
+	    {
+		c = getc(f); if (c=='\n') continue;
+		c = getc(f); if (c=='\n') continue;
+		c = getc(f); if (c=='\n') continue;
+		c = getc(f); if (c=='$')  no_directive = FALSE;
+	    }
+	}
+	else /* next char */
+	    c = getc(f);
+    }
+    safe_fclose(f, name);
+
+    pips_debug(1, "directive for %s: %s\n", name, no_directive? "NO": "YES");
+
+    return !no_directive;
+}
+
 bool hpfc_filter(string name)
 {
-    string file_name, dir_name, new_name;
+    string file_name, dir_name, new_name, src_name;
 
     dir_name = db_get_current_workspace_directory();
     file_name = db_get_file_resource(DBR_SOURCE_FILE, name, TRUE);
     new_name = strdup(concatenate(name, HPFC_FILTERED_SUFFIX, NULL));
+    src_name = strdup(concatenate(dir_name, "/", file_name, NULL));
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
 
     safe_system(concatenate(
 	"PATH=${PATH}:${PIPS_ROOT}/Share ",
-	hpf_directive_string_p(name)? "cat" : "hpfc_directives", 
-	" < ", dir_name, "/", file_name, 
-	" > ", dir_name, "/", new_name, NULL));
+	hpf_directive_string_p(name) || !directive_in_file_p(src_name)?
+	    "cat" : "hpfc_directives", 
+	" < ", src_name, " > ", dir_name, "/", new_name, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_FILTERED_FILE, name, new_name);
+
+    free(src_name);
 
     debug_off();
     return TRUE;
