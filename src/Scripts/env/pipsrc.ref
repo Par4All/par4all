@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/20 14:44:53 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/22 10:34:53 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -197,7 +197,7 @@ OPENWINHOME="/usr/openwin"
 
 WPIPS_ADDED_CPPFLAGS='-I$(OPENWINHOME)/include -Iicons'
 WPIPS_ADDED_LIBS='-lxview -lolgx -lX11'
-WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib -static'
+WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib'
  
 #
 #         #####  #####      #    #####    ####
