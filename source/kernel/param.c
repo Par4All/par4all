@@ -21,7 +21,7 @@ char **Read_ParamNames(FILE *in,int m) {
   else
     do
       f = (fgets(s, 1024, in)!=NULL);
-    while ((*s=='#' || *s=='\n') && f);
+    while (f && (*s=='#' || *s=='\n'));
   
   param_name = (char **)malloc(m*sizeof(char *));
   i = 0;
