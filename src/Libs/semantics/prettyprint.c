@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/05/23 11:19:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/06/23 07:22:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/05/23 11:19:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/06/23 07:22:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -154,7 +154,7 @@ bool give_code_p;
 			  db_get_memory_resource
 			  (DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
-    debug_on("SEMANTICS_DEBUG_LEVEL");
+    debug_on("SEMANTICS_PRINT_DEBUG_LEVEL");
 
     module_to_value_mappings(mod);
 
@@ -302,7 +302,15 @@ static int is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 
 
 #define LINE_SUFFIX "\n"
+/* standard value: 70 */
 #define MAX_LINE_LENGTH 70
+
+/* add_to_current_line core dumps for long transformers
+ * Maybe the coder assumed that no transformer would ever be
+ * longer than 60 characters. FI, 6 June 1997
+ *
+ * #define MAX_LINE_LENGTH 200
+ */
 
 
 boolean add_to_current_line(crt_line, add_string, str_prefix, txt, first_line)
