@@ -203,12 +203,12 @@ void print_marged_text_from_starting_node(FILE *fd, int margin, vertex start_ver
         text txt = (text)vertex_vertex_label(start_ver);
 	MAP(SENTENCE, sen, {
             string s = sentence_to_string(sen);
-	    string call_mark;
-	    if(call_mark = strstr(s, CALL_MARK)) {
+	    string call_mark = strstr(s, CALL_MARK);
+	    if(call_mark) {
 	        vertex ver_child = get_vertex_by_string(call_mark + strlen(CALL_MARK), l_of_vers);
 		print_marged_text_from_starting_node(fd, margin + (call_mark - s), ver_child, l_of_vers);
 	    } else if (strlen(s)) { /* if s in not empty, ok write out */
-		fprintf(fd, "%*s%s\n", margin, "", remove_newline_of_string(s));
+	        fprintf(fd, "%*s%s\n", margin, "", remove_newline_of_string(s));
 	    }
 	}, text_sentences(txt));
     }
@@ -232,13 +232,13 @@ bool make_resource_from_starting_node
 	    print_marged_text_from_starting_node(fd, 0, start_ver, l_of_vers);
 	    safe_fclose(fd, filename);
 	    write_an_attachment_file(filename);
-	    free(filename);
 	} else {
 	    print_graph_daVinci_from_starting_node(fd, start_ver);
 	    safe_fclose(fd, filename);
 	}
     }
     DB_PUT_FILE_RESOURCE(res_name, mod_name, localfilename);
+    free(filename); /* this line must be after DB_PUT_FILE_RESOURCE for the reason of memory liberation */
     
     return TRUE;
 }
