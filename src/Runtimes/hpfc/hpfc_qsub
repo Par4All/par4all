@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_qsub,v $ (version $Revision$)
-# $Date: 1997/01/17 09:25:13 $, 
+# $Date: 1997/01/17 10:49:03 $, 
 #
 # output a description file for qsub.
 
@@ -15,7 +15,7 @@ cat <<-EOF
 	#QSUB -r ${1:-hpfc}
 	#QSUB -eo
 	#QSUB -l mpp_p=${npes}
-	#QSUB -l mpp_t=500
+	#QSUB -l mpp_t=200
 	#QSUB -s /bin/sh
 	TARGET=cray-t3d
 	export TARGET
