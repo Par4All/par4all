@@ -2,6 +2,10 @@
 # $Id$
 #
 # $Log: config.makefile,v $
+# Revision 1.4  2000/08/22 09:56:21  nguyen
+# Change the name of phases
+# Add array_bound_check_instrumentation
+#
 # Revision 1.3  2000/06/07 15:22:15  nguyen
 # Add new array bounds check version, based on regions
 #
@@ -14,8 +18,9 @@
 #
 
 LIB_CFILES 	= \
-	array_bound_check.c \
-	region_based_array_bound_check.c
+	bottom_up_array_bound_check.c \
+	top_down_array_bound_check.c \
+	array_bound_check_instrumentation.c
 
 LIB_HEADERS	= instrumentation-local.h
 
