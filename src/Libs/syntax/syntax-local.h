@@ -1,5 +1,10 @@
-/* Legal characters to start a comment line */
-#define START_COMMENT_LINE "CcDd*!"
+/* Legal characters to start a comment line
+ *
+ * '\n' is added to cope with empty lines
+ * Empty lines with SPACE and TAB characters 
+ * are be preprocessed and reduced to an empty line by GetChar().
+ */
+#define START_COMMENT_LINE "CcDd*!\n"
 
 /* definition of extern variables. see comments and declarations in file
 parser.c */
