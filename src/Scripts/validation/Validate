@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1995/09/05 08:38:25 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1995/09/12 16:30:53 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -89,13 +89,14 @@ alive()
 #
 # gives the pips to be run
 #
-which_pips()
+
+which_executable()
 {
-  if [ -x pips ]
+  if [ -x $1 ]
   then 
-    echo $PWD/pips
+    echo $PWD/$1
   else
-    type pips | sed 's,^pips is ,,'
+    type $1 | sed "s,^$1 is ,,"
   fi
 }
 
@@ -120,6 +121,7 @@ validate_usage()
     echo "   -l dir: lock directory (default .)"
     echo "   -f file: what file in a module (use with -n)"
     echo "   -x pips: pips to be used (default . then Production)"
+    echo "   -y tpips: tpips to be used (default . then Production)"
   } >&2
   exit ${1:-1}
 }
@@ -199,10 +201,11 @@ send_validate()
   $DEBUG " |   -r $RUNDIR \ "
   $DEBUG " |   -l $RESULT \ "
   $DEBUG " |   -x $pips_version \ "
+  $DEBUG " |   -y $tpips_version \ "
   $DEBUG " |   -u $VALIDOPT $validate_module"
 
   rsh $validate_host \
-  $VALID -r $RUNDIR -l $RESULT -x "$pips_version" \
+  $VALID -r $RUNDIR -l $RESULT -x "$pips_version" -y "$tpips_version" \
          -u $VALIDOPT $validate_module &
 
   echo "$validate_module" > $WAITING.$validate_host
@@ -211,7 +214,7 @@ send_validate()
 #
 # get options
 
-while getopts DVudtsvpnhr:l:x: opt
+while getopts DVudtsvpnhr:l:x:y: opt
 do
   case $opt in
     d) DEBUG="debug" ;;
@@ -225,6 +228,7 @@ do
     r) RUNDIR="$OPTARG" ;;
     l) LOCKDIR="$OPTARG" ;;
     x) pips_version="$OPTARG" ;;
+    y) tpips_version="$OPTARG" ;;
     h) validate_usage 0 ;;
     u) UPDATE="$OPTARG" ;;
     *) echo  ; validate_usage 1
@@ -259,8 +263,11 @@ default_file="$VALDIR/defaults"
 default_test="default_test"
 subject="PIPS Validation Suite Report"
 
-pips_version=`absolute_name ${pips_version:-\`which_pips\`}`
+pips_version=`absolute_name ${pips_version:-\`which_executable pips\`}`
+tpips_version=`absolute_name ${tpips_version:-\`which_executable tpips\`}`
+
 export pips_version
+export tpips_version
 
 $DEBUG " | $USER on $HOSTNAME"
 $DEBUG2 " | real PIPSHOME: $REAL_PIPSHOME"
@@ -316,6 +323,7 @@ $VERBOSE "Hosts: $VALHOSTS"
 
 $VERBOSE "parallel validation"
 $VERBOSE " - with $pips_version"
+$VERBOSE " - and  $tpips_version"
 $VERBOSE " - in $RUNDIR"
 
 $VERBOSE "creating initial locks"
@@ -374,10 +382,11 @@ Your Validation Suite Test for
 $MODULES
 
 $final with $pips_version
+       and  $tpips_version
 
 $PERFORMANCE
 
-In case of problems, contact <jouvelot@cri.ensmp.fr>
+In case of problems, contact coelho@cri.ensmp.fr
 %
 
 $MAIL -s "$finalsubject" $USER < $MSG
