@@ -2543,30 +2543,12 @@ quick_recurse_obj_in(obj, dr)
 chunk *obj;
 struct driver *dr;
 {
-    /* don't walk twice thru the same object:
-     */
     if (shared_obj(obj, gen_null, gen_null) || 
-    /* 
-     * temporarily, tabulated objects are not walked thru.
-     * the decision could be managed by the table, or *after* the
-     * filtering: the current status implied that you cannot enumerate 
-     * tabulated elements for instance. 
-     *
-     * these features/bugs/limitations are compatible with gen_slow_recurse.
-     *
-     * FI told me that only persistant edges shouldn't be followed.
-     */
 	IS_TABULATED(&Domains[quick_domain_index(obj)]))
 	return(!GO);
 
-    /*
-     * filter case
-     */
     if (obj->i==current_rec->domain) return((*current_rec->filter)(obj));
 
-    /*
-     * else, here is the *maybe* intelligent decision to be made.
-     */
     return((*current_decision_table)[obj->i]);
 }
 
@@ -2597,7 +2579,7 @@ union domain *dp ;
 }
 
 void 
-gen_recurse(obj, domain, filter, rewrite)
+gen_old_recurse(obj, domain, filter, rewrite)
 chunk *obj;
 int domain;
 bool (*filter)();
@@ -2672,6 +2654,7 @@ typedef GenRewriteType GenRewriteTableType[MAX_DOMAIN];
  */
 struct multi_recurse 
 {
+    hash_table           seen;
     GenDecisionTableType *domains;
     GenDecisionTableType *decisions;
     GenFilterTableType   *filters;
@@ -2693,21 +2676,49 @@ static struct multi_recurse
  * see the comments in these functions...
  */
 
+/*  true if obj was already seen in this recursion, and put it at TRUE
+ */
+static bool 
+quick_multi_already_seen_p(obj)
+chunk * obj;
+{
+    if (hash_get(current_mrc->seen, (char *)obj)==(char*)TRUE)
+	return(TRUE);
+
+    hash_put(current_mrc->seen, (char *)obj, (char *) TRUE);
+    return(FALSE);
+}
+
 static int
 quick_multi_recurse_obj_in(obj, dr)
 chunk *obj;
 struct driver *dr;
 {
-    int 
-	dom = obj->i;
+    int dom = obj->i;
 
-    if (shared_obj(obj, gen_null, gen_null) || 
+    /* don't walk twice thru the same object:
+     */
+    if (quick_multi_already_seen_p(obj) ||
+    /* 
+     * temporarily, tabulated objects are not walked thru.
+     * the decision could be managed by the table, or *after* the
+     * filtering: the current status implied that you cannot enumerate 
+     * tabulated elements for instance. 
+     *
+     * these features/bugs/limitations are compatible with gen_slow_recurse.
+     *
+     * FI told me that only persistant edges shouldn't be followed.
+     */
 	IS_TABULATED(&Domains[quick_domain_index(obj)]))
 	return(!GO);
 
+    /* filter case
+     */
     if ((*(current_mrc->domains))[dom]) 
 	return((*((*(current_mrc->filters))[dom]))(obj));
 
+    /* else, here is the *maybe* intelligent decision to be made.
+     */
     return((*(current_mrc->decisions))[dom]);
 }
 
@@ -2738,6 +2749,15 @@ union domain *dp ;
 	     t==ARRAY              ? obj->p != array_undefined : 
 	    (fatal("persistant_simple_in: unknown type %s\n", 
 		   itoa(dp->ba.type)), FALSE))); 
+}
+
+/*  tells the recursion not to go in this object
+ */
+void 
+gen_recurse_stop(obj)
+chunk *obj;
+{
+    hash_put(current_mrc->seen, (char *)obj, (char *)TRUE);
 }
 
 /*  MULTI RECURSION FUNCTION
@@ -2810,6 +2830,7 @@ va_dcl
 
     va_end(pvar);
 
+    new_mrc.seen      = hash_table_make(hash_pointer, 0),
     new_mrc.domains   = &new_domain_table,
     new_mrc.decisions = &new_decision_table,
     new_mrc.filters   = &new_filter_table,
@@ -2831,21 +2852,17 @@ va_dcl
 
     /*  recurse!
      */
-    shared_pointers(obj, FALSE);
     gen_trav_obj(obj, &dr);
     
     /*  restore environment
      */
+    hash_table_free(new_mrc.seen);
     pop_gen_trav_env();
     current_mrc = saved_mrc;
 }
 
-/*  could replace gen_recurse
- *  could be a macro
- */
-/*
 void 
-gen_one_recurse(obj, domain, filter, rewrite)
+gen_recurse(obj, domain, filter, rewrite)
 chunk *obj;
 int domain;
 bool (*filter)();
@@ -2853,8 +2870,6 @@ void (*rewrite)();
 {
     gen_multi_recurse(obj, domain, filter, rewrite, NULL);
 }
-*/
 
-/*
- *    that is all
+/*    That is all
  */
