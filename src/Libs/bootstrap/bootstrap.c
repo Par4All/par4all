@@ -1467,6 +1467,12 @@ typing_function_overloaded(call c, type_context_p context)
   return make_basic_overloaded();
 }
 
+static basic
+typing_function_format_name(call c, type_context_p context)
+{
+  return make_basic_int(4);
+}
+
 static basic 
 typing_of_assign(call c, type_context_p context)
 {
@@ -1656,7 +1662,7 @@ typing_buffer_inout(call c, type_context_p context)
 static basic
 typing_implied_do(call c, type_context_p context)
 {
-  basic b_int;
+  basic b_int = NULL;
   int count = 0;
 
   MAP(EXPRESSION, e,
@@ -1992,8 +1998,6 @@ is_format_specifier(expression exp, type_context_p context)
 static bool
 is_record_specifier(expression exp, type_context_p context)
 {
-  basic b = GET_TYPE(context->types, exp);
-
   return is_label_integer_string_specifier("RECORD", exp, context);
 }
 
@@ -3047,7 +3051,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {"LLT", 2, character_to_logical_type, typing_function_char_to_logical, 0},
   
   {LIST_DIRECTED_FORMAT_NAME, 0, default_intrinsic_type, 
-   typing_function_overloaded, 0},
+   typing_function_format_name, 0},
   {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type, 
    typing_function_overloaded, 0},
   
