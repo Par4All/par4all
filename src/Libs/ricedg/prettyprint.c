@@ -35,7 +35,8 @@
 
 #include "ricedg.h"
 
-bool print_whole_dependence_graph(mod_name)
+bool 
+print_whole_dependence_graph(mod_name)
 string mod_name;
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS",
@@ -47,7 +48,8 @@ string mod_name;
     return print_dependence_graph(mod_name);
 }
 
-bool print_effective_dependence_graph(mod_name)
+bool 
+print_effective_dependence_graph(mod_name)
 string mod_name;
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS",
@@ -59,7 +61,8 @@ string mod_name;
     return print_dependence_graph(mod_name);
 }
 
-bool print_loop_carried_dependence_graph(mod_name)
+bool 
+print_loop_carried_dependence_graph(mod_name)
 string mod_name;
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS",
@@ -71,7 +74,8 @@ string mod_name;
     return print_dependence_graph(mod_name);
 }
 
-bool print_dependence_graph(mod_name)
+bool 
+print_dependence_graph(mod_name)
 string mod_name;
 {
     string dg_name = NULL;
@@ -98,10 +102,10 @@ string mod_name;
     fp = safe_fopen(dg_name, "w");
     if (get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") || 
 	get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS")) {
-	print_graph_with_reduction(fp, mod_stat, dg);
+	prettyprint_dependence_graph_view(fp, mod_stat, dg);
     }
     else  
-	print_graph(fp, mod_stat, dg);
+	prettyprint_dependence_graph(fp, mod_stat, dg);
     safe_fclose(fp, dg_name);
 
     debug_off();
