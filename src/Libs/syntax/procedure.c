@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/21 13:50:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/25 18:28:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/04/21 13:50:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/04/25 18:28:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -592,7 +592,7 @@ void remove_ghost_variable_entities()
 	      entity_name(e));
 	remove_variable_entity(e);
 	debug(1, "remove_ghost_variable_entities",
-	      " destroyed\n");
+	      "destroyed\n");
 	}, ghost_variable_entities);
 
     ghost_variable_entities = list_undefined;
