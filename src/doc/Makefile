@@ -19,7 +19,7 @@ ROOT	= $(NEWGEN_ROOT)
 else
 ROOT	= ../..
 endif
-include $(ROOT)/makes/base.mk
+include $(ROOT)/makes/main.mk
 
 all: $(INSTALL_DOC)
 
