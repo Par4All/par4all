@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: o-analysis.c,v $
+ * Revision 1.40  1997/05/03 14:11:47  coelho
+ * *** empty log message ***
+ *
  * Revision 1.39  1997/05/03 11:48:58  coelho
  * *** empty log message ***
  *
@@ -785,6 +788,8 @@ generate_optimized_code_for_loop_nest(
 
 	 if (ith_dim_distributed_p(array, dim, &p))
 	 {
+	     statement bc;
+
 	     /* new bounds to compute, and so on */
 	     rg = loop_range(l);
 	     lb = copy_expression(range_lower(rg));
@@ -799,14 +804,17 @@ generate_optimized_code_for_loop_nest(
 	     oldidxvl = make_new_scalar_variable(node_module, 
 					     MakeBasic(is_basic_int));
 
-	     boundcomp = 
-		 gen_nconc(boundcomp,
-			   CONS(STATEMENT,
-				statement_compute_bounds(newlobnd,
-							 newupbnd,
-							 oldidxvl,
-							 lb, ub, an, p),
-				NIL));
+	     bc = statement_compute_bounds
+		 (newlobnd, newupbnd, oldidxvl, lb, ub, an, p);
+
+	     /* constant new loop bounds are computed on entry
+	      * in the subroutine.
+	      */
+	     if (expression_integer_constant_p(lb) && 
+		 expression_integer_constant_p(ub))
+		 hpfc_add_ahead_of_node_code(bc);
+	     else
+		 boundcomp = gen_nconc(boundcomp, CONS(STATEMENT, bc, NIL));
 
 	     newloops = 
 		 gen_nconc(newloops,
