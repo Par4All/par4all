@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/06/06 18:26:20 $, )
+ * ($Date: 1996/06/12 17:15:05 $, )
  */
 
 #include "defines-local.h"
@@ -56,8 +56,7 @@ static void clean_statement(statement s)
 	    lr);
 
 	free_instruction(i);
-	statement_instruction(s) =
-	    make_instruction(is_instruction_block, block);
+	statement_instruction(s) = make_instruction_block(block);
     }
     else
 	instruction_call(i) =
