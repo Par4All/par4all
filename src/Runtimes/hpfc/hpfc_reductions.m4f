@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1995/04/21 17:01:52 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1995/09/07 11:12:53 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -75,10 +75,10 @@ c
 define(`GENERIC_REDUCTION',`dnl
 pushdef(`REDTYPE',$1)dnl
 pushdef(`LEVEL',$2)dnl
-pushdef(`TYPE',$3)dnl
-pushdef(`PVMTYPE',$4)dnl
-pushdef(`NAME',$5)dnl
-pushdef(`OPERATOR',$6)dnl
+pushdef(`PVMTYPE',$3)dnl
+pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
+pushdef(`NAME',$4)dnl
+pushdef(`OPERATOR',$5)dnl
 c
 c    REDTYPE REDUCTION NAME FOR TYPE, LEVEL DIMENSIONS
 c
@@ -207,34 +207,34 @@ popdef(`NAME')dnl
 popdef(`OPERATOR')dnl')dnl
 c
 define(`SEVEN_DIMENSION',`
-GENERIC_REDUCTION($1, 1, $2, $3, $4, $5)
-GENERIC_REDUCTION($1, 2, $2, $3, $4, $5)
-GENERIC_REDUCTION($1, 3, $2, $3, $4, $5)
-GENERIC_REDUCTION($1, 4, $2, $3, $4, $5)
-c GENERIC _REDUCTION($1, 5, $2, $3, $4, $5)
-c GENERIC _REDUCTION($1, 6, $2, $3, $4, $5)
-c GENERIC _REDUCTION($1, 7, $2, $3, $4, $5)')dnl
-define(`LOGICAL_REDUCTION',`SEVEN_DIMENSION(logical, $1, $2, $3, $4)')dnl
+GENERIC_REDUCTION($1, 1, $2, $3, $4)
+GENERIC_REDUCTION($1, 2, $2, $3, $4)
+GENERIC_REDUCTION($1, 3, $2, $3, $4)
+GENERIC_REDUCTION($1, 4, $2, $3, $4)
+dnl GENERIC_REDUCTION($1, 5, $2, $3, $4)
+dnl GENERIC_REDUCTION($1, 6, $2, $3, $4)
+dnl GENERIC_REDUCTION($1, 7, $2, $3, $4)')dnl
+define(`LOGICAL_REDUCTION',`SEVEN_DIMENSION(logical, $1, $2, $3)')dnl
 define(`LOGICAL_REDUCTIONS',`
-LOGICAL_REDUCTION($1, $2, MIN, .LT.)
-LOGICAL_REDUCTION($1, $2, MAX, .GT.)')dnl
-define(`CUMULATE_REDUCTION',`SEVEN_DIMENSION(cumulate, $1, $2, $3, $4)')dnl
+LOGICAL_REDUCTION($1, MIN, .LT.)
+LOGICAL_REDUCTION($1, MAX, .GT.)')dnl
+define(`CUMULATE_REDUCTION',`SEVEN_DIMENSION(cumulate, $1, $2, $3)')dnl
 define(`CUMULATE_REDUCTIONS',`
-CUMULATE_REDUCTION($1, $2, SUM, +)
-CUMULATE_REDUCTION($1, $2, MULT, *)')dnl
+CUMULATE_REDUCTION($1, SUM, +)
+CUMULATE_REDUCTION($1, MULT, *)')dnl
 define(`REDUCTIONS',`
-LOGICAL_REDUCTIONS($1, $2)
-CUMULATE_REDUCTIONS($1, $2)')dnl
+LOGICAL_REDUCTIONS($1)
+CUMULATE_REDUCTIONS($1)')dnl
 c
 c All the reductions:
 c
-c R EDUCTIONS(byte, BYTE1)
-c R EDUCTIONS(integer*2, INTEGER2)
-REDUCTIONS(integer*4, INTEGER4)
-REDUCTIONS(real*4, REAL4)
-REDUCTIONS(real*8, REAL8) 
-c C UMULATE_REDUCTIONS(complex*8, COMPLEX8)
-c C UMULATE_REDUCTIONS(complex*16, COMPLEX16)
+dnl REDUCTIONS(BYTE1)
+dnl REDUCTIONS(INTEGER2)
+REDUCTIONS(INTEGER4)
+REDUCTIONS(REAL4)
+REDUCTIONS(REAL8) 
+dnl CUMULATE_REDUCTIONS(COMPLEX8)
+dnl CUMULATE_REDUCTIONS(COMPLEX16)
 c
 c that is all
 c
