@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/09/04 11:51:10 $, 
+! $Date: 1996/09/07 17:07:13 $, 
 !
       program fractal
 
@@ -61,10 +61,10 @@
       
 
 ! Initialize XPOMP
-      call xpomp_open_display(x_display_size, y_display_size, display)
-      call xpomp_set_color_map(display, 1, 1, 0, 0, status)
+      call xpompf open display(x_display_size, y_display_size, display)
+      call xpompf set color map(display, 1, 1, 0, 0, status)
 
-      call xpomp_show_usage
+      call xpompf show usage
 
       print *, 'Mouse button 1 to zoom in, 2 to recenter, 3 to zoom out'
       print *, 'A mouse + Shift: restart.'
@@ -102,11 +102,11 @@
 !!!fcd$ end time ('Computation of one image')
 
 ! Display the image:
-      call xpomp_flash(display, image, x_size, y_size, 
+      call xpompf flash(display, image, x_size, y_size, 
      &     0, 0, x_display_zoom, y_display_zoom, status)
 
 ! Wait for user interaction:
-      call xpomp_wait_mouse(display, x, y, state, button)
+      call xpompf wait mouse(display, x, y, state, button)
 
 ! Recenter
       xcenter = xcenter + (x/x_display_zoom - x_size/2)*zoom/x_size
@@ -127,7 +127,7 @@
          Y0 = y - y_display_size/zooming_factor/2
          X1 = x + x_display_size/zooming_factor/2
          Y1 = y + y_display_size/zooming_factor/2
-         call xpomp_draw_frame(display, '', 255, -1,
+         call xpompf draw frame(display, '', 255, -1,
      &        X0, Y0, X1, Y1, -181, status)
       else if (button .eq .3) then
 
