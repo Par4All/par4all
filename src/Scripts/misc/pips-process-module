@@ -1,0 +1,15 @@
+#! /bin/sh
+#
+# $RCSfile: pips-process-module,v $ (version $Revision$)
+# $Date: 1996/09/21 17:22:45 $, 
+#
+
+text "`type perl | grep 'not found'`" && {
+    echo "perl not found -- skipping pre processing of file $1"
+    exit 0
+}
+
+perl pips-deal-with-include $1
+
+# end of $RCSfile: pips-process-module,v $
+#
