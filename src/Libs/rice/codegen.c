@@ -2,43 +2,9 @@
  * $Id$
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <values.h>
-
-#include "genC.h"
-
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "polyedre.h"
-
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-
-#include "misc.h"
-#include "ri-util.h"
-#include "text-util.h"
-#include "properties.h"
-#include "effects-generic.h"
-#include "effects-simple.h"
-
-#include "constants.h"
-
-#include "ricedg.h"
-#include "rice.h"
+#include "local.h"
 
 extern current_module_entity;
-
-/* instantiation of the dependence graph */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
 
 /* This function checks if conflict c between vertices v1 and v2 should
 be ignored at level l. 
