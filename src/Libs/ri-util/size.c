@@ -45,6 +45,7 @@ array_size(entity a)
 		   "Array \"%s\" with illegal varying array size\n",
 		   entity_name(a));
     }
+    return s;
 }
 
 Value 
