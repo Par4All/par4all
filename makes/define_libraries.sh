@@ -1,5 +1,5 @@
 # $RCSfile: define_libraries.sh,v $ (version $Revision$)
-# $Date: 1996/08/22 21:20:37 $, 
+# $Date: 1996/08/30 17:32:56 $, 
 #
 # this file define newgen, linear and pips libraries.
 # it is to be included by some shell-scripts and makefiles (after a sed).
@@ -27,6 +27,13 @@ PIPS_ORDERED_LIBS='text-util properties misc ri-util conversion movements pipsdb
 
 # all libraires for pips
 PIPS_LIBS='-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcomp_sections -lcontrol -lsemantics -lcontinuation -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint $(NEWGEN_LIBS) $(LINEAR_LIBS) -lm'
+
+#
+# X11
+
+PIPS_X11_ADDED_CPPFLAGS=''
+PIPS_X11_ADDED_LDFLAGS='-lX11'
+PIPS_X11_ADDED_LIBS=''
 
 #
 # wpips
