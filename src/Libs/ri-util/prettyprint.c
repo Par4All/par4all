@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.108  1997/12/12 15:03:20  coelho
+ * leaks--
+ *
  * Revision 1.107  1997/12/12 14:51:11  coelho
  * leaks--
  *
@@ -144,7 +147,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.107 1997/12/12 14:51:11 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.108 1997/12/12 15:03:20 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -1286,8 +1289,7 @@ init_text_statement(
     statement obj)
 {
     instruction i = statement_instruction(obj);
-    text r = make_text( NIL ) ;
-    /* string comments = statement_comments(obj); */
+    text r;
 
     if (get_bool_property("PRETTYPRINT_ALL_EFFECTS")
 	|| !((instruction_block_p(i) && 
@@ -1301,6 +1303,8 @@ init_text_statement(
 	if (text_statement_hook != empty_text)
 	    attach_decoration_to_text(r);
     }
+    else
+	r  = make_text( NIL ) ;
 
     if (get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
 	get_bool_property("PRETTYPRINT_STATEMENT_ORDERING")) {
