@@ -3,6 +3,14 @@
 # $Id$
 #
 
+# if [ `uname -s -r` -eq "SunOS 5.8" ]
+# then	
+#   echo "SunOS 5.8"
+#   PIPS_TR=/usr/xpg4/bin/tr
+# else
+#   PIPS_TR=/usr/bin/tr
+# fi
+
 # Test function
 
 pips_prgm=${pips_prgm:-.pipsprogram}
@@ -211,7 +219,7 @@ rename ()
 
 uppercase () 
 {
-  echo "$*" |tr a-z A-Z
+  echo "$*" | tr '[a-z]' '[A-Z]'
 }
 
 MOD=`uppercase $MOD`
