@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.26  2003/12/05 17:06:42  nguyen
+ * Add more cases for C prettyprinter
+ *
  * Revision 1.25  2003/09/05 14:31:18  nguyen
  * Handle function prototype declarations for C (words_parameters) and other
  * improvements
@@ -108,7 +111,7 @@
 
 /*===================== Variables and Function prototypes for C ===========*/
 
-extern int is_fortran;
+extern bool is_fortran;
 static text c_text_entity_declaration(entity e, int margin);
 
 /********************************************************************* WORDS */
@@ -184,13 +187,27 @@ words_parameters(entity e)
 	    pc = gen_nconc(pc,words_type(t));
 	  }
 	else 
-	  pc = CHAIN_SWORD(pc, entity_local_name(param));
+	  {
+	    if (is_fortran)
+	      pc = CHAIN_SWORD(pc, entity_local_name(param));
+	    else 
+	      {
+		/* We have to print variable's type, dimensions, ... with C */
+		type t = entity_type(param);
+		variable v = type_variable(t);  
+		/* problems with order: qualifier, basic, ... !*/
+		
+		pc = gen_nconc(pc,words_qualifier(variable_qualifiers(v)));
+		pc = gen_nconc(pc,words_basic(variable_basic(v)));
+		pc = CHAIN_SWORD(pc,entity_local_name(param));
+		pc = gen_nconc(pc,words_dimensions(variable_dimensions(v)));
+	      }
+	  }
       }
   }
-  
   return(pc);
 }
-
+  
 static list 
 words_dimension(dimension obj)
 {
@@ -206,12 +223,17 @@ words_dimension(dimension obj)
 	/* The lower bound of array in C is always equal to 0, 
 	   we only need to print (upper dimension + 1) */
 	expression eup = dimension_upper(obj);
-	int up;
-	if (expression_integer_value(eup, &up))
-	  pc = CHAIN_IWORD(pc,up+1);
+	if (unbounded_expression_p(eup))
+	  pc = CHAIN_SWORD(pc,"");
 	else
-	  /* to be refined here to make more beautiful expression */
-	  pc = words_expression(MakeBinaryCall(CreateIntrinsic("+"),eup,int_to_expression(1)));
+	  {
+	    int up;
+	    if (expression_integer_value(eup, &up))
+	      pc = CHAIN_IWORD(pc,up+1);
+	    else
+	      /* to be refined here to make more beautiful expression */
+	      pc = words_expression(MakeBinaryCall(CreateIntrinsic("+"),eup,int_to_expression(1)));
+	  }
       }
     return(pc);
 }
@@ -268,7 +290,7 @@ words_declaration(
 }
 
 /* what about simple DOUBLE PRECISION, REAL, INTEGER... */
-static list words_basic(basic obj)
+list words_basic(basic obj)
 {
     list pc = NIL;
     /* 31/07/2003 Nga Nguyen : add more cases for C*/
@@ -447,6 +469,9 @@ sentence_head(entity e)
 
     pips_assert("is functionnal", type_functional_p(te));
 
+    if (static_module_p(e))
+      pc = CHAIN_SWORD(pc,"static ");
+    
     fe = type_functional(te);
     tr = functional_result(fe);
     
@@ -493,7 +518,7 @@ sentence_head(entity e)
       pc = gen_nconc(pc, args);
       pc = CHAIN_SWORD(pc, ")");
     }
-    else if (type_variable_p(tr) || type_unknown_p(tr)) {
+    else if (type_variable_p(tr) || type_unknown_p(tr) || type_void_p(tr)) {
       pc = CHAIN_SWORD(pc, "()");
     }
 
@@ -1756,7 +1781,8 @@ static list words_brace_expression(expression exp)
   pc = CHAIN_SWORD(pc,"{");
   MAP(EXPRESSION,e,
   {
-    pc = CHAIN_SWORD(pc,first?"":", ");
+    if (!first) 
+      pc = CHAIN_SWORD(pc,", ");
     if (brace_expression_p(e))
       pc = gen_nconc(pc,words_brace_expression(e));
     else
@@ -1782,10 +1808,10 @@ static list words_dimensions(list dims)
     }
   else
     {
-      MAPL(pd, 
+      MAP(DIMENSION,d, 
       {
 	pc = CHAIN_SWORD(pc, "[");
-	pc = gen_nconc(pc, words_dimension(DIMENSION(CAR(pd))));
+	pc = gen_nconc(pc, words_dimension(d));
 	pc = CHAIN_SWORD(pc, "]");
       }, dims);
     }  
@@ -1859,11 +1885,21 @@ static text c_text_entity_declaration(entity e, int margin)
 	  value val = entity_initial(e);
 	  
 	  /* problems with order: qualifier, basic, ... !*/
+	  ifdebug(5)
+	    {
+	      pips_debug(5,"Variable dimensions : \n");
+	      MAP(DIMENSION,d,
+	      {
+		print_expression(dimension_upper(d));
+		printf(",");
+	      },variable_dimensions(v));
+	    }
 	  
 	  pc = gen_nconc(pc,words_qualifier(variable_qualifiers(v)));
 	  pc = gen_nconc(pc,words_basic(variable_basic(v)));
 	  pc = CHAIN_SWORD(pc,name);
-	  pc = gen_nconc(pc,words_dimensions(variable_dimensions(v)));
+	  if (variable_dimensions(v) != NIL)
+	    pc = gen_nconc(pc,words_dimensions(variable_dimensions(v)));
 	  
 	  if (!value_undefined_p(val))
 	    {
@@ -1924,7 +1960,8 @@ static text c_text_entity_declaration(entity e, int margin)
 	  pc = CHAIN_SWORD(pc," {");
 	  MAP(ENTITY,ent,
 	  { 
-	    pc = CHAIN_SWORD(pc,first?"":", ");
+	    if (!first) 
+	      pc = CHAIN_SWORD(pc,", ");
 	    pc = CHAIN_SWORD(pc,entity_user_name(ent));
 	    first = FALSE;
 	  },l);
