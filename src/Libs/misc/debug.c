@@ -216,5 +216,13 @@ pips_debug_function(int the_expected_debug_level,
    va_end(some_arguments);
 }
 
+double get_process_memory_size()
+{
+    extern etext;
+    double memory_size = (sbrk(0) - etext)/(double)(1 << 20);
+
+	return memory_size;
+}
+
 /* is that all? :-)
  */
