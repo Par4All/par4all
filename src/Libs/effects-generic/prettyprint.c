@@ -326,7 +326,7 @@ print_source_or_code_effects_engine(
     if (prettyprint_with_attachments_p)
 	begin_attachment_prettyprint();
     
-    success = make_text_resource
+    success = make_text_resource_and_free
 	(module_name,
 	 file_resource_name,
 	 file_name,
