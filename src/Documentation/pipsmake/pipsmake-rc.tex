@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.6  2003/04/08 13:22:20  keryell
+%% Added simdizer for François Ferrand.
+%%
 %% Revision 1.5  2002/11/22 14:53:35  phamdat
 %% MODULE.preconditions added to input of impact_check
 %%
@@ -486,7 +489,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2002/11/22 14:53:35 $~$
+$~$Date: 2003/04/08 13:22:20 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2890,6 +2893,22 @@ This algorithm still is in the development stage. Do not use it!
 nest_parallelization                    > MODULE.parallelized_code
         < PROGRAM.entities 
         < MODULE.code MODULE.dg
+\end{verbatim}
+
+
+\subsubsection{SIMDizer for SIMD multimedia instruction set}
+
+%%@UserManualDocumentation: simdizer
+Function \verb+simdizer+ is an attempt at generating SIMD code for SIMD
+multimedia instruction set such as MMX, SSE2, VIS,...
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+simdizer                    > MODULE.code
+        ! MODULE.loop_distribution
+        ! MODULE.new_atomizer
+        < PROGRAM.entities 
+        < MODULE.code MODULE.dg MODULE.preconditions
 \end{verbatim}
 
 
@@ -6239,10 +6258,10 @@ impact_check    > MODULE.code
         < PROGRAM.entities 
         < MODULE.alias_associations
         < MODULE.cumulated_effects
-	< MODULE.summary_effects
+    < MODULE.summary_effects
         < MODULE.proper_effects
-	< MODULE.preconditions
-	< MODULE.summary_precondition
+    < MODULE.preconditions
+    < MODULE.summary_precondition
         < MODULE.dg
         < ALL.code
 \end{verbatim}
