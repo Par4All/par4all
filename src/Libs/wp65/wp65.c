@@ -58,7 +58,8 @@ static void unary_into_binary_ref(reference ref)
     list lt; 
     if (gen_length((lt = reference_indices(ref))) ==1) {
 	expression expr = make_integer_constant_expression(1);
-	reference_indices(ref)= CONS(EXPRESSION, EXPRESSION(CAR(lt)), CONS(EXPRESSION,expr,NIL));
+	reference_indices(ref)= CONS(EXPRESSION, EXPRESSION(CAR(lt)),
+				     CONS(EXPRESSION,expr,NIL));
     }
 }
 
@@ -78,22 +79,21 @@ entity
 MakeEntityFunction(string sname)
 {
     entity f = make_empty_function(sname, MakeIntegerResult());
-
     return f;
 }
 
-void print_ref(reference r)
+static void print_ref(reference r)
 {
   fprintf(stderr, "reference to %s is %p\n", 
 	  entity_name(reference_variable(r)), r);
 }
 
-void print_eff(effect e)
+static void print_eff(effect e)
 {
   print_ref(effect_reference(e));
 }
 
-void debug_refs(gen_chunk *x)
+static void debug_refs(gen_chunk *x)
 {
   gen_multi_recurse(x, 
 		    reference_domain, gen_true, print_ref,
@@ -101,8 +101,8 @@ void debug_refs(gen_chunk *x)
 		    NULL);
 }
 
-bool wp65(input_module_name)
-string input_module_name;
+bool 
+wp65(string input_module_name)
 {
     entity module = local_name_to_top_level_entity(input_module_name);
     /* Let's modify the old code instead of copy it but do not tell
@@ -113,32 +113,31 @@ string input_module_name;
     statement computational = statement_undefined;
     entity memory_module = entity_undefined;
     statement emulator = statement_undefined;
-    int pn;
-    int bn;
-    int ls;
-    int pd = PIPELINE_DEPTH;
+    int pn, bn, ls, pd = PIPELINE_DEPTH;
     graph dg;
+    string ppp;
 
     s = (statement) db_get_memory_resource(DBR_CODE, input_module_name,TRUE);
     dg = (graph) db_get_memory_resource(DBR_DG, input_module_name, TRUE);
     debug_on("WP65_DEBUG_LEVEL");
     debug(8, "wp65", "begin\n");
+
     get_model(&pn, &bn, &ls);
+    ifdebug(1) model_fprint(stderr, pn, bn ,ls);
+
     regions_init();
-    ifdebug(1) {
-	model_fprint(stderr, pn, bn ,ls);
-    }
     set_current_module_entity(module);
-    /*    fprintf(stderr,"refs du code\n");
-      debug_refs(s);
-    fprintf(stderr,"refs du dg\n");
-    debug_refs(dg);
-    */
+    ppp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
+    set_string_property(PRETTYPRINT_PARALLEL, "doall");
+
+    /*    fprintf(stderr,"refs du code\n"); debug_refs(s);
+	  fprintf(stderr,"refs du dg\n"); debug_refs(dg); */
+
     translate_unary_into_binary_ref(s);      
-    /* fprintf(stderr,"refs du code\n"); 
-    debug_refs(s); 
-    fprintf(stderr,"refs du dg\n");
-    debug_refs(dg); */
+
+    /* fprintf(stderr,"refs du code\n"); debug_refs(s); 
+       fprintf(stderr,"refs du dg\n"); debug_refs(dg); */
+
     module_to_wp65_modules(module, s, dg,
 			   pn, bn, ls, pd, 
 			   &compute_module, &computational, 
@@ -168,6 +167,7 @@ string input_module_name;
 
     reset_current_module_statement();
     reset_current_module_entity();
+    set_string_property(PRETTYPRINT_PARALLEL, ppp); free(ppp);
     debug_off();
 
 return TRUE;
