@@ -2,11 +2,11 @@
 # $Id$
 #
 # $Log: makefile_macros.GNU,v $
+# Revision 1.33  1997/09/09 12:05:48  coelho
+# much factored out.
+#
 # Revision 1.32  1997/07/26 12:16:43  coelho
 # SOURCE macros added...
-#
-# Revision 1.31  1997/05/14 15:54:31  coelho
-# *** empty log message ***
 #
 # Revision 1.30  1997/05/14 08:33:54  coelho
 # use bsd files...
@@ -20,59 +20,10 @@
 #
 # this file contains macro definitions 
 
-AR	= gar
-ARFLAGS	= rv
-CC	= gcc
-CANSI	= -ansi -pedantic-errors
-CFLAGS	= -g -O2 -Wall -pipe
-CMKDEP	= -M
-
-# putenv() => svid
-# getwd()  => bsd
-# getopt() => posix2
-
-CPPFLAGS= \
-	-D_POSIX_C_SOURCE=2 \
-	-D_BSD_SOURCE \
-	-D_SVID_SOURCE \
-	-D__USE_FIXED_PROTOTYPES__ \
-	-I. \
-	-I$(NEWGEN_ROOT)/Include \
-	-I$(LINEAR_ROOT)/Include \
-	-I$(PIPS_ROOT)/Include \
-	-I$(EXTERN_ROOT)/Include 
-LD	= $(CC) 
-LDFLAGS	= \
-	-g \
-	-L./$(ARCH) \
-	-L$(PIPS_ROOT)/Lib/$(ARCH) \
-	-L$(NEWGEN_ROOT)/Lib/$(ARCH) \
-	-L$(LINEAR_ROOT)/Lib/$(ARCH) \
-	-L$(EXTERN_ROOT)/Lib/$(ARCH)
-RANLIB	= granlib
-LEX	= flex
-LFLAGS	= 
-FC	= g77
-FFLAGS	= -O2 -g -Wimplicit -pipe
-LINT	= lint
-LINTFLAGS= -habxu
-YACC	= bison
-YFLAGS	= -y
-PROTO	= cproto
-PRFLAGS	= -evcf2
-ETAGS	= etags
-TAR	= gtar
-ZIP	= gzip -v9
-DIFF	= gdiff
-M4	= gm4
-M4FLAGS	=
-LX2HTML	= latex2html
-L2HFLAGS= -link 8 -split 5
-LATEX	= latex
-BIBTEX	= bibtex
-RMAN	= rman
-MAKEIDX	= makeindex
-DVIPS	= dvips
+include makefile_macros.doc
+include makefile_macros.misc
+include makefile_macros.gnu
+include makefile_macros.flags
 
 # end of it!
 #
