@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/02 16:21:25 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/02 19:52:42 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -15,6 +15,8 @@ USAGE="$SCRIPT [-h (HELP!)] [-l|p|s|r|i|n] [-D|P] [-c|a] (default -c)"
 
 MAKEFILE=Makefile
 CONFIG_FILE=config.makefile
+
+PIPSMKMK_OPTION=''
 
 help()
 {
@@ -64,14 +66,23 @@ ALL_RULE_TARGET=''
 while getopts lpsrinDPcah opt
 do
   case $opt in
-    l) DIRTYPE='Lib' ;;
-    p) DIRTYPE='Passes' ;;
-    s) DIRTYPE='Scripts' ;;
-    r) DIRTYPE='Runtime' ;;
-    i) DIRTYPE='Linear' ;;
-    n) DIRTYPE='Newgen' ;;
-    D) DIRSIDE="$PIPS_DEVEDIR" ;;
-    P) DIRSIDE="$PIPS_SRCDIR" ;;
+    l) DIRTYPE='Lib';
+       PIPSMKMK_OPTION='-l $PIPSMKMK_OPTION' ;;
+    p) DIRTYPE='Passes';
+       PIPSMKMK_OPTION='-p $PIPSMKMK_OPTION' ;;
+    s) DIRTYPE='Scripts';
+       PIPSMKMK_OPTION='-s $PIPSMKMK_OPTION' ;;
+    r) DIRTYPE='Runtime';
+       PIPSMKMK_OPTION='-r $PIPSMKMK_OPTION' ;;
+    i) DIRTYPE='Linear';
+       PIPSMKMK_OPTION='-i $PIPSMKMK_OPTION' ;;
+    n) DIRTYPE='Newgen';
+       PIPSMKMK_OPTION='-n $PIPSMKMK_OPTION' ;;
+    D) DIRSIDE="$PIPS_DEVEDIR" ;
+       PIPSMKMK_OPTION='-D $PIPSMKMK_OPTION';;
+    P) DIRSIDE="$PIPS_SRCDIR"; 
+       production='yes' ;
+       PIPSMKMK_OPTION='-P $PIPSMKMK_OPTION' ;;
     c) DIRS='.';;
     a) ALL='1' ;;
     h) help ; exit 0 ;;
@@ -92,9 +103,10 @@ cd_dirname=`dirname $current_directory`
 {
   if [ "`echo $cd_dirname | sed 's,^.*/Production/.*$,,'`" ]
   then
-    DIRSIDE="$PIPS_DEVEDIR" 
+    DIRSIDE="$PIPS_DEVEDIR" ;
   else
-    DIRSIDE="$PIPS_SRCDIR"
+    production='yes' ;
+    DIRSIDE="$PIPS_SRCDIR" ;
   fi
 }
 
@@ -112,6 +124,9 @@ PART=PIPS
 install_file_dir='$(PIPS_INCLUDEDIR)'
 install_lib_dir='$(PIPS_LIBDIR)'
 install_exe_dir='$(PIPS_BINDIR)'
+install_src_dir="$(PIPS_SRCDIR)/${DIRTYPE}"
+
+[ $DIRTYPE = 'Src' ] && DIRTYPE='Newgen'
 
 case $DIRTYPE in
   Lib) ALL_RULE_TARGET='$(ARCH)/lib$(TARGET).a' ;;
@@ -130,10 +145,11 @@ case $DIRTYPE in
            install_exe_dir='$(PIPS_EXTEDIR)' ;
            install_lib_dir='$(PIPS_EXTEDIR)' ;;
   Newgen)  ALL_RULE_TARGET='' ;
-           PART=NEWGEN ;
-           install_file_dir='$(PIPS_EXTEDIR)' ;
-           install_exe_dir='$(PIPS_EXTEDIR)' ;
-           install_lib_dir='$(PIPS_EXTEDIR)' ;;
+	  # PART=NEWGEN ;
+	   install_src_dir='$(NEWGEN_SRCDIR)';
+           install_file_dir='$(NEWGEN_INCLUDEDIR)' ;
+           install_exe_dir='$(NEWGEN_BINDIR)' ;
+           install_lib_dir='$(NEWGEN_LIBDIR)' ;;
   *) usage 5 "unexpected directory type $DIRTYPE"
 esac
 
@@ -193,7 +209,7 @@ do
 # DEFAULTS, may be overwritten by the $CONFIG_FILE content.
 #
 TARGET=		${dir_real_name}
-TARGETDIR=	$(PIPS_SRCDIR)/${DIRTYPE}/$(TARGET)
+TARGET_DIR=	${install_src_dir}/$(TARGET)
 #
 # installation directories for quick-install
 #
@@ -267,14 +283,6 @@ include $CONFIG_FILE
 # prefixed objects:
 LIB_OBJECTS:=$(addprefix $(ARCH)/, $(LIB_OBJECTS))
 #
-%
-
-
-
-##############################################################################
-
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<% 
-#
 PREPROC=	$(CC) -E $(CPPFLAGS) $(TARGET_ARCH)
 COMPILE=	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 LINK=		$(LD) $(LDFLAGS) -o
@@ -283,6 +291,14 @@ TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
 PARSE=		$(YACC) $(YFLAGS)
 ARCHIVE=	$(AR) $(ARFLAGS)
 PROTO=		$(PROTOIZE) -e -E "$(PREPROC)"
+#
+%
+
+
+
+##############################################################################
+
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<% 
 #
 LIB_TARGET=	$(ARCH)/lib$(TARGET).a
 BIN_TARGET=	$(ARCH)/$(TARGET)
@@ -398,7 +414,7 @@ OBJECTS=	$(LIB_OBJECTS)
 INCLUDES=	$(LIB_HEADERS)
 SOURCES= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES) $(DOCS)
 #
-# TARGETDIR=	$(PIPS_BINSRCDIR)/$(TARGET)
+# TARGET_DIR=	$(PIPS_BINSRCDIR)/$(TARGET)
 #
 
 $(PIPS_BINDIR):
@@ -463,8 +479,8 @@ recompile: $(PIPS_BINDIR)/$(BIN_TARGET)
 
 cat >> $MAKEFILE <<%
 
-$(TARGETDIR):
-	mkdir $(TARGETDIR)
+$(TARGET_DIR):
+	mkdir $(TARGET_DIR)
 
 check_os:
 	@if test -n "$(PIPS_CHECK_OS)"; \\
@@ -486,7 +502,7 @@ tar:
 quick-install: .quick-install
 
 .makefile: $(PIPS_UTILDIR)/pips-makemake
-	$(PIPS_UTILDIR)/pips-makemake
+	$(PIPS_UTILDIR)/pips-makemake ${PIPSMKMK_OPTION}
 	touch .makefile
 
 generate_makefile_if_necessary_and_possible:
@@ -513,7 +529,7 @@ delta:
 # partie specifique a Development
 #
 
-[ $DIRSIDE = $PIPS_DEVEDIR ] && cat >> $MAKEFILE <<%
+[ ! "$production" ] && cat >> $MAKEFILE <<%
 
 check_sccs:
 	@[ ! "\`sccs tell\`" ] || \\
@@ -523,13 +539,13 @@ check_sccs:
 # install installs sources, so depends on sources. FC
 # to insure the library is compiled before hand, a make is added.
 .install: $(SOURCES) check_install check_sccs
-	$(MAKE) all $(TARGETDIR) 
+	$(MAKE) all $(TARGET_DIR) 
 	@echo ""; echo; echo -n "Description of changes: " ; \\
 	read comments ; \\
 	install_pips_sources \\
-		-rv -s \`pwd\` -t $(TARGETDIR) -y "\$\$comments" \\
+		-rv -s \`pwd\` -t $(TARGET_DIR) -y "\$\$comments" \\
 		$(SOURCES)
-	-@cd $(TARGETDIR) ; pips-makemake
+	-@cd $(TARGET_DIR) ; pips-makemake
 	touch .install
 	$(MAKE) quick-install
 
@@ -542,7 +558,7 @@ diff:
 	-@for f in $(SOURCES) ; \\
 	do \\
 	  echo "DIFFERENCES BETWEEN DEV AND PROD FOR \$\$f:" ; \\
-	  $(DIFF) \$\$f $(TARGETDIR)/\$\$f ; \\
+	  $(DIFF) \$\$f $(TARGET_DIR)/\$\$f ; \\
 	done
 
 %
@@ -594,13 +610,19 @@ $(INC_TARGET): $(TARGET)-local.h
 header: .header
 	-[ -f $(TARGET).h ] || { $(RM) .header ; $(MAKE) .header ; }
 
+%
+
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Newgen' ] && cat >> $MAKEFILE <<%
+#
+
 # indirect depend bacause I do not trust make for the inclusion of
 # Makefile.depend if that very file does not exist.
 
 .depend: $(CFILES) $(DERIVED_CFILES) 
 	$(RM) $MAKEFILE.depend
-	$(PREPROC) -M $(CFILES) $(DERIVED_CFILES) > $MAKEFILE.depend
-	touch .depend
+	test ! "$(CFILES)$(DERIVED_CFILES)" || \
+		$(PREPROC) -M $(CFILES) $(DERIVED_CFILES) > $MAKEFILE.depend
+	touch $MAKEFILE.depend .depend 
 
 depend: $(INC_TARGET) .depend
 
@@ -617,7 +639,7 @@ touch .makefile
 
 ### force dependence list generation
 
-[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] &&
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' -o $DIRTYPE = 'Newgen' ] &&
 {
   rm -f $MAKEFILE.depend
   touch $MAKEFILE.depend
