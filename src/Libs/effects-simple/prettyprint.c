@@ -156,6 +156,7 @@ simple_effects_to_text(
 	reference ref = effect_reference(eff);
 	action ac = effect_action(eff);
 	approximation ap = effect_approximation(eff);
+	list /* of string */ ls = effect_words_reference(ref);
 	string t;
 
 	/* We build the string containing the effect's reference */
@@ -163,7 +164,8 @@ simple_effects_to_text(
 	 * heavily moved around in the following. words_to_string is now
 	 * attachment safe. RK 
 	 */
-	t = words_to_string(effect_words_reference(ref));
+	t = words_to_string(ls);
+	gen_free_string_list(ls);
 	
 	/* We now proceed to the addition of this effect to the current line
 	   of prettyprint. First, we select the type of effect : R-MAY, W-MAY,
