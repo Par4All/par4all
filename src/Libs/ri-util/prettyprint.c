@@ -2,6 +2,14 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.121  1998/09/09 15:50:40  irigoin
+ * Proper prettyprinting of ranges in expressions. Function text_loop() had
+ * to be splitted into text_loop() and text_loop_default(). The later is
+ * called from text_loop() and from text_loop_90() in fortran90.c. Sometimes
+ * vector loops cannot be expressed as array assignments and a default loop
+ * has to be printed. Function words_subscript_range() was added to print
+ * ranges either as a vector constructor with an implied DO or as a triplet notation.
+ *
  * Revision 1.120  1998/09/08 18:31:50  irigoin
  * Several quick bug fixes. Not a really consistent state for the Fortran 90
  * output but we want to make the Production version of PIPS consistent for
@@ -193,7 +201,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.120 1998/09/08 18:31:50 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.121 1998/09/09 15:50:40 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -341,20 +349,37 @@ words_range(range obj)
 	pc = CONS(STRING, MAKE_SWORD("*"), NIL);
     }
     else {
-	/* FI: array constructor R433, p. 37 in Fortran 90 standard, can
-	   be used anywhere in arithmetic expressions whereas the triplet
-	   notation is restricted to subscript expressions. The triplet
-	   notation is used to define array sections (see R619, p. 64).
-	*/
-	/*
+	call c = syntax_call(expression_syntax(range_increment(obj)));
+
 	  pc = CHAIN_SWORD(pc,"(/ (I,I=");
 	  pc = gen_nconc(pc, words_expression(range_lower(obj)));
 	  pc = CHAIN_SWORD(pc,",");
 	  pc = gen_nconc(pc, words_expression(range_upper(obj)));
+	if(strcmp( entity_local_name(call_function(c)), "1") != 0) {
 	  pc = CHAIN_SWORD(pc,",");
 	  pc = gen_nconc(pc, words_expression(range_increment(obj)));
+	}
 	  pc = CHAIN_SWORD(pc,") /)") ;
-	*/
+    }
+    return pc;
+}
+
+/* FI: array constructor R433, p. 37 in Fortran 90 standard, can
+   be used anywhere in arithmetic expressions whereas the triplet
+   notation is restricted to subscript expressions. The triplet
+   notation is used to define array sections (see R619, p. 64).
+*/
+
+list /* of string */ 
+words_subscript_range(range obj)
+{
+    list pc = NIL ;
+
+    /* if undefined I print a star, why not!? */
+    if (expression_undefined_p(range_lower(obj))) {
+	pc = CONS(STRING, MAKE_SWORD("*"), NIL);
+    }
+    else {
 	call c = syntax_call(expression_syntax(range_increment(obj)));
 
 	pc = gen_nconc(pc, words_expression(range_lower(obj)));
@@ -384,7 +409,16 @@ words_reference(reference obj)
     if (reference_indices(obj) != NIL) {
 	pc = CHAIN_SWORD(pc,"(");
 	MAPL(pi, {
-	    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(pi)), 0, TRUE));
+	    expression subscript = EXPRESSION(CAR(pi));
+	    syntax ssubscript = expression_syntax(subscript);
+
+	    if(syntax_range_p(ssubscript)) {
+		pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript)));
+	    }
+	    else {
+		pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE));
+	    }
+
 	    if (CDR(pi) != NIL)
 		pc = CHAIN_SWORD(pc,",");
 	}, reference_indices(obj));
@@ -1268,7 +1302,7 @@ text_omp_directive(loop l, int m)
 }
 
 text 
-text_loop(
+text_loop_default(
     entity module,
     string label,
     int margin,
@@ -1282,52 +1316,17 @@ text_loop(
     statement body = loop_body( obj ) ;
     entity the_label = loop_label(obj);
     string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
-    bool structured_do = empty_local_label_name_p(do_label),
-         doall_loop_p = FALSE,
-         hpf_prettyprint = pp_hpf_style_p(),
-         do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT"),
-         all_private =  get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
+    bool structured_do = empty_local_label_name_p(do_label);
+    bool doall_loop_p = FALSE;
+    bool hpf_prettyprint = pp_hpf_style_p();
+    bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
+    bool all_private =  get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
 
-    /* small hack to show the initial label of the loop to name it...
-     */
-    if(!structured_do && do_enddo_p)
-    {
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-	  strdup(concatenate("!     INITIALLY: DO ", do_label, "\n", NULL))));
-    }
-
-    /* quite ugly management of other prettyprints...
-     */
-    switch(execution_tag(loop_execution(obj)) ) {
-    case is_execution_sequential:
+    if(execution_sequential_p(loop_execution(obj))) {
 	doall_loop_p = FALSE;
-	break ;
-    case is_execution_parallel:
-        if (pp_cmf_style_p()) {
-          text aux_r;
-          if((aux_r = text_loop_cmf(module, label, margin, obj, n, NIL, NIL))
-             != text_undefined) {
-	      MERGE_TEXTS(r, aux_r);
-            return(r) ;
-          }
-        }
-        if (pp_craft_style_p()) {
-          text aux_r;
-          if((aux_r = text_loop_craft(module, label, margin, obj, n, NIL, NIL))
-             != text_undefined) {
-            MERGE_TEXTS(r, aux_r);
-            return(r);
-          }
-        }
-	if (pp_f90_style_p() && 
-	    instruction_assign_p(statement_instruction(body)) ) {
-	    MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
-	    return(r) ;
-	}
+    }
+    else {
 	doall_loop_p = pp_doall_style_p();
-	break ;
-    default:
-	pips_error("text_loop", "Unknown tag\n") ;
     }
 
     /* HPF directives before the loop if required (INDEPENDENT and NEW) */
@@ -1374,6 +1373,65 @@ text_loop(
     }
 
     attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj);
+
+    return r;
+}
+
+text 
+text_loop(
+    entity module,
+    string label,
+    int margin,
+    loop obj,
+    int n)
+{
+    text r = make_text(NIL);
+    statement body = loop_body( obj ) ;
+    entity the_label = loop_label(obj);
+    string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
+    bool structured_do = empty_local_label_name_p(do_label);
+    bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
+
+    /* small hack to show the initial label of the loop to name it...
+     */
+    if(!structured_do && do_enddo_p)
+    {
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+	  strdup(concatenate("!     INITIALLY: DO ", do_label, "\n", NULL))));
+    }
+
+    /* quite ugly management of other prettyprints...
+     */
+    switch(execution_tag(loop_execution(obj)) ) {
+    case is_execution_sequential:
+	    MERGE_TEXTS(r, text_loop_default(module, label, margin, obj, n));
+	break ;
+    case is_execution_parallel:
+        if (pp_cmf_style_p()) {
+          text aux_r;
+          if((aux_r = text_loop_cmf(module, label, margin, obj, n, NIL, NIL))
+             != text_undefined) {
+	      MERGE_TEXTS(r, aux_r);
+          }
+        }
+        else if (pp_craft_style_p()) {
+          text aux_r;
+          if((aux_r = text_loop_craft(module, label, margin, obj, n, NIL, NIL))
+             != text_undefined) {
+            MERGE_TEXTS(r, aux_r);
+          }
+        }
+	else if (pp_f90_style_p() && 
+	    instruction_assign_p(statement_instruction(body)) ) {
+	    MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
+	}
+	else {
+	    MERGE_TEXTS(r, text_loop_default(module, label, margin, obj, n));
+	}
+	break ;
+	default:
+	pips_error("text_loop", "Unknown tag\n") ;
+    }
     return r;
 }
 
