@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.109  1998/12/26 21:42:26  irigoin
+ * Bug fix in hpfc_error_handler()
+ *
  * Revision 1.108  1998/12/26 21:21:01  irigoin
  * error_handler added
  *
@@ -288,7 +291,8 @@ static void close_hpfc_status()
 
 void hpfc_error_handler()
 {
-    reset_hpfc_status();
+    /* An error_reset_hpfc_status() would be necessary */
+    /* reset_hpfc_status(); */
     hpfc_compile_error_handler();
     hpfc_directives_error_handler();
     hpfc_util_error_handler();
