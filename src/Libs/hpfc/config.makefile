@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/04/28 18:37:22 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/05/05 09:47:35 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -48,7 +48,8 @@ LIB_CFILES=	parser.c parser-util.c debug-util.c hpfc-util.c \
 		align-checker.c messages.c overlap.c normalize.c guard.c \
 		ranges.c message-utils.c reduction.c build-system.c \
 		only-io.c new_io_generation.c io-compile.c sc_solve.c \
-		generate-io.c run-time-functions.c
+		generate-io.c run-time-functions.c host_node_entities.c \
+		hpf_objects.c
 
 LIB_HEADERS=	f77keywords f77symboles hpfkeywords gram.y scanner.l \
 		warning.h hpfc-local.h defines-local.h compiler_parameters.h \
