@@ -66,7 +66,7 @@ show_directory()
 
 
 void
-show_program()
+show_workspace()
 {
    static char *none = "(* none *)";
    char *name = db_get_current_workspace_name();
@@ -193,7 +193,7 @@ create_status_subwindow()
    window_fit(main_frame);
 
    show_directory();
-   show_program();
+   show_workspace();
    show_module();
    display_memory_usage();
 }
