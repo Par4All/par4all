@@ -25,6 +25,7 @@ SRC_MACROS =	auto.h \
 		makefile_macros.TEST \
 		makefile_macros.GNULL \
 		makefile_macros.LINUXI86 \
+		makefile_macros.LINUXI86LL \
 		makefile_macros.GNUSOL2LL \
 		makefile_macros.SOL2LL \
 		makefile_macros.GPROF \
