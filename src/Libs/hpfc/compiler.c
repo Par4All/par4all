@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compiler.c,v $
+ * Revision 1.55  1997/07/21 13:30:25  keryell
+ * Replaced %x format by %p.
+ *
  * Revision 1.54  1997/07/21 13:29:45  keryell
  * Replaced %x format by %p.
  *
@@ -36,8 +39,8 @@ entity host_module, node_module;
 
 #define debug_print_control(c, w)\
   fprintf(stderr, \
-	  "%s: ctr 0x%x (stat 0x%x) , %d preds, %d succs\n", w, \
-          (unsigned int) c, (unsigned int) control_statement(c), \
+	  "%s: ctr %p (stat %p) , %d preds, %d succs\n", w, \
+          c, control_statement(c), \
 	  gen_length(control_predecessors(c)), \
 	  gen_length(control_successors(c))); \
   print_statement(control_statement(c));
