@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.55  2003/12/05 17:08:03  nguyen
+ * Handle entities whose scope is the compilation unit in C
+ *
  * Revision 1.54  2003/08/06 13:44:26  nguyen
  * Add entity_user_name() function
  *
@@ -275,11 +278,13 @@ string entity_global_name(entity e)
 string 
 module_local_name(entity e)
 {
-    string name = local_name(entity_name(e));
+  
+  return entity_user_name(e);
+  /*  string name = local_name(entity_name(e));
     return name 
 	+ strspn(name, MAIN_PREFIX)
 	+ strspn(name, BLOCKDATA_PREFIX)
-	+ strspn(name, COMMON_PREFIX);
+	+ strspn(name, COMMON_PREFIX);*/
 }
 
 /* END_EOLE */
@@ -507,10 +512,7 @@ io_entity_p(entity e)
 bool 
 intrinsic_entity_p(entity e)
 {
-    value v = entity_initial(e);
-    bool intrinsic_p = value_intrinsic_p(v);
-
-    return intrinsic_p;
+  return (!value_undefined_p(entity_initial(e)) && value_intrinsic_p(entity_initial(e)));
 }
 
 /* FI: I do not understand this function name (see next one!). It seems to mee
@@ -632,10 +634,18 @@ local_name_to_top_level_entity(string n)
     entity module = entity_undefined;
     int i;
 
-    for(i=0; i<4 && entity_undefined_p(module); i++)
-	module = gen_find_tabulated(concatenate
-	  (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, 0),
-				    entity_domain);
+    /* Extension with C: the scope of a module can be its compilation unit if this is 
+       a static module, not only TOP-LEVEL. */
+
+    if (static_module_name_p(n))
+      module = gen_find_tabulated(n,entity_domain);
+    else 
+      {
+	for(i=0; i<4 && entity_undefined_p(module); i++)
+	  module = gen_find_tabulated(concatenate
+				      (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, 0),
+				      entity_domain);
+      }
     
     return module;
 }
@@ -994,7 +1004,7 @@ list /* of entity */ string_to_entity_list(string module, string names)
 string entity_user_name(entity e)
 {
   string global_name = entity_name(e);
-  
+ 
   /* All possible prefixes first */
 
   if (strstr(global_name,STRUCT_PREFIX) != NULL)
@@ -1029,8 +1039,15 @@ string entity_user_name(entity e)
   /* Then file seperator */
   if (strstr(global_name,FILE_SEP_STRING) != NULL)
     return strdup(strstr(global_name,FILE_SEP_STRING) + 1);
-
+  
   pips_error("entity_user_name", "no seperator ?\n");
 }
 
 
+
+bool static_module_name_p(string name)
+{
+  /* An entity is a static module if its name contains the FILE_SEP_STRING
+     but the last one is not the last character of the name string */
+  return (!compilation_unit_p(name) && strstr(name, FILE_SEP_STRING) != NULL);
+}
