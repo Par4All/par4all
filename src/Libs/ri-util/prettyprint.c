@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.71  1997/09/13 16:04:01  coelho
+ * cleaner.
+ *
  * Revision 1.70  1997/09/13 15:37:49  coelho
  * fixed a bug that added a blank line in the regenerated declarations.
  * basic block data recognition added.
@@ -26,7 +29,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.70 1997/09/13 15:37:49 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.71 1997/09/13 16:04:01 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -2551,8 +2554,8 @@ text_module(entity module,
 	    /* Add the original header comments if any: */
 	    ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
 	
-	ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(sentence_head(module, stat),
-							module));
+	ADD_SENTENCE_TO_TEXT(r, 
+	   attach_head_to_sentence(sentence_head(module, stat), module));
 	if (head_hook) 
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 						  head_hook(module)));
@@ -2564,8 +2567,9 @@ text_module(entity module,
 	MERGE_TEXTS(r, text_declaration(module));
     }
     else {
-	ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(make_sentence(is_sentence_formatted, s),
-							module));
+	ADD_SENTENCE_TO_TEXT(r, 
+            attach_head_to_sentence(make_sentence(is_sentence_formatted, s),
+				    module));
     }
 
     if (stat != statement_undefined) {
