@@ -2631,6 +2631,10 @@ Polyhedron *AddRays(Value *AddedRays,unsigned NbAddedRays,Polyhedron *Pol,unsign
     /* Add the new rays pointed by 'AddedRays' to matrix 'Ray' */
     Vector_Copy(AddedRays, Ray->p_Init+NbEle1, NbAddedRays * Dimension);
     
+    /* We need at least NbCon rows */
+    if (NbMaxConstrs < NbCon)
+	NbMaxConstrs = NbCon;
+
     /* Allocate space for constraint matrix 'Mat' */
     Mat = Matrix_Alloc(NbMaxConstrs, Dimension);
     if(!Mat) {
