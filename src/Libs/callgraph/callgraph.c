@@ -111,7 +111,7 @@ callgraph_module_name(
     }
 
     print_text(fp, r);
-    fprintf(fp, "%s\n", module_name);
+    fprintf(fp, " %s\n", module_name);
 
     MAP(ENTITY, e,
     {
@@ -119,7 +119,7 @@ callgraph_module_name(
 	string f = db_get_memory_resource(DBR_CALLGRAPH_FILE, n, TRUE);
 	string full = strdup(concatenate(dir, "/", f, 0));
 
-	safe_append(fp, full, CALLGRAPH_INDENT);
+	safe_append(fp, full, CALLGRAPH_INDENT, TRUE);
 
 	free(full);
     }, 
