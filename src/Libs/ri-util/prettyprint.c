@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.112  1998/03/07 21:55:39  irigoin
+ * Improved error message
+ *
  * Revision 1.111  1998/03/05 14:03:11  irigoin
  * pips_assert() added in sentence_goto() to avoid the printout of a GOTO
  * without target label
@@ -157,7 +160,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.111 1998/03/05 14:03:11 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.112 1998/03/07 21:55:39 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -1624,7 +1627,7 @@ text_statement(
     text r= make_text(NIL);
     text temp;
     string label = 
-	    entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
+	entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
     string comments = statement_comments(stmt);
 
     pips_debug(2, "Begin for statement %s\n", statement_identification(stmt));
@@ -1633,8 +1636,8 @@ text_statement(
 
     if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
        statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
-      /* we are in trouble with some kind of dead (?) code... */
-      pips_user_warning("I unexpectedly bumped into dead code?\n");
+	/* we are in trouble with some kind of dead (?) code... */
+	pips_user_warning("I unexpectedly bumped into dead code?\n");
     }
 
     if (same_string_p(label, RETURN_LABEL_NAME)) 
@@ -1644,7 +1647,7 @@ text_statement(
 
 	/* do not add a redundant RETURN before an END, unless requested */
 	if(get_bool_property("PRETTYPRINT_FINAL_RETURN")
-	    || !last_statement_p(stmt)) 
+	   || !last_statement_p(stmt)) 
 	{
 	    sentence s = MAKE_ONE_WORD_SENTENCE(margin, RETURN_FUNCTION_NAME);
 	    temp = make_text(CONS(SENTENCE, s ,NIL));
@@ -1681,12 +1684,21 @@ text_statement(
 
     attach_statement_information_to_text(r, stmt);
 
-    ifdebug(1) if (instruction_sequence_p(i)) {
-	pips_assert("This statement should be labelless, numberless"
-		    " and commentless.",
-		    statement_with_empty_comment_p(stmt)
-		    && statement_number(stmt) == STATEMENT_NUMBER_UNDEFINED
-		    && unlabelled_statement_p(stmt));
+    ifdebug(1) {
+	if (instruction_sequence_p(i)) {
+	    if(!(statement_with_empty_comment_p(stmt)
+		 && statement_number(stmt) == STATEMENT_NUMBER_UNDEFINED
+		 && unlabelled_statement_p(stmt))) {
+		user_log("Block statement %s\n"
+			 "Block number=%d, Block label=\"%s\", block comment=\"%s\"\n",
+			 statement_identification(stmt),
+			 statement_number(stmt), label_local_name(statement_label(stmt)),
+			 statement_comments(stmt));
+		pips_error("text_statement", "This block statement should be labelless, numberless"
+	
+			   " and commentless.\n");
+		}
+	}
     }
 
     pips_debug(2, "End for statement %s\n", statement_identification(stmt));
