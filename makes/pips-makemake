@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/02 14:00:25 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/02 14:23:38 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -349,16 +349,19 @@ SOURCES= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES) $(DOCS)
 
 test: $(LIB_TARGET)
 	$(LINK) $(ARCH)/pips -lpips $(PIPS_LIBS) $(PIPS_MALLOC)
+	@test $(ARCH) -eq . || ln -sf $(ARCH)/pips
 	@echo 
 
 wtest: $(LIB_TARGET) 
 	$(LINK) $(ARCH)/wpips $(WPIPS_ADDED_LDFLAGS) -lwpips \\
 		$(PIPS_LIBS) $(PIPS_MALLOC) $(WPIPS_ADDED_LIBS)
+	@test $(ARCH) -eq . || ln -sf $(ARCH)/wpips
 	@echo 
 
 ttest: $(LIB_TARGET)
 	$(LINK) $(ARCH)/tpips -ltpips \\
 		$(PIPS_LIBS) $(PIPS_MALLOC) $(TPIPS_ADDED_LIBS)
+	@test $(ARCH) -eq . || ln -sf $(ARCH)/tpips
 	@echo 
 
 # obsolete rule I guess. test is better. FC.
