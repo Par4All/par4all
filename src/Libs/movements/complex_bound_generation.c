@@ -34,7 +34,7 @@ extern Variable variable_of_rank();
  */
 
 expression complex_bound_generation(coeff1,coeff2,coeff3,exp1,var1,exp2,var2)
-int coeff1,coeff2,coeff3;
+Value coeff1,coeff2,coeff3;
 Pvecteur exp1;
 Variable var1;
 Pvecteur exp2;
@@ -52,10 +52,13 @@ Variable var2;
     debug(8,"complex_bound_generation","begin\n");
     expr1 = make_vecteur_expression(exp1);
     expr2 = make_vecteur_expression(exp2);
-    ex1 = make_integer_constant_expression(ABS(coeff1));
-    ex2 = make_integer_constant_expression(ABS(coeff2));
-    if (coeff3 !=1)
-	ex3 = make_integer_constant_expression(ABS(coeff3));
+    ex1 = make_integer_constant_expression(
+	VALUE_TO_INT(value_abs(coeff1)));
+    ex2 = make_integer_constant_expression(
+	VALUE_TO_INT(value_abs(coeff2)));
+    if (value_notone_p(coeff3))
+	ex3 = make_integer_constant_expression(
+	    VALUE_TO_INT(value_abs(coeff3)));
     lex2 = CONS(EXPRESSION,ex2,NIL);
     ex4 = make_div_expression(expr1,lex2);
     lex2 = CONS(EXPRESSION,ex4,NIL);
@@ -66,7 +69,7 @@ Variable var2;
 
     expr = ex6 = make_op_expression(operateur_add,
 				    CONS(EXPRESSION,ex5,lex2));
-    if (coeff3 !=1) {
+    if (value_notone_p(coeff3)) {
 	lex2 = CONS(EXPRESSION,ex3,NIL);
 	expr= make_div_expression(ex6,lex2);	
     }
@@ -94,13 +97,13 @@ int rank;
 {
 
     Variable right_var,left_var;
-    int right_coeff,right_rank,left_coeff,left_rank;
-    int coeff_l=0;
-    int coeff_r=0;
+    Value right_coeff,left_coeff;
+    int right_rank,left_rank;
+    Value coeff_l=VALUE_ZERO, coeff_r=VALUE_ZERO;
     Variable el_var= variable_of_rank(index_base,rank);
     Pvecteur right_exp,left_exp;
     expression expr;
-    int coeff=0;
+    Value coeff=VALUE_ZERO;
     int sign =0;
 
     debug_on("MOVEMENT_DEBUG_LEVEL");
@@ -116,52 +119,59 @@ int rank;
        coefficient of the variable "el_var" is negative.
        */
 
-    if ((coeff = vect_coeff(el_var,ineq1->vecteur))>0) {
+    if (value_pos_p(coeff = vect_coeff(el_var,ineq1->vecteur))) {
 	right_exp=vect_dup(ineq1->vecteur);
 	left_exp=vect_dup(ineq2->vecteur);  }
     else { 
-	if ((coeff = vect_coeff(el_var,ineq2->vecteur))>0) {
+	if (value_pos_p(coeff = vect_coeff(el_var,ineq2->vecteur))) {
 	    right_exp=vect_dup(ineq2->vecteur);
 	    left_exp=vect_dup(ineq1->vecteur);
 	} 
     }
-    if (coeff>0) {
+    if (value_pos_p(coeff)) {
 	coeff_r = vect_coeff(el_var,right_exp);
 	coeff_l= vect_coeff(el_var,left_exp);
     }
-    vect_chg_coeff(&right_exp,el_var,0);
-    vect_chg_coeff(&left_exp,el_var,0);
+    vect_chg_coeff(&right_exp,el_var,VALUE_ZERO);
+    vect_chg_coeff(&left_exp,el_var,VALUE_ZERO);
 
     if (left_rank > right_rank) {
 	/* computation of the bound expression of the variable of 
 	   higher rank, after el_var, when this variable 
 	   belongs to left_exp */
   
-	vect_chg_coeff(&left_exp,left_var,0);
-	sign = (left_coeff >0) ? 1 :-1;
-	if (sign) {
+	vect_chg_coeff(&left_exp,left_var,VALUE_ZERO);
+	sign = value_sign(left_coeff);
+	if (sign==1) { /* ??? bug? was sign */
 	    vect_chg_sgn(left_exp);
 	    vect_chg_sgn(right_exp);
 	}
 	else
-	    vect_add_elem(&left_exp,TCST,-left_coeff -1);
-	expr = complex_bound_generation(-coeff_l,coeff_r,sign * left_coeff,
-					right_exp,el_var,left_exp,el_var);
+	    vect_add_elem(&left_exp,TCST,
+			  value_uminus(value_plus(left_coeff,VALUE_ONE)));
+	expr = complex_bound_generation(
+	    value_uminus(coeff_l),coeff_r,
+	    value_abs(left_coeff),
+	    right_exp,el_var,left_exp,el_var);
     }
     else {			
 	/* computation of the bound expression of the variable of 
 	   higher rank, after el_var, when this variable 
 	   belongs to right_exp */
-	vect_add_elem(&left_exp,TCST,-coeff_l -1);
-	vect_chg_coeff(&right_exp,right_var,0);
-	sign = (right_coeff >0) ? 1 :-1;
-	if (sign)
+	vect_add_elem(&left_exp,TCST,
+		      value_uminus(value_plus(coeff_l,VALUE_ONE)));
+	vect_chg_coeff(&right_exp,right_var,VALUE_ZERO);
+	sign = value_sign(right_coeff);
+	if (sign==1) /* ??? was sign */
 	    vect_chg_sgn(right_exp);
 	else
-	    vect_add_elem(&right_exp,TCST,-right_coeff -1);
-	expr = complex_bound_generation(-1 * sign* coeff_r,-coeff_l, 
-					sign *right_coeff,
-					left_exp,el_var,right_exp,el_var);
+	    vect_add_elem(&right_exp,TCST,
+			  value_uminus(value_plus(right_coeff,VALUE_ONE)));
+	expr = complex_bound_generation(
+	    value_mult(int_to_value(-sign), coeff_r),
+	    value_uminus(coeff_l), 
+	    value_mult(sign,right_coeff),
+	    left_exp,el_var,right_exp,el_var);
     }
  
     debug(8,"complex_bound_computation","end\n");
