@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compiler-util.c,v $ ($Date: 1994/12/30 16:49:10 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1995/03/22 10:56:55 $, )
  * got on %D%, %T%
  * $Id$
  *
@@ -311,8 +311,7 @@ list lsyn;
     return(result);
 }
 
-/*
- * atomic_accesses_only_p
+/* atomic_accesses_only_p
  * 
  * checks that only atomic accesses to distributed variables are made
  * inside a parallel loop nest, for every iterations.
@@ -322,17 +321,13 @@ list lsyn;
 bool atomic_accesses_only_p(stat)
 statement stat;
 {
-    bool
-	result = TRUE;
-
-    user_warning("atomic_accesses_only_p", 
+    hpfc_warning("atomic_accesses_only_p", 
 		 "not  implemented, returning TRUE\n");
 
-    return(result);
+    return(TRUE);
 }
 
-/*
- * indirections_inside_statement_p
+/* indirections_inside_statement_p
  *
  * ??? this may be checked using the dependences graph, looking for 
  * edges linking two distributed variables inside the loop...
@@ -340,7 +335,7 @@ statement stat;
 bool indirections_inside_statement_p(stat)
 statement stat;
 {
-    user_warning("indirections_inside_statement_p", 
+    hpfc_warning("indirections_inside_statement_p", 
 		 "not implemented yet, returning FALSE\n");
     return(FALSE);
 }
