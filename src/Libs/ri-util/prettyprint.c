@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/11/22 22:22:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/12/17 10:35:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/11/22 22:22:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/17 10:35:01 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -632,7 +632,7 @@ text_entity_declaration(entity module, list ldecl)
     MERGE_TEXTS(r, make_text(area_decl));
 
     /* And lastly, equivalence statements... - BC -*/
-    MERGE_TEXTS(r, text_equivalences(module, ldecl));
+    /* MERGE_TEXTS(r, text_equivalences(module, ldecl)); */
 
     return (r);
 }
@@ -1084,6 +1084,8 @@ statement stmt;
 						  comments));
 	}
     }
+
+    attach_statement_information_to_text(r, stmt);
 
     debug(2, "text_statement", "End for statement %s\n",
 	  statement_identification(stmt));
