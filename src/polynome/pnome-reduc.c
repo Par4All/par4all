@@ -5,10 +5,6 @@
  */
 
 #include <stdio.h>
-/*for debug with dbmalloc */
-/*
-#include <malloc.h>
-*/
 #include <assert.h>
 
 #include "boolean.h"
@@ -136,7 +132,7 @@ float polynome_TCST(pp)
 Ppolynome pp;
 {
     Pmonome pm;
-    Pvecteur pvTCST = vect_new((Variable) TCST, (Value) 1);
+    Pvecteur pvTCST = vect_new((Variable) TCST, VALUE_ONE);
 
     /* polynome_TCST: polynome is undefined */
     assert(!POLYNOME_UNDEFINED_P(pp));
@@ -165,7 +161,7 @@ Ppolynome pp;
     if (POLYNOME_NUL_P(pp)) 
 	return(TRUE);
     else {
-	Pvecteur pvTCST = vect_new((Variable) TCST, (Value) 1);
+	Pvecteur pvTCST = vect_new((Variable) TCST, VALUE_ONE);
 	boolean b = (vect_equal(pvTCST, monome_term(polynome_monome(pp)))
 		     && (polynome_succ(pp) == NIL));
 
