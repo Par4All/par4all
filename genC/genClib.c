@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/01/02 16:40:25 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/01/02 22:45:45 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -202,7 +202,7 @@ struct gen_binding *bp ;
 	    user("Current limit (%d) can be redefined by setting environment "
 		 "variable NEWGEN_MAX_TABULATED_ELEMENTS\n",
 		 max_tabulated_elements());
-	    abort();
+	    exit(1);
 	}
 	if( (Gen_tabulated_[ bp->index ]+i)->p == gen_chunk_undefined ) {
 	    return( bp->alloc = i ) ;
@@ -2139,6 +2139,12 @@ int create_p ;
 	(void) sprintf(buffer, "Getting %d, expecting %d elements\n",
 		       max,  max_tabulated_elements()) ;
 	user( "gen_read_tabulated: %s\n", buffer ) ;
+	if(max > max_tabulated_elements()) {
+	    user("Current limit (%d) can be redefined by setting environment "
+		 "variable NEWGEN_MAX_TABULATED_ELEMENTS\n",
+		 max_tabulated_elements());
+	  exit(1);
+	}
     }
     if( create_p ) {
 	if( Gen_tabulated_[ index = Domains[ domain ].index ] == NULL ) {
