@@ -1,7 +1,8 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/08/31 13:16:17 $, 
+ * $Date: 1996/09/02 18:29:26 $, 
  */
 
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -115,7 +116,7 @@ pc_getcurrentdisplay(void)
  * "${PIPS_ROOT}/Runtime/xpomp/${PIPS_ARCH:-.}"
  * PATH chosen => ""
  */
-#define NAME_MAX_LENGTH 100
+#define NAME_MAX_LENGTH 300
 
 /* environment variables
  */
@@ -240,7 +241,7 @@ int pc_basic_opendisplay(int X,
 		case 0 :    /* child's subprocess */
 		    fprintf(stderr, "executing %s\n", argv[0]);
 		    execvp(argv[0],argv);
-		    _exit(0);
+		    exit(0);
 		}
 		while(sh_h[i]->lock) sigpause(0);
 		pc_depth[i] = sh_h[i]->p1;
@@ -446,54 +447,62 @@ unsigned char *red,*green,*blue;
 }
 
 
-int pc_basic_mouse(screen,X,Y)
-int *X,*Y;
+static int
+pc_basic_mouse(XPOMP_display screen,
+	       int * X,
+	       int * Y,
+	       int * state)
 {
-	struct sh_header *sh;
-	int B;
+    struct sh_header *sh;
+    int B = -1;
 
-	*X = 32;
-	*Y = 48;
-	if(!is_good_desc(&screen)) return -1;
+    /* Default values: */
+    *X = 32;
+    *Y = 48;
+    
+    if(is_good_desc(&screen)) {
 	sh = sh_h[screen];
 	if(!_NO_PROC) {
-		pc_basic_wait_lock(screen);
-		sh->flag = GR_MOUSE;
-		pc_basic_flush(sh);
-		pc_basic_wait_lock(screen);
-		*X = sh->p1;
-		*Y = sh->p2;
-		B = sh->p3;
+	    pc_basic_wait_lock(screen);
+	    sh->flag = GR_MOUSE;
+	    pc_basic_flush(sh);
+	    pc_basic_wait_lock(screen);
+	    *X = sh->p1;
+	    *Y = sh->p2;
+	    B = sh->p3;
+	    *state = sh->p4;
 	}
-	pc_broadcast(X,sizeof(int));
-	pc_broadcast(Y,sizeof(int));
-	pc_broadcast(&B,sizeof(int));
-	return B;
+    }
+    return B;
 }
 
-int pc_basic_ismouse(screen,X,Y)
-int *X,*Y;
-{
-	struct sh_header *sh;
-	int res;
 
-	*X = 32;
-	*Y = 48;
-	if(!is_good_desc(&screen)) return -1;
+static int
+pc_basic_ismouse(XPOMP_display screen,
+		 int * X,
+		 int * Y,
+		 int * state)
+{
+    struct sh_header *sh;
+    int res = -1;
+
+    /* Default values: */
+    *X = 32;
+    *Y = 48;
+    if(is_good_desc(&screen)) {
 	sh = sh_h[screen];
 	if(!_NO_PROC) {
-		pc_basic_wait_lock(screen);
-		sh->flag = GR_ISMOUSE;
-		pc_basic_flush(sh);
-		pc_basic_wait_lock(screen);
-		*X = sh->p1;
-		*Y = sh->p2;
-		res = sh->p3;
+	    pc_basic_wait_lock(screen);
+	    sh->flag = GR_ISMOUSE;
+	    pc_basic_flush(sh);
+	    pc_basic_wait_lock(screen);
+	    *X = sh->p1;
+	    *Y = sh->p2;
+	    *state = sh->p4;
+	    res = sh->p3;
 	}
-	pc_broadcast(X,sizeof(int));
-	pc_broadcast(Y,sizeof(int));
-	pc_broadcast(&res,sizeof(int));
-	return res;
+    }
+    return res;
 }
 
 int pc_basic_drawframe(screen,name,x0,y0,x1,y1)
@@ -605,20 +614,22 @@ XPOMP_set_user_color_map(XPOMP_display screen,
 /* Wait for a mouse click: */
 int
 XPOMP_wait_mouse(XPOMP_display screen,
-		int * X,
-		int * Y)
+		 int * X,
+		 int * Y,
+		 int * state)
 {
-    return pc_basic_mouse(screen, X, Y);
+    return pc_basic_mouse(screen, X, Y, state);
 }
 
 
 /* Just test for a mouse click: */
 int
 XPOMP_is_mouse(XPOMP_display screen,
-	      int * X,
-	      int * Y)
+	       int * X,
+	       int * Y,
+	       int * state)
 {
-    return pc_basic_ismouse(screen, X, Y);
+    return pc_basic_ismouse(screen, X, Y, state);
 }
 
 
@@ -822,9 +833,10 @@ void
 FUNCTION_(xpomp_wait_mouse)(XPOMP_display * screen,
 			    int * X,
 			    int * Y,
+			    int * state,
 			    int * d)
 {
-    *d = XPOMP_wait_mouse(*screen, X, Y);
+    *d = XPOMP_wait_mouse(*screen, X, Y, state);
 }
 
 
@@ -832,9 +844,10 @@ void
 FUNCTION_(xpomp_is_mouse)(XPOMP_display * screen,
 			  int * X,
 			  int * Y,
+			  int * state,
 			  int * d)
 {
-    *d = XPOMP_is_mouse(*screen, X, Y);
+    *d = XPOMP_is_mouse(*screen, X, Y, state);
 }
 
 
