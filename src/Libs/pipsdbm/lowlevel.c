@@ -130,12 +130,14 @@ db_build_file_resource_name(string rname, string oname, string suffix)
 {
     if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;
     free(db_get_directory_name_for_module(oname));/* mkdir as a side effect. */
-    /* the next name must be compatible with the Display script... */       
+    /* the next name must be compatible with the Display script...
+     * it may depend on the builder function maybe (if pipsmake tells)
+     * may include the resource name? as lower letters?
+     */       
     return strdup(concatenate(oname, "/", oname, suffix, 0));
 }
 
 /* allocate a full file name for the given resource.
- * could be switched to a directory maybe. 
  */
 static string
 get_resource_file_name(string rname, string oname)
