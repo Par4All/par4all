@@ -36,9 +36,7 @@
 
 
 
-/*********************************************************************************/
-/* GENERIC INTERPROCEDURAL OUT EFFECTS ANALYSIS                                  */
-/*********************************************************************************/
+/**************************** GENERIC INTERPROCEDURAL OUT EFFECTS ANALYSIS */
 
 
 static statement current_stmt = statement_undefined;
@@ -203,9 +201,9 @@ summary_out_effects_engine(char *module_name)
     return TRUE;
 }
 
-/*********************************************************************************/
-/* GENERIC INTRAPROCEDURAL OUT EFFECTS ANALYSIS                                  */
-/*********************************************************************************/
+
+
+/***************************** GENERIC INTRAPROCEDURAL OUT EFFECTS ANALYSIS */
 
 /* void out_regions_from_unstructured_to_nodes(unstructured u, 
  *                                             transformer c_trans, list l_out)
@@ -255,20 +253,21 @@ out_effects_from_unstructured_to_nodes(unstructured u)
 					 w_r_combinable_p);
 	effects_to_write_effects(l_out_unst);
 	
-	CONTROL_MAP(c, {
+	CONTROL_MAP(c, 
+	{
 	    statement node_stat = control_statement(c);
 	    transformer node_prec = (*load_context_func)(node_stat);
 	    list l_out_node = effects_dup(l_out_unst);
 	    list l_w_node =
 		effects_write_effects_dup(load_rw_effects_list(node_stat));
 	    
-	    l_out_node =
-		(*effects_precondition_composition_op)(l_out_node, node_prec);
-	    l_out_node =
-		(*effects_intersection_op)(l_out_node, l_w_node, w_w_combinable_p);
+	    l_out_node = (*effects_precondition_composition_op)
+		(l_out_node, node_prec);
+	    l_out_node = (*effects_intersection_op)
+		(l_out_node, l_w_node, w_w_combinable_p);
 	    effects_to_may_effects(l_out_node);
 	    store_out_effects_list(node_stat, l_out_node);
-	    effects_free(l_w_node);
+	    /* effects_free(l_w_node); */ /* ??? seems not a good idea... FC */
 	    
 	}, ct, blocs) ;
 		
