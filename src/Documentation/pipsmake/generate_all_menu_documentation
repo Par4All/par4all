@@ -1,8 +1,8 @@
 #
 # Generate various files for the User Manual:
 #
-
-$debug = 0;
+#
+# $debug = 8;
 
 $generate_menu_layout == 0;
 if ($ARGV[0] eq "-layout") {
@@ -65,7 +65,7 @@ while ($PipsMakeRc =~ /%%\@UserManualDocumentation:\s*(\w*)\s*([^ÿ]*)%%ÿUserManu
 
 
 # Parse the aliases that link a full name to a function name:
-while($PipsMakeRcVerbatim =~ /^\s*alias\s+(\w+)\s+'([^']+)'\s*$/mg) {
+while($PipsMakeRcVerbatim =~ /^\s*alias\s+(\w+)\s+\'([^\']+)\'\s*$/mg) {
     if ($debug >= 5) {
         print "*** Alias $1 -> $2\n";
     }
@@ -83,12 +83,12 @@ if ( $generate_menu_layout == 0) {
 
 
 # Parse the function list and the generated output:
-while($PipsMakeRcVerbatim =~ /^\s*(\w+)\s*>\s*MODULE\.(\w+)\s*$/mg) {
+while($PipsMakeRcVerbatim =~ /^\s*(\w+)\s*>\s*(MODULE|CALLERS)\.(\w+)\s*$/mg) {
     if ($debug >= 5) {
-	print "*** function $1 generates $2\n";
+	print "*** function $1 generates $3 ($2)\n";
     }
     # An associative array of arrays:
-    push @{$ressource_is_generated_by{$2}}, $1;
+    push @{$ressource_is_generated_by{$3}}, $1;
 }
 
 # The option menu is derived from the fact that we need to choose
@@ -153,6 +153,9 @@ sub DealWithDeclarations {
     return $the_text;
 }
 
+#
+# let us deal with transformations...
+#
 sub DealWithTransformations {
     local($the_text) = @_;
     if ($debug >= 8) { print '***DealWithTransformations ' . $the_text; }
@@ -161,9 +164,11 @@ sub DealWithTransformations {
     if ($generate_menu_layout == 0) {
 	# Get the documentation of the pseudo-function "TheTransformations"
 	# that describes indeed the concept of transformations:
-	print TheTransformationsMenu $DocFunction{"TheTransformations"};
+	print TheTransformationsMenu 
+	    $DocFunction{"TheTransformations"};
 	# Get the end of the description:
-	print TheTransformationsAtEnd $DocFunction{"TheTransformationsAtEnd"};
+	print TheTransformationsAtEnd 
+	    $DocFunction{"TheTransformationsAtEnd"};
 
 	&InitDocDescription;
 	# Output an unindented description:
@@ -193,7 +198,10 @@ sub DealWithEachTransformation {
     my($function_name) = @_;
     my($this_item, $the_title);
     my($builder_name);
-    if ($debug >= 8) { print "*** Generate \\item documentation for transformation \"$function_name\".\n"; }
+    if ($debug >= 8) { 
+	print "*** Generate \\item documentation for transformation \"$function_name\".\n"; 
+    }
+    
     if ($function_name ne "x") {
 	if (! defined $DocFunction{$function_name}) {
 	    die "Can't find the documentation for the \"$function_name\" transformation function.";
@@ -211,12 +219,15 @@ sub DealWithEachTransformation {
 	$the_title = "";
 	$builder_name = "\"\"";
     }
+
     if ($generate_menu_layout == 0) {
 	AddItemDocDescription(0, $the_title, $function_name);
     }
     else {
-	print TheWpipsTransformationMenuLayout "{ \"$the_title\", $builder_name },\n";
-	print TheEpipsTransformationMenuLayout "\t(\"$the_title\")\n";
+	print TheWpipsTransformationMenuLayout 
+	    "{ \"$the_title\", $builder_name },\n";
+	print TheEpipsTransformationMenuLayout 
+	    "\t(\"$the_title\")\n";
     }
     return "";
 }
