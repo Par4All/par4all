@@ -4,10 +4,10 @@
    Ronan Keryell.
    */
 
-/* 	%A% ($Date: 1997/07/21 11:08:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/23 22:41:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1997/07/21 11:08:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1997/09/23 22:41:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -141,24 +141,25 @@ void
 remove_unreachable_following_control(control c,
 				     control entry_node)
 {
+    /* If this is the entry node: stop deleting: */
+    if (c == entry_node)
+	return;
+    /* If this is not or no more a sequence, stop deleting: */
+    if (gen_length(control_predecessors(c)) <= 1)
+	return;
     /* If there is a FORMAT inside a control node, just stop deleting
        the control nodes: */
     if (format_inside_statement_p(control_statement(c)))
 	return;
     
-    /* For each successor of c: */
+    /* Ok, we can delete. For each successor of c: */
     MAP(CONTROL, a_successor, {
-	if (a_successor != entry_node
-	    && gen_length(control_predecessors(a_successor)) <= 1)
-	    /* If there is no more than 1 predecessor, we can remove
-	       down this way: */
-	    remove_unreachable_following_control(a_successor, entry_node);
-	else
-	    /* Just remove any predecessor reference of itself in
-	       this successor: */
-	    gen_remove(&control_predecessors(a_successor), c);
+	remove_unreachable_following_control(a_successor, entry_node);
+	/* Remove any predecessor reference of itself in this
+	   successor: */
+	gen_remove(&control_predecessors(a_successor), c);
     }, control_successors(c));
-
+    /* Discard the control node itself: */
     gen_free_list(control_predecessors(c));
     control_predecessors(c) = NIL;
     gen_free_list(control_successors(c));
