@@ -391,33 +391,130 @@ Variable var;
     return(in_base);
 }
 
-
+/* qsort() is not safe if the comparison function is not antisymmetric.
+ * It wanders out of the array to be sorted. It's a pain to debug.
+ * Let's play safe.
+ */
 int
 vect_lexicographic_compare(Pvecteur v1, Pvecteur v2, 
 			   int (*compare)(Pvecteur*, Pvecteur*))
 {
+    int cmp12 = 0;
+    int cmp21 = 0;
+
+    cmp12 = vect_lexicographic_unsafe_compare(v1, v2, compare);
+    cmp21 = vect_lexicographic_unsafe_compare(v2, v1, compare);
+
+    assert(cmp12 == -cmp21);
+
+    return cmp12;
+}
+
+/* This function is a trade-off between a real lexicographic sort
+ * and a prettyprinting function.
+ *
+ * A lot of problems arise because 0 is not represented. It's
+ * hard to compare I==0 and I==1 because they do not have the
+ * same numbers of sparse components.
+ */
+int
+vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2, 
+			   int (*compare)(Pvecteur*, Pvecteur*))
+{
     /* it is assumed that vectors v1 and v2 are already
-       lexicographically sorted */
+       lexicographically sorted, according to the same lexicographic ordre.
+       The constant term should always be the last one. */
     int cmp = 0;
+    int cmp2 = 0;
     Pvecteur pv1 = VECTEUR_UNDEFINED;
     Pvecteur pv2 = VECTEUR_UNDEFINED;
 
+    /*
+    fprintf(stderr,"vect_lexicographic_unsafe_compare: v1 = ");
+    vect_dump(v1);
+    fprintf(stderr,"vect_lexicographic_unsafe_compare: v2 = ");
+    vect_dump(v2);
+    */
+
     for(pv1 = v1, pv2 = v2; 
-	!VECTEUR_UNDEFINED_P(pv1) && !VECTEUR_UNDEFINED_P(pv2) && cmp == 0;
+	!VECTEUR_UNDEFINED_P(pv1) && !VECTEUR_UNDEFINED_P(pv2) && cmp == 0
+	&& !term_cst(pv1) && !term_cst(pv2);
 	pv1 = pv1->succ, pv2= pv2->succ) {
+
+	/*
+	if(term_cst(pv1) && !term_cst(pv2))
+	    cmp = -1;
+	else if(term_cst(pv1) && term_cst(pv2))
+	    cmp = 0;
+	else if(term_cst(pv2))
+	    cmp = 1;
+	else
+	    cmp = compare(&pv1, &pv2);
+	    */
+
 	cmp = compare(&pv1, &pv2);
+
+	if(cmp==0) {
+	    /* if same coordinate, use coefficient, but only for
+	     the last coordinate */
+	    cmp2 = ABS(vecteur_val(pv1)) - ABS(vecteur_val(pv2));
+	}
     }
 
+    if(cmp==0)
+	cmp = cmp2;
+
     if(VECTEUR_UNDEFINED_P(pv1))
-	if(VECTEUR_UNDEFINED_P(pv2))
+	if(VECTEUR_UNDEFINED_P(pv2)) {
+	    /* cmp is left unchanged */
 	    ;
-	else
-	    cmp = 1;
-    else
-	if(VECTEUR_UNDEFINED_P(pv2))
+	}
+        else if(cmp == 0 && term_cst(pv2)) {
+	    cmp = - ABS(vecteur_val(pv2));
+	}
+	else if(cmp == 0) {
 	    cmp = -1;
-	else
-	    assert(cmp!=0);
+	}
+	else {
+	    ;
+	}
+    else {
+	if(VECTEUR_UNDEFINED_P(pv2)) {
+	    if(cmp == 0 && term_cst(pv1)) {
+		cmp = ABS(vecteur_val(pv1));
+	    }
+	    else if(cmp == 0) {
+		cmp = 1;
+	    }
+	    else {
+		;
+	    }
+	}
+	else {
+	    if(cmp==0) {
+		if(term_cst(pv1) && term_cst(pv2)) {
+		    cmp = ABS(vecteur_val(pv1)) - ABS(vecteur_val(pv2));
+		}
+		else if(term_cst(pv1) && !term_cst(pv2)) {
+		    cmp = -1;
+		}
+		else if(!term_cst(pv1) && term_cst(pv2)) {
+		    cmp = 1;
+		}
+		else {
+		    assert(FALSE);
+		}
+	    }
+	    else {
+		/* Should be the standard case for long constraints */
+		;
+	    }
+	}
+    }
+
+    /* 
+    fprintf(stderr,"vect_lexicographic_unsafe_compare: %d\n", cmp);
+    */
 
     return cmp;
 }
