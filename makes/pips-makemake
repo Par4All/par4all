@@ -1,0 +1,379 @@
+#! /bin/sh
+
+# Automatic generation of Makefile for the PIPS project
+#
+# Options:
+#  -l: makes makefile(s) for *library(ies)*
+#  -p: makes makefile(s) for *pass(es)*
+#  -D: makes makefile(s) for *development*
+#  -P: makes makefile(s) for *production*
+#  -c: makes a makefile in *current* directory
+#  -a: makes one makefile in *all* possible directories according to other 
+#      options (ie. with options -lDa: all libraries in development)
+#
+# Remi Triolet, Bruno Baron
+
+# Modifications:
+#   bb, 3.7.91:
+# - MAIN_LIBS -> PIPS_LIBS
+#   bb, 23.10.91:
+# - entry "all" for libraries no more depends on $(BIN_TARGET)
+# - entry $(TARGET)-local.h was created
+# - $(INC_TARGET) now depends on $(TARGET)-local.h
+# - install now depends on $(INC_TARGET). Corresponding building commands 
+#   were suppressed. install for libraries no more depends on $(BIN_TARGET).
+#   $(INC_TARGET), $(OBJECTS), $(LIB_TARGET) and $(BIN_TARGET) are no more
+#   copied to $(TARGETDIR). 
+# - quick-install: $(INC_TARGET) is now simply copied in $INCLUDEDIR . 
+#   $BIN_TARGET is no more copied in $BINDIR for libraries.
+# - entry "depend" now depends on $(INC_TARGET), in order to make sure that 
+#   dependences are computed toward local $(INC_TARGET) (in contrary to 
+#   $INCLUDEDIR/$(INC_TARGET) ).
+#   bb, 4.02.91:
+# - entry "depend": added "s/^		*\$\$//;" (double TAB) in front of
+#   sed string. This way, lines only consisting of TABs are replaced by 
+#   an empty line (for RS6000).
+#   bb, 11.02.92:
+# - impossible to install when redundant libraries in current directory,
+#   to force people to remove symbolic links.
+# - $CONFIG_FILE installed
+# - "production-depend" created and "depend" changed to use production-depend.
+# - at the end, make depend or make production-depend, depending on -D or -P
+#   bb, 17.04.92
+# - added entry $(BINDIR) for installation on new systems.
+#   bb, 22.04.92
+# - added entry .INIT
+# - $(INC_TARGET) uses $(LIB_CFILES) instead of $(CFILES) to avoid
+#   multiple declaration of main(), one per library; this is not to
+#   good, because this part of pips-makemake is used by option -l and -p
+#   fi, 18.07.92
+# - $(INC_TARGET) uses $(TARGET_CFILES) instead of $(LIB_CFILES) with option -p
+#   fi, rk, 18.01.93
+# - use "cproto $(CPPFLAGS)" instead of "make-extern"; fi, 19.01.93
+# - pipe cproto with sed command because cproto does not seem to handle varargs properly
+#   fi, 20.01.93
+# - use $(INC_TARGET).tmp as a temporary file because $(INC_TARGET) is used as an input
+#   for itself via the inclde; this problem did not show up before because the pipes
+#   introduce a long enough delay but for huge libraries like ri-util; fi, 02/02/93
+# - add calls to SCCS to maintain a version history in Production; the return code
+#   for "sccs deledit" is -1 although evrything works fine; this is corrected via
+#   a dummy shell IF; FI, RK, 28.06.93
+#
+# wish:
+#
+USAGE="Usage: $0 -l|p [-D|P] [-c|a] (default -D -c)"
+
+MAKEFILE=Makefile
+CONFIG_FILE=config.makefile
+
+LIBRARY=""
+PASS=""
+PRODUCTION=""
+ALL=""
+
+while getopts lpDPca opt
+do
+	case $opt in
+	l)	LIBRARY=TRUE;;
+	p)	PASS=Passes;;
+	D)	PRODUCTION="";;
+	P)	PRODUCTION=$PRODDIR/Src;;
+	c)	ALL="";;
+	a)	ALL=TRUE;;
+	\?)	echo $USAGE >&2
+		exit 2;;
+	esac
+done
+shift `expr $OPTIND - 1`
+if [ $# -ge 1 ]
+then
+	echo $USAGE >&2
+	exit 2
+fi
+
+if [ \( -n "$LIBRARY" -a -n "$PASS" \) \
+    -o \( -z "$LIBRARY" -a -z "$PASS" \) ]
+then
+	echo $USAGE >&2
+	exit 2
+fi
+
+if [ -z "$ALL" ]
+then
+	DIRS="."
+else
+	DIRS="${PRODUCTION:-$DEVEDIR}/${PASS:-Lib}/*"
+fi
+
+
+### main loop
+for dir in $DIRS
+do
+( cd $dir
+
+if [ ! -f $CONFIG_FILE ] ; then
+   echo "Error $0: cannot find $CONFIG_FILE in $dir; abandon" >&2
+else
+### good case
+echo make $MAKEFILE in $dir
+
+if [ -f $MAKEFILE ] ; then
+   cp $MAKEFILE $MAKEFILE.old
+   rm -f $MAKEFILE
+fi
+
+cat >> $MAKEFILE <<%
+#	---------------------------------------------------------------
+#	---------------------------------------------------------------
+#
+#				    Warning
+#
+#		  This makefile has been automatically generated
+#
+#			       Do not modify it
+#
+#        You can modify the file $CONFIG_FILE in the same directory
+#
+#	---------------------------------------------------------------
+#	---------------------------------------------------------------
+#
+# Copyright (C) Ecole des Mines De Paris
+#               Centre d'Automatique et Informatique
+#               Section Informatique
+#
+# This file is part of PIPS
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY.  No author or distributor accepts responsibility to anyone for
+# the consequences of using it or for whether it serves any particular
+# purpose or works at all, unless he says so in writing.
+%
+
+
+cat >> $MAKEFILE $CONFIG_FILE 
+
+cat >> $MAKEFILE <<% 
+#
+COMPILE=	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+LINK=		$(LD) $(LDFLAGS) -o
+SCAN=		$(LEX) $(LFLAGS) -t
+TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
+PARSE=		$(YACC) $(YFLAGS)
+ARCHIVE=	$(AR) $(ARFLAGS)
+#
+CONFIG_FILE=	$CONFIG_FILE
+MAKEFILE=	$MAKEFILE
+#
+LIB_TARGET=	lib$(TARGET).a
+BIN_TARGET=	$(TARGET)
+INC_TARGET=	$(TARGET).h
+#
+%
+
+if [ "$LIBRARY" ] ; then
+cat >> $MAKEFILE <<% 
+#
+CFILES=		$(MAIN).c $(LIB_CFILES)
+OBJECTS=	$(MAIN).o $(LIB_OBJECTS)
+INCLUDES=	$(LIB_HEADERS)
+SOURCES= 	$(MAKEFILE) $(CONFIG_FILE) $(INCLUDES) $(CFILES)
+#
+TARGETDIR=	$(LIBSRCDIR)/$(TARGET)
+#
+all: $(LIB_TARGET)
+
+.INIT:
+	@if test -n "$(PIPS_CHECK_OS)"; \\
+	then echo "Cannot run make under this OS release"; \\
+	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
+	fi
+
+test: all $(DEVEDIR)/Passes/pips/pips.o
+	$(LINK) pips $(DEVEDIR)/Passes/pips/pips.o $(PIPS_LIBS)
+
+$(LIB_TARGET): $(LIB_OBJECTS)
+	rm -f $(LIB_TARGET)
+	$(ARCHIVE) $(LIB_TARGET) \`lorder $(LIB_OBJECTS) | tsort\`
+	ranlib $(LIB_TARGET)
+
+$(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
+	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS)
+
+install: $(INC_TARGET) $(LIB_TARGET)
+	@if test \`ls *.a | wc -w\` -gt 1 ; then echo install failed: additional local libraries prevent it >&2; exit 1; fi
+	rm -f $(TARGETDIR)/* pips
+	if [ ! -d $(TARGETDIR) ] ; \\
+	then mkdir $(TARGETDIR) ; \\
+	fi
+	cp $(SOURCES) $(TARGETDIR)
+	echo ""; echo; \\
+	echo -n "Description of changes: " ; \\
+	read comments ;\\
+	cd $(TARGETDIR) ; \\
+	for module in $(SOURCES) ;\\
+	do \\
+		if [ ! -f SCCS/s.\$\$module ] ;\\
+		then \\
+			echo sccs create \$\$module;  \\
+			sccs create \$\$module;  \\
+			sccs edit \$\$module; \\
+			if cmp -s ,\$\$module \$\$module ; \\
+			then echo sccs properly initialized for \$\$module ; \\
+				rm ,\$\$module ; \\
+			else echo sccs failed with \$\$module ; \\
+				exit 1; \\
+			fi ; \\
+		else \\
+			echo sccs -y\"\$\$comments\" deledit \$\$module; \\
+			if sccs deledit -y"\$\$comments" \$\$module; \\
+			then echo sccs deledit succeeded; \\
+			else status=\$\$? ; \\
+				if [ \$\$status -eq 255 ] ; \\
+					then echo sccs deledit return code \$\$status ; \\
+					else echo sccs deledit unusual return code \$\$status ; \\
+						exit 1; \\
+				fi ; \\
+			fi ; \\
+		fi ;\\
+	done
+	$(MAKE) quick-install
+
+quick-install:
+	cp $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
+	cp $(LIB_TARGET) $(LIBDIR)
+	ranlib $(LIBDIR)/$(LIB_TARGET)
+
+$(LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
+	cp $(LIB_TARGET) $(LIBDIR)
+	ranlib $(LIBDIR)/$(LIB_TARGET)
+
+$(BINDIR)/$(BIN_TARGET): $(BIN_TARGET)
+	cp $(BIN_TARGET) $(BINDIR)
+
+clean:
+	-rm -f TAGS $(OBJECTS) $(INC_TARGET) $(LIB_TARGET) $(BIN_TARGET) $(DERIVED_HEADERS) *.~[0-9]~
+
+$(TARGET)-local.h:
+	if [ ! -f $(TARGET)-local.h ] ; then touch $(TARGET)-local.h ; fi
+
+$(INC_TARGET): $(TARGET)-local.h
+	$(UTILDIR)/cproto $(CPPFLAGS) $(LIB_CFILES) \\
+		| sed -e 's/int __builtin_va_alist//' \\
+		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
+	mv $(INC_TARGET).tmp $(INC_TARGET)
+
+%
+else
+# ie. for Passes 
+cat >> $MAKEFILE <<% 
+#
+CFILES=		$(TARGET_CFILES)
+OBJECTS=	$(TARGET_OBJECTS)
+INCLUDES=	$(TARGET_HEADERS)
+SOURCES= 	$(MAKEFILE) $(CONFIG_FILE) $(INCLUDES) $(CFILES)
+#
+TARGETDIR=	$(BINSRCDIR)/$(TARGET)
+#
+.INIT:
+	@if test -n "$(PIPS_CHECK_OS)"; \
+	then echo "Cannot run make under this OS release"; \
+	     echo "$(PIPS_CHECK_OS)"; exit 1; \
+	fi
+
+$(BIN_TARGET): $(OBJECTS)
+	$(LINK) $(BIN_TARGET) $(OBJECTS) $(TARGET_LIBS)
+
+install: $(INC_TARGET) $(BIN_TARGET)
+	@if test \`ls *.a | wc -w\` -gt 1 ; then echo install failed: additional local libraries prevent it >&2; exit 1; fi
+	rm -f $(TARGETDIR)/*
+	if [ ! -d $(TARGETDIR) ] ; \\
+	then mkdir $(TARGETDIR) ; \\
+	fi
+	cp $(SOURCES) $(TARGETDIR)
+	echo ""; echo; \\
+	echo -n "Description of changes: " ; \\
+	read comments ;\\
+	cd $(TARGETDIR) ; \\
+	for module in $(SOURCES) ;\\
+	do \\
+		if [ ! -f SCCS/s.\$\$module ] ;\\
+		then \\
+			echo sccs create \$\$module;  \\
+			sccs create \$\$module;  \\
+			sccs edit \$\$module; \\
+			if cmp -s ,\$\$module \$\$module ; \\
+			then echo sccs properly initialized for \$\$module ; \\
+				rm ,\$\$module ; \\
+			else echo sccs failed with \$\$mocule ; \\
+				exit 1; \\
+			fi ; \\
+		else \\
+			echo sccs -y\"\$\$comments\" deledit \$\$module; \\
+			if sccs deledit -y"\$\$comments" \$\$module; \\
+			then echo sccs deledit succeeded; \\
+			else status=\$\$? ; \\
+				if [ \$\$status -eq 255 ] ; \\
+					then echo sccs deledit return code \$\$status ; \\
+					else echo sccs deledit unusual return code \$\$status ; \\
+						exit 1; \\
+				fi ; \\
+			fi ; \\
+		fi ;\\
+	done
+	$(MAKE) quick-install
+
+$(BINDIR):
+	mkdir $(BINDIR)
+
+quick-install: $(BINDIR)
+	cp $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
+	cp $(BIN_TARGET) $(BINDIR)
+
+$(BINDIR)/$(BIN_TARGET): $(BIN_TARGET) $(BINDIR)
+	cp $(BIN_TARGET) $(BINDIR)
+
+clean:
+	-rm -f TAGS $(OBJECTS) $(BIN_TARGET) $(INC_TARGET) $(DERIVED_HEADERS) *.~[0-9]~
+
+$(TARGET)-local.h:
+	if [ ! -f $(TARGET)-local.h ] ; then touch $(TARGET)-local.h ; fi
+
+$(INC_TARGET): $(TARGET)-local.h
+	$(UTILDIR)/cproto $(CPPFLAGS) $(TARGET_CFILES) \\
+		| Sed -e 's/int __builtin_va_alist//' \\
+		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
+	mv $(INC_TARGET).tmp $(INC_TARGET)
+
+%
+fi
+
+cat >> $MAKEFILE <<%
+#
+lint:
+	$(TYPECHECK) $(CFILES) | sed '/possible pointer alignment/d;/gen_alloc/d'
+
+TAGS: $(INCLUDES) $(CFILES)
+	etags $(INCLUDES) $(CFILES)
+
+depend: $(INC_TARGET) production-depend
+
+production-depend: $(DERIVED_HEADERS) $(EXTERN)
+	sed -n -e 's/^		*\$\$//; 1,/^### DO NOT DELETE THIS LINE./p;' < $(MAKEFILE) > $(MAKEFILE).new
+	-for file in $(CFILES) ; do /lib/cpp $(CPPFLAGS) -M \$\$file >> $(MAKEFILE).new; done;
+	cp $(MAKEFILE).new $(MAKEFILE)
+	rm -f $(MAKEFILE).new
+
+### DO NOT DELETE THIS LINE. USED FOR MAKE DEPEND
+%
+
+make -s -f $MAKEFILE ${PRODUCTION:+production-}depend
+
+### end good case
+fi
+
+echo
+
+)
+
+### end main loop
+done
