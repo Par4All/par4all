@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.154  2001/10/29 10:08:24  nguyen
+%% Table of contents + Add comments for array bound checking
+%%
 %% Revision 1.153  2001/09/24 15:13:03  irigoin
 %% Property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT added
 %%
@@ -157,8 +160,8 @@
 %%
 
 \documentclass[a4paper]{article}
-\usepackage{alltt,html,fancybox,amstext,xspace,psfig}
-
+%\usepackage{alltt,html,fancybox,amstext,xspace,psfig}
+\usepackage{psfig,amstext,alltt,html}
 \title{Properties \\
     Low Level Tuning of PIPS}
 \author{Lei Zhou \hspace{2cm} 
@@ -169,7 +172,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2001/09/24 15:13:03 $~$
+$~$Date: 2001/10/29 10:08:24 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -202,6 +205,7 @@ $~$Date: 2001/09/24 15:13:03 $~$
 \begin{document}
 \thispagestyle{empty}
 
+
 \maketitle
 
 % \begin{abstract}
@@ -210,6 +214,14 @@ $~$Date: 2001/09/24 15:13:03 $~$
 %%
 %% INTRO
 %%
+
+
+\begin{latexonly}
+  \clearpage
+  \tableofcontents  
+\end{latexonly}
+
+\newpage
 
 \section*{Introduction}
 
@@ -264,14 +276,6 @@ implement Feautrier's method.
 
 Virtually every PIPS programmer contributed some lines in this
 report. Inconsistencies are likely. Please report them to the PIPS team!
-
-
-\newpage
-
-\tableofcontents
-
-\newpage
-
 
 %%
 %% GLOBAL
@@ -525,7 +529,7 @@ PARSER_WARN_FOR_COLUMNS_73_80   TRUE
 \index{PARSER\_ACCEPT\_ANSI\_EXTENSIONS}
 \index{correctness}
 
-PIPS has been initially developped to parse correct Fortran compliant
+PIPS has been initially developed to parse correct Fortran compliant
 programs only. Real applications use lots of ANSI extensions... and they
 are not always correct! To make sure that PIPS output is correct, the
 input code should be checked against ANSI extensions using property 
@@ -1662,44 +1666,44 @@ statistics displaying:
 DEAD_CODE_DISPLAY_STATISTICS TRUE
 \end{verbatim}
 
+% NN : Are these properties used ? 
 
+%\subsection{Trivial Test Elimination}
+%\index{Trivial Test}
+%\index{TRIVIAL\_TEST\_DISPLAY\_STATISTICS}
 
-\subsection{Trivial Test Elimination}
-\index{Trivial Test}
-\index{TRIVIAL\_TEST\_DISPLAY\_STATISTICS}
-
-Since it is useful to display statistics on what has been found
-useless and removed in a program, this property is used to ask for
-statistics displaying:
-\begin{verbatim}
-TRIVIAL_TEST_DISPLAY_STATISTICS TRUE
-\end{verbatim}
-
-
-
-\subsection{Declaration Common Adding}
-\index{Declaration Common}
-\index{DECLARATION\_COMMON\_DISPLAY\_STATISTICS}
-
-Since it is useful to display statistics on what has been found
-useless and removed in a program, this property is used to ask for
-statistics displaying:
-\begin{verbatim}
-DECLARATION_COMMON_DISPLAY_STATISTICS TRUE
-\end{verbatim}
+%Since it is useful to display statistics on what has been found
+%useless and removed in a program, this property is used to ask for
+%statistics displaying:
+%\begin{verbatim}
+%TRIVIAL_TEST_DISPLAY_STATISTICS TRUE
+%\end{verbatim}
 
 
 
-\subsection{Declaration Table Normalization}
-\index{Declaration Table}
-\index{DECLARATION\_TABLE\_DISPLAY\_STATISTICS}
+%\subsection{Declaration Common Adding}
+%\index{Declaration Common}
+%\index{DECLARATION\_COMMON\_DISPLAY\_STATISTICS}
 
-Since it is useful to display statistics on what has been found
-useless and removed in a program, this property is used to ask for
-statistics displaying:
-\begin{verbatim}
-DECLARATION_TABLE_DISPLAY_STATISTICS TRUE
-\end{verbatim}
+%Since it is useful to display statistics on what has been found
+%useless and removed in a program, this property is used to ask for
+%statistics displaying:
+%\begin{verbatim}
+%DECLARATION_COMMON_DISPLAY_STATISTICS TRUE
+%\end{verbatim}
+
+
+
+%\subsection{Declaration Table Normalization}
+%\index{Declaration Table}
+%\index{DECLARATION\_TABLE\_DISPLAY\_STATISTICS}
+
+%Since it is useful to display statistics on what has been found
+%useless and removed in a program, this property is used to ask for
+%statistics displaying:
+%\begin{verbatim}
+%DECLARATION_TABLE_DISPLAY_STATISTICS TRUE
+%\end{verbatim}
 
 
 
@@ -1859,7 +1863,8 @@ TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
 
 Array bounds checking refers to determining whether all array reference
 are within their declared range in all of its uses in a program. Here are
-array bounds checking options for the instrumentation of the code.
+array bounds checking options for code instrumentation, in order to
+compute the number of bound checks added.
 
 \begin{verbatim}
 INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
@@ -1906,7 +1911,7 @@ generates large source files. It may be turned off.
 
 Note that the statement number is {\em not} related to the line
 number. Two statements on the same line have different statement
-numbers. A multiline statement only has one number. See \Pri{}.
+numbers. A multi-line statement only has one number. See \Pri{}.
 
 \begin{verbatim}
 PRETTYPRINT_STATEMENT_NUMBER TRUE 
