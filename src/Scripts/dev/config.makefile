@@ -33,6 +33,8 @@ forward:
 	$(COPY) forward_gnu_makefile ${PIPS_SRCDIR}/Runtime/Makefile
 	$(COPY) forward_gnu_makefile ${NEWGEN_DEVEDIR}/Makefile
 	$(COPY) forward_gnu_makefile ${NEWGEN_SRCDIR}/Makefile
+	$(COPY) forward_gnu_makefile ${LINEAR_DEVEDIR}/Makefile
+	$(COPY) forward_gnu_makefile ${LINEAR_SRCDIR}/Makefile
 
 # that is all
 #
