@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 11:44:19 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 11:52:43 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -405,7 +405,7 @@ clobber: clean
 [ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Linear' ] && cat >> $MAKEFILE <<% 
 #
 clean-compiled:
-    $(RM) $(OBJECTS) $(LIB_TARGET) $(BIN_TARGET) 
+	$(RM) $(OBJECTS) $(LIB_TARGET) $(BIN_TARGET) 
 
 clean: generate_makefile_if_necessary_and_possible clean-compiled
 	-$(RM) TAGS $(BIN_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
@@ -442,7 +442,7 @@ $(BIN_TARGET): $(INC_TARGET) $(LIB_TARGET)
 	@echo 
 
 clean-compiled:
-    $(RM) $(OBJECTS) $(LIB_TARGET) $(BIN_TARGET) 
+	$(RM) $(OBJECTS) $(LIB_TARGET) $(BIN_TARGET) 
 
 clean: clean-compiled
 	-$(RM) TAGS $(INC_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
