@@ -87,7 +87,7 @@ append_icfg_file(text t, string module_name)
 
     while ((buf=safe_readline(f_called))) 
     {
-	append_marged_text(t, current_stmt, buf, "");
+	append_marged_text(t, current_margin, buf, "");
         free(buf);
     }
     
@@ -224,6 +224,7 @@ loop_rewrite (loop l)
     if ((text_in_loop_p || text_in_do_p) && print_do_loops) 
     {
 	append_marged_text(t, current_margin, st_DO " ", 
+			   entity_local_name(loop_index(l)));
     }
 
     /* Print the text inside the loop
@@ -442,8 +443,7 @@ print_module_icfg(entity module)
     make_icfg_map();
     make_current_stmt_stack();
 
-    ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					    strdup(module_name)));
+    append_marged_text(txt, 0, module_name, "");
 
     current_margin = ICFG_SCAN_INDENT;
 
