@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1996/06/06 18:26:21 $, 
+ * $Date: 1996/06/08 15:04:19 $, 
  */
 
 #include "defines-local.h"
@@ -103,28 +103,26 @@ static char *reduction_name(kind)
 int kind;
 {
     static char *reduction_names[] = {"MAX", "MIN", "SUM"};
-
     pips_assert("valid kind", kind>=0 && kind<3);
-
     return(reduction_names[kind-1]);
 }
 
-/* entity make_reduction_function(prefix, ndim, kind, base, nargs)
- *
- * find or create an entity for the reduction function...
+/* find or create an entity for the reduction function...
  */
-entity make_reduction_function(prefix, ndim, kind, base, nargs)
-string prefix;
-int ndim, kind;
-basic base;
-int nargs;
+static entity 
+make_reduction_function(
+    string prefix,
+    int ndim,
+    int kind,
+    basic base,
+    int nargs)
 {
     char buffer[100];
 
     (void) sprintf(buffer, "%sRED_%d_%s_%s",
 		   prefix, ndim, pvm_what_options(base), reduction_name(kind));
 
-    return(MakeRunTimeSupportFunction(buffer, nargs, basic_tag(base)));
+    return MakeRunTimeSupportFunction(buffer, nargs, basic_tag(base));
 }
 
 /* bool compile_reduction(initial, phost, pnode)
@@ -135,26 +133,15 @@ int nargs;
 bool compile_reduction(initial, phost, pnode)
 statement initial, *phost, *pnode;
 {
-    instruction
-	i = statement_instruction(initial);
-    list
-	args = NIL;
-    expression
-	ref = expression_undefined,
-	cll = expression_undefined;
-    call
-	reduction = call_undefined;
-    t_reduction 
-	*red ;
+    instruction	i = statement_instruction(initial);
+    list args = NIL;
+    expression ref, cll;
+    call reduction;
+    t_reduction *red ;
     basic b;
-    int	
-	dim = 0,
-	arraynum = -1;
+    int	dim = 0, arraynum = -1;
     list largs = NIL;
-    entity
-	array = entity_undefined,
-	hostfunction = entity_undefined, 
-	nodefunction = entity_undefined;
+    entity array, hostfunction, nodefunction;
 
     pips_assert("assignment",
 		(instruction_call_p(i) && 
@@ -207,33 +194,149 @@ statement initial, *phost, *pnode;
 }
 
 /******************************************** REDUCTION DIRECTIVE HANDLING */
+/* hpfc_reductions =
+ *     initial:entity x replacement:entity x operator:reduction ;
+ * reduction = { min , max , sum , prod , and , or } ; 
+ */
+
+/* looking for the reduction operator is a basic recursion. no check. 
+ */
+DEFINE_LOCAL_STACK(current_call, call)
+static entity searched_variable;
+static tag found_operator;
+
+static bool ref_filter(reference r)
+{
+    entity fun;
+
+    if (searched_variable!=reference_variable(r)) return FALSE;
+
+    /* get the call just above -- well, what about intermediate casts ??? */
+    fun = call_function(current_call_head()); 
+
+    if (ENTITY_PLUS_P(fun)||ENTITY_MINUS_P(fun)) 
+	found_operator=is_reduction_sum;
+    else if (ENTITY_MULTIPLY_P(fun)) 
+	found_operator=is_reduction_prod;
+    else if (ENTITY_MIN_P(fun)||ENTITY_MIN0_P(fun))
+	found_operator=is_reduction_min;
+    else if (ENTITY_MAX_P(fun)||ENTITY_MAX0_P(fun))
+	found_operator=is_reduction_max;
+    else if (ENTITY_AND_P(fun))
+	found_operator=is_reduction_and;
+    else if (ENTITY_OR_P(fun))
+	found_operator=is_reduction_or;
+
+    return FALSE;
+}
+
+static reduction get_operator(entity e, statement s)
+{
+    make_current_call_stack();
+    found_operator = tag_undefined;
+    searched_variable = e;
+    gen_multi_recurse(s,
+		      call_domain, current_call_filter, current_call_rewrite,
+		      reference_domain, ref_filter, gen_null,
+		      NULL);
+    free_current_call_stack();
+
+    pips_assert("some operator found", found_operator!=tag_undefined);
+    return make_reduction(found_operator, UU);
+}
+
+/* finally, I can do without replacement:
+ * the host keeps and contributes the initial value! 
+ */
+static hpfc_reductions reduction_of_in(entity e, statement s)
+{
+    pips_assert("reduction variable is a scalar", entity_scalar_p(e));
+    pips_debug(5, "considering scalar %s in 0x%x\n", 
+	       entity_name(e), (unsigned int) s);
+
+    return make_hpfc_reductions(e, entity_undefined, get_operator(e, s));
+}
 
 list /* of hpfc_reductions */
 handle_hpf_reduction(statement s)
 {
-    /* list le = entities_list(load_hpf_reductions(s)); */
+    list /* of hpfc_reductions */ lr = NIL;
 
-    return NIL;
+    MAP(ENTITY, e, 
+	lr = CONS(HPFC_REDUCTIONS, reduction_of_in(e, s), lr),
+	entities_list(load_hpf_reductions(s)));
+
+    return lr;
 }
 
-/* replacement = identity
+/* for reduction directive:
+ */
+static string new_reduction_name(reduction op)
+{
+    if (reduction_sum_p(op)) 
+	return "SUM";
+    else if (reduction_prod_p(op))
+	return "PROD";
+    else if (reduction_min_p(op))
+	return "MIN";
+    else if (reduction_max_p(op))
+	return "MAX";
+    else if (reduction_and_p(op))
+	return "AND";
+    else if (reduction_or_p(op))
+	return "OR";
+    else
+	pips_internal_error("unexpected reduction tag (%d)\n",
+			    reduction_tag(op));
+
+    return "unknown";
+}
+
+/* name is {H,N}{PRE,POST}_{SUM,PROD,MIN,...}_{REAL4,INTERGER4,...}
+ */
+static entity 
+make_new_reduction_function(
+    reduction op,
+    bool prolog,
+    bool host,
+    basic base)
+{
+    char buffer[100];
+
+    (void) sprintf(buffer, "%s", concatenate
+	     (host? "H": "N", prolog? "PRE": "POST", "_",
+	      new_reduction_name(op), "_", pvm_what_options(base), NULL));
+
+    return MakeRunTimeSupportSubroutine(buffer, 1);
+}
+
+static statement 
+compile_one_reduction(
+    hpfc_reductions red,
+    bool prolog,
+    bool host)
+{
+    entity var = hpfc_reductions_initial(red);
+
+    return call_to_statement
+	(make_call(make_new_reduction_function
+	    (hpfc_reductions_operator(red), prolog, host, entity_basic(var)),
+	     CONS(EXPRESSION, entity_to_expression(var), NIL)));
+}
+
+/* 
  */
 list /* of statement */ 
-compile_hpf_reduction_prolog(
-    list /* of reduction */ lr,
+compile_hpf_reduction(
+    list /* of hpfc_reductions */ lr,
+    bool prolog,
     bool host)
 {
-    return NIL;
-}
-
-/* variable = OPERATOR(variable, PVM_operator(replacement))
- */
-list /* of statement */
-compile_hpf_reduction_postlog(
-    list /* of reduction */ lr,
-    bool host)
-{
-    return NIL;
+    list /* of statement */ ls = NIL;
+    MAP(HPFC_REDUCTIONS, r, 
+	ls = CONS(STATEMENT, compile_one_reduction(r, prolog, host), ls),
+	lr);
+    return ls;
 }
 
 /******************************************************** SUB ARRAY SHIFTS */
