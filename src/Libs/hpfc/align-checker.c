@@ -8,7 +8,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1996/06/15 19:15:29 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1996/07/23 15:08:21 $, )
  * version $Revision$
  */
 
@@ -69,20 +69,20 @@ int *pi;
 	break;
     case is_normalized_linear:
     {
-	Pvecteur
-	    v = normalized_linear(n),
-	    vp = vect_del_var(v, TCST);
+	Pvecteur v = normalized_linear(n), vp = vect_del_var(v, TCST);
 	int s = vect_size(vp);
 	bool result;
 
 	if (s!=1) return FALSE;
 
-	result = ((entity_loop_index_p((entity)(vp->var)) && ((vp->val)==1)));
+	result = entity_loop_index_p((entity)var_of(vp)) && 
+	    value_one_p(val_of(vp));
 
 	if (result) 
 	{
-	    *pe = (entity) (vp->var);
-	    *pi = vect_coeff(TCST, v);
+	    Value vi = vect_coeff(TCST, v);
+	    *pe = (entity) var_of(vp);
+	    *pi = VALUE_TO_INT(vi);
 	}
 
 	vect_rm(vp);
@@ -130,13 +130,15 @@ int *pi1, *pi2;
 
 	if (s!=1) return(FALSE);
 
-	result = (entity_loop_index_p((entity)(vp->var)) && ((vp->val)!=1));
+	result = (entity_loop_index_p((entity)var_of(vp)) && 
+		  value_notone_p(val_of(vp)));
 
 	if (result) 
 	{
-	    *pe = (entity) (vp->var);
-	    *pi1 = vect_coeff(TCST, v);
-	    *pi2 = (int) (vp->val);
+	    Value v1 = vect_coeff(TCST, v);
+	    *pe = (entity) var_of(vp);
+	    *pi1 = VALUE_TO_INT(v1);
+	    *pi2 = VALUE_TO_INT(val_of(vp));
 	}
 
 	vect_rm(vp);
@@ -294,8 +296,8 @@ align_check(
 		*plkind = gen_nconc(*plkind, CONS(INT, aligned_constant, NIL));
 		*plvect = gen_nconc(*plvect,
 				    CONS(PVECTOR, (VECTOR)
-					 vect_add(vect_new(TEMPLATEV, t2),
-						  vect_new(DELTAV, t2-t1)),
+		   vect_add(vect_new(TEMPLATEV, int_to_value(t2)),
+			    vect_new(DELTAV, int_to_value(t2-t1))),
 					 NIL));
 	    }
 	    else
@@ -372,9 +374,9 @@ align_check(
 			gen_nconc(*plvect, 
 				  CONS(PVECTOR, (VECTOR)
 				       vect_make(VECTEUR_NUL,
-						 DELTAV, d,
-						 TEMPLATEV, t2,
-						 TCST, shft2),
+						 DELTAV, int_to_value(d),
+						 TEMPLATEV, int_to_value(t2),
+						 TCST, int_to_value(shft2)),
 				       NIL));
 		}
 		else /* say not aligned... */
@@ -395,13 +397,14 @@ align_check(
 			shift = (tc2-tc1);
 
 		    *plkind = gen_nconc(*plkind, CONS(INT, aligned_shift, NIL));
-		    *plvect = gen_nconc(*plvect, 
-					CONS(PVECTOR, (VECTOR)
-					     vect_make(VECTEUR_NUL,
-						       TSHIFTV, shift,
-						       (Variable) index1, 1,
-						       TCST, shft2),
-					     NIL));
+		    *plvect = gen_nconc
+			(*plvect, 
+			 CONS(PVECTOR, (VECTOR)
+			      vect_make(VECTEUR_NUL,
+					TSHIFTV, int_to_value(shift),
+					(Variable) index1, VALUE_ONE,
+					TCST, int_to_value(shft2)),
+			      NIL));
 		}
 		else /* ??? I should do something with blcnst2? */
 		{
@@ -430,11 +433,11 @@ align_check(
 		*plkind = gen_nconc(*plkind, CONS(INT, local_affine, NIL));
 		*plvect = 
 		    gen_nconc(*plvect, 
-			      CONS(PVECTOR, (VECTOR)
-				   vect_make(VECTEUR_NUL,
-					     (Variable) index2, affr2,
-					     TCST, shft2),
-				   NIL));
+		       CONS(PVECTOR, (VECTOR)
+			    vect_make(VECTEUR_NUL,
+				      (Variable) index2, int_to_value(affr2),
+				      TCST, int_to_value(shft2)),
+			    NIL));
 	    }
 	    else
 	    if (bshift2)
@@ -444,8 +447,8 @@ align_check(
 		    gen_nconc(*plvect, 
 			      CONS(PVECTOR, (VECTOR)
 				   vect_make(VECTEUR_NUL,
-					     (Variable) index2, 1,
-					     TCST, shft2),
+					     (Variable) index2, VALUE_ONE,
+					     TCST, int_to_value(shft2)),
 				   NIL));
 	    }
 	    else
@@ -453,7 +456,7 @@ align_check(
 	    {
 		*plkind = gen_nconc(*plkind, CONS(INT, local_constant, NIL));
 		*plvect = gen_nconc(*plvect, CONS(PVECTOR, (VECTOR)
-						  vect_new(TCST, shft2),
+			     vect_new(TCST, int_to_value(shft2)),
 						  NIL));
 	    }
 	    /* else the local constant should be detected, for onde24... */
@@ -508,7 +511,10 @@ int *pi;
 	vect_rm(vp);
 
 	if (result)
-	    *pi = vect_coeff(TCST, v);
+	{
+	    Value vi = vect_coeff(TCST, v);
+	    *pi = VALUE_TO_INT(vi);
+	}
 	
 	return(result);
 	break;
