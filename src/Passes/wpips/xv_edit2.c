@@ -154,7 +154,7 @@ wpips_execute_and_display_something(char * label)
 {
    char string_modulename[SMALL_BUFFER_LENGTH], bank_view_name[SMALL_BUFFER_LENGTH];
    char busy_label[SMALL_BUFFER_LENGTH];
-   char * file_name1, * file_name2;
+   char * file_name1;
    char *busy_label_format = "*Computing %s * ...";
    char *print_type, *print_type_2 = NULL;
    char *modulename = db_get_current_module_name();
@@ -358,6 +358,59 @@ edit_close_notify(Menu menu,
    display_memory_usage();
 }
 
+
+void
+disable_menu_item(Menu_item item)
+{
+   xv_set(item, MENU_INACTIVE, TRUE, 0);
+}
+
+
+void
+enable_menu_item(Menu_item item)
+{
+   xv_set(item, MENU_INACTIVE, FALSE, 0);
+}
+
+
+void
+apply_on_each_view_item(void (* function_to_apply_on_each_menu_item)(Menu_item),
+                        void (* function_to_apply_on_each_panel_item)(Panel_item))
+{
+   int i;
+
+   /* Skip the "current_selection_mi" and "close" Menu_items: */
+   for(i = (int) xv_get(view_menu, MENU_NITEMS) - 1; i > 0; i--) {
+      Menu_item item = (Menu_item) xv_get(view_menu, MENU_NTH_ITEM, i);
+      function_to_apply_on_each_menu_item(item);
+   }
+
+  /* Now walk through the options panel: */
+   {
+      Panel_item panel_item;
+
+      PANEL_EACH_ITEM(options_panel, panel_item)
+         /* Only on the PANEL_CHOICE_STACK: */
+         if ((Panel_item_type) xv_get(panel_item, PANEL_ITEM_CLASS) ==
+             PANEL_BUTTON_ITEM)
+            function_to_apply_on_each_panel_item(panel_item);
+      PANEL_END_EACH
+         }
+}
+
+
+void
+disable_view_selection()
+{
+   apply_on_each_view_item(disable_menu_item, disable_panel_item);
+}
+
+
+void
+enable_view_selection()
+{
+   apply_on_each_view_item(enable_menu_item, enable_panel_item);
+}
 
 
 void create_edit_window()
