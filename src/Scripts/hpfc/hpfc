@@ -3,6 +3,9 @@
 # $Id$
 # 
 # $Log: hpfc,v $
+# Revision 1.29  1997/06/07 09:14:11  coelho
+# little fix.
+#
 # Revision 1.28  1997/06/07 09:12:30  coelho
 # -T option passed to hpfc_compile.
 #
@@ -91,7 +94,7 @@ unset COPT
 
 # options
 
-while getopts hvdqto:D:E: OPT
+while getopts hvdqtTo:D:E: OPT
 do
   case $OPT in
     v) HPFC_MODE=void ;;
