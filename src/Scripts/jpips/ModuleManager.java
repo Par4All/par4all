@@ -2,6 +2,9 @@
   $Id$
 
   $Log: ModuleManager.java,v $
+  Revision 1.6  1999/02/15 14:20:14  coelho
+  *** empty log message ***
+
   Revision 1.5  1998/11/20 17:32:18  coelho
   %MAIN added to the menu.
 
@@ -30,8 +33,8 @@ import JPips.Pawt.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import com.sun.java.swing.*;
-import com.sun.java.swing.border.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 
 /** A module manager for TPips.
