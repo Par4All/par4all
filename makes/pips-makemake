@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/09/25 13:04:49 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/09/25 13:32:20 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -513,7 +513,7 @@ header: .header
 # indirect depend bacause I do not trust make for the inclusion of
 # Makefile.depend if that very file does not exist.
 
-.depend: $(CFILES)
+.depend: $(CFILES) $(DERIVED_CFILES)
 	$(PREPROC) -M $(CFILES) > $(MAKEFILE).depend
 	touch .depend
 
