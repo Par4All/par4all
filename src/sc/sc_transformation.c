@@ -18,34 +18,36 @@
 void sc_transform_ineg_in_eg(sc)
 Psysteme sc;
 {
+    Pcontrainte
+	pc1, pc2, pc1_succ;
+    boolean 
+	found;
 
-    Pcontrainte pc1,pc2,pc1_succ;
-    Pcontrainte pc3=CONTRAINTE_UNDEFINED;
-    Pcontrainte pc4=CONTRAINTE_UNDEFINED;
-    boolean trouve = FALSE;
-
-    for (pc1 = sc->inegalites; 
-	 !CONTRAINTE_UNDEFINED_P(pc1);pc1 = pc1_succ) {
-	trouve = FALSE;
-	for (pc2 = pc1->succ; 
-	     !CONTRAINTE_UNDEFINED_P(pc2) && !trouve; 
-	     pc2 = pc2->succ) {
-	    Pvecteur pv = vect_add(pc1->vecteur,pc2->vecteur); 
-	    if (VECTEUR_NUL_P(pv)) {
-		/* This condition is true if the constraints are opposed. */
-		pc3 = contrainte_dup(pc1);
-		pc4=pc2;
-		trouve = TRUE;
+    for (pc1 = sc->inegalites, pc1_succ = pc1==NULL ? NULL : pc1->succ; 
+	 !CONTRAINTE_UNDEFINED_P(pc1);
+	 pc1 = pc1_succ, pc1_succ = pc1==NULL ? NULL : pc1->succ)
+    {
+	for (pc2 = pc1->succ, found=FALSE; 
+	     !CONTRAINTE_UNDEFINED_P(pc2) && !found; 
+	     pc2 = pc2->succ)
+	{
+	    Pvecteur
+		pv = vect_add(pc1->vecteur, pc2->vecteur); 
+	    
+	    if (VECTEUR_NUL_P(pv)) /* True if the constraints are opposed. */
+	    {
+		sc_add_eg(sc,contrainte_dup(pc1));
+		eq_set_vect_nul(pc2);
+		eq_set_vect_nul(pc1);
+		found = TRUE;
 	    }
-	}
-	pc1_succ = pc1->succ;
-	if (trouve) {
-	    sc_add_eg(sc,pc3);	   
-	    eq_set_vect_nul (pc4);
-	    eq_set_vect_nul (pc1);
+	    
+	    vect_rm(pv);
 	}
     } 
-    sc = sc_kill_db_eg(sc);
+
+    sc = sc_elim_db_constraints(sc);
+    /* ??? humm, the result is *not* returned */
 }
 
 
@@ -59,14 +61,20 @@ Psysteme sc;
 
     for (eg = sc->egalites; 
 	 !CONTRAINTE_UNDEFINED_P(eg); 
-	 eg=eg->succ) {
+	 eg=eg->succ) 
+    {
 	pc1 = contrainte_dup(eg);
 	pc2 = contrainte_dup(eg);
 	vect_chg_sgn(pc2->vecteur);
 	sc_add_ineg(sc,pc1);
 	sc_add_ineg(sc,pc2);
     }
-    free(sc->egalites);
+    
+    sc->egalites = contraintes_free(sc->egalites);
     sc->nb_eq = 0;
-    sc->egalites = CONTRAINTE_UNDEFINED;
+
+    sc = sc_elim_db_constraints(sc); 
+    /* ??? humm, the result is *not* returned */
 }
+
+
