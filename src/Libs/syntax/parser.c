@@ -93,6 +93,7 @@ ParserError(char * f, char * m)
     DynamicArea = entity_undefined;
     StaticArea = entity_undefined;
     reset_common_size_map_on_error();
+    AbortOfProcedure();
 
     /* FI: let catch_error() take care of this in pipsmake since debug_on()
        was not activated in ParserError */
