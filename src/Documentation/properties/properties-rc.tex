@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.131  1998/10/07 07:02:45  irigoin
+%% Property PRETTYPRINT_DATA_STATEMENTS added
+%%
 %% Revision 1.130  1998/07/28 16:45:52  irigoin
 %% Latex bug fixed
 %%
@@ -98,7 +101,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/07/28 16:45:52 $~$
+$~$Date: 1998/10/07 07:02:45 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1855,6 +1858,10 @@ PRETTYPRINT_COMMONS "declaration"
 \end{verbatim}
 
 \verb/DATA/ declarations are partially handled presently.
+
+\begin{verbatim}
+PRETTYPRINT_DATA_STATEMENTS TRUE
+\end{verbatim}
 
 Where to put the dimension information, which must appear once.
 The default is associated to the type information. It can be associated to
