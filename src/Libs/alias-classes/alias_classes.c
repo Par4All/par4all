@@ -218,7 +218,9 @@ unite_lists_containing_same_exact_region()
     new_class = NIL;
 
     make_class_from_list(next_list);
-    l_alias_classes = CONS(EFFECTS,make_effects(new_class),l_alias_classes);
+    l_alias_classes = CONS(EFFECTS,
+			   make_effects(regions_dup(new_class)),
+			   l_alias_classes);
 
 /*    ifdebug(9)
 	{
@@ -355,68 +357,15 @@ unite_lists_with_same_head()
 }
 
 
-/* global variables IN: l_alias_lists, other_lists
- * global variables modified: l_alias_lists, other_lists
- */
-static void
-add_lists_callee( string callee_name )
-{
-    list callee_alias_lists;
-
-    pips_debug(4,"begin for callee %s\n",callee_name);
-
-    callee_alias_lists =
-	effects_classes_classes((effects_classes)
-				db_get_memory_resource(DBR_ALIAS_LISTS,
-						       callee_name,
-						       TRUE));
-    MAP(EFFECTS,callee_alias_list_effects,
-	    {
-		list callee_alias_list =
-		    regions_dup(effects_effects(callee_alias_list_effects));
-
-		ifdebug(9)
-		    {
-			pips_debug(9,"add list:\n");
-			print_inout_regions(callee_alias_list);
-		    }
-
-		l_alias_lists = CONS(LIST,callee_alias_list,l_alias_lists);
-	    },callee_alias_lists);
-
-    pips_debug(4,"end\n");
-}
-
-
-static void
-get_lists_callees(string module_name)
-{
-    callees all_callees;
-
-    pips_debug(4,"begin\n");
-
-    all_callees = (callees) db_get_memory_resource(DBR_CALLEES,
-					       module_name,
-					       TRUE);
-
-    MAP(STRING, callee_name,
-	{
-	    add_lists_callee(callee_name);
-	},
-	    callees_callees(all_callees));
-
-    pips_debug(4,"end\n");
-}
-
-
 bool
 alias_classes( string module_name )
 {
     entity module;
+    list module_alias_lists;
 
     debug_on("ALIAS_CLASSES_DEBUG_LEVEL");
     pips_debug(4,"begin for module %s\n",module_name);
-    ifdebug(9)
+    ifdebug(4)
 	{
 	    /* ATTENTION: we have to do ALL this
 	     * just to call print_inout_regions for debug !!
@@ -443,7 +392,24 @@ alias_classes( string module_name )
     l_alias_classes = NIL;
     l_lists = NIL;
 
-    get_lists_callees(module_name);
+    module_alias_lists =
+	effects_classes_classes((effects_classes)
+				db_get_memory_resource(DBR_ALIAS_LISTS,
+						       module_name,
+						       TRUE));
+    MAP(EFFECTS,module_alias_list_effects,
+	    {
+		list module_alias_list =
+		    effects_effects(module_alias_list_effects);
+
+/*		ifdebug(9)
+		    {
+			pips_debug(9,"add list:\n");
+			print_inout_regions(module_alias_list);
+		    }
+		    */
+		l_alias_lists = CONS(LIST,module_alias_list,l_alias_lists);
+	    },module_alias_lists);
 
     ifdebug(9)
 	{
@@ -476,7 +442,7 @@ alias_classes( string module_name )
 	    pips_debug(9,"classes:\n");
 	    MAP(EFFECTS,alias_class,
 		{
-		    print_inout_regions(effects_effects(alias_class));		    		   pips_debug(9,"---\n");
+		    print_inout_regions(effects_effects(alias_class));
 		},
 		    l_alias_classes);
 	}
@@ -485,7 +451,7 @@ alias_classes( string module_name )
 			   strdup(module_name),
 			   (char*) make_effects_classes(l_alias_classes));    
 
-    ifdebug(9)
+    ifdebug(4)
 	{
 	    free_value_mappings();
 	    reset_current_module_statement();
