@@ -23,6 +23,9 @@
  * - bang comment management added (to avoid the parser)
  *
  * $Log: split_file.c,v $
+ * Revision 1.38  1998/07/10 08:17:54  coelho
+ * entry-related bug fixed.
+ *
  * Revision 1.37  1998/07/09 18:24:18  coelho
  * hack for entry: output file names are preceded by their modules...
  *
@@ -277,28 +280,31 @@ char *s;
 	    (ptr = look(line, "entry")) != 0 ||
 	    (ptr = look(line, "function")) != 0 ||
 	    (ptr = functs(line)) != 0) {
-	    if(scan_name(s, ptr)) return(1);
-	    strcpy( s, x);
+	    if(!scan_name(s, ptr)) 
+		strcpy( s, x);
 	} else if((ptr = look(line, "program")) != 0) {
 	    it_is_a_main = 1;
-	    if(scan_name(s, ptr)) return(1);
-	    implicit_program_name = 1;
-	    get_name( mainp);
-	    strcpy( s, mainp);
+	    if(!scan_name(s, ptr)) {
+		implicit_program_name = 1;
+		get_name( mainp);
+		strcpy( s, mainp);
+	    }
 	} else if((ptr = look(line, "blockdata")) != 0) {
-	    if(scan_name(s, ptr)) return(1);
-	    implicit_blockdata_name = 1;
-	    get_name( blkp);
-	    strcpy( s, blkp);
+	    if(!scan_name(s, ptr)) {
+		implicit_blockdata_name = 1;
+		get_name( blkp);
+		strcpy( s, blkp);
+	    }
 	} else if((ptr = functs(line)) != 0) {
-	    if(scan_name(s, ptr)) return(1);
-	    strcpy( s, x);
+	    if(!scan_name(s, ptr)) 
+		strcpy( s, x);
 	} else {
 	    implicit_program = 1;
 	    it_is_a_main = 1;
 	    get_name(mainp);
 	    strcpy(s, mainp);
 	}
+
 	return(1);
 }
 
@@ -446,8 +452,12 @@ int fsplit(char * dir_name, char * file_name, FILE * out)
 
 	    if (nflag == 0) /* if no name yet, try and find one */
 		nflag = lname(name), newname=nflag;
-	    else /* FC: some hack to deal with entry... */
-		someentry = lname(tmpname), newname=someentry;
+	    else { /* FC: some hack to deal with entry... */
+		someentry = lname(tmpname);
+		newname=someentry;
+		implicit_program = 0;
+		it_is_a_main = 0;
+	    }
 
 	    if (it_is_a_main) {
 		FILE * fm = fopen(main_list, "a");
