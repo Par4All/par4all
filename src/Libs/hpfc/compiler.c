@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/04/02 10:53:37 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/04/17 18:31:26 $, )
  * version $Revision$
  *
  * Compiler
@@ -165,6 +165,30 @@ hpf_compile_call(
     pips_debug(7, "function %s\n", entity_name(call_function(c)));
 
     DEBUG_STAT(9, "statement", stat);
+
+    /* "dead" FC directive.
+     * tells that the array is dead, hence all copies are live...
+     */
+    if (dead_fcd_directive_p(call_function(c)))
+    {
+	list /* of statement */ ls = NIL;
+
+	MAP(EXPRESSION, e,
+	{
+	    entity primary = expression_to_entity(e);
+	    pips_debug(5, "dealing with array %s\n", entity_name(primary));
+	    ls = CONS(STATEMENT, generate_all_live(primary), ls);
+	},
+	    call_arguments(c));
+	
+	(*hoststatp) = MakeStatementLike(stat, is_instruction_block);
+	(*nodestatp) = MakeStatementLike(stat, is_instruction_block);
+	
+	instruction_block(statement_instruction(*hoststatp)) = NIL;
+	instruction_block(statement_instruction(*nodestatp)) = ls;
+
+	return;
+    }
 
     /* no reference to distributed arrays...
      * the call is just translated into local objects.
