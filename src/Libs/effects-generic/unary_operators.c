@@ -29,9 +29,9 @@ effects_to_effects_map(list l_eff, effect (*pure_apply)(effect))
 {
     list l_new = NIL;
     MAP(EFFECT, eff,
-	{l_new = gen_nconc(l_new, CONS(EFFECT, pure_apply(eff),NIL));},
+	l_new = CONS(EFFECT, pure_apply(eff), l_new),
 	l_eff);
-    return l_new;
+    return gen_nreverse(l_new);
 }
 
 void
@@ -46,13 +46,10 @@ effects_to_effects_filter_map(list l_eff , bool (*filter)(effect),
 {
     list l_new = NIL;
     MAP(EFFECT, eff,
-	{
-	    if (filter(eff))
-		l_new = gen_nconc(l_new, CONS(EFFECT, pure_apply(eff),NIL));},
+	if (filter(eff)) l_new = CONS(EFFECT, pure_apply(eff), l_new),
 	l_eff);
-    return l_new;
+    return gen_nreverse(l_new);
 }
-
 
 list 
 effects_add_effect(list l_eff, effect eff)
@@ -60,18 +57,14 @@ effects_add_effect(list l_eff, effect eff)
     return gen_nconc(l_eff, CONS(EFFECT, eff, NIL));
 }
 
-
-
 list
 effects_read_effects(list l_eff)
 {
     list l_new = NIL;
     MAP(EFFECT, eff,
-	{
-	    if (effect_read_p(eff))
-		l_new = gen_nconc(l_new, CONS(EFFECT, eff,NIL));},
+	if (effect_read_p(eff)) l_new = CONS(EFFECT, eff, l_new),
 	l_eff);
-    return l_new;
+    return gen_nreverse(l_new);
 }
 
 list
@@ -79,11 +72,9 @@ effects_write_effects(list l_eff)
 {
     list l_new = NIL;
     MAP(EFFECT, eff,
-	{
-	    if (effect_write_p(eff))
-		l_new = gen_nconc(l_new, CONS(EFFECT, eff,NIL));},
+	if (effect_write_p(eff)) l_new = CONS(EFFECT, eff, l_new),
 	l_eff);
-    return l_new;
+    return gen_nreverse(l_new);
 }
 
 list
@@ -91,12 +82,10 @@ effects_read_effects_dup(list l_eff)
 {
     list l_new = NIL;
     MAP(EFFECT, eff,
-	{
-	    if (effect_read_p(eff))
-		l_new =
-		    gen_nconc(l_new, CONS(EFFECT, (*effect_dup_func)(eff), NIL));},
+	if (effect_read_p(eff))
+           l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new),
 	l_eff);
-    return l_new;
+    return gen_nreverse(l_new);
 }
 
 list
@@ -104,13 +93,10 @@ effects_write_effects_dup(list l_eff)
 {
     list l_new = NIL;
     MAP(EFFECT, eff,
-    {
 	if (effect_write_p(eff))
-	    l_new = gen_nconc(l_new, 
-			      CONS(EFFECT, (*effect_dup_func)(eff), NIL));
-    },
+  	   l_new = CONS(EFFECT, (*effect_dup_func)(eff), l_new),
 	l_eff);
-    return l_new;
+    return gen_nreverse(l_new);
 }
 
 effect
@@ -169,12 +155,14 @@ effects_dup_without_variables(list l_eff, list l_var)
     MAP(EFFECT, eff,
     {
 	if (gen_find_eq(effect_entity(eff), l_var) == entity_undefined)
-	    l_res = effects_add_effect(l_res, (*effect_dup_func)(eff));
+	{
+	  l_res = CONS(EFFECT, (*effect_dup_func)(eff), l_res);
+	}
         else
 	    pips_debug(7, "Effect on variable %s removed\n",
 		       entity_local_name(effect_entity(eff)));
     }, l_eff);
-    return(l_res);
+    return gen_nreverse(l_res);
 }
 
 effect 
