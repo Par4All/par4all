@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: util.c,v $
+   Revision 1.9  2004/02/19 14:07:59  nguyen
+   Correct things about qualifiers
+
    Revision 1.8  2004/02/18 10:33:07  nguyen
    Rewrite declarators (parenthese, array and function)
 
@@ -819,6 +822,8 @@ void UpdateArrayEntity(entity e, list lq, list le)
 {
   type t = entity_type(e);
   pips_debug(3,"Update array entity %s\n",entity_name(e));
+
+  /* lq is for what ? e or le ????*/
   if (type_undefined_p(t))
     {
       pips_debug(3,"First array dimension\n");
@@ -870,7 +875,8 @@ type UpdateType(type t1, type t2)
 	    if (type_variable_p(t2))
 	      return make_type_variable(make_variable(variable_basic(type_variable(t2)),
 						      variable_dimensions(v),
-						      variable_qualifiers(v)));
+						      gen_nconc(variable_qualifiers(v),
+								variable_qualifiers(type_variable(t2)))));
 	    CParserError("t1 is a variable type but not t2\n");
 	  }
 	else 
@@ -916,10 +922,18 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   c_parser_context context = stack_head(ContextStack);
   type tc = c_parser_context_type(context);
   type t1,t2;
+  list lq = c_parser_context_qualifiers(context);
 
-  /* what about context qualifiers ? */
-  
   pips_debug(3,"Update entity %s\n",entity_name(e));
+
+  if (lq != NIL)
+    {
+      /* tc must have variable type, add lq to its qualifiers */
+      if (!type_undefined_p(tc) && type_variable_p(tc))
+	variable_qualifiers(type_variable(tc)) = lq;
+      else
+	CParserError("Entity has qualifier but no type or is not variable type in the context?\n");
+    }
   
   /************************* TYPE PART *******************************************/
  
@@ -983,10 +997,18 @@ void UpdateAbstractEntity(entity e, stack ContextStack)
   c_parser_context context = stack_head(ContextStack);
   type tc = c_parser_context_type(context);
   type t1,t2;
+  list lq = c_parser_context_qualifiers(context);
 
-  /* what about context qualifiers ? */
-  
   pips_debug(3,"Update abstract entity %s\n",entity_name(e));
+  
+  if (lq != NIL)
+    {
+      /* tc must have variable type, add lq to its qualifiers */
+      if (!type_undefined_p(tc) && type_variable_p(tc))
+	variable_qualifiers(type_variable(tc)) = lq;
+      else
+	CParserError("Entity has qualifier but no type or is not variable type in the contex ?\n");
+    }
   
   /************************* TYPE PART *******************************************/
  
