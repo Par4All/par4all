@@ -18,8 +18,6 @@
 #include <assert.h>
 #include <string.h>
 
-extern char *strdup(const char *);
-
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
