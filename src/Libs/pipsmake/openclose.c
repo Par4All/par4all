@@ -61,32 +61,27 @@ string name;
     return db_get_current_workspace_name();
 }
 
-/* FI->GO: could be in top-level, no? */
+/* FI->GO: could be in top-level, no?
+ */
 bool make_close_workspace()
 {
     bool res = TRUE;
     bool tmp_res;
     string name;
 
-    tmp_res = db_set_current_module_name(NULL);
-    if (!tmp_res)
-	res = FALSE;
+    res &= db_set_current_module_name(NULL);
 
-    name = db_get_current_workspace_name();
+    /* dup because freed in db_close_workspace */
+    name = strdup(db_get_current_workspace_name()); 
 
-    tmp_res = close_makefile(name);
-    if (!tmp_res)
-	res = FALSE;
-
-    tmp_res = db_close_workspace();
-    if (!tmp_res)
-	res = FALSE;
+    res &= close_makefile(name);
+    res &= db_close_workspace();
 
     if(res)
 	user_log("Workspace %s closed\n\n", name);
     else
 	user_log("Failed to close workspace %s\n\n", name);
 
+    free(name);
     return res;
 }
-
