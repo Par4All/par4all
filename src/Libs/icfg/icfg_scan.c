@@ -28,17 +28,16 @@
 #include "icfg.h"
 
 #define ICFG_SCAN_INDENT 4
-#define MAX_LINE_LENGTH 256
+#define MAX_LINE_LENGTH 256 /* hmmm... (never checked I guess:-) */
 
 static int current_margin;
 
-static void append_icfg_file(text t,string module_name);
-
-typedef hash_table text_mapping;
-#ifndef bool_undefined
-#define bool_undefined ((bool) (-15))
-#define bool_undefined_p(b) ((b)==bool_undefined)
-#endif
+#define st_DO	 "do"
+#define st_ENDDO "enddo"
+#define st_IF	 "if"
+#define st_THEN	 "then"
+#define st_ELSE	 "else"
+#define st_ENDIF "endif"
 
 #define some_text_p(t) (t!=text_undefined && text_sentences(t)!=NIL)
 
@@ -46,8 +45,44 @@ typedef hash_table text_mapping;
 DEFINE_LOCAL_STACK(current_stmt, statement)
 
 /* We store the text for all statement in a mapping 
-   in order to print afterwards */
-GENERIC_LOCAL_MAPPING(stmt_map, statement, text)
+   in order to print afterwards 
+*/
+GENERIC_LOCAL_MAPPING(icfg, text, statement)
+
+static void append_icfg_file(text t, string module_name)
+{
+    string filename = NULL;
+    string localfilename = NULL;
+    FILE *f_called;
+    char buf[MAX_LINE_LENGTH];
+    char textbuf[MAX_LINE_LENGTH];
+
+    /* create filename */
+    localfilename = strdup(concatenate
+			   (module_name,
+			    get_bool_property(ICFG_IFs) ? ".icfgc" :
+			    ( get_bool_property(ICFG_DOs) ? ".icfgl" : 
+			     ".icfg") ,
+			    NULL));
+    filename = strdup(concatenate
+		      (db_get_current_workspace_directory(), 
+		       "/", localfilename, NULL));
+
+    pips_debug (2, "Inserting ICFG for module %s\n", module_name);
+
+    /* Get the Icfg from the callee */
+    f_called = safe_fopen (filename, "r");
+
+    while (fgets (buf, MAX_LINE_LENGTH, f_called)) {
+	/* add sentences ... */
+	sprintf(textbuf, "%*s%s", current_margin ,"",buf);
+	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
+					      strdup(textbuf)));
+    }
+    
+    /* push resulting text */
+    safe_fclose (f_called, filename);
+}
 
 static bool statement_filter(statement s)
 {
@@ -56,7 +91,7 @@ static bool statement_filter(statement s)
 
     pips_debug (5,"going down\n");
 
-    store_text_stmt_map (s, t);
+    store_statement_icfg (s, t);
     res = current_stmt_filter (s);
     return res;
 }
@@ -64,9 +99,8 @@ static bool statement_filter(statement s)
 static void statement_rewrite(statement s)
 {
     pips_debug (5,"going up\n");
-    ifdebug(9) {
-	print_text(stderr,(text) load_text_stmt_map (s));
-    }
+    ifdebug(9) print_text(stderr,(text) load_statement_icfg (s));
+
     current_stmt_rewrite (s);
     return;
 }
@@ -81,7 +115,7 @@ static void call_filter(call c)
 
     /* If this is a "real function" (defined in the code elsewhere) */
     if (value_code_p(entity_initial(e_callee))) {
-	text r = (text) load_text_stmt_map (current_stmt_head());
+	text r = (text) load_statement_icfg (current_stmt_head());
 
 	entity e_caller = get_current_module_entity();
 	reset_current_module_entity();
@@ -135,7 +169,7 @@ static void call_filter(call c)
 	/* append the callee' icfg */
 	append_icfg_file (r, callee_name);
 	/* store it to the statement mapping */
-	update_text_stmt_map (current_stmt_head(), r);
+	update_statement_icfg (current_stmt_head(), r);
 
 	pips_debug(9, "text %sdefined\n", r==text_undefined ? "un" : "");
     }
@@ -163,17 +197,17 @@ static void loop_rewrite (loop l)
 
     if (print_do) current_margin -= ICFG_SCAN_INDENT;
 
-    inside_the_do = (text) load_text_stmt_map (current_stmt_head());
+    inside_the_do = (text) load_statement_icfg (current_stmt_head());
     text_in_do_p = some_text_p(inside_the_do);
 
-    inside_the_loop = (text) load_text_stmt_map (loop_body (l));
+    inside_the_loop = (text) load_statement_icfg (loop_body (l));
     text_in_loop_p = some_text_p(inside_the_loop);
 
     /* Print the DO 
      */
     if ((text_in_loop_p || text_in_do_p) && print_do) 
     {
-	sprintf(textbuf, "%*sDO\n", current_margin, "");
+	sprintf(textbuf, "%*s" st_DO "\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
     }
@@ -206,13 +240,13 @@ static void loop_rewrite (loop l)
      */
     if ((text_in_loop_p || text_in_do_p) && print_do) 
     {
-	sprintf(textbuf, "%*sENDDO\n", current_margin, "");
+	sprintf(textbuf, "%*s" st_ENDDO "\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
     }
 
     /* store it to the statement mapping */
-    update_text_stmt_map (current_stmt_head(), t);
+    update_statement_icfg (current_stmt_head(), t);
     
     return ;
 }
@@ -231,11 +265,11 @@ static void instruction_rewrite (instruction i)
 
 	MAPL(pm, {   
 	    statement s = STATEMENT(CAR(pm));
-	    MERGE_TEXTS(t, (text) load_text_stmt_map (s));
+	    MERGE_TEXTS(t, (text) load_statement_icfg (s));
 	}, instruction_block (i));
 
 	/* store it to the statement mapping */
-	update_text_stmt_map (current_stmt_head (), t);
+	update_statement_icfg (current_stmt_head (), t);
 	break;
     }
     case is_instruction_unstructured:
@@ -250,11 +284,11 @@ static void instruction_rewrite (instruction i)
 	   I do not know if it's good or not but beware the bugs!!! */
 	CONTROL_MAP(c, {
 	    statement st = control_statement(c) ;
-	    MERGE_TEXTS(t, (text) load_text_stmt_map (st));
+	    MERGE_TEXTS(t, (text) load_statement_icfg (st));
 	}, ct, blocs) ;
 	
 	gen_free_list(blocs) ;
-	update_text_stmt_map (current_stmt_head (), t);
+	update_statement_icfg (current_stmt_head (), t);
 	break;
     }
     }
@@ -280,9 +314,9 @@ static void test_rewrite (test l)
     
     pips_debug (5,"Test end\n");
     
-    inside_if = copy_text((text) load_text_stmt_map (current_stmt_head ()));
-    inside_then = copy_text((text) load_text_stmt_map (test_true (l)));
-    inside_else = copy_text((text) load_text_stmt_map (test_false (l)));
+    inside_if = copy_text((text) load_statement_icfg (current_stmt_head ()));
+    inside_then = copy_text((text) load_statement_icfg (test_true (l)));
+    inside_else = copy_text((text) load_statement_icfg (test_false (l)));
 
     print_if_p = get_bool_property (ICFG_IFs);
     something_to_print = (some_text_p(inside_else) ||
@@ -293,7 +327,7 @@ static void test_rewrite (test l)
     
     /* Print the IF */
     if (something_to_print && print_if_p) {
-	sprintf(textbuf, "%*sIF\n", current_margin, "");
+	sprintf(textbuf, "%*s" st_IF "\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
     }
@@ -307,7 +341,7 @@ static void test_rewrite (test l)
     if (some_text_p(inside_then)) {
 	/* Print the THEN */
 	if (something_to_print && print_if_p) {
-	    sprintf(textbuf, "%*sTHEN\n", current_margin, "");
+	    sprintf(textbuf, "%*s" st_THEN "\n", current_margin, "");
 	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 						  strdup(textbuf)));
 	}
@@ -318,7 +352,7 @@ static void test_rewrite (test l)
     if (some_text_p(inside_else)){
 	/* Print the ELSE */
 	if (something_to_print && print_if_p) {
-	    sprintf(textbuf, "%*sELSE\n", current_margin, "");
+	    sprintf(textbuf, "%*s" st_ELSE "\n", current_margin, "");
 	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 						  strdup(textbuf)));
 	}
@@ -327,13 +361,13 @@ static void test_rewrite (test l)
 
     /* Print the ENDIF */
     if (something_to_print && print_if_p) {
-	sprintf(textbuf, "%*sENDIF\n", current_margin, "");
+	sprintf(textbuf, "%*s" st_ENDIF "\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
     }
     
     /* store it to the statement mapping */
-    update_text_stmt_map (current_stmt_head(), t);
+    update_statement_icfg (current_stmt_head(), t);
     
     return;
 }
@@ -348,7 +382,7 @@ void print_module_icfg(entity module)
     set_current_module_entity (module);
 
     /* allocate the mapping  */
-    make_stmt_map_map();
+    make_icfg_map();
     make_current_stmt_stack();
 
     sprintf(buf,"%s\n",module_name);
@@ -368,7 +402,7 @@ void print_module_icfg(entity module)
 
     pips_assert("stack is empty", current_stmt_empty_p());
 
-    MERGE_TEXTS (txt, (text) load_text_stmt_map (s));
+    MERGE_TEXTS (txt, (text) load_statement_icfg (s));
 
     make_text_resource(module_name, DBR_ICFG_FILE,
 		       get_bool_property(ICFG_IFs) ? ".icfgc" :
@@ -377,42 +411,7 @@ void print_module_icfg(entity module)
 		       txt);
     
     free_text (txt);
-    free_stmt_map_map();
+    free_icfg_map();
     free_current_stmt_stack();
     reset_current_module_entity();
-}
-
-static void append_icfg_file(text t,string module_name)
-{
-    string filename = NULL;
-    string localfilename = NULL;
-    FILE *f_called;
-    char buf[MAX_LINE_LENGTH];
-    char textbuf[MAX_LINE_LENGTH];
-
-    /* create filename */
-    localfilename = strdup(concatenate
-			   (module_name,
-			    get_bool_property(ICFG_IFs) ? ".icfgc" :
-			    ( get_bool_property(ICFG_DOs) ? ".icfgl" : 
-			     ".icfg") ,
-			    NULL));
-    filename = strdup(concatenate
-		      (db_get_current_workspace_directory(), 
-		       "/", localfilename, NULL));
-
-    pips_debug (2, "Inserting ICFG for module %s\n", module_name);
-
-    /* Get the Icfg from the callee */
-    f_called = safe_fopen (filename, "r");
-
-    while (fgets (buf, MAX_LINE_LENGTH, f_called)) {
-	/* add sentences ... */
-	sprintf(textbuf, "%*s%s", current_margin ,"",buf);
-	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
-					      strdup(textbuf)));
-    }
-    
-    /* push resulting text */
-    safe_fclose (f_called, filename);
 }
