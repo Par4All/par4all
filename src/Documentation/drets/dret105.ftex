@@ -1,12 +1,20 @@
 \documentstyle[12pt]{article}
-\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
-\newcommand{\titre}{RAPPORT D'AVANCEMENT No 2 \\
-                    ANALYSE SYNTAXIQUE ET SEMANTIQUE}
-\newcommand{\auteur}{Franc,ois IRIGOIN \\
+% \input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\title{RAPPORT D'AVANCEMENT No 2 \\
+                    ANALYSE SYNTAXIQUE ET SEMANTIQUE \\
+RT EMP 105}
+\author{Franc,ois IRIGOIN \\
         Pierre JOUVELOT \\
         Re'mi TRIOLET}
-\newcommand{\docdate}{Mars 1988}
-\newcommand{\numero}{E105}
+\date{Mars 1988}
+%\newcommand{\titre}{RAPPORT D'AVANCEMENT No 2 \\
+%                    ANALYSE SYNTAXIQUE ET SEMANTIQUE}
+%\newcommand{\auteur}{Franc,ois IRIGOIN \\
+%        Pierre JOUVELOT \\
+%        Re'mi TRIOLET}
+%\newcommand{\docdate}{Mars 1988}
+%\newcommand{\numero}{E105}
 
 \newcommand{\SEC}[1]{\section{#1}}
 \newcommand{\SSE}[1]{\subsection{#1}}
@@ -42,7 +50,8 @@
 \setlength{\parindent}{0cm}
 
 \begin{document}
-\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+%\input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
+\maketitle
 \sloppy
 
 \section{Introduction}
