@@ -4,14 +4,15 @@
 
 # OBJ_DIR and EXEC_EXTRA_SUFFIX must be set correctly
 
-# These may take a long time to compute...
-LONG_EHRHART_TESTS = g1 isnm2 c4 alex1
+# These do not pass in 32 bits mode (integer overflow): isnm isnm2
+ifeq ($(findstring 32,$(OBJ_DIR)),32)
+  OVER = isnm isnm2
+endif
 
-# These do not pass in 32 bits mode without GMP: isnm
-# uncomment the following line if you are not running with GMP.
-NOGMP = isnm
+# These take a long time to compute...
+LONG_EHRHART_TESTS = $(filter-out $(OVER), g1 isnm2 c4 alex1)
 
-EHRHART_TESTS = $(filter-out $(LONG_EHRHART_TESTS) $(NOGMP),\
+EHRHART_TESTS = $(filter-out $(LONG_EHRHART_TESTS) $(OVER),\
 	$(patsubst ehrhart/%.in,%,$(wildcard ehrhart/*.in)))
 
 PP_TESTS = c4 c5

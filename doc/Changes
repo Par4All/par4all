@@ -1,4 +1,4 @@
-The new polylib library combines both the Strassborg version and IRISA version 
+The new polylib library combines both the Strasbourg version and IRISA version 
 and includes option to support 32 bit or 64 bit or GNU muti-precision integers.
 It also includes the recent (April 2001) changes suggested by Doran Wilde and 
 the changes made by Vincent Loechner in polylib4.20. A new feature: computati-

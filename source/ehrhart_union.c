@@ -27,7 +27,7 @@ void Union_Read( Polyhedron **P, Polyhedron **C, char ***param_name )
 
 		if( f && sscanf(s, "%d %d", &NbRows, &NbColumns)==2 )
 		{
-			/* recupere l'ancien pm et l'ajoute a la liste de matrices */
+			/* gets old pm and add it to the union */
 			if( *P )
 				if( pm->NbColumns != ((*P)->Dimension)+2 )
 				{
@@ -40,7 +40,7 @@ void Union_Read( Polyhedron **P, Polyhedron **C, char ***param_name )
 			*P = ptmp;
 			Matrix_Free(pm);
 
-			/* lit la nouvelle matrice en entree */
+			/* reads the new pm */
 			pm = Matrix_Alloc(NbRows, NbColumns);
 			Matrix_Read_Input( pm );
 		}
@@ -48,13 +48,14 @@ void Union_Read( Polyhedron **P, Polyhedron **C, char ***param_name )
 			break;
 	}
 
+	/* Context : last read pm */
 	*C = Constraints2Polyhedron(pm, 200);
 	Matrix_Free(pm);
 
 
 	if( f )
 	{
-		/* lecture des noms des parametres */
+		/* read the parameter names */
 		*param_name = (char **)malloc( (*C)->Dimension*sizeof(char *) );
 		c = 0;
 		for( i=0 ; i<(*C)->Dimension ; ++i )
@@ -71,7 +72,7 @@ void Union_Read( Polyhedron **P, Polyhedron **C, char ***param_name )
 				param[j++] = s[c];
 			}
 
-			/* si pas assez de parametres, fin (parametres par defaut) */
+			/* else, no parameters (use default) */
 			if( j==0 )
 				break;
 			param[j] = 0;

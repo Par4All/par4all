@@ -25,11 +25,11 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.11 2002/08/12 13:11:27 loechner Exp $
+# $Id: vars.mk,v 1.12 2002/08/19 12:13:02 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
-VERSION = 5.07
+VERSION = 5.08beta
 
 # NOTE: Don't edit this file if it is called vars.mk, instead
 # edit vars.mk.in, which is read by configure
@@ -49,7 +49,7 @@ BIN_INSTALL_DIR =	$(exec_prefix)/bin
 
 # c compiler flags and defines
 CC	             	= gcc
-CFLAGS                  = -g -O2 -Wall
+CFLAGS                  = -g -O2
 EXTRA_FLAGS             = 
 DEFINES         	=  -DSTDC_HEADERS=1 -DHAVE_LIMITS_H=1 -DHAVE_UNISTD_H=1 -DSIZEOF_INT=4 -DSIZEOF_LONG_INT=4 -DSIZEOF_LONG_LONG_INT=8  
 
@@ -77,7 +77,7 @@ GMP_BITS = gmp
 # Library type to construct
 LIBSTYPE_TO_BUILD = 
 # Library type to install
-INSTALL_LIB = 
+INSTALL_LIB = install-static install-shared
 
 # Commands used to install scripts and data
 INSTALL =		/usr/bin/install -c
@@ -106,7 +106,7 @@ DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
-EXEC_EXTRA_LIBS= -L$(OBJ_DIR) -lpolylib$(BITS) $(LIBS)
+EXEC_EXTRA_LIBS= -L${exec_prefix}/lib -lpolylib$(BITS) $(LIBS)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 

@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <polylib/polylib.h>
 #define WS 200 
-//#define DOMAIN_IMAGE
+
+/* #define UE_DEBUG */
+
 
 typedef struct _Polyhedron_union { 
 	Enumeration *pt;
@@ -712,10 +714,13 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
       Polun=NULL;
      
      lp = Disjoint_Domain( D, 0, MAXRAYS );
+
+#ifdef UE_DEBUG
      printf("##############################################################\n");
      printf("\n###### DISJOINT UNION  ######\n\n");
      AffConstraints(lp); 
      printf("##############################################################\n");
+#endif
      
 	for (lp1=lp ; lp1; lp1=lp1->next)
 	{
@@ -744,7 +749,9 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
 	}
 	if(!Polun)
 	{
-		fprintf(stdout,"      Error:  No Domain to enumerate\n");	
+#ifdef UE_DEBUG
+		fprintf(stdout,"Empty Polun\n");
+#endif
 		return ((Enumeration *) 0);
 	}
       
@@ -815,6 +822,11 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
 	Remove_RedundantDomains(&res); 
 	return(res);
 }
+
+
+/**********
+ DO NOT USE THE FOLLOWING FUNCTION IT'S NOT WORKING PROPERLY YET.
+ **********/
 
 /* Enumeration of the image by T of domain D */
 Enumeration *Polyhedron_Image_Enumerate(Polyhedron *D,  Polyhedron *C, Matrix *T, unsigned MAXRAYS, char **par_name)
