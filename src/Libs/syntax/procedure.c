@@ -88,10 +88,9 @@ void EndOfProcedure()
     /* get rid of ghost variable entities */
     remove_ghost_variable_entities();
 
-    /* we generate the last statement */
-    if (strcmp(lab_I, "") != 0) {
-	LinkInstToCurrentBlock(MakeZeroOrOneArgCallInst("CONTINUE", 
-							expression_undefined));
+    /* we generate the last statement to carry a label or a comment */
+    if (strcmp(lab_I, "") != 0 /* || iPrevComm != 0 */ ) {
+	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
     }
 
     /* we generate statement last+1 to eliminate returns */
