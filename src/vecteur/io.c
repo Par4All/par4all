@@ -229,30 +229,31 @@ char *mult_symbol;
 	Value exp;
 	for ( ; !VECTEUR_NUL_P(b); b = b->succ) {
 	    exp = vect_coeff(b->var, v);
-	    assert(exp!=0);
+	    if(exp!=0) {
 	    
-	    if (!first_var) {
-		(void) sprintf(r, "%s", mult_symbol);
-		r = strchr(r, NULL);
-	    }
-	    else 
-		first_var = FALSE;
-	    
-	    if (exp > 0) {
-		if (exp==1) {
-		    (void) sprintf(r, "%s", variable_name(b->var));
+		if (!first_var) {
+		    (void) sprintf(r, "%s", mult_symbol);
 		    r = strchr(r, NULL);
 		}
-		else {
-		    (void) sprintf(r,"%s^%d", variable_name(b->var), exp);
+		else 
+		    first_var = FALSE;
+	    
+		if (exp > 0) {
+		    if (exp==1) {
+			(void) sprintf(r, "%s", variable_name(b->var));
+			r = strchr(r, NULL);
+		    }
+		    else {
+			(void) sprintf(r,"%s^%d", variable_name(b->var), exp);
+			r = strchr(r, NULL);
+		    }
+		}
+		else /* exp < 0 */ {
+		    /* inutile pour les polynomes */ 
+		    (void) sprintf(r, "%s^(%d)", variable_name(b->var), exp);
+		    first_var = FALSE;
 		    r = strchr(r, NULL);
 		}
-	    }
-	    else /* exp < 0 */ {
-		/* inutile pour les polynomes */ 
-		(void) sprintf(r, "%s^(%d)", variable_name(b->var), exp);
-		first_var = FALSE;
-		r = strchr(r, NULL);
 	    }
 	}
     }
