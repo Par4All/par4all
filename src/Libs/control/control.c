@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/05 00:36:11 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/08 19:14:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/02/05 00:36:11 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/04/08 19:14:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -46,7 +46,7 @@ char vcid_control_control[] = "%A% ($Date: 1997/02/05 00:36:11 $, ) version $Rev
    following a goto. The list of unreachable statements is kept in the
    successors list. */
 
-static control Unreachable;		
+static list Unreachable;		
 
 /* LABEL_STATEMENTS maps label names to the list of statements where
    they appear (either as definition or reference). */
@@ -60,6 +60,68 @@ static hash_table Label_control;
 
 
 #define MAKE_CONTINUE_STATEMENT() make_continue_statement(entity_undefined) 
+
+
+/* Test if a control node is in a list of control nodes: */
+bool
+is_control_in_list_p(control c,
+		     list cs)
+{
+    MAP(CONTROL, cc, {
+	if (cc == c)
+	    return TRUE;
+    }, cs);
+    return FALSE;
+}
+
+
+/* Test the coherency of a control network.
+
+   Do not verify the fact that nodes could appear twice in the case of
+   unstructured tests. */
+void
+check_control_coherency(control c)
+{
+    list blocs = NIL;
+    CONTROL_MAP(ctl, {
+	/* Test the coherency of the successors: */
+	MAP(CONTROL, cc, {	    
+	    if (!is_control_in_list_p(ctl, control_predecessors(cc))) {
+		pips_debug(0, "Control node %#x not in the predecessor list of %#x\n", (unsigned int) ctl, (unsigned int) cc);
+		/* pips_assert("Control incorrect", 0); */
+	    }
+	}, control_successors(ctl));
+	MAP(CONTROL, cc, {
+	    if (!is_control_in_list_p(ctl, control_successors(cc))) {
+		pips_debug(0, "Control node %#x not in the successor list of %#x\n", (unsigned int) ctl, (unsigned int) cc);
+		/* pips_assert("Control incorrect", 0); */
+	    }
+	}, control_predecessors(ctl));
+    }, c, blocs);
+    gen_free_list(blocs);  
+}
+
+
+/* Display all the control nodes from c for debugging purpose: */
+void
+display_list_of_control_nodes(control c) {
+    list blocs = NIL;
+    CONTROL_MAP(ctl, {
+	fprintf(stderr, "%#x (pred=", (unsigned int) ctl);
+	MAP(CONTROL, cc,
+	    {
+		fprintf(stderr, "%#x,", cc);
+	    }, control_predecessors(c));
+	fprintf(stderr, " succ=");
+	MAP(CONTROL, cc,
+	    {
+		fprintf(stderr, "%#x,", cc);
+	    }, control_successors(c));
+	fprintf(stderr, "), ");
+    }, c, blocs);
+    gen_free_list(blocs);
+    fprintf(stderr, "---\n");
+}
 
 /* HASH_GET_DEFAULT_EMPTY_LIST: returns an empty list instead of
    HASH_UNDEFINED_VALUE when a key is not found */
@@ -265,15 +327,12 @@ hash_table used_labels;
     bool controlized=FALSE;
 
     ifdebug(5) {
-	list blocs = NIL ;
-	pips_debug(1, "st at entry:\n");
+	pips_debug(1, "(st = %#x, pred = %#x, succ = %#x, c_res = %#x)\nst at entry:\n",
+		   (unsigned int) st, (unsigned int) pred,
+		   (unsigned int) succ, (unsigned int) c_res);
 	print_statement(st);
-	CONTROL_MAP(ctl, {
-	    pips_debug(1, "ctl=%#x:\n", (unsigned int) ctl);
-	    print_statement(control_statement(ctl));
-	}, c_res, blocs);
-	fprintf(stderr, "---\n");
-	gen_free_list(blocs);
+	pips_debug(1, "Successors of c_res:\n");
+	display_list_of_control_nodes(c_res);
     }
     
     switch(instruction_tag(i)) {
@@ -317,17 +376,11 @@ hash_table used_labels;
     }
 
     ifdebug(5) {
-	list blocs = NIL ;
 	pips_debug(1, "st at exit:\n");
 	print_statement(st);
-	CONTROL_MAP(ctl, {
-	    pips_debug(1, "ctl=%#x:\n", (unsigned int) ctl);
-	    /* print_text(stderr, text_statement(get_current_module_entity(), 0, st)); */
-	    print_statement(control_statement(ctl));
-	    /* print_text(stderr, text_statement(get_current_module_entity(), 0, control_statement(ctl))); */
-	}, c_res, blocs);
+	pips_debug(1, "Successors of c_res at exit:\n");
+	display_list_of_control_nodes(c_res);
 	fprintf(stderr, "---\n");
-	gen_free_list(blocs);
     }
     
     update_used_labels(used_labels, label, st);
@@ -350,6 +403,10 @@ hash_table used_labels;
 
     stop = FALSE ;
 
+    pips_debug(5, "(st = %#x, pred = %#x, succ = %#x, c_res = %#x)\n",
+	       (unsigned int) st, (unsigned int) pred,
+	       (unsigned int) succ, (unsigned int) c_res);
+        
     UPDATE_CONTROL(c_res, st,
 		    ADD_PRED(pred, c_res), 
 		    (stop ? NIL : CONS(CONTROL, succ, NIL)));
@@ -455,6 +512,10 @@ hash_table used_labels;
     control c_test = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
     bool controlized;
 
+    pips_debug(5, "(st = %#x, pred = %#x, succ = %#x, c_res = %#x)\n",
+	       (unsigned int) st, (unsigned int) pred,
+	       (unsigned int) succ, (unsigned int) c_res);
+    
     controlize(loop_body(l), c_test, c_inc, c_body, loop_used_labels);
 
     if(covers_labels_p(loop_body(l),loop_used_labels)) {
@@ -495,8 +556,12 @@ hash_table used_labels;
     control_successors(pred) = ADD_SUCC(c_res, pred);
 
     union_used_labels( used_labels, loop_used_labels);
+    
+    pips_debug(5, "Exiting\n");
+    
     return(controlized);
 }
+
 
 /* COMPACT_LIST takes a list of controls CTLS coming from a CONTROLIZE_LIST
    and compacts the successive assignments, i.e. concatenates (i=1) followed
@@ -580,16 +645,21 @@ hash_table used_labels;
 	control c_next = 
 		ENDP(CDR(sts)) ? succ : 
 			make_conditional_control(STATEMENT(CAR(CDR(sts))));
-	bool controlized = 
-		controlize(st, pred, c_next, c_res, used_labels);
-	bool unreachable = ENDP(control_predecessors(c_next));
+	bool controlized;
+	bool unreachable;
+
+	ifdebug(5) {
+	    pips_debug(0, "Nodes linked with pred %#x:\n", pred);
+	     display_list_of_control_nodes(pred);
+	}
+
+	controlized = controlize(st, pred, c_next, c_res, used_labels);
+	unreachable = ENDP(control_predecessors(c_next));
 
 	ctls = CONS(CONTROL, c_res, ctls);
 
 	if(unreachable) {
-	    control_successors(Unreachable) =
-		    CONS(CONTROL, (control)st,
-			 control_successors(Unreachable)) ;
+	    Unreachable = CONS(STATEMENT, st, Unreachable);
 	}
 	if(controlized) {
 	    control c_in = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
@@ -631,10 +701,14 @@ hash_table used_labels;
 			    make_conditional_control(STATEMENT(CAR(sts)));
     control c_end = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
     control c_last = c_end;
-    cons *ctls =
-	    controlize_list_1(sts, pred, c_end, c_block, block_used_labels);
+    list ctls;
     bool controlized;
 
+    pips_debug(5, "(st = %#x, pred = %#x, succ = %#x, c_res = %#x)\n",
+	       (unsigned int) st, (unsigned int) pred,
+	       (unsigned int) succ, (unsigned int) c_res);
+    
+    ctls = controlize_list_1(sts, pred, c_end, c_block, block_used_labels);
     c_last = compact_list( ctls, c_end ) ;
 
     if(covers_labels_p(st,block_used_labels)) {
@@ -679,6 +753,9 @@ hash_table used_labels;
 	controlized = TRUE;
     }
     union_used_labels( used_labels, block_used_labels);
+    
+    pips_debug(5, "Exiting\n");
+    
     return(controlized);
 }
 	
@@ -701,6 +778,10 @@ hash_table used_labels;
     statement s_f = test_false(t);
     bool controlized;
 
+    pips_debug(5, "(st = %#x, pred = %#x, succ = %#x, c_res = %#x)\n",
+	       (unsigned int) st, (unsigned int) pred,
+	       (unsigned int) succ, (unsigned int) c_res);
+    
     ifdebug(5) {
 	pips_debug(1, "THEN at entry:\n");
 	print_statement(s_t);
@@ -748,17 +829,12 @@ hash_table used_labels;
 		      union_used_labels(t_used_labels, f_used_labels));
 
     ifdebug(5) {
-	list blocs = NIL ;
 	pips_debug(1, "IF at exit:\n");
 	print_statement(st);
-	CONTROL_MAP(ctl, {
-	    pips_debug(1, "ctl=%#x:\n", (unsigned int) ctl);
-	    print_statement(control_statement(ctl));
-	}, c_res, blocs);
-	fprintf(stderr, "---\n");
-	gen_free_list(blocs);
-    }
-
+	display_list_of_control_nodes(c_res);
+    }    
+    pips_debug(5, "Exiting\n");
+    
     return(controlized);
 }
 
@@ -822,12 +898,21 @@ statement st ;
 		
 
 /* SIMPLIFIED_UNSTRUCTURED tries to get rid of top-level and useless
-   unstructure nodes. */
+   unstructure nodes.
 
-static unstructured simplified_unstructured(top, bottom, res)
-control top, bottom, res;
+   top is the entry node, bottom the exit node. result is ? (see
+   assert below... Looks like it is the second node. RK)
+
+   All the comments below are from RK who is reverse engineering all
+   that stuff... :-(
+
+   Looks like there are many memory leaks. */
+static unstructured
+simplified_unstructured(control top,
+			control bottom,
+			control res)
 {
-    cons *succs;
+    list succs;
     statement st;
     unstructured u;
     instruction i;
@@ -835,37 +920,59 @@ control top, bottom, res;
     u = make_unstructured(top, bottom);
 
     if(!ENDP(control_predecessors(top))) {
+	/* There are goto on the entry node: */
 	return(u);
     }
+    
     if(gen_length(succs=control_successors(top)) != 1) {
+	/* The entry node is not a simple node sequence: */
 	return(u);
     }
+    
     pips_assert("simplify_control", CONTROL(CAR(succs)) == res);
     
     if(gen_length(control_predecessors(res)) != 1) {
+	/* The second node has more than 1 goto on it: */
 	return(u);
     }
+    
     if(gen_length(succs=control_successors(res)) != 1) {
+	/* Second node is not a simple node sequence: */
 	return(u);
     }
+    
     if(CONTROL(CAR(succs)) != bottom) {
+	/* The third node is not the exit node: */
 	return(u);
     }
+
     if(gen_length(control_predecessors(bottom)) != 1) {
+	/* The exit node has more than 1 goto on it: */
 	return(u);
     }
+    
     if(!ENDP(control_successors(bottom))) {
+	/* The exit node has a successor: */
 	return(u);
     }
+
+    /* Here we have a sequence of 3 control node: top, res and
+       bottom. */
     control_predecessors(res) = control_successors(res) = NIL;
     st = control_statement(res);
 
     if(instruction_unstructured_p(i=statement_instruction(st))) {
+	/* If the second node is an unstructured, just return it
+           instead of top and bottom: (??? Lot of assumptions. RK) */
 	return(instruction_unstructured(i));
     }
+
+    /* Just keep the second node as an unstructured with only 1
+       control node: */
     unstructured_control(u) = unstructured_exit(u) = res;
     return(u);
 }
+
 
 /* CONTROL_GRAPH returns the control graph of the statement ST. */
 
@@ -878,7 +985,8 @@ statement st;
 
     debug_on("CONTROL_DEBUG_LEVEL");
 
-    if (get_debug_level() > 0) {
+    ifdebug(1) {
+	pips_assert("Statement should be OK.", gen_consistent_p(st));
 	set_bool_property("PRETTYPRINT_BLOCKS", TRUE);
 	set_bool_property("PRETTYPRINT_EMPTY_BLOCKS", TRUE);
     }
@@ -891,11 +999,18 @@ statement st;
     result = make_conditional_control(st);
     top = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
     bottom = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
-    Unreachable = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+    Unreachable = NIL;
     controlize(st, top, bottom, result, used_labels);
 
-    if(!ENDP(control_successors(Unreachable))) {
+    if(!ENDP(Unreachable)) {
 	user_warning("control_graph", "Some statements are unreachable\n");
+	ifdebug(1) {
+	    pips_debug(0, "Unreachable statements:\n");
+	    MAP(STATEMENT, s, {
+		pips_debug(0, "Statement %#x:\n");
+		print_statement(s);
+	    }, Unreachable);
+	}
     }
     hash_table_free(Label_statements);
     hash_table_free(Label_control);
@@ -903,18 +1018,26 @@ statement st;
     u = simplified_unstructured(top, bottom, result);
 
     if( get_debug_level() > 5) {
-	cons *blocs = NIL ;
-
-	fprintf(stderr, "Nodes in unstructured (%x, %x)\n",
-		(unsigned int) unstructured_control(u),
-		(unsigned int) unstructured_exit(u)) ;
-
-	CONTROL_MAP(ctl, {
-	    fprintf(stderr, "%x, ", (unsigned int) ctl) ;
-	}, unstructured_control(u), blocs);
+	pips_debug(1, "Nodes in unstructured %x (entry %x, exit %x) from entry:\n",
+		   (unsigned int) u,
+		   (unsigned int) unstructured_control(u),
+		   (unsigned int) unstructured_exit(u));
+	display_list_of_control_nodes(unstructured_control(u));
+	pips_debug(1, "Accessible nodes from exit:\n");
+	display_list_of_control_nodes(unstructured_exit(u));
     }
+
     reset_unstructured_number();
     unstructured_reorder(u);
+
+    ifdebug(1) {
+	check_control_coherency(unstructured_control(u));
+	check_control_coherency(unstructured_exit(u));
+	pips_assert("Unstructured should be OK.", gen_consistent_p(u));
+    }
+
+    /* Restore the normal behaviour... */
+    hash_warn_on_redefinition();
 
     debug_off();
 
