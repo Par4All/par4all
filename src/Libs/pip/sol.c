@@ -6,9 +6,6 @@ extern long int cross_product, limit;
 extern int verbose;
 extern FILE *dump;
 
-extern int fprintf();
-extern int fflush();
-
 struct S
     {int flags;
      Entier param1, param2;
