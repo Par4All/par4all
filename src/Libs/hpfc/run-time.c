@@ -4,7 +4,7 @@
  * Fabien Coelho, May and June 1993
  *
  * SCCS stuff:
- * $RCSfile: run-time.c,v $ ($Date: 1994/06/03 14:14:42 $, ) version $Revision$,
+ * $RCSfile: run-time.c,v $ ($Date: 1994/09/01 15:47:58 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -45,18 +45,22 @@ int number_of_arguments;
 }
 
 /*
- * entity MakeRunTimeSupportFunction(local_name, number_of_arguments)
+ * entity MakeRunTimeSupportFunction
+ *   (local_name, number_of_arguments, return_type)
  *
  * this function can be used even if the function is already declared
  * ??? an integer shouldn't always be returned
  */
-entity MakeRunTimeSupportFunction(local_name, number_of_arguments)
+entity MakeRunTimeSupportFunction(local_name, number_of_arguments, return_type)
 string local_name;
 int number_of_arguments;
+tag return_type;
 {
     return(MakeExternalFunction(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
 						   local_name),
-				MakeIntegerResult()));
+				(return_type==is_basic_int ? /* ??? rough */
+				 MakeIntegerResult() :
+				 MakeOverloadedResult())));
 }
 
 expression pvm_what_option_expression(v)
@@ -167,7 +171,7 @@ reference ref;
 	    linds = reference_indices(ref),
 	    largs = make_list_of_constant(0, 7-gen_length(linds));
 	int
-	    narray = get_hpf_number(reference_variable(ref));
+	    narray = load_entity_hpf_number(reference_variable(ref));
 	
 	largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), 
 			       NIL),
@@ -194,7 +198,7 @@ reference ref;
 	    linds = reference_indices(ref),
 	    largs = make_list_of_constant(0, 7-gen_length(linds));
 	int
-	    narray = get_hpf_number(reference_variable(ref));
+	    narray = load_entity_hpf_number(reference_variable(ref));
 	
 	largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), NIL),
 			  gen_nconc(lUpdateExpr(node_module,  linds), largs));
@@ -307,7 +311,7 @@ expression expr;
 	{
 	    expression
 		expr1 = 
-		    int_to_expression(get_hpf_number(array)),
+		    int_to_expression(load_entity_hpf_number(array)),
 		    expr2 = int_to_expression(dim);
 	    
 	    return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND_GAMMA), 
@@ -316,7 +320,7 @@ expression expr;
 	case DELTA_NEW_DECLARATION:
 	{
 	    expression
-		expr1 = int_to_expression(get_hpf_number(array)),
+		expr1 = int_to_expression(load_entity_hpf_number(array)),
 		expr2 = int_to_expression(dim);
 	    
 	    return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND_DELTA), 
@@ -331,7 +335,7 @@ expression expr;
     else
     {
 	expression
-	    expr1 = int_to_expression(get_hpf_number(array)),
+	    expr1 = int_to_expression(load_entity_hpf_number(array)),
 	    expr2 = int_to_expression(dim);
 	
 	return(MakeTernaryCallExpr(hpfc_name_to_entity(LOCAL_IND), 
@@ -470,6 +474,36 @@ bool bsend;
 
 }
 
+/* returns the entity to which e is attached,
+ * that is first a common, then a function...
+ */
+entity hpfc_main_entity(e)
+entity e;
+{
+    storage
+	s = entity_storage(e);
+    bool
+	in_common = entity_in_common_p(e),
+	in_ram = storage_ram_p(s);
+    ram 
+	r = (in_ram ? storage_ram(s) : ram_undefined);
+
+    pips_assert("hpfc_main_entity", !storage_rom_p(s));
+
+    return(in_ram ?
+	   (in_common ? ram_section(r) : ram_function(r)):
+	   (storage_formal_p(s) ? formal_function(storage_formal(s)) :
+	    (storage_return_p(s) ? storage_return(s) : entity_undefined)));
+}
+
+/* returns the name of the entity e belongs too (common, function...)
+ */
+string hpfc_main_entity_name(e)
+entity e;
+{
+    return(module_local_name(hpfc_main_entity(e)));
+}
+
 /*
  * string bound_parameter_name(array, side, dim)
  *
@@ -478,14 +512,15 @@ bool bsend;
  */
 string bound_parameter_name(array, side, dim)
 entity array;
-int side, dim;
+string side;
+int dim;
 {
-    char
-	buffer[100];
+    char buffer[100];
 
-    return(strdup(sprintf(buffer, "%s_%s%d",
-			  local_name(entity_name(array)),
-			  (side)?("UP"):("LO"),
+    return(strdup(sprintf(buffer, "%s_%s_%s%d",
+			  hpfc_main_entity_name(array),
+			  entity_local_name(array),
+			  side,
 			  dim)));
 }
 
