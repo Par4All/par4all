@@ -152,7 +152,7 @@ add_parameter_aliases_for_this_call_site(call call_site,
 		    
 		    ifdebug(9)
 			{
-			    print_region(EFFECT(real_reg));
+			    print_region(real_reg);
 			}
 
 		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
@@ -287,7 +287,6 @@ alias_pairs( string module_name, list l_reg )
 {
 
     callees callers;
-    entity module;
 
     pips_debug(9,"begin for module %s\n",module_name);
 
