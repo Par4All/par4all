@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1997/12/05 18:42:19 $, )
+ * $RCSfile: list.c,v $ ($Date: 1998/04/14 13:23:31 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -76,52 +76,38 @@
 #include "genC.h"
 #include "newgen_include.h"
 
-int gen_eq( obj1, obj2 )
-gen_chunk *obj1, *obj2 ;
+int gen_eq(void * obj1, void * obj2)
 {
-  return( obj1 == obj2 ) ;
+    return obj1 == obj2;
 }
 
-int gen_length( cp )
-     cons *cp ;
+int gen_length(list cp)
 {
   int i ;
-
-  for( i=0; cp != NIL ; cp = cp->cdr, i++ )
-    ;
-  return( i ) ;
+  for( i=0; cp != NIL ; cp = cp->cdr, i++);
+  return i;
 }
 
-
-int
-list_own_allocated_memory(
-    list l)
+int list_own_allocated_memory(list l)
 {
     return gen_length(l)*sizeof(cons);
 }
 
 /*   MAP
  */
-void gen_mapl( fp, cp )
-void (*fp)() ;
-cons *cp ;
+void gen_mapl(void (*fp)(), list cp)
 {
-  for( ; cp != NIL ; cp = cp->cdr )
-    (*fp)( cp ) ;
+  for (; cp != NIL ; cp = cp->cdr)
+      (*fp)(cp);
 }
 
-void gen_map(fp, l)
-void (*fp)();
-list l;
+void gen_map(void (*fp)(), list l)
 {
     for (; !ENDP(l); l=CDR(l))
 	(*fp)(CHUNK(CAR(l)));
 }
 
-char * gen_reduce( r, fp, cp )
-char *r ;
-char *(*fp)() ;
-cons *cp ;
+char * gen_reduce(char * r, char *(*fp)(), list cp)
 {
     for( ; cp != NIL ; cp = cp->cdr ) {
 	r = (*fp)( r, cp ) ;
@@ -129,43 +115,36 @@ cons *cp ;
     return( r ) ;
 }
 
-cons * gen_some( fp, cp )
-bool (*fp)() ;
-cons *cp ;
+cons * gen_some(bool (*fp)(), list cp)
 {
-    for( ; cp!= NIL ; cp = cp->cdr ) {
+    for( ; cp!= NIL ; cp = cp->cdr )
 	if( (*fp)( cp ))
 		return( cp ) ;
-    }
-    return( NIL ) ;
+    return NIL;
 }
 
 /*  SPECIAL INSERTION
  */
 static gen_chunk *gen_chunk_of_cons_of_gen_chunk = gen_chunk_undefined;
-static bool cons_of_gen_chunk(cp)
-cons *cp;
+static bool cons_of_gen_chunk(list cp)
 {
     return(CHUNK(CAR(cp))==gen_chunk_of_cons_of_gen_chunk);
 }
 
-void gen_insert_after(new_obj, obj, l)
-gen_chunk *new_obj, *obj;
-cons *l;
+void gen_insert_after(void * no, void * o, list l)
 {
+    gen_chunk * new_obj = (gen_chunk*) no, * obj = (gen_chunk*) o;
     cons *obj_cons = NIL;
     gen_chunk_of_cons_of_gen_chunk = obj;
 
     obj_cons = gen_some(cons_of_gen_chunk, l);
     assert(!ENDP(obj_cons));
-
     CDR(obj_cons) = CONS(CHUNK, new_obj, CDR(obj_cons));
 }
 
 #define NEXT(cp) (((cp) == NIL) ? NIL : (cp)->cdr)
 
-cons * gen_nreverse( cp )
-cons *cp ;
+list gen_nreverse(list cp)
 {
     cons *next, *next_next ;
 
@@ -184,9 +163,7 @@ cons *cp ;
     return( cp ) ;
 }
     
-void gen_mapc_tabulated( fp, binding )
-void (*fp)() ;
-int binding ;
+void gen_mapc_tabulated(void (*fp)(), int binding)
 {
     struct gen_binding *bp = &Domains[ binding ] ;
     gen_chunk *table = Gen_tabulated_[ bp->index ] ;
@@ -202,9 +179,8 @@ int binding ;
     }
 }
 
-gen_chunk * gen_find_tabulated( key, domain )
-char *key ;
-int domain ;
+/* why here? */
+void * gen_find_tabulated(char * key, int domain)
 {
     gen_chunk *hash ;
 
@@ -212,12 +188,11 @@ int domain ;
 	== (gen_chunk *)HASH_UNDEFINED_VALUE ) {
 	return( gen_chunk_undefined ) ;
     }
-    return( (Gen_tabulated_[ Domains[ domain ].index ]+abs( hash->i ))->p ) ;
+    return (void*) 
+	((Gen_tabulated_[ Domains[ domain ].index ]+abs( hash->i ))->p);
 }
 
-cons * gen_filter_tabulated( filter, domain )
-int (*filter)() ;
-int domain ;
+list gen_filter_tabulated(int (*filter)(), int domain)
 {
     struct gen_binding *bp = &Domains[ domain ] ;
     gen_chunk *table = Gen_tabulated_[ bp->index ] ;
@@ -235,7 +210,7 @@ int domain ;
 	    l = CONS( CHUNK, obj, l ) ;
 	}
     }
-    return( l ) ;
+    return l;
 }
 
 void gen_free_list(list l)
@@ -247,8 +222,7 @@ void gen_free_list(list l)
     }
 }
 
-cons * gen_nconc( cp1, cp2 )
-cons *cp1, *cp2 ;
+list gen_nconc(list cp1, list cp2)
 {
     cons *head = cp1 ;
 
@@ -261,97 +235,73 @@ cons *cp1, *cp2 ;
     return( head ) ;
 }
 
-void gen_copy( a, b )
-gen_chunk *a, *b ;
+void gen_copy(void * a, void * b)
 {
-    *a = *b ;
+    * (gen_chunk*)a = * (gen_chunk*)b ;
 }
 
-gen_chunk *gen_car(l)
-list l;
+void * gen_car(list l)
 {
-    return(CHUNK(CAR(l)));
+    return CHUNK(CAR(l));
 }
 
-gen_chunk *gen_find_if(test, pc, extract)
-bool (*test)();
-cons *pc;
-gen_chunk *(*extract)();
+void * gen_find_if(bool (*test)(), list pc, void *(*extract)())
 {
     for (; pc!=NIL; pc=pc->cdr)
 	if ((*test)((*extract)(CAR(pc))))
-	    return((*extract)(CAR(pc)));
+	    return (*extract)(CAR(pc));
 
-    return(gen_chunk_undefined);
+    return gen_chunk_undefined;
 }
 
 /*  the last match is returned
  */
-gen_chunk *gen_find_if_from_end(test, pc, extract)
-bool (*test)();
-cons *pc;
-gen_chunk *(*extract)();
+void * gen_find_if_from_end(bool (*test)(), list pc, void *(*extract)())
 {
-    gen_chunk *e = gen_chunk_undefined ;
+    void * e = gen_chunk_undefined ;
 
     for (; pc!=NIL; pc=pc->cdr)
 	if ((*test)((*extract)(CAR(pc))))
 	    e = (*extract)(CAR(pc));
 
-    return(e);
+    return e;
 }
 
-gen_chunk *gen_find(item, seq, test, extract)
-gen_chunk *item;
-cons *seq;
-bool (*test)();
-gen_chunk *(*extract)();
+void * gen_find(void * item, list seq, bool (*test)(), void *(*extract)())
 {
-    cons *pc;
-
-    for (pc = seq; pc != NIL; pc = pc->cdr ) {
+    list pc;
+    for (pc = seq; pc != NIL; pc = pc->cdr )
 	if ((*test)(item, (*extract)(CAR(pc))))
 		return (*extract)(CAR(pc));
-    }
-
-    return( gen_chunk_undefined );
+    return gen_chunk_undefined;
 }
 
-gen_chunk *gen_find_from_end(item, seq, test, extract)
-gen_chunk *item;
-cons *seq;
-bool (*test)();
-gen_chunk *(*extract)();
+void * gen_find_from_end(
+    void * item, list seq, bool (*test)(), void *(*extract)())
 {
-    cons *pc;
-    gen_chunk *e = gen_chunk_undefined ;
+    list pc;
+    void * e = gen_chunk_undefined ;
 
     for (pc = seq; pc != NIL; pc = pc->cdr ) {
 	if ((*test)(item, (*extract)(CAR(pc))))
 		e = (*extract)(CAR(pc));
     }
 
-    return(e);
+    return e;
 }
 
-gen_chunk *gen_find_eq(item, seq)
-gen_chunk *item;
-cons *seq;
+void *gen_find_eq(void * item, list seq)
 {
-    cons *pc;
-
-    for (pc = seq; pc != NIL; pc = pc->cdr ) {
+    list pc;
+    for (pc = seq; pc != NIL; pc = pc->cdr )
 	if (item == CAR(pc).p)
 		return CAR(pc).p;
-    }
-
-    return( gen_chunk_undefined );
+    return gen_chunk_undefined;
 }
 
-cons *gen_concatenate(l1, l2)
-cons *l1, *l2;
+list gen_concatenate(list l1, list l2)
 {
-    cons *l = NIL, *q = NIL;
+    list l = NIL, q = NIL;
 
     if (l1 != NIL) {
 	l = q = CONS(CHUNK, CHUNK(CAR(l1)), NIL);
@@ -382,8 +332,7 @@ cons *l1, *l2;
     return(l);
 }
 
-cons *gen_append(l1, l2)
-cons *l1, *l2;
+list gen_append(list l1, list l2)
 {
     cons *l = NIL, *q = NIL;
 
@@ -405,8 +354,7 @@ cons *l1, *l2;
     return(l);
 }
 
-cons * gen_copy_seq(l)
-cons *l;
+list gen_copy_seq(list l)
 {
     cons *nlb = NIL, *nle = NIL;
 
@@ -457,18 +405,17 @@ gen_free_string_list(list /* of string */ ls)
     gen_free_list(ls);
 }
 
-list gen_last(l)
-list l;
+list gen_last(list l)
 {
     if (ENDP(l)) return(l);         /* NIL case */
     while (!ENDP(CDR(l))) l=CDR(l); /* else go to the last */
     return(l);
 }
 	
-void gen_remove( cpp, obj )
-cons **cpp ;
-gen_chunk *obj ;
+void gen_remove(list * cpp, void * vo)
 {
+    gen_chunk * obj = (gen_chunk*) vo;
+
     if( ENDP( *cpp )) {
 	return ;
     }
@@ -488,9 +435,7 @@ gen_chunk *obj ;
  *  was:  return( (n<=0) ? l : gen_nthcdr( n-1, CDR( l ))) ;
  *  if n>gen_length(l), NIL is returned.
  */
-list gen_nthcdr(n, l )
-int n ;
-list l ;
+list gen_nthcdr(int n, list l)
 {
     message_assert("valid n", n>=0);
     for (; !ENDP(l) && n>0; l=CDR(l), n--);
@@ -499,19 +444,16 @@ list l ;
 
 /* to be used as ENTITY(gen_nth(3, l))...
  */
-gen_chunk gen_nth(n, l)
-int n;
-list l;
+gen_chunk gen_nth(int n, list l)
 {
     list r = gen_nthcdr(n, l);
     message_assert("not NIL", r);
     return CAR(r);
 }
 
-list gen_once(item, l)
-gen_chunk *item;
-list l;
+list gen_once(void * vo, list l)
 {
+    gen_chunk * item = (gen_chunk*) vo;
     list c;
     for(c=l; c!=NIL; c=CDR(c))
 	if (CHUNK(CAR(c))==item) return(l);
@@ -519,10 +461,9 @@ list l;
     return(CONS(CHUNK, item, l));
 }
 
-bool gen_in_list_p(item, l)
-gen_chunk *item;
-list l;
+bool gen_in_list_p(void * vo, list l)
 {
+    gen_chunk * item = (gen_chunk*) vo;
     for (; !ENDP(l); POP(l))
 	if (CHUNK(CAR(l))==item) return(TRUE); /* found! */
 
