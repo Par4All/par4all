@@ -417,7 +417,7 @@ char * current_file_name = (char *) NULL;
 static void 
 parse_arguments(int argc, char * argv[])
 {
-    if (argc<1 || !argv[1]) return;
+    if (argc<2) return;
 
     current_file_name = argv[1];
     safe_fclose(stdin, "stdin !");
