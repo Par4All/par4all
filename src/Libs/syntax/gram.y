@@ -1067,32 +1067,32 @@ fortran_type: fortran_basic_type lg_fortran_type
 fortran_basic_type: TK_INTEGER
 	    {
 		    $$ = is_basic_int;
-		    CurrentTypeSize = 4;
+		    CurrentTypeSize = DEFAULT_INTEGER_TYPE_SIZE;
 	    }
 	| TK_REAL
 	    {
 		    $$ = is_basic_float; 
-		    CurrentTypeSize = 4;
+		    CurrentTypeSize = DEFAULT_REAL_TYPE_SIZE;
 	    }
 	| TK_DOUBLEPRECISION
 	    {
 		    $$ = is_basic_float; 
-		    CurrentTypeSize = 8;
+		    CurrentTypeSize = DEFAULT_DOUBLEPRECISION_TYPE_SIZE;
 	    }
 	| TK_LOGICAL
 	    {
 		    $$ = is_basic_logical; 
-		    CurrentTypeSize = 4;
+		    CurrentTypeSize = DEFAULT_LOGICAL_TYPE_SIZE;
 	    }
 	| TK_COMPLEX
 	    {
 		    $$ = is_basic_complex; 
-		    CurrentTypeSize = 8;
+		    CurrentTypeSize = DEFAULT_COMPLEX_TYPE_SIZE;
 	    }
 	| TK_CHARACTER
 	    {
 		    $$ = is_basic_string; 
-		    CurrentTypeSize = 1;
+		    CurrentTypeSize = DEFAULT_CHARACTER_TYPE_SIZE;
 	    }
 	;
 
