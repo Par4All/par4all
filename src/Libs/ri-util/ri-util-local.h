@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.83  2002/10/07 10:00:54  irigoin
+ * Macros for operators ABS, DABS and CABS added.
+ *
  * Revision 1.82  2002/10/04 09:29:41  irigoin
  * Check on stack area added in macro SPECIAL_AREA_P
  *
@@ -160,7 +163,10 @@ typedef hash_table control_mapping;
 #define MAX0_OPERATOR_NAME 		"MAX0"
 #define AMAX1_OPERATOR_NAME 		"AMAX1"
 #define DMAX1_OPERATOR_NAME 		"DMAX1"
+#define ABS_OPERATOR_NAME 		"ABS"
 #define IABS_OPERATOR_NAME 		"IABS"
+#define DABS_OPERATOR_NAME 		"DABS"
+#define CABS_OPERATOR_NAME 		"CABS"
 
 /* generic conversion names.
  */
@@ -258,7 +264,10 @@ typedef hash_table control_mapping;
 #define ENTITY_DMIN1_P(e) entity_an_operator_p(e, DMIN1)
 #define ENTITY_DMAX1_P(e) entity_an_operator_p(e, DMAX1)
 #define ENTITY_MIN_OR_MAX_P(e) (ENTITY_MIN_P(e) || ENTITY_MAX_P(e) )
+#define ENTITY_ABS_P(e) entity_an_operator_p(e, ABS)
 #define ENTITY_IABS_P(e) entity_an_operator_p(e, IABS)
+#define ENTITY_DABS_P(e) entity_an_operator_p(e, DABS)
+#define ENTITY_CABS_P(e) entity_an_operator_p(e, CABS)
 
 #define ENTITY_AND_P(e) entity_an_operator_p(e, AND)
 
