@@ -488,5 +488,22 @@ constraints_lexicographic_sort_generic(Pcontrainte cl,
     return result;
 }
 
+/* returns whether a constraint is a simple equality: X == 12
+ * the system is expected to be normalized?
+ */
+Variable contrainte_simple_equality(Pcontrainte e)
+{
+  Pvecteur v = e->vecteur;
+  int size = vect_size(v);
+  switch (size) {
+  case 0: return NULL;
+  case 1: if (v->var) return v->var; else return NULL;
+  case 2: 
+    if (v->var && !v->succ->var) return v->var;
+    if (!v->var && v->succ->var) return v->succ->var;
+  }
+  return NULL;
+}
+
 /*    that is all
  */
