@@ -2,7 +2,7 @@
 ! parameters used to compile 
 !
 ! $RCSfile: hpfc_parameters.m4h,v $ version $Revision$
-! ($Date: 1997/06/09 13:04:33 $, )
+! ($Date: 1997/07/03 11:09:12 $, )
 !
 ! type declarations
 !
@@ -13,7 +13,15 @@
      $     MAX NB OF PROCESSORS,
      $     MAX MAX SIZE OF PROCS,
      $     MAX MAX SIZE OF BUFFER,
-     $     MAX SIZE OF STATUS
+     $     MAX SIZE OF STATUS,
+     $     DATARAW ENCODING,
+     $     BUFFER ENCODING,
+     $     HPFC SUM,
+     $     HPFC PROD,
+     $     HPFC MAX,
+     $     HPFC MIN
+
+
 !
 ! parameters
 !
@@ -23,10 +31,22 @@
       parameter(MAX NB OF PROCESSORS = 32)
       parameter(MAX MAX SIZE OF PROCS = _HPFC_MAX_NPES_)
       parameter(MAX SIZE OF STATUS = 10)
+      parameter(HPFC SUM=1)
+      parameter(HPFC PROD=2)
+      parameter(HPFC MAX=3)
+      parameter(HPFC MIN=4)
 !
 ! MAXMAXSIZEOFBUFFER is around 1 MB
 !
       parameter(MAX MAX SIZE OF BUFFER = 1000000)
+
+
+!
+! SPECIFIC BUFFER ENCODING (1=Pvmdataraw and 2=_HPFC_ENCODING_) 
+!
+      parameter(DATARAW ENCODING = 1)
+      parameter(BUFFER ENCODING = 2)  
+
 !
 ! that s all
 !
