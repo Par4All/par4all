@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.46  2003/07/28 15:42:44  irigoin
+ * Comment improved for basic_of_expression()
+ *
  * Revision 1.45  2003/06/19 07:25:23  nguyen
  * Update calls to make_statement and make_variable with new RI for C
  *
@@ -789,6 +792,9 @@ basic b;
 /* basic basic_of_expression(expression exp): Makes a basic of the same
  * basic as the expression "exp". Indeed, "exp" will be assigned to
  * a temporary variable, which will have the same declaration as "exp".
+ *
+ * Does not work if the expression is a reference to a functional entity,
+ * as may be the case in a Fortran call.
  *
  * WARNING: a new basic object is allocated
  *
