@@ -165,7 +165,7 @@ cons *ldvr, *ldvl;
 		  dataval_nboccurrences(dvl));
 	}
 	else {
-	    debug(7, "", "(??,%d), ", dataval_nboccurrences(dvl));
+	    debug(7, "", "(x,%d), ", dataval_nboccurrences(dvl));
 	}
 
     }
@@ -251,7 +251,7 @@ cons *ldvr, *ldvl;
 	FatalError("AnalyzeData", "too few initializers\n");
     }
 }
-
+
 /* void DeclareVariable(e, t, d, s, v): update entity e description
  * as declaration statements are encountered. Examples of sequences:
  *
@@ -277,9 +277,9 @@ cons *ldvr, *ldvl;
  *    the type variable may have a dimension; variable or functional
  *    implicit types, as well as undefined type, can be superseded by
  *    the new type t; a NIL type dimension can be superseded by d;
- *    how should area entities be handled?!?
+ *    how should area entities be handled ???
  *  t is a type of kind "variable" (functional types are not accepted;
- *    functional declaration are handled by ????) or undefined; 
+ *    functional declaration are handled by ??? ) or undefined; 
  *    it should have no dimensions;
  *  d is a (possibly) empty list of dimensions; the empty list is
  *    handled as the undefined list; each dimension is an expression
