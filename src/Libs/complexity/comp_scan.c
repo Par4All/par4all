@@ -224,7 +224,7 @@ list eff_list;
     }
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	fprintf(stderr,"complexity for statement (%d,%d) at %#p\n",
+	fprintf(stderr,"complexity for statement (%d,%d) at %p\n",
 		(statement_ordering(stat) >> 16), 
 		(statement_ordering(stat) & 0xffff), comp);
 	complexity_fprint(stderr, comp, TRUE, TRUE);
@@ -360,7 +360,7 @@ list effects_list;
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	(void) gen_consistent_p(comp);
-	fprintf(stderr, "block comp is at %#p and comp value is ", comp);
+	fprintf(stderr, "block comp is at %p and comp value is ", comp);
 	complexity_fprint(stderr, comp, FALSE, TRUE);
     }
     complexity_check_and_warn("block_to_complexity", comp);    
@@ -707,7 +707,7 @@ list effects_list;
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "call '%s': ", name);
 	complexity_fprint(stderr, comp, FALSE, TRUE);
-	fprintf(stderr, "call comp is at %#p\n", comp);
+	fprintf(stderr, "call comp is at %p\n", comp);
     }
     complexity_check_and_warn("call_to_complexity", comp);
 
@@ -744,7 +744,7 @@ list effects_list;
     },exprlist);
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	fprintf(stderr, "argument comp is at %#p and value is ", comp);
+	fprintf(stderr, "argument comp is at %p and value is ", comp);
 	complexity_fprint(stderr, comp, FALSE, TRUE);
     }
     complexity_check_and_warn("arguments_to_complexity", comp);    
