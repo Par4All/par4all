@@ -456,6 +456,9 @@ statement loop_nest;
     instruction ins = statement_instruction(loop_nest);
 
     switch(instruction_tag(ins)) {
+    case is_instruction_call:
+        return loop_nest;
+        
     case is_instruction_block: {
 	list lb = instruction_block(ins);
 	statement first_s = STATEMENT(CAR(lb));
