@@ -90,6 +90,14 @@ reify_ghost_variable_entity(entity e)
 	ghost_variable_entities = arguments_rm_entity(ghost_variable_entities, e);
 }
 
+bool
+ghost_variable_entity_p(entity e)
+{
+    pips_assert("defined list",	!list_undefined_p(ghost_variable_entities));
+
+    return entity_is_argument_p(e, ghost_variable_entities);
+}
+
 
 /* this function is called each time a new procedure is encountered. */
 void 
