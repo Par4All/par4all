@@ -866,7 +866,7 @@ transformer call_site_to_module_precondition(entity caller,
     call_site_prec = precondition_intra_to_inter (callee,
 						  caller_prec,
 						  seffects_callee);
-    call_site_prec = transformer_normalize(call_site_prec);
+    call_site_prec = transformer_normalize(call_site_prec, 2);
     /* translate_global_values(e_caller, call_site_prec); */
     reset_current_module_entity();
 
