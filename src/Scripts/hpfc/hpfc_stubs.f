@@ -4,8 +4,11 @@
 !
 ! (c) Fabien COELHO, 09/95
 !
-! $RCSfile: hpfc_stubs.f,v $ (version $Revision$)
-! ($Date: 1997/01/18 16:58:30 $, )
+! $Id$
+! $Log: hpfc_stubs.f,v $
+! Revision 1.10  1997/03/19 17:52:42  coelho
+! better RCS headers
+!
 !     
 ! synchronization 
       subroutine hpfc1
