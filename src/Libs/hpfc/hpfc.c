@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/11/14 14:42:26 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/11/14 14:51:25 $, )
  * version $Revision$
  */
  
@@ -347,9 +347,12 @@ reset_resources_for_module()
     free_hpfc_current_mappings();
     close_include_entities();
 
-    free_in_regions_map();
-    free_out_regions_map();
-
+  /*IN & OUT Regions are not always used*/
+    if (!get_bool_property("HPFC_IGNORE_IN_OUT_REGIONS"))  
+    {
+	free_in_regions_map();
+	free_out_regions_map();
+    }
 
 }
 
