@@ -20,6 +20,7 @@
 #include <strings.h>
 
 #include "boolean.h"
+#include "arithmetique.h"
 #include "vecteur.h"
 
 /* Pvecteur vect_read(Pbase * b): lecture interactive d'un vecteur sur stdin;
