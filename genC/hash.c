@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1996/07/08 16:46:37 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1996/08/31 16:36:06 $, )
  * version $Revision$
  */
 
@@ -309,6 +309,10 @@ char *key;
     message_assert("legal input key", key!=HASH_ENTRY_FREE &&
 		   key!=HASH_ENTRY_FREE_FOR_PUT);
 
+    if (!htp->hash_entry_number) 
+	return HASH_UNDEFINED_VALUE;
+
+    /* else may be there */
     hep = hash_find_entry(htp, key, &n, hash_get_op);
     
     return(hep->key!=HASH_ENTRY_FREE && hep->key!=HASH_ENTRY_FREE_FOR_PUT ? 
