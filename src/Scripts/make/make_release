@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/21 14:17:04 $, 
+# $Date: 1997/03/25 21:51:58 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -85,7 +85,7 @@ do
     find ./$dir ! -type d -print >> $tmp.tmp
 done
 
-sed '/OLD/d;/SCCS/d;/~/d;/\.database/d;/\.out$/d;/core/d;' $tmp.tmp |
+sed '/OLD/d;/SCCS/d;/RCS/d;/~/d;/\.database/d;/\.out$/d;/core/d;' $tmp.tmp |
 sort -u > $tmp.list
 
 #
