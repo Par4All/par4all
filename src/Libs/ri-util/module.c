@@ -1,5 +1,5 @@
  /* $RCSfile: module.c,v $ (version $Revision$)
-  * $Date: 1997/02/28 16:29:56 $, 
+  * $Date: 1997/04/17 20:43:53 $, 
   */
 #include <stdio.h>
 #include <string.h>
@@ -162,33 +162,26 @@ GENERIC_LOCAL_FUNCTION(declared_variables, entity_int)
 static list /* of entity */
     referenced_variables_list = NIL;
 
-static void store_this_variable(var)
-entity var;
+static void store_this_variable(entity var)
 {
-    assert(!entity_undefined_p(var));
-
-    /* I put this out because of shared entities (HPFC-PACKAGE)
-     * that must be considered again. ??? 
-     */
-    referenced_variables_list = 
-	CONS(ENTITY, var, referenced_variables_list);
+    message_assert("defined variable", !entity_undefined_p(var));
 
     if (!bound_referenced_variables_p(var))
     {
 	pips_debug(9, "%s\n", entity_name(var));
 	store_referenced_variables(var, TRUE);
+	referenced_variables_list = 
+	    CONS(ENTITY, var, referenced_variables_list);
     }
 }
 
-static void store_a_referenced_variable(ref)
-reference ref;
+static void store_a_referenced_variable(reference ref)
 {
     /* assert(!reference_undefined_p(ref)); */
     store_this_variable(reference_variable(ref));
 }
 
-static void store_the_loop_index(l)
-loop l;
+static void store_the_loop_index(loop l)
 {
     /* assert(!loop_undefined_p(l)); */
     store_this_variable(loop_index(l));
@@ -257,7 +250,7 @@ void insure_declaration_coherency(
 		pips_debug(7, "declared variable %s is referenced, kept\n",
 			   entity_name(var));
 		new_decl = CONS(ENTITY, var, new_decl);
-		store_declared_variables(var, TRUE);
+		store_or_update_declared_variables(var, TRUE);
 	    }
 	    else
 	    {
