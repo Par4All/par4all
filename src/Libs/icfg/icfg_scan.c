@@ -169,51 +169,38 @@ static bool statement_flt(statement s)
     
     pips_debug (5,"going down\n");
 
-    /*written by Dat*/
+    /* process the not call statement to print out filtered proper effects */
     if (get_int_property(ICFG_DECOR) == ICFG_DECOR_FILTERED_PROPER_EFFECTS) {
-	entity e_caller = get_current_module_entity();
+        entity e_caller = get_current_module_entity();
 	string caller_name = module_local_name(e_caller);
-	gen_chunk * m = (gen_chunk *)db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, TRUE);
-
+	statement_effects m = (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, TRUE);
+	
 	list l_effs = effects_effects(apply_statement_effects(m, s));
 	list l_effs_flt = effects_filter(l_effs);
-
+	
 	if (l_effs_flt != NIL) {
 	    instruction i = statement_instruction(s);
 
 	    if (instruction_call_p(i)) {
 	        call callee = instruction_call(i);
 		entity e_callee = call_function(callee);
-		
-		/* If this is a "real function" (defined in the code elsewhere) */
-		if (value_code_p(entity_initial(e_callee))) {
-		    expression* exps = call_arguments(callee);
-		  
-		    MAP(EXPRESSION, exp, {
-		      syntax syn = expression_syntax(exp);
 
-		      if (syntax_reference_p(syn)) { /*if argument is a variable */
-			  entity var = reference_variable(syntax_reference(syn));
-			  MAP(ENTITY, e, {
-			    if (entity_conflict_p(e, var)) {
-			        MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
-				MERGE_TEXTS(t, text_statement(entity_undefined, 0, s));
-				break;
-			    }
-			  }, list_variables_to_filter);
-		      }
-		    }, exps);
-		} else { /*if it is not a real call --> writeout */
+		/* the real function is processed in call_flt */
+		if (!value_code_p(entity_initial(e_callee))) {
 		    MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
+		    /* do not display comments in the decoration */
+		    free(statement_comments(s));
 		    MERGE_TEXTS(t, text_statement(entity_undefined, 0, s));
 		}
-	    } else { /*if it is not a call --> writeout */
+	    } else {
 	        MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
+		/* do not display comments in the decoration */
+		free(statement_comments(s));
 		MERGE_TEXTS(t, text_statement(entity_undefined, 0, s));
 	    }
 	}
     }
-    
+
     store_statement_icfg(s, t);
     res = current_stmt_filter(s);
     return res;
@@ -228,6 +215,47 @@ static void statement_rwt(statement s)
     return;
 }
 
+static text get_real_call_filtered_proper_effects(call c, entity e_caller)
+{
+    text t = make_text(NIL);
+
+    string caller_name = module_local_name(e_caller);
+    statement_effects m = (statement_effects) db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, TRUE);
+
+    list l_effs = effects_effects(apply_statement_effects(m, current_stmt_head()));
+    list l_effs_flt = effects_filter(l_effs);
+    
+    /* make the caller as the current module entity */
+    set_current_module_entity(e_caller);
+
+    if (l_effs_flt != NIL) {
+        expression * exps = call_arguments(c);
+
+	MAP(EXPRESSION, exp, {
+	    syntax syn = expression_syntax(exp);
+	    
+	    if (syntax_reference_p(syn)) {
+	        entity var = reference_variable(syntax_reference(syn));
+		
+		MAP(ENTITY, e, {
+		    if (entity_conflict_p(e, var)) {
+		        MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
+			/* do not display comments in the decoration */
+			free(statement_comments(current_stmt_head()));
+			MERGE_TEXTS(t, text_statement(e_caller, 0, current_stmt_head()));
+			break;
+		    }
+		}, list_variables_to_filter);
+	    }
+	}, exps);
+    }
+
+    /* release the current module entity */
+    reset_current_module_entity();
+
+    return t;
+}
+
 /* CALL
  */
 static void call_flt(call c)
@@ -236,11 +264,11 @@ static void call_flt(call c)
     string callee_name = module_local_name(e_callee);
     
     /* current_stmt_head() */
-    pips_debug (5,"called entity is %s\n", entity_name(e_callee));    
+    pips_debug (5,"called entity is %s\n", entity_name(e_callee));  
 
     /* If this is a "real function" (defined in the code elsewhere) */
     if (value_code_p(entity_initial(e_callee))) {
-	text r = (text) load_statement_icfg (current_stmt_head());
+        text r = (text) load_statement_icfg (current_stmt_head());
 
 	/* hum... pushes the current entity... */
 	entity e_caller = get_current_module_entity();
@@ -262,7 +290,8 @@ static void call_flt(call c)
 	case ICFG_DECOR_PROPER_EFFECTS:
 	    MERGE_TEXTS(r,get_text_proper_effects(callee_name));
 	    break;
-	case ICFG_DECOR_FILTERED_PROPER_EFFECTS: /* processed in statement_flt */
+	case ICFG_DECOR_FILTERED_PROPER_EFFECTS:
+	    MERGE_TEXTS(r, get_real_call_filtered_proper_effects(c, e_caller));
 	    break;
 	case ICFG_DECOR_CUMULATED_EFFECTS:
 	    MERGE_TEXTS(r,get_text_cumulated_effects(callee_name));
@@ -286,7 +315,7 @@ static void call_flt(call c)
 	/* append the callee' icfg */
 	append_icfg_file (r, callee_name);
 	/* store it to the statement mapping */
-	update_statement_icfg (current_stmt_head(), r);
+	update_statement_icfg(current_stmt_head(), r);
     }
     return;
 }
@@ -555,11 +584,6 @@ void print_module_icfg(entity module)
     make_icfg_map();
     make_current_stmt_stack();
 
-    /*modified by Dat*/
-    if (get_int_property(ICFG_DECOR) != ICFG_DECOR_FILTERED_PROPER_EFFECTS) {
-        append_marged_text(txt, 0, module_name, "");
-    }
-
     current_margin = ICFG_SCAN_INDENT;
 
     print_do_loops = get_bool_property(ICFG_DOs);
@@ -578,9 +602,12 @@ void print_module_icfg(entity module)
 
     pips_assert("stack is empty", current_stmt_empty_p());
 
-    /*written by Dat */
-    if ((get_int_property(ICFG_DECOR) == ICFG_DECOR_FILTERED_PROPER_EFFECTS) && (text_sentences((text)load_statement_icfg(s)) != NIL))
+    /* print the name of module in some case */
+    if (get_int_property(ICFG_DECOR) != ICFG_DECOR_FILTERED_PROPER_EFFECTS)
         append_marged_text(txt, 0, module_name, "");
+    else if (text_sentences((text)load_statement_icfg(s)) != NIL)
+        append_marged_text(txt, 0, module_name, "");
+
     MERGE_TEXTS (txt, (text) load_statement_icfg (s));
 
     make_text_resource(module_name, DBR_ICFG_FILE,
