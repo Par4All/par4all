@@ -331,7 +331,7 @@ Ppath in_pa;
     else if (sc_empty_p(ps)) continue;
     else if ((ps->nb_ineq == 1) && (ps->nb_eq == 0)) {
       Pdisjunct dj = dj_system_complement( ps );
-      pss          = sc_append( pss, dj->psys );
+      pss          = sc_safe_append( pss, dj->psys );
       tofree       = sl_append_system( tofree, ps );
       dj           = dj_free( dj ); 
       at_least_one = TRUE;
