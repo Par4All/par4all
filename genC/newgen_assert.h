@@ -2,17 +2,17 @@
  * the message generates the function name if possible.
  * message_assert prints a message before aborting
  *
- * $RCSfile: newgen_assert.h,v $ ($Date: 1994/12/30 13:58:43 $, )
+ * $RCSfile: newgen_assert.h,v $ ($Date: 1995/02/01 09:55:22 $, )
  * version $Revision$
  * got on %D%, %T%
  */
 
 #ifdef __GNUC__
 #define _newgen_assert_message \
-    "[%s] assertion failed, file %s (%d)\n", __FUNCTION__, __FILE__, __LINE__
+    "[%s] (%s:%d) assertion failed\n", __FUNCTION__, __FILE__, __LINE__
 #else
 #define _newgen_assert_message \
-    "Assertion failed: file \"%s\", line %d\n", __FILE__, __LINE__
+    "Assertion failed (%s:%d)\n", __FILE__, __LINE__
 #endif
 
 #ifndef NDEBUG
@@ -37,3 +37,6 @@
 #define assert(ex)
 #define message_assert(msg, ex)
 #endif
+
+/*  That is all
+ */
