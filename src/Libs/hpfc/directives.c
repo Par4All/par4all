@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/02/24 17:44:36 $, )
+ * ($Date: 1996/02/29 19:05:22 $, )
  */
 
 #include "defines-local.h"
@@ -113,6 +113,16 @@ static void new_dynamic(expression e)
     add_a_dynamic(a);
 
     pips_debug(3, "entity is %s\n", entity_name(a));
+}
+
+static void new_io_function(expression e)
+{
+    add_an_io_function(expression_to_entity(e)); 
+}
+
+static void new_pure_function(expression e)
+{
+    add_a_pure(expression_to_entity(e)); 
 }
 
 /* array is to be seen as a template. aligned to itself...
@@ -660,10 +670,20 @@ HANDLER_PROTOTYPE(dynamic)
 HANDLER_PROTOTYPE(pure)
 {
     entity module = get_current_module_entity();
-    pips_assert("no args", ENDP(args));
-    add_a_pure(module);
 
-    pips_debug(3,"entity is %s\n", entity_name(module));
+    if (ENDP(args))
+	add_a_pure(module);
+    else
+	gen_map(new_pure_function, args);
+}
+
+HANDLER_PROTOTYPE(io)
+{
+    entity module = get_current_module_entity();
+    if (ENDP(args))
+	add_an_io_function(module);
+    else
+	gen_map(new_io_function, args);
 }
 
 HANDLER_PROTOTYPE(realign)
@@ -775,6 +795,7 @@ static struct DirectiveHandler handlers[] =
   {HPF_PREFIX TIMEOFF_SUFFIX,		HANDLER(time) },
   {HPF_PREFIX SETBOOL_SUFFIX,		HANDLER(set) },
   {HPF_PREFIX SETINT_SUFFIX,		HANDLER(set) },
+  {HPF_PREFIX HPFCIO_SUFFIX,		HANDLER(io) },
 
   /* default issues an error
    */
