@@ -37,7 +37,7 @@ LIB_CFILES=	Psc.c Ppolynome.c Pvecteur.c Pcontrainte.c matrice.c eval.c \
 		loop.c fortran90.c \
 		constant.c bound_generation.c entity.c variable.c statement.c \
 		expression.c type.c normalize.c static.c arguments.c module.c \
-		effects.c cmfortran.c craft.c
+		effects.c cmfortran.c craft.c control.c
 
 LIB_HEADERS=	ri-util-local.h
 LIB_OBJECTS=	Psc.o Ppolynome.o Pvecteur.o Pcontrainte.o matrice.o eval.o \
@@ -45,6 +45,6 @@ LIB_OBJECTS=	Psc.o Ppolynome.o Pvecteur.o Pcontrainte.o matrice.o eval.o \
 		attachment_pretty_print.o constant.o\
 		util.o  bound_generation.o entity.o variable.o statement.o \
 		expression.o type.o normalize.o static.o arguments.o module.o \
-		effects.o cmfortran.o craft.o
+		effects.o cmfortran.o craft.o control.o
 
 
