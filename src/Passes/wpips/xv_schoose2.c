@@ -72,13 +72,13 @@ void schoose_close()
 
     hide_window(schoose_frame);
 
-    nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
+    nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, NULL);
 
     for (i = 0; i < nchoices; i++) {
-	xv_set(choices, PANEL_LIST_DELETE, 0, 0);
+	xv_set(choices, PANEL_LIST_DELETE, 0, NULL);
     }
 
-    xv_set(choice, PANEL_VALUE, "", 0);
+    xv_set(choice, PANEL_VALUE, "", NULL);
 }
 
 void cancel_notify(item, event)
@@ -97,9 +97,9 @@ Panel_list_op op;
 Event *event;
 {
     if (op == PANEL_LIST_OP_SELECT) {
-	char *s  = (char *) xv_get(item, PANEL_LABEL_STRING, 0);
+	char *s  = (char *) xv_get(item, PANEL_LABEL_STRING, NULL);
 
-	xv_set(choice, PANEL_VALUE, s, 0);
+	xv_set(choice, PANEL_VALUE, s, NULL);
     }
 }
 */
@@ -110,13 +110,13 @@ Panel_item item;
 Panel_list_op op;
 Event *event;
 {
-    int nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
+    int nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, NULL);
 
     while (nchoices--) {
 	if ((int) xv_get(choices, PANEL_LIST_SELECTED, nchoices) == TRUE) {
 	    xv_set(choice, PANEL_VALUE, 
 		   (char *)xv_get(choices, PANEL_LIST_STRING, nchoices),
-		   0);
+		   NULL);
 	}
     }
 }
@@ -133,20 +133,20 @@ void (*f)(), (*g)();
     apply_on_choice = f;
     apply_on_cancel = g;
 
-    xv_set(schoose_frame, FRAME_LABEL, title, 0);
+    xv_set(schoose_frame, FRAME_LABEL, title, NULL);
 
     /* reset the choice set to empty */
     nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
 
     for (i = 0; i < nchoices; i++) {
-	xv_set(choices, PANEL_LIST_DELETE, 0, 0);
+	xv_set(choices, PANEL_LIST_DELETE, 0, NULL);
     }
 
     for (i = 0; i < argc; i++) {
-	xv_set(choices, PANEL_LIST_STRING, i, argv[i], 0);
+	xv_set(choices, PANEL_LIST_STRING, i, argv[i], NULL);
     }
     if ( argc > 0 ) {
-	xv_set(choice, PANEL_VALUE, argv[0], 0);
+	xv_set(choice, PANEL_VALUE, argv[0], NULL);
     }
 
     unhide_window(schoose_frame);
@@ -158,16 +158,16 @@ void create_schoose_window()
     schoose_frame = xv_create(main_frame, FRAME,
 			      XV_SHOW, FALSE,
 			      FRAME_DONE_PROC, hide_window,
-			      0);
+			      NULL);
 
-    schoose_panel = xv_create(schoose_frame, PANEL, 0);
+    schoose_panel = xv_create(schoose_frame, PANEL, NULL);
 
     choice = xv_create(schoose_panel, PANEL_TEXT,
 		       PANEL_LABEL_STRING, "Current choice",
 		       PANEL_VALUE_DISPLAY_LENGTH, 8,
 		       XV_X, 10,
 		       XV_Y, 10,
-		       0);
+		       NULL);
 
     choices = xv_create(schoose_panel, PANEL_LIST,
 			PANEL_LABEL_STRING, "Available choices",
@@ -176,28 +176,30 @@ void create_schoose_window()
 			PANEL_CHOOSE_ONE, TRUE,
 			XV_X, 10,
 			XV_Y, 40,
-			0);
+			NULL);
 
     help = xv_create(schoose_panel, PANEL_BUTTON,
 		     PANEL_LABEL_STRING, "Help",
 		     PANEL_NOTIFY_PROC, schoose_help_notify,
 		     XV_X, 250,
 		     XV_Y, 40,
-		     0);
+		     NULL);
 
     cancel = xv_create(schoose_panel, PANEL_BUTTON,
 		     PANEL_LABEL_STRING, "Cancel",
 		   PANEL_NOTIFY_PROC, cancel_notify,
 		   XV_X, 250,
 		   XV_Y, 70,
-		   0);
+		   NULL);
 
     ok = xv_create(schoose_panel, PANEL_BUTTON,
 		   PANEL_LABEL_STRING, "OK",
 		   PANEL_NOTIFY_PROC, ok_notify,
 		   XV_X, 250,
 		   XV_Y, 100,
-		   0);
+		   NULL);
+
+	(void) xv_set(schoose_panel, PANEL_DEFAULT_ITEM, ok, NULL);
 
     window_fit(schoose_panel);
     window_fit(schoose_frame);
