@@ -422,7 +422,7 @@ deal_with_sentence_word_end(string a_word,
 
 /* Output an attachment to the output file: */
 static void
-output_an_attachment(const FILE * output_file,
+output_an_attachment(FILE * output_file,
 		     attachment a)
 {
     attachee at = attachment_attachee(a);
@@ -444,9 +444,8 @@ output_an_attachment(const FILE * output_file,
 	{	    
 	    reference r = attachee_reference(at);
 	    pips_debug(5, "\treference %#x\n", (unsigned int) r);
-	    /* Output the address as a string because Emacs cannot
-               store 32-bit numbers: */
-	    fprintf(output_file, "face epips-face-reference mouse-face epips-mouse-face-reference local-map epips-reference-keymap epips-property-reference \"%#x\" epips-property-reference-variable \"%#x\"",
+	    /* Output the aEvaluate the keymap: */
+	    fprintf(output_file, "face epips-face-reference mouse-face epips-mouse-face-reference local-map ,epips-reference-keymap epips-property-reference \"%#x\" epips-property-reference-variable \"%#x\"",
 		    (unsigned int) r, (unsigned int) reference_variable(r));
 	    break;
 	}
@@ -549,7 +548,7 @@ compare_attachment_for_qsort(const void *xp,
 /* Output the attachment in a sorted order with less precise property
    first: */
 static void
-output_the_attachments_in_a_sorted_order(const FILE * output_file)
+output_the_attachments_in_a_sorted_order(FILE * output_file)
 {
     attachment * as;
     int i;
@@ -602,14 +601,14 @@ static void
 init_output_the_attachments_for_emacs(FILE * output_file)
 {
     /* Begin a string with Emacs Lisp properties: */
-    fprintf(output_file, "(insert\n\t#(\"");
+    fprintf(output_file, "(epips-insert-with-properties\n\t `(\"");
 }
 
 
 /* Output the list of all the attachments found in the text file with
    Emacs Lisp syntax: */
 static void
-output_the_attachments_for_emacs(const FILE * output_file)
+output_the_attachments_for_emacs(FILE * output_file)
 {
     debug_on("ATTACHMENT_DEBUG_LEVEL");
 
