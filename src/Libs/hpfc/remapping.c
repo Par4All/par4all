@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1996/06/11 13:27:10 $, ) 
+ * ($Date: 1996/07/23 15:08:34 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -38,12 +38,12 @@ partial_linearization(
 	    get_entity_dimensions(proc, dim, &low, &up);
 	    size = up - low + 1;
 	    *psize *= size;
-	    v = vect_multiply(v, size);
-	    vect_add_elem(&v, (Variable) create_var(dim), 1);
-	    vect_add_elem(&v, TCST, - low);
+	    v = vect_multiply(v, int_to_value(size));
+	    vect_add_elem(&v, (Variable) create_var(dim), VALUE_ONE);
+	    vect_add_elem(&v, TCST, int_to_value(-low));
 	}
 
-    if (var) vect_add_elem(&v, (Variable) var, -1);
+    if (var) vect_add_elem(&v, (Variable) var, VALUE_MONE);
 
     return contrainte_make(v);
 }
@@ -71,13 +71,15 @@ full_linearization(
 	get_entity_dimensions(obj, i, &low, &up);
 	size = up - low + 1;
 	*psize *= size;
-	v = vect_multiply(v, size);
-	vect_add_elem(&v, (Variable) create_var(i), 1);
-	vect_add_elem(&v, TCST, - low);
+	v = vect_multiply(v, int_to_value(size));
+	vect_add_elem(&v, (Variable) create_var(i), VALUE_ONE);
+	vect_add_elem(&v, TCST, int_to_value(-low));
     }
 
-    if (var) vect_add_elem(&v, (Variable) var, -1);
-    if (initial_offset) vect_add_elem(&v, TCST, initial_offset);
+    if (var) vect_add_elem(&v, (Variable) var, VALUE_MONE);
+    if (initial_offset) 
+	vect_add_elem(&v, TCST, 
+		      int_to_value(initial_offset));
 
     return contrainte_make(v);
 }
@@ -111,20 +113,24 @@ generate_work_sharing_system(
     /* psi_d = psi_r + |psi_r| delta
      */
     sc_add_egalite(sharing, contrainte_make(vect_make
-	(VECTEUR_NUL, psi_d, -1, psi_r, 1, delta, size_r, TCST, 0)));
+	(VECTEUR_NUL, psi_d, VALUE_MONE, 
+	              psi_r, VALUE_ONE, 
+	              delta, int_to_value(size_r), 
+	              TCST, VALUE_ZERO)));
 
     if (size_d >= size_r)
     {
 	/* 0 <= delta (there are cycles)
 	 */
 	sc_add_inegalite(sharing, contrainte_make
-			 (vect_make(VECTEUR_NUL, delta, -1, TCST, 0)));
+	   (vect_make(VECTEUR_NUL, delta, VALUE_MONE, TCST, VALUE_ZERO)));
     }
     else
     {
 	/* delta == 0
 	 */
-	sc_add_egalite(sharing, contrainte_make(vect_new((Variable) delta, 1)));
+	sc_add_egalite(sharing, 
+	   contrainte_make(vect_new((Variable) delta, VALUE_ONE)));
     }
 
     sc_creer_base(sharing);
@@ -310,9 +316,9 @@ processor_loop(
     sc_add_inegalite(simpler, 
 		     contrainte_make
 		     (vect_make(VECTEUR_NUL,
-				hpfc_name_to_entity(MYLID), 1, 
-				TCST, - NumberOfElements
-      (variable_dimensions(type_variable(entity_type(psi)))))));
+				hpfc_name_to_entity(MYLID), VALUE_ONE, 
+				TCST, int_to_value(- NumberOfElements
+      (variable_dimensions(type_variable(entity_type(psi))))))));
 
     DEBUG_SYST(5, "P simpler", simpler);
     DEBUG_SYST(5, "P enumeration", enumeration);
