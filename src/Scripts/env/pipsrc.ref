@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/29 14:06:07 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/29 14:09:39 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -112,6 +112,7 @@ PIPS_CFLAGS_SUN4="-fast -Xc -g"
 # CPP FLAGS
 #
 PIPS_CPPFLAGS="-D__USE_FIXED_PROTOTYPES__ -I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
+PIPS_CPPFLAGS_SUN4="-I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
 # 
 # LD
 #
@@ -131,7 +132,7 @@ PIPS_LINT="lint"
 PIPS_LINTFLAGS="-habxu"
 PIPS_YACC="yacc"
 PIPS_YFLAGS=""
-PIPS_PROTOIZE="$PIPS_UTILDIR/cproto -vcf2"
+PIPS_PROTOIZE="${PIPS_UTILDIR}/cproto -vcf2"
 PIPS_ETAGS='/usr5/gnu/bin-sparc/etags'
 PIPS_TAR='gtar'
 PIPS_ZIP='gzip -v9'
