@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1996/06/08 15:37:33 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1996/06/08 16:17:52 $, )
  * version $Revision$
  */
 
@@ -975,8 +975,6 @@ statement stat, *pstat;
     },
 	W);
 
-    gen_free_list(W);
-    
     pips_debug(5, "Wa length is %d (%d), Wrt lenght is %d\n",
 	       gen_length(Wa), gen_length(lWa), gen_length(Wrt));
 
