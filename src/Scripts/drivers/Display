@@ -204,15 +204,15 @@ if [ -z "$LAST" ]
 then
 if [ -z "$VERBOSE" ]
 then
-	$PIPS_UTILDIR/Pips -w "$OPT_PGM" -m "$OPT_MOD" \
-			$SELECT $PERFORM -b $RESOURCE 1>/dev/null || exit 1;
+    Pips -w "$OPT_PGM" -m "$OPT_MOD" \
+	 $SELECT $PERFORM -b $RESOURCE 1>/dev/null || exit 1;
 else
-	$PIPS_UTILDIR/Pips -w "$OPT_PGM" -m "$OPT_MOD" \
-			$SELECT $PERFORM -b $RESOURCE 1>&2 || exit 1;
+    Pips -w "$OPT_PGM" -m "$OPT_MOD" \
+	 $SELECT $PERFORM -b $RESOURCE 1>&2 || exit 1;
 fi
 fi
 
-. $PIPS_CURRENT_PROGRAM
+. ${PIPS_CURRENT_PROGRAM:-.pipsprogram}
 
 
 uppercase()
