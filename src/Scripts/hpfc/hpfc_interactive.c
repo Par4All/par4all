@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/04/24 15:43:58 $, 
+ * $Date: 1995/04/24 16:31:46 $, 
  */
 
 #include <stdio.h>
@@ -7,23 +7,37 @@
 
 extern int system();
 extern int fprintf();
+extern char *getenv();
 
 #include "readline/readline.h"
 #include "readline/history.h"
 
 #define HPFC_PROMPT "hpfc> "
 #define BUFFER_SIZE 1024
-#define FILE_NAME NULL
+#define DEFAULT_FILE_NAME ".hpfc.history"
 
 #define QUIT "qui"
 
 int main()
 {
-    char *line, buffer[BUFFER_SIZE];
+    char 
+	*line,
+	buffer[BUFFER_SIZE],
+	*home = getenv("HOME"),
+	file_name[BUFFER_SIZE]="";
+
+    /*  default history file is ~/.hpfc.history
+     */
+    if ((strlen(home)+strlen(DEFAULT_FILE_NAME))<BUFFER_SIZE)
+	sprintf(file_name, "%s/%s", home, DEFAULT_FILE_NAME);
     
+    /*  initialize history
+     */
     using_history();
-    read_history(FILE_NAME);
+    read_history(file_name);
     
+    /*  interactive loop
+     */
     while ((line=readline(HPFC_PROMPT)))
     {
 	if ((strlen(line)+strlen(HPFC_PROMPT))>=BUFFER_SIZE) /* woh! */
@@ -32,7 +46,7 @@ int main()
 	    continue;
 	}	    
 
-	if (strncmp(line, QUIT, 3)==0) /* berk */
+	if (strncmp(line, QUIT, 3)==0) /* quit! */
 	    break;
 
 	/*   calls a script:-)
@@ -41,12 +55,15 @@ int main()
 	 */
 	system(sprintf(buffer, "hpfc %s", line));
 
-	/*   maybe a memory leak, history is not very well documented.
+	/*   maybe a memory leak? I guess not.
 	 */
 	add_history(line); 
     }
 
-    write_history(FILE_NAME);
+    /*   close history
+     */
+    write_history(file_name);
+    history_truncate_file(file_name, 100);
 
     fprintf(stdout, "\n"); /* usefull for Ctrl-D terminations */
     return(0);
