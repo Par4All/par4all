@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1997/07/17 20:32:19 $, 
+ * date: $Date: 1997/09/08 19:25:35 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -135,15 +135,17 @@ boolean ofl_res;
 		    ofl_res ? "TRUE" : "FALSE");
 	    break;
 	}		
-    default:
-	if (use_simplex)
-	{
-	    ok = sc_simplexe_feasibility_ofl_ctrl(sc, ofl_ctrl);
-	}
-	else 
-	{
-	    ok = sc_fourier_motzkin_feasibility_ofl_ctrl(sc, integer_p, 
-							 ofl_ctrl);
+    default: {
+	    if (use_simplex)
+	    {
+		ok = sc_simplexe_feasibility_ofl_ctrl(sc, ofl_ctrl);
+	    }
+	    else 
+	    {
+		ok = sc_fourier_motzkin_feasibility_ofl_ctrl(sc, integer_p, 
+							     ofl_ctrl);
+	    }
+	    UNCATCH(overflow_error);
 	}
     }
 
@@ -289,7 +291,6 @@ int ofl_ctrl;
 {
     Psysteme s1;
     boolean faisable = TRUE;
-    extern jmp_buf overflow_error;
 
     if (s == NULL) return TRUE;
     s1 = sc_dup(s);
