@@ -1,5 +1,10 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1997/05/09 08:38:33 $, )
-# version $Revision$, 
+#
+# $Id$
+#
+# $Log: pipsrc.ref,v $
+# Revision 1.107  1997/05/12 12:39:09  coelho
+# linux added.
+#
 #
 # Reference file for PIPS environment variables.
 # A restricted version of this file should be defined for pips users.
@@ -90,6 +95,9 @@ test ${uname_s} = SunOS -a "`expr ${uname_r} : '^4'`" = 1 && \
 
 test ${uname_s} = AIX && \
 	PIPS_ARCH="IBMAIX"
+
+test ${uname_s} = Linux && \
+	PIPS_ARCH="LINUXI86"
 
 PIPS_ROOT="${PIPS_DIR}/Production"
 
