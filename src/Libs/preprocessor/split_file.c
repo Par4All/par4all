@@ -282,7 +282,7 @@ char *s, *ptr;
 	trim(ptr);
 	sptr = s;
 	while (*ptr != '(' && *ptr != '\n') {
-		if (*ptr != ' ' && *ptr != '\t')
+		if (*ptr != ' ' && *ptr != '\t' && *ptr != '\r')
 			*sptr++ = *ptr;
 		ptr++;
 	}
@@ -372,7 +372,7 @@ int
 fsplit(char * dir_name, char * file_name, FILE * out)
 {
     register FILE *ofp;	/* output file */
-    register rv;	/* 1 if got card in output file, 0 otherwise */
+    register int rv;	/* 1 if got card in output file, 0 otherwise */
     int nflag,		/* 1 if got name of subprog., 0 otherwise */
 	retval;
    /* ??? 20 -> 80 because not checked... smaller than a line is ok ? FC */
