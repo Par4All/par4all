@@ -189,6 +189,9 @@ bool readonly;
 	       an exact test could only be useful in presence of arrays;
 	       and in presence of arrays we do nothing here */
 	    if(entity_conflict_p(e, eq) && !integer_scalar_entity_p(eq)) {
+		pips_user_warning("Values for variable %s are not analyzed because "
+				  "%s is aliased with non scalar integer variable %s",
+				  entity_name(e), entity_name(e), entity_name(eq));
 		array_equivalenced = TRUE;
 		break;
 	    }
@@ -232,7 +235,10 @@ bool readonly;
 		 */
 	}
 	else {
-	    /* e cannot be analyzed; it must be removed from the hash tables */
+	    /* Variable e is equivalenced with an array or a non-integer
+	     * variable and cannot be analyzed; it must be removed from
+	     * the hash tables.
+	     */
 	    remove_entity_values(e, readonly);
 	}
     }
