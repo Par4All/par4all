@@ -70,7 +70,6 @@ va_dcl
     va_end(args);
 }
 
-
 /* USER_REQUEST is a function that should be called to request some data 
  * from the user. It returns the string typed by the user until the 
  * return key is typed.
@@ -152,6 +151,8 @@ void user_warning(va_alist)
 va_dcl
 {
     va_list args;
+
+    if (get_bool_property("NO_USER_WARNING")) return; /* FC */
 
     va_start(args);
     (* pips_warning_handler)(& args);
@@ -295,6 +296,7 @@ is issued and the program aborted. The first argument is the function name.
   pips_assert(function_name, boolean);
 */
 /*VARARGS1*/
+/*
 void pips_assert(va_alist)
 va_dcl
 {
@@ -305,13 +307,29 @@ va_dcl
     function = va_arg(args, char *) ;
 
     if( va_arg( args, int ) == 0 ) {
-	/* print name of function causing error */
 	(void) fprintf(stderr, "pips assertion failed in %s: ", function ) ;
 
 	va_end(args);
 
-	/* create a core file for debug */
 	(void) abort();
     }
 }
+*/
 
+/*  new version without varargs, FC 09/06/94
+ */
+void pips_assert(function, predicate)
+char *function;
+int predicate;
+{
+    /* print name of function causing error and
+     * create a core file for debug 
+     */
+    if(!predicate) 
+	(void) fprintf(stderr, "pips assertion failed in %s: ", function),
+	(void) abort();
+}
+
+/*
+ *   that is all
+ */
