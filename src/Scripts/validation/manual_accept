@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: manual_accept,v $ (version $Revision$)
-# $Date: 1996/12/27 09:12:49 $, 
+# $Date: 1996/12/27 14:51:17 $, 
 #
 
 CD=$PWD
@@ -14,6 +14,7 @@ do
 	ref="`dirname $f`/`basename $f .out`"
 	echo CONSIDERING $ref and $f
         diff $ref $f | less
+	echo 
         echo "accept (y|n)?"
 	read answer
 	[ "$answer" = 'y' -o "$answer" = 'Y' ] && mv $f $ref
