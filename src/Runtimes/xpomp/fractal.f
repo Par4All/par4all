@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/10/10 20:39:59 $, 
+! $Date: 1996/10/10 21:00:40 $, 
 !
       program fractal
 
@@ -128,7 +128,7 @@
          Y0 = y - y_display_size/zooming_factor/2
          X1 = x + x_display_size/zooming_factor/2
          Y1 = y + y_display_size/zooming_factor/2
-         call xpompf draw frame(display, '', 255, -1,
+         call xpompf draw frame(display, ' ', 255, -1,
      &        X0, Y0, X1, Y1, -181, status)
       else if (button .eq .3) then
 
