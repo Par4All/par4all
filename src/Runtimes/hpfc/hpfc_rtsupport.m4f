@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/04/16 16:19:08 $, )
+! ($Date: 1997/04/17 13:17:51 $, )
 !
 !-----------------
 !
@@ -445,7 +445,7 @@
          HPFC PVMLENGTH=8
          return
       endif
-      if (what.eq.BYTE1) then
+      if (what.eq.BYTE1.or.what.eq.STRING) then
          HPFC PVMLENGTH=1
          return
       endif
@@ -1155,6 +1155,7 @@ _CM5(
       subroutine HPFC INIT COMMON BUFFER
       include "hpfc_commons.h"
       BYTE1 BUFFSIZE = SIZEOFBUFFER
+      STRING BUFFSIZE = SIZEOFBUFFER
       INTEGER2 BUFFSIZE = SIZEOFBUFFER/2
       INTEGER4 BUFFSIZE = SIZEOFBUFFER/4
       REAL4 BUFFSIZE = SIZEOFBUFFER/4
