@@ -74,7 +74,7 @@ static void append_marged_text(
     int len = margin + strlen(what1) + strlen(what2) + 2;
     char * buffer = (char*) malloc(sizeof(char)*len);
     pips_assert("malloc ok", buffer);
-    sprintf(buffer, "%*s%s%s\n", margin, "", what1, what2);
+    sprintf(buffer, "%*s%s%s\n", margin, "_", what1, what2);
     ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted, buffer));
 }
 
