@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: hpfc-util.c,v $
+ * Revision 1.58  1998/12/26 21:19:35  irigoin
+ * error_handler added
+ *
  * Revision 1.57  1998/09/10 06:31:01  irigoin
  * Improvement/bug fix in HpfcExpressionToInt() because negative integer
  * constants are not stored. They are represented by a positive constant and
@@ -833,6 +836,11 @@ references_aligned_p(reference r1, reference r2)
  */
 
 DEFINE_LOCAL_STACK(current_stmt, statement)
+
+void hpfc_util_error_handler()
+{
+    error_reset_current_stmt_stack();
+}
 
 static void test_rewrite(test t)
 {
