@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/02/06 11:38:07 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/02/06 11:55:25 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -149,6 +149,14 @@ prefix_file_exists()
   $DEBUG2 " | not found"
 }
 
+# returns one arg chosen randomly
+randomize()
+{
+    random -e $#
+    shift $?
+    echo $1
+}
+
 #
 # finds an availbale host
 #   waits for the termination of one run
@@ -169,7 +177,7 @@ available_host()
   #
   # get the result, hostname and remove the lock files
   #
-  ah_file=`echo -n $RESULT.* | tr ' ' '\012' | head -1`
+  ah_file=`randomize $RESULT.*`
   # failed="$failed-"`cat $ah_file`
   #
   # failures append
@@ -331,16 +339,6 @@ $VERBOSE "Modules: $MODULES"
 #
 # hosts to be used by the validation
 
-randomize()
-{
-    random -e `echo $1 | tr ':' ' ' | wc -w`
-    rand=`echo $?`
-    rand=`expr $rand + 1`
-    randp1=`expr $rand + 1`
-    nlist=`echo $1 | tr ':' '\012' | sed -n ${randp1},'$p'`:`echo $1 | tr ':' '\012' | sed -n "1,${rand}p"`
-    echo $nlist | tr ' \012' '::'
-}
-
 VALHOSTS=$hostname
 
 if [ "$parallel" -a "$PIPS_HOSTS" ]
@@ -348,13 +346,10 @@ then
   VALHOSTS="$VALHOSTS:${PIPS_HOSTS}"
 fi
 
-$DEBUG2 " | VALHOSTS 1: $VALHOSTS"
+$DEBUG2 " | hosts before unstammering: $VALHOSTS"
 VALHOSTS=`unstammer $VALHOSTS`
 
-$DEBUG2 " | VALHOSTS 2: $VALHOSTS"
-VALHOSTS=`randomize $VALHOSTS`
-
-$DEBUG2 " | VALHOSTS 3: $VALHOSTS"
+$DEBUG2 " | hosts before checking ups: $VALHOSTS"
 VALHOSTS=`alive $VALHOSTS`
 
 $VERBOSE "Hosts: $VALHOSTS"
