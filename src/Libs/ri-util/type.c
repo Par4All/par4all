@@ -594,6 +594,8 @@ type_to_string(type t)
 	return "variable";
     case is_type_functional:
 	return "functional";
+    case is_type_varargs:
+	return "varargs";
     case is_type_unknown:
 	return "unknow";
     case is_type_void:
