@@ -11,6 +11,7 @@
 /*  standard C includes
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <values.h>
 #include <ctype.h>
 #include <string.h>
