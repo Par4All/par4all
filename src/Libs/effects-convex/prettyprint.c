@@ -340,8 +340,7 @@ void print_region(effect r)
     fprintf(stderr,"\t");
     if(effect_region_p(r)) 
 	print_words(stderr, words_region(r));
-    else 
-	/* print_words(stderr, words_effect(r)); */
+    /* else print_words(stderr, words_effect(r)); */
     fprintf(stderr,"\n");
 }
 
