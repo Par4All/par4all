@@ -16,3 +16,6 @@ struct eformat {
 };
 
 
+/* Ce que renvoie dead_test_filter : */
+enum dead_test { nothing_about_test, then_is_dead, else_is_dead };
+typedef enum dead_test dead_test;
