@@ -1,6 +1,6 @@
 c
 c $RCSfile: hpfc_bufmgr.m4f,v $ (version $Revision$)
-c $Date: 1995/09/07 13:59:00 $, 
+c $Date: 1995/09/12 13:47:51 $, 
 c
 define(`GENERIC_BUFFER_SEND',`
 pushdef(`PVMTYPE',$1)dnl
@@ -11,6 +11,9 @@ pushdef(`PVMTYPE',$1)dnl
       include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
+c
+c could use PvmDataInPlace here ?
+c
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(INTEGER4, BUFINDEX, 1, 1, info)
       call pvmfpack(PVMTYPE, 
