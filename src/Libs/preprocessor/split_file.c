@@ -23,6 +23,9 @@
  * - bang comment management added (to avoid the parser)
  *
  * $Log: split_file.c,v $
+ * Revision 1.36  1998/05/29 16:22:27  coelho
+ * handler for simply processing files.
+ *
  * Revision 1.35  1998/05/29 13:18:58  coelho
  * bang comment skipped... (beurk).
  *
@@ -701,4 +704,17 @@ static void hollerith_and_bangcomments(char * line)
 	strcpy(line,bangcomment);
 	strcat(line,tmp);
     }
+}
+
+/* processing extracted for includes...
+ */
+void process_bang_comments_and_hollerith(FILE * in, FILE * out)
+{
+    ifp = in;
+    while (getline()>0) 
+    {
+	hollerith_and_bangcomments(buf);
+	fputs(buf, out);
+    }
+    ifp = NULL;
 }
