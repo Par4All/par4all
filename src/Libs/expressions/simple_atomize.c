@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1995/09/19 17:36:09 $, 
+ * $Date: 1996/06/12 17:57:48 $, 
  */
 
 #include <stdio.h>
@@ -140,7 +140,7 @@ statement s;
 		CONS(STATEMENT, s, instruction_block(i));
 	else
 	    statement_instruction(cs) =
-		make_instruction(is_instruction_block,
+		make_instruction_block(
 		 CONS(STATEMENT, s,
 		 CONS(STATEMENT, make_stmt_of_instr(statement_instruction(cs)),
 		      NIL)));
