@@ -42,12 +42,6 @@
 #include "paf_ri.h"
 #include "paf-util.h"
 
-extern int fputs();
-extern int _flsbuf();
-extern int fprintf();
-extern int fflush();
-extern int printf();
-
 %}
 
 %union{
