@@ -396,23 +396,16 @@ char* mod_name;
 	mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 	mod_inst = statement_instruction( mod_stat );
 
-
-	/* No unstructured...No static controlization... DB, nov 29th 95*/
-	if (!instruction_unstructured_p(mod_inst))
-	{
-	    if (get_debug_level() > 1) 
-	        user_log("\n\n *** STATIC CONTROLIZE CODE done\n");
-	    debug_off();
-            return( TRUE );
-	    }
-
 	/* HAS TO BE REMOVED AS SOON AS POSSIBLE: as the IOs are not
 	   treated as they would, all the instructions containing IOs are
 	   put inside comments. AP, oct 9th 1995 */
 	gen_recurse(mod_inst, statement_domain, io_filter, gen_null);
 
 	/* Normalization of all loops */
-	loop_normalize_of_unstructured(instruction_unstructured(mod_inst),
+	/* Modification: loop_normalize_of_statement is used instead of */
+	/* loop_normalize_of_unstructured since we cannot ensure that */
+	/* mod_inst is an unstructured --11th Dec 1995, DB */
+        loop_normalize_of_statement(mod_stat,
 				       Gforward_substitute_table,
 				       &Genclosing_loops,
 				       &Genclosing_tests,
@@ -428,8 +421,9 @@ char* mod_name;
 	Genclosing_tests      = (list) NIL;
 
 	/* We compute the static control infos for each instruction. */
+	/* Same remark as before --DB */
 	sc =
-	  static_controlize_unstructured(instruction_unstructured(mod_inst));
+	  static_controlize_statement(mod_stat);
 
 	/* Renumber the statements. */
 	stco_renumber_code( mod_stat, 0 );
@@ -437,6 +431,7 @@ char* mod_name;
 	SET_STATEMENT_MAPPING( Gstatic_control_map, mod_stat, sc );
 
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), (char*) mod_stat);
+	hash_table_print((hash_table) Gstatic_control_map);
 	DB_PUT_MEMORY_RESOURCE(DBR_STATIC_CONTROL, strdup(mod_name),
 			(char*) Gstatic_control_map);
 
@@ -451,3 +446,8 @@ char* mod_name;
 }
 
 /*==================================================================*/
+
+
+
+
+
