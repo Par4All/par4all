@@ -5,6 +5,9 @@
  * preprocessed.
  *
  * $Log: csplit_file.c,v $
+ * Revision 1.7  2003/08/14 08:47:38  irigoin
+ * Compatibility with LINUX for strdup() declaration
+ *
  * Revision 1.6  2003/08/12 15:44:46  irigoin
  * Mostly, implementation of Fabien's (useless) kludge, COMPILATION_UNIT_PREFIX
  *
@@ -31,7 +34,7 @@
 
 #include <stdio.h>
 
-extern char * strdup(char *);
+extern char * strdup(const char *);
 
 #include "genC.h"
 
