@@ -1,7 +1,7 @@
 #! /bin/sh
 #
-# $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1997/05/05 08:21:09 $, )
+# $Id$
+#
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -57,7 +57,7 @@ usage()
     ret=$1
     shift
     cat <<-EOF
-	$script (version $Revision$): $@
+	$script: $@
 	Description
 	  This shell script checks pips sources and functionalities.
 	  It is intended to be run from cron at night, hence its name.
@@ -137,6 +137,8 @@ shift `expr $OPTIND - 1`
 # Debug
 
 $debug "arch=$arch"
+$debug "user=$user"
+$debug "REPLYTO=$REPLYTO"
 $debug "email=$email"
 $debug "PIPS_HOSTS=$PIPS_HOSTS"
 $debug "CNLPV: $no_cleaning/$no_newgen/$no_linear/$no_pips/$no_validation"
