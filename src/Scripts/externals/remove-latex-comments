@@ -13,7 +13,8 @@
 #    chef de projet-president :-) (FI, 29/12/89)
 
 input=$1
-output=`basename $1 .f.tex`.newgen
+tmp=`basename $1 .tex`
+output=`basename $tmp .f`.newgen
 
 cat > $output <<!
 --	   --------------------------------------------------------
