@@ -427,11 +427,12 @@ void db_clean_all_required_resources(void)
     },
       or);
 
-    /* mark as to be deleted if owned resouces is empty. */
+    /* Mark owner symbol os as to be deleted if set of owned resouces is
+       empty. */
     if (hash_table_entry_count(db_owned_resources_hash_table(or))==0)
     {
-      pips_user_warning("module '%s' to be deleted, no more resources owned.\n"
-			"  (maybe temporarily required by pipsmake but some error occured)\n",
+      pips_user_warning("module '%s' to be deleted, no more resources owned.\n",
+			/* maybe temporarily required by pipsmake but some error occured */
 			db_symbol_name(os));
 
       owners_to_delete = CONS(DB_SYMBOL, os, owners_to_delete);
