@@ -4,6 +4,9 @@
  * $Id$
  *
  * $Log: util.c,v $
+ * Revision 1.16  2003/09/05 14:28:57  nguyen
+ * Improve error message
+ *
  * Revision 1.15  2002/03/08 10:14:33  irigoin
  * predicate stack_area_p() added for StackArea + reformatting
  *
@@ -104,10 +107,12 @@ string s;
     static char local[MAXIMAL_MODULE_NAME_SIZE + 1];
     string p_sep = NULL;
 
+    /* We have problem with C, an entity name does not always need MODULE_SEP*/
+
     strncpy(local, s, MAXIMAL_MODULE_NAME_SIZE);
     local[MAXIMAL_MODULE_NAME_SIZE] = 0;
-    if ((p_sep = strchr(local, MODULE_SEP)) == NULL) 
-	pips_error("module_name", 
+    if (((p_sep = strchr(local, MODULE_SEP)) == NULL) && ((p_sep = strstr(local, FILE_SEP_STRING)) == NULL )) 
+      pips_error("module_name", 
 		   "module name too long, or illegal: \"%s\"\n", s);
     else
 	*p_sep = '\0';
@@ -271,11 +276,9 @@ int i;
     cons *pv = code_declarations(value_code(entity_initial(e)));
 
     if (! entity_module_p(e)) {
-	fprintf(stderr, "[find_ith_parameter] entity %s is not a module\n", 
+	pips_internal_error( "entity %s is not a module\n", 
 		entity_name(e));
-	exit(1);
     }
-
     while (pv != NIL) {
 	entity v = ENTITY(CAR(pv));
 	type tv = entity_type(v);
