@@ -10,8 +10,6 @@
   */
 
 #include <stdio.h>
-extern int fprintf();
-extern int _flsbuf();
 
 #include "genC.h"
 #include "ri.h"
