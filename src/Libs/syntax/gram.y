@@ -162,8 +162,9 @@ expression c, n;
     in = (n == expression_undefined) ? 1 : ExpressionToInt(n);
 
     vc = EvalExpression(c);
-    if (! value_constant_p(vc))
-	    FatalError("MakeDataVal", "data value must be a constant\n");
+    if (! value_constant_p(vc)) {
+	ParserError("MakeDataVal", "data value must be a constant\n");
+    }
     cc = value_constant(vc);
     value_constant(vc) = constant_undefined;
     gen_free(vc);
@@ -289,7 +290,7 @@ linstruction: TK_EOS
 	| linstruction instruction TK_EOS
 	;
 
-instruction: inst_spec
+instruction: {check_in_declarations();} inst_spec
 	| { check_first_statement();} inst_exec
 	    { 
 		if ($2 != instruction_undefined)
@@ -897,6 +898,11 @@ dataconst: const_simple
 	    }
 	| entity_name
 	    {
+		/* Cachan bug 4: there should be a check about the entity
+		 * returned as $1 because MakeDatVal() is going to try
+		 * to evaluate that expression. FI: I need to look at
+		 * the Fortran standard to understand the why of this rule.
+		 */
 		$$ = make_expression(make_syntax(is_syntax_call,
 						 make_call($1, NIL)), 
 				     normalized_undefined);
