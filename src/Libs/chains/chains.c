@@ -1326,9 +1326,6 @@ int use;
 static void reset_effects()
 {
     free_proper_effects_map();
-    if (rgch) {
-	free_local_regions_map();
-    }
     if (iorgch) {
 	free_in_regions_map();
 	free_out_regions_map();
