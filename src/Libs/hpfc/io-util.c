@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-util.c,v $
+ * Revision 1.33  1997/04/17 11:47:13  coelho
+ * *** empty log message ***
+ *
  * Revision 1.32  1997/03/20 10:24:21  coelho
  * RCS headers.
  *
@@ -150,55 +153,70 @@ only_io_mapping_initialize(
 /********************************************* GENERATION OF IO STATEMENTS */
 
 /*       T_LID=CMP_LID(pn, pi...)
- *       PVM_{SEND,RECV}(NODETIDS(T_LID), {SEND,RECV}_CHANNELS(T_LID), INFO)
- *       NODE_CHANNELS(T_LID) = NODE_CHANNELS(T_LID) + 2
+ *     ? init buffer...
+ *     /  CALL (type) PACK...
+ *       CALL HPFC {SND TO,RCV FROM} NODE(T_LID)
+ *     /  CALL (type) UPCK...
  */
-static statement hpfc_hmessage(proc, send)
-entity proc;
-boolean send;
+static statement hpfc_hmessage(
+    entity array,
+    entity proc,
+    bool send)
 {
-    entity ld, nc, nt;
-    expression lid, tid, chn;
-    statement cmp_lid, msg;
+    entity ld;
+    expression lid;
+    statement cmp_lid, comm, pack;
+    list /* statement */ lp, ls;
 
     ld = hpfc_name_to_entity(T_LID);
-    nc = hpfc_name_to_entity(send ? SEND_CHANNELS : RECV_CHANNELS);
-    nt = hpfc_name_to_entity(NODETIDS);
     lid = entity_to_expression(ld);
-    tid = reference_to_expression
-	(make_reference(nt, CONS(EXPRESSION, lid, NIL)));
-    chn = reference_to_expression
-	(make_reference(nc, CONS(EXPRESSION, copy_expression(lid), NIL)));
     cmp_lid = hpfc_compute_lid(ld, proc, get_ith_processor_dummy, NULL);
-    msg = hpfc_message(tid, chn, send);
 
-    return make_block_statement
-	(CONS(STATEMENT, cmp_lid, CONS(STATEMENT, msg, NIL)));
+    lp = CONS(STATEMENT, cmp_lid, NIL);
+
+    if (!send)
+	lp = CONS(STATEMENT, hpfc_buffer_initialization(FALSE, FALSE, FALSE), 
+		  lp);
+
+    comm = hpfc_make_call_statement(hpfc_name_to_entity(
+	send? HPFC_sH2N: HPFC_rN2H), CONS(EXPRESSION, lid, NIL));
+
+    pack = hpfc_packing_of_current__buffer(array, send);
+
+    if (send)
+	ls = CONS(STATEMENT, pack, CONS(STATEMENT, comm, NIL));
+    else
+	ls = CONS(STATEMENT, comm, CONS(STATEMENT, pack, NIL));
+
+    return make_block_statement(gen_nconc(lp, ls));
 }
 
-/*       PVM_RECV(HOST_TID, {HOST RCV CHANNEL, MCASTHOST}, BUFID)
- *       {} += 2
+/*      ! init buffer 
+ *        CALL HPFC {RCV FROM HOST, NCAST}
+ *        CALL (type) BUFFER UNPACK 
  */
-static statement hpfc_nrecv(cast) /* from host */
-bool cast;
+static statement hpfc_nrecv(
+    entity array, 
+    bool cast) /* from host */
 {
-    entity hosttid = hpfc_name_to_entity(HOST_TID),
-           channel = hpfc_name_to_entity(cast ? MCASTHOST : HOST_RCV_CHAN);
-    
-    return(hpfc_message(entity_to_expression(hosttid),
-			entity_to_expression(channel), FALSE));
+    return make_block_statement(
+	CONS(STATEMENT, hpfc_buffer_initialization(FALSE, FALSE, FALSE),
+	CONS(STATEMENT, hpfc_make_call_statement
+	     (hpfc_name_to_entity(cast? HPFC_NCAST: HPFC_rH2N), NIL),
+	CONS(STATEMENT, hpfc_packing_of_current__buffer(array, FALSE),
+	     NIL))));
 }
 
 /*      PVM_SEND(HOST_TID, HOST SND CHANNEL, INFO)
  *      HOST SND CHANNEL += 2
  */
-static statement hpfc_nsend()
+static statement hpfc_nsend(entity array)
 {
-    expression
-	channel = entity_to_expression(hpfc_name_to_entity(HOST_SND_CHAN)),
-	htid = entity_to_expression(hpfc_name_to_entity(HOST_TID));
-
-    return(hpfc_message(htid, channel, TRUE));
+    return make_block_statement(
+	CONS(STATEMENT, hpfc_packing_of_current__buffer(array, TRUE),
+	CONS(STATEMENT, hpfc_make_call_statement
+	     (hpfc_name_to_entity(HPFC_sN2H), NIL),
+	     NIL)));
 }
 
 /* static statement hpfc_hcast()
@@ -206,29 +224,13 @@ static statement hpfc_nsend()
  *       PVM_CAST(NBTASKS, NODETIDS, MCASTHOST, INFO)
  *       MCASTHOST = MCASTHOST + 2
  */
-static statement hpfc_hcast()
+static statement hpfc_hcast(entity array)
 {
-    entity
-	pvm_cast = hpfc_name_to_entity(PVM_CAST),
-	nbtasks = hpfc_name_to_entity(NBTASKS),
-	nodetid = hpfc_name_to_entity(NODETIDS),
-	mcasthost = hpfc_name_to_entity(MCASTHOST),
-	info = hpfc_name_to_entity(INFO);
-
-    statement
-	st_cast = 
-	    hpfc_make_call_statement
-		(pvm_cast,
-		 CONS(EXPRESSION, entity_to_expression(nbtasks),
-		 CONS(EXPRESSION, entity_to_expression(nodetid),
-		 CONS(EXPRESSION, entity_to_expression(mcasthost),
-		 CONS(EXPRESSION, entity_to_expression(info),
-		      NIL))))),
-	incr2 = hpfc_add_2(entity_to_expression(mcasthost));
-
-    return(make_block_statement(CONS(STATEMENT, st_cast,
-				CONS(STATEMENT, incr2,
-				     NIL))));
+    return make_block_statement(
+	CONS(STATEMENT, hpfc_packing_of_current__buffer(array, TRUE),
+	CONS(STATEMENT, 
+	     hpfc_make_call_statement(hpfc_name_to_entity(HPFC_HCAST), NIL),
+	     NIL)));
 }
 
 #define GENERATION(NAME, COLLECT, UPDATE)\
@@ -238,23 +240,23 @@ static statement NAME(array, move) entity array; tag move;\
  return((move==is_movement_collect) ? (COLLECT) : (UPDATE));}
 
 GENERATION(node_pre_io,
-	   hpfc_initsend(FALSE),
-	   hpfc_nrecv(FALSE))
+	   hpfc_buffer_initialization(TRUE, FALSE, TRUE),
+	   hpfc_nrecv(array, FALSE))
 GENERATION(node_in_io,
-	   hpfc_pvm_packing(array, get_ith_local_dummy, TRUE),
-	   hpfc_pvm_packing(array, get_ith_local_dummy, FALSE))
+	   hpfc_buffer_packing(array, get_ith_local_dummy, TRUE),
+	   hpfc_buffer_packing(array, get_ith_local_dummy, FALSE))
 GENERATION(node_post_io,
-	   hpfc_nsend(),
+	   hpfc_nsend(array),
 	   make_empty_statement())
 GENERATION(host_pre_io,
-	   hpfc_hmessage(array_to_processors(array), FALSE),
-	   hpfc_initsend(FALSE))
+	   hpfc_hmessage(array, array_to_processors(array), FALSE),
+	   hpfc_buffer_initialization(TRUE, FALSE, TRUE))
 GENERATION(host_in_io,
-	   hpfc_pvm_packing(array, get_ith_array_dummy, FALSE),
-	   hpfc_pvm_packing(array, get_ith_array_dummy, TRUE))
+	   hpfc_buffer_packing(array, get_ith_array_dummy, FALSE),
+	   hpfc_buffer_packing(array, get_ith_array_dummy, TRUE))
 GENERATION(host_post_io,
 	   make_empty_statement(),
-	   hpfc_hmessage(array_to_processors(array), TRUE))
+	   hpfc_hmessage(array, array_to_processors(array), TRUE))
 
 /* generate_io_statements_for_distributed_arrays
  *
@@ -341,8 +343,7 @@ statement *psh, *psn;
 		 make_block_statement(CONS(STATEMENT, h_pre,
 				      CONS(STATEMENT, host_scan_loop,
 				      CONS(STATEMENT, h_post,
-				      CONS(STATEMENT, h_cont,
-					   NIL))))),
+					   NIL)))),
 		 divide),
 	node_scan_loop = 
 	    systeme_to_loop_nest
@@ -353,22 +354,21 @@ statement *psh, *psn;
 					   NIL))),
 		 divide);
 
-    *psh = generate_optional_if(condition, host_proc_loop);
+    *psh = make_block_statement(
+	CONS(STATEMENT, generate_optional_if(condition, host_proc_loop),
+	CONS(STATEMENT, h_cont, NIL)));
 
     node_tmp = 
 	make_block_statement(CONS(STATEMENT, n_pre,
 			     CONS(STATEMENT, node_scan_loop,
 			     CONS(STATEMENT, n_post,
 				  NIL))));
-    *psn = 
-	generate_optional_if
-	    (condition,
-	     make_block_statement(CONS(STATEMENT, node_defproc,
-				  CONS(STATEMENT, 
-				       generate_optional_if(proc_cond,
-							    node_tmp),
-				  CONS(STATEMENT, n_cont,
-				       NIL)))));
+    *psn = make_block_statement(
+	CONS(STATEMENT, generate_optional_if
+	     (condition, make_block_statement(CONS(STATEMENT, node_defproc,
+					      CONS(STATEMENT, 
+			 generate_optional_if(proc_cond, node_tmp), NIL)))),
+	CONS(STATEMENT, n_cont, NIL)));
 
     sc_rm(proc_cond_tmp), sc_rm(proc_cond);
 
@@ -416,29 +416,29 @@ statement *psh, *psn;
  * [ ENDIF ]
  *
  */
-void generate_io_statements_for_shared_arrays
-  (array, move,
-   condition, echelon,
-   parameters, scanners, rebuild,
-   psh, psn)
-entity array;
-tag move;
-Psysteme condition, echelon;
-list parameters, scanners, rebuild;
-statement *psh, *psn;
+void generate_io_statements_for_shared_arrays(
+    entity array,
+    tag move,
+    Psysteme condition,
+    Psysteme echelon,
+    list parameters, 
+    list scanners, 
+    list rebuild,
+    statement *psh, 
+    statement *psn)
 {
     entity divide = hpfc_name_to_entity(IDIVIDE);
     string comment;
     statement
 	h_cont = make_empty_statement(),
 	n_cont = make_empty_statement(),
-	h_pre = hpfc_initsend(FALSE),
+	h_pre = hpfc_buffer_initialization(TRUE, FALSE, TRUE),
 	h_rebuild = generate_deducables(rebuild),
-	h_pack = hpfc_pvm_packing(array, get_ith_array_dummy, TRUE),
-	h_cast = hpfc_hcast(),
-	n_rcv = hpfc_nrecv(TRUE),
+	h_pack = hpfc_buffer_packing(array, get_ith_array_dummy, TRUE),
+	h_cast = hpfc_hcast(array),
+	n_rcv = hpfc_nrecv(array, TRUE),
 	n_rebuild = generate_deducables(rebuild),
-	n_unpack = hpfc_pvm_packing(array, get_ith_local_dummy, FALSE),
+	n_unpack = hpfc_buffer_packing(array, get_ith_local_dummy, FALSE),
 	h_scan = systeme_to_loop_nest
 	             (echelon, 
 		      scanners,
@@ -456,18 +456,20 @@ statement *psh, *psn;
 
     pips_assert("update", movement_update_p(move));
 
-    *psh = generate_optional_if(condition,
-				make_block_statement(CONS(STATEMENT, h_pre,
-						     CONS(STATEMENT, h_scan,
-						     CONS(STATEMENT, h_cast,
-						     CONS(STATEMENT, h_cont,
-							  NIL))))));
+    *psh = make_block_statement(
+	CONS(STATEMENT, generate_optional_if
+	     (condition, make_block_statement(CONS(STATEMENT, h_pre,
+					      CONS(STATEMENT, h_scan,
+					      CONS(STATEMENT, h_cast,
+						   NIL))))),
+	CONS(STATEMENT, h_cont, NIL)));
 
-    *psn = generate_optional_if(condition,
-				make_block_statement(CONS(STATEMENT, n_rcv,
-						     CONS(STATEMENT, n_scan,
-						     CONS(STATEMENT, n_cont,
-							  NIL)))));
+    *psn = make_block_statement(
+	CONS(STATEMENT, generate_optional_if
+	     (condition, make_block_statement(CONS(STATEMENT, n_rcv,
+					      CONS(STATEMENT, n_scan,
+						   NIL)))),
+	CONS(STATEMENT, n_cont, NIL)));
 
     /*   some comments are generated to help understand the code
      */
