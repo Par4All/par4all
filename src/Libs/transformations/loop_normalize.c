@@ -150,7 +150,7 @@ char *mod_name;
   /* Reorder the module. It is necessary because new statements have been
    * generated.
    */
-  module_body_reorder(mod_stat);
+  module_reorder(mod_stat);
 
   /* Save the new generated CODE. */
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
