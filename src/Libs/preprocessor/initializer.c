@@ -192,10 +192,12 @@ ask_a_missing_file(string module)
     do {
 	file = user_request("please enter a file for module %s\n", module);
 	if (file)
+	  {
 	    if (same_string_p(file, "generate"))
 		ok = missing_file_initializer(module);
 	    else
 		ok = process_user_file(file);
+	  }
 	cont = file && !same_string_p(file, "quit") &&
 	    !db_resource_p(DBR_INITIAL_FILE, module);
 	if (file) free(file);
