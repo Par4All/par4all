@@ -73,7 +73,8 @@ void set_debug_stack_pointer(i)
     }
     else
 	pips_error("set_debug_stack_pointer", 
-		   "value %d out of range [0..%d]\n", i, idls);
+		   "value %d out of stack range [0..%d]. "
+		   "Too many calls to debug_off()\n", i, idls);
 }
 
 void debug_off()
