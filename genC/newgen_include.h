@@ -63,59 +63,56 @@ struct gen_binding ;
 
 /* FC, 10/06/1994, set_type in se moved.
  *
- * FC 03/06/2003: it lacks a "size" information which could be 
- *                stored directly next to the type, for alloc/free ?
- *
  * common part assumed for all: type
  * common part assumed for ba, li, se, ar: 
  *      type, constructor, persistant and one gen_binding
  *
  */
 union domain {
-    struct {
-	int type ;
-	char *(*read)() ;
-	void (*write)() ;
-	void (*free)() ;
-	char *(*copy)() ;
-	int (*allocated_memory)();
-    } ex ;
-    struct { 
-	int type ;
-	char *constructor ;
-	int persistant ;
-	struct gen_binding *constructand ;
-    } ba ;
-    struct {
-	int type ;
-	char *constructor ;
-	int persistant ;
-	struct gen_binding *element ;
-    } li ;
-    struct {
-	int type ;
-	char *constructor ;
-	int persistant ;
-	struct gen_binding *element ;
-	set_type what ;
-    } se ;
-    struct {
-	int type;
-	char *constructor;
-	int persistant;
-	struct gen_binding * element;
-	struct intlist * dimensions;
-    } ar ;
-    struct {
-	int type ;
-	int op ;
-	int first ;
-	struct domainlist *components ;
-    } co ;
-    struct {
-	int type ;
-	char *filename ;
-    } im ;
+  struct { /* EXTERNAL */
+    int type ;
+    char *(*read)() ;
+    void (*write)() ;
+    void (*free)() ;
+    char *(*copy)() ;
+    int (*allocated_memory)();
+  } ex ;
+  struct { /* BASIC */
+    int type ;
+    char *constructor ;
+    int persistant ;
+    struct gen_binding *constructand ;
+  } ba ;
+  struct { /* LIST */
+    int type ;
+    char *constructor ;
+    int persistant ;
+    struct gen_binding *element ;
+  } li ;
+  struct { /* SET */
+    int type ;
+    char *constructor ;
+    int persistant ;
+    struct gen_binding *element ;
+    set_type what ;
+  } se ;
+  struct { /* ARRAY */
+    int type;
+    char *constructor;
+    int persistant;
+    struct gen_binding * element;
+    struct intlist * dimensions;
+  } ar ;
+  struct { /* CONSTRUCTED */
+    int type ;
+    int op ;
+    int first ;
+    struct domainlist *components ;
+  } co ;
+  struct { /* IMPORT (another newgen type, not yet defined) */
+    int type ;
+    char *filename ;
+  } im ;
 } ;
 
 /* MAX_DOMAIN is the maximum number of entries in the DOMAINS table */
