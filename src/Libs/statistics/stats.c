@@ -358,7 +358,7 @@ static void call_rwt(call  ca, context_p context)
     (void *) contenu);
   }
   else{
-    contenu=is_a_call;
+    contenu=is_a_call; 
     hash_put(context->contenu,
     stack_head(context->statement_stack), 
     (void *)contenu );
