@@ -62,8 +62,8 @@ sub get_identificators($)
 		     |real|integer|logical|gt|le|lt|ge|eq|ne|\d.*
 		     |character|implicit|none|then|else|or|and|call
 		     |write|return|continue|format|parameter|double
-		     |precision|complex|equivalence)$/ix,
-		 (split /[^A-Za-z0-9_]+/, $line));
+		     |precision|complex|equivalence)$/x,
+		 (split /[^a-z0-9_]+/, $line));
 }
 
 # include files already processed for identificators are not cached
