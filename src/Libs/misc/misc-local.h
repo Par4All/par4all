@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1997/04/08 11:58:11 $, 
+ * $Date: 1997/04/22 10:12:15 $, 
  */
 
 #ifndef _STDARG_H
@@ -20,7 +20,9 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
  * if not available, other macros or function calls are generated.
  * Fabien.
  */
-#ifdef __GNUC__
+#if (defined(__GNUC__))
+#define pips_where(out) \
+  fprintf(out, "[%s] (%s:%d) ", __FUNCTION__, __FILE__, __LINE__)
 #define debug_on(env) debug_on_function(env, __FUNCTION__, __FILE__, __LINE__)
 #define debug_off() debug_off_function(__FUNCTION__, __FILE__, __LINE__)
 #define pips_debug(level, format, args...)\
@@ -42,7 +44,11 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 		   "[%s] (%s:%d) assertion failed\n\n '%s' not verified\n\n", \
 		   __FUNCTION__ , __FILE__ , __LINE__ , what); \
     pips_user_error("this is a USER ERROR, I guess\n");}
+#define pips_exit(code, format, args...)\
+   pips_user_warning(format, ##args), exit(code)
 #else
+#define pips_where(out) \
+  fprintf(out, "[%s] (%s:%d) ", pips_unknown_function, __FILE__, __LINE__)
 #define debug_on(env) \
   debug_on_function(env, pips_unknown_function, __FILE__, __LINE__)
 #define debug_off() \
@@ -62,6 +68,7 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 		   "(%s:%d) assertion failed\n\n '%s' not verified\n\n", \
 		   __FILE__ , __LINE__ , what); \
     pips_user_error("this is a USER ERROR, I guess\n");}
+#define pips_exit pips_where(stderr), pips_exit_function
 #endif
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
