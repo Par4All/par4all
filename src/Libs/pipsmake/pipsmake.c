@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.78  2003/07/08 07:06:04  coelho
+ * \n
+ *
  * Revision 1.77  2003/07/07 13:00:49  irigoin
  * safe_find_rule_by_resource() added and
  * check_physical_resource_up_to_date() commented and improved and reformatted.
@@ -1093,7 +1096,7 @@ void delete_some_resources(void)
     string what = get_string_property("PIPSDBM_RESOURCES_TO_DELETE");
     dont_interrupt_pipsmake_asap();
 
-    user_log("Deletion of %s resources: ", what);
+    user_log("Deletion of %s resources:\n", what);
 
     if (same_string_p(what, "obsolete")) 
     {
