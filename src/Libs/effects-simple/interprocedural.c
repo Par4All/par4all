@@ -308,7 +308,7 @@ global_effect_translation(
     }
     
     /* Second, we calculate the offset and size of the effect entity */
-    eff_ent_size = SizeOfArray(eff_ent);
+    eff_ent_size = array_size(eff_ent);
     eff_ent_begin_offset = ram_offset(storage_ram(entity_storage(eff_ent)));
     eff_ent_end_offset = eff_ent_begin_offset + eff_ent_size - 1;
 
@@ -327,7 +327,7 @@ global_effect_translation(
 	if (strcmp(entity_module_name(new_ent),
 		   module_local_name(target_func)) == 0)
 	{
-	    int new_ent_size = SizeOfArray(new_ent);
+	    int new_ent_size = array_size(new_ent);
 	    int new_ent_begin_offset = 
 		ram_offset(storage_ram(entity_storage(new_ent)));
 	    int new_ent_end_offset = new_ent_begin_offset + new_ent_size - 1;
