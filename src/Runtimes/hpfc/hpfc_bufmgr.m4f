@@ -2,6 +2,9 @@
 ! $Id$
 !
 ! $Log: hpfc_bufmgr.m4f,v $
+! Revision 1.15  1997/05/28 12:46:56  zory
+! *** empty log message ***
+!
 ! Revision 1.14  1997/05/28 12:46:03  zory
 ! replace pvm calls by hpfc subroutines
 !
@@ -39,7 +42,7 @@ fake_buffers(dnl
       if (SEND NOT INITIALIZED) then
          call HPFC INIT SEND(BUFFER ENCODING, bufid)
          debug(if (bufid.lt.0) 
-     $        write (unit=0,fmt=*) "pvm initsend error")
+     $        write (unit=0,fmt=*) "hpfc init send error")
          SEND NOT INITIALIZED=.FALSE.
       endif
       call HPFC PACK(PVMTYPE, build_name(PVMTYPE,BUFF),
