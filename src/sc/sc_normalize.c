@@ -50,37 +50,37 @@ Psysteme sc_normalize(ps)
 Psysteme ps;
 {
     Pcontrainte eq;
-    boolean is_sc_fais = TRUE;
 
-    ps = sc_kill_db_eg(ps);
-    if (ps) {
-	for (eq = ps->egalites;
-	     (eq != NULL) && is_sc_fais;
-	     eq=eq->succ) {
-	    /* normalisation de chaque equation */
-	    if (eq->vecteur)    {
-		vect_normalize(eq->vecteur);
-		if ((is_sc_fais = egalite_normalize(eq))== TRUE)
-		    is_sc_fais = sc_elim_simple_redund_with_eq(ps,eq);
-	    }
-	}
-	for (eq = ps->inegalites;
-	     (eq!=NULL) && is_sc_fais;
-	     eq=eq->succ) {
-	    if (eq->vecteur)    {
-		vect_normalize(eq->vecteur);
-		if ((is_sc_fais = inegalite_normalize(eq))== TRUE)
-		    is_sc_fais = sc_elim_simple_redund_with_ineq(ps,eq);
-	    }
-	}
+    ps = sc_elim_db_constraints(ps);
+    sc_elim_empty_constraints(ps, TRUE);
+    sc_elim_empty_constraints(ps, FALSE);
 
+    if (!SC_UNDEFINED_P(ps)) {
+      /* propagate constant definitions, only once although a triangular
+	 system might require n steps is the equations are in the worse order */
+	for (eq = ps->egalites; (!SC_UNDEFINED_P(ps) && eq != NULL); eq=eq->succ) {
+	  Pvecteur veq = contrainte_vecteur(eq);
+	  if(((vect_size(veq)==1) && (vect_coeff(TCST,veq)==VALUE_ZERO))
+	     || ((vect_size(veq)==2) && (vect_coeff(TCST,veq)!=VALUE_ZERO))) {
+	    Variable v = term_cst(veq)? vecteur_var(vecteur_succ(veq)) : vecteur_var(veq);
+	    Value a = term_cst(veq)? vecteur_val(vecteur_succ(veq)) : vecteur_val(veq);
+
+	    if(value_one_p(a) || value_mone_p(a) || vect_coeff(TCST,veq)==VALUE_ZERO
+	       || value_mod(a,vect_coeff(TCST,veq))==VALUE_ZERO) {
+	      /* An overflow is unlikely... but it should be handled here
+                 I guess rather than be subcontracted. */
+	      sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
+	    }
+	    else {
+	      sc_rm(ps);
+	      ps = SC_UNDEFINED;
+	    }
+	  }
+	}
 	ps = sc_kill_db_eg(ps);
 	sc_elim_empty_constraints(ps, TRUE);
 	sc_elim_empty_constraints(ps, FALSE);
     }
-
-    if (!is_sc_fais) 
-	sc_rm(ps), ps=NULL;
     
     return(ps);
 }
