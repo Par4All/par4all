@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/04/28 13:53:24 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/05/21 10:13:14 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -872,13 +872,24 @@ UNSPAGHETTIFY_DISPLAY_STATISTICS TRUE
 \end{verbatim}
 
 
-\subsubsection{clean up sequences}
+\subsubsection{Clean up sequences}
 
 
 To display the statistics about cleaning-up sequences and removing
 useless CONTINUE or empty statement.
 \begin{verbatim}
 CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS FALSE
+\end{verbatim}
+
+
+\subsubsection{FORMAT restructuring}
+
+To able deeper code transformation, FORMATs can be gathered at the
+very beginning of the code or at the very end according to the
+following options.
+\begin{verbatim}
+GATHER_FORMATS_AT_BEGINNING FALSE
+GATHER_FORMATS_AT_END FALSE
 \end{verbatim}
 
 
