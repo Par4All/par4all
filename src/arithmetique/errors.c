@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.9  1998/10/24 15:36:22  coelho
+  better exception error messages...
+
   Revision 1.8  1998/10/24 15:19:17  coelho
   more verbose throw...
 
@@ -58,6 +61,8 @@ typedef struct
   linear_exception_holder;
 
 /* exception stack.
+   maximum extension.
+   current index (next available bucket)
  */
 #define MAX_STACKED_CONTEXTS 50
 static linear_exception_holder exception_stack[MAX_STACKED_CONTEXTS];
@@ -91,6 +96,15 @@ void dump_exception_stack()
   dump_exception_stack_to_file(stderr);
 }
 
+#define exception_debug_message(type) 				  \
+    fprintf(stderr, "%s[%s:%d %s (%d)/%d]\n", 			  \
+	    type, file, line, function, what, exception_index) 
+
+#define exception_debug_trace(type) \
+    if (linear_exception_debug_mode) { exception_debug_message(type); }
+
+
+
 /* push a what exception on stack.
  */
 jmp_buf * 
@@ -100,14 +114,12 @@ push_exception_on_stack(
     char * file,
     int line)
 {
-  if (linear_exception_debug_mode)
-    fprintf(stderr, "PUSH [%s:%d %s (%d)]\n", file, line, function, what);
+  exception_debug_trace("PUSH ");
 
   if (exception_index==MAX_STACKED_CONTEXTS)
   {
-    fprintf(stderr, 
-	    "exception stack overflow at %s:%d in %s for %d\n",
-	    file, line, function, what);
+    exception_debug_message("push");
+    fprintf(stderr, "exception stack overflow\n");
     dump_exception_stack();
     abort();
   }
@@ -134,14 +146,12 @@ pop_exception_from_stack(
     char * file,
     int line)
 {  
-  if (linear_exception_debug_mode)
-    fprintf(stderr, "POP  [%s:%d %s (%d)]\n", file, line, function, what);
+  exception_debug_trace("POP  ");
 
   if (exception_index==0)
   {
-    fprintf(stderr, 
-	    "exception stack underflow at %s:%d in %s for %d\n",
-	    file, line, function, what);
+    exception_debug_message("pop");
+    fprintf(stderr, "exception stack underflow\n");
     dump_exception_stack();
     abort();
   }
@@ -152,6 +162,7 @@ pop_exception_from_stack(
       !same_string_p(exception_stack[exception_index].file, file) ||
       !same_string_p(exception_stack[exception_index].function, function))
   {
+    exception_debug_message("pop");
     fprintf(stderr, 
 	    "exception stack mismatch at depth=%d:\n"
 	    "   CATCH: %s:%d in %s (%d)\n"
@@ -176,13 +187,11 @@ void throw_exception(
     char * file,
     int line)
 {
-  int i=exception_index-1;
+  int i;
   
-  if (linear_exception_debug_mode)
-    fprintf(stderr, "THROW[%s:%d %s (%d)/%d]\n",
-	    file, line, function, what, exception_index);
+  exception_debug_trace("THROW");
 
-  for (; i>=0 ;i--)
+  for (i=exception_index-1; i>=0; i--)
   {
     if (exception_stack[i].what & what) 
     {
@@ -202,7 +211,8 @@ void throw_exception(
   }
 
   /* error. */
-  fprintf(stderr,"exception %d not found in stack\n", what);
+  exception_debug_message("throw");
+  fprintf(stderr,"exception not found in stack\n");
   dump_exception_stack();
   abort();
 }
