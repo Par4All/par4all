@@ -2,6 +2,9 @@
 ! $Id$
 !
 ! $Log: hpfc_bufmgr.m4f,v $
+! Revision 1.16  1997/05/29 16:11:11  coelho
+! *** empty log message ***
+!
 ! Revision 1.15  1997/05/28 12:46:56  zory
 ! *** empty log message ***
 !
@@ -69,7 +72,7 @@ fake_buffers(dnl
       integer info, length, tag, tid
       include "hpfc_commons.h"
       include "hpfc_includes.h"
-      if (RECEIVED NOT PERFORMED) then
+      if (RECEIVED NOT PERFORMED.or.lid.eq.0) then
          debug(write (unit=0, fmt=*) 
      $        "RCV from ", lid, RECVCHANNELS(lid))
          call HPFC RECEIVE(NODETIDS(lid), RECVCHANNELS(lid), BUFFER ID)
