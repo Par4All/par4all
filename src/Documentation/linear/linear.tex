@@ -5,9 +5,9 @@
 %%
 
 \documentclass[a4paper,11pt]{article}
-\usepackage{french}
+\usepackage{amsmath,amssymb,psfig}
 
-\title{???}
+\title{Linear Algebra as a Proof Engine}
 
 \author{Corinne Ancourt \\
   Fabien Coelho \\
@@ -26,5 +26,106 @@
 }
 
 \section{Introduction}
+
+\section{Convex Hull}
+
+\subsection{Definition}
+
+Let $A$ et $B$ be two finite subsets of an affine or vector space $E$, the convex hull
+of $A$ and $B$ is:
+
+\begin{eqnarray}
+\{ x ~ \in ~ E |
+\exists~a~\in~A~~~\exists~b~\in~B~~~\exists~\lambda~\in~[0..1]~s.t. x =
+\lambda a + (1 - \lambda b) \}
+\end{eqnarray}
+
+If $A$ or $B$ is not finite, the closure of the previous set is their
+convex hull.
+
+\subsection{Properties}
+
+\begin{eqnarray}
+A \subset A \vee A
+\end{eqnarray}
+
+\begin{eqnarray}
+A = A \vee A \Longleftrightarrow A is convex
+\end{eqnarray}
+
+\subsubsection{Convex Hull and Intersection}
+
+Since the computation of the convex hull of two sets is expensive, it would be nice to
+reduce it by extracting common constraints and using the distributivity:
+
+\begin{eqnarray} \label{equation-distributivity}
+A \cap ( B_1 \vee B_2 ) = (A \cap B_1 ) \vee (A \cap B_2 )
+\end{eqnarray}
+
+Unfortunately, this property does not hold in general.
+
+\begin{figure}
+\begin{center}
+\mbox{\psfig{file=distrib01.idraw,width=0.8\hsize,height=0.8\vsize}}
+\end{center}
+\caption{The convex hull should be performed first}
+\label{figure-distrib01}
+\end{figure}
+
+For instance, look at figure~\ref{figure-distrib01}. The convex hull of
+$B_1$ and $B_2$ is a segment which intersects $A$ whereas the
+intersections of $A$ with $B_1$ and $B_2$ are both empty.
+
+\begin{eqnarray}
+A \cap ( B_1 \vee B_2 ) \not\subset (A \cap B_1 ) \vee (A \cap B_2 )
+\end{eqnarray}
+
+\begin{figure}
+\begin{center}
+\mbox{\psfig{file=distrib02.idraw,width=0.8\hsize,height=0.8\vsize}}
+\end{center}
+\caption{The intersection should be performed first}
+\label{figure-distrib02}
+\end{figure}
+
+The converse is not true either. In Figure~\ref{figure-distrib02}, the
+intersection of $A$ with the convex hull of $B_1$ and $B_2$ is just $B_1$
+and $B_2$. But the convex hull of $A \cap B_1$ and $A \cap B_2$ is the
+diameter $[B_1 B_2]$.
+
+\begin{eqnarray}
+A \cap ( B_1 \vee B_2 ) \not\supset (A \cap B_1 ) \vee (A \cap B_2 )
+\end{eqnarray}
+
+If $A$ is convex (and $B_1$ abd $B_2$ are finite sets), then:
+
+\begin{eqnarray}
+A \cap ( B_1 \vee B_2 ) \supset (A \cap B_1 ) \vee (A \cap B_2 )
+\end{eqnarray}
+
+Proof: $x~\in~(A \cap B_1 ) \vee (A \cap B_2 )$ implies there exist $x_1$
+and $x_2$ such that $x_1$ belongs to $A \cap B_1$ and $x_2$ belongs to $A
+\cap B_2$, as well as $\lambda$$
+in $[0..1]$ and $x = \lambda x_1 +
+(1-\lambda) x_2$. Since $x_1$ and $x_2$ belong to $A$ and since $A$ is
+convex, $x$ belongs to $A$ by definition of convexity. Furthermore, $x$$
+belongs to $B_1 \cap B_2$ by definition of convex hull.
+
+\begin{figure}
+\begin{center}
+\mbox{\psfig{file=distrib03.idraw,width=0.8\hsize,height=0.8\vsize}}
+\end{center}
+\caption{Distribution with an affine subset}
+\label{figure-distrib03}
+\end{figure}
+
+If $A$ is a vector or affine subset, this is not a sufficient condition
+for equation~\ref{{equation-distributivity} to hold.In
+  Figure~\ref{figure-distrib03}, let $A$ be the $(Ox, Oy)$ plane and $B_1$
+  and $B_2$ two lines intersecting $A$ in $X$ and $Y$$ respectively. The
+  point $(1,1,0)$ belongs to the intersection of $A$ and the convex
+  enveloppe of $B_1$ and $B_2$ but not to the segment $[B_1 b_2]$ which is
+  the convex hull of the intersections of $A$ with $B_1$ and $B_2$, namely
+  $X$ and $Y$ respectively.
 
 \end{document}
