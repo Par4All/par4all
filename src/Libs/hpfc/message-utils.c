@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1995/04/10 18:49:37 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1995/07/20 18:40:41 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -42,8 +42,7 @@ range r;
     /* else */
     MAPL(cc,
      {
-	 list
-	     lr = CONSP(CAR(cc));
+	 list lr = CONSP(CAR(cc));
 
 	 assert(!ENDP(lr));
 
@@ -66,19 +65,10 @@ list l;
     
     MAPL(cc,
      {
-	 list
-	     lr = CONSP(CAR(cc));
-	 list
-	     lrp = NIL;
+	 list lr = CONSP(CAR(cc));
+	 list lrp = NIL;
 
-	 MAPL(cr,
-	  {
-	      range
-		  r = RANGE(CAR(cr));
-
-	      lrp = gen_nconc(lrp, CONS(RANGE, r, NIL));
-	  },
-	      lr);
+	 MAP(RANGE, r, lrp = gen_nconc(lrp, CONS(RANGE, r, NIL)), lr);
 
 	 assert(gen_length(lrp)==gen_length(lr));
 
@@ -103,8 +93,7 @@ list l;
 
     MAPL(cv,
      {
-	 Pvecteur
-	     v = PVECTOR(CAR(cv));
+	 Pvecteur v = PVECTOR(CAR(cv));
 
 	 result = gen_nconc(result, CONS(PVECTOR, vect_dup(v), NIL));
      },
@@ -246,17 +235,15 @@ list l;
     string s = str;
     bool firstrange = TRUE;
 
-    MAPL(cr,
-     {
-	 range r = RANGE(CAR(cr));
-
-	 if (!firstrange)
-	     s += strlen(sprintf(s, ", "));
-
-	 firstrange = FALSE;
-	 s += strlen(sprint_range(s, r));
-     },
-	 l);
+    MAP(RANGE, r,
+    {
+	if (!firstrange)
+	    s += strlen(sprintf(s, ", "));
+	
+	firstrange = FALSE;
+	s += strlen(sprint_range(s, r));
+    },
+	l);
 
     return(str);
 }
@@ -381,16 +368,7 @@ bool larger_message_in_list(m, l)
 message m;
 list l;
 {
-    MAPL(cm,
-     {
-	 message
-	     mp = MESSAGE(CAR(cm));
-
-	 if (message_larger_p(mp, m))
-	     return(TRUE);
-     },
-	 l);
-
+    MAP(MESSAGE, mp, if (message_larger_p(mp, m)) return TRUE, l);
     return(FALSE);
 }
 
