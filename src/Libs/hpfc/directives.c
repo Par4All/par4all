@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/12/30 09:28:46 $, )
+ * ($Date: 1997/01/18 16:43:29 $, )
  */
 
 #include "defines-local.h"
@@ -933,6 +933,7 @@ static struct DirectiveHandler handlers[] =
     /* remappings before/after a call. internal management. 
      */
     {HPF_PREFIX RENAME_SUFFIX,		3,	HANDLER(prescriptive) },
+    {HPF_PREFIX TELL_SUFFIX,		1, 	HANDLER(nothing) },
 	 
     /* default issues an error
      */
