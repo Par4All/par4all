@@ -87,32 +87,45 @@ statement_mapping
  *
  * Recursive calls used in the top-down walk of the program.
  */
-void hpfcompiler(stat,hoststatp,nodestatp)
+void hpfcompiler(stat, hoststatp, nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
+    bool
+	only_io = (load_statement_only_io(stat)==TRUE);
+
+    if (only_io)
+	if (io_efficient_compilable_p(stat))
+	{
+	    io_efficient_compile(stat,  hoststatp, nodestatp);
+	    return;
+	}
+    
+    /* else usual stuff */
+
     switch(instruction_tag(statement_instruction(stat)))
     {
     case is_instruction_block:
-	hpfcompileblock(stat,hoststatp,nodestatp);
+	hpfcompileblock(stat, hoststatp, nodestatp);
 	break;
     case is_instruction_test:
-	hpfcompiletest(stat,hoststatp,nodestatp);
+	hpfcompiletest(stat, hoststatp, nodestatp);
 	break;
     case is_instruction_loop:
-	hpfcompileloop(stat,hoststatp,nodestatp);
+	hpfcompileloop(stat, hoststatp, nodestatp);
 	break;
     case is_instruction_goto:
-	hpfcompilegoto(stat,hoststatp,nodestatp);
+	hpfcompilegoto(stat, hoststatp, nodestatp);
 	break;
     case is_instruction_call:
-	hpfcompilecall(stat,hoststatp,nodestatp);
+	hpfcompilecall(stat, hoststatp, nodestatp);
 	break;
     case is_instruction_unstructured:
-	hpfcompileunstructured(stat,hoststatp,nodestatp);
+	hpfcompileunstructured(stat, hoststatp, nodestatp);
 	break;
     default:
-	pips_error("hpfcompiler","unexpected instruction tag\n");
+	pips_error("hpfcompiler",
+		   "unexpected instruction tag\n");
 	break;
     }
 }
