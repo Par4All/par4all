@@ -735,7 +735,7 @@ char * s;
 
 void close_workspace_if_opened()
 {
-    if (db_get_current_module_name() != NULL)
+    if (db_get_current_workspace_name() != NULL)
 	close_workspace ();
 }
 
