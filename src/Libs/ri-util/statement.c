@@ -1074,6 +1074,9 @@ gather_all_comments_of_a_statement_filter(statement s)
   string the_comments = statement_comments(s);
   if (!empty_comments_p(the_comments)) {
     string old = gather_all_comments_of_a_statement_string;
+    if (old == NULL)
+	/* For now, no comment has been gathered: */
+	old = strdup("");
     gather_all_comments_of_a_statement_string =
       strdup(concatenate(old, the_comments, NULL));
     free(old);
@@ -1083,27 +1086,28 @@ gather_all_comments_of_a_statement_filter(statement s)
 
 
 /* Gather all the comments recursively found in the given statement
-   and return them in a string.
+   and return them in a strduped string (NULL if no comment found).
 
    Do not forget to free the string returned later when no longer
    used. */
 string
 gather_all_comments_of_a_statement(statement s)
 {
-    gather_all_comments_of_a_statement_string = strdup("");
+    gather_all_comments_of_a_statement_string = NULL;
     gen_recurse(s, statement_domain,
 		gather_all_comments_of_a_statement_filter, gen_null);
     return gather_all_comments_of_a_statement_string;
 }
 
 
-/* Append a comment string to the comments of a statement. */
+/* Append a comment string (if non empty) to the comments of a
+   statement, if the c. */
 void
 append_comments_to_statement(statement s,
 			     string the_comments)
 {
     string old = statement_comments(s);
-    
+
     if (empty_comments_p(the_comments))
 	/* Nothing to add... */
 	return;
@@ -1118,7 +1122,8 @@ append_comments_to_statement(statement s,
 }
 
 
-/* Insert a comment string at the beginning of the comments of a statement. */
+/* Insert a comment string (if non empty) at the beginning of the
+   comments of a statement. */
 void
 insert_comments_to_statement(statement s,
 			     string the_comments)
