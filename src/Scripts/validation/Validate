@@ -49,7 +49,7 @@ ping=${PIPS_PING:-ping}
 
 #
 
-script=`basename $0`
+script=`${PIPS_BASENAME:-basename} $0`
 
 unset valid_option warning performance
 
@@ -258,7 +258,7 @@ available_host()
   #
   # failures append
   cat $ah_file >> $FAILED
-  ah_host=`basename $ah_file | cut -d. -f 5`
+  ah_host=`${PIPS_BASENAME:-basename} $ah_file | cut -d. -f 5`
   rm -f $WAITING.$ah_host $RESULT.$ah_host
   #
   # available host
