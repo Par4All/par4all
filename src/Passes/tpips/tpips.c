@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.98  1998/05/25 16:48:33  coelho
+ * pips signal initialization added.
+ *
  * Revision 1.97  1998/05/22 14:36:09  coelho
  * "interactive" state.
  *
@@ -503,6 +506,7 @@ static char * tpips_read_a_line(char * main_prompt)
 }
 
 /************************************************* TPIPS HANDLERS FOR PIPS */
+
 static void 
 tpips_user_log(char *fmt, va_list args)
 {
@@ -818,8 +822,7 @@ tpips_close(void)
 extern void tpips_set_line_to_parse(char*);
 extern char * tpips_get_line_to_parse(void);
 
-static void 
-handle(string line)
+static void handle(string line)
 {
     tpips_set_line_to_parse(line);
 
@@ -1138,12 +1141,15 @@ tpips_main(int argc, char * argv[])
 {
     debug_on("TPIPS_DEBUG_LEVEL");
     pips_log_handler = tpips_user_log;
+    initialize_pips_signal_handlers();
+
     {
 	string pid = (char*) malloc(sizeof(char)*20);
 	sprintf(pid, "PID=%d", (int) getpid());
 	pips_assert("not too long", strlen(pid)<20);
 	putenv(pid);
     }
+
     parse_arguments(argc, argv);
     fprintf(stdout, "\n");	/* for Ctrl-D terminations */
     tpips_close();
