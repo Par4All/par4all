@@ -1,5 +1,8 @@
 /* $id$
    $Log: c_parser.c,v $
+   Revision 1.6  2003/12/05 17:16:21  nguyen
+   Initialize and free global stacks
+
    Revision 1.5  2003/09/05 14:18:25  nguyen
    Put keywords and typedefs hash table into DECLARATIONS resource of each
    compilation unit.
@@ -44,11 +47,20 @@ extern char *strdup(const char *s1);
 
 string compilation_unit_name; 
 
+list CalledModules = NIL; 
+
 statement ModuleStatement = statement_undefined;
   
 stack ContextStack = stack_undefined;
+stack FunctionStack = stack_undefined;
+stack FormalStack = stack_undefined;
+stack OffsetStack = stack_undefined;
+stack StructNameStack = stack_undefined;
 
-
+/* Global counter */
+int loop_counter = 1; 
+int derived_counter = 1; 
+ 
 hash_table keyword_typedef_table = hash_table_undefined;
 
 void init_keyword_typedef_table()
@@ -133,8 +145,17 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 	compilation_unit_name = compilation_unit_of_module(module_name);
 	keyword_typedef_table = (hash_table) db_get_memory_resource(DBR_DECLARATIONS,compilation_unit_name,TRUE); 
       }
-    ContextStack = stack_make(c_parser_context_domain,0,0);
 
+    ContextStack = stack_make(c_parser_context_domain,0,0);
+    FunctionStack = stack_make(entity_domain,0,0);
+    FormalStack = stack_make(basic_domain,0,0);
+    OffsetStack = stack_make(basic_domain,0,0);
+    StructNameStack = stack_make(code_domain,0,0);
+    
+    loop_counter = 1; 
+    derived_counter = 1;
+    CalledModules = NIL;
+    
     debug_on("C_SYNTAX_DEBUG_LEVEL");
  
     if (compilation_unit_p(module_name))
@@ -158,7 +179,11 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 	print_statement(ModuleStatement);
 	pips_debug(2,"and declarations: ");
 	print_entities(statement_declarations(ModuleStatement));
-	printf("\n");
+	printf("\nList of callees:\n");
+	MAP(STRING,s,
+	{
+	  printf("\t%s\n",s);
+	},CalledModules);
       }
 
     if (compilation_unit_p(module_name))
@@ -179,13 +204,16 @@ static bool actual_c_parser(string module_name, string dbr_file, bool is_compila
 			       (char *) ModuleStatement);
 	DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, 
 			       module_name, 
-			       (char *) make_callees(NIL));
-	/* Should generate a list of callees called_modules */
+			       (char *) make_callees(CalledModules));
       }
     free(file_name);
     file_name = NULL;
     /*  reset_keyword_typedef_table();*/
     stack_free(&ContextStack);
+    stack_free(&FunctionStack);
+    stack_free(&FormalStack);
+    stack_free(&OffsetStack);
+    stack_free(&StructNameStack);
     debug_off();
     return TRUE;
 }
