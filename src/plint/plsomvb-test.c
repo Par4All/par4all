@@ -42,7 +42,7 @@ Psommet som;
     boolean result = FALSE;
 
     for (ps = som;
-	 ps!= NULL && (- vect_coeff(TCST,ps->vecteur) >= 0);
+	 ps!= NULL && value_negz_p(vect_coeff(TCST,ps->vecteur));
 	 ps= ps->succ);
     result = (ps == NULL) ? FALSE : TRUE;
     return (result);
@@ -73,10 +73,10 @@ Psommet eq;
 
     if (eq) {
 	pv = eq->vecteur;
-	if (-vect_coeff(TCST,pv) < 0)
+	if (value_pos_p(vect_coeff(TCST,pv)))
 	{
 	    for (pv= eq->vecteur;pv!= NULL 
-		 && ((pv->var ==NULL) || (pv->val >0))
+		 && ((pv->var ==NULL) || value_pos_p(pv->val))
 		 ;pv= pv->succ);
 	    result = (pv==NULL) ? FALSE : TRUE;
 	}
@@ -121,18 +121,18 @@ Pbase b;
     printf(" ** Gomory - existe-t-il une var. h.base de cout  nul  \n");
 #endif
 
-    liste1 = vect_new(vecteur_var(b),1);
+    liste1 = vect_new(vecteur_var(b),VALUE_ONE);
     for (i = 1 ,pv2 = b->succ;
 	 i< nbvars && !VECTEUR_NUL_P(pv2); 
 	 i++, pv2=pv2->succ)
-	vect_add_elem (&(liste1),vecteur_var(pv2),1);
+	vect_add_elem (&(liste1),vecteur_var(pv2),VALUE_ONE);
     if (fonct != NULL)
 	for (pv = fonct->vecteur;pv != NULL;pv=pv->succ)
-	    if (pv->val != 0)
+	    if (value_notzero_p(pv->val))
 		vect_chg_coeff(&liste1,pv->var,0);
 		
     for (pv = lvbase;pv != NULL;pv=pv->succ)
-	if (pv->val != 0)
+	if (value_notzero_p(pv->val))
 	    vect_chg_coeff(&liste1,pv->var,0);
     result = (liste1 != NULL) ? TRUE : FALSE;
 
