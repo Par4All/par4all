@@ -35,6 +35,18 @@ SizeOfArray(entity e, int * s)
 	return ok;
 }
 
+int
+array_size(entity a)
+{
+    int s = 0;
+
+    if(!SizeOfArray(a, &s)) {
+	pips_error("array_size",
+		   "Array \"%s\" with illegal varying array size\n",
+		   entity_name(a));
+    }
+}
+
 Value 
 ValueSizeOfArray(entity e)
 {
