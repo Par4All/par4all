@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.155  2001/11/27 12:36:36  nguyen
+%% Add new property ARRAY_RESIZING_USING_MAIN_PROGRAM
+%%
 %% Revision 1.154  2001/10/29 10:08:24  nguyen
 %% Table of contents + Add comments for array bound checking
 %%
@@ -172,7 +175,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2001/10/29 10:08:24 $~$
+$~$Date: 2001/11/27 12:36:36 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1871,6 +1874,19 @@ INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
 PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
 
 \end{verbatim}
+
+\subsection{Array Resizing}
+This is a property to tell the array resizing top-down approach to use
+information from MAIN program or not. If the current module is never
+called by the main program, we do no array resizing for the unnormalized
+declarations in this module if the property is on. However, we can 
+do nothing with modules that have no callers at all, because this is a
+top-down approach ! 
+
+\begin{verbatim}
+ARRAY_RESIZING_USING_MAIN_PROGRAM FALSE
+\end{verbatim}
+
 
 %%
 %% PRETTYPRINTER
