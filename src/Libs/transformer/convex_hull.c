@@ -10,6 +10,7 @@
 
 #include "genC.h"
 #include "linear.h"
+
 #include "ri.h"
 #include "ri-util.h"
 
@@ -27,44 +28,8 @@
 /* temporarily, for ifdebug */
 #include "transformer.h"
 
-/* transformer transformer_convex_hull(t1, t2): compute convex hull for t1
- * and t2; t1 and t2 are slightly modified to give them the same basis; else
- * convex hull means nothing; some of the work is duplicated in sc_enveloppe;
- * however their "relation" fields are preserved; the whole thing is pretty
- * badly designed; shame on Francois! FI, 24 August 1990
- */
-transformer transformer_convex_hull(t1, t2)
-transformer t1;
-transformer t2;
-{
-    /* return transformer_convex_hulls(t1, t2, sc_enveloppe);  */
-    /* return transformer_convex_hulls(t1, t2, sc_enveloppe_chernikova); */
-    return transformer_convex_hulls(t1, t2, sc_common_projection_convex_hull); 
-}
-
-/* I removed this because I do not want to port the polyedre library
- * to use "Value". If you want this function, do the port! FC 07/96
- */
-/* 
-transformer transformer_fast_convex_hull(t1, t2)
-transformer t1;
-transformer t2;
-{
-    return transformer_convex_hulls(t1, t2, sc_fast_convex_hull);
-}
-*/
-
-transformer transformer_chernikova_convex_hull(t1, t2)
-transformer t1;
-transformer t2;
-{
-    return transformer_convex_hulls(t1, t2, sc_enveloppe_chernikova);
-}
-
-transformer transformer_convex_hulls(t1, t2, method)
-transformer t1;
-transformer t2;
-Psysteme (*method)();
+static transformer transformer_convex_hulls
+(transformer t1, transformer t2, Psysteme (*method)(Psysteme, Psysteme))
 {
     Psysteme r1;
     Psysteme r2;
@@ -144,3 +109,39 @@ Psysteme (*method)();
 
     return t;
 }
+
+/* transformer transformer_convex_hull(t1, t2): compute convex hull for t1
+ * and t2; t1 and t2 are slightly modified to give them the same basis; else
+ * convex hull means nothing; some of the work is duplicated in sc_enveloppe;
+ * however their "relation" fields are preserved; the whole thing is pretty
+ * badly designed; shame on Francois! FI, 24 August 1990
+ */
+transformer transformer_convex_hull(transformer t1, transformer t2)
+{
+  /* return transformer_convex_hulls(t1, t2, sc_enveloppe);  */
+  /* return transformer_convex_hulls(t1, t2, sc_enveloppe_chernikova); */
+  /* return transformer_convex_hulls(t1, t2, sc_common_projection_convex_hull);
+   */
+  return transformer_convex_hulls(t1, t2, cute_convex_union);
+}
+
+/* I removed this because I do not want to port the polyedre library
+ * to use "Value". If you want this function, do the port! FC 07/96
+ */
+/* 
+transformer transformer_fast_convex_hull(t1, t2)
+transformer t1;
+transformer t2;
+{
+    return transformer_convex_hulls(t1, t2, sc_fast_convex_hull);
+}
+*/
+
+/*
+transformer transformer_chernikova_convex_hull(t1, t2)
+transformer t1;
+transformer t2;
+{
+    return transformer_convex_hulls(t1, t2, sc_enveloppe_chernikova);
+}
+*/
