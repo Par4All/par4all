@@ -1,6 +1,6 @@
 /* Package sc 
  * $RCSfile: sc_transformation.c,v $ (version $Revision$)
- * $Date: 1997/04/10 10:38:13 $, .
+ * $Date: 1997/04/13 19:12:16 $, .
  */
 
 #include <string.h>
@@ -113,6 +113,8 @@ void sc_find_equalities(Psysteme * ps)
 {
     Variable vtmp = (Variable) "local temporary variable";
     Pcontrainte eq;
+ 
+    sc_transform_ineg_in_eg(*ps);
 
     /* FOR EACH EQUALITY
      */
@@ -251,10 +253,6 @@ void sc_find_equalities(Psysteme * ps)
 	/* an == VECTEUR_NUL */
 	vect_rm(m), m=VECTEUR_NUL;
     }
-
-    /* second round
-     */
-    sc_transform_ineg_in_eg(*ps);
 }
 
 /* that is all
