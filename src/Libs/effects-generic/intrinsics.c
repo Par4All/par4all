@@ -42,6 +42,7 @@ static list no_write_effects(entity e,list args);
 static list affect_effects(entity e,list args);
 static list assign_substring_effects(entity e,list args);
 static list substring_effect(entity e,list args);
+static list some_io_effects(entity e, list args);
 static list io_effects(entity e, list args);
 static list effects_of_ioelem(expression exp, tag act);
 static list effects_of_iolist(list exprs, tag act);
@@ -161,9 +162,9 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
 
     {"CONTINUE",                 no_write_effects},
     {"ENDDO",                    no_write_effects},
-    {"PAUSE",                    no_write_effects},
+    {"PAUSE",                    some_io_effects},
     {"RETURN",                   no_write_effects},
-    {"STOP",                     no_write_effects},
+    {"STOP",                     some_io_effects},
     {"END",                      no_write_effects},
     {"FORMAT",                   no_write_effects},
 
@@ -430,6 +431,35 @@ SearchIoElement(char *s, char *i)
 }
 
 static list
+some_io_effects(entity e, list args)
+{
+    /* Fortran standard deliberately does not define the exact output
+       device of a PAUSE or STOP statement. See Page B-6 in ANSI X3.9-1978
+       FORTRAN 77. We assume a WRITE on stderr, i.e. unit 0 on UNIX, if
+       one argument is available or not. */
+    list le = NIL;
+    entity private_io_entity;
+    reference ref;
+    list indices = NIL;
+
+    indices = CONS(EXPRESSION,
+		   int_to_expression(STDERR_LUN),
+		   NIL);
+
+    private_io_entity = global_name_to_entity
+      (IO_EFFECTS_PACKAGE_NAME,
+       IO_EFFECTS_ARRAY_NAME);
+
+    pips_assert("io_effects", private_io_entity != entity_undefined);
+
+    ref = make_reference(private_io_entity,indices);
+    le = gen_nconc(le, generic_proper_effects_of_reference(ref));
+    le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
+
+    return le;
+}
+
+static list
 io_effects(entity e, list args)
 {
     list le = NIL, pc, lep;
@@ -475,10 +505,19 @@ io_effects(entity e, list args)
 	    entity private_io_entity;
 	    reference ref;
 	    list indices = NIL;
+	    expression unit = EXPRESSION(CAR(pc));
+
+	    if(expression_list_directed_p(unit)) {
+		if(same_string_p(entity_local_name(e), READ_FUNCTION_NAME))
+		    unit = int_to_expression(STDIN_LUN);
+		else if(same_string_p(entity_local_name(e), WRITE_FUNCTION_NAME))
+		    unit = int_to_expression(STDOUT_LUN);
+		else
+		    pips_error("io_effects", "Which logical unit?\n");
+	    }
 
 	    indices = gen_nconc(indices,
-				CONS(EXPRESSION,
-				     EXPRESSION(CAR(pc)),NIL));
+				CONS(EXPRESSION, unit, NIL));
 
 	    private_io_entity = global_name_to_entity
 		(IO_EFFECTS_PACKAGE_NAME,
