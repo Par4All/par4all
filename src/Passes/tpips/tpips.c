@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/10 18:03:16 $, 
+ * $Date: 1997/04/11 08:49:29 $, 
  */
 
 #include <stdio.h>
@@ -114,7 +114,7 @@ static struct t_completion_scheme completion_scheme[] =
 
 static char *tp_help_topics[] = 
 {
-    "create","close","delete","echo","module","activate",
+    "readline", "create","close","delete","echo","module","activate",
     "make","apply","display",SET_ENV, SET_PROP,GET_PROP,SHELL_ESCAPE,
     CHANGE_DIR,QUIT,HELP,"rule","resource","owner",
     (char*)NULL
@@ -295,6 +295,10 @@ static void help_handler(char * line)
     line = skip_first_word(line);
 
     printf("\n");
+    TP_HELP("readline",
+	    "* readline interaction facilities\n",
+	    "\ttry <tab><tab> for automatic completion\n"
+	    "\temacs-tyle editing capabilities (see man readline)\n")
     TP_HELP("create",
 	 "create   <workspace-name> <file-name>...\n",
 	 "\tcreate a new worspace from a list of fortran files\n"
@@ -365,7 +369,7 @@ static void help_handler(char * line)
 	 "shell   [<shell-function>]\n",
 	 "\tallow shell functions call\n");
     TP_HELP("owner",
-	"* owner : variable *\n",
+	"* owner : variable*\n",
 	 "\tList of available owners:\n"
 	 "\t\t$MODULE\n"
 	 "\t\t$ALL\n"
