@@ -705,3 +705,10 @@ return(b1);
 /*
  *  that is all
  */
+
+bool overloaded_type_p(type t)
+{
+  pips_assert("overloaded_type_p", type_variable_p(t));
+
+  return basic_overloaded_p(variable_basic(type_variable(t)));
+}
