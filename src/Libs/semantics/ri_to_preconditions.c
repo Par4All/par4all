@@ -852,6 +852,11 @@ bool upwards;
 		    newpre = transformer_add_condition_information_updown
 			(pre, c1, !veracity, upwards);
 	    }
+	    else if((ENTITY_TRUE_P(e) && !veracity) ||
+		    (ENTITY_FALSE_P(e) && veracity)) {
+		free_transformer(pre);
+		newpre = transformer_empty();
+	    }
 	    else
 		/* do not know what to do with other logical operators, for the time being! 
 		 * keep pre unmodified
