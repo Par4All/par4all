@@ -1,33 +1,17 @@
+#include <stdlib.h>
 #include <stdio.h>
-extern int fclose();
-extern int fprintf();
-extern int fflush();
-extern int fseek();
-extern int rewind();
-extern int fgetc();
-extern int fputc();
-extern int fputs();
-extern int fread();
-extern int fscanf();
-extern int fwrite();
-extern int system();
-extern int unlink();
-extern int _filbuf();
-extern int _flsbuf();
 #include <string.h>
-extern char toupper(char c);
 #include <errno.h>
 #include <sys/types.h>
-#include <dirent.h>
+#include <sys/dirent.h>
 #include <sys/stat.h>
 #include <sys/param.h>
 
 #include "genC.h"
 #include "misc.h"
 
-extern void exit();
+/* Should be in stdlib.h or errno.h: */
 extern char * sys_errlist[];
-extern char *getwd();
 
 FILE * safe_fopen( filename, what)
 char * filename, * what;
@@ -226,91 +210,57 @@ FILE * stream;
 	return(count);
 }
 
-/*
-  returns a newgen list of files matching regular expression re
-  in directory 'dir'. re has the ls syntax.
-*/
-list list_files_in_directory(dir, re)
-char *dir;
-char *re;
+/* returns a sorted arg list of files matching regular expression re
+  in directory 'dir' and with file_name_predicate() returning TRUE on
+  the file name (for example use directory_exists_p to select
+  directories, of file_exists_p to select regular files).  re has the
+  ed syntax.  */
+void
+list_files_in_directory(int * pargc,
+                        char * argv[],
+                        char * dir,
+                        char * re,
+                        bool (* file_name_predicate)(char *))
 {
-    FILE *fd;
-    static char buffer[MAXNAMLEN];
-    list *tl, hl;
-    static char *tempfile = NULL;
+   char complete_file_name[MAXNAMLEN + 1];
+   list dir_list = NIL;
+   struct dirent * dirp;
+   struct dirent * dp;
+   char * re_comp_message;
+   
 
-    hl = NIL;
-    tl=&hl;
+   pips_assert("list_files_in_directory", 
+               strcmp(dir, "") != 0);
 
-    pips_assert("list_files_in_directory", 
-		strcmp(dir, "") != 0);
+   re_comp_message = re_comp(re);
+   if (re_comp_message != NULL)
+      user_error("list_files_in_directory",
+                 "re_comp() failed to compile \"%s\", %s.\n",
+                 re, re_comp_message);
+   else {
+      dirp = opendir(dir);
 
-    if (tempfile == NULL) {
-	tempfile = tmpnam(NULL);
-    }
+      if (dirp != NULL) {
+         while((dp = readdir(dirp)) != NULL) {
+            if (re_exec(dp->d_name) == 1) {
+               (void) sprintf(complete_file_name, "%s/%s", dir, dp->d_name);
+               if (file_name_predicate(dp->d_name))
+                  dir_list = CONS(STRING, strdup(dp->d_name), dir_list);
+            }
+         }
+         closedir(dirp);
+      }
+      else
+         user_error("list_files_in_directory",
+                    "opendir() failed on directory \"%s\", %s.\n",
+                    dir,  sys_errlist[errno]);
+   }
 
-    system(concatenate("cd ", dir, "; ls ", re, " >", tempfile, NULL));
-
-    /* build a list from files listed in tempfile */
-    fd = safe_fopen(tempfile, "r");
-    while (fscanf(fd, "%s", buffer) != EOF) {
-	*tl = CONS(STRING, strdup(buffer), NIL);
-	tl = &CDR(*tl);
-    }
-    safe_fclose(fd, tempfile);
-
-    /* Next two lines will remove tempfile.
-     * Could be done later, as exiting the program.
-     */
-    unlink(tempfile);
-    tempfile = NULL;
-
-    return(hl);
+   /* Now sort the file list: */
+   list_to_arg(dir_list, pargc, argv);
+   args_sort(*pargc, argv);
 }
 
-/* 
-  returns the list of files from directory 'dir' whose name matches the
-  regular expression 'pattern' 
-*/
-void directory_list(dir, pargc, argv, pattern)
-char *dir;
-int *pargc;
-char *argv[];
-char *pattern;
-{
-    char *regex_error;
-
-    struct dirent *wde;
-    DIR *wds = opendir(dir);
-    
-    *pargc = 0;
-
-    if (wds == NULL)
-	return;
-
-    if (pattern != NULL) {
-	if ((regex_error = re_comp(pattern)) != NULL) {
-	    pips_error("directory_list", "bad pattern: %s\n", 
-		    regex_error);
-	}
-    }
-
-    while ((wde = readdir(wds)) != NULL) {
-	char *s = wde->d_name;
-
-	if (*s != '.') {
-	    if (pattern != NULL) {
-		if (re_exec(s) == 1)
-		    args_add(pargc, argv, strdup(s));
-	    }
-	    else {
-		args_add(pargc, argv, strdup(s));
-	    }
-	}
-    }
-
-    closedir(wds);
-}
 
 bool directory_exists_p(name)
 char *name;
