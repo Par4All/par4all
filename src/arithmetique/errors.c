@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.8  1998/10/24 15:19:17  coelho
+  more verbose throw...
+
   Revision 1.7  1998/10/24 14:31:13  coelho
   new stack implementation.
   checks for matching catch/uncatch.
@@ -167,9 +170,18 @@ pop_exception_from_stack(
 /* throws an exception of a given type by searching for 
    the specified 'what' in the current exception stack.
 */
-void throw_exception(int what)
+void throw_exception(
+    int what,
+    char * function,
+    char * file,
+    int line)
 {
   int i=exception_index-1;
+  
+  if (linear_exception_debug_mode)
+    fprintf(stderr, "THROW[%s:%d %s (%d)/%d]\n",
+	    file, line, function, what, exception_index);
+
   for (; i>=0 ;i--)
   {
     if (exception_stack[i].what & what) 
@@ -178,12 +190,12 @@ void throw_exception(int what)
       exception_thrown++;
 
       if (linear_exception_debug_mode)
-	fprintf(stderr, "THROW[%s:%d %s (%d&%d)]\n", 
+	fprintf(stderr, "---->[%s:%d %s (%d)/%d]\n", 
 		exception_stack[i].file,
 		exception_stack[i].line,
 		exception_stack[i].function,
 		exception_stack[i].what,
-		what);
+		i);
   
       longjmp(exception_stack[i].where,0);
     }
