@@ -1,5 +1,9 @@
 /* $Id$ 
    $Log: util.c,v $
+   Revision 1.6  2003/12/05 17:19:04  nguyen
+   Add more syntax types : subscript and application.
+   Handle entity creation : array, function, ..
+
    Revision 1.5  2003/09/05 14:18:58  nguyen
    Improved version of CreateCurrentEntity
 
@@ -39,14 +43,15 @@
 
 #include "misc.h"
 #include "pipsdbm.h"
+#include "transformations.h"
 
 /* To avoid warnings */
 extern char *strdup(const char *s1);
 
 extern string compilation_unit_name;
-
 extern hash_table keyword_typedef_table;
 
+extern list CalledModules;
 extern entity StaticArea;
 extern entity DynamicArea;
 
@@ -66,6 +71,23 @@ void MakeTopLevelEntity()
   entity_initial(e) = make_value_unknown();
 }
 
+
+/******************* CURRENT MODULE AREAS **********************/
+
+void init_c_areas()
+{
+  DynamicArea = FindOrCreateEntity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME);
+  entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
+  entity_storage(DynamicArea) = make_storage_rom();
+  entity_initial(DynamicArea) = make_value_unknown();
+  
+  StaticArea = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
+  entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
+  entity_storage(StaticArea) = make_storage_rom();
+  entity_initial(StaticArea) = make_value_unknown();
+}
+
+
 /******************* COMPILATION UNIT **********************/
 
 entity get_current_compilation_unit_entity()
@@ -82,28 +104,15 @@ void MakeCurrentCompilationUnitEntity(string name)
   entity_storage(e) = make_storage_rom();
   entity_type(e) = make_type_functional(make_functional(NIL,make_type_unknown()));
   entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL)));
+  pips_debug(4,"Set current module entity for compilation unit %s\n",name);
   set_current_module_entity(e);
   init_c_areas(); 
 }
 
 void ResetCurrentCompilationUnitEntity()
 {
+  pips_debug(4,"Reset current module entity for compilation unit %s\n",get_current_module_name());
   reset_current_module_entity();
-}
-
-/******************* CURRENT MODULE AREAS **********************/
-
-void init_c_areas()
-{
-  DynamicArea = FindOrCreateEntity(get_current_module_name(), DYNAMIC_AREA_LOCAL_NAME);
-  entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
-  entity_storage(DynamicArea) = make_storage_rom();
-  entity_initial(DynamicArea) = make_value_unknown();
-  
-  StaticArea = FindOrCreateEntity(get_current_module_name(), STATIC_AREA_LOCAL_NAME);
-  entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
-  entity_storage(StaticArea) = make_storage_rom();
-  entity_initial(StaticArea) = make_value_unknown();
 }
 
 
@@ -145,26 +154,47 @@ expression MakeBraceExpression(list l)
   return make_call_expression(CreateIntrinsic(BRACE_INTRINSIC),l);
 }
 
-
-entity ExpressionToEntity(expression e)
+expression MakeFunctionExpression(expression e, list le)
 {
+  /* There are 2 cases :
+     1. The first argument corresponds to a function name (an entity). 
+        In this case, we create a normal call expression and the corresponding
+	entity is added to the list of callees.
+     2. The first argument can be any expression denoting a called function (a pointer 
+        to a function,... such as (*ctx->Driver.RenderString)() in the benchmark mesa in SPEC2000). 
+	In this case, we create a function application expression.  */
+  expression exp = expression_undefined;
   syntax s = expression_syntax(e);
   switch (syntax_tag(s))
     {
-    case is_syntax_call:
-      return call_function(syntax_call(s));
     case is_syntax_reference:
-      return reference_variable(syntax_reference(s));
+      {
+	entity ent = reference_variable(syntax_reference(s));
+	AddToCalledModules(ent);
+	pips_debug(6,"Normal function call\n");
+	exp = make_call_expression(ent,le);
+	break;
+      }
+    case is_syntax_call:
+      {
+	application a = make_application(e,le);
+	pips_debug(6,"Application function call\n");
+	exp = make_expression(make_syntax_application(a),normalized_undefined);
+	break;
+      }
     case is_syntax_range:
     case is_syntax_cast: 
     case is_syntax_sizeofexpression:
+    case is_syntax_subscript:
+    case is_syntax_application:
+      CParserError("This is not a functional expression\n");
       break;
     default: 
       {
 	pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
       }
     }
-  return entity_undefined; 
+  return exp;
 }
 
 expression MemberDerivedIdentifierToExpression(type t,string m)
@@ -172,75 +202,142 @@ expression MemberDerivedIdentifierToExpression(type t,string m)
   if (type_variable_p(t))
     {
       basic b = variable_basic(type_variable(t));
-      if (basic_pointer_p(b))
+      pips_debug(6,"Basic tag is %d",basic_tag(b));
+      switch (basic_tag(b)) {
+      case is_basic_pointer:
 	{
 	  type tp = basic_pointer(b);
 	  return MemberDerivedIdentifierToExpression(tp,m);
 	}
-      if (basic_typedef_p(b))
+      case is_basic_typedef:
 	{
 	  entity te = basic_typedef(b);
 	  type tp = entity_type(te);
 	  return MemberDerivedIdentifierToExpression(tp,m);
 	}
-      if (basic_derived_p(b))
+      case is_basic_derived:
 	{
 	  entity de = basic_derived(b);
 	  string name = entity_user_name(de);
 	  return IdentifierToExpression(strdup(concatenate(name,MEMBER_SEP_STRING,m,NULL))); 
 	}
+      default:
+	break;
+      }
     }
+  CParserError("Cannot find the field identifier from current type\n");
   return expression_undefined;
 }
 
 expression MemberIdentifierToExpression(expression e, string m)
 {
   /* Find the name of struct/union of m from the type of expression e*/
+  
   syntax s = expression_syntax(e);
+  ifdebug(6)
+    {
+      pips_debug(6,"Find the struct/union of %s from expression:\n",m);
+      print_expression(e);
+    }
   switch (syntax_tag(s))
     {
     case is_syntax_call:
       {
+	call c = syntax_call(s);
+	entity f = call_function(c);
+	pips_debug(6,"Call expression %s\n",entity_name(f));
+	if ((strcmp(entity_name(f),"TOP-LEVEL:->")==0) ||
+	    (strcmp(entity_name(f),"TOP-LEVEL:.")==0))
+	  {
+	    expression exp = EXPRESSION(CAR(CDR(call_arguments(c))));
+	    return MemberIdentifierToExpression(exp,m);
+	  }
+	if (strcmp(entity_name(f),"TOP-LEVEL:*indirection")==0)
+	  {
+	    expression exp = EXPRESSION(CAR(call_arguments(c)));
+	    return MemberIdentifierToExpression(exp,m);
+	  }
+	/* More types of call must be added */
+	if (type_functional_p(entity_type(f)))
+	  {
+	    /* User defined call */
+	    type t = functional_result(type_functional(entity_type(f)));
+	    return MemberDerivedIdentifierToExpression(t,m);
+	  }
 	break;
       }
     case is_syntax_reference:
       {
 	entity ent = reference_variable(syntax_reference(s));
 	type t = entity_type(ent);
+	pips_debug(6,"Reference expression\n");
+	return MemberDerivedIdentifierToExpression(t,m);
+      }
+    case is_syntax_cast: 
+      {
+	type t = cast_type(syntax_cast(s));
+	pips_debug(6,"Cast expression\n");
 	return MemberDerivedIdentifierToExpression(t,m);
       }
     case is_syntax_range:
-    case is_syntax_cast: 
+      break;
     case is_syntax_sizeofexpression:
       break;
+    case is_syntax_subscript:
+      {
+	expression exp = subscript_array(syntax_subscript(s));
+	pips_debug(6,"Subscripting array expression\n");
+	return MemberIdentifierToExpression(exp,m);
+      }
+      
     default: 
       {
 	pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
       }
     } 
+  CParserError("Cannot find the field identifier from current expression\n");
   return expression_undefined;
 }
 
 expression IdentifierToExpression(string s)
 {
   entity ent = FindEntityFromLocalName(s);
-  type t = entity_type(ent);
-  pips_debug(5,"Identifier is :%s\n",s);
-  switch (type_tag(t)) {
+  pips_debug(5,"Identifier is: %s\n",s);
+  if (entity_undefined_p(ent))
+    {
+      /* This identifier has not been passed by the parser. 
+         It is probably a function call => try this case now and complete others later.
+         The scope of this function is global */
+      pips_debug(5,"Create unparsed global function: %s\n",s);
+      ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,s);
+      entity_storage(ent) = make_storage_return(ent);
+      entity_type(ent) = make_type_functional(make_functional(NIL,make_type_unknown()));
+      entity_initial(ent) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL)));
+      return make_expression(make_syntax_reference(make_reference(ent,NIL)),normalized_undefined);
+      /*return MakeNullaryCall(ent);*/
+    }
+  switch (type_tag(entity_type(ent))) {
   case is_type_variable: 
-    return reference_to_expression(make_reference(ent,NIL));
   case is_type_functional:
-    return MakeNullaryCall(ent);
+    return make_expression(make_syntax_reference(make_reference(ent,NIL)),normalized_undefined);
   default:
     {
-      pips_user_error("Which kind of expression?\n");
+      CParserError("Which kind of expression?\n");
       return expression_undefined;
     }
   }
 }
 
-expression MakeReferenceExpression(expression exp, list lexp)
+expression MakeArrayExpression(expression exp, list lexp)
 {
+  /* There are two cases: 
+   1. Simple array reference, where the first argument is a simple array or 
+   pointer name. We create a reference expression (syntax = reference). 
+   2. Complicated subscripting array, where the first argument can be a function 
+   call (foo()[]), a structure or union member (str[5].field[7], ... We create a 
+   subscripting expression (syntax = subscript). */
+
+  expression e = expression_undefined;
   syntax s = expression_syntax(exp);
   switch(syntax_tag(s)) {
   case is_syntax_reference:
@@ -248,25 +345,31 @@ expression MakeReferenceExpression(expression exp, list lexp)
       reference r = syntax_reference(s);
       entity ent = reference_variable(r);
       list l = reference_indices(r);
-      return reference_to_expression(make_reference(ent,gen_nconc(l,lexp)));
+      pips_debug(6,"Normal reference expression\n");
+      e = reference_to_expression(make_reference(ent,gen_nconc(l,lexp)));
+      break;
     }
   case is_syntax_call:
+  case is_syntax_range:
+  case is_syntax_cast: 
+  case is_syntax_sizeofexpression:
+  case is_syntax_subscript:
+  case is_syntax_application:
     {
-      call c = syntax_call(s);
-      list args = call_arguments(c);
-      expression e = EXPRESSION(CAR(CDR(args)));
-      reference r = expression_reference(e);
-      entity ent = reference_variable(r);
-      list l = reference_indices(r);
-      return reference_to_expression(make_reference(ent,gen_nconc(l,lexp)));
+      subscript a = make_subscript(exp,lexp);
+      syntax s = make_syntax_subscript(a);
+      pips_debug(6,"Subscripting array expression\n");
+      e = make_expression(s,normalized_undefined);
+      break;
     }
   default: 
     {
-      pips_internal_error("expression bracket_comma_expression default: not treated yet\n");
-      return expression_undefined;
+      pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
     }
-  }
+  } 
+  return e;
 }
+
 /*******************  TYPES *******************/
 
 bool signed_type_p(type t)
@@ -391,13 +494,13 @@ type make_standard_long_integer_type(type t)
 
 bool static_module_p(entity e)
 {
-  return (strstr(entity_name(e), FILE_SEP_STRING) != NULL);
+  return static_module_name_p(entity_name(e));
 }
 
 bool compilation_unit_p(string module_name)
 {
-  /* To be modified, the static function also has FILE_SEP_STRING */
-  if (strstr(module_name,FILE_SEP_STRING) != NULL)
+  /* A module name is a compilation unit if and only if its last character is % */
+  if (module_name[strlen(module_name)-1]=='%')
     return TRUE;
   return FALSE;
 }
@@ -514,36 +617,41 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
   return ent;
 }
 
-entity FindOrCreateCurrentEntity(string name, 
-				 c_parser_context context,
-				 bool is_external,
-				 bool is_formal, 
-				 int offset, 
-				 entity CurrentFunction)
+/* This function finds or creates the current entity. Only entity full name is created, 
+   other fields such as type, storage and initial value are undefined.  */
+
+entity FindOrCreateCurrentEntity(string name,stack ContextStack,stack FormalStack,
+				 stack FunctionStack, bool is_external)
 {
   entity ent; 
-
-  /*************************** Scope part ***************************************/
-
+  c_parser_context context = stack_head(ContextStack);
+  string scope = c_parser_context_scope(context);
+  bool is_typedef = c_parser_context_typedef(context);
+  bool is_static = c_parser_context_static(context);
+  entity function = entity_undefined;
+  bool is_formal;
+  if (stack_undefined_p(FormalStack) || stack_empty_p(FormalStack))
+    is_formal = FALSE;
+  else
+    {
+      is_formal= TRUE; 
+      function = stack_head(FunctionStack);
+    }
   ifdebug(5)
     {
       pips_debug(5,"Entity local name %s\n",name);
-      if (c_parser_context_scope(context) != NULL)
-	pips_debug(5,"Current scope: %s\n",c_parser_context_scope(context));
-      if (c_parser_context_type(context) != type_undefined)
-	pips_debug(5,"Current type tag: %d\n",type_tag(c_parser_context_type(context)));
-      if (c_parser_context_storage(context) != storage_undefined)
-	pips_debug(5,"Current storage tag: %d\n",storage_tag(c_parser_context_storage(context)));
-      pips_debug(5,"is_typedef: %d\n",c_parser_context_typedef(context));
-      pips_debug(5,"is_static: %d\n",c_parser_context_static(context));
+      if (scope != NULL)
+	pips_debug(5,"Current scope: %s\n",scope);
+      pips_debug(5,"is_typedef: %d\n",is_typedef);
+      pips_debug(5,"is_static: %d\n",is_static);
       pips_debug(5,"is_external: %d\n",is_external);
       pips_debug(5,"is_formal: %d\n",is_formal);
       if (is_formal)
-	pips_debug(5,"Current function %s\n",entity_local_name(CurrentFunction));
-      /* CurrentFunction is only used for formal variable cases */
+	pips_debug(5,"of current function %s\n",entity_user_name(function));
+      /* function is only used for formal variables*/
     }
-
-  if (c_parser_context_typedef(context))
+  
+  if (is_typedef)
     {
       /* Tell the lexer about the new type names : add to keyword_typedef_table */
       hash_put(keyword_typedef_table,strdup(name),(void *) TK_NAMED_TYPE);
@@ -552,151 +660,417 @@ entity FindOrCreateCurrentEntity(string name,
     }
   else
     {
-      if (c_parser_context_scope(context)!=NULL)
-	ent = find_or_create_entity(strdup(concatenate(c_parser_context_scope(context),name,NULL)));
+      if (scope != NULL)
+	ent = find_or_create_entity(strdup(concatenate(scope,name,NULL)));
       else 
 	{
-	  /* CurrentScope = NULL, not extern/typedef/struct/union/enum  */
-	  if (is_external)
-	    {
-	      if (c_parser_context_static(context)) 
-		ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-							       name,NULL)));
-	      else 
-		ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
-	    }
+	  if (is_formal)
+	    /* Formal parameter */
+	    ent = find_or_create_entity(strdup(concatenate(top_level_entity_p(function)?
+							   entity_user_name(function):entity_name(function),
+							   MODULE_SEP_STRING,name,NULL)));
 	  else 
 	    {
-	      /* This can be a function entity declaration 
-		 or the module's variable : add block scope here */
-	      if (!type_undefined_p(c_parser_context_type(context)) && type_functional_p(c_parser_context_type(context)))
+	      /* scope = NULL, not extern/typedef/struct/union/enum  */
+	      if (is_external)
 		{
-		  if (c_parser_context_static(context))
+		  /* This is a variable/function declared outside any module's body*/
+		  if (is_static) 
 		    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-								   FILE_SEP_STRING,name,NULL)));
+								   name,NULL)));
 		  else 
 		    ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
 		}
-	      else
+	      else 
 		{
-		  /* There are 2 cases :
-		     1. We are in the compilation unit, this must be a formal variable
-		     2. We are in a normal module, and we have to see if the module is static or not */
-		
-		  /* Attention: the compilation unit satisfies the static_module_p test :-)*/
-
-		  if (is_formal)
-		    {
-		      if (top_level_entity_p(CurrentFunction))
-			ent = find_or_create_entity(strdup(concatenate(entity_local_name(CurrentFunction),
-								       MODULE_SEP_STRING,name,NULL)));
-		      else
-			ent = find_or_create_entity(strdup(concatenate(entity_name(CurrentFunction),
-								       MODULE_SEP_STRING,name,NULL)));
-		    }
+		  /* This is a variable/function declared inside a module's body: add block scope here 
+		     Attention, the scope of a function declared in module is the module, not global.*/
+		  if (static_module_p(get_current_module_entity()))
+		    ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+								   get_current_module_name(),MODULE_SEP_STRING,
+								   name,NULL)));      
 		  else
-		    {
-		      if (static_module_p(get_current_module_entity()))
-			ent = find_or_create_entity(strdup(concatenate(compilation_unit_name,
-								       get_current_module_name(),MODULE_SEP_STRING,
-								       name,NULL)));
-		      
-		      else
-			ent = find_or_create_entity(strdup(concatenate(get_current_module_name(),MODULE_SEP_STRING,
-								       name,NULL)));
-		    }
+		    ent = find_or_create_entity(strdup(concatenate(get_current_module_name(),MODULE_SEP_STRING,
+								   name,NULL)));
 		}
 	    }
 	}
     }
-  pips_debug(5,"Entity global name: %s\n",entity_name(ent));
-  
+  pips_debug(5,"Entity global name %s\n",entity_name(ent));
+  return ent;
+}
 
-  if (!entity_intrinsic_p(ent))
+
+void UpdateParenEntity(entity e, list lq)
+{
+  type t = entity_type(e);
+  if (type_undefined_p(t))
+    t = make_type_variable(make_variable(basic_undefined,list_undefined,lq));
+  else 
     {
+      if (type_variable_p(t))
+	{
+	  variable v = type_variable(t);
+	  variable_qualifiers(v) = gen_nconc(variable_qualifiers(v),lq);
+	}
+      else 
+	{
+	  CParserError("Attributes for not variable type\n");
+	}
+    }
+}
 
-      /*************************** Type part ***************************************/
-      
+
+dimension MakeDimension(list le)
+{
+  dimension d;
+  if (le == NIL)
+    {
+      d = make_dimension(int_to_expression(0),make_unbounded_expression());
+      pips_debug(5,"Unbounded dimension\n");
+    }
+  else 
+    {
+      /* Take only the first expression of le, do not know why it can be a list ?*/
+      expression e = EXPRESSION(CAR(le));
+      int up;
+      if (expression_integer_value(e,&up))
+	d = make_dimension(int_to_expression(0),int_to_expression(up-1));
+      else 
+	d = make_dimension(int_to_expression(0),MakeBinaryCall(CreateIntrinsic("-C"),e,
+							       int_to_expression(1)));
+      ifdebug(5) 
+	{
+	  pips_debug(5,"Array dimension:\n");
+	  print_expression(e);
+	}
+    }
+  return d;
+}
+
+
+void UpdateArrayEntity(entity e, list lq, list le, stack ContextStack, int number_dimensions)
+{
+  type t = entity_type(e);
+  
+  if (!type_undefined_p(t))
+    {
+      /* The variable is partially or totally defined */
+      if (type_variable_p(t))
+	{
+	  variable v = type_variable(t);
+	  int ndims = gen_length(variable_dimensions(v));
+	  if (number_dimensions > ndims)
+	    {
+	      /* The array is not already defined earlier*/
+	      variable_qualifiers(v) = gen_nconc(variable_qualifiers(v),lq);
+	      variable_dimensions(v) = gen_nconc(variable_dimensions(v),CONS(DIMENSION,MakeDimension(le),NIL));
+	    }
+	}
+      else 
+	{
+	  CParserError("Dimension for not variable type\n");
+	}
+    }
+  else 
+    {
+      c_parser_context context = stack_head(ContextStack);
+      type t1 = c_parser_context_type(context);
+      if (type_variable_p(t1))
+	{
+	  basic b = variable_basic(type_variable(t1)); 
+	  entity_type(e) = make_type_variable(make_variable(b,CONS(DIMENSION,MakeDimension(le),NIL),lq));
+	}
+      else
+	{
+	  CParserError("Dimension for not variable type with context\n");
+	}
+    }
+}
+
+void UpdateFinalType(type p, list la)
+{
+  /* This function replaces the type pointed by the current pointer
+     (this can be a pointer of pointer,... so we have to go until the last one)
+     by a functional type (with the list of arguments and the result 
+     type is the pointed type)*/
+  if (type_variable_p(p) && basic_pointer_p(variable_basic(type_variable(p))))
+    {
+      type pp = basic_pointer(variable_basic(type_variable(p)));
+      UpdateFinalType(pp,la);
+    }
+  else
+    p = make_type_functional(make_functional(la,copy_type(p)));
+}
+
+void UpdateFunctionEntity(entity e, list la, stack ContextStack,
+			  stack FormalStack, stack FunctionStack,
+			  stack OffsetStack, bool is_external)
+{
+  c_parser_context context = stack_head(ContextStack);
+  type t = entity_type(e);
+
+  /****************INITIAL VALUE ***************************
+
+   Initial value of this entity (a function, a formal function, 
+   a pointer to a function, ...) is always code */
+  if (value_undefined_p(entity_initial(e)))
+    entity_initial(e) = make_value(is_value_code,
+				   make_code(NIL,strdup(""),make_sequence(NIL)));
+  
+  /**************** STORAGE PART ***************************/
+  
+  if (storage_undefined_p(entity_storage(e)))
+    {
+      if (!stack_undefined_p(FormalStack) && !stack_empty_p(FormalStack))
+	{
+	  entity function = stack_head(FunctionStack);
+	  int offset = basic_int((basic) stack_head(OffsetStack));
+	  pips_debug(3,"Create formal storage for function %s\n",entity_name(e));
+	  entity_storage(e) = make_storage_formal(make_formal(function,offset));
+	}
+      else
+	{
+	  if (type_undefined_p(t))
+	    {
+	      pips_debug(3,"Create normal function with storage rom %s\n",entity_name(e));
+	      entity_storage(e) = make_storage_rom();
+	    }
+	  else
+	    {
+	      pips_debug(3,"Create pointer to function with storage ram %s\n",entity_name(e));
+	      entity_storage(e) = MakeStorageRam(e,is_external,c_parser_context_static(context));
+	    }
+	}
+    }
+
+  /**************** TYPE PART ***************************/
+
+  if (type_undefined_p(t))
+    {
+      /* Make functional type for the entity */
+      type t1 = c_parser_context_type(context);
+      if (type_undefined_p(t1))
+	entity_type(e) = make_type_functional(make_functional(la,make_type_unknown()));
+      else 
+	entity_type(e) = make_type_functional(make_functional(la,t1)); 
+    }
+  else
+    {
+      if (type_variable_p(t))
+	{
+	  /* Only pointer to function is permitted */
+	  variable v = type_variable(t);
+	  basic b = variable_basic(v);
+	  if (basic_pointer_p(b))
+	    UpdateFinalType(basic_pointer(b),la);
+	  else 
+	    CParserError("Function for not basic pointer\n");
+	}
+    }
+}
+
+/* This function fills out the undefined fields of an entity*/
+void UpdateEntity(entity e, stack ContextStack, 
+		  stack FormalStack, stack FunctionStack,
+		  stack OffsetStack, bool is_external)
+{
+  c_parser_context context = stack_head(ContextStack);
+
+  pips_debug(3,"Update entity %s\n",entity_name(e));
+
+  if (type_undefined_p(entity_type(e)))
+    {
+      pips_debug(3,"Type undefined \n");
       if (!type_undefined_p(c_parser_context_type(context)))
 	{
 	  if (type_variable_p(c_parser_context_type(context)))
 	    {
 	      variable v = type_variable(c_parser_context_type(context)); 
+	      pips_debug(3,"context with basic tag %d\n",basic_tag(variable_basic(v)));
 	      variable_qualifiers(v) = c_parser_context_qualifiers(context);
 	    }
-	  entity_type(ent) = c_parser_context_type(context);
+	  entity_type(e) = c_parser_context_type(context);
 	}
-      
-      /*************************** Storage part ***************************************/
-      
+      else 
+	CParserError("This entity has which type ?\n");
+    }
+
+  if (storage_undefined_p(entity_storage(e)))
+    {
       if (!storage_undefined_p(c_parser_context_storage(context)))
-	entity_storage(ent) = c_parser_context_storage(context);
+	{
+	  pips_debug(3,"Current storage context is %d\n",
+		     storage_tag(c_parser_context_storage(context)));
+	  entity_storage(e) = c_parser_context_storage(context);
+	}
       else
 	{
-	  if (is_external)
+	  if (!stack_undefined_p(FormalStack) && (FormalStack != NULL) && !stack_empty_p(FormalStack))
 	    {
-	      ram r; 
-	      if (c_parser_context_static(context))
-		{
-		  r = make_ram(get_current_compilation_unit_entity(),
-			       StaticArea,
-			       ComputeAreaOffset(StaticArea,ent),
-			       NIL);
-		  /*the offset must be recomputed lately, when we know the size of the variable */
-		}
-	      else 
-		{
-		  /* This must be a variable, not a function/typedef/struct/union/enum. 
-		     The variable is declared outside any function, and hence is global
-		     
-		     THIS CAN BE FUNTION ? */
-		  r = make_ram(get_top_level_entity(),
-			       get_top_level_entity(), 
-			       ComputeAreaOffset(get_top_level_entity(),ent),
-			       NIL);
-		  /* the offset must be recomputed lately, when we know the size of the variable */
-		}
-	      entity_storage(ent) = make_storage_ram(r);
+	      entity function = stack_head(FunctionStack);
+	      int offset = basic_int((basic) stack_head(OffsetStack));
+	      pips_debug(3,"Create formal variable %s for function %s with offset %d\n",
+			 entity_name(e),entity_name(function),offset);
+	      entity_storage(e) = make_storage_formal(make_formal(function,offset));
+	      AddToDeclarations(e,function);
 	    }
-	  else 
+	  else
 	    {
-	      /* This can be a function whose storage will be updated lately ? No, because CurrentStorage != undefined
-		 or a static / dynamic / formal variable 
-		 not a typedef/struct/union/enum */
-	      if (is_formal)
-		{
-		  formal f = make_formal(CurrentFunction,offset);
-		  entity_storage(ent) = make_storage_formal(f);
-		  AddToDeclarations(ent,CurrentFunction);
-		}
-	      else
-		{ 
-		  /* ADD BLOCK SCOPE */
-		  if (c_parser_context_static(context))
-		    {
-		      ram r = make_ram(get_current_module_entity(),
-				       StaticArea,
-				       ComputeAreaOffset(StaticArea,ent),
-				       NIL);
-		      /*the offset must be recomputed lately, when we know the size of the variable */
-		      entity_storage(ent) = make_storage_ram(r);
-		    }
-		  else
-		    {
-		      ram r = make_ram(get_current_module_entity(),
-				       DynamicArea,
-				       ComputeAreaOffset(DynamicArea,ent),
-				       NIL);
-		      /* the offset must be recomputed lately, when we know the size of the variable */
-		      entity_storage(ent) = make_storage_ram(r);
-		    }
-		}
+	      entity_storage(e) = MakeStorageRam(e,is_external,c_parser_context_static(context));
 	    }
 	}
     }
-  return ent;
+  pips_debug(3,"with type tag %d\n",type_tag(entity_type(e)));
+  if (type_variable_p(entity_type(e))) 
+    pips_debug(3,"with basic tag %d\n",basic_tag(variable_basic(type_variable(entity_type(e)))));
+}     
+
+void UpdateParenAbstractType(type t, list lq)
+{
+  if (type_undefined_p(t))
+    t = make_type_variable(make_variable(basic_undefined,list_undefined,lq));
+  else 
+    {
+      if (type_variable_p(t))
+	{
+	  variable v = type_variable(t);
+	  variable_qualifiers(v) = gen_nconc(variable_qualifiers(v),lq);
+	}
+      else 
+	{
+	  CParserError("Attributes for not variable type\n");
+	}
+    }
 }
 
+void UpdateArrayAbstractType(type t, list le, stack ContextStack)
+{
+  c_parser_context context = stack_head(ContextStack);
+  dimension d; 
+  type t1 = c_parser_context_type(context);
+
+  if (le == NIL)
+    {
+      d = make_dimension(int_to_expression(0),make_unbounded_expression());
+      pips_debug(5,"Unbounded dimension\n");
+    }
+  else 
+    {
+      /* Take only the first expression of le, do not know why it can be a list ?*/
+      expression e = EXPRESSION(CAR(le));
+      int up;
+      if (expression_integer_value(e,&up))
+	d = make_dimension(int_to_expression(0),int_to_expression(up-1));
+      else 
+	d = make_dimension(int_to_expression(0),MakeBinaryCall(CreateIntrinsic("-C"),e,
+							       int_to_expression(1)));
+      ifdebug(5) 
+	{
+	  pips_debug(5,"Array dimension:\n");
+	  print_expression(e);
+	}
+    }
+
+  if (type_variable_p(t1))
+    {
+      basic b = variable_basic(type_variable(t1)); 
+      if (type_undefined_p(t))
+	t = make_type_variable(make_variable(b,CONS(DIMENSION,d,NIL),NIL));
+      else 
+	{
+	  if (type_variable_p(t))
+	    {
+	      variable v = type_variable(t);
+	      variable_dimensions(v) = gen_nconc(variable_dimensions(v),CONS(DIMENSION,d,NIL));
+	    }
+	  else 
+	    {
+	      CParserError("Dimension for not variable type\n");
+	    }
+	}
+    }
+  else
+    {
+      CParserError("Dimension for not variable type with context\n");
+    }
+}
+
+
+void UpdateFunctionAbstractType(type t, list la, stack ContextStack)
+{
+  c_parser_context context = stack_head(ContextStack);
+
+  /**************** TYPE PART ***************************/
+
+  if (type_undefined_p(t))
+    {
+      /* Make functional type for the entity */
+      t = make_type_functional(make_functional(la,c_parser_context_type(context))); 
+    }
+  else
+    {
+      if (type_variable_p(t))
+	{
+	  /* Only pointer to function is permitted */
+	  variable v = type_variable(t);
+	  basic b = variable_basic(v);
+	  if (basic_pointer_p(b))
+	    UpdateFinalType(basic_pointer(b),la);
+	  else 
+	    CParserError("Abstract function for not basic pointer\n");
+	}
+      else
+	CParserError("Abstract function for not variable type\n");
+    }
+}
+
+storage MakeStorageRam(entity e, bool is_external, bool is_static)
+{
+  ram r; 
+  if (is_external)
+    {
+      if (is_static)
+	{
+	  r = make_ram(get_current_compilation_unit_entity(),
+		       StaticArea,
+		       ComputeAreaOffset(StaticArea,e),
+		       NIL);
+	  /*the offset must be recomputed lately, when we know the size of the variable */
+	}
+      else 
+	{
+	  /* This must be a variable, not a function/typedef/struct/union/enum. 
+	     The variable is declared outside any function, and hence is global*/
+	  r = make_ram(get_top_level_entity(),
+		       get_top_level_entity(), 
+		       ComputeAreaOffset(get_top_level_entity(),e),
+		       NIL);
+	  /* the offset must be recomputed lately, when we know the size of the variable */
+	}
+    }
+  else
+    { 
+      /* ADD BLOCK SCOPE */
+      if (is_static)
+	{
+	  r = make_ram(get_current_module_entity(),
+		       StaticArea,
+		       ComputeAreaOffset(StaticArea,e),
+		       NIL);
+	  /*the offset must be recomputed lately, when we know the size of the variable */
+	}
+      else
+	{
+	  r = make_ram(get_current_module_entity(),
+		       DynamicArea,
+		       ComputeAreaOffset(DynamicArea,e),
+		       NIL);
+	  /* the offset must be recomputed lately, when we know the size of the variable */
+	}
+    }
+  return make_storage_ram(r);
+}
 
 bool entity_in_list_p(entity e, list le)
 {
@@ -708,7 +1082,7 @@ void AddToDeclarations(entity e, entity mod)
 {
   if (!gen_in_list_p(e,code_declarations(value_code(entity_initial(mod)))))
     {
-      pips_debug(5,"Add entity %s to module %s\n",entity_local_name(e),entity_local_name(mod));
+      pips_debug(5,"Add entity %s to module %s\n",entity_user_name(e),entity_user_name(mod));
       code_declarations(value_code(entity_initial(mod))) = gen_nconc(code_declarations(value_code(entity_initial(mod))),
 								     CONS(ENTITY,e,NIL));
     }
@@ -718,19 +1092,19 @@ entity MakeDerivedEntity(string name, list members, bool is_external, int i)
 {
   entity ent;  
   switch (i) {
-  case 1: 
+  case is_type_struct: 
     {
       ent = CreateEntityFromLocalNameAndPrefix(name,STRUCT_PREFIX,is_external);	
       entity_type(ent) = make_type_struct(members);
       break;
     }
-  case 2: 
+  case is_type_union: 
     {
       ent = CreateEntityFromLocalNameAndPrefix(name,UNION_PREFIX,is_external);	
       entity_type(ent) = make_type_union(members);
       break;
     }
-  case 3:
+  case is_type_enum:
     {
       ent = CreateEntityFromLocalNameAndPrefix(name,ENUM_PREFIX,is_external);	
       entity_type(ent) = make_type_enum(members);
@@ -749,7 +1123,7 @@ string CreateMemberScope(string derived, bool is_external)
      - if the struct/union is declared outside any function, its scope is the CurrentCompilationUnit
      - if the struct/union is declared inside a function, we have to know the CurrentBlock, 
      which is omitted for the moment 
-        - if the function is static, its scope is CurrentCompilationUnit#CurrentModule
+        - if the function is static, its scope is CurrentCompilationUnit%CurrentModule
         - if the function is global, its scope is CurrentModule
 
   The name of the struct/union is then added to the field entity name, with 
@@ -758,20 +1132,22 @@ string CreateMemberScope(string derived, bool is_external)
   string s;
   pips_debug(3,"Struc/union name is %s\n",derived);
   if (is_external)
-    s = concatenate(compilation_unit_name,derived,MEMBER_SEP_STRING,NULL);	
+    s = strdup(concatenate(compilation_unit_name,derived,MEMBER_SEP_STRING,NULL));	
   else
     {
       if (static_module_p(get_current_module_entity()))
-	s = concatenate(compilation_unit_name,
+	s = strdup(concatenate(compilation_unit_name,
 			get_current_module_name(),MODULE_SEP_STRING,
-			derived,MEMBER_SEP_STRING,NULL);	
+			derived,MEMBER_SEP_STRING,NULL));	
       else 
-	s = concatenate(get_current_module_name(),MODULE_SEP_STRING,
-			derived,MEMBER_SEP_STRING,NULL);
+	s = strdup(concatenate(get_current_module_name(),MODULE_SEP_STRING,
+			derived,MEMBER_SEP_STRING,NULL));
     } 
   pips_debug(3,"The struct/union member's scope is %s\n",s);
-  return strdup(s);
+  return s;
 }
+
+/* Move this to ri-util !!!*/
 
 string list_to_string(list l)
 {
@@ -831,9 +1207,11 @@ list MakeParameterList(list l1, list l2)
 {
   /* l1 is a list of parameter names and it represents the exact order in the parameter list
      l2 is a list of entities with their type, storage,... and the order can be different from l1
+     In addition, l2 can be incomplete wrt l1, so other entities must be created from l1, with 
+     default type : scalar integer variable. 
      
      We create the list of parameters with the order of l1, and the parameter type and mode 
-     are retrived from l2. 
+     are retrieved from l2. 
 
      Since the offset of formal argument in l2 can be false, we have to update it here by using l1 */
   list l = NIL;
@@ -841,6 +1219,15 @@ list MakeParameterList(list l1, list l2)
   MAP(STRING, s,
   {
     parameter p = FindParameterEntity(s,offset,l2);
+    if (parameter_undefined_p(p))
+      {
+	/* s is not declared in l2, create the corresponding entity/ formal variable */
+	entity ent = FindOrCreateEntity(get_current_module_name(),s);
+	variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
+	entity_type(ent) = make_type_variable(v);
+	entity_storage(ent) = make_storage_formal(make_formal(get_current_module_entity(),offset));
+	p = make_parameter(entity_type(ent),make_mode_reference());
+      }
     l = CONS(PARAMETER,p,l);
     offset++;
   },l1);
@@ -876,14 +1263,47 @@ parameter FindParameterEntity(string s, int offset, list l)
   return parameter_undefined;
 }
 
-/* To be moved to ri-util.c*/
-bool entity_intrinsic_p(entity e)
+void AddToCalledModules(entity e)
 {
-  return (!value_undefined_p(entity_initial(e)) && value_intrinsic_p(entity_initial(e)));
+  if (!intrinsic_entity_p(e))
+    {
+      bool already_here = FALSE;
+      string n = top_level_entity_p(e)?entity_local_name(e):entity_name(e);
+      MAP(STRING,s, 
+      {
+	if (strcmp(n, s) == 0)
+	  {
+	    already_here = TRUE;
+	    break;
+	  }
+      }, CalledModules);
+      
+      if (! already_here)
+	{
+	  pips_debug(2, "Adding %s to list of called modules\n", n);
+	  CalledModules = CONS(STRING, strdup(n), CalledModules);
+	}
+    }
 }
 
+/* Pop n times the stack s*/
+void NStackPop(stack s, int n)
+{
+  while (n-->0)
+    stack_pop(s);
+}
 
+/* The OffsetStack is poped n times, where n is the number of formal arguments
+   of the actual function */
+void StackPop(stack OffsetStack)
+{
+  int n = basic_int((basic) stack_head(OffsetStack));
+  NStackPop(OffsetStack,n);
+}
 
-
-
-
+/* The OffsetStack is pushed incrementally */
+void StackPush(stack OffsetStack)
+{
+  int i = basic_int((basic) stack_head(OffsetStack));
+  stack_push((char *) make_basic_int(i+1),OffsetStack); 
+}
