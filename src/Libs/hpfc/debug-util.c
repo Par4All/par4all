@@ -1,12 +1,13 @@
 /* this is a set of functions to help hpfc debugging
  *
  * $RCSfile: debug-util.c,v $ (version $Revision$)
- * $Date: 1995/12/29 15:37:49 $, 
+ * $Date: 1996/03/01 13:00:17 $, 
  *
  * Fabien Coelho, May 1993.
  */
 
 #include "defines-local.h"
+#include "pipsdbm.h"
 
 extern char *flint_print_basic(basic);
 
@@ -238,8 +239,9 @@ entity module, common;
 void hpfc_print_file(file_name)
 string file_name;
 {
-    safe_system(concatenate("echo file: ", file_name, " >&2 ; "
-			    "cat ", file_name, " >&2", NULL));
+    string dir_name = db_get_current_workspace_directory();
+
+    safe_system(concatenate("cat ", dir_name, "/", file_name, " >&2", NULL));
 }
 
 void fprint_range(file, r)
