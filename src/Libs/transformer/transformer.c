@@ -61,7 +61,7 @@ transformer_combine(
        debug level of 10. */
     ifdebug(10) pips_assert("consistent t1", transformer_consistency_p(t1));
 
-    debug(8,"transformer_combine","arg. t2=%x\n",t2);
+    pips_debug(8,"arg. t2=%x\n",t2);
     ifdebug(8) (void) dump_transformer(t2);
     ifdebug(10) pips_assert("consistent t2", transformer_consistency_p(t2));
 
@@ -132,9 +132,9 @@ transformer_combine(
 		CATCH(overflow_error) 
 		    {
 			/* CA */
-			pips_user_warning("overflow error in projection of %s, "
-					  "variable eliminated\n",
-					  entity_name(e_temp)); 
+		      pips_user_warning("overflow error in projection of %s, "
+					"variable eliminated\n",
+					entity_name(e_temp)); 
 			r1 = sc_elim_var(r1, (Variable) e_temp);
 		    }
 		TRY 
@@ -169,13 +169,13 @@ transformer_combine(
 
     /* update t1 */
     transformer_arguments(t1) = a1;
-    /* predicate_system(transformer_relation(t1)) = (Psysteme) r1; */
-    predicate_system_(transformer_relation(t1)) = r1;
+    predicate_system(transformer_relation(t1)) = r1;
 
      
-    debug(8,"transformer_combine","res. t1=%x\n",t1);
-    ifdebug(8) (void) dump_transformer(t1);
-    debug(8,"transformer_combine","end\n");
+    pips_debug(8,"res. t1=%x\n",t1);
+    ifdebug(8) dump_transformer(t1);
+    pips_debug(8,"end\n");
+
     return t1;
 }
 
