@@ -52,9 +52,9 @@ move pips_GNUSOL2LL
 make_pips_release -CB GNUSOL2LL -D Examples -pe -rz pips_GNUSOL2LL || 
 	error 6 "ret $?"
 
-echo "Solaris 2 binary version, including Public softs (big!)"
-move pips_Public_GNUSOL2LL
-make_pips_release -CB GNUSOL2LL -D Examples -peP -rz pips_Public_GNUSOL2LL ||
+echo "Solaris 2 public softs (big!)"
+move public_GNUSOL2LL
+make_pips_release -P -rz public_GNUSOL2LL ||
 	error 7 "ret $?"
 
 echo done
