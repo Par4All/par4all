@@ -1,10 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/10 18:21:09 $, 
-
-all: .runable
-recompile: .quick-install
-clean:
-	$(RM) *~
+# $Date: 1996/08/21 19:48:52 $, 
 
 SCRIPTS=\
 	make_all_specs\
@@ -13,11 +8,5 @@ SCRIPTS=\
 SOURCES= $(SCRIPTS) config.makefile
 
 INSTALL_SHR=	$(SCRIPTS)
-
-.runable: $(SCRIPTS)
-	-[ "$(SCRIPTS)" ] && chmod a+x $(SCRIPTS)
-	touch .runable
-
-.quick-install: .runable $(RFILES)
 
 #
