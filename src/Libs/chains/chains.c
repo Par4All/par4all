@@ -522,9 +522,9 @@ statement s;
 {
     genkill_one_statement( s ) ;
     genkill_instruction( statement_instruction(s), s ) ;
-    if (get_debug_level() > 0) {
-	fprintf(stderr, "Statement %x (%d):\n", 
-		(unsigned)s, statement_number( s )) ;
+    ifdebug(2) {
+	debug(2, "genkill_statement", "Result for Statement %x [%s]:\n", 
+		(unsigned int) s, statement_identification(s));;
 	local_print_statement_set( "GEN", GEN( s )) ;
 	local_print_statement_set( "REF", REF( s )) ;
 	local_print_statement_set( "KILL", KILL( s )) ;
@@ -1151,7 +1151,7 @@ static void local_print_statement_set( msg, s )
 char *msg ;
 set s ;
 {
-    fprintf( stderr, "%s ", msg ) ;
+    fprintf( stderr, "\t%s ", msg ) ;
     SET_MAP( st, {
 	fprintf(stderr, ",%x (%d) ", 
 		(unsigned)st, statement_number( (statement)st ));
