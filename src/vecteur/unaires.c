@@ -31,9 +31,9 @@
 void vect_normalize(v)
 Pvecteur v;
 {
-    int gcd = vect_pgcd_all(v);
-    if ((gcd != 0) && (gcd != 1))
-	(void) vect_div(v,gcd);
+    Value gcd = vect_pgcd_all(v);
+    if (value_notzero_p(gcd) && value_notone_p(gcd))
+	(void) vect_div(v, gcd);
 }
 
 /* void vect_add_elem(Pvecteur * pvect, Variable var, Value val): 
@@ -52,7 +52,8 @@ Value val;
     if (val!=0) {
 	for (vect=(*pvect);vect!=NULL;vect=vect->succ) {
 	    if (var_of(vect)==var) {
-		if ((val_of(vect) += val) == 0)
+		value_add(val_of(vect), val);
+		if (value_zero_p(val_of(vect)))
 		    vect_erase_var(pvect, var_of(vect));
 		return;
 	    }
@@ -205,7 +206,7 @@ Pvecteur vect;
 }
 
 /* Value vect_coeff_sum(Pvecteur vect): coefficient sum
- * de tout les val de ce vecteur
+ * de tout les val de ce vecteur (devrait etre dans reduction? FC)
  * 
  * return Value
  * Lei Zhou    Mar.25, 91
@@ -213,15 +214,15 @@ Pvecteur vect;
 Value vect_coeff_sum(vect)
 Pvecteur vect;
 {
-    Value val = 0;
+    Value val = VALUE_ZERO;
 
     if ( vect->var == TCST )
-	return (val);
+	return val;
     for (vect = vect; vect != NULL ; vect = vect->succ) {
-	val += vecteur_val(vect);
-	assert(val_of(vect)!=0);
+	value_add(val,vecteur_val(vect));
+	assert(value_notzero_p(val_of(vect)));
     }
-    return (val);
+    return val;
 }
 
 
@@ -239,7 +240,7 @@ Pvecteur v;
     Pvecteur coord;
 
     for(coord = v; coord!=NULL; coord=coord->succ)
-	val_of(coord) = SIGN(val_of(coord));
+	val_of(coord) = (Value) value_sign(val_of(coord));
 
     return v;
 }
@@ -347,8 +348,8 @@ Pvecteur v, *pvpos, *pvneg;
     {
 	var = var_of(vc), 
 	val = val_of(vc);
-	if (val<(Value) 0)
-	  vect_add_elem(pvneg, var, -val);
+	if (value_neg_p(val))
+	  vect_add_elem(pvneg, var, value_uminus(val));
 	else
 	  vect_add_elem(pvpos, var, val);
     }
@@ -424,67 +425,56 @@ vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2,
     /* it is assumed that vectors v1 and v2 are already
        lexicographically sorted, according to the same lexicographic ordre.
        The constant term should always be the last one. */
-    int cmp = 0;
-    int cmp2 = 0;
+    int cmp = 0, cmp2 = 0;
     Pvecteur pv1 = VECTEUR_UNDEFINED;
     Pvecteur pv2 = VECTEUR_UNDEFINED;
-
-    /*
-    fprintf(stderr,"vect_lexicographic_unsafe_compare: v1 = ");
-    vect_dump(v1);
-    fprintf(stderr,"vect_lexicographic_unsafe_compare: v2 = ");
-    vect_dump(v2);
-    */
 
     for(pv1 = v1, pv2 = v2; 
 	!VECTEUR_UNDEFINED_P(pv1) && !VECTEUR_UNDEFINED_P(pv2) && cmp == 0
 	&& !term_cst(pv1) && !term_cst(pv2);
 	pv1 = pv1->succ, pv2= pv2->succ) {
 
-	/*
-	if(term_cst(pv1) && !term_cst(pv2))
-	    cmp = -1;
-	else if(term_cst(pv1) && term_cst(pv2))
-	    cmp = 0;
-	else if(term_cst(pv2))
-	    cmp = 1;
-	else
-	    cmp = compare(&pv1, &pv2);
-	    */
-
 	cmp = compare(&pv1, &pv2);
 
 	if(cmp==0) {
 	    /* if same coordinate, use coefficient, but only for
 	     the last coordinate */
-	    cmp2 = ABS(vecteur_val(pv1)) - ABS(vecteur_val(pv2));
+	    Value tmp = value_minus(value_abs(vecteur_val(pv1)),
+				    value_abs(vecteur_val(pv2)));
+	    cmp2 = value_sign(tmp);
 	}
     }
 
-    if(cmp==0)
+    if (cmp==0)
 	cmp = cmp2;
 
-    if(VECTEUR_UNDEFINED_P(pv1))
-	if(VECTEUR_UNDEFINED_P(pv2)) {
+    if (VECTEUR_UNDEFINED_P(pv1))
+	if (VECTEUR_UNDEFINED_P(pv2)) {
 	    /* cmp is left unchanged */
 	    ;
 	}
-        else if(cmp == 0 && term_cst(pv2)) {
-	    cmp = - ABS(vecteur_val(pv2));
-	}
-	else if(cmp == 0) {
-	    cmp = -1;
+        else if(cmp==0) {
+	    if (term_cst(pv2)) 
+	    {
+		Value tmp = value_uminus(value_abs(val_of(pv2)));
+		cmp = value_sign(tmp);
+	    }
+	    else
+		cmp = -1;
 	}
 	else {
 	    ;
 	}
     else {
 	if(VECTEUR_UNDEFINED_P(pv2)) {
-	    if(cmp == 0 && term_cst(pv1)) {
-		cmp = ABS(vecteur_val(pv1));
-	    }
-	    else if(cmp == 0) {
-		cmp = 1;
+	    if (cmp==0) {
+		if (term_cst(pv1)) 
+		{
+		    Value tmp = value_abs(vecteur_val(pv1));
+		    cmp = value_sign(tmp);
+		}
+		else 
+		    cmp = 1;
 	    }
 	    else {
 		;
@@ -493,7 +483,9 @@ vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2,
 	else {
 	    if(cmp==0) {
 		if(term_cst(pv1) && term_cst(pv2)) {
-		    cmp = ABS(vecteur_val(pv1)) - ABS(vecteur_val(pv2));
+		    Value tmp = value_minus(value_abs(vecteur_val(pv1)),
+					    value_abs(vecteur_val(pv2)));
+		    cmp = value_sign(tmp);
 		}
 		else if(term_cst(pv1) && !term_cst(pv2)) {
 		    cmp = -1;
@@ -511,10 +503,6 @@ vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2,
 	    }
 	}
     }
-
-    /* 
-    fprintf(stderr,"vect_lexicographic_unsafe_compare: %d\n", cmp);
-    */
 
     return cmp;
 }
