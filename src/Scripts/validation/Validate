@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/03/28 23:18:28 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/04/28 20:17:41 $, ), version $Revision$,
 #
 
 #
@@ -274,7 +274,7 @@ then
     warning="$PIPS_PROPERTIESRC used! $warning"
 else
     test -f ./properties.rc && {
-	valid_option="$valid_option -p $PWD/properties.rc"
+	valid_option="$valid_option -p `absolute_name $PWD/properties.rc`"
 	warning="./properties.rc used! $warning"
     }
 fi
@@ -287,7 +287,7 @@ then
     warning="$PIPS_PIPSMAKERC used! $warning"
 else
     test -f ./pipsmake.rc && {
-	valid_option="$valid_option -m $PWD/pipsmake.rc"
+	valid_option="$valid_option -m `absolute_name $PWD/pipsmake.rc`"
 	warning="./pipsmake.rc used! $warning"
     }
 fi
