@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.GNU,v $
+# Revision 1.35  1997/11/13 12:55:55  keryell
+# Added include $(ROOT)/Include/makefile_macros.DEFAULT
+#
 # Revision 1.34  1997/09/09 13:00:47  coelho
 # hop!
 #
@@ -23,11 +26,9 @@
 #
 # this file contains macro definitions 
 
-include $(ROOT)/Include/makefile_macros.doc
-include $(ROOT)/Include/makefile_macros.misc
+include $(ROOT)/Include/makefile_macros.DEFAULT
 include $(ROOT)/Include/makefile_macros.gnu
 include $(ROOT)/Include/makefile_macros.gnutools
-include $(ROOT)/Include/makefile_macros.flags
 
 # end of it!
 #
