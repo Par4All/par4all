@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.91  1998/01/24 10:16:49  coelho
+ * pips_thanks() moved to real main.
+ *
  * Revision 1.90  1998/01/24 10:06:51  coelho
  * + tpips rc file.
  * + -r option.
@@ -1022,7 +1025,6 @@ int
 tpips_main(int argc, char * argv[])
 {
     debug_on("TPIPS_DEBUG_LEVEL");
-    pips_thanks("tpips");
     pips_log_handler = tpips_user_log;
     {
 	string pid = (char*) malloc(sizeof(char)*20);
