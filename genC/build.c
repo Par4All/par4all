@@ -148,7 +148,7 @@ int max_tabulated_elements()
 void
 init()
 {
-    struct binding *bp ;
+    struct gen_binding *bp ;
     struct inlinable *ip ;
 
     for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
@@ -174,7 +174,7 @@ init()
     bp->domain = &d ;
     d.ba.type = ARRAY ;
     d.ar.constructor = "Constructor for tabulated domain" ;
-    d.ar.element = (struct binding *)NULL ;
+    d.ar.element = (struct gen_binding *)NULL ;
     d.ar.dimensions = &il ;
     Tabulated_bp = bp ;
 }
@@ -187,15 +187,15 @@ init()
 
 /* LOOKUP checks whether a given NAME is in the Domains table. If not, the
    ACTION says whether this is an error or it should be introduced. If this
-   is for a new binding, look in the current allocation range, else from
+   is for a new gen_binding, look in the current allocation range, else from
    beginning */
 
-struct binding *
+struct gen_binding *
 lookup( name, action )
 char *name ;
 int action ;
 {
-    struct binding *bp ;
+    struct gen_binding *bp ;
 
     bp = (action == NEW_BINDING) ? Tabulated_bp+Current_start+1 : Domains ;
 
@@ -225,15 +225,15 @@ int action ;
 
 /* NEW_BINDING introduces a new pair (NAME, VAL) in the Domains table. 
    Redeclaration is allowed if this is to overwrite a previous IMPORT
-   definition. Note that we could (should ?) check that this new binding
+   definition. Note that we could (should ?) check that this new gen_binding
    isn't a new (and incompatible) IMPORT definition. */
 
-struct binding *
+struct gen_binding *
 new_binding( name, val )
 char *name ;
 union domain *val ;
 {
-    struct binding *bp ;
+    struct gen_binding *bp ;
 
     if( Read_spec_mode && val->ba.type ==  IMPORT ) {
 	bp = lookup( name, OLD_BINDING ) ;
@@ -358,7 +358,7 @@ print_domains( out )
 FILE *out ;
 {
     extern int fprintf();
-    struct binding *bp ;
+    struct gen_binding *bp ;
     union domain *dp ;
 
     for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) {
@@ -432,7 +432,7 @@ union domain *dp ;
 void
 compile()
 {
-    struct binding *bp = Domains ;
+    struct gen_binding *bp = Domains ;
 
     current_first = 0;
 
@@ -444,7 +444,7 @@ compile()
 	bp->compiled = (bp->domain->ba.type != EXTERNAL ) ;
 
 	if( IS_TABULATED( bp )) {
-	    union domain *dp ;
+	    union domain *dp = NULL;
 
 	    if( !(bp->domain->ba.type == CONSTRUCTED &&
 		  (dp=bp->domain->co.components->domain)->ba.type == BASIS &&
