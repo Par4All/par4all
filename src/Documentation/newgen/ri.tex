@@ -850,6 +850,16 @@ statement in a memory location is dead when leaving a statement or if it
 is used later by another statement execution. In the later case, it is
 called an {\tt OUT} effect.
 
+Note that spurious effects are added in loop bodies to avoid... and/or
+simulate later a control dependence by a data dependence (see
+PJ).  These effects are \verb/read/ effects on the loop bounds
+(variables used in loop bound expressions?). 
+
+Note also that \verb/read/ effects of loop indices are ignored because
+they always are not upward exposed. This is due to the {\em compound}
+nature of the PIPS \verb/DO/ construct. It if were decomposed into
+elementary parts, there would be no such surprising approximations.
+
 \subsection{Effects}
 \label{subsection-effects}
 \index{Effects}
