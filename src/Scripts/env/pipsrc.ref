@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/06/13 17:17:45 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/06/22 09:49:52 $, )
 # version $Revision$, 
 # got on %D%, %T%
 # $Id$
@@ -11,7 +11,7 @@ set -a
 # one. Thus, you should not do anything else as initializing shell 
 # variables.
 # If you add some variables, see at the end of the file.
-# run "Pips/make-pipsrc.csh" after modifying this file
+# run "Utilities/make-pipsrc.csh" after modifying this file
 # Bug: EOL cannot be back-quoted (ie: definitions of variables on 
 #      more than one line makes errors).
 
@@ -158,6 +158,12 @@ HPFC_TOOLS=$UTILDIR
 HPFC_SED=/usr5/gnu/bin-sparc/sed
 HPFC_TR=/bin/tr
 
+# For the daVinci Graph Viewer/Editor :
+DAVINCI_DIR=$RTSRCDIR/daVinci/daVinci_V1.4_solaris_1
+GRAPHEDITOR_DIRECTORY=$DAVINCI_DIR/grapheditor
+DAVINCI_ICONDIR=$DAVINCI_DIR/images
+MANPATH=${MANPATH}:$DAVINCI_DIR/man
+PATH=${PATH}:$DAVINCI_DIR
 #
 # that is all
 #
