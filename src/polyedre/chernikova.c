@@ -513,6 +513,12 @@ Psysteme sc1,sc2;
     assert(!SC_UNDEFINED_P(sc1) && (sc_dimension(sc1) != 0));
     assert(!SC_UNDEFINED_P(sc2) && (sc_dimension(sc2) != 0));
     
+    ifscdebug(1) {
+	fprintf(stderr, "[sc_convex_hull] considering:\n");
+	sc_default_dump(sc1);
+	sc_default_dump(sc2);
+    }
+
     /* comme on il ne faut pas que les structures irisa 
        apparaissent dans le fichier polyedre.h, une sous-routine 
        renvoyant un polyhedron n'est pas envisageable.
@@ -522,26 +528,31 @@ Psysteme sc1,sc2;
     nbcolumns1 = sc1->dimension +2;
     a1 = Matrix_Alloc(nbrows1, nbcolumns1);
     sc_to_matrix(sc1,a1);
-    
-    /*     printf("\na1 =");
-	   Matrix_Print(stderr, "%4d",a1);   */
-    
+
     nbrows2 = sc2->nb_eq + sc2->nb_ineq + 1;
     nbcolumns2 = sc2->dimension +2;
     a2 = Matrix_Alloc(nbrows2, nbcolumns2);
-    sc_to_matrix(sc2,a2);   
-    /*  printf("\na2 =");
-	Matrix_Print(stderr, "%4d,",a2); */
+    sc_to_matrix(sc2,a2);
 
+    ifscdebug(2) {
+	fprintf(stderr, "[sc_convex_hull]\na1 =");
+	Matrix_Print(stderr, "%4d",a1);
+	fprintf(stderr, "\na2 =");
+	Matrix_Print(stderr, "%4d",a2);
+    }
+    
     A1 = Constraints2Polyhedron(a1, 20000);
     Matrix_Free(a1); 
     A2 = Constraints2Polyhedron(a2, 20000);
     Matrix_Free(a2);
 
-   /*    Polyhedron_Print(stderr, "%4d",A1);
-	  Polyhedron_Print(stderr, "%4d",A2);  */
+    ifscdebug(2) {
+	fprintf(stderr, "[sc_convex_hull]\nA1 =");
+	Polyhedron_Print(stderr, "%4d",A1);
+	fprintf(stderr, "\nA2 =");
+	Polyhedron_Print(stderr, "%4d",A2);
+    }
     
-
     sc->base = base_dup(sc1->base);
     sc->dimension = vect_size(sc->base);
 
