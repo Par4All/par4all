@@ -648,12 +648,13 @@ int hash_table_own_allocated_memory(hash_table htp)
 }
 
 /***************************************************************** MAP STUFF */
-
+/* newgen mapping to newgen hash...
+ */
 void * hash_map_get(hash_table h, void * k)
 {
   gen_chunk key;
   key.e = k;
-  return hash_get(h, &key);
+  return ((gen_chunk*)hash_get(h, &key))->e;
 }
 
 bool hash_map_defined_p(hash_table h, void * k)
@@ -670,14 +671,7 @@ void hash_map_put(hash_table h, void * k, void * v)
     * val = (gen_chunk*) malloc(sizeof(gen_chunk));
   key->e = k;
   val->e = v;
-  hash_put(h, &key, &val);
-}
-
-void hash_map_update(hash_table h, void * k, void * v)
-{
-  gen_chunk key;
-  key.e = k;
-  hash_update(h, &key, v);
+  hash_put(h, key, val);
 }
 
 void * hash_map_del(hash_table h, void * k)
@@ -687,9 +681,17 @@ void * hash_map_del(hash_table h, void * k)
 
   key.e = k;
   val = hash_delget(h, &key, (void**) &oldkeychunk);
+  message_assert("defined value (entry to delete must be defined!)",
+		 val!=HASH_UNDEFINED_VALUE);
   result = val->e;
 
   free(oldkeychunk);
   free(val);
   return result;
+}
+
+void hash_map_update(hash_table h, void * k, void * v)
+{
+  hash_map_del(h, k);
+  hash_map_put(h, k, v);
 }
