@@ -15,10 +15,18 @@
 
 #include "sac.h"
 
+
+#define MAX_PACK 16
+
+static argumentInfo* arguments = NULL;
+static int nbArguments = 0;
+static int nbAllocatedArguments = 0;
+
+
 /* Computes the optimal opcode for simdizing 'argc' statements of the
  * 'kind' operation, applied to the 'args' arguments
  */
-static opcode get_optimal_opcode(int kind, int argc, list* args)
+static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 {
    int max_width = 0;
    int i;
@@ -47,7 +55,7 @@ static opcode get_optimal_opcode(int kind, int argc, list* args)
 	    case is_basic_logical: width = 8*basic_logical(b); break;
 	    default: /* HELP: what to do ? */
 	       printf("unsuppported basic type\n");
-	       return 0;
+	       return opcode_undefined;
 	 }
 	 if (width > max_width)
 	    max_width = width;
@@ -58,8 +66,8 @@ static opcode get_optimal_opcode(int kind, int argc, list* args)
    /* Based on the available implementations of the operation, decide
     * how many statements to pack together
     */
-   best = NULL;
-   for( l = opcodeClass_opcodes(get_opcodeClass(kind));
+   best = opcode_undefined;
+   for( l = opcodeClass_opcodes(kind);
 	l != NIL;
 	l = CDR(l) )
    {
@@ -67,7 +75,7 @@ static opcode get_optimal_opcode(int kind, int argc, list* args)
 
       if ( (opcode_subwordSize(oc) >= max_width) &&
 	   (opcode_vectorSize(oc) <= argc) &&
-	   ((best == NULL) || 
+	   ((best == opcode_undefined) || 
 	    (opcode_vectorSize(oc) > opcode_vectorSize(best))) )
 	 best = oc;
    }
@@ -466,12 +474,6 @@ static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
    return new_ent;
 }
 
-#define MAX_PACK 16
-
-static argumentInfo* arguments = NULL;
-static int nbArguments = 0;
-static int nbAllocatedArguments = 0;
-
 void reset_argument_info()
 {
    nbArguments = 0;
@@ -545,14 +547,14 @@ static vectorElement make_vector_element(simdStatementInfo ssi, int i, int j)
    return make_vectorElement(simdStatementInfo_vectors(ssi)[i], j);
 }
 
-static statementInfo make_simd_statement_info(int kind, opcode oc, list* args)
+static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list* args)
 {
    statementInfo si;
    simdStatementInfo ssi;
    int i,j, nbargs;
 
    /* find out the number of arguments needed */
-   nbargs = opcodeClass_nbArgs(get_opcodeClass(kind));
+   nbargs = opcodeClass_nbArgs(kind);
 
    /* allocate memory */
    ssi = make_simdStatementInfo(oc, 
@@ -625,7 +627,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
    list i;
    int index;
    list args[MAX_PACK];
-   int type;
+   opcodeClass type;
    list instr; 
    list all_instr;
 
@@ -638,7 +640,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
    all_instr = CONS(STATEMENT_INFO, NULL, NIL);
    instr = all_instr;
 
-   type = INT(CAR(kinds));
+   type = OPCODECLASS(CAR(kinds));
    while(i != CDR(last))
    {
       opcode oc;
@@ -656,7 +658,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
       /* compute the opcode to use */
       oc = get_optimal_opcode(type, index, args);
 
-      if (oc == NULL)
+      if (oc == opcode_undefined)
       {
 	 /* No optimized opcode found... */
 	 for( index = 0, j = i;
