@@ -19,7 +19,7 @@
 
 /* boolean sys_int_fais(Psysteme sys1):
  * Test de faisabilite d'un systeme lineaire syst1 en nombres entiers par 
- * l'algorithme des congruences decroissantes (cf. livre ???, pp. ???).
+ * l'algorithme des congruences decroissantes (cf. livre ???, pp. ??? ).
  * Renvoie TRUE si le systeme est satisfiable (i.e. il definit un polyedre
  * convexe non vide), FALSE sinon.
  *
