@@ -15,8 +15,6 @@ CMKDEP	= -xM
 FFLAGS	= -fast -u
 LEX	= flex
 LFLAGS	= 
-YACC	= bison
-YFLAGS	= -y
 
 # end of it!
 #
