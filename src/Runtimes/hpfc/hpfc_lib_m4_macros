@@ -1,21 +1,25 @@
-c
-c general m4 macros
-c
-c this macro builds a name from its arguments, separated by _
-c
+dnl
+dnl GENERAL M4 MACROS
+dnl
+dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1994/09/16 17:04:29 $, )
+dnl version $Revision$
+dnl got on %D%, %T%
+dnl
+dnl THIS MACRO BUILDS A NAME FROM ITS ARGUMENTS, SEPARATED BY _
+dnl
 define(`build_name',dnl
 `ifelse($#,0,,$#,1,``$1'',``$1_''`build_name(shift($@))')')dnl
-c
-c this for macro is taken as is from the documentation
-c
+dnl
+dnl FOR MACRO FROM M4 DOCUMENTATION
+dnl
 define(`forloop',
        `pushdef(`$1', `$2')_forloop(`$1', `$2', `$3', `$4')popdef(`$1')')dnl
 define(`_forloop',
        `$4`'ifelse($1, `$3', ,
        `define(`$1', incr($1))_forloop(`$1', `$2', `$3', `$4')')')dnl
-c
-c replicate macros definition
-c
+dnl
+dnl REPLICATE MACROS DEFINITION
+dnl
 define(`SIMPLE_REPLICATE',`dnl
 ifelse($1, 0, ,`forloop(`_I_', 1, $1, `$2(_I_)')')')dnl
 define(`COMMA_REPLICATE',dnl
@@ -27,10 +31,21 @@ define(`REVERSE_BUT_LAST_REPLICATE',dnl
 define(`REVERSE_REPLICATE',dnl
 `ifelse($1, 0,, `$2($1) dnl
    REVERSE_REPLICATE(eval($1 - 1),`$2')')')dnl
-c
-c TO7 definition
-c
+dnl
+dnl TO7 DEFINITION
+dnl
 define(`TO7',`eval(7-$1)')dnl
-c
-c end of general m4 macros
-c
+dnl
+dnl VERSIONS
+dnl
+ifdef(`DEBUG',`define(`debug',`$@')',`define(`debug')')dnl
+ifdef(`DEMO',`define(`demo',`$@')',`define(`demo')')dnl
+ifdef(`DIRECT',`define(`direct',`$@')',`define(`direct')')dnl
+ifdef(`SYNC_EXIT',`define(`sync_exit',`$@')',`define(`sync_exit')')dnl
+dnl
+dnl ARCHITECTURES
+dnl
+include("hpfc_architecture_m4_macros")dnl
+dnl
+dnl end of general m4 macros
+dnl
