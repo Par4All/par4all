@@ -485,6 +485,15 @@ variable_is_a_module_formal_parameter_p(entity a_variable,
    return FALSE;
 }
 
+/* true if v is in a common. */
+bool
+variable_in_common_p(
+    entity v)
+{
+    return type_variable_p(entity_type(v)) &&
+	storage_ram_p(entity_storage(v)) &&
+	!SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(v)))) ;
+}
 
 bool
 variable_in_module_p(entity v,
