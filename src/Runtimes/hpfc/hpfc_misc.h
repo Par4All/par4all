@@ -1,7 +1,7 @@
-c
-c $RCSfile: hpfc_misc.h,v $ (version $Revision$)
-c $Date: 1996/09/07 16:21:28 $, 
-c
+!
+! $RCSfile: hpfc_misc.h,v $ (version $Revision$)
+! $Date: 1997/01/02 18:42:19 $, 
+!
       character*64 hpfc key
       common /HPFC MISC/ hpfc key
       integer 
@@ -12,6 +12,6 @@ c
      $     hpfc fake bufpck, 
      $     hpfc fake bufupk,
      $     hpfc fake bcasts
-c
-c that is all
-c
+!
+! that is all
+!
