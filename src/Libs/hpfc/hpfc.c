@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.106  1997/10/27 16:48:49  coelho
+ * redeclarations cleaned...
+ *
  * Revision 1.105  1997/10/27 09:02:26  coelho
  * PRETTYPRINT_COMMONS bool -> string
  *
@@ -463,19 +466,27 @@ compile_module(entity module)
     if (entity_main_module_p(module))
 	add_pvm_init_and_end(&host_stat, &node_stat);
 
+    /*  DECLARATIONS
+     */
     declaration_with_overlaps_for_module(module);
 
     set_similar_mappings_for_updates();
+
     update_object_for_module(node_stat, node_module);
     update_object_for_module(entity_code(node_module), node_module);
-    insure_declaration_coherency(node_module, node_stat,
+
+    update_object_for_module(host_stat, host_module);
+    update_object_for_module(entity_code(host_module), host_module);
+    
+    insure_declaration_coherency(host_module, host_stat, NIL);
+    insure_declaration_coherency(node_module, node_stat, 
 				 get_include_entities());
+
+    /*  MORE CODE CLEANING
+     */
     kill_statement_number_and_ordering(node_stat);
     statement_structural_cleaning(node_stat);
     
-    update_object_for_module(host_stat, host_module);
-    update_object_for_module(entity_code(host_module), host_module);
-    insure_declaration_coherency(host_module, host_stat, NIL);
     kill_statement_number_and_ordering(host_stat);
     statement_structural_cleaning(host_stat);
 
@@ -521,6 +532,13 @@ bool hpfc_init(string name)
 
     /* where the specials dummy/variables are stored... ??? */
     (void) make_empty_program(HPFC_PACKAGE);
+
+    /* mkdir... */
+    {
+	string dir_name =
+	    db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
+	free(dir_name);
+    }
 
     init_hpfc_status();
     save_hpfc_status();
