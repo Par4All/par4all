@@ -7,9 +7,6 @@
   */
 
 #include <stdio.h>
-extern int fprintf();
-extern int _flsbuf();
-extern int fputs();
 #include <string.h>
 #include <varargs.h>
 
