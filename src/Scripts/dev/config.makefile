@@ -16,16 +16,17 @@ SCRIPTS = 	pips-makemake \
 		pips_at_night \
 		remove_from_sccs_file
 
-MACROS=		makefile_macros.. \
-		makefile_macros.GNU \
+MACROS	=	makefile_macros.. \
 		makefile_macros.DEFAULT \
+		makefile_macros.GNU \
 		makefile_macros.SUN4 \
+		makefile_macros.TEST \
 		makefile_macros.GNULL
 
-FILES=		forward_gnu_makefile \
+FILES	=	forward_gnu_makefile \
 		$(MACROS)
 
-COPY=	cp -f
+COPY	=	cp
 
 quick-install: install_forward_makefiles install_macros
 
