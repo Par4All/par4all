@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/03 00:01:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/25 17:44:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/07/03 00:01:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/07/25 17:44:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1031,36 +1031,44 @@ void reset_prettyprinter_head_hook(){ head_hook=NULL;}
  * carefull! the original text of the declarations is used
  * if possible. Otherwise, the function text_declaration is called.
  */
-text text_module(module, stat)
-entity module;
-statement stat;
+text
+text_module(entity module,
+	    statement stat)
 {
-   text r = make_text(NIL);
-   code c = entity_code(module);
-   string s = code_decls_text(c);
+    text r = make_text(NIL);
+    code c = entity_code(module);
+    string s = code_decls_text(c);
 
-   if ( strcmp(s,"") == 0 
+    if ( strcmp(s,"") == 0 
 	|| get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") ) {
-      ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(sentence_head(module),
-						      module));
-      if (head_hook) 
-	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-						head_hook(module)));
-					  
-      MERGE_TEXTS(r, text_declaration(module));
-   }
-   else {
-      ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(make_sentence(is_sentence_formatted, s),
-						      module));
-   }
+	if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
+	    /* Add the original header comments if any: */
+	    ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
+	    
+	ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(sentence_head(module),
+							module));
+	if (head_hook) 
+	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+						  head_hook(module)));
+	
+	if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
+	    /* Add the original header comments if any: */
+	    ADD_SENTENCE_TO_TEXT(r, get_declaration_comments(module));
+	
+	MERGE_TEXTS(r, text_declaration(module));
+    }
+    else {
+	ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(make_sentence(is_sentence_formatted, s),
+							module));
+    }
 
-   if (stat != statement_undefined) {
-      MERGE_TEXTS(r, text_statement(module, 0, stat));
-   }
+    if (stat != statement_undefined) {
+	MERGE_TEXTS(r, text_statement(module, 0, stat));
+    }
 
-   ADD_SENTENCE_TO_TEXT(r, sentence_tail());
+    ADD_SENTENCE_TO_TEXT(r, sentence_tail());
 
-   return(r);
+    return(r);
 }
 
 text text_graph(), text_control() ;
