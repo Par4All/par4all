@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/21 09:28:34 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/22 10:44:10 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -946,15 +946,12 @@ struct driver *dr ;
 	if( hash_del( Gen_tabulated_names, local ) == HASH_UNDEFINED_VALUE ) {
 	    user( "free_tabulated: clearing unexisting %s\n", local ) ;
 	}
-	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = gen_chunk_undefined; 
+	(Gen_tabulated_[bp->index]+abs((obj+1)->i))->p=gen_chunk_undefined;
     }
 
     if((dp=bp->domain)->ba.type == CONSTRUCTED_DT && dp->co.op == ARROW_OP) {
 	hash_table h = (obj+1 + IS_TABULATED( bp ))->h ;
 
-	/* hmmm... I'm not sure this is a good idea. 
-	 * may forget non persistent data in there ?
-	 */
 	HASH_MAP( k, v, {
 	    free( (void *)k ) ;
 	    free( (void *)v ) ;
@@ -962,7 +959,7 @@ struct driver *dr ;
 	hash_table_free( h ) ;
     }
     obj->p = (gen_chunk *)0 ;
-    free((void *) obj ) ;
+    free((void *) obj) ;
 }
 
 /* GEN_LOCAL_FREE frees the object OBJ with or withou KEEPing the sharing. */ 
@@ -2460,8 +2457,8 @@ struct gen_binding *bp ;
 	if (bp->domain->ex.allocated_memory)
 	    current_size += (*(bp->domain->ex.allocated_memory))(obj->s);
 	else
-	    fprintf(stderr, "[gen_allocated_memory] warning: "
-		    "external with no allocated memory function\n");
+	    user("[gen_allocated_memory] warning: "
+		 "external with no allocated memory function\n");
 		
 	return FALSE;
     }
@@ -2496,7 +2493,7 @@ allocated_memory_simple_in(
     gen_chunk *obj,
     union domain *dp)
 {
-    if (dp->se.persistant) return FALSE;
+    if (dp->ba.persistant) return FALSE;
 
     switch( dp->ba.type ) {
     case BASIS_DT:
@@ -2505,7 +2502,7 @@ allocated_memory_simple_in(
     {
 	list l = obj->l;
 	
-	if (l!=list_undefined && l)
+	if (l && !list_undefined_p(l))
 	{
 	    current_size += list_own_allocated_memory(l);
 	    return TRUE;
@@ -2516,7 +2513,8 @@ allocated_memory_simple_in(
     case SET_DT:
     {
 	set s = obj->t;
-	if (s != set_undefined)
+
+	if (!set_undefined_p(s))
 	{
 	    current_size += set_own_allocated_memory(s);
 	    return TRUE;
@@ -2528,7 +2526,7 @@ allocated_memory_simple_in(
     {
 	gen_chunk *p = obj->p;
 
-	if (p != array_undefined)
+	if (!array_undefined_p(p))
 	{
 	    current_size += array_own_allocated_memory(dp);
 	    return TRUE;
