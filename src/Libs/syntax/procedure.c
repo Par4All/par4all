@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.58  1999/01/05 12:37:48  irigoin
+ * MakeEntry() updated with a better warning when entry formal parameters are
+ * illegally used
+ *
  * Revision 1.57  1998/12/24 13:45:19  irigoin
  * Bug fixes in MaKeEntry() to handle cases when a call site to the entry has been encountered before the entry is parsed
  *
@@ -415,6 +419,12 @@ EndOfProcedure()
     
     pips_debug(8, "checking code consistency = %d\n",
 	       statement_consistent_p( function_body )) ;
+
+    ifdebug(8) {
+	pips_debug(8, "Declarations inherited from module %s:\n",
+		   module_local_name(CurrentFunction));
+	dump_arguments(entity_declarations(CurrentFunction));
+    }
 
     /* get rid of ghost variable entities and substitute them if necessary */
     remove_ghost_variable_entities(TRUE);
@@ -1205,7 +1215,7 @@ MakeEntry(
      * Temporarily, the formal parameters of entry fe are declared in cm
      * to keep the code consistent but they are supposedly not added to
      * cm's declarations... because FindOrCreateEntity() does not update
-     * declarations.
+     * declarations. MakeAtom() does not redeclare formal parameters.
      */
     for(cc = lfp; !ENDP(cc); POP(cc)) {
 	entity fp = ENTITY(CAR(cc));
@@ -1226,8 +1236,21 @@ MakeEntry(
 		if(entity_is_argument_p(fp,entity_declarations(cm))) {
 		    debug(1, "MakeEntry", "Entity %s removed from declarations for %s\n",
 			  entity_name(fp), module_local_name(cm));
+		    gen_remove(&entity_declarations(cm), fp);
+		    pips_user_warning("Variable %s seems to be used before it is declared"
+				      " as a formal parameter for entry %s. It is legal "
+				      "if it only appears in a type statement.\n",
+				      entity_local_name(fp), entity_name(e));
+		    /* fp may appear in a type statement and/or an
+		       executable statement: the information is now
+		       lost. */
+		    /*
+		    ParserError("MakeEntry",
+				"Formal parameters of entries cannot appear textually"
+				" in executable statements before they are declared"
+				" (Fortran Standard, 15.7.4, pp. 15-13)");
+		    */
 		}
-		gen_remove(&entity_declarations(cm), fp);
 	    }
 	}
     }
@@ -1241,6 +1264,9 @@ MakeEntry(
 	(void) fprintf(stderr, "Declarations of formal parameters for entry %s:\n",
 		       entity_name(fe));
 	dump_arguments(entity_declarations(fe));
+	(void) fprintf(stderr, "Declarations for current module %s:\n",
+		       entity_name(cm));
+	dump_arguments(entity_declarations(cm));
     }
 
     debug(1, "MakeEntry", "End for entry %s\n", entity_name(fe));
