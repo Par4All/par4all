@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.37  2000/05/25 15:39:21  coelho
+ * hop.
+ *
  * Revision 1.36  2000/02/03 11:52:53  zory
  * bon ben faut installer... FC>
  *
@@ -358,33 +361,30 @@ read_new_entities_from_eole(FILE * file, string module){
 
       const_value = read_and_allocate_string_from_file(file);
 
-      if (!strcmp(const_type,"int")) {/* int */
+      if (same_string_p(const_type,"int")) {/* int */
 	
 	/* create integer entity */
 	e = make_constant_entity(const_value, is_basic_int, const_size);
-	pips_assert("make integer constant entity\n",
-		    entity_consistent_p(e));  
+	pips_assert("make integer constant entity", entity_consistent_p(e));  
       }
-      else 
-	if (!strcmp(const_type,"float")) {/* float */
-	  
-	  /* create float entity */
-	  e = make_constant_entity(const_value, is_basic_float, const_size);
-	  pips_assert("make float constant entity\n",
-		      entity_consistent_p(e));  
-	}
-      else 
-	pips_error("read_new_entities_from_eole", 
-		   "can't create this kind of constant entity : %s",
-		   const_type);
-
+      else if (same_string_p(const_type,"float")) {/* float */
+	/* create float entity */
+	e = make_constant_entity(const_value, is_basic_float, const_size);
+	pips_assert("make float constant entity", entity_consistent_p(e));  
+      }
+      else if (same_string_p(const_type, "double")) { /* double */
+	e = make_constant_entity(const_value, is_basic_float, const_size);
+	pips_assert("make float constant entity", entity_consistent_p(e));  
+      }
+      else
+	pips_internal_error("can't create this kind of constant entity: %s",
+			    const_type);
       free(const_type);
       free(const_value);
     }
     else 
-      pips_error("read_new_entities_from_eole", 
-		 "can't create this kind of entity : %s",
-		 ent_type);
+      pips_internal_error("can't create this kind of entity: %s",
+			  ent_type);
     
     free(ent_type);
   }
