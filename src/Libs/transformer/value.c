@@ -286,7 +286,7 @@ global_new_value_to_global_old_value(entity v_new)
 					entity_domain);
     return v_old;
 }
-
+
 /* HASH TABLE USE */
 
 string 
@@ -297,7 +297,8 @@ entity e;
     entity m = get_current_module_entity();
     string s = hash_get(hash_value_to_name, (char *) e);
 
-    if(s==HASH_UNDEFINED_VALUE && !variable_in_module_p(e,m)) {
+    if(s==HASH_UNDEFINED_VALUE && !variable_in_module_p(e,m))
+    {
 	if(global_new_value_p(e)) {
 	    entity a = entity_to_new_value(e);
 	    s = hash_get(hash_value_to_name, (char *) a);
@@ -311,11 +312,11 @@ entity e;
 	    s = hash_get(hash_value_to_name, (char *) a);
 	}
 	else {
-	    pips_error("external_value_name","unexpected value %s\n",entity_name(e));
+	    pips_internal_error("unexpected value %s\n", entity_name(e));
 	}
     }
 	    
-    pips_assert("external_value_name", s != HASH_UNDEFINED_VALUE);
+    pips_assert("var must be bounded", s != HASH_UNDEFINED_VALUE);
 
     s = (strcmp(module_local_name(m), module_name(s)) == 0) ? 
 	local_name(s) : s ;
