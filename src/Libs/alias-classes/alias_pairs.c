@@ -34,9 +34,9 @@
 
 
 static entity callee;
-static list list_regions_callee;
+static list list_regions_callee = NIL;
 static statement current_caller_stmt = statement_undefined;
-static list list_pairs;
+static list list_pairs = NIL;
 
 
 /* modifies global var current_caller_statement */
@@ -105,14 +105,16 @@ add_parameter_aliases_for_this_call_site(call call_site,
 
 	MAP(EFFECT, callee_region,
 	 {
-	     entity callee_ent = region_entity(callee_region);
+/*	     entity callee_ent = region_entity(callee_region); */
 	     
-	     pips_debug(9,"\tand entity %s\n",entity_name(callee_ent));
+/*	     pips_debug(9,"\tand entity %s\n",entity_name(callee_ent)); */
+
+	     pips_debug(9,"begin map\n");
 
 	     /* If the formal parameter corresponds to the real argument then
 	      * we perform the translation.
 	      */
-	     if (ith_parameter_p(callee, callee_ent, arg_num))
+	     if (ith_parameter_p(callee,region_entity(callee_region),arg_num))
 	     {
 		 expression real_exp = EXPRESSION(CAR(r_args));
 		 syntax real_syn = expression_syntax(real_exp);
