@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.150  2002/04/23 09:34:12  coelho
+# hop.
+#
 # Revision 1.149  2002/04/22 15:39:45  irigoin
 # Validation for GNUSOL2LL: champeaux only
 #
@@ -308,10 +311,10 @@ test "${PIPS_ARCH}" = GNUSOL2LL && \
 	PIPS_HOSTS="champeaux"
 
 test "${PIPS_ARCH}" = . -o "${PIPS_ARCH}" = GNU && \
-	PIPS_HOSTS="chailly:episy:aiguebelette:roazhon"
+	PIPS_HOSTS=""
 
 test "${PIPS_ARCH}" = LINUXI86 -o "${PIPS_ARCH}" = LINUXI86LL && \
-	PIPS_HOSTS="loreto"
+	PIPS_HOSTS=""
 
 # PIPS_EXPERIMENTSDIR="${pips_dir}/Experiments"
 # PIPS_TESTSDIR="${pips_dir}/Tests"
