@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/12/29 16:20:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/02/23 18:07:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/12/29 16:20:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/02/23 18:07:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -607,6 +607,103 @@ int n;
     return(r) ;
 }
 
+/* private variables.
+ * modified 2-8-94 by BA.
+ * extracted as a function and cleaned a *lot*, FC.
+ */
+static list /* of string */
+loop_private_variables(loop obj)
+{
+    bool
+	all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"),
+	hpf_private = get_bool_property("PRETTYPRINT_HPF"),
+	some_before = FALSE;
+    list l = NIL;
+
+    /* comma-separated list of private variables. 
+     * ??? should be build in reverse order to avoid adding at the end...
+     */
+    MAP(ENTITY, p,
+    {
+	if((p!=loop_index(obj)) || all_private) 
+	{
+	    if (some_before) 
+		l = CHAIN_SWORD(l, ",");
+	    else
+		some_before = TRUE; /* from now on commas... */
+
+	    l = CHAIN_SWORD(l, entity_local_name(p));
+	}
+    }, 
+	loop_locals(obj)) ; /* end of MAP */
+    
+    pips_debug(5, "#printed %d/%d\n", gen_length(l), 
+	       gen_length(loop_locals(obj)));
+
+    /* stuff around if not empty
+     */
+    if (l)
+    {
+	l = CONS(STRING, MAKE_SWORD(hpf_private ? "NEW(" : "PRIVATE "), l);
+	if (hpf_private) CHAIN_SWORD(l, ")");
+    }
+
+    return l;
+}
+
+/* returns a formatted text for the HPF independent and new directive 
+ * well, no continuations and so, but the directives do not fit the 
+ * unformatted domain, because the directive prolog would not be well
+ * managed there.
+ */
+static text 
+text_hpf_directive(
+    loop obj,   /* the loop we're interested in */
+    int margin) /* margin */
+{
+    list /* of string */ l = NIL, ln = NIL,
+         /* of sentence */ ls = NIL;
+    
+    if (execution_parallel_p(loop_execution(obj)))
+    {
+	l = loop_private_variables(obj);
+	ln = CHAIN_SWORD(ln, "INDEPENDENT");
+	if (l) ln = CHAIN_SWORD(ln, ", ");
+    }
+    else if (get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"))
+	l = loop_private_variables(obj);
+    
+    ln = gen_nconc(ln, l);
+    
+    /* ??? directly put as formatted, doesn't matter?
+     */
+    if (ln) 
+    {
+	ls = CONS(SENTENCE, 
+		  make_sentence(is_sentence_formatted, strdup("\n")), NIL);
+	
+	ln = gen_nreverse(ln);
+
+	MAPL(ps, 
+	{
+	    ls = CONS(SENTENCE,
+		make_sentence(is_sentence_formatted, STRING(CAR(ps))), ls);
+	},
+	     ln);
+	
+	for (; margin>0; margin--)
+	    ls = CONS(SENTENCE, make_sentence(is_sentence_formatted, 
+					    strdup(" ")), ls);
+
+	ls = CONS(SENTENCE, make_sentence(is_sentence_formatted, 
+					  strdup("CHPF$ ")), ls);
+
+	gen_free_list(ln);
+    }
+
+    return make_text(ls);
+}
+
 text text_loop(module, label, margin, obj, n)
 entity module;
 string label;
@@ -614,18 +711,17 @@ int margin;
 loop obj;
 int n ;
 {
+    list pc = NIL;
+    unformatted u;
     text r = make_text(NIL);
-    cons *pc ;
-    unformatted u ;
     statement body = loop_body( obj ) ;
     entity the_label = loop_label(obj);
     string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
-    bool structured_do = empty_local_label_name_p( do_label );
-    bool doall_loop_p = FALSE ;
-    bool pp_all_priv_var_p = 
-	get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
-    bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
-    
+    bool structured_do = empty_local_label_name_p(do_label),
+         doall_loop_p = FALSE,
+         hpf_prettyprint = get_bool_property("PRETTYPRINT_HPF"),
+         do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT"),
+         all_private =  get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
 
     if(!structured_do && do_enddo_p)
     {
@@ -640,8 +736,7 @@ int n ;
     case is_execution_parallel:
         if (get_bool_property("PRETTYPRINT_CMFORTRAN")) {
           text aux_r;
-          if((aux_r = text_loop_cmf(module, label, margin,
-                                    obj, n, NIL, NIL))
+          if((aux_r = text_loop_cmf(module, label, margin, obj, n, NIL, NIL))
              != text_undefined) {
             MERGE_TEXTS(r, aux_r);
             return(r) ;
@@ -649,8 +744,7 @@ int n ;
         }
         if (get_bool_property("PRETTYPRINT_CRAFT")) {
           text aux_r;
-          if((aux_r = text_loop_craft(module, label, margin,
-                                      obj, n, NIL, NIL))
+          if((aux_r = text_loop_craft(module, label, margin, obj, n, NIL, NIL))
              != text_undefined) {
             MERGE_TEXTS(r, aux_r);
             return(r);
@@ -658,16 +752,20 @@ int n ;
         }
 	if (get_bool_property("PRETTYPRINT_FORTRAN90") && 
 	    instruction_assign_p(statement_instruction(body)) ) {
-	    MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n ));
+	    MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
 	    return(r) ;
 	}
 	doall_loop_p = !get_bool_property("PRETTYPRINT_CRAY") &&
-	    (!get_bool_property("PRETTYPRINT_CMFORTRAN")) &&
-		(!get_bool_property("PRETTYPRINT_CRAFT"));
+	    !get_bool_property("PRETTYPRINT_CMFORTRAN") &&
+		!get_bool_property("PRETTYPRINT_CRAFT") && !hpf_prettyprint;
 	break ;
     default:
 	pips_error("text_loop", "Unknown tag\n") ;
     }
+
+    if (hpf_prettyprint)
+	MERGE_TEXTS(r, text_hpf_directive(obj, margin));
+
     pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
 
     if(!structured_do && !doall_loop_p && !do_enddo_p) {
@@ -679,41 +777,14 @@ int n ;
     u = make_unformatted(strdup(label), n, margin, pc) ;
     ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
 
-
-    /* private variables. modified 2-8-94 by BA */
-    if( !ENDP(loop_locals(obj)) && (doall_loop_p || pp_all_priv_var_p) ) {
-	int np = 0;
-
-	pc = CHAIN_SWORD(NIL, "PRIVATE ") ;
-
-	MAPL(ps, {
-	    entity p = ENTITY(CAR(ps)) ;
-
-	    if((p != loop_index(obj)) || pp_all_priv_var_p) {
-		pc = CHAIN_SWORD(pc, entity_local_name(p));
-		pc = CHAIN_SWORD(pc,
-				 ( (ENDP(CDR(ps))) || (!pp_all_priv_var_p &&
-				  (ENTITY(CAR(CDR(ps))) == loop_index(obj))
-						       )
-				  )?
-				 "" : ",");
-		np++;
-	    }
-	    else 
-		pc = CHAIN_SWORD(pc,
-				 ((ENDP(CDR(ps))) || 
-				  (ENTITY(CAR(CDR(ps))) == loop_index(obj))
-				  )?
-				 "" : ",");
-
-	}, loop_locals(obj)) ; /* end of MAPL */
-	
-	if(np > 0) {
-	    u = make_unformatted(NULL, 0, margin+INDENTATION, pc) ;
-	    ADD_SENTENCE_TO_TEXT(r, 
-				 make_sentence(is_sentence_unformatted, u));
-	}
+    if(!ENDP(loop_locals(obj)) && (doall_loop_p || all_private)
+       && !hpf_prettyprint) 
+    {
+	MERGE_TEXTS(r, make_sentence(is_sentence_unformatted,
+		     make_unformatted(NULL, 0, margin+INDENTATION,
+				      loop_private_variables(obj))));
     }
+
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
 
     if(structured_do || doall_loop_p || do_enddo_p ||
