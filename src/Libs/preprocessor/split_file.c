@@ -383,8 +383,9 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 	get_name(x, 3);
 	ofp = fopen(x, "w");
 	if (ofp==NULL) {
+	    fprintf(stderr, "%s %s -> %s\n", dir_name, file_name, x);
 	    fprintf(stderr, "fopen(\"%s\", ...) failed\n", x);
-	    exit(2);
+	    abort();
 	}
 	nflag = 0;
 	rv = 0;
@@ -397,7 +398,7 @@ fsplit(char * dir_name, char * file_name, FILE * out)
 		FILE * fm = fopen(main_list, "a");
 		if (fm==NULL) {
 		    fprintf(stderr, "fopen(\"%s\", ...) failed\n", main_list);
-		    exit(2);
+		    abort();
 		}
 		while (*c && *c!='.') putc(toupper(*c++), fm);
 		putc('\n', fm);
