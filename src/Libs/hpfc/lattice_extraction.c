@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: lattice_extraction.c,v $
+ * Revision 1.7  1997/04/08 06:40:27  coelho
+ * *** empty log message ***
+ *
  * Revision 1.6  1997/04/07 17:06:56  coelho
  * test normalization...
  *
@@ -114,7 +117,8 @@ extract_lattice(
     Pbase b, bsorted, byr;
     Pmatrix FM, F, M, V, P, H, Q, Hl, Hli, Ql, Qr, QlHli,
 	QlHliM, QlHliV, mQr, I, Fnew;
-    int det_P, det_Q, i;
+    Value det_P, det_Q;
+    int i;
     list /* of entity */ lns = NIL, ltmp = NIL;
     Pcontrainte eq;
 
