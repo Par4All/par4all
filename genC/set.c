@@ -227,3 +227,10 @@ gen_set_closure(
     set_free(seen);
     set_free(next);
 }
+
+int
+set_own_allocated_memory(
+    set s)
+{
+    return sizeof(set_chunk)+hash_table_own_allocated_memory(s->table);
+}
