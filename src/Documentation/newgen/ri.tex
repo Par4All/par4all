@@ -34,23 +34,57 @@
 
 \section*{Introduction}
 
+This document contains the high-level description of data structures
+used in PIPS as internal representations of programs. These data
+structures are declared using the NewGen Data Definition Language, which
+insulates them from a particular programming language. They currently
+are translated into C or Common Lisp declarations and basic run-time
+support routines, such as \verb+make+, \verb+free+,... For more
+information about NewGen see \cite{}\cite{}.
+
+\iffalse
 Ce document est utilise' directement et automatiquement par l'outil
 de ge'nie logiciel NewGen pour ge'ne'rer les de'clarations des structures
 de donne'es utilise'es dans le projet PIPS, ainsi que les routines de
 base qui les manipulent. C'est pourquoi l'ordre des sections n'est pas
 ne'cessairement naturel.
+\fi
 
+Some external C data structures, used by the PIPS internal
+representation, are described in Section~\ref{external}. They key data
+structures \verb+entity+ (variables and functions), \verb+code+
+(instructions) and \verb+expression+ are introduced in
+Section~\ref{entity}, \ref{code} and \ref{expression}. The binding of
+Fortran to these data structures is explained. Two additional data
+structures, \verb+effect+ and \verb+transformer+, used for
+interprocedural analyses but not by the internal representation, are
+described in Section~\ref{effects} and in
+Section~\ref{semantics}. Effects are used to represent variables read or
+written by expression, statement and procedure. The \verb+transformer+
+data structure is used to abstract the store transformations performed
+by statement and procedure, as well as preconditions. These two domains
+were part of PIPS initial main thrust, interprocedural parallelization
+and analyses. 
+
+\iffalse
 Apre`s une description rapide des structures de donne'es externes a` la
-repre'sentation interne de Pips, nous pre'sentons successivement les
+repre'sentation interne de PIPS, nous pre'sentons successivement les
 notions d'entite's, de code et d'expressions et la manie`re dont elles
 sont utilise'es pour encoder un programme Fortran. Nous de'taillons
 ensuite deux structures de donne'es supple'mentaires, les effets et les
 {\em transformers} qui sont utilise's pour le calcul de de'pendance
 interproce'dural et pour l'analyse syntaxique interproce'durale.
+\fi
 
+The binding of Fortran to the PIPS internal representation is covered in
+greater details in Technical Report EMP-CAII-E105 (in French). The data
+structure management tool NewGen is introduced in TR EMP-CRI-A191.
+
+\iffalse
 La manie`re dont les constructions de Fortran sont repre'sente'es est
 de'crite dans une des sections du rapport EMP-CAII-E105. NewGen est
 pre'sente' dans le rapport EMP-CRI-A191.
+\fi
 
 \section{External Data Structures}
 \label{external}
@@ -71,12 +105,32 @@ Analysis}{http://www.cri.ensmp.fr/pips/pipsmake-rc.html}).
 \domain{External Pvecteur}
 {}
 
+Type {\tt Pvecteur} is used to represent affine expressions such as {\tt
+3I+2} (see also type {\tt normalized} in Section~\ref{expression}) or
+affine constraints such as {\tt 3I + J <= 2} or {\tt 3I == J}. The
+representation is sparse and a special dimension, called {\tt
+TCST}, is used for numerical constants. The constraints are used to
+build systems of equations and inequalities. Such systems are of type
+{\tt Psysteme}.
+
+\iffalse
 Le domaine {\tt Pvecteur} est utilise' pour repre'senter les
 expressions line'aires telles que {\tt 3I+2} (voir le domaine {\tt
 normalized}) ou des contraintes line'aires telles que {\tt 3I + J <= 2}
 ou {\tt 3I == J}. Ces contraintes sont utilise'es dans les syste`mes
 line'aires (voir le domaine {\tt Psysteme}).
+\fi
 
+An object of type {\tt Pvecteur} is a list of pairs $(c,v)$ where $c$ is
+a numerical coefficient and $v$ is a variable. The coefficient is an
+integer, strictly greater or lesser than zero, since zero components are
+not part of a sparse representation. For objects of type {\tt Pvecteur}
+used in PIPS, the variable must be either an {\tt entity} (see
+Section~\ref{entity}) or a special predefined variable {\tt TCST}. Since
+module names are used to prefix names of regular variables, no name
+conflict with a program variable called {\tt TCST} can occur.
+
+\iffalse
 Un Pvecteur est une suite de mono^mes, un mono^me e'tant un couple
 (coefficient,variable).  Le coefficient d'un tel couple est un entier,
 positif ou ne'gatif. La variable est une entite', sauf dans le cas du
@@ -84,12 +138,25 @@ terme constant qui est repre'sente' par la variable pre'de'finie de nom
 {\tt TCST}\footnote{Comme on rajoute le nom des modules devant les
 noms de variables, il ne peut pas y avoir de conflict avec une
 e'ventuelle variable {\tt TCST}.}.
+\fi
 
+Expressions in programs are stored as affine integer expressions,
+wherever possible.
+
+\iffalse
 Les expressions apparaissant dans le programme analyse' sont mises
 sous cette forme quand c'est possible.
+\fi
 
+The type {\tt Pvecteur} is imported from our Integer Linear Algebra
+Library, also called C3 library because its development was funded by
+the CNRS C3 program. See~??? for more details about this library and its
+content.
+
+\iffalse
 La structure de donne'es Pvecteur est importe'e de la bibliothe`que d'alge`bre
 line'aire en nombres entiers du CRI.
+\fi
 
 \subsection{Set of Affine Constraints}
 \label{subsection-psysteme}
