@@ -554,7 +554,7 @@ char* 	mod_name;
 	       "\n CAN'T APPLY FEAUTRIER'S ALGORITHM :\n This is not a static control program !\n" );
   }
   Gstructural_parameters = static_control_params( stco );
-  set_proper_rw_effect((statement_effects) 
+  set_proper_rw_effects((statement_effects) 
 		       db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
 
   /* What will we compute ? */
