@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/10/15 14:44:37 $, )
+ * ($Date: 1996/11/19 18:36:45 $, )
  */
 
 #include "defines-local.h"
@@ -602,15 +602,63 @@ static bool invariant_expression_p(
  */
 static entity subs_v;
 static expression subs_e;
+static Pvecteur subs_pv;
+
+/* returns if vin is in vref
+ */
+static bool vect_in_p(Pvecteur vin, Pvecteur vref)
+{
+    Pvecteur v;
+
+    for (v=vin; v; v=v->succ)
+    {
+	Variable x = vecteur_var(v);
+	if (x)
+	{
+	    if (value_ne(vecteur_val(v),vect_coeff(x, vref)))
+		return FALSE;
+	}
+    }
+
+    return TRUE;
+}
+
+/* returns if e is normalized and linear.
+ */
+bool expression_linear_p(expression e)
+{
+    normalized n = expression_normalized(e);
+    if (!normalized_undefined_p(n) && normalized_linear_p(n))
+	return TRUE;
+    return FALSE;
+}
+
 static bool expression_flt(expression e)
 {
+    /* does sg about the linearization of the expression 
+     */
+    if (subs_pv && expression_linear_p(e))
+    {
+	normalized n = expression_normalized(e);
+	Pvecteur v = normalized_linear(n);
+	if (vect_in_p(subs_pv, v))
+	{
+	    Pvecteur vn = vect_substract(v,subs_pv);
+	    vect_add_elem(&vn, (Variable)subs_v, VALUE_ONE);
+	    vect_rm(v);
+	    normalized_linear_(n) = vn;
+	}
+    }
+
     if (expression_equal_p(e, subs_e))
     {
 	/* ??? memory leak, but how to deal with effect references? */
 	expression_syntax(e) = 
 	    make_syntax(is_syntax_reference, make_reference(subs_v, NIL));
 	free_normalized(expression_normalized(e));
-	expression_normalized(e) = normalized_undefined;
+	expression_normalized(e) = 
+	    make_normalized(is_normalized_linear,
+			    vect_new(subs_v, VALUE_ONE));
 	return FALSE;
     }
     return TRUE;
@@ -626,8 +674,15 @@ static void substitute_and_create(statement s, entity v, expression e)
 
     subs_v = v;
     subs_e = copy_expression(e);
+
+    subs_pv = expression_linear_p(e)?
+	vect_dup(normalized_linear(expression_normalized(e))):
+	(Pvecteur) NULL;
+    
     gen_recurse(s, expression_domain, expression_flt, gen_null);
     
+    vect_rm(subs_pv), subs_pv=(Pvecteur)NULL;
+
     i = loop_to_instruction
 	(make_loop(v, 
 		   make_range(copy_expression(subs_e),
