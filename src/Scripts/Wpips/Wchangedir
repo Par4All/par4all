@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/11 17:13:43 $, 
+# $Date: 1996/09/11 17:14:22 $, 
 #
 # this script allow to chose a directory in interactively
 #
@@ -87,7 +87,7 @@ proc changedir { root currentdir } {
 	filldirlist $changedir_root.list.dirs $changedir_dir
     }
     button $root.top.home -bd 3 -text "Home" -command {
-	set changedir_dir "."; 
+	set changedir_dir $changedir_home; 
 	filldirlist $changedir_root.list.dirs $changedir_dir
     }
     button $root.top.okay -bd 3 -text "Ok" -command {
