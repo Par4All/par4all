@@ -2,10 +2,10 @@
    chooser. */
 
 
-/* 	%A% ($Date: 1995/11/27 17:20:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/28 00:49:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_directory_menu[] = "%A% ($Date: 1995/11/27 17:20:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_directory_menu[] = "%A% ($Date: 1995/11/28 00:49:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <xview/xview.h>
@@ -14,6 +14,8 @@ char vcid_directory_menu[] = "%A% ($Date: 1995/11/27 17:20:03 $, ) version $Revi
 #include <sys/dirent.h>
 #include "genC.h"
 #include "misc.h"
+#include "database.h"
+#include "pipsdbm.h"
 #include "wpips.h"
 
 enum {MENU_PATH_DATA_HANDLER = 54829,
@@ -40,14 +42,13 @@ directory_gen_pullright(Menu_item menu_item,
       char * parent_directory;
       Menu parent = xv_get(menu_item, MENU_PARENT);
 
-      debug(1, "directory_gen_pullright", "menu_item = %#x (%s), parent = %#x\n",
+      debug(2, "directory_gen_pullright", "menu_item = %#x (%s), parent = %#x\n",
             menu_item, (char *) xv_get(menu_item, MENU_STRING), parent);
       
       /* First get the parent directory name that is the title: */
       parent_directory = (char *) xv_get(parent,
                                          XV_KEY_DATA, MENU_PATH_DATA_HANDLER);
-      fprintf(stderr,"!!! %s\n",parent_directory);
-      debug(1, "directory_gen_pullright", " parent_directory = %s\n",
+      debug(2, "directory_gen_pullright", " parent_directory = %s\n",
             parent_directory);
       
       /* Build the new directory name: */
@@ -74,6 +75,20 @@ directory_gen_pullright(Menu_item menu_item,
 }
 
 
+static void
+generate_a_directory_menu_notify(Menu menu, Menu_item menu_item)
+{
+   char full_directory_name[MAXNAMLEN + 1];
+   char * directory_name = (char *) xv_get(menu_item, MENU_STRING);
+   char * parent_path_name =
+      (char *) xv_get(menu, XV_KEY_DATA, MENU_PATH_DATA_HANDLER);
+   
+   (void) sprintf(full_directory_name, "%s/%s",
+                  parent_path_name, directory_name);
+   (void) end_directory_notify(full_directory_name);
+}
+
+
 Menu
 generate_a_directory_menu(char * directory)
 {
@@ -89,8 +104,9 @@ generate_a_directory_menu(char * directory)
                     /* and furthermore MENU_TITLE_ITEM is write
                        only, so add the info somewhere else: */
                     XV_KEY_DATA, MENU_PATH_DATA_HANDLER, strdup(directory),
+                    MENU_NOTIFY_PROC, generate_a_directory_menu_notify,
                     NULL);
-   debug(1, "generate_a_directory_menu", "menu = %#x (%s)\n",
+   debug(2, "generate_a_directory_menu", "menu = %#x (%s)\n",
          menu, directory);
 
    if (db_get_current_workspace() != database_undefined) {
@@ -105,58 +121,41 @@ generate_a_directory_menu(char * directory)
       user_warning("generate_a_directory_menu",
                    "Close the current workspace before changing directory.\n");
    }
-   else
-   /* Get all the files in the directory: */
-   return_code = safe_list_files_in_directory(&file_list_length, file_list,
-                                              directory,
-                                              ".*", accept_all_file_names);
-   if (return_code == -1 || file_list_length == 0)
-      xv_set(menu, MENU_APPEND_ITEM,
-             xv_create(XV_NULL, MENUITEM,
-                       MENU_STRING,
-                       "* No file in this directory or cannot be open *",
-                       MENU_RELEASE,
-                       MENU_INACTIVE, TRUE,
-                       NULL),
-             NULL);
-   else if (file_list_length > WPIPS_MAX_DIRECTORY_MENU_SIZE) {
-      xv_set(menu, MENU_APPEND_ITEM,
-             xv_create(XV_NULL, MENUITEM,
-                       MENU_STRING,
-                       "* Too many files. Type directly in the Directory line of the main panel *",
-                       MENU_RELEASE,
-                       MENU_INACTIVE, TRUE,
-                       NULL),
-             NULL);
-      user_warning("generate_a_directory_menu",
-                   "Too many files in the \"%s\" directory.\n", directory);
-   }
-   else
-      /* Generate a corresponding entry for each file: */
-      for(i = 0; i < file_list_length; i++)
-         /* Skip the "." directory: */
-         if (strcmp(file_list[i], ".") != 0) {
-            struct stat buf;
-            char complete_file_name[MAXNAMLEN + 1];
+   else {
+      /* Get all the files in the directory: */
+      return_code = safe_list_files_in_directory(&file_list_length, file_list,
+                                                 directory,
+                                                 ".*", accept_all_file_names);
+      if (return_code == -1 || file_list_length == 0)
+         xv_set(menu, MENU_APPEND_ITEM,
+                xv_create(XV_NULL, MENUITEM,
+                          MENU_STRING,
+                          "* No file in this directory or cannot be open *",
+                          MENU_RELEASE,
+                          MENU_INACTIVE, TRUE,
+                          NULL),
+                NULL);
+      else if (file_list_length > WPIPS_MAX_DIRECTORY_MENU_SIZE) {
+         xv_set(menu, MENU_APPEND_ITEM,
+                xv_create(XV_NULL, MENUITEM,
+                          MENU_STRING,
+                          "* Too many files. Type directly in the Directory line of the main panel *",
+                          MENU_RELEASE,
+                          MENU_INACTIVE, TRUE,
+                          NULL),
+                NULL);
+         user_warning("generate_a_directory_menu",
+                      "Too many files in the \"%s\" directory.\n", directory);
+      }
+      else
+         /* Generate a corresponding entry for each file: */
+         for(i = 0; i < file_list_length; i++)
+            /* Skip the "." directory: */
+            if (strcmp(file_list[i], ".") != 0) {
+               struct stat buf;
+               char complete_file_name[MAXNAMLEN + 1];
 
-            Menu_item menu_item =
-               xv_create(XV_NULL, MENUITEM,
-                         MENU_STRING, strdup(file_list[i]),
-                         MENU_RELEASE,
-                         /* The strdup'ed string will also be
-                            freed when the menu is discarded: */
-                         MENU_RELEASE_IMAGE,
-                         NULL);
-
-            (void) sprintf(complete_file_name, "%s/%s", directory, file_list[i]);
-            if (((stat(complete_file_name, &buf) == 0) 
-                 && (buf.st_mode & S_IFDIR))) {
-               /* Since a menu item cannot be selected as an item, add an
-                  plain item with the same name. Not beautyful
-                  hack... :-( */
-               xv_set(menu, MENU_APPEND_ITEM, menu_item, NULL);
-               /* Now recreate another item that will be the submenu: */
-               menu_item =
+               Menu_item menu_item =
                   xv_create(XV_NULL, MENUITEM,
                             MENU_STRING, strdup(file_list[i]),
                             MENU_RELEASE,
@@ -164,17 +163,34 @@ generate_a_directory_menu(char * directory)
                                freed when the menu is discarded: */
                             MENU_RELEASE_IMAGE,
                             NULL);
-               /* Put a right menu on each directory entry: */
-               xv_set(menu_item, MENU_GEN_PULLRIGHT, directory_gen_pullright, NULL);
-               debug(1, "generate_a_directory_menu", " menu_item = %#x (%s)\n",
-                     menu_item, file_list[i]);
-            }
-            else
-               /* And disable non-subdirectory entry: */
-               xv_set(menu_item, MENU_INACTIVE, TRUE, NULL);
+
+               (void) sprintf(complete_file_name, "%s/%s", directory, file_list[i]);
+               if (((stat(complete_file_name, &buf) == 0) 
+                    && (buf.st_mode & S_IFDIR))) {
+                  /* Since a menu item cannot be selected as an item, add an
+                     plain item with the same name. Not beautyful
+                     hack... :-( */
+                  xv_set(menu, MENU_APPEND_ITEM, menu_item, NULL);
+                  /* Now recreate another item that will be the submenu: */
+                  menu_item =
+                     xv_create(XV_NULL, MENUITEM,
+                               MENU_STRING, strdup(file_list[i]),
+                               MENU_RELEASE,
+                               /* The strdup'ed string will also be
+                                  freed when the menu is discarded: */
+                               MENU_RELEASE_IMAGE,
+                               NULL);
+                  /* Put a right menu on each directory entry: */
+                  xv_set(menu_item, MENU_GEN_PULLRIGHT, directory_gen_pullright, NULL);
+                  debug(2, "generate_a_directory_menu", " menu_item = %#x (%s)\n",
+                        menu_item, file_list[i]);
+               }
+               else
+                  /* And disable non-subdirectory entry: */
+                  xv_set(menu_item, MENU_INACTIVE, TRUE, NULL);
          
-            xv_set(menu, MENU_APPEND_ITEM, menu_item, NULL);    
-         }
-      
+               xv_set(menu, MENU_APPEND_ITEM, menu_item, NULL);    
+            }
+   }
    return menu;
 }
