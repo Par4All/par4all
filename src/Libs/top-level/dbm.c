@@ -170,16 +170,16 @@ bool close_workspace()
 
 bool delete_workspace(string wname)
 {
-    int success;
+    int failure;
     
     /* FI: No check whatsoever about the current workspace, no information
        about deleting the non-current workspace vs deleting the current
        workspace... */
 
-    if ((success=safe_system_no_abort (concatenate("Delete ", wname, NULL)))) {
+    if ((failure=safe_system_no_abort (concatenate("Delete ", wname, NULL)))) {
 	user_warning("delete_workspace",
-		     "exit code for Delete is %d\n", success);
+		     "exit code for Delete is %d\n", failure);
     }
 
-    return !success;
+    return !failure;
 }
