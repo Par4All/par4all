@@ -71,9 +71,9 @@ typedef float Value;
 #define VALUE_CONST(val) (val)
 #define VALUE_MIN FLOAT_MIN
 #define VALUE_MAX FLOAT_MAX
-#define VALUE_ZERO 0
-#define VALUE_ONE  1
-#define VALUE_MONE -1
+#define VALUE_ZERO 0.0
+#define VALUE_ONE  1.0
+#define VALUE_MONE -1.0
 #define VALUE_TO_LONG(val) ((long)val)
 #define VALUE_TO_INT(val) ((int)val)
 #define VALUE_TO_FLOAT(val) ((float)val)
@@ -83,18 +83,19 @@ typedef float Value;
 /* the purpose of the chars version is to detect invalid assignments
  */
 #elif defined(LINEAR_VALUE_IS_CHARS)
-typedef char * Value;
+typedef union _u_Value Value;
+union _u_Value { char *s; long l; int i; float f; double d;};
 #define VALUE_FMT "%s"
-#define VALUE_CONST(val) ((char*)val)
-#define VALUE_MIN (char*)INT_MIN
-#define VALUE_MAX (char*)INT_MAX
-#define VALUE_ZERO (char*)0
-#define VALUE_ONE  (char*)1
-#define VALUE_MONE (char*)-1
-#define VALUE_TO_LONG(val) ((long)val)
-#define VALUE_TO_INT(val) ((int)val)
-#define VALUE_TO_FLOAT(val) ((float)(int)val)
-#define VALUE_TO_DOUBLE(val) ((double)(int)val)
+#define VALUE_CONST(val) ((Value)val)
+#define VALUE_MIN ((Value)0xdeadbeef)
+#define VALUE_MAX ((Value)0xfeedabee)
+#define VALUE_ZERO ((Value)0)
+#define VALUE_ONE  ((Value)1)
+#define VALUE_MONE ((Value)-1)
+#define VALUE_TO_LONG(val) (val.l)
+#define VALUE_TO_INT(val) (val.i)
+#define VALUE_TO_FLOAT(val) (val.f)
+#define VALUE_TO_DOUBLE(val) (val.d)
 /* end LINEAR_VALUE_IS_CHARS
  */
 #else /* default: LINEAR_VALUE_IS_INT */
@@ -188,12 +189,12 @@ typedef int Value;
  * they are switched to some other operation here...
  */
 #if defined(LINEAR_VALUE_IS_CHARS)
+#define value_fake_binary(v1,v2) ((Value)(v1.i+v2.i))
+#define value_bool_binary(v1,v2) (v1.i+v2.i)
 #undef float_to_value
-#define float_to_value(f) ((Value)(int)f)
+#define float_to_value(f) ((Value)f)
 #undef double_to_value
-#define double_to_value(f) ((Value)(int)f)
-#define value_fake_binary(v1,v2) ((char*)((int)(v1)^(int)(v2)))
-#define value_bool_binary(v1,v2) (((int)(v1)^(int)(v2)))
+#define double_to_value(f) ((Value)f)
 #undef value_uminus
 #define value_uminus(v) (v)
 #undef value_mult
@@ -208,6 +209,10 @@ typedef int Value;
 #define value_le(v1,v2) value_bool_binary(v1,v2)
 #undef value_lt
 #define value_lt(v1,v2) value_bool_binary(v1,v2)
+#undef value_ne
+#define value_ne(v1,v2) value_bool_binary(v1,v2)
+#undef value_eq
+#define value_eq(v1,v2) value_bool_binary(v1,v2)
 #undef value_plus
 #define value_plus(v1,v2) value_fake_binary(v1,v2)
 #undef value_minus
