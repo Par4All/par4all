@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/09/12 21:42:24 $, )
+ * ($Date: 1995/09/14 21:11:00 $, )
  */
 
 #include "defines-local.h"
@@ -74,7 +74,7 @@ void add_a_dynamic(entity c)
 /*  the local stack is used to retrieve the current statement while 
  *  scanning the AST with gen_recurse.
  */
-DEFINE_LOCAL_STACK(current_stmt, statement);
+DEFINE_LOCAL_STACK(current_stmt, statement)
 
 /* recognize an hpf directive special entity.
  * (the prefix of which is HPF_PREFIX, as a convention)
