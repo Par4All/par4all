@@ -3,7 +3,8 @@
 #
 
 SCRIPTS= 	build_tpips_lex \
-		build_completion_lists
+		build_completion_lists \
+		logfile_to_tpips
 
 # that is all
 #
