@@ -120,7 +120,7 @@ rule ru;
 
     for (pbm = builder_maps; pbm->builder_name != NULL; pbm++) {
 	if (same_string_p(pbm->builder_name, run)) {
-	    bool status;
+	    bool success_p = TRUE;
 
 	    if (check_res_use_p)
 		init_resource_usage_check();
@@ -128,7 +128,7 @@ rule ru;
 	    if (print_timing_p)
 		init_log_timers();
 
-	    status = catch_user_error(pbm->builder_func, oname);
+	    success_p = catch_user_error(pbm->builder_func, oname);
 	       
 
 	    if (print_timing_p) {
@@ -155,7 +155,7 @@ rule ru;
 	    if (interrupt_pipsmake_asap_p())
 		return FALSE;
 
-	    return status;
+	    return success_p;
 	}
     }
 
@@ -185,7 +185,7 @@ void reset_make_cache()
 static bool make(rname, oname)
 string rname, oname;
 {
-    bool status;
+    bool success_p = TRUE;
 
     debug_on("PIPSMAKE_DEBUG_LEVEL");
     debug(1, "make", "%s(%s) - requested\n", rname, oname);
@@ -196,7 +196,7 @@ string rname, oname;
 
     dont_interrupt_pipsmake_asap();
 
-    status = rmake(rname, oname);
+    success_p = rmake(rname, oname);
 
     /*
        if ( signal_occured() ) {
@@ -209,13 +209,13 @@ string rname, oname;
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
 
-    if (status)
+    if (success_p)
 	debug(1, "make", "%s(%s) - made\n", rname, oname);
     else
 	debug(1, "make", "%s(%s) - could not be made\n", rname, oname);
     debug_off();
 
-    return status;
+    return success_p;
 }
 
 static bool rmake(rname, oname)
@@ -294,7 +294,7 @@ string rname, oname;
 static bool apply(pname, oname)
 string pname, oname;
 {
-    bool status;
+    bool success_p = TRUE;
 
     debug_on("PIPSMAKE_DEBUG_LEVEL");
     debug(1, "apply", "%s.%s - requested\n", oname, pname);
@@ -305,7 +305,7 @@ string pname, oname;
 
     dont_interrupt_pipsmake_asap();
 
-    status = apply_without_reseting_up_to_date_resources (pname,oname);
+    success_p = apply_without_reseting_up_to_date_resources (pname,oname);
 
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
@@ -313,7 +313,7 @@ string pname, oname;
     debug(1, "apply", "%s.%s - done", oname, pname);
     debug_off();
 
-    return status;
+    return success_p;
 }
 
 static bool apply_without_reseting_up_to_date_resources(pname, oname)
@@ -500,10 +500,12 @@ list lvr;
 	    callees caller_modules;
 	    list lcallers;
 
-	    if (!rmake(DBR_CALLERS, oname))
-		pips_error ("build_real_resources",
-			    "unable to build callers for %s\n",
+	    if (!rmake(DBR_CALLERS, oname)) {
+		user_error ("build_real_resources",
+			    "unable to build callers for %s\n"
+			    "Any missing source code?\n",
 			    oname);
+	    }
 
 	    caller_modules = (callees) 
 		db_get_memory_resource(DBR_CALLERS, oname, TRUE);
@@ -563,7 +565,7 @@ rule ru;
 string oname;
 {
     list reals;
-    bool status = TRUE;
+    bool success_p = TRUE;
 
     /* we select some resources */
     MAPL(pvr, {
@@ -578,14 +580,14 @@ string oname;
 		  vrn);
 	    
 	    if (activate (vrn) == NULL) {
-		status = FALSE;
+		success_p = FALSE;
 		break;
 	    }
 	}
     }, rule_pre_transformation(ru));
     
     
-    if (status) {
+    if (success_p) {
 	/* we build the list of pre transformation real_resources */
 	reals = build_real_resources(oname, rule_pre_transformation(ru));
 	
@@ -604,7 +606,7 @@ string oname;
 		  rron);
 	    
 	    if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
-		status = FALSE;
+		success_p = FALSE;
 	    
 	}, reals);
     }
@@ -617,7 +619,7 @@ rule ru;
 string oname;
 {
     list reals;
-    bool status = TRUE;
+    bool success_p = TRUE;
 
     /* we build the list of required real_resources */
     reals = build_real_resources(oname, rule_required(ru));
@@ -635,7 +637,7 @@ string oname;
 	      rron);
 	
 	if (!rmake(rrrn, rron)) {
-	    status = FALSE;
+	    success_p = FALSE;
 	    /* Want to free the list ... */
 	    break;
 	}
@@ -648,7 +650,7 @@ string oname;
     }, reals);
 
     gen_free_list (reals);
-    return status;
+    return success_p;
 }
 
 static void update_preserved_resources(oname, ru)
@@ -863,7 +865,7 @@ string get_first_main_module()
     static char name[MAX__LENGTH];
     char tmpfile[MAX__LENGTH];
     FILE *ftmp;
-    int status;
+    int success_p;
 
     extern int system(char*);
     extern int unlink(char*);
@@ -886,11 +888,11 @@ string get_first_main_module()
 
     if ((ftmp = fopen (tmpfile,"r")) != NULL)
     {
-	status = fscanf (ftmp,"%s\n", name);
+	success_p = fscanf (ftmp,"%s\n", name);
 	strupper(name,name);
 	fclose (ftmp);
 	unlink (tmpfile);
-	if (status != 1)	/* bad item has been read */
+	if (success_p != 1)	/* bad item has been read */
 	    *name = '\0';
     }
 
