@@ -1,7 +1,12 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/04/12 15:49:30 $, )
+ * This file provides functions used by directives.c to deal with 
+ * dynamic mappings (re*). It includes keeping track of variables 
+ * tagged as dynamic, and managing the static synonyms introduced
+ * to deal with them in HPFC.
+ *
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/04/14 15:55:16 $, )
  * version $Revision$
  */
 
@@ -41,6 +46,11 @@ entity e;
     /* else the entity was already declared as dynamic */
 }
 
+/*  as expected, TRUE if entity e is dynamic. 
+ *  it is just a function name nicer than bound_...
+ */
+bool (*dynamic_entity_p)(entity) = bound_dynamic_hpf_p;
+
 /* what: new_e is stored as a synonym of e.
  */
 static void add_dynamic_synonym(new_e, e)
@@ -58,14 +68,6 @@ entity new_e, e;
     store_primary_entity(new_e, load_primary_entity(e));
 }
 
-/*  as expected, TRUE if entity e is dynamic. 
- */
-bool dynamic_entity_p(e)
-entity e;
-{
-    return(bound_dynamic_hpf_p(e));
-}
-
 /*------------------------------------------------------------------
  *
  *   NEW ENTITIES FOR MANAGING DYNAMIC ARRAYS
@@ -79,7 +81,7 @@ entity e;
 static entity new_synonym(e)
 entity e;
 {
-    int n = gen_length(entities_list(load_dynamic_hpf(e))); /* number */
+    int n = gen_length(entities_list(load_dynamic_hpf(e))); /* syn. number */
     entity primary = load_primary_entity(e), new_e;
     string module = entity_module_name(e);
     char new_name[100];	
@@ -89,6 +91,8 @@ entity e;
     debug(5, "new_synonym", "building entity %s\n", new_name);
 
     new_e = FindOrCreateEntityLikeModel(module, new_name, primary);
+    AddEntityToDeclarations(new_e, get_current_module_entity());
+
     add_dynamic_synonym(new_e, e);
     return(new_e);
 }
@@ -119,7 +123,7 @@ distribute di;
     return(new_t);
 }
 
-/*  as expected, TRUE if d1 and d2 describe the same mapping
+/*  comparison of DISTRIBUTE.
  */
 static bool same_distribute_p(d1, d2)
 distribute d1, d2;
@@ -128,12 +132,45 @@ distribute d1, d2;
     return(TRUE);
 }
 
-/* idem for align
+/*  comparison of ALIGN.
  */
+static bool same_alignment_in_list_p(a, l)
+alignment a;
+list /* of alignments */ l;
+{
+    int adim = alignment_arraydim(a),
+        tdim = alignment_templatedim(a);
+
+    MAPL(ca,
+     {
+	 alignment b = ALIGNMENT(CAR(ca));
+	 
+	 if (adim==alignment_arraydim(b) && tdim==alignment_templatedim(b))
+	     return(expression_equal_p(alignment_rate(a), 
+				       alignment_rate(b)) &&
+		    expression_equal_p(alignment_constant(a), 
+				       alignment_constant(b)));
+     },
+	 l);
+
+    return(FALSE);
+}
+
 static bool same_align_p(a1, a2)
 align a1, a2;
 {
-    pips_error("same_align_p", "not implemented yet");
+    list /* of alignments */ l1 = align_alignment(a1),
+                             l2 = align_alignment(a2);
+
+    if (align_template(a1)!=align_template(a2)) return(FALSE);
+
+    MAPL(ca,
+     {
+	 if (!same_alignment_in_list_p(ALIGNMENT(CAR(ca)), l2))
+	     return(FALSE);
+     },
+	 l1);
+
     return(TRUE);
 }
 
@@ -206,6 +243,173 @@ distribute d;
     /*  else no compatible template does exist, so one must be created
      */
     return(new_synonym_template(temp, d));
+}
+
+/* void propagate_array_synonym(s, old, new)
+ * statement s;
+ * entity old, new;
+ *
+ * what: propagates a new array synonym (old->new) from statement s.
+ * how: travels thru the control graph till the next remapping.
+ * input: the starting statement, plus the two entities.
+ * output: none.
+ * side effects:
+ *  - uses the crtl_graph travelling.
+ *  - set some static variables for the continuation decisions and switch.
+ * bugs or features:
+ *  - not very efficient. Could have done something to deal with 
+ *    several synonyms at the same time...
+ *  - what is done on an "incorrect" code is not clear.
+ */
+
+static entity 
+    old_variable = entity_undefined,
+    new_variable = entity_undefined;
+
+static void ref_rwt(r)
+reference r;
+{
+    if (reference_variable(r)==old_variable)
+	reference_variable(r) = new_variable;
+}
+
+static void simple_switch_old_to_new(s)
+statement s;
+{
+    gen_multi_recurse
+	(statement_instruction(s),
+	 statement_domain,    gen_false, gen_null, /* STATEMENT */
+	 unstructured_domain, gen_false, gen_null, /* UNSTRUCTURED ? */
+	 reference_domain,    gen_true,  ref_rwt,  /* REFERENCE */
+	 NULL);
+}
+
+/*  TRUE if not a remapping for old. 
+ *  if it is a remapping, operates the switch.
+ *  ??? just check for realign right now.
+ */
+static bool continue_propagation_p(s)
+statement s;
+{
+    instruction i = statement_instruction(s);
+
+    if (!instruction_call_p(i)) 
+	return(TRUE);
+    else
+    {
+	call c = instruction_call(i);
+	entity fun = call_function(c);
+
+	if (realign_directive_p(fun))
+	{
+	    MAPL(ce,
+	     {
+		 reference r = expression_to_reference(EXPRESSION(CAR(ce)));
+
+		 if (reference_variable(r)==old_variable)
+		 {
+		     reference_variable(r) = new_variable;
+		     return(FALSE);
+		 }
+	     },
+		 call_arguments(c));
+	}
+
+	return(TRUE);
+    }
+}
+
+void propagate_array_synonym(s, old, new)
+statement s;
+entity old, new;
+{
+    statement current;
+
+    debug(3, "propagate_array_synonym", "%s -> %s from statement 0x%x\n",
+	  entity_name(old), entity_name(new), (unsigned int) s);
+
+    old_variable = old, new_variable = new;
+    init_ctrl_graph_travel(s, continue_propagation_p);
+
+    while (next_ctrl_graph_travel(&current))
+	simple_switch_old_to_new(current);
+
+    old_variable = entity_undefined, new_variable = entity_undefined;
+    close_ctrl_graph_travel();
+}
+
+/* statement generate_copy_loop_nest(src, trg)
+ * entity src, trg;
+ *
+ * what: generates a parallel loop nest that copies src in trg.
+ * how: by building the corresponding AST.
+ * input: the two entities, which should be arrays with the same shape.
+ * output: a statement containing the loop nest.
+ * side effects:
+ *  - adds a few new variables for the loop indexes.
+ * bugs or features:
+ *  - could be more general?
+ */
+statement generate_copy_loop_nest(src, trg)
+entity src, trg;
+{
+    type t = entity_type(src);
+    list /* of entities */    indexes = NIL,
+         /* of expressions */ idx_expr,
+         /* of dimensions */  dims;
+    statement current;
+    int ndims, i;
+
+    assert(array_distributed_p(src) &&
+	   array_distributed_p(trg) &&
+	   type_variable_p(t) &&
+	   load_primary_entity(src)==load_primary_entity(trg)); /* ??? */
+
+    dims = variable_dimensions(type_variable(t));
+    ndims = gen_length(dims);
+    
+    /*  builds the set of indexes needed to scan the dimensions.
+     */
+    for(i=ndims; i>0; i--)
+	indexes = 
+	    CONS(ENTITY, 
+		 hpfc_new_variable(get_current_module_entity(), is_basic_int),
+		 indexes);
+
+    idx_expr = entity_list_to_expression_list(indexes);
+
+    /*  builds the assign statement to put in the body.
+     *  TRG(indexes) = SRC(indexes)
+     */
+    current = make_assign_statement
+	(reference_to_expression(make_reference(trg, idx_expr)),
+	 reference_to_expression(make_reference(src, gen_copy_seq(idx_expr))));
+
+    /*  builds the loop nest
+     */
+    for(; ndims>0; POP(dims), POP(indexes), ndims--)
+    {
+	dimension d = DIMENSION(CAR(dims));
+	
+	current = loop_to_statement
+	    (make_loop(ENTITY(CAR(indexes)),
+		       make_range(copy_expression(dimension_lower(d)),
+				  copy_expression(dimension_upper(d)),
+				  int_to_expression(1)),
+		       current,
+		       entity_empty_label(),
+		       make_execution(is_execution_parallel, UU),
+		       NIL));
+    }
+
+    ifdebug(7)
+    {
+	fprintf(stderr, "[generate_copy_loop_nest] %s to %s\n",
+		entity_name(src), entity_name(trg));
+	print_statement(current);
+    }
+
+    return(current);
 }
 
 /* that is all
