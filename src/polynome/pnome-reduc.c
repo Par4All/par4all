@@ -220,8 +220,8 @@ Ppolynome pp1,pp2;
     Ppolynome ppcopy1 = polynome_dup(pp1);
     Ppolynome ppcopy2 = polynome_dup(pp2);
 
-    polynome_sort(&ppcopy1, default_is_inferior_var);
-    polynome_sort(&ppcopy2, default_is_inferior_var);
+    polynome_sort(&ppcopy1, default_is_inferior_pvarval);
+    polynome_sort(&ppcopy2, default_is_inferior_pvarval);
     
 
     /* TO BE CONTINUED */
