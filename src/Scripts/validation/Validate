@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/02/07 13:59:24 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/02/11 17:25:29 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -152,8 +152,11 @@ prefix_file_exists()
 # returns one arg chosen randomly
 randomize()
 {
-    random -e $#
-    shift $?
+    if type random > /dev/null 2>&1 
+    then
+	random -e $#
+	shift $?
+    fi
     echo $1
 }
 
