@@ -2,27 +2,28 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1996/08/30 15:24:11 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1996/08/31 17:35:55 $, )
 # version $Revision$
 #
 
 # defaults
 
-SCRIPT=`basename $0`
+unset tdir srcdir basedir reffiles toinstall tomake unsplit
 
-unset DIRECTORY SRCDIR BASEDIR REFFILE TOINSTALL TOMAKE ORIGIN
+verb=':'
+debug=':'
+srcdir=${HPFC_RUNTIME:-$PIPS_ROOT/Runtime/hpfc}
+MAKE=${HPFC_MAKE:-${PIPS_MAKE:-gmake}}
+M4=${HPFC_M4:-m4}
 
-VERBOSE=':'
-DEBUG=':'
-SRCDIR=${HPFC_RUNTIME:-$PIPS_ROOT/Runtime/hpfc}
-MAKE='gmake'
-M4='m4'
+verbose()
+{ echo "[$RCSfile: hpfc_install,v $]:" "$@" >&2;}
 
 #
 
 if [ -f "${PIPS_CURRENT_PROGRAM:-.pipsprogram}" ] 
 then
-  BASEDIR="$PWD/`sed -n 's,^PGM=\(.*\)\$,\1,p' .pipsprogram`.database"
+  basedir="$PWD/`sed -n 's,^PGM=\(.*\)\$,\1,p' .pipsprogram`.database"
 fi
 
 # get options
@@ -30,7 +31,7 @@ fi
 usage()
 {
   cat <<-EOF
-	Usage: $SCRIPT [options]
+	Usage: $RCSfile: hpfc_install,v $ [options]
 	   version $Revision$
 	   -h: help
 	   -i: install
@@ -52,83 +53,90 @@ while getopts himvdqot:s:b:f:n: OPT
 do
   case $OPT in
     h) usage 0 ;;
-    i) TOINSTALL=1 ;;
-    m) TOMAKE=1 ;;
-    v) VERBOSE='echo' ;;
-    d) DEBUG='echo' ;;
-    q) VERBOSE=':' ;;
-    o) ORIGIN=':' ;;
-    t) DIRECTORY="$OPTARG" ;;
-    s) SRCDIR="$OPTARG" ;;
-    b) BASEDIR="$OPTARG" ;;
-    f) REFFILE="$REFFILE $OPTARG" ;;
-    n) NAME="$OPTARG" ;;
+    i) toinstall=1 ;;
+    m) tomake=1 ;;
+    v) verb='verbose' ;;
+    d) debug='verbose' ;;
+    q) verb=':' ;;
+    o) unsplit=':' ;;
+    t) tdir="$OPTARG" ;;
+    s) srcdir="$OPTARG" ;;
+    b) basedir="$OPTARG" ;;
+    f) reffiles="$reffiles $OPTARG" ;;
+    n) name="$OPTARG" ;;
     *) usage
   esac
 done
 
+$debug "args:" "$@"
 shift `expr $OPTIND - 1`
 
 #
-$DEBUG checking
+$debug checking
 
 [ "$#" -eq 0 ] || usage
-[ "$BASEDIR" ] || usage
+[ "$basedir" ] || usage
 
-NAME=`echo ${NAME:-\`basename $BASEDIR .database\`} | tr 'A-Z' 'a-z'`
+name=`echo ${name:-\`basename $basedir .database\`} | tr 'A-Z' 'a-z'`
 
-[ "$DIRECTORY" ] ||
+[ "$tdir" ] ||
 {
-  DIRECTORY=$BASEDIR/hpfc
-  [ ! -d "$DIRECTORY" ] && mkdir $DIRECTORY
+  tdir=$basedir/hpfc
+  [ ! -d "$tdir" ] && mkdir $tdir
 }
 
 #
-$DEBUG installating
+$debug installating
 
-if [ "$TOINSTALL" ]
+if [ "$toinstall" ]
 then
-  $VERBOSE "installing in $DIRECTORY"
+  $verb "installing in $tdir"
 
-  $VERBOSE "cleaning $DIRECTORY"
-  rm -f $DIRECTORY/*
+  $verb "cleaning $tdir"
+  rm -f $tdir/*
   
-  touch $BASEDIR/_host.h $BASEDIR/_node.h
+  # if there is no common...
+  touch $basedir/_host.h $basedir/_node.h
 
-  $VERBOSE "copying files in $DIRECTORY"
+  $verb "copying files in $tdir"
 
   {
-    echo "TARGET = $NAME" 
-    cat $SRCDIR/hpfc_Makefile_init 
-  } > $DIRECTORY/Makefile
+    echo "TARGET = $name" 
+    cat $srcdir/hpfc_Makefile_init 
+  } > $tdir/Makefile
 
-  cp $SRCDIR/hpfc_check.f \
-     $SRCDIR/hpfc_*.h \
-     $SRCDIR/hpfc_architecture_m4_macros \
-     $BASEDIR/*_host.f \
-     $BASEDIR/*_host.h \
-     $BASEDIR/*_node.f \
-     $BASEDIR/*_node.h \
-     $BASEDIR/*_parameters.h \
-     $BASEDIR/*_init.h \
-     $DIRECTORY
+  cp $srcdir/hpfc_check.f \
+     $srcdir/hpfc_*.h \
+     $srcdir/hpfc_architecture_m4_macros \
+     $basedir/*_host.f \
+     $basedir/*_host.h \
+     $basedir/*_node.f \
+     $basedir/*_node.h \
+     $basedir/*_parameters.h \
+     $basedir/*_init.h \
+     $tdir
 
-  $DEBUG "$REFFILE"
-  [ "$ORIGIN" ] && cat $BASEDIR/[a-z]*.f > $DIRECTORY/$NAME.f
-  [ "$REFFILE" ] && cat `echo "$REFFILE" | cut -d " " -f 2` > $DIRECTORY/$NAME.f
+  [ "$unsplit" ] && set $basedir/[a-z]*.f 
+  [ "$reffiles" ] && set `echo "$reffiles" | cut -d " " -f 2`
 
-  chmod ug+w $DIRECTORY/*
+  $debug rebuilding initial source file
+  for f 
+  do
+     $debug "considering $f"
+     [ "`grep '^[!cC\*][Ff][Cc][Dd]\$[ 	]*[Ff][Aa][Kk][Ee][ 	]*$' $f`" ] ||
+	cat $f
+  done > $tdir/$name.f
 
-  touch $DIRECTORY/hpfc_Makefile
+  chmod ug+w $tdir/*
 fi
 
 #
-$DEBUG making
+$debug making
 
-if [ "$TOMAKE" ] 
+if [ "$tomake" ] 
 then
-  $VERBOSE "making"
-  cd $DIRECTORY
+  $verb "making"
+  cd $tdir
   $MAKE Makefile
   $MAKE all
 fi
