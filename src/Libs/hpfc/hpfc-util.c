@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/09/01 15:47:43 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/09/03 15:19:35 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -186,20 +186,20 @@ int i, *pprocdim;
  * label, and so on. The goto table is updated. The instruction
  * is also created. (is that really a good idea?)
  */
-statement MakeStatementLike(stat,the_tag,gotos)
+statement MakeStatementLike(stat, the_tag, gotos)
 statement stat;
 int the_tag;
 statement_mapping gotos;
 {
-    statement newstat=make_statement(statement_label(stat),
-				     STATEMENT_NUMBER_UNDEFINED,
-				     STATEMENT_ORDERING_UNDEFINED,
-				     statement_comments(stat),     /* sharing! */
-				     make_instruction(the_tag,
-						      NULL));
+    statement 
+	newstat =
+	    make_statement(statement_label(stat),
+			   STATEMENT_NUMBER_UNDEFINED,
+			   STATEMENT_ORDERING_UNDEFINED,
+			   statement_comments(stat),     /* sharing! */
+			   make_instruction(the_tag, chunk_undefined));
 
-    SET_STATEMENT_MAPPING(gotos,stat,newstat);
-
+    SET_STATEMENT_MAPPING(gotos, stat, newstat);
     return(newstat);
 }
 
