@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/12/08 13:04:45 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2002/06/27 14:52:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1998/12/08 13:04:45 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2002/06/27 14:52:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -26,6 +26,14 @@ char vcid_control_control[] = "%A% ($Date: 1998/12/08 13:04:45 $, ) version $Rev
    if HASH_UNDEFINED_VALUE can be user definable; Francois Irigoin, 7 Sept. 90
 
 */
+
+/*
+ * $Log: control.c,v $
+ * Revision 1.33  2002/06/27 14:52:00  irigoin
+ * Page breaks added.
+ *
+ *
+ */
 
 #include <stdio.h>
 #include <strings.h>
@@ -339,7 +347,7 @@ bool controlize(
     update_used_labels(used_labels, label, st);
     return(controlized);
 }
-
+
 /* CONTROLIZE_CALL controlizes the call C of statement ST in C_RES. The deal
    is to correctly manage STOP; since we don't know how to do it, so we
    assume this is a usual call !! */
@@ -624,7 +632,7 @@ hash_table used_labels;
     return(controlized);
 }
 
-
+
 /* COMPACT_LIST takes a list of controls CTLS coming from a
    CONTROLIZE_LIST and compacts the successive assignments,
    i.e. concatenates (i=1) followed by (j=2) in a single control with
@@ -811,7 +819,7 @@ hash_table used_labels;
     
     return(gen_nreverse(ctls));
 }
-
+
 /* CONTROLIZE_LIST computes in C_RES the control graph of the list
    STS (of statement ST) with PREDecessor and SUCCessor. We try to
    minize the number of graphs by looking for graphs with one node
@@ -928,7 +936,7 @@ hash_table used_labels;
     
     return(controlized);
 }
-	
+	
 /* CONTROL_TEST builds the control node of a statement ST in C_RES which is a 
    test T. */
 
@@ -1010,7 +1018,7 @@ hash_table used_labels;
     
     return(controlized);
 }
-
+
 /* INIT_LABEL puts the reference in the statement ST to the label NAME
    int the Label_statements table and allocate a slot in the Label_control
    table. */
@@ -1072,8 +1080,8 @@ statement st ;
 		gen_true,
 		create_statements_of_label);
 }
-		
-
+	
+
 /* SIMPLIFIED_UNSTRUCTURED tries to get rid of top-level and useless
    unstructure nodes.
 
@@ -1162,7 +1170,7 @@ simplified_unstructured(control top,
     return(u);
 }
 
-
+
 /* CONTROL_GRAPH returns the control graph of the statement ST. */
 
 unstructured control_graph(st) 
@@ -1185,7 +1193,7 @@ statement st;
        READ/WRITE with I/O exceptions (end=, etc), first remove
        useless blocks. RK */
     clean_up_sequences(st);
-    
+
     Label_statements = hash_table_make(hash_string, LABEL_TABLES_SIZE);
     Label_control = hash_table_make(hash_string, LABEL_TABLES_SIZE);
     create_statements_of_labels(st);
@@ -1197,7 +1205,7 @@ statement st;
     controlize(st, top, bottom, result, used_labels);
 
     if(!ENDP(Unreachable)) {
-	user_warning("control_graph", "Some statements are unreachable\n");
+	pips_user_warning("Some statements are unreachable\n");
 	ifdebug(2) {
 	    pips_debug(0, "Unreachable statements:\n");
 	    MAP(STATEMENT, s, {
