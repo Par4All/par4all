@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1995/10/03 15:25:18 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/02/15 14:18:02 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -393,7 +393,6 @@ Pbase base_index;
 		"[sc_triang_elim_redund] warning, %d inequalities\n",
 		ps->nb_ineq);
 
-  
     if (!sc_integer_feasibility_ofl_ctrl(ps, OFL_CTRL,TRUE))
     {
 	sc_rm(ps), ps=NULL;
@@ -408,13 +407,6 @@ Pbase base_index;
 					   compare_the_constraints, 
 					   info);
     reset_info_for_compare();
-
-/*
-    ps->inegalites = 
-	contrainte_sort_info_2levels(ps->inegalites, 
-			     ps->base, base_index,
-			     TRUE, TRUE, info);
-*/
 
     for (ineq = ps->inegalites; ineq != NULL; ineq = ineq1)
     {
