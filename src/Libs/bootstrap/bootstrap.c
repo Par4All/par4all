@@ -726,7 +726,8 @@ bool bootstrap(string workspace)
     /* FI: I guess no pointers to the resource is passed because it
        is a tabulated NewGen field. */
     /* FC: switched to string_undefined to avoid free coredump */
-    DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, "", string_undefined);
+    /* FI: explicit character string to be consistent with pipsdbm/disk.c */
+    DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, "", strdup(SYMBOL_TABLE_STUB));
 
     return TRUE;
 }
