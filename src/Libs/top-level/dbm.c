@@ -44,6 +44,10 @@ void open_module_if_unique()
     char *module_list[ARGS_LENGTH];
     int  module_list_length = 0;
 
+    /* First parse the makefile to avoid writing
+       an empty one */
+    parse_makefile();
+
     db_get_module_list(&module_list_length, module_list);
     if (module_list_length == 1) {
 	open_module(module_list[0]);
