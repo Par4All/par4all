@@ -1,44 +1,19 @@
 #
-# $RCSfile: makefile_macros.GNULL,v $ (version $Revision$)
-# $Date: 1996/09/19 11:51:51 $, 
+# $Id$
+# 
+# $Log: makefile_macros.GNULL,v $
+# Revision 1.23  1997/03/26 17:28:48  coelho
+# simplified.
+#
 #
 # this file contains macro definitions 
 
-# the GNU libc is *required* because "%lld" is not supported on sunos4
-GLIBC	= /usr5/gnu/SPARC/glibc
-GCCDIR	= $(GCC_EXEC_PREFIX)sparc-sun-sunos4.1.4/2.7.2.f.1
+include $(ROOT)/Include/makefile_macros.GNU
 
-AR	= gar
-ARFLAGS	= rv
-CC	= gcc
-CFLAGS	= -O2 -g -Wall -msupersparc -pipe
-CMKDEP	= -M
-CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -D__USE_FIXED_PROTOTYPES__ -nostdinc -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(PIPS_EXTEDIR) -I$(GLIBC)/include -I$(GCCDIR)/include -I/usr/include 
-LD	= $(CC) 
-LDFLAGS	= -g -nostdlib $(GLIBC)/lib/crt0.o -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(PIPS_EXTEDIR) -L$(GLIBC)/lib -L$(GCCDIR)/lib -L/usr/lib -lc -lgcc
-RANLIB	= granlib
-LEX	= flex
-LFLAGS	= 
-FC	= g77
-FFLAGS	= -O2 -g -Wimplicit -pipe
-LINT	= lint
-LINTFLAGS= -habxu
-YACC	= bison
-YFLAGS	= -y
-PROTO	= cproto
-PRFLAGS	= -evcf2
-ETAGS	= etags
-TAR	= gtar
-ZIP	= gzip -v9
-DIFF	= gdiff
-M4	= gm4
-M4FLAGS	=
-LX2HTML	= latex2html
-L2HFLAGS= -link 8 -split 5
-LATEX	= latex
-MAKEIDX	= makeindex
-DVIPS	= dvips
-RMAN	= rman
+CPPFLAGS+= \
+	-DLINEAR_VALUE_IS_LONGLONG \
+	-DLINEAR_VALUE_PROTECT_MULTIPLY \
+	-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV 
 
-# end of $RCSfile: makefile_macros.GNULL,v $
+# end of it!
 #
