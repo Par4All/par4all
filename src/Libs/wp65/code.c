@@ -110,7 +110,7 @@ void eval_variable_in_statement(entity module,statement s,Variable v,int min)
     var_minmax = min; 
     ifdebug(8) {
 	(void) fprintf(stderr, "Loop body :\n");
-	print_text(stderr, text_statement(module, 0, s));
+	wp65_debug_print_text(module, s);
     }
     gen_recurse(s,
 		reference_domain,
@@ -118,7 +118,7 @@ void eval_variable_in_statement(entity module,statement s,Variable v,int min)
 		eval_var);
     ifdebug(8) {
 	(void) fprintf(stderr, "New loop body :\n");
-	print_text(stderr, text_statement(module, 0, s));
+	wp65_debug_print_text(module, s);
     }
 
 }
@@ -190,21 +190,19 @@ Pbase tile_init_basis,tiling tile)
  *
  * Algorithm described in PPoPP'91
  */
-statement make_scanning_over_tiles(module, body, proc_id, pn,
-				   tile, initial_basis, 
-				   tile_basis_in_tile_basis,
-				   tile_basis_in_initial_basis,
-				   iteration_domain,first_parallel_level,last_parallel_level)
-entity module;
-list body;
-entity proc_id;
-int pn;
-tiling tile;
-Pbase initial_basis;
-Pbase tile_basis_in_tile_basis;
-Pbase tile_basis_in_initial_basis;
-Psysteme iteration_domain;
-int first_parallel_level,last_parallel_level;
+statement 
+make_scanning_over_tiles(
+    entity module,
+    list body,
+    entity proc_id,
+    int pn,
+    tiling tile,
+    Pbase initial_basis,
+    Pbase tile_basis_in_tile_basis,
+    Pbase tile_basis_in_initial_basis,
+    Psysteme iteration_domain,
+    int first_parallel_level,
+    int last_parallel_level)
 {
     statement s = statement_undefined;
     entity ind;
@@ -269,8 +267,9 @@ int first_parallel_level,last_parallel_level;
     }
 
     /* apply a row echelon transformation */
-    ordered_tile_domain = new_loop_bound(tile_domain, tile_basis_in_tile_basis);
-   sc_transform_eg_in_ineg(ordered_tile_domain);
+    ordered_tile_domain = 
+	new_loop_bound(tile_domain, tile_basis_in_tile_basis);
+    sc_transform_eg_in_ineg(ordered_tile_domain);
 
     ifdebug(8) {
 	(void) fprintf(stderr, "Ordered constraints on tile indices:\n");
@@ -282,6 +281,9 @@ int first_parallel_level,last_parallel_level;
     /* transform these constraints into a loop nest with the right body,
        starting with the innermost loop */
     s = make_block_statement(body);
+    
+    pips_debug(9, "body statement:");
+    ifdebug(9) wp65_debug_print_text(module, s);
 
     for(t = td; t >= 1; t--) { 
 	keep_indice[t]=TRUE;
@@ -301,11 +303,12 @@ int first_parallel_level,last_parallel_level;
     for (t=1;t<=td && keep_indice[t]== FALSE;t++);
     first_indice = (t==td+1) ? td:t;
     ifdebug(7) 
-    fprintf(stderr,"first tile index %d, %s\n",first_indice,
-	    entity_local_name((entity) variable_of_rank(tile_basis_in_tile_basis, 
-							t)));
+	fprintf(stderr,"first tile index %d, %s\n",first_indice,
+		entity_local_name
+		((entity) variable_of_rank(tile_basis_in_tile_basis, t)));
 
-    for(t = td; t >= 1; t--) {
+    for(t = td; t >= 1; t--)
+    {
 	expression lower;
 	expression upper;
 	range r;
@@ -329,7 +332,8 @@ int first_parallel_level,last_parallel_level;
 	    /* distribute work statically on processors using the outermost
 	       loop (assumed parallel!) if proc_id is properly defined;
 	       this should not be the case for bank tiles */
-	    if(t !=first_parallel_level || !storage_formal_p(entity_storage(proc_id))) 
+	    if(t !=first_parallel_level || 
+	       !storage_formal_p(entity_storage(proc_id))) 
 		r = make_range(lower, upper, int_to_expression(1));
 	    else {
 		normalized n = NORMALIZE_EXPRESSION(lower);
@@ -337,26 +341,30 @@ int first_parallel_level,last_parallel_level;
 		   && VECTEUR_NUL_P((Pvecteur) normalized_linear(n)))
 		    lower = entity_to_expression(proc_id);
 		else
-		    lower = MakeBinaryCall(
-					   local_name_to_top_level_entity(PLUS_OPERATOR_NAME), 
-					   lower,
-					   entity_to_expression(proc_id));
+		    lower = MakeBinaryCall
+			(local_name_to_top_level_entity(PLUS_OPERATOR_NAME), 
+			 lower,
+			 entity_to_expression(proc_id));
 		r = make_range(lower, upper, int_to_expression(pn));
 	    }
 
 	    /* I may need a definition for PROC_ID = MOD(I_0, PROCESSOR_NUMBER) */
-	    if(t==first_parallel_level && !storage_formal_p(entity_storage(proc_id))) {
-		ps = make_assign_statement(entity_to_expression(proc_id),
-					   MakeBinaryCall(local_name_to_top_level_entity(MOD_INTRINSIC_NAME),
-							  entity_to_expression(ind),
-							  int_to_expression(pn)));
+	    if(t==first_parallel_level && 
+	       !storage_formal_p(entity_storage(proc_id))) {
+		ps = make_assign_statement
+		    (entity_to_expression(proc_id),
+		     MakeBinaryCall
+		     (local_name_to_top_level_entity(MOD_INTRINSIC_NAME),
+		      entity_to_expression(ind),
+		      int_to_expression(pn)));
 	    }
 	    else ps = statement_undefined;
 	 
-    /* I need new labels and new continues for my loops!
+	    /* I need new labels and new continues for my loops!
 	       make_loop_label() needs (at least) a module name */
 	    new_label = make_loop_label(9000, module_local_name(module));
 	    cs = make_continue_statement(new_label);
+
 	    if(instruction_block_p(statement_instruction(s))) 
 		(void) gen_nconc(instruction_block(statement_instruction(s)),
 				 CONS(STATEMENT, cs, NIL));
@@ -378,20 +386,21 @@ int first_parallel_level,last_parallel_level;
 	    s = loop_to_statement(new_l);
 	}
     }
+
     statement_comments(s) = 
 	strdup(concatenate("\nC     To scan the tile set for ",
 			   module_local_name(module), "\n", NULL));
     
     ifdebug(8) {
 	(void) fprintf(stderr, "Loop nest over tiles:\n");
-	print_text(stderr, text_statement(module, 0, s));
+	wp65_debug_print_text(module, s);
     }
 
-    debug(8,"make_scanning_over_tiles", "end\n");
+    pips_debug(8,"end\n");
 
     return s;
 }
-
+
 /* make_scanning_over_one_tile():
  *
  * generates a nest of loops to enumerate all iterations contained in
@@ -624,7 +633,7 @@ int first_parallel_level,last_parallel_level;
 	strdup("C           To scan each iteration of the current tile\n");
     ifdebug(8) {
 	(void) fprintf(stderr, "Loop nest over tiles:\n");
-	print_text(stderr, text_statement(module, 0, s));
+	wp65_debug_print_text(module, s);
     }
 
     debug(8,"make_scanning_over_one_tile", "end\n");
@@ -666,7 +675,7 @@ int first_parallel_level,last_parallel_level;
 
     return CONS(STATEMENT, s, NIL);
 }
-
+
 /* void reference_conversion_statement(body, r_to_llv, offsets, initial_basis,
  * local_basis): 
  *
@@ -693,7 +702,7 @@ tiling tile;
 
     pips_debug(8, "begin statement: \n");
     ifdebug(8) {
-	print_text(stderr, text_statement(entity_undefined, 0, body));
+	wp65_debug_print_text(entity_undefined, body);
     }
 
     statement_number(body) = STATEMENT_NUMBER_UNDEFINED;
@@ -751,18 +760,22 @@ tiling tile;
 
     debug(8,"reference_conversion_statement", "return statement: \n");
     ifdebug(8) {
-	print_text(stderr, text_statement(entity_undefined, 0, body));
+	wp65_debug_print_text(entity_undefined, body);
     } 
     return(*lt);
 } 
 
 
-list reference_conversion_computation(entity compute_module,list *lt,expression expr,
-				      Pbase initial_basis,Pbase tile_indices,
-				      Pbase tile_local_indices,tiling tile )
+list reference_conversion_computation(
+    entity compute_module,
+    list *lt,
+    expression expr,
+    Pbase initial_basis,
+    Pbase tile_indices,
+    Pbase tile_local_indices,
+    tiling tile)
 {
     syntax s = expression_syntax(expr);
-
    
     switch(syntax_tag(s)) {
     case is_syntax_reference: {
@@ -1123,35 +1136,31 @@ static void initialize_offsets(list lt)
 }
 
 static void nullify_offsets()
-{
-offset_dim1=offset_dim2=0;
-}
-
-void make_store_blocks(initial_module,compute_module,memory_module,var,shared_variable,local_variable,lrefs,
-		       r_to_ud,sc_domain,index_base,bank_indices,tile_indices,loop_body_indices,
-		       Proc_id,pn,bn,ls,
-		       store_block,bank_store_block,first_parallel_level,last_parallel_level)
-entity initial_module;
-entity compute_module;
-entity memory_module;
-entity var;         /* entity  */
-entity shared_variable;      /* emulated shared variable for example ES_A */
-entity local_variable;       /* local variable for example L_A_1_1*/
-list lrefs;
-hash_table r_to_ud;
-Psysteme sc_domain;        /* domain of iteration */
-Pbase index_base;          /* index basis */
-Pbase bank_indices;        /* contains the index describing the bank:
+{ offset_dim1=offset_dim2=0;}
+
+void make_store_blocks(
+entity initial_module,
+entity compute_module,
+entity memory_module,
+entity var,         /* entity  */
+entity shared_variable,      /* emulated shared variable for example ES_A */
+entity local_variable,       /* local variable for example L_A_1_1*/
+list lrefs,
+hash_table r_to_ud,
+Psysteme sc_domain,        /* domain of iteration */
+Pbase index_base,          /* index basis */
+Pbase bank_indices,        /* contains the index describing the bank:
 			      bank_id, L (ligne of bank) and O (offset in 
 			      the ligne) */
-Pbase tile_indices;       /* contains the local indices  LI, LJ of  tile */
-Pbase loop_body_indices;
-entity Proc_id;              /* corresponds to a processeur identicator */
-int pn,bn,ls;                 /* bank number and line size (depends on the 
+Pbase tile_indices,         /* contains the local indices  LI, LJ of  tile */
+Pbase loop_body_indices,
+entity Proc_id,              /* corresponds to a processeur identicator */
+int pn, int bn, int ls,      /* bank number and line size (depends on the 
 			      machine) */
-statement * store_block;
-statement * bank_store_block;
-int first_parallel_level,last_parallel_level;
+statement * store_block,
+statement * bank_store_block,
+int first_parallel_level,
+int last_parallel_level)
 {
     list ldr;
     list lldr = NIL;
