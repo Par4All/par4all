@@ -3,6 +3,10 @@
  * $Id$
  *
  * $Log: interprocedural.c,v $
+ * Revision 1.31  1999/01/16 21:20:52  irigoin
+ * Bug fix in intra_to_inter_precondition(): even non-feasible system must be
+ * projected because of their possibly non-empty basis.
+ *
  * Revision 1.30  1999/01/15 08:59:08  irigoin
  * Bug fix in precondition_intra_to_inter(): a non feasible transformer must
  * be preserved even though the intersection of the effects of the called
@@ -496,7 +500,14 @@ cons * le;
      *
      */
     if(ENDP(preserved_values)) {
-	if(!transformer_empty_p(pre)) {
+	/* No information but feasibility can be preserved */
+	if(transformer_empty_p(pre)) {
+	    /* Get rid of the basis and arguments to define the empty set */
+	    free_transformer(pre);
+	    pre = transformer_empty();
+	}
+	else{
+	    /* No information: the all value space is OK */
 	    free_transformer(pre);
 	    pre = transformer_identity();
 	}
