@@ -2,11 +2,14 @@
  * and in the static area and in the dynamic area. The heap area is left
  * aside.
  *
- * 	%A% ($Date: 1998/10/13 20:17:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+ * 	%A% ($Date: 1998/10/14 06:47:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: equivalence.c,v $
+ * Revision 1.20  1998/10/14 06:47:12  irigoin
+ * Same bug again, a bit further down in ComputeAddresses()
+ *
  * Revision 1.19  1998/10/13 20:17:51  irigoin
  * Bug fix in ComputeAddress(): some order between DATA and COMMON
  * declarations in equivalence chains was assumed.
@@ -18,7 +21,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1998/10/13 20:17:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1998/10/14 06:47:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -515,7 +518,7 @@ ComputeAddresses()
 			    else if(ram_section(r) == StaticArea) {
 			      /* Same as above but in a different order */
 			      /* Let's hope this is due to a DATA and not to a SAVE */
-			      ram_section(r) == sc;
+			      ram_section(r) = sc;
 			    }
 			    else {
 				user_warning("ComputeAddresses",
@@ -561,7 +564,7 @@ ComputeAddresses()
 		    r = storage_ram(entity_storage(e));
 
 		    if (adr != ram_offset(r)) {
-			if(ram_offset(r)==UNKOWN_RAM_OFFSET && ram_section(r)==StaticArea) {
+			if(ram_offset(r)==UNKNOWN_RAM_OFFSET && ram_section(r)==StaticArea) {
 			    ram_offset(r) = adr;
 			    if(sc == StaticArea && pca != chain_atoms(c)) {
 				/* Static aliases cannot be added right away because
@@ -579,6 +582,9 @@ ComputeAddresses()
 				area_layout(a) = gen_nconc(area_layout(a),
 							   CONS(ENTITY, e, NIL));
 			    }
+			}
+			else if(ram_offset(r)==UNKNOWN_RAM_OFFSET) {
+			  ram_offset(r) = adr;
 			}
 			else {
 			    user_warning("ComputeAddresses",
@@ -666,7 +672,7 @@ ComputeAddresses()
 	}
 	else if(storage_ram_p(entity_storage(e))) {
 	    ram r = storage_ram(entity_storage(e));
-	    if(ram_offset(r)==UNKOWN_RAM_OFFSET) {
+	    if(ram_offset(r)==UNKNOWN_RAM_OFFSET) {
 		if(ram_section(r)==StaticArea) {
 		    /* area sa = type_area(entity_type(StaticArea)); */
 
