@@ -12,9 +12,9 @@
 
 \domain{import entity from "ri.newgen"}
 
-% These newgen data structures are used to tell whether a formal parameter
-% in a called procedure must be checked for used-before-set error or not.  
+% These newgen data structures are used to tell whether a variable (formal parameter
+% or common variable) in a called procedure must be checked for used-before-set error or not.  
  
-\domain{ubs\_formal\_parameter = module:entity x offset:int}
-\domain{ubs = list:ubs\_formal\_parameter*}
+\domain{ubs\_module\_variable = module:entity x variable:entity}
+\domain{ubs = list:ubs\_module\_variable*}
 \end{document}
