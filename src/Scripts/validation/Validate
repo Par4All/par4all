@@ -20,23 +20,23 @@ export PIPS_VALIDDIR
 # sh and pwd are not very clever:-)
 # this results in much troubles thru rsh...
 
-if [ "$PIPS_HOME" ] 
+if [ "$pips_home" ] 
 then
   # this is for cri...
-  REAL_PIPSHOME=`(cd $PIPS_HOME/../pips;pwd)`
+  REAL_PIPSHOME=`(cd $pips_home/../pips;pwd)`
 else
   REAL_PIPSHOME=
 fi
 
-# echo "--$REAL_PIPSHOME--$PIPS_HOME--"
+# echo "--$REAL_PIPSHOME--$pips_home--"
 
 #
 # to avoid nfs problems
 #
 absolute_name()
 {
-  echo $1 | sed "s,^${REAL_PIPSHOME},${PIPS_HOME},;
-                 s,^${PIPS_HOME}/Pips/Production,${PIPS_ROOT},"
+  echo $1 | sed "s,^${REAL_PIPSHOME},${pips_home},;
+                 s,^${pips_home}/Pips/Production,${PIPS_ROOT},"
 }
 
 ping=${PIPS_PING:-ping}
