@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.31  1999/05/28 12:04:43  coelho
+ * nary pattern simplifies added.
+ *
  * Revision 1.30  1999/05/27 14:56:21  ancourt
  * fma moved after icm association/atomization.
  *
@@ -118,9 +121,8 @@
 
 #define DEBUG_NAME "TRANSFORMATION_OPTIMIZE_EXPRESSIONS_DEBUG_LEVEL"
 
-
-extern void 
-icm_cse_on_sequence(string, statement);
+extern void module_reorder(statement);
+extern void perform_icm_association(string, statement);
 
 /****************************************************************** STRATEGY */
 
@@ -136,20 +138,24 @@ typedef struct
   double (*huffman_cost)(expression);
   bool huffman_mode;
   
-  /* EOLE.
+  /* EOLE. 2 passes.
    */
-  bool apply_eole;
-  bool apply_eole2;
   string eole_strategy;
+
+  bool apply_eole1;
+  string apply_eole1_flags; /* not used yet */
+
+  bool apply_eole2;
+  string apply_eole2_flags;
 
   /* SIMPLIFY.
    */
+  bool apply_nary_simplify;
   bool apply_simplify;
 
   /* GCM CSE 
    */
   bool apply_gcm_cse;
-
 
 } optimization_strategy, *poptimization_strategy;
 
@@ -540,11 +546,6 @@ static void generate_bminus(statement s)
   bminus = NULL;
 }
 
-static void generate_bdivision(statement s)
-{
-  /* not implemeted yet. */
-}
-
 /* look for some expressions in s and simplify some patterns.
  */
 static void optimize_simplify_patterns(statement s)
@@ -557,10 +558,96 @@ static void optimize_simplify_patterns(statement s)
 
   /* a * (1/ b)     -> a / b */
   /* (1/ b) * a     -> a / b */
-  generate_bdivision(s);
-
   /* a + (-b * c)   -> a - (b * c) */
+}
+
+
+/************************************************************ N-ARY SIMPLIFY */
+
+static entity
+  multiply = NULL,
+  inverse = NULL,
+  divide = NULL;
+
+static bool is_inverse(expression e)
+{
+  syntax s = expression_syntax(e);
+  if (!syntax_call_p(s)) return FALSE;
+  return call_function(syntax_call(s)) == inverse;
+}
+
+static void call_nary_rwt(call c)
+{
+  entity func = call_function(c);
+  list numerator = NIL, denominator = NIL;
+  int nnum, nden;
+  expression enu, eden;
   
+  if (func != multiply) return;
+  /* it is a multiply */
+  
+  MAP(EXPRESSION, e,
+  {
+    if (is_inverse(e))
+      denominator = 
+	CONS(EXPRESSION, 
+	  EXPRESSION(CAR(call_arguments(syntax_call(expression_syntax(e))))),
+	     denominator);
+    else
+      numerator = CONS(EXPRESSION, e, numerator);
+  },
+      call_arguments(c));
+
+  nden = gen_length(denominator);
+  nnum = gen_length(numerator);
+
+  if (!nden)
+  {
+    gen_free_list(denominator);
+    gen_free_list(numerator);
+    return;
+  }
+
+  /* some denominator */
+  if (nden==1)
+  {
+    eden = EXPRESSION(CAR(denominator));
+    gen_free_list(denominator);
+  }
+  else
+  {
+    eden = call_to_expression(make_call(multiply, denominator));
+  }
+
+  switch (nnum) 
+  {
+  case 0:
+    enu = int_to_expression(1);
+  case 1:
+    enu = EXPRESSION(CAR(numerator));
+    gen_free_list(numerator);
+  default:
+    enu = call_to_expression(make_call(multiply, numerator));
+  }
+
+  call_function(c) = divide;
+  gen_free_list(call_arguments(c));
+  call_arguments(c) = CONS(EXPRESSION, enu, CONS(EXPRESSION, eden, NIL));
+}
+
+static void optimize_simplify_nary_patterns(statement s)
+{
+  /* N-ARY * and 1/ -> N-ARY* / N-ARY*
+   */
+  multiply = entity_intrinsic(EOLE_PROD_OPERATOR_NAME);
+  inverse  = entity_intrinsic("INV");
+  divide   = entity_intrinsic("/");
+
+  gen_recurse(s, call_domain, gen_true, call_nary_rwt);
+
+  multiply = NULL;
+  inverse  = NULL;
+  divide   = NULL;
 }
 
 
@@ -839,30 +926,30 @@ static optimization_strategy
   { 
     /* name */ "P2SC", 
     /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ TRUE, TRUE, "0",
-    /* simp */ TRUE, 
+    /* eole */ "0", TRUE, "", TRUE, "-m",
+    /* simp */ TRUE, TRUE,
     /* gcm cse */ TRUE
 	       
   },
   {
     "test",
     TRUE, expression_gravity, TRUE,
-    TRUE, TRUE, "0",
-    TRUE, 
+    "0", TRUE, "", TRUE, "-m",
+    TRUE, TRUE,
     FALSE
   },
   {
     "R10K",
     TRUE, expression_gravity_inv, FALSE,
-    TRUE, TRUE, "1",
-    TRUE, 
+    "1", TRUE, "", TRUE, "-m",
+    TRUE, TRUE,
     TRUE
   },
   {
     "EOLE",
     FALSE, NULL, FALSE,
-    TRUE, TRUE, "0",
-    FALSE, 
+    "0", TRUE, "", TRUE, "-m",
+    FALSE, FALSE, 
     FALSE
   },
 
@@ -870,8 +957,8 @@ static optimization_strategy
   {
     NULL, /* default similar to P2SC. */
     TRUE, expression_gravity, TRUE,
-    TRUE, TRUE, "0",
-    TRUE, 
+    "0", TRUE, "", TRUE, "-m",
+    TRUE, TRUE,
     TRUE
   }
 };
@@ -953,7 +1040,7 @@ bool optimize_expressions(string module_name)
 
     /* EOLE Stuff
      */
-    if (strategy->apply_eole)
+    if (strategy->apply_eole1)
       apply_eole_on_statement(module_name, s, get_string_property(EOLE_FLAGS));
 
     /* Could perform more optimizations here...
@@ -962,13 +1049,15 @@ bool optimize_expressions(string module_name)
      */
 
     if (strategy->apply_gcm_cse)
-      /* icm_cse_on_sequence(module_name, s); */
       perform_icm_association(module_name, s); 
 
     /* EOLE Stuff, second pass for FMA.
      */
     if (strategy->apply_eole2)
-      apply_eole_on_statement(module_name, s, "-m");
+      apply_eole_on_statement(module_name, s, strategy->apply_eole2_flags);
+
+    if (strategy->apply_nary_simplify)
+      optimize_simplify_nary_patterns(s);
 
     if (strategy->apply_balancing)
       switch_nary_to_binary(s);
