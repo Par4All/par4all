@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: parser.c,v $
+ * Revision 1.37  2003/08/02 14:03:30  irigoin
+ * A very small step to handle errors better.
+ *
  * Revision 1.36  2002/03/08 10:21:53  irigoin
  * StackArea added and some reformatting
  *
@@ -175,6 +178,7 @@ ParserError(char * f, char * m)
     parser_reset_all_reader_buffers();
     parser_reset_StmtHeap_buffer();
     reset_parser_recursive_call();
+    soft_reset_alternate_returns();
     ResetChains();
     AbortEntries();
     AbortOfProcedure();
