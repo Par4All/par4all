@@ -2,7 +2,7 @@ c
 c COMMON /HPFC_BUFFERS/ 
 c
 c $RCSfile: hpfc_buffers.m4h,v $ (version $Revision$)
-c ($Date: 1995/09/07 11:30:36 $, )
+c ($Date: 1995/09/11 12:00:52 $, )
 c
 c buffers to avoid small pvmf(un)pack calls...
 c and to sends buckets of messages if necessary...
@@ -12,19 +12,19 @@ c
      $     BUFINDEX,
      $     SIZEOFBUFFER,
      $     SIZEOFRECEIVEDBUFFER,
-     $     LAZYSEND,
-     $     LAZYRECEIVE
+     $     LAZY_SEND,
+     $     LAZY_RECV
       integer
      $     BUFINDEX,
      $     SIZEOFBUFFER,
      $     SIZEOFRECEIVEDBUFFER
       logical
-     $     LAZYSEND,
-     $     LAZYRECEIVE
+     $     LAZY_SEND,
+     $     LAZY_RECV
       byte
      $     BYTE1_BUFF
 c
-c buffer to be seen differently somehow...
+c buffer must be seen differently somehow...
 c
       integer*2 INTEGER2_BUFF(MAXSIZEOFBUFFER/2)
       equivalence (BYTE1_BUFF, INTEGER2_BUFF)
