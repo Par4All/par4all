@@ -402,7 +402,7 @@ doublecomplex_to_double_type(int n)
     functional ft = functional_undefined;
 
     ft = make_functional(NIL, MakeDoubleprecisionResult());
-    functional_parameters(ft) = make_parameter_list(n, MakeComplexParameter);
+    functional_parameters(ft) = make_parameter_list(n, MakeDoublecomplexParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -416,6 +416,19 @@ complex_to_complex_type(int n)
 
     ft = make_functional(NIL, MakeComplexResult());
     functional_parameters(ft) = make_parameter_list(n, MakeComplexParameter);
+    t = make_type(is_type_functional, ft);
+
+    return t;
+}
+
+static type 
+doublecomplex_to_doublecomplex_type(int n)
+{
+    type t = type_undefined;
+    functional ft = functional_undefined;
+
+    ft = make_functional(NIL, MakeDoublecomplexResult());
+    functional_parameters(ft) = make_parameter_list(n, MakeDoublecomplexParameter);
     t = make_type(is_type_functional, ft);
 
     return t;
@@ -639,6 +652,7 @@ LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"AIMAG", 1, complex_to_real_type},
     {"DIMAG", 1, doublecomplex_to_double_type},
     {"CONJG", 1, complex_to_complex_type},
+    {"DCONJG", 1, doublecomplex_to_doublecomplex_type},
     {"SQRT", 1, default_intrinsic_type},
     {"DSQRT", 1, double_to_double_type},
     {"CSQRT", 1, complex_to_complex_type},
