@@ -6,31 +6,10 @@
  * Miscellaneous functions
  */
 
-#include <stdio.h>
-#include <string.h>
+#include "local.h"
 
-#include "genC.h"
-
-#include "text.h"
-#include "text-util.h"
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-/* #include "database.h" */
-
-#include "ri-util.h"
-#include "constants.h"
-#include "misc.h"
-
-#include "graph.h"
-#include "dg.h"
-/* #include "loop_normalize.h" */
 #define NLC_PREFIX 			"NLC"
 #define ENTITY_NLC_P(e) (strncmp(entity_local_name(e), NLC_PREFIX, 3) == 0)
-
-#include "atomizer.h"
-
-
 
 
 
