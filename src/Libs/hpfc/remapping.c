@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/09/05 17:53:54 $, ) 
+ * ($Date: 1995/09/15 15:54:30 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -56,28 +56,34 @@ entity (*create_var)(/* int */);
 
 /* builds a linarization equation of the dimensions of obj.
  * var is set to the result. *psize returns the size of obj.
- * Done the Fortran way.
+ * Done the Fortran way, or the other way around...
  */ 
 Pcontrainte
-full_linearization(obj, var, psize, create_var)
-entity obj, var;
-int *psize;
-entity (*create_var)(/* int */);
+full_linearization(
+    entity obj,
+    entity var,
+    int *psize,
+    entity (*create_var)(int),
+    bool fortran_way,
+    int initial_offset)
 {
-    int dim = NumberOfDimension(obj), low, up, size;
+    int dim = NumberOfDimension(obj), low, up, size, i;
     Pvecteur v = VECTEUR_NUL;
 
-    for(*psize=1; dim>0; dim--)
+    for(*psize=1, i=fortran_way ? dim : 1 ;
+	fortran_way ? i>0 : i<=dim; 
+	i+= fortran_way ? -1 : 1)
     {
-	get_entity_dimensions(obj, dim, &low, &up);
+	get_entity_dimensions(obj, i, &low, &up);
 	size = up - low + 1;
 	*psize *= size;
 	v = vect_multiply(v, size);
-	vect_add_elem(&v, (Variable) create_var(dim), 1);
+	vect_add_elem(&v, (Variable) create_var(i), 1);
 	vect_add_elem(&v, TCST, - low);
     }
 
     if (var) vect_add_elem(&v, (Variable) var, -1);
+    if (initial_offset) vect_add_elem(&v, TCST, initial_offset);
 
     return contrainte_make(v);
 }
@@ -248,13 +254,17 @@ list *pl, 	/* P */
  *   [ ENDIF ]
  */
 static statement
-processor_loop(s, l_psi, l_oth, psi, oth, lid, create_psi, create_oth, body, sh)
-Psysteme s;
-list /* of entities */ l_psi, l_oth;
-entity psi, oth, lid;
-entity  (*create_psi)(/* int */), (*create_oth)(/* int */);
-statement body;
-boolean sh; /* whether to shift the psi's */
+processor_loop(
+    Psysteme s,
+    list /* of entities */ l_psi,
+    list /* of entities */ l_oth,
+    entity psi,
+    entity oth,
+    entity lid, 
+    entity (*create_psi)(int),
+    entity (*create_oth)(int),
+    statement body,
+    boolean sh) /* whether to shift the psi's */
 {
     entity divide = hpfc_name_to_entity(IDIVIDE);
     Psysteme condition, enumeration, known, simpler;
@@ -265,7 +275,8 @@ boolean sh; /* whether to shift the psi's */
     /* the lid computation is delayed in the body for diffusions
      */
     compute_lid = (lid) ?
-	hpfc_compute_lid(lid, oth, create_oth) : make_empty_statement(); 
+	hpfc_compute_lid(lid, oth, create_oth, FALSE, NULL) : 
+	make_empty_statement(); 
 
     /* simplifies the processor arrangement for the condition
      */
@@ -318,10 +329,11 @@ boolean sh; /* whether to shift the psi's */
  *   ENDDO
  */
 static statement
-elements_loop(s, ll, ld, body)
-Psysteme s;
-list /* of entities */ ll, /* of expressions */ ld;
-statement body;
+elements_loop(
+    Psysteme s,
+    list /* of entities */ ll, 
+    list /* of expressions */ ld,
+    statement body)
 {
     return systeme_to_loop_nest(s, ll,
 	   make_block_statement(CONS(STATEMENT, generate_deducables(ld),
@@ -338,9 +350,10 @@ statement body;
  *   ENDIF
  */
 static statement
-if_different_pe(lid, true, false)
-entity lid;
-statement true, false;
+if_different_pe(
+    entity lid,
+    statement true,
+    statement false)
 {
     return test_to_statement
       (make_test(MakeBinaryCall(CreateIntrinsic(NON_EQUAL_OPERATOR_NAME),
@@ -358,16 +371,19 @@ statement true, false;
  *   ENDDO
  * [ ENDIF ]
  */
-static statement broadcast(lid, proc, sr, ldiff, lazy)
-entity lid, proc;
-Psysteme sr;
-list /* of entity */ ldiff;
-bool lazy;
+static statement 
+broadcast(
+    entity lid,
+    entity proc,
+    Psysteme sr,
+    list /* of entity */ ldiff,
+    bool lazy)
 {
-    statement body, nest;
+    statement cmp_lid, body, nest;
 
+    cmp_lid = hpfc_compute_lid(lid, proc, get_ith_processor_prime, FALSE, NULL);
     body = make_block_statement
-	(CONS(STATEMENT, hpfc_compute_lid(lid, proc, get_ith_processor_prime),
+	(CONS(STATEMENT, cmp_lid,
 	 CONS(STATEMENT, if_different_pe
 	      (lid, hpfc_generate_message(lid, TRUE, FALSE),
 	       make_empty_statement()),
@@ -383,71 +399,172 @@ bool lazy;
  * tag t may have the following values:
  */
 
-#define CPY	1
-#define SND	2
-#define RCV	3
-#define BRD     4
+#define CPY	0
+#define SND	1
+#define RCV	2
+#define BRD     3
+
+#define PRE 	0
+#define INL 	4
+#define PST 	8
+
+#define NLZ 	0
+#define LZY 	16
+
+#define NBF 	0
+#define BUF 	32
+
+/* I have to deal with a 4D space to generate some code:
+ *
+ * buffer/nobuf
+ * lazy/nolazy
+ *
+ * pre/in/post
+ * cpy/snd/rcv/brd
+ */
+
+#define ret(name) result = name; break
 
 static statement 
-pre(t, lid)
-int t;
-entity lid;
+gen(int what,
+    entity src, entity trg, entity lid, entity proc,
+    entity (*create_src)(), entity (*create_trg)(),
+    Psysteme sr, list /* of entity */ ldiff)
 {
-    return t==CPY ? make_empty_statement() :
-	   t==SND || t==BRD ? hpfc_initsend(lazy_message_p()) :
-           t==RCV ? (lazy_message_p() ? 
-		    set_logical(hpfc_name_to_entity(LAZY_RECV), TRUE) :
-		    hpfc_generate_message(lid, FALSE, FALSE)) :
-	   statement_undefined;
+    statement result;
+    bool is_lazy = what & LZY, 
+         is_buff = what & BUF;
+
+    switch (what)
+    {
+	/* cpy pre/post
+	 * rcv post nbuf
+	 */
+    case CPY+PRE: 
+    case CPY+PST:
+    case CPY+PRE+LZY: 
+    case CPY+PST+LZY:
+    case CPY+PRE+BUF:
+    case CPY+PST+BUF:
+    case CPY+PRE+LZY+BUF: 
+    case CPY+PST+LZY+BUF:
+    case RCV+PST: 
+    case RCV+PST+LZY:
+    case RCV+PST+BUF:
+    case RCV+PST+LZY+BUF:
+	ret(make_empty_statement());
+
+	/* snd.brd pre nbuf
+	 */
+    case SND+PRE: 
+    case BRD+PRE:
+    case SND+PRE+LZY: 
+    case BRD+PRE+LZY: 
+	ret(hpfc_initsend(is_lazy));
+
+    case RCV+PRE+LZY:
+	ret(set_logical(hpfc_name_to_entity(LAZY_RECV), TRUE));
+
+    case RCV+PRE:
+	ret(hpfc_generate_message(lid, FALSE, FALSE));
+
+	/* cpy inl 
+	 */
+    case CPY+INL: 
+    case CPY+INL+LZY:
+    case CPY+INL+BUF:
+    case CPY+INL+LZY+BUF:
+	ret(make_assign_statement(make_reference_expression(trg, create_trg),
+				  make_reference_expression(src, create_src)));
+
+	/* snd/brd inl nbf
+	 */
+    case SND+INL:
+    case BRD+INL:
+    case SND+INL+LZY:
+    case BRD+INL+LZY:
+	ret(hpfc_lazy_packing(src, lid, create_src, TRUE, is_lazy));
+
+    case SND+INL+BUF:
+    case SND+INL+LZY+BUF:
+	ret(hpfc_lazy_buffer_packing(src, lid, proc, create_src,
+				     TRUE /* send! */, is_lazy));
+    case RCV+INL+BUF:
+    case RCV+INL+LZY+BUF:
+	ret(hpfc_lazy_buffer_packing(trg, lid, proc, create_trg,
+				     FALSE /* receive! */, is_lazy));
+    case RCV+INL:
+    case RCV+INL+LZY:
+	ret(hpfc_lazy_packing(trg, lid, create_trg, FALSE, is_lazy));
+
+    case SND+PST:
+    case SND+PST+LZY:
+	ret(hpfc_generate_message(lid, TRUE, is_lazy));
+
+    case BRD+PST:
+    case BRD+PST+LZY:
+	ret(broadcast(lid, proc, sr, ldiff, is_lazy));
+
+    case SND+PST+BUF:
+    case SND+PST+LZY+BUF:
+	ret(hpfc_broadcast_if_necessary(src, lid, proc, is_lazy));
+
+	/* snd/rcv pre buf
+	 */
+    case SND+PRE+LZY+BUF:
+    case SND+PRE+BUF:
+	ret(hpfc_buffer_initialization(TRUE /* send! */, is_lazy));
+    case RCV+PRE+LZY+BUF:
+    case RCV+PRE+BUF:
+	ret(hpfc_buffer_initialization(FALSE /* receive! */, is_lazy));
+	
+	/* default is a forgotten case, I guess
+	 */
+    default:
+	pips_error("gen", "invalid tag %d\n", what);
+	ret(statement_undefined); /* to avoid a gcc warning */
+    }
+
+    pips_debug(7, "tag is %d (%s, %s)\n", what, 
+	       is_lazy ? "lazy" : "not lazy",
+	       is_buff ? "bufferized" : "not bufferized");
+    DEBUG_STAT(7, "returning", result);
+
+    return result;
 }
 
 static statement 
-in(t, src, trg, lid, create_src, create_trg)
-int t;
-entity src, trg, lid;
-entity (*create_src)(), (*create_trg)();
+remapping_stats(
+    int t,
+    Psysteme s,
+    Psysteme sr,
+    list /* of entity */ ll,
+    list /* of entity */ ldiff, 
+    list /* of expressions */ ld,
+    entity lid,
+    entity src,
+    entity trg)
 {
-    return
-      t==CPY ? make_assign_statement
-	  (make_reference_expression(trg, create_trg),
-	   make_reference_expression(src, create_src)) :
-      t==SND ? hpfc_lazy_packing(src, lid, create_src, TRUE, lazy_message_p()) :
-      t==BRD ? hpfc_lazy_packing(src, lid, create_src, TRUE, lazy_message_p()) :
-      t==RCV ? hpfc_lazy_packing(trg, lid, create_trg, FALSE, lazy_message_p()) :
-	  statement_undefined;
-}
+    entity proc = array_to_processors(trg);
+    statement inner, prel, postl, result;
+    int what = (get_bool_property(LAZY_MESSAGES) ? LZY : NLZ) + 
+	       (get_bool_property(USE_BUFFERS) ? BUF : NBF) + t;
+    
+    prel  = gen(what+PRE, src, trg, lid, proc, 
+		get_ith_local_dummy, get_ith_local_prime, sr, ldiff);
+    inner = gen(what+INL, src, trg, lid, proc, 
+		get_ith_local_dummy, get_ith_local_prime, sr, ldiff);
+    postl = gen(what+PST, src, trg, lid, proc, 
+		get_ith_local_dummy, get_ith_local_prime, sr, ldiff);
 
-static statement 
-post(t, lid, proc, sr, ldiff)
-int t;
-entity lid, proc;
-Psysteme sr;
-list /* of entities */ ldiff;
-{
-    return t==CPY || t==RCV ? make_empty_statement() :
-           t==SND ? hpfc_generate_message(lid, TRUE, lazy_message_p()) :
-           t==BRD ? broadcast(lid, proc, sr, ldiff, lazy_message_p()) :
-	   statement_undefined;
-}
-
-static statement 
-remapping_stats(t, s, sr, ll, ldiff, ld, lid, src, trg)
-int t;
-Psysteme s, sr;
-list /* of entities */ ll, ldiff, /* of expressions */ ld;
-entity lid, src, trg;
-{
-    statement inner, result;
-
-    inner  = in(t, src, trg, lid, get_ith_local_dummy, get_ith_local_prime),
     result = make_block_statement
-	    (CONS(STATEMENT, pre(t, lid),
+	    (CONS(STATEMENT, prel,
 	     CONS(STATEMENT, elements_loop(s, ll, ld, inner),
-	     CONS(STATEMENT, post(t, lid, array_to_processors(trg), sr, ldiff),
+	     CONS(STATEMENT, postl,
 		  NIL))));
 
     statement_comments(result) = 
-	strdup(concatenate("c - ", lazy_message_p() ? "lazy " : "",
+	strdup(concatenate("c - ", (what & LZY) ? "lazy " : "",
 	   t==CPY ? "copy" : t==SND ? "send" : t==RCV ? "receiv" :
 			   t==BRD ? "broadcast" : "?",  "ing\n", NULL));
 
@@ -618,12 +735,12 @@ statement the_code;
 static char *
 string_micros(long micros)
 {
-    static char buffer[3];
+    static char buffer[7];
     int i;
 
-    sprintf(buffer, "%2ld", micros/10000);
+    sprintf(buffer, "%6ld", micros);
 
-    for (i=0; i<2; i++)
+    for (i=0; i<6; i++)
 	if (buffer[i]==' ') buffer[i]='0' ;
 
     return buffer;
