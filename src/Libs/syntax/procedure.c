@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/04 15:50:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/10 21:15:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/04 15:50:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/10 21:15:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -522,16 +522,19 @@ type r; /* type of result */
 	       appears in an EXTERNAL statement; the result type is
 	       infered from ImplicitType() - see just above -;
 	       let's use implicit_type_p() again, whereas the unknown type
-	       should have been used */
-	  if(implicit_type_p(fe) || overloaded_type_p(tr)) {
+	    should have been used */
+	    if(intrinsic_entity_p(fe)) {
+		/* ignore r */
+	    }
+	    else if(implicit_type_p(fe) || overloaded_type_p(tr)) {
 		/* memory leak of tr */
 		functional_result(type_functional(tfe)) = r;
-	    } 
-	    else {
+	    }
+	    else  {
 		user_warning("MakeExternalFunction",
 			     "Type redefinition for %s.\n", entity_name(fe));
 		ParserError("MakeExternalFunction",
-			   "Functional type redefinition.\n");
+			    "Functional type redefinition.\n");
 	    }
 	}
     }
