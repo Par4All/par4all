@@ -7,6 +7,11 @@
 */
 
 #include <stdio.h>
+#include <unistd.h> /* flex uses isatty */
+
+#include "boolean.h"
+#include "arithmetique.h"
+#include "vecteur.h"
 #include "y.tab.h"
 %}
 
@@ -30,12 +35,12 @@
 <COMMENT>[^\n]*         ;
 %%
 
-yywrap()
+int yywrap()
 {
-	return(-1);
+	return -1;
 }
 
-sc_init_lex()
+void sc_init_lex()
 {
         BEGIN TEXT;
 }
