@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.90  1998/07/09 18:24:39  coelho
+ * hack for entry: file names are preceded by their modules...
+ *
  * Revision 1.89  1998/05/29 16:22:07  coelho
  * filter includes for bang comments and hollerith.
  *
@@ -67,8 +70,7 @@
 
 /* Return a sorted arg list of workspace names. (For each name, there
    is a name.database directory in the current directory): */
-void
-pips_get_workspace_list(gen_array_t array)
+void pips_get_workspace_list(gen_array_t array)
 {
    int i, n;
    
@@ -85,8 +87,7 @@ pips_get_workspace_list(gen_array_t array)
 
 /* Select the true file with names ending in ".[fF]" and return a sorted
    arg list: */
-void
-pips_get_fortran_list(gen_array_t array)
+void pips_get_fortran_list(gen_array_t array)
 {
     list_files_in_directory(array, ".", "^.*\\.[fF]$", file_exists_p);
 }
@@ -94,8 +95,7 @@ pips_get_fortran_list(gen_array_t array)
 
 /* Return the path of an HPFC file name relative to the current PIPS
    directory. Can be freed by the caller. */
-char *
-hpfc_generate_path_name_of_file_name(char * file_name)
+string hpfc_generate_path_name_of_file_name(string file_name)
 {
     string dir_name = db_get_current_workspace_directory(),
 	name = strdup(concatenate(
@@ -105,9 +105,8 @@ hpfc_generate_path_name_of_file_name(char * file_name)
 }
 
 
-int
-hpfc_get_file_list(gen_array_t file_names,
-                   char ** hpfc_directory_name)
+int hpfc_get_file_list(gen_array_t file_names,
+		       char ** hpfc_directory_name)
 {
     /* some static but dynamic buffer.
      */
@@ -140,8 +139,7 @@ hpfc_get_file_list(gen_array_t file_names,
 }
 
 
-char *
-pips_change_directory(char *dir)
+string pips_change_directory(char *dir)
 {
     if (directory_exists_p(dir)) {
 	chdir(dir);
@@ -155,8 +153,7 @@ pips_change_directory(char *dir)
 
 #define SRCPATH "PIPS_SRCPATH"
 
-string 
-pips_srcpath_append(string pathtoadd)
+string pips_srcpath_append(string pathtoadd)
 {
     string old_path, new_path;
     old_path = getenv(SRCPATH);
@@ -166,8 +163,7 @@ pips_srcpath_append(string pathtoadd)
     return old_path;
 }
 
-void
-pips_srcpath_set(string path)
+void pips_srcpath_set(string path)
 {
     putenv(strdup(concatenate(SRCPATH "=", path, 0)));
 }
@@ -179,8 +175,7 @@ static string user_file_directory = NULL;
 
 #ifdef NO_RX_LIBRARY
 
-static bool
-pips_process_file(string file_name)
+static bool pips_process_file(string file_name)
 {
     int err = safe_system_no_abort(concatenate
        ("trap 'exit 123' 2; pips-process-module ", file_name, NULL));
@@ -237,10 +232,9 @@ static regex_t
     dcomplex_cst2_rx;
 
 static void
-insert_at(
-    string * line, /* string to be modified (may be reallocated) */
-    int offset, /* where to insert */
-    string what /* to be inserted */)
+insert_at(string * line, /* string to be modified, may be reallocated */
+	  int offset, /* where to insert */
+	  string what /* to be inserted */)
 {
     int i, len=strlen(*line), shift=strlen(what);
     *line = (char*) realloc(*line, sizeof(char)*(len+shift+1));
@@ -255,8 +249,7 @@ insert_at(
 
 #define CONTINUATION "\n     x "
 
-static void
-add_continuation_if_needed(string * line)
+static void add_continuation_if_needed(string * line)
 {
     int len = strlen(*line);
     if (len<=73) return; /* nothing to do */
@@ -272,8 +265,7 @@ add_continuation_if_needed(string * line)
 
 /* return if modified
  */
-static bool
-try_this_one(
+static bool try_this_one(
     regex_t * prx, 
     string * line,
     string replacement, 
@@ -294,8 +286,7 @@ try_this_one(
     return modified;
 }
 
-static void
-handle_complex_constants(string * line)
+static void handle_complex_constants(string * line)
 {
     bool diff = FALSE;
 
@@ -315,8 +306,7 @@ handle_complex_constants(string * line)
 /* tries several path for a file to include...
  * first rely on $PIPS_SRCPATH, then other directories.
  */
-static string 
-find_file(string name)
+static string find_file(string name)
 {
     string srcpath = getenv(SRCPATH), result;
     string path = strdup(concatenate(
@@ -330,8 +320,7 @@ find_file(string name)
 /* cache of preprocessed includes
  */
 static hash_table processed_cache = hash_table_undefined;
-void 
-init_processed_include_cache(void)
+void init_processed_include_cache(void)
 {
     pips_assert("undefined cache", hash_table_undefined_p(processed_cache));
     processed_cache = hash_table_make(hash_string, 100);
@@ -387,8 +376,7 @@ static string get_new_tmp_file_name(void)
  */
 static bool handle_file(FILE*, FILE*);
 
-static bool 
-handle_file_name(FILE * out, char * file_name, bool included)
+static bool handle_file_name(FILE * out, char * file_name, bool included)
 {
     FILE * f;
     string found = find_file(file_name);
@@ -419,8 +407,7 @@ handle_file_name(FILE * out, char * file_name, bool included)
     return ok;
 }
 
-static bool
-handle_include_file(FILE * out, char * file_name)
+static bool handle_include_file(FILE * out, char * file_name)
 {
     FILE * in;
     bool ok = TRUE;
@@ -473,8 +460,9 @@ handle_include_file(FILE * out, char * file_name)
     return ok;
 }
 
-static bool 
-handle_file(FILE * out, FILE * f) /* process f for includes and nones */
+/* process f for includes and nones
+ */
+static bool handle_file(FILE * out, FILE * f) 
 {
     string line;
     regmatch_t matches[2]; /* matched strings */
@@ -506,8 +494,7 @@ handle_file(FILE * out, FILE * f) /* process f for includes and nones */
     return TRUE;
 }
 
-static void 
-init_rx(void)
+static void init_rx(void)
 {
     static bool done=FALSE;
     if (done) return;
@@ -522,8 +509,7 @@ init_rx(void)
 	pips_internal_error("invalid regular expression\n");
 }
 
-static bool 
-pips_process_file(string file_name, string new_name)
+static bool pips_process_file(string file_name, string new_name)
 {
     bool ok = FALSE;
     FILE * out;
@@ -539,8 +525,7 @@ pips_process_file(string file_name, string new_name)
 
 #define FORTRAN_FILE_SUFFIX ".f"
 
-bool
-filter_file(string mod_name)
+bool filter_file(string mod_name)
 {
     string name, new_name, dir_name, abs_name, abs_new_name;
     name = db_get_memory_resource(DBR_INITIAL_FILE, mod_name, TRUE);
@@ -614,8 +599,7 @@ static void sort_file(string name)
     safe_fclose(f, name);
 }
 
-static bool 
-pips_split_file(string name, string tempfile)
+static bool pips_split_file(string name, string tempfile)
 {
     int err;
     FILE * out = safe_fopen(tempfile, "w");
@@ -645,8 +629,7 @@ pips_split_file(string name, string tempfile)
 #define CPP_CPP			"cpp" /* alternative value: "gcc -E" */
 #define CPP_CPPFLAGS		" -P -C -D__PIPS__ -D__HPFC__ "
 
-static bool 
-dot_F_file_p(string name)
+static bool dot_F_file_p(string name)
 {
     int l = strlen(name);
     return l>=2 && name[l-1]=='F' && name[l-2]=='.';
@@ -690,8 +673,7 @@ static string process_thru_cpp(string name)
 /* Fortran compiler triggerred from the environment (PIPS_CHECK_FORTRAN) 
  * or a property (CHECK_FORTRAN_SYNTAX_BEFORE_PIPS)
  */
-static int
-pips_check_fortran(void)
+static int pips_check_fortran(void)
 {
     string v = getenv("PIPS_CHECK_FORTRAN");
 
@@ -705,9 +687,7 @@ pips_check_fortran(void)
 #define suffix ".pips.o"
 #define DEFAULT_PIPS_FLINT "f77 -c -ansi"
 
-static void 
-check_fortran_syntax_before_pips(
-    string file_name)
+static void check_fortran_syntax_before_pips(string file_name)
 {
     string pips_flint = getenv("PIPS_FLINT");
     user_log("Checking Fortran syntax of %s\n", file_name);
@@ -724,29 +704,23 @@ check_fortran_syntax_before_pips(
 			  file_name);
 }
 
-/* (./foo.database/)name.f -> NAME
- * rather ugly. C lacks some substring manipulation functions...
+/* "foo bla fun  ./e.database/foo.f" -> "./e.database/foo.f"
  */
-static string
-extract_module_name(string file_name)
+static string extract_last_name(string line)
 {
-    string tmp, module, saved=NULL;
-    for (tmp = file_name + strlen(file_name) - 1; tmp>file_name; tmp--)
-	if (*tmp=='.') { saved=tmp; *tmp='\0'; break; }
-    while (*--tmp!='/' && tmp>=file_name);
-    tmp++;
-    module = strdup(tmp);
-    if (saved) *saved='.';
-    (void) strupper(module, module);
-    return module;
+    int l = strlen(line);
+    do {
+	while (l>=0 && line[l]!=' ') l--;
+	if (l>=0 && line[l]==' ') line[l]='\0';
+    } while (l>=0 && strlen(line+l+1)==0);
+    return l>=-1? line+l+1: NULL;
 }
 
-bool 
-process_user_file(string file)
+bool process_user_file(string file)
 {
     FILE *fd;
     bool success_p = FALSE, cpp_processed_p;
-    string initial_file, nfile, file_name, file_list,
+    string initial_file, nfile, file_list, a_line,
 	dir_name = db_get_current_workspace_directory();
 
     static int number_of_files = 0;
@@ -800,36 +774,51 @@ process_user_file(string file)
 
     /* the newly created module files are registered in the database */
     fd = safe_fopen(file_list, "r");
-    while ((file_name=safe_readline(fd))) 
+    while ((a_line = safe_readline(fd))) 
     {
-	string mod_name, res_name, abs_res;
+	string mod_name = NULL, res_name = NULL, abs_res, file_name;
+	bool renamed=FALSE;
 
+	file_name = extract_last_name(a_line);
 	success_p = TRUE;
 	number_of_modules++;
 	pips_debug(2, "module %s (number %d)\n", file_name, number_of_modules);
 
-	mod_name = extract_module_name(file_name);
-	user_log("  Module         %s\n", mod_name);
-
-	res_name = db_build_file_resource_name
-	    (DBR_INITIAL_FILE, mod_name, ".f_initial");
-
-	abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
-	/* abs_file = strdup(concatenate(dir_name, "/", file_name, 0)); */
-	
-	if (rename(file_name, abs_res))
-	{
-	    perror("process_user_file");
-	    pips_internal_error("mv %s %s failed\n", file_name, res_name);
-	}
-	
-	DB_PUT_NEW_FILE_RESOURCE(DBR_INITIAL_FILE, mod_name, res_name);
-	/* from which file the initial source was derived.
-	 * absolute path to the file so that db moves should be ok?
+	/* extract module names from last to first.
 	 */
-	DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
-	free(file_name); free(abs_res); free(mod_name);
+	while (mod_name!=a_line && (mod_name = extract_last_name(a_line)))
+	{
+	    user_log("  Module         %s\n", mod_name);
+
+	    if (!renamed)
+	    {
+		res_name = db_build_file_resource_name
+		    (DBR_INITIAL_FILE, mod_name, ".f_initial");
+	    
+		abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
+		
+		if (rename(file_name, abs_res))
+		{
+		    perror("process_user_file");
+		    pips_internal_error("mv %s %s failed\n", 
+					file_name, res_name);
+		}
+		renamed = TRUE;
+		free(abs_res); 
+	    }
+	    
+	    DB_PUT_NEW_FILE_RESOURCE(DBR_INITIAL_FILE, mod_name, 
+				     strdup(res_name));
+	    /* from which file the initial source was derived.
+	     * absolute path to the file so that db moves should be ok?
+	     */
+	    DB_PUT_NEW_FILE_RESOURCE(DBR_USER_FILE, mod_name, strdup(nfile));
+	}
+
+	if (res_name) free(res_name), res_name = NULL;
+	free(a_line);
     }
+
     safe_fclose(fd, file_list);
     unlink(file_list); 
     free(file_list);
