@@ -109,9 +109,6 @@ $(ARCH)/%.o: $(ARCH)
 
 ################################################################## DEPENDENCIES
 
-phase0: depend
-depend:	
-
 ifdef CFILES
 need_depend	= 1
 endif # CFILES
@@ -121,6 +118,7 @@ need_depend	= 1
 endif # DERIVED_CFILES
 
 ifdef need_depend
+phase0: depend
 
 DEPEND	= .depend.$(ARCH)
 
@@ -181,6 +179,7 @@ arch-clean:; -$(RMDIR) $(ARCH)
 ####################################################################### INSTALL
 
 # multiphase compilation
+phase0:
 phase1:
 phase2:
 phase3:
