@@ -5,7 +5,7 @@
   *    FROM
        ADD_SENTENCE_TO_TEXT(r, 
 			   make_sentence(is_sentence_formatted, 
-					 code_decls_text(entity_code(module))));
+				 code_decls_text(entity_code(module))));
        MERGE_TEXTS(r, text_statement(module, 0, mod_stat));
        ADD_SENTENCE_TO_TEXT(r, sentence_tail(module));
   *    TO
@@ -40,6 +40,38 @@
 #include "constants.h"
 #include "resources.h"
 
+/******************************************************************** UTILS */
+
+/* generate resource res_name for module mod_name with prefix file_ext
+ * as the text provided.
+ */
+bool 
+make_text_resource(
+    string mod_name, /* module name */
+    string res_name, /* resource name [DBR_...] */
+    string file_ext, /* file extension */
+    text texte       /* text to be printed as this resource */)
+{
+    string filename, localfilename;
+    FILE *fd;
+    
+    localfilename = db_build_file_resource_name(res_name, mod_name, file_ext);
+    filename = strdup(concatenate(db_get_current_workspace_directory(), 
+				  "/", localfilename, NULL));
+
+    fd = safe_fopen(filename, "w");
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+    print_text(fd, texte);
+    debug_off();
+    safe_fclose(fd, filename);
+
+    DB_PUT_FILE_RESOURCE(res_name, mod_name, localfilename);
+    write_an_attachment_file(filename);
+    free(filename);
+    
+    return TRUE;
+}
+
 static bool is_user_view;	/* print_code or print_source */
 
 bool
@@ -49,11 +81,54 @@ user_view_p()
 }
 
 bool 
-print_parallelized90_code(mod_name)
-char *mod_name;
+print_code_or_source(string mod_name)
 {
-    bool success;
-    bool f90_property = get_bool_property("PRETTYPRINT_FORTRAN90");
+    bool success = FALSE;
+    text r = make_text(NIL);
+    entity module = local_name_to_top_level_entity(mod_name);
+    statement mod_stat;
+  
+    string resource_name = strdup
+	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
+	    DBR_GRAPH_PRINTED_FILE
+		: (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE));
+    string file_ext =
+	strdup(concatenate
+	       (is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
+		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
+		GRAPH_FILE_EXT : "",
+		NULL));
+
+    set_bool_property("PRETTYPRINT_PARALLEL", FALSE);
+    set_bool_property("PRETTYPRINT_SEQUENTIAL", TRUE);
+
+    mod_stat = (statement)
+	db_get_memory_resource(is_user_view?
+			       DBR_PARSED_CODE:DBR_CODE, mod_name, TRUE);
+
+    begin_attachment_prettyprint();
+    
+    init_prettyprint(empty_text);
+
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+    MERGE_TEXTS(r, text_module(module,mod_stat));
+    debug_off();
+    success = make_text_resource (mod_name, resource_name, file_ext, r);
+
+    end_attachment_prettyprint();
+
+    free(resource_name);
+    free(file_ext);
+    return success;
+}
+    
+
+/************************************************************ PIPSMAKE HOOKS */
+
+bool 
+print_parallelized90_code(string mod_name)
+{
+    bool success, f90_property = get_bool_property("PRETTYPRINT_FORTRAN90");
 
     set_bool_property("PRETTYPRINT_FORTRAN90", TRUE);
     success = print_parallelized_code(mod_name);
@@ -63,10 +138,8 @@ char *mod_name;
 }
 
 bool 
-print_parallelized77_code(mod_name)
-char *mod_name;
+print_parallelized77_code(string mod_name)
 {
-    /* set_bool_property("PRETTYPRINT_FORTRAN90", FALSE); */
     return print_parallelized_code(mod_name);
 }
 
@@ -84,8 +157,7 @@ print_parallelizedHPF_code(string module_name)
 }
 
 bool 
-print_parallelized_code(mod_name)
-char *mod_name;
+print_parallelized_code(string mod_name)
 {
     bool success = FALSE;
     text r = make_text(NIL);
@@ -117,93 +189,16 @@ char *mod_name;
 
 
 bool 
-print_code(mod_name)
-char *mod_name;
+print_code(string mod_name)
 {
   is_user_view = FALSE;
   return print_code_or_source(mod_name);
 }
 
 bool 
-print_source(mod_name)
-char *mod_name;
+print_source(string mod_name)
 {
   is_user_view = TRUE;
   return print_code_or_source(mod_name);
 }
 
-
-bool 
-print_code_or_source(mod_name)
-char *mod_name;
-{
-    bool success = FALSE;
-    text r = make_text(NIL);
-    entity module = local_name_to_top_level_entity(mod_name);
-    statement mod_stat;
-  
-    string resource_name = strdup
-	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
-	    DBR_GRAPH_PRINTED_FILE
-		: (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE));
-    string file_ext =
-	strdup(concatenate
-	       (is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
-		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
-		NULL));
-
-    set_bool_property("PRETTYPRINT_PARALLEL", FALSE);
-    set_bool_property("PRETTYPRINT_SEQUENTIAL", TRUE);
-
-    mod_stat = (statement)
-	db_get_memory_resource(is_user_view?DBR_PARSED_CODE:DBR_CODE, mod_name, TRUE);
-
-    begin_attachment_prettyprint();
-    
-    init_prettyprint(empty_text);
-
-    debug_on("PRETTYPRINT_DEBUG_LEVEL");
-    MERGE_TEXTS(r, text_module(module,mod_stat));
-    debug_off();
-    success = make_text_resource (mod_name, resource_name, file_ext, r);
-
-    end_attachment_prettyprint();
-
-    free(resource_name);
-    free(file_ext);
-    return success;
-}
-    
-
-bool 
-make_text_resource(mod_name, res_name, file_ext, texte)
-char *mod_name;
-char *res_name;
-char *file_ext;
-text texte;
-{
-    char *filename;
-    char *localfilename;
-    FILE *fd;
-    
-    localfilename = strdup(concatenate(mod_name, file_ext, NULL));
-
-    filename = strdup(concatenate(db_get_current_workspace_directory(), 
-				  "/", localfilename, NULL));
-
-    fd = safe_fopen(filename, "w");
-
-    debug_on("PRETTYPRINT_DEBUG_LEVEL");
-    print_text(fd, texte);
-    debug_off();
-
-    safe_fclose(fd, filename);
-
-    DB_PUT_FILE_RESOURCE(strdup(res_name), strdup(mod_name), localfilename);
-
-    write_an_attachment_file(filename);
-   
-    free(filename);
-    
-    return TRUE;
-}
