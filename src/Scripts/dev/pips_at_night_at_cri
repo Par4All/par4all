@@ -6,6 +6,11 @@
 # dispatch cleanings, compilations and validations on different
 # architectures and machines. 
 #
+# $Log: pips_at_night_at_cri,v $
+# Revision 1.22  2002/06/13 11:42:24  irigoin
+# compilation of GNUSOL2LLPROF in gnusol2ll added for Duong
+#
+#
 
 
 
@@ -180,6 +185,7 @@ case ${job} in
 
     gnusol2ll)
 	${verb} "VALIDATE stuff (with necessary compilations)" ;
+	compile ${sol2} GNUSOL2LLPROF ;
 	covalid ${sol2} GNUSOL2LL ;;
 
     linuxi86ll)
