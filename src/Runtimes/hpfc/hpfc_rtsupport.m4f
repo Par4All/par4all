@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/05/29 13:22:50 $, )
+! ($Date: 1997/05/29 13:40:45 $, )
 !
 !-----------------
 !
@@ -1064,7 +1064,8 @@ _CM5(
       call HPFC RECEIVE(HOST TID, 1, bufid)
       call HPFC UNPACK(INTEGER4, NODE TIDS, NB OF TASKS, 1, info)
       debug(if (info.lt.0) then
-         call HPFC PRINT ERROR MSG("[HPFC INIT NODE] node tids recv", info)
+         call HPFC PRINT ERROR MSG("[HPFC INIT NODE] node tids recv",
+     $     info)
          call HPFC TERMINATE TASK(info)
          stop
       endif)
@@ -1216,8 +1217,8 @@ _direct(`'
 
       _spawn(
       if (.not. SPAWN PERFORMED) then
-         debug(print *, "[HPFC INIT HOST] spawning ",
-     $        NB OF TASKS, " ", NODE PROGRAM NAME)
+       debug(print *, "[HPFC INIT HOST] spawning ", NB OF TASKS, 
+     $      " ", NODE PROGRAM NAME)
 
          call pvmfspawn(
      $        NODE PROGRAM NAME, 
