@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.18  2002/06/17 15:30:32  irigoin
+ * Syntactic changes only
+ *
  * Revision 1.17  2002/06/17 13:46:40  irigoin
  * IO_LIST_STRING_NAME replaces "IOLIST="
  *
@@ -982,7 +985,7 @@ static sentence sentence_data_statement(statement is)
   pips_assert("An initialization instruction is a call", instruction_call_p(ii));
   ife = call_function(ic);
   pips_assert("The static initialization function is called",
-	      strcmp(module_local_name(ife), STATIC_INITIALIZATION_NAME)==0);
+	      ENTITY_STATIC_INITIALIZATION_P(ife));
   al = call_arguments(ic);
 
   /* Find all initialized variables */
