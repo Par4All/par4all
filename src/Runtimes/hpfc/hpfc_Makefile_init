@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1995/09/25 13:55:55 $, )
+# ($Date: 1996/08/21 17:10:50 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -10,13 +10,17 @@ MAKEFILE = Makefile
 HPFC_MAKEFILE = hpfc_Makefile
 INCLUDED = hpfc_Makefile.include
 MOVE = mv
-M4 = $(HPFC_M4)
+
+ifdef HPFC_M4
+M4	=	$(HPFC_M4)
+else
+M4 	=	m4
+endif
 
 #
 # M4 parameters are those of the library...
 
-M4_PARAMS = $(HPFC_RUNTIME_M4_PARAMS)
-M4_PARAMS += -D ARCHITECTURE=$(PVM_ARCH) hpfc_architecture_m4_macros
+M4FLAGS += -D ARCHITECTURE=$(PVM_ARCH) hpfc_architecture_m4_macros
 
 #
 # what to do
@@ -26,7 +30,7 @@ M4_PARAMS += -D ARCHITECTURE=$(PVM_ARCH) hpfc_architecture_m4_macros
 all:
 
 $(INCLUDED): $(HPFC_MAKEFILE)
-	$(M4) $(M4_PARAMS) $(HPFC_MAKEFILE) > $(INCLUDED)
+	$(M4) $(M4FLAGS) $(M4OPT) $(HPFC_MAKEFILE) > $(INCLUDED)
 
 include $(INCLUDED)
 
