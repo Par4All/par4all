@@ -160,7 +160,7 @@ cons * args;
 	    }
 	    else {
 		sc_base_remove_variable(r,(Variable) e);
-		r = sc_elim_redond(r);
+		r = sc_elim_redund(r);
 		if (SC_EMPTY_P(r)) {
 		    r = sc_empty(b);
 		    sc_base_remove_variable(r,(Variable) e);
