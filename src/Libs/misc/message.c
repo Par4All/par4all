@@ -9,14 +9,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-/*
-extern int fprintf();
-extern int printf();
-extern int fflush();
-extern int vfprintf(FILE *stream, char *format, ...);
-extern int _flsbuf();
-extern int _filbuf();
-*/
 #include <setjmp.h>
 #include <stdarg.h>
 #include <ctype.h>
