@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1996/03/11 15:25:31 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1996/03/21 15:07:22 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -732,6 +732,18 @@ HPFC_USE_BUFFERS TRUE
 
 \subsection{Program Transformations}
 
+\subsection{Array privatization}
+
+This transfomation privatizes array sections. Several privitizability
+criterions could be applied, and its not clear which one should be used. The
+default case is to remove potential false dependences between
+iterations. The following option, when set to false, remove this
+constraint. It is useful for single assignment programs, to discover what
+section is really local to each iteration.
+
+\begin{verbatim}
+ARRAY_PRIV_FALSE_DEP_ONLY TRUE
+\end{verbatim}
 
 \subsubsection{Partial Atomizer}
 
