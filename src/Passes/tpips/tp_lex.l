@@ -1,9 +1,11 @@
-EMPTY ("//[^\n]*"|[ \t]+)
+EMPTY ("#".*|([ \\t]+("#".*)?))
 
-%START COMMENT TEXT
-
-%a 10000
-%o 30000
+%e 100000
+%p 100000
+%n 100000
+%k 100000
+%a 100000
+%o 100000
 
 %{
 #include <stdio.h>
@@ -12,62 +14,77 @@ EMPTY ("//[^\n]*"|[ \t]+)
 
 #include "genC.h"
 
-#include "ri.h"
-#include "database.h"
-#include "makefile.h"
 
 #include "misc.h"
 
+/*
+#include "ri.h"
+#include "database.h"
+#include "makefile.h"
 #include "pipsdbm.h"
-#include "ri-util.h"
 #include "resources.h"
 #include "phases.h"
 #include "builder_map.h"
 #include "properties.h"
 #include "pipsmake.h"
-
-#include "list.h"
 #include "ri-util.h"
 #include "top-level.h"
+*/
+
+#include "list.h"
 #include "tpips.h"
 #include "y.tab.h"
+
+
+/* now get the characters from a string, not from a file */
+#undef input()
+#define input() tpips_lex_input()
+#undef unput()
+#define unput(c) tpips_lex_unput(c)
+
 %}
 
-%%
-<TEXT>{EMPTY}		;
-<TEXT>({EMPTY}?\n)+{EMPTY}?      {RETURN SEPARATOR;}
-<TEXT>"/*"		{BEGIN COMMENT;}
-<TEXT>"//[^\n]*\n"	;
-<COMMENT>"*/"		{BEGIN TEXT;}
-<COMMENT>(.|\n)      	;
-<TEXT>"."               {RETURN DOT;}
-<TEXT>"OPEN"|"open"     {RETURN OPEN;}
-<TEXT>"CREATE"|"create" {RETURN CREATE;}
-<TEXT>"CLOSE"|"close"   {RETURN CLOSE;}
-<TEXT>"DELETE"|"delete" {RETURN DELETE;}
-<TEXT>"MODULE"|"module" {RETURN MODULE;}
-<TEXT>"MAKE"|"make"     {RETURN MAKE;}
-<TEXT>"APPLY"|"apply"   {RETURN APPLY;}
-<TEXT>"DISPLAY"|"display"       {RETURN DISPLAY;}
-<TEXT>"ACTIVATE"|"activate"     {RETURN ACTIVATE;}
-<TEXT>"EXIT"|"exit"     {RETURN EXIT;}
-<TEXT>"$ALL"            {RETURN OWNER_ALL;}
-<TEXT>"$PROGRAM"        {RETURN OWNER_PROGRAM;}
-<TEXT>"$MAIN"           {RETURN OWNER_MAIN;}
-<TEXT>"$MODULE"         {RETURN OWNER_MODULE;}
-<TEXT>"$CALLERS"        {RETURN OWNER_CALLERS;}
-<TEXT>"$CALLEES"        {RETURN OWNER_CALLEES;}
-<TEXT>[0-9A-Za-z_-]+    {RETURN NAME;}
-<TEXT>[\.0-9A-Za-z_-]+  {RETURN FILE_NAME;}
-<TEXT>[/\.0-9A-Za-z_-]+ {RETURN PATH_NAME;}
-<TEXT,COMMENT>.         {RETURN UNKNOW_CHAR;}
-%%
-yywrap()
-{
-    return(1) ;
-}
+%s KEY FNAME WNAME RES PHASE PROP
 
-init_lex()
-{
-	BEGIN TEXT;
-}
+%%
+<KEY,FNAME,WNAME,RES,PHASE,PROP>{EMPTY}  {return SEPARATOR;}
+<KEY>"open"     {BEGIN WNAME;return OPEN;}
+<KEY>"create"   {BEGIN WNAME;return CREATE;}
+<KEY>"close"    {BEGIN WNAME;return CLOSE;}
+<KEY>"delete"   {BEGIN WNAME;return DELETE;}
+<KEY>"module"   {BEGIN WNAME;return MODULE;}
+<KEY>"make"     {BEGIN RES;return MAKE;}
+<KEY>"apply"    {BEGIN PHASE;return APPLY;}
+<KEY>"display"  {BEGIN RES;return DISPLAY;}
+<KEY>"activate" {BEGIN PHASE;return ACTIVATE;}
+<KEY>"set"      {BEGIN PROP;return SET;}
+<KEY>"get"      {BEGIN PROP;return GET;}
+<KEY>"info"     {BEGIN WNAME;return INFO;}
+<FNAME>[/\\.0-9A-Za-z_-]+       {yylval.name = strdup(yytext);return FILE_NAME;}
+<WNAME>[0-9A-Za-z_-]+   {BEGIN FNAME;yylval.name =strdup(yytext);return WORKSPACE;}
+<RES,PHASE>\\{    {return OPENBRACE;}
+<RES,PHASE>\\.    {return DOT;}
+<RES,PHASE>\\,    {return COMMA;}
+<RES,PHASE>\\}    {return CLOSEBRACE;}
+<RES,PHASE>"$ALL."             {return OWNER_ALL;}
+<RES,PHASE>"$PROGRAM."         {return OWNER_PROGRAM;}
+<RES,PHASE>"$MAIN."            {return OWNER_MAIN;}
+<RES,PHASE>"$MODULE."          {return OWNER_MODULE;}
+<RES,PHASE>"$CALLERS."         {return OWNER_CALLERS;}
+<RES,PHASE>"$CALLEES."         {return OWNER_CALLEES;}
+%%%%%%%%%%
+<RES,PHASE>[0-9A-Za-z_-]+      {yylval.name =strdup(yytext);return OWNER_NAME;}
+<KEY,FNAME,WNAME,RES,PHASE,PROP>.          {return UNKNOW_CHAR;}
+%%
+
+yywrap()
+{return 1;}
+
+void yyinit_lex()
+{BEGIN KEY;}
+
+void yybegin_key()
+{BEGIN KEY;}
+
+void yybegin_fname()
+{BEGIN FNAME;}
