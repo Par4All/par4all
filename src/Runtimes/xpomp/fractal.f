@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/08/31 18:50:08 $, 
+! $Date: 1996/09/01 21:51:06 $, 
 !
       program fractal
 
@@ -12,9 +12,6 @@
 ! XPOMP library interface:
       include 'xpomp_graphic_F.h'
 
-! Tells HPFC where to link:
-!ldi$ -L$XPOMP_RUNTIME/. -L$PIPS_ROOT/Runtime/xpomp -lxpomp
-      
 ! Algorithm parameters:
       integer n_iteration
       parameter (n_iteration = 256)
