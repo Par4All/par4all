@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1996/10/09 17:02:26 $, 
+ * $Date: 1996/10/14 11:31:48 $, 
  */
 
 #include <stdio.h>
@@ -927,6 +927,9 @@ declarations_privatizer(char *module_name)
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     module_stat = get_current_module_statement();
+    set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping)
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)) );
+    module_to_value_mappings(module);
     
 
     /* Privatizable array regions */
@@ -962,7 +965,12 @@ declarations_privatizer(char *module_name)
     /* Then we need to clean the declarations */
     /* to be done later */
 
+    reset_current_module_entity();
+    reset_current_module_statement();
+    free_cumulated_effects_map();
     free_local_regions_map();
+    free_in_regions_map();
+    free_out_regions_map();
     free_private_regions_map();
     return( TRUE );
 }
