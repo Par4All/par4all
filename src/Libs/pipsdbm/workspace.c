@@ -169,7 +169,7 @@ static bool save_meta_data(bool do_free)
 }
 
 #define ONERROR(cond, what) \
-  if (cond) { reset_meta_data(); what; return FALSE; }
+  if (cond) { what; return FALSE; }
 
 /* load metadata from workspace.
  * @return whether successful.
@@ -344,8 +344,9 @@ bool db_open_workspace(string name)
 	
 	if (!ok)  /* failure! */
 	{
-	    db_reset_current_workspace_name();
-	    pips_user_error("cannot load workspace metadata for %s.\n", name);
+	    reset_meta_data();
+	    pips_user_warning("Cannot load workspace metadata for %s.\n",
+			      name);
 	}
 
 	/* load ENTITIES (since no one ask for them as they should;-) */
