@@ -24,6 +24,10 @@
 
 % Correction de quelques erreurs. RK, 07/02/1994.
 
+\renewcommand{\indexname}{Index}
+
+\makeindex
+
 \begin{document}
 \maketitle
 \sloppy
@@ -48,8 +52,12 @@ La manie`re dont les constructions de Fortran sont repre'sente'es est
 de'crite dans une des sections du rapport EMP-CAII-E105. NewGen est
 pre'sente' dans le rapport EMP-CRI-A191.
 
-\section{Structures de donne'es externes}
+\section{External Data Structures}
 \label{external}
+
+\subsection{Vector}
+\label{subsection-pvecteur}
+\index{Pvecteur}
 
 \domain{External Pvecteur}
 { Le domaine {\tt Pvecteur} est utilise' pour repre'senter les
@@ -72,6 +80,11 @@ sous cette forme quand c'est possible.
 La structure de donne'es Pvecteur est importe'e de la bibliothe`que d'alge`bre
 line'aire en nombres entiers du CAII.
 }
+
+\subsection{Set of Affine Constraints}
+\label{subsection-psysteme}
+\index{Psysteme}
+
 \domain{External Psysteme}
 {
 Le domaine {\tt Psysteme} est utilise' pour repre'senter les syste`mes
@@ -95,8 +108,12 @@ Comme le domaine Pvecteur, la structure de donne'es Psysteme est
 importe'e de la bibliothe`que d'alge`bre line'aire en nombres entiers du
 CAII.  }
 
-\section{Entite's: variables, fonctions, e'tiquettes}
+\section{Entities: Variables, Functions, Operators, Constants, Labels...}
 \label{entity}
+
+\subsection{Entity}
+\label{subsection-entity}
+\index{Entity}
 
 \domain{tabulated entity = name:string x type x storage x initial:value}
 \domain{entity_int = entity->int}
@@ -115,6 +132,10 @@ large, puisqu'il s'agit par exemple du code pour les entite's
 repre'sentant des modules.
 }
 
+\subsection{Type}
+\label{subsection-type}
+\index{Type}
+
 \domain{Type = statement:unit + area + variable + functional + unknown:unit + void:unit}
 {
 Le domaine \verb/type/ repre'sente le type d'une entite'.  Le
@@ -128,6 +149,10 @@ sous-domaine \verb/void/ est utilise' pour le re'sultat d'une subroutine
 ou d'un programme principal.
 }
 
+\subsubsection{Area Type}
+\label{subsubsection-area}
+\index{Area}
+
 \domain{Area = size:int x layout:entity*}
 { Le domaine {\tt area} est utilise' pour repre'senter les aires de
 stockage des variables telles que les commons et les aires statiques ou
@@ -139,6 +164,10 @@ variables est respecte', ce qui permettrait de reproduire des programmes
 sources fide`les a` ce qu'e'taient les programmes initiaux\footnote{Les
 de'clarations sont en fait conserve'es sous forme textuelle pour
 garantir une fide'lite' absolue.}.}
+
+\subsubsection{Variable Type}
+\label{subsubsection-variable}
+\index{Variable}
 
 \domain{Variable = basic x dimensions:dimension*}
 {
@@ -153,6 +182,10 @@ nom '*D*' est utilise'e pour les tableaux de taille non de'finie
 (\verb/DIMENSION T(*)/).
 }
 
+\subsubsection{Basic Type}
+\label{subsubsection-basic}
+\index{Basic}
+
 \domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value}
 {
 Le domaine \verb/basic/ permet de repre'senter un type Fortran tel que
@@ -160,12 +193,20 @@ INTEGER ou REAL. La valeur de ce domaine donne la longueur en octets de
 la zone me'moire occupe'e par une variable de ce type.
 }
 
+\subsubsection{Dimension}
+\label{subsubsection-dimension}
+\index{Dimension}
+
 \domain{Dimension = lower:expression x upper:expression}
 {
 Le domaine \verb/dimension/ permet de repre'senter une dimension d'un
 tableau, c'est-a`-dire un couple borne infe'rieure -- sous-domaine
 \verb/lower/ -- borne supe'rieure -- sous-domaine \verb/upper/.
 }
+
+\subsubsection{Functional Type}
+\label{subsubsection-functional}
+\index{Functional}
 
 \domain{Functional = parameters:parameter* x result:type}
 { Le domaine \verb/functional/ repre'sente le type d'un module,
@@ -181,12 +222,17 @@ interdit pour les modules de'finis par le programmeur, de nombreux
 intrinse`ques comme \verb+MIN0+ ou \verb+WRITE+ n'ont pas un profil
 unique.  }
 
+\subsubsection{Parameter Type and Mode}
+\label{subsubsection-parameter}
+\index{Parameter}
+
 \domain{Parameter = type x mode}
 {
 Le domaine \verb/parameter/ repre'sente le type et le mode de passage d'un
 parame`tre formel de module. 
 }
 
+\index{Mode}
 \domain{Mode = value:unit + reference:unit}
 {
 Le domaine \verb/mode/ repre'sente le mode de passage d'un parame`tre
@@ -194,6 +240,10 @@ formel de module. Le domaine contient un objet du domaine \verb/value/
 pour le mode de passage par valeur et \verb/reference/ pour le passage
 par adresse.
 }
+
+\subsection{Storage}
+\label{subsection-storage}
+\index{Storage}
 
 \domain{Storage = return:entity + ram + formal + rom:unit}
 {
@@ -219,6 +269,10 @@ valeur n'est pas modifiable, telles que les fonctions, les labels, les
 ope'rateurs, etc.
 }
 
+\subsubsection{RAM Storage}
+\label{subsubsection-ram}
+\index{RAM}
+
 \domain{Ram = function:entity x section:entity x offset:int x shared:entity*}
 {
 Le domaine \verb/ram/ permet de pre'ciser la de'claration d'une
@@ -232,6 +286,10 @@ shared} donne la liste des entite's qui partagent statiquement un
 morceau d'espace me'moire avec la variable concerne'. En Fortran, le
 partage de me'moire vient des equivalences entre variables.  }
 
+\subsubsection{Formal Parameter Storage}
+\label{subsubsection-formal}
+\index{Formal}
+
 \domain{Formal = function:entity x offset:int}
 {
 Le domaine \verb/formal/ indique le module dans lequel un parame`tre formel
@@ -240,6 +298,10 @@ parame`tre dans la liste des parame`tres gra^ce au sous-domaine
 \verb/offset/.
 Le premier parame`tre a un rang de 1 et non de 0.
 }
+
+\subsection{Entity Value}
+\label{subsection-value}
+\index{Value}
 
 \domain{Value = code + symbolic + constant + intrinsic:unit + unknown:unit}
 {
@@ -254,6 +316,10 @@ ope'rateurs, les instructions, etc. Enfin le sous-domaine
 \verb/unknown/ est utilise' pour les valeurs initiales inconnues.
 }
 
+\subsubsection{Symbolic Value}
+\label{subsubsection-symbolic}
+\index{Symbolic}
+
 \domain{Symbolic = expression x constant}
 {
 Le domaine \verb/symbolic/ est utilise' pour repre'senter la valeur
@@ -265,6 +331,10 @@ initiale contenue dans le sous-domaine \verb/constant/. Le sous-domaine
 source fide`le.
 }
 
+\subsubsection{Constant Value}
+\label{subsubsection-constant}
+\index{Constant}
+
 \domain{Constant = int + litteral:unit}
 {
 Le domaine \verb/constant/ est utilise' pour repre'senter la valeur
@@ -273,18 +343,32 @@ nous inte'ressent, ce qui explique qu'une constante puisse e^tre soit un
 \verb/int/ soit un \verb/litteral/ dont on ne garde pas la valeur (type unit).
 }
 
-\section{Repre'sentation des instructions}
+\section{Code, Statements and Instructions}
 \label{code}
+
+\subsection{Module Code}
+\label{subsection-code}
+\index{Code}\index{Declarations}\index{Decls text}
 
 \domain{Code = declarations:entity* x decls\_text:string}
 { 
 Le domaine \verb/code/ est utilise'
 pour stocker le corps des modules. Le sous-domaine \verb/declarations/
 contient une liste d'entite's qui sont les variables locales,
-parame`ters formels et commons de'clare's dans la fonction. Le
-sous-domaine {\tt decls\_text} contient le texte exact de toutes les
-de'clarations du module; ce texte est utilise' par le prettyprinter.
+parame`ters formels et commons de'clare's dans la fonction.
+
+Le sous-domaine {\tt decls\_text} contient le texte exact de toutes les
+de'clarations du module; ce texte est utilise' par de'faut par le
+prettyprinter tant qu'il existe. Quand le code a e'te' fortement
+transforme', le prettyprinter re'ge'ne`re des de'clarations
+synthe'tiques.
 }
+
+\subsection{Callees}
+\label{subsection-callees}
+\index{Callees}
+
+% Should be put somewhere else!
 
 \domain{Callees = callees:string*}
 { Le domaine {\tt callees} sert a` porter des informations
@@ -293,6 +377,10 @@ callees} contient la liste des noms des sous-programmes et fonctions
 directement appele's dans le code. Il contient une partie du callgraph.
 }
 
+\subsection{Statement}
+\label{subsection-statement}
+\index{Statement}
+
 \domain{Statement = label:entity x number:int x ordering:int x comments:string x instruction}
 { 
 Le
@@ -300,13 +388,23 @@ domaine \verb/statement/ permet de repe'rer les instructions d'un
 module.  Le sous-domaine \verb/label/ contient une entite' qui de'finit
 le label\footnote{Un statement dont l'instruction est un bloc n'a
 jamais de label.}.
-  Le sous-domaine \verb/number/ contient un nume'ro permettant
+
+Le sous-domaine \verb/number/ contient un nume'ro permettant
 de repe'rer le statement pour le debugging ou l'information de
-l'utilisateur (valeur par defaut: \verb+STATEMENT\_NUMBER\_UNDEFINED+). Le sous-domaine \verb/ordering/ contient un entier
-caracte'ristique du statement; il est forme' de la concate'nation du
-nume'ro de composante dans le graphe de contro^le et du nume'ro de
-statement dans dans cette composante; cet entier sert a` comparer
-l'ordre lexical des statements et sa valeur par defaut est \verb+STATEMENT\_ORDERING\_UNDEFINED+. 
+l'utilisateur (valeur par defaut:
+\verb+STATEMENT\_NUMBER\_UNDEFINED+). Ce nume'ro est de'fini par
+l'utilisateur et n'est (en princpe) jamais modifie'. Apre`s de'roulage
+de boucle, plusieurs \verb/statement/s peuvent avoir le me^me nume'ro.
+
+Le sous-domaine \verb/ordering/ contient un entier caracte'ristique du
+statement; il est forme' de la concate'nation du nume'ro de composante
+dans le graphe de contro^le et du nume'ro de statement dans dans cette
+composante; cet entier sert a` comparer l'ordre lexical des statements
+et sa valeur par defaut est \verb+STATEMENT\_ORDERING\_UNDEFINED+. Il
+est automatiquement recalcule' apre`s chaque transformation de
+programme. Il est aussi utilise' comme nom absolu d'un \verb/statement/
+quand des structures de donne'es comme les tables de hash-code sont
+e'crites sur disque ou relues.
 
 Le sous-domaine {\tt comments} contient le texte du commentaire associe'
 a ce statement dans le programme initial; ce texte est utilise' par le
@@ -317,6 +415,10 @@ prend la valeur \verb/string\_undefined/.
 Le sous-domaine \verb/instruction/ contient
 l'instruction proprement dite.
 }
+
+\subsection{Instruction}
+\label{subsection-instruction}
+\index{Instruction}
 
 \domain{Instruction = block:statement* + test + loop + goto:statement + call + unstructured}
 { 
@@ -334,6 +436,10 @@ structure'. Toutes ces instructions
 sont repre'sente'es par des appels a` des fonctions pre'de'finies dont
 nous e'tudierons la nature plus loin.
 }
+
+\subsubsection{Control Flow Graph (a.k.a. Unstructured)}
+\label{subsubsection-unstructured}
+\index{Unstructured}
 
 \domain{Unstructured = control x exit:control}
 {
@@ -409,6 +515,10 @@ Figure~\ref{figure-hierarchical-control-flow-graph}).
 
 }
 
+\subsubsection{Conditional (a.k.a. Test)}
+\label{subsubsection-test}
+\index{Test}
+
 \domain{Test = condition:expression x true:statement x false:statement}
 {
 Le domaine \verb/test/ permet de repre'senter toutes les instructions a` base
@@ -421,6 +531,10 @@ a` l'exception de l'instruction \verb/DO/, est
 transforme'e en une combinaison se'mantiquement e'quivalente de \verb/test/s
 et de \verb/goto/s.
 }
+
+\subsubsection{DO Loop, Sequential or Parallel}
+\label{subsubsection-loop}
+\index{Loop}
 
 \domain{Loop = index:entity x range x body:statement x label:entity x execution x locals:entity*}
 {
@@ -435,6 +549,7 @@ comportement dynamique d'une boucle. Les entite's pre'sentes dans
 masque's quand on sort de la boucle).
 }
 
+\index{Execution}
 \domain{Execution = sequential:unit + parallel:unit}
 {
 Le domain \verb/execution/ de'finit la se'mantique d'une boucle:
@@ -443,6 +558,8 @@ de'finit un boucle dont les instances d'ite'ration peuvent e^tre
 exe'cute'es en paralle`le.
 }
 
+\label{range}
+\index{Range}
 \domain{Range = lower:expression x upper:expression x increment:expression}
 {
 Le domaine \verb/range/ permet de repre'senter les bornes des boucles DO
@@ -450,6 +567,10 @@ Fortran. Il y a trois sous-domaines \verb/lower/, \verb/upper/ et \verb/incremen
 type \verb/expression/ qui sont respectivement la borne infe'rieure, la borne
 supe'rieure et l'incre'ment.
 }
+
+\subsubsection{Function Call}
+\label{subsubsection-call}
+\index{Call}
 
 \domain{Call = function:entity x arguments:expression*}
 {
@@ -473,6 +594,10 @@ Le sous-domaine \verb/function/ est une entite' qui de'finit la fonction
 appele'e. Le sous-domaine \verb/arguments/ est une liste de sous-domaines
 \verb/expression/ qui repre'sente les arguments d'appel de la fonction.
 }
+
+\subsubsection{Control Flow Graph (cont.)}
+\label{subsubsection-control}
+\index{Control}
 
 \domain{Control = statement x predecessors:control* x successors:control*}
 \domain{Controlmap = persistant statement->control}
@@ -511,8 +636,10 @@ because auxiliary data structures must be decraled and freed.
 
 }
 
-\section{Repre'sentation des expressions}
+% \section{Repre'sentation des expressions}
+\section{Expressions}
 \label{expression}
+\index{Expression}
 
 \domain{Expression = syntax x normalized}
 { 
@@ -529,6 +656,10 @@ n'a pas e'te' appele'e pour cette expression; cela {\bf ne} signifie
 que l'expression n'est pas line'aire.
 }
 
+\subsection{Abstract Tree of an Expression: Syntax}
+\label{subsection-syntax}
+\index{Syntax}
+
 \domain{Syntax = reference + range + call}
 {
 Le domaine \verb/syntax/ permet de repre'senter les expressions telles
@@ -543,6 +674,10 @@ un \verb/range/, dans le cas des expressions bornes de boucles (le domaine
 {\em Instructions}).
 }
 
+\subsubsection{Reference}
+\label{subsubsection-reference}
+\index{reference}
+
 \domain{Reference = variable:entity x indices:expression*}
 {
 Le domaine \verb/reference/ est utilise' pour repre'senter une
@@ -554,6 +689,19 @@ contient une entite' de'finissant la variable re'fe'rence'e. Le
 sous-domaine \verb/indices/ contient une liste {\tt expression}s qui sont les
 indices de la re'fe'rence.
 }
+
+\subsubsection{Range}
+
+See Section~\ref{range}.
+
+\subsubsection{Function Call}
+
+All operators, including assignment, are repreented as function calls
+with side effect. See Section~\ref{subsubsection-call}.
+
+\subsection{Affine Representation of an Expression}
+\label{subsection-normalized}
+\index{Normalized}
 
 \domain{Normalized = linear:Pvecteur + complex:unit}
 { Le domaine {\tt normalized} permet de savoir si une expression est une
@@ -568,18 +716,27 @@ T(I) + T(I+1)}).
 La forme normalise'e n'existe pas si l'expression n'a pas encore e'te'
 examine'e. }
 
-\section{Effets des instructions}
+% \section{Effets des instructions}
+\section{Memory Effects of Statements}
 \label{effects}
+
+\subsection{Effects}
+\label{subsection-effects}
+\index{Effects}
 
 \domain{Effects =  effects:effect*}
 {}
+
+\subsection{Effect}
+\label{subsection-effect}
+\index{Effect}\index{Region}
 
 \domain{Effect =  persistant reference x action x approximation x context:transformer}
 {
 Le domaine \verb/effect/ est utilise' pour repre'senter les effets d'un
 statement sur les variables du module. Les effets des instructions sont
 le point de de'part du calcul des Def-Use Chains, des de'pendances, des
-Summary Data Flow Information, et des regions.
+Summary Data Flow Information, et des re'gions.
 
 Le sous-domaine {\tt reference} indique sur quelle variable, scalaire ou
 tableau, a lieu un effet, le sous-domaine {\tt action} pre'cise si la
@@ -599,12 +756,20 @@ exe'cute'e.  Il permet de repre'senter les effets des instructions par
 des re'gions (telles que de'finies par Re'mi Triolet).
 }
 
+\subsection{Nature of an Effect}
+\label{subsection-action}
+\index{Action}
+
 \domain{Action = read:unit + write:unit}
 {
 Deux types d'effets sont utilise's dans les conditions de Bernstein
 et dans les conditions propres a` chaque transformation de programme:
 la lecture d'une variable et son e'criture.
 }
+
+\subsection{Approximation of an Effect}
+\label{subsection-approximation}
+\index{Approximation}
 
 \domain{Approximation = may:unit + must:unit}
 {
@@ -624,6 +789,10 @@ e'le'ments l'est.
 
 \section{Analyse se'mantique}
 \label{semantics}
+
+\subsection{Transformer}
+\label{subsection-transformer}
+\index{Transformer}
 
 \domain{Transformer = arguments:entity* x relation:predicate}
 {
@@ -653,6 +822,10 @@ initial d'un module et l'e'tat pre'ce'dent l'exe'cution de ce {\tt statement}.
 
 Les transformers ne sont de'finis qu'apre`s une phase d'analyse se'mantique.
 }
+
+\subsection{Predicate}
+\label{subsection-predicate}
+\index{Predicate}\index{Precondition}\index{Transformer}
 
 \domain{Predicate = system:Psysteme}
 {
@@ -728,6 +901,12 @@ unstructured = control x exit:control ;
 value = code + symbolic + constant + intrinsic:unit + unknown:unit ;
 variable = basic x dimensions:dimension* ;
 \end{verbatim}
+
+\newpage
+
+% Cross-references for points and keywords
+
+\input{ri.ind}
 
 \end{document}
 \end
