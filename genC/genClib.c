@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1998/04/15 12:05:40 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1998/04/15 12:09:42 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1765,7 +1765,7 @@ write_leaf_in(
     else if( IS_EXTERNAL( bp )) {
 	if( bp->domain->ex.write == NULL ) {
 	    user( "gen_write: uninitialized external type %s (%d)\n",
-		 bp->name, bp->index);
+		 bp->name, bp-Domains);
 	    return( !GO) ;
 	}
 	(void) fprintf( user_file, "#]external %d ", bp-Domains ) ;
