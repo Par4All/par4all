@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/08/01 18:18:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/13 18:06:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/08/01 18:18:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/09/13 18:06:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -247,6 +247,7 @@ Menu_item menu_item;
 void create_log_menu()
 {
     Menu menu;
+    Panel_item log_button;
 
     open_front = xv_create(NULL, MENUITEM, 
 		     MENU_STRING, "Open",
@@ -274,10 +275,16 @@ void create_log_menu()
 		     MENU_APPEND_ITEM, close,
 		     NULL);
 
-    (void) xv_create(main_panel, PANEL_BUTTON,
+    log_button = xv_create(main_panel, PANEL_BUTTON,
 		     PANEL_LABEL_STRING, "Log  ",
 		     PANEL_ITEM_MENU, menu,
 		     0);
+
+    if (wpips_emacs_mode)
+       /* In fact, create it but disabled to keep the same frame
+          layout in the Emacs mode: */
+       xv_set(log_button, PANEL_INACTIVE, TRUE,
+              NULL);
 }
 
 
