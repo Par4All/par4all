@@ -473,6 +473,204 @@ basic b;
     return(string_undefined); /* just to avoid a gcc warning */
 }
 
+
+
+/*============================================================================*/
+/* basic basic_of_expression(expression exp): Makes a basic of the same
+ * basic as the expression "exp". Indeed, "exp" will be assigned to
+ * a temporary variable, which will have the same declaration as "exp".
+ */
+basic basic_of_expression(exp)
+expression exp;
+{
+    syntax sy = expression_syntax(exp);
+
+    debug(6, "basic_of_expression", "\n");
+
+
+    /* FI-AP: is it a simple short cut (which should be eliminated)
+       or is it important?!? */
+    if(nlc_linear_expression_p(exp))
+	return(make_basic(is_basic_int, 4));
+
+    switch(syntax_tag(sy))
+    {
+  case is_syntax_reference :
+    {
+    type exp_type = entity_type(reference_variable(syntax_reference(sy)));
+
+    if (type_tag(exp_type) != is_type_variable)
+      pips_error("make_tmp_basic", "Bad reference type tag");
+    return(variable_basic(type_variable(exp_type)));
+    }
+  case is_syntax_call : return(basic_of_call(syntax_call(sy)));
+  case is_syntax_range : return(basic_of_expression(range_lower(syntax_range(sy))));
+  default : pips_error("basic_of_expression", "Bad syntax tag");
+    /* Never go there... */
+    return make_basic(is_basic_overloaded, 4);
+  }
+}
+
+
+
+/*============================================================================*/
+/* basic basic_of_call(call c): returns the basic of the result given by the
+ * call "c".
+ */
+basic basic_of_call(c)
+call c;
+{
+  entity e = call_function(c);
+  tag t = value_tag(entity_initial(e));
+
+  switch (t)
+    {
+    case is_value_code: return(basic_of_external(c));
+    case is_value_intrinsic: return(basic_of_intrinsic(c));
+    case is_value_symbolic: break;
+    case is_value_constant: return(basic_of_constant(c));
+    case is_value_unknown: pips_error("basic_of_call", "unknown function %s\n",
+				      entity_name(e));
+    default: pips_error("basic_of_call", "unknown tag %d\n", t);
+      /* Never go there... */
+    }
+  return make_basic(is_basic_overloaded,4 );
+}
+
+
+
+/*============================================================================*/
+/* basic basic_of_external(call c): returns the basic of the result given by
+ * the call to an external function.
+ */
+basic basic_of_external(c)
+call c;
+{
+type call_type, return_type;
+
+debug(7, "basic_of_call", "External call\n");
+
+call_type = entity_type(call_function(c));
+if (type_tag(call_type) != is_type_functional)
+  pips_error("basic_of_external", "Bad call type tag");
+
+return_type = functional_result(type_functional(call_type));
+if (type_tag(return_type) != is_type_variable)
+  pips_error("basic_of_external", "Bad return call type tag");
+
+return(variable_basic(type_variable(return_type)));
+}
+
+
+
+/*============================================================================*/
+/* basic basic_of_intrinsic(call c): returns the basic of the result given by
+ * call to an intrinsic function. This basic must be computed with the
+ * basic of the arguments of the intrinsic.
+ */
+basic basic_of_intrinsic(c)
+call c;
+{
+  basic rb;
+  entity call_func;
+
+  debug(7, "basic_of_call", "Intrinsic call\n");
+
+  call_func = call_function(c);
+
+  if(ENTITY_LOGICAL_OPERATOR_P(call_func))
+    rb = make_basic(is_basic_logical, 4);
+  else
+    {
+      list call_args = call_arguments(c);
+      if (call_args == NIL)
+	/* I don't know the type since there is no arguments !
+	   Bug encountered with a FMT=* in a PRINT.
+	   RK, 21/02/1994 : */
+	rb = make_basic(is_basic_overloaded, 1);
+/*	rb = make_basic(is_basic_int, 4); */
+      else {
+      expression arg1, arg2;
+	arg1 = EXPRESSION(CAR(call_args));
+	if(CDR(call_args) == NIL)
+	  rb = basic_of_expression(arg1);
+	else
+	  {
+	    arg2 = EXPRESSION(CAR(CDR(call_args)));
+	    rb = basic_union(arg1, arg2);
+	  }
+
+      }}
+  return(rb);
+}
+
+
+
+/*============================================================================*/
+/* basic basic_of_constant(call c): returns the basic of the call to a
+ * constant.
+ */
+basic basic_of_constant(c)
+call c;
+{
+type call_type, return_type;
+
+debug(7, "basic_of_call", "Constant call\n");
+
+call_type = entity_type(call_function(c));
+if (type_tag(call_type) != is_type_functional)
+  pips_error("basic_of_constant", "Bad call type tag");
+
+return_type = functional_result(type_functional(call_type));
+if (type_tag(return_type) != is_type_variable)
+  pips_error("basic_of_constant", "Bad return call type tag");
+
+return(variable_basic(type_variable(return_type)));
+}
+
+
+
+/*============================================================================*/
+/* basic basic_union(expression exp1 exp2): returns the basic of the
+ * expression which has the most global basic. Then, between "int" and
+ * "float", the most global is "float".
+ *
+ * Note: there are two different "float" : DOUBLE PRECISION and REAL.
+ */
+basic basic_union(exp1, exp2)
+expression exp1, exp2;
+{
+basic b1, b2;
+tag t1, t2;
+
+b1 = basic_of_expression(exp1);
+b2 = basic_of_expression(exp2);
+t1 = basic_tag(b1);
+t2 = basic_tag(b2);
+
+debug(7, "basic_union", "Tags: exp1 = %d, exp2 = %d\n", t1, t2);
+
+if( (t1 != is_basic_complex) && (t1 != is_basic_float) &&
+    (t1 != is_basic_int) && (t2 != is_basic_complex) &&
+    (t2 != is_basic_float) && (t2 != is_basic_int) )
+  pips_error("basic_union",
+	     "Bad basic tag for expression in numerical function");
+
+if(t1 == is_basic_complex)
+  return(b1);
+if(t2 == is_basic_complex)
+  return(b2);
+if(t1 == is_basic_float)
+  {
+  if( (t2 != is_basic_float) || (basic_float(b1) == DOUBLE_PRECISION_SIZE) )
+    return(b1);
+  return(b2);
+  }
+if(t2 == is_basic_float)
+  return(b2);
+return(b1);
+}
+
 /*
  *  that is all
  */
