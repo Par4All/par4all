@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.73  1998/04/14 20:42:15  coelho
+ * *** empty log message ***
+ *
  * Revision 1.72  1997/12/08 14:51:29  coelho
  * free_text added.
  *
@@ -911,22 +914,19 @@ static void debug_ref_rwt(reference r)
 		entity_name(var));
 }
 
-void debug_print_referenced_entities(obj)
-gen_chunk *obj;
+void debug_print_referenced_entities(void * obj)
 {
-    gen_recurse(obj, reference_domain, gen_true, debug_ref_rwt);
+    gen_multi_recurse(obj, reference_domain, gen_true, debug_ref_rwt, NULL);
 }
 
-void update_common_references_in_obj(obj)
-gen_chunk *obj;
+void update_common_references_in_obj(void * obj)
 {
     gen_multi_recurse(obj, 
 		      loop_domain, gen_true, update_loop_rewrite,
 		      reference_domain, gen_true, update_common_rewrite,
 		      NULL);
 
-    ifdebug(8)
-	debug_print_referenced_entities(obj);
+    ifdebug(8) debug_print_referenced_entities(obj);
 }
 
 void update_common_references_in_regions()
