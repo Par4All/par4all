@@ -7,6 +7,9 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.24  2000/11/08 07:47:00  nguyen
+  assert added in dead_unstructured_test_filter()
+
   Revision 1.23  2000/07/19 15:33:43  ancourt
   test linearity of loop range to deal with REAL range type
 
@@ -537,6 +540,9 @@ dead_unstructured_test_filter(statement st)
     transformer pre = load_statement_precondition(st);
     expression cond = test_condition(t);
     
+    pips_assert("Preconditions are defined for all statements",
+		!transformer_undefined_p(pre));
+
     ifdebug(6)
 	sc_fprint(stderr,
 		  predicate_system(transformer_relation(pre)),
