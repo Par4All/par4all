@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.52  2000/10/12 12:43:18  irigoin
+ * MakeDoInst() upgraded to handle property PARSER_LINEARIZE_LOOP_BOUNDS and
+ * to replace complex loop bounds by simple references
+ *
  * Revision 1.51  1998/12/23 12:54:47  ancourt
  * eliminate sharing on expression
  *
@@ -1091,11 +1095,63 @@ string l;
     instblock_do = MakeEmptyInstructionBlock();
     stmt_do = instruction_to_statement(instblock_do);
 
-    ido = make_instruction(is_instruction_loop,
-			   make_loop(dovar, r, stmt_do, dolab,
-				     make_execution(is_execution_sequential, 
-						    UU),
-				     NIL));
+    if(get_bool_property("PARSER_LINEARIZE_LOOP_BOUNDS")) {
+      normalized nl = NORMALIZE_EXPRESSION(range_lower(r));
+      normalized nu = NORMALIZE_EXPRESSION(range_upper(r));
+      normalized ni = NORMALIZE_EXPRESSION(range_increment(r));
+
+      if(normalized_linear_p(nl) && normalized_linear_p(nu) &&  normalized_linear_p(ni)) {
+	ido = make_instruction(is_instruction_loop,
+			       make_loop(dovar, r, stmt_do, dolab,
+					 make_execution(is_execution_sequential, 
+							UU),
+					 NIL));
+      }
+      else {
+	/* Let's build a sequence with loop range assignments */
+	instruction sido = make_instruction(is_instruction_loop,
+					    make_loop(dovar, r, stmt_do, dolab,
+						      make_execution(is_execution_sequential, 
+								     UU),
+						      NIL));
+	list a = CONS(STATEMENT, make_stmt_of_instr(sido), NIL);
+ 
+	if(!normalized_linear_p(ni)) {
+	  entity nv = make_new_scalar_variable_with_prefix("INC_",
+							   get_current_module_entity(),
+							   make_basic(is_basic_int, (void*) 4));
+	  instruction na = make_assign_instruction(entity_to_expression(nv),range_increment(r));
+	  range_increment(r) = entity_to_expression(nv);
+	  a = CONS(STATEMENT, make_stmt_of_instr(na), a);
+	}
+ 
+	if(!normalized_linear_p(nu)) {
+	  entity nv = make_new_scalar_variable_with_prefix("U_",
+							   get_current_module_entity(),
+							   make_basic(is_basic_int, (void*) 4));
+	  instruction na = make_assign_instruction(entity_to_expression(nv),range_upper(r));
+	  range_upper(r) = entity_to_expression(nv);
+	  a = CONS(STATEMENT, make_stmt_of_instr(na), a);
+	}
+
+	if(!normalized_linear_p(nl)) {
+	  entity nv = make_new_scalar_variable_with_prefix("L_",
+							   get_current_module_entity(),
+							   make_basic(is_basic_int, (void*) 4));
+	  instruction na = make_assign_instruction(entity_to_expression(nv),range_lower(r));
+	  range_lower(r) = entity_to_expression(nv);
+	  a = CONS(STATEMENT, make_stmt_of_instr(na), a);
+	}
+	ido = make_instruction_block(a);
+      }
+    }
+    else {
+      ido = make_instruction(is_instruction_loop,
+			     make_loop(dovar, r, stmt_do, dolab,
+				       make_execution(is_execution_sequential, 
+						      UU),
+				       NIL));
+    }
 
     LinkInstToCurrentBlock(ido, TRUE);
    
