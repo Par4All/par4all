@@ -79,7 +79,7 @@ select_fix_point_operator()
 	    transformer_fix_point_operator = transformer_derivative_fix_point;
 	}
 	else {
-	    user_error("select_fix_point_operator", "Value %s for property %s unknown\n",
+	    user_error("select_fix_point_operator", "Unknown value %s for property %s\n",
 		       fp_name, "SEMANTICS_FIX_POINT_OPERATOR");
 	}
     }
