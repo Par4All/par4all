@@ -36,7 +36,7 @@ select_a_module_by_default()
 	if (!string_undefined_p(main_module_name)) {
 	    /* Ok, we got it ! Now we select it: */
 	    module_name = main_module_name;
-	    user_log("Main module PROGRAM \"%s\" found.", module_name);
+	    user_log("Main module PROGRAM \"%s\" found.\n", module_name);
 	    end_select_module_notify(module_name);
 	    /* GO: show_module() has already been called so return now */
 	    return;
