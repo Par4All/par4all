@@ -89,6 +89,11 @@ static void print_property(char*,property);
 static t_file_list the_file_list;
 extern bool tpips_execution_mode;
 
+#define YYERROR_VERBOSE 1 /* MUCH better error messages with bison */
+
+extern int yylex(void);
+extern void yyerror(char *);
+
 %}
 
 %union {
@@ -169,19 +174,23 @@ i_create:
 	    
 	    if (tpips_execution_mode) {
 		if (workspace_exists_p($<name>4))
-		    user_error ("create",
-				"Workspace %s already exists. Delete it!\n",
-				$<name>4);
+		    pips_user_error
+			("i_create: Workspace %s already exists. Delete it!\n",
+			 $<name>4);
 		else {
-		  if(db_create_workspace ((string) $<name>4)) {
-		    free($<name>4);
-		    if(!create_workspace (&the_file_list.argc, the_file_list.argv)) {
-			string wname = db_get_current_workspace_name();
+		  if(db_create_workspace ((string) $<name>4))
+		  {
+		    if(!create_workspace (&the_file_list.argc, 
+					  the_file_list.argv)) 
+		    {
+			/* string wname = db_get_current_workspace_name();*/
 			db_close_workspace();
-			delete_workspace(wname);
-			user_error("create",
-				   "Could not create workspace %s\n", wname);
+			delete_workspace($<name>4);
+			pips_user_error("i_create: Could not create workspace"
+					" %s\n", $<name>4);
 		    }
+
+		    free($<name>4);
 		    main_module_name = get_first_main_module();
 		    
 		    if (!string_undefined_p(main_module_name)) {
@@ -193,8 +202,8 @@ i_create:
 		    $$ = TRUE;
 		  }
 		  else {
-		    user_error("create",
-			       "Cannot create directory for workspace, check rights!\n");
+		    pips_user_error("Cannot create directory for workspace,"
+				    " check rights!\n");
 		  }
 		}
 	    }
@@ -740,13 +749,6 @@ sep_list:
 	;
 
 %%
-
-void yyerror(s)
-char * s;
-{
-    tpips_lex_print_pos(stderr);
-    user_error("yyparse"," %s\n", s);
-}
 
 void close_workspace_if_opened()
 {
