@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/09/22 04:54:38 $, 
+ * $Date: 1997/09/22 06:16:29 $, 
  */
 
 #include <unistd.h>
@@ -385,7 +385,7 @@ char *get_cwd()
 }
 
 /* returns the allocated line read, whatever its length.
- * also some asserts. FC 09/97.
+ * returns NULL on EOF. also some asserts. FC 09/97.
  */
 char * 
 safe_readline(FILE * file)
@@ -402,6 +402,7 @@ safe_readline(FILE * file)
 	}
 	buf[i++] = (char) c;
     }
-    buf[i++] = '\0'; res = strdup(buf); free(buf);
+    if (c==EOF && i==0) { res = NULL; free(buf); }
+    else { buf[i++] = '\0'; res = strdup(buf); free(buf); }
     return res;
 }
