@@ -26,7 +26,7 @@
 #include "sc.h"
 #include "polyedre.h"
 #include "union.h"
-#include "matrice.h"
+/* #include "matrice.h" Obsolete */
 #include "matrix.h"
 
 /* Pips includes 	*/
