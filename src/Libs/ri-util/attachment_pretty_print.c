@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "text.h"
 #include "text-util.h"
@@ -356,7 +358,7 @@ attach_statement_information_to_text(text t,
 	/* Some prettyprinters such as effects generate NULL
            text... Just ignore. */
 	attach_to_text(t, make_attachee(is_attachee_statement_line_number,
-					statement_number(s)));
+					(void*) statement_number(s)));
 }
 
 
@@ -783,6 +785,7 @@ put_an_attachment_in_the_list(attachment a)
 static void
 rewrite_an_attachment(attachment a)
 {
+    return;
 }
 
 
@@ -806,10 +809,11 @@ output_the_attachments_for_emacs(FILE * output_file)
     fprintf(output_file, "\")\n");
 
     /* Enumerate all the attachments: */
-    gen_recurse(get_word_to_attachments_begin(),
-		attachment_domain,
-		put_an_attachment_in_the_list,
-		rewrite_an_attachment);
+    gen_multi_recurse(get_word_to_attachments_begin(),
+		      attachment_domain,
+		      put_an_attachment_in_the_list,
+		      rewrite_an_attachment,
+		      NULL);
 
     /* Now we try to output the stuff in a decent order: */
     output_the_attachments_in_a_sorted_order(output_file);
