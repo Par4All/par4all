@@ -45,6 +45,18 @@ statement s;
     OrderingToStatement = set_ordering_to_statement(s);
 }
 
+void print_ordering_to_statement()
+{
+    HASH_MAP(ko,vs,{
+	int o = (int) ko;
+	statement s = (statement) vs;
+
+	fprintf(stderr,"%d (%d,%d)->%s\n",
+		o, ORDERING_NUMBER(o), ORDERING_STATEMENT(o),
+		statement_identification(s));
+    },OrderingToStatement);
+}
+
 statement ordering_to_statement(o)
 int o;
 {
