@@ -331,8 +331,8 @@ Int     : GRAM_INT   {$$ = atoi( yytext );}
         ;
 
 Name	: IDENT	{
-	        $$ = alloc( strlen( yytext )+1 ) ;
-		check_not_keyword( strcpy( $$, yytext ) ) ;
+	        $$ = strdup(yytext); 
+		check_not_keyword( $$ ) ;
 		}
 	;
 %%
