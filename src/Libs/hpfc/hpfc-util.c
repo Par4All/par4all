@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/09/16 15:54:09 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/09/30 08:03:23 $, )
  * version $Revision$
  */
 
@@ -214,7 +214,7 @@ statement s;
 list DistArraysEffects(expr)
 expression expr;
 {
-    list le = proper_effects_of_expression(expr,is_action_read), lde = NIL;
+    list le = proper_effects_of_expression(expr), lde = NIL;
 
     MAP(EFFECT, e, if (array_distributed_p(e)) lde=CONS(EFFECT,e,lde), le);
     
