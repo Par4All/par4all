@@ -99,7 +99,7 @@ boolean is_test_Di;
 boolean Finds2s1;
 
 
-jmp_buf overflow_error; /* to deal with overflow errors occuring during the projection 
+jmp_buf overflow_error;/* to deal with overflow errors occuring during the projection 
                          * of a Psysteme along a variable */
 
 
@@ -1285,6 +1285,7 @@ Ptsg *gs,*gsop;
     /* Further construction of the dependence system; Constant and GCD tests
      * at the same time. 
      */
+    assert(sc_weak_consistent_p(dep_syst));
     if (gcd_and_constant_dependence_test(r1,r2,llv,n2,&dep_syst)) 
     {
 	/* independence proved */
@@ -1946,6 +1947,9 @@ list llv, s2_enc_loops;
 
 	/* sc_tmp is emptied and freed by sc_fusion() */
 	sc_dep = sc_fusion(sc_dep, sc_tmp);
+	sc_dep->base = BASE_NULLE;
+	sc_creer_base(sc_dep);
+
     }
 
     ifdebug(6) 
@@ -2321,7 +2325,7 @@ effect ef1, ef2;
 static Ptsg dependence_cone_positive(dep_sc)
 Psysteme dep_sc;
 {
-    Psysteme sc_env= SC_UNDEFINED;
+    Psysteme sc_env= SC_UNDEFINED, sc_tmp = SC_UNDEFINED;
     Ptsg sg_env = sg_new();
     Pbase b;
     int n,i, j;
@@ -2369,16 +2373,27 @@ Psysteme dep_sc;
 	    syst_debug(sub_sc); 
 	}
 	
-	if (! sc_integer_feasibility_ofl_ctrl(sub_sc, NO_OFL_CTRL, TRUE))
-	{ 
-	    sc_rm(sub_sc);
-	    debug(7,"dependence_cone_positive", 
-		  "sub lexico-positive dependence system not feasible\n");
-
-	    ifdebug(1) {
-		mem_spy_end("dependence_cone_positive: one iteration, continue 1");
+	/* dans le cas d'une erreur d'overflow, on fait comme si le test 
+	 *  avait renvoye' true. bc.
+	 */  
+	if (setjmp(overflow_error)) 
+	{
+	    pips_debug(1, "overflow error.\n");
+	}
+	else
+	{
+	    if (! sc_integer_feasibility_ofl_ctrl(sub_sc, FWD_OFL_CTRL, TRUE))
+	    { 
+		sc_rm(sub_sc);
+		debug(7,"dependence_cone_positive", 
+		      "sub lexico-positive dependence system not feasible\n");
+		
+		ifdebug(1) {
+		    mem_spy_end("dependence_cone_positive: one iteration," 
+				" continue 1");
+		}
+		continue;
 	    }
-	    continue;
 	}
 	
 	if ((sub_sc = sc_normalize(sub_sc))== NULL)
