@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 2003/07/28 09:17:51 $, 
+# $Date: 2003/07/31 07:20:25 $, 
 
 LIB_CFILES=	sc_alloc.c \
 	        sc_projection.c \
@@ -26,17 +26,12 @@ LIB_CFILES=	sc_alloc.c \
 		sc_new_loop_bound.c \
 		sc_simplexe_feasibility.c \
 		sc_debug.c \
-		sc_janus_feasibility.c \
-		isolve.c \
-		r1.c
+		sc_janus_feasibility.c
 
 LIB_HEADERS=	sc-local.h \
 		sc-private.h \
 		sc_gram.y \
-		sc_lex.l \
-		iabrev.h \
-		iproblem.h \
-		rproblem.h
+		sc_lex.l
 
 DERIVED_HEADERS=sc_gram.h
 DERIVED_CFILES=	sc_gram.c sc_lex.c
