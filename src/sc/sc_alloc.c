@@ -268,3 +268,42 @@ Psysteme sc;
     assert(!SC_UNDEFINED_P(sc));
     return sc_nbre_inegalites(sc)==0 && sc_nbre_egalites(sc)==0;
 }
+
+
+/* void sc_add_egalite(Psysteme p, Pcontrainte e): macro ajoutant une
+ * egalite e a un systeme p; la base n'est pas mise a jour; il faut faire
+ * ensuite un appel a sc_creer_base(); il vaut mieux utiliser sc_make()
+ *
+ * sc_add_eg est (a peu pres) equivalent a sc_add_egalite, mais le
+ * parametre e n'est utilise qu'une fois ce qui permet d'eviter
+ * des surprises en cas de e++ et autres effects de bords a chaque
+ * evaluation de e; sc_add_egalite est donc plus sur que sc_add_eg
+ *
+ * If the system basis should be updated, use sc_constraint_add()
+ * and the two related function in sc_insert.c
+ */
+void sc_add_egalite(Psysteme p, Pcontrainte e)
+{
+  assert(p && e && !e->succ);
+
+  e->succ = p->egalites;
+  p->egalites = e; 
+  p->nb_eq++; 
+}
+
+/* void sc_add_inegalite(Psysteme p, Pcontrainte i): macro ajoutant une
+ * inegalite i a un systeme p; la base n'est pas mise a jour; il faut
+ * ensuite faire un appel a sc_creer_base(); il vaut mieux utiliser
+ * sc_make();
+ *
+ * sc_add_ineg est (a peu pres) equivalent a sc_add_inegalite; cf supra
+ * pour l'explication des differences
+ */
+void sc_add_inegalite(Psysteme p, Pcontrainte i)
+{ 
+  assert(p && i && !i->succ);
+
+  i->succ = p->inegalites;
+  p->inegalites = i; 
+  p->nb_ineq++; 
+}
