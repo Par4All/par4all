@@ -267,11 +267,17 @@ union domain *val ;
 	bp->domain = val ;
 	bp->name = name ;
     }
-    else if( val->ba.type == IMPORT_DT || 
-	     (Read_spec_mode && val->ba.type == EXTERNAL_DT )) {
-	free( (char *)val ) ;
+    else
+    {
+	if( val->ba.type == IMPORT_DT || 
+	    (Read_spec_mode && val->ba.type == EXTERNAL_DT )) {
+	    free( (char *)val ) ;
+	}
+	else 
+	    user( "Redeclaration skipped: <%s>\n", name ) ;
+
+	free(name);
     }
-    else user( "Redeclaration skipped: <%s>\n", name ) ;
 
     return( bp ) ;
 }
