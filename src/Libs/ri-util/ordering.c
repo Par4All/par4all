@@ -6,6 +6,9 @@
  * reset_ordering_to_statement.
  *
  * $Log: ordering.c,v $
+ * Revision 1.14  2003/07/24 07:21:29  nguyen
+ * Add new control structures for C language
+ *
  * Revision 1.13  1998/06/03 06:41:10  irigoin
  * Handling of the whileloop construct added
  *
@@ -121,6 +124,8 @@ rinitialize_ordering_to_statement(hash_table ots, statement s)
 
       case is_instruction_call:
       case is_instruction_goto:
+      case is_instruction_forloop:
+      case is_instruction_multitest:
 	break;
 
       case is_instruction_unstructured: {
