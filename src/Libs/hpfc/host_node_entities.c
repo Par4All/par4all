@@ -1,35 +1,16 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1995/03/28 16:24:49 $, ) version $Revision$,
-*/
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1995/04/10 18:49:50 $, ) 
+ * version $Revision$
+ */
 
-#include <stdio.h>
-#include <string.h> 
-extern fprintf();
+#include "defines-local.h"
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-
-#include "genC.h"
-
-#include "ri.h" 
-#include "hpf.h" 
-#include "hpf_private.h"
-
-#include "ri-util.h" 
-#include "misc.h" 
 #include "control.h"
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
-
-#include "hpfc.h"
-#include "defines-local.h"
-
 
 /*      HOST AND NODE ENTITIES MANAGEMENT
  */
