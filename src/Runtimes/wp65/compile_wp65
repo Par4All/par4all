@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: compile_wp65,v $ (version $Revision$)
-# $Date: 1995/09/20 10:18:14 $, 
+# $Date: 1995/09/20 11:10:39 $, 
 #
 # from csh to sh, FC 19/09/95
 #
@@ -44,7 +44,7 @@ shift `expr $OPTIND - 1`
 
 [ $# -eq 0 ] && usage 2
 
-[ $noise = verbose -a "$PVM_ROOT" ] ||
+[ $noise = verbose -a ! "$PVM_ROOT" ] && 
 {
   cat << USAGE
 
@@ -55,7 +55,7 @@ USAGE
   erreur=1
 }
 
-[ $noise = verbose -a "$PVM_ARCH" ] ||
+[ $noise = verbose -a ! "$PVM_ARCH" ] &&
 {
   cat << USAGE
 
@@ -93,7 +93,7 @@ status=$?
 
 rm -f $TMP.f $TMP.o
 
-[ $noise = verbose -a "$status" -eq 0 ] ||
+[ $noise = verbose -a "$status" -ne 0 ] &&
 {
   cat << USAGE
 
