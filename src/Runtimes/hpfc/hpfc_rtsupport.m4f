@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1996/09/14 17:53:49 $, )
+! ($Date: 1996/10/18 22:19:07 $, )
 !
 !-----------------
 !
@@ -385,8 +385,8 @@
       integer bufid, info
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
-      call pvmfsend(HOSTTID, HOSTCHANNEL, info)
-      HOSTCHANNEL = HOSTCHANNEL + 2
+      call pvmfsend(HOSTTID, HOST SND CHANNEL, info)
+      HOST SND CHANNEL = HOST SND CHANNEL + 2
       end
 !
 !-----------------
@@ -563,8 +563,8 @@ _CM5(
      $     MCASTNODES, 
      $     info)
       MCASTNODES = MCASTNODES + 2
-      call pvmfsend(HOSTTID, HOSTCHANNEL, info)
-      HOSTCHANNEL = HOSTCHANNEL + 2
+      call pvmfsend(HOSTTID, HOST SND CHANNEL, info)
+      HOST SND CHANNEL = HOST SND CHANNEL + 2
       end
 !
 !-----------------
@@ -789,9 +789,9 @@ _CM5(
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfrecv(HOSTTID, HOSTCHANNEL, bufid)
+      call pvmfrecv(HOSTTID, HOST RCV CHANNEL, bufid)
       call pvmfunpack(what, goal, 1, 1, info)
-      HOSTCHANNEL = HOSTCHANNEL + 2
+      HOST RCV CHANNEL = HOST RCV CHANNEL + 2
       debug(print *, MYLID, " receiving from host")
       end
 !
@@ -1139,7 +1139,8 @@ _CM5(
       MCASTHOST  = 3
       OPN = 0
       CPOSPN = 0
-      HOSTCHANNEL = 2
+      HOST SND CHANNEL = 2
+      HOST RCV CHANNEL = 2
       end
 !-----------------
 !
