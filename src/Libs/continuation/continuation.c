@@ -185,7 +185,9 @@ static void statement_continuation_conditions(statement s)
 
 static void block_continuation_conditions(list l_stat)
 {
-    statement s = current_stmt_head();
+    transformer must_cont_t, may_cont_t;
+     statement s = current_stmt_head();
+   
     store_statement_must_continuation(s,transformer_empty());
     store_statement_may_continuation(s,transformer_identity());
 }
@@ -193,6 +195,8 @@ static void block_continuation_conditions(list l_stat)
 static void test_continuation_conditions(test t)
 {
     statement s = current_stmt_head();
+    transformer must_cont_t, may_cont_t;
+
     store_statement_must_continuation(s,transformer_empty());
     store_statement_may_continuation(s,transformer_identity());
 }
@@ -200,6 +204,8 @@ static void test_continuation_conditions(test t)
 static void loop_continuation_conditions(loop l)
 {
     statement s = current_stmt_head();
+    transformer must_cont_t, may_cont_t;
+    
     store_statement_must_continuation(s,transformer_empty());
     store_statement_may_continuation(s,transformer_identity());
 }
@@ -207,6 +213,8 @@ static void loop_continuation_conditions(loop l)
 static void call_continuation_conditions(call c)
 {
     statement s = current_stmt_head();
+    transformer must_cont_t, may_cont_t;
+    
     store_statement_must_continuation(s,transformer_empty());
     store_statement_may_continuation(s,transformer_identity());
 }
@@ -214,9 +222,27 @@ static void call_continuation_conditions(call c)
 static void unstructured_continuation_conditions(unstructured u)
 {
     statement s = current_stmt_head();
-    
-    store_statement_must_continuation(s,transformer_empty());
-    store_statement_may_continuation(s,transformer_identity());
+    transformer must_cont_t, may_cont_t;
+    control c;
+
+    c = unstructured_control( u );
+
+    if(control_predecessors(c) == NIL && control_successors(c) == NIL)
+    {
+	/* there is only one statement in u; no need for a fix-point */
+	must_cont_t = transformer_dup
+	    (load_statement_must_continuation(control_statement(c))); 
+	may_cont_t = transformer_dup
+	    (load_statement_may_continuation(control_statement(c))); 
+    }
+    else
+    {
+	/* nothing clever for the moment - 28/2/96 - BC*/
+	must_cont_t = transformer_empty();
+	may_cont_t = transformer_identity();
+    }    
+    store_statement_must_continuation(s,must_cont_t);
+    store_statement_may_continuation(s,may_cont_t);
 }
 
 
