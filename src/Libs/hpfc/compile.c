@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.66  1997/09/15 19:21:41  coelho
+ * fixed for new common prefix.
+ *
  * Revision 1.65  1997/08/04 13:53:30  coelho
  * new generic effects.
  *
@@ -426,7 +429,7 @@ put_generated_resources_for_common(entity common)
     node_common = load_new_node(common),
     host_common = load_new_host(common);
     
-    prefix = entity_local_name(common);
+    prefix = module_local_name(common);
     dir_name = db_get_current_workspace_directory();
     
     host_name = string_cat(prefix, HINC_SUFFIX);
@@ -564,8 +567,7 @@ put_generated_resources_for_module(
 }
 
 void 
-put_generated_resources_for_program (program_name)
-string program_name;
+put_generated_resources_for_program (string program_name)
 {
     FILE *comm_file, *init_file;
     string comm, init, dir_name;
