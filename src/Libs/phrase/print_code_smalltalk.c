@@ -662,6 +662,41 @@ static bool argument_p(entity e)
 }
 
 /**
+ * Return string representing arguments declaration
+ * written in SmallTalk style
+ */
+static string 
+st_arguments (entity module,
+	      bool (*consider_this_entity)(entity),
+	      string separator,
+	      bool lastsep)
+{
+  string result = strdup("");
+  code c;
+  bool first = TRUE;
+
+  /* Assert that entity represent a value code */
+  pips_assert("it is a code", value_code_p(entity_initial(module)));
+
+  c = value_code(entity_initial(module));
+  MAP(ENTITY, var,
+  {
+    debug(2, "\n Prettyprinter declaration for argument :",st_entity_local_name(var));   
+    if (consider_this_entity(var))
+      {
+	string old = result;
+	string svar = strdup(concatenate("with:",st_entity_local_name(var), NULL));
+	result = strdup(concatenate(old, !first && !lastsep? separator: "",
+				    svar, lastsep? separator: "", NULL));
+	free(old);
+	free(svar);
+	first = FALSE;
+      }
+  },code_declarations(c));
+  return result;
+}
+
+/**
  * Return string representing variables or constants declaration
  * written in SmallTalk style
  */
@@ -776,13 +811,19 @@ st_declarations_comment(entity module,
  */
 static string st_header(entity module)
 {
-  string result, svar;
-
+  string result, svar, args;
+  
   pips_assert("it is a function", type_functional_p(entity_type(module)));
-
+  
   svar = st_entity_local_name(module);
+  
+  /* Generates the arguments declarations */
+  args = st_arguments(module, 
+		      argument_p, 
+		      SPACE, 
+		      TRUE);
 
-  result = strdup(concatenate(svar, NL,
+  result = strdup(concatenate(svar, SPACE, args, NL,
 			      COMMENT, "Automatically generated with PIPS", COMMENT,
 			      NL, NULL));
   
@@ -1271,7 +1312,7 @@ static string st_statement(statement s)
       }
       /* add switch, forloop break, continue, return instructions here*/
     default:
-      pips_debug(2, "Instruction NOT IMPLEMENTED\n");   
+      pips_user_warning("Instruction NOT IMPLEMENTED\n");   
       result = strdup(concatenate(COMMENT, " Instruction not implemented" NL, NULL));
       break;
     }
