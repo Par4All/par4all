@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/15 15:58:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/03 17:02:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/15 15:58:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/10/03 17:02:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -152,7 +152,7 @@ insert_something_in_the_wpips_log_window(char * a_message)
 void
 wpips_user_error_message(char error_buffer[])
 {
-   extern jmp_buf pips_top_level;
+   jmp_buf * ljbp = NULL;
 
    log_on_file(error_buffer);
 
@@ -169,7 +169,8 @@ wpips_user_error_message(char error_buffer[])
    if(get_bool_property("ABORT_ON_USER_ERROR"))
       abort();
 
-   longjmp(pips_top_level, 1);
+   ljbp = top_pips_context_stack();
+   longjmp(*ljbp, 1);
       
    (void) exit(1);
 }
