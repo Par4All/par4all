@@ -1,22 +1,11 @@
-/*
- * Management of Reductions in hpfc
+/* Management of Reductions in hpfc
  *
  * Fabien Coelho, May 1993.
+ *
+ * $RCSfile: special_cases.c,v $ (version $Revision$)
+ * $Date: 1995/04/10 18:49:45 $, 
  */
 
-#include <stdio.h>
-#include <strings.h>
-extern int fprintf();
-
-#include "genC.h"
-#include "ri.h"
-#include "hpf.h"
-#include "hpf_private.h"
-#include "message.h"
-
-#include "ri-util.h"
-#include "misc.h"
-#include "hpfc.h"
 #include "defines-local.h"
 
 #define MAX_REDUCTION 1
@@ -43,8 +32,7 @@ static t_reduction reductions[] =
   {0,         0,             0}
 };
 
-/*
- * static t_reduction *find_reduction(c)
+/* static t_reduction *find_reduction(c)
  *
  * look for the presence of the reduction in the reduction list.
  */
@@ -63,13 +51,11 @@ string s;
      return(NULL);
  }
 
-/*
- * bool call_reduction_p(c)
+/* bool call_reduction_p(c)
  *
  * true if a given call is a call to reduction function.
  * ??? a generic function name should be managed here?
  */
-
 bool hpfc_entity_reduction_p(e)
 entity e;
 {
@@ -117,8 +103,7 @@ int kind;
     return(reduction_names[kind-1]);
 }
 
-/*
- * entity make_reduction_function(prefix, ndim, kind, base, nargs)
+/* entity make_reduction_function(prefix, ndim, kind, base, nargs)
  *
  * find or create an entity for the reduction function...
  */
@@ -136,8 +121,7 @@ int nargs;
     return(MakeRunTimeSupportFunction(buffer, nargs, basic_tag(base)));
 }
 
-/*
- * bool compile_reduction(initial, phost, pnode)
+/* bool compile_reduction(initial, phost, pnode)
  *
  * true is the compiler succeeded in compiling the reduction that way.
  * ??? many conditions are not yet checked...
@@ -216,3 +200,5 @@ statement initial, *phost, *pnode;
     return(TRUE);
 }
 
+/*   that is all
+ */
