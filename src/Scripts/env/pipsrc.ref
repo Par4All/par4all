@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/09/15 10:42:23 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/09/15 16:25:00 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -107,6 +107,9 @@ PIPS_ETAGS='/usr5/gnu/bin-sparc/etags'
 PIPS_TAR='gtar'
 PIPS_ZIP='gzip -v9'
 PIPS_DIFF='diff'
+PIPS_M4='gm4'
+PIPS_FC='f77'
+PIPS_MAKE='gmake'
 		
 # file name in which pips current program is stored (for batch version).
 
@@ -171,8 +174,9 @@ HPFC_INCLUDE=$PIPS_EXTEDIR
 HPFC_LIBS=$PIPS_EXTEDIR
 HPFC_TOOLS=$PIPS_UTILDIR
 
-HPFC_SED=/usr5/gnu/bin-sparc/sed
-HPFC_TR=/bin/tr
+HPFC_SED='/usr5/gnu/bin-sparc/sed'
+HPFC_TR='/bin/tr'
+HPFC_M4='gm4'
 
 # 
 #         #    #     #     ####    ####
