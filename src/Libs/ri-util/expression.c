@@ -538,10 +538,28 @@ expression e;
     return operator_expression_p(e, POWER_OPERATOR_NAME);
 }
 
+bool abs_expression_p(e)
+expression e;
+{
+    return operator_expression_p(e, ABS_OPERATOR_NAME);
+}
+
 bool iabs_expression_p(e)
 expression e;
 {
     return operator_expression_p(e, IABS_OPERATOR_NAME);
+}
+
+bool dabs_expression_p(e)
+expression e;
+{
+    return operator_expression_p(e, DABS_OPERATOR_NAME);
+}
+
+bool cabs_expression_p(e)
+expression e;
+{
+    return operator_expression_p(e, CABS_OPERATOR_NAME);
 }
 
 bool min0_expression_p(e)
