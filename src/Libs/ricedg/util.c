@@ -159,7 +159,23 @@ prettyprint_dependence_graph(FILE * fd,
 		    fprintf(fd, "> - <");
 		    print_words(fd, effect_words_reference(effect_reference(conflict_sink(c))));
 		    fprintf(fd, ">");
-		}
+		    
+		    /* Additional information for EDF prettyprint. 
+		       Instruction calls are given with  statement numbers
+		       /*
+		    if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")) {
+			if (instruction_call_p(statement_instruction(s1)))
+			    fprintf(fd, " %d-%s",statement_number(s1),
+				    entity_local_name(call_function(instruction_call(statement_instruction(s1)))));
+			else  fprintf(fd, " %d",statement_number(s1));
+			if (instruction_call_p(statement_instruction(s2)))
+			    fprintf(fd, " %d-%s",statement_number(s2),
+				    entity_local_name(call_function(instruction_call(statement_instruction(s2)))));
+			else  fprintf(fd, " %d",statement_number(s2));
+			     }
+		    
+		}	
+		
 		else {
 		    fprintf(fd, "\t\tfrom ");
 		    print_words(fd, words_effect(conflict_source(c)));
