@@ -341,11 +341,10 @@ statement st;
 				STATEMENT_NUMBER_UNDEFINED,
 				STATEMENT_ORDERING_UNDEFINED,
 				comment, 
-				make_instruction(is_instruction_block, NIL));
+				make_instruction_block(NIL));
 	  lstat = CONS(STATEMENT, stat, NIL);
  
-	  statement_instruction(st) = make_instruction(is_instruction_block,
-						       lstat);
+	  statement_instruction(st) = make_instruction_block(lstat);
 	  found = TRUE;
 	}
         pid += 1;
