@@ -25,9 +25,9 @@
  * t1 is updated, but t2 is preserved
  */
 transformer 
-transformer_combine(t1, t2)
-transformer t1;
-transformer t2;
+transformer_combine(
+    transformer t1,
+    transformer t2)
 {
     /* algorithm: 
        let a1 be t1 arguments, a2 be t2 arguments,
@@ -83,8 +83,13 @@ transformer t2;
 	}
     }
 
-    /* build global linear system: r1 is destroyed, r2 is preserved */
+    /* build global linear system: r1 is destroyed, r2 is preserved
+     */
     r1 = sc_append(r1, r2);
+
+    /* ??? The base returned may be empty... FC...
+     * boumbadaboum in the projection later on.
+     */
     sc_rm(r2);
     r2 = SC_UNDEFINED;
     ifdebug(9) {
@@ -93,28 +98,27 @@ transformer t2;
 	sc_fprint(stderr, r1, dump_value_name);
 	sc_dump(r1);
     }
-
+    
     /* get rid of intermediate values */
-    MAPL(ce_temp,
-         {
-            entity e_temp = ENTITY(CAR(ce_temp));
-            sc_and_base_projection_along_variable_ofl_ctrl(&r1, (Variable) e_temp, NO_OFL_CTRL);
-            if (! sc_empty_p(r1)) {
-               Pbase b = base_dup(sc_base(r1));
-               
-               r1 = sc_normalize(r1);
-               if(SC_EMPTY_P(r1)) {
-                  r1 = sc_empty(b);
-               }
-               else
-                  base_rm(b);
-            }
-         },
-            ints);
+    MAP(ENTITY, e_temp,
+    {
+	sc_and_base_projection_along_variable_ofl_ctrl
+	    (&r1, (Variable) e_temp, NO_OFL_CTRL);
+	if (! sc_empty_p(r1)) {
+	    Pbase b = base_dup(sc_base(r1));
+	    
+	    r1 = sc_normalize(r1);
+	    if(SC_EMPTY_P(r1)) {
+		r1 = sc_empty(b);
+	    }
+	    else
+		base_rm(b);
+	}
+    },
+	ints);
 
     ifdebug(9) {
-	(void) fprintf(stderr, "%s: %s", "[transformer_combine]",
-		       "global linear system r1 after projection\n");
+	pips_debug(9, "global linear system r1 after projection\n");
 	sc_fprint(stderr, r1, dump_value_name);
 	sc_dump(r1);
     }
