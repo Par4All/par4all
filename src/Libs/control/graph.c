@@ -2,7 +2,7 @@
  *
  *  (c) Fabien COELHO - march 1995
  *
- *  $RCSfile: graph.c,v $ ($Date: 1996/02/15 14:21:12 $, )
+ *  $RCSfile: graph.c,v $ ($Date: 1996/06/15 14:17:33 $, )
  *  version $Revision$
  */
 
@@ -39,10 +39,12 @@ void clean_ctrl_graph()
 		ORDERING_STATEMENT(statement_ordering(s)));
 
 	  control_statement(c) = statement_undefined;
-	  gen_free_list(control_successors(c)); control_successors(c) = NIL;
-	  gen_free_list(control_predecessors(c)); control_predecessors(c) = NIL;
+	  gen_free_list(control_successors(c)); 
+	  control_successors(c) = NIL;
+	  gen_free_list(control_predecessors(c)); 
+	  control_predecessors(c) = NIL;
       },
-	  ctrl_graph);
+	  get_ctrl_graph());
 
     close_ctrl_graph(); /* now it can be freed safely */
 }
