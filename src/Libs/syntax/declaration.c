@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.65  2002/03/08 10:19:06  irigoin
+ * Support for StackArea added + greater use of PARSER_ACCEPT_ANSI_EXTENSIONS
+ *
  * Revision 1.64  2001/07/19 12:47:05  irigoin
  * Function DeclarePointer() added
  *
@@ -83,6 +86,8 @@
 #include "ri-util.h"
 #include "parser_private.h"
 
+#include "properties.h"
+
 #include "misc.h"
 
 #include "syntax.h"
@@ -92,16 +97,17 @@
 int
 SafeSizeOfArray(entity a)
 {
-    int s;
+  int s;
 
-    if(!SizeOfArray(a, &s)) {
-	user_warning("SafeSizeOfArray", "Varying size of array \"%s\"\n", entity_name(a));
-	user_warning("SafeSizeOfArray",
-		     "An integer PARAMETER may have been initialized with a real value?\n");
-	ParserError("SafeSizeOfArray", "Fortran standard prohibit varying size array\n");
-    }
+  if(!SizeOfArray(a, &s)) {
+      user_warning("SafeSizeOfArray", "Varying size of array \"%s\"\n", entity_name(a));
+      user_warning("SafeSizeOfArray",
+		   "An integer PARAMETER may have been initialized with a real value?\n");
+      ParserError("SafeSizeOfArray", "Fortran standard prohibit varying size array\n"
+		  "Set property PARSER_ACCEPT_ANSI_EXTENSIONS to true.\n");
+  }
 
-    return s;
+  return s;
 }
 
 void 
@@ -127,6 +133,13 @@ InitAreas()
     entity_initial(HeapArea) = MakeValueUnknown();
     AddEntityToDeclarations(HeapArea, get_current_module_entity());
     set_common_to_size(HeapArea, 0);
+
+    StackArea = FindOrCreateEntity(CurrentPackage, STACK_AREA_LOCAL_NAME);
+    entity_type(StackArea) = make_type(is_type_area, make_area(0, NIL));
+    entity_storage(StackArea) = MakeStorageRom();
+    entity_initial(StackArea) = MakeValueUnknown();
+    AddEntityToDeclarations(StackArea, get_current_module_entity());
+    set_common_to_size(StackArea, 0);
 }
 
 /* functions for the SAVE declaration */
@@ -499,6 +512,11 @@ void DeclarePointer(entity ptr, entity pointed_array, list decl_dims)
 {
   /* It is assumed that decl_tableau can be ignored for EDF examples */
   list dims = list_undefined;
+
+  if(!get_bool_property("PARSER_ACCEPT_ANSI_EXTENSIONS")) {
+    pips_user_warning("Non-standard pointer declaration. "
+		      "Set property PARSER_ACCEPT_ANSI_EXTENSIONS to true.\n");
+  }
 
   if(!ENDP(decl_dims)) {
     /* A varying dimension is impossible in the dynamic area for address
@@ -1125,7 +1143,7 @@ entity a, v;
 	(void) update_common_to_size(a, OldOffset+SafeSizeOfArray(v));
     }
     else {
-	/* the local areas are StaticArea and DynamicArea */
+	/* the local areas are StaticArea and DynamicArea and HeapArea and StackArea */
 	OldOffset = area_size(aa);
 	area_size(aa) = OldOffset+SafeSizeOfArray(v);
     }
@@ -1643,7 +1661,8 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
     else {
 	if(area_size(type_area(entity_type(c)))==0
 	   && common_to_size(c)==0
-	   && !heap_area_p(c)) {
+	   && !heap_area_p(c)
+	   && !stack_area_p(c)) {
 	    if(debug_p) {
 		user_warning("print_common_layout",
 			     "Non-empty area %s should have a final size greater than 0\n",
@@ -1676,7 +1695,8 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
 		    }
 
 		    if(!SizeOfArray(m, &s)) {
-			if(ram_section(storage_ram(entity_storage(m)))==HeapArea) {
+			if(ram_section(storage_ram(entity_storage(m)))==HeapArea
+			   || ram_section(storage_ram(entity_storage(m)))==StackArea) {
 			    s = -1;
 			}
 			else {
