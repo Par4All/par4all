@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/04/17 18:31:56 $, )
+ * ($Date: 1996/04/19 15:52:34 $, )
  */
 
 #include "defines-local.h"
@@ -294,6 +294,12 @@ entity array_synonym_aligned_as(
     entity array,
     align a)
 {
+    ifdebug(8)
+    {
+	pips_debug(8, "array %s\n", entity_name(array));
+	print_align(a);
+    }
+
     MAP(ENTITY, ar,
     {
 	if (same_align_p(load_hpf_alignment(ar), a))
@@ -762,7 +768,7 @@ continue_propagation_p(statement s)
 	    },
 		call_arguments(c));
 	}
-	else if (dead_fcd_directive_p(fun))
+	else if (dead_fcd_directive_p(fun) && array_propagation)
 	{
 	    entity primary = safe_load_primary_entity(old_variable);
 	    
@@ -777,18 +783,20 @@ continue_propagation_p(statement s)
 
 void 
 propagate_synonym(
-    statement s,
-    entity old, 
-    entity new)
+    statement s,   /* starting statement for the propagation */
+    entity old,    /* entity to be replaced */
+    entity new,    /* replacement for the entity */
+    bool is_array) /* TRUE if array, FALSE if template */
 {
     statement current;
 
     what_stat_debug(3, s);
-    pips_debug(3, "%s -> %s\n", entity_name(old), entity_name(new));
+    pips_debug(3, "%s -> %s (%s)\n", entity_name(old), entity_name(new),
+	       is_array? "array": "template");
     DEBUG_STAT(7, "before propagation", get_current_module_statement());
 
     old_variable = safe_load_primary_entity(old), new_variable = new, 
-    array_propagation = array_distributed_p(old),
+    array_propagation = is_array;
     array_used = FALSE;
     array_modified = FALSE;
     initial_statement = s;
@@ -813,8 +821,7 @@ propagate_synonym(
     pips_debug(4, "out\n");
 }
 
-/*   REMAPPING GRAPH REMAPS "SIMPLIFICATION"
- */
+/********************************* REMAPPING GRAPH REMAPS "SIMPLIFICATION" */
 
 /* for statement s
  * - remapped arrays
