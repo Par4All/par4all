@@ -41,8 +41,11 @@
 #include "sommet.h"
 #include "sg.h"
 #include "polyedre.h"
-#include "graph.h"
 #include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
+
 #include "ricedg.h"
 
 /*********************************************************************************/
