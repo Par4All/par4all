@@ -155,7 +155,7 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
  * modifies global var: list_pairs
  */
 
-/static bool
+static bool
 add_alias_pairs_for_this_call_site(call call_site)
 {
     transformer context;
