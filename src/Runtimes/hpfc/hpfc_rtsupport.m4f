@@ -3,7 +3,7 @@ c Runtime Support Functions for the High Performance Fortran Compiler
 c by Fabien COELHO.
 c
 c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-c ($Date: 1996/06/11 20:10:43 $, )
+c ($Date: 1996/08/21 16:54:27 $, )
 c
 c-----------------
 c
@@ -1083,7 +1083,7 @@ c
       _CM5(include "cmmd_fort.h")
       include "fpvm3.h"
       include "hpfc_commons.h"
-      integer bufid, info, inum, length, i
+      integer bufid, info, inum, i
       character*64 node_key
 
       call HPFC_CHECK
