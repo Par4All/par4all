@@ -39,7 +39,7 @@ sort_list_of_strings(list l)
     list_to_array(l, a);
     pips_assert("same length", number_of_strings==gen_array_nitems(a));
     gen_array_sort(a);
-    update_list_from_arg(l, a);
+    update_list_from_array(l, a);
     gen_array_free(a);
 }
 
