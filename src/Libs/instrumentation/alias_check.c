@@ -48,14 +48,6 @@
  
 *******************************************************************/
 
-/* ATTENTION : depend on the debugging need, we can chose make_print_statement(msg)
-   or make_stop_statement(msg) 
-   
-   IF (I.LT.1) PRINT *,"Alias violation ...."
-
-   IF (I.LT.1) STOP "Alias violation ...." */
-
-
 /* TO AMELIORATE :
    for the moment, we only use trivial_expression_p to compare offsets + array sizes 
    CAN TAKE MORE INFORMATION from array declarations, A(l:u) => u>l
@@ -95,6 +87,7 @@ typedef struct
   expression condition;
   expression flags;
   list path;
+  bool insert;
 } alias_context_t,
 * alias_context_p;
 
@@ -200,21 +193,20 @@ static void initialize_dynamic_check_list()
       l_commons = gen_nconc(l_commons,CONS(ENTITY,e,NIL));
   },
       l_decls);
-  while (!ENDP(l_formals))
+
+  MAP(ENTITY,e1,
+  {
+    MAP(ENTITY,e2,
     {
-      entity e1 = ENTITY(CAR(l_formals));
-      l_formals = CDR(l_formals);
-      MAP(ENTITY,e2,
-      {
-	dynamic_check dc = make_dynamic_check(e1,e2,FALSE);
-	l_dynamic_check = gen_nconc(l_dynamic_check,CONS(DYNAMIC_CHECK,dc,NIL));
-      },l_formals);
-      MAP(ENTITY,e2,
-      {
-	dynamic_check dc = make_dynamic_check(e1,e2,FALSE);
-	l_dynamic_check = gen_nconc(l_dynamic_check,CONS(DYNAMIC_CHECK,dc,NIL));
-      },l_commons);
-    }
+      dynamic_check dc = make_dynamic_check(e1,e2,FALSE);
+      l_dynamic_check = gen_nconc(l_dynamic_check,CONS(DYNAMIC_CHECK,dc,NIL));
+    },l_formals);
+    MAP(ENTITY,e2,
+    {
+      dynamic_check dc = make_dynamic_check(e1,e2,FALSE);
+      l_dynamic_check = gen_nconc(l_dynamic_check,CONS(DYNAMIC_CHECK,dc,NIL));
+    },l_commons);
+  },l_formals);
 }
 
 static bool dynamic_checked_p(entity e1, entity e2)
@@ -267,7 +259,7 @@ bool included_call_chain_p(list l1, list l2)
 
 /****************************************************************************
 
- This function returns true if l2 = conc(cs,l1)               
+ This function returns true if l1 = conc(cs,l2)               
 
 *****************************************************************************/
 
@@ -295,20 +287,18 @@ string int_to_string(int i)
 static string print_call_path(list path)
 {
   list pc = NIL;
-  while (!ENDP(path))
-    {
-      call_site casi = CALL_SITE(CAR(path));
-      entity casifunc = call_site_function(casi);
-      int casiord = call_site_ordering(casi);
-      pc = CHAIN_SWORD(pc,"(");
-      pc = CHAIN_SWORD(pc,module_local_name(casifunc));
-      pc = CHAIN_SWORD(pc,":(");
-      pc = CHAIN_SWORD(pc,int_to_string(ORDERING_NUMBER(casiord)));
-      pc = CHAIN_SWORD(pc,",");
-      pc = CHAIN_SWORD(pc,int_to_string(ORDERING_STATEMENT(casiord)));
-      pc = CHAIN_SWORD(pc,")) ");
-      path = CDR(path);
-    }
+  MAP(CALL_SITE,casi,
+  {
+    entity casifunc = call_site_function(casi);
+    int casiord = call_site_ordering(casi);
+    pc = CHAIN_SWORD(pc,"(");
+    pc = CHAIN_SWORD(pc,module_local_name(casifunc));
+    pc = CHAIN_SWORD(pc,":(");
+    pc = CHAIN_SWORD(pc,int_to_string(ORDERING_NUMBER(casiord)));
+    pc = CHAIN_SWORD(pc,",");
+    pc = CHAIN_SWORD(pc,int_to_string(ORDERING_STATEMENT(casiord)));
+    pc = CHAIN_SWORD(pc,")) ");
+  },path);
   return words_to_string(pc);
 }
 
@@ -410,11 +400,7 @@ static void insert_test_before_statement(expression flags, expression condition,
   expression cond;
   statement smt;
   int order = statement_ordering(s);
-  string message = strdup(concatenate("\"Alias violation in module ", 
-				      module_local_name(current_mod),": write on ", 
-				      entity_local_name(e1),", aliased with ",
-				      entity_local_name(e2)," by call path ",
-				      print_call_path(path),"\"", NULL));
+  string message;
   string mod_name = module_local_name(current_mod);
   string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
   string base_name = pips_basename(user_file, NULL);
@@ -423,14 +409,35 @@ static void insert_test_before_statement(expression flags, expression condition,
     cond = copy_expression(flags);
   else
     cond = and_expression(condition,flags);
-  smt = test_to_statement(make_test(cond, make_stop_statement(message),
-				    make_block_statement(NIL)));
+  if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
+    {   
+      message = strdup(concatenate("\'AV: module ", 
+				   module_local_name(current_mod)," write on ", 
+				   entity_local_name(e1)," aliased with ",
+				   entity_local_name(e2)," by call path ",
+				   print_call_path(path)," with ",
+				   words_to_string(words_syntax(expression_syntax(condition))),
+				   "\'",print_variables(condition), NULL));
+      smt = test_to_statement(make_test(cond, make_print_statement(message),
+					make_block_statement(NIL)));
+    }
+  else
+    {
+      message = strdup(concatenate("\'Alias violation in module ", 
+				   module_local_name(current_mod),": write on ", 
+				   entity_local_name(e1),", aliased with ",
+				   entity_local_name(e2)," by call path ",
+				   print_call_path(path),"\'", NULL));
+      smt = test_to_statement(make_test(cond, make_stop_statement(message),
+					make_block_statement(NIL)));
+    }
   fprintf(out,"%s\t%s\t%s\t(%d,%d)\n",PREFIX1,file_name,module_local_name(current_mod),
 	  ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
   print_text(out, text_statement(entity_undefined,0,smt));
   fprintf(out,"%s\n",PREFIX2);
   number_of_tests++;
   free(file_name), file_name = NULL;
+  free(message), message = NULL;
 }
 
 /*****************************************************************************
@@ -518,7 +525,7 @@ static list make_list_of_flags(list path)
 }
 
 /* This function returns TRUE if c is an user-defined function/subroutine*/
-static bool functional_call_p(call c)
+bool functional_call_p(call c)
 {
   entity fun = call_function(c);
   return entity_module_p(fun);
@@ -579,10 +586,10 @@ static void insert_check_alias_before_statement(entity e1, expression subval,
 						entity e2, expression size,
 						statement s)
 {
-  string message = strdup(concatenate("\"Alias violation in module ", 
+  string message = strdup(concatenate("\'Alias violation in module ", 
 				      module_local_name(current_mod),": write on ", 
 				      entity_local_name(e1),", aliased with ",
-				      entity_local_name(e2),"\"", NULL));
+				      entity_local_name(e2),"\'", NULL));
   list l = CONS(EXPRESSION,size,NIL);
   statement smt;
   int order = statement_ordering(s);
@@ -689,6 +696,7 @@ static bool alias_check_scalar_variable_in_module_flt(statement s,
 		insert_test_before_statement(context->flags,context->condition,s,
 					     context->first_entity,context->second_entity,
 					     context->path);
+		context->insert = TRUE;
 		return FALSE;
 	      }
 	    return TRUE;
@@ -761,6 +769,8 @@ static bool alias_check_array_and_scalar_variable_in_module_flt(statement s,
 		      insert_test_before_statement(context->flags,make_true_expression(),s,
 						   context->first_entity,context->second_entity,
 						   context->path);
+		    
+		    context->insert = TRUE;
 		    return FALSE;	       
 		  }
 		}
@@ -876,6 +886,7 @@ static bool alias_check_array_variable_in_module_flt(statement s,alias_context_p
 							       context->path);
 			      }
 			  }
+			context->insert = TRUE;
 			return FALSE;
 		      }
 		    }
@@ -921,7 +932,7 @@ static void alias_check_two_scalar_variables_in_module(entity e1,entity e2,expre
       /* insert flags before each call site in call path*/
       list l_flags = make_list_of_flags(path);
       alias_context_t context;
-      insert_flag_before_call_site(l_flags,path);
+      context.insert = FALSE;
       context.path = path;
       context.flags = expression_list_to_conjonction(l_flags);	  
       if (k==1)
@@ -936,6 +947,8 @@ static void alias_check_two_scalar_variables_in_module(entity e1,entity e2,expre
       context.second_entity = e1;
       gen_context_recurse(module_statement,&context, statement_domain, 
 			  alias_check_scalar_variable_in_module_flt, gen_null);
+      if (context.insert) 
+	insert_flag_before_call_site(l_flags,path);
       context.first_entity = entity_undefined;
       context.second_entity = entity_undefined;
       context.offset1 = expression_undefined;
@@ -1004,7 +1017,7 @@ static void alias_check_scalar_and_array_variables_in_module(entity e1,entity e2
 		 insert flags before each call site in call path*/
 	      list l_flags = make_list_of_flags(path);
 	      alias_context_t context;
-	      insert_flag_before_call_site(l_flags,path);
+	      context.insert = FALSE;
 	      context.path = path;
 	      context.flags = expression_list_to_conjonction(l_flags);
 	      if (k1+k2==0) // k1=k2=0
@@ -1025,13 +1038,15 @@ static void alias_check_scalar_and_array_variables_in_module(entity e1,entity e2
 	      context.first_entity = e1;
 	      context.second_entity = e2;
 	      gen_context_recurse(module_statement,&context, statement_domain, 
-				  alias_check_scalar_variable_in_module_flt, gen_null);
+				  alias_check_scalar_variable_in_module_flt,gen_null);
 	      context.offset1 = off1;
 	      context.offset2 = off2;
 	      context.first_entity = e2;
 	      context.second_entity = e1;
 	      gen_context_recurse(module_statement,&context, statement_domain, 
-				  alias_check_array_and_scalar_variable_in_module_flt, gen_null);	
+				  alias_check_array_and_scalar_variable_in_module_flt,gen_null);	
+	      if (context.insert)
+		insert_flag_before_call_site(l_flags,path);
 	      context.first_entity = entity_undefined;
 	      context.second_entity = entity_undefined;
 	      context.offset1 = expression_undefined;
@@ -1118,7 +1133,7 @@ static void alias_check_two_array_variables_in_module(entity e1,entity e2,expres
 		  /* insert flags before each call site in call path*/
 		  list l_flags = make_list_of_flags(path);
 		  alias_context_t context;
-		  insert_flag_before_call_site(l_flags,path);
+		  context.insert = FALSE;
 		  context.path = path;
 		  context.flags = expression_list_to_conjonction(l_flags);
 		  context.first_entity = e1;
@@ -1133,6 +1148,8 @@ static void alias_check_two_array_variables_in_module(entity e1,entity e2,expres
 		  context.offset2 = off1;
 		  gen_context_recurse(module_statement,&context, statement_domain, 
 				      alias_check_array_variable_in_module_flt, gen_null);
+		  if (context.insert)
+		    insert_flag_before_call_site(l_flags,path);
 		  context.first_entity = entity_undefined;
 		  context.second_entity = entity_undefined;
 		  context.offset1 = expression_undefined;
@@ -1214,6 +1231,7 @@ static bool alias_check_scalar_variable_in_caller_flt(statement s,alias_context_
 		insert_test_before_statement(context->flags,make_true_expression(),s,
 					     context->first_entity,context->second_entity,
 					     context->path);
+		context->insert = TRUE;
 		return FALSE;
 	      }
 	    return TRUE;
@@ -1301,6 +1319,7 @@ static bool alias_check_array_and_scalar_variable_in_caller_flt(statement s,alia
 			  insert_test_before_caller(simplify_relational_expression(diff),e_flag);
 			else 
 			  insert_test_before_caller(make_true_expression(),e_flag);
+			context->insert = TRUE;
 			return FALSE;
 		      }
 		    }
@@ -1350,16 +1369,20 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
 	    approximation rw = effect_approximation(eff);
 	    if (approximation_must_p(rw))
 	      {
+
+		/*TREATED ? CASE READ *,ARRAY */
+
 		list l_inds = reference_indices(r);
 		/* Attention : <may be written> V(*,*) => what kind of indices ???*/
 		expression subval1 = subscript_value_stride(context->first_entity,l_inds);
 		/* Translate subval1 to the frame of caller, in order to compare with offsets*/
-		expression new_subval1 = translate_to_module_frame(current_mod,current_caller,subval1,current_call);
+		expression new_subval1 = translate_to_module_frame(current_mod,current_caller,
+								   subval1,current_call);
 		if (!expression_undefined_p(new_subval1))
 		  {
-		    expression diff1;
+		    expression diff1 = expression_undefined;
 		    int k1;
-		    expression ref1;
+		    expression ref1 = expression_undefined;
 		    if (same_expression_p(context->offset1,context->offset2))
 		      diff1 = ge_expression(new_subval1,int_to_expression(0));
 		    else
@@ -1437,6 +1460,7 @@ static bool alias_check_array_variable_in_caller_flt(statement s,alias_context_p
 					  insert_test_before_caller(simplify_relational_expression(diff2),e_flag);
 				      }
 				  }
+				context->insert = TRUE;
 				break;
 			      }
 			    }
@@ -1496,12 +1520,7 @@ static void alias_check_two_scalar_variables_in_caller(entity e1,entity e2,expre
 	 current caller, we add the condition */
       list l_flags = make_list_of_flags(path);
       alias_context_t context;
-      expression e_flag = EXPRESSION(CAR(l_flags));
-      insert_flag_before_call_site(CDR(l_flags),CDR(path));
-      if (k==1)
-	insert_test_before_caller(make_true_expression(),e_flag);
-      else
-	insert_test_before_caller(simplify_relational_expression(diff),e_flag);
+      context.insert = FALSE;
       context.path = path;
       context.flags = expression_list_to_conjonction(l_flags);
       context.first_entity = e1;
@@ -1512,6 +1531,15 @@ static void alias_check_two_scalar_variables_in_caller(entity e1,entity e2,expre
       context.second_entity = e1;
       gen_context_recurse(module_statement,&context, statement_domain, 
 			  alias_check_scalar_variable_in_caller_flt, gen_null);
+      if (context.insert)
+	{
+	  expression e_flag = EXPRESSION(CAR(l_flags));
+	  insert_flag_before_call_site(CDR(l_flags),CDR(path));
+	  if (k==1)
+	    insert_test_before_caller(make_true_expression(),e_flag);
+	  else
+	    insert_test_before_caller(simplify_relational_expression(diff),e_flag);
+	}
       context.first_entity = entity_undefined;
       context.second_entity = entity_undefined;
       context.offset1 = expression_undefined;
@@ -1585,27 +1613,7 @@ static void alias_check_scalar_and_array_variables_in_caller(entity e1, entity e
 		     we add the condition */
 		  list l_flags = make_list_of_flags(path);
 		  alias_context_t context;
-		  if (!ENDP(CDR(path)))
-		    insert_flag_before_call_site(CDR(l_flags),CDR(path));
-		  if (variable_is_written_p(e1))
-		    {
-		      expression e_flag = EXPRESSION(CAR(l_flags));
-		      if (k1+k2==0) // k1=k2=0
-			insert_test_before_caller(and_expression(simplify_relational_expression(diff1),
-								 simplify_relational_expression(diff2)),e_flag);
-		      else 
-			{
-			  if (k1+k2==2) // k1=k2=1
-			    insert_test_before_caller(make_true_expression(),e_flag);
-			  else
-			    {
-			      if (k1==0) // k1=0, k2=1
-				insert_test_before_caller(simplify_relational_expression(diff1),e_flag);
-			      else // k2=0, k1=1
-				insert_test_before_caller(simplify_relational_expression(diff2),e_flag);
-			    }
-			}
-		    }
+		  context.insert = FALSE;
 		  context.path = path;
 		  context.flags = expression_list_to_conjonction(l_flags);
 		  context.first_entity = e1;
@@ -1629,6 +1637,30 @@ static void alias_check_scalar_and_array_variables_in_caller(entity e1, entity e
 		  context.second_entity = e1;
 		  gen_context_recurse(module_statement,&context, statement_domain, 
 				      alias_check_array_and_scalar_variable_in_caller_flt, gen_null);
+		  
+		  if (context.insert)
+		    {
+		      insert_flag_before_call_site(CDR(l_flags),CDR(path));
+		      if (variable_is_written_p(e1))
+			{
+			  expression e_flag = EXPRESSION(CAR(l_flags));
+			  if (k1+k2==0) // k1=k2=0
+			    insert_test_before_caller(and_expression(simplify_relational_expression(diff1),
+								     simplify_relational_expression(diff2)),e_flag);
+			  else 
+			    {
+			      if (k1+k2==2) // k1=k2=1
+				insert_test_before_caller(make_true_expression(),e_flag);
+			      else
+				{
+				  if (k1==0) // k1=0, k2=1
+				    insert_test_before_caller(simplify_relational_expression(diff1),e_flag);
+				  else // k2=0, k1=1
+				    insert_test_before_caller(simplify_relational_expression(diff2),e_flag);
+				}
+			    }
+			}
+		    }
 		  context.first_entity = entity_undefined;
 		  context.second_entity = entity_undefined;
 		  context.offset1 = expression_undefined;
@@ -1715,14 +1747,15 @@ static void alias_check_two_array_variables_in_caller(entity e1, entity e2,
 		      default:
 			{
 			  /* insert flag before each call site in call path */
+			  list l_flags = NIL;
 			  alias_context_t context;
+			  context.insert = FALSE;
 			  context.path = path;
 			  if (ENDP(CDR(path)))
 			    context.flags = make_true_expression();
 			  else
 			    {
-			      list l_flags = make_list_of_flags(CDR(path));
-			      insert_flag_before_call_site(l_flags,CDR(path));
+			      l_flags = make_list_of_flags(CDR(path));
 			      context.flags = expression_list_to_conjonction(l_flags);
 			    }
 			  context.first_entity = e1;
@@ -1737,6 +1770,9 @@ static void alias_check_two_array_variables_in_caller(entity e1, entity e2,
 			  context.offset2 = off1;
 			  gen_context_recurse(module_statement,&context, statement_domain, 
 					      alias_check_array_variable_in_caller_flt, gen_null);
+
+			  if (context.insert)
+			    insert_flag_before_call_site(l_flags,CDR(path));
 			  context.first_entity = entity_undefined;
 			  context.second_entity = entity_undefined;
 			  context.offset1 = expression_undefined;
@@ -2129,7 +2165,7 @@ bool alias_check(char * module_name)
       l_dynamic_check = NIL;
       reset_proper_rw_effects();
       reset_cumulated_rw_effects();
-      DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_statement);
+      DB_PUT_MEMORY_RESOURCE(DBR_CODE,module_name,module_statement);
       reset_ordering_to_statement();
       reset_current_module_entity();
       module_statement = statement_undefined;
