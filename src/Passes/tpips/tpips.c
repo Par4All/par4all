@@ -1,4 +1,10 @@
-/* $Id$
+/*
+ * $Id$
+ *
+ * $Log: tpips.c,v $
+ * Revision 1.76  1997/11/27 12:52:44  coelho
+ * does not core dump if .tpips file is not found.
+ *
  */
 
 #include <stdio.h>
@@ -41,8 +47,8 @@ static FILE * current_file; /* current file being processed */
 extern int tgetnum();
 extern void tp_restart( FILE * ); /* tp_lex.c */
 
-static char *usage = 
-  "Usage: %s [-n] [-h/?] [-v] [-l logfilename] tpips-scripts\n";
+#define tpips_usage \
+  "Usage: %s [-n] [-h/?] [-v] [-l logfile] [-e tpips-cmds] tpips-scripts\n"
 
 #define before_initial_prompt \
   "tpips (ARCH=" SOFT_ARCH ")\n\n" \
@@ -609,7 +615,7 @@ tpips_exec(char * line)
 	 */
 	if (use_readline &&
 	    (line && *line && ((last && strcmp(last, line)!=0) || (!last))) &&
-	    (strncmp (line,QUIT,strlen (QUIT))))
+	    (strncmp (line, QUIT, strlen(QUIT))))
 	{
 	    add_history(line);
 	    last = strdup(line);
@@ -619,7 +625,6 @@ tpips_exec(char * line)
 	 */
 	pips_debug(2, "restarting tpips scanner\n");
 	tp_restart(tp_in);
-	skip_blanks(line);
 
 	/* leading setenv/getenv in a tpips script are performed
 	 * PRIOR to pips initialization, hence the environment variable
@@ -678,7 +683,7 @@ parse_arguments(int argc, char * argv[])
     extern char *optarg;
     extern int optind;
 
-    while ((c = getopt(argc, argv, "nl:h?v")) != -1) {
+    while ((c = getopt(argc, argv, "ne:l:h?v")) != -1) {
 	switch (c)
 	{
 	case 'l':
@@ -686,11 +691,14 @@ parse_arguments(int argc, char * argv[])
 	    break;
 	case 'h':
 	case '?':
-	    fprintf (stderr, usage, argv[0]);
+	    fprintf (stderr, tpips_usage, argv[0]);
 	    return;
 	    break;
 	case 'n':
 	    tpips_execution_mode = FALSE;
+	    break;
+	case 'e':
+	    tpips_exec(optarg);
 	    break;
 	case 'v': 
 	    fprintf(stderr, "tpips: (ARCH=%s) %s\n", SOFT_ARCH, argv[0]);
@@ -702,14 +710,14 @@ parse_arguments(int argc, char * argv[])
     {
 	/* no arguments, parses stdin. */
 	bool use_rl = isatty(0);
-	pips_debug(1, "reading from stdin, which %s a tty\n",
-		   use_rl ? "is" : "is not");
+	pips_debug(1, "reading from stdin, which is%s a tty\n",
+		   use_rl ? "" : " not");
 	tpips_process_a_file(stdin, use_rl);
     }
     else 
     {
 	/* process file arguments. */
-	while (optind < argc )
+	while (optind < argc)
 	{
 	    string tps = NULL, saved_srcpath = NULL;
 	    FILE * toprocess;
@@ -717,42 +725,53 @@ parse_arguments(int argc, char * argv[])
 
 	    if (same_string_p(argv[optind], "-")) 
 	    {
+		tps = strdup("-");
 		toprocess = stdin;
 		use_rl = isatty(0);
 	    }
 	    else
 	    {
 		/* the tpips dirname is appended to PIPS_SRCPATH */
-		string dir;
 		tps = find_file_in_directories(argv[optind], 
 					       getenv("PIPS_SRCPATH"));
-		dir = pips_dirname(tps);
-		saved_srcpath = pips_srcpath_append(dir);
-		free(dir), dir = NULL;
-
-		if ((toprocess = fopen(tps, "r"))==NULL)
+		if (tps)
 		{
-		    perror(tps);
-		    exit(1);
-		}
+		    string dir = pips_dirname(tps);
+		    saved_srcpath = pips_srcpath_append(dir);
+		    free(dir), dir = NULL;
+		    
+		    if ((toprocess = fopen(tps, "r"))==NULL)
+		    {
+			perror(tps);
+			fprintf(stderr, "[TPIPS] cannot open \"%s\"\n", tps);
+			free(tps), tps=NULL;
+		    }
 
-		use_rl = FALSE;
+		    use_rl = FALSE;
+		}
+		else
+		    fprintf(stderr, "[TPIPS] \"%s\" not found...\n", 
+			    argv[optind]);
 	    }
 	    
-	    pips_debug(1, "reading from file %s\n", tps);
-	    
-	    tpips_process_a_file (toprocess, use_rl);
-
-	    if (!same_string_p(argv[optind], "-"))
-		safe_fclose(toprocess, tps);
 	    if (tps)
+	    {
+		pips_debug(1, "reading from file %s\n", tps);
+	    
+		tpips_process_a_file (toprocess, use_rl);
+
+		if (!same_string_p(tps, "-"))
+		    safe_fclose(toprocess, tps);
+		
 		free(tps), tps = NULL;
+	    }
+	    
 	    if (saved_srcpath) 
 	    {
 		pips_srcpath_set(saved_srcpath);
 		free(saved_srcpath), saved_srcpath = NULL;
 	    }
-	    
+
 	    optind++;
 	}
     }
