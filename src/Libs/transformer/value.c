@@ -434,11 +434,11 @@ string s;
 void 
 print_value_mappings()
 {
-    (void) fprintf(stderr,"hash table value to name:\n");
+    (void) fprintf(stderr,"\nhash table value to name:\n");
     hash_table_fprintf(stderr, dump_value_name, string_identity,
 		       hash_value_to_name);
 
-    (void) fprintf(stderr,"hash table entity to new value:\n");
+    (void) fprintf(stderr,"\nhash table entity to new value:\n");
     /*
     hash_table_fprintf(stderr, entity_local_name, external_value_name,
 		       hash_entity_to_new_value);
@@ -446,25 +446,67 @@ print_value_mappings()
     hash_table_fprintf(stderr, entity_minimal_name, entity_minimal_name,
 		       hash_entity_to_new_value);
 
-    (void) fprintf(stderr,"hash table entity to old value:\n");
+    (void) fprintf(stderr,"\nhash table entity to old value:\n");
     hash_table_fprintf(stderr, entity_minimal_name, external_value_name,
 		       hash_entity_to_old_value);
 
-    (void) fprintf(stderr, "hash table entity to intermediate value:\n");
+    (void) fprintf(stderr, "\nhash table entity to intermediate value:\n");
     hash_table_fprintf(stderr, entity_minimal_name, external_value_name,
 		       hash_entity_to_intermediate_value);
+}
+
+static int mapping_to_value_number(hash_table h)
+{
+  int count = 0;
+  list values = NIL;
+
+  HASH_MAP(var, val, {
+    if(!gen_in_list_p((entity) val, values)) {
+      values = CONS(ENTITY,(entity) val, values);
+      count++;
+    }
+  }, h);
+
+  pips_assert("The number of insertions is equal to the list length",
+	      count == gen_length(values));
+  gen_free_list(values);
+  return count;
 }
 
 void 
 test_mapping_entry_consistency()
 {
-    int nbo,nbi;
-    pips_assert("consistent mapping entry number", 
+    int nbo = 0;
+    int nbi = 0;
+    int nbn = 0;
+
+    pips_assert("The number of old values is equal to the number of intermediate values", 
 		((nbo= hash_table_entry_count(hash_entity_to_old_value)) 
-		 == (nbi= hash_table_entry_count(hash_entity_to_intermediate_value))) 
-		&& ( hash_table_entry_count(hash_value_to_name) >=
-		    hash_table_entry_count(hash_entity_to_new_value) 
-		    + nbo +nbi));
+		 == (nbi= hash_table_entry_count(hash_entity_to_intermediate_value))));
+    /* This second assert is too strong when some integer variables are
+       equivalenced together. The number of values required is smaller
+       since two (or more) different variables share the same value: the
+       number of entries in the tables is greater than the number of
+       values. We must compute the number of values in each table.
+    */
+    /*
+    pips_assert("The number of values is greater than the number"
+                " of new, old and intermediate values",
+		hash_table_entry_count(hash_value_to_name) >=
+		hash_table_entry_count(hash_entity_to_new_value) 
+		+ nbo + nbi);
+    */
+    nbo = mapping_to_value_number(hash_entity_to_old_value);
+    nbi = mapping_to_value_number(hash_entity_to_intermediate_value);
+    nbn = mapping_to_value_number(hash_entity_to_new_value);
+
+    /* Why greater instead of equal? Because the equivalence variable
+       appears in the equivalence equations although it should never
+       appear in regular constraints, except under its canonical name. */
+    pips_assert("The number of values with a name is greater than the number"
+                " of new, old and intermediate values",
+		hash_table_entry_count(hash_value_to_name) >=
+		nbn + nbo + nbi);
 }
 
 void 
@@ -796,7 +838,8 @@ bool readonly;
 		 (char *) old_value);
 	/* hash_put(hash_value_to_name, (char *) old_value_eq, entity_name(old_value_eq)); */
     }
-    /* the name does not change */
+    /* The name does not change. It is not used until the equivalence
+       equations are added */
     hash_put(hash_value_to_name, (char *) eq,
 	     strdup(concatenate(entity_name(eq),
 				NEW_VALUE_SUFFIX, (char *) NULL)));
@@ -850,6 +893,8 @@ entity val;
 	else if(intermediate_value_entity_p(val))
 	    l_suffix = strlen(INTERMEDIATE_VALUE_SUFFIX);
 	else
+	  /* It can be an equivalenced variable... Additional testing
+             should be performed! */
 	    pips_error("value_to_variable",
 		       "%s is not a locally visible value\n",
 		       entity_name(val));
