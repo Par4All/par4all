@@ -301,56 +301,36 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {EOLE_PROD_OPERATOR_NAME,    no_write_effects },
     {EOLE_FMA_OPERATOR_NAME,     no_write_effects },
 
-    // Here are C intrinsics 
-    
-    // ISO 6.5.2.3 structure and union members 
+    /* Here are C intrinsics */
+  
     {".",                    no_write_effects},
     {"->",                    no_write_effects},
-    // ISO 6.5.2.4 postfix increment and decrement operators, real or pointer type operand
     {"post++",                    no_write_effects},
     {"post--",                    no_write_effects},
-    // ISO 6.5.3.1 prefix increment and decrement operators, real or pointer type operand
     {"++pre",                    no_write_effects},
     {"--pre",                    no_write_effects},
-    // ISO 6.5.3.2 address and indirection operators, add pointer type
     {"&",                    no_write_effects},
     {"*indirection",                    no_write_effects},
-    // ISO 6.5.3.3 unary arithmetic operators
     {"+unary",                    no_write_effects},
     {"-unary",                    no_write_effects},
     {"~",                    no_write_effects},
     {"!",                    no_write_effects},
-    // ISO 6.5.5 multiplicative operators : ALREADY EXIST (FORTRAN)
-    //   {"*",                    no_write_effects},
-    //   {"/",                    no_write_effects},
     {"%",                    no_write_effects},
-    // ISO 6.5.6 additive operators, arithmetic types or pointer + integer type
     {"+C",                    no_write_effects},
     {"-C",                    no_write_effects},
-    // ISO 6.5.7 bitwise shift operators
     {"<<",                    no_write_effects},
     {">>",                    no_write_effects},
-    // ISO 6.5.8 relational operators,arithmetic or pointer types 
     {"<",                    no_write_effects},
     {">",                    no_write_effects},
     {"<=",                    no_write_effects},
     {">=",                    no_write_effects},
-    // ISO 6.5.9 equality operators, return 0 or 1
     {"==",                    no_write_effects},
     {"!=",                    no_write_effects},
-    // ISO 6.5.10 bitwise AND operator 
     {"&bitand",                    no_write_effects},
-    // ISO 6.5.11 bitwise exclusive OR operator 
     {"^",                    no_write_effects},
-    // ISO 6.5.12 bitwise inclusive OR operator 
     {"|",                    no_write_effects},
-    // ISO 6.5.13 logical AND operator 
     {"&&",                    no_write_effects},
-    // ISO 6.5.14 logical OR operator 
     {"||",                    no_write_effects},
-    // ISO 6.5.16.1 simple assignment : ALREADY EXIST (FORTRAN)
-    //   {"=",                    no_write_effects}, 
-    // ISO 6.5.16.2 compound assignments
     {"*=",                    no_write_effects},
     {"/=",                    no_write_effects},
     {"%=",                    no_write_effects},
@@ -361,23 +341,20 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"&=",                    no_write_effects},
     {"^=",                    no_write_effects},
     {"|=",                    no_write_effects},
-    // ISO 6.5.17 comma operator
     {",",                    no_write_effects}, 
 
-    // null statement
-    {";",                    no_write_effects},
+    {BRACE_INTRINSIC,            no_write_effects},
+    {NULL_STATEMENT_INTRINSIC,   no_write_effects},
     {"break",                    no_write_effects},
     {"case",                    no_write_effects},  
     {"default",                    no_write_effects},
     {"return",                    no_write_effects},
 
-    // #include <assert.h>
-    //    {"__assert",                    no_write_effects},
+  
+    /*   
+    {"__assert",                    no_write_effects},
 
-    // #include <complex.h>
-
-    // #include <ctype.h>
-  /*   {"isalnum",                    no_write_effects}, 
+    {"isalnum",                    no_write_effects}, 
     {"isalpha",                    no_write_effects}, 
     {"iscntrl",                    no_write_effects}, 
     {"isdigit",                    no_write_effects}, 
@@ -393,21 +370,13 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"isascii",                    no_write_effects}, 
     {"toascii",                    no_write_effects}, 
     {"_tolower",                    no_write_effects}, 
-    {"_toupper",                    no_write_effects}, */
+    {"_toupper",                    no_write_effects}, 
   
-    // #include <errno.h>
-    //    {"errno",                    no_write_effects}, 
+    {"errno",                    no_write_effects}, 
 
-    // #include <fenv.h>
+    {"__flt_rounds",                    no_write_effects}, 
 
-    // #include <float.h>
-    //   {"__flt_rounds",                    no_write_effects}, 
-
-    // #include <inttypes.h>
-
-    // #include <iso646.h>
-
-  /*   {"_sysconf",                    no_write_effects}, 
+    {"_sysconf",                    no_write_effects}, 
     {"setlocale",                    no_write_effects},
     {"localeconv",                    no_write_effects},
     {"dcgettext",                    no_write_effects},
@@ -422,12 +391,8 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"mcfiller",                    no_write_effects},
     {"mcwrap",                    no_write_effects},*/
 
-    // #include <limits.h>
-
-    // #include <locale.h>
-
-    // #include <math.h>
-  /*    {"acos",                    no_write_effects},  
+  /*
+    {"acos",                    no_write_effects},  
     {"asin",                    no_write_effects}, 
     {"atan",                    no_write_effects}, 
     {"atan2",                    no_write_effects},   
@@ -505,21 +470,12 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"atof",                    no_write_effects},  
     {"strtod",                    no_write_effects},  */
 
-    //#include <setjmp.h>
-
   /*   {"setjmp",                    no_write_effects},
     {"__setjmp",                    no_write_effects},
     {"longjmp",                    no_write_effects},
     {"__longjmp",                    no_write_effects},
     {"sigsetjmp",                    no_write_effects},
     {"siglongjmp",                    no_write_effects},*/
-
-    //#include <signal.h>
-    //#include <stdarg.h>
-    //#include <stdbool.h>
-    //#include <stddef.h>
-    //#include <stdint.h>
-    //#include <stdio.h>
 
   /*    {"remove",                    no_write_effects},
     {"rename",                    no_write_effects},
@@ -588,14 +544,6 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"fsetpos64",                    no_write_effects},
     {"fseeko64",                    no_write_effects},
     {"ftello64",                    no_write_effects},*/ 
-
-
-    //#include <stdlib.h>
-    //#include <string.h>
-    //#include <tgmath.h>
-    //#include <time.h>
-    //#include <wchar.h>
-    //#include <wctype.h>
 
     {NULL, 0}
 };
