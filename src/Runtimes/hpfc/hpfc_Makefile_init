@@ -1,21 +1,27 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/08/30 19:14:57 $, )
+# ($Date: 1996/08/30 19:19:25 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
 # Makefile for PVM and HPFC, Fabien COELHO, 08/06/94
 
+ifndef PIPS_ARCH
+PIPS_ARCH=.
+endif
+
 ARCH=$(PVM_ARCH)
 
 # the RT architecture relies both on PVM and PIPS architectures,
 # because of obscure issues related to naming conventions...
-ifdef PIPS_ARCH
-RT_ARCH=$(ARCH)-$(PIPS_ARCH)
+
+ifeq ($(PIPS_ARCH),.)
+RT_ARCH=$(PVM_ARCH)
 else
-RT_ARCH=$(ARCH)-.
+RT_ARCH=$(PVM_ARCH)-$(PIPS_ARCH)
 endif
 
+# default target
 all:
 
 ifdef HPFC_RUNTIME
