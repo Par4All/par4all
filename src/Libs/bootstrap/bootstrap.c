@@ -601,7 +601,7 @@ logical_to_logical_type(int n)
  * Convert a constant from INT to REAL
  * e.g: REAL(10) --> 10.0
  */
-call convert_constant_from_int_to_real(call c)
+static call convert_constant_from_int_to_real(call c)
 {
   char s[255];
   strcpy(s, entity_local_name(call_function(c)));
@@ -613,7 +613,7 @@ call convert_constant_from_int_to_real(call c)
 /* INT -> DOUBLE
  * e.g: DBLE(10) => 10.0
  */
-call convert_constant_from_int_to_double(call c)
+static call convert_constant_from_int_to_double(call c)
 {
   char s[255];
   strcpy(s, entity_local_name(call_function(c)));
@@ -625,7 +625,7 @@ call convert_constant_from_int_to_double(call c)
 /* REAL -> INT
  * e.g: INT(-5.9E2) => -590
  */
-call convert_constant_from_real_to_int(call c)
+static call convert_constant_from_real_to_int(call c)
 {
   long l;
   float r;
@@ -639,7 +639,7 @@ call convert_constant_from_real_to_int(call c)
 /* REAL -> DOUBLE
  * e.g: DBLE(-5.9E-2) => -5.9D-2
  */
-call convert_constant_from_real_to_double(call c)
+static call convert_constant_from_real_to_double(call c)
 {
   char s[255];
   int i, len;
@@ -665,7 +665,7 @@ call convert_constant_from_real_to_double(call c)
 /* DOUBLE -> REAL
  * e.g: REAL(-5.9D-2) => -5.9E-2
  */
-call convert_constant_from_double_to_real(call c)
+static call convert_constant_from_double_to_real(call c)
 {
   char s[255];
   int i, len;
@@ -691,7 +691,7 @@ call convert_constant_from_double_to_real(call c)
 /* DOUBLE -> INT
  * e.g: INT(-5.9D2) => -590
  */
-call convert_constant_from_double_to_int(call c)
+static call convert_constant_from_double_to_int(call c)
 {
   call c_result, c_real = convert_constant_from_double_to_real(c);
   c_result = convert_constant_from_real_to_int(c_real);
@@ -701,7 +701,7 @@ call convert_constant_from_double_to_int(call c)
 /* REAL -> COMPLEX
  * e.g: CMPLX(-5.9E5) => (-5.9E5, 0.0)
  */
-call convert_constant_from_real_to_complex(call c)
+static call convert_constant_from_real_to_complex(call c)
 {
   expression exp_real, exp_imag;
   call c_imag;
@@ -725,7 +725,7 @@ call convert_constant_from_real_to_complex(call c)
 /* DOUBLE -> COMPLEX
  * e.g: CMPLX(-5.9D5) => (-5.9E5, 0.0)
  */
-call convert_constant_from_double_to_complex(call c)
+static call convert_constant_from_double_to_complex(call c)
 {
   call c_result, c_real = convert_constant_from_double_to_real(c);
   c_result = convert_constant_from_real_to_complex(c_real);
@@ -735,7 +735,7 @@ call convert_constant_from_double_to_complex(call c)
 /* INT -> COMPLEX
  * e.g: CMPLX(-5) => (-5.0, 0.0)
  */
-call convert_constant_from_int_to_complex(call c)
+static call convert_constant_from_int_to_complex(call c)
 {
   call c_result, c_real = convert_constant_from_int_to_real(c);
   c_result = convert_constant_from_real_to_complex(c_real);
@@ -745,7 +745,7 @@ call convert_constant_from_int_to_complex(call c)
 /* DOUBLE -> DCOMPLEX
  * e.g: DCMPLX(-5.9D5) => (-5.9D5, 0.0)
  */
-call convert_constant_from_double_to_dcomplex(call c)
+static call convert_constant_from_double_to_dcomplex(call c)
 {
   expression exp_real, exp_imag;
   call c_imag;
@@ -770,7 +770,7 @@ call convert_constant_from_double_to_dcomplex(call c)
 /* REAL -> DCOMPLEX
  * e.g: DCMPLX(-5.9E5) => (-5.9D5, 0.0D0)
  */
-call convert_constant_from_real_to_dcomplex(call c)
+static call convert_constant_from_real_to_dcomplex(call c)
 {
   call c_result, c_double = convert_constant_from_real_to_double(c);
   c_result = convert_constant_from_double_to_dcomplex(c_double);
@@ -780,7 +780,7 @@ call convert_constant_from_real_to_dcomplex(call c)
 /* INT -> DCOMPLEX
  * e.g: DCMPLX(-5) => (-5D0, 0.0D0)
  */
-call convert_constant_from_int_to_dcomplex(call c)
+static call convert_constant_from_int_to_dcomplex(call c)
 {
   call c_result, c_double = convert_constant_from_int_to_double(c);
   c_result = convert_constant_from_double_to_dcomplex(c_double);
