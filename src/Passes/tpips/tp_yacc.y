@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.82  1998/05/22 13:33:15  coelho
+ * fixes for jpips.
+ *
  * Revision 1.81  1998/05/05 17:40:21  coelho
  * info ++
  *
@@ -63,28 +66,13 @@
  *
  */
 
-%token TK_OPEN
-%token TK_CREATE
-%token TK_CLOSE
-%token TK_CHECKPOINT
-%token TK_DELETE
+%token TK_OPEN TK_CREATE TK_CLOSE TK_CHECKPOINT TK_DELETE
 %token TK_MODULE
-%token TK_MAKE
-%token TK_APPLY
-%token TK_CAPPLY
-%token TK_DISPLAY
-%token TK_REMOVE
-%token TK_ACTIVATE
-%token TK_SET_PROPERTY
-%token TK_GET_PROPERTY
-%token TK_SET_ENVIRONMENT
-%token TK_GET_ENVIRONMENT
-%token TK_CDIR
-%token TK_INFO 
-%token TK_PWD 
-%token TK_HELP 
-%token TK_SHOW
-%token TK_SOURCE
+%token TK_MAKE TK_APPLY TK_CAPPLY TK_DISPLAY
+%token TK_REMOVE TK_ACTIVATE
+%token TK_SET_PROPERTY TK_GET_PROPERTY
+%token TK_SET_ENVIRONMENT TK_GET_ENVIRONMENT
+%token TK_CDIR TK_INFO TK_PWD TK_HELP TK_SHOW TK_SOURCE
 %token TK_SHELL TK_ECHO TK_UNKNOWN
 %token TK_QUIT TK_EXIT
 %token TK_LINE
@@ -322,25 +310,37 @@ static void tp_some_info(string about)
     {
 	string ws = db_get_current_workspace_name();
 	fprintf(stdout, "%s", ws? ws: "");
+	if (jpips_is_running())
+	    jpips_tag2("workspace", ws? ws: "<none>");
     }
     else if (same_string_p(about, "module"))
     {
 	string m = db_get_current_module_name();
 	fprintf(stdout, "%s", m? m: "");
+	if (jpips_is_running())
+	    jpips_tag2("module", m? m: "<none>");
     }
     else if (same_string_p(about, "modules") &&
 	     db_get_current_workspace_name())
     {
 	gen_array_t modules = db_get_module_list();
 	int n = gen_array_nitems(modules), i;
+	if (jpips_is_running()) jpips_begin_tag("modules");
 	for(i=0; i<n; i++) 
-	    fprintf(stdout, "%s ", gen_array_item(modules, i));
+	{
+	    string m = gen_array_item(modules, i);
+	    fprintf(stdout, "%s ", m);
+	    if (jpips_is_running()) jpips_add_tag(m);
+	}
+	if (jpips_is_running()) jpips_end_tag();
 	gen_array_full_free(modules);
     }
     else if (same_string_p(about, "directory"))
     {
 	char pathname[MAXPATHLEN];
 	fprintf(stdout, "%s", (char*) getcwd(pathname, MAXPATHLEN));
+	if (jpips_is_running())
+	    jpips_tag2("directory", (char*) getcwd(pathname, MAXPATHLEN));
     }
     
     fprintf(stdout, "\n");
@@ -398,6 +398,7 @@ i_quit: TK_QUIT TK_ENDOFLINE
 	    exit(0);
 	}
 	;
+
 
 i_exit: TK_EXIT TK_ENDOFLINE 
 	{
@@ -732,6 +733,13 @@ i_get: TK_GET_PROPERTY propname TK_ENDOFLINE
 	    
 	    if (tpips_execution_mode) {
 		fprint_property(stdout, $2);
+		if (jpips_is_running())
+		{
+		    jpips_begin_tag("property");
+		    jpips_add_tag("");
+		    fprint_property_direct(stdout, $2);
+		    jpips_end_tag();
+		}
 		$$ = TRUE;
 	    }
 	    free($2);
