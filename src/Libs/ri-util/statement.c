@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.61  1998/10/15 16:20:18  irigoin
+    Function instruction_identification() added to improve debug messages
+
     Revision 1.60  1998/10/08 16:51:45  irigoin
     Improvement to statement_identification() and Id and Log added for RCS
 
@@ -1219,15 +1222,14 @@ statement stmt;
     return (stmt);
 }
 
-string 
-statement_identification(statement s)
-{
-    static char buffer[50];
-    char *instrstring = NULL;
-    int so = statement_ordering(s);
-    entity called = entity_undefined;
+/* Does not work for undefined instructions */
 
-    switch (instruction_tag(statement_instruction(s)))
+string 
+instruction_identification(instruction i)
+{
+    string instrstring = NULL;
+
+    switch (instruction_tag(i))
     {
     case is_instruction_loop:
 	instrstring="DO LOOP";
@@ -1242,18 +1244,17 @@ statement_identification(statement s)
 	instrstring="GOTO";
 	break;
     case is_instruction_call:
-    {if(continue_statement_p(s))
+    {if(fortran_instruction_p(i, CONTINUE_FUNCTION_NAME))
 	instrstring="CONTINUE";
-    else if(return_statement_p(s))
+    else if(fortran_instruction_p(i, RETURN_FUNCTION_NAME))
 	instrstring="RETURN";
-    else if(stop_statement_p(s))
+    else if(fortran_instruction_p(i, STOP_FUNCTION_NAME))
 	instrstring="STOP";
-    else if(format_statement_p(s))
+    else if(fortran_instruction_p(i, FORMAT_FUNCTION_NAME))
 	instrstring="FORMAT";
-    else if(assignment_statement_p(s))
+    else if(fortran_instruction_p(i, ASSIGN_OPERATOR_NAME))
 	instrstring="ASSIGN";
     else {
-	called = call_function(instruction_call(statement_instruction(s)));
 	instrstring="CALL";
     }
     break;
@@ -1264,9 +1265,28 @@ statement_identification(statement s)
     case is_instruction_unstructured:
 	instrstring="UNSTRUCTURED";
 	break;
-    default: pips_error("assignment_block_or_statement_p",
+    default: pips_error("instruction_identification",
 			"ill. instruction tag %d\n", 
-			instruction_tag(statement_instruction(s)));
+			instruction_tag(i));
+    }
+
+    return instrstring;
+}
+
+/* Does not work neither undefined statements nor for defined statements
+   with undefined instructions */
+
+string 
+statement_identification(statement s)
+{
+    static char buffer[50];
+    instruction i = statement_instruction(s);
+    string instrstring = instruction_identification(i);
+    int so = statement_ordering(s);
+    entity called = entity_undefined;
+
+    if(same_string_p(instrstring, "CALL")) {
+	called = call_function(instruction_call(i));
     }
 
     sprintf(buffer, "%d (%d, %d) at %p: %s %s\n",
