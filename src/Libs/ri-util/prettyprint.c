@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.237 2003/12/09 15:59:56 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.238 2003/12/18 21:41:31 nguyen Exp $";
 #endif /* lint */
 
  /*
@@ -2802,7 +2802,7 @@ text_named_module(
   reset_alternate_return_set();
   MERGE_TEXTS(r, ral);
   
-  if (strstr(entity_name(name),FILE_SEP_STRING) == NULL || is_fortran)
+  if (!compilation_unit_p(entity_name(name)) || is_fortran)
     {
       /* No need to print TAIL (}) if the current module is a C compilation unit*/
       ADD_SENTENCE_TO_TEXT(r, sentence_tail());
