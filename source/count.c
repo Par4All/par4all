@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <polylib/polylib64.h>
+#include <polylib/polylib.h>
 #define MAXRAYS 1024
 
 /****************************************************************/
