@@ -433,15 +433,27 @@ EFFECTS_PRINT_SDFI TRUE
 
 \section{Regions}
 
-Compute regions using the algorithm described in report E/181/CRI,
-called {\em $T^{-1}$ algorithm}. It provides more accurate regions, and
-preserve MUST approximations more often. But it is less efficient. Its
-default value is TRUE for the moment, but it will be later changed to
-FALSE.
+if {\tt MUST_REGIONS} is true, then it computes regions using the algorithm
+described in report E/181/CRI, called {\em $T^{-1}$ algorithm}. It provides more
+accurate regions, and preserve MUST approximations more often. But it is less
+efficient. Its default value is FALSE. EXACT_REGIONS is true for the moment for
+backward compatibility only.
 
 \begin{verbatim}
 EXACT_REGIONS TRUE
 \end{verbatim}
+
+\begin{verbatim}
+MUST_REGIONS FALSE
+\end{verbatim}
+
+The default option is to compute regions without taking into account array
+bounds. Both options have their advantages and drawbacks. 
+
+\begin{verbatim}
+REGIONS_WITH_ARRAY_BOUNDS FALSE
+\end{verbatim}
+
 
 \section{Static Complexity Evaluation}
 
