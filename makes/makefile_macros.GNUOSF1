@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.GNUOSF1,v $
+# Revision 1.2  1997/10/29 09:50:22  keryell
+# Removed -pipe option for OSF1.
+#
 # Revision 1.1  1997/09/09 12:30:36  coelho
 # Initial revision
 #
@@ -9,5 +12,7 @@
 
 include $(ROOT)/Include/makefile_macros.GNU
 
+# The option -pipe does not work on OSF1:
+CFLAGS = -g -O2 -Wall
 # end of it!
 #
