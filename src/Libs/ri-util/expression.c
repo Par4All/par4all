@@ -1330,3 +1330,94 @@ same_expression_name_p(expression e1, expression e2)
     return same_syntax_name_p(expression_syntax(e1), expression_syntax(e2));
 }
 
+/************************************************************* DAVINCI GRAPH */
+
+#define ALREADY_SEEN(node) (hash_defined_p(seen, (char*)node))
+#define SEEN(node) (hash_put(seen, (char*) node, (char*) 1))
+
+#define DV_CIRCLE ",a(\"_GO\",\"circle\")"
+#define DV_YELLOW ",a(\"COLOR\",\"yellow\")"
+
+static void davinci_dump_expression_rc(
+    FILE * out, expression e, hash_table seen)
+{
+  syntax s;
+  string name, shape, color;
+  list sons = NIL;
+  bool first = TRUE;
+
+  if (ALREADY_SEEN(e)) return;
+  SEEN(e);
+
+  s = expression_syntax(e);
+  switch (syntax_tag(s))
+  {
+  case is_syntax_call: 
+    {
+      call c = syntax_call(s);
+      name = entity_local_name(call_function(c));
+      sons = call_arguments(c);
+      shape = "";
+      color = "";
+      break;
+    }
+  case is_syntax_range:
+    name = "::";
+    shape = "";
+    color = "";
+    break;
+  case is_syntax_reference:
+    name = entity_local_name(reference_variable(syntax_reference(s)));
+    shape = DV_CIRCLE;
+    color = DV_YELLOW;
+    break;
+  default:
+    name = "";
+    shape = "";
+    color = "";
+    pips_internal_error("unexpected syntax tag (%d)\n", syntax_tag(s));
+  }
+  
+    /* daVinci node prolog. */
+  fprintf(out, "l(\"%x\",n(\"\",[a(\"OBJECT\",\"%s\")%s%s],[", 
+	  (unsigned int) e, name, color, shape);
+  
+  MAP(EXPRESSION, son, 
+  {      
+    if (!first) fprintf(out, ",\n");
+    else { fprintf(out, "\n"); first=FALSE; }
+    fprintf(out, " l(\"%x->%x\",e(\"\",[],r(\"%x\")))", 
+	    (unsigned int) e, (unsigned int) son, (unsigned int) son);
+  },
+    sons);
+
+    /* node epilog */
+  fprintf(out, "]))\n");
+
+  MAP(EXPRESSION, son, davinci_dump_expression_rc(out, son, seen), sons);
+}
+
+/* dump expression e in file out as a davinci graph.
+ */
+void davinci_dump_expression(FILE * out, expression e)
+{
+  hash_table seen = hash_table_make(hash_pointer, 0);
+  davinci_dump_expression_rc(out, e, seen);
+  hash_table_free(seen);
+}
+
+static FILE * out_flt = NULL;
+static bool expr_flt(expression e)
+{
+  davinci_dump_expression(out_flt, e);
+  return FALSE;
+}
+
+/* dump all expressions in s to out.
+ */
+void davinci_dump_all_expressions(FILE * out, statement s)
+{
+  out_flt = out;
+  gen_recurse(s, expression_domain, expr_flt, gen_null);
+  out_flt = NULL;
+}
