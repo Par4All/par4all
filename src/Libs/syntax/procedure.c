@@ -561,8 +561,12 @@ string name;
     /* entity e = FindOrCreateEntity(CurrentPackage, name); */
     entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
 
+    /*
     pips_assert("CreateIntrinsic",
 		MakeExternalFunction(e, MakeOverloadedResult()) == e);
+		*/
+
+    pips_assert("CreateIntrinsic", e!=entity_undefined);
 
     return(e);
 }
