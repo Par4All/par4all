@@ -207,7 +207,10 @@ void ReplaceReference(char *mod_name, reference ref, expression next_expr)
     /* Sets the current module to "mod_name". */
     set_current_module_entity(local_name_to_top_level_entity(mod_name));
 
-    mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, FALSE);
+    /* FI: who calls ReplaceReference? Since there is a put DBR_CODE,
+     * the get must be TRUE instead of FALSE
+     */
+    mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
     mod_inst = statement_instruction(mod_stat);
     pips_assert("ReplaceReference", instruction_unstructured_p(mod_inst));
