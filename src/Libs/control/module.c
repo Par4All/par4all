@@ -15,7 +15,7 @@
 
 /* interface with pipsdbm and pipsmake */
 
-void controlizer(module_name)
+bool controlizer(module_name)
 string module_name;
 {
    
@@ -37,6 +37,8 @@ string module_name;
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, 
 			   strdup(module_name), 
 			   module_stat);
+
+    return TRUE;
 }
 
 
