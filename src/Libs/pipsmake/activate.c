@@ -1,4 +1,6 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 #include <sys/types.h>
 
@@ -263,7 +265,7 @@ rule r;
 	MAPL(pvr, {
 	    virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
 	    string vrn2 = virtual_resource_name(vr);
-	    owner vro = virtual_resource_owner(vr);
+	    /* owner vro = virtual_resource_owner(vr); */
 
 	    /* We DO check callers and callees (DB,08/96) */
             /* if ( owner_callers_p(vro) || owner_callees_p(vro) ) {}
