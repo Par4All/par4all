@@ -4,12 +4,14 @@
 
 #include "genC.h"
 
+#include "sac.h"
+
 int patterns_yyerror(char* s);
 int patterns_yywrap(void);
 int patterns_yylex();
 static int* make_integer_argument(int x);
 static int* make_empty_argument();
-void insert_pattern(int c, list tokens, list args);
+static opcode make_opcode(char * name, int vecSize, int subwordSize);
 
 %}
 
@@ -23,15 +25,20 @@ void insert_pattern(int c, list tokens, list args);
 
       int iVal;
       char * strVal;
+
+      opcode opVal;
+      list opcodesList;
 }
 
 %type <tokenId> token;
-%type <tokenList> token_list;
+%type <tokenList> tokens_list;
 
 %type <argument> argument;
 %type <argsList> arguments_list;
 %type <argsList> merge_arguments;
 
+%type <opVal> opcode;
+%type <opcodesList> opcodes_list;
 
 %token UNKNOWN_TOK
 %token REFERENCE_TOK
@@ -80,23 +87,40 @@ void insert_pattern(int c, list tokens, list args);
 
 %%
 
-patterndef:
-       pattern_list
+definitions:
+       operations_list patterns_list
        ;
 
-pattern_list:
+operations_list:
+       operations_list operation
+     | 
+       ;
+
+operation:
+       IDENTIFIER_TOK '[' INTEGER_TOK ']' '{' opcodes_list '}' 
+                                        { insert_operation($1, $3, $6); }
+
+opcodes_list:
+       opcodes_list opcode              { $$ = CONS(OPCODE, $2, $1); }
+     |                                  { $$ = NIL; }
+       ;
+
+opcode:
+       IDENTIFIER_TOK ':' INTEGER_TOK '*' INTEGER_TOK ';' 
+                                        { $$ = make_opcode($1, $3, $5); }
+
+patterns_list:
+       patterns_list pattern             
      |
-       pattern_list pattern              
        ;
 
 pattern:
-       INTEGER_TOK ':' token_list merge_arguments ';' { insert_pattern($1, $3, $4); }
+       IDENTIFIER_TOK ':' tokens_list merge_arguments ';' 
+                                        { insert_pattern($1, $3, $4); }
 
-
-token_list:
-       token token_list                 { $$ = CONS(TOKEN, $1, $2); }
+tokens_list:
+       token tokens_list                { $$ = CONS(TOKEN, $1, $2); }
      |                                  { $$ = NIL; }
-       ;
 
 token:
        REFERENCE_TOK                    { $$ = REFERENCE_TOK; }
@@ -144,13 +168,10 @@ merge_arguments:
 arguments_list:
        argument ',' arguments_list      { $$ = CONS(ARGUMENT, $1, $3); }
      | argument                         { $$ = CONS(ARGUMENT, $1, NIL); }
-       ;
 
 argument:
        INTEGER_TOK                      { $$ = make_integer_argument($1); }
      |                                  { $$ = make_empty_argument(); }
-       ;
-
 
 %%
 
@@ -166,6 +187,17 @@ static int* make_integer_argument(int x)
 static int* make_empty_argument()
 {
    return NULL;
+}
+
+static opcode make_opcode(char * name, int vecSize, int subwordSize)
+{
+   opcode op = (opcode)malloc(sizeof(_opcode));
+   
+   op->name = strdup(name);
+   op->vectorSize = vecSize;
+   op->subwordSize = subwordSize;
+   
+   return op;
 }
 
 int patterns_yywrap(void)
