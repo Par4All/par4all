@@ -14,9 +14,9 @@
 string dbll_current_module = (string) NULL;
 
 typedef char * (* READER)(FILE *);
-typedef void  (* WRITER)(FILE *, char *);
-typedef void  (* FREER) (char *);
-typedef bool  (* CHECKER)(char *);
+typedef void  (* WRITER)(FILE *, void *);
+typedef void  (* FREER) (void *);
+typedef bool  (* CHECKER)(void *);
 
 typedef struct {
     string  name;
@@ -30,8 +30,8 @@ typedef struct {
  */
 #define no_read (READER) abort
 #define no_write (WRITER) abort
-static void no_free(char * p) { pips_debug(2, "memory leak (%p)\n", p); }
-static void writeln_string(FILE * f, char * p) { fprintf(f, "%s\n", p); }
+static void no_free(void * p) { pips_debug(2, "memory leak (%p)\n", p); }
+static void writeln_string(FILE * f, void * p) {fprintf(f, "%s\n", (char*)p);}
 static void unexpected(void)
 { pips_internal_error("unexpected pipsdbm method\n");}
 
@@ -53,7 +53,7 @@ static methods * get_methods(string name)
     if (hash_table_undefined_p(cache)) { /* initialize at first call. */
 	cache = hash_table_make(hash_string, 2*dbll_number_of_resources());
 	for (m = all_methods; m->name; m++)
-	    hash_put(cache, m->name, (char *) m);
+	    hash_put(cache, m->name, (void *) m);
     }
 
     /* get the methods! */
@@ -220,7 +220,7 @@ int dbll_stat_resource_file(string rname, string oname, bool okifnotthere)
 
 /* save rname of oname p. get the method, then apply it.
  */
-void dbll_save_resource(string rname, string oname, char * p)
+void dbll_save_resource(string rname, string oname, void * p)
 {
     methods * m;
     FILE * f;
@@ -239,11 +239,11 @@ void dbll_save_resource(string rname, string oname, char * p)
     dbll_current_module = (string) NULL;
 }
 
-char * dbll_load_resource(string rname, string oname)
+void * dbll_load_resource(string rname, string oname)
 {
     methods * m;
     FILE * f;
-    char * p = NULL;
+    void * p = NULL;
     pips_debug(7, "loading resource %s of %s\n", rname, oname);
 
     dbll_current_module = oname;
@@ -258,7 +258,7 @@ char * dbll_load_resource(string rname, string oname)
     return p;
 }
 
-void dbll_free_resource(string rname, string oname, char * p)
+void dbll_free_resource(string rname, string oname, void * p)
 {
     methods * m; 
     pips_debug(7, "freeing resource %s of %s\n", rname, oname);
@@ -266,7 +266,7 @@ void dbll_free_resource(string rname, string oname, char * p)
     m->free_function(p);
 }
 
-bool dbll_check_resource(string rname, string oname, char * p)
+bool dbll_check_resource(string rname, string oname, void * p)
 {
     methods * m;
     pips_debug(7, "checking resource %s of %s\n", rname, oname);
@@ -284,7 +284,7 @@ bool dbll_storable_p(string rname)
 /****************************************************** LESS BASIC INTERFACE */
 
 void dbll_save_and_free_resource(string rname, string oname, 
-				 char * p, bool do_free)
+				 void * p, bool do_free)
 {
     dbll_save_resource(rname, oname, p);
     if (do_free) dbll_free_resource(rname, oname, p);
