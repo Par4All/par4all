@@ -226,12 +226,12 @@ int maximize;
 	    complexity ctmp;
 	    ctmp = evaluate_var_to_complexity((entity)var, precond, effects_list, maximize);
 	    /* should be multiplied by "val" here */
-	    complexity_scalar_mult(&ctmp, (float)val);
+	    complexity_scalar_mult(&ctmp, VALUE_TO_FLOAT(val));
 	    complexity_add(&comp, ctmp);
         }
 	else { 
 	    /* We keep this symbol (including TCST) in the polynome */
-	    ppvar = make_polynome((float) val, var, 1);
+	    ppvar = make_polynome(VALUE_TO_FLOAT(val), var, VALUE_ONE);
 	    if (complexity_zero_p(comp))
 		comp = polynome_to_new_complexity(ppvar);
 	    else
@@ -284,7 +284,7 @@ int maximize;
 	    comp = evaluate_var_to_complexity((entity)var, precond, effects_list, maximize);
 	}
 	else {         /* We keep this symbol in the polynome */
-	    Ppolynome pp = make_polynome((float) 1, (Variable) var, 1);
+	    Ppolynome pp = make_polynome((float) 1, (Variable) var, VALUE_ONE);
 	    comp = polynome_to_new_complexity(pp);
 	    varcount_symbolic(complexity_varcount(comp)) ++;
 	    polynome_rm(&pp);
@@ -532,9 +532,8 @@ int maximize;
 {
     predicate pred = transformer_relation(precond);
     Psysteme psyst = (Psysteme) predicate_system(pred);
-/* #define MAXINT ((~( (1 << 30) -1 )) + (~( (1 << 30) -1 )) + 1) */
-    int min = (INT_MAX);     /*  2^31 - 1 */
-    int max = (INT_MIN);
+    Value min = VALUE_MAX; 
+    Value max = VALUE_MIN;
     boolean faisable;
     complexity comp = make_zero_complexity();
 
@@ -597,53 +596,58 @@ int maximize;
 
 	ps1 = sc_dup(ps);
 	faisable = sc_minmax_of_variable(ps1, (Variable) var,
-					 (Value *) &min, (Value *) &max);
+					 &min, &max);
 
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	    fprintf(stderr," faisable is %d\n",faisable);
 	    fprintf(stderr,"Variable %s -- ", noms_var(var));
-	    fprintf(stderr,"min is %d, max is %d, maximize is %d\n", min, max,maximize);
+	    fprint_string_Value(stderr, "min is ", min);
+	    fprint_string_Value(stderr, ", max is ", max);
+	    fprintf(stderr,", maximize is %d\n", maximize);
 	}
 
-	if ( faisable && ((min != INT_MIN) || (max != INT_MAX)) ) {
+	if ( faisable && (value_notmin_p(min) || value_notmax_p(max)) )
+	    {
 
-	    if ( (max != INT_MAX) && TAKE_MAX(maximize) ) {
+	    if ( value_notmax_p(max) && TAKE_MAX(maximize) ) {
 		comp = simplify_sc_to_complexity(ps,(Variable)var);
 		if ( complexity_zero_p(comp) )
-		    comp = make_constant_complexity( (float)(max) );
+		    comp = make_constant_complexity( VALUE_TO_FLOAT(max) );
 		varcount_bounded(complexity_varcount(comp)) ++;
 	    }
-	    else if ( (min != INT_MIN) && TAKE_MIN(maximize) ) {
+	    else if ( value_notmin_p(min) && TAKE_MIN(maximize) ) {
 		comp = simplify_sc_to_complexity(ps,(Variable)var);
 		if ( complexity_zero_p(comp) )
-		    comp = make_constant_complexity( (float)(min) );
+		    comp = make_constant_complexity( VALUE_TO_FLOAT(min) );
 		varcount_bounded(complexity_varcount(comp)) ++;
 	    }
 
 	    /* for the inner loop 28/06/91 example p.f */
-	    else if ( (max == INT_MAX) && TAKE_MAX(maximize) ) {
+	    else if ( value_max_p(max) && TAKE_MAX(maximize) ) {
 		comp = simplify_sc_to_complexity(ps,(Variable)var);
 		if ( complexity_zero_p(comp) )
-		    comp = make_constant_complexity( (float)(max) );
+		    comp = make_constant_complexity( VALUE_TO_FLOAT(max) );
 		varcount_bounded(complexity_varcount(comp)) ++;
 	    }
-	    else if ( (min == INT_MIN) && TAKE_MIN(maximize) ) {
+	    else if ( value_min_p(min) && TAKE_MIN(maximize) ) {
 		comp = simplify_sc_to_complexity(ps,(Variable)var);
 		if ( complexity_zero_p(comp) )
-		    comp = make_constant_complexity( (float)(min) );
+		    comp = make_constant_complexity( VALUE_TO_FLOAT(min) );
 		varcount_bounded(complexity_varcount(comp)) ++;
 	    }
 
 	    else if (min == max) {
-		comp = make_constant_complexity( (float)(max) );
+		comp = make_constant_complexity( VALUE_TO_FLOAT(max) );
 		varcount_guessed(complexity_varcount(comp)) ++;
 		if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-		    fprintf(stderr,"value is %d\n",
-			    vecteur_val((ps1->egalites)->vecteur));
-		    fprintf(stderr,"max = min = %d\n",max);
+		    fprintf(stderr,"value is ");
+		    fprint_Value(stderr, val_of((ps1->egalites)->vecteur));
+		    fprintf(stderr, "\n");
+		    fprint_string_Value(stderr,"max = min = ",max);
+		    fprintf(stderr, "\n");
 		}
 	    }
-	    else if ( (min != INT_MIN) && (max !=  INT_MAX) ) {
+	    else if ( value_notmin_p(min) && value_notmax_p(max) ) {
 		comp = simplify_sc_to_complexity(ps,(Variable)var);
 	    }
 	    else {
