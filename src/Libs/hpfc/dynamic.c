@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.51  1997/08/05 16:31:35  coelho
+ * more debug, and fixed use of effects...
+ *
  * Revision 1.50  1997/08/04 13:54:38  coelho
  * new generic effects includes.
  *
@@ -70,6 +73,16 @@ entity safe_load_primary_entity(entity e)
    
     return load_primary_entity(e);
 }
+
+bool
+same_primary_entity_p(entity e1, entity e2)
+{
+    if (bound_primary_entity_p(e1) && bound_primary_entity_p(e2))
+	return load_primary_entity(e1)==load_primary_entity(e2);
+    else
+	return FALSE;
+}
+
 
 /*   DYNAMIC STATUS management.
  */
@@ -939,6 +952,8 @@ static void ref_rwt(reference r)
 static void 
 simple_switch_old_to_new(statement s)
 {
+    DEBUG_STAT(9, "considering", s);
+
     /* looks for direct references in s and switch them
      */
     gen_multi_recurse
@@ -948,20 +963,24 @@ simple_switch_old_to_new(statement s)
 	 reference_domain,    gen_true,  ref_rwt,  /* REFERENCE */
 	 NULL);
 
-    /* whether the array may be written...
+    /* whether the array may be written... by scanning the proper effects of s.
      * (caution, was just switched to the new_variable!)
      */
+    pips_debug(8, "statement %p, array %s, rw proper %d\n", 
+	       s, entity_name(new_variable), bound_proper_rw_effects_p(s));
+
     if (!array_modified && bound_proper_rw_effects_p(s))
     {
 	MAP(EFFECT, e,
+        {
+	    entity v = reference_variable(effect_reference(e));
+	    if (same_primary_entity_p(v,new_variable) && effect_write_p(e))
 	    {
-		if (reference_variable(effect_reference(e))==new_variable &&
-		    action_write_p(effect_action(e)))
-		{
-		    array_modified = TRUE;
-		    return;
-		}
-	    },
+		pips_debug(9, "%s W in %p\n", entity_name(new_variable), s);
+		array_modified = TRUE;
+		return;
+	    }
+	},
 	    load_proper_rw_effects_list(s));
     }
 }
