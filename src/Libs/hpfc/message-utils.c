@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1995/10/10 11:38:11 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1995/12/19 15:52:35 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -410,7 +410,7 @@ list array_ranges_to_template_ranges(array, lra)
 entity array;
 list lra;
 {
-    align a = load_entity_align(array);
+    align a = load_hpf_alignment(array);
     entity template = align_template(a);
     list la = align_alignment(a), lrt = NIL;
     int i = 1;
@@ -457,28 +457,18 @@ list template_ranges_to_processors_ranges(template, lrt)
 entity template;
 list lrt;
 {
-    distribute
-	d = load_entity_distribute(template);
-    entity
-	proc = distribute_processors(d);
-    list
-	ld = distribute_distribution(d),
-	lrp = NIL;
-    int
-	i = 1;
+    distribute d = load_hpf_distribution(template);
+    entity proc = distribute_processors(d);
+    list ld = distribute_distribution(d), lrp = NIL;
+    int	i = 1;
 
     for (i=1 ; i<=NumberOfDimension(proc) ; i++)
     {
-	int
-	    tdim = 0;
-	distribution
-	    di = FindDistributionOfProcessorDim(ld, i, &tdim);
-	style
-	    s = distribution_style(di);
-	range
-	    rg = ith_range(tdim-1, lrt);
-	int
-	    p  = 0,
+	int tdim = 0;
+	distribution di = FindDistributionOfProcessorDim(ld, i, &tdim);
+	style s = distribution_style(di);
+	range rg = ith_range(tdim-1, lrt);
+	int p  = 0,
 	    tl = HpfcExpressionToInt(range_lower(rg)),
 	    tu = HpfcExpressionToInt(range_upper(rg)),
 	    n  = HpfcExpressionToInt(distribution_parameter(di));
@@ -488,11 +478,10 @@ list lrt;
 	case is_style_block:
 	{
 	    expression
-		pl = int_to_expression(processor_number(template, tdim, tl, &p)),
-		pu = int_to_expression(processor_number(template, tdim, tu, &p));
+	      pl = int_to_expression(processor_number(template, tdim, tl, &p)),
+	      pu = int_to_expression(processor_number(template, tdim, tu, &p));
 
-	    /*
-	     * ??? another increment could be computed?
+	    /* ??? another increment could be computed?
 	     */
 	    lrp = gen_nconc(lrp,
 			    CONS(RANGE,
@@ -502,13 +491,11 @@ list lrt;
 	}
 	case is_style_cyclic:
 	{
-	    dimension
-		dp = FindIthDimension(proc, i);
-	    int
-		sz = SizeOfDimension(dp);
+	    dimension dp = FindIthDimension(proc, i);
+	    int	sz = SizeOfDimension(dp);
 	    expression
-		pl = int_to_expression(processor_number(template, tdim, tl, &p)),
-		pu = int_to_expression(processor_number(template, tdim, tu, &p));
+	      pl = int_to_expression(processor_number(template, tdim, tl, &p)),
+	      pu = int_to_expression(processor_number(template, tdim, tu, &p));
 
 	    if (((tu-tl)>n*sz) || (pl>pu) || ((pl==pu) && ((tu-tl)>n)))
 		lrp = gen_nconc(lrp,
