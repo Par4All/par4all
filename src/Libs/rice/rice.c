@@ -336,7 +336,9 @@ int l ;
 			       statement_number(stat));
     statement_ordering(nstat) = statement_ordering(stat);
     statement_comments(nstat) = statement_comments(stat);
-
+    /* Do not forget to move forbidden information associated with
+       block: */
+    fix_sequence_statement_attributes_if_sequence(nstat);
     ifdebug(1) {
 	fprintf(stderr, "final nest of loops:\n\n");
 	print_statement(nstat);
