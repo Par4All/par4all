@@ -473,4 +473,9 @@ generic_effects_reset_all_methods()
     set_contracted_rw_effects(TRUE);
 
     set_descriptor_range_p(FALSE);
+
+    set_is_user_view_p(FALSE);
+    set_prettyprint_with_attachments(FALSE);
+
+    reset_action_interpretation();
 }
