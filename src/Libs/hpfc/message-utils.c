@@ -1,6 +1,6 @@
 /* Message Utilities
  * 
- * $RCSfile: message-utils.c,v $ ($Date: 1995/12/19 15:52:35 $, )
+ * $RCSfile: message-utils.c,v $ ($Date: 1995/12/22 16:06:09 $, )
  * version $Revision$
  *
  * Fabien Coelho, August 1993
@@ -543,35 +543,27 @@ list array_access_to_array_ranges(r, lkref, lvref)
 reference r;
 list lkref, lvref;
 {
-    entity
-	array = reference_variable(r);
-    list
-	li  = reference_indices(r),
-	lk  = lkref,
-	lv  = lvref,
-	lra = NIL,
-	ldim = variable_dimensions(type_variable(entity_type(array)));
-    
+    entity array = reference_variable(r);
     int dim = 1;
+    list li  = reference_indices(r), lk  = lkref, lv  = lvref, lra = NIL,
+	ldim = variable_dimensions(type_variable(entity_type(array)));
 
-    debug(7, "array_access_to_array_ranges",
-	  "considering array %s\n",
-	  entity_name(array));
+    pips_debug(7, "considering array %s\n", entity_name(array));
 
-    for ( ; 
-	 li!=NIL ; 
-	 li=CDR(li), lk=CDR(lk), lv=CDR(lv), ldim=CDR(ldim), dim++)
+    for (; li; POP(li), POP(lk), POP(lv), POP(ldim), dim++)
     {
 	access a = INT(CAR(lk));
 	Pvecteur v = (Pvecteur) PVECTOR(CAR(lv));
 	normalized n = expression_normalized(EXPRESSION(CAR(li)));
 	
+	pips_debug(8, "DIM=%d[%d]\n", dim, a);
+
 	switch (access_tag(a))
 	{
 	case local_form_cst:
 	{
-	    /*
-	     * this dimension shouldn't be used, so I put there whatever I want...
+	    /* this dimension shouldn't be used, 
+	     * so I put there whatever I want...
 	     * ??? mouais, the information is in the vector, I think.
 	     */
 	    lra = gen_nconc(lra,
@@ -626,24 +618,16 @@ list lkref, lvref;
 	    else
 		au = copy_expression(dimension_upper(DIMENSION(CAR(ldim))));
 
-	    lra = gen_nconc(lra,
-			    CONS(RANGE,
-				 make_range(al, au, in), /* shared! */
-				 NIL));
+	    lra = gen_nconc(lra, CONS(RANGE, make_range(al, au, in), NIL));
 	    break;
 	}
 	case aligned_affine:
 	case local_affine:
 	{
-	    Pvecteur
-		v2 = vect_del_var(v, TCST);
-	    entity
-		/* ??? should check that it is ok */
-		index = (entity) var_of(v2);
-	    range
-		rg = loop_index_to_range(index);
-	    int
-		rate = val_of(v2),
+	    Pvecteur v2 = vect_del_var(v, TCST);
+	    entity index = (entity) var_of(v2);
+	    range rg = loop_index_to_range(index);
+	    int	rate = val_of(v2),
 		in = HpfcExpressionToInt(range_increment(rg)),
 		lb = HpfcExpressionToInt(range_lower(rg)),
 		ub = HpfcExpressionToInt(range_upper(rg)),
@@ -653,10 +637,7 @@ list lkref, lvref;
 		al = int_to_expression(rate*lb-dt),
 		au = int_to_expression(rate*ub-dt);
 
-	    lra = gen_nconc(lra,
-			    CONS(RANGE,
-				 make_range(al, au, ai), /* shared! */
-				 NIL));
+	    lra = gen_nconc(lra, CONS(RANGE, make_range(al, au, ai), NIL));
 	    break;
 	}
 	default:
