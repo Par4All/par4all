@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.280  1997/05/14 15:57:39  coelho
+# *** empty log message ***
+#
 # Revision 1.279  1997/04/28 16:03:50  coelho
 # *** empty log message ***
 #
@@ -345,7 +348,7 @@ CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
 # a typical interesting example is to put -pg in {C,LD}OPT
 #
 PREPROC=  \$(CC) -E \$(CPPFLAGS) \$(CPPOPT)
-COMPILE=  \$(CC) \$(CFLAGS) \$(COPT) \$(CPPFLAGS) \$(CPPOPT) -c
+COMPILE=  \$(CC) \$(CANSI) \$(CFLAGS) \$(COPT) \$(CPPFLAGS) \$(CPPOPT) -c
 F77COMPILE=\$(FC) \$(FFLAGS) \$(FOPT) -c
 LINK=	  \$(LD) \$(LDFLAGS) \$(LDOPT) -o
 SCAN=	  \$(LEX) \$(LFLAGS) \$(LOPT) -t
