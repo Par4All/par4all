@@ -108,7 +108,7 @@ int i;
 	for(j = 0; j<n; j++) {
 	    i++; p++;
 	    N = p->param1; D = p->param2;
-	    d = pgcd(N, D);
+	    d = sol_pgcd(N, D);
 
 	    if(d == D){ 
 		if(N/d < 0) ecrit_coeff_neg2( -N/d );
@@ -122,7 +122,7 @@ int i;
 
 	/* Take the corresponding new parameter */
 	N = p->param1; D = p->param2;
-	d = pgcd(N, D);
+	d = sol_pgcd(N, D);
 	if(d == D){
 	    second_entier =  N/d;
 	}
@@ -150,7 +150,7 @@ int i;
 	for(j = 0; j<n; j++) {
 	    i++; p++;
 	    N = p->param1; D = p->param2;
-	    d = pgcd(N, D);
+	    d = sol_pgcd(N, D);
 	    if(d == D){
 		ecrit_coeff1( N/d );
 	    }
@@ -188,7 +188,7 @@ int i;
 	    for(j = 0; j<n; j++) {
 		i++; p++;
 		N = p->param1; D = p->param2;
-		d = pgcd(N, D);
+		d = sol_pgcd(N, D);
 		if(d == D){
 		    if (N/d < 0) ecrit_une_var_neg(-N/d);
 		    else ecrit_une_var( N/d );
@@ -275,8 +275,8 @@ int i;
 		for(j = 0; j<n; j++) {
 		    i++; p++;
 		    N = p->param1; D = p->param2;
-			d = pgcd( N, D );
-			lcm = ppcm( lcm, D/d );
+			d = sol_pgcd( N, D );
+			lcm = sol_ppcm( lcm, D/d );
 		}
 
 		/* Then write the new predicate */
@@ -331,8 +331,8 @@ int i;
 			for(j = 0; j<n; j++) {
 		    	i++; p++;
 		    	N = p->param1; D = p->param2;
-				d = pgcd( N, D );
-				lcm = ppcm( lcm, D/d );
+				d = sol_pgcd( N, D );
+				lcm = sol_ppcm( lcm, D/d );
 			}
 
 			/* Then write the expression */
@@ -423,7 +423,7 @@ int i;
                 for(j = 0; j<n; j++) {
                     i++; p++;
                     N = p->param1; D = p->param2;
-                    d = pgcd(N, D);
+                    d = sol_pgcd(N, D);
 
                     if(d == D){ 
 			if(N/d < 0) ecrit_coeff_neg2( -N/d );
@@ -438,7 +438,7 @@ int i;
 
 		/* Take the corresponding new parameter */
      		N = p->param1; D = p->param2;
-                d = pgcd(N, D);
+                d = sol_pgcd(N, D);
                 if(d == D){ second_entier =  N/d;
                 }
 		/* Should not happen here */
@@ -468,7 +468,7 @@ int i;
                 for(j = 0; j<n; j++) {
 		    i++; p++;
                     N = p->param1; D = p->param2;
-                    d = pgcd(N, D);
+                    d = sol_pgcd(N, D);
                     if(d == D){
 			ecrit_coeff1( N/d );
 		    }
@@ -515,7 +515,7 @@ int i;
                 	for(j = 0; j<n; j++) {
 				i++; p++;
                     		N = p->param1; D = p->param2;
-                    		d = pgcd(N, D);
+                    		d = sol_pgcd(N, D);
                     		if(d == D){
 					if (N/d < 0) ecrit_une_var_neg(-N/d);
 					else ecrit_une_var( N/d );
@@ -637,7 +637,8 @@ int		nb_var;
 
 
 		p->row[i].flags = Unknown;
-                new_ecrit_ligne(vect_multiply(vect_dup(cont->vecteur),-1), 
+                new_ecrit_ligne(vect_multiply(vect_dup(cont->vecteur),
+					      VALUE_MONE), 
 				in_ps->base, nb_var, p->row[i].objet.val);
 		i++;
         }
