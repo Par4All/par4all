@@ -7,60 +7,81 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
-/* #include "statistics.h" */
+
 #define DEFAULT_INT_PREFIX 	"I_"
 #define DEFAULT_FLOAT_PREFIX 	"F_"
 #define DEFAULT_LOGICAL_PREFIX 	"L_"
 #define DEFAULT_COMPLEX_PREFIX	"C_"
 #define DEFAULT_STRING_PREFIX	"S_" 
+#define  depth_max  40    /* La profondeur des differents  nids */
+#define  st_max 40       /* Le nombre maximum de stencils q'un nid peut contenir */
+#define nid_nbr 40     /* nombre de nid de la sequence */
 
- typedef struct INFO_LOOP {   
+
+/* La structure d'une boucle : son index et ces deux bornes */
+
+typedef struct INFO_LOOP {    
   Variable index;
   Value upper, lower;  
 } info_loop;
 
 
+/* La structure d'un nid */
+
 typedef struct NID { 
-  entity tableau;
-  Pmatrix  *st;
-  info_loop *nd;
-  int nbr_stencil;
-  Pmatrix delai;
-  statement s;
-  Value surface;
-  Pmatrix coef;
-  Pvecteur pv_acces;
-  entity ref;
+  entity tableau;       /*  le tableau en ecriture */
+  Pmatrix  *st;        /* les stencils */
+  info_loop *nd;       /* les boucles */ 
+  int nbr_stencil;    /* nombre de stencils */
+  Pmatrix delai;      /* le delai qu'on doit ajouter a ce nid */ 
+  statement s;        /* le corps de ce nid */
+  Value surface;      /* le volume memoire du tableau en ecriture de ce nid */
+  Pmatrix coef;       /* le coefficient des fonctions d'acces  */
+  Pvecteur pv_acces;     /*  */ 
+  entity ref;           /*   */
+  Pmatrix n
 } nid;
 
-expression expt;
-Pmatrix a;   
-int k1=0,k2=0;
-nid  sequen[10];
-int depth;
-info_loop  *ptr;     
-int depth_max=40,st_max=40;
-info_loop *merged_nest;
-loop loop1;
-bool overflow=FALSE;
-entity first_array;
+static Pvecteur *tiling_indice;
+static int k1=0, k2=0;  /* k1 represente le nombre de nid et k2 leur profondeur */
+
+static nid  sequen[nid_nbr]; /* la sequence de nids */
+
+static int depth;     /* la pronfondeur des nids */
+
+static info_loop   *merged_nest, *tiled_nest;  /* le nid fusionne */
+
+loop loop1;       /* une copie de l'un des nids de la sequence */
+
+entity first_array;  /* le tableau en entree */
+
+
+/* Compteurs des suffixes de nouvelles references */
 static int unique_integer_number = 0,
   unique_float_number = 0,
   unique_logical_number = 0,
   unique_complex_number = 0,
   unique_string_number = 0;
 
- 
+/* first_turn permet de detecter le premier retour de la fonction loop_rwt()  */
+/* overflow permet de detecter un debordemebnt dans l'un des nids */
 
-static bool first_turn=FALSE;
+static bool first_turn=FALSE, overflow=FALSE;
 
 
- typedef enum {is_a_stencil, is_a_continue, is_a_no_stencil } contenu_t;
- typedef struct {
+/* pour marquer si la sequence repond a nos hypotheses */
+
+typedef enum {is_a_stencil, is_a_continue, is_a_no_stencil } contenu_t;
+
+/* cette structure contient une pile. La tete de cette pile contient le statement courant */
+/* depth represente  la profondeur des nids */ 
+
+typedef struct {
   hash_table contenu;
   hash_table depth;
   stack statement_stack;
 } * context_p, context_t;
+
 
 static bool loop_flt(loop l )
 {  
@@ -69,30 +90,30 @@ static bool loop_flt(loop l )
   normalized norm1, norm2;
   Variable  index;
   Pvecteur pv1,pv2;
-  if( ! first_turn )
+  if( ! first_turn )        /* la premiere boucle d'un nid donne */
     {
       loop1=copy_loop(l);
       first_turn = TRUE; 
+      /* allouer de la memoire pour les differentes boucles de ce nid */
       sequen[k1].nd= (struct INFO_LOOP  *)malloc(depth_max *sizeof(struct INFO_LOOP));
+      /* allouer de la memoire pour les differents stencils  de ce nid */
       sequen[k1].st= ( Pmatrix *)malloc(st_max *sizeof(Pmatrix));
     }; 
   index =(Variable) loop_index(l);
-  range1=loop_range(l); 
-  lower=range_lower(range1);  
-  upper=range_upper(range1); 
-  expt=lower;
+  range1=loop_range(l);    
+  lower=range_lower(range1);  /* la borne inferieure */  
+  upper=range_upper(range1);  /* la borne superiere */
   normalize_all_expressions_of(lower);
   normalize_all_expressions_of(upper);
   norm1=expression_normalized(lower);
   norm2=expression_normalized(upper);
-  pips_assert("normalized are linear", normalized_linear_p(norm1)&&
-	     normalized_linear_p(norm2));
+  pips_assert("normalized are linear", normalized_linear_p(norm1)&& normalized_linear_p(norm2));
   pv1= normalized_linear(norm1);
   pv2= normalized_linear(norm2); 
-  sequen[k1].nd[k2].index=index;
-  sequen[k1].nd[k2].lower=vect_coeff(TCST,pv1);
-  sequen[k1].nd[k2].upper=vect_coeff(TCST,pv2); 
-  k2++; 
+  sequen[k1].nd[k2].index=index;    /* stocker l'index de la boucle l */
+  sequen[k1].nd[k2].lower=vect_coeff(TCST,pv1);  /* stocker sa borne inferieure */
+  sequen[k1].nd[k2].upper=vect_coeff(TCST,pv2);   /* stocker sa borne superieure  */
+  k2++;    /* incrementer le compteur des profondeur des nids */
   return TRUE;
 } 
 
@@ -100,24 +121,20 @@ static void loop_rwt(loop l, context_p context  )
 {  
   contenu_t contenu;
   int depth;
-
-   
-    statement s = loop_body(l);
-    contenu = (contenu_t) hash_get(context->contenu, s);
-    depth= (int) hash_get(context->depth, s); 
-    depth++;
-  
-    hash_put(context->depth,stack_head(context->statement_stack), 
-             ( void *) depth); 
-    hash_put(context->contenu,stack_head(context->statement_stack), 
-	     (void *) contenu  );
-    if (first_turn)
-      {
-	first_turn=FALSE;
-	k2=0;
-	k1++;
-      }
+  statement s = loop_body(l);    /* recuperer le coprs de le boucle l */
+  contenu = (contenu_t) hash_get(context->contenu, s);
+  depth= (int) hash_get(context->depth, s);   
+  depth++;
+  hash_put(context->depth,stack_head(context->statement_stack), ( void *) depth); 
+  hash_put(context->contenu,stack_head(context->statement_stack), (void *) contenu  );
+  if (first_turn)
+    {
+      first_turn=FALSE;
+      k2=0;
+      k1++;
+    }
 }
+
 static bool stmt_flt(statement s,context_p context )
 {  
   stack_push(s, context->statement_stack); 
@@ -127,9 +144,9 @@ static bool stmt_flt(statement s,context_p context )
 
 static void stmt_rwt( statement s, context_p context)
 {  
- stack_pop(context->statement_stack);   
+  stack_pop(context->statement_stack);   
 }
- 
+
 static bool seq_flt(   )
 {
   return TRUE;
@@ -143,9 +160,7 @@ static void seq_rwt(sequence sq, context_p context)
   int i=0;
   list l= sequence_statements(sq);
   contenu=is_a_stencil;
-  hash_put(context->contenu,
-	   stack_head(context->statement_stack), 
-	       (void *) contenu);
+  hash_put(context->contenu, stack_head(context->statement_stack), (void *) contenu);
   MAP(STATEMENT, s,
   {
     contenu = (contenu_t) hash_get(context->contenu, s);
@@ -156,9 +171,7 @@ static void seq_rwt(sequence sq, context_p context)
 	if (depth1!=depth2)
 	  {  
 	    contenu=is_a_no_stencil;
-	    hash_put(context->contenu,
-		     stack_head(context->statement_stack),
-		     (void *) contenu);
+	    hash_put(context->contenu, stack_head(context->statement_stack),(void *) contenu);
 	  };
 	depth1 =  depth2;
       }
@@ -167,17 +180,13 @@ static void seq_rwt(sequence sq, context_p context)
 	if ( contenu !=is_a_continue)
 	  { 
 	    contenu=is_a_no_stencil;
-	    hash_put(context->contenu,
-		     stack_head(context->statement_stack),
-		     (void *) contenu);
+	    hash_put(context->contenu, stack_head(context->statement_stack),(void *) contenu);
 	  };
       };
     if (depth2 > max) max=depth2;
     i++;
   };, l); 
-  hash_put(context->depth,
-	   stack_head(context->statement_stack), 
-	   (void *) max   );
+  hash_put(context->depth,stack_head(context->statement_stack), (void *) max   );
 } 
 
 static bool uns_flt(   )
@@ -187,15 +196,12 @@ static bool uns_flt(   )
 
 static void uns_rwt( context_p context)
 {  contenu_t contenu;
-
-  contenu=is_a_no_stencil; 
-  hash_put(context->contenu,
-	   stack_head(context->statement_stack), 
-	   (void *)contenu );
-  hash_put(context->depth,stack_head(context->statement_stack), 
-	   ( void *) 0);  
-}
  
+ contenu=is_a_no_stencil; 
+ hash_put(context->contenu,stack_head(context->statement_stack),(void *)contenu );
+ hash_put(context->depth,stack_head(context->statement_stack), ( void *) 0);  
+}
+
 static bool test_flt( )
 {
   return TRUE;
@@ -205,11 +211,8 @@ static void test_rwt( context_p context)
 {
   contenu_t contenu;
   contenu=is_a_no_stencil; 
-  hash_put(context->contenu,
-	   stack_head(context->statement_stack), 
-	   (void *)contenu );
-  hash_put(context->depth,stack_head(context->statement_stack), 
-	   ( void *) 0);   
+  hash_put(context->contenu, stack_head(context->statement_stack), (void *)contenu );
+  hash_put(context->depth,stack_head(context->statement_stack), ( void *) 0);   
 } 
 static bool call_flt( )
 {
@@ -219,14 +222,14 @@ static bool call_flt( )
 static void call_rwt(call  ca, context_p context)
 { 
   contenu_t contenu=is_a_stencil;
-  if (  (  strcmp(  entity_name(  call_function(ca)),"TOP-LEVEL:CONTINUE" )==0) ||
-	(  strcmp(  entity_name(  call_function(ca)),"TOP-LEVEL:RETURN" )==0))
+  if ((strcmp(entity_name(call_function(ca)),"TOP-LEVEL:CONTINUE" )==0)||
+      (strcmp(entity_name(call_function(ca)),"TOP-LEVEL:RETURN" )  ==0))
     {
       contenu=is_a_continue; 
     }
   else
     {
-      if (  strcmp(  entity_name(  call_function(ca)),"TOP-LEVEL:=")==0)
+      if (strcmp(entity_name(call_function(ca)),"TOP-LEVEL:=")==0)
 	{
 	  list lis;
 	  expression exp, gauche=NULL, droite=NULL;
@@ -278,7 +281,6 @@ static void call_rwt(call  ca, context_p context)
 		};
 	      lis  =call_arguments( syntax_call(std));
 	      j=0;
-
 	      MAP(EXPRESSION,exp,{ 
 		ref =expression_reference(exp);
 		if(k1==0)
@@ -324,40 +326,36 @@ static void call_rwt(call  ca, context_p context)
 	  contenu=is_a_no_stencil; 
 	}
     }
-  hash_put(context->contenu,
-	   stack_head(context->statement_stack), 
-	   (void *)contenu );
-  hash_put(context->depth,stack_head(context->statement_stack), 
-	   ( void *) 0);  
-  /* if  (contenu==is_a_stencil) */    sequen[k1].s= copy_statement( stack_head(context->statement_stack));
+  hash_put(context->contenu,stack_head(context->statement_stack), (void *)contenu );
+  hash_put(context->depth,stack_head(context->statement_stack), ( void *) 0);  
+  sequen[k1].s= copy_statement( stack_head(context->statement_stack));
 }
 
 
 static void wl_rwt( context_p context)
 {  
-
   contenu_t contenu;
   contenu=is_a_no_stencil; 
-  hash_put(context->contenu,
-	   stack_head(context->statement_stack), 
-	   (void *)contenu );
-  hash_put(context->depth,stack_head(context->statement_stack), 
-	   ( void *) 0); 
-  
- 
+  hash_put(context->contenu,stack_head(context->statement_stack),(void *)contenu );
+  hash_put(context->depth,stack_head(context->statement_stack), ( void *) 0); 
 } 
 
+/* Cette fonction retourne TRUE si  le vecteur 'a' est lexicographiquement superieur au vecteur 'b' */
 static bool lexi_sup(Pmatrix a, Pmatrix b)
-{int i;
- for (i=1;i<=depth;i++)
-   {
-     if (MATRIX_ELEM(a,i,1) >MATRIX_ELEM(b,i,1))
-       return TRUE;
-     if (MATRIX_ELEM(a,i,1) < MATRIX_ELEM(b,i,1))
-       return FALSE;
+{
+  int i;
+  for (i=1;i<=depth;i++)
+    {
+      if (MATRIX_ELEM(a,i,1) >MATRIX_ELEM(b,i,1))
+	return TRUE;
+      if (MATRIX_ELEM(a,i,1) < MATRIX_ELEM(b,i,1))
+	return FALSE;
     }
- return FALSE;
+  return FALSE;
 } 
+
+/* Cette fonction trie un tableau de stencil d'un  nid donne. st est le tableau 
+   de stencils et length sa taille */
 
 static void  trier(Pmatrix *st,int length)
 {
@@ -377,50 +375,118 @@ static void  trier(Pmatrix *st,int length)
 	  };
       };
 }
+
+/* Cette fonction calcule les delais qu'on doit ajouter aux differents nids */
  
-static void compute_delay ()
+static void compute_delay_merged_nest ()
 {
   int i;
   for (i=k1-1;i>=0;i--)
     {
       sequen [i].delai=matrix_new(depth,1);
-      if (i==k1-1)  matrix_nulle(sequen [i].delai);
+      if (i==k1-1)  matrix_nulle(sequen [i].delai);   /* le delaie  du dernier est le vecteur nul */
       else
-	matrix_substract(sequen [i].delai, sequen [i+1].delai ,sequen[i+1].st[sequen[i+1].nbr_stencil-1]  );
+	matrix_substract(sequen [i].delai, sequen [i+1].delai,   
+			 sequen[i+1].st[sequen[i+1].nbr_stencil-1]);
+      /*d_k=d_{k+1} - plus grand vecteur stencil du nid  k+1*/
+    }
+}
+ 
+static void compute_delay_tiled_nest ()
+{
+  int i,j,k;
+  Pmatrix max_st=matrix_new(depth,1);
+  
+  for (i=k1-1;i>=0;i--)
+    {
+      sequen [i].delai=matrix_new(depth,1);
+      if (i==k1-1)  matrix_nulle(sequen [i].delai);   /* le delaie  du dernier est le vecteur nul */
+      else
+	{  
+	  for(k=0;k<=depth-1;k++)
+	    {
+	      Value val;
+	      val=MATRIX_ELEM(sequen[i+1].st[0],k+1,1);
+	      for (j=1;j<=sequen[i+1].nbr_stencil-1;j++)
+	      {
+		if ( MATRIX_ELEM(sequen[i+1].st[j],k+1,1)>val)
+		  val=MATRIX_ELEM(sequen[i+1].st[j],k+1,1);
+		
+	      };
+	      MATRIX_ELEM(max_st,k+1,1)=val;
+            };
+	  matrix_substract(sequen [i].delai, sequen [i+1].delai, max_st);
+	}
+   
+      /*d_k=d_{k+1} - plus grand vecteur stencil du nid  k+1*/
     }
   
 }
 
+
+/* Cette fonction calcule les bornes du nid fusionne */
 static void compute_bound_merged_nest ()
-{int i,j;
- merged_nest= (struct INFO_LOOP  *)malloc(depth *sizeof(struct INFO_LOOP));
- for(j=0;j<=depth-1;j++)
-   {
-     merged_nest[j].lower =sequen[0].nd[j].lower+MATRIX_ELEM( sequen[0].delai,j+1,1);
-     merged_nest[j].upper=sequen[0].nd[j].upper+MATRIX_ELEM( sequen[0].delai,j+1,1);
-     for (i=1;i<=k1-1;i++)
+{
+  int i,j;
+  merged_nest= (struct INFO_LOOP  *)malloc(depth *sizeof(struct INFO_LOOP));
+  for(j=0;j<=depth-1;j++)
+    {
+      merged_nest[j].lower =sequen[0].nd[j].lower+MATRIX_ELEM( sequen[0].delai,j+1,1);
+      merged_nest[j].upper=sequen[0].nd[j].upper+MATRIX_ELEM( sequen[0].delai,j+1,1);
+      for (i=1;i<=k1-1;i++)
        {
 	 if( merged_nest[j].lower > sequen[i].nd[j].lower+MATRIX_ELEM( sequen[i].delai,j+1,1)) 
 	   merged_nest[j].lower =sequen[i].nd[j].lower+MATRIX_ELEM( sequen[i].delai,j+1,1 );
 	 if( merged_nest[j].upper <sequen[i].nd[j].upper+MATRIX_ELEM( sequen[i].delai,j+1,1))
 	   merged_nest[j].upper=sequen[i].nd[j].upper+MATRIX_ELEM( sequen[i].delai,j+1,1);
        };
-   } 
+    } 
 }
+static void compute_bound_tiled_nest ()
+{
+  int i,j;
+  
+  tiled_nest= (struct INFO_LOOP  *)malloc(depth *sizeof(struct INFO_LOOP));
+  for(j=0;j<=depth-1;j++)
+    {
+      Value val;
+      tiled_nest[j].lower =sequen[0].nd[j].lower+MATRIX_ELEM( sequen[0].delai,j+1,1);
+      tiled_nest[j].upper=sequen[0].nd[j].upper+MATRIX_ELEM( sequen[0].delai,j+1,1);
+      for (i=1;i<=k1-1;i++)
+       {
+	 if( tiled_nest[j].lower > sequen[i].nd[j].lower+MATRIX_ELEM( sequen[i].delai,j+1,1)) 
+	   tiled_nest[j].lower =sequen[i].nd[j].lower+MATRIX_ELEM( sequen[i].delai,j+1,1 );
+	 if( tiled_nest[j].upper <sequen[i].nd[j].upper+MATRIX_ELEM( sequen[i].delai,j+1,1))
+	   tiled_nest[j].upper=sequen[i].nd[j].upper+MATRIX_ELEM( sequen[i].delai,j+1,1);
+       };
+      val =value_uminus(tiled_nest[j].lower);
+      tiled_nest[j].lower =value_plus(tiled_nest[j].lower,val);
+      tiled_nest[j].upper =value_plus(tiled_nest[j].upper,val);
+      for (i=0;i<=k1-1;i++)
+	MATRIX_ELEM(sequen[i].delai,j+1,1)=value_plus( MATRIX_ELEM(sequen[i].delai,j+1,1),val);
+       
+
+    } 
  
+}
+
+
+
+/* cette fonction donne le code fusionne */
 static statement  fusion()
-{ int i,j;
- list lis=NULL;
- instruction ins;
- sequence seq=NULL;
+{ 
+  int i,j;
+  list lis=NULL;
+  instruction ins;  
+  sequence seq=NULL;
   statement s;
   loop ls=NULL;
   void ExpressionReplaceReference();
-  /* calcul des delais des differents nis */
-  compute_delay();
+  /* calculer les delais des differents nis */
+  compute_delay_merged_nest();
+  /* calculer les bornes du nid fusionne */
   compute_bound_merged_nest ();
   /* on construit la liste des instructions qui vont former le corps du nid fusionne */
-  normalize_all_expressions_of(expt);
   for (i=k1-1;i>=0;i--)
     {
       expression e1,e2,e,gauche=NULL,droite=NULL,delai_plus;
@@ -429,43 +495,43 @@ static statement  fusion()
       int m;
       Pvecteur pv;
       e1=ge_expression(entity_to_expression ((entity)sequen[i].nd[0].index),
-		       Value_to_expression( value_plus(sequen[i].nd[0].lower,MATRIX_ELEM( sequen[i].delai,1,1))));
+		       Value_to_expression( value_plus(sequen[i].nd[0].lower,
+						       MATRIX_ELEM( sequen[i].delai,1,1))));
       e2=le_expression(entity_to_expression ((entity)sequen[i].nd[0].index),
-		       Value_to_expression( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1))));
-      if (value_eq( value_plus(sequen[i].nd[0].lower,MATRIX_ELEM( sequen[i].delai,1,1)),merged_nest[0].lower))
+		       Value_to_expression( value_plus(sequen[i].nd[0].upper,
+						       MATRIX_ELEM( sequen[i].delai,1,1))));
+      if (value_eq( value_plus(sequen[i].nd[0].lower,
+			       MATRIX_ELEM( sequen[i].delai,1,1)),merged_nest[0].lower))
 	{
-	  if (value_eq( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)),merged_nest[0].upper)) 
-	    {
-	      e=NULL;
-	     }
+	  if (value_eq( value_plus(sequen[i].nd[0].upper,
+				   MATRIX_ELEM( sequen[i].delai,1,1)),merged_nest[0].upper)) 
+	    e=NULL;
 	  else
-	    {
-	      e=e2;
-	    }
+	    e=e2;
 	}
       else
 	{
-	  if (value_eq( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)),merged_nest[0].upper)) 
-	    {
-	      e=e1;
-	    }
+	  if (value_eq( value_plus(sequen[i].nd[0].upper,
+				   MATRIX_ELEM( sequen[i].delai,1,1)),merged_nest[0].upper)) 
+	    e=e1;
 	  else
-	     {
-	       e=and_expression(e1,e2);
-	     }
+	    e=and_expression(e1,e2);
 	};
-      
       for(j=0;j<=depth-1;j++)
 	{
 	  if (j>=1) 
 	    {
-	      e1=ge_expression(entity_to_expression ((entity)sequen[i].nd[j].index),
-			       Value_to_expression( value_plus(sequen[i].nd[j].lower,MATRIX_ELEM( sequen[i].delai,j+1,1))));
+	      e1=ge_expression(entity_to_expression((entity)sequen[i].nd[j].index),
+			       Value_to_expression(value_plus(sequen[i].nd[j].lower,
+							      MATRIX_ELEM( sequen[i].delai,j+1,1))));
 	      e2=le_expression(entity_to_expression ((entity)sequen[i].nd[j].index),
-			       Value_to_expression( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1))));
-	      if (value_eq( value_plus(sequen[i].nd[j].lower,MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].lower))
+			       Value_to_expression( value_plus(sequen[i].nd[j].upper,
+							       MATRIX_ELEM( sequen[i].delai,j+1,1))));
+	      if (value_eq( value_plus(sequen[i].nd[j].lower,
+				       MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].lower))
 		{
-		  if (!value_eq( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].upper)) 
+		  if (!value_eq( value_plus(sequen[i].nd[j].upper,
+					    MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].upper)) 
 		    {
 		      if (e==NULL)
 			e=e2;
@@ -475,7 +541,8 @@ static statement  fusion()
 		}
 	      else
 		{
-		  if (value_eq( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].upper)) 
+		  if (value_eq( value_plus(sequen[i].nd[j].upper,
+					   MATRIX_ELEM( sequen[i].delai,j+1,1)),merged_nest[j].upper)) 
 		    {
 		      if (e==NULL)
 			e=e1;
@@ -504,13 +571,13 @@ static statement  fusion()
 	  delai_plus=Pvecteur_to_expression(pv);
 	  ExpressionReplaceReference(gauche,
 				     make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
-	  MAP(EXPRESSION,exp,{  
+	  MAP(EXPRESSION,exp,{ 
 	    ExpressionReplaceReference(exp,
 				       make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
 	  },call_arguments( syntax_call(expression_syntax(droite))));
 	};
       if (e==NULL)
-       s=sequen[i].s;
+	s=sequen[i].s;
       else
 	{
 	  t= make_test(e,sequen[i].s,make_block_statement(NIL));
@@ -539,6 +606,9 @@ static statement  fusion()
   return s;
 } 
 
+/*ON construit la coifficients des fonctions d'acces */
+/*                   ->             ->                      */
+/* si par exemple f( i )= (N, 1)^t( i- (1,1)^t) alors p= (N, 1)^t */
 static void cons_coef(Pmatrix p, int nid)
 {
   int i;
@@ -554,6 +624,9 @@ static void cons_coef(Pmatrix p, int nid)
 	} 
     }
 }
+/* On  construit  la foction d'acces  */
+ /*                  ->             ->                        ->      */
+/* si par exemple f( i )= (N, 1)^t( i- (1,1)^t) alors  pv= f( i ) */
 
 static Pvecteur buffer_acces(int nid )
 {
@@ -561,29 +634,26 @@ static Pvecteur buffer_acces(int nid )
   int j;
   for(j=0;j<=depth-1;j++)
     {
-      if (j==0) pv = vect_make(VECTEUR_NUL, sequen[nid].nd[j].index, 
-			       MATRIX_ELEM(sequen[nid].coef,1,j+1), TCST,
-			     value_uminus  (value_direct_multiply(MATRIX_ELEM(sequen[nid].coef,1,j+1),
-								  value_plus( sequen[nid].nd[j].lower,
-									      MATRIX_ELEM( sequen[nid].delai,j+1,1 ) ))));
-
-   
+      if(j==0) 
+	pv=vect_make(VECTEUR_NUL,sequen[nid].nd[j].index,MATRIX_ELEM(sequen[nid].coef,1,j+1), 
+		     TCST,value_uminus(value_direct_multiply(MATRIX_ELEM(sequen[nid].coef,1,j+1),
+		     value_plus( sequen[nid].nd[j].lower,
+				 MATRIX_ELEM( sequen[nid].delai,j+1,1 ) ))));
       else 
 	{
           tmp =pv;
-	  pv = vect_make(tmp, sequen[nid].nd[j].index, 
-	 	       MATRIX_ELEM(sequen[nid].coef,1,j+1),   TCST,
-			      value_uminus(value_direct_multiply(MATRIX_ELEM(sequen[nid].coef,1,j+1), 
-								 value_plus( sequen[nid].nd[j].lower,
-									     MATRIX_ELEM( sequen[nid].delai,j+1,1 ) ))));
-
+	  pv = vect_make(tmp,sequen[nid].nd[j].index,MATRIX_ELEM(sequen[nid].coef,1,j+1),
+	       TCST,value_uminus(value_direct_multiply(MATRIX_ELEM(sequen[nid].coef,1,j+1), 
+	       value_plus(sequen[nid].nd[j].lower,
+			  MATRIX_ELEM( sequen[nid].delai,j+1,1 ) ))));
 	}
-     
     };
-
+  
   return pv;
-}
+} 
 
+
+/* J'ai ameliore la fonction make_scalar_entity afin de l'etendre  a des tableau   */
 static entity make_array_entity(name, module_name, base,lis)
 string name;
 string module_name;
@@ -594,105 +664,55 @@ list lis;
   entity e, f, a;
   basic b = base;
  
- 
-  full_name =
-    strdup(concatenate(module_name, MODULE_SEP_STRING, name, NULL));
-  
+  full_name =  strdup(concatenate(module_name, MODULE_SEP_STRING, name, NULL));
   pips_debug(8, "name %s\n", full_name);
- 
   message_assert("not already defined", 
 		 gen_find_tabulated(full_name, entity_domain)==entity_undefined);
-  
-  e = make_entity(full_name, type_undefined, 
-		  storage_undefined, value_undefined);
+  e = make_entity(full_name, type_undefined, storage_undefined, value_undefined);
  
   entity_type(e) = (type) MakeTypeVariable(b, lis);
   f = local_name_to_top_level_entity(module_name);
   a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME); 
-  
   entity_storage(e) = 
     make_storage(is_storage_ram,
 		 make_ram(f, a,
 			  (basic_tag(base)!=is_basic_overloaded)?
 			  (add_variable_to_area(a, e)):(0),
 			  NIL));
-
-    
   entity_initial(e) = make_value(is_value_constant,
 				 MakeConstantLitteral());
-  
   return(e);
 }
 
-static entity make_new_array_variable_with_prefix(string prefix,
-				     entity module,
-				     basic b,list lis)
+
+/* J'ai ameliore la fonction make_new_scalar_variable_with_prefix  */
+/* afin de l'etendre  a des tableau   */
+
+static entity make_new_array_variable_with_prefix(string prefix, entity module,basic b,list lis)
 {
   string module_name = module_local_name(module);
   char buffer[20];
   entity e;
-  int number = 0;
-  bool empty_prefix = (strlen(prefix) == 0);
-  
-  /* let's assume positive int stored on 4 bytes */
-  pips_assert("make_new_scalar_variable_with_prefix", strlen(prefix)<=10);
-
-  do {
-    if (empty_prefix) {
-      switch(basic_tag(b)) {
-      case is_basic_int:
-	sprintf(buffer,"%s%d", DEFAULT_INT_PREFIX,
-		unique_integer_number++);
-	break;
-      case is_basic_float:
-	sprintf(buffer,"%s%d", DEFAULT_FLOAT_PREFIX, 
-		unique_float_number++);
-	break;
-      case is_basic_logical:
-	sprintf(buffer,"%s%d", DEFAULT_LOGICAL_PREFIX,
-		unique_logical_number++);
-	break;
-      case is_basic_complex:
-	sprintf(buffer,"%s%d", DEFAULT_COMPLEX_PREFIX,
-		unique_complex_number++);
-	break;
-      case is_basic_string:
-	sprintf(buffer, "%s%d", DEFAULT_STRING_PREFIX,
-		unique_string_number++);
-	break;
-      default:
-	pips_error("make_new_scalar_variable_with_prefix", 
-		   "unknown basic tag: %d\n",
-		   basic_tag(b));
-	break;
-      }
-    }
-    else {
-      sprintf(buffer,"%s%d", prefix, number++);
-      pips_assert ("make_new_scalar_variable_with_prefix",
-		   strlen (buffer) < 19);
-    }
-  }
-  while(gen_find_tabulated(concatenate(module_name,
-				       MODULE_SEP_STRING,
-				       buffer,
-				       NULL),
-			   entity_domain) != entity_undefined);
-   
-  pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(b));
-   
+  sprintf(buffer,"%s", prefix);
   e = make_array_entity(&buffer[0], module_name, b, lis);
   AddEntityToDeclarations(e, module);
-   
   return e;
 }
 
-static entity make_new_array_variable(entity module,
+/* J'ai ameliore la fonction make_new_scalar_variable */
+/* afin de l'etendre  a des tableau   */
+static entity make_new_array_variable(int i, int j, entity module,
                          basic b,list lis)
 {
-  
-  return make_new_array_variable_with_prefix("B", module, b,lis);
+  char buffer[20];
+  if(j==-1)
+  sprintf(buffer,"%s%d", "B",i);
+  else 
+    sprintf(buffer,"%s%d_%d", "B",i,j);
+  return make_new_array_variable_with_prefix(buffer, module, b,lis);
 }
+
+/* Cette fonction donne le code fusionne avec allocation des tampons */
 static statement fusion_buffer()
 {
   call c;
@@ -710,7 +730,7 @@ static statement fusion_buffer()
    statement s;
    loop ls;
   void ExpressionReplaceReference();
-  compute_delay();
+  compute_delay_merged_nest();
   compute_bound_merged_nest ();
    
 
@@ -722,23 +742,25 @@ static statement fusion_buffer()
       expression e1,e2,e,exp,gauche=NULL,droite=NULL;
       test t;
       statement s;
-      if (i < k1-1){
-      sequen[i].coef=matrix_new(1,depth);
-      cons_coef(sequen[i].coef,i);
-      matrix_substract(temp2,sequen[i+1].delai, sequen[i].delai);
-      matrix_substract(temp3, temp2,sequen[i+1].st[0]);
-      matrix_multiply(sequen[i].coef,temp3,temp1);
-      sequen[i].surface=value_plus(MATRIX_ELEM(temp1,1,1),VALUE_ONE);
-      sequen[i].pv_acces= buffer_acces(i);
-      exp= binary_intrinsic_expression ("MOD",Pvecteur_to_expression(  sequen[i].pv_acces),
-					Value_to_expression( sequen[i].surface) );
-      lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus (sequen[i].surface,VALUE_ONE))), NIL);
-      name= make_new_array_variable(get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
-      
-      lis =CONS(EXPRESSION, exp, NIL);
-      ref=make_reference(name,lis);
-      sequen[i].ref=name; }
-     
+      if (i < k1-1)
+	{
+	  sequen[i].coef=matrix_new(1,depth);
+	  cons_coef(sequen[i].coef,i);
+	  matrix_substract(temp2,sequen[i+1].delai, sequen[i].delai);
+	  matrix_substract(temp3, temp2,sequen[i+1].st[0]);
+	  matrix_multiply(sequen[i].coef,temp3,temp1);
+	  sequen[i].surface=value_plus(MATRIX_ELEM(temp1,1,1),VALUE_ONE);
+	  sequen[i].pv_acces= buffer_acces(i);
+	  exp= binary_intrinsic_expression ("MOD",Pvecteur_to_expression(  sequen[i].pv_acces),
+					    Value_to_expression( sequen[i].surface) );
+	  lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus 
+										      (sequen[i].surface,VALUE_ONE))), NIL);
+	  name= make_new_array_variable(i+1,-1,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
+	  
+	  lis =CONS(EXPRESSION, exp, NIL);
+	  ref=make_reference(name,lis);
+	  sequen[i].ref=name; 
+	}
       e1=ge_expression(entity_to_expression ((entity)sequen[i].nd[0].index),
 		       Value_to_expression( value_plus(sequen[i].nd[0].lower,MATRIX_ELEM( sequen[i].delai,1,1))));
       e2=le_expression(entity_to_expression ((entity)sequen[i].nd[0].index),
@@ -900,6 +922,1217 @@ static statement fusion_buffer()
 
 }
 
+
+
+static entity 
+make_tile_index_entity_n(entity old_index,char *su)
+{
+    entity new_index;
+    string old_name;
+    char *new_name = (char*) malloc(33);
+    
+    old_name = entity_name(old_index);
+    for (sprintf(new_name, "%s%s", old_name, su);
+         gen_find_tabulated(new_name, entity_domain)!=entity_undefined; 
+
+         old_name = new_name) {
+        sprintf(new_name, "%s%s", old_name, su);
+	pips_assert("Variable name cannot be longer than 32 characters",
+		    strlen(new_name)<33);
+    }
+ 
+   new_index = make_entity(new_name,
+			   copy_type(entity_type(old_index)),
+			   /* Should be AddVariableToCommon(DynamicArea) or
+			      something similar! */
+			   copy_storage(entity_storage(old_index)),
+			   copy_value(entity_initial(old_index)));
+
+    return(new_index);
+}
+static void derive_new_basis_deux(Pbase base_oldindex, Pbase * base_newindex, entity (*new_entity)(entity, char*))
+{
+    Pbase pb;
+    entity new_name;
+    char *a;
+    for (pb=base_oldindex; pb!=NULL; pb=pb->succ)
+      { 
+	a="1";
+	new_name = new_entity((entity) pb->var,a);
+        base_add_dimension(base_newindex, (Variable) new_name);
+	a="2";
+	new_name = new_entity((entity) pb->var,a);
+	base_add_dimension(base_newindex, (Variable) new_name);
+	a="3";
+	new_name = new_entity((entity) pb->var,a);
+        printf("%s \n",entity_name(new_name));
+	base_add_dimension(base_newindex, (Variable) new_name);
+
+    }
+    /* *base_newindex = base_reversal(*base_newindex); */
+}
+static void derive_new_basis_une(Pbase base_oldindex, Pbase * base_newindex, entity (*new_entity)(entity, char*))
+{
+    Pbase pb;
+    entity new_name;
+    char *a;
+    for (pb=base_oldindex; pb!=NULL; pb=pb->succ)
+      { 
+	a="1";
+	new_name = new_entity((entity) pb->var,a);
+        base_add_dimension(base_newindex, (Variable) new_name);
+	a="2";
+	new_name = new_entity((entity) pb->var,a);
+	base_add_dimension(base_newindex, (Variable) new_name);
+	
+
+    }
+    /* *base_newindex = base_reversal(*base_newindex); */
+}
+
+
+statement permutation( s, P)
+     statement s;
+     Pmatrix P;
+{
+  statement scopy;
+  int i,j;
+  loop ls1,ls2;
+  bool found=FALSE;
+  scopy=copy_statement(s);
+  ls1=instruction_loop(statement_instruction(scopy));
+  for(i=1;i<=3*depth;i++)
+    {
+      j=1;
+      found=FALSE;
+      ls2=instruction_loop(statement_instruction(s));
+      while ((j<=3*depth)&& !found)
+	{
+	  if (value_eq(MATRIX_ELEM(P,i,j),VALUE_ONE))
+	    {
+	      found =TRUE;
+	      loop_index(ls1)=loop_index(ls2);
+	      loop_range(ls1)=loop_range(ls2);
+	    };
+	  ls2=instruction_loop(statement_instruction(loop_body(ls2)));
+	  j++;
+	};
+      ls1=instruction_loop(statement_instruction(loop_body(ls1)));
+    }
+  
+  return scopy;
+}
+
+statement permutation2( s, P)
+     statement s;
+     Pmatrix P;
+{
+  statement scopy;
+  int i,j;
+  loop ls1,ls2;
+  bool found=FALSE;
+  scopy=copy_statement(s);
+  ls1=instruction_loop(statement_instruction(scopy));
+  for(i=1;i<=2*depth;i++)
+    {
+      j=1;
+      found=FALSE;
+      ls2=instruction_loop(statement_instruction(s));
+      while ((j<=2*depth)&& !found)
+	{
+	  if (value_eq(MATRIX_ELEM(P,i,j),VALUE_ONE))
+	    {
+	      found =TRUE;
+	      loop_index(ls1)=loop_index(ls2);
+	      loop_range(ls1)=loop_range(ls2);
+	    };
+	  ls2=instruction_loop(statement_instruction(loop_body(ls2)));
+	  j++;
+	};
+      ls1=instruction_loop(statement_instruction(loop_body(ls1)));
+    }
+  
+  return scopy;
+}
+
+statement Hierarchical_tiling ()
+{
+  FILE *infp;
+  char *name_file;
+  Pmatrix A,P;
+  int rw,cl,i,j;
+  list lis=NULL;
+  instruction ins;
+  sequence seq=NULL;
+  statement s,s1;
+  loop ls=NULL;
+  cons *lls=NULL;
+  Psysteme sci;			/* sc initial */
+  Pbase base_oldindex = NULL;
+  Pbase base_newindex = NULL;
+  Pbase pb;
+  expression upper=NULL,lower=NULL;
+  int plus;
+  Value elem_mat1,elem_mat2;
+  Psysteme  loop_iteration_domaine_to_sc();
+  void ExpressionReplaceReference();
+  name_file = user_request("nom du fichier pour la matrice A ");
+  infp = safe_fopen(name_file,"r");
+  matrix_fscan(infp,&A,&rw,&cl);
+  name_file = user_request("nom du fichier pour la matrice P ");
+  infp = safe_fopen(name_file,"r");
+  matrix_fscan(infp,&P,&cl,&cl);
+  matrix_print(A);
+  matrix_print(P); 
+  getchar();
+  getchar();
+  compute_delay_tiled_nest ();
+  compute_bound_tiled_nest();
+  ls=loop1;
+  for(j=0;j<=depth-1;j++)
+    {
+      range range1;  
+      expression lower, upper;
+      range1=loop_range(ls); 
+      lower=range_lower(range1);  
+      upper=range_upper(range1); 
+      range_lower(range1)=make_integer_constant_expression(tiled_nest[j].lower);
+      range_upper(range1)= make_integer_constant_expression(tiled_nest[j].upper);
+      if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
+    };
+  s1=loop_to_statement(loop1);
+  while(instruction_loop_p(statement_instruction (s1))) {
+    lls = CONS(STATEMENT,s1,lls);
+    s1 = loop_body(instruction_loop(statement_instruction(s1)));
+  }
+  sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
+
+  derive_new_basis_deux(base_oldindex, &base_newindex , make_tile_index_entity_n);
+  tiling_indice= ( Pvecteur  *)malloc(depth *sizeof( Pvecteur*));
+  plus=depth*3-1;
+  for (pb =base_newindex; pb!=NULL; pb=pb->succ) {
+    loop tl;
+    switch(plus%3)
+      {
+      case 2: 
+	{
+	  elem_mat1=MATRIX_ELEM(A,plus/3+1,plus);
+	  elem_mat2=MATRIX_ELEM(A,plus/3+1,plus+1);
+	  upper= int_to_expression(value_minus(elem_mat1,VALUE_ONE));
+	  lower= int_to_expression(0);
+	  tiling_indice[plus/3]=vect_make(VECTEUR_NUL,vecteur_var(pb),elem_mat2,TCST,VALUE_ZERO);
+	};
+	break;
+      case 1: 
+	{ 
+	  elem_mat1=MATRIX_ELEM(A,plus/3+1,plus) ;
+	  elem_mat2=MATRIX_ELEM(A,plus/3+1,plus+1  ) ;
+	  upper= int_to_expression(value_minus(value_div(elem_mat1,elem_mat2),VALUE_ONE));
+	  lower= int_to_expression(0);
+	  tiling_indice[plus/3]=vect_make( tiling_indice[plus/3],pb->var , elem_mat2,TCST,VALUE_ZERO);
+	};
+	break;   
+      case 0:
+	{ 
+	  elem_mat1=MATRIX_ELEM(A,plus/3+1,plus+1);
+	  upper= int_to_expression(value_div(tiled_nest[plus/3].upper,elem_mat1));
+	  lower= int_to_expression(0);
+	  tiling_indice[plus/3]=vect_make( tiling_indice[plus/3],pb->var ,elem_mat1,TCST,VALUE_ZERO);
+	};
+      default: break;
+      }  
+    tl = make_loop((entity) vecteur_var(pb),
+		   make_range(copy_expression(lower), copy_expression(upper),
+			      int_to_expression(1)),
+		   s1,
+		   entity_empty_label(),
+		   make_execution(is_execution_sequential, UU),
+		   NIL);
+    s1 = instruction_to_statement(make_instruction(is_instruction_loop, tl));
+    plus--;
+  };
+  
+ 
+
+  /******/
+  for (i=k1-1;i>=0;i--)
+    {
+      expression e1,e2,e,gauche=NULL,droite=NULL,delai_plus;
+      test t;
+      call c;
+      int m;
+      Pvecteur pv;
+      e1=ge_expression(Pvecteur_to_expression (tiling_indice[0]),
+		       Value_to_expression( value_plus(sequen[i].nd[0].lower,
+						       MATRIX_ELEM( sequen[i].delai,1,1))));
+      e2=le_expression(Pvecteur_to_expression (tiling_indice[0]), 
+		       Value_to_expression( value_plus(sequen[i].nd[0].upper,
+						       MATRIX_ELEM( sequen[i].delai,1,1))));
+      if (value_eq( value_plus(sequen[i].nd[0].lower,MATRIX_ELEM( sequen[i].delai,1,1)),tiled_nest[0].lower))
+	{
+	  if (value_eq( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)),tiled_nest[0].upper)&&
+	      value_eq(value_mod( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)), 
+				  MATRIX_ELEM(A,1,1)),VALUE_ZERO))
+	    e=NULL;
+	  else
+	    e=e2;
+	}
+      else
+	{
+	  if (value_eq( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)),tiled_nest[0].upper)&&
+	      value_eq(value_mod( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)), 
+				  MATRIX_ELEM(A,1,1)),VALUE_ZERO))
+	    e=e1;
+	   
+	  else
+	    e=and_expression(e1,e2);
+	    
+	};
+      for(j=0;j<=depth-1;j++)
+	{
+	  if (j>=1) 
+	    {
+	      e1=ge_expression( Pvecteur_to_expression (tiling_indice[j]),
+				Value_to_expression(value_plus(sequen[i].nd[j].lower,
+							       MATRIX_ELEM( sequen[i].delai,j+1,1))));
+	      e2=le_expression(Pvecteur_to_expression (tiling_indice[j]), 
+			       Value_to_expression( value_plus(sequen[i].nd[j].upper,
+							       MATRIX_ELEM( sequen[i].delai,j+1,1))));
+	      if (value_eq( value_plus(sequen[i].nd[j].lower,MATRIX_ELEM( sequen[i].delai,j+1,1)),tiled_nest[j].lower))
+		{
+		  if (! (value_eq(value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)),tiled_nest[j].upper)&&
+			 value_eq(value_mod( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)), 
+					     MATRIX_ELEM(A,j+1,3*j+1)),VALUE_ZERO)))
+		    {
+		      if (e==NULL)
+			e=e2;
+		      else
+			e=and_expression(e,e2);
+		    };
+		}
+	      else
+		{
+		  if (value_eq(value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)),tiled_nest[j].upper)&&
+		      value_eq(value_mod( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)), 
+					  MATRIX_ELEM(A,j+1,3*j+1)),VALUE_ZERO))
+		    {
+		      if (e==NULL)
+			e=e1;
+		      else
+			e=and_expression(e,e1);
+		    }
+		  else
+		    {
+		      e1=and_expression(e1,e2);
+		      if(e==NULL)
+			e=e1;
+		      else
+			e=and_expression(e,e1);
+		    }
+		};
+	    }; 
+	  c= instruction_call(statement_instruction((sequen[i].s )));
+	  m=0;
+	  MAP(EXPRESSION,exp,{  
+	    if (m==0)  gauche=exp;
+	    if (m==1)  droite=exp;
+	    m++;
+	  },call_arguments(c)) ;
+	  pv = vect_make(tiling_indice[j],TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
+	  delai_plus=Pvecteur_to_expression(pv);
+	  ExpressionReplaceReference(gauche,
+				     make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
+	  MAP(EXPRESSION,exp,{ 
+	    ExpressionReplaceReference(exp,
+				       make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
+	  },call_arguments( syntax_call(expression_syntax(droite))));
+	};
+      t= make_test(e,sequen[i].s,make_block_statement(NIL));
+      s=test_to_statement(t);
+      if(i==k1-1)   lis=CONS(STATEMENT,s,NIL);
+      else      lis=CONS(STATEMENT,s,lis);
+    };
+  seq= make_sequence(lis);
+  ins= make_instruction_sequence(seq);
+  s= instruction_to_statement(ins);
+  ls=instruction_loop(statement_instruction(s1));
+  for(j=0;j<=3*depth-1;j++)
+    if  (j!=3*depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
+    else loop_body(ls)=s;
+  s1=permutation(s1,P);
+  return s1;
+}
+
+
+
+int position_one_element(Pmatrix P, int i)
+{
+  int j;
+  for (j=1;j<=depth;j++)
+    if(MATRIX_ELEM(P,i,j)==VALUE_ONE) return j;
+  
+}
+
+ 
+statement Tiling_buffer_allocation ()
+{
+  FILE *infp;
+  char *name_file;
+  Pmatrix A,P,ATE,ATEP,ATEPP,P1,P2,N[nid_nbr],NP[nid_nbr],G_PRO[nid_nbr], G_PROP[nid_nbr],G_PROPP[nid_nbr];
+  int rw,cl,i,j,k,pos;
+  list lis=NULL,lis1=NULL,lis2=NULL;
+  instruction ins;
+  sequence seq=NULL;
+  statement s,s1,sequenp[nid_nbr],ps1,ps2,*pst1;
+  loop ls=NULL;
+  cons *lls=NULL;
+  Psysteme sci;			/* sc initial */
+  Pbase base_oldindex = NULL;
+  Pbase base_newindex = NULL;
+  Pbase pb;
+  expression upper=NULL,lower=NULL,exp=NULL;
+  int plus;
+  Value elem_mat1,elem_mat2;
+  entity *ref[nid_nbr],name;
+  reference *buf_ref[nid_nbr];
+  statement *scopy[nid_nbr];
+  Psysteme  loop_iteration_domaine_to_sc();
+  Variable *iter, *itert;
+  void ExpressionReplaceReference();
+  name_file = user_request("nom du fichier pour la matrice A ");
+  infp = safe_fopen(name_file,"r");
+  matrix_fscan(infp,&A,&rw,&cl);
+  name_file = user_request("nom du fichier pour la matrice P ");
+  infp = safe_fopen(name_file,"r");
+  matrix_fscan(infp,&P,&cl,&cl);
+  compute_delay_tiled_nest ();
+  compute_bound_tiled_nest();
+  P1=matrix_new(depth,depth);
+  for(i=1;i<=depth;i++)
+    for(j=1;j<=2*depth;j=j+2)
+      {
+	if ( value_eq(MATRIX_ELEM(P,i,j),VALUE_ONE))
+          MATRIX_ELEM(P1,i,j/2+1)=VALUE_ONE;
+	else 
+          MATRIX_ELEM(P1,i,j/2+1)=VALUE_ZERO;
+      };
+  
+  matrix_print(P1);
+  P2=matrix_new(depth,depth);
+  for(i=depth+1;i<=2*depth;i++)
+    for(j=2;j<=2*depth;j=j+2)
+      {
+	if (value_eq(MATRIX_ELEM(P,i,j),VALUE_ONE))
+          MATRIX_ELEM(P2,(i-1)%depth+1,j/2)=VALUE_ONE;
+	else 
+          MATRIX_ELEM(P2,(i-1)%depth+1,j/2)=VALUE_ZERO;
+      };
+  
+  ATE=matrix_new(depth,1);
+  for(i=0;i<=depth-1;i++)
+    MATRIX_ELEM(ATE,i+1,1)=MATRIX_ELEM(A,i+1,2*i+1);
+ 
+  ATEP=matrix_new(depth,1);
+  matrix_multiply(P1,ATE,ATEP);
+  ATEPP=matrix_new(depth,1);
+  matrix_multiply(P2,ATE,ATEPP);
+ 
+
+
+
+  s1=loop_to_statement(loop1);
+  while(instruction_loop_p(statement_instruction (s1))) {
+    lls = CONS(STATEMENT,s1,lls);
+    s1 = loop_body(instruction_loop(statement_instruction(s1)));
+  }
+ 
+  sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
+  derive_new_basis_une(base_oldindex, &base_newindex , make_tile_index_entity_n);
+ 
+  iter= ( Variable  *)malloc(depth *sizeof( Variable));
+  itert=( Variable  *)malloc(depth *sizeof( Variable));
+  i=2*depth-1;
+  for (pb =base_newindex; pb!=NULL; pb=pb->succ) {
+    if (i%2==1) iter[i/2]=(pb->var);
+    else itert[i/2]=(pb->var);
+    i--;
+  };
+  
+  
+  
+  for(i=0;i<=k1-1;i++)
+    {
+      statement s1;
+      sequence seq;
+      instruction ins;
+
+      Pvecteur pv;
+      Value con;
+      expression e,gauche,droite;
+      test t;
+      statement s;
+      call c;
+      int m;
+      N[i]=matrix_new(depth,1);
+      for (j=1;j<=depth;j++)
+	MATRIX_ELEM(N[i],j,1)= value_plus(value_minus(sequen[i].nd[j-1].upper,sequen[i].nd[j-1].lower),VALUE_ONE);
+      NP[i]=matrix_new(depth,1);
+      matrix_multiply(P1,N[i],NP[i]);
+      if (i<=k1-2)
+	{
+	  lis2=NULL;
+	  G_PRO[i]=matrix_new(depth,1);
+	  for(j=1;j<=depth;j++)
+	    {
+	      Value temp;
+	      temp=value_minus(MATRIX_ELEM(sequen[i+1].delai,j,1),MATRIX_ELEM(sequen[i].delai,j,1));
+	      MATRIX_ELEM( G_PRO[i],j,1)=value_minus(temp, MATRIX_ELEM(sequen[i+1].st[0],j,1));
+	      for(k=1;k<=sequen[i].nbr_stencil-1;k++)
+		{
+		  if (MATRIX_ELEM( G_PRO[i],j,1)< value_minus(temp, MATRIX_ELEM(sequen[i+1].st[k],j,1)))
+		    MATRIX_ELEM( G_PRO[i],j,1)=value_minus(temp, MATRIX_ELEM(sequen[i+1].st[k],j,1));
+		};
+	    };
+	  G_PROP[i]=matrix_new(depth,1);
+	  matrix_multiply(P1,G_PRO[i],G_PROP[i]);
+	  G_PROPP[i]=matrix_new(depth,1);
+	  matrix_multiply(P2,G_PRO[i],G_PROPP[i]);
+	  ref[i]= ( entity  *)malloc((depth+1) *sizeof( entity));
+	  buf_ref[i]=( reference  *)malloc((depth+1) *sizeof( reference));
+          scopy[i]=( statement   *)malloc((depth+1) *sizeof( statement));
+ 
+	  for(j=1;j<=depth;j++)
+	    {	      
+
+	      lis= NULL;
+              lis1=NULL;
+	      for (k=1;k<=j-1;k++)
+		{
+		  lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus 
+										      (MATRIX_ELEM(ATEP,k,1),VALUE_ONE))), lis);
+		  pos=position_one_element(P1,k);
+		  pv= vect_make(VECTEUR_NUL ,iter[pos-1], VALUE_ONE,TCST,VALUE_ZERO);
+		  exp=Pvecteur_to_expression(pv);
+		 
+		  lis1 =CONS(EXPRESSION, exp,lis1);
+		}
+	      lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus 
+										      (MATRIX_ELEM(G_PROP[i],j,1),VALUE_ONE))), 
+		       lis);
+	      pos=position_one_element(P1,k);
+              con=value_minus(MATRIX_ELEM(G_PRO[i],pos,1), MATRIX_ELEM(ATE,pos,1));    
+	      pv= vect_make(VECTEUR_NUL ,iter[pos-1], VALUE_ONE,TCST,con);
+	      exp=Pvecteur_to_expression(pv);
+	      lis1 =CONS(EXPRESSION, exp,lis1);
+	      for (k=j+1;k<=depth;k++)
+		{
+		  lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus 
+										      (MATRIX_ELEM(NP[i],k,1),VALUE_ONE))), lis);
+		  pos=position_one_element(P1,k);
+		  pv= vect_make(VECTEUR_NUL ,iter[pos-1], VALUE_ONE,itert[pos-1], MATRIX_ELEM(ATE,pos,1) ,TCST,VALUE_ZERO);
+		  exp=Pvecteur_to_expression(pv);
+		  lis1 =CONS(EXPRESSION, exp,lis1);
+		}
+	      name= make_new_array_variable(i+1,j,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
+	      buf_ref[i][j-1]=make_reference(name,lis1);
+	      ref[i][j-1]=name;
+              scopy[i][j-1]=copy_statement(sequen[i].s);
+
+	      pos=position_one_element(P1,j);
+	      con=value_minus(MATRIX_ELEM(G_PRO[i],pos,1), MATRIX_ELEM(ATE,pos,1));  
+	      pv= vect_make(VECTEUR_NUL ,iter[pos-1], VALUE_ONE,TCST,con);
+	      e=ge_expression( Pvecteur_to_expression (pv), Value_to_expression( VALUE_ZERO));
+              t= make_test(e,scopy[i][j-1],make_block_statement(NIL));
+	      s=test_to_statement(t);
+	      lis2=CONS(STATEMENT,s,lis2);
+	      c= instruction_call(statement_instruction((   scopy[i][j-1] )));
+	      m=0;
+	      MAP(EXPRESSION,exp,{  
+		if (m==0)  gauche=exp;
+		if (m==1)  droite=exp;
+		m++;
+	      },call_arguments(c)) ;
+	      syntax_reference(expression_syntax(gauche))= buf_ref[i][j-1];
+
+	    }
+	  lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(MATRIX_ELEM(G_PROPP[i],1,1))), NIL);
+	  pos=position_one_element(P2,1);
+	  pv= vect_make(VECTEUR_NUL ,iter[pos-1], VALUE_ONE,TCST,VALUE_ZERO);
+	 
+
+	  exp= binary_intrinsic_expression ("MOD",Pvecteur_to_expression(pv ),
+					    Value_to_expression(value_plus(MATRIX_ELEM(G_PROPP[i],1,1),VALUE_ONE)));
+
+	  
+	  lis1 =CONS(EXPRESSION, exp,NIL);
+	  for (k=2;k<=depth;k++)
+	    {
+	      lis=CONS(DIMENSION, make_dimension(int_to_expression(0),Value_to_expression(value_minus 
+											  (MATRIX_ELEM(ATEPP,k,1),VALUE_ONE))),
+		       lis);
+	      pos=position_one_element(P2,k);
+	      pv= vect_make(VECTEUR_NUL ,iter[pos-1], VALUE_ONE,TCST,VALUE_ZERO);
+	      exp=Pvecteur_to_expression(pv);
+	      
+	      lis1 =CONS(EXPRESSION, exp,lis1);
+	    }
+	  name= make_new_array_variable(i+1,depth+1,get_current_module_entity() , make_basic(is_basic_int, (void *) 4), lis);
+	  buf_ref[i][depth]=make_reference(name,lis1);
+	  ref[i][depth]=name;
+	  scopy[i][depth]=copy_statement(sequen[i].s);
+	  c= instruction_call(statement_instruction((   scopy[i][depth] )));
+	  m=0;
+	  MAP(EXPRESSION,exp,{  
+	    if (m==0)  gauche=exp;
+	    if (m==1)  droite=exp;
+	    m++;
+	  },call_arguments(c)) ;
+	  syntax_reference(expression_syntax(gauche))= buf_ref[i][depth];
+	  lis2=CONS(STATEMENT, scopy[i][depth],lis2);
+	  seq= make_sequence(lis2);
+	  ins= make_instruction_sequence(seq);
+	  sequenp[i]= instruction_to_statement(ins);
+	  
+	};
+    };
+  
+
+  for(i=1;i<=k1-2;i++)
+    { 
+      expression e=NULL;
+      Pvecteur pv;
+      Pmatrix *temp;
+      reference *regi[nid_nbr];
+      int m1;
+      for(j=1;j<=depth;j++)
+	{
+	  Value v2;
+	  v2=value_uminus(MATRIX_ELEM(G_PRO[i-1],j,1));
+	  pv= vect_make(VECTEUR_NUL,iter[j-1], VALUE_ONE,TCST ,v2);
+	  if (j==1)  e=ge_expression(Pvecteur_to_expression(pv),Value_to_expression(VALUE_ZERO));  
+	  else
+	    e=and_expression(e,ge_expression(Pvecteur_to_expression(pv),Value_to_expression(VALUE_ZERO)));
+	}
+      temp=( Pmatrix *)malloc( sequen[i].nbr_stencil *sizeof(Pmatrix));
+      regi[i]=( reference *)malloc( sequen[i].nbr_stencil *sizeof(reference));;
+      for(k=0;k<=sequen[i].nbr_stencil-1;k++)
+	{
+	  entity name;
+	  char buffer[20];  
+ 	  expression exp;
+	  reference ref;
+	  temp[k]=matrix_new(depth,1);
+	  matrix_substract(temp[k],sequen[i].delai, sequen[i-1].delai);
+	  matrix_substract(temp[k], temp[k],sequen[i].st[k]);
+	  sprintf(buffer,"%s%d_%d", "R",i+1,k);
+	  name= make_scalar_entity(buffer,  module_local_name(get_current_module_entity()),
+				   make_basic(is_basic_int, (void *) 4) );
+	  regi[i][k]=make_reference(name,NIL);
+	}
+      for(j=0;j<=depth;j++) 
+	{
+	  expression gauche,droite,expt;
+	  statement s1,s2,s3;
+          sequence seq;
+	  instruction ins;
+	  call c;
+	  test t;
+	  int m,l;
+	  list lis,lisp;
+	  reference ref;
+	  s1=copy_statement(scopy[i][j]);
+	  c= instruction_call(statement_instruction(( s1)));
+	  m=0;
+	  MAP(EXPRESSION,exp,{  
+	    if (m==0)  gauche=exp;
+	    if (m==1)  droite=exp;
+	    m++;
+	  },call_arguments(c)) ;
+	  lis=call_arguments( syntax_call(expression_syntax(droite)));
+	  for(k=0;k<=sequen[i].nbr_stencil-1;k++)
+	    {
+	      expression exp;
+	      ref=copy_reference (buf_ref[i-1][depth]);  /**** ?????? ****/
+	      exp=reference_to_expression(ref);
+              for(l=0;l<=depth-1;l++)
+		{
+		  Pvecteur pv;
+		  expression delai_plus;
+		  pv = vect_make(VECTEUR_NUL,iter[l], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],l+1,1));
+		  delai_plus=Pvecteur_to_expression(pv);
+		  ExpressionReplaceReference(exp,
+					     make_reference((entity) iter[l],NIL), delai_plus);
+		}
+	      expt=EXPRESSION( CAR(lis));
+	      lis=CDR(lis);
+	      syntax_reference(expression_syntax(expt))=ref;
+	    }
+	  lis=NIL;
+	  for(k=0;k<=sequen[i].nbr_stencil-1;k++)
+	    {
+	      statement s,*stemp;
+	      stemp=( statement  *)malloc( (depth+1) *sizeof(statement));
+	      for(l=0;l<=depth;l++)
+		{ 
+		  int r;
+		  expression exp;
+		  reference ref;
+		   
+		    ref=copy_reference (buf_ref[i-1][l]);
+		  exp=reference_to_expression(ref);
+                  for (r=0;r<=depth-1;r++)
+		    {
+		      Pvecteur pv;
+		      expression delai_plus;
+		      
+		      if(r==l)
+			{
+			  Value t;
+			  t=value_minus(MATRIX_ELEM(ATEP,r+1,1),MATRIX_ELEM(temp[k],r+1,1));
+			  pv = vect_make(VECTEUR_NUL,iter[r], VALUE_ONE, TCST,t);
+			  delai_plus=Pvecteur_to_expression(pv);
+			  ExpressionReplaceReference(exp,
+						     make_reference((entity) iter[r],NIL), delai_plus);
+			}		   
+		      
+		      else	     
+			{
+			  pv = vect_make(VECTEUR_NUL,iter[r], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],r+1,1));
+			  delai_plus=Pvecteur_to_expression(pv);
+			  ExpressionReplaceReference(exp,
+						     make_reference((entity) iter[r],NIL), delai_plus);
+			}
+
+		      
+
+		      /*  Pvecteur pv;
+		      expression delai_plus;
+		      pv = vect_make(VECTEUR_NUL,iter[r], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],r+1,1));
+		      delai_plus=Pvecteur_to_expression(pv);
+		      ExpressionReplaceReference(exp,
+		      make_reference((entity) iter[r],NIL), delai_plus);   */
+		    }
+		  stemp[l]=make_assign_statement(reference_to_expression(regi[i][k]),reference_to_expression(ref));
+		};
+	      s=  stemp[depth];
+	      for(l=depth-1;l>=0;l--)
+		{
+		  int pos;
+		  Pvecteur pv1,pv2;
+		  statement s1,s2;
+		  test t;
+		  list list;
+		  expression exp1,exp2,exp;
+		  pos=position_one_element(P1,l+1);
+		  pv1= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST ,VALUE_ZERO);
+		  exp1= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv1 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
+		  pv2= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST , -MATRIX_ELEM(temp[k],l+1,1));
+		  exp2= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv2 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
+		  exp=lt_expression(Pvecteur_to_expression(pv2 ),Value_to_expression(VALUE_ZERO));
+		  t= make_test(exp,stemp[l],s);
+		  s=test_to_statement(t);
+		}
+	      lis=CONS(STATEMENT,s,lis);
+
+	    }
+	  s3=copy_statement(s1);
+	 
+	  c= instruction_call(statement_instruction(( s3)));
+	  m=0;
+	  MAP(EXPRESSION,exp,{  
+	    if (m==0)  gauche=exp;
+	    if (m==1)  droite=exp;
+	    m++;
+	  },call_arguments(c)) ;
+	  lisp=call_arguments( syntax_call(expression_syntax(droite)));
+	  for(k=0;k<=sequen[i].nbr_stencil-1;k++)
+	    {
+	     
+	      expression expt;
+	     
+	   
+               
+	      expt=EXPRESSION( CAR(lisp));
+	       
+	      lisp=CDR(lisp);
+	   
+	      syntax_reference(expression_syntax(expt))=regi[i][k];
+	     
+	    }
+ 
+
+
+	  lis=CONS(STATEMENT,s3,lis);
+	  lis=gen_nreverse(lis);
+	  
+	  seq= make_sequence(lis);
+	  ins= make_instruction_sequence(seq);
+	  s2= instruction_to_statement(ins);
+	  t= make_test(e,s1,s2);
+	  scopy[i][j]=test_to_statement(t);
+	  
+	  
+	};
+
+      m1=0; 
+
+        CHUNK(CAR( sequence_statements(instruction_sequence(statement_instruction(sequenp[i])))))=   (gen_chunk *) scopy[i][depth];  
+      MAP(STATEMENT,s,{  
+	if (m1!=0)   
+	  {
+	    test_true(instruction_test(statement_instruction(s)) )=  scopy[i][depth-m1];
+    
+	  }
+	m1++;
+	}, sequence_statements(instruction_sequence(statement_instruction(sequenp[i]))) ) ; 
+
+
+
+
+      
+    };
+  /*   **********************************   */
+
+  for(i= k1-1 ;i<=k1-1;i++)
+    { 
+      expression e=NULL;
+      Pvecteur pv;
+      Pmatrix *temp;
+      reference *regi[nid_nbr];
+      int m1;
+      /* */
+
+      expression gauche,droite,expt;
+      statement s1,s2,s3;
+      sequence seq;
+      instruction ins;
+      call c;
+      test t;
+      int m,l;
+      list lis,lisp;
+      reference ref;
+      
+      /* */
+	  
+      
+      for(j=1;j<=depth;j++)
+	{
+	  
+          Value v2;
+	  
+	  
+	  
+	  v2=value_uminus(MATRIX_ELEM(G_PRO[i-1],j,1));
+	  
+	  pv= vect_make(VECTEUR_NUL,iter[j-1], VALUE_ONE,TCST ,v2);
+	  
+	  if (j==1)  e=ge_expression(Pvecteur_to_expression(pv),Value_to_expression(VALUE_ZERO));  
+	  else
+	    e=and_expression(e,ge_expression(Pvecteur_to_expression(pv),Value_to_expression(VALUE_ZERO)));
+	  
+	}
+      
+      temp=( Pmatrix *)malloc( sequen[i].nbr_stencil *sizeof(Pmatrix));
+      regi[i]=( reference *)malloc( sequen[i].nbr_stencil *sizeof(reference));;
+      for(k=0;k<=sequen[i].nbr_stencil-1;k++)
+	{
+	  entity name;
+	  char buffer[20];  
+ 	  expression exp;
+	  reference ref;
+	  temp[k]=matrix_new(depth,1);
+	  
+	  matrix_substract(temp[k],sequen[i].delai, sequen[i-1].delai);
+	  matrix_substract(temp[k], temp[k],sequen[i].st[k]);
+	  
+	  
+	  
+	  sprintf(buffer,"%s%d_%d", "R",i+1,k);
+	  name= make_scalar_entity(buffer,  module_local_name(get_current_module_entity()),
+				   make_basic(is_basic_int, (void *) 4) );
+	  
+	  regi[i][k]=make_reference(name,NIL);
+	  
+	  
+	      
+	}
+      
+      s1=copy_statement( sequen[i].s);
+      ps1=s1;
+      c= instruction_call(statement_instruction(( s1)));
+      m=0;
+      MAP(EXPRESSION,exp,{  
+	if (m==0)  gauche=exp;
+	if (m==1)  droite=exp;
+	m++;
+      },call_arguments(c)) ;
+      lis=call_arguments( syntax_call(expression_syntax(droite)));
+      for(k=0;k<=sequen[i].nbr_stencil-1;k++)
+	{
+	  expression exp;
+	  ref=copy_reference (buf_ref[i-1][depth]);
+	  exp=reference_to_expression(ref);
+	  for(l=0;l<=depth-1;l++)
+	    {
+	      Pvecteur pv;
+	      expression delai_plus;
+	      pv = vect_make(VECTEUR_NUL,iter[l], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],l+1,1));
+	      delai_plus=Pvecteur_to_expression(pv);
+	      ExpressionReplaceReference(exp,
+					 make_reference((entity) iter[l],NIL), delai_plus);
+	    }
+	  expt=EXPRESSION( CAR(lis));
+	  lis=CDR(lis);
+	  syntax_reference(expression_syntax(expt))=ref;
+	} 
+      lis=NIL;
+      for(k=0;k<=sequen[i].nbr_stencil-1;k++)
+	{
+	  statement s,*stemp;
+	  stemp=( statement  *)malloc( (depth+1) *sizeof(statement));
+	  for(l=0;l<=depth;l++)
+	    { 
+	      int r;
+	      expression exp;
+	      reference ref;
+	      
+	      ref=copy_reference (buf_ref[i-1][l]);
+	      
+	      
+	      exp=reference_to_expression(ref);
+	      for (r=0;r<=depth-1;r++)
+		{
+		  Pvecteur pv;
+		  expression delai_plus;
+		  
+		     if(r==l)
+			{
+			  Value t;
+			  t=value_minus(MATRIX_ELEM(ATEP,r+1,1),MATRIX_ELEM(temp[k],r+1,1));
+			  pv = vect_make(VECTEUR_NUL,iter[r], VALUE_ONE, TCST,t);
+			  delai_plus=Pvecteur_to_expression(pv);
+			  ExpressionReplaceReference(exp,
+						     make_reference((entity) iter[r],NIL), delai_plus);
+			}		   
+		      
+		      else	     
+			{
+			  pv = vect_make(VECTEUR_NUL,iter[r], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],r+1,1));
+			  delai_plus=Pvecteur_to_expression(pv);
+			  ExpressionReplaceReference(exp,
+						     make_reference((entity) iter[r],NIL), delai_plus);
+			}
+		    
+		}
+	      stemp[l]=make_assign_statement(reference_to_expression(regi[i][k]),reference_to_expression(ref));
+	    };
+	  s=  stemp[depth];
+	  for(l=depth-1;l>=0;l--)
+	    {
+	      int pos;
+	      Pvecteur pv1,pv2;
+	      statement s1,s2;
+	      test t;
+	      list list;
+	      expression exp1,exp2,exp;
+	      pos=position_one_element(P1,l+1);
+	      pv1= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST ,VALUE_ZERO);
+	      exp1= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv1 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
+	      pv2= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST , -MATRIX_ELEM(temp[k],l+1,1));
+	      exp2= binary_intrinsic_expression ("/",Pvecteur_to_expression(pv2 ),Value_to_expression(MATRIX_ELEM(ATE,pos,1)));
+	      exp=lt_expression( Pvecteur_to_expression(pv2 ) ,Value_to_expression(VALUE_ZERO) );
+	      t= make_test(exp,stemp[l],s);
+	      s=test_to_statement(t);
+	    }
+	  lis=CONS(STATEMENT,s,lis);
+	  
+	}
+      s3=copy_statement(s1);
+      ps2=s3;
+      c= instruction_call(statement_instruction(( s3)));
+      m=0;
+      MAP(EXPRESSION,exp,{  
+	if (m==0)  gauche=exp;
+	if (m==1)  droite=exp;
+	m++;
+      },call_arguments(c)) ;
+      lisp=call_arguments( syntax_call(expression_syntax(droite)));
+      for(k=0;k<=sequen[i].nbr_stencil-1;k++)
+	{
+	  expression expt;
+	  expt=EXPRESSION( CAR(lisp));
+	  lisp=CDR(lisp);
+	  syntax_reference(expression_syntax(expt))=regi[i][k];
+	}
+      lis=CONS(STATEMENT,s3,lis);
+      lis=gen_nreverse(lis);
+      seq= make_sequence(lis);
+      ins= make_instruction_sequence(seq);
+      s2= instruction_to_statement(ins);
+      t= make_test(e,s1,s2);
+      sequen[i].s=test_to_statement(t);
+
+
+      
+    }; 
+
+
+
+
+      
+
+/* ************************** */
+
+
+
+
+
+
+
+  ls=loop1;
+  for(j=0;j<=depth-1;j++)
+    {
+      range range1;  
+      expression lower, upper;
+      range1=loop_range(ls); 
+      lower=range_lower(range1);  
+      upper=range_upper(range1); 
+      range_lower(range1)=make_integer_constant_expression(tiled_nest[j].lower);
+      range_upper(range1)= make_integer_constant_expression(tiled_nest[j].upper);
+      if  (j!=depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
+    };
+  tiling_indice= ( Pvecteur  *)malloc(depth *sizeof( Pvecteur*));
+  plus=depth*2-1;
+  
+  for (pb =base_newindex; pb!=NULL; pb=pb->succ) {
+    loop tl;
+    switch(plus%2)
+      {
+      case 1: 
+	{ 
+	  
+	  elem_mat2=MATRIX_ELEM(A,plus/2+1,plus  ) ;
+	  
+	  upper= int_to_expression(value_minus(elem_mat2,VALUE_ONE));
+	  
+	  lower= int_to_expression(0);
+	  
+	  tiling_indice[plus/2]=vect_make(VECTEUR_NUL ,pb->var , VALUE_ONE,TCST,VALUE_ZERO);
+	  
+	  vect_dump( tiling_indice[plus/2]);
+	  
+	 
+	  break;
+	}
+	
+      case 0:
+	{ 
+	  elem_mat1=MATRIX_ELEM(A,plus/2+1,plus+1);
+	  upper= int_to_expression(value_div(tiled_nest[plus/2].upper,elem_mat1));
+	  lower= int_to_expression(0);
+	 
+	  tiling_indice[plus/2]=vect_make( tiling_indice[plus/2],pb->var ,elem_mat1,TCST,VALUE_ZERO);
+	  vect_dup( tiling_indice[plus/2]);
+	 
+	  break;
+	};
+	
+      default: break;
+      }  
+    
+    tl = make_loop((entity) vecteur_var(pb),
+		   make_range(copy_expression(lower), copy_expression(upper),
+			      int_to_expression(1)),
+		   s1,
+		   entity_empty_label(),
+		   make_execution(is_execution_sequential, UU),
+		   NIL);
+    s1 = instruction_to_statement(make_instruction(is_instruction_loop, tl));
+    
+    
+    plus--;
+  };
+  
+  
+
+  /******/
+  for (i=k1-1;i>=0;i--)
+    {
+      expression e1,e2,e,gauche=NULL,droite=NULL,delai_plus;
+      test t;
+      call c;
+      int m;
+      Pvecteur pv;
+      e1=ge_expression(Pvecteur_to_expression (tiling_indice[0]),
+		       Value_to_expression( value_plus(sequen[i].nd[0].lower,
+						       MATRIX_ELEM( sequen[i].delai,1,1))));
+      e2=le_expression(Pvecteur_to_expression (tiling_indice[0]), 
+		       Value_to_expression( value_plus(sequen[i].nd[0].upper,
+						       MATRIX_ELEM( sequen[i].delai,1,1))));
+      if (value_eq( value_plus(sequen[i].nd[0].lower,MATRIX_ELEM( sequen[i].delai,1,1)),tiled_nest[0].lower))
+	{
+	  if (value_eq( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)),tiled_nest[0].upper)&&
+	      value_eq(value_mod( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)), 
+				  MATRIX_ELEM(A,1,1)),VALUE_ZERO))
+	    e=NULL;
+	  else
+	    e=e2;
+	}
+      else
+	{
+	  if (value_eq( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)),tiled_nest[0].upper)&&
+	      value_eq(value_mod( value_plus(sequen[i].nd[0].upper,MATRIX_ELEM( sequen[i].delai,1,1)), 
+				  MATRIX_ELEM(A,1,1)),VALUE_ZERO))
+	    e=e1;
+	  
+	  else
+	    e=and_expression(e1,e2);
+	  
+	};
+     
+      for(j=0;j<=depth-1;j++)
+	{
+	  if (j>=1) 
+	    {
+	      e1=ge_expression( Pvecteur_to_expression (tiling_indice[j]),
+				Value_to_expression(value_plus(sequen[i].nd[j].lower,
+							       MATRIX_ELEM( sequen[i].delai,j+1,1))));
+	      e2=le_expression(Pvecteur_to_expression (tiling_indice[j]), 
+			       Value_to_expression( value_plus(sequen[i].nd[j].upper,
+							       MATRIX_ELEM( sequen[i].delai,j+1,1))));
+	      if (value_eq( value_plus(sequen[i].nd[j].lower,MATRIX_ELEM( sequen[i].delai,j+1,1)),tiled_nest[j].lower))
+		{
+		  if (! (value_eq(value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)),tiled_nest[j].upper)&&
+			 value_eq(value_mod( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)), 
+					     MATRIX_ELEM(A,j+1,2*j+1)),VALUE_ZERO)))
+		    {
+		      if (e==NULL)
+			e=e2;
+		      else
+			e=and_expression(e,e2);
+		    };
+		}
+	      else
+		{
+		  if (value_eq(value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)),tiled_nest[j].upper)&&
+		      value_eq(value_mod( value_plus(sequen[i].nd[j].upper,MATRIX_ELEM( sequen[i].delai,j+1,1)), 
+					  MATRIX_ELEM(A,j+1,2*j+1)),VALUE_ZERO))
+		    {
+		      if (e==NULL)
+			e=e1;
+		      else
+			e=and_expression(e,e1);
+		    }
+		  else
+		    {
+		      e1=and_expression(e1,e2);
+		      if(e==NULL)
+			e=e1;
+		      else
+			e=and_expression(e,e1);
+		    }
+		};
+	    };
+	};
+      if(i<= k1-2) 
+	{
+	  if(i==0)
+	    {
+	      call c;
+	      int m ,j,l;
+	      expression droite;
+	      Pvecteur pv;
+
+	      for(j=0;j<depth+1;j++)
+		{
+		  c= instruction_call(statement_instruction(( scopy[i][j])));
+		  m=0;
+		  MAP(EXPRESSION,exp,{  
+		    if (m==1)  droite=exp;
+		    m++;
+		  },call_arguments(c)) ;
+		  for(l=0;l<=depth-1;l++)
+		    {
+		      pv = vect_make(tiling_indice[l],TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,l+1,1)));
+		      delai_plus=Pvecteur_to_expression(pv);
+		   
+		      MAP(EXPRESSION,exp,{ 
+			ExpressionReplaceReference(exp,
+						   make_reference((entity) sequen[i].nd[l].index,NIL),delai_plus);
+		      },call_arguments( syntax_call(expression_syntax(droite))));
+		    }
+		}
+	    }	      
+	  
+	  t= make_test(e,sequenp[i],make_block_statement(NIL));
+	}
+      else 
+	{
+	  call c;
+	  int m ,j;
+	  expression gauche;
+	  Pvecteur pv;
+	  c= instruction_call(statement_instruction(( ps1 )));
+	  m=0;
+	  MAP(EXPRESSION,exp,{  
+	    if (m==0)  gauche=exp;
+	    m++;
+	  },call_arguments(c)) ;
+	  for(j=0;j<=depth-1;j++)
+	    {  
+	      pv = vect_make(tiling_indice[j],TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
+	      delai_plus=Pvecteur_to_expression(pv);
+	      ExpressionReplaceReference(gauche,
+					 make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
+	    }
+	  c= instruction_call(statement_instruction(( ps2 )));
+	  m=0;
+	  MAP(EXPRESSION,exp,{  
+	    if (m==0)  gauche=exp;
+	    m++;
+	  },call_arguments(c)) ;
+	  for(j=0;j<=depth-1;j++)
+	    {  
+	      pv = vect_make(tiling_indice[j],TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
+	      delai_plus=Pvecteur_to_expression(pv);
+	      ExpressionReplaceReference(gauche,
+					 make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
+	    }
+
+
+	  
+	  t= make_test(e,sequen[i].s,make_block_statement(NIL));
+	};
+      s=test_to_statement(t);
+ 
+      if(i==k1-1)   lis=CONS(STATEMENT,s,NIL);
+      else      lis=CONS(STATEMENT,s,lis);
+      
+    };
+ 
+  seq= make_sequence(lis);
+  ins= make_instruction_sequence(seq);
+  s= instruction_to_statement(ins);
+  ls=instruction_loop(statement_instruction(s1));
+  for(j=0;j<=2*depth-1;j++)
+    if  (j!=2*depth-1) ls=instruction_loop(statement_instruction(loop_body(ls)));
+    else loop_body(ls)=s;
+ 
+   
+  s1=permutation2(s1,P);
+  
+  return s1;
+}
+
+
+
+
+
+
+
+
+
+
 static bool array_overflow()
 { int i,j,k;
 
@@ -968,9 +2201,11 @@ static bool array_overflow()
 
  return overflow;
 }
+
+
 bool tiling_sequence(string module)  
 {
-  statement stat,s1;
+  statement stat,s1=NULL;
   
   context_t context;
  
@@ -1016,15 +2251,37 @@ bool tiling_sequence(string module)
     {  
       if(!array_overflow())
 	{
+	  int choix ;
+	  printf("--------------Choix de la transformation-------\n"); 
+	  printf(" 1: Fusion  \n");
+	  printf(" 2: Fusion avec allocation des tampons  \n");
+	  printf(" 3: Tiling \n");
+	  printf(" 4: Tiling avec  allocation des tampons \n");
+	  printf(" Choix: ");
+	  scanf("%d", &choix);
+	  switch(choix)
+	    {
+	    case 1: s1=fusion(); 
+	      break;
+	    case 2:  s1= fusion_buffer();
+	      break;
+	    case 3: s1=Hierarchical_tiling(); 
+	      break; 
+	    case 4:s1=Tiling_buffer_allocation();
+	      break;
+	    default: break;
+	      
+            }  
 	  
-	  //s1=fusion(); 
-	  s1= fusion_buffer();
 	  
 	  module_reorder(s1); 
 	  
 	  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, s1);
-	} 
-    }
+	}
+      
+	   
+    } 
+
       
     reset_current_module_entity();
     //  reset_current_module_statement();
