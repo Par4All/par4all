@@ -1,13 +1,23 @@
 #! /bin/sh
 #
 # $RCSfile: install_pips,v $ (version $Revision$)
-# $Date: 1997/04/02 18:34:22 $, 
+# $Date: 1997/04/15 11:01:44 $, 
 #
 # installation for pips softwares and automatic generation of pipsrc
 #
 
-unset archdir
+unset archdir type
 
+## on f.. IBM, sh is ksh and type is whence:-(
+
+if test -x /bin/type 
+then
+  type=/bin/type
+else
+  type=type
+fi
+
+export type
 
 ## Whether we have a working echo -n
 
@@ -74,12 +84,12 @@ executable()
     comment=$2
     shift 2
     verbn "looking for $exe ($comment): "
-    if test "`type $exe | grep 'not found'`"
+    if $type $exe > /dev/null 2>&1
     then
+	echo "ok!"
+    else
 	warning "not found!"
 	verb "--" "$@"
-    else
-	echo "ok!"
     fi
 }
 
@@ -154,9 +164,10 @@ then
 
     # cleans pipsrc files...
     test -d $PIPS_ROOT/Share && {
-	share=$PIPS_ROOT/Share
-	mv $share/pipsrc.sh $share/pipsrc.sh.old
-	mv $share/pipsrc.csh $share/pipsrc.csh.old
+	x=$PIPS_ROOT/Share/pipsrc
+	rm -f $x.*.old
+	test $x.sh && mv $x.sh $x.sh.old
+	test $x.csh && mv $x.sh $x.csh.old
     }
 fi
 
