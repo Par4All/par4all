@@ -609,6 +609,7 @@ format_inst: TK_FORMAT
 	;
 
 save_inst: TK_SAVE
+            { save_all_entities(); }
         | TK_SAVE lsavename
 	;
 
