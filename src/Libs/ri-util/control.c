@@ -9,7 +9,7 @@
  */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 2000/07/21 07:18:42 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 2000/10/06 08:08:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -79,9 +79,10 @@ cons **l ;
 /* Same as above, but follows successors by minimal path lengths. It is OK
    if there is only one path length when computing transformers and/or
    preconditions. However, if a node is reached by several paths, the node
-   with the minimal maximal path length should come first. This last
-   condition assumes infinite path length for nodes in cycles. It is not
-   implemented. */
+   with the minimal maximal path length should come first. 
+
+   This last condition assumes infinite path length for nodes in cycles
+   (?). It is not implemented. */
 
 void
 wide_forward_control_map_get_blocs( c, l )
