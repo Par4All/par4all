@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/12 18:16:17 $, 
+# $Date: 1996/09/12 18:16:55 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -65,7 +65,7 @@ do
 	   name="${name}B$OPTARG" ;
 	   tostrip="$tostrip Bin/$OPTARG" ;;
 	L) what="$what -d Lib/$OPTARG" ; name="${name}L$OPTARG" ;;
-	D) what="$what -d $OPTARG"  ; name="${name}Dx" ;;
+	D) what="$what -d $OPTARG"  ; name="${name}D" ;;
 	p) pack="$pack PIPS" ; name="${name}p" ;;
 	n) pack="$pack NEWGEN" ; name="${name}n" ;;
 	l) pack="$pack LINEAR" ; name="${name}l" ;;
