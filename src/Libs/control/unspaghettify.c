@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/03/09 23:30:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/03/11 15:35:57 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/03/09 23:30:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/03/11 15:35:57 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -104,13 +104,14 @@ unlink_2_control_nodes(control source,
 
 /* Fuse a 2 control node and add the statement of the second one to
    the statement of the first one. Assumes that the second node is the
-   only successor of the first one: */
+   only successor of the first one:\. Do not update the entry or exit
+   field of the unstructured. */
 void
 fuse_2_control_nodes(control first,
 		     control second)
 {
     if (gen_length(control_successors(second)) == 2) {
-	/* If the second node has 2 successor, it is a test node. The
+	/* If the second node has 2 successors, it is a test node. The
 	   fused node has 2 successors and must be a test too. So, the
 	   only thing I can do is to remove the first statement, just
 	   keeping its comments: */
@@ -443,7 +444,7 @@ fuse_sequences_in_unstructured(statement s)
 
 		  if (its_successor == entry_node)
 		      /* Update the entry node if we fuse with it: */
-		      entry_node = its_successor;		      
+		      entry_node = a_control_to_fuse;		      
 		  if (its_successor == exit_node)
 		      exit_node = a_control_to_fuse;
 		  
