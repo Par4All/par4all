@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/09/11 18:55:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/09/11 21:30:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1996/09/11 18:55:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1996/09/11 21:30:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -117,7 +117,7 @@ direct_change_directory()
 
     (void) mktemp(tmp);
 
-    safe_system(concatenate("Wchangedir ", get_cwd(), " > ", tmp));
+    safe_system(concatenate("Wchangedir -d ", get_cwd(), " > ", tmp));
 
     tmph = safe_fopen(tmp, "r");
     i=0;
