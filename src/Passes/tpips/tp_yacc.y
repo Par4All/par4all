@@ -54,8 +54,9 @@
 %type <status> opt_sep_list
 
 %{
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 
 #include "genC.h"
@@ -161,7 +162,7 @@ i_create:
 	sep_list
 	WORKSPACE /* workspace name */
 	{
-	    $$ = (int) yylval.name;
+	    $$ = yylval.name;
 	    the_file_list.argc = 0;
 	}
 	sep_list
