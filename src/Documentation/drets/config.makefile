@@ -1,9 +1,11 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/22 22:59:19 $, 
+# $Date: 1996/08/22 23:00:47 $, 
 #
 
-SOURCES=dret103.ftex \
+SOURCES=list_of_reports \
+	old_documentation_makefile \
+	dret103.ftex \
 	dret104.ftex \
 	dret105.ftex \
 	dret109.ftex \
