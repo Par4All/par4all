@@ -631,6 +631,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"DFLOAT", 1, overloaded_to_double_type},
     {"SNGL", 1, overloaded_to_real_type},
     {"DBLE", 1, overloaded_to_double_type},
+    {"DREAL", 1, overloaded_to_double_type}, /* Arnauld Leservot, code CEA */
     {"CMPLX", (INT_MAX), overloaded_to_complex_type},
     {"DCMPLX", (INT_MAX), overloaded_to_doublecomplex_type},
 
