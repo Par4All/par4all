@@ -163,15 +163,11 @@ rice_loop(statement stat, int l)
 	if (gen_consistent_p((statement)nstat))
 	    fprintf(stderr," gen consistent\n");
     }
-    pips_assert( "rice_loop", nstat != statement_undefined ) ;
+    pips_assert( "nstat is defined", nstat != statement_undefined ) ;
     /* FI: I'd rather not return a block when a unique loop statement has to
      * be wrapped.
      */
-    /*
-    pips_assert("rice_loop", 
-		instruction_block_p(statement_instruction(nstat))) ;
-		*/
-    pips_assert("rice_loop", 
+    pips_assert("block or loop", 
 		instruction_block_p(statement_instruction(nstat)) ||
 		instruction_loop_p(statement_instruction(nstat))) ;
     statement_label(nstat) = entity_empty_label();
@@ -195,7 +191,7 @@ rice_loop(statement stat, int l)
 	gen_free_list( (list) val ) ;
     }, get_enclosing_loops_map()) ;
 
-    reset_enclosing_loops_map();
+    clean_enclosing_loops();
 
     return nstat;
 }
