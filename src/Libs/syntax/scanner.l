@@ -167,6 +167,12 @@ DCON (({MANT}|{UICON}){DEXP}?)
                                 yylval.string = strdup(yytext);
 				return(TK_SCON);
 			}
+\"([^\"]|(\"\"))*\"	{
+				pips_debug(9, "TK_SCON %s %d\n",
+                                           yytext, yyleng);
+                                yylval.string = strdup(yytext);
+				return(TK_SCON);
+			}
 "-"			{
 				pips_debug(9, "TK_MINUS\n");
 				return(TK_MINUS);
@@ -230,7 +236,7 @@ DCON (({MANT}|{UICON}){DEXP}?)
 
 void yyerror_lex_part(char *s)
 {
-    user_warning("parser"," error - %s near %s\n", s, yytext);
+    user_warning("parser","lexical error - %s near %s\n", s, yytext);
 }
 
 void yyreset_lex(void)
