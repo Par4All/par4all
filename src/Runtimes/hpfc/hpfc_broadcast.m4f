@@ -1,6 +1,6 @@
 c
 c $RCSfile: hpfc_broadcast.m4f,v $ (version $Revision$)
-c $Date: 1996/09/07 16:56:19 $, 
+c $Date: 1996/09/14 17:58:52 $, 
 c
 c management of broadcasts
 c typical call: hpfc broadcast x(lid, [number, step]*x)
@@ -23,6 +23,9 @@ c broadcast function
 c
 define(`GENERIC_BROADCAST',`
 pushdef(`LEVEL',$1)dnl
+!
+! fake broadcast
+!
 fake_buffers(dnl
       subroutine build_name(hpfc fake broadcast,LEVEL)(
      $     i0`'LEVEL_ZERO(,``,'') dnl
@@ -40,6 +43,9 @@ SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
 SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
       hpfc fake bcasts=hpfc fake bcasts+1
       end)
+!
+! braodcast
+!
       subroutine build_name(hpfc broadcast,LEVEL)(
      $     i0`'LEVEL_ZERO(,``,'') dnl
 COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA'))
@@ -50,16 +56,21 @@ COMMA_REPLICATE(LEVEL,`LIST_INDEX_DECL')`'LEVEL_ZERO(,``,'')
      $     info
       include "fpvm3.h"
       include "hpfc_commons.h"
+      debug(print *, "[hpfc broadcast LEVEL] ", i0)
 SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
       if (i`'LEVEL.ne.MYLID) then
-         debug(write (unit=0, fmt=*)
-     $        "BRD to ", i`'LEVEL, SENDCHANNELS(i`'LEVEL))
+         debug(print *, MY LID, " BRD to ", i`'LEVEL, SENDCHANNELS(i`'LEVEL))
          call pvmfsend(NODETIDS(i`'LEVEL), 
      $        SENDCHANNELS(i`'LEVEL), info)
          SENDCHANNELS(i`'LEVEL) = SENDCHANNELS(i`'LEVEL) + 2
+         debug(print *, "BRD sent")
       endif
 SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
+      debug(print *, "[hpfc broadcast LEVEL] done")
       end
+!
+! remapping broadcast
+!
       subroutine build_name(hpfc remapbrd,LEVEL)(
      $     an, i0`'LEVEL_ZERO(,``,'') dnl
 COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA'))
@@ -72,15 +83,17 @@ COMMA_REPLICATE(LEVEL,`LIST_INDEX_DECL')`'LEVEL_ZERO(,``,'')
       include "hpfc_commons.h"
       external HPFC TWIN P
       logical HPFC TWIN P
+      debug(print *, "[hpfc remapbrd LEVEL] ", an, i0)
 SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
       if (i`'LEVEL.ne.MYLID.and..not.HPFC TWIN P(an, i`'LEVEL)) then
-         debug(write (unit=0, fmt=*)
-     $        "BRD to ", i`'LEVEL, SENDCHANNELS(i`'LEVEL))
+         debug(print *, MY LID, " BRD to ", i`'LEVEL, SENDCHANNELS(i`'LEVEL))
          call pvmfsend(NODETIDS(i`'LEVEL), 
      $        SENDCHANNELS(i`'LEVEL), info)
          SENDCHANNELS(i`'LEVEL) = SENDCHANNELS(i`'LEVEL) + 2
+         debug(print *, "BRD sent")
       endif
 SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
+      debug(print *, "[hpfc remapbrd LEVEL] done")
       end')dnl
 GENERIC_BROADCAST(0)
 GENERIC_BROADCAST(1)
