@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/09/17 19:18:01 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/11/11 13:42:14 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -31,7 +31,7 @@ script=`basename $0`
 unset VALIDOPT PERFORMANCE
 
 vdir="$PIPS_VALIDDIR"
-VALID="$PIPS_UTILDIR/validate-sequential"
+VALID="$PIPS_ROOT/Utils/validate-sequential"
 
 # so as to find the right ping, mail and date...
 PATH="/usr/ucb:/usr/etc:/usr/sbin:/usr/bin:$PATH"
