@@ -11,7 +11,7 @@
  * More thoughts needed. 
  *
  * $RCSfile: stack.c,v $ version $Revision$
- * $Date: 1995/09/16 22:10:19 $, 
+ * $Date: 1996/07/08 16:52:02 $, 
  * got on %D%, %T%
  */
 
@@ -200,7 +200,7 @@ stack s;
 stack stack_make(type, bucket_size, policy)
 int type, bucket_size, policy;
 {
-    stack s = malloc(sizeof(_stack_head));
+    stack s = (stack) malloc(sizeof(_stack_head));
 
     if (bucket_size<10) bucket_size=STACK_DEFAULT_SIZE; /* not too small */
 
