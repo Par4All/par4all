@@ -8,8 +8,10 @@
 
 #include "ri-util.h"
 
-entity 
-make_empty_module(string full_name)
+static entity 
+make_empty_module(
+    string full_name,
+    type r)
 {
     string name = string_undefined;
     entity e = gen_find_tabulated(full_name, entity_domain);
@@ -27,8 +29,7 @@ make_empty_module(string full_name)
 
     e = make_entity(strdup(full_name), 
 		    make_type(is_type_functional, 
-			      make_functional(NIL, 
-					      make_type(is_type_void, UU))),
+			      make_functional(NIL, r)),
 		    MakeStorageRom(),
 		    make_value(is_value_code,
 			       make_code(NIL, strdup(""))));
@@ -54,7 +55,7 @@ make_empty_program(string name)
 {
     string full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
 				   MODULE_SEP_STRING, MAIN_PREFIX, name, NULL);
-    return make_empty_module(full_name);
+    return make_empty_module(full_name, make_type(is_type_void, UU));
 }
 
 entity 
@@ -62,7 +63,15 @@ make_empty_subroutine(string name)
 {
     string full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
 				   MODULE_SEP_STRING, name, NULL);
-    return make_empty_module(full_name);
+    return make_empty_module(full_name, make_type(is_type_void, UU));
+}
+
+entity 
+make_empty_function(string name, type r)
+{
+    string full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
+				   MODULE_SEP_STRING, name, NULL);
+    return make_empty_module(full_name, r);
 }
 
 entity
@@ -70,10 +79,10 @@ make_empty_blockdata(string name)
 {
     string full_name = concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
 				   BLOCKDATA_PREFIX, name, NULL);
-    return make_empty_module(full_name);
+    return make_empty_module(full_name, make_type(is_type_void, UU));
 }
 
-
+
 /* this function checks that e has an initial value code. if yes returns
 it, otherwise aborts.  */
 
