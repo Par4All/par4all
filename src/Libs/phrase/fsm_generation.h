@@ -1,7 +1,10 @@
 #ifndef FSM_GENERATION_DEFS
 #define FSM_GENERATION_DEFS
 
-#define STATE_VARIABLE_NAME "STATE"
+#define STATE_VARIABLE_NAME "FSM%d_STATE"
+#define STATE_VARIABLE_NAME_NO_REF "FSM_STATE"
+#define FSM_BEGIN_COMMENT "! BEGIN FSM, %s\n"
+#define FSM_TRANSITION_COMMENT "! Transition %s=%d\n"
 
 /**
  * Build and return an expression (eg. state = 23), given an entity
