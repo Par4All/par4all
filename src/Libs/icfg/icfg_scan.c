@@ -65,6 +65,17 @@ static bool
     print_ifs = FALSE;
 static text (*decoration)(string) = NULL;
 
+text my_get_text_proper_effects(string module_name)
+{
+  text t;
+
+  set_is_user_view_p(FALSE);
+  /*set_methods_for_rw_effects_prettyprint(module_name);*/
+  t = get_any_effect_type_text(module_name, DBR_PROPER_EFFECTS, string_undefined, TRUE);
+  /*reset_methods_for_effects_prettyprint(module_name);*/
+  return t;
+}
+
 static void append_marged_text(
     text t, 
     int margin, 
@@ -160,7 +171,7 @@ static bool call_flt(call c)
 			(e_caller, e_callee, current_stmt_head(), c));
 	    break;
 	case ICFG_DECOR_PROPER_EFFECTS:
-	    MERGE_TEXTS(r,get_text_proper_effects(callee_name));
+	  /* MERGE_TEXTS(r,get_text_proper_effects(callee_name));*/
 	  /*MERGE_TEXTS(r, get_any_effects_text(callee_name, TRUE));*/
 	    break;
 	case ICFG_DECOR_CUMULATED_EFFECTS:
