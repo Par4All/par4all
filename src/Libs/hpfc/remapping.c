@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1996/12/30 15:51:38 $, ) 
+ * ($Date: 1997/02/18 10:07:51 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -784,6 +784,42 @@ live_mapping_expression(int index)
         (live_status, CONS(EXPRESSION, int_to_expression(index), NIL)));
 }
 
+static statement 
+set_array_status_to_target(entity trg)
+{
+    int trg_n = load_hpf_number(trg),
+        prm_n = load_hpf_number(load_primary_entity(trg));
+    entity m_status = hpfc_name_to_entity(MSTATUS); /* mapping status */
+    expression m_stat_ref;
+
+    /* MSTATUS(primary_n) */
+    m_stat_ref =
+	reference_to_expression
+	    (make_reference(m_status, 
+			    CONS(EXPRESSION, int_to_expression(prm_n), NIL)));
+
+    return make_assign_statement(m_stat_ref, int_to_expression(trg_n));
+}
+
+static statement
+set_live_status(
+    entity trg,
+    bool val)
+{
+    int trg_n = load_hpf_number(load_similar_mapping(trg));
+
+    return make_assign_statement(live_mapping_expression(trg_n),
+				 make_constant_boolean_expression(TRUE));
+}
+
+static statement 
+update_runtime_for_remapping(entity trg)
+{
+    return make_block_statement
+	(CONS(STATEMENT, set_live_status(trg, TRUE),
+         CONS(STATEMENT, set_array_status_to_target(trg), NIL)));
+}
+
 /* Runtime descriptors management around the remapping code.
  * performs the remapping if reaching mapping is ok, and update the 
  * mapping status.
@@ -817,9 +853,7 @@ generate_remapping_guard(
 			    CONS(EXPRESSION, int_to_expression(prm_n), NIL)));
     
     /* MSTATUS(primary_number) = trg_number */
-    l = CONS(STATEMENT,
-	     make_assign_statement(copy_expression(m_stat_ref), 
-				   int_to_expression(trg_n)), l);
+    l = CONS(STATEMENT, set_array_status_to_target(trg), l);
 
     /* MSTATUS(primary_number).eq.src_number */
     cond = eq_expression(m_stat_ref, int_to_expression(src_n));
@@ -845,21 +879,24 @@ generate_remapping_guard(
     return result;
 }
 
-statement 
-generate_all_live(
-    entity primary)
+static statement 
+generate_all_liveness_but(
+    entity primary,
+    bool val, 
+    entity butthisone)
 {
     statement result;
     list /* of statement */ ls = NIL;
 
     MAP(ENTITY, array,
     {
-	/* LIVEMAPPING(array) = .TRUE.
+	/* LIVEMAPPING(array) = val (.TRUE. or .FALSE.)
 	 */
-	ls = CONS(STATEMENT, 
-		  make_assign_statement
-                  (live_mapping_expression(load_hpf_number(array)),
-		   make_constant_boolean_expression(TRUE)), ls);
+	if (array != butthisone)
+	    ls = CONS(STATEMENT, 
+		      make_assign_statement
+		      (live_mapping_expression(load_hpf_number(array)),
+		       make_constant_boolean_expression(val)), ls);
     },
 	entities_list(load_dynamic_hpf(primary)));
 
@@ -867,9 +904,17 @@ generate_all_live(
      */
     result = make_block_statement(ls);
     statement_comments(result) = 
-	strdup(concatenate("! all live for ", 
+	strdup(concatenate("! all livenesss for ", 
 			   entity_local_name(primary), "\n", NULL));
     return result;
+}
+
+statement 
+generate_all_liveness(
+    entity primary,
+    bool val)
+{
+    return generate_all_liveness_but(primary, val, entity_undefined);
 }
 
 static statement 
@@ -960,11 +1005,12 @@ hpf_remapping(
          /* of expressions */ lddc;
     bool time_remapping = get_bool_property("HPFC_TIME_REMAPPINGS");
 
+    pips_debug(1, "%s -> %s\n", entity_name(src), entity_name(trg));
+
+    if (src==trg) /* (optimization:-) */
+	return make_empty_statement();
+
     if (time_remapping) push_performance_spy();
-
-    pips_debug(3, "%s -> %s\n", entity_name(src), entity_name(trg));
-
-    if (src==trg) return make_empty_statement(); /* (optimization:-) */
 
     /*   builds and simplifies the systems.
      */
@@ -1097,12 +1143,16 @@ generate_hpf_remapping_file(renaming r)
     statement remap;
     text t;
     list /* of entity */ l;
+    entity src = renaming_old(r), trg = renaming_new(r);
+
+    pips_debug(1, "%s -> %s\n",
+	       entity_name(src), entity_name(trg));
 
     /* generates the remapping code and text
      * !!! generated between similar arrays...
      */
-    remap = hpf_remapping(load_similar_mapping(renaming_old(r)), 
-			  load_similar_mapping(renaming_new(r)));
+    remap = hpf_remapping(load_similar_mapping(src), 
+			  load_similar_mapping(trg));
     update_object_for_module(remap, node_module);
     t = protected_text_statement(remap);
 
@@ -1137,6 +1187,36 @@ generate_remapping_include(renaming r)
         ("      include '", remapping_file_name(r), "'\n", NULL));
 
     return result;
+}
+
+/* returns the initialization statement:
+ * must initialize the status and liveness of arrays
+ */
+statement
+root_statement_remapping_inits(
+    statement root)
+{
+    list /* of statement */ ls = NIL;
+    list /* of entity */ le =
+	list_of_distributed_arrays_for_module(get_current_module_entity());
+
+    /* LIVENESS(...) = .TRUE.
+     * STATUS(...) = ...
+     */
+    MAP(RENAMING, r,
+	ls = CONS(STATEMENT, update_runtime_for_remapping(renaming_new(r)),ls),
+	load_renamings(root));
+
+    /* LIVENESS(...) = .FALSE.
+     */
+    MAP(ENTITY, array,
+	if (primary_entity_p(array))
+	    ls = CONS(STATEMENT, generate_all_liveness(array, FALSE), ls),
+	le);
+
+    gen_free_list(le), le = NIL;
+    
+    return make_block_statement(ls);
 }
 
 /* void remapping_compile(s, hsp, nsp)
@@ -1183,11 +1263,17 @@ remapping_compile(
      */
     MAP(RENAMING, r,
     {
-	if (!remapping_already_computed_p(r))
-	    generate_hpf_remapping_file(r);
-
-	add_remapping_as_used(r);
-	l = CONS(STATEMENT, generate_remapping_include(r), l);
+	if (renaming_old(r)==renaming_new(r)) /* KILL => status update */
+	    l = CONS(STATEMENT, set_array_status_to_target(renaming_new(r)),
+		     l);
+	else 
+	{
+	    if (!remapping_already_computed_p(r))
+		generate_hpf_remapping_file(r);
+	    
+	    add_remapping_as_used(r);
+	    l = CONS(STATEMENT, generate_remapping_include(r), l);
+	}
     },
 	load_renamings(s));
 
