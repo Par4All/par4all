@@ -894,6 +894,7 @@ dim_tableau: expression
 common_inst: common declaration
 	    { 
 		$$ = NameToCommon(BLANK_COMMON_LOCAL_NAME);
+		AddVariableToCommon($$, $2);
 	    }
 	| common common_name declaration
 	    {
