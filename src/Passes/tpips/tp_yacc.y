@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.70  1997/12/12 12:25:24  coelho
+ * guarded unknown rule to behave like a shell...
+ *
  * Revision 1.69  1997/12/11 16:17:02  coelho
  * fixed log on shells.
  *
@@ -318,8 +321,21 @@ i_shell: TK_SHELL TK_ENDOFLINE
 
 i_unknown: TK_UNKNOWN TK_ENDOFLINE
 	{ 
-	    pips_user_warning("implicit shell command assumed!\n");
-	    tp_system($1); free($1);
+	    if (tpips_behaves_like_a_shell || 
+		get_bool_property("TPIPS_IS_A_SHELL"))
+	    {
+		pips_user_warning("implicit shell command assumed!\n");
+		tp_system($1); 
+	    }
+	    else
+	    {
+		pips_user_warning("\n\n"
+		    "\tMaybe you intended to execute a direct shell command.\n"
+		    "\tThis convinient feature is desactivated by default.\n"
+		    "\tTo enable it, you can run tpips with the -s option,\n"
+		    "\tor do \"setproperty TPIPS_IS_A_SHELL=TRUE\"\n\n");
+	    }
+	    free($1);
 	}
 	;
 
