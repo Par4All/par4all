@@ -1515,6 +1515,7 @@ switch_generic_to_specific(call c, type_context_p context,
 			   string arg_dcomplex_name)
 {
   string specific_name = NULL;
+  entity fc = call_function(c);
   list args = call_arguments(c);
   basic arg_basic = GET_TYPE(context->types, EXPRESSION(CAR(args)));
   
@@ -1543,9 +1544,10 @@ switch_generic_to_specific(call c, type_context_p context,
    * NOTE: If specific_name == NULL: Invalid argument or argument basic unknown
    */
   if(specific_name != NULL && 
-     strcmp(specific_name, entity_local_name(call_function(c))) != 0)
+     strcmp(specific_name, entity_local_name(fc)) != 0)
   {
     call_function(c) = CreateIntrinsic(specific_name);
+    /* ERROR if: free_entity(fc); */
     
     /* Count number of simplifications */
     context->number_of_simplication++;
