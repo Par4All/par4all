@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: special_cases.c,v $
+ * Revision 1.23  1997/07/21 14:23:29  zory
+ * HPFC header is now inserted in the type
+ *
  * Revision 1.22  1997/03/20 10:26:34  coelho
  * RCS headers.
  *
@@ -608,7 +611,7 @@ static entity make_shift_subroutine(entity var)
 
     ndim = gen_length(variable_dimensions(v));
 
-    (void) sprintf(buffer, "HPFC SHIFT %s %d",
+    (void) sprintf(buffer, "%s SHIFT %d",
 		   pvm_what_options(variable_basic(v)),
 		   ndim);
 
