@@ -1080,6 +1080,45 @@ insert_comments_to_statement(statement s,
     }
 }
 
+
+
+/* Since blocks are not represented in Fortran, they cannot
+ * carry a label. A continue could be added by the prettyprinter
+ * but it was decided not to support this facility.
+ * For debugging, it's better to have a transparent prettyprinter
+ * and no ghost statement with no ordering and no number.
+ *
+ * Insert a CONTINUE and move the label and comment from the statement
+ * to the CONTINUE, if label there is.
+ *
+ * Must only be used for empty block statements...
+ */
+void
+fix_label_and_comment_in_empty_block(statement s) 
+{
+    list instructions;
+    statement continue_s;
+   
+    pips_assert("Should be an empty  instruction block...",
+		instruction_block_p(statement_instruction(s)));
+
+    if (unlabelled_statement_p(s) && empty_comments_p(statement_comments(s)))
+	/* The statement block has no label and no comment: just do
+           nothing. */
+	return;
+   
+    instructions = instruction_block(statement_instruction(s));
+
+    continue_s = make_continue_statement(statement_label(s));
+    statement_label(s) = entity_empty_label();
+    statement_comments(continue_s) = statement_comments(s);
+    statement_comments(s) = string_undefined;
+    
+    instructions = CONS(STATEMENT, continue_s, instructions);
+    instruction_block(statement_instruction(s)) = instructions;
+}
+
+
 /* See if statement s is labelled and can be reached by a GO TO */
 entity
 statement_to_label(statement s)
