@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.12  1998/11/09 14:50:35  zory
+ * use make_constant function instead of specific float and integer
+ * make_float/integer_constant_entity funcions
+ *
  * Revision 1.11  1998/11/04 09:42:57  coelho
  * use properties for eole and its options.
  *
@@ -131,62 +135,85 @@ static void write_to_eole(string module, list le, string file_name)
     safe_fclose(toeole, file_name);
 }
 
+
+
+#define SIZE_OF_BUFFER 100
+
+static string
+read_and_allocate_string_from_file(FILE * file)
+{
+  int test; 
+  char buffer[SIZE_OF_BUFFER];
+
+  test = fscanf(file, "%s",buffer);
+  pips_assert("fscanf - read string from file \n",(test==1));
+
+  return strdup(buffer);
+}
+
+
 /* import a list of entity that have been created during the eole
  * transformations and create them
  */
 static void 
 read_new_entities_from_eole(FILE * file, string module){
   int num = 0;
-  int i;
-  int ent_int_value;
-  int test;
-  double ent_double_value;
-  float ent_float_value;
+  int i, test;
+  string ent_type;
+  string const_type;
+  int const_size = 0;
+  string const_value;
+  
   entity e; 
-  string ent_type = (char *) malloc(100) ;
-
+  
   /* read the number of new entities to create */
   test = fscanf(file,"%d\n",&num);
   pips_assert("fscanf - read number of entity \n",(test==1));
   pips_debug(3,"reading %d new entity from module %s\n", num, module);
   for (i=0;i<num;i++){
     
-    test = fscanf(file,"%s",ent_type);
-    pips_assert("fscanf - read entity type \n",(test==1));
+    ent_type = read_and_allocate_string_from_file(file);
     
-    if (!strcmp(ent_type,"int")) {/* int */
-      test = fscanf(file," %d\n", &ent_int_value);
-      pips_assert("fscanf - read entity int value \n",(test==1));
+    if (!strcmp(ent_type,"constant")) { /* constant */
       
-      /* create integer entity */
-      e = make_integer_constant_entity(ent_int_value);
-      pips_assert("make integer constant entity\n",
-		  entity_consistent_p(e));  
-    }
-    else 
-      if (!strcmp(ent_type,"float")) {/* float */
-	test = fscanf(file," %f\n", &ent_float_value);
-	pips_assert("fscanf - read entity float value \n",(test==1));
-	/* create float entity */
-	e = make_float_constant_entity(ent_float_value);
-	pips_assert("make float constant entity\n",
+      const_type = read_and_allocate_string_from_file(file);
+      
+      test = fscanf(file," %d\n", &const_size);
+      pips_assert("fscanf - read entity basic type size \n",(test==1));
+
+      const_value = read_and_allocate_string_from_file(file);
+
+      if (!strcmp(const_type,"int")) {/* int */
+	
+	/* create integer entity */
+	e = make_constant_entity(const_value, is_basic_int, const_size);
+	pips_assert("make integer constant entity\n",
 		    entity_consistent_p(e));  
       }
       else 
-	if (!strcmp(ent_type,"double")) {/* double */
-	  test = fscanf(file," %lf\n", &ent_double_value);
-	  pips_assert("fscanf - read entity double value \n",(test==1));
-	  /* create double entity */
-	  e = make_double_constant_entity(ent_double_value);
-	  pips_assert("make double constant entity\n",
+	if (!strcmp(const_type,"float")) {/* float */
+	  
+	  /* create float entity */
+	  e = make_constant_entity(const_value, is_basic_float, const_size);
+	  pips_assert("make float constant entity\n",
 		      entity_consistent_p(e));  
-	} else 
-	  {
-	    pips_debug(0, "type of entity -%d- is : %s \n", i, ent_type);
-	    pips_assert("type of entity",0);    
-	  }
-  } /* end for */
-}
+	}
+      else 
+	pips_error("read_new_entities_from_eole", 
+		   "can't create this kind of constant entity : %s",
+		   const_type);
+
+      free(const_type);
+      free(const_value);
+    }
+    else 
+      pips_error("read_new_entities_from_eole", 
+		 "can't create this kind of entity : %s",
+		 ent_type);
+    
+    free(ent_type);
+  }
+}   
 
 
 /* import expressions from eole.
