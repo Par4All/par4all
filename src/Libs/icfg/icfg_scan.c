@@ -40,6 +40,8 @@ typedef hash_table text_mapping;
 #define bool_undefined_p(b) ((b)==bool_undefined)
 #endif
 
+#define some_text_p(t) (t!=text_undefined && text_sentences(t)!=NIL)
+
 /* We want to keep track of the current statement inside the recurse */
 DEFINE_LOCAL_STACK(current_stmt, statement)
 
@@ -177,14 +179,17 @@ static void call_filter(call c)
 	append_icfg_file (r, callee_name);
 	/* store it to the statement mapping */
 	update_text_stmt_map (current_stmt_head(), r);
+
+	pips_debug(9, "text %sdefined\n", r==text_undefined ? "un" : "");
     }
     return;
 }
 
-static bool loop_filter (loopl)
+static bool loop_filter (loop l)
 {
+    bool print_do = get_bool_property(ICFG_DOs);
     pips_debug (5, "Loop begin\n");
-    current_margin += ICFG_SCAN_INDENT;
+    if (print_do) current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
@@ -198,35 +203,37 @@ static void loop_rewrite (loop l)
 
     pips_debug (5,"Loop end\n");
 
-    current_margin -= ICFG_SCAN_INDENT;
+    if (print_do) current_margin -= ICFG_SCAN_INDENT;
     inside_the_do = (text) load_text_stmt_map (current_stmt_head());
     inside_the_loop = (text) load_text_stmt_map (loop_body (l));
 
     /* Print the DO */
-    if ((inside_the_loop != text_undefined) ||
-	(inside_the_do   != text_undefined) ||
-	(print_do)) {
+    if ((some_text_p(inside_the_loop) || 
+	 some_text_p(inside_the_do)) && print_do) 
+    {
 	sprintf(textbuf, "%*sDO\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
     }
 
     /* Print the text inside do expressions*/
-    if (inside_the_do != text_undefined) {
+    if (some_text_p(inside_the_do)) {
+	pips_debug(9, "something inside_the_do\n");
 	MERGE_TEXTS (t, inside_the_do);
        	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup("\n")));
     }
 
     /* Print the text inside */
-    if (inside_the_loop != text_undefined) {
+    if (some_text_p(inside_the_loop)) {
+	pips_debug(9, "something inside_the_loop\n");
 	MERGE_TEXTS (t, inside_the_loop);
     }
 
     /* Print the ENDDO */
-    if ((inside_the_loop != text_undefined) ||
-	(inside_the_do   != text_undefined) ||
-	(print_do)) {
+    if ((some_text_p(inside_the_loop) ||
+	 some_text_p(inside_the_do)) && print_do) 
+    {
 	sprintf(textbuf, "%*sENDDO\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
@@ -283,8 +290,10 @@ static void instruction_rewrite (instruction i)
 
 static bool test_filter (test l)
 {
+    bool print_if_p = get_bool_property (ICFG_IFs);
+
     pips_debug (5, "Test begin\n");
-    current_margin += ICFG_SCAN_INDENT;
+    if (print_if_p) current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
@@ -295,37 +304,37 @@ static void test_rewrite (test l)
     text inside_if = text_undefined;
     text t = make_text (NIL);
     char textbuf[MAX_LINE_LENGTH];
-    bool something_to_print = bool_undefined;
+    bool something_to_print, print_if_p;
     
     pips_debug (5,"Test end\n");
-    
-    current_margin -= ICFG_SCAN_INDENT;
     
     inside_if = copy_text((text) load_text_stmt_map (current_stmt_head ()));
     inside_then = copy_text((text) load_text_stmt_map (test_true (l)));
     inside_else = copy_text((text) load_text_stmt_map (test_false (l)));
+
+    print_if_p = get_bool_property (ICFG_IFs);
+    something_to_print = (some_text_p(inside_else) ||
+			  some_text_p(inside_then) ||
+			  some_text_p(inside_if));
     
-    something_to_print = ((inside_else != text_undefined) ||
-			  (inside_then != text_undefined) ||
-			  (inside_if   != text_undefined) ||
-			  get_bool_property (ICFG_IFs));
+    if (print_if_p) current_margin -= ICFG_SCAN_INDENT;
     
     /* Print the IF */
-    if (something_to_print) {
+    if (something_to_print && print_if_p) {
 	sprintf(textbuf, "%*sIF\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
     }
     
     /* print things in the if expression*/
-    if (inside_if != text_undefined)
+    if (some_text_p(inside_if))
 	MERGE_TEXTS (t, inside_if);
 
     
     /* print then statements */
-    if (inside_then != text_undefined) {
+    if (some_text_p(inside_then)) {
 	/* Print the THEN */
-	if (something_to_print) {
+	if (something_to_print && print_if_p) {
 	    sprintf(textbuf, "%*sTHEN\n", current_margin, "");
 	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 						  strdup(textbuf)));
@@ -334,9 +343,9 @@ static void test_rewrite (test l)
     }    
 
     /* print then statements */
-    if (inside_else != text_undefined) {
+    if (some_text_p(inside_else)){
 	/* Print the ELSE */
-	if (something_to_print) {
+	if (something_to_print && print_if_p) {
 	    sprintf(textbuf, "%*sELSE\n", current_margin, "");
 	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 						  strdup(textbuf)));
@@ -345,7 +354,7 @@ static void test_rewrite (test l)
     }    
 
     /* Print the ENDIF */
-    if (something_to_print) {
+    if (something_to_print && print_if_p) {
 	sprintf(textbuf, "%*sENDIF\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
