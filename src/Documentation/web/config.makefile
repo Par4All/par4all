@@ -15,4 +15,8 @@ HTMS =	index.html \
 	wp65_summary.html \
 	wpips.html
 
+SOURCES= $(HTMS)
+
+INSTALL_HTM= $(HTMS)
+
 # end of $RCSfile$
