@@ -537,6 +537,26 @@ entity e;
     return conflict_e;
 }
 
+list effects_conflict_with_entities(fx, e)
+cons * fx;
+entity e;
+{
+    list lconflict_e = NIL;
+    MAPL(cef, 
+     {
+	 effect ef = EFFECT(CAR(cef));
+	 entity e_used = reference_variable(effect_reference(ef));
+	 if(entity_conflict_p(e, e_used)) {
+	     lconflict_e = gen_nconc(lconflict_e, 
+				     CONS(ENTITY, e_used, NIL));
+	    
+	 }
+     },
+	 fx);
+    return lconflict_e;
+}
+
+
 /*************** I/O EFFECTS *****************/
 bool io_effect_entity_p(entity e)
 {
