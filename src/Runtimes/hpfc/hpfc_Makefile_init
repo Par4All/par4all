@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/08/30 19:19:25 $, )
+# ($Date: 1996/08/30 19:20:34 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -9,8 +9,6 @@
 ifndef PIPS_ARCH
 PIPS_ARCH=.
 endif
-
-ARCH=$(PVM_ARCH)
 
 # the RT architecture relies both on PVM and PIPS architectures,
 # because of obscure issues related to naming conventions...
@@ -51,7 +49,7 @@ endif
 #
 # PVM arch dependent settings
 
-ifeq ($(ARCH),CM5)
+ifeq ($(PVM_ARCH),CM5)
 MIMD = 1
 #FC	= f77
 #FFLAGS	= -fast -u
@@ -60,39 +58,39 @@ CMLD = cmmd-ld
 CMLD_FLAGS =
 endif
 
-ifeq ($(ARCH),PGON)
+ifeq ($(PVM_ARCH),PGON)
 MIMD = 1
 PVM_HLIB	+= -lrpc
 PVM_NLIB	+= -lnx -lrpc
 ALL_NLIBS	+= $(PVMHOST)
 endif
 
-ifeq ($(ARCH),SUN4)
+ifeq ($(PVM_ARCH),SUN4)
 NETWORK = 1
 #FC	= f77
 #FFLAGS	= -fast -u
 endif
 
-ifeq ($(ARCH),SUN4SOL2)
+ifeq ($(PVM_ARCH),SUN4SOL2)
 NETWORK = 1
 #FC	= f77
 #FFLAGS	= -fast -u
 endif
 
-ifeq ($(ARCH),SUNMP)
+ifeq ($(PVM_ARCH),SUNMP)
 NETWORK = 1
 #FC	= f77
 #FFLAGS	= -fast -u
 RUNTIME_LIBS     += -lnsl -lsocket -lthread
 endif
 
-ifeq ($(ARCH),ALPHA)
+ifeq ($(PVM_ARCH),ALPHA)
 NETWORK = 1
 #FC	= f77
 #FFLAGS	= -fast -u
 endif
 
-ifeq ($(ARCH),RS6K)
+ifeq ($(PVM_ARCH),RS6K)
 NETWORK = 1
 #FC	= xlf
 #FFLAGS	= -O2 -u
@@ -109,8 +107,8 @@ endif
 #
 # Directories... 
 
-PVM_BIN_DIR 	= $(HOME)/pvm3/bin/$(ARCH)
-PVM_LIB_DIR	= $(PVM_ROOT)/lib/$(ARCH)
+PVM_BIN_DIR 	= $(HOME)/pvm3/bin/$(PVM_ARCH)
+PVM_LIB_DIR	= $(PVM_ROOT)/lib/$(PVM_ARCH)
 PVM_INC_DIR	= $(PVM_ROOT)/include
 
 ifdef USE_PVMe
@@ -266,7 +264,7 @@ fpvm3.h:$(PVM_INC_DIR)/fpvm3.h
 param_init.m4:;	$(RT_DIR)/hpfc_generate_init -n $(TARGET) .
 
 param_init.f: param_init.m4
-	$(M4) -D PVM_ARCHITECTURE=$(ARCH) param_init.m4 > param_init.f
+	$(M4) -D PVM_ARCHITECTURE=$(PVM_ARCH) param_init.m4 > param_init.f
 
 %.o: %.f
 	$(FC) $(FFLAGS) $(FOPT) -c $< 
@@ -300,7 +298,7 @@ $(NODE):
 		$(ALL_NLIBS)
 	$(STRIP) $(NODE)
 
-ifdef ($(ARCH),CM5)
+ifdef ($(PVM_ARCH),CM5)
 $(NODE): $(HOST_OFILES)
 	$(CMLD) $(CMLD_FLAGS) \
 	   -comp $(FC) -o $(NODE) \
