@@ -67,6 +67,7 @@ void create_transform_menu()
     Menu menu;
 
     menu = xv_create(XV_NULL, MENU_COMMAND_MENU, 
+			 MENU_GEN_PIN_WINDOW, main_frame, "Transform Menu",
 		     MENU_ACTION_ITEM, PRIVATIZE_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, DISTRIBUTE_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, PARTIAL_EVAL_TRANSFORM, transform_notify,
