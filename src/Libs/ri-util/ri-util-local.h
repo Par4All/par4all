@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: ri-util-local.h,v $
+ * Revision 1.92  2003/12/22 14:59:53  nguyen
+ * Replace entity_local_name by entity_user_name to handle C
+ *
  * Revision 1.91  2003/12/18 21:40:39  nguyen
  * Replace entity_local_name to entity_user_name to handle C
  *
@@ -273,9 +276,9 @@ typedef hash_table control_mapping;
 
 /* macros */
 #define entity_an_operator_p(e,name) \
-  (strcmp(entity_local_name(e), name##_OPERATOR_NAME)==0)
+  (strcmp(entity_user_name(e), name##_OPERATOR_NAME)==0)
 #define entity_a_function_p(e,name) \
-  (strcmp(entity_local_name(e), name##_FUNCTION_NAME)==0)
+  (strcmp(entity_user_name(e), name##_FUNCTION_NAME)==0)
 
 #define ENTITY_CONVERSION_P(e,name) \
   (strcmp(entity_local_name(e), name##_GENERIC_CONVERSION_NAME)==0)
