@@ -156,7 +156,9 @@ list my_effects_filter(list l_effs, string str_filter)
   MAPL(ce, {
     effect eff = EFFECT(CAR(ce));
     reference ref = effect_reference(eff);
-    string t = effect_words_reference(ref);
+    list ls = effect_words_reference(ref);
+    string t = words_to_string(ls);
+    gen_free_string_list(ls);
     if (same_string_p(t, str_filter))
       l_flt = CONS(EFFECT, eff, l_flt);
     free(t);
