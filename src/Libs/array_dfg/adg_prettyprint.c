@@ -97,8 +97,10 @@ graph obj;
       fprintf(fp,"\nins_%d:\n", statement_number(stmt));
     }
 
-    if(exec_dom != predicate_undefined)
+    if(exec_dom != predicate_undefined) {
+      fprintf(fp, " Execution Domain:\n");
       fprint_pred(fp, exec_dom);
+    }
     else fprintf(fp, " Execution Domain: Nil\n");	/* AL 15 02 94 */
 
     su_l = vertex_successors(crt_v);
