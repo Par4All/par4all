@@ -2,6 +2,11 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.50  1998/12/18 19:51:03  irigoin
+ * Detection of PARAMETER variable used as lhs in assignment,
+ * MakeAssingInst(). Two new functions, MakeSimpleIoInst1() and
+ * MakeSimpleIoInst2(), declared to move some IO code out of gram.y.
+ *
  * Revision 1.49  1998/12/14 13:34:11  coelho
  * macro are better detected.
  *
@@ -902,7 +907,16 @@ MakeAssignInst(syntax l, expression e)
 	       }
 	   }
 	   else {
-	       FatalError("MakeAssignInst", "Unexpected syntax tag\n");
+	       if(syntax_call_p(l)) {
+		   /* FI: we stumble here when a Fortran PARAMETER is used as lhs. */
+		   user_warning("MakeAssignInst", "PARAMETER %s appears as lhs\n",
+		       entity_local_name(call_function(syntax_call(l))));
+		   ParserError("MakeAssignInst",
+			       "Illegal lhs\n");
+	       }
+	       else {
+		   FatalError("MakeAssignInst", "Unexpected syntax tag\n");
+	       }
 	   }
        }
    }
@@ -1643,6 +1657,88 @@ expression e1, e2, e3, e4;
 			    make_call(CreateIntrinsic(NameOfToken(keyword)),
 				      l)));
 }
+
+instruction 
+MakeSimpleIoInst1(int keyword, expression unit)
+{
+    instruction inst = instruction_undefined;
+    expression std, format, unite;
+    cons * lci;
+
+    switch(keyword) {
+    case TK_READ:
+    case TK_PRINT:
+	std = MakeNullaryCall(CreateIntrinsic
+			      (LIST_DIRECTED_FORMAT_NAME));
+	unite = MakeCharacterConstantExpression("UNIT=");
+	format = MakeCharacterConstantExpression("FMT=");
+
+	lci = CONS(EXPRESSION, unite,
+		   CONS(EXPRESSION, std,
+			CONS(EXPRESSION, format,
+			     CONS(EXPRESSION, unit, NULL))));
+	/* Functionally PRINT is a special case of WRITE */
+	inst = MakeIoInstA((keyword==TK_PRINT)?TK_WRITE:TK_READ,
+			 lci, NIL);
+	break;
+    case TK_WRITE:
+    case TK_OPEN:
+    case TK_CLOSE:
+    case TK_INQUIRE:
+	ParserError("Syntax",
+		    "Illegal syntax in IO statement, "
+		    "Parentheses and arguments required");
+    case TK_BACKSPACE:
+    case TK_REWIND:
+    case TK_ENDFILE:
+	unite = MakeCharacterConstantExpression("UNIT=");
+	lci = CONS(EXPRESSION, unite,
+		   CONS(EXPRESSION, unit, NULL));
+	inst = MakeIoInstA(keyword, lci, NIL);
+	break;
+    default:
+	ParserError("Syntax","Unexpected token in IO statement");
+    }
+    return inst;
+}
+
+instruction 
+MakeSimpleIoInst2(int keyword, expression f, list io_list)
+{
+    instruction inst = instruction_undefined;
+    expression std, format, unite;
+    list cil;
+
+    switch(keyword) {
+    case TK_READ:
+    case TK_PRINT:
+	std = MakeNullaryCall(CreateIntrinsic
+			      (LIST_DIRECTED_FORMAT_NAME));
+	unite = MakeCharacterConstantExpression("UNIT=");
+	format = MakeCharacterConstantExpression("FMT=");
+
+	cil = CONS(EXPRESSION, unite,
+		   CONS(EXPRESSION, std,
+			CONS(EXPRESSION, format,
+			     CONS(EXPRESSION, f, NULL))));
+	inst = MakeIoInstA((keyword==TK_PRINT)?TK_WRITE:TK_READ,
+			   cil, io_list);
+	break;
+    case TK_WRITE:
+    case TK_OPEN:
+    case TK_CLOSE:
+    case TK_INQUIRE:
+    case TK_BACKSPACE:
+    case TK_REWIND:
+    case TK_ENDFILE:
+	ParserError("Syntax",
+		    "Illegal syntax in IO statement, Parentheses are required");
+    default:
+	ParserError("Syntax","Unexpected token in IO statement");
+    }
+    return inst;
+}
+
 
 /* Are we in the declaration or in the executable part?
  * Have we seen a FORMAT statement before an executable statement?
