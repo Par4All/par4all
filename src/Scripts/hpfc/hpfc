@@ -1,16 +1,25 @@
 #! /bin/sh
 # 
 # $RCSfile: hpfc,v $ (version $Revision$)
-# $Date: 1995/04/19 11:10:15 $, 
+# $Date: 1995/04/19 15:08:27 $, 
 #
-# hpfc scripts front-end
+# hpfc scripts very front-end
+# just an easy way not to have to remember the name of some scripts.
 #
 
 script=`basename $0`
 
 usage()
 {
-  echo "usage: $script help|compile|full|clean|delete options" >&2
+  cat >&2 <<-END
+	usage: $script function [options]
+	  h|help: give some help
+	  c|comp|compile: compile
+	  f|full|demo: compile and link
+	  D|debug: compile with debug option
+	  C|clean: clean directories
+	  d|del|delete: delete hpfc directory
+	END
   exit ${1:-1}
 }
 
@@ -18,11 +27,12 @@ key=$1
 shift
 
 case $key in
-  help) usage 0 ;;
-  compile) hpfc "$@" ;;
-  full) hpfc -k full "$@" ;;
-  clean) Delete "$@" ; hpfc_del "$@" ;;
-  delete) hpfc_del "$@" ;;
+  h|help) usage 0 ;;
+  c|comp|compile) hpfc "$@" ;;
+  f|full|demo) hpfc -k full "$@" ;;
+  D|debug) hpfc -k debug "$@" ;;
+  C|clean) Delete "$@" ; hpfc_del "$@" ;;
+  d|del|delete) hpfc_del "$@" ;;
   *) usage 2 ;;
 esac
 
