@@ -8,7 +8,7 @@
 
 # Test function
 
-PIPS_CURRENT_PROGRAM=${PIPS_CURRENT_PROGRAM:-.pipsprogram}
+pips_prgm=${pips_prgm:-.pipsprogram}
 
 check () 
 { 
@@ -77,7 +77,7 @@ fi
 # Get PGM
 BAD_WORKSPACE="Unknown workspace"
 
-if [ ! -x $PIPS_CURRENT_PROGRAM ]
+if [ ! -x $pips_prgm ]
 then
   if [ -z "$OPT_PGM" ]
   then
@@ -86,8 +86,9 @@ then
   else	PGM=$OPT_PGM
   fi
 else	
-  echo sourcing $PIPS_CURRENT_PROGRAM in `pwd` >&2
-  . $PIPS_CURRENT_PROGRAM
+  echo sourcing $pips_prgm in `pwd` >&2
+  cat $pips_prgm
+  . $pips_prgm
   echo done >&2
   if [ "$OPT_PGM" ]
   then	
@@ -323,15 +324,17 @@ then
   cd ..
 fi
 
-# Update file $PIPS_CURRENT_PROGRAM
-rm -f $PIPS_CURRENT_PROGRAM
-echo PGM=$PGM >$PIPS_CURRENT_PROGRAM
+# Update file $pips_prgm
+rm -f $pips_prgm
+echo PGM=$PGM > $pips_prgm
 if [ ! -z "$MOD" ]
 then
-  echo MOD=$MOD >>$PIPS_CURRENT_PROGRAM
+  echo MOD=$MOD >> $pips_prgm
 fi
 # change mod -> convention so that only the owner uses this file
-chmod u+x $PIPS_CURRENT_PROGRAM
+chmod u+x $pips_prgm
+
+ls -al $pips_prgm
 
 #
 # that's all
