@@ -265,7 +265,7 @@ resource_text(
 /* returns the text of all required summaries
  */
 static text
-text_summary_any_effect_type(
+my_text_summary_any_effect_type(
     entity module)
 {
     text result = make_text(NIL);
@@ -286,7 +286,7 @@ text_summary_any_effect_type(
 /* returns the text of all required effects associated to statement stat
  */
 static text
-text_statement_any_effect_type(
+my_text_statement_any_effect_type(
     entity module,
     int margin,
     statement stat)
@@ -306,7 +306,7 @@ text_statement_any_effect_type(
 }
 
 static void 
-push_prettyprints(string resource_name)
+my_push_prettyprints(string resource_name)
 {
 
     if (!string_undefined_p(resource_name))
@@ -342,10 +342,10 @@ text my_get_any_effects_text(string module_name)
     debug_on("EFFECTS_DEBUG_LEVEL");
 
     /* prepare the prettyprinting */
-    init_prettyprint(text_statement_any_effect_type);
+    init_prettyprint(my_text_statement_any_effect_type);
 
     /* summary regions first */
-    MERGE_TEXTS(txt, text_summary_any_effect_type(module));
+    MERGE_TEXTS(txt, my_text_summary_any_effect_type(module));
 
     /* then code with effects, using text_statement_any_effect_type */
     MERGE_TEXTS(txt, my_text_named_module(module, module_stat));
@@ -363,7 +363,7 @@ text my_get_any_effects_text(string module_name)
 text my_get_any_effect_type_text(string module_name, string resource_name)
 {
     text txt;
-    push_prettyprints(resource_name);
+    my_push_prettyprints(resource_name);
     txt = my_get_any_effects_text(module_name);
     reset_generic_prettyprints();
     return txt;
