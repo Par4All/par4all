@@ -26,7 +26,6 @@
 
 #include "effects.h"
 
-
 /* instantiation of the dependence graph */
 typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
@@ -384,6 +383,10 @@ bool privatize_module(char *mod_name)
 	    }
 	}, load_proper_rw_effects_list( st )) ;
     }, graph_vertices( mod_graph )) ;
+
+    /* sort locals
+     */
+    sort_all_loop_locals(mod_stat);
 
     debug_off();
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
