@@ -207,6 +207,13 @@ static referenceInfo make_empty_referenceInfo()
 			     0);
 }
 
+static void free_empty_referenceInfo(referenceInfo ri)
+{
+   referenceInfo_entity(ri) = entity_undefined;
+   referenceInfo_index(ri) = reference_undefined;
+   free_referenceInfo(ri);
+}
+
 static statement make_loadsave_statement(int argc, list args, bool isLoad)
 {
    enum {
@@ -359,8 +366,8 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 	 break;
    }
 
-   free_referenceInfo(firstRef);
-   free_referenceInfo(cRef);
+   free_empty_referenceInfo(firstRef);
+   free_empty_referenceInfo(cRef);
 
    sprintf(functionName, "%s%i", funcNames[argsType][isLoad], argc);
    return call_to_statement(make_call(get_function_entity(functionName), 
@@ -576,8 +583,9 @@ static statementInfo make_simd_statement_info(int kind, opcode oc, list* args)
 	 expression e = EXPRESSION(CAR(l));
 	 
 	 //Store it in the argument's matrix
-	 ssa = simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * i];
-	 statementArgument_expression(ssa) = e;
+	 ssa = make_statementArgument(e, NIL);
+	 simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * i] = ssa;
+	 
 	 l = CDR(l);
 
 	 //Get the id of the argumet
@@ -827,7 +835,7 @@ list generate_simd_code(list/* <statementInfo> */ sil)
 	 {
 	    statement s = generate_load_statement(ssi, i);
 
-	    if (s != NULL)
+	    if (s != statement_undefined)
 	       sl = CDR(sl) = CONS(STATEMENT, s, NIL);
 	 }
 
