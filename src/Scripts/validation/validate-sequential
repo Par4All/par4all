@@ -242,7 +242,9 @@ make_diff()
   name=$2
   module=$3
 
-  refresult=$aspect/$name.result/$module
+  resdir=$aspect/$name.result
+  test -d $resdir || mkdir $resdir
+  refresult=$resdir/$module
   test -f $refresult.$PIPS_ARCH && refresult=$refresult.$PIPS_ARCH
 
   if [ ! -f $refresult ] 
