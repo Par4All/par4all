@@ -5,16 +5,16 @@
 
 #include <stdio.h>
 
-#include "genC.h"
-#include "ri.h"
-#include "ri-util.h"
-
-#include "misc.h"
-
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
+
+#include "genC.h"
+#include "ri.h"
+
+#include "misc.h"
+#include "ri-util.h"
 
 #include "transformer.h"
 
