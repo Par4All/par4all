@@ -160,6 +160,11 @@
   * $Id$
   *
   * $Log: value.c,v $
+  * Revision 1.21  2001/07/24 13:10:42  irigoin
+  * Bug fix in make_local_value_entity(): types inherited by temporary values
+  * were wrong due to a "specificity" of type_equal_p() which returns true for
+  * strings even when the lenghts are different.
+  *
   * Revision 1.20  2001/07/19 18:13:58  irigoin
   * Lots of modifications to support the new multitype analysis plus temporary
   * variables. Reformatting of almost all functions.
@@ -360,7 +365,14 @@ static entity make_local_value_entity(int n, int nature, type t)
     free(s);
     /* Another option might be to undefine types when counters are
        reset? */
+    /* It is likely to take longer to compare types than to free one and
+       allocate one... */
     if(!type_equal_p(entity_type(v), t)) {
+      free_type(entity_type(v));
+      entity_type(v) = copy_type(t);
+    }
+    else if(basic_string_p(variable_basic(type_variable(entity_type(v))))) {
+      /* The previous test always returns TRUE for strings */
       free_type(entity_type(v));
       entity_type(v) = copy_type(t);
     }
