@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: defines-local.h,v $ ($Date: 1994/03/16 12:01:59 $, ) version $Revision$, got on %D%, %T%
+ * $RCSfile: defines-local.h,v $ ($Date: 1994/03/25 17:46:01 $, ) version $Revision$, got on %D%, %T%
  * $Id$
  */
 
@@ -18,16 +18,11 @@
 #define TEMPLATEV     12346
 #define TSHIFTV       12347
 
-/*
-#define expression_normalized_p(e) (expression_normalized(e) != normalized_undefined)
-#define expression_undefined_p(e) ((e) == expression_undefined)
-#define normalized_undefined_p(e) ((e) == normalized_undefined)
-#define statement_undefined_p(e) ((e) == statement_undefined)
-#define alignment_undefined_p(e) ((e) == alignment_undefined)
-*/
-
 #define entity_variable_p(e) (type_variable_p(entity_type(e)))
 #define statement_block_p(stat) instruction_block_p(statement_instruction(stat))
+
+#define effect_system(e) \
+  (predicate_system(transformer_relation(effect_context(e))))
 
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
