@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS Stuff:
-# $RCSfile: validate-sequential,v $ ($Date: 1994/06/17 08:33:12 $, ) version $Revision$,
+# $RCSfile: validate-sequential,v $ ($Date: 1994/06/17 13:21:48 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -108,7 +108,8 @@ which_pips()
 {
   if [ -x pips ]
   then 
-    echo "$PWD/`ls -F pips`"
+    # if there are several pips*, it won't work...
+    echo $PWD/`ls -F pips`
   else
     type pips | sed 's,^pips is ,,'
   fi
