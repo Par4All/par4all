@@ -293,7 +293,7 @@ instruction: inst_spec
 	| { check_first_statement();} inst_exec
 	    { 
 		if ($2 != instruction_undefined)
-			LinkInstToCurrentBlock($2);
+			LinkInstToCurrentBlock($2, TRUE);
 	    }
 	;
 
