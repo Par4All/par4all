@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: TPips.java,v $
+ * Revision 1.6  1998/10/16 13:58:34  coelho
+ * import fixed.
+ *
  * Revision 1.5  1998/07/03 08:14:37  coelho
  * a little bit cleaner.
  *
@@ -22,10 +25,12 @@
 package JPips;
 
 import java.lang.*;
+
 import java.util.*;
 import java.io.*;
-import java.awt.swing.*;
 import java.applet.*;
+
+import com.sun.java.swing.*;
 
 import JPips.Pawt.*;
 
@@ -37,8 +42,6 @@ import JPips.Pawt.*;
 public class TPips 
   implements Requestable
 {
-
-
   public	Resetable	jpips;
   public	Process		tpips;		//tpips process
   public	Thread		listener,	//listener instance
