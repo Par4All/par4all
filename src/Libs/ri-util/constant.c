@@ -146,6 +146,13 @@ string s;
     return(MakeNullaryCall(MakeConstant(s, is_basic_int)));
 }
 
+expression make_constant_boolean_expression(bool b)
+{
+    return MakeNullaryCall
+        (MakeConstant(b ? TRUE_OPERATOR_NAME : FALSE_OPERATOR_NAME,
+		      is_basic_logical));
+}
+
 expression int_expr(i)
 int i;
 {
