@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/30 16:49:12 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/10 09:19:10 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -132,8 +132,6 @@ int i;
 list la;
 distribution dist;
 {
-    alignment al=NULL;
-
     if (style_none_p(distribution_style(dist))) return(FALSE);
 
     /*
@@ -143,12 +141,11 @@ distribution dist;
     MAPL(ca,
      {
 	 alignment ali=ALIGNMENT(CAR(ca));
-
-	 if(alignment_templatedim(ali)==i) al=ali;
+	 if(alignment_templatedim(ali)==i) return(FALSE);
      },
 	 la);
 
-    return(al==NULL);
+    return(TRUE);
 }
 
 /*
