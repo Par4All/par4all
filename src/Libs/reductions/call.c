@@ -1,5 +1,5 @@
 /* $RCSfile: call.c,v $ (version $Revision$)
- * $Date: 1996/06/22 10:32:12 $, 
+ * $Date: 1996/12/18 09:04:16 $, 
  *
  * Fabien COELHO
  */
@@ -22,10 +22,9 @@ summary_to_proper_reference(
     call c,
     reference r)
 {
-    effect e = make_effect(r, /* persistent! */
+    effect e = make_simple_effect(r, /* persistent! */
 			   make_action(is_action_write, UU),
-			   make_approximation(is_approximation_must, UU),
-			   make_transformer(NIL, make_predicate(NULL)));
+			   make_approximation(is_approximation_must, UU));
     list /* of effect */ lef, /* of reference */ lref = NIL;
     
     pips_debug(7, "reference to %s\n", entity_name(reference_variable(r)));
