@@ -427,7 +427,9 @@ int ofl_ctrl;
  * an Hermite form
  * 
  */
-Psysteme sc_common_projection_convex_hull(Psysteme s1, Psysteme s2)
+Psysteme
+sc_common_projection_convex_hull_with_base_ordering
+(Psysteme s1, Psysteme s2, void (*sort_base_func)(Pbase *))
 {
 #define ifdebug if(FALSE)
     Psysteme s0 = sc_new();
@@ -533,6 +535,7 @@ Psysteme sc_common_projection_convex_hull(Psysteme s1, Psysteme s2)
 	sc_creer_base(s1p);
 	sc_creer_base(s2p);
 	b = base_union(sc_base(s1p), sc_base(s2p));
+	sort_base_func(&b);
 	d = base_dimension(b);
 	vect_rm(sc_base(s1p));
 	vect_rm(sc_base(s2p));
@@ -606,4 +609,17 @@ Psysteme sc_common_projection_convex_hull(Psysteme s1, Psysteme s2)
     /* */
 
     return hp;
+}
+
+void
+no_base_sort(Pbase *pbase)
+{
+    return;
+}
+
+Psysteme 
+sc_common_projection_convex_hull(Psysteme s1, Psysteme s2)
+{
+    return
+	(sc_common_projection_convex_hull_with_base_ordering(s1, s2, no_base_sort));
 }
