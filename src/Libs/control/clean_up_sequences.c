@@ -5,10 +5,10 @@
 
    */
 
-/* 	%A% ($Date: 1997/02/05 00:36:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/25 23:12:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 1997/02/05 00:36:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_clean_up_sequences[] = "%A% ($Date: 1997/04/25 23:12:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -105,14 +105,14 @@ clean_up_sequences_rewrite(statement s)
 	    ifdebug(5) {
 		pips_debug(5,
 		       "Statement at entry:\n");
-print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+		print_statement(s);
 	    }
 
 	    MAP(STATEMENT, st,
 		{
 		    ifdebug(9) {
 			fprintf(stderr, "[ The current statement in the sequence: ]\n");
-			print_text(stderr, text_statement(get_current_module_entity(), 0, st));
+			print_statement(st);
 		    }
 
 		    if (empty_statement_or_labelless_continue_p(st)) {
@@ -170,7 +170,10 @@ print_text(stderr, text_statement(get_current_module_entity(), 0, s));
 		    }
 		},
 		sequence_statements(instruction_sequence(i)));
-	    gen_free_list(delete_sts);
+	    
+	    /* Remove the list of unused statements with the
+               statemenents them-self: */
+	    gen_full_free_list(delete_sts);
 
 	    if (the_comments != NULL) {
 		/* We have a pending comment we were not able to
@@ -182,6 +185,9 @@ print_text(stderr, text_statement(get_current_module_entity(), 0, s));
 		pips_debug(3, "CONTINUE created to add a pending comment...\n");
 	    }
 
+	    /* Remove the old list of statements without the
+               statements: */
+	    gen_free_list(sequence_statements(instruction_sequence(i)));
 	    sequence_statements(instruction_sequence(i)) = useful_sts;
        
 	    if (gen_length(useful_sts) == 1) {
@@ -196,7 +202,7 @@ print_text(stderr, text_statement(get_current_module_entity(), 0, s));
 		statement_comments(st) = string_undefined;
 		statement_instruction(s) = statement_instruction(st);
 		statement_instruction(st) = instruction_undefined;
-		/* Discard the old instruction: */
+		/* Discard the old statement: */
 		free_instruction(i);
 		pips_debug(3, "Sequence with 1 statement replaced by 1 statement...\n");
 		clean_up_1_statement_sequence++;
@@ -205,7 +211,7 @@ print_text(stderr, text_statement(get_current_module_entity(), 0, s));
 	    ifdebug(5) {
 		pips_debug(5,
 			   "Statement at exit:\n");
-		print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+		print_statement(s);
 	    }
 	    break;
 	}
