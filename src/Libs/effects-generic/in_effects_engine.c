@@ -141,10 +141,28 @@ r_in_effects_of_sequence(list l_inst)
 	    }
 
 	t1 = (*load_transformer_func)(first_statement);    
+	
+	/* Nga Nguyen, 25/04/2002. Bug found in fct.f about the transformer of loops
+	   Preconditions added to regions take into account the loop exit preconditions 
+	   but the corresponding loop transformers do not. This may give false results
+	   when applying transformers to regions. So we have to add loop exit conditions
+	   to the transformers. */
+	
+	//	if (statement_loop_p(first_statement))
+	// {
+	//  loop l = statement_loop(first_statement);
+	//   t1 = (*add_loop_exit_condition_func)(t1,l);
+	// }
+	
 	rb_lin = r_in_effects_of_sequence(remaining_block);
 	    
 	(*effects_transformer_composition_op)(rb_lin, t1); 
-	    
+	
+	/* Nga Nguyen, 25/04/2002.rb_lin may contain regions with infeasible system {0==-1}
+	   => remove them from rb_lin*/
+
+	// rb_lin = (*remove_effects_with_infeasible_system_func)(rb_lin);
+	
 	/* IN(block) = (IN(rest_of_block) - W(S1)) U IN(S1) */
 	l_in = (*effects_union_op)(
 	    s1_lin,
@@ -272,7 +290,7 @@ static void in_effects_of_loop(loop l)
     
     range r;
     statement b;
-    entity i, i_prime, new_i;
+    entity i, i_prime, new_i = entity_undefined;
     
     list lbody_in; /* in regions of the loop body */
     list global_in, global_in_read_only;/* in regions of non local variables */
@@ -401,10 +419,11 @@ static void in_effects_of_loop(loop l)
 	    (*effects_loop_normalize_func)(global_in, i, r,
 					   &new_i, range_descriptor, FALSE);
 	    
-	    if (!same_entity_p(i,new_i))
-		add_intermediate_value(new_i);
-	    i = new_i;
-  
+	    if (!entity_undefined_p(new_i) && !same_entity_p(i,new_i)) {
+	      add_intermediate_value(new_i);
+	      i = new_i; 
+	    }
+
        	    /* COMPUTATION OF IN EFFECTS. We must remove the effects written 
 	     * in previous iterations i.e. IN(i) - U_i'(i'<i)[W(i')] for a 
 	     * positive increment, and  IN(i) - U_i'(i < i')[W(i')]
@@ -511,6 +530,34 @@ in_effects_of_external(entity func, list real_args)
     return le;
 }
 
+static bool written_before_read_p(entity ent,list args)
+{
+  MAP(EXPRESSION,exp,
+  {
+    /* an argument in a READ statement can be a reference or an implied-DO call*/
+    list l = expression_to_reference_list(exp,NIL);
+    MAP(REFERENCE,ref,
+    {
+      entity e = reference_variable(ref);
+      if (same_entity_p(e,ent))
+	{
+	  /* the variable is in the reference list, check if it is written or read*/
+	  if (expression_reference_p(exp))
+	    {
+	      reference r = expression_reference(exp);
+	      if (reference_scalar_p(r))
+		return TRUE;
+	      return FALSE;
+	    }
+	  return FALSE;
+	}
+    },l);    
+  },args);
+
+  return FALSE;
+}
+
+
 static void 
 in_effects_of_call(call c)
 {
@@ -541,8 +588,29 @@ in_effects_of_call(call c)
 	ifdebug(2){
 	    pips_debug(2, "R/W effects: \n");
 	    (*effects_prettyprint_func)(l_in);
-	}	
+	}
+	
 	l_in = effects_read_effects_dup(l_in);
+	
+	/* Nga Nguyen 25/04/2002 : what about READ *,NDIM,(LSIZE(N), N=1,NDIM) ? 
+	   Since NDIM is written before read => no IN effect on NDIM.
+	   
+	   So I add tests for the READ statement case. But this is only true for scalar variables :-)
+
+	   READ *,M,N,L,A(M*N),B(A(L)) ==> MAY-IN A ???*/
+	
+	if (strcmp(entity_local_name(e),READ_FUNCTION_NAME)==0)
+	  {
+	    list args = call_arguments(c);
+	    pips_debug(5, " READ function\n");
+	    MAP(EFFECT,reg,
+	    {
+	      entity ent = effect_entity(reg);
+	      if (entity_scalar_p(ent) && written_before_read_p(ent,args)) 
+		gen_remove(&l_in,reg);
+	    },l_in);
+	  }
+
 	debug_consistent(l_in);
         break;
 
