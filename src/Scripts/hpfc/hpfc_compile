@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/09/13 17:32:26 $, 
+# $Date: 1996/09/13 17:45:05 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -152,16 +152,15 @@ dir=${HPFC_RUNTIME:-${PIPS_ROOT}/Share}
 
 if [ "$FAKES" ] 
 then
-   $debug "adding needed fake file"
-   if [ -f $dir/hpfc_stubs.direct ]
-   then 
-      fake="$dir/hpfc_stubs.direct"
-   else
-      fake="$dir/hpfc_stubs.f"
-   fi
-   HPFFILES="$HPFFILES $fake"
+    $debug "adding needed fake file"
+    for d in ${HPFC_RUNTIME} ${PIPS_ROOT}/Share ; do
+	for f in hpfc_stubs.direct hpfc_stubs.f ; do
+	    [ -f $d/$f -a ! "$fake" ] && fake=$d/$f ;
+	done
+    done
+    HPFFILES="$HPFFILES $fake"
 else
-   $debug "no fake file needed"
+    $debug "no fake file needed"
 fi
 
 $verbose "applying hpfc on file(s):"
