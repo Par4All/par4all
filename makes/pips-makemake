@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/04 11:44:40 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/04 13:19:42 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -16,8 +16,7 @@
 #      options (ie. with options -lDa: all libraries in development)
 #
 # Remi Triolet, Bruno Baron
-#
-# Refonte : Fabien Coelho, 08/95
+# Fabien Coelho, 08/95
 #
 
 usage()
@@ -61,12 +60,12 @@ do
   
   [ -f $CONFIG_FILE ] || usage 5 "no $CONFIG_FILE in $dir" ;
 
-  echo make $MAKEFILE in $dir
-
   # needed because of f.. - in directory names...
-  dirnom=`basename \`pwd\``
-  dirname=`echo $dirnom | tr '-' '_'`
+  dir_real_name=`basename \`pwd\``
+  dir_simple_name=`echo $dir_real_name | tr '-' '_'`
     
+  echo make $DIRTYPE $MAKEFILE in $dir_real_name
+
   [ -f $MAKEFILE ] && 
   {
     rm -f $MAKEFILE.old ;
@@ -99,23 +98,43 @@ do
 # the consequences of using it or for whether it serves any particular
 # purpose or works at all, unless he says so in writing.
 #
-# defaults, may be overwritten by the $CONFIG_FILE content:
+# DEFAULTS, may be overwritten by the $CONFIG_FILE content.
 #
-TARGET = $dirnom
+TARGET=		$dir_real_name
 TARGETDIR=	$(SRCDIR)/$DIRTYPE/$(TARGET)
+# (obsolete?)
+MAIN=		main
 #
-%
-
-cat $CONFIG_FILE >> $MAKEFILE 
-
-cat >> $MAKEFILE <<%
+AR=             $(PIPS_AR)
+ARFLAGS=        $(PIPS_ARFLAGS)
+CC=             $(PIPS_CC)
+CFLAGS=         $(PIPS_CFLAGS)
+CPPFLAGS=       $(PIPS_CPPFLAGS)
+LD=             $(PIPS_LD)
+LDFLAGS=        $(PIPS_LDFLAGS)
+LEX=            $(PIPS_LEX)
+LFLAGS=         $(PIPS_LFLAGS)
+LINT=           $(PIPS_LINT)
+LINTFLAGS=      $(PIPS_LINTFLAGS)
+YACC=           $(PIPS_YACC)
+YFLAGS=         $(PIPS_YFLAGS)
+# 
 #
 CONFIG_FILE=	$CONFIG_FILE
 MAKEFILE=	$MAKEFILE
 #
-
+# to override sun's default rule
 .SCCS_GET:
 
+#
+# begin of $CONFIG_FILE inclusion
+#
+%
+
+cat >> $MAKEFILE $CONFIG_FILE <<%
+#
+# end of $CONFIG_FILE inclusion
+#
 %
 
 [ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] && cat >> $MAKEFILE <<% 
@@ -338,8 +357,8 @@ $(TARGET)-local.h:
 # without having to touch the sources.
 header:
 	{ \\
-	echo "#ifndef ${dirname}_header_included" ;\\
-	echo "#define ${dirname}_header_included" ;\\
+	echo "#ifndef ${dir_simple_name}_header_included" ;\\
+	echo "#define ${dir_simple_name}_header_included" ;\\
 	cat $(TARGET)-local.h ;\\
 	$(PROTOIZE)  $(INC_CFILES) \\
 		| sed 's|,[ 	]*/\*\.\.\.\*/|, ...|g;s,int .*__builtin_va_alist.*\([,\)]\),\1,' ;\\
