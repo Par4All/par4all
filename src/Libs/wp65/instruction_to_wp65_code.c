@@ -167,13 +167,18 @@ instruction_to_wp65_code(entity module, list l, graph dg,int pn,int bn,int ls,in
     entity cme;
     debug_on("WP65_DEBUG_LEVEL");
 
-   if ((cme = get_current_module_entity()) == entity_undefined) 
-	set_current_module_entity(local_name_to_top_level_entity(module_local_name(module)));  
-    if ((cms = get_current_module_statement()) == statement_undefined) 
-	set_current_module_statement( (statement)
-				     db_get_memory_resource(DBR_CODE, 
-							    module_local_name(module),
-							    TRUE) ); 
+    /* FI: the semantics has been changed: the next two get_xxx() cannot/should not return
+     * something undefined.
+     */
+    /* if ((cme = get_current_module_entity()) == entity_undefined)  */
+    /* FI: already done somewhere else */
+    /* set_current_module_entity(local_name_to_top_level_entity(module_local_name(module)));  */
+    /* if ((cms = get_current_module_statement()) == statement_undefined) */
+    /* FI: shouldn't the current statement be retrieved at the same time as the current module? */
+    set_current_module_statement( (statement)
+				  db_get_memory_resource(DBR_CODE, 
+							 module_local_name(module),
+							 TRUE) ); 
     mod_stat = get_current_module_statement();
     MAPL(pm,{
 	statement s1 = STATEMENT(CAR(pm));  
@@ -229,7 +234,7 @@ instruction_to_wp65_code(entity module, list l, graph dg,int pn,int bn,int ls,in
 	    (void) fprintf(stderr,
 			   "instruction_to_wp65_code-instruction_end \n");
     },l);
-    reset_current_module_entity(); 
+    /* reset_current_module_entity(); */
     reset_current_module_statement(); 
     debug_off();
 }
