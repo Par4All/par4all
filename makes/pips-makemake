@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.307  1997/08/18 13:11:46  coelho
+# fixes for main_ in Production/Passes.
+#
 # Revision 1.306  1997/08/18 12:39:03  coelho
 # added clean of fpips in libs.
 #
@@ -509,6 +512,9 @@ quick-install: .runable
 
 $verbose "common to Libs and Passes"
 
+btrg=''
+[ $DIRTYPE = 'Passes' ] && btrg='\$(BIN_TARGET)'
+
 [ $DIRTYPE = 'Libs' -o $DIRTYPE = 'Passes' ] && 
 cat >> $MAKEFILE <<% 
 #
@@ -521,13 +527,10 @@ INC_TARGET=	\$(TARGET).h
 #
 INSTALL_INC+=	\$(INC_TARGET)
 INSTALL_LIB+=	\$(LIB_TARGET)
-INSTALL_BIN+=	`if [ $DIRTYPE = 'Passes' ] ; then echo '\$(BIN_TARGET)' ; fi`
+INSTALL_BIN+=	${btrg}
 #
 
 .PRECIOUS: \$(LIB_TARGET) \$(BIN_TARGET)
-
-# .INIT is a SUN extention...
-# .INIT: check_os
 
 check_install:
 	@if test \`echo *.a | wc -w\` -gt 1 ; \\
@@ -722,10 +725,13 @@ cat >> $MAKEFILE <<%
 
 \$(PIPS_ROOT)/Bin/\$(ARCH):; mkdir \$@
 
+\$(ROOT)/Lib/\$(MAIN): \$(MAIN) 
+	@\$(INSTALL) \$(ROOT)/Lib/\$(ARCH) \$(MAIN)
+
 \$(PIPS_ROOT)/Bin/\$(BIN_TARGET): \$(BIN_TARGET) \$(PIPS_ROOT)/Bin/\$(ARCH)
 	@\$(INSTALL) -x \$(PIPS_ROOT)/Bin/\$(ARCH) \$(BIN_TARGET)
 
-recompile: \$(PIPS_ROOT)/Bin/\$(BIN_TARGET)
+recompile: \$(ROOT)/Lib/\$(MAIN) \$(PIPS_ROOT)/Bin/\$(BIN_TARGET)
 
 %
 
