@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/04/02 15:24:02 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/07/18 19:15:55 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -10,8 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
-#include "assert.h"
 
+#include "assert.h"
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
@@ -67,15 +67,18 @@ Pvecteur v;
     
     /*   constant
      */
-    if (vect_coeff(TCST, v)!=0) cost += ADD_COST;
+    if (value_notzero_p(vect_coeff(TCST, v)))
+	cost += ADD_COST;
 
     /*   other variables
      */
     for (b=others_for_compare; b!=(Pvecteur)NULL; b=b->succ)
     {
-	val = abs(vect_coeff(var_of(b), v));
+	val = vect_coeff(var_of(b), v);
+	val = value_abs(val);
 
-	if (val!=0) cost += val==1 ? ADD_COST : (MUL_COST+ADD_COST) ;
+	if (value_notzero_p(val))
+	    cost+=value_one_p(val)? ADD_COST: (MUL_COST+ADD_COST);
     }
 
     return(cost);
@@ -109,15 +112,20 @@ Pvecteur v;
 
 #define RETURN_HARDER(b) return(complex_for_compare ? (b) : -(b))
 #define RETURN_ORDER(b) return(inner_for_compare ? (b) : -(b))
+#define same_sign_p(v,w) ((value_negz_p(v) && value_negz_p(w)) || \
+			  (value_posz_p(v) && value_posz_p(w)))
 
+/* returns -1: c1<c2, 0: c1==c2, +1: c1>c2
+ */
 static int compare_the_constraints(pc1, pc2)
 Pcontrainte *pc1, *pc2;
 {
     Pvecteur
 	v1 = (*pc1)->vecteur,
 	v2 = (*pc2)->vecteur;
-    int null_1, null_2, i, irank=0, cost_1, cost_2, val_p=0;
-    Value val_1, val_2, val=0;
+    int null_1, null_2, i, irank=0, cost_1, cost_2;
+    Value val_1=VALUE_ZERO, val_2=VALUE_ZERO, 
+          val=VALUE_ZERO, val_p=VALUE_ZERO;
     Pbase b, high=NULL;
 
     /*  for each inner first indexes,
@@ -126,24 +134,28 @@ Pcontrainte *pc1, *pc2;
      */
     for (i=1, b=rbase_for_compare; !BASE_NULLE_P(b); i++, b=b->succ)
     {
-	val_1 = vect_coeff(var_of(b), v1), null_1 = val_1==0,
-	val_2 = vect_coeff(var_of(b), v2), null_2 = val_2==0;
+	val_1 = vect_coeff(var_of(b), v1), null_1 = value_zero_p(val_1),
+	val_2 = vect_coeff(var_of(b), v2), null_2 = value_zero_p(val_2);
 
-	if (irank==0 && val_1*val_2<=0)
-	    RETURN_ORDER(val_1<0 && val_2<0 ? val_2-val_1 : val_1-val_2);
+	if (irank==0 && same_sign_p(val_1,val_2))
+	    RETURN_ORDER(value_neg_p(val_1) && value_neg_p(val_2)? 
+			 value_compare(val_2,val_1): 
+			 value_compare(val_1,val_2));
 
 	if (null_1 ^ null_2) 
 	    if (irank==0)
-		RETURN_ORDER(null_1-null_2);
+		RETURN_ORDER(value_compare(null_1,null_2));
 	    else
-		RETURN_HARDER(null_1-null_2);
+		RETURN_HARDER(value_compare(null_1,null_2));
 
 	if (irank==0 && (!null_1||!null_2)) 
 	    val=val_1, val_p=val_2, irank=i, high=b;
     }
 
-    if (val_p!=val)
-	RETURN_HARDER(val_1<0 && val_2<0 ? val_2-val_1 : val_1-val_2);
+    if (value_ne(val_p,val))
+	RETURN_HARDER(value_neg_p(val_1) && value_neg_p(val_2)? 
+		      value_compare(val_2,val_1): 
+		      value_compare(val_1,val_2));
     
     /*   constant operations
      */
@@ -159,8 +171,10 @@ Pcontrainte *pc1, *pc2;
 	val_1 = vect_coeff(var_of(b), v1),
 	val_2 = vect_coeff(var_of(b), v2);
 	
-	if (val_1!=val_2) 
-	    RETURN_HARDER(val_1<0 && val_2<0 ? val_1-val_2 : val_2-val_1);
+	if (value_ne(val_1,val_2))
+	    RETURN_HARDER(value_neg_p(val_1) && value_neg_p(val_2)? 
+			  value_compare(val_1,val_2): 
+			  value_compare(val_2,val_1));
     }
 
     /*   do it for the for the parameters
@@ -170,7 +184,8 @@ Pcontrainte *pc1, *pc2;
 	val_1 = vect_coeff(var_of(b), v1),
 	val_2 = vect_coeff(var_of(b), v2);
 	
-	if (val_1!=val_2) RETURN_HARDER(val_2-val_1);
+	if (value_ne(val_1,val_2))
+	    RETURN_HARDER(value_compare(val_2,val_1));
     }
     
     /*   at last the constant
@@ -178,7 +193,9 @@ Pcontrainte *pc1, *pc2;
     val_1 = vect_coeff(TCST, v1),
     val_2 = vect_coeff(TCST, v2);
 
-    RETURN_HARDER(val>0 ? val_2-val_1 : val_1-val_2);
+    RETURN_HARDER(value_pos_p(val)? 
+		  value_compare(val_2,val_1): 
+		  value_compare(val_1,val_2));
 }
 
 static int compare_the_constraints_debug(pc1, pc2)
@@ -263,8 +280,10 @@ int info[][2];
 	tc[i] = pc;
 	if (!BASE_NULLE_P(sort_base))
 	{
+	    Value v;
 	    phrank = highest_rank_pvector(pc->vecteur, sort_base, &rank);
-	    info[rank==-1?0:rank][rank==-1?0:(val_of(phrank)>0?1:0)]++;
+	    v = val_of(phrank);
+	    info[rank==-1?0:rank][rank==-1?0:value_pos_p(v)]++;
 	}
     }
     
