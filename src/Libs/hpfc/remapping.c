@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/04/21 10:28:17 $, ) 
+ * ($Date: 1995/04/21 14:50:08 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -24,16 +24,9 @@ entity src, trg;
 	s_equ = generate_system_for_equal_variables
 	    (ndim, get_ith_array_dummy, get_ith_array_prime);
     
-    ifdebug(6)
-    {
-	fprintf(stderr, "[generate_remapping_system]\n");
-	fprintf(stderr, "source %s:\n", entity_name(src));
-	syst_debug(s_src);
-	fprintf(stderr,	"target %s:\n", entity_name(trg));
-	syst_debug(s_trg);
-	fprintf(stderr, "link:\n");
-	syst_debug(s_equ);
-    }
+    DEBUG_SYST(6, concatenate("source ", entity_name(src), NULL), s_src);
+    DEBUG_SYST(6, concatenate("target ", entity_name(trg), NULL), s_trg);
+    DEBUG_SYST(6, "link", s_equ);
 
     result = sc_append(result, s_src), sc_rm(s_src);
     result = sc_append(result, s_trg), sc_rm(s_trg);
@@ -295,9 +288,7 @@ list /* of entities */ l, lp, ll, /* of expressions */ ld;
 				      CONS(STATEMENT, recv,
 					   NIL)));
     
-    ifdebug(3)
-	fprintf(stderr, "[generate_remapping_code] result:\n"),
-	print_statement(result);
+    DEBUG_STAT(3, "result", result)l
     
     return(result);
 }
@@ -321,22 +312,14 @@ entity src, trg;
     gen_free_list(ll);
     scanners = gen_nconc(lo, left);
 
-    ifdebug(4)
-    {
-	fprintf(stderr, "[hpf_remapping] cleaned system:\n"); syst_debug(p);
-	fprintf(stderr, "scanners: "); fprint_entity_list(stderr, scanners);
-	fprintf(stderr, "\n");
-    }
+    DEBUG_SYST(4, "cleaned system", p);
+    DEBUG_ELST(4, "scanners", scanners);
 
     hpfc_algorithm_row_echelon(p, scanners, &proc, &enume);
+    sc_rm(p);
 
-    /* sc_rm(p); */ 
-
-    ifdebug(3)
-    {
-	fprintf(stderr, "[hpf_remapping]\nproc:\n"); syst_debug(proc);
-	fprintf(stderr, "enume:\n"); syst_debug(enume);
-    }
+    DEBUG_SYST(3, "proc", proc);
+    DEBUG_SYST(3, "enum", enume);
 
     s = generate_remapping_code(src, trg, proc, enume, l, lp, scanners, lddc);
     statement_comments(s) =
