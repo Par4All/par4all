@@ -55,10 +55,14 @@ Pvecteur v1, v2;
 {
     Value result = VALUE_ZERO;
 
-    if(v2!=NULL)
-	for(; v1!=NULL; v1 = v1->succ)
-	    value_add(result,
-		      value_mult(val_of(v1),vect_coeff(var_of(v1),v2)));
+    if(v2==NULL) return result;
+
+    for(; v1!=NULL; v1 = v1->succ)
+    {
+	Value tmp = vect_coeff(var_of(v1),v2);
+	value_prod(tmp, val_of(v1));
+	value_add(result, tmp);
+    }
 
     return result;
 }
@@ -436,13 +440,23 @@ Pvecteur v1,v2;
 	c2 = vect_coeff(var_of(v1),v2);
 	prop = 1;
 
-	for (t1 = v1->succ; (t1!=NULL) && (prop != 0); t1=t1->succ)
-	    prop = value_eq(value_mult(c2,val_of(t1)),
-			    value_mult(c1,vect_coeff(var_of(t1),v2)));
+	for (t1 = v1->succ; (t1!=NULL) && (prop); t1=t1->succ)
+	{
+	    Value tmp1 = vect_coeff(var_of(t1),v2), tmp2;
+
+	    value_prod(tmp1,c1);
+	    tmp2 = value_mult(c2,val_of(t1));
+	    prop = value_eq(tmp1,tmp2);
+	}
 
 	for (t2 = v2; (t2!=NULL) && (prop != 0);t2=t2->succ) 
-	    prop = value_eq(value_mult(c1,val_of(t2)),
-			    value_mult(c2,vect_coeff(var_of(t2),v1)));
+	{
+	    Value tmp1 = vect_coeff(var_of(t2),v1), tmp2;
+
+	    value_prod(tmp1,c2);
+	    tmp2 = value_mult(c1,val_of(t2));
+	    prop = value_eq(tmp1,tmp2);
+	}
 
 	if(prop!=0)
 	    if (value_pos_p(value_mult(c1,c2)))
