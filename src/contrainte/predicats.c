@@ -14,6 +14,9 @@
 /* boolean eq_smg(Pcontrainte c1, Pcontrainte c2):
  * comparaison des coefficients de deux contraintes pour savoir si elles ont le
  * meme membre gauche.
+ *
+ * Note: this works for inequalities. Similar equations may differ
+ *       by a factor of -1.
  */
 boolean eq_smg(c1,c2)
 Pcontrainte c1,c2;
@@ -26,6 +29,25 @@ Pcontrainte c1,c2;
 	result = FALSE;
     else
 	result = vect_equal_except(c1->vecteur,c2->vecteur,TCST);
+
+    return result;
+}
+
+/* boolean inequalities_opposite_p(Pcontrainte c1, Pcontrainte c2):
+ * True if the non-constant part of c1 is the opposite of
+ * the non-constant part of c2.
+ */
+boolean inequalities_opposite_p(c1,c2)
+Pcontrainte c1,c2;
+{
+    boolean result;
+
+    if(c1==NULL && c2==NULL)
+	result = TRUE;
+    else if(c1==NULL || c2==NULL)
+	result = FALSE;
+    else
+	result = vect_opposite_except(c1->vecteur,c2->vecteur,TCST);
 
     return result;
 }
