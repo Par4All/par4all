@@ -170,6 +170,11 @@ sentence s;
     }
 }
 
+void dump_sentence(sentence s)
+{
+    print_sentence(stderr, s);
+}
+
 void print_text(fd, t)
 FILE *fd;
 text t;
@@ -177,6 +182,14 @@ text t;
     MAPL(cs, 
 	 print_sentence(fd, SENTENCE(CAR(cs))), 
 	 text_sentences(t));
+}
+
+/* FI: print_text() should be fprint_text() and dump_text(), print_text() */
+
+void dump_text(t)
+text t;
+{
+    print_text(stderr, t);
 }
 
 string words_to_string(lw)
@@ -197,7 +210,12 @@ cons *lw;
     return(strdup(buffer));
 }
 
+void dump_words(list lw)
+{
+    print_words(stderr, lw);
+}
 
+
 void print_words(fd, lw)
 FILE *fd;
 cons *lw;
