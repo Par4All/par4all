@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1996/07/27 11:24:48 $, 
+ * $Date: 1996/07/27 11:51:27 $, 
  */
 
 #ifndef _STDARG_H
@@ -11,6 +11,8 @@
 typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 
 #define ifdebug(l) if(the_current_debug_level>=(l))
+
+#define pips_unknown_function "Unknown Function Name"
 
 /* these macros use the GNU extensions that allow to know the 
  * function name thru the special __FUNCTION__ macro. Also variable
@@ -41,9 +43,10 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 		   __FUNCTION__ , __FILE__ , __LINE__ , what); \
     pips_user_error("this is a USER ERROR, I guess\n");}
 #else
-#define not_known "Unknown Name"
-#define debug_on(env) debug_on_function(env, not_known, __FILE__, __LINE__)
-#define debug_off() debug_off_function(not_known, __FILE__, __LINE__)
+#define debug_on(env) \
+  debug_on_function(env, pips_unknown_function, __FILE__, __LINE__)
+#define debug_off() \
+  debug_off_function(pips_unknown_function, __FILE__, __LINE__)
 #define pips_debug pips_debug_function
 #define pips_user_warning pips_user_warning_function
 #define pips_user_error pips_user_error_function
