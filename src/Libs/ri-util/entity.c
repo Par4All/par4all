@@ -31,7 +31,15 @@ string full_name;
     entity e = gen_find_tabulated(full_name, entity_domain);
     entity DynamicArea, StaticArea;
 
-    pips_assert("make_empty_module", e == entity_undefined);
+    /* FC: added to allow reintrance in HPFC 
+     */
+    if (e!=entity_undefined)
+    {
+	user_warning("module %s already exists, returning it\n", full_name);
+	return e;
+    }
+
+    pips_assert("undefined", e == entity_undefined);
 
     e = make_entity(strdup(full_name), 
 		    make_type(is_type_functional, 
