@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.51  2002/06/14 15:01:56  irigoin
+ * Mostly new functions added to deal with labels and alternate return labels
+ *
  * Revision 1.50  2002/06/13 12:06:02  irigoin
  * Adaptation to new ri.newgen with field "initializations" in structure "code"
  *
@@ -147,7 +150,7 @@ entity e;
     pips_assert("EntityCode", value_tag(ve) == is_value_code);
     return(value_code(ve));
 }
-
+
 entity 
 make_label(string strg)
 {
@@ -184,6 +187,45 @@ char *module_name;
     return e;
 }
 
+static bool label_defined_in_statement = FALSE;
+static entity label_searched_in_statement = entity_undefined;
+
+static bool check_statement_for_label(statement s)
+{
+  if(!label_defined_in_statement) {
+    label_defined_in_statement = (statement_label(s)==label_searched_in_statement);
+  }
+  return !label_defined_in_statement;
+}
+
+bool label_defined_in_statement_p(entity l, statement s)
+{
+  label_defined_in_statement = FALSE;
+  label_searched_in_statement = l;
+
+  gen_recurse(s, statement_domain, check_statement_for_label, gen_null);
+  label_searched_in_statement = entity_undefined;
+
+  return label_defined_in_statement;
+}
+
+bool label_defined_in_current_module_p(entity l)
+{
+  statement s = get_current_module_statement();
+  bool defined_p = label_defined_in_statement_p(l, s);
+
+  return defined_p;
+}
+
+bool label_string_defined_in_current_module_p(string ls)
+{
+  entity l = find_label_entity(get_current_module_name(), ls);
+  statement s = get_current_module_statement();
+  bool defined_p = label_defined_in_statement_p(l, s);
+
+  return defined_p;
+}
+
 /* predicates and functions for entities 
  */
 
