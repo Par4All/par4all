@@ -47,12 +47,14 @@ display_memory_usage()
    char memory_string[17];
    char cpu_string[CPU_USAGE_LENGTH + 1];
    struct rusage an_rusage;
+
+   /* etext, edata and end are only address symbols... */
+   debug(6, "display_memory_usage",
+	 "_text %#x, _data %#x, _end %#x, _brk %#x\n",
+	 &etext, &edata, &end, sbrk(0));
    
-   /* Well, the memory usage is quite approximate in my brain... */
-   sprintf(memory_string, "%10.3f", (sbrk(0) - etext)/(double)(1 << 20));
-   
-   /* printf("_text %x, _data %x, _end %x, _brk %x\n",
-          etext, edata, end, sbrk(0)); */
+   sprintf(memory_string, "%10.3f", (sbrk(0) - (int) &etext)/(double)(1 << 20));
+
    xv_set(memory_name,
           PANEL_VALUE, memory_string,
           NULL);
