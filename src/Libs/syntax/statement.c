@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.53  2001/07/13 11:55:18  coelho
+ * accept constant_call case in assert.
+ *
  * Revision 1.52  2000/10/12 12:43:18  irigoin
  * MakeDoInst() upgraded to handle property PARSER_LINEARIZE_LOOP_BOUNDS and
  * to replace complex loop bounds by simple references
@@ -1621,11 +1624,11 @@ cons *lio;
 	s1 = expression_syntax(EXPRESSION(CAR(l)));
 	s2 = expression_syntax(EXPRESSION(CAR(CDR(l))));
 
-	pips_assert("MakeIoInstA", syntax_call_p(s1));
+	pips_assert("syntax is a call", syntax_call_p(s1));
 	e1 = call_function(syntax_call(s1));
-	pips_assert("MakeIoInstA", value_constant_p(entity_initial(e1)));
-	pips_assert("MakeIoInstA", 
-		    constant_litteral_p(value_constant(entity_initial(e1))));
+	pips_assert("value is constant", value_constant_p(entity_initial(e1)));
+	pips_assert("constant is not int (thus litteral or call)", 
+		    !constant_int_p(value_constant(entity_initial(e1))));
 
 	if (strcmp(entity_local_name(e1), "ERR=") == 0 || 
 	    strcmp(entity_local_name(e1), "END=") == 0 ||
