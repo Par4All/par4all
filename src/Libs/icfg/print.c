@@ -58,8 +58,7 @@ string module_name;
     entity mod = local_name_to_top_level_entity(module_name);
 
     debug_on(ICFG_DEBUG_LEVEL);
-    debug(1,"module_to_icfg","===%s===\n",module_name);
-    debug(1,"module_to_icfg","===%s===\n",entity_name(mod));
+    pips_debug(1,"===%s===\n===%s===\n",module_name,entity_name(mod));
 
     print_module_icfg(mod);
 
@@ -79,9 +78,11 @@ parametrized_print_icfg(
     text (*deco)(string))
 {
     entity module = local_name_to_top_level_entity(module_name);
+
     set_bool_property(ICFG_IFs, print_ifs);
     set_bool_property(ICFG_DOs, print_dos);
     print_module_icfg_with_decoration(module, deco);
+
     return TRUE;
 }
 
