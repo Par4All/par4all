@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/10/29 12:37:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/11/01 10:00:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1997/10/29 12:37:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1997/11/01 10:00:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -27,7 +27,8 @@ static equivalences FinalEquivSet = equivalences_undefined;
 
 /* re-initialize chains between two successives calls to parser
  */
-void ResetChains()
+void 
+ResetChains()
 {
     TempoEquivSet = equivalences_undefined;
     FinalEquivSet = equivalences_undefined;
@@ -45,8 +46,14 @@ syntax s;
     entity e;
     int o;
 
-    if (!syntax_reference_p(s))
-	    FatalError("MakeEquivAtom", "function call in equivalence chain\n");
+    if (!syntax_reference_p(s)) {
+	pips_assert("This is syntax is a call", syntax_call_p(s));
+	pips_user_warning("A function call to %s has been identified by the parser "
+			  "in an EQUIVALENCE statement. Maybe an array declaration "
+			  "should be moved up ahead of the EQUIVALENCE\n",
+			  module_local_name(call_function(syntax_call(s))));
+	ParserError("MakeEquivAtom", "function call in equivalence chain\n");
+    }
 
     r = syntax_reference(s);
     e = reference_variable(r);
@@ -217,7 +224,7 @@ cons *opc1, *opc2;
     }
 
     if (pc1 == NIL || pc2 == NIL)
-	    ParserError("MergeTwoChains", "empty intersection\n");
+	    FatalError("MergeTwoChains", "empty intersection\n");
 
     deltaoff = atom_equioff(ATOM(CAR(pc1)))-atom_equioff(ATOM(CAR(pc2)));
 
@@ -291,6 +298,7 @@ ComputeAddresses()
     cons *pcc, *pca, *pcv;
     entity sc;
     int lc, l, ac;
+    list dynamic_aliases = NIL;
 
     if (FinalEquivSet != equivalences_undefined) {
 	for (pcc = equivalences_chains(FinalEquivSet); pcc != NIL; 
@@ -392,9 +400,22 @@ ComputeAddresses()
 		     */
 		    pips_assert("Entity e is not yet in sc's layout", 
 				!entity_is_argument_p(e,area_layout(a)));
-		    area_layout(a) = gen_nconc(area_layout(a), CONS(ENTITY, e, NIL));
+		    if(sc == DynamicArea) {
+			/* Dynamic aliases cannot be added right away because
+			 * implicitly declared dynamic variables still have to
+			 * be added whereas aliased variables are assumed to be
+			 * put behind in the layout list
+			 */
+			dynamic_aliases = arguments_add_entity(dynamic_aliases, e);
+		    }
+		    else {
+			area_layout(a) = gen_nconc(area_layout(a),
+						   CONS(ENTITY, e, NIL));
+		    }
 
-		    /* If sc really is a common, check its size */
+		    /* If sc really is a common, i.e. neither the *dynamic*
+		     * nor the *static* area, check its size
+		     */
 		    if(top_level_entity_p(sc)) {
 			int s = common_to_size(sc);
 			int new_s = adr + SizeOfArray(e);
@@ -434,6 +455,17 @@ ComputeAddresses()
 					   CurrentOffsetOfArea(DynamicArea,
 							       e), NIL)));
 	}
+    }
+
+    /* Add aliased dynamic variables */
+    if(!ENDP(dynamic_aliases)) {
+	/* neither gen_concatenate() nor gen_append() are OK */
+	list dynamic = area_layout(type_area(entity_type(DynamicArea)));
+
+	pips_assert("aliased dynamic variables imply standard dynamic variables",
+		    !ENDP(dynamic));
+	/* side effect on area_layout */
+	(void) gen_nconc(dynamic, dynamic_aliases);
     }
 }
 
