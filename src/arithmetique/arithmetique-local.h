@@ -47,6 +47,7 @@ typedef long long Value;
 #define VALUE_TO_INT(val) \
     ((int)(val>=(Value)INT_MIN&&val<=(Value)INT_MAX)?val:abort())
 #define VALUE_TO_DOUBLE(val) ((double)val)
+#define VALUE_TO_FLOAT(val) ((float)val)
 /* end LINEAR_VALUE_IS_LONGLONG
  */
 #elif defined(LINEAR_VALUE_IS_LONG)
@@ -60,6 +61,7 @@ typedef long Value;
 #define VALUE_MONE -1L
 #define VALUE_TO_LONG(val) (val)
 #define VALUE_TO_INT(val) ((int)val)
+#define VALUE_TO_FLOAT(val) ((float)val)
 #define VALUE_TO_DOUBLE(val) ((double)val)
 /* end LINEAR_VALUE_IS_LONG
  */
@@ -74,6 +76,7 @@ typedef float Value;
 #define VALUE_MONE -1
 #define VALUE_TO_LONG(val) ((long)val)
 #define VALUE_TO_INT(val) ((int)val)
+#define VALUE_TO_FLOAT(val) ((float)val)
 #define VALUE_TO_DOUBLE(val) ((double)val)
 /* end LINEAR_VALUE_IS_FLOAT
  */
@@ -90,6 +93,7 @@ typedef char * Value;
 #define VALUE_MONE (char*)-1
 #define VALUE_TO_LONG(val) ((long)val)
 #define VALUE_TO_INT(val) ((int)val)
+#define VALUE_TO_FLOAT(val) ((float)(int)val)
 #define VALUE_TO_DOUBLE(val) ((double)(int)val)
 /* end LINEAR_VALUE_IS_CHARS
  */
@@ -104,6 +108,7 @@ typedef int Value;
 #define VALUE_MONE -1
 #define VALUE_TO_LONG(val) ((long)val)
 #define VALUE_TO_INT(val) ((int)val)
+#define VALUE_TO_FLOAT(val) ((float)val)
 #define VALUE_TO_DOUBLE(val) ((double)val)
 /* end LINEAR_VALUE_IS_INT
  */
