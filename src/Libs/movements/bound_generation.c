@@ -14,28 +14,15 @@
 #include "ri-util.h"
 #include "constants.h"
 #include "misc.h"
-#include "boolean.h"
-#include "arithmetique.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
 #include "matrice.h"
-#include "matrix.h"
 #include "sparse_sc.h"
 #include "tiling.h"
 #include "movements.h"
 #include "text-util.h"
-#include "graph.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
 #include "polyedre.h"
 #include "dg.h"
-#include "ricedg.h" 
-#include "rice.h"
 
-static char *noms_var(i)
-entity i;
+static char *noms_var(entity i)
 {
     return(local_name(entity_name(i)));
 }
@@ -444,18 +431,18 @@ bound_generation(
 		/* end of new code by FI */
 
 		if (n0_loop ==1)
-		    newloop = make_loop(var, 
+		    newloop = make_loop((entity) var, 
 					looprange,
 					loopbody,
 					looplabel, 
 					make_execution(is_execution_parallel,
 						       UU),
 					NIL);
-		else newloop = make_loop(var, 
+		else newloop = make_loop((entity) var, 
 					 looprange,
 					 loopbody,
 					 looplabel, 
-					 make_execution(is_execution_sequential,UU),
+				 make_execution(is_execution_sequential,UU),
 					 NIL);
 
 		stat = loop_to_statement(newloop);
