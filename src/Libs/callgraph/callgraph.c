@@ -23,7 +23,8 @@
 #include "database.h"     /* DB_PUT_FILE_RESOURCE is defined there */
 #include "pipsdbm.h"
 #include "resources.h"
-
+#include "effects.h"
+#include "regions.h"
 #include "transformer.h"
 #include "semantics.h"
 
