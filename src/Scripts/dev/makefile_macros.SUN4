@@ -1,17 +1,16 @@
 #
 # $RCSfile: makefile_macros.SUN4,v $ (version $Revision$)
-# $Date: 1996/07/17 08:41:13 $, 
+# $Date: 1996/08/13 15:38:12 $, 
 #
 # this file contains macro definitions 
 
 AR	= gar
 ARFLAGS	= rv
 CC	= acc
-# -Xc removed because of bison generated files:-(
-CFLAGS	= -fast -g -Xa
-CPPFLAGS= -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR)
+CFLAGS	= -fast -g -Xc
+CPPFLAGS= -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(PIPS_EXTEDIR)
 LD	= $(CC) -bsdmalloc
-LDFLAGS	= -fast -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(PIPS_EXTEDIR)
+LDFLAGS	= -fast -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(PIPS_EXTEDIR)
 RANLIB	= granlib
 LEX	= lex
 LFLAGS	=
