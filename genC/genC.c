@@ -320,10 +320,9 @@ struct gen_binding *bp ;
     image = dom->co.components->cdr->domain ;
 
     (void) printf("#define apply_%s(hash, var) ", name ) ;
-    (void) printf("(%sHASH_GET(%s,",
-		  primitive_cast(image) , primitive_field(start)) ;
-    (void) printf("%s,(hash+%d)->h, (var)))\n",
-		  primitive_field(image), data) ;
+    (void) printf("(%sHASH_GET(%s,", 
+		  primitive_cast(image), primitive_field(start));
+    (void) printf("%s,(hash+%d)->h, (var)))\n",  primitive_field(image), data);
 
     (void) printf("#define update_%s(hash, var, val) ", name ) ;
     (void) printf("(HASH_UPDATE(%s", primitive_field(start)) ;
@@ -334,6 +333,10 @@ struct gen_binding *bp ;
     (void) printf("(HASH_EXTEND(%s", primitive_field(start));
     (void) printf(",%s,((hash)+%d)->h,(var),(val)))\n",
 		  primitive_field(image), data ) ;
+
+    (void) printf("#define bound_%s_p(hash, var) ", name);
+    (void) printf("(HASH_BOUND_P(%s,", primitive_field(start));
+    (void) printf("%s,(hash+%d)->h, (var)))\n", primitive_field(image), data);
 }
 
 
