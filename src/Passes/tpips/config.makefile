@@ -5,7 +5,7 @@
 YFLAGS+=	-v -d
 
 #
-LIB_MAIN	=	tpips_main.c
+LIB_MAIN	=	main_tpips.c
 LIB_CFILES	=	tpips.c
 LIB_HEADERS	=	tpips-local.h \
 			ana_lex.l \
