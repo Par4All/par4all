@@ -1,5 +1,5 @@
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/07/11 19:03:01 $, 
+# $Date: 1996/07/11 19:09:29 $, 
 # (c) Fabien COELHO July 1996
 #
 # This makefile forwards make targets to sub-directories...
@@ -32,6 +32,7 @@
 # Their value is printed with special target "debug_forward_makefile"
 #
 
+# Just to avoid troubles...
 SHELL		= /bin/sh
 
 # default values 
@@ -40,15 +41,16 @@ FWD_MSG		=
 FWD_REPORT	= >&2
 FWD_ROOT	= .
 
-# forward any command to the specified directories
+# Forward any command to the specified directories (if any).
+# Report the result of the forward.
 %::
 	@echo Forwarding $@ to $(FWD_DIRS) >&2
 	-@for d in $(FWD_DIRS) ; do \
 	  if test -d $$d ; then \
-	  if $(MAKE) -C $$d FWD_ROOT="$(FWD_ROOT)/$$d" $@ ;\
-	  then echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ succeeded" $(FWD_REPORT);\
-	  else echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ failed" $(FWD_REPORT) ;\
-	fi ; fi ; done
+	    if $(MAKE) -C $$d FWD_ROOT="$(FWD_ROOT)/$$d" $@ ;\
+	    then report=succeeded ; else report=failed ; fi ;\
+	    echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ $report" $(FWD_REPORT);\
+	fi ; done
 
 debug_forward_makefile:
 	@echo "FWD_DIRS=$(FWD_DIRS)"
