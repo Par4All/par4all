@@ -1,18 +1,23 @@
-/* Symbol table initialization with Fortran operators, commands and intrinsics
+/*
+  $Id$
+
+  Symbol table initialization with Fortran operators, commands and intrinsics
    
-   More information is provided in effects/effects.c
+  More information is provided in effects/effects.c
    
-   Remi Triolet
-   
-   Modifications:
-   - add intrinsics according to Fortran standard Table 5, pp. 15.22-15-25,
-   Francois Irigoin, 02/06/90
-   - add .SEQ. to handle ranges outside of arrays [pj]
-   - add intrinsic DFLOAT. bc. 13/1/96.
-   - add pseudo-intrinsics SUBSTR and ASSIGN_SUBSTR to handle strings,
-   fi, 25/12/96
+  Remi Triolet
+  
+  Modifications:
+  - add intrinsics according to Fortran standard Table 5, pp. 15.22-15-25,
+  Francois Irigoin, 02/06/90
+  - add .SEQ. to handle ranges outside of arrays [pj]
+  - add intrinsic DFLOAT. bc. 13/1/96.
+  - add pseudo-intrinsics SUBSTR and ASSIGN_SUBSTR to handle strings,
+    FI, 25/12/96
+  - Fortran specification conformant typing of expressions...
+
    Bugs:
-   - intrinsics are not properly typed
+  - intrinsics are not properly typed
 */
 
 #include <stdio.h>
@@ -590,6 +595,10 @@ logical_to_logical_type(int n)
 
 /***************************************************** TYPE A CALL FUNCTIONS */
 
+/* type check double complex? */
+extern bool get_bool_property(string);
+#define TC_DCOMPLEX get_bool_property("TYPE_CHECKER_DOUBLE_COMPLEX_EXTENSION")
+
 /* Determine the longest basic among the arguments of c
  */
 static basic 
@@ -722,10 +731,7 @@ arguments_are_something(
   {
     argnumber++;
 
-    if (!hash_defined_p(context->types, e))
-    {
-      pips_internal_error("Undefined key in hash_table\n");
-    }
+    pips_assert("type is defined", hash_defined_p(context->types, e));
     
     b = GET_TYPE(context->types, e);
 
@@ -748,9 +754,8 @@ arguments_are_something(
       }
 
       add_one_line_of_comment((statement) stack_head(context->stats),
-			      "untyped '%s' used as a function.",
-			      what,
-			      entity_local_name(call_function(c)));
+			      "not typed '%s' used as a function.",
+			      what, entity_local_name(call_function(c)));
       context->number_of_error++;
       okay = FALSE;
     }
@@ -778,8 +783,10 @@ arguments_are_something(
       okay = FALSE;
     }
 
+    /* if TC_DCOMPLEX, maybe they should not be incompatible? */
     arg_cmplx = arg_cmplx ||
       (complex_ok && basic_complex_p(b) && basic_complex(b)==8);
+
     arg_double = arg_double || 
       (double_ok &&  basic_float_p(b) && basic_float(b)==8);
 
@@ -798,7 +805,7 @@ static bool
 arguments_are_IRDC(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE);
+    (c, context, TRUE, TRUE, TRUE, TRUE, TC_DCOMPLEX, FALSE, FALSE);
 }
 static bool
 arguments_are_character(call c, type_context_p context)
@@ -843,7 +850,7 @@ static bool
 arguments_are_RDC(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE);
+    (c, context, FALSE, TRUE, TRUE, TRUE, TC_DCOMPLEX, FALSE, FALSE);
 }
 
 /***************************************************************************** 
@@ -978,7 +985,7 @@ typing_relational_operator(call c, type_context_p context)
   if(!arguments_are_IRDC(c, context))
   {
     /* Just for return a result */
-    return make_basic(is_basic_logical, UUINT(4));
+    return make_basic_logical(4);
   }
   /* Find the longest type amongs all arguments */
   b = basic_union_arguments(c, context->types);
@@ -987,7 +994,7 @@ typing_relational_operator(call c, type_context_p context)
   typing_arguments(c, context, b);
   
   free_basic(b);
-  return make_basic(is_basic_logical, UUINT(4));
+  return make_basic_logical(4);
 }
 /***************************************************************************** 
  * Typing logical operator (NOT, AND, OR, EQV, NEQV)
@@ -998,9 +1005,9 @@ typing_logical_operator(call c, type_context_p context)
   if(!arguments_are_logical(c, context))
   {
     /* Just for return a result */
-    return make_basic(is_basic_logical, UUINT(4));
+    return make_basic_logical(4);
   }
-  return make_basic(is_basic_logical, UUINT(4));
+  return make_basic_logical(4);
 }
 /***************************************************************************** 
  * Typing concatenate operator (//)
@@ -1011,9 +1018,9 @@ typing_concat_operator(call c, type_context_p context)
   if(!arguments_are_character(c, context))
   {
     /* Just for return a result */
-    return make_basic(is_basic_string, value_undefined);
+    return make_basic_string(value_undefined);
   }
-  return make_basic(is_basic_string, value_undefined);
+  return make_basic_string(value_undefined);
 }
 
 /***************************************************************************** 
@@ -1049,7 +1056,8 @@ typing_function_argument_type_to_return_type(call c, type_context_p context,
   /* DOUBLE COMPLEX */
   else if(basic_complex_p(from_type) && basic_complex(from_type) == 16)
   {
-    check_arg = arguments_are_dcomplex(c, context->types);
+    if (TC_DCOMPLEX)
+      check_arg = arguments_are_dcomplex(c, context->types);
   }
   /* CHAR */
   else if(basic_string_p(from_type))
@@ -1071,7 +1079,7 @@ typing_function_argument_type_to_return_type(call c, type_context_p context,
   if(check_arg == FALSE)
   {
     add_one_line_of_comment((statement) stack_head(context->stats), 
-			    "Invalid argument(s) of '%s'!",
+			    "Invalid argument(s) to '%s'!",
 			    entity_local_name(call_function(c))); 
     
     /* Count the number of errors */
@@ -1113,7 +1121,7 @@ typing_function_complex_to_complex(call c, type_context_p context)
 {
   basic result, type_CMPLX = make_basic_complex(8);
   result = typing_function_argument_type_to_return_type(c, context, 
-						      type_CMPLX, type_CMPLX);
+						     type_CMPLX, type_CMPLX);
   free_basic(type_CMPLX);
   return result;
 }
@@ -1121,8 +1129,8 @@ static basic
 typing_function_dcomplex_to_dcomplex(call c, type_context_p context)
 {
   basic result, type_DCMPLX = make_basic_complex(16);
-  result = typing_function_argument_type_to_return_type(c, context, type_DCMPLX,
-						      type_DCMPLX);
+  result = typing_function_argument_type_to_return_type(c, context, 
+						    type_DCMPLX, type_DCMPLX);
   free_basic(type_DCMPLX);
   return result;
 }
@@ -1322,10 +1330,16 @@ typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c,
   /* Typing all arguments to b if necessary */
   typing_arguments(c, context, b);
 
-  if (basic_complex_p(b))
+  if (basic_complex_p(b) )
   {
-    free_basic(b);
-    b = make_basic_float(4); /* CMPLX --> REAL */
+    if (basic_complex(b)==8) 
+    {
+      free_basic(b);
+      b = make_basic_float(4); /* CMPLX --> REAL */
+    } else if (basic_complex(b)==16 && TC_DCOMPLEX) {
+      free_basic(b);
+      b = make_basic_float(8); /* DCMPLX -> DOUBLE */
+    } /* else? */
   }
   return b;
 }
@@ -1427,7 +1441,8 @@ static basic typing_function_error(call c, type_context_p context)
 {
   /* subroutine intrinsics used as a function... */
   add_one_line_of_comment((statement) stack_head(context->stats),
-			  "XXX");
+			  "intrinsic '%s' used as a function?",
+			  entity_local_name(call_function(c)));
   return make_basic_overloaded();
 }
 
@@ -1502,7 +1517,9 @@ switch_generic_to_specific(expression exp, type_context_p context,
   }
   else if (basic_complex_p(arg_basic) && basic_complex(arg_basic) == 16)
   {
-    specific_name = arg_dcomplex_name;
+    if (TC_DCOMPLEX)
+      specific_name = arg_dcomplex_name;
+    /* else generic name is kept... */
   }
   
   /* Modify the (function:entity) of the call c if necessary
@@ -1544,7 +1561,7 @@ static void
 switch_specific_abs(expression exp, type_context_p context)
 {
   switch_generic_to_specific(exp, context,
-			     "IABS", "ABS", "DABS", "CABS", NULL);
+			     "IABS", "ABS", "DABS", "CABS", "CDABS");
 }
 /* MOD */
 static void
@@ -1586,21 +1603,21 @@ static void
 switch_specific_sqrt(expression exp, type_context_p context)
 {
   switch_generic_to_specific(exp, context,
-			     NULL, "SQRT", "DSQRT", "CSQRT", NULL);
+			     NULL, "SQRT", "DSQRT", "CSQRT", "CDSQRT");
 }
 /* EXP */
 static void
 switch_specific_exp(expression exp, type_context_p context)
 {
   switch_generic_to_specific(exp, context,
-			     NULL, "EXP", "DEXP", "CEXP", NULL);
+			     NULL, "EXP", "DEXP", "CEXP", "CDEXP");
 }
 /* LOG */
 static void
 switch_specific_log(expression exp, type_context_p context)
 {
   switch_generic_to_specific(exp, context,
-			     NULL, "ALOG", "DLOG", "CLOG", NULL);
+			     NULL, "ALOG", "DLOG", "CLOG", "CDLOG");
 }
 /* LOG10 */
 static void
@@ -1614,14 +1631,14 @@ static void
 switch_specific_sin(expression exp, type_context_p context)
 {
   switch_generic_to_specific(exp, context,
-			     NULL,"SIN","DSIN", "CSIN", NULL);
+			     NULL,"SIN","DSIN", "CSIN", "CDSIN");
 }
 /* COS */
 static void
 switch_specific_cos(expression exp, type_context_p context)
 {
   switch_generic_to_specific(exp, context,
-			     NULL, "COS", "DCOS", "CCOS", NULL);
+			     NULL, "COS", "DCOS", "CCOS", "CDCOS");
 }
 /* TAN */
 static void
@@ -1797,15 +1814,18 @@ typedef struct IntrinsicDescriptor
    arguments.
 */
 
-static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
+static IntrinsicDescriptor IntrinsicDescriptorTable[] = 
+{
   {"+", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"-", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"/", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
-  {"INV", 1, real_to_real_type, 
-   typing_function_RealDoubleComplex_to_RealDoubleComplex, 0},
   {"*", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"--", 1, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"**", 2, default_intrinsic_type, typing_power_operator, 0},
+
+  /* internal inverse operator... */
+  {"INV", 1, real_to_real_type, 
+   typing_function_RealDoubleComplex_to_RealDoubleComplex, 0},
   
   {"=", 2, default_intrinsic_type, typing_of_assign, 0},
   
@@ -1842,7 +1862,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
   {ASSIGN_SUBSTRING_FUNCTION_NAME, 4, assign_substring_type, 0, 0},
   
   {"CONTINUE", 0, default_intrinsic_type, 0, 0},
-  {"ENDDO", 0, default_intrinsic_type, 0, 0},
+  {"ENDDO", 0, default_intrinsic_type, 0, 0}, /* ??? */
   {"PAUSE", 1, default_intrinsic_type, 0, 0},
   {"RETURN", 0, default_intrinsic_type, 0, 0},
   {"STOP", 0, default_intrinsic_type, 0, 0},
@@ -1864,16 +1884,15 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
    simplification_real},
   {"DBLE", 1, overloaded_to_double_type, 
    typing_function_conversion_to_double, simplification_double},
-  {"DREAL", 1, overloaded_to_double_type, 
-   typing_function_conversion_to_double, simplification_double}, /* Arnauld Leservot, code CEA */
+  {"DREAL", 1, overloaded_to_double_type, /* Arnauld Leservot, code CEA */
+   typing_function_conversion_to_double, simplification_double}, 
   {"CMPLX", (INT_MAX), overloaded_to_complex_type, 
    typing_function_conversion_to_complex, simplification_complex},
   
   {"DCMPLX", (INT_MAX), overloaded_to_doublecomplex_type, 
    typing_function_conversion_to_dcomplex, simplification_dcomplex},
   
-  /* (0.,1.) -> switched to a function call...
-   */
+  /* (0.,1.) -> switched to a function call... */
   { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type, 
     typing_function_constant_complex, 0},
   { IMPLIED_DCOMPLEX_NAME, 2, overloaded_to_doublecomplex_type, 
@@ -1881,6 +1900,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
   
   {"ICHAR", 1, default_intrinsic_type, typing_function_char_to_int, 0},
   {"CHAR", 1, default_intrinsic_type, typing_function_int_to_char, 0},
+
   {"AINT", 1, real_to_real_type, 
    typing_function_RealDouble_to_RealDouble, switch_specific_aint},
   {"DINT", 1, double_to_double_type, typing_function_double_to_double, 0},
@@ -1890,6 +1910,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
   {"NINT", 1, real_to_integer_type, 
    typing_function_RealDouble_to_Integer, switch_specific_nint},
   {"IDNINT", 1, double_to_integer_type, typing_function_double_to_int, 0},
+
   {"IABS", 1, integer_to_integer_type, typing_function_int_to_int, 0},
   {"ABS", 1, real_to_real_type, 
    typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal, 
@@ -1904,17 +1925,21 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
    switch_specific_mod},
   {"AMOD", 2, real_to_real_type, typing_function_real_to_real, 0},
   {"DMOD", 2, double_to_double_type, typing_function_double_to_double, 0},
+
   {"ISIGN", 2, integer_to_integer_type, typing_function_int_to_int, 0},
   {"SIGN", 2, default_intrinsic_type, 
    typing_function_IntegerRealDouble_to_IntegerRealDouble, 
    switch_specific_sign},
   {"DSIGN", 2, double_to_double_type, typing_function_double_to_double, 0},
+
   {"IDIM", 2, integer_to_integer_type, typing_function_int_to_int, 0},
   {"DIM", 2, default_intrinsic_type, 
    typing_function_IntegerRealDouble_to_IntegerRealDouble, 
    switch_specific_dim},
   {"DDIM", 2, double_to_double_type, typing_function_double_to_double, 0},
+
   {"DPROD", 2, real_to_double_type, typing_function_real_to_double, 0},
+
   {"MAX", (INT_MAX), default_intrinsic_type, 
    typing_function_IntegerRealDouble_to_IntegerRealDouble, 
    switch_specific_max},
@@ -1924,6 +1949,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
    typing_function_double_to_double, 0},
   {"AMAX0", (INT_MAX), integer_to_real_type, typing_function_int_to_real, 0},
   {"MAX1", (INT_MAX), real_to_integer_type, typing_function_real_to_int, 0},
+
   {"MIN", (INT_MAX), default_intrinsic_type, 
    typing_function_IntegerRealDouble_to_IntegerRealDouble, 
    switch_specific_min},
@@ -1933,66 +1959,91 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
    typing_function_double_to_double, 0},
   {"AMIN0", (INT_MAX), integer_to_real_type, typing_function_int_to_real, 0},
   {"MIN1", (INT_MAX), real_to_integer_type, typing_function_real_to_int, 0},
+
   {"LEN", 1, character_to_integer_type, typing_function_char_to_int, 0},
   {"INDEX", 2, character_to_integer_type, typing_function_char_to_int, 0},
+
   {"AIMAG", 1, complex_to_real_type, typing_function_complex_to_real, 0},
   {"DIMAG", 1, doublecomplex_to_double_type, 
    typing_function_dcomplex_to_double, 0},
+
   {"CONJG", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
   {"DCONJG", 1, doublecomplex_to_doublecomplex_type, 
    typing_function_dcomplex_to_dcomplex, 0},
+
   {"SQRT", 1, default_intrinsic_type, 
    typing_function_RealDoubleComplex_to_RealDoubleComplex, 
    switch_specific_sqrt},
   {"DSQRT", 1, double_to_double_type, typing_function_double_to_double, 0},
   {"CSQRT", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CDSQRT", 1, doublecomplex_to_doublecomplex_type, 
+                typing_function_dcomplex_to_dcomplex, 0},
   
   {"EXP", 1, default_intrinsic_type, 
    typing_function_RealDoubleComplex_to_RealDoubleComplex, 
    switch_specific_exp},
   {"DEXP", 1, double_to_double_type, typing_function_double_to_double, 0},
   {"CEXP", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CDEXP", 1, doublecomplex_to_doublecomplex_type, 
+               typing_function_dcomplex_to_dcomplex, 0},
+
   {"LOG", 1, default_intrinsic_type, 
    typing_function_RealDoubleComplex_to_RealDoubleComplex, 
    switch_specific_log},
   {"ALOG", 1, real_to_real_type, typing_function_real_to_real, 0},
   {"DLOG", 1, double_to_double_type, typing_function_double_to_double, 0},
   {"CLOG", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CDLOG", 1, doublecomplex_to_doublecomplex_type, 
+               typing_function_dcomplex_to_dcomplex, 0},
+
   {"LOG10", 1, default_intrinsic_type, 
    typing_function_RealDouble_to_RealDouble, switch_specific_log10},
   {"ALOG10", 1, real_to_real_type, typing_function_real_to_real, 0},
   {"DLOG10", 1, double_to_double_type, typing_function_double_to_double, 0},
+
   {"SIN", 1, default_intrinsic_type, 
    typing_function_RealDoubleComplex_to_RealDoubleComplex, 
    switch_specific_sin},
   {"DSIN", 1, double_to_double_type, typing_function_double_to_double, 0},
   {"CSIN", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CDSIN", 1, doublecomplex_to_doublecomplex_type, 
+               typing_function_dcomplex_to_dcomplex, 0},
+
   {"COS", 1, default_intrinsic_type, 
    typing_function_RealDoubleComplex_to_RealDoubleComplex, 
    switch_specific_cos},
   {"DCOS", 1, double_to_double_type, typing_function_double_to_double, 0},
   {"CCOS", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
+  {"CDCOS", 1, doublecomplex_to_doublecomplex_type, 
+               typing_function_dcomplex_to_dcomplex, 0},
+
   {"TAN", 1, default_intrinsic_type, 
    typing_function_RealDouble_to_RealDouble, switch_specific_tan},
   {"DTAN", 1, double_to_double_type, typing_function_double_to_double, 0},
+
   {"ASIN", 1, default_intrinsic_type, 
    typing_function_RealDouble_to_RealDouble, switch_specific_asin},
   {"DASIN", 1, double_to_double_type, typing_function_double_to_double, 0},
+
   {"ACOS", 1, default_intrinsic_type, 
    typing_function_RealDouble_to_RealDouble, switch_specific_acos},
   {"DACOS", 1, double_to_double_type, typing_function_double_to_double, 0},
+
   {"ATAN", 1, default_intrinsic_type, 
    typing_function_RealDouble_to_RealDouble, switch_specific_atan},
   {"DATAN", 1, double_to_double_type, typing_function_double_to_double, 0},
   {"ATAN2", 1, default_intrinsic_type, 
    typing_function_RealDouble_to_RealDouble, switch_specific_atan2},
   {"DATAN2", 1, double_to_double_type, typing_function_double_to_double, 0},
+
   {"SINH", 1, default_intrinsic_type, 
    typing_function_RealDouble_to_RealDouble, switch_specific_sinh},
   {"DSINH", 1, double_to_double_type, typing_function_double_to_double, 0},
+
   {"COSH", 1, default_intrinsic_type, 
    typing_function_RealDouble_to_RealDouble, switch_specific_cosh},
   {"DCOSH", 1, double_to_double_type, typing_function_double_to_double, 0},
+
   {"TANH", 1, default_intrinsic_type, 
    typing_function_RealDouble_to_RealDouble, switch_specific_tanh},
   {"DTANH", 1, double_to_double_type, typing_function_double_to_double, 0},
