@@ -104,7 +104,7 @@ effects_dynamic_elim(list l_eff)
 		pips_debug(4, "effect kept : \n\t %s\n", 
 			   effect_to_string(eff_res));
 	    }
-            l_res = effects_add_effect(l_res, eff_res);
+            l_res = CONS(EFFECT, eff_res, l_res);
         }
 	else 
 	    ifdebug(4)
@@ -265,10 +265,10 @@ global_effect_translation(
      * It is the case for variables dexcribing I/O effects (LUNS).
      */
     if (top_level_entity_p(eff_ent))
-	return ( CONS(EFFECT, make_sdfi_effect(ef), NIL) );
+	return CONS(EFFECT, make_sdfi_effect(ef), NIL);
 
     if (io_entity_p(eff_ent))
-	return ( CONS(EFFECT, make_sdfi_effect(ef), NIL) );
+	return CONS(EFFECT, make_sdfi_effect(ef), NIL);
 
     /* First, we search if the common is declared in the target function;
      * if not, we have to deterministically choose an arbitrary function
@@ -367,7 +367,7 @@ global_effect_translation(
 		total_size += min (eff_ent_begin_offset,new_ent_end_offset) 
 		    - max(eff_ent_begin_offset, new_ent_begin_offset) + 1;
 						
-		l_new_eff = gen_nconc(l_new_eff, CONS(EFFECT, new_eff, NIL));
+		l_new_eff = CONS(EFFECT, new_eff, l_new_eff);
 	    }
 	}
     }
@@ -377,7 +377,7 @@ global_effect_translation(
 	pips_debug(5, "final effects:\n");
 	print_effects(l_new_eff);
     }
-    return(l_new_eff);
+    return return gen_nreverse(l_new_eff);
 }
 
 static effect 
@@ -739,7 +739,7 @@ summary_to_proper_effects(
 			effect real_effect = 
 			    translate_effect(func, args, real_ref, formal_effect);
 			
-			le = gen_nconc(le, CONS(EFFECT, real_effect, NIL));
+			le = CONS(EFFECT, real_effect, le);
 		    }
 		}, 
 		    func_sdfi);
@@ -793,7 +793,7 @@ summary_to_proper_effects(
 	    
 	    /* if everything is fine, then the effects are the read effects
 	     * of the expression */
-	    le = gen_nconc(le,generic_proper_effects_of_expression(expr));
+	    le = gen_nconc(generic_proper_effects_of_expression(expr), le);
 	}
     
     }
@@ -804,8 +804,8 @@ summary_to_proper_effects(
 	MAP(EFFECT, ef,
 	    {
 		if (storage_ram_p(entity_storage(effect_entity(ef)))) 
-		    le = gen_nconc(le, global_effect_translation
-				   (ef, func, get_current_module_entity()));
+		    le = gen_nconc(global_effect_translation
+				   (ef, func, get_current_module_entity()),le);
 	    },
 		func_sdfi);
     }
@@ -815,12 +815,13 @@ summary_to_proper_effects(
 	MAP(EFFECT, ef,
 	    {
 		if (storage_ram_p(entity_storage(effect_entity(ef)))) 
-		    le = gen_nconc(le, CONS(EFFECT, make_sdfi_effect(ef), NIL));
+		    le = CONS(EFFECT, make_sdfi_effect(ef), le);
+				   
 	    },
 		func_sdfi);
     }
     
-    return(le);
+    return gen_nreverse(le);
 }
     
 
