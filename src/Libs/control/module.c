@@ -16,17 +16,14 @@
 
 /* interface with pipsdbm and pipsmake */
 
-bool controlizer(module_name)
-string module_name;
+bool controlizer(string module_name)
 {
    
     statement module_stat;
     
     module_stat = 
 	copy_statement((statement)
-		       db_get_memory_resource(DBR_PARSED_CODE, 
-					      module_name, 
-					      TRUE)) ;
+	    db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE)) ;
     
        /* *module_stat can be re-used because control_graph reallocates
 	  statements; do not show that to any student!
@@ -42,21 +39,25 @@ string module_name;
        une re'cursion de l'unstructured vers module_stat. :-(
 
        So now correct the label and the comment: */
+
     module_stat = make_statement(entity_empty_label(), 
 				 STATEMENT_NUMBER_UNDEFINED,
-				 MAKE_ORDERING(0,1), 
+				 MAKE_ORDERING(0,1),
 				 empty_comments,
 				 make_instruction(is_instruction_unstructured,
 						  control_graph(module_stat)));
 
     /* By setting this property, we try to unspaghettify the control
        graph of the module: */
+
     if (get_bool_property("UNSPAGHETTIFY_IN_CONTROLIZER")) {
+
 	/* To have the debug in unspaghettify_statement() working: */
 	set_current_module_statement(module_stat);
 	set_current_module_entity(local_name_to_top_level_entity(module_name));
        
 	unspaghettify_statement(module_stat);
+
 	/* Reorder the module, because statements may have been
            changed. */
 	module_reorder(module_stat);
@@ -64,16 +65,7 @@ string module_name;
 	reset_current_module_entity();
     }
     
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, 
-			   strdup(module_name), 
-			   module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
 
     return TRUE;
 }
-
-
-
-
-
-
-
