@@ -48,13 +48,14 @@ typedef dg_arc_label arc_label;
  * shared variables, and create different mappings between local variables
  * and references.
  */
-void loop_nest_to_local_variables(initial_module, compute_module, memory_module, 
-				  llv_to_lcr, r_to_llv, v_to_lllv, r_to_ud,
-				  v_to_esv, v_to_nlv,
-				  lpv, body, indices, dg, bn, ls, pd, tile)
-entity initial_module;           /* initial module: achtung, this arg. is not used!?! */
-entity compute_module;           /* compute module */
-entity memory_module;           /* memory module */
+void loop_nest_to_local_variables(
+    initial_module, compute_module, memory_module, 
+    llv_to_lcr, r_to_llv, v_to_lllv, r_to_ud,
+    v_to_esv, v_to_nlv,
+    lpv, body, indices, dg, bn, ls, pd, tile)
+entity initial_module;  /* initial module: achtung, this arg. is not used!?! */
+entity compute_module;  /* compute module */
+entity memory_module;   /* memory module */
 hash_table llv_to_lcr;	/* local variable to list of conflicting references */
 hash_table r_to_llv;	/* reference to list of local variables  */
 hash_table v_to_lllv;	/* variable to list of lists of local variables */
@@ -569,7 +570,7 @@ Pbase b;
     Psysteme tc = sc_new();
 
     int d = base_dimension(b);
-    int k = DENOMINATOR(P);
+    Value k = DENOMINATOR(P);
     int i,j;
 
     matrice IP = matrice_new(d,d);
@@ -577,7 +578,7 @@ Pbase b;
 
     debug(8,"make_tile_constraints", "begin\n");
 
-    pips_assert("make_tile_constraints", k == 1);
+    pips_assert("make_tile_constraints", value_one_p(k));
 
     ifdebug(8) {
 	(void) fprintf(stderr,"Partitioning matrix P:\n");
@@ -601,13 +602,13 @@ Pbase b;
 	for ( j=1; j<=d; j++) {
 	    vect_add_elem(&contrainte_vecteur(c), 
 			  variable_of_rank(b,i),
-			  -ACCESS(IP, d, j, i));
+			  value_uminus(ACCESS(IP, d, j, i)));
 
 	}
         sc_add_inegalite(tc, c);
 	c1 = contrainte_dup(c);
 	contrainte_chg_sgn(c1);
-	vect_add_elem(&contrainte_vecteur(c1), TCST, -(k-1));
+	vect_add_elem(&contrainte_vecteur(c1), TCST, value_minus(VALUE_ONE,k));
 	sc_add_inegalite(tc, c1);
     }
 
@@ -670,11 +671,11 @@ int dimn;
 {
     /* let's use the first reference to find out the number of dimensions */
     reference r;
-    entity rv;				/* referenced variable */
-    type rvt;				/* referenced variable type */
-    list rvld;				/* referenced variable dimension list */
-    int d = -1;				/* dimension number */
-    list lvd = NIL;			/* dimensions for the local variables */
+    entity rv;			/* referenced variable */
+    type rvt;			/* referenced variable type */
+    list rvld;			/* referenced variable dimension list */
+    int d = -1;			/* dimension number */
+    list lvd = NIL;		/* dimensions for the local variables */
     boolean first_ref;
     matrice P = (matrice) tiling_tile(tile);
     debug(8,"set_dimensions_of_local_variable_family","begin\n");
@@ -688,9 +689,9 @@ int dimn;
 	  entity_name(rv));
 
     for( d = 1; !ENDP(rvld); POP(rvld), d++) {
-	int imax = INT_MIN;
-	int gmin = INT_MAX;
-	int gmax = INT_MIN;
+	Value imax = VALUE_MIN;
+	Value gmin = VALUE_MAX;
+	Value gmax = VALUE_MIN;
 	list cr = list_undefined;
 	dimension dimd = dimension_undefined;
 	
@@ -702,8 +703,11 @@ int dimn;
 	expression upper= dimension_upper(dim1);
 	normalized norm2 = NORMALIZE_EXPRESSION(upper);
 	if (normalized_linear_p(norm1) && normalized_linear_p(norm2)) {
-	    gmin = vect_coeff(TCST,(Pvecteur) normalized_linear(norm1))-1;
-	    imax = gmax = vect_coeff(TCST,(Pvecteur) normalized_linear(norm2))-1;
+	    gmin = vect_coeff(TCST,(Pvecteur) normalized_linear(norm1));
+	    value_decrement(gmin);
+	    gmax = vect_coeff(TCST,(Pvecteur) normalized_linear(norm2));
+	    value_decrement(gmax);
+	    imax = gmax;
 	}
 	first_ref = TRUE;
 	for(cr = lr; !ENDP(cr); POP(cr)) {
@@ -713,9 +717,7 @@ int dimn;
 	    Pvecteur vec;
 	    Pcontrainte eg;
 	    Psysteme s;
-	    int min;
-	    int max;
-	    int coef;
+	    Value min, max, coef;
 	    r = REFERENCE(CAR(cr));
 	    e = find_ith_expression(reference_indices(r), d);
 	    n = NORMALIZE_EXPRESSION(e);
@@ -723,14 +725,15 @@ int dimn;
 	    /* pips_assert("set_dimensions_of_local_variable_family", */
 	    if (normalized_linear_p(n)) {
 		vec = vect_dup((Pvecteur) normalized_linear(n));
-		vect_add_elem(&vec, (Variable) phi, (Value) -1);
+		vect_add_elem(&vec, (Variable) phi, VALUE_MONE);
 		eg = contrainte_make(vec);
 
 		/* pour tenir compte des offsets numeriques dans les 
 		   fonctions d'acces */
-		if ((coef =vect_coeff(TCST,vec)) >0)
-		gmax +=coef;
-		else gmin +=coef;
+		if (value_pos_p(coef =vect_coeff(TCST,vec)))
+		    value_addto(gmax,coef);
+		else 
+		    value_addto(gmin,coef);
 
 		s = sc_dup(tc);
 		sc_add_egalite(s, eg);
@@ -738,39 +741,40 @@ int dimn;
 
 		s = sc_normalize(s);
 		ifdebug(8) {
-		    (void) fprintf(stderr,"System on phi for dimension %d:\n", d);
+		    (void) fprintf(stderr,
+				   "System on phi for dimension %d:\n", d);
 		    sc_fprint(stderr, s, entity_local_name);
 		}
 
 
 		if(!sc_minmax_of_variable(s, (Variable) phi, 
-					  (Value *) &min, (Value *) &max))
+					  &min, &max))
 		    pips_error("set_dimensions_of_local_variable_family",
 			       "empty domain for phi\n");
 
-		if((min == INT_MIN) || (max == INT_MAX)) {
-		    int divis= ACCESS(P,dimn,d,d);
+		if(value_min_p(min) || value_max_p(max)) {
+		    Value divis= ACCESS(P,dimn,d,d);
 		    /* parameter ==> min = max = 1 */
-		    /*		pips_error("set_dimensions_of_local_variable_family",
-				"unbounded domain for phi, %s\n",
-				"check tile bounds and subscript expressions"); */
-		    min=0;
-		    max=(divis < 999 && divis >1) ? imax/divis: imax;
+		    /*pips_error("set_dimensions_of_local_variable_family",
+		      "unbounded domain for phi, %s\n",
+		      "check tile bounds and subscript expressions"); */
+		    min= VALUE_ZERO;
+		    max= value_lt(divis,VALUE_CONST(999)) && 
+			value_gt(divis,VALUE_ONE)? value_div(imax,divis): imax;
 		}
 
 		debug(8,"set_dimensions_of_local_variable_family",
 		      "bounds for dimension %d: [%d:%d]\n", d, min, max);
 
-		 gmin = (first_ref) ? MAX(gmin, min): MIN(gmin, min);
-		gmax = (first_ref) ? MIN(gmax, max):MAX(gmax, max);
+		gmin = first_ref? value_max(gmin, min): value_min(gmin, min);
+		gmax = first_ref? value_min(gmax, max): value_max(gmax, max);
 		
-		if (gmin > gmax) gmax = gmin;
-		first_ref=FALSE;
-		
+		if (value_gt(gmin,gmax)) gmax = gmin;
+		first_ref=FALSE;		
 	    }
 	}
-	dimd = make_dimension(int_to_expression(gmin),
-			      int_to_expression(gmax));
+	dimd = make_dimension(int_to_expression(VALUE_TO_INT(gmin)),
+			      int_to_expression(VALUE_TO_INT(gmax)));
 
 	debug(8,"set_dimensions_of_local_variable_family",
 	      "bounds for dimension %d: [%d:%d]\n", d, gmin, gmax);
