@@ -9,7 +9,7 @@
  */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1998/09/08 13:32:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1998/11/09 16:29:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -341,7 +341,7 @@ remove_all_unreachable_controls_of_an_unstructured(unstructured u)
                           (char *) c);
        }
     },
-       entry_node,
+       exit_node,
        blocs);
     gen_free_list(blocs);
 
@@ -482,6 +482,8 @@ remove_a_control_from_an_unstructured_without_relinking(control c)
    }, the_successors);
    gen_free_list(the_successors);
 
+   pips_assert("The control node should not have any connection here,",
+	       control_predecessors(c) == NIL && control_successors(c) == NIL);
    /* Remove the control node itself: */
    free_control(c);
 }
