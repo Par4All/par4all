@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-util.c,v $
+ * Revision 1.36  1997/07/25 22:28:08  keryell
+ * Avoid to put comments on sequences.
+ *
  * Revision 1.35  1997/07/21 15:25:59  keryell
  * Forgotten 'u'.
  *
@@ -382,14 +385,16 @@ statement *psh, *psn;
 			  " distributed variable ",
 			  entity_local_name(array), "\n", NULL);
 
-    statement_comments(*psh) = strdup(comment);
-    statement_comments(*psn) = strdup(comment);
+    insert_comments_to_statement(*psh, comment);
+    insert_comments_to_statement(*psn, comment);
 
     comment = concatenate("! end of ",
 			  movement_update_p(move) ? "update" : "collect",
 			  "\n", NULL);
-    statement_comments(h_cont) = strdup(comment);
-    statement_comments(n_cont) = strdup(comment);
+    insert_comments_to_statement(h_cont, comment);
+    /* Do not forget to move forbidden information associated with
+       block: */
+    insert_comments_to_statement(n_cont, comment);
 
     DEBUG_STAT(5, "Host", *psh);
     DEBUG_STAT(5, "Node", *psn);
@@ -480,10 +485,10 @@ void generate_io_statements_for_shared_arrays(
      */
     comment = concatenate("! updating shared variable ",
 			  entity_local_name(array), "\n", NULL);
-    statement_comments(*psh) = strdup(comment);
-    statement_comments(*psn) = strdup(comment);
-    statement_comments(h_cont) = strdup("! end of update\n");
-    statement_comments(n_cont) = strdup("! end of update\n");
+    insert_comments_to_statement(*psh, comment);
+    insert_comments_to_statement(*psn, comment);
+    insert_comments_to_statement(h_cont, "! end of update\n");
+    insert_comments_to_statement(n_cont, "! end of update\n");
 }
 
 /* that is all
