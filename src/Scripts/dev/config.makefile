@@ -33,6 +33,7 @@ INSTALL_INC=	$(MACROS)
 SOURCES	=	$(SCRIPTS) $(MACROS) forward_gnu_makefile config.makefile
 
 quick-install: install_forward_makefiles install_macros 
+all: .runable
 
 # bootstraping temporarily include files if needed...
 $(PIPS_ROOT)/Include/makefile_macros.$(ARCH):
