@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/23 22:38:37 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/24 12:58:58 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -104,7 +104,8 @@ $SED '//s,A,a,g;//s,B,b,g;//s,C,c,g;//s,D,d,g;
       //s,Y,y,g;//s,Z,z,g;//s,[ 	][ 	]*, ,g;
       //s,\([0-9a-z]\) \([^0-9a-z]\),\1\2,g;
       //s,\([^0-9a-z]\) \([0-9a-z]\),\1\2,g;
-      //s,\([^0-9a-z]\) \([^0-9a-z]\),\1\2,g;' |
+      //s,\([^0-9a-z]\) \([^0-9a-z]\),\1\2,g;
+      //s,)with ,) with ,;//s,)onto ,) onto ,;' |
 #
 # and continuation handling:
 # put the whole file on one line:-)
