@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1995/12/15 16:30:42 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1995/12/18 15:28:13 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -115,7 +115,6 @@ typedef union gen_chunk {
 extern gen_chunk *Gen_tabulated_[] ;
 extern struct gen_binding Domains[], *Tabulated_bp ;
 
-
 #define TABULATED_MAP(_x,_code,_dom) \
 	{int _tabulated_map_i=0 ; \
 	 gen_chunk *_tabulated_map_t = Gen_tabulated_[Domains[_dom].index] ; \
@@ -160,10 +159,10 @@ extern void gen_init_external GEN_PROTO((int,
 extern gen_chunk *gen_check GEN_PROTO(( gen_chunk *, int )) ;
 extern int gen_type GEN_PROTO((gen_chunk *)) ;
 extern char *gen_domain_name GEN_PROTO((int)) ;
-extern void gen_clear_tabulated_element GEN_PROTO(( gen_chunk * )) ;
-extern gen_chunk *gen_copy_tree GEN_PROTO(( gen_chunk * )) ;
+extern void gen_clear_tabulated_element GEN_PROTO((gen_chunk *)) ;
+extern gen_chunk *gen_copy_tree GEN_PROTO((gen_chunk *)) ;
+extern gen_chunk *gen_copy_tree_with_sharing GEN_PROTO((gen_chunk *)) ;
 extern int gen_consistent_p GEN_PROTO(( gen_chunk * )) ;
-extern char *alloc GEN_PROTO ((int )) ;
 extern int gen_allocated_memory GEN_PROTO((gen_chunk*));
 
 /*  recursion and utilities
@@ -171,6 +170,7 @@ extern int gen_allocated_memory GEN_PROTO((gen_chunk*));
 extern bool gen_true GEN_PROTO((gen_chunk *)) ;
 extern bool gen_false GEN_PROTO((gen_chunk *)) ;
 extern void gen_null GEN_PROTO((gen_chunk *)) ;
+extern void gen_core GEN_PROTO((gen_chunk *)) ;
 
 extern void gen_recurse_stop GEN_PROTO((gen_chunk *));
 extern void gen_multi_recurse GEN_PROTO((gen_chunk *, ...));
