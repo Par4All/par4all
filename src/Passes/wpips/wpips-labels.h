@@ -1,3 +1,5 @@
+/* 	%A% ($Date: 1995/09/05 15:16:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
 /*#define REGULAR_VERSION "Regular Version"
   #define PARALLEL_VERSION "Parallel Version"
   */
@@ -13,6 +15,7 @@
 #define DEPENDENCE_GRAPH_VIEW "Dependence Graph View"
 #define FLINT_VIEW "Flint View"
 #define SEQUENTIAL_EMACS_VIEW "Emacs Sequential View"
+#define SEQUENTIAL_GRAPH_VIEW "Sequential View with Control Graph"
 #define ARRAY_DFG_VIEW "Array data flow graph View"
 #define TIME_BASE_VIEW "Scheduling View"
 #define PLACEMENT_VIEW "Placement View"
