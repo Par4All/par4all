@@ -179,7 +179,7 @@ i_help: TK_HELP TK_NAME TK_ENDOFLINE
 
 i_setprop: TK_SET_PROPERTY TK_LINE TK_ENDOFLINE
 	{
-	    user_log("setproperty %s\n", $2);
+	    user_log("setproperty%s\n", $2);
 	    parse_properties_string($2);
 	    fflush(stdout);
 	    free($2);
