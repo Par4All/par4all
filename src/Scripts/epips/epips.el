@@ -649,7 +649,11 @@ epips-command-content contains the name of the file to display."
 	   (epips-fortran-mode-and-hilit)
 	   ;; Add the file name, for a possible future user edit and
 	   ;; save:
-	   (set-visited-file-name epips-command-content)
+	   ;; Emacs 19.32: added t to avoid asking confirmation
+	   ;; to the user if there is already a buffer displaying this
+	   ;; file. It used to be trouble-shooting for unexperimented
+	   ;; users... :-)
+	   (set-visited-file-name epips-command-content t)
 	   ;; Restore the original "Emacs-PIPS-<n>" name instead of
 	   ;; the file name:
 	   (rename-buffer old-buffer-name)
