@@ -42,7 +42,14 @@
 
 static bool is_user_view;	/* print_code or print_source */
 
-bool print_parallelized90_code(mod_name)
+bool
+user_view_p()
+{
+    return is_user_view;
+}
+
+bool 
+print_parallelized90_code(mod_name)
 char *mod_name;
 {
     bool success;
@@ -55,14 +62,16 @@ char *mod_name;
     return success;
 }
 
-bool print_parallelized77_code(mod_name)
+bool 
+print_parallelized77_code(mod_name)
 char *mod_name;
 {
     /* set_bool_property("PRETTYPRINT_FORTRAN90", FALSE); */
     return print_parallelized_code(mod_name);
 }
 
-bool print_parallelizedHPF_code(string module_name)
+bool 
+print_parallelizedHPF_code(string module_name)
 {
     bool ok, init;
 
@@ -74,7 +83,8 @@ bool print_parallelizedHPF_code(string module_name)
     return ok;
 }
 
-bool print_parallelized_code(mod_name)
+bool 
+print_parallelized_code(mod_name)
 char *mod_name;
 {
     bool success = FALSE;
@@ -106,14 +116,16 @@ char *mod_name;
 }
 
 
-bool print_code(mod_name)
+bool 
+print_code(mod_name)
 char *mod_name;
 {
   is_user_view = FALSE;
   return print_code_or_source(mod_name);
 }
 
-bool print_source(mod_name)
+bool 
+print_source(mod_name)
 char *mod_name;
 {
   is_user_view = TRUE;
@@ -121,7 +133,8 @@ char *mod_name;
 }
 
 
-bool print_code_or_source(mod_name)
+bool 
+print_code_or_source(mod_name)
 char *mod_name;
 {
     bool success = FALSE;
@@ -162,7 +175,8 @@ char *mod_name;
 }
     
 
-bool make_text_resource(mod_name, res_name, file_ext, texte)
+bool 
+make_text_resource(mod_name, res_name, file_ext, texte)
 char *mod_name;
 char *res_name;
 char *file_ext;
