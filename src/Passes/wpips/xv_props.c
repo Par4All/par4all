@@ -301,7 +301,7 @@ Panel props_panel;
 
 				/* Yes, "arg[...]" is awfull ! But if you have a better solution
 					I am interested... :-() RK, 8/6/93. */
-			pips_assert(narg < 19);
+			pips_assert("build_props_menu_and_panel", narg < 19);
 			arg[narg] = arg[narg+1] = NULL;
 			panel_choice_item = xv_create(props_panel, PANEL_CHOICE_STACK,
 				PANEL_LAYOUT, PANEL_HORIZONTAL,
