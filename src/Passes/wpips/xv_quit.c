@@ -64,7 +64,11 @@ Menu_item menu_item;
 	    close_program();
     }
 
-    exit(0);
+    /* Clear the log window to avoid the message about the edited
+       state: */
+    clear_log_subwindow();
+    /* Quit: */
+    xv_destroy_safe(main_frame);
 }
 
 
