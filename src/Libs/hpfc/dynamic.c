@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/12/30 15:44:55 $, )
+ * ($Date: 1997/02/18 10:07:48 $, )
  */
 
 #include "defines-local.h"
@@ -42,8 +42,6 @@ entity safe_load_primary_entity(entity e)
    
     return load_primary_entity(e);
 }
-
-#define primary_entity_p(a) (a==load_primary_entity(a))
 
 /*   DYNAMIC STATUS management.
  */
@@ -198,6 +196,52 @@ static entity new_synonym(entity e)
     return new_e;
 }
 
+void static
+check_for_similarity(
+    entity a, /* array a to be compared against its similars */
+    list /* of entity */ others)
+{
+    bool similar_found = FALSE;
+
+    pips_debug(3, "of %s\n", entity_name(a));
+
+    if (!array_distributed_p(a)) /* no templates! */
+	return;
+
+    /* look for copies with similar mappings for latter update
+     */
+    MAP(ENTITY, e,
+    {
+	pips_debug(7, "%s against %s\n", entity_name(a), entity_name(e));
+	if (a!=e && array_distribution_similar_p(e, a))
+	{
+	    /* a -> init[e] for storage purposes 
+	     */
+	    pips_debug(8, "found similar: %s -> %s\n", 
+		       entity_name(a), entity_name(e));
+	    store_similar_mapping(a, load_similar_mapping(e));
+	    similar_found = TRUE;
+	    break;
+	}
+    },
+	others);
+
+    if (!similar_found) store_similar_mapping(a, a);
+
+    return;
+}
+
+/* check all *dynamic* arrays for some similars...
+ */
+void hpfc_check_for_similarities(list /* of entity */ le)
+{
+    MAP(ENTITY, array,
+	MAPL(ca,
+	    check_for_similarity(ENTITY(CAR(ca)), CDR(ca)),
+	    entities_list(load_dynamic_hpf(array))),
+	le);
+}
+
 /*  builds a new synonym for array a, the alignment of which 
  *  will be al. The new array is set as distributed.
  */
@@ -205,35 +249,14 @@ static entity new_synonym_array(
     entity a,
     align al)
 {
-    bool similar_found = FALSE;
     entity new_a = new_synonym(a);
     set_array_as_distributed(new_a);
     store_hpf_alignment(new_a, al);
-
-    /* look for copies with similar mappings for latter update
-     */
-    MAP(ENTITY, e,
-    {
-	if (new_a!=e && array_distribution_similar_p(e, new_a))
-	{
-	    /* new_a -> init[e] for storage purposes 
-	     */
-	    pips_debug(8, "found similar: %s -> %s\n", 
-		       entity_name(new_a), entity_name(e));
-	    store_similar_mapping(new_a, load_similar_mapping(e));
-	    similar_found = TRUE;
-	    break;
-	}
-    },
-	entities_list(load_dynamic_hpf(new_a)));
-
-    if (!similar_found) store_similar_mapping(new_a, new_a);
-
     return new_a;
 }
 
 /*  builds a new synonym for template t, the distribution of which
- *  will be di. the new entity is set as a template.
+ *  will be di. the new entity is set as a template, and/or as an array
  */
 static entity new_synonym_template(
     entity t,
@@ -1238,6 +1261,7 @@ static void regenerate_renamings(statement s)
     MAP(ENTITY, target,
     {
 	entity primary = load_primary_entity(target);
+	bool some_source_found = FALSE;
 
 	MAP(ENTITY, source,
 	{
@@ -1246,9 +1270,16 @@ static void regenerate_renamings(statement s)
 		pips_debug(4, "%s -> %s\n", 
 			   entity_name(source), entity_name(target));
 		ln = CONS(RENAMING, make_renaming(source, target), ln);
+		some_source_found = TRUE;
 	    }
 	},
 	    lr);
+
+	/* ensures some remapping to enforce an update of the status,
+	 * which may be necessary, for instance if KILL was used.
+	 */
+	if (!some_source_found)
+	    ln = CONS(RENAMING, make_renaming(target, target), ln);
     },
 	ll);
 
@@ -1257,6 +1288,23 @@ static void regenerate_renamings(statement s)
 	gen_map(gen_free, l), gen_free_list(l); /* ??? */
 	update_renamings(s, ln);
     }
+}
+
+/* special case. tags leavings to enable initializing hpfc runtime.
+ */
+static void 
+update_root_special_renamings(statement s)
+{
+    list /* of renamings */ lr = NIL;
+
+    gen_map(gen_free, load_renamings(s)),
+    gen_free_list(load_renamings(s));
+
+    MAP(ENTITY, a, lr = CONS(RENAMING, make_renaming(a, a), lr),
+	entities_list(load_leaving_mappings(s)));
+    
+    update_renamings(s, lr); 
+    /* delete_renamings(s); */
 }
 
 static list /* of statements */ 
@@ -1346,10 +1394,7 @@ void simplify_remapping_graph(void)
     if (bound_remapped_p(root))	remove_unused_remappings(root);
 
     gen_map(regenerate_renamings, ls);
-
-    gen_map(gen_free, load_renamings(root)),
-    gen_free_list(load_renamings(root)), 
-    (void) delete_renamings(root);
+    update_root_special_renamings(root);
 
     gen_free_list(ls);
 }
@@ -1436,6 +1481,8 @@ statement generate_copy_loop_nest(
     statement current;
     entity module;
     int ndims, i;
+
+    if (src==trg) return make_empty_statement();
 
     pips_assert("valid arguments",
 		array_distributed_p(src) && array_distributed_p(trg) &&
