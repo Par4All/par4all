@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.225 2002/06/12 09:43:55 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.226 2002/06/13 12:07:12 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -523,8 +523,10 @@ words_regular_call(call obj, bool is_a_subroutine)
       expression eap = EXPRESSION(CAR(pa));
       if(get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
 	 && actual_label_replacement_p(eap)) {
-	string ls = entity_local_name(call_function(syntax_call(expression_syntax(eap))));
+	entity cf = call_function(syntax_call(expression_syntax(eap)));
+	string ls = entity_local_name(cf);
 	string ls1 = malloc(strlen(ls));
+	pips_assert("ls has at least four characters", strlen(ls)>=4);
 	/* Get rid of initial and final quotes */
 	ls1 = strncpy(ls1, ls+1, strlen(ls)-2);
 	pips_assert("eap must be a call to a constant string", expression_call_p(eap));
