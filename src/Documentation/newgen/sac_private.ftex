@@ -31,10 +31,10 @@ instruction sets, such as MMX, SSE or VIS.
 
 \section*{Opcodes and opcode classes}
 
-\domain{opcodes = name:string x vectorSize:int x subwordSize:int}
+\domain{opcode = name:string x vectorSize:int x subwordSize:int}
 {}
 
-\domain{opcodeClass = nbArgs:int x opcodes*}
+\domain{opcodeClass = nbArgs:int x opcodes:opcode*}
 {}
 
 \section*{Statement matching}
@@ -62,15 +62,14 @@ arguments for the opcode.
 \domain{patternx = class:int x args:patternArg*}
 {}
 
-%% NON (FC): \domain{External hash\_table}
+\domain{matchTreeSons = int->matchTree}
 {}
 
 \verb+matchTree+ is a structure used to efficiently identify
 patterns corresponding to a statement. When traversed, it can thus map
 a statement to a list of patterns that can be used.
 
-%% x sons:hash_table
-\domain{matchTree = patternx:patternx*}
+\domain{matchTree = patterns:patternx* x sons:matchTreeSons}
 {}
 
 A \verb+pattern+ can be translated into a \verb+match+ by mapping the
