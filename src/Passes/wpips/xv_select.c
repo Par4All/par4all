@@ -22,6 +22,30 @@
 #include "resources.h"
 
 
+/* Try to select a main module (that is the PROGRAM in the Fortran
+   stuff) if no one is selected: */
+void
+select_a_module_by_default()
+{
+   char *module_name = db_get_current_module_name();
+
+   if (module_name == NULL) {
+      /* Ok, no current module, then find a main module (PROGRAM): */
+      string main_module_name = get_first_main_module();
+      
+      if (main_module_name != string_undefined) {
+         /* Ok, we got it ! Now we select it: */
+         module_name = main_module_name;
+         user_log("Main module PROGRAM \"%s\" found.", module_name);
+         end_select_module_notify(module_name);
+      }
+   }
+
+   /* Refresh the module name on the status window: */
+   show_module();
+}
+
+
 success end_directory_notify(dir)
 char *dir;
 {
@@ -90,8 +114,8 @@ Event *event;
   cancel_query_notify(item, event);
 }
 
-success continue_create_program_notify(name)
-     char *name;
+success
+continue_create_program_notify(char * name)
 {
    char *fortran_list[ARGS_LENGTH];
    int  fortran_list_length = 0;
@@ -146,23 +170,23 @@ success continue_create_program_notify(name)
                  fortran_list_length, fortran_list, 
                  end_create_program_notify);
          args_free(&fortran_list_length, fortran_list);
+
          return(TRUE);
       }
    }
 }
 
 
-void end_create_program_notify(pargc, argv)
-int *pargc;
-char *argv[];
+void
+end_create_program_notify(int * pargc, char * argv[])
 {
-    create_program(pargc, argv);
+   create_program(pargc, argv);
 
-    xv_set(close_pgm, MENU_INACTIVE, FALSE, 0);
-    xv_set(module_item, MENU_INACTIVE, FALSE, 0);
+   xv_set(close_pgm, MENU_INACTIVE, FALSE, 0);
+   xv_set(module_item, MENU_INACTIVE, FALSE, 0);
 
-    show_program();
-    show_module();
+   show_program();
+   select_a_module_by_default();
 }
 
 
@@ -181,7 +205,7 @@ void end_open_program_notify(name)
       xv_set(close_pgm, MENU_INACTIVE, FALSE, 0);
       xv_set(module_item, MENU_INACTIVE, FALSE, 0);
       show_program();
-      show_module();
+      select_a_module_by_default();
     }
     else {
       xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
