@@ -212,7 +212,7 @@ make_scanning_over_tiles(
     int id = base_dimension(initial_basis);
     int td = base_dimension(tile_basis_in_tile_basis);
     int l,t;
-    int keep_indice[10]; 
+    int keep_indice[11]; 
     Value min,max;
     int first_indice;  
     debug(8,"make_scanning_over_tiles", "begin for module %s\n",
