@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/10/02 12:57:20 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/10/24 13:38:40 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -490,10 +490,10 @@ static bool gen_trav_stop_recursion = FALSE; /* set to TRUE to stop... */
    driver DR. A leaf is an object (inlined or not). */
 
 static void
-gen_trav_leaf( bp, obj, dr )
-struct gen_binding *bp ;
-gen_chunk *obj ;
-struct driver *dr ;
+gen_trav_leaf( 
+    struct gen_binding * bp,
+    gen_chunk * obj,
+    struct driver * dr)
 {
     if (gen_trav_stop_recursion) return;
 
@@ -537,10 +537,10 @@ struct driver *dr ;
    driver DR. */
 
 static void
-gen_trav_simple( dp, obj, dr )
-union domain *dp ;
-gen_chunk *obj ;
-struct driver *dr ;
+gen_trav_simple(
+    union domain * dp,
+    gen_chunk * obj,
+    struct driver * dr)
 {
     if (gen_trav_stop_recursion) return;
 
@@ -604,14 +604,13 @@ struct driver *dr ;
  */
 
 static void
-gen_array_leaf(bp, i, obj, dr)
-struct gen_binding *bp ;
-int i ;
-gen_chunk *obj ;
-struct driver *dr ;
+gen_array_leaf(
+    struct gen_binding *bp,
+    int i,
+    gen_chunk *obj,
+    struct driver *dr)
 {
     if (gen_trav_stop_recursion) return;
-
     gen_trav_leaf( bp, obj, dr ) ;
 }
 
@@ -620,19 +619,16 @@ struct driver *dr ;
    the driver DR. */
 
 static void 
-gen_trav_obj_constructed(obj, bp, dp, data, dr)
-gen_chunk *obj ;
-struct driver *dr ;
-struct gen_binding *bp ;
-union domain *dp ;
-int data ;
+gen_trav_obj_constructed(
+    gen_chunk *obj,
+    struct gen_binding *bp,
+    union domain *dp,
+    int data,
+    struct driver *dr)
 {
     struct domainlist *dlp;
-
     if (gen_trav_stop_recursion) return;
-
     dlp = dp->co.components ;
-
     switch(dp->co.op)
     {
     case AND_OP: 
@@ -667,6 +663,12 @@ int data ;
 
 	HASH_MAP(k, v, 
 	     {
+		 /* fprintf(stderr, "%p (%s) -> %p (%s)\n",
+			 ((gen_chunk *) k)->p,
+			 Domains[((gen_chunk *) k)->p->i].name,
+			 ((gen_chunk *) v)->p,
+			 Domains[((gen_chunk *) v)->p->i].name); */
+		 /* what if: persistent sg -> */
 		 gen_trav_simple(dkeyp, (gen_chunk *) k, dr) ;
 		 if (gen_trav_stop_recursion) return;
 		 gen_trav_simple(dvalp, (gen_chunk *) v, dr) ;
@@ -681,9 +683,9 @@ int data ;
 }
 
 static void
-gen_trav_obj( obj, dr )
-     gen_chunk *obj ;
-     struct driver *dr ;
+gen_trav_obj(
+    gen_chunk * obj,
+    struct driver * dr)
 {
     if (gen_trav_stop_recursion) return;
 
@@ -1680,7 +1682,6 @@ struct driver *dr ;
 /* WRITE_OBJ_OUT is done when the OBJect (of type BP) has been printed. Just
    close the opening parenthese. */
 
-/*ARGSUSED*/
 static void
 write_obj_out( obj, bp, dr )
 gen_chunk *obj ;
@@ -1705,7 +1706,7 @@ string init, s, end ;
 {
     assert(s!=NULL);
     for( (void) fprintf( user_file, init ) ; *s != '\0' ; s++ ) {
-	(void) fprintf( user_file, (*s=='"' || *s=='\\') ? "\\%c" : "%c", *s ) ;
+	(void) fprintf(user_file, (*s=='"' || *s=='\\') ? "\\%c" : "%c", *s );
     }
     (void) fprintf( user_file, end ) ;
 }
@@ -1848,9 +1849,9 @@ union domain *dp ;
    number of which is printed before the object.) */
 
 void
-gen_write(fd, obj)
-FILE *fd ;
-gen_chunk *obj ;
+gen_write(
+    FILE * fd, 
+    gen_chunk * obj)
 {
     struct driver dr ;
 
@@ -2192,9 +2193,9 @@ int create_p ;
 }
 
 int
-gen_read_and_check_tabulated( file, create_p )
-FILE *file ;
-int create_p ;
+gen_read_and_check_tabulated(
+    FILE *file,
+    int create_p)
 {
     int domain ;
 
@@ -2213,9 +2214,9 @@ int create_p ;
 /* GEN_CHECK checks that the gen_chunk received OBJ is of the appropriate TYPE.
  */ 
 gen_chunk *
-gen_check( obj, t )
-gen_chunk *obj ;
-int t ;
+gen_check(
+    gen_chunk *obj,
+    int t)
 {
     extern int max_domain_index() ;
     int max_index ;
@@ -2244,18 +2245,14 @@ int t ;
  * FC 29/12/94
  */
 int
-gen_type(obj)
-gen_chunk *obj;
+gen_type(gen_chunk *obj)
 {
     int dom;
-
     message_assert("no domain for NULL object", obj!=(gen_chunk*)NULL);
     message_assert("no domain for undefined object", 
 		   !gen_chunk_undefined_p(obj)); 
-
     dom = obj->i; check_domain(dom);
-
-    return(dom);
+    return dom;
 }
 
 /*  GEN_DOMAIN_NAME returns the domain name, and may be used for debug
@@ -2263,11 +2260,13 @@ gen_chunk *obj;
  *  
  *  FC 29/12/94
  */
-char *gen_domain_name(t)
-int t;
+char *
+gen_domain_name(int t)
 {
     check_domain(t); return(Domains[t].name);
 }
+
+/*************************************************************** CONSISTENCY */
 
 extern int error_seen ;
 
@@ -2294,7 +2293,7 @@ gen_chunk *obj ;
 
     error_seen = 0 ;
     gen_debug = GEN_DBG_CHECK ;
-    gen_write( black_hole, obj ) ;
+    gen_write(black_hole, obj) ;
     gen_debug = old_gen_debug ;
     return( error_seen  == 0 ) ;
 }
