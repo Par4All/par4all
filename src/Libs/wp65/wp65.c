@@ -36,6 +36,7 @@
 #include "wp65.h"
 
 extern entity MakeRunTimeSupportFunction();
+extern entity MakeExternalFunction(entity e, type r);
 
 DEFINE_CURRENT_MAPPING(fetch,list)
 DEFINE_CURRENT_MAPPING(store,list) 
@@ -74,9 +75,8 @@ entity MakeEntityFunction(string sname)
 
 void print_ref(reference r)
 {
-  fprintf(stderr, "reference to %s is 0x%x\n", 
-	  entity_name(reference_variable(r)),
-	  (unsigned int) r);
+  fprintf(stderr, "reference to %s is %p\n", 
+	  entity_name(reference_variable(r)), r);
 }
 
 void print_eff(effect e)
