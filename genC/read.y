@@ -66,8 +66,9 @@ static int shared_number ;
 
 int allow_forward_ref = FALSE ;
 
-static char *read_external() ;
-static gen_chunk *make_def(), *make_ref() ;
+static char * read_external(int);
+static gen_chunk * make_def(int, gen_chunk*, gen_chunk *);
+static gen_chunk * make_ref(int, gen_chunk *);
 
 %}
 
@@ -185,18 +186,10 @@ Sparse_Datas
 		}
 	;
 
-Data	: Basis	{
-                $$ = $1 ;
-		}
-        | READ_LIST_UNDEFINED {
-	        $$.l = list_undefined ;
-	        }
-	| LP Datas RP {
-		$$.l = gen_nreverse( $2 ) ;
-		}
-        | READ_SET_UNDEFINED {
-	        $$.t = set_undefined ;
-	    }
+Data	: Basis	{ $$ = $1; }
+        | READ_LIST_UNDEFINED { $$.l = list_undefined; }
+	| LP Datas RP {	$$.l = gen_nreverse($2); }
+        | READ_SET_UNDEFINED { $$.t = set_undefined; }
         | LC Int Datas RC {
 	        $$.t = set_make( $2 ) ;
 		MAPL( cp, {
@@ -210,9 +203,7 @@ Data	: Basis	{
 		  }}, $3 ) ;
 		gen_free_list( $3 ) ;
 	        }
-        | READ_ARRAY_UNDEFINED {
-	        $$.p = array_undefined ;
-	        }
+        | READ_ARRAY_UNDEFINED { $$.p = array_undefined ; }
 	| VECTOR_BEGIN Int Sparse_Datas RP {
                 gen_chunk *kp ;
 		cons *cp ;
@@ -246,12 +237,8 @@ Data	: Basis	{
 		gen_free_list( $2 ) ;
 		$$.h = h ;
 		}
-	| Chunk {
-		$$.p = $1 ;
-		}
-	| SHARED_POINTER Int {
-		$$.p = shared_table[ $2-1 ] ;
-		}
+	| Chunk { $$.p = $1 ; }
+	| SHARED_POINTER Int { $$.p = shared_table[ $2-1 ]; }
 	;
   
 Basis	: READ_UNIT { $$.u = 1; }
@@ -261,12 +248,12 @@ Basis	: READ_UNIT { $$.u = 1; }
 	| READ_FLOAT { $$.f = $1; }
 	| String { $$ = *$1 ; }
  	| READ_EXTERNAL Int { $$.s = read_external($2); }
-	| READ_DEF Int String Chunk { $$.p = make_def($2, $3, $4); }
+	| READ_DEF Int String Chunk { $$.p = make_def($2,$3,$4); }
 	| READ_REF Int String { $$.p = make_ref($2, $3) ; }
 	| READ_NULL { $$.p = gen_chunk_undefined ; }
 	;
 
-Int     : READ_INT   { $$ = $1 ; }
+Int     : READ_INT   { $$ = $1; }
 	;
 
 String  : READ_STRING {
@@ -407,13 +394,17 @@ enter_tabulated_def(
 }
 
 /* MAKE_DEF defines the object CHUNK of name STRING to be in the tabulation 
-   table INT. */
-
+   table INT.
+ */
 static gen_chunk * make_def(int domain, gen_chunk* String, gen_chunk* gc)
 {
   char * id = String->s;
   domain = gen_type_translation_old_to_actual(domain);
   message_assert("domain is tabulated", Domains[domain].index!=-1);
+
+  /* this redundancy could be avoided in the format... */
+  message_assert("same type", domain==gc->i && !strcmp(id, (gc+2)->s));
+
   return enter_tabulated_def(Domains[domain].index, domain, id, gc, 
 			     allow_forward_ref) ;
 }
