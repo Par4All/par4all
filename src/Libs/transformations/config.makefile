@@ -43,7 +43,8 @@ LIB_CFILES=	replace.c \
 		nest_parallelization.c\
 		dead_code_elimination.c \
 		privatize.c \
-		simple_atomize.c
+		simple_atomize.c \
+		standardize_structure.c
 LIB_HEADERS=	transformations-local.h
 LIB_OBJECTS=	$(LIB_CFILES:%.c=%.o)
 #
