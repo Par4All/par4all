@@ -1,3 +1,22 @@
+/* Remi Triolet
+ *
+ * Modifications:
+ *
+ * - Bruno Baron:
+ *
+ * - Francois Irigoin: I do not understand why regions of statements are
+ *   implemented as set of statements instead of set of statement orderings
+ *   since the dependence graph refers to statement orderings.
+ *
+ * - Francois Irigoin: use a copy of the code statement to generate
+ *   the parallel code, instead of using side effects on the sequential
+ *   code statement. This works because the dependence graph uses
+ *   persistent pointers towards statement, statement_ordeging, and because
+ *   the references are the same in the sequential code and in its copy.
+ *   So references are still accessible, although it may be useless for
+ *   parallelization.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,6 +52,8 @@
 #include "chains.h"
 #include "ricedg.h"
 #include "rice.h"
+
+static bool do_it(string, bool, string);
 
 /* the dependence graph of the current loop nest */
 graph dg = graph_undefined;
@@ -93,7 +114,7 @@ char *mod_name;
 bool rice(mod_name)
 char *mod_name;
 { 
-    bool success;
+    bool success = TRUE;
     entity
 	module = local_name_to_top_level_entity(mod_name);
 
@@ -114,41 +135,54 @@ char *mod_name;
 /*
  * RICE_DEBUG_LEVEL (properly?) included, FC 23/09/93
  */
-bool do_it(mod_name, distribute_p, what ) 
+static bool do_it(mod_name, distribute_p, what ) 
 char *mod_name ;
 bool distribute_p ;
 char *what ;
 {
-    statement mod_stat;
-    instruction mod_inst;
+    statement mod_stat = statement_undefined;
+    /* In spite of its name, the new statement "mod_parallel_stat"
+     * may be sequential if distribute_p is true
+     */
+    statement mod_parallel_stat = statement_undefined;
 
     set_current_module_statement( (statement)
 				  db_get_memory_resource(DBR_CODE, 
 							 mod_name, 
-							 FALSE) );
+							 TRUE) );
     mod_stat = get_current_module_statement();
 
-    /* FI: I do not understand this sequence. Non balanced  debug_off() ? */
-    /*
+    debug_on("RICE_DEBUG_LEVEL");
+
     ifdebug(7)
     {
 	fprintf(stderr, "\nTesting NewGen consistency for initial code %s:\n",
 		mod_name);
 	if (gen_consistent_p((statement)mod_stat))
 	    fprintf(stderr," NewGen consistent statement\n");
-	else 
-	{    fprintf(stderr," NewGen inconsistent statement\n");
-	    abort();
-	}
     }
 
-    debug_off();
-    */
+    ifdebug(1) {
+	debug(1, "do_it", "original sequential code:\n\n");
+	print_text(stderr, text_statement(entity_undefined, 0, mod_stat));
+    }
 
-    /* FI, BB: hack*/
-    /*(void) db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, FALSE);*/
-    mod_inst = statement_instruction(mod_stat);
-    pips_assert( "do_it", instruction_unstructured_p(mod_inst)) ;
+    mod_parallel_stat = copy_statement(mod_stat);
+
+    ifdebug(7)
+    {
+	debug(7, "do_it",
+	      "\nTesting NewGen consistency for copy code %s:",
+		mod_name);
+	if (gen_consistent_p((statement)mod_parallel_stat))
+	    fprintf(stderr," NewGen consistent statement copy\n");
+    }
+
+    ifdebug(1) {
+	debug(1, "do_it", "copy of sequential code:\n\n");
+	print_text(stderr, text_statement(entity_undefined, 0, mod_stat));
+    }
+
     if (graph_undefined_p(dg)) {
 	dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
     }
@@ -156,39 +190,30 @@ char *what ;
 	pips_error("do_it", "dg should be undefined\n");
     }
 
-    debug_on("RICE_DEBUG_LEVEL");
+    /* Make sure the dependence graph points towards the code copy */
+    reset_ordering_to_statement();
+    initialize_ordering_to_statement(mod_parallel_stat);
+
     rice_distribute_only = distribute_p ;
     enclosing = 0;
-    rice_statement(mod_stat,1);   
-    module_body_reorder(mod_stat);
+    rice_statement(mod_parallel_stat,1);   
+    module_body_reorder(mod_parallel_stat);
 
-    debug_off();
     ifdebug(7)
     {
 	fprintf(stderr, "\nparalized code %s:",mod_name);
-	if (gen_consistent_p((statement)mod_stat))
+	if (gen_consistent_p((statement)mod_parallel_stat))
 	    fprintf(stderr," gen consistent ");
-	else {
-	    fprintf(stderr,"\nFalse NewGen statement");
-	    exit(1);
-	}
     }
-    DB_PUT_MEMORY_RESOURCE(what, strdup(mod_name), (char*) mod_stat);
 
-    /* FI: hack to make hash tables consistent with the code;
-     * their values are good but the pointers to statements are wrong;
-     * the false introduction of a new version of the code forces a
-     * recomputation of all of them (18 May 1993)
-     */
-    reset_current_module_statement();
-    set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
-    mod_stat = get_current_module_statement();
+    debug_off();
+
+    /* FI: This may be parallel or sequential code */
+    DB_PUT_MEMORY_RESOURCE(what, strdup(mod_name), (char*) mod_parallel_stat);
+
     dg = graph_undefined;
-
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), (char*) mod_stat);
-
     reset_current_module_statement();
+    reset_ordering_to_statement();
 
     return TRUE;
 }
@@ -229,14 +254,10 @@ int l ;
       }
       case is_instruction_loop: {
 	  stat = rice_loop(stat,l);
-	  if (get_debug_level() >=7){
+	  ifdebug(7){
 	      fprintf(stderr, "\nparalized loop :");
 	      if (gen_consistent_p((statement)stat))
 		  fprintf(stderr," gen consistent ");
-	      else {
-		  fprintf(stderr,"\nFalse NewGen statement");
-		  exit(1);
-	      }
 	  }
 	  break;
       }
@@ -264,7 +285,7 @@ int l ;
     instruction istat = statement_instruction(stat);
     set region;
 
-    if (get_debug_level() >= 1) {
+    ifdebug(1) {
 	fprintf(stderr, "\n original nest of loops:\n\n");
 	print_text(stderr, text_statement(entity_undefined, 0, stat));
     }
@@ -280,7 +301,7 @@ int l ;
 	return(stat);
     }
 
-    if (get_debug_level() >= 2) {
+    ifdebug(2) {
 	fprintf(stderr, "[rice_loop] applied on region:\n");
 	print_statement_set(stderr, region);
     }
@@ -292,10 +313,6 @@ int l ;
 	fprintf(stderr, "\nCodeGenerate : ");
 	if (gen_consistent_p((statement)nstat))
 	    fprintf(stderr," gen consistent\n");
-	else {
-	    fprintf(stderr,"\nFalse NewGen statement");
-	    exit(1);
-	}
     }
     pips_assert( "rice_loop", nstat != statement_undefined ) ;
     pips_assert("rice_loop", 
@@ -305,7 +322,7 @@ int l ;
     statement_ordering(nstat) = statement_ordering(stat);
     statement_comments(nstat) = statement_comments(stat);
 
-    if (get_debug_level() >= 1) {
+    ifdebug(1) {
 	fprintf(stderr, "final nest of loops:\n\n");
 	print_text(stderr, text_statement(entity_undefined, 0, nstat));
     }
