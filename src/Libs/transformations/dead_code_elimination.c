@@ -861,6 +861,7 @@ suppress_dead_code(char * mod_name)
   initialize_dead_code_statistics();
   some_unstructured_ifs_have_been_changed = FALSE;
   suppress_dead_code_statement(mod_stmt);
+  insure_return_as_last_statement(get_current_module_entity(), &mod_stmt);
   display_dead_code_statistics();
   
   ifdebug(1) {
@@ -874,7 +875,7 @@ suppress_dead_code(char * mod_name)
   /* Reorder the module, because new statements have been generated. */
   module_reorder(mod_stmt);
 
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
 
   reset_current_module_statement();
   reset_current_module_entity();
