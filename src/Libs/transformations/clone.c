@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.6  1997/11/04 10:12:12  coelho
+ * clone_substitute interface added...
+ *
  * Revision 1.5  1997/11/04 10:06:26  coelho
  * new clone_substitute interface added.
  *
@@ -536,7 +539,8 @@ clone_on_argument(string name)
 }
 
 /* clone a routine in a caller. the user is requested the caller and
- * ordering to perform the cloning of that instance.
+ * ordering to perform the cloning of that instance. can also be used
+ * to force a function substitution at a call site.
  *
  * clone 	> CALLERS.code
  * 		> CALLERS.callees
@@ -545,43 +549,10 @@ clone_on_argument(string name)
  *      < CALLERS.code
  *	< CALLERS.callees
  */
-bool
-clone(string name)
-{
-    entity module;
-    string caller, number_s;
-    int number;
-
-    DEBUG_ON;
-    set_currents(name);
-    module = get_current_module_entity();
-
-    caller = user_request("%s caller to update?", name);
-    is_a_caller_or_error(name, caller);
-	
-    number_s = user_request("statement number of %s to clone?", caller);
-    number = atoi(number_s);
-    free(number_s);
-
-    perform_clone(module, caller, 0, number, entity_undefined);
-    
-    free(caller);
-    reset_currents(name);
-    debug_off();
-    return TRUE;
-}
-
-/* substitute a call by another, usually a already cloned version.
- *
- * clone_substitute	> CALLERS.code
- * 			> CALLERS.callees
- * 	< MODULE.code
- *      < MODULE.user_file
- *      < CALLERS.code
- *	< CALLERS.callees
- */
-bool
-clone_substitute(string name)
+static bool
+clone_or_clone_substitute(
+    string name,
+    bool clone_substitute_p)
 {
     entity module, substitute;
     string caller, number_s, substitute_s;
@@ -598,12 +569,17 @@ clone_substitute(string name)
     number = atoi(number_s);
     free(number_s);
 
-    substitute_s = user_request("replacement for %s?", name);
-    substitute = local_name_to_top_level_entity(substitute_s);
-    if (entity_undefined_p(substitute) || 
-	!type_functional_p(entity_type(substitute)))
-	pips_user_error("%s is not an existing function\n", substitute_s);
-    free(substitute_s);
+    if (clone_substitute_p)
+    {
+	substitute_s = user_request("replacement for %s?", name);
+	substitute = local_name_to_top_level_entity(substitute_s);
+	if (entity_undefined_p(substitute) || 
+	    !type_functional_p(entity_type(substitute)))
+	    pips_user_error("%s is not an existing function\n", substitute_s);
+	free(substitute_s);
+    }
+    else
+	substitute = entity_undefined;
 
     perform_clone(module, caller, 0, number, substitute);
 
@@ -611,4 +587,17 @@ clone_substitute(string name)
     reset_currents(name);
     debug_off();
     return TRUE;
+    
+}
+
+bool
+clone(string name)
+{
+    return clone_or_clone_substitute(name, FALSE);
+}
+
+bool
+clone_substitute(string name)
+{
+    return clone_or_clone_substitute(name, TRUE);
 }
