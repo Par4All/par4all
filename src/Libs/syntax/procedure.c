@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/07/22 12:04:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/04 15:50:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/07/22 12:04:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/04 15:50:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -34,14 +34,16 @@ static list ghost_variable_entities = list_undefined;
 static statement function_body = statement_undefined;
 
 /* this function is called each time a new procedure is encountered. */
-void BeginingOfProcedure()
+void 
+BeginingOfProcedure()
 {
     reset_current_module_entity();
     InitImplicit();
     called_modules = NIL;
 }
 
-void update_called_modules(e)
+void 
+update_called_modules(e)
 entity e;
 {
     bool already_here = FALSE;
@@ -84,7 +86,8 @@ entity e;
 }
 
 
-void AbortOfProcedure()
+void 
+AbortOfProcedure()
 {
     /* get rid of ghost variable entities */
     remove_ghost_variable_entities();
@@ -97,7 +100,8 @@ performs a few calculations which cannot be done on the fly and write
 the internal representation of the CurrentFunction with a call to
 gen_free. */
 
-void EndOfProcedure()
+void 
+EndOfProcedure()
 {
     entity CurrentFunction = get_current_module_entity();
 
@@ -132,9 +136,9 @@ void EndOfProcedure()
     ComputeEquivalences();
     ComputeAddresses();
 
-    check_common_layouts(CurrentFunction);
-
     SaveChains();
+
+    check_common_layouts(CurrentFunction);
 
     reset_common_size_map();
 
@@ -198,7 +202,8 @@ void EndOfProcedure()
 /* this function analyzes the CurrentFunction formal parameter list to
 determine the CurrentFunction functional type. l is this list. */
 
-void UpdateFunctionalType(l)
+void 
+UpdateFunctionalType(l)
 cons *l;
 {
     cons *pc;
@@ -233,7 +238,8 @@ cf is the current function
 
 lfp is the list of formal parameters
 */
-void MakeCurrentFunction(t, msf, cf, lfp)
+void 
+MakeCurrentFunction(t, msf, cf, lfp)
 type t;
 int msf;
 entity cf;
@@ -363,7 +369,7 @@ cons *lfp;
     /* two global areas are created */
     InitAreas();
 
-    /* No commons have yet been declared */
+    /* No common has yet been declared */
     initialize_common_size_map();
 
     /* formal parameters are created */
@@ -417,7 +423,8 @@ cons *lfp;
  *    with an inexisting variable, FI, June 1993;
  */
 
-entity MakeExternalFunction(e, r)
+entity 
+MakeExternalFunction(e, r)
 entity e;
 type r; /* type of result */
 {
@@ -565,7 +572,8 @@ type r; /* type of result */
 /* This function creates a formal parameter. fp is an entity, and nfp is
 its rank in the formal parameter list. */
 
-void MakeFormalParameter(fp, nfp)
+void 
+MakeFormalParameter(fp, nfp)
 entity fp;
 int nfp;
 {
@@ -582,7 +590,8 @@ int nfp;
 /* this function scans the formal parameter list. each formal parameter
 is created with an implicit type, and then is added to CurrentFunction's
 declarations. */
-void ScanFormalParameters(l)
+void 
+ScanFormalParameters(l)
 cons * l;
 {
 	cons *pc;
@@ -604,7 +613,8 @@ cons * l;
 
 /* this function creates an intrinsic function. */
 
-entity CreateIntrinsic(name)
+entity 
+CreateIntrinsic(name)
 string name;
 {
     /* entity e = FindOrCreateEntity(CurrentPackage, name); */
@@ -619,13 +629,15 @@ string name;
 
     return(e);
 }
-
-void init_ghost_variable_entities()
+
+void 
+init_ghost_variable_entities()
 {
     ghost_variable_entities = NIL;
 }
 
-void remove_ghost_variable_entities()
+void 
+remove_ghost_variable_entities()
 {
     MAPL(ce, {
 	entity e = ENTITY(CAR(ce));
