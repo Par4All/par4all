@@ -6,7 +6,7 @@
  * This File contains the functions computing the private regions.
  *
  * $RCSfile: array_privatization.c,v $ (version $Revision$)
- * $Date: 1997/02/07 15:59:27 $, 
+ * $Date: 1997/04/11 16:01:17 $, 
  */
 
 #include <stdio.h>
@@ -813,7 +813,7 @@ static text text_privatized_array_regions(list l_priv, list l_out)
 /*********************************************************************************/
 /*********************************************************************************/
 
-
+static entity dynamic_area = entity_undefined;
 
 #define PRIVATE_VARIABLE_SUFFIX "_P"
 static entity current_old_entity = entity_undefined;
@@ -888,8 +888,8 @@ privatize_entity(entity ent)
 	
 	new_ent_storage = make_storage(is_storage_ram,
 				       make_ram(module,
-						DynamicArea,
-						CurrentOffsetOfArea(DynamicArea,
+						dynamic_area,
+						CurrentOffsetOfArea(dynamic_area,
 								    new_ent),
 						NIL));
 	entity_storage(new_ent) = new_ent_storage;
@@ -907,7 +907,7 @@ privatize_entity(entity ent)
 }
 
 bool 
-declarations_privatizer(char *module_name)
+declarations_privatizer(char *mod_name)
 {
     list l_priv = NIL, l_in, l_out, l_write; 
     statement module_stat;
@@ -926,14 +926,22 @@ declarations_privatizer(char *module_name)
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     module_stat = get_current_module_statement();
-    set_current_module_entity( local_name_to_top_level_entity(module_name) );
+    set_current_module_entity( local_name_to_top_level_entity(mod_name) );
     module = get_current_module_entity();
     set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)) );
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE)) );
     module_to_value_mappings(module);
     
+    /* sets dynamic_area */
+    if (entity_undefined_p(dynamic_area))
+    {
+       	
+	dynamic_area = FindOrCreateEntity(module_local_name(module),
+					  DYNAMIC_AREA_LOCAL_NAME); 
+    }
+
     debug_on("ARRAY_PRIVATIZATION_DEBUG_LEVEL");
 
     /* Privatizable array regions */
@@ -944,11 +952,11 @@ declarations_privatizer(char *module_name)
      */
      /* Get the READ, WRITE, IN and OUT regions of the module */
     set_local_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_REGIONS, module_name, TRUE) ) );
+	db_get_memory_resource(DBR_REGIONS, mod_name, TRUE) ) );
     set_in_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE) ) );
+	db_get_memory_resource(DBR_IN_REGIONS, mod_name, TRUE) ) );
     set_out_regions_map( effectsmap_to_listmap( (statement_mapping) 
-	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE) ) );
+	db_get_memory_resource(DBR_OUT_REGIONS, mod_name, TRUE) ) );
    
     l_write = regions_dup
 	(regions_write_regions(load_statement_local_regions(module_stat))); 
@@ -987,8 +995,9 @@ declarations_privatizer(char *module_name)
 
     debug_off();
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), module_stat);
 
+    dynamic_area = entity_undefined;
     reset_current_module_entity();
     reset_current_module_statement();
     free_cumulated_effects_map();
