@@ -17,6 +17,7 @@
 %token INFO
 %token CDIR
 %token PWD
+%token SOURCE
 
 %token OWNER_NAME
 %token OWNER_ALL
@@ -36,7 +37,7 @@
 
 %type <name>   NAME A_STRING propname phasename resourcename
 %type <status> line instruction
-%type <status> i_open i_create i_close i_delete i_module i_make i_pwd
+%type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd
 %type <name> rulename filename 
 %type <array> filename_list
@@ -137,6 +138,7 @@ instruction:
 	| i_setenv
 	| i_cd
 	| i_pwd
+	| i_source
 	| error {$$ = FALSE;}
 	;
 
@@ -187,8 +189,15 @@ i_open:	OPEN NAME
 	    pips_debug(7,"reduce rule i_open\n");
 
 	    if (tpips_execution_mode) {
-		if (db_get_current_workspace_name() != NULL)
-		    close_workspace ();
+		if (db_get_current_workspace_name() != NULL) {
+		    pips_user_warning("Closing workspace %s "
+				      "before opening %s!\n",
+				      db_get_current_workspace_name(), $2);
+		    close_workspace();
+		}
+		if (!workspace_exists_p($2))
+		    pips_user_error("No workspace %s to open!\n", $2);
+
 		if (( $$ = open_workspace ($2)))
 		{
 		    main_module_name = get_first_main_module();
@@ -200,6 +209,7 @@ i_open:	OPEN NAME
 			lazy_open_module(main_module_name);
 		    }
 		}
+		free($2);
 	    }
 	}
 	;
@@ -213,7 +223,11 @@ i_create: CREATE NAME /* workspace name */ filename_list /* fortran files */
 		if (workspace_exists_p($2))
 		    pips_user_error
 			("Workspace %s already exists. Delete it!\n", $2);
-		else {
+		else if (db_get_current_workspace_name()) {
+		    pips_user_error("Close current workspace %s before "
+				    "creating another!\n", 
+				    db_get_current_workspace_name());
+		} else {
 		  if(db_create_workspace ($2))
 		  {
 		      if(!create_workspace ($3))
@@ -471,6 +485,24 @@ i_get: GET_PROPERTY propname
 	}
 	;
 
+i_source: SOURCE filename_list
+	{
+	    int n = gen_array_nitems($2);
+	    for(n--; n>=0; n--) { /* filenames are stored in reverse order. */
+		string name = gen_array_item($2, n);
+		FILE * sourced = fopen(name, "r");
+		if (!sourced) {
+		    perror("while sourcing");
+		    gen_array_full_free($2);
+		    pips_user_error("cannot source file %s\n", name);
+		}
+		tpips_process_a_file(sourced, FALSE);
+		fclose(sourced);
+	    }
+	    gen_array_full_free($2);
+	    tpips_set_line_to_parse(""); /* humm... */
+	}
+
 rulename: phasename
 	;
 
@@ -511,25 +543,32 @@ owner:	OPENPAREN OWNER_ALL CLOSEPAREN
 	    list result = NIL;
 	    pips_debug(7,"reduce rule owner (ALL)\n");
 
-	    if (tpips_execution_mode) {
-		gen_array_t modules = db_get_module_list();
-		int nmodules = gen_array_nitems(modules);
-		message_assert("some modules", nmodules>0);
-		for(i=0; i<nmodules; i++) {
-		    string n =  gen_array_item(modules, i);
-		    result = CONS(STRING, strdup(n), result);
+	    if (tpips_execution_mode) 
+	    {
+		if (!db_get_current_workspace_name())
+		    pips_user_error("No current workspace! "
+				    "create or open one!\n");
+		else {
+		    gen_array_t modules = db_get_module_list();
+		    int nmodules = gen_array_nitems(modules);
+		    message_assert("some modules", nmodules>0);
+		    for(i=0; i<nmodules; i++) {
+			string n =  gen_array_item(modules, i);
+			result = CONS(STRING, strdup(n), result);
+		    }
+		    gen_array_full_free(modules);
+		    result = gen_nreverse(result);
+		    pips_assert("length ok", nmodules==gen_length(result));
+		    $$ = result;
 		}
-		gen_array_full_free(modules);
-		result = gen_nreverse(result);
-		pips_assert("length ok", nmodules==gen_length(result));
-		$$ = result;
 	    }
 	}
 	| OPENPAREN OWNER_PROGRAM CLOSEPAREN
 	{
 	    pips_debug(7,"reduce rule owner (PROGRAM)\n");
 	    if (tpips_execution_mode) {
-		$$ =CONS(STRING, strdup(db_get_current_workspace_name()), NIL);
+		string n = db_get_current_workspace_name();
+		$$ = n? CONS(STRING, strdup(n), NIL): NIL;
 	    }
 	}
 	| OPENPAREN OWNER_MAIN CLOSEPAREN
@@ -541,24 +580,30 @@ owner:	OPENPAREN OWNER_ALL CLOSEPAREN
 	    $$ = NIL;
 
 	    if (tpips_execution_mode) {
-		gen_array_t modules = db_get_module_list();
-		int nmodules = gen_array_nitems(modules);
-		message_assert("some modules", nmodules>0);
-
-		for(i=0; i<nmodules; i++) {
-		    string on = gen_array_item(modules, i);
-		    entity mod = local_name_to_top_level_entity(on);
-
-		    if (!entity_undefined_p(mod) && entity_main_module_p(mod))
-		    {
-			if (number_of_main)
-			    pips_internal_error("More the one main\n");
+		if (!db_get_current_workspace_name())
+		    pips_user_error("No current workspace! "
+				    "create or open one!\n");
+		else {
+		    gen_array_t modules = db_get_module_list();
+		    int nmodules = gen_array_nitems(modules);
+		    message_assert("some modules", nmodules>0);
+		    
+		    for(i=0; i<nmodules; i++) {
+			string on = gen_array_item(modules, i);
+			entity mod = local_name_to_top_level_entity(on);
 			
-			number_of_main++;
-			$$ = CONS(STRING, strdup(on), NIL);
+			if (!entity_undefined_p(mod) && 
+			    entity_main_module_p(mod))
+			{
+			    if (number_of_main)
+				pips_internal_error("More the one main\n");
+			
+			    number_of_main++;
+			    $$ = CONS(STRING, strdup(on), NIL);
+			}
 		    }
+		    gen_array_full_free(modules);
 		}
-		gen_array_full_free(modules);
 	    }
 	}
 	| OPENPAREN OWNER_MODULE CLOSEPAREN
@@ -566,7 +611,8 @@ owner:	OPENPAREN OWNER_ALL CLOSEPAREN
 	    pips_debug(7,"reduce rule owner (MODULE)\n");
 
 	    if (tpips_execution_mode) {
-		$$ = CONS(STRING, strdup(db_get_current_module_name()), NIL);
+		string n = db_get_current_module_name();
+		$$ = n? CONS(STRING, strdup(n), NIL): NIL;
 	    }
 	}
 	| OPENPAREN OWNER_CALLEES CLOSEPAREN
@@ -620,7 +666,8 @@ owner:	OPENPAREN OWNER_ALL CLOSEPAREN
 	    pips_debug(7,"reduce rule owner (none)\n");
 
 	    if (tpips_execution_mode) {
-		$$ = CONS(STRING, strdup(db_get_current_module_name()), NIL);
+		string n = db_get_current_module_name();
+		$$ = n? CONS(STRING, strdup(n), NIL): NIL;
 	    }
 	}
 	| { $$ = NIL;}
