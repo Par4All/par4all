@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/02 09:06:55 $, 
+%% $Date: 1996/09/02 10:43:10 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html}
@@ -534,6 +534,8 @@ Fortran:
 \HPFC{} is the HPF prototype compiler included in the \PIPS project.  It has
 been developped by \FC{}. In order to compile an HPF program which uses
 \xPOMP, convinient headers, functions and extensions are provided.
+They can be used blindly: just include the header file and compile with
+the supplied fake functions. However, here are some explanations.
 
 
 \subsection{XPOMP/HPFC headers}
@@ -565,7 +567,7 @@ effects on arguments are provided.  They must be compiled together with
 the HPF program through \PIPS in order to provide the compiler with the
 necessary information for using the \xPOMP{} display facilities. All
 \xPOMP{} functions are annoted
-as \verb|io| and\verb|fake| with special \verb|!fcd$| %% $
+as \verb|io| and \verb|fake| with special \verb|!fcd$| %% $
 (\FC directives). The first directive tells that the function or
 subroutine performs only I/O. 
 The second directive tells that the source provided are fake. The effect is
@@ -584,15 +586,15 @@ exemple one must write:
 Since the source files for the functions are fake ones (the functions are
 actually written in C), these functions must be provided latter on at
 link-time. The \HPFC{} compiler allows to give this information
-with the \verb|!ldi$| %%$
-(Link eDitor I/o) special directive. This directive supplies aditionnal
+with the \verb|ld io|
+(Link eDitor I/O) special directive. This directive supplies aditionnal
 \verb|ld| options for linking the program with an I/O library (hence the
 library is just linked to the \emph{host} program.  Assuming the 
 \xPOMP{} library and executables being stored in
 a directory described by the \verb|$XPOMP_RUNTIME| environment %%$
 variable, then the desired effect is achieved with:
 \begin{verbatim}
-!ldi$ -L$XPOMP_RUNTIME -lxpomp
+!fcd$ ld io -L$XPOMP_RUNTIME -lxpomp
 \end{verbatim}
 Note that the variables are interpreted by a shell. This directive
 is incorporated in the header file for \xPOMP{} so that the user should
