@@ -121,7 +121,7 @@ concatenate(string next, ...)
 	 */
 	if (current+len >= buffer_size)
 	{
-	    int size = MAX(current+len, buffer_size+BUFFER_SIZE_INCREMENT);
+	    int size = MAX(current+len+1, buffer_size+BUFFER_SIZE_INCREMENT);
 	    string new_buffer = (string) malloc(size);
 	    
 	    (void) memcpy(new_buffer, buffer, current);
