@@ -1612,6 +1612,19 @@ expression exp;
 	}
 	}
     }
+    else if(expression_call_p(exp)) {
+      /* Is it an integer parameter? */
+      entity p = call_function(syntax_call(expression_syntax(exp)));
+      value v = entity_initial(p);
+
+      if(value_symbolic_p(v) && constant_int_p(symbolic_constant(value_symbolic(v)))) {
+	rv = constant_int(symbolic_constant(value_symbolic(v)));
+      }
+      else {
+	pips_error("expression_to_int",
+		   "expression is not an integer constant");
+      }
+    }
     else
 	pips_error("expression_to_int",
 		   "expression is not an integer constant");
