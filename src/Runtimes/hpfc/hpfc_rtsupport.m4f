@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/05 16:35:22 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/05 18:04:31 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -882,6 +882,8 @@ c
       HOSTTID = MYTID
       NBOFTASKS = MAXSIZEOFPROCS
 
+      call HPFC_INIT_COMMON_PARAM()
+
       call pvmfspawn(
      $     NODE_PROGRAM_NAME, 
      $     PVMARCH, 
@@ -889,6 +891,12 @@ c
      $     NBOFTASKS, 
      $     NODETIDS, 
      $     info)
+
+      if (info.lt.0) then
+         call pvmfperror('initial spawning', info)
+         call pvmfexit(info)
+         stop
+      endif
 
       demo(`call print_host_info()')
       demo(`call print_task_info(NBOFTASKS, NODETIDS, HOSTTID)')
@@ -898,7 +906,6 @@ c
       call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
 
       call HPFC_INIT_COMMON_PROCS()
-      call HPFC_INIT_COMMON_PARAM()
 
       call pvmfjoingroup('hpfc_group', inum)
 
