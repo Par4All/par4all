@@ -165,6 +165,7 @@ boolean contrainte_verifiee(ineg,eq_p)
 Pcontrainte ineg;
 boolean eq_p;
 {
+    Value v;
     assert(contrainte_constante_p(ineg));
 
     /* l'inegalite 0 <= 0 est representee par un vecteur nul */
@@ -172,11 +173,10 @@ boolean eq_p;
 	return(TRUE);
 
     /* l'inegalite 0 <= K est representee par un vecteur a un element */
-    if ((!eq_p && (ineg->vecteur)->val<=0 && ineg->vecteur->succ==NULL) 
-	|| (eq_p && (ineg->vecteur)->val==0 && ineg->vecteur->succ==NULL))
-	return(TRUE);
-    else
-	return(FALSE);
+    v = val_of(ineg->vecteur);
+
+    return (!eq_p && value_negz_p(v) && ineg->vecteur->succ==NULL) 
+	|| ( eq_p && value_zero_p(v) && ineg->vecteur->succ==NULL)
 }
 
 /* boolean contrainte_oppos(Pcontrainte ineg1, Pcontrainte ineg2):
