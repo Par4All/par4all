@@ -73,11 +73,11 @@ Psysteme (*method)();
 
     debug(1,"transformer_convex_hulls","begin\n");
     ifdebug(1) {
-	(void) fprintf(stderr, "convex hull t1 (%x):\n", (unsigned int) t1);
+	(void) fprintf(stderr, "convex hull t1 (%#p):\n", t1);
 	dump_transformer(t1) ;
     }
     ifdebug(1) {
-	(void) fprintf(stderr, "convex hull t2 (%x):\n", (unsigned int) t2);
+	(void) fprintf(stderr, "convex hull t2 (%#p):\n", t2);
 	dump_transformer(t2) ;
     }
 
@@ -132,7 +132,7 @@ Psysteme (*method)();
 
     }
     ifdebug(1) {
-	(void) fprintf(stderr, "convex hull, t (%x):\n", (unsigned int) t);
+	(void) fprintf(stderr, "convex hull, t (%#p):\n", t);
 	dump_transformer(t) ;
     }
 
