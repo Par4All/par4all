@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 2000/07/21 08:57:32 $, )
+/* $RCSfile: newgen_hash.h,v $ ($Date: 2003/07/04 08:56:48 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -35,9 +35,6 @@ typedef enum hash_key_type {
  * hash_entry_key(...). If the key is HASH_ENTRY_FREE or
  * HASH_ENTRY_FREE_FOR_PUT then the slot is empty. 
  */
-
-struct __hash_entry;
-typedef struct __hash_entry *hash_entry_pointer;
 
 struct __hash_table;
 typedef struct __hash_table *hash_table;
@@ -100,10 +97,10 @@ extern int hash_table_entry_count GEN_PROTO((hash_table));
 extern int hash_table_size GEN_PROTO((hash_table));
 extern int hash_table_own_allocated_memory GEN_PROTO((hash_table));
 extern hash_key_type hash_table_type GEN_PROTO((hash_table));
-extern hash_entry_pointer hash_table_scan GEN_PROTO((hash_table,
-						     hash_entry_pointer,
-						     void **,
-						     void **));
+extern void * hash_table_scan GEN_PROTO((hash_table,
+					 void *,
+					 void **,
+					 void **));
 
 /* map stuff */
 extern void * hash_map_get GEN_PROTO((hash_table, void *));
