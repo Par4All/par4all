@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 19:11:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/17 14:36:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/15 19:11:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/09/17 14:36:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -141,6 +141,8 @@ EndOfProcedure()
 {
     entity CurrentFunction = get_current_module_entity();
 
+    debug(8, "EndOfProcedure", "Begin for module %s\n", entity_name(CurrentFunction));
+
     /* get rid of ghost variable entities */
     remove_ghost_variable_entities();
 
@@ -231,12 +233,17 @@ EndOfProcedure()
     DynamicArea = entity_undefined;
     StaticArea = entity_undefined;
     reset_current_module_entity();
+
+    debug(8, "EndOfProcedure", "End for module %s\n", entity_name(CurrentFunction));
 }
 
 
 
-/* this function analyzes the CurrentFunction formal parameter list to
-determine the CurrentFunction functional type. l is this list. */
+/* This function analyzes the CurrentFunction formal parameter list to
+ * determine the CurrentFunction functional type. l is this list.
+ *
+ * It is called by EndOfProcedure().
+ */
 
 void 
 UpdateFunctionalType(l)
@@ -246,9 +253,27 @@ cons *l;
     parameter p;
     functional ft;
     entity CurrentFunction = get_current_module_entity();
+    type t = entity_type(CurrentFunction);
 
-    ft = type_functional(entity_type(CurrentFunction));
-    pips_assert("UpdateFunctionalType", functional_parameters(ft) == NULL);
+    debug(8, "UpdateFunctionalType", "Begin for %s\n",
+	  module_local_name(CurrentFunction));
+
+    pips_assert("A module type should be functional", type_functional_p(t));
+
+    ft = type_functional(t);
+
+    /* FI: I do not understand this assert... at least now that
+     * functions are typed at call sites. I do not understand why this
+     * assert has not made more damage. Only OVL in APSI (Spec-cfp95)
+     * generates a core dump. To be studied more!
+     *
+     * This assert is guaranteed by MakeCurrentFunction() but not by 
+     * retype_formal_parameters() which is called in case an intrinsic
+     * statement is encountered. It is not guaranteed by MakeExternalFunction()
+     * which uses the actual parameter list to estimate a functional type
+     */
+    pips_assert("Parameter type list should be empty",
+		ENDP(functional_parameters(ft)));
 
     for (pc = l; pc != NULL; pc = CDR(pc)) {
 	p = make_parameter((entity_type(ENTITY(CAR(pc)))), 
@@ -257,6 +282,9 @@ cons *l;
 		gen_nconc(functional_parameters(ft),
 			  CONS(PARAMETER, p, NIL));
     }
+
+    debug(8, "UpdateFunctionalType", "End for %s\n",
+	  module_local_name(CurrentFunction));
 }
 
 /* this function creates one entity cf that represents the function f being
@@ -482,6 +510,8 @@ MakeExternalFunction(
     entity fe = entity_undefined;
     type tfe;
 
+    debug(8, "MakeExternalFunction", "Begin for %s\n", entity_name(e));
+
     te = entity_type(e);
     if (te != type_undefined) {
 	if (type_variable_p(te)) {
@@ -581,8 +611,19 @@ MakeExternalFunction(
 		/* memory leak of tr */
 		functional_result(type_functional(tfe)) = r;
 	    } else  {
-		pips_user_warning("Type redefinition for %s\n", 
-				  entity_name(fe));
+		user_warning("MakeExternalFunction",
+			     "Type redefinition of result for function %s\n", 
+			     entity_name(fe));
+		if(type_variable_p(tr)) {
+		    user_warning("MakeExternalFunction",
+				 "Currently declared result is %s\n", 
+				 basic_to_string(variable_basic(type_variable(tr))));
+		}
+		if(type_variable_p(r)) {
+		    user_warning("MakeExternalFunction",
+				 "Redeclared result is %s\n", 
+				 basic_to_string(variable_basic(type_variable(r))));
+		}
 		ParserError("MakeExternalFunction",
 			    "Functional type redefinition.\n");
 	    }
@@ -607,12 +648,16 @@ MakeExternalFunction(
 			"Formal functions are not supported by PIPS.\n");
 	}
 
-    /* an external function has an unknown initial value */
+    /* an external function has an unknown initial value, else code would be temporarily
+     * undefined which is avoided (theoretically forbidden) in PIPS.
+     */
     if(entity_initial(fe) == value_undefined)
 	entity_initial(fe) = MakeValueUnknown();
 
-    /* e is added to CurrentFunction's entities */
+    /* fe is added to CurrentFunction's entities */
     AddEntityToDeclarations(fe, get_current_module_entity());
+
+    debug(8, "MakeExternalFunction", "End for %s\n", entity_name(fe));
 
     return fe;
 }
