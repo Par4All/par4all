@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/03/21 15:56:02 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/03/29 18:21:24 $, )
  * version $Revision$
  *
  * Compiler
@@ -171,20 +171,16 @@ hpf_compile_call(
      */
     if (!ref_to_dist_array_p(c))
     {
-	list /* of expressions */
-	    leh=lUpdateExpr(host_module, call_arguments(c)),
-	    len=lUpdateExpr(node_module, call_arguments(c));
-	
 	pips_debug(7, "no reference to distributed variable\n");
 
 	(*hoststatp)=MakeStatementLike(stat, is_instruction_call);
 	(*nodestatp)=MakeStatementLike(stat, is_instruction_call);
 	
-	instruction_call(statement_instruction((*hoststatp)))=
-	    make_call(call_function(c), leh);
+	instruction_call(statement_instruction((*hoststatp))) = copy_call(c);
+	update_object_for_module(*hoststatp, host_module);
 
-	instruction_call(statement_instruction((*nodestatp)))=
-	    make_call(call_function(c), len);
+	instruction_call(statement_instruction((*nodestatp))) = copy_call(c);
+	update_object_for_module(*nodestatp, node_module);
 
 	DEBUG_STAT(8, entity_name(host_module), *hoststatp);
 	DEBUG_STAT(8, entity_name(node_module), *nodestatp);
