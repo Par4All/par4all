@@ -79,7 +79,7 @@ boolean print_bdt(module_name)
      user_log("\n\n *** PRINTING BDT for %s\n", module_name);
 
  b = (bdt) db_get_memory_resource(DBR_BDT, module_name, TRUE);
- filename = strdup(concatenate(db_get_current_program_directory(),
+ filename = strdup(concatenate(db_get_current_workspace_directory(),
                     "/", module_name, ".bdt_file", NULL));
 
  fd = safe_fopen(filename, "w");
