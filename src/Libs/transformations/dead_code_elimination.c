@@ -202,9 +202,9 @@ remove_loop_statement(statement s, instruction i, loop l)
   free_instruction(i);
 }
 
-
-static bool
-loop_executed_once_p(statement s, loop l)
+/* TRUE if do i = x, x or equivalent.
+ */
+static bool loop_executed_once_p(statement s, loop l)
 {
   entity ind;
   range rg;
@@ -221,14 +221,35 @@ loop_executed_once_p(statement s, loop l)
   rg = loop_range(l);
   m1 = range_lower(rg);
   m2 = range_upper(rg);
+
+  /* m1 == m2
+   */
+  if (expression_equal_p(m1, m2))
+    return TRUE;
+
+  pre = load_statement_precondition(s);
+  precondition_ps = predicate_system(transformer_relation(pre));
+  
   m3 = range_increment(rg);
   n_m1 = NORMALIZE_EXPRESSION(m1);
   n_m2 = NORMALIZE_EXPRESSION(m2);
   n_m3 = NORMALIZE_EXPRESSION(m3);
 
-  pre = load_statement_precondition(s);
-  precondition_ps = predicate_system(transformer_relation(pre));
-  
+  if (normalized_linear_p(n_m1) && normalized_linear_p(n_m2))
+  {
+    /* m1 - m2 == 0 redundant ?
+     */
+    Pcontrainte eq = contrainte_make(vect_substract(normalized_linear(n_m1), 
+						    normalized_linear(n_m2)));
+
+    if (eq_redund_with_sc_p(precondition_ps, eq))
+      retour = TRUE;
+    
+    contrainte_free(eq);
+
+    if (retour) return TRUE;
+  }
+
   /* Teste le signe de l'incrément en fonction des préconditions : */
   ps = sc_dup(precondition_ps);
   pv3 = vect_dup(normalized_linear(n_m3));
@@ -237,9 +258,8 @@ loop_executed_once_p(statement s, loop l)
   m3_negatif = sc_faisabilite(ps);
   (void) vect_chg_sgn(pv3);
   m3_positif = sc_faisabilite(ps);
-  debug(2, "loop_executed_once_p",
-        "loop_increment_value positif = %d, negatif = %d\n",
-        m3_positif, m3_negatif);
+  pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
+	     m3_positif, m3_negatif);
   /* Vire aussi pv3 & pc3 : */
   sc_rm(ps);
 
@@ -283,8 +303,7 @@ loop_executed_once_p(statement s, loop l)
     if (get_debug_level() > 2) {
       sc_fprint(stderr, ps, entity_local_name);
       print_statement(s);
-      debug(2, "loop_executed_once_p",
-            "boucle exécutée une seule fois = %d\n\n", retour);
+      pips_debug(2, "boucle exécutée une seule fois = %d\n\n", retour);
       /*    vect_fprint(stderr, pv, entity_local_name);
             vect_fprint(stderr, normalized_linear(n_m1)); */
     }
@@ -292,12 +311,12 @@ loop_executed_once_p(statement s, loop l)
     /* Vire du même coup pv, pv1, pv2, pv_inc_moins_1, pcA & pcB : */
     sc_rm(ps);
    }
+
   return retour;
 }
 
 /* Remplace une boucle vide par la seule initialisation de l'indice : */
-static bool
-remove_dead_loop(statement s, instruction i, loop l) 
+static bool remove_dead_loop(statement s, instruction i, loop l) 
 {
   expression index, rl;
   range lr;
@@ -729,9 +748,9 @@ dead_statement_filter(statement s)
 	     dead_code_loop_removed++;
             break;
          }
-         else if (0 && loop_executed_once_p(s, l)) {
+         else if (loop_executed_once_p(s, l)) {
 	     /* This piece of code is not ready yet */
-	     statement body;
+	     statement body = loop_body(l);
 	     ifdebug(2) {
 		 debug(2,"dead_statement_filter",
 		       "loop %d at %d (%d, %d) executed once and only once\n",
