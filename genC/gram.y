@@ -103,7 +103,7 @@ Externals
 
 		/*NOSTRICT*/
 		dp = (union domain *)alloc( sizeof( union domain )) ;
-		dp->ex.type = EXTERNAL ;
+		dp->ex.type = EXTERNAL_DT ;
 		dp->ex.read = (char *(*)())NULL ;
                 dp->ex.write = dp->ex.free = (void (*)())NULL ;
 		new_binding( $3, dp ) ;
@@ -116,7 +116,7 @@ Imports : Imports GRAM_IMPORT Name FROM File SEMI_COLUMN {
 
 		/*NOSTRICT*/
 		dp = (union domain *)alloc( sizeof( union domain )) ;
-		dp->ba.type = IMPORT ;
+		dp->ba.type = IMPORT_DT ;
 		dp->im.filename = $5 ;
 		new_binding( $3, dp ) ;
 		Number_imports++ ;
@@ -162,7 +162,7 @@ Domain	: Simple Constructed {
                 /* A BASIS type with just one field is considered as an
 		   AND_OP. */
 
-  		if( $2 == NULL && $1->ba.type != BASIS ) 
+  		if( $2 == NULL && $1->ba.type != BASIS_DT ) 
 			$$ = $1 ;
 		else {
 			struct domainlist *dlp ;
@@ -174,7 +174,7 @@ Domain	: Simple Constructed {
 			dlp->cdr = $2 ;
 			/*NOSTRICT*/
 			$$ = (union domain *)alloc( sizeof( union domain )) ;
-			$$->co.type = CONSTRUCTED ;
+			$$->co.type = CONSTRUCTED_DT ;
 			$$->co.components = dlp ;
 			$$->co.op = ($2 == NULL) ? AND_OP : Current_op ;
 			
@@ -194,7 +194,7 @@ Domain	: Simple Constructed {
 		/*NOSTRICT*/
 	        $$ = (union domain *)
 		        alloc( sizeof( union domain )) ;
-		$$->co.type = CONSTRUCTED ;
+		$$->co.type = CONSTRUCTED_DT ;
 		$$->co.op = OR_OP ;
 		$$->co.components = dlp ;
 
@@ -208,10 +208,10 @@ Domain	: Simple Constructed {
 		    ($2->cdr == NULL) ?
 		      NULL :
 		      (struct domainlist *)alloc( sizeof( struct domainlist ));
-		  dlp->domain->ba.type = BASIS ;
+		  dlp->domain->ba.type = BASIS_DT ;
 		  dlp->domain->ba.constructor = $2->name ;
 		  /*NOSTRICT*/
-		  dlp->domain->ba.constructand = (struct gen_binding *)UNIT_TYPE ;
+		  dlp->domain->ba.constructand = (struct gen_binding *)UNIT_TYPE_NAME ;
 	          }
 	      }
         ;
@@ -220,13 +220,13 @@ Simple	: Persistant Basis {
 	        ($$ = $2)->ba.persistant = $1 ;
 		}
 	| Persistant Basis STAR {
-		($$ = $2)->li.type = LIST ;
+		($$ = $2)->li.type = LIST_DT ;
 		$$->li.persistant = $1 ;                
 		$$->li.constructor = $2->ba.constructor ;
 		$$->li.element = $2->ba.constructand ;
 		}
 	| Persistant Basis Dimensions {
-		($$ = $2)->ar.type = ARRAY ;
+		($$ = $2)->ar.type = ARRAY_DT ;
 		$$->ar.persistant = $1 ;
 		$$->ar.constructor = $2->ba.constructor ;
 		$$->ar.element = $2->ba.constructand ;
@@ -235,7 +235,7 @@ Simple	: Persistant Basis {
 	| Persistant Basis LR RR {
 	        char *below = (char *)$2->ba.constructand ;
 
-		($$ = $2)->se.type = SET ;
+		($$ = $2)->se.type = SET_DT ;
 		$$->se.persistant = $1 ;
 		$$->se.constructor = $2->ba.constructor ;
 		$$->se.element = $2->ba.constructand ;
@@ -256,7 +256,7 @@ Persistant
 Basis   : Name {
 		/*NOSTRICT*/
 		$$ = (union domain *)alloc( sizeof( union domain )) ;
-		$$->ba.type = BASIS ;
+		$$->ba.type = BASIS_DT ;
 		$$->ba.constructor = $1 ;
 		/*NOSTRICT*/
 		$$->ba.constructand = (struct gen_binding *)$1 ;
@@ -264,7 +264,7 @@ Basis   : Name {
 	| Name COLUMN Name {
 		/*NOSTRICT*/
 		$$ = (union domain *)alloc( sizeof( union domain )) ;
-		$$->ba.type = BASIS ;
+		$$->ba.type = BASIS_DT ;
 		$$->ba.constructor = $1 ;
 		/*NOSTRICT*/
 		$$->ba.constructand = (struct gen_binding *)$3 ;
@@ -339,7 +339,7 @@ Name	: IDENT	{
 
 /* Syntax error routines called by yacc. */
 
-yyerror( s )
+int yyerror( s )
 char *s ;
 {
   int c;
