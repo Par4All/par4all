@@ -620,7 +620,7 @@ entity    e;
   int       n = 0;
   char      *c;
 
-  c = malloc(32);
+  c = (char*) malloc(32);
 
   c = strcpy(c, (entity_local_name(e)+4));
   n = atoi(c) + BASE_NODE_NUMBER;
