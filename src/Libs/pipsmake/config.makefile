@@ -39,5 +39,3 @@ pipsmake_yacc.c pipsmake_yacc.h: readmakefile.y
 .depend: $(DERIVED_CFILES)
 .header: $(DERIVED_HEADERS)
 
-# end of $RCSfile: config.makefile,v $
-#
