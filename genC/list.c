@@ -77,6 +77,7 @@
    . gen_list_and_not(list * a, list b) : Compute A = A inter non B
    . gen_list_patch(list l, gen_chunk * x, gen_chunk * y) :
      Replace all the reference to x in list l by a reference to y
+   . gen_position(void * item, list l): rank of item in list l, 0 if not present
 */
 
 #include <stdio.h>
@@ -646,6 +647,22 @@ gen_list_patch(list l,
 	 if (CAR(pc).p == (gen_chunk *) x)
 	     CAR(pc).p = (gen_chunk *) y;
      }, l);
+}
+
+/* Element ranks are strictly positive as for first, second, and so on. If
+   item is not in l, 0 is returned. */
+static int gen_position(void * item, list l)
+{
+  list c_item = list_undefined;
+  int rank = 0;
+
+  for(c_item = l; !ENDP(l); POP(l)) {
+    rank++;
+    if(item==CHUNK(CAR(c_item))) {
+      break;
+    }
+  }
+  return rank;
 }
 
 
