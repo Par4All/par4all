@@ -936,7 +936,7 @@ static void top_down_abc_statement(statement module_statement)
   stack_free(&context.uns);
 }
 
-bool top_down_array_bound_check(char *module_name)
+bool array_bound_check_top_down(char *module_name)
 { 
   statement module_statement;
  
