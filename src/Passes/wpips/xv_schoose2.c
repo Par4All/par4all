@@ -27,53 +27,54 @@ enum
 };
 
 static Panel_item choice, choices, ok, help, cancel;
-static void (*apply_on_choice)();
-static void (*apply_on_cancel)();
 
-static void schoose_help_notify(item, event)
-Panel_item item;
-Event *event;
+static void (* apply_on_choice)(char *);
+static void (* apply_on_cancel)(void);
+
+void static
+schoose_help_notify(Panel_item item,
+                    Event * event)
 {
-    display_help("SingleChoice");
+   display_help("SingleChoice");
 }
 
 /* Cette routine est appelé d'une part lorsqu'on a cliqué sur OK pour
    valider un nom tapé textuellement, d'autre part lorsqu'on clique sur
    un choix. */
-static void schoose_ok_notify(item, event)
-Panel_item item;
-Event *event;
+void static
+schoose_ok_notify(Panel_item item,
+                  Event * event)
 {
-  /* Suppose qu'item et event sont folklo car on peut être appelé par
-     schoose_choice_notify */
-    char *curchoice;
-	int i, nchoices;
-	int item_is_in_the_list;
+   /* Suppose qu'item et event sont folklo car on peut être appelé par
+      schoose_choice_notify */
+   char *curchoice;
+   int i, nchoices;
+   int item_is_in_the_list;
 
-    curchoice = strdup((char *) xv_get(choice, PANEL_VALUE, 0));
-    if (strlen(curchoice)==0)
-		prompt_user("Choose one item or cancel");
-	else {
-			/* Modified to verify that an correct item is selected.
-				RK, 21/05/1993. */
-		nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
-		item_is_in_the_list = FALSE;
-		for(i = 0; i < nchoices; i++)
-			if (strcmp((char *)xv_get(choices, PANEL_LIST_STRING, i),
-				curchoice) == 0) {
-				item_is_in_the_list = TRUE;
-				break;
-			}
-		if (item_is_in_the_list == FALSE)
-			prompt_user("You have to choose one item of the list!");
-		else {
+   curchoice = strdup((char *) xv_get(choice, PANEL_VALUE, 0));
+   if (strlen(curchoice)==0)
+      prompt_user("Choose one item or cancel");
+   else {
+      /* Modified to verify that an correct item is selected.
+         RK, 21/05/1993. */
+      nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
+      item_is_in_the_list = FALSE;
+      for(i = 0; i < nchoices; i++)
+         if (strcmp((char *)xv_get(choices, PANEL_LIST_STRING, i),
+                    curchoice) == 0) {
+            item_is_in_the_list = TRUE;
+            break;
+         }
+      if (item_is_in_the_list == FALSE)
+         prompt_user("You have to choose one item of the list!");
+      else {
 				/* Normal case : */
-    		(*apply_on_choice)(curchoice);
-                schoose_close();
-                }
-	}
+         (*apply_on_choice)(curchoice);
+         schoose_close();
+      }
+   }
 
-    free(curchoice);
+   free(curchoice);
 }
 
 /* schoose_close() can be called even when schoose window is already closed.
@@ -152,8 +153,8 @@ schoose(char * title,
         int argc,
         char * argv[],
         char * initial_choice,
-        void (*function_for_ok)(Menu, Menu_item),
-        void (*function_for_cancel)(Menu, Menu_item))
+        void (*function_for_ok)(char *),
+        void (*function_for_cancel)(void))
 {
    int i;
    int nchoices;
