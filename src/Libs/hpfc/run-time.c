@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1996/08/07 17:56:28 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1996/09/07 16:27:07 $, )
  * version $Revision$,
  */
 
@@ -410,7 +410,7 @@ string side;
 int dim;
 {
     char buffer[100]; /* ??? */
-    sprintf(buffer, "%s_%s_%s%d",
+    sprintf(buffer, "%s %s %s%d",
 	    hpfc_main_entity_name(array),
 	    entity_local_name(array), side, dim);
     return strdup(buffer);
@@ -486,7 +486,7 @@ basic base;
 int nargs;
 {
     char buffer[100], *buf = buffer;
-    sprintf(buf, "%s_%s_%s_%d", 
+    sprintf(buf, "%s %s %s %d", 
 	    prefix, (kind ? "PACK" : "UNPACK"), pvm_what_options(base), ndim);
     buf += strlen(buf);
 
