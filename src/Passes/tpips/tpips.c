@@ -193,6 +193,7 @@ void echo_handler(char * line)
     /* skip the key word and a blank character */
     line += strlen(ECHO) + 1;
     fprintf(stdout,"%s\n",line);
+    fflush(stdout);
 }
 
 void help_handler(char * line)
