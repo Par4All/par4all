@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/06/06 18:26:18 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/06/08 15:04:34 $, )
  * version $Revision$
  *
  * Compiler
@@ -503,7 +503,7 @@ statement body, *hoststatp, *nodestatp;
     list lw = NIL, lr = NIL, li = NIL, ls = NIL, lbs = NIL;
 
     /* ???
-     * dependances are not surely respected respected in the definitions list...
+     * dependances are not surely respected in the definitions list...
      * should check that only locals variables, that are not replicated,
      * may be defined during the body of the loop...
      */
@@ -512,10 +512,8 @@ statement body, *hoststatp, *nodestatp;
     ls = FindDefinitionsOf(body, li);
     gen_free_list(li), li=NIL;
 
-    if (gen_length(lw)==0) /* very partial */
+    if (gen_length(lw)==0 && gen_length(lr)==0) /* very partial */
     {
-	pips_assert("no read if no write", gen_length(lr)==0);
-
 	(*hoststatp) = copy_statement(body);
 	(*nodestatp) = copy_statement(body);
     }
@@ -704,12 +702,12 @@ hpf_compiler(
     if (lr)
     {
 	list /* of statement */ lh, ln;
-	lh = gen_nconc(compile_hpf_reduction_prolog(lr, TRUE),
-		       CONS(STATEMENT, *hoststatp,
-			    compile_hpf_reduction_postlog(lr, TRUE)));
-	ln = gen_nconc(compile_hpf_reduction_prolog(lr, FALSE),
-		       CONS(STATEMENT, *nodestatp,
-			    compile_hpf_reduction_postlog(lr, FALSE)));
+	lh = gen_nconc(compile_hpf_reduction(lr, TRUE, TRUE),
+         CONS(STATEMENT, *hoststatp,
+	               compile_hpf_reduction(lr, FALSE, TRUE)));
+	ln = gen_nconc(compile_hpf_reduction(lr, TRUE, FALSE),
+	 CONS(STATEMENT, *nodestatp,
+	               compile_hpf_reduction(lr, FALSE, FALSE)));
 
 	*hoststatp = make_block_statement(lh);
 	*nodestatp = make_block_statement(ln);
