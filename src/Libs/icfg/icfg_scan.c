@@ -49,6 +49,14 @@ DEFINE_LOCAL_STACK(current_stmt, statement)
 */
 GENERIC_LOCAL_MAPPING(icfg, text, statement)
 
+/* static drivers
+ */
+
+static bool 
+    print_dos = FALSE, 
+    print_ifs = FALSE;
+static text (*decoration)(string) = NULL;
+
 static void 
 append_icfg_file(text t, string module_name)
 {
@@ -59,16 +67,14 @@ append_icfg_file(text t, string module_name)
     char textbuf[MAX_LINE_LENGTH];
 
     /* create filename */
-    localfilename = strdup(concatenate
-			   (module_name,
-			    get_bool_property(ICFG_IFs) ? ".icfgc" :
-			    ( get_bool_property(ICFG_DOs) ? ".icfgl" : 
-			     ".icfg") ,
-			    NULL));
-    filename = strdup(concatenate
-		      (db_get_current_workspace_directory(), 
-		       "/", localfilename, NULL));
-
+    localfilename = 
+	strdup(concatenate(module_name,
+	       print_ifs ? ".icfgc" : print_dos ? ".icfgl" : ".icfg" ,
+			   NULL));
+    filename = 
+	strdup(concatenate(db_get_current_workspace_directory(), 
+			   "/", localfilename, NULL));
+    
     pips_debug (2, "Inserting ICFG for module %s\n", module_name);
 
     /* Get the Icfg from the callee */
@@ -183,9 +189,8 @@ static void call_filter(call c)
  */
 static bool loop_filter (loop l)
 {
-    bool print_do = get_bool_property(ICFG_DOs);
     pips_debug (5, "Loop begin\n");
-    if (print_do) current_margin += ICFG_SCAN_INDENT;
+    if (print_dos) current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
@@ -193,14 +198,13 @@ static void loop_rewrite (loop l)
 {
     text inside_the_loop = text_undefined;
     text inside_the_do = text_undefined;
-    bool print_do = get_bool_property(ICFG_DOs), 
-         text_in_do_p, text_in_loop_p;
+    bool text_in_do_p, text_in_loop_p;
     text t = make_text (NIL);
     char textbuf[MAX_LINE_LENGTH];
 
     pips_debug (5,"Loop end\n");
 
-    if (print_do) current_margin -= ICFG_SCAN_INDENT;
+    if (print_dos) current_margin -= ICFG_SCAN_INDENT;
 
     inside_the_do = (text) load_statement_icfg (current_stmt_head());
     text_in_do_p = some_text_p(inside_the_do);
@@ -218,7 +222,7 @@ static void loop_rewrite (loop l)
 
     /* Print the DO 
      */
-    if ((text_in_loop_p || text_in_do_p) && print_do) 
+    if ((text_in_loop_p || text_in_do_p) && print_dos) 
     {
 	sprintf(textbuf, "%*s" st_DO "\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
@@ -234,7 +238,7 @@ static void loop_rewrite (loop l)
 
     /* Print the ENDDO 
      */
-    if ((text_in_loop_p || text_in_do_p) && print_do) 
+    if ((text_in_loop_p || text_in_do_p) && print_dos) 
     {
 	sprintf(textbuf, "%*s" st_ENDDO "\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
@@ -296,14 +300,18 @@ static void instruction_rewrite (instruction i)
  */
 static bool range_filter(range r)
 {
-    if (statement_loop_p(current_stmt_head()) && get_bool_property(ICFG_DOs))
+    statement s = current_stmt_head();
+
+    if (statement_loop_p(s) && loop_range(statement_loop(s)) && print_dos)
        current_margin -= ICFG_SCAN_INDENT;
     return TRUE;
 }
 
 static void range_rewrite(range r)
 {
-    if (statement_loop_p(current_stmt_head()) && get_bool_property(ICFG_DOs))
+    statement s = current_stmt_head();
+
+    if (statement_loop_p(s) && loop_range(statement_loop(s)) && print_dos)
         current_margin += ICFG_SCAN_INDENT;
 }
 
@@ -311,10 +319,8 @@ static void range_rewrite(range r)
  */
 static bool test_filter (test l)
 {
-    bool print_if_p = get_bool_property (ICFG_IFs);
-
     pips_debug (5, "Test begin\n");
-    if (print_if_p) current_margin += ICFG_SCAN_INDENT;
+    if (print_ifs) current_margin += ICFG_SCAN_INDENT;
     return TRUE;
 }
 
@@ -325,7 +331,7 @@ static void test_rewrite (test l)
     text inside_if = text_undefined;
     text t = make_text (NIL);
     char textbuf[MAX_LINE_LENGTH];
-    bool something_to_print, print_if_p;
+    bool something_to_print;
     
     pips_debug (5,"Test end\n");
     
@@ -333,15 +339,14 @@ static void test_rewrite (test l)
     inside_then = copy_text((text) load_statement_icfg (test_true (l)));
     inside_else = copy_text((text) load_statement_icfg (test_false (l)));
 
-    print_if_p = get_bool_property (ICFG_IFs);
     something_to_print = (some_text_p(inside_else) ||
 			  some_text_p(inside_then) ||
 			  some_text_p(inside_if));
     
-    if (print_if_p) current_margin -= ICFG_SCAN_INDENT;
+    if (print_ifs) current_margin -= ICFG_SCAN_INDENT;
     
     /* Print the IF */
-    if (something_to_print && print_if_p) {
+    if (something_to_print && print_ifs) {
 	sprintf(textbuf, "%*s" st_IF "\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
@@ -355,7 +360,7 @@ static void test_rewrite (test l)
     /* print then statements */
     if (some_text_p(inside_then)) {
 	/* Print the THEN */
-	if (something_to_print && print_if_p) {
+	if (something_to_print && print_ifs) {
 	    sprintf(textbuf, "%*s" st_THEN "\n", current_margin, "");
 	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 						  strdup(textbuf)));
@@ -366,7 +371,7 @@ static void test_rewrite (test l)
     /* print then statements */
     if (some_text_p(inside_else)){
 	/* Print the ELSE */
-	if (something_to_print && print_if_p) {
+	if (something_to_print && print_ifs) {
 	    sprintf(textbuf, "%*s" st_ELSE "\n", current_margin, "");
 	    ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 						  strdup(textbuf)));
@@ -375,7 +380,7 @@ static void test_rewrite (test l)
     }    
 
     /* Print the ENDIF */
-    if (something_to_print && print_if_p) {
+    if (something_to_print && print_ifs) {
 	sprintf(textbuf, "%*s" st_ENDIF "\n", current_margin, "");
 	ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					      strdup(textbuf)));
@@ -406,6 +411,9 @@ void print_module_icfg(entity module)
 
     current_margin = ICFG_SCAN_INDENT;
 
+    print_dos = get_bool_property(ICFG_DOs);
+    print_ifs = get_bool_property(ICFG_IFs);
+
     gen_multi_recurse
 	(s,
 	 statement_domain, statement_filter, statement_rewrite,
@@ -430,4 +438,15 @@ void print_module_icfg(entity module)
     free_icfg_map();
     free_current_stmt_stack();
     reset_current_module_entity();
+}
+
+/* parametrized by the decoration...
+ */
+void 
+print_module_icfg_with_decoration(
+    entity module,
+    text (*deco)(string))
+{
+    decoration = deco;
+    print_module_icfg(module);
 }
