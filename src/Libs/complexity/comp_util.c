@@ -461,13 +461,13 @@ FILE *fd;
 void init_cost_table()
 {
     char *sep_chars = strdup(" ");
-    char *token, *comma, *file = malloc(80);
+    char *token, *comma, *file = (char*) malloc(80);
     float file_factor;
 
     char *cost_dir = getenv("PIPS_COSTDIR");
     char *cost_table = strdup(get_string_property("COMPLEXITY_COST_TABLE"));
     char *cost_data = strdup(COST_DATA);
-    char *tmp=malloc(20);
+    char *tmp= (char*) malloc(20);
 
     if (!cost_dir) /* the default value */
 	cost_dir = strdup(concatenate(getenv("PIPS_ROOT"),
@@ -513,8 +513,8 @@ char *filename;
 float file_factor;
 {
     FILE *fd;
-    char *line = malloc(199);
-    char *intrinsic_name = malloc(30);
+    char *line = (char*) malloc(199);
+    char *intrinsic_name = (char*) malloc(30);
     int int_cost, float_cost, double_cost, complex_cost, dcomplex_cost;
     struct intrinsic_cost_rec *p;
     float scale_factor = 1.0;
@@ -725,7 +725,7 @@ void trace_on(char * fmt, ...)
 {
     if (get_bool_property("COMPLEXITY_TRACE_CALLS")) {
 	va_list args;
-	char *indentstring = malloc(99);
+	char *indentstring = (char*) malloc(99);
 	boolean b = (call_level >= 0);
 	int i,k=1;
 
@@ -754,7 +754,7 @@ void trace_on(char * fmt, ...)
 void trace_off()
 {
     if (get_bool_property("COMPLEXITY_TRACE_CALLS")) {
-	char *indentstring = malloc(99);
+	char *indentstring = (char*) malloc(99);
 	boolean b = (call_level >= 0);
 	int i,k=1;
 
@@ -945,7 +945,7 @@ char *module_name;
     hash_table hash_comp_params = hash_table_make(hash_pointer, 0);
     char *parameters = strdup(get_string_property("COMPLEXITY_PARAMETERS"));
     char *sep_chars = strdup(", ");
-    char *token = malloc(30);
+    char *token = (char*) malloc(30);
     entity e;
 
     hash_warn_on_redefinition();
