@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.71  1997/11/22 16:34:03  coelho
+ * translation not needed any more...
+ *
  * Revision 1.70  1997/10/28 14:37:33  keryell
  * Renamed basename and dirname as pips_basename and pips_dirname for
  * OSF1.
@@ -380,9 +383,10 @@ hpfc_common_hook(
     entity module,
     entity common)
 {
+    string name = module_local_name(common);/* old_name(module, common); */
     return strdup(concatenate
-        ("      include \"", old_name(module, common), PARM_SUFFIX "\"\n"
-	 "      include \"", old_name(module, common),  
+        ("      include \"", name, PARM_SUFFIX "\"\n"
+	 "      include \"", name,  
 	 module==host_module ? HINC_SUFFIX "\"\n" : NINC_SUFFIX "\"\n", NULL));
 }
 
