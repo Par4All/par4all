@@ -74,15 +74,15 @@ static transformation_strategy
 	       {{-1, loop_preserve}, 
 		{4, tuned_loop_unroll }, 
 		{80, loop_preserve }, 
-		{MAXINT, loop_preserve}},
+		{INT_MAX, loop_preserve}},
 	       {{-1, loop_vectorize}, 
 		{4, tuned_loop_unroll }, 
 		{80, loop_vectorize }, 
-		{MAXINT, tuned_loop_strip_mine}},
+		{INT_MAX, tuned_loop_strip_mine}},
 	       {{-1, tuned_loop_parallelize}, 
 		{4, tuned_loop_unroll }, 
 		{80, tuned_loop_parallelize }, 
-		{MAXINT, tuned_loop_parallelize}}
+		{INT_MAX, tuned_loop_parallelize}}
 	       };
 
 
