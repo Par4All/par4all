@@ -1,3 +1,42 @@
+/******************************************************************
+ *
+ *		     BOTTOM UP ARRAY RESIZING
+ *
+ *
+*******************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "genC.h"
+#include "linear.h"
+#include "ri.h"
+#include "ri-util.h"
+#include "database.h"
+#include "pipsdbm.h"
+#include "resources.h"
+#include "makefile.h"
+#include "misc.h"
+#include "control.h"
+#include "properties.h"
+#include "semantics.h"
+#include "transformer.h"
+#include "pipsmake.h"
+#include "abc_private.h"
+#include "effects-generic.h"
+#include "effects-convex.h"
+#include "effects-simple.h"
+#include "conversion.h"
+#include "text-util.h" /* for words_to_string*/
+#include "instrumentation.h"
+#include "transformations.h"
+
+static int number_of_right_array_declarations = 0;
+static string current_mod ="";
+
+#define PREFIX_DEC  "$DEC"
+
+
 /* This phase do array resizing for unnormalized and formal arguments only. 
    So we only need SUMMARY_REGIONS */
 bool formal_array_resizing_bottom_up(char* mod_name)
