@@ -16,6 +16,9 @@
  * $Id$
  *
  * $Log: ObservableStream.java,v $
+ * Revision 1.2  1998/10/16 13:52:58  coelho
+ * reindentation...
+ *
  * Revision 1.1  1998/06/30 17:35:33  coelho
  * Initial revision
  *
@@ -37,25 +40,24 @@ public class ObservableStream extends ByteArrayOutputStream
     Vector streamObservers = new Vector();
     
     void addStreamObserver(StreamObserver o) 
-	{
-	    streamObservers.addElement(o);
-	}
+    {
+	streamObservers.addElement(o);
+    }
     
     void removeStreamObserver(StreamObserver o) 
-	{
-	    streamObservers.removeElement(o);
-	}
+    {
+	streamObservers.removeElement(o);
+    }
         
     void notifyObservers() 
-	{
-	    for(int i = 0; i < streamObservers.size(); i++)
-		((StreamObserver) streamObservers.elementAt(i)).streamChanged();
-	}
+    {
+	for(int i = 0; i < streamObservers.size(); i++)
+	    ((StreamObserver) streamObservers.elementAt(i)).streamChanged();
+    }
     
     public void write(byte[] b, int off, int len) 
-	{
-	    super.write(b, off, len);
-	    notifyObservers();
-	}
-
+    {
+	super.write(b, off, len);
+	notifyObservers();
+    }
 }
