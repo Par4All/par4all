@@ -72,6 +72,9 @@ bool controlizer(string module_name)
 	reset_current_module_entity();
     }
 
+    /* type checking, simplifications and so... */
+    typing_of_expressions(module_stat);
+
     ifdebug(5) {
 	statement_consistent_p(module_stat);
     }
