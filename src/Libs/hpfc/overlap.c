@@ -10,7 +10,6 @@
 
 #include <stdio.h>
 #include <string.h>
-
 extern int      fprintf();
 
 #include "genC.h"
