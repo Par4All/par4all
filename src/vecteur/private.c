@@ -46,7 +46,8 @@ Value coeff;
 {
     Pvecteur v_out;
 
-    assert(vect_coeff(var, v_in)==0);
+    /* very expensive for EDF... FC/CA 06/07/2000. useless? */
+    /* assert(vect_coeff(var, v_in)==0); */
 
     v_out = vect_new(var, coeff);
     v_out->succ = v_in;
