@@ -1,10 +1,11 @@
 !
 ! COMMON /HPFC PROCS/
 !
-! $RCSfile: hpfc_procs.m4h,v $ ($Date: 1996/10/18 22:19:45 $, )
-! version $Revision$
-! got on %D%, %T%
 ! $Id$
+! $Log: hpfc_procs.m4h,v $
+! Revision 1.13  1997/03/20 07:49:10  coelho
+! better RCS headers.
+!
 !
 !
       common /HPFC PROCS/
@@ -53,5 +54,5 @@
      $     HPFC GROUP NAME
 !
 !
-! that is all for $RCSfile: hpfc_procs.m4h,v $
+! that is all 
 !
