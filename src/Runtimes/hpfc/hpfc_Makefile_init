@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/10/18 21:20:26 $, )
+# ($Date: 1996/10/19 11:17:37 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET entry is expected somewhere...
@@ -39,7 +39,7 @@ include $(RT_DIR)/$(RT_ARCH)/compilers.make
 # USE_PVMe
 # USE_GNU
 
-ifdef HPFC_USE_PVMe_
+ifdef _HPFC_USE_PVMe_
 all:	$(TARGET).cmd
 PVM=pvme
 endif
@@ -80,6 +80,8 @@ endif
 
 ifeq ($(PVM_ARCH),RS6K)
 NETWORK = 1
+# bsd helps with signals (e.g. if xpomp is used)
+FFLAGS	+= -lbsd
 endif
 
 #
@@ -101,7 +103,10 @@ pvmlib		= $(PVM_ROOT)/lib
 pvminc		= $(PVM_ROOT)/lib
 LIBS_DIR	+= -L/usr/lpp/ssp/css/libus
 PVM_GLIB	=
-COMMON_LIBS	+= -lmpci -bI:$(pvmlib)/pvm3e.exp
+COMMON_LIBS	+= --lmpci -bI:$(pvmlib)/pvm3e.exp
+#
+# LoadLeveller...
+$(TARGET).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(TARGET)
 endif
 
 ifdef MIMD
@@ -190,11 +195,6 @@ pvm:
 reset:
 	@echo "resetting PVM"
 	@echo reset | $(PVM)
-
-#
-# LoadLeveller...
-
-$(TARGET).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(TARGET)
 
 #
 # Installation to run
