@@ -1699,6 +1699,7 @@ Polyhedron* Polyhedron_Alloc(unsigned Dimension,unsigned NbConstraints,unsigned 
   }
   p = (Value *)malloc(NbRows * NbColumns * sizeof(Value));
   if(!p) {
+    free(q);
     errormsg1("Polyhedron_Alloc", "outofmem", "out of memory space");
     return 0;
   }

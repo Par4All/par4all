@@ -74,6 +74,10 @@ Matrix *Matrix_Alloc(unsigned NbRows,unsigned NbColumns) {
   }
   p = NULL;
   q = NULL;
+#ifdef GNUMP
+  Mat->p_allocsize = NbColumns*NbRows;
+#endif
+
   return Mat;
 } /* Matrix_Alloc */
 
@@ -85,16 +89,23 @@ void Matrix_Free(Matrix *Mat) {
   int i,j;
   Value *p;
 
+#ifdef GNUMP
+  p = *(Mat->p);
+  for(i=0;i<Mat->p_allocsize;i++) {
+    value_clear(*p++);
+  }
+#else
   for(i=0;i<Mat->NbRows;i++) {
     p = *(Mat->p+i);
     for(j=0;j<Mat->NbColumns;j++) 
       value_clear(*p++);
   }
+#endif
   if (Mat->p_Init)
-    free((Value *) Mat->p_Init);
+    free(Mat->p_Init);
   if (Mat->p)
-    free((Value *) Mat->p);
-  free((Value *) Mat);
+    free(Mat->p);
+  free(Mat);
 
 } /* Matrix_Free */
 

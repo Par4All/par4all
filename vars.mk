@@ -25,11 +25,11 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.9 2002/06/04 13:48:12 loechner Exp $
+# $Id: vars.mk,v 1.10 2002/06/04 16:15:47 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
-VERSION = 5.06
+VERSION = 5.07
 
 # NOTE: Don't edit this file if it is called vars.mk, instead
 # edit vars.mk.in, which is read by configure
@@ -49,7 +49,7 @@ BIN_INSTALL_DIR =	$(exec_prefix)/bin
 
 # c compiler flags and defines
 CC	             	= gcc
-CFLAGS                  = -g -O2 -Wall
+CFLAGS                  = -g -O2
 EXTRA_FLAGS             = 
 DEFINES         	=  -DSTDC_HEADERS=1 -DHAVE_LIMITS_H=1 -DHAVE_UNISTD_H=1 -DSIZEOF_INT=4 -DSIZEOF_LONG_INT=4 -DSIZEOF_LONG_LONG_INT=8  
 

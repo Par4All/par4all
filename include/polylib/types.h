@@ -68,6 +68,9 @@ typedef struct matrix {
   unsigned NbRows, NbColumns;
   Value **p;
   Value *p_Init;
+#ifdef GNUMP
+  int p_allocsize;	/* needed to free the memory allocated by mpz_init */
+#endif
 } Matrix;
 
 typedef struct polyhedron { 
