@@ -1,7 +1,10 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: lattice_extraction.c,v $ version $Revision$
- * ($Date: 1995/11/30 17:24:04 $, ) 
+ * $Id$
+ * $Log: lattice_extraction.c,v $
+ * Revision 1.3  1997/03/20 10:27:04  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
