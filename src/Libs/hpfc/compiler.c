@@ -1,6 +1,6 @@
 /* Fabien Coelho, May 1993
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/09/04 18:07:51 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/09/22 13:11:44 $, )
  * version $Revision$
  *
  * Compiler
@@ -417,8 +417,7 @@ statement body, *hoststatp, *nodestatp;
 
     if (gen_length(lw)==0) /* very partial */
     {
-	message_assert("parallel body with only read distributed arrays",
-		       gen_length(lr)==0);
+	message_assert("no read if no write", gen_length(lr)==0);
 
 	(*hoststatp) = copy_statement(body);
 	(*nodestatp) = copy_statement(body);
