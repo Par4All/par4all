@@ -743,7 +743,8 @@ call c;
       b = basic_of_intrinsic(c);
       break;
     case is_value_symbolic: 
-      b = make_basic(is_basic_overloaded, UU);
+	/* b = make_basic(is_basic_overloaded, UU); */
+      b = copy_basic(basic_of_constant(c));
       break;
     case is_value_constant:
       b = copy_basic(basic_of_constant(c));
