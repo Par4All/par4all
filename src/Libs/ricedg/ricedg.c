@@ -1,4 +1,3 @@
-
 /* Dependence Graph computation for Allen & Kennedy algorithm
  *
  * Remi Triolet, Yi-qing Yang
@@ -498,9 +497,86 @@ statement stat;
 
 
 
-/*********************************************************************************/
-/* UPDATING OF DEPENDENCE GRAPH                                                  */
-/*********************************************************************************/
+/* Update of dependence graph
+ *
+ * The update of conflict information is performed for all statements in
+ * a loop. This set of statements seems to be defined by "region", while
+ * the loop is defined by "stat".
+ *
+ * Let v denote a vertex, a an arc, s a statement attached to a vertex
+ * and c a conflict, i.e. a pair of effects (e1,e2). Each arc is
+ * labelled by a list of statements. Each vertex points to a list of
+ * arcs. Each arc points to a list of conflicts. See dg.f.tex and
+ * graph.f.tex in Documentation/Newgen for more details.
+ *
+ * The procedure is quite complex because:
+ *
+ * - each dependence arc carries a list of conflicts; when a conflict is
+ * found non-existent, it has to be removed from the conflict list and
+ * the arc may also have to be removed from the arc list associated to
+ * the current vertex if its associated conflict list becomes empty;
+ * removing an element from a list is a pain because you need to know
+ * the previous element and to handle the special case of the list first
+ * element removal;
+ *
+ * - the same conflict may appear twice, once as a def-use conflict and
+ * once as a use-def conflicts; since dependence testing may be long, 
+ * the conflict and its symmetric conflict are processed simultaneously;
+ * of course, conflict list and dependence arc updates become tricky,
+ *
+ * - especially if the two vertices of the dependence arc are only one:
+ * you can have a s1->s1 dependence; thus you might be scanning and
+ * updating the very same list of arcs and conflicts twice... but there
+ * is a test on pchead and pchead1 to avoid it (pchead and pchead1
+ * points to the heads of the current conflict list and of the conflict
+ * list containing the symmetrical conflict); remember, you have no
+ * guarantee that s1!=s2 and/or v1=!v2 and/or a1!=a2
+ *
+ * - note that there also is a test about symmetry: def-def and use-use
+ * conflicts cannot have symmetric conflicts;
+ *
+ * - because of the use-def/def-use symmetry, a conflict may already
+ * have been processed when it is accessed;
+ * 
+ * - due to a strange feature in the NewGen declarations, the arcs
+ * are called "successors"; variables in the procedure are named with
+ * the same convention except... except when they are not; so a so-called
+ * "successor" may be either an arc or a vertex (or a statement since
+ * each vertex points to a statement)
+ *
+ * - you don't know if dg is a graph or a multigraph; apparently it's
+ * a multigraph but there is no clear semantics attaches to the different
+ * arcs joining a pair of vertices (Pierre Jouvelot, help!)
+ *
+ * - conflicts are assumed uniquely identifiable by the addresses of their
+ * two effects (and by labelling the same pair of vertices - but not the
+ * same arc); that calls for tricky bugs if some sharing between effects
+ * exists.
+ *
+ * The procedure is made of many too many nested loops and tests:
+ * 
+ * for all vertex v1 in graph dg
+ *    if statement s1 associated to v1 in region
+ *	 for all arcs a1 outgoing from v1
+ *	    let v2 be the sink of a1 and s2 the statement associated to v2
+ *	    if s2 in region
+ *             for all conflicts c12 carried by a1
+ *                if c12 has not yet been refined
+ *		     if c12 may have a symmetric conflict
+ *			for all arcs a2 outgoing from the sink v2 of a1
+ *			   if sink(a2) equals v1
+ *			      for all conflicts c21
+ *				 if c21 equal c12
+ *				    halleluia!
+ *                   compute refined dependence information for c12
+ *                       and possibly c21
+ *                   possibly update c21 and possibly remove a2
+ *	             update c12 and possibly remove a1
+ *
+ * Good luck for the restructuring! I'm not sure the current procedure
+ * might not end up removing as a2 the very same arc a1 it uses to
+ * iterate... 
+ */
 
 static void rice_update_dependence_graph(stat, region)
 statement stat;
@@ -600,8 +676,15 @@ set region;
 		    /*looking for the opposite dependence from (s2,e2) to 
 		      (s1,e1) */
 		    
+		    /* Make sure that you do not try to find the very same
+		     * conflict: eliminate symmetric conflicts like dd's,
+		     * and, if the KEEP-READ-READ-DEPENDENCE option is on,
+		     * the unusual uu's.
+		     */
 		    if (!((s1==s2) && (action_write_p(effect_action(e1)))
-			  && (action_write_p(effect_action(e2)))) )
+			  && (action_write_p(effect_action(e2)))) &&
+			!((s1==s2) && (action_read_p(effect_action(e1)))
+			  && (action_read_p(effect_action(e2)))) )
              /* && (reference_indices(effect_reference(e1))) != NIL) */
 		    {
 			debug (4, "rice_update_dependence_graph", 
