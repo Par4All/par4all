@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <polylib/polylib.h>
 
+
 typedef struct {
   int count;
   int *fac;
@@ -155,7 +156,7 @@ Bool isLinear(Lattice  *A) {
  *               be made to the Unimodular Matrix U.
  *            5) Return.
  */ 
-void AffineHermite (Lattice *A, Lattice **H, Lattice **U) {
+void AffineHermite (Lattice *A, Lattice **H, Matrix **U) {
  
   Lattice *temp;
   Bool flag = True;
@@ -173,7 +174,7 @@ void AffineHermite (Lattice *A, Lattice **H, Lattice **U) {
     flag = False ;
     temp = (Lattice *)Matrix_Copy(A);
   }  
-  Hermite((Matrix *)temp,(Matrix **) H,(Matrix **) U);
+  Hermite((Matrix *)temp,(Matrix **) H, U);
   if (flag == True) {
     Matrix_Free ((Matrix *) temp);
     temp = Homogenise(H[0],False);
@@ -389,10 +390,10 @@ Bool sameLattice(Lattice *A, Lattice *B) {
  * matrix is (dimension - A->dimension). The input matrix is not necessarily 
  * a Polylib matrix but the output is a polylib matrix. 
  */
-Matrix *ChangeLatticeDimension(Matrix *A, int dimension) {
+Lattice *ChangeLatticeDimension(Lattice *A, int dimension) {
   
   int i, j;
-  Matrix *Result ;
+  Lattice *Result ;
   
   Result = Matrix_Alloc(dimension, dimension);
   if(dimension <= A->NbRows) {
@@ -590,6 +591,126 @@ static Matrix * MakeDioEqforInter (Lattice *A, Lattice *B) {
 static void AddLattice(LatticeUnion *,Matrix *,  Matrix *, int , int);
 LatticeUnion *SplitLattice(Matrix *, Matrix *, Matrix *);
 
+
+
+/*
+ * The function is transforming a lattice X in a union of lattices based on a starting lattice Y.
+ * Note1: If the intersection of X and Y lattices is empty the result is identic with the first argument (X) because no operation can be made.
+ *Note2: The function is availabe only for simple Lattices and not for a union of Lattices.
+
+ *       Step 1:  Find Intersection = LatticeIntersection (A, B).
+ *       Step 2:  Extract the Linear Parts of the Lattices A and Intersection.
+ *                (while dealing with Basis we only deal with the Linear Parts)
+ *       Step 3:  Let M1 = Basis of A and M2 = Basis of B.
+ *                Let B1 and B2 be the Basis of A and B respectively, 
+ *                corresponding to the above Theorem.
+ *                Then we Have B1 = M1 * U1 {a unimodular Matrix }
+ *                and B2 = M2 * U2. M1 and M2 we know, they are the linear 
+ *                parts we obtained in Step 2. Our Task is now to find U1 and
+ *                U2. 
+ *                We know that B1  * Delta = B2.
+ *                i.e. M1 * U1 * Delta = M2 * U2
+ *                or U1*Delta*U2Inverse = M1Inverse * M2.
+ *                and Delta is the Diagonal Matrix which satisifies the 
+ *                above properties (in the Theorem).
+ *                So Delta is nothing but the Smith Normal Form of 
+ *                M1Inverse * M2.
+ *                So, first we have to find M1Inverse.
+ *             
+ *                This Step, involves finding the Inverse of the Matrix M1.
+ *                We find the Inverse using the Polylib function 
+ *                Matrix_Inverse. There is a catch here, the result of this
+ *                function is an integral matrix, not necessarily the exact
+ *                Inverse (since M1 need not be Unimodular), but a multiple
+ *                of the actual inverse. The number by which we have to divide
+ *                the matrix, is not obtained here as the input matrix is not
+ *                a Polylib matrix { We input only the Linear part }. Later I
+ *                give a way for finding that number.
+ *
+ *                M1Inverse = Matrix_Inverse ( M1 );
+ *      
+ *      Step 4 :  MtProduct = Matrix_Product (M1Inverse, M2);
+ *      Step 5 :  SmithNormalFrom (MtProduct, Delta, U, V);
+ *                U1 = U and U2Inverse = V.
+ *      Step 6 :  Find U2 = Matrix_Inverse  (U2inverse). Here there is no prob
+ *                as U1 and its inverse are unimodular.
+ *      
+ *      Step 7 :  Compute B1 = M1 * U1;
+ *      Step 8 :  Compute B2 = M2 * U2;
+ *      Step 9 :  Earlier when we computed M1Inverse, we knew that it was not
+ *                the exact inverse but a multiple of it. Now we find the 
+ *                number, such that ( M1Inverse / number ) would give us the 
+ *                exact inverse of M1.
+ *                We know that B1 * Delta = B2.
+ *                Let k = B2[0][0] / B1[0][0].
+ *                Let number = Delta[0][0]/k;
+ *                This 'number' is the number we want.
+ *                We Divide the matrix Delta by this number, to get the actual
+ *                Delta such that B1 * Delta = B2.
+ *     Step 10 :  Call Split Lattice (B1, B2, Delta ).
+ *                This function returns the Union of Lattices in such a way 
+ *                that B2 is at the Head of this List.
+ *
+ *If the intersection between X and Y is empty then the result is NULL.
+ */
+
+
+LatticeUnion *Lattice2LatticeUnion(Lattice *X,Lattice *Y)
+{
+  Lattice *B1 = NULL, *B2 = NULL, *newB1 = NULL, *newB2 = NULL, *Intersection=NULL;
+  Matrix *U = NULL,*M1 = NULL, *M2 = NULL, *M1Inverse = NULL,*MtProduct = NULL;
+  Matrix *Vinv, *V , *temp, *DiagMatrix ;
+
+  LatticeUnion *Head = NULL, *tempHead = NULL;
+  int i;
+  Value k;
+  
+
+  Intersection = LatticeIntersection(X,Y);
+  if (isEmptyLattice(Intersection) == True) {
+    return NULL;
+  }  
+
+  value_init(k);
+  M1 = (Matrix *)ExtractLinearPart(X);
+  M2 = (Matrix *)ExtractLinearPart(Intersection);
+
+  M1Inverse = Matrix_Alloc(M1->NbRows,M1->NbColumns);
+  temp = Matrix_Copy(M1);
+  Matrix_Inverse(temp,M1Inverse);
+  Matrix_Free(temp);
+
+  MtProduct = Matrix_Alloc(M1->NbRows, M1->NbColumns);
+  Matrix_Product(M1Inverse,M2,MtProduct) ;  
+  Smith(MtProduct, &U, &Vinv, &DiagMatrix);  
+  V = Matrix_Alloc(Vinv->NbRows,Vinv->NbColumns);
+  Matrix_Inverse(Vinv, V);
+  Matrix_Free(Vinv);  
+  B1 = Matrix_Alloc(M1->NbRows, U->NbColumns);
+  B2 = Matrix_Alloc(M2->NbRows, V->NbColumns);  
+  Matrix_Product(M1, U, B1);
+  Matrix_Product(M2, V, B2);
+  Matrix_Free(M1);
+  Matrix_Free(M2);  
+  value_division(k,B2->p[0][0],B1->p[0][0]);
+  value_division(k,DiagMatrix->p[0][0],k);  
+  for (i = 0; i < DiagMatrix->NbRows; i++)
+    value_division(DiagMatrix->p[i][i],DiagMatrix->p[i][i],k);
+  newB1 = ChangeLatticeDimension(B1, B1->NbRows + 1); 
+  Matrix_Free(B1);
+  newB2 = ChangeLatticeDimension(B2, B2->NbRows +1);
+  Matrix_Free(B2);  
+  for(i = 0; i < newB1->NbRows - 1;i ++)
+    value_assign(newB2->p[i][newB1->NbRows-1],Intersection->p[i][X->NbRows-1]);
+  Head = SplitLattice(newB1,newB2,DiagMatrix); 
+  Matrix_Free(newB1);
+  Matrix_Free(DiagMatrix); 
+  value_clear(k);
+  return Head;
+}
+
+
+
 /**
 
 ***        Method : 
@@ -673,17 +794,12 @@ LatticeUnion *SplitLattice(Matrix *, Matrix *, Matrix *);
  *     Step 12 :  Free the Memory that is now not needed and return Head.
  *
  */
-LatticeUnion *LatticeDifference(Matrix  *A,Matrix *B) {
+LatticeUnion *LatticeDifference(Lattice  *A,Lattice *B) {
  
   Lattice *Intersection = NULL;
-  Lattice *B1 = NULL, *B2 = NULL, *newB1 = NULL, *newB2 = NULL;
-  Matrix *U = NULL,*M1 = NULL, *M2 = NULL, *M1Inverse = NULL,*MtProduct = NULL;
-  Matrix *Vinv, *V , *temp, *DiagMatrix ;
-  Matrix *H , *U1 , *X, *Y ;
   LatticeUnion *Head = NULL, *tempHead = NULL;
-  int i;
-  Value k;
-  
+  Matrix *H , *U1 , *X, *Y ;
+
 #ifdef DOMDEBUG
   FILE *fp;
   fp = fopen("_debug", "a");
@@ -706,8 +822,8 @@ LatticeUnion *LatticeDifference(Matrix  *A,Matrix *B) {
     fprintf(stderr,"incompatible dimensions \n");
     return NULL;
   }
-  value_init(k);
-  if (isinHnf (A) != True) {
+
+if (isinHnf (A) != True) {
     AffineHermite(A,&H,&U1);
     X = Matrix_Copy(H);    
     Matrix_Free(U1);
@@ -725,63 +841,36 @@ LatticeUnion *LatticeDifference(Matrix  *A,Matrix *B) {
   else
     Y = Matrix_Copy(B);  
   if (isEmptyLattice(X)) {
-    value_clear(k);
     return NULL;  
-  }
-  Intersection = LatticeIntersection(X,Y);
-  if (isEmptyLattice(Intersection) == True) {
+  } 
+
+  Head=Lattice2LatticeUnion(X,Y);
+
+/* If the spliting operation can't be done the result is X. */
+
+  if (Head == NULL) {
     Head = (LatticeUnion *)malloc(sizeof(LatticeUnion));
     Head->M = Matrix_Copy(X);
     Head->next = NULL;
     Matrix_Free(X);
     Matrix_Free(Y);
-    value_clear(k);
     return Head;
-  }  
-  M1 = (Matrix *)ExtractLinearPart(X);
-  M2 = (Matrix *)ExtractLinearPart(Intersection);
-  M1Inverse = Matrix_Alloc(M1->NbRows,M1->NbColumns);
-  temp = Matrix_Copy(M1);
-  Matrix_Inverse(temp,M1Inverse);
-  Matrix_Free(temp);
-  
-  MtProduct = Matrix_Alloc(M1->NbRows, M1->NbColumns);
-  Matrix_Product(M1Inverse,M2,MtProduct) ;  
-  Smith(MtProduct, &U, &Vinv, &DiagMatrix);  
-  V = Matrix_Alloc(Vinv->NbRows,Vinv->NbColumns);
-  Matrix_Inverse(Vinv, V);
-  Matrix_Free(Vinv);  
-  B1 = Matrix_Alloc(M1->NbRows, U->NbColumns);
-  B2 = Matrix_Alloc(M2->NbRows, V->NbColumns);  
-  Matrix_Product(M1, U, B1);
-  Matrix_Product(M2, V, B2);
-  Matrix_Free(M1);
-  Matrix_Free(M2);  
-  value_division(k,B2->p[0][0],B1->p[0][0]);
-  value_division(k,DiagMatrix->p[0][0],k);  
-  for (i = 0; i < DiagMatrix->NbRows; i++)
-    value_division(DiagMatrix->p[i][i],DiagMatrix->p[i][i],k);
-  newB1 = ChangeLatticeDimension(B1, B1->NbRows + 1); 
-  Matrix_Free(B1);
-  newB2 = ChangeLatticeDimension(B2, B2->NbRows +1);
-  Matrix_Free(B2);  
-  for(i = 0; i < newB1->NbRows - 1;i ++)
-    value_assign(newB2->p[i][newB1->NbRows-1],Intersection->p[i][X->NbRows-1]);
-  Head = SplitLattice(newB1,newB2,DiagMatrix); 
-  Matrix_Free(newB1);
-  Matrix_Free(DiagMatrix);  
+  } 
+
   tempHead = Head;
   Head = Head->next;  
   Matrix_Free (tempHead->M);
   tempHead->next = NULL; 
   free(tempHead);  
-  Matrix_Free (X);
-  Matrix_Free (Y); 
+
   if ((Head != NULL))
     Head = LatticeSimplify (Head);
-  value_clear(k);
+  Matrix_Free (X);
+  Matrix_Free (Y); 
+
   return Head;
 } /* LatticeDifference */
+
 
 /*
  * Given a Lattice 'B1' and a Lattice 'B2' and a Diagonal Matrix 'C' such that
@@ -792,7 +881,7 @@ LatticeUnion *LatticeDifference(Matrix  *A,Matrix *B) {
  * {b0 ... bn} are the columns of Lattice B1. The list is so formed that the 
  * Lattice B2 is the Head of the list. 
  */     
-LatticeUnion *SplitLattice(Matrix *B1, Matrix *B2, Matrix *C) {
+LatticeUnion *SplitLattice(Lattice *B1, Lattice *B2, Matrix *C) {
   
   int i;
   
