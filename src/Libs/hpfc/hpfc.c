@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.94  1997/04/16 09:07:44  creusil
+ * statement_effects used for effects. bc.
+ *
  * Revision 1.93  1997/04/15 10:58:05  creusil
  * statement_effects used instead of statement mappings for regions. bc.
  *
@@ -567,8 +570,8 @@ static bool hpfc_directives_handler(string name, bool dyn)
 	s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
 
 	if (dyn)
-	    set_proper_effects_map(effectsmap_to_listmap((statement_mapping) 
-		db_get_memory_resource(DBR_PROPER_EFFECTS, name, TRUE)));
+	    set_proper_rw_effects((statement_effects) 
+		db_get_memory_resource(DBR_PROPER_EFFECTS, name, TRUE));
 
 	set_current_module_entity(module);
 	set_current_module_statement(s);
@@ -584,14 +587,13 @@ static bool hpfc_directives_handler(string name, bool dyn)
 	reset_current_module_statement();
 	reset_current_module_entity();
 
-	if (dyn) free_proper_effects_map();
+	if (dyn) reset_proper_rw_effects();
 	
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, s);
 
 	/* ??? should not be necessary, some bug in pipsmake
 	 */
-	if (dyn)
-	    db_unput_a_resource(DBR_PROPER_EFFECTS, name);
+	if (dyn) db_unput_a_resource(DBR_PROPER_EFFECTS, name);
     }
 
     debug_off(); 
