@@ -48,6 +48,8 @@
 #include "malloc.h"
 
 extern void add_rule(rule);
+extern int yyerror(char *);
+extern int yylex();
 
 extern char yytext[];
 extern FILE * yyin; 
