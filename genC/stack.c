@@ -7,7 +7,11 @@
  * there is no actual need of such a type on the functional point of view.
  * I put it there since it may be much more efficient than lists.
  *
- * More thoughts needed. 
+ * More thoughts needed. I should had an iterator...
+ *
+ * $RCSfile: stack.c,v $ version $Revision$
+ * $Date: 1995/02/01 10:59:09 $, 
+ * got on %D%, %T%
  */
 
 #include <stdio.h>
@@ -15,6 +19,30 @@ extern int fprintf();
 #include "malloc.h"
 #include "newgen_assert.h"
 #include "newgen_types.h"
+
+/* the stack bulks, that is arrays containing the elements
+ */
+typedef struct _stack_bulk
+{
+  int n_item;                 /* next available item in the bulk */
+  int max_items;              /* the maximun number of items of this bulk */
+  char **items;               /* the items (only pointers at the moment) */
+  struct _stack_bulk *succ;   /* the next bulk */
+}
+  _stack_bulk, *_stack_ptr;
+
+/*  the stack head
+ */
+typedef struct __stack_head
+{
+  int size;
+  int type; /* as BASIC, LIST, EXTERNAL, CHUNK and so on */
+  int max_extent;
+  _stack_ptr stack;
+  _stack_ptr available;
+}
+  _stack_head; /* and *stack */
+
 #include "newgen_stack.h"
 
 /*  usefull defines
@@ -25,13 +53,22 @@ extern int fprintf();
 
 #define STACK_DEFAULT_SIZE 30
 
+/*  tools
+ */
+static int number_of_bulks(x)
+_stack_ptr x;
+{
+    int n=0;
+    for(; !STACK_PTR_NULL_P(x); x=x->succ, n++);
+    return(n);
+}
+
 /* allocates a bulk of size size
  */
 static _stack_ptr allocate_bulk(size)
 int size;
 {
-    _stack_ptr 
-	x = (_stack_ptr) malloc(sizeof(_stack_bulk));
+    _stack_ptr x = (_stack_ptr) malloc(sizeof(_stack_bulk));
     
     x->n_item = 0;
     x->max_items = size;
@@ -42,21 +79,17 @@ int size;
 }
 
 /* search for a new bulk, first in the available list,
- * if non are available, a new bulk is allocated
+ * if none are available, a new bulk is allocated
  */
 static _stack_ptr find_or_allocate(s)
 stack s;
 {
     if (!STACK_PTR_NULL_P(s->available))
     {
-	_stack_ptr 
-	    x = s->available;
+	_stack_ptr x = s->available;
 
 	s->available = (s->available)->succ;
-
-	/*  clean the bulk to be returned
-	 */
-	x->succ = STACK_PTR_NULL;
+	x->succ = STACK_PTR_NULL; /*  clean the bulk to be returned */
 	return(x);
     }
     else
@@ -68,10 +101,9 @@ stack s;
 stack stack_make(type, size)
 int type, size;
 {
-    stack 
-	s = malloc(sizeof(_stack_head));
+    stack s = malloc(sizeof(_stack_head));
 
-    if (size<1) size=STACK_DEFAULT_SIZE;
+    if (size<10) size=STACK_DEFAULT_SIZE; /* not too small */
 
     s->size = 0;
     s->type = type;
@@ -80,6 +112,30 @@ int type, size;
     s->available = STACK_PTR_NULL;
  
     return(s);
+}
+
+void stack_info(f, s)
+FILE *f;
+stack s;
+{
+    fprintf(f, "stack_info about stack 0x%x\n", (unsigned int) s);
+
+    if (STACK_NULL_P(s))
+    {
+	fprintf(f, " - is null\n");
+	return;
+    }
+    /* else */
+    if (stack_undefined_p(s))
+    {
+	fprintf(f, " - is undefined\n");
+	return;
+    }
+    /* else */
+    fprintf(f, " - type %d, size %d, max extent %d\n", 
+	    s->type, s->size, s->max_extent);
+    fprintf(f, " - bulks: %d in use, %d available\n",
+	    number_of_bulks(s->stack), number_of_bulks(s->available));
 }
 
 /* FREEs the stack
@@ -94,15 +150,20 @@ _stack_ptr x;
 static void free_bulks(x)
 _stack_ptr x;
 {
-    if (!STACK_PTR_NULL_P(x))
-	free_bulks(x->succ), x->succ=STACK_PTR_NULL, free_bulk(x);
+    _stack_ptr tmp;
+
+    while(!STACK_PTR_NULL_P(x))
+    {
+	tmp=x, x=x->succ, tmp->succ=STACK_PTR_NULL;
+	free_bulk(tmp);
+    }
 }
 
 void stack_free(s)
 stack s;
 {
-    free_bulks(s->stack), s->stack = STACK_PTR_NULL;
-    free_bulks(s->available), s->available = STACK_PTR_NULL;
+    free_bulks(s->stack), s->stack=STACK_PTR_NULL;
+    free_bulks(s->available), s->available=STACK_PTR_NULL;
     free(s);
 }
 
@@ -148,8 +209,7 @@ stack s;
     /*   PUSH!
      */
     s->size++; 
-    if (s->size > s->max_extent) 
-	s->max_extent = s->size;
+    if (s->size > s->max_extent) s->max_extent = s->size;
     x->items[x->n_item++] = item;
 }
 
