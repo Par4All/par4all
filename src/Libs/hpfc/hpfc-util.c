@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/06 12:07:56 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/06 14:39:15 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -16,7 +16,6 @@
 extern int fprintf();
 
 #include "genC.h"
-#include "hash.h"
 
 #include "ri.h"
 #include "hpf.h"
