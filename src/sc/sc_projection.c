@@ -85,6 +85,7 @@ int ofl_ctrl;
 	if(!egalite_normalize(eq)) {
 	    sc_rm(*psc);
 	    *psc = sc_empty(base_init);
+	    return;
 	}
 	else 
 	    /* si au moins une egalite contient v avec un coeff. non nul */
@@ -103,6 +104,7 @@ int ofl_ctrl;
 	    /* detection de la non faisabilite du Psysteme */
 	    sc_rm(*psc);
 	    *psc = sc_empty(base_init);
+	    return;
 	}
 	(*psc)->nb_ineq = nb_elems_list((*psc)->inegalites);
     }
