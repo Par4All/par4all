@@ -2,11 +2,17 @@
  * and in the static area and in the dynamic area. The heap area is left
  * aside.
  *
- * 	%A% ($Date: 2002/03/08 10:21:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+ * 	%A% ($Date: 2002/03/19 12:30:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: equivalence.c,v $
+ * Revision 1.25  2002/03/19 12:30:07  irigoin
+ * General substitution of debug() by pips_debug() and replacement of CONS by
+ * gen_once() in SaveChains() to avoid later bug in semantics: the same
+ * variable was stored several times in ram_shared when multiple variables
+ * were aliased together.
+ *
  * Revision 1.24  2002/03/08 10:21:03  irigoin
  * Upgrade to ComputeAddresses() to allocate left-over varying size arrays in
  * stack area if PARSER_ACCEPT_ANSI_EXTENSIONS is set to true
@@ -35,7 +41,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 2002/03/08 10:21:03 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 2002/03/19 12:30:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -155,7 +161,7 @@ syntax s;
     /* what is the offset of this reference ? */
     o = so + OffsetOfReference(r);
 
-    debug(8, "MakeEquivAtom", "Offset %d for reference to %s\n",
+    pips_debug(8, "Offset %d for reference to %s\n",
 	  o, entity_local_name(e));
 
     return(make_atom(e, o));
@@ -181,7 +187,7 @@ chain c;
 		maxoff = o;
     }
 
-    debug(9, "StoreEquivChain", "maxoff %d\n", maxoff);
+    pips_debug(9, "maxoff %d\n", maxoff);
 
     if (maxoff > 0) {
 	for (pc = chain_atoms(c); pc != NIL; pc = CDR(pc)) {
@@ -211,17 +217,17 @@ ComputeEquivalences()
     cons *pc;
     int again = TRUE;
 
-    debug(8, "ComputeEquivalences", "Begin\n");
+    pips_debug(8, "Begin\n");
 
     /*
     if (TempoEquivSet == equivalences_undefined) {
-	debug(8, "ComputeEquivalences", "Useless call, end\n");
+	pips_debug(8, "Useless call, end\n");
 	    return;
     }
     */
 
     if (ENDP(equivalences_chains(TempoEquivSet))) {
-	debug(8, "ComputeEquivalences", "No equivalences to process, end\n");
+	pips_debug(8, "No equivalences to process, end\n");
 	    return;
     }
 
@@ -231,7 +237,7 @@ ComputeEquivalences()
     }
     */
 
-    debug(8, "ComputeEquivalences", "Initial equivalence chains\n");
+    pips_debug(8, "Initial equivalence chains\n");
     PrintChains(TempoEquivSet);
 
     while (again) {
@@ -244,16 +250,16 @@ ComputeEquivalences()
 	    TempoEquivSet = FinalEquivSet;
 	    FinalEquivSet = make_equivalences(NIL);
 
-	    debug(8, "ComputeEquivalences", "Intermediate equivalence chains\n");
+	    pips_debug(8, "Intermediate equivalence chains\n");
 	    PrintChains(TempoEquivSet);
 	}
     }
 
-    debug(8, "ComputeEquivalences", "Resulting equivalence chains\n");
+    pips_debug(8, "Resulting equivalence chains\n");
 
     PrintChains(FinalEquivSet);
 
-    debug(8, "ComputeEquivalences", "End\n");
+    pips_debug(8, "End\n");
 }
 
 /* this function adds a chain ct to the set of equivalences. if the
@@ -381,7 +387,7 @@ chain c;
     atom a;
 
     ifdebug(9) {
-	debug(9, "PrintChain", "Begin: ");
+	pips_debug(9, "Begin: ");
 
 	for (pca = chain_atoms(c); pca != NIL; pca = CDR(pca)) {
 	    a = ATOM(CAR(pca));
@@ -390,7 +396,7 @@ chain c;
 			   entity_name(atom_equivar(a)), atom_equioff(a));
 	}
 	(void) fprintf(stderr, "\n");
-	debug(9, "PrintChain", "End\n");
+	pips_debug(9, "End\n");
     }
 }
 
@@ -418,14 +424,14 @@ entity_in_equivalence_chain_p(entity e, chain c)
     atom a;
     bool is_in_p = FALSE;
 
-    debug(9, "entity_in_equivalence_chain_p", "Begin for entity %s \n", entity_name(e));
+    pips_debug(9, "Begin for entity %s \n", entity_name(e));
 
     for (pca = chain_atoms(c); !ENDP(pca) && !is_in_p; POP(pca)) {
 	a = ATOM(CAR(pca));
 
 	is_in_p = (atom_equivar(a) == e);
     }
-    debug(9, "PrintChain", "End\n");
+    pips_debug(9, "End\n");
     return is_in_p;
 }
 
@@ -503,7 +509,7 @@ ComputeAddresses()
     list dynamic_aliases = NIL;
     list static_aliases = NIL;
 
-    debug(1, "ComputeAddresses", "Begin\n");
+    pips_debug(1, "Begin\n");
 
     if (FinalEquivSet != equivalences_undefined) {
 	for (pcc = equivalences_chains(FinalEquivSet); pcc != NIL; 
@@ -764,7 +770,7 @@ ComputeAddresses()
 	if (entity_storage(e) == storage_undefined) {
 	    /* area da = type_area(entity_type(DynamicArea)); */
 
-	    debug(2, "ComputeAddresses", "Add dynamic non-aliased variable %s\n",
+	    pips_debug(2, "Add dynamic non-aliased variable %s\n",
 		  entity_local_name(e));
 
 	    entity_storage(e) = 
@@ -781,7 +787,7 @@ ComputeAddresses()
 		if(ram_section(r)==StaticArea) {
 		    /* area sa = type_area(entity_type(StaticArea)); */
 
-		    debug(2, "ComputeAddresses", "Add static non-aliased variable %s\n",
+		    pips_debug(2, "Add static non-aliased variable %s\n",
 			  entity_local_name(e));
 
 		    ram_offset(r) = CurrentOffsetOfArea(StaticArea, e);
@@ -790,7 +796,7 @@ ComputeAddresses()
 		else if(ram_section(r)==HeapArea) {
 		    area ha = type_area(entity_type(HeapArea));
 
-		    debug(2, "ComputeAddresses",
+		    pips_debug(2,
 			  "Ignore heap variable %s because its address cannot be computed\n",
 			  entity_local_name(e));
 		    area_layout(ha) = gen_nconc(area_layout(ha), CONS(ENTITY, e, NIL));
@@ -799,7 +805,7 @@ ComputeAddresses()
 		  /* Must be stack area */
 		    area sa = type_area(entity_type(StackArea));
 
-		    debug(2, "ComputeAddresses",
+		    pips_debug(2,
 			  "Ignore stack variable %s because its address cannot be computed\n",
 			  entity_local_name(e));
 		    area_layout(sa) = gen_nconc(area_layout(sa), CONS(ENTITY, e, NIL));
@@ -814,7 +820,7 @@ ComputeAddresses()
 	list dynamics = area_layout(type_area(entity_type(DynamicArea)));
 
 	ifdebug(2) {
-	    debug(2, "ComputeAddresses", "There are dynamic aliased variables:");
+	    pips_debug(2, "There are dynamic aliased variables:");
 	    print_arguments(dynamic_aliases);
 	}
 
@@ -830,7 +836,7 @@ ComputeAddresses()
 	list statics = area_layout(type_area(entity_type(StaticArea)));
 
 	ifdebug(2) {
-	    debug(2, "ComputeAddresses", "There are static aliased variables:");
+	    pips_debug(2, "There are static aliased variables:");
 	    print_arguments(static_aliases);
 	}
 
@@ -846,17 +852,17 @@ ComputeAddresses()
     update_common_to_size(DynamicArea,
 			  area_size(type_area(entity_type(DynamicArea))));
 
-    debug(1, "ComputeAddresses", "End\n");
+    pips_debug(1, "End\n");
 }
 
 /* Initialize the shared fields of aliased variables */
 void 
 SaveChains()
 {
-    debug(8, "SaveChains", "Begin\n");
+    pips_debug(8, "Begin\n");
 
     if (FinalEquivSet == equivalences_undefined) {
-    debug(8, "SaveChains", "No equivalence to process. End\n");
+    pips_debug(8, "No equivalence to process. End\n");
 	return;
     }
 
@@ -864,10 +870,11 @@ SaveChains()
 	cons *shared = NIL;
 	chain c = CHAIN(CAR(pc));
 
-	debug(8, "SaveChains", "Process an equivalence chain:\n");
+	pips_debug(8, "Process an equivalence chain:\n");
 
 	MAPL(pa, {
-	    shared = CONS(ENTITY, atom_equivar(ATOM(CAR(pa))), shared);
+	  shared = gen_once(atom_equivar(ATOM(CAR(pa))), shared);
+	  /* shared = CONS(ENTITY, atom_equivar(ATOM(CAR(pa))), shared); */
 	}, chain_atoms(c));
 	
 	pips_assert("SaveChains", !ENDP(shared));
@@ -878,7 +885,7 @@ SaveChains()
 	    storage se = entity_storage(e);
 	    ram re = storage_ram(se);
 
-	    debug(8, "SaveChains", "\talias %s\n", entity_name(e));
+	    pips_debug(8, "\talias %s\n", entity_name(e));
 
 	    ram_shared(re) = gen_copy_seq(shared);
 
@@ -894,7 +901,7 @@ SaveChains()
 
 	    if(value_defined_p(entity_initial(e))
 	       && !value_unknown_p(entity_initial(e))) {
-	      debug(8, "SaveChains",
+	      pips_debug(8,
 		    "\tCheck initalization consistency for %s\n",
 		    entity_name(e));
 	      MAP(ENTITY, ce, {
@@ -914,5 +921,5 @@ SaveChains()
 
     }, equivalences_chains(FinalEquivSet));
 
-    debug(8, "SaveChains", "End\n");
+    pips_debug(8, "End\n");
 }
