@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.28  1999/05/12 12:53:17  zory
+ * reorder module statement after transformation
+ *
  * Revision 1.27  1999/05/06 07:06:00  zory
  * test strategy modified !!
  *
@@ -968,8 +971,10 @@ bool optimize_expressions(string module_name)
 
     ifdebug(1) davinci_dump_expressions(module_name, "final", s);
 
+    module_reorder(s);
+
     /* return result to pipsdbm
-     */
+     */    
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, s);
 
     reset_current_module_entity();
