@@ -117,7 +117,7 @@ typedef int Value;
 #define VALUE_FMT "%d"
 #define VALUE_CONST(val) (val)
 #define VALUE_NAN INT_MIN
-#define VALUE_MIN (INT_MIN+1)
+#define VALUE_MIN INT_MIN
 #define VALUE_MAX INT_MAX
 #define VALUE_ZERO 0
 #define VALUE_ONE  1
@@ -217,6 +217,7 @@ extern jmp_buf overflow_error;
 #define THROW(thrown) longjmp(thrown,__LINE__) /* why not!? */
 
 /* (|v| < MAX / |w|) => v*w is okay
+ * I could check ((v*w)/w)==v but a tmp would be useful
  */
 #define value_protected_hard_idiv_multiply(v,w,throw)		\
   (value_zero_p(w) || value_zero_p(v)? VALUE_ZERO:		\
@@ -248,8 +249,12 @@ extern jmp_buf overflow_error;
 #define value_mult(v,w) value_protected_mult(v,w)
 #define value_product(v,w) value_protected_product(v,w)
 #else
-#define value_mult(v,w) value_direct_multiply(v,w)
-#define value_product(v,w) value_direct_product(v,w)
+#define value_mult(v,w) value_protected_multiply(v,w,abort())
+#define value_product(v,w) v=value_protected_multiply(v,w,abort())
+
+/* #define value_mult(v,w) value_direct_multiply(v,w)
+   #define value_product(v,w) value_direct_product(v,w)
+*/
 #endif
 
 /******************************************************* STATIC VALUE DEBUG */
