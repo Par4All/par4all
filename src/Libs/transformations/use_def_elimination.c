@@ -422,11 +422,11 @@ use_def_deal_if_useful(statement s)
 }
 
 
-void static
+static void
 remove_this_statement_if_useless(statement s)
 {
    if (! set_belong_p(the_useful_statements, (char *) s)) {
-      gen_free(statement_instruction(s));
+      free_instruction(statement_instruction(s));
       statement_instruction(s) = make_instruction_block(NIL);
       /* Since the RI need to have no label on instruction block: */
       fix_sequence_statement_attributes(s);
@@ -436,7 +436,7 @@ remove_this_statement_if_useless(statement s)
 }
 
 
-void static
+static void
 remove_all_the_non_marked_statements(statement s)
 {
    ifdebug(5)
