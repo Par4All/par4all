@@ -142,7 +142,7 @@ transitive_closure_from_two_bases(Psysteme s, Pbase b1, Pbase b2)
  *  . Cg \in Cmn since ((xi)\(yj) ij) in Cmn 
  *    with \mu = \delta i, \nu = \delta j
  *  . Cmn \in Cg by chosing \gamma_ij = \mu_i\nu_j, which >0 and \sum = 1
- * Prop: A T B and A T C => A T (B v C)
+ * Prop: A T B and A T C => A T (B v C) and A T (B n C)
  * Theo: A T B and A T C => (A n B) v (A n C) = A n (B v C)
  *   compute both generating systems with above props. they are equal.
  *
