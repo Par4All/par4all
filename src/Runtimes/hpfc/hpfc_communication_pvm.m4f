@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.8  1997/05/29 15:46:06  zory
+! *** empty log message ***
+!
 ! Revision 1.7  1997/05/29 09:03:25  zory
 ! *** empty log message ***
 !
@@ -42,7 +45,7 @@
 
 
 !
-! Return information about the received message 
+! Return information about the received message (or buffer) 
 ! (length, tag, source, info) 
 !
 ! in mpi status(messageid) is an array of integers
@@ -170,10 +173,17 @@
 
 !
 ! Packing count value in the current buffer...
-!
+! pvm syntax
+! pvmfpack( what, xp, nitem, stride, info )
+! mpi syntax
+! MPI_PACK(choice inbuf,integer incount,integer datatype, choice outbuf,
+!         integer outsize,integer position,integer comm, integer ierror) 
+! MPI_PACKED(value,count,what,HPFC BUFFER,HPFC MAX BUFFER, HPFC POSITION, 
+!             HPFC COMM GROUP, info)
+
       subroutine HPFC PACK(what, value, count, stride, info) 
       include "hpfc_commons.h"
-      integer what, value, count, tag, stride, info
+      integer what, value, count, stride, info
       debug(print *, "packing count values")
       call pvmfpack(what, value, count, stride, info)
       debug(print *, "value packed")
@@ -183,6 +193,14 @@
 !
 ! Sending the current buffer to dest...
 !
+! pvm syntax
+! pvmfsend( dest, msgtag, info ) 
+! mpi syntax
+! MPI_SEND(choice buf,integer count,integer datatype,integer dest,
+!             integer tag, integer comm,integer ierror)
+! MPI_SEND(HPFC BUFFER, HPFC POSITION, MPI_PACKED, dest, tag, 
+!            HPFC COMM GROUP, info)  
+
       subroutine HPFC SEND(dest, tag, info)
       include "hpfc_commons.h"
       integer dest, tag, info
@@ -194,7 +212,13 @@
 
 !
 ! Unpacking count value from the current buffer
-!
+! pvm syntax
+! pvmfunpack( what, xp, nitem, stride, info )
+! mpi syntax 
+! MPI_UNPACK(choice inbuf,integer insize,integer position,
+!               choice outbuf,integer outcount,integer datatype,
+!               integer comm,integer ierror)
+
       subroutine HPFC UNPACK(what, value, count, stride, info) 
       include "hpfc_commons.h"
       integer what, value, count, tag, stride, info
@@ -205,7 +229,12 @@
 
 !
 ! Receiving a message from source
-! 
+! pvm syntax
+! pvmfrecv( source, msgtag , bufid)
+! mpi syntax
+! MPI_RECV(choice buf,integer count,integer datatype,integer source,
+!             integer tag,integer comm,integer status,integer ierror)
+
       subroutine HPFC RECEIVE(source, tag, bufid)
       include "hpfc_commons.h"
       integer source, tag, bufid
