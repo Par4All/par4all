@@ -391,9 +391,16 @@ bool statement_feasible_p(statement s)
 {
   transformer pre;
   Psysteme ps;
+  predicate pred;
 
   pre = load_statement_precondition(s);
-  ps = predicate_system(transformer_relation(pre));
+  if (get_debug_level() >= 7) {
+     (void) printf("Precondition 0x%x\n", pre);
+  }
+  
+  pred = transformer_relation(pre);
+  
+  ps = predicate_system(pred);
 
   if (get_debug_level() >= 6) {
     (void) printf("C  %s\n", precondition_to_string(pre));
