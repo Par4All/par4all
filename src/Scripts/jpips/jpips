@@ -5,6 +5,9 @@
 # a shell wrapper for "JPips", the java-based pips interface.
 #
 # $Log: jpips,v $
+# Revision 1.12  1999/02/15 14:30:25  coelho
+# new default java root path.
+#
 # Revision 1.11  1998/11/20 18:44:53  coelho
 # jpips fixed.
 #
@@ -64,7 +67,7 @@ error()
 unset jpips forward menu_type
 
 props="";
-java_root=${JAVA_ROOT:-/usr/local/jdk1.2beta4}
+java_root=${JAVA_ROOT:-/usr/local/java1.2}
 jar=jpips.jar
 gif=DownArrow.gif
 
