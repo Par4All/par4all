@@ -35,10 +35,10 @@ demand to perform the analyses or transformations required by the user.
 
 Three user interfaces are available: a Shell interface <a
 href="dret144/dret144.html"><em>(Pips)</em></a>, a line interface <a
-href="line-interface.html"><em>(Tpips)</em></a> and an X-window interface
-<a href="wpips.html"><em>(wpips)</em></a> to the parallelizer which is
-the best suited for users. Also use of Emacs for code vizualization is possible
-<em>(epips)</em>. 
+href="line-interface.html"><em>(Tpips)</em></a> and an X-window
+interface <a href="wpips.html"><em>(Wpips)</em></a> which is the best
+suited for users. Emacs also can be used to display Fotran code,
+transformed or not <em>(Epips)</em>.
 
 <p>
 
@@ -49,29 +49,30 @@ The result of these analyses can be displayed in various forms. For instance:
   <li> Transformers, preconditions...
   <li> Symbolic complexity.
   <li> Effects (of instructions on data)... Array regions...
-  <li> call graph, interprocedural control flow graph...
+  <li> Call graph, interprocedural control flow graph...
 </ul>
 
 <p>
 
 Also many program <b>transformations</b> are available, such as:
 <ul>
-  <li> <b>parallelization</b> (shared memory oriented)
-  <li> scalar and <b>array</b> privatization
-  <li> loop unrolling, interchange, normalize, distribution, strip mining...
-  <li> dead code elimination, partial evaluation, atomizer...
+  <li> <b>Interprocedural</b> parallelization (shared-memory oriented)
+  <li> Scalar and <b>array</b> privatization
+  <li> Loop unrolling, interchange, normalize, distribution, strip mining...
+  <li> Dead-code elimination, partial evaluation, atomizer...
 </ul>
 
 <p>
 PIPS Compilers:
 <ul>
-  <li> polyhedral method (Feautrier)
+  <li> Parallelizer/vectorizer for Cray machines
+  <li> <a href="poly_meth.html">Polyhedral method</a> (Pr. P. Feautrier)
        <ul>
 	 <li> Array Data Flow Graph computation.
 	 <li> Scheduling, mapping, and associated code generation.
        </ul>
-  <li> PUMA/WP65: Shared memory emulation
-  <li> HPFC: a prototype HPF Compiler.
+  <li> PUMA/<a href="wp65.html"><b>WP65</b></a>: Shared memory emulation
+  <li> <a href="hpfc.html"><b>HPFC</b></a>: a HPF compiler prototype.
 </ul>
 
 <p>
@@ -85,21 +86,27 @@ file. It supports persistent data and type hierarchies.
 <p>
 
 The second tool is the <em>Linear C3</em> library which handles vectors,
-matrices, linear constraints and structures based on these such as
-polyhedrons. The algorithms used are designed for integer and/or
-rational coefficients. This library is extensively used for analyses
-such as dependence test, precondition and region computation, and for
-transformations, such as tiling. The <em>Linear C3</em> library is a
-joint project with IRISA and PRISM laboratories, partially funded by
-CNRS. IRISA contributed an implementation of Chernikova algorithm and
-PRISM a C implementation of PIP (Parametric Integer Programming).
+matrices, affine constraints, generating systems and polyhedra and
+provides basic linear programming facilities. The algorithms used are
+designed for integer and/or rational coefficients. This library is
+extensively used for analyses such as dependence test, precondition and
+region computation, and for transformations, such as tiling. The
+<em>Linear C3</em> library is a joint project with IRISA and PRISM
+laboratories, partially funded by CNRS. IRISA contributed an
+implementation of Chernikova algorithm and PRISM a C implementation of
+PIP (Parametric Integer Programming).
 
 <p>
 
 Seven years after its inception, PIPS as a workbench is still alive and
 well. PIPS provides a robust infrastructure for new experiments in
 compilation, program analysis, optimisation, transformation and
-parallelization. PIPS can also be used as a reverse engineering tool.
+parallelization. New code can be developped externally by reading
+complex data structures in PIPS interprocedural database.
+
+<p>
+
+PIPS can also be used as a reverse engineering tool.
 Region analyses provide useful summaries of procedure effects, while
 precondition-based partial evaluation and dead code elimination reduce
 code size. 
