@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: inits.c,v $
+ * Revision 1.24  1997/12/13 09:17:05  coelho
+ * leaks--
+ *
  * Revision 1.23  1997/03/20 10:21:40  coelho
  * RCS headers.
  *
@@ -47,7 +50,6 @@ create_parameters_h(
     entity module)
 {
     entity newarray = entity_undefined;
-    dimension d = dimension_undefined;
     int i;
     list l = list_of_distributed_arrays_for_module(module);
 
@@ -62,7 +64,7 @@ create_parameters_h(
 	andim  = NumberOfDimension(newarray);
 
 	pips_debug(8, "considering array %s (new is %s)\n",
-	      entity_name(array), entity_name(newarray));
+		   entity_name(array), entity_name(newarray));
 
 	/* formal parameters are passed the value by the caller
 	 * as far as overlapable dimensions are concerned.
@@ -74,22 +76,21 @@ create_parameters_h(
 	    {
 		if (!is_argument || !ith_dim_overlapable_p(array, i))
 		{
-		    d = FindIthDimension(newarray, i);
+		    string ld = bound_parameter_name(newarray, LOWER, i);
+		    string ud = bound_parameter_name(newarray, UPPER, i);
+		    dimension d = FindIthDimension(newarray, i);
 		    
-		    /* ??? memory leak from bound_parameter_name
-		     */
 		    fprintf(file,
 			    "      integer \n"
 			    "     $    %s,\n"
 			    "     $    %s\n" 
 			    "      parameter(%s = %d)\n"
 			    "      parameter(%s = %d)\n",
-			    bound_parameter_name(newarray, LOWER, i),
-			    bound_parameter_name(newarray, UPPER, i), 
-			    bound_parameter_name(newarray, LOWER, i),
-			HpfcExpressionToInt(dimension_lower(d)),
-			    bound_parameter_name(newarray, UPPER, i),
-			    HpfcExpressionToInt(dimension_upper(d)));
+			    ld, ud, 
+			    ld, HpfcExpressionToInt(dimension_lower(d)),
+			    ud, HpfcExpressionToInt(dimension_upper(d)));
+
+		    free(ld); free(ud);
 		}
 	    }
 	/* otherwise it is a secondary copy */
