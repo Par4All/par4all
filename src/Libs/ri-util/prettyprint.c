@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/01/31 19:35:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/04 18:27:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/01/31 19:35:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/02/04 18:27:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -48,8 +48,7 @@ char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/01/31 19:35:34 $, ) ve
 
 #include "misc.h"
 #include "properties.h"
-
-#include "control.h"
+#include "prettyprint.h"
 
 /* Define the markers used in the raw unstructured output when the
    PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH property is true: */
@@ -218,34 +217,39 @@ entity e, module;
 			 make_unformatted(NULL, 0, 0, pc)));
 }
 
-sentence sentence_goto(module, margin, obj)
+sentence 
+sentence_goto(module, label, margin, obj, n)
 entity module;
+string label;
 int margin;
 statement obj;
+int n;
 {
-    string label = entity_local_name(statement_label(obj)) + 
+    string tlabel = entity_local_name(statement_label(obj)) + 
 	           strlen(LABEL_PREFIX);
 
-    return( sentence_goto_label(module, margin, label)) ;
+    return( sentence_goto_label(module, label, margin, tlabel, n)) ;
 }
 
-sentence sentence_goto_label(module, margin, label)
+sentence sentence_goto_label(module, label, margin, tlabel, n)
 entity module;
-int margin;
 string label;
+int margin;
+string tlabel;
+int n;
 {
     cons *pc = NIL;
 
-    if (strcmp(label, RETURN_LABEL_NAME) == 0) {
+    if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
       pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
     }
     else {
 	pc = CHAIN_SWORD(pc, "GOTO ");
-	pc = CHAIN_SWORD(pc, label);
+	pc = CHAIN_SWORD(pc, tlabel);
     }
 
     return(make_sentence(is_sentence_unformatted, 
-			 make_unformatted(NULL, 0, margin, pc)));
+			 make_unformatted(label?strdup(label):NULL, n, margin, pc)));
 }
 
 sentence sentence_basic_declaration(e)
@@ -675,15 +679,15 @@ int n ;
 	r = text_block(module, label, margin, instruction_block(obj), n) ;
     }
     else if (instruction_test_p(obj)) {
-	r = text_test(module, label, margin, instruction_test(obj),n);
+	r = text_test(module, label, margin, instruction_test(obj), n);
     }
     else if (instruction_loop_p(obj)) {
-	r = text_loop(module, label, margin, instruction_loop(obj),n);
+	r = text_loop(module, label, margin, instruction_loop(obj), n);
     }
     else if (instruction_goto_p(obj)) {
 	r = make_text(CONS(SENTENCE, 
-			   sentence_goto(module, margin,
-					 instruction_goto(obj)), 
+			   sentence_goto(module, label, margin,
+					 instruction_goto(obj), n), 
 			   NIL));
     }
     else if (instruction_call_p(obj)) {
@@ -1027,6 +1031,7 @@ statement obj;
 						   strdup(buffer))) ;
 	    }
 	    else {
+		if(user_view_p())
 	      ADD_SENTENCE_TO_TEXT(r, 
 				   make_sentence(is_sentence_formatted, 
 						   strdup("C (unreachable)\n")));
@@ -1105,7 +1110,60 @@ statement stmt;
     return(r);
 }
 
-text text_test(module, label, margin, obj,n)
+text 
+text_test(module, label, margin, obj, n)
+entity module;
+string label ;
+int margin;
+test obj;
+int n;
+{
+    text r = text_undefined;
+    statement tb = test_true(obj);
+    statement fb = test_false(obj);
+
+    if(nop_statement_p(fb) && statement_call_p(tb) &&
+       entity_empty_label_p(statement_label(tb)) &&
+       empty_comments_p(statement_comments(tb)) &&
+       !statement_continue_p(tb)) {
+	r = text_logical_if(module, label, margin, obj, n);
+    }
+    else {
+	r = text_block_if(module, label, margin, obj, n);
+    }
+
+    return r;
+}
+
+text 
+text_logical_if(module, label, margin, obj,n)
+entity module;
+string label ;
+int margin;
+test obj;
+int n;
+{
+    text r = make_text(NIL);
+    cons *pc = NIL;
+    statement tb = test_true(obj);
+    instruction ti = statement_instruction(tb);
+    call c = instruction_call(ti);
+
+    pc = CHAIN_SWORD(pc, "IF (");
+    pc = gen_nconc(pc, words_expression(test_condition(obj)));
+    pc = CHAIN_SWORD(pc, ") ");
+    pc = gen_nconc(pc, words_call(c, 0));
+
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, 
+				       make_unformatted(strdup(label), n, 
+							margin, pc)));
+
+    return(r);
+}
+
+text 
+text_block_if(module, label, margin, obj,n)
 entity module;
 string label ;
 int margin;
