@@ -1,11 +1,69 @@
 /* semantical analysis
   *
-  * Accurate propagation of pre- and postconditions in unstructured
+  * Accurate propagation of transformers and postconditions in
+  * unstructured (i.e. CFG).
+  *
+  * It is assumed that CFG are small graphs because proper restructuring
+  * has been applied before this analysis is performed. Large graphs with
+  * up to hundreds of nodes as found in some industrial codes cannot be
+  * effectively handled by this implementation. Arbitrary thresholds are
+  * used to avoid expensive analysis and simple fix-point operators are
+  * used instead.
+  *
+  * The control flow graph is decomposed into strongly connected
+  * components. Each component is processed in order and preconditions or
+  * transformers are propagated from the entry point.
+  *
+  * If a component has only one node, it is easy to process.
+  *
+  * If a component is a SCC, it is processed for each of its entry
+  * points. Transformers and preconditions are unioned over all entries.
+  *
+  * If a SCC is a cycle, the cycle is broken at the local entry point and
+  * a fix-point is computed for each path. All fix-points are unioned.
+  *
+  * If a SCC is more complex, it is again decomposed but in a very crude
+  * way because a recursive call to process sub-SCC is not
+  * performed. Instead, regardless of local entry points, transformer
+  * fix-points are computed for each sub-SCC. No local preconditions are
+  * available to sharpen the transformer analysis. If a sub-SCC is a
+  * cycle, its transformer path fix-point is computed. If not, an
+  * approximation is made, equivalent to adding control arcs between
+  * nodes which guarantee the correctness.
+  *
+  * Transformers between the entry point and after the current node are
+  * very similar to postcondition between the module entry point and the
+  * current node. Transformers are obtained like precondition but without
+  * a precondition at the CFG entry point.
+  *
+  * This implementation is not great. It was quickly developped to fix the
+  * problems encountered by Nga Nguyen in array bound checking for a PLDI
+  * submission. I missed the crucial distinction between a scc, a path and
+  * a cycle (or circuit) at first and function names are thus quite
+  * misleading. But the results needed were obtain on time.
+  *
+  * It might be useful to add a pseudo-node as predecessor of the CFG
+  * entry node. This pseudo-node would simplify the algorithms and the
+  * function profiles. Its post-condition would be the precondition of the
+  * CFG or no information. Without it, each node must be checked to see if
+  * it is the entry node because, then, it has an extra-predecessor.
+  *
+  * I should write a report to explain the solver used and the interplay
+  * between transformers and preconditions. It would be useful to prove it
+  * as well. The use of transformers make it quite fast because it is
+  * linear with the nesting depth. It makes it also less accurate. The
+  * check over all paths is expensive and restricts its use to small
+  * CFG. This is not an algorithmic issue but an implementation
+  * issue: Transformers and preconditions associated to partial paths are
+  * not stored but recomputed for each possible path.
   *
   * Francois Irigoin, October 2000
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.4  2000/12/04 16:36:13  irigoin
+  * Comments added to explain the algorithm used
+  *
   * Revision 1.3  2000/11/23 17:16:11  irigoin
   * Too many modifications. Lots of bug fixes for PLDI'2001. New debugging
   * statements, new functions, new consistency checks.
