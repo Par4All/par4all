@@ -150,15 +150,15 @@ load_list(statement_effects m, statement s)
 }
 
 /****************written by Dat**********************/
-void my_effects_filter(list l_effs, string str_filter)
+void my_effects_filter(list *l_effs, string str_filter)
 {
   MAPL(ce, {
     effect eff = EFFECT(CAR(ce));
-    string t = effect_words_reference(effect_reference(eff));
+    string t = effect_words_reference(effect_reference(*eff));
     if (!same_string_p(t, str_filter))
-      gen_remove(l_effs, eff);
+      gen_remove(*l_effs, eff);
     free(t);
-  }, l_effs); 
+  }, *l_effs); 
   return;
 }
 /****************************************************/
@@ -208,7 +208,7 @@ resource_text(
     /*******************written by Dat****************/
     my_effects_filter(l_eff, "KMAX");
     /*************************************************/
-    l_eff_text = (*(pps->get_text))(l_eff);
+    l_eff_text = (*(pps->get_text))(&l_eff);
 
     /* (*attach_effects_decoration_to_text_func)(the_effect_text); */
 
