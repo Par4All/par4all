@@ -14,7 +14,6 @@
 #include <sys/param.h>
 
 #include <dirent.h>
-#include <setjmp.h>
 
 #include "rxposix.h"
 
