@@ -392,23 +392,24 @@ Ptsg  sc_to_sg_chernikova(Psysteme sc)
     {
       if (A) Polyhedron_Free(A);
       if (a) Matrix_Free(a);
+      if (sg) sg_rm(sg);
 
       RETHROW();
     }
     TRY 
     {
-    nbrows = sc->nb_eq + sc->nb_ineq + 1;
-    nbcolumns = sc->dimension +2;
-    sg->base = base_dup(sc->base);
-    a = Matrix_Alloc(nbrows, nbcolumns);
-    sc_to_matrix(sc,a);
-    
-    A = Constraints2Polyhedron(a, MAX_NB_RAYS);
-    Matrix_Free(a), a = NULL;
-
-    sg = sg_new();
-    polyhedron_to_sg(A,sg);
-    Polyhedron_Free(A), A = NULL;
+      sg = sg_new();
+      nbrows = sc->nb_eq + sc->nb_ineq + 1;
+      nbcolumns = sc->dimension +2;
+      sg->base = base_dup(sc->base);
+      a = Matrix_Alloc(nbrows, nbcolumns);
+      sc_to_matrix(sc,a);
+      
+      A = Constraints2Polyhedron(a, MAX_NB_RAYS);
+      Matrix_Free(a), a = NULL;
+      
+      polyhedron_to_sg(A,sg);
+      Polyhedron_Free(A), A = NULL;
     } /* end TRY */
 
     UNCATCH(any_exception_error);
