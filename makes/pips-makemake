@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 22:46:52 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/16 10:14:13 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -243,7 +243,7 @@ MAIN=		main
 CONFIG_FILE=	${CONFIG_FILE}
 MAKEFILE=	${MAKEFILE}
 SHELL	=	/bin/sh
-COPY	=	cp -fa
+COPY	=	cp
 MOVE	=	mv -f
 #
 # default targets...
