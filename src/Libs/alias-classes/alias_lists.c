@@ -179,9 +179,10 @@ make_alias_lists_for_sub_regions(string module_name)
 
 /* tests if reg1 and reg2 are the same,
  * ignoring their action_tags (read/write)
+ * but checking their precision (may/exact)
  */
-static bool
-same_reg(region reg1, region reg2)
+bool
+same_reg_ignore_action(region reg1, region reg2)
     {
     Psysteme reg1_sys, reg2_sys;
     bool result = FALSE;
@@ -198,10 +199,12 @@ same_reg(region reg1, region reg2)
 		}
 		*/
 
-    if (effect_undefined_p(reg1) || effect_undefined_p(reg2))
-	return result;
+    if (effect_undefined_p(reg1) || effect_undefined_p(reg2)) return result;
 
-	if (effect_entity(reg1) == effect_entity(reg2))
+    if (effect_entity(reg1) == effect_entity(reg2))
+    {
+	if (effect_approximation_tag(reg1) == 
+		effect_approximation_tag(reg2))
 	    {
 		reg1_sys = region_system(reg1);
 		reg2_sys = region_system(reg2);
@@ -212,14 +215,15 @@ same_reg(region reg1, region reg2)
 		    pips_debug(4,"same region\n");
 		}
 	    }
-	pips_debug(4,"end\n");
+	}
+    pips_debug(4,"end\n");
 
-	return result;
+    return result;
     }
 
 
 /* tests if reg and any member of reg_list
- * are same_reg
+ * are same_reg_ignore_action
  */
 static bool
 member(region reg, list reg_list)
@@ -246,7 +250,7 @@ member(region reg, list reg_list)
 
 			do{
 			    elem = EFFECT(CAR(rest_list));
-			    if (same_reg(elem,reg))
+			    if (same_reg_ignore_action(elem,reg))
 				{
 				    result = TRUE;
 
@@ -261,29 +265,36 @@ member(region reg, list reg_list)
 	return result;
     }
 
+/* adds reg as final element on the end of reg_list
+ * unless reg is already present in reg_list */
+list
+append_reg_if_not_present(list reg_list, region reg)
+{
+    list new_reg_list;
 
-/* (possibly) modifies parameter reg_list */
-static void
-add_if_not_present(region reg, list reg_list)
-    {
     pips_debug(4,"begin\n");
 
-/*
-	    ifdebug(9)
-		{
-		    pips_debug(9,"add:\n\t");
-		    print_region(reg);
-		    pips_debug(9,"to:\n\t");
-		    print_inout_regions(reg_list);
-		}
-		*/
 
-	if (!member(reg,reg_list))
-	    reg_list = gen_nconc(reg_list,
+/*
+  ifdebug(9)
+  {
+  pips_debug(9,"add:\n\t");
+  print_region(reg);
+  pips_debug(9,"to:\n\t");
+  print_inout_regions(reg_list);
+  }
+*/
+
+    if (!member(reg,reg_list))
+	new_reg_list = gen_nconc(reg_list,
 				 CONS(EFFECT,region_dup(reg),NIL));
+    else
+	new_reg_list = reg_list;
 
     pips_debug(4,"end\n");
-    }
+
+    return new_reg_list;
+}
 
 
 /* GLOBAL IN: l_alias_lists
@@ -319,7 +330,7 @@ add_pair_to_existing_list(list alias_pair)
 		    print_region(formal_reg_list);
 		}
 
-	    if ( same_reg(formal_reg_pair,formal_reg_list) )
+	    if ( same_reg_ignore_action(formal_reg_pair,formal_reg_list) )
 	    {
 		    result = TRUE;
 		    actual_reg_pair = EFFECT(CAR(CDR(alias_pair)));
@@ -330,7 +341,8 @@ add_pair_to_existing_list(list alias_pair)
 			    pips_debug(9,"to:\n\t");
 			    print_inout_regions(alias_list);
 			}
-		    add_if_not_present(actual_reg_pair,alias_list);
+		    alias_list =
+			append_reg_if_not_present(alias_list,actual_reg_pair);
 		}
 	    rest_alias_lists = CDR(rest_alias_lists);
 	} while (rest_alias_lists != NIL && result == FALSE);
