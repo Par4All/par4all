@@ -75,6 +75,9 @@ bool db_open_pips_database(FILE * fd)
     /* coredump in copy if done on save in next function ???. */
     db_clean_db_resources();
 
+    ifdebug(1) 
+      dump_all_db_resource_status(stderr, "db_open_pips_database");
+
     DB_OK;
     return TRUE;
 }
@@ -139,8 +142,10 @@ static void dump_db_resource(string rname, string oname, db_resource r)
   }
 }
 
-void dump_all_db_resource_status(FILE * file)
+void dump_all_db_resource_status(FILE * file, string where)
 {
+  pips_debug(1, "doint at %s\n", where);
+
   DB_RESOURCES_MAP(os, or,
   {
     DB_OWNED_RESOURCES_MAP(rs, r,
@@ -233,9 +238,6 @@ static void db_clean_db_resources()
 {
   list lr = NIL, lo = NIL, lo_init = NIL, lr_init = NIL;
 
-  ifdebug(1) 
-    dump_all_db_resource_status(stderr);
-
   DB_RESOURCES_MAP(os, or,
   {
     DB_OWNED_RESOURCES_MAP(rs, r,
@@ -272,6 +274,8 @@ static void db_clean_db_resources()
   
   gen_free_list(lr_init);
   gen_free_list(lo_init);
+
+  ifdebug(9) dump_all_db_resource_status(stderr, "db_clean_db_resources");
 }
 
 void db_delete_resource(string rname, string oname)
