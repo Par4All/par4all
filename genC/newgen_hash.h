@@ -14,13 +14,13 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 2000/04/20 18:50:07 $, )
+/* $RCSfile: newgen_hash.h,v $ ($Date: 2000/07/21 08:57:32 $, )
  * version $Revision$
  * got on %D%, %T%
  */
 
-#ifndef HASH_INCLUDED
-#define HASH_INCLUDED
+#ifndef newgen_hash_included
+#define newgen_hash_included
 
 #define HASH_DEFAULT_SIZE 7
 
@@ -63,7 +63,6 @@ typedef struct __hash_table *hash_table;
     void *k, *v; \
     while ((_map_hash_p = hash_table_scan(_map_hash_h,_map_hash_p,&k,&v))) { \
             code ; }}
-#endif
 
 /* Let's define a new version of
  * hash_put_or_update() using the warn_on_redefinition 
@@ -105,6 +104,15 @@ extern hash_entry_pointer hash_table_scan GEN_PROTO((hash_table,
 						     hash_entry_pointer,
 						     void **,
 						     void **));
+
+/* map stuff */
+extern void * hash_map_get GEN_PROTO((hash_table, void *));
+extern void hash_map_put GEN_PROTO((hash_table, void *, void *));
+extern void hash_map_update GEN_PROTO((hash_table, void *, void *));
+extern void * hash_map_del GEN_PROTO((hash_table, void *));
+extern bool hash_map_defined_p GEN_PROTO((hash_table, void *));
+
+#endif /* newgen_hash_included */
 
 /*  that is all
  */
