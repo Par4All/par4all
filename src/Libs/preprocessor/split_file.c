@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/01/02 14:59:10 $, 
+ * $Date: 1997/01/04 18:53:35 $, 
  *
  * adapted from whta can be seen by FC 31/12/96
  * 
@@ -9,6 +9,7 @@
  * - include unistd added
  * - exit -> return
  * - close ifp
+ * - bug labeled end (skipped) in lend()
  */
 
 /*
@@ -171,8 +172,12 @@ static int lend()
 {
 	register char *p;
 
-	if ((p = skiplab(buf)) == 0)
-		return (0);
+	/* if ((p = skiplab(buf)) == 0)
+	    return (0) ; */ 
+
+	if (buf[0]!=' ') return 0;
+	p = (buf[1]=='\t')? &buf[2]: &buf[6];
+	    
 	trim(p);
 	if (*p != 'e' && *p != 'E') return(0);
 	p++;
