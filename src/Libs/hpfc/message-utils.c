@@ -2,6 +2,9 @@
  * 
  * $Id$
  * $Log: message-utils.c,v $
+ * Revision 1.21  1998/04/02 20:53:43  irigoin
+ * Call to SizeOfDimension() replaced
+ *
  * Revision 1.20  1998/03/17 15:42:00  coelho
  * warnings--.
  *
@@ -528,7 +531,7 @@ list lrt;
 	case is_style_cyclic:
 	{
 	    dimension dp = FindIthDimension(proc, i);
-	    int	sz = SizeOfDimension(dp);
+	    int	sz = dimension_size(dp);
 	    expression
 	      pl = int_to_expression(processor_number(template, tdim, tl, &p)),
 	      pu = int_to_expression(processor_number(template, tdim, tu, &p));
