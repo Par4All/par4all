@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/29 17:49:30 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/29 19:05:55 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -191,7 +191,7 @@ $SED '#
       #
       # switch to special hpfc functions...
       #
-      s,\([12345abdeintpryu]\),call hpfc\1,g
+      s,\([123456abdeintpryu]\),call hpfc\1,g
       s,\([ck#s]\),hpfc\1,g' | 
 #
 # handles multi lines breaking (independent with new...)
@@ -202,8 +202,8 @@ $TR '' '\012' |
 # separates static directives from others.
 #
 $SED "s,hpfc#,$NOP,g;
-      /^      call hpfc[adptuy45]/w $TMP.1
-      /^      call hpfc[adptuy45]/d" > $TMP.0
+      /^      call hpfc[adptuy456]/w $TMP.1
+      /^      call hpfc[adptuy456]/d" > $TMP.0
 
 #
 # line before which the static directives will be inserted
