@@ -1015,9 +1015,6 @@ Variable var;
 }
 
 
-
-
-
 /* Ppoly sc_poly_enveloppe(s1, s2): calcul d'une representation par polyedre 
  * de l'enveloppe convexe des polyedres definis par les systemes
  * lineaires s1 et s2
@@ -1030,6 +1027,7 @@ Variable var;
  *
  * Il faudrait traiter proprement les cas particuliers SC_RN et SC_EMPTY
  */
+/*
 Ppoly sc_poly_enveloppe(s1, s2)
 Psysteme s1;
 Psysteme s2;
@@ -1043,15 +1041,6 @@ Psysteme s2;
 
     assert(!SC_UNDEFINED_P(s1) || !SC_UNDEFINED_P(s2));
 
-    /*if(SC_RN_P(s1)) {
-	s = s1;
-	sc_rm(s2);
-    }
-    else if(SC_RN_P(s2)) {
-	s = s2;
-	sc_rm(s1);
-    }*/
-
     if(SC_EMPTY_P(s1)) {
 	s = s2;
     }
@@ -1063,12 +1052,10 @@ Psysteme s2;
 	p  = sc_to_poly(s);
 	return (p);
     }
-    else { /* cas general */
-        /* duplication de s1 et de s2 */
+    else { 
 	s1 = sc_dup(s1);
 	s2 = sc_dup(s2);
 
-	/* calcul d'une base unique pour s1 et s2 */
 	b = s1->base;
 	for(coord=s2->base; !VECTEUR_NUL_P(coord); coord = coord->succ) {
 	    b = vect_add_variable(b, vecteur_var(coord));
@@ -1076,12 +1063,11 @@ Psysteme s2;
 	vect_rm(s2->base);
 	s2->base = vect_dup(b);
 	
-	/* conversion en polyedres */
 	p1 = sc_to_poly(s1);
 	p2 = sc_to_poly(s2);
 	
-	/* calcul de l'enveloppe convexe */
 	p = env(p1, p2);	
 	return (p);
     }
 }
+*/
