@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.17  1998/11/24 14:12:59  coelho
+ * nary to binary makes use of the strategy.
+ *
  * Revision 1.16  1998/11/24 14:09:07  coelho
  * strategies...
  *
@@ -603,9 +606,9 @@ switch_nary_to_binary(statement s)
    * the most unbalanced possible expression tree wrt WG.
    */
   build_binary_operators_with_huffman
-    (s, nplus, plus, expression_gravity, TRUE);
+    (s, nplus, plus, strategy->huffman_cost, strategy->huffman_mode);
   build_binary_operators_with_huffman
-    (s, nmult, mult, expression_gravity, TRUE);
+    (s, nmult, mult, strategy->huffman_cost, strategy->huffman_mode);
 }
 
 /***************************************************** PREDEFINED STRATEGIES */
