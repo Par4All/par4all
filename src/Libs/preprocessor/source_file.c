@@ -7,6 +7,10 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.110  2003/12/16 14:06:46  irigoin
+ * Exportation of several functions, previously declared static:
+ * dot_F_file_p(), dot_f_file_p(), dot_c_file_p()
+ *
  * Revision 1.109  2003/12/16 13:35:39  irigoin
  * new function preprocessed_to_user_file() added to regenerate user filename
  * in case of preprocessing
@@ -128,10 +132,6 @@
 
 extern char * strdup(const char *);
 extern int putenv(char *); /* Supposedly in stdlib.h */
-
-static bool dot_c_file_p(string);
-static bool dot_f_file_p(string);
-static bool dot_F_file_p(string);
 
 #define skip_line_p(s) \
   ((*(s))=='\0' || (*(s))=='!' || (*(s))=='*' || (*(s))=='c' || (*(s))=='C')
@@ -674,17 +674,17 @@ static bool suffix_file_p(string name, char suffix)
     return l>=2 && name[l-1]==suffix && name[l-2]=='.';
 }
 
-static bool dot_F_file_p(string name)
+bool dot_F_file_p(string name)
 {
   return suffix_file_p(name, 'F');
 }
 
-static bool dot_f_file_p(string name)
+bool dot_f_file_p(string name)
 {
   return suffix_file_p(name, 'f');
 }
 
-static bool dot_c_file_p(string name)
+bool dot_c_file_p(string name)
 {
   return suffix_file_p(name, 'c');
 }
