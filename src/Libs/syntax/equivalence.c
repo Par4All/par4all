@@ -2,11 +2,15 @@
  * and in the static area and in the dynamic area. The heap area is left
  * aside.
  *
- * 	%A% ($Date: 2001/03/20 14:36:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+ * 	%A% ($Date: 2001/04/05 08:27:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: equivalence.c,v $
+ * Revision 1.22  2001/04/05 08:27:15  irigoin
+ * Test added for non-standard adjustable arrays in MakeEquivAtom() for Nga
+ * NMguyen (equiv23.f)
+ *
  * Revision 1.21  2001/03/20 14:36:38  irigoin
  * Test for user error added in MakeEquivAtom() for Nga
  *
@@ -24,7 +28,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 2001/03/20 14:36:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 2001/04/05 08:27:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -120,6 +124,14 @@ syntax s;
       pips_user_warning("Formal parameter %s appears in EQUIVALENCE declaration\n",
 			entity_local_name(e));
 	    ParserError("MakeEquivAtom", "Formal parameter in equivalence chain\n");
+    }
+
+    /* In case an adjustable array which is not a formal parameter has
+       been encountered, reject it. */
+    if(!array_with_numerical_bounds_p(e)) {
+      pips_user_warning("Adjustable array %s appears in EQUIVALENCE declaration\n",
+			entity_local_name(e));
+      ParserError("MakeEquivAtom", "Adjustable array in equivalence chain\n");
     }
 
     /* what is the offset of this reference ? */
