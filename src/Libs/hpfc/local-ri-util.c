@@ -1,5 +1,5 @@
 /* SCCS Stuff:
- * $RCSfile: local-ri-util.c,v $ ($Date: 1995/03/22 10:56:58 $, )
+ * $RCSfile: local-ri-util.c,v $ ($Date: 1995/03/27 16:26:25 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -23,10 +23,8 @@ extern int fprintf();
 #include "text-util.h"
 #include "hpfc.h"
 #include "defines-local.h"
+#include "properties.h"
 
-/*
- * type_variable_dup
- */
 type type_variable_dup(t)
 type t;
 {
@@ -72,6 +70,25 @@ expression e;
     return(result);
 }
 
-/*
- * that is all
+/*  library functions...
+ */
+static string fortran_library[] =
+{ 
+  "TIME",
+  (string) NULL
+} ;
+
+bool fortran_library_entity_p(e)
+entity e;
+{
+    string *s, name=entity_local_name(e);
+
+    if (!top_level_entity_p(e)) return(FALSE);
+    for (s=fortran_library; *s!=(string) NULL; s++)
+	if (same_string_p(*s, name)) return(TRUE);
+
+    return(FALSE);
+}
+
+/* that is all
  */
