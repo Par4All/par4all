@@ -1,5 +1,8 @@
 /* $Id$
    $Log: clex.l,v $
+   Revision 1.3  2003/08/06 14:12:44  nguyen
+   Correct pragma comment
+
    Revision 1.2  2003/08/04 14:20:59  nguyen
    Preliminary version of the C parser
 
@@ -74,6 +77,10 @@
 
 #include "c_syntax.h"
 #include "cyacc.h"
+
+/* To avoid warnings */
+extern char *strdup(const char *s1);
+extern int fileno(FILE *stream);
 %}
 
 decdigit [0-9]
@@ -109,15 +116,16 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 "//".*\n                { 
                                 pips_debug(5,"Comment %s\n",yytext);
                         }
+^"#"[^\n]*              { 
+                                pips_debug(5,"Pragma comment %s\n",yytext);
+                        }
 {blank}			{ 
                                 /* Eat up whitespaces */
                         }
 \n                      { 
                                 pips_debug(5,"New line\n");
                         }
-"#"			{ 
-                                pips_debug(5,"Hash %s\n",yytext);
-                        }
+
 "_Pragma" 	        { 
                                 pips_debug(5,"Pragma not implemented %s\n",yytext);
 				return(TK_PRAGMA);
