@@ -35,10 +35,10 @@ Frame main_frame,
     schoose_frame, 
     mchoose_frame, 
     log_frame, 
-    edit_frame[2], 
+    edit_frame[MAX_NUMBER_OF_WPIPS_WINDOWS], 
     help_frame, 
     query_frame,
-	properties_frame;
+    properties_frame;
 
 Panel main_panel,
     status_panel,
@@ -185,55 +185,56 @@ int main(argc,argv)
 int argc;
 char *argv[];
 {
-    pips_warning_handler = wpips_user_warning;
-    pips_error_handler = wpips_user_error;
-    pips_log_handler = wpips_user_log;
-    pips_update_props_handler = update_props;
+  pips_warning_handler = wpips_user_warning;
+  pips_error_handler = wpips_user_error;
+  pips_log_handler = wpips_user_log;
+  pips_update_props_handler = update_props;
 
-		/* Added for debug. RK, 8/06/93. */
-	malloc_debug(1);
+  /* Added for debug. RK, 8/06/93. */
+  malloc_debug(1);
 
-    initialize_newgen();
+  initialize_newgen();
 
-    debug_on("WPIPS_DEBUG_LEVEL");
+  debug_on("WPIPS_DEBUG_LEVEL");
 
-    /* we parse command line arguments */
-    /* XV_ERROR_PROC unset as we shifted to xview.3, Apr. 92 */
-    xv_init(XV_INIT_ARGC_PTR_ARGV, &argc, argv, 
-	    /* XV_ERROR_PROC, xview_error_recovery, */
-	    0);
+  /* we parse command line arguments */
+  /* XV_ERROR_PROC unset as we shifted to xview.3, Apr. 92 */
+  xv_init(XV_INIT_ARGC_PTR_ARGV, &argc, argv, 
+	  /* XV_ERROR_PROC, xview_error_recovery, */
+	  0);
 
-    /* we parse remaining command line arguments */
-    parse_arguments(argc, argv);
+  /* we parse remaining command line arguments */
+  parse_arguments(argc, argv);
 
-    /* we create all frames */
-    create_frames();
+  /* we create all frames */
+  create_frames();
 
-    create_main_window();
+  create_main_window();
 
-    create_help_window();
+  create_help_window();
 
-    create_schoose_window();
+  create_schoose_window();
 
-    create_mchoose_window();
+  create_mchoose_window();
 
-    create_query_window();
+  create_query_window();
 
-    create_edit_window();
+  create_edit_window();
 
-    create_log_window();
+  create_log_window();
 
-    create_menus();
+  create_menus();
 
-    create_status_subwindow();
+  create_status_subwindow();
 
-    create_icon();
+  create_icons();
+  /*    create_icon();*/
 
-		/* Call added. RK, 9/06/1993. */
-	place_frames();
+  /* Call added. RK, 9/06/1993. */
+  place_frames();
 
-    xv_main_loop(main_frame);
+  xv_main_loop(main_frame);
 
-    close_log_file();
-    exit(0);
+  close_log_file();
+  exit(0);
 }
