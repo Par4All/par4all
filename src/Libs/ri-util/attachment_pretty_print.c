@@ -166,8 +166,8 @@ attach_to_character_region(char * begin_char,
 
     debug_on("ATTACHMENT_DEBUG_LEVEL");
     debug(6, "attach_to_character_region",
-	  "Attach attachment %#x (attachee %#x) from \"%c\" (%#x) to \"%c\" (%#x)\n",
-	  (unsigned int) a, (unsigned int) at,
+	  "Attach attachment %#x (attachee %#x, tag %d) from \"%c\" (%#x) to \"%c\" (%#x)\n",
+	  (unsigned int) a, (unsigned int) at, attachee_tag(at),
 	  *begin_char, (unsigned int) begin_char,
 	  *end_char, (unsigned int) end_char);
 
@@ -348,7 +348,9 @@ attach_declaration_size_type_to_words(list l,
 void
 attach_decoration_to_text(text t)
 {
-    if (is_emacs_pretty_print_asked)
+    if (is_emacs_pretty_print_asked && text_sentences(t) != NIL)
+	/* Some prettyprinters such as effects generate NULL
+           text... Just ignore. */
 	attach_to_text(t, make_attachee(is_attachee_decoration, UU));
 }
 
