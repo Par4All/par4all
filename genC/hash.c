@@ -155,12 +155,12 @@ int size;
     /* get the next prime number in the table */
     GET_NEXT_HASH_TABLE_SIZE(size, prime_list);
 
-    htp = (hash_table) malloc(sizeof(struct __hash_table));
+    htp = (hash_table) alloc(sizeof(struct __hash_table));
     htp->hash_type = key_type;
     htp->hash_size = size;
     htp->hash_entry_number = 0;
     htp->hash_size_limit = HASH_SIZE_LIMIT(size);
-    htp->hash_array = (hash_entry_pointer) malloc(size*sizeof(hash_entry));
+    htp->hash_array = (hash_entry_pointer) alloc(size*sizeof(hash_entry));
 
     for (i = 0; i < size; i++) 
 	htp->hash_array[i].key = HASH_ENTRY_FREE;
@@ -437,7 +437,7 @@ hash_enlarge_table(hash_table htp)
     /* Get the next prime number in the table */
     GET_NEXT_HASH_TABLE_SIZE(htp->hash_size,prime_list);
     htp->hash_array = (hash_entry_pointer) 
-	malloc(htp->hash_size* sizeof(hash_entry));
+	alloc(htp->hash_size* sizeof(hash_entry));
     htp->hash_size_limit = HASH_SIZE_LIMIT(htp->hash_size);
 
     for (i = 0; i < htp->hash_size ; i++)
@@ -665,8 +665,8 @@ bool hash_map_defined_p(hash_table h, void * k)
 void hash_map_put(hash_table h, void * k, void * v)
 {
   gen_chunk
-    * key = (gen_chunk*) malloc(sizeof(gen_chunk)),
-    * val = (gen_chunk*) malloc(sizeof(gen_chunk));
+    * key = (gen_chunk*) alloc(sizeof(gen_chunk)),
+    * val = (gen_chunk*) alloc(sizeof(gen_chunk));
   key->e = k;
   val->e = v;
   hash_put(h, key, val);
