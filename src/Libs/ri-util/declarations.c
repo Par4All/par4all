@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.13  1999/01/26 10:38:43  ancourt
+ * added parenthesis for function without any parameters
+ *
  * Revision 1.12  1998/10/27 17:18:39  coelho
  * prettyprint of symbolic sized character arrays added.
  *
@@ -279,11 +282,15 @@ sentence_head(entity e)
     }
     pc = CHAIN_SWORD(pc, module_local_name(e));
 
-    if ( !ENDP(args) ) {
+    if (!ENDP(args)) {
 	pc = CHAIN_SWORD(pc, "(");
 	pc = gen_nconc(pc, args);
 	pc = CHAIN_SWORD(pc, ")");
     }
+    else if (type_variable_p(tr)) {
+	pc = CHAIN_SWORD(pc, "()");
+    }
+
     return(make_sentence(is_sentence_unformatted, 
 			 make_unformatted(NULL, 0, 0, pc)));
 }
