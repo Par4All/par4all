@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/12/26 16:07:55 $, )
+ * ($Date: 1996/12/27 14:39:10 $, )
  */
 
 #include "defines-local.h"
@@ -360,7 +360,7 @@ hpfc_head_hook(
     return strdup(concatenate
         ("      implicit none\n"
 	 "      include \"fpvm3.h\"\n"
-	 "      include \"real_parameters.h\"\n"
+	 "      include \"" GLOBAL_PARAMETERS_H "\"\n"
 	 "      include \"hpfc_commons.h\"\n"
 	 "      include \"hpfc_includes.h\"\n"
 	 "      include \"", old_name(m, m), "_parameters.h\"\n", NULL));
@@ -560,8 +560,8 @@ string program_name;
 
     dir_name = db_get_current_workspace_directory();
 
-    comm = strdup("real_parameters.h");
-    init = strdup("hpf_init.h");
+    comm = strdup(GLOBAL_PARAMETERS_H);
+    init = strdup(GLOBAL_INIT_H);
 
     comm_file = hpfc_fopen(full_name(dir_name, comm));
     create_common_parameters_h(comm_file);
