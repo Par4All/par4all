@@ -133,7 +133,7 @@ static void pips_user_log(char *fmt, va_list args)
 
     if(log_file!=NULL) {
 	if (vfprintf(log_file, fmt, args) <= 0) {
-	    perror("tpips_user_log");
+	    perror("pips_user_log");
 	    abort();
 	}
 	else
