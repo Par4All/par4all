@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/10/17 11:12:33 $, )
+ * ($Date: 1995/10/18 13:13:25 $, )
  */
 
 #include "defines-local.h"
@@ -203,9 +203,10 @@ extract_the_align(reference alignee,
     if (ENDP(align_src)) /* align A with T - implicit alignment */
     {
 	int dim, ndim, tlower, alower, unused;
-	pips_assert("no template subscripts", ENDP(align_sub));
 
-	ndim=MIN(andim,tndim);
+	pips_user_assert("no template subscripts", ENDP(align_sub));
+	ndim=MIN(andim, tndim);
+
 	for (dim=1; dim<=ndim; dim++)
 	{
 	    get_entity_dimensions(template, dim, &tlower, &unused);
@@ -220,6 +221,11 @@ extract_the_align(reference alignee,
     }
     else /* explicit alignment */
     {
+	pips_user_assert("align-source-list length = rank",
+			 gen_length(align_src)==andim);
+	pips_user_assert("align-subscript-list length = rank",
+			 gen_length(align_sub)==tndim);
+
 	for(template_dim=1; !ENDP(align_sub); POP(align_sub), template_dim++)
 	{
 	    if (alignment_p(align_src, EXPRESSION(CAR(align_sub)),
@@ -232,8 +238,6 @@ extract_the_align(reference alignee,
 			      aligns);
 	}
     }
-
-    ifdebug(8) gen_map(print_alignment, aligns);	
 
     /* built align is returned. should be normalized?
      */
