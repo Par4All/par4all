@@ -205,8 +205,8 @@ static bool just_show(string rname, string mname)
     return TRUE;
 }
 
-/* apply what to all resources in res. res is freed.
- */
+/* perform "what" to all resources in "res". res is freed. Several rules
+call it: display, apply. */
 static bool perform(bool (*what)(string, string), res_or_rule * res)
 {
     bool result = TRUE;
@@ -217,6 +217,10 @@ static bool perform(bool (*what)(string, string), res_or_rule * res)
 
 	if(!db_get_current_workspace_name())
 	    pips_user_error("Open or create a workspace first!\n");
+
+	/* This may be always trapped earlier in the parser by rule "owner". */
+	if(gen_array_nitems(res->the_owners)==0)
+	    pips_user_error("Empty action: no argument!\n");
 
 	/* push the current module. */
 	save_current_module_name = 
@@ -960,17 +964,24 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 		$$ = gen_array_from_list(callees_callees(caller_modules));
 	    }
 	}
-	|
-	TK_OPENPAREN list_of_owner_name TK_CLOSEPAREN
+	| TK_OPENPAREN list_of_owner_name TK_CLOSEPAREN
 	{ $$ = $2; }
-	|
+        | /* No explicit argument */
 	{
 	    pips_debug(7,"reduce rule owner (none)\n");
 	    if (tpips_execution_mode) 
 	    {
 		string n = db_get_current_module_name();
 		$$ = gen_array_make(0);
-		if (n) gen_array_dupappend($$, n);
+		if (n) 
+		  gen_array_dupappend($$, n);
+		else
+		  /* pips_internal_error("No current module name\n"); */
+		  pips_user_error("No current module has been defined, explicitly or implictly.\n"
+				  "Please specify a module name as argument or check that"
+				  " the current workspace \"%s\" contains one main module"
+				  " or no more than one module.\n",
+				  db_get_current_workspace_name());
 	    }
 	}
 	;
