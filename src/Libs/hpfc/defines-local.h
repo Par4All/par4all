@@ -15,10 +15,6 @@
 #include <ctype.h>
 #include <string.h>
 
-extern int fprintf();
-extern int vfprintf();
-extern int system();
-
 /*  C3/LINEAR
  */
 #include "boolean.h"
