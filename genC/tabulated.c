@@ -21,80 +21,45 @@
    and the index could be dropped.
  */
 
-#define TABULATED_ELEMENTS_SIZE (1000)
+#define TABULATED_ELEMENTS_SIZE (500)
 #define TABULATED_ELEMENTS_INCR (10000)
 
-typedef struct
+struct _gtp
 {
   int domain;           /* domain number */
-  int index;            /* index in table */
   int size;		/* current allocated size */
   int used;		/* how many are used */
   gen_chunk * table;	/* actual table */
-} 
-  gen_tabulated_t, * gen_tabulated_p;
-
-static gen_tabulated_p all_tabulateds = NULL;
-
-#define all_tabulateds_initialized() \
-  message_assert("all tabulated is initialized", all_tabulateds)
-
-static gen_tabulated_p get_tabulated_from_index(int index)
-{
-  all_tabulateds_initialized();
-  check_index(index);
-  return all_tabulateds + index;
-}
+  hash_table names;     /* names to index for fast search */
+};
 
 static gen_tabulated_p get_tabulated_from_domain(int domain)
 {
-  gen_tabulated_p gtp;
   check_domain(domain);
-
-  gtp = get_tabulated_from_index(Domains[domain].index);
-  
-  message_assert("coherent domain", gtp->domain==domain);
-  return gtp;
+  message_assert("domain is tabulated", IS_TABULATED(Domains+domain));
+  return Domains[domain].tabulated;
 }
 
-static void init_tabulated(int index)
+gen_tabulated_p gen_init_tabulated(int domain)
 {
   int i;
   gen_chunk * t;
-  gen_tabulated_p gtp = get_tabulated_from_index(index);
+  gen_tabulated_p gtp;
+
+  gtp = (gen_tabulated_p) alloc(sizeof(struct _gtp));
 
   gtp->size = TABULATED_ELEMENTS_SIZE;
   gtp->used = 0;
-  gtp->index = index;
-  gtp->domain = -1; /* not assigned yet. */
-  t = (gen_chunk*) alloc(sizeof(gen_chunk)*gtp->size);
+  gtp->domain = domain;
+  t = (gen_chunk*) alloc(sizeof(gen_chunk)*TABULATED_ELEMENTS_SIZE);
   
   for (i=0; i<TABULATED_ELEMENTS_SIZE; i++)
     t[i].p = gen_chunk_undefined;
   
   gtp->table = t;
-}
-
-void gen_init_all_tabulateds(void)
-{
-  int i;
-  message_assert("all tabulated not initialized", !all_tabulateds);
-
-  all_tabulateds = (gen_tabulated_p) 
-    alloc(sizeof(gen_tabulated_t)*MAX_TABULATED);
-
-  for (i=0; i<MAX_TABULATED; i++)
-    init_tabulated(i);
-}
-
-/* bof */
-void gen_init_tabulated_set_domain(int index, int domain)
-{
-  gen_tabulated_p gtp = get_tabulated_from_index(index);
-  message_assert("same index, not set yet, coherent", 
-		 gtp->index==index && gtp->domain==-1 &&
-		 Domains[domain].index == index);
-  gtp->domain = domain;
+  gtp->names = hash_table_make(hash_string, 0);
+  
+  return gtp;
 }
 
 static void extends_tabulated(gen_tabulated_p gtp)
@@ -115,6 +80,7 @@ static void extends_tabulated(gen_tabulated_p gtp)
   gtp->table = t;
 }
 
+/* WARNING: it is not reentrant... */
 gen_chunk * gen_tabulated_fake_object_hack(int domain)
 {
   static gen_chunk c[2];
@@ -158,11 +124,12 @@ list gen_filter_tabulated(bool (*filter)(gen_chunk*), int domain)
   register int i, size = gtp->size;
   list l;
 
-  for (l=NIL, i=0; i<size; i++)
-    if (gtp->table[i].p != gen_chunk_undefined) {
-      register gen_chunk * obj = gtp->table[i].p;
-      if (filter(obj)) l = CONS(CHUNK, obj, l);
+  for (l=NIL, i=0; i<size; i++) {
+    gen_chunk * o = gtp->table[i].p;
+    if (o && o != gen_chunk_undefined) {
+      if (filter(o)) l = CONS(CHUNK, o, l);
     }
+  }
 
   return l;
 }
@@ -195,91 +162,34 @@ static int gen_put_tabulated(int domain, gen_chunk * gc)
   return 0;
 }
 
-/***************************************************** GEN_TABULATED_NAMES */
-
-/* I guess the chunks could be avoided?
- */
-static hash_table gen_tabulated_names = NULL;
-
-void gen_init_gen_tabulated_names(void)
+static void gen_put_tabulated_name(int domain, char * id, int number)
 {
-  message_assert("NULL table", !gen_tabulated_names);
-  /* can avoid to allocate a holder since positive ints are stored... */
-  message_assert("hack assumption", ((int)HASH_UNDEFINED_VALUE)<0);
-  gen_tabulated_names = hash_table_make(hash_string, 1000);
+  gen_tabulated_p gtp = get_tabulated_from_domain(domain);
+  message_assert("positive tabulated number", number>0);
+  hash_put(gtp->names, id, (void*)number);
 }
 
-void gen_lazy_init_gen_tabulated_names(void)
-{
-  if (!gen_tabulated_names) gen_init_gen_tabulated_names();
-}
-
-void gen_close_gen_tabulated_names(void)
-{
-  message_assert("defined table", gen_tabulated_names);
-  hash_table_free(gen_tabulated_names);
-  gen_tabulated_names = NULL;
-}
-
-#define check_gen_tabulated_names() \
-  message_assert("gen_tabulated_names defined", gen_tabulated_names)
-
-/* returns a pointer to a static string "number|name"
- */
-static char * gen_build_unique_tabulated_name(int domain, char * name)
-{
-  int len = strlen(name);
-  
-  /* persistant buffer */
-  static int size = 0;
-  static char * buffer = 0;
-  
-  if (len+30>size) {
-    size = len+30;
-    if (buffer) free(buffer);
-    buffer = (char*) malloc(sizeof(char)*size);
-    if (!buffer) fatal("build_unique_tabulated_name: memory exhausted\n");
-  }
-  
-  sprintf(buffer, "%d%c%s", domain, HASH_SEPAR, name);
-  return buffer;
-}
-
-static char * build_unique_tabulated_name_for_obj(gen_chunk * obj)
-{
-  char * name = (obj+HASH_OFFSET)->s;
-  int domain = quick_domain_index(obj);
-  return gen_build_unique_tabulated_name(domain, name);
-}	
 
 /* deletes obj from the tabulated names...
  */
 static void gen_delete_tabulated_name(gen_chunk * obj)
 {
-  char * key = build_unique_tabulated_name_for_obj(obj);
+  char * key = (obj+2)->s;
   void * okey, * val;
-  check_gen_tabulated_names();
+  int domain = obj->i;
+  gen_tabulated_p gtp = get_tabulated_from_domain(domain);
   
-  val = hash_delget(gen_tabulated_names, key, &okey);
+  val = hash_delget(gtp->names, key, &okey);
   if (val == HASH_UNDEFINED_VALUE)
     fatal("gen_delete_tabulated_name: clearing unexisting (%s)\n", key);
-  
-  free(okey);
+
+  // free(okey);
 }
 
 static int gen_get_tabulated_name_basic(int domain, char * id)
 {
-  char * key = gen_build_unique_tabulated_name(domain, id);
-  check_gen_tabulated_names();
-  return (int) hash_get(gen_tabulated_names, key);
-}
-
-static void gen_put_tabulated_name(int domain, char * id, int number)
-{
-  char * key = gen_build_unique_tabulated_name(domain, id);
-  check_gen_tabulated_names();
-  message_assert("positive tabulated number", number>0);
-  hash_put(gen_tabulated_names, strdup(key), (void*)number);
+  gen_tabulated_p gtp = get_tabulated_from_domain(domain);
+  return (int) hash_get(gtp->names, id);
 }
 
 void * gen_find_tabulated(char * key, int domain)
@@ -333,6 +243,7 @@ gen_do_enter_tabulated(int domain, string id, gen_chunk * cp, bool is_a_ref)
 {
   int number = gen_put_tabulated(domain, cp);
   (cp+1)->i = is_a_ref? -number: number; /* stores - if ref */
+  message_assert("name pointer ok", (cp+2)->s == id);
   gen_put_tabulated_name(domain, id, number);
   return cp;
 }
@@ -350,24 +261,27 @@ gen_enter_tabulated(int domain, string id, gen_chunk * cp, int allow_ref)
   {
     cp = gen_do_enter_tabulated(domain, id, cp, FALSE);
   }
-  else
+  else /* already in, redefine */
   {
     register int i, size, number = (gp+1)->i;
 
     if (number>0) 
-      fprintf(stderr, "warning: '%d|%s' redefined\n", domain, id);
+      fprintf(stderr, "warning: '%s' of %d redefined\n", id, domain);
     else
       number = -number;
 
     if (!allow_ref)
-      fprintf(stderr, "unexpected reference to '%d|%s'\n", domain, id);
+      fprintf(stderr, "unexpected reference to '%s' of %d\n", id, domain);
 
     size = gen_size(domain);
     
-    for (i=0; i<size; i++) 
+    message_assert("same name", same_string_p((gp+2)->s, (cp+2)->s));
+    message_assert("same domain", gp->i == cp->i);
+    
+    for (i=3; i<size; i++)
       gp[i] = cp[i];
 
-    free(cp), cp = gp;
+    free((cp+2)->s), free(cp), cp = gp;
     (cp+1)->i = number;
   }
 
