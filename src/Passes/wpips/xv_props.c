@@ -37,6 +37,8 @@ static hash_table aliases;
 static char display_properties_panel[] = "Properties panel...";
 static char hide_properties_panel[] = "Hide properties panel";
 
+	/* Flag allowing update_props also to select a property : */
+int verbose_update_props = 1;
 
 
 /* returns the first key which value is svp. when not found, returns NULL */
@@ -108,6 +110,8 @@ void update_props()
 			/* walk through items of special_prop_m to select the activated 
 			   one */
 			for (j=(int)xv_get(special_prop_m, MENU_NITEMS); j>0; j--) {
+				Panel_item panel_choice_item;
+
 				special_prop_mi = xv_get(special_prop_m, MENU_NTH_ITEM, j);
 				debug(9, "update_props", "Menu item tested:\"%s\"\n", 
 					  (string) xv_get(special_prop_mi, MENU_STRING));
@@ -115,7 +119,13 @@ void update_props()
 						phase_alias_n ) ==0 ) {
 					xv_set(special_prop_mi, MENU_SELECTED, TRUE, NULL);
 
-					user_log("Props: phase %s set on.\n", phase_alias_n);
+						/* Update the dual props panel entry : */
+					panel_choice_item = (Panel_item) xv_get(special_prop_m,
+						MENU_CLIENT_DATA);
+					xv_set(panel_choice_item, PANEL_VALUE, j - 1, NULL);
+
+					if (verbose_update_props)
+						user_log("Props: phase %s set on.\n", phase_alias_n);
 					debug(1, "update_props", 
 					  "Rule `%s' selected to produce resource `%s'\n",
 					  phase_alias_n, res_alias_n);
@@ -160,7 +170,9 @@ char *aliased_phase;
     string phase = hash_get(aliases, aliased_phase);
 
     if (phase == (string) HASH_UNDEFINED_VALUE)
+	{
 		pips_error("props_select", "aliases badly managed !!!\n");
+	}
     else {
 		if ( db_get_current_program()==database_undefined ) {
 			prompt_user("No workspace opened. Props not accounted.\n");
@@ -172,6 +184,11 @@ char *aliased_phase;
 			user_log("Props: phase %s set on.\n", aliased_phase);
 		}
     }
+		/* To have the props panel consistent with the real phase set :
+			RK, 05/07/1993. */
+	verbose_update_props = 0;
+	update_props();
+	verbose_update_props = 1;
 }
 
 void props_panel_notify(item, valeur, event)
@@ -188,7 +205,10 @@ Event *event;
 	menu_special_prop = (Menu) xv_get(item, PANEL_CLIENT_DATA);
 		/* Look at the corresponding (dual) item in the props menu to
 			get the value. RK, 11/06/1993. */
-	menu_item = (Menu_item) xv_get(menu_special_prop, MENU_NTH_ITEM, valeur);
+		/* Argh ! MENU_NTH_ITEM begins from 1 but
+			PANEL_VALUE begins from 0...	RK, 02/07/1993. */
+	menu_item = (Menu_item) xv_get(menu_special_prop,
+		MENU_NTH_ITEM, valeur + 1);
 	aliased_phase = (string) xv_get(menu_item, MENU_STRING);
 	props_select(aliased_phase);
 }
@@ -245,6 +265,7 @@ Panel props_panel;
 
 			Menu_item mi_props;
 			Menu menu_special_prop;
+			Panel_item panel_choice_item;
 
 			menu_special_prop=(Menu)xv_create(NULL, MENU_CHOICE_MENU,
 							  MENU_NOTIFY_PROC, props_menu_notify,
@@ -280,8 +301,9 @@ Panel props_panel;
 
 				/* Yes, "arg[...]" is awfull ! But if you have a better solution
 					I am interested... :-() RK, 8/6/93. */
+			pips_assert(narg < 19);
 			arg[narg] = arg[narg+1] = NULL;
-			xv_create(props_panel, PANEL_CHOICE_STACK,
+			panel_choice_item = xv_create(props_panel, PANEL_CHOICE_STACK,
 				PANEL_LAYOUT, PANEL_HORIZONTAL,
 				PANEL_LABEL_STRING, alias1,
 				PANEL_CLIENT_DATA, menu_special_prop,
@@ -293,7 +315,14 @@ Panel props_panel;
 							arg[10],arg[11],arg[12],arg[13],arg[14],
 							arg[15],arg[16],arg[17],arg[18],arg[19],
 				NULL);
+				/* Since PANEL_CHOICE_STRINGS copies the strings : */
 			args_free(&narg, arg);
+				/* The cross menu/panel reference : */
+				/* MENU_CLIENT_DATA is used for the link in the other
+					direction. 05/07/1993, RK. */
+			xv_set(menu_special_prop,
+				MENU_CLIENT_DATA, panel_choice_item,
+				NULL);
 		}
     }, phase_by_made_htp);
 }
@@ -347,12 +376,12 @@ void display_or_hide_properties_panel(menu, menu_item)
 	if (strcmp(message_string, display_properties_panel) == 0)
 	{
 		unhide_window(properties_frame);
-		xv_set(menu_item, MENU_STRING, hide_properties_panel);
+		xv_set(menu_item, MENU_STRING, hide_properties_panel, NULL);
 	}
 	else
 	{
 		xv_set(properties_frame, XV_SHOW, FALSE, NULL);
-		xv_set(menu_item, MENU_STRING, display_properties_panel);
+		xv_set(menu_item, MENU_STRING, display_properties_panel, NULL);
 	}
 }
 
