@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: host_node_entities.c,v $ ($Date: 1995/03/23 16:54:40 $, ) version $Revision$,
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1995/03/28 16:24:49 $, ) version $Revision$,
 */
 
 #include <stdio.h>
@@ -33,10 +33,10 @@ extern fprintf();
 
 /*      HOST AND NODE ENTITIES MANAGEMENT
  */
-GENERIC_GLOBAL_FUNCTION(new_host, entitymap, entity, entity);
-GENERIC_GLOBAL_FUNCTION(old_host, entitymap, entity, entity);
-GENERIC_GLOBAL_FUNCTION(new_node, entitymap, entity, entity);
-GENERIC_GLOBAL_FUNCTION(old_node, entitymap, entity, entity);
+GENERIC_GLOBAL_FUNCTION(new_host, entitymap);
+GENERIC_GLOBAL_FUNCTION(old_host, entitymap);
+GENERIC_GLOBAL_FUNCTION(new_node, entitymap);
+GENERIC_GLOBAL_FUNCTION(old_node, entitymap);
 
 void store_new_node_variable(new, old)
 entity new, old;
