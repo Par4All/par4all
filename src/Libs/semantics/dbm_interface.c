@@ -311,6 +311,12 @@ char *module_name;
 
     /* filter out local variables from the global intraprocedural effect */
     t_inter = transformer_intra_to_inter(t_intra, e_inter);
+    t_inter = transformer_normalize(t_inter);
+    if(!transformer_consistency_p(t_inter)) {
+	(void) print_transformer(t_inter);
+	pips_error("module_name_to_transformers",
+		   "Non-consistent summary transformer\n");
+    }
     DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_TRANSFORMER, 
 			   strdup(module_local_name( get_current_module_entity() )), 
 			   (char*) t_inter);
