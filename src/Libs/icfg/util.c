@@ -224,7 +224,7 @@ bool make_resource_from_starting_node
     localfilename = db_build_file_resource_name(res_name, mod_name, file_ext);
     dir = db_get_current_workspace_directory();
     filename = strdup(concatenate(dir, "/", localfilename, NULL));
-    free(dir);
+    /*free(dir);*/ /* this line may cause a problem of bus errone*/
 
     fd = safe_fopen(filename, "w");
     if (!vertex_undefined_p(start_ver)) {
