@@ -107,8 +107,8 @@ hpfc_get_file_list(int * file_number,
                                               file_names,
                                 /* Where is the output of HPFC: */
                                               hpfc_dir,
-                                /* All file names are Ok: */
-                                              ".*",
+                                /* generated files start with upercases */
+                                              "^[A-Z].*\\.[fh]$",
                                 /* Plain files only: */
                                               file_exists_p);
    *hpfc_directory_name = hpfc_dir;
