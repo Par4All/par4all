@@ -1,0 +1,23 @@
+#!/bin/sh
+# 
+# Accept differences after validation.
+#
+# Use the validation error message as standard input to accept to update
+# the validations suite. Create a new ~.result .
+#
+# Mail problem to jouvelot@ensmp.fr
+
+pips_test_directory=/home/users/pips/Pips/Tests/Validation
+tmp_mail=/tmp/accept.mail.$$
+header="Diff Commands for"
+
+cat > $tmp_mail
+
+module=`grep "$header" < $tmp_mail | awk '{print $4}'`
+file=`grep "$header" < $tmp_mail | awk '{print $6}'`
+
+result=`dirname $file`/`basename $file .f`.result
+
+sed -e "1,/${header}/d;s/^X//" < $tmp_mail | ed -s $result/$module
+
+rm -f $tmp_mail
