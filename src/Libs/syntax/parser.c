@@ -69,7 +69,9 @@ void ParserError(char * f, char * m)
     DynamicArea = entity_undefined;
     StaticArea = entity_undefined;
 
-    debug_off();
+    /* FI: let catch_error() take care of this in pipsmake since debug_on()
+       was not activated in ParserError */
+    /* debug_off(); */
     user_error(f,"Parser error between lines %d and %d\n%s\n",
 	       line_b_I,line_e_I,m);
 }
