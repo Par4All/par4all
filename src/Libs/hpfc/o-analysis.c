@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/12/20 16:44:14 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/12/20 16:49:26 $, )
  * version $Revision$
  */
 
@@ -15,8 +15,13 @@ static list lblocks = NIL, lloop  = NIL;
 
 GENERIC_LOCAL_MAPPING(variable_used, int, entity)
 
+/* must clear everything before returning in Overlap_Analysis...
+ */
 #define RETURN(x) \
-{ reset_hpfc_current_statement(); reset_current_loops(); return x;}
+{ gen_free_list(Wa); gen_free_list(lWa); gen_free_list(Ra);\
+  gen_free_list(lRa); gen_free_list(Ro); gen_free_list(lRo);\
+  gen_free_list(Rrt); gen_free_list(lblocks); gen_free_list(lloop);\
+  reset_hpfc_current_statement(); reset_current_loops(); return x;}
 
 /* check conditions and compile...
  */
@@ -62,8 +67,7 @@ statement stat, *pstat;
     gen_free_list(lw);
     if (W==NIL) /* no ok distributed variable written ! */
     {
-	debug(7, "Overlap_Analysis", 
-	      "returning FALSE because no ok distributed variable written\n");
+	pips_debug(7, "FALSE: no ok distributed variable written\n");
 	RETURN(FALSE);
     }
 	
@@ -116,14 +120,7 @@ statement stat, *pstat;
 	  gen_length(Wa), gen_length(lWa), gen_length(Wrt));
 
     if (gen_length(Wrt)!=0) 
-    {
-	gen_free_list(Wa);
-	gen_free_list(lWa);
-	gen_free_list(Wrt);
-	gen_free_list(lblocks);
-	gen_free_list(lloop);
 	RETURN(FALSE);
-    }
 
     /* Now, we have the fellowing situation:
      *
@@ -189,18 +186,7 @@ statement stat, *pstat;
 	  gen_length(Ra), gen_length(Ro), gen_length(Rrt));
 
     if (gen_length(Rrt)!=0) 
-    {
-	gen_free_list(Wa);
-	gen_free_list(lWa);
-	gen_free_list(Ra);
-	gen_free_list(lRa);
-	gen_free_list(Ro);
-	gen_free_list(lRo);
-	gen_free_list(Rrt);
-	gen_free_list(lblocks);
-	gen_free_list(lloop);
 	RETURN(FALSE);
-    }
 
     /* here is the situation now:
      *
