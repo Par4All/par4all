@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/09/05 17:01:25 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/09/19 11:51:44 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -855,7 +855,7 @@ $MAKEFILE.depend.\$(ARCH):
 	test ! "\$(DERIVED_CFILES)" || \$(MAKE) \$(GMKNODIR) \$(DERIVED_CFILES)
 	# now it's okay fo building all the dependences.
 	test ! "\$(CFILES)\$(DERIVED_CFILES)" || \\
-	        \$(PREPROC) -M \$(CFILES) \$(DERIVED_CFILES) |\\
+	        \$(PREPROC) $(CMKDEP) \$(CFILES) \$(DERIVED_CFILES) |\\
 		sed 's,^\(.*\.o:\),\$\$(ARCH)/\1,' > \$@
 
 #
