@@ -402,10 +402,26 @@ static void distribute_code (string function_name,
 						   make_call(new_module,call_params)),
 				  NIL,NULL);
 
+  pips_debug(5, "BEFORE REPLACING\n");
+  pips_debug(5, "externalized_code=\n");
+  print_statement(externalized_code);
+  pips_debug(5, "call_statement=\n");
+  print_statement(call_statement);
+  pips_debug(5, "module_stat=\n");
+  print_statement(module_stat);
+
   replace_in_sequence_statement_with (externalized_code,
 				      call_statement, 
 				      module_stat);
   
+  pips_debug(5, "AFTER REPLACING\n");
+  pips_debug(5, "externalized_code=\n");
+  print_statement(externalized_code);
+  pips_debug(5, "call_statement=\n");
+  print_statement(call_statement);
+  pips_debug(5, "module_stat=\n");
+  print_statement(module_stat);
+
   pips_assert("Module structure is consistent after DISTRIBUTE_CODE", 
 	      gen_consistent_p((gen_chunk*)new_module));
 	      
@@ -529,10 +545,10 @@ static entity create_parameter_variable_for_new_module (entity a_variable,
 /**
  * Creates a private variable in specified module
  */
-static entity create_private_variable_for_new_module (entity a_variable,
-						      string new_name, 
-						      string new_module_name,
-						      entity module)
+entity create_private_variable_for_new_module (entity a_variable,
+					       string new_name, 
+					       string new_module_name,
+					       entity module)
 {
   entity new_variable;
   entity a;
@@ -560,6 +576,7 @@ static entity create_private_variable_for_new_module (entity a_variable,
 			      (basic_tag(base)!=is_basic_overloaded)?
 			      (add_variable_to_area(a, new_variable)):(0),
 			      NIL));
+      pips_debug(2, "Created new private variable: %s\n", entity_global_name(new_variable));
       return new_variable;
     }
   else 
@@ -611,11 +628,21 @@ static void replace_loop_index_when_required (loop l, void* a_context)
 }
 
 /**
+ * Replaces all the references to entity pointed by old by references 
+ * created with new_variable.
+ * Update loop indexes by replacing index entity by new entity
+ */
+void replace_entity (statement stat, entity old, entity new_variable) 
+{
+  replace_reference (stat, make_reference(old,NIL),new_variable);
+}
+
+/**
  * Replaces all the references to reference pointed by ref by references 
  * created with new_variable.
  * Update loop indexes by replacing index entity by new entity
  */
-static void replace_reference (statement stat, reference ref, entity new_variable) 
+void replace_reference (statement stat, reference ref, entity new_variable) 
 {
   replace_reference_context context;
 
