@@ -101,5 +101,24 @@ int (*compare)();
     contrainte_vect_sort(sc_inegalites(s), compare);
 }
 
+/* SORT a Psysteme according to sort_base and compare (given to qsort).
+ * Both vectors and constraints are sorted. The only expected property
+ * is that two calls to this function with the same system (whatever its
+ * order) and same sort_base that covers all variables and same compare
+ * function should give the same result. 
+ */
+void sc_sort(
+    Psysteme sc,
+    Pbase sort_base,
+    int (*compare)(Pvecteur*, Pvecteur*))
+{
+    sc_vect_sort(sc, compare);
+    sc->inegalites = 
+	contrainte_sort(sc->inegalites, sc->base, sort_base, TRUE, TRUE);
+    sc->egalites = 
+	contrainte_sort(sc->egalites, sc->base, sort_base, TRUE, TRUE);
+}
+
+
 /*   That is all
  */
