@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/14 17:26:50 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/14 18:39:10 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2370,7 +2370,7 @@ allocated_memory_obj_in(
 	IS_TABULATED(&Domains[quick_domain_index(obj)]))
 	return !GO;
 
-    current_size += gen_size(obj);
+    current_size += gen_size(bp);
 
     if (IS_INLINABLE(bp))
     {
