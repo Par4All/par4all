@@ -509,7 +509,7 @@ statement body;
 				statement_number(old_loop_statement),
 				STATEMENT_ORDERING_UNDEFINED,
 				string_undefined,
-				make_instruction(is_instruction_loop, new_loop));
+				make_instruction(is_instruction_loop, new_loop),NIL,NULL);
     
     ifdebug(8) {
 	debug(8, "MakeLoopAs", "New loop\n");
