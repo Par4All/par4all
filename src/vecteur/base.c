@@ -523,42 +523,40 @@ Pbase b;
  * b = b1 - b2  -- with the set meaning
  * return b;
  */
-Pbase base_difference(b1, b2)
-Pbase b1;
-Pbase b2;
+Pbase base_difference(Pbase b1, Pbase b2)
 {
-    Pbase b = BASE_NULLE; 
-    Pbase eb = BASE_UNDEFINED;
+  Pbase b = BASE_NULLE; 
+  Pbase eb = BASE_UNDEFINED;
+  
+  for(eb = b1; !BASE_NULLE_P(eb); eb = eb->succ) {
+    Variable v = vecteur_var(eb);
+    
+    if(!base_contains_variable_p(b2, v))
+      b = vect_add_variable(b, v);
+  }
 
-    for(eb = b1; !BASE_NULLE_P(eb); eb = eb->succ) {
-	Variable v = vecteur_var(eb);
-
-	if(!base_contains_variable_p(b2, v))
-	    b = vect_add_variable(b, v);
-    }
-
-    return b;
+  return b;
 }
 
 /* Pbase base_included_p(Pbase b1, Pbase b2):
  * include_p = b1 is included in b2  -- with the set meaning
  * return b;
  */
-boolean base_included_p(b1, b2)
-Pbase b1;
-Pbase b2;
+boolean base_included_p(Pbase b1, Pbase b2)
 {
-    Pbase eb = BASE_UNDEFINED;
-    boolean included_p = TRUE;
+  Pbase b;
+  boolean included_p = TRUE;
+  linear_hashtable_pt seen = linear_hashtable_make();
+  
+  for (b=b2; b; b=b->succ)
+    if (var_of(b)!=TCST)
+      linear_hashtable_put_once(seen, var_of(b), var_of(b));
 
-    for(eb = b1; !BASE_NULLE_P(eb); eb = eb->succ) {
-	Variable v = vecteur_var(eb);
+  for (b=b1; b && included_p; b=b->succ)
+    if (var_of(b)!=TCST && !linear_hashtable_isin(seen, var_of(b)))
+      included_p = FALSE;
 
-	if(!base_contains_variable_p(b2, v)) {
-	    included_p = FALSE;
-	    break;
-	}
-    }
-
-    return included_p;
+  linear_hashtable_free(seen);
+  
+  return included_p;
 }
