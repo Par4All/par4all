@@ -362,29 +362,26 @@ Pvecteur expression_to_affine(expression e)
  *    FC 09/06/94
  */
 
-static bool normalized_constant_p(n, pv)
-normalized n;
-int *pv;
+static bool normalized_constant_p(normalized n, int *pv)
 {
     if (normalized_linear_p(n))
     {
 	Pvecteur v = normalized_linear(n);
 	int length = vect_size(v);
 	
-	if (var_of(v)==TCST && length==1) 
-	{
-	    *pv=VALUE_TO_INT(val_of(v)); 
-	    return(TRUE);
-	}
-	
 	if (length==0) 
 	{
 	    *pv=0;
-	    return(TRUE);
+	    return TRUE;
+	} 
+	else if (length==1 && var_of(v)==TCST) 
+	{
+	  *pv=VALUE_TO_INT(val_of(v)); 
+	  return TRUE;
 	}
     }
     
-    return(FALSE);
+    return FALSE;
 }    
 
 static normalized 
