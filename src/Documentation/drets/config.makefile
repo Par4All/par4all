@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/10/30 17:36:27 $, 
+# $Date: 1996/10/31 10:38:45 $, 
 #
 
 SOURCES=list_of_reports \
@@ -46,6 +46,10 @@ INSTALL_HTM= 	dret133 dret105
 
 all: $(INSTALL_DOC) $(INSTALL_DOC:.ps=.html)
 
+clean: local-clean
+local-clean:
+	$(RM) -r $(INSTALL_DOC) $(INSTALL_HTM) \
+		$(INSTALL_DOC:.ps=.html) $(INSTALL_DOC:.ps=.dvi)
+
 # end of $RCSfile: config.makefile,v $
 #
-
