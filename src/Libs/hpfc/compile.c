@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/12/26 10:23:33 $, )
+ * ($Date: 1996/12/26 10:29:55 $, )
  */
 
 #include "defines-local.h"
@@ -316,7 +316,7 @@ init_host_and_node_entities ()
 static string basename(string s)
 {
     string fin = s + strlen(s);
-    while (fin>s && *fin!='/') fin--;
+    while (fin>s && *(fin-1)!='/') fin--;
     return fin;
 }
 
