@@ -701,7 +701,7 @@ arguments_are_dcomplex(call c, hash_table types)
 }
 
 /************************************************************************** 
- * Verify if all the arguments basic of function C are REAL and DOUBLE
+ * Verify if all the arguments basic of function C
  * If there is no argument, I return TRUE
  *
  * Note: I - Integer; R - Real; D - Double; C - Complex
@@ -1409,10 +1409,31 @@ static basic
 typing_function_conversion_to_complex(call c, type_context_p context)
 {
   basic b;
+  expression arg;
   if(!arguments_are_IRDC(c, context))
   {
     return make_basic_float(4); /* Just for return result */
   }
+
+  arg = EXPRESSION(CAR(call_arguments(c)));
+  if (CDR(call_arguments(c)) == NIL &&
+      basic_complex_p(GET_TYPE(context->types, arg)))
+  {
+    syntax ss = expression_syntax(arg);
+    if (syntax_call_p(ss))
+    {
+      call_arguments(c) = call_arguments(syntax_call(ss));
+      context->number_of_conversion++;
+      return make_basic_complex(8);
+      //return typing_function_conversion_to_complex(c, context);
+    }
+    else /* Argument is a varibale */
+    {
+      return make_basic_complex(8);
+    }
+    /* Free memory occupied by old argument list*/	  
+  }
+
   /* Typing all arguments to REAL if necessary */
   b = make_basic_float(4);
   typing_arguments(c, context, b);
@@ -1424,10 +1445,31 @@ static basic
 typing_function_conversion_to_dcomplex(call c, type_context_p context)
 {
   basic b;
+  expression arg;
   if(!arguments_are_IRDC(c, context))
   {
     return make_basic_float(4); /* Just for return result */
   }
+
+  arg = EXPRESSION(CAR(call_arguments(c)));
+  if (CDR(call_arguments(c)) == NIL &&
+      basic_complex_p(GET_TYPE(context->types, arg)))
+  {
+    syntax ss = expression_syntax(arg);
+    if (syntax_call_p(ss))
+    {
+      call_arguments(c) = call_arguments(syntax_call(ss));
+      context->number_of_conversion++;
+      return make_basic_complex(16);
+      //return typing_function_conversion_to_dcomplex(c, context);
+    }    
+    else /* Argument is a varibale */
+    {
+      return make_basic_complex(16);
+    }
+    /* Free memory occupied by old argument list */
+  }
+
   /* Typing all arguments to DBLE if necessary */
   b = make_basic_float(8);
   typing_arguments(c, context, b);
@@ -1444,6 +1486,7 @@ typing_function_constant_complex(call c, type_context_p context)
   {
     return make_basic_float(4); /* Just for return result */
   }
+
   /* Typing all arguments to REAL if necessary */
   b = make_basic_float(4);
   typing_arguments(c, context, b);
@@ -1460,6 +1503,7 @@ typing_function_constant_dcomplex(call c, type_context_p context)
   {
     return make_basic_float(4); /* Just for return result */
   }
+
   /* Typing all arguments to DOUBLE if necessary */
   b = make_basic_float(8);
   typing_arguments(c, context, b);
@@ -2729,14 +2773,51 @@ simplification_conversion(expression exp, basic to_basic,
   call c = syntax_call(expression_syntax(exp));
   arg = EXPRESSION(CAR(call_arguments(c)));
   s_arg = expression_syntax(arg);
-  /* e.g: INT(I) -> I */
-  if (syntax_reference_p(s_arg) &&
-      basic_equal_p(to_basic, 
-	       entity_basic(reference_variable(syntax_reference(s_arg)))))
+  if (syntax_reference_p(s_arg))
   {
-    exp_tmp = copy_expression(arg);
-
-    context->number_of_simplication++;
+    /* e.g: INT(I) -> I */
+    if (basic_equal_p(to_basic, 
+		      entity_basic(reference_variable(
+				   syntax_reference(s_arg)))) &&
+	CDR(call_arguments(c)) == NIL)
+    {
+      exp_tmp = copy_expression(arg);      
+      context->number_of_simplication++;
+    }
+    /* e.g: CMPLX(R) -> CMPLX(R, 0.0E0) */
+    else if (ENTITY_CONVERSION_CMPLX_P(call_function(c)) &&
+	     ! basic_complex_p(entity_basic
+		   (reference_variable(syntax_reference(s_arg)))) &&
+	     CDR(call_arguments(c)) == NIL)
+    {
+      call c_imag;
+      expression exp_imag;
+      c_imag = make_call(make_constant_entity("0.0E0", 
+					      is_basic_float, 8),
+			 NIL);
+      exp_imag = make_expression(make_syntax(is_syntax_call, c_imag), 
+				 normalized_undefined);
+      call_arguments(c) 
+	= CONS(EXPRESSION, arg, CONS(EXPRESSION, exp_imag, NIL));	    
+      context->number_of_simplication++;
+    }
+    /* e.g: DCMPLX(D) -> DCMPLX(D, 0.0D0) */
+    else if (ENTITY_CONVERSION_DCMPLX_P(call_function(c)) &&
+	     ! basic_complex_p(entity_basic
+		   (reference_variable(syntax_reference(s_arg)))) &&
+	     CDR(call_arguments(c)) == NIL)
+    {
+      call c_imag;
+      expression exp_imag;
+      c_imag = make_call(make_constant_entity("0.0D0",
+					      is_basic_float, 16),
+			 NIL);
+      exp_imag = make_expression(make_syntax(is_syntax_call, c_imag), 
+				 normalized_undefined);
+      call_arguments(c) 
+	= CONS(EXPRESSION, arg, CONS(EXPRESSION, exp_imag, NIL));	    
+      context->number_of_simplication++;
+    }
   }
   else if(syntax_call_p(s_arg))
   {
@@ -2755,6 +2836,63 @@ simplification_conversion(expression exp, basic to_basic,
 	     ENTITY_IMPLIED_DCMPLX_P(call_function(c)) ||
 	     ENTITY_CONVERSION_DCMPLX_P(call_function(c)))
     {
+      list args = call_arguments(c);
+      basic b_arg = GET_TYPE(context->types, arg);
+      /* Imagine party is empty */
+      if (CDR(args) == NIL)
+      {
+	/* Argument is NOT complex or double complex */
+	if (!basic_complex_p(b_arg))
+	{
+	  call c_imag;
+	  expression exp_imag;
+	  /* CMPLX */
+	  if ((ENTITY_IMPLIED_CMPLX_P(call_function(c)) ||
+	       ENTITY_CONVERSION_CMPLX_P(call_function(c))))
+	  {
+	    c_imag = make_call(make_constant_entity("0.0E0", 
+						    is_basic_float, 8),
+			       NIL);
+	  }
+	  /* DCMPLX */
+	  else
+	  {
+	    c_imag = make_call(make_constant_entity("0.0D0",
+						    is_basic_float, 16),
+			       NIL);
+	  }	  
+	  exp_imag = make_expression(make_syntax(is_syntax_call, c_imag), 
+				     normalized_undefined);
+	  call_arguments(c) 
+	    = CONS(EXPRESSION, arg, CONS(EXPRESSION, exp_imag, NIL));	    
+	  context->number_of_simplication++;
+	}
+	/* CMPLX(C) -> C;  DCMPLX(DC) -> DC */
+	else if( (basic_complex(b_arg) == 8 && 
+		 ENTITY_CONVERSION_CMPLX_P(call_function(c))) || 
+		 (basic_complex(b_arg) == 16 && 
+		  ENTITY_CONVERSION_DCMPLX_P(call_function(c))))
+	{
+	  syntax s_tmp;
+	  normalized n_tmp;
+	  /* Argument being a call is examined in typing function */
+	  pips_assert("Argument is a call ",
+		      syntax_call_p(expression_syntax(arg)));
+
+	  s_tmp = expression_syntax(exp);
+	  n_tmp = expression_normalized(exp);
+	  expression_syntax(exp) 
+	    = copy_syntax(expression_syntax(arg));
+	  expression_normalized(exp) 
+	    = copy_normalized(expression_normalized(arg));
+
+	  free_syntax(s_tmp);
+	  free_normalized(n_tmp);
+	  context->number_of_simplication++;
+	  return;
+	}
+      }
+      /* Cast constants if necessary */
       exp_tmp = cast_constant(exp, to_basic, context); 
       /* Number of simplifications is already counted in cast_constant() */
     }
