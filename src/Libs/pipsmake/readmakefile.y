@@ -281,7 +281,6 @@ rule r;
 {
     string pn = rule_phase(r);
     bool   active_phase = FALSE;
-    list   required = NIL;
 
     /* Check resources produced by this rule */
     MAPL(pvr, {
@@ -304,31 +303,35 @@ rule r;
     }, rule_produced(r));
 
     /* Check resources required for this rule if it is an active one */
-    if (active_phase) required = (list) rule_required(r);
-    MAPL(pvr, {
-	virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
-	string vrn = virtual_resource_name(vr);
-	owner vro = virtual_resource_owner(vr);
-	string phase;
+    if (active_phase) {
+	MAPL(pvr, {
+	    virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
+	    string vrn = virtual_resource_name(vr);
+	    owner vro = virtual_resource_owner(vr);
+	    string phase;
+	    
+	    /* We must use a resource already defined */
+	    if ( owner_callers_p(vro) || owner_callees_p(vro) ) {}
+	    else {
+		phase = hash_get(activated, vrn);
+		if (phase == HASH_UNDEFINED_VALUE) {
+		    user_warning( "add_rule",
+				 "%s: phase %s requires an undefined resource %s\n",
+				 PIPSMAKE_RC, pn, vrn);
+		}
+		/* If we use a resource, another function should have produced it */
+		else if (strcmp(phase, pn) == 0) {
+		    pips_error("add_rule",
+			       "%s: phase %s cannot be active for the %s resource\n",
+			       PIPSMAKE_RC, phase, vrn);
+		}
+		else debug(1, "add_rule", 
+			   "Required resource %s is checked OK for Function %s\n",
+			   vrn, pn);
+	    }
+	}, rule_required(r));
+    }
 	
-	/* We must use a resource already defined */
-	if ( owner_callers_p(vro) || owner_callees_p(vro) ) {}
-	else if ((phase = hash_get(activated, vrn)) == HASH_UNDEFINED_VALUE) {
-	    user_warning( "add_rule",
-		"%s: phase %s requires an undefined resource %s\n",
-		 PIPSMAKE_RC, pn, vrn);
-	}
-	/* If we use a resource, another function should have produced it */
-	else if (strcmp(phase, pn) == 0) {
-	    pips_error("add_rule",
-			 "%s: phase %s requires a resource it produces\n",
-			  PIPSMAKE_RC, phase);
-	}
-	else debug(1, "add_rule", 
-		"Required resource %s is checked OK for Function %s\n", vrn, pn);
-    }, required);
-
-
     makefile_rules(pipsmakefile) = gen_nconc(makefile_rules(pipsmakefile),
 					     CONS(RULE, r, NIL));
 }
