@@ -78,7 +78,7 @@ prettyprint_dependence_graph(FILE * fd,
 
     debug_on("RICEDG_DEBUG_LEVEL");
 
-    if(sru_format_p) {
+    if(sru_format_p && !statement_undefined_p(mod_stat)) {
 	/* compute line numbers for statements */
 	s_to_l = statement_to_line_number(mod_stat);
 	dl = module_to_declaration_length(get_current_module_entity());
@@ -103,7 +103,7 @@ prettyprint_dependence_graph(FILE * fd,
 	    statement s2 = vertex_to_statement(v2);
 	    dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
 
-	    if(!sru_format_p) {
+	    if(!sru_format_p || statement_undefined_p(mod_stat)) {
 		/* factorize line numbers */
 		fprintf(fd, "\t%02d --> %02d with conflicts\n", 
 			statement_number(s1), statement_number(s2));
@@ -115,7 +115,7 @@ prettyprint_dependence_graph(FILE * fd,
 		/* if (!entity_scalar_p(reference_variable
 		   (effect_reference(conflict_source(c))))) {
 		   */
-		if(sru_format_p) {
+		if(sru_format_p && !statement_undefined_p(mod_stat)) {
 		    int l1 = dl + apply_persistant_statement_to_int(s_to_l, s1);
 		    int l2 = dl + apply_persistant_statement_to_int(s_to_l, s2);
 
@@ -158,7 +158,7 @@ prettyprint_dependence_graph(FILE * fd,
 		}
 
 		if(conflict_cone(c) != cone_undefined){
-		    if(sru_format_p) {
+		    if(sru_format_p && !statement_undefined_p(mod_stat)) {
 			fprintf(fd, " levels(");
 			MAPL(pl, {
 			    fprintf(fd, pl==cone_levels(conflict_cone(c))? "%d" : ",%d",
@@ -178,7 +178,7 @@ prettyprint_dependence_graph(FILE * fd,
 		       ("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES")) {
 			gs = (Ptsg)cone_generating_system(conflict_cone(c));
 			if (!SG_UNDEFINED_P(gs)) {
-			    if(sru_format_p) {
+			    if(sru_format_p && !statement_undefined_p(mod_stat)) {
 				if(sg_nbre_sommets(gs)==1 && sg_nbre_rayons(gs)==0
 				   && sg_nbre_droites(gs)==0) {
 				    /* uniform dependence */
@@ -204,7 +204,7 @@ prettyprint_dependence_graph(FILE * fd,
 		    }
 		}
 		else {
-		    if(sru_format_p) 
+		    if(sru_format_p && !statement_undefined_p(mod_stat)) 
 			fprintf(fd, " levels()");
 		}
 		fprintf(fd, "\n");
@@ -212,7 +212,7 @@ prettyprint_dependence_graph(FILE * fd,
 	}
     } 
 
-    if(sru_format_p) {
+    if(sru_format_p && !statement_undefined_p(mod_stat)) {
 	free_persistant_statement_to_int(s_to_l);
     }
     else {
