@@ -13,29 +13,30 @@
 #include <stdio.h>
 extern int fprintf();
 #include "malloc.h"
-
-#include "genC.h"
+#include "newgen_assert.h"
+#include "newgen_types.h"
+#include "newgen_stack.h"
 
 /*  usefull defines
  */
 
-#define STACK_NULL ((gen_stack_ptr) NULL)
-#define STACK_NULL_P(s) ((s)==STACK_NULL)
+#define STACK_PTR_NULL ((_stack_ptr) NULL)
+#define STACK_PTR_NULL_P(s) ((s)==STACK_PTR_NULL)
 
-#define GEN_STACK_DEFAULT_SIZE 30
+#define STACK_DEFAULT_SIZE 30
 
 /* allocates a bulk of size size
  */
-static gen_stack_ptr allocate_bulk(size)
+static _stack_ptr allocate_bulk(size)
 int size;
 {
-    gen_stack_ptr 
-	x = (gen_stack_ptr) malloc(sizeof(gen_stack_bulk));
+    _stack_ptr 
+	x = (_stack_ptr) malloc(sizeof(_stack_bulk));
     
     x->n_item = 0;
     x->max_items = size;
-    x->items = (chunk **) malloc(sizeof(chunk *)*size);
-    x->succ = STACK_NULL;
+    x->items = (char **) malloc(sizeof(char *)*size);
+    x->succ = STACK_PTR_NULL;
 
     return(x);
 }
@@ -43,19 +44,19 @@ int size;
 /* search for a new bulk, first in the available list,
  * if non are available, a new bulk is allocated
  */
-static gen_stack_ptr find_or_allocate(s)
-gen_stack s;
+static _stack_ptr find_or_allocate(s)
+stack s;
 {
-    if (!STACK_NULL_P(s->available))
+    if (!STACK_PTR_NULL_P(s->available))
     {
-	gen_stack_ptr 
+	_stack_ptr 
 	    x = s->available;
 
 	s->available = (s->available)->succ;
 
 	/*  clean the bulk to be returned
 	 */
-	x->succ = STACK_NULL;
+	x->succ = STACK_PTR_NULL;
 	return(x);
     }
     else
@@ -64,19 +65,19 @@ gen_stack s;
 
 /* ALLOCATEs a new stack of type
  */
-gen_stack gen_stack_make(type, size)
+stack stack_make(type, size)
 int type, size;
 {
-    gen_stack 
-	s = malloc(sizeof(gen_stack_head));
+    stack 
+	s = malloc(sizeof(_stack_head));
 
-    if (size<1) size=GEN_STACK_DEFAULT_SIZE;
+    if (size<1) size=STACK_DEFAULT_SIZE;
 
     s->size = 0;
     s->type = type;
     s->max_extent = 0;
     s->stack = allocate_bulk(size);
-    s->available = STACK_NULL;
+    s->available = STACK_PTR_NULL;
  
     return(s);
 }
@@ -85,37 +86,39 @@ int type, size;
  */
 
 static void free_bulk(x)
-gen_stack_ptr x;
+_stack_ptr x;
 {
-    free(x->items), x->items = (chunk **) NULL, free(x);
+    free(x->items), x->items = (char **) NULL, free(x);
 }
 
 static void free_bulks(x)
-gen_stack_ptr x;
+_stack_ptr x;
 {
-    if (!STACK_NULL_P(x))
-	free_bulks(x->succ), x->succ=STACK_NULL, free_bulk(x);
+    if (!STACK_PTR_NULL_P(x))
+	free_bulks(x->succ), x->succ=STACK_PTR_NULL, free_bulk(x);
 }
 
-void gen_stack_free(s)
-gen_stack s;
+void stack_free(s)
+stack s;
 {
-    free_bulks(s->stack), s->stack = STACK_NULL;
-    free_bulks(s->available), s->available = STACK_NULL;
+    free_bulks(s->stack), s->stack = STACK_PTR_NULL;
+    free_bulks(s->available), s->available = STACK_PTR_NULL;
     free(s);
 }
 
 /* MISC
  */
-int gen_stack_size(s)
-gen_stack s;
+int stack_size(s)
+stack s;
 {
+    assert(!STACK_NULL_P(s) && !stack_undefined_p(s));
     return(s->size);
 }
 
-bool gen_stack_empty_p(s)
-gen_stack s;
+bool stack_empty_p(s)
+stack s;
 {
+    assert(!STACK_NULL_P(s) && !stack_undefined_p(s));
     return(s->size==0);
 }
 
@@ -125,17 +128,17 @@ gen_stack s;
  * the size it the same than the initial bulk size. 
  * Other policies may be considered.
  */
-void gen_push(item, s)
-chunk *item;
-gen_stack s;
+void stack_push(item, s)
+char *item;
+stack s;
 {
-    gen_stack_ptr x = s->stack;
+    _stack_ptr x = s->stack;
 
-    assert(!STACK_NULL_P(x));
+    assert(!STACK_PTR_NULL_P(x));
 
     if (x->n_item == x->max_items)
     {
-	gen_stack_ptr saved = x;
+	_stack_ptr saved = x;
 
 	x = find_or_allocate(x->max_items);
 	x->succ = saved;
@@ -153,22 +156,22 @@ gen_stack s;
 /* POPs one item from stack s
  *
  * the empty bulks are not freed here. 
- * gen_stack_free does the job.
+ * stack_free does the job.
  */
-chunk *gen_pop(s)
-gen_stack s;
+char *stack_pop(s)
+stack s;
 {
-    gen_stack_ptr x = s->stack;
+    _stack_ptr x = s->stack;
 
     if (x->n_item==0)
     {
-	gen_stack_ptr saved = x->succ;
+	_stack_ptr saved = x->succ;
 
 	x->succ = s->available, s->available = x;
 	s->stack = saved, x = saved;
     }
 
-    assert(!STACK_NULL_P(x) && x->n_item>0);
+    assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
 
     /*   POP!
      */
@@ -178,29 +181,29 @@ gen_stack s;
 
 /* returns the item on top of stack s
  */
-chunk *gen_head(s)
-gen_stack s;
+char *stack_head(s)
+stack s;
 {
-    gen_stack_ptr x = s->stack;
+    _stack_ptr x = s->stack;
 
     if (x->n_item==0) x = x->succ;
 
-    assert(!STACK_NULL_P(x) && x->n_item>0);
+    assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
 
     /*   HEAD
      */
     return(x->items[(x->n_item)-1]);
 }
 
-/* REPLACEs the item on top of stack s
+/* REPLACEs the item on top of stack s, and returns the old item
  */
-chunk *gen_replace(item, s)
-chunk *item;
-gen_stack s;
+char *stack_replace(item, s)
+char *item;
+stack s;
 {
-    chunk *old = gen_pop(s);
+    char *old = stack_pop(s);
 
-    gen_push(item, s);
+    stack_push(item, s);
     return(old);
 }
 
