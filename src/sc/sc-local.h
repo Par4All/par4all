@@ -129,35 +129,8 @@ typedef struct Ssysteme {
 #define sc_base(psc) ((psc)->base)
 #define sc_dimension(psc) ((psc)->dimension)
 
-/* void sc_add_egalite(Psysteme p, Pcontrainte e): macro ajoutant une
- * egalite e a un systeme p; la base n'est pas mise a jour; il faut faire
- * ensuite un appel a sc_creer_base(); il vaut mieux utiliser sc_make()
- *
- * sc_add_eg est (a peu pres) equivalent a sc_add_egalite, mais le
- * parametre e n'est utilise qu'une fois ce qui permet d'eviter
- * des surprises en cas de e++ et autres effects de bords a chaque
- * evaluation de e; sc_add_egalite est donc plus sur que sc_add_eg
- *
- * If the system basis should be updated, use sc_constraint_add()
- * and the two related function in sc_insert.c
- */
-#define sc_add_egalite(p,e) { Pcontrainte e_new= (e); \
-                              e_new->succ=(p)->egalites; \
-                              (p)->egalites=e_new; (p)->nb_eq++; }
-#define sc_add_eg(p,e) { (e)->succ=(p)->egalites; (p)->egalites=(e); (p)->nb_eq += 1; }
-
-/* void sc_add_inegalite(Psysteme p, Pcontrainte i): macro ajoutant une
- * inegalite i a un systeme p; la base n'est pas mise a jour; il faut
- * ensuite faire un appel a sc_creer_base(); il vaut mieux utiliser
- * sc_make();
- *
- * sc_add_ineg est (a peu pres) equivalent a sc_add_inegalite; cf supra
- * pour l'explication des differences
- */
-#define sc_add_inegalite(p,i) { Pcontrainte i_new= (i); \
-                              i_new->succ=(p)->inegalites; \
-                              (p)->inegalites=i_new; (p)->nb_ineq++; }
-#define sc_add_ineg(p,i) { (i)->succ=(p)->inegalites; (p)->inegalites=(i); (p)->nb_ineq += 1; }
+void sc_add_egalite(Psysteme, Pcontrainte);
+void sc_add_inegalite(Psysteme, Pcontrainte);
 
 /* ex-definition d'un systeme de contraintes infaisable, representant un
  * polyedre vide.
