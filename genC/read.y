@@ -384,7 +384,10 @@ int allow_ref ;
     if((hash=(gen_chunk *)hash_get( Gen_tabulated_names, local )) != 
        (gen_chunk *)HASH_UNDEFINED_VALUE ) {
 	
-	fatal("no redefinition of a tabulated");
+	/* redefinitions of tabulated should not be allowed...
+	 */
+	(void) fprintf(stderr, "[make_%s] warning: %s redefined\n", 
+		       Domains[domain].name, id);
 
 	/* actually very obscure there... seems that negative domain
 	 * numbers are used to encode something... already used/seen ???
