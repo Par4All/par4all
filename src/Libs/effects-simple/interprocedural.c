@@ -386,7 +386,7 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
     bool bad_reshaping;
 
     tag formal_tac = action_tag(effect_action(formal_effect));
-    tag formal_tap = action_tag(effect_approximation(formal_effect));
+    tag formal_tap = approximation_tag(effect_approximation(formal_effect));
 
     entity formal_var = reference_variable(effect_reference(formal_effect));
     int formal_ndims = NumberOfDimension(formal_var);
@@ -548,7 +548,7 @@ translate_effect(entity called_func, list real_args, reference real_ref,
     entity real_var = reference_variable(real_ref);
 
     tag formal_tac = action_tag(effect_action(formal_effect));
-    tag formal_tap = action_tag(effect_approximation(formal_effect));
+    tag formal_tap = approximation_tag(effect_approximation(formal_effect));
 
     effect real_effect;
 
