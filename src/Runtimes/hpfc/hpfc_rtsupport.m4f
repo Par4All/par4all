@@ -3,7 +3,7 @@ c Runtime Support Functions for the
 c High Performance Fortran Compiler
 c by Fabien COELHO.
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/09/15 15:57:04 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/09/19 18:22:46 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -1171,7 +1171,7 @@ c
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
-      debug(`print *, "[hpfc_synchro] waiting"')
+      debug(`print *, "[hpfc_synchro] ", MYLID, " waiting ", NBOFTASKS+1')
       call pvmfbarrier(HPFC_GROUP_NAME, NBOFTASKS+1, info)
       if (info.lt.0) then
          call pvmfperror("hpfc_synchro", info)
