@@ -618,11 +618,11 @@ goto_inst: TK_GOTO label
 	    }
 	| TK_GOTO entity_name opt_virgule TK_LPAR licon TK_RPAR
 	    {
-		FatalError("parser", "assigned goto statement prohibited\n");
+		ParserError("parser", "assigned goto statement prohibited\n");
 	    }
 	| TK_GOTO entity_name
 	    {
-		FatalError("parser", "assigned goto statement prohibited\n");
+		ParserError("parser", "assigned goto statement prohibited\n");
 	    }
 	;
 
