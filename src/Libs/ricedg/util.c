@@ -310,7 +310,28 @@ Pbase basis;
     }
 }
 
-/* for an improved dependence test */
+/* for an improved dependence test (Beatrice Creusillet)
+ *
+ * The routine name says it all. Only constraints transitively connected
+ * to a constraint referencing a variable of interest with a non-zero 
+ * coefficient are copied from sc to sc_res.
+ *
+ * Input:
+ *  sc: unchanged
+ *  variables: list of variables of interest (e.g. phi variables of regions)
+ * Output:
+ *  sc_res: a newly allocated restricted version of sc
+ * Temporary:
+ *  sc: the pointer is modified to make debugging more interesting:-(
+ *      (no impact on the value pointed to by sc on procedure entry)
+ *
+ * FI: I'm sceptical... OK for speed, quid of accuracy? Nonfeasibility
+ * due to existencial variables is lost if these variables are not
+ * transitively related to the so-called variables of interest, isn'it?
+ * Well, I do not manage to build a counter example because existential
+ * problems are caught by the precondition normalization. Although it is
+ * not as strong as one could wish, it gets lots of stuff...
+ */
 
 Psysteme sc_restricted_to_variables_transitive_closure(sc, variables)
 Psysteme sc;
@@ -426,12 +447,3 @@ Pbase variables;
 
     return(sc_res);
 }
-
-
-
-
-
-
-
-
-
