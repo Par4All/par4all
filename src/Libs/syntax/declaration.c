@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 09:51:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 12:24:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 09:51:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 12:24:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -104,6 +104,15 @@ void
 SaveEntity(e)
 entity e;
 {
+    entity g = local_name_to_top_level_entity(entity_local_name(e));
+
+    if(!entity_undefined_p(g)) {
+	user_warning("SaveEntity", 
+		     "Ambiguity between external %s and local %s forbidden by Fortran standard\n",
+		     entity_name(g), entity_name(e));
+	ParserError("SaveEntity", "Name conflict\n");
+    }
+
     if (entity_type(e) == type_undefined) {
 	DeclareVariable(e, type_undefined, NIL, 
 			storage_undefined, value_undefined);
