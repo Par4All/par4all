@@ -19,7 +19,25 @@
  * Normalisation de chaque contrainte, i.e. division par le pgcd des
  * coefficients (cf. ?!? )
  *
- * Verification de la non redondance de chaque contrainte avec les autres:
+ * Propagation des constantes definies par les equations dans les
+ * inequations. E.g. N==1.
+ *
+ * Selection des variables de rang inferieur quand il y a ambiguite: N==M.
+ * M is used wherever possible.
+ *
+ * Selection des variables eliminables exactement. E.g. N==4M. N is
+ * substituted by 4M wherever possible. Ceci permet de raffiner les
+ * constantes dans les inegalites.
+ *
+ * Les equations de trois variables ou plus ne sont pas utilisees pour ne
+ * pas rendre les inegalites trop complexes.
+ *
+ * Verification de la non redondance de chaque contrainte avec les autres
+ *
+ * Les contraintes sont normalisees par leurs PGCDs.  Les constantes sont
+ * propagees dans les inegalites.  Les paires de variables equivalentes
+ * sont propagees dans les inegalites en utilisant la variable de moindre
+ * rang dans la base.
  *
  * Pour les egalites, on elimine une equation si on a un systeme d'egalites
  * de la forme :
@@ -29,6 +47,8 @@
  * 
  * ou c1/ 0 == 0	 
  * 
+ * Si on finit avec b==0, la non-faisabilite est detectee.
+ *
  * Pour les inegalites, on elimine une inequation si on a un systeme de
  * contraintes de la forme :
  * 
@@ -41,48 +61,99 @@
  *   ou  d2/    Ax <= b,
  *              Ax <= c    avec c >= b ou b >= c
  * 
- * sc_normalize retourne NULL quand la normalisation a montre que le systeme
- * etait non faisable
+ * Les doubles inegalites syntaxiquement equivalentes a une egalite sont
+ * detectees: Ax <= b, Ax >= b
+ *
+ * Si deux inegalites sont incompatibles, la non-faisabilite est detectee:
+ * b <= Ax <= c et c < b.
+ *
+ * sc_normalize retourne NULL/SC_EMPTY quand la normalisation a montre que
+ * le systeme etait non faisable.
+ *
+ * Une grande partie du travail est effectue dans sc_elim_db_constraints()
  *
  * FI: a revoir de pres; devrait retourner SC_EMPTY en cas de non faisabilite
+ *
  */
 Psysteme sc_normalize(ps)
 Psysteme ps;
 {
-    Pcontrainte eq;
+  Pcontrainte eq;
+
+  ps = sc_elim_db_constraints(ps);
+  sc_elim_empty_constraints(ps, TRUE);
+  sc_elim_empty_constraints(ps, FALSE);
+
+  if (!SC_UNDEFINED_P(ps)) {
+    Pbase b = sc_base(ps);
+
+    /* Eliminate variables linked by a two-term equation. Preserve integer
+       information or choose variable with minimal rank in basis b if some
+       ambiguity exists. */
+    for (eq = ps->egalites; (!SC_UNDEFINED_P(ps) && eq != NULL); eq=eq->succ) {
+      Pvecteur veq = contrainte_vecteur(eq);
+      if(((vect_size(veq)==2) && (vect_coeff(TCST,veq)==VALUE_ZERO))
+	 || ((vect_size(veq)==3) && (vect_coeff(TCST,veq)!=VALUE_ZERO))) {
+	Pbase bveq = make_base_from_vect(veq);
+	Variable v1 = vecteur_var(bveq);
+	Variable v2 = vecteur_var(vecteur_succ(bveq));
+	Variable v = VARIABLE_UNDEFINED;
+	Value a1 = value_abs(vect_coeff(v1, veq));
+	Value a2 = value_abs(vect_coeff(v2, veq));
+
+	if(a1==a2) {
+	  /* Then, after normalization, a1 and a2 must be one */
+	  if(rank_of_variable(b, v1) < rank_of_variable(b, v2)) {
+	    v = v2;
+	  }
+	  else {
+	    v = v1;
+	  }
+	}
+	else if(value_one_p(a1)) {
+	  v = v1;
+	}
+	else if(value_one_p(a2)) {
+	  v = v2;
+	}
+	if(VARIABLE_DEFINED_P(v)) {
+	  /* An overflow is unlikely... but it should be handled here
+	     I guess rather than be subcontracted? */
+	  sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
+	}
+      }
+    }
+  }
+
+  if (!SC_UNDEFINED_P(ps)) {
+    /* Propagate constant definitions, only once although a triangular
+       system might require n steps is the equations are in the worse order */
+    for (eq = ps->egalites; (!SC_UNDEFINED_P(ps) && eq != NULL); eq=eq->succ) {
+      Pvecteur veq = contrainte_vecteur(eq);
+      if(((vect_size(veq)==1) && (vect_coeff(TCST,veq)==VALUE_ZERO))
+	 || ((vect_size(veq)==2) && (vect_coeff(TCST,veq)!=VALUE_ZERO))) {
+	Variable v = term_cst(veq)? vecteur_var(vecteur_succ(veq)) : vecteur_var(veq);
+	Value a = term_cst(veq)? vecteur_val(vecteur_succ(veq)) : vecteur_val(veq);
+
+	if(value_one_p(a) || value_mone_p(a) || vect_coeff(TCST,veq)==VALUE_ZERO
+	   || value_mod(a,vect_coeff(TCST,veq))==VALUE_ZERO) {
+	  /* An overflow is unlikely... but it should be handled here
+	     I guess rather than be subcontracted. */
+	  sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
+	}
+	else {
+	  sc_rm(ps);
+	  ps = SC_UNDEFINED;
+	}
+      }
+    }
 
     ps = sc_elim_db_constraints(ps);
     sc_elim_empty_constraints(ps, TRUE);
     sc_elim_empty_constraints(ps, FALSE);
-
-    if (!SC_UNDEFINED_P(ps)) {
-      /* propagate constant definitions, only once although a triangular
-	 system might require n steps is the equations are in the worse order */
-	for (eq = ps->egalites; (!SC_UNDEFINED_P(ps) && eq != NULL); eq=eq->succ) {
-	  Pvecteur veq = contrainte_vecteur(eq);
-	  if(((vect_size(veq)==1) && (vect_coeff(TCST,veq)==VALUE_ZERO))
-	     || ((vect_size(veq)==2) && (vect_coeff(TCST,veq)!=VALUE_ZERO))) {
-	    Variable v = term_cst(veq)? vecteur_var(vecteur_succ(veq)) : vecteur_var(veq);
-	    Value a = term_cst(veq)? vecteur_val(vecteur_succ(veq)) : vecteur_val(veq);
-
-	    if(value_one_p(a) || value_mone_p(a) || vect_coeff(TCST,veq)==VALUE_ZERO
-	       || value_mod(a,vect_coeff(TCST,veq))==VALUE_ZERO) {
-	      /* An overflow is unlikely... but it should be handled here
-                 I guess rather than be subcontracted. */
-	      sc_simple_variable_substitution_with_eq_ofl_ctrl(ps, eq, v, OFL_CTRL);
-	    }
-	    else {
-	      sc_rm(ps);
-	      ps = SC_UNDEFINED;
-	    }
-	  }
-	}
-	ps = sc_kill_db_eg(ps);
-	sc_elim_empty_constraints(ps, TRUE);
-	sc_elim_empty_constraints(ps, FALSE);
-    }
+  }
     
-    return(ps);
+  return(ps);
 }
 
 /*
