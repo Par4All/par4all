@@ -303,13 +303,19 @@ bool user_function_call_p(e)
 expression e;
 {
     syntax s = expression_syntax(e);
-    call c = syntax_call(s);
-    entity f = call_function(c);
-    value v = entity_initial(f);
+    bool user_function_call_p = FALSE;
 
-    pips_assert("user_function_call_p", syntax_call_p(s));
+    if(syntax_call_p(s)) {
+	call c = syntax_call(s);
+	entity f = call_function(c);
+	value v = entity_initial(f);
+	user_function_call_p = value_code_p(v);
+    }
+    else {
+	user_function_call_p = FALSE;
+    }
 
-    return value_code_p(v);
+    return user_function_call_p;
 }
 
 bool operator_expression_p(e, op_name)
