@@ -1,5 +1,5 @@
 /* $RCSfile: pipsmake.c,v $ (version $Revision$)
- * $Date: 1997/09/08 18:04:16 $, 
+ * $Date: 1997/09/25 08:53:05 $, 
  * pipsmake: call by need (make),
  *
  * rule selection (activate),
@@ -38,9 +38,10 @@
  */
 
 #include <stdio.h>
-#include <sys/types.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
-#include <setjmp.h>
+#include <sys/types.h>
 
 #include "genC.h"
 
@@ -99,9 +100,10 @@ rule ru;
     bool print_timing_p = get_bool_property("LOG_TIMINGS");
     bool check_res_use_p = get_bool_property("CHECK_RESOURCE_USAGE");
 
-    MAPL(prr, {
-	rname = real_resource_resource_name(REAL_RESOURCE(CAR(prr)));
-	rowner = real_resource_owner_name(REAL_RESOURCE(CAR(prr)));
+    MAP(REAL_RESOURCE, rr, 
+    {
+	rname = real_resource_resource_name(rr);
+	rowner = real_resource_owner_name(rr);
 	is_required = FALSE;
 
 	MAPL (prrr, {
@@ -211,8 +213,7 @@ void reinit_make_cache_if_necessary()
 	reset_make_cache(), init_make_cache();
 }
 
-static bool make(rname, oname)
-string rname, oname;
+static bool make(string rname, string oname)
 {
     bool success_p = TRUE;
 
@@ -237,25 +238,25 @@ string rname, oname;
     return success_p;
 }
 
-static bool rmake(rname, oname)
-string rname, oname;
+static bool 
+rmake(string rname, string oname)
 {
-    resource res;
     rule ru;
+    char * res = NULL;
 
     debug(2, "rmake", "%s(%s) - requested\n", rname, oname);
 
-    /* do we have this resource in our database ? */
-    res = db_find_resource(rname, oname);
-
     /* is it up to date ? */
-    if (res != resource_undefined) {
+    if (db_resource_p(rname, oname)) {
+	res = db_get_memory_resource(rname, oname, TRUE);
 	if(set_belong_p(up_to_date_resources, (char *) res)) {
 	    debug(5, "rmake", "resource %s(%s) found in up_to_date "
 		      "with time stamp %d\n",
-		      rname, oname, resource_time(res));
-	    return TRUE;
+		      rname, oname, db_time_of_resource(rname, oname));
+	    return TRUE; /* YES, IT IS! */
 	}
+	else
+	    res = NULL; /* NO, IT IS NOT. */
     }
     
     /* we look for the active rule to produce this resource */
@@ -271,8 +272,8 @@ string rname, oname;
     if (!make_required(oname, ru))
 	return FALSE;
 
-    if (check_resource_up_to_date (rname,oname)) {
-	
+    if (check_resource_up_to_date (rname, oname)) 
+    {
 	debug (8,"rmake",
 	       "Resource %s(%s) becomes up-to-date after applying"
 	       "pre-transformations and building required resources\n",
@@ -282,24 +283,22 @@ string rname, oname;
 
 	/* we build the resource */
 	success = apply_a_rule(oname, ru);
-	if (!success)
-	    return FALSE;
+	if (!success) return FALSE;
 
 	/* set up-to-date all the produced resources for that rule */
-	MAPL(prr, {
-	    real_resource rr = REAL_RESOURCE(CAR(prr));
-
+	MAP(REAL_RESOURCE, rr,
+	{
 	    string rron = real_resource_owner_name(rr);
 	    string rrrn = real_resource_resource_name(rr);
-
-	    res = db_find_resource(rrrn, rron);
-
-	    if (res != resource_undefined) {
+	    
+	    if (db_resource_p(rrrn, rron)) 
+	    {
+		res = db_get_memory_resource(rrrn, rron, TRUE);
 		debug(5, "rmake", "resource %s(%s) added to up_to_date "
 		      "with time stamp %d\n",
-		      rname, oname, resource_time(res));
-		set_add_element(up_to_date_resources,
-				up_to_date_resources, (char *) res);
+		      rname, oname, db_time_of_resource(rrrn, rron));
+		set_add_element(up_to_date_resources, 
+				up_to_date_resources, res);
 	    }
 	    else {
 		pips_error("rmake", 
@@ -312,8 +311,7 @@ string rname, oname;
     return TRUE;
 }
 
-/*
- * Apply do NOT activate the rule applied. 
+/* Apply do NOT activate the rule applied. 
  * In the case of an interprocedural rule, the rules applied to the
  * callees of the main will be the default rules. For instance,
  * "apply PRINT_CALL_GRAPH_WITH_TRANSFORMERS" applies the rule
@@ -322,8 +320,7 @@ string rname, oname;
  * Safe apply checks if the rule applied is activated and produces ressources 
  * that it requires (no transitive closure) --DB 8/96
  */
-static bool apply(pname, oname)
-string pname, oname;
+static bool apply(string pname, string oname)
 {
     bool success_p = TRUE;
 
@@ -347,8 +344,8 @@ string pname, oname;
     return success_p;
 }
 
-static bool apply_without_reseting_up_to_date_resources(pname, oname)
-string pname, oname;
+static bool 
+apply_without_reseting_up_to_date_resources(string pname, string oname)
 {
     rule ru;
 
@@ -369,8 +366,7 @@ string pname, oname;
 }
 
 /* this function returns the active rule to produce resource rname */
-rule find_rule_by_resource(rname)
-string rname;
+rule find_rule_by_resource(string rname)
 {
     makefile m = parse_makefile();
 
@@ -378,14 +374,12 @@ string rname;
 	  "searching rule for resource %s\n", rname);
 
     /* walking thru rules */
-    MAPL(pr, {
-	rule r = RULE(CAR(pr));
+    MAP(RULE, r, {
 	bool resource_required_p = FALSE;
 
-
 	/* walking thru resources required by this rule */
-	MAPL(pvr, {
-	    virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
+	MAP(VIRTUAL_RESOURCE, vr,
+	{
 	    string vrn = virtual_resource_name(vr);
 	    owner vro = virtual_resource_owner(vr);
 
@@ -400,8 +394,7 @@ string rname;
 	/* If this particular resource is not required */
 	if (!resource_required_p) {
 	    /* walking thru resources made by this particular rule */
-	    MAPL(pvr, {
-		virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
+	    MAP(VIRTUAL_RESOURCE, vr, {
 		string vrn = virtual_resource_name(vr);
 
 		if (same_string_p(vrn, rname)) {
@@ -621,9 +614,7 @@ string oname;
 	reals = build_real_resources(oname, rule_pre_transformation(ru));
 	
 	/* we recursively make the resources */
-	MAPL(prr, {
-	    real_resource rr = REAL_RESOURCE(CAR(prr));
-	    
+	MAP(REAL_RESOURCE, rr, {
 	    string rron = real_resource_owner_name(rr);
 	    /* actually the resource name is a phase name !! */
 	    string rrpn = real_resource_resource_name(rr);
@@ -654,9 +645,7 @@ string oname;
     reals = build_real_resources(oname, rule_required(ru));
 
     /* we recursively make required resources */
-    MAPL(prr, {
-	real_resource rr = REAL_RESOURCE(CAR(prr));
-	
+    MAP(REAL_RESOURCE, rr, {
 	string rron = real_resource_owner_name(rr);
 	string rrrn = real_resource_resource_name(rr);
 	
@@ -695,9 +684,7 @@ string oname;
     reals = build_real_resources(oname, rule_modified(ru));
 
     /* we delete them from the uptodate set */
-    MAPL(prr, {
-	real_resource rr = REAL_RESOURCE(CAR(prr));
-
+    MAP(REAL_RESOURCE, rr, {
 	string rron = real_resource_owner_name(rr);
 	string rrrn = real_resource_resource_name(rr);
 
@@ -718,112 +705,28 @@ string oname;
 
     gen_free_list (reals);
 }
-
-/* To be used at top-level
- * It creates a new up_to_date list to check is a resource is OK 
+
+/* returns whether resource is up to date.
  */
-bool real_resource_up_to_date_p(rname, oname)
-string rname, oname;
+static bool 
+check_physical_resource_up_to_date(string rname, string oname)
 {
-    bool result;
-
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
-
-    pips_assert("real_resource_up_to_date_p",
-		set_undefined_p(up_to_date_resources));
-
-    up_to_date_resources = set_make(set_pointer);
-
-    dont_interrupt_pipsmake_asap();
-
-    result = check_resource_up_to_date(rname,oname);
-
-    set_free(up_to_date_resources);
-    up_to_date_resources = set_undefined;
-
-    debug_off();
-    
-    return result;
-}
-
-void check_resources(list * pobso, list * pupto)
-{
-    list obso = NIL;
-    list upto = NIL;
-
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
-
-    pips_assert("check_resources",
-		set_undefined_p(up_to_date_resources));
-
-    up_to_date_resources = set_make(set_pointer);
-
-    dont_interrupt_pipsmake_asap();
-    /* For all the resources of the current workspace */
-    MAP(RESOURCE, r, {
-	string rn = resource_name(r);
-	string on = resource_owner_name(r);
-	if (status_memory_p(resource_status(r))
-	    && !check_physical_resource_up_to_date(r)) {
-	    /* Add this resource to the list of useless ones: */
-	    obso = CONS(RESOURCE, r, obso);
-	    debug(2, "free_any_non_up_to_date_resource_in_memory",
-		  "mark %s(%s) as non up to date\n", rn, on);
-	}
-	else {
-	    upto = CONS(RESOURCE, r, upto);
-	    debug(2, "free_any_non_up_to_date_resource_in_memory",
-		  "keep %s(%s) as up to date resource or on disk\n", rn, on);
-	}
-    }, database_resources(db_get_current_workspace()));
-
-    set_free(up_to_date_resources);
-    up_to_date_resources = set_undefined;
-
-    debug_off();
-    
-    *pobso = obso;
-    *pupto = upto;
-
-    return;
-}
-
-/* To be used in a rule. use and update the up_to_dat list
- * created by makeapply 
- */
-bool check_resource_up_to_date(rname, oname)
-string rname, oname;
-{
-    resource res;
-    bool result = TRUE;
-
-    res = db_find_resource(rname, oname);
-
-    /* The resource should be in the data base */
-    if (res == resource_undefined)
-	return FALSE;
-
-    result = check_physical_resource_up_to_date(res);
-
-    return result;
-}
-
-bool check_physical_resource_up_to_date(resource res)
-{
-  string rname = resource_name(res);
-  string oname = resource_owner_name(res);
   list reals = NIL;
   rule ru = rule_undefined;
   bool result = TRUE;
+  char * res = db_get_resource_id(rname, oname);
 
   /* Maybe is has already been proved true */
-  if(set_belong_p(up_to_date_resources, (char *) res))
+  if(set_belong_p(up_to_date_resources, res))
     return TRUE;
 
   /* We get the active rule to build this resource */
   if ((ru = find_rule_by_resource(rname)) == rule_undefined) {
-    pips_error("check_resource_up_to_date",
-	       "could not find a rule for %s\n", rname);
+      /* initial resources have no rule, but that does not matter... */
+      if (same_string_p(rname, DBR_USER_FILE))
+	  return TRUE;
+      /* else */
+      pips_internal_error("could not find a rule for %s\n", rname);
   }
 
   /* we build the list of required real_resources */
@@ -837,72 +740,69 @@ bool check_physical_resource_up_to_date(resource res)
      - proved up to date (recursively)
      - have timestamps older than the tested one
      */
-  MAPL(prr, {
-    real_resource rr = REAL_RESOURCE(CAR(prr));
-
-    string rron = real_resource_owner_name(rr);
-    string rrrn = real_resource_resource_name(rr);
-
-    bool res_in_modified_list_p = FALSE;
-	    
-    /* we build the list of modified real_resources */
-    list virtuals = rule_modified(ru);
-    list reals2 = build_real_resources(oname, virtuals);
-
-    MAPL(mod_prr, {
-      real_resource mod_rr = REAL_RESOURCE(CAR(mod_prr));
-      string mod_rron = real_resource_owner_name(mod_rr);
-      string mod_rrrn = real_resource_resource_name(mod_rr);
-
-      if ((same_string_p(mod_rron, rron)) &&
-	  (same_string_p(mod_rrrn, rrrn))) {
-	/* we found it */
-	res_in_modified_list_p = TRUE;
-	debug(3, "check_resource_up_to_date",
-	      "resource %s(%s) is in the rule_modified list",
-	      rrrn, rron);
-	break;
-      }
-    }, reals2);
+  MAP(REAL_RESOURCE, rr,
+  {
+      string rron = real_resource_owner_name(rr);
+      string rrrn = real_resource_resource_name(rr);
+      
+      bool res_in_modified_list_p = FALSE;
+      
+      /* we build the list of modified real_resources */
+      list virtuals = rule_modified(ru);
+      list reals2 = build_real_resources(oname, virtuals);
+      
+      MAP(REAL_RESOURCE, mod_rr,
+      {
+	  string mod_rron = real_resource_owner_name(mod_rr);
+	  string mod_rrrn = real_resource_resource_name(mod_rr);
+	  
+	  if ((same_string_p(mod_rron, rron)) &&
+	      (same_string_p(mod_rrrn, rrrn))) {
+	      /* we found it */
+	      res_in_modified_list_p = TRUE;
+	      debug(3, "check_resource_up_to_date",
+		    "resource %s(%s) is in the rule_modified list",
+		    rrrn, rron);
+	      break;
+	  }
+      }, reals2);
 
     gen_free_list (virtuals);
     gen_free_list (reals2);
 
     /* If the rule is in the modified list, then
        don't check anything */
-    if (res_in_modified_list_p == FALSE) {
-
-      resource resp = db_find_resource(rrrn, rron);
-
-      if (resp == resource_undefined) {
-	debug(5, "check_resource_up_to_date",
-	      "resource %s(%s) is not present and not in the rule_modified list",
-	      rrrn, rron);
-	result = FALSE;
-	break;
-      } else {
-	/* Check if this resource is up to date */
-	if (check_resource_up_to_date(rrrn, rron)
-	    == FALSE) {
-	  debug(5, "check_resource_up_to_date",
-		"resource %s(%s) is not up to date", rrrn, rron);
-	  result = FALSE;
-	  break;
+    if (res_in_modified_list_p == FALSE)
+    {
+	if (!db_resource_p(rrrn, rron)) {
+	    debug(5, "check_resource_up_to_date",
+	    "resource %s(%s) is not there and not in the rule_modified list",
+		  rrrn, rron);
+	    result = FALSE;
+	    break;
+	} else {
+	    /* Check if this resource is up to date */
+	    long rest;
+	    long respt;
+	    if (check_resource_up_to_date(rrrn, rron) == FALSE) {
+		debug(5, "check_resource_up_to_date",
+		      "resource %s(%s) is not up to date", rrrn, rron);
+		result = FALSE;
+		break;
+	    }
+	    rest = db_time_of_resource(rname, oname);
+	    respt = db_time_of_resource(rrrn, rron);
+	    /* Check if the timestamp is OK */
+	    if (rest<respt)
+	    {
+		debug(5, "check_resource_up_to_date",
+		      "resource %s(%s) with time stamp %ld is newer "
+		      "than resource %s(%s) with time stamp %ld\n",
+		      rrrn, rron, respt, rname, oname, rest);
+		result = FALSE;
+		break;
+	    }
 	}
-	/* Check if the timestamp is OK */
-	if (resource_time(res) < resource_time(resp)) {
-	  debug(5, "check_resource_up_to_date",
-		"resource %s(%s) with time stamp %ld is newer "
-		"than resource %s(%s) with time stamp %ld\n",
-		rrrn, rron,
-		(long) resource_time(resp),
-		resource_name(res),
-		resource_owner_name(res),
-		(long) resource_time(res));
-	  result = FALSE;
-	  break;
-	}
-      }
     }
   }, reals);
 
@@ -910,20 +810,42 @@ bool check_physical_resource_up_to_date(resource res)
 
   /* If the resource is up to date then add it in the set */
   if (result == TRUE) {
-    debug(5, "check_resource_up_to_date",
-	  "resource %s(%s) added to up_to_date "
-	  "with time stamp %d\n",
-	  rname, oname, resource_time(res));
-    set_add_element(up_to_date_resources,
-		    up_to_date_resources, (char *) res);
+      debug(5, "check_resource_up_to_date",
+	    "resource %s(%s) added to up_to_date "
+	    "with time stamp %d\n",
+	    rname, oname, db_time_of_resource(rname, oname));
+      set_add_element(up_to_date_resources, up_to_date_resources, res);
   }
   return result;
 }
 
+/* this is quite ugly, but I wanted to put the enumeration down to pipsdbm.
+ */
+int 
+delete_obsolete_resources(void)
+{
+    int ndeleted;
+    dont_interrupt_pipsmake_asap();
+    pips_assert("undefined", set_undefined_p(up_to_date_resources));
+    up_to_date_resources = set_make(set_pointer);
+    ndeleted =db_delete_obsolete_resources(check_physical_resource_up_to_date);
+    set_free(up_to_date_resources);
+    up_to_date_resources = set_undefined;
+    return ndeleted;
+}
+
+
+/* To be used in a rule. use and update the up_to_dat list
+ * created by makeapply 
+ */
+bool check_resource_up_to_date(string rname, string oname)
+{
+    return db_resource_p(rname, oname)?
+	check_physical_resource_up_to_date(rname, oname): FALSE;
+}
 
 /* Delete from up_to_date all the resources of a given name */
-void delete_named_resources (rn)
-string rn;
+void delete_named_resources (string rn)
 {
     /* GO 29/6/95: many lines ...
        db_unput_resources_verbose (rn);*/
@@ -955,55 +877,37 @@ void delete_all_resources(void)
     up_to_date_resources = set_make(set_pointer);
 }
 
-string get_first_main_module()
+string 
+get_first_main_module(void)
 {
-
-#define MAX__LENGTH 256
-
-    static char name[MAX__LENGTH];
-    char tmpfile[MAX__LENGTH];
-    FILE *ftmp;
-    int success_p;
-
-    extern int system(char*);
-    extern int unlink(char*);
+    string name, tmp_file_name = strdup(".seekfirstmainmoduleXXXXXX");
+    FILE * tmp_file;
 
     debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-    strncpy (tmpfile,".seekfirstmainmoduleXXXXXX",MAX__LENGTH);
-
-    mktemp (tmpfile);
-    if (!(*tmpfile))
-	pips_error("get_first_main_module",
-		   "unable to make a temporary file\n");
+    if (!mktemp(tmp_file_name))
+	pips_internal_error("unable to make a temporary file\n");
 
     system(concatenate
-	   ("sed -n 's,^[ \t]*[pP][rR][oO][gG][rR][aA][mM][ \t]*"
+	   ("sed -n 's, ,,g;s,	,,g;s,[pP][rR][oO][gG][rR][aA][mM]"
 	    "\\([0-9a-zA-Z\\-_]*\\).*$,\\1,p' ",
 	    db_get_current_workspace_directory(),
-	    "/*.f > ",
-	    tmpfile,
-	    NULL));
+	    "/*.f > ", /**/ tmp_file_name, 0));
 
-    if ((ftmp = fopen (tmpfile,"r")) != NULL)
-    {
-	success_p = fscanf (ftmp,"%s\n", name);
-	strupper(name,name);
-	fclose (ftmp);
-	unlink (tmpfile);
-	if (success_p != 1)	/* bad item has been read */
-	    *name = '\0';
-    }
+    tmp_file = safe_fopen(tmp_file_name, "r");
+    name = safe_readline(tmp_file);
+    safe_fclose(tmp_file, tmp_file_name);
+    unlink(tmp_file_name);
+    free(tmp_file_name);
 
-    debug_off ();
+    if (name) strupper(name,name);
+    else name=string_undefined;
 
-    if (*name == '\0')
-	return string_undefined;
+    debug_off();
     return name;
 }
 
-/*
- * check the usage of resrouuuces 
+/* check the usage of resources 
  */
 void do_resource_usage_check(string oname, rule ru)
 {
@@ -1018,8 +922,7 @@ void do_resource_usage_check(string oname, rule ru)
     reals = build_real_resources(oname, rule_required (ru));
 
     /* Delete then from the set of read resources */
-    MAPL(prr, {
-	real_resource rr = REAL_RESOURCE(CAR(prr));
+    MAP(REAL_RESOURCE, rr, {
 	string rron = real_resource_owner_name(rr);
 	string rrrn = real_resource_resource_name(rr);
 	string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
@@ -1045,8 +948,7 @@ void do_resource_usage_check(string oname, rule ru)
     reals = build_real_resources(oname, rule_produced (ru));
 
     /* Delete then from the set of write resources */
-    MAPL(prr, {
-	real_resource rr = REAL_RESOURCE(CAR(prr));
+    MAP(REAL_RESOURCE, rr, {
 	string rron = real_resource_owner_name(rr);
 	string rrrn = real_resource_resource_name(rr);
 	string elem_name = strdup(concatenate(rron,".", rrrn, NULL));
