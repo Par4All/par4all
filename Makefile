@@ -173,7 +173,7 @@ mkinstalldirs = $(SHELL) ./mkinstalldirs
 ## where to put intermediate objects and executables:
 OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)
 LIB = $(OBJ_DIR)/$(PSTATIC)
-INSTALL_LIB = 
+#INSTALL_LIB = 
 #EXEC_EXTRA_LIBS = -L./$(OBJ_DIR) $(EXEC_EXTRA_LIBS)
 EXEC_EXTRA_LIBS = $(LIB)
 
@@ -381,7 +381,8 @@ $(GMP_BITS)libs:
 
 
 # local targets
-mlibs: lib-shared lib-static
+mlibs: $(LIBSTYPE_TO_BUILD)
+# lib-shared lib-static
 
 lib-shared:: $(OBJ_DIR)
 lib-shared:: $(OBJ_DIR)/$(PSHARED)

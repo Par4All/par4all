@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.3 2001/11/19 13:24:10 loechner Exp $
+# $Id: vars.mk,v 1.4 2002/01/14 13:45:48 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -35,7 +35,7 @@ VERSION = 5.0
 # edit vars.mk.in, which is read by configure
 
 # Default top-level directory.
-prefix =	/usr
+prefix =	/usr/local
 
 # Usually the same as prefix. 
 # exec_prefix is part of the autoconf standard.
@@ -67,14 +67,16 @@ RANLIB			= ranlib
 SHEXT  			= so
 
 # defines needed for arithmetic lib
-INT_AFLAGS = -DLINEAR_VALUE_IS_INT
-LONG_AFLAGS = -DLINEAR_VALUE_PROTECT_MULTIPLY 		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -DLINEAR_VALUE_IS_LONGLONG
+INT_AFLAGS = 
+LONG_AFLAGS = -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
 GMP_AFLAGS = -DGNUMP
 INT_BITS = 32
 LONG_BITS = 64
 GMP_BITS = gmp
 
 # Library type to construct
+LIBSTYPE_TO_BUILD = lib-static
+# Library type to install
 INSTALL_LIB = 
 
 # Commands used to install scripts and data
@@ -84,7 +86,7 @@ INSTALL_DATA =		${INSTALL} -m 644
 
 ## GNU-MP stuff
 EXTRA_INCLUDES=
-EXTRA_LIBS=
+EXTRA_LIBS=-lgmp 
 
 # Platform specific variables
 OSTYPE	= linux-gnu
@@ -95,7 +97,7 @@ BUILD   = i686
 EXEC_EXTRA_SUFFIX = 
 
 ## make install puts everything here: relays on --prefix 
-INSTALLDIR = /usr
+INSTALLDIR = /usr/local
 BINDIR = $(INSTALLDIR)/bin
 LIBDIR = $(INSTALLDIR)/lib
 INCLUDEDIR = $(INSTALLDIR)/include
@@ -108,6 +110,6 @@ EXEC_EXTRA_LIBS= -L$(OBJ_DIR) -lpolylib$(BITS) $(LIBS)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 
-LIBS_TO_BUILD = 64
-EXEC_TO_BUILD = 64
+LIBS_TO_BUILD = gmp
+EXEC_TO_BUILD = gmp
 

@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk.in,v 1.1 2001/07/16 15:00:31 risset Exp $
+# $Id: vars.mk.in,v 1.2 2002/01/14 13:45:48 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -75,6 +75,8 @@ LONG_BITS = @LONG_BITS@
 GMP_BITS = @GMP_BITS@
 
 # Library type to construct
+LIBSTYPE_TO_BUILD = @LIBSTYPE_TO_BUILD@
+# Library type to install
 INSTALL_LIB = @INSTALL_LIB@
 
 # Commands used to install scripts and data
