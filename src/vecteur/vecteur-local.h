@@ -111,7 +111,7 @@ typedef struct Svecteur Sbase, * Pbase;
 #define BASE_UNDEFINED ((Pbase) 0)
 #define BASE_UNDEFINED_P(b) ((b)==BASE_UNDEFINED)
 #define base_dimension(b) vect_size((Pvecteur)(b))
-#define base_add_dimension(b,v) vect_chg_coeff((Pvecteur *)(b),(v),1)
+#define base_add_dimension(b,v) vect_chg_coeff((Pvecteur *)(b),(v),VALUE_ONE)
 #define base_rm(b) vect_rm((Pvecteur)(b))
 
 /* I do thing that overflows are managed in a very poor manner. FC.
