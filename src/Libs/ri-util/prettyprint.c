@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.110  1998/02/11 21:23:07  ancourt
+ * text_instruction static again :-)
+ *
  * Revision 1.109  1998/02/11 20:23:06  ancourt
  * text_instruction deleting  the  static option
  *
@@ -150,7 +153,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.109 1998/02/11 20:23:06 ancourt Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.110 1998/02/11 21:23:07 ancourt Exp $";
 #endif /* lint */
 
  /*
@@ -1548,7 +1551,7 @@ static string (*head_hook)(entity) = NULL;
 void set_prettyprinter_head_hook(string(*f)(entity)){ head_hook=f;}
 void reset_prettyprinter_head_hook(){ head_hook=NULL;}
 
-text 
+static text 
 text_instruction(
     entity module,
     string label,
