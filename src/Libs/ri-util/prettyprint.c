@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.81  1997/09/19 17:17:06  coelho
+ * SAVE and dimensions
+ *
  * Revision 1.80  1997/09/19 16:34:09  irigoin
  * Bug fix in text-entity_declaration: SAVE statements were not generated any
  * longer
@@ -57,7 +60,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.80 1997/09/19 16:34:09 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.81 1997/09/19 17:17:06 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -210,8 +213,8 @@ words_declaration(
 
     if (type_variable_p(entity_type(e)))
     {
-	if (!(variable_in_common_p(e) &&
-	      !prettyprint_common_variable_dimensions_p))
+	if (prettyprint_common_variable_dimensions_p ||
+	    !(variable_in_common_p(e) || variable_static_p(e)))
 	{
 	    if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
 	    {
