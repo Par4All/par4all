@@ -23,6 +23,9 @@
  * - bang comment management added (to avoid the parser)
  *
  * $Log: split_file.c,v $
+ * Revision 1.42  1998/09/21 09:45:44  coelho
+ * '#' added as a comment start to deal with cpp output...
+ *
  * Revision 1.41  1998/07/13 11:16:27  coelho
  * fix for entry to match only if there is some name after...
  * however yet another bug to come: entry foo(1) = 2.0
@@ -46,6 +49,15 @@
  * bang comment skipped... (beurk).
  *
  */
+
+/* added macros
+ */
+#define isbegincomment(c) \
+	((c)=='!' || (c)=='*' || (c)=='c' || (c)=='C' || (c)=='#')
+#define issquote(c) ((c)=='\'')
+#define isdquote(c) ((c)=='\"')
+#define ishH(c) ((c)=='h' || (c)=='H')
+#define char2int(c) ((int)((c)-'0'))
 
 static void hollerith_and_bangcomments(char *);
 #define LINESIZE 200
@@ -204,7 +216,7 @@ static char * skip_comment_if_any(char * lines)
 {
     int i = 0;
 
-    while (lines[i]=='c' || lines[i]=='C' || lines[i]=='*' || lines[i]=='!')
+    while (isbegincomment(lines[i]))
     {
 	while (lines[i]!='\0' && lines[i]!='\n') i++;
 	if (lines[i]=='\n') i++;
@@ -269,7 +281,7 @@ static int lname(char * s, int look_for_entry)
 	lbuf = skip_comment_if_any(buf);
 
 	/* first check for comment cards */
-	if(lbuf[0]=='c' || lbuf[0]=='C' || lbuf[0]=='*' || lbuf[0]=='!') 
+	if(isbegincomment(lbuf[0]))
 	    return 0;
 	ptr = lbuf;
 	while (*ptr == ' ' || *ptr == '\t') ptr++;
@@ -622,11 +634,6 @@ int fsplit(char * dir_name, char * file_name, FILE * out)
  *    maybe some other characters?
  */
 
-#define isbegincomment(c) ((c)=='!' || (c)=='*' || (c)=='c' || (c)=='C')
-#define issquote(c) ((c)=='\'')
-#define isdquote(c) ((c)=='\"')
-#define ishH(c) ((c)=='h' || (c)=='H')
-#define char2int(c) ((int)((c)-'0'))
 
 /* global state
  */
@@ -754,7 +761,7 @@ static void hollerith_and_bangcomments(char * line)
 	}
 	
 
-	/* bang comment */
+	/* bang comment in the middle of a line. */
 	if (!in_squotes && !in_dquotes && line[i]=='!')
 	{
 	    strcpy(bangcomment,&line[i]);
