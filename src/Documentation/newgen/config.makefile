@@ -11,7 +11,7 @@ ETEXF =	ri.tex \
 	reductions_private.tex \
 	interval_graph.tex \
 	pipsdbm_private.tex \
-	eole.tex
+	eole_private.tex
 
 FTEXF =	complexity_ri.ftex \
 	database.ftex \
