@@ -1,32 +1,98 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1995/09/15 19:13:27 $, )
+# ($Date: 1996/07/10 21:17:33 $, )
 # 
 # what to do at night...
 #
 # source environment if needed.
 
 [ "$PIPS_DIR" ] || . /projects/Pips/pipsrc.sh
-NAME=`whoami`
+
+user=`whoami`
+email=${REPLYTO:-$user}
+script=`basename $0`
+verbose=:
+
+verb()
+{
+    echo "$script" "$@"
+}
+
+usage()
+{
+    ret=$1
+    shift
+    cat <<-EOF
+	$script (version $Revision$) - "$@"
+	  -v : verbose
+	  -a email : report to this address
+EOF
+    exit $ret
+}
+
+while getopts va: OPT
+do
+    case $OPT in
+	a) email=$OPTARG ;;
+	v) verbose=verb ;;
+	*) usage 2 "invalid option" ;;
+    esac
+done
+
+REPORT=/tmp/${script}.${user}.$$
+rm -f ${REPORT}
 
 {
-  #
-  # Delete old workspaces...
+    $verbose starting $script for $email 
+    $verbose date: `date`
 
-  $PIPS_UTILDIR/search-pips -w -m 14 -D
+    $verbose deleting old workspaces...
+    find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +7 -print | 
+	xargs ${PIPS_UTILDIR}/Delete
 
-  #
-  # Remove core files older than one month:
+    $verbose removing core files older than one week
+    find ${PIPS_HOME}/Pips -name core -mtime +7 -print | 
+	xargs rm -f
 
-  $PIPS_UTILDIR/search-pips -c -m 7 -e "rm {} ;" 
+    $verbose recompiling NEWGEN - Production
 
-  #
-  # Compile Production
+    {   cd ${NEWGEN_SRCDIR} ;
+	${PIPS_MAKE} FWD_MSG='Newgen:P[.]' FWD_REPORT=${REPORT} clean ; 
+        ${PIPS_MAKE} FWD_MSG='Newgen:P[SUN4]' FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' clean ;
+	${PIPS_MAKE} FWD_MSG='Newgen:P[.]' FWD_REPORT=${REPORT} recompile ;
+        ${PIPS_MAKE} FWD_MSG='Newgen:P[SUN4]' FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' recompile ;
+    } 2>&1 | mail -s "$script: newgen recompile night report" $email
 
-  $PIPS_UTILDIR/make-pips -p 2>&1 | mail -s "make-pips night report" $NAME
-  
-  # Validate Pips
-  Validate -vt
 
-} > /dev/null 2>&1 
+    $verbose recompiling LINEAR - Production
+    {   cd ${LINEAR_SRCDIR} ; 
+	${PIPS_MAKE} FWD_MSG='Linear:P[.]' FWD_REPORT=${REPORT} clean ; 
+        ${PIPS_MAKE} FWD_MSG='Linear:P[SUN4]' FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' clean ;
+	${PIPS_MAKE} FWD_MSG='Linear:P[.]' FWD_REPORT=${REPORT} recompile ;
+        ${PIPS_MAKE} FWD_MSG='Linear:P[SUN4]' FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' recompile ;
+    } 2>&1 | mail -s "$script: linear recompile night report" $email
+
+
+    $verbose recompiling PIPS - Production
+    # Runtime/{hpfc,wp65} will be also recompiled!
+    {   cd ${PIPS_SRCDIR} ;
+        DIRS="Lib Passes Scripts Runtime ${PIPS_ORDERED_LIBS}"
+	${PIPS_MAKE} FWD_MSG='Pips:P[.]' FWD_REPORT=${REPORT} clean ; 
+        ${PIPS_MAKE} FWD_MSG='Pips:P[SUN4]' FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' clean ;
+	${PIPS_MAKE} FWD_MSG='Pips:P[.]' PWD_DIRS="$DIRS" FWD_REPORT=${REPORT} recompile ;
+        ${PIPS_MAKE} FWD_MSG='Pips:P[SUN4]' PWD_DIRS="$DIRS" FWD_REPORT=${REPORT} PIPS_ARCH='SUN4' recompile ;
+    } 2>&1 | mail -s "$script: pips recompile night report" $email
+
+
+    # summary
+    mail -s "$script: recompile night report summary" $email < ${REPORT}
+    rm -f ${REPORT}
+
+    # Validate Pips
+    $verbose Validating PIPS
+    Validate -vti 50 -a ${email}
+
+    $verbose date: `date`
+    $verbose end of  $script for $email 
+} 2>&1 | mail -s "$script: night report" ${email}
