@@ -4,8 +4,8 @@
 #
 # $Id$
 # $Log: hpfc_install,v $
-# Revision 1.34  1997/05/07 09:54:31  coelho
-# *** empty log message ***
+# Revision 1.35  1997/10/27 13:55:24  coelho
+# new version with Src
 #
 # Revision 1.33  1997/03/20 09:48:43  coelho
 # *_both.f files also copied.
@@ -91,7 +91,9 @@ name=`echo ${name:-\`basename $basedir .database\`} | tr 'A-Z' 'a-z'`
 [ "$tdir" ] ||
 {
   tdir=$basedir/hpfc
-  [ ! -d "$tdir" ] && mkdir $tdir
+  $verb "cleaning $tdir"
+  rm -rf $tdir
+  mkdir $tdir
 }
 
 #
@@ -101,29 +103,12 @@ if [ "$toinstall" ]
 then
   $verb "installing in $tdir"
 
-  $verb "cleaning $tdir"
-  rm -f $tdir/*
-  
-  # if there is no common...
-  touch $basedir/_host.h $basedir/_node.h $basedir/_both.f
-
-  $verb "copying files in $tdir"
-
   {
     echo "NAME = $name" 
     cat $srcdir/hpfc_Makefile_init 
   } > $tdir/Makefile
 
-  cp $basedir/*_host.f \
-     $basedir/*_host.h \
-     $basedir/*_node.f \
-     $basedir/*_node.h \
-     $basedir/*_both.f \
-     $basedir/*_parameters.h \
-     $basedir/*_init.h \
-     $tdir
-
-  rm -f $tdir/_host.h $tdir/_node.h $tdir/_both.f
+  cp $basedir/Src/* $tdir
 
   [ "$unsplit" ] && set $basedir/[a-z]*.f 
   [ "$reffiles" ] && set `echo "$reffiles" | cut -d " " -f 2`
