@@ -1,13 +1,13 @@
 #
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/07/10 18:50:24 $, 
+# $Date: 1996/07/10 18:52:31 $, 
 
 # DIRS may be overwritten to specify some directories or a specific order
 DIRS=$(wildcard *)
 
 # forward any command to the specified directories
 %::
-	for d in $(DIRS) ; do test -d $$d && $(MAKE) -C $$d $@ ; done
+	-for d in $(DIRS) ; do test -d $$d && $(MAKE) -C $$d $@ ; done
 
 # end of $RCSfile: forward_gnu_makefile,v $
 #
