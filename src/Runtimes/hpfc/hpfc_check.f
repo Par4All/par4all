@@ -1,31 +1,31 @@
-c
-c Checks run-time library version
-c
-c $RCSfile: hpfc_check.f,v $ version $Revision$
-c ($Date: 1995/12/01 11:49:57 $, )
-c
-      subroutine hpfc_check()
+!
+! Checks run-time library version
+!
+! $RCSfile: hpfc_check.f,v $ version $Revision$
+! ($Date: 1996/09/07 17:05:46 $, )
+!
+      subroutine hpfc check
       include 'real_parameters.h'
       include 'hpfc_commons.h'
-      if  (REALNBOFARRAYS.GT.MAXNBOFARRAYS.OR.
-     $     REALNBOFTEMPLATES.GT.MAXNBOFTEMPLATES.OR.
-     $     REALNBOFPROCESSORS.GT.MAXNBOFPROCESSORS.OR.
-     $     REALMAXSIZEOFPROCS.GT.MAXMAXSIZEOFPROCS.OR.
-     $     REALMAXSIZEOFBUFFER.GT.MAXMAXSIZEOFBUFFER) then
+      if  (REAL NB OF ARRAYS.GT.MAX NB OF ARRAYS.OR.
+     $     REAL NB OF TEMPLATES.GT.MAX NB OF TEMPLATES.OR.
+     $     REAL NB OF PROCESSORS.GT.MAX NB OF PROCESSORS.OR.
+     $     REAL MAX SIZE OF PROCS.GT.MAX MAX SIZE OF PROCS.OR.
+     $     REAL MAX SIZE OF BUFFER.GT.MAX MAX SIZE OF BUFFER) then
          write (unit=0, fmt=*) 
      $        'HPFC run-time library',
      $        '  must be recompiled with larger parameters'
          stop
       endif
-c
-c initialize common hpfc_dynamic
-c
-      NBOFARRAYS = REALNBOFARRAYS
-      NBOFTEMPLATES = REALNBOFTEMPLATES
-      NBOFPROCESSORS = REALNBOFPROCESSORS
-      MAXSIZEOFPROCS = REALMAXSIZEOFPROCS
-      SIZEOFBUFFER = REALMAXSIZEOFBUFFER
+!
+! initialize common hpfc_dynamic
+!
+      NB OF ARRAYS = REAL NB OF ARRAYS
+      NB OF TEMPLATES = REAL NB OF TEMPLATES
+      NB OF PROCESSORS = REAL NB OF PROCESSORS
+      MAX SIZE OF PROCS = REAL MAX SIZE OF PROCS
+      SIZE OF BUFFER = REAL MAX SIZE OF BUFFER
       end
-c
-c that s all
-c
+!
+! that s all
+!
