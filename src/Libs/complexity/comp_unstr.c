@@ -207,9 +207,11 @@ list effects_list;
 
     MAPL(pc, {
 	control c = CONTROL(CAR(pc));
-	if ( hash_get(hash_control_to_complexity, c)==HASH_UNDEFINED_VALUE )
+	if ( hash_get(hash_control_to_complexity, (char *) c)
+	    ==HASH_UNDEFINED_VALUE )
 	    controls_to_hash_table(c, pn_controls, control_array,
-				   hash_control_to_complexity, precond, effects_list);
+				   hash_control_to_complexity, precond,
+				   effects_list);
     }, control_successors(cont));
 }
 
