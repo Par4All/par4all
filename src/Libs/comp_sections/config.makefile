@@ -2,13 +2,6 @@
 # The following macros define your library.
 #
 # Name of the library without the .a suffix.
-TARGET= 	comp_sections
-#
-
-# Name of the main program to test or use the library
-MAIN=		main
-#
-
 #		/usr/lib/debug/malloc.o 
 
 # Source, header and object files used to build the library.
