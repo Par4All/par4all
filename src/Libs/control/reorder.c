@@ -102,7 +102,7 @@ statement body;
 {
     /* If a module_body_reorder() is required, ordering_to_statement
        must be recomputed */
-    pips_assert("module_body_reorder", ordering_to_statement_initialized_p());
+    pips_assert("module_body_reorder", !ordering_to_statement_initialized_p());
 
     debug_on("CONTROL_DEBUG_LEVEL");
 
