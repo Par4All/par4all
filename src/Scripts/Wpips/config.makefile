@@ -1,14 +1,12 @@
 #
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1997/04/30 14:22:26 $, 
+# $Id$
 #
 
-SCRIPTS	=	Wchangedir generate_all_menu_documentation
+SCRIPTS	=	Wchangedir
 
 SOURCES =	$(SCRIPTS)
 
 INSTALL_SHR =	Wchangedir
-INSTALL_UTL =   generate_all_menu_documentation
 
-# end of $RCSfile: config.makefile,v $
+# end of it.
 #
