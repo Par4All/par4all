@@ -24,8 +24,20 @@ extern char * sys_errlist[];
 #include "genC.h"
 #include "misc.h"
 
-FILE * 
-safe_fopen(char *filename, char *what)
+/* @return a file descriptor. 
+ */
+FILE * check_fopen(char * file, char * mode)
+{
+    FILE * fd = fopen(file, mode);
+    if (fd==(FILE*)NULL)
+    {
+	pips_user_error("fopen failed on file \"%s\" (mode \"%s\")\n%s\n",
+			file, mode, sys_errlist[errno]);
+    }
+    return fd;
+}
+
+FILE * safe_fopen(char *filename, char *what)
 {
     FILE * f;
     if((f = fopen( filename, what)) == (FILE *) NULL) {
