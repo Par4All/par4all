@@ -2,6 +2,10 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.7  2003/04/11 14:47:13  ferrand
+%% Remove dependences from SIMDizer on the execution of Loop Distribution
+%% and Atomizer.
+%%
 %% Revision 1.6  2003/04/08 13:22:20  keryell
 %% Added simdizer for François Ferrand.
 %%
@@ -489,7 +493,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/04/08 13:22:20 $~$
+$~$Date: 2003/04/11 14:47:13 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2905,8 +2909,6 @@ multimedia instruction set such as MMX, SSE2, VIS,...
 
 \begin{verbatim}
 simdizer                    > MODULE.code
-        ! MODULE.loop_distribution
-        ! MODULE.new_atomizer
         < PROGRAM.entities 
         < MODULE.code MODULE.dg MODULE.preconditions
 \end{verbatim}
