@@ -25,7 +25,7 @@ Variable var;
     else if (MONOME_NUL_P(pm)) 
 	return (MONOME_NUL);
     else {
-	Pmonome newpm = (Pmonome) malloc(sizeof(Smonome));
+	Pmonome newpm = new_monome();
 
 	monome_coeff(newpm) = monome_coeff(pm);
 	monome_term(newpm)  = vect_del_var(monome_term(pm), var);
@@ -96,6 +96,8 @@ int i;
     default: polynome_error("Bernouilli(i)", "i=%d illegal\n", i);
 	/* later, we could compute bigger Bernouilli(i) with the recurrence */
     }
+    /* To please the gcc compiler */
+    return 0.;
 }
 
 
@@ -106,12 +108,16 @@ int i;
 int factorielle(n)
 int n;
 {
+    int fact = -1;
+
     if (n<0) 
 	polynome_error("factorielle", "n=%d", n);
     else if (n<2) 
-	return(1);
+	fact = 1;
     else 
-	return(factorielle(n-1) * n);
+	fact = factorielle(n-1) * n;
+
+    return fact;
 }
 
 
@@ -141,19 +147,26 @@ int n;
  */
 boolean is_inferior_monome(pm1, pm2, is_inferior_var)
 Pmonome pm1, pm2;
-boolean (*is_inferior_var)();
+boolean (*is_inferior_var)(Pvecteur *, Pvecteur *);
 {
     if (MONOME_UNDEFINED_P(pm1) || MONOME_UNDEFINED_P(pm2)
 	||    MONOME_NUL_P(pm1) || MONOME_NUL_P(pm2))
 	return (FALSE);
     else {
+	/* Initial version:
+	   Pvecteur pv1 = vect_tri(monome_term(pm1), is_inferior_var);
+	   Pvecteur pv2 = vect_tri(monome_term(pm2), is_inferior_var);
+	   */
+	/* Fabien's version:
 	Pvecteur pv1 = vect_sort(monome_term(pm1), vect_compare);
 	Pvecteur pv2 = vect_sort(monome_term(pm2), vect_compare);
-	/* Pvecteur pv1 = vect_tri(monome_term(pm1), is_inferior_var);
-	   Pvecteur pv2 = vect_tri(monome_term(pm2), is_inferior_var);*/
+	*/
+	Pvecteur pv1 = vect_sort(monome_term(pm1), is_inferior_var);
+	Pvecteur pv2 = vect_sort(monome_term(pm2), is_inferior_var);
 	Pbase pb = base_union((Pbase) pv1, (Pbase) pv2);
 	/* Pbase pbsorted = (Pbase) vect_tri(pb, is_inferior_var); */
-	Pbase pbsorted = (Pbase) vect_sort(pb, vect_compare);
+	/* Pbase pbsorted = (Pbase) vect_sort(pb, vect_compare); */
+	Pbase pbsorted = (Pbase) vect_sort(pb, is_inferior_var);
 	boolean result = FALSE;
 
 	/* The following test is added by L.Zhou .    
@@ -180,7 +193,7 @@ boolean (*is_inferior_var)();
 		}
 		else if ( power2 < power1 ) 
 		    break;
-		vect_erase_var((Pvecteur) &pbsorted, var);
+		vect_erase_var((Pvecteur *) &pbsorted, var);
 	    }
 	}
 
