@@ -137,8 +137,8 @@ effects stmt_to_fx(statement stmt, statement_effects fx_map)
     pips_assert("stmt_prec", stmt != statement_undefined);
 
     debug(9, "stmt_to_fx", 
-	  "Look for effects for statement at %d (ordering %d, number %d):\n", 
-	  (int) stmt, statement_ordering(stmt), statement_number(stmt));
+	  "Look for effects for statement at %#p (ordering %d, number %d):\n", 
+	  stmt, statement_ordering(stmt), statement_number(stmt));
 
     fx = apply_statement_effects(fx_map, stmt);
     ifdebug(5) 
@@ -187,8 +187,8 @@ Psysteme stmt_prec(statement stmt)
     pips_assert("stmt_prec", stmt != statement_undefined);
 
     debug(9, "stmt_prec", 
-	  "Look for preconditions for statement at %d (ordering %d, number %d):\n", 
-	  (int) stmt, statement_ordering(stmt), statement_number(stmt));
+	  "Look for preconditions for statement at %#p (ordering %d, number %d):\n", 
+	  stmt, statement_ordering(stmt), statement_number(stmt));
 
     t = load_statement_precondition(stmt);
 
@@ -210,8 +210,8 @@ void transformer_map_print(void)
     hash_table_print_header (htp,f);
 
     HASH_MAP(k, v, {
-	fprintf(f, "\nFor statement at %d (ordering %d, number %d):\n", 
-		(int) k,
+	fprintf(f, "\nFor statement at %#p (ordering %d, number %d):\n", 
+		k,
 		statement_ordering((statement) k), 
 		statement_number((statement) k));
 	print_transformer((transformer) v);
