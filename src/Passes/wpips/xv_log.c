@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <varargs.h>
+#include <errno.h>
 
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -264,6 +265,7 @@ va_list args;
 		(Textsw_index) xv_get(log_textsw, TEXTSW_INSERTION_POINT));
     show_message(log_buffer);
     XFlush((Display *) xv_get(main_frame, XV_DISPLAY));
+    XFlush((Display *) xv_get(log_frame, XV_DISPLAY));
     xv_set(clear, MENU_INACTIVE, FALSE, 0);
 }
 
