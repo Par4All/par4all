@@ -208,12 +208,18 @@ cons *ldvr, *ldvl;
 
 	if (IsIntegerScalar(e)) {
 	    pips_assert("AnalyzeData", i == 1);
-	    pips_assert("AnalyzeData", constant_int_p(dataval_constant(dvl)));
-	    entity_initial(e) = make_value(is_value_constant, 
-					   dataval_constant(dvl));
+	    /* pips_assert("AnalyzeData", constant_int_p(dataval_constant(dvl))); */
+	    if(constant_int_p(dataval_constant(dvl))) {
+	      entity_initial(e) = make_value(is_value_constant, 
+					     dataval_constant(dvl));
 
-	    debug(1, "", "[AnalyzeData] %s %d\n", 
-		  entity_name(e), constant_int(dataval_constant(dvl)));
+	      debug(1, "", "[AnalyzeData] %s %d\n", 
+		    entity_name(e), constant_int(dataval_constant(dvl)));
+	    }
+	    else {
+	      Warning("AnalyzeData", 
+		      "Integer scalar variable initialized with non-integer constant");
+	    }
 	}
 
 	while (i > 0 && pcl != NIL) {
@@ -247,7 +253,7 @@ cons *ldvr, *ldvl;
 
     if (pcr != NIL && 
 	(datavar_nbelements(DATAVAR(CAR(pcr))) != 0 || CDR(pcr) != NIL)) {
-	FatalError("AnalyzeData", "too few initializers\n");
+	ParserError("AnalyzeData", "too few initializers\n");
     }
 }
 
