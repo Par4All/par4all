@@ -1,10 +1,12 @@
-
 #
 # $Id$
 #
 # Basic menus for jpips.
 #
 # $Log: jpips_menus.basic,v $
+# Revision 1.6  1998/11/20 18:15:57  coelho
+# menus reordered.
+#
 # Revision 1.5  1998/11/17 22:15:37  ancourt
 # updates.
 #
@@ -21,401 +23,6 @@
 # Initial revision
 #
 #
-
-
-TOP_MENU
-Options
-Options for program  analyses and transformations
-
-GROUP
-PARSER Options
-set fortran parser options
-
-LABEL_WITH_CHOICE
-Statement Functions
-getproperty PARSER_EXPAND_STATEMENT_FUNCTIONS
-..
-what to do with statement functions
-
-	Error
-	setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS FALSE
-	FALSE
-
-	Expand
-	setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
-	TRUE
-
-CLOSE
-
-LABEL_WITH_CHOICE
-Missing Files
-getproperty PREPROCESSOR_MISSING_FILE_HANDLING
-..
-what to do if a source is missing
-
-	Error
-	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "error"
-	error
-
-	Generate
-	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
-	generate
-
-	Query
-	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "query"
-	query
-
-CLOSE
-
-LABEL_WITH_CHOICE
-Alternate Returns
-getproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS
-..
-what to do with alternate returns
-
-	Error
-	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
-	NO
-
-	Stop
-	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
-	STOP
-
-	Substitute
-	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "RC"
-	RC
-
-CLOSE
-
-LABEL_WITH_CHOICE
-Assigned Gotos
-getproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO
-..
-what to do with assigned gotos
-
-	Error
-	setproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO FALSE
-	FALSE
-
-	Substitute
-	setproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO TRUE
-	TRUE
-
-CLOSE
-
-LABEL_WITH_CHOICE
-Entries substitution
-getproperty PARSER_SUBSTITUTE_ENTRIES
-..
-Handle Entries ?
-
-	Yes
-	setproperty PARSER_SUBSTITUTE_ENTRIES TRUE
-	TRUE
-
-	No
-	setproperty PARSER_SUBSTITUTE_ENTRIES FALSE
-	FALSE
-
-CLOSE
-
-##end of parser options
-CLOSE
-
-##
-## Prettyprint
-##
-
-GROUP
-PRETTYPRINT Options
-Code display
-
-LABEL_WITH_CHOICE
-Statement Numbers
-getproperty PRETTYPRINT_STATEMENT_NUMBER
-..
-whether to print statement numbers
-
-	Yes
-	setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
-	TRUE
-
-	No
-	setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-	FALSE
-
-CLOSE
-
-LABEL_WITH_CHOICE
-Declarations
-getproperty PRETTYPRINT_ALL_DECLARATIONS
-..
-whether to regenerate declarations
-
-	Reuse Initial
-	setproperty PRETTYPRINT_ALL_DECLARATIONS FALSE
-	FALSE
-
-	Regenerate
-	setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
-	TRUE
-
-CLOSE
-
-## end of prettyprint options
-CLOSE
-
-##semantics stuff
-##
-
-GROUP
-SEMANTIC Options
-Semantical analyses
-
-LABEL_WITH_CHOICE
-Fix Point
-getproperty SEMANTICS_FIX_POINT_OPERATOR
-..
-select the fix point version
-
-	Basic
-	setproperty SEMANTICS_FIX_POINT_OPERATOR "transfer"
-	transfer
-
-	Medium
-	setproperty SEMANTICS_FIX_POINT_OPERATOR "pattern"
-	pattern
-
-	Better?
-	setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
-	derivative
-
-CLOSE
-
-LABEL_WITH_CHOICE
-Transformers
-check activate TRANSFORMERS
-..
-select transformers computation algorithm
-
-	Quick Intra-Procedural
-	activate TRANSFORMERS_INTRA_FAST
-	TRANSFORMERS_INTRA_FAST
-
-	Full Intra-Procedural
-	activate TRANSFORMERS_INTRA_FULL
-	TRANSFORMERS_INTRA_FULL
-
-	Quick Inter-Procedural
-	activate TRANSFORMERS_INTER_FAST
-	TRANSFORMERS_INTER_FAST
-
-	Full Inter-Procedural
-	activate TRANSFORMERS_INTER_FULL
-	TRANSFORMERS_INTER_FULL
-
-CLOSE
-
-LABEL_WITH_CHOICE
-Preconditions
-check activate PRECONDITIONS
-..
-select preconditions computation algorithm
-
-	Intra-Procedural
-	activate PRECONDITIONS_INTRA
-	PRECONDITIONS_INTRA
-
-	Quick Inter-Procedural
-	activate PRECONDITIONS_INTER_FAST
-	PRECONDITIONS_INTER_FAST
-
-	Full Inter-Procedural
-	activate PRECONDITIONS_INTER_FULL
-	PRECONDITIONS_INTER_FULL
-
-CLOSE
-
-## temporary place
-
-LABEL_WITH_CHOICE
-Regions with Array Bounds
-getproperty REGIONS_WITH_ARRAY_BOUNDS
-..
-whether to include array bounds when computing regions
-
-	Ignored
-	setproperty REGIONS_WITH_ARRAY_BOUNDS FALSE
-	FALSE
-
-	Included
-	setproperty REGIONS_WITH_ARRAY_BOUNDS TRUE
-	TRUE
-
-CLOSE
-
-LABEL_WITH_CHOICE
-Regions Computation
-check activate REGIONS
-..
-precision of the region computations
-
-	Approximate
-	activate MAY_REGIONS
-	MAY_REGIONS
-
-	Try Exact
-	activate MUST_REGIONS
-	MUST_REGIONS
-
-CLOSE
-
-##end of semantics options
-CLOSE
-
-
-GROUP
-PARALLELIZATION Options
-Management of parallelization
-
-LABEL_WITH_CHOICE
-Use-Def Chains
-check activate CHAINS
-..
-select use-def chains generation
-
-	Standard
-	activate ATOMIC_CHAINS
-	ATOMIC_CHAINS
-
-	Regions
-	activate REGION_CHAINS
-	REGION_CHAINS
-
-	In-Out Regions
-	activate IN_OUT_REGIONS_CHAINS
-	IN_OUT_REGIONS_CHAINS
-
-CLOSE
-
-LABEL_WITH_CHOICE
-Dependence Test
-check activate DG
-..
-select dependence test accuracy
-
-	Simple
-	activate RICE_FAST_DEPENDENCE_GRAPH
-	RICE_FAST_DEPENDENCE_GRAPH
-
-	with Loop Bounds
-	activate RICE_FULL_DEPENDENCE_GRAPH
-	RICE_FULL_DEPENDENCE_GRAPH
-
-	with Preconditions
-	activate RICE_SEMANTICS_DEPENDENCE_GRAPH
-	RICE_SEMANTICS_DEPENDENCE_GRAPH
-
-	with Regions
-	activate RICE_REGIONS_DEPENDENCE_GRAPH
-	RICE_REGIONS_DEPENDENCE_GRAPH
-CLOSE
-
-LABEL_WITH_CHOICE
-Parallelization
-check activate PARALLELIZED_CODE
-..
-select parallelization algorithm
-	
-	using All Dependences
-	activate RICE_ALL_DEPENDENCE
-	RICE_ALL_DEPENDENCE
-
-	using True Dependences Only
-	activate RICE_DATA_DEPENDENCE
-	RICE_DATA_DEPENDENCE
-
-	Perfectly  Nested Loops
-	activate NEST_PARALLELIZATION
-	NEST_PARALLELIZATION
-
-	Coarse Grain
-	activate COARSE_GRAIN_PARALLELIZATION
-	COARSE_GRAIN_PARALLELIZATION
-
-CLOSE
-
-
-## end of parallelization options
-CLOSE
-
-GROUP
-RUNNING Options
-set running options
-
-LABEL_WITH_CHOICE
-Checkpoints
-getproperty PIPSMAKE_CHECKPOINTS
-..
-Pipsmake backup frequency
-
-	0
-	setproperty PIPSMAKE_CHECKPOINTS 0
-	0
-
-	50
-	setproperty PIPSMAKE_CHECKPOINTS 50
-	50
-
-	500
-	setproperty PIPSMAKE_CHECKPOINTS 500
-	500
-
-	2000
-	setproperty PIPSMAKE_CHECKPOINTS 2000
-	2000
-
-CLOSE
-
-
-LABEL_WITH_CHOICE
-Deleted PIPSDBM Resources
-getproperty PIPSDBM_RESOURCES_TO_DELETE
-..
-Which Pipsdbm resources to delete
-
-	Old
-	setproperty PIPSDBM_RESOURCES_TO_DELETE "obsolete"
-	"obsolete"
-
-	All
-	setproperty PIPSDBM_RESOURCES_TO_DELETE "all"
-	"all"
-
-CLOSE
-
-
-LABEL_WITH_CHOICE
-Abort on User Error 
-getproperty ABORT_ON_USER_ERROR
-..
-Stop on user error
-
-	No
-	setproperty ABORT_ON_USER_ERROR FALSE
-	FALSE
-
-	Yes
-	setproperty ABORT_ON_USER_ERROR TRUE
-	TRUE
-
-CLOSE
-
-#end of running options
-CLOSE
-
-## end of top-menu Options
-CLOSE
 
 TOP_MENU
 Views & Transformations
@@ -950,6 +557,400 @@ CLOSE
 ## end Top-menu transformations
 CLOSE
 
+
+TOP_MENU
+Options
+Options for program  analyses and transformations
+
+GROUP
+PARSER Options
+set fortran parser options
+
+LABEL_WITH_CHOICE
+Statement Functions
+getproperty PARSER_EXPAND_STATEMENT_FUNCTIONS
+..
+what to do with statement functions
+
+	Error
+	setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS FALSE
+	FALSE
+
+	Expand
+	setproperty PARSER_EXPAND_STATEMENT_FUNCTIONS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Missing Files
+getproperty PREPROCESSOR_MISSING_FILE_HANDLING
+..
+what to do if a source is missing
+
+	Error
+	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "error"
+	error
+
+	Generate
+	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+	generate
+
+	Query
+	setproperty PREPROCESSOR_MISSING_FILE_HANDLING "query"
+	query
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Alternate Returns
+getproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS
+..
+what to do with alternate returns
+
+	Error
+	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
+	NO
+
+	Stop
+	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
+	STOP
+
+	Substitute
+	setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "RC"
+	RC
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Assigned Gotos
+getproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO
+..
+what to do with assigned gotos
+
+	Error
+	setproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO FALSE
+	FALSE
+
+	Substitute
+	setproperty PARSER_SUBSTITUTE_ASSIGNED_GOTO TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Entries substitution
+getproperty PARSER_SUBSTITUTE_ENTRIES
+..
+Handle Entries ?
+
+	Yes
+	setproperty PARSER_SUBSTITUTE_ENTRIES TRUE
+	TRUE
+
+	No
+	setproperty PARSER_SUBSTITUTE_ENTRIES FALSE
+	FALSE
+
+CLOSE
+
+##end of parser options
+CLOSE
+
+##
+## Prettyprint
+##
+
+GROUP
+PRETTYPRINT Options
+Code display
+
+LABEL_WITH_CHOICE
+Statement Numbers
+getproperty PRETTYPRINT_STATEMENT_NUMBER
+..
+whether to print statement numbers
+
+	Yes
+	setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+	TRUE
+
+	No
+	setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+	FALSE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Declarations
+getproperty PRETTYPRINT_ALL_DECLARATIONS
+..
+whether to regenerate declarations
+
+	Reuse Initial
+	setproperty PRETTYPRINT_ALL_DECLARATIONS FALSE
+	FALSE
+
+	Regenerate
+	setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+	TRUE
+
+CLOSE
+
+## end of prettyprint options
+CLOSE
+
+##semantics stuff
+##
+
+GROUP
+SEMANTIC Options
+Semantical analyses
+
+LABEL_WITH_CHOICE
+Fix Point
+getproperty SEMANTICS_FIX_POINT_OPERATOR
+..
+select the fix point version
+
+	Basic
+	setproperty SEMANTICS_FIX_POINT_OPERATOR "transfer"
+	transfer
+
+	Medium
+	setproperty SEMANTICS_FIX_POINT_OPERATOR "pattern"
+	pattern
+
+	Better?
+	setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+	derivative
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Transformers
+check activate TRANSFORMERS
+..
+select transformers computation algorithm
+
+	Quick Intra-Procedural
+	activate TRANSFORMERS_INTRA_FAST
+	TRANSFORMERS_INTRA_FAST
+
+	Full Intra-Procedural
+	activate TRANSFORMERS_INTRA_FULL
+	TRANSFORMERS_INTRA_FULL
+
+	Quick Inter-Procedural
+	activate TRANSFORMERS_INTER_FAST
+	TRANSFORMERS_INTER_FAST
+
+	Full Inter-Procedural
+	activate TRANSFORMERS_INTER_FULL
+	TRANSFORMERS_INTER_FULL
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Preconditions
+check activate PRECONDITIONS
+..
+select preconditions computation algorithm
+
+	Intra-Procedural
+	activate PRECONDITIONS_INTRA
+	PRECONDITIONS_INTRA
+
+	Quick Inter-Procedural
+	activate PRECONDITIONS_INTER_FAST
+	PRECONDITIONS_INTER_FAST
+
+	Full Inter-Procedural
+	activate PRECONDITIONS_INTER_FULL
+	PRECONDITIONS_INTER_FULL
+
+CLOSE
+
+## temporary place
+
+LABEL_WITH_CHOICE
+Regions with Array Bounds
+getproperty REGIONS_WITH_ARRAY_BOUNDS
+..
+whether to include array bounds when computing regions
+
+	Ignored
+	setproperty REGIONS_WITH_ARRAY_BOUNDS FALSE
+	FALSE
+
+	Included
+	setproperty REGIONS_WITH_ARRAY_BOUNDS TRUE
+	TRUE
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Regions Computation
+check activate REGIONS
+..
+precision of the region computations
+
+	Approximate
+	activate MAY_REGIONS
+	MAY_REGIONS
+
+	Try Exact
+	activate MUST_REGIONS
+	MUST_REGIONS
+
+CLOSE
+
+##end of semantics options
+CLOSE
+
+
+GROUP
+PARALLELIZATION Options
+Management of parallelization
+
+LABEL_WITH_CHOICE
+Use-Def Chains
+check activate CHAINS
+..
+select use-def chains generation
+
+	Standard
+	activate ATOMIC_CHAINS
+	ATOMIC_CHAINS
+
+	Regions
+	activate REGION_CHAINS
+	REGION_CHAINS
+
+	In-Out Regions
+	activate IN_OUT_REGIONS_CHAINS
+	IN_OUT_REGIONS_CHAINS
+
+CLOSE
+
+LABEL_WITH_CHOICE
+Dependence Test
+check activate DG
+..
+select dependence test accuracy
+
+	Simple
+	activate RICE_FAST_DEPENDENCE_GRAPH
+	RICE_FAST_DEPENDENCE_GRAPH
+
+	with Loop Bounds
+	activate RICE_FULL_DEPENDENCE_GRAPH
+	RICE_FULL_DEPENDENCE_GRAPH
+
+	with Preconditions
+	activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+	RICE_SEMANTICS_DEPENDENCE_GRAPH
+
+	with Regions
+	activate RICE_REGIONS_DEPENDENCE_GRAPH
+	RICE_REGIONS_DEPENDENCE_GRAPH
+CLOSE
+
+LABEL_WITH_CHOICE
+Parallelization
+check activate PARALLELIZED_CODE
+..
+select parallelization algorithm
+	
+	using All Dependences
+	activate RICE_ALL_DEPENDENCE
+	RICE_ALL_DEPENDENCE
+
+	using True Dependences Only
+	activate RICE_DATA_DEPENDENCE
+	RICE_DATA_DEPENDENCE
+
+	Perfectly  Nested Loops
+	activate NEST_PARALLELIZATION
+	NEST_PARALLELIZATION
+
+	Coarse Grain
+	activate COARSE_GRAIN_PARALLELIZATION
+	COARSE_GRAIN_PARALLELIZATION
+
+CLOSE
+
+
+## end of parallelization options
+CLOSE
+
+GROUP
+RUNNING Options
+set running options
+
+LABEL_WITH_CHOICE
+Checkpoints
+getproperty PIPSMAKE_CHECKPOINTS
+..
+Pipsmake backup frequency
+
+	0
+	setproperty PIPSMAKE_CHECKPOINTS 0
+	0
+
+	50
+	setproperty PIPSMAKE_CHECKPOINTS 50
+	50
+
+	500
+	setproperty PIPSMAKE_CHECKPOINTS 500
+	500
+
+	2000
+	setproperty PIPSMAKE_CHECKPOINTS 2000
+	2000
+
+CLOSE
+
+
+LABEL_WITH_CHOICE
+Deleted PIPSDBM Resources
+getproperty PIPSDBM_RESOURCES_TO_DELETE
+..
+Which Pipsdbm resources to delete
+
+	Old
+	setproperty PIPSDBM_RESOURCES_TO_DELETE "obsolete"
+	"obsolete"
+
+	All
+	setproperty PIPSDBM_RESOURCES_TO_DELETE "all"
+	"all"
+
+CLOSE
+
+
+LABEL_WITH_CHOICE
+Abort on User Error 
+getproperty ABORT_ON_USER_ERROR
+..
+Stop on user error
+
+	No
+	setproperty ABORT_ON_USER_ERROR FALSE
+	FALSE
+
+	Yes
+	setproperty ABORT_ON_USER_ERROR TRUE
+	TRUE
+
+CLOSE
+
+#end of running options
+CLOSE
+
+## end of top-menu Options
+CLOSE
 
 
 
