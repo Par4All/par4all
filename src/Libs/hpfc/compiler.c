@@ -1,6 +1,6 @@
 /* Fabien Coelho, May 1993
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/04/21 10:28:15 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/04/21 14:50:05 $, )
  * version $Revision$
  *
  * Compiler
@@ -99,8 +99,8 @@ statement *hoststatp,*nodestatp;
 		  s_nodetrue,
 		  s_nodefalse);
 
-    IFDBPRINT(9,"hpf_compiletest",host_module,(*hoststatp));
-    IFDBPRINT(9,"hpf_compiletest",node_module,(*nodestatp));
+    DEBUG_STAT(9, entity_name(host_module), *hoststatp);
+    DEBUG_STAT(9, entity_name(node_module), *nodestatp);
 }
 
 static void hpf_compile_call(stat, hoststatp, nodestatp)
@@ -137,8 +137,8 @@ statement *hoststatp,*nodestatp;
 	instruction_call(statement_instruction((*nodestatp)))=
 	    make_call(call_function(c), len);
 
-	IFDBPRINT(8,"hpf_compile_call", host_module, (*hoststatp));
-	IFDBPRINT(8,"hpf_compile_call", node_module, (*nodestatp));
+	DEBUG_STAT(8, entity_name(host_module), *hoststatp);
+	DEBUG_STAT(8, entity_name(node_module), *nodestatp);
 
 	return;
     }
@@ -195,9 +195,9 @@ statement *hoststatp,*nodestatp;
 	instruction_block(statement_instruction(*hoststatp)) = lh;
 	instruction_block(statement_instruction(*nodestatp)) = ln;
 	
-	IFDBPRINT(8,"hpf_compilecall", host_module, (*hoststatp));
-	IFDBPRINT(8,"hpf_compilecall", node_module, (*nodestatp));
-	
+	DEBUG_STAT(8, entity_name(host_module), *hoststatp);
+	DEBUG_STAT(8, entity_name(node_module), *nodestatp);
+
 	return;
     }
 
@@ -261,16 +261,9 @@ statement *hoststatp,*nodestatp;
 	     
 	     hpf_compiler(statc, &stath, &statn);
 	     
-	     ifdebug(7)
-	     {
-		 fprintf(stderr, "[hpf_compile_unstructured] statements:\n");
-		 fprintf(stderr, "statc = \n");
-		 print_statement(statc);
-		 fprintf(stderr, "host stat = \n");
-		 print_statement(stath);
-		 fprintf(stderr, "node stat = \n");
-		 print_statement(statn);
-	     }
+	     DEBUG_STAT(7, "statc", statc);
+	     DEBUG_STAT(7, "host stat", stath);
+	     DEBUG_STAT(7, "node stat", statn);
 	     
 	     hostc = make_control(stath, NIL, NIL);
 	     SET_CONTROL_MAPPING(hostmap, c, hostc);
@@ -339,11 +332,7 @@ statement *hoststatp,*nodestatp;
 	instruction_unstructured(statement_instruction(*hoststatp)) =
 	    make_unstructured(new_ct, new_ce);
 
-	ifdebug(7)
-	{
-	    fprintf(stderr, "[hpf_compile_unstructured] host new stat:\n");
-	    print_statement(*hoststatp);
-	}
+	DEBUG_STAT(7, "host new stat", *hoststatp);
 
 	/*    NODE statement
 	 */
@@ -357,11 +346,7 @@ statement *hoststatp,*nodestatp;
 	instruction_unstructured(statement_instruction(*nodestatp)) =
 	    make_unstructured(new_ct, new_ce);
 
-	ifdebug(7)
-	{
-	    fprintf(stderr, "[hpf_compileunstructured] host new stat:\n");
-	    print_statement(*hoststatp);
-	}
+	DEBUG_STAT(7, "host new stat (again)", *hoststatp);
 	
 	gen_free_list(blocks);
 	FREE_CONTROL_MAPPING(hostmap);
@@ -389,7 +374,7 @@ statement stat, *hoststatp, *nodestatp;
 	upper=range_upper(r),
 	increment=range_increment(r);
     
-    hpf_compiler(body,&hostbody,&nodebody);
+    hpf_compiler(body, &hostbody, &nodebody);
     
     if (hpfc_empty_statement_p(hostbody))
     {
@@ -412,12 +397,8 @@ statement stat, *hoststatp, *nodestatp;
 		    lNewVariableForModule(host_module,locals));
     }
 
-    ifdebug(8)
-    {
-	fprintf(stderr, "[hpf_compile_sequential_loop] host stat:\n");
-	print_statement(*hoststatp);
-    }
-    
+    DEBUG_STAT(8, "host stat", *hoststatp);
+
     (*nodestatp)=MakeStatementLike(stat, is_instruction_loop);
 
     instruction_loop(statement_instruction(*nodestatp))=
@@ -430,11 +411,7 @@ statement stat, *hoststatp, *nodestatp;
 		  make_execution(is_execution_sequential,UU),
 		  lNewVariableForModule(node_module,locals));
 
-    ifdebug(8)
-    {
-	fprintf(stderr, "[hpf_compile_sequential_loop] node stat:\n");
-	print_statement(*nodestatp);
-    }
+    DEBUG_STAT(8, "node stat", *nodestatp);
 }
 
 static void hpf_compile_parallel_body(body, hoststatp, nodestatp)
