@@ -8,7 +8,8 @@
 
 #include "ri-util.h"
 
-entity make_empty_program(name)
+entity 
+make_empty_program(name)
 string name;
 {
     string full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
@@ -16,7 +17,8 @@ string name;
     return make_empty_module(full_name);
 }
 
-entity make_empty_subroutine(name)
+entity 
+make_empty_subroutine(name)
 string name;
 {
     string full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
@@ -24,7 +26,8 @@ string name;
     return make_empty_module(full_name);
 }
 
-entity make_empty_module(full_name)
+entity 
+make_empty_module(full_name)
 string full_name;
 {
     string name = string_undefined;
@@ -69,7 +72,8 @@ string full_name;
 /* this function checks that e has an initial value code. if yes returns
 it, otherwise aborts.  */
 
-code EntityCode(e) 
+code 
+EntityCode(e) 
 entity e; 
 {
     value ve = entity_initial(e);
@@ -79,7 +83,8 @@ entity e;
 
  
 /* This function returns a new label */
-entity make_new_label(module_name)
+entity 
+make_new_label(module_name)
 char * module_name;
 {
     /* FI: do labels have to be declared?*/
@@ -100,7 +105,8 @@ char * module_name;
 
 }
 
-entity make_loop_label(desired_number, module_name)
+entity 
+make_loop_label(desired_number, module_name)
 int desired_number;
 char *module_name;
 {
@@ -117,7 +123,8 @@ char *module_name;
  * special care of constants there. So I added something here, to deal
  * with the "null" entity which codes the constant. FC 28/11/94.
  */
-string entity_local_name(e)
+string 
+entity_local_name(e)
 entity e;
 {
     static string 
@@ -131,14 +138,16 @@ entity e;
 	   local_name(entity_name(e)));
 }
 
-string module_local_name(e)
+string 
+module_local_name(e)
 entity e;
 {
     string name = local_name(entity_name(e));
     return name+strspn(name, MAIN_PREFIX);
 }
 
-string label_local_name(e)
+string 
+label_local_name(e)
 entity e;
 {
     string name = local_name(entity_name(e));
@@ -147,7 +156,8 @@ entity e;
 
 /* See next function! */
 /*
-string entity_relative_name(e)
+string 
+entity_relative_name(e)
 entity e;
 {
     extern entity get_current_module_entity();
@@ -163,7 +173,8 @@ entity e;
 }
 */
 
-string entity_minimal_name(e)
+string 
+entity_minimal_name(e)
 entity e;
 {
     entity 
@@ -173,25 +184,29 @@ entity e;
 	entity_local_name(e) : entity_name(e) ;
 }
 
-bool entity_empty_label_p(e)
+bool 
+entity_empty_label_p(e)
 entity e;
 {
     return(empty_label_p(entity_name(e)));
 }
 
-bool entity_return_label_p(e)
+bool 
+entity_return_label_p(e)
 entity e;
 {
     return(return_label_p(entity_name(e)));
 }
 
-bool entity_label_p(e)
+bool 
+entity_label_p(e)
 entity e;
 {
     return type_statement_p(entity_type(e));
 }
 
-bool entity_module_p(e)
+bool 
+entity_module_p(e)
 entity e;
 {
     value v = entity_initial(e);
@@ -199,13 +214,15 @@ entity e;
     return(v != value_undefined && value_code_p(v));
 }
 
-bool entity_main_module_p(e)
+bool 
+entity_main_module_p(e)
 entity e;
 {
     return entity_module_p(e) && strspn(entity_local_name(e), MAIN_PREFIX) == 1;
 }
 
-bool entity_function_p(e)
+bool 
+entity_function_p(e)
 entity e;
 {
     type
@@ -219,7 +236,8 @@ entity e;
 	   !type_void_p(t));
 }
 
-bool entity_subroutine_p(e)
+bool 
+entity_subroutine_p(e)
 entity e;
 {
     return(entity_module_p(e) && 
@@ -227,7 +245,8 @@ entity e;
 	   !entity_function_p(e));
 }
 
-bool local_entity_of_module_p(e, module)
+bool 
+local_entity_of_module_p(e, module)
 entity e, module;
 {
     bool
@@ -241,7 +260,8 @@ entity e, module;
 	  return(result);
 }
 
-bool entity_in_common_p(e)
+bool 
+entity_in_common_p(e)
 entity e;
 {
     storage s = entity_storage(e);
@@ -250,13 +270,15 @@ entity e;
 	   !SPECIAL_COMMON_P(ram_section(storage_ram(s))));
 }
 
-string entity_module_name(e)
+string 
+entity_module_name(e)
 entity e;
 {
     return(module_name(entity_name(e)));
 }
 
-code entity_code(e)
+code 
+entity_code(e)
 entity e;
 {
     value ve = entity_initial(e);
@@ -264,7 +286,8 @@ entity e;
     return(value_code(ve));
 }
 
-entity entity_empty_label()
+entity 
+entity_empty_label()
 {
     /* FI: it is difficult to memoize entity_empty_label because its value is changed
      * when the symbol table is written and re-read from disk; Remi's memoizing
@@ -283,7 +306,8 @@ entity entity_empty_label()
     return empty;
 }
 
-bool top_level_entity_p(e)
+bool 
+top_level_entity_p(e)
 entity e;
 {
     /* This code is wrong because it only checks that entity_module_name(e)
@@ -318,7 +342,8 @@ entity e;
     return top;
 }
 
-bool io_entity_p(e)
+bool 
+io_entity_p(e)
 entity e;
 {
     return(strncmp(IO_EFFECTS_PACKAGE_NAME, 
@@ -326,7 +351,22 @@ entity e;
 		   strlen(entity_module_name(e))) == 0);
 }
 
-entity entity_intrinsic(name)
+bool 
+intrinsic_entity_p(e)
+entity e;
+{
+    value v = entity_initial(e);
+    bool intrinsic_p = value_intrinsic_p(v);
+
+    return intrinsic_p;
+}
+
+/* FI: I do not understand this function name. It seems to mee
+ * that any common or user function or user subroutine would
+ * be return.
+ */
+entity 
+entity_intrinsic(name)
 string name;
 {
     entity e = gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
@@ -341,7 +381,8 @@ string name;
 
 /* predicates on entities */
 
-bool same_entity_p(e1, e2)
+bool 
+same_entity_p(e1, e2)
 entity e1, e2;
 {
     return(e1 == e2);
@@ -349,7 +390,8 @@ entity e1, e2;
 
 /*  Comparison function for qsort.
  */
-int compare_entities(pe1, pe2)
+int 
+compare_entities(pe1, pe2)
 entity *pe1, *pe2;
 {
     int
@@ -364,7 +406,8 @@ entity *pe1, *pe2;
 
 /*   TRUE if var1 <= var2
  */
-bool lexicographic_order_p(var1, var2)
+bool 
+lexicographic_order_p(var1, var2)
 entity var1, var2;
 {
     /*   TCST is before anything else
@@ -380,7 +423,8 @@ entity var1, var2;
 
 /* return the basic associated to entity e if it's a function/variable/constant
  * basic_undefined otherwise */
-basic entity_basic(e)
+basic 
+entity_basic(e)
 entity e;
 {
     if (e != entity_undefined) {
@@ -395,7 +439,8 @@ entity e;
 }
 
 /* return TRUE if the basic associated with entity e matchs the passed tag */
-bool entity_basic_p(e, basictag)
+bool 
+entity_basic_p(e, basictag)
 entity e;
 int basictag;
 {
@@ -409,7 +454,8 @@ TOP-LEVEL entity, whose name is TOP-LEVEL:P
 n is the local name
 */
 
-entity local_name_to_top_level_entity(n)
+entity 
+local_name_to_top_level_entity(n)
 string n;
 {
     entity module =
@@ -431,7 +477,8 @@ string n;
     return module;
 }
 
-entity global_name_to_entity(m, n)
+entity 
+global_name_to_entity(m, n)
 string m;
 string n;
 {
@@ -483,7 +530,8 @@ string n;
  *    benchmarks; variables DIMS conflicts with intrinsics DIMS;
  *    (Francois Irigoin, ?? ???? 1991)
  */
-entity FindOrCreateEntity(package, name)
+entity 
+FindOrCreateEntity(package, name)
 string package; /* le nom du package */
 string name; /* le nom de l'entite */
 {
@@ -530,23 +578,27 @@ string name;
 }
 */
 
-constant MakeConstantLitteral()
+constant 
+MakeConstantLitteral()
 {
     return(make_constant(is_constant_litteral, NIL));
 }
 
-storage MakeStorageRom()
+storage 
+MakeStorageRom()
 {
     return((make_storage(is_storage_rom, UU)));
 }
 
-value MakeValueUnknown()
+value 
+MakeValueUnknown()
 {
     return(make_value(is_value_unknown, NIL));
 }
 
 /* returns a range expression containing e's i-th bounds */
-expression entity_ith_bounds(e, i)
+expression 
+entity_ith_bounds(e, i)
 entity e;
 int i;
 {
