@@ -104,9 +104,12 @@ typedef int Value;
  */
 #endif 
 
-#define VALUE_NAN value_uminus(VALUE_ZERO)
+#define VALUE_NAN VALUE_MIN
 
-/* boolean (or more) operators on values
+#define int_to_value(i) ((Value)i)
+#define long_to_value(l) ((Value)l)
+
+/* boolean operators on values
  */
 #define value_eq(v1,v2) ((v1)==(v2))
 #define value_ne(v1,v2) ((v1)!=(v2))
@@ -114,7 +117,11 @@ typedef int Value;
 #define value_ge(v1,v2) ((v1)>=(v2))
 #define value_lt(v1,v2) ((v1)<(v2))
 #define value_le(v1,v2) ((v1)<=(v2))
+
+/* trian operators on values
+ */
 #define value_sign(v) (value_eq(v,VALUE_ZERO)?0:value_lt(v,VALUE_ZERO)?-1:1)
+#define value_compare(v1,v2) (value_eq(v1,v2)?0:value_lt(v1,v2)?-1:1)
 
 /* binary operators on values
  */
@@ -134,24 +141,14 @@ typedef int Value;
 #define value_add(ref,val) ref+=(val)
 #define value_prod(ref,val) ref*=(val)
 #define value_sub(ref,val) ref-=(val)
-#define value_divide(ref,val) ref/=(val)
-#define value_pdivide(ref,val) value_assign(ref,value_pdiv(ref,val))
+#define value_division(ref,val) ref/=(val)
+#define value_pdivision(ref,val) value_assign(ref,value_pdiv(ref,val))
 #define value_inv(ref) ref=value_uminus(ref)
 
 /* unary operators on values
  */
 #define value_uminus(val)  (-(val))
 #define value_abs(val)     (value_ge(val,VALUE_ZERO)? (val): value_uminus(val))
-
-#define VALUE_POS_P(val)      value_gt(val,VALUE_ZERO)
-#define VALUE_NEG_P(val)      value_lt(val,VALUE_ZERO)
-#define VALUE_POSZ_P(val)     value_ge(val,VALUE_ZERO)
-#define VALUE_NEGZ_P(val)     value_le(val,VALUE_ZERO)
-#define VALUE_ZERO_P(val)     value_eq(val,VALUE_ZERO)
-#define VALUE_NOTZERO_P(val)  value_ne(val,VALUE_ZERO)
-#define VALUE_ONE_P(val)      value_eq(val,VALUE_ONE)
-#define VALUE_NOTONE_P(val)   value_ne(val,VALUE_ONE)
-#define VALUE_MONE_P(val)     value_eq(val,VALUE_MONE)
 
 #define value_pos_p(val)      value_gt(val,VALUE_ZERO)
 #define value_neg_p(val)      value_lt(val,VALUE_ZERO)
@@ -169,18 +166,21 @@ typedef int Value;
  */
 #if defined(LINEAR_VALUE_IS_CHARS)
 #define value_fake_binary(v1,v2) ((char*)((int)(v1)^(int)(v2)))
+#define value_bool_binary(v1,v2) (((int)(v1)^(int)(v2)))
 #undef value_uminus
 #define value_uminus(v) (v)
 #undef value_mult
 #define value_mult(v1,v2) value_fake_binary(v1,v2)
+#undef value_mod
+#define value_mod(v1,v2) value_fake_binary(v1,v2)
 #undef value_ge
-#define value_ge(v1,v2) value_fake_binary(v1,v2)
+#define value_ge(v1,v2) value_bool_binary(v1,v2)
 #undef value_gt
-#define value_gt(v1,v2) value_fake_binary(v1,v2)
+#define value_gt(v1,v2) value_bool_binary(v1,v2)
 #undef value_le
-#define value_le(v1,v2) value_fake_binary(v1,v2)
+#define value_le(v1,v2) value_bool_binary(v1,v2)
 #undef value_lt
-#define value_lt(v1,v2) value_fake_binary(v1,v2)
+#define value_lt(v1,v2) value_bool_binary(v1,v2)
 #undef value_plus
 #define value_plus(v1,v2) value_fake_binary(v1,v2)
 #undef value_minus
@@ -197,6 +197,10 @@ typedef int Value;
 #define value_sub(v1,v2) value_add(v1,v2)
 #undef value_prod
 #define value_prod(v1,v2) value_add(v1,v2)
+#undef value_division
+#define value_division(v1,v2) value_add(v1,v2)
+#undef value_negz_p
+#define value_negz_p(v) ((int)v)
 #endif
 
 /* valeur absolue
