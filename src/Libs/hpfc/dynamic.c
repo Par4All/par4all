@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1995/12/19 15:52:33 $, )
+ * ($Date: 1996/02/16 12:02:18 $, )
  */
 
 #include "defines-local.h"
@@ -26,10 +26,12 @@
  * - primary_entity: primary entity of an entity, when synonyms are 
  *   introduced to handle remappings.
  * - renamings: remappings associated to a statement.
+ * - maybeuseful_mappings: to be kept for a statement. 
  */
 GENERIC_GLOBAL_FUNCTION(dynamic_hpf, entity_entities)
 GENERIC_GLOBAL_FUNCTION(primary_entity, entitymap)
 GENERIC_GLOBAL_FUNCTION(renamings, statement_renamings)
+GENERIC_GLOBAL_FUNCTION(maybeuseful_mappings, statement_entities)
 
 entity safe_load_primary_entity(entity e)
 {
@@ -48,6 +50,7 @@ void init_dynamic_status()
     init_dynamic_hpf();
     init_primary_entity();
     init_renamings();
+    init_maybeuseful_mappings();
 }
 
 void reset_dynamic_status()
@@ -55,21 +58,23 @@ void reset_dynamic_status()
     reset_dynamic_hpf();
     reset_primary_entity();
     reset_renamings();
+    reset_maybeuseful_mappings();
 }
 
 dynamic_status get_dynamic_status()
 {
     return make_dynamic_status(get_dynamic_hpf(), 
 			       get_primary_entity(), 
-			       get_renamings());
+			       get_renamings(),
+			       get_maybeuseful_mappings());
 }
 
-void set_dynamic_status(d)
-dynamic_status d;
+void set_dynamic_status(dynamic_status d)
 {
     set_dynamic_hpf(dynamic_status_dynamics(d));
     set_primary_entity(dynamic_status_primary(d));
     set_renamings(dynamic_status_renamings(d));
+    set_maybeuseful_mappings(dynamic_status_tokeep(d));
 }
 
 void close_dynamic_status()
@@ -77,14 +82,14 @@ void close_dynamic_status()
     close_dynamic_hpf();
     close_primary_entity();
     close_renamings();
+    close_maybeuseful_mappings();
 }
 
 /*  a new dynamic entity is stored.
  *  HPF allows arrays and templates as dynamic.
  *  ??? could be asserted, but not here. should be checked afterward.
  */
-void set_entity_as_dynamic(e)
-entity e;
+void set_entity_as_dynamic(entity e)
 {
     if (!bound_dynamic_hpf_p(e))
     {
@@ -101,8 +106,9 @@ bool (*dynamic_entity_p)(entity) = bound_dynamic_hpf_p;
 
 /* what: new_e is stored as a synonym of e.
  */
-static void add_dynamic_synonym(new_e, e)
-entity new_e, e;
+static void add_dynamic_synonym(
+    entity new_e, 
+    entity e)
 {
     entities es = load_dynamic_hpf(e);
 
@@ -122,8 +128,7 @@ entity new_e, e;
  *  an underscore and a number added. May be used for templates and arrays.
  *  the new synonym is added as a synonym of e.
  */
-static entity new_synonym(e)
-entity e;
+static entity new_synonym(entity e)
 {
     int n = gen_length(entities_list(load_dynamic_hpf(e))); /* syn. number */
     entity primary = load_primary_entity(e), new_e;
@@ -144,9 +149,9 @@ entity e;
 /*  builds a new synonym for array a, the alignment of which 
  *  will be al. The new array is set as distributed.
  */
-static entity new_synonym_array(a, al)
-entity a;
-align al;
+static entity new_synonym_array(
+    entity a,
+    align al)
 {
     entity new_a = new_synonym(a);
     set_array_as_distributed(new_a);
@@ -157,9 +162,9 @@ align al;
 /*  builds a new synonym for template t, the distribution of which
  *  will be di. the new entity is set as a template.
  */
-static entity new_synonym_template(t, di)
-entity t;
-distribute di;
+static entity new_synonym_template(
+    entity t,
+    distribute di)
 {
     entity new_t = new_synonym(t);
     set_template(new_t);
@@ -169,8 +174,9 @@ distribute di;
 
 /*  comparison of DISTRIBUTE.
  */
-static bool same_distribute_p(d1, d2)
-distribute d1, d2;
+static bool same_distribute_p(
+    distribute d1, 
+    distribute d2)
 {
     list /* of distributions */ l1 = distribute_distribution(d1),
                                 l2 = distribute_distribution(d2);
@@ -199,9 +205,9 @@ distribute d1, d2;
 
 /*  comparison of ALIGN.
  */
-static bool same_alignment_in_list_p(a, l)
-alignment a;
-list /* of alignments */ l;
+static bool same_alignment_in_list_p(
+    alignment a,
+    list /* of alignments */ l)
 {
     int adim = alignment_arraydim(a),
         tdim = alignment_templatedim(a);
@@ -219,8 +225,9 @@ list /* of alignments */ l;
     return FALSE;
 }
 
-static bool same_align_p(a1, a2)
-align a1, a2;
+static bool same_align_p(
+    align a1,
+    align a2)
 {
     list /* of alignments */ l1 = align_alignment(a1),
                              l2 = align_alignment(a2);
@@ -247,9 +254,9 @@ align a1, a2;
  *  - the align is freed if not used.
  * bugs or features:
  */
-entity array_synonym_aligned_as(array, a)
-entity array;
-align a;
+entity array_synonym_aligned_as(
+    entity array,
+    align a)
 {
     MAP(ENTITY, ar,
     {
@@ -266,9 +273,9 @@ align a;
     return new_synonym_array(array, a);
 }
 
-align new_align_with_template(a, t)
-align a;
-entity t;
+align new_align_with_template(
+    align a,
+    entity t)
 {
     align b = copy_align(a);
     align_template(b) = t;
@@ -287,9 +294,9 @@ entity t;
  *  - this entity is stored as a synonym of array, and tagged as dynamic.
  *  - the distribute is freed if not used.
  */
-entity template_synonym_distributed_as(temp, d)
-entity temp;
-distribute d;
+entity template_synonym_distributed_as(
+    entity temp,
+    distribute d)
 {
     MAP(ENTITY, t,
     {
@@ -316,6 +323,8 @@ distribute d;
  *   for both arrays and templates. 
  * - used_dynamics: from a remapping statement, the remapped arrays that 
  *   are actually referenced in their new shape.
+ * - modified_dynamics: from a remapping statement, the remapped arrays 
+ *   that may be modified in their new shape.
  * - remapping_graph: the remapping graph, based on the control domain.
  *   the control_statement is the remapping statement in the code.
  *   predecessors and successors are the possible remapping statements 
@@ -327,6 +336,7 @@ distribute d;
  */
 GENERIC_LOCAL_FUNCTION(alive_synonym, statement_entities)
 GENERIC_LOCAL_FUNCTION(used_dynamics, statement_entities)
+GENERIC_LOCAL_FUNCTION(modified_dynamics, statement_entities)
 GENERIC_LOCAL_FUNCTION(remapping_graph, controlmap)
 GENERIC_LOCAL_FUNCTION(reaching_mappings, statement_entities)
 GENERIC_LOCAL_FUNCTION(leaving_mappings, statement_entities)
@@ -336,6 +346,7 @@ void init_dynamic_locals()
 {
     init_alive_synonym();
     init_used_dynamics();
+    init_modified_dynamics();
     init_reaching_mappings();
     init_leaving_mappings();
     init_remapped();
@@ -346,6 +357,7 @@ void close_dynamic_locals()
 {
     close_alive_synonym();
     close_used_dynamics();
+    close_modified_dynamics();
     close_reaching_mappings();
     close_leaving_mappings();
     close_remapped();
@@ -383,28 +395,30 @@ void close_dynamic_locals()
  */
 
 static entity 
-    old_variable = entity_undefined, /* entity to be replaced */
+    old_variable = entity_undefined, /* entity to be replaced, the primary? */
     new_variable = entity_undefined; /* replacement */
 static bool 
     array_propagation, /* TRUE if an array is propagated, FALSE if template */
-    array_used;        /* TRUE if the array was actually used */
+    array_used,        /* TRUE if the array was actually used */
+    array_modified;    /* TRUE if the array may be modified... */
 static statement 
     initial_statement = statement_undefined; /* starting point */
 
 /*  initialize both the remapping graph and the used dynamics for s
  */
-static void lazy_initialize_for_statement(s)
-statement s;
+static void lazy_initialize_for_statement(statement s)
 {
     if (!bound_remapping_graph_p(s))
 	store_remapping_graph(s, make_control(s, NIL, NIL));
 
     if (!bound_used_dynamics_p(s))
 	store_used_dynamics(s, make_entities(NIL));
+
+    if (!bound_modified_dynamics_p(s))
+	store_modified_dynamics(s, make_entities(NIL));
 }
 
-static void add_as_a_closing_statement(s)
-statement s;
+static void add_as_a_closing_statement(statement s)
 {
     control 
 	c = load_remapping_graph(initial_statement),
@@ -412,22 +426,28 @@ statement s;
 
     what_stat_debug(6, s);
 
-    control_successors(c) = gen_once(load_remapping_graph(s),
-				     control_successors(c));
-    control_predecessors(n) = gen_once(load_remapping_graph(initial_statement), 
-				       control_predecessors(n));
+    control_successors(c) = 
+	gen_once(load_remapping_graph(s), control_successors(c));
+    control_predecessors(n) = 
+	gen_once(load_remapping_graph(initial_statement),
+		 control_predecessors(n));
 }
 
-static void add_as_a_used_variable(e)
-entity e;
+static void add_as_a_used_variable(entity e)
 {
     entities es = load_used_dynamics(initial_statement);
     entities_list(es) = gen_once(load_primary_entity(e), entities_list(es));
 }
 
-static void add_alive_synonym(s, a)
-statement s;
-entity a;
+static void add_as_a_modified_variable(entity e)
+{
+    entities es = load_modified_dynamics(initial_statement);
+    entities_list(es) = gen_once(load_primary_entity(e), entities_list(es));
+}
+
+static void add_alive_synonym(
+    statement s,
+    entity a)
 {
     entities es;
 
@@ -440,8 +460,7 @@ entity a;
     entities_list(es) = gen_once(a, entities_list(es));
 }
 
-static void ref_rwt(r)
-reference r;
+static void ref_rwt(reference r)
 {
     if (reference_variable(r)==old_variable)
 	reference_variable(r) = new_variable,
@@ -451,12 +470,31 @@ reference r;
 static void 
 simple_switch_old_to_new(statement s)
 {
+    /* looks for direct references in s and switch them
+     */
     gen_multi_recurse
 	(statement_instruction(s),
 	 statement_domain,    gen_false, gen_null, /* STATEMENT */
 	 unstructured_domain, gen_false, gen_null, /* UNSTRUCTURED ? */
 	 reference_domain,    gen_true,  ref_rwt,  /* REFERENCE */
 	 NULL);
+
+    /* whether the array may be written...
+     * (caution, was just switched to the new_variable!)
+     */
+    if (!array_modified && !statement_proper_effects_undefined_p(s))
+    {
+	MAP(EFFECT, e,
+	    {
+		if (reference_variable(effect_reference(e))==new_variable &&
+		    action_write_p(effect_action(e)))
+		{
+		    array_modified = TRUE;
+		    return;
+		}
+	    },
+	    load_statement_proper_effects(s));
+    }
 }
 
 /*  TRUE if not a remapping for old. 
@@ -468,6 +506,7 @@ continue_propagation_p(statement s)
     instruction i = statement_instruction(s);
 
     what_stat_debug(8, s);
+    DEBUG_STAT(9, "current", s);
 
     if (!instruction_call_p(i)) 
     {
@@ -503,9 +542,11 @@ continue_propagation_p(statement s)
 	}
 	else if (redistribute_directive_p(fun))
 	{
-	    entity t = array_propagation ?
-		align_template(load_hpf_alignment(new_variable)):old_variable;
+	    entity t = safe_load_primary_entity(array_propagation ?
+		align_template(load_hpf_alignment(new_variable)):old_variable);
 		
+	    DEBUG_STAT(8, "redistribute directive", s);
+
 	    MAP(EXPRESSION, e,
 	    {
 		entity v = expression_to_entity(e);
@@ -518,15 +559,9 @@ continue_propagation_p(statement s)
 		if (safe_load_primary_entity(v)==t)
 		{
 		    if (array_propagation)
-			/*  then the new_variable is the alive one.
-			 */
 			add_alive_synonym(s, new_variable);
-		    else
-			reference_variable
-			    (syntax_reference(expression_syntax(e))) = 
-				new_variable;
-		    
 		    add_as_a_closing_statement(s);
+
 		    return FALSE;
 		}
 	    },
@@ -547,10 +582,12 @@ propagate_synonym(
 
     what_stat_debug(3, s);
     pips_debug(3, "%s -> %s\n", entity_name(old), entity_name(new));
+    DEBUG_STAT(7, "before propagation", get_current_module_statement());
 
     old_variable = safe_load_primary_entity(old), new_variable = new, 
     array_propagation = array_distributed_p(old),
-    array_used = FALSE,
+    array_used = FALSE;
+    array_modified = FALSE;
     initial_statement = s;
 
     lazy_initialize_for_statement(s);
@@ -560,10 +597,15 @@ propagate_synonym(
     while (next_ctrl_graph_travel(&current))
 	simple_switch_old_to_new(current);
 
-    if (array_used) add_as_a_used_variable(old);
-
-    old_variable = entity_undefined, new_variable = entity_undefined;
     close_ctrl_graph_travel();
+
+    if (array_used) add_as_a_used_variable(old);
+    if (array_modified) add_as_a_modified_variable(old);
+
+    old_variable = entity_undefined, 
+    new_variable = entity_undefined;
+
+    DEBUG_STAT(7, "after propagation", get_current_module_statement());
 
     pips_debug(4, "out\n");
 }
@@ -589,9 +631,9 @@ statement s;
 	old = renaming_old(r);
 	new = renaming_new(r);
 	
-	le = CONS(ENTITY, old, le);
+	le = gen_once(old, le);
 	lp = gen_once(load_primary_entity(old), lp);
-	ll = CONS(ENTITY, new, ll);
+	ll = gen_once(new, ll);
     },	 
 	load_renamings(s));
 
@@ -600,8 +642,7 @@ statement s;
     store_leaving_mappings(s, make_entities(ll));
 }
 
-static void remove_not_remapped_leavings(s)
-statement s;
+static void remove_not_remapped_leavings(statement s)
 {
     entities leaving  = load_leaving_mappings(s);
     list /* of entities */ 
@@ -628,8 +669,13 @@ statement s;
     gen_free_list(ll), entities_list(leaving) = ln;
 }
 
-static void reinitialize_reaching_mappings(s)
-statement s;
+/* must be called after useless leaving mappings removal */
+static void initialize_maybeuseful_mappings(statement s)
+{
+    store_maybeuseful_mappings(s, copy_entities(load_leaving_mappings(s)));    
+}
+
+static void reinitialize_reaching_mappings(statement s)
 {
     entities er = load_reaching_mappings(s);
     list /* of entity */ newr = NIL, /* new reachings */
@@ -651,22 +697,28 @@ statement s;
     entities_list(er) = newr;
 }
 
-static list /* of statements */ propagate_used_arrays(s, ls)
-statement s;
-list /* of statements */ ls;
+/* more options, such as may or must? */
+static list /* of statement */
+propagation_on_remapping_graph(
+    statement s,
+    list /* of statement */ ls,
+    entities (*built)(statement),
+    entities (*condition)(statement),
+    bool local, /* local or remote condition */
+    bool forward) /* backward or forward */
 {
-    bool touched = FALSE;
-    entities er = load_reaching_mappings(s);
+    bool modified = FALSE;
+    entities built_set = built(s);
     list /* of entity */
 	lrem = entities_list(load_remapped(s)),
-	lrea = entities_list(er);
+	lbuilt = entities_list(built_set);
     control current = load_remapping_graph(s);
 
     MAP(CONTROL, c,
     {
 	statement sc = control_statement(c);
 	list /* of entity */ lp_rem = entities_list(load_remapped(sc));
-	list /* idem      */ lp_use = entities_list(load_used_dynamics(sc));
+	list /* idem      */ lp_cond = entities_list(condition(local?s:sc));
 
 	MAP(ENTITY, e,
 	{
@@ -674,34 +726,53 @@ list /* of statements */ ls;
 
 	    if (gen_in_list_p(prim, lrem) && 
 		gen_in_list_p(prim, lp_rem) &&
-		!gen_in_list_p(prim, lp_use) &&
-		!gen_in_list_p(e, lrea))
+		!gen_in_list_p(prim, lp_cond) &&
+		!gen_in_list_p(e, lbuilt))
 	    {
-		lrea = CONS(ENTITY, e, lrea);
-		touched = TRUE;
+		what_stat_debug(5, s);
+		pips_debug(5, "adding %s from\n", entity_local_name(e));
+		what_stat_debug(5, sc);
+
+		lbuilt = CONS(ENTITY, e, lbuilt);
+		modified = TRUE;
 	    }
 	},
-	    entities_list(load_reaching_mappings(sc)));
+	    entities_list(built(sc)));
     },
-	control_predecessors(current));
+	forward ? control_predecessors(current):control_successors(current));
 
-    /* if Reachings(current) was modified, the successors of current
-     * may have to be recomputed at the next stage. quite rough.
-     */
-    if (touched)
+    /* if the built set was modified, must propagate at next step... */
+    if (modified)
     {
-	entities_list(er) = lrea;
-	MAP(CONTROL, c, 
-	    ls = gen_once(control_statement(c), ls), 
-	    control_successors(current));
+	entities_list(built_set) = lbuilt;
+	MAP(CONTROL, c, ls = gen_once(control_statement(c), ls), 
+	  forward?control_successors(current):control_predecessors(current));
     }
 
     return ls;
 }
 
-static void remove_from_entities(primary, es)
-entity primary;
-entities es;
+static list /* of statements */
+propagate_used_arrays(
+    statement s,
+    list /* of statements */ ls)
+{
+    return propagation_on_remapping_graph
+      (s, ls, load_reaching_mappings, load_used_dynamics, FALSE, TRUE);
+}
+
+static list /* of statements */
+propagate_maybeuseful_mappings(
+    statement s,
+    list /* of statement */ ls)
+{
+    return propagation_on_remapping_graph
+      (s, ls, load_maybeuseful_mappings, load_modified_dynamics, TRUE, FALSE);
+}
+
+static void remove_from_entities(
+    entity primary,
+    entities es)
 {
     list /* of entity(s) */ le = gen_copy_seq(entities_list(es));
 
@@ -715,8 +786,7 @@ entities es;
     gen_free_list(le);
 }
 
-static void remove_unused_remappings(s)
-statement s;
+static void remove_unused_remappings(statement s)
 {
     entities remapped = load_remapped(s),
              reaching = load_reaching_mappings(s),
@@ -741,8 +811,7 @@ statement s;
 /* regenerate the renaming structures after the optimizations performed on 
  * the remapping graph. 
  */
-static void regenerate_renamings(s)
-statement s;
+static void regenerate_renamings(statement s)
 {
     list /* of entity(s) */
 	lr = entities_list(load_reaching_mappings(s)),
@@ -790,15 +859,13 @@ list_of_remapping_statements()
 
 /* functions used for debug.
  */
-static void print_control_ordering(c)
-control c;
+static void print_control_ordering(control c)
 {
     register int so = statement_ordering(control_statement(c));
     fprintf(stderr, "(%d,%d), ", ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
 }
 
-static void dump_remapping_graph_info(s)
-statement s;
+static void dump_remapping_graph_info(statement s)
 {
     control c = load_remapping_graph(s);
 
@@ -812,8 +879,10 @@ statement s;
 
     DEBUG_ELST(1, "remapped", entities_list(load_remapped(s)));
     DEBUG_ELST(1, "used", entities_list(load_used_dynamics(s)));
+    DEBUG_ELST(1, "modified", entities_list(load_modified_dynamics(s)));
     DEBUG_ELST(1, "reaching", entities_list(load_reaching_mappings(s)));
     DEBUG_ELST(1, "leaving", entities_list(load_leaving_mappings(s)));
+    DEBUG_ELST(1, "maybeuseful", entities_list(load_maybeuseful_mappings(s)));
 }
 
 /* void simplify_remapping_graph()
@@ -845,12 +914,17 @@ void simplify_remapping_graph()
     what_stat_debug(4, root);
 
     gen_map(initialize_reaching_propagation, ls);
+    gen_map(remove_not_remapped_leavings, ls);
+    gen_map(initialize_maybeuseful_mappings, ls);
+    gen_map(reinitialize_reaching_mappings, ls);
 
     ifdebug(4) gen_map(dump_remapping_graph_info, ls);
 
-    gen_map(remove_not_remapped_leavings, ls);
-    gen_map(reinitialize_reaching_mappings, ls);
+    pips_debug(4, "used array propagation\n");
     gen_closure(propagate_used_arrays, ls);
+
+    pips_debug(4, "may be useful mapping propagation\n");
+    gen_closure(propagate_maybeuseful_mappings, ls);
 
     ifdebug(4) gen_map(dump_remapping_graph_info, ls);
 
@@ -865,11 +939,7 @@ void simplify_remapping_graph()
     gen_free_list(ls);
 }
 
-/* list alive_arrays(s, t);
- * statement s;
- * entity t;
- * 
- * what: returns the list of alive arrays for statement s and template t.
+/* what: returns the list of alive arrays for statement s and template t.
  * how: uses the alive_synonym, and computes the defaults.
  * input: statement s and template t which are of interest.
  * output: a list of entities which is allocated.
@@ -882,19 +952,21 @@ alive_arrays(
 {
     list /* of entities */ l = NIL, lseens = NIL; /* to tag seen primaries. */
 
-    pips_assert("template", entity_template_p(t));
-
-    /*   first the alive list is scanned.
-     */
+    pips_assert("template", entity_template_p(t) && primary_entity_p(t));
+    pips_debug(7, "for template %s\n", entity_name(t));
 
     /* ??? well, it is not necessarily initialized, I guess...
      */
     if (!bound_alive_synonym_p(s))
 	store_alive_synonym(s, make_entities(NIL));
 
+    /*   first the alive list is scanned.
+     */
     MAP(ENTITY, array,
     {
-	if (align_template(load_hpf_alignment(array))==t)
+	entity ta = align_template(load_hpf_alignment(array));
+
+	if (safe_load_primary_entity(ta)==t)
 	    l = CONS(ENTITY, array, l);
 
 	pips_debug(8, "adding %s as alive\n", entity_name(array));
@@ -938,8 +1010,9 @@ alive_arrays(
  * bugs or features:
  *  - could be more general?
  */
-statement generate_copy_loop_nest(src, trg)
-entity src, trg;
+statement generate_copy_loop_nest(
+    entity src,
+    entity trg)
 {
     type t = entity_type(src);
     list /* of entities */    indexes = NIL,
