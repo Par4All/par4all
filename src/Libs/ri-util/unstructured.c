@@ -4,6 +4,12 @@
   * Prettyprint unstructured
   *
   * $Log: unstructured.c,v $
+  * Revision 1.12  2001/03/12 15:53:45  irigoin
+  * Bug fix in decorate_trail() and text_trail() for check IO statement. See
+  * cplch.f in Validation. I had forgotten that the apparent successor of an
+  * IO statement might be TWO statement away since two different conditions
+  * may be checked, END= and ERR=
+  *
   * Revision 1.11  2001/02/05 14:40:47  irigoin
   * Bug fix in decorate_trail() for check IO statement
   *
@@ -301,6 +307,13 @@ decorate_trail(entity module, list trail, hash_table labels)
 		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
 	      /* The real successor is the FALSE successor of the IO check */
 	      succ = CONTROL(CAR(CDR(control_successors(succ))));
+	      if(check_io_statement_p(control_statement(succ)) &&
+		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
+		/* The real successor is the FALSE successor of the IO check */
+		succ = CONTROL(CAR(CDR(control_successors(succ))));
+	      }
+	      pips_assert("The successor is not a check io statement",
+			  !check_io_statement_p(control_statement(succ)));
 	    }
 
 	    /* If the statement "really" has a continuation (e.g. not a STOP
@@ -525,6 +538,13 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
 	      /* The real successor is the FALSE successor of the IO check */
 	      succ = CONTROL(CAR(CDR(control_successors(succ))));
+	      if(check_io_statement_p(control_statement(succ)) &&
+		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
+		/* The real successor is the FALSE successor of the IO check */
+		succ = CONTROL(CAR(CDR(control_successors(succ))));
+	      }
+	      pips_assert("The successor is not a check io statement",
+			  !check_io_statement_p(control_statement(succ)));
 	    }
 
 	    MERGE_TEXTS(r, text_statement(module, margin, st));
