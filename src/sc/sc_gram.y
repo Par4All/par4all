@@ -17,7 +17,7 @@ Psysteme ps_yacc;
 
 boolean syntax_error;
 
-long int valcst;
+Value valcst;
 
 short int fac;        /* facteur multiplicatif suivant qu'on analyse un terme*/
                       /* introduit par un moins (-1) ou par un plus (1) */
@@ -131,11 +131,11 @@ terme	: const ident
 			fac *=((cote == GAUCHE) ? 1 : -1);
                         /* ajout du couple (ident,const) a la contrainte 
                            courante                                     */
-                        vect_add_elem(&(eq->vecteur),$2,fac*$1);
+                        vect_add_elem(&(eq->vecteur),(Variable) $2,fac*$1);
                         /* duplication du couple (ident,const)
                            de la combinaison lineaire traitee           */ 
                         if (operat)
-                            vect_add_elem(&cp,$2,-fac*$1);
+                            vect_add_elem(&cp,(Variable) $2,-fac*$1);
                 }
 	| const
 		{
@@ -146,11 +146,11 @@ terme	: const ident
 		{
 		        fac *= ((cote == GAUCHE) ? 1 :-1 );
                         /* ajout du couple (ident,1) a la contrainte courante */
-                        vect_add_elem (&(eq->vecteur),$1,fac);
+                        vect_add_elem (&(eq->vecteur),(Variable) $1,fac);
                         /* duplication du couple (ident,1) de la
                            combinaison lineaire traitee                    */
                         if (operat)
-				vect_add_elem(&cp,$1,-fac);
+				vect_add_elem(&cp,(Variable) $1,-fac);
 		}
 	;
 
@@ -167,9 +167,13 @@ newid	: IDENT
 		}
 	;
 
+/* I'm pessimistic for long long here... 
+ * should rather return a pointer to a Value stored somewhere...
+ */
 const	: CONSTANTE
-		{ sscanf (yytext,"%d%",&valcst);
-                  $$ = (int) valcst;
+		{ 
+		    sscan_Value(yytext,&valcst);
+		    $$ = valcst;
 		}
 	;
 
@@ -251,8 +255,8 @@ virg_opt : VIRG
          |
          ; 
 %%
-
-yyerror(s)
+
+void yyerror(s)
 char *s;
 {
 	/* procedure minimun de recouvrement d'erreurs */
