@@ -561,7 +561,7 @@ Functions with a variable number of arguments are declared with INT_MAX
 arguments.
 */
 
-LOCAL IntrinsicDescriptor IntrinsicDescriptorTable[] = {
+static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"+", 2, default_intrinsic_type},
     {"-", 2, default_intrinsic_type},
     {"/", 2, default_intrinsic_type},
@@ -759,6 +759,9 @@ CreateIntrinsics()
 bool 
 bootstrap(string workspace)
 {
+    if (db_resource_p(DBR_ENTITIES, "")) 
+	pips_internal_error("entities already initialized");
+
     CreateIntrinsics();
 
     /* Creates the dynamic and static areas for the super global
