@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/15 19:38:47 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/07/19 10:34:35 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -176,7 +176,8 @@ PIPS_ORDERED_LIBS="text-util properties misc ri-util conversion movements pipsdb
 
 PIPS_LIBS="-ltop-level -lpipsmake -lwp65 -lhpfc -ltransformations -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity -lconversion -lprettyprint -latomizer -lprgm_mapping -lscheduling -lreindexing -larray_dfg -lpaf-util -lstatic_controlize -lsyntax -lregions -lcomp_sections -lcontrol -lsemantics -lcontinuation -lrice -lricedg -leffects -lpipsdbm -ltransformer -lpip -lri-util -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint ${NEWGEN_LIBS} ${LINEAR_LIBS} -lm"
 
-PIPS_MALLOC='/usr/lib/debug/malloc.o'
+# can be added explicitely to LDopt if required
+# PIPS_MALLOC='/usr/lib/debug/malloc.o'
 
 #
 #         #    #  #####      #    #####    ####
