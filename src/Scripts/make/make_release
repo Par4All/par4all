@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/21 11:09:54 $, 
+# $Date: 1996/09/21 11:44:52 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -83,7 +83,8 @@ $verb in `pwd`
 	find ./$dir ! -type d -print
     done 
 
-} > $tmp.list
+} | sed '/\/OLD/d;/\/SCCS/d;/~/d;/\.database/d;/a\.out/d;/core/d;' |
+    sort -u > $tmp.list
 
 #
 # suggest editing the file now
@@ -101,9 +102,7 @@ test "$edit" &&
 $verb copying files in $trgt
 $verb taring...
 
-$tar $taropt $tmp.tar `
-    sed '/\/OLD/d;/\/SCCS/d;/~/d;/\.database/d;' $tmp.list |
-    sort -u`
+$tar $taropt $tmp.tar `cat $tmp.list`
 
 # ls -l $tmp.tar 
 
