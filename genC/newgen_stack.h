@@ -1,8 +1,6 @@
 /*  STACK MANAGEMENT -- headers
  *  
- * $RCSfile: newgen_stack.h,v $ version $Revision$
- * $Date: 1995/02/03 17:19:05 $, 
- * got on %D%, %T%
+ * $Id$
  *
  *  - a stack is declared with type stack (internals not visible from here!)
  *  - a stack_iterator allows to iterate over the items in a stack.
@@ -71,10 +69,10 @@ extern void stack_map _PROTO((stack, void(*)()));
 
 /*   stack use
  */
-extern void stack_push _PROTO((char*, stack));
-extern char *stack_pop _PROTO((stack));
-extern char *stack_head _PROTO((stack));
-extern char *stack_replace _PROTO((char*, stack));
+extern void stack_push _PROTO((void*, stack));
+extern void *stack_pop _PROTO((stack));
+extern void *stack_head _PROTO((stack));
+extern void *stack_replace _PROTO((void*, stack));
 
 /*   stack iterator
  *
@@ -83,7 +81,7 @@ extern char *stack_replace _PROTO((char*, stack));
  *   Consider gen_map first which has a very small overhead.
  */
 extern stack_iterator stack_iterator_init _PROTO((stack, int)); /* X-ward */
-extern int stack_iterator_next_and_go _PROTO((stack_iterator, char**));
+extern int stack_iterator_next_and_go _PROTO((stack_iterator, void**));
 extern void stack_iterator_end _PROTO((stack_iterator*));
 extern int stack_iterator_end_p _PROTO((stack_iterator)); /* not needed */
 
@@ -93,7 +91,7 @@ extern int stack_iterator_end_p _PROTO((stack_iterator)); /* not needed */
 {\
     stack_iterator _i = stack_iterator_init(_stack, 1);\
     _itemtype _item;\
-    while(stack_iterator_next_and_go(_i, (char**)&_item)) _code;\
+    while(stack_iterator_next_and_go(_i, (void**)&_item)) _code;\
     stack_iterator_end(&_i);\
 }
 
