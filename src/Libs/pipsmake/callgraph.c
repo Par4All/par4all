@@ -5,6 +5,8 @@
 #include "misc.h"
 #include "ri.h"
 #include "database.h"
+
+#include "ri-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
 
