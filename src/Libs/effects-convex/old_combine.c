@@ -1,9 +1,7 @@
 /* 
  * package regions :  Beatrice Creusillet, September 1994
  *
- * ------------ 
- * combine.c
- * ------------
+ * $Id$
  *
  * This File contains the functions that deal with the comparison and
  * combinations of regions.
@@ -48,9 +46,7 @@
 jmp_buf overflow_error;
 
 
-/****************************************************************************/
-/* STATISTICS FOR BINARY OPERATORS                                          */
-/****************************************************************************/
+/****************************************** STATISTICS FOR BINARY OPERATORS */
 
 static int nb_umust = 0;
 static int nb_umust_must_must = 0;
@@ -176,9 +172,7 @@ void print_dinf_statistics(char *mod_name, char *prefix)
 
 
 
-/***********************************************************************/
-/* INTERFACES                                                          */
-/***********************************************************************/
+/*********************************************************** INTERFACES */
 
 /* definition of the generic binary operator for lists of regions */
 static list list_of_regions_generic_binary_op(list l1, 
@@ -192,7 +186,8 @@ static list list_of_regions_generic_binary_op(list l1,
  * input    : two lists of regions
  * output   : a list of regions, may union of the two initial lists
  * modifies : l1 and l2 and their regions. Regions that are not reused in
- *            the output list of regions are freed.nothing (no sharing introduced).
+ *            the output list of regions are freed.nothing
+ *            (no sharing introduced).
  */
 list RegionsMayUnion(list l1, list l2,
 		     boolean (*union_combinable_p)(effect, effect))
@@ -233,7 +228,7 @@ list RegionsMustUnion(list l1, list l2,
 
 
 /* list RegionsIntersection(list l1,l2, 
-                           boolean (*intersection_combinable_p)(effect, effect))
+        boolean (*intersection_combinable_p)(effect, effect))
  * input    : 
  * output   : 
  * modifies : 
@@ -257,7 +252,7 @@ list RegionsIntersection(list l1, list l2,
 
 
 /* list RegionsEntitiesIntersection(list l1,l2, 
-                           boolean (*intersection_combinable_p)(effect, effect))
+            boolean (*intersection_combinable_p)(effect, effect))
  * input    : two lists of regions
  * output   : a list of regions containing all the regions of l1 that have
  *            a corresponding region (i.e. same entity) in l2.
@@ -344,8 +339,9 @@ list RegionsInfDifference(list l1, list l2,
  *            of l2, but we don't keep the regions of l2 that are not 
  *            combinable with those of l_reg1.	
  */
-list RegionsEntitiesInfDifference(list l1, list l2,
-				  boolean (*difference_combinable_p)(effect, effect))
+list RegionsEntitiesInfDifference(
+    list l1, list l2,
+    boolean (*difference_combinable_p)(effect, effect))
 {
     list l_res = NIL;
 
@@ -361,13 +357,11 @@ list RegionsEntitiesInfDifference(list l1, list l2,
 }
 
 
-/***********************************************************************/
-/* INDIVIDUAL REGIONS COMBINATION                                      */
-/***********************************************************************/
+/***************************************** INDIVIDUAL REGIONS COMBINATION */
 
 
-/* 1- Union :                                                          */
-/* ----------                                                          */
+/* 1- Union :
+ */
 
 effect regions_must_convex_hull(region f1, region f2);
 static effect regions_may_convex_hull(region f1, region f2);
@@ -376,8 +370,9 @@ list region_must_union(region r1, region r2)
 {
     list l_res = NIL;
     effect r_res;
-        
+    
     r_res = regions_must_convex_hull(r1, r2);
+
     debug_region_consistency(r_res);
 
     if (!region_empty_p(r_res))
@@ -526,7 +521,8 @@ effect regions_must_convex_hull(region r1, region r2)
 
 	if (op_statistics_p())
 	{
-	    if ((app1 == is_approximation_must) && (app2 == is_approximation_must))
+	    if ((app1 == is_approximation_must) &&
+		(app2 == is_approximation_must))
 		nb_umust_must_must++;
 	    else
 		if (!((app1 == is_approximation_may)
@@ -563,7 +559,7 @@ effect regions_must_convex_hull(region r1, region r2)
 		switch (app2)
 		{
 		case is_approximation_must: /* U_must(must, must) */
-		    /* si enveloppe convexe (s1, s2) exacte alors must sinon may */
+		    /* si enveloppe convexe (s1, s2) exacte must sinon may */
 		    if (sc_convex_hull_equals_union_p_ofl(sr,s1,s2))
 		    {
 			pips_debug(8,"exact convex hull\n");
@@ -590,7 +586,8 @@ effect regions_must_convex_hull(region r1, region r2)
 		    if (op_statistics_p())
 		    {
 			nb_umust_must_may++;
-			if (appr == is_approximation_must) nb_umust_must_may_must++;
+			if (appr == is_approximation_must) 
+			    nb_umust_must_may_must++;
 		    }
 		    break;
 		}
@@ -607,7 +604,8 @@ effect regions_must_convex_hull(region r1, region r2)
 		    if (op_statistics_p())
 		    {
 			nb_umust_must_may++;
-			if (appr == is_approximation_must) nb_umust_must_may_must++;
+			if (appr == is_approximation_must) 
+			    nb_umust_must_may_must++;
 		    }
 		    break;
 		case is_approximation_may:
@@ -725,7 +723,8 @@ static effect regions_may_convex_hull(region r1, region r2)
 
     /* if we want to preserve must approximations, then we must find the 
      * approximation of the resulting region ;
-     * it may depend on the approximations of the initial regions, on the precision
+     * it may depend on the approximations of the initial regions, on the 
+     * precision
      * (must union or may union), and on the relations between the two initial 
      * systems of constraints */
 
@@ -763,7 +762,8 @@ static effect regions_may_convex_hull(region r1, region r2)
 	}    
 	else
 	{
-	    if ((app1 == is_approximation_must) && (app2 == is_approximation_must))
+	    if ((app1 == is_approximation_must) &&
+		(app2 == is_approximation_must))
 	    {
 		/* U_may(must,must) */
 		/* si s1 == s2 (ie repre'sentent le me^me ensemble) 
@@ -826,8 +826,9 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
     }
 
     /* update bases using their "union"; convex hull has to be computed 
-       relatively to ONE space. I don't know if it is usefull for regions, since
-       they concern the same array with the same preconditions. BA, may 1994 */
+       relatively to ONE space. I don't know if it is usefull for regions,
+       since they concern the same array with the same preconditions.
+       BA, may 1994 */
     b1 = ps1->base;
     b2 = ps2->base;
     b = base_union(b1, b2);
@@ -853,7 +854,8 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
 
     if(SC_EMPTY_P(ps))
     {
-	/* FI: this could be eliminated if SC_EMPTY was really usable; 27/5/93 */
+	/* FI: this could be eliminated if SC_EMPTY was really usable;
+	   27/5/93 */
 	/* and replaced by a SC_UNDEFINED_P() and pips_error() */
 	ps = sc_empty(b);
     }
@@ -875,8 +877,8 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
 }
 
 
-/* 2- Intersection :                                                   */
-/* -----------------                                                   */
+/* 2- Intersection :
+ */
 
 /* list region_intersection(region reg1, reg2)
  * input    : two regions
@@ -884,9 +886,10 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
  *            the action of the resulting regions is the action
  *            of the first region (reg1).
  * modifies : nothing.
- * comment  : not debugged, because not yet used.	
+ * comment  : not debugged, because not yet used. (funny, FC;-)
  */
-list region_intersection(region reg1, region reg2)
+list /* of region */
+region_intersection(region reg1, region reg2)
 {
     list l_res = NIL;
 
@@ -913,12 +916,12 @@ list region_intersection(region reg1, region reg2)
 	print_region(reg2);
     }
 
-    /* else return a list containing a region which predicate is the intersection
-     * of the two initial predicates, and which approximation is the "logical" 
-     * and of the initial approximations 
+    /* else return a list containing a region which predicate is the 
+     * intersection of the two initial predicates, and which approximation 
+     * is the "logical" and of the initial approximations.
      */
     reg = region_dup(reg1);
-    region_sc_append_and_normalize(reg,sc2,2);
+    region_sc_append_and_normalize(reg,sc2,2); /* could be some other level? */
 
     if (setjmp(overflow_error))
     {	
@@ -964,8 +967,8 @@ list region_entities_intersection(region reg1, region reg2)
 }
 
 
-/* 3- Difference :                                                     */
-/* ---------------                                                     */
+/* 3- Difference :
+ */
 
 static list disjunction_to_list_of_regions(Pdisjunct disjonction, effect reg, 
 					  tag app, boolean super_or_sub);
@@ -983,8 +986,9 @@ list region_sup_difference(region reg1, region reg2)
     Psysteme sc1, sc2;
     tag app1 = region_approximation_tag(reg1);
     tag app2 = region_approximation_tag(reg2);
-    
-    tag app; /* approximation of the resulting regions if the difference is exact */
+
+    /* approximation of the resulting regions if the difference is exact */    
+    tag app; 
     region reg;
     list l_reg = NIL;
 
@@ -1059,7 +1063,8 @@ list region_sup_difference(region reg1, region reg2)
 	{
 	    Pdisjunct disjonction;
 	    disjonction = sc_difference(sc1,sc2);
-	    l_reg = disjunction_to_list_of_regions(disjonction, reg1, app, SUPER);
+	    l_reg = disjunction_to_list_of_regions
+		(disjonction, reg1, app, SUPER);
 	}
 
 	if (op_statistics_p() && app == is_approximation_must &&
@@ -1194,7 +1199,7 @@ list region_inf_difference(region reg1, region reg2)
 
 
 
-/* static Psysteme disjunction_to_region_sc(Pdisjunct disjonction, boolean exact)
+/* static Psysteme disjunction_to_region_sc(Pdisjunct disjonction, boolean *b)
  * input    : a disjunction representing the union of several Psystemes 
  * output   : a Psysteme representing the convex_hull of the disjunction
  *            of predicates.
@@ -1291,9 +1296,7 @@ static list disjunction_to_list_of_regions(Pdisjunct disjonction, region reg,
 }
 
 
-/***********************************************************************/
-/* BOOLEAN FUNCTIONS                                                   */
-/***********************************************************************/
+/*************************************************** BOOLEAN FUNCTIONS */
 
 /* bool combinable_regions_p(effect r1, r2)
  * input    : two regions
@@ -1335,9 +1338,7 @@ boolean regions_same_variable_p(region r1, region r2)
 
 
 
-/***********************************************************************/
-/* GENERIC FUNCTIONS                                                   */
-/***********************************************************************/
+/******************************************************* GENERIC FUNCTIONS */
 
 /* static list list_of_regions_generic_binary_op(list l1,l2,
  *                         bool (*r1_r2_combinable_p)(),
@@ -1354,11 +1355,12 @@ boolean regions_same_variable_p(region r1, region r2)
  * modifies : l1 and l2, and their regions.
  * comment : ?
 */
-static list list_of_regions_generic_binary_op(list l1, list l2,
-					      bool (*r1_r2_combinable_p)(effect,effect),
-					      list (*r1_r2_binary_op)(effect,effect),
-					      list (*r1_unary_op)(effect),
-					      list (*r2_unary_op)(effect))
+static list list_of_regions_generic_binary_op(
+    list l1, list l2,
+    bool (*r1_r2_combinable_p)(effect,effect),
+    list (*r1_r2_binary_op)(effect,effect),
+    list (*r1_unary_op)(effect),
+    list (*r2_unary_op)(effect))
 {
     list l_res = NIL;
 
@@ -1447,9 +1449,7 @@ static list list_of_regions_generic_binary_op(list l1, list l2,
     return(l_res);
 }
 
-/*********************************************************************************/
-/* PROPER REGIONS TO SUMMARY REGIONS                                             */
-/*********************************************************************************/
+/*************************************** PROPER REGIONS TO SUMMARY REGIONS */
 
 /* list proper_to_summary_regions(list l_reg)
  * input    : a list of proper regions: there may be several regions for 
