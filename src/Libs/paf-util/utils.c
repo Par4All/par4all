@@ -1472,9 +1472,6 @@ list *init_l, *elim_l;
 	    
 	    /* If we get such a variable, we eliminate it. */
 	    if(! var_not_found) {
-		Pvecteur v_out;
-		Pvecteur v;
-
 		/* First, we remove it from "vl". */
 		gen_remove(&vl, (chunk *) var);
 		
