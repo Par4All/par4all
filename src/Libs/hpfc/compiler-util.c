@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compiler-util.c,v $ ($Date: 1995/10/05 11:32:22 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1995/10/05 11:34:55 $, )
  * version $Revision$
  */
 
@@ -36,7 +36,7 @@ control_mapping map;
 {
     control cprime = (control) GET_CONTROL_MAPPING(map, c);
 
-    pips_assert("empty lists for cprime"
+    pips_assert("empty lists for cprime",
 		control_predecessors(cprime)==NIL &&
 		control_successors(cprime)==NIL);
 
