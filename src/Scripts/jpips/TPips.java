@@ -1,14 +1,17 @@
-/**
-  * $Id$
-  *
-  * $Log: TPips.java,v $
-  * Revision 1.2  1998/06/30 17:35:33  coelho
-  * last version of FD.
-  *
-  * Revision 1.1  1998/06/30 16:42:54  coelho
-  * Initial revision
-  *
-  */
+/*
+ * $Id$
+ *
+ * $Log: TPips.java,v $
+ * Revision 1.3  1998/07/01 13:32:34  coelho
+ * more comments.
+ *
+ * Revision 1.2  1998/06/30 17:35:33  coelho
+ * last version of FD.
+ *
+ * Revision 1.1  1998/06/30 16:42:54  coelho
+ * Initial revision
+ *
+ */
 
 package JPips;
 
@@ -94,8 +97,12 @@ public class TPips
           out = new PrintWriter(tpips.getOutputStream());
           in = new DataInputStream(tpips.getInputStream());
 	  inErr = new DataInputStream(tpips.getErrorStream());
+
+	  // listen to tpips error
 	  Thread listener = new Thread(new Listener(inErr,jpips));
 	  listener.start();
+
+	  // warns if tpips dies.
 //	  Thread watcher = new Thread(new Watcher(tpips));
 //	  watcher.start();
 	}
