@@ -5,7 +5,8 @@
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
 		make-builder-map \
-		generate_all_menu_documentation
+		generate_all_menu_documentation \
+		user-and-source-files.idraw
 
 INSTALL_SHR=	epips_view_menu_layout.el \
 		epips_transform_menu_layout.el \
