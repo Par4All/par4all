@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1997/04/17 08:52:55 $, )
+# ($Date: 1997/04/17 11:52:12 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -181,13 +181,14 @@ LIB_M4FFILES = 	hpfc_packing.m4f \
 		hpfc_rtsupport.m4f \
 		hpfc_shift.m4f \
 		hpfc_bufmgr.m4f \
-		hpfc_broadcast.m4f
+		hpfc_broadcast.m4f \
+		hpfc_communication.m4f
+
 LIB_M4CFILES =	hpfc_misc.m4c
 LIB_FFILES =	hpfc_check.f \
 		hpfc_main.f \
 		hpfc_main_host.f \
-		hpfc_main_node.f \
-		hpfc_communication.f
+		hpfc_main_node.f
 
 M4_HEADERS 	= hpfc_procs.m4h \
 		  hpfc_buffers.m4h \
@@ -208,7 +209,7 @@ $(DDC_FFILES) $(DDC_CFILES) $(DDC_HEADERS): $(PVM_ARCH).m4
 LIB_HEADERS	= $(CORE_HEADERS) \
 		  $(DDC_HEADERS)
 
-LIBOBJECTS:= $(addprefix $(RT_ARCH)/, $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
+LIBOBJECTS:= $(addprefix $(RT_ARCH)/,  $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
 
 M4_MACROS 	= hpfc_lib_m4_macros hpfc_architecture_m4_macros
 HPFC_MAKEFILES 	= hpfc_Makefile_init 
