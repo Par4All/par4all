@@ -5,6 +5,9 @@
  * preprocessed.
  *
  * $Log: csplit_file.c,v $
+ * Revision 1.9  2003/08/14 16:13:27  irigoin
+ * Operational check for files with the same name
+ *
  * Revision 1.8  2003/08/14 09:32:13  irigoin
  * COMPILATION_UNIT_PREFIX eliminated
  *
@@ -125,10 +128,13 @@ void csplit_open_compilation_unit(string input_file_name)
 
   /* Loop with a counter until the open is OK. Two or more files with the
      same local names may be imported from different directories. */
+  /* This does not work because this file is later moved in the proper directory. */
+  /*
   if(fopen(unambiguous_file_name, "r")!=NULL) {
     pips_internal_error("Two source files (at least) with same name: \"%s\"\n",
 			simpler_file_name);
   }
+  */
   compilation_unit_file = safe_fopen(unambiguous_file_name, "w");
 
   /* Loop over counter not implemented. */
@@ -139,6 +145,21 @@ void csplit_open_compilation_unit(string input_file_name)
   current_compilation_unit_file_name = unambiguous_file_name;
   current_compilation_unit_name
     = strdup(concatenate(simpler_file_name, FILE_SEP_STRING, NULL));
+
+  /* Does this current compilation unit already exist? */
+  if(fopen(concatenate(current_workspace_name,
+		       "/",
+		       simpler_file_name,
+		       FILE_SEP_STRING,
+		       "/",
+		       simpler_file_name,
+		       FILE_SEP_STRING,
+		       ".c", NULL)
+	   , "r")!=NULL) {
+    pips_user_error("Two source files (at least) with same name: \"%s.c\".\n"
+		    "Not supported yet.\n",
+			simpler_file_name);
+  }
 
   /* Keep track of the new compilation unit as a "module" stored in a file */
 
