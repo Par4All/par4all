@@ -201,7 +201,7 @@ $debug "report=$report"
 		$verbose cleaning files of ${a} [${name}: ${dir}]
 		find $dir \
 		    \( -name '*.[ao]' -o -name pips -o -name '[tw]pips' \) \
-		    -mtime +4 -print | xargs rm -rf
+		    -mtime +4 -print -o -name EXTERN -prune | xargs rm -rf
 		}
 	    }
 	done
