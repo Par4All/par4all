@@ -44,9 +44,8 @@ static void parse_properties()
     property pr;
     property opr;
     
-    while (tok = yylex()) {
+    while ((tok = yylex())) {
 	string n;
-	property p;
 	
 	if (tok != TIDENT) {
 	    fprintf(stderr, 
@@ -67,14 +66,16 @@ static void parse_properties()
 	    pr = make_property(is_property_int, atoi(yytext));
 	    break;
 	  case TSTRING: {
-            char *s = strdup(yytext);
+	      /* GO: We need to free(s) so the skeep now 
+		 the quote and do not use s+1 anymore*/
+            char *s = strdup(pptext + 1);
             char *q = strrchr(s, '"');
             if (q == NULL) {
-                fprintf(stderr,"[read_properties] bad string : %s\n", yytext);
+                fprintf(stderr,"[read_properties] bad string : %s\n", pptext);
 	        exit(1);
             }
             *q = '\0';            
-	    pr = make_property(is_property_string, s+1);
+	    pr = make_property(is_property_string, s);
 	    break;
           }
 	  default:
@@ -84,7 +85,8 @@ static void parse_properties()
 	    exit(1);
 	}
 
-	if((opr = hash_get(pl, n)) != HASH_UNDEFINED_VALUE) {
+	if ((opr = (property) hash_get(pl, n)) != 
+            (property) HASH_UNDEFINED_VALUE) {
             user_warning("parse_properties","property %s redefined\n", n);
             free_property(opr);
             hash_update(pl, n, (char *) pr); 
@@ -112,7 +114,7 @@ static void read_properties()
     }
 }
 
-static property get_property(name)
+property get_property(name)
 string name;
 {
     property p;
