@@ -1,5 +1,5 @@
 /* $RCSfile: abs.c,v $ (version $Revision$)
- * $Date: 1996/07/13 11:58:52 $, 
+ * $Date: 1996/07/13 12:03:46 $, 
  */
 
 #include <stdio.h>
@@ -10,11 +10,15 @@
 #include "arithmetique.h"
 #include "assert.h"
 
-/* int absval(int i): absolute value of i (SUN version)
- */
-Value absval(Value i)
+Value abs_ofl_ctrl(Value i, int ofl_ctrl)
 {
-    return abs_ofl_ctrl(i, 0);
+    extern jmp_buf overflow_error;
+    
+    if ((ofl_ctrl == 1) && (i == VALUE_MIN))   
+	longjmp(overflow_error, 5);
+        
+    assert(i != VALUE_MIN);
+    return (i>0) ? i: -i;    
 }
 
 /* int absval_ofl(int i): absolute value of i (SUN version)
@@ -26,13 +30,9 @@ Value absval_ofl(Value i)
 }
 
 
-Value abs_ofl_ctrl(Value i, int ofl_ctrl)
+/* int absval(int i): absolute value of i (SUN version)
+ */
+Value absval(Value i)
 {
-    extern jmp_buf overflow_error;
-    
-    if ((ofl_ctrl == 1) && (i == VALUE_MIN))   
-	longjmp(overflow_error, 5);
-        
-    assert(i != VALUE_MIN);
-    return (i>0) ? i: -i;    
+    return abs_ofl_ctrl(i, 0);
 }
