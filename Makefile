@@ -173,7 +173,9 @@ mkinstalldirs = $(SHELL) ./mkinstalldirs
 ## where to put intermediate objects and executables:
 OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)
 LIB = $(OBJ_DIR)/$(PSTATIC)
+INSTALL_LIB = 
 #EXEC_EXTRA_LIBS = -L./$(OBJ_DIR) $(EXEC_EXTRA_LIBS)
+EXEC_EXTRA_LIBS = $(LIB)
 
 POLYLIB_INC = ./include/polylib
 POLYLIB_SRC = ./source
@@ -467,8 +469,9 @@ gmplongtests:
 
 ########################################################################
 ##  Lib Objects
-######################################################################## 
-$(OBJ_DIR):
+########################################################################
+
+$(OBJ_DIR):  
 	mkdir $(OBJ_DIR)
 
 $(LIB_OBJECTS): $(OBJ_DIR)/%.o:$(POLYLIB_SRC)/%.c $(PHEADERS)
