@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.3  1999/01/04 16:56:32  zory
+   atomize_level in progress ...
+
    Revision 1.2  1998/12/30 16:54:18  zory
    atomization updated
 
@@ -107,6 +110,7 @@ static void seq_rwt(sequence s)
 
   store_is_nested(current, result);
 }
+
 
 
 /* 
@@ -484,6 +488,147 @@ build_sequence(instruction i)
   return nested_sequence;
 }
 
+/******************************************* ATOMIZATION WITH LEVELS */
+
+GENERIC_LOCAL_FUNCTION(has_level, persistant_entity_to_int);
+
+
+static void 
+assert_expressions_are_scalar_references(list /* of expression */ le) {
+
+  MAP(EXPRESSION, 
+      e, 
+      {
+	syntax s = expression_syntax(e);
+	pips_assert(" argument is a reference without indices ", 
+		    syntax_reference_p(s) && 
+		    reference_indices(syntax_reference(s))==NIL);
+      }, le);
+}
+
+static gen_array_t /* list of expressions */
+group_entities_by_levels(list /* of expressions */ l) {
+  
+  list /* of expressions */ tmp;
+  gen_array_t /* of list of expressions */ result = gen_array_make(0);
+
+  assert_expressions_are_scalar_references(l);
+
+  /* evaluate levels ... */
+  MAP(EXPRESSION,
+      e,
+      {
+	ent = reference_variable(syntax_reference(expression_syntax(e)));
+	level = compute_level_for_entity(ent);
+	
+	size  = gen_array_size(tmp);
+	if (level>size)
+	  for (i=size; i<=level; i++)
+	    gen_array_append(tmp,NIL);
+	
+	tmp = gen_array_item(result, level);
+
+	tmp = CONS(EXPRESSION,e,tmp);
+
+      }, l);
+
+  return tmp;
+}
+
+
+
+
+/* expressions are references without args ! */
+static list /* of expression */ 
+atomize_AC_operator(list /* of expression */ exps) {
+
+  list /* of expression */ result = NIL;
+  list /* of expression */ le = NIL;
+  list /* of expression */ lnext = NIL;
+  int size, levels;
+  gen_array_t /* of list of expressions */ groups = NIL; 
+  
+  assert_expressions_are_scalar_references(exps);
+
+  groups = group_by_levels(le);
+  levels = gen_array_size(entity_groups);
+
+  for (i = 0; i<(levels-1) ; i++) { 
+
+    le = gen_array_item(groups, i);
+    size = gen_length(le);
+     
+    if ( size >= 2 ) {
+      /* make new statement for this level */
+      /* store_has_level(...., i); */
+      /* insert new reference in next level list ... */
+    }
+    else {
+      /* move this entity to the next level */
+      if (le) {
+	/* get list of expressions of the next level */
+	lnext = gen_array_item(i+1);
+	tmp = CONS(EXPRESSION, EXPRESSION(CDR(le)) , tmp);
+      }
+      i++;
+    }
+  }
+
+  /* insert expressions with highest level in result */
+  MAP(EXPRESSION, 
+      e, 
+      result = CONS(EXPRESSION, e, result),
+      gen_array_item(t, levels-1));
+
+  return result;
+}
+
+/* call is assumed to be already atomized ! */
+/* i.e. all arguments are scalar references ! */
+static bool
+call_flt_level (call c) 
+{ 
+  list /* of expressions */ args = call_arguments(c);
+  entity function = call_function(c);
+  
+  if (entity_local_name(function) == ASSIGN_OPERATOR_NAME)
+    return TRUE;
+  
+  /* associatif-commutatif operator */
+  if (Is_Associatif_Commutatif(function))
+    {
+      args = atomize_AC_operator(args);
+    }
+  else 
+    {
+      /* nop */
+    }
+  return FALSE; /* stop top-down search */
+}
+
+static int depth = 0;
+
+static bool
+loop_flt_level (loop l) {
+
+  entity index = loop_index(l);
+
+  store_has_level(index, ++depth);
+
+  return TRUE; /* keep on. */
+}
+
+
+
+static void 
+atomization_with_levels (statement s)
+{
+  gen_multi_recurse
+    (s,
+     loop_domain, loop_flt_level, gen_true,          /* LOOP */
+     call_domain, call_rwt_level, gen_true,          /* CALL */
+     NULL);
+}
 
 /*********************************************** WALK THRU NESTS TO OPTIMIZE */
 
@@ -499,46 +644,47 @@ static bool
 simple_expression_decision(e)
 expression e;
 {
-    syntax s = expression_syntax(e);
+  syntax s = expression_syntax(e);
 
-    /*  don't atomize A(I)
-     */
-    if (syntax_reference_p(s)) {
-      print_expression(e);
-      return(!entity_scalar_p(reference_variable(syntax_reference(s))));
-    }
-
-    /*  don't atomize A(1)
-     */
-    if (expression_constant_p(e)) 
-	return(FALSE);
-
-    return(TRUE);
+  /*  don't atomize A(I)
+   */
+  if (syntax_reference_p(s)) {
+    return(!entity_scalar_p(reference_variable(syntax_reference(s))));
+  }
+  
+  /*  don't atomize A(1)
+   */
+  if (expression_constant_p(e)) 
+    return(FALSE);
+  
+  return(TRUE);
 }
 
 static bool
 ref_atomization(reference r, expression e)
 {
-    return(simple_expression_decision(e));
+  return(simple_expression_decision(e));
 }
 
 static bool
 call_atomization(call c, expression e)
 {
-    entity f = call_function(c);
-    syntax s = expression_syntax(e);
-
-    if (ENTITY_ASSIGN_P(f)) return(FALSE); 
-    if (value_tag(entity_initial(f)) == is_value_intrinsic ||
-	!syntax_reference_p(s))
-	return(simple_expression_decision(e));
-	
-    /* the default is *not* to atomize.
-     * should check that the reference is not used as a vector
-     * and is not modified?
-     */ 
-    return(FALSE); 
+  entity f = call_function(c);
+  syntax s = expression_syntax(e);
+  
+  if (ENTITY_ASSIGN_P(f)) return(FALSE); 
+  if (value_tag(entity_initial(f)) == is_value_intrinsic ||
+      !syntax_reference_p(s))
+    return(simple_expression_decision(e));
+  
+  /* the default is *not* to atomize.
+   * should check that the reference is not used as a vector
+   * and is not modified?
+   */ 
+  return(FALSE); 
 }
+
+
 
 static void 
 specific_atomization (statement s) 
@@ -546,6 +692,8 @@ specific_atomization (statement s)
 
   pips_debug(2," specific ATOMIZATION applied \n");
 
+  
+  /* classic atomization */  
   atomize_as_required(s,
 		      ref_atomization,
 		      call_atomization,
@@ -554,6 +702,9 @@ specific_atomization (statement s)
 		      gen_true, /* whileloop */
 		      /*new_atomizer_create_a_new_entity*/
 		      new_variable);
+
+  /* atomize expression with respect to level of variables in the loop nest */
+  
 }
 
 static void 
