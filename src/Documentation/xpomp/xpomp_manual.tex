@@ -1,6 +1,6 @@
 %% Documentation for XPOMP
 %% $RCSfile: xpomp_manual.tex,v $ (version $Revision$)
-%% $Date: 1996/09/07 16:51:19 $, 
+%% $Date: 1996/09/08 21:50:32 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,xspace,html,verbatim}
@@ -700,8 +700,8 @@ provided, as described in the next section.
 
 \subsection{Fake functions}
 
-As \PIPS{} is an interprocedural compiler, fake functions sources for the
-\xPOMP{} routines (\verb|xpomp_fake.f| file) that simply mimic their
+As \PIPS{} is an interprocedural compiler, fake function sources for the
+\xPOMP{} routines (\verb|xpomp_stubs.f| file) that simply mimic their
 effects on arguments are provided.  They must be compiled together with
 the HPF program through \PIPS{} in order to provide the compiler with the
 necessary information for using the \xPOMP{} display facilities. All
@@ -717,12 +717,12 @@ The \verb|hpfc| front end accepts
 a list of files for compilation, hence for compiling the \verb|fractal|
 exemple one must write:
 \begin{verbatim}
-    hpfc xpomp_fake.f fractal.f
+    hpfc xpomp_stubs.f fractal.f
 \end{verbatim}
 
 \subsection{Linker extensions}
 
-Since the source files for the functions are fake ones (the functions are
+Since the source files for the functions are stubs (the functions are
 actually written in C), these functions must be provided latter on at
 link-time. The \HPFC{} compiler allows to give this information
 with the \verb|ld io|
