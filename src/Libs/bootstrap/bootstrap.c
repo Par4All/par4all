@@ -727,6 +727,13 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {LIST_DIRECTED_FORMAT_NAME, 0, default_intrinsic_type},
     {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type},
 
+    /* These operators are used within the OPTIMIZE transformation in
+order to manipulate operators such as n-ary add and multiply or
+multiply-add operators ( JZ - sept 98) */
+    {EOLE_SUM_OPERATOR_NAME, (INT_MAX), default_intrinsic_type },
+    {EOLE_PROD_OPERATOR_NAME, (INT_MAX), default_intrinsic_type },
+    {EOLE_FMA_OPERATOR_NAME, 3, default_intrinsic_type },
+
     {NULL, 0, 0}
 };
 
