@@ -806,7 +806,7 @@ statement s;
 }
 
 statement
-apply_number_to_statement(int n)
+apply_number_to_statement(hash_table nts, int n)
 {
     /* This function used to be inline in prettyprinting functions for user views.
      * It was assumed that all statements produced by the parser had a defined
@@ -814,12 +814,12 @@ apply_number_to_statement(int n)
      * GO TO statements are not (always) numbered. So n hasa to be tested.
      */
 
-    statement s = STATEMENT_UNDEFINED;
+    statement s = statement_undefined;
 
     if(n!=STATEMENT_NUMBER_UNDEFINED) {
 	s = (statement) hash_get(nts, (char *) n);
 	if (s == (statement) HASH_UNDEFINED_VALUE) {
-	    s= STATEMENT_UNDEFINED;
+	    s = statement_undefined;
 	}
     }
 
