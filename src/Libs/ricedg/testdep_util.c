@@ -40,7 +40,7 @@
 
 #include "ricedg.h"
 
- jmp_buf overflow_error; /* to deal with overflow errors occuring during the projection 
+extern jmp_buf overflow_error; /* to deal with overflow errors occuring during the projection 
                          * of a Psysteme along a variable */
 
 
@@ -423,7 +423,7 @@ action ac1,ac2;
  *    *psc on return is sc_empty() if *psc on entry turns out to be 
  *    non-feasible.
  * a long jump buffer must have been initialized to handle overflows
- * The value returned is TRUE is the system is feasible, FALSE otherwise.
+ * The value returned is TRUE if the system is feasible, FALSE otherwise.
  */
 
 int sc_proj_optim_on_di_ofl(cl, psc)
@@ -852,7 +852,7 @@ Pvecteur pv;
 /* 	    } */
 
 	    build_sc_nredund_2pass_ofl_ctrl(&sc, FWD_OFL_CTRL);
-	    
+
 	    ifdebug(7) {
 		debug(7, "sc_projection_optim_along_vecteur_ofl", 
 		      "is_test_exact after: ");
