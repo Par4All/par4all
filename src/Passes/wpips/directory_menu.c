@@ -2,10 +2,10 @@
    chooser. */
 
 
-/* 	%A% ($Date: 1996/12/03 17:21:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/01 22:59:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_directory_menu[] = "%A% ($Date: 1996/12/03 17:21:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_directory_menu[] = "%A% ($Date: 1997/04/01 22:59:29 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <xview/xview.h>
@@ -134,9 +134,14 @@ generate_a_directory_menu(char * directory)
    }
    else {
       /* Get all the files in the directory: */
+       /*
       return_code = safe_list_files_in_directory(&file_list_length, file_list,
                                                  directory,
                                                  ".*", accept_all_file_names);
+						 */
+      return_code = safe_list_files_in_directory(&file_list_length, file_list,
+                                                 directory,
+                                                 ".*", directory_exists_p);
       if (return_code == -1 || file_list_length == 0)
          xv_set(menu, MENU_APPEND_ITEM,
                 xv_create(XV_NULL, MENUITEM,
