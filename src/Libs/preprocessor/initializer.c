@@ -67,8 +67,13 @@ stub_head(entity f)
 {
     list ls = NIL;
     type t = entity_type(f);
-    functional fu = type_functional(t);
-    int number, n = gen_length(functional_parameters(fu));
+    functional fu;
+    int number, n;
+
+    pips_assert("type is functional", type_functional_p(t));
+
+    fu = type_functional(t);
+    n = gen_length(functional_parameters(fu));
     
     /* is it a subroutine or a function? */
     if(!type_void_p(functional_result(fu)))
