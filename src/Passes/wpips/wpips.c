@@ -30,7 +30,7 @@ extern void(* pips_warning_handler)();
 extern void(* pips_log_handler)(char * fmt, va_list args);
 extern void(* pips_update_props_handler)();
 
-
+/* If we are in the Emacs mode, the log_frame is no longer really used: */
 Frame main_frame, 
     schoose_frame, 
     mchoose_frame, 
@@ -57,7 +57,9 @@ void create_menus()
 /*    create_analyze_menu();*/
     create_transform_menu();
     create_help_menu();
-    create_log_menu();
+    /* In the Emacs mode, no XView log window: */
+    if (! wpips_emacs_mode)
+       create_log_menu();
     create_quit_button();
 }
 
@@ -101,7 +103,7 @@ void create_main_window()
 }
 
 
-short pips_bits[] = {
+static unsigned short pips_bits[] = {
 #include "pips.icon"
 };
 
@@ -138,7 +140,12 @@ char *argv[];
     int iarg = 1, nfiles;
 
     while (iarg < argc) {
-	if (same_string_p(argv[iarg], "-workspace")) {
+	if (same_string_p(argv[iarg], "-emacs")) {
+	    argv[iarg] = NULL;
+            /* Wpips is called from emacs. RK. */
+            wpips_emacs_mode = 1;
+	}
+	else if (same_string_p(argv[iarg], "-workspace")) {
 	    argv[iarg] = NULL;
 	    pname = argv[++iarg];
 	}
@@ -154,7 +161,7 @@ char *argv[];
 	else {
 	    if (argv[iarg][0] == '-') {
 		fprintf(stderr, "Usage: %s ", argv[0]);
-		fprintf(stderr, "[ X-Window options ] ");
+		fprintf(stderr, "[ X-Window options ] [ -emacs ]");
 		fprintf(stderr, "[ -workspace name [ -module name ] ");
 		fprintf(stderr, "[ -files file1.f file2.f ... ] ]\n");
 		exit(1);
@@ -185,56 +192,64 @@ int main(argc,argv)
 int argc;
 char *argv[];
 {
-  pips_warning_handler = wpips_user_warning;
-  pips_error_handler = wpips_user_error;
-  pips_log_handler = wpips_user_log;
-  pips_update_props_handler = update_props;
+   pips_warning_handler = wpips_user_warning;
+   pips_error_handler = wpips_user_error;
+   pips_log_handler = wpips_user_log;
+   pips_update_props_handler = update_props;
 
-  /* Added for debug. RK, 8/06/93. */
-  malloc_debug(1);
+   /* Added for debug. RK, 8/06/93. */
+   malloc_debug(1);
 
-  initialize_newgen();
+   initialize_newgen();
 
-  debug_on("WPIPS_DEBUG_LEVEL");
+   debug_on("WPIPS_DEBUG_LEVEL");
 
-  /* we parse command line arguments */
-  /* XV_ERROR_PROC unset as we shifted to xview.3, Apr. 92 */
-  xv_init(XV_INIT_ARGC_PTR_ARGV, &argc, argv, 
-	  /* XV_ERROR_PROC, xview_error_recovery, */
-	  0);
+   /* we parse command line arguments */
+   /* XV_ERROR_PROC unset as we shifted to xview.3, Apr. 92 */
+   xv_init(XV_INIT_ARGC_PTR_ARGV, &argc, argv, 
+           /* XV_ERROR_PROC, xview_error_recovery, */
+           0);
 
-  /* we parse remaining command line arguments */
-  parse_arguments(argc, argv);
+   /* we parse remaining command line arguments */
+   parse_arguments(argc, argv);
 
-  /* we create all frames */
-  create_frames();
+   /* we create all frames */
+   create_frames();
 
-  create_main_window();
+   create_main_window();
 
-  create_help_window();
+   create_help_window();
 
-  create_schoose_window();
+   create_schoose_window();
 
-  create_mchoose_window();
+   create_mchoose_window();
 
-  create_query_window();
+   create_query_window();
 
-  create_edit_window();
+   if (! wpips_emacs_mode)
+      /* Create the edit/view windows only if we are not in the Emacs
+         mode: */
+      create_edit_window();
 
-  create_log_window();
+   /* In the Emacs mode, no XView log window but we need it to compute
+      the size of some other frames... */
+   create_log_window();
 
-  create_menus();
+   create_menus();
 
-  create_status_subwindow();
+   create_status_subwindow();
 
-  create_icons();
-  /*    create_icon();*/
+   create_icons();
+   /*    create_icon();*/
 
-  /* Call added. RK, 9/06/1993. */
-  place_frames();
+   /* Call added. RK, 9/06/1993. */
+   place_frames();
 
-  xv_main_loop(main_frame);
+   /* If we are in the emacs mode, initialize some things: */
+   initialize_emacs_mode();
+   
+   xv_main_loop(main_frame);
 
-  close_log_file();
-  exit(0);
+   close_log_file();
+   exit(0);
 }
