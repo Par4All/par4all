@@ -7,6 +7,9 @@
   one trip loops fixed, FC 08/01/1998
 
   $Log: dead_code_elimination.c,v $
+  Revision 1.20  2000/07/05 07:11:02  coelho
+  new debug stuff
+
   Revision 1.19  2000/07/04 16:09:51  coelho
   hop.
 
@@ -47,7 +50,8 @@
 static bool some_unstructured_ifs_have_been_changed;
 
 
-/* Statistic stuff: */
+/**************************************************************** STATISTICS */
+
 static int dead_code_if_removed;
 static int dead_code_if_replaced_by_its_effect;
 static int dead_code_if_false_branch_removed;
@@ -76,7 +80,6 @@ initialize_dead_code_statistics()
     dead_code_unstructured_if_true_branch_removed = 0;
     initialize_clean_up_sequences_statistics();
 }
-
 
 static void
 display_dead_code_statistics()
@@ -126,6 +129,15 @@ display_dead_code_statistics()
     }
 }
 
+/********************************************************************* DEBUG */
+
+static void stdebug(int dl, string msg, statement s)
+{
+  ifdebug(dl) {
+    pips_debug(dl, "statement %p: %s\n", s, msg);
+    if (s) print_statement(s);
+  }
+}
 
 /* Give an information on the liveness of the 2 if's branches: */
 static dead_test
@@ -133,12 +145,8 @@ dead_test_filter(statement true, statement false)
 {
   pips_debug(5, "Begin\n");
 
-  ifdebug(9) {
-    fprintf(stderr, "dead_test_filter, then branch: %p\n", true);
-    print_statement(true);
-    fprintf(stderr, "dead_test_filter, false branch: %p\n", false);
-    print_statement(false);
-  }
+  stdebug(9, "dead_test_filter: then branch", true);
+  stdebug(9, "dead_test_filter: else branch", false);
 
   if (!statement_feasible_p(true)) {
     pips_debug(5, "End: then_is_dead\n");
@@ -252,9 +260,7 @@ remove_loop_statement(statement s, instruction i, loop l)
   statement_label(s) = entity_empty_label();
   fix_sequence_statement_attributes(s);
 
-  ifdebug(4) {
-    print_statement(s);
-  }
+  stdebug(4, "remove_loop_statement", s);
 
   loop_body(l) = make_empty_statement();
   free_instruction(i);
@@ -397,10 +403,7 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
   statement_label(s) = entity_empty_label();
   fix_sequence_statement_attributes(s);
 
-  ifdebug(9) {
-    pips_debug(9, "New value of statement\n");
-    print_statement(s);
-  }
+  stdebug(9, "remove_dead_loop: New value of statement", s);
 
   free_instruction(i);
   return FALSE;
@@ -662,10 +665,7 @@ dead_statement_rewrite(statement s)
 	      ORDERING_NUMBER(statement_ordering(s)),
 	      ORDERING_STATEMENT(statement_ordering(s)));
 
-   ifdebug(8) {
-     fprintf(stderr, "[ The current statement : ]\n");
-     print_statement(s);
-   }
+   stdebug(2, "dead_statement_rewrite: The current statement", s);
 
    switch(t) {
    case is_instruction_sequence:
@@ -683,25 +683,20 @@ dead_statement_rewrite(statement s)
        test te;
 
        pips_debug(2, "is_instruction_test\n\n");
-       ifdebug(9) {
-           print_statement(s);
-       }
+       stdebug(9, "dead_statement_rewrite: test", s);
     
        te = instruction_test(i);
        true = test_true(te);
        false = test_false(te);
        if (empty_statement_or_continue_p(true)
 	   && empty_statement_or_continue_p(false)) {
-           /* Even if there is a label, it is useless since it is not
-              an unstructured. */
+	 /* Even if there is a label, it is useless since it is not
+	    an unstructured. */
 	 pips_debug(2, "test deletion\n");
-
-           ifdebug(9) {
-	       print_statement(s);
-	   }
-
-           remove_if_statement_according_to_write_effects(s,
-							  FALSE /* structured if */);
+	 stdebug(9, "dead_statement_rewrite: ", s);
+	 
+	 remove_if_statement_according_to_write_effects
+	   (s, FALSE /* structured if */);
        }
        break;
    }
@@ -740,10 +735,7 @@ dead_statement_filter(statement s)
 	      ORDERING_NUMBER(statement_ordering(s)),
 	      ORDERING_STATEMENT(statement_ordering(s)));
 
-   ifdebug(9) {
-     pips_debug(9, "The current statement:\n");
-     print_statement(s);
-   }
+   stdebug(9, "dead_statement_filter: The current statement", s);
 
    /* Pour permettre un affichage du code de retour simple : */
    for(;;) {
@@ -804,17 +796,12 @@ dead_statement_filter(statement s)
 		ORDERING_NUMBER(statement_ordering(s)),
 		ORDERING_STATEMENT(statement_ordering(s)));
 
-		 ifdebug(9) {
-		   print_statement(s);
-		 }
+	       stdebug(9, "dead_statement_filter", s);
 	     }
 
 	     remove_loop_statement(s, i, l);
 	     dead_code_loop_executed_once++;
-	     ifdebug(9) {
-	       pips_debug(9, "After remove_loop_statement\n"); 
-	       print_statement(s);
-	     }
+	     stdebug(9, "dead_statement_filter: out remove_loop_statement", s);
 
 	     suppress_dead_code_statement(body);
 	     retour = FALSE;
