@@ -1,7 +1,6 @@
  /* package matrix */
 
 #include <stdio.h>
-#include <sys/stdtypes.h> /*for debug with dbmalloc */
 #include <malloc.h>
 
 #include "assert.h"
@@ -45,8 +44,8 @@ Pmatrix Q;
 {
     int n_min,m_min;
     int level = 0;
-    int ALL;        /* le plus petit element sur la diagonale */
-    int x;          /* le rest de la division par ALL */
+    Value ALL;        /* le plus petit element sur la diagonale */
+    Value x=VALUE_ZERO;          /* le rest de la division par ALL */
     int i;
     
     boolean stop = FALSE;
@@ -57,7 +56,7 @@ Pmatrix Q;
     int m = MATRIX_NB_COLUMNS(MAT);
     assert(m > 0 && n >0);
     matrix_assign(MAT,D);
-    assert(MATRIX_DENOMINATOR(D)==1);
+    assert(value_one_p(MATRIX_DENOMINATOR(D)));
 
     matrix_identity(P,0);
     matrix_identity(Q,0);
@@ -89,14 +88,14 @@ Pmatrix Q;
 	    ALL = SUB_MATRIX_ELEM(D,1,1,level);
 	    if (matrix_line_el(D,level) != 0) 
 		for (i=level+2; i<=m; i++) {
-		    x = MATRIX_ELEM(D,level+1,i) / ALL;
+		    x = value_div(MATRIX_ELEM(D,level+1,i),ALL);
 		    matrix_subtraction_column(D,i,level+1,x);
 		    matrix_subtraction_column(Q,i,level+1,x);
 		    next = FALSE;
 		}
 	    if (matrix_col_el(D,level) != 0) 
 		for(i=level+2;i<=n;i++) {
-		    x = MATRIX_ELEM(D,i,level+1) / ALL;
+		    x = value_div(MATRIX_ELEM(D,i,level+1),ALL);
 		    matrix_subtraction_line(D,i,level+1,x);
 		    matrix_subtraction_line(P,i,level+1,x);
 		    next = FALSE;
