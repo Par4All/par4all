@@ -350,9 +350,7 @@ variable_equal_p(variable v1, variable v2)
 }
 
 bool 
-basic_equal_p(b1, b2)
-basic b1;
-basic b2;
+basic_equal_p(basic b1, basic b2)
 {
     if(b1 == b2)
 	return TRUE;
@@ -393,9 +391,7 @@ basic b2;
 }
 
 bool 
-functional_equal_p(f1, f2)
-functional f1;
-functional f2;
+functional_equal_p(functional f1, functional f2)
 {
     if(f1 == f2)
 	return TRUE;
@@ -423,9 +419,7 @@ functional f2;
 }
 
 bool 
-parameter_equal_p(p1, p2)
-parameter p1;
-parameter p2;
+parameter_equal_p(parameter p1, parameter p2)
 {
     if(p1 == p2)
 	return TRUE;
@@ -439,9 +433,7 @@ parameter p2;
 }
 
 bool 
-mode_equal_p(m1, m2)
-mode m1;
-mode m2;
+mode_equal_p(mode m1, mode m2)
 {
     if(m1 == m2)
 	return TRUE;
@@ -454,8 +446,7 @@ mode m2;
 }
 
 int 
-string_type_size(b)
-basic b;
+string_type_size(basic b)
 {
     int size = -1;
     value v = basic_string(b);
@@ -478,8 +469,7 @@ basic b;
 
 /* See also SizeOfElements() */
 int 
-basic_type_size(b)
-basic b;
+basic_type_size(basic b)
 {
     int size = -1;
 
@@ -515,8 +505,7 @@ basic b;
  * WARNING: a pointer to an existing data structure is returned.
  */
 basic 
-expression_basic(expr)
-expression expr;
+expression_basic(expression expr)
 {
     syntax the_syntax=expression_syntax(expr);
     basic b = basic_undefined;
@@ -547,19 +536,16 @@ expression expr;
 }
 
 dimension 
-dimension_dup(d)
-dimension d;
+dimension_dup(dimension d)
 {
     return(make_dimension(expression_dup(dimension_lower(d)),
 			  expression_dup(dimension_upper(d))));
 }
 
 list 
-ldimensions_dup(l)
-list l;
+ldimensions_dup(list l)
 {
-    list 
-	result = NIL ;
+    list result = NIL ;
 
     MAPL(cd,
      {
@@ -572,9 +558,7 @@ list l;
 }
 
 dimension 
-FindIthDimension(e, i)
-entity e;
-int i;
+FindIthDimension(entity e, int i)
 {
     cons * pc;
 
@@ -707,8 +691,7 @@ basic b;
  * WARNING: a new basic object is allocated
  */
 basic 
-basic_of_expression(exp)
-expression exp;
+basic_of_expression(expression exp)
 {
   syntax sy = expression_syntax(exp);
   basic b = basic_undefined;
@@ -746,8 +729,7 @@ expression exp;
  * WARNING: a new basic is allocated
  */
 basic 
-basic_of_call(c)
-call c;
+basic_of_call(call c)
 {
   entity e = call_function(c);
   tag t = value_tag(entity_initial(e));
@@ -788,8 +770,7 @@ call c;
  * WARNING: returns a pointer
  */
 basic 
-basic_of_external(c)
-call c;
+basic_of_external(call c)
 {
   type call_type, return_type;
 
@@ -813,8 +794,7 @@ call c;
  * WARNING: returns a newly allocated basic object
  */
 basic 
-basic_of_intrinsic(c)
-call c;
+basic_of_intrinsic(call c)
 {
   basic rb;
   entity call_func;
@@ -860,8 +840,7 @@ call c;
  * WARNING: returns a pointer towards an existing data structure
  */
 basic 
-basic_of_constant(c)
-call c;
+basic_of_constant(call c)
 {
   type call_type, return_type;
 
@@ -890,8 +869,7 @@ call c;
  * always find a proper data structure to return simply a pointer
  */
 basic 
-basic_union(exp1, exp2)
-expression exp1, exp2;
+basic_union(expression exp1, expression exp2)
 {
   basic b1 = basic_of_expression(exp1);
   basic b2 = basic_of_expression(exp2);
@@ -1080,8 +1058,7 @@ basic b1, b2;
 }
 
 basic 
-simple_basic_dup(b)
-basic b;
+simple_basic_dup(basic b)
 {
     /* basic_int, basic_float, basic_logical, basic_complex are all int's */
     /* so we duplicate them the same manner: with basic_int. */
@@ -1098,6 +1075,48 @@ basic b;
 		             value_tag(basic_string(b)));
 	return (make_basic(basic_tag(b), basic_int(b))); 
     }
+}
+
+/* returns the corresponding generic conversion entity, if any.
+ * otherwise returns entity_undefined.
+ */
+entity
+basic_to_generic_conversion(basic b)
+{
+    entity result;
+
+    switch (basic_tag(b))
+    {
+    case is_basic_int: 
+	/* what about INTEGER*{2,4,8} ? 
+	 */
+	result = entity_intrinsic(INT_GENERIC_CONVERSION_NAME);
+	break;
+    case is_basic_float:
+    {
+	if (basic_float(b)==4)
+	    result = entity_intrinsic(REAL_GENERIC_CONVERSION_NAME);
+	else if (basic_float(b)==8)
+	    result = entity_intrinsic(DBLE_GENERIC_CONVERSION_NAME);
+	else
+	    result = entity_undefined;
+	break;
+    }
+    case is_basic_complex:
+    {
+	if (basic_complex(b)==8)
+	    result = entity_intrinsic(CMPLX_GENERIC_CONVERSION_NAME);
+	else if (basic_complex(b)==16)
+	    result = entity_intrinsic(DCMPLX_GENERIC_CONVERSION_NAME);
+	else
+	    result = entity_undefined;
+	break;
+    }
+    default:
+	result = entity_undefined;
+    }
+
+    return result;
 }
 
 /*
