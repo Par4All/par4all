@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1996/02/16 12:02:19 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1996/02/16 15:11:37 $, )
  * version $Revision$,
  */
 
@@ -155,9 +155,9 @@ entity module;
 	    /* The primary entity is the initial mapping ???
 	     * not sure... some decision should be involved...
 	     */
-	    fprintf(file,
+	    fprintf(file, "\n"
 		    "      MSTATUS(%d) = %d\n"
-		    "      LIVEMAPPING(%d) = .TRUE.", an, an, an);
+		    "      LIVEMAPPING(%d) = .TRUE.\n", an, an, an);
 	}
 	
 	/* RANGEA: lower, upper, size and declaration, aso
