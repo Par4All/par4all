@@ -85,8 +85,10 @@ void stf(char *mod_name)
     else
 	user_warning ("stf","No ouput from command\n");
 
-    if (!status)
+    if (!status) {
 	debug (1,"stf", "ok for module %s\n", mod_name);
+	db_update_time (DBR_SOURCE_FILE, mod_name);
+    }
     else if (status == 2)
 	user_error ("stf",
 		    "should clean up with toolpack command for module %s\n",
