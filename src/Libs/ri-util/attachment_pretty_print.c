@@ -479,7 +479,7 @@ output_the_attachments_for_emacs(FILE * output_file)
     fprintf(local_output_file, "\"");
 
     /* Enumerate all the attachments: */
-    gen_recurse(word_to_attachments_begin,
+    gen_recurse(get_word_to_attachments_begin(),
 		attachment_domain,
 		output_an_attachment,
 		rewrite_an_attachment);
@@ -506,7 +506,7 @@ output_the_attachments_for_emacs(FILE * output_file)
 	     },
 	     attachments_attachment(attachment_list));
     },
-       word_to_attachments_begin);
+			    get_word_to_attachments_begin());
 
     /* End the property part: */
     fprintf(local_output_file, "\n\t)\n)\n");
