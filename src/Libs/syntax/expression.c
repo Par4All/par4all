@@ -1,8 +1,12 @@
-/* 	%A% ($Date: 2000/04/26 11:27:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+/* 	%A% ($Date: 2000/07/07 16:12:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: expression.c,v $
+ * Revision 1.19  2000/07/07 16:12:48  irigoin
+ * call to pips_assert() replaced by call to ParserError() in MakeAtom() if
+ * an array section is parsed.
+ *
  * Revision 1.18  2000/04/26 11:27:55  irigoin
  * MakeIoList() updated to avoid sharing between calls to IOLIST.
  *
@@ -28,7 +32,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 2000/04/26 11:27:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 2000/07/07 16:12:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -299,7 +303,12 @@ int HasParenthesis;
 		entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
 		basic bt = variable_basic(type_variable(te));
 
-		pips_assert("Substring can only be applied to a string", basic_string_p(bt));
+		if(!basic_string_p(bt)) {
+		  /* pips_assert("Substring can only be applied to a string",
+				 basic_string_p(bt)); */
+		  ParserError("MakeAtom",
+			      "Substring operations can only be applied to strings in Fortran 77\n");
+		}
 
 		if(fc == expression_undefined) 
 		    fce = int_to_expression(1);
