@@ -260,14 +260,10 @@ Basis	: READ_UNIT { $$.u = 1; }
 	| Int	{ $$.i = $1; }
 	| READ_FLOAT { $$.f = $1; }
 	| String { $$ = *$1 ; }
- 	| READ_EXTERNAL Int 
-                { $$.s = read_external($2); }
-	| READ_DEF Int String Chunk 
-                { $$.p = make_def($2, $3, $4); }
-	| READ_REF Int String 
-                { $$.p = make_ref($2, $3) ; }
-	| READ_NULL 
-                { $$.p = gen_chunk_undefined ; }
+ 	| READ_EXTERNAL Int { $$.s = read_external($2); }
+	| READ_DEF Int String Chunk { $$.p = make_def($2, $3, $4); }
+	| READ_REF Int String { $$.p = make_ref($2, $3) ; }
+	| READ_NULL { $$.p = gen_chunk_undefined ; }
 	;
 
 Int     : READ_INT   { $$ = $1 ; }
@@ -301,41 +297,47 @@ void yyerror(char * s)
 
 static char * read_external(int which)
 {
-    struct gen_binding *bp = &Domains[ which ] ;
-    union domain *dp = bp->domain ;
-    extern int yyinput() ;
+  struct gen_binding *bp;
+  union domain *dp;
+  extern int yyinput();
 
-    if( dp->ba.type != EXTERNAL_DT ) {
-	fatal( "gen_read: undefined external %s\n", bp->name ) ;
-	/*NOTREACHED*/
-    }
-    if( dp->ex.read == NULL ) {
-	user( "gen_read: uninitialized external %s\n", bp->name ) ;
-	return( NULL ) ;
-    }
-    if( yyinput() != ' ' ) {
-	fatal( "read_external: white space expected\n", (char *)NULL ) ;
-	/*NOTREACHED*/
-    }
-    /*
-      Attention, ce qui suit est absolument horrible. Les fonctions
-      suceptibles d'etre  appelees a cet endroit sont:
-      - soit des fonctions 'user-written' pour les domaines externes
-      non geres par NewGen
-      - soit la fonctions gen_read pour les domaines externes geres
-      par NewGen 
-      
-      Dans le 1er cas, il faut passer la fonction de lecture d'un caractere
-      (yyinput) a la fonction de lecture du domaine externe (on ne peut pas
-      passer le pointeur de fichier car lex bufferise les caracteres en
-      entree). Dans le second cas, il faut passer le pointeur de fichier a
-      cause de yacc/lex.
-      
-      Je decide donc de passer les deux parametres: pointeur de fichier et
-      pointeur de fonction de lecture. Dans chaque cas, l'un ou l'autre sera
-      ignore. 
-      */
-    return( (*(dp->ex.read))( yyin, yyinput )) ;
+  which = gen_type_translation_old_to_actual(which);
+  message_assert("consistent domain number", which>=0 && which<MAX_DOMAIN);
+
+  bp = &Domains[ which ] ;
+  dp = bp->domain ;
+  
+  if( dp->ba.type != EXTERNAL_DT ) {
+    fatal( "gen_read: undefined external %s\n", bp->name ) ;
+    /*NOTREACHED*/
+  }
+  if( dp->ex.read == NULL ) {
+    user( "gen_read: uninitialized external %s\n", bp->name ) ;
+    return( NULL ) ;
+  }
+  if( yyinput() != ' ' ) {
+    fatal( "read_external: white space expected\n", (char *)NULL ) ;
+    /*NOTREACHED*/
+  }
+  /*
+    Attention, ce qui suit est absolument horrible. Les fonctions
+    suceptibles d'etre  appelees a cet endroit sont:
+    - soit des fonctions 'user-written' pour les domaines externes
+    non geres par NewGen
+    - soit la fonctions gen_read pour les domaines externes geres
+    par NewGen 
+    
+    Dans le 1er cas, il faut passer la fonction de lecture d'un caractere
+    (yyinput) a la fonction de lecture du domaine externe (on ne peut pas
+    passer le pointeur de fichier car lex bufferise les caracteres en
+    entree). Dans le second cas, il faut passer le pointeur de fichier a
+    cause de yacc/lex.
+    
+    Je decide donc de passer les deux parametres: pointeur de fichier et
+    pointeur de fonction de lecture. Dans chaque cas, l'un ou l'autre sera
+    ignore. 
+  */
+  return (*(dp->ex.read))(yyin, yyinput);
 }
 
 
