@@ -41,7 +41,7 @@ wpips.rc: pipsmake-rc.tex
 	# buidling $@
 	#
 	{ cat $(AUTO)-dash.h ;\
-	  sed 's,	,    ,g;s/ *$$//;/^alias /!d' $< ; } > $@
+	  perl -e 'undef $$/; while (<>) {s/\\begin{verbatim}(.*?)\\end{verbatim}/print $$1/gse;}' $< | sed 's,	,    ,g;s/ *$$//;/^alias /!d' ; } > $@
 
 resources.h: pipsmake.rc
 	#
