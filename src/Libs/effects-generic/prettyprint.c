@@ -152,7 +152,12 @@ load_list(statement_effects m, statement s)
 /****************written by Dat**********************/
 void my_effects_filter(list l_effs, string str_filter)
 {
-  //MAP(
+  MAPL(ce, {
+    effect eff = EFFECT(CAR(ce));
+    string t = effect_word_reference(effect_reference(eff));
+    if (!same_string_p(t, str_filter))
+      gen_remove(l_effs, eff);
+  }, l_effs); 
   return;
 }
 /****************************************************/
