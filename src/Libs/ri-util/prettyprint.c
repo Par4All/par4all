@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/12/26 15:12:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/12/26 16:08:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/26 15:12:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/26 16:08:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -462,8 +462,8 @@ text_entity_declaration(entity module, list ldecl)
          from_hpfc = get_bool_property("PRETTYPRINT_HPFC");
     text r, t_chars;
     list before = NIL, area_decl = NIL, ph = NIL,
-	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, pc = NIL, ps = NIL,
-	equivalence_decl = NIL;
+	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, pc = NIL, ps = NIL;
+    /* equivalence_decl = NIL; */
 
     t_chars = make_text(NIL); 
 
@@ -499,19 +499,15 @@ text_entity_declaration(entity module, list ldecl)
 	 }
 	 else if (param || external)
 	 {
+	     before = CONS(SENTENCE, sentence_basic_declaration(e), before);
 	     if (param) 
 		 /*        PARAMETER
 		  */
-		 before = CONS(SENTENCE, sentence_symbolic(e), 
-			       before);
+		 before = CONS(SENTENCE, sentence_symbolic(e), before);
 	     else 
 		 /*        EXTERNAL
 		  */
-		 before = CONS(SENTENCE, sentence_external(e), 
-			       before);
-
-	     before = CONS(SENTENCE, sentence_basic_declaration(e), 
-			   before);
+		 before = CONS(SENTENCE, sentence_external(e), before);
 	 }
 	 else if (area_p)
 	 {
@@ -900,7 +896,7 @@ int n ;
     if(!structured_do && do_enddo_p)
     {
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-	  strdup(concatenate("C     INITIALLY: DO ", do_label, "\n", NULL))));
+	  strdup(concatenate("!     INITIALLY: DO ", do_label, "\n", NULL))));
     }
 
     /* quite ugly management of other prettyprints...
