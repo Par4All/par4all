@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1996/07/12 15:35:35 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1996/10/11 17:18:38 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1996/07/12 15:35:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1996/10/11 17:18:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -49,6 +49,8 @@ static char EMACS_USER_ERROR[] = "USER_ERROR";
 static char EMACS_USER_LOG[] = "USER_LOG";
 static char EMACS_USER_WARNING[] = "USER_WARNING";
 static char EMACS_WINDOW_NUMBER[] = "WINDOW_NUMBER";
+static char EMACS_NEW_DAVINCI_CONTEXT[] = "NEW_DAVINCI_CONTEXT";
+static char EMACS_VIEW_DAVINCI_GRAPH[] = "VIEW_DAVINCI_GRAPH";
 
 /* The token to mark the begin and end of command. Use some strings to
    be usually never used in ISO-8859-1: */
@@ -205,6 +207,19 @@ send_notice_prompt_to_emacs(char *first_line, ...)
    va_end(ap);
 }
 
+
+void
+ask_emacs_to_open_a_new_daVinci_context()
+{
+    send_command_to_emacs(EMACS_NEW_DAVINCI_CONTEXT, "");
+}
+
+
+void
+ask_emacs_to_display_a_graph(string file_name)
+{
+    send_command_to_emacs(EMACS_VIEW_DAVINCI_GRAPH, file_name);
+}
 
 
 /* Here are described all the functions used to receive informations
