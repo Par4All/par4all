@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.31  2004/02/24 14:51:17  guerin
+%% New pipsmake-rc definition for PHRASE_DISTRIBUTOR_CONTROL_CODE
+%%
 %% Revision 1.30  2004/02/19 16:14:00  guerin
 %% New pipsmake-rc definition for PHRASE_DISTRIBUTOR
 %%
@@ -572,7 +575,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2004/02/19 16:14:00 $~$
+$~$Date: 2004/02/24 14:51:17 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -3408,6 +3411,23 @@ phrase_distributor                       > MODULE.code
         < MODULE.in_regions
         < MODULE.out_regions
         < MODULE.dg
+\end{verbatim}
+
+\paragraph{Phrase Distributor Control Code}
+\index{Phrase Distributor Control Code}
+
+%%@UserManualDocumentation:  phrase_distributor_control_code
+This phase add control code for PHRASE distribution. All calls to
+externalized code portions are transformed into START and WAIT calls.
+Parameters communication (send and receive) are also handled here
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+alias phrase_distributor_control_code 'PHRASE Distributor Control Code'
+
+phrase_distributor_control_code          > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
 \end{verbatim}
 
 \section{Program Transformations}
@@ -7355,6 +7375,7 @@ Thèse de doctorat de l'Université Pierre et Marie Curie,
 
 %%% Local Variables: 
 %%% mode: latex
+%%% TeX-master: t
 %%% TeX-master: t
 %%% TeX-master: t
 %%% End: 
