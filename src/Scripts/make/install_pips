@@ -1,12 +1,15 @@
 #! /bin/sh
 #
 # $RCSfile: install_pips,v $ (version $Revision$)
-# $Date: 1997/04/15 11:01:44 $, 
+# $Date: 1997/04/16 16:33:04 $, 
 #
 # installation for pips softwares and automatic generation of pipsrc
 #
 
 unset archdir type
+
+problems=./encountered_problemes
+rm -f $problems
 
 ## on f.. IBM, sh is ksh and type is whence:-(
 
@@ -90,6 +93,7 @@ executable()
     else
 	warning "not found!"
 	verb "--" "$@"
+	echo "exe: $exe ($comment)" "$@" >> $problems
     fi
 }
 
@@ -98,7 +102,7 @@ library()
 {
     lib=$1
     comment=$2
-    shift 3
+    shift 2
     verbn "looking for $lib ($comment): "
     for l in `echo $LD_LIBRARY_PATH:./Extern/Lib/$ARCH | tr : ' '`
     do
@@ -106,6 +110,7 @@ library()
     done
     warning  "not found!"
     verb "--" "$@"
+    echo "lib: $lib ($comment)" "$@" >> $problems
     return 1
 }
 
@@ -123,6 +128,7 @@ environment()
     else
 	warning "not set!"
 	verb "--" "$@"
+	echo "env: $var ($comment)" "$@" >> $problems
     fi
 }
 
@@ -408,3 +414,10 @@ verb "you can look for sources/pointers from the PIPS web page"
 verb "    http://www.cri.ensmp.fr/pips"
 echo
 warning "Source pipsrc.{sh,csh} as appropriate to your shell!"
+
+test -f $problems && {
+  echo
+  echo "SUMMARY: "
+  cat $problems
+  echo
+}
