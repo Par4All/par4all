@@ -1,7 +1,7 @@
  /* package arithmetique 
   *
   * $RCSfile: exp.c,v $ (version $Revision$)
-  * $Date: 1996/07/17 10:56:52 $, 
+  * $Date: 1996/07/19 17:57:11 $, 
   */
 
 /*LINTLIBRARY*/
@@ -29,7 +29,7 @@ Value exponentiate(Value x, int n)
     /* FI: la complexite pourrait etre reduite de O(n) a O(log n) 
      */
     for(y=VALUE_ONE; n>0; n--)
-	value_prod(y,x);
+	value_product(y,x);
 
     return y;
 }
