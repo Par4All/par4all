@@ -56,7 +56,13 @@ main()
     for(i = 4; i >= 0; i--) {
 	system("sleep 1");
 	(void) XPOMP_set_color_map(d, i, 0, 0, -1);
+	XPOMP_draw_frame(d, "", 0, 0,
+			 X_data_array_size/2 - 10*i, Y_data_array_size/2 - 5*i,
+			 X_data_array_size/2 + 10*i, Y_data_array_size/2 + 5*i,
+			 -128);
+	(void) XPOMP_scroll(d, i);
     }
+    (void) XPOMP_scroll(d, -10);
 
     system("sleep 1");
     for (i = 255; i >= -1; i--) {
@@ -84,6 +90,7 @@ main()
 	/* Display a point at mouse position: */
 	XPOMP_flash(d, &color, 1, 1, x, y, 3, 3);
 	printf("Point displayed with color %ud at (%d,%d).\n", color, x, y);
+	XPOMP_draw_frame(d, "Here", 10, 200, x - 20, y - 20, x + 20, y + 20, 100);
     }
     
     /*
