@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/07/23 11:56:38 $, )
+ * ($Date: 1996/07/23 15:08:20 $, )
  */
 
 #include "defines-local.h"
@@ -20,7 +20,7 @@ static string
 hpfc_local_name (string name, string suffix)
 {
     static char buffer[100]; /* ??? should be enough */
-    (void) sprintf(buffer, "%s_%s", name, suffix)
+    (void) sprintf(buffer, "%s_%s", name, suffix);
     return buffer;
 }
 
