@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/10/02 16:25:53 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/10/02 16:37:57 $, )
  * version $Revision$
  */
  
@@ -326,7 +326,7 @@ compile_module(entity module)
 
 /********************************************* FUNCTIONS CALLED BY PIPSMAKE */
 
-/* void hpfc_init(string name)
+/* bool hpfc_init(string name)
  *
  * what: initialize the hpfc status for a program.
  * input: the program (workspace) name.
@@ -336,7 +336,7 @@ compile_module(entity module)
  * bugs or features:
  *  - some callees are filtered out with a property, to deal with pipsmake.
  */
-void hpfc_init(string name)
+bool hpfc_init(string name)
 {
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
@@ -352,10 +352,10 @@ void hpfc_init(string name)
     save_hpfc_status();
 
     debug_off();
+    return TRUE;
 }
 
-/* void hpfc_filter(name)
- * string name;
+/* bool hpfc_filter(string name)
  *
  * what: filter the source code for module name. to be called by pipsmake.
  * how: call to a shell script, "hpfc_directives", that transforms 
@@ -369,7 +369,7 @@ void hpfc_init(string name)
  * bugs or features:
  *  - ??? not all hpf syntaxes are managable this way.
  */
-void hpfc_filter(string name)
+bool hpfc_filter(string name)
 {
     string file_name = db_get_file_resource(DBR_SOURCE_FILE, name, TRUE);
 
@@ -380,11 +380,11 @@ void hpfc_filter(string name)
 
     DB_PUT_FILE_RESOURCE(DBR_SOURCE_FILE, strdup(name), file_name);
 
-    debug_off(); 
+    debug_off();
+    return TRUE;
 }
 
-/* void hpfc_directives(name)
- * string name;
+/* bool hpfc_directives(string name)
  *
  * what: deals with directives. to be called by pipsmake.
  * input: the name of the module.
@@ -396,7 +396,7 @@ void hpfc_filter(string name)
  *  - fortran library, reduction and hpfc special functions are skipped.
  *  - ??? obscure problem with the update of common entities.
  */
-void hpfc_directives(string name)
+bool hpfc_directives(string name)
 {
     entity module = local_name_to_top_level_entity(name);
     statement s = (statement) db_get_memory_resource(DBR_CODE, name, FALSE);
@@ -429,11 +429,12 @@ void hpfc_directives(string name)
 	save_hpfc_status();
     }
 
-    debug_off(); debug_off();
+    debug_off(); 
+    debug_off();
+    return TRUE;
 }
 
-/* void hpfc_compile(name)
- * string name;
+/* bool hpfc_compile(string name)
  *
  * what: hpf compile module name. to be called by pipsmake.
  * input: the name of the module to compile.
@@ -445,7 +446,7 @@ void hpfc_directives(string name)
  *  - fortran library, reduction and hpfc special functions are skipped.
  *  - a fake file is put as the generated resource for such modules.
  */
-void hpfc_compile(string name)
+bool hpfc_compile(string name)
 {
     entity module = local_name_to_top_level_entity(name);
 
@@ -475,10 +476,10 @@ void hpfc_compile(string name)
     }
 
     debug_off();
+    return TRUE;
 }
 
-/* void hpfc_common(name)
- * string name;
+/* bool hpfc_common(string name)
  *
  * what: compile a common, that is generate the common for both host and nodes.
  * how: generate files to be included.
@@ -490,7 +491,7 @@ void hpfc_compile(string name)
  * bugs or features:
  *  - never called by pipsmake (:-)
  */
-void hpfc_common(string name)
+bool hpfc_common(string name)
 {
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering common %s\n", name);
@@ -503,10 +504,10 @@ void hpfc_common(string name)
     save_hpfc_status();
 
     debug_off();
+    return TRUE;
 }
 
-/* void hpfc_close(name)
- * string name;
+/* bool hpfc_close(string name)
  *
  * what: closes the hpf compiler execution. to be called by pipsmake.
  * input: the program (workspace) name.
@@ -517,7 +518,7 @@ void hpfc_common(string name)
  * bugs or features:
  *  - ??? COMMON should be managable thru pipsmake ad-hoc rules.
  */
-void hpfc_close(string name)
+bool hpfc_close(string name)
 {
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
@@ -535,9 +536,10 @@ void hpfc_close(string name)
     DB_PUT_FILE_RESOURCE(DBR_HPFC_COMMONS, strdup(name), NO_FILE); /* fake */
 
     debug_off();
+    return TRUE;
 }
 
-/* void hpfc_install(string name)
+/* bool hpfc_install(string name)
  *
  * what: install generated files in a directory. done for wpips.
  * how: all in the hpfc_install shell script.
@@ -548,7 +550,7 @@ void hpfc_close(string name)
  *  - copies the files in this directory...
  * bugs or features:
  */
-void hpfc_install(string name)
+bool hpfc_install(string name)
 {
     string dir = db_get_current_program_directory();
 
@@ -561,9 +563,10 @@ void hpfc_install(string name)
     DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, strdup(name), NO_FILE);
 
     debug_off();
+    return TRUE;
 }
 
-/* void hpfc_make(string name)
+/* bool hpfc_make(string name)
  *
  * what: compile the generated and installed code. for wpips.
  * how: system call to $HPFC_MAKE
@@ -572,7 +575,7 @@ void hpfc_install(string name)
  * side effects: may stop if can't execute
  * bugs or features:
  */
-void hpfc_make(string name)
+bool hpfc_make(string name)
 {
     string dir = db_get_current_program_directory();
     
@@ -584,6 +587,7 @@ void hpfc_make(string name)
     DB_PUT_FILE_RESOURCE(DBR_HPFC_CONSTRUCTION, strdup(name), NO_FILE);
 
     debug_off();
+    return TRUE;
 }
 
 /*   that is all
