@@ -37,7 +37,7 @@ LIB_HEADERS=	f77keywords \
 
 # headers made by some rule (except $INC_TARGET)
 
-DERIVED_HEADERS=toklex.h keywtbl.h tokyacc.h
+DERIVED_HEADERS=toklex.h keywtbl.h tokyacc.h yacc.in 
 DERIVED_CFILES= y.tab.c scanner.c
 
 LIB_OBJECTS=	$(DERIVED_CFILES:.c=.o)  $(LIB_CFILES:.c=.o) 
