@@ -4,7 +4,7 @@
 
 #include "all.h"
 #include "text-util.h"
-/*#include "prettyprint.h"*/
+#include "prettyprint.h"
 #include "top-level.h"
 
 /* {{{ banner */
@@ -388,7 +388,8 @@ cons *words_comp_region(comp_desc Dad)
   tag RefType;
   list pc = NIL;
 
-  Rank = context_info_rank(simple_section_context(Dad));
+  Rank = context_info_rank(simple_section_context
+			   (comp_sec_hull(comp_desc_section(Dad))));
 
   buffer[0] = '\0';
 
