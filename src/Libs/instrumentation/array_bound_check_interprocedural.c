@@ -1,17 +1,45 @@
-
+/****************************************************************** *
+ *
+ *		 INTERPROCEDURAL ARRAY BOUND CHECKING
+ *
+ *
+*******************************************************************/
 /* This phase checks for out of bound error when passing arrays or array
    elements as arguments in procedure call. It ensures that there is no bound
    violation in every array access in the callee procedure, with respect to
-   the array declarations in the caller procedure.*/
+   the array declarations in the caller procedure
+
+   The association rules for dummy and actual arrays in Fortran standard (ANSI) 
+   Section 15.9.3.3 are verified by this checking
+ 
+   * 1. If actual argument is an array name : 
+           size(dummy_array) <= size(actual_array) (1)
+   * 2. Actual argument is an array element name :
+   *       size(dummy_array) <= size(actual_array)+1-subscript_value(array element) (2)
+
+  * Remarks to simplify our checking :
+  * 1. If the first k dimensions of the actual array and the dummy array are the same, 
+  * we have (1) is equivalent with  
+  * size_from_position(dummy_array,k+1) <= size_from_position(actual_array,k+1)
+  *
+  * 2. If the first k dimensions of the actual array and the dummy array are the same, 
+  * and the first k subscripts of the array element are equal with their 
+  * correspond lower bounds (column-major order), we have (2) is equivalent with:
+  *
+  * size_from_position(dummy_array,k+1) = size_from_position(actual_array,k+1) +1 
+  *                     - subscript_value_from_position(array_element,k+1).
+
+  ATTENTION : FORTRAN standard (15.9.3) says that an association of dummy and actual 
+  arguments is valid only if the type of the actual argument is the same as the type 
+  of the corresponding dummy argument. But in practice, not much program respect this 
+  rule , so we have to multiply the array size by its element size in order to compare 
+  2 arrays*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "genC.h"
-
 #include "linear.h"
-
 #include "ri.h"
 #include "ri-util.h"
 #include "database.h"
@@ -30,7 +58,6 @@
  * bound violations for which array in which call, the following 
  * typedef array_test permits us to create a sequence of tests 
  * for each statement more easier. 
- *
  * The functions interprocedural_abc_call,
  * interprocedural_abc_expression return results of type 
  * array_test */
@@ -42,7 +69,6 @@ typedef struct array_test
 } array_test;
 
 /* context data structure for interprocedural_abc newgen recursion */
-
 typedef struct 
 {
   persistant_statement_to_control map;
@@ -81,7 +107,6 @@ static void display_interprocedural_abc_statistics()
     + number_of_bound_violations;
 }
 
-
 #define array_test_undefined ((array_test) {NIL,NIL})
 
 static bool array_test_undefined_p(array_test x)
@@ -109,8 +134,7 @@ add_array_test(array_test retour, array_test temp)
   if (!array_test_undefined_p(temp))
     {
       if (array_test_undefined_p(retour)) 
-	return temp;
-      
+	return temp;      
       /* If in temp.exp, there are expressions that exist 
        * in retour.exp, we don't have 
        * to add those expressions to retour.exp */
@@ -130,139 +154,14 @@ add_array_test(array_test retour, array_test temp)
   return retour;
 }
 
-static expression translate_to_caller_frame(call c, expression e)
-{
-  /* The size of dummy array contains only integer constants, formal variables or common variables.
-     - integer constants => keep
-     - formal variables => find the corresponding actual variables
-     - common variables => find the corresponding common variable declared in the caller */
-  expression retour = expression_undefined;
-  syntax syn = expression_syntax(e);
-  tag t = syntax_tag(syn);
-  ifdebug(2)
-    {
-      fprintf(stderr, "\n Expression to be translated: \n");
-      print_expression(e);
-    } 
-  switch(t){  
-  case is_syntax_reference: 
-    {
-      /* There are 2 cases for a reference N : formal variable or common variable*/     
-      reference ref = syntax_reference(syn);
-      entity en = reference_variable(ref);
-      storage sto = entity_storage(en);
-      if (storage_formal_p(sto)) 
-	{
-	  formal fo = storage_formal(sto);
-	  int off = formal_offset(fo);
-	  list l_args = call_arguments(c);
-	  retour = find_ith_argument(l_args,off);
-	  if (expression_undefined_p(retour)) 
-	    pips_user_warning("The actual and formal argument lists do not have the same number of arguments\n"); 
-	}
-      else 
-	{
-	  if (variable_in_common_p(en))
-	    {
-	      /* Check if the COOMON/FOO/ N is also declared in the caller or not 
-	       * We can use ram_shared which contains a list of aliased variables with en 
-	       * but it does not work ????  
-	       
-	       * Another way : looking for a variable in the declaration of the caller
-	       * that has the same offset in the same common block */
-	      
-	      list l_decl = code_declarations(entity_code(get_current_module_entity()));
-	      /* search for equivalent variable in the list */
-	      
-	      while(!ENDP(l_decl))
-		{
-		  entity enti = ENTITY(CAR(l_decl));
-		  if (same_scalar_location_p(en, enti))
-		    {
-		      /* ATTENTION : enti may be an array, such as A(2):
-			 COMMON C1,C2,C3,C4,C5
-			 COMMON C1,A(2,2)
-			 we must return A(1,1), not A */
-		      if (array_entity_p(enti))
-			{
-			  variable varenti = type_variable(entity_type(enti));   		      
-			  int len =  gen_length(variable_dimensions(varenti));
-			  list l_inds = make_list_of_constant(1,len);
-			  reference refer = make_reference(enti,l_inds);
-			  retour = reference_to_expression(refer);
-			}
-		      else 
-			retour = entity_to_expression(enti);
-		      ifdebug(2)
-			{
-			  fprintf(stderr, "\n Equivalent common variable: \n");
-			  print_expression(retour);
-			} 
-		      break;
-		    }
-		  l_decl = CDR(l_decl);
-		}
-	    }
-	}
-      break;
-    }
-  case is_syntax_call:
-    {
-      call ca = syntax_call(syn);
-      entity fun = call_function(ca);
-      list l_args = call_arguments(ca);
-      if (l_args==NIL)
-	{
-	  /* Numerical constant or symbolic value (PARAMETER) */
-	  retour = e;
-	  ifdebug(2)
-	    {
-	      fprintf(stderr, "\n Numerical constant or symbolic value \n");
-	      print_expression(e);
-	    } 	
-	}
-      else 
-	{
-	  /* e is a call, not a constant 
-	     Recursive : with the arguments of the call
-	     As our generated expression e is a call with operators : +,-,* only,
-	     we treat only these cases */
-	  if (gen_length(l_args)==1)
-	    {
-	      expression e1 = EXPRESSION(CAR(l_args));
-	      e1 = translate_to_caller_frame(c,e1);
-	      if (! expression_undefined_p(e1))
-		retour = MakeUnaryCall(fun,e1);
-	    }
-	  if (gen_length(l_args)==2)
-	    {
-	      expression e1 = EXPRESSION(CAR(l_args));
-	      expression e2 = EXPRESSION(CAR(CDR(l_args)));
-	      e1 = translate_to_caller_frame(c,e1);
-	      e2 = translate_to_caller_frame(c,e2);
-	      if ((!expression_undefined_p(e1)) && (!expression_undefined_p(e2)))
-		retour = MakeBinaryCall(fun,e1,e2);
-	    } 
-	}
-      break;
-    }
-  default:
-    pips_error("", "Abnormal cases \n");
-    break;
-  }
-   ifdebug(2)
-    {
-      fprintf(stderr, "\n is translated to: \n");
-      print_expression(retour);
-    } 
-  return retour;
-}
 
 static expression size_of_dummy_array(entity dummy_array,int i)
 {
   variable dummy_var = type_variable(entity_type(dummy_array));
   list l_dummy_dims = variable_dimensions(dummy_var);
   int num_dim = gen_length(l_dummy_dims),j;
+  basic b = variable_basic(type_variable(entity_type(dummy_array)));
+  expression e_size = int_to_expression(SizeOfElements(b));
   expression e = expression_undefined;
   for (j=i+1; j<= num_dim; j++)
     {
@@ -283,25 +182,34 @@ static expression size_of_dummy_array(entity dummy_array,int i)
       else
 	e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,e,size_j);  
     }
+  if (!expression_undefined_p(e))
+    e = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(e),e_size);
+  else 
+    e = copy_expression(e_size);
+  ifdebug(2)
+    {
+      fprintf(stderr, "\n Size of dummy array: \n");
+      print_expression(e);
+    }
   return e;
 }
 
-static expression expression_less_than_in_context(expression e1, expression e2, transformer prec)
+static expression expression_less_than_in_context(expression e1, expression e2, 
+						  transformer context)
 {
   /*This function returns a TRUE expression if (e1 < e2) = TRUE
                                  expression undefined if (e1 < e2) = FALSE
 				 a test e1 < e2*/
   normalized n1 = NORMALIZE_EXPRESSION(e1);
   normalized n2 = NORMALIZE_EXPRESSION(e2);
-  
   ifdebug(3) 
     {	  
-      fprintf(stderr, "\n first expression e1: ");    
+      fprintf(stderr, "\n First expression e1: ");    
       print_expression(e1);	
-      fprintf(stderr, "\n second expression e2 : ");    
+      fprintf(stderr, "\n Second expression e2: ");    
       print_expression(e2);
-      fprintf(stderr, " \n e1 less e2 wrt to the  precondition : ");
-      fprint_transformer(stderr,prec, entity_local_name);
+      fprintf(stderr, " \n e1 less e2 wrt to the precondition : ");
+      fprint_transformer(stderr,context, entity_local_name);
     }
   if (normalized_linear_p(n1) && normalized_linear_p(n2))
     {
@@ -321,14 +229,14 @@ static expression expression_less_than_in_context(expression e1, expression e2, 
 	  /* Tets if v_init < 0 */
 	  if (VECTEUR_NUL_P(v_init)) return expression_undefined;; /* False => no bound violation*/
 	  if (value_neg_p(val_of(v_init))) return make_true_expression();/* True => bound violation*/
-	  if (value_posz_p(val_of(v_init))) return expression_undefined;;	/* False => no bound violation*/
+	  if (value_posz_p(val_of(v_init))) return expression_undefined;/* False => no bound violation*/
 	}
       else 
 	{
 	  /* Constraint form:  v +1 <= 0*/
 	  Pvecteur v_one = vect_new(TCST,1);
 	  Pvecteur v = vect_add(v_init,v_one);
-	  Psysteme ps = predicate_system(transformer_relation(prec));  
+	  Psysteme ps = predicate_system(transformer_relation(context));  
 	  switch (sc_check_inequality_redundancy(contrainte_make(v), ps)) /* try fast check */
 	    {
 	    case 1: /* ok, e1<e2 is redundant wrt ps => bound violation*/
@@ -362,9 +270,7 @@ static expression expression_less_than_in_context(expression e1, expression e2, 
 		  return expression_undefined;	
 		if (sc_rn_p(sc))
 		  return make_true_expression();
-
 		/* Before using the system, we have to porject variables such as V#init from PIPS*/	
-
 		b = sc->base;
 		for(; !VECTEUR_NUL_P(b);b = b->succ)
 		  {
@@ -409,42 +315,43 @@ static expression expression_less_than_in_context(expression e1, expression e2, 
   return lt_expression(e1,e2);
 }
 
-static expression interprocedural_abc_arrays(call c,
-					     entity actual_array, 
+static expression interprocedural_abc_arrays(call c, entity actual_array, 
 					     entity dummy_array, 
-					     list l_actual_ref, 
-					     statement s)
+					     list l_actual_ref, statement s)
 {
   expression retour = expression_undefined;
   expression dummy_array_size;
   int same_dim = 0;  
   transformer prec = load_statement_precondition(s);
-  transformer current_context;
+  transformer context;
   if (statement_weakly_feasible_p(s))
-    current_context = add_formal_to_actual_bindings(c,transformer_dup(prec));
+    context = formal_and_actual_parameters_association(c,transformer_dup(prec));
   else 
-    current_context = add_formal_to_actual_bindings(c,transformer_identity());  
-
-  /* Compute the number of same dimensions of the actual array, dummy array and array element
-     Base on association information, common variables,  preconditions for more informations) */
-
-  while (same_dimension_p(actual_array,dummy_array,l_actual_ref,same_dim+1,current_context))
+    /* If statement is unreachable => do we need check here ?*/
+    context = formal_and_actual_parameters_association(c,transformer_identity());  
+  /* Compute the number of same dimensions of the actual array, dummy array 
+     and actual array element, based on association information, common variables,  
+     preconditions for more informations) */
+  while (same_dimension_p(actual_array,dummy_array,l_actual_ref,
+			  same_dim+1,context))
     same_dim ++;
-
   ifdebug(2)
     fprintf(stderr, "\n Number of same dimensions : %d \n",same_dim);  
-
   dummy_array_size = size_of_dummy_array(dummy_array,same_dim); 
-  
   if (!expression_undefined_p(dummy_array_size))
     {
       /* same_dim < number of dimension of the dummy array*/
+      entity current_callee = call_function(c);
       ifdebug(2)
 	{
-	  fprintf(stderr, "\n Dummy array size before translation: \n");
+	  fprintf(stderr, "\n Dummy array size before translation:\n");
 	  print_expression(dummy_array_size);
 	}
-      dummy_array_size = translate_to_caller_frame(c,dummy_array_size);
+      /* translate the size of dummy array from the current callee to the 
+	 frame of current module */
+      // dummy_array_size = iabc_translate_to_module_frame(c,dummy_array_size);
+      dummy_array_size = translate_to_module_frame(current_callee,get_current_module_entity(),
+						   dummy_array_size,c);
       ifdebug(2)
 	{
 	  fprintf(stderr, "\n Dummy array size after translation: \n");
@@ -452,33 +359,29 @@ static expression interprocedural_abc_arrays(call c,
 	}
       if (!expression_undefined_p(dummy_array_size))
 	{
-	  /*The size of the dummy array is translated to the caller's frame*/
+	  /* The size of the dummy array is translated to the caller's frame*/
 	  expression actual_array_size = size_of_actual_array(actual_array,l_actual_ref,same_dim); 
 	  /* As the size of the dummy array is translated, we need only precondition of the call
 	     in the current context*/
 	  if (!expression_undefined_p(actual_array_size))
 	    {
 	      /* same_dim < number of dimension of the actual array*/
-	      if (! same_expression_p(dummy_array_size,actual_array_size))
+	      if (!same_expression_p(dummy_array_size,actual_array_size))
 		retour = expression_less_than_in_context(actual_array_size,dummy_array_size,prec);
 	    }
 	  else 
-	    /* same_dim = number of dimension of the actual array
+	    /* same_dim == number of dimension of the actual array
 	     * If the size of the dummy array is greater than 1 => violation
 	     * For example : actual array A(M,N), dummy array D(M,N,K) or D(M,N,1,K) */
 	    retour = expression_less_than_in_context(int_to_expression(1),dummy_array_size,prec);
 	}
       else 
-	user_log("\n Warning : cannot translate the size of dummy array into the caller's frame \n");
+	user_log("\n Warning: cannot translate the size of dummy array into module's frame \n");
+        /* This case is rare, because size of dummy array = constants or formal parameters or commons*/
     }
-  
-  /* We return expression_undefined in the following cases:
-     1. dummy_array_size = expression_unefined => same_dim = number of dimension of dummy array
-        => the size of the dummy array is always equal to or les than the size of the actual array 
-     2. we cannot translate the size of the dummy array to the caller's frame 
-        => not good solution !!!
-     3. actual array size = dummy array size 
-     4. the value of retour is expression_undefined ... */
+  /* else, dummy_array_size == expression_undefined because same_dim == number of 
+     dimensions of dummy array, the inequation (1) or (2) is always true (suppose
+     that there is no intraprocedural bound violation) */
   return retour;
 }
 
@@ -491,75 +394,72 @@ static array_test interprocedural_abc_call(call c, statement s)
   array_test retour = array_test_undefined;
   entity f = call_function(c);
   list l_args = call_arguments(c);
-  while (!ENDP(l_args))
-    {
-      expression e = EXPRESSION(CAR(l_args));
-      array_test temp = interprocedural_abc_expression(e,s);
-      retour = add_array_test(retour,temp);		     
-      l_args = CDR(l_args);
-    }  
-  /* ATTENTION : we have to compute the callgraph (make CALLGRAPH_FILE[%ALL])
+  /* Traverse the argument list => check for argument which is a function call*/
+  MAP(EXPRESSION,e,
+  {
+    array_test temp = interprocedural_abc_expression(e,s);
+    retour = add_array_test(retour,temp);	
+  },	     
+      l_args);  
+  /* ATTENTION : we have to compute the callgraph before (make CALLGRAPH_FILE[%ALL])
      in order to have the initial value of f is recognized by PIPS as value code.
-     If not => core dumped 
-     I should add a user warning here !!!*/
-
+     If not => core dumped. I should add a user warning here !!!*/ 
   if (value_code_p(entity_initial(f)))
     {
       /* c is a call to a function or subroutine */
-      list l_args = call_arguments(c);
       int i =1;
       ifdebug(2)
 	{
 	  fprintf(stderr, "\n Call to a function/subroutine:");
 	  fprintf(stderr, "%s ", entity_name(f));
 	}  
-      while (!ENDP(l_args))
-	{
-	  expression e = EXPRESSION(CAR(l_args));
-	  if (array_argument_p(e))
-	    {
-	      reference r = expression_reference(e);
-	      entity actual_array = reference_variable(r);
-	      if (!assumed_size_array_p(actual_array))
+      MAP(EXPRESSION,e,
+      {
+	if (array_argument_p(e))
+	  {
+	    reference r = expression_reference(e);
+	    entity actual_array = reference_variable(r);
+	    if (!assumed_size_array_p(actual_array))
+	      {
+		/* find corresponding formal argument in f : 
+		   f -> value -> code -> declaration -> formal variable 
+		   -> offset == i ?*/
+		list l_actual_ref = reference_indices(r);
+		list l_decls = code_declarations(entity_code(f));
+		MAP(ENTITY, dummy_array,
 		{
-		  /* find corresponding formal argument in f : complicated !!!
-		     f -> value -> code -> declaration -> formal variable 
-		     -> offset = i*/
-		  list l_actual_ref = reference_indices(r);
-		  list l_decls = code_declarations(entity_code(f));
-		  while (!ENDP(l_decls))
+		  if (formal_parameter_p(dummy_array))
 		    {
-		      entity dummy_array = ENTITY(CAR(l_decls));
-		      storage sto = entity_storage(dummy_array);
-		      if (storage_formal_p(sto))
+		      formal fo = storage_formal(entity_storage(dummy_array));
+		      if (formal_offset(fo) == i)
 			{
-			  formal fo = storage_formal(sto);
-			  int off = formal_offset(fo);
-			  if (off == i)
+			  /* We have found the corresponding dummy argument*/
+			  if (!assumed_size_array_p(dummy_array))
 			    {
-			      /*we have found the corresponding dummy argument*/
-			      if (!assumed_size_array_p(dummy_array))
+			      expression check = interprocedural_abc_arrays(c,actual_array,
+								dummy_array,l_actual_ref,s);
+			      if (!expression_undefined_p(check))
 				{
-				  expression check = interprocedural_abc_arrays(c, actual_array,
-										dummy_array,
-										l_actual_ref,
-										s);
-				  if (!expression_undefined_p(check))
-				    {
-				      array_test tmp = make_array_test(actual_array,check);
-				      retour = add_array_test(retour,tmp);	
-				    }
+				  array_test tmp = make_array_test(actual_array,check);
+				  retour = add_array_test(retour,tmp);	
 				}
-			      break;
 			    }
+			  else 
+			    /* Formal parameter is an assumed-size array => what to do ?*/
+			    user_log("\n  Warning: formal parameter is an assumed-size array \n");
+			  break;
 			}
-		      l_decls = CDR(l_decls);
 		    }
-		}
-	    }
-	  i++;
-	  l_args = CDR(l_args);
-	}
+		},
+		    l_decls);
+	      }
+	    else 
+	      /* Actual argument is an assumed-size array => what to do ?*/
+	      user_log("\n  Warning: actual argument is an assumed-size array \n");
+	  }
+	i++;
+      },  
+	  l_args);
     }
   return retour;
 }
@@ -576,16 +476,13 @@ static statement make_interprocedural_abc_tests(array_test at)
 {  
   list la = at.arr,le = at.exp; 
   statement retour = statement_undefined;
-
   while (!ENDP(la))
     { 
       entity a = ENTITY(CAR(la));
       expression e = EXPRESSION(CAR(le));     
       string message = strdup(concatenate("\"Bound violation:array ", 
 					  entity_name(a),"\"", NULL));
-      test tes = test_undefined;
-      statement temp = statement_undefined;
-
+      statement smt = statement_undefined;
       if (true_expression_p(e))
 	{
 	  // There exists bound violation, we put a stop statement 
@@ -593,14 +490,13 @@ static statement make_interprocedural_abc_tests(array_test at)
 	  return make_stop_statement(message);	  
 	}
       number_of_added_tests++;
-      tes =  make_test(e, make_stop_statement(message),
-		       make_block_statement(NIL));
-      temp = test_to_statement(tes);
+      smt = test_to_statement(make_test(e, make_stop_statement(message),
+					make_block_statement(NIL)));
       if (statement_undefined_p(retour))
-	retour = copy_statement(temp);
+	retour = copy_statement(smt);
       else 
 	// always structured case
-	insert_statement(retour,copy_statement(temp),FALSE);   
+	insert_statement(retour,copy_statement(smt),FALSE);   
       la = CDR(la);
       le = CDR(le);
     }
@@ -619,8 +515,7 @@ static void interprocedural_abc_insert_before_statement(statement s, statement s
      when inserting s1 before s.  */
   if (bound_persistant_statement_to_control_p(context->map, s))
     {
-      /* take the control that  has s as its statement  */
-      
+      /* take the control that  has s as its statement  */      
       control c = apply_persistant_statement_to_control(context->map, s);
       if (stack_size(context->uns)>0)
 	{	
@@ -631,16 +526,13 @@ static void interprocedural_abc_insert_before_statement(statement s, statement s
 	    {
 	      fprintf(stderr, "Unstructured case: \n");
 	      print_statement(s);
-	    }    
-	  
+	    }    	  
 	  /* for a consistent unstructured, a test must have 2 successors, 
 	     so if s1 is a test, we transform it into sequence in order 
-	     to avoid this constraint. 
-	  
+	     to avoid this constraint. 	  
 	     Then we create a new control for it, with the predecessors 
 	     are those of c and the only one successor is c. 
-	     The new predecessors of c are only the new control*/
-	  
+	     The new predecessors of c are only the new control*/	  
 	  if (statement_test_p(s1))
 	    {
 	      list seq = CONS(STATEMENT,s1,NIL);
@@ -652,7 +544,6 @@ static void interprocedural_abc_insert_before_statement(statement s, statement s
 		  print_statement(s1);
 		  print_statement(s2);
 		}      
-
 	      newc = make_control(s2, control_predecessors(c), CONS(CONTROL, c, NIL));
 	    }
 	  else 
@@ -664,21 +555,16 @@ static void interprocedural_abc_insert_before_statement(statement s, statement s
 	    {
 	      if (CONTROL(CAR(lc))==c) CONTROL(CAR(lc)) = newc;
 	    }, control_successors(co));
-	  },control_predecessors(c));
- 
+	  },control_predecessors(c)); 
 	  control_predecessors(c) = CONS(CONTROL,newc,NIL);
-
 	  /* if c is the entry node of the correspond unstructured u, 
-	     the newc will become the new entry node of u */
-	      
+	     the newc will become the new entry node of u */	      
 	  if (unstructured_control(u)==c) 
 	    unstructured_control(u) = newc;	 
 	}
       else
-	{
-	  // there is no unstructured (?)
-	  insert_statement(s,s1,TRUE);
-	}
+	// there is no unstructured (?)
+	insert_statement(s,s1,TRUE);
     }
   else
     // structured case 
@@ -790,11 +676,10 @@ bool array_bound_check_interprocedural(char *module_name)
   statement module_statement;  
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
-  set_current_module_statement(module_statement);
   set_precondition_map((statement_mapping)
 		       db_get_memory_resource(DBR_PRECONDITIONS,module_name,TRUE));
   initialize_ordering_to_statement(module_statement);
-  debug_on("INTERPROCEDURAL_ARRAY_BOUND_CHECK_DEBUG_LEVEL");
+  debug_on("ARRAY_BOUND_CHECK_INTERPROCEDURAL_DEBUG_LEVEL");
   ifdebug(1)
     {
       debug(1, "Interprocedural array bound check","Begin for %s\n", module_name);
@@ -815,8 +700,8 @@ bool array_bound_check_interprocedural(char *module_name)
     }
   debug_off(); 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name),module_statement);
+  reset_ordering_to_statement();
   reset_precondition_map();
-  reset_current_module_statement();
   reset_current_module_entity();
   return TRUE;
 }
