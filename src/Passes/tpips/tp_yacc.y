@@ -136,9 +136,9 @@ i_open:
 	    debug(7,"yyparse","reduce rule i_open\n");
 
 	    if (execution_mode) {
-		if (db_get_current_program_name() != NULL)
-		    close_program ();
-		if (( $$ = open_program (yylval.name)))
+		if (db_get_current_workspace_name() != NULL)
+		    close_workspace ();
+		if (( $$ = open_workspace (yylval.name)))
 		{
 		    main_module_name = get_first_main_module();
 		    
@@ -179,7 +179,7 @@ i_create:
 		else {
 		    db_create_workspace ((string) $<name>4);
 		    free($<name>4);
-		    create_program (&the_file_list.argc, the_file_list.argv);
+		    create_workspace (&the_file_list.argc, the_file_list.argv);
 		    main_module_name = get_first_main_module();
 		    
 		    if (!string_undefined_p(main_module_name)) {
@@ -206,8 +206,8 @@ i_close:
 	    debug(7,"yyparse","reduce rule i_close\n");
 
 	    if (execution_mode) {
-		if (db_get_current_program_name() != NULL) {
-		    close_program ();
+		if (db_get_current_workspace_name() != NULL) {
+		    close_workspace ();
 		    $$ = TRUE;
 		} else {
 		    user_error ("yyparse","No workspace to close\n");
@@ -234,7 +234,7 @@ i_delete:
 		    user_error ("yyparse","Workspace opened\n");
 		    $$ = FALSE;
 		} else {
-		    delete_program (t);
+		    delete_workspace (t);
 		    /* In case of problem, user_error() has been
 		       called, so it is OK now !!*/
 		    user_log ("Workspace %s deleted.\n", t);
@@ -559,7 +559,7 @@ owner:
 	    debug(7,"yyparse","reduce rule owner (PROGRAM)\n");
 
 	    if (execution_mode) {
-		$$ = CONS(STRING, db_get_current_program_name (), NIL);
+		$$ = CONS(STRING, db_get_current_workspace_name (), NIL);
 	    }
 	}
 	|
@@ -735,8 +735,8 @@ char * s;
 
 void close_workspace_if_opened()
 {
-    if (db_get_current_program_name() != NULL)
-	close_program ();
+    if (db_get_current_module_name() != NULL)
+	close_workspace ();
 }
 
 static void print_property(char* pname, property p)
