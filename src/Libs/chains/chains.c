@@ -105,6 +105,7 @@ static hash_table Vertex_statement ;	/* Vertex_statement maps each
 
 static bool one_trip_do ;
 static bool keep_read_read_dependences ;
+static bool disambiguate_constant_subscripts ;
 
 static void set_effects(char *module_name, int use);
 static void reset_effects();
@@ -942,7 +943,10 @@ bool (*which)() ;
 
 	    if( entity_conflict_p( ein, eout ) && (*which)( fin, fout )) {
 		list loops = load_statement_enclosing_loops(stout);
-		bool remove_this_conflict_p = FALSE;
+		reference rin = effect_reference(fin);
+		reference rout = effect_reference(fout);
+		bool remove_this_conflict_p = disambiguate_constant_subscripts?
+		    references_do_not_conflict_p(rin, rout): FALSE;
 
 		MAPL(pl, {
 		    statement el = STATEMENT(CAR(pl));
@@ -1152,6 +1156,8 @@ unstructured u ;
     one_trip_do = get_bool_property( "ONE_TRIP_DO" ) ;
     keep_read_read_dependences = 
 	    get_bool_property( "KEEP_READ_READ_DEPENDENCE" ) ;
+    disambiguate_constant_subscripts = 
+	    get_bool_property( "CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS" ) ;
 
     ifdebug(1) {
 	mem_spy_begin();
