@@ -17,6 +17,8 @@
 
 #include "sac.h"
 
+#include "properties.h"
+
 #include <limits.h>
 
 static bool should_unroll_p(instruction i)
@@ -76,6 +78,8 @@ static bool simple_simd_unroll_loop_filter(statement s)
    instruction i;
    loop l;
    instruction iBody;
+   int regWidth;
+   int j;
 
    /* If this is not a loop, keep on recursing */
    i = statement_instruction(s);
@@ -100,16 +104,23 @@ static bool simple_simd_unroll_loop_filter(statement s)
    else
       varwidth = varwidths.min;
 
-   /* Unroll as many times as needed by the variables width */
-   if ((varwidth > 32) || (varwidth <= 0)) 
+   /* Round up varwidth to a power of 2 */
+   regWidth = get_int_property("SAC_SIMD_REGISTER_WIDTH");
+
+   if ((varwidth > regWidth/2) || (varwidth <= 0)) 
       return FALSE;
-   else if (varwidth <= 8) 
-      varwidth = 8;
-   else if (varwidth <= 16) 
-      varwidth = 16;
-   else 
-      varwidth = 32;
-   loop_unroll(s, 64 / varwidth);
+
+   for(j = 8; j <= regWidth/2; j*=2)
+   {
+      if (varwidth <= j)
+      {
+	 varwidth = j; 
+	 break;
+      }
+   }
+
+   /* Unroll as many times as needed by the variables width */
+   loop_unroll(s, regWidth / regWidth);
 
    /* Do not recursively analyse the loop */
    return FALSE;
