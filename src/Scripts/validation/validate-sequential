@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/05/27 11:28:19 $, ) 
+# ($Date: 1997/05/27 11:52:10 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -191,7 +191,7 @@ report()
   result=$1
   message=$2
   
-  $debg " || report $1 suggested"
+  $debg " || report $1 suggested ${3:-$directory/$program}"
 
   if [ $result -ne 0 ] 
   then
@@ -272,6 +272,8 @@ test_aspect()
      u_name=`echo $name | tr [a-z] [A-Z]`
      program=$name
 
+     $debg " || in `pwd` for $file ($name)"
+
      test -r $aspect/$name.f -o -r $aspect/$name.F || 
 	echo "! no $aspect/$name.[fF]"
      
@@ -291,7 +293,7 @@ test_aspect()
 
        report $STATUS \
          "Execution of $aspect/$name.test failed" || \
-         { $debg " || error"; continue;}
+         { $debg " || error $aspect/$name.test"; continue;}
        
        make_diff $aspect $name test
        continue
@@ -309,7 +311,7 @@ test_aspect()
        
        report $STATUS \
          "Execution of $aspect/$name.tpips failed" || \
-         { $debg " || error"; continue;}
+         { $debg " || error $aspect/$name.tpips"; continue;}
 
        make_diff $aspect $name test
        continue
@@ -329,7 +331,8 @@ test_aspect()
        [ -f core ] && rm -f core
 
        report $STATUS "Execution of $aspect/default_test on $name.f failed" ||
-	    { $debg " || error"; rm -f $aspect/$name.test; continue;}
+	    { $debg " || error $aspect/default_test"; 
+	      rm -f $aspect/$name.test; continue;}
        
        rm -f $aspect/$name.test
        make_diff $aspect $name test
@@ -351,7 +354,7 @@ test_aspect()
 	[ -f core ] && rm -f core
 
         report $STATUS "Execution of $aspect/default_tpips on $file failed" ||
-	    { $debg " || error"; continue;}
+	    { $debg " || error $aspect/default_tpips"; continue;}
        
 	make_diff $aspect $name test
 	continue
