@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.132  1998/01/16 16:19:38  coelho
+# loreto added as a linux host.
+#
 # Revision 1.131  1997/11/25 17:23:49  coelho
 # calice -> calice1 on tir for LINUXI86 also...
 #
@@ -231,7 +234,7 @@ test "${PIPS_ARCH}" = . -o "${PIPS_ARCH}" = GNU && \
 	PIPS_HOSTS="chailly:episy:aiguebelette:roazhon"
 
 test "${PIPS_ARCH}" = LINUXI86 -o "${PIPS_ARCH}" = LINUXI86LL && \
-	PIPS_HOSTS="tirnanog:coulommiers"
+	PIPS_HOSTS="tirnanog:loreto:coulommiers"
 
 # PIPS_EXPERIMENTSDIR="${pips_dir}/Experiments"
 # PIPS_TESTSDIR="${pips_dir}/Tests"
