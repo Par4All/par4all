@@ -106,9 +106,15 @@ print_sentence(FILE * fd,
 	    /* Keep track of the attachment against the padding: */
 	    deal_with_attachments_in_this_string(label,
 						 position_in_the_output);
-	    /* In C, a label cannot begin with a number so "l" is added for this case*/
-	    fprintf_sentence(fd,get_bool_property("PRETTYPRINT_C_CODE")?
-			     (isdigit(label[0])?"l%s:":"%s"):"%-5s ", label);
+
+	    if (!get_bool_property("PRETTYPRINT_C_CODE"))
+	      fprintf_sentence(fd, "%-5s ", label);
+	    else 
+	      {
+		/* C prettyprinter: a label cannot begin with a number so "l" is added for this case*/
+		if (strlen(label)>0)
+		  fprintf_sentence(fd,isdigit(label[0])?"l%s:":"%s:",label);
+	      }
 	}
 	else {
 	  fprintf_sentence(fd,get_bool_property("PRETTYPRINT_C_CODE")?"":"      ");
