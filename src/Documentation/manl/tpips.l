@@ -6,215 +6,133 @@
 tpips \- Interprocedural Parallelizer of Scientific Programs, 
 PIPS tty interface.
 .SH SYNOPSIS
-tpips [-n] [-h] [-?] [-v] [-l
-.IR logfilename ] [ 
-.IR scriptfilename ]
+tpips [-nscvh?jw] [-l 
+.IR logfile ] 
+[-r 
+.IR rcfile ] 
+[-e 
+.IR tpips-cmds ] 
 .\"
 .SH DESCRIPTION
 
+.B tpips
+is the 
+.B line interface
+and scripting language of the
+PIPS project. All PIPS functionalities are available, with
+on-line help and automatic completion.
+
+.B tpips
+is more efficient than the pips based scripts ( Init,
+Display,...) because the database is not open, read, written and closed
+for each command. 
+.B tpips
+is less user-friendly than wpips and epips,
+although it provides the unique opportunity to apply a transformation or
+display some information on several modules with one command, using
+pipsmake metavariables, 
+.BR %CALLERS
+and  
+.BR %CALLEES,  
+or environment  user defined variables such
+as 
+.BR $MODULES
+The jpips future user
+interface will provide these pips/tpips functionalities too.
+
+.B tpips
+is recommended for large benchmarks and experiments, when
+analysis and optimization results do not require interactive working. 
+.B  tpips
+is used for the validation of each new pips version.
+
+.B tpips
+can be used to automatically replay a manual wpips or 
+.B  tpips
+session by using 
+.BR logfile_to_tpips
+The
+.BR logfile_to_tpips 
+command derives a
+.B tpips 
+script
+from a logfile in a workspace. A PIPS beginner
+should start with a window interface, wpips or epips, and not with 
+.B  tpips
+
+
+
+Access to Unix Shell and to PIPS properties is provided by 
+.B tpips
+PIPS properties can be modified from 
+.B tpips
+and only from 
+.B  tpips
+during a 
 .B PIPS 
-(Paralleliseur Interprocedural de Programmes Scientifiques) 
-is a
-research project from the Computer Science Research Center (Centre de
-Recherche en Informatique, CRI) at Ecole des Mines de Paris (France). It
-is an interprocedural source-to-source compiler, currently supporting most
-of Fortran 77, to analyze and parallelize real scientific codes for shared
-memory multi-processor machines, and to distribute automatically simple
-codes for distributed-memory machines and processor networks (e.g. NOW). 
-It also includes an HPF compiler prototype, hpfc.
+session. On the other hand,
+.B Wpips
+reads at the
+beginning of the session the default properties and the new ones
+(re)defined in the 
+.B properties.rc
+file, but no change can be done
+afterwards.  Resetting properies during a session can be used to rebuild
+an application when some modules have been updated by 
+.B PIPS,
+e.g. after
+partial evaluation.
 
-.B tpips 
-is the line interface and scripting language of the PIPS
-project. All PIPS functionalities are available, with on-line help and
-automatic completion.  Access to Unix Shell and to PIPS properties also is
-provided. This can be used to rebuild an application when some modules
-have been updated by PIPS, e.g. after partial evaluation.
+The
+.Bt tpips
+commands are listed on-line by the help command.
+Possible arguments are completed or suggested by automatic
+completion (TAB and TAB/TAB). A command may be spread on
+several lines by guarding the line feed characters by
+backslashes.
 
-.B tpips 
-is more efficient than the 
-.B pips 
-based scripts (
-.B Init, 
-.B Display,...)
-because the database is not open, read, written and closed for each
-command. 
-.B tpips 
-is less user-friendly than 
-.B wpips 
-and 
-.B epips, 
-although it
-provides the unique opportunity to apply a transformation or display some
-information on several modules with one command, using pipsmake
-meta-variables, $ALL, $CALLERS and $CALLEES. PIPS 
-.B properties
-can also be modified from tpips, and only from tpips.
-.B tpips 
-can be used to replay a
-wpips session by using 
-.B logfile_to_tpips
-to derive a tpips script from a logfile in a workspace. A PIPS beginner
-should start with a window interface, 
-.B wpips 
-or 
-.B epips,
-and not with
-.B tpips.
-
-The tpips commands are listed on-line by the 
-.B help
-command. Possible
-arguments are completed or suggested by automatic completion (TAB and
-TAB/TAB). A command may be spread on several lines by guarding the line
-feed characters by backslashes.
-
-A simple tpips session is made of a few steps. First, a workspace
-must be created:
-
-.BR create
-foo source1.f source2.f
-
-and a subdirectory of the current directory, here 
-.B foo.database, 
-is opened
-or created to store and retrieve code and information computed by PIPS about
-subroutines and functions found in module1.f or module2.f.
-
-Then, you have to select a module, let say
-.B foo, 
-by typing:
-
-.BR module
-foo
-
-unless there is only one function or subroutine in the Fortran
-file(s) which were passed to the 
-.B create
-command, in which case it is automatically selected.
-
-To keep it simple the first time, you should then try to display the
-sequential code by typing:
-
-.BR display
-PRINTED_FILE
-
-Other resource names let you visualize the parallelized code
-(PARALLELPRINTED_FILE), or the distributed code.
-
-The commands for workspaces are: 
-.B create 
-a new workspace (see Shell command 
-.B Init),
-.B open 
-an existing workspace, 
-.B close 
-the current workspace,
-and 
-.B delete 
-the current workspace or a specific one (see Shell command
-.B Delete). 
-
-These commands can be used several times during a session or within a
-tpips script file.
-
-A specific current module is selected as current module with: 
-
-.B module 
-.I module_name
-
-When several rules, i.e. functions, can be used to compute the same
-resource, for instance a parallel version of a module, the rule selection
-command is: 
-
-.B activate 
-.I rule
-
-It is equivalent to the Shell
-.B Select
-command.
-
-A resource, i.e. any piece of information computed by PIPS, 
-can be required by command:
-
-.B make 
-.I resource
-
-or
-
-.B make 
-.I resource(owner)
-
-which uses interproceduraly and recursively default rules (see Shell command
-.B Build). 
-Or it is produced by
-a specific rule:
-
-.B apply 
-.I rule
-
-which will require all its resource arguments by recursively calling 
-.B make
-(see Shell command
-.B Perform).
-
-The 
-.I owner 
-of a resource is the module it is attached to. By default,
-the owner is assumed to be the current module.
-
-
-
-File resources can be displayed on screen:
-
-.B display 
-.I printable_resource
-
-as with the Shell
-.B Display
-script.
-
-Names for printable resources usually contain the string 
-.B FILE. 
-They are
-stored as human readable ASCII file in the workspace, whereas
-non-printable resources are ASCII-encoded internal data structures.
-
-The tpips Unix-related commands are:
-.B cd,
-.B setenv,
-.B echo,
-and
-.B shell.
-
-The standard command to leave 
-.B tpips 
-is
-.B quit
-but a control-D or end-of-file condition are valid too.
 
 .\"
 .SH OPTIONS
 
 .TP
-.B \-n
-requires a syntax check of a Script file (no PIPS action is performed)
-
+.B \-n    
+ no execution mode. Just check the script syntax.
 .TP
-.B \-l
-specifies a non-default log file.
-
+.B \-s    
+ behaves like a shell. 
+.B tpips
+ commands simply extend a shell.
 .TP
-.B \-h
+.B \-c    
+ behaves like a command, not a shell (it is the default option).
 .TP
-.B \-?
-provides some help.
-
+.B \-v    
+ displays version and architecture information.
 .TP
-.B \-v
-returns the version number (in fact, no; if you are good, 
-you can guess if you are executing the 32-bit or 
-the 64-bit version of PIPS...) before starting the 
-tpips interpretation loop.
+.B \-h or \-?    
+ provides some help.
+.TP
+.B \-j   
+ jpips special mode.
+.TP
+.B \-w    
+ starts with a wrapper (jpips special again)...
+.TP
+.B \-l logfile 
+ log to 
+.BR logfile
+.TP
+.B \-r rcfile 
+source the 
+.BR rcfile
+file. (default
+.B \~.tpipsrc)
+.TP
+.B \-e tpips-cmds
+executes the 
+.B tpips-cmds
+commands.
 
 .\"
 .SH EXAMPLE
@@ -288,3 +206,4 @@ reports and papers.
 
 .\"
 .SH DIAGNOSTICS
+
