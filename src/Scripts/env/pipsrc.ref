@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1994/03/22 09:53:32 $, ) version $Revision$, 
+# $RCSfile: pipsrc.ref,v $ ($Date: 1994/03/22 15:28:45 $, ) version $Revision$, 
 # got on %D%, %T%
 # $Id$
 #
@@ -22,6 +22,9 @@ TEMPDIR="/tmp"
 
 # home directory for openwin (only used by the XView interface: wpips)
 OPENWINHOME="/usr/openwin"
+
+# hosts for Validate
+PIPS_HOSTS=":avon:chailly:moret:denver:provins:lutetia:nemours:montsegur"
 
 # home directories for external softwares
 LINEARDIR=/home/users/pips/C3/Linear
