@@ -625,31 +625,38 @@ dot_F_file_p(string name)
 static string 
 process_thru_cpp(string name)
 {
-    string dir_name, new_name, simpler, cpp_options, cpp, tmp_file;
+    string dir_name, new_name, simpler, cpp_options, cpp, tmp_link,
+	path_to_name, dir_to_name;
 
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, ".F");
     new_name = strdup(concatenate(dir_name, "/", simpler, CPPED, 0));
-    tmp_file = strdup(concatenate(dir_name, "/", simpler, ".tmp.c", 0));
-    free(simpler);
+    tmp_link = strdup(concatenate(dir_name, "/", simpler, ".tmp.c", 0));
     free(dir_name);
+    free(simpler);
 
     cpp = getenv(CPP_PIPS_ENV);
     cpp_options = getenv(CPP_PIPS_OPTIONS_ENV);
+    
+    path_to_name = strdup(name[0]=='.'? concatenate("../../", name, 0): name);
+    dir_to_name = pips_dirname(name);
 
-    /* some C compilers do not like to cpp a .F file.
-     * hence the tmp_file used here as a work around.
+    /* some C compilers do not like to cpp a .F file. (gcc without g77...)
+     * hence the tmp_link used here as a work around. 
+     * it can fail anyway if "'" appears in Fortran comments.
      */
-    safe_system(concatenate(
-	"cp ", name, " ", tmp_file, " && ",
-	cpp? cpp: CPP_CPP, 
-	CPP_CPPFLAGS, cpp_options? cpp_options: "", " ",
-	tmp_file, " > ", new_name, 0));
+    safe_symlink(path_to_name, tmp_link);
+	
+    safe_system(concatenate(cpp? cpp: CPP_CPP, 
+			    CPP_CPPFLAGS, cpp_options? cpp_options: "", 
+			    " -I", dir_to_name, " ",
+			    tmp_link, " > ", new_name, 0));
 
-    if (unlink(tmp_file)) 
-	pips_internal_error("unlink of %s failed\n", tmp_file);
+    safe_unlink(tmp_link);
 
-    free(tmp_file);
+    free(path_to_name);
+    free(dir_to_name);
+    free(tmp_link);
     return new_name;
 }
 
