@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/08 19:52:44 $, 
+# $Date: 1996/07/08 19:55:28 $, 
 
 LIB_CFILES=	sc_alloc.c \
 	        sc_projection.c \
@@ -16,16 +16,16 @@ LIB_CFILES=	sc_alloc.c \
 	        sc_triang_elim_redond.c \
 	        sc_elim_redund.c \
 	        sc_elim_simple_redund.c \
-        	sc_insert_eq.c \
-	        sc_transformation.c\
-        	sc_var.c \
+		sc_insert_eq.c \
+		sc_transformation.c\
+		sc_var.c \
 	        sc_eval.c \
-        	sc_unaires.c \
-	        sc_error.c \
-        	sc_io.c \
-	        sc_new_loop_bound.c \
-        	sc_simplexe_feasibility.c \
-	        sc_debug.c
+		sc_unaires.c \
+		sc_error.c \
+		sc_io.c \
+		sc_new_loop_bound.c \
+		sc_simplexe_feasibility.c \
+		sc_debug.c
 
 LIB_HEADERS=	sc-local.h \
 		sc-private.h \
@@ -40,8 +40,7 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 LIB_OBJECTS= $(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o) 
 
 sc_lex.c: sc_lex.l
-	$(SCAN) $<
-	mv lex.yy.c $@
+	$(SCAN) $< > $@
 
 sc_gram.c: sc_gram.y
 	$(PARSE) $<
