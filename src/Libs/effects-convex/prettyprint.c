@@ -59,10 +59,10 @@ pips_region_user_name(entity ent)
 	    /* ent is a PHI entity from the regions module */
 	    name = entity_local_name(ent);
 	else	
-            if (entity_has_values_p(ent))
-		name = entity_minimal_name(ent);
-	    else
-		name = entity_name(ent);
+	    /**** ARGH why using this stuff in transformer... ******/
+            /* if (entity_has_values_p(ent)) */
+	    /* else name = entity_name(ent); */
+	    name = entity_minimal_name(ent);
     }
 
     return name;
@@ -331,10 +331,6 @@ text text_private_array_regions(list l)
 
 /* CALLGRAPH/ICFG stuff (should be OBSOLETE?)
  */
-#define is_RW
-#define is_IN
-#define is_OUT
-
 static text 
 get_text_regions_for_module(
     string module_name, 
@@ -342,10 +338,16 @@ get_text_regions_for_module(
     string ifread,
     string ifwrite)
 {
+    text t;
+    entity mod;
     list /* of effect */ le = effects_effects((effects) 
 	db_get_memory_resource(resource_name, module_name, TRUE));
-    text t;
+
+    /* the current entity may be used for minimal names... */
+    mod = local_name_to_top_level_entity(module_name);
+    set_current_module_entity(mod);
     t = text_array_regions(le, ifread, ifwrite);
+    reset_current_module_entity();
     return t;
 }
 
