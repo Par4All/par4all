@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/04/17 13:17:51 $, )
+! ($Date: 1997/05/14 15:18:15 $, )
 !
 !-----------------
 !
@@ -270,7 +270,7 @@
 !
 ! where should I put it?
 !
-      call pvmfinitsend(PVMRAW, bufid)
+      call HPFC INIT SEND
       end
 !
 !-----------------
@@ -364,9 +364,9 @@
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(what, val, 1, 1, info)
-      call pvmfsend(COMPUTERTID, SENDCHANNELS(CLID), info)
+      call HPFC INIT SEND
+      call HPFC PACK(what, val, 1, 1, info)
+      call HPFC SEND(COMPUTERTID, SENDCHANNELS(CLID), info)
       SENDCHANNELS(CLID) = SENDCHANNELS(CLID) + 2
       end
 !
@@ -380,9 +380,9 @@
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(what, val, 1, 1, info)
-      call pvmfsend(HOSTTID, HOST SND CHANNEL, info)
+      call HPFC INIT SEND
+      call HPFC PACK(what, val, 1, 1, info)
+      call HPFC SEND(HOSTTID, HOST SND CHANNEL, info)
       HOST SND CHANNEL = HOST SND CHANNEL + 2
       end
 !
@@ -397,9 +397,9 @@
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "sending to ", OLID)
-      call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(what, val, 1, 1, info)
-      call pvmfsend(OWNERTID, SENDCHANNELS(OLID), info)
+      call HPFC INIT SEND
+      call HPFC PACK(what, val, 1, 1, info)
+      call HPFC SEND(OWNERTID, SENDCHANNELS(OLID), info)
       SENDCHANNELS(OLID) = SENDCHANNELS(OLID) + 2
       end
 !
@@ -413,8 +413,8 @@
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(what, val, 1, 1, info)
+      call HPFC INIT SEND
+      call HPFC PACK(what, val, 1, 1, info)
       if (MYLID.GT.1)
      $     call pvmfmcast(
      $     MYLID-1, 
@@ -524,9 +524,9 @@ _CM5(
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "sending to all nodes")
-      call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(what, val, 1, 1, info)
-      call pvmfmcast(NBOFTASKS, NODETIDS, MCASTHOST, info)
+      call HPFC INIT SEND
+      call HPFC PACK(what, val, 1, 1, info)
+      call HPFC SEND(NBOFTASKS, NODETIDS, MCASTHOST, info)
       MCASTHOST = MCASTHOST + 2
       debug(print *, "sent!")
       end
@@ -541,8 +541,8 @@ _CM5(
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(what, val, 1, 1, info)
+      call HPFC INIT SEND
+      call HPFC PACK(what, val, 1, 1, info)
       if (MYLID.GT.1)
      $     call pvmfmcast(
      $     MYLID-1, 
@@ -556,7 +556,7 @@ _CM5(
      $     MCASTNODES, 
      $     info)
       MCASTNODES = MCASTNODES + 2
-      call pvmfsend(HOSTTID, HOST SND CHANNEL, info)
+      call HPFC SEND(HOSTTID, HOST SND CHANNEL, info)
       HOST SND CHANNEL = HOST SND CHANNEL + 2
       end
 !
@@ -588,8 +588,8 @@ _CM5(
             lb(i) = 1
             ub(i) = 1
          enddo
-         call pvmfinitsend(PVMRAW, bufid)
-         call pvmfpack(what, val, 1, 1, info)
+         call HPFC INIT SEND
+         call HPFC PACK(what, val, 1, 1, info)
          do i7=lb(7), ub(7)
             indp(7) = i7
             do i6=lb(6), ub(6)
@@ -611,7 +611,7 @@ _CM5(
 !
                               call HPFC PROCLID(
      $                             indp, OPN, lid, .FALSE.)
-                              call pvmfsend(
+                              call HPFC SEND(
      $                             NODETIDS(lid), 
      $                             SENDCHANNELS(lid), 
      $                             info)
@@ -656,8 +656,8 @@ _CM5(
          lb(i) = 1
          ub(i) = 1
       enddo
-      call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(what, val, 1, 1, info)
+      call HPFC INIT SEND
+      call HPFC PACK(what, val, 1, 1, info)
       do i7=lb(7), ub(7)
          indp(7) = i7
          do i6=lb(6), ub(6)
@@ -679,7 +679,7 @@ _CM5(
 !
                            call HPFC PROCLID(indp, OPN, lid, .FALSE.)
                            if (lid.NE.CLID) then
-                              call pvmfsend(
+                              call HPFC SEND(
      $                             NODETIDS(lid), 
      $                             SENDCHANNELS(lid), 
      $                             info)
@@ -705,8 +705,8 @@ _CM5(
       include "hpfc_commons.h"
       integer bufid, info, i, indp(7), ndim, lid
       logical result
-      call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(what, val, 1, 1, info)
+      call HPFC INIT SEND
+      call HPFC PACK(what, val, 1, 1, info)
       ndim = NODIMP(OPN)
       do lid=1, NBOFTASKS
 !
@@ -722,7 +722,7 @@ _CM5(
      $           result = result.AND.(OINDP(i).EQ.indp(i))
          enddo
          if (.NOT.result) then
-            call pvmfsend(NODETIDS(lid), SENDCHANNELS(lid), info)
+            call HPFC SEND(NODETIDS(lid), SENDCHANNELS(lid), info)
             SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
          endif
       enddo
@@ -749,8 +749,8 @@ _CM5(
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfrecv(SENDERTID, RECVCHANNELS(SLID), bufid)
-      call pvmfunpack(what, goal, 1, 1, info)
+      call HPFC RECEIVE(SENDERTID, RECVCHANNELS(SLID), bufid)
+      call HPFC UNPACK(what, goal, 1, 1, info)
       RECVCHANNELS(SLID) = RECVCHANNELS(SLID) + 2
       end
 !
@@ -762,8 +762,8 @@ _CM5(
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfrecv(COMPUTERTID, RECVCHANNELS(CLID), bufid)
-      call pvmfunpack(what, goal, 1, 1, info)
+      call HPFC RECEIVE(COMPUTERTID, RECVCHANNELS(CLID), bufid)
+      call HPFC UNPACK(what, goal, 1, 1, info)
       RECVCHANNELS(CLID) = RECVCHANNELS(CLID) + 2
       end
 !
@@ -775,8 +775,8 @@ _CM5(
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfrecv(HOSTTID, HOST RCV CHANNEL, bufid)
-      call pvmfunpack(what, goal, 1, 1, info)
+      call HPFC RECEIVE(HOSTTID, HOST RCV CHANNEL, bufid)
+      call HPFC UNPACK(what, goal, 1, 1, info)
       HOST RCV CHANNEL = HOST RCV CHANNEL + 2
       debug(print *, MYLID, " receiving from host")
       end
@@ -789,8 +789,8 @@ _CM5(
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
-      call pvmfrecv(SENDERTID, MCASTNODES, bufid)
-      call pvmfunpack(what, goal, 1, 1, info)
+      call HPFC RECEIVE(SENDERTID, MCASTNODES, bufid)
+      call HPFC UNPACK(what, goal, 1, 1, info)
       MCASTNODES = MCASTNODES + 2
       end
 !
@@ -803,8 +803,8 @@ _CM5(
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "receiving from host")
-      call pvmfrecv(HOSTTID, MCASTHOST, bufid)
-      call pvmfunpack(what, goal, 1, 1, info)
+      call HPFC RECEIVE(HOSTTID, MCASTHOST, bufid)
+      call HPFC UNPACK(what, goal, 1, 1, info)
       MCASTHOST = MCASTHOST + 2
       debug(print *, "received!")
       end
@@ -966,7 +966,7 @@ _CM5(
       call pvmfjoingroup(HPFC GROUP NAME, inum)
       if (inum.lt.0) then
          call pvmfperror("while joining group in HPFC INIT MAIN", info)
-         call pvmfexit(info)
+         call HPFC TERMINATE TASK(info)
          stop
       end if
 
@@ -1033,7 +1033,7 @@ _CM5(
       call pvmfjoingroup(HPFC GROUP NAME, inum)
       if (inum.lt.0) then
          call pvmfperror("while joining group", info)
-         call pvmfexit(info)
+         call HPFC TERMINATE TASK(info)
          stop
       endif
 
@@ -1068,11 +1068,11 @@ _CM5(
 ! receive from host global informations about the nodes implicated
 ! in this run.
       _spawn(
-      call pvmfrecv(HOST TID, 1, bufid)
-      call pvmfunpack(INTEGER4, NODE TIDS, NB OF TASKS, 1, info)
+      call HPFC RECEIVE(HOST TID, 1, bufid)
+      call HPFC UNPACK(INTEGER4, NODE TIDS, NB OF TASKS, 1, info)
       debug(if (info.lt.0) then
          call pvmfperror("[HPFC INIT NODE] node tids recv", info)
-         call pvmfexit(info)
+         call HPFC TERMINATE TASK(info)
          stop
       endif)
 
@@ -1097,9 +1097,9 @@ _CM5(
 !
       if (MY LID.eq.1) then
       debug(print *, "[HPFC INIT NODE] sending key to ", HOSTTID)
-         call pvmfinitsend(PVMRAW, info)
-         call pvmfpack(STRING, hpfc key, 64, 1, info)
-         call pvmfsend(HOSTTID, 1, info)
+         call HPFC INIT SEND
+         call HPFC PACK(STRING, hpfc key, 64, 1, info)
+         call HPFC SEND(HOSTTID, 1, info)
       endif
 
 _CM5(
@@ -1110,12 +1110,12 @@ _CM5(
       CM MY ID   = cmmd_self_address()
       CM SIZE    = cmmd_partition_size()
 !
-      call pvmfinitsend(PVMRAW, info)
-      call pvmfpack(INTEGER4, CM MY ID, 1, 1, info)
-      call pvmfsend(HOSTTID, 1, info)
+      call HPFC INIT SEND
+      call HPFC PACK(INTEGER4, CM MY ID, 1, 1, info)
+      call HPFC SEND(HOSTTID, 1, info)
 !
-      call pvmfrecv(HOSTTID, 1, bufid)
-      call pvmfunpack(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
+      call HPFC RECEIVE(HOSTTID, 1, bufid)
+      call HPFC UNPACK(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
 !
 ! end of cm5 related initializations
 !)
@@ -1236,13 +1236,13 @@ _direct(`'
 
          if (info.lt.0) then
             call pvmfperror("initial spawning", info)
-            call pvmfexit(info)
+            call HPFC TERMINATE TASK(info)
             stop
          endif
 
          if (info.ne.NBOFTASKS) then
             call pvmfperror("not spawned", 0)
-            call pvmfexit(0)
+            call HPFC TERMINATE TASK(0)
             stop
          endif
 
@@ -1257,17 +1257,17 @@ _direct(`'
       
       _spawn(
 ! if not T3D, the host sends the tids...
-      call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
+      call HPFC INIT SEND
+      call HPFC PACK(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
       debug(if (info.lt.0) then
          call pvmfperror("initial pack", info)
-         call pvmfexit(info)
+         call HPFC TERMINATE TASK(info)
          stop
       endif)
       call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
       debug(if (info.lt.0) then
          call pvmfperror("initial mcast", info)
-         call pvmfexit(info)
+         call HPFC TERMINATE TASK(info)
          stop
       endif))
 
@@ -1278,8 +1278,8 @@ _direct(`'
 ! to insure that both host and node where generated together...
 !
       debug(print *, "[HPFC INIT HOST] receiving key")
-      call pvmfrecv(NODETIDS(1), 1, bufid)
-      call pvmfunpack(STRING, node key, 64, 1, info)
+      call HPFC RECEIVE(NODETIDS(1), 1, bufid)
+      call HPFC UNPACK(STRING, node key, 64, 1, info)
       if (node key.ne.hpfc key) then
          print *, "*** incompatible version keys!"
          print *, "*** host: ", hpfc key
@@ -1287,7 +1287,7 @@ _direct(`'
          do i=1, NBOFTASKS
             call pvmfkill(NODETIDS(i), info)
          enddo
-         call pvmfexit(info)
+         call HPFC TERMINATE TASK(info)
          stop
       endif
 
@@ -1300,12 +1300,12 @@ _CM5(
       CM SIZE    = cmmd_partition_size()
 !
       do i=1, NBOFTASKS
-         call pvmfrecv(NODETIDS(i), 1, info)
-         call pvmfunpack(INTEGER4, CM NODE IDS(i), 1, 1, info)
+         call HPFC RECEIVE(NODETIDS(i), 1, info)
+         call HPFC UNPACK(INTEGER4, CM NODE IDS(i), 1, 1, info)
       enddo
 !
-      call pvmfinitsend(PVMRAW, bufid)
-      call pvmfpack(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
+      call HPFC INIT SEND
+      call HPFC PACK(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
       call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
 !
 ! end of cm5 related initializations
@@ -1338,7 +1338,7 @@ _CM5(
       include "hpfc_commons.h"
       debug(print *, "[HPFC HOST END] ", MY LID)
       sync_exit(call HPFC SYNCHRO)
-      call pvmfexit(info)
+      call HPFC TERMINATE TASK(info)
 !!      stop
       end
 !
@@ -1351,7 +1351,7 @@ _CM5(
       include "hpfc_commons.h"
       debug(print *, "[HPFC STOP] ", MY LID)
       sync_exit(call HPFC SYNCHRO)
-      call pvmfexit(info)
+      call HPFC TERMINATE TASK(info)
       stop
       end
       
@@ -1365,7 +1365,7 @@ _CM5(
       include "hpfc_commons.h"
       debug(print *, "[HPFC NODE END] ", MY LID)
       sync_exit(call HPFC SYNCHRO)
-      call pvmfexit(info)
+      call HPFC TERMINATE TASK(info)
 !!      stop
       end
 !
@@ -1376,7 +1376,7 @@ _CM5(
       subroutine HPFC RCVFR N
       include "hpfc_commons.h"
       integer info
-      call pvmfrecv(NTID, RECVCHANNELS(NLID), info)
+      call HPFC RECEIVE(NTID, RECVCHANNELS(NLID), info)
       end
 !
 !-----------------
@@ -1386,7 +1386,7 @@ _CM5(
       subroutine HPFC SNDTO N
       include "hpfc_commons.h"
       integer info
-      call pvmfsend(NTID, SENDCHANNELS(NLID), info)
+      call HPFC SEND(NTID, SENDCHANNELS(NLID), info)
       end
 !
 !-----------------
@@ -1475,7 +1475,7 @@ _CM5(
       call pvmfbarrier(HPFC GROUP NAME, NBOFTASKS+1, info)
       if (info.lt.0) then
          call pvmfperror("hpfc synchro", info)
-         call pvmfexit(info)
+         call HPFC TERMINATE TASK(info)
          stop
       endif
       debug(print *, "[hpfc synchro] done")
