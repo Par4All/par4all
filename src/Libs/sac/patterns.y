@@ -36,6 +36,8 @@ static int* make_empty_argument();
 
       opcode opVal;
       list opcodesList;
+
+      list mappingsList;
 }
 
 %type <tokenId> token;
@@ -47,6 +49,7 @@ static int* make_empty_argument();
 
 %type <opVal> opcode;
 %type <opcodesList> opcodes_list;
+%type <mappingsList> mappings;
 
 %token UNKNOWN_TOK
 %token REFERENCE_TOK
@@ -107,6 +110,7 @@ definitions_list:
 definition:
        operation
      | pattern
+     | transformation
        ;
  
 operation:
@@ -179,6 +183,14 @@ arguments_list:
 argument:
        INTEGER_TOK                      { $$ = make_integer_argument($1); }
      |                                  { $$ = make_empty_argument(); }
+
+transformation:
+     IDENTIFIER_TOK '[' INTEGER_TOK ',' INTEGER_TOK ',' INTEGER_TOK ',' INTEGER_TOK ',' INTEGER_TOK ']' '{' mappings '}'
+                                        { insert_transformation( $1, $3, $5, $7, $9, $11, $14); }
+
+mappings:
+       mappings ',' INTEGER_TOK         { $$ = CONS(INT, $3, $1); }
+     | INTEGER_TOK                      { $$ = CONS(INT, $1, NIL); }
 
 %%
 
