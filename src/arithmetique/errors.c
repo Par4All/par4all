@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.16  2000/10/27 13:26:03  ancourt
+  exception_thrown -> linear_number_of_exception_thrown
+
   Revision 1.15  2000/07/27 15:21:55  coelho
   message++
 
@@ -93,7 +96,7 @@ static int exception_index = 0;
 
 /* total number of exceptions thrown, for statistics.
  */
-static int exception_thrown = 0;
+int linear_number_of_exception_thrown = 0;
 
 /* dump stack
  */
@@ -223,7 +226,7 @@ void throw_exception(
     if (exception_stack[i].what & what) 
     {
       exception_index = i;
-      exception_thrown++;
+      linear_number_of_exception_thrown++;
 
       if (linear_exception_debug_mode)
 	fprintf(stderr, "---->[%s:%d %s (%d)/%d]\n", 
