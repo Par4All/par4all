@@ -597,6 +597,31 @@ logical_to_logical_type(int n)
 
 /***************************** TYPE A CALL FUNCTIONS **********************/
 
+/***************************************************************************** 
+ * Typing range of loop to the type of index loop. 
+ * This range is already verified 
+ */
+void type_loop_range(basic index, range r, type_context_p context)
+{
+  basic lower, upper, incr;
+  lower = GET_TYPE(context->types, range_lower(r));
+  upper = GET_TYPE(context->types, range_upper(r));
+  incr = GET_TYPE(context->types, range_increment(r));
+  
+  if(!basic_equal_p(index, lower))
+  {
+    range_lower(r) = insert_cast(index, lower, range_lower(r), context);
+  }
+  if(!basic_equal_p(index, upper))
+  {
+    range_upper(r) = insert_cast(index, upper, range_upper(r), context);
+  }
+  if(!basic_equal_p(index, incr))
+  {
+    range_increment(r) = insert_cast(index, incr, range_increment(r), context);
+  }
+}
+
 /************************************************************************** 
  * Convert a constant from INT to REAL
  * e.g: REAL(10) --> 10.0
