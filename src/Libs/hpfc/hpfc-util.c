@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/04/02 15:04:22 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/06/12 17:24:03 $, )
  * version $Revision$
  */
 
@@ -168,6 +168,7 @@ ith_dim_overlapable_p(
     return style_block_p(distribution_style(d));
 }
 
+
 /* creates a new statement for the given module
  * that looks like the stat one, i.e. same (shared) comment, same 
  * label, and so on. The goto table is updated. The instruction
@@ -177,11 +178,20 @@ statement MakeStatementLike(stat, the_tag)
 statement stat;
 int the_tag;
 {
-    return(make_statement(statement_label(stat),
+    loop x = loop_undefined;
+
+/* temporary for block->sequence transition
+ */
+#ifdef is_instruction_sequence 
+    if (the_tag==is_instruction_sequence)
+	x = make_sequence(NIL);
+#endif
+
+    return make_statement(statement_label(stat),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
 			  statement_comments(stat),     /* sharing! */
-			  make_instruction(the_tag, instruction_undefined)));
+			  make_instruction(the_tag, x));
 }
 
 static void stmt_rwt(s)
@@ -811,7 +821,7 @@ static void loop_rewrite(loop l)
 	pips_debug(5, "loop on %s simplified\n", entity_name(loop_index(l)));
 
 	statement_instruction(current_stmt_head()) = 
-	    make_instruction(is_instruction_block,
+	    make_instruction_block(
 	      CONS(STATEMENT, make_assign_statement
 		         (entity_to_expression(loop_index(l)),
 			  copy_expression(range_lower(r))),
