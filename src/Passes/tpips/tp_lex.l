@@ -39,13 +39,9 @@ static char * line_parsed;
 void tpips_set_line_to_parse(char * line)
 {
     skip_blanks(line);
-
     /* store line pointer */
     line_parsed = line_to_parse = line;
     cr_not_returned = TRUE;
-
-    /* cut line at the beginning of comments */
-    if ((*line) == TPIPS_COMMENT_PREFIX) *line = '\0';
 }
 
 char * tpips_get_line_to_parse(void)
@@ -106,6 +102,8 @@ static int tpips_lex_input (void)
 <KEY>shell 		{ SPECIAL(TK_SHELL); }
 
 <SPEC>[^\n]* 		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }
+<INITIAL,KEY>#[^\n]*	{ BEGIN INITIAL;
+			  /* skip comments... (not for echo, shell set). */}
 
 \(			{ RETURN(TK_OPENPAREN); }
 \)			{ RETURN(TK_CLOSEPAREN); }
@@ -143,7 +141,7 @@ void yyinit_lex()
 
 void yyerror(char * s)
 {
-    tpips_init(); /* needed for the user error... */
+    tpips_init(); /* needed for user error... */
     tpips_lex_print_pos(stderr);
     pips_user_error("%s\n", s);
 }
