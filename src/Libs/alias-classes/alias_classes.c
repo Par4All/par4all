@@ -458,11 +458,19 @@ alias_classes( string module_name )
     l_alias_classes = NIL;
     other_lists = NIL;
 
+/*
     alias_lists =
 	effects_to_list((effects)
 			db_get_memory_resource(DBR_ALIAS_LISTS,
 					       module_name,
 					       TRUE));
+*/
+
+    alias_lists =
+	effects_classes_classes((effects_classes)
+				db_get_memory_resource(DBR_ALIAS_LISTS,
+						       module_name,
+						       TRUE));
 
     MAP(LIST,alias_list,
 	{
