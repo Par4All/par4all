@@ -218,10 +218,10 @@ simple_effects_to_text(
 	free(t);
     }
     
-    close_current_line(r, rt);
-    close_current_line(w, wt);
-    close_current_line(R, Rt);
-    close_current_line(W, Wt);
+    close_current_line(r, rt,CONTINUATION);
+    close_current_line(w, wt,CONTINUATION);
+    close_current_line(R, Rt,CONTINUATION);
+    close_current_line(W, Wt,CONTINUATION);
 
     if (rb) { MERGE_TEXTS(sefs_text, rt); } else free_text(rt);
     if (wb) { MERGE_TEXTS(sefs_text, wt); } else free_text(wt);
