@@ -315,18 +315,12 @@ text text_cray(entity module, int margin, statement stat)
 
 bool print_parallelizedcray_code(char *mod_name)
 {
-    entity 
-	module = local_name_to_top_level_entity(mod_name);
-    statement 
-	mod_stat = statement_undefined;
-    bool 
-	prettyprint_cray_p = get_bool_property("PRETTYPRINT_CRAY");
+    entity module = local_name_to_top_level_entity(mod_name);
+    statement mod_stat = statement_undefined;
 
-    /* which properties? */
-    set_bool_property("PRETTYPRINT_CRAY", TRUE);
-    set_bool_property("PRETTYPRINT_PARALLEL", TRUE);
-    /* set_bool_property("PRETTYPRINT_FORTRAN90", FALSE); */
-    set_bool_property("PRETTYPRINT_SEQUENTIAL", FALSE);
+    /* push prettyprint style */
+    string pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
+    set_string_property(PRETTYPRINT_PARALLEL, "cray");
 
     mod_stat = (statement)
 	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, TRUE);
@@ -352,7 +346,8 @@ bool print_parallelizedcray_code(char *mod_name)
     close_prettyprint();
 
     /* free proper effects and cumulated effects 
-     Je ne sais pas trop comment le free fonctionne avec statement_effects. bc.*/
+     Je ne sais pas trop comment le free fonctionne avec statement_effects.
+    bc.*/
     /* free_statement_effects( get_rw_effects() );
        free_statement_effects( get_proper_rw_effects() ); */
 
@@ -360,22 +355,10 @@ bool print_parallelizedcray_code(char *mod_name)
     reset_proper_rw_effects();
     reset_current_module_entity();
     
-    set_bool_property("PRETTYPRINT_CRAY", prettyprint_cray_p);
+    set_string_property(PRETTYPRINT_PARALLEL, pp);
+    free(pp);
 
     debug_off();
 
     return TRUE;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
