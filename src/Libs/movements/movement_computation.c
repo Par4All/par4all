@@ -508,8 +508,10 @@ movement_computation(
 						    sc_on_constants,
 						    index_base,
 						    dim_h2);	
-	ifdebug(8) {(void)fprintf(stderr,"Constraints on the %d-th var.:\n",i);
-		    sc_fprint(stderr,list_of_systems[i],entity_local_name); }
+	ifdebug(8) {
+	    pips_debug(8,"Constraints on the %d-th var.:\n",i);
+	    sc_fprint(stderr,list_of_systems[i],entity_local_name); 
+	}
     }
 	  
     var_id = (bank_code) ? vect_dup(ppid) : 
@@ -519,12 +521,10 @@ movement_computation(
 			    loop_body_offsets,var_id,
 			    list_of_systems,index_base,n,sc_info);
 
-    ifdebug(3) {
-	entity mod;
-	text t;
-	mod = local_name_to_top_level_entity(entity_local_name(module));
-	t = text_statement(mod, 2,stat);
-	print_text(stderr,t); 
+    ifdebug(4) {
+	/* if you get through this pp, it core dumps much later on:-) */
+	pips_debug(3, "returning:\n");
+	wp65_debug_print_text(entity_undefined, stat);
     }
     debug(3,"movement_computation","end\n");
     debug_off();
@@ -580,9 +580,9 @@ int *n,*dim_h;
     debug(3,"sc_image_computation","begin\n");
 
     ifdebug(3) { 
-	(void) fprintf(stderr,"ITERATION DOMAIN:\n");
+	pips_debug(3,"ITERATION DOMAIN:\n");
 	sc_fprint(stderr,sc_domain2,entity_local_name);
-	(void) fprintf(stderr,"ARRAY FUNCTION :\n");
+	pips_debug(3,"ARRAY FUNCTION :\n");
 	sc_fprint(stderr,sc_array_function,entity_local_name);
     }
     if (!sc_faisabilite(sc_domain2)) 
@@ -699,14 +699,15 @@ int *n,*dim_h;
 		sc_add_inegalite(sc_image,contrainte_make(pvnew));
 	    }
 	}
-	ifdebug(3) { (void) fprintf(stderr,"NEW ITERATION DOMAIN:\n");
-		     sc_fprint(stderr,sc_image,entity_local_name);
-		 }
+	ifdebug(3) { 
+	    pips_debug(3,"NEW ITERATION DOMAIN:\n");
+	    sc_fprint(stderr,sc_image,entity_local_name);
+	}
     
 	/** Computation of the new matrix for array function **/
 	matrice_multiply(P,HERM,HERF,n2,n2,ma);
 	ifdebug(3) { 
-	    (void) fprintf(stderr," New Matrix for Array Function \n");
+	    pips_debug(3," New Matrix for Array Function \n");
 	    matrice_fprint(stderr,HERF,n2,ma);
 	    matrice_fprint(stderr,F0,n2,mb);
 	}
@@ -718,7 +719,7 @@ int *n,*dim_h;
 			    n2,
 			    ma,mb);
 	ifdebug(3) { 
-	    (void) fprintf(stderr,"New Array Function :\n");
+	    pips_debug(3,"New Array Function :\n");
 	    sc_fprint(stderr,sc_array_function,entity_local_name);
 	}
     }
@@ -728,8 +729,9 @@ int *n,*dim_h;
     sort_tile_indices(tile_indices,new_tile_indices,F,n2);
 
 
-    ifdebug(3) { (void) fprintf(stderr,"New Iteration Domain :\n");
-		 sc_fprint(stderr,sc_image,entity_local_name); }
+    ifdebug(3) { 
+	pips_debug(3,"New Iteration Domain :\n");
+	sc_fprint(stderr,sc_image,entity_local_name); }
     debug(3,"sc_image_computation","end\n");
     debug_off();
 
