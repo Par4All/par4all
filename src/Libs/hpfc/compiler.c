@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compiler.c,v $
+ * Revision 1.58  1997/10/30 17:09:14  coelho
+ * now comes with old var...
+ *
  * Revision 1.57  1997/09/13 12:57:58  coelho
  * *** empty log message ***
  *
@@ -143,8 +146,8 @@ caller_list_of_bounds(
 	{
 	    entity var, old;
 
-	    var = reference_variable(syntax_reference(s));
-	    old = load_old_node(var);
+	    old = reference_variable(syntax_reference(s));
+	    var = load_new_node(old);
 	    pips_debug(8, "considering %s\n", entity_name(var));
 
 	    if (array_distributed_p(old))
