@@ -21,6 +21,9 @@
   - intrinsics are not properly typed
 
   $Log: bootstrap.c,v $
+  Revision 1.76  2003/07/28 15:06:55  nguyen
+  Add new intrinsics for C language
+
   Revision 1.75  2002/06/20 15:53:41  irigoin
   New pseudo-intrisics to handle DATA
 
@@ -32,6 +35,9 @@
 
   Revision 1.72  2002/06/10 12:00:37  irigoin
   $Log: bootstrap.c,v $
+  Revision 1.76  2003/07/28 15:06:55  nguyen
+  Add new intrinsics for C language
+
   Revision 1.75  2002/06/20 15:53:41  irigoin
   New pseudo-intrisics to handle DATA
 
@@ -3521,6 +3527,173 @@ simplification_dcomplex(expression exp, type_context_p context)
   free_basic(b);
 }
 
+/* Move the following functions to ri-util/type.c */
+
+type 
+MakePointerResult()
+{
+    return MakeAnyScalarResult(is_basic_pointer, DEFAULT_POINTER_TYPE_SIZE);
+}
+
+type 
+MakeVoidResult()
+{
+    return make_type(is_type_void, UU);
+}
+
+parameter 
+MakePointerParameter()
+{
+  return MakeAnyScalarParameter(is_basic_pointer, DEFAULT_POINTER_TYPE_SIZE);
+}
+
+parameter 
+MakeVoidParameter()
+{
+  return make_parameter(make_type(is_type_void, UU),
+			make_mode(is_mode_reference, UU));
+}
+
+static type 
+integer_to_overloaded_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  
+  ft = make_functional(NIL, MakeOverloadedResult());
+  t = make_type(is_type_functional, ft);
+  
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakeIntegerParameter);
+  return t;
+}
+
+static type 
+pointer_to_overloaded_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  
+  ft = make_functional(NIL, MakeOverloadedResult());
+  t = make_type(is_type_functional, ft);
+  
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakePointerParameter);
+  return t;
+}
+
+static type 
+void_to_overloaded_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  
+  ft = make_functional(NIL, MakeOverloadedResult());
+  t = make_type(is_type_functional, ft);
+  
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakeVoidParameter);
+  return t;
+}
+
+static type 
+overloaded_to_pointer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  
+  ft = make_functional(NIL, MakePointerResult());
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakeOverloadedParameter);
+  t = make_type(is_type_functional, ft);
+  
+  return t;
+}
+
+static type 
+overloaded_to_void_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  
+  ft = make_functional(NIL, MakeVoidResult());
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakeOverloadedParameter);
+  t = make_type(is_type_functional, ft);
+  
+  return t;
+}
+
+static type 
+void_to_integer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  
+  ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakeVoidParameter);
+  t = make_type(is_type_functional, ft);
+  
+  return t;
+}
+
+static type 
+void_to_pointer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  
+  ft = make_functional(NIL, MakePointerResult());
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakeVoidParameter);
+  t = make_type(is_type_functional, ft);
+  
+  return t;
+}
+
+static type 
+pointer_to_integer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  
+  ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakePointerParameter);
+  t = make_type(is_type_functional, ft);
+  
+  return t;
+}
+
+static type 
+pointer_to_pointer_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  
+  ft = make_functional(NIL, MakePointerResult());
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakePointerParameter);
+  t = make_type(is_type_functional, ft);
+  
+  return t;
+}
+
+static type 
+pointer_to_void_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  
+  ft = make_functional(NIL, MakeVoidResult());
+  functional_parameters(ft) = 
+    make_parameter_list(n, MakePointerParameter);
+  t = make_type(is_type_functional, ft);
+  
+  return t;
+}
+
 /******************************************************** INTRINSICS LIST */
 
 /* The following data structure describes an intrinsic function: its
@@ -3542,13 +3715,19 @@ typedef struct IntrinsicDescriptor
    arguments.
 */
 
+/* Nga Nguyen 27/06/2003 Fuse the tables of intrinsics for C and Fortran. 
+   Since there are differences between some kind of operators, such as in
+   Fortran, "+" is only applied to arithmetic numbers, in C, "+" is also applied
+   to pointer, the typing functions are different. So in some cases, we have to 
+   rename the operators */
+
 static IntrinsicDescriptor IntrinsicDescriptorTable[] = 
 {
   {"+", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"-", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"/", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"*", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
-  {"--", 1, default_intrinsic_type, typing_arithmetic_operator, 0},
+  {"--", 1, default_intrinsic_type, typing_arithmetic_operator, 0}, // unary minus
   {"**", 2, default_intrinsic_type, typing_power_operator, 0},
 
   /* internal inverse operator... */
@@ -3819,8 +3998,308 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   {EOLE_FMS_OPERATOR_NAME, 3, default_intrinsic_type , 
    typing_arithmetic_operator, 0},
   
+  // Here are C intrinsics 
+
+  // ISO 6.5.2.3 structure and union members 
+  {".", 2, default_intrinsic_type, 0, 0},
+  {"->", 2, default_intrinsic_type, 0, 0},
+  // ISO 6.5.2.4 postfix increment and decrement operators, real or pointer type operand
+  {"post++", 1, default_intrinsic_type, 0, 0},
+  {"post--", 1, default_intrinsic_type, 0, 0},
+  // ISO 6.5.3.1 prefix increment and decrement operators, real or pointer type operand
+  {"++pre", 1, default_intrinsic_type, 0, 0},
+  {"--pre", 1, default_intrinsic_type, 0, 0},
+  // ISO 6.5.3.2 address and indirection operators, add pointer type
+  {"&", 1, default_intrinsic_type, 0, 0},
+  {"*indirection", 1, default_intrinsic_type, 0, 0},
+  // ISO 6.5.3.3 unary arithmetic operators
+  {"+unary", 1, default_intrinsic_type, typing_arithmetic_operator, 0},
+  {"-unary", 1, default_intrinsic_type, typing_arithmetic_operator, 0},
+  {"~", 1, integer_to_overloaded_type, typing_arithmetic_operator, 0},
+  {"!", 1, overloaded_to_integer_type, 0, 0},
+  // ISO 6.5.5 multiplicative operators : ALREADY EXIST (FORTRAN)
+  // {"*", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
+  // {"/", 2, default_intrinsic_type, typing_arithmetic_operator, 0},
+  {"%", 2, integer_to_overloaded_type, typing_arithmetic_operator, 0},
+  // ISO 6.5.6 additive operators, arithmetic types or pointer + integer type
+  {"+C", 2, default_intrinsic_type, 0, 0},
+  {"-C", 2, default_intrinsic_type, 0, 0},
+  // ISO 6.5.7 bitwise shift operators
+  {"<<", 2, integer_to_overloaded_type, 0, 0},
+  {">>", 2, integer_to_overloaded_type, 0, 0},
+  // ISO 6.5.8 relational operators,arithmetic or pointer types 
+  {"<", 2, overloaded_to_integer_type, 0, 0},
+  {">", 2, overloaded_to_integer_type, 0, 0},
+  {"<=", 2, overloaded_to_integer_type, 0, 0},
+  {">=", 2, overloaded_to_integer_type, 0, 0},
+  // ISO 6.5.9 equality operators, return 0 or 1
+  {"==", 2, overloaded_to_integer_type, 0, 0},
+  {"!=", 2, overloaded_to_integer_type, 0, 0},
+  // ISO 6.5.10 bitwise AND operator 
+  {"&bitand", 2, integer_to_integer_type, typing_arithmetic_operator, 0},
+  // ISO 6.5.11 bitwise exclusive OR operator 
+  {"^", 2, integer_to_integer_type, typing_arithmetic_operator, 0},
+  // ISO 6.5.12 bitwise inclusive OR operator 
+  {"|", 2, integer_to_integer_type, typing_arithmetic_operator, 0},
+  // ISO 6.5.13 logical AND operator 
+  {"&&", 2, overloaded_to_integer_type, 0, 0},
+  // ISO 6.5.14 logical OR operator 
+  {"||", 2, overloaded_to_integer_type, 0, 0},
+  // ISO 6.5.16.1 simple assignment : ALREADY EXIST (FORTRAN)
+  // {"=", 2, default_intrinsic_type, typing_of_assign, 0}, 
+  // ISO 6.5.16.2 compound assignments
+  {"*=", 2, default_intrinsic_type, typing_of_assign, 0},
+  {"/=", 2, default_intrinsic_type, typing_of_assign, 0},
+  {"%=", 2, default_intrinsic_type, typing_of_assign, 0},
+  {"+=", 2, default_intrinsic_type, typing_of_assign, 0},
+  {"-=", 2, default_intrinsic_type, typing_of_assign, 0},
+  {"<<=", 2, default_intrinsic_type, typing_of_assign, 0},
+  {">>=", 2, default_intrinsic_type, typing_of_assign, 0},
+  {"&=", 2, default_intrinsic_type, typing_of_assign, 0},
+  {"^=", 2, default_intrinsic_type, typing_of_assign, 0},
+  {"|=", 2, default_intrinsic_type, typing_of_assign, 0},
+  // ISO 6.5.17 comma operator
+  {",", (INT_MAX), default_intrinsic_type, 0, 0}, 
+
+  // null statement
+  {";", 0, default_intrinsic_type, 0, 0},
+  {"break", 0, default_intrinsic_type, 0, 0},
+  {"case", 0, default_intrinsic_type, 0, 0},  
+  {"default", 0, default_intrinsic_type, 0, 0},
+  {"return", 1, default_intrinsic_type, 0, 0},
+
+  // intrinsic to handle C initialization 
+  {BRACE_INTRINSIC, (INT_MAX) , default_intrinsic_type, no_typing, 0},
+
+  // #include <assert.h>
+  //  {"__assert",3,overloaded_to_void_type,0,0},
+
+  // #include <complex.h>
+
+  // #include <ctype.h>
+  /* {"isalnum", 1, integer_to_integer_type, 0, 0}, 
+  {"isalpha", 1, integer_to_integer_type, 0, 0}, 
+  {"iscntrl", 1, integer_to_integer_type, 0, 0}, 
+  {"isdigit", 1, integer_to_integer_type, 0, 0}, 
+  {"isgraph", 1, integer_to_integer_type, 0, 0}, 
+  {"islower", 1, integer_to_integer_type, 0, 0}, 
+  {"isprint", 1, integer_to_integer_type, 0, 0}, 
+  {"ispunct", 1, integer_to_integer_type, 0, 0}, 
+  {"isspace", 1, integer_to_integer_type, 0, 0}, 
+  {"isupper", 1, integer_to_integer_type, 0, 0}, 
+  {"isxdigit", 1, integer_to_integer_type, 0, 0}, 
+  {"tolower", 1, integer_to_integer_type, 0, 0}, 
+  {"toupper", 1, integer_to_integer_type, 0, 0}, 
+  {"isascii", 1, integer_to_integer_type, 0, 0}, 
+  {"toascii", 1, integer_to_integer_type, 0, 0}, 
+  {"_tolower", 1, integer_to_integer_type, 0, 0}, 
+  {"_toupper", 1, integer_to_integer_type, 0, 0}, */
+  
+  // #include <errno.h>
+  //  {"errno", 0, overloaded_to_integer_type, 0, 0}, 
+
+  // #include <fenv.h>
+
+  // #include <float.h>
+  // {"__flt_rounds", 1, void_to_integer_type, 0, 0}, 
+
+  // #include <inttypes.h>
+
+  // #include <iso646.h>
+
+  /* {"_sysconf", 1, integer_to_integer_type, 0, 0}, 
+  {"setlocale", 2, overloaded_to_pointer_type, 0, 0},
+  {"localeconv", 1, void_to_pointer_type, 0, 0},
+  {"dcgettext", 3, overloaded_to_pointer_type, 0, 0},
+  {"dgettext", 2, pointer_to_pointer_type, 0, 0},
+  {"gettext", 1, pointer_to_pointer_type, 0, 0},
+  {"textdomain", 1, pointer_to_pointer_type, 0, 0},
+  {"bindtextdomain", 2, pointer_to_pointer_type, 0, 0},
+  {"wdinit", 1, void_to_integer_type, 0 ,0}, 
+  {"wdchkind", 1, overloaded_to_integer_type, 0 ,0}, 
+  {"wdbindf", 3, overloaded_to_integer_type, 0 ,0}, 
+  {"wddelim", 3, overloaded_to_pointer_type, 0, 0}, 
+  {"mcfiller", 1, void_to_overloaded_type, 0, 0},
+  {"mcwrap", 1, void_to_integer_type, 0 ,0},*/
+
+  // #include <limits.h>
+
+  // #include <locale.h>
+
+  // #include <math.h>
+  /*  {"acos", 1, double_to_double_type, 0, 0},  
+  {"asin", 1, double_to_double_type, 0, 0}, 
+  {"atan", 1, double_to_double_type, 0, 0}, 
+  {"atan2", 2, double_to_double_type, 0, 0},   
+  {"cos", 1, double_to_double_type, 0, 0}, 
+  {"sin", 1, double_to_double_type, 0, 0}, 
+  {"tan", 1, double_to_double_type, 0, 0}, 
+  {"cosh", 1, double_to_double_type, 0, 0}, 
+  {"sinh", 1, double_to_double_type, 0, 0}, 
+  {"tanh", 1, double_to_double_type, 0, 0}, 
+  {"exp", 1, double_to_double_type, 0, 0}, 
+  {"frexp", 2, overloaded_to_double_type, 0, 0},  
+  {"ldexp", 2, overloaded_to_double_type, 0, 0},  
+  {"log", 1, double_to_double_type, 0, 0}, 
+  {"log10", 1, double_to_double_type, 0, 0}, 
+  {"modf", 2, overloaded_to_double_type, 0, 0},   
+  {"pow", 2, double_to_double_type, 0, 0},   
+  {"sqrt", 1, double_to_double_type, 0, 0},  
+  {"ceil", 1, double_to_double_type, 0, 0},  
+  {"fabs", 1, double_to_double_type, 0, 0},  
+  {"floor", 1, double_to_double_type, 0, 0},  
+  {"fmod", 2, double_to_double_type, 0, 0},  
+  {"erf", 1, double_to_double_type, 0, 0}, 
+  {"erfc", 1, double_to_double_type, 0, 0}, 
+  {"gamma", 1, double_to_double_type, 0, 0}, 
+  {"hypot", 2, double_to_double_type, 0, 0}, 
+  {"isnan", 1, double_to_integer_type, 0, 0},  
+  {"j0", 1, double_to_double_type, 0, 0}, 
+  {"j1", 1, double_to_double_type, 0, 0}, 
+  {"jn", 2, overloaded_to_double_type, 0, 0}, 
+  {"lgamma", 1, double_to_double_type, 0, 0}, 
+  {"y0", 1, double_to_double_type, 0, 0}, 
+  {"y1", 1, double_to_double_type, 0, 0}, 
+  {"yn", 2, overloaded_to_double_type, 0, 0}, 
+  {"acosh", 1, double_to_double_type, 0, 0}, 
+  {"asinh", 1, double_to_double_type, 0, 0}, 
+  {"atanh", 1, double_to_double_type, 0, 0}, 
+  {"cbrt", 1, double_to_double_type, 0, 0}, 
+  {"logb", 1, double_to_double_type, 0, 0}, 
+  {"nextafter", 2, double_to_double_type, 0, 0},   
+  {"remainder", 2, double_to_double_type, 0, 0},   
+  {"scalb", 2, double_to_double_type, 0, 0},   
+  {"expm1", 1, double_to_double_type, 0, 0}, 
+  {"ilogb", 1, double_to_integer_type, 0, 0}, 
+  {"log1p", 1, double_to_double_type, 0, 0}, 
+  {"rint", 1, double_to_double_type, 0, 0}, 
+  {"matherr", 1, overloaded_to_integer_type, 0, 0},  
+  {"significand", 1, double_to_double_type, 0, 0}, 
+  {"copysign", 2, double_to_double_type, 0, 0},   
+  {"scalbn", 2, overloaded_to_double_type, 0, 0}, 
+  {"modff", 2, overloaded_to_real_type, 0, 0},  
+  {"sigfpe", 2, default_intrinsic_type, 0, 0},  
+  {"single_to_decimal", 4, overloaded_to_void_type, 0, 0}, 
+  {"double_to_decimal", 4, overloaded_to_void_type, 0, 0}, 
+  {"extended_to_decimal", 4, overloaded_to_void_type, 0, 0},
+  {"quadruple_to_decimal", 4, overloaded_to_void_type, 0, 0},
+  {"decimal_to_single", 4, overloaded_to_void_type, 0, 0},
+  {"decimal_to_double", 4, overloaded_to_void_type, 0, 0},
+  {"decimal_to_extended", 4, overloaded_to_void_type, 0, 0},
+  {"decimal_to_quadruple", 4, overloaded_to_void_type, 0, 0},
+  {"string_to_decimal", 6, overloaded_to_void_type, 0, 0},
+  {"func_to_decimal", 9, overloaded_to_void_type, 0, 0},
+  {"file_to_decimal", 8, overloaded_to_void_type, 0, 0},
+  {"seconvert", 5, default_intrinsic_type, 0, 0},  
+  {"sfconvert", 5, default_intrinsic_type, 0, 0},  
+  {"sgconvert", 4, default_intrinsic_type, 0, 0},  
+  {"econvert", 5, default_intrinsic_type, 0, 0},  
+  {"fconvert", 5, default_intrinsic_type, 0, 0},  
+  {"gconvert", 4, default_intrinsic_type, 0, 0},  
+  {"qeconvert", 5, default_intrinsic_type, 0, 0},  
+  {"qfconvert", 5, default_intrinsic_type, 0, 0},  
+  {"qgconvert", 4, default_intrinsic_type, 0, 0},  
+  {"ecvt", 4, default_intrinsic_type, 0, 0},  
+  {"fcvt", 4, default_intrinsic_type, 0, 0},  
+  {"gcvt", 3, default_intrinsic_type, 0, 0},  
+  {"atof", 1, overloaded_to_double_type, 0, 0},  
+  {"strtod", 2, overloaded_to_double_type, 0, 0},  */
+
+  //#include <setjmp.h>
+
+  /* {"setjmp", 1, overloaded_to_integer_type, 0, 0},
+  {"__setjmp", 1, overloaded_to_integer_type, 0, 0},
+  {"longjmp", 2, overloaded_to_void_type, 0, 0},
+  {"__longjmp", 2, overloaded_to_void_type, 0, 0},
+  {"sigsetjmp", 2, overloaded_to_integer_type, 0, 0},
+  {"siglongjmp", 2, overloaded_to_void_type, 0, 0},*/
+
+  //#include <signal.h>
+  //#include <stdarg.h>
+  //#include <stdbool.h>
+  //#include <stddef.h>
+  //#include <stdint.h>
+  //#include <stdio.h>
+
+  /*  {"remove", 1, pointer_to_integer_type, 0, 0},
+  {"rename", 2, pointer_to_integer_type, 0, 0},
+  {"tmpfile", 1, void_to_pointer_type, 0, 0},
+  {"tmpnam", 1, pointer_to_pointer_type, 0, 0}, 
+  {"fclose", 1, pointer_to_integer_type, 0, 0},
+  {"fflush", 1, pointer_to_integer_type, 0, 0},
+  {"fopen", 2, pointer_to_pointer_type, 0, 0}, 
+  {"freopen", 3, pointer_to_pointer_type, 0, 0}, 
+  {"setbuf", 2, pointer_to_void_type, 0, 0},
+  {"setvbuf", 4, overloaded_to_integer_type, 0, 0},
+  {"fprintf", (INT_MAX), overloaded_to_integer_type, 0, 0},
+  {"fscanf", (INT_MAX), overloaded_to_integer_type, 0, 0},*/
+  {"printf", (INT_MAX), overloaded_to_integer_type, 0, 0},
+  /* {"scanf", (INT_MAX), overloaded_to_integer_type, 0, 0},
+  {"sprintf", (INT_MAX), overloaded_to_integer_type, 0, 0},
+  {"sscanf", (INT_MAX), overloaded_to_integer_type, 0, 0},
+  {"vfprintf", 3, overloaded_to_integer_type, 0, 0},
+  {"vprintf", 2, overloaded_to_integer_type, 0, 0},
+  {"vsprintf", 3, overloaded_to_integer_type, 0, 0},
+  {"fgetc", 1, pointer_to_integer_type, 0, 0},
+  {"fgets", 3, overloaded_to_pointer_type, 0, 0}, 
+  {"fputc", 2, overloaded_to_integer_type, 0, 0},
+  {"fputs", 2, pointer_to_integer_type, 0, 0},
+  {"getc", 1, pointer_to_integer_type, 0, 0},
+  {"putc", 2, overloaded_to_integer_type, 0, 0},
+  {"getchar", 1, void_to_integer_type, 0, 0},
+  {"putchar", 1, integer_to_integer_type, 0, 0},
+  {"gets", 1, pointer_to_pointer_type, 0, 0}, 
+  {"puts", 1, pointer_to_integer_type, 0, 0},
+  {"ungetc", 2, overloaded_to_integer_type, 0, 0},
+  {"fread", 4, default_intrinsic_type, 0, 0}, 
+  {"fwrite", 4, default_intrinsic_type, 0, 0},
+  {"fgetpos", 2, pointer_to_integer_type, 0, 0},
+  {"fseek", 3, overloaded_to_integer_type, 0, 0},
+  {"fsetpos", 2, pointer_to_integer_type, 0, 0},
+  {"ftell",1, pointer_to_integer_type, 0, 0}, 
+  {"rewind",1, pointer_to_void_type, 0, 0},
+  {"clearerr",1, pointer_to_void_type, 0, 0},
+  {"feof", 1, pointer_to_integer_type, 0, 0},
+  {"ferror", 1, pointer_to_integer_type, 0, 0},
+  {"perror", 1, pointer_to_integer_type, 0, 0},
+  {"__filbuf", 1, pointer_to_integer_type, 0, 0},
+  {"__flsbuf", 2, overloaded_to_integer_type, 0, 0},
+  {"setbuffer", 3, overloaded_to_void_type, 0, 0},
+  {"setlinebuf", 1, pointer_to_integer_type, 0, 0},
+  {"snprintf", (INT_MAX), overloaded_to_integer_type, 0, 0},
+  {"vsnprintf", 4, overloaded_to_integer_type, 0, 0},
+  {"fdopen", 2, overloaded_to_pointer_type, 0, 0}, 
+  {"ctermid", 1, pointer_to_pointer_type, 0, 0}, 
+  {"fileno", 1, pointer_to_integer_type, 0, 0},
+  {"popen", 2, pointer_to_pointer_type, 0, 0}, 
+  {"cuserid", 1, pointer_to_pointer_type, 0, 0}, 
+  {"tempnam", 2, pointer_to_pointer_type, 0, 0}, 
+  {"getopt", 3, overloaded_to_integer_type, 0, 0},
+  {"getsubopt", 3, pointer_to_integer_type, 0, 0},
+  {"getw", 1, pointer_to_integer_type, 0, 0},
+  {"putw", 2, overloaded_to_integer_type, 0, 0},
+  {"pclose", 1, pointer_to_integer_type, 0, 0},
+  {"fseeko", 3, overloaded_to_integer_type, 0, 0},
+  {"ftello", 1, pointer_to_overloaded_type, 0, 0},
+  {"fopen64", 2, pointer_to_pointer_type, 0, 0}, 
+  {"freopen64", 3, pointer_to_pointer_type, 0, 0},
+  {"tmpfile64", 1, void_to_pointer_type, 0, 0},
+  {"fgetpos64", 2, pointer_to_integer_type, 0, 0},
+  {"fsetpos64", 2, pointer_to_integer_type, 0, 0},
+  {"fseeko64", 3, overloaded_to_integer_type, 0, 0},
+  {"ftello64", 1, pointer_to_overloaded_type, 0, 0},*/ 
+
+
+  //#include <stdlib.h>
+  //#include <string.h>
+  //#include <tgmath.h>
+  //#include <time.h>
+  //#include <wchar.h>
+  //#include <wctype.h>
+
   {NULL, 0, 0, 0, 0}
 };
+
 
 /************************************************************************** 
  * Get the function for typing the specified intrinsic
