@@ -1159,7 +1159,7 @@ hash_table fst;
     char    *name  = NULL, *name2 = NULL, *num = NULL;
     
     counter++;
-    num     = malloc(32); (void) sprintf(num, "%d", counter);
+    num     = (char*) malloc(32); (void) sprintf(num, "%d", counter);
     mod_ent = get_current_module_entity(); 
     name    = strdup(concatenate("RE", num, (char *) NULL));
 
