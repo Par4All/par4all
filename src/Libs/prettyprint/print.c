@@ -190,7 +190,7 @@ text texte;
     /* Add the attachment in Emacs mode by creating a twin file that
        is decorated with Emacs properties: */
     if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {
-	char * emacs_file_name = concatenate(filename, EMACS_FILE_EXT, NULL);
+	char * emacs_file_name = strdup(concatenate(filename, EMACS_FILE_EXT, NULL));
 	FILE * emacs_file_stream = safe_fopen(emacs_file_name, "w");
 	init_output_the_attachments_for_emacs(emacs_file_stream);
 	/* Now include the original plain file: */
