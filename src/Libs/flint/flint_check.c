@@ -132,7 +132,7 @@ bool check_procedure(c)
  * there are calls to labels which describe the format of a write or a read;
  * that's quite strange!)
  */
-bool check_call(c)
+bool check_the_call(c)
     call            c;
 {
     list            la = call_arguments(c);
@@ -394,7 +394,7 @@ bool check_call_basic_and_dim(exp, param, c, i)
  * this function checks that the indexes of an array are all mere integers.
  * maybe it could accept floats with a cast, if the ANSI says so.
  */
-void check_reference(ref)
+void check_the_reference(ref)
     reference       ref;
 {
     list            the_indices = reference_indices(ref);
