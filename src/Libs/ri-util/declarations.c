@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.14  2000/05/12 15:02:24  coelho
+ * comments added.
+ *
  * Revision 1.13  1999/01/26 10:38:43  ancourt
  * added parenthesis for function without any parameters
  *
@@ -182,6 +185,7 @@ words_declaration(
     return(pl);
 }
 
+/* what about simple DOUBLE PRECISION, REAL, INTEGER... */
 static list 
 words_basic(basic obj)
 {
@@ -200,6 +204,7 @@ words_basic(basic obj)
 	pc = CHAIN_IWORD(pc,basic_logical(obj));
     }
     else if (basic_overloaded_p(obj)) {
+      /* should be a user error ? */
 	pc = CHAIN_SWORD(pc,"OVERLOADED");
     }
     else if (basic_complex_p(obj)) {
