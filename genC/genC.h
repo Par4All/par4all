@@ -179,7 +179,6 @@ extern int gen_consistent_p GEN_PROTO(( gen_chunk * )) ;
 extern int gen_tabulated_consistent_p GEN_PROTO((int));
 extern int gen_allocated_memory GEN_PROTO((gen_chunk*));
 extern int gen_defined_p GEN_PROTO((gen_chunk *));
-extern int max_tabulated_elements GEN_PROTO((void));
 
 /*  recursion and utilities
  */
