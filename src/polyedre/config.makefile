@@ -1,8 +1,10 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/22 14:06:21 $, 
+# $Date: 1997/04/14 10:57:30 $, 
 
-CPPFLAGS+=	-DCHECK_OVERFLOW -DNO_MESSAGES
+# -DNO_MESSAGES
+
+CPPFLAGS+=	-DCHECK_OVERFLOW 
 
 OBSOLETE_FILES= affect.c elarg.c elim_red.c env.c incl_p_h.c inter_poly.c \
 	poly.c sc_elarg.c inter_demi.c inter_hyp.c inter_obj.c saturation.c \
