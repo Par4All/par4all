@@ -454,7 +454,7 @@ print_value_mappings()
 void 
 allocate_value_mappings(int n, int o, int i)
 {
-    pips_assert("allocate_value_mappings",
+    pips_assert("undefined mappings for allocation",
 		hash_table_undefined_p(hash_entity_to_new_value) &&
 		hash_table_undefined_p(hash_entity_to_old_value) &&
 		hash_table_undefined_p(hash_entity_to_intermediate_value) &&
@@ -470,7 +470,7 @@ allocate_value_mappings(int n, int o, int i)
 }
 
 static void 
-reset_value_mappings()
+reset_value_mappings(void)
 {
     hash_entity_to_new_value = hash_table_undefined;
     hash_entity_to_old_value = hash_table_undefined;
@@ -479,29 +479,28 @@ reset_value_mappings()
 }
 
 void 
-free_value_mappings()
+free_value_mappings(void)
 {
     /* free previous hash tables, desallocate names; this implies ALL
        value names were malloced and were not pointer to a ri part */
 
     /* the three tables are assumed to be allocated all together */
-    if (hash_table_undefined_p(hash_entity_to_old_value)) {
-	pips_error("free_value_mappings", "Attempt to free undefined mapping(s)\n");
-    }
-    else {
-	/* free names in hash_value_to_name; the other two hash tables
-	   contain pointers to the entity tabulated domain and thus need
-	   no value freeing */
-	/* k is discovered unused by lint; it is syntaxically necessary */
-	HASH_MAP(k, v, {free(v);}, hash_value_to_name);
-	/* free the three tables themselves */
-	hash_table_free(hash_entity_to_new_value);
-	hash_table_free(hash_entity_to_old_value);
-	hash_table_free(hash_entity_to_intermediate_value);
-	hash_table_free(hash_value_to_name);
 
-	reset_value_mappings();
-    }
+    pips_assert("no free of undefined mappings", 
+		!hash_table_undefined_p(hash_entity_to_old_value));
+
+    /* free names in hash_value_to_name; the other two hash tables
+       contain pointers to the entity tabulated domain and thus need
+    no value freeing */
+    /* k is discovered unused by lint; it is syntaxically necessary */
+    HASH_MAP(k, v, {free(v);}, hash_value_to_name);
+    /* free the three tables themselves */
+    hash_table_free(hash_entity_to_new_value);
+    hash_table_free(hash_entity_to_old_value);
+    hash_table_free(hash_entity_to_intermediate_value);
+    hash_table_free(hash_value_to_name);
+    
+    reset_value_mappings();
 }
 
 /* HASH TABLE INITIALIZATION */
