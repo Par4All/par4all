@@ -3,6 +3,9 @@
   * $Id$
   *
   * $Log: transformer.c,v $
+  * Revision 1.49  2003/06/20 07:21:45  irigoin
+  * Intermediate version with development feaures about time-out control commented out
+  *
   * Revision 1.48  2002/07/24 08:59:56  irigoin
   * Function transformer_value_substitutable_p() added to check beforehand
   * problems created by aliases in semantics/interprocedural.c
@@ -931,7 +934,8 @@ transformer_projection_with_redundancy_elimination(
 	  }
 	TRY 
 	  {
-	    sc_projection_along_variable_ofl_ctrl
+	    /* sc_projection_along_variable_ofl_ctrl_timeout_ctrl */
+ 	    sc_projection_along_variable_ofl_ctrl
 	      (&r,(Variable) e, NO_OFL_CTRL);
 	    UNCATCH(overflow_error);
 	  }
@@ -1151,7 +1155,8 @@ cons * args;
 	  }
 	TRY 
 	  {
-	    sc_projection_along_variable_ofl_ctrl
+	    /* sc_projection_along_variable_ofl_ctrl_timeout_ctrl */
+ 	    sc_projection_along_variable_ofl_ctrl
 	      (&r, (Variable) e, NO_OFL_CTRL);
 	    UNCATCH(overflow_error);
 	  }
@@ -1603,6 +1608,7 @@ parametric_transformer_empty_p(transformer t,
 	    }
 	  TRY 
 	    {
+	      /* sc_projection_along_variable_ofl_ctrl_timeout_ctrl */
 	      sc_projection_along_variable_ofl_ctrl
 		(&new_ps, var, NO_OFL_CTRL);
 	      UNCATCH(overflow_error);
