@@ -1,8 +1,8 @@
-$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/09/26 08:52:25 $, 
+$RCSfile: hpfc_runtime_library.README,v $ ($Revision$) $Date: 1995/09/26 22:22:39 $, 
 
  (c) Fabien Coelho, 1993-1995
 
-This file describe the content of the Hpfc Runtime Library.
+This file describes the content of the Hpfc Runtime Library.
 Don't expect anything from these sources, so you won't be disapointed.
 
 Introduction:
@@ -20,10 +20,11 @@ How to built the library:
 
 Define the following environment variables:
 
-PIPS_M4
-HPFC_M4 
- these m4 should include the shift operator. 
- (Sun m4 is defficient, GNU m4 1.4 is okay)
+PIPS_AR and PIPS_ARFLAGS
+PIPS_M4 and HPFC_M4 
+  These m4 should include the shift operator. 
+  I had bad experiences with SUN and DEC m4. 
+  GNU m4 1.4 is okay.
 PVM_ROOT and PVM_ARCH
 HPFC_RUNTIME_M4_PARAMS:
  -D DEMO      (print some messages when launched)
@@ -32,7 +33,7 @@ HPFC_RUNTIME_M4_PARAMS:
  -D SYNC_EXIT (synchronize on exit)
  -D USE_PVMe  (for IBM's PVM. a PVM3_ROOT is expected if set)
 
-Then make and hope.
+Then make (and hope:-)...
 
 Library content and organization:
 ---------------------------------
