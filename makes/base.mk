@@ -43,7 +43,7 @@ INC.d	= $(INSTALL_DIR)/Include
 DOC.d	= $(INSTALL_DIR)/Doc
 HTM.d	= $(INSTALL_DIR)/Html
 UTL.d	= $(INSTALL_DIR)/Utils
-SHR.d	= $(INSTALL_DIR)/Share
+SHR.d	= $(INSTALL_DIR)/Bin
 RTM.d	= $(INSTALL_DIR)/Runtime
 MAKE.d	= $(INSTALL_DIR)/makes
 
