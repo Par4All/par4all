@@ -37,28 +37,44 @@
 
 #include "top-level.h"
 
-/* returns the allocated full path name 
+/* returns the allocated full path name.
+ * the database is added if it is relative...
  */
-static char *
-get_view_file(char * print_type, bool displayable)
+static string get_view_file(string print_type, bool displayable)
 {
-   char * module_name = db_get_current_module_name();
+    string module_name = db_get_current_module_name();
 
    if(displayable && !displayable_file_p(print_type)) {
        pips_user_error("resource %s cannot be displayed\n", print_type);
    }
 
-   if(module_name != NULL)
+   if (module_name != NULL)
    {
-      if ( safe_make(print_type, module_name) ) 
+      if (safe_make(print_type, module_name)) 
       {
-         char *file_name = db_get_file_resource(print_type, module_name, TRUE);
-	 char *pgm_wd = build_pgmwd(db_get_current_workspace_name());
-	 char *file_name_in_database = strdup(
-	     concatenate(pgm_wd, "/", file_name, NULL));
+         string file_name = 
+	     db_get_file_resource(print_type, module_name, TRUE);
 
-	 free(pgm_wd); 
-         return file_name_in_database;
+	 if (file_name[0]!='.' && file_name[0]!='/')
+	 {
+	     /* the file name is relative to the database.
+	      * thus the workspace directory name is prefixed.
+	      */
+	     string pgm_wd, file_name_in_database;
+
+	     pgm_wd = build_pgmwd(db_get_current_workspace_name());
+	     file_name_in_database = 
+		 strdup(concatenate(pgm_wd, "/", file_name, NULL));
+
+	     free(pgm_wd); 
+	     return file_name_in_database;
+	 }
+	 else
+	 {
+	     /* it is relative to pips pwd, or absolute.
+	      */
+	     return file_name;
+	 }
       }
    }
    else {
@@ -68,14 +84,12 @@ get_view_file(char * print_type, bool displayable)
    return NULL;
 }
 
-char *
-build_view_file(char * print_type)
+string build_view_file(string print_type)
 {
     return get_view_file(print_type, TRUE);
 }
 
-char *
-get_dont_build_view_file(char * print_type)
+string get_dont_build_view_file(string print_type)
 {
     return get_view_file(print_type, FALSE);
 }
