@@ -414,9 +414,16 @@ list lvr;
 	tag vrt = owner_tag(virtual_resource_owner(vr));
 
 	switch (vrt) {
+	    /* FI: should be is_owner_workspace, but changing Newgen decl... */
 	case is_owner_program:
+	    /* FI: for  relocation of workspaces */
+	    /*
 	    result = gen_nconc(result, CONS(REAL_RESOURCE, 
 					    make_real_resource(vrn, db_get_current_workspace_name()),
+					    NIL));
+					    */
+	    result = gen_nconc(result, CONS(REAL_RESOURCE, 
+					    make_real_resource(vrn, ""),
 					    NIL));
 	    break;
 
