@@ -128,7 +128,6 @@ BeginingOfParsing()
 
     /* the current package is initialized */
     CurrentPackage = TOP_LEVEL_MODULE_NAME;
-
     called = TRUE;
 }
 
@@ -145,6 +144,7 @@ the_actual_parser(
 
     /* set up parser properties */
     init_parser_properties();
+    parser_init_macros_support();
 
     /* parser is initialized */
     BeginingOfParsing();
