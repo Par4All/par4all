@@ -1,24 +1,27 @@
 #
-# $Id: makefile,v 1.2 2002/10/15 10:08:52 kienhuis Exp $
+# $Id: Makefile.am,v 1.1 2004/01/31 22:17:46 verdoolaege Exp $
 #
 
-ROOT  = ../..
+OBJ_DIR = $(top_builddir)
 
 PP =  \
 	c6.in \
-	c7.in \
-	c10.in
+	c7.in
 
-	#c5.in \
+#	c5.in \
 #	c4.in \
-#	c9.in \
+#	c9.in
+#	c10.in
 
-test:
+EXTRA_DIST = $(PP) \
+	$(PP:%.in=%.out) 
+
+check:
 	@failedtest=0; \
 	for x in $(PP) ; do \
 		echo "Verify file $$x"; \
-		$(ROOT)/bin/polytest.exe < $$x > xyz;\
-		diff -w xyz `basename $$x .in`.out ; \
+		$(OBJ_DIR)/pp < $(srcdir)/$$x > xyz;\
+		diff -w xyz $(srcdir)/`basename $$x .in`.out ; \
 		result=$$?; \
 		if [ "$$result" -eq "1" ]; then \
 			echo "Error: $$x is not the same"; \
@@ -32,7 +35,3 @@ test:
 	else \
 	        echo "Test pp works correctly"; \
         fi
-
-# Include the shared compilation rules
-include $(ROOT)/vars.mk
-include $(ROOT)/default_functions.mk

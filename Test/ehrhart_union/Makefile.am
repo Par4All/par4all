@@ -1,21 +1,24 @@
 #
-# $Id: makefile,v 1.5 2002/10/17 12:27:46 olaru Exp $
+# $Id: Makefile.am,v 1.1 2004/01/31 22:17:46 verdoolaege Exp $
 #
 
-ROOT  = ../..
+OBJ_DIR = $(top_builddir)
 
 EHRHART_UNION =  \
 	ue1.in \
 	ue2.in
 
+EXTRA_DIST = $(EHRHART_UNION) \
+	$(EHRHART_UNION:%.in=%.out) 
+
 TEST=$(EHRHART_UNION:%.in=%.tested) 
 
-test:
+check:
 	@failedtest=0; \
 	for x in $(EHRHART_UNION) ; do \
 		echo "Verify file $$x" ; \
-		$(ROOT)/bin/ehrhart_union$(BITS).exe < $$x > xyz;\
-		diff -w xyz `basename $$x .in`.out ; \
+		$(OBJ_DIR)/ehrhart_union < $(srcdir)/$$x > xyz;\
+		diff -w xyz $(srcdir)/`basename $$x .in`.out ; \
 		result=$$?; \
 		if [ "$$result" -eq "1" ]; then \
 			echo "Error: $$x is not the same"; \
@@ -29,7 +32,3 @@ test:
 	else \
 	        echo "Test ehrhart_union works correctly"; \
         fi
-
-# Include the shared compilation rules
-include $(ROOT)/vars.mk
-include $(ROOT)/default_functions.mk

@@ -1,8 +1,8 @@
 #
-# $Id: makefile,v 1.3 2002/10/17 12:27:12 olaru Exp $
+# $Id: Makefile.am,v 1.1 2004/01/31 22:17:46 verdoolaege Exp $
 #
 
-ROOT  = ../..
+OBJ_DIR = $(top_builddir)
 
 GENERAL =  \
 	convex1.in \
@@ -18,14 +18,17 @@ GENERAL =  \
 	simpl7.in \
 	test1.in
 
+EXTRA_DIST = $(GENERAL) \
+	$(GENERAL:%.in=%.out) 
+
 #	test.in
 
-test:
+check:
 	@failedtest=0; \
 	for x in $(GENERAL) ; do \
 		echo "Verify file $$x"; \
-		$(ROOT)/bin/polytest$(BITS).exe < $$x > xyz;\
-		diff -w xyz `basename $$x .in`.out ; \
+		$(OBJ_DIR)/polytest < $(srcdir)/$$x > xyz;\
+		diff -w xyz $(srcdir)/`basename $$x .in`.out ; \
 		result=$$?; \
 		if [ "$$result" -eq "1" ]; then \
 			echo "Error: $$x is not the same"; \
@@ -39,8 +42,3 @@ test:
 	else \
 	        echo "Test polytest works correctly"; \
         fi
-
-
-# Include the shared compilation rules
-include $(ROOT)/vars.mk
-include $(ROOT)/default_functions.mk

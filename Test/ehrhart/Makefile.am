@@ -1,8 +1,8 @@
 #
-# $Id: makefile,v 1.4 2002/10/17 12:27:38 olaru Exp $
+# $Id: Makefile.am,v 1.1 2004/01/31 22:17:46 verdoolaege Exp $
 #
 
-ROOT  = ../..
+OBJ_DIR = $(top_builddir)
 
 EHRHART =  \
 	8hedron.in \
@@ -43,16 +43,22 @@ EHRHART =  \
 	t4.in\
 	tpar.in
 
-TEST=$(EHRHART:%.in=%.tested) 
+EXTRA_DIST = $(EHRHART) \
+	$(EHRHART:%.in=%.out) 
 
-TESTLONG=$(EHRHART:%.in=%.tested) 
+# These do not pass in 32 bits mode (integer overflow): isnm isnm2 e16
+if BITS32
+  OVER = isnm.in isnm2.in e16.in
+endif
 
-test:
+EHRHART_TESTS = $(filter-out $(LONG_EHRHART_TESTS) $(OVER), $(EHRHART))
+
+check:
 	@failedtest=0; \
-	for x in $(EHRHART) ; do \
+	for x in $(EHRHART_TESTS) ; do \
 		echo "Verify file $$x" ; \
-		$(ROOT)/bin/testehrhart$(BITS).exe < $$x > xyz;\
-		diff -w xyz `basename $$x .in`.out ; \
+		$(OBJ_DIR)/testehrhart < $(srcdir)/$$x >xyz; \
+		diff -w xyz $(srcdir)/`basename $$x .in`.out ; \
 		result=$$?; \
 		if [ "$$result" -eq "1" ]; then \
 			echo "Error: $$x is not the same"; \
@@ -68,16 +74,7 @@ test:
         fi
 
 longtest:
-	@for x in $(EHRHART) ; do \
+	@for x in $(EHRHART_TESTS) ; do \
 		echo "Verify Ehrhart for $$x"; \
-		$(ROOT)/bin/verif_ehrhart.exec < $$x ;\
-	done ; \
-
-# The default compile rule
-.in.tested:
-	$(ROOT)/bin/ehrhart.exec < $< > xyz
-	diff -w xyz $*.out
-
-# Include the shared compilation rules
-include $(ROOT)/vars.mk
-include $(ROOT)/default_functions.mk
+		$(OBJ_DIR)/verif_ehrhart < $(srcdir)/$$x ;\
+	done ;

@@ -1,8 +1,8 @@
 #
-# $Id: makefile,v 1.4 2002/10/17 12:27:26 olaru Exp $
+# $Id: Makefile.am,v 1.1 2004/01/31 22:17:45 verdoolaege Exp $
 #
 
-ROOT  = ../..
+OBJ_DIR = $(top_builddir)
 
 ZPOLYTESTS =  \
 	LatHNF1.in \
@@ -30,14 +30,17 @@ ZPOLYTESTS =  \
 	SplitZpol2.in \
 	SplitZpol3.in
 
+EXTRA_DIST = $(ZPOLYTESTS) \
+	$(ZPOLYTESTS:%.in=%.out) 
+
 TEST=$(ZPOLYTESTS:%.in=%.tested) 
 
-test:
+check:
 	@failedtest=0; \
 	for x in $(ZPOLYTESTS) ; do \
 		echo "Verify file $$x" ; \
-		$(ROOT)/bin/Zpolytest$(BITS).exe < $$x > xyz;\
-		diff -w xyz `basename $$x .in`.out ; \
+		$(OBJ_DIR)/Zpolytest < $(srcdir)/$$x > xyz;\
+		diff -w xyz $(srcdir)/`basename $$x .in`.out ; \
 		result=$$?; \
 		if [ "$$result" -eq "1" ]; then \
 			echo "Error: $$x is not the same"; \
@@ -51,7 +54,3 @@ test:
 	else \
 	        echo "Test Zpolytest works correctly"; \
         fi
-
-# Include the shared compilation rules
-include $(ROOT)/vars.mk
-include $(ROOT)/default_functions.mk

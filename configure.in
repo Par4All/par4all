@@ -1,4 +1,4 @@
-audnl	This file is an input file used by the GNU "autoconf" program to
+dnl	This file is an input file used by the GNU "autoconf" program to
 dnl	generate the file "configure", which is run to configure the
 dnl	Makefile in this directory.
 
@@ -32,17 +32,18 @@ dnl Process this file with autoconf to produce a configure script.
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_INIT(include/polylib/polylib.h)
+AM_INIT_AUTOMAKE(polylib, 5.20.0)
 
 VERSION=5.20.0
 
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_CANONICAL_SYSTEM 
+AC_SUBST(versioninfo)
+versioninfo=5:1:0
 
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_LN_S
-AC_PROG_RANLIB
 AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -53,46 +54,8 @@ AC_CHECK_HEADERS(limits.h unistd.h)
 
 
 case "$target" in
-  *hpux*)  
-	LD="ld";	
-	SHEXT="sl" ; 
-	EXEC_SUFFIX=	
-#	SHAREDLIB_FLAG="-Wl,-B,immediate,-B,nonfatal,-B,verbose";
-#	LDCONFIG=
-	;;
-  i*-*-linux-gnu)  
-	LD="gcc"
-	SHEXT="so" ; 
-	EXEC_SUFFIX=
-#	SHAREDLIB_FLAG="-shared"
-#	LDCONFIG=ldconfig
-	;;
-  *-sun-solaris*)  
-	LD="gcc"
-	SHEXT="so" 
-	EXEC_SUFFIX=	
-#	SHAREDLIB_FLAG="-G"
-#	LDCONFIG=
-	prefix="$(PWD)"
-	;;
- *-pc-solaris*)  
-        LD="gcc"
-        SHEXT="so" 
-        EXEC_SUFFIX=    
-#        SHAREDLIB_FLAG="-G"
-#        LDCONFIG=
-	;;
  i*-pc-cygwin)   
-	LD="gcc -static"
-	SHEXT="dll"
-	LIBS="$LIBS -lcygwin -lkernel32 -lcrtdll"
-	prefix="$(PWD)"
-	EXEC_SUFFIX=.exe	
-#	SHAREDLIB_FLAG=""
-#	LDCONFIG=
-	EXTRA_FLAGS="-DCYGWIN"
-	;;
-	 *) AC_MSG_ERROR([ARCH "$target" is not supported]) ;;
+	CPPFLAGS="-DCYGWIN $CPPFLAGS"
 esac
 
 
@@ -112,188 +75,102 @@ case "$target" in
 esac
 
 
+AC_ARG_ENABLE(int-lib,
+	[  --enable-int-lib        Build an int library], 
+        lib_type=int)
+AC_ARG_ENABLE(longint-lib,
+	[  --enable-longint-lib    Build a long int library], 
+        lib_type=longint)
+AC_ARG_ENABLE(longlongint-lib,
+	[  --enable-longlongint-lib Build a long long int library], 
+        lib_type=longlongint)
 
-AC_ARG_ENABLE(int-lib,[ --enable-int-lib         Enable that only an int library is constructed], only_int_lib=$enableval,only_int_lib=no)
-AC_ARG_ENABLE(longint-lib,[ --enable-longint-lib     Enable that only a long int library is constructed], only_longint_lib=$enableval,only_longint_lib=no)
-AC_ARG_ENABLE(longlongint-lib,[ --enable-longlongint-lib Enable that only a long long int library is constructed], only_longlongint_lib=$enableval,only_longlongint_lib=no)
-AC_ARG_ENABLE(gmpint-lib,[ --enable-gmpint-lib Enable that only a gmp int library is constructued], only_gmpint_lib=$enableval,only_gmpint_lib=no)
-AC_ARG_ENABLE(allint-lib,[ --enable-allint-lib Enable that 32, 64 and gmp int library is constructued], allint_lib=$enableval,allint_lib=no)
-
-INT_BITS=`expr $ac_cv_sizeof_int \* 8`
-INT_AFLAGS=-DLINEAR_VALUE_IS_INT
-
-LONG_BITS=`expr $ac_cv_sizeof_long_long_int \* 8`
-LONG_AFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
-			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
-
-dnl GMP_BITS=`expr gmp`
-GMP_BITS="gmp"
-GMP_AFLAGS="-DGNUMP"
-
-
-if test "$only_int_lib" = "yes"; then
-	no_long=yes
-elif test "$only_longint_lib" = "yes"; then
-dnl /* type "long int" is built using INT_AFLAGS.
-	INT_BITS=`expr $ac_cv_sizeof_long_int \* 8`
-	INT_AFLAGS="-DLINEAR_VALUE_IS_LONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
-			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
-	no_long=yes
-elif test "$only_longlongint_lib" = "yes"; then
-	no_long=no
-elif test "$only_gmpint_lib" = "yes"; then
-	no_long=no
+dnl Check for GMP library
+AC_MSG_CHECKING(whether to use GMP)
+AC_ARG_WITH(libgmp, 
+        [  --with-libgmp           DIR Location of the GMP Distribution], 
+	gmp_package=$withval, gmp_package=no)
+if test "x$gmp_package" = "xno"; then
+	AC_MSG_RESULT(no)
 else
+	AC_MSG_RESULT(yes)
+	if test "x$gmp_package" != "xyes"; then
+	    GMP_DIR=$gmp_package
+	    if test ! -d "$GMP_DIR"; then
+	    	AC_ERROR(Directory given for GMP Distribution is not a directory)
+	    fi
+	    CPPFLAGS="-I$GMP_DIR/include $CPPFLAGS"
+	    LDFLAGS="-L$GMP_DIR/lib $LDFLAGS"
+	fi
+	AC_CHECK_HEADER(gmp.h,
+		[AC_CHECK_LIB(gmp,main,
+		    [poly_cv_gmpfatal="no"],
+		    [poly_cv_gmpfatal="yes"])],
+		[poly_cv_gmpfatal="yes"])
+	if test "$poly_cv_gmpfatal" = "yes"; then
+		AC_MSG_ERROR([GMP not found])
+	fi
 
-dnl /******************************************************************/
-dnl Check the size of the int's.
-dnl three sizes library can be constructed: size = INT, LONG, or GMP.
-dnl have to compute [size]BITS and [size]AFLAGS
+	lib_type=gmp
+	BITS=`expr gmp`
+	CPPFLAGS="-DGNUMP $CPPFLAGS"
+	LIBS="-lgmp $LIBS"
+fi
 
-AC_MSG_CHECKING(what the LONG representation is)
-no_long=no
-if test "$ac_cv_sizeof_long_long_int" -gt "$ac_cv_sizeof_int"; then
-	LONG_BITS=`expr $ac_cv_sizeof_long_long_int \* 8`
-	AC_MSG_RESULT([long long int, $LONG_BITS bits])
-elif test "$ac_cv_sizeof_long_int" -gt "$ac_cv_sizeof_int"; then
-	LONG_BITS=`expr $ac_cv_sizeof_long_int \* 8`
-	AC_MSG_RESULT([long int, $LONG_BITS bits])
-else
+if test "X$lib_type" = "X"; then
+    AC_MSG_CHECKING(what the LONG representation is)
+    if test "$ac_cv_sizeof_long_long_int" -gt "$ac_cv_sizeof_int"; then
+	AC_MSG_RESULT([long long int])
+	lib_type=longlongint
+    elif test "$ac_cv_sizeof_long_int" -gt "$ac_cv_sizeof_int"; then
+	AC_MSG_RESULT([long int])
+	lib_type=longint
+    else
 	AC_MSG_RESULT([NONE!])
-	no_long=yes
-fi
-fi
-
-
-dnl case "$target" in
-dnl i*-pc-cygwin)
-dnl	   no_long=yes
-dnl esac
-
-if test "$no_long" = "yes"; then
-	LIBS_TO_BUILD=$INT_BITS
-	EXEC_TO_BUILD=$INT_BITS
-	DEFAULT_INT_BITS=$INT_BITS
-	DEFAULT_AFLAGS=$INT_AFLAGS
-elif test "$only_longlongint_lib" = "yes"; then
-	LIBS_TO_BUILD=$LONG_BITS
-	EXEC_TO_BUILD=$LONG_BITS
-	DEFAULT_INT_BITS=$LONG_BITS
-	DEFAULT_AFLAGS=$LONG_AFLAGS
-elif test "$only_gmpint_lib" = "yes"; then
-	LIBS_TO_BUILD="$GMP_BITS"
-	EXEC_TO_BUILD="$GMP_BITS"
-	DEFAULT_INT_BITS="$GMP_BITS"
-	DEFAULT_AFLAGS="$GMP_AFLAGS"
-	usegmp=yes
-elif test "$allint_lib" = "yes"; then
-	LIBS_TO_BUILD="$INT_BITS $LONG_BITS $GMP_BITS"
-	EXEC_TO_BUILD="$LONG_BITS"
-	DEFAULT_INT_BITS=$INT_BITS
-	DEFAULT_AFLAGS=$INT_AFLAGS
-	usegmp=yes
-else
-	LIBS_TO_BUILD="$LONG_BITS"
-	EXEC_TO_BUILD="$LONG_BITS"
-	DEFAULT_INT_BITS=$LONG_BITS
-	DEFAULT_AFLAGS=$LONG_AFLAGS
+	lib_type=int
+    fi
 fi
 
-AC_ARG_ENABLE(short-exec,[ --enable-short-exec      Enable that the int library is used by the executables (by default, the long library is used if built)],[ if test "$enableval" = yes; then
-		EXEC_TO_BUILD=$INT_BITS
-		DEFAULT_INT_BITS=$INT_BITS
-		DEFAULT_AFLAGS=$INT_AFLAGS
+case "$lib_type" in
+	int)
+	    BITS=`expr $ac_cv_sizeof_int \* 8`
+	    CPPFLAGS="-DLINEAR_VALUE_IS_INT $CPPFLAGS"
+	    ;;
+	longint)
+	    BITS=`expr $ac_cv_sizeof_long_int \* 8`
+	    CPPFLAGS="-DLINEAR_VALUE_IS_LONG \
+		      -DLINEAR_VALUE_PROTECT_MULTIPLY \
+		      -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV $CPPFLAGS"
+	    ;;
+	longlongint)
+	    BITS=`expr $ac_cv_sizeof_long_long_int \* 8`
+	    CPPFLAGS="-DLINEAR_VALUE_IS_LONGLONG \
+		      -DLINEAR_VALUE_PROTECT_MULTIPLY \
+		      -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV $CPPFLAGS"
+	    ;;
+esac
 
-    fi ] )
+
+AC_SUBST(polylib)
+polylib="libpolylib$BITS.la"
+
+AM_CONDITIONAL(BITS32, test $BITS = 32)
 
 dnl /*****************************************************************************/
-EXEC_EXTRA_SUFFIX=$EXEC_SUFFIX
-AC_ARG_ENABLE(extra-suffix,[ --enable-extra-suffix    Enable that the executables take an extra suffix depending on the library size],[ if test "$enableval" = yes; then
-		EXEC_EXTRA_SUFFIX="\$(BITS)$EXEC_SUFFIX"
+AC_ARG_ENABLE(extra-suffix,
+	[  --enable-extra-suffix   Add bits size suffix to executables],
+	[ if test "$enableval" = yes; then
+		program_transform_name="s/\$\$/$BITS/;$program_transform_name"
     fi ] )
-AC_ARG_ENABLE(all-exec,[ --enable-all-exec        Enable that all sized libraries are used to build the executables of each, which take an extra suffix depending on the library (by default, only the long library is used)],[ if test "$enableval" = yes; then
-		EXEC_TO_BUILD="$LIBS_TO_BUILD"
-		DEFAULT_INT_BITS=$INT_BITS
-		DEFAULT_AFLAGS=$INT_AFLAGS
-		EXEC_EXTRA_SUFFIX="\$(BITS)$EXEC_SUFFIX"
-    fi ] )
-
-dnl /*****************************************************************************/
-dnl install static/shared/none libraries (default : see below)
-dnl EXEC_EXTRA_LIBS="-lpolylib\$(BITS)"
-dnl dnl See if the only goal is to create a shared library
-dnl AC_ARG_ENABLE(onlyshared,[ --enable-onlyshared      Enable that only a shared library is constructued], only_shared=$enableval,only_shared=no)
-dnl if test "$only_shared" = "yes"; then
-dnl 	INSTALL_LIB="install-shared"
-dnl fi
-dnl dnl See if the only goal is to create a static library
-dnl AC_ARG_ENABLE(onlystatic,[ --enable-onlystatic      Enable that only a static library is constructued], only_static=$enableval,only_static=no)
-dnl if test "$only_static" = "yes"; then
-dnl 	INSTALL_LIB="install-static"
-dnl fi
-dnl dnl See if the user does not want to create any library
-dnl AC_ARG_ENABLE(install-lib,[ --disable-install-lib    Disable installation of the library],
-dnl 	[if test "$enableval" = "no"; then
-dnl 		INSTALL_LIB=""
-dnl 		EXEC_EXTRA_LIBS="-L\$(OBJ_DIR) $EXEC_EXTRA_LIBS"
-dnl 	fi], EXEC_EXTRA_LIBS="-L$libdir $EXEC_EXTRA_LIBS" )
-dnl 
-dnl AC_ARG_WITH(ldconfig-cache, [ --with-ldconfig-cache=FILE Run ldconfig -C <FILE>],
-dnl 	[if test "x$LDCONFIG" = "xldconfig"; then
-dnl 		LDCONFIG="$LDCONFIG -C $withval"
-dnl 	fi])
-
-dnl static only.
-INSTALL_LIB="install-static"
 
 dnl /********************************************************************/
 dnl Check for DOXYGEN package
 AC_ARG_WITH(doxygen, [ --with-doxygen            DIR Location of the Doxygen Distribution (http://www.doxygen.org)], doxygen_package=$withval)
 
 dnl AC_MSG_CHECKING(for Doxygen program)
-AC_CHECK_PROG(DOXYGEN,doxygen,$withval,test,[$PATH:$doxygen_package/bin:/usr/local/bin])
+AC_CHECK_PROG(DOXYGEN,doxygen,doxygen,test,[$PATH:$doxygen_package/bin:/usr/local/bin])
 dnl AC_MSG_RESULT($DOXYGEN)
 
-
-
-
-dnl /********************************************************************/
-dnl Check for GMP library
-AC_ARG_WITH(libgmp, [ --with-libgmp            DIR Location of the GMP Distribution], gmp_package=$withval,gmp_package=yes)	
-
-EXTRA_LIBS=
-EXTRA_INCLUDE=
-
-dnl if test "x$usegmp" = "xyes"; then
-	AC_MSG_CHECKING(for GMP)
-	if test "x$gmp_package" = "xno"; then
-		AC_MSG_RESULT(no)
-	else
-		if test "x$gmp_package" = "xyes"; then
-			AC_CHECK_HEADER(gmp.h,
-				AC_CHECK_LIB(gmp,main,
-					[ EXTRA_LIBS="-lgmp $EXTRA_LIBS"]))
-		else
-	dnl Check if the GMP directory is a valid location
-			GMP_DIR=$gmp_package
-			if test ! -d "$GMP_DIR"; then
-	    		AC_ERROR(Directory given for GMP Distribution is not a directory)
-			else
-				GMP_INC=$GMP_DIR/include
-				GMP_LIB=$GMP_DIR/lib
-				if test ! -f $GMP_INC/gmp.h; then
-		    		AC_ERROR(Can't find $GMP_INC/gmp.h)
-				elif test -f $GMP_LIB/libgmp.so -o -f $GMP_LIB/libgmp.a -o -f $GMP_LIB/libgmp.$SHEXT; then
-					EXTRA_INCLUDES="-I$GMP_INC"
-					EXTRA_LIBS="-L$GMP_LIB -lgmp $EXTRA_LIBS"
-					AC_MSG_RESULT(yes)
-				else
-		    		AC_ERROR(Can't find $GMP_LIB/libgmp.so nor $GMP_LIB/libgmp.a nor $GMP_LIB/libgmp.$SHEXT)
-				fi
-			fi
-		fi
-	fi
-dnl fi
 
 echo "Polylib will be built with " $LIBS_TO_BUILD "integer size"
 echo "---------------------------------------------------"
@@ -306,43 +183,20 @@ echo "---------------------------------------------------"
 
 AC_SUBST(VERSION)
 
-AC_SUBST(LD)
-AC_SUBST(SHEXT)
-AC_SUBST(SHAREDLIB_FLAG)
 AC_SUBST(LIBS)
-AC_SUBST(INSTALL_LIB)
-AC_SUBST(LDCONFIG)
-
-dnl define variants of polylib to build
-AC_SUBST(LIBS_TO_BUILD)
-AC_SUBST(EXEC_TO_BUILD)
 
 dnl long/int bits and compilation flags
-AC_SUBST(INT_BITS)
-AC_SUBST(INT_AFLAGS)
-AC_SUBST(LONG_BITS)
-AC_SUBST(LONG_AFLAGS)
-AC_SUBST(GMP_BITS)
-AC_SUBST(GMP_AFLAGS)
-
-AC_SUBST(DEFAULT_INT_BITS)
-AC_SUBST(DEFAULT_AFLAGS)
-
-dnl Used with GMP is selected
-AC_SUBST(EXTRA_INCLUDES)
-AC_SUBST(EXTRA_LIBS)
-
-AC_SUBST(EXEC_EXTRA_SUFFIX)
-AC_SUBST(EXEC_EXTRA_LIBS)
-
-dnl Used with CYGWIN platform
-AC_SUBST(EXTRA_FLAGS)
+AC_SUBST(BITS)
 
 dnl Used with doxygen
 AC_SUBST(DOXYGEN)
 
-
-AC_OUTPUT(vars.mk)
-
-
-
+AC_OUTPUT(Makefile
+	  include/Makefile
+	  include/polylib/Makefile
+	  Test/Makefile
+	  Test/Zpolytest/Makefile
+	  Test/ehrhart/Makefile
+	  Test/ehrhart_union/Makefile
+	  Test/general/Makefile
+	  Test/pp/Makefile)
