@@ -42,8 +42,9 @@ bool return_statement_p(s)
 statement s;
 {
     instruction i = statement_instruction(s);
+    bool return_p = fortran_instruction_p(i, RETURN_FUNCTION_NAME);
 
-    return (fortran_instruction_p(i, RETURN_FUNCTION_NAME));
+    return return_p;
 }
 
 bool continue_statement_p(s)
@@ -60,6 +61,14 @@ statement s;
     instruction i = statement_instruction(s);
 
     return (fortran_instruction_p(i, STOP_FUNCTION_NAME));
+}
+
+bool format_statement_p(s)
+statement s;
+{
+    instruction i = statement_instruction(s);
+
+    return (fortran_instruction_p(i, FORMAT_FUNCTION_NAME));
 }
 
 bool statement_less_p(st1, st2)
@@ -105,16 +114,11 @@ bool statement_test_p(statement s)
     return(instruction_test_p(statement_instruction(s)));
 }
 
+/* This function should not be used ! */
 bool statement_continue_p(s)
 statement s;
 {
-    return(instruction_continue_p(statement_instruction(s)));
-}
-
-bool statement_format_p(s)
-statement s;
-{
-    return(instruction_format_p(statement_instruction(s)));
+    return continue_statement_p(s);
 }
 
 bool unlabelled_statement_p(st)
@@ -191,6 +195,22 @@ statement s;
 {
     return(instruction_call_p(statement_instruction(s)));
 }
+
+bool check_io_statement_p(statement s)
+{
+  bool check_io = FALSE;
+  instruction i = statement_instruction(s);
+
+  if(instruction_test_p(i)) {
+    syntax c = expression_syntax(test_condition(instruction_test(i)));
+
+    if(syntax_reference_p(c)) {
+      check_io = io_entity_p(reference_variable(syntax_reference(c)));
+    }
+  }
+
+  return check_io;
+}
 
 bool perfectly_nested_loop_p(stat)
 statement stat;
@@ -203,7 +223,7 @@ statement stat;
 	list lb = instruction_block(ins);
 
 	if ( lb != NIL && (lb->cdr) != NIL && (lb->cdr)->cdr == NIL 
-	    && ( statement_continue_p(STATEMENT(CAR(lb->cdr))) ) ) {
+	    && ( continue_statement_p(STATEMENT(CAR(lb->cdr))) ) ) {
 	    if ( assignment_statement_p(STATEMENT(CAR(lb))) )
 		return TRUE;
 	    else
@@ -528,6 +548,18 @@ instruction i;
     return fortran_instruction_p(i, CONTINUE_FUNCTION_NAME);
 }
 
+bool instruction_return_p(i)
+instruction i;
+{
+    return fortran_instruction_p(i, RETURN_FUNCTION_NAME);
+}
+
+bool instruction_stop_p(i)
+instruction i;
+{
+    return fortran_instruction_p(i, STOP_FUNCTION_NAME);
+}
+
 bool instruction_format_p(i)
 instruction i;
 {
@@ -538,15 +570,17 @@ bool fortran_instruction_p(i, s)
 instruction i;
 string s;
 {
+  bool call_s_p = FALSE;
+
     if (instruction_call_p(i)) {
 	call c = instruction_call(i);
 	entity f = call_function(c);
 
 	if (strcmp(entity_local_name(f), s) == 0)
-	    return(TRUE);
+	  call_s_p = TRUE;
     }
 
-    return(FALSE);
+    return call_s_p;
 }
 
 /*
@@ -687,7 +721,7 @@ statement s;
     statement_label(s) = entity_empty_label();
 
 
-    if(statement_format_p(s)) {
+    if(format_statement_p(s)) {
 	user_error("clear_label", "Cannot clear FORMAT label!\n");
     }
 
@@ -791,7 +825,9 @@ statement s_old;
 			     statement_ordering(s_old),
 			     statement_comments(s_old),
 			     instr_l);
-    l_body = make_statement(entity_empty_label(), -1,  -1,
+    l_body = make_statement(entity_empty_label(),
+			    STATEMENT_NUMBER_UNDEFINED,
+			    STATEMENT_ORDERING_UNDEFINED,
 			    string_undefined,
 			make_instruction_block(CONS(STATEMENT,state_l,NIL)));
 
@@ -842,8 +878,20 @@ string statement_identification(statement s)
 	instrstring="GOTO";
 	break;
     case is_instruction_call:
+      {if(continue_statement_p(s))
+	instrstring="CONTINUE";
+      else if(return_statement_p(s))
+	instrstring="RETURN";
+      else if(stop_statement_p(s))
+	instrstring="STOP";
+      else if(format_statement_p(s))
+	instrstring="FORMAT";
+      else if(assignment_statement_p(s))
+	instrstring="ASSIGN";
+      else
 	instrstring="CALL";
-	break;
+      break;
+      }
     case is_instruction_block:
 	instrstring="BLOCK";
 	break;
@@ -937,4 +985,110 @@ insert_comments_to_statement(statement s,
 	statement_comments(s) = strdup(concatenate(the_comments, old, NULL));
 	free(old);
     }
+}
+
+/* See if statement s is labelled and can be reached by a GO TO */
+entity
+statement_to_label(statement s)
+{
+  entity l = statement_label(s);
+
+  if(entity_empty_label_p(l)) {
+    instruction i = statement_instruction(s);
+
+    switch(instruction_tag(i)) {
+
+    case is_instruction_sequence:
+      /* The initial statement may be an unlabelled CONTINUE... */
+      l = statement_to_label(STATEMENT(CAR(sequence_statements(instruction_sequence(i)))));
+      break;    
+    case is_instruction_unstructured:
+      l = statement_to_label(unstructured_control(instruction_unstructured(i)));
+      break;
+    case is_instruction_call:
+    case is_instruction_test:
+    case is_instruction_loop:
+    case is_instruction_goto:
+      break;
+    default:
+      pips_error("statement_to_label", "Ill. tag %d for instruction",
+		  instruction_tag(i));
+    }
+  }
+
+  debug(8, "statement_to_label", "stmt %s, pointed by = %s\n",
+	statement_identification(s), entity_local_name(l));
+
+  return l;
+}
+
+/* Returns FALSE is no syntactic control path exits s (i.e. even if TRUE is returned
+ * there might be no control path). Subroutines and
+ * functions are assumed to always return to keep the analysis intraprocedural.
+ * See the continuation library for more advanced precondition-based analyses.
+ *
+ * TRUE is a safe default value.
+ *
+ * The function name is misleading: a RETURN statement does not return...
+ * It should be called "statement_does_continue()"
+ */
+bool
+statement_does_return(statement s)
+{
+  bool returns = TRUE;
+  instruction i = statement_instruction(s);
+  test t = test_undefined;
+
+  switch(instruction_tag(i)) {
+  case is_instruction_sequence:
+      MAPL(sts,
+           {
+	     statement st = STATEMENT(CAR(sts)) ;
+	     if (!statement_does_return(st)) {
+	       returns = FALSE;
+	       break;
+	     }
+	   },
+	     sequence_statements(instruction_sequence(i)));
+
+      break;    
+    case is_instruction_unstructured:
+      returns = unstructured_does_return(instruction_unstructured(i));
+      break;
+    case is_instruction_call:
+      /* the third condition is due to a bug/feature of unspaghettify */
+      returns = !stop_statement_p(s) && !return_statement_p(s) &&
+	!(continue_statement_p(s) && entity_return_label_p(statement_label(s)));
+      break;
+    case is_instruction_test:
+      t = instruction_test(i);
+      returns = statement_does_return(test_true(t)) ||
+	statement_does_return(test_false(t));
+      break;
+    case is_instruction_loop:
+      /* No precise answer, unless you can prove the loop executes at
+       * least one iteration.
+       */
+      returns = TRUE;
+      break;
+    case is_instruction_goto:
+      /* returns = statement_does_return(instruction_goto(i)); */
+      returns = FALSE;
+      break;
+    default:
+      pips_error("statement_does_return", "Ill. tag %d for instruction",
+		  instruction_tag(i));
+  }
+
+  debug(8, "statement_does_return", "stmt %s, does return= %d\n",
+	statement_identification(s), returns);
+
+  return returns;
+}
+
+bool
+unstructured_does_return(unstructured u)
+{
+  bool returns = TRUE;
+  return returns;
 }
