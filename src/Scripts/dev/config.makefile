@@ -42,6 +42,10 @@ all: $(DDC_MACROS)
 define_libraries.make: define_libraries.sh
 	sed "s,$<,$@,g;s,',,g" $< > $@
 
+clean: local-clean
+local-clean:
+	$(RM) $(DDC_MACROS)
+
 # bootstraping temporarily include files if needed...
 $(PIPS_ROOT)/Include/makefile_macros.$(ARCH):
 	touch $@
