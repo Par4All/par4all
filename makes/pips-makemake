@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/04 08:55:19 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/04 11:44:40 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -144,7 +144,8 @@ INC_TARGET=	$(TARGET).h
 
 [ $DIRTYPE = 'Scripts' ] && cat >> $MAKEFILE <<%
 
-SOURCES=	$(SCRIPTS) $(FILES) $(CONFIG_FILE)
+SOURCES=	$(SCRIPTS) $(FILES) $(SFILES) $(CONFIG_FILE)
+RUNS=		$(SCRIPTS) $(FILES) $(RFILES)
 
 .runable: $(SCRIPTS)
 	chmod a+x $(SCRIPTS)
@@ -153,9 +154,9 @@ SOURCES=	$(SCRIPTS) $(FILES) $(CONFIG_FILE)
 check_install:
 	@echo ok
 
-.quick-install: .runable
-	( cd $(UTILDIR) ; $(RM) $(SCRIPTS) $(FILES); )
-	cp $(SCRIPTS) $(FILES) $(UTILDIR)
+.quick-install: .runable $(RFILES)
+	( cd $(UTILDIR) ; $(RM) $(RUNS) )
+	cp $(RUNS) $(UTILDIR)
 	touch .quick-install
 
 .INIT: $(MAKEFILE)
