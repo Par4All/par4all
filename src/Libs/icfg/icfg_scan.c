@@ -15,7 +15,8 @@
 #include "properties.h"  /* get_bool_property */
 #include "misc.h"
 #include "database.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 #include "regions.h"
 #include "resources.h"
 #include "semantics.h"
