@@ -667,36 +667,31 @@ int main(int argc, char * argv[])
 
     fprintf(stdout, "\n");	/* for Ctrl-D terminations */
     quit_handler("quit");
-    exit (0);			/* statement not reached ... */
+    return 0;			/* statement not reached ... */
 }
 
 int tpips_lex_input ()
 {
     char c =*line_to_parse;
 
-    debug(9,"tpips_lex_input","input char '%c'(0x%2x) from input\n", c, c);
-    if (c)
-	line_to_parse++;
+    pips_debug(9,"input char '%c'(0x%2x) from input\n", c, c);
+    if (c) line_to_parse++;
     return (int) c;
 }
 
 void tpips_lex_unput(int c)
 {
-
-    debug(9,"tpips_lex_unput","unput char '%c'(0x%2x)\n",
-	  c,c);
+    pips_debug(9,"unput char '%c'(0x%2x)\n", c,c);
     *(--line_to_parse) = (char) c;
 }
 
 void tpips_lex_print_pos(FILE* fout)
 {
-    fprintf (fout,"%s\n",line_parsed);
+    fprintf(fout,"%s\n",line_parsed);
     fprintf(fout,"%*s^\n",(int)((long) line_to_parse - (long)line_parsed),"");
 }
 
-
-/*
- * Tell the GNU Readline library how to complete.  We want to try to complete
+/* Tell the GNU Readline library how to complete.  We want to try to complete
  * on command names if this is the first word in the line, or on filenames
  * if not. 
  */
@@ -714,8 +709,7 @@ static void initialize_readline ()
     rl_completion_entry_function = (Function *)param_generator;
 }
 
-/*
- * Attempt to complete on the contents of TEXT.  START and END show the
+/* Attempt to complete on the contents of TEXT.  START and END show the
  * region of TEXT that contains the word to complete.  We can use the
  * entire line in case we want to do some simple parsing.  Return the
  * array of matches, or NULL if there aren't any. 
