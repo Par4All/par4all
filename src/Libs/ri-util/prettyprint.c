@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.233 2003/08/07 14:40:05 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.234 2003/08/14 09:29:47 nguyen Exp $";
 #endif /* lint */
 
  /*
@@ -548,7 +548,7 @@ text generate_alternate_return_targets()
 	make_unformatted
 	(strdup(label_local_name(le)),
 	 STATEMENT_NUMBER_UNDEFINED, 0, 
-	 CONS(STRING, is_fortran?strdup("CONTINUE"):strdup(";"), NIL));
+	 CONS(STRING, strdup(is_fortran?"CONTINUE":";"), NIL));
 
       s1 = make_sentence(is_sentence_unformatted, u1);
       sl = gen_nconc(sl, CONS(SENTENCE, s1, NIL));
@@ -695,9 +695,9 @@ words_assign_op(call obj, int precedence, bool leftmost)
     /* FI->NN: I revert to the previous version to keep the SPACES
        surrounding the assignment operator.Do not forget the strdup or
        nothing can later be freed. */
-    /* pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj))); */
-    pc = CHAIN_SWORD(pc, strdup(is_fortran? " = "
-				: entity_local_name(call_function(obj))));
+    pc = CHAIN_SWORD(pc," ");
+    pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj))); 
+    pc = CHAIN_SWORD(pc," ");
     pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
     return(pc);
 }
@@ -2161,7 +2161,7 @@ text_logical_if(
     instruction ti = statement_instruction(tb);
     call c = instruction_call(ti);
 
-    pc = CHAIN_SWORD(pc, is_fortran?"IF (":"if (");
+    pc = CHAIN_SWORD(pc, strdup(is_fortran?"IF (":"if ("));
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
     pc = CHAIN_SWORD(pc, ") ");
     pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE));
@@ -2223,7 +2223,7 @@ text_block_if(
 				      test_false_obj));
       }
     
-    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,is_fortran?"ENDIF":"}"));
+    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup(is_fortran?"ENDIF":"}")));
 
     return(r);
 }
@@ -2406,7 +2406,7 @@ text_test(
 		    (module,
 		     label_local_name(statement_label(fb)),
 		     margin, statement_test(fb), n));
-	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,is_fortran?"ENDIF":"}"));
+	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup(is_fortran?"ENDIF":"}")));
 
 	/* r = text_block_if(module, label, margin, obj, n); */
     }
@@ -2481,10 +2481,15 @@ text_instruction(
 	r = make_text(NIL);
       }
       else {
-	u = make_unformatted(strdup(label), n, margin, 
+	if (is_fortran)
+	  u = make_unformatted(strdup(label), n, margin, 
+			       words_call(instruction_call(obj), 
+					  0, TRUE, TRUE));
+	else
+	  u = make_unformatted(strdup(label), n, margin, 
 			     CHAIN_SWORD(words_call(instruction_call(obj), 
 						    0, TRUE, TRUE),
-					 strdup(is_fortran? "" : ";")));
+					 strdup(";")));
 	s = make_sentence(is_sentence_unformatted, u);
 	r = make_text(CONS(SENTENCE, s, NIL));
       }
