@@ -235,6 +235,13 @@ text_statement_any_effect_type(
 	if (!pps->is_a_summary) {
 	    pips_debug(5, "considering resource %s\n", pps->name);
 	    MERGE_TEXTS(result, resource_text(module, margin, stat, pps));
+	    {
+	      string filename = "/users/tmp/phamdat/textout";
+	      FILE * my_file = safe_fopen(filename, "w");
+	      print_text(my_file, result);
+	      safe_fclose(my_file, filename);
+	      free(filename);
+	    }
 	}
     }
 
