@@ -1,11 +1,11 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/02 22:17:48 $, 
+# $Date: 1996/09/02 22:41:09 $, 
 #
 # (c) Fabien COELHO 1996
 
-unset pack what tz zip name
+unset pack what tz zip name tostrip strip
 
 tar=${PIPS_TAR:-gtar}
 taropt=cf
@@ -28,6 +28,7 @@ usage()
 	  misc:
 	    -h: this help
 	    -v: verbose
+	    -s: strip binaries
 	    -z: tar and zip
 	    -w: additional what options for make_release
 	  release content:
@@ -51,10 +52,13 @@ do
     case $opt in
 	h) usage 0 some help ;;
 	v) verb=verbose ; what="$what -v" ; taropt=cvf ;;
+	s) strip='strip' ;;
 	z) tz='1' ;;
 	w) what="$what $OPTARG" ;;
 	S) what="$what -s Src -d Include -d Utils" ; name="${name}S" ;;
-	B) what="$what -d Bin/$OPTARG" ; name="${name}B$OPTARG" ;;
+	B) what="$what -d Bin/$OPTARG" ;
+	   name="${name}B$OPTARG" ;
+	   tostrip="$tostrip Bin/$OPTARG" ;;
 	L) what="$what -d Lib/$OPTARG" ; name="${name}L$OPTARG" ;;
 	p) pack="$pack PIPS" ; name="${name}p" ;;
 	n) pack="$pack NEWGEN" ; name="${name}n" ;;
@@ -74,7 +78,7 @@ $verb "target release name: $name"
 test -d $name || mkdir $name || error 2 "cannot create directory $name"
 
 #
-# getting the files
+# get the files
 
 for p in $pack
 do
@@ -90,7 +94,16 @@ do
 done
 
 #
-# taring and zipping if required
+# strip if required
+
+test "$tostrip" -a "$strip" &&
+{
+    $verb stripping binaries
+    for d in $tostrip ; do $strip $d/* ; done
+}
+
+#
+# tar and zip if required
 
 test "$tz" && 
 {
