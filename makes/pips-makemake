@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/09/15 11:12:08 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/09/15 16:27:30 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -191,12 +191,13 @@ YACC=           $(PIPS_YACC)
 YFLAGS=         $(PIPS_YFLAGS)
 TAR=		$(PIPS_TAR)
 ZIP=		$(PIPS_ZIP)
+DIFF= 		$(PIPS_DIFF)
+M4=		$(PIPS_M4)
 # 
 #
 CONFIG_FILE=	${CONFIG_FILE}
 MAKEFILE=	${MAKEFILE}
 SHELL=		/bin/sh
-DIFF= 		diff
 
 #
 all: $ALL_RULE_TARGET
