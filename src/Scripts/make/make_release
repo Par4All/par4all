@@ -1,14 +1,14 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1997/03/27 15:06:25 $, 
+# $Date: 1997/04/02 10:40:36 $, 
 #
 # (c) Fabien COELHO 1996
 
 # creates a release, with sources / executables ???
 # namely a compressed tar file?
 
-unset name dirs root trgt oths edit
+unset name dirs root trgt oths edit files 
 tar=${PIPS_TAR:-gtar}
 taropt=cf
 make=${PIPS_MAKE:-gmake}
@@ -33,12 +33,14 @@ usage()
 	 -t dir: Target directory -- idem!
 	 -s dir: Source directories -- with release!
 	 -d dir: Other directories -- direct!
+	 -f file: put file into the release -- direct!
+	 -c file: add the contents of file (list of subdirectories/files)
 	 dirs: direct directories relative to root -- cleaned!
 	EOF
     exit $ret
 }
 
-while getopts hver:s:t:d: opt
+while getopts hver:s:t:d:f:c: opt
 do
     case $opt in
 	h) usage 0 "some help" ;;
@@ -48,6 +50,8 @@ do
 	s) dirs="$dirs $OPTARG" ;;
 	t) trgt=$OPTARG ;;
 	d) oths="$oths $OPTARG" ;;
+	f) files="$files $OPTARG" ;;
+	c) contents="$contents $OPTARG" ;;
 	*) error 2 invalid option -$opt ;;
     esac
 done
@@ -85,8 +89,32 @@ do
     find ./$dir ! -type d -print >> $tmp.tmp
 done
 
+# Very direct 
+
+for f in $files
+do
+  $verb "consireding file $file (direct)"
+  test -r $file && echo $file >> $tmp.tmp
+done 
+
+# contents
+
+for c in $contents
+do
+  $verb "considering file contents $c"
+  dn=`dirname $c`
+  test -r $contents && {
+    for r in `sed /#/d $c`
+    do
+      $verb "considering $dn/$r"
+      test -r $dn/$r && 
+	  find $dn/$r \( -type f -o -type l \) -print >> $tmp.tmp
+    done 
+  }
+done
+
 #
-# clean the list of file of obvious useless stuff.
+# clean the list of file of obviously useless stuff.
 
 sed '/\/OLD/d;/\/SCCS/d;/\/RCS/d;/~/d;/\.database/d;/\.out$/d;/core/d;' \
     $tmp.tmp | sort -u > $tmp.list
