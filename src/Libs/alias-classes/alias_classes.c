@@ -39,39 +39,25 @@
 #include "alias-classes.h"
 
 static list l_alias_lists, l_alias_classes;
-static list other_lists, class, rest_list, rest_other_lists;
-
-/* The algorithms below depend on the following properties
- * of Alias Lists and Alias Classes:
- * - an Alias List contains no repeated elements
- * - two Alias Lists of the same module never have the same
- *   head (distinct heads)
- * - an element from one Alias List of a particular module can also
- *   be present in another Alias List of the same module (not disjoint sets)
- * - no element from one Alias Class of a particular module is also
- *   present in another Alias Class of the same module (disjoint sets)
- */
+static list l_lists, new_class, rest_list, rest_lists;
 
 
-/* global variables IN: l_alias_lists
- * gloabl variables modified: l_alias_lists
- * add a copy of each element in additional_list
+/* add a copy of each element in additional_list
  * not already present in initial_reg_list
  * to the end of initial_reg_list
  */
 static list
-append_all_not_present(list initial_reg_list, list additional_list)
+union_lists(list initial_reg_list, list additional_list)
 {
-    list new_reg_list;
+    list new_reg_list = initial_reg_list;
 
     pips_debug(4,"begin\n");
 
     MAP(EFFECT,additional_reg,
 	{
-	    new_reg_list = append_reg_if_not_present(initial_reg_list,
-				      region_dup(additional_reg));
-	},
-	additional_list);
+	    new_reg_list =
+		append_reg_if_not_present(new_reg_list,additional_reg);
+	},additional_list);
 
     pips_debug(4,"end\n");
 
@@ -79,8 +65,8 @@ append_all_not_present(list initial_reg_list, list additional_list)
 }
 
 
-/* global variables IN: rest_list, other_lists
- * global variables modified: rest_list, other_lists
+/* global variables IN: rest_list, l_lists
+ * global variables modified: rest_list, l_lists
  */
 static void
 compare_other_list(region elem, list other_list)
@@ -122,38 +108,37 @@ compare_other_list(region elem, list other_list)
 		{
 		    pips_debug(9,"same\n");
 
-		    rest_list = append_all_not_present(rest_list,other_list);
+		    rest_list = union_lists(rest_list,other_list);
 		    result = TRUE;
 		}
 	    }
 	} while (result == FALSE && rest_other_list != NIL);
 	if (result == FALSE)
-	    other_lists = gen_nconc(other_lists,CONS(LIST,other_list,NIL));
+	    l_lists = CONS(LIST,other_list,l_lists);
     }
     pips_debug(4,"end\n");
 }
 
 
-/* global variables IN: rest_list, rest_other_lists, other_lists
- * global variables modified: rest_list, other_lists, rest_other_lists
- * ATTENTION: recursive function
+/* global variables IN: rest_list, rest_lists, l_lists
+ * global variables modified: rest_list, l_lists, rest_lists
  * compares "elem" (the current element from
  * the list currently being made into a class)
- * to each element of each list of "rest_other_lists"
+ * to each element of each list of "rest_lists"
  * (the other lists not yet made into classes)
  * if a match is found, "other_list"
  * (the other list containing the matching element "other_elem")
  * is appended to "rest_list" (the not yet treated elements from the list
  * currently being made into a class)
- * and "other_list" will no longer be a member of "other_lists"
- * if not, "other_list" is appended to "other_lists"
+ * and "other_list" will no longer be a member of "l_lists"
+ * if not, "other_list" is appended to "l_lists"
  */
 static void
-compare_rest_other_lists(region elem)
+compare_rest_lists(region elem)
 {
     list other_list;
 
-    if (rest_other_lists != NIL)
+    while (rest_lists != NIL)
     {
     ifdebug(4)
 	{
@@ -163,20 +148,16 @@ compare_rest_other_lists(region elem)
 	    reset_action_interpretation();	    
 	}
 
-    other_list = LIST(CAR(rest_other_lists));
-    rest_other_lists = CDR(rest_other_lists);
+    other_list = LIST(CAR(rest_lists));
+    rest_lists = CDR(rest_lists);
     compare_other_list(elem, other_list);
-
-    if(rest_other_lists != NIL)
-	compare_rest_other_lists(elem);
-
-    pips_debug(4,"end\n");
     }
+    pips_debug(4,"end\n");
 }
 
 
-/* global variables IN: class, rest_other_lists, other_lists
- * global variables modified: class, other_lists, rest_other_lists, rest_list
+/* global variables IN: new_class, rest_lists, l_lists
+ * global variables modified: new_class, l_lists, rest_lists, rest_list
  */
 static void
 make_class_from_list(list reg_list)
@@ -189,183 +170,186 @@ make_class_from_list(list reg_list)
 	    print_inout_regions(reg_list);
 	}
 
-    if (reg_list != NIL)
-    {
-	rest_list = reg_list;
-	do {
-	   elem = EFFECT(CAR(rest_list));
-	   rest_list = CDR(rest_list);
+    rest_list = reg_list;
 
-	   ifdebug(9)
-	       {
-		   pips_debug(9,"elem:\n");
+    while (rest_list != NIL)
+    {
+	elem = EFFECT(CAR(rest_list));
+	rest_list = CDR(rest_list);
+
+	ifdebug(9)
+	    {
+		pips_debug(9,"elem:\n");
 		   set_action_interpretation(ACTION_IN,ACTION_OUT);	    
 		   print_region(elem);
 		   reset_action_interpretation();	    
-	       }
+	    }
+	
+	if ( effect_exact_p(elem) )
+	{
+	    pips_debug(9,"exact\n");
 
-	   if ( effect_exact_p(elem) )
-	   {
-	       pips_debug(9,"exact\n");
-
-	       rest_other_lists = other_lists;
-	       other_lists = NIL;
-	       compare_rest_other_lists(elem);
-	   }
-	   class = gen_nconc(class,CONS(EFFECT,elem,NIL));
-	} while(rest_list != NIL);
+	    rest_lists = l_lists;
+	    l_lists = NIL;
+	    compare_rest_lists(elem);
+	}
+	new_class = gen_nconc(new_class,CONS(EFFECT,elem,NIL));
     }
 
     pips_debug(4,"end\n");
 }
 
 
-/* global variables IN: other_lists
- * global variables modified:class, other_lists, rest_other_lists, rest_list
- * ATTENTION: recursive function
+/* global variables IN: l_lists, l_alias_classes
+ * global variables modified:class, l_lists, rest_lists, rest_list,
+ *                           l_alias_classes
  */
 static void
-make_classes_from_lists()
+unite_lists_containing_same_exact_region()
 {
     list next_list;
 
-    if (other_lists != NIL)
+    while (l_lists != NIL)
     {
     pips_debug(4,"begin\n");
 
-    next_list = LIST(CAR(other_lists));
-/*    rest_other_lists = CDR(other_lists); */
-/*	       other_lists = NIL; */
-    other_lists = CDR(other_lists);
-    class = NIL;
+    next_list = LIST(CAR(l_lists));
+    l_lists = CDR(l_lists);
+    new_class = NIL;
 
     make_class_from_list(next_list);
-    l_alias_classes = gen_nconc(l_alias_classes,CONS(LIST,class,NIL));
+    l_alias_classes = CONS(EFFECTS,make_effects(new_class),l_alias_classes);
 
-    ifdebug(9)
+/*    ifdebug(9)
 	{
-	    pips_debug(9,"class:\n");
-	    print_inout_regions(class);		    
-	    pips_debug(9,"other_lists:\n");
+	    pips_debug(9,"new_class:\n");
+	    print_inout_regions(new_class);		    
+	    pips_debug(9,"l_lists:\n");
 	    MAP(LIST,alias_list,
 		{
 		    print_inout_regions(alias_list);		    
 		    pips_debug(9,"---\n");
 		},
-		    other_lists);
-	}
+		    l_lists);
+	}*/
 
-    if (other_lists != NIL) make_classes_from_lists();
-
-    pips_debug(4,"end\n");
+    if (l_lists != NIL) unite_lists_containing_same_exact_region();
     }
+    pips_debug(4,"end\n");
 }
 
 
 /* global variables IN: l_alias_lists
  * global variables modified: l_alias_lists
- * returns TRUE if l_alias_lists modified,
- * i.e. if callee_class_elem is present
- * in one or more of the callers alias lists,
- * in which case,
- * the whole callee_alias_class is added to
- * each of these caller alias lists
+ * compares "head" (the head of the current list)
+ * to the head of each list of "rest_lists"
+ * (the other lists not yet treated)
+ * if a match is found, "other_list"
+ * (the other list containing the matching head "other_head")
+ * is appended to "new_list"
+ * and "other_list" will no longer be a member of "l_alias_lists"
+ * if not, "other_list" is appended to "l_alias_lists"
  */
-static bool
-match_this_callee_class_elem(region callee_class_elem, list callee_alias_class)
+static list
+compare_heads_rest_lists(region head, list new_list)
 {
-    bool result = FALSE;
-    list rest_alias_lists, alias_list;
-    region formal_reg_caller_list;
+    list rest_lists;
+    region other_head;
 
+    rest_lists = l_alias_lists;
+    l_alias_lists = NIL;
+
+    MAP(LIST, other_list,
+    {
     ifdebug(4)
 	{
-	    pips_debug(4,"begin for elem:\n");
+	    pips_debug(4,"begin for:\n");
 	    set_action_interpretation(ACTION_IN,ACTION_OUT);	    
-	    print_region(callee_class_elem);
+	    print_region(head);
 	    reset_action_interpretation();	    
 	}
 
-    rest_alias_lists = l_alias_lists;
-    if (l_alias_lists != NIL)
-	do{
-	    alias_list = LIST( CAR(rest_alias_lists) );
-	    formal_reg_caller_list = EFFECT( CAR(alias_list) );
+    if (other_list != NIL)
+    {
+	    other_head = EFFECT(CAR(other_list));
 
 	    ifdebug(9)
 		{
-		    pips_debug(9,"compare with:\n");
+		    pips_debug(9,"compare elem:\n");
 		    set_action_interpretation(ACTION_IN,ACTION_OUT);	    
-		    print_region(formal_reg_caller_list);
+		    print_region(other_head);
 		    reset_action_interpretation();	    
 		}
 
-	    if ( same_reg_ignore_action(formal_reg_caller_list,
-					callee_class_elem) )
-		    {
-			pips_debug(9,"match\n");
-	    ifdebug(9)
-		{
-		    pips_debug(9,"old alias list:\n");
-		    print_inout_regions(alias_list);
-		}
+	    if ( same_reg_ignore_action(head,other_head) )
+	    {
+		pips_debug(9,"same\n");
 
-			result = TRUE;
-			alias_list =
-			    append_all_not_present(alias_list,
-						   callee_alias_class);
+		new_list = union_lists(new_list,CDR(other_list));
+	    }
+	    else
+	    {
+	    l_alias_lists = CONS(LIST,other_list,l_alias_lists);
+	    }
+    }
 
-	    ifdebug(9)
-		{
-		    pips_debug(9,"new alias list:\n");
-		    print_inout_regions(alias_list);
-		}
-
-		    }
-	    rest_alias_lists = CDR(rest_alias_lists);
-	}while (rest_alias_lists != NIL && result == FALSE);
+    },rest_lists);
 
     pips_debug(4,"end\n");
 
-    return result;
+    return new_list;
 }
 
 
-/* global variables IN: l_alias_lists
- * global variables modified: l_alias_lists
- */
-static bool
-add_callee_class_to_lists(list callee_alias_class )
-{
-    bool result = FALSE;
-
-    pips_debug(4,"begin\n");
-
-    MAP(EFFECT,callee_class_elem,
-	{
-	    if ( match_this_callee_class_elem(callee_class_elem,
-					      callee_alias_class) )
-		result = TRUE;
-	},
-    callee_alias_class);
-
-    pips_debug(4,"end\n");
-
-    return result;
-}
-
-
-/* global variables IN: other_lists
- * global variables modified: other_lists
+/* global variables IN: l_alias_lists, l_lists
+ * global variables modified: l_alias_lists, l_lists
  */
 static void
-save_callee_class(list callee_alias_class )
+unite_lists_with_same_head()
 {
+    list next_list, new_list;
+    region head;
+
     pips_debug(4,"begin\n");
 
-    other_lists =
-	gen_nconc(other_lists,
-		  CONS(LIST,regions_dup(callee_alias_class),NIL));
+    while (l_alias_lists != NIL)
+    {
+
+    next_list = LIST(CAR(l_alias_lists));
+    l_alias_lists = CDR(l_alias_lists);
+    new_list = next_list;
+
+    if (next_list != NIL)
+    {
+	   head = EFFECT(CAR(next_list));
+
+	   ifdebug(9)
+	       {
+		   pips_debug(9,"head:\n");
+		   set_action_interpretation(ACTION_IN,ACTION_OUT);	    
+		   print_region(head);
+		   reset_action_interpretation();	    
+	       }
+
+	   new_list = compare_heads_rest_lists(head, new_list);
+    }
+
+    l_lists = CONS(LIST,new_list,l_lists);
+
+/*    ifdebug(9)
+	{
+	    pips_debug(9,"new_list:\n");
+	    print_inout_regions(new_list);		    
+	    pips_debug(9,"l_alias_lists:\n");
+	    MAP(LIST,alias_list,
+		{
+		    print_inout_regions(alias_list);		    
+		    pips_debug(9,"---\n");
+		},
+		    l_alias_lists);
+	}
+	*/
+    }
 
     pips_debug(4,"end\n");
 }
@@ -375,35 +359,37 @@ save_callee_class(list callee_alias_class )
  * global variables modified: l_alias_lists, other_lists
  */
 static void
-add_classes_for_this_callee( string callee_name )
+add_lists_callee( string callee_name )
 {
-    list callee_alias_classes;
+    list callee_alias_lists;
 
     pips_debug(4,"begin for callee %s\n",callee_name);
 
-    callee_alias_classes = effects_to_list((effects)
-				  db_get_memory_resource(DBR_ALIAS_CLASSES,
-							 callee_name,
-							 TRUE));
-    MAP(LIST,callee_alias_class,
+    callee_alias_lists =
+	effects_classes_classes((effects_classes)
+				db_get_memory_resource(DBR_ALIAS_LISTS,
+						       callee_name,
+						       TRUE));
+    MAP(EFFECTS,callee_alias_list_effects,
 	    {
+		list callee_alias_list =
+		    regions_dup(effects_effects(callee_alias_list_effects));
+
 		ifdebug(9)
 		    {
-			pips_debug(9,"add class:\n");
-			print_inout_regions(callee_alias_class);
+			pips_debug(9,"add list:\n");
+			print_inout_regions(callee_alias_list);
 		    }
 
-		if (!add_callee_class_to_lists(callee_alias_class))
-		    save_callee_class(callee_alias_class);
-	    },
-    callee_alias_classes);
+		l_alias_lists = CONS(LIST,callee_alias_list,l_alias_lists);
+	    },callee_alias_lists);
 
     pips_debug(4,"end\n");
 }
 
 
 static void
-add_classes_callees(string module_name)
+get_lists_callees(string module_name)
 {
     callees all_callees;
 
@@ -415,7 +401,7 @@ add_classes_callees(string module_name)
 
     MAP(STRING, callee_name,
 	{
-	    add_classes_for_this_callee(callee_name);
+	    add_lists_callee(callee_name);
 	},
 	    callees_callees(all_callees));
 
@@ -426,7 +412,6 @@ add_classes_callees(string module_name)
 bool
 alias_classes( string module_name )
 {
-    list alias_lists;
     entity module;
 
     debug_on("ALIAS_CLASSES_DEBUG_LEVEL");
@@ -456,42 +441,9 @@ alias_classes( string module_name )
 
     l_alias_lists = NIL;
     l_alias_classes = NIL;
-    other_lists = NIL;
+    l_lists = NIL;
 
-/*
-    alias_lists =
-	effects_to_list((effects)
-			db_get_memory_resource(DBR_ALIAS_LISTS,
-					       module_name,
-					       TRUE));
-*/
-
-    alias_lists =
-	effects_classes_classes((effects_classes)
-				db_get_memory_resource(DBR_ALIAS_LISTS,
-						       module_name,
-						       TRUE));
-
-    MAP(LIST,alias_list,
-	{
-	    l_alias_lists =
-		gen_nconc(CONS(LIST,regions_dup(alias_list),NIL),
-			  l_alias_lists);
-	},
-	    alias_lists);
-
-    ifdebug(9)
-	{
-	    pips_debug(9,"alias lists:\n");
-	    MAP(LIST,alias_list,
-		{
-		    print_inout_regions(alias_list);		    
-		    pips_debug(9,"---\n");
-		},
-		    l_alias_lists);
-	}
-
-    add_classes_callees(module_name);
+    get_lists_callees(module_name);
 
     ifdebug(9)
 	{
@@ -502,18 +454,32 @@ alias_classes( string module_name )
 		    pips_debug(9,"---\n");
 		},
 		    l_alias_lists);
-	    pips_debug(9,"callee classes:\n");
-	    MAP(LIST,alias_class,
-		{
-		    print_inout_regions(alias_class);		    
-		    pips_debug(9,"---\n");
-		},
-		    other_lists);
 	}
 
-    other_lists = gen_nconc(l_alias_lists,other_lists);
+    unite_lists_with_same_head();
 
-    make_classes_from_lists();
+    ifdebug(9)
+	{
+	    pips_debug(9,"new lists:\n");
+	    MAP(LIST,alias_list,
+		{
+		    print_inout_regions(alias_list);		    
+		    pips_debug(9,"---\n");
+		},
+		    l_lists);
+	}
+
+    unite_lists_containing_same_exact_region();
+
+    ifdebug(9)
+	{
+	    pips_debug(9,"classes:\n");
+	    MAP(EFFECTS,alias_class,
+		{
+		    print_inout_regions(effects_effects(alias_class));		    		   pips_debug(9,"---\n");
+		},
+		    l_alias_classes);
+	}
 
     DB_PUT_MEMORY_RESOURCE(DBR_ALIAS_CLASSES, 
 			   strdup(module_name),
@@ -521,7 +487,6 @@ alias_classes( string module_name )
 
     ifdebug(9)
 	{
-/*	    reset_action_interpretation(); */
 	    free_value_mappings();
 	    reset_current_module_statement();
 	    reset_cumulated_rw_effects();
