@@ -12,6 +12,7 @@
 #include "ri.h"
 
 #include "misc.h"
+#include "ri-util.h"
 
 #include "syntax.h"
 
@@ -207,7 +208,6 @@ resize_stmt_buffer(void)
  */
 static int iStmt, lStmt;
 
-
 /*************************************************************** LINE BUFFER */
 
 /* le buffer contenant la ligne que l'on doit lire en avance pour se rendre
@@ -237,6 +237,25 @@ resize_line_buffer(void)
 }
 
 static int iLine, lLine; 
+
+void 
+append_data_current_stmt_buffer_to_declarations(void)
+{
+    int i=0;
+    char * tmp = (char*) malloc(lStmt+1), * ndecls, * odecls;
+    code c = EntityCode(get_current_module_entity());
+
+    for (; i<lStmt; i++)
+	tmp[i] = (char) stmt_buffer[i];
+    stmt_buffer[i]='\0';
+
+    odecls = code_decls_text(c);
+    ndecls = strdup(concatenate(odecls, "! moved up...\n      DATA ", 
+				tmp+4, 0));
+    free(odecls);
+    free(tmp);
+    code_decls_text(c) = ndecls;
+}
 
 /*
  * Une variable pour traiter les quotes. Petit automate a 3 etats:
@@ -847,7 +866,7 @@ ReadStmt(FILE * fp)
 
 	    if ((TypeOfLine = ReadLine(fp)) == CONTINUATION_LINE) {
 		ParserError("ReadStmt",
-			   "[scanner] incorrect continuation line as first line\n");
+		  "[scanner] incorrect continuation line as first line\n");
 	    }
 	    else if (TypeOfLine == EOF_LINE) {
 		result = EOF;
