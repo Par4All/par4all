@@ -65,7 +65,7 @@
 /* another non recursive section used to filter out preconditions */
 static list module_global_arguments = NIL;
 
-static list
+list
 get_module_global_arguments()
 {
     return module_global_arguments;
@@ -398,12 +398,20 @@ data_to_prec_for_variables(entity m, list /* of entity */le)
       {
 	if (entity_has_values_p(e) && !linear_hashtable_isin(b, e))
 	{
-	  Pvecteur v = vect_make(VECTEUR_NUL,
-				 (Variable) e, VALUE_ONE,
-				 (Variable) constant_call(c), VALUE_MONE,
-				 TCST, VALUE_ZERO);
-	  pre = transformer_equality_add(pre, v);
-	  linear_hashtable_put_once(b, e, e);
+	  entity f = constant_call(c);
+	  basic bt = variable_basic(type_variable(functional_result
+						 (type_functional(entity_type(f)))));
+
+	  if((basic_float_p(bt) && float_analyzed_p())
+	     || (basic_string_p(bt) && string_analyzed_p())
+	     || (basic_logical_p(bt) && boolean_analyzed_p()) ) {
+	    Pvecteur v = vect_make(VECTEUR_NUL,
+				   (Variable) e, VALUE_ONE,
+				   (Variable) constant_call(c), VALUE_MONE,
+				   TCST, VALUE_ZERO);
+	    pre = transformer_equality_add(pre, v);
+	    linear_hashtable_put_once(b, e, e);
+	  }
 	}
       }
     }
