@@ -3,6 +3,9 @@
 # $Id$
 # 
 # $Log: install_pips_sources,v $
+# Revision 1.15  1997/05/22 06:55:35  coelho
+# *** empty log message ***
+#
 # Revision 1.14  1997/05/20 14:49:56  coelho
 # debug and verbose off.
 #
@@ -21,7 +24,7 @@ debg=':'
 #verb='verbose'
 #debg='debug'
 
-unset source_dir target_dir comment OPTIONS clean_cs files 
+unset source_dir target_dir comment options clean_cs files 
 only_diff=':'
 
 #
@@ -73,11 +76,12 @@ cs_all()
 
 move_old()
 {
-    for i ; do
-	$verb moving $i RCS/SCCS file to OLD
-	is_sccs && mv SCCS/s.$i OLD/
+    for i in "$@"
+    do
+	$verb moving ${i} RCS/SCCS file to OLD
+	is_sccs && mv SCCS/s.${i} OLD/
 	is_rcs && mv RCS/${i},v OLD/
-	rm -f $i
+	rm -f ${i}
     done
 }
 
@@ -99,20 +103,25 @@ usage()
   exit ${1:-1}
 }
 
+
+#
+# get options
+#
+
 while getopts hvDdart:s:y: OPT
 do
   case $OPT in
     h) usage 0 ;;
     v) verb='verbose' ; 
-       OPTIONS="$OPTIONS -v" ;;
+       options="$options -v" ;;
     D) debg='debug' ; 
-       OPTIONS="$OPTIONS -D" ;;
+       options="$options -D" ;;
     d) only_diff=':' ; 
-       OPTIONS="$OPTIONS -d" ;;
+       options="$options -d" ;;
     a) only_diff= ; 
-       OPTIONS="$OPTIONS -a" ;;
+       options="$options -a" ;;
     r) clean_cs='yes' ; 
-       OPTIONS="$OPTIONS -r" ;;
+       options="$options -r" ;;
     t) target_dir="$OPTARG" ;;
     s) source_dir="$OPTARG" ;;
     y) comment="$OPTARG" ;;
@@ -173,7 +182,7 @@ do
     # ITEM IN SUBDIRECTORY
     #
     $verb "something in a directory, recursing"
-    eval $0 $OPTIONS -y "$comment" \
+    eval $0 $options -y "$comment" \
     	-s "`dirname $src_item`" -t "`dirname $trg_item`" \
 	"`basename $item`"
     $debg "end of recursion"
@@ -188,7 +197,7 @@ do
     # SUBDIRECTORY
     #
     $verb "directory, recursing"
-    $0 $OPTIONS -y "$comment" -s "$src_item" -t "$trg_item" \
+    $0 $options -y "$comment" -s "$src_item" -t "$trg_item" \
     	`cd $src_item ; ls -d * | sed '/~/d;/SCCS/d;/RCS/d;/OLD/d'`
     $debg "end of recursion"
     continue
