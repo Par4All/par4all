@@ -423,7 +423,16 @@ instance).
 	for instance, the same
 	statement should not have a \verb+MUST WRITE T+ and a
 	\verb+MAY WRITE T+ simultaneously; the \verb+MAY+ effect
-	should be deleted;
+	should be deleted; let say that different kind of effects could
+	be computed;
+
+  \item control effects (stop/exit) should also be computed;
+
+  \item effects should take into account the declarations; see
+	$PIPSDIR/Test/Bugs/Semantics/contrex3.f for an example. FI, BA,
+	9 february 1994.
+	
+
 	
 \end{enumerate}
 
@@ -706,6 +715,10 @@ Pierre is responsible for NewGen maintenance.
 	are likely to be full of \verb+#]null+ to represent empty buckets;
 
   \item check for disk full condition; 
+
+  \item mapping.h : MAKE_STATEMENT_MAPPING should take no argument in
+	order to be coherent with the make functions usually generated
+	by NewGen; fixed, BA, August 1993. 
 
 \end{enumerate}
 
@@ -998,6 +1011,10 @@ Managed by Lei Zhou, \verb+<zhou@cri.ensmp.fr>+.
   \item RETURN statements are kept implicit whenever possible;
 	FI, AL, 16 July 1992;
 
+  \item the priority between the integer division and the integer
+	multiplication is not observed; useful parentheses as in
+	\verb+2*(I/2)+ disappear; FI, 10 July 1993
+
 \end{enumerate}
 
 \section{Privatize}
@@ -1107,6 +1124,8 @@ See report dret146.
 
 \section{Regions}
 
+Managed by Beatrice Apvrille, \verb+<apvrille@cri.ensmp.fr>+.
+
 \subsection{Bugs}
 
 \begin{enumerate}
@@ -1116,7 +1135,9 @@ See report dret146.
   \item elementary statements are decorated with proper regions
 	instead of cumulated regions; FI, 2 August 1992;
 	useless information is kept but it's hard to decide whether
-	a predicate is useful or not (connected components?);
+	a predicate is useful or not (connected components?); {\em
+	Franc,ois has found a counter-example that shows that all the 
+	information from the predicate must be kept.\/}
 	redundant information should be eliminated at least;
 
   \item three intrinsics were missing: \verb+LOG+, \verb+LOG10+ and
@@ -1169,6 +1190,9 @@ See report dret146.
 	solution to retrieve the action tag, but to set it in a static
 	variable when the first call is issued from \verb+regions_of_iolist+;
 	see \verb+norm+ in \verb+aile.f+; FI, 9 August 1992;
+	I must have fixed it when I debugged regions_of_implied_do in
+	september or october 1993. But I don't remember how. 
+	BA, 10 February 1994.
 
   \item inadequate optimization in region translation was losing one
 	region out of two: each array could have either one READ region
@@ -1178,6 +1202,37 @@ See report dret146.
 	call; this bug is likely to have been introduced when FI
 	decided to add context to reference predicates as early
 	as possible; FI, 7 December 1992; see \verb+Bugs/Regions/vt.f+
+
+  \item the region given for the expression 
+		\verb+A(1,1)+ + \verb+A(3,3)+ 
+	is a MUST region; it must be a MAY region because the convex
+	hull of the two elementary regions is not equal to their strict
+	union. BA, September 17, 1993.
+	fixed, BA, September 20, 1993 : each time a convex hull is
+	calculated, the resulting region is set to MAY. 
+
+  \item the regions given for an implied do are wrong :
+	\begin{verbatim}
+	C <A-W-MUST-\{PHI1==I\}>
+	READ (UNIT=5, FMT=*) (A(I), I=1,5)
+	\end{verbatim}
+	is displayed instead of :
+	\begin{verbatim}
+	C <A(PHI1)-W-MUST-\{PHI1<=5, 1<=PHI1\}>
+	READ (UNIT=5, FMT=*) (A(I), I=1,5)
+	\end{verbatim}
+	BA, September 23, 1993
+	fixed, even for nested implied_do; BA, September 27, 1993
+
+  \item sc_projection returns a SC_EMPTY predicate when an unfeasible
+	system is given as argument. This induces a bug in
+	enlarge_statement_regions because a sc_rn is expected (bug
+	detected in regions_exact_convex_hull).
+	Fixed, BA, September 28, 1993.
+
+  \item there is a pb during the translation of regions. see mm.f in
+	Validation/Regions. BA, February 10, 1994.
+
 
 \end{enumerate}
 
@@ -1212,10 +1267,11 @@ See report dret146.
 	unstructured; the projection should no longer be performed
 	uniformely at the statement level in \verb+regions_of_statement+;
 	this may create havoc as a major design assumption is changed;
-	FI, 5 August 1992;
+	FI, 5 August 1992; Done, see report E/181/CRI. BA, February 10, 1994.
 
   \item replace \verb+SC_UNDEFINED+ by \verb+transformer_undefined+
-	as context for scalar variables
+	as context for scalar variables. Replced by sc_rn(..). BA,
+	February 10, 1994.
 
 \end{enumerate}
 
@@ -1231,7 +1287,11 @@ intermediate write rewrites the whole array.
   \item associate to statement cumulated regions instead of summary regions;
 	i.e. delay the projection of modified variables as much as
 	possible; FI, 5 August 1992; a first step was carried out for
-	elementary instruction (i.e. \verb+call+ instruction);
+	elementary instruction (i.e. \verb+call+ instruction); well, I
+	prettyprint proper regions for elementary statements, but I
+	compute cumulated regions to have the regions of a block. See
+	report E/181/CRI. BA, February 10, 1994.
+	
 
   \item better computation of MUST vs MAY regions; a new projection procedure
 	should be used to know whether the result is exact or not; only
@@ -1282,6 +1342,11 @@ intermediate write rewrites the whole array.
   \item \verb+entity_conflict_p()+ was deadly wrong; it returned almost
 	always false; it contains a static hash table that is going to
 	cause trouble in wpips sone day! FI, 29 June 1993;
+
+
+  \item NORMALIZE\_EXPRESSION is now used instead of
+	NormalizeExpression to recurse in normalize.c. RK, FI, 3/12/93.
+
 
 \end{enumerate}
 
@@ -1340,7 +1405,7 @@ FI, PJ: 16 June 1993; see above, comments from BB on 3 Jan. 92;
 \newpage
 \section{Ricedg (Dependence Graph Computation)}
 
-This library is managed by Yi-Qing.
+This library is managed by Yi-Qing, FI and BA.
 
 \subsection{Bugs}
 
@@ -1357,10 +1422,18 @@ A(2*I+4*J) = A(2*I+4*J+1)
 	however, normalization steps
 	were later added in \verb+sc_minmax_of_variable()+ by CA for PUMA;
 	this should be cleaned up;
-  \item \verb+quick_privatize_graph()+ did not work very whell. I have
-modified it slightly. It works whell now for Wolfe's Cholesky. I can't assure
-it always works for any others programs. If it fails, use
-\verb+Perform priv+ before; (YY)
+  \item \verb+quick_privatize_graph()+ did not work very well. I have
+	modified it slightly. It works well now for Wolfe's Cholesky. I can't assure
+	it always works for any other programs. If it fails, use
+	\verb+Perform priv+ before; (YY)
+
+  \item	the types arc_label and vertex_label were not defined. They were
+	declared as externals in graph.hand used to define vertex;  
+	dg_vertex_label and dg_arc_label are defined in dg.h using
+	vertex.
+	It didn't appear until PJ added castings in dg.h.
+	fixed by FI and BA, August 1993, by defining the types arc_label
+	and vertex_label in ricedg-local.h.
 
 \end{enumerate}
 
@@ -1628,6 +1701,16 @@ Summary Data Flow Information.
 	seen from B; however, B summary transformer and precondition
 	must take them into account; FI, 29 June 1993;
 
+  \item code added for MIN0 and MAX0 intrinsics; FI, 18 August 1993;
+
+  \item code added for STOP intrinsic; FI, 3 February 1993; this may be
+	devastating in a main; STOP is abstracted as the non-feasible
+	transformer;
+
+  \item prettyprint of transformers and preconditions with the parsed
+	code instead of the code to avoid display troubles introduced by
+	the controlizer; FI, 3 February 1994
+
 \end{enumerate}
 
 \subsection{Wishes:}
@@ -1649,13 +1732,22 @@ Summary Data Flow Information.
 	format is used, a parser is already available; \verb+user_request+
 	could be used to enter a file name; FI, 30 July 1992
 
+  \item LOGICAL variables should be handled; see bdna.f (perfect Club)
+	as an example; this is also requested by Stein and Fox in CPE,
+	Dec. 93; FI, 10 February 1994
+
 \end{enumerate}
 
 \section{Syntax}
 
-Lexical and syntactic analyzer. Should be called \verb+parser+. BTW, to
-see debug messages, set \verb+PARSER_DEBUG_LEVEL+ instead of 
-\verb+SYNTAX_DEBUG_LEVEL+!
+Lexical and syntactic analyzer. 
+
+% Should be called \verb+parser+. BTW, to
+% see debug messages, set \verb+PARSER_DEBUG_LEVEL+ instead of 
+% \verb+SYNTAX_DEBUG_LEVEL+!
+%
+% No more: I changed PARSER_DEBUG_LEVEL into SYNTAX_DEBUG_LEVEL; FI, 15
+% September 1993
 
 \subsection{Bugs}
 
@@ -1718,6 +1810,8 @@ see debug messages, set \verb+PARSER_DEBUG_LEVEL+ instead of
 	The sample program is kept in ~pips/Pips/Tests/Bugs/Syntax/ilaenc.f .
 	Reported by LZ, Oct. 9, 92.
 
+	Fixed; FI, 15 September 1993
+
   \item missing declarations observed by Lei Zhou when building the call
 	graph; might be due to name captures?
 
@@ -1735,11 +1829,13 @@ see debug messages, set \verb+PARSER_DEBUG_LEVEL+ instead of
 	in awk (FI); but awk cannot open more than 7 files and is stuck
 	when more than 6 subroutines have to be split;
 
-  \item run PIPS on SPEC77 (PerfectClub); look at del4, gloop and gwater;
+	BLOCKDATA are parsed like other modules; FI, 15 September 1993;
+
+  \item run PIPS on SPEC77 (PerfectClub); look at \verb+del4+, \verb+gloop+ and \verb+gwater+;
 	these files are now properly parsed; parallelization bug from
-	Yi-qing prevents interprocedural parallelization in del4; effects
-	bug in gfidi prevents interprocedural parallelization in gloop;
-	effects bug in lrgscl prevents interprocedural parallelization in
+	Yi-qing prevents interprocedural parallelization in \verb+del4+; effects
+	bug in \verb+gfidi+ prevents interprocedural parallelization in \verb+gloop+;
+	effects bug in \verb+lrgscl+ prevents interprocedural parallelization in
 	gwater;
 
   \item ParserError() should accept varargs; at least errors should be better
@@ -1952,7 +2048,7 @@ see debug messages, set \verb+PARSER_DEBUG_LEVEL+ instead of
 	fixed, FI, 27 February 1992;
 
   \item all symbols declared in an EXTERNAL statement are considered
-	begin FUNCTIONS and there result is given an implicit type;
+	FUNCTIONS and their results are given implicit types;
 	this clashes when it is discovered later that is is a SUBROUTINE;
 	the type consistency test was soften to allow implicit types
 	to be redefined; why is the \verb+unknown_type+ not used? See
@@ -1969,7 +2065,7 @@ see debug messages, set \verb+PARSER_DEBUG_LEVEL+ instead of
 
   \item PIPS core dumps on the following string declaration:
 	\verb+CHARACTER*(*) MESAGE+; see \verb+/Bugs/Syntax/errors.f+; YQ,
-        6 Apr. 1992;
+        6 Apr. 1992; Fixed, FI, 15 September 1993;
 
   \item type reconstruction error in \verb+MakeExternalFunction+; see
 	\verb+Validation/Syntax/linear.f+ and \verb+formel.f+; the bug
@@ -2038,6 +2134,36 @@ ALOG(0.5*ALOG(X))
 	parser, and forgotten in bootstrap/bootstrap.c and
 	effects/intrinsics.c; CA, FI: 8 July 1993
 	
+  \item character constants are unduly capitalized (see standard section
+	4.8: {\em any character capable of representation in the processor});
+	FC: July 1993
+
+  \item computed GOTO are desugared; FI, 15 September1993;
+
+  \item field offset is fixed at the end of the declaration section; it
+	was wrong when the type was declared after the first occurence
+	of the variable; this bug introduced pseudo-conflict between
+	variables in the same common (see TRACK for instance); FI, 1 December 1993
+
+  \item commons already in the symbol table are now properly declared as
+	visible in the current module declaration field; FI, 1 December 1993
+
+  \item bug on offset computation for variables of different modules
+	fixed; FI, 2 December 1993
+
+  \item CleanLocalVariables() improved to clean up the layout field of
+	commons; possible explanantion for a problem with free added;
+	FI, 2 December 1993
+
+  \item bug on area layout when types of variables are redeclared: the
+	type redeclaration modifies the length used by the variable in
+	the area but not its offset; observed on track-fi.f; 1 February
+	1994; problem avoided by ignoring type redefinition for
+	variables whose store is already defined; FI, 1 February 1994;
+
+  \item bug on area layout (again); previous modification was a mistake;
+	bug in update_common_layout() fixed; validation with retype.f;
+	FI, 7 February 1994;
 
 \end{enumerate}
 
