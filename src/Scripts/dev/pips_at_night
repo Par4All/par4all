@@ -36,6 +36,7 @@ host=`hostname`
 email=${MAILTO:-${REPLYTO:-$user}}
 script=`basename $0`
 verbose=:
+vopt=
 debug=:
 msg=
 
@@ -85,16 +86,21 @@ usage()
 # the detailed report is sent only on failures.
 MAKE()
 {
+    ${debug} MAKE: "$@"
+
     what=$1; name=$2; report=$3; targets="$4"; shift 4
     detailed=$report.detailed
     summary=$report.summary
 
-    # the doc is skipped...
+    touch ${detailed} ${summary}
 
-    for a in "$@"; do
-	$verbose "Making $targets in $name ARCH=$a"
-	make-pips -k -$what -o $summary -m $a ARCH=$a $targets
-    done 2> $detailed > /dev/null
+    ${debug} MAKE: "$@"
+
+    for a in "$@" ; do
+	${debug} "Making $targets in $name ARCH=$a"
+	make-pips -k${vopt} -$what -o $summary -m $a ARCH=$a $targets \
+	    2>> $detailed > /dev/null
+    done
 
     cat $summary >> $report
 
@@ -113,7 +119,7 @@ while getopts hvDd:CNLPVc:a: OPT
 do
     case $OPT in
 	h) usage 0 "some help" ;;
-	v) verbose=verb ;;
+	v) verbose=verb ; vopt=v ;;
 	D) debug=deb ;;
 	d) cd $OPTARG ; 
 	   validate_dir="-r $OPTARG" ;;
