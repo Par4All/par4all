@@ -14,10 +14,12 @@ RFILES = 	pipsrc.sh \
 all: pipsrc.sh pipsrc.csh
 
 pipsrc.sh: pipsrc.ref
+	$(RM) pipsrc.sh
 	$(SHELL) make-pipsrc.sh 
 	chmod a-w pipsrc.sh
 
 pipsrc.csh: pipsrc.sh
+	$(RM) pipsrc.csh
 	$(SHELL) make-pipsrc.csh 
 	chmod a-w pipsrc.csh
 
