@@ -8,6 +8,10 @@
   * $Id$
   *
   * $Log: convex_hull.c,v $
+  * Revision 1.20  2003/07/24 08:37:25  irigoin
+  * Now, empty transformers() must have an empty basis (although it does
+  * mathematically make sense to to otherwise).
+  *
   * Revision 1.19  2001/12/05 17:08:52  irigoin
   * Normalization step added before call to convex hull. Seems to help for
   * Validation/Semantics/ocean.f but not for Validation/Semantics/ocanea_fi2.f
@@ -163,7 +167,7 @@ static transformer transformer_convex_hulls
     if(SC_EMPTY_P(r)) {
       /* FI: this could be eliminated if SC_EMPTY was really usable; 27/5/93 */
       /* and replaced by a SC_UNDEFINED_P() and pips_error() */
-      r = sc_empty(b);
+      r = sc_empty(BASE_NULLE);
     }
     else {
       base_rm(b);
