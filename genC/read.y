@@ -431,7 +431,7 @@ static gen_chunk * make_ref(int domain, gen_chunk * st)
       user( "read: Unloaded tabulated domain %s\n", Domains[domain].name ) ;
     }
 
-    String = gen_build_unique_tabulated_name(domain, st->s);
+    String = strdup(gen_build_unique_tabulated_name(domain, st->s));
 
     if((hash=(gen_chunk *)gen_get_tabulated_name_direct(String))
 	== (gen_chunk *) HASH_UNDEFINED_VALUE) 
