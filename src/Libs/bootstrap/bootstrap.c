@@ -577,6 +577,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"+", 2, default_intrinsic_type},
     {"-", 2, default_intrinsic_type},
     {"/", 2, default_intrinsic_type},
+    {"INV", 1, default_intrinsic_type},
     {"*", 2, default_intrinsic_type},
     {"--", 1, default_intrinsic_type},
     {"**", 2, default_intrinsic_type},
