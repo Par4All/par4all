@@ -725,26 +725,26 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 int level)
 {
 
-#define if_debug_sc_strong_normalize_2 if(FALSE)
+#define if_debug_sc_strong_normalize_and_check_feasibility2 if(FALSE)
 
     Psysteme new_ps = sc_make(NULL, NULL);
     boolean feasible_p = TRUE;
 
-    if_debug_sc_strong_normalize_2 {
-	fprintf(stderr, "[sc_strong_normalize2]: Begin\n");
+    if_debug_sc_strong_normalize_and_check_feasibility2 {
+	fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Begin\n");
     }
 
     if(SC_UNDEFINED_P(ps)) {
-	if_debug_sc_strong_normalize_2 {
+	if_debug_sc_strong_normalize_and_check_feasibility2 {
 	    fprintf(stderr,
-		    "[sc_strong_normalize2]: Empty system as input\n");
+		    "[sc_strong_normalize_and_check_feasibility2]: Empty system as input\n");
 	}
 	feasible_p = FALSE;
     }
     else if(SC_EMPTY_P(ps = sc_normalize(ps))) {
-	if_debug_sc_strong_normalize_2 {
+	if_debug_sc_strong_normalize_and_check_feasibility2 {
 	    fprintf(stderr,
-		    "[sc_strong_normalize2]:"
+		    "[sc_strong_normalize_and_check_feasibility2]:"
 		    " Non-feasibility detected by first call to sc_normalize\n");
 	}
 	feasible_p = FALSE;
@@ -755,24 +755,25 @@ int level)
 	Pcontrainte next_eq = CONTRAINTE_UNDEFINED;
 	Pcontrainte new_eq = CONTRAINTE_UNDEFINED;
 	int nvar;
+	int neq = sc_nbre_egalites(ps);
 
-	if_debug_sc_strong_normalize_2 {
+	if_debug_sc_strong_normalize_and_check_feasibility2 {
 	    fprintf(stderr,
-		    "[sc_strong_normalize2]: After call to sc_normalize\n");
-	    fprintf(stderr, "[sc_strong_normalize2]: Input system %x\n",
+		    "[sc_strong_normalize_and_check_feasibility2]: After call to sc_normalize\n");
+	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %x\n",
 		    (unsigned int) ps);
 	    sc_dump(ps);
 	}
 
 	/* 
-	 * Solve the equalities
+	 * Solve the equalities (if any)
 	 *
 	 * Start with equalities with the smallest number of variables
 	 * and stop when all equalities have been used and or when
 	 * all equalities left have too many variables.
 	 */
-	for(nvar = 0;
-	    feasible_p && nvar <= level && sc_nbre_egalites(ps) != 0;
+	for(nvar = 1;
+	    feasible_p && neq > 0 && nvar <= level /* && sc_nbre_egalites(ps) != 0 */;
 	    nvar++) {
 	    for(eq = sc_egalites(ps); 
 		feasible_p && !CONTRAINTE_UNDEFINED_P(eq);
@@ -792,7 +793,9 @@ int level)
 			 * required dimension, nvar. Hence the non-equality
 			 * test.
 			 */
-			if(vect_dimension(contrainte_vecteur(eq))<=nvar) {
+			int d = vect_dimension(contrainte_vecteur(eq));
+
+			if(d<=nvar) {
 			    Pcontrainte def = CONTRAINTE_UNDEFINED;
 			    Variable v = TCST;
 			    Variable v1 = TCST;
@@ -847,7 +850,20 @@ int level)
 			}
 			else {
 			    /* too early to use this equation eq */
-			    ;
+			    /* If there any hope to use it in the future?
+			     * Yes, if its dimension is no more than nvar+1
+			     * because one of its variable might be substituted.
+			     * If more variable are substituted, it's dimension
+			     * is going to go down and it will be counted later...
+			     * Well this is not true, it will be lost:-(
+			     */
+			    if(d<=nvar+1) {
+				neq++;
+			    }
+			    else {
+				/* to be on the safe side till I find a better idea... */
+				neq++;
+			    }
 			}
 		    }
 		}
@@ -857,19 +873,38 @@ int level)
 		    break;
 		}
 
-		if_debug_sc_strong_normalize_2 {
+		/* This reaaly generates a lot of about on real life system! */
+		/*
+		if_debug_sc_strong_normalize_and_check_feasibility2 {
 		    fprintf(stderr,
 			    "Print the two systems at each elimination step:\n");
-		    fprintf(stderr, "[sc_strong_normalize2]: Input system %x\n",
+		    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %x\n",
 			    (unsigned int) ps);
 		    sc_dump(ps);
-		    fprintf(stderr, "[sc_strong_normalize2]: New system %x\n",
+		    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: New system %x\n",
 			    (unsigned int) new_ps);
 		    sc_dump(new_ps);
 		}
+		*/
 
-		feasible_p = (!SC_EMPTY_P(ps = sc_normalize(ps)));
+		/* This is a much too much expensive transformation
+		 * in an innermost loop!
+		 *
+		 * It cannot be used as a convergence test.
+		 */
+		/* feasible_p = (!SC_EMPTY_P(ps = sc_normalize(ps))); */
 
+	    }
+
+	    if_debug_sc_strong_normalize_and_check_feasibility2 {
+		fprintf(stderr,
+			"Print the two systems at each nvar=%d step:\n", nvar);
+		fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %x\n",
+			(unsigned int) ps);
+		sc_dump(ps);
+		fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: New system %x\n",
+			(unsigned int) new_ps);
+		sc_dump(new_ps);
 	    }
 	}
 
@@ -880,13 +915,13 @@ int level)
 	assert(check_feasibility != (Psysteme (*)(Psysteme)) NULL);
 	feasible_p = feasible_p && !SC_EMPTY_P(ps = check_feasibility(ps));
 
-	if_debug_sc_strong_normalize_2 {
+	if_debug_sc_strong_normalize_and_check_feasibility2 {
 	    fprintf(stderr,
 		    "Print the three systems after inequality normalization:\n");
-	    fprintf(stderr, "[sc_strong_normalize2]: Input system %x\n",
+	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %x\n",
 		    (unsigned int) ps);
 	    sc_dump(ps);
-	    fprintf(stderr, "[sc_strong_normalize2]: New system %x\n",
+	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: New system %x\n",
 		    (unsigned int) new_ps);
 	    sc_dump(new_ps);
 	}
@@ -908,12 +943,12 @@ int level)
 
     sc_rm(ps);
 
-    if_debug_sc_strong_normalize_2 {
+    if_debug_sc_strong_normalize_and_check_feasibility2 {
 	fprintf(stderr,
-		"[sc_strong_normalize2]: Final value of new system %x:\n",
+		"[sc_strong_normalize_and_check_feasibility2]: Final value of new system %x:\n",
 		(unsigned int) new_ps);
 	sc_dump(new_ps);
-	fprintf(stderr, "[sc_strong_normalize2]: End\n");
+	fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: End\n");
     }
 
     return new_ps;
