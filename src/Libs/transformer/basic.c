@@ -4,6 +4,7 @@
   */
 
 #include <stdio.h>
+#include <malloc.h> 
 
 #include "boolean.h"
 #include "vecteur.h"
