@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1996/09/24 15:47:52 $, ) 
+# ($Date: 1996/11/11 13:42:13 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -78,7 +78,7 @@ unset UNIQDIR pips_version RUNDIR LOCKFILE PERFORMANCE
 
 which_executable()
 {
-  PATH="$PWD:$PWD/$PIPS_ARCH:$PIPS_BINDIR/$PIPS_ARCH:$PATH" \
+  PATH="$PWD:$PWD/$PIPS_ARCH:$PIPS_ROOT/Bin/$PIPS_ARCH:$PATH" \
     type $1 | sed "s,.* is ,,"
 }
 
