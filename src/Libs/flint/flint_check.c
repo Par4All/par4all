@@ -50,17 +50,11 @@
   ((approximation_may_p(effect_approximation(my_effect))) || \
    (approximation_must_p(effect_approximation(my_effect))) )
 
-#define declaration_formal_p(E)  \
-  storage_formal_p(entity_storage(E))
-
 #define call_intrinsic_p(C)                       \
   value_intrinsic_p(entity_initial(call_function(C)))
 
 #define effect_to_name(the_effect)\
   entity_name(reference_variable(effect_reference(the_effect)))
-
-#define entity_to_offset(E)\
-  formal_offset(storage_formal(entity_storage(E)))
 
 #define entity_is_a_common_p(Ent)               \
   (type_area_p(entity_type(Ent)))
@@ -506,42 +500,7 @@ bool check_call_mode_consistency(la, lt, the_fnct)
 
 /***************************************************************************/
 
-/*
- * find_ith_formal_parameter
- * 
- * This function gives back the ith formal parameter, which is found in the
- * declarations of a call or a subroutine.
- */
-entity find_ith_formal_parameter(the_fnct, rank)
-    entity          the_fnct;
-    int             rank;
-{
-    list
-	ldecl = code_declarations(value_code(entity_initial(the_fnct)));
-    entity
-	current = entity_undefined;
-
-    while (ldecl != NULL) 
-    {
-	current = ENTITY(CAR(ldecl));
-	ldecl = CDR(ldecl);
-	if (declaration_formal_p(current) && (entity_to_offset(current) == rank))
-	    return (current);
-    }
-
-    pips_error("find_ith_formal_parameter",
-	       "cannot find the %d dummy argument of %s",
-	       rank, entity_name(the_fnct));
-
-    return(entity_undefined);
-}
-
-/*-----------------------------------------------------------------------*/
-
-/*
- * check_call_one_mode
- * 
- * This function checks that a reference to a constant in a call may not be
+/* This function checks that a reference to a constant in a call may not be
  * modified, if it could happen, a message is broadcast.
  */
 bool check_call_one_mode(exp, param, the_fnct, sefs_list, i)
