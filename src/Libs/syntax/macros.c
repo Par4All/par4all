@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: macros.c,v $
+ * Revision 1.10  1998/12/23 16:43:42  coelho
+ * recursive descent to substitute macros in macros...
+ *
  * Revision 1.9  1998/11/20 17:19:16  keryell
  * Added a call to ParserError when a macro is not yet defined.
  *
@@ -15,7 +18,7 @@
  * linear.h
  *
  * Revision 1.5  1997/09/23 15:21:39  coelho
- * typo:[3~
+ * typo:
  *
  * Revision 1.4  1997/09/20 22:06:58  coelho
  * recurse if necessary only.
@@ -48,7 +51,7 @@
 
 #include "syntax.h"
 
-extern void parser_macro_expansion(expression);
+extern void parser_substitute_all_macros_in_expression(expression);
 
 /*********************************************************** MACRO HANDLING */
 
@@ -133,7 +136,8 @@ void parser_add_a_macro(call c, expression e)
     }
     
     if (find_entity_macro(macro) != NULL) {
-      pips_user_warning("Macro \"%s\" is not yet defined.", entity_name(macro));
+      pips_user_warning("Macro \"%s\" is not yet defined.", 
+			entity_name(macro));
       ParserError("parser_add_a_macro",
 		  "It may be an undeclared array.\n");
     }
@@ -141,7 +145,7 @@ void parser_add_a_macro(call c, expression e)
     /* expand macros in the macro! It is ok, because
      * referenced macros must appear in preceding lines (F77 15-5, line 3-5).
      */
-    parser_macro_expansion(e);
+    parser_substitute_all_macros_in_expression(e);
 
     /* store the result.
      */
@@ -302,4 +306,10 @@ void parser_substitute_all_macros(statement s)
     if (current_macro_index>0 &&
         get_bool_property("PARSER_EXPAND_STATEMENT_FUNCTIONS"))
 	gen_recurse(s, expression_domain, gen_true, parser_macro_expansion);
+}
+
+
+void parser_substitute_all_macros_in_expression(expression e)
+{
+  parser_substitute_all_macros((statement)e);
 }
