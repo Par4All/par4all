@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "genC.h"
+#include "newgen_set.h"
 
 #define INITIAL_SET_SIZE 10
 
@@ -49,12 +50,9 @@ set_type typ ;
     return( hp ) ;
 }
 
-set set_singleton( type, p ) 
-set_type type ;
-char *p ;
+set set_singleton(set_type type, void * p) 
 {
     set s = set_make( type ) ;
-
     hash_put( s->table, p, p ) ;
     return( s ) ;
 }
@@ -72,9 +70,7 @@ set s1, s2 ;
     }
 }
 
-set set_add_element(s1, s2, e )
-set s1, s2 ;
-char *e;
+set set_add_element(set s1, set s2, void * e)
 {
     if( s1 == s2 ) {
 	if (! set_belong_p(s1, e))
@@ -90,9 +86,7 @@ char *e;
     }
 }
 
-bool set_belong_p(s, e )
-set s;
-char *e;
+bool set_belong_p(set s, void * e)
 {
     /* GO 7/8/95:
        Problem for set_string type because the value returned by
@@ -105,8 +99,7 @@ char *e;
     return hash_get(s->table, (char *) e) != HASH_UNDEFINED_VALUE;
 }
 
-set set_union( s1, s2, s3 )
-set s1, s2, s3 ;
+set set_union(set s1, set s2, set s3)
 {
     if( s1 != s3 ) {
 	set_assign( s1, s2 ) ;
@@ -118,8 +111,7 @@ set s1, s2, s3 ;
     return( s1 ) ;
 }
 
-set set_intersection( s1, s2, s3 )
-set s1, s2, s3 ;
+set set_intersection(set s1, set s2, set s3)
 {
     if( s1 != s2 && s1 != s3 ) {
 	set_clear( s1 ) ;
@@ -142,25 +134,21 @@ set s1, s2, s3 ;
     }
 }
 
-set set_difference( s1, s2, s3 )
-set s1, s2, s3 ;
+set set_difference(set s1, set s2, set s3)
 {
     set_assign( s1, s2 ) ;
     HASH_MAP( k, ignore, {hash_del( s1->table, k );}, s3->table ) ;
     return( s1 ) ;
 }
 
-set set_del_element( s1, s2, e )
-set s1, s2 ;
-char *e ;
+set set_del_element(set s1, set s2, void * e)
 {
     set_assign( s1, s2 ) ;
     hash_del( s1->table, e );
     return( s1 ) ;
 }
 
-bool set_equal( s1, s2 )
-set s1, s2 ;
+bool set_equal(set s1, set s2)
 {
     bool equal ;
     
@@ -176,22 +164,19 @@ set s1, s2 ;
     return( equal ) ;
 }
 
-void set_clear( s )
-set s ;
+void set_clear(set s)
 {
     hash_table_clear( s->table ) ;
 }
 
-void set_free( s )
-set s ;
+void set_free(set s)
 {
-    hash_table_free( s->table ) ;
-    free( s ) ;
+    hash_table_free(s->table);
+    gen_free_area((void**) s, sizeof(set_chunk));
 }
 
 bool 
-set_empty_p(
-    set s)
+set_empty_p(set s)
 {
     SET_MAP(x, return FALSE, s);
     return TRUE;
@@ -199,7 +184,7 @@ set_empty_p(
 
 void
 gen_set_closure_iterate(
-    void (*iterate)(char*, set),
+    void (*iterate)(void *, set),
     set initial,
     bool dont_iterate_twice)
 {
@@ -237,17 +222,14 @@ gen_set_closure_iterate(
  * that does not go twice in the same object.
  * FC 27/10/95.
  */
-void
-gen_set_closure(
-    void (*iterate)(char *, set),
+void gen_set_closure(
+    void (*iterate)(void *, set),
     set initial)
 {
     gen_set_closure_iterate(iterate, initial, TRUE);
 }
 
-int
-set_own_allocated_memory(
-    set s)
+int set_own_allocated_memory(set s)
 {
     return sizeof(set_chunk)+hash_table_own_allocated_memory(s->table);
 }
