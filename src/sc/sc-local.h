@@ -50,12 +50,10 @@ typedef struct Ssysteme {
 	} *Psysteme,Ssysteme;
 
 
-#include <setjmp.h>
-
 /* - Traitement des overflows :
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~ 
  * Pour ne pas dupliquer trop de fonctions pour le traitement des
- * overflows, nous avons fait une seule fonction prenant en parame`tre ofl_ctrl.
+ * overflows, nous avons fait une seule fonction prenant en parametre ofl_ctrl.
  *
  * NO_OFL_CTRL : pas de traitement des overflows.
  * 
@@ -118,6 +116,8 @@ typedef struct Ssysteme {
  * 
  * 
 */
+
+#define ifscdebug(level) if (sc_debug_level>=level)
 
 /* MACROS */
 
