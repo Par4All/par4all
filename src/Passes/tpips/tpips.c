@@ -36,8 +36,8 @@ static char *usage = "Usage: %s [-n] [-h] [-l logfilename] sourcefile...\n";
 
 /*************************************************************** Some Macros */
 
-#define TPIPS_PROMPT "tpips> " 		/* prompt for readline  */
-#define TPIPS_SECOND_PROMPT "> "
+#define TPIPS_PRIMARY_PROMPT 	"tpips> "	/* prompt for readline  */
+#define TPIPS_SECONDARY_PROMPT 	"> "
 #define TPIPS_CONTINUATION_CHAR '\\'
 #define TPIPS_HISTENV "TPIPS_HISTORY"	/* history file env variable */
 #define TPIPS_HISTORY_LENGTH 100	/* max length of history file */
@@ -538,33 +538,36 @@ static void (*find_handler(char* line))(char *)
     return x->function;
 }
 
-/*********************************************************** DOING THE JOB */
+/*************************************************************** DO THE JOB */
 
+#define MAX_LINE_LENGTH  1024
 static char * get_next_line(char * prompt)
 {
-#define MAX_LINE_LENGTH  1024
-    static char line[MAX_LINE_LENGTH];
+    char line[MAX_LINE_LENGTH];
     char * tmp = use_readline? 
 	readline(prompt): fgets(line, MAX_LINE_LENGTH, current_file);
 
     return tmp && !use_readline? strdup(tmp): tmp;
 }
 
+/* returns an allocated line read, including continuations.
+ * may return NULL at end of file.
+ */
 static char * tpips_read_a_line(void)
 {
     char *line;
     int l;
 
-    line = get_next_line(TPIPS_PROMPT);
+    line = get_next_line(TPIPS_PRIMARY_PROMPT);
     
     /* handle backslash-style continuations
      */
     while (line && (l=strlen(line), line[l-1]==TPIPS_CONTINUATION_CHAR))
     {
-	char *tmp, *next = get_next_line(TPIPS_SECOND_PROMPT);
+	char *tmp, *next = get_next_line(TPIPS_SECONDARY_PROMPT);
 	line[l-1] = '\0';
 	tmp = strdup(concatenate(line, next, NULL));
-	free(line);
+	free(line); if (next) free(next);
 	line = tmp;
     }
 
