@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/11/29 13:37:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/30 00:34:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 1995/11/29 13:37:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "%A% ($Date: 1997/04/30 00:34:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -322,7 +322,7 @@ options_panel_to_view_menu_gateway(Panel_item item,
 {
    char * label = (char *) xv_get(item, PANEL_LABEL_STRING);
 
-   wpips_execute_and_display_something(label);
+   wpips_execute_and_display_something_from_alias(label);
 }
 
 
@@ -646,7 +646,7 @@ build_aliases()
    char buffer[128];
    char true_name[128], alias_name[128];
    FILE *fd;
-   char * wpips_rc = WPIPS_RC;
+   char * wpips_rc = WPIPS_RC; /* WPIPS_RC hides a strdup()... */
 
    aliases = hash_table_make(hash_string, 0);
 
@@ -672,6 +672,8 @@ build_aliases()
                   strdup(strupper(upper, true_name)));
       }
    }
+
+   free(wpips_rc);
 }
 
 void
