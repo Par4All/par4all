@@ -4,7 +4,7 @@
  *
  * also include functions for timings...
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/20 18:58:19 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/27 12:42:42 $, )
  * version $Revision$
  *
  * Fabien Coelho, June 1993
@@ -16,15 +16,9 @@
 
 #include "pvm3.h"
 
-/* PVM 3.2 compatibility
+/* PVM 3.2 compatibility: managed by m4
  *  - pvmhostinfo <-> hostinfo
  *  - pvmtaskinfo <-> taskinfo (also adds ti_pid)
- */
-#ifdef PVM_OLD
-#define pvmtaskinfo taskinfo
-#define pvmhostinfo hostinfo
-#endif
-/*   end of fix for compatibility
  */
 
 #define check(var, msg) if(var<0)fprintf(stderr,"Error %d (%s)\n",var,msg);
@@ -39,18 +33,24 @@ host_name(
     for(i=0 ; i<nhost ; i++)
 	if (hostp[i].hi_tid==ti_host) return hostp[i].hi_name;
 
+    fprintf(stderr, "[hpfc.host_name] no host tid=0x%x among %d hosts\n",
+	    ti_host, nhost);
+
     return "name not found";
 }
 
 static struct pvmtaskinfo *
 which_task(
     int ti_tid, /* the host number we are looking for */
-    int ntask,  /* the number of hosts */
+    int ntask,  /* the number of tasks */
     struct pvmtaskinfo *taskp)/* the struct in which the information is */
 {
     int i;
     for(i=0 ; i<ntask ; i++)
 	if (taskp[i].ti_tid==ti_tid) return &taskp[i];
+
+    fprintf(stderr, "[hpfc.which_task] no task tid=0x%x among %d tasks\n", 
+	    ti_tid, ntask);
 
     return (struct pvmtaskinfo *) NULL;
 }
