@@ -15,10 +15,10 @@ OR
 TRUE
 FALSE
 <string> NAME
-ICON
-SCON
-RCON
-DCON
+<string> ICON
+<string> SCON
+<string> RCON
+<string> DCON
 MINUS
 PLUS
 SLASH
