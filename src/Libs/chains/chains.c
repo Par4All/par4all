@@ -150,9 +150,8 @@ statement st ;
 	vertex v ;
 
 	ifdebug(2) {
-	    fprintf(stderr, "Init statement %d with effects %x\n", 
-		    statement_number( st ), 
-		    (unsigned int) load_statement_effects(st) );
+	    fprintf(stderr, "Init statement %d with effects %#p\n", 
+		    statement_number( st ), load_statement_effects(st) );
 	    print_effects( load_statement_effects(st) ) ;
 	}
 	hash_put( Gen, (char *)st, (char *)MAKE_STATEMENT_SET()) ;
@@ -544,8 +543,8 @@ statement s;
     genkill_one_statement( s ) ;
     genkill_instruction( statement_instruction(s), s ) ;
     ifdebug(2) {
-	debug(2, "genkill_statement", "Result for Statement %x [%s]:\n", 
-		(unsigned int) s, statement_identification(s));;
+	debug(2, "genkill_statement", "Result for Statement %#p [%s]:\n", 
+		s, statement_identification(s));;
 	local_print_statement_set( "GEN", GEN( s )) ;
 	local_print_statement_set( "REF", REF( s )) ;
 	local_print_statement_set( "KILL", KILL( s )) ;
@@ -716,8 +715,8 @@ statement st ;
     */
     
     ifdebug(2) {
-	fprintf( stderr, "%*s> Statement %x (%d):\n", 
-		 indent++, "", (unsigned)st, statement_number( st )) ;
+	fprintf( stderr, "%*s> Statement %#p (%d):\n", 
+		 indent++, "", st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
 	local_print_statement_set( "DEF_OUT", DEF_OUT( st )) ;
 	local_print_statement_set( "REF_IN", REF_IN( st )) ;
@@ -746,8 +745,8 @@ statement st ;
 	pips_error( "inout_statement", "Unknown tag %d\n", i ) ;
     }
     ifdebug(2) {
-	fprintf( stderr, "%*s> Statement %x (%d):\n", 
-		 indent--, "", (unsigned)st, statement_number( st )) ;
+	fprintf( stderr, "%*s> Statement %#p (%d):\n", 
+		 indent--, "", st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
 	local_print_statement_set( "DEF_OUT", DEF_OUT( st )) ;
 	local_print_statement_set( "REF_IN", REF_IN( st )) ;
@@ -784,8 +783,8 @@ control ct ;
     }
 
     ifdebug(2) {
-	fprintf(stderr, "Computing DEF_IN and OUT of control %x entering", 
-		(unsigned)ct ) ;
+	fprintf(stderr, "Computing DEF_IN and OUT of control %#p entering", 
+		ct ) ;
 	local_print_statement_set( "", DEF_IN( control_statement( ct ))) ;
     }
     CONTROL_MAP( c, {statement st = control_statement( c ) ;
@@ -807,7 +806,7 @@ control ct ;
 
     for( change = TRUE ; change ; ) {
 	ifdebug(3) {
- 	    fprintf( stderr, "Iterating on %x ...\n", (unsigned)ct ) ;
+ 	    fprintf( stderr, "Iterating on %#p ...\n", ct ) ;
 	}
 	change = FALSE ;
 
@@ -920,9 +919,9 @@ bool (*which)() ;
     }
 
     ifdebug(2) {
-	fprintf( stderr, "Conflicts %d(%x) -> %d(%x) %s\n",
-		statement_number( stin ), (unsigned)stin,
-		statement_number( stout ), (unsigned)stout,
+	fprintf( stderr, "Conflicts %d(%#p) -> %d(%#p) %s\n",
+		statement_number( stin ), stin,
+		statement_number( stout ), stout,
 		(which == ud) ? "ud" : "dd_du" ) ;
     }
     vin = vertex_statement( stin ) ;
@@ -1338,8 +1337,8 @@ set s ;
 {
     fprintf( stderr, "\t%s ", msg ) ;
     SET_MAP( st, {
-	fprintf(stderr, ",%x (%d) ", 
-		(unsigned)st, statement_number( (statement)st ));
+	fprintf(stderr, ",%#p (%d) ", 
+		st, statement_number( (statement)st ));
     }, s ) ;
     fprintf( stderr, "\n" );
 }
