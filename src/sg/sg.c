@@ -276,6 +276,59 @@ Pbase b;
 
     (void) fprintf(f,"\nEnd of generating system ****\n");
 }
+
+/* Print a generating system as a dependence direction vector */
+
+#define LESSER_DIRECTION 4
+#define GREATER_DIRECTION 1
+#define ZERO_DIRECTION 2
+#define ANY_DIRECTION 7
+#define NO_DIRECTION 0
+
+static int vertex_to_direction[3] = {LESSER_DIRECTION, ZERO_DIRECTION, GREATER_DIRECTION};
+
+static int ray_to_direction[3] = {LESSER_DIRECTION, NO_DIRECTION, GREATER_DIRECTION};
+
+static int line_to_direction[3] = {ANY_DIRECTION, NO_DIRECTION, ANY_DIRECTION};
+
+static char * direction_to_representation[8] = {"?", "<", "=", "<=", ">", "*", ">=", "*"};
+
+void
+sg_fprint_as_ddv(
+    FILE * fd,
+    Ptsg sg)
+{
+    Pbase c = BASE_NULLE;
+    int ddv = 0;
+
+    fprintf(fd, "ddv(");
+
+    /* For each coordinate */
+    for(c=sg->base; !BASE_NULLE_P(c); c = c->succ) {
+	Psommet v;
+	Pray_dte r;
+	Pray_dte l;
+
+	/* For all vertices */
+	for(v=sg_sommets(sg); v!= NULL; v = v->succ) {
+	    ddv |= vertex_to_direction[1+value_sign(vect_coeff(vecteur_var(c), v->vecteur))];
+	}
+
+	/* For all rays */
+	for(r=sg_rayons(sg); r!= NULL; r = r->succ) {
+	    ddv |= ray_to_direction[1+value_sign(vect_coeff(vecteur_var(c), r->vecteur))];
+	}
+
+	/* For all lines */
+	for(l=sg_droites(sg); l!= NULL; l = l->succ) {
+	    ddv |= line_to_direction[1+value_sign(vect_coeff(vecteur_var(c), l->vecteur))];
+	}
+
+	fprintf(fd, c==sg->base? "%s" : ",%s", direction_to_representation[ddv]);
+    }
+
+    fprintf(fd, ")");
+}
 
 void sg_dump(sg)
 Ptsg sg;
