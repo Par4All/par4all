@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/09/04 09:12:04 $, 
+! $Date: 1996/09/04 11:31:36 $, 
 !
       program fractal
 
@@ -52,12 +52,11 @@
 ! Some HPF distributions:
 ! cyclic would make more sense as far as load balancing is concerned
 ! However HPFC would not be very good at it...
+! No communication -> block distribution on the second dimension
       integer nproc
       parameter (nproc=5)
 !hpf$ processors pe(nproc)
-!hpf$ template space(0:x_size - 1, 0:y_size - 1)
-!hpf$ distribute space(*,block) onto pe
-!hpf$ align image with space
+!hpf$ distribute image(*,block) onto pe
       
 
 ! Initialize XPOMP
@@ -107,15 +106,20 @@
 
 ! Wait for user interaction:
       call xpomp_wait_mouse(display, x, y, state, button)
+
+! Recenter
       xcenter = xcenter + (x/x_display_zoom - x_size/2)*zoom/x_size
       ycenter = ycenter + (y/y_display_zoom - y_size/2)*zoom/y_size
       
       if (state .eq. 1) then
-!     A button with shift -> restart from the begining:
+
+! A button with shift -> restart from the begining:
        xcenter = 0
        ycenter = 0
        zoom = 5
       else if (button .eq. 1) then
+
+! Zoom in
          zoom = zoom/zooming_factor
 ! Display the frame that will be zoomed in:
          X0 = x - x_display_size/zooming_factor/2
@@ -123,14 +127,15 @@
          X1 = x + x_display_size/zooming_factor/2
          Y1 = y + y_display_size/zooming_factor/2
          call xpomp_draw_frame(display, '', 255, -1,
-     &        X0, Y0, X1, Y1,
-     &        -181, status)
+     &        X0, Y0, X1, Y1, -181, status)
       else if (button .eq .3) then
+
+! Zoom out
          zoom = zoom*zooming_factor
       endif
 
       print *, 'Position (', xcenter, ',', ycenter, '), zoom =', 
-     &     zoom, ' (button =', button, ', state =', state, ')'
+     &     zoom, ' button =', button, ', state =', state
 
 ! hpfc does not like infinite loop without an exit point...
 ! some bug related to the management of unstructured to be investigated
