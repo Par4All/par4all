@@ -2,6 +2,7 @@
 /* If we have already used stdarg.h do not include: */
 #include <varargs.h>
 #endif
+#include <setjmp.h>
 
 #define ifdebug(l) if(the_current_debug_level>=(l))
 
