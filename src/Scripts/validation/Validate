@@ -60,6 +60,7 @@ VALID="$PIPS_ROOT/Utils/validate-sequential"
 PATH="/usr/ucb:/usr/etc:/usr/bin:/usr/games:.:$PATH"
 
 MAIL=${PIPS_MAIL:-Mail}
+export MAIL
 
 hostname=`host_name`
 user=`whoami`
@@ -197,6 +198,37 @@ randomize()
 	shift $?
     fi
     echo $1
+}
+
+#
+# sends an e-mail and exit.
+#
+mailfinal()
+{
+    user=${1}
+    result=${2}
+    final=${3}
+    warning=${4}
+    performance=${5}
+
+    ${MAIL} -s "$subject: $result" $user <<-%%%
+	
+	Your Validation Suite Test for
+	
+	$MODULES
+	
+	$final
+	pips:  $pips_version
+	tpips: $tpips_version
+	
+	$warning
+	
+	$performance
+	
+	In case of problems, contact coelho@cri.ensmp.fr
+%%%
+
+    exit 0
 }
 
 #
@@ -349,11 +381,21 @@ fi
 default_test="default_test"
 subject="PIPS Validation"
 
+export subject
+
+#
+# find and check {,t}pips
 pips_version=`absolute_name ${pips_version:-\`which_executable pips\`}`
 tpips_version=`absolute_name ${tpips_version:-\`which_executable tpips\`}`
 
 export pips_version
 export tpips_version
+
+test "${pips_version}" -a -x "${pips_version}" || \
+    mailfinal "${user}" failed "" "no pips found!" ""
+
+test "${tpips_version}" -a -x "${tpips_version}" || \
+    mailfinal "${user}" failed "" "no tpips found!" ""
 
 $deb1 " | $user on $hostname"
 $deb2 " | real PIPSHOME: $REAL_PIPSHOME"
@@ -369,6 +411,7 @@ esac
 
 $deb2 " | MODULES 1: $MODULES"
 MODULES=`unstammer "$MODULES" ' '`
+export MODULES
 
 $verb "Modules: $MODULES"
 
@@ -447,6 +490,8 @@ $verb "generating final report at `date`"
 
 failed=`tr '\012' '-' < $FAILED`
 
+rm -f $FAILED
+
 $deb2 " | failed 0: /$failed/"
 failed=`unstammer "$failed" '-'`
 $deb1 " | failed : /$failed/"
@@ -454,34 +499,15 @@ $deb1 " | failed : /$failed/"
 if [ "$failed" ]
 then
   final="failed: [$failed]"
-  finalsubject="$subject: failed"
+  result="failed"
 else
   final="succeeded"
-  finalsubject="$subject: succeeded"
+  result="succeeded"
 fi
 
 [ "$performance" ] && performance="$performance, end `local_date`"
 
-cat >> $MSG <<%
-
-Your Validation Suite Test for
-
-$MODULES
-
-$final
-pips:  $pips_version
-tpips: $tpips_version
-
-$warning
-
-$performance
-
-In case of problems, contact coelho@cri.ensmp.fr
-%
-
-${MAIL} -s "$finalsubject" $user < $MSG
-
-rm -f $FAILED $MSG
+mailfinal "${user}" "${result}" "${final}" "${warning}" "${performance}"
 
 #
 # that is all
