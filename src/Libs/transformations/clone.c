@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.11  1997/11/04 20:18:04  coelho
+ * comment added in front of generated clones. free the text...
+ *
  * Revision 1.10  1997/11/04 17:34:05  coelho
  * more comments.
  *
@@ -157,7 +160,7 @@ build_a_clone_for(
     int argn,
     int val)
 {
-    string name = entity_local_name(cloned), new_name;
+    string name = entity_local_name(cloned), new_name, comments;
     entity new_fun;
     statement stat;
     type saved_t; 
@@ -197,12 +200,27 @@ build_a_clone_for(
     set_bool_property(ALL_DECLS, saved_b1);
     set_bool_property(STAT_ORDER, saved_b2);
 
-    /* add somme comments before the code.
+    /* add some comments before the code.
      */
-
-    /* ??? */
+    comments = strdup(concatenate(
+      "!!\n"
+      "!! PIPS: please caution!\n"
+      "!!\n"
+      "!! this routine has been generated as a clone of ", name, "\n"
+      "!! the code may change significantly with respect to the original\n"
+      "!! version, especially after program transformations such as dead\n"
+      "!! code elimination and partial evaluation, hence the function may\n"
+      "!! not have the initial behavior, if called under some other context.\n"
+      "!!\n", 0));
+    text_sentences(t) = 
+	CONS(SENTENCE, make_sentence(is_sentence_formatted, comments),
+	     text_sentences(t));
 
     make_text_resource(new_name, DBR_INITIAL_FILE, ".f_initial", t);
+    free_text(t);
+
+    /* give the clonee a user file.
+     */
     DB_PUT_MEMORY_RESOURCE(DBR_USER_FILE, new_name, 
 	strdup(db_get_memory_resource(DBR_USER_FILE, name, TRUE)));
 
