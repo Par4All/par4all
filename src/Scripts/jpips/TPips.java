@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: TPips.java,v $
+ * Revision 1.13  1999/02/15 14:17:19  coelho
+ * *** empty log message ***
+ *
  * Revision 1.12  1998/11/21 15:04:48  coelho
  * cleaner?
  *
@@ -49,7 +52,7 @@ import java.util.*;
 import java.io.*;
 import java.applet.*;
 
-import com.sun.java.swing.*;
+import javax.swing.*;
 
 import JPips.Pawt.*;
 
