@@ -1470,11 +1470,11 @@ Ptsg *gs,*gsop;
     {
 	while (DiIncNonCons != NULL){
 	    Variable di;
-	    int val;
+	    Value val;
 	    
 	    di = DiIncNonCons->var;
 	    if (sc_value_of_variable(dep_syst, di, &val) ==  TRUE)
-		if (val != 0){
+		if (value_notzero_p(val)){
 		    sc_elim_var(dep_syst, di);
 		}
 	    DiIncNonCons = DiIncNonCons->succ;
@@ -2017,9 +2017,13 @@ Psysteme *psc_dep;
 		loop lo = statement_loop(STATEMENT(CAR(pc)));
 		entity i = loop_index(lo);
 		int li = loop_increment_value(lo);
-		if (li!=0) 
-		    vect_add_elem(&v2, (Variable) GetDiVar(l), 
-				  li*vect_coeff((Variable) i, v2));
+		Value vli = int_to_value(li);
+		if (value_notzero_p(vli))
+		{
+		    Value v = vect_coeff((Variable) i, v2);
+		    value_product(v,vli);
+		    vect_add_elem(&v2, (Variable) GetDiVar(l), v);
+		}
 		else
 		    vect_chg_var(&v2, (Variable) i, (Variable) GetLiVar(l));
 	    }
@@ -2035,7 +2039,7 @@ Psysteme *psc_dep;
 		Pcontrainte c = contrainte_make(v);
 	    
 		/* case of T(3)=... et T(4)=... */
-		if (contrainte_constante_p(c) && COEFF_CST(c) != 0) 
+		if (contrainte_constante_p(c) && value_notzero_p(COEFF_CST(c)))
 		{
 		    NbrTestCnst++;
 		    debug(4,"TestDependence","TestCnst succssed!");
@@ -2230,7 +2234,7 @@ effect ef1, ef2;
     for (l = 1; !all_level_founds && l <= cl; l++) 
     {
 	Variable di = (Variable) GetDiVar(l);
-	int min, max;
+	Value min, max;
 	int IsPositif, IsNegatif, IsNull, NotPositif;
 	/* FI: Keep a consistent interface in memory allocation */
 	/* Psysteme pss = (l==cl) ? ps : sc_dup(ps); */
@@ -2249,16 +2253,17 @@ effect ef1, ef2;
 	    break;
 	}
 
-	IsPositif = min > 0;
-	IsNegatif = max < 0;
-	IsNull = (min == 0 && max == 0);
-	NotPositif = (max == 0 && min <0);
+	IsPositif = value_pos_p(min);
+	IsNegatif = value_neg_p(max);
+	IsNull = value_zero_p(min) && value_zero_p(max);
+	NotPositif = value_zero_p(max) && value_neg_p(min);
 
 	ifdebug(7)
 	{	    
-	    debug(7, "TestDiVariables", 
-		  "min = %d   max = %d  ==> %s\n", 
-		  min, max, 
+	    pips_debug(7, "values: ");
+	    fprint_string_Value(stderr, "min = ", min);
+	    fprint_string_Value(stderr, "  max = ",max);
+	    fprintf(stderr, "  ==> %s\n", 
 		  IsPositif?"positive": 
 		  (IsNegatif? "negative" : (IsNull? "null":"undefined") ) );
 	}
@@ -2325,7 +2330,7 @@ effect ef1, ef2;
 static Ptsg dependence_cone_positive(dep_sc)
 Psysteme dep_sc;
 {
-    Psysteme sc_env= SC_UNDEFINED, sc_tmp = SC_UNDEFINED;
+    Psysteme sc_env= SC_UNDEFINED;
     Ptsg sg_env = sg_new();
     Pbase b;
     int n,i, j;
@@ -2526,7 +2531,7 @@ effect ef1,ef2;
   {
       Variable di = (Variable) GetDiVar(l);
       Psysteme pss;
-      int val;
+      Value val;
       bool success_p = TRUE;
 
       ifdebug(1) {
@@ -2543,7 +2548,7 @@ effect ef1,ef2;
 
       if ( success_p ) 
       {
-	  if (val != 0) {
+	  if (value_notzero_p(val)) {
 	      ifdebug(1) {
 		  mem_spy_end("TestDiCnst: exit 1");
 	      }
