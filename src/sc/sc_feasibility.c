@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1996/07/29 09:05:06 $, 
+ * date: $Date: 1996/08/07 13:41:36 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -114,13 +114,8 @@ boolean ofl_res;
     use_simplex = (n_cont >= NB_CONSTRAINTS_MAX_FOR_FM || 
 		   (n_cont>=10 && n_ref>2*n_cont));
 
-/*
-    fprintf(stderr, "[sc_feasibility_ofl_ctrl] %s=[%d,%d,%d]\n",
-	   use_simplex ? "S" : "FM", n_var, n_cont, n_ref);
-*/
-
     if (sc_rn_p(sc)) 
-	return(TRUE);
+	return TRUE;
 
     /* else
      */
@@ -128,7 +123,7 @@ boolean ofl_res;
     {
     case OFL_CTRL :
 	ofl_ctrl = FWD_OFL_CTRL;
-	if (setjmp(overflow_error)) {
+	CATCH(overflow_error) {
 	    ok = ofl_res;
 	    /* 
 	     *   PLEASE do not remove this warning.
