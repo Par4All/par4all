@@ -299,7 +299,7 @@ switch_method_when_error(Psysteme d, boolean int_p, int ofl_ctrl)
   boolean ok = TRUE;
   char * label;
   char * filename;
-  
+
   //if there's once more exception, donot rethrow directly to sc_feasibility_ofl_ctrl
   //but produce an user_exception_error and catch in internal_sc_feasibility
     CATCH(any_exception_error) 
@@ -318,50 +318,16 @@ switch_method_when_error(Psysteme d, boolean int_p, int ofl_ctrl)
 	  filename = "S_and_FM_fail_sc_dump.out";
 	  sc_default_dump_to_file(d,label,0,filename); 
 	}
+	FM_overflow_or_timeout = FALSE;
+	S_overflow_or_timeout = FALSE;
 
 	THROW(user_exception_error);	
     }
     TRY
     {
-	if (!(FM_overflow_or_timeout)) {
-
-	  ifscprintexact(2) { //Test temporary - to be removed
-	    fprintf(stderr,"\n *** * *** Simplex die %d th\n",S_counter);
-	  }
-	 
-	  //print or not all the systems troublesome with Simplex here 	  
-
-	  ifscprintexact(8) {
-	    fprintf(stderr,"\nSimplex overflow or timeout. Let's try Fourier-Motzkin ...");
-	    //sc_default_dump(d);
-	    //fprintf(stderr,"Exception with Simplex %dth\n",S_counter);
-	    //sc_dump(d);
-	    //when using sc_pre_process_for_simplex, cannot use default_variable_to_string
-	    label = "LABEL - System of constraints given to internal_sc_feasibility - Simplex : ";
-	    filename = "S_fail_sc_dump.out";
-	    sc_default_dump_to_file(d,label,S_counter,filename);
-	  }
-	  ifscprintexact(5) {	    
-	    fprintf(stderr,"\nSimplex overflow or timeout. Let's try Fourier-Motzkin ...");
-	    label = "LABEL - System of constraints given to internal_sc_feasibility - Simplex : ";
-	    filename = "S_fail_sc_dump.out";
-	    sc_default_dump_to_file(d,label,S_counter,filename);
-	  }
-	  FM_counter ++;
-	  ok = sc_fourier_motzkin_feasibility_ofl_ctrl(d, int_p, ofl_ctrl);
-	  //if timeout, then go to CATCH(overflow_error) within S_overflow_or_timeout, else return ok.
-	  ifscprintexact(5) {	     fprintf(stdout," Pass !!!\n");}
-	  FM_overflow_or_timeout = FALSE;	  
-	  UNCATCH(any_exception_error);
-	  return ok;
-	}//of if (!(FM_overflow_or_timeout))
-
 	if (!(S_overflow_or_timeout)) {
-	  
-	  //I don't think this case would happen (FM die while haven't tested S), but who'll know ...
-	  
-	  //print or not all the systems troublesome with FM here
-	  
+	
+	  //print or not all the systems troublesome with FM here	  
 	  ifscprintexact(2) { //Test temporary - to be removed
 	    fprintf(stderr,"\n *** * *** FM die %d th\n",FM_counter);
 	  }
@@ -384,15 +350,44 @@ switch_method_when_error(Psysteme d, boolean int_p, int ofl_ctrl)
 	  ok = sc_simplexe_feasibility_ofl_ctrl(d, ofl_ctrl);
 	  //if overflow, then go to CATCH(overflow_error) within FM_overflow_or_timeout, else return ok. 
 	  ifscprintexact(5) {fprintf(stdout," Pass !!!\n");}
-	  S_overflow_or_timeout = FALSE;
-	  UNCATCH(any_exception_error);
-	  return ok;
+	 
 	}//of (!(S_overflow_or_timeout))
-	fprintf(stderr,"Error: shouldn't reach here, DN.\n");
-	UNCATCH(any_exception_error);
-	return ok;//default is faisable 
+
+	if (!(FM_overflow_or_timeout)) {
+	  	 
+	  //print or not all the systems troublesome with Simplex here 	  
+	  ifscprintexact(2) { //Test temporary - to be removed
+	    fprintf(stderr,"\n *** * *** Simplex die %d th\n",S_counter);
+	  }
+	  ifscprintexact(8) {
+	    fprintf(stderr,"\nSimplex overflow or timeout. Let's try Fourier-Motzkin ...");
+	    //sc_default_dump(d);
+	    //fprintf(stderr,"Exception with Simplex %dth\n",S_counter);
+	    //sc_dump(d);
+	    //when using sc_pre_process_for_simplex, cannot use default_variable_to_string
+	    label = "LABEL - System of constraints given to internal_sc_feasibility - Simplex : ";
+	    filename = "S_fail_sc_dump.out";
+	    sc_default_dump_to_file(d,label,S_counter,filename);
+	  }
+	  ifscprintexact(5) {	    
+	    fprintf(stderr,"\nSimplex overflow or timeout. Let's try Fourier-Motzkin ...");
+	    label = "LABEL - System of constraints given to internal_sc_feasibility - Simplex : ";
+	    filename = "S_fail_sc_dump.out";
+	    sc_default_dump_to_file(d,label,S_counter,filename);
+	  }
+	  FM_counter ++;
+	  ok = sc_fourier_motzkin_feasibility_ofl_ctrl(d, int_p, ofl_ctrl);
+	  //if timeout, then go to CATCH(overflow_error) within S_overflow_or_timeout, else return ok.
+	  ifscprintexact(5) {	     fprintf(stdout," Pass !!!\n");}	  
+	}//of if (!(FM_overflow_or_timeout))
+
+	UNCATCH(any_exception_error);	
     }//of TRY
-    //UNCATCH() already put in TRY{}
+
+    FM_overflow_or_timeout = FALSE;	  
+    S_overflow_or_timeout = FALSE;
+
+    return ok;//default is faisable 
 }
 
 #define SIMPLEX_METHOD		1
@@ -404,7 +399,9 @@ static boolean internal_sc_feasibility
   (Psysteme sc, int method, boolean int_p, int ofl_ctrl)
 {
   Psysteme w = NULL;
-  boolean ok = TRUE; 
+  boolean ok = TRUE;
+
+  //w = sc_dup(sc); //force to revserse in all cases.
    
   if ((method & PROJECT_EQ_METHOD))//if method = 01 then 01&10 = 0, if method = 11 then 11&10= 1
   {
@@ -454,23 +451,24 @@ static boolean internal_sc_feasibility
 	
     
     }//of CATCH()
-        
-    if (method & SIMPLEX_METHOD)
-    {
-      S_overflow_or_timeout = TRUE;
-      S_counter ++;
-      ok = sc_simplexe_feasibility_ofl_ctrl(w? w: sc, ofl_ctrl);      
-      S_overflow_or_timeout = FALSE; //if no overflow then go to this line 
-    }
-    else
-    { 
-      FM_overflow_or_timeout = TRUE;
-      FM_counter ++;
-      ok = sc_fourier_motzkin_feasibility_ofl_ctrl(w? w: sc, int_p, ofl_ctrl);
-      FM_overflow_or_timeout = FALSE;//if no timeout then go to this line
-    }
-  
-    UNCATCH(any_exception_error);
+    
+    TRY {
+      if (method & SIMPLEX_METHOD)
+	{
+	  S_overflow_or_timeout = TRUE;
+	  S_counter ++;
+	  ok = sc_simplexe_feasibility_ofl_ctrl(w? w: sc, ofl_ctrl);      
+	  S_overflow_or_timeout = FALSE; //if no overflow then go to this line 
+	}
+      else
+	{ 
+	  FM_overflow_or_timeout = TRUE;
+	  FM_counter ++;
+	  ok = sc_fourier_motzkin_feasibility_ofl_ctrl(w? w: sc, int_p, ofl_ctrl);
+	  FM_overflow_or_timeout = FALSE;//if no timeout then go to this line
+	}  
+      UNCATCH(any_exception_error);
+    }//of TRY
   
   }//of if(ok)
   
@@ -613,12 +611,14 @@ int ofl_ctrl;
 {
   Psysteme s1;// a copy of the system to calculate on
   boolean faisable = TRUE;
-   
+
   CATCH(any_exception_error) {
     // maybe timeout_error or overflow_error
            
     alarm(0); // clear the alarm 
     
+    if (s1) sc_rm(s1);
+
     if (ofl_ctrl == FWD_OFL_CTRL) {
 	ifscprintexact(2) {
 	  fprintf(stderr,"\nThis is an exception rethrown from [sc_fourier_motzkin_feasibility_ofl_ctrl]\n ");
