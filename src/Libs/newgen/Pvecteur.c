@@ -31,8 +31,8 @@ Pvecteur v;
     fprintf(fd, "(");
 
     for (p = v; p != NULL; p = p->succ) {
-	(void) fprintf(fd,"%d %s ", 
-		       p->val, 
+	fprint_Value(fd, val_of(v));
+	(void) fprintf(fd," %s ", 
 		       (p->var == (Variable) 0) ? TCST_NAME : 
 		       entity_name((entity) p->var));
     }
@@ -73,7 +73,7 @@ int (*f)();
 
     pbuffer = strtok(buffer, " ");
     while (pbuffer != NULL) {
-	val = atoi(pbuffer);
+	sscan_Value(pbuffer, &val);
 	varname = strtok(NULL, " ");
 	if (strcmp(varname, TCST_NAME) == 0) {
 	    var = (Variable) 0;
