@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1996/10/15 13:41:00 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1997/12/05 18:39:58 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -118,5 +118,7 @@ extern bool gen_in_list_p GEN_PROTO((gen_chunk *, list));
 extern void gen_sort_list GEN_PROTO((list, int (*)())) ;
 extern void gen_closure GEN_PROTO((list (*)(), list));
 extern list gen_make_list GEN_PROTO((int, ...));
+extern list gen_copy_string_list(list);
+extern void gen_free_string_list(list);
 
 #endif
