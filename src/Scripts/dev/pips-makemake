@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/07 17:13:39 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 08:56:11 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -271,9 +271,8 @@ test: $(LIB_TARGET)
 	@echo 
 
 wtest: $(LIB_TARGET) 
-	$(LINK) wpips \\
-		-static -L$(OPENWINHOME)/lib -lwpips \\
-		$(PIPS_LIBS) -lxview -lolgx -lX11
+	$(LINK) wpips $(WPIPS_ADDED_LDFLAGS) -lwpips \\
+		$(PIPS_LIBS) $(WPIPS_ADDED_LIBS)
 	@echo 
 
 ttest: $(LIB_TARGET)
