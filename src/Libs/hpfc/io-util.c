@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-util.c,v $ ($Date: 1995/04/21 14:50:09 $, )
+ * $RCSfile: io-util.c,v $ ($Date: 1995/04/21 17:01:13 $, )
  * version $Revision$,
  */
 
@@ -14,7 +14,7 @@
 #include "conversion.h"
 
 /*       T_LID=CMP_LID(pn, pi...)
- *       PVM_{SEND,RECV}(NODETIDS(T_LID), NODE_CHANNELS(T_LID), INFO)
+ *       PVM_{SEND,RECV}(NODETIDS(T_LID), {SEND,RECV}_CHANNELS(T_LID), INFO)
  *       NODE_CHANNELS(T_LID) = NODE_CHANNELS(T_LID) + 2
  */
 static statement hpfc_hmessage(proc, send)
@@ -23,7 +23,7 @@ boolean send;
 {
     entity
 	ld = hpfc_name_to_entity(T_LID),
-	nc = hpfc_name_to_entity(NODE_CHANNELS),
+	nc = hpfc_name_to_entity(send ? SEND_CHANNELS : RECV_CHANNELS),
 	nt = hpfc_name_to_entity(NODETIDS);
     expression
 	lid = entity_to_expression(ld),
@@ -33,9 +33,9 @@ boolean send;
 	    (make_reference(nc, CONS(EXPRESSION, copy_expression(lid), NIL)));
 
     return(make_block_statement
-	   (CONS(STATEMENT, hpfc_compute_lid(ld, proc, get_ith_processor_dummy),
-	    CONS(STATEMENT, hpfc_message(tid, chn, send),
-		 NIL))));
+         (CONS(STATEMENT, hpfc_compute_lid(ld, proc, get_ith_processor_dummy),
+	  CONS(STATEMENT, hpfc_message(tid, chn, send),
+	       NIL))));
 }
 
 /*       PVM_RECV(HOST_TID, {HOST_CHANNEL, MCASTHOST}, BUFID)
