@@ -27,6 +27,26 @@
 
 #include "effects-generic.h"
 
+/***************************************************** ACTION INTERPRETATION */
+
+static string read_action_interpretation = string_undefined;
+static string write_action_interpretation = string_undefined;
+void set_action_interpretation(string r, string w)
+{
+    read_action_interpretation = r;
+    write_action_interpretation = w;
+}
+void reset_action_interpretation(void)
+{
+    read_action_interpretation = string_undefined;
+    write_action_interpretation = string_undefined;
+}
+string action_interpretation(int tag)
+{
+    return tag==is_action_read ? 
+	read_action_interpretation : write_action_interpretation;
+}
+
 /****************************************************************************/
 
 static bool is_user_view_p = FALSE;
@@ -237,10 +257,6 @@ get_any_effects_text(
 				 (DBR_CODE, module_name, TRUE));
     module_stat = get_current_module_statement();
 
-    /* WHY?
-     */
-    (*effects_computation_init_func)(module_name);
-
     /* resources to be prettyprinted...
      */
     load_resources(module_name);
@@ -282,10 +298,6 @@ get_any_effects_text(
 
     reset_current_module_entity();
     reset_current_module_statement();
-
-    /* WHY?
-     */
-    (*effects_computation_reset_func)(module_name);
 
     return txt;
 }
