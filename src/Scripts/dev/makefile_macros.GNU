@@ -1,0 +1,28 @@
+#
+# $RCSfile: makefile_macros.GNU,v $ (version $Revision$)
+# $Date: 1996/07/11 10:56:24 $, 
+#
+# this file contains macro definitions 
+
+AR	= gar
+ARFLAGS	= rv
+CC	= gcc
+CFLAGS	= -O2 -g -ansi -pedantic -Wall -mv8 -pipe
+CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR)
+LD	= $(CC) 
+LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)
+LEX	= flex
+LFLAGS	= -l
+LINT	= lint
+LINTFLAGS= -habxu
+YACC	= bison
+YFLAGS	= -y
+PROTOIZE= cproto -vcf2
+ETAGS	= etags
+TAR	= gtar
+ZIP	= gzip -v9
+DIFF	= gdiff
+M4	= gm4
+
+# end of $RCSfile: makefile_macros.GNU,v $
+#
