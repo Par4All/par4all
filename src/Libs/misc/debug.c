@@ -220,9 +220,10 @@ pips_debug_function(int the_expected_debug_level,
 double get_process_memory_size()
 {
     /* This is about the always increasing swap space */
-    extern etext;
+    /* etext is not portable. it is not even documented on SUN:-) */
+    /* extern etext; 
     double memory_size = (sbrk(0) - etext)/(double)(1 << 20);
-
+    */
     return memory_size;
 }
 
