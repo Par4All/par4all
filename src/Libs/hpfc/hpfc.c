@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/02/29 19:05:21 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/03/20 13:19:22 $, )
  * version $Revision$
  */
  
@@ -440,7 +440,7 @@ bool hpfc_filter(string name)
  *  - fortran library, reduction and hpfc special functions are skipped.
  *  - ??? obscure problem with the update of common entities.
  */
-bool hpfc_directives(string name)
+static bool hpfc_directives_handler(string name, bool dyn)
 {
     entity module = local_name_to_top_level_entity(name);
 
@@ -455,7 +455,8 @@ bool hpfc_directives(string name)
 	statement s;
 
 	s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
-	
+
+	if (dyn)
 	set_proper_effects_map(effectsmap_to_listmap((statement_mapping) 
             db_get_memory_resource(DBR_PROPER_EFFECTS, name, TRUE)));
 
@@ -463,29 +464,51 @@ bool hpfc_directives(string name)
 	set_current_module_statement(s);
 	load_hpfc_status();
 	make_update_common_map(); 
-	build_full_ctrl_graph(s);
 
-	NormalizeCommonVariables(module, s);
-	handle_hpf_directives(s); /* do the job... */
+	if (!dyn)
+	    NormalizeCommonVariables(module, s);
+	handle_hpf_directives(s, dyn); /* do the job... */
 
-	clean_ctrl_graph();
 	free_update_common_map(); 
 	save_hpfc_status();
 	reset_current_module_statement();
 	reset_current_module_entity();
+
+	if (dyn)
 	free_proper_effects_map();
 	
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, s);
 
 	/* ??? should not be necessary, some bug in pipsmake
 	 */
-	db_unput_a_resource(DBR_PROPER_EFFECTS, name);
+	if (dyn)
+	    db_unput_a_resource(DBR_PROPER_EFFECTS, name);
     }
 
     debug_off(); 
     debug_off();
     return TRUE;
 }
+
+bool hpfc_directives(string name)
+{
+    hpfc_static_directives(name);
+    hpfc_dynamic_directives(name);
+    return TRUE;
+}
+
+bool hpfc_static_directives(string name)
+{
+    hpfc_directives_handler(name, FALSE);
+    return TRUE;
+}
+
+bool hpfc_dynamic_directives(string name)
+{
+    hpfc_directives_handler(name, TRUE);
+    return TRUE;
+}
+
 
 /* bool hpfc_compile(string name)
  *
