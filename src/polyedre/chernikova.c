@@ -130,7 +130,7 @@ Pbase base;
 	 pb = pb->succ,j++)
     {
 	v = vect_coeff(vecteur_var(pb),pr->vecteur);
-	mat->p[i][j] = VALUE_TO_IRINT(v),
+	mat->p[i][j] = VALUE_TO_IRINT(v);
     }
 }
 
