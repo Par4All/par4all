@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.DEFAULT,v $ (version $Revision$)
-# $Date: 1996/09/02 13:44:22 $, 
+# $Date: 1996/09/02 17:52:23 $, 
 #
 # this file contains macro definitions 
 
@@ -8,9 +8,9 @@ AR	= ar
 ARFLAGS	= rv
 CC	= cc
 CFLAGS	= -O -g
-CPPFLAGS= -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(PIPS_EXTEDIR)
+CPPFLAGS= -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC)
-LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -L$(PIPS_EXTEDIR)
+LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(EXTERN_ROOT)/Lib/$(ARCH)
 RANLIB	= ranlib
 LEX	= lex
 LFLAGS	=
