@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.65  1997/07/24 15:10:08  keryell
+ * Assert added to insure no attribute on a sequence statement.
+ *
  * Revision 1.64  1997/07/22 11:27:42  keryell
  * %x -> %p formats.
  *
@@ -11,7 +14,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.64 1997/07/22 11:27:42 keryell Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.65 1997/07/24 15:10:08 keryell Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1407,6 +1410,13 @@ statement stmt;
     }
 
     attach_statement_information_to_text(r, stmt);
+
+    if (instruction_sequence_p(i)) {
+	pips_assert("This statement should be labelless, numberless and commentless.",
+		    statement_with_empty_comment_p(stmt)
+		    && statement_number(stmt) == STATEMENT_NUMBER_UNDEFINED
+		    && unlabelled_statement_p(stmt));
+    }
 
     debug(2, "text_statement", "End for statement %s\n",
 	  statement_identification(stmt));
