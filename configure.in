@@ -126,7 +126,8 @@ LONG_BITS=`expr $ac_cv_sizeof_long_long_int \* 8`
 LONG_AFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
 			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
 
-GMP_BITS=`expr gmp`
+dnl GMP_BITS=`expr gmp`
+GMP_BITS="gmp"
 GMP_AFLAGS="-DGNUMP"
 
 
@@ -163,10 +164,11 @@ else
 fi
 fi
 
-case "$target" in
- i*-pc-cygwin)
-	   no_long=yes
-esac
+
+dnl case "$target" in
+dnl i*-pc-cygwin)
+dnl	   no_long=yes
+dnl esac
 
 if test "$no_long" = "yes"; then
 	LIBS_TO_BUILD=$INT_BITS
@@ -179,10 +181,10 @@ elif test "$only_longlongint_lib" = "yes"; then
 	DEFAULT_INT_BITS=$LONG_BITS
 	DEFAULT_AFLAGS=$LONG_AFLAGS
 elif test "$only_gmpint_lib" = "yes"; then
-	LIBS_TO_BUILD=$GMP_BITS
-	EXEC_TO_BUILD=$GMP_BITS
-	DEFAULT_INT_BITS=$GMP_BITS
-	DEFAULT_AFLAGS=$GMP_AFLAGS
+	LIBS_TO_BUILD="$GMP_BITS"
+	EXEC_TO_BUILD="$GMP_BITS"
+	DEFAULT_INT_BITS="$GMP_BITS"
+	DEFAULT_AFLAGS="$GMP_AFLAGS"
 	usegmp=yes
 elif test "$allint_lib" = "yes"; then
 	LIBS_TO_BUILD="$INT_BITS $LONG_BITS $GMP_BITS"

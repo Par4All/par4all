@@ -20,13 +20,15 @@ EXECDIR = $(ROOT)/bin
 
 VPATH = $(OBJDIR)
 
+
 ##############################################################
 ## Rules to compile and to construct executables
 ##############################################################
 
+
 # The default compile rule
 $(OBJDIR)/%.o : %.c
-	@if [ ! -d $(OBJDIR) ]; \
+	if [ ! -d $(OBJDIR) ]; \
 		then mkdir -p $(OBJDIR) ; \
 	fi
 	$(CC) -c $(CFLAGS) $(EXTRA_FLAGS) $(DEFINES) $(EXTRA_DEFINES) $< -o $@
@@ -60,44 +62,53 @@ $(ROOT)/lib/$(STATIC_LIB):
 
 # Compile subpackages
 package: $(ROOT)/vars.mk
-	@if [ "x$(SUBDIRS)" != "x" ]; then \
+	@set $(LIBS_TO_BUILD) ;\
+	for z do \
+	if [ "x$(SUBDIRS)" != "x" ]; then \
 		set $(SUBDIRS) ; \
 		for x do \
 		    if [ -r $$x ] ; then \
 			( cd $$x ; \
-			$(MAKE) $(MFLAGS) $(MAKEVARS) package ;\
+			$(MAKE) $(MFLAGS) $(MAKEVARS) BITS=$$z package ;\
 			) \
 		    fi ; \
 		done ; \
-	fi
+	fi ; \
+	done ; \
 	make library
 
 # Compiles the applications to executables
 execs: package
-	@if [ "x$(APPDIRS)" != "x" ]; then \
+	@set $(LIBS_TO_BUILD) ;\
+	for z do \
+	if [ "x$(APPDIRS)" != "x" ]; then \
 		set $(APPDIRS) ; \
 		for x do \
 		    if [ -r $$x ] ; then \
 			( cd $$x ; \
-			$(MAKE) $(MFLAGS) $(MAKEVARS) execs ;\
+			$(MAKE) $(MFLAGS) $(MAKEVARS) BITS=$$z execs ;\
 			) \
 		    fi ; \
 		done ; \
 	fi ;\
+	done ; \
 	make exe
 
 # Run the tests for the various applications
 tests: 
-	@if [ "x$(TESTDIRS)" != "x" ]; then \
+	@set $(LIBS_TO_BUILD) ;\
+	for z do \
+	if [ "x$(TESTDIRS)" != "x" ]; then \
 		set $(TESTDIRS) ; \
 		for x do \
 		    if [ -r $$x ] ; then \
 			( cd $$x ; \
-			$(MAKE) $(MFLAGS) $(MAKEVARS) tests ;\
+			$(MAKE) $(MFLAGS) $(MAKEVARS) BITS=$$z tests ;\
 			) \
 		    fi ; \
 		done ; \
-	fi
+	fi ; \
+	done ; \
 	make test
 
 # To construct an executable, compile the 'c' file and link with the
