@@ -30,6 +30,10 @@ AUTO =	$(PIPS_ROOT)/Include/auto
 
 all: $(DERIVED_FILES)
 
+# skip latex 2 html if needed:
+simple: $(DERIVED_INC) $(INSTALL_SHR) $(INSTALL_DOC)
+simpleinstall: simple; $(MAKE) INSTALL_HTM= install
+
 pipsmake.rc: pipsmake-rc.tex
 	#
 	# building pipsmake.rc
