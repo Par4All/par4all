@@ -14,7 +14,7 @@ $opt_suffix = 'old';
 $opt_help = '';
 $opt_control = '';
 
-$current_working_directory=`pwd`;
+chomp($current_working_directory=`pwd`); # getcwd()?
 
 GetOptions("directory=s", "suffix=s", "control:s", "help")
     or die $!;
