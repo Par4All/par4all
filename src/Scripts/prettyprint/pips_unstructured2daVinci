@@ -3,7 +3,7 @@
 # This takes a PIPS output file in the GRAPH format in stdin
 # and generates a new one in the daVinci format on stdout.
 
-# 	%A% ($Date: 1995/09/08 14:29:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+# 	%A% ($Date: 1995/09/08 16:03:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
 
 # Ronan.Keryell@cri.ensmp.fr, 5/09/1995.
 
@@ -11,8 +11,8 @@ $statement_number = 0;
 $indent_level = 0;
 $output_statement_buffer = "";
 $this_is_the_unstructured_entry_p = 0;
-@node_attribute_to_add = ();
-@edge_attribute_to_add = ();
+%node_attribute_to_add = ();
+%edge_attribute_to_add = ();
 
 sub indent_string {
     local($i) = $indent_level;
@@ -89,26 +89,32 @@ sub output_a_statement_end {
 
 
 sub output_some_other_node_attributes {
-    while ($value = pop(@node_attribute_to_add)) {
+    while (($attribute, $value) = each %node_attribute_to_add) {
 	&output_indent;
-	print "a(\"" . pop(@node_attribute_to_add) . "\", \"$value\"),\n";
+	print "a(\"$attribute\", \"$value\"),\n";
     }
+    %node_attribute_to_add = ();
 }
 sub add_a_node_attribute {
     local($attribute, $value) = @_;
-    push(@node_attribute_to_add, $attribute, $value);
+    # Keep only the last value for this attribute:
+    $node_attribute_to_add{$attribute} = $value;
 }
 
 
 sub output_some_other_edge_attributes {
-    while ($value = pop(@edge_attribute_to_add)) {
+    while (($attribute, $value) = each %edge_attribute_to_add) {
 	&output_indent;
-	print "a(\"" . pop(@edge_attribute_to_add) . "\", \"$value\"),\n";
+	print "a(\"$attribute\", \"$value\"),\n";
     }
+    %edge_attribute_to_add = ();
 }
+
+
 sub add_an_edge_attribute {
     local($attribute, $value) = @_;
-    push(@edge_attribute_to_add, $attribute, $value);
+    # Keep only the last value for this attribute:
+    $edge_attribute_to_add{$attribute} = $value;
 }
 
 
