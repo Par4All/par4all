@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/04/21 14:32:54 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/04/21 14:50:06 $, )
  * version $Revision$
  */
 
@@ -259,10 +259,8 @@ statement stat, *pstat;
      * the common case)
      */
     
-    if (!generate_optimized_code_for_loop_nest(innerbody, 
-					       &newloopnest,
-					       Wa, Ra, Ro, 
-					       lWa, lRa, lRo))
+    if (!generate_optimized_code_for_loop_nest
+	(innerbody, &newloopnest, Wa, Ra, Ro, lWa, lRa, lRo))
 	return(FALSE);
 
     (*pstat) = 
@@ -274,7 +272,7 @@ statement stat, *pstat;
 					     CONSP(CAR(CDR(CONSP(CAR(lWa)))))),
 		  NIL)));    
 
-    IFDBPRINT(8, "Overlap_Analysis", node_module, (*pstat));
+    DEBUG_SYST(8, entity_name(node_module), (*pstat));
 
     reset_hpfc_current_statement();
 
