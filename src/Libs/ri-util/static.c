@@ -51,6 +51,12 @@ reset_current_module_entity()
     current_module_entity = entity_undefined;
 }
 
+string
+get_current_module_name()
+{
+    return module_local_name(current_module_entity);
+}
+
 
 /******************************************************* CURRENT STATEMENT */
 
