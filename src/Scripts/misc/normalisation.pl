@@ -105,7 +105,7 @@ while (<>)
 	
 	# first occurence of ARRAY( 
 	#   is supposed to be its dimension declaration!
-	if ($ligne =~ /[ ,&]$array\(/i)
+	if ($ligne =~ /[ ,&]$array *\(/i)
 	{
 	    print STDERR "? $array(in $module): $ligne";
 	    $done = 1;
