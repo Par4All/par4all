@@ -350,8 +350,11 @@ apply_without_reseting_up_to_date_resources(string pname, string oname)
 	  "apply %s on %s\n", pname, oname);
 
     /* we look for the rule describing this phase */
-    if ((ru = find_rule_by_phase(pname)) == rule_undefined)
-	pips_error("apply", "could not find rule %s\n", pname);
+    if ((ru = find_rule_by_phase(pname)) == rule_undefined) {
+	user_warning("apply_without_reseting_up_to_date_resources",
+		     "could not find rule %s\n", pname);
+	return FALSE;
+    }
 
     if (!make_pre_transformation(oname, ru))
 	return FALSE;
@@ -988,6 +991,7 @@ safe_make(string res_n, string module_n)
     if(find_rule_by_resource(res_n) == rule_undefined) {
 	user_warning("safe_make", "Unkown resource \"%s\"\n", res_n);
 	success = FALSE;
+	debug_off();
 	return success;
     }
 
