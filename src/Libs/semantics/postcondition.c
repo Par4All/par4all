@@ -1,6 +1,6 @@
 /* by Fabien COELHO
  *
- * $RCSfile: postcondition.c,v $ ($Date: 1996/07/09 23:30:40 $, )
+ * $RCSfile: postcondition.c,v $ ($Date: 1997/07/18 14:26:30 $, )
  * version $Revision$,
  */
 
@@ -65,8 +65,7 @@ static bool postcondition_filter(statement stat)
     instruction inst = statement_instruction(stat);
     transformer post = LoadPost(stat);
 
-    pips_debug(5, "statement 0x%x (post 0x%x)\n", 
-	       (unsigned int) stat, (unsigned int) post);
+    pips_debug(5, "statement %#p (post %#p)\n", stat, post);
     
     ifdebug(9) {
 	pips_debug(9, "statement is\n");
