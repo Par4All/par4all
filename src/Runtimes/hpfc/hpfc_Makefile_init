@@ -1,5 +1,5 @@
 #
-# $RCSfile: hpfc_Makefile_init,v $ ($Date: 1994/09/21 17:23:08 $, )
+# $RCSfile: hpfc_Makefile_init,v $ ($Date: 1995/08/10 17:14:40 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -11,6 +11,8 @@ SED = sed
 M4 = m4
 
 .INIT:	$(MAKEFILE)
+
+all:
 
 $(MAKEFILE): $(HPFC_MAKEFILE)
 	$(SED) -n '1,/^### do not delete this line/p' \
