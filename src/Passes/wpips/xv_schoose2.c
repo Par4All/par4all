@@ -264,7 +264,7 @@ abbrev_menu_event_filter_proc(Panel panel,
 		   Menu new_menu;
 		   void (* a_menu_notify_procedure)(Menu, Menu_item);
 		   /* If there is an old menu, remove it: */
-                  Menu old_menu = xv_get(item, PANEL_ITEM_MENU);
+                  Menu old_menu =  (Menu) xv_get(item, PANEL_ITEM_MENU);
 
 		  debug(9, "abbrev_menu_event_filter_proc",
 			"OK, we clicked on a abbrev_menu_with_text menu.\n");
@@ -275,7 +275,7 @@ abbrev_menu_event_filter_proc(Panel panel,
                   /* Create the new menu: */
                   new_menu = generate_menu();
 
-                  a_menu_notify_procedure = xv_get(new_menu, MENU_NOTIFY_PROC);
+                  a_menu_notify_procedure = (void (*)(Menu, Menu_item)) xv_get(new_menu, MENU_NOTIFY_PROC);
                   /* menu_return_value() seems to be the default
                      MENU_NOTIFY_PROC in XView... Hum, internal
                      details... */
