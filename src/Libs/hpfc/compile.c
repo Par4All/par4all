@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.63  1997/04/15 10:57:02  creusil
+ * statement_effects used instead of statement mappings. bc.
+ *
  * Revision 1.62  1997/03/20 09:49:06  coelho
  * system -> safe_system.
  *
@@ -912,8 +915,11 @@ gen_chunk *obj;
 
 void update_common_references_in_regions()
 {
-    HASH_MAP(stat, lef,
+
+    STATEMENT_EFFECTS_MAP(stat, effs,
 	 {
+	     list lef = effects_effects(effs);
+
 	     debug(3, "update_common_references_in_regions",
 		   "statement 0x%x (%d effects)\n", 
 		   (unsigned int) stat, gen_length((list) lef));
@@ -921,7 +927,7 @@ void update_common_references_in_regions()
 	     MAP(EFFECT, e, update_common_rewrite(effect_reference(e)), 
 		 (list) lef);
 	 },
-	     get_local_regions_map());
+	     get_rw_effects());
 }
 
 void 
