@@ -1,32 +1,17 @@
-/*
- * this file describe a few functions usefull to the compiler
+/* this file describe a few functions usefull to the compiler
  * to manage the hpfc data structures.
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/27 17:14:18 $, )
- * version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/04/10 18:49:35 $, )
+ * version $Revision$
  */
 
-#include <stdio.h>
-#include <string.h>
-
-extern int fprintf();
-
-#include "genC.h"
-
-#include "ri.h"
-#include "hpf.h"
-#include "hpf_private.h"
-
-#include "ri-util.h"
-#include "misc.h"
-#include "effects.h"
-#include "hpfc.h"
 #include "defines-local.h"
 
-/*
- * Predicates
+#include "effects.h"
+
+/* Predicates
  */
 
 /* TRUE if there is a reference to a distributed array within obj
@@ -43,10 +28,8 @@ gen_chunk* obj;
     gen_free_list(l); return(b);
 }
 
-/*
- * written_effects_to_dist_arrays_p
+/* written_effects_to_dist_arrays_p
  */
-
 bool written_effect_p(var, le)
 entity var;
 list le;
