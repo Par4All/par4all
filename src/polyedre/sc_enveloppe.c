@@ -23,76 +23,6 @@
 
 #include "polyedre.h"
 
-/* Psysteme sc_enveloppe(s1, s2): calcul d'une representation par systeme
- * lineaire de l'enveloppe convexe des polyedres definis par les systemes
- * lineaires s1 et s2
- *
- * s = enveloppe(s1, s2);
- * return s;
- *
- * s1 et s2 ne sont pas modifies. Ils doivent tous les deux avoir au moins
- * une base.
- *
- * Il faudrait traiter proprement les cas particuliers SC_RN et SC_EMPTY
- */
-/*
-Psysteme sc_enveloppe(s1, s2)
-Psysteme s1;
-Psysteme s2;
-{
-    Pbase b;
-    Pvecteur coord;
-    Ppoly p1;
-    Ppoly p2;
-    Ppoly p;
-    Psysteme s;
-
-    assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
-
-    s1 = sc_dup(s1);
-    s2 = sc_dup(s2);
-
-    b = s1->base;
-    for(coord=s2->base; !VECTEUR_NUL_P(coord); coord = coord->succ) {
-	b = vect_add_variable(b, vecteur_var(coord));
-    }
-    vect_rm(s2->base);
-    s2->base = vect_dup(b);
-
-    if(SC_RN_P(s1)) {
-	s = s1;
-	sc_rm(s2);
-    }
-    else if(SC_RN_P(s2)) {
-	s = s2;
-	sc_rm(s1);
-    }
-    else if(SC_EMPTY_P(s1)) {
-	assert(FALSE);
-	s = s2;
-	sc_rm(s1);
-    }
-    else if(SC_EMPTY_P(s2)) {
-	assert(FALSE);
-	s = s1;
-	sc_rm(s2);
-    }
-    else {
-	p1 = sc_to_poly(s1);
-	p2 = sc_to_poly(s2);
-
-	p = env(p1, p2);
-
-	s = p->sc;
-	p->sc = SC_UNDEFINED;
-	poly_rm(p);
-    }
-
-    return s;
-}
-*/
-
-
 /* Psysteme sc_enveloppe_chernikova_ofl_ctrl(Psysteme s1, s2, int ofl_ctrl)
  * input    : 
  * output   : 
@@ -172,422 +102,6 @@ Psysteme s1, s2;
   return sc_enveloppe_chernikova_ofl_ctrl((s1), (s2), OFL_CTRL);
 } 
 
-
-/* Psysteme sc_fast_convex_hull(Psysteme s1, Psysteme s2):
- *
- * exploit constraints shared by s1 and s2 to decrease the space
- * dimension and the number of constraints before calling the
- * effective convex hull function.
- *
- * Simplified view of the algorithm (in fact equalities and inequalities
- * are treated differently):
- *
- * Let s1 and s2 be sets of constraints
- * Build s0 = intersection(s1, s2)
- * Build s1' = s1 - s0
- * Build s2' = s2 - s0
- * Compute h' = convex_hull(s1', s2')
- * Build h = intersection(h', s0)
- * Free h', s1', s2'
- * Return h
- *
- * Francois Irigoin, 9 August 1992
- *
- * Note: This algorithm is simply wrong.
- * Let s1 = {i==1, i==2} and s2 = {i==3, i==2}.
- * Constraint i==2 can be removed. 
- * The convex hull of i==1 and i==3 is 1 <= i <= 3.
- * Its intersection with i == 2 is i == 2.
- */
-/*
-Psysteme sc_fast_convex_hull(s1, s2)
-Psysteme s1;
-Psysteme s2;
-{
-    Psysteme s0 = sc_new();
-    Psysteme s1p = sc_new();
-    Psysteme s2p = sc_new();
-    Psysteme hp = SC_UNDEFINED;
-    Pcontrainte eq;
-    Pbase b;
-    int d;
-    extern char * dump_value_name();
-
-    assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
-
-    for(eq = sc_egalites(s1); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
-	if(egalite_in_liste(eq, sc_egalites(s2))) {
-	    sc_add_egalite(s0, contrainte_dup(eq));
-	}
-	else if(contrainte_in_liste(eq, sc_inegalites(s2))) {
-	    sc_add_inegalite(s0, contrainte_dup(eq));
-	}
-	else {
-	    sc_add_egalite(s1p, contrainte_dup(eq));
-	}
-    }
-
-    for(eq = sc_inegalites(s1); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
-	if(contrainte_in_liste(eq, sc_inegalites(s2)) ||
-	   contrainte_in_liste(eq, sc_egalites(s2))) {
-	    sc_add_inegalite(s0, contrainte_dup(eq));
-	}
-	else {
-	    sc_add_inegalite(s1p, contrainte_dup(eq));
-	}
-    }
-
-    for(eq = sc_egalites(s2); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
-	if(contrainte_in_liste(eq, sc_inegalites(s0)) ||
-	   egalite_in_liste(eq, sc_egalites(s0))) {
-	    ;
-	}
-	else {
-	    sc_add_egalite(s2p, contrainte_dup(eq));
-	}
-    }
-
-    for(eq = sc_inegalites(s2); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
-	if(contrainte_in_liste(eq, sc_inegalites(s0)) ||
-	   contrainte_in_liste(eq, sc_egalites(s0))) {
-	    ;
-	}
-	else {
-	    sc_add_inegalite(s2p, contrainte_dup(eq));
-	}
-    }
-
-    sc_creer_base(s1p);
-    sc_creer_base(s2p);
-    b = base_union(sc_base(s1p), sc_base(s2p));
-    d = base_dimension(b);
-    vect_rm(sc_base(s1p));
-    vect_rm(sc_base(s2p));
-    sc_base(s1p) = base_dup(b);
-    sc_dimension(s1p) = d;
-    sc_base(s2p) = b;
-    sc_dimension(s2p) = d;
-    sc_base(s0) = base_union(sc_base(s1), sc_base(s2));
-
-    hp = sc_enveloppe(s1p, s2p);
-
-    hp = sc_append(hp, s0);
-
-    sc_rm(s0);
-    sc_rm(s1p);
-    sc_rm(s2p);
-
-    return hp;
-}
-*/
-
-/* Psysteme sc_fast_convex_hull(Psysteme s1, Psysteme s2):
- *
- * exploit constraints shared by s1 and s2 to decrease the space
- * dimension and the number of constraints before calling the
- * effective convex hull function.
- *
- * Simplified view of the algorithm (in fact equalities and inequalities
- * are treated differently):
- *
- * Let s1 and s2 be sets of constraints
- * Build s0 = intersection(s1, s2)
- * Build s1' = s1 - s0
- * Build s2' = s2 - s0
- * Compute h' = convex_hull(s1', s2')
- * Build h = intersection(h', s0)
- * Free h', s1', s2'
- * Return h
- *
- * Francois Irigoin, 9 August 1992
- *
- * Note: as false as above. 
- */
-/*
-Psysteme sc_fast_enveloppe_chernikova_ofl_ctrl(s1, s2, ofl_ctrl)
-Psysteme s1;
-Psysteme s2;
-int ofl_ctrl;
-{
-    Psysteme s0 = sc_new();
-    Psysteme s1p = sc_new();
-    Psysteme s2p = sc_new();
-    Psysteme hp = SC_UNDEFINED;
-    Pcontrainte eq;
-    Pbase b;
-    int d;
-    extern char * dump_value_name();
-
-    assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
-
-    for(eq = sc_egalites(s1); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
-	if(egalite_in_liste(eq, sc_egalites(s2))) {
-	    sc_add_egalite(s0, contrainte_dup(eq));
-	}
-	else if(contrainte_in_liste(eq, sc_inegalites(s2))) {
-	    sc_add_inegalite(s0, contrainte_dup(eq));
-	}
-	else {
-	    sc_add_egalite(s1p, contrainte_dup(eq));
-	}
-    }
-
-    for(eq = sc_inegalites(s1); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
-	if(contrainte_in_liste(eq, sc_inegalites(s2)) ||
-	   contrainte_in_liste(eq, sc_egalites(s2))) {
-	    sc_add_inegalite(s0, contrainte_dup(eq));
-	}
-	else {
-	    sc_add_inegalite(s1p, contrainte_dup(eq));
-	}
-    }
-
-    for(eq = sc_egalites(s2); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
-	if(contrainte_in_liste(eq, sc_inegalites(s0)) ||
-	   egalite_in_liste(eq, sc_egalites(s0))) {
-	    ;
-	}
-	else {
-	    sc_add_egalite(s2p, contrainte_dup(eq));
-	}
-    }
-
-    for(eq = sc_inegalites(s2); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
-	if(contrainte_in_liste(eq, sc_inegalites(s0)) ||
-	   contrainte_in_liste(eq, sc_egalites(s0))) {
-	    ;
-	}
-	else {
-	    sc_add_inegalite(s2p, contrainte_dup(eq));
-	}
-    }
-
-    sc_creer_base(s1p);
-    sc_creer_base(s2p);
-    b = base_union(sc_base(s1p), sc_base(s2p));
-    d = base_dimension(b);
-    vect_rm(sc_base(s1p));
-    vect_rm(sc_base(s2p));
-    sc_base(s1p) = base_dup(b);
-    sc_dimension(s1p) = d;
-    sc_base(s2p) = b;
-    sc_dimension(s2p) = d;
-    sc_base(s0) = base_union(sc_base(s1), sc_base(s2));
-    sc_dimension(s0) = vect_size(s0->base);
-
-    hp = sc_enveloppe_chernikova_ofl_ctrl(s1p, s2p, ofl_ctrl);
-
-    hp = sc_safe_append(hp, s0);
-
-    sc_rm(s0);
-    sc_rm(s1p);
-    sc_rm(s2p);
-
-    return hp;
-}
-*/
-
-/* Psysteme sc_common_projection_convex_hull(Psysteme s1, Psysteme s2):
- *
- * exploits equalities shared by s1 and s2 to decrease the space
- * dimension and the number of constraints before calling the
- * effective convex hull function.
- *
- * Simplified view of the algorithm:
- *
- * Let s1 and s2 be sets of constraints, eq1 and eq2 their sets of equalities
- * Build eq0 = intersection(eq1, eq2)
- * Build s1' = projection of s1 along eq0
- * Build s2' = projection of s2 along eq0
- * Compute h' = convex_hull(s1', s2')
- * Build h = intersection(h', s0)
- * Free h', s1', s2'
- * Return h
- *
- * Francois Irigoin, 20 November 1995
- *
- * Note:  it would be better to compute the convex hull of eq1 and eq2 using 
- * an Hermite form
- *
- * Note: missing -1 coeff...
- */
-Psysteme
-sc_common_projection_convex_hull_with_base_ordering
-(Psysteme s1, Psysteme s2, void (*sort_base_func)(Pbase *))
-{
-#define ifdebug if(FALSE)
-    Psysteme s0 = sc_new();
-    Psysteme s1p = sc_dup(s1);
-    Psysteme s2p = sc_dup(s2);
-    Psysteme hp = SC_UNDEFINED;
-    Pcontrainte eq;
-    Pbase b;
-    int d;
-    boolean feasible_p = TRUE;
-    boolean feasible_p1 = TRUE;
-    boolean feasible_p2 = TRUE;
-
-    assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
-
-    /* 
-    ifdebug {
-    (void) fprintf(stderr, "sc_common_projection_convex_hull: begin\ns1:\n");
-    sc_dump(s1);
-    (void) fprintf(stderr, "s2:\n");
-    sc_dump(s2);
-    }
-    */
-
-    for(eq = sc_egalites(s1p); !CONTRAINTE_UNDEFINED_P(eq) && feasible_p; eq = eq->succ) {
-	if(egalite_in_liste(eq, sc_egalites(s2p))) {
-	    if(egalite_normalize(eq)) {
-		if(CONTRAINTE_NULLE_P(eq)) {
-		    /* eq is redundant in s1, ignore it */
-		    ;
-		}
-		else {
-		    Pcontrainte def = CONTRAINTE_UNDEFINED;
-		    Pcontrainte new_eq = CONTRAINTE_UNDEFINED;
-		    Variable v = TCST;
-		    Pvecteur pv;
-
-		    /* Keep eq in s0 */
-
-		    new_eq = contrainte_dup(eq);
-		    sc_add_egalite(s0, new_eq);
-
-		    /* Use eq to eliminate a variable */
-
-		    /* Let's use a variable with coefficient 1 if
-		     * possible.
-		     */
-		    for( pv = contrainte_vecteur(eq);
-			!VECTEUR_NUL_P(pv);
-			pv = vecteur_succ(pv)) {
-			if(!term_cst(pv)) {
-			    v = vecteur_var(pv);
-			    if(vecteur_val(pv)==VALUE_ONE) {
-				break;
-			    }
-			}
-		    }
-		    assert(v!=TCST);
-
-		    /* eq itself is going to be modified in proj_ps.
-		     * use a copy!
-		     */
-		    def = contrainte_dup(eq);
-		    s1p = 
-			sc_simple_variable_substitution_with_eq_ofl_ctrl
-			    (s1p, def, v, NO_OFL_CTRL);
-		    s2p = 
-			sc_simple_variable_substitution_with_eq_ofl_ctrl
-			    (s2p, def, v, NO_OFL_CTRL);
-		    contrainte_rm(def);
-		}
-	    }
-	    else {
-		/* The system is not feasible. Stop */
-		feasible_p = FALSE;
-		break;
-	    }
-	}
-    }
-
-    /* Keep track of the full bases for the convex hull */
-    sc_base(s0) = base_union(sc_base(s1), sc_base(s2));
-    sc_dimension(s0) = vect_size(s0->base);
-
-    /* 
-    ifdebug {
-    (void) fprintf(stderr, "sc_common_projection_convex_hull: common equalities\ns1p:\n");
-    sc_dump(s0);
-    }
-    */
-
-    feasible_p1 = feasible_p && !SC_EMPTY_P(s1p = sc_normalize(s1p));
-    feasible_p2= !SC_EMPTY_P(s2p = sc_normalize(s2p));
-
-    if(feasible_p1 && feasible_p2) {
-	/* Perform a convex hull */
-
-	/* reduce the dimension of s1p and s2p as much as possible */
-	base_rm(sc_base(s1p));
-	sc_base(s1p) = BASE_UNDEFINED;
-	base_rm(sc_base(s2p));
-	sc_base(s2p) = BASE_UNDEFINED;
-	sc_creer_base(s1p);
-	sc_creer_base(s2p);
-	b = base_union(sc_base(s1p), sc_base(s2p));
-	sort_base_func(&b);
-	d = base_dimension(b);
-	vect_rm(sc_base(s1p));
-	vect_rm(sc_base(s2p));
-	sc_base(s1p) = base_dup(b);
-	sc_dimension(s1p) = d;
-	sc_base(s2p) = b;
-	sc_dimension(s2p) = d;
-
-	/*
-	ifdebug {
-	(void) fprintf(stderr, "sc_common_projection_convex_hull: new systems\ns1p:\n");
-	sc_dump(s1p);
-	(void) fprintf(stderr, "s2p:\n");
-	sc_dump(s2p);
-        }
-	 */
-
-	hp = sc_enveloppe_chernikova_ofl_ctrl(s1p, s2p, OFL_CTRL);
-
-	/*
-	ifdebug {
-	(void) fprintf(stderr, "sc_common_projection_convex_hull: small enveloppe\nhp:\n");
-	sc_dump(hp);
-        }
-	 */
-
-	hp = sc_safe_append(hp, s0);
-
-    }
-    else if (feasible_p2) {
-	/* if(sc_feasible_p(s2p)) { */
-	if(sc_rational_feasibility_ofl_ctrl(s2p, OFL_CTRL, TRUE)) {
-	    hp = s2p;
-	    s2p = SC_UNDEFINED;
-	    sc_base(hp) = sc_base(s0);
-	}
-	else {
-	    hp = sc_empty(sc_base(s0));
-	}
-	sc_dimension(hp) = sc_dimension(s0);
-	sc_base(s0) = BASE_UNDEFINED;
-    }
-    else if (feasible_p1) {
-	/* if(sc_feasible_p(s1p)) { */
-	if(sc_rational_feasibility_ofl_ctrl(s1p, OFL_CTRL, TRUE)) {
-	    hp = s1p;
-	    s1p = SC_UNDEFINED;
-	    sc_base(hp) = sc_base(s0);
-	}
-	else {
-	    hp = sc_empty(sc_base(s0));
-	}
-	sc_dimension(hp) = sc_dimension(s0);
-	sc_base(s0) = BASE_UNDEFINED;
-    }
-    else {
-	hp = sc_empty(sc_base(s0));
-	sc_dimension(hp) = sc_dimension(s0);
-	sc_base(s0) = BASE_UNDEFINED;
-    }
-
-    sc_rm(s0);
-    sc_rm(s1p);
-    sc_rm(s2p);
-
-    return hp;
-}
-
 void no_base_sort(Pbase *pbase)
 {
     return;
@@ -655,4 +169,210 @@ Psysteme elementary_convex_union(Psysteme s1, Psysteme s2)
   */
 
   return actual_convex_union(s1, s2);
+}
+
+
+/********************************************** SET BASED TRANSITIVE CLOSURE */
+
+/* put base variables in set.
+   returns whether something was put.
+ */
+static boolean base_to_set(linear_hashtable_pt s, Pvecteur b)
+{
+  boolean modified = FALSE;
+
+  for (; b; b=b->succ)
+    if (b->var && !linear_hashtable_isin(s, b->var)) 
+    {
+      linear_hashtable_put(s, b->var, b->var);
+      modified = TRUE;
+    }
+
+  return modified;
+}
+
+/* returns whether c contains variables of vars. */
+static boolean contains_variables(Pvecteur v, linear_hashtable_pt vars)
+{
+  for (; v; v = v->succ)
+    if (v->var && linear_hashtable_isin(vars, v->var))
+      return TRUE;
+  return FALSE;
+}
+
+/* one pass only of transitive closure.
+ * returns whether vars was modified.
+ * appends extracted constraints to ex.
+ */
+static boolean 
+transitive_closure_pass(Pcontrainte * pc, Pcontrainte * ex, 
+			linear_hashtable_pt vars)
+{
+  Pcontrainte c, cp, cn;
+  boolean modified = FALSE;
+
+  for (c=*pc, 
+	 cp = CONTRAINTE_UNDEFINED, 
+	 cn = c? c->succ: CONTRAINTE_UNDEFINED; 
+       c;
+       cp = c==cn? cp: c,
+	 c = cn, 
+	 cn = c? c->succ: CONTRAINTE_UNDEFINED)
+  {
+    if (contains_variables(c->vecteur, vars)) 
+    {
+      modified |= base_to_set(vars, c->vecteur);
+      c->succ = *ex, *ex = c;
+      if (cp) cp->succ = cn; else *pc = cn;
+      c = cn;
+    }
+  }
+
+  return modified;
+}
+
+/* transtitive extraction of constraints.
+ */
+static Psysteme transitive_closure_system(Psysteme s, linear_hashtable_pt vars)
+{
+  Pcontrainte e = CONTRAINTE_UNDEFINED, i = CONTRAINTE_UNDEFINED;
+  boolean modified;
+
+  do {
+    modified = transitive_closure_pass(&s->egalites, &e, vars);
+    modified |= transitive_closure_pass(&s->inegalites, &i, vars);
+  }
+  while (modified);
+
+  sc_fix(s);
+  return sc_make(e, i);
+}
+
+/* returns constraints from s which may depend on variables in b1 and b2.
+ * these constraints are removed from s, hence s is modified.
+ */
+static Psysteme
+transitive_closure_from_two_bases(Psysteme s, Pbase b1, Pbase b2)
+{
+  Psysteme st;
+  linear_hashtable_pt vars = linear_hashtable_make();
+
+  base_to_set(vars, b1);
+  base_to_set(vars, b2);
+  st = transitive_closure_system(s, vars);
+  linear_hashtable_free(vars);
+
+  return st;
+}
+
+/*********************************************** HOPEFULLY CUTE CONVEX UNION */
+
+/* returns s1 v s2.
+ * initial systems are not changed.
+ * 
+ * v convex union
+ * u union
+ * n intersection
+ * T orthogonality
+ * 
+ * (1) CA: 
+ * 
+ * P1 v P2 = (P n X1) v (P n X2) = 
+ * let P = P' n P'' 
+ *   so that P' T X1 and P' T X2 and P' T P'' built by transitive closure,
+ * then P1 v P2 = (P' n (P'' n X1)) v (P' n (P'' n X2)) =
+ *                 P' n ((P'' n X1) v (P'' n X2))
+ *
+ * Proof by considering generating systems:
+ * Def: A T B <=> var(A) n var(B) = 0
+ * Prop: A n B if A T B
+ *  Let A = (x,v,l), B = (y,w,m)
+ *  A n B = { z | z = (x) \mu + (v) d + (l) e + (0) f
+ *                    (0)     + (0)   + (0)     (I)
+ *            and z = (0) \nu + (0) g + (0) h + (I) f'
+ *                    (y)     + (w)   + (m)     (0)
+ *            with \mu>0, \nu>0, \sum\mu=1, \sum\nu=1, d>0, g>0 }
+ *  we can always find f and f' equals to the other part (by extension) so
+ *  A n B = { z | z = (x 0) \mu + (v 0) d + (l 0) e
+ *                    (0 y) \nu   (0 w) g   (0 m) h 
+ *            with \mu \nu d g constraints... }
+ *  It is a convex : ((xi)  , (v 0), (l 0))
+ *                    (yj)ij, (0 w), (0 m)
+ *  we just need to prove that Cmn == Cg defined as
+ *    (x 0) \mu  ==  (xi)   \gamma with >0 and \sum = 1
+ *    (0 y) \nu      (yj)ij
+ *  . Cg in a convex.
+ *  . Cg \in Cmn since ((xi)\(yj) ij) in Cmn 
+ *    with \mu = \delta i, \nu = \delta j
+ *  . Cmn \in Cg by chosing \gamma_ij = \mu_i\nu_j, which >0 and \sum = 1
+ * Prop: A T B and A T C => A T (B v C) and A T (B n C)
+ * Theo: A T B and A T C => (A n B) v (A n C) = A n (B v C)
+ *   compute both generating systems with above props. they are equal.
+ *
+ * (2) FI:
+ *
+ * perform exact projections of common equalities.
+ * no proof at the time. It looks ok anyway.
+ * 
+ * (3) FC:
+ * 
+ * base(P) n base(Q) = 0 => P u Q = Rn
+ * and some other very basic simplifications...
+ * which are not really interesting if no decomposition is performed?
+ */
+Psysteme sc_cute_convex_hull(Psysteme is1, Psysteme is2)
+{
+  Psysteme s1, s2, sc, stc, su;
+
+  s1 = sc_dup(is1);
+  s2 = sc_dup(is2);
+
+  /* CA: extract common disjoint part.
+   */
+  sc = extract_common_syst(s1, s2);
+  stc = transitive_closure_from_two_bases(sc, s1->base, s2->base);
+
+  /* FI: in sc_common_projection_convex_hull
+     note that equalities are not that big a burden to chernikova?
+   */
+  sc_extract_exact_common_equalities(stc, sc, s1, s2);
+
+  /* fast sc_append */
+  s1 = sc_fusion(s1, sc_dup(stc));
+  sc_fix(s1);
+
+  s2 = sc_fusion(s2, stc);
+  sc_fix(s2);
+
+  stc = NULL;
+
+  /* how useful it is:
+  fprintf(stderr, "common eg=%d/%d, in=%d/%d\n",
+	  sc_nbre_egalites(sc), 
+	  sc_nbre_egalites(sc)+sc_nbre_egalites(s1)+sc_nbre_egalites(s2),
+	  sc_nbre_inegalites(sc),
+	 sc_nbre_inegalites(sc)+sc_nbre_inegalites(s1)+sc_nbre_inegalites(s2));
+  */
+
+  su = elementary_convex_union(s1, s2);
+
+  sc_rm(s1); 
+  sc_rm(s2);
+
+  /* better compatibility with previous version, as the convex union
+   * normalizes the system and removes redundancy, what is not done
+   * if part of the system is separated. Other calls may be considered here?
+   */
+  sc_transform_ineg_in_eg(sc);
+  sc_project_very_simple_equalities(sc);
+
+  /* sc, su: fast union of disjoint */
+  sc = sc_fusion(sc, su);
+
+  sc_fix(sc);
+  if (sc_base(sc)) base_rm(sc_base(sc));
+  sc_base(sc) = base_union(sc_base(is1), sc_base(is2));
+  sc_dimension(sc) = vect_size(sc_base(sc));
+  
+  return sc;
 }
