@@ -45,21 +45,30 @@ install_forward_makefiles:
 	# 
 	# copying directory makefiles where required (and usefull)
 	#
+	# PIPS
+	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Makefile
+	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Makefile
+	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Lib/Makefile
+	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Passes/Makefile
+	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Scripts/Makefile
+	$(COPY) forward_gnu_makefile ${PIPS_ROOT}/Src/Runtime/Makefile
+	#
+	# NEWGEN
+	$(COPY) forward_gnu_makefile ${NEWGEN_ROOT}/Makefile
+	$(COPY) forward_gnu_makefile ${NEWGEN_ROOT}/Src/Makefile
+	#
+	# LINEAR
+	$(COPY) forward_gnu_makefile ${LINEAR_ROOT}/Makefile
+	$(COPY) forward_gnu_makefile ${LINEAR_ROOT}/Src/Makefile
+	#
+	# and development sides
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Lib/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Passes/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Scripts/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_DEVEDIR}/Runtime/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_PRODDIR}/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_SRCDIR}/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_SRCDIR}/Lib/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_SRCDIR}/Passes/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_SRCDIR}/Scripts/Makefile
-	$(COPY) forward_gnu_makefile ${PIPS_SRCDIR}/Runtime/Makefile
 	$(COPY) forward_gnu_makefile ${NEWGEN_DEVEDIR}/Makefile
-	$(COPY) forward_gnu_makefile ${NEWGEN_SRCDIR}/Makefile
 	$(COPY) forward_gnu_makefile ${LINEAR_DEVEDIR}/Makefile
-	$(COPY) forward_gnu_makefile ${LINEAR_SRCDIR}/Makefile
 
 # that is all
 #
