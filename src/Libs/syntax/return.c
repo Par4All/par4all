@@ -270,10 +270,33 @@ instruction MakeReturn(expression e)
 }
 
 /* Generate a unique call to RETURN per module */
-void GenerateReturn()
+void 
+GenerateReturn()
 {
-    strcpy(lab_I, end_label_local_name);
-    LinkInstToCurrentBlock(MakeZeroOrOneArgCallInst("RETURN", 
-						    expression_undefined),
-			   TRUE);
+    instruction inst = instruction_undefined;
+    /* statement c = MakeStatement(l, make_continue_instruction()); */
+
+
+    if(substitute_p && uses_alternate_return_p()) {
+	entity l = MakeLabel(strdup(end_label_local_name));
+	expression rc = int_to_expression(0);
+	statement src = make_assign_statement(entity_to_expression(GetReturnCodeVariable()), rc);
+	statement jmp = statement_undefined;
+	    (MakeZeroOrOneArgCallInst("RETURN", expression_undefined));
+
+	statement_number(src) = look_at_next_statement_number();
+	jmp = MakeStatement(l, MakeZeroOrOneArgCallInst("RETURN", expression_undefined));
+	/*
+	statement_number(jmp) = look_at_next_statement_number();
+	(void) get_next_statement_number();
+	*/
+	inst = make_instruction_block(CONS(STATEMENT, src, CONS(STATEMENT, jmp, NIL)));
+	gen_consistent_p(inst);
+    }
+    else {
+	strcpy(lab_I, end_label_local_name);
+	inst = MakeZeroOrOneArgCallInst("RETURN", expression_undefined);
+    }
+
+    LinkInstToCurrentBlock(inst, TRUE);
 }
