@@ -312,11 +312,11 @@ $VERBOSE $pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_R
 
 $pips_version $SOURCE_FILES $ARG_MOD $SELECT_RULES $USING_RULE $BUILD_RES $PGM || error
 
-# Build `modules'
+# Build `modules' ???
 if [ "$SOURCE_FILES" ]
 then
   cd $PGM.database
-  ls *.f | sed 's/.f$//' | tr '[a-z]' '[A-Z]' > modules
+  ls */*.f | sed 's/.f$//' | tr '[a-z]' '[A-Z]' > modules
   cd ..
 fi
 
