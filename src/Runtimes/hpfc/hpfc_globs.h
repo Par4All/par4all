@@ -1,7 +1,7 @@
 c
 c COMMON /HPFC_GLOBS/
 c
-c $RCSfile: hpfc_globs.h,v $ ($Date: 1994/04/11 10:23:53 $, )
+c $RCSfile: hpfc_globs.h,v $ ($Date: 1994/09/21 17:23:03 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
