@@ -56,12 +56,14 @@ then
 		true
 	else
 		exit 3
+	fi
 else
 	if Pips -w "$1"
 	then
 		true
 	else
 		exit 4
+	fi
 fi
 
 exit 0
