@@ -149,7 +149,7 @@ statement st ;
 	dg_vertex_label l ;
 	vertex v ;
 
-	if (get_debug_level() > 0) {
+	ifdebug(2) {
 	    fprintf(stderr, "Init statement %d with effects %x\n", 
 		    statement_number( st ), 
 		    (unsigned int) load_statement_effects(st) );
@@ -239,9 +239,17 @@ control ct ;
 {
     cons *blocs = NIL ;
 
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+
     CONTROL_MAP( c, {init_statement( control_statement( c ));},
 		 ct, blocs ) ;
     gen_free_list( blocs ) ;
+
+    ifdebug(1) {
+	mem_spy_end("init_control");
+    }
 }
 
 /* The GENKILL_xxx functions implement the computation of GEN, REF and 
@@ -477,13 +485,14 @@ statement st ;
 
     if( set_undefined_p( DEF_OUT( exit ))) {
 	set ref = MAKE_STATEMENT_SET() ;
-
+	set empty = MAKE_STATEMENT_SET() ;
 	CONTROL_MAP( cc, {
 	    set_union( ref, ref, REF( control_statement( cc ))) ;
 	}, c, blocs ) ;
 	set_assign( REF( st ), ref ) ;
 	set_free( ref ) ;
-	set_assign( GEN( st ), MAKE_STATEMENT_SET()) ;
+	set_assign( GEN( st ), empty) ;
+	set_free( empty ) ;
     }
     else {
 	set_assign( GEN( st ), DEF_OUT( exit )) ;
@@ -556,6 +565,10 @@ cons *l ;
     set ref_in = REF_IN( st ) ;
     statement one ;
 
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+
     MAPL( sts, {one = STATEMENT( CAR( sts )) ;
 
 		set_assign( DEF_IN( one ), def_in ) ;
@@ -566,6 +579,10 @@ cons *l ;
 	 l ) ;
     set_assign( DEF_OUT( st ), def_in ) ;
     set_assign( REF_OUT( st ), ref_in ) ;
+
+    ifdebug(1) {
+	mem_spy_end("inout_block");
+    }
 }
 
 
@@ -576,6 +593,10 @@ test t ;
     statement sv = test_true( t ) ;
     statement sf = test_false( t ) ;
 
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+
     set_assign( DEF_IN( sv ), DEF_IN( st )) ;
     set_assign( REF_IN( sv ), REF_IN( st )) ;
     inout_statement( sv );
@@ -584,6 +605,10 @@ test t ;
     inout_statement( sf );
     set_union( DEF_OUT( st ), DEF_OUT( sv ), DEF_OUT( sf )) ;
     set_union( REF_OUT( st ), REF_OUT( sv ), REF_OUT( sf )) ;
+
+    ifdebug(1) {
+	mem_spy_end("inout_test");
+    }
 }
 
 static void inout_loop( st, lo )
@@ -592,6 +617,10 @@ loop lo ;
 {
     statement l = loop_body( lo ) ;
     set diff = MAKE_STATEMENT_SET() ;
+
+    ifdebug(1) {
+	mem_spy_begin();
+    }
 
     set_union( DEF_IN( l ), GEN( st ),
 	       set_difference( diff, DEF_IN( st ), KILL( st )));
@@ -607,6 +636,10 @@ loop lo ;
 	set_union( DEF_OUT( st ), DEF_OUT( l ), DEF_IN( st )) ;
 	set_union( REF_OUT( st ), REF_OUT( l ), REF_IN( st )) ;
     }
+
+    ifdebug(1) {
+	mem_spy_end("inout_loop");
+    }
 }
 
 static void inout_call( st, c )
@@ -615,10 +648,18 @@ call c ;
 {
     set diff = MAKE_STATEMENT_SET() ;
 
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+
     set_union( DEF_OUT( st ), GEN( st ),
 	       set_difference( diff, DEF_IN( st ), KILL( st )));
     set_union( REF_OUT( st ), REF_IN( st ), REF( st )) ;
     set_free( diff ) ;
+
+    ifdebug(1) {
+	mem_spy_end("inout_call");
+    }
 }
 
 static void inout_unstructured( st, u )
@@ -629,6 +670,10 @@ unstructured u ;
     control exit = unstructured_exit( u ) ;
     statement s_exit =  control_statement( exit ) ;
 
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+
     set_assign( DEF_IN( control_statement( c )), DEF_IN( st )) ;
     set_assign( REF_IN( control_statement( c )), REF_IN( st )) ;
     inout_control( c ) ;
@@ -636,19 +681,25 @@ unstructured u ;
     if( set_undefined_p( DEF_OUT( s_exit ))) {
 	list blocs = NIL ;
 	set ref = MAKE_STATEMENT_SET() ;
+	set empty = MAKE_STATEMENT_SET() ;
 
 	CONTROL_MAP( cc, {
 	    set_union( ref, ref, REF( control_statement( cc ))) ;
 	}, c, blocs ) ;
 	set_assign( REF_OUT( st ), ref ) ;
-	set_assign( DEF_OUT( st ), MAKE_STATEMENT_SET()) ;
+	set_assign( DEF_OUT( st ), empty) ;
 
 	set_free( ref ) ;
+	set_free( empty ) ;
 	gen_free_list( blocs ) ;
     }
     else {
 	set_assign( DEF_OUT( st ), DEF_OUT( s_exit )) ;
 	set_assign( REF_OUT( st ), REF_OUT( s_exit )) ;
+    }
+
+    ifdebug(1) {
+	mem_spy_end("inout_unstructured");
     }
 }					
 
@@ -657,8 +708,14 @@ statement st ;
 {
     instruction i ;
     static int indent = 0 ;
+
+    /*
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+    */
     
-    if (get_debug_level() > 0) {
+    ifdebug(2) {
 	fprintf( stderr, "%*s> Statement %x (%d):\n", 
 		 indent++, "", (unsigned)st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
@@ -680,6 +737,7 @@ statement st ;
 	inout_call( st, instruction_loop( i )) ;
 	break ;
     case is_instruction_goto: 
+	pips_error( "inout_statement", "Unexpected tag %d\n", i ) ;
 	break ;
     case is_instruction_unstructured:
 	inout_unstructured( st, instruction_unstructured( i )) ;
@@ -687,7 +745,7 @@ statement st ;
     default:
 	pips_error( "inout_statement", "Unknown tag %d\n", i ) ;
     }
-    if (get_debug_level() > 0) {
+    ifdebug(2) {
 	fprintf( stderr, "%*s> Statement %x (%d):\n", 
 		 indent--, "", (unsigned)st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
@@ -695,6 +753,12 @@ statement st ;
 	local_print_statement_set( "REF_IN", REF_IN( st )) ;
 	local_print_statement_set( "REF_OUT", REF_OUT( st )) ;
     }
+
+    /*
+    ifdebug(1) {
+	mem_spy_end("inout_statement");
+    }
+    */
 }
 
 /* INOUT_CONTROL computes the in and out sets of the structured control
@@ -714,7 +778,12 @@ control ct ;
     set diff = MAKE_STATEMENT_SET() ;
     cons *blocs = NIL ;
 
-    if (get_debug_level() > 0) {
+    ifdebug(1) {
+	mem_spy_begin();
+	mem_spy_begin();
+    }
+
+    ifdebug(2) {
 	fprintf(stderr, "Computing DEF_IN and OUT of control %x entering", 
 		(unsigned)ct ) ;
 	local_print_statement_set( "", DEF_IN( control_statement( ct ))) ;
@@ -731,8 +800,13 @@ control ct ;
 		     }},
 		 ct, blocs ) ;
 
+    ifdebug(1) {
+	mem_spy_end("inout_control: phase 1");
+	mem_spy_begin();
+    }
+
     for( change = TRUE ; change ; ) {
-	if (get_debug_level() > 0) {
+	ifdebug(3) {
  	    fprintf( stderr, "Iterating on %x ...\n", (unsigned)ct ) ;
 	}
 	change = FALSE ;
@@ -759,6 +833,11 @@ control ct ;
 			!set_equal( r_oldout, REF_OUT( st )));
 	 }, ct, blocs ) ;
     }
+
+    ifdebug(1) {
+	mem_spy_end("inout_control: phase 2 (fix-point)");
+	mem_spy_begin();
+    }
     CONTROL_MAP( c, {inout_statement( control_statement( c ));},
 		 ct, blocs ) ;
     set_free( d_oldout ) ;
@@ -767,6 +846,11 @@ control ct ;
     set_free( r_out ) ;
     set_free( diff ) ;
     gen_free_list( blocs ) ;
+
+    ifdebug(1) {
+	mem_spy_end("inout_control: phase 3");
+	mem_spy_end("inout_control");
+    }
 }
 
 /* PUSHNEW_CONFLICTS adds the conflict FIN->FOUT in the list CS (if it's
@@ -786,7 +870,7 @@ cons *cfs ;
 	}
     }, cfs ) ;
     c = make_conflict( fin, fout, cone_undefined) ;
-    if (get_debug_level() > 0) {
+    ifdebug(2) {
 	fprintf( stderr, "Adding %s->%s\n", 
 		entity_name( effect_entity( fin )),
 		entity_name( effect_entity( fout ))) ;
@@ -831,7 +915,11 @@ bool (*which)() ;
     cons *effect_outs = load_statement_effects( stout ) ;
     cons *cs = NIL ;
 
-    if (get_debug_level() > 0) {
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+
+    ifdebug(2) {
 	fprintf( stderr, "Conflicts %d(%x) -> %d(%x) %s\n",
 		statement_number( stin ), (unsigned)stin,
 		statement_number( stout ), (unsigned)stout,
@@ -869,6 +957,10 @@ bool (*which)() ;
 	    
 	vertex_successors( vin ) = 
 		CONS( SUCCESSOR, s, vertex_successors( vin )) ;
+    }
+
+    ifdebug(1) {
+	mem_spy_end("add_conflicts");
     }
 }
 
@@ -917,9 +1009,17 @@ control c ;
 {
     cons *blocs = NIL ;
 
+    ifdebug(1) {
+	mem_spy_begin();
+    }
+
     CONTROL_MAP( n, {usedef_statement( control_statement( n ));},
 		 c, blocs ) ;
     gen_free_list( blocs ) ;
+
+    ifdebug(1) {
+	mem_spy_end("usedef_control");
+    }
 }
 
 
@@ -956,6 +1056,16 @@ int use;
     graph module_graph;
     void print_graph() ;
 
+    debug_on("CHAINS_DEBUG_LEVEL");
+
+    ifdebug(1) {
+	mem_spy_init(0, 100000., NET_MEASURE, 0);
+	mem_spy_begin();
+	mem_spy_begin();
+    }
+
+    debug_off();
+
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     module_stat = get_current_module_statement();
@@ -963,6 +1073,11 @@ int use;
     /* set_entity_to_size(); should be performed at the workspace level */
 
     debug_on("CHAINS_DEBUG_LEVEL");
+
+    ifdebug(1) {
+	mem_spy_end("Chains: resources loaded");
+	mem_spy_begin();
+    }
    
     debug(1, "chains", "finding enclosing loops ...\n");
     set_enclosing_loops_map( loops_mapping_of_statement(module_stat) );
@@ -978,14 +1093,20 @@ int use;
     }
     set_effects(module_name,use);
 
-    /* */
+    ifdebug(1) {
+	mem_spy_end("Chains: Preamble");
+	mem_spy_begin();
+    }
+
     module_graph = 
 	dependence_graph(instruction_unstructured(module_inst));
-	/* */
 
-    /* module_graph = statement_dependence_graph(module_stat); */
+    ifdebug(1) {
+	mem_spy_end("Chains: Computation");
+	mem_spy_begin();
+    }
 
-    if (get_debug_level() > 0)
+    ifdebug(2)
 	print_graph(stderr, module_stat, module_graph);
 
     debug_off();
@@ -1002,6 +1123,14 @@ int use;
     reset_current_module_statement();
     reset_current_module_entity();
     /* reset_entity_to_size(); */
+
+    debug_on("CHAINS_DEBUG_LEVEL");
+    ifdebug(1) {
+	mem_spy_end("Chains: Deallocation");
+	mem_spy_end("Chains");
+	mem_spy_reset();
+    }
+    debug_off();
 
     return TRUE;
 }
@@ -1020,6 +1149,11 @@ unstructured u ;
     keep_read_read_dependences = 
 	    get_bool_property( "KEEP_READ_READ_DEPENDENCE" ) ;
 
+    ifdebug(1) {
+	mem_spy_begin();
+	mem_spy_begin();
+    }
+
     Gen = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
     Ref = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
     Kill = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
@@ -1035,7 +1169,12 @@ unstructured u ;
     usedef_control( c ) ;
 
 #define TABLE_FREE(t) \
-{HASH_MAP( k, v, {set_free( (set)v ) ;}, t ) ; hash_table_free(t);}
+    {HASH_MAP( k, v, {set_free( (set)v ) ;}, t ) ; hash_table_free(t);}
+
+    ifdebug(1) {
+	mem_spy_end("dependence_graph: after computation");
+	mem_spy_begin();
+    }
 
     TABLE_FREE( Gen ) ;
     TABLE_FREE( Ref ) ;
@@ -1047,6 +1186,12 @@ unstructured u ;
     TABLE_FREE( Defs ) ;
 
     hash_table_free( Vertex_statement ) ;
+
+
+    ifdebug(1) {
+	mem_spy_end("dependence graph: after freeing the hash tables");
+	mem_spy_end("dependence_graph");
+    }
 
     return( dg ) ;
 }
@@ -1178,13 +1323,13 @@ int use;
 
 static void reset_effects()
 {
-    reset_proper_effects_map();
+    free_proper_effects_map();
     if (rgch) {
-	reset_local_regions_map();
+	free_local_regions_map();
     }
     if (iorgch) {
-	reset_in_regions_map();
-	reset_out_regions_map();
+	free_in_regions_map();
+	free_out_regions_map();
     }
 }
 
