@@ -142,8 +142,9 @@ bool
 pipsdbm_check_statement_mapping(statement_mapping h)
 {
     STATEMENT_MAPPING_MAP(k, v, {
-	pips_assert("consistent statement", gen_consistent_p((statement) k));
-	pips_assert("consistent val", gen_consistent_p((gen_chunkp) v));
+	pips_assert("consistent statement", 
+		    statement_consistent_p((statement) k));
+	pips_assert("consistent val", gen_consistent_p((void*) v));
     },
 	h);
     return TRUE;
@@ -152,7 +153,7 @@ pipsdbm_check_statement_mapping(statement_mapping h)
 void
 pipsdbm_free_statement_mapping(statement_mapping h)
 {
-    STATEMENT_MAPPING_MAP(k, v, gen_free((gen_chunkp) v), h);
+    STATEMENT_MAPPING_MAP(k, v, gen_free((void*) v), h);
     FREE_STATEMENT_MAPPING(h);
 }
 
@@ -167,8 +168,8 @@ pipsdbm_free_statement_mapping(statement_mapping h)
       char *_map_k; char *_map_v;					\
       while ((_map_hash_p =						\
 	   hash_table_scan(_map_hash_h,_map_hash_p,&_map_k,&_map_v))) {	\
-        statement k = ((gen_chunk*)_map_k)->p ;				\
-        gen_chunkp v = ((gen_chunk*)_map_v)->p;				\
+        statement k = (statement) ((gen_chunkp)_map_k)->p ;		\
+        gen_chunkp v = ((gen_chunkp)_map_v)->p;				\
         code ; }}
 
 /* count the number of statements with a valid ordering. */
@@ -187,8 +188,8 @@ pipsdbm_consistent_statement_function(gen_chunkp map)
     hash_table h = (map+1)->h;
     STATEMENT_FUNCTION_MAP(s, x, 
     {
-	if (gen_type(s)!=statement_domain) return FALSE;
-	if (!gen_consistent_p(x)) return FALSE;
+	if (gen_type((void*)s)!=statement_domain) return FALSE;
+	if (!gen_consistent_p((void*)x)) return FALSE;
     },
 	h);
     return TRUE;
@@ -270,7 +271,7 @@ free_static_control_mapping(statement_mapping map)
         static_control_loops((static_control) val)=NULL;
         static_control_tests((static_control) val)=NULL;
         static_control_params((static_control) val)=NULL;
-        gen_free( (static_control) val );
+        gen_free( (void*) val );
     }, map);
 
     FREE_STATEMENT_MAPPING(map);
