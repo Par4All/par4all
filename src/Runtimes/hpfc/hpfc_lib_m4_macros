@@ -1,7 +1,7 @@
 dnl
 dnl GENERAL M4 MACROS
 dnl
-dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1996/09/07 15:48:36 $, )
+dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1996/10/17 14:27:35 $, )
 dnl version $Revision$
 dnl got on %D%, %T%
 dnl
@@ -39,11 +39,11 @@ define(`TO7',`eval(7-$1)')dnl
 dnl
 dnl VERSIONS
 dnl
-ifdef(`DEBUG',`define(`debug',`$@')',`define(`debug')')dnl
-ifdef(`DEMO',`define(`demo',`$@')',`define(`demo')')dnl
-ifdef(`DIRECT',`define(`_direct',`$@')',`define(`_direct')')dnl
-ifdef(`SYNC_EXIT',`define(`sync_exit',`$@')',`define(`sync_exit')')dnl
-ifdef(`FAKE_BUFFERS',`define(`fake_buffers',`$@')',`define(`fake_buffers')')dnl
+ifdef(`_HPFC_DEBUG_',`define(`debug',`$@')',`define(`debug')')dnl
+ifdef(`_HPFC_DEMO_',`define(`demo',`$@')',`define(`demo')')dnl
+ifdef(`_HPFC_DIRECT_',`define(`_direct',`$@')',`define(`_direct')')dnl
+ifdef(`_HPFC_SYNC_EXIT_',`define(`sync_exit',`$@')',`define(`sync_exit')')dnl
+ifdef(`_HPFC_FAKE_BUFFERS_',`define(`fake_buffers',`$@')',`define(`fake_buffers')')dnl
 dnl
 dnl ARCHITECTURES
 dnl
