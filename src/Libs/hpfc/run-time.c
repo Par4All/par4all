@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1996/03/20 19:09:46 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1996/03/21 15:56:05 $, )
  * version $Revision$,
  */
 
@@ -410,31 +410,47 @@ string side;
 int dim;
 {
     char buffer[100]; /* ??? */
-
     return strdup(sprintf(buffer, "%s_%s_%s%d",
 			  hpfc_main_entity_name(array),
-			  entity_local_name(array),
-			  side,
-			  dim));
+			  entity_local_name(array), side, dim));
+}
+
+entity 
+argument_bound_entity(
+    entity module,
+    entity array,
+    bool upper,
+    int dim)
+{
+    entity result;
+    string name = bound_parameter_name(array, upper? UPPER: LOWER, dim);
+
+    result = find_or_create_typed_entity(name, module_local_name(module), 
+					 is_basic_int);
+
+    free(name);
+    return result;
 }
 
 expression 
-hpfc_array_bound(entity array, int dim, string what)
+hpfc_array_bound(entity array, bool upper, int dim)
 {
-    char *bf = bound_parameter_name(array, what, dim);
-    expression e = MakeCharacterConstantExpression(bf);
-    free(bf);
-    return e;
+    /*
+    return entity_to_expression
+	(argument_bound_entity(node_module, array, upper, dim)); 
+	*/
+    return MakeCharacterConstantExpression(bound_parameter_name(array, 
+			 upper?UPPER:LOWER, dim));
 }
 
-list /* of expressions */
-array_bounds_list(entity array, string what)
+static list /* of expressions */
+array_bounds_list(entity array, bool upper)
 {
     int	i = -1,	ndim = NumberOfDimension(array);
     list result = NIL;
 
     for (i=ndim ; i>=1 ; i--)
-	result = CONS(EXPRESSION, hpfc_array_bound(array, i, what), result);
+	result = CONS(EXPRESSION, hpfc_array_bound(array, upper, i), result);
 
     return result;
 }
@@ -442,8 +458,8 @@ array_bounds_list(entity array, string what)
 list /* of expressions */
 array_lower_upper_bounds_list(entity array)
 {
-    list /* of expression */ lb = array_bounds_list(array, LOWER),
-    			     lu = array_bounds_list(array, UPPER),
+    list /* of expression */ lb = array_bounds_list(array, FALSE),
+    			     lu = array_bounds_list(array, TRUE),
     			     l = lb, lnb, lnu;
 
     if (!l) return NIL;
