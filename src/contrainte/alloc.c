@@ -142,6 +142,8 @@ Pcontrainte c;
 	    c->vecteur = NULL;
 	}
 
+	c->succ = NULL;
+
 	free((char *)c);
     }
     return(CONTRAINTE_UNDEFINED);
