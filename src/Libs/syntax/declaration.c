@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 16:39:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 19:11:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 16:39:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 19:11:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -886,8 +886,7 @@ entity e;
  */
 
 bool 
-implicit_type_p(e)
-entity e;
+implicit_type_p(entity e)
 {
     int i;
     string s = entity_local_name(e);
@@ -903,10 +902,15 @@ entity e;
     if (s[0] == '_')
 	    s++;
     if (!(IS_UPPER(s[0]))) {
-	pips_error("implicit_type_p", "[implicit_type_p] bad name: %s\n", s);
+	pips_internal_error("bad name: %s\n", s);
 	FatalError("implicit_type_p", "\n");
     }
     i = (int) (s[0] - 'A');
+
+    /* ASSERT */
+    if (!type_variable_p(t))
+	pips_internal_error("expecting a variable for %s, got tag %d\n",
+			    entity_name(e), type_tag(t));
 
     b = variable_basic(type_variable(t));
 
@@ -919,14 +923,12 @@ entity e;
 	case is_basic_logical: return basic_logical(b)==int_implicit[i];
 	case is_basic_complex: return basic_complex(b)==int_implicit[i];
 	case is_basic_overloaded:
-	    pips_error("implicit_type_p", 
-		       "[implicit_type_p] unexpected overloaded basic tag\n");
+	    pips_internal_error("unexpected overloaded basic tag\n");
 	case is_basic_string: 
 	    return constant_int(value_constant(basic_string(b)))==
 		int_implicit[i];
 	default:
-	    pips_error("implicit_type_p", 
-		       "[implicit_type_p] illegal basic tag\n");
+	    pips_internal_error("illegal basic tag\n");
 	}
     return FALSE; /* to please gcc */
 }
