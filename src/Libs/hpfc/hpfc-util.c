@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/22 11:27:09 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1994/12/22 16:52:17 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -105,7 +105,7 @@ entity e;
     entity template;
     distribute d;
 
-    pips_assert("replicated_p", array_distributed_p(e));
+    assert(array_distributed_p(e));
 
     a = load_entity_align(e);
     la = align_alignment(a);    
@@ -364,7 +364,7 @@ entity model;
 	  "entity %s to be made after %s\n",
 	  new_name, entity_name(model));
 
-    pips_assert("FindOrCreateEntityLikeModel", gen_consistent_p(model));
+    assert(gen_consistent_p(model));
 
     return(!entity_undefined_p(new) ?
 	   new :
@@ -539,7 +539,7 @@ int dim, *pdim;
 	i,
 	procdim = 1;
 
-    pips_assert("FindDistributionOfDim",((dim>=1) && (dim<=gen_length(ldi))));
+    assert(dim>=1 && dim<=gen_length(ldi));
 
     for (i=1; i<dim; i++) 
     {
@@ -712,8 +712,7 @@ int dim, acell;
     int
 	rate, constant;
 
-    pips_assert("global_array_cell_to_local_array_cell",
-		(a!=alignment_undefined));
+    assert(a!=alignment_undefined);
 
     rate     = HpfcExpressionToInt(alignment_rate(a));
     constant = HpfcExpressionToInt(alignment_constant(a));
@@ -768,20 +767,20 @@ int dim, *ptdim, *pa, *pb;
     alignment
 	a = alignment_undefined;
     
-    pips_assert("get_alignment", array_distributed_p(array));
+    assert(array_distributed_p(array));
     
     *ptdim = template_dimension_of_array_dimension(array, dim);
     a = FindAlignmentOfTemplateDim(align_alignment(al), *ptdim);
 
     if (a==alignment_undefined)
     {
-	pips_assert("get_alignment", *ptdim==0);
+	assert(*ptdim==0);
 	*pa = 0;
 	*pb = 0;
     }
     else
     {
-	pips_assert("get_alignment", *ptdim>=1);
+	assert(*ptdim>=1);
 	*pa = HpfcExpressionToInt(alignment_rate(a));
 	*pb = HpfcExpressionToInt(alignment_constant(a));
     }
@@ -807,14 +806,12 @@ int dim, *plow, *pup;
     dimension
 	d = dimension_undefined;
 
-    pips_assert("get_entity_dimensions",
-		entity_variable_p(e) && dim>0 && dim<=7);
+    assert(entity_variable_p(e) && dim>0 && dim<=7);
 
     d = entity_ith_dimension(e, dim),
     *plow = ExpressionToInt(dimension_lower(d)),
     *pup = ExpressionToInt(dimension_upper(d));
 }
 
-/*
- * that's all
+/*   that is all
  */
