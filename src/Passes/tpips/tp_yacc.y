@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.80  1998/05/05 08:50:01  coelho
+ * close accpet the current workspace name as an argument.
+ *
  * Revision 1.79  1998/04/29 08:24:11  coelho
  * show added.
  *
@@ -277,6 +280,39 @@ static void tp_system(string s)
 			  status%256, status/256);
 }
 
+static bool tp_close_the_workspace(string s)
+{
+    bool result = TRUE;
+
+    pips_debug(7, "reduce rule i_close\n");
+    
+    if (tpips_execution_mode) 
+    {
+	string current = db_get_current_workspace_name();
+
+	if (current!=NULL && s!=NULL) 
+	{
+	    if (same_string_p(s, current))
+	    {
+		close_workspace ();
+		result = TRUE;
+	    }
+	    else
+	    {
+		pips_user_error("must close the current workspace!\n");
+		result = FALSE;
+	    }
+	}
+	else {
+	    pips_user_error("No workspace to close. Open or create one!\n");
+	    result = FALSE;
+	}	
+	result = TRUE;
+    }
+
+    return result;
+}
+
 %}
 
 %union {
@@ -541,22 +577,13 @@ i_create: TK_CREATE TK_NAME /* workspace name */
 	}
 	;
 
-i_close: TK_CLOSE TK_ENDOFLINE
+i_close: TK_CLOSE /* assume current workspace */ TK_ENDOFLINE
 	{
-	    pips_debug(7,"reduce rule i_close\n");
-
-	    if (tpips_execution_mode) {
-		if (db_get_current_workspace_name() != NULL) {
-		    close_workspace ();
-		    $$ = TRUE;
-		}
-		else {
-		    pips_user_error("No workspace to close. "
-				    "Open or create one!\n");
-		    $$ = FALSE;
-		}	
-		$$ = TRUE;
-	    }
+	    $$ = tp_close_the_workspace(db_get_current_workspace_name());
+	}
+	| TK_CLOSE TK_NAME /* workspace name */ TK_ENDOFLINE
+	{
+	    $$ = tp_close_the_workspace($2);
 	}
 	;
 
