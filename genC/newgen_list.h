@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1998/04/14 21:42:37 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1998/12/08 09:24:08 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -116,6 +116,7 @@ extern list gen_some  GEN_PROTO(( bool(*)(), list )) ;
 extern void gen_insert_after GEN_PROTO((void *, void *, list )) ;
 extern list gen_once GEN_PROTO((void *, list));
 extern bool gen_in_list_p GEN_PROTO((void *, list));
+extern bool gen_once_p GEN_PROTO((list));
 extern void gen_sort_list GEN_PROTO((list, int (*)())) ;
 extern void gen_closure GEN_PROTO((list (*)(), list));
 extern list gen_make_list GEN_PROTO((int, ...));
