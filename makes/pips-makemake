@@ -3,10 +3,7 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
-# Revision 1.283  1997/05/22 16:43:19  coelho
-# *** empty log message ***
-#
-# Revision 1.282  1997/05/22 16:37:48  coelho
+# Revision 1.284  1997/05/23 12:20:45  coelho
 # *** empty log message ***
 #
 # Revision 1.276  1997/03/28 07:13:52  coelho
@@ -330,6 +327,13 @@ check_install:
 # is this appropriate?
 # .DEFAULT:; @echo "$MAKEFILE [\$(FWD_ROOT)] *** no rule for target $@!" >&2
 #
+ifdef PIPS_DIRECTORY_FOR_\$(ARCH)_BINARIES
+\$(ARCH):
+	# creating remote \$(ARCH) directory...
+	rdir=\$(PIPS_DIRECTORY_FOR_\$(ARCH)_BINARIES)/${SIDE}/${PART}/${target_dir};\\
+	test -d \$\$rdir || mkdir \$\$rdir ; \\
+	ln -s \$\$rdir \$(ARCH);
+else
 ifdef PIPS_DIRECTORY_FOR_BINARIES
 \$(ARCH):
 	# creating remote \$(ARCH) directory...
@@ -338,6 +342,7 @@ ifdef PIPS_DIRECTORY_FOR_BINARIES
 	ln -s \$\$rdir \$(ARCH);
 else
 \$(ARCH):; test -d \$(ARCH) || mkdir \$(ARCH)
+endif
 endif
 #
 include \$(ROOT)/Include/define_libraries.make
