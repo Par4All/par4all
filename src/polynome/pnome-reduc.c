@@ -84,6 +84,25 @@ Variable var;
     return(deg);
 }
 
+/* int polynome_max_degree(Ppolynome pp)
+ *  returns the degree of polynomial pp 
+ *  Let's hope there aren't too many negative powers...
+ *  If pp is POLYNOME_UNDEFINED: abort. [???]
+ */
+int polynome_max_degree(Ppolynome pp)
+{
+    int power, deg = 0;
+    Ppolynome m = POLYNOME_UNDEFINED;
+
+    /* polynome_degree: polynome is undefined */
+    assert(!POLYNOME_UNDEFINED_P(pp));
+    for(m = pp ; m != NIL; m = polynome_succ(m)) {
+	power = (int) vect_sum(monome_term(polynome_monome(m)));
+	if (deg < power) deg = power;
+    }
+    return deg;
+}
+
 
 /* Ppolynome polynome_factorize(Ppolynome pp, Variable var, int n)
  *  returns the (polynomial) coefficient of var^n in polynomial pp
