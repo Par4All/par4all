@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/01/04 19:07:45 $, 
+ * $Date: 1997/01/06 15:55:50 $, 
  *
  * adapted from whta can be seen by FC 31/12/96
  * 
@@ -10,6 +10,8 @@
  * - exit -> return
  * - close ifp
  * - bug labeled end (skipped) in lend()
+ * - tab in first columns...
+ * - bang comments added
  */
 
 /*
@@ -171,19 +173,21 @@ static int getline()
 static int lend()
 {
 	register char *p;
+	int tab = FALSE;
 
 	/* if ((p = skiplab(buf)) == 0)
 	    return (0) ; */ 
 
-	if (buf[0]!=' ') return 0;
-	if (buf[1]=='\t')
-	    p = &buf[2];
-	else
-	    if (buf[1] && buf[2] && buf[3] && buf[4] && 
-		buf[5]==' ' /* must not be a continuation! */)
-		p = &buf[6];
-	    else
-		return 0;
+	if (buf[0]!=' ' && buf[0]!='\t') 
+	    return 0; /* a comment */
+	for (p=buf; p<&buf[6] && !tab; p++)
+	{
+	    if (*p=='\0') return 0;
+	    if (*p=='\t') tab=TRUE;
+	}
+	
+	if (!tab && (buf[5]!=' ' && buf[5]!='\t')) 
+	    return 0; /* a continuation */
 	    
 	trim(p);
 	if (*p != 'e' && *p != 'E') return(0);
@@ -212,7 +216,7 @@ char *s;
 	char	line[LINESIZE], *iptr = line;
 
 	/* first check for comment cards */
-	if(buf[0] == 'c' || buf[0] == 'C' || buf[0] == '*') return(0);
+	if(buf[0]=='c' || buf[0]=='C' || buf[0]=='*' || buf[0]=='!') return 0;
 	ptr = buf;
 	while (*ptr == ' ' || *ptr == '\t') ptr++;
 	if(*ptr == '\n') return(0);
