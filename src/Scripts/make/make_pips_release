@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1997/03/27 15:23:37 $, 
+# $Date: 1997/04/02 10:40:36 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -38,7 +38,8 @@ usage()
 	  release content:
 	    -C: common (Share Doc Examples)
 	    -S: add sources (Include, Src [but not Public], Utils)
-	    -D dir: add directory dir (Validation?)
+	    -D dir: add directory dir (Examples?)
+	    -F file: add file content (Validation/exportonly?)
 	    -B arch: add binaries for arch (Runtime Bin/arch)
 	    -L arch: add libraries for arch (Lib/arch)
 	  software:
@@ -55,7 +56,7 @@ usage()
 #
 # get options
 
-while getopts hvrstzw:CSB:L:D:pnleP opt
+while getopts hvrstzw:CSB:L:D:F:pnleP opt
 do
     case $opt in
 	h) usage 0 some help ;;
@@ -72,6 +73,7 @@ do
 	B) what="$what  -d Runtime -d Bin/$OPTARG" ;
 	   name="${name}B$OPTARG" ;
 	   tostrip="$tostrip Bin/$OPTARG" ;;
+	F) what="$what -c $OPTARG" ;;
 	L) what="$what -d Lib/$OPTARG" ; name="${name}L$OPTARG" ;;
 	D) what="$what -d $OPTARG"  ; name="${name}D" ;;
 	p) pack="$pack PIPS" ; name="${name}p" ;;
