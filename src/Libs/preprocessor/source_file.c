@@ -190,7 +190,7 @@ FILE *fd;
 }
 
 
-void process_user_file(file)
+bool process_user_file(file)
 string file;
 {
     database pgm;
@@ -203,7 +203,7 @@ string file;
 
     if (! file_exists_p(file)) {
 	user_warning("process_user_file", "Cannot open file : %s\n", file);
-	return;
+	return FALSE;
     }
 
     if (tempfile == NULL) {
@@ -211,7 +211,7 @@ string file;
     }
 
     /* the current program is retrieved */
-    pgm = db_get_current_program();
+    pgm = db_get_current_workspace();
 
     /* the full path of file is calculated */
     abspath = strdup((*file == '/') ? file : 
@@ -226,7 +226,7 @@ string file;
     cwd = strdup(get_cwd());
     chdir(database_directory(pgm));
     /* reverse sort because the list of modules is reversed later */
-    system(concatenate("pips-split ", abspath,
+    safe_system(concatenate("pips-split ", abspath,
 		       "| sed -e /zzz00[0-9].f/d | sort -r > ",
 		       tempfile, NULL));
     chdir(cwd);
@@ -256,4 +256,5 @@ string file;
      */
     unlink(tempfile);
     tempfile = NULL;
+    return TRUE;
 }
