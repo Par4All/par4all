@@ -1,29 +1,8 @@
 /* Fabien Coelho, May 1993
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/04/10 18:49:33 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/04/21 10:28:15 $, )
  * version $Revision$
- */
-
-#include "defines-local.h"
-
-#include "control.h"     /* for CONTROL_MAP() */
-
-/* global variables
- */
-
-entity 
-    host_module,
-    node_module;
-
-#define debug_print_control(c)\
-  fprintf(stderr, \
-	  "control 0x%x (stat 0x%x) , %d predecessors, %d successors\n", \
-          (unsigned int) c, (unsigned int) control_statement(c), \
-	  gen_length(control_predecessors(c)), \
-	  gen_length(control_successors(c))); \
-  print_statement(control_statement(c));
-
-/*
+ *
  * Compiler
  *
  * stat is the current statement to be compiled, and there are
@@ -38,16 +17,30 @@ entity
  * I don't think this is a problem.
  */
 
+#include "defines-local.h"
+
+#include "control.h"     /* for CONTROL_MAP() */
+
+/* global variables
+ */
+entity 
+    host_module,
+    node_module;
+
+#define debug_print_control(c)\
+  fprintf(stderr, \
+	  "control 0x%x (stat 0x%x) , %d predecessors, %d successors\n", \
+          (unsigned int) c, (unsigned int) control_statement(c), \
+	  gen_length(control_predecessors(c)), \
+	  gen_length(control_successors(c))); \
+  print_statement(control_statement(c));
+
 static void hpf_compile_block(stat,hoststatp,nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
-    list 
-	lhost=NIL,
-	lnode=NIL;
-    statement 
-	hostcd,
-	nodecd;
+    list /* of statements */ lhost=NIL, lnode=NIL;
+    statement hostcd, nodecd;
 
     assert(instruction_block_p(statement_instruction(stat)));
 
@@ -72,12 +65,8 @@ statement s;
 statement *hoststatp,*nodestatp;
 {
     statement
-	s_true,
-	s_hosttrue,
-	s_nodetrue,
-	s_false,
-	s_hostfalse,
-	s_nodefalse;
+	s_true,	s_hosttrue, s_nodetrue,
+	s_false, s_hostfalse, s_nodefalse;
     test the_test;
     expression condition;
     
@@ -89,8 +78,7 @@ statement *hoststatp,*nodestatp;
     (*hoststatp) = MakeStatementLike(s, is_instruction_test);
     (*nodestatp) = MakeStatementLike(s, is_instruction_test);
 
-    /*
-     * if it may happen that a condition modifies the value
+    /* if it may happen that a condition modifies the value
      * of a distributed variable, this condition is to be
      * put out of the statement, for separate compilation.
      */
@@ -119,8 +107,7 @@ static void hpf_compile_call(stat, hoststatp, nodestatp)
 statement stat;
 statement *hoststatp,*nodestatp;
 {
-    call 
-	c = instruction_call(statement_instruction(stat));
+    call c = instruction_call(statement_instruction(stat));
 
     assert(instruction_call_p(statement_instruction(stat)));
 
@@ -135,7 +122,7 @@ statement *hoststatp,*nodestatp;
      */
     if (!ref_to_dist_array_p(c))
     {
-	list
+	list /* of expressions */
 	    leh=lUpdateExpr(host_module, call_arguments(c)),
 	    len=lUpdateExpr(node_module, call_arguments(c));
 	
@@ -160,10 +147,8 @@ statement *hoststatp,*nodestatp;
      */    
     if (ENTITY_ASSIGN_P(call_function(c)))
     {
-	list 
-	    lh = NIL,
-	    ln = NIL,
-	    args = call_arguments(c) ;
+	list /* of expressions */
+	    lh = NIL, ln = NIL, args = call_arguments(c) ;
 	expression 
 	    w = EXPRESSION(CAR(args)),
 	    r = EXPRESSION(CAR(CDR(args)));
@@ -387,16 +372,13 @@ statement *hoststatp,*nodestatp;
 static void hpf_compile_sequential_loop(stat,hoststatp,nodestatp)
 statement stat, *hoststatp, *nodestatp;
 {
-    loop
-	the_loop=statement_loop(stat);
+    loop the_loop=statement_loop(stat);
     statement
 	body=loop_body(the_loop),
 	hostbody,
 	nodebody;
-    range
-	r=loop_range(the_loop);
-    list
-	locals=loop_locals(the_loop);
+    range r=loop_range(the_loop);
+    list /* of entities */ locals=loop_locals(the_loop);
     entity
 	label=loop_label(the_loop),
 	index=loop_index(the_loop),
@@ -458,12 +440,7 @@ statement stat, *hoststatp, *nodestatp;
 static void hpf_compile_parallel_body(body, hoststatp, nodestatp)
 statement body, *hoststatp, *nodestatp;
 {
-    list
-	lw = NIL,
-	lr = NIL,
-	li = NIL,
-	ls = NIL,
-	lbs = NIL;
+    list lw = NIL, lr = NIL, li = NIL, ls = NIL, lbs = NIL;
 
     /* ???
      * dependances are not surely respected respected in the definitions list...
@@ -498,12 +475,9 @@ statement body, *hoststatp, *nodestatp;
 static void hpf_compile_parallel_loop(stat, hoststatp, nodestatp)
 statement stat, *hoststatp, *nodestatp;
 {
-    loop
-	the_loop = statement_loop(stat);
+    loop the_loop = statement_loop(stat);
     statement
-	s,
-	nodebody,
-	body = loop_body(the_loop);
+	s, nodebody, body = loop_body(the_loop);
     instruction
 	bodyinst = statement_instruction(body);
     entity
@@ -547,8 +521,7 @@ static void hpf_compile_loop(stat, hoststatp, nodestatp)
 statement stat;
 statement *hoststatp, *nodestatp;
 {
-    loop
-	the_loop = instruction_loop(statement_instruction(stat));
+    loop the_loop = instruction_loop(statement_instruction(stat));
 
     assert(statement_loop_p(stat));
 
@@ -612,27 +585,33 @@ statement *hoststatp, *nodestatp;
     }
 }
 
-/*
- * hpf_compiler
+/* void hpf_compiler(stat, hoststatp, nodestatp)
+ * statement stat, *hoststatp, *nodestatp;
  *
- * drive the compilation of the statement to the relevant
- * procedure.
- *
- * Recursive calls used in the top-down walk of the program.
+ * what: compile a statement intoi a host and SPMD node code.
+ * how: double code rewriting in a recursive traversal of stat.
+ * input: statement stat.
+ * output: statements *hoststatp and *nodestatp
+ * side effects: ?
+ * bugs or features:
+ *  - special care is made here of I/O and remappings.
  */
 void hpf_compiler(stat, hoststatp, nodestatp)
-statement stat;
-statement *hoststatp,*nodestatp;
+statement stat, *hoststatp, *nodestatp;
 {
     if (load_statement_only_io(stat)==TRUE) /* necessary */
     {
 	io_efficient_compile(stat,  hoststatp, nodestatp);
 	return;
     }
+    else if (bound_renamings_p(stat)) /* remapping */
+    {
+	remapping_compile(stat, hoststatp, nodestatp);
+	return;
+    }
     
     /* else usual stuff 
      */
-
     switch(instruction_tag(statement_instruction(stat)))
     {
     case is_instruction_block:
@@ -644,15 +623,13 @@ statement *hoststatp,*nodestatp;
     case is_instruction_loop:
 	hpf_compile_loop(stat, hoststatp, nodestatp);
 	break;
-    case is_instruction_goto:
-	pips_error("hpf_compiler", "there should be no goto!\n");
-	break;
     case is_instruction_call:
 	hpf_compile_call(stat, hoststatp, nodestatp);
 	break;
     case is_instruction_unstructured:
 	hpf_compile_unstructured(stat, hoststatp, nodestatp);
 	break;
+    case is_instruction_goto:
     default:
 	pips_error("hpf_compiler", "unexpected instruction tag\n");
 	break;
