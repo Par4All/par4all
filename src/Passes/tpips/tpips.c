@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.107  1998/07/10 18:09:02  coelho
+ * comments++
+ *
  * Revision 1.106  1998/07/03 08:09:54  coelho
  * tpips_usage options reordered.
  *
@@ -169,15 +172,13 @@ extern void tp_restart( FILE * ); /* tp_lex.c */
 
 #define SEPARATOR_P(c) (index (" \t", c))
 
-static bool 
-prefix_equal_p(string str, string prf)
+static bool prefix_equal_p(string str, string prf)
 {
     skip_blanks(str);
     return !strncmp(str, prf, strlen(prf));
 }
 
-static bool 
-string_is_true(string s)
+static bool string_is_true(string s)
 {
     return s && (*s=='1' || *s=='t' || *s=='T' || *s=='y' || *s=='Y' || 
 		 *s=='o' || *s=='O');
@@ -188,8 +189,8 @@ string_is_true(string s)
  * the default is FALSE, but if the user name is coelho.
  */
 #define TPIPS_IS_A_SHELL "TPIPS_IS_A_SHELL"
-bool 
-tpips_behaves_like_a_shell(void)
+
+bool tpips_behaves_like_a_shell(void)
 {
     return tpips_is_a_shell || get_bool_property(TPIPS_IS_A_SHELL) ||
 	string_is_true(getenv(TPIPS_IS_A_SHELL));
@@ -344,8 +345,7 @@ static char *tp_help_topics[] =
  * to start from scratch; without any state (i.e. STATE == 0), then we
  * start at the top of the list. 
  */
-static char *
-fun_generator(char *texte, int state)
+static char * fun_generator(char *texte, int state)
 {
     static int list_index, len;
     char *name;
@@ -376,8 +376,7 @@ fun_generator(char *texte, int state)
  * to start from scratch; without any state (i.e. STATE == 0), then we
  * start at the top of the list. 
  */
-static char *
-param_generator(char *texte, int state)
+static char * param_generator(char *texte, int state)
 {
     static int list_index, len;
     char *name;
@@ -488,8 +487,7 @@ param_generator(char *texte, int state)
  * entire line in case we want to do some simple parsing.  Return the
  * array of matches, or NULL if there aren't any. 
  */
-static char **
-fun_completion(char *texte, int start, int end)
+static char ** fun_completion(char *texte, int start, int end)
 {
 
     char **matches;
@@ -512,8 +510,7 @@ fun_completion(char *texte, int start, int end)
  * on command names if this is the first word in the line, or on filenames
  * if not. 
  */
-static void 
-initialize_readline(void)
+static void initialize_readline(void)
 {
     /* Allow conditional parsing of the ~/.inputrc file. */
     rl_readline_name = "Tpips";
@@ -570,8 +567,7 @@ static char * tpips_read_a_line(char * main_prompt)
 
 /************************************************* TPIPS HANDLERS FOR PIPS */
 
-static void 
-tpips_user_log(char *fmt, va_list args)
+static void tpips_user_log(char *fmt, va_list args)
 {
     FILE * log_file = get_log_file();
 
@@ -595,8 +591,7 @@ tpips_user_log(char *fmt, va_list args)
 #define BEGIN_RQ	"begin_user_request"
 #define END_RQ		"end_user_request"
 
-static string 
-tpips_user_request(string fmt, va_list args)
+static string tpips_user_request(string fmt, va_list args)
 {
     char * response;
 
@@ -628,10 +623,10 @@ tpips_user_request(string fmt, va_list args)
 #define BEGIN_UE	"begin_user_error"
 #define END_UE		"end_user_error"
 
-static void 
-tpips_user_error(string calling_function_name,
-		 string a_message_format,
-		 va_list *some_arguments)
+static void tpips_user_error(
+    string calling_function_name,
+    string a_message_format,
+    va_list *some_arguments)
 {
     /* extern jmp_buf pips_top_level; */
     jmp_buf * ljbp = 0;
@@ -666,8 +661,7 @@ tpips_user_error(string calling_function_name,
  *  - $TPIPS_HISTORY (if any)
  *  - $HOME/"TPIPS_HISTORY"
  */
-static string 
-default_hist_file_name(void)
+static string default_hist_file_name(void)
 {
     string home, hist = getenv(TPIPS_HISTENV);
     if (hist) return strdup(hist);
@@ -677,8 +671,7 @@ default_hist_file_name(void)
     return strdup(concatenate(home? home: "", "/", TPIPS_HISTORY, 0));
 }
 
-static void
-initialize_tpips_history(void)
+static void initialize_tpips_history(void)
 {
     string file_name = default_hist_file_name();
     
@@ -696,8 +689,7 @@ initialize_tpips_history(void)
   if (!*line || prefix_equal_p(line, prefix)) {	\
       printf(simple); if (*line) printf(full);}
 
-void 
-tpips_help(string line)
+void tpips_help(string line)
 {
     skip_blanks(line);
 
@@ -860,8 +852,7 @@ tpips_help(string line)
     fflush(stdout);
 }
 
-void 
-tpips_close(void)
+void tpips_close(void)
 {
     /*   close history: truncate list and write history file
      */
@@ -904,8 +895,7 @@ static void handle(string line)
 /* whether some substitutions are needed...
  * variables are restricted to the ${xxx} syntax.
  */
-static bool
-line_with_substitutions(string line)
+static bool line_with_substitutions(string line)
 {
     while (*line) 
     {
@@ -919,8 +909,7 @@ line_with_substitutions(string line)
 
 /* returns an allocated string after shell substitutions.
  */
-static string
-tp_substitutions(string line)
+static string tp_substitutions(string line)
 {
     string substituted;
 
@@ -929,6 +918,9 @@ tp_substitutions(string line)
     if (!prefix_equal_p(line, "shell") && !prefix_equal_p(line, "!")
 	&& !prefix_equal_p(line, "#") && line_with_substitutions(line))
     {
+	/* substitutions are performed by forking sh;-)
+	 * however sh does not understand ~
+	 */
 	substituted = safe_system_substitute(line);
 	if (!substituted)
 	{
@@ -944,8 +936,7 @@ tp_substitutions(string line)
 }
 
 static bool tpips_init_done = FALSE;
-void 
-tpips_init(void)
+void tpips_init(void)
 {
     if (tpips_init_done) return;
 
@@ -964,15 +955,13 @@ tpips_init(void)
     tpips_init_done = TRUE;
 }
 
-static bool
-blank_or_comment_line_p(string line)
+static bool blank_or_comment_line_p(string line)
 {
     skip_blanks(line);
     return line[0]==TPIPS_COMMENT_PREFIX || line[0]=='\0';
 }
 
-void 
-tpips_exec(char * line)
+void tpips_exec(char * line)
 {
     jmp_buf pips_top_level;
 
@@ -1025,8 +1014,7 @@ tpips_exec(char * line)
 /* processing command line per line. 
  * might be called recursively thru source.
  */
-void 
-tpips_process_a_file(FILE * file, bool use_rl)
+void tpips_process_a_file(FILE * file, bool use_rl)
 {
     static bool readline_initialized = FALSE;
     char * line;
@@ -1067,8 +1055,7 @@ static string default_tpipsrc(void)
 extern char *optarg;
 extern int optind;
 
-static void 
-parse_arguments(int argc, char * argv[])
+static void parse_arguments(int argc, char * argv[])
 {
     int c;
     string tpipsrc = default_tpipsrc();
@@ -1213,8 +1200,7 @@ parse_arguments(int argc, char * argv[])
 
 /* MAIN: interactive loop and history management.
  */
-int 
-tpips_main(int argc, char * argv[])
+int tpips_main(int argc, char * argv[])
 {
     debug_on("TPIPS_DEBUG_LEVEL");
     pips_log_handler = tpips_user_log;
