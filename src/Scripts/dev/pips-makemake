@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/11 18:45:24 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/12 09:56:06 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -657,6 +657,9 @@ header: .header
 	touch $MAKEFILE.depend .depend 
 
 depend: $(INC_TARGET) .depend
+
+$MAKEFILE.depend:
+	$(MAKE) depend
 
 #
 # dependences are stored in another file which is simply included.
