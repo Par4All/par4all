@@ -17,9 +17,10 @@
 #include "contrainte.h"
 #include "sc.h"
 #include "matrice.h"
+#include "matrix.h"
 #include "sparse_sc.h"
 #include "conversion.h"
-#include "generation.h"
+/* #include "generation.h" */
 
 #include "loops_interchange.h"
 
@@ -33,12 +34,7 @@
  *        ...
  *  ENDDO
  */
-statement gener_DOSEQ(lls, pvg, base_oldindex, base_newindex, sc_newbase)
-cons *lls;
-Pvecteur pvg[];
-Pbase base_oldindex;
-Pbase base_newindex;
-Psysteme sc_newbase;
+statement gener_DOSEQ(cons *lls, Pvecteur *pvg, Pbase base_oldindex, Pbase base_newindex, Psysteme sc_newbase)
 {
     statement state_lhyp;
     instruction instr_lhyp;
@@ -99,8 +95,7 @@ Psysteme sc_newbase;
  * FI: should be replaced by interchange_two_loops(lls, 1, n)
  */
 
-statement interchange(lls)
-cons * lls;
+statement interchange(cons *lls)
 {
     Psysteme sci;			/* sc initial */
     Psysteme scn;			/* sc nouveau */
@@ -175,10 +170,7 @@ cons * lls;
     return(s_lhyp);
 }
 
-statement interchange_two_loops(lls, n1, n2)
-cons * lls;
-int n1;
-int n2;
+statement interchange_two_loops(cons *lls, int n1, int n2)
 {
     Psysteme sci;			/* sc initial */
     Psysteme scn;			/* sc nouveau */
