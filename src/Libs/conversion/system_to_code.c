@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/03 16:28:10 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1995/10/03 16:36:19 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -238,16 +238,12 @@ reset_information_for_code_optimizations()
 
 
 /* this functions returns bounds for variable var if both are available.
- * used thru a hook provided in Psysteme_to_code. This allows to provide
- * the code generation with some information that allow to improve the
- * generated code.
- * ??? Whether this should be here or not is another question. 
  */
-static boolean
+static boolean    /* whether bounds were found */
 range_of_variable(
-    Variable var, 
-    Value * lb,
-    Value * ub)
+    Variable var, /* the VARiable */
+    Value * lb,   /* Lower Bound */
+    Value * ub)   /* Upper Bound */
 {
     if (lowers_undefined_p() || uppers_undefined_p()) 
 	return FALSE; /* no information available, that's for sure */
