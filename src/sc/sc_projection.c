@@ -861,3 +861,28 @@ Variable v;
     Value coeff;
     return contrainte_var_min_coeff(contraintes, v, &coeff, TRUE);
 }
+
+boolean sc_expensive_projection_p(sc,v)
+Psysteme sc;
+Variable v;
+{
+    boolean expensive = FALSE;
+    /* if Variable v is constrained by  equalities, the system size 
+       is kept (-1) after projection */
+    if (!var_in_lcontrainte_p(sc->egalites,v) 
+	 &&  sc->nb_ineq > NB_CONSTRAINTS_MAX_FOR_FM) {
+	Pcontrainte ineg;
+	int nb_pvar, nb_nvar =0;
+	for (ineg=sc->inegalites;!CONTRAINTE_UNDEFINED_P(ineg);
+	     ineg=ineg->succ) {
+	    int coeff= vect_coeff(v,ineg->vecteur);
+	    if (coeff >0)  nb_pvar ++;
+	    else if (coeff<0) nb_nvar ++;
+	}
+       if (nb_pvar*nb_nvar>200) 
+	   expensive=TRUE; 
+    }
+    return (expensive);
+
+
+}
