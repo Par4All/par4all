@@ -132,7 +132,7 @@ boolean infer;
     /* calcul du determinant de h */
     determinant = VALUE_ONE;
     for (i= 1; i<=n; i++)
-	value_prod(determinant, MATRIX_ELEM(h,i,i));
+	value_product(determinant, MATRIX_ELEM(h,i,i));
 
     /* calcul du denominateur de inv_h */
     gcd = pgcd(deno1,determinant);
@@ -141,8 +141,8 @@ boolean infer;
 	value_division(determinant,gcd);
     }
     if (value_neg_p(determinant)){
-	deno1 = value_uminus(deno1); 
-	determinant = value_uminus(determinant);
+	value_oppose(deno1); 
+	value_oppose(determinant);
     }
     MATRIX_DENOMINATOR(inv_h) = determinant;
     /* calcul des sub_determinants des Aii */
@@ -150,7 +150,7 @@ boolean infer;
 	sub_determinant = VALUE_ONE;
 	for (j=1; j<=n; j++)
 	    if (j != i)
-		value_prod(sub_determinant, MATRIX_ELEM(h,j,j));
+		value_product(sub_determinant, MATRIX_ELEM(h,j,j));
 	MATRIX_ELEM(inv_h,i,i) = value_mult(sub_determinant,deno1);
     }
     /* calcul des sub_determinants des Aij (i<j) */
