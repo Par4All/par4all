@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/09/01 15:47:39 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/09/03 15:19:34 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -128,13 +128,15 @@ statement *hoststatp,*nodestatp;
     pips_assert("hpfcompileblock",
 		(instruction_block_p(statement_instruction(stat))));
 
-    (*hoststatp)=MakeStatementLike(stat,
-				   is_instruction_block,
-				   get_host_gotos_map());
+    (*hoststatp) =
+	MakeStatementLike(stat,
+			  is_instruction_block,
+			  get_host_gotos_map());
 
-    (*nodestatp)=MakeStatementLike(stat,
-				   is_instruction_block,
-				   get_node_gotos_map());
+    (*nodestatp) =
+	MakeStatementLike(stat,
+			  is_instruction_block,
+			  get_node_gotos_map());
 
     MAPL(cs,
      {
@@ -173,13 +175,15 @@ statement *hoststatp,*nodestatp;
     the_test = instruction_test(statement_instruction(stat));
     condition = test_condition(the_test);
     
-    (*hoststatp)=MakeStatementLike(stat,
-				   is_instruction_test,
-				   get_host_gotos_map());
+    (*hoststatp) =
+	MakeStatementLike(stat,
+			  is_instruction_test,
+			  get_host_gotos_map());
 
-    (*nodestatp)=MakeStatementLike(stat,
-				   is_instruction_test,
-				   get_node_gotos_map());
+    (*nodestatp) =
+	MakeStatementLike(stat,
+			  is_instruction_test,
+			  get_node_gotos_map());
 
     /*
      * if it may happen that a condition modifies the value
@@ -187,8 +191,8 @@ statement *hoststatp,*nodestatp;
      * put out of the statement, for separate compilation.
      */
 
-    stattrue=test_true(the_test);
-    statfalse=test_false(the_test);
+    stattrue = test_true(the_test);
+    statfalse = test_false(the_test);
 
     hpfcompiler(stattrue, &stathosttrue, &statnodetrue);
     hpfcompiler(statfalse, &stathostfalse, &statnodefalse);
@@ -291,12 +295,14 @@ statement *hoststatp,*nodestatp;
      * code being compiled, and the link will be reduced later.
      */
     
-    (*hoststatp)=MakeStatementLike(stat,
-				   is_instruction_goto,
-				   get_host_gotos_map());
-    (*nodestatp)=MakeStatementLike(stat,
-				   is_instruction_goto,
-				   get_node_gotos_map());
+    (*hoststatp) =
+	MakeStatementLike(stat,
+			  is_instruction_goto,
+			  get_host_gotos_map());
+    (*nodestatp) =
+	MakeStatementLike(stat,
+			  is_instruction_goto,
+			  get_node_gotos_map());
     
     instruction_goto(statement_instruction(*hoststatp))=
 	instruction_goto(statement_instruction(stat));
@@ -433,12 +439,15 @@ statement *hoststatp,*nodestatp;
 	    }
 	}
 
-	(*hoststatp) = MakeStatementLike(stat, 
-					 is_instruction_block, 
-					 get_host_gotos_map());
-	(*nodestatp) = MakeStatementLike(stat, 
-					 is_instruction_block,
-					 get_node_gotos_map());
+	(*hoststatp) =
+	    MakeStatementLike(stat, 
+			      is_instruction_block, 
+			      get_host_gotos_map());
+
+	(*nodestatp) = 
+	    MakeStatementLike(stat, 
+			      is_instruction_block,
+			      get_node_gotos_map());
 	
 	instruction_block(statement_instruction(*hoststatp)) = lh;
 	instruction_block(statement_instruction(*nodestatp)) = ln;
@@ -478,7 +487,8 @@ statement *hoststatp,*nodestatp;
 	 * ??? there may be a problem with the label of the statement, if any.
 	 */
 	hpfcompiler
-	    (control_statement(unstructured_control(instruction_unstructured(inst))),
+	    (control_statement
+	     (unstructured_control(instruction_unstructured(inst))),
 	     hoststatp,
 	     nodestatp);
     }
@@ -491,59 +501,147 @@ statement *hoststatp,*nodestatp;
 	    u=instruction_unstructured(inst);
 	control 
 	    ct = unstructured_control(u),
-	    ce = unstructured_exit(u);
+	    ce = unstructured_exit(u),
+	    new_ct = control_undefined,
+	    new_ce = control_undefined,
+	    nodec = control_undefined,
+	    hostc = control_undefined;
+	statement 
+	    statc = statement_undefined,
+	    stath = statement_undefined,
+	    statn = statement_undefined;
+
 	list 
 	    blocks = NIL;
 
-	CONTROL_MAP(c,
-		{
-		    statement
-			statc=control_statement(c);
-		    statement
-			stath;
-		    statement
-			statn;
-		    control
-			hostc;
-		    control
-			nodec;
+	debug(6, "hpfcompileunstructured", "beginning\n");
 
-		    hpfcompiler(statc,&stath,&statn);
-		    
-		    hostc = make_control(stath,NULL,NULL);
-		    SET_CONTROL_MAPPING(hostmap, c, hostc);
-
-		    nodec = make_control(statn,NULL,NULL);
-		    SET_CONTROL_MAPPING(nodemap, c, nodec);
-		    
-		},
-		    ct,
-		    blocks);
-
+	CONTROL_MAP
+	    (c,
+	 {
+	     statc=control_statement(c);
+	     
+	     hpfcompiler(statc, &stath, &statn);
+	     
+	     ifdebug(7)
+	     {
+		 fprintf(stderr, "[hpfcompileunstructured] statements:\n");
+		 fprintf(stderr, "statc = \n");
+		 print_statement(statc);
+		 fprintf(stderr, "host stat = \n");
+		 print_statement(stath);
+		 fprintf(stderr, "node stat = \n");
+		 print_statement(statn);
+	     }
+	     
+	     hostc = make_control(stath, NIL, NIL);
+	     SET_CONTROL_MAPPING(hostmap, c, hostc);
+	     
+	     nodec = make_control(statn, NIL, NIL);
+	     SET_CONTROL_MAPPING(nodemap, c, nodec);
+	 },
+	     ct,
+	     blocks);
+	
 	MAPL(cc,
 	 {
 	     control
 		 c = CONTROL(CAR(cc));
-
+	     
 	     update_control_lists(c, hostmap);
 	     update_control_lists(c, nodemap);
 	 },
 	     blocks);
 
-	(*hoststatp)=MakeStatementLike(stat,
-				       is_instruction_unstructured,
-				       get_host_gotos_map());
-	statement_instruction(instruction_unstructured(*hoststatp)) =
-	    make_unstructured((control) GET_CONTROL_MAPPING(hostmap,ct),
-			      (control) GET_CONTROL_MAPPING(hostmap,ce));
+#define debug_print_control(c)\
+  fprintf(stderr, \
+	  "control 0x%x (stat 0x%x) , %d predecessors, %d successors\n", \
+          (unsigned int) c, (unsigned int) control_statement(c), \
+	  gen_length(control_predecessors(c)), \
+	  gen_length(control_successors(c))); \
+  print_statement(control_statement(c));
 
-	(*nodestatp)=MakeStatementLike(stat,
-				       is_instruction_unstructured,
-				       get_node_gotos_map());
-	statement_instruction(instruction_unstructured(*nodestatp)) =
-	    make_unstructured((control) GET_CONTROL_MAPPING(nodemap,ct),
-			      (control) GET_CONTROL_MAPPING(nodemap,ce));
+	ifdebug(9)
+	{
+	    control
+		c_tmp = control_undefined,
+		h_tmp = control_undefined,
+		n_tmp = control_undefined;
 
+	    fprintf(stderr, "[hpfcompileunstructured] controls:\n");
+	    
+	    MAPL(cc,
+	     {
+		 c_tmp = CONTROL(CAR(cc));
+		 h_tmp = (control) GET_CONTROL_MAPPING(hostmap, c_tmp);
+		 n_tmp = (control) GET_CONTROL_MAPPING(nodemap, c_tmp);
+		 
+		 fprintf(stderr, "\nOriginal:\n");
+		 debug_print_control(c_tmp);
+		 fprintf(stderr, "Host:\n");
+		 debug_print_control(h_tmp);
+		 fprintf(stderr, "Node:\n");
+		 debug_print_control(n_tmp);
+	     },
+		 blocks);
+	}
+
+	/*    HOST statement
+	 */
+	(*hoststatp) = 
+	    MakeStatementLike(stat,
+			      is_instruction_unstructured,
+			      get_host_gotos_map());
+
+	new_ct = (control) GET_CONTROL_MAPPING(hostmap, ct);
+	new_ce = (control) GET_CONTROL_MAPPING(hostmap, ce);
+
+	pips_assert("hpfcompileunstructured",
+		    !control_undefined_p(new_ct) || 
+		    !control_undefined_p(new_ce));
+
+	ifdebug(9)
+	{
+	    fprintf(stderr,
+		    "[hpfcompileunstructured] host unstructured controls:\n");
+	    
+		 fprintf(stderr, "Main:\n");
+		 debug_print_control(new_ct);
+		 fprintf(stderr, "Exit:\n");
+		 debug_print_control(new_ce);
+	}
+
+	instruction_unstructured(statement_instruction(*hoststatp)) =
+	    make_unstructured(new_ct, new_ce);
+
+	ifdebug(7)
+	{
+	    fprintf(stderr, "[hpfcompileunstructured] host new stat:\n");
+	    print_statement(*hoststatp);
+	}
+
+	/*    NODE statement
+	 */
+	(*nodestatp) =
+	    MakeStatementLike(stat,
+			      is_instruction_unstructured,
+			      get_node_gotos_map());
+
+	new_ct = (control) GET_CONTROL_MAPPING(nodemap, ct);
+	new_ce = (control) GET_CONTROL_MAPPING(nodemap, ce);
+
+	pips_assert("hpfcompileunstructured",
+		    !control_undefined_p(new_ct) || 
+		    !control_undefined_p(new_ce));
+	instruction_unstructured(statement_instruction(*nodestatp)) =
+	    make_unstructured(new_ct, new_ce);
+
+	ifdebug(7)
+	{
+	    fprintf(stderr, "[hpfcompileunstructured] host new stat:\n");
+	    print_statement(*hoststatp);
+	}
+	
 	gen_free_list(blocks);
 	FREE_CONTROL_MAPPING(hostmap);
 	FREE_CONTROL_MAPPING(nodemap);
