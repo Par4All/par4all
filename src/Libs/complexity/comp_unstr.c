@@ -70,8 +70,10 @@ list effects_list;
     A = matrice_new(n_controls, n_controls);
     B = matrice_new(n_controls, n_controls);
 
-    matrice_identite(A, n_controls, 0);   /* A is identical matrice I */
-    matrice_substract(B, A, P, n_controls, n_controls);  /* B = A - P =  I - P */
+    /* A is identity matrix I */
+    matrice_identite(A, n_controls, 0);   
+    /* B = A - P =  I - P */
+    matrice_substract(B, A, P, n_controls, n_controls);  
 
     if (get_debug_level() >= 5) {
 	fprintf(stderr, "I - P =");
@@ -137,7 +139,7 @@ list effects_list;
 	    control conti = control_array[i];
 	    complexity compi = (complexity) 
 		hash_get(hash_control_to_complexity, (char *) conti);
-	    float f = (float) FA(0,i-1);
+	    float f = FA(0,i-1);
 
 	    if ( get_debug_level() >= 5 ) {
 		fprintf(stderr, "control $%X:f=%f, compl.=",(int)conti, f);
