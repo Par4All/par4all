@@ -76,33 +76,6 @@ static void append_marged_text(
     ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted, buffer));
 }
 
-static void append_icfg_file(text t, string module_name)
-{
-    string filename, localfilename, dir;
-    FILE * f_called;
-    string buf;
-       
-    localfilename = db_get_memory_resource(DBR_ICFG_FILE, module_name, TRUE);
-    dir = db_get_current_workspace_directory();
-    filename = strdup(concatenate(dir, "/", localfilename, 0));
-    free(dir);
-    
-    pips_debug (2, "Inserting ICFG for module %s\n", module_name);
-
-    /* Get the Icfg from the callee */
-    f_called = safe_fopen (filename, "r");
-
-    while ((buf=safe_readline(f_called))) 
-    {
-	append_marged_text(t, current_margin, buf, "");
-        free(buf);
-    }
-    
-    /* push resulting text */
-    safe_fclose (f_called, filename);
-    free(filename); 
-}
-
 static list /* of entity */ list_vars_to_filter = NIL;
 static list /* of vertex */ verlist = NIL; /* to make graph daVinci */
 static vertex current_vertex = NULL; /* caller */
