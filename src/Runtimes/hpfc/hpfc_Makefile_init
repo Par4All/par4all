@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.56  1997/05/03 16:43:24  coelho
+# one all entry commented out...
+#
 # Revision 1.55  1997/05/03 16:38:30  coelho
 # *** empty log message ***
 #
@@ -245,7 +248,7 @@ DEDUCED = $(PVM_HEADERS) $(RT_INIT) $(RT_SRC_FILES)
 #
 # Rules
 
-all:	$(DEDUCED) 
+# all:	$(DEDUCED) 
 
 .SUFFIXES:	.f .o .m4
 
