@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 2000/02/29 14:58:38 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 2000/02/29 15:19:53 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -3174,6 +3174,10 @@ void gen_recurse(
 {
     gen_multi_recurse(obj, domain, filter, rewrite, NULL);
 }
+
+#ifdef gen_context_recurse 
+#undef gen_context_recurse
+#endif
 
 void gen_context_recurse(
     void * obj, /* starting point */
