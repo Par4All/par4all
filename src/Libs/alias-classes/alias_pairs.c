@@ -701,10 +701,10 @@ in_alias_pairs( string module_name )
 bool 
 out_alias_pairs( string module_name )
 {
-    list l_reg, l_pairs;
-
+/*    list l_reg, l_pairs;
+ */
     /* we need the OUT summary regions*/
-    l_reg = (list) db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS,
+/*    l_reg = (list) db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS,
 					  module_name,
 					  TRUE);
 
@@ -714,7 +714,7 @@ out_alias_pairs( string module_name )
     DB_PUT_MEMORY_RESOURCE(DBR_OUT_ALIAS_PAIRS, 
 			   strdup(module_name),
 			   (char*) make_effects_classes(l_pairs));
-
+			   */
     return(TRUE);
 
 }
