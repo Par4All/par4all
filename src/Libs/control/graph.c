@@ -1,7 +1,8 @@
-/*
- *  FULL CONTROL GRAPH
+/*  FULL CONTROL GRAPH
  *
- *  $RCSfile: graph.c,v $ ($Date: 1995/03/22 11:31:23 $, )
+ *  (c) Fabien COELHO - march 1995
+ *
+ *  $RCSfile: graph.c,v $ ($Date: 1995/03/28 16:22:42 $, )
  *  version $Revision$
  */
 
@@ -22,9 +23,28 @@ extern int fprintf();
 #include "pipsdbm.h"
 #include "control.h"
 
-/* global mapping from statements to their control in the control graph
+/* global mapping from statements to their control in the full control graph
  */
-GENERIC_GLOBAL_FUNCTION(ctrl_graph, controlmap, statement, control);
+GENERIC_GLOBAL_FUNCTION(ctrl_graph, controlmap);
+
+/* the crtl_graph is freed by hand, because the default behavior is
+ * not convenient for my purpose. I would have needed a persistant
+ * statement in the control, but it is not desired in pips.
+ */
+void clean_ctrl_graph()
+{
+    CONTROLMAP_MAP(s, c, 
+      {
+	  debug(7, "clean_crtl_graph", "statement 0x%x\n", (unsigned int) s);
+
+	  control_statement(c) = statement_undefined;
+	  gen_free_list(control_successors(c)); control_successors(c) = NIL;
+	  gen_free_list(control_predecessors(c)); control_predecessors(c) = NIL;
+      },
+	  ctrl_graph);
+
+    close_ctrl_graph(); /* now it can be freed safely */
+}
 
 /*  add (s1) --> (s2), 
  *  that is s2 as successor of s1 and s1 as predecessor of s2.
@@ -47,7 +67,7 @@ statement s1, s2;
 
 static void add_arrows_in_ctrl_graph(s, l)
 statement s;
-list l;
+list /* of statements */ l;
 {
     for(; !ENDP(l); l=CDR(l))
 	add_arrow_in_ctrl_graph(s, STATEMENT(CAR(l)));
@@ -67,7 +87,7 @@ list /* of controls */ l;
 
 static void statement_arrows(s, next)
 statement s;
-list next;
+list /* of statements */ next;
 {
     instruction i = statement_instruction(s);
     tag t = instruction_tag(i);
@@ -77,7 +97,7 @@ list next;
     case is_instruction_block:
     {
 	statement current, succ;
-	list 
+	list /* of statements */
 	    l = instruction_block(i),
 	    just_next;
 	
@@ -128,7 +148,7 @@ list next;
     {
 	loop l = instruction_loop(i);
 	statement b = loop_body(l);
-	list just_next = 
+	list /* of statements */ just_next = 
 	    gen_nconc(gen_copy_seq(next), CONS(STATEMENT, s, NIL));
 	
 	add_arrows_in_ctrl_graph(s, next); /* no iteration */
@@ -146,7 +166,7 @@ list next;
     case is_instruction_unstructured:
     {
 	unstructured u = instruction_unstructured(i);
-	list 
+	list /* of statements */
 	    blocks = NIL,
 	    lstat = NIL;	
 	statement x;
