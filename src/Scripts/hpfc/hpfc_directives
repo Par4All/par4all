@@ -2,6 +2,9 @@
 #
 # $Id$
 # $Log: hpfc_directives,v $
+# Revision 1.77  1998/03/17 10:05:48  coelho
+# dimension is a declaration also.
+#
 # Revision 1.76  1997/03/31 09:21:37  coelho
 # data is a declaration
 #
@@ -340,7 +343,8 @@ LINE=`$SED -n '
      /^[^Cc\*!].... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
      /^[^Cc\*!].... [ 	]*[Dd][Oo][Uu][Bb][Ll][Ee][Pp][Rr][Ee][Cc][Ii][Ss][Ii][Oo][Nn][ 	]/=
-     /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 |
+     /^[^Cc\*!].... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=
+     /^[^Cc\*!].... [ 	]*[Dd][Ii][Mm][Ee][Nn][Ss][Ii][Oo][Nn][ 	\*]/=' $TMP.0 |
 $SED -n '$p'`
 
 [ "$LINE" ] || LINE=1
