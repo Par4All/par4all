@@ -1,5 +1,5 @@
 /* $RCSfile: abs.c,v $ (version $Revision$)
- * $Date: 1996/07/13 12:03:46 $, 
+ * $Date: 1996/07/16 17:49:35 $, 
  */
 
 #include <stdio.h>
@@ -18,7 +18,7 @@ Value abs_ofl_ctrl(Value i, int ofl_ctrl)
 	longjmp(overflow_error, 5);
         
     assert(i != VALUE_MIN);
-    return (i>0) ? i: -i;    
+    return (i>VALUE_ZERO)? i: -i;    
 }
 
 /* int absval_ofl(int i): absolute value of i (SUN version)
