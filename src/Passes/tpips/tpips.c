@@ -1,5 +1,5 @@
 /* $RCSfile: tpips.c,v $ (version $Revision$
- * $Date: 1997/04/21 11:51:53 $, 
+ * $Date: 1997/04/21 18:30:36 $, 
  */
 
 #include <stdio.h>
@@ -557,20 +557,30 @@ static void (*find_handler(char* line))(char *)
 
 /*************************************************************** DO THE JOB */
 
-#define MAX_LINE_LENGTH  1024
+/* returns an allocated string up to \n or EOF from f
+ */
+static char * tpips_readline(FILE *f)
+{
+    int c, index = 0, size = 20;
+    char * line = (char*) malloc(size);
+    if (!line) pips_internal_error("malloc failed\n");
+
+    while ((c=getc(f)), c!=EOF && c!='\n') 
+    {
+	if (index+1>=size) size*=2, line = (char*) realloc(line, size);
+	if (!line) pips_internal_error("realloc failed\n");
+	line[index++] = (char) c;
+    }
+    line[index++] = '\0';
+
+    return line;
+}
+
+/* returns the next line from the input, interactive of file...
+ */
 static char * get_next_line(char * prompt)
 {
-    char line[MAX_LINE_LENGTH];
-    char * tmp = use_readline? 
-	readline(prompt): fgets(line, MAX_LINE_LENGTH, current_file);
-
-    if (tmp==line) /* fgets puts an \n where readline puts a \0 */
-    {
-	int len = strlen(tmp);
-	if (tmp[len-1]=='\n') tmp[len-1]='\0';
-    }
-
-    return tmp && !use_readline? strdup(tmp): tmp;
+    return use_readline? readline(prompt): tpips_readline(current_file);
 }
 
 /* returns an allocated line read, including continuations.
@@ -597,7 +607,7 @@ static char * tpips_read_a_line(char * main_prompt)
     if (logfile && line)
 	fprintf(logfile,"%s\n",line);
 
-    pips_debug(7, "line is --%s--\n", line);
+    pips_debug(3, "line is --%s--\n", line);
 
     return line;
 }
