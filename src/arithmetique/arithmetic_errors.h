@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.25  2000/07/26 08:41:40  coelho
+ * RETHROW added.
+ *
  * Revision 1.24  1998/10/26 14:37:48  coelho
  * constants moved out.
  *
@@ -37,8 +40,6 @@
 
 #include <setjmp.h>
 
-/* the index points to the first available chunck for a new context...
- */
 /*
 const unsigned int overflow_error = 1;
 const unsigned int simplex_arithmetic_error = 2;
@@ -70,6 +71,8 @@ const unsigned int any_exception_error = ~0;
 			       __FILE__, __LINE__))
 
 #define TRY else
+
+#define RETHROW() THROW(the_last_just_thrown_exception)
 
 #endif /* LINEAR_ARITHMETIC_ERROR_INCLUDED */
 
