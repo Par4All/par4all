@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # $RCSfile: logfile_to_tpips,v $ (version $Revision$)
-# $Date: 1997/03/30 18:57:07 $, 
+# $Date: 1997/03/31 10:23:55 $, 
 #
 # Usage: logfile_to_tpips <workspacename>
 #
@@ -15,6 +15,9 @@
 #	  rule creating multiple resources.
 #       - works with GNU sed, but not with SUN sed
 #
+
+# We need a test to stop if the version of sed which is
+# oing to be used is not powerful enough
 
 WS=${1:?"Please give me the workspace name to work with"}
 if [ `basename $WS` != "$WS" ]
