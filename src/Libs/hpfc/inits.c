@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1996/03/21 15:56:03 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1996/12/26 10:23:40 $, )
  * version $Revision$,
  */
 
@@ -19,7 +19,7 @@ FILE* file;
 	    "     $     REALNBOFPROCESSORS,\n"
 	    "     $     REALMAXSIZEOFPROCS,\n"
 	    "     $     REALMAXSIZEOFBUFFER\n\n"
-	    "c\nc parameters\nc\n"
+	    "!\n! parameters\n!\n"
 	    "      parameter(REALNBOFARRAYS = %d)\n"
 	    "      parameter(REALNBOFTEMPLATES = %d)\n"
 	    "      parameter(REALNBOFPROCESSORS = %d)\n"
@@ -46,7 +46,7 @@ entity module;
     int i;
     list l = list_of_distributed_arrays_for_module(module);
 
-    fprintf(file, "c\nc parameters generated for %s\nc\n",
+    fprintf(file, "!\n! parameters generated for %s\n!\n",
 	    module_local_name(module));
 
     MAP(ENTITY, array,
@@ -134,7 +134,7 @@ entity module;
 {
     list l = list_of_distributed_arrays_for_module(module);
     
-    fprintf(file, "c\nc Arrays Initializations for %s\nc\n",
+    fprintf(file, "!\n! Arrays Initializations for %s\n!\n",
 	    module_local_name(module));
 
     MAP(ENTITY, array,
@@ -151,7 +151,7 @@ entity module;
 	 * ATOT: Array TO Template
 	 */
 	fprintf(file, 
-		"c\nc initializing array %s, number %d\nc\n"
+		"!\n! initializing array %s, number %d\n!\n"
 		"      NODIMA(%d) = %d\n"
 		"      ATOT(%d) = %d\n",
 		entity_local_name(array), an, an, nd, an, tn);
@@ -364,7 +364,7 @@ entity module;
 void create_init_common_param_for_templates(file)
 FILE* file;
 {
-    fprintf(file, "c\nc Templates Initializations\nc\n");
+    fprintf(file, "!\n! Templates Initializations\n!\n");
 
     MAP(ENTITY, template,
     {
@@ -380,7 +380,7 @@ FILE* file;
 	  * TTOP: Template TO Processors arrangement
 	  */
 	 fprintf(file,
-		 "c\nc initializing template %s, number %d\nc\n"
+		 "!\n! initializing template %s, number %d\n!\n"
 		 "      NODIMT(%d) = %d\n"
 		 "      TTOP(%d) = %d\n", 
 		 entity_local_name(template), tn, tn, nd, tn, pn);
@@ -442,7 +442,7 @@ FILE* file;
 void create_init_common_param_for_processors(file)
 FILE* file;
 {
-    fprintf(file, "c\nc Processors Initializations\nc\n");
+    fprintf(file, "!\n! Processors Initializations\n!\n");
 
     MAP(ENTITY, proc,
     {
@@ -450,7 +450,7 @@ FILE* file;
 	int nd  = NumberOfDimension(proc);
 	int procdim = 1;
 	 
-	 fprintf(file, "c\nc initializing processors %s, number %d\nc\n",
+	 fprintf(file, "!\n! initializing processors %s, number %d\n!\n",
 		 entity_local_name(proc), pn);
 
 	 /* NODIMP: Number Of  DIMensions of a Processors arrangement
