@@ -18,11 +18,11 @@
 #include "misc.h"
 #include "linear.h"
 #include "ri.h"
-#include "tiling.h"
 
 #include "ri-util.h"
 
 #include "matrice.h"
+#include "tiling.h"
 
 /* loop_nest_to_tile():
  *
