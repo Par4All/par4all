@@ -25,12 +25,14 @@ bool selected_loop_p(loop l)
     return loop_label(l) == selected_label;
 }
 
-bool loop_interchange(string module_name)
+bool
+loop_interchange(string module_name)
 {
     char lp_label[6];
     entity module = local_name_to_top_level_entity(module_name);
     statement s;
     string resp;
+    bool return_status;
 
     pips_assert("loop_interchange", entity_module_p(module));
 
@@ -41,26 +43,33 @@ bool loop_interchange(string module_name)
     s = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
     /* Get the loop label form the user */
-    resp= user_request("Which loop do you want to exchange?\n"
-		       "(give its label): ");
-    sscanf(resp, "%s", lp_label);
-    selected_label = find_label_entity(module_name, lp_label);
-    if (selected_label==entity_undefined) {
-	user_error("loop_interchange", "loop label `%s' does not exist\n", lp_label);
+    resp = user_request("Which loop do you want to exchange?\n"
+			"(give its label): ");
+    if (resp[0] == '\0') {
+	user_log("Loop interchange has been cancelled.\n");
+	return_status = FALSE;
     }
+    else {    
+	sscanf(resp, "%s", lp_label);
+	selected_label = find_label_entity(module_name, lp_label);
+	if (selected_label==entity_undefined) {
+	    user_error("loop_interchange", "loop label `%s' does not exist\n", lp_label);
+	}
 
-    debug_on("LOOP_INTERCHANGE_DEBUG_LEVEL");
+	debug_on("LOOP_INTERCHANGE_DEBUG_LEVEL");
 
-    look_for_nested_loop_statements(s, interchange,selected_loop_p);
+	look_for_nested_loop_statements(s, interchange, selected_loop_p);
 
-    debug_off();
+	debug_off();
 
-    /* Reorder the module, because new statements have been generated. */
-    module_reorder(s);
+	/* Reorder the module, because new statements have been generated. */
+	module_reorder(s);
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, 
-			   strdup(module_name), 
-			   (char*) s);
-
-    return TRUE;
+	DB_PUT_MEMORY_RESOURCE(DBR_CODE, 
+			       strdup(module_name), 
+			       (char*) s);
+	return_status = TRUE;
+    }
+    
+    return return_status;
 }
