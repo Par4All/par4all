@@ -120,6 +120,45 @@ char * (*variable_name)();
 	}
 }
 
+/* void vect_fprint_as_dense(FILE * f, Pvecteur v, Pbase b):
+ *
+ * Par exemple, le vecteur v
+ *  ->     ->    ->  ->
+ *  v == 2 i - 3 j + k
+ * est imprime sous la forme
+ * ( 2 -3 1)
+ * dans la base (i j k)
+ *
+ * No constant term TCST is expected.
+ */
+void vect_fprint_as_dense(f, v, b)
+FILE * f;
+Pvecteur v;
+Pbase b;
+{
+/* FI: some work needed!!!
+    Pvecteur p;
+
+    if(v==NULL) 
+	(void) fprintf(f,"vecteur nul\n");
+    else
+	for (p = v; p != NULL; p = p->succ)
+	{
+	    if (p->var != TCST) {
+		(void) fprintf(f,"%d * %s ", p->val, variable_name(p->var));
+	    }
+	    else {
+		(void) fprintf(f,"%d ", p->val);
+	    }
+
+	    if (p->succ != NULL) {
+		(void) fprintf(f,"+ ");}
+	    else {
+		(void) fprintf(f,"\n");}
+	}
+*/
+}
+
 /* void vect_fprint_as_monome(FILE * f, Pvecteur v, Pbase b,
  *                            char * (*variable_name)(), char *mult_symbol):
  * impression d'un vecteur creux considere comme un monome sans coefficient.
