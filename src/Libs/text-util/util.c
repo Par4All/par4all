@@ -14,6 +14,7 @@
 #include "misc.h"
 #include "properties.h"
 
+#define CONTINUATION PIPS_COMMENT_CONTINUATION "                              "
 char *
 i2a(int i)
 {
@@ -116,12 +117,13 @@ add_to_current_line(
     string continuation, /* prefix when breaking a line */
     text txt             /* where to append completed lines */)
 {
-	bool divide;
-	char tmp[MAX_LINE_LENGTH];
-	int last_cut;
-    int lbuffer, lappend;
-    lbuffer = strlen(buffer);
-
+    bool divide;
+    char tmp[MAX_LINE_LENGTH];
+    int last_cut;
+    int lappend;
+    int lbuffer = strlen(buffer);
+    boolean comment = FALSE;
+    char stmp;
     /* spacial case: appends a sole "," on end of line... */
     if (same_string_p(append, ", ") && lbuffer+3==MAX_LINE_LENGTH) 
 	append = ",";
@@ -137,7 +139,8 @@ add_to_current_line(
 
 	divide = (last_cut > 0)
 	    && (last_cut != lbuffer-1) 
-	    && (lbuffer - last_cut + lappend +strlen(continuation) < MAX_LINE_LENGTH - 2);
+	    && (lbuffer - last_cut + lappend +strlen(continuation) 
+		< MAX_LINE_LENGTH - 2);
 
 	if (divide) 
 	{
@@ -155,35 +158,86 @@ add_to_current_line(
 	/* now regenerate the beginning of the line */
 	strcpy(buffer, continuation);
 	
-	if (divide) strcat(buffer, tmp); /* get back saved part */
+	if (divide) {
+	    strcat(buffer, tmp); /* get back saved part */
+	    
+	    if (strlen(buffer) + lappend + 2 > MAX_LINE_LENGTH
+		&& ! same_string_p(buffer,continuation)) {
+		/* current line + new line are too large. Try to append the 
+		   buffer alone, before trying to add the new line alone */
+		strcat(buffer, LINE_SUFFIX);
+		ADD_SENTENCE_TO_TEXT
+		    (txt, make_sentence(is_sentence_formatted, strdup(buffer)));
+		strcpy(buffer, continuation);
+	    }
+	}
 	
     }
-
+    
+    /* Append the new line */
+    lbuffer = strlen(buffer);
+    stmp = continuation[0];
+    comment = stmp == 'c'|| stmp == 'C'	|| stmp == '!'|| stmp == '*';
+    
     if (strlen(buffer) + lappend + 2 > MAX_LINE_LENGTH)
 	/* this shouldn't happen. 
 	 * it can occur if lappend+lcontinuation is too large.
 	 */
-	pips_internal_error("something got wrong...\n");
+	if (comment) {
+	    /* Cut the comment */
+	    int coupure = MAX_LINE_LENGTH-2 -lbuffer;
+	    char tmp2[2*MAX_LINE_LENGTH];
+	    strcpy(tmp2,append+coupure);
+	    append[coupure]='\0';
+	    
+	    add_to_current_line(buffer,append,continuation,txt);
+	    add_to_current_line(buffer,tmp2,continuation,txt);
+	    
+	}
+	else 
+	    pips_internal_error("line code too large...\n");
 
-    /* special case: do not append spaces to simple continuations.
-     */
-    if (same_string_p(append, " ") && same_string_p(buffer, continuation))
-	return;
-
-    strcat(buffer, append);
+    else if (! same_string_p(append, " ") 
+	     || ! same_string_p(buffer, continuation))
+	strcat(buffer, append);
 }
 
 void
 close_current_line(
     string buffer,
-    text txt)
-{
-    if (strlen(buffer)!=0) /* do not append an empty line to text */
+    text txt,
+    string continuation)
+{  if (strlen(buffer)!=0) /* do not append an empty line to text */
     {
-	pips_assert("buffer large enough", strlen(buffer)+1<MAX_LINE_LENGTH);
-	strcat(buffer, LINE_SUFFIX);
-	ADD_SENTENCE_TO_TEXT
-	    (txt, make_sentence(is_sentence_formatted, strdup(buffer)));
-	buffer[0] = '\0';
+	int lbuffer=0; 
+	char stmp = continuation[0];
+	boolean comment = stmp == 'c'|| stmp == 'C'	
+	|| stmp == '!'|| stmp == '*';
+
+
+	if ((lbuffer=strlen(buffer))+2>MAX_LINE_LENGTH) { 
+	    if (comment) {
+		int coupure = MAX_LINE_LENGTH-2;
+		char tmp2[2*MAX_LINE_LENGTH];
+		strcpy(tmp2,buffer+coupure);
+		buffer[coupure]='\0';
+		
+		add_to_current_line(buffer,"  ",continuation,txt);
+		add_to_current_line(buffer,tmp2,continuation,txt);
+		close_current_line(buffer,txt,continuation);
+	    }
+	    else pips_assert("buffer is too large", 
+			     strlen(buffer)+1<MAX_LINE_LENGTH);
+	}
+	else {
+	    strcat(buffer, LINE_SUFFIX);
+	    ADD_SENTENCE_TO_TEXT
+		(txt, make_sentence(is_sentence_formatted, strdup(buffer)));
+	    buffer[0] = '\0';
+	    
+	}
     }
+
 }
+
+
