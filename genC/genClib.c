@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/12/10 13:52:49 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/12/10 16:22:16 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -90,7 +90,7 @@ static int disallow_undefined_tabulated = TRUE ;
   message_assert("gen_read_spec not performed prior to use", \
 		 Read_spec_performed);
 
-#define newgen_free(p) free(p)
+#define newgen_free(p) (*((char*)(p))='\0',free(p)) /* just to hide bugs */
 
 /* DOMAIN_INDEX returns the index in the Domain table for object OBJ.
  */
