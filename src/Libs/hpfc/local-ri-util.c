@@ -1,5 +1,5 @@
 /* SCCS Stuff:
- * $RCSfile: local-ri-util.c,v $ ($Date: 1994/12/22 16:52:20 $, )
+ * $RCSfile: local-ri-util.c,v $ ($Date: 1995/03/22 10:56:58 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -64,7 +64,7 @@ expression e;
 	else
 	    /* else some clever analysis could be done
 	     */
-	    user_warning("suggest_basic_for_expression",
+	    hpfc_warning("suggest_basic_for_expression",
 			 "an overloaded is turned into an int...\n"),
 	    result = is_basic_int;
     }
