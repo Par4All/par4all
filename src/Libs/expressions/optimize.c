@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.29  1999/05/27 14:48:18  ancourt
+ * 2 eole passes. does not work yet.
+ *
  * Revision 1.28  1999/05/12 12:53:17  zory
  * reorder module statement after transformation
  *
@@ -133,6 +136,7 @@ typedef struct
   /* EOLE.
    */
   bool apply_eole;
+  bool apply_eole2;
   string eole_strategy;
 
   /* SIMPLIFY.
@@ -169,10 +173,11 @@ static poptimization_strategy strategy = NULL;
 static string 
 get_eole_command
   (string in, /* input file from eole. */
-   string out /* output file to eole. */)
+   string out,/* output file to eole. */
+   string flags)
 {
   return strdup(concatenate(get_string_property(EOLE), " ", 
-			    get_string_property(EOLE_FLAGS), " ", 
+			    flags, " ",
 			    get_string_property(EOLE_OPTIONS), 
 			    " -S ", strategy->eole_strategy,
 			    " -o ", in, " ", out, NULL));
@@ -407,7 +412,8 @@ swap_syntax_in_expression(  list /* of expressionwithlevel */ lcode,
 
 /* apply eole on all expressions in s.
  */
-static void apply_eole_on_statement(string module_name, statement s)
+static void 
+apply_eole_on_statement(string module_name, statement s, string flags)
 {
   list /* of expressionwithlevel/expression */ le, ln;
 
@@ -428,7 +434,7 @@ static void apply_eole_on_statement(string module_name, statement s)
     /* run eole (Evaluation Optimization for Loops and Expressions) 
      * as a separate process.
      */
-    cmd = get_eole_command(in, out);
+    cmd = get_eole_command(in, out, flags);
     
     pips_debug(2, "executing: %s\n", cmd);
     
@@ -455,7 +461,6 @@ static void apply_eole_on_statement(string module_name, statement s)
   }
   else 
     pips_debug(3, "no expression for module %s\n", module_name);
-  
 
   pips_debug(3,"EOLE transformations ... Done for module %s\n", module_name);
 
@@ -831,7 +836,7 @@ static optimization_strategy
   { 
     /* name */ "P2SC", 
     /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ TRUE, "0",
+    /* eole */ TRUE, FALSE, "0",
     /* simp */ TRUE, 
     /* gcm cse */ TRUE
 	       
@@ -839,21 +844,21 @@ static optimization_strategy
   {
     "test",
     TRUE, expression_gravity, TRUE,
-    TRUE, "0",
+    TRUE, FALSE, "0",
     TRUE, 
     FALSE
   },
   {
     "R10K",
     TRUE, expression_gravity_inv, FALSE,
-    TRUE, "1",
+    TRUE, FALSE, "1",
     TRUE, 
     TRUE
   },
   {
     "EOLE",
     FALSE, NULL, FALSE,
-    TRUE, "0",
+    TRUE, FALSE, "0",
     FALSE, 
     FALSE
   },
@@ -862,7 +867,7 @@ static optimization_strategy
   {
     NULL, /* default similar to P2SC. */
     TRUE, expression_gravity, TRUE,
-    TRUE, "0",
+    TRUE, FALSE, "0",
     TRUE, 
     TRUE
   }
@@ -946,7 +951,7 @@ bool optimize_expressions(string module_name)
     /* EOLE Stuff
      */
     if (strategy->apply_eole)
-      apply_eole_on_statement(module_name, s);
+      apply_eole_on_statement(module_name, s, get_string_property(EOLE_FLAGS));
 
     /* Could perform more optimizations here...
      */
@@ -954,7 +959,13 @@ bool optimize_expressions(string module_name)
      */
 
     if (strategy->apply_gcm_cse)
-      icm_cse_on_sequence(module_name, s); 
+      /* icm_cse_on_sequence(module_name, s); */
+      perform_icm_association(module_name, s); 
+
+    /* EOLE Stuff, second pass for FMA.
+     */
+    if (strategy->apply_eole2)
+      apply_eole_on_statement(module_name, s, "-f");
 
     if (strategy->apply_balancing)
       switch_nary_to_binary(s);
