@@ -1,6 +1,7 @@
 #
 # Generate various files for the User Manual:
 #
+# $Id$
 #
 # $debug = 8;
 
@@ -83,6 +84,7 @@ if ( $generate_menu_layout == 0) {
 
 
 # Parse the function list and the generated output:
+# FC: clone modifies CALLERS...
 while($PipsMakeRcVerbatim =~ /^\s*(\w+)\s*>\s*(MODULE|CALLERS)\.(\w+)\s*$/mg) {
     if ($debug >= 5) {
 	print "*** function $1 generates $3 ($2)\n";
