@@ -327,7 +327,10 @@ cons * e; /* effects of loop l */
 	     * transformer_equality_fix_point() and to update it with
 	     * new equations...
 	     */
-	    transformer ftf = transformer_equality_fix_point(tfb);
+	    /* transformer ftf = transformer_equality_fix_point(tfb); */
+	    transformer ftf = get_bool_property("SEMANTICS_PATTERN_MATCHING_FIX_POINT")? 
+		transformer_pattern_fix_point(tfb)
+		: transformer_equality_fix_point(tfb);
 	    Psysteme fsc = predicate_system(transformer_relation(ftf));
 	    Psysteme sc = SC_UNDEFINED;
 	    Pcontrainte eq = CONTRAINTE_UNDEFINED;
@@ -357,9 +360,20 @@ cons * e; /* effects of loop l */
 		eq = neq;
 	    }
 
+	    /* add inequalities from ftf to tf */
+	    for(eq = sc_inegalites(fsc); !CONTRAINTE_UNDEFINED_P(eq); ) {
+		Pcontrainte neq;
+
+		neq = eq->succ;
+		sc_add_inegalite(sc, eq);
+		eq = neq;
+	    }
+
 	    /* FI" I hope that inequalities will be taken care of some day! */
+	    /* Well, in June 1997.. */
 
 	    sc_egalites(fsc) = CONTRAINTE_UNDEFINED;
+	    sc_inegalites(fsc) = CONTRAINTE_UNDEFINED;
 	    free_transformer(ftf);
 
 	    ifdebug(8) {
@@ -675,44 +689,7 @@ list ef;
 	normalized n = NORMALIZE_EXPRESSION(expr);
 
 	if(normalized_linear_p(n)) {
-	    entity e_new = entity_to_new_value(e);
-	    entity e_old = entity_to_old_value(e);
-	    cons * tf_args = CONS(ENTITY, e_new, NIL);
-	    /* must be duplicated right now  because it will be
-	       renamed and checked at the same time by
-	       value_mappings_compatible_vector_p() */
-	    Pvecteur vexpr = vect_dup((Pvecteur) normalized_linear(n));
-	    Pcontrainte c;
-	    Pvecteur eq = VECTEUR_NUL;
-
-	    ifdebug(9) {
-		(void) fprintf(stderr,"Expression to linearize:\n");
-		print_words(stderr,words_expression(expr));
-		(void) fprintf(stderr,"\nLinearized expression:\n");
-		vect_dump(vexpr);
-	    }
-
-	    if(value_mappings_compatible_vector_p(ve) &&
-	       value_mappings_compatible_vector_p(vexpr)) {
-		ve = vect_variable_rename(ve,
-					  (Variable) e,
-					  (Variable) e_new);
-		(void) vect_variable_rename(vexpr,
-					    (Variable) e_new,
-					    (Variable) e_old);
-		eq = vect_substract(ve, vexpr);
-		vect_rm(ve);
-		vect_rm(vexpr);
-		c = contrainte_make(eq);
-		tf = make_transformer(tf_args,
-				      make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
-	    }
-	    else {
-		vect_rm(eq);
-		vect_rm(ve);
-		vect_rm(vexpr);
-		tf = transformer_undefined;
-	    }
+	    tf = affine_assignment_to_transformer(e, (Pvecteur) normalized_linear(n));
 	}
 	else if(modulo_expression_p(expr)) {
 	    tf = modulo_to_transformer(e, expr);
@@ -1123,6 +1100,84 @@ transformer_add_identity(transformer tf, entity v)
     vect_add_elem(&eq, (Variable) v_old, (Value) -1);
     tf = transformer_equality_add(tf, eq);
     transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), v_new);
+
+    return tf;
+}
+
+transformer 
+affine_assignment_to_transformer(entity e, Pvecteur a)
+{
+    transformer tf = transformer_undefined;
+
+    tf = affine_to_transformer(e, a, TRUE);
+
+    return tf;
+}
+
+transformer 
+affine_increment_to_transformer(entity e, Pvecteur a)
+{
+    transformer tf = transformer_undefined;
+
+    tf = affine_to_transformer(e, a, FALSE);
+
+    return tf;
+}
+
+transformer 
+affine_to_transformer(entity e, Pvecteur a, bool assignment)
+{
+    transformer tf = transformer_undefined;
+    Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
+    entity e_new = entity_to_new_value(e);
+    entity e_old = entity_to_old_value(e);
+    cons * tf_args = CONS(ENTITY, e_new, NIL);
+    /* must be duplicated right now  because it will be
+       renamed and checked at the same time by
+       value_mappings_compatible_vector_p() */
+    Pvecteur vexpr = vect_dup(a);
+    Pcontrainte c;
+    Pvecteur eq = VECTEUR_NUL;
+
+    debug(8, "affine_to_transformer", "begin\n");
+
+    ifdebug(9) {
+	debug(9, "affine_to_transformer", "\nLinearized expression:\n");
+	vect_dump(vexpr);
+    }
+
+    if(!assignment) {
+	vect_add_elem(&vexpr, (Variable) e, (Value) 1);
+
+	ifdebug(8) {
+	    debug(8, "affine_to_transformer", "\nLinearized expression for incrementation:\n");
+	    vect_dump(vexpr);
+	}
+    }
+
+    if(value_mappings_compatible_vector_p(ve) &&
+       value_mappings_compatible_vector_p(vexpr)) {
+	ve = vect_variable_rename(ve,
+				  (Variable) e,
+				  (Variable) e_new);
+	(void) vect_variable_rename(vexpr,
+				    (Variable) e_new,
+				    (Variable) e_old);
+	eq = vect_substract(ve, vexpr);
+	vect_rm(ve);
+	vect_rm(vexpr);
+	c = contrainte_make(eq);
+	tf = make_transformer(tf_args,
+			      make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
+    }
+    else {
+	vect_rm(eq);
+	vect_rm(ve);
+	vect_rm(vexpr);
+	tf = transformer_undefined;
+    }
+
+    debug(8, "affine_to_transformer", "end\n");
 
     return tf;
 }
