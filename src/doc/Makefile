@@ -1,16 +1,18 @@
 # $Id$
 # Newgen documention
 
-ETEX = 	newgen_manual.tex \
+TEX = 	newgen_manual.tex \
 	newgen_paper.tex \
 	tutoriel_newgen.tex
 
-SOURCES = $(ETEX) obtention.txt
+SOURCES = $(TEX) obtention.txt
 
-PS =	$(ETEX:%.tex=%.ps)
+DVI	= $(TEX:%.tex=%.dvi)
+PS	= $(TEX:%.tex=%.ps)
+PDF 	= $(TEX:%.tex=%.pdf)
 
-INSTALL_DOC =	$(PS)
-INSTALL_HTM =   $(PS:%.ps=%)
+INSTALL_DOC =	$(PDF)
+#INSTALL_HTM =   $(PS:%.ps=%)
 
 ifdef NEWGEN_ROOT
 ROOT	= $(NEWGEN_ROOT)
@@ -20,10 +22,13 @@ endif
 include $(ROOT)/makes/base.mk
 
 all: $(INSTALL_DOC)
+
+pdf: $(PDF)
 ps: $(PS)
-dvi: $(PS:.ps=.dvi)
+dvi: $(DVI)
 
 clean: local-clean
+
 local-clean:
-	$(RM) -r $(INSTALL_DOC) $(INSTALL_HTM) \
-		$(PS:.ps=.html) *.dvi $(FTEX:.ftex=.tex) *.aux *.log
+	$(RM) -r $(INSTALL_DOC) $(INSTALL_HTM) $(PDF) $(PS) $(DVI) \
+		*.html *.aux *.log *~
