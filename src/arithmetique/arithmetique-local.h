@@ -236,20 +236,23 @@ typedef int Value;
 #define value_addto(ref,val) 		ref+=(val)
 #define value_increment(ref) 		ref++
 #define value_direct_product(ref,val)	ref*=(val) /* direct! */
-#define value_multiply(ref,val)	value_assign(ref,value_mult(ref,val))
-#define value_substract(ref,val) 	ref-=(val)
+#define value_multiply(ref,val)		value_assign(ref,value_mult(ref,val))
+#define value_substract(ref,val) 		ref-=(val)
 #define value_decrement(ref) 		ref--
-#define value_division(ref,val) 	ref/=(val)
+#define value_division(ref,val) 		ref/=(val)
 #define value_modulus(ref,val) 		ref%=(val)
-#define value_pdivision(ref,val)	value_assign(ref,value_pdiv(ref,val))
-#define value_oppose(ref) 		value_assign(ref,value_uminus(ref))
-#define value_absolute(ref)		value_assign(ref,value_abs(ref))
+#define value_pdivision(ref,val)		value_assign(ref,value_pdiv(ref,val))
+#define value_oppose(ref) 			value_assign(ref,value_uminus(ref))
+#define value_absolute(ref)			value_assign(ref,value_abs(ref))
 #define value_minimum(ref,val)		value_assign(ref,value_min(ref,val))
 #define value_maximum(ref,val)		value_assign(ref,value_max(ref,val))
+#define value_orto(ref,val)			ref |= (val)
+#define value_andto(ref,val)		ref &= (val)
 
 /* unary operators on values
  */
 #define value_uminus(val)  (-(val))
+#define value_not(val)	(~(val))
 #define value_abs(val)     (value_ge(val,VALUE_ZERO)? (val): value_uminus(val))
 
 #define value_pos_p(val)      value_gt(val,VALUE_ZERO)
