@@ -14,13 +14,9 @@
 
 /* Newgen includes      */
 #include "genC.h"
-#include "hash.h"
-#include "list.h"
-#include "graph.h"
-#include "mapping.h"
-#include "boolean.h"
 
 /* C3 includes          */
+#include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
 #include "contrainte.h"
