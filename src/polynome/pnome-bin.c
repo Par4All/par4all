@@ -165,7 +165,7 @@ Ppolynome *ppp,pp2;
 Ppolynome polynome_addition(pp, pp2)
 Ppolynome pp,pp2;
 {
-    Ppolynome newpp;
+    Ppolynome newpp = POLYNOME_UNDEFINED;
 
     if (POLYNOME_NUL_P(pp)) {
 	if ( !POLYNOME_NUL_P(pp2))
@@ -256,6 +256,8 @@ Pmonome pm;
 Ppolynome polynome_mult(pp1, pp2)
 Ppolynome pp1, pp2;
 {
+    Ppolynome mp2 = POLYNOME_UNDEFINED;
+
     if (POLYNOME_UNDEFINED_P(pp1) || POLYNOME_UNDEFINED_P(pp2))
 	return (POLYNOME_UNDEFINED);
     if (POLYNOME_NUL_P(pp1) || POLYNOME_NUL_P(pp2))
@@ -263,8 +265,8 @@ Ppolynome pp1, pp2;
     else {
 	Ppolynome pppartiel, ppresult = POLYNOME_NUL;
 
-	for ( ; pp2 != NIL; pp2 = polynome_succ(pp2)) {
-	    pppartiel = polynome_monome_mult(pp1, polynome_monome(pp2));
+	for (mp2 = pp2 ; mp2 != NIL; mp2 = polynome_succ(mp2)) {
+	    pppartiel = polynome_monome_mult(pp1, polynome_monome(mp2));
 	    polynome_add(&ppresult, pppartiel);
 	    polynome_rm(&pppartiel);
 	}
@@ -293,8 +295,7 @@ Pmonome pm1, pm2;
 	    return (MONOME_UNDEFINED);
 	}
 	else {
-	    Pmonome pmr = (Pmonome) malloc(sizeof(Smonome));
-	    /* Should be added the allocation test here. lz 12/07/91 */
+	    Pmonome pmr = new_monome();
 
 	    if (MONOME_CONSTANT_P(pm2))
 		monome_term(pmr) = vect_dup(monome_term(pm1));
@@ -313,6 +314,8 @@ Pmonome pm1, pm2;
 	    return (pmr);
 	}
     }
+    polynome_error("monome_monome_div","Unreachable...\n");
+    return MONOME_UNDEFINED;
 }
 
 /* Ppolynome polynome_monome_div(Ppolynome pp, Pmonome pm)
