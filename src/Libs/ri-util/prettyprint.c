@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.194  2002/04/26 14:49:23  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.193  2002/04/26 14:42:43  phamdat
  * *** empty log message ***
  *
@@ -421,7 +424,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.193 2002/04/26 14:42:43 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.194 2002/04/26 14:49:23 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2353,6 +2356,8 @@ text_instruction(
 /* Handles all statements but tests that are nodes of an unstructured.
  * Those are handled by text_control.
  */
+static bool found_filter = FALSE;
+
 text 
 text_statement(
     entity module,
@@ -2412,9 +2417,14 @@ text_statement(
 						  strdup(comments)));
 	}
 	MERGE_TEXTS(r, temp);
+	found_filter = TRUE;
       } else {
-	free_text(t);
-	free_text(temp);
+	if (found_filter)
+	  MERGE_TEXTS(r, temp);
+	else {
+	  free_text(t);
+	  free_text(temp);
+	}
       }
       /**********************************/
       /*MERGE_TEXTS(r, init_text_statement(module, margin, stmt));
@@ -2597,6 +2607,7 @@ text_named_module(
     }
 
     if (stat != statement_undefined) {
+      found_filter = FALSE;
         MERGE_TEXTS(r, text_statement(module, 0, stat));
     }
     
