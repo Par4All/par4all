@@ -1,5 +1,9 @@
 /* $Id$
    $Log: splitc.y,v $
+   Revision 1.5  2003/08/08 15:59:27  irigoin
+   A lot of free_partial_signature added. Rule 4 is now implemented. Symbols
+   such as enum elements can now be used to size an array.
+
    Revision 1.4  2003/08/04 16:53:07  irigoin
    Intermediate version. A few more rules to derive signatures thanks to SPEC2000.
 
@@ -583,12 +587,10 @@ global:
                         {
 			  pips_debug(5, "declaration->global\n");
 			  csplit_is_external = 1; /* the variable is declared outside of any function */
-			  pips_debug(5, "Declaration is located between line %d and line %d\n", get_csplit_current_beginning(), csplit_line_number);
-			  pips_debug(5, "declaration finishes at line %d\n",
-				  csplit_line_number);
+			  pips_debug(1, "Declaration is located between line %d and line %d\n", get_csplit_current_beginning(), csplit_line_number);
 			  csplit_append_to_compilation_unit(csplit_line_number);
 			  if(!string_undefined_p($1)) {
-			    pips_debug(8, "Definition: \"%s\"\n", $1);
+			    pips_debug(1, "Definition: \"%s\"\n", $1);
 			    free_partial_signature($1);
 			  }
                           reset_csplit_current_beginning();
@@ -597,7 +599,7 @@ global:
                         {
 			  pips_debug(5, "function_def->global\n");
 			  csplit_is_external = 0; /* the variable is declared inside a function */
-			  pips_debug(5, "Function \"%s\" declaration and body are located between line %d and line %d\n",
+			  pips_debug(1, "Function \"%s\" declaration and body are located between line %d and line %d\n",
 				  csplit_definite_function_name,
 				  get_csplit_current_beginning(),
 				  csplit_line_number);
@@ -677,7 +679,9 @@ expression:
 			}
 |   TK_IDENT
 		        {
-			  $$ = string_undefined;
+			  /* Elements in enum are symbolic constant which
+                             may appear in an array declaration. */
+			  $$ = new_signature($1);
                         }
 |   TK_SIZEOF expression
 		        {
@@ -1053,7 +1057,7 @@ one_string:
 ;    
 
 init_expression:
-    expression          { }
+    expression          { free_partial_signature($1);}
 |   TK_LBRACE initializer_list_opt TK_RBRACE
 			{ }
 
@@ -1090,9 +1094,9 @@ init_designators:
     TK_DOT id_or_typename init_designators_opt
                         { }
 |   TK_LBRACKET expression TK_RBRACKET init_designators_opt
-                        { }
+                        { free_partial_signature($2); }
 |   TK_LBRACKET expression TK_ELLIPSIS expression TK_RBRACKET
-                        { }
+                        { free_partial_signature($2); free_partial_signature($4); }
 ;         
 init_designators_opt:
     /* empty */         { }
@@ -1107,14 +1111,14 @@ gcc_init_designators:  /*(* GCC supports these strange things *)*/
 
 arguments: 
     /* empty */         { }
-|   comma_expression    { }
+|   comma_expression    { free_partial_signature($1); }
 ;
 
 opt_expression:
     /* empty */
 	        	{ }
 |   comma_expression
-	        	{ }
+	        	{ free_partial_signature($1); }
 ;
 
 comma_expression:
@@ -1154,6 +1158,7 @@ paren_comma_expression:
 bracket_comma_expression:
     TK_LBRACKET comma_expression TK_RBRACKET 
                         {
+			  free_partial_signature($2); 
 			}
 |   TK_LBRACKET error TK_RBRACKET  
                         {
@@ -1210,19 +1215,23 @@ statement:
 			}
 |   comma_expression TK_SEMICOLON
 	        	{
+			  free_partial_signature($1); 
 			}
 |   block               { }
 |   TK_IF paren_comma_expression statement                    %prec TK_IF
                 	{
+			  free_partial_signature($2); 
 			}
 |   TK_IF paren_comma_expression statement TK_ELSE statement
 	                {
+			  free_partial_signature($2); 
 			}
 |   TK_SWITCH 
                         {
 			} 
     paren_comma_expression 
                         {
+			  /* free_partial_signature($1); */
 			} 
     statement
                         {
@@ -1232,12 +1241,14 @@ statement:
 			} 
     paren_comma_expression statement
 	        	{
+			  /* free_partial_signature($1); */
 			}
 |   TK_DO
                         {
 			} 
     statement TK_WHILE paren_comma_expression TK_SEMICOLON
 	        	{
+			  /* free_partial_signature($3); */
 			}
 |   TK_FOR
                         {
@@ -1250,9 +1261,12 @@ statement:
 			}
 |   TK_CASE expression TK_COLON
                         {
+			  free_partial_signature($2); 
 			}
 |   TK_CASE expression TK_ELLIPSIS expression TK_COLON
                         {
+			  free_partial_signature($2); 
+			  free_partial_signature($4); 
 			}
 |   TK_DEFAULT TK_COLON
 	                {
@@ -1262,6 +1276,7 @@ statement:
 			}
 |   TK_RETURN comma_expression TK_SEMICOLON
 	                {
+			  free_partial_signature($2); 
 			}
 |   TK_BREAK TK_SEMICOLON
                         {
@@ -1274,6 +1289,7 @@ statement:
 			}
 |   TK_GOTO TK_STAR comma_expression TK_SEMICOLON 
                         {
+			  free_partial_signature($3); 
 			}
 |   TK_ASM asmattr TK_LPAREN asmtemplate asmoutputs TK_RPAREN TK_SEMICOLON
                         { }
@@ -1518,11 +1534,17 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_STRUCT id_or_typename                           
                         {
 			  pips_debug(8, "TK_STRUCT id_or_typename->type_spec\n");
+			  if(strcmp(csplit_current_function_name, $2)==0) {
+			    reset_csplit_current_function_name();
+			  }
 			  $$ = build_signature(new_signature("struct"), $2, NULL);
 			}
 |   TK_STRUCT id_or_typename TK_LBRACE /* { } */ struct_decl_list TK_RBRACE
                         {
 			  pips_debug(8, "TK_STRUCT id_or_typename TK_LBRACE struct_decl_list TK_RBRACE->type_spec\n");
+			  if(strcmp(csplit_current_function_name, $2)==0) {
+			    reset_csplit_current_function_name();
+			  }
 			  $$ = build_signature(new_signature("bstruct"), $2, new_lbrace(), $4,
 					       new_rbrace(), NULL);
 			}
@@ -1536,11 +1558,17 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_UNION id_or_typename 
                         {
 			  pips_debug(8, "TK_UNION id_or_typename->type_spec\n");
+			  if(strcmp(csplit_current_function_name, $2)==0) {
+			    reset_csplit_current_function_name();
+			  }
 			  $$ = build_signature(new_signature("union"), $2, NULL);
 			}
 |   TK_UNION id_or_typename TK_LBRACE /* { } */ struct_decl_list TK_RBRACE
                         {
 			  pips_debug(8, "TK_UNION id_or_typename TK_LBRACE struct_decl_list TK_RBRACE->type_spec\n");
+			  if(strcmp(csplit_current_function_name, $2)==0) {
+			    reset_csplit_current_function_name();
+			  }
 			  $$ = build_signature(new_signature("union"), $2, new_lbrace(), $4,
 					       new_rbrace(), NULL);
 			}
@@ -1553,13 +1581,17 @@ type_spec:   /* ISO 6.7.2 */
 |   TK_ENUM id_or_typename   
                         {
 			  pips_debug(8, "TK_ENUM id_or_typename->type_spec\n");
-			  reset_csplit_current_function_name();
+			  if(strcmp(csplit_current_function_name, $2)==0) {
+			    reset_csplit_current_function_name();
+			  }
 			  $$ = build_signature(new_signature("enum"), $2, NULL);
 			}
 |   TK_ENUM id_or_typename TK_LBRACE enum_list maybecomma TK_RBRACE
                         {
 			  pips_debug(8, "TK_ENUM id_or_typename TK_LBRACE enum_list maybecomma TK_RBRACE->type_spec\n");
-			  reset_csplit_current_function_name();
+			  if(strcmp(csplit_current_function_name, $2)==0) {
+			    reset_csplit_current_function_name();
+			  }
 			  $$ = build_signature(new_signature("enum"), $2, new_lbrace(), $4, $5, new_rbrace(), NULL);
 			}                   
 |   TK_ENUM TK_LBRACE enum_list maybecomma TK_RBRACE
@@ -1994,8 +2026,19 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 				     $1,
 				     get_csplit_current_beginning(),
 				     csplit_line_number);
+			  csplit_definite_function_name = strdup($1);
 			  csplit_is_function = 1; /* function's declaration */
-			  pips_internal_error("Not implemented yet");
+			  current_function_is_static_p = csplit_is_static_p;
+			  csplit_is_static_p = FALSE;
+
+			  free_partial_signature($3);
+			  free_partial_signature($5);
+			  csplit_definite_function_signature
+			    = simplify_signature
+			    (build_signature($1, new_rparen(), new_lparen(), NULL));
+			  pips_debug(1, "Signature for function %s: %s\n\n",
+				     csplit_current_function_name,
+				     csplit_definite_function_signature);
 			}	
 /* (* No return type and no parameters *) */
 |   TK_IDENT TK_LPAREN TK_RPAREN
@@ -2084,33 +2127,39 @@ attr:
 |   TK_CONST                                
                         { }	
 |   TK_SIZEOF expression                     
-                        { }	
+                        {
+			  free_partial_signature($2); 
+			}	
 |   TK_SIZEOF TK_LPAREN type_name TK_RPAREN	                         
                         { }	
 
 |   TK_ALIGNOF expression                   
-                        { }	
+                        {
+			  free_partial_signature($2); 
+			}	
 |   TK_ALIGNOF TK_LPAREN type_name TK_RPAREN      
                         { }	
 |   TK_PLUS expression    	                 
-                        { }	
+                        { 
+			  free_partial_signature($2); 
+			}	
 |   TK_MINUS expression 		        
-                        { }	
+                        { free_partial_signature($2);}	
 |   TK_STAR expression		       
-                        { }	
+                        { free_partial_signature($2);}	
 |   TK_AND expression				                 %prec TK_ADDROF
 	                                
-                        { }	
+                        { free_partial_signature($2);}	
 |   TK_EXCLAM expression		       
-                        { }	
+                        { free_partial_signature($2);}	
 |   TK_TILDE expression		        
-                        { }	
+                        { free_partial_signature($2);}	
 |   attr TK_PLUS attr                      
                         { }	 
 |   attr TK_MINUS attr                    
                         { }	
 |   attr TK_STAR expression               
-                        { }	
+                        { free_partial_signature($3);}	
 |   attr TK_SLASH attr			
                         { }	
 |   attr TK_PERCENT attr			
@@ -2205,7 +2254,7 @@ asmoperandsne:
 ;
 asmoperand:
     string_constant TK_LPAREN expression TK_RPAREN    
-                        { }
+                        { free_partial_signature($3);}
 |   string_constant TK_LPAREN error TK_RPAREN         
                         { }
 ; 
