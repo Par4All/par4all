@@ -536,6 +536,11 @@ entity v;
 		      entity_name(v));
 		return;
 	    }
+	    if(storage_return_p(store)) {
+		debug(7, "translate_global_value", "return %s is not translatable\n",
+		      entity_name(v));
+		return;
+	    }
 	    else
 		pips_error("translate_global_value", "%s is not translatable: store tag %d\n",
 			   entity_name(v), storage_tag(store));
