@@ -229,25 +229,33 @@ transformer tf;
     return post;
 }
 
-transformer block_to_postcondition(pre, b)
-transformer pre;
-cons * b;
+transformer block_to_postcondition(b_pre, b)
+transformer b_pre;
+list b;
 {
     statement s;
     transformer post;
+    transformer s_pre = transformer_undefined;
+    list ls = b;
 
-    debug(8,"block_to_postcondition","begin pre=%x\n", pre);
+    debug(8,"block_to_postcondition","begin pre=%x\n", b_pre);
 
-    if(ENDP(b))
+    /* The first statement of the block must receive a copy
+     * of the block precondition to avoid data sharing
+     */
+
+    if(ENDP(ls))
 	/* to avoid accumulating equivalence equalities */
-	post = transformer_dup(pre);
+	post = transformer_dup(b_pre);
     else {
-	s = STATEMENT(CAR(b));
-	post = statement_to_postcondition(transformer_dup(pre), s);
-	for (POP(b) ; !ENDP(b); POP(b)) {
-	    s = STATEMENT(CAR(b));
-	    pre = post;
-	    post = statement_to_postcondition(pre, s);
+	s = STATEMENT(CAR(ls));
+	s_pre = transformer_dup(b_pre);
+	post = statement_to_postcondition(s_pre, s);
+	for (POP(ls) ; !ENDP(ls); POP(ls)) {
+	    s = STATEMENT(CAR(ls));
+	    /* the precondition has been allocated as post */
+	    s_pre = post;
+	    post = statement_to_postcondition(s_pre, s);
 	}
     }
 
@@ -271,6 +279,10 @@ transformer tf;
     if(control_predecessors(c) == NIL && control_successors(c) == NIL) {
 	/* there is only one statement in u; no need for a fix-point */
 	debug(8,"unstructured_to_postcondition","unique node\n");
+	/* FI: pre should not be duplicated because
+	 * statement_to_postcondition() means that pre is not
+	 * going to be changed, just post produced.
+	 */
 	post = statement_to_postcondition(transformer_dup(pre),
 					  control_statement(c));
     }
@@ -288,8 +300,10 @@ transformer tf;
 	debug(8,"unstructured_to_postcondition",
 	      "complex: based on transformer\n");
 	/* FI: I do not know if I should duplicate pre or not. */
+	/* FI: well, dumdum, you should have duplicated tf! */
 	(void) unstructured_to_postconditions(pre_u, pre, u) ;
-	post = transformer_apply(tf, pre);
+	post = transformer_apply(transformer_dup(tf), pre);
+	transformer_free(pre_u);
     }
 
     debug(8,"unstructured_to_postcondition","end\n");
@@ -304,11 +318,21 @@ unstructured u ;
 {
     cons *blocs = NIL ;
     control ct = unstructured_control(u) ;
+    transformer c_pre = transformer_undefined;
+    transformer post = transformer_undefined;
 
     debug(8,"unstructured_to_postconditions","begin\n");
 
     /* SHARING! Every statement gets a pointer to the same precondition!
-       I do not know if it's good or not but beware the bugs!!! */
+     * I do not know if it's good or not but beware the bugs!!!
+     */
+    /* FI: changed to make free_transformer_mapping possible without 
+     * testing sharing.
+     *
+     * pre and pre_first can or not be used depending on the
+     * unstructured structure. They are always duplicated and
+     * the caller has to take care of their de-allocation.
+     */
     CONTROL_MAP(c, {
 	statement st = control_statement(c) ;
 	if(c==ct && ENDP(control_predecessors(c)) && statement_test_p(st)) {
@@ -317,10 +341,14 @@ unstructured u ;
 	    /* unspaghettify has been applied... */
 	    /* this is pretty useless and should be generalized to the
 	       DAG part of the CFG */
-	    (void) statement_to_postcondition(pre_first, st);
+	    c_pre = transformer_dup(pre_first);
+	    post = statement_to_postcondition(c_pre, st);
+	    transformer_free(post);
 	}
 	else {
-	    (void) statement_to_postcondition(pre, st);
+	    c_pre = transformer_dup(pre);
+	    post = statement_to_postcondition(c_pre, st);
+	    transformer_free(post);
 	}
     }, ct, blocs) ;
 
