@@ -85,9 +85,14 @@ statement s;
 
     ifdebug(1) {
 	int so = statement_ordering(s);
-	(void) fprintf(stderr, "statement %03d (%d,%d):\n", statement_number(s),
-		       ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
-	(void) print_transformer(load_statement_transformer(s));
+	transformer stf = load_statement_transformer(s);
+
+	(void) fprintf(stderr, "statement %03d (%d,%d), transformer 0x%x:\n",
+		       statement_number(s),
+		       ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
+		       (unsigned int) stf);
+	(void) print_transformer(stf);
+	pips_assert("statement_to_transformer", stf==t);
     }
 
     debug(8,"statement_to_transformer","end with t=%x\n",
@@ -145,32 +150,37 @@ transformer block_to_transformer(b)
 cons * b;
 {
     statement s;
-    transformer tf;
+    transformer btf;
+    transformer stf = transformer_undefined;
+    list l = b;
 
     debug(8,"block_to_transformer","begin\n");
 
-    if(ENDP(b))
-	tf = transformer_identity();
+    if(ENDP(l))
+	btf = transformer_identity();
     else {
-	s = STATEMENT(CAR(b));
-	tf = transformer_dup(statement_to_transformer(s));
-	for (POP(b) ; !ENDP(b); POP(b)) {
-	    s = STATEMENT(CAR(b));
-	    tf = transformer_combine(tf, statement_to_transformer(s));
+	s = STATEMENT(CAR(l));
+	stf = statement_to_transformer(s);
+	btf = transformer_dup(stf);
+	for (POP(l) ; !ENDP(l); POP(l)) {
+	    s = STATEMENT(CAR(l));
+	    stf = statement_to_transformer(s);
+	    btf = transformer_combine(btf, stf);
 	    ifdebug(1) {
-		(void) transformer_consistency_p(tf);
+		(void) transformer_consistency_p(btf);
 	    }
 	}
     }
 
-    debug(8,"block_to_transformer","end\n");
-    return tf;
+    debug(8, "block_to_transformer", "end\n");
+    return btf;
 }
 
 transformer unstructured_to_transformer(u, e)
 unstructured u;
 cons * e; /* effects */
 {
+    transformer ctf;
     transformer tf;
     control c;
 
@@ -182,7 +192,8 @@ cons * e; /* effects */
     if(control_predecessors(c) == NIL && control_successors(c) == NIL) {
 	/* there is only one statement in u; no need for a fix-point */
 	debug(8,"unstructured_to_transformer","unique node\n");
-	tf = statement_to_transformer(control_statement(c));
+	ctf = statement_to_transformer(control_statement(c));
+	tf = transformer_dup(ctf);
     }
     else {
 	/* Do not try anything clever! God knows what may happen in
