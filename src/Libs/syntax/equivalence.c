@@ -2,11 +2,14 @@
  * and in the static area and in the dynamic area. The heap area is left
  * aside.
  *
- * 	%A% ($Date: 2002/03/19 12:30:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+ * 	%A% ($Date: 2003/08/11 16:25:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: equivalence.c,v $
+ * Revision 1.26  2003/08/11 16:25:26  irigoin
+ * User error detection improved
+ *
  * Revision 1.25  2002/03/19 12:30:07  irigoin
  * General substitution of debug() by pips_debug() and replacement of CONS by
  * gen_once() in SaveChains() to avoid later bug in semantics: the same
@@ -41,7 +44,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 2002/03/19 12:30:07 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 2003/08/11 16:25:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -149,6 +152,13 @@ syntax s;
 	    ParserError("MakeEquivAtom", "Initialized variable in equivalence chain\n");
     }
     */
+
+    /* In case, the entity is not of type variable, reject it. */
+    if(!type_variable_p(entity_type(e))) {
+      pips_user_warning("Illegal symbol %s appears in EQUIVALENCE declaration\n",
+			entity_local_name(e));
+      ParserError("MakeEquivAtom", "Functional variable (?) in equivalence chain.\n");
+    }
 
     /* In case an adjustable array which is not a formal parameter has
        been encountered, reject it. */
