@@ -564,16 +564,15 @@ string oname;
     bool success_p = TRUE;
 
     /* we select some resources */
-    MAPL(pvr, {
-	virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
+    MAP(VIRTUAL_RESOURCE, vr, 
+    {
 	string vrn = virtual_resource_name(vr);
 	tag vrt = owner_tag(virtual_resource_owner(vr));
-
+	
 	if (vrt == is_owner_select) {
-
-	    debug(3, "make_pre_transformation",
-		  "rule %s : selecting phase %s\n",
-		  vrn);
+	    
+	    pips_debug(3, "rule %s : selecting phase %s\n",
+		       rule_phase(ru), vrn);
 	    
 	    if (activate (vrn) == NULL) {
 		success_p = FALSE;
@@ -581,7 +580,6 @@ string oname;
 	    }
 	}
     }, rule_pre_transformation(ru));
-    
     
     if (success_p) {
 	/* we build the list of pre transformation real_resources */
