@@ -11,6 +11,8 @@
 #include <string.h>
 #include <malloc.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "misc.h"
 
@@ -26,7 +28,7 @@
 
 static bool statement_is_empty;
 
-static bool cannot_be_empty(gen_chunk* x)
+static bool cannot_be_empty(void)
 {
     statement_is_empty = FALSE;
     gen_recurse_stop(NULL);
@@ -39,7 +41,7 @@ static bool call_filter(call c)
     if (ENTITY_CONTINUE_P(e) || ENTITY_RETURN_P(e))
 	return FALSE;
     else
-	return cannot_be_empty(c);
+	return cannot_be_empty();
 }
 
 bool 
@@ -84,7 +86,7 @@ number_of_sequential_and_parallel_loops(
     int * ppar)
 {
     nseq=0, npar=0;
-    gen_recurse(stat, loop_domain, gen_true, loop_rwt);
+    gen_multi_recurse(stat, loop_domain, gen_true, loop_rwt, NULL);
     *pseq=nseq, *ppar=npar;
 }
 
@@ -1040,7 +1042,7 @@ statement
 clear_labels(s)
 statement s;
 {
-    gen_recurse (s, statement_domain, gen_true, clear_label);
+    gen_multi_recurse(s, statement_domain, gen_true, clear_label, NULL);
     return s;
 }
 
@@ -1286,8 +1288,9 @@ string
 gather_all_comments_of_a_statement(statement s)
 {
     gather_all_comments_of_a_statement_string = NULL;
-    gen_recurse(s, statement_domain,
-		gather_all_comments_of_a_statement_filter, gen_null);
+    gen_multi_recurse(s, statement_domain,
+		gather_all_comments_of_a_statement_filter, gen_null,
+		      NULL);
     
     if (gather_all_comments_of_a_statement_string == NULL)
 	return empty_comments;
@@ -1686,9 +1689,10 @@ gather_and_remove_all_format_statements(statement s)
 {
     gather_and_remove_all_format_statements_list = NIL;
     
-    gen_recurse(s, statement_domain,
+    gen_multi_recurse(s, statement_domain,
 		gen_true,
-		gather_and_remove_all_format_statements_rewrite);
+		gather_and_remove_all_format_statements_rewrite,
+		      NULL);
     
     gather_and_remove_all_format_statements_list =
 	gen_nreverse(gather_and_remove_all_format_statements_list);
@@ -1704,11 +1708,11 @@ put_formats_at_module_beginning(statement s)
     /* Pick up all the FORMATs of the module: */
     list formats = gather_and_remove_all_format_statements(s);
     ifdebug (1)
-	pips_assert("Incorrect statements...", gen_consistent_p(s));
+	pips_assert("Incorrect statements...", statement_consistent_p(s));
     /* And put them at the very beginning of the module: */
     insert_a_statement_list_in_a_statement(s, formats);
     ifdebug (1)
-	pips_assert("Incorrect statements...", gen_consistent_p(s));
+	pips_assert("Incorrect statements...", statement_consistent_p(s));
 }
 
 
@@ -1719,11 +1723,11 @@ put_formats_at_module_end(statement s)
     /* Pick up all the FORMATs of the module: */
     list formats = gather_and_remove_all_format_statements(s);
     ifdebug (1)
-	pips_assert("Incorrect statements...", gen_consistent_p(s));
+	pips_assert("Incorrect statements...", statement_consistent_p(s));
     /* And put them at the very beginning of the module: */
     append_a_statement_list_to_a_statement(s, formats);
     ifdebug (1)
-	pips_assert("Incorrect statements...", gen_consistent_p(s));
+	pips_assert("Incorrect statements...", statement_consistent_p(s));
 }
 
 
@@ -1749,9 +1753,9 @@ format_inside_statement_p(statement s)
 {
     format_inside_statement_has_been_found = FALSE;
     
-    gen_recurse(s, instruction_domain,
+    gen_multi_recurse(s, instruction_domain,
 		figure_out_if_it_is_a_format,
-		gen_null);
+		gen_null, NULL);
 
     return format_inside_statement_has_been_found;
 }
@@ -1854,7 +1858,7 @@ statement_to_line_number(statement s)
 
     current_line = 0;
 
-    gen_recurse(s, statement_domain, down_counter, up_counter);
+    gen_multi_recurse(s, statement_domain, down_counter, up_counter, NULL);
 
     s_to_l = stmt_to_line;
     stmt_to_line = persistant_statement_to_int_undefined;
