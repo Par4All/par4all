@@ -1,5 +1,11 @@
 /*
  * local definitions
+ * 
+ * SCCS stuff:
+ * $RCSfile: hpfc-local.h,v $ ($Date: 1994/06/03 14:14:45 $, )
+ * version $Revision$,
+ * got on %D%, %T%
+ * $Id$
  */
 
 #include <ctype.h>
@@ -26,6 +32,7 @@
 #define GAMMA_PREFIX "GAMMA"
 #define DELTA_PREFIX "DELTA"
 #define IOTA_PREFIX "IOTA"
+#define SIGMA_PREFIX "SIGMA"
 
 #define HPFC_PACKAGE "HPFC-PACKAGE"
 
@@ -34,51 +41,18 @@
  */
 
 /* in compiler.c */
-extern int 
-    uniqueintegernumber,
-    uniquefloatnumber,
-    uniquelogicalnumber,
-    uniquecomplexnumber;
-
-extern entity_mapping 
-    oldtonewhostvar,
-    oldtonewnodevar,
-    newtooldhostvar,
-    newtooldnodevar,
-    hpfnumber, 
-    hpfalign, 
-    hpfdistribute;
 
 extern statement_mapping
     hostgotos,
     nodegotos;
 
-extern list 
-    distributedarrays,
-    templates,
-    processors;	
-
 extern entity
-    hostmodule,
-    nodemodule;
+    host_module,
+    node_module;
 
 /* in compile-decl.c */
 
-extern entity_mapping
-    newdeclarations;
-
 #define computer reference
-extern computer 
-    currentcomputer; 
-/*extern list currentloopindexes; */
-
-/* in run-time.c */
-
-extern entity 
-    e_MYPOS, /* used in the overlap analysis, defined in compile.c */
-    e_LoopBounds;
-
-/* in o-analysis.c */
 
 extern list
     lloop;
