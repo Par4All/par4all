@@ -37,15 +37,7 @@ Here is what can be attached to a word:
 file and {\tt end} the position of its end.
 
 The various objects that can be attached:
-\domain{attachee =
-  persistent reference
-  + persistent loop
-  + persistent module_head:entity
-  + {complementary_sections, complexities, continuation_conditions,
-    cumulated_effects, out_regions, preconditions,
-    privatized_regions, proper_effects, proper_regions, regions,
-    static_control, transformers, decoration}
-  }
+\domain{attachee = persistent reference + persistent loop + persistent module_head:entity + {complementary_sections, complexities, continuation_conditions, cumulated_effects, out_regions, preconditions, privatized_regions, proper_effects, proper_regions, regions, static_control, transformers, decoration}}
 
 Persistence is need because we do not want the RI to be broken when
 the attachments are freed.
