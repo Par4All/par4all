@@ -17,13 +17,13 @@ parallel architectures. Funded by PARADIGME.
 <h2>Input language</h2>
 <ul>
   <li> Fortran 77
-  <li> HPF <b>static</b> and <b>dynamic</b> mapping directives 
+  <li> HPF <b>static</b> and <b>dynamic</b> mapping directives
+  <li> <b>prescriptive</b> and <b>descriptive</b> mappings for arguments.
   <li> HPF <code>independent</code> and <code>new</code> directives
   <li> private <code>local</code>, <code>pure</code> and
        <code>io</code> directives
-  <li> assumes a number of processors known at compile time
-  <li> distributed arrays can be passed thru commons
-       (but not as arguments)
+  <li> assumes all sizes as known at compile time
+  <li> arrays in commons can be distributed statically
 </ul>
 
 <h2>Output</h2>
@@ -35,7 +35,7 @@ parallel architectures. Funded by PARADIGME.
 <h2>Implementation</h2>
 <ul>
   <li> data structures based on NEWGEN. Linear/C3 library for linear techniques.
-  <li> 17,000 lines of C for the compiler (HPFC, a PIPS module) 
+  <li> 18,000 lines of C for the compiler (HPFC, a PIPS module) 
   <li> 1,000 lines of shell and C for the driver and other utilities
   <li> 3,000 lines of m4/fortran for the runtime support library
        (expanded to +8,000)
