@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/04/19 15:53:38 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/06/06 18:26:18 $, )
  * version $Revision$
  *
  * Compiler
@@ -660,6 +660,8 @@ hpf_compiler(
     statement *hoststatp,
     statement *nodestatp)
 {
+    list /* of hpfc_reduction */ lr = NIL;
+
     if (load_statement_only_io(stat)==1) /* necessary */
     {
 	io_efficient_compile(stat,  hoststatp, nodestatp);
@@ -670,6 +672,9 @@ hpf_compiler(
 	remapping_compile(stat, hoststatp, nodestatp);
 	return;
     }
+    
+    if (bound_hpf_reductions_p(stat)) /* HPF REDUCTION */
+	lr = handle_hpf_reduction(stat);
     
     /* else usual stuff 
      */
@@ -695,7 +700,21 @@ hpf_compiler(
 	pips_internal_error("unexpected instruction tag\n");
 	break;
     }
+
+    if (lr)
+    {
+	list /* of statement */ lh, ln;
+	lh = gen_nconc(compile_hpf_reduction_prolog(lr, TRUE),
+		       CONS(STATEMENT, *hoststatp,
+			    compile_hpf_reduction_postlog(lr, TRUE)));
+	ln = gen_nconc(compile_hpf_reduction_prolog(lr, FALSE),
+		       CONS(STATEMENT, *nodestatp,
+			    compile_hpf_reduction_postlog(lr, FALSE)));
+
+	*hoststatp = make_block_statement(lh);
+	*nodestatp = make_block_statement(ln);
+    }
 }
 
-/*   That is all
+/*   That is all for $RCSfile: compiler.c,v $
  */
