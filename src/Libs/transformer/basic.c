@@ -217,7 +217,9 @@ transformer t;
     list args = transformer_arguments(t);
     bool consistent = TRUE;
 
-    consistent = sc_weak_consistent_p(sc);
+    consistent = gen_defined_p(t);
+
+    consistent = consistent && sc_weak_consistent_p(sc);
 
     if(consistent) {
 	Pbase b = sc_base(sc);
@@ -230,7 +232,16 @@ transformer t;
 
 		consistent = entity_is_argument_p(var, args);
 	    }
+	    /* The constant term should not appear in the basis */
+	    consistent = consistent && !term_cst(t);
 	}
+    }
+
+    /* The constant term should not be an argument */
+    if(consistent) {
+	MAP(ENTITY, e, {
+	    consistent = consistent && (e != (entity) TCST);
+	}, args);
     }
 
     /* FI: let the user react and print info before core dumping */
