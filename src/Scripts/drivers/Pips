@@ -87,7 +87,8 @@ then
   fi
 else	
   echo sourcing $pips_prgm in `pwd` >&2
-  echo cat >&2
+  echo cat $pips_prgm [$PATH] >&2
+  ls -al $pips_prgm >&2 
   cat $pips_prgm >&2 
   echo cat done >&2
   . $pips_prgm
