@@ -1,7 +1,7 @@
 c
 c everything about packing
 c
-c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/08/29 12:37:01 $, )
+c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/08/29 12:42:32 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -30,8 +30,8 @@ c
       integer info  
       integer i1  
       do i1=rglo1, rgup1, rgin1  
-         call PVMFUNCTION(PVMTYPE, 
-     $        array(i1), 1, 1, info)  
+         call PVMFUNCTION
+     $        (PVMTYPE, array(i1), 1, 1, info)  
       enddo  
       end  
 c
@@ -66,8 +66,8 @@ c
       integer i1, i2
       do i1=rglo1, rgup1, rgin1
          do i2=rglo2, rgup2, rgin2
-            call PVMFUNCTION(PVMTYPE, 
-     $           array(i1, i2), 1, 1, info)
+            call PVMFUNCTION
+     $           (PVMTYPE, array(i1, i2), 1, 1, info)
          enddo
       enddo
       end
@@ -108,8 +108,8 @@ c
       do i1=rglo1, rgup1, rgin1
          do i2=rglo2, rgup2, rgin2
             do i3=rglo3, rgup3, rgin3
-               call PVMFUNCTION(PVMTYPE, 
-     $                       array(i1, i2, i3), 1, 1, info)
+               call PVMFUNCTION
+     $              (PVMTYPE, array(i1, i2, i3), 1, 1, info)
             enddo
          enddo
       enddo
@@ -157,8 +157,8 @@ c
          do i2=rglo2, rgup2, rgin2
             do i3=rglo3, rgup3, rgin3
                do i4=rglo4, rgup4, rgin4
-                  call PVMFUNCTION(PVMTYPE, 
-     $                          array(i1, i2, i3, i4), 1, 1, info)
+                  call PVMFUNCTION
+     $                 (PVMTYPE, array(i1, i2, i3, i4), 1, 1, info)
                enddo
             enddo
          enddo
