@@ -250,7 +250,7 @@ pips_process_file(string file_name)
  * also the generated lines may be too long...
  */
 #define COMPLEX_CST_RX \
-    "^[^\"']*[^a-zA-Z0-9_][ \t]*\\((\\)[-0-9\\. \t]*,[-0-9\\. \t]*)"
+    "^[^\"']*[^a-zA-Z0-9_ \t][ \t]*\\((\\)[-0-9\\. \t]*,[-0-9\\. \t]*)"
 
 static regex_t 
     implicit_none_rx, 
@@ -267,11 +267,15 @@ insert_at(
     int i, len=strlen(line), shift=strlen(what);
     pips_assert("line large enough", len+shift<LINE_LENGTH);
 
+    fprintf(stderr, "** %s\n", line);
+
     for (i=len; i>=offset; i--)
 	line[i+shift]=line[i];
 
     for (shift--; shift>=0; shift--)
 	line[offset+shift]=what[shift];
+
+    fprintf(stderr, "++ %s\n", line);
 }
 
 static void
