@@ -12,7 +12,7 @@
 #include "ri-util.h"
 
 #include "misc.h"
-#include "semantics.h"
+/* #include "semantics.h" */
 
 #include "transformer.h"
 
@@ -24,7 +24,8 @@
  *
  * t1 is updated, but t2 is preserved
  */
-transformer transformer_combine(t1, t2)
+transformer 
+transformer_combine(t1, t2)
 transformer t1;
 transformer t2;
 {
@@ -86,8 +87,8 @@ transformer t2;
     r1 = sc_append(r1, r2);
     sc_rm(r2);
     r2 = SC_UNDEFINED;
-    if( get_debug_level() >= 9) {
-	(void) fprintf(stderr, "%s: %s", "transformer_combine",
+    ifdebug(9) {
+	(void) fprintf(stderr, "%s: %s", "[transformer_combine]",
 		       "global linear system r1 before projection\n");
 	sc_fprint(stderr, r1, dump_value_name);
 	sc_dump(r1);
@@ -111,8 +112,8 @@ transformer t2;
          },
             ints);
 
-    if( get_debug_level() >= 9) {
-	(void) fprintf(stderr, "%s: %s", "transformer_combine",
+    ifdebug(9) {
+	(void) fprintf(stderr, "%s: %s", "[transformer_combine]",
 		       "global linear system r1 after projection\n");
 	sc_fprint(stderr, r1, dump_value_name);
 	sc_dump(r1);
@@ -243,7 +244,8 @@ transformer_normalize(transformer t, int level)
  *
  * args is not modified. t is modified by side effects.
  */
-transformer transformer_projection(t, args)
+transformer 
+transformer_projection(t, args)
 transformer t;
 cons * args;
 {
@@ -252,12 +254,14 @@ cons * args;
     return t;
 }
 
-Psysteme no_elim(Psysteme ps)
+Psysteme 
+no_elim(Psysteme ps)
 {
     return ps;
 }
 
-transformer transformer_projection_with_redundancy_elimination(t, args, elim)
+transformer 
+transformer_projection_with_redundancy_elimination(t, args, elim)
 transformer t;
 cons * args;
 Psysteme (*elim)(Psysteme);
@@ -343,7 +347,8 @@ Psysteme (*elim)(Psysteme);
  * There is (should be!) no sharing between pre and tf. No sharing is
  * introduced between pre or tf and post. Neither pre nor tf are modified.
  */
-transformer transformer_apply(tf, pre)
+transformer 
+transformer_apply(tf, pre)
 transformer tf;
 transformer pre;
 {
@@ -390,7 +395,8 @@ transformer pre;
  * transformer_projection is useful to get cores when you know all entities
  * in args should appear in the relation.
  */
-transformer transformer_filter(t, args)
+transformer 
+transformer_filter(t, args)
 transformer t;
 cons * args;
 {
@@ -443,7 +449,8 @@ cons * args;
  * returns FALSE if l is invariant w.r.t. tf, i.e. for all state s,
  * eval(l, s) == eval(l, tf(s))
  */
-bool transformer_affect_linear_p(tf, l)
+bool 
+transformer_affect_linear_p(tf, l)
 transformer tf;
 Pvecteur l;
 {
@@ -461,8 +468,12 @@ Pvecteur l;
     return FALSE;
 }
 
-transformer args_to_transformer(e)
-cons * e; /* list of entities */
+/* Generates a transformer abstracting a totally unknown modification of
+ * the values associated to variables in list le.
+ */
+transformer 
+args_to_transformer(le)
+list le; /* list of entities */
 {
     transformer tf = transformer_identity();
     cons * args = transformer_arguments(tf);
@@ -475,7 +486,7 @@ cons * e; /* list of entities */
 
       args = arguments_add_entity(args, new_val);
       b = vect_add_variable(b, (Variable) new_val);
-      }, e);
+      }, le);
 
     transformer_arguments(tf) = args;
     s->base = b;
@@ -495,7 +506,8 @@ cons * e; /* list of entities */
  *
  * p is not modified
  */
-transformer invariant_wrt_transformer(p, tf)
+transformer 
+invariant_wrt_transformer(p, tf)
 transformer p;
 transformer tf;
 {
@@ -521,7 +533,8 @@ transformer tf;
  * which is not seen from A. A may contain relations between B:X and C:X...
  * See hidden.f in Bugs or Validation...
  */
-transformer transformer_value_substitute(t, e1, e2)
+transformer 
+transformer_value_substitute(t, e1, e2)
 transformer t;
 entity e1;
 entity e2;
@@ -561,75 +574,15 @@ entity e2;
     return t;
 }
 
-/* Return true if statement s is reachable according to its precondition. */
-static bool parametric_statement_feasible_p(statement s,
-					    bool empty_p(transformer))
-{
-    transformer pre;
-    bool feasible_p;
-
-    pre = load_statement_precondition(s);
-
-    ifdebug(6) {
-	int so = statement_ordering(s);
-	debug(6, "parametric_statement_feasible_p",
-	      "Begin for statement %d (%d,%d) and precondition 0x%x\n",
-	      statement_number(s),
-	      ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-	      (unsigned int) pre);
-    }
-
-    feasible_p = !empty_p(pre);
-
-    debug(6, "parametric_statement_feasible_p", " End with feasible_p = %d\n",
-	  feasible_p);
-
-    return feasible_p;
-}
-
-/* Return FALSE if precondition of statement s is transformer_empty() */
-bool statement_weakly_feasible_p(statement s)
-{
-    transformer pre = load_statement_precondition(s);
-    /* bool feasible_p = !transformer_empty_p(pre); */
-
-    /* FI: this test is much stronger than I intended. I just wanted
-     * to check that the predicate of pre was exactly sc_empty()!
-     *
-     * Now I'm afraid to change it. suppress_dead_code isn't that slow
-     * on ocean. I'm not sure that I could validate Transformations.
-     */
-
-    Psysteme sc = predicate_system(transformer_relation(pre));
-
-    bool feasible_p = !sc_empty_p(sc);
-
-    return feasible_p;
-}
-
-/* Return true if statement s is reachable according to its precondition. */
-bool statement_feasible_p(statement s)
-{
-    bool feasible_p = parametric_statement_feasible_p(s, transformer_empty_p);
-    return feasible_p;
-}
-
-/* Return true if statement s is reachable according to its precondition. */
-bool statement_strongly_feasible_p(statement s)
-{
-    bool feasible_p =
-	parametric_statement_feasible_p(s, transformer_strongly_empty_p);
-    return feasible_p;
-}
-
 /* If TRUE is returned, the transformer certainly is empty.
  * If FALSE is returned,
  * the transformer still might be empty, it all depends on the normalization
  * procedure power. Beware of its execution time!
  */
-static bool parametric_transformer_empty_p(transformer t,
-					   Psysteme (*normalize)(Psysteme,
-								 char * (*)(Variable)))
+static bool 
+parametric_transformer_empty_p(transformer t,
+			       Psysteme (*normalize)(Psysteme,
+						     char * (*)(Variable)))
 {
     /* FI: the arguments seem to have no impact on the emptiness
      * (i.e. falseness) of t
@@ -668,7 +621,8 @@ static bool parametric_transformer_empty_p(transformer t,
  * If FALSE is returned,
  * the transformer still might be empty, but it's not too likely...
  */
-bool transformer_empty_p(transformer t)
+bool 
+transformer_empty_p(transformer t)
 {
     bool empty_p = parametric_transformer_empty_p(t, sc_strong_normalize4);
     return empty_p;
@@ -678,9 +632,9 @@ bool transformer_empty_p(transformer t)
  * If FALSE is returned,
  * the transformer still might be empty, but it's not likely at all...
  */
-bool transformer_strongly_empty_p(transformer t)
+bool 
+transformer_strongly_empty_p(transformer t)
 {
     bool empty_p = parametric_transformer_empty_p(t, sc_strong_normalize5);
     return empty_p;
 }
-
