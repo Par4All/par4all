@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compiler-util.c,v $ ($Date: 1995/07/20 18:40:36 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1995/10/04 19:29:09 $, )
  * version $Revision$
  */
 
@@ -266,8 +266,7 @@ list lsyn;
 bool atomic_accesses_only_p(stat)
 statement stat;
 {
-    hpfc_warning("atomic_accesses_only_p", 
-		 "not  implemented, returning TRUE\n");
+    hpfc_warning("not  implemented, returning TRUE\n");
 
     return(TRUE);
 }
@@ -280,8 +279,7 @@ statement stat;
 bool indirections_inside_statement_p(stat)
 statement stat;
 {
-    hpfc_warning("indirections_inside_statement_p", 
-		 "not implemented yet, returning FALSE\n");
+    hpfc_warning("not implemented yet, returning FALSE\n");
     return(FALSE);
 }
 
