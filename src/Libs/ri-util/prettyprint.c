@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/12/26 16:08:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/12/29 23:13:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/26 16:08:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/12/29 23:13:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -997,6 +997,7 @@ statement obj;
 	      !get_bool_property("PRETTYPRINT_BLOCKS")) || 
 	     (instruction_unstructured_p(i) && 
 	      !get_bool_property("PRETTYPRINT_UNSTRUCTURED")))) {
+      /* FI: before calling the hook, statement_ordering(obj) should be checked */
 	r = (*text_statement_hook)( module, margin, obj );
 	
 	if (text_statement_hook != empty_text)
@@ -1024,12 +1025,17 @@ statement obj;
 				     make_sentence(is_sentence_formatted, 
 						   strdup(buffer))) ;
 	    }
+	    else {
+	      ADD_SENTENCE_TO_TEXT(r, 
+				   make_sentence(is_sentence_formatted, 
+						   strdup("C (unreachable)\n")));
+	    }
 	}
     }
     return( r ) ;
 }
 
-/* Handles all statements but tests with are nodes of an unstructured
+/* Handles all statements but tests that are nodes of an unstructured.
  * Those are handled by text_control.
  */
 text text_statement(module, margin, stmt)
@@ -1046,6 +1052,12 @@ statement stmt;
 
     debug(2, "text_statement", "Begin for statement %s\n",
 	  statement_identification(stmt));
+
+    if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
+       statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
+      /* we are in trouble with some kind of dead (?) code... */
+      user_warning("text_statement", "I unexpectedly bumped into dead code?\n");
+    }
 
     if (strcmp(label, RETURN_LABEL_NAME) == 0) {
 	/* do not add a redundant RETURN before an END, unless required */
