@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/23 18:02:43 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/24 13:46:00 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -200,6 +200,19 @@ implicitly in the controlizer phase.
 \begin{verbatim}
 UNSPAGHETTIFY_IN_CONTROLIZER   TRUE
 \end{verbatim}
+
+The following option enables the use of IF/THEN/ELSE restructuring
+when applying the controlizer:
+\begin{verbatim}
+UNSPAGHETTIFY_TEST_RESTRUCTURING FALSE
+\end{verbatim}
+
+The following option enables the use of control graph hierarchisation
+when applying the controlizer:
+\begin{verbatim}
+UNSPAGHETTIFY_HIERARCHISATION FALSE
+\end{verbatim}
+
 
 
 \subsection{Chains}
@@ -781,14 +794,6 @@ HPFC_IGNORE_IN_OUT_REGIONS TRUE
 \end{verbatim}
 
 \section{Program Transformations}
-
-
-\subsection{Control Flow Graph Restruturing}
-
-The following option enables the use of IF/THEN/ELSE:
-\begin{verbatim}
-UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
-\end{verbatim}
 
 
 \subsection{Dead code elimination}
