@@ -184,7 +184,7 @@ Domain	: Simple Constructed {
 			$$->co.op = ($2 == NULL) ? AND_OP : Current_op ;
 			
 			if( $$->co.op == OR_OP && Read_spec_mode )
-				$$->co.first = Current_first ;
+				$$->co.first = 0 ;
 
 			Current_op = UNDEF_OP ;
 		        }
@@ -203,7 +203,7 @@ Domain	: Simple Constructed {
 		$$->co.op = OR_OP ;
 		$$->co.components = dlp ;
 
-                if( Read_spec_mode ) $$->co.first = Current_first ;
+                if( Read_spec_mode ) $$->co.first = 0 ;
 
 	        for( ; $2 != NULL ; $2 = $2->cdr, dlp = dlp->cdr ) {
 		  /*NOSTRICT*/
