@@ -76,14 +76,10 @@ string default_user_request(fmt, args)
 char *fmt;
 va_list args;
 {
-    static char buf[INPUT_BUFFER_LENGTH];
-    string str;
-
     printf("\nWaiting for your response: ");
-    (void) vfprintf(stdout, fmt, args);
+    vfprintf(stdout, fmt, args);
     fflush(stdout);
-    str= gets(buf);
-    return(str);
+    return safe_readline(stdin);
 }
 
 /* default assignment of pips_request_handler is default_user_request. Some 
@@ -92,12 +88,9 @@ va_list args;
  */
 string (* pips_request_handler)(char *, va_list) = default_user_request;
 
-
-    /* The generic fonction to ask something to the user. Note that if
-       the user cancels his/her request,the empty string "" is
-       returned: */
-/* USER_REQUEST(format [, arg] ... ) */
-/*VARARGS1*/
+/* The generic fonction to ask something to the user. Note that if
+ * the user cancels his/her request,the empty string "" is returned:
+ */
 string user_request(char * a_message_format, ...)
 {
    string str;
