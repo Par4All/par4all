@@ -1,5 +1,8 @@
 /* $Id$ 
    $Log: util.c,v $
+   Revision 1.10  2004/02/19 15:18:24  nguyen
+   Bug related to "const void", qualifier for not variable type
+
    Revision 1.9  2004/02/19 14:07:59  nguyen
    Correct things about qualifiers
 
@@ -931,8 +934,9 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       /* tc must have variable type, add lq to its qualifiers */
       if (!type_undefined_p(tc) && type_variable_p(tc))
 	variable_qualifiers(type_variable(tc)) = lq;
-      else
-	CParserError("Entity has qualifier but no type or is not variable type in the context?\n");
+      /*else
+	const void, void is not of type variable, store const where ?????????  
+	CParserError("Entity has qualifier but no type or is not variable type in the context?\n");*/
     }
   
   /************************* TYPE PART *******************************************/
@@ -1006,8 +1010,9 @@ void UpdateAbstractEntity(entity e, stack ContextStack)
       /* tc must have variable type, add lq to its qualifiers */
       if (!type_undefined_p(tc) && type_variable_p(tc))
 	variable_qualifiers(type_variable(tc)) = lq;
-      else
-	CParserError("Entity has qualifier but no type or is not variable type in the contex ?\n");
+      /*else
+	const void, void is not of type variable, store const where ?????????  
+	CParserError("Entity has qualifier but no type or is not variable type in the context?\n");*/
     }
   
   /************************* TYPE PART *******************************************/
