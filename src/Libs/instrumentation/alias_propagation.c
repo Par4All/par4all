@@ -65,8 +65,8 @@
  
    2.1 Alias created by only one call:
 
-   Case 3. An actual argument is bound to different formal parameters or different 
-   actual arguments but equivalenced. So for a call site, we can divide the 
+   Case 3. An actual argument is bound to different formal parameters or there are  
+   different actual arguments but equivalent. So for a call site, we can divide the 
    argument list into groups of same actual or equivalence arguments. For 
    example:
    EQUIVALENCE (V1(1,1),V2(5))
@@ -82,7 +82,7 @@
    can be different variables, and their sections are ram section. For the other 
    cases, we can use section = ALIAS_SPECIAL_i, initial_off = 0.
   
-   => useless tests  ??? No for same variables because the section is unique but
+   => useless tests  ??? Not for same variables because the section is unique but
    useless tests for equivalence variables, as U and V1 have the same section
    => test between F8,F12, ...
 
@@ -156,17 +156,6 @@ static void display_alias_propagation_statistics()
   user_log("\n Number of processed modules: %d\n",number_of_processed_modules); 
 }
 
-boolean entity_in_list_p(entity e, list l)
-{
-  while (!ENDP(l))
-    {
-      entity ent = ENTITY(CAR(l));
-      if (same_entity_p(e,ent)) return TRUE;
-      l = CDR(l);
-    }
-  return FALSE;
-}
-
 /*****************************************************************************
    This function computes the subscript value of an array element 
    minus 1, multiplied by the size of array element. 
@@ -237,9 +226,9 @@ expression subscript_value_stride(entity arr, list l_inds)
       if (!expression_equal_integer_p(retour,0))
 	retour = binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,copy_expression(retour),e_size);
     }
-  ifdebug(3)
+  ifdebug(4)
     {
-      fprintf(stderr, "\n Stride of subscript value : \n");
+      pips_debug(4,"\nStride of subscript value:");
       print_expression(retour);
     }
   return retour;
@@ -285,9 +274,7 @@ expression translate_to_module_frame(entity mod1, entity mod2, expression e1, ca
 	  MAP(ENTITY, enti,{
 	    if (same_scalar_location_p(en,enti))
 	      {
-		ifdebug(3)
-		  fprintf(stderr, "\n The common variable %s is translated\n", 
-			  entity_local_name(en));
+		pips_debug(4,"\nThe common variable %s is translated\n",entity_local_name(en));
 		if (array_entity_p(enti))
 		  {
 		    /* ATTENTION : enti may be an array, such as A(2):
@@ -302,8 +289,7 @@ expression translate_to_module_frame(entity mod1, entity mod2, expression e1, ca
 		  }
 		return entity_to_expression(enti);
 	      }
-	  },
-	      l_decls);
+	  },l_decls);
 	  // return the common variable although it is not declared in the module !!!!!!
 	  //	  return entity_to_expression(en);
 	}
@@ -317,9 +303,8 @@ expression translate_to_module_frame(entity mod1, entity mod2, expression e1, ca
 	         miss a check : mod2 = caller of mod1 => can be wrong !!!*/
 	      int off = formal_offset(fo);
 	      list l_args = call_arguments(c);
-	      ifdebug(3)
-		fprintf(stderr, "\n The formal parameter %s is translated to the caller's frame\n", 
-			entity_local_name(en));
+	      pips_debug(4,"\nThe formal parameter %s is translated to the caller's frame\n", 
+			 entity_local_name(en));
 	      return find_ith_argument(l_args,off);
 	    }
 	}
@@ -400,8 +385,8 @@ expression translate_to_module_frame(entity mod1, entity mod2, expression e1, ca
 				}
 			      if (check)
 				{
-				  ifdebug(3)
-				    fprintf(stderr, "\n The variable %s is translated by using binding information\n",entity_local_name(en));
+				  pips_debug(4,"\nThe variable %s is translated by using binding information\n",
+					     entity_local_name(en));
 				  return Pvecteur_to_expression(newv);
 				}
 			      vect_rm(newv);
@@ -423,9 +408,9 @@ expression translate_to_module_frame(entity mod1, entity mod2, expression e1, ca
       if (l_args==NIL)
 	{
 	  /* Numerical constant or symbolic value (PARAMETER) */
-	  ifdebug(3)
+	  ifdebug(4)
 	    {
-	      fprintf(stderr, "\n Numerical constant or symbolic value is translated\n");
+	      pips_debug(4,"\nNumerical constant or symbolic value is translated\n");
 	      print_expression(e1);
 	    }
 	  return e1;
@@ -477,11 +462,10 @@ static void ram_variable_add_aliases(call c,call_site cs,entity actual_var,
     }
   else
     end_off = initial_off;
-  ifdebug(2)
+  ifdebug(4)
     {
-      fprintf(stderr, " \n Actual argument %s is a ram variable", 
-	      entity_name(actual_var));
-      fprintf(stderr,"\n with initial ram offset %d and end offset %d",initial_off,end_off);
+      fprintf(stderr, "\nActual argument %s is a ram variable",entity_name(actual_var));
+      fprintf(stderr,"\nwith initial ram offset %d and end offset %d",initial_off,end_off);
     }
   if (expression_equal_integer_p(subval,0))
     /* The offset of actual variable is an integer 
@@ -494,11 +478,11 @@ static void ram_variable_add_aliases(call c,call_site cs,entity actual_var,
 	 multiplied by the size of array element (number of numerical/character
 	 storage units, according to Fortran standard, in PIPS 1 storage unit=1 byte)*/
       expression new_subval = translate_to_module_frame(current_caller,current_mod,subval,c);
-      ifdebug(3)
+      ifdebug(4)
 	{
-	  fprintf(stderr, "\n Subval expression before translation: \n");
+	  fprintf(stderr, "\nSubval expression before translation:");
 	  print_expression(subval);
-	  fprintf(stderr, "\n Subval expression after translation: \n");
+	  fprintf(stderr, "\nSubval expression after translation:");
 	  print_expression(new_subval);
 	}
       if (!expression_undefined_p(new_subval))
@@ -552,13 +536,11 @@ static bool common_is_visible_p(entity sec, entity mod)
       string mod_name = module_local_name(mod);
       callees all_callees = (callees) db_get_memory_resource(DBR_CALLEES,mod_name,TRUE);
       list l_callees = callees_callees(all_callees); 
-      while (!ENDP(l_callees))
-	{
-	  string callee_name = STRING(CAR(l_callees));
-	  entity current_callee = local_name_to_top_level_entity(callee_name);
-	  if (common_is_visible_p(sec,current_callee)) return TRUE;
-	  l_callees = CDR(l_callees);
-	} 
+      MAP(STRING,callee_name,
+      {
+	entity current_callee = local_name_to_top_level_entity(callee_name);
+	if (common_is_visible_p(sec,current_callee)) return TRUE;
+      },l_callees);
     }
   return FALSE;
 }
@@ -575,42 +557,39 @@ static bool common_is_visible_p(entity sec, entity mod)
 static bool same_section_formal_variable_in_list_p(entity actual_var,entity sec,
 						   list actual_path,list l,list l_aliases)
 {
- while (!ENDP(l))
-   {
-     expression exp = EXPRESSION(CAR(l));
-     if (expression_reference_p(exp))
-       {
-	 reference ref = expression_reference(exp);
-	 entity var = reference_variable(ref);
-	 if (!same_entity_p(var,actual_var))
-	   {
-	     storage si =  entity_storage(var);
-	     if (storage_formal_p(si))
-	       {
-		 MAP(ALIAS_ASSOCIATION, aa,
-		 {
-		   entity formal_var = alias_association_variable(aa);
-		   if (same_entity_p(formal_var,var))
-		     {
-		       entity formal_sec = alias_association_section(aa);
-		       list formal_path = alias_association_call_chain(aa);
-		       if (same_entity_p(formal_sec,sec) && 
-			   included_call_chain_p(actual_path,formal_path)) 
-			 {
-			   /* INCLUDED CALL CHAIN ????????*/
-			   ifdebug(2)
-			     fprintf(stderr, "\n Aliases from an actual argument that is a formal parameter and has same section with other actual argument (the last one can be a common variable or another formal variable).\n");
-			   return TRUE;
-			 }
-		     } 
-		 },
-		     l_aliases);
-	       }
-	   }
-       }
-     l = CDR(l);
-   }
- return FALSE;
+  MAP(EXPRESSION,exp,
+  {
+    if (expression_reference_p(exp))
+      {
+	reference ref = expression_reference(exp);
+	entity var = reference_variable(ref);
+	if (!same_entity_p(var,actual_var))
+	  {
+	    storage si =  entity_storage(var);
+	    if (storage_formal_p(si))
+	      {
+		MAP(ALIAS_ASSOCIATION, aa,
+		{
+		  entity formal_var = alias_association_variable(aa);
+		  if (same_entity_p(formal_var,var))
+		    {
+		      entity formal_sec = alias_association_section(aa);
+		      list formal_path = alias_association_call_chain(aa);
+		      if (same_entity_p(formal_sec,sec) && 
+			  included_call_chain_p(actual_path,formal_path)) 
+			{
+			  /* INCLUDED CALL CHAIN ????????*/
+			  pips_debug(3,"\nAliases from an actual argument that is a formal parameter and has same section with other actual argument (the last one can be a common variable or another formal variable).\n");
+			  return TRUE;
+			}
+		    } 
+		},
+		    l_aliases);
+	      }
+	  }
+      }
+  },l);
+  return FALSE;
 }
 
 /******************************************************************** 
@@ -620,27 +599,24 @@ static bool same_section_formal_variable_in_list_p(entity actual_var,entity sec,
 
 static bool same_section_common_variable_in_list_p(entity sec,list l)
 {
- while (!ENDP(l))
-   {
-     expression exp = EXPRESSION(CAR(l));
-     if (expression_reference_p(exp))
-       {
-	 reference ref = expression_reference(exp);
-	 entity var = reference_variable(ref);
-	 if (variable_in_common_p(var))
-	   {
-	     storage si =  entity_storage(var);
-	     entity seci = ram_section(storage_ram(si));
-	     if (same_entity_p(seci,sec)) 
-	       {
-		  ifdebug(2)
-		    fprintf(stderr, "\n Aliases from an actual argument that is a common variable and has same section with other actual argument that is a formal variable.\n");
-		  return TRUE;
-	       }
-	   }
-       }
-     l = CDR(l);
-   }
+  MAP(EXPRESSION,exp,
+  {
+    if (expression_reference_p(exp))
+      {
+	reference ref = expression_reference(exp);
+	entity var = reference_variable(ref);
+	if (variable_in_common_p(var))
+	  {
+	    storage si =  entity_storage(var);
+	    entity seci = ram_section(storage_ram(si));
+	    if (same_entity_p(seci,sec)) 
+	      {
+		pips_debug(3,"\nAliases from an actual argument that is a common variable and has same section with other actual argument that is a formal variable.\n");
+		return TRUE;
+	      }
+	  }
+      }
+  },l);
  return FALSE;
 }
 
@@ -662,9 +638,8 @@ static void formal_variable_add_aliases(call c,call_site cs, entity actual_var,
 {
   list l_caller_aliases = alias_associations_list((alias_associations)
        db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name,TRUE)); 
-  ifdebug(2)
-    fprintf(stderr, " \n Actual argument %s is a formal parameter", 
-	    entity_name(actual_var));	
+  pips_debug(2,"\nActual argument %s is a formal parameter", 
+	     entity_name(actual_var));	
   MAP(ALIAS_ASSOCIATION, aa,
   {
     entity caller_var = alias_association_variable(aa);
@@ -690,7 +665,7 @@ static void formal_variable_add_aliases(call c,call_site cs, entity actual_var,
 	    int end_off = -1;
 	    // path = gen_nconc(path,gen_full_copy_list(alias_association_call_chain(aa)));
 	    ifdebug(3)
-	      fprintf(stderr, " \n Entry for %s found in the alias_association", 
+	      fprintf(stderr,"\nEntry for %s found in the alias_association", 
 		      entity_name(caller_var));
 	    /* If offset of aa is not expression_undefined, we must translate 
 	       it to the module's frame by using binding information */
@@ -700,9 +675,9 @@ static void formal_variable_add_aliases(call c,call_site cs, entity actual_var,
 								       initial_off,c);
 		ifdebug(3)
 		  {
-		    fprintf(stderr, "\n Initial offset expression before translation: \n");
+		    fprintf(stderr, "\nInitial offset expression before translation: \n");
 		    print_expression(initial_off);
-		    fprintf(stderr, "\n Initial offset expression after translation: \n");
+		    fprintf(stderr, "\nInitial offset expression after translation: \n");
 		    print_expression(new_initial_off);
 		  }		
 		if (!expression_undefined_p(new_initial_off))
@@ -780,111 +755,89 @@ static list list_of_same_or_equivalence_arguments(entity e,list l)
 	  reference ref = expression_reference(exp);
 	  entity var = reference_variable(ref);
 	  if (same_entity_p(var,e))
-	    retour = CONS(EXPRESSION,int_to_expression(j),retour);
+	    retour = CONS(INT,j,retour);
 	  else 
 	    if (entity_conflict_p(var,e) && 
 		!(variable_in_common_p(e)&&variable_in_common_p(var)))
 	      {
 		l_traversed = CONS(ENTITY,var,l_traversed);
-		retour = CONS(EXPRESSION,int_to_expression(j),retour);
+		retour = CONS(INT,j,retour);
 	      }
 	}
     }
   return retour;
 }
 
-/* Add alias_association for each formal variable whose offset = i or 
-   i + an integer in the list l*/
-static void same_or_equivalence_argument_add_aliases(int i,list l,call c,call_site cs,
+/* Add alias_association for each formal variable whose offset is in the list l*/
+static void same_or_equivalence_argument_add_aliases(list l,call c,call_site cs,
 						     list l_actual,bool equiv)
 {
-  l = CONS(EXPRESSION,int_to_expression(0),l);
   if (equiv)
     {
-      ifdebug(2)
-	{
-	  fprintf(stderr, "\n Aliases from equivalence actual arguments\n");
-	  fprintf(stderr, " \n List of same or equivalence arguments: ");
-	}
-      while (!ENDP(l))
-	{
-	  expression e = EXPRESSION(CAR(l));
-	  int k = expression_to_int(e)+i;
-	  expression actual_arg = find_ith_argument(l_actual,k);
-	  reference actual_ref = expression_reference(actual_arg);
-	  entity actual_var = reference_variable(actual_ref);
-	  entity formal_var = find_ith_formal_parameter(current_mod,k);	     
-	  list l_actual_inds = reference_indices(actual_ref);
-	  expression subval = subscript_value_stride(actual_var,l_actual_inds);
-	  ifdebug(2)
-	    fprintf(stderr,"%d,",k);
-	  ram_variable_add_aliases(c,cs,actual_var,formal_var,subval);
-	  l = CDR(l);
-	}
+      MAP(INT,k,
+      {
+	expression actual_arg = find_ith_argument(l_actual,k);
+	reference actual_ref = expression_reference(actual_arg);
+	entity actual_var = reference_variable(actual_ref);
+	entity formal_var = find_ith_formal_parameter(current_mod,k);	     
+	list l_actual_inds = reference_indices(actual_ref);
+	expression subval = subscript_value_stride(actual_var,l_actual_inds);
+	ram_variable_add_aliases(c,cs,actual_var,formal_var,subval);
+      },l);
     }
   else
     {
       entity sec = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
 	 strdup(concatenate(ALIAS_SECTION,int_to_string(unique_section_number++),NULL)));
-      ifdebug(2)
-	{
-	  fprintf(stderr, "\n Aliases from same actual arguments\n");
-	  fprintf(stderr, " \n List of same arguments: ");
-	}
-      while (!ENDP(l))
-	{
-	  expression e = EXPRESSION(CAR(l));
-	  int k = expression_to_int(e)+i;
-	  expression actual_arg = find_ith_argument(l_actual,k);
-	  reference actual_ref = expression_reference(actual_arg);
-	  entity actual_var = reference_variable(actual_ref);
-	  entity formal_var = find_ith_formal_parameter(current_mod,k);	     
-	  list l_actual_inds = reference_indices(actual_ref);
-	  expression subval = subscript_value_stride(actual_var,l_actual_inds);
-	  expression off = expression_undefined;
-	  int end_off = -1;
-	  alias_association one_alias = alias_association_undefined;
-	  list path = CONS(CALL_SITE,cs,NIL);
-	  if (array_entity_p(actual_var))
-	    {
-	      int tmp;
-	      if (SizeOfArray(actual_var, &tmp))
-		end_off = tmp - SizeOfElements(variable_basic(type_variable(entity_type(actual_var))));
-	    }
-	  else
-	    end_off = 0;
-	  ifdebug(2)
-	    fprintf(stderr,"%d,",k);
-	  if (expression_equal_integer_p(subval,0))
-	    /* The offset of the actual variable is an integer 
-	       that can always be translated into the module's frame*/
-	    off = int_to_expression(0);	
-	  else 
-	    {
-	      off  = translate_to_module_frame(current_caller,current_mod,subval,c);
-	      ifdebug(3)
-		{
-		  fprintf(stderr, "\n Subval expression before translation: \n");
-		  print_expression(subval);
-		  fprintf(stderr, "\n Subval expression after translation: \n");
-		  print_expression(off);
-		}
-	    }
-	  if (expression_undefined_p(off))
-	    number_of_unknown_offsets++;
-	  else 
-	    number_of_known_offsets++;
-	  /* 0 <= off <= 0 + array_size_stride (no bound violation ;-))*/
-	  one_alias = make_alias_association(formal_var,sec,off,0,end_off,path);
-	  number_of_alias_associations++;
-	  message_assert("alias_association is consistent",
-			 alias_association_consistent_p(one_alias));
-	  ifdebug(2)
-	    print_alias_association(one_alias);
-	  l_current_aliases = gen_nconc(l_current_aliases, 
-					CONS(ALIAS_ASSOCIATION,one_alias, NIL));
-	  l = CDR(l);
-	}
+      MAP(INT,k,
+      {
+	expression actual_arg = find_ith_argument(l_actual,k);
+	reference actual_ref = expression_reference(actual_arg);
+	entity actual_var = reference_variable(actual_ref);
+	entity formal_var = find_ith_formal_parameter(current_mod,k);	     
+	list l_actual_inds = reference_indices(actual_ref);
+	expression subval = subscript_value_stride(actual_var,l_actual_inds);
+	expression off = expression_undefined;
+	int end_off = -1;
+	alias_association one_alias = alias_association_undefined;
+	list path = CONS(CALL_SITE,cs,NIL);
+	if (array_entity_p(actual_var))
+	  {
+	    int tmp;
+	    if (SizeOfArray(actual_var, &tmp))
+	      end_off = tmp - SizeOfElements(variable_basic(type_variable(entity_type(actual_var))));
+	  }
+	else
+	  end_off = 0;
+	if (expression_equal_integer_p(subval,0))
+	  /* The offset of the actual variable is an integer 
+	     that can always be translated into the module's frame*/
+	  off = int_to_expression(0);	
+	else 
+	  {
+	    off  = translate_to_module_frame(current_caller,current_mod,subval,c);
+	    ifdebug(4)
+	      {
+		fprintf(stderr, "\nSubval expression before translation: \n");
+		print_expression(subval);
+		fprintf(stderr, "\nSubval expression after translation: \n");
+		print_expression(off);
+	      }
+	  }
+	if (expression_undefined_p(off))
+	  number_of_unknown_offsets++;
+	else 
+	  number_of_known_offsets++;
+	/* 0 <= off <= 0 + array_size_stride (no bound violation ;-))*/
+	one_alias = make_alias_association(formal_var,sec,off,0,end_off,path);
+	number_of_alias_associations++;
+	message_assert("alias_association is consistent",
+		       alias_association_consistent_p(one_alias));
+	ifdebug(2)
+	  print_alias_association(one_alias);
+	l_current_aliases = gen_nconc(l_current_aliases, 
+				      CONS(ALIAS_ASSOCIATION,one_alias, NIL));
+      },l);
     }
 }
 
@@ -899,63 +852,67 @@ static bool add_aliases_for_current_call_site(call c)
       int i = 0;
       call_site cs = make_call_site(current_caller,order);
       //  list path = gen_full_copy_list(CONS(CALL_SITE,cs,NIL));
-      ifdebug(3)
+      ifdebug(2)
 	{
-	  fprintf(stderr, " \n Current caller: %s ", caller_name);
-	  fprintf(stderr, " \n Current call site:\n");
+	  pips_debug(2,"\nCurrent caller: %s", caller_name);
+	  fprintf(stderr,"\nCurrent call site:");
 	  print_statement(stmt);
 	}
       message_assert("call_site is consistent", call_site_consistent_p(cs));	
       l_traversed = NIL;
-      while (!ENDP(l))
-	{
-	  expression actual_arg = EXPRESSION(CAR(l));
-	  i++;
-	  l = CDR(l);
-	  if (expression_reference_p(actual_arg))
-	    {
-	      /* Correspond to different cases of alias, we make the following groups
-		 and order :
-		 Case 3. list_of_same_or_equivalence_arguments
-		 Case 1 + Case 5.2. common variable
-		 Case 2 + Case 4 + Case 5.1. formal variable */
-	      reference actual_ref = expression_reference(actual_arg);
-	      entity actual_var = reference_variable(actual_ref);
-	      list l_same_or_equiv = NIL;
-	      entity formal_var = find_ith_formal_parameter(current_mod,i);	     
-	      list l_actual_inds = reference_indices(actual_ref);
-	      expression subval = subscript_value_stride(actual_var,l_actual_inds);
-	      /* To distinguish between equivalence or same argument cases*/
-	      int j = gen_length(l_traversed);
-	      bool equiv = FALSE;
-	      ifdebug(2)
+      MAP(EXPRESSION,actual_arg,
+      {
+	i++;
+	if (expression_reference_p(actual_arg))
+	  {
+	    /* Correspond to different cases of alias, we make the following groups and order :
+	       Case 3. list_of_same_or_equivalence_arguments
+	       Case 1 + Case 5.2. common variable
+	       Case 2 + Case 4 + Case 5.1. formal variable */
+	    reference actual_ref = expression_reference(actual_arg);
+	    entity actual_var = reference_variable(actual_ref);     
+	    list l_actual_inds = reference_indices(actual_ref);
+	    expression subval = subscript_value_stride(actual_var,l_actual_inds);
+	    entity formal_var = find_ith_formal_parameter(current_mod,i);	
+	    list l_same_or_equiv = NIL;
+	    /* To distinguish between equivalence or same argument cases*/
+	    int j = gen_length(l_traversed);
+	    bool equiv = FALSE;
+	    if (!variable_in_list_p(actual_var,l_traversed))
+	      {
+		l_same_or_equiv = list_of_same_or_equivalence_arguments(actual_var,l);
+		if (gen_length(l_traversed)>j) equiv = TRUE;
+		l_traversed = CONS(ENTITY,actual_var,l_traversed);
+	      }
+	    ifdebug(3)
+	      {
+		if (equiv)
+		  fprintf(stderr,"\nList of equivalent arguments: ");
+		else
+		  fprintf(stderr,"\nList of same arguments: ");
+		MAP(INT,l,
 		{
-		  fprintf(stderr, " \n List of traversed entities: ");
-		  print_list_entities(l_traversed);
-		}
-	      if (!entity_in_list_p(actual_var,l_traversed))
-		{
-		  l_same_or_equiv = list_of_same_or_equivalence_arguments(actual_var,l);
-		  if (gen_length(l_traversed)>j) equiv = TRUE;
-		  l_traversed = CONS(ENTITY,actual_var,l_traversed);
-		}
-	      if (l_same_or_equiv != NIL)
-		same_or_equivalence_argument_add_aliases(i,l_same_or_equiv,c,cs,l_actuals,equiv);
-	      if (variable_in_common_p(actual_var))
-		{
-		  storage s = entity_storage(actual_var);
-		  entity sec = ram_section(storage_ram(s)); 
-		  list l_caller_aliases = alias_associations_list((alias_associations)
-		     db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name, TRUE)); 
-		  if (common_is_visible_p(sec,current_mod) || 
-		      same_section_formal_variable_in_list_p(actual_var,sec,NIL,l_actuals,l_caller_aliases))
-		    ram_variable_add_aliases(c,cs,actual_var,formal_var,subval);
-		}
-	      if (storage_formal_p(entity_storage(actual_var)))
-		formal_variable_add_aliases(c,cs,actual_var,formal_var,subval,l_actuals); 
-	    } 
-	}
+		  fprintf(stderr,"%d,",l);
+		},l_same_or_equiv);
+	      }
+	    if (gen_length(l_same_or_equiv) > 1)
+	      same_or_equivalence_argument_add_aliases(l_same_or_equiv,c,cs,l_actuals,equiv);
+	    if (variable_in_common_p(actual_var))
+	      {
+		storage s = entity_storage(actual_var);
+		entity sec = ram_section(storage_ram(s)); 
+		list l_caller_aliases = alias_associations_list((alias_associations)
+								db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name, TRUE)); 
+		if (common_is_visible_p(sec,current_mod) || 
+		    same_section_formal_variable_in_list_p(actual_var,sec,NIL,l_actuals,l_caller_aliases))
+		  ram_variable_add_aliases(c,cs,actual_var,formal_var,subval);
+	      }
+	    if (storage_formal_p(entity_storage(actual_var)))
+	      formal_variable_add_aliases(c,cs,actual_var,formal_var,subval,l_actuals); 
+	  } 
+      },l);
       l_traversed = NIL;
+      gen_free_list(l);
     }
   return TRUE;
 }
@@ -976,8 +933,7 @@ static void add_aliases_for_current_caller()
 
 static list alias_propagation_callers(list l_callers)
 {
-  /* we traverse all callers to find all call sites,
-   * and fill in the list of aliases (l_current_aliases) */
+  /* Traverse each caller and add aliases to the list of aliases (l_current_aliases) */
   l_current_aliases = NIL;
   MAP(STRING, c_name,
   {
@@ -985,13 +941,12 @@ static list alias_propagation_callers(list l_callers)
     caller_name = module_local_name(current_caller);
     if (get_bool_property("ALIAS_CHECKING_USING_MAIN_PROGRAM") &&
 	(! module_is_called_by_main_program_p(current_caller)))
-      /* If the current caller is never called by the main program => 
+      /* If the current caller is never called by the main program =>
 	 no need to follow this caller*/
       pips_user_warning("Module %s is not called by the main program \n",caller_name);
     else
       add_aliases_for_current_caller();
-  },
-      l_callers);
+  }, l_callers);
   return l_current_aliases;
 }
  
@@ -1003,13 +958,12 @@ bool alias_propagation(char * module_name)
   //  number_of_alias_associations = 0;
   number_of_processed_modules++;
   debug_on("ALIAS_PROPAGATION_DEBUG_LEVEL");
-  ifdebug(1)
-    fprintf(stderr, " \n Begin alias_propagation for %s \n", module_name); 
+  pips_debug(1,"\nBegin alias propagation for module %s \n", module_name); 
   /* No alias for main program*/
   if (!entity_main_module_p(current_mod))
     {
       if (get_bool_property("ALIAS_CHECKING_USING_MAIN_PROGRAM") &&
-	  (! module_is_called_by_main_program_p(current_mod)))
+	  (!module_is_called_by_main_program_p(current_mod)))
 	/* If the current module is never called by the main program => 
 	   don't need to compute aliases for this module*/
 	pips_user_warning("Module %s is not called by the main program \n",module_name);
@@ -1022,8 +976,7 @@ bool alias_propagation(char * module_name)
 	  {
 	    if (formal_parameter_p(e))
 	      l_formals = gen_nconc(l_formals,CONS(ENTITY,e,NIL));
-	  },
-	      l_decls);
+	  },l_decls);
 	  /* if there is no formal parameter, do nothing */
 	  if (l_formals != NIL)
 	    {
@@ -1034,9 +987,9 @@ bool alias_propagation(char * module_name)
 		{
 		  ifdebug(2)
 		    {
-		      fprintf(stderr," \n The formal parameters list:");
+		      fprintf(stderr,"The list of formal parameters:");
 		      print_entities(l_formals);
-		      fprintf(stderr," \n The caller list : ");
+		      fprintf(stderr,"\nThe list of callers: ");
 		      MAP(STRING, caller_name, {
 			(void) fprintf(stderr, "%s, ", caller_name);
 		      }, l_callers);
@@ -1050,15 +1003,11 @@ bool alias_propagation(char * module_name)
 	    }
 	}
     }
-  
   /* save to resource */
-  DB_PUT_MEMORY_RESOURCE(DBR_ALIAS_ASSOCIATIONS,module_name, 
-			 (char*) make_alias_associations(l_aliases));  
+  DB_PUT_MEMORY_RESOURCE(DBR_ALIAS_ASSOCIATIONS,module_name,make_alias_associations(l_aliases));  
   display_alias_propagation_statistics();
   reset_current_module_entity();
   current_mod = entity_undefined;
-  ifdebug(1)
-    fprintf(stderr, " \n End \n");
   debug_off();  
   return TRUE;
 }
