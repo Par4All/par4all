@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/07/26 16:55:24 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/04 11:08:09 $, )
 # version $Revision$, 
 # got on %D%, %T%
 # $Id$
@@ -91,7 +91,7 @@ PVMDIR="${RTSRCDIR}/pvm3.3"
 
 # where manl directory is (Pb: cannot be derived to cshrc)
 # MANPATH="${MANPATH}${MANPATH:+:}${DOCDIR}"
-MANPATH=`${UTILDIR}/newmanpath`
+MANPATH=${MANPATH}:${DOCDIR}
 
 # new command path
 PATH=${PATH}:${BINDIR}:${UTILDIR}:/usr5/gnu/bin-sparc
