@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 2003/07/21 12:19:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2003/08/02 13:40:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2003/07/21 12:19:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2003/08/02 13:40:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -31,6 +31,9 @@ char vcid_control_control[] = "%A% ($Date: 2003/07/21 12:19:41 $, ) version $Rev
  * $Id$
  *
  * $Log: control.c,v $
+ * Revision 1.38  2003/08/02 13:40:05  irigoin
+ * Cosmetic changes to silence gcc
+ *
  * Revision 1.37  2003/07/21 12:19:41  nguyen
  * Add new control structures for C language (for loop, switch, ...), preliminary version
  *
@@ -462,6 +465,8 @@ hash_table used_labels;
   pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	     st, pred, succ, c_res);
         
+  pips_assert("Useless parameters", c==c && used_labels==used_labels);
+
   UPDATE_CONTROL(c_res, st,
 		 ADD_PRED(pred, c_res), 
 		 CONS(CONTROL, succ, NIL));
@@ -748,7 +753,8 @@ hash_table used_labels;
 {
     hash_table loop_used_labels = hash_table_make(hash_string, 0);
     control c_body = make_conditional_control(forloop_body(l));
-    bool controlized;
+    bool controlized = FALSE; /* To avoid gcc warning about possible
+                                 non-initialization */
 
     pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	       st, pred, succ, c_res);
