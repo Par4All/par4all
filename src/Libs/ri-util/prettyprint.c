@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.72  1997/09/15 09:31:54  coelho
+ * declaration regeneration~: data / blockdata fixes.
+ *
  * Revision 1.71  1997/09/13 16:04:01  coelho
  * cleaner.
  *
@@ -29,7 +32,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.71 1997/09/13 16:04:01 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.72 1997/09/15 09:31:54 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -956,7 +959,7 @@ words_subexpression(
  * approximate BLOCK DATA / SUBROUTINE distinction also added. FC 09/97
  */
 static sentence 
-sentence_head(entity e, statement stat)
+sentence_head(entity e)
 {
     list pc = NIL;
     type te = entity_type(e);
@@ -975,11 +978,7 @@ sentence_head(entity e, statement stat)
 	    pc = CHAIN_SWORD(pc, "PROGRAM ");
 	else
 	{
-	    if (ENDP(args) && empty_code_p(stat))
-		/* this is quite approximated. should be encoded somewhere.
-		 * if you have an empty sunroutine with no arg, it is going
-		 * to be considered as a block data.
-		 */
+	    if (entity_blockdata_p(e))
 		pc = CHAIN_SWORD(pc, "BLOCKDATA ");
 	    else
 		pc = CHAIN_SWORD(pc, "SUBROUTINE ");
@@ -2555,7 +2554,7 @@ text_module(entity module,
 	    ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
 	
 	ADD_SENTENCE_TO_TEXT(r, 
-	   attach_head_to_sentence(sentence_head(module, stat), module));
+	   attach_head_to_sentence(sentence_head(module), module));
 	if (head_hook) 
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 						  head_hook(module)));
