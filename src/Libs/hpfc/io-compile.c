@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/04/19 16:56:37 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/06/11 13:27:01 $, )
  * version $Revision$
  */
 
@@ -69,7 +69,7 @@ generate_shared_io_system(
     Psysteme
 	result = SC_UNDEFINED, /* ??? bug post with region */
 	region = effect_system(entity_to_region(stat, array, act)), 
-	a_decl = entity_to_declaration_constraints(array),
+	a_decl = entity_to_declaration_constraints(array, 0),
 	stamme = hpfc_unstutter_dummies(array),
 	contxt = statement_context(stat, move); 
     
@@ -108,8 +108,7 @@ generate_distributed_io_system(
     tag act)
 {
     Psysteme result = SC_UNDEFINED,
-	/*
-	 * ??? bug: the preconditions may be in the regions.  To update, I
+	/* ??? bug: the preconditions may be in the regions.  To update, I
 	 * should have the postconditions instead, that is the statement
 	 * transformer should be applied to the system.
 	 */
@@ -137,11 +136,11 @@ generate_distributed_io_system(
     sc_base(result) = NULL;
     sc_creer_base(result);
     
-    DEBUG_SYST(7, "region", region);
-    DEBUG_SYST(7, "array syst", dist_v);
-    DEBUG_SYST(7, "hpf unicity", sother);
-    DEBUG_SYST(7, "unstammer", stamme);
-    DEBUG_SYST(7, "context", contxt);
+    DEBUG_SYST(9, "region", region);
+    DEBUG_SYST(9, "array syst", dist_v);
+    DEBUG_SYST(9, "hpf unicity", sother);
+    DEBUG_SYST(9, "unstammer", stamme);
+    DEBUG_SYST(9, "context", contxt);
     
     DEBUG_SYST(6, concatenate("result: ", entity_name(array), NULL), result);
     
