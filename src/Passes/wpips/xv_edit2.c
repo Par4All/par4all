@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/06 14:25:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/15 14:40:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/06 14:25:16 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/09/15 14:40:14 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -157,20 +157,101 @@ int alloc_first_initialized_window()
 }    
 
 
-/* To display some Pips output with wpips or epips: */
+/* Mark a wpips or epips window as busy: */
+void
+wpips_view_marked_busy(char * title_module_name, /* The module name for example */
+                       char * title_label, /* "Sequential View" for exemple */
+                       int window_number,
+                       int icon_number,
+                       char * icon_title)
+{
+   char busy_label[SMALL_BUFFER_LENGTH];
+   
+   if (! wpips_emacs_mode) {
+      (void) sprintf(busy_label, "*Computing %s * ...", title_label);
+      /* Display the file name and the module name. RK, 2/06/1993 : */
+      xv_set(edit_frame[window_number],
+             FRAME_LABEL, compute_title_string(window_number),
+             FRAME_SHOW_FOOTER, TRUE,
+             FRAME_LEFT_FOOTER, busy_label,
+             FRAME_RIGHT_FOOTER, title_module_name,
+             FRAME_BUSY, TRUE,
+             NULL);
+
+      if (icon_number >= 0)
+         set_pips_icon(edit_frame[window_number], icon_number, icon_title);
+
+      unhide_window(edit_frame[window_number]);
+   }
+   display_memory_usage();
+}
+
+
+/* Display a file in a wpips or epips window: */
+void
+wpips_file_view(char * file_name,
+                char * title_module_name, /* The module name for example */
+                char * title_label, /* "Sequential View" for exemple */
+                int window_number,
+                int icon_number,
+                char * icon_title)
+{
+   if (file_name == NULL) {
+      /* Well, something got wrong... */
+      prompt_user("Nothing available to display...");
+      return;
+   }
+   
+   if (! wpips_emacs_mode) {
+      /* Display the file name and the module name. RK, 2/06/1993 : */
+      xv_set(edit_frame[window_number],
+             FRAME_LABEL, compute_title_string(window_number),
+             FRAME_SHOW_FOOTER, TRUE,
+             FRAME_RIGHT_FOOTER, title_module_name,
+             NULL);
+
+      if (icon_number >= 0)
+         set_pips_icon(edit_frame[window_number], icon_number, icon_title);
+
+      xv_set(edit_textsw[window_number], 
+             TEXTSW_FILE, file_name,
+             TEXTSW_BROWSING, TRUE,
+             TEXTSW_FIRST, 0,
+             NULL);
+
+      xv_set(edit_frame[window_number],
+             FRAME_LEFT_FOOTER, title_label,
+             FRAME_BUSY, FALSE,
+             NULL);
+      
+      unhide_window(edit_frame[window_number]);
+   }
+   else {
+      /* The Emacs mode equivalent: */
+      send_window_number_to_emacs(window_number);
+      send_module_name_to_emacs(title_module_name);
+      /* send_icon_name_to_emacs(icon_number); */
+      send_view_to_emacs(title_label, file_name);
+   }
+   
+   xv_set(current_selection_mi, 
+          MENU_STRING, "Lasts",
+          MENU_INACTIVE, FALSE, NULL);
+   xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
+   
+   display_memory_usage();
+}
+
+
+/* To execute something and display some Pips output with wpips or
+   epips: */
 void
 wpips_execute_and_display_something(char * label)
 {
-   char string_modulename[SMALL_BUFFER_LENGTH], bank_view_name[SMALL_BUFFER_LENGTH];
-   char busy_label[SMALL_BUFFER_LENGTH];
-   char * file_name1;
-   char *busy_label_format = "*Computing %s * ...";
-   char *print_type, *print_type_2 = NULL;
-   char *modulename = db_get_current_module_name();
-   int win1, win2;
-   Icon icon_number, icon_number2;
+   char * file_name;
+   char *module_name = db_get_current_module_name();
 
-   if (modulename == NULL) {
+   if (module_name == NULL) {
       prompt_user("No module selected");
       return;
    }
@@ -179,167 +260,105 @@ wpips_execute_and_display_something(char * label)
       /* Use some graph viewer to display the resource: */
       char system_buffer[300];
       
-      file_name1 = build_view_file(DBR_GRAPH_PRINTED_FILE);
-      user_log("Launching a \"daVinci\" process...\n");
-      (void) sprintf(system_buffer, "display_pips_daVinci %s &", file_name1);
+      file_name = build_view_file(DBR_GRAPH_PRINTED_FILE);
+
+      user_log("Launching a \"daVinci\" process in background...\n");
+
+      (void) sprintf(system_buffer, "display_pips_daVinci %s &", file_name);
       system(system_buffer);
    }
    else {
       /* Use some text viewer to display the resource: */
-
-   /* Is there an available edit_textsw ? */
-   if ( (win1=alloc_first_initialized_window()) == NO_TEXTSW_AVAILABLE ) {
-      prompt_user("None of the text-windows is available");
-      return;
-   }
-   icon_number = icon_number2 = -1;
-   if (strcmp(label, USER_VIEW) == 0) {
-      print_type = DBR_PARSED_PRINTED_FILE;
-      icon_number = user_ICON;
-   }
-   else if (strcmp(label, SEQUENTIAL_VIEW) == 0) {
-      print_type = DBR_PRINTED_FILE;
-      icon_number = sequential_ICON;
-   }
-   else if (strcmp(label, SEQUENTIAL_EMACS_VIEW) == 0) {
-      print_type = DBR_EMACS_PRINTED_FILE;
-      icon_number = sequential_ICON;
-   }
-   else if (strcmp(label, PARALLEL_VIEW) == 0) {
-      print_type = DBR_PARALLELPRINTED_FILE;
-      icon_number = parallel_ICON;
-   }
-   else if (strcmp(label, CALLGRAPH_VIEW) == 0) {
-      print_type = DBR_CALLGRAPH_FILE;
-      icon_number = callgraph_ICON;
-   }
-   else if (strcmp(label, ICFG_VIEW) == 0) {
-      print_type = DBR_ICFG_FILE;
-      icon_number = ICFG_ICON;
-   }
-   else if (strcmp(label, DISTRIBUTED_VIEW) == 0) {
-      print_type = DBR_WP65_COMPUTE_FILE;
-      icon_number = WP65_PE_ICON;
-      print_type_2 = DBR_WP65_BANK_FILE;
-      icon_number2 = WP65_bank_ICON;
-   }
-   else if (strcmp(label, DEPENDENCE_GRAPH_VIEW) == 0) {
-      print_type = DBR_DG_FILE;
-   }
-   else if (strcmp(label, FLINT_VIEW) == 0) {
-      print_type = DBR_FLINTED;
-   }
-   else if (strcmp(label, ARRAY_DFG_VIEW) == 0) {
-      print_type = DBR_ADFG_FILE;
-   }
-   else if (strcmp(label, TIME_BASE_VIEW) == 0) {
-      print_type = DBR_BDT_FILE;
-   }
-   else if (strcmp(label, PLACEMENT_VIEW) == 0) {
-      print_type = DBR_PLC_FILE;
-   }
-   else {
-      pips_error("view_notify", "bad label : %s\n", label);
-   }
-
-   file_name1 = build_view_file(print_type);
-
-   if (file_name1 == NULL) {
-      /* Well, something got wrong... */
-      prompt_user("Nothing available to display...");
-      return;
-   }
-   
-   if (! wpips_emacs_mode) {
-      (void) sprintf(busy_label, busy_label_format, label);
-      /* Display the file name and the module name. RK, 2/06/1993 : */
-      sprintf(string_modulename, "Module: %s", modulename);
-      xv_set(edit_frame[win1], FRAME_LABEL, compute_title_string(win1),
-             FRAME_SHOW_FOOTER, TRUE,
-             FRAME_LEFT_FOOTER, busy_label,
-             FRAME_RIGHT_FOOTER, string_modulename,
-             FRAME_BUSY, TRUE,
-             NULL);
-	
-      set_pips_icon(edit_frame[win1], icon_number, modulename);
-
-      xv_set(edit_textsw[win1], 
-             TEXTSW_FILE, file_name1,
-             TEXTSW_BROWSING, TRUE,
-             TEXTSW_FIRST, 0,
-             NULL);
-
-      xv_set(edit_frame[win1],
-             FRAME_LEFT_FOOTER, label,
-             FRAME_BUSY, FALSE,
-             NULL);
-   }
-   else {
-      /* The Emacs mode equivalent: */
-      send_window_number_to_emacs(win1);
-      send_module_name_to_emacs(modulename);
-      /* send_icon_name_to_emacs(icon_number); */
-      send_view_to_emacs(label, file_name1);
-   }
-   
-  
-   if ( print_type_2 != NULL ) {
+      int window_number;
+      char * print_type;
+      char * print_type_2 = NULL;
+      /* No icon image by default: */
+      int icon_number = -1;
+      int icon_number2 = -1;
+      char title_module_name[SMALL_BUFFER_LENGTH];
+      
       /* Is there an available edit_textsw ? */
-      if ( (win2=alloc_first_initialized_window()) 
-           == NO_TEXTSW_AVAILABLE ) {
+      if ((window_number = alloc_first_initialized_window())
+          == NO_TEXTSW_AVAILABLE) {
          prompt_user("None of the text-windows is available");
          return;
       }
-
-      if (! wpips_emacs_mode) {
-         /* Display the file name and the module name. RK, 2/06/1993 : */
-         (void) sprintf(bank_view_name, "%s (bank view)", label);
-         (void) sprintf(busy_label, busy_label_format, bank_view_name);
-         xv_set(edit_frame[win2], FRAME_LABEL, compute_title_string(win2),
-                FRAME_SHOW_FOOTER, TRUE,
-                FRAME_LEFT_FOOTER, busy_label,
-                FRAME_RIGHT_FOOTER, string_modulename,
-                FRAME_BUSY, TRUE,
-                NULL);
-    
-         set_pips_icon(edit_frame[win2], icon_number2, modulename);
-
-         xv_set(edit_textsw[win2], 
-                TEXTSW_FILE, get_dont_build_view_file(print_type_2),
-                TEXTSW_BROWSING, TRUE,
-                TEXTSW_FIRST, 0,
-                NULL);
-    
-         xv_set(edit_frame[win2],
-                FRAME_LEFT_FOOTER, bank_view_name,
-                FRAME_BUSY, FALSE,
-                NULL);
+      icon_number = icon_number2 = -1;
+      if (strcmp(label, USER_VIEW) == 0) {
+         print_type = DBR_PARSED_PRINTED_FILE;
+         icon_number = user_ICON;
+      }
+      else if (strcmp(label, SEQUENTIAL_VIEW) == 0) {
+         print_type = DBR_PRINTED_FILE;
+         icon_number = sequential_ICON;
+      }
+      else if (strcmp(label, SEQUENTIAL_EMACS_VIEW) == 0) {
+         print_type = DBR_EMACS_PRINTED_FILE;
+         icon_number = sequential_ICON;
+      }
+      else if (strcmp(label, PARALLEL_VIEW) == 0) {
+         print_type = DBR_PARALLELPRINTED_FILE;
+         icon_number = parallel_ICON;
+      }
+      else if (strcmp(label, CALLGRAPH_VIEW) == 0) {
+         print_type = DBR_CALLGRAPH_FILE;
+         icon_number = callgraph_ICON;
+      }
+      else if (strcmp(label, ICFG_VIEW) == 0) {
+         print_type = DBR_ICFG_FILE;
+         icon_number = ICFG_ICON;
+      }
+      else if (strcmp(label, DISTRIBUTED_VIEW) == 0) {
+         print_type = DBR_WP65_COMPUTE_FILE;
+         icon_number = WP65_PE_ICON;
+         print_type_2 = DBR_WP65_BANK_FILE;
+         icon_number2 = WP65_bank_ICON;
+      }
+      else if (strcmp(label, DEPENDENCE_GRAPH_VIEW) == 0) {
+         print_type = DBR_DG_FILE;
+      }
+      else if (strcmp(label, FLINT_VIEW) == 0) {
+         print_type = DBR_FLINTED;
+      }
+      else if (strcmp(label, ARRAY_DFG_VIEW) == 0) {
+         print_type = DBR_ADFG_FILE;
+      }
+      else if (strcmp(label, TIME_BASE_VIEW) == 0) {
+         print_type = DBR_BDT_FILE;
+      }
+      else if (strcmp(label, PLACEMENT_VIEW) == 0) {
+         print_type = DBR_PLC_FILE;
       }
       else {
-         /* The Emacs mode equivalent: */
-         send_window_number_to_emacs(win2);
-         /* Should be the same, nevertheless...: */
-         send_module_name_to_emacs(modulename);
-         /* send_icon_name_to_emacs(icon_number2); */
-         send_view_to_emacs("BANK", get_dont_build_view_file(print_type_2));
+         pips_error("view_notify", "bad label : %s\n", label);
       }
-   }
 
-   xv_set(current_selection_mi, 
-          MENU_STRING, "Lasts",
-          MENU_INACTIVE, FALSE, NULL);
-   xv_set(close_menu_item, MENU_INACTIVE, FALSE, NULL);
+      sprintf(title_module_name, "Module: %s", module_name);
+      wpips_view_marked_busy(title_module_name, label, window_number, icon_number, module_name);
 
-   if (! wpips_emacs_mode) {
-      unhide_window(edit_frame[win1]);
+      file_name = build_view_file(print_type);
+
+      wpips_file_view(file_name, title_module_name, label, window_number, icon_number, module_name);
+   
+   
+  
       if ( print_type_2 != NULL ) {
-         unhide_window(edit_frame[win2]);
+         char bank_view_name[SMALL_BUFFER_LENGTH];
+         /* Is there an available edit_textsw ? */
+         if ((window_number = alloc_first_initialized_window())
+             == NO_TEXTSW_AVAILABLE) {
+            prompt_user("None of the text-windows is available");
+            return;
+         }
+
+         (void) sprintf(bank_view_name, "%s (bank view)", label);
+         wpips_view_marked_busy(title_module_name, bank_view_name, window_number, icon_number2, module_name);
+         file_name = get_dont_build_view_file(print_type_2);
+      
+         wpips_file_view(file_name, title_module_name, bank_view_name, window_number, icon_number2, module_name);
       }
    }
    
-}
-
-   display_memory_usage();
 }
 
 
