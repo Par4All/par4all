@@ -24,6 +24,12 @@ range: a range is not evaluated.
 
 #include "ri-util.h"
 
+/* FI: these values were taken from synatx/tokyacc.h but I do not 
+ * think they matter.
+ *
+ * MOD was an initial exception. So are MINIMUM and MAXIMUM
+ */
+
 #define AND     55
 #define EQ     56
 #define EQV     57
@@ -42,6 +48,8 @@ range: a range is not evaluated.
 #define POWER     77
 #define MOD       78  /* not evaluated, but later added in IsBinaryOperator*/
 #define CONCAT     84
+#define MINIMUM 85
+#define MAXIMUM 86
 
 value EvalExpression(e)
 expression e;
@@ -138,6 +146,8 @@ cons *la;
 	    v = EvalUnaryOp(token, la);
     else if ((token = IsBinaryOperator(e)) > 0)
 	    v = EvalBinaryOp(token, la);
+    else if ((token = IsNaryOperator(e)) > 0)
+	    v = EvalNaryOp(token, la);
     else
 	    v = make_value(is_value_unknown, NIL);
 
@@ -228,6 +238,49 @@ cons *la;
 
     return(v);
 }
+
+value EvalNaryOp(t, la)
+int t;
+cons *la;
+{
+    value v = value_undefined;
+    value w = value_undefined;
+    int new_arg = 0;
+    bool first_arg_p = TRUE;
+
+    /* 2 operands at least are needed */
+    assert(la != NIL && CDR(la) != NIL);
+
+    MAP(EXPRESSION, e, {
+	v = EvalExpression(e);
+	if (value_constant_p(v) && constant_int_p(value_constant(v))) {
+	    new_arg = constant_int(value_constant(v));
+	    if (first_arg_p) {
+		first_arg_p = FALSE;
+		w = v;
+	    }
+	    else {
+		switch(t) {
+		case MAXIMUM:
+		    constant_int(value_constant(w))= MAX(constant_int(value_constant(w)),
+							 new_arg);
+		    break;
+		case MINIMUM:
+		    constant_int(value_constant(w))= MIN(constant_int(value_constant(w)),
+							 new_arg);
+		    break;
+		default:
+		    return v;
+		}
+		gen_free(v);
+	    }
+	}
+	else
+	    return(v);
+    }, la);
+
+    return(w);
+}
 
 /* FI: These string constants are defined in ri-util.h */
 int IsUnaryOperator(e)
@@ -283,6 +336,20 @@ entity e;
 		token = OR;
 	else if (strcmp(entity_local_name(e), ".AND.") == 0)
 		token = AND;		
+	else
+		token = -1;
+
+	return(token);
+}
+int IsNaryOperator(e)
+entity e;
+{
+	int token;
+
+	if (strcmp(entity_local_name(e), MIN0_OPERATOR_NAME) == 0)
+		token = MINIMUM;
+	else if (strcmp(entity_local_name(e), MAX0_OPERATOR_NAME) == 0)
+		token = MAXIMUM;
 	else
 		token = -1;
 
