@@ -1,57 +1,28 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/03/24 15:02:12 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/04/10 18:49:41 $, )
  * version $Revision$
  */
 
-#include <stdio.h>
-#include <string.h> 
-extern fprintf();
+#include "defines-local.h"
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-
-#include "genC.h"
-
-#include "ri.h" 
-#include "hpf.h" 
-#include "hpf_private.h"
-
-#include "ri-util.h" 
-#include "misc.h" 
 #include "control.h"
 #include "transformer.h"
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
-#include "properties.h"
 
-/* in paf-util.h: */
+/* in paf-util.h:
+ */
 list base_to_list(Pbase base);
 void fprint_entity_list(FILE *fp, list l);
 
  /* Yi-Qing stuff */
-#include <values.h>
-
-#include "arithmetique.h"
-#include "text.h"
 #include "graph.h"
 #include "dg.h"
-#include "database.h"
 #include "rice.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "polyedre.h"
-
 #include "ricedg.h"      
-
-#include "hpfc.h"
-#include "defines-local.h"
-/* #include "compiler_parameters.h" */
 
 /*----------------------------------------------------------------
  *
