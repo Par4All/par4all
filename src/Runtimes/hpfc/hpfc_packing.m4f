@@ -3,11 +3,12 @@
 !
 ! $Id$
 ! $Log: hpfc_packing.m4f,v $
+! Revision 1.19  1997/07/03 11:08:26  zory
+! pvm specific constructions are replaced by hpfc general ones
+!
 ! Revision 1.18  1997/06/09 14:01:43  zory
 ! include hpfc_commons_pvm (temporary)
 !
-! Revision 1.17  1997/05/29 15:48:06  zory
-! *** empty log message ***
 !
 ! Revision 1.16  1997/03/20 07:50:01  coelho
 ! better RCS headers.
@@ -34,7 +35,7 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
 !
 ! Packing LEVEL dimensional array
 !
-      subroutine build_name(HPFC,NAME,PVMTYPE,LEVEL)(
+      subroutine build_name(PVMTYPE,NAME,LEVEL)(
      $     array, dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_SECTION')
@@ -44,7 +45,7 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_SECTION')
       TYPE
      $ array(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
-      include "hpfc_commons_pvm.h"
+      include "hpfc_commons.h"
       integer info, nitem
       integer COMMA_REPLICATE(LEVEL, `INDEX_REF')
       i1=rl1
@@ -74,13 +75,15 @@ define(ALLPACK,`
 forloop(`_D_',1,_HPFC_DIMENSIONS_,`ONE_PACKING(_D_,$1)')
 !')dnl
 !
-ifdef(`_HPFC_NO_BYTE1_',,`ALLPACK(BYTE1)')
-ifdef(`_HPFC_NO_INTEGER2_',,`ALLPACK(INTEGER2)')
-ifdef(`_HPFC_NO_INTEGER4_',,`ALLPACK(INTEGER4)')
-ifdef(`_HPFC_NO_REAL4_',,`ALLPACK(REAL4)')
-ifdef(`_HPFC_NO_REAL8_',,`ALLPACK(REAL8)')
-ifdef(`_HPFC_NO_COMPLEX8_',,`ALLPACK(COMPLEX8)')
-ifdef(`_HPFC_NO_COMPLEX16_',,`ALLPACK(COMPLEX16)')
+ifdef(`_HPFC_NO_BYTE1_',,`ALLPACK(HPFC BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`ALLPACK(HPFC INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`ALLPACK(HPFC INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`ALLPACK(HPFC REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`ALLPACK(HPFC REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`ALLPACK(HPFC COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`ALLPACK(HPFC COMPLEX16)')
+ifdef(`_HPFC_NO_STRING_',,`ALLPACK(HPFC STRING)')
+
 !
 ! that is all
 !
