@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/12/30 14:06:08 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1997/01/04 14:46:07 $, )
  * version $Revision$
  */
  
@@ -732,6 +732,9 @@ bool hpfc_close(string name)
      */
     save_hpfc_status();
     
+    /* ??? the next function is in pipsmake... (should be in pipsdbm only,
+     * but pipsmake manages its own cache which must be destroyed also...
+     */
     delete_all_resources(); /* rough! */
     DB_PUT_FILE_RESOURCE(DBR_HPFC_COMMONS, name, NO_FILE); /* fake */
 
