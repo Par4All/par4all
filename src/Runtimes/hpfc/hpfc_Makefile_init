@@ -1,6 +1,9 @@
 #
-# $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1997/02/17 16:51:05 $, )
+# $Id$
+# $Log: hpfc_Makefile_init,v $
+# Revision 1.54  1997/03/19 17:05:25  coelho
+# _both.f files considered as common files for host and node.
+#
 #
 # This is the initial makefile for HPFC compilation
 # a NAME macro is expected somewhere...
@@ -205,7 +208,7 @@ HEADERS 	=	$(wildcard hpfc_*.h) $(PVM_HEADERS)
 
 RT_INIT		= 	hpfc_initialize_runtime.f
 
-COMMON_FFILES	=	$(RT_INIT) hpfc_check.f
+COMMON_FFILES	=	$(RT_INIT) hpfc_check.f $(wildcard [A-Z]*_both.f)
 HOST_FFILES 	=	$(wildcard [A-Z]*_host.f)
 NODE_FFILES 	= 	$(wildcard [A-Z]*_node.f)
 
