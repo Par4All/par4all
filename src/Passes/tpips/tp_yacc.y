@@ -1,7 +1,12 @@
 /* $Id$
  *
- * each full syntax looks for ENDOFLINE so as to check that the right
+ * Each full syntax looks for ENDOFLINE so as to check that the right
  * number of arguments is matched.
+ *
+ * $Log: tp_yacc.y,v $
+ * Revision 1.63  1997/11/27 12:14:52  coelho
+ * list of command are ok.
+ *
  */
 
 %token TK_OPEN
@@ -43,7 +48,7 @@
 %token TK_ENDOFLINE
 
 %type <name>   TK_NAME TK_A_STRING TK_LINE propname phasename resourcename
-%type <status> instruction
+%type <status> command commands
 %type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd i_rm
 %type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help
@@ -198,7 +203,11 @@ perform(bool (*what)(string, string), res_or_rule * res)
 
 %%
 
-instruction: TK_ENDOFLINE { /* may be empty! */ }
+commands: commands command { $$ = $1 && $2; } 
+	| command
+	;
+
+command: TK_ENDOFLINE { /* may be empty! */ }
 	| i_open 
 	| i_create
   	| i_close
