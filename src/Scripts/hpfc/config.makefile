@@ -1,21 +1,25 @@
 #
 # $RCSfile: config.makefile,v $ for hpfc scripts
+# (version $Revision$, $Date: 1996/08/21 15:36:27 $, )
 #
 
-SCRIPTS	= 	hpfc \
+SHR_SCRIPTS = 	hpfc \
 		hpfc_directives \
+		hpfc_compile \
+		hpfc_delete \
+		hpfc_install
+
+RTM_SCRIPTS =	hpfc_llcmd \
 		hpfc_add_warning \
 		hpfc_generate_h \
-		hpfc_compile \
-		hpfc_generate_init \
-		hpfc_delete \
-		hpfc_install \
-		hpfc_llcmd
+		hpfc_generate_init
 
+SCRIPTS = 	$(SHR_SCRIPTS) $(RTM_SCRIPTS)
 SOURCES	=	$(SCRIPTS) hpfc_interactive.c
 
-INSTALL_SHR=	$(SCRIPTS)
+INSTALL_SHR=	$(SHR_SCRIPTS)
 INSTALL_BIN=	$(ARCH)/hpfc_interactive
+INSTALL_RTM=	$(RTM_SCRIPTS)
 
 all:	$(ARCH)/hpfc_interactive
 
