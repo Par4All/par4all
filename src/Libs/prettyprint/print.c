@@ -1,24 +1,13 @@
- /* Main C functions to print code, sequential or parallel
-  *
-  * Modifications:
-  *  - In order to make consistent with the ri-util, I modified some codes
-  *    FROM
-       ADD_SENTENCE_TO_TEXT(r, 
-			   make_sentence(is_sentence_formatted, 
-				 code_decls_text(entity_code(module))));
-       MERGE_TEXTS(r, text_statement(module, 0, mod_stat));
-       ADD_SENTENCE_TO_TEXT(r, sentence_tail(module));
-  *    TO
-       MERGE_TEXTS(r, text_module(module, mod_stat));
-  *    23/10/91
-  *    BTW, sentence_tail should have no argument at all.
-  *
-  *  - printparallelized_code should have properties: 
-           set_bool_property("PRETTYPRINT_PARALLEL", TRUE);
-	   set_bool_property("PRETTYPRINT_SEQUENTIAL", FALSE);
-  *    Too. Not just print_parallelized90_code and print_parallelized77_code
-  *    LZ, 17/01/92
-  */ 
+/* Main C functions to print code, sequential or parallel
+ *
+ * $Id$
+ *
+ * $Log: print.c,v $
+ * Revision 1.18  1997/11/21 13:17:58  coelho
+ * cleaner headers.
+ *
+ * 
+ */ 
 
 #include <stdlib.h>
 #include <stdio.h>
