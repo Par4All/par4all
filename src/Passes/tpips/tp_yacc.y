@@ -4,6 +4,9 @@
  * number of arguments is matched.
  *
  * $Log: tp_yacc.y,v $
+ * Revision 1.65  1997/12/05 13:28:20  coelho
+ * capply rule added.
+ *
  * Revision 1.64  1997/11/27 13:34:04  coelho
  * some user errors moved as user warnings in delete...
  *
@@ -19,6 +22,7 @@
 %token TK_MODULE
 %token TK_MAKE
 %token TK_APPLY
+%token TK_CAPPLY
 %token TK_DISPLAY
 %token TK_REMOVE
 %token TK_ACTIVATE
@@ -54,11 +58,11 @@
 %type <status> command commands
 %type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd i_rm
-%type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help
+%type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help i_capply
 %type <name> rulename filename 
 %type <array> filename_list
 %type <rn> resource_id rule_id
-%type <owner> owner list_of_owner_name
+%type <array> owner list_of_owner_name
 
 %{
 #include <stdlib.h>
@@ -97,11 +101,8 @@ extern void yyerror(char *);
 static void
 free_owner_content(res_or_rule * pr)
 {
-    gen_map(free, pr->the_owners);
-    gen_free_list(pr->the_owners);
-    free(pr->the_name);
-    pr->the_owners = NIL;
-    pr->the_name = NULL;
+    gen_array_full_free(pr->the_owners), pr->the_owners = NULL;
+    free(pr->the_name), pr->the_name = NULL;
 }
 
 void 
@@ -168,9 +169,8 @@ perform(bool (*what)(string, string), res_or_rule * res)
 	    db_get_current_module_name()?
 	    strdup(db_get_current_module_name()): NULL;
 	
-	MAPL(e, {
-	    string mod_name = STRING(CAR(e));
-	    
+	GEN_ARRAY_MAP(mod_name, 
+        {
 	    if (mod_name != NULL)
 	    {
 		if (what(res->the_name, mod_name) == FALSE) {
@@ -200,7 +200,6 @@ perform(bool (*what)(string, string), res_or_rule * res)
     int status;
     string name;
     res_or_rule rn;
-    list owner;
     gen_array_t array;
 }
 
@@ -218,6 +217,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| i_module
 	| i_make
 	| i_apply
+	| i_capply
 	| i_display
 	| i_rm
 	| i_activate
@@ -508,6 +508,13 @@ i_apply: TK_APPLY rule_id TK_ENDOFLINE
 	}
 	;
 
+i_capply: TK_CAPPLY rule_id TK_ENDOFLINE
+	{
+	    pips_debug(7, "reduce rule i_capply\n");
+	    $$ = safe_concurrent_apply($2.the_name, $2.the_owners);
+	}
+	;
+
 i_display: TK_DISPLAY resource_id TK_ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_display\n");
@@ -602,43 +609,28 @@ rule_id: phasename owner
 
 owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 	{
-	    int i;
-	    list result = NIL;
 	    pips_debug(7,"reduce rule owner (ALL)\n");
-
 	    if (tpips_execution_mode) 
 	    {
 		if (!db_get_current_workspace_name())
 		    pips_user_error("No current workspace! "
 				    "create or open one!\n");
-		else {
-		    gen_array_t modules = db_get_module_list();
-		    int nmodules = gen_array_nitems(modules);
-		    message_assert("some modules", nmodules>0);
-		    for(i=0; i<nmodules; i++) {
-			string n =  gen_array_item(modules, i);
-			result = CONS(STRING, strdup(n), result);
-		    }
-		    gen_array_full_free(modules);
-		    result = gen_nreverse(result);
-		    pips_assert("length ok", nmodules==gen_length(result));
-		    $$ = result;
-		}
+		else 
+		    $$ = db_get_module_list();
 	    }
 	}
 	| TK_OPENPAREN TK_OWNER_PROGRAM TK_CLOSEPAREN
 	{
 	    pips_debug(7,"reduce rule owner (PROGRAM)\n");
 	    if (tpips_execution_mode)
-		$$ = CONS(STRING, strdup(PROGRAM_RESOURCE_OWNER), NIL);
+	    {
+		$$ = gen_array_make(0);
+		gen_array_dupappend($$, "");
+	    }
 	}
 	| TK_OPENPAREN TK_OWNER_MAIN TK_CLOSEPAREN
 	{
-	    int i;
-	    int number_of_main = 0;
-	    
 	    pips_debug(7,"reduce rule owner (MAIN)\n");
-	    $$ = NIL;
 
 	    if (tpips_execution_mode) {
 		if (!db_get_current_workspace_name())
@@ -646,13 +638,15 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 				    "create or open one!\n");
 		else {
 		    gen_array_t modules = db_get_module_list();
-		    int nmodules = gen_array_nitems(modules);
+		    int nmodules = gen_array_nitems(modules),
+			number_of_main = 0;
 		    message_assert("some modules", nmodules>0);
+		    $$ = gen_array_make(0);
 		    
-		    for(i=0; i<nmodules; i++) {
-			string on = gen_array_item(modules, i);
+		    GEN_ARRAY_MAP(on, 
+		    {
 			entity mod = local_name_to_top_level_entity(on);
-			
+
 			if (!entity_undefined_p(mod) && 
 			    entity_main_module_p(mod))
 			{
@@ -660,9 +654,10 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 				pips_internal_error("More the one main\n");
 			
 			    number_of_main++;
-			    $$ = CONS(STRING, strdup(on), NIL);
+			    gen_array_dupappend($$, on);
 			}
-		    }
+		    },
+			modules);
 		    gen_array_full_free(modules);
 		}
 	    }
@@ -670,42 +665,38 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 	| TK_OPENPAREN TK_OWNER_MODULE TK_CLOSEPAREN
 	{
 	    pips_debug(7,"reduce rule owner (MODULE)\n");
-
 	    if (tpips_execution_mode) {
 		string n = db_get_current_module_name();
-		$$ = n? CONS(STRING, strdup(n), NIL): NIL;
+		$$ = gen_array_make(0);
+		if (n) gen_array_dupappend($$, n);
 	    }
 	}
 	| TK_OPENPAREN TK_OWNER_CALLEES TK_CLOSEPAREN
 	{
-	    callees called_modules;
-	    list lcallees;
-
 	    pips_debug(7,"reduce rule owner (CALLEES)\n");
 
-	    if (tpips_execution_mode) {
-		if (safe_make(DBR_CALLEES, db_get_current_module_name())
-		    == FALSE) {
+	    if (tpips_execution_mode) 
+	    {
+		callees called_modules;
+
+		if (!safe_make(DBR_CALLEES, db_get_current_module_name()))
 		  pips_internal_error("Cannot make callees for %s\n",
 				      db_get_current_module_name());
-		}
-
+		
 		called_modules = (callees) 
-		db_get_memory_resource(DBR_CALLEES,
-				       db_get_current_module_name(),TRUE);
-		lcallees = callees_callees(called_modules);
+		    db_get_memory_resource(DBR_CALLEES,
+					   db_get_current_module_name(),TRUE);
 
-		for($$=NIL; lcallees; POP(lcallees))
-		    $$ = CONS(STRING, strdup(STRING(CAR(lcallees))), $$);
+		$$ = gen_array_from_list(callees_callees(called_modules));
 	    }
 	}
 	| TK_OPENPAREN TK_OWNER_CALLERS TK_CLOSEPAREN
 	{
-	    callees caller_modules;
-	    list lcallers;
-
 	    pips_debug(7,"reduce rule owner (CALLERS)\n");
-	    if (tpips_execution_mode) {
+	    if (tpips_execution_mode) 
+	    {
+		callees caller_modules;
+
 		if (!safe_make(DBR_CALLERS, db_get_current_module_name()))
 		    pips_internal_error("Cannot make callers for %s\n",
 					db_get_current_module_name());
@@ -713,10 +704,8 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 		caller_modules = (callees) 
 		    db_get_memory_resource(DBR_CALLERS,
 					   db_get_current_module_name(),TRUE);
-
-		lcallers = callees_callees(caller_modules);
-		for($$=NIL; lcallers; POP(lcallers))
-		    $$ = CONS(STRING, strdup(STRING(CAR(lcallers))), $$);
+		
+		$$ = gen_array_from_list(callees_callees(caller_modules));
 	    }
 	}
 	|
@@ -725,21 +714,21 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 	|
 	{
 	    pips_debug(7,"reduce rule owner (none)\n");
-
-	    if (tpips_execution_mode) {
+	    if (tpips_execution_mode) 
+	    {
 		string n = db_get_current_module_name();
-		$$ = n? CONS(STRING, strdup(n), NIL): NIL;
+		$$ = gen_array_make(0);
+		if (n) gen_array_dupappend($$, n);
 	    }
 	}
-	| { $$ = NIL;}
 	;
 
 list_of_owner_name: TK_NAME
-	{ $$ = CONS(STRING, strupper($1,$1), NIL); }
+	{ $$ = gen_array_make(0); gen_array_append($$, strupper($1,$1)); }
 	| list_of_owner_name TK_NAME
-	{ $$ = CONS(STRING, strupper($2,$2), $1); }
+	    { gen_array_append($1, strupper($2,$2)); $$ = $1; }
 	| list_of_owner_name TK_COMMA TK_NAME
-	{ $$ = CONS(STRING, strupper($3,$3), $1); }
+	    { gen_array_append($1, strupper($3,$3)); $$ = $1; }
 	;
 
 propname: TK_NAME
