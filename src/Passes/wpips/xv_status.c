@@ -11,6 +11,14 @@
 #include <xview/text.h>
 #include <xview/svrimage.h>
 
+#if (defined(TEXT))
+#undef TEXT
+#endif
+
+#if (defined(TEXT_TYPE))
+#undef TEXT_TYPE
+#endif
+
 #include "genC.h"
 #include "ri.h"
 #include "makefile.h"
