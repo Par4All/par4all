@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.11  2004/06/15 15:48:49  hurbain
+   This is not a stable version, backup sync only.
+
    Revision 1.10  2004/06/15 15:33:47  hurbain
    Version pré-récupération de sauvegarde
 
@@ -363,7 +366,260 @@ static string claire_call_from_assignation(call c, int task_number){
       string varname = claire_entity_local_name(reference_variable(ref));
       if(gen_array_index(array_names, varname) != ITEM_NOT_IN_ARRAY){
 	result = strdup(concatenate(result, claire_array_in_task(ref, FALSE, task_number), NULL));
-      })[0] == 'M'){
+      }
+
+     
+      break;
+    }
+    default:{
+      pips_user_error("only call and references allowed here");
+    }
+    }
+  }, arguments);
+  return result;
+}
+
+static void claire_call_from_indice(call c, string * offset_array, string paving_array[]){
+  entity called = call_function(c);
+  string funname = claire_entity_local_name(called);
+  list arguments = call_arguments(c);
+  syntax args[2];
+  int i = 0;
+  int iterator_nr;
+  printf("Fonction : %s %i\n", funname, gen_length(arguments));
+  if(gen_length(arguments)==2){
+    if(same_string_p(funname, "+") || same_string_p(funname, "-") || same_string_p(funname, "*")){
+      MAP(EXPRESSION, arg, {
+	args[i] = expression_syntax(arg);
+	i++;
+      }, arguments);
+      
+      
+      if(same_string_p(funname, "+")){
+	if(syntax_tag(args[0]) == is_syntax_call){
+	  claire_call_from_indice(syntax_call(args[0]), offset_array, paving_array);
+	}
+	if(syntax_tag(args[1]) == is_syntax_call){
+	  claire_call_from_indice(syntax_call(args[1]), offset_array, paving_array);
+	}
+	if(syntax_tag(args[0]) == is_syntax_reference){
+	  reference ref = syntax_reference(args[0]);
+	  if((iterator_nr = gen_array_index(indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
+	    paving_array[iterator_nr] = "1";
+	  }
+	}
+	if(syntax_tag(args[1]) == is_syntax_reference){
+	  reference ref = syntax_reference(args[1]);
+	  if((iterator_nr = gen_array_index(indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
+	   paving_array[iterator_nr] = "1";
+	  }
+	}
+      }
+      else if(same_string_p(funname, "-")){
+	if(syntax_tag(args[1]) == is_syntax_call && gen_length(call_arguments(syntax_call(args[1])))==0){
+	  
+	}
+	else {
+	  pips_user_error("APOTRES doesn't allow negative coefficients in paving and fitting matrices");
+	}
+      }
+      else if(same_string_p(funname, "*")){
+	if(syntax_tag(args[0]) != is_syntax_call || syntax_tag(args[1]) != is_syntax_reference || gen_length(call_arguments(syntax_call(args[0])))!=0 ){
+	  pips_user_error("Only scalar * reference are allowed here. Please develop expressions.");
+	}
+	else {
+	  int iterator_nr = gen_array_index(indices_array, claire_entity_local_name(reference_variable(syntax_reference(args[1]))));
+	  string mult =  claire_entity_local_name(call_function(syntax_call(args[0]))); 
+	  paving_array[iterator_nr] = mult;
+	}
+      }
+    }
+    else{
+      pips_user_error("only linear expression of indices allowed");
+    }
+  }
+  else if(gen_length(arguments) == 0){
+    *offset_array = funname;
+  }
+  else{
+    printf("%i\n", gen_length(arguments));
+    pips_user_error("only +, -, * and constants allowed");
+  }
+}
+
+static string claire_array_in_task(reference r, bool first, int task_number){
+  string varname = claire_entity_local_name(reference_variable(r));
+  int indice_nr = 0;
+  list indices = reference_indices(r);
+  string result = "";
+  int nb_loops = gen_array_nitems(indices_array);
+  
+  int * index_of_array = (int *) (gen_array_item(array_dims, gen_array_index(array_names, varname)));
+  string offset_array[*index_of_array];
+  string paving_array[*index_of_array][gen_array_nitems(indices_array)];
+  int i;
+  int j;
+  
+  for (i=0; i<*index_of_array; i++)
+    offset_array[i] = "0";
+  
+  for (i=0; i<gen_array_nitems(indices_array) ; i++)
+    for (j=0; j<*index_of_array; j++)
+      paving_array[i][j] = "0";
+  
+  result = strdup(concatenate(result, first?"":TAB, "DATA name = symbol!(\"", "T_", int_to_string(task_number),
+			      "\" /+ \"", varname, "\"),", NL, TAB, TAB, NULL));
+  result = strdup(concatenate(result, "darray = ", varname, "," NL, TAB, TAB, "accessMode = ", (first?"Wmode,":"Rmode,"),
+			      NL, TAB, TAB, "offset = list<VARTYPE>(", NULL));
+  
+  MAP(EXPRESSION, ind, {
+    syntax sind = expression_syntax(ind);
+    int iterator_nr;
+    switch(syntax_tag(sind)){
+    case is_syntax_reference:{
+      reference ref = syntax_reference(sind);
+      if((iterator_nr = gen_array_index(extern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
+	paving_array[indice_nr][iterator_nr] = "1";
+      }
+      else if((iterator_nr = gen_array_index(intern_indices_array, claire_entity_local_name(reference_variable(ref)))) != ITEM_NOT_IN_ARRAY){
+	fitting_array[indice_nr][iterator_nr] = "1";
+      }
+
+      break;
+    }
+    case is_syntax_call:{
+      call c = syntax_call(sind);
+      claire_call_from_indice(c, &(offset_array[indice_nr]), paving_array[indice_nr]);
+      break;
+    }
+    default:{
+      pips_user_error("Only call and reference allowed in indices");
+      break;
+    }
+    }
+    indice_nr++;
+  }, indices);
+  for(i=0; i<*index_of_array - 1; i++){
+    result=strdup(concatenate(result, "vartype!(", offset_array[i],"), ", NULL));
+  }
+  result = strdup(concatenate(result, "vartype!(", offset_array[i], "))," NL, NULL));
+  result = strdup(concatenate(result, TAB, TAB, "fitting = list<list[VARTYPE]>(list()),", NL, NULL));
+  result = strdup(concatenate(result, TAB, TAB, "paving = list<list[VARTYPE]>(", NULL));
+  
+ 
+  for(i=0;i<gen_array_nitems(indices_array) - 1; i++){
+    result = strdup(concatenate(result, "list(", NULL));
+    for(j = 0; j<(*index_of_array)-1; j++){
+      result = strdup(concatenate(result, "vartype!(", paving_array[i][j], "), ", NULL));
+    }
+    result = strdup(concatenate(result, "vartype!(", paving_array[i][j], ")),", NL, TAB, TAB, TAB, NULL));
+  }
+  result = strdup(concatenate(result, "list(", NULL));
+  for(j = 0; j<(*index_of_array)-1; j++){
+    result = strdup(concatenate(result, "vartype!(", paving_array[i][j], "), ", NULL));
+  }
+  result = strdup(concatenate(result, "vartype!(", paving_array[i][j], "))),", NL, TAB, TAB, NULL));
+  
+  result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = 1, ", NL, TAB, TAB, TAB, "upperBound = list<VARTYPE>(vartype!(1)), ", NL, TAB, TAB, TAB, "names = list<string>(\"m_i\"))))", NL, NULL)); 
+  return result;
+  
+}
+
+static string claire_call_from_loopnest(call c, int task_number){
+  entity called = call_function(c);
+  list arguments = call_arguments(c);
+  
+  syntax s;
+  string result = "";
+  bool first = TRUE;
+  string name = claire_entity_local_name(called);
+
+  if(!same_string_p(name, "="))
+    pips_user_error("only assignation allowed here");
+  
+  MAP(EXPRESSION, e, {
+    s = expression_syntax(e);
+    switch(syntax_tag(s)){
+    case is_syntax_call:{
+      if(first)
+	pips_user_error("call not allowed in left-hand side argument of assignation");
+      else
+	result = strdup(concatenate(result, claire_call_from_assignation(syntax_call(s), task_number), NULL));
+      break;
+    }
+    case is_syntax_reference:{
+      
+      reference r = syntax_reference(s);
+      string varname = claire_entity_local_name(reference_variable(r));
+      printf("%s\n", varname);
+      if(gen_array_index(array_names, varname) != ITEM_NOT_IN_ARRAY){
+	result = strdup(concatenate(result, claire_array_in_task(r, first, task_number), NULL));
+      }
+    }
+    }
+    first = FALSE;
+  }, arguments);
+  return result;
+}
+
+
+
+static call claire_loop_from_loop(loop l, int task_number){
+  
+  string * up = malloc(sizeof(string));
+  string * claire_name = malloc(sizeof(string));
+  statement s = loop_body(l);
+  instruction i = statement_instruction(s);
+
+  *ln = int_to_string(loop_number);
+  *claire_name = claire_entity_local_name(loop_index(l));
+  if( (*claire_name)[0] == 'M'){
+    gen_array_append(internal_indices_array, claire_name);
+  }
+  else{
+    gen_array_append(external_indices_array, claire_name);
+  }
+
+  switch(instruction_tag(i)){
+  case is_instruction_loop:{
+    loop l = instruction_loop(i);
+    return claire_loop_from_loop(l, task_number);
+    break;
+  }
+  case is_instruction_call:{
+    call c = instruction_call(i);
+    *result = strdup(concatenate(*result, int_to_string(gen_array_nitems(external_indices_array)), ",", NL, TAB, TAB,NULL));
+    return c;
+  }
+  default:
+    pips_user_error("only loops and calls allowed in a loop");
+  }
+}
+
+
+/* we enter a loopnest. the first loop is obligatory an extern loop */
+static string claire_loop_from_sequence(loop l, int task_number){
+  statement s = loop_body(l);
+  call c;
+  inti i;
+  /* (re-)initialize task-scoped arrays*/
+  extern_indices_array = gen_array_make(0);
+  intern_indices_array = gen_array_make(0);
+  extern_upperbounds_array = gen_array_make(0);
+  intern_upperbounds_array = gen_array_make(0);
+  
+  /* Initialize result string with the declaration of the task */
+  string result = strdup(concatenate("T_", int_to_string(task_number), 
+			      " :: TASK(unitSpentTime = vartype!(1),"
+			      NL, TAB, "exLoopNest = LOOPNEST(deep = ", NULL));
+
+  instruction ins = statement_instruction(s);
+  list li = statement_declarations(s);
+
+  string * name = malloc(sizeof(string));
+  *name = claire_entity_local_name(loop_index(l));
+
+  if((*name)[0] == 'M'){
     pips_user_error("At least one extern loop is needed");
   }
   else{
