@@ -90,6 +90,9 @@ static gen_chunk *make_def(), *make_ref() ;
   gen_chunk *chunkp ;
   cons *consp ;
   int val ;
+  char * s;
+  double d;
+  char c;
 }
 
 %type <chunk> Data Basis 
@@ -245,13 +248,13 @@ Basis	: READ_UNIT 	{
 		$$.b = $2 ;
 		}
 	| READ_CHAR	{
-		$$.c = *(yytext+2) ;
+		$$.c = yylval.c ;
 		}
 	| Int	{
 		$$.i = $1 ;
 		}
 	| READ_FLOAT {
-		$$.f = (double)atof( yytext ) ;
+		$$.f = yylval.d ;
 		}
 	| String {
 	        $$ = *$1 ;
@@ -271,7 +274,7 @@ Basis	: READ_UNIT 	{
 	;
 
 Int     : READ_INT   {
-  		$$ = atoi( yytext ) ;
+  		$$ = yylval.val ;
 		}
 	;
 
