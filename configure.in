@@ -33,7 +33,7 @@ define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_INIT(include/polylib/polylib.h)
 
-VERSION=5.10
+VERSION=5.11
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_CANONICAL_SYSTEM 
