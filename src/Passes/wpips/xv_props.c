@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1995/09/27 17:46:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_xv_props[] = "%A% ($Date: 1995/09/27 17:46:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -522,7 +528,6 @@ build_options_menu_and_panel(Menu menu_options,
    {
       Panel_item option_item;
       char * option_item_label;
-      Panel_item panel_item;
 
       PANEL_EACH_ITEM(options_panel, option_item)
          if ((Panel_item_type) xv_get(option_item, PANEL_ITEM_CLASS) ==
