@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/12/22 15:40:35 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/12/27 08:53:16 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -415,7 +415,7 @@ close_hpfc_for_program (void)
     free_hpfc_already_compiled_map();
     free_hpfc_current_mappings();
     free_new_declaration_map();
-    free_referenced_variables_map();
+    free_referenced_variables_map(); 
     free_update_common_map();
 }
 
@@ -481,13 +481,12 @@ hpfcompile_module (string module_name)
     declaration_with_overlaps_for_module(module);
 
     update_object_for_module(node_stat, node_module);
-    update_object_for_module(host_stat, host_module);
-
-    insure_declaration_coherency(node_module, node_stat);
     update_object_for_module(entity_code(node_module), node_module);
+    insure_declaration_coherency(node_module, node_stat);
 
-    insure_declaration_coherency(host_module, host_stat);
+    update_object_for_module(host_stat, host_module);
     update_object_for_module(entity_code(host_module), host_module);
+    insure_declaration_coherency(host_module, host_stat);
 
     put_generated_resources_for_module(module_stat, host_stat, node_stat);
     
