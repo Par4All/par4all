@@ -20,7 +20,6 @@ int patterns_yywrap(void);
 int patterns_yylex();
 static int* make_integer_argument(int x);
 static int* make_empty_argument();
-static opcode make_opcode(char * name, int vecSize, int subwordSize);
 
 %}
 
@@ -112,7 +111,7 @@ definition:
  
 operation:
        IDENTIFIER_TOK '[' INTEGER_TOK ']' '{' opcodes_list '}' 
-                                        { insert_operation($1, $3, $6); }
+                                        { insert_opcodeClass($1, $3, $6); }
 
 opcodes_list:
        opcodes_list opcode              { $$ = CONS(OPCODE, $2, $1); }
@@ -195,17 +194,6 @@ static int* make_integer_argument(int x)
 static int* make_empty_argument()
 {
    return NULL;
-}
-
-static opcode make_opcode(char * name, int vecSize, int subwordSize)
-{
-   opcode op = (opcode)malloc(sizeof(_opcode));
-   
-   op->name = strdup(name);
-   op->vectorSize = vecSize;
-   op->subwordSize = subwordSize;
-   
-   return op;
 }
 
 int patterns_yywrap(void)
