@@ -3,10 +3,6 @@
 #include "tab.h"
 extern long int cross_product, limit;
 
-extern int fprintf();
-extern int fflush();
-extern sscanf();
-
 extern Entier pgcd();
 extern void sol_new();
 extern void sol_div();
