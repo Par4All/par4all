@@ -23,6 +23,10 @@
  * - bang comment management added (to avoid the parser)
  *
  * $Log: split_file.c,v $
+ * Revision 1.41  1998/07/13 11:16:27  coelho
+ * fix for entry to match only if there is some name after...
+ * however yet another bug to come: entry foo(1) = 2.0
+ *
  * Revision 1.40  1998/07/10 16:13:25  coelho
  * fix of the fix about entry and implicit name interaction.
  *
@@ -251,8 +255,7 @@ static int it_is_an_entry;
 		return 0 if comment card, 1 if found
 		name and put in arg string. invent name for unnamed
 		block datas and main programs.		*/
-static int lname(s)
-char *s;
+static int lname(char * s, int look_for_entry)
 {
 	register char *ptr, *p;
 	char	line[LINESIZE], *iptr = line, * lbuf;
@@ -284,14 +287,16 @@ char *s;
 	}
 	*iptr = '\n';
 
+	if (look_for_entry) {
+	    /* entry is looked for within a something... */
+	    if ((ptr = look(line, "entry")) != 0) 
+		if(scan_name(s, ptr))
+		    it_is_an_entry = 1;
+	} else {
 	if ((ptr = look(line, "subroutine")) != 0 ||
 	    (ptr = look(line, "function")) != 0 ||
 	    (ptr = functs(line)) != 0) {
 	    if(!scan_name(s, ptr)) 
-		strcpy( s, x);
-	} else if ((ptr = look(line, "entry")) != 0) {
-		it_is_an_entry = 1;
-	    if(!scan_name(s, ptr))
 		strcpy( s, x);
 	} else if((ptr = look(line, "program")) != 0) {
 	    it_is_a_main = 1;
@@ -315,9 +320,19 @@ char *s;
 	    get_name(mainp);
 	    strcpy(s, mainp);
 	}
+	}
 
 	return(1);
 }
+
+#define allowed_first_char(c) \
+	(((c)>='a' && (c)<='z') || ((c)>='A' && (c)<='Z') || ((c)=='_'))
+
+#define allowed_char(c) \
+	(allowed_first_char(c) || ((c)>='0' && (c)<='9'))
+
+#define skippable_char(c) \
+    	((c)==' ' || (c)=='\t' || (c)=='\r')
 
 static int scan_name(s, ptr)
 char *s, *ptr;
@@ -327,13 +342,20 @@ char *s, *ptr;
 	/* scan off the name */
 	trim(ptr);
 	sptr = s;
-	while (*ptr != '(' && *ptr != '\n') {
-		if (*ptr != ' ' && *ptr != '\t' && *ptr != '\r')
-			*sptr++ = *ptr;
-		ptr++;
+
+	/* must have a valid first char. */
+	if (!allowed_first_char(*ptr)) return 0;
+
+	while (allowed_char(*ptr) || skippable_char(*ptr)) {
+	    if (!skippable_char(*ptr))
+		*sptr++ = *ptr;
+	    ptr++;
 	}
 
 	if (sptr == s) return(0);
+	
+	/* next char should be a ( or \n */
+	if (*ptr!='(' && *ptr!='\n') return 0;
 
 	*sptr++ = '.';
 	*sptr++ = 'f';
@@ -467,9 +489,9 @@ int fsplit(char * dir_name, char * file_name, FILE * out)
 	    hollerith_and_bangcomments(buf); /* FC */
 
 	    if (nflag == 0) /* if no name yet, try and find one */
-		nflag = lname(name), newname=nflag;
+		nflag = lname(name, 0), newname=nflag;
 	    else { /* FC: some hack to deal with entry... */
-		lname(tmpname);
+		lname(tmpname, 1);
 		newname = it_is_an_entry;
 		someentry = it_is_an_entry;
 		implicit_program = 0;
