@@ -15,7 +15,7 @@
 */
 
 /*  SCCS Stuff
- *  $RCSfile: genC.h,v $ ($Date: 1997/09/26 12:43:37 $, )
+ *  $RCSfile: genC.h,v $ ($Date: 1998/04/14 13:27:06 $, )
  *  version $Revision$
  *  got on %D%, %T%
  */
@@ -174,17 +174,17 @@ extern int max_tabulated_elements GEN_PROTO((void));
 
 /*  recursion and utilities
  */
-extern bool gen_true GEN_PROTO((gen_chunk *)) ;
-extern bool gen_false GEN_PROTO((gen_chunk *)) ;
-extern void gen_null GEN_PROTO((gen_chunk *)) ;
-extern void gen_core GEN_PROTO((gen_chunk *)) ;
+extern bool gen_true GEN_PROTO((void *)) ;
+extern bool gen_false GEN_PROTO((void *)) ;
+extern void gen_null GEN_PROTO((void *)) ;
+extern void gen_core GEN_PROTO((void *)) ;
 
-extern void gen_recurse_stop GEN_PROTO((gen_chunk *));
-extern void gen_multi_recurse GEN_PROTO((gen_chunk *, ...));
-extern void gen_recurse GEN_PROTO((gen_chunk *,
+extern void gen_recurse_stop GEN_PROTO((void *));
+extern void gen_multi_recurse GEN_PROTO((void *, ...));
+extern void gen_recurse GEN_PROTO((void *,
 				   int, 
-				   bool (*)( gen_chunk * ), 
-				   void (*)( gen_chunk * ))) ;
+				   bool (*)(void *), 
+				   void (*)(void *))) ;
 
 /* Since C is not-orthogonal (chunk1 == chunk2 is prohibited),
  * this one is needed.
