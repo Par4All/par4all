@@ -248,20 +248,6 @@ static char *skip_first_word(char *line)
 
 /* Handlers
  */
-static void cdir_handler(char * line)
-{
-    user_log("%s\n", line);
-    if (chdir(skip_first_word(line)))
-	fprintf(stderr, "error while changing directory\n");
-}
-
-static void pwd_handler(char * line)
-{
-    char pathname[MAXPATHLEN];
-    user_log("pwd\n");
-    fprintf(stdout, "current working directory: %s\n", 
-	    (char*) getwd(pathname));
-}
 
 /* was set in the grammar, moved here as setenv.
  * motivation: the property lexer can be reused directly here.
@@ -532,13 +518,11 @@ static struct t_handler handlers[] =
 {
   { QUIT,		quit_handler },
   { "exit",		exit_handler }, /* exit is a synonymous for quit */
-  { CHANGE_DIR, 	cdir_handler },
   { SET_PROP,   	setproperty_handler },
   { "set ",		setproperty_handler }, /* compatibility */
   { SHELL_ESCAPE, 	shell_handler },
   { HELP,		help_handler },
   { ECHO,		echo_handler },
-  { "pwd",		pwd_handler },
   { (char *) NULL, 	default_handler}
 };
 
@@ -1042,3 +1026,25 @@ param_generator(char *texte, int state)
     /* If no names matched, then return NULL. */
     return NULL;
 }
+
+/*************************************************************** IS IT A... */
+
+#define CACHED_STRING_LIST(NAME)					\
+bool NAME##_name_p(string name)						\
+{									\
+    static hash_table cache = NULL;					\
+									\
+    if (!cache) {							\
+	char ** p;							\
+	cache = hash_table_make(hash_string, 				\
+		       2*sizeof(tp_##NAME##_names)/sizeof(char*));	\
+	for (p=tp_##NAME##_names; *p; p++)				\
+	    hash_put(cache, *p, (char*) 1);				\
+    }									\
+									\
+    return hash_get(cache, name)!=HASH_UNDEFINED_VALUE;			\
+}
+
+CACHED_STRING_LIST(phase)
+CACHED_STRING_LIST(resource)
+CACHED_STRING_LIST(property)
