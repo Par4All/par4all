@@ -1,30 +1,32 @@
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/07/10 20:38:57 $, 
+# $Date: 1996/07/10 20:56:59 $, 
 # (c) Fabien COELHO 1996
 #
 # this makefile forwards make targets to sub-directories...
 # it must be used with GNU make.
 #
 # these variables may be overwritten on the command line
-# gmake FWD_DIRS="foo blah" FWD_FAILMSG="argh!" FWD_REPORT=/dev/null
+# gmake FWD_DIRS="foo blah" FWD_MSG="argh!" FWD_REPORT=/dev/null
 #
 
 # the list of sub directories for forwarding commands:
 FWD_DIRS=$(wildcard *)
 
-# the message if reporting a failure:
-FWD_FAILMSG=
+# the message if reporting a failure or success: 
+# default is none. dir is appended.
+# FWD_MSG=
 
-# where (file) to report a failure:
+# where (file) to report a failure or success:
 FWD_REPORT=/dev/tty
 
 # forward any command to the specified directories
 %::
 	-for d in $(FWD_DIRS) ; do \
 	  if test -d $$d ; then \
-	    $(MAKE) -C $$d $@ || \
-	    echo "$@ failed [$(FWD_FAILMSG)] in $$d" >> $(FWD_REPORT) ;\
-	fi ; done
+	    if $(MAKE) -C $$d FWD_FAILMSG="$(FWD_MSG)/$$d" $@ ;\
+	    then echo "$@ failed [$(FWD_MSG)] in $$d" >> $(FWD_REPORT) ;\
+	    else echo "$@ succeeded [$(FWD_MSG)] in $$d" >> $(FWD_REPORT) ;\
+	fi ; fi ; done
 
 # end of $RCSfile: forward_gnu_makefile,v $
 #
