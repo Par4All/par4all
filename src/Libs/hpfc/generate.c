@@ -1,4 +1,4 @@
-/* $RCSfile: generate.c,v $ ($Date: 1995/10/04 10:54:00 $, )
+/* $RCSfile: generate.c,v $ ($Date: 1995/10/05 11:32:28 $, )
  * version $Revision$
  * 
  * Fabien Coelho, May 1993
@@ -30,19 +30,20 @@ list *lhp, *lnp;
     (*lhp) = NIL;
     (*lnp) = NIL;
     
-    assert(instruction_call_p(statement_instruction(stat)));
+    pips_assert("call", statement_call_p(stat));
 
     the_call = instruction_call(statement_instruction(stat));
 
     /* this shouldn't be necessary
      */
-    assert(ENTITY_ASSIGN_P(call_function(the_call)));
+    pips_assert("assignment", ENTITY_ASSIGN_P(call_function(the_call)));
     
     w = EXPRESSION(CAR(call_arguments(the_call)));
     
-    assert(syntax_reference_p(expression_syntax(w)) &&
-	   (!array_distributed_p
-	    (reference_variable(syntax_reference(expression_syntax(w))))));
+    pips_assert("reference",
+		syntax_reference_p(expression_syntax(w)) &&
+		(!array_distributed_p
+		 (reference_variable(syntax_reference(expression_syntax(w))))));
 
     /* references to distributed arrays:
      * w(A(I)) = B(I)
@@ -57,7 +58,7 @@ list *lhp, *lnp;
 	 list lhost; 	 
 	 list lnode;
  	 	
-	 debug(8, "generate_c1_beta", "considering reference to %s\n", 	
+	 pips_debug(8, "considering reference to %s\n", 	
 	       entity_name(reference_variable(syntax_reference(s))));
 
 	 generate_read_of_ref_for_all(s, &lhost, &lnode);
@@ -118,15 +119,14 @@ list *lhp, *lnp;
     (*lhp) = NIL;
     (*lnp) = NIL;
     
-    /* assertions... 
-     */
-    assert(instruction_call_p(statement_instruction(stat)));
+    pips_assert("call", statement_call_p(stat));
 
     the_call = instruction_call(statement_instruction(stat));
-    assert(ENTITY_ASSIGN_P(call_function(the_call)));
+    pips_assert("assignment", ENTITY_ASSIGN_P(call_function(the_call)));
 
     writtenexpr = EXPRESSION(CAR(call_arguments(the_call)));
-    assert(syntax_reference_p(expression_syntax(writtenexpr)) &&
+    pips_assert("reference",
+		syntax_reference_p(expression_syntax(writtenexpr)) &&
 	   (array_distributed_p 		
 	    (reference_variable
 	     (syntax_reference(expression_syntax(writtenexpr))))));
@@ -143,7 +143,7 @@ list *lhp, *lnp;
 	list lnotcomp;
 	list lcomp;
 	
-	debug(8, "generate_c1_alpha", "considering reference to %s\n",  	
+	pips_debug(8, "considering reference to %s\n",  	
 	      entity_name(reference_variable(syntax_reference(s))));
 	
 	generate_read_of_ref_for_computer(s, &lcomp, &lnotcomp);
@@ -263,7 +263,7 @@ list *lcompp, *lnotcompp;
 	temp = make_new_scalar_variable(get_current_module_entity(), 
 				    entity_basic(var));
 
-    assert(array_distributed_p(var));
+    pips_assert("distributed array", array_distributed_p(var));
 
     AddEntityToHostAndNodeModules(temp);
     tempn = load_new_node(temp);
@@ -304,7 +304,7 @@ list *lhp, *lnp;
 	temp = make_new_scalar_variable(get_current_module_entity(), 
 				    entity_basic(var));
 
-    assert(array_distributed_p(var));
+    pips_assert("distributed array", array_distributed_p(var));
     
     AddEntityToHostAndNodeModules(temp);
     temph = load_new_host(temp); 
@@ -373,12 +373,11 @@ list *lsp, *lindsp;
     entity array = reference_variable(ref);
     list inds = reference_indices(ref);
 
-    assert(array_distributed_p(array));
+    pips_assert("distributed array", array_distributed_p(array));
 
     (*lsp) = NIL, (*lindsp) = NIL;
 
-    debug(9, "generate_compute_local_indices", 
-	  "number of dimensions of %s to compute: %d\n",
+    pips_debug(9, "number of dimensions of %s to compute: %d\n",
 	  entity_name(array), NumberOfDimension(array));
 
     for(i=1; i<=NumberOfDimension(array); i++, inds = CDR(inds)) 
@@ -407,19 +406,9 @@ list *lsp, *lindsp;
 	} 
     }
 
-    debug(8, "generate_compute_local_indices", "result:\n");
-    MAP(STATEMENT, s, DEBUG_STAT(8, entity_name(node_module), s), (*lsp));
-	      
-}
-
-/* generate_common_hpfrtds(...)
- *
- * must add a common in teh declarations that define
- * the data structures needed for the run time resolution...
- */
-void generate_common_hpfrtds()
-{
-    pips_error("generate_common_hpfrtds", "not yet implemented\n");
+    pips_debug(8, "result:\n");
+    ifdebug(8)
+	MAP(STATEMENT, s, DEBUG_STAT(8, entity_name(node_module), s), (*lsp));
 }
 
 /* generate_get_value_locally
@@ -444,7 +433,7 @@ list *lstatp;
  	   newarray = load_new_node(array);
     list ls = NIL, newinds = NIL;
     
-    assert(array_distributed_p(array));
+    pips_assert("distributed array", array_distributed_p(array));
 
     generate_compute_local_indices(ref, &ls, &newinds);
     expr = reference_to_expression(make_reference(newarray, newinds));
@@ -469,7 +458,7 @@ list *lstatp;
  	newarray = load_new_node(array);
     list ls = NIL, newinds = NIL;
     
-    assert(array_distributed_p(array));
+    pips_assert("distributed array", array_distributed_p(array));
 
     generate_compute_local_indices(ref, &ls, &newinds);
     statsnd = st_send_to_computer(make_reference(newarray, newinds));
@@ -489,7 +478,7 @@ list *lstatp;
  	newarray = load_new_node(array);
     list ls = NIL, newinds = NIL;
     
-    assert(array_distributed_p(array));
+    pips_assert("distributed array", array_distributed_p(array));
 
     generate_compute_local_indices(ref, &ls, &newinds);
     statrcv = st_receive_from_computer(make_reference(newarray, newinds));
@@ -513,7 +502,7 @@ list *lstatp, lw, lr;
 	lnotcompw = NIL;
     syntax comp;
 
-    assert(gen_length(lw)>0);
+    pips_assert("at leat one written", gen_length(lw)>0);
 
     comp = SYNTAX(CAR(lw));
     statcc = st_compute_current_computer(syntax_reference(comp));
@@ -611,7 +600,7 @@ list *lstatp, lw, lr;
 
     ifdebug(6)
     {
-	debug(6, "generate_parallel_body", "final statement:\n");
+	pips_debug(6, "final statement:\n");
 	MAP(STATEMENT, s, DEBUG_STAT(6, entity_name(node_module),s), (*lstatp));
     }
 }
@@ -690,7 +679,8 @@ list *lhstatp, *lnstatp;
     statement statnco, stathco, stnrcv, stnif, sthsnd;
     list linds = NIL, lnstat = NIL;
 
-    assert(array_distributed_p(reference_variable(syntax_reference(s))));
+    pips_assert("distrivuted reference",
+		array_distributed_p(reference_variable(syntax_reference(s))));
 
     array    = reference_variable(r);
     newarray = load_new_node(array);
@@ -736,7 +726,8 @@ list *lhstatp, *lnstatp;
 	varn = load_new_node(var),
 	varh = load_new_host(var);
     
-    assert(!array_distributed_p(reference_variable(syntax_reference(s))));
+    pips_assert("not distributed reference",
+		!array_distributed_p(reference_variable(syntax_reference(s))));
 
     (*lhstatp) = CONS(STATEMENT,
 		      st_host_send_to_all_nodes(make_reference(varh, NIL)),
