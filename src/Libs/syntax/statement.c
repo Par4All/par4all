@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.55  2001/07/20 11:33:14  irigoin
+ * Upgrade of MakeAssignedOrComputedGotoInst() to cope with side effects in
+ * selecting expression
+ *
  * Revision 1.54  2001/07/19 17:05:23  irigoin
  * Function update_functional_type_result() added to make sure that
  * subroutines are declared as subroutines. The result type is updated to
@@ -156,13 +160,13 @@ statement
 LabelToStmt(l)
 string l;
 {
-    int i;
+  int i;
 
-    for (i = 0; i < CurrentStmt; i++)
-	    if (strcmp(l, StmtHeap_buffer[i].l) == 0)
-		    return(StmtHeap_buffer[i].s);
+  for (i = 0; i < CurrentStmt; i++)
+    if (strcmp(l, StmtHeap_buffer[i].l) == 0)
+      return(StmtHeap_buffer[i].s);
 
-    return(statement_undefined);
+  return(statement_undefined);
 }
 
 
@@ -174,24 +178,24 @@ label has been parsed. */
 void 
 CheckAndInitializeStmt(void)
 {
-    int i;
-    int MustStop = FALSE;
+  int i;
+  int MustStop = FALSE;
 
-    for (i = 0; i < CurrentStmt; i++) {
-	statement s = StmtHeap_buffer[i].s;
-	if (statement_instruction(s) == instruction_undefined) {
-	    MustStop = TRUE;
-	    user_warning("CheckAndInitializeStmt", "Undefined label \"%s\"\n", 
-		     label_local_name(statement_label(s)));
-	}
+  for (i = 0; i < CurrentStmt; i++) {
+    statement s = StmtHeap_buffer[i].s;
+    if (statement_instruction(s) == instruction_undefined) {
+      MustStop = TRUE;
+      user_warning("CheckAndInitializeStmt", "Undefined label \"%s\"\n", 
+		   label_local_name(statement_label(s)));
     }
+  }
 
-    if (MustStop) {
-	ParserError("CheckAndInitializeStmt", "Undefined label(s)\n");
-    }
-    else {
-	CurrentStmt = 0;
-    }
+  if (MustStop) {
+    ParserError("CheckAndInitializeStmt", "Undefined label(s)\n");
+  }
+  else {
+    CurrentStmt = 0;
+  }
 }
 
 
@@ -204,24 +208,24 @@ NewStmt(e, s)
 entity e;
 statement s;
 {
-    init_StmtHeap_buffer();
+  init_StmtHeap_buffer();
 
-    pips_assert("The empty label is not associated to a statement",
-		!entity_empty_label_p(e));
+  pips_assert("The empty label is not associated to a statement",
+	      !entity_empty_label_p(e));
 
-    pips_assert("Label e is the label of statement s", e==statement_label(s));
+  pips_assert("Label e is the label of statement s", e==statement_label(s));
 
-    if (LabelToStmt(entity_name(e)) != statement_undefined) {
-	user_log("NewStmt: duplicate label: %s\n", entity_name(e));
-	ParserError("NewStmt", "duplicate label\n");
-    }
+  if (LabelToStmt(entity_name(e)) != statement_undefined) {
+    user_log("NewStmt: duplicate label: %s\n", entity_name(e));
+    ParserError("NewStmt", "duplicate label\n");
+  }
 
-    if (CurrentStmt >= StmtHeap_buffer_size)
-	resize_StmtHeap_buffer();
+  if (CurrentStmt >= StmtHeap_buffer_size)
+    resize_StmtHeap_buffer();
 
-    StmtHeap_buffer[CurrentStmt].l = entity_name(e);
-    StmtHeap_buffer[CurrentStmt].s = s;
-    CurrentStmt += 1;
+  StmtHeap_buffer[CurrentStmt].l = entity_name(e);
+  StmtHeap_buffer[CurrentStmt].s = s;
+  CurrentStmt += 1;
 }
 
 
@@ -256,19 +260,19 @@ LOCAL int CurrentBlock = 0;
 void 
 ResetBlockStack()
 {
-    CurrentBlock = 0;
+  CurrentBlock = 0;
 }
 
 bool 
 IsBlockStackEmpty()
 {
-	return(CurrentBlock == 0);
+  return(CurrentBlock == 0);
 }
 
 bool 
 IsBlockStackFull()
 {
-	return(CurrentBlock == MAXBLOCK);
+  return(CurrentBlock == MAXBLOCK);
 }
 
 void 
@@ -276,25 +280,25 @@ PushBlock(i, l)
 instruction i;
 string l;
 {
-	if (IsBlockStackFull())
-		ParserError("PushBlock", "top of stack reached\n");
+  if (IsBlockStackFull())
+    ParserError("PushBlock", "top of stack reached\n");
 
-	pips_assert("PushBlock", instruction_block_p(i));
+  pips_assert("PushBlock", instruction_block_p(i));
 
-	BlockStack[CurrentBlock].i = i;
-	BlockStack[CurrentBlock].l = l;
-	BlockStack[CurrentBlock].c = NULL;
-	BlockStack[CurrentBlock].elsifs = 0;
-	CurrentBlock += 1;
+  BlockStack[CurrentBlock].i = i;
+  BlockStack[CurrentBlock].l = l;
+  BlockStack[CurrentBlock].c = NULL;
+  BlockStack[CurrentBlock].elsifs = 0;
+  CurrentBlock += 1;
 }
 
 instruction 
 PopBlock()
 {
-	if (IsBlockStackEmpty())
-		ParserError("PopBlock", "bottom of stack reached\n");
+  if (IsBlockStackEmpty())
+    ParserError("PopBlock", "bottom of stack reached\n");
 
-	return(BlockStack[--CurrentBlock].i);
+  return(BlockStack[--CurrentBlock].i);
 }
 
 
@@ -695,9 +699,9 @@ instruction MakeEmptyInstructionBlock()
     return(make_instruction_block(NIL));
 }
 
+
 
-
-/* this function creates a simple fortran statement such as RETURN,
+/* this function creates a simple Fortran statement such as RETURN,
 CONTINUE, ... 
 
 s is the name of the intrinsic function.
@@ -717,7 +721,7 @@ expression e;
 			    make_call(CreateIntrinsic(s), l)));
 }
 
-
+
 
 /* this function creates a goto instruction. n is the target label. */
 
@@ -762,22 +766,14 @@ make_goto_instruction(entity l)
 }
 
 
-instruction 
-MakeComputedGotoInst(ll, e)
-list ll;
-expression e;
+instruction MakeComputedGotoInst(list ll, expression e)
 {
-    /* It is assumed that e has no side effects */
-
     instruction inst = MakeAssignedOrComputedGotoInst(ll, e, FALSE);
 
     return inst;
 }
 
-instruction 
-MakeAssignedGotoInst(ll, i)
-list ll;
-entity i;
+instruction MakeAssignedGotoInst(list ll, entity i)
 {
     instruction inst;
     expression expr = entity_to_expression(i);
@@ -790,64 +786,97 @@ entity i;
 }
 
 instruction 
-MakeAssignedOrComputedGotoInst(ll, e, assigned)
-list ll;
-expression e;
-bool assigned;
+MakeAssignedOrComputedGotoInst(list ll, expression ce, bool assigned)
 {
-    instruction ins = instruction_undefined;
-    list cs = NIL;
-    int l = 0;
-    list cl = list_undefined;
+  instruction ins = instruction_undefined;
+  list cs = NIL;
+  int l = 0;
+  list cl = list_undefined;
+  expression e = expression_undefined;
+  syntax sce = expression_syntax(ce);
+  statement s_init = statement_undefined;
 
-    for(l = gen_length(ll), cl = ll; !ENDP(cl); l--, POP(cl)) {
-	string ln = STRING(CAR(cl));
-	instruction g = MakeGotoInst(ln);
-	expression cond = 
-	    MakeBinaryCall(
-			   gen_find_tabulated(
-					      make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-								   EQUAL_OPERATOR_NAME), 
-					      entity_domain),
-			   copy_expression(e),
-			   int_to_expression(assigned? atoi(ln):l));
-	/* Assigned GO TO: if the current label is not in the list, this is an error
-	 * in Fortran 90. ISO/IEC 1539 Section 8.2.4 page 108. Same in Fortran 77
-	 * standard, Section 11-2.
-	 */
-	statement may_stop = (assigned && (cl==ll)) ?
-	    instruction_to_statement(MakeZeroOrOneArgCallInst(STOP_FUNCTION_NAME,
-							      expression_undefined))
-	    :
-	    make_empty_statement();
-	instruction iif = 
-	    make_instruction(is_instruction_test,
-			     make_test(cond,
-				       instruction_to_statement(g),
-				       may_stop));
-	statement s = statement_undefined;
-
-	s = instruction_to_statement(iif);
-
-	/* Update the statement numbers of all possibly allocated statements */
-	statement_number(s) = look_at_next_statement_number();
-	if(stop_statement_p(may_stop))
-	statement_number(may_stop) = look_at_next_statement_number();
-
-	cs = CONS(STATEMENT, s, cs);
+  /* ce might have side effects */
+  if(syntax_reference_p(sce)) {
+    /* ce can be used several times without side effects */
+    e = ce;
+  }
+  else if(syntax_call_p(sce)) {
+    if(call_constant_p(syntax_call(sce))) {
+      e = ce;
     }
+    else {
+      /* We cannot know yet if ce has side effects */
+      /* expression_intrinsic_operation_p(ce): a user call may be hidden
+	 at a lower level and some intrinsics may have side effects and
+	 it might be more efficient not to recompute a complex
+	 expression several times */
+      /* Prefix starts with I to avoid an explicit declaration and a
+         regeneration of declarations by the prettyprinter. */
+      entity tmp = make_new_scalar_variable_with_prefix("ICG",
+							get_current_module_entity(),
+							make_basic(is_basic_int, (void*) 4));
+      s_init = make_assign_statement(entity_to_expression(tmp), ce);
 
-    /* MakeStatement won't increment the current statement number
-     * because this is a block... so it has to be done here
+      e = entity_to_expression(tmp);
+    }
+  }
+  else {
+    pips_internal_error("No range expected", FALSE);
+  }
+    
+
+  for(l = gen_length(ll), cl = ll; !ENDP(cl); l--, POP(cl)) {
+    string ln = STRING(CAR(cl));
+    instruction g = MakeGotoInst(ln);
+    expression cond = 
+      MakeBinaryCall(
+		     gen_find_tabulated(
+					make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+							     EQUAL_OPERATOR_NAME), 
+					entity_domain),
+		     copy_expression(e),
+		     int_to_expression(assigned? atoi(ln):l));
+    /* Assigned GO TO: if the current label is not in the list, this is an error
+     * in Fortran 90. ISO/IEC 1539 Section 8.2.4 page 108. Same in Fortran 77
+     * standard, Section 11-2.
      */
-    (void) get_next_statement_number();
-    ins = make_instruction_block(cs);
+    statement may_stop = (assigned && (cl==ll)) ?
+      instruction_to_statement(MakeZeroOrOneArgCallInst(STOP_FUNCTION_NAME,
+							expression_undefined))
+      :
+      make_empty_statement();
+    instruction iif = 
+      make_instruction(is_instruction_test,
+		       make_test(cond,
+				 instruction_to_statement(g),
+				 may_stop));
+    statement s = statement_undefined;
 
-    (void) instruction_consistent_p(ins);
+    s = instruction_to_statement(iif);
 
-    /* FatalError("parser", "computed goto statement prohibited\n"); */
+    /* Update the statement numbers of all possibly allocated statements */
+    statement_number(s) = look_at_next_statement_number();
+    if(stop_statement_p(may_stop))
+      statement_number(may_stop) = look_at_next_statement_number();
 
-    return ins;
+    cs = CONS(STATEMENT, s, cs);
+  }
+
+  if(!statement_undefined_p(s_init))
+    cs = CONS(STATEMENT, s_init, cs);
+
+  /* MakeStatement won't increment the current statement number
+   * because this is a block... so it has to be done here
+   */
+  (void) get_next_statement_number();
+  ins = make_instruction_block(cs);
+
+  (void) instruction_consistent_p(ins);
+
+  /* FatalError("parser", "computed goto statement prohibited\n"); */
+
+  return ins;
 }
 
 /* this function creates an affectation statement. 
