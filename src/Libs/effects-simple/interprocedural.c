@@ -377,7 +377,8 @@ global_effect_translation(
 	pips_debug(5, "final effects:\n");
 	print_effects(l_new_eff);
     }
-    return return gen_nreverse(l_new_eff);
+    
+    return gen_nreverse(l_new_eff);
 }
 
 static effect 
