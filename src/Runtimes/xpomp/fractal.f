@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/08/31 18:29:18 $, 
+! $Date: 1996/08/31 18:43:54 $, 
 !
       program fractal
 
@@ -27,7 +27,7 @@
 ! Size of the iteration space:
       integer x_size, y_size
       parameter(x_size = 400)     
-      parameter(y_size = 400)
+      Parameter(y_size = 400)
 
 ! The zooming ratio to display this iteration space:      
       integer x_display_zoom, y_display_zoom
@@ -54,22 +54,26 @@
 ! Some HPF distributions:
 ! cyclic would make more sense as far as load balancing is concerned
 ! However HPFC would not be very good at it...
-!hpf$ processors pe(2,2)
+      integer nproc
+      parameter (nproc=5)
+!hpf$ processors pe(nproc)
 !hpf$ template space(0:x_size - 1, 0:y_size - 1)
-!hpf$ distribute space(block, block) onto pe
+!hpf$ distribute space(*,block) onto pe
 !hpf$ align image with space
       
+
+! Initialize XPOMP
       call xpomp_open_display(x_display_size, y_display_size, display)
       call xpomp_set_color_map(display, 1, 1, 0, 0, status)
-      
-      xcenter = 0
-      ycenter = 0
-      zoom = 5
 
       call xpomp_show_usage
 
-      print *, 'Use mouse button 1 to zoom in, button 2 to recenter'
-      print *, '    and button 3 to zoom out'
+      print *, 'Mouse button 1 to zoom in, 2 to recenter, 3 to zoom out'
+
+! Initial position
+      xcenter = 0
+      ycenter = 0
+      zoom = 5
 
 ! Main loop:
       counter = 0
