@@ -3,7 +3,8 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/10/21 19:02:38 $, 
+! $Date: 1996/10/25 21:29:48 $, 
+!
 !
       program fractal
 
@@ -11,6 +12,9 @@
 
 ! XPOMP library interface:
       include 'xpomp_graphic_F.h'
+
+! also tells that a file of stubs is needed:
+!fcd$ stubs xpomp_stubs.f
 
 ! Algorithm parameters:
       integer n_iteration
