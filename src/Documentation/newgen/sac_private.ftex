@@ -28,6 +28,8 @@ instruction sets, such as MMX, SSE or VIS.
 {}
 \domain{import statement from "ri.newgen"}
 {}
+\domain{import reference from "ri.newgen"}
+{}
 
 \section*{Opcodes and opcode classes}
 
@@ -82,8 +84,7 @@ arguments (list of \verb+patternArg+).
 
 \section*{Statement information}
 
-\domain{referenceInfo = entity x nbDimensions:int x index:reference x
-offset:int}
+\domain{referenceInfo = entity x nbDimensions:int x index:reference x offset:int}
 {}
 
 The \verb+referenceInfo+ domain reprensents an easier to use
@@ -105,8 +106,7 @@ expression has already been parsed to find all the items.
 
 \section*{Transformation}
 
-\domain{transformation = name:string x vectorLength:int x
-subwordSize:int x nbArgs:int x mapping:int[16]}
+\domain{transformation = name:string x vectorLength:int x subwordSize:int x nbArgs:int x mapping:int[16]}
 {}
 
 \end{document}
