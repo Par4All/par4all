@@ -46,6 +46,7 @@ typedef long long Value;
     ((long)(val>=(Value)LONG_MIN&&val<=(Value)LONG_MAX)?val:abort())
 #define VALUE_TO_INT(val) \
     ((int)(val>=(Value)INT_MIN&&val<=(Value)INT_MAX)?val:abort())
+#define VALUE_TO_DOUBLE(val) ((double)val)
 /* end LINEAR_VALUE_IS_LONGLONG
  */
 #elif defined(LINEAR_VALUE_IS_LONG)
@@ -59,6 +60,7 @@ typedef long Value;
 #define VALUE_MONE -1L
 #define VALUE_TO_LONG(val) (val)
 #define VALUE_TO_INT(val) ((int)val)
+#define VALUE_TO_DOUBLE(val) ((double)val)
 /* end LINEAR_VALUE_IS_LONG
  */
 #elif defined(LINEAR_VALUE_IS_FLOAT)
@@ -72,6 +74,7 @@ typedef float Value;
 #define VALUE_MONE -1
 #define VALUE_TO_LONG(val) ((long)val)
 #define VALUE_TO_INT(val) ((int)val)
+#define VALUE_TO_DOUBLE(val) ((double)val)
 /* end LINEAR_VALUE_IS_FLOAT
  */
 /* the purpose of the chars version is to detect invalid assignments
@@ -87,6 +90,7 @@ typedef char * Value;
 #define VALUE_MONE (char*)-1
 #define VALUE_TO_LONG(val) ((long)val)
 #define VALUE_TO_INT(val) ((int)val)
+#define VALUE_TO_DOUBLE(val) ((double)(int)val)
 /* end LINEAR_VALUE_IS_CHARS
  */
 #else /* default: LINEAR_VALUE_IS_INT */
@@ -100,6 +104,7 @@ typedef int Value;
 #define VALUE_MONE -1
 #define VALUE_TO_LONG(val) ((long)val)
 #define VALUE_TO_INT(val) ((int)val)
+#define VALUE_TO_DOUBLE(val) ((double)val)
 /* end LINEAR_VALUE_IS_INT
  */
 #endif 
@@ -109,6 +114,7 @@ typedef int Value;
 #define int_to_value(i) ((Value)i)
 #define long_to_value(l) ((Value)l)
 #define float_to_value(f) ((Value)f)
+#define double_to_value(d) ((Value)d)
 
 /* boolean operators on values
  */
@@ -170,6 +176,8 @@ typedef int Value;
 #if defined(LINEAR_VALUE_IS_CHARS)
 #undef float_to_value
 #define float_to_value(f) ((Value)(int)f)
+#undef double_to_value
+#define double_to_value(f) ((Value)(int)f)
 #define value_fake_binary(v1,v2) ((char*)((int)(v1)^(int)(v2)))
 #define value_bool_binary(v1,v2) (((int)(v1)^(int)(v2)))
 #undef value_uminus
