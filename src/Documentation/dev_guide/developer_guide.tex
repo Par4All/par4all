@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: developer_guide.tex,v $
+%% Revision 1.12  2001/06/01 09:05:30  coelho
+%% closer to reality;-)
+%%
 %% Revision 1.11  2001/05/28 08:39:49  nguyen
 %% yes
 %%
@@ -864,8 +867,7 @@ Here are now the steps to install a new library named {\tt mylib}:
 
   \end{itemize}
   
-\item In the directory {\tt \$PIPS\_DOCDIR}, i.e. {\tt
-    \$PIPS\_DEVEDIR/Documentation/pipsmake-rc/}:
+\item In the directory {\tt\$PIPS\_DEVEDIR/Documentation/pipsmake-rc/}:
   
   \begin{itemize}
     
@@ -1025,50 +1027,51 @@ files. When declaring a new data structure, two cases may arise:
 
 \begin{enumerate}
   
-\item The new data strucutre is defined in a {\em new\/} file {\tt
-    mysd.ftex}:
+\item The new data structure is defined in a {\em new\/} file {\tt
+    mysd.ftex} or \texttt{mysd.tex}:
   
   This file has to be declared in the local {\tt Makefile} (in {\tt
-    \$PIPS\_DOCDIR/Newgen}) for its further installation in the {\bf\tt
-    Production} hierarchy. It merely consists in adding its name {\tt
-    mysd.f.tex} to the {\tt SOURCE\_FILES} list.
+    \$PIPS\_DEVEDIR/Documentation/newgen}) for its further installation in the {\bf Production} hierarchy. It merely consists in adding its name {\tt
+    mysd.ftex} to the {\tt SOURCE\_FILES} list.
 
-  Then, the macro instruction {\tt \#include "mysd.h"} must be added to the
-  files 
+If the data structure is to be managed by pipsdbm, \emph{i.e.} it
+is declared as a resource in pipsmake, then
 \begin{verbatim}
-$PIPS_DEVEDIR/Lib/top-level/newgen.c
-$PIPS_DEVEDIR/Lib/pipsdbm/methods_io.c
-\end{verbatim}
-  It is not compulsory to immediately execute the command {\tt make install}
-  in these directories. But it will be necessary before any global
-  recompilation of PIPS (see below).
-  
+$PIPS_DEVEDIR/Lib/pipsdbm/methods.h
+\end{verbatim} %% $
+must be updated.
 
+It is not compulsory to immediately execute the command {\tt make install}
+in these directories. But it will be necessary before any global
+recompilation of PIPS (see below).
+  
 \item The new data structure is added to an already existing file {\tt 
-    mysd.f.tex}: modifying this file is sufficient, and the above steps are
+    mysd.ftex}: modifying this file is sufficient, and the above steps are
     not necessary. 
 \end{enumerate}
 
 Then, in both cases, the next steps have to be performed:
 \begin{itemize}
   
-\item In the directory {\tt \$PIPS\_DOCDIR/Newgen}, execute the command {\tt
-    make} (which is equivalent to {\tt make
-    c\_internal\_representation}). This command builds the DDL file {\tt
-    mysd.newgen}, and copies it in the directory {\tt \$PIPS\_INCLUDEDIR}; then
-    in this last directory, it executes the command {\tt newgen -c *.newgen}
-    which builds the C header file corresponding to the DLL file. It also
-    builds the {\tt specs.h} file. 
+\item In the directory {\tt \$PIPS\_DEVEDIR/Documentation/newgen}, 
+  execute the command {\tt
+    make}.  This command builds the DDL files \texttt{mysd.newgen
+    mysd.spec mysd.h mysd.c} and some common files such as \texttt{specs.h}.
+  If everything is ok (check that the header and source code
+  for mysd look good), then do a \texttt{make install}.
+ which copies the generated files to the \texttt{\$PIPS\_ROOT/Include} 
+ directory;
 
 \item NewGen globally handles all the data structures defined in the
   project. Hence any minor modification of one of them, or any addition,
   potentially leads to a modification of all the interfaces which are
   generated. It is thus necessary to recompile everything in the {\bf \tt
-  Production} directory. Do not forget tofirst install {\tt
-  \$PIPS\_DEVEDIR/Lib/top-level} and {\tt \$PIPS\_DEVEDIR/Lib/pipsdbm} if
-  they have been modified in a previous step. The command {\tt make-pips}
+  Production} directory. Do not forget to first recompile {\tt
+  \$PIPS\_ROOT/Src/Lib/newgen} and,
+  install {\tt \$PIPS\_DEVEDIR/Lib/pipsdbm} if
+  it has been modified in a previous step. The command {\tt make-pips}
   achieves the global recompilation of PIPS. It is in the directory {\tt
-  \$PIPS\_UTILDIR} (Cf Page~\pageref{make-pips}). 
+    \$PIPS\_ROOT/Share} (Cf Page~\pageref{make-pips}). 
 \end{itemize}
 
 
