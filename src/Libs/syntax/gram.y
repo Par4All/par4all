@@ -56,6 +56,10 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.60  2002/06/08 16:21:58  irigoin
+  * Instead of ignoring formal and actual return labels, replace them by
+  * string variables as suggested by Fabien Coelho
+  *
   * Revision 1.59  2002/04/23 12:11:46  coelho
   * syntax error --
   *
@@ -511,12 +515,16 @@ arguments: expression
 	| TK_STAR TK_ICON
 	    {
 		add_alternate_return($2);
-		$$ = NIL;
+		$$ = CONS(EXPRESSION,
+			  generate_string_for_alternate_return_argument($2),
+			  NIL);
 	    }
 	| arguments TK_COMMA TK_STAR TK_ICON
 	    {
 		add_alternate_return($4);
-		$$ = $1;
+		$$ = gen_nconc($1, CONS(EXPRESSION,
+					generate_string_for_alternate_return_argument($4),
+					NIL));
 	    }
 	;
 
@@ -1243,7 +1251,7 @@ lformalparameter: entity_name
         | TK_STAR
             {
 		uses_alternate_return(TRUE);
-		$$ = NIL;
+		$$ = CONS(ENTITY, generate_pseudo_formal_variable_for_formal_label(), NIL);
             }
 	| lformalparameter TK_COMMA entity_name
 	    {
@@ -1252,7 +1260,9 @@ lformalparameter: entity_name
         | lformalparameter TK_COMMA TK_STAR
             {
 		uses_alternate_return(TRUE);
-		$$ = $1;
+		$$ = gen_nconc($1, CONS(ENTITY,
+					generate_pseudo_formal_variable_for_formal_label(),
+					NIL));
             }
 	;
 
@@ -1664,9 +1674,11 @@ iobuf_keyword: TK_BUFFERIN
 psf_keyword: TK_PROGRAM 
 	    { $$ = TK_PROGRAM; init_ghost_variable_entities(); }
 	| TK_SUBROUTINE 
-	    { $$ = TK_SUBROUTINE; init_ghost_variable_entities(); }
+	    { $$ = TK_SUBROUTINE; init_ghost_variable_entities();
+	    set_current_number_of_alternate_returns();}
 	| TK_FUNCTION
-	    { $$ = TK_FUNCTION; init_ghost_variable_entities(); }
+	    { $$ = TK_FUNCTION; init_ghost_variable_entities();
+	    set_current_number_of_alternate_returns();}
 	| TK_BLOCKDATA
 	    { $$ = TK_BLOCKDATA; init_ghost_variable_entities(); }
 	;
