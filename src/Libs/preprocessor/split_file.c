@@ -15,7 +15,7 @@
  * - bug name[20] overflow not checked in lname (20 -> 80)
  * - hollerith constants conversion;-)
  * - LINESIZE 80 -> 200...
- * - "PROGRAM MAIN..." added if implicit name.
+ * - "PROGRAM MAIN..." added if implicit program name.
  */
 
 static void hollerith(char *);
@@ -92,7 +92,7 @@ char fsplit_sccsid[] = "@(#)fsplit.c	5.5 (Berkeley) 3/12/91";
  *		isolates sub1 and sub2 in sub1.f and sub2.f.  The space 
  *		after -e is optional.
  *
- *	Modified Feb., 1983 by Jerry Berkman, Computing Services, U.C. Berkeley.
+ *    Modified Feb., 1983 by Jerry Berkman, Computing Services, U.C. Berkeley.
  *		- added comments
  *		- more function types: double complex, character*(*), etc.
  *		- fixed minor bugs
@@ -105,7 +105,7 @@ static char buf[BSZ];
 static FILE *ifp;
 static char 	x[]="zzz000.f",
 	mainp[]="main000.f",
-	blkp[]="blkdta000.f";
+	blkp[]="data000.f";
 
 #define TRUE 1
 #define FALSE 0
@@ -213,6 +213,8 @@ static int lend()
 	return (0);
 }
 
+static int implicit_program; /* FC */
+static int implicit_blockdata_name; /* FC */
 static int implicit_program_name; /* FC */
 
 /*		check for keywords for subprograms	
@@ -225,6 +227,8 @@ char *s;
 	register char *ptr, *p;
 	char	line[LINESIZE], *iptr = line;
 
+	implicit_program = 0;
+	implicit_blockdata_name = 0;
 	implicit_program_name = 0;
 
 	/* first check for comment cards */
@@ -255,17 +259,19 @@ char *s;
 		strcpy( s, x);
 	} else if((ptr = look(line, "program")) != 0) {
 		if(scan_name(s, ptr)) return(1);
+		implicit_program_name = 1;
 		get_name( mainp, 4);
 		strcpy( s, mainp);
 	} else if((ptr = look(line, "blockdata")) != 0) {
 		if(scan_name(s, ptr)) return(1);
-		get_name( blkp, 6);
+		implicit_blockdata_name = 1;
+		get_name( blkp, 4);
 		strcpy( s, blkp);
 	} else if((ptr = functs(line)) != 0) {
 		if(scan_name(s, ptr)) return(1);
 		strcpy( s, x);
 	} else {
-	    implicit_program_name = 1;
+	    implicit_program = 1;
 		get_name( mainp, 4);
 		strcpy( s, mainp);
 	}
@@ -355,7 +361,10 @@ char *s, *m;
 	return (sp);
 }
 
-
+static void print_name(FILE * o, char * name, int n) /* FC */
+{
+    while (n-->0) putc(*name++, o);
+}
 
 /*
 main(argc, argv)
@@ -390,14 +399,31 @@ int fsplit(char * file_name, FILE * out)
 	    hollerith(buf); /* FC */
 	    if (nflag == 0) /* if no name yet, try and find one */
 		nflag = lname(name);
-	    if (nflag!=0 && implicit_program_name==1) /* FC again */ {
-		fprintf(ofp, "! next line added by fsplit() in pips\n"
-			"      PROGRAM %c%c%c%c%c%c%c\n", name[0], name[1], 
-			name[2], name[3], name[4], name[5], name[6]);
-		implicit_program_name = 0; /* now we gave it a name! */
+	    if (implicit_program==1) /* FC again */ 
+	    {
+		fprintf(ofp, 
+			"! next line added by fsplit() in pips\n"
+			"      PROGRAM ");
+		print_name(ofp, name, 7);
+		implicit_program = 0; /* now we gave it a name! */
 	    }
+	    
+	    if (implicit_blockdata_name==1 || implicit_program_name==1) 
+	    {
+		fprintf(ofp, 
+			"! next line modified by fsplit() in pips\n"
+			"      %s ", 
+			implicit_program_name==1? "PROGRAM": "BLOCK DATA");
+		print_name(ofp, name, 7);
+		putc('\n', ofp);
+		implicit_blockdata_name = 0;
+		implicit_program_name = 0;
+	    }
+	    else
+		fprintf(ofp, "%s", buf);
+
 	    rv = 1;
-	    fprintf(ofp, "%s", buf);
+
 	    if (lend())		/* look for an 'end' statement */
 		break;
 	}
