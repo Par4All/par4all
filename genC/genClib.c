@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/22 10:44:10 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/22 10:46:45 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -999,6 +999,8 @@ void
 gen_free(
     gen_chunk *obj)
 {
+    /* reentry or not: whether the already_seen table is initialized or not...
+     */
     bool first_in_stack = (free_already_seen==(hash_table)NULL);
     struct driver dr ;
 
