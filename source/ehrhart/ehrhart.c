@@ -1785,6 +1785,7 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
     value_clear(tmp);
     for (j=0;j<= hdim;j++) 
         value_clear(context[j]);  
+    free(context);
     return(res);
 } /* Enumerate_NoParameters */
 
