@@ -47,17 +47,18 @@ char *dir;
 
 
 void start_directory_notify(menu, menu_item)
-Menu menu;
-Menu_item menu_item;
+     Menu menu;
+     Menu_item menu_item;
 {
-	if (db_get_current_workspace() != database_undefined)
-		/* RK, 25/01/1993. */
-		prompt_user("You have to close the current workspace before changing directory.");
-	else
-		start_query("Change Directory",
-			"Enter directory path: ", 
-			"ChangeDirectory",
-			end_directory_notify);
+  if (db_get_current_workspace() != database_undefined)
+    /* RK, 25/01/1993. */
+    prompt_user("You have to close the current workspace before changing directory.");
+  else
+    start_query("Change Directory",
+		"Enter directory path: ", 
+		"ChangeDirectory",
+		end_directory_notify,
+		cancel_query_notify);
 }
 
 
@@ -73,10 +74,21 @@ Menu_item menu_item;
     start_query("Create Workspace", 
 		"Enter workspace name: ", 
 		"CreateWorkspace",
-		continue_create_program_notify);
+		continue_create_program_notify,
+		/* Pas la peine de faire quelque chose si on appuie
+                   sur cancel : */
+		cancel_create_program_notify);
 }
 
-
+success cancel_create_program_notify(item, event)
+Panel_item item;
+Event *event;
+{
+  /* Re'tablit le droit d'ouvrir ou de cre'er un autre worspace : */
+  xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
+  xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
+  cancel_query_notify(item, event);
+}
 
 success continue_create_program_notify(name)
      char *name;
@@ -88,7 +100,7 @@ success continue_create_program_notify(name)
 
     if( setjmp(pips_top_level) ) {
       xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
-	xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
+      xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
       return(FALSE);
     }
     else {
