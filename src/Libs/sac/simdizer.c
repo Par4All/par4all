@@ -178,6 +178,8 @@ static void simdize_simple_statements(statement s)
    seq = sequence_statements(instruction_sequence(statement_instruction(s)));
    init_statement_matches_map(seq);
    init_statement_successors_map(seq);
+
+   //argument info dependencies are local to each sequence -> RESET
    reset_argument_info();
 
    sinfo = sinfo_begin = CONS(NULL, NULL, NIL);
@@ -199,7 +201,12 @@ static void simdize_simple_statements(statement s)
       /* if this is not a recognized statement (ie, no match), skip it */
       group_matches = get_statement_matching_types(si);
       if (group_matches == NIL)
+      {
+	 sinfo = CDR(sinfo) = CONS(STATEMENT_INFO,
+				   make_nonsimd_statement_info(STATEMENT(CAR(i))),
+				   NIL);
 	 continue;
+      }
 
       /* try to find all the compatible isomorphic statements after the
        * current statement
@@ -249,7 +256,7 @@ static void simdize_simple_statements(statement s)
 					group_last);
       while(CDR(sinfo) != NIL)
 	 sinfo = CDR(sinfo);
-
+      
       /* skip what has already been matched */
       i = group_last;
    }
@@ -273,26 +280,13 @@ static void simdize_simple_statements(statement s)
 static bool simd_simple_sequence_filter(statement s)
 {
    instruction i;
-   cons * j;
 
-   /* Make sure this is a sequence */
+   /* Do not recurse through simple calls, for better performance */ 
    i = statement_instruction(s);
-   if (!instruction_sequence_p(i))
-      return TRUE; /* keep searching recursively */
-   
-   /* Make sure all statements are calls */
-   for( j = sequence_statements(instruction_sequence(i));
-	j != NIL;
-	j = CDR(j) )
-   {
-      if (!instruction_call_p(statement_instruction(STATEMENT(CAR(j)))))
-	 return TRUE; /* keep searching recursively */
-   }
-   
-   /* Try to parallelize this */
-   simdize_simple_statements(s);
-
-   return FALSE;
+   if (instruction_call_p(i))
+      return FALSE;
+   else
+      return TRUE;
 }
 
 bool simdizer(char * mod_name)
@@ -310,7 +304,7 @@ bool simdizer(char * mod_name)
    /* Now do the job */
   
    gen_recurse(mod_stmt, statement_domain,
-	       simd_simple_sequence_filter, gen_null);
+	       simd_simple_sequence_filter, simdize_simple_statements);
 
    pips_assert("Statement is consistent after SIMDIZER", 
 	       statement_consistent_p(mod_stmt));
