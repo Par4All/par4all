@@ -89,3 +89,24 @@ make_close_workspace(void)
     free(name);
     return res;
 }
+
+/* checkpoint the current workspace, i.e. save everything so
+ * that it is possible to reopen it in case of failure. 
+ */
+void
+checkpoint_workspace(void)
+{
+    if (db_get_current_workspace_name())
+    {
+	user_log("Checkpoint of workspace.\n");
+	pips_debug(3, "\tdeleting obsolete resources...\n");
+	delete_obsolete_resources();
+	pips_debug(3, "\tsaving resources...\n");
+	db_checkpoint_workspace();
+	pips_debug(3, "\tproperties and makefile...\n");
+	close_properties();
+	open_properties();
+	close_makefile();
+	open_makefile();
+    }
+}
