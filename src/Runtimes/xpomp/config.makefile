@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/03 18:12:50 $ 
+# $Date: 1996/09/03 23:20:48 $ 
 
 # expected from makefile macros
 ifeq ($(FC),g77)
@@ -17,8 +17,8 @@ BIN=		$(ARCH)/xpomp
 LOCAL_HEADERS=	gr.h rasterfile.h 
 EXPORT_HEADERS=	xpomp_graphic.h xpomp_graphic_F.h
 CFILES=		xpomp.c 
-M4CFILES=		cgraphic.m4c
-DEMO=		test_xpomp.c fractal.f 
+M4CFILES=	cgraphic.m4c
+DEMO=		test_xpomp.c fractal.f wave.f wave_parameters.h
 HPFC=		xpomp_fake.f
 DOC=		xpomp_manual.tex xPOMP_window_explained.eps
 SOURCES=	$(LOCAL_HEADERS) \
@@ -66,6 +66,9 @@ $(ARCH)/test_xpomp : $(ARCH)/test_xpomp.o $(LIB)
 	$(LINK) $@ $+ -lm $(LIB)
 
 $(ARCH)/fractal : $(ARCH)/fractal.o $(LIB) 
+	$(FC) $(FFLAGS) $(LDFLAGS) -o $@ $+ -lm $(LIB)
+
+$(ARCH)/wave : $(ARCH)/wave.o $(LIB) 
 	$(FC) $(FFLAGS) $(LDFLAGS) -o $@ $+ -lm $(LIB)
 
 clean: local-clean
