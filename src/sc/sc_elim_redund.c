@@ -70,7 +70,7 @@ Psysteme sc_elim_redund(ps)
 Psysteme ps;
 {
     Pcontrainte eq;
-  
+
     for (eq = ps->egalites; eq != NULL; eq=eq->succ)
 	vect_normalize(eq->vecteur);
     ps = sc_kill_db_eg(ps);
@@ -81,6 +81,8 @@ Psysteme ps;
 	sc_rm(ps);
 	return(NULL);
     }
-    return(sc_inequations_elim_redund(ps));
+    
+    ps = sc_inequations_elim_redund(ps);
+    return(ps);
 }
 
