@@ -383,6 +383,13 @@ entity get_ith_##lname##_prime(int i)\
                                      ENTITY_MULTIPLY_P(e) || \
                                      ENTITY_DIVIDE_P(e) )
 
+/* soft block->sequence transition
+ */
+#ifdef is_instruction_sequence
+#define is_instruction_block is_instruction_sequence
+#define instruction_block_p(i) instruction_sequence_p(i)
+#define instruction_block(i) sequence_statements(instruction_sequence(i))
+#endif
 
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
