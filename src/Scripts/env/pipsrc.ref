@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/29 12:04:57 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/29 12:42:51 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -107,7 +107,7 @@ PIPS_CC_SUN4="acc"
 # C FLAGS
 #
 PIPS_CFLAGS="-O2 -g -ansi -pedantic -Wall -mv8 -pipe"
-PIPS_CFLAGS_SUN4="-fast -g"
+PIPS_CFLAGS_SUN4="-fast -Xc -g"
 #
 # CPP FLAGS
 #
@@ -116,7 +116,7 @@ PIPS_CPPFLAGS="-D__USE_FIXED_PROTOTYPES__ -I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}
 # LD
 #
 PIPS_LD=${PIPS_CC}
-PIPS_LD_SUN4=${PIPS_CC_SUN4}
+PIPS_LD_SUN4="${PIPS_CC_SUN4} -B dynamic -bsdmalloc"
 #
 # LD FLAGS
 #
