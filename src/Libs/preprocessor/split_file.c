@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1996/12/31 15:29:25 $, 
+ * $Date: 1997/01/02 10:19:46 $, 
  *
  * adapted from whta can be seen by FC 31/12/96
  * 
@@ -329,7 +329,7 @@ char *s, *m;
 main(argc, argv)
 char **argv;
 */
-int pips_fsplit(char * file_name, FILE *out)
+int fsplit(char * file_name, FILE *out)
 {
     register FILE *ofp;	/* output file */
     register rv;		/* 1 if got card in output file, 0 otherwise */
