@@ -202,8 +202,8 @@
       call HPFC TEMPLATE(inda, an, indt, tn)
       call HPFC PROCESSORS(indt, tn, OINDP, OPN, OREPLICATED)
       if (OREPLICATED) then
-         OLID = INTFLAG
-         OWNERTID = INTFLAG
+         OWNERLID = INTFLAG
+c         OWNERTID = INTFLAG
          do i=1, NODIMP(OPN)
             if (OINDP(i).EQ.INTFLAG) then
                indp(i) = RANGEP(OPN, i, 1)
@@ -211,13 +211,13 @@
                indp(i) = OINDP(i)
             endif
          enddo
-         call HPFC PROCLID(indp, OPN, SLID, .FALSE.)
-         SENDERTID  = NODETIDS(SLID)
+         call HPFC PROCLID(indp, OPN, SENDERLID, .FALSE.)
+c         SENDERTID  = NODETIDS(SLID)
       else
-         call HPFC PROCLID(OINDP, OPN, OLID, OREPLICATED)
-         OWNERTID  = NODETIDS(OLID)
-         SENDERTID = OWNERTID
-         SLID = OLID
+         call HPFC PROCLID(OINDP, OPN, OWNERLID, OREPLICATED)
+c         OWNERTID  = NODETIDS(OLID)
+c         SENDERTID = OWNERTID
+         SENDERLID = OWNERLID
       endif
       end
 !
@@ -248,8 +248,8 @@
          enddo
          replicated = .FALSE.
       endif
-      call HPFC PROCLID(CINDP, CPN, CLID, replicated)
-      COMPUTERTID  = NODETIDS(CLID)
+      call HPFC PROCLID(CINDP, CPN, COMPUTERLID, replicated)
+c      COMPUTERTID  = NODETIDS(COMPUTERLID)
       CPOSCOMPUTED = .FALSE.
       end
 !
@@ -264,8 +264,8 @@
       integer delta
       include "hpfc_commons.h"
       integer bufid
-      NLID = MYLID + DELTA
-      NTID = NODETIDS(NLID)
+      NEIGHBORLID = MYLID + DELTA
+c      NTID = NODETIDS(NEIGHBORLID)
 !
 ! where should I put it?
 !
@@ -288,7 +288,7 @@
      $           result = result.AND.(OINDP(i).EQ.MYPOS(i, OPN))
          enddo
       else
-         result = MYLID.EQ.OLID
+         result = MYLID.EQ.OWNERLID
       endif
       HPFC OWNERP = result
       end
@@ -300,7 +300,7 @@
 !
       logical function HPFC SENDERP()
       include "hpfc_commons.h"
-      HPFC SENDERP = MYLID.EQ.SLID
+      HPFC SENDERP = MYLID.EQ.SENDERLID
       end
 !
 !-----------------
@@ -310,7 +310,7 @@
 !
       logical function HPFC COMPUTERP()
       include "hpfc_commons.h"
-      HPFC COMPUTERP = MYLID.EQ.CLID
+      HPFC COMPUTERP = MYLID.EQ.COMPUTERLID
       end
 !
 !-----------------
@@ -338,7 +338,7 @@
 ! position on the owners processors, if it has not been done.
 !
             if ((.NOT.CPOSCOMPUTED).OR.(CPOSPN.NE.OPN)) then
-               call HPFC CMPPOS(OPN, CLID, CPOS)
+               call HPFC CMPPOS(OPN, COMPUTERLID, CPOS)
                CPOSPN = OPN
                CPOSCOMPUTED = .TRUE.
             endif
@@ -348,7 +348,7 @@
             enddo
          endif
       else
-         result = CLID.EQ.OLID
+         result = COMPUTERLID.EQ.OWNERLID
       endif
       HPFC COMPUTERINOWNERSP = result
       end
@@ -365,8 +365,8 @@
       integer bufid, info
       call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
-      call HPFC SEND(COMPUTERTID, SENDCHANNELS(CLID), info)
-      SENDCHANNELS(CLID) = SENDCHANNELS(CLID) + 2
+      call HPFC SEND(COMPUTERLID, SENDCHANNELS(COMPUTERLID), info)
+      SENDCHANNELS(COMPUTERLID) = SENDCHANNELS(COMPUTERLID) + 2
       end
 !
 !-----------------
@@ -381,7 +381,7 @@
       integer bufid, info
       call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
-      call HPFC SEND(HOSTTID, HOST SND CHANNEL, info)
+      call HPFC SEND(HOSTLID, HOST SND CHANNEL, info)
       HOST SND CHANNEL = HOST SND CHANNEL + 2
       end
 !
@@ -395,11 +395,11 @@
       integer what, val
       include "hpfc_commons.h"
       integer bufid, info
-      debug(print *, "sending to ", OLID)
+      debug(print *, "sending to ", OWNERLID)
       call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
-      call HPFC SEND(OWNERTID, SENDCHANNELS(OLID), info)
-      SENDCHANNELS(OLID) = SENDCHANNELS(OLID) + 2
+      call HPFC SEND(OWNERLID, SENDCHANNELS(OWNERLID), info)
+      SENDCHANNELS(OWNERLID) = SENDCHANNELS(OWNERLID) + 2
       end
 !
 !-----------------
@@ -417,7 +417,7 @@
       if (MYLID.GT.1)
      $     call HPFC BCAST ROOT(
      $     MYLID-1, 
-     $     NODETIDS, 
+     $     NODETIDS(1), 
      $     MCASTNODES, 
      $     info)
       if (MYLID.LT.NBOFTASKS)
@@ -503,7 +503,7 @@ _CM5(
       integer len
       len = HPFC PVMLENGTH(what)
       if (0.ne.CMMD_receive(
-     $     CM NODE IDS(SLID),
+     $     CM NODE IDS(SENDERLID),
      $     MCASTNODES,
      $     goal,
      $     len)) then
@@ -525,7 +525,7 @@ _CM5(
       debug(print *, "sending to all nodes")
       call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(what, val, 1, 1, info)
-      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS, MCASTHOST, info)
+      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS(1), MCASTHOST, info)
       MCASTHOST = MCASTHOST + 2
       debug(print *, "sent!")
       end
@@ -545,7 +545,7 @@ _CM5(
       if (MYLID.GT.1)
      $     call HPFC BCAST ROOT(
      $     MYLID-1, 
-     $     NODETIDS, 
+     $     NODETIDS(1), 
      $     MCASTNODES, 
      $     info)
       if (MYLID.LT.NBOFTASKS)
@@ -555,7 +555,7 @@ _CM5(
      $     MCASTNODES, 
      $     info)
       MCASTNODES = MCASTNODES + 2
-      call HPFC SEND(HOSTTID, HOST SND CHANNEL, info)
+      call HPFC SEND(HOSTLID, HOST SND CHANNEL, info)
       HOST SND CHANNEL = HOST SND CHANNEL + 2
       end
 !
@@ -611,7 +611,7 @@ _CM5(
                               call HPFC PROCLID(
      $                             indp, OPN, lid, .FALSE.)
                               call HPFC SEND(
-     $                             NODETIDS(lid), 
+     $                             lid, 
      $                             SENDCHANNELS(lid), 
      $                             info)
                               SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
@@ -677,9 +677,9 @@ _CM5(
 ! have time for that...
 !
                            call HPFC PROCLID(indp, OPN, lid, .FALSE.)
-                           if (lid.NE.CLID) then
+                           if (lid.NE.COMPUTERLID) then
                               call HPFC SEND(
-     $                             NODETIDS(lid), 
+     $                             lid, 
      $                             SENDCHANNELS(lid), 
      $                             info)
                               SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
@@ -721,7 +721,7 @@ _CM5(
      $           result = result.AND.(OINDP(i).EQ.indp(i))
          enddo
          if (.NOT.result) then
-            call HPFC SEND(NODETIDS(lid), SENDCHANNELS(lid), info)
+            call HPFC SEND(lid, SENDCHANNELS(lid), info)
             SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
          endif
       enddo
@@ -748,9 +748,9 @@ _CM5(
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC RECEIVE(SENDERTID, RECVCHANNELS(SLID), bufid)
+      call HPFC RECEIVE(SENDERLID, RECVCHANNELS(SENDERLID), bufid)
       call HPFC UNPACK(what, goal, 1, 1, info)
-      RECVCHANNELS(SLID) = RECVCHANNELS(SLID) + 2
+      RECVCHANNELS(SENDERLID) = RECVCHANNELS(SENDERLID) + 2
       end
 !
 !-----------------
@@ -761,9 +761,9 @@ _CM5(
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC RECEIVE(COMPUTERTID, RECVCHANNELS(CLID), bufid)
+      call HPFC RECEIVE(COMPUTERLID, RECVCHANNELS(COMPUTERLID), bufid)
       call HPFC UNPACK(what, goal, 1, 1, info)
-      RECVCHANNELS(CLID) = RECVCHANNELS(CLID) + 2
+      RECVCHANNELS(COMPUTERLID) = RECVCHANNELS(COMPUTERLID) + 2
       end
 !
 !-----------------
@@ -774,7 +774,7 @@ _CM5(
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC RECEIVE(HOSTTID, HOST RCV CHANNEL, bufid)
+      call HPFC RECEIVE(HOSTLID, HOST RCV CHANNEL, bufid)
       call HPFC UNPACK(what, goal, 1, 1, info)
       HOST RCV CHANNEL = HOST RCV CHANNEL + 2
       debug(print *, MYLID, " receiving from host")
@@ -788,7 +788,7 @@ _CM5(
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC BCAST RECV(SENDERTID, MCASTNODES, bufid)
+      call HPFC BCAST RECV(SENDERLID, MCASTNODES, bufid)
       call HPFC UNPACK(what, goal, 1, 1, info)
       MCASTNODES = MCASTNODES + 2
       end
@@ -802,7 +802,7 @@ _CM5(
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "receiving from host")
-      call HPFC BCAST RECV(HOSTTID, MCASTHOST, bufid)
+      call HPFC BCAST RECV(HOSTLID, MCASTHOST, bufid)
       call HPFC UNPACK(what, goal, 1, 1, info)
       MCASTHOST = MCASTHOST + 2
       debug(print *, "received!")
@@ -914,6 +914,7 @@ _CM5(
       endif
       endif
       end
+
 !
 !-----------------
 !
@@ -945,12 +946,11 @@ _CM5(
 
       host known = .false.
 
-      call HPFC GET MYTID(MY TID)
+      call pvmfmytid(MY TID)
 
       _getpe(
 ! the CRAY T3D does not have spawn, but the spawning is automatic!
-! the same thing is true for mpi implementations
-      call HPFC GET PE(MY TID, my rank)
+      call pvmfgetpe(MY TID, my rank)
       debug(print *, "[HPFC INIT MAIN] getting pe ", MY TID, "-", my rank)
 ! mouais...
       MY TID = my rank
@@ -963,8 +963,12 @@ _CM5(
          HOST TID = MY TID
       end if)
       
-
-      call HPFC JOIN GROUP(inum)
+      call pvmfjoingroup(HPFC GROUP NAME, inum)
+      if (inum.lt.0) then
+         call pvmfperror("while joining group in HPFC INIT MAIN", info)
+         call pvmfexit(info)
+         stop
+      end if
 
       debug(print *, "[HPFC INIT MAIN] group ", HPFC GROUP NAME, inum)
 
@@ -982,7 +986,6 @@ _CM5(
          host known = .true.
       end if
  
-! spawning is necessary for pvm (expect T3D) but not for mpi
       _spawn(
       if (.not. SPAWN PERFORMED) then
          debug(print *, "spawning ", NB OF TASKS, " ", MAIN PROGRAM NAME)
@@ -991,7 +994,7 @@ _CM5(
      $        PVM ARCH,
      $        NODE ARCHITECTURE,
      $        NB OF TASKS,
-     $        NODE TIDS,
+     $        NODE TIDS(1),
      $        info)
 
 ! may think of an external spawning?
@@ -1002,6 +1005,7 @@ _CM5(
       debug(print *, "[HPFC INIT MAIN] exiting")
 
       end
+
 ! 
 !-----------------
 !
@@ -1022,7 +1026,7 @@ _CM5(
 
       call HPFC INIT COMMON PARAM LIB
 
-      call HPFC GET MYTID(MYTID)
+      call pvmfmytid(MY TID)
 
 !
 ! done before the spawn so host is (group, 0)
@@ -1032,8 +1036,8 @@ _CM5(
       if (inum.ne.0) then
          SPAWN PERFORMED = .true.
       endif
-
       end
+
 !
 !-----------------
 !
@@ -1046,8 +1050,11 @@ _CM5(
       include "hpfc_commons.h"
       integer i, bufid, info
 
-      debug(print *, "[HPFC INIT NODE] in tid:", MY TID)
+      HOST LID = 0
 
+      debug(print *, "[HPFC INIT NODE] in ")
+
+! in order to get the host tid 
       if (.not.OUTSIDE SPAWN) then
          call pvmfparent(HOST TID)
       end if
@@ -1060,8 +1067,10 @@ _CM5(
 ! receive from host global informations about the nodes implicated
 ! in this run.
       _spawn(
-      call HPFC RECEIVE(HOST TID, 1, bufid)
-      call HPFC UNPACK(INTEGER4, NODE TIDS, NB OF TASKS, 1, info)
+! Should be a call to HPFC BCAST RECV, but NODETIDS is not yet available 
+!      call HPFC BCAST RECV(HOST LID, 1, bufid)
+      call pvmfrecv(HOSTTID, 1, bufid)
+      call HPFC UNPACK(INTEGER4, NODE TIDS, NB OF TASKS + 1, 1, info)
       debug(if (info.lt.0) then
          call HPFC PRINT ERROR MSG("[HPFC INIT NODE] node tids recv",
      $     info)
@@ -1075,7 +1084,7 @@ _CM5(
       enddo)
 
       _getpe(
-      do i=1, NB OF TASKS
+      do i=0, NB OF TASKS
          NODE TIDS(i) = i
       enddo)
 
@@ -1089,10 +1098,10 @@ _CM5(
 ! 1 sends node version key to host
 !
       if (MY LID.eq.1) then
-      debug(print *, "[HPFC INIT NODE] sending key to ", HOSTTID)
+      debug(print *, "[HPFC INIT NODE] sending key to ", HOSTLID)
          call HPFC INIT SEND(PVMRAW, bufid)
          call HPFC PACK(STRING, hpfc key, 64, 1, info)
-         call HPFC SEND(HOSTTID, 1, info)
+         call HPFC SEND(HOSTLID, 1, info)
       endif
 
 _CM5(
@@ -1105,9 +1114,9 @@ _CM5(
 !
       call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(INTEGER4, CM MY ID, 1, 1, info)
-      call HPFC SEND(HOSTTID, 1, info)
+      call HPFC SEND(HOSTLID, 1, info)
 !
-      call HPFC RECEIVE(HOSTTID, 1, bufid)
+      call HPFC RECEIVE(HOSTLID, 1, bufid)
       call HPFC UNPACK(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
 !
 ! end of cm5 related initializations
@@ -1207,23 +1216,24 @@ _direct(`'
       integer bufid, info
       character*64 node key
       
-      debug(print *, "[HPFC INIT HOST] in ", MY LID)
+      debug(print *, "[HPFC INIT HOST] in ")
       
       MYLID = 0
-      HOSTTID = MYTID
+      HOSTLID = 0
       
       _direct(call HPFC DIRECTROUTE IF POSSIBLE)
 
       _spawn(
       if (.not. SPAWN PERFORMED) then
-       debug(print *,"[HPFCINITHOST] spawning",NB OF TASKS," ", NODE PROGRAM NAME)
+       debug(`print *,"[HPFCINITHOST] spawning",NB OF TASKS," ", 
+     $ NODE PROGRAM NAME')
 
        call pvmfspawn(
      $      NODE PROGRAM NAME, 
      $      PVM ARCH, 
      $      NODE ARCHITECTURE, 
      $      NB OF TASKS, 
-     $      NODE TIDS, 
+     $      NODE TIDS(1), 
      $      info)
 
          if (info.lt.0) then
@@ -1238,25 +1248,26 @@ _direct(`'
             stop
          endif
 
-      endif)
+        endif)
 
       _getpe(
 ! rather specific to CRAY T3D
       debug(print *, "[HPFC INIT HOST] initializing NODE TIDS")
-      do i=1, NB OF TASKS
+      do i=0, NB OF TASKS
          NODE TIDS(i)=i
       end do)
       
       _spawn(
 ! if not T3D and not MPI, the host sends the tids...
+      NODETIDS(0) = MY TID
       call HPFC INIT SEND(PVMRAW, bufid)
-      call HPFC PACK(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
+      call HPFC PACK(INTEGER4, NODETIDS, NBOFTASKS + 1, 1, info)
       debug(if (info.lt.0) then
          call HPFC PRINT ERROR MSG("initial pack", info)
          call HPFC TERMINATE TASK(info)
          stop
       endif)
-      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS, 1, info)
+      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS(1), 1, info)
       debug(if (info.lt.0) then
          call HPFC PRINT ERROR MSG("initial mcast", info)
          call HPFC TERMINATE TASK(info)
@@ -1270,7 +1281,7 @@ _direct(`'
 ! to insure that both host and node where generated together...
 !
       debug(print *, "[HPFC INIT HOST] receiving key")
-      call HPFC RECEIVE(NODETIDS(1), 1, bufid)
+      call HPFC RECEIVE(1, 1, bufid)
       call HPFC UNPACK(STRING, node key, 64, 1, info)
       if (node key.ne.hpfc key) then
          print *, "*** incompatible version keys!"
@@ -1291,13 +1302,13 @@ _CM5(
       CM SIZE    = cmmd_partition_size()
 !
       do i=1, NBOFTASKS
-         call HPFC RECEIVE(NODETIDS(i), 1, info)
+         call HPFC RECEIVE(i, 1, info)
          call HPFC UNPACK(INTEGER4, CM NODE IDS(i), 1, 1, info)
       enddo
 !
       call HPFC INIT SEND(PVMRAW, bufid)
       call HPFC PACK(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
-      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS, 1, info)
+      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS(1), 1, info)
 !
 ! end of cm5 related initializations
 !)
@@ -1309,7 +1320,7 @@ _CM5(
       else
          write (unit=0,fmt=*) " -- single main program"
       end if
-      call print task info(NBOFTASKS, NODETIDS, HOSTTID))
+      call print task info(NBOFTASKS, NODETIDS(1), HOSTTID))
 
 !
 ! insures that all nodes joined the group...
@@ -1367,7 +1378,7 @@ _CM5(
       subroutine HPFC RCVFR N
       include "hpfc_commons.h"
       integer info
-      call HPFC RECEIVE(NTID, RECVCHANNELS(NLID), info)
+      call HPFC RECEIVE(NEIGHBORLID, RECVCHANNELS(NEIGHBORLID), info)
       end
 !
 !-----------------
@@ -1377,7 +1388,7 @@ _CM5(
       subroutine HPFC SNDTO N
       include "hpfc_commons.h"
       integer info
-      call HPFC SEND(NTID, SENDCHANNELS(NLID), info)
+      call HPFC SEND(NEIGHBORLID, SENDCHANNELS(NEIGHBORLID), info)
       end
 !
 !-----------------
