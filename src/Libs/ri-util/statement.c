@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.77  2003/12/05 17:09:42  nguyen
+    Add expression and forloop instruction cases
+
     Revision 1.76  2003/08/06 13:45:40  nguyen
     Correct function insert_statement
 
@@ -82,9 +85,14 @@
 
 #include "properties.h"
 
+/*===================== Variables and Function prototypes for C ===========*/
+extern bool is_fortran; 
+
+
 /******************************************************* EMPTY STATEMENT */
 /* detects a statement with no special effect...
  */ 
+
 
 static bool statement_is_empty;
 
@@ -960,7 +968,7 @@ string s;
 	call c = instruction_call(i);
 	entity f = call_function(c);
 
-	if (strcmp(entity_local_name(f), s) == 0)
+	if (strcmp(entity_user_name(f), s) == 0)
 	  call_s_p = TRUE;
     }
 
@@ -1394,6 +1402,12 @@ instruction_identification(instruction i)
     case is_instruction_unstructured:
 	instrstring="UNSTRUCTURED";
 	break;
+    case is_instruction_forloop:
+      instrstring="FOR LOOP";
+      break;
+    case is_instruction_expression:
+      instrstring="EXPRESSION";
+      break;
     default: pips_error("instruction_identification",
 			"ill. instruction tag %d\n", 
 			instruction_tag(i));
@@ -1648,7 +1662,7 @@ fix_sequence_statement_attributes(statement s)
 
 	if (strcmp(label_name, RETURN_LABEL_NAME) == 0)
 	    /* This the label of a RETURN, do not forward it: */
-	    continue_s = make_continue_statement(entity_empty_label());
+	    continue_s = make_continue_statement(entity_empty_label()); 
 	else
 	    continue_s = make_continue_statement(statement_label(s));
 	
@@ -1709,6 +1723,8 @@ statement_to_label(statement s)
     case is_instruction_loop:
     case is_instruction_whileloop:
     case is_instruction_goto:
+    case is_instruction_forloop:
+    case is_instruction_expression:
       break;
     default:
       pips_error("statement_to_label", "Ill. tag %d for instruction",
@@ -1776,6 +1792,10 @@ statement_does_return(statement s)
 	/* returns = statement_does_return(instruction_goto(i)); */
 	returns = FALSE;
 	break;
+    case is_instruction_forloop:
+      break;
+    case is_instruction_expression:
+      break;
     default:
 	pips_error("statement_does_return", "Ill. tag %d for instruction",
 		   instruction_tag(i));
