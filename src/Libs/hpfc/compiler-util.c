@@ -2,33 +2,53 @@
  *
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compiler-util.c,v $ ($Date: 1995/10/05 11:34:55 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1996/06/12 15:55:59 $, )
  * version $Revision$
  */
 
 #include "defines-local.h"
 #include "control.h"
 
-
-bool hpfc_empty_statement_p(stat)
-statement stat;
-{
-    return((stat==statement_undefined) ||
-	   (stat==NULL) ||
-	   (statement_continue_p(stat)) ||
-	   ((statement_block_p(stat)) && 
-	    (hpfc_empty_statement_list_p
-	      (instruction_block(statement_instruction(stat))))) ||
-	   (empty_statement_p(stat)));
-}
-
 bool hpfc_empty_statement_list_p(l)
 list l;
 {
-    return(ENDP(l) ? TRUE :
-	   hpfc_empty_statement_p(STATEMENT(CAR(l))) && 
-	   hpfc_empty_statement_list_p(CDR(l)));
+    MAP(STATEMENT, s, if (!hpfc_empty_statement_p(s)) return FALSE, l);
+    return TRUE;
 }
+
+/******************************************************* EMPTY STATEMENTS */
+static bool statement_is_empty;
+
+#define ENTITY_CONTINUE_P(e) \
+    (strcmp(entity_local_name(e), CONTINUE_FUNCTION_NAME))
+
+static bool cannot_be_empty(gen_chunk* x)
+{
+    statement_is_empty=FALSE;
+    gen_recurse_stop(NULL);
+    return FALSE;
+}
+
+static bool call_filter(call c)
+{
+    return ENTITY_CONTINUE_P(call_function(c)) || cannot_be_empty(c);
+}
+
+bool hpfc_empty_statement_p(statement s)
+{
+    if (!s || statement_undefined_p(s)) 
+	return TRUE;
+
+    statement_is_empty = TRUE;
+    gen_multi_recurse(s,
+		      test_domain, cannot_be_empty, gen_null,
+		      loop_domain, cannot_be_empty, gen_null,
+		      call_domain, call_filter, gen_null,
+		      NULL);
+    return statement_is_empty;
+}
+
+/***************************************************************************/
 
 void update_control_lists(c, map)
 control c;
