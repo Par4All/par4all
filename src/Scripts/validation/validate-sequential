@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/01/13 21:17:27 $, ) 
+# ($Date: 1997/02/04 10:09:32 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -169,7 +169,6 @@ diffout_e=${tdir}/diff_e.$$
 diffout=${tdir}/diff.$$
 # global variable...
 errors=${tdir}/errors.$$
-shell='/bin/sh'
 
 echo 0 > $errors
 
@@ -267,7 +266,7 @@ test_aspect()
      if [ -f $aspect/$name.test ] 
      then
        $DEBUG " || .test case"
-       $shell $aspect/$name.test > $tmpout 2> $tmperr
+       $aspect/$name.test > $tmpout 2> $tmperr
        STATUS=$?
        [ -f core ] && rm -f core
 
@@ -289,7 +288,7 @@ or $tpips_version" || \
        $DEBUG " || default_test case"
        sed "s/tested_file/$name/g;s/TESTED_FILE/$u_name/g" \
        $aspect/default_test > $aspect/$name.test
-       $shell $aspect/$name.test > $tmpout 2> $tmperr
+       $aspect/$name.test > $tmpout 2> $tmperr
        STATUS=$?
        [ -f core ] && rm -f core
 
