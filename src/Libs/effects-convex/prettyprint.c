@@ -37,27 +37,6 @@
 #define REGION_FORESYS_PREFIX "C$REG"
 #define PIPS_NORMAL_PREFIX "C"
 
-/***************************************************** ACTION INTERPRETATION */
-
-static string read_action_interpretation = string_undefined;
-static string write_action_interpretation = string_undefined;
-static void set_action_interpretation(string r, string w)
-{
-    read_action_interpretation = r;
-    write_action_interpretation = w;
-}
-static void reset_action_interpretation(void)
-{
-    read_action_interpretation = string_undefined;
-    write_action_interpretation = string_undefined;
-}
-static string action_interpretation(action a)
-{
-    return action_read_p(a) ? 
-	read_action_interpretation : write_action_interpretation;
-}
-
-
 /* char * pips_region_user_name(entity ent)
  * output   : the name of entity.
  * modifies : nothing.
@@ -231,7 +210,7 @@ words_region(region reg)
 	pc = CHAIN_SWORD(pc, "<");
 	pc = gen_nconc(pc, effect_words_reference(r));
 	pc = CHAIN_SWORD(pc, "-");
-	pc = CHAIN_SWORD(pc, action_interpretation(ac));
+	pc = CHAIN_SWORD(pc, action_interpretation(action_tag(ac)));
 	pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY" : "-EXACT");
 	pc = CHAIN_SWORD(pc, buffer);
 	pc = CHAIN_SWORD(pc, ">");
