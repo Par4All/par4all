@@ -73,10 +73,11 @@ Value *det_q;
     boolean stop = FALSE;
     int i;
     
-    *det_p = *det_q = VALUE_ONE;
+    *det_p = VALUE_ONE;
+    *det_q = VALUE_ONE;
 
     /* if ((n>0) && (m>0) && MAT) */
-    assert((n >0) && (m > 0));
+    assert((n > 0) && (m > 0));
     assert(value_one_p(DENOMINATOR(MAT)));
 
     HN = matrice_new(n, m);
