@@ -1162,7 +1162,7 @@ void recursiv_partial_eval(statement stmt)
 /* Top-level function
  */
 
-void partial_eval(char *mod_name)
+bool partial_eval(char *mod_name)
 {
     entity module;
     statement mod_stmt;
@@ -1224,9 +1224,11 @@ void partial_eval(char *mod_name)
 	break;
  
     default:
-	user_warning ("partial_eval", "Non-acceptable instruction tag %d\n",
-		      instruction_tag (mod_inst));
+	pips_error("partial_eval", "Non-acceptable instruction tag %d\n",
+		   instruction_tag (mod_inst));
     }
+
+    debug_off();
 
     /* Reorder the module, because new statements have been generated. */
     module_body_reorder(mod_stmt);
@@ -1239,6 +1241,6 @@ void partial_eval(char *mod_name)
     reset_current_module_entity();
     reset_current_module_statement();
 
-    debug_off();
+    return TRUE;
 }
 
