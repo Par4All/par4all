@@ -133,19 +133,6 @@ char *name;
     return success;
 }
 
-
-/* Used when a worspace is closed since it is useless and dangerous to
-   save on disk some no longer valid resources... */
-void
-free_any_non_up_to_date_resource_in_memory(void)
-{
-    int ndeleted;
-    user_log("Deleting obsolete resources\n");
-    ndeleted = delete_obsolete_resources(); /* done by pipsmake... */
-    user_log("%d obsolete resource%s destroyed\n",
-	     ndeleted, ndeleted>1? "s": "");
-}
-
 /* should be: success (cf wpips.h) */
 bool 
 open_workspace(char *name)
@@ -175,9 +162,8 @@ bool
 close_workspace(void)
 {
     bool success;
-
     /* It is useless to save on disk some non up to date resources: */
-    free_any_non_up_to_date_resource_in_memory();
+    delete_some_resources();
     success = make_close_workspace();
     close_log_file();
     reset_entity_to_size();
