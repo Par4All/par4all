@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.67  2002/06/21 13:47:16  irigoin
+ * Comments are used in MakeDataStatement()
+ *
  * Revision 1.66  2002/06/20 15:48:15  irigoin
  * New handling of DATA, function MakeDataStatement() added
  *
@@ -547,7 +550,10 @@ void MakeDataStatement(list ldr, list ldv)
   ds = make_call_statement(STATIC_INITIALIZATION_NAME,
 			   gen_nconc(CONS(EXPRESSION, pldr, NIL), ldv),
 			   entity_undefined,
-			   empty_comments);
+			   strdup(PrevComm));
+  PrevComm[0] = '\0';
+  iPrevComm = 0;
+
   sequence_statements(code_initializations(mc)) = 
     gen_nconc(sequence_statements(code_initializations(mc)), CONS(STATEMENT, ds, NIL));
 }
