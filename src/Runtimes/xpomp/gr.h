@@ -11,8 +11,8 @@ GR_CLOSE,
 GR_BUF_CLIP
 };
 struct sh_header{
-int lock:1;
-int activite:1;
+unsigned int lock:1;
+unsigned int activite:1;
 enum gr_flag flag;
 int bufsize;
 int id;
