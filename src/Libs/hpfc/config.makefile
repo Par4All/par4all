@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/04/14 18:10:47 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/04/14 18:21:07 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -61,11 +61,13 @@ LIB_OBJECTS= $(DERIVED_CFILES:.c=.o)  $(LIB_CFILES:.c=.o)
 # todo: init
 # init: toklex.h keywtbl.h scanner.c y.tab.c
 
+$(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
+
 sccs_close:
 	@echo "closing the sccs session"
 	@echo "Description of changes:"
 	@read comments
-	sccs delget -y"$comments" `sccs tell -u`
+	sccs delget -y"$$comments" `sccs tell -u`
 
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
 # filtred here.
@@ -107,21 +109,9 @@ tokyacc.h: warning.h f77keywords hpfkeywords f77symboles
 depend: scanner.c y.tab.c
 
 CLEAN: clean
-	-$(RM) keywtbl.h toklex.h tokyacc.h scanner.c yacc.in y.tab.c \
-	y.output y.tab.h lex.yy.c 
+	$(RM) $(DERIVED_HEADERS) $(DERIVED_CFILES) \
+		yacc.in y.output y.tab.h lex.yy.c 
 
-tar:
-	rm -f hpfc.tar.Z
-	tar cvf hpfc.tar $(LIB_HEADERS) $(LIB_CFILES) Run RunHpfcTest \
-		tests/*.f main.c hpfc.h \
-		fortran-run-time/*.f \
-		fortran-run-time/*.h \
-		fortran-run-time/Makefile* \
-		fortran-run-time/*.c \
-		fortran-run-time/*.ref \
-		RunHpfcTest
-	compress -v hpfc.tar
 
-$(TARGET).h: toklex.h tokyacc.h keywtbl.h
 #
 # --------------------------------------------------------------------
