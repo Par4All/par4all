@@ -13,22 +13,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "boolean.h"
-#include "arithmetique.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "polyedre.h"
-#include "sg.h"
-
 #include "genC.h"
 
 #include "linear.h"
 #include "ri.h"
-#include "graph.h"
 #include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
+
+#include "matrice.h"
 #include "tiling.h"
 #include "database.h"
 #include "text.h"
@@ -47,8 +41,6 @@
 #include "ricedg.h" 
 #include "wp65.h"
 
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
 static list implied_do_range_list=NIL;
 static int loop_nest_dim =0;
 static list loops_of_nest=NIL;
@@ -126,14 +118,14 @@ list_of_calls_p(list lsb)
 }
 
 entity
-ith_index_of_ref(reference r,int level)
+ith_index_of_ref(reference r, int level)
 {
     entity result = entity_undefined;
     list  ith_index=reference_indices(r);
     expression exp_ind = EXPRESSION(gen_nth(level,ith_index));
     syntax sy = expression_syntax(exp_ind);
     if (syntax_reference_p(sy)) 
-	result = reference_variable(sy);
+	result = reference_variable(syntax_reference(sy));
     return (result);
 } 
 
