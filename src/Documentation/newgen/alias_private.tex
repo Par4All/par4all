@@ -31,8 +31,17 @@
 
 % Call-site ordering is used to localize the call in the caller function. 
 
+% 13/11/2001 NN: offset is not enough to remove some useless checks
+% (because the section is not unique, useless tests on varibales in the
+% same common block although there is no intersection of storage sequence,
+% or in the same SUB*DYNAMIC* section, for example). So lower and upper
+% bounds of the offset are added in order to simplify some false
+% tests. These bounds are integers, for scalar variable: lower = upper =
+% offset, for array variable: lower = &A <= offset <= upper = &A +
+% size_of_array(A) 
+ 
 \domain{call\_site = function:entity x ordering:int}
-\domain{alias\_association = variable:entity x section:entity x offset:expression x call\_chain:call\_site*}
+\domain{alias\_association = variable:entity x section:entity x offset:expression x lower\_offset:int x upper\_offset:int x call\_chain:call\_site*}
 \domain{alias\_associations = list:alias\_association*}
 \domain{dynamic\_check = first:entity x second:entity x checked:bool}
 
