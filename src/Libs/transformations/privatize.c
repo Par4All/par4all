@@ -185,7 +185,6 @@ static bool expression_implied_do_index_p(expression exp,entity e)
 
       MAP(EFFECT, eff, 
 	  {
-printf("variable d'effet : %s\n",entity_name(reference_variable(effect_reference(eff))));
 	    if (reference_variable(effect_reference(eff)) == e &&
 		action_read_p(effect_action(eff))) 
 	      {
@@ -272,14 +271,12 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 	    if(!entity_conflict_p( e, effect_entity( sc )) ||
 	       !entity_conflict_p( e, effect_entity( sk )) ||
 	       action_write_p( effect_action( sk))) {
-	        debug(5,"try_privatize","pas bonne var\n");
 		continue ;
 	    }
 	    /* PC dependance and the sink is a loop index */
 	    if(action_read_p( effect_action( sk )) &&
 	       (instruction_loop_p( succ_i) ||
 	       is_implied_do_index( e, succ_i))) {
-	        debug(5,"try_privatize","compteur de boucle %d\n",statement_number(succ_st));
 		continue ;
 	    }
 	    debug(5,"try_privatize","update...\n");
