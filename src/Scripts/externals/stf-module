@@ -1,0 +1,38 @@
+#! /bin/sh
+
+#
+# Guillaume Oget, Francois Irigoin, 15 sep 1995
+#
+
+# Modifcations:
+#  - list of failed modules kept in variable FAILURES; FI, 2 July 1993
+
+# Bug: interruptions should be caught to run "discard"
+
+USAGE="Usage: $0 module"
+
+if [ $# -eq 0 ]
+then	echo $USAGE >&2
+	exit 2
+fi
+
+source=$1
+
+echo source="$source"
+stf $source >$source$$ 2>$source.$$.log
+if grep '_.TOOLPACK' $source.$$.log
+then
+	echo clean up with toolpack command "discard"
+	exit 1
+fi
+if grep ERROR $source.$$.log
+then
+	echo stf failed for file $source
+	exit 1
+else
+	rm $source
+	sed -e '/\[ISTLY Normal Termination\]/d' <$source$$ >$source
+	rm $source$$
+fi
+rm $source.$$.log
+exit 0
