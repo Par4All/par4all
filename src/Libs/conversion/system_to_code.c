@@ -3,7 +3,7 @@
  *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1994/05/16 15:12:22 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1994/06/03 13:50:33 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -50,12 +50,7 @@ extern fprintf();
 /* in syntax.h */
 entity CreateIntrinsic(string name);
 
-/* 
- * my own local includes
- */
-
-#include "hpfc.h"
-#include "defines-local.h"
+#include "conversion.h"
 
 /*
  * ONE ARRAY REFERENCES MODIFICATIONS
@@ -137,15 +132,17 @@ entity operator;
  * Pcontrainte *pc;
  * Variable var;
  * bool is_lower;
+ * entity divide;
  * 
  * the is_lower (lower/upper) loop bound for variable var relative
  * to Pcontrainte *pc is generated, and the used constraints are
  * removed from the set.
  */
-expression contrainte_to_loop_bound(pc, var, is_lower)
+expression contrainte_to_loop_bound(pc, var, is_lower, divide)
 Pcontrainte *pc;
 Variable var;
 bool is_lower;
+entity divide;
 {
   int 
     len = 0,
@@ -157,8 +154,6 @@ bool is_lower;
     goods = CONTRAINTE_UNDEFINED,
     others = CONTRAINTE_UNDEFINED,
     c = CONTRAINTE_UNDEFINED;
-  entity
-    divide = hpfc_name_to_entity(IDIVIDE);
   expression
     result = expression_undefined;
   list
@@ -238,10 +233,11 @@ bool is_lower;
  *
  * sc is not touched...
  */
-statement systeme_to_loop_nest(sc, vars, body)
+statement systeme_to_loop_nest(sc, vars, body, divide)
 Psysteme sc;
 list vars;
 statement body;
+entity divide; /* I have to give the divide entity to be called */
 {
     Psysteme
 	t = sc_dup(sc);
@@ -266,8 +262,8 @@ statement body;
 	 debug(5, "systeme_to_loop_nest",
 	       "variable %s loop\n", entity_name((entity) var));
 	 
-	 rg = make_range(contrainte_to_loop_bound(&c, var, TRUE),
-			 contrainte_to_loop_bound(&c, var, FALSE),
+	 rg = make_range(contrainte_to_loop_bound(&c, var, TRUE, divide),
+			 contrainte_to_loop_bound(&c, var, FALSE, divide),
 			 int_to_expression(1));
 	 
 	 current = 
