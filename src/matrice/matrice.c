@@ -17,9 +17,9 @@
  *         t
  * a_t := a ;
  */
-matrice_transpose(a,a_t,n,m)
-int	a[];
-int	a_t[];
+void matrice_transpose(a,a_t,n,m)
+matrice	a;
+matrice	a_t;
 int	n;
 int	m;
 {
@@ -60,7 +60,7 @@ int	q;			/* input */
 int	r;			/* input */
 {
     int	loop1,loop2,loop3;
-    int	i;
+    register Value i,va,vb;
 
     /* validate dimensions */
     assert(p > 0 && q > 0 && r > 0);
@@ -68,14 +68,18 @@ int	r;			/* input */
     assert(c != a && c != b);
 
     /* set denominator */
-    DENOMINATOR(c) = DENOMINATOR(a) * DENOMINATOR(b);
+    DENOMINATOR(c) = value_mult(DENOMINATOR(a),DENOMINATOR(b));
 
     /* use ordinary school book algorithm */
     for(loop1=1; loop1<=p; loop1++)
 	for(loop2=1; loop2<=r; loop2++) {
-	    i = 0;
+	    i = VALUE_ZERO;
 	    for(loop3=1; loop3<=q; loop3++) 
-		i = i + ACCESS(a,p,loop1,loop3)*ACCESS(b,q,loop3,loop2); 
+	    {
+		va = ACCESS(a,p,loop1,loop3);
+		vb = ACCESS(b,q,loop3,loop2);
+		value_addto(i,value_mult(va,vb));
+	    }
 	    ACCESS(c,p,loop1,loop2) = i;
 	}
 }
@@ -91,14 +95,14 @@ int	r;			/* input */
  * Precondition: DENOMINATOR(a)!=0
  */
 void matrice_normalize(a,n,m)
-int	a[];			/* input */
+matrice a;			/* input */
 int	n;			/* input */
 int	m;			/* output */
 {
     int	loop1,loop2;
-    int	factor;
+    Value factor;
 
-    assert(DENOMINATOR(a) != 0);
+    assert(value_notzero_p(DENOMINATOR(a)));
 
     /* we must find the GCD of all elements of matrix */
     factor = DENOMINATOR(a);
@@ -108,25 +112,24 @@ int	m;			/* output */
 	    factor = pgcd(factor,ACCESS(a,n,loop1,loop2));
 
     /* factor out */
-    if (factor != 1) {
+    if (value_notone_p(factor)) {
 	for(loop1=1; loop1<=n; loop1++)
 	    for(loop2=1; loop2<=m; loop2++)
-		ACCESS(a,n,loop1,loop2) = 
-		    ACCESS(a,n,loop1,loop2) / factor;
-	DENOMINATOR(a) = DENOMINATOR(a) / factor;
+		value_division(ACCESS(a,n,loop1,loop2),factor);
+	value_division(DENOMINATOR(a),factor);
     }
 
     /* ensure denominator is positive */
     /* FI: this code is useless because pgcd()always return a positive integer,
        even if a is the null matrix; its denominator CANNOT be 0 */
-    assert(DENOMINATOR(a) > 0);
+    assert(value_pos_p(DENOMINATOR(a)));
+    /*
     if(DENOMINATOR(a) < 0) {
 	DENOMINATOR(a) = DENOMINATOR(a)*-1;
 	for(loop1=1; loop1<=n; loop1++)
 	    for(loop2=1; loop2<=m; loop2++)
-		ACCESS(a,n,loop1,loop2) = 
-		    -1 * ACCESS(a,n,loop1,loop2);
-    }
+		value_oppose(ACCESS(a,n,loop1,loop2));
+    }*/
 }
 
 /* void matrice_normalizec(matrice MAT, int n, int m):
@@ -142,20 +145,21 @@ int	m;			/* output */
  * int  m 	: nombre de colonnes de la matrice
  */
 void matrice_normalizec(MAT,n,m)
-int MAT[];
+matrice MAT;
 int n,m;
 {
-    int i,a;
+    int i;
+    Value a;
 
     /* FI What an awful test! It should be an assert() */
     if (n && m) {
 	a = MAT[0];
-	for (i = 1;(i<=n*m) && (a >1);i++)
+	for (i = 1;(i<=n*m) && value_gt(a,VALUE_ONE);i++)
 	    a = pgcd(a,MAT[i]);
 
-	if (a>1) {
+	if (value_gt(a,VALUE_ONE)) {
 	    for (i = 0;i<=n*m;i++)
-		MAT[i] /= a;
+		value_division(MAT[i],a);
 	}
     }
 }
@@ -166,13 +170,13 @@ int n,m;
  *	Precondition:	n > 0; m > 0; 0 < c1 <= m; 0 < c2 <= m; 
  */
 void matrice_swap_columns(matrix,n,m,c1,c2)
-int	matrix[];		/* input and output matrix */
+matrice	matrix;		/* input and output matrix */
 int	n;			/* number of rows */
 int	m;			/* number of columns */
 int	c1,c2;			/* column numbers */
 {
     int	loop1;
-    int	temp;
+    register Value temp;
 
     /* validation step */
     /*
@@ -196,13 +200,13 @@ int	c1,c2;			/* column numbers */
  * Precondition: n > 0; m > 0; 1 <= r1 <= n; 1 <= r2 <= n
  */
 void matrice_swap_rows(a,n,m,r1,r2)
-int	a[];		/* input and output matrix */
+matrice a;		/* input and output matrix */
 int	n;			/* number of columns */
 int	m;			/* number of rows */
 int	r1,r2;			/* row numbers */
 {
     int	loop1;
-    int	temp;
+    register Value temp;
 
     /* validation */
     assert(n > 0);
@@ -230,11 +234,11 @@ int	r1,r2;			/* row numbers */
  * Ancien nom: mat_dup
  */
 void matrice_assign(A,B,n,m)
-int A[],B[];
+matrice A,B;
 int n,m;
 {
-    int i;
-    for (i = 0 ;i<= n*m;i++)
+    int i, size=n*m;
+    for (i = 0 ;i<=size;i++)
 	B[i] = A[i];
 }
 
@@ -251,12 +255,12 @@ int n,m;
  * int  m 	: nombre de colonnes de la matrice
  */
 boolean matrice_egalite(A,B,n,m)
-int A[],B[];
+matrice A, B;
 int n,m;
 {
     int i;
     for (i = 0 ;i<= n*m;i++)
-	if(B[i] != A[i])
+	if(value_ne(B[i],A[i]))
 	    return(FALSE);
     return(TRUE);
 }
@@ -277,15 +281,15 @@ int n,m;
  * int  m 	: nombre de colonnes de la matrice
  */
 void matrice_nulle(Z,n,m)
-int Z[];
+matrice Z;
 int n,m;
 {
     int i,j;
 
     for (i=1;i<=n;i++)
 	for (j=1;j<=m;j++)
-	    ACCESS(Z,n,i,j)=0;
-    DENOMINATOR(Z) = 1;
+	    ACCESS(Z,n,i,j)=VALUE_ZERO;
+    DENOMINATOR(Z) = VALUE_ONE;
 }
 
 /* boolean matrice_nulle_p(matrice Z, int n, int m):
@@ -309,7 +313,7 @@ int n,m;
 
     for (i=1;i<=n;i++)
 	for (j=1;j<=m;j++)
-	    if(ACCESS(Z,n,i,j)!=0)
+	    if(value_notzero_p(ACCESS(Z,n,i,j)))
 		return(FALSE);
     return(TRUE);
 }
@@ -335,7 +339,7 @@ int n,m;
 
     for (i=1;i<=n;i++)
 	for (j=1;j<=m;j++)
-	    if(i!=j && ACCESS(Z,n,i,j)!=0)
+	    if(i!=j && value_notzero_p(ACCESS(Z,n,i,j)))
 		return(FALSE);
     return(TRUE);
 }
@@ -369,13 +373,13 @@ boolean inferieure;
     for (i=1; i <= n; i++)
 	if(inferieure)
 	    for (j=i+1; j <= m; j++)
-		if(ACCESS(Z,n,i,j)!=0)
+		if(value_notzero_p(ACCESS(Z,n,i,j)))
 		    return(FALSE);
 		else
 		    ;
 	else
 	    for (j=1; j <= i-1; j++)
-		if(ACCESS(Z,n,i,j)!=0)
+		if(value_notzero_p(ACCESS(Z,n,i,j)))
 		    return(FALSE);
 		else
 		    ;
@@ -414,7 +418,7 @@ boolean inferieure;
 	return(FALSE);
     else{
 	for(i=1; i<=n; i++)
-	    if (ACCESS(Z,n,i,i) != 1)
+	    if (value_notone_p(ACCESS(Z,n,i,i)))
 		return(FALSE);
 	return(TRUE);
     }
@@ -441,31 +445,39 @@ matrice a;         /* output */
 matrice b, c;      /* input */
 int n,m;           /* input */
 {
-    int d1,d2;   /* denominators of b, c */
-    int lcm;     /* ppcm of b,c */
+    register Value d1,d2;   /* denominators of b, c */
+    register Value lcm;     /* ppcm of b,c */
     int i,j;
 
     /* precondition */
     assert(n>0 && m>0);
-    assert(DENOMINATOR(b) > 0);
-    assert(DENOMINATOR(c) > 0);
+    assert(value_pos_p(DENOMINATOR(b)));
+    assert(value_pos_p(DENOMINATOR(c)));
 
     d1 = DENOMINATOR(b);
     d2 = DENOMINATOR(c);
     if (d1 == d2){
 	for (i=1; i<=n; i++)
 	    for (j=1; j<=m; j++)
-		ACCESS(a,n,i,j) = ACCESS(b,n,i,j) - ACCESS(c,n,i,j);
+		ACCESS(a,n,i,j) = value_minus(ACCESS(b,n,i,j),
+					      ACCESS(c,n,i,j));
 	DENOMINATOR(a) = d1;
     }
     else{
+	register Value v1,v2;
 	lcm = ppcm(d1,d2);
-	d1 = lcm/d1;
-	d2 = lcm/d2;
-	for (i=1; i<=n; i++)
-	    for (j=1; j<=m; j++)
-		ACCESS(a,n,i,j) = ACCESS(b,n,i,j)*d1 - ACCESS(c,n,i,j)*d2;
 	DENOMINATOR(a) = lcm;
+	d1 = value_div(lcm,d1);
+	d2 = value_div(lcm,d2);
+	for (i=1; i<=n; i++)
+	    for (j=1; j<=m; j++) 
+	    {
+		v1 = ACCESS(b,n,i,j);
+		value_product(v1, d1);
+		v2 = ACCESS(c,n,i,j);
+		value_product(v2, d2);
+		ACCESS(a,n,i,j) = value_minus(v1,v2);
+	    }
     }
 }
 
@@ -484,13 +496,19 @@ int n,m;           /* input */
  * int  x         : 
  */
 void matrice_soustraction_colonne(MAT,n,m,c1,c2,x)
-int MAT[];        
+matrice MAT;        
 int n,m; 
-int c1,c2,x;
+int c1,c2;
+Value x;
 {
     int i;
+    register Value p;
     for (i=1; i<=n; i++)
-	ACCESS(MAT,n,i,c1) = ACCESS(MAT,n,i,c1) - x * ACCESS(MAT,n,i,c2);
+    {
+	p = ACCESS(MAT,n,i,c2);
+	value_product(p,x);
+	value_substract(ACCESS(MAT,n,i,c1),p);
+    }
 }
 
 /* void matrice_soustraction_ligne(matrice MAT,int n,int m,int r1,int r2,int x):
@@ -508,11 +526,17 @@ int c1,c2,x;
  * int  x         : 
  */
 void matrice_soustraction_ligne(MAT,n,m,r1,r2,x)
-int MAT[];        
+matrice MAT;        
 int n,m; 
-int r1,r2,x;
+int r1,r2;
+Value x;
 {
     int i;
+    register Value p;
     for (i=1; i<=m; i++)
-	ACCESS(MAT,n,r1,i) = ACCESS(MAT,n,r1,i) - x * ACCESS(MAT,n,r2,i);
+    {
+	p = ACCESS(MAT,n,r2,i);
+	value_product(p,x);
+	value_substract(ACCESS(MAT,n,r1,i),p);
+    }
 }
