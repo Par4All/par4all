@@ -56,6 +56,9 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.61  2002/06/12 10:40:39  irigoin
+  * Small comments to recuperate user source code of data statement
+  *
   * Revision 1.60  2002/06/08 16:21:58  irigoin
   * Instead of ignoring formal and actual return labels, replace them by
   * string variables as suggested by Fabien Coelho
@@ -418,6 +421,10 @@ instruction:
 		    "DATA as an executable statement, moved up...\n");
 		append_data_current_stmt_buffer_to_declarations();
 	    }
+
+	    /* See if we could save the DATA statements somewhere */
+	    /* dump_current_statement(); */
+
 	}
         | { check_in_declarations();} inst_spec
 	| { check_first_statement();} inst_exec
