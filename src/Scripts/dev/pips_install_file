@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/08/07 15:24:54 $, )
+# ($Date: 1996/08/07 15:43:23 $, )
 #
 
 RUN=':'
@@ -48,7 +48,7 @@ do
     echo "$SCRIPT: copying $file"
     rm -f $target
     cp $file $directory
-    eval $RUN $target
+    eval "$RUN $target"
   fi
 done
 
