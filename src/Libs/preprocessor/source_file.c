@@ -241,8 +241,8 @@ pips_process_file(string file_name)
 #define MAX_LINE_LENGTH 100
 #include "rxposix.h"
 
-#define IMPLICIT_NONE_RX "implicit[[:blank:]]*none"
-#define INCLUDE_FILE_RX "include[[:blank:]]*['\"]\\([^'\"]*\\)['\"]"
+#define IMPLICIT_NONE_RX "^[ \t]*implicit[ \t]*none"
+#define INCLUDE_FILE_RX "^[ \t]*include[ \t]*['\"]\\([^'\"]*\\)['\"]"
 
 static regex_t implicit_none_rx, include_file_rx;
 static FILE *output_file;
@@ -274,7 +274,12 @@ static void handle_file_name(char * file_name, bool comment)
     FILE * f;
     string found = find_file(file_name);
 
-    pips_assert("some file found", found);
+    if (!found)
+    {
+	pips_user_error("include file %s not found\n", file_name);
+	fprintf(output_file, "! include \"%s\" not found\n", file_name);
+    }
+
     pips_debug(2, "including file \"%s\"\n", found);
 
     if (comment)
@@ -297,7 +302,10 @@ static void handle_file(FILE * f) /* process f for includes and nones */
 
     while (!feof(f))
     {
-	line[0]='\0'; fgets(line, MAX_LINE_LENGTH, f);
+	line[0]='\0'; 
+	
+	if (!fgets(line, MAX_LINE_LENGTH, f))
+	    return;
 	
 	if (!regexec(&include_file_rx, line, 2, matches, 0))
 	{
@@ -323,8 +331,7 @@ static void init_rx(void)
 	abort();
 }
 
-static bool
-pips_process_file(string file_name)
+static bool pips_process_file(string file_name)
 {
     string origin = strdup(concatenate(file_name, ".origin", NULL));
     
@@ -399,7 +406,7 @@ static bool pips_split_file(string name, string tempfile)
 #else
     int err;
     FILE * out = safe_fopen(tempfile, "w");
-    err = pips_fsplit(name, out);
+    err = fsplit(name, out);
     safe_fclose(out, tempfile);
 
     sort_file(tempfile);
@@ -422,7 +429,7 @@ string file;
     int err;
 
     if (! file_exists_p(file)) {
-	user_warning("process_user_file", "Cannot open file : %s\n", file);
+	pips_user_warning("Cannot open file : %s\n", file);
 	return FALSE;
     }
 
