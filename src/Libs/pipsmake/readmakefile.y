@@ -14,6 +14,7 @@
 %token CALLEES
 %token CALLERS
 %token ALL
+%token SELECT
 %token REQUIRED
 %token PRODUCED
 %token MODIFIED
@@ -155,6 +156,8 @@ owner:		PROGRAM
 		{ $$ = make_owner(is_owner_callers, UU); }
 	|	ALL
 		{ $$ = make_owner(is_owner_all, UU); }
+	|	SELECT
+		{ $$ = make_owner(is_owner_select, UU); }
 	;
 
 phase:		NAME
@@ -183,32 +186,35 @@ FILE *fd;
 string dir;
 list lrv;
 {
-    MAPL(prv, {
-	virtual_resource vr = VIRTUAL_RESOURCE(CAR(prv));
+    MAP(VIRTUAL_RESOURCE, vr,
+    {
 	owner o = virtual_resource_owner(vr);
 	string n = virtual_resource_name(vr);
-
+	
 	switch (owner_tag(o)) {
-	  case is_owner_program:
+	case is_owner_program:
 	    fprintf(fd, "    %s program.%s\n", dir, n);
 	    break;
-	  case is_owner_module:
+	case is_owner_module:
 	    fprintf(fd, "    %s module.%s\n", dir, n);
 	    break;
-	  case is_owner_main:
+	case is_owner_main:
 	    fprintf(fd, "    %s main.%s\n", dir, n);
 	    break;
-	  case is_owner_callees:
+	case is_owner_callees:
 	    fprintf(fd, "    %s callees.%s\n", dir, n);
 	    break;
-	  case is_owner_callers:
+	case is_owner_callers:
 	    fprintf(fd, "    %s callers.%s\n", dir, n);
 	    break;
-	  case is_owner_all:
+	case is_owner_all:
 	    fprintf(fd, "    %s all.%s\n", dir, n);
 	    break;
-	  default:
-	    pips_error("fprint_virtual_resources", "bad tag (%s)\n");
+	case is_owner_select:
+	    fprintf(fd, "    %s select.%s\n", dir, n);
+	    break;
+	default:
+	    pips_internal_error("bad tag (%s)\n");
 	}
     }, lrv);
 }
