@@ -234,6 +234,10 @@ int nb_unknowns, min_or_max;
                 fprintf(stderr, "Number of variables : %d\n", nb_unknowns);
         }
 
+	/* We remove the TCST from the base and we compute the value of
+           the dimension. AP, 28th july 95. */
+	vect_erase_var(&(ps_dep->base), (Variable) TCST);
+	ps_dep->dimension = vect_size((ps_dep)->base);
 
         /* We set the env for the kind of resolution desired (Min or Max) */
         if(min_or_max == PIP_SOLVE_MIN) {
@@ -242,7 +246,13 @@ int nb_unknowns, min_or_max;
         }
         else {
                 ps_dep = converti_psysmin_psysmax(ps_dep, nb_unknowns);
-                ind_min_max = 1;
+
+		/* We remove the TCST from the base and we compute the
+		   value of the dimension. AP, 28th july 95. */
+		vect_erase_var(&(ps_dep->base), (Variable) TCST);
+		ps_dep->dimension = vect_size((ps_dep)->base);
+
+		ind_min_max = 1;
                 infinite_num = vect_size((ps_dep)->base);
         }
 
@@ -251,6 +261,7 @@ int nb_unknowns, min_or_max;
 	 */
         base_var_ref = base_dup((ps_dep)->base);
         old_base_var = base_dup(base_var_ref);	/* Total base of ps_dep */
+
         for(i = 1, pvect = base_var_ref; i<nb_unknowns; i++)
                 { pvect = pvect->succ; }
         base_ref = pvect->succ;			/* parameters of ps_dep */
