@@ -2,7 +2,7 @@
 # for debug, try:
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 18:12:01 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 18:36:45 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -242,7 +242,7 @@ INSTALL_FILE=	$(FILES)
 INSTALL_LIB=
 INSTALL_EXE=	$(SCRIPTS) $(RFILES)
 
-all: .runable
+all: .runable $(RFILES)
 
 .runable: $(SCRIPTS)
 	-[ "$(SCRIPTS)" ] && chmod a+x $(SCRIPTS)
