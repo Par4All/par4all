@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/05/14 15:18:15 $, )
+! ($Date: 1997/05/15 15:12:15 $, )
 !
 !-----------------
 !
@@ -407,7 +407,7 @@
 !
 ! HPFC SNDTO A
 !
-! send to all nodes
+! send to all nodes (with a BROADCAST) 
 !
       subroutine HPFC SNDTO A(what, val)
       integer what, val
@@ -416,13 +416,13 @@
       call HPFC INIT SEND
       call HPFC PACK(what, val, 1, 1, info)
       if (MYLID.GT.1)
-     $     call pvmfmcast(
+     $     call HPFC BCAST ROOT(
      $     MYLID-1, 
      $     NODETIDS, 
      $     MCASTNODES, 
      $     info)
       if (MYLID.LT.NBOFTASKS)
-     $     call pvmfmcast(
+     $     call HPFC BCAST ROOT(
      $     NBOFTASKS-MYLID, 
      $     NODETIDS(MYLID+1), 
      $     MCASTNODES, 
@@ -526,7 +526,7 @@ _CM5(
       debug(print *, "sending to all nodes")
       call HPFC INIT SEND
       call HPFC PACK(what, val, 1, 1, info)
-      call HPFC SEND(NBOFTASKS, NODETIDS, MCASTHOST, info)
+      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS, MCASTHOST, info)
       MCASTHOST = MCASTHOST + 2
       debug(print *, "sent!")
       end
@@ -536,7 +536,7 @@ _CM5(
 ! HPFC SNDTO HA
 !
 ! send to host and all nodes, but not the sender.
-!
+!    (with a BROADCAST)
       subroutine HPFC SNDTO HA(what, val)
       integer what, val
       include "hpfc_commons.h"
@@ -544,13 +544,13 @@ _CM5(
       call HPFC INIT SEND
       call HPFC PACK(what, val, 1, 1, info)
       if (MYLID.GT.1)
-     $     call pvmfmcast(
+     $     call HPFC BCAST ROOT(
      $     MYLID-1, 
      $     NODETIDS, 
      $     MCASTNODES, 
      $     info)
       if (MYLID.LT.NBOFTASKS)
-     $     call pvmfmcast(
+     $     call HPFC BCAST ROOT(
      $     NBOFTASKS-MYLID, 
      $     NODETIDS(MYLID+1), 
      $     MCASTNODES, 
@@ -783,27 +783,27 @@ _CM5(
 !
 !-----------------
 !
-! HPFC RCVFR mCS
+! HPFC RCVFR mCS    (Receive from BROADCAST)
 !
       subroutine HPFC RCVFR mCS(what, goal)
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
-      call HPFC RECEIVE(SENDERTID, MCASTNODES, bufid)
+      call HPFC BCAST RECV(SENDERTID, MCASTNODES, bufid)
       call HPFC UNPACK(what, goal, 1, 1, info)
       MCASTNODES = MCASTNODES + 2
       end
 !
 !-----------------
 !
-! HPFC RCVFR mCH
+! HPFC RCVFR mCH    (Receive from BROADCAST Host) 
 !
       subroutine HPFC RCVFR mCH(what, goal)
       integer what, goal
       include "hpfc_commons.h"
       integer bufid, info
       debug(print *, "receiving from host")
-      call HPFC RECEIVE(HOSTTID, MCASTHOST, bufid)
+      call HPFC BCAST RECV(HOSTTID, MCASTHOST, bufid)
       call HPFC UNPACK(what, goal, 1, 1, info)
       MCASTHOST = MCASTHOST + 2
       debug(print *, "received!")
@@ -946,11 +946,12 @@ _CM5(
 
       host known = .false.
 
-      call pvmfmytid(MY TID)
+      call HPFC GET MYTID(MY TID)
 
       _getpe(
 ! the CRAY T3D does not have spawn, but the spawning is automatic!
-      call pvmfgetpe(MY TID, my rank)
+! the same thing is true for mpi implementations
+      call HPFC GET PE(MY TID, my rank)
       debug(print *, "[HPFC INIT MAIN] getting pe ", MY TID, "-", my rank)
 ! mouais...
       MY TID = my rank
@@ -963,12 +964,8 @@ _CM5(
          HOST TID = MY TID
       end if)
       
-      call pvmfjoingroup(HPFC GROUP NAME, inum)
-      if (inum.lt.0) then
-         call pvmfperror("while joining group in HPFC INIT MAIN", info)
-         call HPFC TERMINATE TASK(info)
-         stop
-      end if
+
+      call HPFC JOIN GROUPE(inum)
 
       debug(print *, "[HPFC INIT MAIN] group ", HPFC GROUP NAME, inum)
 
@@ -986,6 +983,7 @@ _CM5(
          host known = .true.
       end if
  
+! spawning is necessary for pvm (expect T3D) but not for mpi
       _spawn(
       if (.not. SPAWN PERFORMED) then
          debug(print *, "spawning ", NB OF TASKS, " ", MAIN PROGRAM NAME)
@@ -1025,17 +1023,12 @@ _CM5(
 
       call HPFC INIT COMMON PARAM LIB
 
-      call pvmfmytid(MYTID)
+      call HPFC GET MYTID(MYTID)
 
 !
 ! done before the spawn so host is (group, 0)
 !
-      call pvmfjoingroup(HPFC GROUP NAME, inum)
-      if (inum.lt.0) then
-         call pvmfperror("while joining group", info)
-         call HPFC TERMINATE TASK(info)
-         stop
-      endif
+      call HPFC JOIN GROUPE(inum)
 
       if (inum.ne.0) then
          SPAWN PERFORMED = .true.
@@ -1071,7 +1064,7 @@ _CM5(
       call HPFC RECEIVE(HOST TID, 1, bufid)
       call HPFC UNPACK(INTEGER4, NODE TIDS, NB OF TASKS, 1, info)
       debug(if (info.lt.0) then
-         call pvmfperror("[HPFC INIT NODE] node tids recv", info)
+         call HPFC PRINT ERROR MSG("[HPFC INIT NODE] node tids recv", info)
          call HPFC TERMINATE TASK(info)
          stop
       endif)
@@ -1235,13 +1228,13 @@ _direct(`'
      $        info)
 
          if (info.lt.0) then
-            call pvmfperror("initial spawning", info)
+            call HPFC PRINT ERROR MSG("initial spawning", info)
             call HPFC TERMINATE TASK(info)
             stop
          endif
 
          if (info.ne.NBOFTASKS) then
-            call pvmfperror("not spawned", 0)
+            call HPFC PRINT ERROR MSG("not spawned", 0)
             call HPFC TERMINATE TASK(0)
             stop
          endif
@@ -1256,17 +1249,17 @@ _direct(`'
       end do)
       
       _spawn(
-! if not T3D, the host sends the tids...
+! if not T3D and not MPI, the host sends the tids...
       call HPFC INIT SEND
       call HPFC PACK(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
       debug(if (info.lt.0) then
-         call pvmfperror("initial pack", info)
+         call HPFC PRINT ERROR MSG("initial pack", info)
          call HPFC TERMINATE TASK(info)
          stop
       endif)
-      call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
+      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS, 1, info)
       debug(if (info.lt.0) then
-         call pvmfperror("initial mcast", info)
+         call HPFC PRINT ERROR MSG("initial mcast", info)
          call HPFC TERMINATE TASK(info)
          stop
       endif))
@@ -1284,9 +1277,8 @@ _direct(`'
          print *, "*** incompatible version keys!"
          print *, "*** host: ", hpfc key
          print *, "*** node: ", node key
-         do i=1, NBOFTASKS
-            call pvmfkill(NODETIDS(i), info)
-         enddo
+         call HPFC KILL ALLTASKS
+!the following line should be deleted ??          
          call HPFC TERMINATE TASK(info)
          stop
       endif
@@ -1306,7 +1298,7 @@ _CM5(
 !
       call HPFC INIT SEND
       call HPFC PACK(INTEGER4, CM NODE IDS, NBOFTASKS, 1, info)
-      call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
+      call HPFC BCAST ROOT(NBOFTASKS, NODETIDS, 1, info)
 !
 ! end of cm5 related initializations
 !)
@@ -1463,23 +1455,7 @@ _CM5(
       end if
       debug(print *, "init lb: ", llb, " new lb: ", nlb, " new ub: ", nub)
       end
-!
-!-----------------
-!
-! HPFC SYNCHRO
-!
-      subroutine HPFC SYNCHRO
-      include "hpfc_commons.h"
-      integer info
-      debug(print *, "[hpfc synchro] ", MYLID, " waiting ", NBOFTASKS+1)
-      call pvmfbarrier(HPFC GROUP NAME, NBOFTASKS+1, info)
-      if (info.lt.0) then
-         call pvmfperror("hpfc synchro", info)
-         call HPFC TERMINATE TASK(info)
-         stop
-      endif
-      debug(print *, "[hpfc synchro] done")
-      end
+
 !
 !-----------------
 !
