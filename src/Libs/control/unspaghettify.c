@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1998/04/14 19:54:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/09/08 13:37:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1998/04/14 19:54:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1998/09/08 13:37:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -99,7 +99,7 @@ remove_useless_continue_or_empty_code_in_unstructured(unstructured u)
                {
 		   ifdebug (1)
                      pips_assert("control inconsistants...",
-                                 gen_consistent_p(c));
+                                 control_consistent_p(c));
 
                   /* Do not remove the exit nor the entry node node
                      since it is boring to relink the entry and exit
@@ -210,14 +210,14 @@ fuse_sequences_in_unstructured(statement s)
    
     ifdebug (1)
 	pips_assert("unstructured inconsistants...",
-		    gen_consistent_p(u));
+		    unstructured_consistent_p(u));
     pips_debug(3, "Unstructured %p\n", u);
    
     CONTROL_MAP(c,
 		{
 		    ifdebug (1)
 			pips_assert("control inconsistants...",
-				    gen_consistent_p(c));
+				    control_consistent_p(c));
 		    pips_debug(3, "Looking for control %p...\n", c);
 		    /* Select a node with only one successor: */      
 		    if (gen_length(control_successors(c)) == 1) {
@@ -331,14 +331,14 @@ fuse_sequences_in_unstructured(statement s)
 	    fprintf(stderr, "Want to fuse control %p", a_control_to_fuse);
 	ifdebug (1)
 	    pips_assert("control a_control_to_fuse inconsistants...",
-			gen_consistent_p(a_control_to_fuse));
+			control_consistent_p(a_control_to_fuse));
                
 	the_successor = CONTROL(CAR(control_successors(a_control_to_fuse)));
 	ifdebug (3)
 	    fprintf(stderr, " with control %p\n", the_successor);
 	ifdebug (1)
 	    pips_assert("control the_successor inconsistants...",
-			gen_consistent_p(the_successor));
+			control_consistent_p(the_successor));
 
 	if (a_control_to_fuse == the_successor) {
 	    pips_debug(3, "\tA loop of control has been found... Do not fuse the control %p\n", a_control_to_fuse);
@@ -389,7 +389,7 @@ fuse_sequences_in_unstructured(statement s)
 	}
 	ifdebug (1)
 	    pips_assert("control after fuse inconsistants...",
-			gen_consistent_p(a_control_to_fuse));
+			control_consistent_p(a_control_to_fuse));
 
     },
 	control_nodes_to_fuse);
@@ -410,7 +410,7 @@ fuse_sequences_in_unstructured(statement s)
 
    If the first node is taked out, then * new_unstructured_statement
    returns the new statement that own the unstructured, else s. */
-bool static
+static bool
 take_out_the_entry_node_of_the_unstructured(statement s,
                                             statement * new_unstructured_statement)
 {
@@ -708,7 +708,7 @@ take_out_the_exit_node_if_not_a_continue(statement s)
 	statement_instruction(the_exit_statement) =
 	    make_continue_instruction();
 	ifdebug (1)
-	    pips_assert("Statements inconsistants...", gen_consistent_p(the_exit_statement));
+	    pips_assert("Statements inconsistants...", statement_consistent_p(the_exit_statement));
 	/* Replace the unstructured by an unstructured followed by the
 	   out-keeped instruction: */
 	new_statement = make_stmt_of_instr(i);
@@ -725,7 +725,7 @@ take_out_the_exit_node_if_not_a_continue(statement s)
        above... */
 
     ifdebug (1)
-	pips_assert("Statements inconsistants...", gen_consistent_p(s));
+	pips_assert("Statements inconsistants...", statement_consistent_p(s));
 
     return the_unstructured;
 }
@@ -748,7 +748,7 @@ restructure_this_test(control c,
 	print_text(stderr, text_statement(get_current_module_entity(),
 					  0, the_test_statement));
 	pips_assert("Statements inconsistants...",
-		    gen_consistent_p(the_test_statement));
+		    statement_consistent_p(the_test_statement));
     }
 
     /* Find the exit node of the test: */
@@ -778,7 +778,7 @@ restructure_this_test(control c,
 	    print_text(stderr, text_statement(get_current_module_entity(),
 					      0, then_statement));
 	    pips_assert("Statements inconsistants...",
-			gen_consistent_p(then_statement));
+			statement_consistent_p(then_statement));
 	}
     }
     if (t == STRUCTURED_IF_ELSE || t == STRUCTURED_IF_THEN_ELSE) {
@@ -789,7 +789,7 @@ restructure_this_test(control c,
 	    print_text(stderr, text_statement(get_current_module_entity(),
 					      0, else_statement));
 	    pips_assert("Statements inconsistants...",
-			gen_consistent_p(else_statement));
+			statement_consistent_p(else_statement));
 	}
     }
     
@@ -821,7 +821,7 @@ restructure_this_test(control c,
 	print_text(stderr, text_statement(get_current_module_entity(),
 					  0, the_test_statement));
 	pips_assert("Statements inconsistants...",
-		    gen_consistent_p(the_test_statement));
+		    statement_consistent_p(the_test_statement));
     }
 }
 
@@ -842,7 +842,7 @@ restructure_if_then_else(statement s)
        types: */
     hash_table structured_tests = hash_table_make(hash_int, 0);
 
-    pips_assert("Control inconsistants...", gen_consistent_p(entry_node));
+    pips_assert("Control inconsistants...", control_consistent_p(entry_node));
 
     /* First mark the IF that can be restructured: */
     CONTROL_MAP(c,
@@ -954,7 +954,7 @@ recursively_restructure_an_unstructured(statement s)
     ifdebug(5) {
 	pips_debug(5, "after fuse_sequences_in_unstructured\n");
 	print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-	pips_assert("Statements inconsistants...", gen_consistent_p(s));
+	pips_assert("Statements inconsistants...", statement_consistent_p(s));
     }
     
     if (take_out_the_entry_node_of_the_unstructured(s, &new_unstructured_statement)) {
@@ -965,7 +965,7 @@ recursively_restructure_an_unstructured(statement s)
 	    pips_debug(5,
 		       "after take_out_the_entry_node_of_the_unstructured\n");
 	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-	    pips_assert("Statements inconsistants...", gen_consistent_p(s));
+	    pips_assert("Statements inconsistants...", statement_consistent_p(s));
 	}
 
 	new_unstructured_statement =
@@ -974,7 +974,7 @@ recursively_restructure_an_unstructured(statement s)
 	ifdebug(5) {
 	    pips_debug(5, "after take_out_the_exit_node_if_not_a_continue\n");
 	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-	    pips_assert("Statements inconsistants...", gen_consistent_p(s));
+	    pips_assert("Statements inconsistants...", statement_consistent_p(s));
 	}
 
 	/* If we ask for, try to restructure the tests: */
@@ -983,7 +983,7 @@ recursively_restructure_an_unstructured(statement s)
 	    ifdebug(5) {
 		pips_debug(5, "after restructure_if_then_else\n");
 		print_text(stderr, text_statement(get_current_module_entity(), 0, s));
-		pips_assert("Statements inconsistants...", gen_consistent_p(s));
+		pips_assert("Statements inconsistants...", statement_consistent_p(s));
 	    }
 	    /* Well, some tests has been restructured, recurse: */
 	    recursively_restructure_an_unstructured(new_unstructured_statement);
@@ -1014,7 +1014,7 @@ clean_up_control(statement s)
 	}
 	clean_up_exit_node(u);
    
-	remove_the_unreachable_controls_of_an_unstructured(u);
+	remove_all_unreachable_controls_of_an_unstructured(u);
 
 	ifdebug(5) {
 	    pips_debug(0, "after remove_the_unreachable_controls_of_an_unstructured\n");
@@ -1043,7 +1043,7 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
    debug_on("UNSPAGHETTIFY_DEBUG_LEVEL");
 
    ifdebug (1)
-      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
+      pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
 
    if (get_bool_property("GATHER_FORMATS_AT_BEGINNING"))
        put_formats_at_module_beginning(mod_stmt);
@@ -1051,7 +1051,7 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
        put_formats_at_module_end(mod_stmt);
    
    ifdebug (1)
-      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
+      pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
 
    initialize_unspaghettify_statistics();
    /* Split the recursion in three parts to fit in my brain: */
@@ -1075,7 +1075,7 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
    clean_up_sequences(mod_stmt);
    
    ifdebug (1)
-      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
+      pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
 
    pips_debug(2, "done\n");
    debug_off();
