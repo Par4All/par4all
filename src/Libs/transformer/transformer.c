@@ -94,22 +94,22 @@ transformer t2;
     }
 
     /* get rid of intermediate values */
-    MAPL(ce_temp, { entity e_temp = ENTITY(CAR(ce_temp));
-		    r1 = sc_projection(r1, (Variable) e_temp);
-		    r1 = sc_normalize(r1);
-		    if(SC_EMPTY_P(r1))
-			break;
-		    sc_base_remove_variable(r1,(Variable) e_temp);},
-	 ints);
-    if(SC_EMPTY_P(r1)) {
-	/* FI: this could be eliminated if SC_EMPTY was really usable; 27/5/93 */
-	Pvecteur v = vect_new(TCST, 1);
-	Pcontrainte eq = contrainte_make(v);
-
-	r1 = sc_make(eq, CONTRAINTE_UNDEFINED);
-    }
-    else 
-	r1->dimension = vect_size(r1->base);
+    MAPL(ce_temp,
+         {
+            entity e_temp = ENTITY(CAR(ce_temp));
+            sc_and_base_projection_along_variable_ofl_ctrl(&r1, (Variable) e_temp, NO_OFL_CTRL);
+            if (! sc_empty_p(r1)) {
+               Pbase b = base_dup(sc_base(r1));
+               
+               r1 = sc_normalize(r1);
+               if(SC_EMPTY_P(r1)) {
+                  r1 = sc_empty(b);
+               }
+               else
+                  base_rm(b);
+            }
+         },
+            ints);
 
     if( get_debug_level() >= 9) {
 	(void) fprintf(stderr, "%s: %s", "transformer_combine",
@@ -153,6 +153,9 @@ cons * args;
 	for (cea = args ; !ENDP(cea); POP(cea)) {
 	    entity e = ENTITY(CAR(cea));
 	    Pbase b = base_dup(sc_base(r));
+            pips_assert("transformer_projection",
+                        base_contains_variable_p(b, (Variable) e));
+            
 	    sc_projection_along_variable_ofl_ctrl(&r,(Variable) e, NO_OFL_CTRL);
 	    sc_base_remove_variable(r,(Variable) e);
 	    if (!sc_empty_p(r))
