@@ -44,6 +44,15 @@ Panel main_panel,
     schoose_panel,
     help_panel;
 
+
+/* The variables to pass information between inside and outside the
+   XView notifyer: */
+
+/* By default, exiting the notifyer is to exit wpips: */
+static wpips_main_loop_command_type wpips_main_loop_command = WPIPS_EXIT;
+
+
+
 void static
 create_menus()
 {
@@ -184,16 +193,52 @@ char *argv[];
     if (pname != NULL) {
 	if (files != NULL) {
 	    db_create_program(pname);
-	    create_program(&nfiles, files);
+	    create_workspace(&nfiles, files);
 	}
 	else {
-	    open_program(pname);
+	    open_workspace(pname);
 	}
 
 	if (mname != NULL) {
 	    open_module(mname);
 	}
     }
+}
+
+
+/* How much to call the notifyer between each pipsmake phase: */
+enum {
+   WPIPS_NUMBER_OF_EVENT_TO_DEAL_DURING_PIPSMAKE_INTERPHASE = 10
+};
+
+/* Since XView is not called while pipsmake is running, explicitly run
+   a hook from pipsmake to run the notifyer such as to stop pipsmake: */
+bool static
+deal_with_wpips_events_during_pipsmake()
+{
+   int i;
+
+   /* First, try to show we are working :-) */
+   wpips_interrupt_button_blink();
+
+   for (i = 0; i < WPIPS_NUMBER_OF_EVENT_TO_DEAL_DURING_PIPSMAKE_INTERPHASE; i++)
+      /* Ask the XView notifyer to deal with one event. */
+      notify_dispatch();
+
+   /* Refresh the main frame: */
+   XFlush((Display *) xv_get(main_frame, XV_DISPLAY));
+   /* pipsmake not interrupted by default: */
+   return TRUE;
+}
+
+
+/* To ask pipsmake to stop as soon as possible: */
+void
+wpips_interrupt_pipsmake(Panel_item item,
+                         Event * event)
+{
+   interrupt_pipsmake_asap();
+   user_log("PIPS interruption requested...\n");
 }
 
 
@@ -221,6 +266,52 @@ wpips_xview_error(Xv_object object,
 }
 
 
+/* Exit the notify loop to execute a WPips command: */
+void
+execute_main_loop_command(wpips_main_loop_command_type command)
+{
+   wpips_main_loop_command = command;
+   notify_stop();
+   /* I guess the function above does not return... */
+}
+
+
+/* The main loop that deals with command outside the XView notifyer: */
+void static
+wpips_main_loop(Frame frame_to_map_first)
+{
+   xv_main_loop(frame_to_map_first);
+
+   /* The loop to execute commands: */
+   while (wpips_main_loop_command != WPIPS_EXIT) {
+      debug(1, "wpips_main_loop", "wpips_main_loop_command = %d\n", wpips_main_loop_command);
+   
+      switch((int) wpips_main_loop_command) {
+        case WPIPS_SAFE_APPLY:
+         execute_safe_apply_outside_the_notifyer();
+         break;
+
+        case WPIPS_EXECUTE_AND_DISPLAY:
+         execute_wpips_execute_and_display_something_outside_the_notifyer();
+         break;
+         
+        default:
+         pips_assert("wpips_main_loop does not understand the wpips_main_loop_command", 0);
+      }
+      
+      /* If the notifyer happen to exit without a specifyed command,
+         just exit: */
+      wpips_main_loop_command = WPIPS_EXIT;
+
+      /* Restore the initial state of the blinking pips icon: */
+      wpips_interrupt_button_restore();
+         
+      /* Wait again for something from X11 and emacs: */
+      notify_start();
+   }
+}
+
+
 int
 main(int argc,
      char * argv[])
@@ -229,6 +320,7 @@ main(int argc,
    pips_error_handler = wpips_user_error;
    pips_log_handler = wpips_user_log;
    pips_update_props_handler = update_options;
+   pips_request_handler = wpips_user_request;
 
    /* Added for debug. RK, 8/06/93. */
    malloc_debug(1);
@@ -295,7 +387,11 @@ main(int argc,
    disable_compile_selection();
    disable_option_selection();
 
-   xv_main_loop(main_frame);
+   set_pipsmake_callback(deal_with_wpips_events_during_pipsmake);
+
+   wpips_main_loop(main_frame);
+   
+   reset_pipsmake_callback();
 
    close_log_file();
    
