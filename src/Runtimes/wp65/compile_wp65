@@ -44,7 +44,7 @@ if ($status == 0) then
 	cat << USAGE
 
 	Vous pouvez lancer pvm dans une fenêtre si ce n'est pas déjà fait 
-	et lancer « `echo $1 | sed 's/.f\$//'` ».
+	et lancer votre programme « `echo $1 | sed 's/.f\$//'` ».
 
 	Dans le shell pvm,
 	- « add » permet de rajouter une liste une machines ;
@@ -60,7 +60,7 @@ if ($status == 0) then
 	2 : affiche les tids des processus lancés ;
 	3 : ouvre autant de xterm avec gdb que de processus ;
 	4 : affiche les messages échangés entre bancs et PEs ;
-	5 : idem que 4 avec les tids en plus.
+	5 : idem que 4 avec les tids en plus et les morceaux de message.
 USAGE
 endif
 	
