@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/08/30 15:47:18 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/09/02 18:06:36 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -911,8 +911,9 @@ c HPFC_HOST_END
 c
       subroutine HPFC_HOST_END()
       integer info
-      call HPFC_SYNCHRO()
+c      call HPFC_SYNCHRO()
       call pvmfexit(info)
+      stop
       end
 c
 c-----------------
@@ -921,8 +922,9 @@ c HPFC_NODE_END
 c
       subroutine HPFC_NODE_END()
       integer info
-      call HPFC_SYNCHRO()
+c      call HPFC_SYNCHRO()
       call pvmfexit(info)
+      stop
       end
 c
 c-----------------
