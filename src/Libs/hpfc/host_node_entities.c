@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: host_node_entities.c,v $
+ * Revision 1.31  1998/04/14 20:54:39  coelho
+ * casts
+ *
  * Revision 1.30  1998/04/14 20:41:08  coelho
  * *** empty log message ***
  *
@@ -143,8 +146,8 @@ entity module;
 
 /****************************************************************** UPDATES */
 
-static bool (*bound_p)(entity) = gen_false;
-static entity (*load)(entity) = gen_identity;
+static bool (*bound_p)(entity) = (bool(*)(entity)) gen_false;
+static entity (*load)(entity) = (entity(*)(entity)) gen_identity;
 
 static void update_for_module_rewrite(
     entity *pe)
@@ -173,7 +176,9 @@ static void update_call_for_module_rewrite(call c)
 
 static void update_code_for_module_rewrite(code c)
 {
-    MAPL(ce, update_for_module_rewrite(&ENTITY(CAR(ce))),code_declarations(c));
+    MAPL(ce, 
+	 update_for_module_rewrite((entity*) &(CAR(ce).p)),
+	 code_declarations(c));
 }
 
 static void update_loop_for_module_rewrite(loop l)
@@ -188,8 +193,7 @@ void update_object_for_module(
     bool (*saved_bound)(entity);
     entity (*saved_load)(entity);
 
-    pips_debug(8, "updating (%s) %p\n",
-	  gen_domain_name(gen_type(obj)), obj);
+    pips_debug(8, "updating (%s) %p\n", gen_domain_name(gen_type(obj)), obj);
 
     saved_bound = bound_p, saved_load = load; /* push the current functions */
 
