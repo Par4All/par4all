@@ -1106,7 +1106,7 @@ int use;
     }
 
     ifdebug(2)
-	print_graph(stderr, module_stat, module_graph);
+	prettyprint_dependence_graph(stderr, module_stat, module_graph);
 
     debug_off();
 
