@@ -148,7 +148,7 @@ char * (*nom_var)();
 void sc_fprint(fp, ps, nom_var)
 FILE *fp;
 Psysteme ps;
-char * (*nom_var)();
+char * (*nom_var)(Variable);
 {
     register Pbase b;
     Pcontrainte peq;
