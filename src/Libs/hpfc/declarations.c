@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: declarations.c,v $
+ * Revision 1.17  1997/08/04 13:54:03  coelho
+ * new generic effects incldues.
+ *
  * Revision 1.16  1997/03/20 10:18:42  coelho
  * RCS headers.
  *
@@ -13,9 +16,10 @@
 #include "defines-local.h"
 
 #include "control.h"
-#include "regions.h"
 #include "semantics.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 
 bool expression_constant_p(expression); /* in static_controlize */
 
