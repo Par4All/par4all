@@ -73,7 +73,7 @@ Variable v;
     return(buffer);
 }
 
-extern char *strdup(char *);
+extern char *strdup(const char *);
 
 /* Variable variable_make(char * name): defines a new variable of a given
  * name
