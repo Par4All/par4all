@@ -105,10 +105,26 @@ FILE * f;
 Psommet s;
 char * (*nom_var)();
 {
-    (void) fprintf(f,"denominator = %d\t",s->denominateur);
+    if(s->denominateur!=1) {
+	(void) fprintf(f,"denominator = %d\t",s->denominateur);
+    }
     vect_fprint(f,s->vecteur,nom_var); 
     /* malgre le clash de type, je kludge... */
    /* ray_dte_fprint(f, s, nom_var);*/
+}
+
+/* void sommet_fprint_as_dense(FILE * f, Psommet s):
+ * impression d'un sommet
+ */
+void sommet_fprint_as_dense(f, s, b)
+FILE * f;
+Psommet s;
+Pbase b;
+{
+    if(s->denominateur!=1) {
+	(void) fprintf(f,"denominator = %d\t",s->denominateur);
+    }
+    vect_fprint_as_dense(f,s->vecteur, b);
 }
 
 /* void sommet_dump(Psommet s): impression d'un sommet sur stderr avec
@@ -131,6 +147,20 @@ char * (*nom_var)();
     Psommet e;
     for (e = ls; e != NULL; e = e->succ) {
 	sommet_fprint(f, e, nom_var);
+    }
+}
+
+/* void fprint_lsom_as_dense(FILE * f, Psommet s):
+ * impression d'une liste de sommets
+ */
+void fprint_lsom_as_dense(f, ls, b)
+FILE * f;
+Psommet ls;
+Pbase b;
+{
+    Psommet e;
+    for (e = ls; e != NULL; e = e->succ) {
+	sommet_fprint_as_dense(f, e, b);
     }
 }
 
