@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1994/11/30 11:55:22 $, 
+# $Date: 1994/11/30 14:05:45 $, 
 # got on %D%, %T%
 #
 
@@ -16,16 +16,33 @@ PIPSARGS='-s MUST_REGIONS -p HPFCOMPILE'
 
 unset HPFFILE MODULE WORKSPACE
 
+#
+# not very convincing. stdin is taken as stdout and stderr...
+
+STDOUT=`tty`
+[ "$STDOUT" = "not a tty" ] && STDOUT=/dev/null
+
+STDERR="$STDOUT"
+
+#
+# source ~/.hpfcrc if exists. May be used to modify the defaults
+
+[ -r "$HOME/.hpfcrc" ] && . $HOME/.hpfcrc
+
+#
+
 usage()
 {
-  cat 2>&1 <<-EOF
-	Usage: $script [-vDdhM] [ -w ws ] [ -m mod ] [-n n | file[.f]]
+  cat <<-EOF
+	Usage: $script [-vDdhMqQ] [ -w ws ] [ -m mod ] [-n n | file[.f]]
 	  version is $Revision$
 	  -v: verbose
 	  -D: debug
 	  -d: delete
 	  -h: help
 	  -M: make
+	  -q: quiet (stdout redirected)
+	  -Q: more quiet (stderr and stdout redirected)
 	  -w ws: workspace ws
 	  -m mod: module mod
 	  -n n: source number n
@@ -44,13 +61,15 @@ debug()
   echo "$script: $@" 1>&2
 }
 
-while getopts vDdMn:hm:w: OPT
+while getopts vDdMqQn:hm:w: OPT
 do
   case $OPT in
     v) VERBOSE='verbose' ;;
     D) DEBUG='debug' ;;
     d) DELETE='Delete' ;;
     M) MAKE='gmake' ;;
+    q) STDOUT='/dev/null' ;;
+    Q) STDERR='/dev/null' ; STDOUT='/dev/null' ;;
     n) HPFFILE="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
     m) MODULE="$OPTARG" ;;
     w) WORKSPACE="$OPTARG" ;;
@@ -67,10 +86,10 @@ shift `expr $OPTIND - 1`
 [ "$WORKSPACE" ] || WORKSPACE=`basename $HPFFILE .f`
 
 $VERBOSE "applying hpfc on file $HPFFILE"
-$VERBOSE "pips is `type $PIPS`"
+$DEBUG "pips is `type $PIPS`"
 
 set -e
-$PIPS -f $HPFFILE $PIPSARGS -m $MODULE $WORKSPACE
+$PIPS -f $HPFFILE $PIPSARGS -m $MODULE $WORKSPACE > $STDOUT 2> $STDERR
 set +e
 
 $VERBOSE "installing generated codes"
@@ -80,14 +99,14 @@ ${INSTALL} -b $WORKSPACE.database -r $HPFFILE -i -t $WORKSPACE.hpfc -n $MODULE
 
 [ "$DELETE" = : ] ||
 {
-  $VERBOSE "Deleting $WORKSPACE"
+  $VERBOSE "Deleting $WORKSPACE workspace"
   $DELETE $WORKSPACE
 }
 
 [ "$MAKE" = : ] ||
 {
   $VERBOSE "Making $WORKSPACE"
-  (cd $WORKSPACE.hpfc ; $MAKE all )
+  (cd $WORKSPACE.hpfc ; $MAKE all) > $STDOUT 2> $STDERR
 }
 
 $VERBOSE "done"
