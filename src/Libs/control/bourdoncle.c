@@ -25,6 +25,9 @@
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.9  2003/07/11 09:45:05  irigoin
+ bourdoncle_free() added, some presentation imrpovements
+
  Revision 1.8  2003/06/19 08:25:58  irigoin
  Improvements of debugging information
 
@@ -596,7 +599,7 @@ static void print_embedding_graph(control c, string msg)
     pips_debug(2, "End: the embedding graph for vertex %p is consistent.\n", c);
   }
 }
-
+
 /* Allocate a list of control nodes transitively linked to control c */
 static list node_to_linked_nodes(control c)
 {
@@ -1437,7 +1440,7 @@ static list copy_successors(list succs)
    data structrue). Another node in the partition could be chosen as new
    cycle head, but the partition may only contain tests with side
    effects. Instead we choose to insert a non-deterministic node in front
-   in ase it is needed. The initial CFG is less disturbed.
+   in case it is needed. The initial CFG is less disturbed.
 
    Well, I changed my mind again because inserting new control nodes does
    not make it easy to stay compatible with Bourdoncle's algorithm and
@@ -2163,7 +2166,7 @@ list bourdoncle_component(control vertex,
   return b_partition;
 }
 
-
+
 int bourdoncle_visit(control vertex,
 		     list * ppartition,
 		     hash_table ancestor_map,
@@ -2289,3 +2292,32 @@ bool false_successors_only_p(control c)
   true_only_p = one_successor_kind_only_p(c, TRUE);
   return true_only_p;
 }
+
+static void suppress_statement_reference(control c)
+{
+  /* The statements were not replicated and are still pointed to by the
+     initial unstructured. */
+  control_statement(c) = statement_undefined;
+}
+
+static void bourdoncle_unstructured_free(unstructured u)
+{
+  /* Suppress references to statements */
+  gen_recurse(u, control_domain, gen_true, suppress_statement_reference);
+
+  free_unstructured(u);
+}
+
+void bourdoncle_free(unstructured ndu,
+		     hash_table ancestor_map,
+		     hash_table scc_map)
+{
+  /* Do not free the statements pointed by the nodes in ndu or in the scc */
+  bourdoncle_unstructured_free(ndu);
+  HASH_MAP(k, v, {
+    bourdoncle_unstructured_free((unstructured) v);
+  }, scc_map);
+  hash_table_free(ancestor_map);
+  hash_table_free(scc_map);
+}
+
