@@ -174,7 +174,7 @@ i_create:
 				"Workspace %s already exists. Delete it!\n",
 				$<name>4);
 		else {
-		    db_create_workspace ((string) $<name>4);
+		  if(db_create_workspace ((string) $<name>4)) {
 		    free($<name>4);
 		    if(!create_workspace (&the_file_list.argc, the_file_list.argv)) {
 			string wname = db_get_current_workspace_name();
@@ -192,6 +192,11 @@ i_create:
 			lazy_open_module(main_module_name);
 		    }
 		    $$ = TRUE;
+		  }
+		  else {
+		    user_error("create",
+			       "Cannot create directory for workspace, check rights!\n");
+		  }
 		}
 	    }
 /*
