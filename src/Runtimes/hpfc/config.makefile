@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1997/01/07 11:15:56 $, )
+# ($Date: 1997/01/14 15:50:52 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -301,6 +301,7 @@ $(RT_ARCH)/compilers.make:
 	#
 	{ echo "FC=$(FC)"; \
 	  echo "FFLAGS=$(FFLAGS)";\
+	  echo "FOPT=$(FOPT)";\
 	  echo "CC=$(CC)";\
 	  echo "CFLAGS=$(CFLAGS)";\
 	  echo "CPPFLAGS=$(CPPFLAGS)";\
