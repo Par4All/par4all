@@ -85,11 +85,11 @@ open_module_if_unique()
 }
 
 bool 
-open_module(name)
-char *name;
+open_module(string name)
 {
     bool success;
-    pips_assert("some current workspace", db_get_current_workspace_name());
+    if (!db_get_current_workspace_name())
+	pips_user_error("No current workspace, open or create one first!\n");
 
     if (db_get_current_module_name()) /* reset if needed */
 	db_reset_current_module_name();
@@ -97,10 +97,8 @@ char *name;
     success = db_set_current_module_name(name);
     reset_unique_variable_numbers();
 
-    if (success)
-	user_log("Module %s selected\n", name);
-    else
-	user_warning("open_module", "Could not open module %s\n", name);
+    if (success) user_log("Module %s selected\n", name);
+    else pips_user_warning("Could not open module %s\n", name);
 
     return success;
 }
@@ -130,9 +128,12 @@ char *name;
 
 /* should be: success (cf wpips.h) */
 bool 
-open_workspace(char *name)
+open_workspace(string name)
 {
     bool success;
+
+    if (db_get_current_workspace_name())
+	pips_user_error("Some current workspace, close it first!\n");
 
     if (make_open_workspace(name) == NULL) {
 	/* should be show_message */
@@ -157,7 +158,12 @@ bool
 close_workspace(void)
 {
     bool success;
-    /* It is useless to save on disk some non up to date resources: */
+
+    if (!db_get_current_workspace_name())
+	pips_user_error("No workspace to close!\n");
+
+    /* It is useless to save on disk some non up to date resources:
+     */
     delete_some_resources();
     success = make_close_workspace();
     close_log_file();
@@ -172,16 +178,12 @@ delete_workspace(string wname)
     int failure;
     string current = db_get_current_workspace_name();
 
-    /* FI: No check whatsoever about the current workspace, no information
-       about deleting the non-current workspace vs deleting the current
-       workspace... */
-
     /* Yes but at least close the LOGFILE if we delete the current
        workspace since it will fail on NFS because of the open file
        descriptor (creation of .nfs files). RK */
 
     if (current && same_string_p(wname, current))
-	close_log_file();
+	pips_user_error("Cannot delete current workspace, close it first!\n");
 
     if ((failure=safe_system_no_abort(concatenate("Delete ", wname, NULL))))
 	pips_user_warning("exit code for Delete is %d\n", failure);
