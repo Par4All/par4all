@@ -127,6 +127,10 @@ int iPrevComm = 0;
  * 	INQUOTES	on etait dans l'etat NONINQUOTES et on a vu une quote 
  * 	INQUOTEQUOTE	on etait dans l'etat INQUOTES et on a vu un quote
  *
+ *                           INQUOTEBACKSLASH
+ *                              ^      x
+ *                              |      |
+ *                              \      v
  *      NONINQUOTES -----'----> INQUOTES -------'-----> INQUOTEQUOTE
  *      |   ^     ^             |   ^  ^                |          |
  *      |   |     |             |   |  |                |          |
@@ -136,14 +140,23 @@ int iPrevComm = 0;
  *
  *      x est un caractere quelconque different de '
  *
- * Modification: la quote peut-etre ' ou " pour faire plaisir a Fabien Coelho.
+ * Modifications: 
+ *  - la quote peut-etre ' ou " pour faire plaisir a Fabien Coelho.
  * L'information est stockee lors de la rentree dans une constante chaine
  * de caracteres (variable QuoteChar).
+ *  - ajout de l'etat INQUOTEBACKSLASH pour traiter les extensions 
+ * non normalisees similaires aux chaines C
+ *
+ * Notes:
+ *  - il faut rester compatible avec l'analyseur lexical scanner.l
+ *  - les declarations sont relues par un autre analyseur pour en garder
+ * le texte et rester fidele au source
  */
 LOCAL int EtatQuotes;
 #define NONINQUOTES 1
 #define INQUOTES 2
 #define INQUOTEQUOTE 3
+#define INQUOTEBACKSLASH 4
 
 /*
  * le buffer contenant la ligne que l'on doit lire en avance pour se rendre
@@ -573,6 +586,8 @@ FILE * fp;
 		        if (EtatQuotes == INQUOTEQUOTE)
 			    EtatQuotes = NONINQUOTES;
 		    }
+		else if(EtatQuotes == INQUOTEBACKSLASH) 
+		        EtatQuotes = INQUOTES;
 		else {
 		    EtatQuotes = INQUOTES;
 		    QuoteChar = c;
@@ -581,6 +596,10 @@ FILE * fp;
 	    else {
 		if (EtatQuotes == INQUOTEQUOTE)
 		    EtatQuotes = NONINQUOTES;
+		else if(EtatQuotes == INQUOTES && c == '\\')
+		    EtatQuotes = INQUOTEBACKSLASH;
+		else if(EtatQuotes == INQUOTEBACKSLASH)
+		    EtatQuotes = INQUOTES;
 	    }
 
 	    if (EtatQuotes == NONINQUOTES) {
