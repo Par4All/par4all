@@ -3,8 +3,8 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
-# Revision 1.290  1997/08/04 16:12:05  coelho
-# *** empty log message ***
+# Revision 1.291  1997/08/18 07:45:26  coelho
+# ftest/fpips additions.
 #
 # Revision 1.289  1997/06/23 09:02:53  coelho
 # info entry for rlog improved.
@@ -73,7 +73,7 @@ help()
 	  -h: this help
 	  -v: verbose
 	Useful macros in $CONFIG_FILE: 
-	 - libraries/passes: LIB_{CFILES,HEADERS,OBJECTS}
+	 - libraries/passes: LIB_{CFILES,HEADERS,OBJECTS,MAIN}
 	   and maybe DERIVED_{HEADERS,CFILES,FILES}
 	 - default:
 	   SOURCES (config.makefile need not be included)
@@ -283,7 +283,7 @@ INSTALL_RTM_DIR= ${install_rtm_dir}
 INSTALL_LIB_DIR= ${install_lib_dir}/\$(ARCH)
 INSTALL_BIN_DIR= ${install_bin_dir}/\$(ARCH)
 # (obsolete?)
-MAIN=		main
+# MAIN=		main
 #
 # 
 #
@@ -517,11 +517,11 @@ $verbose "specific to Libs"
 CFILES=		\$(LIB_CFILES)
 OBJECTS=	\$(LIB_OBJECTS)
 INCLUDES=	\$(LIB_HEADERS)
-SOURCES+= 	\$(INCLUDES) \$(CFILES) \$(DOCS)
+SOURCES+= 	\$(INCLUDES) \$(CFILES) \$(DOCS) \$(LIB_MAIN)
 #
 
 clean-compiled:
-	\$(RM) \$(OBJECTS) \$(LIB_TARGET) \$(BIN_TARGET) \\
+	\$(RM) \$(OBJECTS) \$(LIB_TARGET) \$(BIN_TARGET)  \$(LIB_MAIN:.c=.o) \\
 		\$(ARCH)/pips \$(ARCH)/[tw]pips
 
 clean: generate_makefile_if_necessary_and_possible clean-compiled
@@ -539,34 +539,51 @@ $verbose "specific to Libs for PIPS"
 
 [ $DIRTYPE = 'Libs' -a $PART = PIPS ] && cat >> $MAKEFILE <<% 
 #
-CFILES+=	\$(MAIN).c 
-OBJECTS+=	\$(MAIN).o 
+# CFILES+=	\$(MAIN).c 
+# OBJECTS+=	\$(MAIN).o 
 #
 
 test: all
 	#
 	# building a local PIPS
 	#
-	\$(LINK) \$(ARCH)/pips -lpips \$(PIPS_LIBS) 
+	\$(LINK) \$(ARCH)/pips \$(PIPS_MAIN) -lpips \$(PIPS_LIBS) 
 	@echo 
 
 wtest: all
 	#
 	# building a local WPIPS
 	#
-	\$(LINK) \$(ARCH)/wpips \$(WPIPS_ADDED_LDFLAGS) -lwpips \\
-		\$(PIPS_LIBS) \$(WPIPS_ADDED_LIBS)
+	\$(LINK) \$(ARCH)/wpips \$(WPIPS_ADDED_LDFLAGS) \$(WPIPS_MAIN) \\
+		-lwpips \$(PIPS_LIBS) \$(WPIPS_ADDED_LIBS)
 	@echo 
 
 ttest: all
 	#
 	# building a local TPIPS
 	#
-	\$(LINK) \$(ARCH)/tpips -ltpips \$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS)
+	\$(LINK) \$(ARCH)/tpips  \$(TPIPS_MAIN) \\
+	    -ltpips \$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS)
+	@echo 
+
+ftest: all
+	#
+	# building a local Full PIPS
+	#
+	\$(LINK) \$(ARCH)/fpips \$(FPIPS_MAIN) -lpips -ltpips -lwpips \\
+	    \$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS) \$(WPIPS_ADDED_LIBS)
+	#
+	# creating links
+	#
+	\$(RM) \$(ARCH)/pips \$(ARCH)/tpips \$(ARCH)/wpips 
+	ln \$(ARCH)/fpips \$(ARCH)/pips 
+	ln \$(ARCH)/fpips \$(ARCH)/tpips 
+	ln \$(ARCH)/fpips \$(ARCH)/wpips 
+	#
 	@echo 
 
 # obsolete rule I guess. test is better. FC.
-\$(BIN_TARGET): \$(LIB_TARGET) \$(ARCH)/\$(MAIN).o
+\$(BIN_TARGET): \$(ARCH)/\$(LIB_MAIN:.c=.o) \$(LIB_TARGET)
 	#
 	# building \$@
 	#
@@ -591,10 +608,12 @@ $verbose "specific to Passes"
 	\$(LINEAR_ROOT)/Lib/\$(ARCH)/*.a \\
 	\$(NEWGEN_ROOT)/Lib/\$(ARCH)/*.a
 #
-CFILES=		\$(LIB_CFILES)
-OBJECTS=	\$(LIB_OBJECTS)
-INCLUDES=	\$(LIB_HEADERS)
-SOURCES+= 	\$(INCLUDES) \$(CFILES) \$(DOCS)
+INSTALL_LIB +=	\$(LIB_MAIN:.c=.o)
+#
+CFILES	 =	\$(LIB_CFILES)
+OBJECTS	 =	\$(LIB_OBJECTS)
+INCLUDES =	\$(LIB_HEADERS)
+SOURCES  += 	\$(INCLUDES) \$(CFILES) \$(DOCS)
 #
 
 \$(PIPS_BINDIR):; mkdir \$(PIPS_BINDIR)
