@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.45  1997/05/02 19:53:06  coelho
+ * *** empty log message ***
+ *
  * Revision 1.44  1997/04/17 15:28:38  coelho
  * shorten similarity check if already done;-)
  *
@@ -992,20 +995,25 @@ continue_propagation_p(statement s)
 
 	    MAP(EXPRESSION, e,
 	    {
-		reference r = expression_to_reference(e);
-		entity var = reference_variable(r);
-
-		if (entity_template_p(var)) /* up to the template, stop */
-		    return TRUE;
-		
-		if (safe_load_primary_entity(var)==primary)
+		if (expression_reference_p(e)) 
 		{
-		    /*  the variable is realigned.
-		     */
-		    add_alive_synonym(s, new_variable);
-		    add_as_a_closing_statement(s);
-		    return FALSE;
+		    reference r = expression_to_reference(e);
+		    entity var = reference_variable(r);
+		    
+		    if (entity_template_p(var)) /* up to the template, stop */
+			return TRUE;
+		
+		    if (safe_load_primary_entity(var)==primary)
+		    {
+			/*  the variable is realigned.
+			 */
+			add_alive_synonym(s, new_variable);
+			add_as_a_closing_statement(s);
+			return FALSE;
+		    }
 		}
+		/* else it may be a call because of ALIGN () WITH T()::X...
+		 */
 	    },
 		call_arguments(c));
 	}
