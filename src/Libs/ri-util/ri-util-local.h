@@ -465,5 +465,14 @@ entity get_ith_##lname##_prime(int i)\
 #define instruction_block(i) sequence_statements(instruction_sequence(i))
 #endif
 
+/* Default type sizes */
+
+#define DEFAULT_INTEGER_TYPE_SIZE (4)
+#define DEFAULT_REAL_TYPE_SIZE (4)
+#define DEFAULT_DOUBLEPRECISION_TYPE_SIZE (8)
+#define DEFAULT_COMPLEX_TYPE_SIZE (8)
+#define DEFAULT_LOGICAL_TYPE_SIZE (4)
+#define DEFAULT_CHARACTER_TYPE_SIZE (1)
+
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
