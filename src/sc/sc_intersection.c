@@ -142,8 +142,6 @@ Psysteme s2;
 	s1 = SC_EMPTY;
     }
     else {
-	Pbase b;
-	Pvecteur coord;
 
 	/* ni s1 ni s2 ne sont des systemes particuliers */
 	for(c = sc_egalites(s2); c != (Pcontrainte) NULL; c = c->succ) {
@@ -155,7 +153,7 @@ Psysteme s2;
 
 	/* update s1 basis with s2's vectors */
 	base_append(&s1->base, s2->base);
-	s1->dimension = vect_size(b);
+	s1->dimension = vect_size(s1->base);
     }
 
     return s1;
