@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1994/06/03 15:18:51 $, ) version $Revision$, 
+# $RCSfile: pipsrc.ref,v $ ($Date: 1994/06/07 11:55:52 $, ) version $Revision$, 
 # got on %D%, %T%
 # $Id$
 #
@@ -107,7 +107,8 @@ PIPS_CC="gcc"
 # For SUNOS' cc:
 # PIPS_CFLAGS="-pipe -temp=$TEMPDIR -g"
 # For GNU cc:
-PIPS_CFLAGS="-g -ansi -Wall"
+# PIPS_CFLAGS="-g -ansi -Wall"
+PIPS_CFLAGS="-O2 -g -ansi -Wall"
 PIPS_CPPFLAGS="-I${INCLUDEDIR} -I${EXTEDIR}"
 # PIPS_LD="cc"
 # PIPS_LD="/usr5/gnu/bin-sparc/gcc"
