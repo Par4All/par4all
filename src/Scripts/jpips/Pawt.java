@@ -2,6 +2,9 @@
  * $Id$
  * 
  * $Log: Pawt.java,v $
+ * Revision 1.5  1998/10/16 13:55:59  coelho
+ * import fixed.
+ *
  * Revision 1.4  1998/07/03 16:36:51  coelho
  * PComboBox includes a direct field.
  *
@@ -19,10 +22,12 @@
 package JPips;
 
 import java.util.*;
+
 import java.awt.*;
-import java.awt.swing.*;
 import java.awt.event.*;
-import java.awt.swing.event.*;
+
+import com.sun.java.swing.*;
+import com.sun.java.swing.event.*;
 
 /** A graphical package for JPips
   * All components extends from swing components.
@@ -37,101 +42,101 @@ interface Pawt
     public String checking; 
     PComponent() { super(); } 
   }
-
+  
   class PFrame extends java.awt.swing.JFrame
-    { 
-      public Vector optionVector;
-      PFrame(String name){ super(name); }
-      
-      /** Disables or enables the Option objects of JPips.
-       * @param yes true means disable
-       */
-      public void lock(boolean yes)
-        {
-          for(int i=1; i<optionVector.size(); i++)
-	      ((Activatable) optionVector.elementAt(i)).setActivated(!yes);
-        }
+  { 
+    public Vector optionVector;
+    PFrame(String name){ super(name); }
+    
+    /** Disables or enables the Option objects of JPips.
+     * @param yes true means disable
+     */
+    public void lock(boolean yes)
+    {
+      for(int i=1; i<optionVector.size(); i++)
+	((Activatable) optionVector.elementAt(i)).setActivated(!yes);
     }
+  }
 
   class PDialog extends java.awt.swing.JDialog
     { PDialog(Frame f, String s, boolean b){ super(f, s, b); } }
-
+  
   class PPanel extends java.awt.swing.JPanel
-    {
-      PPanel(){ super(); }
-      PPanel(LayoutManager l){ super(l); }
-    }
-
+  {
+    PPanel(){ super(); }
+    PPanel(LayoutManager l){ super(l); }
+  }
+  
   class PMenuBar extends java.awt.swing.JMenuBar
-    { PMenuBar(){ super(); } }
-
+  { PMenuBar(){ super(); } }
+  
   class PMenu extends java.awt.swing.JMenu
-    { PMenu(){ super(); }
-      PMenu(String name){ super(name); }
-    }
-
+  { PMenu(){ super(); }
+    PMenu(String name){ super(name); }
+  }
+  
   class PMenuItem extends java.awt.swing.JMenuItem
-    {
-      public String command;
-      public PTextField tf;
-      PMenuItem(String name){ super(name); }
-      PMenuItem(String name,String command)
-        { super(name); this.command = command; }
-      PMenuItem(String name,String command,PTextField tf)
-        { super(name); this.command = command; this.tf = tf; }
-    }
-
+  {
+    public String command;
+    public PTextField tf;
+    PMenuItem(String name){ super(name); }
+    PMenuItem(String name,String command)
+    { super(name); this.command = command; }
+    PMenuItem(String name,String command,PTextField tf)
+    { super(name); this.command = command; this.tf = tf; }
+  }
+  
   class PCheckBox 
     extends java.awt.swing.JCheckBox
-    {
-      public String command,checking;
-      public PCheckBoxMenuItem cbmi;
-      public PTextFrame frame;
-      
-      PCheckBox(String name, String command, String checking, String tip, 
-		PCheckBoxMenuItem cbmi, PTextFrame frame)
-      { 
-	super(name); 
-	if (tip!=null) setToolTipText(tip);
-	this.command = command; 
-	this.checking = checking;
-	this.cbmi = cbmi; 
-	this.frame = frame;
-      }	
-
-      PCheckBox(String name)
-      { this(name, null, null, null, null, null); }
-      
-      PCheckBox(String name, String command, String checking, String tip)
-      { this(name, command, checking, tip, null, null); }
-
-      PCheckBox(String name, PTextFrame frame)
-      { this(name, null, null, null, null, frame); }
-    }
-
+  {
+    public String command,checking;
+    public PCheckBoxMenuItem cbmi;
+    public PTextFrame frame;
+    
+    PCheckBox(String name, String command, String checking, String tip, 
+	      PCheckBoxMenuItem cbmi, PTextFrame frame)
+    { 
+      super(name); 
+      if (tip!=null) setToolTipText(tip);
+      this.command = command; 
+      this.checking = checking;
+      this.cbmi = cbmi; 
+      this.frame = frame;
+    }	
+    
+    PCheckBox(String name)
+    { this(name, null, null, null, null, null); }
+    
+    PCheckBox(String name, String command, String checking, String tip)
+    { this(name, command, checking, tip, null, null); }
+    
+    PCheckBox(String name, PTextFrame frame)
+    { this(name, null, null, null, null, frame); }
+  }
+  
   class PCheckBoxMenuItem extends java.awt.swing.JCheckBoxMenuItem
-    {
-      public String command,checking;
-      public PCheckBox cb;
-
-      PCheckBoxMenuItem(String name){ super(name); }
-
-      PCheckBoxMenuItem(String name,String command,String checking)
-      { 
-	super(name);
-	this.command = command;
-	this.checking = checking; 
-      }
-
-      PCheckBoxMenuItem(String name, String command, 
-			String checking, PCheckBox cb)
-      {
-	super(name); 
-	this.command = command; 
-	this.checking = checking;
-	this.cb = cb; 
-      }
+  {
+    public String command,checking;
+    public PCheckBox cb;
+    
+    PCheckBoxMenuItem(String name){ super(name); }
+    
+    PCheckBoxMenuItem(String name,String command,String checking)
+    { 
+      super(name);
+      this.command = command;
+      this.checking = checking; 
     }
+    
+    PCheckBoxMenuItem(String name, String command, 
+		      String checking, PCheckBox cb)
+    {
+      super(name); 
+      this.command = command; 
+      this.checking = checking;
+      this.cb = cb; 
+    }
+  }
 
   class PRadioButtonMenuItem 
     extends java.awt.swing.JRadioButtonMenuItem
