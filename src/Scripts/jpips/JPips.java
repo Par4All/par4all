@@ -1,0 +1,347 @@
+/*
+ * $Id$
+ *
+ * $Log: JPips.java,v $
+ * Revision 1.1  1998/06/30 17:34:07  coelho
+ * Initial revision
+ *
+ */
+
+package JPips;
+
+import java.awt.event.*;
+import java.applet.*;
+import java.lang.*;
+import java.util.*;
+import java.io.*;
+import java.awt.*;
+import java.awt.swing.*;
+import java.awt.swing.preview.*;
+import java.awt.swing.event.*;
+import java.awt.swing.text.*;
+import java.awt.swing.border.*;
+
+import JPips.Pawt.*;
+
+/** The application of jpips.
+  * It builds the main frame and its menu.
+  * 
+  * @author Francois Didry
+  */
+public class JPips 
+  extends Applet 
+  implements Resetable
+{
+
+
+  public final	String	source = "menus.txt",	//the parsed text for the menu
+			TOP_MENU = "TOP_MENU";	//tag to delimit a menu
+
+  public DirectoryManager	directoryManager;	//manages the directory
+  public WorkspaceManager	workspaceManager;	//manages the workspace
+  public ModuleManager		moduleManager;		//manages the modules
+  
+  public TPips		tpips;		//tpips instance
+  public TextDisplayer 	textDisplayer;	//regulates the displayed windows
+  public Vector		optionVector;	//contains the components for JPips
+			
+  public PMenuBar	menu;		//menu of JPips
+
+  public static boolean	console;	//notifies the use of a console
+  public static	PFrame	frame;		//main frame
+  
+  public static String	title = "JPips",
+			noConsole = "-n";
+
+  
+  
+  
+  /** Creates the main frame with JPips inside.
+    */
+  static public void main(String args[]) 
+    {
+      console = true;
+      if(args.length>0 && args[0].equals(noConsole)) console = false;
+      frame = new PFrame(title);
+      GridBagLayout fLayout = new GridBagLayout();
+      frame.getContentPane().setLayout(fLayout);
+      JPips jpips = new JPips();
+      jpips.init();
+    }
+  
+
+  /** Launches TPips.
+    * Builds the JPips main frame.
+    */
+  public void init() 
+    {
+      super.init();
+
+      tpips = new TPips(this);
+      tpips.start();
+
+      GridBagConstraints c = new GridBagConstraints();
+      optionVector = new Vector();
+      
+      buildOptionVector();
+      frame.setJMenuBar(getMenuBar());
+      add((Container)frame.getContentPane(),getJPipsPanel(),
+          0,0,1,1,1,1,1.0,1.0,5,
+          GridBagConstraints.BOTH,GridBagConstraints.WEST,c);
+      frame.lock(true);
+      frame.pack();
+      frame.setVisible(true);
+    }
+    
+    
+  /** Resets jpips.
+    */
+  public void reset() 
+    {
+      tpips.start();
+      directoryManager.reset();
+      workspaceManager.reset();
+      moduleManager.reset();
+      frame.lock(true);
+    }
+    
+    
+  /** Builds the vector of Option objects.
+    */
+  public void buildOptionVector()
+    {
+      optionVector.addElement(getWorkspaceOption());
+      
+      try
+        {
+          FileReader f = new FileReader(source);
+          Parser p = new Parser(f);
+	  String lineContent = p.nextNonEmptyLine();
+	  while(lineContent != null)
+	    {
+	      if(lineContent.equals(TOP_MENU))
+	        {
+	          OptionParser op = new OptionParser(p,source,tpips);
+		  optionVector.addElement(
+		    new Option(op.title,op.menu,op.frame,op.vector,op.state));
+		}
+	      lineContent = p.nextNonEmptyLine();
+	    } 
+	}
+      catch(FileNotFoundException e)
+        {
+	  System.out.println(e);
+	}
+
+      optionVector.addElement(getHelpOption());
+      frame.optionVector = optionVector;
+      tpips.optionVector = optionVector;
+    }
+
+
+  /** @return the menu of the main frame
+    */
+  public PMenuBar getMenuBar()
+    {
+      PMenuBar mb = new PMenuBar();
+      for(int i=0; i<optionVector.size(); i++)
+        mb.add(((Option)optionVector.elementAt(i)).getMenu());
+      return mb;
+    }
+
+
+  /** @return the panel of the main frame
+    */
+  public PPanel getJPipsPanel()
+    {
+    
+      PPanel filePanel = new PPanel(new GridBagLayout());
+      GridBagConstraints c = new GridBagConstraints();
+      PPanel p;
+      PButton b;
+      ActionListener a;
+      PTextField tf;
+      
+      //displayer panel
+      textDisplayer = new TextDisplayer(frame);
+      add((Container)filePanel,(PPanel)textDisplayer.getComponent(),
+          1,2,2,1,1,1,1.0,0.0,5,
+	  GridBagConstraints.NONE,GridBagConstraints.EAST,c);
+      tpips.textDisplayer = textDisplayer;
+      
+      //directory
+      directoryManager = new DirectoryManager(frame, tpips);
+      p = (PPanel)directoryManager.getComponent();
+      add((Container)filePanel,p,0,0,3,1,1,1,1.0,0.0,5,
+          GridBagConstraints.HORIZONTAL,GridBagConstraints.WEST,c);
+
+      //modules
+      moduleManager = new ModuleManager(tpips);
+      p = (PPanel)moduleManager.getComponent();
+      add((Container)filePanel,p,0,2,1,1,1,1,0.0,0.0,5,
+          GridBagConstraints.NONE,GridBagConstraints.WEST,c);
+      tpips.list = moduleManager.list;
+      
+      //workspace
+      workspaceManager = new WorkspaceManager(tpips, frame, directoryManager,
+                               moduleManager, textDisplayer, optionVector);
+      p = (PPanel)workspaceManager.getComponent();
+      add((Container)filePanel,p,0,1,1,1,1,1,0.0,0.0,5,
+          GridBagConstraints.NONE,GridBagConstraints.WEST,c);
+      
+      //console
+      if(console)
+        {
+	  Console cons = new Console();
+         add((Container)filePanel,cons.getConsoleLinePanel(
+              "TPips console"),0,3,3,1,1,1,1.0,0.0,5,
+          GridBagConstraints.BOTH,GridBagConstraints.WEST,c);
+	}
+
+      return filePanel;
+    }
+
+
+  /** @return the option object for the workspace menu
+    */
+  public Option getWorkspaceOption()
+    {
+      PMenu m;
+      PMenuItem mi;
+      PCheckBoxMenuItem cbmi;
+      ActionListener a;
+      Vector v1 =new Vector();
+      Vector v2 =new Vector();
+
+      //create
+      m = new PMenu("Workspace");
+      mi = (PMenuItem) m.add(new PMenuItem("Create"));
+      a = new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { workspaceManager.create(); }
+	};
+      mi.addActionListener(a);
+      v1.addElement(mi);
+
+      //open
+      mi = (PMenuItem) m.add(new PMenuItem("Open"));
+      a = new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { workspaceManager.choose(); }
+	};
+      mi.addActionListener(a);
+      v1.addElement(mi);
+
+      //checkpoint
+      mi = (PMenuItem) m.add(new PMenuItem("Checkpoint"));
+      a = new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { workspaceManager.checkPoint(); }
+	};
+      mi.addActionListener(a);
+      mi.setEnabled(false);
+      v2.addElement(mi);
+
+      //close
+      mi = (PMenuItem) m.add(new PMenuItem("Close"));
+      a = new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { workspaceManager.close(false); }
+	};
+      mi.addActionListener(a);
+      mi.setEnabled(false);
+      v2.addElement(mi);
+      
+      //quit
+      mi = (PMenuItem) m.add(new PMenuItem("Quit"));
+      a = new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { tpips.quit(); System.exit(0); }
+	};
+      mi.addActionListener(a);
+      v1.addElement(mi);
+
+      //close & quit
+      mi = (PMenuItem) m.add(new PMenuItem("Close & Quit"));
+      a = new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { workspaceManager.close(false); tpips.quit(); System.exit(0);}
+	};
+      mi.addActionListener(a);
+      mi.setEnabled(false);
+      v2.addElement(mi);
+      
+      //close & delete & quit
+      mi = (PMenuItem) m.add(new PMenuItem("Delete & Quit"));
+      a = new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    {
+	      workspaceManager.close(true);
+	      tpips.quit();
+	      System.exit(0);
+	    }
+	};
+      mi.addActionListener(a);
+      mi.setEnabled(false);
+      v2.addElement(mi);
+      
+      //exit
+      mi = (PMenuItem) m.add(new PMenuItem("Exit"));
+      a = new ActionListener()
+        {
+	  public void actionPerformed(ActionEvent e)
+	    { tpips.exit(); System.exit(0); }
+	};
+      mi.addActionListener(a);
+      mi.setForeground(Color.red);
+      
+      return new Option(m.getName(), m, null, null, null, v1, v2);
+    }
+
+
+  /** @return the option object for the help menu
+    */
+  public Option getHelpOption()
+    {
+      PMenuItem mi;
+
+      PMenu m = new PMenu("Help");
+      mi = (PMenuItem) m.add(new PMenuItem("About"));
+      mi = (PMenuItem) m.add(new PMenuItem("Introduction"));
+      mi = (PMenuItem) m.add(new PMenuItem("Documentation"));
+      
+      return new Option(m.getName(), m, null, null, null);
+    }
+
+
+  /** A short add method for a GridBagLayout.
+    */
+  public void add(Container cont, Component comp, int x, int y, int w, int h,
+  		  int px, int py, double wex, double wey, int in,
+		  int f, int a, GridBagConstraints c)
+    {
+      c.insets = new Insets(in,in,in,in);
+      c.gridx = x;
+      c.gridy = y;
+      c.gridwidth = w;
+      c.gridheight = h;
+      c.ipadx = px;
+      c.ipady = py;
+      c.weightx = wex;
+      c.weightx = wex;
+      c.fill = f;
+      c.anchor = a;
+      cont.add(comp,c);
+    }
+
+
+}
+
+
