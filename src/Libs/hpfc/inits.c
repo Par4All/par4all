@@ -7,7 +7,7 @@
  * run-time resolution parameters.
  *
  * SCCS stuff:
- * $RCSfile: inits.c,v $ ($Date: 1994/09/01 15:47:44 $, ) version $Revision$,
+ * $RCSfile: inits.c,v $ ($Date: 1994/12/22 16:52:18 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  *
@@ -117,7 +117,7 @@ int max_size_of_processors()
 	 variable 
 	     a;
 	 
-	 pips_assert("max_size_of_processors", type_variable_p(entity_type(e)));
+	 assert(type_variable_p(entity_type(e)));
 	 a = type_variable(entity_type(e));
 
 	 current_max = max(current_max,
@@ -217,8 +217,7 @@ entity module;
 		 dimension 
 		     dim = FindIthDimension(template, tdim);
 		 
-		 pips_assert("create_init_common_param", 
-			     style_block_p(distribution_style(d)));
+		 assert(style_block_p(distribution_style(d)));
 		 
 		 rate = HpfcExpressionToInt(alignment_rate(a));
 		 shift = (HpfcExpressionToInt(alignment_constant(a)) -
@@ -251,8 +250,7 @@ entity module;
 		 entity
 		     proc = distribute_processors(di);
 		 
-		 pips_assert("create_init_common_param", 
-			     style_cyclic_p(distribution_style(d)));
+		 assert(style_cyclic_p(distribution_style(d)));
 		 
 		 sc = param*SizeOfIthDimension(proc, procdim);
 		 shift = (HpfcExpressionToInt(alignment_constant(a)) -
@@ -292,8 +290,7 @@ entity module;
 		 entity
 		     proc = distribute_processors(di);
 		 
-		 pips_assert("create_init_common_param", 
-			     style_cyclic_p(distribution_style(d)));
+		 assert(style_cyclic_p(distribution_style(d)));
 		 
 		 sc = param*SizeOfIthDimension(proc, procdim);
 		 shift = (cst - HpfcExpressionToInt(dimension_lower(templdim)));
