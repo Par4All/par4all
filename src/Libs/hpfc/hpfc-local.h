@@ -2,7 +2,7 @@
  * local definitions
  * 
  * SCCS stuff:
- * $RCSfile: hpfc-local.h,v $ ($Date: 1994/06/03 14:14:45 $, )
+ * $RCSfile: hpfc-local.h,v $ ($Date: 1994/09/01 15:48:02 $, )
  * version $Revision$,
  * got on %D%, %T%
  * $Id$
@@ -41,10 +41,6 @@
  */
 
 /* in compiler.c */
-
-extern statement_mapping
-    hostgotos,
-    nodegotos;
 
 extern entity
     host_module,
