@@ -45,7 +45,7 @@ char **Read_ParamNames(FILE *in,int m) {
       if(j==0)
 	break;
       param[j] = 0;
-      param_name[i] = (char *)malloc( j*sizeof(char) );
+      param_name[i] = (char *)malloc( (j+1)*sizeof(char) );
       strcpy(param_name[i],param);
     }
   }
