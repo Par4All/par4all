@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/10 09:19:10 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/14 18:50:28 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -288,7 +288,7 @@ static int
     unique_logical_number,
     unique_complex_number;
 
-void hpfc_init_unique_numbers()
+void reset_unique_numbers()
 {
     unique_integer_number=0;
     unique_float_number=0;
