@@ -1,37 +1,15 @@
-/* 
- * $RCSfile: generate.c,v $ ($Date: 1995/03/23 16:54:30 $, )
+/* $RCSfile: generate.c,v $ ($Date: 1995/04/10 18:49:34 $, )
  * version $Revision$
- * got on %D%, %T%
  * 
  * Fabien Coelho, May 1993
- *
  */
 
-/*
- * included files, from C libraries, newgen and pips libraries.
- */
-
-#include <stdio.h> 
-#include <string.h> 
-
-extern fprintf();
-
-#include "genC.h"
-
-#include "ri.h" 
-#include "hpf.h" 
-#include "hpf_private.h"
-
-#include "misc.h" 
-#include "ri-util.h" 
-#include "bootstrap.h" 
-#include "hpfc.h"
 #include "defines-local.h"
 
+#include "bootstrap.h" 
 extern entity CreateIntrinsic(string name); /* in syntax.h */
 
-/*
- * ??? this should work (but that is not the case yet),
+/* ??? this should work (but that is not the case yet),
  * with every call with no write to distributed arrays. 
  *
  * these conditions are to be verifyed, by calculating
