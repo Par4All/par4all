@@ -30,9 +30,9 @@ FILE * stream;
 char * filename;
 {
 	if(fclose(stream) == EOF) {
-		fprintf(stderr,"fclose failed on file %s\n", filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
+	    pips_error("safe_fclose","fclose failed on file %s (%s)\n",
+		       filename,
+		       sys_errlist[errno]);
 	}
 	return(0);
 }
@@ -42,9 +42,9 @@ FILE * stream;
 char * filename;
 {
 	if(fflush(stream) == EOF) {
-		fprintf(stderr,"fflush failed on file %s\n", filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
+	    pips_error("safe_fflush","fflush failed on file %s (%s)\n",
+		       filename,
+		       sys_errlist[errno]);
 	}
 	return(0);
 }
@@ -53,14 +53,14 @@ FILE * safe_freopen( filename, what, stream)
 char * filename, * what;
 FILE * stream;
 {
-	FILE * f;
+    FILE *f;
 
-	if((f = freopen( filename, what, stream)) == (FILE *) NULL) {
-		fprintf(stderr,"freopen failed on file %s\n", filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(f);
+    if((f = freopen( filename, what, stream)) == (FILE *) NULL) {
+	pips_error("safe_freopen","freopen failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(f);
 }
 
 int safe_fseek( stream, offset, wherefrom, filename)
@@ -69,66 +69,66 @@ long int offset;
 int wherefrom;
 char * filename;
 {
-	if( fseek( stream, offset, wherefrom) != 0) {
-		fprintf(stderr,"fseek failed on file %s\n", filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(0);
+    if( fseek( stream, offset, wherefrom) != 0) {
+	pips_error("safe_fseek","fseek failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(0);
 }
 
 long int safe_ftell( stream, filename)
 FILE * stream;
 char * filename;
 {
-	long int pt;
-	pt = ftell( stream);
-	if((pt == -1L) && (errno != 0)) {
-		fprintf(stderr,"ftell failed on file %s\n",filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(pt);
+    long int pt;
+    pt = ftell( stream);
+    if((pt == -1L) && (errno != 0)) {
+	pips_error("safe_ftell","ftell failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(pt);
 }
 
 void safe_rewind( stream, filename)
 FILE * stream;
 char * filename;
 {
-	rewind( stream );
-	if(errno != 0) {
-		fprintf(stderr,"rewind failed on file %s\n",filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
+    rewind( stream );
+    if(errno != 0) {
+	pips_error("safe_rewind","rewind failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
 }
 
 int safe_fgetc( stream, filename)
 FILE * stream;
 char * filename;
 {
-	int value;
-
-	if((value = fgetc( stream)) == EOF) {
-		fprintf(stderr,"fgetc failed on file %s\n",filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(value);
+    int value;
+    
+    if((value = fgetc( stream)) == EOF) {
+	pips_error("safe_fgetc","fgetc failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(value);
 }
 
 int safe_getc( stream, filename)
 FILE * stream;
 char * filename;
 {
-	int value;
-
-	if((value = getc( stream)) == EOF ) {
-	    (void) fprintf(stderr,"getc failed on file %s\n",filename);
-	    (void) fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(value);
+    int value;
+    
+    if((value = getc( stream)) == EOF ) {
+	pips_error("safe_getc","getc failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(value);
 }
 
 char * safe_fgets( s, n, stream, filename)
@@ -136,12 +136,12 @@ char * s, * filename;
 int n;
 FILE * stream;
 {
-	if (fgets( s, n, stream) == (char *) NULL) {
-		fprintf(stderr,"gets failed on file %s\n",filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(s);
+    if (fgets( s, n, stream) == (char *) NULL) {
+	pips_error("safe_fgets","gets failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(s);
 }
 
 int safe_fputc( c, stream, filename)
@@ -149,12 +149,12 @@ char c;
 FILE * stream;
 char * filename;
 {
-	if(fputc( c, stream) == EOF) {
-		fprintf(stderr,"fputc failed on file %s\n",filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(c);
+    if(fputc( c, stream) == EOF) {
+	pips_error("safe_fputc","fputc failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(c);
 }
 
 int safe_putc( c, stream, filename)
@@ -162,24 +162,24 @@ char c;
 FILE * stream;
 char * filename;
 {
-	if(putc( c, stream) == EOF) {
-		fprintf(stderr,"putc failed on file %s\n",filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(c);
+    if(putc( c, stream) == EOF) {
+	pips_error("safe_putc","putc failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(c);
 }
 
 int safe_fputs( s, stream, filename)
 char * s, * filename;
 FILE * stream;
 {
-	if(fputs( s, stream) == EOF) {
-		fprintf(stderr,"fputs failed on file %s\n",filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(1);
+    if(fputs( s, stream) == EOF) {
+	pips_error("safe_fputs","fputs failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(1);
 }
 
 int safe_fread( ptr, element_size, count, stream, filename)
@@ -188,12 +188,12 @@ int element_size;
 int count;
 FILE * stream;
 {
-	if(fread(ptr, element_size, count, stream) != count) {
-		fprintf(stderr,"fread failed on file %s\n",filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(count);
+    if(fread(ptr, element_size, count, stream) != count) {
+	pips_error("safe_fread","fread failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(count);
 }
 
 int safe_fwrite( ptr, element_size, count, stream, filename)
@@ -202,12 +202,12 @@ int element_size;
 int count;
 FILE * stream;
 {
-	if(fwrite(ptr, element_size, count, stream) != count) {
-		fprintf(stderr,"fwrite failed on file %s\n",filename);
-		fprintf(stderr,"%s\n",sys_errlist[errno]);
-		exit(1);
-	}
-	return(count);
+    if(fwrite(ptr, element_size, count, stream) != count) {
+	pips_error("safe_fwrite","fwrite failed on file %s (%s)\n",
+		   filename,
+		   sys_errlist[errno]);
+    }
+    return(count);
 }
 
 /* returns a sorted arg list of files matching regular expression re
