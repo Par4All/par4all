@@ -4,7 +4,7 @@
  *
  * also include functions for timings...
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/04 18:04:40 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1995/09/05 15:08:46 $, )
  * version $Revision$
  *
  * Fabien Coelho, June 1993
@@ -110,34 +110,45 @@ int *number, *tids, *hosttid;
 }
 
 /******************************************************************** TIME */
-
+/* functions to measure wall clock time and be called by the rt.
+ * there is a static stack of ten timer starts, thus imbrication is possible.
+ */
 #include <sys/time.h>
 
 /* gettimeofday is not declared anywhere! 
  */
-extern int gettimeofday(struct timeval *, struct timezone *tzp);
-static struct timeval initial;
-static int is_timer_on = 0;
+extern int gettimeofday(struct timeval *, struct timezone *);
+
+/* static stack of timings...
+ */
+#define TIMER_STACK_SIZE 10
+static struct timeval initial[TIMER_STACK_SIZE];
+static int timer_index=0;
 
 void
 FUNCTION(hpfc_timeon) ARGS(`')
 {
-    assert(!is_timer_on);
-    if (gettimeofday(&initial, (struct timezone *) NULL))
+    assert(timer_index<TIMER_STACK_SIZE);
+
+    /* push current time
+     */
+    if (gettimeofday(&initial[timer_index++], (struct timezone *) NULL))
 	fprintf(stderr, "gettimeofday error\n");
-    is_timer_on = 1;
 }
 
-#define MAX_COMMENT_LENGTH 127
+#define MAX_COMMENT_LENGTH 63
 
 void 
 FUNCTION(hpfc_timeoff) ARGS(`STRING_ARG(comment)')
 STRING_ARG_DECL(comment);
 {
-    struct timeval current;
     char buffer[ MAX_COMMENT_LENGTH + 1 ];
-    int i;
+    struct timeval current;
     long seconds, micros;
+    int i;
+
+    assert(timer_index>0);
+    timer_index--;
 
     /* copy the comment in the buffer to ensure there is a NULL at the end.
      */  
@@ -145,19 +156,20 @@ STRING_ARG_DECL(comment);
 	buffer[i] = STRING_PTR(comment)[i];
     buffer[i]='\0';
 
-    assert(is_timer_on);
+    /* get current time.
+     */
     if (gettimeofday(&current, (struct timezone *) NULL))
 	fprintf(stderr, "gettimeofday error\n");
 
-    seconds = current.tv_sec-initial.tv_sec;
-    micros = current.tv_usec-initial.tv_usec;
+    /* display result.
+     */
+    seconds = current.tv_sec-initial[timer_index].tv_sec;
+    micros = current.tv_usec-initial[timer_index].tv_usec;
 
     if (micros<0) micros+=1000000, seconds--;
 
     fprintf(stderr, "%s (wall clock time): %ld.%6ld\n", 
 	    buffer, seconds, micros);
-
-    is_timer_on = 0;
 }
 
 /* that is all
