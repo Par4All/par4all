@@ -48,19 +48,24 @@ pips_region_user_name(entity ent)
 {
     /* external_value_name cannot be used because there is no need for
        the #new suffix, but the #old one is necessary */
+    string name;
     if(ent == NULL)
 	/* take care of the constant term TCST */
-	return "";
+	name = "";
     else {
 	char *ent_name = entity_name(ent);
 
 	if (strncmp(ent_name, REGIONS_MODULE_NAME, 7) == 0)
 	    /* ent is a PHI entity from the regions module */
-	    return(entity_local_name(ent));
+	    name = entity_local_name(ent);
 	else	
-            return entity_has_values_p(ent)? entity_minimal_name(ent) :
-		entity_name(ent); 
+            if (entity_has_values_p(ent))
+		name = entity_minimal_name(ent);
+	    else
+		name = entity_name(ent);
     }
+
+    return name;
 }
 
 
