@@ -17,6 +17,34 @@
 
 static int display_width, display_height;
 
+
+    void
+event_procedure(Xv_Window window, Event *event, Notify_arg arg)
+{
+  debug_on("WPIPS_EVENTmake _DEBUG_LEVEL");
+  debug(2,"event_procedure",
+	"Event_id %d, event_action %d\n",
+	event_id(event), event_action(event));
+  debug_off();
+  switch (event_id(event)) {
+  case LOC_WINENTER :
+    win_set_kbd_focus(window, xv_get(window, XV_XID));
+    printf("Entre'e\n");
+    break;
+  }
+}
+
+
+    void
+install_event_procedure(Xv_Window window)
+{
+  xv_set(window,
+	 WIN_EVENT_PROC, event_procedure,
+	 WIN_CONSUME_EVENTS, LOC_WINENTER, NULL,
+	 NULL);
+}
+
+
 void place_frame(frame, l, t)
 Frame frame;
 int l, t;
@@ -45,6 +73,7 @@ void create_frames()
 /*			   XV_WIDTH, WPIPS_WIDTH, 
 			   XV_HEIGHT, WPIPS_HEIGHT,
 	*/		   NULL);
+    install_event_procedure(main_frame);
 
 
     /* get the display dimensions */
@@ -61,6 +90,7 @@ void create_frames()
 			       XV_WIDTH, DIALOG_WIDTH, 
 			       XV_HEIGHT, DIALOG_HEIGHT, 
 			       NULL);
+    install_event_procedure(log_frame);
 
     xv_set(log_frame, FRAME_LABEL, "Pips Log Window", NULL);
 
@@ -86,16 +116,19 @@ void create_frames()
 			   XV_WIDTH, HELP_WIDTH, 
 			   XV_HEIGHT, HELP_HEIGHT, 
 			   NULL);
+    install_event_procedure(help_frame);
 
     mchoose_frame = xv_create(main_frame, FRAME,
 			      XV_SHOW, FALSE,
 			      FRAME_DONE_PROC, hide_window,
 			      NULL);
+    install_event_procedure(mchoose_frame);
 
     schoose_frame = xv_create(main_frame, FRAME,
 			      XV_SHOW, FALSE,
 			      FRAME_DONE_PROC, hide_window,
 			      NULL);
+    install_event_procedure(schoose_frame);
 
     query_frame = xv_create(main_frame, FRAME,
 			    XV_SHOW, FALSE,
@@ -103,6 +136,7 @@ void create_frames()
 			    XV_WIDTH, QUERY_WIDTH, 
 			    XV_HEIGHT, QUERY_HEIGHT, 
 			    NULL);
+    install_event_procedure(query_frame);
 
     properties_frame = xv_create(main_frame, FRAME,
 				FRAME_LABEL, "Properties panel",
@@ -110,6 +144,7 @@ void create_frames()
 			      XV_WIDTH, display_width - EDIT_WIDTH -2*X_WM_DECOR_SIZE, 
 			      FRAME_DONE_PROC, hide_window,
 			      NULL);
+    install_event_procedure(properties_frame);
 }
 
 void place_frames()
