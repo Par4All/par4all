@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/04 18:27:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/05 21:18:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/02/04 18:27:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/02/05 21:18:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -231,28 +231,37 @@ int n;
     return( sentence_goto_label(module, label, margin, tlabel, n)) ;
 }
 
-sentence sentence_goto_label(module, label, margin, tlabel, n)
+sentence 
+sentence_goto_label(module, label, margin, tlabel, n)
 entity module;
 string label;
 int margin;
 string tlabel;
 int n;
 {
-    cons *pc = NIL;
+    list pc = words_goto_label(tlabel);
 
-    if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
-      pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
-    }
-    else {
-	pc = CHAIN_SWORD(pc, "GOTO ");
-	pc = CHAIN_SWORD(pc, tlabel);
-    }
 
     return(make_sentence(is_sentence_unformatted, 
 			 make_unformatted(label?strdup(label):NULL, n, margin, pc)));
 }
 
-sentence sentence_basic_declaration(e)
+list 
+words_goto_label(string tlabel)
+{
+    cons *pc = NIL;
+    if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
+	pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
+    }
+    else {
+	pc = CHAIN_SWORD(pc, "GOTO ");
+	pc = CHAIN_SWORD(pc, tlabel);
+    }
+    return pc;
+}
+
+sentence 
+sentence_basic_declaration(e)
 entity e;
 {
     list decl = NIL;
@@ -268,7 +277,8 @@ entity e;
 			 make_unformatted(NULL, 0, 0, decl)));
 }
 
-sentence sentence_external(f)
+sentence 
+sentence_external(f)
 entity f;
 {
     list pc = NIL;
@@ -280,7 +290,8 @@ entity f;
 			 make_unformatted(NULL, 0, 0, pc)));
 }
 
-sentence sentence_symbolic(f)
+sentence 
+sentence_symbolic(f)
 entity f;
 {
     cons *pc = NIL;
@@ -1128,6 +1139,16 @@ int n;
        !statement_continue_p(tb)) {
 	r = text_logical_if(module, label, margin, obj, n);
     }
+    else if(statement_test_p(fb) &&
+       entity_empty_label_p(statement_label(fb)) &&
+	    empty_comments_p(statement_comments(fb))) {
+
+	r = text_block_ifthen(module, label, margin, obj, n);
+	MERGE_TEXTS(r, text_block_elseif(module, label, margin, statement_test(fb), n));
+	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
+
+	/* r = text_block_if(module, label, margin, obj, n); */
+    }
     else {
 	r = text_block_if(module, label, margin, obj, n);
     }
@@ -1187,7 +1208,7 @@ int n;
 
     test_false_obj = test_false(obj);
     if(statement_undefined_p(test_false_obj)){
-      pips_error("text_test","undefined statement\n");
+	pips_error("text_test","undefined statement\n");
     }
     if (!statement_with_empty_comment_p(test_false_obj)
 	||
@@ -1202,11 +1223,101 @@ int n;
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
 	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
 				      test_false_obj));
-      }
+    }
 
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
 
     return(r);
+}
+
+text 
+text_block_ifthen(module, label, margin, obj,n)
+entity module;
+string label ;
+int margin;
+test obj;
+int n;
+{
+    text r = make_text(NIL);
+    cons *pc = NIL;
+
+    pc = CHAIN_SWORD(pc, "IF (");
+    pc = gen_nconc(pc, words_expression(test_condition(obj)));
+    pc = CHAIN_SWORD(pc, ") THEN");
+
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, 
+				       make_unformatted(strdup(label), n, 
+							margin, pc)));
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
+				  test_true(obj)));
+
+    return(r);
+}
+
+text 
+text_block_elseif(module, label, margin, obj,n)
+entity module;
+string label ;
+int margin;
+test obj;
+int n;
+{
+    text r = make_text(NIL);
+    cons *pc = NIL;
+    statement tb = test_true(obj);
+    statement fb = test_false(obj);
+
+    /*
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
+				  test_true(obj)));
+				  */
+
+    pc = CHAIN_SWORD(pc, "ELSEIF (");
+    pc = gen_nconc(pc, words_expression(test_condition(obj)));
+    pc = CHAIN_SWORD(pc, ") THEN");
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, 
+				       make_unformatted(strdup(label), n, 
+							margin, pc)));
+
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, tb));
+
+    if(statement_test_p(fb)) {
+	MERGE_TEXTS(r, text_block_elseif(module, label, margin, statement_test(fb), n));
+    }
+    else {
+	MERGE_TEXTS(r, text_block_else(module, label, margin, fb, n));
+    }
+
+    return(r);
+}
+
+text 
+text_block_else(module, label, margin, stmt, n)
+entity module;
+string label ;
+int margin;
+statement stmt;
+int n;
+{    
+    text r = make_text(NIL);
+
+    if (!statement_with_empty_comment_p(stmt)
+	||
+	(!empty_statement_p(stmt)
+	 && !statement_continue_p(stmt))
+	||
+	(empty_statement_p(stmt)
+	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
+	||
+	(statement_continue_p(stmt)
+	 && (get_bool_property("PRETTYPRINT_ALL_LABELS")))) {
+	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt));
+    }
+
+    return r;
 }
 
 /* hook for adding something in the head. used by hpfc.
@@ -1967,21 +2078,20 @@ int precedence;
 {
     cons *pc = NIL;
     cons *pcio = call_arguments(obj);
-    cons *pio_write;
-    boolean good_fmt, good_unit, iolist_reached;
-
+    cons *pio_write = pcio;
+    boolean good_fmt = FALSE;
+    bool good_unit = FALSE;
+    bool iolist_reached = FALSE;
+    bool complex_io_control_list = FALSE;
+    list fmt_words = NIL;
+    list unit_words = NIL;
+    
     /* AP: I try to convert WRITE to PRINT. Three conditions must be
        fullfilled. The first, and obvious, one, is that the function has
        to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
        "UNIT" has to be equal either to "*" or "6".  In such case,
        "WRITE(*,*)" is replaced by "PRINT *,". */
     /* GO: Not anymore for UNIT=6 leave it ... */
-    good_fmt = FALSE;
-    good_unit = FALSE;
-    pio_write = pcio;
-
-    if (strcmp(entity_local_name(call_function(obj)), "WRITE") == 0) {
-      iolist_reached = FALSE;
       while ((pio_write != NIL) && (!iolist_reached)) {
 	syntax s = expression_syntax(EXPRESSION(CAR(pio_write)));
 	call c;
@@ -1993,28 +2103,51 @@ int precedence;
 
 	c = syntax_call(s);
 
-	if ((strcmp(entity_local_name(call_function(c)), "FMT=") == 0) &&
-	    (strcmp(words_to_string(words_expression(arg)), "*") == 0))
+	if (strcmp(entity_local_name(call_function(c)), "FMT=") == 0) {
+	   if(strcmp(words_to_string(fmt_words = words_expression(arg)), "*") == 0) {
 	    good_fmt= TRUE;
-
-	if ((strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) &&
-	    (strcmp(words_to_string(words_expression(arg)), "*") == 0))
-	    good_unit = TRUE;
-
-	if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
+	   }
+	   else {
+	    good_fmt= FALSE;
+	   }
+	   pio_write = CDR(CDR(pio_write));
+	}
+	else if (strcmp(entity_local_name(call_function(c)), "UNIT=") == 0) {
+	    if(strcmp(words_to_string(unit_words = words_expression(arg)), "*") == 0) {
+		good_unit = TRUE;
+	    }
+	    else {
+		good_unit = FALSE;
+	    }
+	    pio_write = CDR(CDR(pio_write));
+	}
+	else if (strcmp(entity_local_name(call_function(c)), "IOLIST=") == 0) {
 	  iolist_reached = TRUE;
 	  pio_write = CDR(pio_write);
 	}
-	else
+	else {
+	    complex_io_control_list = TRUE;
 	  pio_write = CDR(CDR(pio_write));
+	}
       }
-    }
 
-    if (good_fmt && good_unit) {
+    if (good_fmt && good_unit && strcmp(entity_local_name(call_function(obj)), "WRITE") == 0) {
       /* AP: Allright for the substitution of WRITE by PRINT. For the
          IOLIST prettyprint, we skip everything but elements following the
          first "IOLIST=" keyword. */
-      pc = CHAIN_SWORD(pc, "PRINT *,");
+      pc = CHAIN_SWORD(pc, "PRINT *, ");
+      pcio = pio_write;
+    }
+    else if(!complex_io_control_list) {
+	pips_assert("A unit must be defined", !ENDP(unit_words));
+      pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
+      pc = CHAIN_SWORD(pc, " (");
+      pc = gen_nconc(pc, unit_words);
+      if(!ENDP(fmt_words)) {
+	  pc = CHAIN_SWORD(pc, ", ");
+	  pc = gen_nconc(pc, fmt_words);
+      }
+      pc = CHAIN_SWORD(pc, ") ");
       pcio = pio_write;
     }
     else {
@@ -2024,6 +2157,10 @@ int precedence;
          see LZ */
       pc = gen_nconc(pc, words_io_control(&pcio, precedence));
       pc = CHAIN_SWORD(pc, ") ");
+      /* 
+	free_words(unit_words);
+	free_words(fmt_words);
+      */
     }
 
     /* because the "IOLIST=" keyword is embedded in the list
@@ -2036,7 +2173,7 @@ int precedence;
 	    POP(pp);
 	    if(pp==NIL) 
 		pips_error("words_io_inst","missing element in IO list");
-	    pc = CHAIN_SWORD(pc, ",");
+	    pc = CHAIN_SWORD(pc, ", ");
 	}
     }, pcio);
     return(pc) ;
