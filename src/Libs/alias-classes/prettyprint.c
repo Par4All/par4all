@@ -36,6 +36,7 @@ static text alias_pairs_text(string module_name,string resource_name)
     list l_pairs;
     entity module;
     text txt = make_text(NIL);
+    text txt_reg = make_text(NIL);
 
     pips_debug(8,"module %s resource %s\n",module_name,resource_name);
 
@@ -67,13 +68,25 @@ static text alias_pairs_text(string module_name,string resource_name)
 		MAP(EFFECT, reg,
 		    {
 			pips_debug(9,"start 2nd map\n");
+
+			txt_reg = text_region(reg);
+
+			pips_debug(9,"done text_region\n");
+
 			MERGE_TEXTS(txt, text_region(reg));
+
+			pips_debug(9,"done MERGE_TEXTS\n");
 		    },
 			pair);
+
+		pips_debug(9,"done 2nd map\n");
+
 		ADD_SENTENCE_TO_TEXT(
 		    txt,
 		    make_sentence(is_sentence_formatted,strdup("\n"))
 		    );
+
+		pips_debug(9,"done ADD_SENTENCE_TO_TEXT\n");
 	    }
 	},
 	    l_pairs);
