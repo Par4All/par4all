@@ -111,7 +111,7 @@ static bool statement_flt(statement s)
 {
     bool res = TRUE;
     text t = make_text (NIL);
-
+    
     pips_debug (5,"going down\n");
 
     store_statement_icfg(s, t);
@@ -121,10 +121,9 @@ static bool statement_flt(statement s)
 
 static void statement_rwt(statement s)
 {
-    text r = make_text(NIL);
     pips_debug (5,"going up\n");
     ifdebug(9) print_text(stderr,(text) load_statement_icfg (s));
-
+   
     current_stmt_rewrite(s);
     return;
 }
@@ -135,69 +134,59 @@ static void call_flt(call c)
 {
     entity e_callee = call_function(c);
     string callee_name = module_local_name(e_callee);
-
+    
+    /* current_stmt_head() */
     pips_debug (5,"called entity is %s\n", entity_name(e_callee));    
 
-    return; 
-}
+    /* If this is a "real function" (defined in the code elsewhere) */
+    if (value_code_p(entity_initial(e_callee))) {
+	text r = (text) load_statement_icfg (current_stmt_head());
 
-static void call_rwt(call c)
-{
-  entity e_callee = call_function(c);
-  string callee_name = module_local_name(e_callee);
-  text r;
+	/* hum... pushes the current entity... */
+	entity e_caller = get_current_module_entity();
+	reset_current_module_entity();
 
-  /* hum... pushes the current entity... */
-  entity e_caller = get_current_module_entity();
-
-  /* If this is a "real function" (defined in the code elsewhere) */  
-  if (value_code_p(entity_initial(e_callee)))
-    r = (text) load_statement_icfg(current_stmt_head);
-
-  reset_current_module_entity();
-
-
-  switch (get_int_property (ICFG_DECOR)) {
-  case ICFG_DECOR_NONE:
-    break;
-  case ICFG_DECOR_COMPLEXITIES:
-    MERGE_TEXTS(r,get_text_complexities(callee_name));
-    break;
-  case ICFG_DECOR_TRANSFORMERS:
-    MERGE_TEXTS(r,get_text_transformers(callee_name));
-    break;
-  case ICFG_DECOR_PRECONDITIONS:
-    MERGE_TEXTS(r, call_site_to_module_precondition_text
-		(e_caller, e_callee, current_stmt_head(), c));
-    break;
-  case ICFG_DECOR_PROPER_EFFECTS:
-    /*MERGE_TEXTS(r, get_text_proper_effects(callee_name));*/
-    MERGE_TEXTS(r, get_text_proper_effects_flt(callee_name));
-    break;
-  case ICFG_DECOR_CUMULATED_EFFECTS:
-    MERGE_TEXTS(r,get_text_cumulated_effects(callee_name));
-    break;
-  case ICFG_DECOR_REGIONS:
-    MERGE_TEXTS(r,get_text_regions(callee_name));
-    break;
-  case ICFG_DECOR_IN_REGIONS:
-    MERGE_TEXTS(r,get_text_in_regions(callee_name));
-    break;
-  case ICFG_DECOR_OUT_REGIONS:
-    MERGE_TEXTS(r,get_text_out_regions(callee_name));
-    break;
+	switch (get_int_property (ICFG_DECOR)) {
+	case ICFG_DECOR_NONE:
+	    break;
+	case ICFG_DECOR_COMPLEXITIES:
+	    MERGE_TEXTS(r,get_text_complexities(callee_name));
+	    break;
+	case ICFG_DECOR_TRANSFORMERS:
+	    MERGE_TEXTS(r,get_text_transformers(callee_name));
+	    break;
+	case ICFG_DECOR_PRECONDITIONS:
+	    MERGE_TEXTS(r, call_site_to_module_precondition_text
+			(e_caller, e_callee, current_stmt_head(), c));
+	    break;
+	case ICFG_DECOR_PROPER_EFFECTS:
+	    MERGE_TEXTS(r,get_text_proper_effects_flt(callee_name));
+	    break;
+	case ICFG_DECOR_CUMULATED_EFFECTS:
+	    MERGE_TEXTS(r,get_text_cumulated_effects(callee_name));
+	    break;
+	case ICFG_DECOR_REGIONS:
+	    MERGE_TEXTS(r,get_text_regions(callee_name));
+	    break;
+	case ICFG_DECOR_IN_REGIONS:
+	    MERGE_TEXTS(r,get_text_in_regions(callee_name));
+	    break;
+	case ICFG_DECOR_OUT_REGIONS:
+	    MERGE_TEXTS(r,get_text_out_regions(callee_name));
+	    break;
 	default:
-	  pips_error("module_to_icfg",
-		     "unknown ICFG decoration for module %s\n",
-		     callee_name);
-  }
-  /* retrieve the caller entity */
-  set_current_module_entity(e_caller);
-  /* append the callee' icfg */
-  append_icfg_file (r, callee_name);
-  /* store it to the statement mapping */
-  update_statement_icfg (current_stmt_head(), r);
-  return;
+	    pips_error("module_to_icfg",
+		       "unknown ICFG decoration for module %s\n",
+		       callee_name);
+	}
+	/* retrieve the caller entity */
+	set_current_module_entity(e_caller);
+	/* append the callee' icfg */
+	append_icfg_file (r, callee_name);
+	/* store it to the statement mapping */
+	update_statement_icfg (current_stmt_head(), r);
+    }
+    return;
 }
 
 /* LOOP
