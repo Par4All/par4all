@@ -3,7 +3,6 @@
  */
 
 #include <stdio.h>
-#include <setjmp.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -28,8 +27,6 @@
 #include "pipsmake.h"
 
 #include "top-level.h"
-
-jmp_buf pips_top_level;
 
 extern void (*pips_error_handler)();
 extern void (*pips_log_handler)();
@@ -154,6 +151,7 @@ pips_main(int argc, char ** argv)
 {
     bool success = TRUE;
     pips_checks();
+
     initialize_newgen();
     initialize_sc((char*(*)(Variable)) entity_local_name); 
 
@@ -163,16 +161,15 @@ pips_main(int argc, char ** argv)
     initialize_signal_catcher();
     pips_log_handler = pips_user_log;
 
-    if (setjmp(pips_top_level)) {
+    CATCH(any_exception_error)
+    {
 	/* no need to pop_pips_context() at top-level */
 	/* FI: are you sure make_close_program() cannot call user_error() ? */
 	close_workspace(TRUE);
 	success = FALSE;
     }
-    else 
+    TRY
     {
-	push_pips_context(&pips_top_level);
-
 	/* Initialize workspace
 	 */
 	if (gen_array_nitems(source_files)>0) {
@@ -242,6 +239,8 @@ pips_main(int argc, char ** argv)
 	/* pop_performance_spy(stderr, "pips"); */
 	/* check debug level if no exception occured */
 	debug_off();
+
+	UNCATCH(any_exception_error);
     }
 
     return !success;
