@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1998/10/24 14:45:27 $, 
+ * $Date: 2000/07/07 11:09:17 $, 
  */
 
 /* test du simplex : 
@@ -458,12 +458,12 @@ static int hash(Variable s)
 /* fonction de calcul de la faisabilite' d'un systeme
  * d'equations et d'inequations
  * Auteur : Robert Mahl, Date : janvier 1994
- */
-/* Retourne : 1 si le systeme est soluble (faisable)
- *  en rationnels,
- * 0 s'il n'y a pas de solution.
- */
-/* overflow control :
+ *
+ * Retourne : 
+ *   1 si le systeme est soluble (faisable) en rationnels,
+ *   0 s'il n'y a pas de solution.
+ *
+ * overflow control :
  *  ofl_ctrl == NO_OFL_CTRL  => no overflow control
  *  ofl_ctrl == FWD_OFL_CTRL  
  *           => overflow control is made THROW(overflow_error,5)
@@ -483,7 +483,9 @@ sc_simplexe_feasibility_ofl_ctrl(
      *  pour reinitialiser a 0
      *  en sortie de la procedure.
      */
-    static hashtable_t hashtable[MAX_VAR] ;
+    static hashtable_t hashtable[MAX_VAR];
+    Pbase saved_base;
+    int saved_dimension;
     EXCEPTION simplex_arithmetic_error;
     tableau *eg = NULL; /* tableau des egalite's  */
     tableau *t = NULL; /* tableau des inegalite's  */
@@ -497,11 +499,20 @@ sc_simplexe_feasibility_ofl_ctrl(
     frac objectif[2] ; /* objectif de max pour simplex : 
 			  somme des (b2,c2) termes constants "inferieurs" */
     frac rapport1, rapport2, min1, min2, pivot, cc ;
+
+    /* recompute the base so as to only allocate necessary columns
+     * some bases are quite large although all variables do not appear in
+     * actual contraints. The base is used to store all variants in
+     * preconditions for instance.
+     */
+    saved_base = sc_base(sc);
+    saved_dimension = sc_dimension(sc);
+    sc_base(sc) = BASE_NULLE;
+    sc_creer_base(sc);
     
     /* Allocation a priori du tableau des egalites.
      * "eg" : tableau a "nb_eq" lignes et "dimension"+2 colonnes.
      */
-    
     if (ofl_ctrl!=FWD_OFL_CTRL)
 	fprintf(stderr, "[sc_simplexe_feasibility_ofl_ctrl] "
 		"should not (yet) be called with control %d...\n", ofl_ctrl);
@@ -531,33 +542,37 @@ sc_simplexe_feasibility_ofl_ctrl(
     
     CATCH(simplex_arithmetic_error)
     {
-	ifscdebug(2) {
-	    fprintf(stderr,
-		    "[sc_simplexe_feasibility_ofl_ctrl] arithmetic error\n");
-	}
+      ifscdebug(2) {
+       fprintf(stderr,"[sc_simplexe_feasibility_ofl_ctrl] arithmetic error\n");
+      }
 
-	DEBUG(fprintf(stdout, "arithmetic error in simplex\n"));
-
-	for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
-	    hashtable[i].nom = 0 ;
-	if(NB_EQ > 0) {
-	    for(i=0 ; i<(3+DIMENSION) ; i++)
-		free(eg[i].colonne);
-	    free(eg);
-	}
-
-	/* I have noticed that when pips core dumps here, it is because
-	 * a CATCH(overflow_error) has been forgotten. bc.
-	 */
-	for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)  
-	    free(t[i].colonne); 
-	free(t); 
-	free(nlle_colonne); 
-
-	if (ofl_ctrl == FWD_OFL_CTRL) 
-	    THROW(overflow_error);
-
-	return TRUE; /* default is feasible */
+      DEBUG(fprintf(stdout, "arithmetic error in simplex\n"));
+      
+      for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
+	hashtable[i].nom = 0 ;
+      if(NB_EQ > 0) {
+	for(i=0 ; i<(3+DIMENSION) ; i++)
+	  free(eg[i].colonne);
+	free(eg);
+      }
+      
+      /* I have noticed that when pips core dumps here, it is because
+       * a CATCH(overflow_error) has been forgotten. bc.
+       */
+      for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)  
+	free(t[i].colonne); 
+      free(t); 
+      free(nlle_colonne); 
+      
+      if (ofl_ctrl == FWD_OFL_CTRL) 
+	THROW(overflow_error);
+      
+      /* restore initial base */
+      base_rm(sc_base(sc));
+      sc_base(sc) = saved_base;
+      sc_dimension(sc) = saved_dimension;
+      
+      return TRUE; /* default is feasible */
     }
 
     if(NB_EQ != 0)
@@ -1270,21 +1285,27 @@ sc_simplexe_feasibility_ofl_ctrl(
     DEBUG1(dump_tableau("fin simplexe", t, compteur));
     DEBUG(fprintf(stderr, "soluble = %d\n", soluble));
 
-	for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
-	    hashtable[i].nom = 0 ;
+    for(i=premier_hash ; i!=(int)PTR_NIL; i=hashtable[i].succ)
+      hashtable[i].nom = 0 ;
+    
+    if (NB_EQ > 0) {
+      for(i=0 ; i<(3+DIMENSION) ; i++)
+	free(eg[i].colonne);
+      free(eg);
+    }
+    
+    for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++) 
+      free(t[i].colonne);
+    free(t);
+    free(nlle_colonne);
+    UNCATCH(simplex_arithmetic_error);
+    
+    /* restore initial base */
+    vect_rm(sc_base(sc));
+    sc_base(sc) = saved_base;
+    sc_dimension(sc) = saved_dimension;
 
-	if (NB_EQ > 0) {
-	    for(i=0 ; i<(3+DIMENSION) ; i++)
-		free(eg[i].colonne);
-	    free(eg);
-	}
-	
-	for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++) 
-	    free(t[i].colonne);
-	free(t);
-	free(nlle_colonne);
-	UNCATCH(simplex_arithmetic_error);
-	return (soluble) ;
+    return soluble;
 }     /* main */
 
 /* (that is all, folks!:-)
