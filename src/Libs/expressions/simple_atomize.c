@@ -137,7 +137,8 @@ statement s;
 						       statement_number(cs),
 						       statement_ordering(cs),
 						       statement_comments(cs),
-						       statement_instruction(cs)),
+						       statement_instruction(cs),
+						       NIL,NULL),
 					NIL)));
 	  statement_label(cs) = entity_empty_label();
 	  statement_number(cs) = STATEMENT_NUMBER_UNDEFINED;
