@@ -4,6 +4,10 @@
 # updates to GNU for LINUX.
 
 CFLAGS	+=	-m486
+CPPFLAGS += \
+	-D_POSIX_C_SOURCE=2 \
+	-D_BSD_SOURCE \
+	-D_SVID_SOURCE
 
 AR	=	ar
 RANLIB	=	ranlib
