@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/17 08:42:24 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/17 08:49:36 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -245,6 +245,7 @@ MAKEFILE=	${MAKEFILE}
 SHELL	=	/bin/sh
 COPY	=	cp
 MOVE	=	mv -f
+GMKNODIR=	--no-print-directory
 #
 # default targets...
 all: generate_makefile_if_necessary_and_possible
@@ -534,7 +535,7 @@ quick-install: .quick-install
 
 generate_makefile_if_necessary_and_possible:
 	-@[ -x $(PIPS_UTILDIR)/pips-makemake ] && \\
-		$(MAKE) --no-print-directory  .makefile 
+		$(MAKE) $(GMKNODIR)  .makefile 
 
 count:
 	@wc -l $(SOURCES)
@@ -581,7 +582,7 @@ check_sccs:
 # install installs sources, so depends on sources. FC
 # to insure the library is compiled before hand, a make is added.
 .install: $(SOURCES) check_install check_sccs
-	$(MAKE) --no-print-directory all $(TARGET_DIR) 
+	$(MAKE) $(GMKNODIR) all $(TARGET_DIR) 
 	@echo ""; echo; echo -n "Description of changes: " ; \\
 	read comments ; \\
 	install_pips_sources \\
@@ -642,14 +643,15 @@ build-header-file:
 	echo "#ifndef ${dir_simple_name}_header_included";\\
 	echo "#define ${dir_simple_name}_header_included";\\
 	cat $(TARGET)-local.h;\\
-	$(PROTOIZE) $(INC_CFILES);\\
+	$(PROTOIZE) $(INC_CFILES) | \\
+		sed 's/struct _iobuf/FILE/g;s/__const/const/g;' ;\\
 	echo "#endif /* ${dir_simple_name}_header_included */";\\
 	} > $(INC_TARGET).tmp
 	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
 
 # .header carrie all dependencies for INC_TARGET:
 .header: $(TARGET)-local.h $(DERIVED_HEADERS) $(INC_CFILES) 
-	$(MAKE) --no-print-directory $(HEADER_ARCH) build-header-file
+	$(MAKE) $(GMKNODIR) $(HEADER_ARCH) build-header-file
 	touch .header
 
 # checks for the header file, and build if necessary...
@@ -662,7 +664,7 @@ build-header-file:
 header: .header $(INC_TARGET)
 
 $(INC_TARGET): $(TARGET)-local.h 
-	$(MAKE) --no-print-directory $(HEADER_ARCH) build-header-file
+	$(MAKE) $(GMKNODIR) $(HEADER_ARCH) build-header-file
 
 %
 
