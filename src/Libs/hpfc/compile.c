@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/12/27 19:46:39 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/12/28 09:17:01 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -643,7 +643,9 @@ hpfcompile_module (string module_name)
     
     host_stat = statement_undefined, node_stat = statement_undefined;
 
-    hpfcompiler(module_stat, &host_stat, &node_stat);
+    /*   Actual compilation
+     */
+    hpf_compiler(module_stat, &host_stat, &node_stat);
     
     if (entity_main_module_p(module))
 	add_pvm_init_and_end(&host_stat, &node_stat);
