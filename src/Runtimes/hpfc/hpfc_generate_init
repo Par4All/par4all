@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_generate_init,v $ ($Date: 1994/08/30 16:47:06 $, )
+# $RCSfile: hpfc_generate_init,v $ ($Date: 1994/09/05 15:56:52 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -10,20 +10,33 @@
 
 script=`basename $0`
 
-[ $# -eq 1 ] ||
+usage()
 {
-  echo "Usage: $script dirname" 1>&2
+  echo "Usage: $script [ -n name ] dirname" 1>&2
   exit 1
 }
+
+while getopts n: OPT
+do
+  case $OPT in
+    n) NAME=$OPTARG ;;
+    *) usage ;;
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+[ "$#" -eq 1 ] ||
 
 dirname=$1
 init=$dirname/param_init.f
 
+NAME=`echo ${NAME:-`basename $dirname .database`} | tr 'A-Z' 'a-z'`
+
 {
   echo "      SUBROUTINE HPFC_INIT_COMMON_PARAM()"
-#  echo "      include 'real_parameters.h'"
   echo "      include 'hpfc_parameters.h'"
-  echo "      include 'hpfc_param.h'"
+  echo "      include 'hpfc_commons.h'"
   for file in $dirname/*_parameters.h
   do
     echo "      include '`basename $file`'"
@@ -32,6 +45,8 @@ init=$dirname/param_init.f
   do
     echo "      include '`basename $file`'"
   done
+  echo "      NODE_PROGRAM_NAME='$NAME.node'"
+  echo "      NODE_ARCHITECTURE='$PVM_ARCH'"
   echo "      end"
 } > $init
 
