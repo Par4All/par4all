@@ -3,6 +3,9 @@
   * $Id$
   *
   * $Log: loop.c,v $
+  * Revision 1.6  2003/07/12 16:46:07  irigoin
+  * Temporary version, with unsatisfactory implementation of loop_initialization_to_transformer()
+  *
   * Revision 1.5  2002/03/21 09:36:32  irigoin
   * debug() replaced by pips_debug() and similar cosmetic modifications
   *
@@ -744,23 +747,49 @@ transformer loop_bound_evaluation_to_transformer(loop l, transformer pre)
   return r;
 }
 
+/* Note: It used to be implemented by computing the effect list of the
+   lower bound expression and and new allocated effect for the loop index
+   definition. It turns out to be very heavy, because cells must be of
+   kind preference to be usable by several functions because macro
+   effect_reference() expects so without testing it. */
 transformer loop_initialization_to_transformer(loop l, transformer pre)
 {
-  effect init_e = make_effect(make_cell(is_cell_reference,
-					make_reference(loop_index(l), NIL)),
+  effect init_e = make_effect(make_cell(is_cell_preference,
+					make_preference(make_reference(loop_index(l), NIL))),
 			      make_action(is_action_write, UU),
 			      make_approximation(is_approximation_must, UU),
 			      make_descriptor(is_descriptor_none,UU));
-  list e = CONS(EFFECT, init_e,
-		expression_to_proper_effects(range_lower(loop_range(l))));
+  list l_init_e = CONS(EFFECT, init_e, NIL);
+  list l_expr_e = expression_to_proper_effects(range_lower(loop_range(l)));
+  list el = list_undefined;
+
   transformer r_pre = transformer_safe_range(pre);
-  transformer t_init =
+  transformer t_init = transformer_undefined;
+
+  ifdebug(9) {
+    print_effects(l_init_e);
+    print_effects(l_expr_e);
+  }
+
+  el = gen_nconc(l_init_e, l_expr_e);
+
+  ifdebug(9) {
+    print_effects(el);
+  }
+
+  t_init =
     any_scalar_assign_to_transformer(loop_index(l),
 				     range_lower(loop_range(l)),
-				     e, /* over approximation of effects */
+				     el, /* over-approximation of effects */
 				     r_pre);
 
-  gen_free_list(e);
+  ifdebug(9) {
+    print_effects(el);
+  }
+
+  gen_free_list(el);
+  /* free_effects() is not enough, because it is a persistant reference */
+  free_reference();
   free_effect(init_e);
   free_transformer(r_pre);
 
@@ -1442,7 +1471,7 @@ transformer whileloop_to_postcondition(
   statement s = whileloop_body(l);
   expression c = whileloop_condition(l);
 
-  debug(8,"whileloop_to_postcondition","begin\n");
+  pips_debug(8, "begin\n");
 
   if(pips_flag_p(SEMANTICS_FIX_POINT) && pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
     pips_internal_error("Halbwachs not implemented\n");
@@ -1496,7 +1525,7 @@ transformer whileloop_to_postcondition(
       debug(8, "whileloop_to_postcondition", "The loop may be executed or not\n");
 
       /* propagate preconditions in the loop body */
-      precondition_add_condition_information(preb, c, preb, TRUE);
+      preb = precondition_add_condition_information(preb, c, preb, TRUE);
       (void) statement_to_postcondition(preb, s);
 
       /* The loop is executed at least once: let's execute the last iteration */
@@ -1517,7 +1546,7 @@ transformer whileloop_to_postcondition(
 		   "resultat post =");
     (void) print_transformer(post);
   }
-  debug(8,"whileloop_to_postcondition","end\n");
+  pips_debug(8, "end\n");
   return post;
 }
 
