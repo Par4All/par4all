@@ -26,7 +26,6 @@ extern int fprintf();
 #include "ri-util.h"
 #include "misc.h"
 #include "effects.h"
-#include "sdfi.h"
 #include "hpfc.h"
 #include "defines-local.h"
 #include "access_description.h"
