@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/03/19 14:36:51 $, )
+ * ($Date: 1996/03/20 13:19:24 $, )
  */
 
 #include "defines-local.h"
@@ -14,6 +14,13 @@
 #include "resources.h"
 #include "bootstrap.h"
 #include "control.h"
+
+/* several phases are used to analyze the directives.
+ * 1: static directives
+ * 2: special management of prescriptive mappings
+ * 3: dynamic mappings
+ */
+static int analysis_phase = 0;
 
 /***************************************************************** UTILITIES */
 
@@ -378,8 +385,7 @@ static tag distribution_format(expression e,
     function = call_function(c);
     *pl = call_arguments(c);
 
-    pips_assert("valid distribution format", 
-		   hpf_directive_entity_p(function));
+    pips_assert("valid distribution format", hpf_directive_entity_p(function));
 
     name = entity_local_name(function);
     
@@ -533,7 +539,6 @@ handle_distribute_and_redistribute_directive(
 {
     list /* of expression */ last = gen_last(args);
     reference proc;
-    bool descriptive;
 
     if (dynamic) store_renamings(current_stmt_head(), NIL);
 
@@ -755,6 +760,16 @@ HANDLER_PROTOTYPE(set)
     add_statement_to_clean(current_stmt_head());
 }
 
+HANDLER_PROTOTYPE(prescriptive)
+{
+    pips_debug(4, "in\n");
+}
+
+HANDLER_PROTOTYPE(nothing)
+{
+    pips_debug(4, "skipping entity %s\n", entity_name(f));
+}
+
 /******************************************************** DIRECTIVE HANDLING */
 
 /* finds the handler for a given entity.
@@ -766,43 +781,49 @@ HANDLER_PROTOTYPE(set)
 struct DirectiveHandler 
 {
   string name;                   /* all names must start with the HPF_PREFIX */
+  int phase;                     /* which pass should consider the directive */
   void (*handler)(entity, list); /* handler for directive "name" */
 };
 
 static struct DirectiveHandler handlers[] =
 { 
-  /* special functions for HPF keywords are not expected at this level
-   */
-  {HPF_PREFIX BLOCK_SUFFIX,		HANDLER(unexpected) },
-  {HPF_PREFIX CYCLIC_SUFFIX,		HANDLER(unexpected) },
-  {HPF_PREFIX STAR_SUFFIX,		HANDLER(unexpected) },
+    /* special functions for HPF keywords are not expected at this level
+     */
+    {HPF_PREFIX BLOCK_SUFFIX,		0,	HANDLER(unexpected), },
+    {HPF_PREFIX CYCLIC_SUFFIX,		0,	HANDLER(unexpected) },
+    {HPF_PREFIX STAR_SUFFIX,		0,	HANDLER(unexpected) },
+    
+    /* FC (== Fabien Coelho:-) directives
+     */
+    {HPF_PREFIX SYNCHRO_SUFFIX,		1,	HANDLER(synchro) },
+    {HPF_PREFIX TIMEON_SUFFIX,		1,	HANDLER(time) },
+    {HPF_PREFIX TIMEOFF_SUFFIX,		1,	HANDLER(time) },
+    {HPF_PREFIX SETBOOL_SUFFIX,		1,	HANDLER(set) },
+    {HPF_PREFIX SETINT_SUFFIX,		1,	HANDLER(set) },
+    {HPF_PREFIX HPFCIO_SUFFIX,		1,	HANDLER(io) },
 
-  /* HPF directives
-   */
-  {HPF_PREFIX ALIGN_SUFFIX,		HANDLER(align) },
-  {HPF_PREFIX REALIGN_SUFFIX,		HANDLER(realign) },
-  {HPF_PREFIX DISTRIBUTE_SUFFIX,	HANDLER(distribute) },
-  {HPF_PREFIX REDISTRIBUTE_SUFFIX,	HANDLER(redistribute) },
-  {HPF_PREFIX INDEPENDENT_SUFFIX,	HANDLER(independent) },
-  {HPF_PREFIX NEW_SUFFIX,		HANDLER(new) },
-  {HPF_PREFIX REDUCTION_SUFFIX,		HANDLER(reduction) }, 
-  {HPF_PREFIX PROCESSORS_SUFFIX,	HANDLER(processors) },
-  {HPF_PREFIX TEMPLATE_SUFFIX,		HANDLER(template) },
-  {HPF_PREFIX DYNAMIC_SUFFIX,		HANDLER(dynamic) },
-  {HPF_PREFIX PURE_SUFFIX,		HANDLER(pure) },
+    /* HPF directives
+     */
+    {HPF_PREFIX ALIGN_SUFFIX,		1,	HANDLER(align) },
+    {HPF_PREFIX DISTRIBUTE_SUFFIX,	1,	HANDLER(distribute) },
+    {HPF_PREFIX PROCESSORS_SUFFIX,	1,	HANDLER(processors) },
+    {HPF_PREFIX TEMPLATE_SUFFIX,	1,	HANDLER(template) },
+    {HPF_PREFIX DYNAMIC_SUFFIX,		1,	HANDLER(dynamic) },
+    {HPF_PREFIX PURE_SUFFIX,		1,	HANDLER(pure) },
 
-  /* FC (Fabien Coelho) directives
-   */
-  {HPF_PREFIX SYNCHRO_SUFFIX,		HANDLER(synchro) },
-  {HPF_PREFIX TIMEON_SUFFIX,		HANDLER(time) },
-  {HPF_PREFIX TIMEOFF_SUFFIX,		HANDLER(time) },
-  {HPF_PREFIX SETBOOL_SUFFIX,		HANDLER(set) },
-  {HPF_PREFIX SETINT_SUFFIX,		HANDLER(set) },
-  {HPF_PREFIX HPFCIO_SUFFIX,		HANDLER(io) },
-
-  /* default issues an error
-   */
-  { (string) NULL,			HANDLER(unexpected) }
+    {HPF_PREFIX REALIGN_SUFFIX,		3,	HANDLER(realign) },
+    {HPF_PREFIX REDISTRIBUTE_SUFFIX,	3,	HANDLER(redistribute) },
+    {HPF_PREFIX INDEPENDENT_SUFFIX,	3,	HANDLER(independent) },
+    {HPF_PREFIX NEW_SUFFIX,		3,	HANDLER(new) },
+    {HPF_PREFIX REDUCTION_SUFFIX,	3,	HANDLER(reduction) }, 
+    
+    /* remappings before/after a call. internal management. 
+     */
+    {HPF_PREFIX "_call",		3,	HANDLER(prescriptive) },
+	 
+    /* default issues an error
+     */
+    {(string) NULL,			0,	HANDLER(unexpected) }
 };
 
 /* returns the handler for directive name.
@@ -812,7 +833,13 @@ static void (*directive_handler(string name))(entity, list)
 {
     struct DirectiveHandler *x=handlers;
     while (x->name && strcmp(name, x->name)) x++;
-    return x->handler;
+    return (!x->phase || x->phase==analysis_phase)? 
+	x->handler: HANDLER(nothing);
+}
+
+static bool directive_managed_now_p(string name)
+{
+    return directive_handler(name)!=HANDLER(nothing);
 }
 
 /* newgen recursion thru the IR.
@@ -821,21 +848,37 @@ static bool directive_filter(call c)
 {
     entity f = call_function(c);
     
+    /* DIRECTIVES 
+     */
     if (hpf_directive_entity_p(f))
     {
+	string name = entity_local_name(f);
 	pips_debug(8, "hpfc entity is %s\n", entity_name(f));
 
 	/* call the appropriate handler for the directive.
 	 */
-	(directive_handler(entity_local_name(f)))(f, call_arguments(c));
+	(directive_handler(name))(f, call_arguments(c));
 	
 	/* the current statement will have to be cleaned.
 	 */
-	if (!keep_directive_in_code_p(entity_local_name(f)))
+	if (directive_managed_now_p(name) && !keep_directive_in_code_p(name))
 	    add_statement_to_clean(current_stmt_head());
     }
     
     return FALSE; /* no instructions within a call! */
+}
+
+static bool prescription_filter(call c)
+{
+    entity f = call_function(c);
+    
+    if (hpfc_call_with_distributed_args_p(c))
+    {
+	pips_debug(5, "distributed call to %s\n", entity_name(f));
+	hpfc_translate_call_with_distributed_args(current_stmt_head(), c);
+    }
+
+    return FALSE;
 }
 
 /* void handle_hpf_directives(s)
@@ -856,15 +899,46 @@ static bool directive_filter(call c)
  *  - the "new" directive is not used to tag private variables.
  *  - a non hpf "pure" directive is parsed.
  */
-void handle_hpf_directives(statement s)
+void handle_hpf_directives(statement s, bool dyn)
 {
+    /* INITIALIZE needed static stuff
+     */
     make_current_stmt_stack();
     init_dynamic_locals();
     init_the_dynamics();
-
     to_be_cleaned = NIL;
+
+    if (!dyn)
+    {
+    /* PHASE 1
+     */
+    pips_debug(1, "starting phase 1\n");
+    analysis_phase = 1;
+    gen_multi_recurse(s,
+        statement_domain,  current_stmt_filter, current_stmt_rewrite, 
+	expression_domain, gen_false,           gen_null,
+	call_domain,       directive_filter,    gen_null,
+		      NULL);
+    }
+    else
+    {
+    /* PHASE 2
+     */
     store_renamings(s, NIL);
 
+    pips_debug(1, "starting phase 2\n");
+    analysis_phase = 2;
+    gen_multi_recurse(s,
+        statement_domain,  current_stmt_filter, current_stmt_rewrite, 
+	call_domain,       prescription_filter, gen_null,
+		      NULL);
+
+
+    /* PHASE 3
+     */
+    pips_debug(1, "starting phase 3\n");
+    analysis_phase = 3;
+    build_full_ctrl_graph(s);
     gen_multi_recurse(s,
         statement_domain,  current_stmt_filter, current_stmt_rewrite, 
 	expression_domain, gen_false,           gen_null,
@@ -875,10 +949,18 @@ void handle_hpf_directives(statement s)
 
     DEBUG_STAT(7, "intermediate code", s);
 
+    /* OPTIMIZATION
+     */
+    pips_debug(1, "starting optimization phase\n");
     simplify_remapping_graph();
+    clean_ctrl_graph();
+
+    }
+
+    /* CLEAN
+     */
     gen_map(clean_statement, to_be_cleaned);
     pips_assert("empty stack", current_stmt_empty_p());
-
     gen_free_list(to_be_cleaned), to_be_cleaned=NIL;
     free_current_stmt_stack();
     close_dynamic_locals();
