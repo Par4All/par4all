@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1996/02/23 13:11:13 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1996/03/11 15:25:31 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -712,11 +712,14 @@ HPFC_IGNORE_FCD_SET FALSE
 Whether to measure and display the compilation times for remappings,
 and whether to generate outward redundant code for remappings. Also
 whether to generate code that keeps track dynamically of live mappings. 
+Also whether not to send data to a twin (a processor that holds the very
+same data for a given array). 
 
 \begin{verbatim}
 HPFC_TIME_REMAPPINGS TRUE
 HPFC_REDUNDANT_SYSTEMS_FOR_REMAPS FALSE
 HPFC_DYNAMIC_LIVENESS TRUE
+HPFC_GUARDED_TWINS TRUE
 \end{verbatim}
 
 Whether to use the local buffer management. 1 MB of buffer is allocated.
