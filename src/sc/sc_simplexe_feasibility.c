@@ -253,7 +253,7 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 	    NB_INEQ++;
     }
     
-    if ((ofl_ctrl == FWD_OFL_CTRL) && setjmp(overflow_error3))
+    if (setjmp(overflow_error3))
     {
 	for(i=premier_hash ; i!=PTR_NIL; i=hashtable[i].succ)
 	    hashtable[i].nom = 0 ;
@@ -270,7 +270,8 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 	    free(t[i].colonne); 
 	free(t); 
 	free(nlle_colonne); 
-	longjmp(overflow_error,5);
+	if (ofl_ctrl == FWD_OFL_CTRL) 
+	    longjmp(overflow_error,5);
     }
     else
     {
@@ -490,6 +491,9 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
     
     for(pc=sc->egalites ; pc!=0; pc=pc->succ, ligne++)
     {
+	/* Added by bc: do nothing for nul equalities */
+	if (pc->vecteur != NULL)
+	{
         valeur = 0 ;
         poidsM=0 ;
         for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ)
@@ -556,10 +560,14 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 	/* Creation d'une colonne cachee */
         CREVARCACHEE ;
 	if(DEBUG)dump_tableau(t, compteur) ;
+        }
     }
     
     for(pc=sc->egalites ; pc!=0; pc=pc->succ, ligne++)
     {
+	/* Added by bc: do nothing for nul equalities */
+	if (pc->vecteur != NULL)
+	{
         valeur = 0 ;
         poidsM=0 ;
         for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ)
@@ -626,6 +634,7 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 	/* Creation d'une colonne cachee */
         CREVARCACHEE ;
 	if(DEBUG)dump_tableau(t, compteur) ;
+        }
     }
     
     /* FIN DE SOLUTION PROVISOIRE */
