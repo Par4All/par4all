@@ -60,7 +60,7 @@ void db_create_pips_database(void)
 }
 
 /* latter */
-static void db_clean_db_resources(db_resources);
+static void db_clean_db_resources();
 
 /* @return whether okay.
  */
@@ -73,7 +73,7 @@ bool db_open_pips_database(FILE * fd)
     set_pips_database(rs); 
 
     /* coredump in copy if done on save in next function ???. */
-    db_clean_db_resources(rs);
+    db_clean_db_resources();
 
     DB_OK;
     return TRUE;
@@ -208,7 +208,7 @@ static db_resource find_or_create_db_resource(string rname, string oname)
 
 /* on checkpoints, status may be "loaded", but is is not true!
  */
-static void db_clean_db_resources(db_resources dbres)
+static void db_clean_db_resources()
 {
   DB_RESOURCES_MAP(os, or,
   {
@@ -234,7 +234,7 @@ static void db_clean_db_resources(db_resources dbres)
     },
 			   or)
       },
-		   dbres);
+		   get_pips_database());
 }
 
 void db_delete_resource(string rname, string oname)
@@ -465,9 +465,15 @@ static void db_save_and_free_resource(
       }
       else
       {
-	db_status_tag(db_resource_db_status(r)) = 
-	  is_db_status_loaded_and_stored;
-	db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
+	/* ??? manual fix for entities... which are not well integrated. */
+	if (!(same_string_p(rname, DBR_ENTITIES) && same_string_p(oname, "")))
+	{
+	  db_status_tag(db_resource_db_status(r)) = 
+	    is_db_status_loaded_and_stored;
+	}
+	/* else is loaded */
+	db_resource_file_time(r) = 
+	  dbll_stat_resource_file(rname, oname, TRUE);
       }
     } 
     else 
