@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: install_pips_sources,v $ ($Date: 1996/08/26 12:09:26 $, )
+# $RCSfile: install_pips_sources,v $ ($Date: 1996/08/26 12:10:23 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -9,8 +9,8 @@ script=`basename $0`
 VERBOSE=':'
 DEBUG=':'
 
-VERBOSE='verbose'
-DEBUG='debug'
+#VERBOSE='verbose'
+#DEBUG='debug'
 
 unset SOURCE_DIR TARGET_DIR COMMENT OPTIONS CLEAN_SCCS FILES
 ONLYDIFF=':'
