@@ -243,7 +243,7 @@ char *mod_name;
 	  "Computing Rice dependence graph for %s\n", mod_name);
 
     ifdebug(1) {
-	mem_spy_init(2, 0.000001, NET_MEASURE, 0);
+	mem_spy_init(0, 5*1024, NET_MEASURE, 0);
     }
 
     debug_off();
@@ -269,56 +269,21 @@ char *mod_name;
     ifdebug(1) {
 	fprintf(stderr, "Space for chains: %d bytes\n", 
 		gen_allocated_memory(chains));
+	fprintf(stderr, "Space for obj_table: %d bytes\n", 
+		current_shared_obj_table_size());
 	mem_spy_begin();
     }
     
     hash_warn_on_redefinition();
 
-/*
-    dg = gen_copy_tree (chains);
-    
-    ifdebug(1) {
-	mem_spy_end("After DG copy 1");
-	fprintf(stderr, "Space for copy 1: %d bytes\n", 
-		gen_allocated_memory(dg)); 
-    	mem_spy_begin();
-    }
-
-    free_graph(dg);
-    dg =  graph_undefined;
-
-    ifdebug(1) {
-	mem_spy_end("After DG free 1");
-	fprintf(stderr, "Space for freed copy 1: %d bytes\n", 
-		gen_allocated_memory(dg));
-	mem_spy_begin();
-    }
-
-    dg = gen_copy_tree (chains);
-
-    ifdebug(1) {
-	mem_spy_end("After DG copy 2");
-	fprintf(stderr, "Space for copy 2: %d bytes\n", 
-		gen_allocated_memory(dg));
-	mem_spy_begin();
-    }
-
-    free_graph(dg);
-    dg =  graph_undefined;
-
-    ifdebug(1) {
-	mem_spy_end("After DG free 2");
-	fprintf(stderr, "Space for freed copy 2: %d bytes\n", 
-		gen_allocated_memory(dg));
-	mem_spy_begin();
-    }
-*/
     dg = gen_copy_tree (chains);
 
     ifdebug(1) {
 	mem_spy_end("After DG copy");
 	fprintf(stderr, "Space for chains's copy: %d bytes\n", 
-		gen_allocated_memory(dg));
+		gen_allocated_memory(dg));	
+	fprintf(stderr, "Space for obj_table: %d bytes\n", 
+		current_shared_obj_table_size());
     }
 
     debug(8,"rice_dependence_graph","original graph\n");
