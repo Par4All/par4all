@@ -65,7 +65,7 @@ init_member( dp )
   static char buffer[ 1024 ] ;
 
   switch( dp->ba.type ) {
-  case BASIS: {
+  case BASIS_DT: {
     struct gen_binding *bp = dp->ba.constructand ;
 
     if( IS_INLINABLE( bp ))
@@ -76,10 +76,10 @@ init_member( dp )
     else sprintf( buffer, ":undefined", bp->name ) ;
     break ;
   }
-  case LIST:
+  case LIST_DT:
     sprintf( buffer, ":list-undefined" ) ;
     break ;
-  case ARRAY: {
+  case ARRAY_DT: {
     struct intlist *ilp ;
 
     sprintf( buffer, "(lisp:make-array '(" ) ;
@@ -91,7 +91,7 @@ init_member( dp )
     strcat( buffer, ") :initial-element '--no-value--)" ) ;
     break ;
   }
-  case SET:
+  case SET_DT:
       sprintf( buffer, "(set:set-make)" ) ;
       break ;
   default:
@@ -121,7 +121,7 @@ gen_external_member( dp, offset )
 union domain *dp ;
 int offset ;
 {
-    if( dp->ba.type == BASIS ) {
+    if( dp->ba.type == BASIS_DT ) {
 	struct gen_binding *bp = dp->ba.constructand ;
 	
 	if( !IS_INLINABLE( bp ) && IS_EXTERNAL( bp )) {
@@ -223,7 +223,7 @@ struct gen_binding *bp ;
 }
 
 /* GEN_OR generates the manipulation function for an OR_OP type BP. Note
-   that for a UNIT_TYPE, no access function is defined since the value is
+   that for a UNIT_TYPE_NAME, no access function is defined since the value is
    meaningless. */
 
 void
@@ -266,7 +266,7 @@ gen_or( bp )
 	       name, name, dp->ba.constructor ) ;
 
 	if( dp->ba.type == BASIS && 
-	   strcmp( dp->ba.constructand->name, UNIT_TYPE ) == 0 ||
+	   strcmp( dp->ba.constructand->name, UNIT_TYPE_NAME ) == 0 ||
 	   gen_external_member( dp, OR_VALUE_INDEX )) 
 		continue ;
 
@@ -338,21 +338,21 @@ gen_domain( bp )
       printf("  `(gen-read ,fd))\n");
   }
   switch( dp->ba.type ) {
-  case CONSTRUCTED:
+  case CONSTRUCTED_DT:
     if( dp->co.op == AND_OP ) gen_and( bp ) ;
     else if( dp->co.op == OR_OP ) gen_or( bp ) ;
     else fatal( "gen_domain: Unknown constructed %s\n", itoa( dp->co.op )) ;
     break ;
-  case LIST:
+  case LIST_DT:
     gen_list( bp ) ;
     break ;
-  case ARRAY:
+  case ARRAY_DT:
     gen_array( bp ) ;
     break ;
- case SET:
+ case SET_DT:
     gen_set( bp ) ;
     break ;
-  case EXTERNAL:
+  case EXTERNAL_DT:
     gen_external( bp ) ;
     break ;
   default:
