@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1995/10/04 10:54:01 $, )
+ * ($Date: 1995/10/05 11:32:31 $, )
  */
 
 #include "defines-local.h"
@@ -54,7 +54,7 @@ only_io_rewrite(
 	is_io = Load(loop_body(instruction_loop(i)));
         break;
     case is_instruction_goto:
-	pips_error("only_io_rewrite", "unexpected goto encountered");
+	pips_internal_error("unexpected goto encountered");
         break;
     case is_instruction_call:
 	/* ??? something else should be done?
@@ -74,7 +74,7 @@ only_io_rewrite(
         break;
     }
     default:
-        pips_error("only_io_rewrite", "unexpected instruction tag\n");
+        pips_internal_error("unexpected instruction tag\n");
         break;
     }
 
@@ -186,7 +186,8 @@ static statement hpfc_hcast()
 
 #define GENERATION(NAME, COLLECT, UPDATE)\
 static statement NAME(array, move) entity array; tag move;\
-{assert(move==is_movement_collect || move==is_movement_update);\
+{pips_assert("valid move", \
+  move==is_movement_collect || move==is_movement_update);\
  return((move==is_movement_collect) ? (COLLECT) : (UPDATE));}
 
 GENERATION(node_pre_io,
@@ -406,7 +407,7 @@ statement *psh, *psn;
 						NIL))),
 		      divide);
 
-    assert(movement_update_p(move));
+    pips_assert("update", movement_update_p(move));
 
     *psh = generate_optional_if(condition,
 				make_block_statement(CONS(STATEMENT, h_pre,
