@@ -306,7 +306,16 @@ void CreateIntrinsics()
 bool bootstrap(string workspace)
 {
     CreateIntrinsics();
+
+    /* Creates the dynamic and static areas for the super global
+     * arrays such as the logical unit array (see below).
+     */
     CreateAreas();
+
+    /*
+     * The current entity is unknown, but for a TOP-LEVEL:TOP-LEVEL
+     * which is used to create the logical unit array for IO effects
+     */
     CreateArrays();
 
     /* DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(workspace), NULL); */
