@@ -142,6 +142,7 @@ extern void gen_recurse GEN_PROTO((chunk *,
 				   bool (*)( chunk * ), 
 				   void (*)( chunk * ))) ;
 
+extern void gen_recurse_stop GEN_PROTO((chunk *));
 extern void gen_multi_recurse GEN_PROTO(()); /* was ... */
 
 /* Since C is not-orthogonal (chunk1 == chunk2 is prohibited), this one is
