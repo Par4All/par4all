@@ -27,7 +27,7 @@
     (READER) pipsdbm_read_statement_function, 	\
     (WRITER) pipsdbm_write_statement_function, 	\
     (FREER) gen_free, 				\
-    (CHECKER) gen_consistent_p
+    (CHECKER) pipsdbm_consistent_statement_function 
 
 #define STATEMENT_MAPPING_METHODS 		\
     (READER)  pipsdbm_read_statement_mapping, 	\
