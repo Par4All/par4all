@@ -2,7 +2,7 @@
 !     Reductions management 
 !
 ! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1996/10/18 22:16:42 $, )
+! ($Date: 1997/01/07 11:50:55 $, )
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -60,7 +60,6 @@ pushdef(`OPERATOR',$5)dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
      & )
-      include "fpvm3.h"
 _CM5(`      include "cmmd_fort.h"')
       include "hpfc_commons.h"
       include "hpfc_rtsupport.h"
@@ -125,7 +124,6 @@ ifelse(PVM_ARCH,`CM5',`dnl
 ! HOST PART
 !
       TYPE function build_name(hred,LEVEL,PVMTYPE,NAME)()
-      include "fpvm3.h"
 _CM5(`      include "cmmd_fort.h"')
       include "hpfc_commons.h"
       TYPE result(MAX MAX SIZE OF PROCS), final
@@ -229,7 +227,6 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
       end
       subroutine build_name(hpost,NAME,PVMTYPE)(val)
       TYPE val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       external pvm_opname(NAME)
       integer info
@@ -247,7 +244,6 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
       end 
       subroutine build_name(npost,NAME,PVMTYPE)(val)
       TYPE val
-      include "fpvm3.h"
       include "hpfc_commons.h"
       external pvm_opname(NAME)
       integer info
