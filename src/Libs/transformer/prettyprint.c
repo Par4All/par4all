@@ -10,6 +10,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.10  2003/07/24 08:38:32  irigoin
+ * generic_value_name() made a little bit more robust
+ *
  * Revision 1.9  2001/12/05 17:09:38  irigoin
  * Modification to handle value names in a safer way
  *
@@ -91,7 +94,8 @@ char * generic_value_name(entity e)
       n = entity_minimal_name(e);
     }
     /* else if (entity_has_values_p(e)){ */
-    else if (value_entity_p(e)){
+    else if (!hash_value_to_name_undefined_p()
+	     && value_entity_p(e)){
       /* n = external_value_name(e); */
       n = pips_user_value_name(e);
     }
