@@ -344,6 +344,19 @@ attach_declaration_size_type_to_words(list l,
 }
 
 
+/* Attach some statement information to text: */
+void
+attach_statement_information_to_text(text t,
+				     statement s)
+{
+    if (is_emacs_pretty_print_asked && text_sentences(t) != NIL)
+	/* Some prettyprinters such as effects generate NULL
+           text... Just ignore. */
+	attach_to_text(t, make_attachee(is_attachee_statement_line_number,
+					statement_number(s)));
+}
+
+
 /* Attach a decoration: */
 void
 attach_decoration_to_text(text t)
@@ -677,6 +690,15 @@ output_an_attachment(FILE * output_file,
 	    pips_debug(5, "\tproper-effect\n");
 	    fprintf(output_file,
 		    "face epips-face-proper-effect invisible epips-invisible-proper-effect");
+	    break;
+	}
+
+    case is_attachee_statement_line_number:
+	{
+	    int line_number = attachee_statement_line_number(at);
+
+	    pips_debug(5, "\tstatement_line_number %d\n", line_number);
+	    fprintf(output_file, "epips-line-number %d", line_number);
 	    break;
 	}
 
