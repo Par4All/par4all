@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1996/11/18 10:44:17 $, 
+%% $Date: 1996/12/18 08:49:29 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,newgen_domain}
@@ -1476,6 +1476,10 @@ un \verb/range/, dans le cas des expressions bornes de boucles (le domaine
 
 \domain{Reference = variable:entity x indices:expression*}
 {}
+\domain{Preference = persistant reference}
+{}
+\domain{Cell = reference + preference}
+{}
 
 Type \verb/reference/ is used to represent references to array
 elements\footnote{Scalar variables are represented as 0-dimensional
@@ -1643,7 +1647,9 @@ Should be used for proper and cumulated effects and references.
 \label{subsection-effect}
 \index{Effect}\index{Region}
 
-\domain{Effect = persistant reference x action x approximation x context:transformer}
+\domain{Effect = cell x action x approximation x descriptor}
+{}
+\domain{Descriptor = convex:Psysteme + none:unit}
 {}
 
 Type \verb/effect/ is used to represent a read or write access to a
@@ -1789,7 +1795,7 @@ la lecture d'une variable et son e'criture.
 \label{subsection-approximation}
 \index{Approximation}
 
-\domain{Approximation = may:unit + must:unit}
+\domain{Approximation = may:unit + must:unit + exact:unit}
 {}
 
 It is not always possible to determine statically if a statement guarded
