@@ -517,7 +517,7 @@ void gen_free_area(void ** p, int size)
   free(p);
 }
 
-/* Sorts a list of gen_chunks in place, to avoid mallocs. 
+/* Sorts a list of gen_chunks in place, to avoid allocations...
  * The list skeleton is not touched, but the items are replaced
  * within the list. If some of the cons are shared, it may trouble
  * the data and the program.
