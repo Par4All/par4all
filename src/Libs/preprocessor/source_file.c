@@ -7,6 +7,9 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.106  2003/09/03 16:26:42  irigoin
+ * return code added to signal error in compilation
+ *
  * Revision 1.105  2003/08/18 08:55:13  coelho
  * setjmp out.
  *
@@ -890,24 +893,31 @@ static int pips_check_fortran(void)
     return get_bool_property("CHECK_FORTRAN_SYNTAX_BEFORE_PIPS");
 }
 
-#define suffix ".pips.o"
+#define SUFFIX ".pips.o"
 #define DEFAULT_PIPS_FLINT "f77 -c -ansi"
 
-static void check_fortran_syntax_before_pips(string file_name)
+static bool check_fortran_syntax_before_pips(string file_name)
 {
-    string pips_flint = getenv("PIPS_FLINT");
-    user_log("Checking Fortran syntax of %s\n", file_name);
+  string pips_flint = getenv("PIPS_FLINT");
+  bool syntax_ok_p = TRUE;
 
-    if (safe_system_no_abort(concatenate(
-	pips_flint? pips_flint: DEFAULT_PIPS_FLINT, " ", file_name, 
-	" -o ", file_name, suffix, " ; test -f ", file_name, suffix, 
-	" && rm ", file_name, suffix, NULL)))
+  user_log("Checking Fortran syntax of %s\n", file_name);
 
-	/* f77 is rather silent on errors... which is detected if no
-	 * file was output as expected.
-	 */
-	pips_user_warning("\n\n\tFortran syntax errors in file %s!\007\n\n", 
-			  file_name);
+  if (safe_system_no_abort(concatenate(
+				       pips_flint? pips_flint: DEFAULT_PIPS_FLINT, " ",
+				       file_name, 
+				       " -o ", file_name, SUFFIX,
+				       " ; test -f ", file_name, SUFFIX, 
+				       " && rm ", file_name, SUFFIX, NULL))) {
+
+    /* f77 is rather silent on errors... which is detected if no
+     * file was output as expected.
+     */
+    pips_user_warning("\n\n\tFortran syntax errors in file %s!\007\n\n", 
+		      file_name);
+    syntax_ok_p = FALSE;
+  }
+  return syntax_ok_p;
 }
 
 /* "foo bla fun  ./e.database/foo.f" -> "./e.database/foo.f"
@@ -953,8 +963,12 @@ bool process_user_file(string file)
 
   /* Fortran compiler if required.
    */
-  if (pips_check_fortran() && (dot_F_file_p(nfile) || dot_f_file_p(nfile))) 
-    check_fortran_syntax_before_pips(nfile);
+  if (pips_check_fortran() && (dot_F_file_p(nfile) || dot_f_file_p(nfile))) {
+    bool syntax_ok_p = check_fortran_syntax_before_pips(nfile);
+
+    if(!syntax_ok_p)
+      return FALSE;
+  }
   else if(FALSE) {
     /*Run the C compiler */
     ;
