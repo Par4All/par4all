@@ -95,8 +95,14 @@ int n;
 {
     if (POLYNOME_UNDEFINED_P(pp)) 
 	return (POLYNOME_UNDEFINED);
-    else if (POLYNOME_NUL_P(pp)) 
-	return (POLYNOME_NUL);
+    else if (POLYNOME_NUL_P(pp)) {
+	if(n>0)
+	    return POLYNOME_NUL;
+	else if (n == 0)
+	    return make_polynome(1.0, TCST, 1);
+	else
+	    return POLYNOME_UNDEFINED;
+    }
     else if (n < 0) {
 	if ( is_polynome_a_monome(pp) ) {
 	    int i,m=-n;
@@ -129,6 +135,9 @@ int n;
 	}
 	return(ppresult);
     }
+    /* FI: a unique return would be welcome! No enough time for cleaning */
+    polynome_error("polynome_power_n", "Cannot happen!\n");
+    return POLYNOME_UNDEFINED;
 }
 
 
