@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.91  1997/10/29 12:35:09  irigoin
+ * Guard added to avoid calling find_last_statement() thru
+ * set_last_statement() when it is not needed
+ *
  * Revision 1.90  1997/10/28 15:01:13  coelho
  * much moved to declarations.c
  *
@@ -88,7 +92,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.90 1997/10/28 15:01:13 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.91 1997/10/29 12:35:09 irigoin Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1652,7 +1656,12 @@ text_module(entity module,
     code c = entity_code(module);
     string s = code_decls_text(c);
 
-    set_last_statement(stat);
+    /* This guard is correct but could be removed if find_last_statement()
+     * were robust and/or if the internal representations were always "correct".
+     * See also the guard for reset_last_statement()
+     */
+    if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
+	set_last_statement(stat);
 
     if ( strcmp(s,"") == 0 
 	|| get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") )
@@ -1685,7 +1694,8 @@ text_module(entity module,
 
     ADD_SENTENCE_TO_TEXT(r, sentence_tail());
 
-    reset_last_statement();
+    if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
+	reset_last_statement();
 
     return(r);
 }
