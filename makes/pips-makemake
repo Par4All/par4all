@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.319  1997/09/25 09:32:55  coelho
+# typos again...
+#
 # Revision 1.318  1997/09/25 09:29:02  coelho
 # typo.
 #
@@ -549,7 +552,7 @@ cat >> $MAKEFILE <<%
 LIB_OBJECTS:=\$(addprefix \$(ARCH)/, \$(LIB_OBJECTS))
 #
 LIB_TARGET=	\$(ARCH)/lib\$(TARGET).a
-ifneq(\$(ARCH),.)
+ifneq (\$(ARCH),.)
 lib\$(TARGET).a: \$(LIB_TARGET)
 endif
 BIN_TARGET=	\$(ARCH)/\$(TARGET)
@@ -707,7 +710,7 @@ clean: clean-compiled
 
 INC_CFILES += \$(LIB_CFILES)
 
-ifneq(\$(ARCH),.)
+ifneq (\$(ARCH),.)
 \$(TARGET): \$(ARCH)/\$(TARGET)
 endif
 
