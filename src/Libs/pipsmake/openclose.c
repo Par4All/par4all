@@ -52,9 +52,9 @@ make_open_workspace(string name)
 {
     if (db_open_workspace(name)) {
 	open_properties();
-	if (open_makefile(name) != makefile_undefined)
+	if (open_makefile(name) != makefile_undefined) {
 	    pips_debug(7, "makefile opened\n");
-	else
+	} else
 	    pips_user_warning("No special makefile for this workspace "
 			      "%s/%s.database\n", get_cwd(), name);
     } else
