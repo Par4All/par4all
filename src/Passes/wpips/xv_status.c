@@ -69,7 +69,7 @@ void
 show_program()
 {
    static char *none = "(* none *)";
-   char *name = db_get_current_program_name();
+   char *name = db_get_current_workspace_name();
 
    if (name == NULL)
       name = none;
