@@ -842,6 +842,10 @@ void check_first_statement()
 {
     int line_start = TRUE;
     int in_comment = FALSE;
+    int out_of_constant_string = TRUE;
+    int in_constant_string = FALSE;
+    int end_of_constant_string = FALSE;
+    char string_sep = '\000';
 
     if (! seen) {
 	FILE *fd;
@@ -857,9 +861,48 @@ void check_first_statement()
 	while ((c = getc(fd)) != EOF) {
 	    if(line_start == TRUE)
 		in_comment = strchr(START_COMMENT_LINE,c) != NULL;
-	    buffer[ibuffer++] = in_comment? c : toupper(c);
+	    /* buffer[ibuffer++] = in_comment? c : toupper(c); */
+	    if(in_comment) {
+	      buffer[ibuffer++] =  c;
+	    }
+	    else {
+	      /* Constant strings must be taken care of */
+	      if(out_of_constant_string) {
+		if(c=='\'' || c == '"') {
+		  string_sep = c;
+		  out_of_constant_string = FALSE;
+		  in_constant_string = TRUE;
+		  buffer[ibuffer++] =  c;
+		} 
+		else {
+		  buffer[ibuffer++] =  toupper(c);
+		}
+	      }
+	      else
+		if(in_constant_string) {
+		  if(c==string_sep) {
+		    in_constant_string = FALSE;
+		    end_of_constant_string = TRUE;
+		  }
+		  buffer[ibuffer++] =  c;
+		}
+		else 
+		  if(end_of_constant_string) {
+		    if(c==string_sep) {
+		      in_constant_string = TRUE;
+		      end_of_constant_string = FALSE;
+		      buffer[ibuffer++] =  c;
+		    }
+		    else {
+		      out_of_constant_string = TRUE;
+		      end_of_constant_string = FALSE;
+		      buffer[ibuffer++] =  toupper(c);
+		    }
+		  }
+	    }
+
 	    if (ibuffer >= SIZE) {
-		ParserError("check_first_statement", "buffer too small\n");
+		ParserError("check_first_statement", "Static buffer too small, resize!\n");
 	    }
 
 	    if (c == '\n') {
