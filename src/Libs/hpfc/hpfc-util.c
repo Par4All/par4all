@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1997/01/10 15:23:21 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1997/01/10 15:25:55 $, )
  * version $Revision$
  */
 
@@ -749,10 +749,17 @@ references_aligned_p(reference r1, reference r2)
            e2 = reference_variable(r2);
     list /* of expression */ le1 = reference_indices(r1),
                              le2 = reference_indices(r2);
-    align a1 = load_hpf_alignment(e1), 
-          a2 = load_hpf_alignment(e2);
     int dim1 = 1, dim2;
     entity index;
+    align a1, a2;
+
+    if (!array_distributed_p(e1) || !array_distributed_p(e2))
+    {
+	XDEBUG("not distributed"); return FALSE;
+    }
+
+    a1 = load_hpf_alignment(e1);
+    a2 = load_hpf_alignment(e2);
 
     /* both references must be aligned to the same template
      * and be of the same arity.
