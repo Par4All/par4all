@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.223 2002/05/06 09:43:36 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.224 2002/06/10 15:19:05 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -1153,6 +1153,21 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
 	    we2 = words_subexpression(exp, prec, FALSE);
 	else
 	    we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
+    }
+    else if ( strcmp(entity_local_name(call_function(obj)), "*") == 0 ) {
+	expression exp = EXPRESSION(CAR(CDR(args)));
+	if ( expression_call_p(exp) &&
+	     ENTITY_DIVIDE_P(call_function(syntax_call(expression_syntax(exp))))) {
+	  basic bexp = basic_of_expression(exp);
+	  if(basic_int_p(bexp)) {
+	    we2 = words_subexpression(exp, MAXIMAL_PRECEDENCE, FALSE);
+	  }
+	  else
+	    we2 = words_subexpression(exp, prec, FALSE);
+	  free_basic(bexp);
+	}
+	else
+	  we2 = words_subexpression(exp, prec, FALSE);
     }
     else {
 	we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), prec,
