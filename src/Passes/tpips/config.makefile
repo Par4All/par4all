@@ -1,4 +1,4 @@
-YFLAGS=		$(PIPS_YFLAGS) -v -d
+YFLAGS+=	-v -d
 LEX=		flex
 LFLAGS=         -l
 #
