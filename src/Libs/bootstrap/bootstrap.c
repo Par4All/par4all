@@ -70,6 +70,12 @@ void CreateArrays()
 
     set_current_module_entity(ent);
 
+    make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME, 
+				 STATIC_AREA_LOCAL_NAME),
+		make_type(is_type_area, make_area(0, NIL)),
+		make_storage(is_storage_rom, UU),
+		make_value(is_value_unknown, UU));
+
     /* GO: entity for io logical units: It is an array which*/
     make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 				 IO_EFFECTS_ARRAY_NAME),
