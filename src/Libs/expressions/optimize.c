@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.18  1998/11/24 14:15:28  coelho
+ * more comments.
+ *
  * Revision 1.17  1998/11/24 14:12:59  coelho
  * nary to binary makes use of the strategy.
  *
@@ -619,10 +622,10 @@ static optimization_strategy
   strategies[] = 
 {
   { 
-    "P2SC", 
-    TRUE, expression_gravity, TRUE,
-    TRUE, "0",
-    TRUE
+    /* name */ "P2SC", 
+    /* huff */ TRUE, expression_gravity, TRUE,
+    /* eole */ TRUE, "0",
+    /* simp */ TRUE
   },
   {
     "R10K",
