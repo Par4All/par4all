@@ -1470,32 +1470,6 @@ if(expression_constant_p(exp))
 return(FALSE);
 }
 
-/*=================================================================*/
-/* statement make_block_with_stmt(statement stmt): makes sure that the given
- * statement "stmt" is a block of instructions. If it is not the case, this
- * function returns a new statement with a block of one statement. This
- * statement is "stmt".
- * If "stmt" is already a block, it is returned unmodified.
- */
-statement make_block_with_stmt(stmt)
-statement stmt;
-{
-debug( 7, "make_block_with_stmt", "doing\n");
-if (instruction_tag(statement_instruction(stmt)) != is_instruction_block)
-  {
-  /* We create a new statement with an empty block of instructions.
-   * "make_empty_statement() is defined in Lib/ri-util, it creates a statement
-   * with a NIL instruction block. */
-  statement block_stmt = make_empty_statement();
-
-  /* Then, we put the statement "stmt" in the block. */
-  instruction_block(statement_instruction(block_stmt)) = CONS(STATEMENT,
-                                                              stmt, NIL);
-  return (block_stmt);
-  }
-return (stmt);
-}
-
 
 
 /*=================================================================*/
