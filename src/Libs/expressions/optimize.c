@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.24  1998/12/08 16:48:36  coelho
+ * new structure to send data to eole.
+ *
  * Revision 1.23  1998/11/26 14:26:45  coelho
  * fixed static variables. more comments.
  *
@@ -92,6 +95,7 @@
 #include "resources.h"
 #include "pipsdbm.h"
 
+#include "eole_private.h"
 
 #define DEBUG_NAME "TRANSFORMATION_OPTIMIZE_EXPRESSIONS_DEBUG_LEVEL"
 
@@ -157,57 +161,83 @@ get_eole_command
 
 /* the list of right hand side expressions.
  */
-static list /* of expression */ rhs;
+static list /* of expressionwithlevel */ rhs;
 
 /* the current list of loop indices for the expression (not used yet).
  */
 static list /* of entity */ indices; 
 
+static void add_one_more_expression(expression e)
+{
+  expressionwithlevel ewl = make_expressionwithlevel(gen_copy_seq(indices), e);
+  rhs = CONS(EXPRESSIONWITHLEVEL, ewl, rhs);
+}
+
+static bool loop_flt(loop l)
+{
+  entity index = loop_index(l);
+  indices = CONS(ENTITY, index, indices);
+  return TRUE; /* keep on. */
+}
+
+static void loop_rwt(loop l)
+{
+  list tmp = indices;
+  pips_assert("same index", ENTITY(CAR(indices))==loop_index(l));
+  indices = CDR(indices);
+  CDR(tmp) = NIL;
+  gen_free_list(tmp);
+}
+
 /* rhs expressions of assignments.
  */
 static bool call_filter(call c)
 {
-    if (ENTITY_ASSIGN_P(call_function(c)))
-    {
-	expression e = EXPRESSION(CAR(CDR(call_arguments(c))));
-	rhs = CONS(EXPRESSION, e, rhs);
-    }
-    return FALSE;
+  if (ENTITY_ASSIGN_P(call_function(c)))
+  {
+    expression e = EXPRESSION(CAR(CDR(call_arguments(c))));
+    add_one_more_expression(e);
+  }
+  return FALSE;
 }
 
 /* other expressions may be found in loops and so?
  */
 static bool expr_filter(expression e)
 {
-    rhs = CONS(EXPRESSION, e, rhs);
-    return FALSE;
+  add_one_more_expression(e);
+  return FALSE;
 }
 
-static list /* of expression */ 
+static list /* of expressionwithlevel */ 
 get_list_of_rhs(statement s)
 {
-    list result;
+  list result;
 
-    rhs = NIL;
-    gen_multi_recurse(s,
-		      expression_domain, expr_filter, gen_null,
-		      call_domain, call_filter, gen_null,
-		      NULL);
-    
-    result = gen_nreverse(rhs);
-    rhs = NIL;
-    return result;
+  rhs = NIL;
+  indices = NIL;
+  gen_multi_recurse(s,
+		    expression_domain, expr_filter, gen_null,
+		    call_domain, call_filter, gen_null,
+		    loop_domain, loop_flt, loop_rwt,
+		    NULL);
+  
+  result = gen_nreverse(rhs);
+  rhs = NIL;
+  indices = NIL;
+  return result;
 }
 
 /* export a list of expression of the current module.
  * done thru a convenient reference.
  */
-static void write_list_of_rhs(FILE * out, list /* of expression */ le)
+static void write_list_of_rhs(FILE * out, list /* of expressionwithlevel */ le)
 {
-    reference astuce = make_reference(get_current_module_entity(), le);
-    write_reference(out, astuce);
-    reference_indices(astuce) = NIL;
-    free_reference(astuce);
+  //reference astuce = make_reference(get_current_module_entity(), le);
+  lexpressionwithlevel lewl = make_lexpressionwithlevel(le);
+  write_lexpressionwithlevel(out, lewl);
+  lexpressionwithlevel_list(lewl) = NIL;
+  free_lexpressionwithlevel(lewl);
 }
 
 /* export expressions to eole thru the newgen format.
@@ -215,18 +245,16 @@ static void write_list_of_rhs(FILE * out, list /* of expression */ le)
  */
 static void write_to_eole(string module, list le, string file_name)
 {
-    FILE * toeole;
+  FILE * toeole;
+  
+  pips_debug(3, "writing to eole for module %s\n", module);
+  
+  toeole = safe_fopen(file_name, "w");
+  write_tabulated_entity(toeole);
+  write_list_of_rhs(toeole, le);
 
-    pips_debug(3, "writing to eole for module %s\n", module);
-
-    toeole = safe_fopen(file_name, "w");
-    write_tabulated_entity(toeole);
-    write_list_of_rhs(toeole, le);
-
-    safe_fclose(toeole, file_name);
+  safe_fclose(toeole, file_name);
 }
-
-
 
 #define SIZE_OF_BUFFER 100
 
@@ -270,7 +298,7 @@ read_new_entities_from_eole(FILE * file, string module){
       const_type = read_and_allocate_string_from_file(file);
       
       test = fscanf(file," %d\n", &const_size);
-      pips_assert("fscanf - read entity basic type size \n",(test==1));
+      pips_assert("fscanf - read entity basic type size\n",(test==1));
 
       const_value = read_and_allocate_string_from_file(file);
 
@@ -336,7 +364,7 @@ read_from_eole(string module, string file_name)
 /* swap term to term syntax field in expression list, as a side effect...
  */
 static void 
-swap_syntax_in_expression(  list /* of expression */ lcode,
+swap_syntax_in_expression(  list /* of expressionwithlevel */ lcode,
 			    list /* of expression */ lnew)
 {
   pips_assert("equal length lists", gen_length(lcode)==gen_length(lnew));
@@ -345,8 +373,8 @@ swap_syntax_in_expression(  list /* of expression */ lcode,
     {
       expression old, new;
       syntax tmp;
-      
-      old = EXPRESSION(CAR(lcode));
+
+      old = expressionwithlevel_expression(EXPRESSIONWITHLEVEL(CAR(lcode)));
       new = EXPRESSION(CAR(lnew));
       
       tmp = expression_syntax(old);
@@ -359,7 +387,7 @@ swap_syntax_in_expression(  list /* of expression */ lcode,
  */
 static void apply_eole_on_statement(string module_name, statement s)
 {
-  list /* of expression */ le, ln;
+  list /* of expressionwithlevel/expression */ le, ln;
 
   ln = NIL;
   le = get_list_of_rhs(s);
