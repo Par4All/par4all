@@ -6,6 +6,9 @@
  * reset_ordering_to_statement.
  *
  * $Log: ordering.c,v $
+ * Revision 1.15  2003/09/05 14:29:19  nguyen
+ * Remove the switch (multitest) case
+ *
  * Revision 1.14  2003/07/24 07:21:29  nguyen
  * Add new control structures for C language
  *
@@ -125,7 +128,6 @@ rinitialize_ordering_to_statement(hash_table ots, statement s)
       case is_instruction_call:
       case is_instruction_goto:
       case is_instruction_forloop:
-      case is_instruction_multitest:
 	break;
 
       case is_instruction_unstructured: {
