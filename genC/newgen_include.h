@@ -52,6 +52,26 @@ DEFLIST(namelist,char *,name) ;
 DEFLIST(intlist,int,val) ;
 DEFLIST(domainlist,union domain *,domain) ;
 
+/* actually defined in tabulated.c */
+typedef struct _gtp * gen_tabulated_p;
+
+union domain ;
+struct inlinable ;
+struct gen_binding {
+  char * name;
+  int compiled;
+  int size; /* number of chunks to hold this data. */
+  gen_tabulated_p tabulated;
+  union domain *domain ;
+  struct inlinable *inlined ;
+} ;
+
+/* The implementation of tabulated domains */
+extern struct gen_binding Domains[], *Tabulated_bp ;
+
+/* The root of the gen_chunk read with READ_CHUNK. */
+extern gen_chunk *Read_chunk ;
+
 struct gen_binding ;
 
 /* A DOMAIN union describes the structure of a user type. 
