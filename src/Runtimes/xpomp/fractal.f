@@ -3,7 +3,7 @@
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
 !
 ! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/08/31 13:16:17 $, 
+! $Date: 1996/08/31 16:48:48 $, 
 !
       program fractal
 
@@ -11,7 +11,7 @@
 
       include 'xpomp_graphic_F.h'
 
-!ldf$ -L$(XPOMP_RUNTIME) -L$(PIPS_ROOT)/Runtime/xpomp -lxpomp
+!ldf$ -L$XPOMP_RUNTIME/. -L$PIPS_ROOT/Runtime/xpomp -lxpomp
       
 ! Algorithm parameters:
       integer n_iteration
