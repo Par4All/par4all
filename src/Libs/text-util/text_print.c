@@ -102,14 +102,14 @@ print_sentence(FILE * fd,
 	    fprintf_sentence(fd, "      ");
 	}
 
-	/* FI: do not indent too much (9 June 1995)*/
+	/* FI: do not indent too much (9 June 1995) */
 	em = em > 42 ? 42 : em;
 
 	for (i = 0; i < em; i++) 
 	    putc_sentence(' ', fd);
 	col = 7+em;
 
-	pips_assert("print_sentence", col <= 72);
+	pips_assert("less than 72 columns", col <= 72);
 
 	while (lw) {
 	    string w = STRING(CAR(lw));
