@@ -196,31 +196,16 @@ resource_text(
 
     pips_assert("must not be a summary", !pps->is_a_summary);
 
-    if (is_user_view_p)
-    {
-	statement i;
-
-	if (!statement_undefined_p
-	    (i = apply_number_to_statement(nts, statement_number(stat))))
-	{
-	    l_eff = load_list(pps->resource, i);
-	}
-	else
-	    l_eff = (list) HASH_UNDEFINED_VALUE;
-    }
-    else
-    {
-	l_eff = load_list(pps->resource, stat);
-	ifdebug(1)
-	 {
-	     if (l_eff != (list) HASH_UNDEFINED_VALUE &&
-		 l_eff != list_undefined) 
-	     {
+    l_eff = load_list(pps->resource, stat);
+    ifdebug(1)
+        {
+	    if (l_eff != (list) HASH_UNDEFINED_VALUE &&
+		l_eff != list_undefined) 
+	    {
 		 pips_debug(1, "current effects:\n");
 		 (*(pps->prettyprint))(l_eff);
 	     }
-	 }
-    }
+	}
 
     l_eff_text = (*(pps->get_text))(l_eff);
 
