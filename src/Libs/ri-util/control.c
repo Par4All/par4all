@@ -9,7 +9,7 @@
  */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 2000/11/03 15:45:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 2001/07/19 11:36:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -446,7 +446,7 @@ remove_all_unreachable_controls_of_an_unstructured(unstructured u)
              pips_user_warning("Discarding an unreachable FORMAT that may be "
                                "usefull. "
                                "Try to use the GATHER_FORMATS_AT_BEGINNING "
-                               "property.");
+                               "property.\n");
           remove_a_control_from_an_unstructured_without_relinking(c);
        }      
     },
