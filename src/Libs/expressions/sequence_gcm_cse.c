@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.20  2000/07/21 16:06:14  phamdinh
+   CSE: Remove statements temporel
+
    Revision 1.19  2000/07/21 08:26:56  phamdinh
    Modification of the update aspt->available_contents
 
@@ -308,6 +311,26 @@ static bool currently_nested_p(void)
 #endif
 }
 
+static expression
+right_side_of_assign_statement(statement stat)
+{
+  instruction i;
+  call assign;
+  expression right_side;
+
+  pips_assert("Instruction is a call", 
+	      instruction_call_p(statement_instruction(stat)));
+  i = statement_instruction(stat);
+  assign = instruction_call(i);
+
+  pips_assert("Call is an assignment!", 
+	      ENTITY_ASSIGN_P(call_function(assign)));
+
+  right_side = EXPRESSION(CAR(CDR(call_arguments(assign))));
+  
+  return right_side;
+}
+
 /* Verify if entity ent is an argument in the right expression 
  * of the assign statement stat
  */
@@ -398,6 +421,7 @@ dump_list_of_statement(list l)
   {
     print_statement(ss);
   }, l);
+  fprintf(stderr, "\n END dumpt List!!! \n");
 }
 
 static void 
@@ -747,6 +771,121 @@ static void loop_rwt(loop l)
   do_atomize_if_different_level(range_increment(bounds), level);
 }
 
+static void
+set_comment_of_statement(statement s, string new_comment)
+{
+  if (!statement_comments(s))
+  {
+    statement_comments(s) = new_comment;
+  }
+  else
+  {
+    string old = statement_comments(s);
+    /* free old ... */
+    statement_comments(s) = new_comment;
+  }
+}
+
+/* Set statement inserted for the statement container 
+ * that defines 'ent' become a real one 
+ */
+static void
+set_statement_to_a_real_one(entity ent, statement container)
+{
+  if (bound_inserted_p(container))
+  {
+    statement sblock = load_inserted(container);
+    instruction i = statement_instruction(sblock);
+    sequence seq;
+    list lst;
+    pips_assert("it is a sequence", instruction_sequence_p(i));
+    
+    /* reverse list of inserted statements (#1#) */
+    seq = instruction_sequence(i);
+    lst = sequence_statements(seq);
+    MAP(STATEMENT, s,
+    {
+      entity left_side = left_side_of_assign_statement(s);
+      if(ent == left_side) /* s defines ent */
+      {
+	set_comment_of_statement(s, "REAL");
+	return;
+      }
+    }, lst);
+  }
+  else
+  {
+    pips_internal_error("No statement inserted!\n", entity_name(ent));
+  }
+
+  pips_internal_error("No statement defining '%s'\n", entity_name(ent));
+}
+
+/* Statement inserted with:
+ *    Comment = REAL: is real statement
+ *    otherwise: is redundant statement
+ */
+static bool
+real_statement(statement s)
+{
+  //if (TRUE) return TRUE; /* just for TEST */
+
+  if (!empty_comments_p(statement_comments(s)) && 
+      strcmp(statement_comments(s), "REAL") == 0)
+  {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+static void
+expression_rwt(expression e, list* inserted)
+{
+  entity scala;
+
+  if(!syntax_reference_p(expression_syntax(e)))
+  {
+    return;
+  }
+
+  scala = reference_variable(syntax_reference(expression_syntax(e)));
+  MAP(STATEMENT, s,
+  {
+    entity ent = left_side_of_assign_statement(s);
+    
+    if (scala == ent)
+    {
+      if (real_statement(s))
+      {
+	return;
+      }
+      else /* s is a redundant statement */
+      {
+	expression right_side = right_side_of_assign_statement(s);
+	expression_syntax(e) = 
+	  expression_syntax(copy_expression(right_side));
+	/* leak of memory */
+	
+	/* Remove s from list */
+	gen_remove_once(inserted, s);
+	
+	free_statement(s); /* -> current_available is also modified */
+	return;
+      }
+    }
+  }, *inserted);
+  
+}
+
+/* Remove statement redundant inserted before statement s
+ */
+static void
+remove_statement_redundant(statement s, list* inserted)
+{
+  gen_context_recurse(s, inserted,
+		      expression_domain, gen_true, expression_rwt);
+}
+
 static bool insert_reverse_order = TRUE;
 
 /* insert in front if some inserted.
@@ -761,10 +900,19 @@ static void insert_rwt(statement s)
       statement sblock = load_inserted(s);
       instruction i = statement_instruction(sblock);
       sequence seq;
+
+      fprintf(stderr,"\n\t Block: "); print_statement(sblock); /* test */
+
       pips_assert("it is a sequence", instruction_sequence_p(i));
 
       /* reverse list of inserted statements (#1#) */
       seq = instruction_sequence(i);
+
+      /* Remove statements redundant */
+      remove_statement_redundant(s, &sequence_statements(seq));
+
+      fprintf(stderr,"\n\tAfter Remove: "); print_statement(sblock); /* test */
+
       if (insert_reverse_order)
 	sequence_statements(seq) = gen_nreverse(sequence_statements(seq));
 
@@ -1203,10 +1351,24 @@ static list /* of expression */ list_diff(list l1, list l2)
   return diff;
 }
 
-static bool simple_reference_p(expression e)
+static bool 
+simple_reference_p(expression e)
 {
   syntax s = expression_syntax(e);
   return syntax_reference_p(s) && !reference_indices(syntax_reference(s));
+}
+
+static bool
+expression_constant_p(expression e)
+{
+  syntax s = expression_syntax(e);
+  if(syntax_call_p(s))
+  {
+    call c = syntax_call(s);
+    entity en = call_function(c);
+    return entity_constant_p(en);
+  }
+  return FALSE;
 }
 
 /* remove some inpropriate ones...
@@ -1261,6 +1423,10 @@ static void atom_cse_expression(expression e)
 
 		syntax_tag(s) = is_syntax_reference;
 		syntax_reference(s) = make_reference(aspt->scalar, NIL);
+
+		/* Set the statement to status REAL */
+		set_statement_to_a_real_one(aspt->scalar, aspt->container);
+
 		return;
 	      }
 	    else /* partial common expression... */
@@ -1301,6 +1467,10 @@ static void atom_cse_expression(expression e)
 		    gen_nconc(lo1, 
 			      CONS(EXPRESSION,
 				   entity_to_expression(aspt->scalar), NIL));
+
+		  /* Set the statement to status REAL */
+		  set_statement_to_a_real_one(aspt->scalar, aspt->container);
+
 		}
 		else
 		{
@@ -1342,6 +1512,10 @@ static void atom_cse_expression(expression e)
 		  gen_free_list(old);
 
 		  // ..
+		  /* This is the real statement */
+		  set_comment_of_statement(scse, "REAL");
+
+
 		  insert_before_statement(scse, aspt->container, FALSE);
 		  
 		  /* don't visit it later. */
@@ -1378,7 +1552,7 @@ static void atom_cse_expression(expression e)
     }
   } while(aspt);
 
-  if (!simple_reference_p(e))
+  if (!simple_reference_p(e))  // && !expression_constant_p(e))
     {
       statement atom;
 
