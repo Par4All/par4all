@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/03 22:26:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/03/19 11:55:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/02/03 22:26:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/03/19 11:55:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -765,7 +765,7 @@ void retype_formal_parameters()
     list vars = code_declarations(value_code(entity_initial(m)));
 
     MAP(ENTITY, v, {
-	if(formal_parameter_p(v)) {
+	if(!storage_undefined_p(entity_storage(v)) && formal_parameter_p(v)) {
 	    if(!implicit_type_p(v)) {
 		free_type(entity_type(v));
 		entity_type(v) = ImplicitType(v);
