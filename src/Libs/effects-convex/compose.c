@@ -14,6 +14,8 @@
 #include <string.h>
 
 #include "genC.h"
+#include "ri.h"
+#include "ri-util.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"
