@@ -1,6 +1,10 @@
 #
-# $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1997/04/17 11:52:12 $, )
+# $Id$
+# 
+# $Log: config.makefile,v $
+# Revision 1.53  1997/04/17 11:54:47  coelho
+# better RCS headers.
+#
 #
 # depends on 
 # + PVM_ARCH 
