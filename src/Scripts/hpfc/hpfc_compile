@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/08/08 09:14:34 $, 
+# $Date: 1995/08/08 09:19:47 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -67,11 +67,10 @@ usage()
 	  -M: make (compile and link) the generated codes
 	  -q: quiet  (stdout=/dev/null)
 	  -s: silent (stderr=/dev/null - for demonstations:-)
-	  -T: with timings (LOG_TIMINGS TRUE)
 	  -w W: workspace W is used for pips and hpfc
 	  -m M: module M is compiled (should be the main)
 	  -n N: source number n
-	  -k K: keyword control (debug,demo,full,validate,void|none)
+	  -k K: keyword control (debug,demo,full,validate,timing,void|none)
 	  file: source file
 	EOF
   exit ${1:-1}
@@ -80,7 +79,7 @@ usage()
 #
 # the keyword control enables a global control of the switches
 
-while getopts rtivxDdMqsTn:hm:w:p:k: OPT
+while getopts rtivxDdMqsn:hm:w:p:k: OPT
 do
   case $OPT in
     t) DUMPFILES='1' ;;
@@ -94,7 +93,6 @@ do
     M) MAKE='gmake' ;;
     q) STDOUT='/dev/null' ;;
     s) STDERR='/dev/null' ;;
-    T) TIMEPROP='-1 LOG_TIMINGS' ;;
     n) HPFFILES="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
     m) MODULE="$OPTARG" ;;
     w) WORKSPACE="$OPTARG" ;;
@@ -106,6 +104,8 @@ do
 	 full)
 	     DELETE='Delete' ;
 	     MAKE='gmake' ;;
+	 timing)
+	     TIMEPROP='-1 LOG_TIMINGS' ;;
 	 void|none) : ;;
 	 validate) 
 	     DUMPFILES=':' ;
