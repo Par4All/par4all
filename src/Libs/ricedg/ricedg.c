@@ -157,28 +157,32 @@ static int dg_type = DG_FAST;
 static bool rice_dependence_graph(char */*mod_name*/);
 
 
-bool rice_fast_dependence_graph(mod_name)
+bool 
+rice_fast_dependence_graph(mod_name)
 char *mod_name;
 {
     dg_type = DG_FAST;
     return rice_dependence_graph(mod_name);
 }
 
-bool rice_full_dependence_graph(mod_name)
+bool 
+rice_full_dependence_graph(mod_name)
 char *mod_name;
 {
     dg_type = DG_FULL;
     return rice_dependence_graph(mod_name);
 }
 
-bool rice_semantics_dependence_graph(mod_name)
+bool 
+rice_semantics_dependence_graph(mod_name)
 char *mod_name;
 {
     dg_type = DG_SEMANTICS;
     return rice_dependence_graph(mod_name);
 }
 
-bool rice_regions_dependence_graph(mod_name)
+bool 
+rice_regions_dependence_graph(mod_name)
 char *mod_name;
 {
     if (!same_string_p(rule_phase(find_rule_by_resource("CHAINS")),
@@ -297,7 +301,7 @@ char *mod_name;
 
     debug(8,"rice_dependence_graph","original graph\n");
     ifdebug(8) {  	
-	print_graph(stderr, mod_stat, dg);
+	prettyprint_dependence_graph(stderr, mod_stat, dg);
     }
     
     debug_off();
@@ -385,7 +389,7 @@ char *mod_name;
 
     ifdebug(2) {
 	fprintf(stderr, "updated graph\n");
-	print_graph(stderr, mod_stat, dg);
+	prettyprint_dependence_graph(stderr, mod_stat, dg);
     }
 
     /* FI: this is not a proper way to do it */
@@ -393,7 +397,7 @@ char *mod_name;
 	dg_name = strdup(concatenate(db_get_current_workspace_directory(), 
 			             "/", mod_name, ".dg", NULL));
 	fp = safe_fopen(dg_name, "w");
-	print_graph(fp, mod_stat, dg);
+	prettyprint_dependence_graph(fp, mod_stat, dg);
 	safe_fclose(fp,dg_name);
     }
     
@@ -419,7 +423,8 @@ char *mod_name;
 
 
 
-static void rdg_unstructured(u)
+static void 
+rdg_unstructured(u)
 unstructured u ;
 {
     list blocs = NIL ;
@@ -433,7 +438,8 @@ unstructured u ;
 
 
 
-static void rdg_statement(stat)
+static void 
+rdg_statement(stat)
 statement stat;
 {
     instruction istat = statement_instruction(stat);
@@ -470,7 +476,8 @@ statement stat;
 
 
 
-static void rdg_loop(stat)
+static void 
+rdg_loop(stat)
 statement stat;
 {
     set region;
@@ -588,7 +595,8 @@ statement stat;
  * iterate... 
  */
 
-static void rice_update_dependence_graph(stat, region)
+static void 
+rice_update_dependence_graph(stat, region)
 statement stat;
 set region;
 {
@@ -867,15 +875,15 @@ set region;
 		else 
 		    CDR(pss) = ps;
 	    }
-	    /*ifdebug(4){ print_graph(stderr, mod_stat, dg); }*/
+	    /*ifdebug(4){ prettyprint_dependence_graph(stderr, mod_stat, dg); }*/
 	}
     }
 
     ifdebug(8) 
     {
-	fprintf(stderr, "rice_update_dependence_graph] updated graph\n");
+	fprintf(stderr, "[rice_update_dependence_graph] updated graph\n");
 	print_statement_set(stderr, region);
-	print_graph(stderr, get_current_module_statement(), dg);
+	prettyprint_dependence_graph(stderr, get_current_module_statement(), dg);
     }
 
     reset_context_map();
@@ -888,7 +896,8 @@ set region;
 
 
 
-static list TestCoupleOfEffects(s1, e1, s2, e2,llv,gs,levelsop,gsop)
+static list 
+TestCoupleOfEffects(s1, e1, s2, e2,llv,gs,levelsop,gsop)
 statement s1, s2;
 effect e1, e2;
 list llv; 
@@ -962,7 +971,8 @@ Ptsg *gs,*gsop;
  * TestDependence() is called.
 */
 
-list TestCoupleOfReferences(n1, sc1, s1, ef1, r1, n2, sc2, s2, ef2, r2,llv,gs,levelsop, gsop)
+list 
+TestCoupleOfReferences(n1, sc1, s1, ef1, r1, n2, sc2, s2, ef2, r2,llv,gs,levelsop, gsop)
 list n1, n2;
 Psysteme sc1, sc2;
 statement s1, s2;
@@ -1206,7 +1216,8 @@ Ptsg *gs, *gsop;
  *
  * - sc_rm() added for dep_syst, dep_syst1, dep_syst_op and dep_syst2
  */
-static list TestDependence(n1, sc1, s1, ef1, r1, n2, sc2, s2, ef2, r2, llv, gs,levelsop,gsop)
+static list 
+TestDependence(n1, sc1, s1, ef1, r1, n2, sc2, s2, ef2, r2, llv, gs,levelsop,gsop)
 list n1, n2;
 Psysteme sc1, sc2;
 statement s1, s2;
@@ -1773,7 +1784,8 @@ Ptsg *gs,*gsop;
  *    dependence test will be tested with an even stronger test, this
  *    should have no accuracy impact (FI, 12 December 1995)
  */
-static boolean build_and_test_dependence_context(r1, r2, sc1, sc2, psc_dep, llv, 
+static boolean 
+build_and_test_dependence_context(r1, r2, sc1, sc2, psc_dep, llv, 
 						 s2_enc_loops)
 reference r1, r2;
 Psysteme sc1, sc2, *psc_dep;
@@ -1978,7 +1990,8 @@ list llv, s2_enc_loops;
  *    by build_and_test_dependence_context.
  *  - no side effects on r1, r2,...
  */
-static boolean gcd_and_constant_dependence_test(r1, r2, llv, s2_enc_loops, psc_dep)
+static boolean 
+gcd_and_constant_dependence_test(r1, r2, llv, s2_enc_loops, psc_dep)
 reference r1, r2;
 list llv, s2_enc_loops;
 Psysteme *psc_dep;
@@ -2091,7 +2104,8 @@ Psysteme *psc_dep;
  *
  * comment  : DiIncNonCons must be undefined on entry.
  */
-static void dependence_system_add_lci_and_di(psc_dep, s1_enc_loops,
+static void 
+dependence_system_add_lci_and_di(psc_dep, s1_enc_loops,
 					     p_DiIncNonCons)
 Psysteme *psc_dep;
 list s1_enc_loops;
@@ -2212,7 +2226,8 @@ Pvecteur *p_DiIncNonCons;
  *    Yi Qing (10/91)
  */
 
-static list TestDiVariables(ps, cl, s1, ef1, s2, ef2)
+static list 
+TestDiVariables(ps, cl, s1, ef1, s2, ef2)
 Psysteme ps;
 int cl;
 statement s1, s2;
@@ -2324,7 +2339,8 @@ effect ef1, ef2;
 
 /* Ptsg  dependence_cone_positive(Psysteme dept_syst)
  */ 
-static Ptsg dependence_cone_positive(dep_sc)
+static Ptsg 
+dependence_cone_positive(dep_sc)
 Psysteme dep_sc;
 {
     Psysteme sc_env= SC_UNDEFINED;
@@ -2481,7 +2497,8 @@ Psysteme dep_sc;
 
 
     
-static list loop_variant_list(stat)
+static list 
+loop_variant_list(stat)
 statement stat;
 {
     list lv = NIL;
@@ -2512,7 +2529,8 @@ statement stat;
 /* this function detects intra-statement, non loop carried dependence
  * ( Di=(0,0,...0) and s1 = s2).
  */ 
-static boolean TestDiCnst(ps, cl, s1, ef1, s2, ef2)  
+static boolean 
+TestDiCnst(ps, cl, s1, ef1, s2, ef2)  
 Psysteme ps;
 int cl;
 statement s1, s2;
@@ -2580,7 +2598,8 @@ effect ef1,ef2;
 
 
 
-void writeresult(mod_name)
+void 
+writeresult(mod_name)
 char *mod_name;
 {
     FILE *fp;
