@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1997/05/27 12:04:13 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1997/09/30 06:56:37 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1997/05/27 12:04:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1997/09/30 06:56:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -117,20 +117,19 @@ void
 send_the_names_of_the_available_modules_to_emacs(void)
 {
     if (wpips_emacs_mode) {
-	int i;
-	char * module_list[ARGS_LENGTH];
-	int  module_list_length = 0;
 	char * module_string_list_string = strdup("(");
    
 	if (db_get_current_workspace_name() != NULL) {
-	    db_get_module_list(&module_list_length, module_list);
+	    gen_array_t modules = db_get_module_list();
+	    int  module_list_length = gen_array_nitems(modules), i;
 	    for(i = 0; i < module_list_length; i++) {
 		char * new_module_string_list_string =
 		    strdup(concatenate(module_string_list_string,
-				       "\"", module_list[i], "\" ",
+				       "\"", gen_array_item(modules, i), "\" ",
 				       NULL));
 		free(module_string_list_string);
 		module_string_list_string = new_module_string_list_string;
+		gen_array_full_free(modules);
 	    }
 	}
 	send_command_to_emacs(EMACS_AVAILABLE_MODULES_NAME,
@@ -235,10 +234,10 @@ ask_emacs_to_display_a_graph(string file_name)
 static bool
 epips_select_module(char * module_name)
 {
-   char *module_list[ARGS_LENGTH];
-   int new_module_list_length;
-   int module_list_length = 0;
-   int i = 0;
+    gen_array_t modules;
+    int new_module_list_length;
+    int module_list_length = 0;
+    int i = 0;
 
    if (db_get_current_workspace_name() == NULL) {
       user_warning("epips_select_module",
@@ -246,7 +245,8 @@ epips_select_module(char * module_name)
       return FALSE;
    }
 
-   db_get_module_list(&module_list_length, module_list);
+   modules = db_get_module_list();
+   module_list_length = gen_array_nitems(modules);
 
    if (module_list_length == 0)
    {
@@ -256,7 +256,7 @@ epips_select_module(char * module_name)
    else {
       /* Just to be sure that the selected module exist: */
       for(i = 0; i < module_list_length; i++) {
-         if (strcmp(module_name, module_list[i]) == 0) {
+         if (strcmp(module_name, gen_array_item(modules, i)) == 0) {
             end_select_module_notify(module_name);
             break;
          }
@@ -267,7 +267,7 @@ epips_select_module(char * module_name)
    }
    /* args_free zeroes also its length argument... */
    new_module_list_length = module_list_length;
-   args_free(&new_module_list_length, module_list);
+   gen_array_full_free(modules);
 
    if (module_list_length == 0 || i == module_list_length)
       /* Something went wrong. */
