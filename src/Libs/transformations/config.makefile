@@ -26,7 +26,8 @@ LIB_CFILES =	replace.c \
 		loop_normalize.c  \
 		declarations.c \
 		clone.c \
-	        transformation_test.c
+	        transformation_test.c \
+		freeze_variables.c
 
 #		optimize_misc.c
 
