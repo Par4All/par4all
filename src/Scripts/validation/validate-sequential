@@ -48,8 +48,14 @@ else
     default_file="$vdir/defaults"
 fi
 
+# coulommiers.ensmp.fr -> coulommiers
+host_name()
+{
+    hostname | sed 's/\..*//'
+}
+
 RUNNER=`whoami`
-hostname=`hostname`
+hostname=`host_name`
 PWD=`pwd`
 subject="PIPS Validation:"
 failed=""
