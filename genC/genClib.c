@@ -1681,10 +1681,9 @@ static int write_obj_in(gen_chunk *obj, struct driver *dr)
   
   type_number = gen_type_translation_actual_to_old(bp-Domains);
   fputci('T', type_number, user_file);
-  
-  if (IS_TABULATED(bp))
-    fputi(abs((obj+1)->i), user_file);
-  
+
+  /* tabulated number is skipped... */
+
   switch( dp->ba.type ) {
   case EXTERNAL_DT:
     fatal( "write_obj_in: Don't know how to write an EXTERNAL: %s\n", 
@@ -1698,7 +1697,7 @@ static int write_obj_in(gen_chunk *obj, struct driver *dr)
     }
     break ;
   }
-  return( GO) ;
+  return GO;
 }
 
 /* WRITE_OBJ_OUT is done when the OBJect (of type BP) has been printed. Just
@@ -1711,7 +1710,7 @@ struct driver *dr;
 {
     union domain * dp = bp->domain ;
 
-    switch( dp->ba.type ) {
+    switch (dp->ba.type) {
     case CONSTRUCTED_DT:
 	if( dp->co.op == ARROW_OP ) {
 	  putc(')', user_file);
@@ -1765,9 +1764,7 @@ static int write_leaf_in(gen_chunk *obj, struct gen_binding *bp)
       }
     }
     else {
-      /* references are by name.
-	 I don't think that a number is allowed to change, so
-	 the number should be okay.
+      /* references are by name. The number may can be changed...
        */
       int type_number = gen_type_translation_actual_to_old(bp-Domains);
       fputci('R', type_number, user_file);
@@ -1854,8 +1851,8 @@ write_array_leaf(
     }
     else if( obj->p != gen_chunk_undefined ) 
     {
-      fputi(i, user_file);
-      gen_trav_leaf( bp, obj, dr ) ;
+      fputi(i, user_file);           /* write array index */
+      gen_trav_leaf( bp, obj, dr ) ; /* write array value at index */
     }
 }
 
@@ -1978,7 +1975,8 @@ write_tabulated_leaf_in(
       /* once written the domain number sign is inverted,
        * to tag the object has been written, so that
        * its definition is not written twice on disk.
-       * The second time a simple reference is written instead. FC.
+       * The second time a simple reference is written instead. 
+       * beurk. FC.
        */ 
       (obj->p+1)->i = - (obj->p+1)->i ;
       return GO;
@@ -1993,11 +1991,10 @@ write_tabulated_leaf_in(
 int
 gen_write_tabulated(FILE * fd, int domain)
 {
-    int index =  Domains[ domain ].index, i, size, wdomain;
-    gen_chunk *fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof( gen_chunk ),
-				0, 
-				Tabulated_bp-Domains,
-			        Gen_tabulated_[ index ] ) ;
+    int index =  Domains[domain].index, i, size, wdomain;
+    gen_chunk *
+      fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof(gen_chunk),
+			   0, Tabulated_bp-Domains, Gen_tabulated_[index]) ;
     struct driver dr ;
     gen_chunk * t;
 
@@ -2016,18 +2013,21 @@ gen_write_tabulated(FILE * fd, int domain)
     dr.obj_out = write_obj_out ;
     user_file = fd ;
 
-    push_gen_trav_env() ;
-    shared_pointers( fake_obj, FALSE ) ;
+    push_gen_trav_env();
+    shared_pointers(fake_obj, FALSE);
     wdomain = gen_type_translation_actual_to_old(domain);
+
     fputi(wdomain, fd);
     fputi(size, fd);
     fputi(shared_number, fd);
-    gen_trav_obj( fake_obj, &dr ) ;
-    pop_gen_trav_env() ;
 
-    newgen_free((char *) fake_obj ) ;
+    gen_trav_obj(fake_obj, &dr);
 
-    /* restore the index sign which was changed to tag it as seen.
+    pop_gen_trav_env();
+
+    newgen_free(fake_obj);
+
+    /* restore the index sign which was changed to tag as seen.
      */
     t = Gen_tabulated_[index];
     for (i=0; i<size; i++)
@@ -2484,7 +2484,7 @@ int gen_read_tabulated(FILE * file, int create_p)
     /* gen_chunk *cp ; */
     int domain, index, max ;
     int i ;
-    extern int allow_forward_ref ;
+    extern int newgen_allow_forward_ref ;
 
     newgen_start_lexer(file);
 
@@ -2521,10 +2521,11 @@ int gen_read_tabulated(FILE * file, int create_p)
 	    (Gen_tabulated_[ index ]+i)->p = gen_chunk_undefined ;
 	}
     }
-    allow_forward_ref = TRUE;
+    newgen_allow_forward_ref = TRUE;
     genread_parse();
-    allow_forward_ref = FALSE;
+    newgen_allow_forward_ref = FALSE;
 
+    /* free hack array. */
     newgen_free((char *) ((Read_chunk+1)->p) ) ;
     newgen_free((char *) Read_chunk ) ;
 
