@@ -2,6 +2,12 @@
  * Compiler Utilities
  *
  * Fabien Coelho, May 1993
+ *
+ * SCCS Stuff:
+ * $RCSfile: compiler-util.c,v $ ($Date: 1994/04/11 17:01:16 $, )
+ * got on %D%, %T%
+ * $Id$
+ *
  */
 
 #include <stdio.h>
@@ -1059,3 +1065,29 @@ entity e;
 {
     return(gen_find_eq((chunk *) e, processors)==e);
 }
+
+/* ----------------------------------------------------
+ *
+ * NEW DECLARATIONS
+ */
+
+void get_ith_dim_new_declaration(array, i, pmin, pmax)
+entity array;
+int i, *pmin, *pmax;
+{
+    list
+	lnewdecl = (list) GET_ENTITY_MAPPING(newdeclarations, array);
+    dimension
+	d = DIMENSION(CAR(gen_nthcdr(i-1, lnewdecl)));
+
+    pips_assert("get_ith_dim_new_declaration",
+		((array_distributed_p(array)) && 
+		 (entity_variable_p(array))));
+
+    *pmin = HpfcExpressionToInt(dimension_lower(d));
+    *pmax = HpfcExpressionToInt(dimension_upper(d));
+}
+
+/*
+ * that's all
+ */
