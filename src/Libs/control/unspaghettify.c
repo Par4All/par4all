@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/10/23 14:04:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/10/27 09:36:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/10/23 14:04:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/10/27 09:36:00 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -338,8 +338,9 @@ fuse_sequences_in_unstructured(statement s)
 	    pips_assert("control the_successor inconsistants...",
 			gen_consistent_p(the_successor));
 
-	if (a_control_to_fuse == the_successor)
-	    pips_debug(3, "\tA loop of control has been found... Do not fuse the control %p\n", a_control_to_fuse)
+	if (a_control_to_fuse == the_successor) {
+	    pips_debug(3, "\tA loop of control has been found... Do not fuse the control %p\n", a_control_to_fuse);
+	}
 	else {
 	    int number_of_successors_of_the_successor =
 		gen_length(control_successors(the_successor));
