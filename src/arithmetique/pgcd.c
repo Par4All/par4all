@@ -114,8 +114,8 @@ Value pgcd_interne(Value a, Value b)
     assert(value_gt(a,b) && value_pos_p(b));
 
     do{
-	if(value_le(b,(Value)GCD_MAX_B) && 
-	   value_le(a,(Value)GCD_MAX_A)) {
+	if(value_le(b,int_to_value(GCD_MAX_B)) && 
+	   value_le(a,int_to_value(GCD_MAX_A))) {
 	    gcd = gcd_look_up[VALUE_TO_INT(a)][VALUE_TO_INT(b)];
 	    break;
 	}
