@@ -545,13 +545,7 @@ list lvr;
 	}
 	case is_owner_select:
 	{
-	    /* ??? I put the activation right here.
-	     * I guess I should make a real resource, but I do not 
-	     * want to trace what is done with the real resources.
-	     * FC.
-	     */
-	    pips_debug(2, "automatic selection of %s\n", vrn);
-	    activate(vrn);
+	    /* do nothing ... */
 	    break;
 	}
 	default:
@@ -569,28 +563,51 @@ rule ru;
 string oname;
 {
     list reals;
+    bool status = TRUE;
 
-    /* we build the list of pre transformation real_resources */
-    reals = build_real_resources(oname, rule_pre_transformation(ru));
-
-    /* we recursively make the resources */
+    /* we select some resources */
     MAPL(prr, {
-	real_resource rr = REAL_RESOURCE(CAR(prr));
+	real_resource rr = VIRTUAL_RESOURCE(CAR(prr));
+	string vrn = virtual_resource_name(vr);
+	tag vrt = owner_tag(virtual_resource_owner(vr));
 
-	string rron = real_resource_owner_name(rr);
-	/* actually the resource name is a phase name !! */
-	string rrpn = real_resource_resource_name(rr);
+	if (vrt == is_owner_select) {
 
-	debug(3, "make_pre_transformation",
-	      "rule %s : applying %s to %s - recursive call\n",
-	      rule_phase(ru),
-	      rrpn,
-	      rron);
-
-	if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
-	    return FALSE;
-
+	    debug(3, "make_pre_transformation",
+		  "rule %s : selecting phase %s\n",
+		  vrn);
+	    
+	    if (activate (vrn) == NULL) {
+		status = FALSE;
+		break;
+	    }
+	}
     }, reals);
+    
+    
+    if (status) {
+	/* we build the list of pre transformation real_resources */
+	reals = build_real_resources(oname, rule_pre_transformation(ru));
+	
+	/* we recursively make the resources */
+	MAPL(prr, {
+	    real_resource rr = REAL_RESOURCE(CAR(prr));
+	    
+	    string rron = real_resource_owner_name(rr);
+	    /* actually the resource name is a phase name !! */
+	    string rrpn = real_resource_resource_name(rr);
+	    
+	    debug(3, "make_pre_transformation",
+		  "rule %s : applying %s to %s - recursive call\n",
+		  rule_phase(ru),
+		  rrpn,
+		  rron);
+	    
+	    if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
+		status = FALSE;
+	    
+	}, reals);
+    }
     return TRUE;
 }
 
