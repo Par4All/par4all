@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.311  1997/08/19 11:17:39  coelho
+# forgotten protections.
+#
 # Revision 1.310  1997/08/19 11:03:06  coelho
 # also clean .so.
 #
@@ -431,8 +434,8 @@ ifneq (\$(ARCH),.)
 %.a: \$(ARCH)/%.a
 endif
 # Java:
-%.class: %.java; javac $<
-%.h: %.class; javah -jni $*
+%.class: %.java; javac \$<
+%.h: %.class; javah -jni \$*
 # C:
 \$(ARCH)/%.o: %.c ; \$(COMPILE) \$< -o \$@
 # Fortran 77:
