@@ -12,7 +12,7 @@
 # - uses less instead of more to avoid extra-characters when Display is run in background
 
 USAGE="Usage: Display [-w wspace] [-m module] [-v] [-l] [-s] [pretty-print]"
-AVAILABLE_PRETTY_P="Available Pretty-prints: para77 para90 cray cmf craft adfg bdt plc code tran utran prec uprec comp regi inreg outreg prop cumu cg icfg icfgl icfgc dg wp65 bank flint dead"
+AVAILABLE_PRETTY_P="Available Pretty-prints: para77 para90 cray cmf craft adfg bdt plc code tran utran prec uprec comp regi inreg outreg prop cumu cg icfg icfgprec icfgcomp icfgl icfglprec icfglcomp icfgc icfgcprec icfgccomp dg wp65 bank flint dead"
 
 MORE=less
 
@@ -132,10 +132,28 @@ case $PRETTY_P in
 	icfg)	SELECT=PRINT_ICFG
 		EXT=.icfg
 		RESOURCE=ICFG_FILE;;
+	icfgprec)	SELECT=PRINT_ICFG_WITH_PRECONDITIONS
+		EXT=.icfg
+		RESOURCE=ICFG_FILE;;
+	icfgcomp)	SELECT=PRINT_ICFG_WITH_COMPLEXITIES
+		EXT=.icfg
+		RESOURCE=ICFG_FILE;;
 	icfgl)	SELECT=PRINT_ICFG_WITH_LOOPS
 		EXT=.icfgl
 		RESOURCE=ICFG_FILE;;
+	icfglprec)	SELECT=PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
+		EXT=.icfgl
+		RESOURCE=ICFG_FILE;;
+	icfglcomp)	SELECT=PRINT_ICFG_WITH_LOOPS_COMPLEXITIES
+		EXT=.icfgl
+		RESOURCE=ICFG_FILE;;
 	icfgc)	SELECT=PRINT_ICFG_WITH_CONTROL
+		EXT=.icfgc
+		RESOURCE=ICFG_FILE;;
+	icfgcprec)	SELECT=PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
+		EXT=.icfgc
+		RESOURCE=ICFG_FILE;;
+	icfgccomp)	SELECT=PRINT_ICFG_WITH_CONTROL_COMPLEXITIES
 		EXT=.icfgc
 		RESOURCE=ICFG_FILE;;
 	dg)     SELECT=PRINT_RICE_SEMANTICS_DEPENDENCE_GRAPH
