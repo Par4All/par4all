@@ -128,6 +128,7 @@ type t2;
 
        Francois Irigoin, 10 March 1992
        */
+  bool tequal = FALSE;
 
     if(t1 == t2)
 	return TRUE;
@@ -145,7 +146,8 @@ type t2;
     case is_type_area:
 	return area_equal_p(type_area(t1), type_area(t2));
     case is_type_variable:
-	return variable_equal_p(type_variable(t1), type_variable(t2));
+      tequal = variable_equal_p(type_variable(t1), type_variable(t2));
+      return tequal;
     case is_type_functional:
 	return functional_equal_p(type_functional(t1), type_functional(t2));
     case is_type_unknown:
@@ -186,20 +188,22 @@ bool variable_equal_p(v1, v2)
 variable v1;
 variable v2;
 {
+  bool vtequal = FALSE;
+
     if(v1 == v2)
 	return TRUE;
     else if (v1 == variable_undefined && v2 != variable_undefined)
 	return FALSE;
     else if (v1 != variable_undefined && v2 == variable_undefined)
 	return FALSE;
-    else if (!basic_equal_p(variable_basic(v1), variable_basic(v2)))
+    else if (!(vtequal = basic_equal_p(variable_basic(v1), variable_basic(v2))))
 	return FALSE;
     else {
 	list ld1 = variable_dimensions(v1);
 	list ld2 = variable_dimensions(v2);
 
 	if(ld1==NIL && ld2==NIL)
-	    return TRUE;
+	    return vtequal;
 	else {
 	    /* dimensions should be checked, but it's hard: the only
 	       Fortran requirement is that the space allocated in
@@ -213,6 +217,8 @@ variable v2;
 	    pips_error("variable_equal_p", "dimension check not implemented\n");
 	}
     }
+  /* Should never be executed */
+  return vtequal;
 }
 
 bool basic_equal_p(b1, b2)
