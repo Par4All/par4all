@@ -5,7 +5,7 @@
 .SH NAME
 Delete \- remove the workspace(s) of pips
 .SH SYNOPSIS
-.B Delete 
+.B Delete [\-a]
 .IR workspace  .\|.\|. 
 .\"
 .SH AVAILABILITY
@@ -24,6 +24,10 @@ is. Filename generation rules can be used to express the workspace name, provide
 .B
 example% Delete 'ws*'
 .\"
+.SH OPTIONS
+.TP
+.B \-a
+Delete all workspaces in the current directory, if allowed according to UNIX file protection system.
 .SH ENVIRONMENT
 .LP
 In order to add a directory to your path and to set some environment variables, you should run one of the shell script: Pips/pipsrc.sh (under any sh compatible shell) or Pips/pipsrc.csh (under any csh compatible shell).
