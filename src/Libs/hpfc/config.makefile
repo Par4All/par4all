@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/08/24 12:18:45 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/12/09 15:41:56 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -71,7 +71,8 @@ LIB_CFILES=	parser.c \
 		generate-io.c \
 		run-time-functions.c \
 		host_node_entities.c \
-		hpf_objects.c
+		hpf_objects.c \
+		subarray_shift.c
 
 LIB_HEADERS=	f77keywords \
 		f77symboles \
