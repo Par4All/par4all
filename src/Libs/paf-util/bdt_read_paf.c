@@ -74,11 +74,16 @@ bdt	base;
 
 /* External variables */
 
+
+#if defined(HAS_BDTYY)
+
 /* The file read in by the scanner */
 extern FILE * bdtyyin;
 
 /* The parsing function created by Yacc */
 extern int bdtyyparse();
+
+#endif
 
 /*============================================================================*/
 /* bdt bdt_read_paf(char *s) : computes the BDT of the PAF program name given
@@ -104,8 +109,17 @@ char *s;
      exit(1);
    }
 
+#if defined(HAS_BDTYY)
+
  bdtyyin = bdt_file;
  (void) bdtyyparse();
+
+#else
+
+ pips_internal_error("not bdtyy{in,parse} compiled in (HAS_BDTYY undef)\n");
+
+#endif
+
  fclose(bdt_file);
 
  reorganize_bdt(base);
