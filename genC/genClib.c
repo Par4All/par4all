@@ -41,9 +41,6 @@ extern FILE *genspec_in, *genspec_out;
 
 #define GO (1)
 
-extern int max_tabulated_elements(void);
-extern gen_chunk *enter_tabulated_def();
-
 cons *Gen_cp_[ MAX_NESTED_CONS ] ;
 cons **gen_cp_ = (cons**) NULL ; 
 
@@ -69,30 +66,36 @@ static int gen_debug_indent = 0 ;
 
 static int disallow_undefined_tabulated = TRUE ;
 
-/*
- * MACROS added for code checking
- *
- * Fabien COELHO 10/06/94
- */
-#define check_domain(dom) \
-  message_assert("Consistant domain number",\
-		 (dom)>=0 && (dom)<MAX_DOMAIN)
-
-#define check_read_spec_performed() \
-  message_assert("gen_read_spec not performed prior to use", \
-		 Read_spec_performed);
-
-#define check_index(i) \
-  message_assert("valid tabulated index", (i)>=0 && (i)<MAX_TABULATED);
-
-#define newgen_free(p) (*((char*)(p))='\0',free(p)) /* just to hide bugs */
-
 /********************************************************************** MISC */
+
+/* GEN_TYPE returns the domain number for the object in argument
+ * 
+ * FC 29/12/94
+ */
+int gen_type(gen_chunk *obj)
+{
+    int dom;
+    message_assert("no domain for NULL object", obj!=(gen_chunk*)NULL);
+    message_assert("no domain for undefined object", 
+		   !gen_chunk_undefined_p(obj)); 
+    dom = obj->i; check_domain(dom);
+    return dom;
+}
+
+/*  GEN_DOMAIN_NAME returns the domain name, and may be used for debug
+ *  purposes. It should be a valid domain name.
+ *  
+ *  FC 29/12/94
+ */
+string gen_domain_name(int t)
+{
+    check_domain(t); 
+    return Domains[t].name;
+}
 
 /* DOMAIN_INDEX returns the index in the Domain table for object OBJ.
  */
-static int domain_index( obj )
-gen_chunk *obj ;
+int newgen_domain_index(gen_chunk * obj)
 {
     message_assert("No NULL object", obj!=NULL);
     message_assert("No undefined object", obj!=gen_chunk_undefined);
@@ -101,312 +104,6 @@ gen_chunk *obj ;
 	      obj->i, obj);
     return obj->i;
 }
-
-/* inlined version of domain_index. what is done by optimizing compilers?
- */
-#define quick_domain_index(obj) \
-  (((! (obj)) || ((obj)==gen_chunk_undefined) || \
-    ((obj)->i<0) || ((obj)->i>MAX_DOMAIN)) ? \
-   domain_index(obj) : (obj)->i) /* prints the error message or returns */
-
-
-/*********************************************************** TABULATED STUFF */
-
-/* table of tabulated elements.
- */
-#define TABULATED_ELEMENTS_SIZE (1000)
-#define TABULATED_ELEMENTS_INCR (10000)
-
-typedef struct
-{
-  int domain;           /* domain number */
-  int index;            /* index in table */
-  int size;		/* current allocated size */
-  int used;		/* how many are used */
-  gen_chunk * table;	/* actual table */
-} 
-  gen_tabulated_t, * gen_tabulated_p;
-
-static gen_tabulated_p all_tabulateds = NULL;
-
-#define all_tabulateds_initialized() \
-  message_assert("all tabulated is initialized", all_tabulateds)
-
-static void init_tabulated(int index)
-{
-  int i;
-  gen_chunk * t;
-
-  all_tabulateds[index].size = TABULATED_ELEMENTS_SIZE;
-  all_tabulateds[index].used = 0;
-  all_tabulateds[index].index = index;
-  all_tabulateds[index].domain = -1; /* not assigned yet. */
-  t = (gen_chunk*) alloc(sizeof(gen_chunk)*all_tabulateds[index].size);
-  
-  for (i=0; i<TABULATED_ELEMENTS_SIZE; i++)
-    t[i] = gen_chunk_undefined;
-  
-  all_tabulateds[index].table = t;
-}
-
-static void init_all_tabulateds(void)
-{
-  int i;
-  message_assert("all tabulated not initialized", !all_tabulateds);
-
-  all_tabulateds = (gen_tabulated_p) 
-    alloc(sizeof(gen_tabulated_t)*MAX_TABULATED);
-
-  for (i=0; i<MAX_TABULATED; i++)
-    init_tabulated(i);
-}
-
-static void extends_tabulated(int index)
-{
-  int nsize, i;
-  gen_chunk * t;
-  check_index(index);
-
-  nsize = all_tabulateds[index].size + TABULATED_ELEMENTS_INCR;
-
-  t = (gen_chunk*) 
-    realloc(all_tabulateds[index].table, sizeof(gen_chunk)*nsize);
-
-  message_assert("realloc ok", t);
-
-  for (i=all_tabulateds[index].size; i<nsize; i++)
-    t[i] = gen_chunk_undefined;
-  
-  all_tabulateds[index].size = nsize;
-  all_tabulateds[index].table = t;
-}
-
-gen_chunk * gen_tabulated_table_of(int domain)
-{
-  int index = Domain[domain].index;
-  check_index[index];
-  return all_tabulateds[index].table;
-}
-
-void gen_tabulated_table_set(int domain, int number, gen_chunk * gc)
-{
-  abort();
-  return;
-}
-
-
-/* ENTER_TABULATED_DEF enters a new definition (previous refs are allowed if
-   ALLOW_REF) in the INDEX tabulation table of the DOMAIN, with the unique
-   ID and value CHUNKP. */
-
-gen_chunk * 
-gen_enter_tabulated_def(
-    int index,
-    int domain,
-    char *id,
-    gen_chunk *chunkp,
-    int allow_ref)
-{
-  gen_chunk *hash ;
-  
-  if( Gen_tabulated_[ index ] == (gen_chunk *)NULL ) {
-    fatal( "enter_tabulated_def: Uninitialized %s\n", 
-	   Domains[ domain ].name ) ;
-  }
-  
-  if ((hash=(gen_chunk *) gen_get_tabulated_name_basic(domain, id)) !=
-      (gen_chunk *)HASH_UNDEFINED_VALUE ) {
-    
-    /* redefinitions of tabulated should not be allowed...
-     * but you cannot be user it is a redefinition if allow_ref
-     */
-    if(!allow_ref)
-      (void) fprintf(stderr, "[make_%s] warning: %s redefined\n", 
-		     Domains[domain].name, id);
-    
-    /* actually very obscure there... seems that negative domain
-     * numbers are used to encode something... already used/seen ???
-     */
-    if( allow_ref && hash->i < 0 ) 
-      {
-	int i, size = gen_size( Domains+domain ) ;
-	gen_chunk *cp, *gp ;
-	
-	hash->i = -hash->i ;
-	
-	if( (gp=(Gen_tabulated_[ index ]+hash->i)->p) == NULL ) {
-	  fatal( "make_def: Null for %d%c%s\n", domain, HASH_SEPAR, id);
-	}
-	for( cp=chunkp, i=0 ; i<size ; i++ ) {
-	  *gp++ = *cp++ ;
-	}
-	((Gen_tabulated_[ index ]+hash->i)->p+1)->i = hash->i ;
-	return( (Gen_tabulated_[ index ]+hash->i)->p ) ;
-      } 
-    else {
-      if (hash_warn_on_redefinition_p()) {
-	user("Tabulated entry %d%c%s already defined: updating\n",
-	     domain, HASH_SEPAR, id);
-      }
-    }
-  }
-  else {
-    hash = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
-    hash->i = gen_find_free_tabulated( &Domains[ domain ] ) ;
-    gen_put_tabulated_name(domain, id, (char *)hash);
-  }
-  (Gen_tabulated_[ index ]+hash->i)->p = chunkp ;
-  (chunkp+1)->i = hash->i ;
-  return chunkp;
-}
-    
-void gen_mapc_tabulated(void (*fp)(), int binding)
-{
-    struct gen_binding *bp = &Domains[ binding ] ;
-    gen_chunk *table = Gen_tabulated_[ bp->index ] ;
-    int i ;
-
-    if( table == NULL ) {
-	user( "gen_mapc_tabulated: non tabulated domain %s\n", bp->name ) ;
-	return ;
-    }
-    for( i = 0 ; i < max_tabulated_elements() ; i++ ) {
-	if( (table+i)->p != gen_chunk_undefined ) 
-		(*fp)( (table+i)->p ) ;
-    }
-}
-
-void * gen_find_tabulated(char * key, int domain)
-{
-    gen_chunk *hash ;
-
-    if( (hash=(gen_chunk *)gen_get_tabulated_name_basic(domain, key))
-	== (gen_chunk *)HASH_UNDEFINED_VALUE ) {
-	return( gen_chunk_undefined ) ;
-    }
-    return (void*) 
-	((Gen_tabulated_[ Domains[ domain ].index ]+abs( hash->i ))->p);
-}
-
-list gen_filter_tabulated(int (*filter)(), int domain)
-{
-    struct gen_binding *bp = &Domains[ domain ] ;
-    gen_chunk *table = Gen_tabulated_[ bp->index ] ;
-    int i ;
-    cons *l ;
-
-    if( table == NULL ) {
-	user( "gen_filter_tabulated: non tabulated domain %s\n", bp->name ) ;
-	return( NIL ) ;
-    }
-    for( i = 0, l = NIL ; i < max_tabulated_elements() ; i++ ) {
-	gen_chunk *obj = (table+i)->p ;
-
-	if( obj != gen_chunk_undefined && (*filter)( obj )) {
-	    l = CONS( CHUNK, obj, l ) ;
-	}
-    }
-    return l;
-}
-
-/***************************************************** GEN_TABULATED_NAMES */
-
-static hash_table Gen_tabulated_names = 0;
-
-void gen_init_Gen_tabulated_names(void)
-{
-    message_assert("NULL table", !Gen_tabulated_names)
-    Gen_tabulated_names = hash_table_make(hash_string, 1000);
-}
-
-void gen_close_Gen_tabulated_names(void)
-{
-    message_assert("defined table", Gen_tabulated_names);
-    hash_table_free(Gen_tabulated_names);
-    Gen_tabulated_names = 0;
-}
-
-#define check_Gen_tabulated_names() \
-  message_assert("Gen_tabulated_names defined", Gen_tabulated_names)
-
-/* returns a pointer to a static string "number|name"
- */
-char * gen_build_unique_tabulated_name(int domain, char * name)
-{
-    int len = strlen(name);
-
-    /* permanent buffer */
-    static int size = 0;
-    static char * buffer = 0;
-    
-    if (len+30>size) {
-	size = len+30;
-	if (buffer) free(buffer);
-	buffer = (char*) malloc(sizeof(char)*size);
-	if (!buffer) fatal("build_unique_tabulated_name: memory exhausted\n");
-    }
-
-    sprintf(buffer, "%d%c%s", domain, HASH_SEPAR, name);
-    return buffer;
-}
-
-static char * build_unique_tabulated_name_for_obj(gen_chunk * obj)
-{
-    char * name = (obj+HASH_OFFSET)->s;
-    int domain = quick_domain_index(obj);
-    return gen_build_unique_tabulated_name(domain, name);
-}	
-
-/* deletes obj from the tabulated names...
- */
-void gen_delete_tabulated_name(gen_chunk * obj)
-{
-    char * key = build_unique_tabulated_name_for_obj(obj);
-    char * okey, * val;
-    check_Gen_tabulated_names();
-    
-    if ((val=hash_delget(Gen_tabulated_names, key, &okey)) == 
-	HASH_UNDEFINED_VALUE)
-	fatal("gen_delete_tabulated_name: clearing unexisting (%s)\n", key);
-
-    free(okey); free(val);
-}
-
-char * gen_get_tabulated_name_basic(int domain, char * id)
-{
-    char * key = gen_build_unique_tabulated_name(domain, id);
-    check_Gen_tabulated_names();
-    return hash_get(Gen_tabulated_names, key);
-}
-
-char * gen_get_tabulated_name(gen_chunk * obj)
-{
-    char * key = build_unique_tabulated_name_for_obj(obj);
-    check_Gen_tabulated_names();
-    return hash_get(Gen_tabulated_names, key);
-}
-
-char * gen_get_tabulated_name_direct(char * key)
-{
-    check_Gen_tabulated_names();
-    return hash_get(Gen_tabulated_names, key);
-}
-
-void gen_put_tabulated_name(int domain, char * name, char * val)
-{
-    char * key = gen_build_unique_tabulated_name(domain, name);
-    check_Gen_tabulated_names();
-    hash_put(Gen_tabulated_names, strdup(key), val);
-}
-
-void gen_put_tabulated_name_direct(char * key, char * val)
-{
-    check_Gen_tabulated_names();
-    hash_put(Gen_tabulated_names, key, val);
-}
-
-
-
 
 /* FPRINTF_SPACES prints NUMBER spaces on the FD file descriptor.`
  */
@@ -442,6 +139,8 @@ write_gen_chunk( file, obj, l )
 }
 #endif
 
+/**************************************************************** ALLOCATION */
+
 /* ARRAY_SIZE returns the number of elements in the array whose dimension
  * list is DIM. 
  */
@@ -460,9 +159,7 @@ array_size( dim )
 /* INIT_ARRAY returns a freshly allocated array initialized according to
  * the information in its domain DP.
  */
-static gen_chunk *
-init_array( dp )
-     union domain *dp ;
+static gen_chunk * init_array(union domain * dp)
 {
   int sizarray = array_size( dp->ar.dimensions ) ;
   /*NOSTRICT*/
@@ -471,50 +168,19 @@ init_array( dp )
   for( ; sizarray ; sizarray-- )
     ar[ sizarray-1 ].p = gen_chunk_undefined ;
 
-  return( ar ) ;
+  return ar;
 }
 
-static int 
-array_own_allocated_memory(
-    union domain *dp)
+static int array_own_allocated_memory(union domain *dp)
 {
-    return sizeof(gen_chunk)*array_size(dp->ar.dimensions);
-}
-
-/* FIND_FREE_TABULATED finds a free slot for the tabulated domain BP.
-   The slot 0 is unused (see write_tabulated_leaf_in) */
-
-int
-gen_find_free_tabulated( bp )
-struct gen_binding *bp ;
-{
-    int i ;
-    int mte = max_tabulated_elements();
-
-    if( Gen_tabulated_[ bp->index ] == gen_chunk_undefined ) {
-	fatal( "find_free_tabulated: Uninitialized %s\n", bp->name ) ;
-    }
-    i = ((bp->alloc == mte-1) ? 1 : bp->alloc)+1 ;
-
-    for( ; ; i = (i == mte-1) ? 1 : i+1 ) {
-	if( i == bp->alloc ) {
-	    user( "Too many elements in tabulated domain %s\n", bp->name ) ;
-	    user("Current limit (%d) can be redefined by setting environment "
-		 "variable NEWGEN_MAX_TABULATED_ELEMENTS\n", mte);
-	    exit(1);
-	}
-	if( (Gen_tabulated_[ bp->index ]+i)->p == gen_chunk_undefined ) {
-	    return( bp->alloc = i ) ;
-	}
-    }
+  return sizeof(gen_chunk)*array_size(dp->ar.dimensions);
 }
 
 /* GEN_ALLOC_COMPONENT updates the gen_chunk CP from the arg list AP according
    to the domain DP. */
 
 /*VARARGS2*/
-void
-gen_alloc_component( dp, cp, ap, gen_check_p )
+static void gen_alloc_component( dp, cp, ap, gen_check_p )
 union domain *dp ;
 gen_chunk *cp ;
 va_list *ap ;
@@ -565,8 +231,7 @@ int gen_check_p ;
    the index in the Domains table. A fairly sophisticated initialization
    process is run, namely arrays are filled with undefineds. */
 
-void
-gen_alloc_constructed( ap, bp, dp, cp, data, gen_check_p )
+static void gen_alloc_constructed( ap, bp, dp, cp, data, gen_check_p )
 va_list ap ;
 struct gen_binding *bp ;
 union domain *dp ;
@@ -611,8 +276,9 @@ int gen_check_p ;
     }
 }
 
-gen_chunk *
-gen_alloc(int size, int gen_check_p, int dom, ...)
+/* allocates something in newgen.
+ */
+gen_chunk * gen_alloc(int size, int gen_check_p, int dom, ...)
 {
     va_list ap ;
     union domain *dp ;
@@ -650,12 +316,14 @@ gen_alloc(int size, int gen_check_p, int dom, ...)
     }
 
     if (IS_TABULATED(bp)) 
-	enter_tabulated_def(bp->index, dom, (cp+HASH_OFFSET)->s, cp, FALSE);
+      gen_enter_tabulated(dom, (cp+HASH_OFFSET)->s, cp, FALSE);
 
     va_end( ap ) ;
 
-    return( cp ) ;
+    return cp;
 }
+
+/********************************************************** NEWGEN RECURSION */
 
 /* The DRIVER structure is used to monitor the general function which
  * traverses objects. NULL is called whenver an undefined pointer is found.
@@ -688,10 +356,7 @@ static bool gen_trav_stop_recursion = FALSE; /* set to TRUE to stop... */
    driver DR. A leaf is an object (inlined or not). */
 
 static void
-gen_trav_leaf( 
-    struct gen_binding * bp,
-    gen_chunk * obj,
-    struct driver * dr)
+gen_trav_leaf(struct gen_binding * bp, gen_chunk * obj, struct driver * dr)
 {
     if (gen_trav_stop_recursion) return;
 
@@ -714,7 +379,6 @@ gen_trav_leaf(
     if( (*dr->leaf_in)(obj, bp))
     {
 	if (gen_trav_stop_recursion) return;
-
 	if( !IS_INLINABLE( bp ) && !IS_EXTERNAL( bp ))
 	{
 	    if (gen_debug & GEN_DBG_CHECK)
@@ -723,7 +387,6 @@ gen_trav_leaf(
 	    CHECK_NULL(obj->p, bp, dr) ;
 	    gen_trav_obj( obj->p, dr ) ;
 	}
-
 	(*dr->leaf_out)(obj, bp) ;
     }
 
@@ -934,6 +597,8 @@ struct gen_binding *bp ;
     return(!IS_TABULATED(bp));
 }
 
+/******************************************************************* SHARING */
+
 /* These functions computes an hash table of object pointers
  * (to be used to manage sharing when dealing with objects). 
  */
@@ -969,56 +634,6 @@ int current_shared_obj_table_size()
  */
 
 static int shared_number = 0 ;
-
-/* GEN_TRAV_ENVS are stacked to allow recursive calls to GEN_TRAV_OBJ 
- * (cf. GEN_RECURSE)
- */
-
-#define MAX_GEN_TRAV_ENV 100
-
-static int gen_trav_env_top = 0 ;
-
-struct gen_trav_env {
-    char *first_seen ;
-    char *seen_once ;
-    hash_table obj_table ;
-    int shared_number ;
-} gen_trav_envs[ MAX_GEN_TRAV_ENV ] ;
-
-static void push_gen_trav_env() 
-{
-    struct gen_trav_env *env ;
-
-    message_assert("Too many recursive gen_trav",
-		   gen_trav_env_top < MAX_GEN_TRAV_ENV);
-
-    env = &gen_trav_envs[gen_trav_env_top++] ;
-    env->first_seen = first_seen ;
-    env->seen_once = seen_once ;
-    env->obj_table = obj_table ;
-    env->shared_number = shared_number ;
-
-    first_seen = (char *)alloc( MAX_SHARED_OBJECTS ) ;
-    seen_once = (char *)alloc( MAX_SHARED_OBJECTS ) ;
-    obj_table = hash_table_make( hash_pointer, 0 ) ;
-    shared_number = 0 ;
-}
-
-static void pop_gen_trav_env() 
-{
-    struct gen_trav_env *env ;
-
-    message_assert("Too many pops", gen_trav_env_top >= 0);
-
-    newgen_free( first_seen ) ;
-    newgen_free( seen_once ) ;
-    hash_table_free( obj_table ) ;
-
-    first_seen = (env = &gen_trav_envs[--gen_trav_env_top])->first_seen ;
-    seen_once = env->seen_once ;
-    obj_table = env->obj_table ;
-    shared_number = env->shared_number ;
-}
 
 /* SHARED_OBJ_IN introduces an object OBJ in the OBJ_TABLE. If it is
    already in the table, don't recurse (at least, if you want to avoid an
@@ -1147,9 +762,58 @@ void (*others)() ;
     }
 }
 
+/***************************************************** RECURSION ENVIRONMENT */
 
+/* GEN_TRAV_ENVS are stacked to allow recursive calls to GEN_TRAV_OBJ 
+ * (cf. GEN_RECURSE)
+ */
+#define MAX_GEN_TRAV_ENV 100
 
-/********************************************************************* FREE */
+static int gen_trav_env_top = 0 ;
+
+struct gen_trav_env {
+    char *first_seen ;
+    char *seen_once ;
+    hash_table obj_table ;
+    int shared_number ;
+} gen_trav_envs[ MAX_GEN_TRAV_ENV ] ;
+
+static void push_gen_trav_env() 
+{
+    struct gen_trav_env *env ;
+
+    message_assert("Too many recursive gen_trav",
+		   gen_trav_env_top < MAX_GEN_TRAV_ENV);
+
+    env = &gen_trav_envs[gen_trav_env_top++] ;
+    env->first_seen = first_seen ;
+    env->seen_once = seen_once ;
+    env->obj_table = obj_table ;
+    env->shared_number = shared_number ;
+
+    first_seen = (char *)alloc( MAX_SHARED_OBJECTS ) ;
+    seen_once = (char *)alloc( MAX_SHARED_OBJECTS ) ;
+    obj_table = hash_table_make( hash_pointer, 0 ) ;
+    shared_number = 0 ;
+}
+
+static void pop_gen_trav_env() 
+{
+    struct gen_trav_env *env ;
+
+    message_assert("Too many pops", gen_trav_env_top >= 0);
+
+    newgen_free(first_seen);
+    newgen_free(seen_once);
+    hash_table_free(obj_table);
+
+    first_seen = (env = &gen_trav_envs[--gen_trav_env_top])->first_seen ;
+    seen_once = env->seen_once ;
+    obj_table = env->obj_table ;
+    shared_number = env->shared_number ;
+}
+
+/********************************************************************** FREE */
 
 /* These functions are used to implement the freeing of objects. A
    tabulated constructor has to stop recursive freeing. */
@@ -1271,33 +935,26 @@ union domain *dp ;
     return(-1); /* just to avoid a gcc warning */
 }
 
-static int
-free_obj_in(
-    gen_chunk *obj,
-    struct driver *dr)
+static int free_obj_in(gen_chunk * obj, struct driver * dr)
 {
-    int notseen = !free_already_seen_p(obj);
-
-    if (notseen) {
-	int dom = quick_domain_index(obj);
-	struct gen_binding *bp = &Domains[dom] ;
-
-	if( IS_TABULATED( bp )) 
-	{
-	    gen_delete_tabulated_name(obj);
-	    (Gen_tabulated_[bp->index]+abs((obj+1)->i))->p=gen_chunk_undefined;
-	}
+  int notseen = !free_already_seen_p(obj);
+  
+  if (notseen) 
+  {
+    struct gen_binding * bp = Domains+obj->i;
+    if (IS_TABULATED(bp)) 
+    {
+      gen_clear_tabulated_element(obj);
     }
-    
-    return notseen;
+  }
+  
+  return notseen;
 }
 
-/* version withouy shared_pointers.
+/* version without shared_pointers.
  * automatic re-entry allowed. FC.
  */
-void
-gen_free(
-    gen_chunk *obj)
+void gen_free(gen_chunk *obj)
 {
     /* reentry or not: whether the already_seen table is initialized or not...
      */
@@ -1328,8 +985,7 @@ gen_free(
 }
 
 void 
-gen_full_free_list(
-		   list l)
+gen_full_free_list(list l)
 {
     list p, nextp ;
     bool first_in_stack = (free_already_seen==(hash_table)NULL);
@@ -1337,10 +993,11 @@ gen_full_free_list(
     if (first_in_stack)
 	free_already_seen = hash_table_make(hash_pointer, 0);
     
-    for( p = l ; p != NIL ; p = nextp ) {
-	nextp = p->cdr ;
-	gen_free( CAR(p).p ) ;
-	newgen_free( p ) ;
+    for (p = l; p ; p=nextp) 
+    {
+	nextp = p->cdr;
+	gen_free(CAR(p).p);
+	newgen_free(p);
     }
     
     if (first_in_stack)
@@ -1404,7 +1061,7 @@ struct driver *dr ;
 	/* memory is allocated to duplicate the object referenced by obj 
 	 */
 	gen_chunk *new_obj;
-	int size = gen_size(bp)*sizeof(gen_chunk);
+	int size = gen_size(bp-Domains)*sizeof(gen_chunk);
 	new_obj = (gen_chunk *)alloc(size);
 
 	/* thus content is copied, thus no probleme with inlined and so
@@ -1751,61 +1408,34 @@ gen_copy_tree_with_sharing(
 
 /*********************************************************** FREE_TABULATED */
 
-/* GEN_FREE_TABULATED frees all the elements of the tabulated table of
-   BINDING. */
-
-int 
-gen_free_tabulated(int domain)
+/*
+static void free_this_tabulated(gen_chunk * obj)
 {
-    struct gen_binding *bp = &Domains[ domain ];
-    gen_chunk * t = Gen_tabulated_[bp->index];
-    int i, size = max_tabulated_elements();
-    
-    check_read_spec_performed();
-
-    /* since gen_free is reentrant and manages sharing globally
-     * with the following table, we just call it for each object
-     * and everything is fine. Well, I hope so. FC
-     */
-    message_assert("not initialized", !free_already_seen);
-    free_already_seen = hash_table_make(hash_pointer, 0);
-
-    /* fprintf(stderr, " -- domain %d (%d allocated)\n", domain, bp->alloc); */
-
-    for (i=0; i<size; i++)
-    {
-	if (t[i].p && !gen_chunk_undefined_p(t[i].p)) {
-	    /*fprintf(stderr, "freeing [%d] (0x%x) %s \n", i,
-		    (unsigned int) t[i].p, ((t[i].p)+2)->s); */
-
-	    gen_free(t[i].p), t[i].p = gen_chunk_undefined;
-	}
-    }
-
-    hash_table_free(free_already_seen);
-    free_already_seen = NULL;
-
-    bp->alloc = 1; /* ??? */
-    return domain;
+  gen_clear_tabulated_element(obj);
+  gen_free(obj);
 }
+*/
 
-/* GEN_CLEAR_TABULATED_ELEMENT only clears the entry for object OBJ in the
-   Gen_tabulated_ and Gen_tabulated_names tables. */
-
-void
-gen_clear_tabulated_element( obj )
-gen_chunk *obj  ;
+/* free tabulated elements of this domain. 
+ */
+int gen_free_tabulated(int domain)
 {
-    struct gen_binding *bp = &Domains[ quick_domain_index( obj ) ] ;
+  check_read_spec_performed();
+  
+  /* since gen_free is reentrant and manages sharing globally
+   * with the following table, we just call it for each object
+   * and everything is fine. Well, I hope so. FC
+   */
+  message_assert("not initialized", !free_already_seen);
+  free_already_seen = hash_table_make(hash_pointer, 0);
+  
+  gen_mapc_tabulated(gen_free, domain);
+  
+  hash_table_free(free_already_seen);
+  free_already_seen = NULL;
 
-    if( IS_TABULATED( bp )) {
-	gen_delete_tabulated_name(obj);
-	(Gen_tabulated_[ bp->index ]+abs( (obj+1)->i ))->p = 
-	    gen_chunk_undefined ;
-    }
-    else {
-	user( "clear_tabulated: not a tabulated element\n" ) ;
-    }
+  /* bp->alloc = 1; // ??? */
+  return domain;
 }
 
 /********************************************************************* WRITE */
@@ -1970,8 +1600,6 @@ static int write_leaf_in(gen_chunk *obj, struct gen_binding *bp)
     return !GO;
   }
   else if( IS_INLINABLE( bp )) {
-    char *format = bp->inlined->C_format ;
-    
     /* hummm... */
     if (IS_UNIT_TYPE(bp-Domains))
       putc('U', user_file);
@@ -1980,7 +1608,7 @@ static int write_leaf_in(gen_chunk *obj, struct gen_binding *bp)
     else if (IS_INT_TYPE(bp-Domains))
       fputi(obj->i, user_file);
     else if (IS_FLOAT_TYPE(bp-Domains))
-      (void) fprintf(user_file, format, obj->f) ;
+      (void) fprintf(user_file, "%f", obj->f) ;
     else if (IS_STRING_TYPE(bp-Domains))
       write_string( "\"", obj->s, "\"", "_", "!") ;
     else 
@@ -2074,8 +1702,8 @@ write_simple_out(
 }
 
 /* GEN_WRITE writes the OBJect on the stream FD. Sharing is managed (the 
-   number of which is printed before the object.) */
-
+   number of which is printed before the object.)
+ */
 void
 gen_write(
     FILE * fd, 
@@ -2108,7 +1736,6 @@ gen_write(
 /* GEN_WRITE_WITHOUT_SHARING writes the OBJect on the stream FD. Sharing
    is NOT managed.
 */
-
 void
 gen_write_without_sharing( fd, obj )
 FILE *fd ;
@@ -2140,28 +1767,27 @@ gen_chunk *obj ;
 }
 
 /* WRITE_TABULATED_LEAF_IN prints the OBJect of type BP. If it is tabulated,
-   then recurse. */
-
-static int
-write_tabulated_leaf_in(
-    gen_chunk *obj, 
-    struct gen_binding *bp)
+   then recurse.
+ */
+static int write_tabulated_leaf_in(gen_chunk *obj, struct gen_binding *bp)
 {
-  if( IS_TABULATED( bp )) {
+  if (IS_TABULATED(bp)) 
+  {
     int number ;
     
-    if( obj->p == gen_chunk_undefined ) {
-      write_null( bp ) ;
+    if (obj->p == gen_chunk_undefined) {
+      write_null(bp);
       return !GO;
     }
-    if( (number = (obj->p+1)->i) == 0 ) {
-      fatal("write_tabulated_leaf_in: Zero index in domain %s\n", 
-	    bp->name ) ;
+    number = (obj->p+1)->i;
+
+    if (number==0) { /* boum! why? */
+      fatal("write_tabulated_leaf_in: Zero index in domain %s\n", bp->name);
     }
     
     /* fprintf(stderr, "writing %d %s\n", number, (obj->p+HASH_OFFSET)->s);
      */
-    if( number >= 0 ) 
+    if (number >= 0)
     {
       putc('D', user_file);
       /*
@@ -2175,11 +1801,26 @@ write_tabulated_leaf_in(
        * The second time a simple reference is written instead. 
        * beurk. FC.
        */ 
-      (obj->p+1)->i = - (obj->p+1)->i ;
+      (obj->p+1)->i = - (obj->p+1)->i;
       return GO;
     }
   }
+
   return write_leaf_in(obj, bp);
+}
+
+static struct gen_binding * wtt_bp = NULL;
+static struct driver * wtt_dr = NULL;
+static void write_this_tabulated(gen_chunk * o)
+{
+  gen_chunk g; 
+  g.p = o;
+  gen_trav_leaf(wtt_bp, &g, wtt_dr);
+}
+
+static void change_sign(gen_chunk * o)
+{
+  if ((o+1)->i < 0) (o+1)->i = -((o+1)->i);
 }
 
 /* GEN_WRITE_TABULATED writes the tabulated object TABLE on FD.
@@ -2188,19 +1829,15 @@ write_tabulated_leaf_in(
 int gen_write_tabulated(FILE * fd, int domain)
 {
   struct gen_binding * bp = Domains+domain;
-  int index =  Domains[domain].index, i, size, wdomain;
-  gen_chunk 
-    * tt = Gen_tabulated_[index],
-    * fake_obj = gen_alloc(GEN_HEADER_SIZE+sizeof(gen_chunk),
-			 0, Tabulated_bp-Domains, tt);
   struct driver dr ;
+  int i, wdomain;
+  gen_chunk * fake_obj;
   
   check_read_spec_performed();
-  
-  size = max_tabulated_elements();
+
   wdomain = gen_type_translation_actual_to_old(domain);
+  fake_obj = gen_tabulated_fake_object_hack(domain);
   
-  Tabulated_bp->domain->ar.element = &Domains[domain]; 
   dr.null = write_null;
   dr.leaf_out = gen_null ;
   dr.leaf_in = write_tabulated_leaf_in ;
@@ -2220,35 +1857,25 @@ int gen_write_tabulated(FILE * fd, int domain)
   putc('*', fd);
   fputi(wdomain, fd);
   
-  for (i=0; i<size; i++)
-  {
-    if (tt[i].p && !gen_chunk_undefined_p(tt[i].p))
-      gen_trav_leaf(bp, &tt[i], &dr);
-  }
+  wtt_bp = bp, wtt_dr = &dr;
+  gen_mapc_tabulated(write_this_tabulated, domain);
+  wtt_bp = NULL, wtt_dr = NULL;
 
   putc(')', fd);
 
-  /* gen_trav_obj(fake_obj, &dr); */
-    
   pop_gen_trav_env();
 
-  newgen_free(fake_obj);
-
-  /* restore the index sign which was changed to tag as seen.
-   */
-  for (i=0; i<size; i++)
-    if (tt[i].p && !gen_chunk_undefined_p(tt[i].p)) 
-      if ((tt[i].p+1)->i<0) (tt[i].p+1)->i = -(tt[i].p+1)->i;
+  /* restore the index sign which was changed to tag as seen... */
+  gen_mapc_tabulated(change_sign, domain);
 
   return domain;
 }
 
 #ifdef BSD
-static char *strdup( s )
-char *s ;
+static char * strdup(const char * s)
 {
-    char *new = (char*) malloc( strlen( s )+1 ) ;
-    strcpy( new, s ) ;
+    char * new = (char*) malloc(strlen(s)+1);
+    strcpy(new, s);
     return new;
 }
 #endif
@@ -2543,8 +2170,7 @@ static void init_gen_quick_recurse_tables(void);
 extern void genspec_set_string_to_parse(char*);
 extern void genspec_reset_string_to_parse(void);
 
-void
-gen_read_spec(char * spec, ...)
+void gen_read_spec(char * spec, ...)
 {
     va_list ap ;
     gen_chunk **cpp ;
@@ -2575,42 +2201,31 @@ gen_read_spec(char * spec, ...)
 
     compile() ;
 
-    for( cpp= &Gen_tabulated_[0] ; 
-	 cpp<&Gen_tabulated_[MAX_TABULATED] ; 
-	 cpp++ ) {
-	*cpp = gen_chunk_undefined ;
-    }
+    gen_init_all_tabulateds();
 
-    for( bp = Domains ; bp < &Domains[ MAX_DOMAIN ] ; bp++ ) 
+    for (bp=Domains ; bp<&Domains[MAX_DOMAIN]; bp++)
     {
-      /* DEBUG */
-      /* if (bp->name) fprintf(stderr, "%d: %s\n", bp-Domains, bp->name); */
-
-	if( bp->name != NULL &&
-	   !IS_INLINABLE( bp ) && !IS_EXTERNAL( bp ) &&
-	   bp->domain->ba.type == IMPORT_DT ) {
-	    user( "Cannot run with imported domains: %s\n", bp->name ) ;
+	if(bp->name && !IS_INLINABLE(bp) && !IS_EXTERNAL(bp) &&
+	   bp->domain->ba.type == IMPORT_DT) {
+	  user( "Cannot run with imported domains: %s\n", bp->name ) ;
 	    return ;
 	}
-	if( IS_TABULATED( bp )) {
+	if (IS_TABULATED(bp))
+	{
 	    int i ;
-
 	    bp->alloc = 1 ;
-	    Gen_tabulated_[ bp->index ] = 
-		(gen_chunk *)alloc(max_tabulated_elements()*sizeof(gen_chunk));
-	    
-	    for( i=0 ; i<max_tabulated_elements() ; i++ ) {
-		(Gen_tabulated_[ bp->index ]+i)->p = gen_chunk_undefined ;
-	    }
-	    if( Gen_tabulated_names == NULL )
-		gen_init_Gen_tabulated_names();
+	    gen_lazy_init_gen_tabulated_names();
+	    gen_init_tabulated_set_domain(bp->index, bp-Domains);
 	}
     }
+
     gen_cp_ = &Gen_cp_[ 0 ] ;
     gen_hash_ = &Gen_hash_[ 0 ] ;
+
     Read_spec_mode = 0 ;
     Read_spec_performed = TRUE ;
-    va_end( ap ) ;
+
+    va_end(ap);
 
     /* quick recurse decision tables initializations
      */
@@ -2651,7 +2266,7 @@ int (*allocated_memory)() ;
 	dp->ex.allocated_memory = allocated_memory ;
 }
 
-/*****************************************************************************/
+/********************************************************************** READ */
 
 /* GEN_MAKE_ARRAY allocates an initialized array of NUM gen_chunks. */
 
@@ -2685,26 +2300,10 @@ gen_chunk * gen_read(FILE * file)
 
 int gen_read_tabulated(FILE * file, int create_p)
 {
-    /* gen_chunk *cp ; */
-    int domain, index, max ;
-    int i ;
-    extern int newgen_allow_forward_ref ;
+    extern int newgen_allow_forward_ref;
+    int domain;
 
     newgen_start_lexer(file);
-
-/*
-    if (create_p) {
-	if( Gen_tabulated_[ index = Domains[domain].index ] == NULL ) {
-	    user( "gen_read_tabulated: Trying to read untabulated domain %s\n",
-		  Domains[domain].name);
-	}
-	Domains[domain].alloc = 1 ;
-
-	for( i = 0 ; i < max_tabulated_elements() ; i++ ) {
-	    (Gen_tabulated_[ index ]+i)->p = gen_chunk_undefined ;
-	}
-    }
-*/
 
     newgen_allow_forward_ref = TRUE;
     genread_parse();
@@ -2714,25 +2313,6 @@ int gen_read_tabulated(FILE * file, int create_p)
     newgen_free((char *) Read_chunk);
 
     return domain;
-}
-
-int
-gen_read_and_check_tabulated(
-    FILE *file,
-    int create_p)
-{
-    int domain ;
-
-    domain = gen_read_tabulated( file, create_p ) ;
-
-    HASH_MAP( k, v, {
-	gen_chunk *hash = (gen_chunk *)v ;
-
-        if( hash->i < 0 ) {
-            user( "Tabulated element not defined: %s\n", k ) ;
-        }
-    }, Gen_tabulated_names ) ;
-    return( domain ) ;
 }
 
 /* GEN_CHECK checks that the gen_chunk received OBJ is of the appropriate TYPE.
@@ -2764,30 +2344,6 @@ gen_check(
     return( obj ) ;
 }
 
-/* GEN_TYPE returns the domain number for the object in argument
- * 
- * FC 29/12/94
- */
-int gen_type(gen_chunk *obj)
-{
-    int dom;
-    message_assert("no domain for NULL object", obj!=(gen_chunk*)NULL);
-    message_assert("no domain for undefined object", 
-		   !gen_chunk_undefined_p(obj)); 
-    dom = obj->i; check_domain(dom);
-    return dom;
-}
-
-/*  GEN_DOMAIN_NAME returns the domain name, and may be used for debug
- *  purposes. It should be a valid domain name.
- *  
- *  FC 29/12/94
- */
-char * gen_domain_name(int t)
-{
-    check_domain(t); return(Domains[t].name);
-}
-
 /*************************************************************** CONSISTENCY */
 
 extern int error_seen ;
@@ -2802,37 +2358,31 @@ static void open_black_hole()
 	    fatal("Cannot open /dev/null !") ; /* not reached */
 }
 
+static bool cumulated_error_seen;
+
 /* GEN_CONSISTENT_P dynamically checks the type correctness of OBJ. 
  */
-int
-gen_consistent_p( obj )
-gen_chunk *obj ;
+int gen_consistent_p(gen_chunk * obj)
 {
-    int old_gen_debug = gen_debug ;
-
+    int old_gen_debug = gen_debug;
     check_read_spec_performed();
     open_black_hole();
 
     error_seen = 0 ;
-    gen_debug = GEN_DBG_CHECK ;
-    gen_write(black_hole, obj) ;
-    gen_debug = old_gen_debug ;
-    return( error_seen  == 0 ) ;
+    gen_debug = GEN_DBG_CHECK;
+
+    gen_write(black_hole, obj);
+
+    gen_debug = old_gen_debug;
+    cumulated_error_seen |= error_seen;
+    return !error_seen;
 }
 
 int gen_tabulated_consistent_p(int domain)
 {
-    struct gen_binding *bp = &Domains[ domain ];
-    gen_chunk * t = Gen_tabulated_[bp->index];
-    int i, size = max_tabulated_elements();
-
-    for (i=0; i<size; i++)
-    {
-      if (t[i].p && !gen_chunk_undefined_p(t[i].p))
-	gen_consistent_p(t[i].p);
-    }
-    
-    return 1;
+  cumulated_error_seen = 0;
+  gen_mapc_tabulated((void (*)(gen_chunk*)) gen_consistent_p, domain);
+  return !cumulated_error_seen;
 }
 
 /* GEN_DEFINED_P checks that the OBJect is fully defined 
@@ -3036,7 +2586,7 @@ allocated_memory_obj_in(
 
     /* gen size is quite slow. should precompute sizes...
      */
-    current_size += sizeof(gen_chunk*)*gen_size(bp); 
+    current_size += sizeof(gen_chunk*)*gen_size(bp-Domains); 
 
     return GO;
 }
@@ -3139,9 +2689,9 @@ gen_allocated_memory(
     
     return result;
 }
-  
-/* -------------------------------------------------------------
- *
+
+/*********************************************************** MULTI RECURSION */
+/*
  *    quick and Intelligent Recursion Thru Gen_Multi_Recurse
  *
  *    Fabien COELHO, Jun-Sep-Dec 94
@@ -3434,12 +2984,12 @@ typedef GenRewriteType GenRewriteTableType[MAX_DOMAIN];
  */
 struct multi_recurse 
 {
-    hash_table           seen;
-    GenDecisionTableType *domains;
-    GenDecisionTableType *decisions;
-    GenFilterTableType   *filters;
-    GenRewriteTableType  *rewrites;
-    void                 *context;
+    hash_table             seen;
+    GenDecisionTableType * domains;
+    GenDecisionTableType * decisions;
+    GenFilterTableType   * filters;
+    GenRewriteTableType  * rewrites;
+    void                 * context;
 };
 
 /* the current multi recurse driver.
