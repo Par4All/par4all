@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: host_node_entities.c,v $ ($Date: 1995/10/05 11:32:42 $, ) 
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1996/03/19 14:36:51 $, ) 
  * version $Revision$
  */
 
@@ -93,30 +93,8 @@ entity module;
 /* UPDATES
  */
 
-static entity current_updated_module = entity_undefined;
-
-static bool bound_p(e)
-entity e;
-{
-    if (current_updated_module==node_module) return(bound_new_node_p(e));
-    if (current_updated_module==host_module) return(bound_new_host_p(e));
-    /* else
-     */
-    pips_internal_error("invalid current module\n");
-    return(FALSE);
-}
-
-static entity load(e)
-entity e;
-{
-    
-    if (current_updated_module==node_module) return(load_new_node(e));
-    if (current_updated_module==host_module) return(load_new_host(e));
-    /* else
-     */
-    pips_internal_error("invalid current module\n");
-    return(FALSE);
-}
+static bool (*bound_p)(entity) = gen_false;
+static entity (*load)(entity) = gen_identity;
 
 static void update_for_module_rewrite(pe)
 entity *pe;
@@ -126,42 +104,50 @@ entity *pe;
 
 /* shift the references to the right variable, in the module
  */
-static void update_reference_for_module_rewrite(ref)
-reference ref;
+static void update_reference_for_module_rewrite(reference ref)
 {
     update_for_module_rewrite(&reference_variable(ref));
 }
 
 /* shift the calls to the right variable, in the module
  */
-static void update_call_for_module_rewrite(c)
-call c;
+static void update_call_for_module_rewrite(call c)
 {
     update_for_module_rewrite(&call_function(c));
 }
 
-static void update_code_for_module_rewrite(c)
-code c;
+static void update_code_for_module_rewrite(code c)
 {
     MAPL(ce, update_for_module_rewrite(&ENTITY(CAR(ce))), code_declarations(c));
 }
 
-static void update_loop_for_module_rewrite(l)
-loop l;
+static void update_loop_for_module_rewrite(loop l)
 {
     update_for_module_rewrite(&loop_index(l));
 }
 
-void update_object_for_module(obj, module)
-gen_chunk *obj; /* loosely typed, indeed */
-entity module;
+void update_object_for_module(
+    gen_chunk *obj, /* loosely typed, indeed */
+    entity module)
 {
-    entity saved = current_updated_module;
+    bool (*saved_bound)(entity);
+    entity (*saved_load)(entity);
 
     pips_debug(8, "updating (%s) 0x%x\n",
 	  gen_domain_name(gen_type(obj)), (unsigned int) obj);
 
-    current_updated_module = module;
+    saved_bound = bound_p, saved_load = load; /* push the current functions */
+
+    if (module==host_module)
+    {
+	bound_p = bound_new_host_p;
+	load = load_new_host;
+    }
+    else
+    {
+	bound_p = bound_new_node_p;
+	load = load_new_node;
+    }
 
     gen_multi_recurse
 	(obj, 
@@ -171,7 +157,7 @@ entity module;
 	 code_domain, gen_true, update_code_for_module_rewrite,
 	 NULL);
 
-    current_updated_module = saved;
+    bound_p = saved_bound, load = saved_load; /* pop the initial functions */
 }
 
 void update_list_for_module(l, module)
@@ -207,12 +193,8 @@ entity common;
     area_layout(type_area(t)) = lnew;
 }
 
-/*
- * UpdateExpressionForModule
- *
- * this function creates a new expression using the mapping of
+/* this function creates a new expression using the mapping of
  * old to new variables map.
- *
  * some of the structures generated may be shared...
  */
 
@@ -225,19 +207,38 @@ expression ex;
     return(new);
 }
 
+/* used for compiling calls.
+ */
+list 
+lUpdateExpr_but_distributed(
+    entity module,
+    list /* of expression */ l)
+{
+    list new = NIL;
+
+    MAP(EXPRESSION, e,
+    {
+	if (!array_distributed_p(expression_to_entity(e)))
+	    new = CONS(EXPRESSION, copy_expression(e), new);
+    },
+	l);
+
+    update_list_for_module(new, module);    
+
+    return new;
+}
 
 list lUpdateExpr(module, l)
 entity module;
 list l;
 {
-    list new = NIL, rev = NIL;
+    list new;
 
-    MAP(EXPRESSION, e,
-	rev = CONS(EXPRESSION, copy_expression(e), rev), l);
-
-    new = gen_nreverse(rev); 
+    new = gen_copy_seq(l);
+    new = gen_nreverse(new); 
     update_list_for_module(new, module);    
-    return(new);
+
+    return new;
 }
 
 list lNewVariableForModule(module, le)
@@ -260,21 +261,29 @@ list le;
     return(result);
 }
 
-entity NewVariableForModule(module,e)
-entity module;
-entity e;
+entity NewVariableForModule(
+    entity module,
+    entity e)
 {
-    entity saved = current_updated_module, result;
-    current_updated_module = module;
-    pips_assert("bound", bound_p(e));
-    result = load(e);
-    current_updated_module = saved;
-    return(result);
+    if (module==host_module)
+    {
+	if (bound_new_host_p(e)) 
+	    return load_new_host(e);
+    }
+    else
+    {
+	if (bound_new_node_p(e))
+	    return load_new_node(e);
+    }
+
+    pips_internal_error("unexpected entity %s\n", entity_name(e));
+
+    return entity_undefined;
 }
 
-statement UpdateStatementForModule(module, stat)
-entity module;
-statement stat;
+statement UpdateStatementForModule(
+    entity module,
+    statement stat)
 {
     statement new_stat = copy_statement(stat);
     update_object_for_module(new_stat, module);
