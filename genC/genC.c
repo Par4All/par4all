@@ -4,6 +4,9 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.56  2000/04/20 18:51:46  coelho
+ * gen_size proto is nicer.
+ *
  * Revision 1.55  2000/04/14 13:28:22  coelho
  * same string moved.
  *
@@ -119,34 +122,35 @@ static void sharp_endif(FILE * out)
 /* GEN_SIZE returns the size (in gen_chunks) of an object of type defined by
  * the BP type.
  */
-int gen_size(struct gen_binding * bp)
+int gen_size(int domain)
 {
-    int overhead = GEN_HEADER + IS_TABULATED(bp);
+  struct gen_binding * bp = Domains+domain;
+  int overhead = GEN_HEADER + IS_TABULATED(bp);
 
-    switch (bp->domain->ba.type) 
+  switch (bp->domain->ba.type) 
+  {
+  case BASIS_DT:
+  case ARRAY_DT:
+  case LIST_DT:
+  case SET_DT:
+    return overhead + 1;
+  case CONSTRUCTED_DT:
+    if (bp->domain->co.op == OR_OP)
+      return overhead + 2;
+    else if (bp->domain->co.op == AND_OP) 
     {
-    case BASIS_DT:
-    case ARRAY_DT:
-    case LIST_DT:
-    case SET_DT:
-	return overhead + 1;
-    case CONSTRUCTED_DT:
-	if (bp->domain->co.op == OR_OP)
-	    return overhead + 2;
-	else if (bp->domain->co.op == AND_OP) 
-	{
-	    int size ;
-	    struct domainlist * dlp = bp->domain->co.components ;
-	    for( size=0 ; dlp != NULL ; dlp=dlp->cdr, size++ );
-	    return overhead + size;
-	}
-	else if (bp->domain->co.op == ARROW_OP)
-	    return overhead+1;
-    default:
-	fatal( "gen_size: Unknown type %s\n", itoa( bp->domain->ba.type )) ;
-	return -1; /* to avoid a gcc warning */
-	/*NOTREACHED*/
+      int size ;
+      struct domainlist * dlp = bp->domain->co.components ;
+      for( size=0 ; dlp != NULL ; dlp=dlp->cdr, size++ );
+      return overhead + size;
     }
+    else if (bp->domain->co.op == ARROW_OP)
+      return overhead+1;
+  default:
+    fatal( "gen_size: Unknown type %s\n", itoa( bp->domain->ba.type )) ;
+    return -1; /* to avoid a gcc warning */
+    /*NOTREACHED*/
+  }
 }
 
 /* returns s duplicated and case-uppered.
@@ -268,6 +272,7 @@ static void generate_make(
     string name = bp->name;
     union domain * dom = bp->domain;
     struct domainlist * dlp;
+    int domain = bp-Domains;
     int i;
 
     /* HEADER
@@ -341,7 +346,7 @@ static void generate_make(
     fprintf(code,
 	    ")\n{ return (%s) "
 	    "gen_alloc(%d*sizeof(gen_chunk), GEN_CHECK_ALLOC, %s_domain",
-	    name, gen_size(bp), name);
+	    name, gen_size(domain), name);
     
     
     switch (domain_type)
