@@ -32,7 +32,6 @@ extern int fprintf();
 extern int printf();
 #include <string.h>
 
-#include "hash.h"
 #include "genC.h"
 #include "ri.h"
 #include "text.h"
