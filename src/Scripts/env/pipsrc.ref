@@ -1,16 +1,10 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/08 17:07:12 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/09 12:13:03 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
 # A restricted version of this file should be defined for pips users.
 
 set -a
-
-# space for temporary files
-PIPS_TEMPDIR="/tmp"
-
-# hosts for Validate
-PIPS_HOSTS="chailly:episy:aiguebelette"
 
 # 
 #         #####      #    #####    ####
@@ -20,6 +14,12 @@ PIPS_HOSTS="chailly:episy:aiguebelette"
 #         #          #    #       #    #
 #         #          #    #        ####
 # 
+
+# space for temporary files
+PIPS_TEMPDIR="/tmp"
+
+# hosts for Validate
+PIPS_HOSTS="chailly:episy:aiguebelette"
 
 # Pips project sources and binaries
 PIPSHOME=/home/users/pips
@@ -92,10 +92,10 @@ PIPS_CC="gcc"
 # PIPS_CFLAGS="-pipe -temp=${PIPS_TEMPDIR} -g"
 # For GNU cc:
 PIPS_CFLAGS="-O2 -g -ansi -Wall -mv8 -pipe"
-PIPS_CPPFLAGS="-I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
+PIPS_CPPFLAGS="-D__USE_FIXED_PROTOTYPES__ -I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
 # PIPS_LD="cc"
 PIPS_LD="gcc"
-PIPS_LDFLAGS='-L. -L${PIPS_LIBDIR} -L${PIPS_EXTEDIR} -g'
+PIPS_LDFLAGS="-L. -L${PIPS_LIBDIR} -L${PIPS_EXTEDIR} -g"
 PIPS_LEX="lex"
 PIPS_LFLAGS=""
 PIPS_LINT="lint"
@@ -199,6 +199,8 @@ PATH=${PATH}:$DAVINCI_DIR
 #
 # obsolete environment variables
 
+[ `logname` != coelho ] && 
+{
 UTILDIR=$PIPS_UTILDIR
 PRODDIR=$PIPS_PRODDIR
 BINDIR=$PIPS_BINDIR
@@ -214,7 +216,7 @@ TEMPDIR=$PIPS_TEMPDIR
 RELEDIR=$PIPS_RELEDIR
 INCLUDEDIR=$PIPS_INCLUDEDIR
 DOCDIR=$PIPS_DOCDIR
-
+}
 # that is all
 #
 
