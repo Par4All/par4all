@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.23  2003/08/18 14:55:15  coelho
+  better callback called on throw...
+
   Revision 1.22  2003/08/18 14:35:30  coelho
   callback commented out.
 
@@ -121,6 +124,9 @@ typedef struct
   char * function;
   char * file;
   int    line;
+
+  /* useful callback to do something else on throw or pop... */
+  void (* callback)(int);
 } 
   linear_exception_holder;
 
@@ -145,12 +151,13 @@ void dump_exception_stack_to_file(FILE * f)
   for (i=0; i<exception_index; i++)
   {
     fprintf(f, 
-	    "%d: [%s:%d in %s (%d)]\n",
+	    "%d: [%s:%d in %s (%d) %p]\n",
 	    i, 
 	    exception_stack[i].file,
 	    exception_stack[i].line,
 	    exception_stack[i].function,
-	    exception_stack[i].what);
+	    exception_stack[i].what,
+	    exception_stack[i[.callback);
   }
   fprintf(f, "\n");
 }
@@ -194,8 +201,7 @@ push_exception_on_stack(
   exception_stack[exception_index].function = function;
   exception_stack[exception_index].file = file;
   exception_stack[exception_index].line = line;
-
-  /* if (callback) callback(exception_index); */
+  exception_stack[exception_index].callback = callback;
 
   return & exception_stack[exception_index++].where;
 }
@@ -212,8 +218,7 @@ pop_exception_from_stack(
     int what,
     char * function,
     char * file,
-    int line,
-    void (*callback)(int))
+    int line)
 {  
   exception_debug_trace("POP  ");
 
@@ -246,8 +251,6 @@ pop_exception_from_stack(
     dump_exception_stack();
     abort();
   }
-
-  /* if (callback) callback(exception_index); */
 }
 
 /* throws an exception of a given type by searching for 
@@ -257,8 +260,7 @@ void throw_exception(
     int what,
     char * function,
     char * file,
-    int line,
-    void (*callback)(int))
+    int line)
 {
   int i;
   
@@ -289,7 +291,8 @@ void throw_exception(
 		exception_stack[i].file,
 		exception_stack[i].line);
 
-      /* if (callback) callback(i); */
+      if (exception_stack[i].callback)
+	exception_stack[i].callback(i);
 
       longjmp(exception_stack[i].where, 0);
     }
