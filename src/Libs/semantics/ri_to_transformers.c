@@ -55,19 +55,22 @@ transformer statement_to_transformer(s)
 statement s;
 {
     instruction i = statement_instruction(s);
-    cons * e = load_statement_cumulated_effects(s);
+    list e = NIL;
     transformer t;
 
     debug(8,"statement_to_transformer","begin for statement %03d (%d,%d)\n",
 	  statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 	  ORDERING_STATEMENT(statement_ordering(s)));
 
-    /* some fix for HPFC... */
-    if (e==list_undefined)
+    /* some fix for HPFC - FC */
+    if (!bound_cumulated_rw_effects_p(s))
     {
-	pips_user_warning("undefined list -> NIL\n");
+	pips_user_warning("undefined effects -> NIL\n");
 	e = NIL;
     }
+    else
+	e = load_cumulated_rw_effects_list(s);
+    
 
     t = load_statement_transformer(s);
 
