@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS STuff
-# $RCSfile: make-tags,v $ ($Date: 1994/03/10 14:24:59 $) version $Revision$, got on %D%, %T%
+# $RCSfile: make-tags,v $ ($Date: 1994/05/31 13:53:15 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 # Tags computation for the PIPS project, using the Development version.
@@ -60,7 +60,7 @@ done
 
 # tags generation
 
-${PIPS_ETAGS} -f ${TAGS} `cat ${FILES}` 2>/dev/null
+${PIPS_ETAGS} -f ${TAGS} `sed '/,/d' ${FILES}` 2>/dev/null
 
 cp ${TAGS} ${PIPSDIR}/Tags/TAGS
 
