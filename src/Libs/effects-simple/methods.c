@@ -9,6 +9,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "genC.h"
@@ -275,9 +276,6 @@ set_methods_for_proper_references()
 /*  effects_forward_translation_op = ; */
     effects_local_to_global_translation_op = effects_dynamic_elim;
 
-    effects_prettyprint_func = print_effects;
-    effects_to_text_func = simple_effects_to_text;
-
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
     empty_context_test = empty_context_test_false;
@@ -293,6 +291,7 @@ set_methods_for_proper_references()
 
     set_contracted_proper_effects(FALSE);
     set_descriptor_range_p(FALSE);
+    set_methods_for_rw_effects_prettyprint(string_undefined);
 }
 
 
@@ -333,9 +332,6 @@ set_methods_for_cumulated_references()
 /*  effects_forward_translation_op = ; */
     effects_local_to_global_translation_op = effects_dynamic_elim;
 
-    effects_prettyprint_func = print_effects;
-    effects_to_text_func = simple_effects_to_text;
-
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
     empty_context_test = empty_context_test_false;
@@ -359,8 +355,8 @@ set_methods_for_cumulated_references()
     /* FC: rm set_contracted_proper_effects(!PROPER_EFFECTS_CONTRACT); */
     set_contracted_rw_effects(FALSE);
     set_descriptor_range_p(FALSE);
+    set_methods_for_rw_effects_prettyprint(string_undefined);
 }
-
 
 
 void
@@ -398,9 +394,6 @@ set_methods_for_proper_simple_effects()
 /*  effects_forward_translation_op = ; */
     effects_local_to_global_translation_op = effects_dynamic_elim;
 
-    effects_prettyprint_func = print_effects;
-    effects_to_text_func = simple_effects_to_text;
-
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
     empty_context_test = empty_context_test_false;
@@ -415,6 +408,7 @@ set_methods_for_proper_simple_effects()
 
     set_contracted_proper_effects(TRUE);
     set_descriptor_range_p(FALSE);
+    set_methods_for_rw_effects_prettyprint(string_undefined);
 }
 
 void
@@ -451,8 +445,6 @@ set_methods_for_simple_effects()
 /*  effects_forward_translation_op = ; */
 
     effects_local_to_global_translation_op = effects_dynamic_elim;
-    effects_prettyprint_func = print_effects;
-    effects_to_text_func = simple_effects_to_text;
 
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
@@ -487,5 +479,23 @@ set_methods_for_simple_effects()
 
     set_contracted_rw_effects(TRUE);
     set_descriptor_range_p(FALSE);
+    set_methods_for_rw_effects_prettyprint(string_undefined);
 }
 
+void set_methods_for_rw_effects_prettyprint(string module_name)
+{
+    effects_prettyprint_func = print_effects;
+    effects_to_text_func = simple_rw_effects_to_text;
+}
+
+void set_methods_for_inout_effects_prettyprint(string module_name)
+{
+    effects_prettyprint_func = print_effects;
+    effects_to_text_func = simple_inout_effects_to_text;
+}
+
+void reset_methods_for_effects_prettyprint(string module_name)
+{
+    effects_prettyprint_func = (generic_prettyprint_function) abort;
+    effects_to_text_func = (generic_text_function) abort;
+}
