@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/30 00:34:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/12 09:00:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_props[] = "%A% ($Date: 1997/04/30 00:34:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "%A% ($Date: 1997/09/12 09:00:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -672,7 +672,7 @@ build_aliases()
                   strdup(strupper(upper, true_name)));
       }
    }
-
+   safe_fclose(fd, wpips_rc);
    free(wpips_rc);
 }
 
