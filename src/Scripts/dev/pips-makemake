@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/16 17:06:15 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/16 17:07:06 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -280,7 +280,7 @@ SCAN=		$(LEX) $(LFLAGS) $(Lopt) -t
 TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
 PARSE=		$(YACC) $(YFLAGS) $(Yopt)
 ARCHIVE=	$(AR) $(ARFLAGS)
-# struct _iobuf for sun headers that would not look nice.
+# struct _iobuf -> FILE for sun headers that would not look nice.
 PROTOIZE=	$(PROTO) $(PRFLAGS) \
 			-E "$(PREPROC) | sed 's,struct _iobuf,FILE,g'"
 #
