@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/08 18:17:53 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/11 11:58:12 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -17,7 +17,7 @@
 \documentstyle[11pt]{article}
 \title{Properties \\
     Low Level Tuning of PIPS}
-\author{Lei Zhou\thanks{E-mail: {\tt zhou@ensmp.fr}} \hspace{2cm} 
+\author{Lei Zhou \hspace{2cm} 
         Fran\c{c}ois Irigoin\thanks{E-mail: {\tt irigoin@ensmp.fr}} \vspace{1cm}\\
         Centre de Recherche en Informatique \\
         Ecole des Mines de Paris \\
@@ -65,8 +65,28 @@ The default property file can be used to generate a custom version of
 properties.rc. It is derived automatically from
 \verb+Documentation/properties-rc.tex+.
 
-Properties are listed on a source library basis, except for general
-properties..
+PIPS behavior can also be altered by Shell environment variables. Their
+generic names is \verb+XXXX_DEBUG_LEVEL+, where \verb+XXXX+ is a library
+or a phase or an interface name (of course, there are
+exceptions). Theoretically these environment variables are also declared
+as properties, but this generelly is forgotten by programmers. A debug
+level of 0 is equivalent to no tracing. The amount of tracing increases
+with the debug level. The maximum useful value is 9.
+
+Properties are listed below on a source library basis. The outline is
+close the outline for pipsmake-rc\cite{}.  Properties used in more than
+one library are presented
+first. Section~\ref{section-pips-infrastructure} contains information
+about infrastructure, external and user interface libraries. Analyses
+are grouped in Section~\ref{section-analyses}. Program transformations,
+parallelization and distribution phases are listed in the next
+section. User output produced by different kinds of prettyprinters are
+presented in
+Section~\ref{section-prettyprinters}. Section~\ref{section-feautrier} is
+dedicated to libraries added by CEA to implement Feautrier's method.
+
+Virtually every PIPS programmer contributed some lines in this
+report. Inconsistencies are likely. Please report them to the PIPS team!
 
 \section{Global Options}
 
@@ -83,7 +103,20 @@ Shall we print phase timings
 LOG_TIMINGS FALSE
 \end{verbatim}
 
-\section{Pipsmake}
+\section{PIPS Infrastructure}
+\label{section-pips-infrastructure}
+
+\subsection{Newgen}
+
+Newgen offers some debugging support to check object consistency
+(\verb+gen_consistent_p+ and \verb+gen_defined_p+), and for dynamic type
+checking. See Newgen documentation\cite{JT89}\cite{JT90}.
+
+\subsection{C3 Linear Library}
+
+This library is external and offers an independent debugging system.
+
+\subsection{Pipsmake}
 
 Shall we log and report differences between resource read/write and
 which are not declared to pipsmake
@@ -99,8 +132,33 @@ derived resources from the newly activated rule
 ACTIVATE_DEL_DERIVED_RES TRUE
 \end{verbatim}
 
+\subsection{Pipsbdm}
 
-\section{Chains}
+Shell environment variables \verb+PIPSDBM_DEBUG_LEVEL+ can be set to ?
+to check object consistency when they are stored in the database, and to
+? to check object consistency when they are stored or retrieved (in case
+an intermediate phase has corrupted some data structure unwillingly).
+
+\subsection{Top level control}
+
+Print a log of the session
+
+\begin{verbatim}
+USER_LOG_P      TRUE
+\end{verbatim}
+
+What to do on user errors: go ahead (default) or core dump (debug)
+
+\begin{verbatim}
+ABORT_ON_USER_ERROR     FALSE
+\end{verbatim}
+
+\section{Analyses}
+\label{section-analyses}
+
+\subsection{Parser}
+
+\subsection{Chains}
 
 Update dependency graph with RR dependency arcs.
 Useful for estimation of cache memory traffic. use/def related.
@@ -124,238 +182,31 @@ Do we only keep dataflow (Def -- Use) dependences in the chain graph.
 CHAINS_DATAFLOW_DEPENDENCE_ONLY FALSE
 \end{verbatim}
 
-\section{Prettyprinter Options}
+\subsection{Effects}
 
-Added for homogeneity reason; could be (easily) reduced to one?  In
-fact, with many target machines in mind, we should have an integer flag
-``architecture'', with two basic architectures, sequential and parallel.
-Useless values: re-initialized in the C code.
+print SDFI just after computation
 
 \begin{verbatim}
-PRETTYPRINT_PARALLEL FALSE
-
-PRETTYPRINT_SEQUENTIAL TRUE
-\end{verbatim}
-
-Print parallel DO loops using FORTRAN 90 syntax. Useless value:
-re-initialized in the C code.
-
-\begin{verbatim}
-PRETTYPRINT_FORTRAN90 FALSE
-\end{verbatim}
-
-Adds Cray (FMP + CFT77) compatible directives for parallelization.
-Useless value: re-initialized in the C code.
-
-\begin{verbatim}
-PRETTYPRINT_CRAY FALSE
-\end{verbatim}
-
-Adds Connection Machine Fortran prettyprint.
-
-\begin{verbatim}
-PRETTYPRINT_CMFORTRAN FALSE
-\end{verbatim}
-
-Adds Cray-T3D CRAFT Fortran prettyprint.
-
-\begin{verbatim}
-PRETTYPRINT_CRAFT FALSE
-\end{verbatim}
-
-Add statement effects as comments in output; not implemented (that way) yet.
-
-\begin{verbatim}
-PRETTYPRINT_EFFECTS FALSE
-\end{verbatim}
-
-Transform DOALL loops into sequential loops with an opposed increment
-not implemented
-
-\begin{verbatim}
-PRETTYPRINT_REVERSE_DOALL FALSE
-\end{verbatim}
-
-Print statement transformers as comments in code.
-
-\begin{verbatim}
-PRETTYPRINT_TRANSFORMER FALSE
-\end{verbatim}
-
-Print statement preconditions as comments in code.
-
-\begin{verbatim}
-PRETTYPRINT_EXECUTION_CONTEXT FALSE
-\end{verbatim}
-
-Print statement regions as comments in code.
-
-\begin{verbatim}
-PRETTYPRINT_REGION FALSE
-\end{verbatim}
-
-Print regions of scalars.
-
-\begin{verbatim}
-PRETTYPRINT_SCALAR_REGIONS FALSE
-\end{verbatim}
-
-Print statement blocks
-
-\begin{verbatim}
-PRETTYPRINT_BLOCKS FALSE
-\end{verbatim}
-
-Print unstructured blocks
-
-\begin{verbatim}
-PRETTYPRINT_UNSTRUCTURED FALSE
-\end{verbatim}
-
-Print all effects for all statements regardless of PRETTYPRINT\_BLOCKS
-and PRETTYPRINT\_UNSTRUCTURED
-
-\begin{verbatim}
-PRETTYPRINT_ALL_EFFECTS FALSE
-\end{verbatim}
-
-Print empty statement blocks
-
-\begin{verbatim}
-PRETTYPRINT_EMPTY_BLOCKS FALSE
-\end{verbatim}
-
-Print statement ordering information
-
-\begin{verbatim}
-PRETTYPRINT_STATEMENT_ORDERING FALSE
-\end{verbatim}
-
-Print code with DO label and CONTINUE instead of DO-ENDDO. If FALSE, all
-useless CONTINUE statements are NOT prettyprinted (ie. all those in
-structured parts of the code). Warning: case TRUE, generated code may be
-wrong after some code transformations like distribution...
-
-\begin{verbatim}
-PRETTYPRINT_ALL_LABELS FALSE
-\end{verbatim}
-
-Print code with DO label as comment.
-
-\begin{verbatim}
-PRETTYPRINT_DO_LABEL_AS_COMMENT FALSE
-\end{verbatim}
-
-Print private variables without regard for their use
-
-\begin{verbatim}
-PRETTYPRINT_ALL_PRIVATE_VARIABLES FALSE
+EFFECTS_PRINT_SDFI TRUE
 \end{verbatim}
 
 
-Print all the declarations even if it's not declared in the original program.
-Added by LZ 22/10/91
-
-\begin{verbatim}
-PRETTYPRINT_ALL_DECLARATIONS FALSE
-\end{verbatim}
-
-Manage internal RETURNs correctly if set to TRUE.  This results in a
-slightly ugly (but correct) prettyprint, compared to a nicer (but
-possibly incorrect) default one.
-
-\begin{verbatim}
-PRETTYPRINT_INTERNAL_RETURN TRUE
-\end{verbatim}
-
-Print transformers, preconditions and regions in a format acceptd by Foresys and
-Partita. 
-
-\begin{verbatim}
-PRETTYPRINT_FOR_FORESYS FALSE
-\end{verbatim}
-
-Whether to regenerate the commons in the declarations or not.
-
-\begin{verbatim}
-PRETTYPRINT_COMMONS TRUE
-\end{verbatim}
-
-To deal specifically with the prettyprint for hpfc
-
-\begin{verbatim}
-PRETTYPRINT_HPFC FALSE
-\end{verbatim}
-
-To output a code with a hierarchical view of the control graph with
-markers instead of a flat one. It purposes a display with a graph
-browser such as daVinci:
-\begin{verbatim}
-PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH FALSE
-\end{verbatim}
-and to have a decorated output with the hexadecimal adresses of the
-control nodes:
-\begin{verbatim}
-PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE FALSE
-\end{verbatim}
-
-\section{Semantic Analysis}
-
-Perform ``meet'' operations for semantics analysis.
-
-\begin{verbatim}
-SEMANTICS_FLOW_SENSITIVE FALSE
-\end{verbatim}
-
-To be refined later; basically, use callee\'s transformers instead of
-callee\'s effects when computing transformers bottom-up in the call graph;
-when going top-down with preconditions, should we care about unique
-call site and/or perform meet operation on call site preconditions ?
-
-\begin{verbatim}
-SEMANTICS_INTERPROCEDURAL FALSE
-\end{verbatim}
-
-Go all the Halbwachs way, compute inequalities instead of sticking
-to equalities; implies SEMANTICS\_FIX\_POINT and SEMANTICS\_FLOW\_SENSITIVE.
-
-\begin{verbatim}
-SEMANTICS_INEQUALITY_INVARIANT FALSE
-\end{verbatim}
-
-CPU time and memory space are cheap: compute loop fixpoint for
-transformers and preconditions; this implies SEMANTICS\_FLOW\_SENSITIVE.
-
-\begin{verbatim}
-SEMANTICS_FIX_POINT FALSE
-\end{verbatim}
-
-Output semantics results on stdout
-
-\begin{verbatim}
-SEMANTICS_STDOUT FALSE
-\end{verbatim}
-
-Debug level for semantics
-
-\begin{verbatim}
-SEMANTICS_DEBUG_LEVEL 0
-\end{verbatim}
-
-\section{Dependence Test (Ricedg)}
+\subsection{Dependence Test (Ricedg)}
 
 % Module code and list of called module names.
 
-\subsection{Dependence Test Selection}
+\subsubsection{Dependence Test Selection}
 
 This property seems to be now obsolete. The dependence test choice is
-now controlled directly and only by rules in pipsmake.rc.
+now controlled directly and only by rules in pipsmake.rc. The procedures
+called by these rules may use this property. Anyway, it is useless to
+set it manually.
 
 \begin{verbatim}
 DEPENDENCE_TEST "full"
 \end{verbatim}
 
-\subsection{Statistics}
+\subsubsection{Statistics}
 
 Provide the following counts during the dependence test. There are three
 parts: numbers of dependencies and independences (fields 1-10),
@@ -460,7 +311,7 @@ including these involved in call statement.
 RICEDG_STATISTICS_ALL_ARRAYS FALSE
 \end{verbatim}
 
-\subsection{Algorithmic Dependences}
+\subsubsection{Algorithmic Dependences}
 
 Only take into account true flow dependences (Def -- Use) during the
 computation of SCC?  Note that this is different from the
@@ -472,7 +323,7 @@ code.
 RICE_DATAFLOW_DEPENDENCE_ONLY FALSE
 \end{verbatim}
 
-\subsection{Printout}
+\subsubsection{Printout}
 
 To print the dependence graph in a file called {\em module\_name}.{\tt dg}
 
@@ -493,7 +344,7 @@ To print the dependence graph without the no loop carried dependences
 PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
 \end{verbatim}
 
-\subsection{Optimization}
+\subsubsection{Optimization}
 
 The default option is to compute the dependence graph only for loops
 which can be parallelized using Allen \& Kennedy algorithm.
@@ -506,15 +357,198 @@ by setting this option to TRUE.
 COMPUTE_ALL_DEPENDENCES FALSE
 \end{verbatim}
 
-\section{Effects}
+\subsection{Flinter}
 
-print SDFI just after computation
+No property for this library.
+
+\subsection{Semantic Analysis}
+
+Perform ``meet'' operations for semantics analysis.
 
 \begin{verbatim}
-EFFECTS_PRINT_SDFI TRUE
+SEMANTICS_FLOW_SENSITIVE FALSE
 \end{verbatim}
 
-\section{Regions}
+To be refined later; basically, use callee\'s transformers instead of
+callee\'s effects when computing transformers bottom-up in the call graph;
+when going top-down with preconditions, should we care about unique
+call site and/or perform meet operation on call site preconditions ?
+
+\begin{verbatim}
+SEMANTICS_INTERPROCEDURAL FALSE
+\end{verbatim}
+
+Go all the Halbwachs way, compute inequalities instead of sticking
+to equalities; implies SEMANTICS\_FIX\_POINT and SEMANTICS\_FLOW\_SENSITIVE.
+
+\begin{verbatim}
+SEMANTICS_INEQUALITY_INVARIANT FALSE
+\end{verbatim}
+
+CPU time and memory space are cheap: compute loop fixpoint for
+transformers and preconditions; this implies SEMANTICS\_FLOW\_SENSITIVE.
+
+\begin{verbatim}
+SEMANTICS_FIX_POINT FALSE
+\end{verbatim}
+
+Output semantics results on stdout
+
+\begin{verbatim}
+SEMANTICS_STDOUT FALSE
+\end{verbatim}
+
+Debug level for semantics
+
+\begin{verbatim}
+SEMANTICS_DEBUG_LEVEL 0
+\end{verbatim}
+
+\subsection{Static Complexity Evaluation}
+
+The following properties control the static estimation of dynamic code
+execution time.
+
+\subsubsection{Debugging}
+
+Trace the walk across a module's internal representation:
+
+\begin{verbatim}
+COMPLEXITY_TRACE_CALLS FALSE
+\end{verbatim}
+
+Trace all intermediate complexities:
+
+\begin{verbatim}
+COMPLEXITY_INTERMEDIATES FALSE
+\end{verbatim}
+
+Print the complete cost table at the beginning of the execution:
+
+\begin{verbatim}
+COMPLEXITY_PRINT_COST_TABLE FALSE
+\end{verbatim}
+
+The cost table(s) contain machine and compiler dependent information
+about basic execution times, e.g. time for a load or a store.
+
+\subsubsection{Fine Tuning}
+
+It is possible to specify a list of variables which must remain
+litterally in the complexity formula, although their numerical values
+are known (this is OK) or although they have multiple unkown and
+unrelated values during any execution (this leads to an incorrect
+result).
+
+Formal parameters and imported global variables are left unevaluated.
+
+They have relatively high priority (FI: I do not understand this comment
+by Lei).
+
+This list should be empty by default (but is not for unknown historical
+reasons):
+
+\begin{verbatim}
+COMPLEXITY_PARAMETERS "IMAX LOOP"
+\end{verbatim}
+
+Controls the printing of {\em accuracy} statistics:
+
+\begin{itemize}
+
+  \item 0: do not prettyprint any statistics with complexities (to give
+the user a false sense of accuracy and/or to avoid clutering his/her
+display); this is the default value;
+
+  \item 1: prettyprint statistics only for loop/block/test/unstr.
+statements and not for basic statements, since they should not cause
+accuracy problems;
+
+  \item 2 : prettyprint statistics for all statements
+
+\end{itemize}
+
+\begin{verbatim}
+COMPLEXITY_PRINT_STATISTICS 0
+\end{verbatim}
+
+\subsubsection{Target Machine and Compiler Selection}
+
+This property is used to select a set of basic execution times. These
+times depend on the target machine, the compiler and the compilation
+options used. It is shown in \cite{Z94} that fixed basic times can be
+used to obtain accurate execution times, if enough basic times are
+considered, and if the target machine has a simple RISC processor. For
+instance, it is not possible to use only one time for a register
+load. It is necessary to take into account the nature of the variable,
+i.e. formal parameter, dynamic variable, global variable, and the nature
+of the access, e.g. the dimension of an accessed array. The cache can be
+ignored an replacer by an average hit ratio.
+
+Different set of elementary cost tables are available:
+
+\begin{itemize}
+
+  \item \verb+all_1+: each basic operation cost is 1;
+
+  \item \verb+fp_1+: only floating point operations are taken into
+account and have cost unit 1; all other operations have a null cost.
+
+\end{itemize}
+
+In the future, we might add a sparc-2 table...
+
+The different elementary table names are defined in
+\verb+complexity-local.h+. They presently are \verb+operation+, 
+\verb+memory+, \verb+index+, \verb+transcend+
+and \verb+trigo+.
+
+The different tables required are to be found in
+\verb+$LIBDIR/complexity/xyz+,
+where \verb+xyz+ is specified by this property:
+
+\begin{verbatim}
+COMPLEXITY_COST_TABLE "all_1"
+\end{verbatim}
+
+\subsubsection{Evaluation Strategy}
+
+For the moment, we have designed two ways to to solve the complexity
+combination problem.Since symbolic complexity formulae use program
+variable it is necessary to specify in which store they are
+evaluated. If two complexity formulae are computed relatively to two
+different stores, they cannot be directly added.
+
+First approach, which is implemented, uses the module initial store as
+universal store for all formulae (but possibly for the complexity of
+elementary statements).
+In some way, symbolic variable are evaluated as early as possible as
+soon as it is known that they won't make it in the module summary
+complexity.
+
+This first method is easy to implement when the preconditions are available
+but it has at least two drawbacks:
+
+\begin{itemize}
+
+  \item if a variable is used in different places with the same unknown
+value, each occurence will be replaced by a different unknown value
+symbol (the infamous \verb+UU_xx+ symbols in formulae).
+
+  \item since variables are replaced by numerical values as soon as
+possible as early as possible, the user is shown a numerical execution
+time instead of a symbolic formulae which would likely be more useful
+(see property \verb+COMPLEXITY_PARAMETERS+). This is especially true
+with interprocedural constant propagation.
+
+\end{itemize}
+
+
+\begin{verbatim}
+COMPLEXITY_EARLY_EVALUATION TRUE
+\end{verbatim}
+
+\subsection{Regions}
 
 if {\tt MUST\_REGIONS} is true, then it computes regions using the
 algorithm described in report E/181/CRI, called {\em $T^{-1}$
@@ -555,219 +589,13 @@ DISJUNCT_IN_OUT_REGIONS FALSE
 REGIONS_OP_STATISTICS FALSE
 \end{verbatim}
 
+\section{Transformations, Parallelization, Distribution}
+\label{section-transformations}
 
-\section{Static Complexity Evaluation}
 
-The following properties control the static estimation of dynamic code
-execution time.
+\subsection{Parallelization}
 
-\subsection{Debugging}
-
-Trace the walk across a module's internal representation:
-
-\begin{verbatim}
-COMPLEXITY_TRACE_CALLS FALSE
-\end{verbatim}
-
-Trace all intermediate complexities:
-
-\begin{verbatim}
-COMPLEXITY_INTERMEDIATES FALSE
-\end{verbatim}
-
-Print the complete cost table at the beginning of the execution:
-
-\begin{verbatim}
-COMPLEXITY_PRINT_COST_TABLE FALSE
-\end{verbatim}
-
-The cost table(s) contain machine and compiler dependent information
-about basic execution times, e.g. time for a load or a store.
-
-\subsection{Fine Tuning}
-
-It is possible to specify a list of variables which must remain
-litterally in the complexity formula, although their numerical values
-are known (this is OK) or although they have multiple unkown and
-unrelated values during any execution (this leads to an incorrect
-result).
-
-Formal parameters and imported global variables are left unevaluated.
-
-They have relatively high priority (FI: I do not understand this comment
-by Lei).
-
-This list should be empty by default (but is not for unknown historical
-reasons):
-
-\begin{verbatim}
-COMPLEXITY_PARAMETERS "IMAX LOOP"
-\end{verbatim}
-
-Controls the printing of {\em accuracy} statistics:
-
-\begin{itemize}
-
-  \item 0: do not prettyprint any statistics with complexities (to give
-the user a false sense of accuracy and/or to avoid clutering his/her
-display); this is the default value;
-
-  \item 1: prettyprint statistics only for loop/block/test/unstr.
-statements and not for basic statements, since they should not cause
-accuracy problems;
-
-  \item 2 : prettyprint statistics for all statements
-
-\end{itemize}
-
-\begin{verbatim}
-COMPLEXITY_PRINT_STATISTICS 0
-\end{verbatim}
-
-\subsection{Target Machine and Compiler Selection}
-
-This property is used to select a set of basic execution times. These
-times depend on the target machine, the compiler and the compilation
-options used. It is shown in \cite{Z94} that fixed basic times can be
-used to obtain accurate execution times, if enough basic times are
-considered, and if the target machine has a simple RISC processor. For
-instance, it is not possible to use only one time for a register
-load. It is necessary to take into account the nature of the variable,
-i.e. formal parameter, dynamic variable, global variable, and the nature
-of the access, e.g. the dimension of an accessed array. The cache can be
-ignored an replacer by an average hit ratio.
-
-Different set of elementary cost tables are available:
-
-\begin{itemize}
-
-  \item \verb+all_1+: each basic operation cost is 1;
-
-  \item \verb+fp_1+: only floating point operations are taken into
-account and have cost unit 1; all other operations have a null cost.
-
-\end{itemize}
-
-In the future, we might add a sparc-2 table...
-
-The different elementary table names are defined in
-\verb+complexity-local.h+. They presently are \verb+operation+, 
-\verb+memory+, \verb+index+, \verb+transcend+
-and \verb+trigo+.
-
-The different tables required are to be found in
-\verb+$LIBDIR/complexity/xyz+,
-where \verb+xyz+ is specified by this property:
-
-\begin{verbatim}
-COMPLEXITY_COST_TABLE "all_1"
-\end{verbatim}
-
-\subsection{Evaluation Strategy}
-
-For the moment, we have designed two ways to to solve the complexity
-combination problem.Since symbolic complexity formulae use program
-variable it is necessary to specify in which store they are
-evaluated. If two complexity formulae are computed relatively to two
-different stores, they cannot be directly added.
-
-First approach, which is implemented, uses the module initial store as
-universal store for all formulae (but possibly for the complexity of
-elementary statements).
-In some way, symbolic variable are evaluated as early as possible as
-soon as it is known that they won't make it in the module summary
-complexity.
-
-This first method is easy to implement when the preconditions are available
-but it has at least two drawbacks:
-
-\begin{itemize}
-
-  \item if a variable is used in different places with the same unknown
-value, each occurence will be replaced by a different unknown value
-symbol (the infamous \verb+UU_xx+ symbols in formulae).
-
-  \item since variables are replaced by numerical values as soon as
-possible as early as possible, the user is shown a numerical execution
-time instead of a symbolic formulae which would likely be more useful
-(see property \verb+COMPLEXITY_PARAMETERS+). This is especially true
-with interprocedural constant propagation.
-
-\end{itemize}
-
-
-\begin{verbatim}
-COMPLEXITY_EARLY_EVALUATION TRUE
-\end{verbatim}
-
-\section{Top level control}
-
-Print a log of the session
-
-\begin{verbatim}
-USER_LOG_P      TRUE
-\end{verbatim}
-
-What to do on user errors: go ahead (default) or core dump (debug)
-
-\begin{verbatim}
-ABORT_ON_USER_ERROR     FALSE
-\end{verbatim}
-
-\section{Call Graph}
-This section is used to see the calling relations of callees.
-In this section,
-we use the datebase to get the graph. It is different with icfg.
-ex: if A calls B twice, in callgraph, we only have ONCE A calls B;
-while in icfg, we have twice B called by A.
-So there is no option on the so-called callgraph except the debugging.
-
-debugging level (should be \verb+CALLGRAPH_DEBUG_LEVEL+ and numeric!)
-
-\begin{verbatim}
-CALLGRAPH_DEBUG FALSE
-\end{verbatim}
-
-\section{Interprocedural Control Flow Graph}
-This section is NOT identical to that of Callgraph. 
-We use the different schemes to get the results.
-We get the calling relations by the declaration, it should be correct.
-But there are bugs somewhere.
-
-print controlling IF's
-
-\begin{verbatim}
-ICFG_IFs FALSE
-\end{verbatim}
-
-print enclosing DO loops
-
-\begin{verbatim}
-ICFG_DOs FALSE
-\end{verbatim}
-
-to be destroyed
-
-\begin{verbatim}
-ICFG_CALLEES_TOPO_SORT FALSE
-\end{verbatim}
-
-\begin{verbatim}
-ICFG_DECOR 0
-\end{verbatim}
-
-\begin{verbatim}
-ICFG_DRAW TRUE
-\end{verbatim}
-
-Debugging level (should be \verb+ICFG_DEBUG_LEVEL+ and numeric instead
-of boolean!):
-
-\begin{verbatim}
-ICFG_DEBUG FALSE
-\end{verbatim}
-
-\section{Rice (Parallelization)}
+\subsubsection{Rice (Parallelization)}
 
 TRUE to show all parallel loops, FALSE to generate real (vector,
 innermost parallel?) code
@@ -776,32 +604,15 @@ innermost parallel?) code
 GENERATE_NESTED_PARALLEL_LOOPS TRUE
 \end{verbatim}
 
-\section{wp65 (PUMA project)}
+\subsection{Code Distribution}
+
+\subsubsection{wp65 (PUMA project)}
 
 \begin{verbatim}
 WP65_DEBUG_LEVEL        0
 \end{verbatim}
 
-\section{Partial Atomizer}
-
-This transformation only atomizes indirect references of array access functions.
-
-
-\begin{verbatim}
-ATOMIZE_INDIRECT_REF_ONLY FALSE
-\end{verbatim}
-
-\section{Distribution}
-
-Partial distribution distributes the statements of a loop nest except
- the isolated statements,that have no dependences at the common level l,
- are gathered in the same l-th loop.
-
-\begin{verbatim}
-PARTIAL_DISTRIBUTION FALSE
-\end{verbatim}
-
-\section{HPFC {\em High Performance Fortran Compiler}}
+\subsubsection{HPFC {\em High Performance Fortran Compiler}}
 
 debugging levels considered by HPFC: 
 {\tt HPFC\_\{,IO,REMAPPING\}\_DEBUG\_LEVEL}.
@@ -853,12 +664,291 @@ Whether to measure and display the compilation times for remappings
 HPFC_TIME_REMAPPINGS TRUE
 \end{verbatim}
 
+\subsection{Program Transformations}
+
+
+\subsubsection{Partial Atomizer}
+
+This transformation only atomizes indirect references of array access
+functions.
+
+\begin{verbatim}
+ATOMIZE_INDIRECT_REF_ONLY FALSE
+\end{verbatim}
+
+\subsubsection{Loop Distribution}
+
+Partial distribution distributes the statements of a loop nest except
+ the isolated statements,that have no dependences at the common level l,
+ are gathered in the same l-th loop.
+
+\begin{verbatim}
+PARTIAL_DISTRIBUTION FALSE
+\end{verbatim}
+
+\section{Prettyprinter Options}
+\label{section-prettyprinters}
+
+\subsection{Code Prettyprinter}
+
+Added for homogeneity reason; could be (easily) reduced to one?  In
+fact, with many target machines in mind, we should have an integer flag
+``architecture'', with two basic architectures, sequential and parallel.
+Useless values: re-initialized in the C code.
+
+\begin{verbatim}
+PRETTYPRINT_PARALLEL FALSE
+
+PRETTYPRINT_SEQUENTIAL TRUE
+\end{verbatim}
+
+Print parallel DO loops using FORTRAN 90 syntax. Useless value:
+re-initialized in the C code.
+
+\begin{verbatim}
+PRETTYPRINT_FORTRAN90 FALSE
+\end{verbatim}
+
+Adds Cray (FMP + CFT77) compatible directives for parallelization.
+Useless value: re-initialized in the C code.
+
+\begin{verbatim}
+PRETTYPRINT_CRAY FALSE
+\end{verbatim}
+
+Adds Connection Machine Fortran prettyprint.
+
+\begin{verbatim}
+PRETTYPRINT_CMFORTRAN FALSE
+\end{verbatim}
+
+Adds Cray-T3D CRAFT Fortran prettyprint.
+
+\begin{verbatim}
+PRETTYPRINT_CRAFT FALSE
+\end{verbatim}
+
+Add statement effects as comments in output; not implemented (that way) yet.
+
+\begin{verbatim}
+PRETTYPRINT_EFFECTS FALSE
+\end{verbatim}
+
+Transform DOALL loops into sequential loops with an opposed increment
+not implemented
+
+\begin{verbatim}
+PRETTYPRINT_REVERSE_DOALL FALSE
+\end{verbatim}
+
+Print statement transformers as comments in code.
+
+\begin{verbatim}
+PRETTYPRINT_TRANSFORMER FALSE
+\end{verbatim}
+
+Print statement preconditions as comments in code.
+
+\begin{verbatim}
+PRETTYPRINT_EXECUTION_CONTEXT FALSE
+\end{verbatim}
+
+Print statement regions as comments in code.
+
+\begin{verbatim}
+PRETTYPRINT_REGION FALSE
+\end{verbatim}
+
+Print regions of scalars.
+
+\begin{verbatim}
+PRETTYPRINT_SCALAR_REGIONS FALSE
+\end{verbatim}
+
+Print statement blocks
+
+\begin{verbatim}
+PRETTYPRINT_BLOCKS FALSE
+\end{verbatim}
+
+Print unstructured blocks
+
+\begin{verbatim}
+PRETTYPRINT_UNSTRUCTURED FALSE
+\end{verbatim}
+
+Print all effects for all statements regardless of \verb+PRETTYPRINT_BLOCKS+
+and \verb+PRETTYPRINT_UNSTRUCTURED+.
+
+\begin{verbatim}
+PRETTYPRINT_ALL_EFFECTS FALSE
+\end{verbatim}
+
+Print empty statement blocks (false by default):
+
+\begin{verbatim}
+PRETTYPRINT_EMPTY_BLOCKS FALSE
+\end{verbatim}
+
+Print statement ordering information (false by default):
+
+\begin{verbatim}
+PRETTYPRINT_STATEMENT_ORDERING FALSE
+\end{verbatim}
+
+Print code with DO label and CONTINUE instead of DO-ENDDO. If FALSE, all
+useless CONTINUE statements are NOT prettyprinted (ie. all those in
+structured parts of the code). Warning: case TRUE, generated code may be
+wrong after some code transformations like distribution...
+
+\begin{verbatim}
+PRETTYPRINT_ALL_LABELS FALSE
+\end{verbatim}
+
+Print code with DO label as comment.
+
+\begin{verbatim}
+PRETTYPRINT_DO_LABEL_AS_COMMENT FALSE
+\end{verbatim}
+
+Print private variables without regard for their effective use. By
+default, private variables are shown only for parallel DO loops.
+
+\begin{verbatim}
+PRETTYPRINT_ALL_PRIVATE_VARIABLES FALSE
+\end{verbatim}
+
+
+Regenerate all variable declarations, including those variables not
+declared in the user program. By default, when possible, the user
+declaration {\em text} is used to preserve comments.
+
+\begin{verbatim}
+PRETTYPRINT_ALL_DECLARATIONS FALSE
+\end{verbatim}
+
+Manage internal RETURNs correctly if set to TRUE.  This results in a
+slightly ugly (but correct) prettyprint, compared to a nicer (but
+possibly incorrect) default one.
+
+\begin{verbatim}
+PRETTYPRINT_INTERNAL_RETURN TRUE
+\end{verbatim}
+
+Print transformers, preconditions and regions in a format acceptd by
+Foresys and Partita.
+
+\begin{verbatim}
+PRETTYPRINT_FOR_FORESYS FALSE
+\end{verbatim}
+
+Whether to regenerate the commons in the declarations or not.
+
+\begin{verbatim}
+PRETTYPRINT_COMMONS TRUE
+\end{verbatim}
+
+To deal specifically with the prettyprint for hpfc
+
+\begin{verbatim}
+PRETTYPRINT_HPFC FALSE
+\end{verbatim}
+
+To output a code with a hierarchical view of the control graph with
+markers instead of a flat one. It purposes a display with a graph
+browser such as daVinci:
+
+\begin{verbatim}
+PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH FALSE
+\end{verbatim}
+
+and to have a decorated output with the hexadecimal adresses of the
+control nodes:
+\begin{verbatim}
+PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE FALSE
+\end{verbatim}
+
+\subsection{Call Graph}
+
+This library is used to display the calling relationship between
+modules.  It is different from the interprocedural call flow graph
+(ICFG). For  example: if A calls B twice, in
+callgraph, there is only one edge between A and B; while in ICFG (see
+next section)), there are two edges between A and B, since A contains
+two call sites.  
+
+The call graph is derived from the modules declarations.
+
+There is no option for the callgraph prettyprinter except
+for debugging.
+
+Debugging level (should be \verb+CALLGRAPH_DEBUG_LEVEL+ and numeric!)
+
+\begin{verbatim}
+CALLGRAPH_DEBUG FALSE
+\end{verbatim}
+
+\subsection{Interprocedural Control Flow Graph}
+
+This prettyprinter is NOT a call graph prettyprinter. Control flow
+information can be displayed and every call site is shown, possibly with
+some annotation like precondition or region
+
+This prettyprinter uses the module codes in the workspace database to
+build the ICFG.
+
+Print IF statements controlling call sites:
+
+\begin{verbatim}
+ICFG_IFs FALSE
+\end{verbatim}
+
+Print DO loops enclosing call sites:
+
+\begin{verbatim}
+ICFG_DOs FALSE
+\end{verbatim}
+
+To be destroyed:
+
+\begin{verbatim}
+ICFG_CALLEES_TOPO_SORT FALSE
+\end{verbatim}
+
+\begin{verbatim}
+ICFG_DECOR 0
+\end{verbatim}
+
+\begin{verbatim}
+ICFG_DRAW TRUE
+\end{verbatim}
+
+Debugging level (should be \verb+ICFG_DEBUG_LEVEL+ and numeric instead
+of boolean!):
+
+\begin{verbatim}
+ICFG_DEBUG FALSE
+\end{verbatim}
+
+\section{Feautrier's Method}
+
+No properties apparently.
+
 \section*{Conclusion}
 
 Do not be surprised by strange results obtained after selecting a
 property yourself!
 
 \begin{thebibliography}{99}
+
+\bibitem{JT89} P. Jouvelot, R. Triolet, 
+{\em NewGen: A Language-Independent Program Generator},
+July 12, 1989, 
+<a href="newgen-paper/newgen-paper.html">Tech. Report A/191.</a>
+
+\bibitem{JT90} P. Jouvelot, R. Triolet, 
+{\em NewGen User Manual}. December
+1990, <a href="newgen-manual/newgen-manual.html">Tech. Report A/???.</a>
 
 \bibitem{Z94} Lei Zhou,
 {\em Analyse statique et dynamique de la compl\'exite' des programmes
