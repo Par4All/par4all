@@ -68,7 +68,9 @@ fpips_usage(int ret)
 int /* non static to avoid a gcc warning if not called. */
 fpips_error(char * what, int argc, char ** argv)
 {
-    fprintf(stderr, "[fpips] %s not available\n", what);
+    fprintf(stderr, 
+	    "[fpips] sorry, %s not available with " SOFT_ARCH "\n", what);
+
     return fpips_usage(1);
 }
 
