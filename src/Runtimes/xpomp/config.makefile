@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/08 21:52:07 $ 
+# $Date: 1996/09/09 08:44:30 $ 
 
 CPPFLAGS+=	$(PIPS_X11_ADDED_CPPFLAGS)
 LDFLAGS+=	$(PIPS_X11_ADDED_LDFLAGS)
@@ -33,7 +33,7 @@ INSTALL_BIN_DIR:=$(INSTALL_RTM_DIR)/$(ARCH)
 
 INSTALL_BIN=	$(BIN) $(LIB)
 INSTALL_RTM=	$(EXPORT_HEADERS)
-INSTALL_SHR=	$(HPFC) xpomp_graphic_F.h
+INSTALL_SHR=	$(HPFC) xpomp_graphic_F.h xpomp_stubs.direct
 INSTALL_DOC=	xpomp_manual.ps 
 INSTALL_HTM=	xpomp_manual
 
@@ -43,7 +43,7 @@ INSTALL_HTM=	xpomp_manual
 DRUN =	$(LIB) $(BIN) $(ARCH)/fractal $(ARCH)/test_xpomp $(ARCH)/wave
 DDOC =	$(INSTALL_DOC) xpomp_manual.html xpomp_manual/fractal.f
 
-all: run doc
+all: run xpomp_stubs.direct doc
 run: $(DRUN)
 doc: $(DDOC)
 
@@ -51,6 +51,12 @@ xpomp_manual/fractal.f: xpomp_manual.html fractal.f
 	cp fractal.f xpomp_manual
 
 # cproto:; $(PROTOIZE) xpomp.c
+
+# the direct version of the stubs need not be filtered by hpfc_directives.
+xpomp_stubs.direct: xpomp_stubs.f
+	# building $@ from $<
+	sed 's,^!fcd\$$ fake,      call hpfc9,;\
+	     s,^!fcd\$$ io,      call hpfc6,' $< > $@
 
 $(ARCH)/xpomp: $(ARCH)/xpomp.o gr.h
 	$(LINK) $@ $(ARCH)/xpomp.o $(X11LIB)
