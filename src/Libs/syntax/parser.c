@@ -52,7 +52,7 @@ char FormatValue[FORMATLENGTH];
 void ParserError(char * f, char * m)
 {
     /* reset lex... Might be better to read the whole file like sserror() */
-    extern char sys_sbuf[];
+    extern char syn_sbuf[];
     extern char * syn_sptr;
     extern int syn_previous;
     entity mod = get_current_module_entity();
