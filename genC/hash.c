@@ -44,7 +44,7 @@ struct __hash_table {
   hash_key_type hash_type; /* the type of keys... */
   int hash_size;           /* size of actual array */
   int hash_entry_number;   /* number of associations stored */
-  int (*hash_rank)();      /* how to compute rank for key */
+  unsigned int (*hash_rank)();      /* how to compute rank for key */
   int (*hash_equal)();     /* how to compare entries */
   hash_entry *hash_array;  /* actual array */
   int hash_size_limit;     /* number entry for which to reallocate */
@@ -66,7 +66,7 @@ struct __hash_table {
 /* Hash function to get the index
  * of the array from the key 
  */
-#define HASH_FUNCTION(key, size) ((((unsigned int)(key))&(0x7fffffff))%(size))
+#define HASH_FUNCTION(key, size) (((unsigned int)(key))%(size))
 
 /* define the increment of the hash_function
  * in case of heat.
@@ -99,14 +99,14 @@ typedef enum
 static void hash_enlarge_table();
 static hash_entry_pointer hash_find_entry();
 static int hash_int_equal();
-static int hash_int_rank();
+static unsigned int hash_int_rank();
 static int hash_pointer_equal();
-static int hash_pointer_rank();
+static unsigned int hash_pointer_rank();
 static string hash_print_key();
 static int hash_string_equal();
-static int hash_string_rank();
+static unsigned int hash_string_rank();
 static int hash_chunk_equal() ;
-static int hash_chunk_rank() ;
+static unsigned int hash_chunk_rank() ;
 
 /* List of the prime numbers from 17 to 2^31-1 
  */
@@ -239,8 +239,8 @@ void hash_table_free(hash_table htp)
 
 void hash_put(hash_table htp, void * key, void * val)
 {
-    int rank;
-    hash_entry_pointer hep;
+  unsigned int rank;
+  hash_entry_pointer hep;
     
     if (htp->hash_entry_number+1 >= (htp->hash_size_limit)) 
 	hash_enlarge_table(htp);
@@ -275,7 +275,7 @@ hash_delget(
 {
     hash_entry_pointer hep;
     void *val;
-    int rank;
+    unsigned int rank;
     
     message_assert("legal input key",
 		   key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
@@ -341,7 +341,7 @@ hash_table htp;
 void *key, *val;
 {
     hash_entry_pointer hep;
-    int n;
+    unsigned int n;
 
     message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
 		   key!=HASH_ENTRY_FREE_FOR_PUT);
@@ -450,7 +450,7 @@ hash_enlarge_table(hash_table htp)
 
 	if (he.key != HASH_ENTRY_FREE && he.key != HASH_ENTRY_FREE_FOR_PUT) {
 	    hash_entry_pointer nhep;
-	    int rank;
+	    unsigned int rank;
 
 	    nhep = hash_find_entry(htp, he.key, &rank, hash_put_op);
 
@@ -464,31 +464,32 @@ hash_enlarge_table(hash_table htp)
     gen_free_area((void**)old_array, old_size*sizeof(hash_entry));
 }
 
-static int hash_string_rank(void * key, int size)
+static unsigned int hash_string_rank(void * key, int size)
 {
-    int v;
-    char * s;
+  unsigned int v;
+  char * s;
+  
+  v = 0;
+  for (s = (char*) key; *s; s++)
+    v <<= 2, v += *s;
+  /* FC: v = ((v<<7) & (v>>25)) ^ *s; */
+  /* v = abs(v) ; */
+  v %= size ;
 
-    v = 0;
-    for (s = (char*) key; *s; s++)
- 	v <<= 2, v += *s;
-    v = abs(v) ;
-    v %= size ;
-
-    return v;
+  return v;
 }
 
-static int hash_int_rank(void * key, int size)
-{
-  return HASH_FUNCTION(key, size);
-}
-
-static int hash_pointer_rank(void * key, int size)
+static unsigned int hash_int_rank(void * key, int size)
 {
   return HASH_FUNCTION(key, size);
 }
 
-static int hash_chunk_rank(gen_chunk * key, int size)
+static unsigned int hash_pointer_rank(void * key, int size)
+{
+  return HASH_FUNCTION(key, size);
+}
+
+static unsigned int hash_chunk_rank(gen_chunk * key, int size)
 {
   return HASH_FUNCTION(key->i, size);
 }
@@ -539,7 +540,7 @@ static char * hash_print_key(hash_key_type t, void * key)
 static hash_entry_pointer hash_find_entry(htp, key, prank, operation)
 hash_table htp;
 void *key;
-int *prank;
+unsigned int *prank;
 hash_operation operation;
 {
     int r;
