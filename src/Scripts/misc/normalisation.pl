@@ -14,6 +14,8 @@ $opt_suffix = 'old';
 $opt_help = '';
 $opt_control = '';
 
+$current_working_directory=`pwd`;
+
 GetOptions("directory=s", "suffix=s", "control:s", "help")
     or die $!;
 
@@ -189,9 +191,8 @@ sub save
 	    or die "cannot rename file $current_file as $old_file ($!)";
 
 	if ($opt_control) {
-	    print STDERR "SCCS EDIT $current_file\n";	
-	    system("sccs edit -G$current_file $current_file")
-	      and die "canNOT sccs edit -G$current_file $current_file ($!)\n";
+	    print STDERR "SCCS EDIT $current_file\n";
+	    &sccs("edit", $current_file);
 	}
 
 	unlink $current_file;
@@ -201,9 +202,7 @@ sub save
 	close FILE or die $!;
 	
 	if ($opt_control) {
-	 system("sccs delget -y'$opt_control' -G$current_file $current_file") 
-	   and die "cannot " .
-	   "sccs delget -y'$opt_control' -G$current_file $current_file ($!)\n";
+	    &sccs("delget -y'$opt_control'", $current_file);
 	}
     }
 }
@@ -218,4 +217,29 @@ sub failed
 {
     my ($n, $l) = @_;
     error "($n) $file $module $array $ndim $new $old\n$l";
+}
+
+# sccs(what, file)
+sub sccs
+{
+    my ($what,$file) = @_;
+    my $dir = '';
+    if ($file =~ /^(.*)\/([^\/]*)$/)
+    {
+	$dir = $1;
+	$file = $2;
+    }
+
+    my $cmd = "sccs $what $file";
+
+    if ($dir) {
+	chdir $dir or die "cannot cd $dir ($!)";
+    }
+
+    system($cmd) and die "cannot: $cmd";
+
+    if ($dir) {
+	chdir $current_working_directory or 
+	    die "cannot cd $current_working_directory ($!)";
+    }
 }
