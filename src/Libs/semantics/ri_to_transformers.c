@@ -629,16 +629,15 @@ user_function_call_to_transformer(
 	}
 	*/
     }
-    else
+    /* else */
 	/* must be initialized! */
-	t_caller = transformer_empty();
+	/*t_caller = transformer_empty(); */
 
     pips_assert("transformer t_caller is consistent", 
+		!transformer_undefined_p(t_caller) &&
 		transformer_consistency_p(t_caller)); 
 
-
-    debug(8, "user_function_call_to_transformer",
-	  "end with t_caller=%p\n", t_caller);
+    pips_debug(8, "end with t_caller=%p\n", t_caller);
 
     
     return t_caller;
