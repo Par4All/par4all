@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.55  1997/04/15 16:38:15  coelho
+ * *** empty log message ***
+ *
  * Revision 1.54  1997/04/10 08:51:06  coelho
  * *** empty log message ***
  *
@@ -1092,6 +1095,9 @@ hpf_remapping(
 
     if (sc_egalites(proc))
 	hpfc_warning("lattice extraction not implemented (proc)\n");
+    /* {
+	list ns = NIL;
+	extract_lattice(proc, lp, &ns, &lp.. */
 
 
     if (sc_egalites(enume))
