@@ -105,16 +105,16 @@ $(ARCH)/%.o: %.f ; $(F77CMP) $< -o $@
 	chmod a-w $@
 
 %.o: %.f
-	$(F77COMPILE) $< -o $@
+	$(F77CMP) $< -o $@
 
 %.f: %.m4f
-	$(M4FILTER) $(M4FOPT) $< > $@
+	$(M4FLT) $(M4FOPT) $< > $@
 
 %.c: %.m4c
-	$(M4FILTER) $(M4COPT) $< > $@
+	$(M4FLT) $(M4COPT) $< > $@
 
 %.h: %.m4h
-	$(M4FILTER) $(M4HOPT) $< > $@
+	$(M4FLT) $(M4HOPT) $< > $@
 
 ifdef INC_TARGET
 
@@ -153,8 +153,9 @@ arch-clean:; -$(RMDIR) $(ARCH)
 # multiphase compilation
 phase1: install_inc install_shr install_utl
 phase2:	install_lib install_bin
-phase3: install_htm install_doc
+phase3: install_doc
 phase4: install_rtm
+phase5: install_htm 
 
 # includes
 INSTALL_INC	+=   $(INC_TARGET)
@@ -171,18 +172,27 @@ endif
 
 $(LIB.d):; $(MKDIR) $(LIB.d)
 
-install_lib: $(INSTALL_LIB)  $(LIB.d)
+install_lib: $(INSTALL_LIB) $(LIB.d)
 	$(INSTALL) $(INSTALL_LIB) $(LIB.d)
 
 # binaries
+ifdef BIN_TARGET
 INSTALL_BIN	+=   $(BIN_TARGET)
+endif
 
 $(BIN.d):; $(MKDIR) $(BIN.d)
 
-install_bin: $(INSTALL_BIN)  $(BIN.d)
+install_bin: $(INSTALL_BIN) $(BIN.d)
 	$(INSTALL) $(INSTALL_BIN) $(BIN.d)
 
-# clean installation
+# documentation
+$(DOC.d):; $(MKDIR) $(DOC.d)
+
+install_doc: $(INSTALL_DOC) $(DOC.d)
+	$(INSTALL) $(INSTALL_DOC) $(DOC.d)
+
+
+# clean installation. TOO ROUGH!
 uninstall:
-	$(RM) -r $(INC.d) $(LIB.d) $(BIN.d)
+	$(RM) -r $(INC.d) $(LIB.d) $(BIN.d) $(DOC.d)
 	-$(RMDIR) $(ROOT)/Bin $(ROOT)/Lib
