@@ -831,6 +831,37 @@ list l;
 	   expression_list_to_binary_operator_call(l, and));
 }
 
+/*============================================================================*/
+/* bool expression_intrinsic_operation_p(expression exp): Returns TRUE
+ * if "exp" is an expression with a call to an intrinsic operation.
+ */
+bool expression_intrinsic_operation_p(exp)
+expression exp;
+{
+    entity e;
+    syntax syn = expression_syntax(exp);
+
+    if (syntax_tag(syn) != is_syntax_call)
+	return (FALSE);
+
+    e = call_function(syntax_call(syn));
+
+    return(value_tag(entity_initial(e)) == is_value_intrinsic);
+}
+
+/*============================================================================*/
+/* bool call_constant_p(call c): Returns TRUE if "c" is a call to a constant,
+ * that is, a constant number or a symbolic constant.
+ */
+bool call_constant_p(c)
+call c;
+{
+    value cv = entity_initial(call_function(c));
+
+    return( (value_tag(cv) == is_value_constant) ||
+	   (value_tag(cv) == is_value_symbolic)   );
+}
+
 /*
  *   that is all
  */
