@@ -97,8 +97,7 @@ static void scan_statement(statement s, list loops)
     case is_instruction_goto:
 	break ;
     default:
-	pips_error( "[scan_statement] unexpected tag %d\n", 
-		    instruction_tag(i)) ;
+	pips_error("scan_statement", "unexpected tag %d\n", instruction_tag(i));
     }
 }
 
