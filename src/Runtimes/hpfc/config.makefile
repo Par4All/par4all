@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/08/21 17:54:44 $, )
+# ($Date: 1996/08/22 11:03:08 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -16,11 +16,11 @@ SCRIPTS=hpfc_llcmd \
 #
 # Default compilers and options
 
-FC 		= f77
-FFLAGS		= -O2 -u
 CC		= gcc
 CFLAGS		= -O2 -pipe -ansi -pedantic -Wall
 CPPFLAGS	= -D__USE_FIXED_PROTOTYPES__
+FC 		= f77
+FFLAGS		= -O2 -u
 
 #
 # others
@@ -50,6 +50,18 @@ ifeq ($(PVM_ARCH),SUNMP)
 #
 CC	= cc
 CFLAGS	= -O2
+FC	= f77
+FFLAGS	= -fast -u
+#
+endif
+
+ifeq ($(PVM_ARCH),SUN4SOL2)
+#
+# SUN - SOLARIS 2
+#
+CC	= cc
+CFLAGS	= -O2
+FC	= f77
 FFLAGS	= -fast -u
 #
 endif
@@ -76,6 +88,7 @@ CFLAGS	= -O4
 #
 endif
 
+# ??? this env. dependence is not very convincing...
 ifdef USE_GNU
 #
 # GNU Compilers
@@ -108,8 +121,8 @@ M4FLAGS += -D ARCHITECTURE=$(PVM_ARCH) hpfc_lib_m4_macros
 # additional defs for m4
 M4FLAGS	+= -D DEMO
 M4FLAGS	+= -D DIRECT
+M4FLAGS	+= -D USE_GNU
 # M4FLAGS	+= -D DEBUG
-# M4FLAGS	+= -D USE_GNU
 # M4FLAGS	+= -D USE_PVMe
 
 COPY		= cp
