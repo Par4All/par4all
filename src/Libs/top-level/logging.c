@@ -1,6 +1,8 @@
 #include <stdio.h>
 
 #include "genC.h"
+
+#include "ri.h"
 #include "misc.h"
 #include "database.h"
 #include "ri-util.h"
