@@ -227,6 +227,9 @@ static bool load_meta_data(void)
     ONERROR(!ok, pips_user_error("Could not read database content!"))
     safe_fclose(file, file_name);
     free(file_name);
+
+    /* checkpoint catch up ??? */
+    db_switch_not_stored_as_stored();
     
     pips_debug(2, "done\n");
 
