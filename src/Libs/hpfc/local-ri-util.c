@@ -1,5 +1,8 @@
 /* $Id$
  * $Log: local-ri-util.c,v $
+ * Revision 1.16  1997/10/30 17:09:53  coelho
+ * nope.
+ *
  * Revision 1.15  1997/03/20 10:20:58  coelho
  * RCS headers.
  *
@@ -57,7 +60,7 @@ entity expression_to_entity(e)
 expression e;
 {
     syntax s = expression_syntax(e);
-
+    
     switch (syntax_tag(s))
     {
     case is_syntax_call:
