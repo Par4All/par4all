@@ -30,8 +30,8 @@
 
 #include "wp65.h"
 
-static Value offset_dim1 = VALUE_ZERO;
-static Value offset_dim2 = VALUE_ZERO;
+Value offset_dim1 = VALUE_ZERO;
+Value offset_dim2 = VALUE_ZERO;
 
 static entity tile_indice_entity1;
 static boolean ref_in_statement1;
