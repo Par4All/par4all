@@ -1,0 +1,13 @@
+#
+# $Id$
+#
+# updates to GNU for LINUX.
+
+CFLAGS	+=	-m486
+
+AR	=	ar
+RANLIB	=	ranlib
+DIFF	=	diff
+
+# end of it
+#
