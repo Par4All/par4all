@@ -6,9 +6,12 @@ MAIN_LIBS=	-lri-util -lproperties -ltext-util -ldg-util -lmisc \
                 -lpolynome -lvecteur -larithmetique -lreductions -lm \
                 /usr/lib/debug/malloc.o
 
+# to enable local parsing...
+# CPPFLAGS+=-DHAS_BDTYY
+
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
-LIB_CFILES=	adg_read_paf.c bdt_read_paf.c utils.c print.c
-LIB_HEADERS=	paf-util-local.h
-LIB_OBJECTS=	adg_read_paf.o bdt_read_paf.o utils.o print.o
+LIB_CFILES =	adg_read_paf.c bdt_read_paf.c utils.c print.c
+LIB_HEADERS =	paf-util-local.h
+LIB_OBJECTS =	$(LIB_CFILES:.c=.o)
 
