@@ -57,6 +57,7 @@ fprint_contrainte_vecteur(
 	    char signe;
 
 	    if (value_notzero_p(coeff)) {
+
 		if (value_pos_p(coeff))
 		    signe = (debut) ? ' ' : '+';
 		else {
@@ -75,6 +76,16 @@ fprint_contrainte_vecteur(
 	    value_addto(constante, coeff);
 
 	v = v->succ;
+    }
+
+    /* To handle cases where the constraint only has constant (this is a bug 
+       somewhere, we must remove the constraint). If we print: 
+       "<= constant ," then sc_fscan cannot read this output, so let's print:
+       " constant <= constant ," which is readable by sc_fscan, and doesn't change
+       the sc.
+    */
+    if (debut) {
+      (void) fprintf(fp, " "), fprint_Value(fp, constante), fprintf(fp, " ");
     }
 
     return constante;
