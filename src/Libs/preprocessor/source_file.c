@@ -236,8 +236,12 @@ pips_process_file(string file_name)
 
 #define IMPLICIT_NONE_RX "^[ \t]*implicit[ \t]*none"
 #define INCLUDE_FILE_RX "^[ \t]*include[ \t]*['\"]\\([^'\"]*\\)['\"]"
+#define BLOCK_DATA_RX "^[ \t]*block[ \t]*data[ \t]*\\([a-zA-Z0-9_ \t]*\\)"
 
-static regex_t implicit_none_rx, include_file_rx;
+static regex_t 
+    implicit_none_rx, 
+    include_file_rx,
+    block_data_rx;
 static FILE *output_file;
 
 /* tries several path for a file to include...
@@ -270,7 +274,8 @@ static bool handle_file_name(char * file_name, bool comment)
 
     if (!found)
     {
-      /* Do not raise a user_error exception because you are not in the right directory */
+      /* Do not raise a user_error exception,
+	 because you are not in the right directory */
 	pips_user_warning("include file %s not found\n", file_name);
 	fprintf(output_file, "! include \"%s\" not found\n", file_name);
 	return FALSE;
@@ -305,10 +310,18 @@ static bool handle_file(FILE * f) /* process f for includes and nones */
 	{
 	    line[matches[1].rm_eo]='\0';
 	    ok = handle_file_name(&line[matches[1].rm_so], TRUE);
-	    if(!ok)
-	      return ok;
+	    if (!ok) return ok;
 	}
-	else 
+	else /* if (!regexec(&block_data_rx, line, 2, matches, 0))
+	{
+	    fprintf(output_file, 
+		    "! block data converted to subroutine by PIPS\n!");
+	    fprintf(output_file, "%s", line);
+	    line[matches[1].rm_eo+1] = '\0';
+	    fprintf(output_file, "      SUBROUTINE %s", 
+		    &line[matches[1].rm_so]);
+	}
+	else */
 	{
 	    if (!regexec(&implicit_none_rx, line, 0, matches, 0))
 		fprintf(output_file, "! MIL-STD-1553 Fortran not in PIPS\n! ");
@@ -325,8 +338,9 @@ static void init_rx(void)
     if (done) return;
     done=TRUE;
     if (regcomp(&implicit_none_rx, IMPLICIT_NONE_RX, REG_ICASE) ||
-	regcomp(&include_file_rx, INCLUDE_FILE_RX, REG_ICASE))
-	abort();
+	regcomp(&include_file_rx, INCLUDE_FILE_RX, REG_ICASE) /* ||
+	regcomp(&block_data_rx, BLOCK_DATA_RX, REG_ICASE)*/)
+	pips_internal_error("invalid regular expression");
 }
 
 static bool pips_process_file(string file_name)
