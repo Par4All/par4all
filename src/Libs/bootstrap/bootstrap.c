@@ -104,7 +104,7 @@ void CreateArrays()
     /* GO: entity for io logical units: It is an array which*/
     make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 				 IO_EOF_ARRAY_NAME),
-		MakeTypeArray(make_basic(is_basic_int,
+		MakeTypeArray(make_basic(is_basic_logical,
 					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
 			      CONS(DIMENSION,
 				   make_dimension
@@ -129,7 +129,7 @@ void CreateArrays()
     /* GO: entity for io logical units: It is an array which*/
     make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 				 IO_ERROR_ARRAY_NAME),
-		MakeTypeArray(make_basic(is_basic_int,
+		MakeTypeArray(make_basic(is_basic_logical,
 					 IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
 			      CONS(DIMENSION,
 				   make_dimension
