@@ -1,13 +1,16 @@
+/*
+  $Id$
+  
+  $Log: WorkspaceManager.java,v $
+  Revision 1.3  1998/10/16 17:15:46  coelho
+  attempt to update to 1.2b4.
 
-/** $Id$
-  * $Log: WorkspaceManager.java,v $
-  * Revision 1.2  1998/07/03 11:55:30  coelho
-  * workspace menu moved here.
-  *
-  * Revision 1.1  1998/06/30 17:35:33  coelho
-  * Initial revision
-  *
-  */
+  Revision 1.2  1998/07/03 11:55:30  coelho
+  workspace menu moved here.
+  
+  Revision 1.1  1998/06/30 17:35:33  coelho
+  Initial revision
+*/
 
 
 package JPips;
@@ -16,15 +19,17 @@ package JPips;
 import java.lang.*;
 import java.util.*;
 import java.io.*;
-import java.awt.*;
-import java.awt.swing.*;
 import JPips.Pawt.*;
+
+import java.awt.*;
 import java.awt.event.*;
-import java.awt.swing.preview.*;
-import java.awt.swing.border.*;
-import java.lang.*;
-import java.awt.swing.event.*;
-import java.awt.swing.text.*;
+
+//import java.awt.swing.preview.*;
+import com.sun.java.swing.*;
+import com.sun.java.swing.filechooser.*;
+import com.sun.java.swing.border.*;
+import com.sun.java.swing.event.*;
+import com.sun.java.swing.text.*;
 
 
 /** A workspace file for JPips
@@ -32,8 +37,6 @@ import java.awt.swing.text.*;
   */  
 public class WorkspaceManager implements JPipsComponent
 {
-
-
   public TPips			tpips;		// tpips instance
   public PFrame			frame;		// frame of jpips
   public DirectoryManager	directoryManager;	// manager instance
@@ -46,10 +49,10 @@ public class WorkspaceManager implements JPipsComponent
   public PDialog		dialog;		// opened to create a workspace
   public PPanel			panel;		// jpips workspace panel
   public PList			filesList;	// contains fortran files
+  public DefaultListModel	files;
   public PMenu 			wk_menu;	// menu.
   private Vector 		v1, v2; 	// used by Option...
   private Option		option;
-
 
   /** Creates a workspace file.
     * Creates the workspace component.
@@ -187,91 +190,77 @@ public class WorkspaceManager implements JPipsComponent
       p = new PPanel(new GridBagLayout());
       p.setBorder(new TitledBorder("Attached files"));
       GridBagConstraints cc = new GridBagConstraints();
-      filesList = new PList(new DefaultListModel());
-      filesList.setSelectionMode(2);
-      PScrollPanel s = new PScrollPanel((Component)filesList);
+      files = new DefaultListModel();
+      filesList = new PList(files);
+      filesList.setSelectionMode
+	(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+      PScrollPanel s = new PScrollPanel((Component) filesList);
       s.setPreferredSize(new Dimension(400,100));
-      MouseListener m = new MouseAdapter()
-        {
-          public void mouseClicked(MouseEvent e)
-	    {
-              if (e.getClickCount() == 2)
-	        {
-	          DefaultListModel dlm
-		    = (DefaultListModel) filesList.getModel();
-		  dlm.removeElement(filesList.getSelectedValue());
-                }
-            }
-        };
-      filesList.addMouseListener(m);
+
+      filesList.addMouseListener(new MouseAdapter() {
+	public void mouseClicked(MouseEvent e) {
+	  if (e.getClickCount() == 2)
+	  {
+	    //DefaultListModel dlm = (DefaultListModel) filesList.getModel();
+	    files.removeElement(filesList.getSelectedValue());
+	  }
+	}
+      });
+
       add((Container)p,s,0,0,2,1,1,1,1.0,1.0,0,
           GridBagConstraints.BOTH,GridBagConstraints.WEST,cc);
       
       //add & remove
       PPanel p2 = new PPanel(new GridLayout(1,0));
       b = new PButton("Add...");
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
+      b.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e)
+	{
+	  File dir = new File(directoryManager.getDirectory());
+	  //if (dir==null) throw new Error("null directory");
+	  JFileChooser chooser = new JFileChooser(dir);
+
+	  /*ExtensionFileFilter filter = new ExtensionFileFilter(); 
+	  filter.addExtension("f"); 
+	  filter.addExtension("F"); 
+	  filter.setDescription("Fortran"); 
+	  chooser.setFileFilter(filter); */
+
+	  if(chooser.showDialog(frame, "Add") == JFileChooser.APPROVE_OPTION)
+	  {
+	    System.err.println("Adding...");
+	    File[] v = chooser.getSelectedFiles();
+	    if (v.length>0)
 	    {
-	      JFileChooser chooser = new JFileChooser(
-	        directoryManager.getDirectory());
-	      String st[] = new String[2]; st[0] = ".f"; st[1] = ".F";
-	      FileType types[] =  new FileType[1];
-	      types[0] = new FileType.ExtensionBased
-		           ("Fortran files (*.f,*.F)", st, null);
-	      chooser.setChoosableFileTypes(types);
-	      if(chooser.showDialog(frame) == 0)
-                {
-	          Vector v = chooser.getDirectoryPane().getSelectedFiles();
-	          if(v != null)
-		    {
-	              DefaultListModel dlm = 
-			(DefaultListModel) filesList.getModel();
-		      for(int i=0; i<v.size(); i++)
-	                {
-		          boolean ok = true;
-			  File f = (File)v.elementAt(i);
-			  if(!f.isDirectory()
-			     &&( (f.getName().indexOf(".f")!=-1)
-			      || (f.getName().indexOf(".F")!=-1)))
-			    {
-	                      for(int j=0; j<dlm.size(); j++)
-			        {
-			          if(((String)dlm.elementAt(j))
-				    .equals(f.getAbsolutePath()))ok = false;
-				}
-			      if(ok) dlm.addElement(f.getAbsolutePath());
-			    }
-			  else
-			    {
-                              JOptionPane.showMessageDialog(frame,
-		                "Invalid Fortran file!","Error",
-			        JOptionPane.ERROR_MESSAGE);
-			    }
-		        }
-		    }
-	        }
-	      dialog.pack();
+	      for (int i=0; i<v.length; i++)
+	      { 
+		addIfFortranFile(v[i]);
+	      }
 	    }
-	};
-      b.addActionListener(a);
+	    else
+	    {
+	      addIfFortranFile(chooser.getSelectedFile());
+	    }
+	    dialog.pack();
+	  }
+	}
+      });
       p2.add(b);
+
       b = new PButton("Remove");
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
-	    {
-	      DefaultListModel dlm = (DefaultListModel) filesList.getModel();
-	      if(dlm.size() > 0)
-	        {
-		  Object o[] = filesList.getSelectedValues();
-	          for(int i=0; i<o.length; i++) dlm.removeElement(o[i]);
-		}
-	      dialog.pack();
-	    }
-	};
-      b.addActionListener(a);
+      b.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  //DefaultListModel dlm = (DefaultListModel) filesList.getModel();
+	  if (files.size() > 0)
+	  {
+	    Object o[] = filesList.getSelectedValues();
+	    for(int i=0; i<o.length; i++) 
+	      files.removeElement(o[i]);
+	  }
+	  dialog.pack();
+	}
+      });
+
       p2.add(b);
       add(p,p2,0,1,2,1,1,1,1.0,1.0,5,
           GridBagConstraints.BOTH,GridBagConstraints.WEST,c);
@@ -281,123 +270,153 @@ public class WorkspaceManager implements JPipsComponent
       //ok & cancel
       p = new PPanel(new GridLayout(1,0));
       b = new PButton("Ok");
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
+      a = new ActionListener() {
+	public void actionPerformed(ActionEvent e)
+	{
+	  //DefaultListModel dlm = (DefaultListModel) filesList.getModel();	      
+	  if(!editText.getText().equals(""))
+	  {
+	    if(files.size() != 0)
 	    {
-              DefaultListModel dlm
-	        = (DefaultListModel) filesList.getModel();	      
-	      if(!editText.getText().equals(""))
-	        {
-		  if(dlm.size() != 0)
-	            {
-		      File f = new File(
-		        directoryManager.getDirectory()
-		        +"/"+editText.getText());
-		      File truefile
-		        = new File(f.getAbsolutePath()+".database");
-		      if(!truefile.exists())
-		        {		  
-		          dialog.setVisible(false);
-                          createWorkspace(f,filesList);
-		          frame.pack();
-			}
-		      else
-		        {
-                          JOptionPane.showMessageDialog(frame,
-		            "File "+editText.getText()+" exists!","Error",
-			    JOptionPane.ERROR_MESSAGE);
-			}
-		    }
-		  else
-		    {
-                      JOptionPane.showMessageDialog(frame,
-		        "Add Fortan files!","Error",JOptionPane.ERROR_MESSAGE);
-		    }
-		}
+	      File f = new File(directoryManager.getDirectory()
+				+"/"+editText.getText());
+	      File truefile
+	      = new File(f.getAbsolutePath()+".database");
+	      if(!truefile.exists())
+	      {		  
+		dialog.setVisible(false);
+		createWorkspace(f,filesList);
+		frame.pack();
+	      }
 	      else
-	        {
-                  JOptionPane.showMessageDialog(frame,
-		    "Enter a name!","Error",JOptionPane.ERROR_MESSAGE);
-		}
+	      {
+		JOptionPane.showMessageDialog
+		(frame,
+		 "File "+editText.getText()+" exists!","Error",
+		 JOptionPane.ERROR_MESSAGE);
+	      }
 	    }
-	};
+	    else
+	    {
+	      JOptionPane.showMessageDialog
+	      (frame,"Add Fortan files!","Error",JOptionPane.ERROR_MESSAGE);
+	    }
+	  }
+	  else
+	  {
+	    JOptionPane.showMessageDialog
+	    (frame, "Enter a name!","Error",JOptionPane.ERROR_MESSAGE);
+	  }
+	}
+      };
       b.addActionListener(a);
       p.add(b);
       b = new PButton("Cancel");
-      a = new ActionListener()
-        {
-	  public void actionPerformed(ActionEvent e)
-	    {
-	      dialog.setVisible(false); 
-	      frame.pack();
-	    }
-	};
+      a = new ActionListener() {
+	public void actionPerformed(ActionEvent e)
+	{
+	  dialog.setVisible(false); 
+	  frame.pack();
+	}
+      };
       b.addActionListener(a);
       p.add(b);
       add((Container)dialog.getContentPane(),p,0,2,1,1,1,1,1.0,0.0,5,
           GridBagConstraints.HORIZONTAL,GridBagConstraints.WEST,c);
-
+      
       dialog.pack();
       dialog.setLocationRelativeTo(frame);
       dialog.setVisible(true);
     }
+  
+  /** Add the specified file to the filesList, if *.[fF] and not there.
+      @param f the file to be added.
+   */
+  public void addIfFortranFile(File f)
+  {
+    boolean ok = true;
+    String abs_name = f.getAbsolutePath();
 
+    System.err.println("considering " + f + "/" + abs_name);
+
+    if (!f.isFile()) return;
+
+    if (abs_name.endsWith(".f") || abs_name.endsWith(".F"))
+    {
+      //DefaultListModel dlm = (DefaultListModel) filesList.getModel();
+
+      // drop if already there
+      for(int j=0; j<files.size(); j++)
+	if (abs_name.equals((String) files.elementAt(j))) 
+	  return;
+      
+      files.addElement(abs_name);
+    }
+    else
+    {
+      JOptionPane.showMessageDialog(frame, f + ": Invalid Fortran file!",
+				    "Error", JOptionPane.ERROR_MESSAGE);
+    }
+  }
 
   /** Creates a workspace in tpips.
     */  
   public void createWorkspace(File f, PList l)
+  {
+    directoryManager.check();
+    workspace = f;
+    tf.setText(workspace.getName());
+    DefaultListModel dlm = (DefaultListModel) l.getModel();
+    String command = "create "+ workspace.getName();;
+    for(int i=0; i<dlm.size(); i++)
     {
-      directoryManager.check();
-      workspace = f;
-      tf.setText(workspace.getName());
-      DefaultListModel dlm = (DefaultListModel) l.getModel();
-      String command = "create "+ workspace.getName();;
-      for(int i=0; i<dlm.size(); i++)
-	{
-	  String pathFile = (String)dlm.elementAt(i);
-	  command = command + " " + pathFile;
-        }
-      tpips.sendCommand(command);
-      option.setState(false);
-      moduleManager.setModules();
-      check();
-      directoryManager.setActivated(false);
-      frame.lock(false);
+      String pathFile = (String) dlm.elementAt(i);
+      command = command + " " + pathFile;
     }
+    tpips.sendCommand(command);
+    option.setState(false);
+    moduleManager.setModules();
+    check();
+    directoryManager.setActivated(false);
+    frame.lock(false);
+  }
 
 
   /** Displays a file chooser.
     * Opens a workspace in tpips.
     */
   public void choose()
-    {
-      JFileChooser chooser = new JFileChooser(
-        directoryManager.getDirectory());
-      String st[] = new String[1]; st[0] = "database";
+  {
+    JFileChooser chooser = new JFileChooser
+      (new File(directoryManager.getDirectory()));
+
+    /*String st[] = new String[1]; st[0] = "database";
       FileType types[] =  new FileType[1];
       types[0] = new FileType.ExtensionBased
-		       ("Workspace (*.database)", st, null);
-      chooser.setChoosableFileTypes(types);
-      if(chooser.showDialog(frame) == 0)
-	{
-	  File f = chooser.getDirectoryPane().getSelectedFile();
-	  if(f == null) f = chooser.getDirectoryPane().getCurrentDirectory();
-	  String s = f.getAbsolutePath();
-          int index = s.indexOf(".");
-          if(index != -1 && s.substring(index+1).equals("database"))
-            {
-	      s = s.substring(0,index);
-              open(new File(s));
-            }
-          else
-            {
-              JOptionPane.showMessageDialog(frame,
-		"Invalid workspace!","Error",JOptionPane.ERROR_MESSAGE);
-	    }
-	}
-      frame.pack();
+      ("Workspace (*.database)", st, null);
+      chooser.setChoosableFileTypes(types);*/
+
+    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+    if(chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
+    {
+      File f = chooser.getSelectedFile();
+      if(f == null) f = chooser.getCurrentDirectory();
+      String s = f.getAbsolutePath();
+      int index = s.lastIndexOf(".");
+      if(index != -1 && s.substring(index+1).equals("database"))
+      {
+	s = s.substring(0,index);
+	open(new File(s));
+      }
+      else
+      {
+	JOptionPane.showMessageDialog
+	  (frame, "Invalid workspace!","Error",JOptionPane.ERROR_MESSAGE);
+      }
     }
+    frame.pack();
+  }
 
 
   /** A short add method for a GridBagLayout.
