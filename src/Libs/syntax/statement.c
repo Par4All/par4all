@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.60  2003/08/02 14:06:42  irigoin
+ * One step to accomodate formal functional parameters.
+ *
  * Revision 1.59  2003/06/20 07:16:27  irigoin
  * Keep declaration text, temporarily thrown away for a huge application
  *
@@ -1018,80 +1021,117 @@ update_functional_type_result(entity f, type nt)
 void
 update_functional_type_with_actual_arguments(entity e, list l)
 {
-    list pc = list_undefined;
-    list pc2 = list_undefined;
-    type t = type_undefined;
-    functional ft = functional_undefined;
+  list pc = list_undefined;
+  list pc2 = list_undefined;
+  type t = type_undefined;
+  functional ft = functional_undefined;
 
-    pips_assert("update_functional_type_with_actual_arguments", !type_undefined_p(entity_type(e)));
-    t = entity_type(e);
-    pips_assert("update_functional_type_with_actual_arguments", type_functional_p(t));
-    ft = type_functional(t);
+  pips_assert("update_functional_type_with_actual_arguments", !type_undefined_p(entity_type(e)));
+  t = entity_type(e);
+  pips_assert("update_functional_type_with_actual_arguments", type_functional_p(t));
+  ft = type_functional(t);
 
 
-    if( ENDP(functional_parameters(ft))) {
-	/* OK, it is not safe: may be it's a 0-ary function */
-	for (pc = l; pc != NULL; pc = CDR(pc)) {
-	    basic b = basic_of_expression(EXPRESSION(CAR(pc)));
-	    variable v = make_variable(b, NIL,NIL); 
-	    type t = make_type(is_type_variable, v);
-	    parameter p = make_parameter(t,
-					 MakeModeReference());
+  if( ENDP(functional_parameters(ft))) {
+    /* OK, it is not safe: may be it's a 0-ary function */
+    for (pc = l; pc != NULL; pc = CDR(pc)) {
+      expression ae = EXPRESSION(CAR(pc));
+      type t = type_undefined;
+      parameter p = parameter_undefined;
 
-	    functional_parameters(ft) = 
-		gen_nconc(functional_parameters(ft),
-			  CONS(PARAMETER, p, NIL));
+      if(expression_reference_p(ae)) {
+	reference r = expression_reference(ae);
+	type tv = entity_type(reference_variable(r));
+
+	if(type_functional_p(tv)) {
+	  pips_user_warning("Functional actual argument %s found.\n"
+			    "Functional arguments are not yet suported by PIPS\n",
+			    entity_local_name(reference_variable(r)));
 	}
+
+	t = copy_type(tv);
+      }
+      else {
+	basic b = basic_of_expression(ae);
+	variable v = make_variable(b, NIL,NIL); 
+	t = make_type(is_type_variable, v);
+      }
+
+      p = make_parameter(t,
+			 MakeModeReference());
+      functional_parameters(ft) = 
+	gen_nconc(functional_parameters(ft),
+		  CONS(PARAMETER, p, NIL));
     }
-    else if(get_bool_property("PARSER_TYPE_CHECK_CALL_SITES"))  {
-	/* The pre-existing typing of e should match the new one */
-	int i = 0;
-	bool warning_p = FALSE;
+  }
+  else if(get_bool_property("PARSER_TYPE_CHECK_CALL_SITES"))  {
+    /* The pre-existing typing of e should match the new one */
+    int i = 0;
+    bool warning_p = FALSE;
 
-	for (pc = l, pc2 = functional_parameters(ft), i = 1;
-	     !ENDP(pc) && !ENDP(pc2);
-	     POP(pc), i++) {
-	    basic b = basic_of_expression(EXPRESSION(CAR(pc)));
-	    variable v = make_variable(b, NIL,NIL); 
-	    type at = make_type(is_type_variable, v);
-	    type ft = parameter_type(PARAMETER(CAR(pc2)));
-	    type eft = type_varargs_p(ft)? type_varargs(ft) : ft;
+    for (pc = l, pc2 = functional_parameters(ft), i = 1;
+	 !ENDP(pc) && !ENDP(pc2);
+	 POP(pc), i++) {
+      expression ae = EXPRESSION(CAR(pc));
+      type at = type_undefined;
+      type ft = parameter_type(PARAMETER(CAR(pc2)));
+      type eft = type_varargs_p(ft)? type_varargs(ft) : ft;
+      /* parameter p = parameter_undefined; */
 
-	    if((type_variable_p(eft)
-		&& basic_overloaded_p(variable_basic(type_variable(eft))))
-	       || type_equal_p(at, eft)) {
-		/* OK */
-		if(!type_varargs_p(ft)) 
-		    POP(pc2);
-	    }
-	    else {
-		user_warning("update_functional_type_with_actual_arguments",
-			     "incompatible %d%s actual argument and type in call to %s "
-			     "between lines %d and %d. Current type is not updated\n",
-			     i, nth_suffix(i),
-			     module_local_name(e), line_b_I, line_e_I);
-		free_type(at);
-		warning_p = TRUE;
-		break;
-	    }
-	    free_type(at);
+      if(expression_reference_p(ae)) {
+	reference r = expression_reference(ae);
+	type tv = entity_type(reference_variable(r));
+
+	if(type_functional_p(tv)) {
+	  pips_user_warning("Functional actual argument %s found.\n"
+			    "Functional arguments are not yet suported by PIPS\n",
+			    entity_local_name(reference_variable(r)));
 	}
 
-	if(!warning_p) {
-	    if(!(ENDP(pc) /* the actual parameter list must be exhausted */
-		 && (ENDP(pc2) /* as well as the type parameter list */
-		     || (ENDP(CDR(pc2)) /* unless the last type in the parameter list is a varargs */
-			 && type_varargs_p(parameter_type(PARAMETER(CAR(pc2)))))))) {
-		user_warning("update_functional_type_with_actual_arguments",
-			     "inconsistent arg. list lengths for %s:\n"
-			     " %d args according to type and %d actual arguments\n"
-			     "between lines %d and %d. Current type is not updated\n",
-			     module_local_name(e),
-			     gen_length(functional_parameters(ft)), 
-			     gen_length(l), line_b_I, line_e_I);
-	    }
-	}
+	at = copy_type(tv);
+      }
+      else {
+	basic b = basic_of_expression(ae);
+	variable v = make_variable(b, NIL,NIL); 
+
+	at = make_type(is_type_variable, v);
+      }
+
+      if((type_variable_p(eft)
+	  && basic_overloaded_p(variable_basic(type_variable(eft))))
+	 || type_equal_p(at, eft)) {
+	/* OK */
+	if(!type_varargs_p(ft)) 
+	  POP(pc2);
+      }
+      else {
+	user_warning("update_functional_type_with_actual_arguments",
+		     "incompatible %d%s actual argument and type in call to %s "
+		     "between lines %d and %d. Current type is not updated\n",
+		     i, nth_suffix(i),
+		     module_local_name(e), line_b_I, line_e_I);
+	free_type(at);
+	warning_p = TRUE;
+	break;
+      }
+      free_type(at);
     }
+
+    if(!warning_p) {
+      if(!(ENDP(pc) /* the actual parameter list must be exhausted */
+	   && (ENDP(pc2) /* as well as the type parameter list */
+	       || (ENDP(CDR(pc2)) /* unless the last type in the parameter list is a varargs */
+		   && type_varargs_p(parameter_type(PARAMETER(CAR(pc2)))))))) {
+	user_warning("update_functional_type_with_actual_arguments",
+		     "inconsistent arg. list lengths for %s:\n"
+		     " %d args according to type and %d actual arguments\n"
+		     "between lines %d and %d. Current type is not updated\n",
+		     module_local_name(e),
+		     gen_length(functional_parameters(ft)), 
+		     gen_length(l), line_b_I, line_e_I);
+      }
+    }
+  }
 }
 
 /* this function creates a call statement. e is the called function. l
@@ -1107,27 +1147,36 @@ MakeCallInst(
     list ar = get_alternate_returns();
     list ap = add_actual_return_code(l);
     storage s = entity_storage(e);
+    bool ffp_p = FALSE;
+    entity fe = e;
 
     if(!storage_undefined_p(s)) {
 	if(storage_formal_p(s)) {
+	  ffp_p = TRUE;
 	    pips_user_warning("entity %s is a formal functional parameter\n",
 			      entity_name(e));
-	    ParserError("MakeCallInst",
+	    /* ParserError("MakeCallInst",
 			"Formal functional parameters are not supported "
-			"by PIPS.\n");
+			"by PIPS.\n"); */
 	}
     }
 
-    update_called_modules(e);
+    if(!ffp_p) {
+      update_called_modules(e);
 
-    pips_assert("e itself is returned", MakeExternalFunction(e, MakeTypeVoid()) == e); 
+      /* The following assertion is no longer true when fucntions are
+         passed as actual arguments. */
+      /* pips_assert("e itself is returned",
+	 MakeExternalFunction(e, MakeTypeVoid()) == e); */
+      fe = MakeExternalFunction(e, MakeTypeVoid());
+    }
 
-    update_functional_type_result(e, make_type(is_type_void,UU));
-    update_functional_type_with_actual_arguments(e, ap);
+    update_functional_type_result(fe, make_type(is_type_void,UU));
+    update_functional_type_with_actual_arguments(fe, ap);
 
     if(!ENDP(ar)) {
 	statement s = instruction_to_statement
-	    (make_instruction(is_instruction_call, make_call(e, ap)));
+	    (make_instruction(is_instruction_call, make_call(fe, ap)));
 
 	statement_number(s) = look_at_next_statement_number();
 	pips_assert("Alternate return substitution required\n", SubstituteAlternateReturnsP());
@@ -1138,7 +1187,7 @@ MakeCallInst(
 				    instruction_block(i));
     }
     else {
-	i = make_instruction(is_instruction_call, make_call(e, ap));
+	i = make_instruction(is_instruction_call, make_call(fe, ap));
     }
 
     return i;
@@ -2059,12 +2108,14 @@ check_first_statement()
 	}
 	safe_fclose(fd, CurrentFN);
 	buffer[ibuffer++] = '\0';
+	/* Standard version */
 	code_decls_text(EntityCode(get_current_module_entity())) = buffer;
 	buffer = NULL;
-	/* For Cathare, get rid of 100 MB of declaration text:
+	/* For Cathare-2, get rid of 100 to 200 MB of declaration text: */
+	/*
 	   code_decls_text(EntityCode(get_current_module_entity())) = strdup("");
-	   free(buffer); */
-
+	   free(buffer);
+	*/
 	/* strdup(buffer); */
 	/* free(buffer), buffer=NULL; */
 
