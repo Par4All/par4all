@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/08/10 11:36:07 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/09/14 22:29:51 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2619,8 +2619,8 @@ void gen_core(gen_chunk *p){ abort();}
  *
  */
 
-#define decision_table_undefined ((bool)-25)
-typedef bool GenDecisionTableType[MAX_DOMAIN];
+#define decision_table_undefined ((char)25)
+typedef char GenDecisionTableType[MAX_DOMAIN];
 typedef GenDecisionTableType gen_tables[MAX_DOMAIN];
 
 static int 
