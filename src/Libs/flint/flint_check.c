@@ -221,14 +221,17 @@ bool check_call_intrinsic(la, lt, c)
  * intrinsics without parameter are not checked. (they are supposed to be
  * varryings)
  */
-bool check_call_args_number(la, lt, c)
-    list            la, lt;
-    call            c;
+bool 
+check_call_args_number(
+    list            la, /* list of actual arguments */
+    list            lt, /* list of parameters */
+    call            c)
 {
     int             na = gen_length(la);
     int             nt = gen_length(lt);
 
-    if (na == nt)
+    
+    if (na == nt || (nt<=na && type_varargs_p(parameter_type(PARAMETER(CAR(gen_last(lt)))))))
 	return (TRUE);
 
     if (call_intrinsic_p(c) && (nt == 0)) {	/* sometimes out... */
@@ -250,7 +253,8 @@ bool check_call_args_number(la, lt, c)
  * This function checks that the list of parameters and the list of arguments
  * are compatible.
  */
-bool check_call_types_compatibility(la, lt, c)
+bool 
+check_call_types_compatibility(la, lt, c)
     list            la, lt;
     call            c;
 {
@@ -283,7 +287,8 @@ bool check_call_types_compatibility(la, lt, c)
  * check-functions later
  * 
  */
-bool check_call_one_type(exp, param, c, i)
+bool 
+check_call_one_type(exp, param, c, i)
     expression      exp;
     parameter       param;
     call            c;
@@ -301,7 +306,8 @@ bool check_call_one_type(exp, param, c, i)
  * This function checks that two basics are compatible (ie the same) if not, a
  * message is broadcast
  */
-bool check_call_basic(be, bp, c, i)
+bool 
+check_call_basic(be, bp, c, i)
     basic           be, bp;
     call            c;
     int             i;
@@ -332,7 +338,8 @@ bool check_call_basic(be, bp, c, i)
  * not, a message... (dimension means here the number of elements of the
  * array)
  */
-bool check_call_dim(de, dp, c, i)
+bool 
+check_call_dim(de, dp, c, i)
     list            de, dp;
     call            c;
     int             i;
