@@ -16,7 +16,7 @@ more=
 
 function usage()
 {
-    echo "pips_at_night_at_cri [-gGv]";
+    echo "pips_at_night_at_cri [-gGvn]";
     exit ${1}
 }
 
@@ -28,12 +28,13 @@ function verb()
 #
 # OPTIONS
 
-while getopts Ggv opt
+while getopts gGvn opt
 do
     case ${opt} in
-        g) mailto=coelho ; more=CNLPV;;
+        g) mailto=coelho ;;
 	G) script=echo ;;
 	v) verb=verb ;;
+	n) more=CNLPV ;;
 	*) usage 1;;
     esac
 done
