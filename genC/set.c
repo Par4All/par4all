@@ -152,11 +152,10 @@ set set_del_element(set s1, set s2, void * e)
 set set_delfree_element(set s1, set s2, void * e)
 {
   void * pe;
-
-    set_assign( s1, s2 ) ;
-    (void) hash_delget( s1->table, e ,&pe);
-    free(*pe);
-    return( s1 ) ;
+  set_assign( s1, s2 ) ;
+  (void) hash_delget( s1->table, e ,&pe);
+  free(pe);
+  return( s1 ) ;
 }
 
 bool set_equal(set s1, set s2)
