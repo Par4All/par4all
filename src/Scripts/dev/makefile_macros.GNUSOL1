@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL1,v $ (version $Revision$)
-# $Date: 1996/07/15 21:09:00 $, 
+# $Date: 1996/07/15 21:09:46 $, 
 #
 # this file contains macro definitions 
 
@@ -21,7 +21,7 @@ LINTFLAGS= -habxu
 YACC	= bison
 YFLAGS	= -y
 PROTO	= cproto
-PRFLAGS	= -vcf2
+PRFLAGS	= -evcf2
 ETAGS	= etags
 TAR	= gtar
 ZIP	= gzip -v9
