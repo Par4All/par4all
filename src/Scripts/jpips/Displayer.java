@@ -2,6 +2,9 @@
   $Id$
 
   $Log: Displayer.java,v $
+  Revision 1.5  1998/10/30 15:43:21  ancourt
+  class Entension moved from TextDisplayer and toString added
+
   Revision 1.4  1998/10/17 12:07:53  coelho
   Border++.
 
@@ -94,4 +97,46 @@ abstract class Displayer implements JPipsComponent
   public void setActivated(boolean yes) {}
   
   public void reset() {}
+
+    /** A link between an extension and its representative string..
+   * @author Francois Didry
+   */
+  static public class Extension
+  {
+    
+    
+    public String		extension,	//extension 
+      info;		//information about the extension
+    
+    
+    /** Sets the extension and its info..
+     */
+    public Extension(String extension, String info)
+    {
+      this.extension = extension;
+      this.info = info;
+    }
+    
+    
+    /** @return the extension.
+     */
+    public String getExtension()
+    {
+      return extension;
+    }
+    
+    
+    /** @return the info.
+     */
+    public String getInfo()
+    {
+      return info;
+    }
+
+    public String toString()
+    { 
+	return this.getExtension();
+    }
+  }
+
 }
