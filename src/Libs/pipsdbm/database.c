@@ -502,7 +502,8 @@ static void db_save_resource(string rname, string oname, db_resource r)
 static void db_save_and_free_resource(
     string rname, string oname, db_resource r, bool do_free)
 {
-    pips_debug(7, "saving and freeing %s[%s]\n", rname, oname);
+    pips_debug(7, "saving%s %s[%s]\n", 
+	       do_free? " and freeing...": "...", rname, oname);
 
     pips_assert("resource is loaded", 
 		db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r));
