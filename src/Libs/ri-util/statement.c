@@ -595,13 +595,39 @@ make_return_statement(module)
 entity module;
 {
     char *module_name = entity_local_name(module);
-    string name= concatenate( module_name, MODULE_SEP_STRING, LABEL_PREFIX,
+    string name = concatenate( module_name, MODULE_SEP_STRING, LABEL_PREFIX,
 		       RETURN_LABEL_NAME,NULL);
-    entity l =(entity) make_label(strdup(name)) ;
-    return make_call_statement(RETURN_FUNCTION_NAME, NIL, 
-			       l, empty_comments);
+    entity l = gen_find_tabulated(name, entity_domain);
+    if (entity_undefined_p(l)) l = make_label(strdup(name));
+    return make_call_statement(RETURN_FUNCTION_NAME, NIL, l, empty_comments);
 }
 
+/* adds a RETURN statement to *ps if necessary
+ */
+void
+insure_return_as_last_statement(
+    entity module,
+    statement *ps)
+{
+    statement last = find_last_statement(*ps);
+    if (statement_undefined_p(last) || !return_statement_p(last))
+    {
+	statement ret = make_return_statement(module);
+	if (statement_block_p(*ps))
+	{
+	    sequence_statements(instruction_sequence(
+		statement_instruction(*ps))) = 
+		gen_nconc(sequence_statements(instruction_sequence(
+		    statement_instruction(*ps))),
+			  CONS(STATEMENT, ret, NIL));
+	}
+	else
+	{
+	    *ps = make_block_statement(CONS(STATEMENT, *ps,
+				       CONS(STATEMENT, ret, NIL)));
+	}
+    }
+}
 
 instruction 
 make_continue_instruction()
