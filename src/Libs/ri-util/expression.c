@@ -411,6 +411,12 @@ expression e;
     return operator_expression_p(e, DIVIDE_OPERATOR_NAME);
 }
 
+bool power_expression_p(e)
+expression e;
+{
+    return operator_expression_p(e, POWER_OPERATOR_NAME);
+}
+
 bool min0_expression_p(e)
 expression e;
 {
