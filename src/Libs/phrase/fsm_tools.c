@@ -199,8 +199,8 @@ statement make_transition_statement(control current_node,
   expression test_condition;
   int successors_nb;
   int current_transition_number;
-  string comment;
-  char buffer[50];
+  /*string comment;
+    char buffer[50];*/
 
   debug_control ("TRANSITION: Module statement", current_node, 2);
 
@@ -430,8 +430,8 @@ statement make_fsm_from_statement(statement stat,
   instruction loop_instruction;
   instruction sequence_instruction;
   sequence new_sequence;
-  string comment;
-  char buffer[256];
+  /*string comment;
+    char buffer[256];*/
   
   /* Assert that given stat is UNSTRUCTURED */
   pips_assert("Statement is UNSTRUCTURED in FSM_GENERATION", 
