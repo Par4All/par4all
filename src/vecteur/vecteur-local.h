@@ -109,7 +109,46 @@ typedef struct Svecteur Sbase, * Pbase;
 #define base_add_dimension(b,v) vect_chg_coeff((Pvecteur *)(b),(v),1)
 #define base_rm(b) vect_rm((Pvecteur)(b))
 
-/* OVERFLOW CONTROL */
+/* I do thing that overflows are managed in a very poor manner. FC.
+ * It should be all or not, as provided by any os that would raise
+ * integer overflows. Thus we should have thought of a sofware
+ * mecanism compatible with such a hardware and os approach.
+ * maybe by defining a mult_Value macro to check explicitely for 
+ * overflows if needed, and defined to a simple product if not. 
+ * functions would have an additional argument for returning a 
+ * conservative answer in case of overflow. Maybe some global
+ * variable could count the number of overflow that occured so that
+ * some caller could check whether sg got wrong and thus could 
+ * warn about the result and this fact.
+ * then we would have either the library compiled for these soft checks
+ * or for none, but without any difference or explicite requirements 
+ * from the user of these functions.
+ *
+ * instead of that, we have the two versions at the same time with explicite 
+ * control required from the user. I heard that for some functions 
+ * this is not used... thus allowing good performance (each time some
+ * result is false someone tracks down the not checked function and
+ * checks overflow explicitely, thus it is not a very good approach).
+ * moreover the most costly functions (simplexe, chernikova) are also
+ * those in which the exceptions occurs thus they are all checked. 
+ * the the impact on performances is definitely low.
+ * as far as software engineering is concerned, the current solution
+ * adds low level switch for calling different versions (controled or not)
+ * of pieces of code... this will have to be removed if some good os
+ * is to host this software...
+ */
+
+/* OVERFLOW CONTROL
+ */
+#if (defined(LINEAR_NO_OVERFLOW_CONTROL))
+#define OFL_CTRL 0
+#define FWD_OFL_CTRL 0
+#define NO_OFL_CTRL 0
+#else /* some OVERFLOW CONTROL is allowed */
 #define OFL_CTRL 2     /* overflows are treated in the called procedure */
 #define FWD_OFL_CTRL 1 /* overflows are treated by the calling procedure */
 #define NO_OFL_CTRL 0  /* overflows are not trapped at all  (dangerous !) */
+#endif /* LINEAR_NO_OVERFLOW_CONTROL */
+
+/* end of $RCSfile: vecteur-local.h,v $
+ */
