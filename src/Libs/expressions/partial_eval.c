@@ -1215,10 +1215,12 @@ bool partial_eval(char *mod_name)
 
     mod_inst = statement_instruction(mod_stmt);
     /* FI: not necessarily the case anymore */
+    /*
     if(!instruction_unstructured_p(mod_inst)) {
 	user_warning ("partial_eval", "Non-standard instruction tag %d\n",
 		      instruction_tag (mod_inst));
     }
+    */
     /* pips_assert("unroll", instruction_unstructured_p(mod_inst)); */
     /* "unstructured expected\n"); */
 
