@@ -46,6 +46,7 @@ DEFINE_CURRENT_MAPPING(semantic, transformer)
 
 static bool is_transformer;
 static bool is_user_view;
+static bool is_transformer_filtered;
 static hash_table nts = hash_table_undefined;
 
 static bool print_code_semantics();
@@ -57,6 +58,7 @@ char *module_name;
 {
     is_user_view = FALSE;
     is_transformer = TRUE;
+    is_transformer_filtered = FALSE;
     return print_code_semantics(module_name);
 }
 
@@ -66,6 +68,7 @@ char *module_name;
 {
     is_user_view = FALSE;
     is_transformer = FALSE;
+    is_transformer_filtered = get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
     return print_code_semantics(module_name);
 }
 
@@ -75,6 +78,7 @@ char *module_name;
 {
     is_user_view = TRUE;
     is_transformer = TRUE;
+    is_transformer_filtered = FALSE;
     return print_code_semantics(module_name);
 }
 
@@ -84,6 +88,7 @@ char *module_name;
 {
     is_user_view = TRUE;
     is_transformer = FALSE;
+    is_transformer_filtered = get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
     return print_code_semantics(module_name);
 }
 
@@ -93,6 +98,7 @@ char *module_name;
 {
     is_user_view = FALSE;
     is_transformer = TRUE;
+    is_transformer_filtered = FALSE;
     return get_semantic_text(module_name,FALSE);
 }
 
@@ -102,6 +108,7 @@ char *module_name;
 {
     is_user_view = FALSE;
     is_transformer = FALSE;
+    is_transformer_filtered = get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
     return get_semantic_text(module_name,FALSE);
 }
 
@@ -250,6 +257,12 @@ semantic_to_text(
     }
     else
 	t = load_statement_semantic(stmt);
+
+    if(is_transformer_filtered && !transformer_undefined_p(t) 
+	&& t != (transformer) HASH_UNDEFINED_VALUE) {
+	list ef = load_cumulated_rw_effects_list(stmt);
+	t = filter_transformer(t, ef);
+    }
 
     txt = text_transformer(t);
 
