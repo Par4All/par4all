@@ -18,6 +18,13 @@
  *     ofl_ctrl == FWD_OFL_CTRL
  *               -> overflow errors must be handled by the calling function
  *
+ * Comments :
+ * 
+ *  The base of the Psysteme is not always updated. Check the comments at the 
+ *  head of each function for more details. 
+ *  In the functions that update the base, there is an assert if the variables
+ *  that are eliminated do not belong to the base.
+ *
  * Authors :
  *
  * Remi Triolet, Malik Imadache, Francois Irigoin, Yi-Qing Yang, 
@@ -51,8 +58,9 @@ jmp_buf overflow_error;
  *            sc_empty(initial_base).
  * modifies : sc
  * comment  :  
- *             The base of *psc is not updated for backward compatibility
- *             purpose.
+ *             The base of *psc is not updated.
+ *             It is not even checked if the variable belongs to the base.
+ *             
  *             The case ofl_ctrl == OFL_CTRL is not handled, because
  *             the user may want an SC_UNDEFINED, or an sc_empty(sc->base)
  *             or an sc_rn(sc->base) as a result. It is not homogeneous.
@@ -116,7 +124,9 @@ int ofl_ctrl;
  * input    : a Psysteme to project along the input variable.
  * output   : nothing.
  * modifies : the initial Psysteme and its base.
- * comment  : no overflow control. Should be updated.
+ * comment  : The initial system is projected along the variable, which is then 
+ *            eliminated from the base. assert if the variable does not belong to
+ *            the base.
  */
 void sc_and_base_projection_along_variable_ofl_ctrl(psc,v, ofl_ctrl) 
 Psysteme *psc;
@@ -135,9 +145,11 @@ int ofl_ctrl;
  * output   : a system of contraints, resulting of the successive projection
  *            of the initial system along each variable of pv.
  * modifies : *psc.
- * comment  : it is very different from sc_projection_along_vecteur.	
+ * comment  : it is very different from 
+ *              sc_projection_with_test_along_variables_ofl_ctrl.	
  *            sc_empty is returned if the system is not feasible (BC).
- *            The base of *psc is updated.
+ *            The base of *psc is updated. assert if one of the variable
+ *            does not belong to the base.
  *             The case ofl_ctrl == OFL_CTRL is not handled, because
  *             the user may want an SC_UNDEFINED, or an sc_empty(sc->base)
  *             or an sc_rn(sc->base) as a result. It is not homogeneous.
@@ -572,13 +584,6 @@ int ofl_ctrl;
 
 
 
-
-/* sc_projection_on_variables()
- * This fonction returns the union of all the systems resulting of 
- * the projection of the system sc on each variable contained 
- * in vecteur index_base. pv is the list of variables that might be
- * eliminated from the system (symbolic constants are not in).
-*/
 /* Psysteme sc_projection_on_variables(Psysteme sc, Pbase index_base, Pvecteur pv)
  * input    : 
  * output   : a Psysteme representing the union of all the systems 
