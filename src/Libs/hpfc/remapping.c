@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/04/25 11:02:28 $, ) 
+ * ($Date: 1995/04/25 18:56:33 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -318,6 +318,8 @@ entity src, trg;
          /* of expressions */ lddc;
 
     debug(3, "hpf_remapping", "%s -> %s\n", entity_name(src), entity_name(trg));
+
+    if (src==trg) return(make_empty_statement()); /* (optimization:-) */
 
     /*   builds and simplifies the systems.
      */
