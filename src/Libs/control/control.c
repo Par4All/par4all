@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 2002/10/07 09:56:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2003/06/19 07:30:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2002/10/07 09:56:41 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2003/06/19 07:30:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -31,6 +31,9 @@ char vcid_control_control[] = "%A% ($Date: 2002/10/07 09:56:41 $, ) version $Rev
  * $Id$
  *
  * $Log: control.c,v $
+ * Revision 1.36  2003/06/19 07:30:13  nguyen
+ * Update calls to make_statement and make_variable with new RI for C
+ *
  * Revision 1.35  2002/10/07 09:56:41  irigoin
  * Bug fix in controlize_whileloop(). See Validation/redlec.f
  *
@@ -506,7 +509,7 @@ statement loop_test(statement sl)
 		      statement_number(sl),
 		      STATEMENT_ORDERING_UNDEFINED,
 		      cs,
-		      make_instruction(is_instruction_test, t));
+		      make_instruction(is_instruction_test, t),NIL,NULL);
 
   return ts;
 }
@@ -568,7 +571,7 @@ hash_table used_labels;
 				      STATEMENT_ORDERING_UNDEFINED,
 				      statement_comments(st),
 				      make_instruction(is_instruction_loop, 
-						       new_l)),
+						       new_l),NIL,NULL),
 		       ADD_PRED(pred, c_res),
 		       ADD_SUCC(succ, c_res )) ;
 	controlized = FALSE;
@@ -640,7 +643,7 @@ statement whileloop_test(statement sl)
 			statement_number(sl),
 			STATEMENT_ORDERING_UNDEFINED,
 			cs,
-			make_instruction(is_instruction_test, t));
+			make_instruction(is_instruction_test, t),NIL,NULL);
 
     return ts;
 }
@@ -671,7 +674,8 @@ hash_table used_labels;
     if(covers_labels_p(whileloop_body(l),loop_used_labels)) {
 	whileloop new_l = make_whileloop(whileloop_condition(l),
 					 control_statement(c_body),
-					 whileloop_label(l));
+					 whileloop_label(l),
+					 make_evaluation_before());
 
 	/* The edges between c_res and c_body, created by the above call to 
 	 * controlize are useless. The edge succ
@@ -687,7 +691,7 @@ hash_table used_labels;
 				      STATEMENT_ORDERING_UNDEFINED,
 				      statement_comments(st),
 				      make_instruction(is_instruction_whileloop, 
-						       new_l)),
+						       new_l),NIL,NULL),
 		       ADD_PRED(pred, c_res),
 		       ADD_SUCC(succ, c_res )) ;
 	controlized = FALSE;
@@ -790,7 +794,7 @@ compact_list(list ctls,
 				   STATEMENT_NUMBER_UNDEFINED,
 				   STATEMENT_ORDERING_UNDEFINED,
 				   string_undefined,
-				   i);
+				   i,NIL,NULL);
 	    }
 	    if(instruction_block_p(succ_i=statement_instruction(succ_st))){
 		instruction_block(i) = 
@@ -979,7 +983,7 @@ hash_table used_labels;
 				    statement_number(st),
 				    STATEMENT_ORDERING_UNDEFINED,
 				    statement_comments(st),
-				    i);
+				    i,NIL,NULL);
 	}
 	/* Not a good idea from mine to add this free... RK
 	   free_statement(control_statement(c_res)); */
@@ -1077,7 +1081,7 @@ hash_table used_labels;
 				  STATEMENT_ORDERING_UNDEFINED,
 				  statement_comments(st),
 				  make_instruction(is_instruction_test, 
-						   it)),
+						   it),NIL,NULL),
 		   ADD_PRED(pred, c_res),
 		   CONS(CONTROL, succ, NIL));
     control_predecessors(succ) = ADD_PRED(c_res, succ);
