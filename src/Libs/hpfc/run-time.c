@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: run-time.c,v $
+ * Revision 1.41  1997/10/21 13:36:45  coelho
+ * guard against already defined routines...
+ *
  * Revision 1.40  1997/10/21 13:29:03  coelho
  * prettier.
  *
@@ -46,7 +49,10 @@ MakeRunTimeSupportSubroutine(
     string local_name,
     int number_of_arguments)
 {
-    return make_empty_subroutine(local_name);
+    entity res = local_name_to_top_level_entity(local_name);
+    if (entity_undefined_p(res))
+	res = make_empty_subroutine(local_name);
+    return res;
 }
 
 /* entity MakeRunTimeSupportFunction
