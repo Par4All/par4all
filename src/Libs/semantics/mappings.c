@@ -1,16 +1,18 @@
- /* mappings package 
+ /* Variable value mappings package 
   *
-  * Establish mappings between integer scalar variable entities and
-  * value entities for a given module
+  * Establish mappings between analyzed scalar variable entities and
+  * variable value entities for a given module
   *
-  * Handle equivalences
+  * Handle equivalences too.
   *
   * Cannot handle more than one module at a time: no recursivity on
-  * modules or chaos will occur
+  * modules or chaos will occur.
   *
-  * See package value for more information on ri independent routines
+  * See package value.c for more information on more or less ri
+  * independent routines
   *
   * Francois Irigoin, 20 April 1990
+  *
   */
 
 #include <stdio.h>
@@ -36,17 +38,14 @@
 
 static Pcontrainte equivalence_equalities = CONTRAINTE_UNDEFINED;
 
-static void 
-reset_equivalence_equalities()
+static void reset_equivalence_equalities()
 {
     if(equivalence_equalities != CONTRAINTE_UNDEFINED) {
 	equivalence_equalities = contraintes_free(equivalence_equalities);
     }
 }
 
-transformer 
-tf_equivalence_equalities_add(tf)
-transformer tf;
+transformer tf_equivalence_equalities_add(transformer tf)
 {
     /* I need here a contraintes_dup() that is not yet available
        in Linear and I cannot change Linear just before the DRET meeting;
@@ -56,10 +55,7 @@ transformer tf;
     return tf;
 }
 
-static void 
-add_equivalence_equality(e, eq)
-entity e;
-entity eq;
+static void add_equivalence_equality(entity e, entity eq)
 {
     /* assumes e and eq are different */
     Pvecteur v = vect_new((Variable) e, 1);
@@ -73,11 +69,7 @@ entity eq;
     equivalence_equalities = c;
 }
 
-void 
-add_equivalenced_values(e, eq, readonly)
-entity e;
-entity eq;
-bool readonly;
+void add_equivalenced_values(entity e, entity eq, bool readonly)
 {
     /* e and eq are assumed to be integer scalar variables */
     /* eq will be seen as e, as far as values are concerned,
@@ -100,9 +92,7 @@ bool readonly;
 
 /* void add_interprocedural_value_entities 
  */
-static void 
-add_interprocedural_value_entities(e)
-entity e;
+static void add_interprocedural_value_entities(entity e)
 {
     debug(8,"add_interprocedural_value_entities","for %s\n", 
 	  entity_name(e));
@@ -121,9 +111,7 @@ entity e;
 	}
     }
 }
-static void 
-add_interprocedural_new_value_entity(e)
-entity e;
+static void add_interprocedural_new_value_entity(entity e)
 {
     debug(8,"add_interprocedural_new_value_entities","for %s\n", 
 	  entity_name(e));
@@ -140,20 +128,18 @@ entity e;
     }
 }
 
-static void 
-add_intraprocedural_value_entities_unconditionally(entity e)
+static void add_intraprocedural_value_entities_unconditionally(entity e)
 {
-    pips_debug(8, "for %s\n", entity_name(e));
-	add_new_value(e);
-	add_local_old_value(e);
-	add_local_intermediate_value(e);
-	add_or_kill_equivalenced_variables(e, FALSE);
+  pips_debug(8, "for %s\n", entity_name(e));
+  add_new_value(e);
+  add_local_old_value(e);
+  add_local_intermediate_value(e);
+  add_or_kill_equivalenced_variables(e, FALSE);
 }
 
 /* void add_intraprocedural_value_entities(entity e)
  */
-static void 
-add_intraprocedural_value_entities(entity e)
+static void add_intraprocedural_value_entities(entity e)
 { 
     debug(8,"add_interprocedural__value_entities",
 	  "for %s\n", entity_name(e));
@@ -164,112 +150,121 @@ add_intraprocedural_value_entities(entity e)
 
 /*  */
 
-void 
-add_or_kill_equivalenced_variables(e, readonly)
-entity e;
-bool readonly;
+void add_or_kill_equivalenced_variables(entity e, bool readonly)
 {
-    /* look for equivalenced variables; forget dynamic aliasing
-       between formal parameters */
-    storage s;
+  /* look for equivalenced variables; forget dynamic aliasing
+     between formal parameters */
+  storage s;
  
-    debug(8,"add_or_kill_equivalenced_variables",
-	  "for %s\n", entity_name(e));
-    s = entity_storage(e);
-    if(storage_ram_p(s)) {
-	/* handle intraprocedural aliasing */
-	list local_shared = ram_shared(storage_ram(s));
-	/* handle interprocedural aliasing: this does not seem to be the right place
-	 * because too many synonyms, not visible from the current procedure, are
-	 * introduced */
-	/* list global_shared = NIL; */
-	bool array_equivalenced = FALSE;
-	entity sec = ram_section(storage_ram(s));
-	type t = entity_type(sec);
+  debug(8,"add_or_kill_equivalenced_variables",
+	"for %s\n", entity_name(e));
+  s = entity_storage(e);
+  if(storage_ram_p(s)) {
+    /* handle intraprocedural aliasing */
+    list local_shared = ram_shared(storage_ram(s));
+    /* handle interprocedural aliasing: this does not seem to be the right place
+     * because too many synonyms, not visible from the current procedure, are
+     * introduced */
+    /* list global_shared = NIL; */
+    bool array_equivalenced = FALSE;
+    entity sec = ram_section(storage_ram(s));
+    type t = entity_type(sec);
 
-	pips_assert("add_or_kill_equivalenced_variables", type_area_p(t));
+    pips_assert("add_or_kill_equivalenced_variables", type_area_p(t));
 
-	/* global_shared = area_layout(type_area(t)); */
+    /* global_shared = area_layout(type_area(t)); */
 
-	/* Is e intra or interprocedurally equivalenced/aliased with an array or a
-	 * non-integer variable?
-	 */
-	MAPL(ce, {
-	    entity eq = ENTITY(CAR(ce));
-	    /* this approximate test by Pierre Jouvelot should be
-	       replaced by an exact test but it does not really matter;
-	       an exact test could only be useful in presence of arrays;
-	       and in presence of arrays we do nothing here */
-	    if(entity_conflict_p(e, eq) && !integer_scalar_entity_p(eq)) {
-		pips_user_warning("Values for variable %s are not analyzed because "
-				  "%s is aliased with non scalar integer variable %s\n",
-				  entity_name(e), entity_name(e), entity_name(eq));
-		array_equivalenced = TRUE;
-		break;
-	    }
-	},
-	     local_shared);
-
-	/* if it's not, go ahead */
-	if(!array_equivalenced) {
-
-	    /* If it is intra-procedurally equivalenced, set the synonyms as
-	     * read-only variables
-	     */
-	    MAPL(ce, {
-		entity eq = ENTITY(CAR(ce));
-		if(entity_conflict_p(e, eq)) {
-		    if(integer_scalar_entity_p(eq)) {
-			/* if eq is an integer scalar variable it does not
-			   only have a destructive effect */
-			add_equivalenced_values(e, eq, readonly);
-		    }
-		}
-	    },
-		 local_shared); 
-
-	    /* If it is inter-procedurally aliased, set the synonyms as
-	     * regular variables
-	     */
-	    /* FI: This is damaging because too many equivalences are introduced;
-	     * synonyms that are not visible from the current procedure are added
-	     * because they are visible from the main, i.e. the whole program
-	     * is (assumed) analyzed.
-	    MAPL(ce, {
-		entity eq = ENTITY(CAR(ce));
-		if(entity_conflict_p(e, eq) && !entity_is_argument_p(eq, local_shared)) {
-		    if(integer_scalar_entity_p(eq)) {
-			add_equivalenced_values(e, eq, FALSE);
-		    }
-		}
-	    },
-		 global_shared); 
-		 */
+    /* Is e intra or interprocedurally equivalenced/aliased with an array or a
+     * non-integer variable?
+     */
+    MAPL(ce, {
+      entity eq = ENTITY(CAR(ce));
+      /* this approximate test by Pierre Jouvelot should be
+	 replaced by an exact test but it does not really matter;
+	 an exact test could only be useful in presence of arrays;
+	 and in presence of arrays we do nothing here */
+      if(entity_conflict_p(e, eq) && !analyzable_scalar_entity_p(eq)) {
+	pips_user_warning("Values for variable %s are not analyzed because "
+			  "%s is aliased with scalar variable %s with non "
+			  "analyzed type %s or with array variable\n",
+			  entity_name(e), entity_name(e), entity_name(eq),
+			  type_to_string(entity_type(eq)));
+	array_equivalenced = TRUE;
+	break;
+      }
+      if(entity_conflict_p(e, eq) && analyzable_scalar_entity_p(eq)) {
+	if(!type_equal_p(entity_type(e),entity_type(eq))) {
+	  pips_user_warning("Values for variable %s of type %s are not analyzed because "
+			    "%s is aliased with scalar variable %s with different "
+			    "type %s\n",
+			    entity_name(e), type_to_string(entity_type(e)),
+			    entity_name(e), entity_name(eq),
+			    type_to_string(entity_type(eq)));
+	  array_equivalenced = TRUE;
+	  break;
 	}
-	else {
-	    /* Variable e is equivalenced with an array or a non-integer
-	     * variable and cannot be analyzed; it must be removed from
-	     * the hash tables.
-	     */
-	    remove_entity_values(e, readonly);
+      }
+    },
+	 local_shared);
+
+    /* if it's not, go ahead */
+    if(!array_equivalenced) {
+
+      /* If it is intra-procedurally equivalenced, set the synonyms as
+       * read-only variables
+       */
+      MAPL(ce, {
+	entity eq = ENTITY(CAR(ce));
+	if(entity_conflict_p(e, eq)) {
+	  if(entity_has_values_p(eq)) {
+	    /* if eq is an integer scalar variable it does not
+	       only have a destructive effect */
+	    add_equivalenced_values(e, eq, readonly);
+	  }
 	}
+      },
+	   local_shared); 
+
+      /* If it is inter-procedurally aliased, set the synonyms as
+       * regular variables
+       */
+      /* FI: This is damaging because too many equivalences are introduced;
+       * synonyms that are not visible from the current procedure are added
+       * because they are visible from the main, i.e. the whole program
+       * is (assumed) analyzed.
+       MAPL(ce, {
+       entity eq = ENTITY(CAR(ce));
+       if(entity_conflict_p(e, eq) && !entity_is_argument_p(eq, local_shared)) {
+       if(integer_scalar_entity_p(eq)) {
+       add_equivalenced_values(e, eq, FALSE);
+       }
+       }
+       },
+       global_shared); 
+      */
     }
-    else if(storage_return_p(s))
-	/* semantics analysis should be performed on this kind of variable
-	   but it has probably been eliminated earlier; no equivalence
-	   possible anyway! */
-	user_warning("add_or_kill_equivalenced_variables","storage return\n");
-    else if(storage_formal_p(s))
-	/* to be dealt with later if we assume non-standard dynamic
-	   aliasing between formal parameters */
-	;
-    else
-	pips_error("add_or_kill_equivalenced_variables",
-		   "unproper storage = %d\n", storage_tag(s));
+    else {
+      /* Variable e is equivalenced with an array or a non-integer
+       * variable and cannot be analyzed; it must be removed from
+       * the hash tables.
+       */
+      remove_entity_values(e, readonly);
+    }
+  }
+  else if(storage_return_p(s))
+    /* semantics analysis should be performed on this kind of variable
+       but it has probably been eliminated earlier; no equivalence
+       possible anyway! */
+    pips_user_warning("storage return\n");
+  else if(storage_formal_p(s))
+    /* to be dealt with later if we assume non-standard dynamic
+       aliasing between formal parameters */
+    ;
+  else
+    pips_internal_error("unproper storage = %d\n", storage_tag(s));
 }
-
-static void 
-allocate_module_value_mappings(entity m)
+
+static void allocate_module_value_mappings(entity m)
 {
     /* this routine tries to estimate the sizes of the hash tables,
        although the hashtable package has enlarging capability;
@@ -317,7 +312,7 @@ allocate_module_value_mappings(entity m)
     allocate_value_mappings(new_value_number, old_value_number,
 			    intermediate_value_number);
 }
-
+
 /* void module_to_value_mappings(entity m): build hash tables between
  * variables and values (old, new and intermediate), and between values
  * and names for module m, as well as equivalence equalities
@@ -351,9 +346,7 @@ allocate_module_value_mappings(entity m)
  * reset_current_module_entity(); 
  * free_value_mappings();
  */
-void 
-module_to_value_mappings(m)
-entity m;
+void module_to_value_mappings(entity m)
 {
     cons * module_inter_effects;
     cons * module_intra_effects;
@@ -370,28 +363,30 @@ entity m;
        make_local_intermediate_value_entity and make_local_old_value_entity */
     reset_value_counters();
     reset_equivalence_equalities();
+    reset_temporary_value_counter();
+    set_analyzed_types();
 
     /* module_inter_effects = code_effects(value_code(entity_initial(m))); */
     module_inter_effects = load_summary_effects(m);
 
-    /* look for interprocedural write effects on scalar integer variables
+    /* look for interprocedural write effects on scalar analyzable variables
        and generate proper entries into hash tables */
     MAPL(cef,
      {entity e = 
 	  reference_variable(effect_reference(EFFECT(CAR(cef))));
 	  action a = effect_action(EFFECT(CAR(cef)));
-	  if(integer_scalar_entity_p(e) && action_write_p(a)) 
+	  if(analyzable_scalar_entity_p(e) && action_write_p(a)) 
 	      add_interprocedural_value_entities(e);
       },
 	 module_inter_effects);
 
-    /* look for interprocedural read effects on scalar integer variables
+    /* look for interprocedural read effects on scalar analyzable variables
        and generate proper entries into hash tables */
     MAPL(cef,
      {entity e = 
 	  reference_variable(effect_reference(EFFECT(CAR(cef))));
 	  action a = effect_action(EFFECT(CAR(cef)));
-	  if(integer_scalar_entity_p(e) && action_read_p(a)) 
+	  if(analyzable_scalar_entity_p(e) && action_read_p(a)) 
 	      add_interprocedural_new_value_entity(e);
       },
 	 module_inter_effects);
@@ -403,13 +398,13 @@ entity m;
     module_intra_effects = 
 	load_module_intraprocedural_effects(m);
 
-    /* look for intraprocedural write effects on scalar integer variables
+    /* look for intraprocedural write effects on scalar analyzable variables
        and generate proper entries into hash tables */
     MAP(EFFECT, ef,
     {
 	entity e = reference_variable(effect_reference(ef));
 	action a = effect_action(ef);
-	if(integer_scalar_entity_p(e) && action_write_p(a)) {
+	if(analyzable_scalar_entity_p(e) && action_write_p(a)) {
 	    if(storage_return_p(entity_storage(e))) {
 		add_interprocedural_value_entities(e);
 	    }
@@ -420,7 +415,7 @@ entity m;
     },
 	 module_intra_effects);
     
-    /* look for intraprocedural read effects on scalar integer variables
+    /* look for intraprocedural read effects on scalar analyzable variables
        and generate proper entry into value name hash table if it has
        not been entered before; interprocedural read effects are implicitly
        dealed with since they are included; 
@@ -429,7 +424,7 @@ entity m;
     MAP(EFFECT, ef,
      {
 	 entity e = reference_variable(effect_reference(ef));
-	 if(integer_scalar_entity_p(e) && !entity_has_values_p(e)) {
+	 if(analyzable_scalar_entity_p(e) && !entity_has_values_p(e)) {
 	      /* FI: although it may only be read within this procedure,
 	       * e might be written in another one thru a COMMON;
 	       * this write is not visible from OUT, but only from a caller
@@ -461,7 +456,7 @@ entity m;
        Only intraprocedural variables can be privatized (1 Aug. 92) */
     MAPL(ce,
      {entity e = ENTITY(CAR(ce));
-	  if(integer_scalar_entity_p(e) && !entity_has_values_p(e)) {
+	  if(analyzable_scalar_entity_p(e) && !entity_has_values_p(e)) {
 	      add_intraprocedural_value_entities(e);
 	  }}, code_declarations(value_code(entity_initial(m))));
 
@@ -485,20 +480,102 @@ bool
 value_mappings_compatible_vector_p(v)
 Pvecteur v;
 {
-    for(;!VECTEUR_NUL_P(v); v = v->succ) {
-	if(vecteur_var(v) != TCST) {
-	    if(entity_has_values_p((entity) vecteur_var(v))) {
-	    entity new_v = entity_to_new_value((entity) vecteur_var(v));
+  for(;!VECTEUR_NUL_P(v); v = v->succ) {
+    if(vecteur_var(v) != TCST) {
+      entity e = (entity) vecteur_var(v);
+
+      /* The variable may denote a constant with compatible type */
+      if(entity_constant_p(e) && !analyzed_constant_p(e)) {
+	return FALSE;
+      }
+
+      /* or a temporary variable */
+      else if(local_temporary_value_entity_p(e)) {
+	;
+      }
+
+      /* Or a variable value */
+      else if(entity_has_values_p(e)) {
+	entity new_v = entity_to_new_value(e);
 	
-	    if(new_v != entity_undefined)
-		vecteur_var(v) = (Variable) new_v;
-	    else
-		return FALSE;
-	    }
-	    else {
-		return FALSE;
-	    }
-	}
+	if(new_v != entity_undefined)
+	  vecteur_var(v) = (Variable) new_v;
+	else
+	  return FALSE;
+      }
+
+      /* Or the vector cannot be used in the semantics analysis */
+      else {
+	return FALSE;
+      }
     }
-    return TRUE;
+  }
+  return TRUE;
+}
+
+list variables_to_values(list list_mod)
+{
+  list list_val = NIL;
+
+  MAP(ENTITY, e, {
+    entity v_old = entity_to_old_value(e);
+    entity v_new = entity_to_new_value(e);
+
+    list_val = CONS(ENTITY, v_old, list_val);
+    list_val = CONS(ENTITY, v_new, list_val);
+  }, list_mod);
+  return list_val;
+}
+
+list variables_to_old_values(list list_mod)
+{
+  list list_val = NIL;
+
+  MAP(ENTITY, e, {
+    entity v_old = entity_to_old_value(e);
+
+    list_val = CONS(ENTITY, v_old, list_val);
+  }, list_mod);
+  return list_val;
+}
+
+/* replace variables by new values which is necessary for equivalenced
+   variables */
+void variables_to_new_values(Pvecteur v)
+{
+  Pvecteur elem = VECTEUR_UNDEFINED;
+
+  for(elem = v; !VECTEUR_NUL_P(elem); elem = vecteur_succ(elem)) {
+    entity var = (entity) vecteur_var(elem);
+
+    if(vecteur_var(elem)!=TCST) {
+      entity v_new = entity_to_new_value(var);
+
+      if(v_new!=var) {
+	(void) vect_variable_rename(v, (Variable) var,
+				    (Variable) v_new);
+      }
+    }
+  }
+}
+
+/* Renaming of variables in v according to transformations occuring
+ * later. If a variable is modified by post, its old value must
+ * be used in v
+ */
+
+void
+upwards_vect_rename(Pvecteur v, transformer post)
+{
+    /* FI: it would probably ne more efficient to
+     * scan va and vb than the argument list...
+     */
+    list modified_values = transformer_arguments(post);
+    
+    MAP(ENTITY, v_new, {
+	entity v_init = new_value_to_old_value(v_new);
+	
+	(void) vect_variable_rename(v, (Variable) v_new,
+				    (Variable) v_init);
+    }, modified_values);
 }
