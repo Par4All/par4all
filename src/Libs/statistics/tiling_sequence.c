@@ -1,5 +1,3 @@
- 
-
 #include <stdio.h>
 #include "genC.h"    
 #include "linear.h"
@@ -33,7 +31,7 @@ static bool loop_flt(loop l, context_p context )
   if( ! first_turn ) first_turn = TRUE; 
   return TRUE;
 } 
-void loop_rwt(loop l, context_p context  ) 
+static void loop_rwt(loop l, context_p context  ) 
 {  
   contenu_t contenu;
   int depth;
@@ -415,565 +413,59 @@ static void put_result(string filename)
   safe_fclose(file, filename);
 }
 
+static bool valide( statement s)
+{ 
+  bool code ;
+  
 
-int tiling_sequence(string name)
+
+}  
+
+
+bool tiling_sequence(string module)  
 {
   statement stat;
-  string filename, localfilename; 
+  instruction ins;
+  sequence seq;
+  list lis;
   context_t context;
-                                  
-  debug_on("STATISTICS_DEBUG_LEVEL");
-  pips_debug(1, "considering module %s\n", name);
-  set_current_module_entity(local_name_to_top_level_entity(name));
-  printf(" salutfddddddddddddddddddddddddddddddddddddddddddddd  \n");
-  /*
-  initialize() ;
   
-  stat = (statement) db_get_memory_resource(DBR_CODE, name, TRUE); 
-
+  debug_on("STATISTICS_DEBUG_LEVEL");
+  pips_debug(1, "considering module %s\n", module);
+  set_current_module_entity(local_name_to_top_level_entity(module));
+  
+ 
+  
+  stat = (statement) db_get_memory_resource(DBR_CODE, module, TRUE); 
+  
   context.contenu = hash_table_make(hash_pointer, 0);  
   context.depth   = hash_table_make(hash_pointer, 0);
   context.statement_stack = stack_make(statement_domain, 0, 0); 
-   
+ 
+
+
+
+
+
+
+
+
+ 
+  ins=statement_instruction(stat);
+  seq=instruction_sequence(ins);
+  lis =sequence_statements(seq); 
+
+    MAP(STATEMENT,s,{ ins=statement_instruction(s);printf("dd %d",instruction_tag(ins));lis=CDR(lis);},lis) ;
   
-  gen_context_multi_recurse
-    (stat, & context, 
-     statement_domain, stmt_flt, stmt_rwt,
-     sequence_domain, seq_flt, seq_rwt,
-     test_domain, test_flt, test_rwt,
-     loop_domain, loop_flt, loop_rwt,
-     call_domain, call_flt, call_rwt,
-     whileloop_domain, gen_true, wl_rwt,
-     unstructured_domain, uns_flt, uns_rwt,
-     expression_domain, gen_false, gen_null,
-     NULL); 
+    
 
 
-  hash_table_free(context.contenu);
-
-
-  hash_table_free(context.depth);
-  stack_free(&context.statement_stack); 
-
-  localfilename = db_build_file_resource_name(DBR_STATS_FILE,
-					      name, ".loop_stats");
-
-  filename = strdup(concatenate(db_get_current_workspace_directory(), 
-				"/", localfilename, NULL));
-
-   put_result(filename);  
-   free(nbr_no_perf_nest_loop_of_depth);
-   free(nbr_perf_nest_loop_of_depth);
-  free(filename);
-  DB_PUT_FILE_RESOURCE(DBR_STATS_FILE, name, localfilename);
-  reset_current_module_entity(); */
+ 
+  reset_current_module_entity(); 
   
 pips_debug(1, "done.\n");
   debug_off();
    
   return TRUE;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
