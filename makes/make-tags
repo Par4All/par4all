@@ -18,8 +18,12 @@ TAGS=/tmp/PIPS-TAGS
 FILES=/tmp/PIPS-FILES
 PATHNAME_LIST="${HOME}/Newgen/genClib.c ${HOME}/Newgen/hash.c ${HOME}/Newgen/list.c ${HOME}/Newgen/set.c ${DEVEDIR}/Lib/[a-z]* ${DEVEDIR}/Passes/[a-z]* ${INCLUDEDIR} ${EXTEDIR}"
 
-find ${PATHNAME_LIST} -name '*.[cyhl]' -print > ${FILES} 2>/dev/null
+# On saute les SCCS, RK 28/9/93.
+find ${PATHNAME_LIST} -name '*.[cyhl]' -print | \
+	sed '/SCCS/d' > ${FILES} 2>/dev/null
+
 /usr/local/bin/etags -f ${TAGS} `cat ${FILES}` 2>/dev/null
+
 cp ${TAGS} ${PIPSDIR}/Tags/TAGS
 
 rm -f ${TAGS} ${FILES}
