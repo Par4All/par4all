@@ -29,5 +29,5 @@
 #define ICFG_DECOR_TOTAL_PRECONDITIONS 10
 
 /*************written by Dat*************/
-typedef text get_text_function(list);
+typedef text (*get_text_function)(list);
 /****************************************/
