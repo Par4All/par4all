@@ -1,11 +1,8 @@
 c
 c Checks run-time library version
 c
-c $RCSfile: hpfc_check.f,v $ ($Date: 1995/09/15 15:57:02 $, )
-c version $Revision$
-c got on %D%, %T%
-c $Id$
-c
+c $RCSfile: hpfc_check.f,v $ version $Revision$
+c ($Date: 1995/09/27 18:02:24 $, )
 c
       subroutine hpfc_check()
       include 'real_parameters.h'
