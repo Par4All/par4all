@@ -1,8 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_delete,v $ version $Revision$
-# $Date: 1996/03/15 16:59:17 $, 
-# got on %D%, %T%
+# $Date: 1996/12/27 14:53:16 $, 
 #
 
 script=`basename $0`
