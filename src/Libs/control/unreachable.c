@@ -4,6 +4,9 @@
  * $Id$
  *
  * $Log: unreachable.c,v $
+ * Revision 1.8  1998/06/03 08:46:10  irigoin
+ * Handling of while loops slightly modified
+ *
  * Revision 1.7  1998/04/14 19:55:19  coelho
  * *** empty log message ***
  *
@@ -88,6 +91,8 @@ control_propagate(control c)
 
 /* returns whether propagation is continued after s.
  * (that is no STOP or infinite loop encountered ??? ).
+ * It is a MAY information. If there is no propagation, it 
+ * is a MUST information.
  */
 bool 
 propagate(statement s)
@@ -112,6 +117,12 @@ propagate(statement s)
 	propagate(loop_body(instruction_loop(i)));
 	break;
     }
+    case is_instruction_whileloop:
+    {
+	/* Undecidable implies "propagate" by default */
+	propagate(whileloop_body(instruction_whileloop(i)));
+	break;
+    }
     case is_instruction_test:
     {	
 	test t = instruction_test(i);
@@ -130,11 +141,6 @@ propagate(statement s)
     case is_instruction_call:
     {
 	continued = !ENTITY_STOP_P(call_function(instruction_call(i)));
-	break;
-    }
-    case is_instruction_whileloop:
-    {
-	propagate(whileloop_body(instruction_whileloop(i)));
 	break;
     }
     case is_instruction_goto:
