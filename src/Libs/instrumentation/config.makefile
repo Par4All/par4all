@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: config.makefile,v $
+# Revision 1.5  2000/09/22 09:32:59  nguyen
+# Add Partial_redundancy_elimination for logical expression
+#
 # Revision 1.4  2000/08/22 09:56:21  nguyen
 # Change the name of phases
 # Add array_bound_check_instrumentation
@@ -20,7 +23,8 @@
 LIB_CFILES 	= \
 	bottom_up_array_bound_check.c \
 	top_down_array_bound_check.c \
-	array_bound_check_instrumentation.c
+	array_bound_check_instrumentation.c \
+	partial_redundancy_elimination.c
 
 LIB_HEADERS	= instrumentation-local.h
 
