@@ -27,7 +27,7 @@ parametric_statement_feasible_p(statement s,
     ifdebug(6) {
 	int so = statement_ordering(s);
 	debug(6, "parametric_statement_feasible_p",
-	      "Begin for statement %d (%d,%d) and precondition %#p\n",
+	      "Begin for statement %d (%d,%d) and precondition %p\n",
 	      statement_number(s),
 	      ORDERING_NUMBER(so), ORDERING_STATEMENT(so), pre);
     }
