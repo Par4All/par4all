@@ -210,7 +210,7 @@ instruction i;
 	if (instruction_block_p(i))
 		ParserError("makeStatement", "a block must have no label\n");
 
-	/* FI, PJ: the "rice" phase does not handle lables on DO like 100 in:
+	/* FI, PJ: the "rice" phase does not handle labels on DO like 100 in:
 	 *  100 DO 200 I = 1, N
 	 *
 	 * This should be trapped by "rice" when loops are checked to see
@@ -218,7 +218,7 @@ instruction i;
 	 */
 	if (instruction_loop_p(i)) {
 	    user_warning("MakeStatement",
-			 "unsupported DO loop reachable by GO TO via label %s\n",
+			 "DO loop reachable by GO TO via label %s cannot be parallelized by PIPS\n",
 			 entity_local_name(l));
 	}
 
