@@ -140,7 +140,7 @@ void create_frames()
   install_event_procedure(query_frame);
 
   properties_frame = xv_create(main_frame, FRAME,
-			       FRAME_LABEL, "Properties panel",
+			       FRAME_LABEL, "Options panel",
 			       XV_SHOW, FALSE,
 			       XV_WIDTH, display_width - EDIT_WIDTH -2*X_WM_DECOR_SIZE, 
 			       FRAME_DONE_PROC, hide_window,
