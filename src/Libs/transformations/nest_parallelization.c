@@ -10,6 +10,7 @@
 #include "genC.h"
 #include "constants.h"
 #include "misc.h"
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "text.h"
