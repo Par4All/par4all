@@ -11,7 +11,7 @@
  * More thoughts needed. 
  *
  * $RCSfile: stack.c,v $ version $Revision$
- * $Date: 1995/02/03 10:10:24 $, 
+ * $Date: 1995/02/03 10:11:36 $, 
  * got on %D%, %T%
  */
 
@@ -241,8 +241,8 @@ _stack_ptr x;
 void stack_free(ps)
 stack *ps;
 {
-    free_bulks(*ps->stack), *ps->stack=STACK_PTR_NULL;
-    free_bulks(*ps->avail), *ps->avail=STACK_PTR_NULL;
+    free_bulks((*ps)->stack), (*ps)->stack=STACK_PTR_NULL;
+    free_bulks((*ps)->avail), (*ps)->avail=STACK_PTR_NULL;
     free(*ps); *ps = STACK_NULL;
 }
 
