@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/10/05 11:32:36 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/10/05 11:52:37 $, )
  * version $Revision$
  */
  
@@ -143,7 +143,7 @@ static void reset_hpfc_status()
 
 static void save_hpfc_status() /* GET them */
 {
-    string name = db_get_current_program_name();
+    string name = db_get_current_workspace_name();
     hpfc_status s = 
 	make_hpfc_status(get_overlap_status(),
 			 get_data_status(),
@@ -161,7 +161,7 @@ static void save_hpfc_status() /* GET them */
 
 static void load_hpfc_status() /* SET them */
 {
-    string name = db_get_current_program_name();
+    string name = db_get_current_workspace_name();
     hpfc_status	s = (hpfc_status) 
 	db_get_memory_resource(DBR_HPFC_STATUS, name, TRUE);
 
@@ -551,7 +551,7 @@ bool hpfc_close(string name)
  */
 bool hpfc_install(string name)
 {
-    string dir = db_get_current_program_directory();
+    string dir = db_get_current_workspace_directory();
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
@@ -576,7 +576,7 @@ bool hpfc_install(string name)
  */
 bool hpfc_make(string name)
 {
-    string dir = db_get_current_program_directory();
+    string dir = db_get_current_workspace_directory();
     
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
