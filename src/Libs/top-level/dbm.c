@@ -99,13 +99,15 @@ bool
 create_workspace(gen_array_t files)
 {
     int i, argc = gen_array_nitems(files);
-    string name;
+    string name, dir = db_get_current_workspace_directory();
     bool success = FALSE;
 
     /* since db_create_workspace() must have been called before... */
     pips_assert("some current workspace", db_get_current_workspace_name());
 
     open_log_file();
+    open_warning_file(dir);
+    free(dir);
     set_entity_to_size();
 
     for (i = 0; i < argc; i++) 
@@ -182,8 +184,11 @@ open_workspace(string name)
 	success = FALSE;
     }
     else {
+	string dir = db_get_current_workspace_directory();
 	(* pips_update_props_handler)();
 	open_log_file();
+	open_warning_file(dir);
+	free(dir);
 	set_entity_to_size();
 	user_log("Workspace %s opened.\n", name);
 	success = open_module_if_unique();
@@ -208,6 +213,7 @@ close_workspace(void)
     close_log_file();
     close_processed_include_cache();
     reset_entity_to_size();
+    close_warning_file();
     pop_path();
     return success;
     /*clear_props();*/
