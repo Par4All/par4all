@@ -1,20 +1,69 @@
-c     
-c      
-c     
-
-c
-
-      subroutine hpfc init send (encoding, bufid) 
-      int encoding, bufid
-
-      call pvmfinitsend( encoding, bufid )
-
-
-      end 
-
-
-      subroutine hpfc send (
-      
-
-
-      call pvmfsend( tid, msgtag, info )
+! $Id$
+!
+! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.2  1997/04/16 16:35:42  coelho
+! functions for io-related communications.
+!
+!
+! 
+!
+!
+!
+! The host send a message to every node.
+!
+      subroutine HPFC HCAST
+      include "hpfc_commons.h"
+      integer info
+      call pvmfmcast(MAX SIZE OF PROCS, NODE TIDS, MCAST HOST, info)
+      MCAST HOST = MCAST HOST + 2
+      end
+!
+! every node receive a broadcast from host.
+!
+      subroutine HPFC NCAST
+      include "hpfc_commons.h"
+      integer info
+      call pvmfrecv(HOST TID, MCAST HOST, INFO)
+      MCAST HOST = MCAST HOST + 2
+      end
+!
+!
+!
+      subroutine HPFC SND TO HOST
+      include "hpfc_commons.h"
+      integer info
+      call pvmfsend(HOST TID, HOST SND CHANNEL, info)
+      HOST SND CHANNEL = HOST SND CHANNEL+2
+      end
+!
+!
+!
+      subroutine HPFC RCV FROM HOST
+      include "hpfc_commons.h"
+      integer info
+      call pvmfrecv(HOST TID, HOST RCV CHANNEL, info)
+      HOST RCV CHANNEL = HOST RCV CHANNEL+2
+      end
+!
+!
+!
+      subroutine HPFC SND TO NODE(lid)
+      include "hpfc_commons.h"
+      integer lid
+      integer info
+      call pvmfsend(NODE TIDS(lid), SEND CHANNELS(lid), info)
+      SEND CHANNELS(lid) = SEND CHANNELS(lid)+2
+      end
+!
+!
+!
+      subroutine HPFC RCV FROM NODE(lid)
+      include "hpfc_commons.h"
+      integer lid
+      integer bufid
+      call pvmfrecv(NODE TIDS(lid), RECV CHANNELS(lid), bufid)
+      RECV CHANNELS(lid) = RECV CHANNELS(lid)+2
+      end
+!
+!
+!
