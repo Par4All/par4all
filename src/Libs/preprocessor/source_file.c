@@ -147,9 +147,8 @@ get_view_file(char * print_type, bool displayable)
 {
    char * module_name = db_get_current_module_name();
 
-   if(displayable && !unloadable_file_p(print_type)) {
-       user_error("build_view_file", "resource %s cannot be displayed\n",
-		   print_type);
+   if(displayable && !displayable_file_p(print_type)) {
+       pips_user_error("resource %s cannot be displayed\n", print_type);
    }
 
    if(module_name != NULL)
@@ -182,22 +181,6 @@ char *
 get_dont_build_view_file(char * print_type)
 {
     return get_view_file(print_type, FALSE);
-}
-
-char *read_line(fd)
-FILE *fd;
-{
-    static char line[LINE_LENGTH];
-    if (fgets(line, LINE_LENGTH, fd) != NULL) {
-	int l = strlen(line);
-
-	if (l > 0)
-	    line[l-1] = '\0';
-
-	return(line);
-    }
-
-    return(NULL);
 }
 
 /*************************** MODULE PROCESSING (INCLUDES and IMPLICIT NONE) */
@@ -477,24 +460,29 @@ static bool pips_process_file(string file_name)
 static bool zzz_file_p(string s) /* zzz???.f */
 { return strlen(s)==8 && s[0]=='z' && s[1]=='z' && s[2]=='z' &&
       s[6]=='.' && s[7]=='f'; }
-#define MAX_NLINES 1000
 static int cmp(const void * x1, const void * x2)
 { return strcmp(*(char**)x1, *(char**)x2);}
 static void sort_file(string name)
 {
     FILE *f;
-    char * lines[MAX_NLINES];
     string line;
-    int i=0;
+    int i=0, size = 20;
+    char ** lines = (char**) malloc(sizeof(char*)*size);
+    pips_assert("malloc ok", lines);
 
     f=safe_fopen(name, "r");
-    while ((line=read_line(f)))
+    while ((line=safe_readline(f)))
     {
 	if (!zzz_file_p(line)) /* drop zzz* files */
 	{
-	    pips_assert("not too many lines", i<MAX_NLINES);
-            lines[i++]=strdup(line);
+	    if (i==size) { /* resize lines[] */
+		size*=2;
+		lines = (char**) realloc(lines, sizeof(char*)*size);
+		pips_assert("realloc ok", lines);
+	    }
+            lines[i++]=line;
 	}
+	else free(line);
     }
     safe_fclose(f, name);
 
@@ -505,6 +493,7 @@ static void sort_file(string name)
 	fprintf(f, "%s\n", lines[--i]);
 	free(lines[i]);
     }
+    free(lines);
     safe_fclose(f, name);
 }
 
