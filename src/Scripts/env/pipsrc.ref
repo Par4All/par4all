@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1997/01/13 20:58:24 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1997/01/14 15:26:27 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -95,6 +95,10 @@ PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
 # default: 
 # PIPS_PIPSMAKERC=./pipsmake.rc else
 # PIPS_PIPSMAKERC=${PIPS_ROOT}/Share/pipsmake.rc 
+
+#
+# Additional options to pass to cpp for .F files:
+# default: PIPS_CPP_FLAGS=""
 
 
 ############################################################## COMPILING PIPS
