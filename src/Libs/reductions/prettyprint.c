@@ -1,5 +1,5 @@
 /* $RCSfile: prettyprint.c,v $ (version $Revision$)
- * $Date: 1996/06/15 18:11:18 $, 
+ * $Date: 1996/06/17 11:32:50 $, 
  *
  * (pretty)print of reductions.
  *
@@ -46,12 +46,14 @@ string reduction_operator_name(reduction_operator o)
     return strdup(reduction_operator_tag_name(reduction_operator_tag(o)));
 }
 
+/* allocates and returns a list of strings for reduction r
+ */
 static list /* of string */ words_reduction(reduction r)
 {
     return CONS(STRING, reduction_operator_name(reduction_op(r)),
-	   CONS(STRING, "[",
-            gen_nconc( words_reference(reduction_reference(r)),
-	   CONS(STRING, "],", NIL))));
+	   CONS(STRING, strdup("["),
+             gen_nconc( words_reference(reduction_reference(r)),
+	   CONS(STRING, strdup("],"), NIL))));
 }
 
 static list /* of string */ words_reductions(string note, reductions rs)
@@ -126,7 +128,9 @@ print_reductions(
 
     t = text_code_reductions(get_current_module_statement());
     (void) make_text_resource(module_name, DBR_PRINTED_FILE, file_suffix, t);
-    free_text(t);
+    /* some bug some where not investigated yet
+     * free_text(t); results in a coredup much latter on.
+     */
 
     reset_current_module_entity();
     reset_current_module_statement();
