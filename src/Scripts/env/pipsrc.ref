@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/30 19:04:56 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/09/02 17:32:26 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -216,6 +216,19 @@ PATH=${PATH}:${DAVINCI_DIR}
 
 # Toolpack is used for STF
 TOOLPACK_DIR="$PIPS_HOME/Toolpack/toolpack1.2"
+
+#
+#         ######  #    #   #####  ######  #####   #    #
+#         #        #  #      #    #       #    #  ##   #
+#         #####     ##       #    #####   #    #  # #  #
+#         #         ##       #    #       #####   #  # #
+#         #        #  #      #    #       #   #   #   ##
+#         ######  #    #     #    ######  #    #  #    #
+#
+
+EXTERN_ROOT="$PIPS_DIR/Externals"
+
+PATH="$PATH:$EXTERN_ROOT/Share:$EXTERN_ROOT/Bin:$EXTERN_ROOT/Utils"
 
 #
 #          ####   #       #####
