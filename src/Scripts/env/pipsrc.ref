@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1997/04/10 16:31:54 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1997/04/30 15:56:01 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -74,7 +74,11 @@ PIPS_DIR=/projects/Pips
 
 # default architecture for building pips
 # the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
-PIPS_ARCH="."
+test -d /opt && \
+	PIPS_ARCH="GNUSOL2LL"
+
+test ! -d /opt && \
+	PIPS_ARCH="."
 
 PIPS_ROOT="${PIPS_DIR}/Production"
 
@@ -128,8 +132,12 @@ PATH="${PATH}:${PIPS_ROOT}/Utils:/usr5/gnu/bin-sparc"
 # Validation directory
 # PIPS_VALIDDIR="${PIPS_ROOT}/Validation"
 
-# hosts for Validate
-PIPS_HOSTS="chailly:episy:aiguebelette:roazhon"
+# hosts for Validate:
+test -d /opt && \
+	PIPS_HOSTS="recanati:deauville"
+
+test ! -d /opt && \
+	 PIPS_HOSTS="chailly:episy:aiguebelette:roazhon"
 
 # PIPS_EXPERIMENTSDIR="${PIPS_DIR}/Experiments"
 # PIPS_TESTSDIR="${PIPS_DIR}/Tests"
