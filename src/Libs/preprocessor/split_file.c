@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/04/11 21:50:23 $, 
+ * $Date: 1997/04/12 12:40:54 $, 
  *
  * adapted from what can be seen by FC 31/12/96
  * 
@@ -443,6 +443,10 @@ int fsplit(char * file_name, FILE *out)
  * bugs:
  *  - under special circonstances, the dilatation of the transformation
  *    may lead continuations to exceed the 19 lines limit. 
+ *
+ * to improve:
+ *  - hack for "real*8 hollerith", but should just forbids start after *?
+ *    maybe some other characters?
  */
 
 #define isbegincomment(c) ((c)=='!' || (c)=='*' || (c)=='c' || (c)=='C')
@@ -499,7 +503,8 @@ static void hollerith(char * line)
 	{
 	    if (isalpha(line[i]))
 		in_id=1;
-	    else if (!isalnum(line[i]) && !isspace(line[i]))
+	    else if (!isalnum(line[i]) && !isspace(line[i]) 
+		&& line[i]!='*') /* hack for real*8 hollerith */
 		in_id=0;
 	}
 
