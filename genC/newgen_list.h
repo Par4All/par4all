@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1995/07/20 17:05:43 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1995/09/16 21:42:41 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -42,8 +42,8 @@ typedef cons *list ;
 
 #define MAX_NESTED_CONS 10
 
-extern cons *Gen_cp_[] ;
-extern cons **gen_cp_ ;
+extern list Gen_cp_[] ;
+extern list *gen_cp_ ;
 
 #define CAR(pcons) ((pcons)->car)
 #define CDR(pcons) ((pcons)->cdr)
@@ -68,49 +68,49 @@ IN_STACK(gen_cp_, &Gen_cp_[MAX_NESTED_CONS], \
 	{cons* _map_list_cp = (_l) ; \
 	for(;!ENDP(_map_list_cp);POP(_map_list_cp)) _code;}
 
-#define MAP(CASTER, _map_chunkp, _map_code, _map_list) \
-{ list _map_chunkp##_consp = _map_list; gen_chunk * _map_chunkp;\
+#define MAP(_map_CASTER, _map_chunkp, _map_code, _map_list) \
+{ list _map_chunkp##_consp = (_map_list); gen_chunk * _map_chunkp;\
   for(; !ENDP(_map_chunkp##_consp); POP(_map_chunkp##_consp))\
-  { _map_chunckp = CASTER(CAR(_map_chunkp##_consp)); _code; }}
+  { _map_chunkp = _map_CASTER(CAR(_map_chunkp##_consp)); _map_code; }}
 
 /* Fonctions de list.c 
  */
-extern cons *gen_append GEN_PROTO(( cons *, cons *)) ;
-extern cons *gen_concatenate GEN_PROTO(( cons *, cons * )) ;
+extern list gen_append GEN_PROTO(( list , list )) ;
+extern list gen_concatenate GEN_PROTO(( list , list )) ;
 extern void gen_copy GEN_PROTO(( gen_chunk *, gen_chunk *)) ;
-extern cons *gen_copy_seq GEN_PROTO(( cons * )) ;
+extern list gen_copy_seq GEN_PROTO(( list )) ;
 extern int gen_eq GEN_PROTO(( gen_chunk *, gen_chunk * )) ;
 extern gen_chunk *gen_car GEN_PROTO((list));
 extern gen_chunk *gen_identity GEN_PROTO((gen_chunk*));
-extern gen_chunk *gen_find GEN_PROTO((gen_chunk *, cons *, 
+extern gen_chunk *gen_find GEN_PROTO((gen_chunk *, list , 
 				  bool (*)(), gen_chunk *(*)() )) ;
-extern gen_chunk *gen_find_from_end GEN_PROTO((gen_chunk *, cons *, 
+extern gen_chunk *gen_find_from_end GEN_PROTO((gen_chunk *, list , 
 				  bool (*)(), gen_chunk *(*)() )) ;
-extern gen_chunk *gen_find_eq GEN_PROTO(( gen_chunk *, cons * )) ;
-extern gen_chunk *gen_find_if GEN_PROTO(( bool (*)(), cons *,
+extern gen_chunk *gen_find_eq GEN_PROTO(( gen_chunk *, list )) ;
+extern gen_chunk *gen_find_if GEN_PROTO(( bool (*)(), list ,
 					 gen_chunk *(*)())) ;
-extern gen_chunk *gen_find_if_from_end GEN_PROTO((bool (*)(), cons *, 
+extern gen_chunk *gen_find_if_from_end GEN_PROTO((bool (*)(), list , 
 					      gen_chunk *(*)())) ;
 extern gen_chunk *gen_find_tabulated GEN_PROTO(( char *, int )) ;
-extern cons *gen_filter_tabulated GEN_PROTO(( int (*)(), int )) ;
-extern void gen_free_list GEN_PROTO(( cons *)) ;
-extern cons *gen_last GEN_PROTO(( cons * )) ;
-extern int gen_length GEN_PROTO(( cons * )) ;
+extern list gen_filter_tabulated GEN_PROTO(( int (*)(), int )) ;
+extern void gen_free_list GEN_PROTO(( list )) ;
+extern list gen_last GEN_PROTO(( list )) ;
+extern int gen_length GEN_PROTO(( list )) ;
 extern void gen_map GEN_PROTO(( void (*)(), list )) ;
-extern void gen_mapl GEN_PROTO(( void (*)(), cons * )) ;
+extern void gen_mapl GEN_PROTO(( void (*)(), list )) ;
 extern void gen_mapc_tabulated GEN_PROTO(( void (*)(), int )) ;
-extern cons *gen_nconc GEN_PROTO(( cons *, cons * )) ;
-extern cons *gen_nreverse GEN_PROTO(( cons * )) ;
+extern list gen_nconc GEN_PROTO(( list , list )) ;
+extern list gen_nreverse GEN_PROTO(( list )) ;
 extern gen_chunk gen_nth GEN_PROTO(( int, list )) ;
-extern cons *gen_nthcdr GEN_PROTO(( int, list )) ;
-extern char *gen_reduce GEN_PROTO(( char *, char *(*)(), cons * )) ;
-extern void gen_remove GEN_PROTO(( cons **, gen_chunk * )) ;
-extern cons *gen_some  GEN_PROTO(( bool(*)(), cons * )) ;
-extern void gen_insert_after GEN_PROTO((gen_chunk *, gen_chunk *, cons *)) ;
+extern list gen_nthcdr GEN_PROTO(( int, list )) ;
+extern char *gen_reduce GEN_PROTO(( char *, char *(*)(), list )) ;
+extern void gen_remove GEN_PROTO(( list *, gen_chunk * )) ;
+extern list gen_some  GEN_PROTO(( bool(*)(), list )) ;
+extern void gen_insert_after GEN_PROTO((gen_chunk *, gen_chunk *, list )) ;
 extern list gen_once GEN_PROTO((gen_chunk *, list));
 extern bool gen_in_list_p GEN_PROTO((gen_chunk *, list));
 extern void gen_sort_list GEN_PROTO((list, int (*)())) ;
 extern void gen_closure GEN_PROTO((list (*)(), list));
-extern list gen_make_list GEN_PROTO(());
+extern list gen_make_list GEN_PROTO((int, ...));
 
 #endif
