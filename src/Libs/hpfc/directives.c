@@ -6,6 +6,9 @@
  *
  * $Id$
  * $Log: directives.c,v $
+ * Revision 1.69  1998/12/26 21:18:59  irigoin
+ * error_handler added
+ *
  * Revision 1.68  1998/03/17 16:52:10  coelho
  * more debug.
  *
@@ -96,6 +99,11 @@ void add_a_dynamic(entity c)
  *  scanning the AST with gen_recurse.
  */
 DEFINE_LOCAL_STACK(current_stmt, statement)
+
+void hpfc_directives_error_handler()
+{
+    error_reset_current_stmt_stack();
+}
 
 /* management of PROCESSORS and TEMPLATE directives.
  *
