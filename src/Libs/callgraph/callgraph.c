@@ -105,7 +105,6 @@ entity module;
 FILE *fp;
 int decor_type;
 {
-    extern int fprintf();
     string module_name = module_local_name(module);
 
     text r = make_text(NIL);
