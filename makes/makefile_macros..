@@ -1,0 +1,14 @@
+#
+# $Id$
+#
+# $Log: makefile_macros..,v $
+# Revision 1.1  1997/08/06 08:16:58  coelho
+# Initial revision
+#
+#
+# this is the default file at CRI.
+
+include $(ROOT)/Include/makefile_macros.GNUSOL1
+
+# end of it!
+#
