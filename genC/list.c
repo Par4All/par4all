@@ -65,13 +65,17 @@
    . GEN_NTH returns the N-th (beginning at 0) car of L.
      CAR(L) = GEN_NTH(0,L).
    . GEN_SORT_LIST(L, compare) sorts L in place with compare (see man qsort)
-   . GEN_ONCE(ITEM, L) adds ITEM to L if not already there.
+   . GEN_ONCE(ITEM, L) prepends ITEM to L if not already there.
    . GEN_IN_LIST_P(ITEM, L) checks that item ITEM appears in list L
    . GEN_OCCURENCES(ITEM, L) returns the number of occurences of item ITEM in list L
    . GEN_ONCE_P(L) checks that each item in list L appears only once
    . GEN_CLOSURE()
    . GEN_MAKE_LIST(DOMAIN, ...) makes an homogeneous list of the varargs (but
      homogeneity is not checked)
+   . gen_list_and(list * a, list b) : Compute A = A inter B
+   . gen_list_and_not(list * a, list b) : Compute A = A inter non B
+   . gen_list_patch(list l, gen_chunk * x, gen_chunk * y) :
+     Replace all the reference to x in list l by a reference to y
 */
 
 #include <stdio.h>
@@ -445,6 +449,11 @@ gen_chunk gen_nth(int n, list l)
     return CAR(r);
 }
 
+
+/* Prepend an item to a list only if it is not already in the list.
+
+   Return the list anyway.
+*/
 list gen_once(void * vo, list l)
 {
     gen_chunk * item = (gen_chunk*) vo;
@@ -581,6 +590,62 @@ list gen_cons(void * item, list next)
   ncons->cdr = next;
   return ncons;
 }
+
+
+/* Compute A = A inter B: */
+void
+gen_list_and(list * a,
+	     list b)
+{
+    if (ENDP(*a))
+	return ;
+
+    if (!gen_in_list_p(CHUNK(CAR(*a)), b)) {
+	/* This element of a is not in list b: delete it: */
+	cons *aux = *a;
+
+	*a = CDR(*a);
+	free(aux);
+	gen_list_and(a, b);
+    }
+    else
+	gen_list_and(&CDR(*a), b);
+}
+
+
+/* Compute A = A inter non B: */
+void
+gen_list_and_not(list * a,
+		 list b)
+{
+    if (ENDP(*a))
+	return ;
+
+    if (gen_in_list_p(CHUNK(CAR(*a)), b)) {
+	/* This element of a is in list b: delete it: */
+	cons *aux = *a;
+
+	*a = CDR(*a);
+	free(aux);
+	gen_list_and_not(a, b);
+    }
+    else
+	gen_list_and_not(&CDR(*a), b);
+}
+
+
+/* Replace all the reference to x in list l by a reference to y: */
+void
+gen_list_patch(list l,
+	       gen_chunk * x,
+	       gen_chunk * y)
+{
+    MAPL(pc, {
+	 if (CAR(pc).p == x)
+	     CAR(pc).p = y;
+     }, l);
+}
+
 
 /*   That is all
  */
