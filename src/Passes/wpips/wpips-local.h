@@ -2,7 +2,9 @@
   #define PARALLEL_VERSION "Parallel Version"
   */
 
-/* Labels for menu Edit/View */
+/* Labels for menu Edit/View (These definitions are almost automatically available as aliases
+   in wpips.rc; FI) */
+#define USER_VIEW "User View"
 #define SEQUENTIAL_VIEW "Sequential View"
 #define PARALLEL_VIEW "Parallel View"
 #define CALLGRAPH_VIEW "Callgraph View"
@@ -12,15 +14,17 @@
 #define FLINT_VIEW "Flint View"
 
 /* Labels for menu Transform */
-#define PARALLELIZE_TRANSFORM "Parallelize"
+#define PARALLELIZE_TRANSFORM "!Parallelize"
 #define PRIVATIZE_TRANSFORM "Privatize"
 #define DISTRIBUTE_TRANSFORM "Distribute"
 #define PARTIAL_EVAL_TRANSFORM "Partial Eval"
 #define UNROLL_TRANSFORM "Loop Unroll"
 #define STRIP_MINE_TRANSFORM "Strip Mining"
 #define LOOP_INTERCHANGE_TRANSFORM "Loop Interchange"
-#define DEAD_CODE_ELIMINATION_TRANSFORM "Dead Code Elimination"
-#define REDUCTIONS_TRANSFORM "Reductions"
+#define SUPPRESS_DEAD_CODE_TRANSFORM "!Dead Code Elimination"
+#define ATOMIZER_TRANSFORM"!Atomize"
+#define REDUCTIONS_TRANSFORM "!Reductions"
+#define STATIC_CONTROLIZE_TRANSFORM "Static Controlize"
 
 #define SEMANTICS_ANALYZE "Semantics"
 #define CALLGRAPH_ANALYZE "Call Graph"
