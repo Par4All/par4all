@@ -1,4 +1,56 @@
- /* transformer package - fix point computation
+ /* transformer package - fix point computations
+  *
+  * Several algorithms are available:
+  *
+  *  - two untested versions using Halwachs approach; sc_elarg() was found to
+  *    be very slow in an earlier implementation by Malik; experimentally,
+  *    we did not find scientific Frotran programs that required such an
+  *    algorithm.
+  *
+  *  - a fix point algorithm based on the transfer matrix linking the new values
+  *    to the old values; this is sufficient for induction variables but only
+  *    equations can be found.
+  *
+  *  - a fix point algorithm based on pattern matching which was developped
+  *    experimentally for examples presented at FORMA; once the constant terms
+  *    are eliminated using a loop counter, the constraints which are their
+  *    own fixpoints are easy to pattern match; equations and inequalities
+  *    can both be found.
+  *
+  *  - a fix point algorithm combining the last two algorithms above. This
+  *    algorithm adds difference variables d_i = i#new - i#old for each variable
+  *    i. All non d_i variables are thn projected. If the projection algorithm is
+  *    sophisticated enough, the projection ordering will be "good". Left over
+  *    inequalities are invariant or useless. Let N be the strictly positive iteration count:
+  *
+  *    sum ai di <= -k implies N sum ai di <= -Nk <= -k (OK)
+  *
+  *    sum ai di <= k implies N sum ai di <= Nk <= infinity (useless unless k == 0)
+  *
+  *    Left over equations can stay equations if the
+  *    constant term is 0, or be degraded into an inequation if not. The nw inequation
+  *    depends on the sign of the constant:
+  *
+  *    sum ai di == -k implies N sum ai di == -Nk <= -k
+  *
+  *    sum ai di == k implies N sum ai di == Nk >= k
+  *
+  *    sum ai di == 0 implies N sum ai di == 0
+  *
+  *    In a second step, the constant terms are eliminated to obtain new constraints
+  *    leading to new invariants, using the same rules as above.
+  *
+  *    This algorithm was designed for while loops such as:
+  *
+  *    WHILE( I > 0 )
+  *      J = J + I
+  *      I = I - 1
+  *
+  *    to find as loop transformer T(I,J) {I#new <= I#old - 1, J#new >= J#old + 1,
+  *                                        I#new+J#new >= I#old + J#old}
+  *
+  *    Note that the second constraint is redundant with the other two, but the last
+  *    one cannot be found before the constant terms are eliminated.
   *
   * Francois Irigoin, 21 April 1990
   */
@@ -26,6 +78,7 @@
 #include "matrice.h"
 
 #include "transformer.h"
+
 /*
 transformer 
 transformer_fix_point(t1, t2)
@@ -55,7 +108,7 @@ transformer t2;
     return t;
 }
 */
-
+
 transformer 
 transformer_halbwachs_fix_point(tf)
 transformer tf;
@@ -146,53 +199,6 @@ transformer tf;
 }
 
 
-
-static void 
-build_transfer_matrix(pa, lteq, n_eq, b_new)
-matrice * pa;
-Pcontrainte lteq;
-int n_eq;
-Pbase b_new;
-{
-    matrice a = matrice_new(n_eq, n_eq);
-    Pcontrainte eq = CONTRAINTE_UNDEFINED;
-
-    matrice_nulle(a, n_eq, n_eq);
-
-    for(eq = lteq; !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
-	Pvecteur t = contrainte_vecteur(eq);
-	entity nv = new_value_in_transfer_equation(t);
-	int nv_rank = rank_of_variable(b_new, (Variable) nv);
-
-	for( ; !VECTEUR_UNDEFINED_P(t); t = t->succ) {
-	    entity e = (entity) vecteur_var(t);
-
-	    if( e != (entity) TCST )
-		if(new_value_entity_p(e)) {
-		    pips_assert("build_transfer_matrix", 
-				value_one_p(vecteur_val(t)));
-		}
-		else {
-		    entity ov = old_value_to_new_value(e);
-		    int ov_rank = rank_of_variable(b_new, (Variable) ov);
-		    debug(8,"build_transfer_matrix", "nv_rank=%d, ov_rank=%d\n",
-			  nv_rank, ov_rank);
-		    ACCESS(a, n_eq, nv_rank, ov_rank) = 
-			value_uminus(vecteur_val(t));
-		}
-	    else {
-		ACCESS(a, n_eq, nv_rank, n_eq) = 
-		    value_uminus(vecteur_val(t));
-	    }
-	}
-    }
-    /* add the homogeneous coordinate */
-    ACCESS(a, n_eq, n_eq, n_eq) = VALUE_ONE;
-
-    *pa = a;
-}
-
-
 /* Let A be the affine loop transfert function. The affine transfer fix-point T
  * is such that T(A-I) = 0
  *
@@ -213,6 +219,13 @@ Pbase b_new;
  *
  * T P^-1 = X
  * T = X P
+ *
+ * Note: I (FI) believe this functions is wrong because it does not
+ * return the appropriate arguments. The fix point transformer
+ * should modify as many variables as the input tf. A new basis
+ * should not be recomputed according to the transition matrix.
+ * This problem seems to be fixed in the callers, see
+ * loop_to_transformer() and whileloop_to_transformer().
  */
 
 transformer 
@@ -244,6 +257,19 @@ transformer tf;
     Pbase t = BASE_UNDEFINED;
 
     debug(8, "transformer_equality_fix_point", "begin\n");
+ 
+    /* If the input transformer is not feasible, so is not its fixpoint
+     * because the number of iterations may be zero which implies identity.
+     */
+    if(transformer_empty_p(tf)) {
+	fix_tf = transformer_identity();
+	ifdebug(8) {
+	    debug(8, "transformer_equality_fix_point", "fix-point fix_tf=\n");
+	    fprint_transformer(stderr, fix_tf, external_value_name);
+	    debug(8, "transformer_equality_fix_point", "end\n");
+	}
+	return fix_tf;
+    }
 
     /* find or build explicit transfer equations: v#new = f(v1#old, v2#old,...)
      * and the corresponding sub-basis
@@ -358,7 +384,7 @@ transformer tf;
 
     return fix_tf;
 }
-
+
 void 
 build_transfer_equations(leq, plteq, pb_new)
 Pcontrainte leq;
@@ -525,6 +551,54 @@ Pvecteur eq;
     return new_value;
 }
 
+
+
+static void 
+build_transfer_matrix(pa, lteq, n_eq, b_new)
+matrice * pa;
+Pcontrainte lteq;
+int n_eq;
+Pbase b_new;
+{
+    matrice a = matrice_new(n_eq, n_eq);
+    Pcontrainte eq = CONTRAINTE_UNDEFINED;
+
+    matrice_nulle(a, n_eq, n_eq);
+
+    for(eq = lteq; !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
+	Pvecteur t = contrainte_vecteur(eq);
+	entity nv = new_value_in_transfer_equation(t);
+	int nv_rank = rank_of_variable(b_new, (Variable) nv);
+
+	for( ; !VECTEUR_UNDEFINED_P(t); t = t->succ) {
+	    entity e = (entity) vecteur_var(t);
+
+	    if( e != (entity) TCST ) {
+		if(new_value_entity_p(e)) {
+		    pips_assert("build_transfer_matrix", 
+				value_one_p(vecteur_val(t)));
+		}
+		else {
+		    entity ov = old_value_to_new_value(e);
+		    int ov_rank = rank_of_variable(b_new, (Variable) ov);
+		    debug(8,"build_transfer_matrix", "nv_rank=%d, ov_rank=%d\n",
+			  nv_rank, ov_rank);
+		    ACCESS(a, n_eq, nv_rank, ov_rank) = 
+			value_uminus(vecteur_val(t));
+		}
+	    }
+	    else {
+		ACCESS(a, n_eq, nv_rank, n_eq) = 
+		    value_uminus(vecteur_val(t));
+	    }
+	}
+    }
+    /* add the homogeneous coordinate */
+    ACCESS(a, n_eq, n_eq, n_eq) = VALUE_ONE;
+
+    *pa = a;
+}
+
 /* FI: should be moved in base.c */
 
 /* sub_basis_p(Pbase b1, Pbase b2): check if b1 is included in b2 */
@@ -559,13 +633,14 @@ Pbase * pb_old;
 	for(t=contrainte_vecteur(eq); !VECTEUR_UNDEFINED_P(t); t = t->succ) {
 	    entity e = (entity) vecteur_var(t);
 
-	    if( e != (entity) TCST )
+	    if( e != (entity) TCST ) {
 		if(new_value_entity_p(e)) {
 		    b_new = vect_add_variable(b_new, (Variable) e);
 		}
 		else {
 		    b_old = vect_add_variable(b_old, (Variable) old_value_to_new_value(e));
 		}
+	    }
 	}
     }
 
@@ -573,6 +648,25 @@ Pbase * pb_old;
     *pb_old = b_old;
 }
 
+
+/* This fixpoint function was developped to present a talk at FORMA. I used
+ * examples published by Pugh and I realized that the fixpoint constraints 
+ * were obvious in the loop body transformer. You just had to identify them.
+ * This is not a clever algorithm. It certainly would not resist any messing up
+ * with the constraints, i.e. a change of basis. But it provides very good result
+ * for a class of applications.
+ *
+ * Algorithm:
+ *  1. Find a loop counter
+ *  2. Use it to eliminate all constant terms
+ *  3. Look for invariant constraints
+ *
+ * Let d_i = i#new - i#old. An invariant constraint is a sum of d_i which is
+ * equal to zero or greater than zero. Such a constraint is its own fixpoint:
+ * if you combine it with itself after renaming i#new as i#int on one hand
+ * and i#old as i#int on the other, the global sum for and equation or its sign
+ * for an inequality is unchanged.
+ */
 
 transformer 
 transformer_pattern_fix_point(tf)
@@ -657,6 +751,17 @@ transformer tf;
 
     return fix_tf;
 }
+
+
+/* Try to identify a loop counter among the equation egs.
+ * If the transformer has been build naively, a loop counter
+ * should have a transformer equation like i#new = i#old + K_i
+ * where K_i is a numerical constant.
+ * 
+ * Since the loop counter is later used to eliminate constant
+ * terms in other constraints, variable i with the minimal absolute
+ * value K_i shuold be chosen.
+ */
 
 Pvecteur
 look_for_the_best_counter(Pcontrainte egs)
@@ -713,7 +818,7 @@ look_for_the_best_counter(Pcontrainte egs)
 
     return v_inc;
 }
-
+
 /* Eliminate all constant terms in sc using v.
  * No sharing between sc and v is assumed as sc is updated!
  *
@@ -763,7 +868,7 @@ constraints_eliminate_constant_terms(Pcontrainte lc, Pvecteur v)
  *
  * It could be improved by using an approximate initial fix-point
  * to evaluate v_sum (see invariant_vector_p) and to degrade
- * equations into inequalities or too relax inequalities.
+ * equations into inequalities or to relax inequalities.
  *
  * For instance, p = p + a won't generate an invariant.
  * However, if the lousy fix-point is sufficient to prove a >= 0,
@@ -794,6 +899,15 @@ constraints_keep_invariants_only(Pcontrainte lc)
 
     return lc;
 }
+
+/* A vector (in fact, a constraint) represents an invariant
+ * if it is a sum of delta for each variable.
+ * Let di = i#new - i#old. If v = sigma (di) = 0, v can
+ * be used to build a loop invariant.
+ *
+ * It is assumed that constant terms have been substituted
+ * earlier using a loop counter.
+ */
 
 bool
 invariant_vector_p(Pvecteur v)
