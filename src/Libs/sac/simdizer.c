@@ -328,10 +328,10 @@ bool simdizer(char * module_name)
    string resp;
 
    /* get the resources */
-   statement module_stmt = (statement)
+   statement mod_stmt = (statement)
       db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
-   set_current_module_statement(module_stmt);
+   set_current_module_statement(mod_stmt);
    set_current_module_entity(local_name_to_top_level_entity(module_name));
    set_proper_rw_effects((statement_effects)
       db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
@@ -351,14 +351,14 @@ bool simdizer(char * module_name)
       case '1':
       {
 	 printf("unrolling loops...\n");
-	 simd_unroll_as_needed(module_stmt);
+	 simd_unroll_as_needed(mod_stmt);
       }
       break;
       
       case '2':
       {
 	 printf("SIMDizing simple statements...\n");
-	 gen_recurse(module_stmt, statement_domain,
+	 gen_recurse(mod_stmt, statement_domain,
 		     simd_simple_sequence_filter, simd_simple_sequence_rewrite);
       }
       break;
