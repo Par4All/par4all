@@ -311,6 +311,8 @@ statement make_empty_statement()
 			  make_instruction_block(NIL)));
 }
 
+/* to be compared with instruction_to_statement() which is a macro (thanks to FC?) ! */
+
 statement make_stmt_of_instr(instr)
 instruction instr;
 {
@@ -1028,7 +1030,11 @@ statement_to_label(statement s)
 {
   entity l = statement_label(s);
 
-  if(entity_empty_label_p(l)) {
+  if(format_statement_p(s)) {
+    /* You cannot jump onto a non-executable statement */
+    l = entity_empty_label();
+  }
+  else if(entity_empty_label_p(l)) {
     instruction i = statement_instruction(s);
 
     switch(instruction_tag(i)) {
