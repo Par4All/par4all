@@ -650,7 +650,7 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
 	my_Matrix_Free(&a);
 
 	a = Polyhedron2Constraints(A);    
-	my_Polyhedron_Free(A);
+	my_Polyhedron_Free(&A);
     }
 
     matrix_to_sc(a,sc);
