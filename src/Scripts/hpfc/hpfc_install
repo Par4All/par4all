@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1995/08/10 13:02:36 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1995/09/08 10:16:12 $, )
 # version $Revision$
 #
 
@@ -119,9 +119,9 @@ then
   [ "$ORIGIN" ] && cat $BASEDIR/*.origin > $DIRECTORY/$NAME.f
   [ "$REFFILE" ] && cat `echo "$REFFILE" | cut -d " " -f 2` > $DIRECTORY/$NAME.f
 
-  touch $DIRECTORY/hpfc_Makefile
+  chmod ug+w $DIRECTORY/*
 
-  chmod u+w $DIRECTORY/*
+  touch $DIRECTORY/hpfc_Makefile
 fi
 
 #
