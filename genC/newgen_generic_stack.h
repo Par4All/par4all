@@ -60,6 +60,32 @@ PREFIX bool name##_empty_p()\
 {\
   assert(name##_stack!=gen_stack_undefined);\
   return(gen_stack_empty_p(name##_stack));\
+}\
+\
+PREFIX int name##_size()\
+{\
+  assert(name##_stack!=gen_stack_undefined);\
+  return(gen_stack_size(name##_stack));\
+}\
+\
+static void check_##name()\
+{\
+  gen_stack s = get_##name##_stack();\
+  chunk\
+     *item_1 = (chunk *) check_##name,\
+     *item_2 = (chunk *) get_##name##_stack;\
+  \
+  reset_##name##_stack();\
+  make_##name##_stack();\
+  assert(name##_empty_p());\
+  name##_push(item_1);\
+  assert(name##_head()==item_1);\
+  name##_replace(item_2);\
+  assert(name##_pop()==item_2);\
+  assert(name##_size()==0);\
+  free_##name##_stack();\
+  reset_##name##_stack();\
+  set_##name##_stack(s);\
 }
 
 #define DEFINE_LOCAL_STACK(name, type) DEFINE_STACK(static, name, type)
