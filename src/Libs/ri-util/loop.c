@@ -12,31 +12,45 @@ DEFINE_CURRENT_MAPPING(enclosing_loops, list)
 
 void clean_enclosing_loops(void)
 {
-    STATEMENT_MAPPING_MAP(s, l, gen_free_list((list)l), 
-			  get_enclosing_loops_map());
+    /* warning: there are shared lists...
+     */
+    hash_table seen = hash_table_make(hash_pointer, 0);
+    
+    STATEMENT_MAPPING_MAP(s, l, 
+    {
+	if (l && !hash_defined_p(seen, l))
+	{
+	    gen_free_list((list)l);
+	    hash_put(seen, l, (char*) 1);
+	}
+    },
+	get_enclosing_loops_map());
+
+    hash_table_free(seen);
     free_enclosing_loops_map();
 }
 
 static void rloops_mapping_of_statement();
 
-static void rloops_mapping_of_unstructured(m, loops, u)
-statement_mapping m;
-cons *loops;
-unstructured u ;
+static void 
+rloops_mapping_of_unstructured(
+    statement_mapping m,
+    list loops,
+    unstructured u)
 {
-    cons *blocs = NIL ;
+    list blocs = NIL ;
 	  
-    CONTROL_MAP(c, {
-	rloops_mapping_of_statement(m, loops, control_statement(c));
-    }, unstructured_control(u), blocs) ;
+    CONTROL_MAP(c, rloops_mapping_of_statement(m, loops, control_statement(c)),
+		unstructured_control(u), blocs) ;
 
     gen_free_list(blocs) ;
 }
 
-static void rloops_mapping_of_statement(m, loops, s)
-statement_mapping m;
-cons *loops;
-statement s;
+static void 
+rloops_mapping_of_statement(
+    statement_mapping m,
+    list loops,
+    statement s)
 {
     instruction i = statement_instruction(s);
 
@@ -45,28 +59,22 @@ statement s;
     switch(instruction_tag(i)) {
 
       case is_instruction_block:
-	MAPL(ps, {
-	    rloops_mapping_of_statement(m, loops, STATEMENT(CAR(ps)));
-	}, instruction_block(i));
+	MAP(STATEMENT, s, rloops_mapping_of_statement(m, loops, s),
+	    instruction_block(i));
 	break;
 
-      case is_instruction_loop: {
-	  cons *nloops = gen_copy_seq(loops);
+      case is_instruction_loop: 
+      {
+	  list nl = gen_nconc(gen_copy_seq(loops), CONS(STATEMENT, s, NIL));
 	  Nbrdo++;
-	  rloops_mapping_of_statement(m, 
-				      gen_nconc(nloops, 
-						CONS(STATEMENT, s, NIL)), 
-				      loop_body(instruction_loop(i)));
+	  rloops_mapping_of_statement(m, nl, loop_body(instruction_loop(i)));
+	  gen_free_list(nl);
 	  break;
       }
 
       case is_instruction_test:
-	rloops_mapping_of_statement(m, 
-				    loops, 
-				    test_true(instruction_test(i)));
-	rloops_mapping_of_statement(m, 
-				    loops, 
-				    test_false(instruction_test(i)));
+	rloops_mapping_of_statement(m, loops, test_true(instruction_test(i)));
+	rloops_mapping_of_statement(m, loops, test_false(instruction_test(i)));
 	break;
 
       case is_instruction_call:
@@ -74,15 +82,12 @@ statement s;
 	break;
 
       case is_instruction_unstructured: {
-	  rloops_mapping_of_unstructured(m, 
-					 loops,
-					 instruction_unstructured(i)) ;
+	  rloops_mapping_of_unstructured(m, loops,instruction_unstructured(i));
 	  break ;
       }
 	
       default:
-	pips_error("rloops_mapping_of_statement", 
-		   "unexpected tag %d\n", instruction_tag(i));
+	pips_internal_error("unexpected tag %d\n", instruction_tag(i));
     }
 }
 
