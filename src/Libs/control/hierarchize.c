@@ -95,12 +95,33 @@ add_node_to_interval(graph intervals,
 		     vertex node)
 {
     /* Replace every allusion to node by interval in the interval
-       graph: */
+       graph.
+
+       The main issue is that the interval graph must remain a graph, that
+       is it cannot have more than one edge from a vertex to another one: */
     MAP(VERTEX, v, {
+      list predecessors_to_change = NIL;
+      bool interval_already_in_predecessors = FALSE;
 	MAPL(ip, {
-	    if (predecessor_vertex(PREDECESSOR(CAR(ip))) == node)
-		predecessor_vertex(PREDECESSOR(CAR(ip))) = interval;
+	  if (predecessor_vertex(PREDECESSOR(CAR(ip))) == node)
+	    predecessors_to_change = CONS(PREDECESSOR,
+					  PREDECESSOR(CAR(ip)),
+					  predecessors_to_change);
+	  if (predecessor_vertex(PREDECESSOR(CAR(ip))) == interval)
+	    interval_already_in_predecessors = TRUE;
 	}, vertex_predecessors(v));
+	if (predecessors_to_change != NIL) {
+	  /* There is at least an interval that must appear ONLY ONCE in
+             the predecessors. Thus it is easier to delete any reference
+             an create an unique instance of it: */
+	  /* I guess there is memory leak here... */
+	  gen_list_and_not(&vertex_predecessors(v), predecessors_to_change);
+	  if (! interval_already_in_predecessors)
+	    /* Add the lacking interval in the predecessors: */
+	    vertex_predecessors(v) = CONS(PREDECESSOR,
+					  make_predecessor(interval_vertex_label_undefined, interval),
+					  vertex_predecessors(v));
+	}
     }, graph_vertices(intervals));
 
     /* Concatenate the control nodes to the interval and preserve the
@@ -287,14 +308,25 @@ control_graph_to_interval_graph_format(control entry_node)
 					   control_to_interval_node);
 	pips_debug(6, "\tControl %p -> interval %p\n", c,  interval);   
 	MAP(CONTROL, p, {
+	  bool interval_already_in_predecessors = FALSE;
 	    vertex vertex_predecessor =
 		create_or_get_an_interval_node(p,
 					       intervals,
 					       control_to_interval_node);
-	    predecessor v_p = make_predecessor(interval_vertex_label_undefined,
-					       vertex_predecessor);
-	    vertex_predecessors(interval) =
+	    /* Add the predeccessor only if it is not already in the
+               predecessor list: */
+	    MAPL(ip, {
+	      if (predecessor_vertex(PREDECESSOR(CAR(ip))) == vertex_predecessor) {
+		interval_already_in_predecessors = TRUE;
+		break;
+	      }
+	    }, vertex_predecessors(interval));
+	    if (! interval_already_in_predecessors) {
+	      predecessor v_p = make_predecessor(interval_vertex_label_undefined,
+						 vertex_predecessor);
+	      vertex_predecessors(interval) =
 		CONS(PREDECESSOR, v_p, vertex_predecessors(interval));
+	    }
 	    pips_debug(7, "\t\tControl predecessor %p -> interval %p\n",
 		   p,  vertex_predecessor);   
 	}, control_predecessors(c));
@@ -637,7 +669,9 @@ control_graph_recursive_decomposition(unstructured u)
 	    list controls = interval_vertex_label_controls(vertex_vertex_label(interval));
 	    control interval_entry = CONTROL(CAR(controls));
 	    list interval_exits = interval_exit_nodes(interval, exit_node);
-	    if (gen_length(interval_exits) <= 1
+	    if (/* If this interval has at most one exit it should be put
+                   in its own unstructured: */
+		gen_length(interval_exits) <= 1
 		&& /* Useless to restructure the exit node... */
 		interval_entry != exit_node
 		&& /* If a single node, only useful if there is a loop
