@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.56  1998/12/18 19:48:37  irigoin
+ * Function CreateIntrinsic() moved in ri-util/entity.c
+ *
  * Revision 1.55  1998/12/02 15:00:59  irigoin
  * Some calls to reset_current_module_statement() replaced by calls to error_reset_current_module_statement()
  *
@@ -1848,16 +1851,4 @@ UpdateFormalStorages(
 				entity_name(fp));
 	}
     }
-}
-
-
-
-/* this function creates an intrinsic function. */
-
-entity 
-CreateIntrinsic(string name)
-{
-    entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
-    pips_assert("entity is defined", e!=entity_undefined);
-    return(e);
 }
