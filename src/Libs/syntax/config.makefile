@@ -8,6 +8,9 @@ CFLAGS=	-g -Wall -ansi
 endif
 
 # bison does not like this pips grammar for Fortran, it reports errors:-)
+# idem flex:-)
+LEX=lex
+LFLAGS=
 YACC=yacc
 YFLAGS=
 
