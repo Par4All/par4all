@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/05/29 09:02:59 $, )
+! ($Date: 1997/05/29 09:50:49 $, )
 !
 !-----------------
 !
@@ -1011,7 +1011,7 @@ _CM5(
       subroutine HPFC INIT HOST NODE
       include "hpfc_commons.h"
 
-      integer info, inum
+      integer  inum
 
       call HPFC CHECK
 
