@@ -374,19 +374,27 @@ static void db_save_resource(string rname, string oname, db_resource r)
 }
 
 static void db_save_and_free_resource(
-    string rname, string oname, db_resource r)
+    string rname, string oname, db_resource r, bool do_free)
 {
     pips_debug(7, "saving and freeing %s of %s\n", rname, oname);
     pips_assert("resource loaded", db_resource_loaded_p(r));
     if (dbll_storable_p(rname)) {
-        dbll_save_and_free_resource(rname, oname, db_resource_pointer(r));
-        db_resource_pointer(r) = string_undefined;
-	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
-	db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
+        dbll_save_and_free_resource(rname, oname, 
+				    db_resource_pointer(r), do_free);
+	if (do_free)
+	{
+	  db_resource_pointer(r) = string_undefined;
+	  db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
+	  db_resource_file_time(r) = 
+	    dbll_stat_resource_file(rname, oname, TRUE);
+	}
     } else { /* lost.. delete resource. */
+      if (do_free)
+      {
         dbll_free_resource(rname, oname, db_resource_pointer(r));
         db_resource_pointer(r) = string_undefined;
 	db_delete_resource(rname, oname);
+      }
     }
 }
 
@@ -513,13 +521,14 @@ void db_unput_resources(string rname)
         get_pips_database());
 }
 
-void db_save_and_free_memory_resource_if_any(string rname, string oname)
+void db_save_and_free_memory_resource_if_any
+  (string rname, string oname, bool do_free)
 {
     db_resource r;
     DB_OK;
     r = get_db_resource(rname, oname);
     if (!db_resource_undefined_p(r) && db_resource_loaded_p(r))
-	db_save_and_free_resource(rname, oname, r);
+	db_save_and_free_resource(rname, oname, r, do_free);
 }
 
 /* FC: I added this function to clean all resources, hence avoiding
