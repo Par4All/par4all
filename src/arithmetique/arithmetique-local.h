@@ -194,13 +194,15 @@ typedef int Value;
 #include <setjmp.h>
 extern jmp_buf overflow_error;
 
-/* TRY/CATCH/THROW: macros with a C++ look and feel.
+/* TRY/CATCH/THROW/EXCEPTION: macros with a C++ look and feel.
+ * EXCEPTION overflow_error;
  * CATCH(overflow_error) {
  *   ...
  * } TRY {
  *   ... THROW(overflow_error) ...
  * }
  */
+#define EXCEPTION jmp_buf
 #define CATCH(thrown) if (setjmp(thrown))
 #define TRY else
 #define THROW(thrown) longjmp(thrown,__LINE__) /* why not!? */
