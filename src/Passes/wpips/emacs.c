@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1996/10/11 17:18:38 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1997/04/11 13:06:30 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1996/10/11 17:18:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1997/04/11 13:06:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -505,5 +505,8 @@ initialize_emacs_mode()
       /* Ask Pips to display the declarations from the RI to have
          hypertext functions on the declarations: */
       set_bool_property("PRETTYPRINT_ALL_DECLARATIONS", TRUE);
+      /* Since the comments of the declarations are not in the RI,
+         pick them in the text: */
+      set_bool_property("PRETTYPRINT_HEADER_COMMENTS", TRUE);      
    }
 }
