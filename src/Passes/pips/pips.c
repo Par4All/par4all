@@ -30,7 +30,7 @@ extern void (*pips_log_handler)();
 extern void (*pips_warning_handler)();
 extern void set_bool_property();
 
-char *usage = 
+static char *usage = 
   "Usage: %s [-v] [-f F]* [-m M] [-s S]* [-p P] [-b B] [-(0|1) T]* wspace\n"
   "\t-v: pips version (which pips/ARCH)\n"
   "\t-f F: source file F\n"
@@ -110,7 +110,7 @@ char * argv[];
     wspace= argv[argc - 1];
 }
 
-void
+static void
 select_rule(rule_name)
 char *rule_name;
 {
@@ -118,13 +118,12 @@ char *rule_name;
 
     activate(rule_name);
 
-    if(get_debug_level()>5)
-	fprint_activated(stderr);
+    ifdebug(5) fprint_activated(stderr);
 }
 
 /* Pips user log */
 
-void pips_user_log(char *fmt, va_list args)
+static void pips_user_log(char *fmt, va_list args)
 {
     FILE * log_file = get_log_file();
 
@@ -145,7 +144,7 @@ void pips_user_log(char *fmt, va_list args)
     fflush(stderr);
 }
 
-void main(argc, argv)
+int main(argc, argv)
 int argc;
 char * argv[];
 {
@@ -276,5 +275,8 @@ char * argv[];
 	debug_off();
     }
 
-    exit(!success);
+    return !success;
 }
+
+/* end of $RCSfile: pips.c,v $ 
+ */
