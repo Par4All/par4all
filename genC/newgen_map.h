@@ -26,13 +26,13 @@
 
 #define MAX_NESTED_HASH 10
 
-extern chunk Gen_hash_[] ;
-chunk *gen_hash_ ;
+extern gen_chunk Gen_hash_[] ;
+gen_chunk *gen_hash_ ;
 
 #define HASH_GET(start,image,h,k) \
 IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 	 ((gen_hash_-1)->start=(k), \
-	  (((chunk *)hash_get((h),(char *)(gen_hash_-- -1)))->image)), \
+	  (((gen_chunk *)hash_get((h),(char *)(gen_hash_-- -1)))->image)), \
 	 gen_hash_->image)
 
 #define HASH_UPDATE(start,image,h,k,v) \
@@ -40,7 +40,7 @@ IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 	 ((gen_hash_-1)->start=(k), \
 	  IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 		   ((gen_hash_-1)->image=(v), \
-		    *((chunk *)hash_get((h),(char *)(gen_hash_-2)))= \
+		    *((gen_chunk *)hash_get((h),(char *)(gen_hash_-2)))= \
 		    *(gen_hash_-1), \
 		    gen_hash_ -=2, \
 		    (h)), \
@@ -49,10 +49,10 @@ IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
 
 #define HASH_EXTEND(start,image,h,k,v) \
 IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-	 IN_HEAP((gen_hash_-1)->p, chunk, \
+	 IN_HEAP((gen_hash_-1)->p, gen_chunk, \
 		 ((gen_hash_-1)->p->start=(k), \
 		  IN_STACK(gen_hash_, &Gen_hash_[MAX_NESTED_HASH], \
-			   IN_HEAP((gen_hash_-1)->p, chunk, \
+			   IN_HEAP((gen_hash_-1)->p, gen_chunk, \
 				   ((gen_hash_-1)->p->image=(v), \
 				    hash_put((h), \
 					     (char *)(gen_hash_-2)->p,\
