@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 19:30:30 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 21:14:37 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -280,7 +280,7 @@ SCAN=		$(LEX) $(LFLAGS) $(Lopt) -t
 TYPECHECK=      $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH) $(LINT_LIBS)
 PARSE=		$(YACC) $(YFLAGS) $(Yopt)
 ARCHIVE=	$(AR) $(ARFLAGS)
-PROTO=		$(PROTOIZE) -e -E "$(PREPROC)"
+PROTOIZE=	$(PROTO) $(PRFLAGS) -E "$(PREPROC)"
 #
 # Default rules
 #
@@ -638,11 +638,11 @@ $(INC_TARGET): $(TARGET)-local.h
 .header: $(TARGET)-local.h $(DERIVED_HEADERS) $(INC_CFILES)
 	@$(COPY) $(TARGET)-local.h $(INC_TARGET);
 	{ \\
-	echo "/* header file built for ARCH=$(ARCH) by $(PROTOIZE) */";\\
+	echo "/* header file built by $(PROTO) for ARCH=$(ARCH) */";\\
 	echo "#ifndef ${dir_simple_name}_header_included";\\
 	echo "#define ${dir_simple_name}_header_included";\\
 	cat $(TARGET)-local.h;\\
-	$(PROTO) $(INC_CFILES);\\
+	$(PROTOIZE) $(INC_CFILES);\\
 	echo "#endif /* ${dir_simple_name}_header_included */";\\
 	} > $(INC_TARGET).tmp
 	$(MOVE) $(INC_TARGET).tmp $(INC_TARGET)
