@@ -20,6 +20,8 @@ extern void get_model(int *ppn, int *pbn, int *pls);
 
 #define IF_DEBUG(niveau, code) if (get_debug_level() >= niveau) { code; }
 
+#define WP65_PVM_DATA PvmDataRaw
+
 int numero, banc, mytid, pere;
 
 /* Retient la « topologie » de la machine : */
@@ -183,8 +185,8 @@ main(int argc, char *argv[])
      soient réellement partis. Rajout d'une barrière de synchro à la
      fin pour cela... */
   /* Augmente l'efficacité des communications : */
-  testerreur("pvm_advise",
-	     pvm_advise(PvmRouteDirect));
+  testerreur("pvm_setopt",
+	     pvm_setopt(PvmRoute, PvmRouteDirect));
   
   if (pere < 0) {
     /* Je suis le contrôleur de départ... */
@@ -220,7 +222,7 @@ main(int argc, char *argv[])
 		 nb_t - (nb_taches - 1));
 
     testerreur("pvm_initsend",
-	       pvm_initsend(PvmDataDefault));
+	       pvm_initsend(WP65_PVM_DATA));
   
     /* Envoi du model.rc de la machine : */
     envoie_params();
@@ -326,7 +328,7 @@ main(int argc, char *argv[])
 void send_4(int tid, float *donnee, int taille)
 {
   testerreur("pvm_initsend",
-	     pvm_initsend(PvmDataDefault));
+	     pvm_initsend(WP65_PVM_DATA));
   /* Envoie aussi la taille du message pour être capable de le lire
      par morceaux : */
   testerreur("pvm_pack",
@@ -452,5 +454,5 @@ void WP65_RECEIVE_4_(int *bank_id, float *donnee, int *taille)
 void MAIN_()
 {
   /* Jamais exécuté, je pense... */
-  fprintf("Entrée dans MAIN_ !\n");
+  fprintf(stderr, "Entrée dans MAIN_ !\n");
 }
