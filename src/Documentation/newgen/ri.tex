@@ -487,7 +487,9 @@ freeing the statements when the mapping is freed.
 \label{subsection-instruction}
 \index{Instruction}
 
-\domain{Instruction = block:statement* + test + loop + goto:statement + call + unstructured}
+\domain{Sequence = statements:statement*}
+\domain{Instruction = sequence + test + loop + goto:statement + call + unstructured}
+
 { 
 Le domaine \verb/instruction/ permet de repre'senter les instructions
 d'un module. Une instruction peut e^tre un sous-domaine \verb/block/,
