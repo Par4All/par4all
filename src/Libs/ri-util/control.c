@@ -4,10 +4,10 @@
    Ronan Keryell.
    */
 
-/* 	%A% ($Date: 1997/09/23 22:41:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/25 20:23:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 1997/09/23 22:41:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "%A% ($Date: 1997/09/25 20:23:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -24,6 +24,8 @@ char vcid_ri_util_control[] = "%A% ($Date: 1997/09/23 22:41:17 $, ) version $Rev
  * an unstructured. It is usually called from the CONTROL_MAP macro,
  * with the entry node of an unstructured as initial argument. It uses
  * both successors and predecessors to define reachability.
+ *
+ * l must be initialized, if only to NIL, but no list_undefined;
  */
 
 void
