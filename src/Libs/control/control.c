@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/07/22 13:56:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/24 00:50:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/07/22 13:56:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/09/24 00:50:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -500,9 +500,6 @@ hash_table used_labels;
 }
 
 
-/* This procedure is disabled and rely on unspaghettify later since
-   there is a remaining bug about camat-t.f. RK. */
-
 /* COMPACT_LIST takes a list of controls CTLS coming from a
    CONTROLIZE_LIST and compacts the successive assignments,
    i.e. concatenates (i=1) followed by (j=2) in a single control with
@@ -520,10 +517,11 @@ compact_list(list ctls,
 {
     control c_res;
     set processed_nodes;
+    /* Pointer to the end of the current unstructured: */
     control c_last = c_end ;
 
     ifdebug(5) {
-	pips_debug(0, "List ctls:");
+	pips_debug(0, "List c_end %p, ctls:", c_end);
 	display_address_of_control_nodes(ctls);
 	fprintf(stderr, "\n");
     }
@@ -555,9 +553,6 @@ compact_list(list ctls,
                the node and go on inspecting next node from the
                list. RK */
 	    c_res = CONTROL(CAR(ctls));
-	    if (!set_belong_p(processed_nodes, (char *) c_res))
-		/* Do not remember an already seen node. */
-		c_last = c_res;
 	    continue;
 	}
 	
@@ -566,17 +561,17 @@ compact_list(list ctls,
 	succ_st = control_statement(succ);
 	set_add_element(processed_nodes, processed_nodes, (char *) succ);
 	
-	if(!instruction_block_p(i=statement_instruction(st))) {
-	    i = make_instruction_block(CONS(STATEMENT, st, NIL));
-	    control_statement(c_res) =
-		make_statement(entity_empty_label(), 
-			       STATEMENT_NUMBER_UNDEFINED,
-			       STATEMENT_ORDERING_UNDEFINED,
-			       string_undefined,
-			       i);
-	}
 	if(c_res != succ) {
 	    /* If it is not a loop on c_res, fuse the nodes: */
+	    if(!instruction_block_p(i=statement_instruction(st))) {
+		i = make_instruction_block(CONS(STATEMENT, st, NIL));
+		control_statement(c_res) =
+		    make_statement(entity_empty_label(), 
+				   STATEMENT_NUMBER_UNDEFINED,
+				   STATEMENT_ORDERING_UNDEFINED,
+				   string_undefined,
+				   i);
+	    }
 	    if(instruction_block_p(succ_i=statement_instruction(succ_st))){
 		instruction_block(i) = 
 		    gen_nconc(instruction_block(i), 
@@ -605,19 +600,10 @@ compact_list(list ctls,
 #endif
 	}
 
-	if(			/* We are at the end... */
-	   succ == c_end
-	   || (			/* ...or next time we will reach this end */
-	       gen_length(control_successors(c_res)) == 1
-	       && CONTROL(CAR(control_successors(c_res))) == c_end)) {
+	if(succ == c_last) {
+	    /* We are at the end and the last node has
+               disappeared... Update the pointer to the new one: */
 	    c_last = c_res;
-	    /* Hmmm... I think it is dangerous to go further because
-               in some case ctls go on before the entry node and thus
-               c_last will no longer point to the exit node!  Of
-               course, there are many assumptions in this
-               assertion... :-( The minor one is that unreachable code
-               is not fused, but since it is unreachable and optimized
-               anyway in unspaghettify... RK */
 	    break;
 	}
     }
