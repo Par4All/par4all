@@ -73,20 +73,15 @@ print_sentence(FILE * fd,
 {
     if (sentence_formatted_p(s)) {
 	string ps = sentence_formatted(s);
-	string ps_begin = ps;
 	
-	deal_with_sentence_word_begin(ps_begin,
-				      position_in_the_output);
 	while (*ps) {
-	    char c = *ps++;
-	    /* FI/FC: Why on earth?!?
-	       (void) putc((islower((int) c) ? (char) toupper((int) c) : c), fd);
-	       */
-	    putc_sentence( c, fd);
+	    char c = *ps;
+	    putc_sentence(c, fd);
+	    deal_with_attachments_at_this_character(ps,
+						    position_in_the_output);
+	    ps++;
 	}
-	deal_with_sentence_word_end(ps_begin,
-				    position_in_the_output);
-    }
+   }
     else {
 	unformatted u = sentence_unformatted(s);
 	int col;
@@ -98,11 +93,10 @@ print_sentence(FILE * fd,
 	cons *lw = unformatted_words(u);
 
 	if (label != (char *) NULL) {
-	    deal_with_sentence_word_begin(label,
-					  position_in_the_output);
+	    /* Keep track of the attachment against the padding: */
+	    deal_with_attachments_in_this_string(label,
+						 position_in_the_output);
 	    fprintf_sentence(fd, "%-5s ", label);
-	    deal_with_sentence_word_end(label,
-					position_in_the_output);
 	}
 	else {
 	    fprintf_sentence(fd, "      ");
@@ -119,14 +113,13 @@ print_sentence(FILE * fd,
 
 	while (lw) {
 	    string w = STRING(CAR(lw));
-	    deal_with_sentence_word_begin(w,
-					  position_in_the_output);
-
 	    STRING(CAR(lw)) = NULL;
 	    lw = CDR(lw);
 
 	    /* if the string fits on the current line: no problem */
 	    if (col + strlen(w) <= 70) {
+		deal_with_attachments_in_this_string(w,
+						     position_in_the_output);
 		col += fprintf_sentence(fd, "%s", w);
 	    }
 	    /* if the string fits on one line: 
@@ -160,6 +153,8 @@ print_sentence(FILE * fd,
 
 			col = 7+em;
 		    }
+		    deal_with_attachments_in_this_string(w,
+							 position_in_the_output);
 		    col += fprintf_sentence(fd, "%s", w);
 		}
 	    /* if the string has to be broken in at least two lines: 
@@ -171,6 +166,9 @@ print_sentence(FILE * fd,
 
 		    /* complete the current line */
 		    ncar = 72 - col + 1;
+		    deal_with_attachments_in_this_string_length(line,
+								position_in_the_output,
+								ncar);
 		    fprintf_sentence(fd,"%.*s", ncar, line);
 		    line += ncar;
 		    col = 73;
@@ -200,14 +198,14 @@ print_sentence(FILE * fd,
 			    (void) fprintf_sentence(fd, "     &");
 
 			col = 7 ;
+			deal_with_attachments_in_this_string_length(line,
+								    position_in_the_output,
+								    ncar);
 			(void) fprintf_sentence(fd, "%.*s", ncar, line);
 			line += ncar;
 			col += ncar;
 		    }
 		}
-	    deal_with_sentence_word_end(w,
-					position_in_the_output);
-
 	    free(w);
 	}
 
