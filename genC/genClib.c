@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/10/13 13:18:37 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/14 10:38:23 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -76,6 +76,7 @@ static int disallow_undefined_tabulated = TRUE ;
 #define check_domain(domain) \
   message_assert("Inconsistant domain number",\
 		 (domain)>=0 && (domain)<MAX_DOMAIN)
+
 #define check_read_spec_performed() \
   message_assert("gen_read_spec not performed prior to use", \
 		 Read_spec_performed);
@@ -86,7 +87,8 @@ static int domain_index( obj )
 gen_chunk *obj ;
 {
     message_assert("Trying to use a NULL object", obj!=NULL);
-    message_assert("Trying to use an undefined object", obj!=gen_chunk_undefined);
+    message_assert("Trying to use an undefined object", 
+		   obj!=gen_chunk_undefined);
     check_domain(obj->i);
     return(obj->i) ;
 }
@@ -836,15 +838,19 @@ struct gen_binding *bp ;
     return( !IS_TABULATED( bp ) && !shared_obj( obj, gen_null, gen_null )) ;
 }
 
-/* FREE_LEAF_OUT manages external types */
+/* FREE_LEAF_OUT manages external types. */
 
 static void
 free_leaf_out( obj, bp ) 
 gen_chunk *obj ;
 struct gen_binding *bp ;
 {
-    if( IS_INLINABLE( bp )) return ;
-
+    if( IS_INLINABLE(bp )) {
+	if( *bp->name == 's' ) {
+	    free( obj->s ) ; 
+	}
+	return ;
+    }
     if( IS_EXTERNAL( bp )) {
 	if( bp->domain->ex.free == NULL ) {
 	    user( "gen_free: uninitialized external type %s\n",
@@ -1028,17 +1034,27 @@ struct driver *dr ;
     if (shared_obj( obj, gen_null, gen_null ))
 	    return 0;
 
-    /* memory is allocated to duplicate the object referenced by obj */
-    size = gen_size(bp)*sizeof(gen_chunk);
-    new_obj = (gen_chunk *)alloc(size);
+    /* FI: hash_get() theoretically is useless because shared_obj()
+     * should be enough to avoid duplicate copies
+     */
+    if ((gen_chunk *)hash_get( copy_table, (char *)obj )==
+	(gen_chunk *)HASH_UNDEFINED_VALUE) {
+	/* memory is allocated to duplicate the object referenced by obj */
+	size = gen_size(bp)*sizeof(gen_chunk);
+	new_obj = (gen_chunk *)alloc(size);
 
-    /* the object obj is copied into the new one */
-    (void) memcpy((char *) new_obj, (char *) obj, size);
+	/* the object obj is copied into the new one */
+	(void) memcpy((char *) new_obj, (char *) obj, size);
 
-    /* hash table copy_table is updated */
-    copy_hput(copy_table, (char *)obj, (char *)new_obj);
-    
-    return 1;
+	/* hash table copy_table is updated */
+	copy_hput(copy_table, (char *)obj, (char *)new_obj);
+	return 1;
+    }
+    /* FI: I'd like to return 0, but this would not be consistent
+     * with shared_obj. Let's do it anyway to avoid recursing uselessly
+     * downwards with gen_trav_obj().
+     */
+    return 0;
 }
 
 /* Just check for defined simple domains. */
@@ -2054,17 +2070,24 @@ gen_chunk *obj ;
 int t ;
 {
     char buffer[ 1024 ] ;
+    extern int max_domain_index() ;
+    int max_index ;
 
-    if( obj == NULL ) 
-    {
+    if( obj == NULL ) {
 	(void) user("gen_check: NULL pointer, expecting type %s\n",
 		    Domains[ t ].name) ;
 	abort() ;
     }
+    max_index = max_domain_index() ;
+    message_assert("Improper domain_index", max_index >= 0 ) ;
+
     if( obj != gen_chunk_undefined && t != obj->i ) {
 	(void) sprintf( buffer, 
-		"gen_check: Type clash (expecting %s, getting %s)\n",
-		Domains[ t ].name, Domains[ obj->i ].name ) ;
+		       "gen_check: Type clash (expecting %s, getting %s)\n",
+		       Domains[ t ].name, 
+		       (obj->i >= 0 && obj->i <= max_index ) ?
+		       Domains[ obj->i ].name :
+		       "???") ;
 	user( buffer, (char *)NULL ) ;
 	abort() ;
     }
@@ -2082,7 +2105,8 @@ gen_chunk *obj;
     int dom;
 
     message_assert("no domain for NULL object", obj!=(gen_chunk*)NULL);
-    message_assert("no domain for undefined object", !gen_chunk_undefined_p(obj));
+    message_assert("no domain for undefined object", 
+		   !gen_chunk_undefined_p(obj)); 
 
     dom = obj->i; check_domain(dom);
 
