@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/02 06:15:15 $, 
+ * $Date: 1997/10/02 10:21:36 $, 
  */
 
 #include <unistd.h>
@@ -295,19 +295,29 @@ list_files_in_directory(
 }
 
 
-bool directory_exists_p(char * name)
+bool 
+directory_exists_p(char * name)
 {
     struct stat buf;
     return (stat(name, &buf) == 0) && S_ISDIR(buf.st_mode);
 }
 
-bool file_exists_p(char * name)
+bool 
+file_exists_p(char * name)
 {
     struct stat buf;
     return (stat(name, &buf) == 0) && S_ISREG(buf.st_mode);
 }
 
-bool create_directory(char *name)
+bool 
+file_readable_p(char * name)
+{
+    struct stat buf;
+    return !stat(name, &buf) && (S_IRUSR & buf.st_mode);
+}
+
+bool 
+create_directory(char *name)
 {
     bool success = TRUE;
 
