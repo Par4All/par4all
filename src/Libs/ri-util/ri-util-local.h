@@ -157,6 +157,22 @@
     ((same_string_p(entity_local_name(e), DYNAMIC_AREA_LOCAL_NAME)) || \
      (same_string_p(entity_local_name(e), STATIC_AREA_LOCAL_NAME)))
 
+/* IO Management
+ */
+#define ENTITY_NAME_P(e, name)(same_string_p(entity_local_name(e),name))
+#define ENTITY_WRITE_P(e) ENTITY_NAME_P(e, "WRITE")
+#define ENTITY_REWIND_P(e) ENTITY_NAME_P(e, "REWIND")
+#define ENTITY_OPEN_P(e) ENTITY_NAME_P(e, "OPEN")
+#define ENTITY_CLOSE_P(e) ENTITY_NAME_P(e, "CLOSE")
+#define ENTITY_READ_P(e) ENTITY_NAME_P(e, "READ")
+#define ENTITY_BUFFERIN_P(e) ENTITY_NAME_P(e, "BUFFERIN")
+#define ENTITY_BUFFEROUT_P(e) ENTITY_NAME_P(e, "BUFFEROUT")
+#define ENTITY_ENDFILE_P(e) ENTITY_NAME_P(e, "ENDFILE")
+#define ENTITY_IMPLIEDDO_P(e) ENTITY_NAME_P(e, "IMPLIED-DO")
+#define ENTITY_FORMAT_P(e) ENTITY_NAME_P(e, "FORMAT")
+
+#define IO_CALL_P(call) io_intrinsic_p(call_function(call))
+
 /*  constant sizes
  */
 #define LABEL_SIZE 5
