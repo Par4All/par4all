@@ -1,11 +1,15 @@
+%%
+%% $Id$
+%%
+%% $Log: developer_guide.tex,v $
+%% Revision 1.8  1997/11/20 07:58:28  coelho
+%% ref to new pips architectures added.
+%%
+%%
 %
-%% $RCSfile: developer_guide.tex,v $ (version $Revision$)
-%% $Date: 1997/04/10 13:30:33 $, 
 % PIPS development environment documentation; translated and updated from 
 % dret146.f.tex
 %
-
-%% titlepage,
 \documentclass[a4paper]{article}
 
 \usepackage{psfig,amstext,alltt,html}
@@ -120,6 +124,8 @@ values) used: %%$
   file that can be exploited by \verb+gprof+ for extracting profiling
   information)
 \item[IBMAIX]: the compilers and options used on IBM AIX workstations. 
+\item[LINUXI86]: for i386 machines under linux.
+\item[OSF1]: for DEC Alpha machines under OSF1. 
 \end{description}
 
 
@@ -129,7 +135,7 @@ values) used: %%$
 
 This section describes the directory hierarchy of PIPS\@. 
 Here at CRI, École des mines de Paris, Pips resides in
-\verb+/projects/Pips+ (\verb|$PIPS_DIR|). %% $
+\verb+/projects/Pips+ (\verb|$pips_dir|). %% $
 This directory is owned by the \verb+pips+ user.
 From this directory, several sub directories can be found. The most
 important is the \verb+Production+ directory which contains the main copy
@@ -1353,4 +1359,4 @@ which are updated every hour.
 \input{developer_guide.ind}
 
 \end{document}
-\end
+
