@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include <stdio.h>
-extern   int fprintf();
+
 #include "assert.h"
 
 #include "boolean.h"
