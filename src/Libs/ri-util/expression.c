@@ -180,46 +180,178 @@ bool expression_in_list_p(expression e, list le)
   return FALSE;
 }
 
-/* This function returns TRUE if we can affirm that the expression is always TRUE
- *                       FALSE, otherwise
-*/
-
-bool trivial_expression_p(expression e)
+bool logical_operator_expression_p(expression e)
 {
-  list args;
-  expression e1,e2;
-  normalized n1,n2;
-  Pvecteur v1,v2,v;
-
+  /* Logical operators are : .NOT.,.AND.,.OR.,.EQV.,.NEQV.*/
   if (expression_call_p(e))
     {
-      /* If e is a binary call expression*/
-      args = call_arguments(syntax_call(expression_syntax(e)));
-      e1 =  EXPRESSION(CAR(args));
-      e2 = EXPRESSION(CAR(CDR(args)));
-      n1 = NORMALIZE_EXPRESSION(e1);
-      n2 = NORMALIZE_EXPRESSION(e2);
-
-      if (normalized_linear_p(n1) && normalized_linear_p(n2))
-	{
-	  v1 = normalized_linear(n1);
-	  v2 = normalized_linear(n2);
-
-	  v = vect_substract(v1,v2);
-
-	  if (vect_constant_p(v))
-	    {
-	      if (VECTEUR_NUL_P(v) || value_negz_p(val_of(v))) 
-		return TRUE;
-	      return FALSE;
-	    }	
-	  return FALSE;
-	}
+      entity op = call_function(syntax_call(expression_syntax(e)));
+      if (ENTITY_AND_P(op) || ENTITY_OR_P(op) || ENTITY_NOT_P(op) || 
+	  ENTITY_EQUIV_P(op) ||ENTITY_NON_EQUIV_P(op))
+	return TRUE;
       return FALSE;
     }
-    
-   return FALSE;
+  return FALSE;
 }
+
+bool relational_expression_p(expression e)
+{
+  /* A relational expression is a call whose function is either one of the following :
+   * .LT.,.LE.,.EQ.,.NE.,.GT.,.GE. */
+  if (expression_call_p(e))
+    {
+      entity op = call_function(syntax_call(expression_syntax(e)));
+      if (ENTITY_RELATIONAL_OPERATOR_P(op)) 
+	return TRUE;
+      return FALSE;
+    }
+  return FALSE;
+}
+
+bool logical_expression_p(expression e)
+{  
+  /* A logical expression is either one of the following:
+   * - a logical constant
+   * - the symbolic name of a logical constant
+   * - a logical variable name 
+   * - a logical array element name
+   * - a logical function reference
+   * - a relational expression (.LT.,.LE.,.EQ.,.NE.,.GT.,.GE.)
+   * - is formed by combining together one or more of the above 
+   *   entities using parentheses and the logical operators 
+   *   .NOT.,.AND.,.OR.,.EQV.,.NEQV. */
+
+  /* In fact, I didn't use the PIPS function : basic_of_expression because of 2 reasons : 
+   * - the function basic_of_intrinsic use the macro : ENTITY_LOGICAL_OPERATOR_P 
+   *   which is not like the Fortran Standard definition (the above comments)
+   * - the case where an expression is a range is not considered here for a 
+   *   logical expression */
+  
+  syntax s = expression_syntax(e);
+  basic b;
+  entity func;
+
+  debug(2, "logical expression", "\n");
+  
+  switch(syntax_tag(s)) {
+  case is_syntax_reference:
+    {        
+      b = variable_basic(type_variable(entity_type(reference_variable(syntax_reference(s)))));
+      if (basic_logical_p(b))
+	return TRUE;
+      return FALSE;     
+    }
+  case is_syntax_call:
+    {
+      if (operator_expression_p(e,TRUE_OPERATOR_NAME) || 
+	  operator_expression_p(e,FALSE_OPERATOR_NAME) ||
+	  relational_expression_p(e)|| 
+	  logical_operator_expression_p(e) )
+	return TRUE;
+      func = call_function(syntax_call(expression_syntax(e)));
+      b = variable_basic(type_variable(functional_result(type_functional(entity_type(func)))));
+      if (basic_logical_p(b)) return TRUE;   
+
+      /* The case of symbolic name of a logical constant is not treated here */
+
+      return FALSE;
+    }
+  case is_syntax_range: 
+    return FALSE;
+  default: pips_error("basic_of_expression", "Bad syntax tag");
+    return FALSE;
+  }
+  
+  debug(2, "logical expression", " ends\n");  
+}
+
+
+/* This function returns:
+ *                        1 , if e is a relational expression that is always TRUE
+ *                       -1 , if e is a relational expression that is always FALSE
+ *                        0 , otherwise */
+
+int trivial_expression_p(expression e)
+{  
+  if (relational_expression_p(e))
+    {
+      /* If e is a relational expression*/
+      list args = call_arguments(syntax_call(expression_syntax(e)));
+      expression e1 =  EXPRESSION(CAR(args));
+      expression e2 = EXPRESSION(CAR(CDR(args)));
+      normalized n1 = NORMALIZE_EXPRESSION(e1);
+      normalized n2 = NORMALIZE_EXPRESSION(e2);
+      entity op = call_function(syntax_call(expression_syntax(e)));
+     
+      ifdebug(3) {
+	fprintf(stderr, "Normalizes of  expression:");
+	print_expression(e);
+	print_normalized(n1);
+	print_normalized(n2);
+      }
+ 
+      if (normalized_linear_p(n1) && normalized_linear_p(n2))
+	{
+	  Pvecteur v1 = normalized_linear(n1);
+	  Pvecteur v2 = normalized_linear(n2);
+	  Pvecteur v = vect_substract(v1,v2);
+	   
+	  /* The test if an expression is trivial (always TRUE or FALSE) or not 
+	   * depends on the operator of the expression : 
+	   * (op= {<=,<,>=,>,==,!=}) so we have to treat each different case */
+	  
+	  if (vect_constant_p(v))
+	    {
+	      if (ENTITY_NON_EQUAL_P(op))
+		{
+		  /* Expression :  v != 0 */	
+		  if (VECTEUR_NUL_P(v)) return -1;
+		  if (value_zero_p(val_of(v))) return -1;
+		  if (value_notzero_p(val_of(v))) return 1;	
+		}
+	      if (ENTITY_EQUAL_P(op))
+		{
+		  /* Expression :  v == 0 */
+		  if (VECTEUR_NUL_P(v)) return 1;
+		  if (value_zero_p(val_of(v))) return 1;
+		  if (value_notzero_p(val_of(v))) return -1;	
+		}	
+	      if (ENTITY_GREATER_OR_EQUAL_P(op))
+		{
+		  /* Expression :  v >= 0 */
+		  if (VECTEUR_NUL_P(v)) return 1;
+		  if (value_posz_p(val_of(v))) return 1;
+		  if (value_neg_p(val_of(v))) return -1;	
+		}	
+	      if (ENTITY_LESS_OR_EQUAL_P(op))
+		{
+		  /* Expression :  v <= 0 */
+		  if (VECTEUR_NUL_P(v)) return 1;
+		  if (value_negz_p(val_of(v))) return 1;
+		  if (value_pos_p(val_of(v))) return -1;	
+		}	
+	      if (ENTITY_LESS_THAN_P(op))
+		{
+		  /* Expression :  v < 0 */
+		  if (VECTEUR_NUL_P(v)) return -1;
+		  if (value_neg_p(val_of(v))) return 1;
+		  if (value_posz_p(val_of(v))) return -1;	
+		}	
+	      if (ENTITY_GREATER_THAN_P(op))
+		{
+		  /* Expression :  v > 0 */
+		  if (VECTEUR_NUL_P(v)) return -1;
+		  if (value_pos_p(val_of(v))) return 1;
+		  if (value_negz_p(val_of(v))) return -1;	
+		}	
+	    }	
+	  return 0;
+	}
+      return 0;
+    }
+  return 0;
+}
+
 
 
 bool expression_implied_do_p(e)
@@ -325,6 +457,25 @@ string op_name;
 	return FALSE;
 }
 
+expression  make_true_expression()
+{ 
+  return make_call_expression(MakeConstant(TRUE_OPERATOR_NAME,is_basic_logical),NIL);
+}
+
+expression make_false_expression() 
+{
+  return make_call_expression(MakeConstant(FALSE_OPERATOR_NAME,is_basic_logical),NIL);
+}
+
+bool true_expression_p(expression e) 
+{
+  return operator_expression_p(e,TRUE_OPERATOR_NAME);
+}
+
+bool false_expression_p(expression e) 
+{
+  return operator_expression_p(e,FALSE_OPERATOR_NAME);
+}
 
 /* boolean unbounded_dimension_p(dim)
  * input    : a dimension of an array entity.
@@ -1517,13 +1668,9 @@ void davinci_dump_all_expressions(FILE * out, statement s)
   out_flt = NULL;
 }
 
-/*-------------------------------------------------------------------------------------------------
-
-  This function replaces all the occurences of an old entity in the expression exp by the new entity. 
-  It returns the expression modified.  
-  I think we  can write this function by using gen_context_multi_recurse  ... To do .... NN
-    
--------------------------------------------------------------------------------------------------*/
+/* This function replaces all the occurences of an old entity in the 
+ * expression exp by the new entity. It returns the expression modified.  
+ * I think we  can write this function by using gen_context_multi_recurse  ... * To do .... NN */
 expression substitute_entity_in_expression(entity old, entity new, expression e)
 {
   syntax s;
