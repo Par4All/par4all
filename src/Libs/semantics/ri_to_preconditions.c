@@ -293,12 +293,12 @@ unstructured u ;
        I do not know if it's good or not but beware the bugs!!! */
     CONTROL_MAP(c, {
 	statement st = control_statement(c) ;
-	if(c==ct && ENDP(control_predecessors(c))) {
+	if(c==ct && ENDP(control_predecessors(c)) && statement_test_p(st)) {
 	    /* special case for the first node if it has no predecessor */
+	    /* and if it is a test, as it always should, at least if */
+	    /* unspaghettify has been applied... */
 	    /* this is pretty useless and should be generalized to the
 	       DAG part of the CFG */
-	    pips_assert("unstructured_to_postcondition", 
-			statement_test_p(st));
 	    (void) statement_to_postcondition(pre_first, st);
 	}
 	else {
