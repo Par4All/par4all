@@ -129,7 +129,7 @@ void flint_message(char *fun, char *fmt, ...)
     order = statement_ordering(flint_current_statement);
 
     (void) fprintf(flint_messages_file,
-		   "flint message from %s, in module %s, (%d.%d), line %d\n",
+		   "flint message from %s, in module %s, in statement (%d.%d), number %d\n",
 		   fun, flint_current_module_name,
 		   ORDERING_NUMBER(order), ORDERING_STATEMENT(order),
 		   statement_number(flint_current_statement));
