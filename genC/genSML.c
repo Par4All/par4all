@@ -19,16 +19,16 @@
 
    This file includes the function used to implement user types in C.
 
-   The implementation is based on vectors of chunks. The first one always
+   The implementation is based on vectors of gen_chunks. The first one always
    holds, when considered as an integer, the index in the Domains table of the
    type of the object.
 
-   . An inlined value is simply stored inside one chunk,
+   . An inlined value is simply stored inside one gen_chunk,
    . A list is a (CONS *),
    . A sey is a SET,
    . An array is a (CHUNK *),
-   . Components values of an AND_OR value are stored in the following chunks.
-   . An OR_OP value has 2 more chunks. The second on is the OR_TAG
+   . Components values of an AND_OR value are stored in the following gen_chunks.
+   . An OR_OP value has 2 more gen_chunks. The second on is the OR_TAG
      (an integer). The third is the component value. */
 
 #include <stdio.h>
@@ -37,9 +37,9 @@
 #include "newgen_include.h"
 #include "genC.h"
 
-#undef HEADER
+#undef GEN_HEADER
 /* For simplicity, the tabulation slot is always here */
-#define HEADER 2
+#define GEN_HEADER 2
 
 #define IS_NON_INLINABLE_BASIS(f) (strcmp(f,"chunk")==0)
 #define UPPER(c) ((islower( c )) ? toupper( c ) : c )
@@ -51,16 +51,16 @@ static char start[ 1024 ] ;
 
 int Read_spec_mode ;
 
-struct binding *Tabulated_bp ;
+struct gen_binding *Tabulated_bp ;
 
-/* GEN_SIZE returns the size (in chunks) of an object of type defined by
+/* GEN_SIZE returns the size (in gen_chunks) of an object of type defined by
    the BP type. */
 
 int
 gen_size( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
-    int overhead = HEADER ;
+    int overhead = GEN_HEADER ;
 
     switch( bp->domain->ba.type ) {
     case BASIS:
@@ -96,7 +96,7 @@ primitive_field( dp )
 
     switch( dp->ba.type ) {
     case BASIS: {
-	struct binding *bp = dp->ba.constructand ;
+	struct gen_binding *bp = dp->ba.constructand ;
       
 	if( IS_INLINABLE( bp )) {
 	    sprintf( buffer, "%s", bp->name ) ;
@@ -194,7 +194,7 @@ gen_update_args( dlp )
 struct domainlist *dlp ;
 {
     static char buffer[ 1024 ] ;
-    int index = HEADER ;
+    int index = GEN_HEADER ;
 
     for( sprintf(buffer, "") ; dlp->cdr!=NULL ; dlp=dlp->cdr, index++ ) {
 	strcat(buffer, gen_update_arg(dlp->domain, index)) ;
@@ -203,12 +203,12 @@ struct domainlist *dlp ;
     return( buffer ) ;
 }
 
-/* GEN_MAKE generates the gen_alloc call for bindings BD with SIZE user
+/* GEN_MAKE generates the gen_alloc call for gen_bindings BD with SIZE user
    members and ARGS as list of arguments. */
 
 static void
 gen_make( bp, size, args, updated_args, option_name )
-struct binding *bp ;
+struct gen_binding *bp ;
 int size ;
 char *args, *updated_args, *option_name ;
 {
@@ -218,7 +218,7 @@ char *args, *updated_args, *option_name ;
 		  (strcmp(option_name, "") == 0 ? "" : "_"), option_name,
 		  args) ;
     (void) printf(" let val gen_v = array(%d+%d, undefined) in\n",
-		  HEADER, size);
+		  GEN_HEADER, size);
     (void) printf(" update(gen_v, 0, int (%s+%d));\n", start, TYPE(bp)) ;
     (void) printf(" %s\n", updated_args);
 
@@ -236,17 +236,17 @@ char *args, *updated_args, *option_name ;
 
 void
 gen_and( bp )
-     struct binding *bp ;
+     struct gen_binding *bp ;
 {
     union domain *dom = bp->domain ;
     struct domainlist *dlp ;
     int size ;
 
-    gen_make(bp, gen_size(bp)-HEADER,
+    gen_make(bp, gen_size(bp)-GEN_HEADER,
 	     gen_args(dom->co.components), 
 	     gen_update_args(dom->co.components),
 	     "") ;
-    size = HEADER ;
+    size = GEN_HEADER ;
 
     for( dlp=dom->co.components ; dlp != NULL ; dlp=dlp->cdr )
 	    gen_member( bp->name, dlp->domain, size++ ) ;
@@ -258,7 +258,7 @@ gen_and( bp )
 
 void
 gen_or( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     extern int printf();
     char *name = bp->name ;
@@ -268,7 +268,7 @@ struct binding *bp ;
   
     (void) printf("fun %s_tag (vector or) = ", name ) ;
     (void) printf("case (sub (or,%d)) of (int x) => x;\n", 
-		  HEADER) ;
+		  GEN_HEADER) ;
 
     for( dlp=dom->co.components,offset=dom->co.first ;
 	dlp != NULL ; 
@@ -295,12 +295,12 @@ struct binding *bp ;
 
 void
 gen_list( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     extern int printf();
     char *name = bp->name ;
     union domain *dom = bp->domain ;
-    int data = HEADER ;
+    int data = GEN_HEADER ;
 
     gen_make(bp, 1, dom->li.constructor, gen_update_arg(dom, 2), "") ;
     (void) printf("fun %s_%s (vector li) = ", name, dom->li.constructor ) ;
@@ -311,7 +311,7 @@ struct binding *bp ;
 
 void
 gen_set( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     fprintf( stderr, "Set: too be implemented\n" ) ;
 }
@@ -320,12 +320,12 @@ struct binding *bp ;
 
 void
 gen_array( bp )
-     struct binding *bp ;
+     struct gen_binding *bp ;
 {
     extern int printf();
     char *name = bp->name ;
     union domain *dom = bp->domain ;
-    int data = HEADER ;
+    int data = GEN_HEADER ;
 
     gen_make(bp, 1, dom->ar.constructor, gen_update_arg(dom, 2), "");
     (void) printf("fun %s_%s (vector ar) = ", name, dom->ar.constructor ) ;
@@ -338,7 +338,7 @@ gen_array( bp )
 
 void
 gen_external( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     fprintf( stderr, "External: too be implemented\n" ) ;
 }
@@ -348,7 +348,7 @@ struct binding *bp ;
 
 void
 gen_domain( bp )
-struct binding *bp ;
+struct gen_binding *bp ;
 {
     extern int printf();
     union domain *dp = bp->domain ;
@@ -400,7 +400,7 @@ void
 gencode( file )
 char *file ;
 {
-    struct binding *bp = Domains ;
+    struct gen_binding *bp = Domains ;
     
     sprintf( start, "gen_%s_start", file ) ;
 
