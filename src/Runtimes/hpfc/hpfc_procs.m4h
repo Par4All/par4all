@@ -1,0 +1,28 @@
+c
+c COMMON /HPFC_PROCS/
+c
+c $RCSfile: hpfc_procs.m4h,v $ ($Date: 1994/04/11 10:23:56 $, )
+c version $Revision$
+c got on %D%, %T%
+c $Id$
+c
+c
+      common /HPFC_PROCS/
+     $     MYLID,
+     $     MYTID,
+     $     HOSTTID,
+     $     NODETIDS(MAXMAXSIZEOFPROCS),
+     $     MYPOS(7, MAXNBOFPROCESSORS),
+     $     NBOFTASKS,
+     $     NODECHANNELS(MAXMAXSIZEOFPROCS),
+     $     HOSTCHANNEL,
+     $     MCASTHOST,
+     $     MCASTNODES
+c
+      integer 
+     $     MYLID, MYTID, HOSTTID, NODETIDS, NBOFTASKS, MYPOS,
+     $     NODECHANNELS, HOSTCHANNEL,  MCASTHOST, MCASTNODES
+c
+c
+c that s all
+c
