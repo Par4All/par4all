@@ -326,6 +326,56 @@ static void RaySort(Matrix *Ray,SatMatrix *Sat,int NbBid,int NbRay,int *equal_bo
   }
 } /* RaySort */ 
 
+static void SatMatrix_Extend(SatMatrix *Sat, Matrix* Mat, unsigned rows)
+{
+  int i;
+  unsigned cols;
+  cols = (Mat->NbRows - 1)/(sizeof(int)*8) + 1;
+
+  Sat->p = (int **)realloc(Sat->p, rows * sizeof(int *));
+  if(!Sat->p) {
+    errormsg1("SatMatrix_Extend", "outofmem", "out of memory space");
+    return;
+  }
+  Sat->p_init = (int *)realloc(Sat->p_init, rows * cols * sizeof (int));
+  if(!Sat->p_init) {
+    errormsg1("SatMatrix_Extend", "outofmem", "out of memory space");
+    return;
+  }
+  for (i = 0; i < rows; ++i)
+    Sat->p[i] = Sat->p_init + (i * cols);
+  Sat->NbRows = rows;
+}
+
+static void Matrix_Extend(Matrix *Mat, unsigned NbRows)
+{
+  Value *p, **q;
+  unsigned rows = Mat->p_Init_size / Mat->NbColumns;
+  int i,j;
+
+  q = (Value **)realloc(Mat->p, NbRows * sizeof(*q));
+  if(!q) {
+    errormsg1("Matrix_Extend", "outofmem", "out of memory space");
+    return;
+  }
+  Mat->p = q;
+  p = (Value *)realloc(Mat->p_Init, NbRows * Mat->NbColumns * sizeof(Value));
+  if(!p) {
+    errormsg1("Matrix_Extend", "outofmem", "out of memory space");
+    return;
+  }
+  Mat->p_Init = p;
+  for (i=0;i<NbRows;i++) {
+    Mat->p[i] = Mat->p_Init + (i * Mat->NbColumns);
+    if (i < rows)
+      continue;
+    for (j=0;j<Mat->NbColumns;j++)   
+      value_init(Mat->p[i][j]);
+  }
+  Mat->p_Init_size = Mat->NbColumns*NbRows;
+  Mat->NbRows = NbRows;
+}
+
 /* 
  * Compute the dual of matrix 'Mat' and place it in matrix 'Ray'.'Mat' 
  * contains the constraints (equalities and inequalities) in rows and 'Ray' 
@@ -598,10 +648,9 @@ static int Chernikova (Matrix *Mat,Matrix *Ray,SatMatrix *Sat, unsigned NbBid, u
 	    
 	      if (!redundant) {
 		if (NbRay==NbMaxRays) {
-		  errormsg1("chernikova", "outofmem", "out of table space");
-		  UNCATCH(any_exception_error);
-		  value_clear(tmp);
-		  return 1;
+		  NbMaxRays *= 2;
+		  Matrix_Extend(Ray, NbMaxRays);
+		  SatMatrix_Extend(Sat, Mat, NbMaxRays);
 		}
 		
 		/* Compute the new ray */
