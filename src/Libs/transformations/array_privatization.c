@@ -88,7 +88,7 @@ bool array_section_privatizer(char *module_name)
     store_as_loop_locals = TRUE;
     privatize_sections = TRUE;
     copy_in = FALSE;
-    copy_out = TRUE;
+    copy_out = get_bool_property("ARRAY_SECTION_PRIV_COPY_OUT");
     return( privatizer(module_name) );    
 }
 
@@ -110,9 +110,9 @@ static bool privatizer(char *module_name)
 		privatize_sections || (!copy_in && !copy_out) );
 
     /* set and get the current properties concerning regions */
-    (void) set_bool_property("MUST_REGIONS", TRUE);
-    (void) set_bool_property("EXACT_REGIONS", TRUE);
-    (void) get_regions_properties();
+    set_bool_property("MUST_REGIONS", TRUE);
+    set_bool_property("EXACT_REGIONS", TRUE);
+    get_regions_properties();
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)
@@ -154,8 +154,8 @@ static bool privatizer(char *module_name)
     pips_debug(1, "begin\n");
 
     /* Compute the private regions of the module and of its loops. */
-    (void) private_regions_of_module_statement(module_stat); 
-    (void) private_regions_of_module_loops(module_stat);
+    private_regions_of_module_statement(module_stat); 
+    private_regions_of_module_loops(module_stat);
 
     pips_debug(1, "end\n");
     debug_off();
