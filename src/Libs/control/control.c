@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/10 19:52:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/10 20:14:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/04/10 19:52:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/04/10 20:14:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -580,33 +580,34 @@ compact_list(list ctls,
 			       i);
 	}
 	if(c_res != succ) {
+	    /* If it is not a loop on c_res, fuse the nodes: */
 	    if(instruction_block_p(succ_i=statement_instruction(succ_st))){
 		instruction_block(i) = 
-			gen_nconc(instruction_block(i), 
-				  instruction_block(succ_i));
+		    gen_nconc(instruction_block(i), 
+			      instruction_block(succ_i));
 		statement_instruction(succ_st) = instruction_undefined;
 		free_statement(succ_st);
 	    }
 	    else {
 		instruction_block(i) =
-			gen_nconc(instruction_block(i), 
-				  CONS(STATEMENT, succ_st, NIL));
+		    gen_nconc(instruction_block(i), 
+			      CONS(STATEMENT, succ_st, NIL));
 	    }
+	    /* Skip the useless control: */
+	    gen_free_list(control_successors(c_res));
+	    control_successors(c_res) = control_successors(succ);
+	    patch_references(PREDS_OF_SUCCS, succ, c_res);
+	    /* Now remove the useless control: */
+	    gen_free_list(control_predecessors(succ));
+	    control_successors(succ) = NIL;
+	    control_predecessors(succ) = NIL;
+	    control_statement(succ) = statement_undefined;
+	    free_control(succ);
 	}
-	/* Skip the useless control: */
-	gen_free_list(control_successors(c_res));
-	control_successors(c_res) = control_successors(succ);
-	patch_references(PREDS_OF_SUCCS, succ, c_res);
-	/* Now remove the useless control: */
-	gen_free_list(control_predecessors(succ));
-	control_successors(succ) = NIL;
-	control_predecessors(succ) = NIL;
-	control_statement(succ) = statement_undefined;
-	free_control(succ);
-	
-	if(/* We are at the end... */
+
+	if(			/* We are at the end... */
 	   succ == c_end
-	   || (/* ...or next time we will reach this end */
+	   || (			/* ...or next time we will reach this end */
 	       gen_length(control_successors(c_res)) == 1
 	       && CONTROL(CAR(control_successors(c_res))) == c_end)) {
 	    c_last = c_res;
@@ -1049,7 +1050,6 @@ statement st;
 	set_bool_property("PRETTYPRINT_EMPTY_BLOCKS", TRUE);
     }
 
-    hash_dont_warn_on_redefinition();
     Label_statements = hash_table_make(hash_string, LABEL_TABLES_SIZE);
     Label_control = hash_table_make(hash_string, LABEL_TABLES_SIZE);
     create_statements_of_labels(st);
@@ -1093,9 +1093,6 @@ statement st;
 	check_control_coherency(unstructured_exit(u));
 	pips_assert("Unstructured should be OK.", gen_consistent_p(u));
     }
-
-    /* Restore the normal behaviour... */
-    hash_warn_on_redefinition();
 
     debug_off();
 
