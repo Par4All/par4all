@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1996/06/15 14:32:01 $, 
+ * $Date: 1996/09/07 16:42:42 $, 
  */
 
 #include "defines-local.h"
@@ -115,7 +115,7 @@ make_reduction_function(
 {
     char buffer[100];
 
-    (void) sprintf(buffer, "%sRED_%d_%s_%s",
+    (void) sprintf(buffer, "%sRED %d %s %s",
 		   prefix, ndim, pvm_what_options(base), reduction_name(kind));
 
     return MakeRunTimeSupportFunction(buffer, nargs, basic_tag(base));
@@ -300,8 +300,8 @@ make_new_reduction_function(
     char buffer[100];
 
     (void) sprintf(buffer, "%s", concatenate
-	     (host? "H": "N", prolog? "PRE": "POST", "_",
-	      new_reduction_name(op), "_", pvm_what_options(base), NULL));
+	     (host? "H": "N", prolog? "PRE": "POST", " ",
+	      new_reduction_name(op), " ", pvm_what_options(base), NULL));
 
     return MakeRunTimeSupportSubroutine(buffer, 1);
 }
@@ -604,7 +604,7 @@ static entity make_shift_subroutine(entity var)
 
     ndim = gen_length(variable_dimensions(v));
 
-    (void) sprintf(buffer, "HPFC_SHIFT_%s_%d",
+    (void) sprintf(buffer, "HPFC SHIFT %s %d",
 		   pvm_what_options(variable_basic(v)),
 		   ndim);
 
