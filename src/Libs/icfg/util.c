@@ -23,19 +23,10 @@
 #include "text-util.h"
 #include "icfg.h"
 
-/* Graph is defined here for making daVinci */
-#include "dg.h"
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-#include "graph.h"
-#define ADD_ELEMENT_TO_LIST( _list, _type, _element) \
-    (_list = gen_nconc( _list, CONS( _type, _element, NIL)))
-
-
 void safe_free_vertex(vertex ver, list l_of_vers)
 {
     if (!gen_in_list_p(ver, l_of_vers))
-        free(ver);
+        free_vertex(ver);
     return;
 }
 
@@ -59,23 +50,26 @@ list list_of_connected_nodes(vertex ver, list l_of_vers)
 string remove_newline_of_string(string s)
 {
     string r = strdup(s);
-    if (*(r + strlen(r) - 1) == '\n')
-        *(r + strlen(r) - 1) = '\0';
+    int l = strlen(s);
+    if (l > 0) {
+        if (*(r + l - 1) == '\n') *(r + l - 1) = '\0';
+    }
     return r;
 }
 
 string add_flash_newline_to_string(string s)
 {
     string r;
-    if (strlen(s) == 0)
-      return "";
-    else if (*(s + strlen(s) - 1) == '\n') {
-        r = (string)malloc(strlen(s) + 1);
-	memset(r, 0, strlen(s) + 1);
-	strncpy(r, s, strlen(s) - 1);
+    int l = strlen(s);
+    if (l == 0)
+        return s;
+    else if (*(s + l - 1) == '\n') {
+        r = (string)malloc(l + 1);
+	memset(r, 0, l + 1);
+	strncpy(r, s, l - 1);
     } else {
-        r = (string)malloc(strlen(s) + 2);
-	memset(r, 0, strlen(s) + 2);
+        r = (string)malloc(l + 2);
+	memset(r, 0, l + 2);
 	strcpy(r, s);
     }
     strcat(r, "\\n");
@@ -90,7 +84,7 @@ vertex get_vertex_by_string(string str_name, list l_of_vers)
         sentence ver_first_sen = SENTENCE(CAR(sens));
 	string ver_name = first_word_of_sentence(ver_first_sen);
 	string ver_real_name = remove_newline_of_string(ver_name);
-	if (same_string_p(ver_real_name, str_name)) {
+	if (same_string_p(ver_real_name, str_name) || same_string_p(ver_name, str_name)) {
 	    free(ver_real_name);
 	    return ver;
 	} else
@@ -101,16 +95,10 @@ vertex get_vertex_by_string(string str_name, list l_of_vers)
 
 string sentence_to_string(sentence sen)
 {
-    string r;
-    if (!sentence_formatted_p(sen)) {
-        string s = words_to_string(unformatted_words(sentence_unformatted(sen)));
-	r = add_flash_newline_to_string(s);
-	free(s);
-    } else {
-        string s = sentence_formatted(sen);
-	r = add_flash_newline_to_string(s);
-    }
-    return r;
+    if (!sentence_formatted_p(sen))
+        return words_to_string(unformatted_words(sentence_unformatted(sen)));
+    else
+        return sentence_formatted(sen);
 }
 
 list safe_make_successor(vertex ver_parent, vertex ver_child, list l_of_vers)
@@ -137,7 +125,7 @@ list safe_make_successor(vertex ver_parent, vertex ver_child, list l_of_vers)
 }
 
 
-void print_graph_of_text_to_daVinci(FILE * f_out, graph g_in)
+void print_graph_of_text_to_daVinci(FILE * f_out, list l_of_vers)
 {
     bool first_node_parent = TRUE;
     fprintf(f_out, "[\n");
@@ -153,11 +141,16 @@ void print_graph_of_text_to_daVinci(FILE * f_out, graph g_in)
 	    fprintf(f_out, ",\n");
 	
 	MAP(SENTENCE, sen, {
+	    string s = sentence_to_string(sen);
 	    if (first_sentence) {
-	        fprintf(f_out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"", remove_newline_of_string(first_word_of_sentence(sen)));
+	        fprintf(f_out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"", remove_newline_of_string(s));
 		first_sentence = FALSE;
 	    }
-	    fprintf(f_out, sentence_to_string(sen));
+	    if (strstr(s, CALL_MARK)) {
+	      /*fprintf(f_out, add_flash_newline_to_string(s + strlen(CALL_MARK)));*/
+	    } else {
+	        fprintf(f_out, add_flash_newline_to_string(s));
+	    }
 	}, text_sentences(node_parent_text));
 	
 	fprintf(f_out, "\")],[\n");
@@ -166,35 +159,86 @@ void print_graph_of_text_to_daVinci(FILE * f_out, graph g_in)
 	    vertex ver_child = successor_vertex(succ);
 	    text node_child_text = (text)vertex_vertex_label(ver_child);
 	    sentence node_child_sen = SENTENCE(CAR(text_sentences(node_child_text)));
-	    string node_name_child = first_word_of_sentence(node_child_sen);
+	    string node_name_child = remove_newline_of_string(first_word_of_sentence(node_child_sen));
 	    
 	    if (first_node_child)
 	        first_node_child = FALSE;
 	    else
 	        fprintf(f_out, ",\n");
-	    fprintf(f_out, "  l(\"\",e(\"\",[],r(\"%s\")))", remove_newline_of_string(node_name_child));
+	    fprintf(f_out, "  l(\"\",e(\"\",[],r(\"%s\")))", node_name_child);
+	    free(node_name_child);
 	}, vertex_successors(ver_parent));
 
 	fprintf(f_out, "]))");
-    }, graph_vertices(g_in));
+    }, l_of_vers);
     
     fprintf(f_out, "\n]");
     
     return;
 }
 
-void print_graph_daVinci_with_starting_node(FILE * f_out, vertex start_ver)
+void print_graph_daVinci_from_starting_node(FILE * f_out, vertex start_ver)
 {
-    graph g = NULL;
     list l = NIL;
     ADD_ELEMENT_TO_LIST(l, VERTEX, start_ver);
     l = list_of_connected_nodes(start_ver, l);
-    g = make_graph(l);
-    print_graph_of_text_to_daVinci(f_out, g);
-    /*free_graph(g);*/
+    print_graph_of_text_to_daVinci(f_out, l);
     gen_free_list(l);
-    l = NIL;
     return;
+}
+
+void print_marged_text_from_starting_node(FILE *fd, int margin, vertex start_ver, list l_of_vers)
+{
+    if (!vertex_undefined_p(start_ver)) {
+        text txt = (text)vertex_vertex_label(start_ver);
+	bool first_sen = TRUE; /* the name of module is stored in the first sentence */
+	MAP(SENTENCE, sen, {
+            string s = remove_newline_of_string(sentence_to_string(sen));
+	    if(strstr(s, CALL_MARK)) {
+	        vertex ver_child = get_vertex_by_string(s + strlen(CALL_MARK), l_of_vers);
+		print_marged_text_from_starting_node(fd, margin + ICFG_SCAN_INDENT, ver_child, l_of_vers);
+	    } else {
+	        if (strlen(s) != 0) {
+		    if (first_sen) {
+		        fprintf(fd, "%*s%s\n", margin, "", s);
+			first_sen = FALSE;
+		    } else {
+		      fprintf(fd, "%*s%s\n", margin + ICFG_SCAN_INDENT, "", s);
+		    }
+		}
+	    }
+	    free(s);
+	}, text_sentences(txt));
+    }
+    return;
+}
+
+bool make_resource_from_starting_node
+(string mod_name, string res_name, string file_ext, vertex start_ver, list l_of_vers, bool res_text_type)
+{
+    string filename, localfilename, dir;
+    FILE *fd;
+    
+    localfilename = db_build_file_resource_name(res_name, mod_name, file_ext);
+    dir = db_get_current_workspace_directory();
+    filename = strdup(concatenate(dir, "/", localfilename, NULL));
+    free(dir);
+
+    fd = safe_fopen(filename, "w");
+    if (!vertex_undefined_p(start_ver)) {
+        if (res_text_type) {
+	    print_marged_text_from_starting_node(fd, 0, start_ver, l_of_vers);
+	    safe_fclose(fd, filename);
+	    write_an_attachment_file(filename);
+	    free(filename);
+	} else {
+	    print_graph_daVinci_from_starting_node(fd, start_ver);
+	    safe_fclose(fd, filename);
+	}
+    }
+    DB_PUT_FILE_RESOURCE(res_name, mod_name, localfilename);
+    
+    return TRUE;
 }
 
 list /* of entity */ get_list_of_variable_to_filter() {
