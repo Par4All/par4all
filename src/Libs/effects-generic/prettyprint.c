@@ -399,7 +399,7 @@ push_prettyprints(
 
     if (!string_undefined_p(resource_name))
 	add_a_generic_prettyprint(resource_name, 
-				  TRUE, 
+				  FALSE, 
 				  effects_to_text_func,
 				  effects_prettyprint_func, 
 				  attach_effects_decoration_to_text_func);
