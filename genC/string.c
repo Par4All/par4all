@@ -89,18 +89,13 @@ register string s; /* la chaine a copier */
 #define MAX(x,y) (((x)>(y))?(x):(y))
 #endif
 
-/* concatenation is based on a static dynamic buffer
- * which is shared from one call to another.
- * FC.
- */
-string 
-concatenate(string next, ...)
+static string buffer = (string) NULL;
+static int buffer_size = 0;
+static int current = 0;
+
+void
+init_the_buffer()
 {
-    static string buffer = (string) NULL;
-    static int buffer_size = 0;
-    int current = 0; /* first not used char */
-    va_list args;
-    
     /* initial allocation
      */
     if (buffer_size==0)
@@ -109,36 +104,60 @@ concatenate(string next, ...)
 	buffer = (string) malloc(BUFFER_SIZE_INCREMENT);
 	buffer_size = BUFFER_SIZE_INCREMENT;
     }
+    current = 0;
+    buffer[0] = '\0';
+}
+
+string 
+append_to_the_buffer(
+    string s) /* what to append to the buffer */
+{
+    int len = strlen(s);
+
+    /* reallocates if needed
+     */
+    if (current+len >= buffer_size)
+    {
+	buffer_size = MAX(current+len+1, buffer_size+BUFFER_SIZE_INCREMENT);
+	buffer = realloc(buffer, buffer_size);
+    }
+
+    (void) memcpy(&buffer[current], s, len);
+    current+=len;
+    buffer[current] = '\0' ;
+
+    return buffer;
+}
+
+string 
+get_the_buffer()
+{
+    return buffer;
+}
+
+/* concatenation is based on a static dynamic buffer
+ * which is shared from one call to another.
+ * FC.
+ */
+string 
+concatenate(string next, ...)
+{
+    va_list args;
+    
+    init_the_buffer();
 
     /* now gets the strings and concatenates them
      */
     va_start(args, next);
     while (next)
     {
-	int len = strlen(next);
-
-	/* reallocates if needed
-	 */
-	if (current+len >= buffer_size)
-	{
-	    int size = MAX(current+len+1, buffer_size+BUFFER_SIZE_INCREMENT);
-	    string new_buffer = (string) malloc(size);
-	    
-	    (void) memcpy(new_buffer, buffer, current);
-
-	    free(buffer); buffer = new_buffer, buffer_size = size;
-	}
-
-	(void) memcpy(&buffer[current], next, len);
-	current+=len;
-	
+	(void) append_to_the_buffer(next);
 	next = va_arg(args, string);
     }
     va_end(args);
 
     /* returns the static null terminated buffer
      */
-    buffer[current] = '\0' ;
     return buffer;
 }
 
