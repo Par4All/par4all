@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <dirent.h>
+#include <setjmp.h>
 
 #include "genC.h"
 #include "misc.h"
