@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.219 2002/05/03 15:23:17 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.220 2002/05/04 13:15:03 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2427,7 +2427,7 @@ text_named_module(
         ADD_SENTENCE_TO_TEXT(r, 
             attach_head_to_sentence(make_sentence(is_sentence_formatted, 
 						  strdup(s)),
-						  module));*/
+						  module));
     }
 
     if (stat != statement_undefined) {
