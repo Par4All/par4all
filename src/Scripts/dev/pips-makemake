@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/07 17:05:36 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/08 18:19:39 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -671,7 +671,7 @@ build-header-file:
 # checks for the header file, and build if necessary...
 # it is build for the GNU target, because it is the only ANSI one...
 # FILE* and so are not struct _iobuf or so.
-# if pips is exported, may you should consider HEADER_ARCH="". FC.
+# if pips is exported, you should consider HEADER_ARCH="". FC.
 
 # header: checks for INC_TARGET dependencies (.header) and for
 # INC_TARGET existance !
@@ -692,21 +692,32 @@ $(INC_TARGET): $(TARGET)-local.h
 # indirect depend bacause I do not trust make for the inclusion of
 # Makefile.depend if that very file does not exist.
 
-.depend: $(CFILES) $(DERIVED_CFILES) 
-	$(RM) $MAKEFILE.depend.$(ARCH)
-	test ! "$(CFILES)$(DERIVED_CFILES)" || \
-	        $(PREPROC) -M $(CFILES) $(DERIVED_CFILES) |\
-		sed 's,^\(.*\.o:\),\$\$(ARCH)/\1,' > $MAKEFILE.depend.$(ARCH)
-	touch $MAKEFILE.depend.$(ARCH) .depend 
+.depend: $(CFILES) $(DERIVED_CFILES) $MAKEFILE.depend.$(ARCH)
+	touch \$@
 
 depend: $(INC_TARGET) .depend
 
 # default rule if the dependence file is not there...
-# forces the regeneration.
+# forces the regeneration:
+# - the dependences' generation needs the headers
+# - the headers are generated thru the Makefile.
+# - the Makefile needs the dependences.
+# how to get out of this?
 $MAKEFILE.depend.$(ARCH):
-	@touch \$@
-	@$(RM) .depend
-	$(MAKE) --no-print-directory depend
+	# creates an empty dependence file, it is ok for going on and
+	# will prevent any recursion for generating the same dependences.
+	touch \$@ 
+	# the headers are needed. but they may be built under some other ARCH,
+	# hence the bootstrap for avoiding building it twice recursively.
+	test -f $(TARGET).h -o -f .bootstrap || \\
+	    { touch $(TARGET).h .bootstrap ; \\
+	      $(RM) .header; $(MAKE) $(GMKNODIR) header; $(RM) .bootstrap;}
+	# may need the derived files
+	test ! "$(DERIVED_CFILES)" || $(MAKE) $(GMKNODIR) $(DERIVED_CFILES)
+	# now it's okay fo building all the dependences.
+	test ! "$(CFILES)$(DERIVED_CFILES)" || \\
+	        $(PREPROC) -M $(CFILES) $(DERIVED_CFILES) |\\
+		sed 's,^\(.*\.o:\),\$\$(ARCH)/\1,' > \$@
 
 #
 # dependences are stored in another file which is simply included.
