@@ -19,15 +19,3 @@ struct eformat {
 /* What is returned by dead_test_filter : */
 enum dead_test { nothing_about_test, then_is_dead, else_is_dead };
 typedef enum dead_test dead_test;
-
-/* To specify the way that remove_a_control_from_a_list_and_relink
-   acts: */
-enum remove_a_control_from_a_list_and_relink_direction 
-{
-   /* Put some strange number to avoid random clash as much as
-      possible... */
-   source_is_predecessor_and_dest_is_successor = 119,
-      source_is_successor_and_dest_is_predecessor = -123
-      };
-typedef enum remove_a_control_from_a_list_and_relink_direction
-remove_a_control_from_a_list_and_relink_direction;
