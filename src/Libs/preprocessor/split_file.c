@@ -18,6 +18,7 @@
  * - "PROGRAM MAIN..." added if implicit program name.
  * - extr* stuff dropped.
  * - dir_name for localizing files...
+ * - \r skipped
  */
 
 static void hollerith(char *);
@@ -201,7 +202,7 @@ static int lend()
 	if (*p != 'd' && *p != 'D') return(0);
 	p++;
 	trim(p);
-	if (p - buf >= 72 || *p == '\n')
+	if (p - buf >= 72 || *p == '\n' || *p == '\r')
 		return (1);
 	return (0);
 }
