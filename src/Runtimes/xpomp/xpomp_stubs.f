@@ -1,5 +1,5 @@
 ! $RCSfile: xpomp_stubs.f,v $ (version $Revision$)
-! $Date: 1996/09/02 18:33:02 $, 
+! $Date: 1996/09/03 18:13:14 $, 
 !
 ! List of fake functions to have PIPS happy with 
 ! the same « effects » as the xPOMP graphical library.
@@ -159,6 +159,34 @@
             print *, image(x, y)
          enddo
       enddo
+      read *, status
+      end
+      
+      subroutine xpomp_scroll(window, y, result)
+      integer window, y, result
+!fcd$ io
+!fcd$ fake
+      print *, window, y
+      read *, result
+      end
+      
+      subroutine xpomp_draw_frame(window,
+     &     title,
+     &     title_color, background_color,
+     &     X0, Y0, X1, Y1,
+     &     color,
+     &     status)
+      integer window
+      character*(*) title
+      integer title_color, background_color
+      integer X0, Y0, X1, Y1
+      integer color
+      integer status
+!fcd$ io
+!fcd$ fake
+      print *, window, title, title_color, background_color,
+     &     X_data_array_size, Y_data_array_size,
+     &     X0, Y0, X1, Y1, color
       read *, status
       end
       
