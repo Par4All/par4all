@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/07 12:13:18 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/07 12:15:50 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -37,7 +37,7 @@ MAKEFILE=Makefile
 CONFIG_FILE=config.makefile
 
 DIRSIDE="$DEVEDIR"
-DIRTYPE=`basename \`dirname \\\`pwd\\\`\``
+DIRTYPE=''
 DIRS='.'
 ALL=''
 ALL_RULE_TARGET=''
@@ -60,7 +60,7 @@ done
 shift `expr $OPTIND - 1`
 
 [ $# -eq 0 ] || usage 3 "$# remaining parameters"
-[ "${DIRTYPE}" ] || usage 4 "must specify -l|p|s|r"
+[ "${DIRTYPE}" ] || DIRTYPE=`basename \`dirname \\\`pwd\\\`\``
 
 # delayed to ensure that DIRTYPE is available
 
