@@ -12,11 +12,11 @@
  * New common variable ARRAY_BOUND_CHECK_COUNT is added.
  * For each bound check, we increase ARRAY_BOUND_CHECK_COUNT by one
  * If the module is the main program, we initialize 
- * ARRAY_BOUND_CHECK_COUNT equal to 0 and before the terminasion 
+ * ARRAY_BOUND_CHECK_COUNT equal to 0 and before the termination 
  * of program, we display the value of ARRAY_BOUND_CHECK_COUNT. 
  *
  *
- * Hypothese : there is no write effect on the array bound expression.
+ * Hypotheses : there is no write effect on the array bound expression.
  *
  * There was a test for write effect on bound here but I put it away (in 
  * effect_on_array_bound.c) because it takes time to calculate the effect
@@ -158,7 +158,7 @@ statement array_bound_check_display()
 static void abc_instrumentation_insert_before_statement(statement s, statement s1,
 				 abc_instrumentation_context_p context)
 {
-  /* If s is in an unstructured instruction, we must pay attetion 
+  /* If s is in an unstructured instruction, we must pay attention 
      when inserting s1 before s.  */
   if (bound_persistant_statement_to_control_p(context->map, s))
     {
@@ -210,7 +210,7 @@ static void abc_instrumentation_insert_before_statement(statement s, statement s
 	}
       else
 	{
-	  // there is no untructured (?)
+	  // there is no unstructured (?)
 	  insert_statement(s,s1,TRUE);
 	}
     }
@@ -237,11 +237,11 @@ static void initial_code_abc_statement_rwt(statement s,abc_instrumentation_conte
 	}
       if (stop_statement_p(s) || (entity_main_module_p(mod_ent) && return_statement_p(s)) )
 	{
-	  // There are 2 kinds of statement which cause the execution of the program to terminate
-	  // 1. STOP statement in every module
-	  // 2. END statement in main program
-	  // ( PIPS considers the END statement of MAIN PROGRAM as a RETURN statement)
-	  // we display the counter of bound checks before these kinds of statement 
+	  /* There are 2 kinds of statement which cause the execution of the program to terminate
+	   1. STOP statement in every module
+	   2. END statement in main program
+	   ( PIPS considers the END statement of MAIN PROGRAM as a RETURN statement)
+	   we display the counter of bound checks before these kinds of statement */
 
 	  statement tmp = array_bound_check_display();
 	  abc_instrumentation_insert_before_statement(s,tmp,context);
@@ -291,7 +291,7 @@ static bool abc_bound_violation_stop_statement_p(statement s)
 	{
 	  expression e = EXPRESSION(CAR(l));
 	  string name = entity_name(call_function(syntax_call(expression_syntax(e))));	  
-	  fprintf(stderr, "name = %s\n",name);
+	  //  fprintf(stderr, "name = %s\n",name);
 	  if (strstr(name,"Bound violation") != NULL) return TRUE;
 	  return FALSE;
 	}
@@ -373,13 +373,13 @@ static void pips_code_abc_statement_rwt(statement s, abc_instrumentation_context
       if ((stop_statement_p(s) && !abc_bound_violation_stop_statement_p(s)) 
 	  || (return_statement_p(s) && entity_main_module_p(mod_ent)))
 	{
-	  // There are 2 kinds of statement which cause the execution of the program to terminate
-	  // 1. STOP statement in every module
-	  // 2. END statement in main program
-	  // ( PIPS considers the END statement of MAIN PROGRAM as a RETURN statement)
-	  // we display the counter of bound checks before these kinds of statement 
+	  /* There are 2 kinds of statement which cause the execution of the program to terminate
+	   1. STOP statement in every module
+	   2. END statement in main program
+	   ( PIPS considers the END statement of MAIN PROGRAM as a RETURN statement)
+	   we display the counter of bound checks before these kinds of statement 
 
-	  // The case of STOP "Bound violation" is done seperatally
+	   The case of STOP "Bound violation" is done separately */
 	  
 	  statement tmp = array_bound_check_display();
 	  abc_instrumentation_insert_before_statement(s,tmp,context);
@@ -453,8 +453,8 @@ bool array_bound_check_instrumentation(char *module_name)
 { 
   statement module_statement;
   
-  // add COMMON /ARRAY_BOUND_CHECK/ ARRAY_BOUND_CHECK_COUNT to the declaration
-  // if main program : DATA ARRAY_BOUND_CHECK_COUNT /0/
+  /* add COMMON /ARRAY_BOUND_CHECK/ ARRAY_BOUND_CHECK_COUNT to the declaration
+     if main program : DATA ARRAY_BOUND_CHECK_COUNT /0/*/
 
   string new_decl = 
     "      INTEGER*8 ARRAY_BOUND_CHECK_COUNT\n"
@@ -517,7 +517,7 @@ bool array_bound_check_instrumentation(char *module_name)
       // module_reorder(module_statement);
       ifdebug(1)
 	{
-	  debug(1, " Initial code array bound check instrumention",
+	  debug(1, " Initial code array bound check instrumentation",
 		"Begin for %s\n", module_name);
 	  pips_assert("Statement is consistent ...", 
 		      statement_consistent_p(module_statement));
@@ -559,6 +559,7 @@ bool array_bound_check_instrumentation(char *module_name)
   return TRUE;
  
 }
+
 
 
 
