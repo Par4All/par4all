@@ -80,32 +80,35 @@ statement stat;
     return (t);
 }
 
-void print_code_complexities(module_name)
+bool print_code_complexities(module_name)
 char *module_name;
 {
   is_user_view = FALSE;
-  print_code_or_source_comp(module_name);
+  return print_code_or_source_comp(module_name);
 }
 
-void print_source_complexities(module_name)
+bool print_source_complexities(module_name)
 char *module_name;
 {
   is_user_view = TRUE;
-  print_code_or_source_comp(module_name);
+  return print_code_or_source_comp(module_name);
 }
 
-void print_code_or_source_comp(module_name)
+bool print_code_or_source_comp(module_name)
 char *module_name;
 {
     FILE *fd;
     entity mod;
     statement mod_stat,user_stat;
-    char *fn = strdup(concatenate(db_get_current_program_directory(), 
-				  "/",
-				  module_name,
-				  is_user_view? ".ucomp" : ".comp",
-                                  get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
-				  NULL));
+    char *fn = strdup
+	(concatenate
+	 (db_get_current_program_directory(), 
+	  "/",
+	  module_name,
+	  is_user_view? ".ucomp" : ".comp",
+	  get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
+	  GRAPH_FILE_EXT : "",
+	  NULL));
     text txt = make_text(NIL);
 
     
@@ -136,10 +139,12 @@ char *module_name;
     print_text(fd, txt);
     safe_fclose(fd, fn);
 
-    DB_PUT_FILE_RESOURCE(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? DBR_GRAPH_PRINTED_FILE
-                         : is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE,
-			 strdup(module_name),
-			 fn);
+    DB_PUT_FILE_RESOURCE
+	(get_bool_property
+	 ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? DBR_GRAPH_PRINTED_FILE
+	 : is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE,
+	 strdup(module_name),
+	 fn);
 
     if(is_user_view) {
 	hash_table_free(nts);
@@ -148,6 +153,8 @@ char *module_name;
     reset_complexity_map();
     reset_current_module_entity();
     reset_current_module_statement();
+
+    return TRUE;
 }
 
 text text_summary_complexity(module)
