@@ -1,6 +1,6 @@
 dnl
 dnl $RCSfile: hpfc_architecture_m4_macros,v $ version $Revision$
-dnl ($Date: 1996/09/09 16:43:32 $, )
+dnl ($Date: 1996/10/17 11:31:36 $, )
 dnl
 dnl DEFAULT ARCHITECTURE
 dnl
@@ -27,21 +27,15 @@ ifelse(PVM_ARCH,`CM5',`define(`COM_PREFIX',`CM')')dnl
 ifelse(PVM_ARCH,`SUN4',`define(`_SUN4',`$@')',
        PVM_ARCH,`SUNMP',`define(`_SUNMP',`$@')', 
        PVM_ARCH,`PGON',`define(`_PGON',`$@')',
-       PVM_ARCH,`CRAY',`define(`_CRAY',`$@')',
        PVM_ARCH,`CM5',`define(`_CM5',`$@')',
        PVM_ARCH,`ALPHA',`define(`_ALPHA',`$@')',
-       PVM_ARCH,`RS6K',`define(`_RS6K',`$@')')dnl
+       PVM_ARCH,`RS6K',`define(`_RS6K',`$@')',
+       PVM_ARCH,`CRAY',`define(`_CRAY',`$@')')dnl
 dnl
 dnl whether to spawn
 dnl
 ifelse(PVM_ARCH, `CRAY', `define(`_spawn',)')dnl
 ifelse(PVM_ARCH, `CRAY', `define(`_getpe',`$@')')dnl
-dnl
-dnl GNU Fortran compiler g77
-dnl byte is not supported...
-dnl
-ifdef(`USE_GNU',`define(`_GNU',`$@')',`define(`_GNU',)')dnl
-ifdef(`USE_GNU',`define(`_NOGNU',)',`define(`_NOGNU',`$@')')dnl
 dnl
 dnl TO USE IBM PVMe IMPLEMENTATION
 dnl 
