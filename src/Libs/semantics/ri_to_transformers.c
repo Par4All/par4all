@@ -575,7 +575,7 @@ expression expr;
 	       value_mappings_compatible_vector_p() */
 	    Pvecteur vexpr = vect_dup((Pvecteur) normalized_linear(n));
 	    Pcontrainte c;
-	    Pvecteur eq;
+	    Pvecteur eq = VECTEUR_NUL;
 
 	    ifdebug(9) {
 		(void) fprintf(stderr,"Expression to linearize:\n");
