@@ -10,6 +10,10 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.60  2001/10/22 15:42:16  irigoin
+  * Intraprocedural preconditions can be propagated along transformers to
+  * refine them.
+  *
   * Revision 1.59  2001/07/24 13:21:55  irigoin
   * Formatting added
   *
@@ -123,7 +127,8 @@ transformer filter_transformer(transformer t, list e)
   Psysteme s = SC_UNDEFINED;
   Psysteme sc = predicate_system(transformer_relation(t));
   list args = NIL;
-  
+  Psysteme sc_restricted_to_variables_transitive_closure(Psysteme, Pbase);
+
   MAP(EFFECT, ef, 
   {
     reference r = effect_reference(ef);
@@ -154,7 +159,7 @@ transformer filter_transformer(transformer t, list e)
 
 /* SHARING : returns the transformer stored in the database. Make a copy 
  * before using it. The copy is not made here because the result is not 
- * always used after a call to this function, and itwould create non 
+ * always used after a call to this function, and it would create non 
  * reachable structures. Another solution would be to store a copy and free 
  * the unused result in the calling function but transformer_free does not 
  * really free the transformer. Not very clean. 
@@ -162,11 +167,13 @@ transformer filter_transformer(transformer t, list e)
  */
 
 static transformer 
-block_to_transformer(list b)
+block_to_transformer(list b, transformer pre)
 {
   statement s;
-  transformer btf;
+  transformer btf = transformer_undefined;
   transformer stf = transformer_undefined;
+  transformer post = transformer_undefined;
+  transformer next_pre = transformer_undefined;
   list l = b;
 
   pips_debug(8,"begin\n");
@@ -175,16 +182,26 @@ block_to_transformer(list b)
     btf = transformer_identity();
   else {
     s = STATEMENT(CAR(l));
-    stf = statement_to_transformer(s);
+    stf = statement_to_transformer(s, pre);
+    post = transformer_safe_apply(stf, pre);
     btf = transformer_dup(stf);
     for (POP(l) ; !ENDP(l); POP(l)) {
       s = STATEMENT(CAR(l));
-      stf = statement_to_transformer(s);
+      if(!transformer_undefined_p(next_pre))
+	free_transformer(next_pre);
+      next_pre = post;
+      stf = statement_to_transformer(s, next_pre);
+      post = transformer_safe_apply(stf, next_pre);
       btf = transformer_combine(btf, stf);
+      btf = transformer_normalize(btf, 7);
       ifdebug(1) 
-	pips_assert("consistent transformer", 
+	pips_assert("btf is a consistent transformer", 
 		    transformer_consistency_p(btf));
+	pips_assert("post is a consistent transformer if pre is defined", 
+		    transformer_undefined_p(pre)
+		    || transformer_consistency_p(post));
     }
+    free_transformer(post);
   }
 
   pips_debug(8, "end\n");
@@ -192,7 +209,7 @@ block_to_transformer(list b)
 }
 
 static void 
-unstructured_to_transformers(unstructured u)
+unstructured_to_transformers(unstructured u, transformer pre)
 {
   list blocs = NIL ;
   control ct = unstructured_control(u) ;
@@ -205,7 +222,7 @@ unstructured_to_transformers(unstructured u)
    */
   CONTROL_MAP(c, {
     statement st = control_statement(c) ;
-    (void) statement_to_transformer(st) ;
+    (void) statement_to_transformer(st, pre) ;
   }, ct, blocs) ;
   
   gen_free_list(blocs) ;
@@ -214,7 +231,7 @@ unstructured_to_transformers(unstructured u)
 }
 
 static transformer 
-unstructured_to_transformer(unstructured u, list e) /* effects */
+unstructured_to_transformer(unstructured u, transformer pre, list e) /* effects */
 {
   transformer ctf;
   transformer tf;
@@ -228,17 +245,25 @@ unstructured_to_transformer(unstructured u, list e) /* effects */
   if(control_predecessors(c) == NIL && control_successors(c) == NIL) {
     /* there is only one statement in u; no need for a fix-point */
     pips_debug(8,"unique node\n");
-    ctf = statement_to_transformer(control_statement(c));
+    ctf = statement_to_transformer(control_statement(c), pre);
     tf = transformer_dup(ctf);
   }
   else {
-    statement exit = control_statement(unstructured_exit(u));
+    /* statement exit = control_statement(unstructured_exit(u)); */
+
+    /* simple unstructured fixpoint */
+    transformer fpf = effects_to_transformer(e);
+    /* approximate precondition for nodes */
+    transformer epre = transformer_safe_apply(fpf, pre);
       
     pips_debug(8,"complex: based on effects\n");
       
-    unstructured_to_transformers(u);
-      
-    tf = unstructured_to_accurate_transformer(u, e);
+    /* compute node transformers */
+    unstructured_to_transformers(u, epre);
+    free_transformer(epre);
+
+    /* compute CFG transformer */
+    tf = unstructured_to_accurate_transformer(u, pre, e);
   }
 
   pips_debug(8,"end\n");
@@ -267,345 +292,15 @@ effects_to_arguments(list fx) /* list of effects */
   return args;
 }
 
-/* The loop initialization is performed before tf */
-transformer transformer_add_loop_index_initialization(transformer tf, loop l)
-{
-  entity i = loop_index(l);
-  range r = loop_range(l);
-  normalized nlb = NORMALIZE_EXPRESSION(range_lower(r));
-
-  if(entity_has_values_p(i) && normalized_linear_p(nlb)) {
-    Psysteme sc = (Psysteme) predicate_system(transformer_relation(tf));
-    Pcontrainte eq = CONTRAINTE_UNDEFINED;
-    Pvecteur v_lb = vect_dup(normalized_linear(nlb));
-    Pbase b_tmp, b_lb = make_base_from_vect(v_lb); 
-    entity i_init = entity_to_old_value(i);
-
-    vect_add_elem(&v_lb, (Variable) i_init, VALUE_MONE);
-    eq = contrainte_make(v_lb);
-    /* The new variables in eq must be added to sc; otherwise,
-     * further consistency checks core dump. bc.
-     */
-    /* sc_add_egalite(sc, eq); */
-    /* The call to sc_projection_with_eq frees eq */
-    sc = sc_projection_by_eq(sc, eq, (Variable) i_init);
-    b_tmp = sc_base(sc);
-    sc_base(sc) = base_union(b_tmp, b_lb);
-    sc_dimension(sc) = base_dimension(sc_base(sc));
-    base_rm(b_tmp);
-    base_rm(b_lb);
-    if(SC_RN_P(sc)) {
-      /* FI: a NULL is not acceptable; I assume that we cannot
-       * end up with a SC_EMPTY...
-       */
-      predicate_system_(transformer_relation(tf)) =
-	newgen_Psysteme
-	(sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED));
-    }
-    else
-      predicate_system_(transformer_relation(tf)) = 
-	newgen_Psysteme(sc);
-  }
-  else if(entity_has_values_p(i)) {
-    /* Get rid of the initial value since it is unknowable */
-    entity i_init = entity_to_old_value(i);
-    list l_i_init = CONS(ENTITY, i_init, NIL);
-
-    tf = transformer_projection(tf, l_i_init);
-  }
-
-return tf;
-}
-
-transformer transformer_add_loop_index_incrementation(transformer tf, loop l)
-{
-  entity i = loop_index(l);
-  range r = loop_range(l);
-  expression incr = range_increment(r);
-  Pvecteur v_incr = VECTEUR_UNDEFINED;
-
-  pips_assert("Transformer tf is consistent before update",
-	      transformer_consistency_p(tf));
-
-  /* it does not contain the loop index update
-     the loop increment expression must be linear to find inductive 
-     variables related to the loop index */
-  if(!VECTEUR_UNDEFINED_P(v_incr = expression_to_affine(incr))) {
-    if(entity_has_values_p(i)) {
-      if(value_mappings_compatible_vector_p(v_incr)) {
-	tf = transformer_add_variable_incrementation(tf, i, v_incr);
-      }
-      else {
-	entity i_old = entity_to_old_value(i);
-	entity i_new = entity_to_new_value(i);
-	Psysteme sc = predicate_system(transformer_relation(tf));
-	Pbase b = sc_base(sc);
-	
-	transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), i);
-	b = base_add_variable(b, (Variable) i_old);
-	b = base_add_variable(b, (Variable) i_new);
-	sc_base(sc) = b;
-	sc_dimension(sc) = base_dimension(sc_base(sc));
-      }
-    }
-    else {
-      pips_user_warning("non-integer or equivalenced loop index %s?\n",
-			entity_local_name(i));
-    }
-  }
-  else {
-    if(entity_has_values_p(i)) {
-      entity i_old = entity_to_old_value(i);
-      entity i_new = entity_to_new_value(i);
-      Psysteme sc = predicate_system(transformer_relation(tf));
-      Pbase b = sc_base(sc);
-
-      transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), i);
-      b = base_add_variable(b, (Variable) i_old);
-      b = base_add_variable(b, (Variable) i_new);
-      sc_base(sc) = b;
-      sc_dimension(sc) = base_dimension(sc_base(sc));
-    }
-  }
-
-  pips_assert("Transformer tf is consistent after update",
-	      transformer_consistency_p(tf));
-
-  return tf;
-}
-
-/* The transformer associated to a DO loop does not include the exit 
- * condition because it is used to compute the precondition for any 
- * loop iteration.
- *
- * There is only one attachment for the unbounded transformer and
- * for the bounded one.
- */
-
-static transformer 
-loop_to_transformer(loop l)
-{
-  /* loop transformer tf = tfb* or tf = tfb+ or ... */
-  transformer tf;
-  /* loop body transformer */
-  transformer tfb;
-  range r = loop_range(l);
-  statement s = loop_body(l);
-
-  pips_debug(8,"begin\n");
-
-  /* compute the loop body transformer */
-  tfb = transformer_dup(statement_to_transformer(s));
-  tfb = transformer_add_loop_index_incrementation(tfb, l);
-
-  /* compute tfb's fix point according to pips flags */
-  tf = (* transformer_fix_point_operator)(tfb);
-
-  ifdebug(8) {
-    pips_debug(8, "intermediate fix-point tf=\n");
-    fprint_transformer(stderr, tf, external_value_name);
-  }
-
-  /* add initialization for the unconditional initialization of the loop
-     index variable */
-  tf = transformer_add_loop_index_initialization(tf, l);
-
-  ifdebug(8) {
-    debug(8, "loop_to_transformer", "full fix-point tf=\n");
-    fprint_transformer(stderr, tf, external_value_name);
-    debug(8, "loop_to_transformer", "end\n");
-  }
-
-  /* we have a problem here: to compute preconditions within the
-     loop body we need a tf using private variables; to return
-     the loop transformer, we need a filtered out tf; only
-     one hook is available in the ri..; let'a assume there
-     are no private variables and that if they are privatizable
-     they are not going to get in our way */
-
-  ifdebug(8) {
-    (void) fprintf(stderr,"%s: %s\n","loop_to_transformer",
-		   "resultat tf =");
-    (void) (void) print_transformer(tf);
-    debug(8,"loop_to_transformer","end\n");
-  }
-
-  return tf;
-}
-
-/* The index variable is always initialized and then the loop is either
-   entered and exited or not entered */
-transformer 
-refine_loop_transformer(transformer t, loop l)
-{
-  transformer tf = transformer_undefined;
-  transformer t_enter = transformer_undefined;
-  transformer t_skip = transformer_undefined;
-  transformer pre = transformer_undefined;
-  /* loop body transformer */
-  transformer tfb = transformer_undefined;
-  range r = loop_range(l);
-  statement s = loop_body(l);
-
-  pips_debug(8,"begin\n");
-
-  /* compute the loop body transformer */
-  tfb = transformer_dup(load_statement_transformer(s));
-  tfb = transformer_add_loop_index_incrementation(tfb, l);
-
-  /* compute the transformer when the loop is entered */
-  t_enter = transformer_combine(tfb, t);
-
-  /* add the entry condition */
-  /* but it seems to be in t already */
-  /* t_enter = transformer_add_loop_index_initialization(t_enter, l); */
-
-  /* add the exit condition, without any information pre to estimate the
-     increment */
-  pre = transformer_identity();
-  t_enter = add_loop_index_exit_value(t_enter, l, pre, NIL);
-
-  ifdebug(8) {
-    pips_debug(8, "entered loop transformer t_enter=\n");
-    fprint_transformer(stderr, t_enter, external_value_name);
-  }
-
-  /* add initialization for the unconditional initialization of the loop
-     index variable */
-  t_skip = transformer_identity();
-  t_skip = add_loop_index_initialization(t_skip, l);
-  t_skip = add_loop_skip_condition(t_skip, l);
-
-  ifdebug(8) {
-    pips_debug(8, "skipped loop transformer t_skip=\n");
-    fprint_transformer(stderr, t_skip, external_value_name);
-  }
-
-  /* It might be better not to compute useless transformer, but it's more
-     readbale that way. Since pre is information free, only loops with
-     constant lower and upper bound and constant increment can benefit
-     from this. */
-  if(empty_range_wrt_precondition_p(r, pre)) {
-    tf = t_skip;
-    free_transformer(t_enter);
-  }
-  else if(non_empty_range_wrt_precondition_p(r, pre)) {
-    tf = t_enter;
-    free_transformer(t_skip);
-  }
-  else {
-    tf = transformer_convex_hull(t_enter, t_skip);
-    free_transformer(t_enter);
-    free_transformer(t_skip);
-  }
-
-  free_transformer(pre);
-
-  ifdebug(8) {
-    pips_debug(8, "full refined loop transformer tf=\n");
-    fprint_transformer(stderr, tf, external_value_name);
-    pips_debug(8, "end\n");
-  }
-
-  return tf;
-}
-
-/* This function computes the effect of K loop iteration, with K positive.
- * This function does not take the loop exit into account because its result
- * is used to compute the precondition of the loop body.
- * Hence the loop exit condition only is added when preconditions are computed.
- * This is confusing when transformers are prettyprinted with the source code.
- */
 
 static transformer 
-whileloop_to_transformer(whileloop l, list e) /* effects of whileloop l */
-{
-  /* loop transformer tf = tfb* or tf = tfb+ or ... */
-  transformer tf;
-  /* loop body transformer */
-  transformer tfb;
-  expression cond = whileloop_condition(l);
-  statement s = whileloop_body(l);
-
-  debug(8,"whileloop_to_transformer","begin\n");
-
-  if(pips_flag_p(SEMANTICS_FIX_POINT)) {
-    /* compute the whileloop body transformer */
-    tfb = transformer_dup(statement_to_transformer(s));
-
-    /* If the while entry condition is usable, it must be added
-     * on the old values
-     */
-    tfb = transformer_add_condition_information(tfb, cond, TRUE);
-
-    /* compute tfb's fix point according to pips flags */
-    if(pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
-      tf = transformer_halbwachs_fix_point(tfb);
-    }
-    else if (transformer_empty_p(tfb)) {
-      /* The loop is never entered */
-      tf = transformer_identity();
-    }
-    else {
-      transformer ftf = (* transformer_fix_point_operator)(tfb);
-
-      if(*transformer_fix_point_operator==transformer_equality_fix_point) {
-	Psysteme fsc = predicate_system(transformer_relation(ftf));
-	Psysteme sc = SC_UNDEFINED;
-	    
-	/* Dirty looking fix for a fix point computation error:
-	 * sometimes, the basis is restricted to a subset of
-	 * the integer scalar variables. Should be useless with proper
-	 * fixpoint opertors.
-	 */
-	tf = effects_to_transformer(e);
-	sc = (Psysteme) predicate_system(transformer_relation(tf));
-
-	sc = sc_append(sc, fsc);
-
-	free_transformer(ftf);
-      }
-      else {
-	tf = ftf;
-      }
-
-      ifdebug(8) {
-	pips_debug(8, "intermediate fix-point tf=\n");
-	fprint_transformer(stderr, tf, external_value_name);
-      }
-
-    }
-    /* we have a problem here: to compute preconditions within the
-       whileloop body we need a tf using private variables; to return
-       the loop transformer, we need a filtered out tf; only
-       one hook is available in the ri..; let'a assume there
-       are no private variables and that if they are privatizable
-       they are not going to get in our way */
-  }
-  else {
-    /* basic cheap version: do not use the whileloop body transformer and
-       avoid fix-points; local variables do not have to be filtered out
-       because this was already done while computing effects */
-
-    (void) statement_to_transformer(s);
-    tf = effects_to_transformer(e);
-  }
-
-  ifdebug(8) {
-    (void) fprintf(stderr,"%s: %s\n","whileloop_to_transformer",
-		   "resultat tf =");
-    (void) (void) print_transformer(tf);
-  }
-  debug(8,"whileloop_to_transformer","end\n");
-  return tf;
-}
-
-static transformer 
-test_to_transformer(test t, list ef) /* effects of t */
+test_to_transformer(test t, transformer pre, list ef) /* effects of t */
 {
   statement st = test_true(t);
   statement sf = test_false(t);
   transformer tf;
+
+  /* EXPRESSION_TO_TRANSFORMER() SHOULD BE USED MORE EFFECTIVELY */
 
   pips_debug(8,"begin\n");
 
@@ -615,8 +310,11 @@ test_to_transformer(test t, list ef) /* effects of t */
        precondition, intraprocedural if nothing else better is
        available. This function's profile as well as most function
        profiles in ri_to_transformers should be modifed. */
-    transformer tftwc = transformer_identity();
-    transformer tffwc = transformer_identity();
+    transformer tftwc = transformer_undefined_p(pre)?
+      transformer_identity() :
+      precondition_to_abstract_store(pre);
+    transformer context = transformer_dup(tftwc);
+    transformer tffwc = transformer_dup(tftwc);
     transformer post_tftwc = transformer_undefined;
     transformer post_tffwc = transformer_undefined;
     list ta = NIL;
@@ -627,17 +325,32 @@ test_to_transformer(test t, list ef) /* effects of t */
     tffwc = transformer_dup(statement_to_transformer(sf));
     */
 
-    tftwc = precondition_add_condition_information(tftwc, e, TRUE);
+    tftwc = precondition_add_condition_information(tftwc, e, context, TRUE);
+    ifdebug(8) {
+      pips_debug(8, "tftwc before transformer_temporary_value_projection %p:\n", tftwc);
+      (void) print_transformer(tftwc);
+    }
     tftwc = transformer_temporary_value_projection(tftwc);
     reset_temporary_value_counter();
-    post_tftwc = transformer_apply(statement_to_transformer(st), tftwc);
+    ifdebug(8) {
+      pips_debug(8, "tftwc before transformer_apply %p:\n", tftwc);
+      (void) print_transformer(tftwc);
+    }
+    post_tftwc = transformer_apply(statement_to_transformer(st, tftwc), tftwc);
+    ifdebug(8) {
+      pips_debug(8, "tftwc after transformer_apply %p:\n", tftwc);
+      (void) print_transformer(tftwc);
+      pips_debug(8, "post_tftwc before transformer_apply %p:\n", post_tftwc);
+      (void) print_transformer(post_tftwc);
+    }
 
-    tffwc = precondition_add_condition_information(tffwc, e, FALSE);
+    tffwc = precondition_add_condition_information(tffwc, e, context, FALSE);
     tffwc = transformer_temporary_value_projection(tffwc);
     reset_temporary_value_counter();
-    post_tffwc = transformer_apply(statement_to_transformer(sf), tffwc);
+    post_tffwc = transformer_apply(statement_to_transformer(sf, tffwc), tffwc);
 
     tf = transformer_convex_hull(post_tftwc, post_tffwc);
+    transformer_free(context);
     transformer_free(tftwc);
     transformer_free(tffwc);
     transformer_free(post_tftwc);
@@ -646,24 +359,24 @@ test_to_transformer(test t, list ef) /* effects of t */
     free_arguments(fa);
   }
   else {
-    (void) statement_to_transformer(st);
-    (void) statement_to_transformer(sf);
+    transformer id = transformer_identity();
+    (void) statement_to_transformer(st, id);
+    (void) statement_to_transformer(sf, id);
     tf = effects_to_transformer(ef);
+    free_transformer(id);
   }
 
   debug(8,"test_to_transformer","end\n");
   return tf;
 }
 
-static transformer 
+transformer 
 intrinsic_to_transformer(
-    entity e, list pc, list ef) /* effects of intrinsic call */
+    entity e, list pc, transformer pre, list ef) /* effects of intrinsic call */
 {
-  transformer tf;
-  /* should become a parameter, but one thing at a time */
-  transformer pre = transformer_undefined;
+  transformer tf = transformer_undefined;
 
-  debug(8,"intrinsic_to_transformer","begin\n");
+  pips_debug(8, "begin\n");
 
   if(ENTITY_ASSIGN_P(e)) {
     tf = any_assign_to_transformer(pc, ef, pre);
@@ -673,15 +386,15 @@ intrinsic_to_transformer(
   else
     tf = effects_to_transformer(ef);
 
-  debug(8,"intrinsic_to_transformer","end\n");
+  pips_debug(8, "end\n");
 
   return tf;
 }
-
+
 static transformer user_call_to_transformer(entity, list, list);
 
 static transformer 
-call_to_transformer(call c, list ef) /* effects of call c */
+call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
 {
   transformer tf = transformer_undefined;
   entity e = call_function(c);
@@ -711,7 +424,7 @@ call_to_transformer(call c, list ef) /* effects of call c */
     break;
   case is_value_intrinsic:
     pips_debug(5, "intrinsic function %s\n", entity_name(e));
-    tf = intrinsic_to_transformer(e, pc, ef);
+    tf = intrinsic_to_transformer(e, pc, pre, ef);
     break;
   default:
     pips_internal_error("unknown tag %d\n", tt);
@@ -719,8 +432,16 @@ call_to_transformer(call c, list ef) /* effects of call c */
   pips_assert("transformer tt is consistent", 
 	      transformer_consistency_p(tf)); 
 
+  /* Add information from pre. Invariant information is easy to
+     use. Information about initial values, that is final values in pre,
+     can also be used. */
+  tf = transformer_safe_domain_intersection(tf, pre);
+  tf = transformer_normalize(tf, 7);
 
-  pips_debug(8,"end\n");
+  pips_debug(8,"end after normalization with tf=%p\n", tf);
+  ifdebug(8) {
+    (void) print_transformer(tf);
+  }
 
   return(tf);
 }
@@ -1164,22 +885,6 @@ user_call_to_transformer(
   return t_caller;
 }
 
-/* SHould be moved into the transformer library */
-transformer
-transformer_add_identity(transformer tf, entity v)
-{
-  entity v_new = entity_to_new_value(v);
-  entity v_old = entity_to_old_value(v);
-  Pvecteur eq = vect_new((Variable) v_new, (Value) 1);
-
-  vect_add_elem(&eq, (Variable) v_old, (Value) -1);
-  tf = transformer_equality_add(tf, eq);
-  transformer_arguments(tf) = 
-    arguments_add_entity(transformer_arguments(tf), v_new);
-
-  return tf;
-}
-
 
 /* transformer assigned_expression_to_transformer(entity e, expression
  * expr, list ef): returns a transformer abstracting the effect of
@@ -1193,7 +898,8 @@ transformer_add_identity(transformer tf, entity v)
 transformer 
 assigned_expression_to_transformer(
     entity v,
-    expression expr)
+    expression expr,
+    transformer pre)
 {
   transformer tf = transformer_undefined;
 
@@ -1205,7 +911,7 @@ assigned_expression_to_transformer(
     entity tmp = make_local_temporary_value_entity(entity_type(v));
     list tf_args = CONS(ENTITY, v, NIL);
 
-    tf = any_expression_to_transformer(tmp, expr, transformer_undefined, TRUE);
+    tf = any_expression_to_transformer(tmp, expr, pre, TRUE);
     reset_temporary_value_counter();
     if(!transformer_undefined_p(tf)) {
       tf = transformer_value_substitute(tf, v_new, v_old);
@@ -1226,6 +932,7 @@ assigned_expression_to_transformer(
 
 transformer integer_assign_to_transformer(expression lhs,
 					  expression rhs,
+					  transformer pre,
 					  list ef) /* effects of assign */
 {
   /* algorithm: if lhs and rhs are linear expressions on scalar integer
@@ -1270,7 +977,7 @@ transformer integer_assign_to_transformer(expression lhs,
        * expressions used to initialize a scalar integer entity.
        */
       if(some_integer_scalar_read_or_write_effects_p(ef)) {
-	tf = assigned_expression_to_transformer(e, rhs);
+	tf = assigned_expression_to_transformer(e, rhs, pre);
       }
     }
   }
@@ -1379,9 +1086,10 @@ transformer any_assign_to_transformer(list args, /* arguments for assign */
 }
 
 static transformer 
-instruction_to_transformer(i, e)
-instruction i;
-cons * e; /* effects associated to instruction i */
+instruction_to_transformer(
+			   instruction i,
+			   transformer pre,
+			   cons * e) /* effects associated to instruction i */
 {
   transformer tf = transformer_undefined;
   test t;
@@ -1393,19 +1101,19 @@ cons * e; /* effects associated to instruction i */
 
   switch(instruction_tag(i)) {
   case is_instruction_block:
-    tf = block_to_transformer(instruction_block(i));
+    tf = block_to_transformer(instruction_block(i), pre);
     break;
   case is_instruction_test:
     t = instruction_test(i);
-    tf = test_to_transformer(t, e);
+    tf = test_to_transformer(t, pre, e);
     break;
   case is_instruction_loop:
     l = instruction_loop(i);
-    tf = loop_to_transformer(l);
+    tf = loop_to_transformer(l, pre, e);
     break;
   case is_instruction_whileloop:
     wl = instruction_whileloop(i);
-    tf = whileloop_to_transformer(wl, e);
+    tf = whileloop_to_transformer(wl, pre, e);
     break;
   case is_instruction_goto:
     pips_error("instruction_to_transformer",
@@ -1414,10 +1122,10 @@ cons * e; /* effects associated to instruction i */
     break;
   case is_instruction_call:
     c = instruction_call(i);
-    tf = call_to_transformer(c, e);
+    tf = call_to_transformer(c, pre, e);
     break;
   case is_instruction_unstructured:
-    tf = unstructured_to_transformer(instruction_unstructured(i), e);
+    tf = unstructured_to_transformer(instruction_unstructured(i), pre, e);
     break ;
   default:
     pips_error("instruction_to_transformer","unexpected tag %d\n",
@@ -1430,29 +1138,54 @@ cons * e; /* effects associated to instruction i */
 }
 
 
-transformer statement_to_transformer(s)
-statement s;
+transformer statement_to_transformer(
+				     statement s,
+				     transformer spre) /* stmt precondition */
 {
   instruction i = statement_instruction(s);
   list e = NIL;
-  transformer t;
-  transformer te;
+  transformer t = transformer_undefined;
+  transformer te = transformer_undefined;
+  transformer pre = transformer_undefined;
 
-  pips_debug(8,"begin for statement %03d (%d,%d)\n",
+  pips_debug(8,"begin for statement %03d (%d,%d) with precondition:\n",
 	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
 	     ORDERING_STATEMENT(statement_ordering(s)));
+  ifdebug(8) {
+    (void) print_transformer(spre);
+  }
+
+  pips_assert("spre is a consistent precondition",
+	      transformer_consistent_p(spre));
+
+  if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) 
+    pre = transformer_undefined_p(spre)? transformer_identity() : 
+    transformer_range(spre);
+  else
+    pre = transformer_undefined;
+
+  pips_assert("pre is a consistent precondition",
+	      transformer_consistent_p(pre));
+
+  pips_debug(8,"Range precondition pre:\n");
+  ifdebug(8) {
+    (void) print_transformer(pre);
+  }
 
   e = load_cumulated_rw_effects_list(s);
   t = load_statement_transformer(s);
 
   /* it would be nicer to control warning_on_redefinition */
   if (t == transformer_undefined) {
-    t = instruction_to_transformer(i, e);
+    t = instruction_to_transformer(i, pre, e);
 
-    /* add array references information */
+    /* add array references information using proper effects */
     if(get_bool_property("SEMANTICS_TRUST_ARRAY_REFERENCES")) {
       transformer_add_reference_information(t, s);
+      /* t = transformer_normalize(t, 0); */
     }
+    /* t = transformer_normalize(t, 7); */
+    t = transformer_normalize(t, 4);
 
     if(!transformer_consistency_p(t)) {
       int so = statement_ordering(s);
@@ -1468,6 +1201,7 @@ statement s;
       pips_assert("Transformer is internally consistent",
 		  transformer_internal_consistency_p(t));
     }
+
     store_statement_transformer(s, t);
   }
   else {
@@ -1489,7 +1223,6 @@ statement s;
     pips_assert("same pointer", stf==t);
   }
 
-
   /* If i is a loop, the expected transformer can be more complex (see
      nga06) because the stores transformer is later used to compute the
      loop body precondition. It cannot take into account the exit
@@ -1498,13 +1231,20 @@ statement s;
     /* likely memory leak:-(. te should be allocated in both test
        branches and freed at call site but I program everything under
        the opposite assumption */
-    te = refine_loop_transformer(t, instruction_loop(i));
+    /* The refined transformer may be lost or stored as a block
+       transformer is the loop is directly surrounded by a bloc or used to
+       compute the transformer of the surroundings blokcs */
+    te = refine_loop_transformer(t, pre, instruction_loop(i));
   }
   else {
     te = t;
   }
 
-  pips_debug(8,"end with t=%p\n", t);
+  free_transformer(pre);
+
+  pips_debug(8,"end for statement %03d (%d,%d) with t=%p and te=%p\n",
+	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
+	     ORDERING_STATEMENT(statement_ordering(s)), t, te);
 
   return te;
 }
