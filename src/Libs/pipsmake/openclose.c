@@ -31,9 +31,6 @@
 
 extern makefile open_makefile();
 
-/**** Begin saved_makefile version ****/
-static char pgm_makefile[MAXPATHLEN]="";
-
 /* returns the program makefile file name */
 /* .pipsmake should be hidden in the .database
  * I move it to the .database
@@ -41,13 +38,12 @@ static char pgm_makefile[MAXPATHLEN]="";
  * Next thing to do is to delete the prefix of .pipsmake
  * it's redundant. Done 04/07/91 
  */
-char *build_pgm_makefile(n)
-char *n;
+char *build_pgm_makefile(char *n)
 {
-    return(strcpy(pgm_makefile, 
-		  concatenate(get_cwd(), "/", n, ".database", 
-			                 "/", "pipsmake", NULL)));
+    return strdup(concatenate(get_cwd(), "/", n, ".database", 
+			                 "/", "pipsmake", NULL));
 }
+
 /**** End saved_makefile version ****/
 
 
