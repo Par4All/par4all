@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: hpfc.c,v $
+ * Revision 1.103  1997/10/08 06:06:47  coelho
+ * PRETTYPRINT_VARIABLE_DIMENSIONS in use.
+ *
  * Revision 1.102  1997/09/26 10:50:56  coelho
  * resource deletion thru a property.
  *
@@ -504,7 +507,7 @@ bool hpfc_init(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
 
-    set_bool_property("PRETTYPRINT_HPFC", TRUE);
+    set_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS", "common");
     set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
     set_bool_property("GLOBAL_EFFECTS_TRANSLATION", FALSE);
     set_bool_property("WARNING_ON_STAT_ERROR", FALSE); /* for my fake files */
