@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.92  1998/04/14 16:18:18  coelho
+ * headers fixed.
+ *
  * Revision 1.91  1998/01/24 10:16:49  coelho
  * pips_thanks() moved to real main.
  *
@@ -71,6 +74,8 @@
 #include "readline.h"
 #include "history.h"
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "database.h"
@@ -78,6 +83,7 @@
 #include "makefile.h"
 
 #include "misc.h"
+#include "newgen.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "properties.h"
