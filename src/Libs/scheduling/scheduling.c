@@ -1,16 +1,7 @@
-/* 	$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.11 1997/07/22 12:57:11 keryell Exp $ ($Name:  $)\n Copyright (c) École des Mines de Paris Proprietary	 */
-
-#ifndef lint
-static char vcid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.11 1997/07/22 12:57:11 keryell Exp $ ($Name:  $)\n Copyright (c) École des Mines de Paris Proprietary";
-#endif /* lint */
-
-#include <stdlib.h>
 #include <stdio.h>
-#include <stdio.h>
-#include <malloc.h>
+#include <setjmp.h>
 
 #include "genC.h"
-#include "list.h"
 #include "ri.h"
 #include "constants.h"
 #include "ri-util.h"
@@ -46,7 +37,6 @@ static char vcid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/sche
 #include "graph.h"
 #include "paf_ri.h"
 #include "paf-util.h"
-#include "mapping.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "scheduling.h"
