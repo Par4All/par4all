@@ -78,7 +78,8 @@ effects_dynamic_elim(list l_eff)
 	case is_storage_ram:
 	{
 	    ram r = storage_ram(eff_s);
-	    if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r)))
+	    if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
+		|| stack_area_p(ram_section(r)))
 	    {
 		pips_debug(5, "dynamic or pointed var ignored (%s)\n", 
 			   entity_name(eff_ent));
@@ -907,7 +908,8 @@ common_simple_effects_forward_translation(
 	entity a = effect_variable(e);
 	storage s = entity_storage(a);
 	if (storage_ram_p(s) && !dynamic_area_p(ram_section(storage_ram(s))) 
-	    && !heap_area_p(ram_section(storage_ram(s))))
+	    && !heap_area_p(ram_section(storage_ram(s)))
+	    && !stack_area_p(ram_section(storage_ram(s))))
 	{
 	    pips_debug(5, "considering common variable %s\n", entity_name(a));
 
