@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.32  1997/12/11 16:07:48  coelho
+ * if unknow, and implicit shell is assumed.
+ *
  * Revision 1.31  1997/12/05 16:50:16  coelho
  * checkpoint added.
  *
@@ -77,14 +80,21 @@ static int tpips_lex_input (void)
     return (int) c;
 }
 
+/* string to be processed by some other lexer/parser.
+ */
+static char unk[2]; /* one char lines are not implicit shells */
+
 #define RETURN(x)  pips_debug(8, "init %d\n", x); return x
 #define KEYWORD(x) pips_debug(8, "key %d\n", x); BEGIN INITIAL; return x
-#define SPECIAL(x) pips_debug(8, "spe %d\n", x); BEGIN SPEC; return x
+#define LITTERAL(x) 				\
+	pips_debug(8, "lit %d\n", x); 		\
+	BEGIN LIT; 				\
+	return x
 #define RESTART(x) pips_debug(8, "rst %d\n", x); BEGIN KEY; return x
 
 %}
 
-%s KEY STR SPEC
+%s KEY STR LIT UNK
 
 %%
 
@@ -112,37 +122,43 @@ static int tpips_lex_input (void)
 <KEY>help 		{ KEYWORD(TK_HELP); }
 <KEY>remove 		{ KEYWORD(TK_REMOVE); }
 
-<KEY>setproperty	{ SPECIAL(TK_SET_PROPERTY); }
-<KEY>set		{ SPECIAL(TK_SET_PROPERTY); }
-<KEY>echo 		{ SPECIAL(TK_ECHO); }
-<KEY>shell 		{ SPECIAL(TK_SHELL); }
+<KEY>setproperty	{ LITTERAL(TK_SET_PROPERTY); }
+<KEY>set		{ LITTERAL(TK_SET_PROPERTY); }
+<KEY>echo 		{ LITTERAL(TK_ECHO); }
+<KEY>shell 		{ LITTERAL(TK_SHELL); }
 
-<SPEC>[^\n]* 		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }
+<KEY,INITIAL>[ \t]+	/* skip blanks... */
+
+<KEY>.			{ unk[0]=yytext[0]; unk[1]='\0'; BEGIN UNK; }
+<UNK>[^\n]*		{ yylval.name = strdup(concatenate(unk, yytext, 0));
+			  KEYWORD(TK_UNKNOWN); }
+
+<LIT>[^\n]* 		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }
 <INITIAL,KEY>#[^\n]*	{ BEGIN INITIAL;
 			  /* skip comments... (not for echo, shell set). */}
 
-\(			{ RETURN(TK_OPENPAREN); }
-\)			{ RETURN(TK_CLOSEPAREN); }
-\,			{ RETURN(TK_COMMA); }
-= 			{ RETURN(TK_EQUAL); }
+<INITIAL>\(		{ RETURN(TK_OPENPAREN); }
+<INITIAL>\)		{ RETURN(TK_CLOSEPAREN); }
+<INITIAL>\,		{ RETURN(TK_COMMA); }
+<INITIAL>= 		{ RETURN(TK_EQUAL); }
 
-<SPEC,INITIAL>[\n;]	{ RESTART(TK_ENDOFLINE); }
-<SPEC,INITIAL><<EOF>>	{ RESTART(TK_ENDOFLINE); }
+<LIT,INITIAL>[\n;]	{ RESTART(TK_ENDOFLINE); }
+<LIT,INITIAL><<EOF>>	{ RESTART(TK_ENDOFLINE); }
 
 <STR>[^\"]*\"		{ /* " */ yylval.name = strdup(yytext);
 			  yylval.name[strlen(yytext)-1] = '\0';
 		  	  BEGIN INITIAL; RETURN(TK_A_STRING);}
-\"			{ /* " */ BEGIN STR;} 
+<INITIAL>\"		{ /* " */ BEGIN STR;} 
 
-"$ALL"			{ RETURN(TK_OWNER_ALL); }
-"$PROGRAM"		{ RETURN(TK_OWNER_PROGRAM); }
-"$MAIN"			{ RETURN(TK_OWNER_MAIN); }
-"$MODULE"		{ RETURN(TK_OWNER_MODULE); }
-"$CALLERS"		{ RETURN(TK_OWNER_CALLERS); }
-"$CALLEES"		{ RETURN(TK_OWNER_CALLEES); }
+<INITIAL>"$ALL"		{ RETURN(TK_OWNER_ALL); }
+<INITIAL>"$PROGRAM"	{ RETURN(TK_OWNER_PROGRAM); }
+<INITIAL>"$MAIN"	{ RETURN(TK_OWNER_MAIN); }
+<INITIAL>"$MODULE"	{ RETURN(TK_OWNER_MODULE); }
+<INITIAL>"$CALLERS"	{ RETURN(TK_OWNER_CALLERS); }
+<INITIAL>"$CALLEES"	{ RETURN(TK_OWNER_CALLEES); }
 
-[/\.0-9A-Za-z_:-]+ 	{ yylval.name = strdup(yytext); RETURN(TK_NAME);}
-<KEY,INITIAL>[ \t]+	/* skip blanks... */
+<INITIAL>[/\.0-9A-Za-z_:-]+ 	{ yylval.name=strdup(yytext); RETURN(TK_NAME);}
+
 .			{ pips_user_error("unexpected char %c\n", *yytext); }
 
 %%
