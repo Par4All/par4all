@@ -1,8 +1,11 @@
-/* 	%A% ($Date: 2002/06/20 15:47:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+/* 	%A% ($Date: 2003/08/02 14:02:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: expression.c,v $
+ * Revision 1.21  2003/08/02 14:02:47  irigoin
+ * Comments improved. An intermediate step to allow functional formal parameters.
+ *
  * Revision 1.20  2002/06/20 15:47:23  irigoin
  * explicit constant "IOLIST=" replaced by preprocessor constant
  *
@@ -35,10 +38,11 @@
  */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 2002/06/20 15:47:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 2003/08/02 14:02:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
+#include <ctype.h>
 
 #include "genC.h"
 #include "linear.h"
@@ -198,7 +202,9 @@ int HasParenthesis;
 		if(!value_undefined_p(iv) && value_code_p(iv)) {
 		    user_warning("MakeAtom", "reference to functional entity %s\n",
 				 entity_name(e));
-		    ParserError("MakeAtom", "unsupported use of a functional entity\n");
+		    /* Not enough information to decide to stop or not. */
+		    /* ParserError("MakeAtom",
+		       "unsupported use of a functional entity\n"); */
 		}
 	    }
 	}
@@ -216,7 +222,7 @@ int HasParenthesis;
 				storage_undefined, value_undefined);
 	    }
 	    else if(storage_formal_p(entity_storage(e))) {
-		debug(2, "MakeAtom", "reference to a functional parameter: %s\n",
+		pips_debug(2, "reference to a functional parameter: %s\n",
 		      entity_name(e));
 		/* It has already been declared and should not be
                    redeclared because it may be an entry formal parameter
@@ -278,9 +284,9 @@ int HasParenthesis;
 	    }
 	}
     }
-    else if (type_functional_p(te)) {
-	/* In fact, only check compatability... if requested! */
-	    update_functional_type_with_actual_arguments(e, indices);
+    else if (type_functional_p(te) && HasParenthesis) {
+      /* In fact, only check compatability... if requested! */
+      update_functional_type_with_actual_arguments(e, indices);
     }
 
     /* here, bad cases have been transformed into good ones. */
@@ -352,7 +358,8 @@ int HasParenthesis;
     }
     else if (type_functional_p(te)) {
 	if (value_unknown_p(entity_initial(e))) {
-	    /* e is either called or passed as argument to a function. */
+	    /* e is either called or passed as argument to a function.
+	     It cannot be a PARAMETER or its value would be known. */
 	    if (indices == NIL && HasParenthesis == FALSE) {
 		s = make_syntax(is_syntax_reference, make_reference(e, NIL));
 	    }
@@ -365,7 +372,17 @@ int HasParenthesis;
 	    if (value_code_p(entity_initial(e))) {
 		update_called_modules(e);
 	    }
-    	    s = make_syntax(is_syntax_call, make_call(e, indices));
+
+	    /* e is either called or passed as argument to a function, or
+               it is a PARAMETER, in which case, it must really be
+               called. */
+	    if (indices == NIL && HasParenthesis == FALSE
+		&& !value_symbolic_p(entity_initial(e))) {
+		s = make_syntax(is_syntax_reference, make_reference(e, NIL));
+	    }
+	    else {
+		s = make_syntax(is_syntax_call, make_call(e, indices));
+	    }
 	}
     }
     else {
@@ -471,7 +488,14 @@ CheckLeftHandSide(syntax s)
     syntax new_s = syntax_undefined;
 
     if(syntax_reference_p(s)) {
+      entity v = reference_variable(syntax_reference(s));
+      type vt = entity_type(v);
+
+      if(type_variable_p(vt))
 	new_s = s;
+      else 
+	pips_user_error("Illegal assignment to variable %s with type %s\n",
+			entity_local_name(v), type_to_string(vt));
     }
     else {
 	call c = syntax_call(s);
