@@ -28,7 +28,7 @@
  *
  * FC, Feb 21, 1994
  *
- * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1994/12/27 19:02:37 $, )
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1994/12/28 08:55:32 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -100,6 +100,22 @@ result t;\
 {\
     assert(s != type##_undefined && t != result##_undefined);\
     hash_put((hash_table) (name##_map), (char *)(s), (char *)(t));\
+}\
+\
+static void check_##name()\
+{\
+  type item = (type) check_##name;\
+  result r = (result)check_##name;\
+  type##_mapping saved = get_##name##_map();\
+\
+  reset_##name##_map();\
+  make_##name##_map(); \
+  assert(type##_##name##_undefined_p(item));\
+  store_##type##_##name(item,r);\
+  assert(load_##type##_##name(item)==r);\
+  free_##type##_##name();\
+  reset_##name##_map();\
+  set_##name##_map(saved);\
 }
 
 #define GENERIC_CURRENT_MAPPING(name, result, type) \
