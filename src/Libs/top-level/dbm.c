@@ -67,7 +67,7 @@ char *name;
     char *current_name = db_get_current_module_name();
     if (current_name == NULL
 	|| strcmp(current_name, name) != 0)
-      db_set_current_module_name(name);
+      open_module(name);
 }
      
 /* should be: success (cf wpips.h) */
