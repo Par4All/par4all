@@ -1290,13 +1290,11 @@ insert_comments_to_statement(statement s,
  * For debugging, it's better to have a transparent prettyprinter
  * and no ghost statement with no ordering and no number.
  *
- * Insert a CONTINUE and move the label and comment from the statement
- * to the CONTINUE, if label there is.
- *
- * Must only be used for empty block statements...
+ * Insert a CONTINUE and move the label, comment and statement number
+ * if any from the statement to the CONTINUE, if label there is.
  */
 void
-fix_label_and_comment_in_empty_block(statement s) 
+fix_sequence_statement_attributes(statement s) 
 {
     list instructions;
     statement continue_s;
