@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/10/04 19:30:29 $, ) 
+ * ($Date: 1995/10/05 11:32:38 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -535,7 +535,7 @@ gen(int what,
 	/* default is a forgotten case, I guess
 	 */
     default:
-	pips_error("gen", "invalid tag %d\n", what);
+	pips_internal_error("invalid tag %d\n", what);
 	ret(statement_undefined); /* to avoid a gcc warning */
     }
 
