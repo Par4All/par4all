@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.70  2003/05/20 09:03:19  irigoin
+ * Update of MakeFortranType() to accomodate Francois Ferrand's needs for his SIMDizer
+ *
  * Revision 1.69  2003/04/29 13:51:28  coelho
  * check type size... for FI/FF
  *
@@ -1548,7 +1551,12 @@ value v;
     switch (t)
       {
       case is_basic_int:
-	ok = l==2 || l==4 || l==8;
+	if(get_bool_property("PARSER_ACCEPT_ANSI_EXTENSIONS"))
+	  /* Accept INTEGER*1 for SIMD parallelizer and INTEGER*2 for
+             legacy code and INTEGER*8 for 64 bit machines */
+	  ok = l==1 || l==2 || l==4 || l==8;
+	else
+	  ok = l==4;
 	break;
       case is_basic_float:
 	ok = l==4 || l==8;
