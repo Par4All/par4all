@@ -300,6 +300,7 @@ bool db_resource_p(string rname, string oname)
     return db_resource_loaded_p(r) || db_resource_stored_p(r);
 }
 
+/*
 void db_check_time_of_all_resources(string rname, string oname)
 {
   pips_debug(2, "checking time of all resources...");
@@ -316,6 +317,7 @@ void db_check_time_of_all_resources(string rname, string oname)
   },
 		   get_pips_database());
 }
+*/
 
 int db_time_of_resource(string rname, string oname)
 {
@@ -324,7 +326,7 @@ int db_time_of_resource(string rname, string oname)
 	return -1;
 
     /* loaded or stored */
-    if (db_resource_loaded_p(r) && 
+    if ((db_resource_loaded_p(r) || db_resource_stored_p(r)) && 
 	displayable_file_p(rname) &&
 	dbll_database_managed_file_p(db_resource_pointer(r)))
     {
@@ -612,8 +614,14 @@ bool db_module_exists_p(string name)
     return FALSE;
 
   DB_RESOURCES_MAP(os, or, 
-		   if (same_string_p(db_symbol_name(os), name)) 
-		       return TRUE,
+  {
+    ifdebug(9) {
+      pips_assert("consistant stuff", 
+		  db_owned_resources_consistent_p(or));
+    }
+    if (same_string_p(db_symbol_name(os), name)) 
+      return TRUE;
+  },
 		   get_pips_database());
 
   return FALSE;
