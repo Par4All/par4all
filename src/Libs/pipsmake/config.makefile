@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/22 11:54:38 $, 
+# $Date: 1996/08/23 08:54:29 $, 
 
 YFLAGS+=	-d
 
