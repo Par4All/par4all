@@ -35,7 +35,7 @@ static void writeln_string(FILE * f, char * p) { fprintf(f, "%s\n", p); }
 static void unexpected(void)
 { pips_internal_error("unexpected pipsdbm method\n");}
 
-/* all methods are stored in this separate file.
+/* all methods are stored in this separate file. as an array.
  */
 static methods all_methods[] = {
 #include "methods.h"
@@ -46,8 +46,21 @@ static methods all_methods[] = {
 static methods *
 get_methods(string name)
 {
-    methods * m = all_methods;
-    while (m->name && !same_string_p(name, m->name)) m++;
+    /* we use a local cache for fast retrieval.
+     */
+    static hash_table cache = hash_table_undefined;
+    methods * m;
+
+    if (hash_table_undefined_p(cache)) { /* initialize at first call. */
+	cache = hash_table_make(hash_string, 2*dbll_number_of_resources());
+	for (m = all_methods; m->name; m++)
+	    hash_put(cache, m->name, (char *) m);
+    }
+
+    /* get the methods! */
+    m = (methods*) hash_get(cache, name);
+    if (m==(methods*)HASH_UNDEFINED_VALUE) 
+	m = &all_methods[dbll_number_of_resources()]; /* last is unexpected */
     return m;
 }
 
