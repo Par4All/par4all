@@ -308,6 +308,28 @@ string file;
 	modname = strdup(buffer);
 
 	user_log("  Module         %s\n", modname);
+
+        /* Apply a cleaning procedure on each module: */
+        cwd = strdup(get_cwd());
+        chdir(db_get_current_workspace_directory());
+        err = safe_system_no_abort(concatenate("trap 'exit 123' 2;",
+                                               "pips-process-module ",
+                                               modrelfilename,
+                                               NULL));
+        chdir(cwd);
+        free(cwd);
+
+        if(err==123) {
+           user_warning("process_user_file",
+                        "pips-process-module interrupted by control-C\n");
+           return FALSE;
+    }
+        else if(err!=0) {
+           pips_error("process_user_file",
+                      "Unexpected return code from pips-process-module: %d\n", err);
+        }
+        
+    
 	if(DB_PUT_NEW_FILE_RESOURCE(DBR_SOURCE_FILE, 
 				    modname, modrelfilename)
 	   == resource_undefined) {
