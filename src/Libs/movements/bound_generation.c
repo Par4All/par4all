@@ -308,23 +308,23 @@ Pbase index_base;
     return(lexpr); 
 }
 
-/*
- * Generation of the new loop nest characterizing the new domain.
+/* Generation of the new loop nest characterizing the new domain.
  * The set of systems lsystem describes the set of constraints 
  * of each loop index. New loop bounds are deduced from these sytems.
  * 
  */
 statement 
-bound_generation(module,bank_code,receive_code,ent,loop_body_indices,var_id,lsystem,index_base,n,sc_info)
-entity module;
-boolean bank_code;
-boolean receive_code;
-entity ent;
-Pbase loop_body_indices,var_id;
-Psysteme *lsystem;
-Pbase index_base;
-int n;
-int sc_info[][3];
+bound_generation(
+    entity module,
+    boolean bank_code,
+    boolean receive_code,
+    entity ent,
+    Pbase loop_body_indices,
+    Pbase var_id,
+    Psysteme *lsystem,
+    Pbase index_base,
+    int n,
+    int sc_info[][3])
 {
  
     Psysteme ps,*sc_pos,*sc_neg,sc_test;
@@ -461,12 +461,8 @@ int sc_info[][3];
 	
 		loopbody = make_block_statement(CONS(STATEMENT,stat,NIL));
 		ifdebug(8) {
-
-		    mod = local_name_to_top_level_entity(entity_local_name(module));
-		    t = text_statement(mod, 2,loopbody);
-		    print_text(stderr,t); 
-
-		    (void) fprintf(stderr,"systeme pour la %d boucle \n",n0_loop);
+		    wp65_debug_print_text(entity_undefined, loopbody);
+		    pips_debug(8,"systeme pour la %d boucle \n",n0_loop);
 		    (void) sc_fprint(stderr,sc_neg[n0_loop],noms_var);
 		    (void) sc_fprint(stderr,sc_pos[n0_loop],noms_var);
 		    (void) sc_fprint(stderr,sc_test,noms_var);
