@@ -3,19 +3,7 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
-# Revision 1.281  1997/05/14 16:00:01  coelho
-# *** empty log message ***
-#
-# Revision 1.280  1997/05/14 15:57:39  coelho
-# *** empty log message ***
-#
-# Revision 1.279  1997/04/28 16:03:50  coelho
-# *** empty log message ***
-#
-# Revision 1.278  1997/04/28 08:37:05  coelho
-# *** empty log message ***
-#
-# Revision 1.277  1997/04/17 18:58:35  coelho
+# Revision 1.282  1997/05/22 16:37:48  coelho
 # *** empty log message ***
 #
 # Revision 1.276  1997/03/28 07:13:52  coelho
@@ -201,9 +189,11 @@ esac
   if [ "`echo $current_directory | grep Development`" ]
   then
     DIRSIDE=`eval echo '$'"${PART}_DEVEDIR"` ;
+    SIDE=Deve
   else
     production='yes' ;
     DIRSIDE=`eval echo '$'"${PART}_ROOT/Src"`;
+    SIDE=Prod
   fi
   $verbose "default DIRSIDE computed: $DIRSIDE"
 }
@@ -337,7 +327,15 @@ check_install:
 # is this appropriate?
 # .DEFAULT:; @echo "$MAKEFILE [\$(FWD_ROOT)] *** no rule for target $@!" >&2
 #
+ifdef PIPS_DIRECTORY_FOR_BINARIES
+\$(ARCH):
+	# creating remote \$(ARCH) directory...
+	rdir=\$(PIPS_DIRECTORY_FOR_BINARIES)/${PART}/${SIDE}/${target_dir};\\
+	test -d \$\$rdir || mkdir \$\$rdir ; \\
+	ln -s \$\$rdir \$(ARCH);
+else
 \$(ARCH):; test -d \$(ARCH) || mkdir \$(ARCH)
+endif
 #
 include \$(ROOT)/Include/define_libraries.make
 include \$(ROOT)/Include/makefile_macros.\$(ARCH)
