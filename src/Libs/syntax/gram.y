@@ -56,6 +56,10 @@
   * $Id$
   *
   * $Log: gram.y,v $
+  * Revision 1.66  2003/08/11 16:26:37  irigoin
+  * Rule "entity_name:" : further attempts at identifying earlier the nature
+  * of symbols or variables encountered.
+  *
   * Revision 1.65  2003/08/02 13:51:01  irigoin
   * Three obsolete functions removed to silence gcc: MakeData, ValMakeDataVar,
   * ExpandDataVar. Comments improved in one place.
@@ -1105,11 +1109,23 @@ parametre: entity_name TK_EQUALS expression
 
 entity_name: name
 	    {
-	        /* malloc_verify(); */
-	        /* if SafeFind were used, intrinsic would mask local variables. */
-		/* $$ = SafeFindOrCreateEntity(CurrentPackage, $1); */
+	      /* malloc_verify(); */
+	      /* if SafeFind were always used, intrinsic would mask local
+                 variables, either when the module declarations are not
+                 available or when a new entity still has to be
+                 declared. See Validation/capture01.f */
+	      /* Let's try not to search intrinsics in SafeFindOrCreateEntity(). */
+	      /* Do not declare undeclared variables, because it generates
+                 a problem when processing entries. */
+	      /* $$ = SafeFindOrCreateEntity(CurrentPackage, $1); */
+
+	      if(!entity_undefined_p(get_current_module_entity())) {
+		$$ = SafeFindOrCreateEntity(CurrentPackage, $1);
+		/* AddEntityToDeclarations($$, get_current_module_entity()); */
+	      }
+	      else
 		$$ = FindOrCreateEntity(CurrentPackage, $1);
-		free($1);
+	      free($1);
 	    }
 	;
 
