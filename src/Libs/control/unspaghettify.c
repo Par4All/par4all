@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/04/25 23:08:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/05/29 15:34:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/04/25 23:08:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/05/29 15:34:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -1072,7 +1072,15 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
 
    ifdebug (1)
       pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
+
+   if (get_bool_property("GATHER_FORMATS_AT_BEGINNING"))
+       put_formats_at_module_beginning(mod_stmt);
+   else if (get_bool_property("GATHER_FORMATS_AT_END"))
+       put_formats_at_module_end(mod_stmt);
    
+   ifdebug (1)
+      pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
+
    initialize_unspaghettify_statistics();
    gen_recurse(mod_stmt, statement_domain,
                unspaghettify_filter, unspaghettify_rewrite);
