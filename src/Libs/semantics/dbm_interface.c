@@ -638,14 +638,16 @@ entity e;
 {
     /* memoization could be used to improve efficiency */
     list t;
+    statement s;
 
-    pips_assert("load_module_intraprocedural_effects", entity_module_p(e));
-    pips_assert("load_module_intraprocedural_effects", 
-		e == get_current_module_entity() );
+    pips_assert("is a module", entity_module_p(e));
+    pips_assert("is the current module", e == get_current_module_entity());
+    s = get_current_module_statement();
+    pips_assert("some statement", s!=statement_undefined);
 
-    t = load_cumulated_rw_effects_list( get_current_module_statement() );
+    t = load_cumulated_rw_effects_list(s);
 
-    pips_assert("load_module_intraprocedural_effects", t != list_undefined);
+    pips_assert("some list", t != list_undefined);
 
     return t;
 }
