@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/01/24 15:41:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/01/31 13:54:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/01/24 15:41:50 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/01/31 13:54:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -61,9 +61,7 @@ display_unspaghettify_statistics()
 	    + number_of_restructured_if_else
 		+ number_of_restructured_if_then_else
 		    + number_of_restructured_null_if;
-	if (number_of_restructured_tests == 0)
-	    printf("* No test has been restructured. *\n");
-	else {
+	if (number_of_restructured_tests != 0) {
 	    printf("%d test%s %s been restructured:\n",
 		   number_of_restructured_tests,
 		   number_of_restructured_tests > 1 ? "s" : "",
@@ -91,6 +89,9 @@ remove_useless_continue_or_empty_code_in_unstructured(unstructured u)
    control entry_node = unstructured_control(u);
    /* and its exit point: */
    control exit_node = unstructured_exit(u);
+
+   pips_debug(7, "Dealing with unstructured %#x (begin: %#x, end: %#x)\n",
+	      (int) u, (int) entry_node, (int) exit_node);     
 
    CONTROL_MAP(c,
                {
@@ -124,13 +125,17 @@ still useful...
                         if (gen_length(control_predecessors(c)) <= 1) {
                            statement st = control_statement(c);
 
+			   pips_debug(7, "\tNode %#x has candidate links\n",
+				      (int) c);
                            if (empty_statement_or_continue_without_comment_p(st)) {
                               /* It is some useless code with no
                                  comment to spare: put it in the
                                  remove list: */
-                              remove_continue_list = CONS(CONTROL,
-                                                          c,
+			       remove_continue_list = CONS(CONTROL,
+							   c,
                                                           remove_continue_list);
+			       pips_debug(7, "\tNode %#x to be removed\n",
+					  (int) c);     
                            }
                         }
                      }
@@ -631,43 +636,93 @@ try_to_structure_the_unstructured(statement s,
 statement
 take_out_the_exit_node_if_not_a_continue(statement s)
 {
-    statement new_statement;
+    /* To return and keep track of the unstructured: */
+    statement the_unstructured = s;
     instruction i = statement_instruction(s);
     unstructured u = instruction_unstructured(i);
     control exit_node = unstructured_exit(u);
-    statement the_control_statement = control_statement(exit_node);
-    instruction the_control_instruction =
-	statement_instruction(the_control_statement);
+    statement the_exit_statement = control_statement(exit_node);
+    instruction the_exit_instruction;
 
     pips_assert("take_out_the_exit_node_if_not_a_continue :"
 		"i != statement_instruction(s) || u != instruction_unstructured(i) !",
 		instruction_unstructured_p(i)
 		&& u == instruction_unstructured(i));
-   
-    if (! empty_statement_or_continue_p(the_control_statement)
-	&& ! return_statement_p(the_control_statement)) {
-	/* Put an empty exit node and keep the statement for the label : */
-	statement_instruction(the_control_statement) =
+
+    /* First, linearize the exit statement since
+       fuse_sequences_in_unstructured() may have gathered many
+       statements in a messy way: */
+    clean_up_sequences_internal(the_exit_statement);
+    the_exit_instruction =
+	statement_instruction(the_exit_statement);
+
+    /* Then normalize to have only one non-sequence statement as the
+       exit node: */
+    if (instruction_sequence_p(the_exit_instruction)) {
+	list first_statement_list;
+	statement first_statement, last_statements;
+	
+	list the_statements =
+	    sequence_statements(instruction_sequence(the_exit_instruction));
+	pips_assert("the_statements must be a true sequence",
+		    gen_length(the_statements) >= 2);
+	
+	/* Well, this should be always true if the sequence
+	   survived to clean_up_sequences_rewrite()... */
+	first_statement_list = the_statements;
+	first_statement = STATEMENT(CAR(first_statement_list));
+	the_statements = CDR(the_statements);
+	CDR(first_statement_list) = NIL;
+	gen_free_list(first_statement_list);
+	    
+	last_statements = the_exit_statement;
+	sequence_statements(instruction_sequence(the_exit_instruction)) =
+	    the_statements;
+	    
+	control_statement(exit_node) = first_statement;
+	/* Then, append the last statements at the end of the
+	   unstructured: */
+	the_unstructured = make_stmt_of_instr(i);
+	statement_instruction(s) =
+	    make_instruction_block(CONS(STATEMENT,
+					the_unstructured,
+					/* ...followed by the last
+					   statements: */
+					CONS(STATEMENT,
+					     last_statements,
+					     NIL)));
+	/* Fix the variables for the following pass: */
+	the_exit_statement = first_statement;
+	the_exit_instruction = statement_instruction(the_exit_statement);
+    }
+    /* Here the_exit_statement is not a sequence. */
+    if (! empty_statement_or_continue_p(the_exit_statement)
+	&& ! return_statement_p(the_exit_statement)) {
+	statement new_statement;
+	/* Put an empty exit node and keep the statement for the
+           label: */
+	statement_instruction(the_exit_statement) =
 	    make_continue_instruction();
 	ifdebug (1)
-	    pips_assert("Statements inconsistants...", gen_consistent_p(the_control_statement));
+	    pips_assert("Statements inconsistants...", gen_consistent_p(the_exit_statement));
 	/* Replace the unstructured by an unstructured followed by the
 	   out-keeped instruction: */
 	new_statement = make_stmt_of_instr(i);
-	statement_instruction(s) =
+	statement_instruction(the_unstructured) =
 	    make_instruction_block(CONS(STATEMENT,
 					new_statement,
 					CONS(STATEMENT,
-					     make_stmt_of_instr(the_control_instruction),
-					     NIL)));            
-	ifdebug (1)
-	    pips_assert("Statements inconsistants...", gen_consistent_p(s));
+					     make_stmt_of_instr(the_exit_instruction),
+					     NIL)));
+	the_unstructured = new_statement;
     }
-    else
-	/* In fact the new statement is not new: */
-	new_statement = s;
+    /* Heavily rely on a later clean_up_sequences to normalize the
+       above... */
 
-    return new_statement;
+    ifdebug (1)
+	pips_assert("Statements inconsistants...", gen_consistent_p(s));
+
+    return the_unstructured;
 }
 
 
@@ -888,9 +943,15 @@ restructure_if_then_else(statement s)
 }
 
 
-/* Use an interval graph partitionning method to hierarchically
-   restructure the control graph: */
-
+/* Use an interval graph partitionning method to recursively
+   decompose the control graph: */
+void
+control_graph_recursive_decomposition(statement s)
+{
+  /*
+    graph interval = interval_graph(entry_node);
+    */
+}
 
 
 
@@ -913,9 +974,9 @@ recursively_restructure_an_unstructured(statement s)
 	/* If take_out_the_entry_node_of_the_unstructured() has not been
 	   able to discard the unstructured, go on with some other
 	   optimizations: */
-	ifdebug(9) {
-	    debug(9, "unspaghettify_rewrite_unstructured",
-		  "after take_out_the_entry_node_of_the_unstructured\n");
+	ifdebug(5) {
+	    pips_debug(5,
+		       "after take_out_the_entry_node_of_the_unstructured\n");
 	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
 	    pips_assert("Statements inconsistants...", gen_consistent_p(s));
 	}
@@ -923,9 +984,8 @@ recursively_restructure_an_unstructured(statement s)
 	new_unstructured_statement =
 	    take_out_the_exit_node_if_not_a_continue(new_unstructured_statement);
 	
-	ifdebug(9) {
-	    debug(9, "unspaghettify_rewrite_unstructured",
-		  "after take_out_the_exit_node_if_not_a_continue\n");
+	ifdebug(5) {
+	    pips_debug(5, "after take_out_the_exit_node_if_not_a_continue\n");
 	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
 	    pips_assert("Statements inconsistants...", gen_consistent_p(s));
 	}
@@ -933,9 +993,8 @@ recursively_restructure_an_unstructured(statement s)
 	/* If we ask for, try to restructure the tests: */
 	if (currently_apply_test_restructuring
 	    && restructure_if_then_else(new_unstructured_statement)) {
-	    ifdebug(9) {
-		debug(9, "unspaghettify_rewrite_unstructured",
-		      "after restructure_if_then_else\n");
+	    ifdebug(5) {
+		pips_debug(5, "after restructure_if_then_else\n");
 		print_text(stderr, text_statement(get_current_module_entity(), 0, s));
 		pips_assert("Statements inconsistants...", gen_consistent_p(s));
 	    }
@@ -957,24 +1016,22 @@ unspaghettify_rewrite_unstructured(statement s)
    
     remove_the_unreachable_controls_of_an_unstructured(u);
 
-    ifdebug(9) {
-	debug(9, "unspaghettify_rewrite_unstructured",
-	      "after remove_the_unreachable_controls_of_an_unstructured\n");
+    ifdebug(5) {
+	pips_debug(5, "after remove_the_unreachable_controls_of_an_unstructured\n");
 	print_text(stderr, text_statement(get_current_module_entity(), 0, s));
     }
 
     remove_useless_continue_or_empty_code_in_unstructured(u);
    
-    ifdebug(9) {
-	debug(9, "unspaghettify_rewrite_unstructured",
-	      "after remove_useless_continue_or_empty_code_in_unstructured\n");
+    ifdebug(5) {
+	pips_debug(5, "after remove_useless_continue_or_empty_code_in_unstructured\n");
 	print_text(stderr, text_statement(get_current_module_entity(), 0, s));
     }
    
     recursively_restructure_an_unstructured(s);
        
-    ifdebug(9) {
-	debug(9, "unspaghettify_rewrite_unstructured", "End:\n");
+    ifdebug(5) {
+	pips_debug(5, "End.\n");
 	print_text(stderr, text_statement(get_current_module_entity(), 0, s));
     }
 }
@@ -990,7 +1047,7 @@ unspaghettify_rewrite(statement s)
 {
    instruction i = statement_instruction(s);
 
-   debug(2, "unspaghettify_rewrite enter", "\n");
+   pips_debug(2, "enter\n");
    ifdebug (3) {
       fprintf(stderr, "[ The current statement : ]\n");
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
@@ -998,13 +1055,13 @@ unspaghettify_rewrite(statement s)
 
    if (instruction_unstructured_p(i)) {
       unspaghettify_rewrite_unstructured(s);
-      ifdebug (9) {
+      ifdebug (5) {
          fprintf(stderr, "After dead_rewrite_unstructured:\n");
          print_text(stderr, text_statement(get_current_module_entity(), 0, s));
          fprintf(stderr, "-----\n");
       }
    }
-   debug(2, "unspaghettify_rewrite exit", "\n");
+   pips_debug(2, "exit\n");
 }
 
 
@@ -1012,7 +1069,6 @@ unspaghettify_rewrite(statement s)
 static bool
 unspaghettify_filter(statement s)
 {
-
    return TRUE;
 }
 
@@ -1030,11 +1086,14 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
    gen_recurse(mod_stmt, statement_domain,
                unspaghettify_filter, unspaghettify_rewrite);
    display_unspaghettify_statistics();
+
+   /* End by removing parasitic sequences: */
+   clean_up_sequences(mod_stmt);
    
    ifdebug (1)
       pips_assert("Statements inconsistants...", gen_consistent_p(mod_stmt));
 
-   debug(2,"unspaghettify_or_restructure_statement", "done");
+   pips_debug(2, "done\n");
    debug_off();
 }
 
