@@ -159,7 +159,8 @@ graph                   dup_dg;
       ret_dest_ver = make_vertex( ret_dest_dvl, NIL );
       ADD_ELEMENT_TO_LIST( ret_verl, VERTEX, ret_dest_ver );
     }
-    else vertex_vertex_label(ret_dest_ver) = ret_dest_dvl;
+    else 
+	vertex_vertex_label_(ret_dest_ver) = newgen_vertex_label(ret_dest_dvl);
 
 
 
