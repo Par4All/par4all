@@ -259,9 +259,15 @@ generic_proper_effects_of_expression(expression e)
   /* keep track of proper effects associated to sub-expressions if required.
    */
   if (!expr_prw_effects_undefined_p())
-    {
+  {
+    /* in IO lists, the effects are computed twice, 
+     * once as LHS, once as a REFERENCE...
+     * so something may already be in. Let's skip it.
+     * I should investigate further maybe. FC.
+     */
+    if (!bound_expr_prw_effects_p(e))
       store_expr_prw_effects(e, make_effects(gen_full_copy_list(le)));
-    }
+  }
 
   return le;
 }
