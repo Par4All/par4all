@@ -1,11 +1,12 @@
-/* %A% ($Date: 1996/09/21 12:02:39 $, ) 
+/* %A% ($Date: 1996/09/21 16:06:05 $, ) 
     version $Revision$, got on %D%, %T% [%P%].
    Copyright (c) - École des Mines de Paris Proprietary.  */
 
 #ifndef lint
-char top_level_newgen_c_vcid[] = "%A% ($Date: 1996/09/21 12:02:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char top_level_newgen_c_vcid[] = "%A% ($Date: 1996/09/21 16:06:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "genC.h"
 #include "specs.h"
