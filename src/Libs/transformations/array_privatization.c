@@ -368,9 +368,9 @@ loop l;
 	l_loc_i = regions_dup(l_loc);
 	array_regions_variable_rename(l_loc_i_prime, i, i_prime);
 	contrainte = contrainte_make(vect_make(VECTEUR_NUL, 
-					       (Variable) i_prime, 1,
-					       (Variable) i, -1,
-					       TCST, 1));
+					       (Variable) i_prime, VALUE_ONE,
+					       (Variable) i, VALUE_MOME,
+					       TCST, VALUE_ONE));
 	sc_add_inegalite(sc_loop_prec, contrainte_dup(contrainte));
 	sc_loop_prec->base = BASE_NULLE;
 	sc_creer_base(sc_loop_prec);
