@@ -207,7 +207,7 @@ slightly ugly (but correct) prettyprint, compared to a nicer (but
 possibly incorrect) default one.
 
 \begin{verbatim}
-PRETTYPRINT_INTERNAL_RETURN FALSE
+PRETTYPRINT_INTERNAL_RETURN TRUE
 \end{verbatim}
 
 \section{Semantic Analysis}
@@ -424,6 +424,18 @@ print SDFI just after computation
 EFFECTS_PRINT_SDFI TRUE
 \end{verbatim}
 
+\section{Regions}
+
+Compute regions using the algorithm described in report E/181/CRI,
+called {\em $T^{-1}$ algorithm}. It provides more accurate regions, and
+preserve MUST approximations more often. But it is less efficient. Its
+default value is TRUE for the moment, but it will be later changed to
+FALSE.
+
+\begin{verbatim}
+EXACT_REGIONS TRUE
+\end{verbatim}
+
 \section{Static Complexity Evaluation}
 
 print each ri-walk function call
@@ -433,13 +445,13 @@ COMPLEXITY_TRACE_CALLS FALSE
 \end{verbatim}
 
 
-print intermediate complexities
+print intermediate complexities 
 
 \begin{verbatim}
 COMPLEXITY_INTERMEDIATES FALSE
 \end{verbatim}
 
-Print the complete cost table
+Print the complete cost table at the beginning of the execution.
 
 \begin{verbatim}
 COMPLEXITY_PRINT_COST_TABLE FALSE
