@@ -1,0 +1,35 @@
+\documentstyle{article}
+
+\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\title{Attachment of some information to text words\\Data structures}
+\author{Ronan Keryell\\
+                \\
+        CRI, E'cole des mines de Paris}
+
+\newcommand{\domain}[2]{\paragraph{{#1}}\paragraph{}{{#2}}}
+
+\begin{document}
+
+\section*{Introduction}
+
+This report present the data structures used to attavh some
+information to some word of text, mainly to use in the hypertext Emacs
+interface.
+
+\domain{import entity from "ri.newgen"}
+\domain{import expression from "ri.newgen"}
+
+\section{Attachments}
+
+Are only a list of {\tt attachment}s:
+
+\domain{attachments = attachment*}
+
+\section{Attachment}
+
+Here is what we can attach to a word:
+
+\domain{attachment = entity + unknown:unit}
+
+\end{document}
