@@ -475,6 +475,7 @@ char *mod_name;
 			       r);
 
   reset_current_stco_map();
+  reset_current_module_entity();
   close_prettyprint();
 
   debug_off();
@@ -573,6 +574,7 @@ char *mod_name;
 			       r);
 
   reset_current_stco_map();
+  reset_current_module_entity();
   close_prettyprint();
 
   debug_off();
