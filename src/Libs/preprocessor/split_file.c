@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/04/11 20:30:01 $, 
+ * $Date: 1997/04/11 21:07:58 $, 
  *
  * adapted from what can be seen by FC 31/12/96
  * 
@@ -439,6 +439,9 @@ int fsplit(char * file_name, FILE *out)
 
 /* ADDITION: basic Hollerith constants handling
  * FC 11 Apr 1997
+ *
+ * bugs:
+ * - lines may exceed the length limit after the preprocessing...
  */
 
 #define isbegincomment(c) ((c)=='!' || (c)=='*' || (c)=='c' || (c)=='C')
@@ -462,7 +465,7 @@ static int blank_line_p(char * line)
 
 static void hollerith(char * line)
 {
-    int i,j;
+    int i,j,initial, touched=0;
     
     if (!line) {
 	in_squotes=0, in_dquotes=0, in_id=0; /* RESET */
@@ -483,7 +486,9 @@ static void hollerith(char * line)
     if (isspace(line[i-1]))
 	in_squotes=0, in_dquotes=0, in_id=0; /* RESET */
 
-    while (line[i])
+    initial=i;
+
+    while (line[i] && initial<72) /* 73.. ignored */
     {
 	if (!in_dquotes && issquote(line[i])) 
 	    in_squotes = !in_squotes, in_id=0;
@@ -502,31 +507,40 @@ static void hollerith(char * line)
 	    /* looks for [0-9 ]+[hH] 
 	     */
 	    int len=char2int(line[i]), ni=i;
-	    i++;
+	    i++, initial++;
 	    
-	    while (line[i] && (isdigit(line[i]) || isspace(line[i])))
+	    while (line[i] && initial<72
+		   && (isdigit(line[i]) || isspace(line[i])))
 	    {
 		if (isdigit(line[i]))
 		    len=10*len+char2int(line[i]);
-		i++;
+		i++, initial++;
 	    }
 
-	    if (!line[i]) return;
+	    if (!line[i] || initial>=72) return;
 	    
 	    if (ishH(line[i])) /* YEAH, here it is! */
 	    {
 		char tmp[200];
 		int k;
 
+		if (!touched) { /* rm potential 73-80 text */
+		    touched=1;
+		    line[72]='\n'; 
+		    line[73]='\0';			
+		}
+
 		j=1;
 
-		tmp[0] = '\''; i++;
-		while (j<200 && line[i] && line[i]!='\n' && len>0)
+		tmp[0] = '\''; i++, initial++;
+		while (j<200 && line[i] && initial<72 && 
+		       line[i]!='\n' && len>0)
 		{
 		    len--;
 		    if (line[i]=='\'')
 			tmp[j++]='\'';
 		    tmp[j++] = line[i++];
+		    initial++;
 		}
 		
 		tmp[j]='\'';
@@ -554,7 +568,7 @@ static void hollerith(char * line)
 	    }
 	}
 	
-	i++;
+	i++, initial++;
     }
 }
 
