@@ -711,11 +711,10 @@ entity vari;
     }
 }
 
-/* expression make_vecteur_expression(Pvecteur pv)
- * make expression for vector (Pvecteur)
+/* make expression for vector (Pvecteur)
  */
-expression make_vecteur_expression(pv)
-Pvecteur pv;
+expression make_vecteur_expression(
+    Pvecteur pv)
 {
     /* sort: to insure a deterministic generation of the expression.
      * note: the initial system is *NOT* touched.
@@ -740,7 +739,7 @@ Pvecteur pv;
 
     coef = VALUE_TO_INT(vecteur_val(v));
 
-    if (coef==-1) /* let us avoid -1*v */
+    if (coef==-1) /* let us avoid -1*var, we prefer -var */
     {
 	entity op_ums = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
 	factor1 = make_factor_expression(1, (entity) vecteur_var(v));
