@@ -7,6 +7,9 @@
  * generated, they should also be stored there. 
  * 
  * $Log: unsplit.c,v $
+ * Revision 1.3  1997/10/21 05:24:11  coelho
+ * unsplit seems ok.
+ *
  * Revision 1.2  1997/10/16 19:09:25  coelho
  * comment added.
  *
@@ -16,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include "genC.h"
 #include "misc.h"
 #include "resources.h"
@@ -27,6 +31,26 @@
  */
 static hash_table user_files = hash_table_undefined;
 
+string 
+basename(string fullpath, string suffix)
+{
+    int len = strlen(fullpath)-1, i, j;
+    string result;
+    if (suffix) /* drop the suffix */
+    {
+	int ls = strlen(suffix)-1, le = len;
+	while (suffix[ls]==fullpath[le] && ls>=0 && le>=0) ls--, le--;
+	if (ls<0) /* ok */ len=le;
+    }
+    for (i=len; i>=0; i--) if (fullpath[i]=='/') break;
+    /* fullpath[i+1:len] */
+    result = (char*) malloc(sizeof(char)*(len-i));
+    for (i++, j=0; i<=len; i++, j++) 
+	result[j] = fullpath[i];
+    result[j++] = '\0';
+    return result;
+}
+
 /* returns the new user file where to store user_file
  */
 static string 
@@ -35,14 +59,17 @@ get_new_user_file(string dir_name, string user_file)
     string s = hash_get(user_files, user_file);
     if (s==HASH_UNDEFINED_VALUE) 
     {
-	int len = strlen(user_file)-1;
-	while (len>=0 && user_file[len]!='/') len--;
-	pips_assert("must be a / in user file", len>=0);
-	s = strdup(concatenate(dir_name, &user_file[len], 0));
+	FILE * tmp;
+	string name = basename(user_file, NULL);
+	s = strdup(concatenate(dir_name, "/", name, 0));
+	hash_put(user_files, user_file, s);
 	/* could check that the file does not exist...
 	 * there could be homonymes...
 	 */
-	hash_put(user_files, user_file, s);
+	tmp = safe_fopen(s, "w");
+	fprintf(tmp, "!!\n!! file for %s\n!!\n", name);
+	safe_fclose(tmp, s);
+	free(name);
     }
     return s;
 }
@@ -56,51 +83,50 @@ unsplit(string name)
 {
     gen_array_t modules = db_get_module_list();
     int n = gen_array_nitems(modules), i;
-    string src_dir = db_get_directory_name_for_module("Src"),
-	summary_name = db_build_file_resource_name(DBR_USER_FILE, "", ".txt");
+    string src_dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE),
+	summary_name = db_build_file_resource_name
+	(DBR_USER_FILE, PROGRAM_RESOURCE_OWNER, ".txt"), 
+	summary_full_name, dir_name;
     FILE * summary;
 
     user_files = hash_table_make(hash_string, 2*n);
 
-    /* should only purge the directory of .f files?
-     */
-    if (!purge_directory(src_dir))
-	pips_internal_error("purge of Src dir failed\n");
+    dir_name = db_get_current_workspace_directory();
+    summary_full_name = strdup(concatenate(dir_name, "/", summary_name, 0));
 
-    if (!create_directory(src_dir))
-	pips_internal_error("creation of Src dir failed\n");
-
-    summary = safe_fopen(summary_name, "w");
-    fprintf(summary, "module / file\n");
+    summary = safe_fopen(summary_full_name, "w");
+    fprintf(summary, "! module / file\n");
 
     /* each module PRINTED_FILE is appended to a new user file
      * depending on its initial user file.
      */
-    for (i=0; i<n; n++) 
+    for (i=0; i<n; i++) 
     {
-	string module, user_file, new_user_file, printed_file;
+	string module, user_file, new_user_file, printed_file, full;
 	FILE * out, * in;
 
 	module = gen_array_item(modules, i);
 	user_file = db_get_memory_resource(DBR_USER_FILE, module, TRUE);
 	new_user_file = get_new_user_file(src_dir, user_file);
 	printed_file = db_get_memory_resource(DBR_PRINTED_FILE, module, TRUE);
+	full = strdup(concatenate(dir_name, "/", printed_file, 0));
 
 	out = safe_fopen(new_user_file, "a");
-	in = safe_fopen(printed_file, "r");
+	in = safe_fopen(full, "r");
 
 	safe_cat(out, in);
 
 	safe_fclose(out, new_user_file);
-	safe_fclose(in, printed_file);
+	safe_fclose(in, full);
 
 	fprintf(summary, "%s: %s\n", module, new_user_file);
+	free(full);
     }
 
     /* clean 
      */
-    safe_fclose(summary, summary_name);
-    free(src_dir);
+    safe_fclose(summary, summary_full_name);
+    free(summary_full_name), free(src_dir), free(dir_name);
     gen_array_full_free(modules);
     HASH_MAP(k, v, free(v), user_files);
     hash_table_free(user_files);
@@ -108,6 +134,6 @@ unsplit(string name)
 
     /* kind of a pseudo resource...
      */
-    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, "", summary_name);
+    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, PROGRAM_RESOURCE_OWNER, summary_name);
     return TRUE;
 }
