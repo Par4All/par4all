@@ -613,12 +613,15 @@ transformer tf;
 	debug(5, "call_to_postcondition", "intrinsic function %s\n",
 	      entity_name(e));
 	post = transformer_apply(tf, pre);
-	if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	    /* propagate precondition pre as summary precondition 
-	       of user functions */
-	    list args = call_arguments(c);
-	    expressions_to_summary_precondition(pre, args);
-	}
+	/* propagate precondition pre as summary precondition 
+	   of user functions */
+	/* FI: don't! Summary preconditions are computed independently*/
+	/*
+	   if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+	   list args = call_arguments(c);
+	   expressions_to_summary_precondition(pre, args);
+	   }
+	   */
 	break;
       case is_value_code:
 	debug(5, "call_to_postcondition", "external function %s\n",
@@ -631,7 +634,9 @@ transformer tf;
 		add_formal_to_actual_bindings(c, pre_callee);
 	    add_module_call_site_precondition(e, pre_callee);
 	    */
+	    /*
 	    expressions_to_summary_precondition(pre, args);
+	    */
 	}
 	post = transformer_apply(tf, pre);
 	break;
