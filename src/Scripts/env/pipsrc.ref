@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1997/01/14 15:26:27 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1997/01/21 11:49:17 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -130,7 +130,7 @@ PATH="${PATH}:${PIPS_ROOT}/Utils:/usr5/gnu/bin-sparc"
 # PIPS_VALIDDIR="${PIPS_ROOT}/Validation"
 
 # hosts for Validate
-PIPS_HOSTS="chailly:episy:aiguebelette"
+PIPS_HOSTS="chailly:episy:aiguebelette:roazhon"
 
 # PIPS_EXPERIMENTSDIR="${PIPS_DIR}/Experiments"
 # PIPS_TESTSDIR="${PIPS_DIR}/Tests"
