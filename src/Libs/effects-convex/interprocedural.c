@@ -38,12 +38,13 @@
 #include "polyedre.h"
 
 #include "transformer.h"
-#include "effects.h"
 #include "flint.h"
-#include "regions.h"
 
 #include "pipsdbm.h"
 #include "resources.h"
+
+#include "effects-generic.h"
+#include "effects-convex.h"
 
 #define BACKWARD TRUE
 #define FORWARD FALSE
@@ -237,8 +238,29 @@ list regions_of_external(entity func,list real_args,transformer context,
     return le;
 }
 
+list /* of effects */
+convex_regions_backward_translation(entity func, list real_args,
+				    list l_reg, transformer context)
+{
+    list l_res = NIL;
+    
+    l_res = regions_backward_translation(func, real_args, l_reg, context, TRUE);
+    
+    return l_res;
+}
 
-
+list /* of effects */
+convex_regions_forward_translation(entity callee, list real_args,
+				    list l_reg, transformer context)
+{
+    list l_res = NIL;
+    
+    l_res = regions_forward_translation(callee, real_args, l_reg, context);
+    
+    return l_res;
+}
+
+
 /*********************************************************************************/
 /* BACKWARD TRANSLATION                                                          */
 /*********************************************************************************/
@@ -376,10 +398,9 @@ transformer context;
 		    real_regions = regions_add_region(real_regions, real_reg);
 		    /* The indices of the reference are always evaluated */
 		    if (! ENDP(real_inds)) 
-			real_regions =
-			    gen_nconc(real_regions,
-				      proper_regions_of_expressions(real_inds,
-								    context));
+			real_regions = gen_nconc
+			    (real_regions,
+			     proper_regions_of_expressions(real_inds, context));
 		}
 		 /* Else, the real argument is a complex expression, which
 		  * is merely evaluated during execution of the program; 
@@ -392,7 +413,7 @@ transformer context;
 		 {
 		    real_regions =
 			gen_nconc(real_regions,
-				  proper_regions_of_expression(real_exp,context)); 
+				  generic_proper_effects_of_expression(real_exp)); 
 		}
 	     }
 	 }, func_regions);
