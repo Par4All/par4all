@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/25 11:16:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/03/03 11:13:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/02/25 11:16:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1997/03/03 11:13:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1769,7 +1769,11 @@ output_a_graph_view_of_the_unstructured(text r,
                                         PRETTYPRINT_UNREACHABLE_EXIT_MARKER,
                                         (unsigned int) begin_control,
                                         (unsigned int) end_control);
-   }
+      if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE"))
+	  add_one_unformated_printf_to_text(r, "C Unreachable exit node (%#x -> %#x)\n",
+					    (unsigned int) begin_control,
+					    (unsigned int) end_control);
+  }
    
    add_one_unformated_printf_to_text(r, "%s %#x end: %#x\n",
                                      PRETTYPRINT_UNSTRUCTURED_END_MARKER,
