@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.12  1998/10/26 18:48:34  coelho
+  message++.
+
   Revision 1.11  1998/10/26 14:38:06  coelho
   constants back in.
 
@@ -218,7 +221,9 @@ void throw_exception(
 
   /* error. */
   exception_debug_message("throw");
-  fprintf(stderr,"exception not found in stack\n");
+  fprintf(stderr,
+	  "exception not found in stack:\n"
+	  "an exception was THROWN without a proper matching CATCH\n");
   dump_exception_stack();
   abort();
 }
