@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.65  1997/09/19 07:46:50  zory
+# mpif.h must be copied at the beginning ...
+#
 # Revision 1.64  1997/07/21 15:05:48  zory
 # hpfc_misc -> hpfc_misc + hpfc_misc_mpi + hpfc_misc_pvm
 #
@@ -315,8 +318,8 @@ $(CMMD_F77_H):	$(CMMD_INDIR)/cm/$(CMMD_F77_H)
 	$(COPY) $(CMMD_INDIR)/cm/$(CMMD_F77_H) .
 endif
 
-all: $(RT_ARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
-		$(LIB_OBJECTS) $(INSTALL_LIB)
+all: $(RT_ARCH) $(PVM_HEADERS) $(MPI_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) \
+		$(DDC_FFILES) $(LIB_OBJECTS) $(INSTALL_LIB)
 
 #
 # get runtime headers
