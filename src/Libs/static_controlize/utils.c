@@ -139,7 +139,9 @@ stco_renumber_code(statement in_st,
    		}
   		case is_instruction_loop : {
     			statement lb = loop_body( instruction_loop( inst ) );
-			statement_number( lb ) = count++;
+			/* 
+			   statement_number( lb ) = count++;
+			*/
     			count = stco_renumber_code( lb, count );
     			break;
     		}
