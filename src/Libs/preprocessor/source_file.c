@@ -405,7 +405,7 @@ handle_file(FILE * f) /* process f for includes and nones */
 	    }
 	    else if (!regexec(&implicit_none_rx, line, 0, matches, 0))
 		    fprintf(output_file, 
-			    "! MIL-STD-1553 Fortran not in PIPS\n! ");
+			    "! MIL-STD-1753 Fortran extension not in PIPS\n! ");
 	    else
 		handle_complex_constants(line);
 	}
