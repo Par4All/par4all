@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.83  1997/10/08 06:04:49  coelho
+ * dim or save variables are ok.
+ *
  * Revision 1.82  1997/09/19 17:33:57  coelho
  * SAVE & dims fixed again...
  *
@@ -63,7 +66,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.82 1997/09/19 17:33:57 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.83 1997/10/08 06:04:49 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -216,7 +219,7 @@ words_declaration(
 
     if (type_variable_p(entity_type(e)))
     {
-	if (prettyprint_common_variable_dimensions_p ||
+	if (prettyprint_common_variable_dimensions_p || 
 	    !(variable_in_common_p(e) || variable_static_p(e)))
 	{
 	    if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
@@ -1070,14 +1073,11 @@ empty_static_area_p(entity e)
  *  this may happen in the hpfc generated code.
  */
 static sentence 
-sentence_area(entity e, entity module)
+sentence_area(entity e, entity module, bool pp_dimensions)
 {
     string area_name = module_local_name(e);
     type te = entity_type(e);
-    bool prettyprint_hpfc = get_bool_property("PRETTYPRINT_HPFC");
-    list 
-	pc = NIL,
-	entities = NIL;
+    list pc = NIL, entities = NIL;
 
     if (dynamic_area_p(e)) /* shouldn't get in? */
 	return sentence_undefined;
@@ -1087,19 +1087,18 @@ sentence_area(entity e, entity module)
     if (!ENDP(area_layout(type_area(te))))
     {
 	MAP(ENTITY, ee,
-	 {
-	     if (local_entity_of_module_p(ee, module) || prettyprint_hpfc)
-		 entities = CONS(ENTITY, ee, entities);
-	 },
-	     area_layout(type_area(te)));	     
+	    if (local_entity_of_module_p(ee, module))
+	        entities = CONS(ENTITY, ee, entities),
+	    area_layout(type_area(te)));
 
 	/*  the common is not output if it is empty
 	 */
 	if (!ENDP(entities))
 	{
 	    bool comma = FALSE;
+	    bool is_save = static_area_p(e);
 
-	    if (static_area_p(e))
+	    if (is_save)
 	    {
 		pc = CHAIN_SWORD(pc, "SAVE ");
 	    }
@@ -1123,7 +1122,8 @@ sentence_area(entity e, entity module)
 		  * within the COMMON, not with the type. this is just
 		  * a personnal taste. FC.
 		  */
-		 pc = gen_nconc(pc, words_declaration(ee, prettyprint_hpfc));
+		 pc = gen_nconc(pc, 
+			words_declaration(ee, !is_save && pp_dimensions));
 	     },
 		 entities);
 
@@ -1131,8 +1131,8 @@ sentence_area(entity e, entity module)
 	}
     }
 
-    return(make_sentence(is_sentence_unformatted, 
-			 make_unformatted(NULL, 0, 0, pc)));
+    return make_sentence(is_sentence_unformatted, 
+			 make_unformatted(NULL, 0, 0, pc));
 }
 
 sentence 
@@ -1687,15 +1687,23 @@ text_data(entity module, list /* of entity */ ldecl)
 static text 
 text_entity_declaration(entity module, list ldecl)
 {
-    bool print_commons = get_bool_property("PRETTYPRINT_COMMONS"),
-         from_hpfc = get_bool_property("PRETTYPRINT_HPFC");
-    text r, t_chars;
+    bool print_commons = get_bool_property("PRETTYPRINT_COMMONS");
     list before = NIL, area_decl = NIL, ph = NIL,
 	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, 
 	pc8 = NIL, pc16 = NIL, ps = NIL;
-    /* equivalence_decl = NIL; */
-
-    t_chars = make_text(NIL); 
+    text r, t_chars = make_text(NIL); 
+    string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
+    bool pp_in_type = FALSE, pp_in_common = FALSE;
+     
+    /* where to put the dimensionn information.
+     */
+    if (same_string_p(pp_var_dim, "type"))
+	pp_in_type = TRUE, pp_in_common = FALSE;
+    else if (same_string_p(pp_var_dim, "common"))
+	pp_in_type = FALSE, pp_in_common = TRUE;
+    else 
+	pips_internal_error("PRETTYPRINT_VARIABLE_DIMENSIONS=\"%s\""
+			    " unexpected value\n", pp_var_dim);
 
     MAP(ENTITY, e,
     {
@@ -1747,11 +1755,14 @@ text_entity_declaration(entity module, list ldecl)
 	    /*            AREAS: COMMONS and SAVEs
 	     */	     
 	    pips_debug(7, "considered as a regular common\n");
-	    area_decl = CONS(SENTENCE, sentence_area(e, module), area_decl);
+	    area_decl = CONS(SENTENCE, sentence_area(e, module, pp_in_common), 
+			     area_decl);
 	}
 	else if (var)
 	{
 	    basic b = variable_basic(type_variable(te));
+	    bool pp_dim = pp_in_type || variable_static_p(e);
+
 	    pips_debug(7, "is a variable...\n");
 	    
 	    switch (basic_tag(b)) 
@@ -1763,12 +1774,12 @@ text_entity_declaration(entity module, list ldecl)
 		if (variable_dimensions(type_variable(te)))
 		{
 		    pi = CHAIN_SWORD(pi, pi==NIL ? "INTEGER " : ",");
-		    pi = gen_nconc(pi, words_declaration(e, !from_hpfc)); 
+		    pi = gen_nconc(pi, words_declaration(e, pp_dim)); 
 		}
 		else
 		{
 		    ph = CHAIN_SWORD(ph, ph==NIL ? "INTEGER " : ",");
-		    ph = gen_nconc(ph, words_declaration(e, !from_hpfc)); 
+		    ph = gen_nconc(ph, words_declaration(e, pp_dim)); 
 		}
 		break;
 	    case is_basic_float:
@@ -1777,12 +1788,12 @@ text_entity_declaration(entity module, list ldecl)
 		{
 		case 4:
 		    pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : ",");
-		    pf4 = gen_nconc(pf4, words_declaration(e, !from_hpfc));
+		    pf4 = gen_nconc(pf4, words_declaration(e, pp_dim));
 		    break;
 		case 8:
 		default:
 		    pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : ",");
-		    pf8 = gen_nconc(pf8, words_declaration(e, !from_hpfc));
+		    pf8 = gen_nconc(pf8, words_declaration(e, pp_dim));
 		    break;
 		}
 		break;			
@@ -1792,19 +1803,19 @@ text_entity_declaration(entity module, list ldecl)
 		{
 		case 8:
 		    pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : ",");
-		    pc8 = gen_nconc(pc8, words_declaration(e, !from_hpfc));
+		    pc8 = gen_nconc(pc8, words_declaration(e, pp_dim));
 		    break;
 		case 16:
 		default:
 		    pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : ",");
-		    pc16 = gen_nconc(pc16, words_declaration(e, !from_hpfc));
+		    pc16 = gen_nconc(pc16, words_declaration(e, pp_dim));
 		    break;
 		}
 		break;
 	    case is_basic_logical:
 		pips_debug(7, "is a logical\n");
 		pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ",");
-		pl = gen_nconc(pl, words_declaration(e, !from_hpfc));
+		pl = gen_nconc(pl, words_declaration(e, pp_dim));
 		break;
 	    case is_basic_overloaded:
 		/* nothing! some in hpfc I guess...
@@ -1822,7 +1833,7 @@ text_entity_declaration(entity module, list ldecl)
 		    if (i==1)
 		    {
 			ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : ",");
-			ps = gen_nconc(ps, words_declaration(e, !from_hpfc));
+			ps = gen_nconc(ps, words_declaration(e, pp_dim));
 		    }
 		    else
 		    {
@@ -1831,7 +1842,7 @@ text_entity_declaration(entity module, list ldecl)
 			chars = CHAIN_IWORD(chars, i);
 			chars = CHAIN_SWORD(chars, " ");
 			chars = gen_nconc(chars, 
-					  words_declaration(e, !from_hpfc));
+					  words_declaration(e, pp_dim));
 			attach_declaration_size_type_to_words
 			    (chars, "CHARACTER", i);
 			ADD_WORD_LIST_TO_TEXT(t_chars, chars);
@@ -1842,7 +1853,7 @@ text_entity_declaration(entity module, list ldecl)
 		    list chars=NIL;
 		    chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
 		    chars = gen_nconc(chars, 
-				      words_declaration(e, !from_hpfc));
+				      words_declaration(e, pp_dim));
 		    attach_declaration_type_to_words
 			(chars, "CHARACTER*(*)");
 		    ADD_WORD_LIST_TO_TEXT(t_chars, chars);
