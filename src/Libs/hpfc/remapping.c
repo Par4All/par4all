@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/12/28 18:20:45 $, ) 
+ * ($Date: 1996/02/16 12:02:22 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -748,12 +748,25 @@ generate_remapping_code(
     return result;
 }
 
+/* returns LIVEMAPPING(index) 
+ */
+static expression 
+live_mapping_expression(int index)
+{
+    entity live_status = hpfc_name_to_entity(LIVEMAPPING);
+    return reference_to_expression(make_reference
+        (live_status, CONS(EXPRESSION, int_to_expression(index), NIL)));
+}
+
 /* Runtime descriptors management around the remapping code.
  * performs the remapping if reaching mapping is ok, and update the 
  * mapping status.
  *
  * IF (MSTATUS(primary_number).eq.src_number) THEN
- *   the_code
+ *  [ IF (.not.LIVEMAPPING(target_number)]) THEN ]
+ *     the_code
+ *  [ ENDIF ]
+ *  [ LIVEMAPPING(target_number) = .TRUE. ]
  *   MSTATUS(primary_number) = trg_number
  * ENDDIF
  */
@@ -768,7 +781,8 @@ generate_remapping_guard(
         prm_n = load_hpf_number(load_primary_entity(src));
     entity m_status = hpfc_name_to_entity(MSTATUS); /* mapping status */
     expression m_stat_ref, cond;
-    statement affecte, result;
+    statement result;
+    list /* of statement */ l = NIL;
     
     /* MSTATUS(primary_n) */
     m_stat_ref =
@@ -777,19 +791,103 @@ generate_remapping_guard(
 			    CONS(EXPRESSION, int_to_expression(prm_n), NIL)));
     
     /* MSTATUS(primary_number) = trg_number */
-    affecte = make_assign_statement(copy_expression(m_stat_ref), 
-				    int_to_expression(trg_n));
+    l = CONS(STATEMENT,
+	     make_assign_statement(copy_expression(m_stat_ref), 
+				   int_to_expression(trg_n)), l);
 
     /* MSTATUS(primary_number).eq.src_number */
     cond = MakeBinaryCall(entity_intrinsic(EQUAL_OPERATOR_NAME),
 			  m_stat_ref, int_to_expression(src_n));
 
+    /* checks whether alive or not */
+    if (get_bool_property("HPFC_DYNAMIC_LIVENESS"))
+    {
+	expression live_cond =
+	    MakeUnaryCall(entity_intrinsic(NOT_OPERATOR_NAME),
+			  live_mapping_expression(trg_n));
+
+	the_code =  test_to_statement(make_test
+	    (live_cond, the_code, make_empty_statement()));
+
+	l = CONS(STATEMENT,
+		 make_assign_statement(live_mapping_expression(trg_n),
+				   make_constant_boolean_expression(TRUE)), l);
+    }
+
     result = test_to_statement(make_test(cond, 
-      make_block_statement(CONS(STATEMENT, the_code,
-			   CONS(STATEMENT, affecte, 
-				NIL))),
+      make_block_statement(CONS(STATEMENT, the_code, l)),
       make_empty_statement()));
 
+    return result;
+}
+
+static statement 
+generate_dynamic_liveness_for_primary(
+    entity primary, 
+    list /* of entity */ tokeep)
+{
+    statement result;
+    list /* of statement */ ls = NIL;
+
+    /* clean not maybeuseful instances of the primary
+     */
+    MAP(ENTITY, array,
+    {
+	if (!gen_in_list_p(array, tokeep))
+	{
+	    /* LIVEMAPPING(array) = .FALSE.
+	     */
+	    ls = CONS(STATEMENT, 
+	      make_assign_statement
+                  (live_mapping_expression(load_hpf_number(array)),
+		   make_constant_boolean_expression(FALSE)), ls);
+	}	    
+    },
+	entities_list(load_dynamic_hpf(primary)));
+
+    /* commented result
+     */
+    result = make_block_statement(ls);
+    statement_comments(result) = 
+	strdup(concatenate("c clean live set for ", 
+			   entity_local_name(primary), "\n", NULL));
+    return result;
+}
+
+static statement
+generate_dynamic_liveness_management(statement s)
+{
+    statement result;
+    list /* of entity */ already_seen = NIL,
+                         tokeep = entities_list(load_maybeuseful_mappings(s)),
+         /* of statement */ ls;
+    
+    result = make_empty_statement();
+    statement_comments(result) = 
+	strdup(concatenate("c end of liveness management\n", NULL));
+    ls = CONS(STATEMENT, result, NIL);
+
+    /* for each primary remapped at s, generate the management code.
+     */
+    MAP(ENTITY, array,
+    {
+	entity primary = load_primary_entity(array);
+
+	if (!gen_in_list_p(primary, already_seen))
+	{
+	    ls = CONS(STATEMENT, 
+		      generate_dynamic_liveness_for_primary(primary, tokeep),
+		      ls);
+	    already_seen = CONS(ENTITY, primary, already_seen);
+	}
+    },
+	tokeep);
+
+    /* commented result 
+     */
+    result = make_block_statement(ls);
+    statement_comments(result) = 
+	strdup(concatenate("c liveness management\n", NULL));
     return result;
 }
 
@@ -824,14 +922,13 @@ hpf_remapping(
     remapping_variables(p, src, trg, &l, &lp, &ll, &lrm, &ld, &lo);
     clean_the_system(&p, &lrm, &lo);
     lddc = simplify_deducable_variables(p, ll, &left);
+
     gen_free_list(ll);
     
     /* the P cycle ?
      */
     proc_distribution_p = gen_in_list_p(lambda, lo);
-
     if (proc_distribution_p) gen_remove(&lo, lambda);
-
     scanners = gen_nconc(lo, left);
 
     DEBUG_SYST(4, "cleaned system", p);
@@ -922,8 +1019,7 @@ static void reference_rwt(reference r)
 { l_found = gen_once(reference_variable(r), l_found);}
 
 static list
-list_of_referenced_entities(
-    statement s)
+list_of_referenced_entities(statement s)
 {
     l_found = NIL;
     gen_multi_recurse(s, loop_domain, gen_true, loop_rwt,
@@ -931,9 +1027,18 @@ list_of_referenced_entities(
     return l_found;
 }
 
+static text
+protected_text_statement(statement s)
+{
+    text t;
+    debug_on("PRETTYPRINT_DEBUG_LEVEL");
+    t = text_statement(entity_undefined, 0, s);
+    debug_off();
+    return t;
+}
+
 static void
-generate_hpf_remapping_file(
-    renaming r)
+generate_hpf_remapping_file(renaming r)
 {
     string file_name;
     FILE * f;
@@ -945,7 +1050,7 @@ generate_hpf_remapping_file(
      */
     remap = hpf_remapping(renaming_old(r), renaming_new(r));
     update_object_for_module(remap, node_module);
-    t = text_statement(entity_undefined, 0, remap);
+    t = protected_text_statement(remap);
 
     /* stores the remapping as computed
      */
@@ -970,8 +1075,7 @@ generate_hpf_remapping_file(
 /* just a hack because pips does not have 'include'
  */
 static statement
-generate_remapping_include(
-    renaming r)
+generate_remapping_include(renaming r)
 {
     statement result;
 
@@ -992,11 +1096,13 @@ generate_remapping_include(
  * side effects: (none?)
  * bugs or features:
  */
-void remapping_compile(
+void 
+remapping_compile(
     statement s,      /* initial statement in the source code */
     statement *hsp,   /* Host Statement Pointer */
     statement *nsp)   /* idem Node */
 {
+    statement tmp;
     list /* of statements */ l = NIL;
     
     debug_on("HPFC_REMAPPING_DEBUG_LEVEL");
@@ -1007,6 +1113,21 @@ void remapping_compile(
 
     *hsp = make_empty_statement(); /* nothing for host */
 
+    /* comment at the end
+     */
+    tmp = make_empty_statement();
+    statement_comments(tmp) = strdup(concatenate("c end remappings\n", NULL));
+    l = CONS(STATEMENT, tmp, l);
+
+    /* dynamic liveness management if required
+     */
+    if (get_bool_property("HPFC_DYNAMIC_LIVENESS"))
+    {
+	l = CONS(STATEMENT, generate_dynamic_liveness_management(s), l);
+    }
+
+    /* remapping codes (indirect thru include)
+     */
     MAP(RENAMING, r,
     {
 	if (!remapping_already_computed_p(r))
@@ -1017,8 +1138,13 @@ void remapping_compile(
     },
 	load_renamings(s));
 
-    *nsp = make_block_statement(l); /* block of remaps for the nodes */
+    /* comment at the beginning
+     */
+    tmp = make_empty_statement();
+    statement_comments(tmp)=strdup(concatenate("c begin remappings\n", NULL));
+    l = CONS(STATEMENT, tmp, l);
 
+    *nsp = make_block_statement(l); /* block of remaps for the nodes */
     DEBUG_STAT(8, "result", *nsp);
 
     debug_off();
