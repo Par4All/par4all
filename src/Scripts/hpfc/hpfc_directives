@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1996/08/21 15:37:49 $, 
+# $Date: 1996/08/22 14:02:37 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -118,17 +118,21 @@ $RM -f $TMP.*
 # FCD are simply translated into hpf-like prefixed directives
 # ??? maybe should I add some option to avoid this translation?
 #
-$SED '#
+$SED "#
       # switch HPF and FC directive origins to Ctrl-V ot Ctrl-W
       #
       s,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,\1,;
       s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,;
       #
-      # ! style comments are removed. There should be none in time messages...
+      # ! style comments are removed. 
       #
-      /[]/s,!.*,,;
+      /[]/s,^\([^'\"]*\)!.*,\1,;
+      /[]/s,^\([^'\"]*'[^'\"]*'[^'\"]*\)!.*,\1,;
+      /[]/s,^\([^'\"]*\"[^'\"]*\"[^'\"]*\)!.*,\1,;
       #
-      # switch to lower case letters the directives *only*
+      # switch to lower case letters the directive lines *only*
+      # ??? this includes messages that may be put in directives,
+      #     as with the time/end time stuff.
       #
       /[]/s,A,a,g;/[]/s,B,b,g;/[]/s,C,c,g;/[]/s,D,d,g;
       /[]/s,E,e,g;/[]/s,F,f,g;/[]/s,G,g,g;/[]/s,H,h,g;
@@ -136,7 +140,7 @@ $SED '#
       /[]/s,M,m,g;/[]/s,N,n,g;/[]/s,O,o,g;/[]/s,P,p,g;
       /[]/s,Q,q,g;/[]/s,R,r,g;/[]/s,S,s,g;/[]/s,T,t,g;
       /[]/s,U,u,g;/[]/s,V,v,g;/[]/s,W,w,g;/[]/s,X,x,g;
-      /[]/s,Y,y,g;/[]/s,Z,z,g;' |
+      /[]/s,Y,y,g;/[]/s,Z,z,g;" |
 #
 # continuation handling:
 # - put the whole file on one line:-)
@@ -151,16 +155,14 @@ $TR '' '\012' |
 # massive pattern-matching transformations:
 # directives are switched to hpfc specials calls.
 #
-$SED '#
+$SED "#
       # space normalization (pattern-matching is easier afterwards)
+      # all spaces are removed but on lines that includes quotes
+      # (there are some in endtime directives, that are thus expected
+      # with some spaces)
       #
-      /[]/s,[ 	][ 	]*, ,g;
-      /[]/s, $,,;
-      /[]/s,\([0-9a-z]\) \([^0-9a-z]\),\1\2,g;
-      /[]/s,\([^0-9a-z]\) \([0-9a-z]\),\1\2,g;
-      /[]/s,\([^0-9a-z]\) \([^0-9a-z]\),\1\2,g;
-      //s,)with\([\* ]\),) with\1,;
-      //s,)onto ,) onto ,;
+      /[][^'\"]*$/s,[ 	][ 	]*,\1,g;
+      /[]/s,\([]\),\1 ,;
       #
       # simple 1D FORALL instruction without continuation... 
       s,^\([^Cc!\*].... \)[ 	]*[Ff][Oo][Rr][Aa][Ll][Ll][ 	]*(\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\))\(.*\),\1do \2=\3\,\4\5enddo,
@@ -168,8 +170,8 @@ $SED '#
       s,^\([^Cc!\*].... \)[ 	]*[Ff][Oo][Rr][Aa][Ll][Ll][ 	]*(\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\)\,\([ 	a-zA-Z0-9]*\)=\([ 	a-zA-Z0-9]*\):\([ 	a-zA-Z0-9]*\))\(.*\),\1do \2=\3\,\4do \5=\6\,\7\8enddoenddo,
       #
       # descriptive mappings: switched to prescriptive!
-      //s, align \(.*\) with\*, align \1 with ,;
-      //s, distribute \([a-z0-9_]*\)\*, distribute \1,;
+      //s, align\(.*\)with\*, align\1with,;
+      //s, distribute\([a-z0-9_]*\)\*, distribute\1,;
       #
       # indirect reserved words: block, cyclic, *, nop
       #
@@ -184,18 +186,19 @@ $SED '#
       //s,number_of_processors(),#,g
       #
       # obsolescent FC directives:
-      s, time *on,2,
-      s, time *off,3,
+      s, timeon,2,
+      s, timeoff,3,
       #
       # FC directives and hacks...
       #
       s, synchro,1,
       s, time,2,
-      s, end *time,3,
-      s, set *bool,4,
-      s, set *int,5,
+      # end time may not be normalized
+      s, [ 	]*e[ 	]*n[ 	]*d[ 	]*t[ 	]*i[ 	]*m[ 	]*e,3,
+      s, setbool,4,
+      s, setint,5,
       s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
-      s, end *local,      enddo,
+      s, endlocal,      enddo,
       s, io\(.*\),6(\1),
       s, kill\(.*\),8(\1),
       #
@@ -203,40 +206,40 @@ $SED '#
       # (two levels needed because of some unstructured...)
       #
       s, host,      if (.true.) then7if (.true.) then,
-      s, end *host,      endifendif,
+      s, endhost,      endifendif,
       # io args shoud look like calls for pips
       /6(/s,\,,()\,,g;
-      /6(/s,\([a-z0-9]\))$,\1()),;
+      /6(/s,\([a-z0-9]\))\$,\1()),;
       #
       # HPF declaration directives (well, pure is not)
       #
-      s, dynamic \(.*\),y(\1),
-      s, template \(.*\),      logical \1t(\1),
-      s, processors \(.*\),      logical \1p(\1),
+      s, dynamic\(.*\),y(\1),
+      s, template\(.*\),      logical \1t(\1),
+      s, processors\(.*\),      logical \1p(\1),
       s, pure\(.*\),u(\1),
       # pure treated as io above.
       /u(/s,\,,()\,,g;
-      /u(/s,\([a-z0-9]\))$,\1()),;
+      /u(/s,\([a-z0-9]\))\$,\1()),;
       #
       # HPF static and dynamic mapping directives
       #  - some simple free style is parsed.
       #
       # inherit... I am still laughing about it
-      s, inherit , distribute ,;
+      s, inherit, distribute,;
       #
-      s, align with \(.*\)::\(.*\),a(\2\,\1),
-      s, align\(.*\) with \(.*\)::\(.*\),a(hpfck\1\,\3\,\2),
-      s, align \(.*\) with \(.*\),a(\1\,\2),
-      s, re *align with \(.*\)::\(.*\),b(\2\,\1),
-      s, re *align\(.*\) with \(.*\)::\(.*\),b(hpfck\1\,\3\,\2),
-      s, re *align \(.*\) with \(.*\),b(\1\,\2),
+      s, alignwith\(.*\)::\(.*\),a(\2\,\1),
+      s, align\(.*\)with\(.*\)::\(.*\),a(hpfck\1\,\3\,\2),
+      s, align\(.*\)with\(.*\),a(\1\,\2),
+      s, realignwith\(.*\)::\(.*\),b(\2\,\1),
+      s, realign\(.*\)with\(.*\)::\(.*\),b(hpfck\1\,\3\,\2),
+      s, realign\(.*\)with\(.*\),b(\1\,\2),
       #
-      s, distribute\(.*\) onto \(.*\)::\(.*\),d(\3\,\2\1),
-      s, distribute \(.*\) onto \(.*\),d(\1\,\2),
-      s, distribute \(.*\),d(\1\,hpfcX),
-      s, re *distribute\(.*\) onto \(.*\)::\(.*\),e(\3\,\2\1),
-      s, re *distribute \(.*\) onto \(.*\),e(\1\,\2),
-      s, re *distribute \(.*\),e(\1\,hpfcX),
+      s, distribute\(.*\)onto\(.*\)::\(.*\),d(\3\,\2\1),
+      s, distribute\(.*\)onto\(.*\),d(\1\,\2),
+      s, distribute\(.*\),d(\1\,hpfcX),
+      s, redistribute\(.*\)onto\(.*\)::\(.*\),e(\3\,\2\1),
+      s, redistribute\(.*\)onto\(.*\),e(\1\,\2),
+      s, redistribute\(.*\),e(\1\,hpfcX),
       #
       # HPF parallelism directives
       #
@@ -245,7 +248,7 @@ $SED '#
       //s,\,new(, new(,g
       //s,\,reduction(, reduction(,g
       //s,\,independent\([(\,]\), independent\1,g
-      //s,\,independent *$, independent,
+      //s,\,independent *\$, independent,
       # specific handling
       s, new,n,g
       s, reduction,r,g
@@ -262,7 +265,7 @@ $SED '#
       # SWITCH to special hpfc functions...
       #
       s,\([12345678abdeintpryu]\),      call hpfc\1,g
-      s,\([ck#s]\),hpfc\1,g' | 
+      s,\([ck#s]\),hpfc\1,g" | 
 #
 # handles multi lines breaking (independent/new/reduction...)
 #
