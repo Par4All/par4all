@@ -99,6 +99,12 @@ bool continuation_conditions(char *module_name)
     DB_PUT_MEMORY_RESOURCE(DBR_MAY_SUMMARY_CONTINUATION, 
 			   strdup(module_name),
 			   (char*) may_sum_cont_t);
+    reset_current_module_entity();
+    reset_current_module_statement();
+    reset_transformer_map();
+    free_cumulated_effects_map();
+    reset_must_continuation_map();
+    reset_may_continuation_map();
 
     return(TRUE);
 }
