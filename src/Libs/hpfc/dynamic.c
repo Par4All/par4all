@@ -1,34 +1,16 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/04/04 10:47:31 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/04/10 18:49:33 $, )
  * version $Revision$
  */
- 
-#include <stdio.h>
-#include <string.h> 
-extern fprintf();
 
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
+#include "defines-local.h"
 
-#include "genC.h"
-#include "ri.h" 
-#include "hpf.h" 
-#include "hpf_private.h"
-
-#include "ri-util.h" 
-#include "misc.h" 
 #include "control.h"
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
-#include "properties.h"
-
-#include "hpfc.h"
-#include "defines-local.h"
 
 /*--------------------------------------------------
  *
@@ -42,6 +24,7 @@ extern fprintf();
  * which is distributed or aligned in a different way.
  */
 GENERIC_GLOBAL_FUNCTION(dynamic_hpf, entity_entities);
+GENERIC_GLOBAL_FUNCTION(primary_entity, entitymap);
 
 void set_entity_as_dynamic(a)
 entity a;
@@ -62,12 +45,32 @@ entity new_e, e;
 
     entities_list(es) = CONS(ENTITY, new_e, entities_list(es));
     store_dynamic_hpf(new_e, es);
+    store_primary_entity(new_e, load_primary_entity(e));
 }
 
 bool dynamic_entity_p(a)
 entity a;
 {
     return(bound_dynamic_hpf_p(a));
+}
+
+/*  builds a synonym for entity e. The name is based on e, plus
+ *  an underscore and a number added.
+ */
+static entity new_synonym(e)
+entity e;
+{
+    int n = gen_length(entities_list(load_dynamic_hpf(e))); /* number */
+    entity primary = load_primary_entity(e);
+    string module = entity_module_name(e);
+    char new_name[100];	
+    
+    (void) sprintf(new_name, "%s_%x",
+		   entity_local_name(primary), (unsigned int) n);
+
+    debug(5, "new_synonym", "building entity %s\n", new_name);
+
+    return(FindOrCreateEntityLikeModel(module, new_name, primary));
 }
 
 /*  as expected, TRUE if d1 and d2 describe the same mapping
