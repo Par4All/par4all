@@ -42,9 +42,6 @@
 #define call_constant_p(C) \
   (value_constant_p(entity_initial(call_function(C))))
 
-#define effect_write_p(my_effect) \
-  (action_write_p(effect_action(my_effect)))
-
 /* The following define may be replaced by #define ... (TRUE) */
 #define effect_may_or_must_p(my_effect) \
   ((approximation_may_p(effect_approximation(my_effect))) || \
