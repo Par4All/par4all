@@ -42,6 +42,9 @@ static bool is_transformer;
 static bool is_user_view;
 static hash_table nts = hash_table_undefined;
 
+static void print_code_semantics();
+static text get_semantic_text();
+
 void print_code_transformers(module_name)
 char *module_name;
 {
@@ -74,12 +77,63 @@ char *module_name;
     print_code_semantics(module_name);
 }
 
-void print_code_semantics(module_name)
+text get_text_transformers(module_name)
 char *module_name;
 {
-    text r = make_text(NIL);
+    is_user_view = FALSE;
+    is_transformer = TRUE;
+    return get_semantic_text(module_name,FALSE);
+}
+
+text get_text_preconditions(module_name)
+char *module_name;
+{
+    is_user_view = FALSE;
+    is_transformer = FALSE;
+    return get_semantic_text(module_name,FALSE);
+}
+
+static void print_code_semantics(module_name)
+char *module_name;
+{
     char *filename;
     FILE *fd;
+    entity mod;
+    text r = make_text(NIL);
+
+    mod = local_name_to_top_level_entity(module_name);
+    /* prepare the prettyprintting */
+    filename = strdup(concatenate(db_get_current_program_directory(), 
+				  "/",
+				  module_name,
+				  is_transformer?
+				  (is_user_view? USER_TRANSFORMER_SUFFIX :
+				   SEQUENTIAL_TRANSFORMER_SUFFIX ) :
+				  (is_user_view? USER_PRECONDITION_SUFFIX :
+				   SEQUENTIAL_PRECONDITION_SUFFIX),
+				  NULL));
+    fd = safe_fopen(filename, "w");
+
+    MERGE_TEXTS(r,get_semantic_text(module_name,TRUE));
+
+    print_text(fd, r);
+
+    safe_fclose(fd, filename);
+
+    /* Let's assume that value_mappings will be somehow sometime freed... */
+
+    DB_PUT_FILE_RESOURCE((is_user_view? DBR_PARSED_PRINTED_FILE :
+			  DBR_PRINTED_FILE),
+			 strdup(module_name),
+ 			 filename);
+
+}
+
+static text get_semantic_text(module_name,give_code_p)
+char *module_name;
+bool give_code_p;
+{
+    text r = make_text(NIL);
     entity mod;
     statement mod_stat;
     transformer summary = transformer_undefined;
@@ -89,7 +143,7 @@ char *module_name;
     mod = get_current_module_entity();
 
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+				 db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     mod_stat = get_current_module_statement();
 
     if(is_user_view) {
@@ -109,16 +163,16 @@ char *module_name;
 
     /* to set up the hash table to translate value into value names */
     set_cumulated_effects_map( effectsmap_to_listmap((statement_mapping) 
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
+						     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE)));
     module_to_value_mappings(mod);
 
     /* semantic information to print */
     set_semantic_map( (statement_mapping)
-	db_get_memory_resource(
-			       is_transformer? DBR_TRANSFORMERS 
-			       : DBR_PRECONDITIONS,
-			       module_name,
-			       TRUE) );
+		     db_get_memory_resource(
+					    is_transformer? DBR_TRANSFORMERS 
+					    : DBR_PRECONDITIONS,
+					    module_name,
+					    TRUE) );
     summary = (transformer)
 	db_get_memory_resource(
 			       is_transformer? DBR_SUMMARY_TRANSFORMER
@@ -127,54 +181,32 @@ char *module_name;
 			       TRUE);
 
     if(string_undefined_p((string) summary)) {
-	pips_error("print_code_semantics",
+	pips_error("get_code_semantics",
 		   "Summary information %s unavailable\n",
 		   is_transformer? "DBR_SUMMARY_TRANSFORMER"
 		   : "DBR_SUMMARY_PRECONDITION");
     }
 
-    /* prepare the prettyprintting */
-    filename = strdup(concatenate(db_get_current_program_directory(), 
-				  "/",
-				  module_name,
-				  is_transformer?
-				  (is_user_view? USER_TRANSFORMER_SUFFIX : SEQUENTIAL_TRANSFORMER_SUFFIX ) :
-				  (is_user_view? USER_PRECONDITION_SUFFIX : SEQUENTIAL_PRECONDITION_SUFFIX),
-				  NULL));
-    fd = safe_fopen(filename, "w");
-
     init_prettyprint(semantic_to_text);
 
     debug_on("SEMANTICS_DEBUG_LEVEL");
 
-
-
     /* initial version; to be used again when prettyprint really prettyprints*/
     /* print_text(fd, text_statement(mod, 0, mod_stat)); */
-
-    /* new version */
 
     /* summary information first */
     MERGE_TEXTS(r,text_transformer(summary)); 
 
+    if (give_code_p == TRUE) {
+	/* then code with the corresponding information */
+	ADD_SENTENCE_TO_TEXT(r, 
+			     make_sentence(is_sentence_formatted, 
+					   code_decls_text(entity_code(mod))));
+	MERGE_TEXTS(r, text_statement(mod, 0, is_user_view? user_stat:mod_stat));
+	ADD_SENTENCE_TO_TEXT(r, sentence_tail());
+    }
+
     debug_off();
-
-    /* then code with the corresponding information */
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_formatted, 
-				       code_decls_text(entity_code(mod))));
-    MERGE_TEXTS(r, text_statement(mod, 0, is_user_view? user_stat:mod_stat));
-    ADD_SENTENCE_TO_TEXT(r, sentence_tail());
-    print_text(fd, r);
-    /* end of new version */
-
-    safe_fclose(fd, filename);
-
-    /* Let's assume that value_mappings will be somehow sometime freed... */
-
-    DB_PUT_FILE_RESOURCE(is_user_view? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE,
-			 strdup(module_name),
- 			 filename);
 
     if(is_user_view) {
 	hash_table_free(nts);
@@ -184,6 +216,8 @@ char *module_name;
     reset_semantic_map();
     reset_current_module_entity();
     reset_current_module_statement();
+
+    return r;
 }
 
 /* this function name is VERY misleading - it should be changed, sometime FI */
@@ -217,7 +251,7 @@ statement stmt;
  * output   : a text containing commentaries representing the transformer
  * modifies : nothing.
  */
-text text_transformer(tran)
+static text text_transformer(tran)
 transformer tran;
 {
     text txt = make_text(NIL);
@@ -240,10 +274,12 @@ transformer tran;
 		str_prefix = PIPS_NORMAL_PREFIX;
 	}
 	
-	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted, strdup("\n")));
+	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+						strdup("\n")));
 	MERGE_TEXTS(txt, 
 		    string_predicate_to_commentary(str_tran, str_prefix));
-	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted, strdup("\n")));
+	ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
+						strdup("\n")));
     }
     return txt; 
 }
@@ -307,7 +343,8 @@ string comment_prefix;
 
 	    /* add it to the text */
 	    ADD_SENTENCE_TO_TEXT(t_pred, 
-				 make_pred_commentary_sentence(strdup(str_tmp), str_prefix));
+				 make_pred_commentary_sentence(strdup(str_tmp),
+							       str_prefix));
 	    str_pred =  str_suiv;
 	}
 	else {
@@ -318,7 +355,8 @@ string comment_prefix;
 	    (void) strcat(str_tmp, str_pred);
 
 	    ADD_SENTENCE_TO_TEXT(t_pred, 
-				 make_pred_commentary_sentence(str_tmp, str_prefix));
+				 make_pred_commentary_sentence(str_tmp,
+							       str_prefix));
 	    str_pred[0] = '\0';
 	}
 	
@@ -326,7 +364,10 @@ string comment_prefix;
 	    premiere_ligne = FALSE;
 	    longueur_max = longueur_max - 1;
 	    if (foresys){
-		int i, nb_espaces = strlen (str_prefix) - strlen(FORESYS_CONTINUATION_PREFIX);
+		int i;
+		int nb_espaces = strlen(str_prefix) -
+		    strlen(FORESYS_CONTINUATION_PREFIX);
+
 		str_prefix = strdup(str_prefix);
 		str_prefix[0] = '\0';
 		(void) strcat(str_prefix, FORESYS_CONTINUATION_PREFIX);
