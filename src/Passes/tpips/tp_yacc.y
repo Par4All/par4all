@@ -104,11 +104,13 @@ close_workspace_if_opened(void)
 }
 
 static void
-set_env(string var, string val)
+set_env_log_and_free(string var, string val)
 {
     string ival = getenv(var);
     if (!ival || !same_string_p(val, ival))
 	putenv(strdup(concatenate(var, "=", val, 0)));
+    user_log("setenv %s \"%s\"\n", var, val);
+    free(var); free(val);
 }
 
 /* Default comand to print a file (if $PAGER is not set) */
@@ -324,17 +326,13 @@ i_getenv: TK_GET_ENVIRONMENT TK_NAME TK_ENDOFLINE
 	;
 
 i_setenv: TK_SET_ENVIRONMENT TK_NAME TK_NAME TK_ENDOFLINE
-	{
-	    set_env($2, $3);
-	    user_log("setenv %s %s\n", $2, $3);
-	    free($2); free($3);
-	}
+	{ set_env_log_and_free($2, $3);	}
 	| TK_SET_ENVIRONMENT TK_NAME TK_EQUAL TK_NAME TK_ENDOFLINE
-	{
-	    set_env($2, $4);
-	    user_log("setenv %s %s\n", $2, $4);
-	    free($2); free($4);
-	}
+	{ set_env_log_and_free($2, $4);	}
+	| TK_SET_ENVIRONMENT TK_NAME TK_A_STRING TK_ENDOFLINE
+	{ set_env_log_and_free($2, $3);	}
+	| TK_SET_ENVIRONMENT TK_NAME TK_EQUAL TK_A_STRING TK_ENDOFLINE
+	{ set_env_log_and_free($2, $4);	}
 	;
 
 i_open:	TK_OPEN TK_NAME TK_ENDOFLINE
