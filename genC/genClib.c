@@ -19,8 +19,6 @@
  * implemented by gen_chunks (see genC.c).
  */
 
-/*LINTLIBRARY*/
-
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -35,12 +33,16 @@
  */
 extern void newgen_start_lexer(FILE*);
 
+#define GO (1)
+
 /* lex files
  */
 extern FILE *genspec_in, *genspec_out;
 
-#define GO (1)
+/********************************************************** GLOBAL VARIABLES */
 
+/* pointer to tabulated domain hack 
+ */
 struct gen_binding *Tabulated_bp ;
 
 int Read_spec_mode ;
@@ -52,13 +54,18 @@ static bool Read_spec_performed = FALSE ;
  * when gen_trav_obj() moves upwards the point it was when gen_debug
  * was set
  */
-
 int gen_debug = 0 ;
 static int gen_debug_indent = 0 ;
 
 /* Default option in GEN_WRITE. */
 
 static int disallow_undefined_tabulated = TRUE ;
+
+/* to be dropped... */
+list Gen_cp_[50];
+list * gen_cp_ = Gen_cp_;
+gen_chunk Gen_hash_[50] ;
+gen_chunk * gen_hash_ = Gen_hash_;
 
 /********************************************************************** MISC */
 
