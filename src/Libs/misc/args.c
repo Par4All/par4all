@@ -24,6 +24,22 @@ list_to_arg(list li,
 }
 
 
+/* Just modify the strings in a list from an array of strings. The
+   array of string must have at least as much as strings as in the
+   list. No free is done. */
+void
+update_list_from_arg(list l,
+		     char ** the_strings)
+{
+    int i = 0;
+    MAPL(scons,
+	{
+	    STRING(CAR(scons)) = the_strings[i++];
+	},
+	l);
+}
+
+
 void args_free(pargc, argv)
 int *pargc;
 char *argv[];
@@ -72,4 +88,20 @@ args_sort(int argc,
          argc,
          sizeof(char *),
          compare_args_string_for_qsort);
+}
+
+
+/* Sort a list of string: */
+void
+sort_list_of_strings(list l)
+{
+    int arg_number;
+    int number_of_strings = gen_length(l);    
+    char ** the_strings = malloc(number_of_strings*sizeof(char *));
+    
+    list_to_arg(l, &arg_number, the_strings);
+    pips_assert("The size of the args and the list should be the same",
+		arg_number == number_of_strings);
+    args_sort(arg_number, the_strings);
+    update_list_from_arg(l, the_strings);
 }
