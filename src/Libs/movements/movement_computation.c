@@ -332,7 +332,7 @@ int dim_h;
     Pbase var_id;
     int dim_h2= dim_h;
     unsigned	space;
-    int sc_info[sc_image->dimension+1][3];
+    int sc_info[sc_image->dimension+1][3]; /* this is NOT ANSI C */
     int i;
     Pvecteur pv1= NULL;
     Pbase btmp = BASE_NULLE;
