@@ -27,9 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "newgen_types.h"
 #include "genC.h"
-#include "newgen_set.h"
 
 #define INITIAL_SET_SIZE 10
 
@@ -40,7 +38,7 @@ void set_clear(), set_free();
 set set_make( type )
 set_type type ;
 {
-    set hp = (set)malloc( sizeof( struct set )) ;
+    set hp = (set)malloc( sizeof( set_chunk )) ;
 
     if( hp == (set)NULL ) {
 	(void) fprintf( stderr, "set_make: cannot allocate\n" ) ;
@@ -191,3 +189,41 @@ set s ;
     free( s ) ;
 }
 
+bool 
+set_empty_p(
+    set s)
+{
+    SET_MAP(x, return FALSE, s);
+    return TRUE;
+}
+
+/* a set-based implementation of gen_closure
+ * that does not go twice in the same object.
+ * FC 27/10/95.
+ */
+void
+gen_set_closure(
+    void (*iterate)(char *, set),
+    set initial)
+{
+    set curr, next, seen;
+    set_type t = initial->type;
+
+    seen = set_make(t);
+    curr = set_make(t);
+    next = set_make(t);
+
+    set_assign(curr, initial);
+
+    while (!set_empty_p(curr))
+    {
+	SET_MAP(x, iterate(x, next), curr);
+	(void) set_union(seen, seen, curr);
+	set_difference(curr, next, seen);
+	set_clear(next);
+    }
+
+    set_free(curr);
+    set_free(seen);
+    set_free(next);
+}
