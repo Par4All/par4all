@@ -11,7 +11,8 @@
 
 <A HREF="index.html"><B> B&eacute;atrice CREUSILLET</B></A>
 <P>
-<EM> creusillet@cri.ensmp.fr</EM>,
+<EM> creusillet@cri.ensmp.fr</EM>
+<P>
 <EM>http://www.cri.ensmp.fr/~creusil</EM>
 
 <P>
@@ -41,7 +42,7 @@ inter-procedural analysis of array data flow.
 <P>
 
 A recent type of analysis (see <A HREF="#brandes">Thomas Brandes</A> and <A
-HREF="#feautrier">Paul Feautrier</A> has opened up wide perspectives in this
+HREF="#feautrier">Paul Feautrier</A>) has opened up wide perspectives in this
 area.  It provides an exact analysis of array data flow, originally
 in monoprocedural programs with static control. This last constraint has
 since been partially removed by <A HREF="#maslov">Vadim Maslov</A> and <A
@@ -60,13 +61,13 @@ scalar variables, they are not accurate enough to support powerful
 optimizations.  <P>
 
 In <A HREF="/~pips">PIPS</A>, the Interprocedural Parallelizer of Scientific
-Programs developed at E'cole des Mines de Paris, we have extended Triolet's
+Programs developed at &Eacute;cole des mines de Paris, we have extended Triolet's
 array regions to compute summaries that exactly represent the effects of
 statements and procedures on sets of array elements, whenever possible;
 whereas the regions originally defined by Triolet were <I>
 over-approximations </I> of these effects. The computation of READ and WRITE
 regions relies on a preliminary analysis of the exact effects of statements
-and procedures upon array elements.
+and procedures upon array elements. <P>
 
 
 The resulting regions are already used in <A HREF="/~pips">PIPS</A> to
@@ -77,7 +78,7 @@ optimizations such as array privatization.  <P>
 
 We have therefore introduced two new types of exact regions: for any
 statement or procedure, IN regions contain its imported array elements, and
-OUT regions represent its set of live array elements.
+OUT regions represent its set of live array elements. <P>
 
 The possible applications are numerous. These regions are already used in
 PIPS to privatize array sections. In massively parallel or heterogeneous
@@ -99,10 +100,10 @@ translation is needed. However, by examining the Perfect Club benchmarks, we
 found out that the existing methods for handling array reshapes were
 insufficient. We have implemented in <A HREF="/~pips">PIPS</A> a general
 linear framework that handles array reshapes in most cases, including when
-the arrays are not of the same type, or belong to a COMMON which does not
-have the same layout in the caller and the callee.
+the arrays are not of the same type, or belong to a <TT>COMMON</TT> which does not
+have the same layout in the caller and the callee. <P>
 
-The following sections give more details about array regions.
+The following sections give some more details about array regions.
 
 <HR>
 <P>
@@ -120,11 +121,11 @@ characteristics are also of interest:
 and OUT to represent the flow of array elements;
 
 <LI> the <I> approximation</I> of the region: <TT>EXACT</TT> when the region
-  exactly represents the requested set of array elements, or <TT>may</TT> or
-<TT>must</TT>
-  if it is an over- or under-approximation; in the PIPS, we only
-  consider <TT>exact</TT> and <TT>may</TT> regions; previously,
-  <TT>must</TT> was unfortunately used to mean <TT>exact</TT>.
+  exactly represents the requested set of array elements, or <TT>MAY</TT> or
+<TT>MUST</TT>
+  if it is an over- or under-approximation; in PIPS, we only
+  consider <TT>EXACT</TT> and <TT>MAY</TT> regions (previously,
+  <TT>MUST</TT> was unfortunately used to mean <TT>EXACT</TT>).
 </UL>
 
 
@@ -165,12 +166,12 @@ it defines, and that are (<TT> EXACT</TT>) or may be (<TT>MAY</TT>) used
 afterwards, in the execution order of the program. These are the <I>live</I>
 or <I> exported</I> array elements. <P>
 
-The OUT region of a statement is not defiend <I>per se<I>, but depends on
+The OUT region of a statement is not defiend <I>per se</I>, but depends on
 the future of the computation. For instance, the OUT region of <TT>S1</TT>
 in program <TT>S1;S2</TT> is a function of <TT>S1;S2</TT> as a whole, and of
 <TT>S2</TT>. Thus, OUT regions are propagateed in a top-down fashion along
 the call graph and hierarchical control flow graph of the program. Since I/O
-operations are part of the program, the OU regions of the main program, from
+operations are part of the program, the OUT regions of the main program, from
 which the other OUT regions are derived, is initialized to the empty set.
 
 
@@ -181,18 +182,18 @@ which the other OUT regions are derived, is initialized to the empty set.
 
 The interprocedural propagation of READ, WRITE, and IN regions
 is a backward analysis. At each call site, the summary regions of the called
-subroutine are translated from the calle{e}'s name space into the caller's
+subroutine are translated from the callee's name space into the caller's
 name space, using the relations between actual and formal parameters, and
-between the declarations of global variables in both routines.
+between the declarations of global variables in both routines. <P>
 
 On the contrary, the interprocedural propagation of OUT regions is a
 forward analysis. The regions of all the call sites are first translated
 from the callers'name space into the callee's name space, and are then
-merged to form a unique summary.
+merged to form a unique summary. <P>
 
-Because the source and target arrays may not have the same decalration
+Because the source and target arrays may not have the same declaration
 (<I>array reshaping</I>), the translation is not a straightforward
-operation.
+operation. <P>
 
 In his thesis, Triolet gave conditions to perform the translation by simply
 changing the name of the array, and projecting the polyhedron onto the name
@@ -202,7 +203,7 @@ instance a single column of a matrix. <P>
 
 For the Perfect Club Benchmarks, these conditions are too restrictive. In
 particular, they cannot handle offsets in declarations, general offsets in
-the references at call site, and array reshaping is rarely treated.
+the references at call site, and array reshaping is rarely treated. <P>
 
 In order to handle the general case, <B>subscript values</B> (see the
 FORTRAN standard) are used. The subscript value of an array element is its
@@ -211,7 +212,7 @@ FORTRAN standard) are used. The subscript value of an array element is its
 array. However, this may lead to non-linear expressions that are not
 handled in PIPS. The method tries instead to find similar dimensions, which
 are translated in a trivial way. The subscript values are then used for the
-remaining dimensions. 
+remaining dimensions. <P>
 
 The translation from formal to real parameters, as well as the translation
 of global variables (arrays in <TT>COMMONs</TT>, even in case of a partial
@@ -223,10 +224,10 @@ elements is also performed.
 <P>
 <H2> <A NAME="references">5. References</A> </H2>
 
-<A HREF="/~creusil/references.html#publications">Bibliography</A>
+<H3> <A HREF="/~creusil/references.html#publications">Bibliography</A> </H3>
 <P>
 
-Related work:
+<H3> Related work: </H3>
 <P>
 
 <DT> <A NAME="brandes"> Thomas Brandes. </A> <CITE> The importance of direct dependences for automatic parallelization. </CITE>
