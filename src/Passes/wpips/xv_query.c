@@ -24,7 +24,7 @@ static success (*apply_on_query)();
 void start_query(window_title, query_title, help_topic, ok_func, cancel_func)
      char *window_title, *query_title, *help_topic;
      success (*ok_func)();
-     success (*cancel_func)();
+     success (*cancel_func)(Panel_item, Event *);
 {
   xv_set(query_frame, FRAME_LABEL, window_title, NULL);
   /*	     PANEL_NOTIFY_PROC, cancel_query_notify, */
