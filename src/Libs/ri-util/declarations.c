@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.23  2003/08/11 16:21:44  irigoin
+ * Sort added before declarations are regenerated.
+ *
  * Revision 1.22  2003/08/06 13:43:45  nguyen
  * Modify and add functions for C prettyprinter
  *
@@ -1295,8 +1298,11 @@ text_entity_declaration(
   text r, t_chars = make_text(NIL), t_area = make_text(NIL); 
   string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
   bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
+  list sorted_ldecl = gen_copy_seq(ldecl);
+
+  gen_sort_list(sorted_ldecl, compare_entities);
      
-  /* where to put the dimensionn information.
+  /* where to put the dimension information.
    */
   if (same_string_p(pp_var_dim, "type"))
     pp_in_type = TRUE, pp_in_common = FALSE;
@@ -1545,7 +1551,7 @@ text_entity_declaration(
 				basic_tag(b));
 	  }
       }
-  }, ldecl);
+  }, sorted_ldecl);
     
   /* usually they are sorted in order, and appended backwards,
    * hence the reversion.
@@ -1592,7 +1598,7 @@ text_entity_declaration(
 
   /* and EQUIVALENCE statements... - BC 
    */
-  MERGE_TEXTS(r, text_equivalences(module, ldecl, 
+  MERGE_TEXTS(r, text_equivalences(module, sorted_ldecl, 
 				   pp_cinc || !print_commons));
 
   /* what about DATA statements! FC 
@@ -1604,6 +1610,8 @@ text_entity_declaration(
     MERGE_TEXTS(r, text_data(module, ldecl));
   }
   */
+
+  gen_free_list(sorted_ldecl);
 
   return r;
 }
