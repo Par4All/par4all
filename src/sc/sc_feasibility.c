@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1995/09/01 14:32:33 $, 
+ * date: $Date: 1995/09/14 20:04:54 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -176,8 +176,8 @@ Pbase b;
     ifscdebug(8)
     {
 	fprintf(stderr, "[chose_variable_to_project_for_feasability] b/s:\n");
-	vect_fprint(stderr, b, variable_default_name);
-	sc_fprint(stderr, s, variable_default_name);
+	vect_fprint(stderr, b, default_variable_to_string);
+	sc_fprint(stderr, s, default_variable_to_string);
     }
 
     if (size==1) return var_of(b);
@@ -233,7 +233,8 @@ Pbase b;
 		var = var_of(v); 
 		if (var!=TCST)
 		{
-		    ifscdebug(9) fprintf(stderr, "%s\n", var);
+		    ifscdebug(9) 
+			fprintf(stderr, "%s\n", default_variable_to_string(var));
 
 		    for (i=0, tmp=b; tmp && var_of(tmp)!=var; 
 			 i++, tmp=tmp->succ);
@@ -258,7 +259,7 @@ Pbase b;
 
     ifscdebug(8)
 	fprintf(stderr, "[chose_variable_to_project_for_feasability] "
-		"suggesting %s\n", var);
+		"suggesting %s\n", default_variable_to_string(var));
 
     return var;
 }
@@ -295,7 +296,7 @@ int ofl_ctrl;
     ifscdebug(8)
     {
 	fprintf(stderr, "[sc_fourier_motzkin_feasibility_ofl_ctrl] system:\n");
-	sc_fprint(stderr, s1, variable_default_name);
+	sc_fprint(stderr, s1, default_variable_to_string);
     }
 
     s1 = sc_elim_db_constraints(s1);
@@ -316,7 +317,7 @@ int ofl_ctrl;
 	    {
 		fprintf(stderr, "sc_fourier_motzkin_feasibility_ofl_ctrl]"
 			" system before %s projection:\n", var);
-		sc_fprint(stderr, s1, variable_default_name);
+		sc_fprint(stderr, s1, default_variable_to_string);
 	    }
 	    
 	    sc_projection_along_variable_ofl_ctrl(&s1, var, ofl_ctrl);
@@ -325,7 +326,7 @@ int ofl_ctrl;
 	    {
 		fprintf(stderr, "sc_fourier_motzkin_feasibility_ofl_ctrl]"
 			" system after projection:\n");
-		sc_fprint(stderr, s1, variable_default_name);
+		sc_fprint(stderr, s1, default_variable_to_string);
 	    }
 	    
 	    if (sc_empty_p(s1))
