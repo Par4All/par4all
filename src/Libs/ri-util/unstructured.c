@@ -4,6 +4,9 @@
   * Prettyprint unstructured
   *
   * $Log: unstructured.c,v $
+  * Revision 1.10  2001/02/05 12:25:31  irigoin
+  * Bug fix in text_trail() for check-io statements
+  *
   * Revision 1.9  1998/04/14 15:23:28  coelho
   * linear.h
   *
@@ -507,14 +510,21 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	case 1: {
 	    control succ = CONTROL(CAR(control_successors(c)));
 
+	    if(check_io_statement_p(control_statement(succ)) &&
+		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
+	      /* The real successor is the FALSE successor of the IO check */
+	      succ = CONTROL(CAR(CDR(control_successors(succ))));
+	    }
+
 	    MERGE_TEXTS(r, text_statement(module, margin, st));
 
 	    /* If the statement "really" has a continuation (e.g. not a STOP
-	     * or a RETURN
+	     * or a RETURN)
 	     */
-	    if(statement_does_return(st) &&
+	    /* if(statement_does_return(st) &&
 	       !(check_io_statement_p(control_statement(succ)) &&
-		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) ) {
+	       !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) ) { */
+	    if(statement_does_return(st)) {
 		if(!ENDP(CDR(cc))) {
 		    control tsucc = CONTROL(CAR(CDR(cc)));
 		    if(tsucc==succ) {
