@@ -99,4 +99,4 @@ typedef Scontrainte Sinegalite, * Pinegalite;
 #endif
 
 
-#endif CONTRAINTE
+#endif /* CONTRAINTE */
