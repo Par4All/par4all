@@ -2,10 +2,10 @@
 
    Ronan Keryell, 1995.
    */
-/* 	%A% ($Date: 1997/07/03 11:13:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/18 15:30:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 1997/07/03 11:13:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "%A% ($Date: 1997/07/18 15:30:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -97,8 +97,8 @@ remove_useless_continue_or_empty_code_in_unstructured(unstructured u)
    /* and its exit point: */
    control exit_node = unstructured_exit(u);
 
-   pips_debug(7, "Dealing with unstructured %#x (begin: %#x, end: %#x)\n",
-	      (int) u, (int) entry_node, (int) exit_node);     
+   pips_debug(7, "Dealing with unstructured %#p (begin: %#p, end: %#p)\n",
+	      u, entry_node, exit_node);     
 
    CONTROL_MAP(c,
                {
@@ -132,8 +132,7 @@ still useful...
                         if (gen_length(control_predecessors(c)) <= 1) {
                            statement st = control_statement(c);
 
-			   pips_debug(7, "\tNode %#x has candidate links\n",
-				      (int) c);
+			   pips_debug(7, "\tNode %#p has candidate links\n", c);
                            if (empty_statement_or_continue_without_comment_p(st)) {
                               /* It is some useless code with no
                                  comment to spare: put it in the
@@ -141,9 +140,7 @@ still useful...
 			       remove_continue_list = CONS(CONTROL,
 							   c,
 							   remove_continue_list);
-			       pips_debug(7, "\tNode %#x to be removed\n",
-					  (int) c);     
-                           }
+			       pips_debug(7, "\tNode %#p to be removed\n", c);                           }
                         }
                      }
                },
@@ -158,7 +155,7 @@ still useful...
            control c = CONTROL(CAR(a_control_list));
 
            debug(3, "remove_useless_continue_or_empty_code_in_unstructured",
-                 "Remove control 0x%x\n", c);           
+                 "Remove control %#p\n", c);           
            remove_a_control_from_an_unstructured(c);
         },
            remove_continue_list);
@@ -220,7 +217,7 @@ fuse_sequences_in_unstructured(statement s)
     ifdebug (1)
 	pips_assert("unstructured inconsistants...",
 		    gen_consistent_p(u));
-    pips_debug(3, "Unstructured %x\n", (unsigned int) u);
+    pips_debug(3, "Unstructured %#p\n", u);
    
     CONTROL_MAP(c,
 		{
@@ -304,9 +301,8 @@ fuse_sequences_in_unstructured(statement s)
 	   it has already been fused with predecessors through
 	   a transitive closure: */
 	for(old_address = (char *) the_original_control;;) {
-	    pips_debug(3, "Control %x (originally %x):\n",
-		       (unsigned int) its_address_now,
-		       (unsigned int) the_original_control);
+	    pips_debug(3, "Control %#p (originally %#p):\n",
+		       its_address_now, the_original_control);
 	    if (old_address == its_address_now
 		/* ...The control node has not been moved */
 		|| !hash_defined_p(controls_to_fuse_with_their_successors,
@@ -329,28 +325,25 @@ fuse_sequences_in_unstructured(statement s)
 	ifdebug(5)
 	    print_text(stderr, text_statement(get_current_module_entity(), 0, control_statement(a_control_to_fuse)));
 	ifdebug(6) {
-	    pips_debug(5, "All the unstructured %x:\n",
-		       (unsigned int) u);
+	    pips_debug(5, "All the unstructured %#p:\n", u);
 	    print_text(stderr, text_statement(get_current_module_entity(), 0, s));
 	}
 	ifdebug (3)
-	    fprintf(stderr, "Want to fuse control %x",
-		    (unsigned int) a_control_to_fuse);
+	    fprintf(stderr, "Want to fuse control %#p", a_control_to_fuse);
 	ifdebug (1)
 	    pips_assert("control a_control_to_fuse inconsistants...",
 			gen_consistent_p(a_control_to_fuse));
                
 	its_successor = CONTROL(CAR(control_successors(a_control_to_fuse)));
 	ifdebug (3)
-	    fprintf(stderr, " with control %x\n",
-		    (unsigned int) its_successor);
+	    fprintf(stderr, " with control %#p\n", its_successor);
 	ifdebug (1)
 	    pips_assert("control its_successor inconsistants...",
 			gen_consistent_p(its_successor));
 
 	if (a_control_to_fuse == its_successor)
 	    debug(3, "fuse_sequences_in_unstructured",
-		  "\tA loop of control has been found... Do not fuse the control %#x\n", (int) a_control_to_fuse);     
+		  "\tA loop of control has been found... Do not fuse the control %#p\n", a_control_to_fuse);     
 
 	else {
 	    /* Well, it seems to be a real sequence, at most a
@@ -754,7 +747,7 @@ restructure_this_test(control c,
 	test_exit = CONTROL(CAR(control_successors(then_node)));
     else
 	test_exit = CONTROL(CAR(control_successors(else_node)));
-    pips_debug(9, "exit node=%#x\n", (unsigned int) test_exit);
+    pips_debug(9, "exit node=%#p\n", test_exit);
 		
     /* Discard and unlink the then_node and else_node if any: */
     if (t == STRUCTURED_IF_THEN || t == STRUCTURED_IF_THEN_ELSE)
@@ -990,14 +983,11 @@ remove_interval_predecessor(vertex interval,
 }
 
 
-/* Add an interval node to an interval, select the node and put it in
-   the intervals_to_be_removed list.  */
+/* Add an interval node to an interval and remove the node. */
 static void
-add_node_to_interval(vertex node,
+add_node_to_interval(graph intervals,
 		     vertex interval,
-		     graph intervals,
-		     set selected_nodes,
-		     list * intervals_to_be_removed)
+		     vertex node)
 {
     /* Replace every allusion to node by interval in the interval
        graph: */
@@ -1008,19 +998,20 @@ add_node_to_interval(vertex node,
 	}, vertex_predecessors(v));
     }, graph_vertices(intervals));
 
-    /* Transfer the control nodes to the interval and preserve the
+    /* Concatenate the control nodes to the interval and preserve the
        order to keep the entry node first: */
     interval_vertex_label_controls(vertex_vertex_label(interval)) =
 	gen_nconc(interval_vertex_label_controls(vertex_vertex_label(interval)),
 		  interval_vertex_label_controls(vertex_vertex_label(node)));
-    /* Protect the control nodes from later deletion: */
-    gen_free_list(interval_vertex_label_controls(vertex_vertex_label(node)));
+    /* Protect the control nodes from later deletion (useless to free
+       the list since it is still lived via gen_nconc. Thanks to
+       purify... :-) */
     interval_vertex_label_controls(vertex_vertex_label(node)) = NIL;
     /* Detach the node: */
     remove_interval_predecessors(node);
-    set_add_element(selected_nodes, selected_nodes, (char *) node);
-
-    *intervals_to_be_removed = CONS(VERTEX, node, *intervals_to_be_removed);
+    /* Clean up the useless old node: */
+    gen_remove(&graph_vertices(intervals), node);
+    free_vertex(node);
 }
 
 
@@ -1056,11 +1047,11 @@ add_to_interval_or_create_new_interval(vertex node,
 		}, vertex_predecessors(candidate));
 		if (all_predecessors_are_in_current_interval) {
 		    /* Ok, this node belong to the new interval: */
-		    add_node_to_interval(candidate,
+		  /*  add_node_to_interval(candidate,
 					 node,
 					 intervals,
 					 selected_nodes,
-					 &intervals_to_be_removed);
+					 &intervals_to_be_removed);*/
 		    /* Look for the next appliant: */
 		    a_node_has_been_added = TRUE;
 		    break;
@@ -1069,10 +1060,6 @@ add_to_interval_or_create_new_interval(vertex node,
 	}, graph_vertices(intervals));
     } while(a_node_has_been_added);
 
-    /* Clean up the useless old intervals: */
-    MAP(VERTEX, node, {
-	gen_remove(&graph_vertices(intervals), node);
-    }, intervals_to_be_removed);
     gen_full_free_list(intervals_to_be_removed);
 }
 
@@ -1081,11 +1068,11 @@ void
 display_interval_graph(graph intervals)
 {
     MAP(VERTEX, node, {
-	pips_debug(0, "Interval %#x, control nodes:\n", (int) node);
+	pips_debug(0, "Interval %#p, control nodes:\n", (int) node);
 	display_address_of_control_nodes(interval_vertex_label_controls(vertex_vertex_label(node)));
 	pips_debug(0, "Interval predecessors:\n");
 	MAP(VERTEX, predecessor, {
-	    pips_debug(0, "\t%#x\n", (int) predecessor_vertex(predecessor));
+	    pips_debug(0, "\t%#p\n", (int) predecessor_vertex(predecessor));
 	}, vertex_predecessors(node));    
     }, graph_vertices(intervals));
 }
@@ -1094,7 +1081,8 @@ display_interval_graph(graph intervals)
 /* Build an interval graph from an older interval graph and put it in
    the older one.
 
-   Algorithm can be found on page 665 of:
+   Algorithm use the T1/T2 analysis that can be found from pages 665
+   to 670 of:
 
 @book{dragon-1986,
     author = {Alfred V. Aho and Ravi Sethi and Jeffrey D. Ullman},
@@ -1106,50 +1094,43 @@ display_interval_graph(graph intervals)
 static bool
 interval_graph(graph intervals)
 {
-    bool a_node_has_been_selected;
+    bool a_node_has_been_fused;
     bool the_interval_graph_has_been_modified = FALSE;
     set selected_nodes = set_make(set_pointer);
+    vertex entry_interval = VERTEX(CAR(graph_vertices(intervals)));
 
-    /* According to the vertex ordering, the algorithm should pick the
-       entry node first. */
+    /* Apply the T2 transformation, that is equivalent to my
+       fuse_sequences_in_unstructured elsewhere. Just use a less
+       optimized algorithm here: */
     do {
-	/* First select nodes not already selected but with at least 1
-	   selected predecessor and build a new interval from it: */
-	a_node_has_been_selected = FALSE;
+	a_node_has_been_fused = FALSE;
 	MAP(VERTEX, node, {
-	    pips_debug(8, "vertex %#x.\n", (int) node);
-	    if (!set_belong_p(selected_nodes, (char *) node)) {
-		pips_debug(8, "\tvertex not selected yet\n");
-		MAP(VERTEX, predecessor, {
-		    vertex p_v = predecessor_vertex(predecessor);
-		    pips_debug(8, "\tInspecting predecessor vertex %#x.\n",
-			       (int) p_v);
-		    if (set_belong_p(selected_nodes, (char *) p_v)) {
-			add_interval(node, intervals, selected_nodes);
-			/* Let's go to find a new interval nest: */
-			a_node_has_been_selected = TRUE;
-			the_interval_graph_has_been_modified = TRUE;
-			break;
-		    }
-		}, vertex_predecessors(node));
-		if (a_node_has_been_selected)
-		    /* Begin a new selection process: */
-		    break;
+	    pips_debug(8, "vertex %#p.\n", (int) node);
+	    if (node != entry_interval
+		/* The entry interval is kept untouched */
+		&& gen_length(vertex_predecessors(node)) == 1) {
+		/* Fuse a node with its only predecessor: */
+		vertex p_v = predecessor_vertex(PREDECESSOR(CAR(vertex_predecessors(node))));
+		pips_debug(8, "\tonly one vertex predecessor %#p.\n",
+			   (int) p_v);
+		add_node_to_interval(intervals, p_v, node);
+		/* Let's go to find a new interval to fuse: */
+		a_node_has_been_fused = TRUE;
+		break;
 	    }
 	}, graph_vertices(intervals));
-    } while (a_node_has_been_selected);
+	the_interval_graph_has_been_modified |= a_node_has_been_fused;	
+    } while (a_node_has_been_fused);
 
-    set_free(selected_nodes);
-    
-    /* Remove the eventual arcs to itself (T1 transformation on page
-       668: */
+    /* T1 transformation on page 668: Remove the eventual arcs to
+       itself: */
     MAP(VERTEX, node, {
 	/* If a loop around a interval node is removed, it considered
-	as a graph modification: */
+	   as a graph modification: */
 	the_interval_graph_has_been_modified
 	    |= remove_interval_predecessor(node, node);
     }, graph_vertices(intervals));
-
+    
     return the_interval_graph_has_been_modified;
 }
 
@@ -1193,13 +1174,13 @@ control_graph_to_interval_graph_format(control entry_node)
     graph intervals = make_graph(NIL);
 
     hash_table control_to_interval_node = hash_table_make(hash_pointer, 0);
-    pips_debug(5, "Control entry node %#x:\n", (int) entry_node);   
+    pips_debug(5, "Control entry node %#p:\n", (int) entry_node);   
     CONTROL_MAP(c, {
 	vertex interval =
 	    create_or_get_an_interval_node(c,
 					   intervals,
 					   control_to_interval_node);
-	pips_debug(6, "\tControl %#x -> interval %#x\n",
+	pips_debug(6, "\tControl %#p -> interval %#p\n",
 		   (int) c,  (int) interval);   
 	MAP(CONTROL, p, {
 	    vertex vertex_predecessor =
@@ -1210,7 +1191,7 @@ control_graph_to_interval_graph_format(control entry_node)
 					       vertex_predecessor);
 	    vertex_predecessors(interval) =
 		CONS(PREDECESSOR, v_p, vertex_predecessors(interval));
-	    pips_debug(7, "\t\tControl predecessor %#x -> interval %#x\n",
+	    pips_debug(7, "\t\tControl predecessor %#p -> interval %#p\n",
 		   (int) p,  (int) vertex_predecessor);   
 	}, control_predecessors(c));
     }, entry_node, blocs);
@@ -1228,12 +1209,12 @@ interval_exit_nodes(vertex interval)
 {
     list exit_controls = NIL;
     
-    pips_debug(6, "Interval %#x with controls ", (int) interval);
+    pips_debug(6, "Interval %#p with controls ", (int) interval);
     display_address_of_control_nodes(interval_vertex_label_controls(vertex_vertex_label(interval)));
     MAP(CONTROL, c, {
-	pips_debug(7, "\n\tControl %#x:\n", (int) c);   
+	pips_debug(7, "\n\tControl %#p:\n", (int) c);   
 	MAP(CONTROL, successor, {	    
-	    pips_debug(7, "\t\tControl successor %#x:\n", (int) successor);   
+	    pips_debug(7, "\t\tControl successor %#p:\n", (int) successor);   
 	    if (!gen_in_list_p(successor,
 			       interval_vertex_label_controls(vertex_vertex_label(interval)))) {
 		/* A successor that is not in the interval is an exit
@@ -1337,51 +1318,72 @@ replace_control_related_to_a_list(control old_node,
 				  control new_node,
 				  list controls)
 {
+    /* Need a intermediate list since we cannot iterate on
+       control_successors(old_node) for example and modifying it...*/
+    list controls_to_change = NIL;
     /* Since we need to keep successors order (to avoid for example
        IF/THEN/ELSE transformed in IF/ELSE/THEN), iterate directly on
        the links of old_node instead of on controls: */
-    /* First transfer the successorspredecessors in controls from old_node to
+    /* First transfer the successors in controls from old_node to
        new_node: */
     MAP(CONTROL, c, {
-	if (gen_in_list_p(c, controls)) {
-	    if (c != old_node)
-		transfer_control_successor(old_node, new_node, c);
-	    else {
-		/* Hmmm... We need to transfer a loop around old_node
-                   to a loop around new_node: */
-		/* Create the new loop around new_node: */
-		control_successors(new_node) =
-		    gen_nconc(control_successors(new_node),
-			      CONS(CONTROL, new_node, NIL));
-		control_predecessors(new_node) =
-		    gen_nconc(control_predecessors(new_node),
-                              CONS(CONTROL, new_node, NIL));
-                /* Delete the old one. Use gen_remove_first() instead
-                   of gen_remove() to deal with double loops around a
-                   node (See hierarchy02.f in validation): */
-		gen_remove_first(&control_successors(old_node), old_node);
-		gen_remove_first(&control_predecessors(old_node), old_node);
-            }
-        }
+	if (gen_in_list_p(c, controls))
+	    /* Use gen_nconc to keep test order: */
+	    controls_to_change = gen_nconc(controls_to_change,
+					   CONS(CONTROL, c, NIL));
     }, control_successors(old_node));
+    /* And then do the modification: */
+    MAP(CONTROL, c, {
+	pips_debug(8, "Transfer old node %#p to new node %#p in successor %#p\n", old_node, new_node, c);
+	if (c != old_node)
+	    transfer_control_successor(old_node, new_node, c);
+	else {
+	    /* Hmmm... We need to transfer a loop around old_node to a
+               loop around new_node: */
+	    /* Create the new loop around new_node: */
+	    control_successors(new_node) =
+		gen_nconc(control_successors(new_node),
+			  CONS(CONTROL, new_node, NIL));
+	    control_predecessors(new_node) =
+		gen_nconc(control_predecessors(new_node),
+			  CONS(CONTROL, new_node, NIL));
+	    /* Delete the old one. Use gen_remove_first() instead of
+               gen_remove() to deal with double loops around a node
+               (See hierarchy02.f in validation): */
+	    gen_remove_first(&control_successors(old_node), old_node);
+	    gen_remove_first(&control_predecessors(old_node), old_node);
+	}
+    }, controls_to_change);
+    gen_free_list(controls_to_change);
+    
     /* And then transfer the predecessors in controls from old_node to
        new_node (the previous double loops have disappeared here): */
+    controls_to_change = NIL;
     MAP(CONTROL, c, {
 	if (gen_in_list_p(c, controls))
-            transfer_control_predecessor(old_node, new_node, c);
+	    /* Use gen_nconc to keep test order: */
+	    controls_to_change = gen_nconc(controls_to_change,
+					   CONS(CONTROL, c, NIL));
     }, control_predecessors(old_node));
+    /* And then do the modification: */
+    MAP(CONTROL, c, {
+	pips_debug(8, "Transfer old node %#p to new node %#p in predecessor %#p\n", old_node, new_node, c);
+	transfer_control_predecessor(old_node, new_node, c);
+    }, controls_to_change);
+    gen_free_list(controls_to_change);
 }
 
 
 /* Put all the controls in their own unstructured to hierarchize the
    graph and link the unstructured to the outer unstructured.
    
-   The exit_node is either a one element control node, either NIL if
+   The exit_node is the exit control node, either control_undefined if
    it there is no exit : it is a true endless loop (assume it is not
    the exit node). */
 static void
-hierarchize_control_list(list controls,
-			 list exit_node)
+hierarchize_control_list(vertex interval,
+			 list controls,
+			 control exit_node)
 {
     control entry_node = CONTROL(CAR(controls));
     /* Create the new control nodes with the new unstructured: */
@@ -1397,25 +1399,33 @@ hierarchize_control_list(list controls,
     ifdebug(6) {
 	pips_debug(0, "List of controls: ");
 	display_address_of_control_nodes(controls);
-	if (exit_node != NIL) {
-            pips_debug(0, "\nExit node list: ");
-            display_address_of_control_nodes(exit_node);
+	if (exit_node != control_undefined) {
+            pips_debug(0, "\nExit node %#p\n", exit_node);
         }
-	pips_debug(0, "\nnew_entry_node = %#x, new_exit_node = %#x\n",
+	pips_debug(0, "new_entry_node = %#p, new_exit_node = %#p\n",
 		   new_entry_node, new_exit_node);
     }
     /* Now the hard work: replace carefully the old control nodes by
        new one in the spaghetti plate... */
     replace_control_related_to_a_list(entry_node, new_entry_node, controls);
-    if (exit_node != NIL)
-	replace_control_related_to_a_list(CONTROL(CAR(exit_node)),
-					  new_exit_node, controls);
+    if (exit_node != control_undefined) {
+	replace_control_related_to_a_list(exit_node, new_exit_node, controls);
+	/* Now the exit_node becomes a successor of the entry_node: */
+	link_2_control_nodes(entry_node, exit_node);
+    }
+
+    /* Update the control list of the interval that owns only
+       entry_node after hierarchization: */
+    gen_free_list(interval_vertex_label_controls(vertex_vertex_label(interval)));
+    interval_vertex_label_controls(vertex_vertex_label(interval)) =
+	CONS(CONTROL, entry_node, NIL);
+
     ifdebug(5) {
 	pips_debug(0, "Nodes from entry_node: ");
 	display_linked_control_nodes(entry_node);
-	if (exit_node != NIL) {
+	if (exit_node != control_undefined) {
 	    pips_debug(0, "\nNodes from exit_node: ");
-	    display_linked_control_nodes(CONTROL(CAR(exit_node)));
+	    display_linked_control_nodes(exit_node);
 	}
 	pips_debug(0, "\nNodes from new_entry_node: ");
 	display_linked_control_nodes(new_entry_node);
@@ -1426,8 +1436,8 @@ hierarchize_control_list(list controls,
 	check_control_coherency(new_entry_node);
 	check_control_coherency(new_exit_node);
 	check_control_coherency(entry_node);
-	if (exit_node != NIL)
-	    check_control_coherency(CONTROL(CAR(exit_node)));
+	if (exit_node != control_undefined)
+	    check_control_coherency(exit_node);
 	pips_assert("Control should be consistent from entry_node)...",
 		    gen_consistent_p(entry_node));
     }
@@ -1463,7 +1473,7 @@ control_graph_recursive_decomposition(unstructured u)
     /* The seed interval graph is indeed the control graph itself: */
     intervals = control_graph_to_interval_graph_format(entry_node);
 
-    pips_debug(3, "Entering with unstructured %#x (%#x, %#x)\n",
+    pips_debug(3, "Entering with unstructured %#p (%#p, %#p)\n",
 	       (int) u, (int) entry_node, (int) exit_node);
     ifdebug(5) {
 	pips_debug(0, "Nodes from entry_node: ");
@@ -1501,19 +1511,21 @@ control_graph_recursive_decomposition(unstructured u)
 		       an unstructured. */
 		    /* Put all the controls in their own unstructured
                        to hierarchize the graph: */
-		    hierarchize_control_list(controls,
-					     interval_exits);
-		    /* Mark control_already_hierarchized to avoid
-                       restructuring again this interval: */
+		    hierarchize_control_list(interval,
+					     controls,
+					     interval_exits == NIL ? control_undefined : CONTROL(CAR(interval_exits)));
+		    /* Update control_already_hierarchized with the
+                       new size (1 control) to avoid restructuring
+                       again this interval: */
 		    if (hash_defined_p(control_already_hierarchized,
 				       (char *) interval_entry))
 			hash_update(control_already_hierarchized,
 				    (char *) interval_entry,
-				    (char *) gen_length(controls));
+				    (char *) 1);
 		    else
 			hash_put(control_already_hierarchized,
 				 (char *) interval_entry,
-				 (char *) gen_length(controls));
+				 (char *) 1);
 		}
 		gen_free_list(interval_exits);
 	    }
@@ -1670,8 +1682,9 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
                gen_true, clean_up_control);
 /*   if (get_bool_property("HIERARCHIZE_CONTROL")) */
        /* Then try to hierarchize the control flow: */
-   gen_recurse(mod_stmt, unstructured_domain,
+/*   gen_recurse(mod_stmt, unstructured_domain,
 	       gen_true, control_graph_recursive_decomposition);
+	       */
    /* Now apply some local rule, such as if/then/else restructuring
       and so on: */
    gen_recurse(mod_stmt, statement_domain,
