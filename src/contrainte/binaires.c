@@ -201,6 +201,35 @@ Pcontrainte c1,c2;
     return (b);
 }
 
+/* Value eq_sum_const(Pcontrainte c1, Pcontrainte c2):
+ * calcul de la somme des deux termes constants des deux 
+ * contraintes c1 et c2
+ *
+ * Notes:
+ *  - cette routine fait l'hypothese que CONTRAINTE_UNDEFINED=>CONTRAINTE_NULLE
+ */
+Value eq_sum_const(c1,c2)
+Pcontrainte c1,c2;
+{
+    Value b;
+
+    if(c1!=NULL) 
+	if(c2!=NULL) {
+	    int b1 = vect_coeff(TCST,c1->vecteur);
+	    int b2 = vect_coeff(TCST,c2->vecteur);
+	    b = b1 + b2;
+	}
+	else
+	    b = vect_coeff(TCST,c1->vecteur);
+    else
+	if(c2!=NULL)
+	    b = vect_coeff(TCST,c2->vecteur);
+	else
+	    b = 0;
+
+    return (b);
+}
+
 /* Pcontrainte contrainte_append(c1, c2)
  * Pcontrainte c1, c2;
  *
