@@ -1,5 +1,5 @@
 /* $RCSfile: misc-local.h,v $ (version $Revision$)
- * $Date: 1995/10/17 09:20:27 $, 
+ * $Date: 1995/11/02 17:03:36 $, 
  */
 
 /* hmmm...
@@ -62,6 +62,7 @@
 #endif
 
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
+#define cat concatenate
 
 /* Constant used to dimension arrays in wpips and pipsmake */
 #define ARGS_LENGTH 512
@@ -70,8 +71,3 @@
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 1024
 #endif
-
-/* hmmm. ???
- */
-extern char *re_comp();
-extern int re_exec();
