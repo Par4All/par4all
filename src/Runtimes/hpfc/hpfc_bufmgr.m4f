@@ -1,6 +1,6 @@
 c
 c $RCSfile: hpfc_bufmgr.m4f,v $ (version $Revision$)
-c $Date: 1995/09/27 16:53:01 $, 
+c $Date: 1995/09/27 18:23:34 $, 
 c
 c First routines to fake the pack/unpack of data.
 c The issue is to allow quite simply to measure the different
@@ -10,6 +10,7 @@ c The the routines for doing the job...
 c
 define(`GENERIC_BUFFER_PACK',`dnl
 pushdef(`PVMTYPE',$1)dnl
+fake_buffers(dnl
       subroutine build_name(PVMTYPE,hpfc_fake_bufpck)()
       include "fpvm3.h"
       include "hpfc_commons.h"
@@ -17,7 +18,7 @@ pushdef(`PVMTYPE',$1)dnl
       SEND_NOT_INITIALIZED=.FALSE.
       BUFINDEX=0
       hpfc_fake_bufpck=hpfc_fake_bufpck+1
-      end
+      end)
       subroutine build_name(PVMTYPE,hpfc_bufpck)()
       integer info, bufid
       include "fpvm3.h"
@@ -36,6 +37,7 @@ pushdef(`PVMTYPE',$1)dnl
 popdef(`PVMTYPE')')dnl
 define(`GENERIC_BUFFER_UPCK',`dnl
 pushdef(`PVMTYPE',$1)dnl
+fake_buffers(dnl
       subroutine build_name(PVMTYPE,hpfc_fake_bufupk)(lid)
       integer lid
       include "fpvm3.h"
@@ -47,7 +49,7 @@ pushdef(`PVMTYPE',$1)dnl
       endif
       SIZEOFRECEIVEDBUFFER=build_name(PVMTYPE,BUFFSIZE)
       hpfc_fake_bufupk=hpfc_fake_bufupk+1
-      end
+      end)
       subroutine build_name(PVMTYPE,hpfc_bufupk)(lid)
       integer lid
       integer info, bufid
