@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.54  1999/05/25 13:26:55  coelho
+ * proto update.
+ *
  * Revision 1.53  1998/03/17 16:51:48  coelho
  * bug when arrays are template in continue_propagation_p fixed.
  *
@@ -1604,7 +1607,9 @@ statement generate_copy_loop_nest(
     /*  builds the set of indexes needed to scan the dimensions.
      */
     for(module=get_current_module_entity(), i=ndims; i>0; i--)
-      indexes = CONS(ENTITY, hpfc_new_variable(module, is_basic_int), indexes);
+      indexes = CONS(ENTITY, 
+		     hpfc_new_variable(module, MakeBasic(is_basic_int)),
+		     indexes);
 
     idx_expr = entity_list_to_expression_list(indexes);
 
