@@ -61,6 +61,10 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.11  2002/07/09 06:52:31  irigoin
+  * Comments added for the last version of unstructured.c not using
+  * Bourdoncle's partitioning heuristics
+  *
   * Revision 1.10  2002/07/03 11:07:19  irigoin
   * check "!get_bool_property("SEMANTICS_ANALYZE_UNSTRUCTURED")" added to
   * circumvent an EDF bug in emergency for Corinne.
@@ -131,7 +135,7 @@
 #include "transformer.h"
 
 #include "semantics.h"
-
+
 /* These control nodes are successors of the entry node */
 /* static list to_be_processed = list_undefined; */
 /*
@@ -168,6 +172,10 @@ static bool secondary_entry_p(control c)
 }
 */
 
+/*
+ * Prettyprinting of control nodes for debugging purposes
+ */
+
 static void print_control_node(control c)
 {
   fprintf(stderr,
@@ -198,9 +206,18 @@ static void print_control_nodes(list l)
   fprintf(stderr, "\n");
 }
 
-/* Node postconditions cannot be recomputed several time because
-   preconditions are stored. Since they have to be used several time in an
-   unknown order, it is necessary to store them. */
+/* 
+ * Storage and retrieval of intermediate postconditions
+ *
+ * Node postconditions cannot be recomputed several times because
+ * preconditions are stored. Since they have to be used several times in
+ * an unknown order, it is necessary to store them.
+ * 
+ * A static variable was initially used which reduced the number of
+ * parameters passed but this was not compatible with recursive calls, the
+ * embedding of unstructured within unstructured, and so on.
+ *  */
+
 /* static statement_mapping statement_to_control_postcondition_map = NULL; */
 
 static transformer load_control_postcondition(statement stat,
@@ -272,6 +289,11 @@ static statement_mapping free_control_postcondition(statement_mapping control_po
   return NULL;
 }
 
+/*
+ * Scheduling of the postcondition computations on a DAG
+ *
+ */
+
 /* a control can be considered already processed if it has been processed
    already or if it can receive a trivial empty postcondition */
 static bool considered_already_processed_p(control c, list to_be_processed,
@@ -387,6 +409,10 @@ static bool nodes_ready_to_be_processed_p(list l,
 
   return ready;
 }
+
+/*
+ * Management of arc postconditions: test conditions must be taken into account
+ * */
 
 /* A new postcondition may have to be allocated because a unique control
    may have to successors and hence two preconditions. To keep memory
@@ -454,6 +480,17 @@ static transformer load_predecessor_test_condition(control pred, control c,
     (pred, c, FALSE, control_postcondition_map);
   return post;
 }
+
+/*
+ * Perform a convex hull of the postconditions of the predecessors and
+ * compute the node transformer even if no predecessors exist and store
+ * the postcondition if required:
+ *
+ *  - process_ready_node()
+ *
+ *  - process_unreachable_node()
+ *
+ * */
 
 static void process_ready_node(control c, transformer pre_entry, unstructured u,
 			       statement_mapping control_postcondition_map,
@@ -564,6 +601,17 @@ static bool process_unreachable_node(control c,
   return TRUE;
 }
 
+/*
+ * Handling of strongly connected components (SCC)
+ *
+ *  - check_scc_for_exit_node()
+ *
+ *  - find_ready_scc_in_cfg()
+ *
+ *  - finc_scc_entry_nodes()
+ *
+ */
+
 static void check_scc_for_exit_node(list scc, control e)
 {
   /* e is assumed to be the exit node of an unstructured. As such it
@@ -711,6 +759,16 @@ static list find_scc_entry_nodes(list scc, unstructured u, list already_processe
   return entry_nodes;
 }
 
+/*
+ * FIX POINT COMPUTATIONS
+ *
+ * - control_node_set_to_fix_point()
+ *
+ * - control_node_sequence_to_fix_point()
+ *
+ *
+ */
+
 /* Control information is ignored. All nodes are considered successors of
    all nodes. This is an over-approximation of the real control flow */
 static transformer control_node_set_to_fix_point
@@ -867,6 +925,17 @@ static transformer control_node_sequence_to_fix_point
   return fptf;
 }
 
+/*
+ * BUILD CONTROL PATHS AND CONTROL CYCLES FROM CONTROL SETS
+ *
+ * - control_set_to_control_list()
+ *
+ * - control_set_to_control_path()
+ *
+ * - control_set_to_control_cycle()
+ *
+ */
+
 /* Returns a control list starting with the first node from a set of
 control nodes. Follow control paths as much as possible to improve
 postcondition propagation. The set is assumed to be non-empty. Abort only
@@ -1066,7 +1135,18 @@ static list control_set_to_control_cycle(list set)
 
   return path;
 }
-
+
+/*
+ * DECOMPOSITION OF STRONGLY CONNECTED COMPONENTS (SCC) INTO SUB-SCC
+ *
+ *  - subscc_to_cycle_heads()
+ *
+ *  - scc_to_secondary_entries()
+ *
+ *  - head_to_subcycle()
+ *
+ *
+ */
 /* This is an auxiliary function for the next one */
 static void recursive_subscc_to_cycle_heads(list scc, control h, list path, list * pcycle_heads)
 {
@@ -1280,6 +1360,19 @@ static list head_to_subcycle(list cycle, control h, list * new_secondary_entries
   return subcycle;
 }
 
+/*
+ * PROCESSING OF SUB-SCC's
+ *
+ *  - subcycle_to_fix_point()
+ *
+ *  - cycle_to_postconditions()
+ *
+ *  - subcycle_to_postconditions()
+ *
+ *  - sort_secondary_entries()
+ *
+ */
+
 static transformer subcycle_to_fixpoint
 (list cycle, control h, statement_mapping control_postcondition_map,
  statement_mapping statement_to_subcycle_fix_point_map)
@@ -1579,6 +1672,14 @@ static list sort_secondary_entries(list secondary_entries, list cycle)
 }
 
 
+/*
+ * PROCESS A STRONGLY CONNECTED COMPONENT
+ *
+ *  - process_cycle_in_scc()
+ *
+ *
+ */
+
 /* Accumulate postconditions for one global cycle in the scc. A global
    cycle starts with the first node in scc and ends with it. Preconditions
    are propagated downwards in control statements later, when all scc
@@ -1811,6 +1912,16 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
   pips_debug(5, "End\n");
 }
 
+/*
+ * BUILD CYCLES IN STRONGLY CONNECTED COMPONENT
+ *
+ *  - add_control_to_cycle()
+ *
+ *  - build_control_cycles_in_scc()
+ *
+ *
+ */
+
 static void add_control_to_cycle(list scc, list cycle, control succ,
 				 transformer pre_entry, unstructured u,
 				 bool process_it, list * psecondary_entries,
@@ -1930,6 +2041,18 @@ static void build_control_cycles_in_scc(list scc, list cycle,
   }
 }
 
+/*
+ * COMPUTE PRECONDITIONS IN A SCC, ONE ENTRY AT A TIME, AND ACCUMULATE
+ *
+ *  - generic_compute_and_propagate_precondition()
+ *
+ *  - entry_compute_and_propagate_precondition()
+ *
+ *  - process_ready_scc_for_one_entry()
+ *
+ *  - process_ready_scc()
+ *
+ */
 static void generic_compute_and_propagate_precondition
 (control c, transformer pre, statement_mapping control_postcondition_map)
 {
@@ -2136,6 +2259,26 @@ static void process_ready_scc(list scc,
   pips_debug(3, "End\n");
 }
 
+/*
+ * PROCESSING OF AN UNSTRUCTURED
+ *
+ *  - local_process_unreachable_node()
+ *
+ *  - node_to_path_transformer_or_postcondition()
+ *
+ *  - unstructured_to_accurate_postconditions_or_transformer()
+ *
+ *  - unstructured_to_postconditions()
+ *
+ *  - unstructured_to_accurate_postconditions()
+ *
+ *  - unreachable_node_to_transformer()
+ *
+ *  - unstructured_to_global_transformer()
+ *
+ *  - unstructured_to_accurate_transformer()
+ *
+ */
   
 static void local_process_unreachable_node(control c, struct  { 
     bool pcond;
@@ -2400,6 +2543,11 @@ transformer unstructured_to_accurate_postconditions
 			"Have you fully restructured your code?\n", gen_length(succs));
     post = unstructured_to_postconditions(pre_u, pre, u);
   }
+  else if(!get_bool_property("SEMANTICS_ANALYZE_UNSTRUCTURED")) {
+    pips_user_warning("\nControl flow graph not analyzed accurately"
+		      " because property SEMANTICS_ANALYZE_UNSTRUCTURED is not set\n");
+    post = unstructured_to_postconditions(pre_u, pre, u);
+  }
   else {
     post = unstructured_to_accurate_postconditions_or_transformer
       (pre_u, pre, u, TRUE);
@@ -2424,8 +2572,13 @@ transformer unstructured_to_accurate_total_preconditions
   forward_control_map_get_blocs(head, &succs);
 
   if(gen_length(succs)>SEMANTICS_MAX_CFG_SIZE1) {
-      pips_user_warning("\nControl flow graph too large for an accurate analysis (%d nodes)\n"
-			"Have you fully restructured your code?\n", gen_length(succs));
+    pips_user_warning("\nControl flow graph too large for an accurate analysis (%d nodes)\n"
+		      "Have you fully restructured your code?\n", gen_length(succs));
+    post = unstructured_to_postconditions(pre_u, pre, u);
+  }
+  else if(!get_bool_property("SEMANTICS_ANALYZE_UNSTRUCTURED")) {
+    pips_user_warning("\nControl flow graph not analyzed accurately"
+		      " because property SEMANTICS_ANALYZE_UNSTRUCTURED is not set\n");
     post = unstructured_to_postconditions(pre_u, pre, u);
   }
   else {
