@@ -1,5 +1,7 @@
  /* package vecteur - routines sur les bases
   *
+  * $Id$
+  *
   * Francois Irigoin
   *
   * The function variable_name should be inlined as much as possible to
