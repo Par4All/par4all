@@ -91,7 +91,9 @@ static void linear_hashtable_extend(linear_hashtable_pt h)
     register void * k = oldkeys[i];
     if (k!=FREE_CHUNK && k!=EMPTIED_CHUNK)
     {
-      h->keys[key_location(h, k, false)] = oldvals[i];
+      register int index = key_location(h, k, false);
+      h->keys[index] = k;
+      h->vals[index] = oldvals[i];
       moved_nitems--;
     }
   }
