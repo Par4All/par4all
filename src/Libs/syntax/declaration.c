@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.60  2001/04/06 11:50:36  irigoin
+ * additional testing to detect conflicting storage and DATA statements
+ *
  * Revision 1.59  2001/04/05 08:25:43  irigoin
  * Comments improved for function OffsetOfReference()
  *
@@ -349,11 +352,49 @@ AnalyzeData(list ldvr, list ldvl)
 				       NIL)));
 	}
 	else if(storage_ram_p(entity_storage(e))) {
-	    if(dynamic_area_p(ram_section(storage_ram(entity_storage(e))))) {
+	  entity s = ram_section(storage_ram(entity_storage(e)));
+	  entity m = get_current_module_entity();
+
+	    if(dynamic_area_p(s)) {
+	      if(entity_blockdata_p(m)) {
+		pips_user_warning
+		  ("Variable %s is declared dynamic in a BLOCKDATA\n",
+		   entity_local_name(e));
+		ParserError("AnalyzeData",
+			    "No dynamic variables in BLOCKDATA\n");
+	      }
+	      else {
 		SaveEntity(e);
+	      }
 	    }
 	    else {
-		/* Variable is in static area or in a user declared common */
+	      /* Variable is in static area or in a user declared common */
+	      if(entity_blockdata_p(m)) {
+		/* Variable must be in a user declared common */
+		if(static_area_p(s)) {
+		  pips_user_warning
+		    ("DATA for variable %s declared is impossible:"
+		     " it should be declared in a COMMON instead\n",
+		     entity_local_name(e));
+		  ParserError("AnalyzeData",
+			      "Improper DATA declaration in BLOCKDATA");
+		}
+	      }
+	      else {
+		/* Variable must be in static area */
+		if(!static_area_p(s)) {
+		  pips_user_warning
+		    ("DATA for variable %s declared in COMMON %s:"
+		     " not standard compliant,"
+		     " use a BLOCKDATA\n",
+		     entity_local_name(e), module_local_name(s));
+		  if(!get_bool_property("PARSER_ACCEPT_ANSI_EXTENSIONS")) {
+		    ParserError("AnalyzeData",
+				"Improper DATA declaration, use a BLOCKDATA"
+				" or set property PARSER_ACCEPT_ANSI_EXTENSIONS");
+		  }
+		}
+	      }
 	    }
 	}
 	else {
@@ -374,11 +415,19 @@ AnalyzeData(list ldvr, list ldvl)
 	    pips_assert("AnalyzeData", i == 1);
 
 	    if(constant_int_p(dataval_constant(dvl))) {
-	      entity_initial(e) = make_value(is_value_constant, 
-					     dataval_constant(dvl));
+	      if(value_undefined_p(entity_initial(e)) ||
+		 value_unknown_p(entity_initial(e))) {
+		entity_initial(e) = make_value(is_value_constant, 
+					       dataval_constant(dvl));
 
-	      debug(1, "AnalyzeData", "%s %d\n", 
-		    entity_name(e), constant_int(dataval_constant(dvl)));
+		debug(1, "AnalyzeData", "%s %d\n", 
+		      entity_name(e), constant_int(dataval_constant(dvl)));
+	      }
+	      else {
+		pips_user_warning("Conflicting initial values for variable %s\n",
+				  entity_local_name(e));
+		ParserError("AnalyzeData", "Too many intial values");
+	      }
 	    }
 	    else {
 	      Warning("AnalyzeData", 
@@ -924,9 +973,29 @@ entity c, v;
 			"Ill. decl. of function or subroutine in a common\n");
 	}
 	else {
-	    user_warning("AddVariableToCommon", "Storage tag=%d for entity %s\n",
-			 storage_tag(entity_storage(v)), entity_name(v));
-	    FatalError("AddVariableToCommon", "storage already defined\n");
+	  entity m = get_current_module_entity();
+
+	  if(value_defined_p(entity_initial(v)) && !entity_blockdata_p(m)) {
+	      pips_user_warning("Variable %s has conflicting requirements"
+				" for storage (e.g. it appears in a DATA"
+				" and in a COMMON statement in a non "
+				"BLOCKDATA module\n", entity_local_name(v));
+	      ParserError("AddVariableToCommon", "Storage conflict\n");
+	    }
+	    else {
+	      if(entity_blockdata_p(m)) {
+		pips_user_warning("ANSI extension: specification statements"
+				  " after DATA statement for variable %s\n",
+				  entity_local_name(v));
+		ParserError("AddVariableToCommon", "Storage conflict\n");
+	      }
+	      else {
+		user_warning("AddVariableToCommon",
+			     "Storage tag=%d for entity %s\n",
+			     storage_tag(entity_storage(v)), entity_name(v));
+		FatalError("AddVariableToCommon", "storage already defined\n");
+	      }
+	    }
 	}
     }
     else {
