@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/12/29 15:24:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/12/29 16:20:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/12/29 15:24:21 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/12/29 16:20:22 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -138,7 +138,7 @@ entity e;
     pc = gen_nconc(pc, words_basic(variable_basic(type_variable(te))));
     pc = CHAIN_SWORD(pc, " ");
 
-    pc = gen_nconc(pc, words_declaration(e));
+    pc = gen_nconc(pc, words_declaration(e, TRUE));
 
     return(make_sentence(is_sentence_unformatted, 
 			 make_unformatted(NULL, 0, 0, pc)));
@@ -165,9 +165,8 @@ entity e, module;
 
     if (!ENDP(area_layout(type_area(te))))
     {
-	MAPL(pee,
+	MAP(ENTITY, ee,
 	 {
-	     entity ee = ENTITY(CAR(pee));
 	     if (local_entity_of_module_p(ee, module) || prettyprint_hpfc)
 		 entities = CONS(ENTITY, ee, entities);
 	 },
@@ -189,16 +188,11 @@ entity e, module;
 	    
 	    entities = gen_nreverse(entities);
 	    
-	    MAPL(pee, 
+	    MAP(ENTITY, ee, 
 	     {
-		 entity ee = ENTITY(CAR(pee));
-		 
-		 if (comma) 
-		     pc = CHAIN_SWORD(pc, ",");
-		 else
-		     comma = TRUE;
-		 
-		 pc = gen_nconc(pc, words_declaration(ee));
+		 if (comma) pc = CHAIN_SWORD(pc, ",");
+		 else comma = TRUE;
+		 pc = gen_nconc(pc, words_declaration(ee, TRUE));
 	     },
 		 entities);
 
@@ -357,7 +351,8 @@ static text text_entity_declaration(module, ldecl)
 entity module;
 list ldecl;
 {
-    bool print_commons = get_bool_property("PRETTYPRINT_COMMONS");
+    bool print_commons = get_bool_property("PRETTYPRINT_COMMONS"),
+         from_hpfc = get_bool_property("PRETTYPRINT_HPFC");
     text r = text_undefined;
     list before = NIL, after_before = NIL,
 	pi = NIL, pf4 = NIL, pf8 = NIL, pl = NIL, pc = NIL, ps = NIL;
@@ -417,49 +412,47 @@ list ldecl;
 	 }
 	 else if (var)
 	 {
-	     basic
-		 b = variable_basic(type_variable(te));
+	     basic b = variable_basic(type_variable(te));
 	     
-	     switch ( basic_tag(b) ) 
+	     switch (basic_tag(b)) 
 	     {
 	     case is_basic_int:
 		 pi = CHAIN_SWORD(pi, pi==NIL ? "INTEGER " : ",");
-		 pi = gen_nconc(pi, words_declaration(e)); 
+		 pi = gen_nconc(pi, words_declaration(e, !from_hpfc)); 
 		 break;
 	     case is_basic_float:
 		 switch (basic_float(b))
 		 {
 		 case 4:
 		     pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : ",");
-		     pf4 = gen_nconc(pf4, words_declaration(e));
+		     pf4 = gen_nconc(pf4, words_declaration(e, !from_hpfc));
 		     break;
 		 case 8:
 		 default:
 		     pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : ",");
-		     pf8 = gen_nconc(pf8, words_declaration(e));
+		     pf8 = gen_nconc(pf8, words_declaration(e, !from_hpfc));
 		     break;
 		 }
 		 break;			
 	     case is_basic_logical:
 		 pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : ",");
-		 pl = gen_nconc(pl, words_declaration(e));
+		 pl = gen_nconc(pl, words_declaration(e, !from_hpfc));
 		 break;
 	     case is_basic_overloaded:
-/*		 po = CHAIN_SWORD(po, po==NIL ? "OVERLOADED " : ",");
-		 po = gen_nconc(po, words_declaration(e));*/
+		 /* nothing! some in hpfc I guess...
+		  */
 		 break; 
 	     case is_basic_complex:
 		 pc = CHAIN_SWORD(pc, pc==NIL ? "COMPLEX " : ",");
-		 pc = gen_nconc(pc, words_declaration(e));
+		 pc = gen_nconc(pc, words_declaration(e, !from_hpfc));
 		 break;
 	     case is_basic_string:
 		 ps = CHAIN_SWORD(ps, ps==NIL ? "STRING  " : ",");
-		 ps = gen_nconc(ps, words_declaration(e));
+		 ps = gen_nconc(ps, words_declaration(e, !from_hpfc));
 		 break;
 	     default:
-		 pips_error("text_declarations", 
-			    "unexpected basic tag (%d)\n",
-			    basic_tag(b));
+		 pips_internal_error("unexpected basic tag (%d)\n",
+				     basic_tag(b));
 	     }
 	 }
      }, ldecl);
@@ -483,27 +476,22 @@ entity module;
 				   code_declarations(entity_code(module))));
 }
 
+/* needed for hpfc 
+ */
 text text_common_declaration(common, module)
 entity common, module;
 {
-    type 
-	t = entity_type(common);
-    list 
-	ldecl = NIL;    
-    text
-	result = text_undefined;
+    type t = entity_type(common);
+    list ldecl;
+    text result;
 
-    pips_assert("text_common_declaration", type_area_p(t));
+    pips_assert("indeed a common", type_area_p(t));
 
-    ldecl = CONS(ENTITY,
-		 common,
-		 gen_copy_seq(area_layout(type_area(t))));
-
+    ldecl = CONS(ENTITY, common, gen_copy_seq(area_layout(type_area(t))));
     result = text_entity_declaration(module, ldecl);
 
     gen_free_list(ldecl);
-
-    return(result);
+    return result;
 }
 
 text text_instruction(module, label, margin, obj, n)
@@ -1357,18 +1345,22 @@ entity e;
  * extended to cope with PRETTYPRINT_HPFC 
  */
 
-list words_declaration(e)
-entity e;
+/* some compilers don't like dimensions that are declared twice.
+ * this is the case of g77 used after hpfc. thus I added a
+ * flag not to prettyprint again the dimensions of common variables. FC.
+ */
+list words_declaration(
+    entity e,
+    bool prettyprint_common_variable_dimensions_p)
 {
-    extern bool declaration_delayed_p(entity);
-    extern string bound_parameter_name(entity, string, int);
-
-    list 
-	pl = NIL;
+    list pl = NIL;
 
     pl = CHAIN_SWORD(pl, entity_local_name(e));
 
-    if (!type_variable_p(entity_type(e))) return(pl);
+    if (!type_variable_p(entity_type(e))) return pl;
+
+    if (variable_in_common_p(e) && !prettyprint_common_variable_dimensions_p)
+	return pl;
 
     if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
     {
@@ -1376,30 +1368,12 @@ entity e;
 	
 	pl = CHAIN_SWORD(pl, "(");
 
-	/*
-	if (get_bool_property("PRETTYPRINT_HPFC") && declaration_delayed_p(e))
-	{
-	    int i;
-	    list ls = NIL;
-
-	    for(i=gen_length(dims); i>0; i--)
-		ls = CONS(STRING, bound_parameter_name(e, "LO", i),
-		     CONS(STRING, strdup(":"),
-		     CONS(STRING, bound_parameter_name(e, "UP", i),
-		     ENDP(ls) ? NIL : CONS(STRING, strdup(","), ls))));
-	    
-	    pl = gen_nconc(pl, ls);
-	}
-	else
-	*/
-
 	MAPL(pd, 
-	 {
-	     pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
-	     
-	     if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, ",");
-	 }, 
-	     dims);
+        {
+	    pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
+	    if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, ",");
+	}, 
+	    dims);
 	
 	pl = CHAIN_SWORD(pl, ")");
     }
