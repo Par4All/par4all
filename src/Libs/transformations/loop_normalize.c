@@ -101,7 +101,7 @@
  * You may note the reorder of the module body. It is necessary if you want to
  * make others analyses upon the generated CODE.
  */
-void loop_normalize(mod_name)
+bool loop_normalize(mod_name)
 char *mod_name;
 {
   statement mod_stat;
@@ -145,6 +145,8 @@ char *mod_name;
 		     &Genclosing_tests, &Gscalar_written_forward,
 		     &Gcount_nlc);
 
+  debug_off();
+
   /* Reorder the module. It is necessary because new statements have been
    * generated.
    */
@@ -158,7 +160,8 @@ char *mod_name;
   }
 
   reset_current_module_entity();
-  debug_off();
+
+  return TRUE;
 }
 
 
