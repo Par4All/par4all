@@ -97,9 +97,10 @@ resource. At any time one of these rules is the default rule
 	<LI> <b>cd</b> <i>&lt;directory-name&gt;</i><br>
 	changes the default directory
 
-	<LI> <b>\</b><i>&lt;sh-command&gt;</i>
-<i>&lt;parameters&gt;...</i><br>
-	Executes a sh command
+	<LI> <b>shell</b> [<i>&lt;sh-command&gt;</i>
+<i>&lt;parameters&gt;...</i>]<br>
+	Execute the rest of the line as a shell command. With no
+arguments, run an inferior shell.
 
 	<LI> <b>help</b> [<i>&lt;command&gt;</i>]<br>
 	prints out general help or detailled help about an item
