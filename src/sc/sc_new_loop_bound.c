@@ -26,52 +26,15 @@ Psysteme new_loop_bound(scn, base_index)
 Psysteme scn;
 Pbase base_index;
 {
-/*
-    Psysteme PD;
-    Psysteme ps_project;
-    Psysteme ps1;
-    Pvecteur pb;
- 
-    if (VECTEUR_NUL_P(base_index)) return(scn);
-
-    PD = sc_new();
-    scn = sc_normalize(scn);
-    ps_project = sc_dup(scn);
-    
-    for (pb = base_reversal(base_index); 
-	 !VECTEUR_NUL_P(pb) && pb->succ!= NULL; 
-	 pb = pb->succ)
-    {
-	ps_project = sc_projection(ps_project,pb->var);	
-	ps_project = sc_triang_elim_redond(ps_project,base_index);
-
-	ps1 = sc_dup(ps_project);
-	PD = sc_fusion(PD,ps1);
-	PD = sc_triang_elim_redond(PD,base_index);
-    }
-
-    PD = sc_fusion(scn,PD);
-    PD = sc_triang_elim_redond(PD,base_index);
-
-    return PD;
-*/
     Psysteme
 	result = NULL,
 	condition = NULL,
 	enumeration = NULL;
 
-/*    extern char* entity_local_name();
-    fprintf(stderr, "[new_loop_bound] input:\n");
-    base_fprint(stderr, base_index, entity_local_name);
-    sc_fprint(stderr, scn, entity_local_name); */
-
     algorithm_row_echelon(scn, base_index, &condition, &enumeration);
 
     sc_rm(scn);
     result = sc_fusion(condition, enumeration);
-
-/*    fprintf(stderr, "[new_loop_bound] output:\n");
-    sc_fprint(stderr, result, entity_local_name); */
 
     return(result);
 }
@@ -141,8 +104,6 @@ Pbase vars;
 /* each variable should be at least within one <= and one >=;
  * the equalities are assumed to have been translated into inequalities;
  * scn IS NOT modified.
- *
- * !!! there should be no equalities on the scanners (base_index)
  */
 void algorithm_row_echelon(scn, base_index, pcondition, penumeration)
 Psysteme scn;
@@ -161,12 +122,6 @@ Psysteme *pcondition, *penumeration;
 	ineq = NULL,
 	*c = (Pcontrainte*) malloc(sizeof(Pcontrainte)*(dimension+1));
 
-    /* check for equalities on the scanners... 
-     */
-    if (!constraints_without_vars(sc_egalites(scn), base_index))
-	fprintf(stderr, "[algorithm_row_echelon] eq with scanner found\n"),
-	abort();
-
     if (VECTEUR_NUL_P(base_index)) 
     {
 	*penumeration = sc_rn(NULL);
@@ -175,6 +130,7 @@ Psysteme *pcondition, *penumeration;
     }
 
     ps_project = sc_dup(scn);
+    sc_transform_eg_in_ineg(ps_project);
     ps_project = sc_sort_constraints(ps_project, base_index);
     ps_project = sc_elim_redond(ps_project);
 
@@ -193,9 +149,10 @@ Psysteme *pcondition, *penumeration;
     {
 	c[i] = contrainte_dup_extract(sc_inegalites(ps_project), pb->var);
 
-	ps_project = sc_projection(ps_project, pb->var);	
-	/* the real redundancy elimination should be used ? */
-	ps_project = sc_triang_elim_redond(ps_project, base_index);
+	ps_project = sc_projection(ps_project, pb->var);
+	vect_erase_var(&sc_base(ps_project), pb->var);
+	ps_project->dimension--;
+	ps_project = sc_triang_elim_redund(ps_project, base_index); 
     }
 
     if (ps_project==NULL || sc_empty_p(ps_project))
@@ -217,14 +174,15 @@ Psysteme *pcondition, *penumeration;
     fprintf(stderr, "intermediate redundant system:\n");
     sc_fprint(stderr, ps_interm, *variable_default_name);
     */
-
     /*  include the original system again, to recover simple
      *  constraints that may have been removed. May not be interesting...
      */
     ps_interm = sc_fusion(ps_interm, sc_dup(scn));
-    ps_interm = sc_triang_elim_redond(ps_interm, base_index); 
+    ps_interm = sc_triang_elim_redund(ps_interm, base_index); 
 
     *pcondition = get_other_constraints(&ps_interm, base_index);
+    sc_transform_ineg_in_eg(*pcondition); 
+
     *penumeration = ps_interm;
 
     base_rm(reverse_base), free(c);
