@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/12/27 14:39:10 $, )
+ * ($Date: 1997/01/07 14:11:43 $, )
  */
 
 #include "defines-local.h"
@@ -359,7 +359,6 @@ hpfc_head_hook(
 {
     return strdup(concatenate
         ("      implicit none\n"
-	 "      include \"fpvm3.h\"\n"
 	 "      include \"" GLOBAL_PARAMETERS_H "\"\n"
 	 "      include \"hpfc_commons.h\"\n"
 	 "      include \"hpfc_includes.h\"\n"
