@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: io-compile.c,v $
+ * Revision 1.51  1998/04/14 20:38:05  coelho
+ * useless includes removed.
+ *
  * Revision 1.50  1997/09/26 10:52:34  coelho
  * julien added in/out effects io optimizations.
  *
@@ -34,13 +37,6 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
-
-/* Yi-Qing stuff
- */
-#include "graph.h"
-#include "dg.h"
-#include "rice.h"
-#include "ricedg.h"      
 
 /************************************************* IO EFFICIENT COMPILATION */
 
