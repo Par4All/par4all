@@ -6,29 +6,8 @@
  * Those functions remove the definition instructions with no def-use
  * dependence.
  */
-#include <stdio.h>
 
-#include "genC.h"
-#include "ri.h"
-#include "ri-util.h"
-#include "graph.h"
-#include "dg.h"
-#include "database.h"
-#include "text.h"
-#include "text-util.h"
-
-#include "control.h"
-#include "constants.h"
-#include "misc.h"
-#include "effects-generic.h"
-#include "effects-simple.h"
-
-#include "atomizer.h"
-
-
-/* instantiation of the dependence graph */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
+#include "local.h"
 
 /*============================================================================*/
 /* static int vertex_ordering(vertex v): returns the "ordering" of "v".
