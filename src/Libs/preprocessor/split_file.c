@@ -23,6 +23,9 @@
  * - bang comment management added (to avoid the parser)
  *
  * $Log: split_file.c,v $
+ * Revision 1.39  1998/07/10 15:59:04  coelho
+ * fix for implicit main and data that interacted with entries.
+ *
  * Revision 1.38  1998/07/10 08:17:54  coelho
  * entry-related bug fixed.
  *
@@ -239,6 +242,7 @@ static int implicit_program; /* FC */
 static int implicit_blockdata_name; /* FC */
 static int implicit_program_name; /* FC */
 static int it_is_a_main; /* FC */
+static int it_is_an_entry;
 
 /*		check for keywords for subprograms	
 		return 0 if comment card, 1 if found
@@ -254,6 +258,7 @@ char *s;
 	implicit_blockdata_name = 0;
 	implicit_program_name = 0;
 	it_is_a_main = 0;
+	it_is_an_entry = 0;
 
 	lbuf = skip_comment_if_any(buf);
 
@@ -277,11 +282,15 @@ char *s;
 	*iptr = '\n';
 
 	if ((ptr = look(line, "subroutine")) != 0 ||
-	    (ptr = look(line, "entry")) != 0 ||
 	    (ptr = look(line, "function")) != 0 ||
 	    (ptr = functs(line)) != 0) {
 	    if(!scan_name(s, ptr)) 
 		strcpy( s, x);
+	} else if ((ptr = look(line, "entry")) != 0) {
+	    if(!scan_name(s, ptr)) {
+		it_is_an_entry = 1;
+		strcpy( s, x);
+	    }
 	} else if((ptr = look(line, "program")) != 0) {
 	    it_is_a_main = 1;
 	    if(!scan_name(s, ptr)) {
@@ -391,8 +400,13 @@ char *s, *m;
 	return (sp);
 }
 
-static void put_upper_till_dot_or_end(char * what, FILE * where)
+static void put_upper_from_slash_till_dot_or_end(char * what, FILE * where)
 {
+    if (*what=='.') {
+	char * tmp = what+strlen(what);
+	while (tmp>what && *tmp!='/') tmp--;
+	if (what!=tmp) what=tmp+1;
+    }
     while (*what && *what!='.') putc(toupper(*what++), where);
 }
 
@@ -454,9 +468,10 @@ int fsplit(char * dir_name, char * file_name, FILE * out)
 		nflag = lname(name), newname=nflag;
 	    else { /* FC: some hack to deal with entry... */
 		someentry = lname(tmpname);
-		newname=someentry;
+		newname = it_is_an_entry;
 		implicit_program = 0;
 		it_is_a_main = 0;
+		it_is_an_entry = 0;
 	    }
 
 	    if (it_is_a_main) {
@@ -468,7 +483,7 @@ int fsplit(char * dir_name, char * file_name, FILE * out)
 		if (implicit_program_name==1 || implicit_program==1)
 		    print_name(fm, name, 7, 1);
 		else
-		    put_upper_till_dot_or_end(name, fm);
+		    put_upper_from_slash_till_dot_or_end(name, fm);
 		putc('\n', fm);
 		fclose(fm);
 		it_is_a_main = 0;
@@ -503,7 +518,8 @@ int fsplit(char * dir_name, char * file_name, FILE * out)
 	    {
 		if ((someentry && tmpname[0]) || (!someentry && name[0]))
 		{
-		    put_upper_till_dot_or_end(someentry? tmpname: name, out);
+		    put_upper_from_slash_till_dot_or_end
+			(someentry? tmpname: name, out);
 		    putc(' ', out);
 		}
 		newname = 0;
