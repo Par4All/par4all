@@ -60,9 +60,9 @@ print_dependence_or_chains_graph(string mod_name, bool with_dg)
 
     /* get the dg or chains... */
     dg = (graph) db_get_memory_resource(
-	with_dg? DBR_DG: DBR_CHAINS, mod_name, TRUE);
+	with_dg ? DBR_DG : DBR_CHAINS, mod_name, TRUE);
 
-    local_dg_name = db_build_file_resource_name(DBR_DG, mod_name, ".dg");
+    local_dg_name = db_build_file_resource_name(with_dg ? DBR_DG : DBR_CHAINS, mod_name, ".dg");
     dg_name = strdup(concatenate(db_get_current_workspace_directory(), 
 				 "/", local_dg_name, NULL));
     fp = safe_fopen(dg_name, "w");
