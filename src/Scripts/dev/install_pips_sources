@@ -1,8 +1,11 @@
 #! /bin/sh
 #
-# $RCSfile: install_pips_sources,v $ ($Date: 1996/08/26 12:10:23 $, )
-# version $Revision$
-# got on %D%, %T%
+# $Id$
+# 
+# $Log: install_pips_sources,v $
+# Revision 1.12  1997/03/26 13:50:25  coelho
+# RCS headers.
+#
 #
 
 script=`basename $0`
