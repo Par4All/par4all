@@ -17,6 +17,9 @@
  * $Id$
  *
  * $Log: Console.java,v $
+ * Revision 1.3  1998/10/17 09:51:45  coelho
+ * background color is white.
+ *
  * Revision 1.2  1998/10/16 13:40:56  coelho
  * fixed.
  *
@@ -127,8 +130,12 @@ public class Console extends JFrame implements StreamObserver
       aTextArea = new JTextArea();
       aTextArea.setEditable(false);
       aTextArea.setLineWrap(true);
+      aTextArea.setBackground(Color.white);
       
-      the_scroll_pane = new JScrollPane(aTextArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+      the_scroll_pane = new JScrollPane
+	(aTextArea, 
+	 ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, 
+	 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
       clear = new JButton("Clear");
       close = new JButton("Close");
@@ -324,6 +331,7 @@ public class Console extends JFrame implements StreamObserver
    public JTextField getConsoleTextField() {
       console_text_field = new JTextField();
       console_text_field.setEditable(false);
+      console_text_field.setBackground(Color.white);
       
       return console_text_field;
    }
