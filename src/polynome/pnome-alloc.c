@@ -78,7 +78,9 @@ float coeff;
 Variable var;
 Value exp;
 {
-    return (monome_to_new_polynome(make_monome(coeff, var, exp)));
+    Pmonome m = make_monome(coeff, var, exp);
+    Ppolynome p = monome_to_new_polynome(m);
+    return p;
 }
 
 
