@@ -253,13 +253,23 @@ type {\tt entity}. Such object could be a module (function or subroutine
 or program), a variable, a common, an operator, an intrinsic, a
 constant, a label,... Field {\tt name} contains the name of the object,
 more or less as it appears in the source code, concatenated to a prefix
-string and a special separator. The prefix string is the name of the
-package defining the scope of the object. The package name may be a
-module name, the reserved name {\tt TOP-LEVEL} for global objects, or
-some other reserved names for objects specific to some analysis,
+string and a special one-character separator, {\tt
+MODULE_SEP_STRING}. The prefix string is the name of the package
+defining the scope of the object. The package name may be a module name,
+the reserved name {\tt TOP-LEVEL} for global objects, or some other
+reserved names for objects specific to some analysis,
 e.g. \verb+*SEMANTICS*+ for value names used in the semantics
-analysis. Note the use of star, \verb+*+, to avoid name collision with user
-defined name.
+analysis. Note the use of star, \verb+*+, to avoid name collision with
+user defined name.
+
+To sum up, an entity name is unique and known internally as a {\em
+global} name. It is made of a {\em local} name and a {\em module} name.
+
+Several other tricks are used to store information in names. To spot
+main modules which cannot be distinguished from subroutines by the
+typing information, their local names are prefixed by a constant
+character, {\tt MAIN\_PREFIX}. Local names of labels also are prefixed
+by one character, {\tt LABEL_PREFIX}.
 
 As expected, field {\tt type} specifies the type of the object (see
 Section~\ref{subsection-type}), field {\tt storage} defines the memory
@@ -331,71 +341,147 @@ ou d'un programme principal.
 
 \domain{Area = size:int x layout:entity*}
 
+Type {\tt area} is used to represent storage sections for variables such
+as commons or static or dynamic area. Areas are {\em global} objects in
+the current implementation. The package name used in the corresponding
+entity name must be \verb/TOP-LEVEL/, but this is not explictly
+enforced. Dynamic commons defined by the Fortran standard are not
+implemented, as is the case with most Fortran~77 compiler. Dynamic
+commons cannot be statically identified because a dynamic binding is
+used.
+
+\iffalse
 Le domaine {\tt area} est utilise' pour repre'senter les aires de
 stockage des variables telles que les commons et les aires statiques ou
 dynamiques. Ces aires sont des objets globaux et leur package de
 rattachement est donc \verb/TOP-LEVEL/.
+\fi
 
+Field {\tt size} is the amount of memory space expressed in bytes, or
+according to the Fortran standard in {\em character storage unit}
+(X3.9-1978, \S~2.13), which is required to allocate the area in
+memory. This space is the largest space encountered in all modules of a
+program. At some stages, PIPS used to enforce a unique size for all
+declarations of a common, but this is not true in the current version.
+
+\iffalse
 Le sous-domaine {\tt size} donne la taille de l'aire
 exprime'e en octets ({\em character storage unit} de la norme ANSI
 X3.9-1978, \S~2.13). Cette taille est la taille maximum rencontre'e
 parmi les modules d'un programme. 
+\fi
 
+Field {\tt layout} is the list of variables declared allocated in the
+area. These variables may have been declared in different modules, where
+the common itself is declared. Their names are non-ambiguous because
+PIPS entity names include a package name as prefix. Their offsets in the
+common are stored in Type {\tt storage} (see
+Section~\ref{subsubsection-ram}).
+
+\iffalse
 Le sous-domaine {\tt layout} donne la
 liste des entite's stocke'es dans cette aire. Il s'agit des variables
 de'clare'es dans ce common dans n'importe quel module.
+\fi
 
+As long as no program transformation has been applied, the textual ordre
+for declarations is preserved in the layout list. This can be used to
+regenerate declarations close to the programmer declarations. To provide
+the best possible user-friendliness, programmer declarations are in fact
+stored as a huge string which is used by prettyprinter as long as it is
+consistent with the code.
+
+\iffalse
 L'ordre des de'clarations des variables est respecte', ce qui
 permettrait de reproduire des programmes sources fide`les a` ce
 qu'e'taient les programmes initiaux\footnote{Les de'clarations sont en
 fait conserve'es sous forme textuelle pour garantir une fide'lite'
 absolue.}.
+\fi
 
 \subsubsection{Variable Type}
 \label{subsubsection-variable}
 \index{Variable}
 
-\domain{Variable = basic x dimensions:dimension*}
-{
+\domain{Variable = basic x dimensions:dimension*}{}
+
+Type {\tt variable} represents the type of usual non-functional
+variables. Field {\tt basic} is the underlying scalar type, e.g. {\tt
+REAL*8} or {\tt INTEGER*4}. Field {\tt dimensions} is a list of lower
+and upper bound pairs. Scalar variables are of dimension 0 and have an
+empty dimension list.
+
+\iffalse
 Le domaine \verb/variable/ repre'sente le type d'une variable.  Le
 sous-domaine \verb/basic/ donne le type Fortran de la variable.  Le
 sous-domaine \verb/dimensions/ donne la liste des dimensions de la variable.
 Un scalaire est un tableau de ze'ro dimension.
+\fi
 
+Each dimension is an expression, which is not always numerically
+expressed or known. Constant parameter can be used to build symbolic
+constant expressions. Formal parameters can be used to specify the
+dimensions of other formal parameters. A special predefined constant
+entity is used for arrays with no defined dimension which often are
+declared in libraries such as (\verb/DIMENSION T(*)/). Its name is
+'*D*'\footnote{In {\tt ri-util}, the unbounded dimension name is {\tt
+UNBOUNDED-DIMENSION}.}.
+
+\iffalse
 Chaque dimension est une expression, qui n'est pas ne'cessairement
 constante dans le cas des tableaux formels. La constante pre'de'finie de
 nom '*D*' est utilise'e pour les tableaux de taille non de'finie
 (\verb/DIMENSION T(*)/).
-}
+\fi
 
 \subsubsection{Basic Type}
 \label{subsubsection-basic}
 \index{Basic}
 
-\domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value}
-{
+\domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value}{}
+
+Type {\tt basic} is used to store basic type information such has {\tt
+REAL} or {\tt INTEGER}. Each member includes a precision information,
+namely the number of bytes required to store one scalar object of this
+type. The precision information is numerically known for all basic types
+but for {\tt string}.
+
+\iffalse
 Le domaine \verb/basic/ permet de repre'senter un type Fortran tel que
 INTEGER ou REAL. La valeur de ce domaine donne la longueur en octets de
 la zone me'moire occupe'e par une variable de ce type.
-}
+\fi
+
+Note that no {\em default} type is provided. Untyped object are given
+the current default type when they are first encountered. They only can
+be typed explictly if they still have their default type when the type
+declaration is encountered. PIPS parser is implemented in such a way
+that {\tt IMPLICIT} statements should appear as early as possible in a
+module declarations.
 
 \subsubsection{Dimension}
 \label{subsubsection-dimension}
 \index{Dimension}
 
-\domain{Dimension = lower:expression x upper:expression}
-{
+\domain{Dimension = lower:expression x upper:expression}{}
+
+Type {\tt dimension} is used to represent intervals, with a lower and
+an upper bounds. These bounds may not be numerically known at compile
+time when they are used to define formal arrays.
+
+\iffalse
 Le domaine \verb/dimension/ permet de repre'senter une dimension d'un
 tableau, c'est-a`-dire un couple borne infe'rieure -- sous-domaine
 \verb/lower/ -- borne supe'rieure -- sous-domaine \verb/upper/.
-}
+\fi
 
 \subsubsection{Functional Type}
 \label{subsubsection-functional}
 \index{Functional}
 
-\domain{Functional = parameters:parameter* x result:type}
-{ Le domaine \verb/functional/ repre'sente le type d'un module,
+\domain{Functional = parameters:parameter* x result:type}{}
+
+Le domaine \verb/functional/ repre'sente le type d'un module,
 c'est-a`-dire une fonction, une subroutine ou un programme principal. Le
 sous-domaine \verb/parameters/ donne le type et le mode de passage de
 chaque parame`tre, et le sous-domaine \verb/result/ donne le type du
@@ -406,7 +492,7 @@ Il n'y a pas de moyens simples pour repre'senter les fonctions ou
 sous-programmes a` nombre variable de parame`tres. Bien que ce soit
 interdit pour les modules de'finis par le programmeur, de nombreux
 intrinse`ques comme \verb+MIN0+ ou \verb+WRITE+ n'ont pas un profil
-unique.  }
+unique.
 
 \subsubsection{Parameter Type and Mode}
 \label{subsubsection-parameter}
