@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "type.h"
-#include "tab.h"
+#include "pip__type.h"
+#include "pip__tab.h"
 extern long int cross_product, limit;
 
 extern Entier sol_pgcd();
