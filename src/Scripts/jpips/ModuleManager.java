@@ -2,6 +2,9 @@
   $Id$
 
   $Log: ModuleManager.java,v $
+  Revision 1.4  1998/10/17 12:19:24  coelho
+  border++.
+
   Revision 1.3  1998/10/16 18:06:37  coelho
   obscure bug tmp fix...
 
@@ -53,7 +56,7 @@ public class ModuleManager implements JPipsComponent
   public void buildPanel()
   {
     panel = new PPanel(new BorderLayout());
-    panel.setBorder(new TitledBorder("Modules"));
+    panel.setBorder(Pawt.createTitledBorder("Modules"));
     modules = new DefaultListModel();
     list = new PList(modules);
     list.setSelectionMode(2);
