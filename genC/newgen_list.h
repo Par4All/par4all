@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1998/04/14 13:23:20 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1998/04/14 21:42:37 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -48,6 +48,7 @@ extern list *gen_cp_ ;
 
 #define CAR(pcons) ((pcons)->car)
 #define CDR(pcons) ((pcons)->cdr)
+#define REFCAR(pc) (&(CAR(pc).p))
 
 #define IN_STACK(i,s,e,res) \
 (((i++)>=(s))? \
