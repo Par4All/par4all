@@ -5,7 +5,7 @@ c
 c (c) Fabien COELHO, 09/95
 c
 c $RCSfile: hpfc_stubs.f,v $ (version $Revision$)
-c ($Date: 1996/04/01 11:31:47 $, )
+c ($Date: 1996/04/17 17:44:54 $, )
 c     
 c synchronization 
       subroutine hpfc1()
@@ -23,6 +23,11 @@ c timer off
 c io/host section marker
       subroutine hpfc7()
       print *, 'hpfc7: '
+      end
+c dead FC directive. one argument, why not...
+      subroutine hpfc8(x)
+      integer x
+      print *, 'hpfc8: ', x
       end
 c
 c That is all
