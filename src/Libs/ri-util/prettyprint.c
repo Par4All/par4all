@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.111  1998/03/05 14:03:11  irigoin
+ * pips_assert() added in sentence_goto() to avoid the printout of a GOTO
+ * without target label
+ *
  * Revision 1.110  1998/02/11 21:23:07  ancourt
  * text_instruction static again :-)
  *
@@ -153,7 +157,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.110 1998/02/11 21:23:07 ancourt Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.111 1998/03/05 14:03:11 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -973,6 +977,7 @@ sentence_goto(
 {
     string tlabel = entity_local_name(statement_label(obj)) + 
 	           strlen(LABEL_PREFIX);
+    pips_assert("Legal label required", strlen(tlabel)!=0);
     return sentence_goto_label(module, label, margin, tlabel, n);
 }
 
