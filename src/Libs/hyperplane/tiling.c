@@ -9,6 +9,8 @@
  *    - directions (e.g. communication minimization): Darte/Robert, Hoegsted
  *    - ratios (e.g. critical path minimization)
  *    - volume (fix cost amortization) under memory constraints
+ *    - mapping on finite hardware (Robert/...)
+ *    restriction to orthogonal tilings: ratios, volume, mapping (Andonov/Rajopadhye)
  * 4. Code Generation (Xue?)
  *    - control and memory addressing overheads
  * 5. Hierarchical Tiling (Ferrante/Carter,...)
@@ -19,10 +21,14 @@
  *    - general nested loops (e.g. ADI)
  *    - sequence of loop nests (signal processing, Thomson-CSF)
  *    - ...
+ * See: http://www.irisa.fr/api/Rajopadhye/tiling
  *
  * $Id$
  * 
  * $Log: tiling.c,v $
+ * Revision 1.8  1999/10/05 11:59:30  irigoin
+ * Yet some more comments
+ *
  * Revision 1.7  1999/10/05 11:23:57  irigoin
  * Some more comments
  *
