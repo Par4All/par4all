@@ -78,7 +78,6 @@
 #include "top-level.h"
 #include "tpips.h"
 
-extern char yytext[];
 extern FILE * yyin; 
 
 /* Default comand to print a file (if $PAGER is not set) */
