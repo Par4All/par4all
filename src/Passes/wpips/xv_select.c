@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1995/08/07 12:08:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+static char vcid[] = "%A% ($Date: 1995/08/07 12:08:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
 #include <stdio.h>
 
 #include <sys/time.h>
@@ -20,6 +26,9 @@
 #include "wpips.h"
 
 #include "resources.h"
+
+
+static char * workspace_name_to_create;
 
 
 /* Try to select a main module (that is the PROGRAM in the Fortran
@@ -106,6 +115,7 @@ start_create_program_notify(Menu menu,
                cancel_create_program_notify);
 }
 
+
 void
 cancel_create_program_notify(Panel_item item,
                              Event * event)
@@ -115,6 +125,7 @@ cancel_create_program_notify(Panel_item item,
   xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
   cancel_query_notify(item, event);
 }
+
 
 success
 continue_create_program_notify(char * name)
@@ -130,9 +141,6 @@ continue_create_program_notify(char * name)
       return(FALSE);
    }
    else {
-      xv_set(create_pgm, MENU_INACTIVE, TRUE, 0);
-      xv_set(open_pgm, MENU_INACTIVE, TRUE, 0);
-
       pips_get_fortran_list(&fortran_list_length, fortran_list);
 
       if (fortran_list_length == 0) {
@@ -145,7 +153,7 @@ continue_create_program_notify(char * name)
             RK 18/05/1993. */
          if (workspace_exists_p(name))
          {
-	    int result;
+            int result;
             /* Send to emacs if we are in the emacs mode: */
             if (wpips_emacs_mode) 
                send_notice_prompt_to_emacs("The database",
@@ -153,27 +161,42 @@ continue_create_program_notify(char * name)
                                            "already exists!",
                                            "Do you really want to remove it?",
                                            NULL);
-	    result = notice_prompt(xv_find(main_frame, WINDOW, 0),
-				   NULL,
-				   NOTICE_MESSAGE_STRINGS,
-				   "The database", name, "already exists!",
-				   "Do you really want to remove it?",
-				   NULL,
-				   NOTICE_BUTTON_YES,  "Yes, remove the database",
-				   NOTICE_BUTTON_NO,   "No, cancel",
-				   NULL);
-	    if (result == NOTICE_NO)
+            result = notice_prompt(xv_find(main_frame, WINDOW, 0),
+                                   NULL,
+                                   NOTICE_MESSAGE_STRINGS,
+                                   "The database", name, "already exists!",
+                                   "Do you really want to remove it?",
+                                   NULL,
+                                   NOTICE_BUTTON_YES,  "Yes, remove the database",
+                                   NOTICE_BUTTON_NO,   "No, cancel",
+                                   NULL);
+            if (result == NOTICE_NO)
                return(FALSE);
          }
 
-         db_create_program(name);
-         open_log_file();
-         display_memory_usage();
-         mchoose("Create Workspace", 
-                 fortran_list_length, fortran_list, 
-                 end_create_program_notify);
-         args_free(&fortran_list_length, fortran_list);
+         xv_set(create_pgm, MENU_INACTIVE, TRUE, 0);
+         xv_set(open_pgm, MENU_INACTIVE, TRUE, 0);
 
+         /* To avoid passing the name through mchoose(): */
+         workspace_name_to_create = name;
+         
+         if (fortran_list_length == 1) {
+            /* Only one Fortran program: use it without user
+               confirmation. */
+            user_log("There is only one Fortran program in the current directory.\n"
+                     "\tCreating the workspace \"%s\" from the file \"%s\"...\n",
+                     name, fortran_list[0]);     
+            end_create_program_notify(&fortran_list_length,
+                                      &fortran_list[0]);
+         }
+         else {
+            mchoose("Create Workspace", 
+                    fortran_list_length, fortran_list, 
+                    end_create_program_notify);
+         }
+         /* Memory leak if mchoose exit... */
+         args_free(&fortran_list_length, fortran_list);
+         
          return(TRUE);
       }
    }
@@ -183,6 +206,10 @@ continue_create_program_notify(char * name)
 void
 end_create_program_notify(int * pargc, char * argv[])
 {
+   db_create_program(workspace_name_to_create);
+   open_log_file();
+   display_memory_usage();
+   
    create_program(pargc, argv);
 
    xv_set(close_pgm, MENU_INACTIVE, FALSE, 0);
@@ -235,6 +262,14 @@ Menu_item menu_item;
 
     if (program_list_length == 0) {
 		prompt_user("No workspace available in this directory.");
+    }
+    else if (program_list_length == 1) {
+       /* There is only workspace: open it without asking confirmation
+          to the user: */
+       user_log("There is only one workspace in the current directory.\n"
+                     "\tOpening the workspace \"%s\"...\n",
+                     program_list[0]); 
+       end_open_program_notify(program_list[0]);
     }
     else {
 		xv_set(create_pgm, MENU_INACTIVE, TRUE, 0);
