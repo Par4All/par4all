@@ -1264,20 +1264,20 @@ expression exp;
 bool expression_constant_p(exp)
 expression exp;
 {
-debug( 7, "expression_constant_p", "doing\n");
-if(syntax_tag(expression_syntax(exp)) == is_syntax_call)
-  {
-  call c = syntax_call(expression_syntax(exp));
-  switch(value_tag(entity_initial(call_function(c))))
+    if(syntax_call_p(expression_syntax(exp)))
     {
-    case is_value_constant:
-      return(TRUE);
-    case is_value_intrinsic:
-      if(ENTITY_UNARY_MINUS_P(call_function(c)))
-	return(expression_constant_p(EXPRESSION(CAR(call_arguments(c)))));
+	call c = syntax_call(expression_syntax(exp));
+	switch(value_tag(entity_initial(call_function(c))))
+	{
+	case is_value_constant:
+	    return(TRUE);
+	case is_value_intrinsic:
+	    if(ENTITY_UNARY_MINUS_P(call_function(c)))
+		return expression_constant_p
+		    (EXPRESSION(CAR(call_arguments(c))));
+	}
     }
-  }
-return(FALSE);
+    return(FALSE);
 }
 
 
