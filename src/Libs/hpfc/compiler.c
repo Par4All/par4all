@@ -1,6 +1,6 @@
-/* Fabien Coelho, May 1993
+/* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/10/04 19:28:58 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/10/05 11:32:27 $, )
  * version $Revision$
  *
  * Compiler
@@ -41,7 +41,7 @@ statement *hoststatp,*nodestatp;
     list /* of statements */ lhost=NIL, lnode=NIL;
     statement hostcd, nodecd;
 
-    assert(instruction_block_p(statement_instruction(stat)));
+    pips_assert("block", instruction_block_p(statement_instruction(stat)));
 
     (*hoststatp) = MakeStatementLike(stat, is_instruction_block);
     (*nodestatp) = MakeStatementLike(stat, is_instruction_block);
@@ -73,7 +73,7 @@ statement *hoststatp,*nodestatp;
     test the_test;
     expression condition;
     
-    assert(instruction_test_p(statement_instruction(s)));
+    pips_assert("test", instruction_test_p(statement_instruction(s)));
 
     the_test = instruction_test(statement_instruction(s));
     condition = test_condition(the_test);
@@ -113,13 +113,13 @@ statement *hoststatp,*nodestatp;
 {
     call c = instruction_call(statement_instruction(stat));
 
-    assert(instruction_call_p(statement_instruction(stat)));
+    pips_assert("call", instruction_call_p(statement_instruction(stat)));
 
     pips_debug(7, "function %s\n", entity_name(call_function(c)));
 
     /* IO functions should be detected earlier, in hpf_compiler
      */
-    assert(!IO_CALL_P(c));
+    pips_assert("not an io call", !IO_CALL_P(c));
 
     /* no reference to distributed arrays...
      * the call is just translated into local objects.
@@ -157,7 +157,7 @@ statement *hoststatp,*nodestatp;
 	    w = EXPRESSION(CAR(args)),
 	    r = EXPRESSION(CAR(CDR(args)));
 
-	assert(syntax_reference_p(expression_syntax(w)));
+	pips_assert("reference", syntax_reference_p(expression_syntax(w)));
 
 	if (array_distributed_p
 	    (reference_variable(syntax_reference(expression_syntax(w)))))
@@ -177,8 +177,7 @@ statement *hoststatp,*nodestatp;
 		statement sh, sn;
 
 		if (!compile_reduction(stat, &sh, &sn))
-		    pips_error("hpf_compile_call", 
-			       "reduction compilation failed\n");
+		    pips_internal_error("reduction compilation failed\n");
 
 		lh = CONS(STATEMENT, sh, NIL);
 		ln = CONS(STATEMENT, sn, NIL);
@@ -217,7 +216,7 @@ statement *hoststatp,*nodestatp;
 {
     instruction inst=statement_instruction(stat);
 
-    assert(instruction_unstructured_p(inst));
+    pips_assert("unstructured", instruction_unstructured_p(inst));
 
     if (one_statement_unstructured(instruction_unstructured(inst)))
     {
@@ -303,7 +302,9 @@ statement *hoststatp,*nodestatp;
 	new_ct = (control) GET_CONTROL_MAPPING(hostmap, ct);
 	new_ce = (control) GET_CONTROL_MAPPING(hostmap, ce);
 
-	assert(!control_undefined_p(new_ct) && !control_undefined_p(new_ce));
+	pips_assert("defined control",
+		    !control_undefined_p(new_ct) &&
+		    !control_undefined_p(new_ce));
 
 	ifdebug(9)
 	{
@@ -328,7 +329,9 @@ statement *hoststatp,*nodestatp;
 	new_ct = (control) GET_CONTROL_MAPPING(nodemap, ct);
 	new_ce = (control) GET_CONTROL_MAPPING(nodemap, ce);
 
-	assert(!control_undefined_p(new_ct) && !control_undefined_p(new_ce));
+	pips_assert("defined control",
+		    !control_undefined_p(new_ct) && 
+		    !control_undefined_p(new_ce));
 
 	instruction_unstructured(statement_instruction(*nodestatp)) =
 	    make_unstructured(new_ct, new_ce);
@@ -417,7 +420,7 @@ statement body, *hoststatp, *nodestatp;
 
     if (gen_length(lw)==0) /* very partial */
     {
-	message_assert("no read if no write", gen_length(lr)==0);
+	pips_assert("no read if no write", gen_length(lr)==0);
 
 	(*hoststatp) = copy_statement(body);
 	(*nodestatp) = copy_statement(body);
@@ -450,7 +453,8 @@ statement stat, *hoststatp, *nodestatp;
 	upper = range_upper(r),
 	increment = range_increment(r);
     
-    assert(execution_parallel_p(loop_execution(the_loop)));
+    pips_assert("parallel loop",
+		execution_parallel_p(loop_execution(the_loop)));
 
     if ((instruction_loop_p(bodyinst)) &&
 	(execution_parallel_p(loop_execution(instruction_loop(bodyinst)))))
@@ -479,7 +483,7 @@ statement *hoststatp, *nodestatp;
 {
     loop the_loop = instruction_loop(statement_instruction(stat));
 
-    assert(statement_loop_p(stat));
+    pips_assert("loop", statement_loop_p(stat));
 
     if (execution_parallel_p(loop_execution(the_loop)))
     {
@@ -594,7 +598,7 @@ statement stat, *hoststatp, *nodestatp;
 	break;
     case is_instruction_goto:
     default:
-	pips_error("hpf_compiler", "unexpected instruction tag\n");
+	pips_internal_error("unexpected instruction tag\n");
 	break;
     }
 }
