@@ -3,6 +3,9 @@
 !
 ! $Id$
 ! $Log: hpfc_procs.m4h,v $
+! Revision 1.14  1997/06/03 08:00:06  zory
+! new common HOST LID
+!
 ! Revision 1.13  1997/03/20 07:49:10  coelho
 ! better RCS headers.
 !
@@ -12,6 +15,7 @@
      $     MY LID,
      $     MY TID,
      $     HOST TID,
+     $     HOST LID
      $     NODE TIDS(MAX MAX SIZE OF PROCS),
      $     MY POS(7, MAX NB OF PROCESSORS),
      $     NB OF TASKS,
@@ -36,7 +40,7 @@
 !
       integer 
      $     MY LID, MY TID, HOST TID, NODE TIDS, NB OF TASKS, MY POS,
-     $     SEND CHANNELS, RECV CHANNELS, 
+     $     SEND CHANNELS, RECV CHANNELS, HOST LID,
      $     HOST SND CHANNEL, HOST RCV CHANNEL,
      $     MCAST HOST, MCAST NODES _CM5(`,
      $     CM HOST ID, CM MY ID, CM SIZE,
