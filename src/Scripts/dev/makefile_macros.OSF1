@@ -2,7 +2,6 @@
 
 include $(ROOT)/Include/makefile_macros.DEFAULT
 
-CFLAGS	= -O3
 RANLIB	= :
 
 LEX	= flex
