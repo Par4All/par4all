@@ -6,12 +6,12 @@
 #include <stdio.h>
 #include <string.h>
 
-extern int fprintf();
-
 #include "genC.h"
 #include "list.h"
 #include "ri.h"
 #include "control.h"      /* CONTROL_MAP is defined there */
+#include "text.h"
+#include "text-util.h"
 #include "ri-util.h"
 #include "properties.h"  /* get_bool_property */
 #include "misc.h"
@@ -34,22 +34,56 @@ int margin;
 entity module;
 {
     string module_name = module_local_name(module);
-    statement s = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,TRUE);
     string filename;
+    text r = make_text(NIL);
 
     if ( s == statement_undefined )
 	pips_error("module_to_icfg","statement for module %s\n",module_name);
     else {
 	if (margin==0) {
-	    filename = strdup(concatenate(db_get_current_program_directory(), 
-					  "/", module_name,
-					  get_bool_property(ICFG_IFs) ? ".icfgc" :
-					  ( get_bool_property(ICFG_DOs) ? ".icfgl" : 
-					  ".icfg") ,
-					  NULL));
+	    filename = strdup(concatenate
+			      (db_get_current_program_directory(), 
+			       "/", module_name,
+			       get_bool_property(ICFG_IFs) ? ".icfgc" :
+			       ( get_bool_property(ICFG_DOs) ? ".icfgl" : 
+				".icfg") ,
+			       NULL));
 
 	    fp = safe_fopen(filename, "w");
 	}
+
+	switch (get_int_property (ICFG_DECOR)) {
+	case ICFG_DECOR_NONE:
+	    break;
+	case ICFG_DECOR_TRANSFORMERS:
+	    MERGE_TEXTS(r,get_text_transformers(module_name));
+	    break;
+	case ICFG_DECOR_PRECONDITIONS:
+	    MERGE_TEXTS(r,get_text_preconditions(module_name));
+	    break;
+	case ICFG_DECOR_PROPER_EFFECTS:
+	    MERGE_TEXTS(r,get_text_proper_effects(module_name));
+	    break;
+	case ICFG_DECOR_CUMULATED_EFFECTS:
+	    MERGE_TEXTS(r,get_text_cumulated_effects(module_name));
+	    break;
+	case ICFG_DECOR_REGIONS:
+	    MERGE_TEXTS(r,get_text_regions(module_name));
+	    break;
+	case ICFG_DECOR_IN_REGIONS:
+	    MERGE_TEXTS(r,get_text_in_regions(module_name));
+	    break;
+	case ICFG_DECOR_OUT_REGIONS:
+	    MERGE_TEXTS(r,get_text_out_regions(module_name));
+	    break;
+	default:
+	    pips_error("module_to_icfg",
+		       "unknown ICFG decoration for module %s\n",
+		       module_name);
+	}
+	
+	print_text(fp, r);
 
 	fprintf(fp,"%*s%s\n",margin,"",module_local_name(module));
 
