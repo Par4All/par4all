@@ -15,7 +15,7 @@
 #include "pipsdbm.h"
 #include "prettyprint.h"
 
-#include "constants.h"
+#include "top-level.h"
 #include "resources.h"
 #include "control.h" /* for macro CONTROL_MAP() */
 
