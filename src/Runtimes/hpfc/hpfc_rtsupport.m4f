@@ -3,7 +3,7 @@ c Runtime Support Functions for the High Performance Fortran Compiler
 c by Fabien COELHO.
 c
 c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-c ($Date: 1996/06/08 13:58:42 $, )
+c ($Date: 1996/06/08 15:01:16 $, )
 c
 c-----------------
 c
@@ -995,7 +995,10 @@ c
 c end of cm5 related initializations
 c)
       call pvmfjoingroup(HPFC_GROUP_NAME, inum)
-      debug(call HPFC_SYNCHRO)
+c
+c insures that all nodes joined the group
+c
+      call HPFC_SYNCHRO
       end
 c
 c-----------------
@@ -1179,7 +1182,10 @@ c
 c end of cm5 related initializations
 c)
 
-      debug(call HPFC_SYNCHRO)
+c
+c insures that all nodes joined the group...
+c
+      call HPFC_SYNCHRO
 
       end
 c
