@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-! ($Date: 1997/06/03 07:07:17 $, )
+! ($Date: 1997/06/09 13:00:18 $, )
 !
 !
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -327,7 +327,7 @@ SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
 ! the SHIFT is to another processor
 !
              call HPFC RECEIVE(lid(j),
-     $            RECVCHANNELS(lid(j)),info)
+     $            RECVCHANNELS(lid(j)))
              RECV CHANNELS(lid(j))=RECV CHANNELS(lid(j))+2
              call build_name(HPFCUNPACK,PVMTYPE,LEVEL)
      $            (array, dnl
