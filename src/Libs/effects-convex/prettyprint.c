@@ -400,6 +400,16 @@ print_regions_with_action(list pc, string ifread, string ifwrite)
 }
 
 /* external interfaces
+ *
+ * NW:
+ * before calling
+ * "print_inout_regions"
+ * or "print_rw_regions"
+ * or "print_copyinout_regions"
+ * or "print_private_regions"
+ *
+ * "module_to_value_mappings" must be called to set up the
+ * hash table to translate value into value names
  */
 void print_rw_regions(list l)
 { print_regions_with_action(l, ACTION_READ, ACTION_WRITE);}
@@ -419,8 +429,39 @@ void print_regions(list l) { print_rw_regions(l);}
  * input    : a region.
  * modifies : nothing.
  * comment  : prints the region on stderr using words_region.
+ *
+ * NW:
+ * before calling "print_region" or "text_region"
+ * 
+ * "module_to_value_mappings" must be called to set up the
+ * hash table to translate value into value names
+ * (see comment for "module_to_value_mappings" for what must be done
+ * before that is called)
+ * 
+ * and also "set_action_interpretation" with arguments:
+ * ACTION_READ, ACTION_WRITE to label regions as R/W
+ * ACTION_IN, ACTION_OUT to label regions as IN/OUT
+ * ACTION_COPYIN, ACTION_COPYOUT to label regions as COPYIN/COPYOUT
+ * ACTION_PRIVATE, ACTION_PRIVATE to label regions as PRIVATE
+ *
+ * like this:
+ *
+ * string module_name;
+ * entity module;
+ * ...
+ * (set up call to module_to_value_mappings as indicated in its comments)
+ * ...
+ * module_to_value_mappings(module);
+ * set_action_interpretation(ACTION_IN, ACTION_OUT);
+ *
+ * (that's it, but after the call to "print_region" or "text_region",
+ * don't forget to do:)
+ *
+ * reset_action_interpretation();
+ * (resets after call to module_to_value_mappings as indicated in its comments)
  */
-void print_region(effect r)
+void 
+print_region(effect r)
 {
     fprintf(stderr,"\t");
     if(effect_region_p(r)) 
