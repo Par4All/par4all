@@ -26,6 +26,8 @@ extern ZPolyhedron *ZDomain_Copy ( ZPolyhedron *Head );
 extern void ZDomain_Free ( ZPolyhedron *Head );
 extern Bool ZPolyhedronIncludes ( ZPolyhedron *A, ZPolyhedron *B );
 extern ZPolyhedron *ZPolyhedron_Alloc ( Lattice *Lat, Polyhedron *Poly );
+extern ZPolyhedron *SplitZpolyhedron(/*ZPolyhedron *ZPol, Lattice *B */);
+
 
 #else /* __STDC__ */
 
@@ -47,6 +49,7 @@ extern ZPolyhedron *ZDomain_Copy (/* ZPolyhedron *Head */);
 extern void ZDomain_Free (/* ZPolyhedron *Head */);
 extern Bool ZPolyhedronIncludes (/* ZPolyhedron *A, ZPolyhedron *B */);
 extern ZPolyhedron *ZPolyhedron_Alloc (/* Lattice *Lat, Polyhedron *Poly */);
+extern ZPolyhedron *SplitZpolyhedron(/*ZPolyhedron *ZPol, Lattice *B */);
 
 #endif /* __STDC__ */
 #endif /* _Zpolyhedron_h_ */

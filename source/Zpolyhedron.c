@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <polylib/polylib.h> 
 
 static ZPolyhedron * ZPolyhedronIntersection(ZPolyhedron *, ZPolyhedron *);
@@ -435,12 +434,13 @@ ZPolyhedron *ZDomainDifference(ZPolyhedron  *A, ZPolyhedron *B) {
     
     for(tempB = B; tempB != NULL; tempB = tempB->next) {
       templist = NULL; res = NULL;
-      for(i = temp; i != NULL; i = i->next) {
+      //for(i = temp; i != NULL; i = i->next) {
+	i=temp;
 	res = ZPolyhedronDifference(i,tempB);
 	for (j = res; j != NULL; j = j->next )
 	  templist = AddZPoly2ZDomain(j,templist);
 	ZDomain_Free(res);
-      }
+      //}
       ZDomain_Free (temp);
       temp = NULL; 
       for(i = templist; i != NULL; i = i->next)
@@ -946,6 +946,85 @@ ZPolyhedron *ZDomainSimplify(ZPolyhedron *ZDom) {
   return Result;
 } /* ZDomainSimplify */ 
 
+ZPolyhedron *SplitZpolyhedron(ZPolyhedron *ZPol,Lattice *B) {
+ 
+  Lattice *Intersection = NULL;
+  Lattice *B1 = NULL, *B2 = NULL, *newB1 = NULL, *newB2 = NULL;
+  Matrix *U = NULL,*M1 = NULL, *M2 = NULL, *M1Inverse = NULL,*MtProduct = NULL;
+  Matrix *Vinv, *V , *temp, *DiagMatrix ;
+  Matrix *H , *U1 , *X, *Y ;
+  ZPolyhedron *zpnew, *Result;
+  LatticeUnion *Head = NULL, *tempHead = NULL;
+  int i;
+  Value k;
+  
+#ifdef DOMDEBUG
+  FILE *fp;
+  fp = fopen("_debug", "a");
+  fprintf(fp,"\nEntered SplitZpolyhedron \n"); 
+  fclose(fp);
+#endif
+
+  
+  if (B->NbRows != B->NbColumns) { 
+    fprintf(stderr,"\n SplitZpolyhedron : The Input Matrix B is not a proper Lattice \n");
+    return NULL;
+  }
+  
+  if (ZPol->Lat->NbRows != B->NbRows) {
+    fprintf(stderr,"\nSplitZpolyhedron : The Lattice in Zpolyhedron and B have ");
+    fprintf(stderr,"incompatible dimensions \n");
+    return NULL;
+  }
+  
+  if (isinHnf (ZPol->Lat) != True) {
+    AffineHermite(ZPol->Lat,&H,&U1);
+    X = Matrix_Copy(H);    
+    Matrix_Free(U1);
+    Matrix_Free(H);
+  }
+  else
+    X = Matrix_Copy(ZPol->Lat);
+  
+  if (isinHnf(B) != True) {
+    AffineHermite(B,&H,&U1);
+    Y = Matrix_Copy(H);   
+    Matrix_Free(H);
+    Matrix_Free(U1);
+  }
+  else
+    Y = Matrix_Copy(B);  
+  if (isEmptyLattice(X)) {
+    return NULL;  
+  }
+
+  Head=Lattice2LatticeUnion(X,Y);
+
+/* If the spliting operation can't be done the result is the original Zplyhedron. */
+
+  if (Head == NULL) {
+    Matrix_Free(X);
+    Matrix_Free(Y);
+    return ZPol;
+  }  
+
+
+  Result=NULL;
+
+  if (Head)
+   while(Head)
+    {
+      tempHead = Head;
+      Head = Head->next;  
+      zpnew=ZPolyhedron_Alloc(tempHead->M,ZPol->P);
+      Result=AddZPoly2ZDomain(zpnew,Result);
+      ZPolyhedron_Free(zpnew);
+      tempHead->next = NULL; 
+      free(tempHead);  
+    }
+
+  return Result;
+}
 
 
 
