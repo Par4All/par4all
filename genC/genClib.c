@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/01/02 16:37:14 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/01/02 16:40:25 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -200,7 +200,8 @@ struct gen_binding *bp ;
 	if( i == bp->alloc ) {
 	    user( "Too many elements in tabulated domain %s\n", bp->name ) ;
 	    user("Current limit (%d) can be redefined by setting environment "
-		 "variable NEWGEN_MAX_TABULATED_ELEMENTS\n");
+		 "variable NEWGEN_MAX_TABULATED_ELEMENTS\n",
+		 max_tabulated_elements());
 	    abort();
 	}
 	if( (Gen_tabulated_[ bp->index ]+i)->p == gen_chunk_undefined ) {
