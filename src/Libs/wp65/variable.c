@@ -742,10 +742,9 @@ int dimn;
 
 		/* pour tenir compte des offsets numeriques dans les 
 		   fonctions d'acces */
-		if (value_pos_p(coef =vect_coeff(TCST,vec)))
-		    value_addto(gmax,coef);
-		else 
-		    value_addto(gmin,coef);
+		coef =vect_coeff(TCST,vec);
+		if (value_pos_p(coef)) value_addto(gmax,coef);
+		else value_addto(gmin,coef);
 
 		s = sc_dup(tc);
 		sc_add_egalite(s, eg);
@@ -818,5 +817,5 @@ int dimn;
 	     llv);
     }
 
-    debug(8,"set_dimensions_of_local_variable_family","end\n");
+    pips_debug(8,"end\n");
 }
