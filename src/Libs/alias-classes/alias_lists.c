@@ -28,6 +28,7 @@
 #include "effects-convex.h"
 
 #include "semantics.h"
+#include "transformer.h"
 
 #include "pipsdbm.h"
 #include "resources.h"
@@ -342,7 +343,7 @@ alias_lists( string module_name )
 					    TRUE));
     MAP(EFFECTS, alias_pair_effects,
 	{
-	    list alias_pair = effects_to_list(alias_pair_effects);
+	    list alias_pair = regions_dup(effects_to_list(alias_pair_effects));
 
 	    ifdebug(9)
 		{
