@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/04/17 18:31:26 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/04/19 15:53:38 $, )
  * version $Revision$
  *
  * Compiler
@@ -166,7 +166,7 @@ hpf_compile_call(
 
     DEBUG_STAT(9, "statement", stat);
 
-    /* "dead" FC directive.
+    /* "kill" FC directive.
      * tells that the array is dead, hence all copies are live...
      */
     if (dead_fcd_directive_p(call_function(c)))
@@ -177,7 +177,8 @@ hpf_compile_call(
 	{
 	    entity primary = expression_to_entity(e);
 	    pips_debug(5, "dealing with array %s\n", entity_name(primary));
-	    ls = CONS(STATEMENT, generate_all_live(primary), ls);
+	    if (array_distributed_p(primary))
+		ls = CONS(STATEMENT, generate_all_live(primary), ls);
 	},
 	    call_arguments(c));
 	
@@ -274,7 +275,6 @@ hpf_compile_call(
 
     /* temporary (?:-) hack 
      */
-    if (TRUE)
     {
 	entity fun = call_function(c);
 	list /* of expressions */
@@ -300,9 +300,6 @@ hpf_compile_call(
 
 	return;
     }
-    
-
-    hpfc_warning("not implemented yet\n");
 }
 
 static void 
