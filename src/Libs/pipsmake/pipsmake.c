@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.68  1998/12/26 22:01:01  irigoin
+ * error handler reset_static_phase_variables() improved
+ *
  * Revision 1.67  1998/12/24 11:06:45  irigoin
  * Improved error handling
  *
@@ -173,9 +176,16 @@ void reset_static_phase_variables()
     extern void error_reset_cumulated_rw_effects(void);
     extern void reset_transformer_map(void);
     extern void error_reset_value_mappings(void);
-    extern void error_reset_effects_private_current_stmt_stack(void);
-    extern void error_reset_effects_private_current_context_stack(void);
-    extern void error_reset_current_downward_cumulated_range_effects_stack(void);
+    extern void proper_effects_error_handler(void);
+    extern void icfg_error_handler(void);
+    extern void use_def_elimination_error_handler(void);
+    extern void simple_atomize_error_handler(void);
+    extern void coarse_grain_parallelization_error_handler(void);
+    extern void clone_error_handler(void);
+    extern void array_privatization_error_handler(void);
+    extern void hpfc_error_handler(void);
+
+    hpfc_error_handler();
 
     /* From ri-util/static.c */
     error_reset_current_module_entity();
@@ -188,12 +198,21 @@ void reset_static_phase_variables()
     error_reset_cumulated_rw_effects();
     reset_transformer_map();
 
-    /* Macro-generated resets in effects-generic/utils.c */
-    error_reset_effects_private_current_stmt_stack();
-    error_reset_effects_private_current_context_stack();
-    error_reset_current_downward_cumulated_range_effects_stack();
+    icfg_error_handler();
 
-    /* Special cases */
+    /* Macro-generated resets in effects-generic/utils.c */
+    proper_effects_error_handler();
+
+    /* Error handlers for the transformation library */
+    use_def_elimination_error_handler();
+    simple_atomize_error_handler();
+    coarse_grain_parallelization_error_handler();
+    clone_error_handler();
+    array_privatization_error_handler();
+
+    hpfc_error_handler();
+
+    /* Special cases: Transformers or preconditions are computed or used */
     error_reset_value_mappings();
 }
 
