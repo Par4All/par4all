@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/03/20 14:33:07 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/04/05 14:28:01 $, )
  * version $Revision$
  */
 
@@ -33,12 +33,40 @@ extern int cfree();
 #define FREE (char *) 0
 #define FREE_FOR_PUT (char *) -1
 
+/* Constant to find the end of the prime numbers table */
+#define END_OF_SIZE_TABLE ((int) 0)
+
 /* >>1: 50 percent limit 
  * >>1 + >>2: 75 percent limit
  */
 #define HASH_SIZE_LIMIT(size) (((size)>>1)+((size)>>2))
 #define HASH_ENLARGE_PARAMETER ((int)2)
 #define HASH_FUNCTION(key, size) ((((unsigned int)(key))&(0x7fffffff))%(size))
+
+/* define the increment of the hash_function
+ * in case of heat.
+ * The old version can be achieved by setting
+ * this macro to ((int) 1)
+ */
+
+
+#define HASH_FUNCTION_INCREMENT(key, size) \
+    (1 + (((unsigned int)(key)&0x7fffffff)%((size) - 1)))
+
+/* Now we need the table size to be a prime number.
+ * So when we enlarge the table, we must retrieve
+ * the next prime number in a list.
+ */
+
+#define GET_NEXT_HASH_TABLE_SIZE(size,pointer_to_table)			\
+{									\
+     while (*(pointer_to_table) <= (size)) {				\
+	 message_assert("size too big ",				\
+			*(pointer_to_table) != END_OF_SIZE_TABLE);	\
+	 (pointer_to_table)++;						\
+     }									\
+ (size) = *(pointer_to_table);						\
+}
 
 typedef enum 
     { hash_get_op , hash_put_op , hash_del_op } hash_operation;
@@ -55,10 +83,18 @@ static int hash_string_rank();
 static int hash_chunk_equal() ;
 static int hash_chunk_rank() ;
 
+/* This array could be of unsigned int ! */
+static int prime_numbers_for_table_size[] = {
+    17,37,71,137,277,547,1091,2179,4357,8707,17417,
+    34819,69653,139267,278543,557057,1114117,2228243,
+    4456451,8912921,17825803,35651593,71303171,
+    142606357,285212677,570425377,1140850699,
+    END_OF_SIZE_TABLE};
+
 static bool should_i_warn_on_redefinition = TRUE;
 
 /* these function set the variable should_i_warn_on_redefinition to the 
-value TRUE or FALSE */
+   value TRUE or FALSE */
 
 void hash_warn_on_redefinition()
 {
@@ -76,8 +112,8 @@ bool hash_warn_on_redefinition_p()
 }
 
 /* this function makes a hash table of size size. if size is less or
-equal to zero a default size is used. the type of keys is given by
-key_type (see hash.txt for further details).  */
+   equal to zero a default size is used. the type of keys is given by
+   key_type (see hash.txt for further details).  */
 
 hash_table hash_table_make(key_type, size)
 hash_key_type key_type;
@@ -85,9 +121,12 @@ int size;
 {
     register int i;
     hash_table htp;
+    int *prime_list = &prime_numbers_for_table_size[0];
 
     if (size<=0) size=HASH_DEFAULT_SIZE;
     message_assert("size too small", size>1);
+    /* get the next prime number in the table */
+    GET_NEXT_HASH_TABLE_SIZE(size,prime_list);
 
     htp = (hash_table) alloc(sizeof(struct hash_table));
     htp->hash_type = key_type;
@@ -343,11 +382,14 @@ hash_table htp;
     extern int fprintf();
     hash_entry *old_array;
     int i, old_size;
+    int *prime_list = &prime_numbers_for_table_size[0];
 
     old_size = htp->hash_size;
     old_array = htp->hash_array;
 
-    htp->hash_size *= HASH_ENLARGE_PARAMETER ;
+    htp->hash_size++;
+    /* Get the next prime number in the table */
+    GET_NEXT_HASH_TABLE_SIZE(htp->hash_size,prime_list);
     htp->hash_array = 
 	    (hash_entry *) alloc( htp->hash_size* sizeof(hash_entry));
     htp->hash_size_limit = HASH_SIZE_LIMIT(htp->hash_size);
@@ -385,8 +427,14 @@ int size;
 
     v = 0;
     for (s = key; *s; s++) {
-	v += *s;
+ 
+	/* This is the old version:
+	 * v += *s;
+	 * v <<= 2;
+	 * Now the first two bits are significant
+	 */
 	v <<= 2 ;
+	v += *s;
     }
     v = abs( v ) ;
     v %= size ;
@@ -455,13 +503,13 @@ char *key;
     static char buffer[256];
 
     if (t == hash_string)
-	    sprintf(buffer, "%s", key);
+	sprintf(buffer, "%s", key);
     else if (t == hash_int)
-	    sprintf(buffer, "%d", (int)key);
+	sprintf(buffer, "%d", (int)key);
     else if (t == hash_pointer)
-	    sprintf(buffer, "%x", (unsigned int) key);
+	sprintf(buffer, "%x", (unsigned int) key);
     else if (t == hash_chunk)
-	    sprintf(buffer, "%x", (unsigned int)((gen_chunk *)key)->p);	    
+	sprintf(buffer, "%x", (unsigned int)((gen_chunk *)key)->p);	    
     else {
 	fprintf(stderr, "[hash_print_key] bad type : %d\n", t);
 	abort();
@@ -483,8 +531,10 @@ hash_operation operation;
     int r;
     hash_entry he;
     int r_init ;
+    int r_increment;
 
     r_init = r = (*(htp->hash_rank))(key, htp->hash_size);
+    r_increment = HASH_FUNCTION_INCREMENT(r_init, htp->hash_size);
 
     while (1) {
 	he = htp->hash_array[r];
@@ -502,7 +552,7 @@ hash_operation operation;
 	if (he.key != FREE_FOR_PUT && (*(htp->hash_equal))(he.key, key))
 	    break;
 
-	r = (r == htp->hash_size-1) ? 0 : r+1;
+	r = (r + r_increment) % htp->hash_size;
 
 	/*   ??? this may happen in a hash_get after many put and del,
 	 *   if the table contains no FREE, but many FREE_FOR_PUT instead!
