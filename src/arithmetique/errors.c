@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.26  2003/09/03 14:05:20  coelho
+  push/pop callbacks called.
+
   Revision 1.25  2003/09/03 13:35:06  coelho
   no more callback.
 
@@ -141,6 +144,25 @@ typedef struct
 static linear_exception_holder exception_stack[MAX_STACKED_CONTEXTS];
 static int exception_index = 0;
 
+/* callbacks...
+ */
+static exception_callback_t push_callback = NULL;
+static exception_callback_t pop_callback = NULL;
+
+void set_exception_callbacks(exception_callback_t push, 
+			     exception_callback_t pop)
+{
+  if (push_callback!=NULL || pop_callback!=NULL)
+  {
+    fprintf(stderr, "exception callbacks already defined! (%p, %p)\n",
+	    push_callback, pop_callback);
+    abort();
+  }
+
+  push_callback = push;
+  pop_callback = pop;
+}
+
 /* total number of exceptions thrown, for statistics.
  */
 int linear_number_of_exception_thrown = 0;
@@ -196,6 +218,8 @@ push_exception_on_stack(
     abort();
   }
 
+  if (push_callback) push_callback(file, function, line);
+
   the_last_just_thrown_exception = 0;
 
   exception_stack[exception_index].what = what;
@@ -229,6 +253,8 @@ pop_exception_from_stack(
     dump_exception_stack();
     abort();
   }
+
+  if (pop_callback) pop_callback(file, function, line);
 
   exception_index--;
   the_last_just_thrown_exception = 0;
@@ -270,6 +296,12 @@ void throw_exception(
 
   for (i=exception_index-1; i>=0; i--)
   {
+    if (pop_callback) 
+      /* pop with push parameters! */
+      pop_callback(exception_stack[i].file,
+		   exception_stack[i].function,
+		   exception_stack[i].line);
+
     if (exception_stack[i].what & what) 
     {
       exception_index = i;
