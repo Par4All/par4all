@@ -15,9 +15,6 @@
 
 /* Newgen includes 	*/
 #include "genC.h"
-#include "hash.h"
-#include "mapping.h"
-#include "list.h"
 
 /* C3 includes 		*/
 #include "boolean.h"
