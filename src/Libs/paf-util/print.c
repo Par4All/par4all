@@ -19,7 +19,6 @@
 
 /* Newgen includes 	*/
 #include "genC.h"
-#include "list.h"
 
 /* C3 includes 		*/
 #include "boolean.h"
@@ -35,10 +34,8 @@
 #include "matrix.h"
 
 /* Pips includes 	*/
-#include "boolean.h"
 #include "ri.h"
 #include "ri-util.h"
-#include "arithmetique.h"
 #include "constants.h"
 #include "misc.h"
 #include "graph.h"
