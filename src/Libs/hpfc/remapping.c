@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.56  1997/04/17 11:47:21  coelho
+ * *** empty log message ***
+ *
  * Revision 1.55  1997/04/15 16:38:15  coelho
  * *** empty log message ***
  *
@@ -579,10 +582,10 @@ gen(int what,
     case SND+PRE+LZY+BUF:
     case BRD+PRE+BUF:
     case BRD+PRE+LZY+BUF:
-	ret(hpfc_buffer_initialization(TRUE /* send! */, is_lazy));
+	ret(hpfc_buffer_initialization(TRUE /* send! */, is_lazy, TRUE));
     case RCV+PRE+BUF:
     case RCV+PRE+LZY+BUF:
-	ret(hpfc_buffer_initialization(FALSE /* receive! */, is_lazy));
+	ret(hpfc_buffer_initialization(FALSE /* receive! */, is_lazy, TRUE));
 	
 	/* default is a forgotten case, I guess
 	 */
