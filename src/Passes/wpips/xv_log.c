@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/12 15:32:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/30 14:58:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_log[] = "%A% ($Date: 1996/07/12 15:32:08 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_log[] = "%A% ($Date: 1997/04/30 14:58:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -18,6 +18,14 @@ char vcid_xv_log[] = "%A% ($Date: 1996/07/12 15:32:08 $, ) version $Revision$, g
 #include <xview/notice.h> 
 #include <xview/xv_error.h>
 #include <setjmp.h>
+
+#if (defined(TEXT))
+#undef TEXT
+#endif
+
+#if (defined(TEXT_TYPE))
+#undef TEXT_TYPE
+#endif
 
 #include "genC.h"
 #include "misc.h"
