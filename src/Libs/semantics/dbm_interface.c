@@ -30,7 +30,8 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 
 #include "misc.h"
 
