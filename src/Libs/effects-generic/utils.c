@@ -452,8 +452,8 @@ cons * fx;
 {
     MAPL(ceffect,
      {entity e = 
-	  reference_variable(effect_reference(ENTITY(CAR(ceffect))));
-	  if(!integer_scalar_entity_p(e)) return FALSE;},
+	  reference_variable(effect_reference(EFFECT(CAR(ceffect))));
+     if(!integer_scalar_entity_p(e)) return FALSE;},
 	 fx);
     return TRUE;
 }
@@ -467,7 +467,7 @@ cons * fx;
 {
     MAPL(ceffect,
      {entity e = 
-	  reference_variable(effect_reference(ENTITY(CAR(ceffect))));
+	  reference_variable(effect_reference(EFFECT(CAR(ceffect))));
 	  if(integer_scalar_entity_p(e)) return TRUE;},
 	 fx);
     return FALSE;
