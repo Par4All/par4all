@@ -245,13 +245,13 @@ Basis	: READ_UNIT 	{
 		$$.b = $2 ;
 		}
 	| READ_CHAR	{
-		$$.c = *(xxtext+2) ;
+		$$.c = *(yytext+2) ;
 		}
 	| Int	{
 		$$.i = $1 ;
 		}
 	| READ_FLOAT {
-		$$.f = (double)atof( xxtext ) ;
+		$$.f = (double)atof( yytext ) ;
 		}
 	| String {
 	        $$ = *$1 ;
@@ -271,7 +271,7 @@ Basis	: READ_UNIT 	{
 	;
 
 Int     : READ_INT   {
-  		$$ = atoi( xxtext ) ;
+  		$$ = atoi( yytext ) ;
 		}
 	;
 
