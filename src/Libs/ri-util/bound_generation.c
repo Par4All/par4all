@@ -12,13 +12,14 @@
 
 #include "ri-util.h"
 
-char *nom_de_variable(e)
-char *e;
+/* hum... */
+string 
+nom_de_variable(string e)
 {
     if (e!=NULL) return(entity_name((entity) e));
     else return("TCST");
 }
-
+
 /* expression make_contrainte_expression(Pcontrainte pc, variable index)
  * make an expression for constraint of index I 
  * for example: for a constraint of index I : aI + expr_linear(J,K,TCST) <=0
