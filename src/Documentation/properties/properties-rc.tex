@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.172  2003/07/30 14:57:04  ferrand
+%% Add properties for SAC (auto-unroll).
+%%
 %% Revision 1.171  2003/07/30 14:34:37  nguyen
 %% Add new property to prettyprint C code
 %%
@@ -228,7 +231,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2003/07/30 14:34:37 $~$
+$~$Date: 2003/07/30 14:57:04 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2102,6 +2105,31 @@ top-down approach !
 
 \begin{verbatim}
 ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
+\end{verbatim}
+
+\subsection{SAC - SIMD Architecture Compiler}
+
+\subsubsection{Auto-Unroll}
+
+This property is used to control how the auto unroll phase computes
+the unroll factor. By default, the minimum unroll factor is used. It
+is computed by using the minimum of the optimal factor for each
+statement. If the property is set to FALSE, then the maximum unroll
+factor is used instead.
+
+\begin{verbatim}
+SIMD_AUTO_UNROLL_MINIMIZE_UNROLL TRUE
+\end{verbatim}
+
+This property controls how the ``optimal'' unroll factor is
+computed. Two algorithms can be used. By default, a simple algorithm
+is used, which simply compares the actual size of the variables used
+to the size of the registers to find out the best unroll factor. 
+If the property is set to FALSE, a more complex algorithm is used,
+which takes into account the actual SIMD instructions.
+
+\begin{verbatim}
+SIMD_AUTO_UNROLL_SIMPLE_CALCULATION TRUE
 \end{verbatim}
 
 
