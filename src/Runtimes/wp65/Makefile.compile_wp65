@@ -1,5 +1,5 @@
 # $RCSfile: Makefile.compile_wp65,v $ (version $Revision$)
-# $Date: 1995/09/19 22:28:11 $, 
+# $Date: 1995/09/20 10:18:24 $, 
 #
 
 FC	=	f77
@@ -23,8 +23,9 @@ LINK	= $(LD) $(LDFLAGS) -o
 # files
 
 OBJECTS.f = $(SOURCES.f:%.f=%.o)
-CIBLE = $(CIBLE.f:%.f=%)
 RUNDIR = $(HOME)/pvm3/bin/$(PVM_ARCH)
+
+# CIBLE is expected from somewhere...
 
 all: $(RUNDIR) $(CIBLE)
 
