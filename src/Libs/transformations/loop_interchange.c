@@ -1,8 +1,8 @@
  /* interface with pipsmake */
 
 #include <stdio.h>
-extern int fprintf();
-extern int sscanf();
+extern int fprintf(FILE *, const char *, ...);
+extern int sscanf(const char *, const char *, ...);
 #include <string.h>
 
 #include "genC.h"
@@ -15,20 +15,19 @@ extern int sscanf();
 #include "resources.h"
 
 #include "control.h"
-#include "generation.h"
+#include "conversion.h"
+/* #include "generation.h" */
 
 #include "transformations.h"
 
 entity selected_label;
 
-bool selected_loop_p(l)
-loop l;
+bool selected_loop_p(loop l)
 {
     return loop_label(l) == selected_label;
 }
 
-void loop_interchange(module_name)
-string module_name;
+void loop_interchange(string module_name)
 {
     char lp_label[6];
     entity module = local_name_to_top_level_entity(module_name);
