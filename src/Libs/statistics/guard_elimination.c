@@ -1211,8 +1211,8 @@ bool guard_elimination(string module)
 			    statement_domain, stmt_flt, stmt_rwt,
 			    loop_domain, loop_flt, gen_null,
 			    NULL);  
-  str = user_request("for Which nid do you want apply unimodular 
-                      transformation ?\n" "(give its ordering): ");
+  str = user_request("for Which nid do you want apply unimodular " 
+                      "transformation ?\n" "(give its ordering): ");
   ordering=atoi(str); 
   	      
   s1=ordering_to_statement(ordering);
