@@ -1,0 +1,29 @@
+#! /bin/sh
+
+# create couples (function library) of uses and definitions for all libraries
+# used in PIPS (default option -a), including Linear and NewGen, or for
+# all PIPS libraries (option -p)
+
+# Remi Triolet, Francois Irigoin, Corinne Ancourt
+
+USAGE="Usage: $0 [-p|a]"
+
+LIBS="$LIBDIR/*.a $EXTEDIR/*.a"
+
+while getopts ap opt
+do
+	case $opt in
+	p)	LIBS="$LIBDIR/*.a";;
+	a)	LIBS="$LIBDIR/*.a $EXTEDIR/*.a";;
+	\?)	echo $USAGE >&2
+		exit 2;;
+	esac
+done
+
+nm -go $LIBS | fgrep " T " | sed 's/:.* / /' | sed 's/^\/.*\///' | 
+	awk '{ print $2 , $1}' | sort > $TEMPDIR/libs.d
+
+nm -go $LIBS | fgrep " U " | sed 's/:.* / /' | sed 's/^\/.*\///' | 
+	awk '{ print $2 , $1}' | sort > $TEMPDIR/libs.u
+
+join $TEMPDIR/libs.u $TEMPDIR/libs.d > $TEMPDIR/libs.j
