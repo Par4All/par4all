@@ -6,6 +6,9 @@
  *
  * $Id$
  * $Log: directives.c,v $
+ * Revision 1.67  1997/07/24 14:21:34  keryell
+ * Added a call to fix_sequence_statement_attributes().
+ *
  * Revision 1.66  1997/04/29 11:57:16  coelho
  * *** empty log message ***
  *
@@ -63,6 +66,9 @@ static void clean_statement(statement s)
 
 	free_instruction(i);
 	statement_instruction(s) = make_instruction_block(block);
+	/* Do not forget to move forbidden information associated with
+	   block: */
+	fix_sequence_statement_attributes(s);
     }
     else
 	instruction_call(i) =
