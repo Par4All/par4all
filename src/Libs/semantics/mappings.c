@@ -236,7 +236,7 @@ bool readonly;
 	pips_error("add_or_kill_equivalenced_variables",
 		   "unproper storage = %d\n", storage_tag(s));
 }
-
+
 static void allocate_module_value_mappings(m)
 entity m;
 {
@@ -289,7 +289,7 @@ entity m;
     allocate_value_mappings(new_value_number, old_value_number,
 			    intermediate_value_number);
 }
-
+
 /* void module_to_value_mappings(entity m): build hash tables between
  * variables and values, and values and names for module m, as well as
  * equivalence equalities
@@ -300,11 +300,10 @@ entity m;
     cons * module_inter_effects;
     cons * module_intra_effects;
 
-    debug(8,"module_to_value_mappings","begin\n");
-    debug(8,"module_to_value_mappings","module = %s\n",
-	  module_local_name(m));
+    pips_debug(8,"begin\n");
+    pips_debug(8,"module = %s\n", module_local_name(m));
 
-    pips_assert("module_to_value_mappings", entity_module_p(m));
+    pips_assert("m is a module", entity_module_p(m));
 
     free_value_mappings();
 
@@ -349,39 +348,41 @@ entity m;
 
     /* look for intraprocedural write effects on scalar integer variables
        and generate proper entries into hash tables */
-    MAPL(cef,
-     {entity e = 
-	  reference_variable(effect_reference(EFFECT(CAR(cef))));
-	  action a = effect_action(EFFECT(CAR(cef)));
-	  if(integer_scalar_entity_p(e) && action_write_p(a)) 
-	      if(storage_return_p(entity_storage(e))) {
-		  add_interprocedural_value_entities(e);
-	      }
-	      else {
-		  add_intraprocedural_value_entities(e);
-	      }
-      },
+    MAP(EFFECT, ef,
+    {
+	entity e = reference_variable(effect_reference(ef));
+	action a = effect_action(ef);
+	if(integer_scalar_entity_p(e) && action_write_p(a)) 
+	    if(storage_return_p(entity_storage(e))) {
+		add_interprocedural_value_entities(e);
+	    }
+	    else {
+		add_intraprocedural_value_entities(e);
+	    }
+    },
 	 module_intra_effects);
-
+    
     /* look for intraprocedural read effects on scalar integer variables
        and generate proper entry into value name hash table if it has
        not been entered before; interprocedural read effects are implicitly
        dealed with since they are included; 
        most entities are likely to have been encountered before; however
        in parameters and uninitialized variables have to be dealt with */
-    MAPL(cef,
-     {entity e = 
-	  reference_variable(effect_reference(EFFECT(CAR(cef))));
-	  if(integer_scalar_entity_p(e) && !entity_has_values_p(e)) {
+    MAP(EFFECT, ef,
+     {
+	 entity e = reference_variable(effect_reference(ef));
+	 if(integer_scalar_entity_p(e) && !entity_has_values_p(e)) {
 	      /* FI: although it may only be read within this procedure,
 	       * e might be written in another one thru a COMMON;
 	       * this write is not visible from OUT, but only from a caller
-	       * of out; because we have only a local intraprocedural or a global
-	       * interprocedural view of aliasing, we have to create useless values:-(
+	       * of out; because we have only a local intraprocedural or a 
+	       * global interprocedural view of aliasing, we have to create 
+	       * useless values:-(
 	       *
 	       * add_new_value(e);
 	       *
-	       * Note: this makes the control structure of this procedure obsolete!
+	       * Note: this makes the control structure of this procedure 
+	       * obsolete!
 	       */
 	      add_intraprocedural_value_entities(e);
 	      add_or_kill_equivalenced_variables(e, TRUE);
@@ -400,11 +401,11 @@ entity m;
 	  }}, code_declarations(value_code(entity_initial(m))));
 
     /* for debug, print hash tables */
-    ifdebug(1) {
+    ifdebug(8) {
 	(void) fprintf(stderr,"[module_to_value_mappings] hash tables\n");
 	print_value_mappings();
     }
-    debug(8,"module_to_value_mappings","end\n");
+    pips_debug(8,"end\n");
 }
 
 /* transform a vector based on variable entities into a vector based
