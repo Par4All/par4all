@@ -632,30 +632,39 @@ basic b;
 	case 2: return("INTEGER*2") ;
 	case 4: return("INTEGER*4") ;
 	case 8: return("INTEGER*8") ;
-	default: break;
+	default: pips_error("basic_to_string",
+			    "Unexpected integer size %d\n", basic_int(b));
 	}
+	break;
     case is_basic_float:
 	switch(basic_float(b))
 	{
 	case 4: return("REAL*4") ;
 	case 8: return("REAL*8") ;
-	default: break;
+	default: pips_error("basic_to_string",
+			    "Unexpected float size %d\n", basic_float(b));
 	}
+	break;
     case is_basic_logical:
 	switch(basic_logical(b))
 	{
+	case 1: return("LOGICAL*1") ;
 	case 2: return("LOGICAL*2") ;
 	case 4: return("LOGICAL*4") ;
 	case 8: return("LOGICAL*8") ;
-	default: break;
+	default: pips_error("basic_to_string",
+			    "Unexpected logical size %d\n", basic_logical(b));
 	}
+	break;
     case is_basic_complex:
 	switch(basic_complex(b))
 	{
 	case 8: return("COMPLEX*8") ;
 	case 16: return("COMPLEX*16") ;
-	default: break;
+	default: pips_error("basic_to_string",
+			    "Unexpected complex size %d\n", basic_complex(b));
 	}
+	break;
     case is_basic_string:
 	if(value_constant_p(basic_string(b))
 	   && constant_int_p(value_constant(basic_string(b)))) {
@@ -674,13 +683,14 @@ basic b;
 	}
 	pips_assert("basic_to_string", strlen(char_decl)<20);
 	return(char_decl);
+	break;
     case is_basic_overloaded:
 	return("OVERLOADED");
     default: break;
     }
 
     pips_error("basic_to_string", 
-	       "unexpected basic: 0x%x (tag=%d)",
+	       "unexpected basic: 0x%x (tag=%d)\n",
 	       b,
 	       basic_tag(b));
 
