@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/09/22 17:54:33 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/10/02 16:25:53 $, )
  * version $Revision$
  */
  
@@ -186,8 +186,6 @@ static void close_hpfc_status()
     close_dynamic_status();
     close_the_pures();
     close_computed_remaps();
-
-    reset_hpfc_status();
 }
 
 /************************************************************** COMPILATION */
