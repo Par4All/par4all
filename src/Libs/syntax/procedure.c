@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/07/10 15:18:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/10 20:49:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_procedure[] = "%A% ($Date: 1997/07/10 15:18:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_procedure[] = "%A% ($Date: 1997/07/10 20:49:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -255,11 +255,18 @@ cons *lfp;
     if( entity_type(cf) != type_undefined
        && intrinsic_entity_p(cf) ) {
 	user_warning("MakeCurrentFunction",
-		     "Intrinsic %s redefined\n",
-		     entity_local_name(cf));
-	/* Hopefully, the intrinsic can be redefined, just like a user function
-	 * or subroutine after editing.
+		     "Intrinsic %s redefined.\n"
+		     "This is not supported by PIPS. Please rename %s\n",
+		     entity_local_name(cf), entity_local_name(cf));
+	/* Unfortunately, an intrinsics cannot be redefined, just like a user function
+	 * or subroutine after editing because intrinsics are not handled like
+	 * user functions or subroutines. They are not added to the called_modules
+	 * list of other modules, unless the redefining module is parsed FIRST.
+	 * There is not mechanism in PIPS to control the parsing order.
 	 */
+	ParserError("MakeCurrentFunction",
+		    "Name conflict between a "
+		    "subroutine and/or a function and an intrinsic\n");
     }
 
     /* set ghost variable entities to NIL */
