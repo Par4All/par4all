@@ -78,18 +78,18 @@ int ofl_ctrl;
     Pvecteur save_c;
 
     /* cv_def = coeff de v dans def */
-    int cv_def = vect_coeff(v,def->vecteur);
+    Value cv_def = vect_coeff(v,def->vecteur);
     /* cv_c = coeff de v dans c */
-    int cv_c = vect_coeff(v,c->vecteur);
+    Value cv_c = vect_coeff(v,c->vecteur);
 
     /* il faut que cv_def soit non nul pour que la variable v puisse etre
        eliminee */
-    assert(cv_def!=0);
+    assert(VALUE_NOTZERO_P(cv_def));
 
     /* il n'y a rien a faire si la variable v n'apparait pas dans la
        contrainte c */
     /* substitution inutile: variable v absente */
-    if (cv_c==0) return (1);
+    if (VALUE_ZERO_P(cv_c)) return 1;
 
     /* on garde trace de la valeur de c avant substitution pour pouvoir
        la desallouer apres le calcul de la nouvelle */
@@ -97,12 +97,15 @@ int ofl_ctrl;
     /* on ne fait pas de distinction entre egalites et inegalites, mais
        on prend soin de toujours multiplier la contrainte, inegalite
        potentielle, par un coefficient positif */
-    if (cv_def<0) {
-	c->vecteur = vect_cl2_ofl_ctrl(-cv_def,c->vecteur,cv_c,
-				       def->vecteur,ofl_ctrl);
+    if (VALUE_NEG_P(cv_def)) {
+	c->vecteur = vect_cl2_ofl_ctrl(value_uminus(cv_def),
+				       c->vecteur,cv_c,
+				       def->vecteur,
+				       ofl_ctrl);
     }
     else {
-	c->vecteur = vect_cl2_ofl_ctrl(cv_def,c->vecteur,-cv_c,
+	c->vecteur = vect_cl2_ofl_ctrl(cv_def,c->vecteur,
+				       value_uminus(cv_c),
 				  def->vecteur, ofl_ctrl);
     }
     vect_rm(save_c);
@@ -119,9 +122,6 @@ int ofl_ctrl;
     }
     return(TRUE);
 }
-
-
-
 
 /* Pcontrainte inegalite_comb_ofl_ctrl(Pcontrainte posit, Pcontrainte negat, 
  *                            Variable v, int ofl_ctrl):
@@ -146,23 +146,24 @@ Pcontrainte posit, negat;
 Variable v;
 int ofl_ctrl;
 {
-    int cv_p, cv_n;
-    int d;
+    Value cv_p, cv_n, d;
     Pcontrainte ineg;
 
     cv_p = vect_coeff(v,posit->vecteur); 
     cv_n = vect_coeff(v,negat->vecteur);
 
-    assert(cv_p>0 && cv_n<0);
+    assert(VALUE_POS_P(cv_p) && VALUE_NEG_P(cv_n));
 
-    if((d = pgcd(cv_p, -cv_n))!=1) {
-	cv_p = cv_p/d;
-	cv_n = cv_n/d;
+    d = pgcd(cv_p, value_uminus(cv_n));
+    if(value_notone_p(d)) {
+	cv_p = value_div(cv_p,d); /* pdiv ??? */
+	cv_n = value_div(cv_n,d);
     }
 
     ineg = contrainte_new();
 
-    ineg->vecteur = vect_cl2_ofl_ctrl(cv_p,negat->vecteur,-cv_n,
+    ineg->vecteur = vect_cl2_ofl_ctrl(cv_p,negat->vecteur,
+				      value_uminus(cv_n),
 				      posit->vecteur, ofl_ctrl);
     return(ineg);
 }
@@ -182,23 +183,19 @@ int ofl_ctrl;
 Value eq_diff_const(c1,c2)
 Pcontrainte c1,c2;
 {
-    Value b;
-
     if(c1!=NULL) 
 	if(c2!=NULL) {
-	    int b1 = vect_coeff(TCST,c1->vecteur);
-	    int b2 = vect_coeff(TCST,c2->vecteur);
-	    b = b1 - b2;
+	    Value b1 = vect_coeff(TCST,c1->vecteur),
+	          b2 = vect_coeff(TCST,c2->vecteur);
+	    return value_minus(b1,b2);
 	}
 	else
-	    b = vect_coeff(TCST,c1->vecteur);
+	    return vect_coeff(TCST,c1->vecteur);
     else
 	if(c2!=NULL)
-	    b = - vect_coeff(TCST,c2->vecteur);
+	    return value_uminus(vect_coeff(TCST,c2->vecteur));
 	else
-	    b = 0;
-
-    return (b);
+	    return VALUE_ZERO;
 }
 
 /* Value eq_sum_const(Pcontrainte c1, Pcontrainte c2):
@@ -211,23 +208,19 @@ Pcontrainte c1,c2;
 Value eq_sum_const(c1,c2)
 Pcontrainte c1,c2;
 {
-    Value b;
-
     if(c1!=NULL) 
 	if(c2!=NULL) {
-	    int b1 = vect_coeff(TCST,c1->vecteur);
-	    int b2 = vect_coeff(TCST,c2->vecteur);
-	    b = b1 + b2;
+	    Value b1 = vect_coeff(TCST,c1->vecteur),
+	          b2 = vect_coeff(TCST,c2->vecteur);
+	    return value_plus(b1, b2);
 	}
 	else
-	    b = vect_coeff(TCST,c1->vecteur);
+	    return vect_coeff(TCST,c1->vecteur);
     else
 	if(c2!=NULL)
-	    b = vect_coeff(TCST,c2->vecteur);
+	    return vect_coeff(TCST,c2->vecteur);
 	else
-	    b = 0;
-
-    return (b);
+	    return VALUE_ZERO;
 }
 
 /* Pcontrainte contrainte_append(c1, c2)
