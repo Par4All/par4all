@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.75  1998/12/30 13:12:28  zory
+ * call to atomize_as_required extended to accept new parameters
+ *
  * Revision 1.74  1998/12/26 21:18:15  irigoin
  * error_handler added
  *
@@ -874,6 +877,8 @@ void NormalizeCodeForHpfc(statement s)
 			hpfc_decision,      /* reference test */
 			gen_false,          /* function call test */
 			ref_to_dist_array_p,/* test condition test */
+			gen_false,          /* range test */
+			gen_false,          /* whileloop test */
 			hpfc_new_variable);
 }
 
