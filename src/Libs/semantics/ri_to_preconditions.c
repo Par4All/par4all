@@ -66,19 +66,22 @@
 /* another non recursive section used to filter out preconditions */
 static cons * module_global_arguments = NIL;
 
-static cons * get_module_global_arguments()
+static cons * 
+get_module_global_arguments()
 {
     return module_global_arguments;
 }
 
-void set_module_global_arguments(args)
+void 
+set_module_global_arguments(args)
 cons * args;
 {
     module_global_arguments = args;
 }
 /* end of the non recursive section */
 
-transformer statement_to_postcondition(pre, s)
+transformer 
+statement_to_postcondition(pre, s)
 transformer pre;
 statement s;
 {
@@ -182,7 +185,8 @@ statement s;
     return post;
 }
 
-transformer instruction_to_postcondition(pre, i, tf)
+transformer 
+instruction_to_postcondition(pre, i, tf)
 transformer pre;
 instruction i;
 transformer tf;
@@ -229,7 +233,8 @@ transformer tf;
     return post;
 }
 
-transformer block_to_postcondition(b_pre, b)
+transformer 
+block_to_postcondition(b_pre, b)
 transformer b_pre;
 list b;
 {
@@ -263,7 +268,8 @@ list b;
     return post;
 }
 
-transformer unstructured_to_postcondition(pre, u, tf)
+transformer 
+unstructured_to_postcondition(pre, u, tf)
 transformer pre;
 unstructured u;
 transformer tf;
@@ -319,7 +325,8 @@ transformer tf;
     return post;
 }
 
-void unstructured_to_postconditions(pre, pre_first, u)
+void 
+unstructured_to_postconditions(pre, pre_first, u)
 transformer pre;
 transformer pre_first;
 unstructured u ;
@@ -365,7 +372,8 @@ unstructured u ;
     debug(8,"unstructured_to_postconditions","end\n");
 }
 
-transformer add_good_loop_conditions(pre, l, tf)
+transformer 
+add_good_loop_conditions(pre, l, tf)
 transformer pre;
 loop l;
 transformer tf;
@@ -390,7 +398,8 @@ transformer tf;
 }
 
 
-transformer add_index_range_conditions(pre, i, r, tfb)
+transformer 
+add_index_range_conditions(pre, i, r, tfb)
 transformer pre;
 entity i;
 range r;
@@ -481,7 +490,8 @@ transformer tfb;
     return pre;
 }
 
-transformer add_index_bound_conditions(pre, index, bound, lower_or_upper, tfb)
+transformer 
+add_index_bound_conditions(pre, index, bound, lower_or_upper, tfb)
 transformer pre;
 entity index;
 expression bound;
@@ -530,7 +540,8 @@ transformer tfb;
     return(pre);
 }
 
-bool simple_dead_loop_p(expression lower, expression upper)
+bool 
+simple_dead_loop_p(expression lower, expression upper)
 {
     bool dead_loop_p = FALSE;
     normalized n_lower = NORMALIZE_EXPRESSION(lower);
@@ -568,7 +579,8 @@ bool simple_dead_loop_p(expression lower, expression upper)
 }
 
 
-transformer loop_to_postcondition(pre, l, tf)
+transformer 
+loop_to_postcondition(pre, l, tf)
 transformer pre;
 loop l;
 transformer tf;
@@ -643,7 +655,8 @@ transformer tf;
     return post;
 }
 
-transformer test_to_postcondition(pre, t, tf)
+transformer 
+test_to_postcondition(pre, t, tf)
 transformer pre;
 test t;
 transformer tf;
@@ -727,7 +740,8 @@ transformer tf;
     return post;
 }
 
-transformer call_to_postcondition(pre, c, tf)
+transformer 
+call_to_postcondition(pre, c, tf)
 transformer pre;
 call c;
 transformer tf;
@@ -792,7 +806,8 @@ transformer tf;
     return(post);
 }
 
-transformer transformer_add_condition_information(pre, c, veracity)
+transformer 
+transformer_add_condition_information(pre, c, veracity)
 transformer pre;
 expression c;
 bool veracity;
@@ -801,7 +816,8 @@ bool veracity;
     return post;
 }
 
-transformer precondition_add_condition_information(pre, c, veracity)
+transformer
+precondition_add_condition_information(pre, c, veracity)
 transformer pre;
 expression c;
 bool veracity;
@@ -822,7 +838,8 @@ bool veracity;
  * freed and newpre allocated. In other words, argument "pre" should not be used
  * after a call to this function.
  */
-transformer transformer_add_condition_information_updown(pre, c, veracity, upwards)
+transformer 
+transformer_add_condition_information_updown(pre, c, veracity, upwards)
 transformer pre;
 expression c;
 bool veracity;
@@ -1022,7 +1039,8 @@ upwards_vect_rename(Pvecteur v, transformer post)
     }, modified_values);
 }
 
-transformer transformer_add_relation_information(pre, relop, e1, e2, veracity, upwards)
+transformer 
+transformer_add_relation_information(pre, relop, e1, e2, veracity, upwards)
 transformer pre;
 entity relop;
 expression e1;
@@ -1143,7 +1161,8 @@ bool upwards;
     return newpre;
 }
 
-transformer data_to_precondition(m)
+transformer 
+data_to_precondition(m)
 entity m;
 {
     transformer pre = transformer_identity();
