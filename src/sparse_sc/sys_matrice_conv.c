@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include "boolean.h"
+#include "arithmetique.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
