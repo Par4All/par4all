@@ -8,6 +8,9 @@
 # $Id$
 #
 # $Log: pips_set_directory_for_binaries,v $
+# Revision 1.6  1997/05/30 12:16:27  coelho
+# *** empty log message ***
+#
 # Revision 1.5  1997/05/30 09:55:03  coelho
 # *** empty log message ***
 #
@@ -89,7 +92,7 @@ for x in Prod Deve ; do
     md ${dir}/${arch}/${x}
     for s in PIPS NEWGEN LINEAR EXTERN ; do
 	md ${dir}/${arch}/${x}/${s}
-        for d in Bin Lib Runtime ; do
+        for d in Bin Lib ; do
             md ${dir}/${arch}/${x}/${s}/${d}
         done
     done
@@ -97,6 +100,10 @@ for x in Prod Deve ; do
         md ${dir}/${arch}/${x}/PIPS/${d}
     done
 done
+
+md  ${dir}/${arch}/Prod/PIPS/Runtime \
+    ${dir}/${arch}/Prod/PIPS/Runtime/hpfc \
+    ${dir}/${arch}/Prod/PIPS/Runtime/wp65
 
 #
 # owner and rights
