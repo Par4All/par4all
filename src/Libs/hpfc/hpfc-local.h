@@ -2,7 +2,7 @@
  * local definitions
  * 
  * SCCS stuff:
- * $RCSfile: hpfc-local.h,v $ ($Date: 1994/09/01 15:48:02 $, )
+ * $RCSfile: hpfc-local.h,v $ ($Date: 1994/11/17 14:19:19 $, )
  * version $Revision$,
  * got on %D%, %T%
  * $Id$
@@ -49,7 +49,3 @@ extern entity
 /* in compile-decl.c */
 
 #define computer reference
-
-extern list
-    lloop;
-
