@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.17  2003/07/22 15:37:20  irigoin
+%% Double occurence of section about program_precondition
+%%
 %% Revision 1.16  2003/07/22 15:32:14  irigoin
 %% Reordering of sections about module_initial_precondition and inter- and
 %% intra-procedural summary preconditions. Pipsmake requires resources to be
@@ -530,7 +533,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/07/22 15:32:14 $~$
+$~$Date: 2003/07/22 15:37:20 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1974,41 +1977,6 @@ summary_transformer             > MODULE.summary_transformer
         < MODULE.transformers
         < MODULE.summary_effects
 \end{verbatim}
-
-\subsubsection{Initial Precondition}
-\label{subsubsection-initial-precs}
-\index{Precondition (Initial)}
-\index{Initial Precondition}
-
-All \texttt{DATA} initializations contribute to the global initial state
-of the program. The contribution of each module is computed independently.
-Note that variables statically initialized behave as static variables and
-are preserved between calls according to Fortran standard. The module
-initial states are abstracted by an initial precondition based on integer
-scalar variables only.
-
-\begin{verbatim}
-initial_precondition     > MODULE.initial_precondition
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.cumulated_effects
-        < MODULE.summary_effects
-\end{verbatim}
-
-All initial preconditions, including the initial precondition for the
-main, are combined to define the program precondition which is an
-abstraction of the program initial state.
-
-\begin{verbatim}
-program_precondition     > PROGRAM.program_precondition
-        < PROGRAM.entities
-        < ALL.initial_precondition
-\end{verbatim}
-
-The program precondition can only be used for the initial state of the
-main procedure. Although it appears below for all interprocedural analyses
-and it always is computed, it only is used when a main procedure is
-available.
 
 \subsubsection{Initial Precondition}
 \label{subsubsection-initial-precs}
