@@ -339,7 +339,7 @@ void build_aliases()
     aliases = hash_table_make(hash_string, 0);
 
     if(wpips_rc == NULL)
-	user_error("build_aliases", "Shell variable LIBDIR is undefined. Have you run pipsrc?\n",
+		user_error("build_aliases", "Shell variable LIBDIR is undefined. Have you run pipsrc?\n",
 		   0 );
     fd = safe_fopen(wpips_rc, "r");
 
