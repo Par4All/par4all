@@ -1,5 +1,5 @@
 %% $RCSfile: reductions_private.tex,v $ (version $Revision$)
-%% $Date: 1996/06/15 10:40:46 $, 
+%% $Date: 1996/06/15 10:59:29 $, 
 %%
 
 \documentclass{article}
@@ -45,12 +45,17 @@ List of reductions are separated.
 \domain{reductions = list:reduction*}
 
 
-\section{Function}
-\label{sec:function}
+\section{Functions}
+\label{sec:functions}
 
 Function from statement to reductions to be used for proper and cumulated
 reductions. 
 
 \domain{statement_reductions = statement -> reductions}
+
+Function from entity to reductions to be used to store callees'
+reductions. 
+
+\domain{entity_reductions = entity -> reductions}
 
 \end{document}
