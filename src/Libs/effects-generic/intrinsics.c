@@ -177,7 +177,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"SNGL",                     no_write_effects},
     {"DBLE",                     no_write_effects},
     {"CMPLX",                    no_write_effects},
-    {"DCMPLX",                    no_write_effects},
+    {"DCMPLX",                   no_write_effects},
     {"ICHAR",                    no_write_effects},
     {"CHAR",                     no_write_effects},
     {"AINT",                     no_write_effects},
