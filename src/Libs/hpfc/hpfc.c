@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/12/01 14:52:54 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/12/01 14:54:14 $, )
  * version $Revision$
  */
  
@@ -178,6 +178,9 @@ static void load_hpfc_status() /* SET them */
     set_computed_remaps(hpfc_status_computed(s));
 }
 
+/* never called... memory to be freed by pipsdbm...
+ */
+/*
 static void close_hpfc_status()
 {
     close_entity_status();
@@ -189,6 +192,7 @@ static void close_hpfc_status()
     close_the_pures();
     close_computed_remaps();
 }
+*/
 
 /************************************************************** COMPILATION */
 
