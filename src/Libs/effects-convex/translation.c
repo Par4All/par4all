@@ -33,7 +33,6 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "flint.h"
 #include "control.h"
 #include "misc.h"
 #include "semantics.h"
