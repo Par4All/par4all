@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/15 15:35:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/15 15:40:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/15 15:35:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/15 15:40:27 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1201,14 +1201,8 @@ text_unstructured(entity module,
 
    if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH"))
    {
-      r = empty_text(NULL);
-      
-      output_a_graph_view_of_the_unstructured(r,
-                                              module,
-                                              label,
-                                              margin,
-                                              u,
-                                              num);
+      output_a_graph_view_of_the_unstructured
+	  (r, module, label, margin, u, num);
    }
    else {
        list pbeg, pend;
