@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1995/11/24 09:43:22 $, 
+ * date: $Date: 1996/05/21 17:21:59 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
