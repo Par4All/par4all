@@ -1,5 +1,7 @@
 /* package generic effects :  Be'atrice Creusillet 5/97
  *
+ * $Id$
+ *
  * File: intrinsics.c
  * ~~~~~~~~~~~~~~~~~~
  *
@@ -44,6 +46,7 @@ static list assign_substring_effects(entity e,list args);
 static list substring_effect(entity e,list args);
 static list some_io_effects(entity e, list args);
 static list io_effects(entity e, list args);
+static list read_io_effects(entity e, list args);
 static list effects_of_ioelem(expression exp, tag act);
 static list effects_of_iolist(list exprs, tag act);
 static list effects_of_implied_do(expression exp, tag act);
@@ -277,7 +280,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"OPEN",                     io_effects},
     {"CLOSE",                    io_effects},
     {"INQUIRE",                  io_effects},
-    {"READ",                     io_effects},
+    {"READ",                     read_io_effects},
     {"BUFFERIN",                 io_effects},
     {"BUFFEROUT",                io_effects},
     {"ENDFILE",                  io_effects},
@@ -457,6 +460,20 @@ some_io_effects(entity e, list args)
     le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
 
     return le;
+}
+
+static list read_io_effects(entity e, list args)
+{
+  /* get standard io effects */
+  list le = io_effects(e, args);
+
+  /* get current transformer */
+  transformer t = (*load_transformer_func)(effects_private_current_stmt_head());
+
+  /* reverse-apply transformer to le. */
+  le = (*effects_transformer_composition_op)(le, t); 
+
+  return le;
 }
 
 static list
