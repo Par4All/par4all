@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: run-time.c,v $
+ * Revision 1.33  1997/04/17 11:47:29  coelho
+ * *** empty log message ***
+ *
  * Revision 1.32  1997/03/20 10:20:07  coelho
  * RCS headers.
  *
@@ -573,6 +576,15 @@ static RunTimeSupportDescriptor RTSTable[] =
     { SYNCHRO, 		0, is_sub, no_basic, no_entity },
     { SND_TO_N, 	0, is_sub, no_basic, no_entity },
     { RCV_FR_N, 	0, is_sub, no_basic, no_entity },
+
+/* HOST/NODE MESSAGES
+ */
+    { HPFC_HCAST,	0, is_sub, no_basic, no_entity },
+    { HPFC_NCAST,	0, is_sub, no_basic, no_entity },
+    { HPFC_sN2H,	0, is_sub, no_basic, no_entity },
+    { HPFC_sH2N,	1, is_sub, no_basic, no_entity },
+    { HPFC_rN2H,	1, is_sub, no_basic, no_entity },
+    { HPFC_rH2N,	0, is_sub, no_basic, no_entity },
 
 /*  PVM 3 stuff
  */
