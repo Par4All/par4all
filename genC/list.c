@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1998/12/30 16:49:48 $, )
+ * $RCSfile: list.c,v $ ($Date: 2000/04/19 14:01:36 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -180,8 +180,6 @@ list gen_insert_before(void * no, void * o, list l)
   return r;
 }
 
-
-
 #define NEXT(cp) (((cp) == NIL) ? NIL : (cp)->cdr)
 
 list gen_nreverse(list cp)
@@ -201,56 +199,6 @@ list gen_nreverse(list cp)
 	next_next = NEXT( next_next ) ;
     }
     return( cp ) ;
-}
-    
-void gen_mapc_tabulated(void (*fp)(), int binding)
-{
-    struct gen_binding *bp = &Domains[ binding ] ;
-    gen_chunk *table = Gen_tabulated_[ bp->index ] ;
-    int i ;
-
-    if( table == NULL ) {
-	user( "gen_mapc_tabulated: non tabulated domain %s\n", bp->name ) ;
-	return ;
-    }
-    for( i = 0 ; i < max_tabulated_elements() ; i++ ) {
-	if( (table+i)->p != gen_chunk_undefined ) 
-		(*fp)( (table+i)->p ) ;
-    }
-}
-
-/* why here? */
-void * gen_find_tabulated(char * key, int domain)
-{
-    gen_chunk *hash ;
-
-    if( (hash=(gen_chunk *)gen_get_tabulated_name_basic(domain, key))
-	== (gen_chunk *)HASH_UNDEFINED_VALUE ) {
-	return( gen_chunk_undefined ) ;
-    }
-    return (void*) 
-	((Gen_tabulated_[ Domains[ domain ].index ]+abs( hash->i ))->p);
-}
-
-list gen_filter_tabulated(int (*filter)(), int domain)
-{
-    struct gen_binding *bp = &Domains[ domain ] ;
-    gen_chunk *table = Gen_tabulated_[ bp->index ] ;
-    int i ;
-    cons *l ;
-
-    if( table == NULL ) {
-	user( "gen_filter_tabulated: non tabulated domain %s\n", bp->name ) ;
-	return( NIL ) ;
-    }
-    for( i = 0, l = NIL ; i < max_tabulated_elements() ; i++ ) {
-	gen_chunk *obj = (table+i)->p ;
-
-	if( obj != gen_chunk_undefined && (*filter)( obj )) {
-	    l = CONS( CHUNK, obj, l ) ;
-	}
-    }
-    return l;
 }
 
 void gen_free_list(list l)
