@@ -1,7 +1,9 @@
 #!/usr/local/bin/perl
 
-# This takes a PIPS output file in the GRAPH format as a file name
-# and generates a new one in the daVinci format on stdout.
+# This takes a PIPS output file in the -graph format as a file name
+# and generates a new one in the -daVinci format file.
+
+# The -launch_daVinci can be used to launch a daVinci in background.
 
 # 	@(#) pips_unstructured2daVinci 1.8@(#) (95/11/13, 16:45:20) version 1.8, got on 95/11/13, 16:45:21 [/a/chailly/export/users/export/users/pips/Pips/Development/Scripts/prettyprint/SCCS/s.pips_unstructured2daVinci].\n Copyright (c) École des Mines de Paris Proprietary.	
 
@@ -22,7 +24,7 @@ sub indent_string {
 
 
 sub output_indent {
-    print &indent_string;
+    print OUTPUT &indent_string;
 }
 
 
@@ -37,16 +39,16 @@ sub indent_minus {
 sub output_a_statement_begin {
     local($label, $comment) = @_;
     &output_indent;
-    print "l(\"$label\",\n";
+    print OUTPUT "l(\"$label\",\n";
     $indent_level += 2;
     &output_indent;
-    print "n(\"$comment\",\n";
+    print OUTPUT "n(\"$comment\",\n";
     $indent_level += 2;
     &output_indent;
     # Remove the \ and n at the end:
     chop $output_statement_buffer;
     chop $output_statement_buffer;
-    print "[\n";
+    print OUTPUT "[\n";
     &indent_plus;
     if ($this_is_the_unstructured_entry_p == 1) {
 	&add_a_node_attribute("_GO", "ellipse");
@@ -57,9 +59,9 @@ sub output_a_statement_begin {
     &output_some_other_node_attributes;
     &indent_minus ;
     &output_indent;
-    print "],\n";
+    print OUTPUT "],\n";
     &output_indent;
-    print "[\n";
+    print OUTPUT "[\n";
     &indent_plus ;
 }
 
@@ -68,22 +70,22 @@ sub output_a_successor {
     local($successor, $comment) = @_;
 
     &output_indent;
-    print "e(\"$comment\", [";
+    print OUTPUT "e(\"$comment\", [";
     &output_some_other_edge_attributes;
-    print "], r(\"$successor\")),\n";
+    print OUTPUT "], r(\"$successor\")),\n";
 }
 
 
 sub output_a_statement_end {
     &indent_minus;
     &output_indent;
-    print "]\n";
+    print OUTPUT "]\n";
     &indent_minus;
     &output_indent;
-    print " )\n";
+    print OUTPUT " )\n";
     &indent_minus;
     &output_indent;
-    print " ),\n";
+    print OUTPUT " ),\n";
     $this_is_the_unstructured_entry_p = 0;
 }
 
@@ -91,7 +93,7 @@ sub output_a_statement_end {
 sub output_some_other_node_attributes {
     while (($attribute, $value) = each %node_attribute_to_add) {
 	&output_indent;
-	print "a(\"$attribute\", \"$value\"),\n";
+	print OUTPUT "a(\"$attribute\", \"$value\"),\n";
     }
     %node_attribute_to_add = ();
 }
@@ -105,7 +107,7 @@ sub add_a_node_attribute {
 sub output_some_other_edge_attributes {
     while (($attribute, $value) = each %edge_attribute_to_add) {
 	&output_indent;
-	print "a(\"$attribute\", \"$value\"),\n";
+	print OUTPUT "a(\"$attribute\", \"$value\"),\n";
     }
     %edge_attribute_to_add = ();
 }
@@ -121,37 +123,37 @@ sub add_an_edge_attribute {
 sub output_a_node {
     local($label, $name, $successors, $comment) = @_;
     &output_indent;
-    print "l(\"$label\",\n";
+    print OUTPUT "l(\"$label\",\n";
     $indent_level += 2;
     &output_indent;
-    print "n(\"$comment\",\n";
+    print OUTPUT "n(\"$comment\",\n";
     $indent_level += 2;
     &output_indent;
     # Remove the \ and n at the end:
     chop $output_statement_buffer;
     chop $output_statement_buffer;
-    print "[\n";
+    print OUTPUT "[\n";
     &indent_plus ;
     &add_a_node_attribute("OBJECT", $name);
     &output_some_other_node_attributes;
     &indent_minus ;
     &output_indent;
-    print "],\n";
+    print OUTPUT "],\n";
     &output_indent;
-    print "[\n";
+    print OUTPUT "[\n";
     &indent_plus ;
     foreach $successor (split(/ /, $successors)) {
 	&output_a_successor($successor, $comment);
     }
     &indent_minus;
     &output_indent;
-    print "]\n";
+    print OUTPUT "]\n";
     &indent_minus;
     &output_indent;
-    print " )\n";
+    print OUTPUT " )\n";
     &indent_minus;
     &output_indent;
-    print " ),\n";
+    print OUTPUT " ),\n";
 }
 
 
@@ -175,6 +177,13 @@ sub keep_for_output {
     $output_statement_buffer .= $string . "\\n";
 }
 
+if ($ARGV[0] eq "-launch_daVinci") {
+    $launch_daVinci = 1;
+    shift;
+}
+else {
+    $launch_daVinci = 0;
+}
 
 $input_file_name = $ARGV[0];
 shift;
@@ -192,9 +201,9 @@ while (<INPUT>) {
 }
 close INPUT || die "Cannot close \"$input_file_name\".";
 
-open(STDOUT, ">$output_file_name") || die "Cannot open \"$output_file_name\".";
+open(OUTPUT, ">$output_file_name") || die "Cannot open \"$output_file_name\".";
 
-print "[\n";
+print OUTPUT "[\n";
 $indent_level += 2;
 
 # The label of the statement:
@@ -316,4 +325,12 @@ close INPUT || die "Cannot close \"$input_file_name\".";
 			  "Statement not from an unstructured");
 &output_a_statement_end();
 
-print "]\n";
+print OUTPUT "]\n";
+
+close OUTPUT || die "Cannot close \"$output_file_name\".";
+
+# If we have been asked to launch a daVinci process to display the graph : */
+if ($launch_daVinci) {
+    /* Be careful not to block stdout because it would block daVinci: */
+    system("daVinci $output_file_name &");
+}
