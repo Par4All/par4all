@@ -97,7 +97,15 @@ bool set_belong_p(s, e )
 set s;
 char *e;
 {
-    return( hash_get(s->table, (char *) e) == (char *) e) ;
+    /* GO 7/8/95:
+       Problem for set_string type because the value returned by
+       hash_get is not the same than the pointer value, only the
+       content of the string is the same ...
+       
+       return( hash_get(s->table, (char *) e) == (char *) e) ;
+       */
+
+    return hash_get(s->table, (char *) e);
 }
 
 set set_union( s1, s2, s3 )
