@@ -1,5 +1,8 @@
 /* $Id$
    $Log: splitc.l,v $
+   Revision 1.6  2005/03/22 10:26:16  nguyen
+   Correct the regular expressions for character constants
+
    Revision 1.5  2003/08/08 16:00:29  irigoin
    LF counted in comments. Lexical problems with floating point constants and
    C comments fixed.
@@ -211,18 +214,38 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
                                 pips_debug(5,"Pragma not implemented %s\n",yytext);
 				return(TK_PRAGMA);
                         }
-\'([^\']|(\'\')|(\\\'))*\'	{ 
-                                /* Attention, the regular expression is not true*/
-                                pips_debug(5,"TK_CHARCON: %s\n",yytext);
+
+\'[^\\]\'               { 
+                                pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-L\'([^\']|(\'\')|(\\\'))*\'	{ 
-                                /* Attention, the regular expression is not true*/
-                                pips_debug(5,"TK_CHARCON wide character constant: %s\n",yytext);
+\'\\[abfnrtv\'\\]\'     { 
+                                pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
+\'\\0[0-9]*\'           { 
+                                pips_debug(9,"TK_CHARCON: %s\n",yytext);
+                                yylval.string = strdup(yytext);
+				return(TK_CHARCON);
+                        }
+L\'[^\\]\'               { 
+                                pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
+                                yylval.string = strdup(yytext);
+				return(TK_CHARCON);
+                        }
+L\'\\[abfnrtv\'\\]\'     { 
+                                pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
+                                yylval.string = strdup(yytext);
+				return(TK_CHARCON);
+                        }
+L\'\\0[0-9]*\'           { 
+                                pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
+                                yylval.string = strdup(yytext);
+				return(TK_CHARCON);
+                        }
+
 \"([^\"]|(\"\")|(\\\"))*\"	{ 
                                 pips_debug(5,"TK_STRINGCON regular or wide string: %s\n",yytext);
                                 /* the "world" in L"Hello, " "world" should be treated as 
