@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/10/03 15:34:36 $, ) 
+ * ($Date: 1995/10/04 19:30:29 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -170,8 +170,8 @@ remapping_variables(
     list *pl, 	/* P */
     list *plp, 	/* P' */
     list *pll, 	/* locals */
-    list *plrm, 	/* to remove */
-    list *pld,      /* diffusion processor variables */
+    list *plrm, /* to remove */
+    list *pld,  /* diffusion processor variables */
     list *plo)	/* others */
 {
     entity
@@ -842,10 +842,29 @@ hpf_remapping(
     DEBUG_SYST(4, "cleaned system", p);
     DEBUG_ELST(4, "scanners", scanners);
 
-    /*   processors/array elements separation.
+    /* processors/array elements separation.
+     *
+     * ??? why row echelon? why not... it is not too bad a projection!
+     * actually, what I want is to separate processors and elements. 
+     * Then I would like to perform some manipulations on the systems
+     * to improve them, extracting deducables and lattices... 
+     * but the conservation of the optimized order is not obvious... 
+     * May/should I give it up in some cases? Well, I guess so.
+     *
+     * What's missing:
+     *  - extraction of the lattice if equalities remain in a system.
+     *    1 Hermite transformation + variable list update...
+     *  - also some deducables could be extracted once the code is transformed.
+     *  - Q: what about variables which were kept althought not desired?
      */
     hpfc_algorithm_row_echelon(p, scanners, &proc, &enume);
     sc_rm(p);
+
+    sc_transform_ineg_in_eg(proc);
+    sc_transform_ineg_in_eg(enume);
+
+    if (sc_egalites(proc) || sc_egalites(enume))
+	hpfc_warning("lattice extraction not implemented\n");
 
     DEBUG_SYST(3, "proc", proc);
     DEBUG_SYST(3, "enum", enume);
