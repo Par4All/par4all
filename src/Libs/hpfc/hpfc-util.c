@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/08/30 14:33:11 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/08/30 15:20:47 $, )
  * version $Revision$
  */
 
@@ -752,7 +752,7 @@ expression_number_for_index(entity index, list /* of expression */ le)
 }
 
 #define XDEBUG(msg) \
-  pips_debug(3, "%s and %s: " msg "\n", entity_name(e1), entity_name(e2))
+  pips_debug(6, "%s and %s: " msg "\n", entity_name(e1), entity_name(e2))
 
 bool 
 references_aligned_p(reference r1, reference r2)
