@@ -69,16 +69,6 @@ struct gen_binding {
   struct inlinable *inlined ;
 } ;
 
-/* translation tables 
-*/
-typedef struct 
-{
-  bool identity;
-  int old_to_actual[MAX_DOMAIN];
-  int actual_to_old[MAX_DOMAIN];
-} 
-  gen_type_translation_t, * gen_type_translation_p;
-
 #ifdef __STRICT_ANSI__
 #define GEN_PROTO(x) x
 #else
