@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: macros.c,v $
+ * Revision 1.3  1997/09/18 17:11:23  coelho
+ * does not subs twice...
+ *
  * Revision 1.2  1997/09/18 16:56:55  coelho
  * warn if non safe.
  *
@@ -153,7 +156,16 @@ untrusted_call_p(expression e)
 
 /****************************************************** MACRO SUBSTITUTION */
 
-static expression s_init, s_repl;
+/* must take care not to substitute in an inserted expression
+ */
+static expression s_init = expression_undefined, s_repl = expression_undefined;
+static list /* of expression */ already_subs = NIL;
+
+static bool
+expr_flt(expression e)
+{
+    return !gen_in_list_p(e, already_subs);
+}
 
 static void
 expr_rwt(expression e)
@@ -162,6 +174,7 @@ expr_rwt(expression e)
     {
 	free_syntax(expression_syntax(e));
 	expression_syntax(e) = copy_syntax(expression_syntax(s_repl));
+	already_subs = CONS(EXPRESSION, e, already_subs);
     }
 }
 
@@ -183,9 +196,18 @@ substitute_expression_in_expression(
     s_init = initial; 
     s_repl = replacement;
 
-    gen_recurse(tree, expression_domain, gen_true, expr_rwt);
+    gen_recurse(tree, expression_domain, expr_flt, expr_rwt);
+
+    s_init = expression_undefined;
+    s_repl = expression_undefined;
 }
 
+void 
+reset_substitute_expression_in_expression(void)
+{
+    gen_free_list(already_subs); 
+    already_subs = NIL;
+}
 
 void
 parser_macro_expansion(expression e)
@@ -220,6 +242,8 @@ parser_macro_expansion(expression e)
 
     pips_assert("same #args", gen_length(lactuals)==gen_length(lformals));
 
+    reset_substitute_expression_in_expression();
+
     /* replace each formal by its actual.
      */
     for (; !ENDP(lactuals); POP(lactuals), POP(lformals))
@@ -244,6 +268,8 @@ parser_macro_expansion(expression e)
 
 	substitute_expression_in_expression(rhs, form, actu);
     }
+
+    reset_substitute_expression_in_expression();
 
     /* it is important to keep the same expression, for gen_recurse use.
      */
