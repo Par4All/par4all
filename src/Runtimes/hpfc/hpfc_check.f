@@ -2,7 +2,7 @@ c
 c Checks run-time library version
 c
 c $RCSfile: hpfc_check.f,v $ version $Revision$
-c ($Date: 1995/09/27 18:02:24 $, )
+c ($Date: 1995/09/27 18:02:50 $, )
 c
       subroutine hpfc_check()
       include 'real_parameters.h'
@@ -24,9 +24,6 @@ c
       NBOFTEMPLATES = REALNBOFTEMPLATES
       NBOFPROCESSORS = REALNBOFPROCESSORS
       MAXSIZEOFPROCS = REALMAXSIZEOFPROCS
-c
-c and hpfc_buffers
-c
       SIZEOFBUFFER = REALMAXSIZEOFBUFFER
       end
 c
