@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/10/02 15:32:56 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/10/02 16:06:39 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -235,7 +235,7 @@ recompile: depend header all
 # to override sun's default rule
 .SCCS_GET:
 # .INIT is a SUN extension...
-.INIT: generate_makefile_if_necessary_and_possible
+.INIT: 
 check_install:
 #
 # begin of $CONFIG_FILE inclusion
@@ -268,6 +268,7 @@ INSTALL_EXE=	`if [ $DIRTYPE = 'Passes' ] ; then echo '$(BIN_TARGET)' ; fi`
 
 .PRECIOUS: $(LIB_TARGET) $(BIN_TARGET)
 
+# .INIT is a SUN extention...
 .INIT: check_os
 
 check_install:
