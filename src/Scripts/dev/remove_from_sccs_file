@@ -1,7 +1,11 @@
 #! /bin/sh
+# $RCSfile: remove_from_sccs_file,v $ (version $Revision$)
+# $Date: 1996/07/16 11:29:15 $, 
 
 MOTIF="$1"
 shift
+
+set -e
 
 for f
 do
