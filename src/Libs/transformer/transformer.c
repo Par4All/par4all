@@ -3,6 +3,11 @@
   * $Id$
   *
   * $Log: transformer.c,v $
+  * Revision 1.51  2003/12/19 16:27:21  irigoin
+  * two calls to entity_module_name() used to retrieve the constant string
+  * associated to a constant string entity replaced by calls to entity_name()
+  * following some modification of entity_module_name() by Nga
+  *
   * Revision 1.50  2003/07/24 08:45:35  irigoin
   * A lot of reformatting, some additional debugging statement, empty
   * transformers now must have an empty basis. transformer_safe_normalize()
@@ -1674,11 +1679,13 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
 	  }
 	}
 	if(number_of_strings==0) {
-	  s1 = module_local_name(e);
+	  /* s1 = module_local_name(e); */
+	  s1 = entity_name(e);
 	  i1 = (int) val;
 	}
 	else if(number_of_strings==1) {
-	  s2 = module_local_name(e);
+	  /* s2 = module_local_name(e); */
+	  s2 = entity_name(e);
 	  i2 = (int) val;
 	}
 	else
