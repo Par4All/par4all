@@ -2,7 +2,7 @@
  * Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1995/03/13 17:44:44 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1995/03/14 18:34:31 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -22,6 +22,10 @@ extern int fprintf();
 #include "ri-util.h"
 #include "loop_normalize.h"
 #include "hpfc.h"
+
+/* could be
+ * GENERIC_GLOBAL_FUNCTION(overlap_management, overlapsmap)
+ */
 
 GENERIC_CURRENT_MAPPING(overlaps, overlaps, entity);
 
