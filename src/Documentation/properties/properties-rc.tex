@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.119  1998/03/10 14:36:27  irigoin
+%% Property PRETTYPRINT_ALL_PARENTHESES added
+%%
 %% Revision 1.118  1998/03/10 14:18:55  irigoin
 %% New property added, CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS.
 %%
@@ -58,7 +61,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/03/10 14:18:55 $~$
+$~$Date: 1998/03/10 14:36:27 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1553,6 +1556,14 @@ which the entity is declared if any.
 
 \begin{verbatim}
 PRETTYPRINT_WITH_COMMON_NAMES FALSE
+\end{verbatim}
+
+By default, expressions are simplified according to operator
+precedences. It is possible to override this prettyprinting option and to
+reflect the abstract tree with redundant parentheses.
+
+\begin{verbatim}
+PRETTYPRINT_ALL_PARENTHESES FALSE
 \end{verbatim}
 
 \subsubsection{Declarations}
