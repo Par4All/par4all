@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/10/02 15:15:47 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/10/02 15:32:56 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -227,9 +227,14 @@ SHELL=		/bin/sh
 
 #
 all: $ALL_RULE_TARGET
+all: generate_makefile_if_necessary_and_possible
+recompile: generate_makefile_if_necessary_and_possible
 recompile: depend header all
+# .PHONY is a gnu extension...
+.PHONY: install all depend header recompile clobber count info delta
 # to override sun's default rule
 .SCCS_GET:
+# .INIT is a SUN extension...
 .INIT: generate_makefile_if_necessary_and_possible
 check_install:
 #
