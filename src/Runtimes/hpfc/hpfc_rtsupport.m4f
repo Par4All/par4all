@@ -2,13 +2,14 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/08/29 13:38:41 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/08/29 13:56:30 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
-ifdef(`DEBUG',define(`debug',`$1'),define(`debug'))
-ifdef(`DEMO',define(`demo',`$1'),define(`demo'))
+ifdef(`DEBUG',`define(`debug',$1)',`define(`debug')')dnl
+ifdef(`DEMO',`define(`demo',$1)',`define(`demo')')dnl
+debug(this is a debugsection)
 c-----------------
 c
 c HPFC_TEMPLATE
@@ -905,8 +906,10 @@ c
      $     NBOFTASKS, 
      $     NODETIDS, 
      $     info)
-      demo(`CALL print_host_info()')
-      demo(`CALL print_task_info(NBOFTASKS, NODETIDS, HOSTTID)'
+
+      demo(`call print_host_info()')
+      demo(`call print_task_info(NBOFTASKS, NODETIDS, HOSTTID)')
+
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
       call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
