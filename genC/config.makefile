@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/08 10:49:15 $, 
+# $Date: 1996/08/08 11:48:36 $, 
 #
 # Newgen should be quite particular...
 
@@ -48,9 +48,9 @@ OTHER_CFILES=\
 	genSML.c
 
 DERIVED_CFILES=\
-	genread.c \
+	genread_yacc.c \
 	genread_lex.c \
-	genspec.c \
+	genspec_yacc.c \
 	genspec_lex.c
 
 DERIVED_FILES=
@@ -75,19 +75,21 @@ $(ARCH)/libgenC.a: $(LIB_OBJECTS)
 	$(ARCHIVE) $@ $+
 	ranlib $@
 
-genread.h genread.c: read.y
+genread.h genread_yacc.c: read.y
 	$(PARSE) $< 
-	sed 's,YY,GENREAD_,g;s,yy,genread_,g' < y.tab.c > genread.c
+	sed 's,YY,GENREAD_,g;s,yy,genread_,g' < y.tab.c > genread_yacc.c
 	sed 's,YY,GENREAD_,g;s,yy,genread_,g' < y.tab.h > genread.h
+	$(RM) y.output y.tab.c y.tab.h
 
 genread_lex.o: genread.h
 genread_lex.c: read.l 
 	$(SCAN) $< | sed 's,YY,GENREAD_,g;s,yy,genread_,g;' > $@
 
-genspec.h genspec.c: gram.y
+genspec.h genspec_yacc.c: gram.y
 	$(PARSE) $< 
-	sed 's,YY,GENSPEC_,g;s,yy,genspec_,g' < y.tab.c > genspec.c
+	sed 's,YY,GENSPEC_,g;s,yy,genspec_,g' < y.tab.c > genspec_yacc.c
 	sed 's,YY,GENSPEC_,g;s,yy,genspec_,g' < y.tab.h > genspec.h
+	$(RM) y.output y.tab.c y.tab.h
 
 genspec_lex.o: genspec.h
 genspec_lex.c: token.l
