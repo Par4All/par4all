@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/22 15:38:35 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/09/17 19:18:01 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -12,6 +12,9 @@
 # get the environment if necessary
 
 [ "$PIPS_ROOT" ] || . /projects/Pips/pipsrc.sh
+
+[ "$PIPS_VALIDDIR" ] || PIPS_VALIDDIR=$PIPS_ROOT/Validation
+export PIPS_VALIDDIR
 
 #
 # should be in the environment
