@@ -21,6 +21,9 @@ GENERIC_GLOBAL_FUNCTION(invariant_rw_effects, statement_effects)
 /* for external use - identical to rw_effects */
 GENERIC_GLOBAL_FUNCTION(cumulated_rw_effects, statement_effects)
 
+/* PROPER RW EFFECTS associated to expressions
+ */
+GENERIC_GLOBAL_FUNCTION(expr_prw_effects, persistant_expression_to_effects)
 
 list 
 load_proper_rw_effects_list(statement s)
