@@ -56,6 +56,8 @@ DEXP (D{ICON})
 RCON (({MANT}|{UICON}){REXP}?)
 DCON (({MANT}|{UICON}){DEXP}?)
 
+%start TYPEDECLARATION
+
 %%
 %AND%			{
 				pips_debug(9, "TK_AND\n");
@@ -131,6 +133,15 @@ DCON (({MANT}|{UICON}){DEXP}?)
                                         *(s-1) = '\0';
 				}
 
+                                switch(tv) {
+                                case TK_CHARACTER:
+                                case TK_COMPLEX:
+                                case TK_INTEGER:
+                                case TK_LOGICAL:
+                                case TK_REAL:
+                                        BEGIN TYPEDECLARATION;
+                                }
+
 				pips_debug(9, "TK_KEYWORD %s %d %d\n", yytext, yyleng, tv);
 				return(tv);
 			}
@@ -149,14 +160,14 @@ DCON (({MANT}|{UICON}){DEXP}?)
 				return(TK_ICON); 
 			}
 
-{RCON}			{
+<INITIAL>{RCON}			{
 				pips_debug(9, "TK_RCON %s %d\n",
 					      yytext, yyleng);
                                 yylval.string = strdup(yytext);
 				return(TK_RCON); 
 			}
 
-{DCON}			{
+<INITIAL>{DCON}		{
 				pips_debug(9, "TK_DCON %s %d\n",
 					      yytext, yyleng);
                                 yylval.string = strdup(yytext);
@@ -223,7 +234,8 @@ DCON (({MANT}|{UICON}){DEXP}?)
 				pips_debug(9, "TK_CONCAT\n");
 				return(TK_CONCAT);
 			}
-\n			{       line++;    
+\n			{       line++;
+                                BEGIN INITIAL;
 				pips_debug(9, "TK_EOS\n");
 				return(TK_EOS);
 			}
