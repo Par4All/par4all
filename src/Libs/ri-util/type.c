@@ -228,7 +228,9 @@ basic b2;
     else if (basic_tag(b1) != basic_tag(b2))
 	return FALSE;
 
-    /* assertion: b1 and b2 are defined and have the same tag */
+    /* assertion: b1 and b2 are defined and have the same tag
+       (see previous tests) */
+
     switch(basic_tag(b1)) {
     case is_basic_int:
 	return basic_int(b1) == basic_int(b2);
