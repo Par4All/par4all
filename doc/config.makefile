@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/23 11:52:19 $, 
+# $Date: 1996/08/23 11:53:24 $, 
 #
 # Newgen documention
 
@@ -8,7 +8,7 @@ FTEX =	tutoriel_newgen.ftex
 ETEX = 	newgen_manual.tex \
 	newgen_paper.tex
 
-SOURCES =	$(FTEX) $(ETEX)
+SOURCES =	$(FTEX) $(ETEX) obtention.txt
 
 PS =	$(FTEX:.ftex=.ps) $(ETEX:.tex=.ps)
 
