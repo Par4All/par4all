@@ -43,7 +43,7 @@
 
 
 #define VARSUPP "Variable_pour_max_en_min_q"
-jmp_buf overflow_error;
+
 
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
