@@ -5,6 +5,9 @@
  * debug: CLONE_DEBUG_LEVEL
  *
  * $Log: clone.c,v $
+ * Revision 1.15  1997/11/08 17:28:42  coelho
+ * fix with prettyprint, to include commons in redeclarations...
+ *
  * Revision 1.14  1997/11/07 18:16:24  coelho
  * text memory leak is back to avoid core dumps...
  *
@@ -204,7 +207,7 @@ build_a_clone_for(
     set_bool_property(STAT_ORDER, FALSE);
 
     stat = build_statement_for_clone(cloned, argn, val);
-    t = text_module(new_fun, stat);
+    t = text_named_module(new_fun, cloned, stat);
 
     entity_type(new_fun) = saved_t;
     entity_storage(new_fun) = saved_s;
