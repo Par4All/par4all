@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.111  1997/12/05 07:58:57  coelho
+%% PREPROCESSOR_MISSING_FILE_HANDLING added.
+%%
 %% Revision 1.110  1997/11/21 12:28:59  coelho
 %% prettyprint of parallel loops is now managed thru only one property
 %% which describe the style to be used. typically do, doall, f90, hpf and
@@ -33,7 +36,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1997/11/21 12:28:59 $~$
+$~$Date: 1997/12/05 07:58:57 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -305,12 +308,18 @@ request cannot be satisfied because some source code is missing. It also
 is possible to generate some synthetic code (a.k.a. {\em stubs} or ???)
 and to update the current module list but this is not a very satisfying
 option because all interprocedural analysis results are going to be wrong.
-The user should retrieve the generated \verb/.f/ files in the workspace
-and add some assignments (def) and uses. The user modified synthetic files
-should then be saved and used to generate a new workspace.
+The user should retrieve the generated \verb/.f/ files in the workspace,
+under the Tmp directory, and add some assignments (def) and uses. The user
+modified synthetic files should then be saved and used to generate a new
+workspace. 
+
+Valid settings: \verb|error generate query|.
 
 \begin{verbatim}
 GENERATE_MISSING_SOURCE_FILES FALSE
+
+
+PREPROCESSOR_MISSING_FILE_HANDLING "error"
 \end{verbatim}
 
 
