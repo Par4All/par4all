@@ -606,24 +606,26 @@ list le; /* list of entities */
  *
  * p is not modified.
  */
-transformer 
-invariant_wrt_transformer(p, tf)
-transformer p;
-transformer tf;
+transformer invariant_wrt_transformer(transformer p, transformer tf)
 {
   transformer inv = transformer_undefined;
   transformer fptf = transformer_undefined;
 
-  if(FALSE) {
+  if(FALSE)
+  {
     fptf = args_to_transformer(transformer_arguments(tf));
   }
-  else {
-    fptf = transformer_derivative_fix_point(tf);
+  else 
+  {
+    /* if it is expensive, maybe it should not be computed over and over...
+     */
+    fptf = transformer_derivative_fix_point(tf); 
   }
 
-    inv = transformer_apply(tf, p);
+  inv = transformer_apply(fptf, p); /* tf? fptf? */
 
-    return inv;
+  transformer_free(fptf); /* must be freed, otherwise it is leaked. */
+  return inv;
 }
 
 /* transformer transformer_value_substitute(transformer t,
@@ -635,9 +637,10 @@ transformer tf;
  *    error
  * fi
  *
- * "e2 must not appear in t initially": this is the general case; the second case
- * may occur when procedure A calls B and C and when B and C share a global variable X
- * which is not seen from A. A may contain relations between B:X and C:X...
+ * "e2 must not appear in t initially": this is the general case; 
+ * the second case may occur when procedure A calls B and C and when B and C 
+ * share a global variable X which is not seen from A. A may contain 
+ * relations between B:X and C:X...
  * See hidden.f in Bugs or Validation...
  */
 transformer 
