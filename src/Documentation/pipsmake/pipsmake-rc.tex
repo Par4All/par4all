@@ -2,6 +2,10 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.9  2003/06/04 13:11:17  ferrand
+%% Add a new atomizer customized for use within the SIMDizing process
+%% with SAC.
+%%
 %% Revision 1.8  2003/05/21 12:28:11  ferrand
 %% Remove unneeded dependence from Simdizer on MODULE.preconditions.
 %% Add a new phase for SIMD-optimized loop unrolling (loop unrolling with
@@ -498,7 +502,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/05/21 12:28:11 $~$
+$~$Date: 2003/06/04 13:11:17 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2906,6 +2910,23 @@ nest_parallelization                    > MODULE.parallelized_code
 
 
 \subsubsection{SIMDizer for SIMD multimedia instruction set}
+
+%%@UserManualDocumentation:  simd_atomizer
+Here is yet another atomizer, based on 'new atomizer'. There are only
+some minor differences with respect to new atomizer, except that it
+does not atomize ``simple'' arguments (that is, arguments that are the
+sum of a reference and a constant). This is needed to be able to
+generate code that would potentially be efficient, whereas the
+original atomizer would most of the time generate unusable code.
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+alias simd_atomizer 'SIMD Atomizer'
+
+simd_atomizer                      > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
 
 %%@UserManualDocumentation: simdizer_auto_unroll
 Function \verb+simdizer_auto_unroll+ tries to unroll the code for
