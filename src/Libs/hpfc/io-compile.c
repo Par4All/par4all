@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/11/17 14:19:16 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/11/24 17:22:00 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -304,8 +304,14 @@ statement *psh, *psn;
 
 	hpfc_algorithm_tiling(syst, processors, scanners, 
 			      &condition, &proc_echelon, &tile_echelon);
-
 	hpfc_simplify_condition(&condition, stat, move);
+
+	/*  the sorting is done again at the code generation,
+	 *  but this phase will ensure more determinism in the debug messages
+	 */
+	sc_vect_sort(condition, lexicographic_order_p);
+	sc_vect_sort(proc_echelon, lexicographic_order_p);
+	sc_vect_sort(tile_echelon, lexicographic_order_p);
 
 	if (!sc_empty_p(proc_echelon) && !sc_empty_p(tile_echelon))
 	{
@@ -343,8 +349,13 @@ statement *psh, *psn;
 	pips_assert("generate_io_collect_or_update", ENDP(tmp));
 
 	hpfc_algorithm_row_echelon(syst, scanners, &condition, &row_echelon);
-
 	hpfc_simplify_condition(&condition, stat, move);
+
+	/*  the sorting is done again at the code generation,
+	 *  but this phase will ensure more determinism in the debug messages
+	 */
+	sc_vect_sort(condition, lexicographic_order_p);
+	sc_vect_sort(row_echelon, lexicographic_order_p);
 
 	if (!sc_empty_p(row_echelon))
 	{
@@ -399,6 +410,8 @@ tag move, act;
 	result = generate_shared_io_system(array, stat, move, act);
 	result = clean_shared_io_system(result, array, move);
     }
+
+    sc_vect_sort(result, lexicographic_order_p);
 
     /*
      * Final DEBUG message
@@ -853,12 +866,6 @@ tag move;
     }
     
     return(syst);
-}
-
-void XXX(syst)
-Psysteme syst;
-{
-    sc_fprint(stderr, syst, entity_local_name);
 }
 
 /* void put_variables_in_ordered_lists
