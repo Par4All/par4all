@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/17 17:45:27 $, 
+ * $Date: 1996/06/18 11:47:51 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -9,6 +9,7 @@
 
 #include "local-header.h"
 #include "control.h" /* for CONTROL_MAP() */
+#include "semantics.h" /* for load_summary_effects() */
 
 /****************************************************** SUMMARY REDUCTIONS */
 
@@ -19,17 +20,103 @@ reductions load_summary_reductions(entity f)
 	(DBR_SUMMARY_REDUCTIONS, module_local_name(f), TRUE);
 }
 
-bool summary_reductions(string module)
+/* should rather check conflicts ??? */
+static bool entity_in_effect_list_p(entity v, list /* of effect */ le)
+{
+    MAP(EFFECT, e, if (effect_variable(e)==v) return TRUE, le);
+    return FALSE;
+}
+
+/* allocates and returns the list of not conflicting entities */
+static list /* of entity */ 
+all_no_conflict_read_entity(entity var, list /* of effect */ le)
+{
+    list /* of entity */ lread = NIL;
+
+    MAP(EFFECT, e,
+    {
+	entity dep = effect_variable(e);
+	if (effect_read_p(e) && !entity_conflict_p(var, dep))
+	    lread = gen_once(dep, lread);
+    },
+	le);
+
+    return lread;
+}
+
+static reduction compute_one_summary_reduction(
+    reduction model, list /* of effect */ le)
+{
+    reduction r = copy_reduction(model);
+    entity var = reduction_variable(model);
+
+    /* keep the entities that are exported... 
+     */
+    MAP(ENTITY, e,
+	if (!entity_in_effect_list_p(e, le))
+	    remove_variable_from_reduction(r, e),
+	reduction_dependences(r));
+
+    /* the dependences are updated to all touched exported vars 
+     * this is a conservative assumption. may be improved.
+     * when using this information, it must be checked that the 
+     * accumulator is not binded at call site to any of these...
+     */
+    gen_free_list(reduction_dependences(r));
+    reduction_dependences(r) = all_no_conflict_read_entity(var, le);
+
+    DEBUG_REDUCTION(3, "result\n", r);
+    return r;
+}
+
+static reductions compute_summary_reductions(entity f)
+{
+    list /* of effect */ le = load_summary_effects(f);
+    list /* of reduction */ lr = NIL, lc;
+
+    lc = reductions_list
+	(load_cumulated_reductions(get_current_module_statement()));
+
+    pips_debug(3, "module %s: %d cumulated reductions\n",
+	       entity_name(f), gen_length(lc));
+
+    MAP(REDUCTION, r,
+    {
+	DEBUG_REDUCTION(4, "considering\n", r);
+	if (entity_in_effect_list_p(reduction_variable(r), le))
+	    lr = CONS(REDUCTION, compute_one_summary_reduction(r, le), lr);
+    },
+	lc);
+
+    return make_reductions(lr);
+}
+
+/* handler for pipsmake
+ * input: module name
+ * output: TRUE
+ * side effects: stores the summary reductions to pipsdbm
+ */
+bool summary_reductions(string module_name)
 {
     reductions red;
 
     debug_on("REDUCTIONS_DEBUG_LEVEL");
-    pips_debug(1, "considering module %s\n", module);
+    pips_debug(1, "considering module %s\n", module_name);
     pips_user_warning("not implemented yet\n");
 
-    /* that is indeed a first implementation */
-    red = make_reductions(NIL);
-    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_REDUCTIONS, module, red);
+    set_current_module_entity(local_name_to_top_level_entity(module_name));
+    set_current_module_statement((statement)
+        db_get_memory_resource(DBR_CODE, module_name, TRUE));
+    set_cumulated_reductions((pstatement_reductions)
+        db_get_memory_resource(DBR_CUMULATED_REDUCTIONS, module_name, TRUE));
+
+    red = compute_summary_reductions(get_current_module_entity());
+
+    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_REDUCTIONS, module_name, red);
+
+    reset_cumulated_reductions();
+    reset_current_module_statement();
+    reset_current_module_entity();
 
     debug_off();
     return TRUE;
@@ -40,15 +127,6 @@ bool summary_reductions(string module)
  */
 GENERIC_GLOBAL_FUNCTION(proper_reductions, pstatement_reductions)
 
-reductions sload_proper_reductions(statement s)
-{
-    if (bound_proper_reductions_p(s))
-	return load_proper_reductions(s);
-    /* else */
-    pips_user_warning("prop reduction not found for 0x%x\n", (unsigned int) s);
-    return make_reductions(NIL); /* ??? memory leak! */
-}
-
 DEFINE_LOCAL_STACK(crt_stat, statement)
 
 static bool pr_statement_flt(statement s)
@@ -56,6 +134,8 @@ static bool pr_statement_flt(statement s)
     store_proper_reductions(s, make_reductions(NIL));
     return crt_stat_filter(s);
 }
+
+/* static reductions reductions_from_callees */
 
 static void pr_call_rwt(call c)
 {
@@ -136,15 +216,6 @@ bool proper_reductions(string module_name)
  */
 GENERIC_GLOBAL_FUNCTION(cumulated_reductions, pstatement_reductions)
 
-reductions sload_cumulated_reductions(statement s)
-{
-    if (bound_cumulated_reductions_p(s))
-	return load_cumulated_reductions(s);
-    /* else */
-    pips_user_warning("cumu reduction not found for 0x%x\n", (unsigned int) s);
-    return make_reductions(NIL); /* ??? memory leak */
-}
-
 /************************************************ LIST OF REDUCED ENTITIES */
 
 /* list of entities that may be reduced
@@ -168,7 +239,7 @@ list_of_reduced_variables(
     list /* of entity */ le = NIL;
     le = add_reduced_variables(le, load_proper_reductions(node));
     MAP(STATEMENT, s, 
-	le = add_reduced_variables(le, sload_cumulated_reductions(s)),
+	le = add_reduced_variables(le, load_cumulated_reductions(s)),
 	ls);
     return le;
 }
@@ -190,7 +261,7 @@ build_reduction_of_variable(
 	(reference_undefined,
 	 make_reduction_operator(is_reduction_operator_none, UU),
 	 NIL);
-    
+
     if (!update_compatible_reduction
 	(pr, var, load_statement_proper_effects(node),
 	 load_proper_reductions(node)))
@@ -229,6 +300,9 @@ build_creductions_of_statement(
     /* list of candidate entities */
     le = list_of_reduced_variables(node, ls);
 
+    pips_debug(5, "stat %s 0x%x: %d candidate(s)\n",
+	       note_for_statement(node), (unsigned int) node, gen_length(le));
+
     /* for each candidate, extract the reduction if any */
     MAP(ENTITY, var,
 	if (build_reduction_of_variable(var, node, ls, &r))
@@ -236,6 +310,9 @@ build_creductions_of_statement(
 	le);
 
     /* store the result */
+    pips_debug(5, "stat %s 0x%x -> %d reductions\n", 
+	       note_for_statement(node), (unsigned int) node, gen_length(lr));
+
     store_cumulated_reductions(node, make_reductions(lr)); 
     gen_free_list(le);
 }
@@ -269,10 +346,11 @@ static void cr_test_rwt(test t)
 
 static void cr_unstructured_rwt(unstructured u)
 {
-    list /* of statements */ ls = NIL;
-    CONTROL_MAP(c, {}, unstructured_control(u), ls);
+    list /* of control */ lc = NIL, /* of statement */ ls;
+    CONTROL_MAP(c, {}, unstructured_control(u), lc);
+    ls = control_list_to_statement_list(lc);
     build_creductions_of_statement(crt_stat_head(), ls);
-    gen_free_list(ls);
+    gen_free_list(ls); gen_free_list(lc);
 }
 
 static void cr_call_rwt(call c)
