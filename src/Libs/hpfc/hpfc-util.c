@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/04/02 14:58:57 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/04/02 15:02:14 $, )
  * version $Revision$
  */
 
@@ -785,7 +785,7 @@ static void test_rewrite(test t)
 	statement_instruction(current_stmt_head()) = 
 	    statement_instruction(test_true(t));
 
-	test_true(t) = statement_undefined;
+	statement_instruction(test_true(t)) = instruction_undefined;
 	free_test(t);
     }
     else if (ENTITY_FALSE_P(e))
@@ -795,7 +795,7 @@ static void test_rewrite(test t)
 	statement_instruction(current_stmt_head()) = 
 	    statement_instruction(test_false(t));
 
-	test_false(t) = statement_undefined;
+	statement_instruction(test_false(t)) = instruction_undefined;
 	free_test(t);
     }
 }
