@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.115  2001/04/06 16:10:49  coelho
+ * hop.
+ *
  * Revision 1.114  2000/11/29 09:15:27  coelho
  * tpips_init_done made visible.
  *
@@ -925,7 +928,7 @@ static bool line_with_substitutions(string line)
     while (*line) 
     {
 	if ((line[0]=='$' && line[1]=='{') || 
-	    line[0]=='`' || line[0]=='*' || line[0]=='?' || line[0]=='[')
+	    line[0]=='`' || line[0]=='*' || line[0]=='?'/* || line[0]=='['*/)
 	    return TRUE;
 	line++;
     }
@@ -951,6 +954,11 @@ static string tp_substitutions(string line)
 	{
 	    pips_user_warning("error in shell substitutions...\n");
 	    substituted = strdup(line);
+	}
+	if (line_with_substitutions(substituted))
+	{
+	  pips_user_warning("maybe error in substituted lines:\n\t%s\n", 
+			    substituted);
 	}
     }
     else
