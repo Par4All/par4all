@@ -1,9 +1,11 @@
  /* 
-  *  Functions for the expressions
+  * $Id$
   *
-  *  Yi-Qing YANG, Lei ZHOU, Francois IRIGOIN, Fabien Coelho
+  * Functions for the expressions
   *
-  *  12, Sep, 1991
+  * Yi-Qing YANG, Lei ZHOU, Francois IRIGOIN, Fabien Coelho
+  *
+  * 12, Sep, 1991
   *
   * AP, sep 25th 1995 : I have added some usefull functions from
   * static_controlize/utils.c
@@ -11,6 +13,8 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "misc.h"
