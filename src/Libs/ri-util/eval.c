@@ -1,4 +1,8 @@
-/* This file contains a set of functions to evaluate integer constant
+/* 
+ * $Id$
+ * 
+
+This file contains a set of functions to evaluate integer constant
 expressions. The algorithm is built on a recursive analysis of the
 expression structure. Lower level functions are called until basic atoms
 are reached. The succes of basic atom evaluation depend on the atom
@@ -31,7 +35,7 @@ range: a range is not evaluated.
 value 
 EvalExpression(expression e)
 {
-    return(EvalSyntax(expression_syntax(e)));
+    return EvalSyntax(expression_syntax(e));
 }
 
 value 
@@ -53,7 +57,7 @@ EvalSyntax(syntax s)
 		abort();
 	}
 
-	return(v);
+	return v;
 }
 
 /* only calls to constant, symbolic or intrinsic functions might be
