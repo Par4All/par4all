@@ -38,8 +38,6 @@
 #define PIPS_NORMAL_PREFIX "C"
 
 
-
-
 /* char * pips_region_user_name(entity ent)
  * output   : the name of entity.
  * modifies : nothing.
@@ -75,8 +73,8 @@ pips_region_user_name(entity ent)
  * comment  : ps is supposed to be sorted in such a way that in equalities and 
  *            inequalities constraints containing phi variables come first.
  *            equalities with phi variables are printed first, and then 
- *            inequalities with phi variables, and then equalities and inequalities
- *            with no phi variables.
+ *            inequalities with phi variables, and then equalities and 
+ *            inequalities with no phi variables.
  */
 string
 region_sc_to_string(string s, Psysteme ps)
@@ -101,7 +99,8 @@ region_sc_to_string(string s, Psysteme ps)
     for(passe = 1; passe <= 2; passe++) {
 	bool phis = (passe == 1);
 
-	for (; (peg!=NULL) &&  ((!phis) || (phis && vect_contains_phi_p(peg->vecteur))); 
+	for (;(peg!=NULL) &&
+		 ((!phis) || (phis && vect_contains_phi_p(peg->vecteur))); 
 	     peg=peg->succ) 
 	{
 	    if(first)
@@ -123,8 +122,8 @@ region_sc_to_string(string s, Psysteme ps)
 	}
 	
 	for (;
-	     (pineg!=NULL) &&  ((!phis) || 
-				(phis && vect_contains_phi_p(pineg->vecteur))); 
+	     (pineg!=NULL) && ((!phis) || 
+			       (phis && vect_contains_phi_p(pineg->vecteur))); 
 	     pineg=pineg->succ) {
 	    if(first)
 	    first = FALSE;
@@ -139,7 +138,8 @@ region_sc_to_string(string s, Psysteme ps)
 		}
 	    if (a_la_fortran)
 		(void) sprintf(s+strlen(s),"(");
-	    inegalite_sprint_format(s,pineg, pips_region_user_name, a_la_fortran);
+	    inegalite_sprint_format(s,pineg, pips_region_user_name, 
+				    a_la_fortran);
 	    if (a_la_fortran)
 		(void) sprintf(s+strlen(s),")");
 	}
@@ -158,7 +158,8 @@ region_sc_to_string(string s, Psysteme ps)
  * input    : a region.
  * output   : a list of strings representing the region.
  * modifies : nothing.
- * comment  :	because of 'buffer', this function cannot be called twice before
+ * comment  :	because of 'buffer', this function cannot be called twice
+ * before
  * its output is processed. Also, overflows in relation_to_string() 
  * cannot be prevented. They are checked on return.
  */
@@ -181,7 +182,7 @@ words_region(region reg)
 	Pbase sorted_base = region_sorted_base_dup(reg);
 	Psysteme sc = sc_dup(region_system(reg));
 	
-	/* sorts in such a way that constraints with phi variables come first */
+      /* sorts in such a way that constraints with phi variables come first */
 	region_sc_sort(sc, sorted_base);
 
 	strcat(buffer, "-");	
@@ -197,31 +198,28 @@ words_region(region reg)
     }
     pips_assert("words_region", strlen(buffer) < REGION_BUFFER_SIZE );
 
-    switch (foresys)
+    if (foresys)
     {
-    case FALSE :
-      pc = CHAIN_SWORD(pc, "<");
-      pc = gen_nconc(pc, effect_words_reference(r));
-      if (action_read_p(ac))	  	  
-	  pc = CHAIN_SWORD(pc, get_read_action_interpretation() == READ_IS_READ ?
-			   "-R" : "-IN");
-      else 
-	  pc = CHAIN_SWORD(pc, get_write_action_interpretation() == WRITE_IS_WRITE?
-			   "-W" : "-OUT");
-      pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY" : "-EXACT");
-      pc = CHAIN_SWORD(pc, buffer);
-      pc = CHAIN_SWORD(pc, ">");
-      break;
-    case TRUE:
       pc = gen_nconc(pc, words_reference(r));
       pc = CHAIN_SWORD(pc, ", RGSTAT(");
       pc = CHAIN_SWORD(pc, action_read_p(ac) ? "R," : "W,");
       pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "MAY), " : "EXACT), ");
       pc = CHAIN_SWORD(pc, buffer);
-      break;
+    }
+    else /* PIPS prettyprint */
+    {
+	string what_action = string_undefined;
+
+	pc = CHAIN_SWORD(pc, "<");
+	pc = gen_nconc(pc, effect_words_reference(r));
+	pc = CHAIN_SWORD(pc, "-");
+	pc = CHAIN_SWORD(pc, action_interpretation(ac));
+	pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY" : "-EXACT");
+	pc = CHAIN_SWORD(pc, buffer);
+	pc = CHAIN_SWORD(pc, ">");
     }
 
-    return(pc);
+    return pc;
 }
 
 
@@ -249,8 +247,9 @@ text_region(effect reg)
     if(reg == effect_undefined)
     {
 	ADD_SENTENCE_TO_TEXT(t_reg, 
-			     make_pred_commentary_sentence(strdup("<REGION_UNDEFINED>"),
-							   str_prefix));
+			     make_pred_commentary_sentence
+			     (strdup("<REGION_UNDEFINED>"),
+			      str_prefix));
 	user_log("[region_to_string] unexpected effect undefined\n");
     }
     else
@@ -346,9 +345,7 @@ void print_region(effect r)
 
 
 
-/*********************************************************************************/
-/* STATISTICS FOR OPERATORS                                                      */
-/*********************************************************************************/
+/************************************************* STATISTICS FOR OPERATORS */
 
 
 void
@@ -377,9 +374,7 @@ print_regions_op_statistics(char *mod_name, int regions_type)
 }
 
 
-/*********************************************************************************/
-/* SORTING                                                                       */
-/*********************************************************************************/
+/***************************************************************** SORTING */
 
 
 /* Compares two effects for sorting. The first criterion is based on names.
@@ -424,9 +419,4 @@ effect_compare(effect *peff1, effect *peff2)
 
     return(eff1_pos);
 }
-
-
-
-
-
 
