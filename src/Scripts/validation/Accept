@@ -13,7 +13,7 @@
 # - several files may be piped simultaneously
 #
 # SCCS Stuff:
-# $RCSfile: Accept,v $ ($Date: 1995/09/22 09:05:04 $, ) version $Revision$,
+# $RCSfile: Accept,v $ ($Date: 1996/09/24 14:54:22 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -29,14 +29,12 @@ error()
   exit $1
 }
 
-sed -n "/^$header/s,^$header \([^ ]*\) in \([^ ]*\) :,\1 \2,p" |
+sed -n "/^$header/s,^$header \([^ ]*\) in \([^ ]*\):,\1 \2,p" |
 while read module file
 do
-  resultdir=`dirname $file`/`basename $file .f`.result
-  outfile=$resultdir/$module.out
-  reffile=$resultdir/$module
+  outfile=$file.out
+  reffile=$file
 
-  [ -d $resultdir ] || error 1 "no $resultdir"
   [ -f $outfile ] || error 2 "no $outfile"
 
   echo "accepting for $file"
