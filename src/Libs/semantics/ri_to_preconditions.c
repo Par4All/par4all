@@ -126,6 +126,16 @@ statement s;
 	/* add equivalence equalities */
 	pre = tf_equivalence_equalities_add(pre);
 
+	pre = transformer_normalize(pre);
+	if(!transformer_consistency_p(pre)) {
+	    int so = statement_ordering(s);
+	    (void) fprintf(stderr, "statement %03d (%d,%d), precondition %x end:\n",
+			   statement_number(s), ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
+			   (unsigned int) load_statement_precondition(s));
+	    (void) print_transformer(load_statement_precondition(s));
+	    pips_error("statement_to_postcondition", "Non-consistent precondition\n");
+	}
+
 	/* store the precondition in the ri */
 	store_statement_precondition(s,
 				     transformer_filter(pre,
