@@ -51,6 +51,12 @@ Panel main_panel,
 /* By default, exiting the notifyer is to exit wpips: */
 static wpips_main_loop_command_type wpips_main_loop_command = WPIPS_EXIT;
 
+/* To deal with argument parsing: */
+string static workspace_name_given_to_wpips = NULL;
+string static module_name_given_to_wpips = NULL;
+string static * files_given_to_wpips = NULL;
+int static number_of_files_given_to_wpips = 0;
+    
 
 
 void static
@@ -151,58 +157,84 @@ void create_icon()
 }
 
 
-void parse_arguments(argc, argv)
-int argc;
-char *argv[];
+/* Try to parse the WPips arguments.
+   
+   The problem is that the -emacs option need to be known early but
+   the workspace and other typical PIPS options need to be evaluate
+   later... */
+void static
+wpips_parse_arguments(int argc,
+                      char * argv[])
 {
-    string pname = NULL, mname = NULL, *files = NULL;
-    int iarg = 1, nfiles;
+   int iarg = 1;
 
-    while (iarg < argc) {
-	if (same_string_p(argv[iarg], "-emacs")) {
-	    argv[iarg] = NULL;
-            /* Wpips is called from emacs. RK. */
-            wpips_emacs_mode = 1;
-	}
-	else if (same_string_p(argv[iarg], "-workspace")) {
-	    argv[iarg] = NULL;
-	    pname = argv[++iarg];
-	}
-	else if (same_string_p(argv[iarg], "-module")) {
-	    argv[iarg] = NULL;
-	    mname = argv[++iarg];
-	}
-	else if (same_string_p(argv[iarg], "-files")) {
-	    argv[iarg] = NULL;
-	    files = &argv[++iarg];
-	    nfiles = argc-iarg;
-	}
-	else {
-	    if (argv[iarg][0] == '-') {
-		fprintf(stderr, "Usage: %s ", argv[0]);
-		fprintf(stderr, "[ X-Window options ] [ -emacs ]");
-		fprintf(stderr, "[ -workspace name [ -module name ] ");
-		fprintf(stderr, "[ -files file1.f file2.f ... ] ]\n");
-		exit(1);
-	    }
-	}
+   while (iarg < argc) {
+      if (same_string_p(argv[iarg], "-emacs")) {
+         argv[iarg] = NULL;
+         /* Wpips is called from emacs. RK. */
+         wpips_emacs_mode = 1;
+      }
+      else if (same_string_p(argv[iarg], "-workspace")) {
+         argv[iarg] = NULL;
+         workspace_name_given_to_wpips = argv[++iarg];
+      }
+      else if (same_string_p(argv[iarg], "-module")) {
+         argv[iarg] = NULL;
+         module_name_given_to_wpips = argv[++iarg];
+      }
+      else if (same_string_p(argv[iarg], "-files")) {
+         argv[iarg] = NULL;
+         files_given_to_wpips = &argv[++iarg];
+         number_of_files_given_to_wpips = argc-iarg;
+      }
+      else {
+         if (argv[iarg][0] == '-') {
+            fprintf(stderr, "Usage: %s ", argv[0]);
+            fprintf(stderr, "[ X-Window options ] [ -emacs ]");
+            fprintf(stderr, "[ -workspace name [ -module name ] ");
+            fprintf(stderr, "[ -files file1.f file2.f ... ] ]\n");
+            exit(1);
+         }
+      }
 
-	iarg += 1;
-    }
+      iarg += 1;
+   }
+}
 
-    if (pname != NULL) {
-	if (files != NULL) {
-	    db_create_program(pname);
-	    create_workspace(&nfiles, files);
-	}
-	else {
-	    open_workspace(pname);
-	}
 
-	if (mname != NULL) {
-	    open_module(mname);
-	}
-    }
+/* Execute some actions asked as option after XView initialization: */
+void static
+execute_workspace_creation_and_so_on_given_with_options()
+{
+   if (workspace_name_given_to_wpips != NULL) {
+      if (files_given_to_wpips != NULL) {
+         if (! db_create_workspace(workspace_name_given_to_wpips))
+            /* It fails, Go on with the normal WPips behaviour... */
+            return;
+         
+         if (! create_workspace(&number_of_files_given_to_wpips,
+                                files_given_to_wpips))
+            /* It fails, Go on with the normal WPips behaviour... */
+            return;
+         
+      }
+      else {
+         if (! open_workspace(workspace_name_given_to_wpips))
+            /* It fails, Go on with the normal WPips behaviour... */
+            return;
+      }
+
+      if (module_name_given_to_wpips != NULL) {
+         end_select_module_notify(module_name_given_to_wpips);
+      }
+      enable_workspace_close();
+      show_workspace();
+      enable_module_selection();
+      disable_change_directory();
+      enable_workspace_create_or_open();
+      display_memory_usage();
+      show_module();
+   }
 }
 
 
@@ -337,7 +369,7 @@ main(int argc,
            0);
 
    /* we parse remaining command line arguments */
-   parse_arguments(argc, argv);
+   wpips_parse_arguments(argc, argv);
 
    /* we create all frames */
    create_frames();
@@ -389,6 +421,8 @@ main(int argc,
 
    set_pipsmake_callback(deal_with_wpips_events_during_pipsmake);
 
+   execute_workspace_creation_and_so_on_given_with_options();
+   
    wpips_main_loop(main_frame);
    
    reset_pipsmake_callback();
