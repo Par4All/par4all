@@ -14,7 +14,7 @@
 #define FLINT_VIEW "Flint View"
 #define SEQUENTIAL_EMACS_VIEW "Emacs Sequential View"
 #define ARRAY_DFG_VIEW "Array data flow graph View"
-#define TIME_BASE_VIEW "Time base View"
+#define TIME_BASE_VIEW "Scheduling View"
 #define PLACEMENT_VIEW "Placement View"
 
 /* Labels for menu Transform */
