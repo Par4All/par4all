@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.63  1999/01/08 15:27:03  irigoin
+    Function unstructured_does_return() updated so as not to return always TRUE!
+
     Revision 1.62  1998/12/03 15:46:06  coelho
     flatten hack added.
 
@@ -34,6 +37,8 @@
 #include "ri.h"
 
 #include "ri-util.h"
+
+#include "properties.h"
 
 /******************************************************* EMPTY STATEMENT */
 /* detects a statement with no special effect...
@@ -752,7 +757,7 @@ string c; /* comments, default empty_comments (was: "" (was: string_undefined)) 
 			  STATEMENT_ORDERING_UNDEFINED,
 			  c,
 			  make_instruction(is_instruction_call,
-					   make_call(called_function,NIL)));
+					   make_call(called_function,args)));
 
     ifdebug(8) {
 	pips_debug(8, "cs is\n");
@@ -1673,7 +1678,16 @@ statement_does_return(statement s)
 bool
 unstructured_does_return(unstructured u)
 {
-  bool returns = TRUE;
+  bool returns = FALSE;
+  control entry = unstructured_control(u);
+  control exit = unstructured_exit(u);
+  list nodes = NIL;
+
+  FORWARD_CONTROL_MAP(c, {
+      returns = returns || (c==exit);
+  }, entry, nodes);
+  gen_free_list(nodes);  
+
   return returns;
 }
 
