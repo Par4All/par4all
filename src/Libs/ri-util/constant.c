@@ -195,6 +195,10 @@ MakeComplexConstantExpression(
     syntax is = expression_syntax(i);
 
     if(syntax_call_p(rs) && syntax_call_p(is)) {
+	entity re = call_function(syntax_call(rs));
+	entity ie = call_function(syntax_call(is));
+	/* re and ie must denote numerical constants */
+	if(entity_constant_p(re) && entity_constant_p(ie)) {
 	basic rb = basic_of_expression(r);
 	basic ib = basic_of_expression(i);
 	int rsize = basic_type_size(rb);
@@ -203,6 +207,7 @@ MakeComplexConstantExpression(
 
 	cce = MakeBinaryCall(local_name_to_top_level_entity
 			     (size==4? IMPLIED_COMPLEX_NAME: IMPLIED_DCOMPLEX_NAME), r, i);
+	}
     }
     return cce;
 }
