@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/09/20 15:59:01 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/09/20 16:56:59 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -188,7 +188,7 @@ dir_simple_name=`echo $dir_real_name | tr '-' '_'`
 
 # type sed
 target_dir=`echo "$current_directory" | 
-    sed 's,.*/Development/,,;s,.*/Production/Src/,,;'`
+    sed 's,.*/Development/,,;s,.*/Src/,,;'`
 
 echo "Making $DIRTYPE $PART $MAKEFILE in $dir_real_name ($DIRSIDE $target_dir)"
 
