@@ -240,14 +240,33 @@ in_effects_of_test(test t)
     debug_consistent(l_in);
 }
 
+/* Rin[while (c) s] = Rr[while (c) s] * may
+ */
+static void in_effects_of_whileloop(whileloop w)
+{
+  statement current;
+  list /* of effect */ lin;
+
+  pips_debug(9, "considering while loop 0x%p\n", (void *) w);
+
+  current = effects_private_current_stmt_head();
+  lin = load_rw_effects_list(current);
+  lin = effects_read_effects_dup(lin);
+  /* switch to MAY... */
+  MAP(EFFECT, e, 
+      approximation_tag(effect_approximation(e)) = is_approximation_may,
+      lin);
+  store_in_effects_list(current, lin);
+  store_invariant_in_effects_list(current, NIL);
+}
+
 /* list in_effects_of_loop(loop l)
  * input    : a loop, its transformer and its context.
  * output   : the corresponding list of in regions.
  * modifies : in_regions_map.
  * comment  : IN(loop) = proj[i] (proj[i'] (IN(i) - W(i', i'<i))) U IN(i=1))
  */
-static void
-in_effects_of_loop(loop l)
+static void in_effects_of_loop(loop l)
 {
     statement current_stat = effects_private_current_stmt_head();
     
@@ -585,23 +604,24 @@ in_effects_of_unstructured(unstructured u)
 static void
 in_effects_of_module_statement(statement module_stat)
 {    
-    make_effects_private_current_stmt_stack();
+  make_effects_private_current_stmt_stack();
   
-     pips_debug(1,"begin\n");
-    
-    gen_multi_recurse(
+  pips_debug(1,"begin\n");
+  
+  gen_multi_recurse(
 	module_stat, 
 	statement_domain, in_effects_stmt_filter, in_effects_of_statement,
 	sequence_domain, gen_true, in_effects_of_sequence,
 	test_domain, gen_true, in_effects_of_test,
 	call_domain, gen_true, in_effects_of_call,
 	loop_domain, gen_true, in_effects_of_loop,
+	whileloop_domain, gen_true, in_effects_of_whileloop,
 	unstructured_domain, gen_true, in_effects_of_unstructured,
 	expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
 	NULL);     
 
-    pips_debug(1,"end\n");
-    free_effects_private_current_stmt_stack();
+  pips_debug(1,"end\n");
+  free_effects_private_current_stmt_stack();
 }
 
 
@@ -614,8 +634,7 @@ in_effects_of_module_statement(statement module_stat)
  * modifies : 
  * comment  : computes the in effects of the current module.	
  */
-bool
-in_effects_engine(char *module_name)
+bool in_effects_engine(char * module_name)
 {
     statement module_stat;
     make_effects_private_current_context_stack();
