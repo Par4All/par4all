@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.36  2000/02/03 11:52:53  zory
+ * bon ben faut installer... FC>
+ *
  * Revision 1.35  1999/08/04 16:38:26  zory
  * new strategies added.
  *
@@ -1194,6 +1197,15 @@ static optimization_strategy
     TRUE,
     FALSE
   },
+  {  /* EOLE and Huffman and Simplify with gravity - most balanced tree*/
+    /* WITHOUT FMA EXTRACTION */
+    "ultraIIi",
+    TRUE, expression_gravity, TRUE,
+    "0", TRUE, "", FALSE, "",
+    TRUE, TRUE, 
+    FALSE,
+    FALSE
+  },
   { /* whatever you want */
     "test",
     TRUE, expression_gravity, TRUE,
@@ -1255,7 +1267,8 @@ static optimization_strategy
     TRUE, expression_gravity, TRUE,
     "0", TRUE, "", TRUE, "-m",
     TRUE, TRUE,
-    TRUE    
+    TRUE,
+    TRUE
   },
   /* this one MUST be the last one! */
   {
