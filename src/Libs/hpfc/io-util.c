@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/10/18 22:26:21 $, )
+ * ($Date: 1996/12/24 15:22:42 $, )
  */
 
 #include "defines-local.h"
@@ -369,7 +369,7 @@ statement *psh, *psn;
 
     sc_rm(proc_cond_tmp), sc_rm(proc_cond);
 
-    comment = concatenate("c ", 
+    comment = concatenate("! ", 
 			  movement_update_p(move) ? "updating" : "collecting",
 			  " distributed variable ",
 			  entity_local_name(array), "\n", NULL);
@@ -377,7 +377,7 @@ statement *psh, *psn;
     statement_comments(*psh) = strdup(comment);
     statement_comments(*psn) = strdup(comment);
 
-    comment = concatenate("c end of ",
+    comment = concatenate("! end of ",
 			  movement_update_p(move) ? "update" : "collect",
 			  "\n", NULL);
     statement_comments(h_cont) = strdup(comment);
@@ -468,12 +468,12 @@ statement *psh, *psn;
 
     /*   some comments are generated to help understand the code
      */
-    comment = concatenate("c updating shared variable ",
+    comment = concatenate("! updating shared variable ",
 			  entity_local_name(array), "\n", NULL);
     statement_comments(*psh) = strdup(comment);
     statement_comments(*psn) = strdup(comment);
-    statement_comments(h_cont) = strdup("c end of update\n");
-    statement_comments(n_cont) = strdup("c end of update\n");
+    statement_comments(h_cont) = strdup("! end of update\n");
+    statement_comments(n_cont) = strdup("! end of update\n");
 }
 
 /* that is all
