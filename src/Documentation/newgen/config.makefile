@@ -28,7 +28,8 @@ FTEXF =	complexity_ri.ftex \
 	reduction.ftex \
 	message.ftex \
 	text.ftex \
-	hpf.ftex
+	hpf.ftex \
+	sac.ftex
 
 SOURCES = $(ETEXF) $(FTEXF) unstructured.idraw newgen_domain.sty
 
