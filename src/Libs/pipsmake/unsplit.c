@@ -7,6 +7,12 @@
  * generated, they should also be stored there. 
  * 
  * $Log: unsplit.c,v $
+ * Revision 1.9  2003/12/19 17:42:16  irigoin
+ * unsplit() extended to cope with preprocessed file such as .F and .c
+ * files. In .F case, initial file name is not exactly regenerated since
+ * preprocessing is now useless: preprocessing cannot be undone. In .c case,
+ * include files may clutter the unsplitted files.
+ *
  * Revision 1.8  2003/08/18 14:18:53  coelho
  * warns--
  *
@@ -50,24 +56,58 @@ static hash_table user_files = hash_table_undefined;
 /* returns the new user file where to store user_file
  */
 static string 
-get_new_user_file(string dir_name, string user_file)
+get_new_user_file(string dir_name, string preprocessed_user_file)
 {
-    string s = hash_get(user_files, user_file);
-    if (s==HASH_UNDEFINED_VALUE) 
-    {
-	FILE * tmp;
-	string name = pips_basename(user_file, NULL);
-	s = strdup(concatenate(dir_name, "/", name, 0));
-	hash_put(user_files, user_file, s);
-	/* could check that the file does not exist...
-	 * there could be homonymes...
-	 */
-	tmp = safe_fopen(s, "w");
-	fprintf(tmp, "!!\n!! file for %s\n!!\n", name);
-	safe_fclose(tmp, s);
-	free(name);
+  /* C or Fortran preprocessing may have or have not occured */
+  extern string preprocessed_to_user_file(string);
+  extern bool dot_f_file_p(string);
+  extern bool dot_c_file_p(string);
+  string user_file = preprocessed_to_user_file(preprocessed_user_file);
+  string s = hash_get(user_files, user_file);
+
+  if (s==HASH_UNDEFINED_VALUE) {
+    FILE * tmp;
+    string name = pips_basename(user_file, NULL);
+
+    pips_debug(1,
+	       "It does not exist a file \"%p\"\n for user_file \"%s\"\n"
+	       " and for preprocessed_user_file \"%s\".\n"
+	       "in table %p\n",
+	       s, user_file, preprocessed_user_file, user_files);
+    s = strdup(concatenate(dir_name, "/", name, 0));
+    hash_put(user_files, user_file, s);
+    /* could check that the file does not exist...
+     * there could be homonymes...
+     */
+    if((tmp=fopen(s, "r"))!=NULL) {
+      pips_internal_error("Rewriting existing file \"%s\" for user_file \"%s\""
+			  " and for preprocessed_user_file \"%s\".\n",
+			  s, user_file, preprocessed_user_file);
     }
-    return s;
+    tmp = safe_fopen(s, "w");
+    if(dot_f_file_p(user_file)) {
+      fprintf(tmp, "!!\n!! file for %s\n!!\n", name);
+    }
+    else if(dot_c_file_p(user_file)) {
+      fprintf(tmp, "/*\n * file for %s\n */\n", name);
+    }
+    else {
+      pips_internal_error("unexpected user file suffix: \"%s\"\n", user_file);
+    }
+    safe_fclose(tmp, s);
+    free(name);
+  }
+  else {
+    pips_debug(1,
+	       "It does exist a file \"%s\"\n for user_file \"%s\"\n"
+	       " and for preprocessed_user_file \"%s\".\n"
+	       "in table %p\n",
+	       s, user_file, preprocessed_user_file, user_files);
+  }
+  /* Do not free it, as it is used in the hash table and will be freed
+     later with the hash table */
+  /* free(user_file); */
+  return s;
 }
 
 /* unsplit > PROGRAM.user_file
@@ -79,10 +119,11 @@ unsplit(string name)
 {
     gen_array_t modules = db_get_module_list_initial_order();
     int n = gen_array_nitems(modules), i;
-    string src_dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE),
-	summary_name = db_build_file_resource_name
-	(DBR_USER_FILE, PROGRAM_RESOURCE_OWNER, ".txt"), 
-	summary_full_name, dir_name;
+    string src_dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
+    string summary_name = db_build_file_resource_name
+      (DBR_USER_FILE, PROGRAM_RESOURCE_OWNER, ".txt");
+    string summary_full_name;
+    string dir_name;
     FILE * summary;
 
     pips_assert("unused argument", name==name);
@@ -105,6 +146,7 @@ unsplit(string name)
 
 	module = gen_array_item(modules, i);
 	user_file = db_get_memory_resource(DBR_USER_FILE, module, TRUE);
+	pips_debug(1, "Module: \"%s\", user_file: \"%s\"\n", module, user_file);
 	new_user_file = get_new_user_file(src_dir, user_file);
 	printed_file = db_get_memory_resource(DBR_PRINTED_FILE, module, TRUE);
 	full = strdup(concatenate(dir_name, "/", printed_file, 0));
