@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.19  2003/06/13 13:59:07  coelho
+  const out.
+
   Revision 1.18  2003/06/13 13:54:47  coelho
   hop.
 
@@ -56,13 +59,14 @@
 
 /* global constants to designate exceptions.
    to be put in the type field bellow.
+   cproto 4.6 does not line 'const'...
 */
-const unsigned int overflow_error = 1;
-const unsigned int simplex_arithmetic_error = 2;
-const unsigned int user_exception_error = 4;
-const unsigned int parser_exception_error = 8;
-const unsigned int timeout_error = 16;
-const unsigned int any_exception_error = ~0;
+unsigned int overflow_error = 1;
+unsigned int simplex_arithmetic_error = 2;
+unsigned int user_exception_error = 4;
+unsigned int parser_exception_error = 8;
+unsigned int timeout_error = 16;
+unsigned int any_exception_error = ~0;
 
 /* keep track of last thrown exception for RETHROW()
  */
