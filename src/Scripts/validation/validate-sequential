@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/04/08 09:23:18 $, ) 
+# ($Date: 1997/04/09 08:19:21 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -264,12 +264,14 @@ test_aspect()
      
      rm -f $tmpout $tmperr
 
+     echo "considering directory `basename $aspect` file $name.[fF]" > $tmperr
+
      #
      # .test case
 
      if [ -f $aspect/$name.test ] 
      then
-       echo "testing with $name.test" > $tmperr
+       echo "testing with $name.test" >> $tmperr
        $aspect/$name.test > $tmpout 2>> $tmperr
        STATUS=$?
        [ -f core ] && rm -f core
@@ -289,7 +291,7 @@ or $tpips_version" || \
 
      if [ -r $aspect/$name.tpips ]
      then
-       echo "testing with $name.tpips" > $tmperr
+       echo "testing with $name.tpips" >> $tmperr
        $tpips_version $aspect/$name.tpips > $tmpout 2>> $tmperr
        STATUS=$?
        test -f core && rm -f core
@@ -308,7 +310,7 @@ failed with $tpips_version" || \
      
      if [ -f $aspect/default_test ]
      then
-       echo "testing with default_test" > $tmperr
+       echo "testing with default_test" >> $tmperr
        sed "s/tested_file/$name/g;s/TESTED_FILE/$u_name/g" \
        $aspect/default_test > $aspect/$name.test
        chmod ugo+x $aspect/$name.test
@@ -325,8 +327,7 @@ failed with $tpips_version" || \
      
      #
      # default case
-     $DEBUG " || default case"
-     echo "testing with none (parallelize)" > $tmperr
+     echo "testing with none (parallelize)" >> $tmperr
      Init -f $file -d $name > $tmpout 2>> $tmperr
      report $? "Cannot initialize $file" || continue
      
@@ -335,7 +336,7 @@ failed with $tpips_version" || \
        STATUS=$?
        [ -f core ] && rm -f core
 
-       report $STATUS "Cannot parallelize module $module in $file with $pips_version" || continue
+       report $STATUS "Cannot parallelize module $module in $file with $pips_version or $tpips_version" || continue
        
        make_diff $aspect $name $module
      done
