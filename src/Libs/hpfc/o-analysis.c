@@ -14,6 +14,7 @@
 extern int      fprintf();
 
 #include "genC.h"
+#include "hash.h"
 
 #include "ri.h"
 #include "hpf.h"
@@ -506,14 +507,26 @@ list lpref, lkref;
 	    ta = access_tag(INT(CAR(lk)));
 	int
 	    p = 0,
-	    shift = vect_coeff(TSHIFTV, PVECTOR(CAR(lp)));
+	    shift = vect_coeff(TSHIFTV, PVECTOR(CAR(lp))),
+	    dlt = vect_coeff(DELTAV, PVECTOR(CAR(lp))),
+	    t2 = vect_coeff(TEMPLATEV, PVECTOR(CAR(lp)));
 
-	if ((ta==local_star) ||
+	if ((ta==not_aligned) ||
+	    (ta==local_star) ||
 	    (ta==aligned_star) ||
-	    (ta==aligned_constant) || /* ??? something could be done? */
+	    ((ta==aligned_constant) &&
+	     (!on_same_proc_p(t2-dlt, t2,
+			     array_to_template(array), 
+			     template_dimension_of_array_dimension(array, i)))) ||
 	    ((ta==aligned_shift) &&
 	     (shift>DistributionParameterOfArrayDim(array, i, &p))))
+	{
+	    debug(5, "message_manageable_p",
+		  "returning false for %s, dim %d, access %d\n",
+		  entity_name(array), i, ta);
+
 	    return(FALSE);
+	}
 
 	i++;
     }
@@ -662,13 +675,17 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
 	     int
 		 ub = HpfcExpressionToInt(range_upper(rg));
 	     entity
-		 newindex = NewTemporaryVariable(nodemodule, is_basic_int);
+		 newindex = NewTemporaryVariable(nodemodule, 
+						 MakeBasic(is_basic_int));
 	     entity
-		 newlobnd = NewTemporaryVariable(nodemodule, is_basic_int);
+		 newlobnd = NewTemporaryVariable(nodemodule, 
+						 MakeBasic(is_basic_int));
 	     entity
-		 newupbnd = NewTemporaryVariable(nodemodule, is_basic_int);
+		 newupbnd = NewTemporaryVariable(nodemodule, 
+						 MakeBasic(is_basic_int));
 	     entity
-		 oldidxvl = NewTemporaryVariable(nodemodule, is_basic_int);
+		 oldidxvl = NewTemporaryVariable(nodemodule, 
+						 MakeBasic(is_basic_int));
 
 	     boundcomp = gen_nconc(boundcomp,
 				   CONS(STATEMENT,
@@ -705,9 +722,6 @@ list Wa, Ra, Ro, lWa, lRa, lRo;
 	 }
      },
 	 lloop);
-
-/*    debug(6, "Overlap_Analysis",*/
-	  
 
     update_indices_for_local_computation(new_indexes, Wa, lWa);
     update_indices_for_local_computation(new_indexes, Ra, lRa);
@@ -1109,4 +1123,21 @@ entity a;
     }
    
     return(n);
+}
+
+/*
+ * bool on_same_proc_p(t1, t2, temp, dim)
+ *
+ * true if the given template elements on the specified dimension
+ * are mapped on the same processor.
+ */
+bool on_same_proc_p(t1, t2, template, dim)
+int t1, t2;
+entity template;
+int dim;
+{
+    int p;
+
+    return(processor_number(template, dim, t1, &p) ==
+	   processor_number(template, dim, t2, &p));
 }
