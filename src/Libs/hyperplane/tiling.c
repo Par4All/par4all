@@ -3,6 +3,9 @@
  * $Id$
  * 
  * $Log: tiling.c,v $
+ * Revision 1.5  1998/11/18 14:51:28  irigoin
+ * insure coherency of specified tiling wrt the loop depth.
+ *
  * Revision 1.4  1998/10/13 07:17:53  irigoin
  * Intermediate version of tiling which works on at least a small set of
  * cases for Martin Griebl's visit.
@@ -96,8 +99,9 @@ interactive_partitioning_matrix(matrice P, int n)
     debug(8, "interactive_partitioning_matrix", "Reading P\n");
 
     for(row=1; row<=n; row++) {
-	resp = user_request("Partitioning matrix?\n"
-			    "(give all its integer coordinates on one line per row): ");
+	resp = user_request("Partitioning matrix (%dx%d)?\n"
+			    "(give all its integer coordinates on one line of %d per row): ",
+			    n, n, n);
 	if (resp[0] == '\0') {
 	    user_log("Tiling loop transformation has been cancelled.\n");
 	    return_status = FALSE;
