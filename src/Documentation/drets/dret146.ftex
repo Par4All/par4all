@@ -1,7 +1,7 @@
 %
 % Documentation de l'environnement de de'veloppement PIPS
 %
-% $RCSfile: dret146.ftex,v $ ($Date: 1994/11/21 09:10:56 $) version $Revision$, got on %D%, %T%
+% $RCSfile: dret146.ftex,v $ ($Date: 1994/11/21 09:11:49 $) version $Revision$, got on %D%, %T%
 % %A%
 %
 
@@ -27,7 +27,7 @@
                         Be'atrice APVRILLE 
 }
 %\newcommand{\docdate}{7 octobre 1993}
-\newcommand{\docdate}{$Date: 1994/11/21 09:10:56 $}
+\newcommand{\docdate}{$Date: 1994/11/21 09:11:49 $}
 
 \begin{document}
 
@@ -715,7 +715,7 @@ On suppose que la fonction {\tt void phase(char *module\_name)} a de'ja` e'te'
 de'clare'e dans une des bibliothe`ques.
 
 \item exe'cuter la commande {\tt make all} pour de'river de ce fichier de 
-re`gles les fichiers {\tt phases.h}, {\tt resources.h} et {\tt builder_map.h}
+re`gles les fichiers {\tt phases.h}, {\tt resources.h} et {\tt builder\_map.h}
 place's dans {\tt \$INCLUDEDIR}, et les fichiers {\tt pipsmake.rc} et {\tt
 wpips.rc} place's dans {\tt \$LIBDIR}.
 
