@@ -2,6 +2,12 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.90  1998/01/24 10:06:51  coelho
+ * + tpips rc file.
+ * + -r option.
+ * + pips_thanks().
+ * + cleaner tpips_behaves_like_a_shell().
+ *
  * Revision 1.89  1997/12/15 14:21:37  coelho
  * help fixed...
  *
@@ -84,8 +90,8 @@
 /********************************************************** Static variables */
 
 bool tpips_execution_mode = TRUE;
-bool tpips_behaves_like_a_shell = FALSE;
 
+static bool tpips_is_a_shell = FALSE;
 static bool use_readline = FALSE;
 static FILE * logfile;
 static FILE * current_file; /* current file being processed */
@@ -96,23 +102,16 @@ extern void tp_restart( FILE * ); /* tp_lex.c */
 /*************************************************************** Some Macros */
 
 #define tpips_usage							\
-  "Usage: %s [-nscvh?] [-l logfile] [-e tpips-cmds] tpips-scripts\n"	\
+  "Usage: %s [-nscvh?] "						\
+  "[-l logfile] [-r rcfile] [-e tpips-cmds] tpips-scripts\n"		\
   "\t-n: no execution mode. just to check a script for syntax errors\n"	\
   "\t-s: behaves like a shell. tpips commands simply extend a shell.\n"	\
   "\t-c: behaves like a command, not a shell (it is the default).\n"	\
   "\t-h: this help. (also -?)\n"					\
   "\t-v: display version and architecture informations.\n"		\
-  "\t-l logfile: log to logfile\n"					\
+  "\t-l logfile: log to logfile.\n"					\
+  "\t-r rcfile: tpips rc file to source. (default ~/.tpipsrc)\n"	\
   "\t-e tpips-cmds: here tpips commands.\n"
-
-#define before_initial_prompt						\
-  "tpips (ARCH=" SOFT_ARCH ")\n\n"					\
-  "  (c) 1988-1997 Centre de Recherche en Informatique,\n"		\
-  "                École des mines de Paris, France.\n\n"		\
-  "  URL: http://www.cri.ensmp.fr/pips\n"				\
-  "  MAIL: pipsgroup@cri.ensmp.fr\n\n"					\
-  "  This software is provided as is, under the terms of the GPL.\n"	\
-  "  It includes software from GNU (readline, rx) and Berkeley (fsplit).\n\n"
 
 #define SEPARATOR_P(c) (index (" \t", c))
 
@@ -121,6 +120,25 @@ prefix_equal_p(string str, string prf)
 {
     skip_blanks(str);
     return !strncmp(str, prf, strlen(prf));
+}
+
+static bool 
+string_is_true(string s)
+{
+    return s && (*s=='1' || *s=='t' || *s=='T' || *s=='y' || *s=='Y' || 
+		 *s=='o' || *s=='O');
+}
+
+/* whether pips should behave as a shell. can be turned on from
+ * the command line, from properties and from the environment.
+ * the default is FALSE, but if the user name is coelho.
+ */
+#define TPIPS_IS_A_SHELL "TPIPS_IS_A_SHELL"
+bool 
+tpips_behaves_like_a_shell(void)
+{
+    return tpips_is_a_shell || get_bool_property(TPIPS_IS_A_SHELL) ||
+	string_is_true(getenv(TPIPS_IS_A_SHELL));
 }
 
 /********************************************************** TPIPS COMPLETION */
@@ -836,7 +854,7 @@ tpips_exec(char * line)
 void 
 tpips_process_a_file(FILE * file, bool use_rl)
 {
-    static readline_initialized = FALSE;
+    static bool readline_initialized = FALSE;
     char * line;
     FILE * saved = current_file;
     bool saved_use_rl = use_readline;
@@ -850,9 +868,6 @@ tpips_process_a_file(FILE * file, bool use_rl)
 	initialize_readline();
 	initialize_tpips_history();
 	readline_initialized = TRUE;
-
-	fprintf(stdout, before_initial_prompt);
-	fflush(stdout);
     }
 
     /* interactive loop
@@ -867,6 +882,13 @@ tpips_process_a_file(FILE * file, bool use_rl)
     use_readline = saved_use_rl;
 }
 
+/* default .tpipsrc is $HOME/.tpipsrc. the returned string is allocated.
+ */
+static string default_tpipsrc(void)
+{
+    return strdup(concatenate(getenv("HOME"), "/.tpipsrc", 0));
+}
+
 extern char *optarg;
 extern int optind;
 
@@ -874,23 +896,16 @@ static void
 parse_arguments(int argc, char * argv[])
 {
     int c;
-    string user;
+    string tpipsrc = default_tpipsrc();
 
-    /* default for me is -s. FC.
-     * this is not done directly thru properties because 
-     * they should not be initialized to early.
-     */
-    user = getlogin();
-    tpips_behaves_like_a_shell = user && same_string_p(user, "coelho");
-
-    while ((c = getopt(argc, argv, "ne:l:h?vsc")) != -1) {
+    while ((c = getopt(argc, argv, "ne:l:h?vscr:")) != -1) {
 	switch (c)
 	{
 	case 's':
-	    tpips_behaves_like_a_shell = TRUE;
+	    tpips_is_a_shell = TRUE;
 	    break;
 	case 'c':
-	    tpips_behaves_like_a_shell = FALSE;
+	    tpips_is_a_shell = FALSE;
 	    break;
 	case 'l':
 	    logfile = safe_fopen (optarg,"w");
@@ -909,7 +924,25 @@ parse_arguments(int argc, char * argv[])
 	case 'v': 
 	    fprintf(stderr, "tpips: (ARCH=%s) %s\n", SOFT_ARCH, argv[0]);
             break;
+	case 'r': 
+	    free(tpipsrc);
+	    tpipsrc = strdup(optarg);
+	    break;
 	}
+    }
+
+    /* sources ~/.tpipsrc or the like, if any.
+     */
+    if (tpipsrc) {
+	if (file_exists_p(tpipsrc)) {
+	    FILE * rc = fopen(tpipsrc, "r");
+	    if (rc) {
+		user_log("sourcing tpips rc file: %s\n", tpipsrc);
+		tpips_process_a_file(rc, FALSE);
+		fclose(rc);
+	    }
+	}
+	free(tpipsrc), tpipsrc=NULL;
     }
 
     if (argc == optind)
@@ -989,6 +1022,7 @@ int
 tpips_main(int argc, char * argv[])
 {
     debug_on("TPIPS_DEBUG_LEVEL");
+    pips_thanks("tpips");
     pips_log_handler = tpips_user_log;
     {
 	string pid = (char*) malloc(sizeof(char)*20);
