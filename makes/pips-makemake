@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.306  1997/08/18 12:39:03  coelho
+# added clean of fpips in libs.
+#
 # Revision 1.305  1997/08/18 12:36:45  coelho
 # fixed main clean for Libs.
 #
@@ -557,7 +560,7 @@ SOURCES+= 	\$(INCLUDES) \$(CFILES) \$(DOCS) \$(LIB_MAIN)
 
 clean-compiled:
 	\$(RM) \$(OBJECTS) \$(LIB_TARGET) \$(BIN_TARGET) \\
-		\$(ARCH)/pips \$(ARCH)/[tw]pips
+		\$(ARCH)/pips \$(ARCH)/[ftw]pips
 
 clean: generate_makefile_if_necessary_and_possible clean-compiled
 	-\$(RM) TAGS \$(BIN_TARGET) \$(DERIVED_HEADERS) \$(DERIVED_CFILES) \\
