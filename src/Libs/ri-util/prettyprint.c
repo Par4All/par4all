@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/13 09:58:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/18 11:40:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/10/13 09:58:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1995/10/18 11:40:28 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -634,7 +634,7 @@ int n;
     }
     return(r) ;
 }
-
+
 text text_loop(module, label, margin, obj, n)
 entity module;
 string label;
@@ -646,20 +646,22 @@ int n ;
     cons *pc ;
     unformatted u ;
     statement body = loop_body( obj ) ;
-    string do_label = 
-	    entity_local_name(loop_label( obj ))+strlen(LABEL_PREFIX) ;
+    entity the_label = loop_label(obj);
+    string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
     bool structured_do = empty_local_label_name_p( do_label );
     bool doall_loop_p = FALSE ;
     bool pp_all_priv_var_p = 
 	get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
+    bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
+    
 
-    if(get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT")) {
-	string st = concatenate("C     INITIALLY: DO ", do_label, NULL);
-
-	ADD_SENTENCE_TO_TEXT(r, 
-			     make_sentence(is_sentence_formatted, strdup(st)));
+    if(!structured_do && do_enddo_p)
+    {
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+	  strdup(concatenate("C     INITIALLY: DO ", do_label, "\n", NULL))));
     }
-    switch( execution_tag(loop_execution(obj)) ) {
+
+    switch(execution_tag(loop_execution(obj)) ) {
     case is_execution_sequential:
 	doall_loop_p = FALSE;
 	break ;
@@ -696,7 +698,7 @@ int n ;
     }
     pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
 
-    if(!structured_do && !doall_loop_p) {
+    if(!structured_do && !doall_loop_p && !do_enddo_p) {
 	pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
     }
     pc = CHAIN_SWORD(pc, entity_local_name(loop_index(obj)));
@@ -719,7 +721,7 @@ int n ;
 		pc = CHAIN_SWORD(pc, entity_local_name(p));
 		pc = CHAIN_SWORD(pc,
 				 ( (ENDP(CDR(ps))) || (!pp_all_priv_var_p &&
-						       (ENTITY(CAR(CDR(ps))) == loop_index(obj))
+				  (ENTITY(CAR(CDR(ps))) == loop_index(obj))
 						       )
 				  )?
 				 "" : ",");
@@ -742,16 +744,17 @@ int n ;
     }
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
 
-    if(structured_do || 
-       doall_loop_p || 
+    if(structured_do || doall_loop_p || do_enddo_p ||
        get_bool_property("PRETTYPRINT_CRAY") ||
        get_bool_property("PRETTYPRINT_CRAFT") ||
-       get_bool_property("PRETTYPRINT_CMFORTRAN")) {
+       get_bool_property("PRETTYPRINT_CMFORTRAN"))
+    {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
     }
-    return(r);
+
+    return r;
 }
-
+
 text init_text_statement(module, margin, obj)
 entity module;
 int margin;
@@ -891,7 +894,7 @@ statement stat;
 
    return(r);
 }
-
+
 text text_graph(), text_control() ;
 string control_slabel() ;
 
@@ -1030,7 +1033,7 @@ text_unstructured(entity module,
    set_free(trail) ;
    return(r) ;
 }
-
+
 /* CONTROL_SLABEL returns a freshly allocated label name for the control
 node C in the module M. H maps controls to label names. Computes a new
 label name. */
