@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/07/24 11:23:10 $, 
+ * $Date: 1996/07/24 11:33:53 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
