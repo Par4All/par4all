@@ -439,6 +439,7 @@ DeclareVariable(
 {
     type et = entity_type(e);
     list etd = list_undefined;
+    bool variable_had_implicit_type_p = FALSE;
 
     debug(8, "DeclareVariable", "%s\n", entity_name(e));
     pips_assert("DeclareVariable", t == type_undefined || type_variable_p(t));
@@ -508,6 +509,8 @@ DeclareVariable(
 			    variable_dimensions(type_variable(t))==NIL);
 		if(implicit_type_p(e)){
 		    type nt;
+
+		    variable_had_implicit_type_p = TRUE;
 
 		    /* set dimension etd if NIL */
 		    if(etd==NIL)
@@ -597,6 +600,50 @@ DeclareVariable(
     }
 
     AddEntityToDeclarations(e, get_current_module_entity());
+
+    /* If the return variable is retyped, the function must be retyped */
+
+    if(!type_undefined_p(t) && !storage_undefined_p(entity_storage(e)) 
+       && storage_return_p(entity_storage(e))) {
+	entity f = get_current_module_entity();
+	type tf = entity_type(f);
+	functional func = type_functional(tf);
+	type tr = functional_result(func);
+	basic old = variable_basic(type_variable(tr));
+	basic new = variable_basic(type_variable(t));
+
+	pips_assert("Return variable and function must have the same name",
+		    strcmp(entity_local_name(e), module_local_name(f)) == 0 );
+	pips_assert("Function must have functional type", type_functional_p(tf));
+	pips_assert("New type must be of kind variable", type_variable_p(t));
+
+	if(!type_equal_p(tr, t)) {
+	    if(variable_had_implicit_type_p) {
+		debug(8, "DeclareVariable", " Type for result of function %s "
+		      "changed from %s to %s\n", module_local_name(f),
+			     basic_to_string(old), basic_to_string(new));
+		free_type(functional_result(func));
+		old = basic_undefined; /* the pointed area has just been freed! */
+		functional_result(func) = t;
+	    }
+	    else {
+		user_warning("DeclareVariable",
+			     "Attempt to retype function %s with result of type "
+			     "%s with new type %s\n", module_local_name(f),
+			     basic_to_string(old), basic_to_string(new));
+		ParserError("DeclareVariable", "Illegal retyping");
+	    }
+	}
+	else {
+	    /* Meaningless warning when the result variable is declared the first time
+	     * with the function itself
+	     * user_warning("DeclareVariable",
+	     *	     "Attempt to retype function %s with result of type "
+	     *	     "%s with very same type %s\n", module_local_name(f),
+	     *	     basic_to_string(old), basic_to_string(new));
+	     */
+	}
+    }
 }
 
 /*
@@ -1450,6 +1497,44 @@ entity c;
     return updated;
 }
 
+void
+fprint_functional(FILE * fd, functional f)
+{
+    type tr = functional_result(f);
+
+    MAPL(cp, {
+	parameter p = PARAMETER(CAR(cp));
+	type ta = parameter_type(p);
+
+	pips_assert("Argument type is variable or varags:variable", type_variable_p(ta)
+		    || (type_varargs_p(ta) && type_variable_p(type_varargs(ta))));
+	if(type_varargs_p(ta)) {
+	    (void) fprintf(fd, " %s:", type_to_string(ta));
+	    ta = type_varargs(ta);
+	}
+	(void) fprintf(fd, "%s", basic_to_string(variable_basic(type_variable(ta))));
+	if(!ENDP(cp->cdr))
+	    (void) fprintf(fd, " x ");
+    },
+	functional_parameters(f));
+
+    if(ENDP(functional_parameters(f))) {
+	(void) fprintf(fd, " ()");
+    }
+    (void) fprintf(fd, " -> ");
+
+    if(type_variable_p(tr))
+	(void) fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(tr))));
+    else if(type_void_p(tr))
+	(void) fprintf(fd, " %s\n", type_to_string(tr));
+    else if(type_varargs_p(tr)) {
+	(void) fprintf(fd, " %s:%s", type_to_string(tr),
+		       basic_to_string(variable_basic(type_variable(type_varargs(tr)))));
+    }
+    else
+	pips_error("fprint_functional", "Ill. type %d\n", type_tag(tr));
+}
+
 void 
 fprint_environment(FILE * fd, entity m)
 {
@@ -1459,8 +1544,10 @@ fprint_environment(FILE * fd, entity m)
 
     decls = code_declarations(value_code(entity_initial(m)));
 
-    (void) fprintf(fd, "\nDeclarations for module %s\n\n", 
+    (void) fprintf(fd, "\nDeclarations for module %s with type ", 
 		   module_local_name(m));
+    fprint_functional(fd, type_functional(entity_type(m)));
+    (void) fprintf(fd, "\n\n");
 
     /* List of implicitly and explicitly declared variables, 
        functions and areas */
@@ -1476,40 +1563,7 @@ fprint_environment(FILE * fd, entity m)
 	if(type_variable_p(t))
 	    fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(t))));
 	else if(type_functional_p(t)) {
-	    functional f = type_functional(t);
-	    type tr = functional_result(f);
-
-	    MAPL(cp, {
-		parameter p = PARAMETER(CAR(cp));
-		type ta = parameter_type(p);
-
-		pips_assert("Argument type is variable or varags:variable", type_variable_p(ta)
-			    || (type_varargs_p(ta) && type_variable_p(type_varargs(ta))));
-		if(type_varargs_p(ta)) {
-		    (void) fprintf(fd, " %s:", type_to_string(ta));
-		    ta = type_varargs(ta);
-		}
-		(void) fprintf(fd, "%s", basic_to_string(variable_basic(type_variable(ta))));
-		if(!ENDP(cp->cdr))
-		    (void) fprintf(fd, " x ");
-	    },
-	    functional_parameters(f));
-
-	    if(ENDP(functional_parameters(f))) {
-		(void) fprintf(fd, " ()");
-	    }
-	    (void) fprintf(fd, " -> ");
-
-	    if(type_variable_p(tr))
-		(void) fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(tr))));
-	    else if(type_void_p(tr))
-		(void) fprintf(fd, " %s\n", type_to_string(tr));
-	    else if(type_varargs_p(tr)) {
-		(void) fprintf(fd, " %s:%s", type_to_string(tr),
-			       basic_to_string(variable_basic(type_variable(type_varargs(tr)))));
-	    }
-	    else
-		pips_error("fprint_environment", "Ill. type %d\n", type_tag(tr));
+	    fprint_functional(fd, type_functional(t));
 	}
 	else if(type_area_p(t)) {
 	    (void) fprintf(fd, "with size %d\n", area_size(type_area(t)));
