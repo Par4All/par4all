@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1996/06/17 22:11:34 $, 
+ * $Date: 1996/06/19 13:56:40 $, 
  *
  * utilities for reductions.
  *
@@ -296,12 +296,17 @@ bool pure_function_p(entity f)
 	return TRUE;
     /* else */
 
-    MAP(EFFECT, e,
+    if (entity_module_p(f))
     {
-	if (effect_write_p(e)) return FALSE; /* a side effect!? */
-	if (io_effect_entity_p(effect_variable(e))) return FALSE; /* LUNS */
-    },
+	MAP(EFFECT, e,
+	    {
+		if (effect_write_p(e)) /* a side effect!? */
+		    return FALSE; 
+		if (io_effect_entity_p(effect_variable(e))) /* LUNS */
+		    return FALSE; 
+	    },
 	load_summary_effects(f));
+    }
 
     return TRUE;
 }
