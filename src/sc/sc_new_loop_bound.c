@@ -57,29 +57,27 @@ Psysteme get_other_constraints(psyst, vars)
 Psysteme *psyst;
 Pbase vars;
 {
-    Psysteme
-	others = SC_UNDEFINED;
     Pcontrainte
 	egothers = (Pcontrainte) NULL,
 	inothers = (Pcontrainte) NULL,
 	egsyst = (Pcontrainte) NULL,
 	insyst = (Pcontrainte) NULL;
 
-    if (!SC_UNDEFINED_P(*psyst))
-    {
-	Pcontrainte_separate_on_vars
-	    (sc_egalites(*psyst), vars, &egsyst, &egothers);
-	Pcontrainte_separate_on_vars
-	    (sc_inegalites(*psyst), vars, &insyst, &inothers);
+    assert(!SC_UNDEFINED_P(*psyst));
+
+    if (sc_empty_p(*psyst))
+	return(sc_empty(base_difference(sc_base(*psyst), vars)));
+    /* else 
+     */
+    Pcontrainte_separate_on_vars(sc_egalites(*psyst), 
+				 vars, &egsyst, &egothers);
+    Pcontrainte_separate_on_vars(sc_inegalites(*psyst), 
+				 vars, &insyst, &inothers);
 	
-	/*
-	 * result in built and syst is modified.
-	 */
-	others = sc_make(egothers, inothers);
-	*psyst = (sc_rm(*psyst), sc_make(egsyst, insyst));
-    }
-	
-    return(others);
+    /* result in built and syst is modified.
+     */
+    *psyst = (sc_rm(*psyst), sc_make(egsyst, insyst));
+    return(sc_make(egothers, inothers));
 }
 
 /*----------------------------------------------------------
@@ -102,7 +100,6 @@ Pbase vars;
  */
 
 /* each variable should be at least within one <= and one >=;
- * the equalities are assumed to have been translated into inequalities;
  * scn IS NOT modified.
  */
 void algorithm_row_echelon(scn, base_index, pcondition, penumeration)
@@ -134,7 +131,10 @@ Psysteme *pcondition, *penumeration;
     ps_project = sc_sort_constraints(ps_project, base_index);
     ps_project = sc_elim_redond(ps_project);
 
-    if (ps_project==NULL || sc_empty_p(ps_project))
+    if (SC_UNDEFINED_P(ps_project))
+	ps_project = sc_empty(base_difference(sc_base(scn), base_index));
+
+    if (sc_empty_p(ps_project))
     {
 	*penumeration = sc_empty(base_index);
 	*pcondition = ps_project;
@@ -182,10 +182,13 @@ Psysteme *pcondition, *penumeration;
 
     *pcondition = get_other_constraints(&ps_interm, base_index);
     sc_transform_ineg_in_eg(*pcondition); 
-
     *penumeration = ps_interm;
 
     base_rm(reverse_base), free(c);
+
+    /*  what is returned must be ok.
+     */
+    assert(!SC_UNDEFINED_P(*pcondition) && !SC_UNDEFINED_P(*penumeration));
 }
 
 /*----------------------------------------------------------
@@ -233,12 +236,12 @@ Psysteme *pcondition, *ptile_enum, *piter_enum;
      */
     algorithm_row_echelon(syst, inner, &transfer, piter_enum);
 
-    if (SC_UNDEFINED_P(*piter_enum) || SC_UNDEFINED_P(transfer))
+    if (sc_empty_p(transfer))
     {
-	sc_rm(transfer),
+	sc_rm(transfer), sc_rm(*piter_enum),
 	*piter_enum = sc_empty(BASE_NULLE),
 	*ptile_enum = sc_empty(BASE_NULLE),
-	*pcondition = sc_rn(BASE_NULLE);
+	*pcondition = sc_empty(BASE_NULLE);
 	return;
     }
 
@@ -257,13 +260,11 @@ Psysteme *pcondition, *ptile_enum, *piter_enum;
      */
     algorithm_row_echelon(sc, outer, pcondition, ptile_enum);
 
-    if (SC_UNDEFINED_P(*ptile_enum) || SC_UNDEFINED_P(*pcondition))
+    if (sc_empty_p(*pcondition))
     {
-	sc_rm(*piter_enum),
-	sc_rm(*pcondition),
+	sc_rm(*piter_enum), sc_rm(*ptile_enum),
 	*piter_enum = sc_empty(BASE_NULLE),
-	*ptile_enum = sc_empty(BASE_NULLE),
-	*pcondition = sc_rn(BASE_NULLE);
+	*ptile_enum = sc_empty(BASE_NULLE);
 	return;
     }
 
@@ -277,7 +278,6 @@ Psysteme *pcondition, *ptile_enum, *piter_enum;
     sc_creer_base(*piter_enum);
 }
 
-/*
- *   that is all
+/*   that is all
  */
 
