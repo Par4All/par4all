@@ -178,9 +178,9 @@ entity_minimal_name(e)
 entity e;
 {
     entity m = get_current_module_entity();
-    string namel
+    string name;
 
-    /* when called thru the icfg, there is no current entity */
+    /* when called thru the icfg, there is no current entity... */
     if (entity_undefined_p(m))
 	name = entity_local_name(e);
     else 
