@@ -3,7 +3,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1994/12/06 14:42:48 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1994/12/22 16:52:22 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -742,7 +742,7 @@ statement innerbody;
 	}
 
 	/* the swith must have been encountered */
-	pips_assert("make_loop_nest_for_overlap", !pre);
+	assert(!pre);
 	    
 	lnew_loop = gen_nconc(gen_nreverse(lpre),
 		    gen_nconc(lnew_loop,
@@ -890,8 +890,7 @@ statement stat;
 
     e = EXPRESSION(CAR(call_arguments(instruction_call(i))));
 
-    pips_assert("hpfc_overlap_kill_unused_scalars_rewrite",
-		expression_reference_p(e));
+    assert(expression_reference_p(e));
 
     var = reference_variable(syntax_reference(expression_syntax(e)));
 
@@ -917,8 +916,7 @@ statement stat;
 bool hpfc_overlap_kill_unused_scalars(stat)
 statement stat;
 {
-    pips_assert("hpfc_overlap_kill_unused_scalars",
-		get_variable_used_map()!=hash_table_undefined);
+    assert(get_variable_used_map()!=hash_table_undefined);
 
     hpfc_killed_scalar = FALSE;
 
@@ -1212,8 +1210,7 @@ statement stat;
     bool
 	result;
 
-    pips_assert("variable_used_in_statement_p",
-		stat == current_variable_used_statement);
+    assert(stat == current_variable_used_statement);
 
     result = (!entity_variable_used_undefined_p(ent));
     
