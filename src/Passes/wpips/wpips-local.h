@@ -45,6 +45,23 @@ extern int get_bool_property();
    mode: */
 extern bool wpips_emacs_mode;
 
+
+/* The type to describe the command to execute outside the notifyer: */
+typedef enum {
+   WPIPS_EXIT = 1647300,
+      WPIPS_SAFE_APPLY,
+      WPIPS_EXECUTE_AND_DISPLAY
+} wpips_main_loop_command_type;
+
+
+/* The type describing a Transform menu entry: */
+typedef struct 
+{
+   char * menu_entry_string;
+   char * transformation_name_to_apply;
+}
+wpips_transform_menu_layout_line;
+
 /* Define the menu separator: */
 #define WPIPS_MENU_SEPARATOR MENU_ITEM, MENU_STRING, "", MENU_INACTIVE, TRUE, NULL
 
