@@ -12,6 +12,11 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.168  2002/07/03 09:14:48  irigoin
+%% Property SEMANTICS_ANALYZE_UNSTRUCTURED added with default value TRUE.
+%% Some provisional comments added for a ICFG property, RW_FILTERED_EFFECTS,
+%% introduced by Dat.
+%%
 %% Revision 1.167  2002/07/01 09:29:54  phamdat
 %% RW_FILTERED_EFFECTS added
 %%
@@ -213,7 +218,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2002/07/01 09:29:54 $~$
+$~$Date: 2002/07/03 09:14:48 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1199,13 +1204,27 @@ SEMANTICS_TRUST_ARRAY_REFERENCES FALSE
 \subsubsection{Flow Sensitivity}
 \index{Flow Sensitivity}
 \index{SEMANTICS\_FLOW\_SENSITIVE}
+\index{SEMANTICS\_ANALYZE\_UNSTRUCTURED}
 
 Perform ``meet'' operations for semantics analysis. This property is
-managed by \PIPSMAKE{}.
+managed by \PIPSMAKE{} which often sets it to TRUE. See comments in
+\PIPSMAKE{}
+documentation to turn off convex hull operations for a module or more if
+they last too long.
 
 \begin{verbatim}
 SEMANTICS_FLOW_SENSITIVE FALSE
 \end{verbatim}
+
+Complex control flow graph may require excessive computation
+resources. This may happen when analyzing a parser for instance.
+
+\begin{verbatim}
+SEMANTICS_ANALYZE_UNSTRUCTURED TRUE
+\end{verbatim}
+
+To reduce execution time, this property is complemented with a heuristics
+to turn off the analysis of very complex unstructured.
 
 
 \subsubsection{Contexte for statement and expression transformers}
@@ -2478,6 +2497,7 @@ CALLGRAPH_DEBUG FALSE
 \index{ICFG}
 \index{ICFG\_IFs}
 \index{ICFG\_DOs}
+\index{ICFG\_DV}
 \index{ICFG\_CALLEES\_TOPO\_SORT}
 \index{ICFG\_DECOR}
 \index{ICFG\_DRAW}
@@ -2503,7 +2523,8 @@ Print DO loops enclosing call sites:
 ICFG_DOs FALSE
 \end{verbatim}
 
-Print resource icfg to daVinci format
+It is possible to print the interprocedural control flow graph as text or
+as a graph using daVinci format. By default, the text output is selected.
 
 \begin{verbatim}
 ICFG_DV FALSE
@@ -2530,13 +2551,20 @@ of boolean!):
 ICFG_DEBUG FALSE
 \end{verbatim}
 
-RW\_FILTERED\_EFFECTS: criteria to filter
-0: READ\_ALL
-1: WRITE\_ALL
-2: READWRITE\_ALL
-3: READ\_END
-4: WRITE\_END
-5: READWRITE\_END
+Effects are often much too numerous to produce a useful interprocedural
+control flow graph.
+
+The integer property \verb/RW_FILTERED_EFFECTS/ is used to specify a
+filtering criterion.
+\begin{itemize}
+\item 0: \verb/READ_ALL/,
+\item 1: \verb/WRITE_ALL/,
+\item 2: \verb/READWRITE_ALL/,
+\item 3: \verb/READ_END/,
+\item 4: \verb/WRITE_END/,
+\item 5: \verb/READWRITE_END/, .
+\end{itemize}
+
 \begin{verbatim}
 RW_FILTERED_EFFECTS 0
 \end{verbatim}
