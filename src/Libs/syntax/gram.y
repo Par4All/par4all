@@ -52,6 +52,15 @@
   *    see declarations.c (Francois Irigoin, 22 January 1992)
   *  - remove complex constant detection because this conflicts with
   *    IO statements
+  *
+  * $Id$
+  *
+  * $Log: gram.y,v $
+  * Revision 1.55  2001/07/18 17:53:11  irigoin
+  * Feature added for EDF code: pointers can be declared several times
+  * pointing to different allocatable arrays
+  *
+  *
   */
 
 %type <chain>	        latom
@@ -950,8 +959,31 @@ pointer_inst: TK_POINTER TK_LPAR entity_name TK_COMMA entity_name decl_tableau T
 		    dims = $6;
 		}
 
-		pips_user_warning("SUN pointer declaration detected\n");
-		DeclareVariable($3, type_undefined, NIL, storage_undefined, value_undefined);
+		pips_user_warning("SUN pointer declaration detected. Integer type used.\n");
+		/* No specific type for SUN pointers */
+		if(type_undefined_p(entity_type($3))) {
+		  DeclareVariable($3, MakeTypeVariable(MakeBasic(is_basic_int), NIL),
+				  NIL, storage_undefined, value_undefined);
+		}
+		else {
+		  type tp = entity_type($3);
+
+		  if(type_variable_p(tp)
+		     && basic_int_p(variable_basic(type_variable(tp)))) {
+		    /* EDF code contains several declaration for a unique pointer */
+		    pips_user_warning("%s %s between lines %d and % d\n",
+				 "Redefinition of pointer",
+				 entity_local_name($3), line_b_I, line_e_I);
+
+		  }
+		  else {
+		    pips_user_warning("DeclareVariable",
+				 "%s %s between lines %d and % d\n",
+				 "Redefinition of type for entity",
+				 entity_local_name($3), line_b_I, line_e_I);
+		    ParserError("Syntax", "Conflicting type declarations\n");
+		  }
+		}
 		DeclareVariable($5, type_undefined, dims, 
 				make_storage(is_storage_ram,
 					     make_ram(get_current_module_entity(),
