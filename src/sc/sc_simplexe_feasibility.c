@@ -69,7 +69,7 @@ static int NB_INEQ = 0;
 static void 
 control_catch_alarm_Simplex (int sig)
 {
-  alarm(0); //clear the alarm 
+  alarm(0); /*clear the alarm */
 }
 
 #endif
@@ -126,17 +126,20 @@ control_catch_alarm_Simplex (int sig)
     else 					\
       { G(j,b,a); }				\
 }
-/*************************************************** Replacement of macro GCD to GCD_ZERO_CTRL : duong.
-
-Explication : I have seen negative numbers when debugging this program (with variables x.num, x.den look for example in lines 238-239), that's why I tried to find out if the macro Macro GCD(j,a,b) were used with negative arguments. The macro GCD(j,a,b) calls the macro G(j,a,b), which assumes b > 0 and better with a>b (means a>b>0). (I must state here that G(j,a,b) works well with 0 < a < b.)
-
-I don't understand why, if these macros were supposed to work with positive numbers, still have inside them a statement like this : if (value_neg_p(j)) value_oppose(j). This means a can be negative.
-If a < 0 then G(j,a,b) still works fine, but GCD(j,a,b) will work wrongly. Because if b > 0, a < 0, then we alwayls have GCD(a,b) = abs(a). Moreover, when b < 0, if we put G(a,b) = b => This is confusing :-)
-
-I propose another macro GCDZZN(j,a,b): ZxZ)->N+, which means GCDZZN(a,b) = GCD(value_absolute(a),value_absolute(b)). Another remark, is that the Greatest Commom Divisor normally of two positive integers (a>=1,b>=1), so if a = 0 or b = 0, it'll make no sense. That's why I test if a = 0 or b = 0 by macro GCD_ZERO_CTRL(j,a,b) before send it to GCDNNZ(j,a,b). 
-
-Then GCDNNZ will be faster, assuming a != 0 and b != 0. If a = 0 or b = 0 then GCD_ZERO_CTRL(a,b) = 1.
-Change only in line 262.
+/*************************************************** Replacement of macro GCD to GCD_ZERO_CTRL: DN.
+Explication:
+- Negative numbers (e.g: lines 238-239, variables x.num, x.den, see older version) may be given to 
+macro GCD(j,a,b). This macro calls G(j,a,b), which assumes b > 0 and better with a>b (means a>b>0).
+(note that G(j,a,b) works well with 0 < a < b)
+- If a < 0 then G(j,a,b) still works fine, but GCD(j,a,b) will be wrong:
+  if b > 0, a < 0, then we alwayls have GCD(a,b) = abs(a). 
+  moreover, when b < 0, if we put G(a,b) = b => This is confusing!
+Proposition:
+- macro GCDZZN(j,a,b): ZxZ)->N+: 
+  GCDZZN(a,b) = GCD(value_absolute(a),value_absolute(b)). 
+- Remark, is that the Greatest Commom Divisor of a and b where a = 0 or b = 0 makes no sense.
+  So we should test if a = 0 or b = 0 by macro GCD_ZERO_CTRL(j,a,b) before send it to GCDNNZ(j,a,b).
+  Then we can assume a != 0 and b != 0. If a = 0 or b = 0 then GCD_ZERO_CTRL(a,b) = 1.
 ****************************************************/
 
 #define GCDZZN(j,a,b)					\
@@ -194,7 +197,7 @@ Change only in line 262.
 /* ??? value_zero_p(y.num)? 
 Then x.num != VALUE_ZERO and x.den = VALUE_ZERO, it's not good at all.(assuming y.den != VALUE_ZERO) 
 This means : test if  y = 0 then x = 0 else x = 1/y
-Change in line 286 :duong.*/
+Change in line 286 : DN.*/
 
 #define INV_ZERO_CTRL(x,y) {if (value_zero_p(y.num)) {fprintf(stderr,"ERROR : inverse of fraction zero !"); x.num = VALUE_ZERO; x.den = VALUE_ONE;} else {INV(x,y)}}
 
@@ -225,9 +228,9 @@ Change in line 286 :duong.*/
     value_eq(mult(x.num,y.den),mult(x.den,y.num))))
 
 /*#define INF_MACRO(x,y,mult) (value_lt(mult(x.num,y.den),mult(x.den,y.num)))
-// c'est pas assez pour la comparaison entre deux fractions, qu'est-ce qui se passe  \
-// s'il y a seulement un denominateur negatif??? Ca donnera un resultat faux.
-// a/b < c/d <=> if b*d > 0 then a*d < b*c else a*d < b*c : duong.
+  DN: c'est pas assez pour la comparaison entre deux fractions, qu'est-ce qui se passe
+  s'il y a seulement un denominateur negatif??? Ca donnera un resultat faux.
+  a/b < c/d <=> if b*d > 0 then a*d < b*c else a*d < b*c
 */
 
 #define INF_MACRO(x,y,mult) ((value_pos_p(mult(x.den,y.den)) && value_lt(mult(x.num,y.den),mult(x.den,y.num))) || (value_neg_p(mult(x.den,y.den)) && value_gt(mult(x.num,y.den),mult(x.den,y.num))))
@@ -250,9 +253,10 @@ Change in line 286 :duong.*/
 }
 */
 
-/* This macro DIV_MACRO doesn't test if z = 0, then x = y/z means x.num = y.num*z.den and x.den = 0. 
-It's not good so I added the test : if z = 0 then x.num = 0 and x.den = 1
-I tried to avoid the denominator equal to 0 : duong.
+/* DN: This macro DIV_MACRO doesn't test if z = 0, 
+then x = y/z means x.num = y.num*z.den and x.den = 0. 
+We better add the test : if z = 0 then x.num = 0 and x.den = 1
+We try to avoid the denominator equal to 0.
 */
 
 #define DIV_MACRO(x,y,z,mult)			\
@@ -409,7 +413,7 @@ I tried to avoid the denominator equal to 0 : duong.
 /* Pivot :  x = a - b c / d
  * mult is used for multiplying values.
  * the macro has changed a lot, for indentation and so... FC.
- * Why don't we test if d.num = 0 ? (meanwhile, we do test d.den = 0).duong.
+ * DN: Why don't we test d.num = 0 ? (meanwhile, we do test d.den = 0)
  */
 	     
 #define PIVOT_MACRO(X,A,B,C,D,mult)					      \
@@ -504,7 +508,7 @@ dump_hashtable(hashtable_t hashtable[])
  */
 /* utilise'es par dump_tableau ; a rendre local */
 static int nbvariables, variablescachees[MAX_VAR], variables[MAX_VAR] ; 
-static frac frac0={0,1,0} ;//duong.change 000 -> 010
+static frac frac0={0,1,0} ;/*DN: change 000 -> 010*/
 
 static void printfrac(frac x) {
     printf(" "); print_Value(x.num);
@@ -594,14 +598,14 @@ sc_simplexe_feasibility_ofl_ctrl(
 
     
     DEBUG(static int simplex_sc_counter = 0;)
-      // count number of calls of this function (at the beginning)       
+      /* count number of calls of this function (at the beginning)       */
 
-    soluble=1;// int soluble = 1;
+      soluble=1;/* int soluble = 1;*/
 
     rapport1 =frac0, rapport2 =frac0, min1 =frac0, min2 =frac0, pivot =frac0, cc =frac0 ;
     objectif[0] = frac0, objectif[1] = frac0;
     i=-1, j=-1, k=-1, h=-1, trouve=-1, hh=0, ligne=-1, i0=-1, i1=-1, jj=-1, ii=-1;
-    poidsM =-1, valeur=-1, tmpval=-1,w=-1;//duong.
+    poidsM =-1, valeur=-1, tmpval=-1,w=-1;/*DN.*/
 
     /* recompute the base so as to only allocate necessary columns
      * some bases are quite large although all variables do not appear in
@@ -629,7 +633,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     
     DEBUG(simplex_sc_counter ++;
 	  fprintf(stderr,"BEGIN SIMPLEX : %d th\n",simplex_sc_counter);
-	  sc_default_dump(sc);//sc_default_dump_to_file(); print to file	  
+	  sc_default_dump(sc);/*sc_default_dump_to_file(); print to file	  */
     )
 
     /* the input Psysteme must be consistent; this is not the best way to
@@ -679,31 +683,31 @@ sc_simplexe_feasibility_ofl_ctrl(
       sc_dimension(sc) = saved_dimension;
 
 #ifdef CONTROLING
-      alarm(0); //clear the alarm
+      alarm(0); /*clear the alarm*/
 #endif
 
       if (ofl_ctrl == FWD_OFL_CTRL) {	
-	RETHROW(); //rethrow whatever the exception is
+	RETHROW(); /*rethrow whatever the exception is*/
       }
-      //THROW(user_exception_error);
-      // need CATCH(user_exception_error) before calling sc_simplexe_feasibility)
+      /*THROW(user_exception_error);*/
+      /* need CATCH(user_exception_error) before calling sc_simplexe_feasibility)*/
       ifscdebug(5) {fprintf(stderr,"DNDNDN WARNING: Exception not treated, return feasible!");}
       return TRUE; /* if don't catch exception, then default is feasible */
 
-      //if (ofl_ctrl == FWD_OFL_CTRL)  
-      //THROW(overflow_error);
+      /*if (ofl_ctrl == FWD_OFL_CTRL)  */
+      /*THROW(overflow_error);*/
 
-      //return TRUE; /* default is feasible */
-    }// of CATCH(simplex_arithmetic_error)
+      /*return TRUE;  default is feasible */
+    }/* of CATCH(simplex_arithmetic_error)*/
 
-    //begin of TRY
+    /*begin of TRY*/
 
 #ifdef CONTROLING
-    //start the alarm
+    /*start the alarm*/
     if (CONTROLING_TIMEOUT_SIMPLEX) {
       signal(SIGALRM, controling_catch_alarm_Simplex);   
       alarm(CONTROLING_TIMEOUT_SIMPLEX);    
-    } //else nothing
+    } /*else nothing*/
 #endif
 
     if(NB_EQ != 0)
@@ -1299,7 +1303,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 			   printfrac(t[j].colonne[i]) ;
 			   printfrac(t[jj].colonne[i1]) ;
 			   if (value_zero_p(t[jj].colonne[i1].den))
-			   printf("ATTENTION fraction 0/0 ");/*duong*/
+			   printf("ATTENTION fraction 0/0 ");/*DN*/
 			   printfrac(cc);
 			   printfrac(pivot);)
 		    
@@ -1437,7 +1441,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     free(nlle_colonne);
 
 #ifdef CONTROLING
-    alarm(0); //clear the alarm
+    alarm(0); /*clear the alarm*/
 #endif
     UNCATCH(simplex_arithmetic_error|timeout_error);
     
@@ -1451,11 +1455,3 @@ sc_simplexe_feasibility_ofl_ctrl(
 
 /* (that is all, folks!:-)
  */
-
-
-
-
-
-
-
-
