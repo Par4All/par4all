@@ -10,8 +10,7 @@
 
 extern int fprintf();
 
-/*
- * this function shouldn't be called. 
+/* this function shouldn't be called. 
  * Use macro NORMALIZE_EXPRESSION(e) instead.
  */
 normalized NormalizeExpression(e)
@@ -20,8 +19,8 @@ expression e;
     normalized n;
 
     if (expression_normalized(e) != normalized_undefined)
-	    pips_error("NormalizeExpression", 
-		       "expression is already normalized\n");
+	user_warning("NormalizeExpression", 
+		     "expression is already normalized\n");
 
     n = NormalizeSyntax(expression_syntax(e));
 
@@ -233,7 +232,7 @@ statement st ;
 		gen_true,
 		free_expression_normalized);
 }
-
+
 Pvecteur expression_to_affine(e)
 expression e;
 {
@@ -370,8 +369,7 @@ constant c;
 normalized normalize_reference(r)
 reference r;
 {
-    entity
-	var = reference_variable(r);
+    entity var = reference_variable(r);
 
     pips_assert("normalize_reference", entity_variable_p(var));
 
@@ -383,14 +381,10 @@ reference r;
 normalized normalize_call(c)
 call c;
 {
-    normalized
-	n = normalized_undefined;
-    entity
-	f = call_function(c);
-    value 
-	v = entity_initial(f);
-    tag
-	t = value_tag(v);
+    normalized n = normalized_undefined;
+    entity f = call_function(c);
+    value v = entity_initial(f);
+    tag	t = value_tag(v);
 
     switch (t) 
     {
@@ -414,21 +408,11 @@ call c;
     return(n);
 }
 
-/*
-static bool normalize_all_expressions_filter(e)
-expression e;
-{
-    return(normalized_undefined_p(expression_normalized(e)));
-}
-*/
-
 static void normalize_all_expressions_rewrite(e)
 expression e;
 {
-    syntax 
-	s = expression_syntax(e);
-    tag 
-	t = syntax_tag(s);
+    syntax s = expression_syntax(e);
+    tag t = syntax_tag(s);
 
     if (!normalized_undefined_p(expression_normalized(e))) return;
 
@@ -452,7 +436,7 @@ chunk *obj;
 
 /* --------------------------------------------------------------------- 
  *
- * the first expressions encountered are normalized
+ *   the first expressions encountered are normalized
  */
 
 static bool normalize_first_expressions_filter(e)
@@ -471,21 +455,14 @@ expression e;
     return(FALSE);
 }
 
-static void normalize_first_expressions_rewrite(x)
-chunk *x;
-{
-    return;
-}
-
 void normalize_first_expressions_of(obj)
 chunk *obj;
 {
     gen_recurse(obj,
 		expression_domain,
 		normalize_first_expressions_filter,
-		normalize_first_expressions_rewrite);
+		gen_null);
 }
 
-/*
- *   that is all
+/*   that is all
  */
