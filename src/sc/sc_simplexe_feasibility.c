@@ -238,7 +238,7 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
      * no time to do it properly for the moment. BC.
      */
     assert(sc_weak_consistent_p(sc));
-    
+
     /* Do not allocate place for NULL constraints */
     NB_EQ = 0;
     NB_INEQ = 0;
@@ -263,13 +263,13 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 	    free(eg);
 	}
 
-	/* In two cases, it does not seem to appreciate this loop at all!
-	 * I remove it for the moment. BC.
+	/* I have noticed that when pips core dumps here, it is because
+	 * a setjmp(overflow_error) has been forgotten. bc.
 	 */
-	/* for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)  */
-/* 	    free(t[i].colonne); */
-	free(t);
-	free(nlle_colonne);
+	for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)  
+	    free(t[i].colonne); 
+	free(t); 
+	free(nlle_colonne); 
 	longjmp(overflow_error,5);
     }
     else
