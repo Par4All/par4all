@@ -31,6 +31,9 @@ typedef int bool;
 
 /* STRING
  */
+#ifdef string
+#undef string
+#endif
 typedef char *string ;
 
 /* this is the disk representation of an undefined string
