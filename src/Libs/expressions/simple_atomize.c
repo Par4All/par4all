@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1998/12/30 16:53:55 $, 
+ * $Date: 1999/01/04 16:55:50 $, 
  */
 
 #include <stdio.h>
@@ -69,7 +69,7 @@ void simple_atomize_error_handler()
 }
 
 /* s is inserted before the current statement. 
- * if it is a block, it si added at the head of the list,
+ * if it is a block, it is added just before the last statement of the block,
  * else a block statement is created in place of the current statement.
  */
 static void insert_before_current_statement(s)
