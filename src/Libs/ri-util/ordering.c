@@ -29,8 +29,9 @@ bool ordering_to_statement_initialized_p()
 void initialize_ordering_to_statement(s)
 statement s;
 {
+    /* FI: I do not like that automatic cleaning any more... */
     if (OrderingToStatement != (hash_table) NULL) {
-	reset_ordering_to_statement(OrderingToStatement);
+	reset_ordering_to_statement();
     }
 
     OrderingToStatement = set_ordering_to_statement(s);
@@ -54,11 +55,10 @@ statement s;
     return ots;
 }
 
-void reset_ordering_to_statement(ots)
-hash_table ots;
+void reset_ordering_to_statement()
 {
-    if (ots != (hash_table) NULL) {
-	hash_table_clear(ots);
+    if (OrderingToStatement != (hash_table) NULL) {
+	hash_table_clear(OrderingToStatement);
     }
     else {
 	pips_error("reset_ordering_to_statement", "ill. NULL arg.\n");
