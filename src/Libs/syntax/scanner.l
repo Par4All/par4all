@@ -240,7 +240,7 @@ void yyerror(char * msg)
 {
     int c;
 
-    pips_user_warning("Syntax error - %s line $d near %s\n", 
+    pips_user_warning("Syntax error - %s line %d near %s\n", 
 		      msg, line, yytext);
 
     /* what does it mean? */
