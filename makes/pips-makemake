@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1994/12/09 09:03:40 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/06/14 17:26:05 $, )
 # version $Revision$
 # got on %D%, %T%
 # %A%
@@ -116,6 +116,9 @@
 # - Avoid installing SCCS directory that confuse the SCCS production directory!
 #	Ronan.Keryell@cri.ensmp.fr, 6/12/1994.
 # - install rely on install_pips_sources, which is a shell script, FC 09/12/94
+
+# Work around a bug with the C protoizer cproto that does not
+# understand ", ...", RK, 14/06/1995.
 #
 # wish:
 #
@@ -395,9 +398,10 @@ $(TARGET)-local.h:
 #
 # Pour eviter trop de compilations, $(INC_TARGET) ne depend pas 
 #	de $(TARGET_CFILES) tout le temps :
+# Work around the /*...*/ for protoize with stdarg.h. RK, 14/06/1995.
 $(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
 	$(PROTOIZE)  $(INC_CFILES) \\
-		| sed -e 's,int .*__builtin_va_alist.*\([,\)]\),\1,' \\
+		| sed -e 's|,[ 	]*/\*\.\.\.\*/|, ...|g' -e 's,int .*__builtin_va_alist.*\([,\)]\),\1,' \\
 		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
 	mv $(INC_TARGET).tmp $(INC_TARGET)
 
