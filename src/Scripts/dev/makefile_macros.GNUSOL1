@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL1,v $ (version $Revision$)
-# $Date: 1996/09/19 11:51:50 $, 
+# $Date: 1996/09/30 11:50:26 $, 
 #
 # this file contains macro definitions 
 
@@ -20,10 +20,10 @@ RANLIB	= granlib
 
 #
 # tools for managing/generating code
-LEX	= lex
+LEX	= flex
 LFLAGS	= 
-YACC	= yacc
-YFLAGS	= 
+YACC	= bison
+YFLAGS	= -y
 LINT	= lint
 LINTFLAGS= -habxu
 PROTO	= cproto
