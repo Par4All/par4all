@@ -163,7 +163,7 @@ bool readonly;
 	entity sec = ram_section(storage_ram(s));
 	type t = entity_type(sec);
 
-	pips_assert(type_area_p(t));
+	pips_assert("add_or_kill_equivalenced_variables", type_area_p(t));
 
 	/* global_shared = area_layout(type_area(t)); */
 
