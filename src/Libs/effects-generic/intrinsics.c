@@ -671,7 +671,7 @@ static list
 effects_of_implied_do(expression exp, tag act)
 {
     list le, lep, lr, args;
-    expression arg1, arg2; 
+    expression arg1, arg2;
     entity index;
     range r;
     reference ref;
@@ -781,6 +781,12 @@ effects_of_implied_do(expression exp, tag act)
 		{	     
 		    if (effect_entity(eff) != index)
 			lr =  effects_add_effect(lr, eff);
+		    else if(act==is_action_write /* This is a read */
+			    && action_write_p(effect_action(eff))) {
+		      pips_user_error("Index %s in implied DO is read. "
+				      "Standard violation, see Section 12.8.2.3\n",
+				      entity_local_name(index));
+		    }
 		    else
 		    {
 			debug(5, "effects_of_implied_do", "index removed");
