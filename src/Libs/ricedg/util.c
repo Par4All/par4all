@@ -92,10 +92,9 @@ static string dependence_graph_banner[8] = {
 
 /* Print all edges and arcs */
 void 
-prettyprint_dependence_graph(fd, mod_stat, mod_graph)
-FILE *fd;
-statement mod_stat;
-graph mod_graph;
+prettyprint_dependence_graph(FILE * fd,
+			     statement mod_stat,
+			     graph mod_graph)
 {
     cons *pv1, *ps, *pc;
     Ptsg gs;
@@ -239,10 +238,9 @@ graph mod_graph;
  * At least, hopefully...
  */
 void 
-prettyprint_dependence_graph_view(fd, mod_stat, mod_graph)
-FILE *fd;
-statement mod_stat;
-graph mod_graph;
+prettyprint_dependence_graph_view(FILE * fd,
+				  statement mod_stat,
+				  graph mod_graph)
 {
     cons *pv1, *ps, *pc;
     Ptsg gs;
