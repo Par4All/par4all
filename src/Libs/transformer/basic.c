@@ -265,23 +265,32 @@ transformer t;
 
        /* test aliasing between arguments and relations
           high cost testing */
-	    ifdebug(8) {      
-		MAP(ENTITY, e, {
-		    string emn =strdup(entity_module_name(e));
+	    ifdebug(8) {  
+		boolean aliasing = FALSE;
+		string emn =entity_module_name(val);
+		string eln =entity_local_name(val);
+		list lt =  args;
+		entity e;
+		for (lt =  args; lt && !aliasing ;POP(lt))
+		{
+		    e = ENTITY(CAR(lt));
 		    consistent = consistent && 
-			(same_string_p(entity_local_name(e), 
-				       entity_local_name(val)) ? 
-			 same_string_p(emn,
-				       entity_module_name(val)) 
+			(same_string_p(entity_local_name(e), eln) ? 
+			 same_string_p(entity_module_name(e),emn) 
 			 : TRUE);
-		    free(emn);
-		}, args);
+		    aliasing = aliasing && entity_conflict_p(e,val);
+		}
+		
 		if(!consistent)
+		    user_warning("transformer_consistency_p", 
+				 "different global variable names in  arguments and basis (%s) \n",
+				 eln);
+		if (aliasing)
 		    pips_error("transformer_consistency_p", 
-			  "aliasing between arguments and basis \n");
+			       "aliasing between  arguments and basis (%s) \n",
+			       entity_name(val));
 	    }
-	    
-
+	   
 	    /* FI: the next test is not safe because val can be
 	     * a global value not recognized in the current
 	     * context. old_value_entity_p() returns TRUE or FALSE
