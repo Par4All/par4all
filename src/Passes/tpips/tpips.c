@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.103  1998/06/24 07:29:53  coelho
+ * jpips_printf added.
+ *
  * Revision 1.102  1998/05/29 08:10:35  coelho
  * -w NOT => -j
  *
@@ -258,6 +261,16 @@ void jpips_string(string a_message_format, va_list * some_arguments)
 {
     vfprintf(out_to_jpips, a_message_format, * some_arguments);
     fflush(out_to_jpips);
+}
+
+#include <stdarg.h>
+
+void jpips_printf(string format, ...)
+{
+   va_list some_arguments;
+   va_start(some_arguments, format);
+   (void) vfprintf(out_to_jpips, format, some_arguments);
+   va_end(some_arguments);
 }
 
 /********************************************************** TPIPS COMPLETION */
@@ -622,7 +635,7 @@ tpips_user_error(string calling_function_name,
     if (jpips_is_running)
     {
 	jpips_tag(BEGIN_UE);
-	jpips_string("%s\n", calling_function_name);
+	jpips_printf("%s\n", calling_function_name);
 	jpips_string(a_message_format, some_arguments);
 	jpips_tag(END_UE);
     }
