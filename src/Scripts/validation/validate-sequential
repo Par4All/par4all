@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1995/10/13 09:19:31 $, ) 
+# ($Date: 1996/02/26 10:10:29 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -61,13 +61,14 @@ unset UNIQDIR pips_version RUNDIR LOCKFILE PERFORMANCE
 usage()
 {
   {
-    echo "Usage: $0 [-uvdsth] [-l file] [-x pips] [-r dir] [-f file] [modules]"
+    echo "Usage: $0 [-uvdsth] [-a address] [-l file] [-x pips] [-r dir] [-f file] [modules]"
     echo "  -u: uniq directory to be used"
     echo "  -t: timing"
     echo "  -h: help"
     echo "  -v: verbose"
     echo "  -s: silent (default)"
     echo "  -d: debug"
+    echo "  -a address: mail destination"
     echo "  -l file: lockfile name where to report"
     echo "  -f file: fortran files"
     echo "  -x pips: pips to be used (dafault . then Production)"
@@ -83,7 +84,7 @@ usage()
 
 unset FILES
 
-while getopts tuvsdhx:y:r:f:l:i: opt
+while getopts tuvsdhx:y:r:f:l:i:a: opt
 do
   case $opt in
     t) PERFORMANCE="begin: `date`" ;;
@@ -98,6 +99,7 @@ do
     l) LOCKFILE="$OPTARG" ;;
     h) usage 0 ;;
     i) MAX_NB_LINES="$OPTARG" ;;
+    a) RUNNER="$OPTARG" ;;
     *) usage 1
   esac
 done
