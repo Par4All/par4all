@@ -2,6 +2,11 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.66  1997/09/19 08:47:51  zory
+# diffmpi is now available, but the MPI_LAM implementation inserts some
+# comments in stdout ... So diff is created even if the output is
+# correct !!
+#
 # Revision 1.65  1997/09/18 13:47:06  zory
 # Quick mpi control added
 #
@@ -423,6 +428,17 @@ diffpvm: $(MAINPVM) $(RTEST) install pvm
 	else echo "DIFF ON STDOUT:" ; diff parallel.out sequential.out ; fi
 	@# make is stopped at the diff if different...
 	$(RM) parallel.out parallel.err sequential.out sequential.err
+
+diffmpi: $(MAINMPI) $(RTEST) 
+	@echo "**** Don't forget to specify the number of processors by setting NBPROCS ****"
+	$(MAKE) mpi_run > parallel_mpi.out 2> parallel_mpi.err
+	$(RTEST) > sequential.out 2> sequential.err
+	@if cmp -s parallel_mpi.out sequential.out ; \
+	then echo "DIFF ON STDOUT: none!" ; \
+	else echo "DIFF ON STDOUT:" ; diff parallel_mpi.out sequential.out ; fi
+	@# make is stopped at the diff if different...
+	$(RM) parallel_mpi.out parallel_mpi.err sequential.out sequential.err
+
 
 
 #
