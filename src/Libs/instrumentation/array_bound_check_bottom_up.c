@@ -7,33 +7,23 @@
  * This program takes as input the current module, adds array range checks
  * (lower and upper bound checks) to every statement that has one or more 
  * array accesses. The output is the module with those tests added.
- *
- *
+
  * Hypotheses : there is no write effect on the array bound expression.
  *
  * There was a test for write effect on bound here but I put it away (in 
  * effect_on_array_bound.c) because it takes time to calculate the effect
- * but in fact this case is rare.
- *
- *
+ * but in fact this case is rare. 
  * $Id$
- *
-
  * Version: change the structure of test: 
  * IF (I.LT.lower).OR.(I.GT.upper) THEN STOP "Bound violation ..."
-
  * Add statistics 
- 
  * Version : Modify the Implied-DO process*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "genC.h"
-
 #include "linear.h"
-
 #include "ri.h"
 #include "ri-util.h"
 #include "database.h"
@@ -43,7 +33,6 @@
 #include "control.h"
 #include "properties.h"
 #include "semantics.h"
-
 #include "instrumentation.h"
 #include "transformations.h"
 
@@ -56,7 +45,6 @@
  * bottom_up_abc_reference, 
  * bottom_up_abc_expression return results of type 
  * array_dimension_test */
-
 typedef struct array_dimension_test 
 {
   list arr;
@@ -70,8 +58,8 @@ typedef struct Index_range
   list ind;
   list ran;
 } Index_range;
-/* context data structure for bottom_up_abc newgen recursion */
 
+/* context data structure for bottom_up_abc newgen recursion */
 typedef struct 
 {
   persistant_statement_to_control map;
@@ -79,7 +67,6 @@ typedef struct
 } 
   bottom_up_abc_context_t, 
 * bottom_up_abc_context_p;
-
 
 #define array_dimension_test_undefined ((array_dimension_test) {NIL,NIL,NIL} )
 #define Index_range_undefined ((Index_range) {NIL,NIL})
@@ -110,8 +97,7 @@ static void display_bottom_up_abc_statistics()
 	       number_of_array_references > 1 ? "s" : "");	
       total_number_of_array_references = total_number_of_array_references + 
 	                                 2*number_of_array_references;
-    }
-  
+    }  
   if (number_of_useful_added_tests > 0) 
     user_log("* There %s %d array bound check%s added *\n",
 	     number_of_useful_added_tests > 1 ? "are" : "is",
@@ -179,7 +165,6 @@ bool array_need_bound_check_p(entity e)
 }
 
 /* This function returns the ith dimension of a list of dimensions */
-
 dimension find_ith_dimension(list dims, int n)
 {
   int i;
@@ -188,7 +173,6 @@ dimension find_ith_dimension(list dims, int n)
     ;
   if(i==n && !ENDP(dims))
     return DIMENSION(CAR(dims));
-  
   return dimension_undefined;
 }
 
@@ -223,8 +207,7 @@ add_array_dimension_test(array_dimension_test retour,
   if (!array_dimension_test_undefined_p(temp))
     {
       if (array_dimension_test_undefined_p(retour)) 
-	return temp;
-      
+	return temp;      
       /* If in temp.exp, there are expressions that exist 
        * in retour.exp, we don't have 
        * to add those expressions to retour.exp */
@@ -251,8 +234,7 @@ add_array_dimension_test(array_dimension_test retour,
 		  number_of_useful_added_tests--;
 		  number_of_useless_tests_not_added++; 			
 		}		      
-	    }
-	  
+	    }	  
 	  temp.arr = CDR(temp.arr);
 	  temp.dim = CDR(temp.dim);
 	  temp.exp = CDR(temp.exp);
@@ -267,14 +249,12 @@ static array_dimension_test bottom_up_abc_call(call cal);
 
 static array_dimension_test bottom_up_abc_reference(reference r)
 {  
-  array_dimension_test retour = array_dimension_test_undefined; 
-  
+  array_dimension_test retour = array_dimension_test_undefined;   
   ifdebug(3) 
     {
       fprintf(stderr, "\n Array bound check for reference:");
       print_reference(r);      
     }
- 
   if (array_reference_p(r))
     { 
       entity e = reference_variable(r);
@@ -289,34 +269,25 @@ static array_dimension_test bottom_up_abc_reference(reference r)
 	  for (i=1;i <= gen_length(arrayinds);i++)
 	    { 
 	      number_of_array_references++;
-
-	      dimi = find_ith_dimension(arraydims,i);
-	 
-	      ith = find_ith_argument(arrayinds,i);
- 	  
+	      dimi = find_ith_dimension(arraydims,i);	 
+	      ith = find_ith_argument(arrayinds,i); 	  
 	      checklow = lt_expression( copy_expression(ith),
 					dimension_lower(copy_dimension(dimi)));
-
 	      /* Call the function trivial_expression_p(checklow)
 	       * + If the checklow expression is always TRUE: 
 	       *        there is certainly bound violation, we return retour 
 	       *        immediately: retour = ({e},{i},{.TRUE.})
 	       * + If the checklow expression is always FALSE, 
 	       *        we don't have to add it to exp. 
-	       * + Otherwise, we have to add it to exp.*/
-	
+	       * + Otherwise, we have to add it to exp.*/	
       	      ifdebug(3) {
 		fprintf(stderr, "Checklow expression:");
 		print_expression(checklow);
 	      }
-
 	      t = trivial_expression_p(checklow);
 	      switch(t){
 	      case 1:
-		{
-		  retour = make_true_array_dimension_test(e,i);
-		  return retour;
-		}
+		return  make_true_array_dimension_test(e,i);
 	      case -1: // do not add checklow to exp
 		{
 		  number_of_useless_tests_not_added++;
@@ -328,7 +299,11 @@ static array_dimension_test bottom_up_abc_reference(reference r)
 		      exp = expression_undefined;
 		    }
 		  else 
-		    {			
+		    {	
+		      ifdebug(3) {
+			fprintf(stderr, "Upper bound of dimension:");
+			print_expression(dimension_upper(dimi));
+		      }
 		      checkup = gt_expression( copy_expression(ith),
 					       dimension_upper(copy_dimension(dimi)));
 		      ifdebug(3) {
@@ -338,10 +313,7 @@ static array_dimension_test bottom_up_abc_reference(reference r)
 		      k = trivial_expression_p(checkup);
 		      switch(k){
 		      case 1:
-			{
-			  retour = make_true_array_dimension_test(e,i);
-			  return retour;
-			}
+			return  make_true_array_dimension_test(e,i);
 		      case -1: // do not add checkup to exp
 			{
 			  number_of_useless_tests_not_added++;
@@ -370,8 +342,12 @@ static array_dimension_test bottom_up_abc_reference(reference r)
 		    }
 		  else 
 		    {			
-		      checkup = gt_expression( copy_expression(ith),
-					       dimension_upper(copy_dimension(dimi)));
+		      ifdebug(3) {
+			fprintf(stderr, "\n Upper bound of dimension: \n");
+			print_expression(dimension_upper(dimi));
+		      }
+		      checkup = gt_expression(copy_expression(ith),
+					      dimension_upper(copy_dimension(dimi)));
 		      ifdebug(3) {
 			fprintf(stderr, "Checkup expression:");
 			print_expression(checkup);
@@ -379,10 +355,7 @@ static array_dimension_test bottom_up_abc_reference(reference r)
 		      k = trivial_expression_p(checkup);
 		      switch(k){
 		      case 1:
-			{
-			  retour = make_true_array_dimension_test(e,i);
-			  return retour;
-			}
+			return make_true_array_dimension_test(e,i);
 		      case -1: // do not add checkup to exp
 			{
 			  number_of_useless_tests_not_added++;
@@ -403,11 +376,9 @@ static array_dimension_test bottom_up_abc_reference(reference r)
 	      ifdebug(3) {
 		fprintf(stderr, "Test expression:");
 		print_expression(exp);
-	      }
-	      
+	      }	      
 	      temp = make_array_dimension_test(e,i,exp);
 	      retour = add_array_dimension_test(retour,temp);
-	      
 	      /* if the ith subscript index is also an array reference, 
 	       * we must check this reference*/	          
 	      temp = bottom_up_abc_expression(ith);
@@ -451,10 +422,7 @@ bottom_up_abc_base_reference_implied_do(reference re,
 	  t = trivial_expression_p(checklow);
 	  switch(t){
 	  case 1:
-	    {
-	      retour = make_true_array_dimension_test(ent,i);
-	      return retour;
-	    }
+	    return make_true_array_dimension_test(ent,i);
 	  case -1: // do not add checklow to exp
 	    {
 	      number_of_useless_tests_not_added++;
@@ -475,10 +443,7 @@ bottom_up_abc_base_reference_implied_do(reference re,
 		  k = trivial_expression_p(checkup);
 		  switch(k){
 		  case 1:
-		    {
-		      retour = make_true_array_dimension_test(ent,i);
-		      return retour;
-		    }
+		    return  make_true_array_dimension_test(ent,i);
 		  case -1: // do not add checkup to exp
 		    {
 		      number_of_useless_tests_not_added++;
@@ -514,10 +479,7 @@ bottom_up_abc_base_reference_implied_do(reference re,
 		  k = trivial_expression_p(checkup);
 		  switch(k){
 		  case 1:
-		    {
-		      retour = make_true_array_dimension_test(ent,i);
-		      return retour;
-		    }
+		    return make_true_array_dimension_test(ent,i);
 		  case -1: // do not add checkup to exp
 		    {
 		      number_of_useless_tests_not_added++;
@@ -604,39 +566,33 @@ bottom_up_abc_expression_implied_do(expression e, Index_range ir)
    * IF (e1.LT.lower.OR.e2.GT.upper) STOP Bound violation
    * for statement READ *,(A(I),I=e1,e2) 
    *
-   *
    * An Implied-DO can be occurred in a DATA statement or an input/output 
    * statement. As DATA statement is in the declaration, not executable,
-   * we do not need to pay attention to it.*/
-  
+   * we do not need to pay attention to it.*/ 
   array_dimension_test retour = array_dimension_test_undefined;
-
-  list args = call_arguments(syntax_call(expression_syntax(e)));
- 
+  list args = call_arguments(syntax_call(expression_syntax(e))); 
   expression arg2 = EXPRESSION(CAR(CDR(args)));  /* range e1,e2,e3*/ 
   range r = syntax_range(expression_syntax(arg2));
   expression one_exp = int_to_expression(1);
-
   if (same_expression_p(range_increment(r),one_exp))
     { 
       /* The increment is 1 */
       expression arg1 = EXPRESSION(CAR(args)); /* Implied-DO index*/
       args = CDR(CDR(args));
-      while (!ENDP(args))
-	{
-	  expression expr  = EXPRESSION(CAR(args));
-	  array_dimension_test temp = array_dimension_test_undefined;
-	  Index_range new_ir;
-	  new_ir.ind = gen_nconc(CONS(EXPRESSION,arg1,NIL),ir.ind);
-	  new_ir.ran = gen_nconc(CONS(RANGE,r,NIL),ir.ran);
-	  if (expression_implied_do_p(expr))
-	    temp = bottom_up_abc_expression_implied_do(expr,new_ir);
-	  else
-	    /* normal expression */
-	    temp = bottom_up_abc_reference_implied_do(expr,new_ir);
-	  retour = add_array_dimension_test(retour,temp);
-	  args = CDR(args);
-	}
+      MAP(EXPRESSION, expr,
+      {
+	array_dimension_test temp = array_dimension_test_undefined;
+	Index_range new_ir;
+	new_ir.ind = gen_nconc(CONS(EXPRESSION,arg1,NIL),ir.ind);
+	new_ir.ran = gen_nconc(CONS(RANGE,r,NIL),ir.ran);
+	if (expression_implied_do_p(expr))
+	  temp = bottom_up_abc_expression_implied_do(expr,new_ir);
+	else
+	  /* normal expression */
+	  temp = bottom_up_abc_reference_implied_do(expr,new_ir);
+	retour = add_array_dimension_test(retour,temp);
+      },
+	  args);
     }
   else 
     {
@@ -655,10 +611,8 @@ bottom_up_abc_expression_implied_do(expression e, Index_range ir)
 
 static array_dimension_test bottom_up_abc_expression (expression e)
 {
-  /* the syntax of an expression can be a reference, a range or a call*/
- 
-  array_dimension_test retour = array_dimension_test_undefined;
-  
+  /* the syntax of an expression can be a reference, a range or a call*/ 
+  array_dimension_test retour = array_dimension_test_undefined;  
   if (expression_implied_do_p(e))
     retour = bottom_up_abc_expression_implied_do(e,Index_range_undefined);
   else
@@ -686,38 +640,53 @@ static array_dimension_test bottom_up_abc_expression (expression e)
 
 static bool expression_in_array_subscript(expression e, list args)
 {
-  list l = args; 
-  while (!ENDP(l))
-    {
-      expression exp = EXPRESSION(CAR(l));
-      syntax s = expression_syntax(exp);
-      tag t = syntax_tag(s);
-      switch (t){ 
-      case is_syntax_call:  
-	{
-	  /* We have to consider only the case of Implied DO 
-	  * if e is in the lower or upper bound of implied DO's range or not */
-	
-	  break;
-	}
-      case is_syntax_reference:
-	{ 
-	  reference ref = syntax_reference(s);
-	  if (array_reference_p(ref))
-	    { 
-	      list arrayinds = reference_indices(ref);
-	      if (same_expression_in_list_p(e,arrayinds))
-		return TRUE;
-	    }
-	  break;
-	}
-      case is_syntax_range:
-	break;     
+  MAP(EXPRESSION, exp,
+  {
+    syntax s = expression_syntax(exp);
+    tag t = syntax_tag(s);
+    switch (t){ 
+    case is_syntax_call:  
+      {
+	/* We have to consider only the case of Implied DO 
+	 * if e is in the lower or upper bound of implied DO's range or not */
+	if (expression_implied_do_p(exp))
+	  {
+	    call c = syntax_call(s);
+	    list cargs = call_arguments(c);
+	    expression arg2 = EXPRESSION(CAR(CDR(cargs)));  /* range e1,e2,e3*/ 
+	    range r = syntax_range(expression_syntax(arg2));
+	    expression e1 = range_lower(r);
+	    expression e2 = range_upper(r);
+	    expression e3 = range_increment(r);
+	    ifdebug(3)
+	      {
+		fprintf(stderr,"\n Implied DO expression:\n");
+		print_expression(exp);
+	      }
+	    if (same_expression_p(e,e1)||same_expression_p(e,e2)||same_expression_p(e,e3))
+	      return TRUE;
+	  }
+	break;
       }
-      l = CDR(l);
+    case is_syntax_reference:
+      { 
+	reference ref = syntax_reference(s);
+	if (array_reference_p(ref))
+	  { 
+	    list arrayinds = reference_indices(ref);
+	    if (same_expression_in_list_p(e,arrayinds))
+	      return TRUE;
+	  }
+	break;
+      }
+    case is_syntax_range:
+      break;     
     }
+  },
+      args);
   return FALSE;
 }
+
 static bool read_statement_with_write_effect_on_array_subscript(call c)
 {
   entity func = call_function(c);
@@ -738,37 +707,26 @@ static bool read_statement_with_write_effect_on_array_subscript(call c)
 static array_dimension_test bottom_up_abc_call(call cal)
 {
   list args = call_arguments(cal);
-  array_dimension_test retour = array_dimension_test_undefined;
-  
-  /* We must check two special cases:
-   * 
-   * 1. The call is a READ statement with array reference whose index is 
+  array_dimension_test retour = array_dimension_test_undefined;  
+  /* We must check a special case:
+   * The call is a READ statement with array reference whose index is 
    * read in the same statement. 
-   * 
-   * Example : READ *,N, A(N)
    *
-   * 2. The call is an Implied DO statement 
+   * Example : READ *,N, A(N) or READ *,N,(A(I),I=1,N) (implied DO expression)
    *
-   * Example : WRITE *,((A(I,J),J=1,M),I=1,N)
-   *
-   * or more complicated: READ *,N,(A(I),I=1,N)
-   *
-   * In the complicated cases, we can put a dynamic check function such as :
-   *
-   * READ *,N,(A(checkA(I)),I=1,N),M
-     
-   * where checkA is a function that does the range checking for array A */
+   * In these case, we have to put a dynamic check function such as :
+   * READ *,N,(A(abc_check(I,1,10)),I=1,N),M 
+   * where abc_check is a function that does the range checking by using its parameters */
 
   if (read_statement_with_write_effect_on_array_subscript(cal))
-    user_log("\n READ statement with write effect on array subscript.\n This case has not been treated yet :-( \n");
+    user_log("\n Warning : READ statement with write effect on array subscript. \n This case has not been treated yet :-( \n");
   else
-    while (!ENDP(args))
-      {
-	expression e = EXPRESSION(CAR(args));
-	array_dimension_test temp = bottom_up_abc_expression(e);
-	retour = add_array_dimension_test(retour,temp);		     
-	args = CDR(args);
-      }  
+    MAP(EXPRESSION, e,
+    {
+      array_dimension_test temp = bottom_up_abc_expression(e);
+      retour = add_array_dimension_test(retour,temp);	
+    },
+	args);
   return retour;
 }
 
@@ -776,7 +734,6 @@ static statement make_bottom_up_abc_tests(array_dimension_test adt)
 {  
   list la = adt.arr,ld = adt.dim,le = adt.exp; 
   statement retour = statement_undefined;
-
   while (!ENDP(la))
     { 
       entity a = ENTITY(CAR(la));
@@ -787,26 +744,20 @@ static statement make_bottom_up_abc_tests(array_dimension_test adt)
 					  int_to_dimension(d),"\"", NULL));
       test tes = test_undefined;
       statement temp = statement_undefined;
-
       if (true_expression_p(e))
 	{
 	  number_of_statements_having_bound_violation++;
 	  // There exists bound violation, we put a stop statement 
-	  retour = make_stop_statement(message);
-	  return retour;	  
+	  return make_stop_statement(message);  
 	}
-
       tes =  make_test(e, make_stop_statement(message),
 		       make_block_statement(NIL));
-      
       temp = test_to_statement(tes);
-
       if (statement_undefined_p(retour))
 	retour = copy_statement(temp);
       else 
 	// always structured case
 	insert_statement(retour,copy_statement(temp),FALSE);   
-      
       la = CDR(la);
       ld = CDR(ld);
       le = CDR(le);
@@ -826,8 +777,7 @@ static void bottom_up_abc_insert_before_statement(statement s, statement s1,
      when inserting s1 before s.  */
   if (bound_persistant_statement_to_control_p(context->map, s))
     {
-      /* take the control that  has s as its statement  */
-      
+      /* take the control that  has s as its statement  */      
       control c = apply_persistant_statement_to_control(context->map, s);
       if (stack_size(context->uns)>0)
 	{	
@@ -839,15 +789,12 @@ static void bottom_up_abc_insert_before_statement(statement s, statement s1,
 	      fprintf(stderr, "Unstructured case: \n");
 	      print_statement(s);
 	    }    
-	  
 	  /* for a consistent unstructured, a test must have 2 successors, 
 	     so if s1 is a test, we transform it into sequence in order 
-	     to avoid this constraint. 
-	  
+	     to avoid this constraint. 	  
 	     Then we create a new control for it, with the predecessors 
 	     are those of c and the only one successor is c. 
-	     The new predecessors of c are only the new control*/
-	  
+	     The new predecessors of c are only the new control*/	  
 	  if (statement_test_p(s1))
 	    {
 	      list seq = CONS(STATEMENT,s1,NIL);
@@ -859,7 +806,6 @@ static void bottom_up_abc_insert_before_statement(statement s, statement s1,
 		  print_statement(s1);
 		  print_statement(s2);
 		}      
-
 	      newc = make_control(s2, control_predecessors(c), CONS(CONTROL, c, NIL));
 	    }
 	  else 
@@ -871,21 +817,16 @@ static void bottom_up_abc_insert_before_statement(statement s, statement s1,
 	    {
 	      if (CONTROL(CAR(lc))==c) CONTROL(CAR(lc)) = newc;
 	    }, control_successors(co));
-	  },control_predecessors(c));
- 
+	  },control_predecessors(c)); 
 	  control_predecessors(c) = CONS(CONTROL,newc,NIL);
-
 	  /* if c is the entry node of the correspond unstructured u, 
-	     the newc will become the new entry node of u */
-	      
+	     the newc will become the new entry node of u */	      
 	  if (unstructured_control(u)==c) 
 	    unstructured_control(u) = newc;	 
 	}
       else
-	{
-	  // there is no unstructured (?)
-	  insert_statement(s,s1,TRUE);
-	}
+	// there is no unstructured (?)
+	insert_statement(s,s1,TRUE);
     }
   else
     // structured case 
@@ -898,15 +839,12 @@ static void bottom_up_abc_statement_rwt(
 { 
   instruction i = statement_instruction(s);
   tag t = instruction_tag(i);  
-
   switch(t)
     {
     case is_instruction_call:
       {	
 	call cal = instruction_call(i);
-
 	array_dimension_test adt = bottom_up_abc_call(cal);
-
 	if (!array_dimension_test_undefined_p(adt))
 	  { 	   
 	    statement seq = make_bottom_up_abc_tests(adt);	    
@@ -916,18 +854,13 @@ static void bottom_up_abc_statement_rwt(
 	    bottom_up_abc_insert_before_statement(s,seq,context);	    
 	  }
       	break;
-      }
- 
+      } 
     case is_instruction_whileloop:
       {
-	whileloop wl = instruction_whileloop(i); 
-	
-	// array bound check of while loop condition 
-	
-	expression e1 = whileloop_condition(wl);
-	
-	array_dimension_test adt = bottom_up_abc_expression(e1);
-		
+	whileloop wl = instruction_whileloop(i); 	
+	// array bound check of while loop condition 	
+	expression e1 = whileloop_condition(wl);	
+	array_dimension_test adt = bottom_up_abc_expression(e1);		
 	if (!array_dimension_test_undefined_p(adt))
 	  { 
 	    statement seq = make_bottom_up_abc_tests(adt);
@@ -941,35 +874,16 @@ static void bottom_up_abc_statement_rwt(
     case is_instruction_test:
       {
 	test it = instruction_test(i);
-
 	// array bound check of the test condition
-
 	expression e1 = test_condition(it);
-
 	array_dimension_test adt = bottom_up_abc_expression(e1);
-
 	if (!array_dimension_test_undefined_p(adt))
 	  { 
 	    statement seq = make_bottom_up_abc_tests(adt);	
-
-	    /* I put this fraction of code in comments because of bug in PERMA
-	     * I replace the current statement which is a test with same true and false
-	     * branches by a STOP => assertion failed of unstructured */
-
-	    //    if (stop_statement_p(seq))
-	    // {
-		/* There are bounds violations, we replace the current 
-		 * statement by a 
-		 * STOP "Bound violation:array .. dimension .." */
-	    //	fprintf(stderr, "Bound violation !!!!\n");
-	    //free_instruction(statement_instruction(s));
-	    //statement_instruction(s) = statement_instruction(seq);
-	    // }
-	    // else	
-	    // insert the new sequence of tests before the current statement
-	    
+	    /* If there is a bound violation with a STOP, we insert this STOP before
+	     * current statement also (if replace current statement by STOP => bug in perma.f) */    
 	    if (stop_statement_p(seq))
-	      user_log("Bound violation !!! \n");
+	      user_log("Bound violaton !!! \n");
 	    bottom_up_abc_insert_before_statement(s,seq,context);	           
 	  }	
 	break;
@@ -1021,24 +935,16 @@ static void bottom_up_abc_statement(statement module_statement)
   stack_free(&context.uns);
 }
 
-
-
 bool array_bound_check_bottom_up(char *module_name)
 { 
   statement module_statement;  
   set_current_module_entity(local_name_to_top_level_entity(module_name));
-
   /* Begin the dynamic array bound checking phase. 
-   * Get the code from dbm (true resource) */
-  
+   * Get the code from dbm (true resource) */  
   module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
-
-  set_current_module_statement(module_statement);
- 
-  initialize_ordering_to_statement(module_statement);
-      
-  debug_on("BOTTOM_UP_ARRAY_BOUND_CHECK_DEBUG_LEVEL");
- 
+  set_current_module_statement(module_statement); 
+  initialize_ordering_to_statement(module_statement);      
+  debug_on("ARRAY_BOUND_CHECK_BOTTOM_UP_DEBUG_LEVEL"); 
   ifdebug(1)
     {
       debug(1, "Array bound check","Begin for %s\n", module_name);
@@ -1048,29 +954,21 @@ bool array_bound_check_bottom_up(char *module_name)
   bottom_up_abc_statement(module_statement);
   display_bottom_up_abc_statistics();
   user_log("* The total number of array references in this file is %d *\n", 
-	   total_number_of_array_references );
-  
+	   total_number_of_array_references );  
   /* Reorder the module, because the bound checks have been added */
-  module_reorder(module_statement);
-      
+  module_reorder(module_statement);      
   ifdebug(1)
     {
       pips_assert("Statement is consistent ...", statement_consistent_p(module_statement));
       debug(1, "array bound check","End for %s\n", module_name);
     }
-  debug_off(); 
-  
+  debug_off();   
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name),module_statement);
-  
+  reset_ordering_to_statement();
   reset_current_module_statement();
-  
   reset_current_module_entity();
-  
   return TRUE;
- 
 }
-
-
 /* END OF FILE */
 
 
