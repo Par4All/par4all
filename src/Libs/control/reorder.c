@@ -124,7 +124,7 @@ statement body;
     if(ordering_to_statement_initialized_p()) {
 	reset_ordering_to_statement();
 	module_body_reorder(body);
-	set_ordering_to_statement(body);
+	initialize_ordering_to_statement(body);
     }
     else {
 	module_body_reorder(body);
