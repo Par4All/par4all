@@ -49,6 +49,10 @@
  * - I forgot some part of it I guess. FC
  */
 
+#define error(fun, msg) { \
+    fprintf(stderr, "pips internal error in %s: %s\n", fun, msg); exit(2); \
+}
+
 extern Pvecteur vect_gen_read();
 extern void vect_gen_write();
 
@@ -115,13 +119,13 @@ Psysteme sc_gen_read(FILE * fd /* ignored */, int (*f)())
     int c;
 
     if ((c = f()) != '(') {
-	pips_error("sc_gen_read","initial '(' missing\n");
+	error("sc_gen_read","initial '(' missing\n");
     }
 
     s->base = vect_gen_read(fd, f);
 
     if ((c = f()) != '(') {
-	pips_error("sc_gen_read","equalities '(' missing\n");
+	error("sc_gen_read","equalities '(' missing\n");
     }
 
     while ((c = f()) != ')') {
@@ -134,7 +138,7 @@ Psysteme sc_gen_read(FILE * fd /* ignored */, int (*f)())
     }
 
     if ((c = f()) != '(') {
-	pips_error("sc_gen_read","inequalities '(' missing\n");
+	error("sc_gen_read","inequalities '(' missing\n");
     }
 
     while ((c = f()) != ')') {
@@ -147,7 +151,7 @@ Psysteme sc_gen_read(FILE * fd /* ignored */, int (*f)())
     }
 
     if ((c = f()) != ')') {
-	pips_error("sc_gen_read","closing ')' missing\n");
+	error("sc_gen_read","closing ')' missing\n");
     }
 
     /* It might be a good idea to check that the basis is consistent
