@@ -6,28 +6,7 @@
  */
 #define START_COMMENT_LINE "CcDd*!\n"
 
-/* definition of extern variables. see comments and declarations in file
-parser.c */
-
-extern char *LogFN;
-extern FILE *LogFD;
-extern char *ModulesFN;
-extern char *CurrentFN;
-extern int debugging_level;
-/* extern entity CurrentFunction; */
-extern char *CurrentPackage;
-extern entity DynamicArea;
-extern entity StaticArea;
-extern cons * FormalParameters;
-extern char lab_I[];
-extern char FormatValue[];
 extern FILE * syn_in; /* the file read in by the scanner */
-extern int line_b_I, line_e_I, line_b_C, line_e_C;
-extern char Comm[]; /* the current comment */
-extern char PrevComm[]; /* the previous comment */
-extern int iComm;
-extern int iPrevComm;
-
 
 /* definition of implementation dependent constants */
 
