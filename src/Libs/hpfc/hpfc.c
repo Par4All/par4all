@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/08/22 08:31:01 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/08/31 16:45:34 $, )
  * version $Revision$
  */
  
@@ -51,6 +51,21 @@ void add_an_io_function(entity f)
 
 bool hpfc_special_io(entity f)
 { return gen_in_list_p(f, the_ios_object);}
+
+/******************************************************************** FAKES */
+
+/* ??? to be added to HPFC_STATUS
+ */
+/* GENERIC_STATIC_STATUS(static, the_fakes, list, NIL, gen_free_list) */
+
+static list the_fakes_object=NIL;
+
+void add_a_fake_function(entity f)
+{ the_fakes_object = gen_once(f, the_fakes_object);}
+
+bool hpfc_special_fake(entity f)
+{ return gen_in_list_p(f, the_fakes_object);}
+
 
 /*************************************************************** REMAPPINGS */
 
@@ -527,19 +542,22 @@ bool hpfc_dynamic_directives(string name)
 bool hpfc_compile(string name)
 {
     entity module = local_name_to_top_level_entity(name);
-    bool do_compile = 
-	!hpfc_entity_reduction_p(module) &&
-	!hpf_directive_entity_p(module) &&
-	!fortran_library_entity_p(module);
+    bool do_compile;
 
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", name);
 
+    load_hpfc_status();
+    set_current_module_entity(module);
+
+    do_compile = 
+	!hpfc_entity_reduction_p(module) &&
+	!hpf_directive_entity_p(module) &&
+	!fortran_library_entity_p(module) &&
+	!hpfc_special_fake(module);
+
     if (do_compile)
     {
-	load_hpfc_status();
-	set_current_module_entity(module);
-
 	set_bool_property("PRETTYPRINT_COMMONS", FALSE); 
 
 	if (hpfc_special_io(module))
@@ -548,17 +566,31 @@ bool hpfc_compile(string name)
 	    compile_a_pure_function(module);
 	else
 	    compile_module(module);
-
-	reset_current_module_entity();
-	save_hpfc_status();
     }
     else /* just fake for pipsmake... */
     {
+	pips_debug(2, "skipping %s compilation\n", name);
 	DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, name, NO_FILE);
 	DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, name, NO_FILE);
 	DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, name, NO_FILE);
 	DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, name, NO_FILE);
     }
+
+    /* for callers */
+    if (hpfc_special_io(module))
+    {
+	store_new_host_variable(module, module);
+	store_new_node_variable(entity_intrinsic(CONTINUE_FUNCTION_NAME), 
+				module);
+    }
+    else if (hpf_pure_p(module))
+    {
+	store_new_host_variable(module, module);
+	store_new_node_variable(module, module);
+    }
+
+    reset_current_module_entity();
+    save_hpfc_status();
 
     debug_off();
     return TRUE;
