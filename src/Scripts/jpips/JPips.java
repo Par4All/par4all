@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: JPips.java,v $
+ * Revision 1.2  1998/07/01 15:55:22  coelho
+ * jpips.menus property used for the menus file.
+ *
  * Revision 1.1  1998/06/30 17:34:07  coelho
  * Initial revision
  *
@@ -34,7 +37,7 @@ public class JPips
 {
 
 
-  public final	String	source = "menus.txt",	//the parsed text for the menu
+  public final	String	source = "jpips.menus",	//the parsed text for the menu
 			TOP_MENU = "TOP_MENU";	//tag to delimit a menu
 
   public DirectoryManager	directoryManager;	//manages the directory
@@ -114,14 +117,14 @@ public class JPips
       
       try
         {
-          FileReader f = new FileReader(source);
+          FileReader f = new FileReader(System.getProperty(source));
           Parser p = new Parser(f);
 	  String lineContent = p.nextNonEmptyLine();
 	  while(lineContent != null)
 	    {
 	      if(lineContent.equals(TOP_MENU))
 	        {
-	          OptionParser op = new OptionParser(p,source,tpips);
+	          OptionParser op = new OptionParser(p, tpips);
 		  optionVector.addElement(
 		    new Option(op.title,op.menu,op.frame,op.vector,op.state));
 		}
