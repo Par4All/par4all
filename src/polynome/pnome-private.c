@@ -32,7 +32,7 @@ Variable var;
 	monome_term(newpm)  = vect_del_var(monome_term(pm), var);
 	if (VECTEUR_NUL_P(monome_term(newpm))) {
 	    /* is it the only variable */
-	    monome_term(newpm) = vect_new(TCST, 1); 
+	    monome_term(newpm) = vect_new(TCST, VALUE_ONE); 
 	    /* now it is a constant term   */
 	}
     
