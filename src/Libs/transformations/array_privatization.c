@@ -160,14 +160,19 @@ static bool privatizer(char *module_name)
     pips_debug(1, "end\n");
     debug_off();
 
-    DB_PUT_MEMORY_RESOURCE(DBR_PRIVATIZED_REGIONS, 
-			   strdup(module_name),
-			   (char*) listmap_to_effectsmap(get_private_regions_map()) );
-
-    DB_PUT_MEMORY_RESOURCE(DBR_COPY_OUT_REGIONS, 
-			   strdup(module_name),
-			   (char*) listmap_to_effectsmap(get_copy_out_regions_map()));
-
+    if (store_as_regions)
+    {
+	DB_PUT_MEMORY_RESOURCE(DBR_PRIVATIZED_REGIONS, 
+			       strdup(module_name),
+			       (char*) listmap_to_effectsmap
+			       (get_private_regions_map()) );
+	
+	DB_PUT_MEMORY_RESOURCE(DBR_COPY_OUT_REGIONS, 
+			       strdup(module_name),
+			       (char*) listmap_to_effectsmap
+			       (get_copy_out_regions_map()));
+	
+    }
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
 
