@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1995/08/30 14:34:20 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1995/09/12 14:26:10 $, )
  * version $Revision$,
  */
 
@@ -67,8 +67,8 @@ basic b;
     case is_basic_int:
 	switch (basic_int(b))
 	{
-	case 2: return("INTEGER2");
-	case 4: return("INTEGER4");
+	case 2: return(PVM_INTEGER2);
+	case 4: return(PVM_INTEGER4);
 	default:
 	    pips_error("pvm_what_options", 
 		       "unexpected integer length (%d)\n",
@@ -77,8 +77,8 @@ basic b;
     case is_basic_float:
 	switch (basic_float(b))
 	{
-	case 4: return("REAL4");
-	case 8: return("REAL8");
+	case 4: return(PVM_REAL4);
+	case 8: return(PVM_REAL8);
 	default:
 	    pips_error("pvm_what_options", 
 		       "unexpected float length (%d)\n",
@@ -87,8 +87,8 @@ basic b;
     case is_basic_logical:
 	switch (basic_logical(b))
 	{
-	case 2: return("INTEGER2");
-	case 4: return("INTEGER4");
+	case 2: return(PVM_INTEGER2);
+	case 4: return(PVM_INTEGER4);
 	default:
 	    pips_error("pvm_what_options", 
 		       "unexpected logical length (%d)\n",
@@ -99,15 +99,15 @@ basic b;
     case is_basic_complex:
 	switch (basic_complex(b))
 	{
-	case  8: return("COMPLEX8");
-	case 16: return("COMPLEX16");
+	case  8: return(PVM_COMPLEX8);
+	case 16: return(PVM_COMPLEX16);
 	default:
 	    pips_error("pvm_what_options", 
 		       "unexpected complex length (%d)\n",
 		       basic_complex(b));
 	}
     case is_basic_string:
-	return("STRING");
+	return(PVM_STRING);
     default:
 	pips_error("pvm_what_options", "unexpected basic tag\n");
     }
