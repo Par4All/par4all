@@ -24,11 +24,11 @@
 #include "graph.h"
 #include "dg.h"
 #include "database.h"
-#include "rice.h"
 
 #include "misc.h"
 #include "text-util.h"
 #include "ri-util.h"
+#include "rice.h"
 
 /* includes pour system generateur */
 #include "ray_dte.h"
@@ -38,10 +38,10 @@
 
 #include "ricedg.h"
 
-extern jmp_buf overflow_error; /* to deal with overflow errors occuring during the projection 
-                         * of a Psysteme along a variable */
+extern jmp_buf overflow_error; 
+/* to deal with overflow errors occuring during the projection 
+ * of a Psysteme along a variable */
 
-
 /* the tables of di variables, li variables and ds variables.
  *
  * variable DiVars[i-1] or LiVars[i-1] is associated to the loop at nesting
