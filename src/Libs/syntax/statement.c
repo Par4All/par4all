@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/04 15:46:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/10 13:54:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_statement[] = "%A% ($Date: 1997/09/04 15:46:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_statement[] = "%A% ($Date: 1997/09/10 13:54:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -634,19 +634,79 @@ expression e;
    return i;
 }
 
+void
+update_functional_type_with_actual_arguments(entity e, list l)
+{
+    list pc = list_undefined;
+    list pc2 = list_undefined;
+    type t = type_undefined;
+    functional ft = functional_undefined;
 
+    pips_assert("update_functional_type_with_actual_arguments", !type_undefined_p(entity_type(e)));
+    t = entity_type(e);
+    pips_assert("update_functional_type_with_actual_arguments", type_functional_p(t));
+    ft = type_functional(t);
+
+
+    if( ENDP(functional_parameters(ft))) {
+	for (pc = l; pc != NULL; pc = CDR(pc)) {
+
+	    parameter p = make_parameter(entity_type(reference_variable(syntax_reference(expression_syntax(EXPRESSION(CAR(pc)))))), 
+					 MakeModeReference());
+
+	    /*
+	    parameter p = make_parameter(expression_to_type(EXPRESSION(CAR(pc))), 
+					 MakeModeReference());
+					 */
+	    functional_parameters(ft) = 
+		gen_nconc(functional_parameters(ft),
+			  CONS(PARAMETER, p, NIL));
+	}
+    }
+    else {
+	/* The pre-existing typing of e should match the new one */
+	if(gen_length(functional_parameters(ft))!=gen_length(l)) {
+	    user_warning("MakeCallInst", "inconsistent arg. list lengths for %s:\n"
+			 " %d args according to type and %d actual arguments\n"
+			 "between lines %d and %d. Current type is not updated\n",
+			 module_local_name(e),
+			 gen_length(functional_parameters(ft)), 
+			 gen_length(l), line_b_I, line_e_I);
+	}
+	else {
+	    for (pc = l, pc2 = functional_parameters(ft);
+		 pc != NULL && !ENDP(pc2);
+		 POP(pc), POP(pc2)) {
+
+		type at = entity_type(reference_variable(syntax_reference(expression_syntax(EXPRESSION(CAR(pc))))));
+		type ft = parameter_type(PARAMETER(CAR(pc2)));
+
+		if(!type_equal_p(at, ft)) {
+		    user_warning("MakeCallInst",
+				 "incompatible actual argument and type in call to %s\n"
+				 "between lines %d and %d. Current type is not updated\n",
+				 module_local_name(e), line_b_I, line_e_I);
+		    break;
+		}
+	    }
+	}
+    }
+}
 
 /* this function creates a call statement. e is the called function. l
-is the argument list. */
+is the argument list, a list of expressions. */
 
 instruction 
 MakeCallInst(e, l)
 entity e;
 cons * l;
 {
+
     update_called_modules(e);
 
-    pips_assert("MakeCallInst", MakeExternalFunction(e, MakeTypeVoid()) == e);
+    pips_assert("MakeCallInst", MakeExternalFunction(e, MakeTypeVoid()) == e); 
+
+    update_functional_type_with_actual_arguments(e, l);
 
     return(make_instruction(is_instruction_call, make_call(e, l)));
 }
