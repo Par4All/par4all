@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_directives,v $ version $Revision$
-# $Date: 1996/08/22 14:02:37 $, 
+# $Date: 1996/08/22 14:06:51 $, 
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by the PIPS Fortran 77 parser. 
@@ -22,11 +22,11 @@
 #   this is because declaration directives switched to calls are 
 #   moved after the declarations, so that they can be recognized as 
 #   calls...
-# - I do not deal with "R E A L" like Fortran lexical problems.
-#   maybe I could do something about it, by removing all spaces,
-#   but then sed will have troubles to differentiate
-#   "DISTRIBUTE T ONTO PONTOP" and "DISTRIBUTE TONTOP ONTO P"
-#   thus let us stay with sg sensible...
+# - I do deal with "R E A L" like Fortran lexical problems,
+#   by removing all spaces, but then sed has troubles to differentiate
+#   "DISTRIBUTE T ONTO PONTOP" and "DISTRIBUTE TONTOP ONTO P".
+#   That does not matter because such a syntax is forbidden by HPF
+#   hpfc choses what sed choses.
 # - INDEPENDENT, NEW and REDUCTION are orthogonal, because it should have
 #   been defined as such.
 # - Ctrl-L, Ctrl-G, Ctrl-V and Ctrl-W are used as intermediate characters, 
