@@ -51,12 +51,13 @@ PATH=$added:$PATH
 # should check for various executables
 # perl
 # fsplit
-# gmake
-# gm4
-# gsed
 # flex
 # bison
 # gcc
 # g77? f77?
+# gmake
+# pvm
+# gm4
+# gsed
 
 gmake link
