@@ -141,6 +141,7 @@ remove_from_called_modules(entity e)
 	    if (same_string_p(name, STRING(CAR(l)))) {
 		CDR(lp) = CDR(l);
 		found = TRUE;
+		break;
 	    }
 	}
     }    
