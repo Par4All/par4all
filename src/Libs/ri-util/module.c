@@ -2,6 +2,9 @@
   * $Id$
   *
   * $Log: module.c,v $
+  * Revision 1.26  1997/11/22 16:24:26  coelho
+  * missing assert added.
+  *
   * Revision 1.25  1997/11/22 16:17:42  coelho
   * insure_global_declaration_coherency() hook for hpfc.
   *
@@ -266,6 +269,7 @@ insure_global_declaration_coherency(
     pips_debug(2, "Processing module %s\n", entity_name(module));
 
     init_declared_variables();
+    pips_assert("ref var initialized", !referenced_variables_undefined_p());
     referenced_variables_list = NIL;
 
     if (le) MAP(ENTITY, e, store_this_entity(e), le);
