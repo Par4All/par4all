@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.27  2003/12/09 16:00:34  nguyen
+ * Add () only to functions in C
+ *
  * Revision 1.26  2003/12/05 17:06:42  nguyen
  * Add more cases for C prettyprinter
  *
@@ -113,6 +116,8 @@
 
 extern bool is_fortran;
 static text c_text_entity_declaration(entity e, int margin);
+static list words_qualifier(list obj);
+static list words_dimensions(list dims);
 
 /********************************************************************* WORDS */
 
@@ -518,7 +523,7 @@ sentence_head(entity e)
       pc = gen_nconc(pc, args);
       pc = CHAIN_SWORD(pc, ")");
     }
-    else if (type_variable_p(tr) || type_unknown_p(tr) || type_void_p(tr)) {
+    else if (type_variable_p(tr) || (!is_fortran && (type_unknown_p(tr) || type_void_p(tr)))) {
       pc = CHAIN_SWORD(pc, "()");
     }
 
