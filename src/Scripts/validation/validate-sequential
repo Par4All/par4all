@@ -284,7 +284,7 @@ test_aspect()
   export PIPS_SRCPATH
   
   (
-   for file in ${FILES:-`ls $aspect/*.[fF]`} ; do
+   for file in ${FILES:-`ls $aspect/*.[cfF]`} ; do
      name=`basename $file .f`
      name=`basename $name .F`
      name=`basename $name .c`
