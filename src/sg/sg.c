@@ -228,20 +228,58 @@ FILE * f;
 Ptsg sg;
 char * (*nom_var)();
 {
-    (void) fprintf(f,"SG \n");
-    (void) fprintf(f,"%d SOMMETS \n",sg_nbre_sommets(sg));
+    (void) fprintf(f,"Generating system:\n");
+    (void) fprintf(f,"%d Vert%s \n",sg_nbre_sommets(sg),
+		   sg_nbre_sommets(sg)==1? "ex" : "ices");
     fprint_lsom(f, sg_sommets(sg), nom_var);
-    (void) fprintf(f,"\n%d RAYONS \n",sg_nbre_rayons(sg));
-    fprint_lray_dte(f, sg_rayons(sg), nom_var);
-    (void) fprintf(f,"\n%d DROITES \n",sg_nbre_droites(sg));
-    fprint_lray_dte(f, sg_droites(sg), nom_var);
-    (void) fprintf(f,"\nEND SG ****\n");
+    if(sg_nbre_rayons(sg)>0) {
+	(void) fprintf(f,"\n%d Ray%s \n",sg_nbre_rayons(sg),
+		       sg_nbre_rayons(sg)==1? "" : "s");
+	fprint_lray_dte(f, sg_rayons(sg), nom_var);
+    }
+    if(sg_nbre_droites(sg)>0) {
+	(void) fprintf(f,"\n%d Line%s \n",sg_nbre_droites(sg),
+		       sg_nbre_rayons(sg)==1? "" : "s");
+	fprint_lray_dte(f, sg_droites(sg), nom_var);
+    }
+    (void) fprintf(f,"\nEnd of generating system ****\n");
+}
+
+/* void sg_fprint_as_dense(FILE * f, Ptsg sg):
+ * impression d'un systeme generateur
+ *
+ * Note: b could/should be sg->base
+ */
+void sg_fprint_as_dense(f, sg, b)
+FILE * f;
+Ptsg sg;
+Pbase b;
+{
+    (void) fprintf(f,"Generating system:\n");
+
+    (void) fprintf(f,"%d Vert%s \n",sg_nbre_sommets(sg),
+		   sg_nbre_sommets(sg)==1? "ex" : "ices");
+    fprint_lsom_as_dense(f, sg_sommets(sg), b);
+
+    if(sg_nbre_rayons(sg)>0) {
+	(void) fprintf(f,"\n%d Ray%s \n",sg_nbre_rayons(sg),
+		       sg_nbre_rayons(sg)==1? "" : "s");
+	fprint_lray_dte_as_dense(f, sg_rayons(sg), b);
+    }
+
+    if(sg_nbre_droites(sg)>0) {
+	(void) fprintf(f,"\n%d Line%s \n",sg_nbre_droites(sg),
+		       sg_nbre_rayons(sg)==1? "" : "s");
+	fprint_lray_dte_as_dense(f, sg_droites(sg), b);
+    }
+
+    (void) fprintf(f,"\nEnd of generating system ****\n");
 }
 
 void sg_dump(sg)
 Ptsg sg;
 {
-    char * (*variable_dump_name)();
+    /* char * (*variable_dump_name)(); */
 
     sg_fprint(stderr, sg, variable_dump_name);
 }
