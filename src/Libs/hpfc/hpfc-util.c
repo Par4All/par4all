@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: hpfc-util.c,v $
+ * Revision 1.54  1997/07/25 22:26:50  keryell
+ * Avoid to put comments on sequences.
+ *
  * Revision 1.53  1997/07/24 14:21:44  keryell
  * Added a call to fix_sequence_statement_attributes().
  *
@@ -193,7 +196,7 @@ int the_tag;
 {
     loop x = loop_undefined;
     string c = statement_comments(stat);
-
+    statement new_s;
 /* temporary for block->sequence transition
  */
 #ifdef is_instruction_sequence 
@@ -201,11 +204,13 @@ int the_tag;
 	x = make_sequence(NIL);
 #endif
 
-    return make_statement(statement_label(stat),
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  string_undefined_p(c)? c: strdup(c),
-			  make_instruction(the_tag, x));
+    new_s = make_statement(statement_label(stat),
+			   STATEMENT_NUMBER_UNDEFINED,
+			   STATEMENT_ORDERING_UNDEFINED,
+			   string_undefined_p(c)? c: strdup(c),
+			   make_instruction(the_tag, x));
+    fix_sequence_statement_attributes_if_sequence(new_s);
+    return new_s;
 }
 
 static void stmt_rwt(s)
@@ -826,6 +831,8 @@ static void test_rewrite(test t)
 	pips_debug(5, "true test simplified\n");
 
 	statement_instruction(s) = statement_instruction(test_true(t));
+	/* Fix attributes if it is a sequence: */
+	fix_sequence_statement_attributes_if_sequence(s);
 
 	statement_instruction(test_true(t)) = instruction_undefined;
 	/* free_instruction(i); */ /* ??? */
@@ -837,6 +844,8 @@ static void test_rewrite(test t)
 	pips_debug(5, "false test simplified\n");
 
 	statement_instruction(s) = statement_instruction(test_false(t));
+	/* Fix attributes if it is a sequence: */
+	fix_sequence_statement_attributes_if_sequence(s);
 
 	statement_instruction(test_false(t)) = instruction_undefined;
 	/* free_instruction(i); */ /* ??? */
