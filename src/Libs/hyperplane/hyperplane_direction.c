@@ -3,12 +3,16 @@
  * $Id$
  *
  * $Log: hyperplane_direction.c,v $
+ * Revision 1.3  1998/10/12 10:43:28  irigoin
+ * Better error checking on user input
+ *
  * Revision 1.2  1998/10/09 15:50:23  irigoin
  * scanf() replaced by user_request()
  *
  */
 
 #include <stdio.h>
+#include <strings.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -22,11 +26,12 @@ interactive_hyperplane_direction(Value * h, int n)
     int i;
     int n_read;
     string resp = string_undefined;
+    string cn = string_undefined;
     bool return_status = FALSE;
 
     /* Query the user for h's coordinates */
     pips_assert("hyperplane_direction", n>=1);
-    debug(8,"hyperplane_direction","Reading h\n");
+    debug(8, "interactive_hyperplane_direction", "Reading h\n");
     resp = user_request("Hyperplane direction vector?\n"
 			"(give all its integer coordinates on one line): ");
     if (resp[0] == '\0') {
@@ -34,16 +39,31 @@ interactive_hyperplane_direction(Value * h, int n)
 	return_status = FALSE;
     }
     else {    
+	cn = strtok(resp, " \t");
+
 	return_status = TRUE;
 	for( i = 0; i<n; i++) {
-	    n_read = sscanf(resp," " VALUE_FMT, h+i);
+	    if(cn==NULL) {
+		user_log("Not enough coordinates. "
+			 "Hyperplane loop transformation has been cancelled.\n");
+		return_status = FALSE;
+		break;
+	    }
+	    n_read = sscanf(cn," " VALUE_FMT, h+i);
 	    if(n_read!=1) {
 		user_log("Not enough coordinates. "
 			 "Hyperplane loop transformation has been cancelled.\n");
 		return_status = FALSE;
 		break;
 	    }
+	    cn = strtok(NULL, " \t");
 	}
+    }
+
+    if(cn!=NULL) {
+	user_log("Too many coordinates. "
+		 "Hyperplane loop transformation has been cancelled.\n");
+	return_status = FALSE;
     }
 
     ifdebug(8) {
