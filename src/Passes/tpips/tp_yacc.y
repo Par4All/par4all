@@ -179,7 +179,12 @@ i_create:
 		else {
 		    db_create_workspace ((string) $<name>4);
 		    free($<name>4);
-		    create_workspace (&the_file_list.argc, the_file_list.argv);
+		    if(!create_workspace (&the_file_list.argc, the_file_list.argv)) {
+			string wname = db_get_current_workspace_name();
+			db_close_workspace();
+			delete_workspace(wname);
+			user_error("tpips", "could not create workspace %s\n", wname);
+		    }
 		    main_module_name = get_first_main_module();
 		    
 		    if (!string_undefined_p(main_module_name)) {
