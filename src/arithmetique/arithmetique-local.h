@@ -169,20 +169,6 @@ typedef int Value;
 #define value_uminus(val)  (-(val))
 #define value_abs(val)     (value_ge(val,VALUE_ZERO)? (val): value_uminus(val))
 
-#define value_pos_p(val)      value_gt(val,VALUE_ZERO)
-#define value_neg_p(val)      value_lt(val,VALUE_ZERO)
-#define value_posz_p(val)     value_ge(val,VALUE_ZERO)
-#define value_negz_p(val)     value_le(val,VALUE_ZERO)
-#define value_zero_p(val)     value_eq(val,VALUE_ZERO)
-#define value_notzero_p(val)  value_ne(val,VALUE_ZERO)
-#define value_one_p(val)      value_eq(val,VALUE_ONE)
-#define value_notone_p(val)   value_ne(val,VALUE_ONE)
-#define value_mone_p(val)     value_eq(val,VALUE_MONE)
-#define value_notmone_p(val)  value_ne(val,VALUE_MONE)
-#define value_min_p(val)      value_eq(val,VALUE_MIN)
-#define value_max_p(val)      value_eq(val,VALUE_MAX)
-#define value_notmin_p(val)   value_ne(val,VALUE_MIN)
-#define value_notmax_p(val)   value_ne(val,VALUE_MAX)
 
 /* LINEAR_VALUE_IS_CHARS is used for type checking.
  * some operations are not allowed on (char*), thus
@@ -233,9 +219,23 @@ typedef int Value;
 #define value_modulus(v1,v2) value_addto(v1,v2)
 #undef value_division
 #define value_division(v1,v2) value_addto(v1,v2)
-#undef value_negz_p
-#define value_negz_p(v) ((int)v)
 #endif
+
+
+#define value_pos_p(val)      value_gt(val,VALUE_ZERO)
+#define value_neg_p(val)      value_lt(val,VALUE_ZERO)
+#define value_posz_p(val)     value_ge(val,VALUE_ZERO)
+#define value_negz_p(val)     value_le(val,VALUE_ZERO)
+#define value_zero_p(val)     value_eq(val,VALUE_ZERO)
+#define value_notzero_p(val)  value_ne(val,VALUE_ZERO)
+#define value_one_p(val)      value_eq(val,VALUE_ONE)
+#define value_notone_p(val)   value_ne(val,VALUE_ONE)
+#define value_mone_p(val)     value_eq(val,VALUE_MONE)
+#define value_notmone_p(val)  value_ne(val,VALUE_MONE)
+#define value_min_p(val)      value_eq(val,VALUE_MIN)
+#define value_max_p(val)      value_eq(val,VALUE_MAX)
+#define value_notmin_p(val)   value_ne(val,VALUE_MIN)
+#define value_notmax_p(val)   value_ne(val,VALUE_MAX)
 
 /* valeur absolue
  */
