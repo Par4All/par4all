@@ -218,7 +218,7 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 /* PRIVATIZE_DG looks for definition of entities that are locals to the loops
    in the dependency graph G for the control graph U. */
 
-void privatize_module(char *mod_name)
+bool privatize_module(char *mod_name)
 {
     entity module;
     statement mod_stat;
@@ -278,6 +278,7 @@ void privatize_module(char *mod_name)
     reset_cumulated_effects_map();
     reset_enclosing_loops_map();
 
+    return TRUE;
 }
 
 
