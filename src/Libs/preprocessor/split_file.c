@@ -1,5 +1,5 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/01/02 10:19:46 $, 
+ * $Date: 1997/01/02 14:59:10 $, 
  *
  * adapted from whta can be seen by FC 31/12/96
  * 
@@ -8,6 +8,7 @@
  * - stdout -> FILE* out;
  * - include unistd added
  * - exit -> return
+ * - close ifp
  */
 
 /*
@@ -332,7 +333,7 @@ char **argv;
 int fsplit(char * file_name, FILE *out)
 {
     register FILE *ofp;	/* output file */
-    register rv;		/* 1 if got card in output file, 0 otherwise */
+    register rv;	/* 1 if got card in output file, 0 otherwise */
     int nflag,		/* 1 if got name of subprog., 0 otherwise */
 	retval,
 	i;
@@ -367,6 +368,7 @@ int fsplit(char * file_name, FILE *out)
 				fprintf( stderr, "fsplit: %s not found\n",
 					extrnames[i]);
 			}
+		fclose(ifp);
 		return ( retval );
 	}
 	if (nflag) {			/* rename the file */
@@ -392,6 +394,7 @@ int fsplit(char * file_name, FILE *out)
 		unlink(x);
     }
 
+    fclose(ifp);
     return 1;
 }
 
