@@ -94,11 +94,11 @@ char *name;
 
     message_assert("cannot lazy_open no module", name != NULL);
 
-    if (current_name == NULL || strcmp(current_name, name) != 0) {
-	if (current_name != NULL)
-	    user_log ("Module %s already active\n", name);
+    if (current_name == NULL || strcmp(current_name, name) != 0)
 	status = open_module(name);
-    }
+    else if (current_name != NULL)
+	user_log ("Module %s already active\n", name);
+
     return status;
 }
      
