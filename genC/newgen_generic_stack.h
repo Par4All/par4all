@@ -77,9 +77,9 @@ static void check_##name##_stack()\
   make_##name##_stack();\
   assert(name##_empty_p());\
   name##_push(item_1);\
-  assert(name##_head()==item_1);\
+  assert((char *) name##_head()==item_1);\
   name##_replace(item_2);\
-  assert(name##_pop()==item_2);\
+  assert((char *) name##_pop()==item_2);\
   assert(name##_size()==0);\
   free_##name##_stack();\
   reset_##name##_stack();\
