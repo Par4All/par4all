@@ -36,7 +36,7 @@ instruction sets, such as MMX, SSE or VIS.
 \domain{opcode = name:string x vectorSize:int x subwordSize:int}
 {}
 
-\domain{opcodeClass = nbArgs:int x opcodes:opcode*}
+\domain{tabulated opcodeClass = name:string x nbArgs:int x opcodes:opcode*}
 {}
 
 \section*{Statement matching}
@@ -61,7 +61,7 @@ class corresponding to the pattern, as well as a list that can be used
 to translate from original statement references or constants to
 arguments for the opcode.
 
-\domain{patternx = class:int x args:patternArg*}
+\domain{patternx = class:opcodeClass x args:patternArg*}
 {}
 
 \domain{matchTreeSons = int->matchTree}
@@ -79,7 +79,7 @@ arguments properly. The argument list in a \verb+match+ is constructed
 from the arguments of the statement, following the rules of pattern
 arguments (list of \verb+patternArg+).
 
-\domain{match = type:int x args:expression*}
+\domain{match = type:opcodeClass x args:expression*}
 {}
 
 \section*{Statement information}
