@@ -1,5 +1,5 @@
  /* $RCSfile: module.c,v $ (version $Revision$)
-  * $Date: 1997/07/18 12:30:08 $, 
+  * $Date: 1997/07/24 15:13:14 $, 
   */
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,7 +18,8 @@
 static bool module_coherent_p=TRUE;
 static entity checked_module = entity_undefined;
 
-bool variable_in_module_p2(v,m)
+bool 
+variable_in_module_p2(v,m)
 entity v;
 entity m;
 {
@@ -39,7 +40,8 @@ entity m;
 }
 
 
-void variable_declaration_verify(reference ref)
+void 
+variable_declaration_verify(reference ref)
 {
 
     if (!variable_in_module_p2(reference_variable(ref),checked_module))
@@ -50,7 +52,8 @@ void variable_declaration_verify(reference ref)
     }
 }
 
-void symbolic_constant_declaration_verify(call c)
+void 
+symbolic_constant_declaration_verify(call c)
 {
     
     if (value_symbolic_p(entity_initial(call_function(c)))) {
@@ -63,7 +66,8 @@ void symbolic_constant_declaration_verify(call c)
     }
 }
 
-void add_non_declared_reference_to_declaration(reference ref)
+void 
+add_non_declared_reference_to_declaration(reference ref)
 {
     entity var = reference_variable(ref);
     /* type t = entity_type(var); */
@@ -95,7 +99,8 @@ void add_non_declared_reference_to_declaration(reference ref)
     }
 }
 
-void add_symbolic_constant_to_declaration(call c)
+void 
+add_symbolic_constant_to_declaration(call c)
 {    
     if (value_symbolic_p(entity_initial(call_function(c)))) {
 	value val = entity_initial(checked_module);
@@ -122,7 +127,8 @@ void add_symbolic_constant_to_declaration(call c)
     }
 }
 
-bool variable_declaration_coherency_p(entity module, statement st)
+bool 
+variable_declaration_coherency_p(entity module, statement st)
 {
     module_coherent_p = TRUE;
     checked_module = module;
@@ -164,7 +170,8 @@ GENERIC_LOCAL_FUNCTION(declared_variables, entity_int)
 static list /* of entity */
     referenced_variables_list = NIL;
 
-static void store_this_variable(entity var)
+static void 
+store_this_variable(entity var)
 {
     message_assert("defined variable", !entity_undefined_p(var));
 
@@ -177,13 +184,15 @@ static void store_this_variable(entity var)
     }
 }
 
-static void store_a_referenced_variable(reference ref)
+static void 
+store_a_referenced_variable(reference ref)
 {
     /* assert(!reference_undefined_p(ref)); */
     store_this_variable(reference_variable(ref));
 }
 
-static void store_the_loop_index(loop l)
+static void 
+store_the_loop_index(loop l)
 {
     /* assert(!loop_undefined_p(l)); */
     store_this_variable(loop_index(l));
@@ -192,7 +201,8 @@ static void store_the_loop_index(loop l)
 /*  to be called if the referenced map need not be shared between modules
  *  otherwise the next function is okay.
  */
-void insure_declaration_coherency_of_module(
+void 
+insure_declaration_coherency_of_module(
     entity module,
     statement stat)
 {
@@ -204,7 +214,8 @@ void insure_declaration_coherency_of_module(
 /*  the referenced_variable_map is global and must be made/freed
  *  before/after the call
  */
-void insure_declaration_coherency(
+void 
+insure_declaration_coherency(
     entity module,
     statement stat,
     list /* of entity */ le) /* added entities, for includes... */
@@ -399,7 +410,8 @@ get_declaration_comments(entity module)
  * comment  : Made from "entity_to_formal_integer_parameters()" that considers 
  *            only integer variables.
  */
-list module_formal_parameters(entity func)
+list 
+module_formal_parameters(entity func)
 {
     list formals = NIL;
     list decl = list_undefined;
@@ -417,7 +429,45 @@ list module_formal_parameters(entity func)
     return (formals);
 }
 
+/* Number of user declaration lines for a module */
+int
+module_to_declaration_length(entity func)
+{
+    value v = entity_initial(func);
+    code c = code_undefined;
+    int length = 0;
 
+    if(!value_undefined_p(v)) {
+	if(value_code_p(v)) {
+	    string s = string_undefined;
+
+	    c = value_code(v);
+	    s = code_decls_text(c);
+	    if(string_undefined_p(s)) {
+		/* Is it allowed? The declaration text may be destroyed or
+		 * may not exist when a module is synthesized or heavily
+		 * transformed.
+		 */
+		length = 0;
+	    }
+	    else {
+		char l;
+		while((l=*s++)!= '\0')
+		    if(l=='\n')
+			length++;
+	    }
+	}
+	else {
+	    pips_internal_error("Entity %s is not a module", entity_module_name(func));
+	}
+    }
+    else {
+	/* Entity func has not been parsed yet */
+	length = -1;
+    }
+
+    return length;
+}
 
 
 /*
