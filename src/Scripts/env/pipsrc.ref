@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.141  1998/06/26 06:36:34  coelho
+# just loreto for LINUXI86LL...
+#
 # Revision 1.140  1998/06/15 15:54:44  coelho
 # tir out.
 #
@@ -264,7 +267,7 @@ test "${PIPS_ARCH}" = . -o "${PIPS_ARCH}" = GNU && \
 	PIPS_HOSTS="chailly:episy:aiguebelette:roazhon"
 
 test "${PIPS_ARCH}" = LINUXI86 -o "${PIPS_ARCH}" = LINUXI86LL && \
-	PIPS_HOSTS="loreto:coulommiers"
+	PIPS_HOSTS="loreto"
 
 # PIPS_EXPERIMENTSDIR="${pips_dir}/Experiments"
 # PIPS_TESTSDIR="${pips_dir}/Tests"
