@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1996/10/18 22:24:33 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1997/01/07 11:17:19 $, )
  * version $Revision$,
  */
 
@@ -609,7 +609,7 @@ static RunTimeSupportDescriptor RTSTable[] =
     { BUFFER_SIZE,	0, is_var, no_basic, no_entity },
     { BUFFER_INDEX, 	0, is_var, no_basic, no_entity },
     { BUFFER_RCV_SIZE,	0, is_var, no_basic, no_entity },
-    { BUFFER_ENCODING,	0, is_var, no_basic, no_entity },
+    /* { BUFFER_ENCODING,	0, is_var, no_basic, no_entity }, */
   
     /* typed buffers 
      */
