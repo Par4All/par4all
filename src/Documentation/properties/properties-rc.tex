@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.167  2002/07/01 09:29:54  phamdat
+%% RW_FILTERED_EFFECTS added
+%%
 %% Revision 1.166  2002/06/14 09:09:30  irigoin
 %% property PRETTYPRINT_REGENERATED_LABEL added
 %%
@@ -210,7 +213,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2002/06/14 09:09:30 $~$
+$~$Date: 2002/07/01 09:29:54 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2525,6 +2528,17 @@ of boolean!):
 
 \begin{verbatim}
 ICFG_DEBUG FALSE
+\end{verbatim}
+
+RW\_FILTERED\_EFFECTS: criteria to filter
+0: READ\_ALL
+1: WRITE\_ALL
+2: READWRITE\_ALL
+3: READ\_END
+4: WRITE\_END
+5: READWRITE\_END
+\begin{verbatim}
+RW_FILTERED_EFFECTS 0
 \end{verbatim}
 
 
