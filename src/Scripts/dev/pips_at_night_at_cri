@@ -87,14 +87,14 @@ clean    chailly 	/projects/Pips . ;
 #
 # compilation/validation pipeline
 
-compile  coulommiers 	/tmp LINUXI86 ;
-validate coulommiers 	/tmp LINUXI86 &
+compile  chailly 	/projects/Pips . ;
+validate chailly 	/projects/Pips . &
 
 compile  recanati 	/projects/Pips/Experiments2 GNUSOL2LL ;
 validate recanati 	/projects/Pips/Experiments2 GNUSOL2LL &
 
-compile  chailly 	/projects/Pips . ;
-validate chailly 	/projects/Pips . &
+compile  coulommiers 	/tmp LINUXI86 ;
+validate coulommiers 	/tmp LINUXI86 &
 
 #
 # remaining compilations
