@@ -2,6 +2,9 @@
    $Id$
 
    $Log: sequence_gcm_cse.c,v $
+   Revision 1.21  2000/07/24 16:25:46  phamdinh
+   CSE: Remove statements temporel...
+
    Revision 1.20  2000/07/21 16:06:14  phamdinh
    CSE: Remove statements temporel
 
@@ -318,9 +321,9 @@ right_side_of_assign_statement(statement stat)
   call assign;
   expression right_side;
 
-  pips_assert("Instruction is a call", 
-	      instruction_call_p(statement_instruction(stat)));
   i = statement_instruction(stat);
+
+  pips_assert("Instruction is a call", instruction_call_p(i));
   assign = instruction_call(i);
 
   pips_assert("Call is an assignment!", 
@@ -337,21 +340,10 @@ right_side_of_assign_statement(statement stat)
 static bool 
 entity_as_arguments(entity ent, statement stat)
 {
-  instruction i;
   expression right_side;
-  call assign, right_call;
+  call right_call;
 
-  /* Here, the statement stat is an assignment */
-  
-  pips_assert("Instruction is a call", 
-	      instruction_call_p(statement_instruction(stat)));
-  i = statement_instruction(stat);
-  assign = instruction_call(i);
-
-  pips_assert("Call is an assignment!", 
-	      ENTITY_ASSIGN_P(call_function(assign)));
-
-  right_side = EXPRESSION(CAR(CDR(call_arguments(assign))));
+  right_side = right_side_of_assign_statement(stat);
 
   pips_assert("Right expression is a call!", 
 	      syntax_call_p(expression_syntax(right_side)));
@@ -362,7 +354,7 @@ entity_as_arguments(entity ent, statement stat)
     syntax s = expression_syntax(e);
     pips_assert("Every argument is a reference!", syntax_reference_p(s));
 
-    /* Every entity of the same name is shared in memory */
+    // Every entity of the same name is shared in memory
     if (ent == reference_variable(syntax_reference(s)))
     {
       return TRUE;
@@ -380,11 +372,11 @@ left_side_of_assign_statement(statement stat)
   instruction i;
   call assign;
   expression left_side;
-  /* Here, the statement stat is an assignment */
+  // Here, the statement stat is an assignment
   
-  pips_assert("Instruction is a call", 
-	      instruction_call_p(statement_instruction(stat)));
   i = statement_instruction(stat);
+  pips_assert("Instruction is a call", 
+	      instruction_call_p(i));
   assign = instruction_call(i);
 
   pips_assert("Call is an assignment!", 
@@ -408,7 +400,7 @@ insertion_statement_in_correct_position(statement news, list l)
   {
     return CONS(STATEMENT, s, CONS(STATEMENT, news, CDR(l)));
   }
-  return CONS(STATEMENT, s, 
+  return CONS(STATEMENT, s,
 	      insertion_statement_in_correct_position(news, CDR(l)));
 }
 
@@ -446,7 +438,7 @@ insert_before_statement(statement news, statement s, bool last)
     dump_list_of_statement(instruction_block(i));
 
     /* Just pour comprendre code */
-    fprintf(stderr,"\nStatement loaded: "); print_statement(sb);
+    fprintf(stderr,"\nStatement loaded:\n "); print_statement(sb);
     
     pips_assert("inserted in block", statement_block_p(sb));
     
@@ -466,8 +458,8 @@ insert_before_statement(statement news, statement s, bool last)
      */
     else
     {
-      instruction_block(i) = 
-	insertion_statement_in_correct_position(news, instruction_block(i));
+       instruction_block(i) = 
+	 insertion_statement_in_correct_position(news, instruction_block(i));
     }
   
     /* TEST */
@@ -772,16 +764,16 @@ static void loop_rwt(loop l)
 }
 
 static void
-set_comment_of_statement(statement s, string new_comment)
+set_comment_of_statement(statement s, char *new_comment)
 {
-  if (!statement_comments(s))
+  if (empty_comments_p(statement_comments(s)))
   {
     statement_comments(s) = new_comment;
   }
   else
   {
-    string old = statement_comments(s);
-    /* free old ... */
+    // free old ...
+    free(statement_comments(s));
     statement_comments(s) = new_comment;
   }
 }
@@ -800,15 +792,15 @@ set_statement_to_a_real_one(entity ent, statement container)
     list lst;
     pips_assert("it is a sequence", instruction_sequence_p(i));
     
-    /* reverse list of inserted statements (#1#) */
+    // reverse list of inserted statements (#1#)
     seq = instruction_sequence(i);
     lst = sequence_statements(seq);
     MAP(STATEMENT, s,
     {
       entity left_side = left_side_of_assign_statement(s);
-      if(ent == left_side) /* s defines ent */
+      if(ent == left_side) // s defines ent
       {
-	set_comment_of_statement(s, "REAL");
+	set_comment_of_statement(s, string_undefined);
 	return;
       }
     }, lst);
@@ -828,14 +820,14 @@ set_statement_to_a_real_one(entity ent, statement container)
 static bool
 real_statement(statement s)
 {
-  //if (TRUE) return TRUE; /* just for TEST */
+  //if (TRUE) return TRUE; // just for TEST
 
   if (!empty_comments_p(statement_comments(s)) && 
-      strcmp(statement_comments(s), "REAL") == 0)
+      strcmp((const char*)statement_comments(s), "VIRTUAL") == 0)
   {
-    return TRUE;
+    return FALSE;
   }
-  return FALSE;
+  return TRUE;
 }
 
 static void
@@ -859,17 +851,19 @@ expression_rwt(expression e, list* inserted)
       {
 	return;
       }
-      else /* s is a redundant statement */
+      else // s is a redundant statement
       {
-	expression right_side = right_side_of_assign_statement(s);
-	expression_syntax(e) = 
-	  expression_syntax(copy_expression(right_side));
-	/* leak of memory */
+	instruction i = statement_instruction(s);
+	list args = call_arguments(instruction_call(i));
+	expression exp = EXPRESSION(CAR(CDR(args)));
+	expression_syntax(e) = expression_syntax(exp);
+
+	expression_syntax(exp) = NULL;
 	
-	/* Remove s from list */
+	// Remove s from list
 	gen_remove_once(inserted, s);
 	
-	free_statement(s); /* -> current_available is also modified */
+	free_statement(s); // -> current_available is also modified
 	return;
       }
     }
@@ -885,6 +879,7 @@ remove_statement_redundant(statement s, list* inserted)
   gen_context_recurse(s, inserted,
 		      expression_domain, gen_true, expression_rwt);
 }
+
 
 static bool insert_reverse_order = TRUE;
 
@@ -1483,9 +1478,6 @@ static void atom_cse_expression(expression e)
 						     in_common));
 		  scse = atomize_this_expression(hpfc_new_variable, cse);
 
-		  print_statement(scse); // TEst
-		  print_statement(aspt->container); // TEst
-
 		  /* now cse is a reference to the newly created scalar. */
 		  pips_assert("a reference...",
 			      syntax_reference_p(expression_syntax(cse)));
@@ -1512,19 +1504,12 @@ static void atom_cse_expression(expression e)
 		  gen_free_list(old);
 
 		  // ..
-		  /* This is the real statement */
-		  set_comment_of_statement(scse, "REAL");
-
-
 		  insert_before_statement(scse, aspt->container, FALSE);
 		  
 		  /* don't visit it later. */
 		  gen_recurse_stop(scse);		  		  
 		  //..
 
-		  print_expression(e); // TEst
-		  print_statement(aspt->container); // TEst
-		  
 		  /* updates... */
 		  aspt->depends = CONS(ENTITY, scalar, aspt->depends);
 		  old = aspt->available_contents; 
@@ -1560,10 +1545,10 @@ static void atom_cse_expression(expression e)
       /* create a new atom... */
       atom = atomize_this_expression(hpfc_new_variable, e);
 
-      print_statement(atom); // TEst
-      print_statement(current_statement); // TEst
-      
       insert_before_statement(atom, current_statement, TRUE);
+      /* This is a virtual statement */
+      set_comment_of_statement(atom,strdup("VIRTUAL"));
+
       /* don't visit it later, just in case... */
       gen_recurse_stop(atom);
       {
