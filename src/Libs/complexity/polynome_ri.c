@@ -116,13 +116,13 @@ bool is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
     bool is_inferior = TRUE;
     
     if (term_cst(*pvarval1))
-	is_inferior = TRUE;
-    else if(term_cst(*pvarval2))
 	is_inferior = FALSE;
+    else if(term_cst(*pvarval2))
+	is_inferior = TRUE;
     else
 	is_inferior = (strcmp(variable_local_name(vecteur_var(*pvarval1)), 
 			      variable_local_name(vecteur_var(*pvarval2)))
-		       <= 0 );
+		       > 0 );
 
     return is_inferior; 
 }
