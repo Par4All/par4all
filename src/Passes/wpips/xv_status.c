@@ -20,7 +20,15 @@
 
 #define DECALAGE_STATUS 100
 
-static Panel_item directory_name, program_name, module_name, memory_name, message;
+static Panel_item directory_name, program_name, module_name,
+memory_name, message, window_number;
+
+
+void window_number_notify(Panel_item item, int value, Event *event)
+{
+  number_of_wpips_windows = (int) xv_get(item, PANEL_VALUE);
+}
+
 
 void show_directory()
 {
@@ -136,6 +144,18 @@ void create_status_subwindow()
 	      PANEL_LABEL_STRING, "Memory:",
 	      PANEL_READ_ONLY, TRUE,
 	      PANEL_VALUE_DISPLAY_LENGTH, 10,
+	      NULL);
+
+ window_number = 
+    xv_create(main_panel, PANEL_NUMERIC_TEXT,
+	      PANEL_ITEM_X_GAP, DECALAGE_STATUS,
+	      PANEL_VALUE_Y, xv_rows(main_panel, 4),
+	      PANEL_LABEL_STRING, "# windows:",
+	      PANEL_MIN_VALUE, 1,
+	      PANEL_MAX_VALUE, MAX_NUMBER_OF_WPIPS_WINDOWS,
+	      PANEL_VALUE, number_of_wpips_windows,
+	      PANEL_VALUE_DISPLAY_LENGTH, 2,
+	      PANEL_NOTIFY_PROC, window_number_notify,
 	      NULL);
 
   window_fit(main_panel);
