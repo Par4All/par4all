@@ -14,28 +14,32 @@
  */
 Value pgcd_slow(Value a, Value b)
 {
+    Value m;
+
     if (VALUE_ZERO_P(a) && VALUE_ZERO_P(b))
 	return VALUE_ONE;
 
     if (VALUE_ZERO_P(a))
-	return ABS(b);
+	return value_abs(b);
 
     if (VALUE_ZERO_P(b))
-	return ABS(a);
+	return value_abs(a);
 
-    a = ABS(a);
-    b = ABS(b);
-    if (a>=b) { 
-	if (a%b==0) 
-	    return ABS(b);
+    a = value_abs(a);
+    b = value_abs(b);
+    m = value_mod(a,b);
+
+    if (value_ge(a,b)) { 
+	if (VALUE_ZERO_P(m))
+	    return value_abs(b);
 	else 
-	    return pgcd(b,a%b);
+	    return pgcd(b,m);
     }
     else {
-	if (b%a==0)
-	    return ABS(a);
+	if (VALUE_ZERO_P(m))
+	    return value_abs(a);
 	else
-	    return pgcd(a,b%a);
+	    return pgcd(a,m);
     }
 }
 
@@ -49,16 +53,16 @@ Value pgcd_fast(Value a, Value b)
    
     assert(VALUE_NOTZERO_P(b)||VALUE_NOTZERO_P(a));
 
-    a = ABS(a);
-    b = ABS(b);
+    a = value_abs(a);
+    b = value_abs(b);
 
     /* si cette routine n'est JAMAIS appelee avec des arguments nuls,
        il faudrait supprimer les deux tests d'egalite a 0; ca devrait
        etre le cas avec les vecteurs creux */
-    if(a > b)
-	gcd = (b==0)? a : pgcd_interne(a,b);
+    if(value_gt(a,b))
+	gcd = VALUE_ZERO_P(b)? a : pgcd_interne(a,b);
     else
-	gcd = (a==0)? b : pgcd_interne(b,a);
+	gcd = VALUE_ZERO_P(a)? b : pgcd_interne(b,a);
 
     return gcd;
 }
@@ -80,7 +84,8 @@ Value pgcd_interne(Value a, Value b)
 #define GCD_MAX_B 15
     /* la commutativite du pgcd n'est pas utilisee pour reduire la
        taille de la table */
-    static Value gcd_look_up[GCD_MAX_A+1][GCD_MAX_B+1]= {
+    static Value 
+	gcd_look_up[GCD_MAX_A+1][GCD_MAX_B+1]= {
 	/*  b ==        0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 */
         {/* a ==   0 */ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15},
         {/* a ==   1 */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -106,25 +111,26 @@ Value pgcd_interne(Value a, Value b)
     Value gcd = VALUE_MONE;
     Value mod;
 
-    assert(a>b && b>=VALUE_ZERO);
+    assert(value_gt(a,b) && VALUE_POS_P(b));
 
     do{
-	if(b<=GCD_MAX_B && a<=GCD_MAX_A) {
-	    gcd = gcd_look_up[a][b];
+	if(value_le(b,(Value)GCD_MAX_B) && 
+	   value_le(a,(Value)GCD_MAX_A)) {
+	    gcd = gcd_look_up[VALUE_TO_INT(a)][VALUE_TO_INT(b)];
 	    break;
 	}
 	else {
 	    /* compute modulo(a,b) en utilisant la routine C puisque a et b
 	       sont strictement positifs (vaudrait-il mieux utiliser la
 	       soustraction?) */
-	    if((mod = a % b)==0) {
+	    mod = value_mod(a,b);
+	    if(VALUE_ZERO_P(mod)) {
 		gcd = b;
 	    }
 	    else {
 		a = b;
 		b = mod;
 	    }
-
 	}
     } while(VALUE_NEG_P(gcd));
 
@@ -150,13 +156,14 @@ Value pgcd_interne(Value a, Value b)
  */
 Value gcd_subtract(Value a, Value b)
 {
-    if (a < 0) a = -a;
-    if (b < 0) b = -b;
-    while ((a != 0) && (b != 0)) {
-	if (a >= b) 
-	    a = a - b;
+    a = value_abs(a);
+    b = value_abs(b);
+
+    while (VALUE_NOTZERO_P(a) && VALUE_NOTZERO_P(b)) {
+	if (value_ge(a,b)) 
+	    a = value_minus(a,b);
 	else
-	    b = b - a;
+	    b = value_minus(b,a);
     }
 
     if (a == VALUE_ZERO) {
@@ -209,7 +216,7 @@ Value vecteur_bezout(Value u[], Value v[], int l)
 	    gcd = bezout(a1,gcd,p1,&x);
 	    /* printf("gcd = %d\n",gcd); */
 	    for (j=0;j<i;j++)
-		v[j] = v[j]*x;	
+		v[j] = value_mult(v[j],x);	
 	} 
     }
 
@@ -225,34 +232,34 @@ Value vecteur_bezout(Value u[], Value v[], int l)
  */
 Value bezout(Value a, Value b, Value *x, Value *y)
 {
-    Value u0=1,u1=0,v0=0,v1=1;
+    Value u0=VALUE_ONE,u1=VALUE_ZERO,v0=VALUE_ZERO,v1=VALUE_ONE;
     Value a0,a1,u,v,r,q,c;
 
-    if (a>=b)
+    if (value_ge(a,b))
     {
 	a0 = a;
 	a1 = b;
-	c = 0;
+	c = VALUE_ZERO;
     }
     else
     {
 	a0 = b;
 	a1 = a;
-	c = 1;
+	c = VALUE_ONE;
     }
 	
-    r = a0 % a1;
+    r = value_mod(a0,a1);
     while (r!=0)
     {
-	q = a0 /a1;
-	u = u0 - u1 * q;
+	q = value_div(a0,a1);
+	u = u0 - value_mult(u1,q);
 
-	v = v0 - v1*q;
+	v = v0 - value_mult(v1,q);
 	a0 = a1; a1 = r;
 	u0 = u1;u1 = u;
 	v0 = v1; v1 = v;
 
-	r = a0 % a1;
+	r = value_mod(a0,a1);
     }
   
     if (c==0) {
@@ -282,23 +289,23 @@ Value bezout(Value a, Value b, Value *x, Value *y)
  */
 Value bezout_grl(Value a, Value b, Value *x, Value *y)
 {
-    Value u0=1,u1=0,v0=0,v1=1;
+    Value u0=VALUE_ONE,u1=VALUE_ZERO,v0=VALUE_ZERO,v1=VALUE_ONE;
     Value a0,a1,u,v,r,q,c;
     Value sa,sb;               /* les signes de a et b */
 
     sa = sb = 1;
-    if (a<0){
-	sa = -1;
-	a = -a;
+    if (VALUE_NEG_P(a)){
+	sa = VALUE_MONE;
+	a = value_uminus(a);
     }
-    if (b<0){
-	sb  = -1;
-	b = -b;
+    if (VALUE_NEG_P(b)){
+	sb  = VALUE_MONE;
+	b = value_uminus(b);
     }
-    if (a==0 && b==0){
-	*x = 1;
-	*y = 1;
-	return(0);
+    if (VALUE_ZERO_P(a) && VALUE_ZERO_P(b)){
+	*x = VALUE_ONE;
+	*y = VALUE_ONE;
+	return VALUE_ZERO;
     }
     else if(VALUE_ZERO_P(a) || VALUE_ZERO_P(b)){
 	if (VALUE_ZERO_P(a)){
@@ -327,27 +334,27 @@ Value bezout_grl(Value a, Value b, Value *x, Value *y)
 	    c = VALUE_ONE;
 	}
 	
-	r = a0 % a1;
+	r = value_mod(a0,a1);
 	while (VALUE_NOTZERO_P(r))
 	{
-	    q = a0 /a1;
-	    u = u0 - u1 * q;
+	    q = value_div(a0,a1);
+	    u = u0 - value_mult(u1,q);
 
-	    v = v0 - v1*q;
+	    v = v0 - value_mult(v1,q);
 	    a0 = a1; a1 = r;
 	    u0 = u1; u1 = u;
 	    v0 = v1; v1 = v;
 
-	    r = a0 % a1;
+	    r = value_mod(a0,a1);
 	}
   
 	if (VALUE_ZERO_P(c)) {
-	    *x = sa*u1;
-	    *y = sb*v1;
+	    *x = value_mult(sa,u1);
+	    *y = value_mult(sb,v1);
 	}
 	else {
-	    *x = sa*v1;
-	    *y = sb*u1;
+	    *x = value_mult(sa,v1);
+	    *y = value_mult(sb,u1);
 	}
 
 	return a1;
