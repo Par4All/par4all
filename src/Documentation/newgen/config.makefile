@@ -42,6 +42,7 @@ all: $(ALLHS) $(INSTALL_DOC) ri.html dg.html
 
 dvi: $(NGENS:.newgen=.dvi)
 ps: $(NGENS:.newgen=.ps)
+newgen: $(NGENS)
 
 all_newgen_headers.h: $(NGENS)
 	#
