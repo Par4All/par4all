@@ -1,0 +1,26 @@
+#! /bin/sh
+
+# orders libraries used by Pips. Should be called after analyze_libraries.
+# -t top-down (default)
+# -b bottom-up order 
+
+USAGE="Usage: $0 [-t|b]"
+
+DEFAULT=TRUE
+
+while getopts tb opt
+do
+	case $opt in
+	t)	DEFAULT=TRUE;;
+	b)	DEFAULT="";;
+	\?)	echo $USAGE >&2
+		exit 2;;
+	esac
+done
+
+if [ -n "$DEFAULT" ]
+then
+awk '$2 != $3 { print $2 , $3 }' /tmp/libs.j | sort -u | tee /tmp/libs.s | tsort > /tmp/libs.o 2> /tmp/libs.c
+else
+awk '$2 != $3 { print $3 , $2 }' /tmp/libs.j | sort -u | tee /tmp/libs.s | tsort > /tmp/libs.b 2> /tmp/libs.c
+fi
