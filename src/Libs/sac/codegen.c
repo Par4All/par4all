@@ -318,8 +318,6 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 	 }
 	 else
 	 {
-	    printf("*********\nfailure due to expr:\n");
-	    print_expression(e);
 	    argsType = OTHER;
 	    break;
 	 }
@@ -463,7 +461,7 @@ static entity make_new_simd_vector(int itemSize, int nbItems, bool isInt)
 #define MAX_PACK 16
 
 typedef struct {
-      int expr;
+      expression expr;
       list deps;
 } _simd_statement_arg, * simd_statement_arg;
 
@@ -557,6 +555,7 @@ static vector_element make_vector_element(statement_info ssi, int vector, int el
 static statement_info make_statement_info(statement s)
 {
    statement_info ssi;
+   int i;
 
    /* allocate memory */
    ssi = (statement_info)malloc(sizeof(_statement_info));
@@ -569,9 +568,14 @@ static statement_info make_statement_info(statement s)
    ssi->s = copy_statement(s);
 
    /* see if some expressions are modified.
-    * If that is the case, invalidate the list of its available places 
+    * If that is the case, invalidate the list of their available places 
     */
-   
+   for(i=0; i<nbArguments; i++)
+   {
+      //for now, reset all...
+      gen_free_list(arguments[i].places_available);
+      arguments[i].places_available = NIL;
+   }
 
    return ssi;
 }
@@ -604,24 +608,20 @@ static statement_info make_simd_statement_info(int kind, opcode oc, list* args)
    {
       list l = args[j];
 
-      pips_assert("2", ssi->op);
-
       for(i=nbargs-1; i>=0; i--)
       {
 	 argument_info ai;
-	 int id;
 	 simd_statement_arg ssa;
-
-	 //Get the id of the argumet
-	 id = get_argument_id(EXPRESSION(CAR(l)));
+	 expression e = EXPRESSION(CAR(l));
 	 
 	 //Store it in the argument's matrix
 	 ssa = &(ssi->arguments[j + oc->vectorSize * i]);
-	 ssa->expr = id;
+	 ssa->expr = e;
 	 l = CDR(l);
 
+	 //Get the id of the argumet
 	 //Build the dependance tree
-	 ai = get_argument_info(id);
+	 ai = get_argument_info(get_argument_id(e));
 
 	 if (i == nbargs-1)
 	 {  //we write to this variable
@@ -633,16 +633,10 @@ static statement_info make_simd_statement_info(int kind, opcode oc, list* args)
 	 }
 	 else
 	 {  //we read this variable
-	    list l;
 
-	    //ssi depends on all the places where the variable was
+	    //ssa depends on all the places where the expression was
 	    //used before
-	    for(l = ai->places_available; l != NIL; l = CDR(l))
-	    {
-	       vector_element pVe = VECTOR_ELEMENT(CAR(l));
-	       
-	       ssa->deps = CONS(VECTOR_ELEMENT, pVe, ssa->deps);
-	    }
+	    ssa->deps = gen_copy_seq(ai->places_available);
 	 }
 
 	 //Remember that this variable can be found here too
@@ -650,12 +644,6 @@ static statement_info make_simd_statement_info(int kind, opcode oc, list* args)
 				     make_vector_element(ssi, i, j),
 				     ai->places_available);
       }
-   }
-
-   if (ssi->op == NULL)
-   {
-      printf("in the end....\n");
-      exit(-1);
    }
 
    return ssi;
@@ -674,8 +662,6 @@ list make_simd_statements(list kinds, cons* first, cons* last)
       return CONS(STATEMENT_INFO,
 		  make_statement_info(STATEMENT(CAR(first))),
 		  NIL);
-
-   reset_argument_info();
 
    i = first;
    all_instr = CONS(STATEMENT_INFO, NULL, NIL);
@@ -738,7 +724,7 @@ static statement generate_exec_statement(statement_info si)
    list args = NIL;
    int i;
 
-   for(i = si->nbArgs-1; i >= 0; i--)
+   for(i = 0; i < si->nbArgs; i++)
    {
       args = CONS(EXPRESSION,
 		  entity_to_expression(si->vectors[i]),
@@ -748,25 +734,85 @@ static statement generate_exec_statement(statement_info si)
    return make_exec_statement(si->op, args);
 }
 
+static list merge_available_places(list l1, list l2, int element)
+{
+   list i;
+   list j;
+
+   list res = NIL;
+
+   for(i = l1; i != NIL; i = CDR(i))
+   {
+      for(j = l2; j != NIL; j = CDR(j))
+      {
+	 vector_element ei = VECTOR_ELEMENT(CAR(i));
+	 vector_element ej = VECTOR_ELEMENT(CAR(j));
+
+	 if ( (ei->ssi == ej->ssi) &&
+	      (ei->vector == ej->vector) &&
+	      (ei->element == element) )
+	    res = CONS(, ej, NIL);
+      }
+   }
+
+   return res;
+}
+
+void print_places(list l)
+{
+   while(l != NIL)
+   {
+      vector_element e = VECTOR_ELEMENT(CAR(l));
+
+      printf("   ssi=0x%x, vector=%i, element=%i\n", 
+	     e->ssi, e->vector, e->element);
+      
+      l = CDR(l);
+   }
+}
+
 static statement generate_load_statement(statement_info si, int line)
 {
    list args = NIL;
    int i;
    int offset = si->op->vectorSize * line;
+   list sources;
 
-   for(i = si->op->vectorSize-1; i >= 0; i--)
+   //try to see if the arguments have not already been loaded
+   sources = gen_copy_seq(si->arguments[offset].deps);
+
+   for(i = 1; (i<si->op->vectorSize) && (sources!=NIL); i++)
    {
-      argument_info ai = get_argument_info(si->arguments[i + offset].expr);
-      args = CONS(EXPRESSION,
-		  copy_expression(ai->e),
-		  args);
+      list new_sources;
+
+      new_sources = merge_available_places(si->arguments[i + offset].deps, sources, i);
+
+      gen_free_list(sources);
+      sources = new_sources;
    }
 
-   args = CONS(EXPRESSION,
-	       entity_to_expression(si->vectors[line]),
-	       args);
-
-   return make_load_statement(si->op->vectorSize, args);
+   if (sources != NIL)
+   {
+      vector_element vec = VECTOR_ELEMENT(CAR(sources));
+      si->vectors[line] = vec->ssi->vectors[vec->vector];
+      return NULL;
+   }
+   else
+   {
+      //Build the arguments list
+      for(i = si->op->vectorSize-1; i >= 0; i--)
+      {
+	 args = CONS(EXPRESSION,
+		     copy_expression(si->arguments[i + offset].expr),
+		     args);
+      }
+      args = CONS(EXPRESSION,
+		  entity_to_expression(si->vectors[line]),
+		  args);
+      
+      //Make a load statement
+      return make_load_statement(si->op->vectorSize, args);
+   }
 }
 
 static statement generate_save_statement(statement_info si)
@@ -777,9 +823,8 @@ static statement generate_save_statement(statement_info si)
 
    for(i = si->op->vectorSize-1; i >= 0; i--)
    {
-      argument_info ai = get_argument_info(si->arguments[i + offset].expr);
       args = CONS(EXPRESSION,
-		  copy_expression(ai->e),
+		  copy_expression(si->arguments[i + offset].expr),
 		  args);
    }
 
@@ -797,8 +842,6 @@ list generate_simd_code(list/* <statement_info> */ sil)
 
    sl = sl_begin = CONS(STATEMENT, NULL, NIL);
 
-   printf("************************\n"
-	  "generating code:\n");
    for(; sil != NIL; sil=CDR(sil))
    {
       statement_info si = STATEMENT_INFO(CAR(sil));
@@ -807,41 +850,27 @@ list generate_simd_code(list/* <statement_info> */ sil)
       {
 	 /* regular (non-SIMD) statement */
 	 sl = CDR(sl) = CONS(STATEMENT, si->s, NIL);
-	 print_statement(STATEMENT(CAR(sl)));
       }
       else
       {
 	 /* SIMD statement (will generate more than one statement) */
 	 int i;
 
-	 printf("<there>");
-	 
 	 //First, the load statement(s)
 	 for(i = 0; i < si->nbArgs-1; i++)
 	 {
 	    statement s = generate_load_statement(si, i);
 
 	    if (s != NULL)
-	    {
 	       sl = CDR(sl) = CONS(STATEMENT, s, NIL);
-	       print_statement(s);
-	    }
 	 }
-
-	 printf("<then>");
 
 	 //Then, the exec statement
 	 sl = CDR(sl) = CONS(STATEMENT, generate_exec_statement(si), NIL);
-	 print_statement(STATEMENT(CAR(sl)));
-
-	 printf("<nowhere>");
 
 	 //Finally, the save statement (always generated. It is up to 
 	 //latter phases (USE-DEF elimination....) to remove it, if needed
 	 sl = CDR(sl) = CONS(STATEMENT, generate_save_statement(si), NIL);
-	 print_statement(STATEMENT(CAR(sl)));
-
-	 printf("<done>");
       }
    }
 
