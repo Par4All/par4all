@@ -644,7 +644,10 @@ process_thru_cpp(string name)
 	"cp ", name, " ", tmp_file, " && ",
 	cpp? cpp: CPP_CPP, 
 	CPP_CPPFLAGS, cpp_options? cpp_options: "", " ",
-	tmp_file, " > ", new_name, " && rm ", tmp_file, 0));
+	tmp_file, " > ", new_name, 0));
+
+    if (unlink(tmp_file)) 
+	pips_internal_error("unlink of %s failed\n", tmp_file);
 
     free(tmp_file);
     return new_name;
