@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make-pips,v $ version $Revision$
-# $Date: 1996/07/11 14:50:12 $, 
+# $Date: 1996/07/13 11:11:30 $, 
 #
 # (c) Fabien COELHO July 1996
 #
@@ -11,7 +11,7 @@
 
 umask 2
 script=`basename $0`
-unset sides parts commands dirs libs pips newgen linear msg report
+unset sides parts commands dirs libs pips newgen linear msg report where
 verb=':'
 job=$PIPS_MAKE
 
@@ -70,14 +70,15 @@ usage()
 	  -d dir: specifies a directory
 	  -o file: log file to report to (default is /dev/null)
 	  -m msg: message
+	  -w where: where to redirect output (default is none)
 	 targets: make targets to require (e.g. clean all recompile diff...)
 EOF
     exit $ret
 }
 
-while getopts hvNRPDplnbd:o:m: OPT
+while getopts hvNRPDplnbd:o:m:w: opt
 do
-    case $OPT in
+    case $opt in
 	h) usage 0 "here is some help!" ;;
 	v) verb=verbose ;;
 	N) job="echo $PIPS_MAKE" ;;
@@ -98,6 +99,7 @@ do
 	o) report="$OPTARG" ;;
 	m) msg="$msg[$OPTARG]" ;;
 	d) dirs="$dirs $OPTARG" ;;
+	w) where="$OPTARG" ;;
 	*) usage 2 "invalid option" ;;
     esac
 done
@@ -138,13 +140,14 @@ done
 
 $verb "dirs=$dirs"
 $verb "msg=$msg"
+#verb "where=$where"
 $verb "commands=$commands"
 
 for d in $dirs
 do
   $verb "dealing with $d"
   test -d $d || error 3 "no $d directory!" 
-  $job -C $d FWD_LIBS="$libs" FWD_REPORT=">> $report" FWD_MSG="$msg" $commands
+  $job -C $d FWD_LIBS="$libs" FWD_REPORT=">> $report" FWD_MSG="$msg" FWD_OUT="$where" $commands
 done
 
 $verb "done"
