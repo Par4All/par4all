@@ -7,7 +7,7 @@
  * run-time resolution parameters.
  *
  * SCCS stuff:
- * $RCSfile: inits.c,v $ ($Date: 1994/12/22 16:52:18 $, ) version $Revision$,
+ * $RCSfile: inits.c,v $ ($Date: 1995/03/14 14:43:16 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  *
@@ -50,8 +50,7 @@ FILE* file;
 	    max_size_of_processors());
 }
 
-/*
- * create_parameters_h
+/* create_parameters_h
  *
  * to be called after the declaration_with_overlaps() call.
  * it generates the parameters for module.
@@ -102,9 +101,6 @@ entity module;
     gen_free_list(l);
 }
 
-/*
- * max_size_of_processors
- */
 int max_size_of_processors()
 {
     int 
@@ -126,6 +122,25 @@ int max_size_of_processors()
 	 list_of_processors());
 
     return(current_max);
+}
+
+/* translation from an hpf_newdecl tag to the runtime code expected
+ */
+static int code_number(t)
+tag t;
+{
+    switch(t)
+    {
+    case is_hpf_newdecl_none: return(0);
+    case is_hpf_newdecl_alpha: return(1);
+    case is_hpf_newdecl_beta: return(2);
+    case is_hpf_newdecl_gamma: return(3);
+    case is_hpf_newdecl_delta: return(4);
+    default: 
+	pips_error("code_number", "unexpected hpf_newdecl tag %d\n", t);
+    }
+    
+    return(-1); /* just to avoid a gcc warning */
 }
 
 void create_init_common_param_for_arrays(file, module)
@@ -168,17 +183,14 @@ entity module;
 	 i = 1;
 	 for (i=1; i<=nd; i++)
 	 {
-	     dimension
-		 d = entity_ith_dimension(array, i);
+	     dimension d = entity_ith_dimension(array, i);
 	     int lb = HpfcExpressionToInt(dimension_lower(d));
 	     int ub = HpfcExpressionToInt(dimension_upper(d));
 	     int sz = (ub-lb+1);
-	     int decl = new_declaration(array, i);
-	     alignment 
-		 a = FindAlignmentOfDim(align_alignment(al), i);
+	     tag decl = new_declaration(array, i);
+	     alignment a = FindAlignmentOfDim(align_alignment(al), i);
 	     
-	     /*
-	      * RANGEA contents:
+	     /* RANGEA contents:
 	      *
 	      * 1: lower bound
 	      * 2: upper bound
@@ -190,20 +202,21 @@ entity module;
 	     fprintf(file, "      RANGEA(%d, %d, 2) = %d\n", an, i, ub);
 	     fprintf(file, "      RANGEA(%d, %d, 3) = %d\n", an, i, sz);
 	     fprintf(file, "c\n");
-	     fprintf(file, "      RANGEA(%d, %d, 4) = %d\n", an, i, decl);
+	     fprintf(file, "      RANGEA(%d, %d, 4) = %d\n", an, i, 
+		     code_number(decl));
 	     
 	     switch(decl)
 	     {
-	     case NO_NEW_DECLARATION:
+	     case is_hpf_newdecl_none:
 		 break;
-	     case ALPHA_NEW_DECLARATION:
+	     case is_hpf_newdecl_alpha:
 		 /*
 		  * 5: 1 - lower bound
 		  */
 		 fprintf(file, "      RANGEA(%d, %d, 5) = %d\n", 
 			 an, i, (1-lb));
 		 break;
-	     case BETA_NEW_DECLARATION:
+	     case is_hpf_newdecl_beta:
 	     {
 		 int tdim = alignment_templatedim(a);
 		 int procdim = 0;
@@ -233,7 +246,7 @@ entity module;
 		 
 		 break;
 	     }
-	     case GAMMA_NEW_DECLARATION:
+	     case is_hpf_newdecl_gamma:
 	     {
 		 int tdim = alignment_templatedim(a);
 		 int procdim = 0;
@@ -270,7 +283,7 @@ entity module;
 		 
 		 break;
 	     }
-	     case DELTA_NEW_DECLARATION:
+	     case is_hpf_newdecl_delta:
 	     {
 		 int tdim = alignment_templatedim(a);
 		 int rate = HpfcExpressionToInt(alignment_rate(a));
