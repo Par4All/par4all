@@ -145,17 +145,28 @@ static void tpips_user_log(char *fmt, va_list args)
 
 /* Tpips user request */
 
-static string tpips_user_request(fmt, args)
+static string 
+tpips_user_request(fmt, args)
 char *fmt;
 va_list args;
 {
+    char * response;
+
+    debug_on("TPIPS_DEBUG_LEVEL");
+
     if (use_readline) {
 	(void) fprintf(stdout,"\nWaiting for your response: ");
 	(void) vfprintf(stdout, fmt, args);
 	fflush(stdout);
     }
 
-    return tpips_read_a_line(TPIPS_REQUEST_PROMPT);
+    response = tpips_read_a_line(TPIPS_REQUEST_PROMPT);
+
+    pips_debug(2, "returning --%s--\n", response? response: "<NULL>");
+
+    debug_off();
+
+    return response;
 }
 
 /* Tpips user error */
