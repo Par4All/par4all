@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.113  1998/03/08 20:43:28  irigoin
+ * Improved pips error message
+ *
  * Revision 1.112  1998/03/07 21:55:39  irigoin
  * Improved error message
  *
@@ -160,7 +163,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.112 1998/03/07 21:55:39 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.113 1998/03/08 20:43:28 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -1004,7 +1007,12 @@ text_block(
 	return(r) ;
     }
 
-    pips_assert("text_block", strcmp(label, "") == 0) ;
+/* pips_assert("A block cannot be labelled\n", empty_local_label_name_p(label)) ; */
+
+    if(!empty_local_label_name_p(label)) {
+	pips_error("text_block", "Illegal label \"%s\". Blocks cannot carry a label\n",
+		   label);
+    }
     
     if (get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
 	get_bool_property("PRETTYPRINT_BLOCKS")) {
