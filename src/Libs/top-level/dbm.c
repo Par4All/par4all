@@ -13,8 +13,7 @@
 #include "top-level.h"
 
 void default_update_props()
-{
-}
+{}
 
 /* default assignment of pips_update_props_handler is default_update_props.
  * Some top-level (eg. wpips) may need a special update_props proceedure; they 
@@ -22,54 +21,73 @@ void default_update_props()
  */
 void (* pips_update_props_handler)() = default_update_props;
 
-void create_program(pargc, argv)
+bool create_workspace(pargc, argv)
 int *pargc;
 char *argv[];
 {
     int i;
     string name;
+    bool status = FALSE;
 
-    for (i = 0; i < *pargc; i++)
-	process_user_file(argv[i]);
+    for (i = 0; i < *pargc; i++) {
+	status = process_user_file(argv[i]);
+	if (status == FALSE)
+	    break;
+    }
 
-    (* pips_update_props_handler)();
+    if (status) {
+	(* pips_update_props_handler)();
 
-    name = database_name(db_get_current_program());
-    user_log("Workspace %s created and opened\n", name);
+	name = database_name(db_get_current_workspace());
+	user_log("Workspace %s created and opened\n", name);
 
-    open_module_if_unique();
+	status = open_module_if_unique();
+    }
+    return status;
 }
 
-void open_module_if_unique()
+bool open_module_if_unique()
 {
     char *module_list[ARGS_LENGTH];
     int  module_list_length = 0;
+    bool status = TRUE;
 
     /* First parse the makefile to avoid writing
        an empty one */
-    parse_makefile();
+    (void) parse_makefile();
 
-    db_get_module_list(&module_list_length, module_list);
-    if (module_list_length == 1) {
-	open_module(module_list[0]);
+    status = db_get_module_list(&module_list_length, module_list);
+    if (status) {
+	if (module_list_length == 1) {
+	    status = open_module(module_list[0]);
+	}
+	args_free(&module_list_length, module_list);
     }
-    args_free(&module_list_length, module_list);
+    return status;
 }
 
-void open_module(name)
+bool open_module(name)
 char *name;
 {
-    db_set_current_module_name(name);
+    bool status;
+
+    status = db_set_current_module_name(name);
     reset_unique_variable_numbers();
 
-    user_log("Module %s selected\n", name);
+    if (status)
+	user_log("Module %s selected\n", name);
+    else
+	user_warning("open_module", "Could not open module %s\n", name);
+
+    return status;
 }
 
 
 /* Do not open a module already opened : */
-void lazy_open_module(name)
+bool lazy_open_module(name)
 char *name;
 {
+    bool status = TRUE;
     char *current_name = db_get_current_module_name();
 
     message_assert("cannot lazy_open no module", name != NULL);
@@ -77,40 +95,49 @@ char *name;
     if (current_name == NULL || strcmp(current_name, name) != 0) {
 	if (current_name != NULL)
 	    user_log ("Module %s already active\n", name);
-	open_module(name);
+	status = open_module(name);
     }
+    return status;
 }
      
 /* should be: success (cf wpips.h) */
-bool open_program(name)
+bool open_workspace(name)
 char *name;
 {
-    if (make_open_program(name) == NULL) {
+    bool status;
+
+    if (make_open_workspace(name) == NULL) {
 	/* should be show_message */
 	user_log("Cannot open workspace %s\n", name);
-	return (FALSE);
+	status = FALSE;
     }
     else {
 	(* pips_update_props_handler)();
 
 	user_log("Workspace %s opened\n", name);
 
-	open_module_if_unique();
-	return (TRUE);
+	status = open_module_if_unique();
     }
+    return status;
 }
 
-void close_program()
+bool close_workspace()
 {
-    make_close_program();
+    bool status;
 
+    status = make_close_workspace();
+    return status;
     /*clear_props();*/
 }
 
-void delete_program(string wname)
+bool delete_workspace(string wname)
 {
     int status;
     
-    if ((status = safe_system_no_abort (concatenate("Delete ", wname, NULL))))
-	user_error("delete_program", "exit code for Delete is %d\n", status);
+    if ((status = safe_system_no_abort (concatenate("Delete ", wname, NULL)))) {
+	user_warning("delete_workspace", "exit code for Delete is %d\n", status);
+	return FALSE;
+    } else {
+	return TRUE;
+    }
 }
