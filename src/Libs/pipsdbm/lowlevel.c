@@ -109,16 +109,13 @@ db_get_directory_name_for_module(string name)
 /* returns an allocated file name for a file resource.
  * may depend on the current builder, someday.
  * this function is to be used by all phases that generate files.
+ * it does not include the directory for movability
  */
 string
 db_build_file_resource_name(string rname, string oname, string suffix)
 {
-    string dir_name, file_name;
     if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;
-    dir_name = db_get_directory_name_for_module(oname);
-    file_name = strdup(concatenate(dir_name, "/", oname, ".", suffix, 0));
-    free(dir_name);
-    return file_name;
+    return strdup(concatenate(oname, "/", oname, ".", suffix, 0));
 }
 
 /* allocate a full file name for the given resource.
@@ -127,7 +124,12 @@ db_build_file_resource_name(string rname, string oname, string suffix)
 static string
 get_resource_file_name(string rname, string oname)
 {
-    return db_build_file_resource_name(rname, oname, rname);
+    string dir_name, file_name;
+    if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;
+    dir_name = db_get_directory_name_for_module(oname);
+    file_name = strdup(concatenate(dir_name, "/", oname, ".", rname, 0));
+    free(dir_name);
+    return file_name;
 }
 
 static FILE *
@@ -154,24 +156,57 @@ close_resource_file(FILE * file, string rname, string oname)
 #include <sys/stat.h>
 #include <unistd.h>
 
+void
+dbll_unlink_resource_file(string rname, string oname, bool erroriffailed)
+{
+    string full_name = get_resource_file_name(rname, oname);
+    if (unlink(full_name) && erroriffailed) {
+	perror(full_name);
+	pips_internal_error("cannot unlink resource %s of %s\n", rname, oname);
+    }
+}
+
 /* returns 0 on errors (say no file).
  * otherwise returns the modification time.
  */
+static int
+dbll_stat_file(string file_name, bool okifnotthere)
+{
+    struct stat buf;
+    int time = 0, error = stat(file_name, &buf);
+    if (error<0) { /* some error */
+	if (!okifnotthere || get_bool_property("WARNING_ON_STAT_ERROR")) {
+	    perror(file_name);
+	    pips_internal_error("error in stat for %s\n", file_name);
+	}	    
+    } else time = (int) buf.st_mtime; /* humm... unsigned... */
+    return time;
+}
+
+/* it is impportant that the workspace directory does not appear in the
+ * file name so as to allow workspaces to be moveable.
+ */
+int
+dbll_stat_local_file(string file_name, bool okifnotthere)
+{
+    string full_name;
+    int time;
+    if (file_name[0]!='/' && file_name[0]!='.') {
+	string dir_name = db_get_current_workspace_directory();
+	full_name = strdup(concatenate(dir_name, "/", file_name, 0));
+	free(dir_name);
+    } else full_name = strdup(file_name);
+    time = dbll_stat_file(full_name, okifnotthere);
+    free(full_name);
+    return time;
+}
+
 int 
 dbll_stat_resource_file(string rname, string oname, bool okifnotthere)
 {
-    string full_name = get_resource_file_name(rname, oname);
-    struct stat buf;
-    int time = 0, code = stat(full_name, &buf);
-
-    if (code<0) /* some error */
-	if (!okifnotthere || get_bool_property("WARNING_ON_STAT_ERROR")) {
-	    perror(full_name);
-	    pips_internal_error("error in stat for %s\n", full_name);
-	}	    
-    else time = (int) buf.st_mtime; /* humm... unsigned... */
-
-    free(full_name);
+    string file_name = get_resource_file_name(rname, oname);
+    int time = dbll_stat_file(file_name, okifnotthere);
+    free(file_name);
     return time;
 }
 
