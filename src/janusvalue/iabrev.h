@@ -1,3 +1,17 @@
+/* ========================================================================= */
+/*                       SIMPLEXE for integer variables                      */
+/*                            ALL-INTEGER METHODS                            */
+/*                             Jean Claude SOGNO                             */
+/*                     Projet CHLOE -- INRIA ROCQUENCOURT                    */
+/*                                Juin 1994                                  */
+/* ========================================================================= */
+
+/* ========================================================================= */
+/*                             Duong NGUYEN QUE                              */
+/*                 Adaption to abstract computation: janusvalue              */
+/*                               CRI-ENSMP                                   */
+/* ========================================================================= */
+
 #define FTRACE XX->ftrace 
 /* ................ variables resultats ....................... */
 #define VRESULT XX->result
