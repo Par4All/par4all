@@ -213,7 +213,6 @@ bool
 entity_module_p(entity e)
 {
     value v = entity_initial(e);
-
     return v!=value_undefined && value_code_p(v);
 }
 
@@ -234,7 +233,7 @@ entity_blockdata_p(entity e)
 bool 
 entity_common_p(entity e)
 {
-    return entity_module_p(e) && 
+    return entity_module_p(e) && /* ?????? */
 	strspn(entity_local_name(e), COMMON_PREFIX)==1;
 }
 
@@ -607,3 +606,115 @@ entity_continue_p(
 	same_string_p(entity_local_name(f), CONTINUE_FUNCTION_NAME);
 }
 
+
+/**************************************************** CHECK COMMON INCLUSION */
+
+/* returns the list of entity to appear in the common declaration.
+ */
+list /* of entity */
+common_members_of_module(
+    entity common, 
+    entity module,
+    bool only_primary /* not the equivalenced... */)
+{
+    list result = NIL;
+    int cumulated_offset = 0;
+    pips_assert("entity is a common", type_area_p(entity_type(common)));
+
+    MAP(ENTITY, v,
+    {    
+	storage s = entity_storage(v);
+	ram r;
+	pips_assert("storage ram", storage_ram_p(s));
+	r = storage_ram(s);
+	if (ram_function(r)==module)
+	{
+	    int offset = ram_offset(r);
+	    int size = SizeOfArray(v);
+	    if (cumulated_offset==offset || !only_primary)
+		result = CONS(ENTITY, v, result);
+	    else 
+		break; /* drop equivalenced that come hereafter... */
+
+	    cumulated_offset+=size;
+	}
+    },
+        area_layout(type_area(entity_type(common))));
+
+    return gen_nreverse(result);
+}
+
+/* returns if l contains an entity with same type, local name and offset.
+ */
+static bool 
+comparable_entity_in_list_p(
+    entity v, 
+    list l)
+{
+    entity ref = entity_undefined;
+    bool ok, sn, so = FALSE, st = FALSE;
+
+    /* first find an entity with the same NAME. 
+     */
+    string nv = entity_local_name(v);
+    MAP(ENTITY, e,
+    {
+	if (same_string_p(entity_local_name(e),nv))
+	{
+	    ref = e;
+	    break;
+	}
+    },
+	l);
+    
+    ok = sn = !entity_undefined_p(ref);
+
+    pips_assert("v storage ram", storage_ram_p(entity_storage(v)));
+    if (ok) pips_assert("ref storage ram", storage_ram_p(entity_storage(ref)));
+
+    /* same OFFSET?
+     */
+    if (ok) ok = so = ram_offset(storage_ram(entity_storage(v))) ==
+		ram_offset(storage_ram(entity_storage(ref)));
+
+    /* same TYPE?
+     */
+    if (ok) ok = st = type_equal_p(entity_type(v), entity_type(ref));
+
+    pips_debug(4, "%s ~ %s? %d: n=%d,o=%d,t=%d\n", entity_name(v),
+	       entity_undefined_p(ref)? "<undef>": entity_name(ref), 
+	       ok, sn, so, st);
+
+    return ok;
+}
+
+/* check whether a common declaration can be simply included, that is
+ * it is declared with the same names, orders and types in all instances.
+ */
+bool
+check_common_inclusion(entity common)
+{
+    bool ok = TRUE;
+    list /* of entity */ lv, lref;
+    entity ref;
+    pips_assert("entity is a common", type_area_p(entity_type(common)));
+    lv = area_layout(type_area(entity_type(common)));
+
+    if (!lv) return TRUE; /* empty common! */
+
+    /* take the first function as the reference for the check. */
+    ref = ram_function(storage_ram(entity_storage(ENTITY(CAR(lv)))));
+    lref = common_members_of_module(common, ref, FALSE);
+
+    /* SAME name, type, offset */
+    while (lv && ok)
+    {
+	entity v = ENTITY(CAR(lv));
+	if (ram_function(storage_ram(entity_storage(v)))!=ref)
+	    ok = comparable_entity_in_list_p(v, lref);
+	POP(lv);
+    }
+
+    gen_free_list(lref);
+    return ok;
+}
