@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_pips_release,v $ (version $Revision$)
-# $Date: 1996/09/02 22:58:47 $, 
+# $Date: 1996/09/02 23:06:11 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -45,6 +45,7 @@ usage()
     exit $ret
 }
 
+# having the full Doc is too much for binary releases?
 what="-d Share -d Doc -d Runtime -d Examples" 
 
 while getopts hvszw:SB:L:pnle opt
