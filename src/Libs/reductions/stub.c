@@ -30,8 +30,7 @@
 #define REDUCTIONS_SOURCE_DIRECTORY \
         (strdup(concatenate(getenv("DEVEDIR"), "/Lib/reductions", NULL)))
 
-bool reductions(mod_name)
-char *mod_name;
+bool old_reductions(string mod_name)
 {
     string program_name = db_get_current_workspace_name() ;
     char command[ 1024 ] ;
