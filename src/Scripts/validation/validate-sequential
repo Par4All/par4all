@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1996/08/12 16:14:13 $, ) 
+# ($Date: 1996/08/21 15:18:52 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -32,10 +32,11 @@
 #  - tmperr added
 #  - source environment if necessary
 
-[ "$PIPS_HOME" ] || . /home/users/pips/Pips/pipsrc.sh
+[ "$PIPS_ROOT" ] || . /users/softs/pips/Pips/pipsrc.sh
 umask 002
 
 vdir=${PIPS_VALIDDIR}
+tdir=${PIPS_TEMPDIR:=/tmp}
 
 if test -r $vdir/defaults.$PIPS_ARCH
 then
@@ -151,12 +152,12 @@ $VERBOSE "tpips to be used: $tpips_version"
 
 $VERBOSE "running in directory `pwd`"
 
-tmpout=${PIPS_TEMPDIR}/validate.$$
-tmperr=${PIPS_TEMPDIR}/validate_err.$$
-diffout_e=${PIPS_TEMPDIR}/diff_e.$$
-diffout=${PIPS_TEMPDIR}/diff.$$
+tmpout=${tdir}/validate.$$
+tmperr=${tdir}/validate_err.$$
+diffout_e=${tdir}/diff_e.$$
+diffout=${tdir}/diff.$$
 # global variable...
-errors=${PIPS_TEMPDIR}/errors.$$
+errors=${tdir}/errors.$$
 shell='/bin/sh'
 
 echo 0 > $errors
