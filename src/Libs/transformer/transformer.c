@@ -3,6 +3,10 @@
   * $Id$
   *
   * $Log: transformer.c,v $
+  * Revision 1.48  2002/07/24 08:59:56  irigoin
+  * Function transformer_value_substitutable_p() added to check beforehand
+  * problems created by aliases in semantics/interprocedural.c
+  *
   * Revision 1.47  2002/03/11 09:28:42  irigoin
   * calls to sc_normalize() replaced by calls to sc_normalize2()
   *
@@ -1370,6 +1374,22 @@ transformer_value_substitute(transformer t, entity e1, entity e2)
   }
 
   return t;
+}
+
+/* If e1 does not appear in t, it is substitutable. If e1 does appear in t but not e2, again it is substitutable. Else, it if not. */
+bool transformer_value_substitutable_p(transformer t, entity e1, entity e2)
+{
+  bool substitutable_p = TRUE;
+  Psysteme s = (Psysteme) predicate_system(transformer_relation(t));
+
+  pips_assert("e1 and e2 are defined entities",
+	      e1 != entity_undefined && e2 != entity_undefined);
+
+  if(base_contains_variable_p(s->base, (Variable) e1)) {
+    substitutable_p = !base_contains_variable_p(s->base, (Variable) e2);
+  }
+
+  return substitutable_p;
 }
 
 transformer 
