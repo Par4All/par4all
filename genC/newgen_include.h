@@ -206,13 +206,7 @@ extern hash_table Gen_tabulated_names ;
 /* External routines. */
 extern char *alloc() ;
 extern void user() ;
-#ifdef FLEX_SCANNER
-extern char *genspec_text ;
-extern char *genread_text ;
-#else
-extern char genspec_text[] ;
-extern char genread_text[] ;
-#endif
+
 extern void gencode() ;
 extern void fatal() ;
 extern char *itoa() ;
@@ -220,6 +214,7 @@ extern void print_domains() ;
 extern void init() ;
 extern void compile() ;
 extern int gen_size();
+extern void print_domain();
+
 extern int genspec_parse();
 extern int genread_parse();
-extern void print_domain();
