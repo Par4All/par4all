@@ -47,7 +47,7 @@ static void append_to_literal(string s)
 
     total = strlen(literal)+strlen(s)+1;
     if (total >= literal_size) {
-	literal_size = total+10;
+	literal_size = total+100;
 	literal = (char*) realloc(literal, sizeof(char)*literal_size);
 	message_assert("realloc ok", literal);
     }
