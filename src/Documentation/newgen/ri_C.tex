@@ -855,8 +855,8 @@ There are about 36 make\_variable in PIPS source code to modify.
 \newpage
 \section{Expressions}
 
-Expression in Fortran PIPS must be extended to handle new kinds of
-expressions.
+Expressions in Fortran PIPS must be extended to handle new kinds of
+expressions with C language.
 
 \verb/expression = syntax x normalized/
 
@@ -864,13 +864,16 @@ expressions.
 
 \verb/reference = variable:entity x indices:expression*/
 
-New kinds of syntax are added to handle C language. They are cast
-expressions, sizeof expressions and subscripting array expressions. The last
-one is an extension of reference expressions, because they include other
-more complicated array objects which can be a pointer, a function, a
-structure or union member, ...   
+New kinds of syntax are added to handle C language. They are {\it cast},
+ {\it sizeof}, {\it subscripting array} and
+{\it function application} expressions. The subscripting array expression
+is an extension of the reference expression, which includes other
+more complicated array objects such as pointer, function, 
+structure or union member, ... The same extension is made to call
+expression, named function application, because the called function is
+not necessarily an entity but can be any expression that denotes a function.   
 
-\verb/syntax += cast + sizeofexpression + subscript/
+\verb/syntax += cast + sizeofexpression + subscript + application/
 
 \subsection{Cast}
 \verb/cast = type x expression/
@@ -881,6 +884,10 @@ structure or union member, ...
 \subsection{Subscript}
 \verb/subscript = array:expression x indices:expression*/
 
+\subsection{Application}
+\verb/application = function:expression x arguments:expression*/
+
+For example, we can have this complicated function call in C: (*ctx->Driver.RendererString)().
 \subsection{Special calls }
 
 \subsubsection{Member references }
@@ -1086,6 +1093,8 @@ easier? The semantic difference between \verb/continue/ in Fortran and
 
 Another solution is to treat \verb/break/ and \verb/continue/ as
 \verb/goto/. How about code regeneration ?  
+
+
 \section*{Conclusion}
 \nocite{Kern78, Necu02}
 \newpage
@@ -1157,11 +1166,15 @@ incrementation:expression x body:statement ;
 statement = label:entity x number:int x ordering:int x comments:string x
 instruction x declarations:entity* x decls_text:string ;
 
-syntax = reference + range + call + cast + sizeofexpression;
+syntax = reference + range + call + cast + sizeofexpression + subscript + application;
 
 cast = type x expression ;
 
 sizeofexpression = type + expression ;
+
+subscript = array:expression x indices:expression* ;
+
+application = function:expression x arguments:expression* ;
 
 type = statement:unit + area + variable + functional + varargs:type +
 unknown:unit + void:unit + struct:entity* + union:entity* + enum:entity*;
