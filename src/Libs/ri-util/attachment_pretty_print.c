@@ -355,6 +355,24 @@ attach_decoration_to_text(text t)
 }
 
 
+/* Attach a cumulated effects decoration: */
+void
+attach_cumulated_effects_decoration_to_text(text t)
+{
+    if (is_emacs_pretty_print_asked)
+	attach_to_text(t, make_attachee(is_attachee_cumulated_effects, UU));
+}
+
+
+/* Attach a proper effects decoration: */
+void
+attach_proper_effects_decoration_to_text(text t)
+{
+    if (is_emacs_pretty_print_asked)
+	attach_to_text(t, make_attachee(is_attachee_proper_effects, UU));
+}
+
+
 /* Attach a preconditions decoration: */
 void
 attach_preconditions_decoration_to_text(text t)
@@ -470,6 +488,85 @@ deal_with_attachments_in_this_string_length(string a_string,
 }
 
 
+/* Many pretty-printers format their own pseudo-comment by their own
+   and move in memory words that have attachments on them. To be able
+   to track them up to the output, we need to overload the movement
+   function to keep track of these. */
+void
+relocate_attachments(char * source,
+		     char * new_position)
+{
+    int i;
+    int source_length = strlen(source);
+
+    debug_on("ATTACHMENT_DEBUG_LEVEL");
+
+    pips_debug(5, "source = \"%s\" (%x), new_position = \"%s\" (%x)\n",
+	       source, (unsigned int) source,
+	       new_position, (unsigned int) new_position);
+    
+    for(i = 0; i < source_length; i++) {
+	if (bound_word_to_attachments_begin_p((int) source + i)) {
+	    pips_debug(4, "Relocating begin of attachment from %x to %x\n",
+		       (unsigned int) source + i,
+		       (unsigned int) new_position + i);
+	    pips_assert("There is already an attachment on the target",
+			!bound_word_to_attachments_begin_p((int) new_position + i));
+	    store_word_to_attachments_begin((int) new_position + i,
+					    load_word_to_attachments_begin((int) source + i));
+	    delete_word_to_attachments_begin((int) source + i);
+	}
+	if (bound_word_to_attachments_end_p((int) source + i)) {
+	    pips_debug(4, "Relocating end of attachment from %x to %x\n",
+		       (unsigned int) source + i,
+		       (unsigned int) new_position + i);
+	    pips_assert("There is already an attachment on the target",
+			!bound_word_to_attachments_end_p((int) new_position + i));
+	    store_word_to_attachments_end((int) new_position + i,
+					  load_word_to_attachments_end((int) source + i));
+	    delete_word_to_attachments_end((int) source + i);
+	}
+    }
+    debug_off();
+}
+
+
+/* Concatenate source to target and update the source attachments to
+   point to the new location: */
+char *
+strcat_word_and_migrate_attachments(char * target,
+				    char * source)
+{
+    char * new_string;
+    
+    if (is_emacs_pretty_print_asked) {
+	int target_length = strlen(target);
+
+	/* The actual copy: */
+	new_string = strcat(target, source);
+	relocate_attachments(source, target + target_length);
+    }
+    else
+	/* The actual copy: */
+	new_string = strcat(target, source);
+	
+    return new_string;
+}
+
+
+/* Duplicate a string and update the attachments to point to the new
+   returned string: */
+char *
+strdup_and_migrate_attachments(char * a_string)
+{
+    char * new_string = strdup(a_string);
+    
+    if (new_string != NULL && is_emacs_pretty_print_asked)
+	relocate_attachments(a_string, new_string);
+    return new_string;
+}
+
+
 /* Output an attachment to the output file: */
 static void
 output_an_attachment(FILE * output_file,
@@ -564,6 +661,22 @@ output_an_attachment(FILE * output_file,
 	    pips_debug(5, "\ttransformers\n");
 	    fprintf(output_file,
 		    "face epips-face-transformers invisible epips-invisible-transformers");
+	    break;
+	}
+	
+    case is_attachee_cumulated_effects:
+	{
+	    pips_debug(5, "\tcumulated-effect\n");
+	    fprintf(output_file,
+		    "face epips-face-cumulated-effect invisible epips-invisible-cumulated-effect");
+	    break;
+	}
+	
+    case is_attachee_proper_effects:
+	{
+	    pips_debug(5, "\tproper-effect\n");
+	    fprintf(output_file,
+		    "face epips-face-proper-effect invisible epips-invisible-proper-effect");
 	    break;
 	}
 
@@ -685,9 +798,9 @@ output_the_attachments_for_emacs(FILE * output_file)
 
     WORD_TO_ATTACHMENTS_MAP(word_pointer, attachment_list,
     {
-	pips_debug_function(6, "Key %#x, value %#x\n",
-			    (unsigned int) word_pointer,
-			    (unsigned int) attachment_list);
+	pips_debug(6, "Key %#x, value %#x\n",
+		   (unsigned int) word_pointer,
+		   (unsigned int) attachment_list);
 	/* Unlink the attachment from
 	   attachments to avoid double free
 	   later since referenced both by
