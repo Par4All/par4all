@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.230 2003/07/23 13:53:01 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.231 2003/07/28 15:11:21 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -1320,7 +1320,7 @@ static struct intrinsic_handler {
     {"*", words_infix_binary_op, 21},
     {"/", words_infix_binary_op, 21},
     
-    {"INV", words_inverse_op, 21}, 
+    {INVERSE_OPERATOR_NAME, words_inverse_op, 21}, 
     
     {"+", words_infix_binary_op, 20},
     {"-", words_infix_binary_op, 20},
