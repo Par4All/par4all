@@ -16,18 +16,24 @@
 #include "polyedre.h"
 
 /* IRISA  data structures */
-#include "types-irisa.h"
+#include "polylib.h"
 
 /* Irisa is based on int. We would like to change this to 
  * some other type, say "long long" if desired, as VALUE may
  * also be changed. It is currently an int. Let us assume
  * that the future type will be be called "IRINT" (Irisa Int)
  */
+/*
 #define VALUE_TO_IRINT(val) VALUE_TO_INT(val)
 #define IRINT_TO_VALUE(i) ((Value)i)
+*/
+
+#define VALUE_TO_IRINT(val) (val)
+#define IRINT_TO_VALUE(i) (i)
 
 /* should be ANSI C headers...
  */
+/*
 extern Matrix * Matrix_Alloc();
 extern void Matrix_Print();
 extern void Matrix_Free();
@@ -36,6 +42,7 @@ extern Polyhedron * Constraints2Polyhedron();
 extern Polyhedron * Rays2Polyhedron();
 extern Matrix * Polyhedron2Constraints();
 extern void Polyhedron_Free();
+*/
 
 /*  Fonctions de conversion traduisant une ligne de la structure 
  * Matrix de l'IRISA en un Pvecteur
@@ -421,8 +428,8 @@ Psysteme sc;
     A = Constraints2Polyhedron(a, 20000);
     Matrix_Free(a);
 
-    /*   Polyhedron_Print("%4d",A);
-     */
+/*    Polyhedron_Print(stderr, "%4d",A);
+*/
     polyhedron_to_sg(A,sg);
     Polyhedron_Free(A);
     /*   printf(" systeme generateur\n");
@@ -463,7 +470,8 @@ Ptsg sg;
 	A = Rays2Polyhedron(a, 20000);
 	Matrix_Free(a);
 
-	/*      Polyhedron_Print("%4d",A);*/
+/*	Polyhedron_Print(stderr, "%4d",A);
+*/
 	a= Polyhedron2Constraints(A);
 	Polyhedron_Free(A);
 	/* printf("\na =");
@@ -679,8 +687,8 @@ Psysteme sc1,sc2;
 		Matrix_Print(stderr, "%4d,",a); */
 
 	A = Rays2Polyhedron(a, 20000);
-	/*	    Polyhedron_Print(stderr, "%4d",A); */
-
+/*	Polyhedron_Print(stderr, "%4d",A);
+*/
 	a= Polyhedron2Constraints(A);    
 	Polyhedron_Free(A);
     }
