@@ -23,7 +23,6 @@
 #include <values.h>
 
 #include "genC.h"
-#include "mapping.h"
 
 #include "boolean.h"
 #include "vecteur.h"
