@@ -14,18 +14,18 @@
 char *
 i2a(int i)
 {
-   static char buffer[32];
-   sprintf(buffer, "%d", i);
-   return(strdup(buffer));
+    char buffer[32];
+    sprintf(buffer, "%d", i);
+    return strdup(buffer);
 }    
 
 
 char *
 f2a(float f)
 {
-   static char buffer[32];
-   sprintf(buffer, "%f", f);
-   return(strdup(buffer));
+    char buffer[32];
+    sprintf(buffer, "%f", f);
+    return strdup(buffer);
 }    
 
 
