@@ -30,7 +30,8 @@ contraire, la chaine resultat est padde avec des caracteres null.
 
 #include "misc.h"
 
-string strndup(n, s)
+string
+strndup(n, s)
 register int n; /* le nombre de caracteres a copier */
 register string s; /* la chaine a copier */
 {
@@ -56,7 +57,8 @@ register string s; /* la chaine a copier */
 	return(r);
 }
 
-string strndup0(n, s)
+string 
+strndup0(n, s)
 register int n; /* le nombre de caracteres a copier */
 register string s; /* la chaine a copier */
 {
@@ -163,7 +165,8 @@ concatenate(string next, ...)
     return buffer;
 }
 
-char *strupper(s1, s2)
+char *
+strupper(s1, s2)
 char *s1, *s2;
 {
     char *r = s1;
@@ -179,7 +182,8 @@ char *s1, *s2;
     return(r);
 }
 
-char *strlower(s1, s2)
+char *
+strlower(s1, s2)
 char *s1, *s2;
 {
     char *r = s1;
@@ -195,11 +199,32 @@ char *s1, *s2;
     return(r);
 }
 
-string bool_to_string(b)
+string 
+bool_to_string(b)
 bool b;
 {
     static string t = "TRUE";
     static string f = "FALSE";
 
     return b?t:f;
+}
+
+string
+nth_suffix(int i)
+{
+    string suffix = string_undefined;
+
+    pips_assert("Formal parameter i is greater or equal to 1", i >= 1);
+
+    switch(i) {
+    case 1: suffix = "st";
+	break;
+    case 2: suffix = "nd";
+	break;
+    case 3: suffix = "rd";
+	break;
+    default: suffix = "th";
+	break;
+    }
+    return suffix;
 }
