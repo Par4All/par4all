@@ -145,8 +145,7 @@ build_view_file(char * print_type)
 
    if(module_name != NULL) {
       if ( safe_make(print_type, module_name) ) {
-         /* Allow some place for "/./" and other useless stuff: */
-         char file_name_in_database[MAXPATHLEN*2];
+         static char file_name_in_database[MAXPATHLEN];
            
          char * file_name = db_get_file_resource(print_type, module_name, TRUE);
          sprintf(file_name_in_database, "%s/%s",
@@ -170,7 +169,7 @@ get_dont_build_view_file(char * print_type)
 
    if(module_name != NULL) {
       /* Allow some place for "/./" and other useless stuff: */
-      char file_name_in_database[MAXPATHLEN*2];
+       static char file_name_in_database[MAXPATHLEN];
            
       char * file_name = db_get_file_resource(print_type, module_name, TRUE);
 
