@@ -11,10 +11,13 @@ TARGET_LIBS= 	$(PIPS_LIBS) $(TPIPS_ADDED_LIBS)
 DERIVED_HEADERS= y.tab.h completion_list.h
 DERIVED_CFILES= y.tab.c lex.yy.c
 
-ana_lex_completed.l: ana_lex.l $(PIPS_INCLUDEDIR)/resources.h $(PIPS_INCLUDEDIR)/phases.h
+ana_lex_completed.l:	ana_lex.l \
+			$(PIPS_INCLUDEDIR)/resources.h \
+			$(PIPS_INCLUDEDIR)/phases.h \
+			$(PIPS_LIBDIR)/properties.rc
 	$(PIPS_UTILDIR)/build_tpips_lex <ana_lex.l > ana_lex_completed.l
 
-lex.yy.c: ana_lex_completed.l
+lex.yy.c: ana_lex_completed.l y.tab.h
 	$(SCAN) ana_lex_completed.l | sed -e 's/YY/TP_/g;s/yy/tp_/g' > lex.yy.c
 
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
@@ -28,7 +31,9 @@ y.tab.c: ana_syn.y
 
 y.tab.h: y.tab.c
 
-completion_list.h : $(PIPS_INCLUDEDIR)/resources.h $(PIPS_INCLUDEDIR)/phases.h
+completion_list.h :	$(PIPS_INCLUDEDIR)/resources.h \
+			$(PIPS_INCLUDEDIR)/phases.h \
+			$(PIPS_LIBDIR)/properties.rc
 	$(PIPS_UTILDIR)/build_completion_lists > completion_list.h
 
 depend: y.tab.c lex.yy.c
