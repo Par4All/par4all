@@ -1,0 +1,570 @@
+% PIPS Project
+%
+% Description des enchainements possibles des passes et analyses de PIPS
+% pour properties
+%
+% Derivation rules and aliases must be included in verbatim environments. 
+% Nothing else should appear in a verbatim environment.
+% 
+% Modifications
+
+\batchmode
+\documentstyle[11pt]{article}
+\title{Properties \\
+	Low Level Tuning of PIPS}
+\author{Lei Zhou\thanks{E-mail: {\tt zhou@ensmp.fr}} \hspace{2cm} 
+        Fran\c{c}ois Irigoin\thanks{E-mail: {\tt irigoin@ensmp.fr}} \vspace{1cm}\\
+        Centre de Recherche en Informatique \\
+        Ecole des Mines de Paris \\
+        77305 Fontainebleau Cedex \\
+        France \\}
+\date{October 1991}
+
+\addtolength{\textwidth}{72pt}
+\addtolength{\oddsidemargin}{-48pt}
+\addtolength{\evensidemargin}{-48pt}
+\addtolength{\textheight}{172pt}
+\addtolength{\topmargin}{-60pt}
+
+\begin{document}
+\thispagestyle{empty}
+
+\maketitle
+
+% \begin{abstract}
+% \end{abstract}
+
+\section*{Introduction}
+
+This paper describes...
+
+The information here is machine and/or site independent.
+
+Casual users should not use them. They do modify them only through pipsmake
+requests.
+
+Experimented users can modify them by inserting a file called properties.rc
+in their local directory. Of course, they cannot declare new properties,
+which would not be recognized by the PIPS system.
+
+Properties are presented on a library basis, but for the general options.
+
+The file Production/Lib/properties.rc is derived...
+
+\section{Global Option}
+
+Are DO loops bodies at-least executed once (F-66 style).
+Useful for use/def and semantics analysis.
+
+\begin{verbatim}
+ONE_TRIP_DO FALSE
+\end{verbatim}
+
+\section{Chains}
+
+Update dependency graph with RR dependencies.
+Useful for estimation of cache memory traffic. use/def related.
+
+\begin{verbatim}
+KEEP_READ_READ_DEPENDENCE FALSE
+\end{verbatim}
+
+Do we want to mask effects in loop bodies (dangerous with current
+version of Allen \& Kennedy which assumes that all the edges are
+present, the ones on private variables being eventually discarded
+but with a current distribution)
+
+\begin{verbatim}
+CHAINS_MASK_EFFECTS FALSE
+\end{verbatim}
+
+Do we only keep dataflow (Def -- Use) dependences in the chain graph.
+
+\begin{verbatim}
+CHAINS_DATAFLOW_DEPENDENCE_ONLY FALSE
+\end{verbatim}
+
+\section{Prettyprinter Options}
+
+Added for homogeneity reason; could be (easily) reduced to one?  In
+fact, with many target machines in mind, we should have an integer flag
+``architecture", with two basic architectures, sequential and parallel.
+Useless values: re-initialized in the C code.
+
+\begin{verbatim}
+PRETTYPRINT_PARALLEL FALSE
+
+PRETTYPRINT_SEQUENTIAL TRUE
+\end{verbatim}
+
+Print parallel DO loops using FORTRAN 90 syntax. Useless value:
+re-initialized in the C code.
+
+\begin{verbatim}
+PRETTYPRINT_FORTRAN90 FALSE
+\end{verbatim}
+
+Adds Cray (FMP + CFT77) compatible directives for parallelization.
+Useless value: re-initialized in the C code.
+
+\begin{verbatim}
+PRETTYPRINT_CRAY FALSE
+\end{verbatim}
+
+Add statement effects as comments in output; not implemented (that way) yet.
+
+\begin{verbatim}
+PRETTYPRINT_EFFECTS FALSE
+\end{verbatim}
+
+Transform DOALL loops into sequential loops with an opposed increment
+not implemented
+
+\begin{verbatim}
+PRETTYPRINT_REVERSE_DOALL FALSE
+\end{verbatim}
+
+Print statement transformers as comments in code.
+
+\begin{verbatim}
+PRETTYPRINT_TRANSFORMER FALSE
+\end{verbatim}
+
+Print statement preconditions as comments in code.
+
+\begin{verbatim}
+PRETTYPRINT_EXECUTION_CONTEXT FALSE
+\end{verbatim}
+
+Print statement regions as comments in code.
+
+\begin{verbatim}
+PRETTYPRINT_REGION FALSE
+\end{verbatim}
+
+Print statement blocks
+
+\begin{verbatim}
+PRETTYPRINT_BLOCKS FALSE
+\end{verbatim}
+
+Print unstructured blocks
+
+\begin{verbatim}
+PRETTYPRINT_UNSTRUCTURED FALSE
+\end{verbatim}
+
+Print all effects for all statements regardless of PRETTYPRINT\_BLOCKS
+and PRETTYPRINT\_UNSTRUCTURED
+
+\begin{verbatim}
+PRETTYPRINT_ALL_EFFECTS FALSE
+\end{verbatim}
+
+Print empty statement blocks
+
+\begin{verbatim}
+PRETTYPRINT_EMPTY_BLOCKS FALSE
+\end{verbatim}
+
+Print statement ordering information
+
+\begin{verbatim}
+PRETTYPRINT_STATEMENT_ORDERING FALSE
+\end{verbatim}
+
+Print code with DO label and CONTINUE instead of DO-ENDDO. If FALSE, all
+useless CONTINUE statements are NOT prettyprinted (ie. all those in
+structured parts of the code). Warning: case TRUE, generated code may be
+wrong after some code transformations like distribution...
+
+\begin{verbatim}
+PRETTYPRINT_ALL_LABELS FALSE
+\end{verbatim}
+
+Print code with DO label as comment.
+
+\begin{verbatim}
+PRETTYPRINT_DO_LABEL_AS_COMMENT FALSE
+\end{verbatim}
+
+Print private variables without regard for their use
+
+\begin{verbatim}
+PRETTYPRINT_ALL_PRIVATE_VARIABLES FALSE
+\end{verbatim}
+
+
+Print all the declarations even if it's not declared in the original program.
+Added by LZ 22/10/91
+
+\begin{verbatim}
+PRETTYPRINT_ALL_DECLARATIONS FALSE
+\end{verbatim}
+
+Manage internal RETURNs correctly if set to TRUE.  This results in a
+slightly ugly (but correct) prettyprint, compared to a nicer (but
+possibly incorrect) default one.
+
+\begin{verbatim}
+PRETTYPRINT_INTERNAL_RETURN FALSE
+\end{verbatim}
+
+\section{Semantic Analysis}
+
+Perform ``meet" operations for semantics analysis.
+
+\begin{verbatim}
+SEMANTICS_FLOW_SENSITIVE FALSE
+\end{verbatim}
+
+To be refined later; basically, use callee\'s transformers instead of
+callee\'s effects when computing transformers bottom-up in the call graph;
+when going top-down with preconditions, should we care about unique
+call site and/or perform meet operation on call site preconditions ?
+
+\begin{verbatim}
+SEMANTICS_INTERPROCEDURAL FALSE
+\end{verbatim}
+
+Go all the Halbwachs way, compute inequalities instead of sticking
+to equalities; implies SEMANTICS\_FIX\_POINT and SEMANTICS\_FLOW\_SENSITIVE.
+
+\begin{verbatim}
+SEMANTICS_INEQUALITY_INVARIANT FALSE
+\end{verbatim}
+
+CPU time and memory space are cheap: compute loop fixpoint for
+transformers and preconditions; this implies SEMANTICS\_FLOW\_SENSITIVE.
+
+\begin{verbatim}
+SEMANTICS_FIX_POINT FALSE
+\end{verbatim}
+
+Output semantics results on stdout
+
+\begin{verbatim}
+SEMANTICS_STDOUT FALSE
+\end{verbatim}
+
+Debug level for semantics
+
+\begin{verbatim}
+SEMANTICS_DEBUG_LEVEL 0
+\end{verbatim}
+
+\section{Dependence Test (Ricedg)}
+
+% Module code and list of called module names.
+
+\paragraph{Dependence test choice}
+
+This property seems to be now obsolete. The dependence test choice is
+now controlled directly and only by rules in pipsmake.rc.
+
+\begin{verbatim}
+DEPENDENCE_TEST "full"
+\end{verbatim}
+
+\paragraph{Statistics}
+
+Provide the following counts during the dependence test. There are three
+parts: numbers of dependencies and independences (fields 1-10),
+dimensions of referenced arrays and dependence natures (fields 11-25)
+and the same information for constant dependencies (fields 26-40),
+decomposition of the dependence test in elementary steps (fields 41-49),
+use and complexity of Fourier-Motzkin's pair-wise elimination (fields
+50, 51 and 52-68).
+
+\begin{itemize}
+
+  \item[1] array reference pairs, i.e. number of tests effected
+	(used to be the number of use-def, def-use and def-def pairs on arrays);
+
+  \item[2] number of independences found (on array reference pairs);
+
+	{\bf Note:} field 1 minus field 2 is the number of array
+	dependencies. 
+
+  \item[3] numbers of loop independent dependences between references
+	in the 	same statement (not useful for program transformation
+	and parallelization if statements are preserved); it should
+	be subtracted from field 2 to compare results with other
+	parallelizers;
+
+  \item[4] numbers of constant dependences; 
+
+  \item[5] numbers of exact dependences;
+
+	{\bf Note:} field 5 must be greater or equal to field 4.
+
+  \item[6] numbers of inexact dependences involved only by the 
+           elimination of equation;
+  \item[7] numbers of inexact dependences involved only by the F-M
+           elimination;
+  \item[8] numbers of inexact dependences involved by both elimination of
+           equation and F-M elimination; 
+
+	{\bf Note:} the sum of fields 5 to 8 and field 2 equals field 1
+
+  \item[9] number of dependences among scalar variables;
+  \item[10] numbers of dependences among loop index variables;
+  \item[11-40] dependence types detail table with the dimensions [5][3]
+               and constant dependence detail table with the
+               dimensions [5][3]; the first index is the array dimension
+	(from 0 to 4 - no larger arrays has ever been found); the
+	second index is the dependence nature (1: d-u, 2: u-d, 3: d-d);
+	both arrays are flatten according to C rule  as 5 sequences of
+	3 natures;
+
+	{\bf Note:} the sum of fields 11 to 25 should be equal to
+	the sum of field 9 and 2 minus field 1.
+
+	{\bf Note:} the fields 26 to 40 must be less than or equal to
+	the corresponding fields 11 to 25
+
+  \item[41] numbers of independences found by the test of constant;
+  \item[42] numbers of independences found by the GCD test;
+  \item[43] numbers of independences found by the normalize test;
+  \item[44] numbers of independences found by the lexico-positive test
+             for constant Di variables;
+  \item[45] numbers of independences found during the projetion on Di
+            variables by the elimination of equation;
+  \item[46] numbers of independences found during the projetion on Di
+            variables by the Fourier-Motzkin's elimination;
+  \item[47] numbers of independences found during the test of
+            faisability of  Di sub-system by the elimination of equation;
+  \item[48] numbers of independences found during the test of
+            faisability of Di sous-system by the Fourier-Motzkin's
+            elimination; 
+  \item[49] numbers of independences found by the test of lexico-positive
+            for Di sub-system; 
+
+	{\bf Note:} the sum of fields 41 to 49 equals field 2
+
+  \item[50] total number of Fourier-Motzkin's pair-wise eliminations
+	 used; 
+  \item[51] number of Fourier-Motzkin's pair-wise elimination 
+	in which the system size doesn't augment after the elimination;
+  \item[52-68] complexity counter table of dimension [17]. The
+               complexity of one projection by F-M is the product of the
+               number of positive inequalities and the number of negatives
+               inequalities that contain the eliminated variable. This
+	is an histogram of the products. Products which are less than 
+	or equal to 4
+	imply that the total number of inequalities does not increase.
+	So if no larger product exists, field 50 and 51 must be equal.
+\end{itemize}
+
+The results are stored in the currentworkspace in MODULE.resulttestfast,
+MODULE.resultesttestfull, or MODULE.resulttestseman according to the
+test selected.
+
+\begin{verbatim}
+RICEDG_PROVIDE_STATISTICS FALSE
+\end{verbatim}
+
+Provide the statistics above and counte all array reference pairs
+including these involved in call statement.
+
+\begin{verbatim}
+RICEDG_STATISTICS_ALL_ARRAYS FALSE
+\end{verbatim}
+
+\paragraph{Algorithmic dependences}
+
+Only take into account true flow dependences (Def -- Use) during the computation of
+SCC?  Note that this is different from the
+CHAINS_DATAFLOW_DEPENDENCE_ONLY option which doesn't compute the whole
+graph.  Warning: this option potentially yields incorrect parallel code.
+
+\begin{verbatim}
+RICE_DATAFLOW_DEPENDENCE_ONLY FALSE
+\end{verbatim}
+
+\paragraph{Printout}
+
+To print the dependence graph in a file called {\em module\_name}.{\tt dg}
+
+\begin{verbatim}
+PRINT_DEPENDENCE_GRAPH FALSE
+\end{verbatim}
+
+To print the dependence graph without the dependences on privatized
+variables 
+
+\begin{verbatim}
+PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS FALSE
+\end{verbatim}
+
+To print the dependence graph without the no loop carried dependences
+ 
+\begin{verbatim}
+PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
+\end{verbatim}
+
+\paragraph{Optimization}
+
+The default option is to compute the dependence graph only for loops
+which can be parallelized using Allen \& Kennedy algorithm.
+However it is possible to
+compute the dependences in any case even for loop containing test, goto,
+etc...
+by setting this option to TRUE.
+
+\begin{verbatim}
+COMPUTE_ALL_DEPENDENCES FALSE
+\end{verbatim}
+
+\section{Effects}
+
+print SDFI just after computation
+
+\begin{verbatim}
+EFFECTS_PRINT_SDFI TRUE
+\end{verbatim}
+
+\section{Static Complexity Evaluation}
+
+print each ri-walk function call
+
+\begin{verbatim}
+COMPLEXITY_TRACE_CALLS FALSE
+\end{verbatim}
+
+
+print intermediate complexities
+
+\begin{verbatim}
+COMPLEXITY_INTERMEDIATES FALSE
+\end{verbatim}
+
+Print the complete cost table
+
+\begin{verbatim}
+COMPLEXITY_PRINT_COST_TABLE FALSE
+\end{verbatim}
+
+list of variables that must appear litterally in the complexity formula.
+They have relatively high priority.
+
+\begin{verbatim}
+COMPLEXITY_PARAMETERS "IMAX LOOP"
+\end{verbatim}
+
+Controls the printing of statistics:    \\
+ ... = 0 : don't prettyprint statistics with complexities  \\
+ ... = 1 : prettyprint statistics only for loop/block/test/unstr.
+statements \\
+ ... = 2 : prettyprint statistics for all statements
+
+\begin{verbatim}
+COMPLEXITY_PRINT_STATISTICS 0
+\end{verbatim}
+
+In order to change cost table easily, I added this property.
+It means that unit cost can be found under this directory. We have all_1
+that means all operation cost is 1 , fp_1 that means only floating
+point operation is taken into account and has cost unit 1.
+In the future, we will add ``sparc-2'' and ``cray-ymp'',etc.
+The cost filenames are stored in the complexity-local.h, they are operation,
+memory, index, transcend and trigo.
+
+\begin{verbatim}
+COMPLEXITY_COST_TABLE "all_1"
+\end{verbatim}
+
+For the moment, we have two versions of variable evaluation. First,
+evaluate variable as early as possible. This mothod is easier to reach
+but at least it has two drawbacks: (1) If there are several unknown
+variables which are identical, when we use early variable evaluation, we
+can get several UU's . (2) If user want to see the relation of
+complexity. Because the variable is too early replaced by a constant, we
+can not see great thing.
+
+\begin{verbatim}
+COMPLEXITY_EARLY_EVALUATION TRUE
+\end{verbatim}
+
+\section{Top level control}
+
+Print a log of the session
+
+\begin{verbatim}
+USER_LOG_P      TRUE
+\end{verbatim}
+
+What to do on user errors: go ahead (default) or core dump (debug)
+
+\begin{verbatim}
+ABORT_ON_USER_ERROR     FALSE
+\end{verbatim}
+
+\section{Call Graph}
+This section is used to see the calling relations of callees.
+In this section,
+we use the datebase to get the graph. It is different with icfg.
+ex: if A calls B twice, in callgraph, we only have ONCE A calls B;
+while in icfg, we have twice B called by A.
+So there is no option on the so-called callgraph except the debugging.
+
+debugging level (should be CALLGRAPH_DEBUG_LEVEL and numeric)
+
+\begin{verbatim}
+CALLGRAPH_DEBUG FALSE
+\end{verbatim}
+
+\section{Interprocedural Control Flow Graph}
+This section is NOT identical to that of Callgraph. 
+We use the different schemes to get the results.
+We get the calling relations by the declaration, it should be correct.
+But there are bugs somewhere.
+
+print controlling IF's
+
+\begin{verbatim}
+ICFG_IFs FALSE
+\end{verbatim}
+
+print enclosing DO loops
+
+\begin{verbatim}
+ICFG_DOs FALSE
+\end{verbatim}
+
+to be destroyed
+
+\begin{verbatim}
+ICFG_CALLEES_TOPO_SORT FALSE
+\end{verbatim}
+
+\begin{verbatim}
+ICFG_DRAW TRUE
+\end{verbatim}
+
+debugging level (should be ICFG_DEBUG_LEVEL and numeric)
+
+\begin{verbatim}
+ICFG_DEBUG FALSE
+\end{verbatim}
+
+\section{Rice (parallelization)}
+
+TRUE to show all parallel loops  \
+FALSE to generate real code
+
+\begin{verbatim}
+GENERATE_NESTED_PARALLEL_LOOPS TRUE
+\end{verbatim}
+
+\section{wp65 (PUMA project)}
+
+\begin{verbatim}
+WP65_DEBUG_LEVEL        0
+\end{verbatim}
+
+% \begin{thebibliography}{99}
+
+% \end{thebibliography}
+
+\end{document}
