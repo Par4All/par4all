@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1998/07/13 19:40:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1998/09/24 06:54:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1998/07/13 19:40:38 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 1998/09/24 06:54:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -136,6 +136,17 @@ int HasParenthesis;
 	else if (type_unknown_p(te)) {
 	    FatalError("MakeAtom", "unknown dans une expression\n");
 	}
+	else if (type_functional_p(te)) {
+	    if(!HasParenthesis) {
+		/* It can be a PARAMETER or a functional variable or... */
+		value iv = entity_initial(e);
+		if(!value_undefined_p(iv) && value_code_p(iv)) {
+		    user_warning("MakeAtom", "reference to functional entity %s\n",
+				 entity_name(e));
+		    ParserError("MakeAtom", "unsupported use of a functional entity\n");
+		}
+	    }
+	}
     }
 
     /* fixing bad cases */
@@ -164,73 +175,77 @@ int HasParenthesis;
 	/* FI: same as in previous paragraph */
 	/* if (variable_dimensions(type_variable(te))==NULL && indices!=NULL) { */
 	/* if (variable_dimensions(type_variable(te))==NULL
-	    && (indices!=NULL || HasParenthesis)) { */
+	   && (indices!=NULL || HasParenthesis)) { */
 	if (variable_dimensions(type_variable(te))==NULL
 	    && (indices!=NULL || HasParenthesis)) {
-	  if(fc==expression_undefined && lc==expression_undefined)
-	  /*
-	  if( !basic_string_p(variable_basic(type_variable(te)))
-	      || (fc==expression_undefined && lc==expression_undefined)) */ {
-	    e = MakeExternalFunction(e, type_undefined);
-	    /* FI: probleme here for character returning function! You have to know if
-	     * you are dealing with a substring operator or a function call.
-	     *
-	     * Fortunately, according to SUN f77 compiler, you are not allowed to
-	     * take the substring of a function call!
-	     */
-	  }
+	    if(fc==expression_undefined && lc==expression_undefined)
+		/*
+		  if( !basic_string_p(variable_basic(type_variable(te)))
+		  || (fc==expression_undefined && lc==expression_undefined)) */ {
+		e = MakeExternalFunction(e, type_undefined);
+		/* FI: probleme here for character returning function! You have to know if
+		 * you are dealing with a substring operator or a function call.
+		 *
+		 * Fortunately, according to SUN f77 compiler, you are not allowed to
+		 * take the substring of a function call!
+		 */
+	    }
 	}
+    }
+    else if (type_functional_p(te)) {
+	/* In fact, only check compatability... if requested! */
+	    update_functional_type_with_actual_arguments(e, indices);
     }
 
     /* here, bad cases have been transformed into good ones. */
     te = entity_type(e);
 
     if (type_variable_p(te)) {
-      if((gen_length(indices)==0) ||
-	 (gen_length(indices)==
-	  gen_length(variable_dimensions(type_variable(te))))) {
-	if (lc == expression_undefined && fc == expression_undefined) {
-	  s = make_syntax(is_syntax_reference, 
-			  make_reference(e, indices));
+	if((gen_length(indices)==0) ||
+	   (gen_length(indices)==
+	    gen_length(variable_dimensions(type_variable(te))))) {
+	    if (lc == expression_undefined && fc == expression_undefined) {
+		s = make_syntax(is_syntax_reference, 
+				make_reference(e, indices));
+	    }
+	    else {
+		/* substring */
+		expression ref = 
+		    make_expression(make_syntax(is_syntax_reference, 
+						make_reference(e, indices)),
+				    normalized_undefined);
+		expression lce = expression_undefined;
+		expression fce = expression_undefined;
+		list lexpr = NIL;
+		entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
+		basic bt = variable_basic(type_variable(te));
+
+		pips_assert("Substring can only be applied to a string", basic_string_p(bt));
+
+		if(fc == expression_undefined) 
+		    fce = int_to_expression(1);
+		else
+		    fce = fc;
+
+		if(lc == expression_undefined)
+		    lce = int_to_expression(basic_type_size(bt));
+		else
+		    lce = lc;
+
+		lexpr = CONS(EXPRESSION, ref, 
+			     CONS(EXPRESSION, fce,
+				  CONS(EXPRESSION, lce, NIL)));
+		s = make_syntax(is_syntax_call, make_call(substr, lexpr));
+		/* ParserError("MakeAtom", "Substrings are not implemented\n"); */
+	    }
 	}
 	else {
-	  /* substring */
-	  expression ref = 
-	    make_expression(make_syntax(is_syntax_reference, 
-					make_reference(e, indices)),
-			    normalized_undefined);
-	  expression lce = expression_undefined;
-	  expression fce = expression_undefined;
-	  list lexpr = NIL;
-	  entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
-	  basic bt = variable_basic(type_variable(te));
-
-	  pips_assert("Substring can only be applied to a string", basic_string_p(bt));
-
-	  if(fc == expression_undefined) 
-	    fce = int_to_expression(1);
-	  else
-	    fce = fc;
-
-	  if(lc == expression_undefined)
-	    lce = int_to_expression(basic_type_size(bt));
-	  else
-	    lce = lc;
-
-	  lexpr = CONS(EXPRESSION, ref, 
-		      CONS(EXPRESSION, fce,
-			   CONS(EXPRESSION, lce, NIL)));
-	  s = make_syntax(is_syntax_call, make_call(substr, lexpr));
-	  /* ParserError("MakeAtom", "Substrings are not implemented\n"); */
+	    user_warning("MakeAtom",
+			 "Too many or too few subscript expressions"
+			 " for reference to %s\n",
+			 entity_local_name(e));
+	    ParserError("MakeAtom", "Illegal array reference\n");
 	}
-      }
-      else {
-	user_warning("MakeAtom",
-		     "Too many or too few subscript expressions"
-		     " for reference to %s\n",
-		     entity_local_name(e));
-	ParserError("MakeAtom", "Illegal array reference\n");
-      }
 
     }
     else if (type_functional_p(te)) {
@@ -333,4 +348,60 @@ MakeFortranUnaryCall(
     e = MakeUnaryCall(op, e1);
 
     return e;
+}
+
+/* If a left hand side is a call, it should be a substring operator or a macro.
+   If it is a call to an intrinsic with no arguments,
+   the intrinsic is in fact masqued by a local variable.
+
+   If s is not OK, it is freed and a new_s is allocated.
+ */
+
+syntax
+CheckLeftHandSide(syntax s)
+{
+    syntax new_s = syntax_undefined;
+
+    if(syntax_reference_p(s)) {
+	new_s = s;
+    }
+    else {
+	call c = syntax_call(s);
+	entity f = call_function(c);
+
+	if(intrinsic_entity_p(f)) {
+	    if(strcmp(entity_local_name(f), SUBSTRING_FUNCTION_NAME)==0) {
+		/* OK for substrings: They are processed later by MakeAssignInst() */
+		pips_debug(7, "Substring assignment detected\n");
+		new_s = s;
+	    }
+	    else if(ENDP(call_arguments(c))) {
+		/* Oupss... This must be a local variable */
+		entity v = FindOrCreateEntity(get_current_module_name(), entity_local_name(f));
+
+		user_warning("CheckLeftHandSide",
+			     "Name conflict between local variable %s and intrinsics %s\n",
+			     entity_local_name(f), entity_name(f));
+
+		free_syntax(s);
+		reify_ghost_variable_entity(v);
+		new_s = make_syntax(is_syntax_reference, make_reference(v, NIL));
+	    }
+	    else {
+		/* A call to an intrinsic cannot be a lhs: statement function? 
+		   Let's hope it works... */
+		user_warning("CheckLeftHandSide",
+			     "Name conflict between statement function %s and intrinsics %s\n",
+			     entity_local_name(f), entity_name(f));
+		new_s = s;
+	    }
+	}
+	else {
+	    /* Must be a macro... */
+	    pips_debug(2, "Statement function definition %s\n", entity_name(f));
+	    new_s = s;
+	}
+    }
+
+    return new_s;
 }
