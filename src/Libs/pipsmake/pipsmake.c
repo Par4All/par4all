@@ -275,8 +275,9 @@ string rname, oname;
 	    res = db_find_resource(rrrn, rron);
 
 	    if (res != resource_undefined) {
-		debug(8, "rmake", "resource %s(%s) added to up_to_date\n",
-		      rname, oname);
+		debug(5, "rmake", "resource %s(%s) added to up_to_date"
+		      "with time stamp %d\n",
+		      rname, oname, resource_time(res));
 		set_add_element(up_to_date_resources,
 				up_to_date_resources, (char *) res);
 	    }
@@ -804,10 +805,13 @@ string rname, oname;
 		/* Check if the timestamp is OK */
 		if (resource_time(res) < resource_time(resp)) {
 		    debug(5, "up_date_without_reseting_up_to_date_p",
-			  "resource %s(%s) is newer (%ld < %ld)\n",
+			  "resource %s(%s) with time stamp %ld is newer "
+			  "than resource %s(%s) with time stamp %ld\n",
 			  rrrn, rron,
-			  (long) resource_time(res),
-			  (long) resource_time(resp));
+			  (long) resource_time(resp),
+			  resource_name(res),
+			  resource_owner_name(res),
+			  (long) resource_time(res));
 		    result = FALSE;
 		    break;
 		}
@@ -820,8 +824,9 @@ string rname, oname;
     /* If the resource is up to date then add it in the set */
     if (result == TRUE) {
 	debug(5, "up_date_without_reseting_up_to_date_p",
-	      "resource %s(%s) added to up_to_date\n",
-	      rname, oname);
+	      "resource %s(%s) added to up_to_date "
+	      "with time stamp %d\n",
+	      rname, oname, resource_time(res));
 	set_add_element(up_to_date_resources,
 			up_to_date_resources, (char *) res);
     }
