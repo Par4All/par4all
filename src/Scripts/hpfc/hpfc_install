@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1994/09/03 14:18:43 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1994/09/03 17:17:00 $, )
 # version $Revision$
 # got on %D%, %T%
 # $Id$
@@ -88,6 +88,8 @@ then
   $VERBOSE "cleaning $DIRECTORY"
   rm -f $DIRECTORY/*
   
+  touch $BASEDIR/_host.h $BASEDIR/_node.h
+
   $VERBOSE "copying files in $DIRECTORY"
   cp $SRCDIR/hpfc_*.h \
      $SRCDIR/hpfc_*.f \
