@@ -194,7 +194,7 @@ wpips_user_request(char * a_printf_format,
    
    /* returns a newly allocated string...
     */
-   if (the_answer && |string_undefined_p(the_answer))
+   if (the_answer && !string_undefined_p(the_answer))
        the_answer = strdup(the_answer);
 
    return the_answer;
