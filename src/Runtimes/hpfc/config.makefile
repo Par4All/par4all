@@ -2,26 +2,14 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.62  1997/06/09 09:53:20  coelho
+# separate hpfc pvm lib.
+#
 # Revision 1.61  1997/06/06 14:54:21  zory
 # hpfc_communication -> hpfc_communication_pvm
 #
-# Revision 1.60  1997/06/03 08:06:56  coelho
-# *** empty log message ***
-#
-# Revision 1.59  1997/05/30 09:32:20  coelho
-# *** empty log message ***
-#
-# Revision 1.58  1997/05/29 15:07:31  coelho
-# adapted to t3e.
-#
-# Revision 1.57  1997/05/29 13:55:56  zory
-# *** empty log message ***
-#
 # Revision 1.56  1997/05/29 13:31:49  zory
 # _HPFC_DEBUG_ added
-#
-# Revision 1.55  1997/05/28 15:48:14  zory
-# *** empty log message ***
 #
 # Revision 1.54  1997/05/28 15:47:49  zory
 # -ansi added to g77.
@@ -236,8 +224,18 @@ $(DDC_FFILES) $(DDC_CFILES) $(DDC_HEADERS): $(PVM_ARCH).m4
 LIB_HEADERS	= $(CORE_HEADERS) \
 		  $(DDC_HEADERS)
 
-LIBOBJECTS:= $(addprefix $(RT_ARCH)/,  $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
+#
+# OBJECT files
+#
+LIB_OBJECTS:= $(addprefix $(RT_ARCH)/, $(DDC_FFILES:.f=.o) $(DDC_CFILES:.c=.o))
 
+LIB_RTM_OBJECTS	= $(filter-out %pvm.o %mpi.o, $(LIB_OBJECTS))
+LIB_PVM_OBJECTS	= $(filter %pvm.o, $(LIB_OBJECTS))
+LIB_MPI_OBJECTS	= $(filter %mpi.o, $(LIB_OBJECTS))
+
+#
+#
+# MISC files
 M4_MACROS 	= hpfc_lib_m4_macros hpfc_architecture_m4_macros
 HPFC_MAKEFILES 	= hpfc_Makefile_init 
 DOCS		= hpfc_runtime_library.README
@@ -255,10 +253,15 @@ SOURCES = 	$(M4_MACROS) \
 		$(DOCS) \
 		$(SCRIPTS)
 
-LIB_TARGET = $(RT_ARCH)/libhpfcruntime.a
-MKI_TARGET = $(RT_ARCH)/compilers.make
+#
+# Targets to be built
+#
+LIB_TARGET 	= $(RT_ARCH)/libhpfcruntime.a
+LIB_PVM_TARGET 	= $(RT_ARCH)/libhpfcpvm.a
+LIB_MPI_TARGET 	= $(RT_ARCH)/libhpfcmpi.a
+MKI_TARGET 	= $(RT_ARCH)/compilers.make
 
-# $(LIBOBJECTS) $(LIB_TARGET): $(RT_ARCH)
+# $(LIB_OBJECTS) $(LIB_TARGET): $(RT_ARCH)
 
 $(RT_ARCH): $(PIPS_ARCH) ; -test -d $@ || mkdir $@
 
@@ -275,7 +278,10 @@ INSTALL_INC =	$(CORE_HEADERS) \
 		$(SCRIPTS) \
 		$(LIB_FFILES) 
 
-INSTALL_LIB=	$(LIB_TARGET) $(MKI_TARGET)
+INSTALL_LIB=	$(LIB_TARGET) \
+		$(LIB_PVM_TARGET) \
+		$(LIB_MPI_TARGET) \
+		$(MKI_TARGET)
 
 recompile: quick-install
 
@@ -291,28 +297,43 @@ $(CMMD_F77_H):	$(CMMD_INDIR)/cm/$(CMMD_F77_H)
 endif
 
 all: $(RT_ARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
-		$(LIBOBJECTS) $(LIB_TARGET) $(MKI_TARGET)
+		$(LIB_OBJECTS) $(INSTALL_LIB)
 
 #
 # get pvm headers
 #
 
-pvm3.h:	$(pvminc)/pvm3.h
-	$(COPY) $< $@
-
-fpvm3.h:$(pvminc)/fpvm3.h
-	$(COPY) $< $@
-
-$(PVM_ARCH).m4:
-	$(COPY) $(pvmconf)/$(PVM_ARCH).m4 $@
+pvm3.h:	$(pvminc)/pvm3.h; $(COPY) $< $@
+fpvm3.h:$(pvminc)/fpvm3.h; $(COPY) $< $@
+$(PVM_ARCH).m4:; $(COPY) $(pvmconf)/$(PVM_ARCH).m4 $@
 
 #
+# HPFC RUNTIME
+#
+$(LIB_TARGET):	$(LIB_HEADERS) $(LIB_RTM_OBJECTS) 
+	$(RM) $@ ; \
+	$(ARCHIVE) $@ $(LIB_RTM_OBJECTS) ; \
+	$(RANLIB) $@
 
-$(LIB_TARGET):	$(PVM_HEADERS) $(LIB_HEADERS) $(LIBOBJECTS) 
-	$(RM) $(LIB_TARGET) 
-	$(ARCHIVE) $(LIB_TARGET) $(LIBOBJECTS) 
-	$(RANLIB) $(LIB_TARGET) 
+#
+# HPFC PVM
+#
+$(LIB_PVM_TARGET): $(PVM_HEADERS) $(LIB_HEADERS) $(LIB_PVM_OBJECTS) 
+	$(RM) $@ ; \
+	$(ARCHIVE) $@ $(LIB_PVM_OBJECTS) ; \
+	$(RANLIB) $@
 
+#
+# HPFC MPI
+#
+$(LIB_MPI_TARGET): $(PVM_HEADERS) $(LIB_HEADERS) $(LIB_MPI_OBJECTS) 
+	$(RM) $@ ; \
+	$(ARCHIVE) $@ $(LIB_MPI_OBJECTS) ; \
+	$(RANLIB) $@
+
+#
+#
+#
 %.h: %.f
 	# building $@ from $<
 	sh ./hpfc_generate_h < $< > $@ ; \
@@ -322,12 +343,10 @@ $(RT_ARCH)/%.o: %.c
 	$(COMPILE) $< -o $@
 
 ifeq ($(PVM_ARCH),CRAY)
-$(RT_ARCH)/%.o: %.f
-	$(F77COMPILE) $<
-	mv $*.o $@
+# the cray compilers do not like combining -c and -o
+$(RT_ARCH)/%.o: %.f; $(F77COMPILE) $< ; mv $*.o $@
 else
-$(RT_ARCH)/%.o: %.f
-	$(F77COMPILE) $< -o $@
+$(RT_ARCH)/%.o: %.f; $(F77COMPILE) $< -o $@
 endif
 
 $(RT_ARCH)/compilers.make:
@@ -353,9 +372,8 @@ hpfc_includes.h: $(LIB_M4FFILES:.m4f=.h)
 
 clean: local-clean
 local-clean: 
-	$(RM) *~ $(LIBOBJECTS) $(PVM_HEADERS) \
-		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) \
-		$(LIB_TARGET)   $(MKI_TARGET)
+	$(RM) *~ $(LIB_OBJECTS) $(PVM_HEADERS) \
+		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) $(INSTALL_LIB)
 	test ! -d $(RT_ARCH) || rmdir $(RT_ARCH)
 
 # that is all
