@@ -259,11 +259,11 @@ int level;
 }
 
 /* 
-FindSccs is the interface function to compute the SCCs of a graph. it
+FindSccs is the interface function to compute the SCCs of a graph. It
 marks all nodes as 'not visited' and then apply the main function
 LowlinkCompute on all vertices. 
 
-a vertex is processed only if it belongs to region. later, successoressors
+A vertex is processed only if it belongs to region. Later, successors
 will be processed if they can be reached through arcs whose level is
 greater or equal to level.
 
@@ -304,8 +304,10 @@ int level;
 
     free(Stack);
 
-    if (get_debug_level() >= 3) {
+    ifdebug(3) {
+	debug(3, "FindSccs", "Strongly connected components:\n");
 	PrintSccs(Components);    
+	debug(3, "FindSccs", "End\n");
     }
 
     return(Components);
@@ -408,6 +410,11 @@ int l;
 {
     cons *lsccs;
 
+    ifdebug(8) {
+	debug(8, "FindAndTopSortSccs", "Dependence graph:\n");
+	print_graph(stderr, statement_undefined, g);
+    }
+
     debug(3, "FindAndTopSortSccs", "computing sccs ...\n");
     Components = FindSccs(g, region, l);
 
@@ -437,6 +444,11 @@ scc s;
 void PrintSccs(ss)
 sccs ss;
 {
-    fprintf(stderr, "Strongly connected components\n");
-    MAPL(ps, {PrintScc(SCC(CAR(ps)));}, sccs_sccs(ss));
+    fprintf(stderr, "Strongly connected components:\n");
+    if(!ENDP(sccs_sccs(ss))) {
+	MAPL(ps, {PrintScc(SCC(CAR(ps)));}, sccs_sccs(ss));
+    }
+    else {
+	fprintf(stderr, "Empty list of scc\n");
+    }
 }
