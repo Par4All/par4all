@@ -11,7 +11,7 @@
 #
 # The following macros define the value of commands that are used to
 #
-CPPFLAGS	+= -DLARGE_FONTS -DPIPS_ARCH=\"$(ARCH)\" 
+# CPPFLAGS	+= -DLARGE_FONTS -DPIPS_ARCH=\"$(ARCH)\" 
 #
 # Source, header and object files used to build the target
 #
