@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/03/29 11:00:47 $, ) 
+# ($Date: 1997/04/02 10:46:19 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -259,7 +259,7 @@ test_aspect()
      u_name=`echo $name | tr a-z A-Z`
      program=$name
 
-     test -f $aspect/$name.f -o -f $aspect/$name.F || 
+     test -r $aspect/$name.f -o -r $aspect/$name.F || 
 	echo "! no $aspect/$name.[fF]"
      
      rm -f $tmpout $tmperr
@@ -284,6 +284,25 @@ or $tpips_version" || \
        continue
      fi
      
+     #
+     # .tpips case
+
+     if [ -r $aspect/$name.tpips ]
+     then
+       $DEBUG " || .tpips case"
+       $tpips_version $aspect/$name.tpips 2> $tmperr
+       STATUS=$?
+       test -f core && rm -f core
+       
+       report $STATUS \
+         "Execution of $aspect/$name.tpips
+failed with $tpips_version" || \
+         { $DEBUG " || error"; continue;}
+
+       make_diff $aspect $name test
+       continue
+     fi
+
      #
      # default_test case
      
