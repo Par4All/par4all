@@ -9,6 +9,11 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.76  2003/06/27 09:59:15  irigoin
+ * Intermediate version. rmake() made visible for callgraph.c: to be improved
+ * if possible and reversed to static rmake(). Comments added. Some casts
+ * added unsuccessfully to suppress some gcc complaints.
+ *
  * Revision 1.75  2003/06/24 08:22:01  irigoin
  * Improvements of debugging messages
  *
@@ -243,7 +248,8 @@ void reset_static_phase_variables()
 /* Apply an instantiated rule with a given ressource owner 
  */
 
-static bool rmake(string, string);
+/* FI: uncomment if rmake no longer needed in callgraph.c */
+/* static bool rmake(string, string); */
 
 #define add_res(vrn, on)					\
   result = CONS(REAL_RESOURCE, \
@@ -290,7 +296,7 @@ static list build_real_resources(string oname, list lvr)
 			pips_internal_error("More the one main\n");
 		    
 		    number_of_main++;
-		    pips_debug(8, "Main is %s\n", on);
+		    pips_debug(8, "Main is %s\n", (string) on);
 		    add_res(vrn, on);
 		}
 	    },
@@ -366,7 +372,7 @@ static list build_real_resources(string oname, list lvr)
 
 	    GEN_ARRAY_MAP(on, 
 	    {
-		pips_debug(8, "\t%s\n", on);
+		pips_debug(8, "\t%s\n", (string) on);
 		add_res(vrn, on);
 	    },
 		modules);
@@ -533,9 +539,10 @@ static bool apply_a_rule(string oname, rule ru)
 }
 
 
-/* this function returns the active rule to produce resource rname */
-rule 
-find_rule_by_resource(string rname)
+/* This function returns the active rule to produce resource rname. It
+   selects the first active rule in the database which produces the
+   resource but does not use/require it.  */
+rule find_rule_by_resource(string rname)
 {
     makefile m = parse_makefile();
 
@@ -545,7 +552,9 @@ find_rule_by_resource(string rname)
     MAP(RULE, r, {
 	bool resource_required_p = FALSE;
 
-	/* walking thru resources required by this rule */
+	/* walking thru resources required by this rule to eliminate rules
+           using and producing this resource, e.g. code transformations
+           for the CODE resource. */
 	MAP(VIRTUAL_RESOURCE, vr,
 	{
 	    string vrn = virtual_resource_name(vr);
@@ -559,7 +568,7 @@ find_rule_by_resource(string rname)
 
 	}, rule_required(r));
 
-	/* If this particular resource is not required */
+	/* If this particular resource is not required by the current rule. */
 	if (!resource_required_p) {
 	    /* walking thru resources made by this particular rule */
 	    MAP(VIRTUAL_RESOURCE, vr, {
@@ -569,7 +578,7 @@ find_rule_by_resource(string rname)
 
 		    pips_debug(5, "made by phase %s\n", rule_phase(r));
 
-		    /* is this phase an active one ? */
+		    /* Is this phase an active one ? */
 		    MAP(STRING, pps, {
 			if (same_string_p(pps, rule_phase(r))) {
 			    pips_debug(5, "active phase\n");
@@ -699,8 +708,8 @@ static bool make(string rname, string oname)
     return success_p;
 }
 
-/* recursive make resource */
-static bool rmake(string rname, string oname)
+/* recursive make resource. Should be static, but FI needs it from callgraph.c */
+bool rmake(string rname, string oname)
 {
     rule ru;
     char * res = NULL;
@@ -942,7 +951,7 @@ static bool check_physical_resource_up_to_date(string rname, string oname)
     gen_full_free_list (virtuals);
     gen_full_free_list (reals2);
 
-    /* If the rule is in the modified list, then
+    /* If the resource is in the modified list, then
        don't check anything */
     if (res_in_modified_list_p == FALSE)
     {
