@@ -13,8 +13,8 @@
 #include "ri-util.h"
 #include "misc.h"
 
-#include "tiling.h"
 #include "matrice.h"
+#include "tiling.h"
 #include "movements.h"
 
 /* this function builds the following system of constraints depending
