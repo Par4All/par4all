@@ -243,7 +243,7 @@ char *mod_name;
 	  "Computing Rice dependence graph for %s\n", mod_name);
 
     ifdebug(1) {
-	mem_spy_init(0, 5*1024, NET_MEASURE, 0);
+	mem_spy_init(0, 0, NET_MEASURE, 0);
     }
 
     debug_off();
@@ -275,6 +275,15 @@ char *mod_name;
     }
     
     hash_warn_on_redefinition();
+
+/*
+    ifdebug(1)
+    {
+	mem_spy_begin();
+	gen_write(stderr, chains);
+	mem_spy_end("after gen_write alone");
+    }
+*/
 
     dg = gen_copy_tree (chains);
 
