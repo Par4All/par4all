@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/04/01 11:36:38 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/04/02 14:35:41 $, )
  * version $Revision$
  */
  
@@ -344,11 +344,13 @@ compile_module(entity module)
     insure_declaration_coherency(node_module, node_stat,
 				 get_include_entities());
     kill_statement_number_and_ordering(node_stat);
+    statement_structural_cleaning(node_stat);
     
     update_object_for_module(host_stat, host_module);
     update_object_for_module(entity_code(host_module), host_module);
     insure_declaration_coherency(host_module, host_stat, NIL);
     kill_statement_number_and_ordering(host_stat);
+    statement_structural_cleaning(host_stat);
 
     /*   PUT IN DB
      */
