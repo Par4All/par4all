@@ -3,7 +3,7 @@
 #
 # SCCS stuff:
 #
-# $RCSfile: Pips,v $ ($Date: 1994/03/28 08:40:24 $) version $Revision$, got on %D%, %T%
+# $RCSfile: Pips,v $ ($Date: 1994/05/20 15:58:08 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 
@@ -193,8 +193,12 @@ rename ()
         s/^pcinterfull$/PreConditions_INTER_FULL/; \
         s/^pcinter$/PreConditions_INTER_fast/; \
         s/^pc$/PreConditions_intra/; \
+	s/^mayreg$/MAY_REGions/; \
+	s/^mustreg$/MUST_REGions/; \
+	s/^ioreg$/In_Out_REGions/; \
 	s/^prcg$/PRint_Call_Graph/; \
 	s/^prcr$/PRint_Code_Regions/; \
+	s/^prcior$/PRint_Code_In_Out_Regions/; \
         s/^prct$/PRint_Code_Transformers/; \
 	s/^prcpe$/PRint_Code_Proper_Effects/; \
 	s/^prcce$/PRint_Code_Cumulated_Effects/; \
