@@ -1,0 +1,46 @@
+#! /bin/sh
+
+# Delete
+#
+# Delete removes a list of workspaces whose names are provided
+# after the command, no matter which the current workspace is.
+# Filename generation rules can be used to expres the workspace 
+# name, provided that special characters are quoted.
+#
+# Exemples equivalents:
+# Delete foo
+# Delete foo.database
+# Delete foo.database/
+# Delete `pwd`/foo.database
+#
+# bb, revised: 24.12.91
+
+# check that at least 1 argument is passed 
+if [ $# -lt 1 ]
+then
+echo "Usage: $0 wspace ..." >&2
+exit 1
+fi
+
+while [ $# -gt 0 ]
+do
+	for WS in $1
+	do
+	# bug:	dirname foo.database/   makes:  "."
+	#	basename foo.database/   makes:  ""
+	# donc on supprime l'eventuel / de fin de ligne:
+	WS=`echo $WS | sed 's/\/$//'`
+	# delete .PIPS_CURRENT_PROGRAM
+	rm -f `dirname $WS`/$PIPS_CURRENT_PROGRAM
+	# so that both zzz.database and zzz are good workspace names
+	WS=`dirname $WS`/`basename $WS .database`.database
+	if [ ! -d "$WS" ]
+	then
+		echo $0: No such directory \`$WS\' >&2
+	else
+		# echo rm -r $WS
+		rm -r $WS
+	fi
+	done
+	shift
+done
