@@ -376,3 +376,40 @@ bool full_simple_proper_effects(string module_name, statement current)
   generic_effects_reset_all_methods();
   return ok;
 }
+
+bool simple_cumulated_effects(string module_name, statement current)
+{
+  bool ok = TRUE;
+  set_methods_for_proper_simple_effects();
+
+  (*effects_computation_init_func)(module_name);
+
+  /* We also need the proper effects of the module */
+  /*
+  set_proper_rw_effects((*db_get_proper_rw_effects_func)(module_name));
+  */
+
+  /* Compute the rw effects or references of the module. */
+  init_rw_effects();
+  init_invariant_rw_effects();
+  
+  debug_on("EFFECTS_DEBUG_LEVEL");
+  pips_debug(1, "begin\n");
+  
+  rw_effects_of_module_statement(current);
+
+  pips_debug(1, "end\n");
+  debug_off();
+  
+  (*db_put_rw_effects_func)(module_name, get_rw_effects());
+  (*db_put_invariant_rw_effects_func)(module_name, get_invariant_rw_effects());
+
+  (*effects_computation_reset_func)(module_name);
+  
+  generic_effects_reset_all_methods();
+  return ok;
+}
+
+
+
+
