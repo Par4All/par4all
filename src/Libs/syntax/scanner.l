@@ -6,8 +6,7 @@
  */
 
 #define YY_INPUT(buf,result,max_size) \
-{ int c = PipsGetc(yyin);\
-  result = (c == EOF)? YY_NULL: (buf[0] = c, 1);}
+{ int c = PipsGetc(yyin); result = (c == EOF)? YY_NULL: (buf[0] = c, 1);}
 
 #else /* we're not using flex... let us assume some very peculiar lex... */
 
@@ -259,10 +258,8 @@ void yyreset_lex(void)
 #ifdef FLEX_SCANNER
     yyrestart(yyin);
 #else
-    extern char syn_sbuf[];
-    extern char * syn_sptr;
-    extern int syn_previous;
-    /* reset lex... Might be better to read the whole file? */
+    /* reset lex... Might be better to read the whole file?
+     */
     syn_sptr = syn_sbuf;
 # define MMNEWLINE 10
     syn_previous = MMNEWLINE;
