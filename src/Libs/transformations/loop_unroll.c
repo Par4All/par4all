@@ -62,11 +62,10 @@ statement loop_statement;
 int rate;
 {
     debug(2, "loop_unroll", "unroll %d times\n", rate);
+
     pips_assert("loop_unroll", 
-		instruction_loop_p(statement_instruction(loop_statement)),
-		"bad argument type\n");
-    pips_assert("loop_unroll", rate > 0, 
-		"loop unrolling rate not positiv: %d\n", rate);
+		instruction_loop_p(statement_instruction(loop_statement)));
+    pips_assert("loop_unroll", rate > 0); 
 
 {
     loop il = instruction_loop(statement_instruction(loop_statement));
@@ -86,8 +85,8 @@ int rate;
     int lbval, ubval, incval;
     bool numeric_range_p = FALSE;
 
-    pips_assert("loop_unroll", mod_ent != entity_undefined,
-		"module entity undefined\n");
+    pips_assert("loop_unroll", mod_ent != entity_undefined);
+
     if(get_debug_level()==7) {
 	/* Start debug in Newgen */
 	gen_debug |= GEN_DBG_CHECK;
@@ -178,8 +177,7 @@ int rate;
     /* Create body of the loop, with updated index */
     body = gen_copy_tree(loop_body(il));
     ifdebug(9) {
-	pips_assert("loop_unroll", gen_consistent_p(body),
-		    "gen_copy_tree returns bad statement\n");
+	pips_assert("loop_unroll", gen_consistent_p(body));
     }
     expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 			  MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME), 
@@ -187,8 +185,7 @@ int rate;
 					 gen_copy_tree(inc)),
 			  gen_copy_tree(lb));
     ifdebug(9) {
-	pips_assert("loop_unroll", gen_consistent_p(expr),
-		    "gen_copy_tree returns bad expression(s)\n");
+	pips_assert("loop_unroll", gen_consistent_p(expr));
     }
     StatementReplaceReference(body,
 			      make_reference(ind,NIL),
@@ -367,8 +364,8 @@ statement loop_statement;
     int iter;
 
     debug(2, "full_loop_unroll", "begin\n");
-    pips_assert("full_loop_unroll", mod_ent != entity_undefined,
-		"module entity undefined\n");
+    pips_assert("full_loop_unroll", mod_ent != entity_undefined);
+
     if(get_debug_level()==7) {
 	/* Start debug in Newgen */
 	gen_debug |= GEN_DBG_CHECK;
@@ -572,8 +569,7 @@ char *mod_name;
        data base after unrolling */
     mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
     mod_inst = statement_instruction(mod_stmt);
-    pips_assert("unroll", instruction_unstructured_p(mod_inst),
-		"unstructured expected\n");
+    pips_assert("unroll", instruction_unstructured_p(mod_inst));
 
     /* go through unstructured and apply recursiv_loop_unroll */
     CONTROL_MAP(ctl, {
