@@ -23,6 +23,11 @@
 /* $Id$
  * 
  * $Log: dbm_interface.c,v $
+ * Revision 1.42  2003/06/27 11:52:59  irigoin
+ * temporary/intermediate version. resource SUMMARY_PRECONDITION should not
+ * be generated in intraprocedural mode. other modifs linked to Duong's needs
+ * to print out variables in constraints systems.
+ *
  * Revision 1.41  2001/12/05 17:13:19  irigoin
  * Numerous additions to compute total preconditions
  *
@@ -542,7 +547,7 @@ bool summary_total_precondition(char * module_name)
 
 
 
-/* resource module_name_to_transformers(char * module_name):
+/* bool generic_module_name_to_transformers(char * module_name, bool in_context):
  * compute a transformer for each statement of a module with a given
  * name; compute also the global transformer for the module
  */
@@ -555,6 +560,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     list e_inter;
 
     debug_on(SEMANTICS_DEBUG_LEVEL);
+    sc_variable_name_push((char* (*)(Variable)) readable_value_name);
 
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     /* could be a gen_find_tabulated as well... */
@@ -648,6 +654,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
 
     free_value_mappings();
 
+    sc_variable_name_pop();
     debug_off();
 
     return TRUE;
@@ -689,7 +696,8 @@ bool module_name_to_preconditions(char *module_name)
     transformer post;
 
     /* set_debug_level(get_int_property(SEMANTICS_DEBUG_LEVEL)); */
-     debug_on(SEMANTICS_DEBUG_LEVEL);
+    debug_on(SEMANTICS_DEBUG_LEVEL);
+    sc_variable_name_push((char* (*)(Variable)) readable_value_name);
 
     set_current_module_entity( local_name_to_top_level_entity(module_name) );
     /* could be a gen_find_tabulated as well... */
@@ -817,9 +825,14 @@ bool module_name_to_preconditions(char *module_name)
 	}
     }
     else {
+      /* FI: in the intraprocedural mode, this is not declared to
+         pipsmake.rc and should not be done. */
+      /*
       DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
 			   module_name, 
 			   (char*) transformer_dup(pre) );
+      */
+      ;
     }
 
     /* Add declaration information: arrays cannot be empty (Fortran
@@ -858,6 +871,7 @@ bool module_name_to_preconditions(char *module_name)
 
     free_value_mappings();
 
+    sc_variable_name_pop();
     debug_off();
 
     return TRUE;
@@ -872,6 +886,7 @@ bool module_name_to_total_preconditions(char *module_name)
   list e_inter = list_undefined;
 
   debug_on(SEMANTICS_DEBUG_LEVEL);
+  sc_variable_name_push((char* (*)(Variable)) readable_value_name);
 
   set_current_module_entity( local_name_to_top_level_entity(module_name) );
   set_current_module_statement( 
@@ -980,6 +995,7 @@ bool module_name_to_total_preconditions(char *module_name)
 
   free_value_mappings();
 
+  sc_variable_name_pop();
   debug_off();
 
   return TRUE;
