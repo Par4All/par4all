@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: compile_wp65,v $ (version $Revision$)
-# $Date: 1996/08/21 18:16:02 $, 
+# $Date: 1996/09/03 14:39:59 $, 
 #
 # from csh to sh, FC 19/09/95
 #
@@ -110,13 +110,13 @@ fi
 #
 # Let's compile
 
-WP65_LIBRARY=${WP65_LIBRARY:-${PIPS_ROOT}/Runtime/wp65}
-export WP65_LIBRARY 
+WP65_RUNTIME=${WP65_RUNTIME:-${PIPS_ROOT}/Runtime/wp65}
+export WP65_RUNTIME 
 
 TMP=wp65_tmp_$$
 
 sed 's,DOALL ,DO ,;/PRIVATE /d' $FILES > $TMP.f
-make -f $WP65_LIBRARY/Makefile.compile_wp65 SOURCES.f="$TMP.f" CIBLE="$target"
+make -f $WP65_RUNTIME/Makefile.compile_wp65 SOURCES.f="$TMP.f" CIBLE="$target"
 status=$?
 
 [ $debug = ':' ] && rm -f $TMP.f $TMP.o
