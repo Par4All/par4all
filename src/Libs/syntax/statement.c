@@ -2,6 +2,11 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.54  2001/07/19 17:05:23  irigoin
+ * Function update_functional_type_result() added to make sure that
+ * subroutines are declared as subroutines. The result type is updated to
+ * void in MakeCallInst() when a CALL is encountered.
+ *
  * Revision 1.53  2001/07/13 11:55:18  coelho
  * accept constant_call case in assert.
  *
@@ -934,6 +939,32 @@ MakeAssignInst(syntax l, expression e)
    return i;
 }
 
+/* Update of the type returned by function f. nt must be a freshly
+   allocated object. It is included in f's data structure */
+void
+update_functional_type_result(entity f, type nt)
+{
+  type ft = entity_type(f);
+  type rt = type_undefined;
+
+  pips_assert("function type is functional", type_functional_p(ft));
+
+  rt = functional_result(type_functional(ft));
+
+  pips_assert("result type is variable or unkown or void or undefined",
+	      type_undefined_p(rt)
+	      || type_unknown_p(rt)
+	      || type_void_p(rt)
+	      || type_variable_p(rt));
+
+  pips_assert("new result type is variable or void",
+	      type_void_p(nt)
+	      ||type_variable_p(nt));
+
+  free_type(rt);
+  functional_result(type_functional(ft)) = nt;
+}
+
 void
 update_functional_type_with_actual_arguments(entity e, list l)
 {
@@ -1039,8 +1070,9 @@ MakeCallInst(
 
     update_called_modules(e);
 
-    pips_assert("MakeCallInst", MakeExternalFunction(e, MakeTypeVoid()) == e); 
+    pips_assert("e itself is returned", MakeExternalFunction(e, MakeTypeVoid()) == e); 
 
+    update_functional_type_result(e, make_type(is_type_void,UU));
     update_functional_type_with_actual_arguments(e, ap);
 
     if(!ENDP(ar)) {
