@@ -339,6 +339,8 @@ char *module_name;
     reset_cumulated_rw_effects();
     reset_transformer_map();
 
+    free_value_mappings();
+
     debug_off();
 
     return TRUE;
@@ -478,6 +480,8 @@ char *module_name;
     reset_transformer_map();
     reset_precondition_map();
     reset_cumulated_rw_effects();
+
+    free_value_mappings();
 
     debug_off();
 
