@@ -735,9 +735,12 @@ int hash_table_own_allocated_memory(hash_table htp)
  */
 void * hash_map_get(hash_table h, void * k)
 {
-  gen_chunk key;
+  gen_chunk key, * val;
   key.e = k;
-  return ((gen_chunk*)hash_get(h, &key))->e;
+  val = (gen_chunk*)hash_get(h, &key);
+  if (val==HASH_UNDEFINED_VALUE)
+    fatal("no value correspond to key %p", k);
+  return val->e;
 }
 
 bool hash_map_defined_p(hash_table h, void * k)
