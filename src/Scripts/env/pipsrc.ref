@@ -1,99 +1,6 @@
 #
 # $Id$
 #
-# $Log: pipsrc.ref,v $
-# Revision 1.151  2003/06/20 08:49:46  coelho
-# use make instead of default gmake
-#
-# Revision 1.150  2002/04/23 09:34:12  coelho
-# hop.
-#
-# Revision 1.149  2002/04/22 15:39:45  irigoin
-# Validation for GNUSOL2LL: champeaux only
-#
-# Revision 1.148  2002/04/22 09:02:19  silber
-# Mise en commentaire de LINUXI86*
-#
-# Revision 1.147  2000/03/21 15:26:15  coelho
-# maj PIPS_HOSTS.
-#
-# Revision 1.146  1999/01/13 09:44:59  coelho
-# GNUSOL2LLPROF added.
-#
-# Revision 1.145  1998/12/30 17:32:06  irigoin
-# Modification of PIPS_CPP initialization for Solaris 2 with SUN Workshop: use fpp
-#
-# Revision 1.144  1998/11/18 12:21:36  coelho
-# unset EPIPS_EMACS.
-#
-# Revision 1.143  1998/09/22 08:54:09  coelho
-# eole added.
-#
-# Revision 1.142  1998/08/22 08:22:40  coelho
-# new Ultra 5  machines added as GNUSOL2LL hosts.
-#
-# Revision 1.141  1998/06/26 06:36:34  coelho
-# just loreto for LINUXI86LL...
-#
-# Revision 1.140  1998/06/15 15:54:44  coelho
-# tir out.
-#
-# Revision 1.139  1998/05/06 09:17:38  coelho
-# Linux arch default moved to LINUXI86LL.
-#
-# Revision 1.138  1998/04/15 13:10:09  coelho
-# -x c with gcc does not work properly.
-# the cpp must know about the fortran language lexical properties.
-#
-# Revision 1.137  1998/04/02 14:38:58  coelho
-# PIPS_CPP fixed for gcc-2.8.0 if g77 is not installed.
-#
-# Revision 1.136  1998/03/21 12:10:06  coelho
-# actual path to pips bins dropped. shell wrapper to be used instead.
-#
-# Revision 1.135  1998/01/27 14:38:55  coelho
-# recanati moved out.
-#
-# Revision 1.134  1998/01/26 09:49:06  coelho
-# hop.
-#
-# Revision 1.133  1998/01/23 07:58:55  coelho
-# LINUXI86LL bin dir updated.
-#
-# Revision 1.132  1998/01/16 16:19:38  coelho
-# loreto added as a linux host.
-#
-# Revision 1.131  1997/11/25 17:23:49  coelho
-# calice -> calice1 on tir for LINUXI86 also...
-#
-# Revision 1.130  1997/11/25 17:15:23  coelho
-# calice -> calice1 on tirnanog.
-#
-# Revision 1.129  1997/11/19 14:38:34  coelho
-# tirnanog, the new linux machine is on the net.
-#
-# Revision 1.128  1997/11/17 07:35:54  coelho
-# location of linuxi86* files changed.
-#
-# Revision 1.127  1997/08/21 08:01:04  coelho
-# cpp is always gcc -E to improve the determinism of the validation at cri.
-#
-# Revision 1.126  1997/08/20 06:49:13  coelho
-# LD_LIBRARY_PATH added.
-#
-# Revision 1.124  1997/08/06 08:01:54  coelho
-# default arch . -> GNUSOL1; some variables switched to lower case.
-#
-# Revision 1.114  1997/05/22 17:01:11  coelho
-# PIPS_DIRECTORY_FOR_BINARIES added.
-#
-# Revision 1.108  1997/05/13 20:30:12  coelho
-# some settings for Linux.
-#
-# Revision 1.107  1997/05/12 12:39:09  coelho
-# linux added.
-#
-#
 # Reference file for PIPS environment variables.
 # A restricted version of this file should be defined for pips users.
 # The syntax is compatible with both sh and csh... edit with care!
@@ -136,6 +43,9 @@ test ${uname_s} = SunOS && expr ${uname_r} : '^4' > /dev/null && \
 
 test ${uname_s} = Linux && \
 	PIPS_ARCH="LINUXI86LL"
+
+test ${uname_s} = FreeBSD && \
+	PIPS_ARCH="FREEBSDLL"
 
 # could use ll as a default on loreto.
 # test ${uname_s} = Linux -a $HOSTNAME = loreto.ensmp.fr && \
@@ -319,6 +229,9 @@ test "${PIPS_ARCH}" = . -o "${PIPS_ARCH}" = GNU && \
 test "${PIPS_ARCH}" = LINUXI86 -o "${PIPS_ARCH}" = LINUXI86LL && \
 	PIPS_HOSTS=""
 
+test "${PIPS_ARCH}" = FREEBSD -o "${PIPS_ARCH}" = FREEBSDLL && \
+	PIPS_HOSTS=""
+
 # PIPS_EXPERIMENTSDIR="${pips_dir}/Experiments"
 # PIPS_TESTSDIR="${pips_dir}/Tests"
 
@@ -340,6 +253,9 @@ test ${uname_s} = Linux && \
 
 test ${uname_s} = Linux && \
 	PIPS_MAKE="make"
+
+test ${uname_s} = FreeBSD && \
+	PIPS_MAKE="gmake"
 
 
 #
