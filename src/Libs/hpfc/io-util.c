@@ -1,64 +1,21 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * SCCS stuff:
- * $RCSfile: io-util.c,v $ ($Date: 1995/03/22 10:57:06 $, ) version $Revision$,
- * got on %D%, %T%
- * $Id$
+ * $RCSfile: io-util.c,v $ ($Date: 1995/04/10 18:49:48 $, )
+ * version $Revision$,
  */
 
-/*
- * Standard includes
- */
- 
-#include <stdio.h>
-#include <string.h> 
-extern fprintf();
+#include "defines-local.h"
 
-/*
- * Psystems stuff
- */
-
-#include "boolean.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "sc.h"
-
-/*
- * Newgen stuff
- */
-
-#include "genC.h"
-
-#include "ri.h" 
-#include "hpf.h" 
-#include "hpf_private.h"
-
-/*
- * PIPS stuff
- */
-
-#include "ri-util.h" 
-#include "misc.h" 
 #include "control.h"
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
 #include "conversion.h"
-#include "properties.h"
-
-/* 
- * my own local includes
- */
-
-#include "hpfc.h"
-#include "defines-local.h"
-/* #include "compiler_parameters.h" */
 
 entity CreateIntrinsic(string name); /* in syntax */
 
-/*
- * ??? beurk
+/* ??? beurk
  */
 static statement define_node_processor_id(proc)
 entity proc;
