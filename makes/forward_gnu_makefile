@@ -1,29 +1,44 @@
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/07/11 18:46:13 $, 
+# $Date: 1996/07/11 19:03:01 $, 
 # (c) Fabien COELHO July 1996
 #
-# this makefile forwards make targets to sub-directories...
-# it must be used with GNU make.
+# This makefile forwards make targets to sub-directories...
+# It must be used with GNU make.
+# 
+# If you do 'gmake FOO' in a directory with this Makefile 
+# then 'gmake FOO' is done downwards in the sub-directories.
+# Gmake automatically forward make macros of the command line,
+# thus 'gmake CC=mycc all' will also forward the CC macro.
 #
-# these variables may be overwritten on the command line
+# 4 macros are of special interet for the make target forwarding process:
+#
+# FWD_DIRS:
+#   the list of sub directories for forwarding commands.
+#   if speficied, the target are only forwarded to these directories.
+#   the default value is all sub-directories.
+# FWD_MSG:
+#   message to print when reporting failure or success of a sub-make.
+#   the default is no message.
+# FWD_ROOT:
+#   relative directory from the start of the forward process.
+#   the default value is "." (current directory).
+# FWD_REPORT:
+#   where to report failures or successes.
+#   may be a pipe, a redirection as "> /dev/null", "" or "> file"...
+#   the default is to report to stderr.
+#
+# These variables may be overwritten on the command line as
 # gmake FWD_DIRS="foo" FWD_MSG="argh!" FWD_REPORT="> /dev/null" FWD_ROOT=$PWD
+# Their value is printed with special target "debug_forward_makefile"
 #
 
-# the list of sub directories for forwarding commands:
-# default is all sub-directories
-FWD_DIRS=$(wildcard *)
+SHELL		= /bin/sh
 
-# the message if reporting a failure or success: 
-# default is none. dir is appended.
-FWD_MSG=
-
-# where to report a failure or success:
-# default is stdout
-FWD_REPORT=
-
-# current directory as seen by the launched make
-# default is curent directory
-FWD_ROOT=.
+# default values 
+FWD_DIRS	= $(wildcard *)
+FWD_MSG		=
+FWD_REPORT	= >&2
+FWD_ROOT	= .
 
 # forward any command to the specified directories
 %::
@@ -35,7 +50,7 @@ FWD_ROOT=.
 	  else echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ failed" $(FWD_REPORT) ;\
 	fi ; fi ; done
 
-debug:
+debug_forward_makefile:
 	@echo "FWD_DIRS=$(FWD_DIRS)"
 	@echo "FWD_MSG=$(FWD_MSG)"
 	@echo "FWD_REPORT=$(FWD_REPORT)"
