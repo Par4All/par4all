@@ -1,7 +1,9 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1994/12/09 08:32:42 $) version $Revision$, got on %D%, %T%
+# $RCSfile: pips-makemake,v $ ($Date: 1994/12/09 09:03:40 $, )
+# version $Revision$
+# got on %D%, %T%
 # %A%
 
 # Automatic generation of Makefile for the PIPS project
@@ -113,6 +115,7 @@
 # - the installation takes care of files that are removed from the SOURCES, FC
 # - Avoid installing SCCS directory that confuse the SCCS production directory!
 #	Ronan.Keryell@cri.ensmp.fr, 6/12/1994.
+# - install rely on install_pips_sources, which is a shell script, FC 09/12/94
 #
 # wish:
 #
@@ -283,48 +286,11 @@ install: $(INC_TARGET) $(LIB_TARGET)
 	  echo "install failed: additional local libraries prevent it" >&2;\\
 	  exit 1;\\
 	fi
-	[ -d $(TARGETDIR) ] || { mkdir $(TARGETDIR) $(TARGETDIR)/SCCS ; }
-	-cd $(TARGETDIR) ; sccs edit SCCS
-	-$(RM) $(TARGETDIR)/*
-	cp $(SOURCES) $(TARGETDIR)
-	echo ""; echo; \\
-	echo -n "Description of changes: " ; \\
+	@echo ""; echo; echo -n "Description of changes: " ; \\
 	read comments ;
-	cd $(TARGETDIR) ; \\
-	for module in $(SOURCES) ;\\
-	do \\
-	  if [ ! -f SCCS/s.\$\$module ] ;\\
-	  then \\
-	    echo sccs create \$\$module;  \\
-	    sccs create \$\$module;  \\
-	    if cmp -s ,\$\$module \$\$module ; \\
-	    then \\
-	      rm ,\$\$module ; \\
-	    else \\
-	      echo sccs failed with \$\$module ; \\
-	      exit 1; \\
-	    fi ; \\
-	  else \\
-	    echo sccs delget -y\"\$\$comments\" \$\$module; \\
-	    sccs delget -y"\$\$comments" \$\$module || \\
-	    { \\
-	      status=\$\$? ; \\
-	      if [ \$\$status -eq 255 ] ; \\
-	      then \\
-	        echo sccs delget return code \$\$status ; \\
-	      else \\
-	        echo sccs delget unusual return code \$\$status ; \\
-	        exit 1; \\
-	      fi ; \\
-	    } \\
-	  fi ;\\
-	done ; \\
-	for module in \`sccs tell\` ; \\
-	do \\
-	  echo "no more \$\$module file" ; \\
-	  sccs unedit \$\$module ; \\
-	  $(RM) \$\$module ; \\
-	done ;
+	install_pips_sources \
+		-v -s \`pwd\` -t $(TARGETDIR) -y "\$\$comments" \
+		$(SOURCES)
 	cp $(MAKEFILE) $(TARGETDIR)/Makefile
 	cd $(TARGETDIR) ; $(MAKE) depend
 	$(MAKE) quick-install
@@ -378,56 +344,11 @@ install: $(INC_TARGET) $(BIN_TARGET)
 	  exit 1;\\
 	}
 	@$(RM) _tmp_hack.a
-	[ -d $(TARGETDIR) ] || { mkdir $(TARGETDIR) $(TARGETDIR)/SCCS ; }
-	-cd $(TARGETDIR) ; \\
-	for s in \`find . -name SCCS -print \` ; \\
-	do \\
-	  (echo \$\$s ; cd \`dirname \$\$s\` ; sccs edit SCCS ;); \\
-	done
-	-$(RM) $(TARGETDIR)/*
-	#cp -r $(SOURCES) $(TARGETDIR)
-	# Equivalent to the previous line but skipping the SCCS stuff:
-	find $(SOURCES) -exec echo cp -r '{}' $(TARGETDIR) \; | grep -v SCCS | sed 's, \(.*/\)\(.* \)\(.*\), \1\2\3/\1,' | sh
-	echo ""; echo; \\
-	echo -n "Description of changes: " ; \\
-	read comments ; \\
-	cd $(TARGETDIR) ; \\
-	for m in \`find $(SOURCES) -type f -print\` ;\\
-	do \\
-	  ( cd \$\$PWD/\`dirname \$\$m\` ; \\
-	  module=\`basename \$\$m\` ; \\
-	  if sccs prs \$\$module > /dev/null 2>&1 ;\\
-	  then \\
-	    echo sccs delget -y\"\$\$comments\" \$\$module; \\
-	    sccs delget -y"\$\$comments" \$\$module || \\
-	    { \\
-	      status=\$\$? ; \\
-	      if [ \$\$status -eq 255 ] ; \\
-	      then \\
-	        echo sccs delget return code \$\$status ; \\
-	      else \\
-	        echo sccs delget unusual return code \$\$status ; \\
-	        exit 1; \\
-	      fi ; \\
-	    } \\
-	  else \\
-	    echo sccs create \$\$module;  \\
-	    sccs create \$\$module;  \\
-	    if cmp -s ,\$\$module \$\$module ; \\
-	    then \\
-	      rm ,\$\$module ; \\
-	    else \\
-	      echo sccs failed with \$\$module ; \\
-	      exit 1; \\
-	    fi ; \\
-	  fi ; ) ;\\
-	done ; \\
-	for module in \`sccs tell\` ; \\
-	do \\
-	  echo "no more \$\$module file" ; \\
-	  sccs unedit \$\$module ; \\
-	  $(RM) \$\$module ; \\
-	done
+	@echo ""; echo; echo -n "Description of changes: " ; \\
+	read comments ; 
+	install_pips_sources \
+		-v -s \`pwd\` -t $(TARGETDIR) -y "\$\$comments" \
+		$(SOURCES)
 	cp $(MAKEFILE) $(TARGETDIR)/Makefile
 	cd $(TARGETDIR) ; $(MAKE) depend
 	$(MAKE) quick-install
