@@ -1,13 +1,14 @@
-/*************************************************************** pnome-private.c
+/************************************************************ pnome-private.c
  *
  * PRIVATE ROUTINES  (MONOMIAL MANIPULATIONS)
  *
  */
 
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 
 #include "boolean.h"
+#include "arithmetique.h"
 #include "vecteur.h"
 #include "polynome.h"
 
