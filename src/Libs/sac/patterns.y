@@ -18,8 +18,6 @@
 int patterns_yyerror(char* s);
 int patterns_yywrap(void);
 int patterns_yylex();
-static int* make_integer_argument(int x);
-static int* make_empty_argument();
 
 %}
 
@@ -28,7 +26,7 @@ static int* make_empty_argument();
       int tokenId;
       list tokenList;
 
-      int* argument;
+      patternArg argument;
       list argsList;
 
       int iVal;
@@ -181,8 +179,8 @@ arguments_list:
      | argument                         { $$ = CONS(ARGUMENT, $1, NIL); }
 
 argument:
-       INTEGER_TOK                      { $$ = make_integer_argument($1); }
-     |                                  { $$ = make_empty_argument(); }
+       INTEGER_TOK                      { $$ = make_patternArg_static($1); }
+     |                                  { $$ = make_patternArg_dynamic(); }
 
 transformation:
      IDENTIFIER_TOK '[' INTEGER_TOK ',' INTEGER_TOK ',' INTEGER_TOK ',' INTEGER_TOK ',' INTEGER_TOK ']' '{' mappings '}'
@@ -193,20 +191,6 @@ mappings:
      | INTEGER_TOK                      { $$ = CONS(INT, $1, NIL); }
 
 %%
-
-static int* make_integer_argument(int x)
-{
-   int * res;
-   
-   res = (int*)malloc(sizeof(int));
-   *res = x;
-   return res;
-}
-
-static int* make_empty_argument()
-{
-   return NULL;
-}
 
 int patterns_yywrap(void)
 {
