@@ -4,8 +4,11 @@
  * (just a big hack, but few lines of code and neither lex nor yacc:-)
  * I'm definitely happy with this. FC.
  *
- * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1997/02/18 10:07:52 $, )
+ * $Id$
+ * $Log: directives.c,v $
+ * Revision 1.65  1997/03/20 10:14:04  coelho
+ * better RCS headers.
+ *
  */
 
 #include "defines-local.h"
