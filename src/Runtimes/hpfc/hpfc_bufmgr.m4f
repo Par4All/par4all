@@ -1,6 +1,6 @@
 c
 c $RCSfile: hpfc_bufmgr.m4f,v $ (version $Revision$)
-c $Date: 1995/12/01 11:49:19 $, 
+c $Date: 1996/09/07 15:47:07 $, 
 c
 c First routines to fake the pack/unpack of data.
 c The issue is to allow quite simply to measure the different
@@ -11,24 +11,24 @@ c
 define(`GENERIC_BUFFER_PACK',`dnl
 pushdef(`PVMTYPE',$1)dnl
 fake_buffers(dnl
-      subroutine build_name(PVMTYPE,hpfc_fake_bufpck)()
+      subroutine build_name(PVMTYPE,hpfc fake bufpck)()
       include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
-      SEND_NOT_INITIALIZED=.FALSE.
+      SEND NOT INITIALIZED=.FALSE.
       BUFINDEX=0
-      hpfc_fake_bufpck=hpfc_fake_bufpck+1
+      hpfc fake bufpck=hpfc fake bufpck+1
       end)
-      subroutine build_name(PVMTYPE,hpfc_bufpck)()
+      subroutine build_name(PVMTYPE,hpfc bufpck)()
       integer info, bufid
       include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
-      if (SEND_NOT_INITIALIZED) then
-         call pvmfinitsend(BUFFER_ENCODING, bufid)
+      if (SEND NOT INITIALIZED) then
+         call pvmfinitsend(BUFFER ENCODING, bufid)
          debug(if (bufid.lt.0) 
-     $        write (unit=0,fmt=*) "pvm_initsend error")
-         SEND_NOT_INITIALIZED=.FALSE.
+     $        write (unit=0,fmt=*) "pvm initsend error")
+         SEND NOT INITIALIZED=.FALSE.
       endif
       call pvmfpack(PVMTYPE, build_name(PVMTYPE,BUFF),
      $     BUFINDEX, 1, info)
@@ -38,30 +38,30 @@ popdef(`PVMTYPE')')dnl
 define(`GENERIC_BUFFER_UPCK',`dnl
 pushdef(`PVMTYPE',$1)dnl
 fake_buffers(dnl
-      subroutine build_name(PVMTYPE,hpfc_fake_bufupk)(lid)
+      subroutine build_name(PVMTYPE,hpfc fake bufupk)(lid)
       integer lid
       include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
-      if (RECEIVED_NOT_PERFORMED) then
+      if (RECEIVED NOT PERFORMED) then
          RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
-         RECEIVED_NOT_PERFORMED = .FALSE.
+         RECEIVED NOT PERFORMED = .FALSE.
       endif
       SIZEOFRECEIVEDBUFFER=build_name(PVMTYPE,BUFFSIZE)
-      hpfc_fake_bufupk=hpfc_fake_bufupk+1
+      hpfc fake bufupk=hpfc fake bufupk+1
       end)
-      subroutine build_name(PVMTYPE,hpfc_bufupk)(lid)
+      subroutine build_name(PVMTYPE,hpfc bufupk)(lid)
       integer lid
       integer info, bufid, length, tag, tid
       include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
-      if (RECEIVED_NOT_PERFORMED) then
+      if (RECEIVED NOT PERFORMED) then
          debug(write (unit=0, fmt=*) 
      $        "RCV from ", lid, RECVCHANNELS(lid))
          call pvmfrecv(NODETIDS(lid), RECVCHANNELS(lid), bufid)
          RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
-         RECEIVED_NOT_PERFORMED = .FALSE.
+         RECEIVED NOT PERFORMED = .FALSE.
          debug(write (unit=0, fmt=*) "RCV done")
       endif
       call pvmfbufinfo(bufid, length, tag, tid, info)
