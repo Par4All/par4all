@@ -36,6 +36,7 @@ bool save_active_phases()
 						 NIL));
 	}, makefile_active_phases(current_makefile));
     }
+
     return result;
 }
 
