@@ -3,6 +3,9 @@ dnl GENERAL M4 MACROS
 dnl
 dnl $Id$
 dnl $Log: hpfc_lib_m4_macros,v $
+dnl Revision 1.13  1997/06/10 09:32:48  zory
+dnl m4_type_name is now working on HPFC Types
+dnl
 dnl Revision 1.12  1997/03/19 16:51:31  coelho
 dnl better RCS headers
 dnl
@@ -57,13 +60,13 @@ define(`M4_PVM_LENGTH',`dnl
 ifelse($1,`BYTE1',1,$1,`INTEGER2',2,$1,`INTEGER4',4,dnl
 $1,`REAL4',4,$1,`REAL8',8,$1,`COMPLEX8',8,$1,`COMPLEX16',16)')dnl
 define(`m4_type_name',`dnl
-ifelse($1,`BYTE1',byte,dnl
-$1,`INTEGER2',integer*2,dnl
-$1,`INTEGER4',integer*4,dnl
-$1,`REAL4',real*4,dnl
-$1,`REAL8',real*8,dnl
-$1,`COMPLEX8',complex*8,dnl
-$1,`COMPLEX16',complex*16)')dnl
+ifelse($1,`HPFC BYTE1',byte,dnl
+$1,`HPFC INTEGER2',integer*2,dnl
+$1,`HPFC INTEGER4',integer*4,dnl
+$1,`HPFC REAL4',real*4,dnl
+$1,`HPFC REAL8',real*8,dnl
+$1,`HPFC COMPLEX8',complex*8,dnl
+$1,`HPFC COMPLEX16',complex*16)')dnl
 dnl
 dnl END OF GENERAL M4 MACROS
 dnl
