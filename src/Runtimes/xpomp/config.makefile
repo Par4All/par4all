@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/30 18:15:57 $ 
+# $Date: 1996/08/30 18:18:35 $ 
 
 ifeq ($(FC),g77)
 CPPFLAGS+=	-DCOMPILE_FOR_G77
@@ -15,6 +15,7 @@ LOCAL_HEADERS=	gr.h rasterfile.h
 EXPORT_HEADERS=	xpomp_graphic.h xpomp_graphic_F.h
 CFILES=		cgraphic.c xpomp.c 
 DEMO=		test_xpomp.c fatal.f 
+HPFC=		xpomp_fake.f
 
 SOURCES=	$(LOCAL_HEADERS) \
 		$(EXPORT_HEADERS) \
@@ -31,6 +32,7 @@ INSTALL_BIN_DIR:=$(INSTALL_RTM_DIR)/$(ARCH)
 
 INSTALL_BIN=	$(BIN) $(LIB)
 INSTALL_RTM=	$(EXPORT_HEADERS)
+INSTALL_SHR=	$(HPFC)
 
 # 
 # compilation and so
