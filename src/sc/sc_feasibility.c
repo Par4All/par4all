@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1995/11/23 11:17:57 $, 
+ * date: $Date: 1995/11/24 09:43:22 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -252,7 +252,7 @@ Pbase b;
 	 */
 	for (i=0; i<size; i++) t[i][0] *= t[i][1];
 
-	for (tmp=b->succ, var=var_of(b), min_new=t[i][0], i=1;
+	for (tmp=b->succ, var=var_of(b), min_new=t[0][0], i=1;
 	     min_new && i<size; 
 	     i++, tmp=tmp->succ)
 	    if (val_of(tmp)<min_new) min_new=val_of(tmp), var=var_of(tmp);
