@@ -176,6 +176,7 @@ test "$install" &&
 
     $verb "taring ($tar $taropt $tarname)..."
     $tar $taropt ${tarname:=${name}}.tar ${name} || error 3 "$tar returned $?"
+    chmod a+r ${tarname}.tar
 
     $verb "removing distribution tree"
     rm -rf $name || error 4 "rm returned $?"
