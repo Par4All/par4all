@@ -4,6 +4,15 @@
  * Version which generates typed newgen structures.
  *
  * $Log: genC.c,v $
+ * Revision 1.49  1998/06/08 11:24:22  irigoin
+ * xxx_defined_p() added
+ *
+ * Revision 1.48  1998/04/16 12:22:09  coelho
+ * field names fixed to avoid collisions...
+ *
+ * Revision 1.47  1998/04/16 12:15:58  coelho
+ * FIELD dropped.
+ *
  * Revision 1.46  1998/04/16 11:45:07  coelho
  * new management of inlines...
  *
@@ -61,7 +70,7 @@
 #include "newgen_include.h"
 
 #define INDENT "  "
-#define FIELD  "field_"
+#define FIELD  "" /* was: "field_" */
 #define STRUCT "_newgen_struct_"
 
 #define OPTIMIZE_NEWGEN "OPTIMIZE_NEWGEN"
@@ -357,12 +366,12 @@ static void generate_struct_members(
      */
     if (IS_TABULATED(bp))
 	fprintf(out, 
-		INDENT "%s _%s_index_;\n", 
+		INDENT "%s _%s_index__;\n", 
 		int_type(), bp->name);
 
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
 	fprintf(out, 
-		INDENT "%s _%s_tag_;\n" 
+		INDENT "%s _%s_tag__;\n" 
 		INDENT "union {\n",
 		int_type(), bp->name);
 	offset = INDENT;
@@ -418,7 +427,7 @@ static void generate_access_members(
     if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
 	in_between = TRUE;
 	fprintf(out, 
-		"#define %s_tag(x) ((x)->_%s_tag_%s)\n", 
+		"#define %s_tag(x) ((x)->_%s_tag__%s)\n", 
 		name, name, int_type_access_complement());
     }
     else in_between = FALSE;
@@ -625,7 +634,8 @@ generate_domain(
 		"extern %s read_%s(FILE *);\n"
 		"extern void free_%s(%s);\n"
 		"extern %s check_%s(%s);\n"
-		"extern bool %s_consistent_p(%s);\n",
+		"extern bool %s_consistent_p(%s);\n"
+		"extern bool %s_defined_p(%s);\n",
 		Name,
 		Name, name, /* defines... */
 		Name, name,
@@ -636,7 +646,8 @@ generate_domain(
 		name, name, /* read */
 		name, name, /* free */
 		name, name, name, /* check */  
-		name, name  /* consistent */);
+		name, name,  /* consistent */
+		name, name  /* defined */ );
 	
 	fprintf(code,
 		"/* %s\n */\n"
@@ -651,14 +662,17 @@ generate_domain(
 		"%s check_%s(%s p)\n"
 		"{ return (%s) gen_check((gen_chunk*)p, %s_domain); }\n"
 		"bool %s_consistent_p(%s p)\n"
-		"{ check_%s(p); return gen_consistent_p((gen_chunk*)p); }\n",
+		"{ check_%s(p); return gen_consistent_p((gen_chunk*)p); }\n"
+		"bool %s_defined_p(%s p)\n"
+		"{ return gen_defined_p((gen_chunk*)p); }\n",
 		Name,
 		name, name, name, name, /* copy */
 		name, name, /* write */
 		name, name, name, /* read */
 		name, name, /* free */
 		name, name, name, name, name, /* check */
-		name, name, name /* consistent */);
+		name, name, name, /* consistent */
+		name, name /* consistent */ );
 
 	if (IS_TABULATED(bp))
 	{
