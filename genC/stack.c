@@ -16,8 +16,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
-#include "newgen_assert.h"
-#include "newgen_stack.h"
+#include "genC.h"
+#include "newgen_include.h"
+/* #include "newgen_assert.h" #include "newgen_stack.h" */
 
 /*
  *   STACK STRUCTURES
@@ -143,7 +144,12 @@ int stack_iterator_end_p(stack_iterator i)
 
 void stack_iterator_end(stack_iterator * pi)
 {
-    free(*pi), *pi=(stack_iterator) NULL;
+    (*pi)->bucket = NEWGEN_FREED;
+    (*pi)->downward = 0;
+    (*pi)->index = 0;
+    (*pi)->list = NEWGEN_FREED;
+    free(*pi);
+    *pi=(stack_iterator) NULL;
 }
 
 /*
@@ -156,10 +162,12 @@ void stack_iterator_end(stack_iterator * pi)
 static _stack_ptr allocate_bucket(int size)
 {
     _stack_ptr x = (_stack_ptr) malloc(sizeof(_stack_bucket));
+    message_assert("pointer was allocated", x);
     
     x->n_item = 0;
     x->max_items = size;
     x->items = (void **) malloc(sizeof(void *)*size);
+    message_assert("pointer was allocated", x->items);
     x->succ = STACK_PTR_NULL;
 
     return(x);
@@ -190,6 +198,7 @@ static _stack_ptr find_or_allocate(stack s)
 stack stack_make(int type, int bucket_size, int policy)
 {
     stack s = (stack) malloc(sizeof(_stack_head));
+    message_assert("pointer was allocated", s);
 
     if (bucket_size<10) bucket_size=STACK_DEFAULT_SIZE; /* not too small */
 
@@ -207,17 +216,16 @@ stack stack_make(int type, int bucket_size, int policy)
 
 /* FREEs the stack
  */
-static void free_bucket(x)
-_stack_ptr x;
+static void free_bucket(_stack_ptr x)
 {
-    free(x->items), x->items = (void**)NULL, free(x);
+  gen_free_area(x->items, x->max_items*sizeof(void*));
+  gen_free_area((void**) x, sizeof(_stack_bucket));
 }
 
 static void free_buckets(x)
 _stack_ptr x;
 {
     _stack_ptr tmp;
-
     while(!STACK_PTR_NULL_P(x))
     {
 	tmp=x, x=x->succ, tmp->succ=STACK_PTR_NULL;
@@ -225,12 +233,12 @@ _stack_ptr x;
     }
 }
 
-void stack_free(ps)
-stack *ps;
+void stack_free(stack * ps)
 {
     free_buckets((*ps)->stack), (*ps)->stack=STACK_PTR_NULL;
     free_buckets((*ps)->avail), (*ps)->avail=STACK_PTR_NULL;
-    free(*ps); *ps = STACK_NULL;
+    gen_free_area((void**) *ps, sizeof(stack_head));
+    *ps = STACK_NULL;
 }
 
 /* 
