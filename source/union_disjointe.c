@@ -118,14 +118,40 @@ int main() {
       }
     }
     
-    /* s'il reste qqchosea la fin, on le rajoute au debut de Result */
+     /* Vin100, may 22, 2002 */
+	  /* s'il reste qqchosea la fin, on le rajoute dans Result : le premier */
+	  /*  au debut,  si c'est une union à la suite de lP */
     if(reste)
-      if(!emptyQ(reste)) {
-	lR = (LP *)malloc(sizeof(LP));
-	lR->next = Result;
-	lR->P = reste;
-	Result = lR;
+      if(!emptyQ(reste))
+		{
+			Polyhedron *r, *rn;
+			lR = (LP *)malloc(sizeof(LP));
+			lR->next = Result;
+			lR->P = reste;
+			r = lR->P->next;
+			lR->P->next = NULL;
+			Result = lR;
+			/* ajoute la fin du reste dans lp->next */
+			while( r )
+			{
+				lR = (LP *)malloc(sizeof(LP));
+				lR->next = lP->next;
+				lP->next = lR;
+
+				rn = r->next;
+				r->next = NULL;
+				lR->P = r;
+				r = rn;
+			}
       }
+/* was:
+      if(!emptyQ(reste)) {
+			lR = (LP *)malloc(sizeof(LP));
+			lR->next = Result;
+			lR->P = reste;
+			Result = lR;
+      }
+*/
   }
   
   

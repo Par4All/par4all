@@ -194,6 +194,7 @@ PEXEC = \
 	findv \
 	pp \
 	union_disjointe \
+	union_disjointe2 \
 	union_convex \
 	ehrhart \
 	verif_ehrhart\
@@ -551,6 +552,10 @@ $(OBJ_DIR)/union_disjointe$(EXEC_EXTRA_SUFFIX): $(PHEADERS) $(LIB) \
 			$(POLYLIB_SRC)/union_disjointe.c
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ \
 		$(POLYLIB_SRC)/union_disjointe.c $(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
+$(OBJ_DIR)/union_disjointe2$(EXEC_EXTRA_SUFFIX): $(PHEADERS) $(LIB) \
+			$(POLYLIB_SRC)/union_disjointe2.c
+	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ \
+		$(POLYLIB_SRC)/union_disjointe2.c $(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
 $(OBJ_DIR)/union_convex$(EXEC_EXTRA_SUFFIX): $(PHEADERS) $(LIB) \
 			$(POLYLIB_SRC)/union_convex.c
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ \
