@@ -1118,7 +1118,7 @@ each imbriquation
 polyhedron 
 
 */
-int count_points (int pos,Polyhedron *P,Value *context) {
+void count_points (int pos,Polyhedron *P,Value *context, Value *res) {
    
     Value LB, UB, k;
     int CNT,result;
@@ -1132,7 +1132,8 @@ int count_points (int pos,Polyhedron *P,Value *context) {
         /* Problem if UB or LB is INFINITY */
         fprintf(stderr, "count_points: ? infinite domain\n");
         value_clear(LB); value_clear(UB); value_clear(k);
-        return -1;
+	value_set_si(*res, -1);
+	return;
     }
   
 #ifdef EDEBUG1
@@ -1153,14 +1154,15 @@ int count_points (int pos,Polyhedron *P,Value *context) {
     value_set_si(context[pos],0);
     if (value_lt(UB,LB)) {
         value_clear(LB); value_clear(UB); value_clear(k);
-        return 0;  
+	value_set_si(*res, 0);
+	return;  
     }  
     if (!P->next) {
         value_substract(k,UB,LB);
         value_add_int(k,k,1);
-        result = VALUE_TO_INT(k);
+	value_assign(*res, k);
         value_clear(LB); value_clear(UB); value_clear(k);
-        return (result);
+        return;
     } 
 
     /*-----------------------------------------------------------------*/
@@ -1172,20 +1174,20 @@ int count_points (int pos,Polyhedron *P,Value *context) {
     /*   (skip the for loop)                                           */
     /*-----------------------------------------------------------------*/
   
-    CNT = 0;
+    value_init(c);
+    value_set_si(*res, 0);
     for (value_assign(k,LB);value_le(k,UB);value_increment(k,k)) {
-        int c;
-    
         /* Insert k in context */
         value_assign(context[pos],k);
-        c = count_points(pos+1,P->next,context);
-        if(c!=-1)
-            CNT = CNT + c;
-        else {
-            CNT=0;
-            break;
+	count_points(pos+1,P->next,context,&c);
+	if(value_notmone_p(c))
+	    value_addto(*res, *res, c);
+	else {
+	    value_set_si(*res, 0);
+	    break;
         }
     }
+    value_clear(c);
   
 #ifdef EDEBUG11
     fprintf(stderr,"%d\n",CNT);
@@ -1194,7 +1196,7 @@ int count_points (int pos,Polyhedron *P,Value *context) {
     /* Reset context */
     value_set_si(context[pos],0);
     value_clear(LB); value_clear(UB); value_clear(k);
-    return CNT;
+    return;
 } /* count_points */
 
 /*-------------------------------------------------------------------*/
@@ -1227,7 +1229,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
   if(nb_param==0) {
     res=new_enode(polynomial,1,0);
     value_set_si(res->arr[0].d,1);
-    value_set_si(res->arr[0].x.n,(count_points(1,L,context)));
+    count_points(1,L,context,&res->arr[0].x.n);
     return res;
   }
   
@@ -1444,7 +1446,7 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
 	/* call count */
 	/* count can only be called when the context is fully specified */
 	value_set_si(B->arr[i].d,1);
-	value_set_si(B->arr[i].x.n,(count_points(1,L,context)));
+	count_points(1,L,context,&B->arr[i].x.n);
 	
 #ifdef EDEBUG3
 	for (j=1; j<pos; j++) fputs("   ",stdout);

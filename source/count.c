@@ -28,6 +28,7 @@ int main(int argc,char *argv[]) {
   int i,j,k;
   int m,M;
   char str[1024];
+  Value c;
 
   /******* Read the input *********/
   P1 = Matrix_Read();
@@ -70,6 +71,8 @@ int main(int argc,char *argv[]) {
   
   /*** S = scanning list of polyhedra ***/
   S = Polyhedron_Scan(P,C,MAXRAYS);
+
+  value_init(c);
   
   /******* Count now *********/
   FOREVER {
@@ -85,10 +88,14 @@ int main(int argc,char *argv[]) {
       printf(", ");
       value_print(stdout,VALUE_FMT,p[k]);
     }  
-    printf(" ) = %d\n",count_points(1,S,p)); 
+    printf(" ) = "); 
+    count_points(1,S,p,&c);
+    value_print(stdout,VALUE_FMT,c);
+    printf("\n"); 
   }
   for(i=0;i<=(P->Dimension+1);i++)
     value_clear(p[i]);
+  value_clear(c);
   return(0);
 } /* main */
 

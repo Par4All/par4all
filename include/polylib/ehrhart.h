@@ -17,7 +17,7 @@ extern int overflow_warning_flag;
 
 #if __STDC__
 
-extern int count_points ( int pos, Polyhedron *P, Value *context );
+extern void count_points ( int pos, Polyhedron *P, Value *context, Value *res );
 extern void eadd ( evalue *e1, evalue *res );
 extern enode *ecopy ( enode *e );
 extern void edot ( enode *v1, enode *v2, evalue *res );
@@ -32,7 +32,7 @@ extern void Enumeration_Free(Enumeration *en);
 
 #else /* __STDC__ */
 
-extern int count_points (/* int pos, Polyhedron *P, Value *context */);
+extern void count_points (/* int pos, Polyhedron *P, Value *context, Value *res */);
 extern void eadd (/* evalue *e1, evalue *res */);
 extern enode *ecopy (/* enode *e */);
 extern void edot (/* enode *v1, enode *v2, evalue *res */);
