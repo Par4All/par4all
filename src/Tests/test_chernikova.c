@@ -1,10 +1,7 @@
  /* test de chernikovaa */
 
 #include <stdio.h>
-#include <malloc.h>
-extern int fprintf();
-extern int printf();
-extern char * strdup();
+#include <string.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -32,9 +29,9 @@ typedef struct matrix
 } matrix;
 
 
-main(argc, argv)
-     int argc;
-     char **argv;
+int main(
+    int argc,
+    char **argv)
 {
     FILE * f;
     char * filename = "stdin";
@@ -44,37 +41,36 @@ main(argc, argv)
 
     if(argc==1) {
 	f = stdin;
-	fprintf(stderr,"Lecture sur stdin\n");
+	fprintf(stderr,"From stdin\n");
     }
     else if (argc==2) {
 	filename = strdup(argv[1]);
 	if((f = fopen(filename,"r")) == NULL) {
-	    fprintf(stderr,"Ouverture du fichier %s impossible\n",
-		    filename);
-	    exit(4);
+	    fprintf(stderr,"Cannot open file %s\n", filename);
+	    return 4;
 	}
     }
     else {
 	fprintf(stderr,"Usage: test_chernikova [filename]\n");
-	exit(1);
+	return 1;
     }
 
     sg = sg_new();
     if(sc_fscan(f,&sc)) {
-	printf("Systeme a tester:\n");
+	printf("Initial constraint system:\n");
 	sc_fprint(stdout,sc,*variable_default_name);
 
 	sg = sc_to_sg_chernikova(sc);
-	printf("systeme generateur \n");
+	printf("Generating system\n");
 	sg_fprint(stdout,sg,*variable_default_name);
 	
 	sc1 = sc_new();
 	sc1 = sg_to_sc_chernikova(sg);
-	printf("Systeme lineaire:\n");
+	printf("Regenerated constraint system:\n");
 	sc_fprint(stdout,sc,*variable_default_name);
     }
     else {
-	fprintf(stderr,"erreur de syntaxe dans %s\n",filename);
+	fprintf(stderr,"syntax error in %s\n",filename);
     }
     return 0;
 }					/* main */
