@@ -18,5 +18,7 @@ LFLAGS	=
 YACC	= bison
 YFLAGS	= -y
 
+PROTO   = cproto
+
 # end of it!
 #
