@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/06/11 20:39:41 $, 
+%% $Date: 1997/06/20 10:59:01 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
@@ -1695,7 +1695,7 @@ behaviors are not taken into account in PIPS analyses.
 
 Effects and the types defined in the following
 subsections are not used to represent code, but to store analysis
-result. These types are declared in the {\em internal representation}
+result. These types are declared in the {\em internal representation\/}
 for historical reasons.
 
 \domain{Effects = effects:effect*}
@@ -1710,6 +1710,18 @@ Should be used for proper and cumulated effects and references.
 
 \domain{statement\_effects = persistent statement->effects}
 {}
+
+
+\subsection{Effects Classes}
+\label{subsection-effects-classes}
+\index{Effects Classes}
+
+\domain{Effects\_classes = classes:effects*}
+{}
+
+The type {\tt effects\_classes} is used to store equivalence classes of
+dynamic aliases, i.e. aliases created at call sites. {\tt Effects\_classes}
+are lists of effects, i.e. lists of lists of regions.
 
 \subsection{Effect}
 \label{subsection-effect}
