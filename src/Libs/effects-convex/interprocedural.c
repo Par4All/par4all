@@ -650,7 +650,8 @@ static list common_regions_forward_translation(entity func, list real_regions)
 	 * They are  the entities with a ram storagethat are not dynamic
          * variables*/
 	if (storage_ram_p(real_s) && 
-	    !dynamic_area_p(ram_section(storage_ram(real_s))))
+	    !dynamic_area_p(ram_section(storage_ram(real_s)))
+	    && !heap_area_p(ram_section(storage_ram(real_s))))
 	{
 	    list regs = common_region_translation(func, real_reg, FORWARD);
 	    func_regions = RegionsMustUnion(func_regions, regs, 
