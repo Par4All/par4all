@@ -2,10 +2,8 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1995/03/27 17:17:59 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1995/08/08 17:50:03 $, )
 # version $Revision$
-# got on %D%, %T%
-# $Id$
 #
 
 # defaults
@@ -16,7 +14,7 @@ unset DIRECTORY SRCDIR BASEDIR REFFILE TOINSTALL TOMAKE
 
 VERBOSE=':'
 DEBUG=':'
-SRCDIR=${HPFC_INCLUDE:-$EXTEDIR}
+SRCDIR=${HPFC_INCLUDE:-$PIPS_EXTEDIR}
 MAKE='gmake'
 M4='m4'
 
