@@ -1,13 +1,13 @@
 #
 # $RCSfile: makefile_macros.CRAY-T3D,v $ (version $Revision$)
-# $Date: 1996/10/17 14:28:43 $, 
+# $Date: 1997/01/14 15:45:20 $, 
 #
 # this file contains macro definitions 
 
 AR	= ar
 ARFLAGS	= -rv
 CC	= cc -T cray-t3d
-CFLAGS	= -O 1 -g
+CFLAGS	= -O 3
 CMKDEP	= -M
 CPPFLAGS= -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC)
@@ -16,7 +16,8 @@ RANLIB	= :
 LEX	= lex
 LFLAGS	=
 FC	= cf77 -C cray-t3d
-FFLAGS	= -O 1 -g
+# -g suppresses all optimizations!
+FFLAGS	= -O 1 -O scalar3
 LINT	= lint
 LINTFLAGS= -habxu
 YACC	= yacc
