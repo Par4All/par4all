@@ -1,4 +1,12 @@
 /*
+ * $Id$
+ *
+ * $Log: genC.c,v $
+ * Revision 1.31  1998/04/09 15:19:18  coelho
+ * RCS headers.
+ *
+ */
+/*
 
 	-- NewGen Project
 
@@ -13,10 +21,6 @@
 	(C) Copyright Ecole des Mines de Paris, 1989
 
 */
-
-/* $RCSfile: genC.c,v $ ($Date: 1997/04/24 19:28:59 $, )
- * version $Revision$
- */
 
 /* genC.c
 
@@ -33,7 +37,7 @@
    . Components values of an AND_OR value are stored in the following gen_chunks.
    . An OR_OP value has 2 more gen_chunks. The second on is the OR_TAG
      (an integer). The third is the component value.
-     */
+*/
 
 #include <stdio.h>
 #include <ctype.h>
@@ -559,8 +563,7 @@ struct gen_binding *bp ;
    non-inlinable type in the Domains table. */
 
 void
-gencode( file )
-char *file ;
+gencode(char * file)
 {
     struct gen_binding *bp = Domains ;
 
@@ -574,4 +577,3 @@ char *file ;
 	gen_domain( bp ) ;
     }
 }
-
