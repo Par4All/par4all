@@ -4,7 +4,7 @@
 ! Fabien COELHO (HPF version)
 !
 ! $RCSfile: wave.f,v $ (version $Revision$)
-! $Date: 1996/09/04 08:58:18 $, 
+! $Date: 1996/09/06 10:46:11 $, 
 !
 
 !
@@ -69,7 +69,7 @@
          end do
       end do
 
-      end subroutine
+      end
 
 
 
@@ -99,7 +99,7 @@
          end do
       end do
 
-      end subroutine
+      end
 
 
 
@@ -148,7 +148,7 @@
          end do
       end do
 
-      end subroutine
+      end
 
 
 
@@ -184,7 +184,7 @@
 
 !      print *, 'max = ', kmax, ' min = ', kmin
 
-      end subroutine
+      end
 
 
 
@@ -262,7 +262,7 @@
 
       end do
 
-      end program
+      end
 
 ! end of $RCSfile: wave.f,v $
 
