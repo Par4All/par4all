@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/03/10 09:19:09 $, ) version $Revision$,
+ * $RCSfile: build-system.c,v $ ($Date: 1995/03/14 14:43:14 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -565,7 +565,7 @@ entity array;
 
 	 switch (new_declaration(array, dim))
 	 {
-	 case  NO_NEW_DECLARATION:
+	 case is_hpf_newdecl_none:
 	     /*
 	      * LALPHAi == ALPHAi
 	      */
@@ -575,7 +575,7 @@ entity array;
 						      lalpha, 	-1,
 						      TCST,	0)));
 	     break;
-	 case ALPHA_NEW_DECLARATION:
+	 case is_hpf_newdecl_alpha:
 	 {
 	     /*
 	      * LALPHAi = ALPHAi - ALPHAi_min + 1
@@ -593,7 +593,7 @@ entity array;
 
 	     break;
 	 }
-	 case BETA_NEW_DECLARATION:
+	 case is_hpf_newdecl_beta:
 	 {
 	     /* 
 	      * (|a|==1) LALPHA_i == DELTA_j + 1
@@ -648,7 +648,7 @@ entity array;
 
 	     break;
 	 }
-	 case GAMMA_NEW_DECLARATION:
+	 case is_hpf_newdecl_gamma:
 	 {
 	     /*
 	      * LALPHA_i == N* (GAMMA_j - GAMMA_0) + DELTA_j + 1
@@ -690,7 +690,7 @@ entity array;
 					    TCST, 	1-(n*gamma_0))));
 	     break;
 	 }
-	 case DELTA_NEW_DECLARATION:
+	 case is_hpf_newdecl_delta:
 	 {
 	     /*
 	      * LALPHA_i = iceil(N,|a|) * (GAMMA_j - GAMMA_0) + SIGMA_j +1
