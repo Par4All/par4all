@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/09/18 15:14:39 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/09/18 19:12:06 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -490,10 +490,9 @@ depend: $(INC_TARGET) $(MAKEFILE) .depend
 include $MAKEFILE.depend
 %
 
-# Supprime le mode silencieux -s :
-#
-[ \( $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' \) \
-  -a  $DIRSIDE = $PIPS_DEVEDIR ] &&
+### generates the dependences...
+
+[ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] &&
 {
   touch $MAKEFILE.depend
   make -f $MAKEFILE depend
