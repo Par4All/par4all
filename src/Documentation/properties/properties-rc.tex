@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/10/03 09:04:44 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/10/03 14:44:03 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -69,7 +69,7 @@ PIPS behavior can also be altered by Shell environment variables. Their
 generic names is \verb+XXXX_DEBUG_LEVEL+, where \verb+XXXX+ is a library
 or a phase or an interface name (of course, there are
 exceptions). Theoretically these environment variables are also declared
-as properties, but this generelly is forgotten by programmers. A debug
+as properties, but this is generally forgotten by programmers. A debug
 level of 0 is equivalent to no tracing. The amount of tracing increases
 with the debug level. The maximum useful value is 9.
 
@@ -711,6 +711,14 @@ PARTIAL_DISTRIBUTION FALSE
 \label{section-prettyprinters}
 
 \subsection{Code Prettyprinter}
+
+When prettyprinting semantic information (preconditions, transformers and
+regions) adds a line before and after each piece of information if set to
+\verb+TRUE+. The resulting code is more readable, but is larger.  
+
+\begin{verbatim}
+PRETTYPRINT_LOOSE TRUE 
+\end{verbatim}
 
 Added for homogeneity reason; could be (easily) reduced to one?  In
 fact, with many target machines in mind, we should have an integer flag
