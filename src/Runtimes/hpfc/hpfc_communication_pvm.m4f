@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.7  1997/05/29 09:03:25  zory
+! *** empty log message ***
+!
 ! Revision 1.6  1997/05/15 15:07:38  zory
 ! add new communication subroutines
 !
@@ -20,6 +23,42 @@
 ! pvm and mpi, maybe. The pvm model (separate init/pack/send) is kept.
 !
 
+
+!
+! Reduce operation 
+!
+! call pvmfreduce(func, data, count, datatype,msgtag, group, rootginst, info) 
+! call MPI_REDUCE(sendbuf,recvbuf,count,datatype,op,root,comm,ierror)
+!
+
+!      subroutine HPFC REDUCE(function, data, count, msgtag, group, root, info)
+!      include "hpfc_commons.h"
+!    integer count, msgtag, group, root, info 
+!      
+!    call pvmfreduce(func, data, count, datatype, 
+!     $     msgtag, group, rootginst, info) 
+!
+!      end
+
+
+!
+! Return information about the received message 
+! (length, tag, source, info) 
+!
+! in mpi status(messageid) is an array of integers
+! INTEGER STATUS(MPI_STATUS_SIZE) 
+
+      subroutine HPFC MESSAGE INFO(messageid, length, tag, source, info)
+      include "hpfc_commons.h"
+      integer messageid, length, tag, source, info
+      call pvmfbufinfo(messageid, length, tag, source, info)
+      if (info.lt.0) then
+         call pvmfperror("hpfc message info", info)
+         call HPFC TERMINATE TASK(info)
+         stop
+      endif
+      end 
+
 !
 ! Return an error string associated with the error code 
 ! plus additional information to the error message 
@@ -36,7 +75,7 @@
 !
 ! Create a group of tasks called HPFC GROUP NAME
 !
-      subroutine HPFC JOIN GROUPE(inum)
+      subroutine HPFC JOIN GROUP(inum)
       include "hpfc_commons.h"
       integer inum,info
       call pvmfjoingroup(HPFC GROUP NAME, inum)
@@ -121,11 +160,11 @@
 !
 ! Initialize the current buffer
 !
-      subroutine HPFC INIT SEND
+      subroutine HPFC INIT SEND(encoding,bufid)
       include "hpfc_commons.h"
-      integer bufid
+      integer bufid,encoding
       debug(print *, "initializing current buffer")
-      call pvmfinitsend(PVMRAW, bufid)
+      call pvmfinitsend(encoding, bufid)
       debug(print *, "current buffer initialized")
       end 
 
