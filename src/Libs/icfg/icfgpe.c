@@ -104,7 +104,7 @@ load_resources_icfg(string module_name)
   }, lp);
 }
 
-text text_statement_flt(entity module, int margin, statement stmt)
+/*text text_statement_flt(entity module, int margin, statement stmt)
 {
   instruction i = statement_instruction(stmt);
   text r = make_text(NIL);
@@ -125,7 +125,7 @@ text text_statement_flt(entity module, int margin, statement stmt)
   } else
     free_text(temp);
   return r;
-}
+}*/
 
 static text get_any_effects_text_flt(string module_name)
 {
@@ -151,7 +151,7 @@ static text get_any_effects_text_flt(string module_name)
   
   init_prettyprint(text_statement_any_effect_type_flt);
 
-  MERGE_TEXTS(txt, text_statement_flt(module, 0, module_stat));
+  MERGE_TEXTS(txt, text_statement(module, 0, module_stat));
   
   close_prettyprint();
 
