@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/08/10 11:24:26 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/08/10 11:36:07 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2116,7 +2116,6 @@ int create_p ;
     char buffer[ 1024 ] ;
 
     genread_in = file ;
-#ifdef FLEX_SCANNER
     if( (i=genread_lex()) != READ_INT ) {
 	(void) sprintf( buffer, "%d", i ) ;
 	user( "Incorrect data for gen_read_tabulated: %s\n", buffer ) ;
@@ -2130,9 +2129,8 @@ int create_p ;
 	exit( 1 ) ;
     }
     max = genread_lval.val ;
-#else
-    (void) fscanf( file, "%d %d", &domain, &max ) ;
-#endif
+
+    /* (void) fscanf( file, "%d %d", &domain, &max ) ; */
 
     if( max != max_tabulated_elements()) {
 	(void) sprintf(buffer, "Getting %d, expecting %d elements\n",
