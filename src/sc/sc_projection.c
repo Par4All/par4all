@@ -891,7 +891,7 @@ Variable v;
     /* if Variable v is constrained by  equalities, the system size 
        is kept (-1) after projection */
     if (!var_in_lcontrainte_p(sc->egalites,v) 
-	 &&  sc->nb_ineq > NB_CONSTRAINTS_MAX_FOR_FM) {
+	&&  sc->nb_ineq > 20 /* was max for FM */) {
 	Pcontrainte ineg;
 	int nb_pvar = 0, nb_nvar = 0;
 	for (ineg=sc->inegalites;!CONTRAINTE_UNDEFINED_P(ineg);
