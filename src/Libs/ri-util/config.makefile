@@ -40,11 +40,4 @@ LIB_CFILES=	Psc.c Ppolynome.c Pvecteur.c Pcontrainte.c matrice.c eval.c \
 		effects.c cmfortran.c craft.c control.c
 
 LIB_HEADERS=	ri-util-local.h
-LIB_OBJECTS=	Psc.o Ppolynome.o Pvecteur.o Pcontrainte.o matrice.o eval.o \
-		size.o ordering.o loop.o fortran90.o prettyprint.o \
-		attachment_pretty_print.o constant.o\
-		util.o  bound_generation.o entity.o variable.o statement.o \
-		expression.o type.o normalize.o static.o arguments.o module.o \
-		effects.o cmfortran.o craft.o control.o
-
-
+LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
