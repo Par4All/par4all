@@ -28,7 +28,7 @@
  *
  * FC, Feb 21, 1994
  *
- * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1994/12/28 08:55:32 $, )
+ * $RCSfile: newgen_generic_mapping.h,v $ ($Date: 1994/12/28 08:58:06 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -113,7 +113,7 @@ static void check_##name()\
   assert(type##_##name##_undefined_p(item));\
   store_##type##_##name(item,r);\
   assert(load_##type##_##name(item)==r);\
-  free_##type##_##name();\
+  free_##name##_map();\
   reset_##name##_map();\
   set_##name##_map(saved);\
 }
