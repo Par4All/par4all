@@ -1,5 +1,5 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/08/30 17:24:41 $, 
+ * $Date: 1996/08/31 13:16:17 $, 
  */
 
 #include <stdlib.h>
@@ -235,11 +235,12 @@ int pc_basic_opendisplay(int X,
 		/* fork! */
 		switch(id = vfork()) {
 		case -1 :
-			fprintf(stderr,"unsuccessfull fork!\n");
-			return 0;
+		    fprintf(stderr,"unsuccessfull fork!\n");
+		    return 0;
 		case 0 :    /* child's subprocess */
-			execvp(argv[0],argv);
-			_exit(0);
+		    fprintf(stderr, "executing %s\n", argv[0]);
+		    execvp(argv[0],argv);
+		    _exit(0);
 		}
 		while(sh_h[i]->lock) sigpause(0);
 		pc_depth[i] = sh_h[i]->p1;
@@ -754,11 +755,13 @@ XPOMP_show_usage()
 #define FUNCTION_(name) name##_
 #define FUNCTION(name) name##_
 #endif
-XPOMP_display
+
+void
 FUNCTION_(xpomp_open_display)(int * X_window_size,
-			      int * Y_window_size)
+			      int * Y_window_size, 
+			      XPOMP_display * d)
 {
-    return XPOMP_open_display(*X_window_size, *Y_window_size);
+    *d = XPOMP_open_display(*X_window_size, *Y_window_size);
 }
 
 
@@ -769,120 +772,129 @@ FUNCTION_(xpomp_close_display)(XPOMP_display * screen)
 }
 
 
-int
-FUNCTION_(xpomp_get_current_default_display)()
+void
+FUNCTION_(xpomp_get_current_default_display)(int * d)
 {
-    return XPOMP_get_current_default_display();
+    *d = XPOMP_get_current_default_display();
 }
 
 
-int
-FUNCTION_(xpomp_set_current_default_display)(XPOMP_display * screen)
+void 
+FUNCTION_(xpomp_set_current_default_display)(XPOMP_display * screen,
+					     int * d)
 {
-    return XPOMP_set_current_default_display(*screen);
+    *d = XPOMP_set_current_default_display(*screen);
 }
 
 
-int
-FUNCTION_(xpomp_get_depth)(XPOMP_display * screen)
+void
+FUNCTION_(xpomp_get_depth)(XPOMP_display * screen,
+			   int * d)
 {
-    return XPOMP_get_depth(*screen);
+    *d = XPOMP_get_depth(*screen);
 }
 
 
-int
+void
 FUNCTION_(xpomp_set_color_map)(XPOMP_display * screen,
 			       int * pal,
 			       int * cycle,
 			       int * start,
-			       int * clip)
+			       int * clip,
+			       int * d)
 {
-    return XPOMP_set_color_map(*screen, *pal, *cycle, *start, *clip);
+    *d = XPOMP_set_color_map(*screen, *pal, *cycle, *start, *clip);
 }
 
 
-int
+void
 FUNCTION_(xpomp_set_user_color_map)(XPOMP_display  * screen,
 				    unsigned char * red,
 				    unsigned char * green,
-				    unsigned char * blue)
+				    unsigned char * blue,
+				    int * d)
 {
-    return XPOMP_set_user_color_map(*screen, red, green, blue);
+    *d = XPOMP_set_user_color_map(*screen, red, green, blue);
 }
 
 
-int
+void
 FUNCTION_(xpomp_wait_mouse)(XPOMP_display * screen,
 			    int * X,
-			    int * Y)
+			    int * Y,
+			    int * d)
 {
-    return XPOMP_wait_mouse(*screen, X, Y);
+    *d = XPOMP_wait_mouse(*screen, X, Y);
 }
 
 
-int
+void
 FUNCTION_(xpomp_is_mouse)(XPOMP_display * screen,
-			int * X,
-			int * Y)
+			  int * X,
+			  int * Y,
+			  int * d)
 {
-    return XPOMP_is_mouse(*screen, X, Y);
+    *d = XPOMP_is_mouse(*screen, X, Y);
 }
 
 
-int
+void
 FUNCTION_(xpomp_flash)(XPOMP_display * screen,
-		      unsigned char * data_array,
-		      int * X_data_array_size,
-		      int * Y_data_array_size,
-		      int * X_offset,
-		      int * Y_offset,
-		      int * X_zoom_ratio,
-		      int * Y_zoom_ratio)
+		       unsigned char * data_array,
+		       int * X_data_array_size,
+		       int * Y_data_array_size,
+		       int * X_offset,
+		       int * Y_offset,
+		       int * X_zoom_ratio,
+		       int * Y_zoom_ratio,
+		       int * d)
 {
-    return XPOMP_flash(*screen, data_array,
-		      *X_data_array_size, *Y_data_array_size,
-		      *X_offset, *Y_offset,
-		      *X_zoom_ratio, *Y_zoom_ratio);
+    *d = XPOMP_flash(*screen, data_array,
+		     *X_data_array_size, *Y_data_array_size,
+		     *X_offset, *Y_offset,
+		     *X_zoom_ratio, *Y_zoom_ratio);
 }
 
 
-int
+void
 FUNCTION_(xpomp_show_real4)(XPOMP_display * screen,
-			   float * data_array,
-			   int * X_data_array_size,
-			   int * Y_data_array_size,
-			   int * X_offset,
-			   int * Y_offset,
-			   int * X_zoom_ratio,
-			   int * Y_zoom_ratio,
-			   double * min_value,
-			   double * max_value)
+			    float * data_array,
+			    int * X_data_array_size,
+			    int * Y_data_array_size,
+			    int * X_offset,
+			    int * Y_offset,
+			    int * X_zoom_ratio,
+			    int * Y_zoom_ratio,
+			    double * min_value,
+			    double * max_value,
+			    int * d)
 {
-    return XPOMP_show_float(*screen, data_array,
+    *d = XPOMP_show_float(*screen, data_array,
+			  *X_data_array_size, *Y_data_array_size,
+			  *X_offset, *Y_offset,
+			  *X_zoom_ratio, *Y_zoom_ratio,
+			  *min_value, *max_value);
+}
+
+
+void
+FUNCTION_(xpomp_show_real8)(XPOMP_display * screen,
+			    double * data_array,
+			    int * X_data_array_size,
+			    int * Y_data_array_size,
+			    int * X_offset,
+			    int * Y_offset,
+			    int * X_zoom_ratio,
+			    int * Y_zoom_ratio,
+			    double * min_value,
+			    double * max_value,
+			    int * d)
+{
+    *d = XPOMP_show_double(*screen, data_array,
 			   *X_data_array_size, *Y_data_array_size,
 			   *X_offset, *Y_offset,
 			   *X_zoom_ratio, *Y_zoom_ratio,
 			   *min_value, *max_value);
-}
-
-
-int
-FUNCTION_(xpomp_show_real8)(XPOMP_display * screen,
-			   double * data_array,
-			   int * X_data_array_size,
-			   int * Y_data_array_size,
-			   int * X_offset,
-			   int * Y_offset,
-			   int * X_zoom_ratio,
-			   int * Y_zoom_ratio,
-			   double * min_value,
-			   double * max_value)
-{
-    return XPOMP_show_double(*screen, data_array,
-			    *X_data_array_size, *Y_data_array_size,
-			    *X_offset, *Y_offset,
-			    *X_zoom_ratio, *Y_zoom_ratio,
-			    *min_value, *max_value);
 }
 
 
