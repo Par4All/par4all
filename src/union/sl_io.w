@@ -486,7 +486,9 @@ int    in_tab;
 {
   int            d;
   static  char   name[20];
+#ifndef strdup
   extern  char*  strdup();
+#endif
 
   if (in_tab == 0) return strdup("");
   assert( (in_tab > 0) && (in_tab < 20) );
