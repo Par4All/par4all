@@ -214,11 +214,12 @@ Pmonome *ppm, pm2;
 	    else if (MONOME_CONSTANT_P(*ppm))
 		produit = vect_dup(monome_term(pm2));		
 	    else {
-		if ( vecteur_val(monome_term(*ppm))+vecteur_val(monome_term(pm2)) == 0 
-		    && vecteur_var(monome_term(*ppm))==vecteur_var(monome_term(pm2)) ) {
+		if (var_of(monome_term(*ppm))==var_of(monome_term(pm2)) &&
+		    value_zero_p(value_plus(val_of(monome_term(*ppm)),
+					    val_of(monome_term(pm2))))) {
 		    /* M^-1 *M should be 1 .   26/10/92    LZ 
 		     and the vecteur must be same. 09/11/92 */
-		    produit = vect_new(TCST,1);
+		    produit = vect_new(TCST, VALUE_ONE);
 		}
 		else
 		    produit = vect_add(monome_term(*ppm), monome_term(pm2));
@@ -309,7 +310,7 @@ Pmonome pm1, pm2;
 	    else {
 		monome_term(pmr) = vect_substract(monome_term(pm1), monome_term(pm2));
 		if ( monome_term(pmr) == VECTEUR_NUL )
-		    monome_term(pmr) = vect_new(TCST,1);
+		    monome_term(pmr) = vect_new(TCST, VALUE_ONE);
 	    }
 	    monome_coeff(pmr) = monome_coeff(pm1)/monome_coeff(pm2);
 
