@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/13 19:37:24 $, 
+# $Date: 1996/09/13 19:43:47 $, 
 #
 # (c) FC September 1996
 #
@@ -75,16 +75,9 @@ proc packinfo { win opt } {
     set next 0
     set odd 1
     foreach o $lopt {
-	if {$odd} {
-	    if {$o == $opt} {
-		set next 1
-	    }
-	} else {
-	    if {$next} { return $o }
-	}
+	if {$odd} {if {$o == $opt} {set next 1}} else {if {$next} {return $o}}
 	set odd [expr ! $odd ]
     }
-    return 
 }
 
 #
@@ -107,11 +100,12 @@ proc changedir { root currentdir } {
     # creates the window if needed
     #
     if {$root == ""} {
-	wm title . "Change Directory"
+	set wroot .
     } else {
 	toplevel $root
-	wm title $root "Change Directory"
+	set wroot $root
     }
+    wm title $wroot "Change Directory"
 
     #
     # top buttons: "/" "Home" "Ok" "Quit"
@@ -165,7 +159,7 @@ proc changedir { root currentdir } {
 	# 18 = 2*[e.b(3)+e.i(1)+e.p(2)+l.b(0)+l.i(1)+l.p(2)]
 	set n [expr ($d-$l-18)/$changedir_fontsize]
 	set w [%W cget -width]
-	if {$n!=$w} {
+	if {$n!=$w} { # reconfigure under an configure event! :-)
 	    %W configure -width $n
 	    %W xview end
 	}
@@ -182,7 +176,6 @@ proc changedir { root currentdir } {
 	    [packinfo $root.direct.entry -padx]+\
 	    [packinfo $root.direct.entry -ipadx]))/\
 	[$root.direct.entry cget -width]]
-
 
     #
     # choice from the list
@@ -215,16 +208,14 @@ proc changedir { root currentdir } {
     filldirlist $root.list.dirs $changedir_dir
     $root.direct.entry xview end
 
-    if {$root != ""} {
-	# focus and interaction...
-	set old [focus]
-	grab set $root
-	focus $root
-    } 
+    # focus and interaction...
+    set old [focus]
+    grab set $wroot
+    focus $wroot
 
     # waits for changedir_result to be set, then returns...
     tkwait variable changedir_result
-    destroy $root
+    destroy $wroot
     focus $old
     return $changedir_result
 }
