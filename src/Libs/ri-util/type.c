@@ -310,6 +310,28 @@ mode m2;
 	return mode_tag(m1) == mode_tag(m2);
 }
 
+int string_type_size(b)
+basic b;
+{
+    int size = -1;
+    value v = basic_string(b);
+    constant c = constant_undefined;
+
+    switch(value_tag(v)) {
+    case is_value_constant:
+      c = value_constant(v);
+      if(constant_int_p(c))
+	size = constant_int(c);
+      else
+	pips_error("string_size_type", "Non-integer constant to size a string");
+      break;
+    default:
+	pips_error("string_size_type", "Non-constant value to size a string");
+    }
+
+    return size;
+}
+
 int basic_type_size(b)
 basic b;
 {
@@ -328,7 +350,8 @@ basic b;
     case is_basic_complex: size = basic_complex(b);
 	break;
     case is_basic_string: 
-	pips_error("basic_type_size", "undefined for type string\n");
+      /* pips_error("basic_type_size", "undefined for type string\n"); */
+      size = string_type_size(b);
 	break;
     default: size = basic_int(b);
 	pips_error("basic_type_size", "ill. tag %d\n", basic_tag(b));
