@@ -29,7 +29,7 @@
 /* Top-level functions
  */
 
-void stf(char *mod_name)
+bool stf(char *mod_name)
 {
 
 #define MAX__LENGTH 256
@@ -97,4 +97,6 @@ void stf(char *mod_name)
 		    mod_name);
 
     debug_off ();
+
+    return TRUE;
 }
