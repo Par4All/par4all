@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.50  1997/08/04 13:54:38  coelho
+ * new generic effects includes.
+ *
  * Revision 1.49  1997/07/25 22:28:56  keryell
  * Avoid to put comments on sequences.
  *
@@ -36,9 +39,10 @@
 #include "defines-local.h"
 
 #include "control.h"
-#include "regions.h"
 #include "semantics.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "effects-convex.h"
 
 /*  DYNAMIC MANAGEMENT
  *
