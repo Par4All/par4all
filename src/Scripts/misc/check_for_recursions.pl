@@ -30,11 +30,20 @@ my %file_names = ();
 find(
     sub 
      {
-	if (/^CALLEES$/) 
-	{
-	    my ($module) = (split '/' , $File::Find::dir)[-1];
-	    $file_names{$module} = $File::Find::name;
-	}
+	 if (/^CALLEES$/) 
+	 {
+	     my ($module) = (split '/' , $File::Find::dir)[-1];
+	     $file_names{$module} = $File::Find::name;
+	 }
+	
+	 if (-d $File::Find::name)
+	 {
+	     my ($module) = $_;
+	     if (-e "$File::Find::name/$module.f" and not
+		 -e "$File::Find::name/CALLEES") {
+		 print STDERR "$module.f without callees\n";
+	     }
+	 }
     }, $database);
 
 #dump_hash %file_names;
