@@ -33,14 +33,14 @@
 
 list
 ReferenceUnion(list l1, list l2,
-		     boolean (*union_combinable_p)(effect, effect))
+	       boolean (*union_combinable_p)(effect, effect))
 {
     return gen_nconc(l1,l2);
 }
 
 list
 ReferenceTestUnion(list l1, list l2,
-		     boolean (*union_combinable_p)(effect, effect))
+		   boolean (*union_combinable_p)(effect, effect))
 {
     list l_res;
 
