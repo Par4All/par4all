@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1995/07/31 17:28:23 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1995/09/27 15:48:25 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/07/31 17:28:23 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1995/09/27 15:48:25 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -182,10 +182,10 @@ send_notice_prompt_to_emacs(char *first_line, ...)
 static bool
 epips_select_module(char * module_name)
 {
-   int i;
    char *module_list[ARGS_LENGTH];
    int new_module_list_length;
-   int  module_list_length = 0;
+   int module_list_length = 0;
+   int i = 0;
 
    if (db_get_current_workspace_name() == NULL) {
       user_warning("epips_select_module",
@@ -268,7 +268,7 @@ epips_execute_command(char * command_buffer)
    command_name = command_buffer;
    *separator_index = '\0';
    command_content = separator_index + 1;
-   debug(1, "epips_execute_command",
+   debug(2, "epips_execute_command",
          "command_name: \"%s\", command_content: \"%s\"\n",
          command_name,
          command_content);
@@ -445,5 +445,8 @@ initialize_emacs_mode()
       (void) notify_set_input_func(notifier_client,
                                    read_commands_from_emacs,
                                    fileno(stdin));
+
+      /* The user query is redirected to Emacs: */
+      /* pips_request_handler = epips_user_request; */
    }
 }
