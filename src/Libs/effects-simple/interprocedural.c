@@ -461,6 +461,7 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
     bad_reshaping = TRUE;
     if (size_formal != NULL && size_real != NULL && offset != (Pvecteur) -1) 
     {
+	Pcontrainte ct = CONTRAINTE_UNDEFINED;
 	ineq = size_real;
 	vect_add_elem(&ineq,  TCST, VALUE_ONE);
 	ineq = vect_cl(ineq, VALUE_MONE, size_formal);
@@ -469,7 +470,8 @@ translate_array_effect(entity called_func, list real_args, reference real_ref,
 	vect_rm(offset);
 
 	/* on ajoute la contrainte au systeme */
-	sc_add_ineg(equations, contrainte_make(ineq));
+	ct =  contrainte_make(ineq);
+	sc_add_ineg(equations, ct);
 
 	ifdebug(5) {
 	    fprintf(stderr, "contrainte: ");
@@ -696,105 +698,118 @@ summary_to_proper_effects(
     {
         expression expr = EXPRESSION(CAR(pc));
         syntax sexpr = expression_syntax(expr);
+	boolean substringp = FALSE;
+	boolean refp = FALSE;
+	list la = NULL;
 
-        if (syntax_reference_p(sexpr))
+	if (syntax_call_p(sexpr)) {
+	    /* To deal with substring real argument */
+	    call c = syntax_call(sexpr);
+	    entity f = call_function(c);
+	    la = call_arguments(c);
+
+	   if  (intrinsic_entity_p(f)
+		&& (strcmp(entity_local_name(f), SUBSTRING_FUNCTION_NAME)==0)) 
+	    sexpr = expression_syntax(EXPRESSION(CAR(la)));
+	}
+       
+	if (syntax_reference_p(sexpr))
  	{
-            reference real_ref = syntax_reference(sexpr);
-
+            reference real_ref= syntax_reference(sexpr); 
+	    
             MAP(EFFECT, formal_effect,
-	    {
-                entity formal_param = effect_entity(formal_effect);
-
-                if (ith_parameter_p(func, formal_param, ipc))
 		{
-                    effect real_effect = 
-                        translate_effect(func, args, real_ref, formal_effect);
-
-                    le = gen_nconc(le, CONS(EFFECT, real_effect, NIL));
-                }
-            }, 
-		func_sdfi);
+		    entity formal_param = effect_entity(formal_effect);
+		    
+		    if (ith_parameter_p(func, formal_param, ipc))
+		    {
+			effect real_effect = 
+			    translate_effect(func, args, real_ref, formal_effect);
+			
+			le = gen_nconc(le, CONS(EFFECT, real_effect, NIL));
+		    }
+		}, 
+		    func_sdfi);
         }
-        else
-	{
+	else {	
 	    /* check if there is no must write effect */
 	    MAP(EFFECT, formal_effect,
-	    {
-		entity formal_param = effect_entity(formal_effect);
-		
-		if (ith_parameter_p(func, formal_param, ipc))
 		{
-		    if (effect_write_p(formal_effect)) {
-			char * term = NULL;
-			
-			switch(ipc) {
-			case 1: term = "st";
-			    break;
-			case 2: term = "nd";
-			    break;
-			case 3: term ="rd";
-			    break;
-			default:
-			    term = "th";
+		    entity formal_param = effect_entity(formal_effect);
+		    
+		    if (ith_parameter_p(func, formal_param, ipc))
+		    {
+			if (effect_write_p(formal_effect)) {
+			    char * term = NULL;
+			    
+			    switch(ipc) {
+			    case 1: term = "st";
+				break;
+			    case 2: term = "nd";
+				break;
+			    case 3: term ="rd";
+				break;
+			    default:
+				term = "th";
+			    }
+			    
+			    if (effect_must_p(formal_effect))
+				pips_user_error
+				    ("\nmodule %s called by module %s:\n\twrite"
+				     " effect on non-variable actual"
+				     " parameter thru %d%s formal parameter %s\n",
+				     module_local_name(func),
+				     module_local_name
+				     (get_current_module_entity()),
+				     ipc, term, entity_local_name(formal_param));
+			    else
+				pips_user_warning
+				    ("\nmodule %s called by module %s:\n\t"
+				     "possible write effect on non-variable "
+				     "actual parameter thru %d%s "
+				     "formal parameter %s\n",
+				     module_local_name(func),
+				     module_local_name
+				     (get_current_module_entity()),
+				     ipc, term, 
+				     entity_local_name(formal_param));
 			}
-			
-			if (effect_must_p(formal_effect))
-			    pips_user_error
-				("\nmodule %s called by module %s:\n\twrite"
-				 " effect on non-variable actual"
-				 " parameter thru %d%s formal parameter %s\n",
-				 module_local_name(func),
-				 module_local_name
-				 (get_current_module_entity()),
-				 ipc, term, entity_local_name(formal_param));
-			else
-			    pips_user_warning
-				("\nmodule %s called by module %s:\n\t"
-				 "possible write effect on non-variable "
-				 "actual parameter thru %d%s "
-				 "formal parameter %s\n",
-				 module_local_name(func),
-				 module_local_name
-				 (get_current_module_entity()),
-				 ipc, term, 
-				 entity_local_name(formal_param));
 		    }
-		}
-	    }, 
-		func_sdfi);
+		}, 
+		    func_sdfi);
 	    
 	    /* if everything is fine, then the effects are the read effects
 	     * of the expression */
 	    le = gen_nconc(le,generic_proper_effects_of_expression(expr));
-        }
-    }
+	}
     
+    }
     pips_debug(3, "effects on statics and globals\n");
-    /* effets of func on static and global variables are translated */
+/* effets of func on static and global variables are translated */
     if (get_bool_property("GLOBAL_EFFECTS_TRANSLATION"))
     {
 	MAP(EFFECT, ef,
-	{
-	    if (storage_ram_p(entity_storage(effect_entity(ef)))) 
-		le = gen_nconc(le, global_effect_translation
-			       (ef, func, get_current_module_entity()));
-	},
-	    func_sdfi);
+	    {
+		if (storage_ram_p(entity_storage(effect_entity(ef)))) 
+		    le = gen_nconc(le, global_effect_translation
+				   (ef, func, get_current_module_entity()));
+	    },
+		func_sdfi);
     }
     else
 	/* hack for HPFC: no translation of global effects */
     {
 	MAP(EFFECT, ef,
-	{
-	    if (storage_ram_p(entity_storage(effect_entity(ef)))) 
-		le = gen_nconc(le, CONS(EFFECT, make_sdfi_effect(ef), NIL));
-	},
-	    func_sdfi);
+	    {
+		if (storage_ram_p(entity_storage(effect_entity(ef)))) 
+		    le = gen_nconc(le, CONS(EFFECT, make_sdfi_effect(ef), NIL));
+	    },
+		func_sdfi);
     }
-
+    
     return(le);
 }
-
+    
 
 /****************************************************** FORWARD TRANSLATION */
 
