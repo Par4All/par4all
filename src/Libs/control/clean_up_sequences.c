@@ -5,10 +5,10 @@
 
    */
 
-/* 	%A% ($Date: 1997/02/03 22:29:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/04 17:18:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_clean_up_sequences[] = "%A% ($Date: 1997/02/03 22:29:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_clean_up_sequences[] = "%A% ($Date: 1997/02/04 17:18:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -28,7 +28,7 @@ static int clean_up_fused_sequences;
 static int clean_up_1_statement_sequence;
 
 
-static void
+void
 initialize_clean_up_sequences_statistics()
 {
     clean_up_empty_block_removed = 0;
@@ -37,7 +37,7 @@ initialize_clean_up_sequences_statistics()
 }
 
 
-static void
+void
 display_clean_up_sequences_statistics()
 {
     if (get_bool_property("CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS")
