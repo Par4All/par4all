@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/09 11:26:23 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/12 18:24:30 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -299,6 +299,9 @@ GRAPHEDITOR_DIRECTORY=${DAVINCI_DIR}/grapheditor
 DAVINCI_ICONDIR=${DAVINCI_DIR}/images
 MANPATH=${MANPATH}:${DAVINCI_DIR}/man
 PATH=${PATH}:${DAVINCI_DIR}
+
+# Toolpack is used for STF
+TOOLPACK_DIR="$PIPS_HOME/Toolpack/toolpack1.2"
 
 #
 #          ####   #       #####
