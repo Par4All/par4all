@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/11 11:57:53 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/09/12 21:35:45 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -12,6 +12,8 @@
 # ??? I do not deal with "R E A L" like Fortran lexical problems.
 # ??? There may be problems with if and do instructions...
 #     that is IF () & DO with a directive comment would not work.
+# Ctr-L and C-G are used as intermediate characters, that should 
+# not appear in the program, otherwise troubles...
 #
 # (c) Fabien Coelho 02/95.
 #
@@ -47,10 +49,12 @@
 #
 # HPFC directives: (FCD, Fabien Coelho Directives:-)
 #
+# local/endlocal (hack for localized computations:-)
 # _1: synchro
 # _2: timeon
 # _3: timeoff
-#     local/endlocal (hack for localized computations)
+# _4: setbool // to change the compiler global behavior...
+# _5: setint  // dangerous and added to validation purposes...
 #
 # (_ is hpfc)
 #
@@ -105,34 +109,37 @@ $SED 's,&[ 	]*chpf\$., ,g;
 #
 $TR '' '\012' | 
 #
-# massive transformations
+# massive transformations.
+# directives are switched to hpfc specials calls.
 #
-$SED '/^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1_k\2,g
-      /^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1_k\2,g
-      /^chpf\$/s,_k\([\,)]\),_k()\1,g
-      /^chpf\$/s,\([ 	\,(]\)cyclic\([ 	\,()]\),\1_c\2,g
-      /^chpf\$/s,\([ 	\,(]\)cyclic\([ 	\,()]\),\1_c\2,g
-      /^chpf\$/s,_c\([\,)]\),_c(1)\1,g
-      /^chpf\$/s,\*\([\,)]\),_s()\1,g
-      s,^chpf\$ synchro,      _1,
-      s,^chpf\$ timeon,      _2,
-      s,^chpf\$ timeoff,      _3,
-      s,^chpf\$ local,      _i(I_LOCAL)      do I_LOCAL = 0\, 0,
+$SED '/^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1k\2,g
+      /^chpf\$/s,\([ 	\,(]\)block\([ 	\,()]\),\1k\2,g
+      /^chpf\$/s,k\([\,)]\),k()\1,g
+      /^chpf\$/s,\([ 	\,(]\)cyclic\([ 	\,()]\),\1c\2,g
+      /^chpf\$/s,\([ 	\,(]\)cyclic\([ 	\,()]\),\1c\2,g
+      /^chpf\$/s,c\([\,)]\),c(1)\1,g
+      /^chpf\$/s,\*\([\,)]\),s()\1,g
+      s,^chpf\$ synchro,      1,
+      s,^chpf\$ timeon,      2,
+      s,^chpf\$ timeoff,      3,
+      s,^chpf\$ setbool,      4,
+      s,^chpf\$ setint,      5,
+      s,^chpf\$ local,      i(I_LOCAL)      do I_LOCAL = 0\, 0,
       s,^chpf\$ endlocal,      enddo,
-      s,^chpf\$ dynamic \(.*\),      _y(\1),
-      s,^chpf\$ pure \(.*\),      _u(\1),
-      s,^chpf\$ template \(.*\),      _o \1      _t(\1),
-      s,^chpf\$ processors \(.*\),      _o \1      _p(\1),
-      s,^chpf\$ align \(.*\) with \(.*\),      _a(\1\,\2),
-      s,^chpf\$ realign \(.*\) with \(.*\),      _b(\1\,\2),
-      s,^chpf\$ distribute \(.*\) onto \(.*\),      _d(\1\,\2),
-      s,^chpf\$ redistribute \(.*\) onto \(.*\),      _e(\1\,\2),
-      s,^chpf\$ independent[ 	]*\([^( ,][^()\,]*\),      _i(\1),
-      s,^chpf\$ independent[ 	]*\(.*\),      _i\1,
-      s,^      _i\,,      _i()\,,
-      s,^      _i(\([^)]*\))[ 	]*\,[ 	]*new[ 	]*(\([^)]*\)),      _i(\1)      _n(\2),
-      s,_\([123abdeintpyou]\),call hpfc\1,g
-      s,_\([cks]\),hpfc\1,g' |
+      s,^chpf\$ dynamic \(.*\),      y(\1),
+      s,^chpf\$ pure \(.*\),      u(\1),
+      s,^chpf\$ template \(.*\),      o \1      t(\1),
+      s,^chpf\$ processors \(.*\),      o \1      p(\1),
+      s,^chpf\$ align \(.*\) with \(.*\),      a(\1\,\2),
+      s,^chpf\$ realign \(.*\) with \(.*\),      b(\1\,\2),
+      s,^chpf\$ distribute \(.*\) onto \(.*\),      d(\1\,\2),
+      s,^chpf\$ redistribute \(.*\) onto \(.*\),      e(\1\,\2),
+      s,^chpf\$ independent[ 	]*\([^( ,][^()\,]*\),      i(\1),
+      s,^chpf\$ independent[ 	]*\(.*\),      i\1,
+      s,^      i\,,      i()\,,
+      s,^      i(\([^)]*\))[ 	]*\,[ 	]*new[ 	]*(\([^)]*\)),      i(\1)      n(\2),
+      s,\([12345abdeintpyou]\),call hpfc\1,g
+      s,\([cks]\),hpfc\1,g' |
 #
 # handles multi lines breaking (independent with new...)
 #
@@ -140,8 +147,8 @@ $TR '' '\012' |
 #
 # separates static directives from others
 #
-$SED "/^      call hpfc[adptuy]/w $TMP.1
-      /^      call hpfc[adptuy]/d" > $TMP.0
+$SED "/^      call hpfc[adptuy45]/w $TMP.1
+      /^      call hpfc[adptuy45]/d" > $TMP.0
 
 #
 # line before which the static directives will be inserted
