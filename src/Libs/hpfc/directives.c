@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/10/04 19:30:11 $, )
+ * ($Date: 1995/10/05 11:32:39 $, )
  */
 
 #include "defines-local.h"
@@ -29,7 +29,7 @@ static void clean_statement(statement s)
 {
     instruction i = statement_instruction(s);
 
-    assert(instruction_call_p(i));
+    pips_assert("call", instruction_call_p(i));
 
     free_call(instruction_call(i));
     instruction_call(i) = call_undefined;
@@ -84,7 +84,7 @@ DEFINE_LOCAL_STACK(current_stmt, statement)
 static void switch_basic_type_to_overloaded(entity e)
 {
     basic b = entity_basic(e);
-    assert(b!=basic_undefined);
+    pips_assert("basic defined", b!=basic_undefined);
     basic_tag(b)=is_basic_overloaded;
 }
 
@@ -140,7 +140,7 @@ alignment_p(list /* of expressions */ align_src,
 
     /*  the alignment should be a simple affine expression
      */
-    message_assert("affine align subscript", *pshift==0 ? size<=1 : size<=2)
+    pips_assert("affine align subscript", *pshift==0 ? size<=1 : size<=2)
 
     /*   constant alignment case
      */
@@ -159,8 +159,8 @@ alignment_p(list /* of expressions */ align_src,
 	{
 	    v_src = normalized_linear(n);
 
-	    message_assert("simple index",
-			   vect_size(v_src)==1 && var_of(v_src)!=TCST);
+	    pips_assert("simple index",
+			vect_size(v_src)==1 && var_of(v_src)!=TCST);
 	    
 	    *prate = vect_coeff(var_of(v_src), v);
 
@@ -192,7 +192,7 @@ extract_the_align(reference alignee,
     int array_dim, template_dim = 1;
     Value rate, shift;
 
-    assert(entity_template_p(template));
+    pips_assert("template", entity_template_p(template));
     
     /*  each array dimension is looked for a possible alignment
      */
@@ -252,8 +252,8 @@ one_align_directive(reference alignee,
 	statement current = current_stmt_head();
 	entity new_array;
 
-	message_assert("dynamic array realignment",
-		       array_distributed_p(array) && dynamic_entity_p(array));
+	pips_assert("dynamic array realignment",
+		    array_distributed_p(array) && dynamic_entity_p(array));
 
 	new_array = array_synonym_aligned_as(array, a);
 	propagate_synonym(current, array, new_array);
@@ -281,7 +281,7 @@ handle_align_and_realign_directive(entity f,
 
     /* last points to the last item of args, which should be the template
      */
-    assert(gen_length(args)>=2);
+    pips_assert("at least 2 arguments", gen_length(args)>=2);
     template = expression_to_reference(EXPRESSION(CAR(last)));
 
     gen_map(normalize_all_expressions_of, args);
@@ -306,13 +306,13 @@ static tag distribution_format(expression e,
     string name;
     call c;
 
-    message_assert("valid distribution format", syntax_call_p(s));
+    pips_assert("valid distribution format", syntax_call_p(s));
 
     c = syntax_call(s);
     function = call_function(c);
     *pl = call_arguments(c);
 
-    message_assert("valid distribution format", 
+    pips_assert("valid distribution format", 
 		   hpf_directive_entity_p(function));
 
     name = entity_local_name(function);
@@ -326,7 +326,7 @@ static tag distribution_format(expression e,
     if (same_string_p(name, HPF_PREFIX STAR_SUFFIX))   /* * [star] */
 	return is_style_none;
     else
-	user_error("distribution_format", "invalid");
+	pips_user_error("invalid");
 
     return 0; /* just to avoid a gcc warning */
 }
@@ -353,7 +353,7 @@ extract_the_distribute(reference distributee, reference proc)
 	{
 	case is_style_block:
 	case is_style_cyclic:
-	    message_assert("valid distribution", gen_length(largs)<=1);
+	    pips_assert("valid distribution", gen_length(largs)<=1);
 
 	    parameter = ENDP(largs) ? 
 		expression_undefined :                   /* implicit size */
@@ -364,7 +364,7 @@ extract_the_distribute(reference distributee, reference proc)
 	    parameter = expression_undefined;
 	    break;
 	default:
-	    pips_error("one_distribute_directive", "unexpected style tag\n");
+	    pips_internal_error("unexpected style tag\n");
 	}
 
 	ldist = CONS(DISTRIBUTION, 
@@ -386,7 +386,7 @@ one_distribute_directive(reference distributee,
            template  = reference_variable(distributee);
     distribute d = extract_the_distribute(distributee, proc);
 
-    assert(ENDP(reference_indices(proc))); /* no ... ONTO P(something) */
+    pips_assert("no indices to processor", ENDP(reference_indices(proc)));
     
     normalize_distribute(template, d);
 
@@ -398,7 +398,7 @@ one_distribute_directive(reference distributee,
 	statement current = current_stmt_head();
 	entity new_t;
 
-	message_assert("dynamic template redistribution",
+	pips_assert("dynamic template redistribution",
 		  entity_template_p(template) && dynamic_entity_p(template));
 
 	new_t = template_synonym_distributed_as(template, d);
@@ -448,7 +448,7 @@ handle_distribute_and_redistribute_directive(
 
     /* last points to the last item of args, which should be the processors
      */
-    assert(gen_length(args)>=2);
+    pips_assert("at least 2 args", gen_length(args)>=2);
     proc = expression_to_reference(EXPRESSION(CAR(last)));
     gen_map(normalize_all_expressions_of, args);
 
@@ -476,7 +476,7 @@ static void HANDLER(name) (entity f, list /* of expressions */ args)
  */
 HANDLER_PROTOTYPE(unexpected)
 {
-    user_error("handle_hpf_directives", "unexpected hpf directive\n");
+    pips_user_error("unexpected hpf directive\n");
 }
 
 HANDLER_PROTOTYPE(processors)
@@ -551,7 +551,7 @@ HANDLER_PROTOTYPE(independent)
     }
     
     close_ctrl_graph_travel();
-    user_error("handle_independent_directive", "some loop not found!\n");
+    pips_user_error("some loop not found!\n");
 }
 
 /* ??? not implemented and not used. The independent directive is trusted
@@ -575,7 +575,7 @@ HANDLER_PROTOTYPE(dynamic)
 HANDLER_PROTOTYPE(pure)
 {
     entity module = get_current_module_entity();
-    assert(ENDP(args));
+    pips_assert("no args", ENDP(args));
     add_a_pure(module);
 
     pips_debug(3,"entity is %s\n", entity_name(module));
@@ -618,12 +618,12 @@ HANDLER_PROTOTYPE(set)
 	string property;
 	int val, i;
 	
-	message_assert("two args", gen_length(args)==2);
+	pips_assert("two args", gen_length(args)==2);
 	arg1 = EXPRESSION(CAR(args));
 	arg2 = EXPRESSION(CAR(CDR(args)));
-	message_assert("constant args",
-		       expression_is_constant_p(arg1) &&
-		       expression_is_constant_p(arg2));
+	pips_assert("constant args",
+		    expression_is_constant_p(arg1) &&
+		    expression_is_constant_p(arg2));
 
 	/* property name.
 	 * ??? moved to uppers because hpfc_directives put lowers.
@@ -767,7 +767,7 @@ void handle_hpf_directives(statement s)
 
     simplify_remapping_graph();
     gen_map(clean_statement, to_be_cleaned);
-    assert(current_stmt_empty_p());
+    pips_assert("empty stack", current_stmt_empty_p());
 
     gen_free_list(to_be_cleaned), to_be_cleaned=NIL;
     free_current_stmt_stack();
