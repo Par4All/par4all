@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/10/02 10:21:36 $, 
+ * $Date: 1997/10/02 13:55:40 $, 
  */
 
 #include <unistd.h>
@@ -309,6 +309,56 @@ file_exists_p(char * name)
     return (stat(name, &buf) == 0) && S_ISREG(buf.st_mode);
 }
 
+#define COLON ':'
+/* returns the allocated nth path in colon-separated path list.
+ */
+static string
+nth_path(string path_list, int n)
+{
+    int len=0,i;
+    string result;
+    while (*path_list && n>0)
+	if (*path_list++==COLON) n--;
+    if (!*path_list) return (string) NULL;
+    while (path_list[len] && path_list[len]!=COLON) len++;
+    result = (string) malloc(len+1);
+    pips_assert("malloc ok", result);
+    for (i=0; i<len; i++) 
+	result[i]=path_list[i];
+    result[len]='\0';
+    return result;
+}
+
+/* returns an allocated string pointing to the file, possibly 
+ * with an additional path taken from colon-separated dir_path.
+ * returns NULL if no file was found.
+ */
+string 
+find_file_in_directories(string file_name, string dir_path)
+{
+    string path;
+    int n=0;
+    pips_assert("some file name", file_name);
+
+    if (file_exists_p(file_name))
+	return strdup(file_name);
+
+    if (!dir_path || file_name[0]=='/')
+	return (string) NULL;
+
+    /* looks for the file with an additionnal path ahead.
+     */
+    while ((path=nth_path(dir_path, n++))) {
+	string name = strdup(concatenate(path, "/", file_name, 0));
+	free(path);
+	if (file_exists_p(name))
+	    return name;
+	free(name);
+    }
+
+    return (string) NULL;
+}
+
 bool 
 file_readable_p(char * name)
 {
@@ -400,3 +450,4 @@ safe_readline(FILE * file)
     else { buf[i++] = '\0'; res = strdup(buf); free(buf); }
     return res;
 }
+
