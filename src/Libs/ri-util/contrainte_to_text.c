@@ -356,7 +356,7 @@ contraintes_text_format(
     string prefix, 		/* for continuations */
     text txt,      		/* formed text */
     Pcontrainte cs, 		/* contraintes to be printed */
-    string (*variable_name)(),	/* hook for naming a variable */
+    string (*variable_name)(Variable),	/* hook for naming a variable */
     bool invert_put_first,      /* whether to invert put_first */
     int (*put_first)(Pvecteur), /* whether to put first some constraints */
     bool some_previous,         /* whether a separator is needed */
@@ -391,7 +391,7 @@ system_sorted_text_format(
     string prefix,
     text txt,
     Psysteme ps,
-    string (*variable_name)(),
+    string (*variable_name)(Variable),
     bool (*put_first)(Pvecteur), /* whether to put a constraints ahead */
     bool a_la_fortran)
 {
@@ -452,7 +452,7 @@ system_text_format(
     string prefix,
     text txt,
     Psysteme ps,
-    string (*variable_name)(),
+    string (*variable_name)(Variable),
     bool a_la_fortran)
 {
     system_sorted_text_format
