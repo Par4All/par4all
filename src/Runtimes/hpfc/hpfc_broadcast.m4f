@@ -1,6 +1,6 @@
 c
 c $RCSfile: hpfc_broadcast.m4f,v $ (version $Revision$)
-c $Date: 1995/09/07 13:42:45 $, 
+c $Date: 1995/09/07 13:58:28 $, 
 c
 c management of broadcasts
 c typical call: hpfc_broadcast_x(lid, [number, step]*x)
@@ -23,16 +23,24 @@ COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA'))
      $     lid, i0, info, dnl
 COMMA_REPLICATE(LEVEL,`LIST_DECL_AREA'),dnl
 COMMA_REPLICATE(LEVEL,`LIST_INDEX_DECL')
+      include "fpvm3.h"
+      include "hpfc_commons.h"
       i0 = lid
 SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
       if (i`'LEVEL.ne.MYLID) then
-         pvmfsend(NODETIDS(i`'LEVEL), 
+         call pvmfsend(NODETIDS(i`'LEVEL), 
      $        SENDCHANNELS(i`'LEVEL), info)
          SENDCHANNELS(i`'LEVEL) = SENDCHANNELS(i`'LEVEL) + 2
       endif
 SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
       end')dnl
+GENERIC_BROADCAST(1)
+GENERIC_BROADCAST(2)
 GENERIC_BROADCAST(3)
+dnl GENERIC_BROADCAST(4)
+dnl GENERIC_BROADCAST(5)
+dnl GENERIC_BROADCAST(6)
+dnl GENERIC_BROADCAST(7)
 c
 c that is all
 c
