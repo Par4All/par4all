@@ -1,7 +1,7 @@
 /* package arithmetic
  *
  * $RCSfile: io.c,v $ (version $Revision$)
- * $Date: 1996/07/26 14:44:21 $, 
+ * $Date: 1997/12/10 17:07:58 $, 
  *
  * IO on a Value
  */
@@ -52,7 +52,7 @@ int sscan_Value(char *s, Value *pv)
 char * Value_to_string(Value v)
 {
     static char buf[BUFFER_SIZE];
-    sprintf(VALUE_FMT "\0", buf, v);
+    sprintf(buf, VALUE_FMT, v);
     return buf;
 }
 
