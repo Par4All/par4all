@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/31 13:16:18 $ 
+# $Date: 1996/09/02 08:52:43 $ 
 
 # expected from makefile macros
 ifeq ($(FC),g77)
@@ -38,14 +38,14 @@ INSTALL_BIN=	$(BIN) $(LIB)
 INSTALL_RTM=	$(EXPORT_HEADERS)
 INSTALL_SHR=	$(HPFC) xpomp_graphic_F.h
 INSTALL_DOC=	xpomp_manual.ps 
-INSTALL_HTM=	xpomp_manual.html xpomp_manual
+INSTALL_HTM=	xpomp_manual
 
 # 
 # compilation and so
 
 all: run doc
 run: $(LIB) $(BIN) fractal test_xpomp
-doc: $(INSTALL_DOC) $(INSTALL_HTM)
+doc: $(INSTALL_DOC) xpomp_manual.html
 
 # cproto:; $(PROTOIZE) xpomp.c
 
