@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# 
+# Usage: Init [-f file.f]... [-d] workspace
+#
+# When workspace is "", the previous selected one is selected again.
+#
+# reste a ajouter:
+# - un systeme d'invalidation de Init sans argument apres n minutes de non 
+#  utilisation
+# - Faire une veritable initialisation (en particulier pipsmakefile doit 
+#  etre parse puis stocke pour eviter le warning  apres le build
+
+USAGE="Usage: Init [-f file.f]... [-d] workspace, or Init [-f \"file.f ...\"] [-d] workspace"
+BAD_WORKSPACE="Unknown workspace"
+
+usage () {
+echo $USAGE
+}
+
+if [ $# -eq 0 ]
+then	usage >&2
+	exit 1
+fi
+
+while getopts f:d opt
+do
+	case $opt in
+	f)	SOURCE_FILES="$SOURCE_FILES $OPTARG";;
+	d)	DELETE=TRUE;;
+	\?)	usage >&2
+		exit 1;;
+	esac
+done
+shift `expr $OPTIND - 1`
+if [ $# != 1 ]
+then
+	usage >&2
+	exit 1
+fi
+
+if [ "$DELETE" ]
+then
+	Delete "$1"
+fi
+
+if [ "$SOURCE_FILES" ]
+then
+	Pips -w "$1" -f "$SOURCE_FILES"
+else
+	Pips -w "$1"
+fi
