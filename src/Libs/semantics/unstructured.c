@@ -61,6 +61,11 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.6  2001/02/07 18:16:17  irigoin
+  * Lots of improvement to handle recursion in fixpoint computation. Should
+  * still be improved. Subscc should be handled like scc by enumerating paths
+  * instead of looking for a unique covering path, regardless of subsubcyles.
+  *
   * Revision 1.5  2001/02/02 12:17:48  irigoin
   * After bug fixes for tilt.f, before cleaning up and before bug fixes for
   * spice and fppp
@@ -700,7 +705,6 @@ static transformer control_node_set_to_fix_point
   transformer fptf = transformer_undefined;
   static transformer subcycle_to_fixpoint(list, control,
 					  statement_mapping,
-					  list,
 					  statement_mapping);
 
   ifdebug(5) {
@@ -724,10 +728,9 @@ static transformer control_node_set_to_fix_point
 	 process_cycle_in_scc() */
       /* pips_assert("The fix point is ready in control_node_set_to_fix_point",
 	 fptf!= (transformer) HASH_UNDEFINED_VALUE); */
-      if(fptf== (transformer) HASH_UNDEFINED_VALUE) {
+      if(fptf == (transformer) HASH_UNDEFINED_VALUE) {
 	fptf = subcycle_to_fixpoint(set, c,
 				    NULL /* control_postcondition_map*/,
-				    secondary_entries,
 				    statement_to_subcycle_fix_point_map);
 
 	pips_assert("The fix point transformer to insert is consistent", 
@@ -766,6 +769,9 @@ static transformer control_node_sequence_to_fix_point
 (list seq, statement_mapping control_postcondition_map, list secondary_entries,
  statement_mapping statement_to_subcycle_fix_point_map)
 {
+  static transformer subcycle_to_fixpoint(list, control,
+					  statement_mapping,
+					  statement_mapping);
   transformer seqtf = transformer_identity();
   transformer fptf = transformer_undefined;
   control pred = control_undefined;
@@ -785,8 +791,19 @@ static transformer control_node_sequence_to_fix_point
 	(transformer) hash_get((hash_table) statement_to_subcycle_fix_point_map,
 			       (char *) s);
       /* I do not see why it should be ready. We should compute it recursively */
-      pips_assert("The fix point is ready in control_node_sequencet_to_fix_point",
-		  fptf!= (transformer) HASH_UNDEFINED_VALUE);
+      /* pips_assert("The fix point is ready in control_node_sequence_to_fix_point",
+	 fptf!= (transformer) HASH_UNDEFINED_VALUE); */
+      if(fptf == (transformer) HASH_UNDEFINED_VALUE) {
+	fptf = subcycle_to_fixpoint(seq, c,
+				    NULL /* control_postcondition_map*/,
+				    statement_to_subcycle_fix_point_map);
+
+	pips_assert("The fix point transformer to insert is consistent", 
+		    transformer_consistency_p(fptf));
+
+	hash_put((hash_table) statement_to_subcycle_fix_point_map,
+		 (char *) s, (char *) fptf);
+      }
       tf_with_cond = copy_transformer(fptf);
       tf_with_cond = transformer_combine(tf_with_cond,
 					 load_statement_transformer(s));
@@ -1013,7 +1030,11 @@ static list control_set_to_control_cycle(list set)
       }
     }
     else {
-      pips_error("control_set_to_control_cycle", "Set contains no cycles");
+      /* pips_error("control_set_to_control_cycle", "Set contains no cycles"); */
+      /* This occurs in READIN from SPICE: the scc can be covered by a
+         path but the path is not a cycle */
+      gen_free_list(path);
+      path = NIL;
     }
   }
 
@@ -1129,6 +1150,9 @@ static list head_to_subcycle(list cycle, control h, list * new_secondary_entries
   pips_debug(5, "Begin for head %s", 
 	     statement_identification(control_statement(h)));
 
+  pips_debug(5, "and break node %s", 
+	     statement_identification(control_statement(f)));
+
   pips_assert("The subcycle head is in the cycle", gen_in_list_p(h, cycle));
 
   /* *new_secondary_entries = scc_to_secondary_entries(cycle, h); */
@@ -1144,7 +1168,9 @@ static list head_to_subcycle(list cycle, control h, list * new_secondary_entries
        be a secondary entry. */
     list outernodes = gen_copy_seq(control_predecessors(h));
 
-    gen_list_and(&outernodes, new_secondary_entries);
+    pips_assert("The head must no be the break node", FALSE)
+
+    gen_list_and(&outernodes, *new_secondary_entries);
 
 
     pips_assert("At least one node can be used to break the master scc",
@@ -1225,7 +1251,7 @@ static list head_to_subcycle(list cycle, control h, list * new_secondary_entries
 }
 
 static transformer subcycle_to_fixpoint
-(list cycle, control h, statement_mapping control_postcondition_map, list secondary_entries,
+(list cycle, control h, statement_mapping control_postcondition_map,
  statement_mapping statement_to_subcycle_fix_point_map)
 {
   list new_secondary_entries = NIL;
@@ -1497,10 +1523,14 @@ static list sort_secondary_entries(list secondary_entries, list cycle)
   }, cycle);
 
   ifdebug(5) {
-    pips_debug(5, "Seccondary entries:\n");
+    pips_debug(5, "Secondary entries:\n");
     print_control_nodes(secondary_entries);
     pips_debug(5, "Ordered secondary entries:\n");
     print_control_nodes(ordered_secondary_entries);
+    pips_assert("There are fewer sorted entries because some may not belong to the cycle",
+		gen_length(secondary_entries)>=gen_length(ordered_secondary_entries));
+    if(gen_length(secondary_entries)!=gen_length(ordered_secondary_entries))
+      pips_debug(5, "WARNING!!! Some secondary entries have been dropped!\n");
   }
 
   return ordered_secondary_entries;
@@ -1529,15 +1559,24 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
   pips_debug(5, "Begin for cycle:\n");
   ifdebug(5) print_control_nodes(cycle);
 
-  /* ordered_secondary_entries = sort_secondary_entries(secondary_entries, cycle); */
+  ordered_secondary_entries = sort_secondary_entries(secondary_entries, cycle);
   /* ordered_secondary_entries = gen_copy_list(secondary_entries); */
   /* ordered_secondary_entries = gen_copy_seq(secondary_entries); */
-  ordered_secondary_entries = secondary_entries;
+  /* ordered_secondary_entries = secondary_entries; */
 
   /* compute a fix point for each sub-cycle head (i.e. secondary entry) */
   MAPL(hc, {
     control h = CONTROL(CAR(hc));
     statement s = control_statement(h);
+    list subscc = gen_copy_seq(scc);
+    control current_head = CONTROL(CAR(cycle));
+
+    pips_assert("The current cycle head belongs to the scc", 
+		gen_in_list_p(current_head, scc));
+    /* the current head is put first in subscc in order to remember that
+       is cannot be used in an internal cycle */
+    gen_remove(&subscc, current_head);
+    subscc = CONS(CONTROL, current_head, subscc);
 
     if(gen_in_list_p(h, cycle)) {
       /* Why? It could appear on different paths for one entry or for
@@ -1550,9 +1589,8 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
 
       if(hash_get((hash_table) statement_to_subcycle_fix_point_map, (char *) s)
 	 == HASH_UNDEFINED_VALUE) {
-	transformer fptf = subcycle_to_fixpoint(scc, h,
+	transformer fptf = subcycle_to_fixpoint(subscc, h,
 						control_postcondition_map,
-						ordered_secondary_entries,
 						statement_to_subcycle_fix_point_map);
 
 	ifdebug(5) {
@@ -1571,6 +1609,7 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
 			  statement_identification(s));
       }
     }
+    gen_free_list(subscc);
   }, ordered_secondary_entries);
 
   /* compute transformer along path, as in a sequence but with test
@@ -1725,7 +1764,7 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
   FREE_STATEMENT_MAPPING(statement_to_subcycle_fix_point_map);
   statement_to_subcycle_fix_point_map = NULL;
 
-  /* gen_free_list(ordered_secondary_entries); */
+  gen_free_list(ordered_secondary_entries);
 
   pips_debug(5, "End\n");
 }
@@ -1963,7 +2002,8 @@ static void process_ready_scc_for_one_entry(list scc,
     int count = 0;
     pips_debug(4, "Make sure that most nodes have non empty postconditions\n");
     MAP(CONTROL, c, {
-      transformer post = load_control_postcondition(control_statement(c), control_postcondition_map);
+      transformer post = load_control_postcondition(control_statement(c),
+						    control_postcondition_map);
 
       pips_debug(4, "Postcondition for node %s",
 		 statement_identification(control_statement(c)));
@@ -2068,7 +2108,6 @@ static void node_to_path_transformer_or_postcondition(control c, struct  {
     statement_mapping smap;
 } * pcontext)
 {
-  bool postcondition_p = pcontext->pcond;
   statement_mapping control_postcondition_map = pcontext->smap;
   statement s = control_statement(c);
   transformer tf = (transformer)
@@ -2091,7 +2130,6 @@ transformer unstructured_to_accurate_postconditions_or_transformer
   list to_be_processed = NIL; /* forward reachable nodes in u */
   list still_to_be_processed = NIL;
   list already_processed = NIL;
-  list linked_nodes = NIL; /* all nodes in unstructured u */
   statement_mapping control_postcondition_map = make_control_postcondition();
   
   struct  { 
