@@ -32,8 +32,7 @@ void (* pips_update_props_handler)() = default_update_props;
  */
 static string saved_pips_src_path = NULL;
 
-static void 
-push_path(void)
+static void push_path(void)
 {
     string dir;
     pips_assert("not set", !saved_pips_src_path);
@@ -42,27 +41,28 @@ push_path(void)
     free(dir);
 }
 
-static void
-pop_path(void)
+static void pop_path(void)
 {
     pips_assert("set", saved_pips_src_path);
     pips_srcpath_set(saved_pips_src_path);
     free(saved_pips_src_path), saved_pips_src_path = NULL;
 }
 
-
-bool 
-open_module(string name)
+bool open_module(string name)
 {
-    bool success;
+    bool success = FALSE;
+
     if (!db_get_current_workspace_name())
-	pips_user_error("No current workspace, open or create one first!\n");
+      pips_user_error("No current workspace, open or create one first!\n");
 
-    if (db_get_current_module_name()) /* reset if needed */
+    if (db_module_exists_p(name))
+    {
+      if (db_get_current_module_name()) /* reset if needed */
 	db_reset_current_module_name();
-
-    success = db_set_current_module_name(name);
-    reset_unique_variable_numbers();
+      
+      success = db_set_current_module_name(name);
+      reset_unique_variable_numbers();
+    }
 
     if (success) user_log("Module %s selected\n", name);
     else pips_user_warning("Could not open module %s\n", name);
@@ -71,8 +71,7 @@ open_module(string name)
 }
 
 
-bool 
-open_module_if_unique()
+bool open_module_if_unique()
 {
     bool success = TRUE;
     gen_array_t a;
