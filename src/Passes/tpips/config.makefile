@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/15 15:09:58 $, 
+# $Date: 1996/07/18 08:52:45 $, 
 
 LEX=		flex
 LFLAGS=         -l
@@ -27,17 +27,18 @@ lex.yy.c: ana_lex_completed.l y.tab.h
 
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
 # filtred here.
-y.tab.c: ana_syn.y
+y.tab.c y.tab.h: ana_syn.y
 	$(PARSE) ana_syn.y
 	sed -e '/extern char \*malloc/d;s/YY/TP_/g;s/yy/tp_/g' y.tab.c > m.tab.c
 	mv m.tab.c y.tab.c
 	sed -e 's/YY/TP_/g;s/yy/tp_/g' y.tab.h > m.tab.h
 	mv m.tab.h y.tab.h
 
-y.tab.h: y.tab.c
-
 completion_list.h :	$(PIPS_INCLUDEDIR)/resources.h \
 			$(PIPS_INCLUDEDIR)/phases.h \
 			$(PIPS_LIBDIR)/properties.rc
 	$(PIPS_UTILDIR)/build_completion_lists > completion_list.h
 
+# for bootstraping the dependences...
+tpips.o: completion_list.h
+tpips.c: completion_list.h
