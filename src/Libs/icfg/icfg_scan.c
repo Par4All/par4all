@@ -180,12 +180,17 @@ text my_text_named_module(entity module, statement stat)
             attach_head_to_sentence(make_sentence(is_sentence_formatted, 
 						  strdup(s)),
 				    module));
+    my_print(r);
 
     if (stat != statement_undefined) {
         MERGE_TEXTS(r, text_statement(module, 0, stat));
     }
+    
+    my_print(r);
 
     ADD_SENTENCE_TO_TEXT(r, sentence_tail());
+
+    my_print(r);
 
     if(!get_bool_property("PRETTYPRINT_FINAL_RETURN"))
 	reset_last_statement();
