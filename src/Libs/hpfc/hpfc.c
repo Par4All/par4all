@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/09/18 13:23:28 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/09/19 18:34:15 $, )
  * version $Revision$
  */
  
@@ -17,10 +17,9 @@
  */
 #define NO_FILE "dummy-file"
 
-/*  COMMONS
- */
+/****************************************************************** COMMONS */
 
-GENERIC_STATIC_STATUS(/**/, the_commons, list, NIL, gen_free_list)
+GENERIC_STATIC_STATUS(static, the_commons, list, NIL, gen_free_list)
 
 void add_a_common(entity c)
 {
@@ -34,7 +33,9 @@ static void compile_common(entity c)
     put_generated_resources_for_common(c);
 }
 
-GENERIC_STATIC_STATUS(/**/, the_pures, list, NIL, gen_free_list)
+/******************************************************************** PURES */
+
+GENERIC_STATIC_STATUS(static, the_pures, list, NIL, gen_free_list)
 
 void add_a_pure(entity f)
 {
@@ -48,9 +49,73 @@ bool hpf_pure_p(entity f)
     return(gen_in_list_p(f, the_pures));
 }
 
+/*************************************************************** REMAPPINGS */
 
-/*  COMPILER STATUS MANAGEMENT
+/* list of already computed remappings...
  */
+GENERIC_STATIC_STATUS(static, computed_remaps, list, NIL, gen_free_list)
+
+/* exported interface 
+ */
+
+bool 
+remapping_already_computed_p(
+    renaming x)
+{
+    entity src = renaming_old(x), trg = renaming_new(x);
+
+    MAP(REMAPPING, r, 
+    {
+	renaming p = remapping_renaming(r);
+	if (renaming_old(p)==src && renaming_new(p)==trg) 
+	    return TRUE;
+    },
+	get_computed_remaps());
+
+    return FALSE;
+}
+
+void
+add_remapping_as_computed(
+    renaming r,                /* old -> new remapping */
+    list /* of entity */ vars) /* variables to be declared */
+{
+    computed_remaps = CONS(REMAPPING, 
+			   make_remapping(copy_renaming(r), gen_copy_seq(vars)),
+			   computed_remaps);
+}
+
+/***************************************************** ENTITIES IN INCLUDES */
+
+GENERIC_STATIC_STATUS(static, include_entities, list, NIL, gen_free_list)
+
+void
+add_remapping_as_used(
+   renaming x)
+{
+    entity src = renaming_old(x), trg = renaming_new(x);
+    remapping p = remapping_undefined;
+
+    MAP(REMAPPING, r, 
+    {
+	renaming y = remapping_renaming(r);
+
+	if (renaming_old(y)==src && renaming_new(y)==trg) 
+	{
+	    p = r;
+	    break;
+	}
+    },
+	get_computed_remaps());
+
+    assert(!remapping_undefined_p(p));
+
+    MAP(ENTITY, e, include_entities = gen_once(e, include_entities), 
+	remapping_referenced(p));
+}
+
+/*********************************************** COMPILER STATUS MANAGEMENT */
+
 /* initialization of data that belongs to the hpf compiler status
  */
 static void init_hpfc_status()
@@ -62,6 +127,7 @@ static void init_hpfc_status()
     init_the_commons();
     init_dynamic_status();
     init_the_pures();
+    init_computed_remaps();
 }
 
 static void reset_hpfc_status()
@@ -73,6 +139,7 @@ static void reset_hpfc_status()
     reset_the_commons();
     reset_dynamic_status();
     reset_the_pures();
+    reset_computed_remaps();
 }
 
 static void save_hpfc_status() /* GET them */
@@ -85,7 +152,8 @@ static void save_hpfc_status() /* GET them */
 			 get_entity_status(),
 			 get_the_commons(),
 			 get_dynamic_status(),
-			 get_the_pures());    
+			 get_the_pures(),
+			 get_computed_remaps());    
 
     DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, strdup(name), s);
 
@@ -105,6 +173,7 @@ static void load_hpfc_status() /* SET them */
     set_the_commons(hpfc_status_commons(s));
     set_dynamic_status(hpfc_status_dynamic_status(s));
     set_the_pures(hpfc_status_pures(s));
+    set_computed_remaps(hpfc_status_computed(s));
 }
 
 static void close_hpfc_status()
@@ -116,12 +185,12 @@ static void close_hpfc_status()
     close_the_commons();
     close_dynamic_status();
     close_the_pures();
+    close_computed_remaps();
 
     reset_hpfc_status();
 }
 
-/*  COMPILATION
- */
+/************************************************************** COMPILATION */
 
 static void automatic_translation(entity old, entity host, entity node)
 {
@@ -131,7 +200,7 @@ static void automatic_translation(entity old, entity host, entity node)
 
 static void set_resources_for_module(entity module)
 {
-    string module_name = module_local_name(module);
+    string module_name = strdup(module_local_name(module));
 
     /*   STATEMENT
      */
@@ -168,6 +237,7 @@ static void set_resources_for_module(entity module)
     /*   OTHERS
      */
     make_hpfc_current_mappings();
+    init_include_entities();
 
     /*  next in hpfc_init ???
      */
@@ -188,6 +258,8 @@ static void set_resources_for_module(entity module)
     automatic_translation(hpfc_name_to_entity(HPF_PREFIX TIMEOFF_SUFFIX),
 			  hpfc_name_to_entity(HOST_TIMEOFF),
 			  hpfc_name_to_entity(NODE_TIMEOFF));
+
+    free(module_name);
 }
 
 static void 
@@ -201,14 +273,13 @@ reset_resources_for_module()
     free_postcondition_map();
 
     free_hpfc_current_mappings();
+    close_include_entities();
 }
 
 static void 
 compile_module(entity module)
 {
-    statement s, 
-        host_stat = statement_undefined, 
-        node_stat = statement_undefined;
+    statement s, host_stat, node_stat;
 
     /*   INIT
      */
@@ -236,12 +307,13 @@ compile_module(entity module)
 
     update_object_for_module(node_stat, node_module);
     update_object_for_module(entity_code(node_module), node_module);
-    insure_declaration_coherency(node_module, node_stat);
+    insure_declaration_coherency(node_module, node_stat, 
+				 get_include_entities());
     kill_statement_number_and_ordering(node_stat);
     
     update_object_for_module(host_stat, host_module);
     update_object_for_module(entity_code(host_module), host_module);
-    insure_declaration_coherency(host_module, host_stat);
+    insure_declaration_coherency(host_module, host_stat, NIL);
     kill_statement_number_and_ordering(host_stat);
 
     /*   PUT IN DB
@@ -254,11 +326,9 @@ compile_module(entity module)
 }
 
 
-/*  FUNCTIONS CALLED BY PIPSMAKE
- */
+/********************************************* FUNCTIONS CALLED BY PIPSMAKE */
 
-/* void hpfc_init(name)
- * string name;
+/* void hpfc_init(string name)
  *
  * what: initialize the hpfc status for a program.
  * input: the program (workspace) name.
