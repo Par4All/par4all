@@ -1,8 +1,15 @@
 /* $RCSfile: system.c,v $ version $Revision$
- * ($Date: 1998/05/14 11:44:57 $, )
+ * ($Date: 2003/12/22 15:56:12 $, )
  *
  * a safe system call. abort if fails.
  * FC 09/95
+ *
+ * $Log: system.c,v $
+ * Revision 1.10  2003/12/22 15:56:12  irigoin
+ * Function safe_system_no_abort_no_warning() added without restructuring to
+ * fit the three system functions into one general frame.
+ *
+ *
  */
 
 #include <stdio.h>
@@ -32,6 +39,16 @@ int safe_system_no_abort(string command) /* the command to be executed */
 	pips_user_warning("Failed (ret: %d, sig: %d) for '%s'\n", 
 			  (status/0x100) & 0xff, status & 0xff, command);
     }
+
+    return (status / 256) & 255;
+}
+
+int safe_system_no_abort_no_warning(string command) /* the command to be executed */
+{
+    int status = system(command);
+    
+    if (status == 127)
+	pips_internal_error("Could not execute : '%s'\n", command);
 
     return (status / 256) & 255;
 }
