@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/08/26 12:52:27 $, 
+ * $Date: 1997/09/22 04:54:38 $, 
  */
 
 #include <unistd.h>
@@ -379,7 +379,29 @@ bool purge_directory(char *name)
  */
 char *get_cwd()
 {
-    static char cwd[PATH_MAX];
+    static char cwd[PATH_MAX]; /* argh */
     cwd[PATH_MAX-1] = '\0';
     return getcwd(cwd, PATH_MAX);
+}
+
+/* returns the allocated line read, whatever its length.
+ * also some asserts. FC 09/97.
+ */
+char * 
+safe_readline(FILE * file)
+{
+    int i=0, size = 20, c;
+    char * buf = (char*) malloc(sizeof(char)*size), * res;
+    pips_assert("malloc ok", buf);
+    while((c=getc(file)) && c!=EOF && c!='\n')
+    {
+	if (i==size-1) /* larger for trailing '\0' */
+	{
+	    size+=20; buf = (char*) realloc((char*) buf, sizeof(char)*size);
+	    pips_assert("realloc ok", buf);
+	}
+	buf[i++] = (char) c;
+    }
+    buf[i++] = '\0'; res = strdup(buf); free(buf);
+    return res;
 }
