@@ -17,6 +17,7 @@
 
 #include "sac.h"
 
+#include <limits.h>
 
 static bool should_unroll_p(instruction i)
 {
@@ -41,6 +42,8 @@ static bool should_unroll_p(instruction i)
       }
 
       case is_instruction_test:
+	 return TRUE;
+
       case is_instruction_loop:
       case is_instruction_whileloop:
       case is_instruction_goto:
@@ -50,8 +53,25 @@ static bool should_unroll_p(instruction i)
    }
 }
 
-static bool simd_unroll_loop_filter(statement s)
+typedef struct {
+      int min;
+      int max;
+} MinMaxVar;
+
+static void compute_variable_size(statement s, MinMaxVar* varwidth)
 {
+   int width = effective_variables_width(statement_instruction(s));
+
+   if (width > varwidth->max)
+      varwidth->max = width;
+
+   if (width < varwidth->min)
+      varwidth->min = width;
+}
+
+static bool simple_simd_unroll_loop_filter(statement s)
+{
+   MinMaxVar varwidths;
    int varwidth;
    instruction i;
    loop l;
@@ -69,7 +89,11 @@ static bool simd_unroll_loop_filter(statement s)
       return TRUE;  /* can't do anything */
 
    /* Compute variable size */
-   varwidth = effective_variables_width(iBody);
+   varwidths.min = INT_MAX;
+   varwidths.max = 0;
+   gen_context_recurse(iBody, &varwidths, statement_domain, gen_true, 
+		       compute_variable_size);
+   varwidth = varwidths.max;
 
    /* Unroll as many times as needed by the variables width */
    if ((varwidth > 32) || (varwidth <= 0)) 
@@ -86,10 +110,71 @@ static bool simd_unroll_loop_filter(statement s)
    return FALSE;
 }
 
+static void compute_parallelism_factor(statement s, MinMaxVar* factor)
+{
+   int varwidth = effective_variables_width(statement_instruction(s));
+
+   /* see if the statement can be SIMDized */
+   MAP(MATCH,
+       m,
+   {
+      /* and if so, to what extent it may benefit from unrolling */
+      MAP(OPCODE,
+	  o,
+      {
+	 if (opcode_subwordSize(o) >= varwidth) //opcode may be used
+	 {
+	    if (opcode_vectorSize(o) > factor->max)
+	       factor->max = opcode_vectorSize(o);
+	    if (opcode_vectorSize(o) < factor->min)
+	       factor->min = opcode_vectorSize(o);
+	 }
+      },
+	  opcodeClass_opcodes(match_type(m)));
+   },
+       match_statement(s));
+}
+
+static bool full_simd_unroll_loop_filter(statement s)
+{
+   MinMaxVar factor;
+   instruction i;
+   loop l;
+   instruction iBody;
+
+   /* If this is not a loop, keep on recursing */
+   i = statement_instruction(s);
+   if (!instruction_loop_p(i))
+      return TRUE;
+   l = instruction_loop(i);
+
+   /* Can only simdize certain loops */
+   iBody = statement_instruction(loop_body(l));
+   if (!should_unroll_p(iBody))
+      return TRUE;  /* can't do anything */
+
+   /* look at each of the statements in the body */
+   factor.min = INT_MAX;
+   factor.max = 1;
+   gen_context_recurse(iBody, &factor, statement_domain, gen_true, 
+		       compute_parallelism_factor);
+   loop_unroll(s, factor.min);
+
+   /* Do not recursively analyse the loop */
+   return FALSE;
+}
+
 void simd_unroll_as_needed(statement module_stmt)
 {
+#if 1
    gen_recurse(module_stmt, statement_domain, 
-	       simd_unroll_loop_filter, gen_null);
+	       simple_simd_unroll_loop_filter, gen_null);
+#else
+   init_tree_patterns();
+   init_operator_id_mappings();
+   gen_recurse(module_stmt, statement_domain, 
+	       full_simd_unroll_loop_filter, gen_null);
+#endif
 }
 
 bool simdizer_auto_unroll(char * mod_name)
