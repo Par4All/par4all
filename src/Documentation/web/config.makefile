@@ -45,11 +45,11 @@ INSTALL_HTM= $(HTMS)
 INSTALL_UTL= $(SCRIPTS)
 
 # To deal with non-framed viewer and no server side include:
-APPLY_CPP = $(CC) -E -C -P
+APPLY_CPP = $(CC) -E -C -P -
 
 # Overkill for home.html and index.html but anyway...
 %.html : %.cpp.html go_back.html
-	$(APPLY_CPP) $< > $@
+	$(APPLY_CPP) < $< > $@
 
 home.html : home_content.html
 
