@@ -1,22 +1,23 @@
 # $RCSfile: define_libraries.sh,v $ (version $Revision$)
-# $Date: 1996/08/21 14:19:02 $, 
+# $Date: 1996/08/22 21:20:37 $, 
 #
 # this file define newgen, linear and pips libraries.
-# it is to be included by some shell-scripts and makefiles.
+# it is to be included by some shell-scripts and makefiles (after a sed).
 
 #
 # Newgen
 
-NEWGEN_ORDERED_LIBS='genC'
+NEWGEN_ORDERED_LIBS='doc scripts genC'
+
 NEWGEN_LIBS='-lgenC'
 
 #
 # C3/linear
+LINEAR_ORDERED_LIBS='arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre plint sparse_sc union'
+
 # removed because not used by pips: plint
 
 LINEAR_LIBS='-lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome -lmatrix -lvecteur -larithmetique'
-
-LINEAR_ORDERED_LIBS='arithmetique vecteur contrainte sc matrice matrix ray_dte sommet sg polynome polyedre plint sparse_sc union'
 
 #
 # Pips
