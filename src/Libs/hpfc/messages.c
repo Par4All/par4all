@@ -1,6 +1,6 @@
 /* Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1995/09/15 15:54:19 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1995/10/04 19:28:34 $, )
  * version $Revision$
  * 
  * Fabien Coelho, August 1993
@@ -823,8 +823,7 @@ list Ro, lRo;
     /* here should be performed some message coalescing and/or aggregation:
      * a first simple version could check for messages sent twice, and so on.
      */
-    hpfc_warning("messages_handling", 
-		 "messages coalescing and aggregation not implemented yet\n");
+    hpfc_warning("messages coalescing and aggregation not implemented\n");
 
     lms = remove_stammering_messages(lm4);
 
