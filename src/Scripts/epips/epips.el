@@ -15,11 +15,6 @@
 ;; To store the module name in a buffer:
 (make-variable-buffer-local 'epips-local-module-name)
 
-;;; The faces used to display various informations. Use the
-;;; hilit-lookup-face-create function from hilit19.el:
-;; To have hilit-lookup-face-create at least:
-;; (require 'hilit19)
-
 (if (x-display-color-p)
     (progn
      ; We have a color screen:
@@ -35,8 +30,9 @@
      (copy-face 'bold-italic 'epips-face-user-warning)
      (set-face-foreground 'epips-face-user-warning "orange")
 
-     (copy-face (hilit-lookup-face-create 'red/lightblue-bold)
-		'epips-face-module-head)
+     (copy-face 'bold 'epips-face-module-head)
+     (set-face-foreground 'epips-face-module-head "red")
+     (set-face-background 'epips-face-module-head "lightblue")
 
      (copy-face 'default 'epips-face-parallel-loop)
      (set-face-background 'epips-face-parallel-loop "lemonchiffon")
@@ -48,17 +44,17 @@
      (set-face-underline-p 'epips-face-reference t)
      (copy-face 'highlight 'epips-mouse-face-reference)
 
-     (copy-face (hilit-lookup-face-create 'black/lightblue)
-		'epips-face-preconditions)
+     (copy-face 'default 'epips-face-preconditions)
+     (set-face-foreground 'epips-face-preconditions "black")
+     (set-face-background 'epips-face-preconditions "lightblue")
 
-     (copy-face (hilit-lookup-face-create 'black/lightgreen)
-		'epips-face-transformers)
+     (copy-face 'default 'epips-face-transformers)
+     (set-face-foreground 'epips-face-transformers "black")
+     (set-face-background 'epips-face-transformers "lightgreen")
 
-     (copy-face (hilit-lookup-face-create 'black/dodgerblue1)
-		'epips-face-cumulated-effect)
-
-     (copy-face (hilit-lookup-face-create 'black/magenta-blue)
-		'epips-face-cumulated-effect)
+     (copy-face 'default 'epips-face-cumulated-effect)
+     (set-face-foreground 'epips-face-cumulated-effect "black")
+     (set-face-background 'epips-face-cumulated-effect "dodgerblue1")
      )
   (progn
      ; No...
@@ -327,7 +323,7 @@ If no buffer can be found, just return nil."
 (defun epips-daVinci-sentinel (process event)
   "Handler for daVinci process state change"
   (epips-debug (format "Process %s had event '%s'." process event))
-  (epips-debug "Just consider the daVinci process is no longet usable...")
+  (epips-debug "Just consider the daVinci process is no longer usable...")
   (setq epips-daVinci-process nil)
   )
 
@@ -426,11 +422,13 @@ If no buffer can be found, just return nil."
 
 (defun epips-daVinci-view (epips-command-name epips-command-content)
   "Ask daVinci for displaying a graph in the current daVinci context"
-  ;; Load the "-daVinci" file instead of the "-graph" one:
   (epips-debug (format "epips-daVinci-view: %s" epips-command-content))
-  (string-match "-graph$" epips-command-content)
   (let (
-	(graph-file-name (replace-match "-daVinci" t t epips-command-content))
+	(graph-file-name (if (string-match "-graph$" epips-command-content)
+			     ;; Load the "-daVinci" file instead of
+			     ;; the "-graph" one if any:
+			     (replace-match "-daVinci" t t epips-command-content)
+			   epips-command-content))
 	)
     (epips-send-command-to-daVinci (format "menu(file(open_graph(\"%s\")))"
 					   graph-file-name))
@@ -486,11 +484,8 @@ If no buffer can be found, just return nil."
 
 
 (defun epips-fortran-mode-and-hilit ()
-  "Go in Fortran mode and Hilit19"
+  "Go in Fortran mode"
   (fortran-mode)
-  (if (fboundp 'hilit-rehighlight-buffer)
-      (hilit-rehighlight-buffer)
-    )
   ;;(epips-add-keymaps-and-menu-in-the-current-buffer)
   )
 
@@ -1549,7 +1544,7 @@ for example... :-)
 You can choose the wpips executable by setting the EPIPS_WPIPS 
 variable to its path.
 
-By the way, EPips assumes the use of hilit19...
+By the way, EPips is nicer when use with a package such as font-lock-mode...
 
 Special commands: 
 \\{epips-keymap}
