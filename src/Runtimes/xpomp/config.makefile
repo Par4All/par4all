@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/09/04 11:52:57 $ 
+# $Date: 1996/09/06 10:55:56 $ 
 
 # expected from makefile macros
 ifeq ($(FC),g77)
@@ -29,7 +29,7 @@ SOURCES=	$(LOCAL_HEADERS) \
 		$(DEMO) \
 		$(DOC)
 
-OFILES=		cgraphic.o
+OFILES=		$(ARCH)/cgraphic.o
 
 #
 # installation
@@ -58,13 +58,13 @@ xpomp_manual/fractal.f: xpomp_manual.html fractal.f
 
 # cproto:; $(PROTOIZE) xpomp.c
 
-xpomp: $(ARCH)/xpomp.o
-	$(LINK) $@ $+ $(X11LIB)
+$(ARCH)/xpomp: $(ARCH)/xpomp.o gr.h
+	$(LINK) $@ $(ARCH)/xpomp.o $(X11LIB)
 
 # Deal with different Fortran to C interface call conventions (for strings)
 M4OPT=$(PVM_ROOT)/conf/$(PVM_ARCH).m4
 
-$(LIB):	$(OFILES) cgraphic.c
+$(LIB):	$(OFILES) cgraphic.c gr.h
 	$(AR) $(ARFLAGS) $(LIB) $(OFILES)
 	ranlib $(LIB)
 
