@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/10 20:44:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/10 20:53:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/04/10 20:44:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/04/10 20:53:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -74,6 +74,8 @@ char * k;
 
     return (l == (list) HASH_UNDEFINED_VALUE)? NIL : l;
 }
+
+/* No longer used. RK */
 
 /* REMV removes a (unique) control X from the list L. */
 
@@ -654,7 +656,8 @@ hash_table used_labels;
 	bool unreachable;
 
 	ifdebug(5) {
-	    pips_debug(0, "Nodes linked with pred %#x:\n", pred);
+	    pips_debug(0, "Nodes linked with pred %#x:\n",
+		       (unsigned int) pred);
 	     display_linked_control_nodes(pred);
 	}
 
@@ -1072,7 +1075,7 @@ statement st;
 	ifdebug(1) {
 	    pips_debug(0, "Unreachable statements:\n");
 	    MAP(STATEMENT, s, {
-		pips_debug(0, "Statement %#x:\n");
+		pips_debug(0, "Statement %#x:\n", (unsigned int) s);
 		print_statement(s);
 	    }, Unreachable);
 	}
