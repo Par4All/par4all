@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.77  2003/06/19 07:39:15  nguyen
+ * Update calls to make_statement and make_variable with new RI for C
+ *
  * Revision 1.76  1999/05/25 13:00:50  coelho
  * type fixed.
  *
@@ -211,7 +214,7 @@ add_one_bound_argument(
     (void) create_bound_entity(module, array, upper, dim, formal_number);
     lp = CONS(PARAMETER, 
 	      make_parameter(make_type(is_type_variable, 
-		   make_variable(MakeBasic(is_basic_int), NIL)),
+		   make_variable(MakeBasic(is_basic_int), NIL,NIL)),
 			     make_mode(is_mode_value, UU)), lp);
     return lp;
 }
