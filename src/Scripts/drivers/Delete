@@ -37,6 +37,7 @@ do
 	if [ ! -d "$WS" ]
 	then
 		echo $0: No such directory \`$WS\' >&2
+		exit 2
 	else
 		# echo rm -r $WS
 		rm -r $WS
