@@ -26,6 +26,12 @@ Paradigme at SuperComputing '95 </a></STRONG>
 
 <hr>
 
+Last update: 8 September 1995
+
+<p>
+
+URL: http://www.cri.ensmp.fr/pips
+
 <h2> Content </h2>
 
 <ul>
@@ -34,7 +40,7 @@ Paradigme at SuperComputing '95 </a></STRONG>
   <li> <a href="index.html#man">Man Pages</a>
   <li> <a href="index.html#team"><b>PIPS</b> Team</a>
   <li> <a href="index.html#history"><b>PIPS</b> History</a>
-  <li> <a href="index.html#rwork">Related Work</a>
+  <li> <a href="index.html#rwork">Related Projects</a>
   <li> <a href="index.html#bibliography"><b>PIPS</b> Bibliography</a>
 </ul>
 
@@ -43,15 +49,16 @@ Paradigme at SuperComputing '95 </a></STRONG>
 <a name="introduction"><h2>Introduction</h2></a>
 
 <b>PIPS</b> is an automatic parallelizer for scientific programs. It
-takes as input Fortran 77 codes and uses emphasizes interprocedural
+takes as input Fortran 77 codes and emphasizes interprocedural
 techniques for program analyses. PIPS specific interprocedural analyses
-are precondition and <a href="regions.html">array region</a>
-computation. PIPS computes affine preconditions for integer scalar
-variables which are much more powerful than standard constant
-propagation or forward substitution. PIPS also computes several kinds of
-polyhedral array regions (READ, WRITE, IN and OUT). PIPS is based on
-linear algebra techniques for analyses, e.g.  dependence testing, as
-well as for code generation, e.g. loop interchange or tiling.
+are <a href="cnrs-nsf92/cnrs-nsf92.html">precondition</a> and <a
+href="regions.html">array region</a> computations. PIPS computes affine
+preconditions for integer scalar variables which are much more powerful
+than standard constant propagation or forward substitution. PIPS also
+computes several kinds of polyhedral array regions (READ, WRITE, IN and
+OUT). PIPS is based on linear algebra techniques for analyses, e.g.
+dependence testing, as well as for code generation, e.g. loop
+interchange or tiling.
 
 <p>
 
@@ -62,24 +69,30 @@ interprocedural use in a database by a resource manager,
 <em>(pipsdbm)</em>. The compiler is made of phases that are called on
 demand to perform the analyses or transformations required by the user.
 
-<p>
-
-Three user interfaces are available: 
-a Shell interface <a href="dret144/dret144.html"><em>(Pips)</em></a>,
-a line interface <a href="line-interface.html><em>(Tpips)</em></a> and 
-a X-window interface <em>(wpips)</em> to the parallelizer 
-which is the best suited for users.
+# <center>
+#
+# <!IMG SRC=poster.gif> <b>PIPS Overall Structure</b>
+#
+# </center>
 
 <p>
 
-<b>PIPS</b> has been developped at <a href="/index-english.html"
->CRI</a> since 1988, thru several research projects funded by the French
-DoD (DRET), the French NSF (CNRS) and the European Union (ESPRIT
+Three user interfaces are available: a Shell interface <a
+href="dret144/dret144.html"><em>(Pips)</em></a>, a line interface <a
+href="line-interface.html><em>(Tpips)</em></a> and a X-window interface
+<a href="wpips.html"><em>(wpips)</em></a> to the parallelizer which is
+the best suited for users.
+
+<p>
+
+<b>PIPS</b> has been developped at <a href="/index-english.html">CRI</a>
+since 1988, thru several research projects funded by the French DoD
+(DRET), the French NSF (CNRS) and the European Union (ESPRIT
 programs). The initial design was made by R&eacute;mi TRIOLET,
 Fran&ccedil;ois IRIGOIN and Pierre JOUVELOT. This initial design has
 proved good enough since then and has not required any major change. The
-overview paper presented at ICS'91 still is up-to-date, although major
-functionalities have been added since.  
+overview paper presented at <a href="ics91/ics91.html">ICS'91</a> still
+is up-to-date, although major functionalities have been added since.
 
 <p>
 
@@ -87,7 +100,14 @@ functionalities have been added since.
 href="newgen-manual/newgen-manual.html"><em>Newgen</em></a> which
 manages data structures a la <em>IDL</em>. It provides basic
 manipulation functions for data structures described in a declaration
-file. It supports persistent data and type hierachies. All <b>PIPS</b>
+file. It supports persistent data and type hierachies. An introductory
+<a href="newgen-paper/newgen-paper.html">paper (in English) </a> and a
+<a href="newgen-tutorial/newgen-tutorial.html">tutorial (in French)</a>
+are available.
+
+<p>
+
+All <b>PIPS</b>
 data-types are based on <em>Newgen</em>. A description of PIPS internal
 representation is available in a <a href="ri/ri.html">technical
 report</a>.
@@ -126,8 +146,10 @@ Seven years after its inception, PIPS as a workbench is still alive and
 well. PIPS provides a robust infrastructure for new experiments in
 compilation, program analysis, optimisation, transformation and
 parallelization. The PIPS developper environment is described in a <a
-href="dret146/dret146.html">technical report</a>, written in
-French. 
+href="dret146/dret146.html">technical report</a>, written in French, but
+it also is possible to develop new phases on top of but <em>outside</em>
+of PIPS since all (in fact, most...) PIPS data structures can be
+reloaded using Newgen primitives.
 
 <p>
 
@@ -206,7 +228,7 @@ PIPS is available on request.
 </ul>
 
 Noticeable contributors are numerous: Bruno Baron, Pierre Berthomier,
-Pierre Jouvelot, R&eacutemi Triolet, Yi-qing Yang, Lei Zhou.
+Pierre Jouvelot, R&eacute;mi Triolet, Yi-qing Yang, Lei Zhou.
 
 <hr>
 
@@ -238,27 +260,36 @@ techniques for compiling HPF Fortran
 
 <hr>
 
-<a name="rwork"><h2> Related Work </h2></a>
+<a name="rwork"><h2> Related Projects </h2></a>
 
 Many research prototypes have been developped to test new compilation
 techniques. Here are a few:
 
 <ul>
-  <li> Adaptor (GMD)
+  <li> <a href=http://www.gmd.de/SCAI/lab/adaptor/adaptor_home.html>Adaptor</A>
+(GMD)
   <li> Bouclette (LIP/ENS-Lyon)
-  <li> D System (CRPC/Rice)
-  <li> Omega, Petite (/Maryland)
-  <li> PAF, Parall&eacuteliseur de Programme Fortran (PRISM/UVSQ)
-  <li> Parafrase (CSRD)
-  <li> Parafrase-2, Paradigme (CSRD and ?)
+  <li> <a href=http://www.cs.rice.edu/fortran-tools/DSystem/DSystem.html>D System</A> (CRPC/Rice University)
+  <li> <a href= http://www.crim.ca/Domaines_Services/APAR/Anglais/eppp.html>EPPP</A> (CRIM Montreal)
+  <li> <a href="http://www.cs.umd.edu/projects/omega/index.html">Omega,
+	Petit</a> (Maryland)
+  <li> <a href="http://www.prism.uvsq.fr/english/parallel/paf/autom_us.html">PAF</a>, 
+	Parall&eacute;liseur de Programme Fortran (PRISM/UVSQ)
+  <li> Parafrase (CSRD/UIUC)
+  <li> <a href="http://www.csrd.uiuc.edu/parafrase2/index.html">Parafrase-2</a>, Paradigme (CSRD and ?)
   <li> Parascope (Rice)
-  <li> Pandore (PAMPA/IRISA)
-  <li> PIPS, Parall&eacuteliseur Interproc&eacutedural de Programmes Scientifiques (CRI/ENSMP)
-  <li> Polaris (CSRD)
+  <li> <a href="http://www.irisa.fr/EXTERNE/projet/pampa/PANDORE/pandore.html">Pandore</a>
+(<a href="http://www.irisa.fr/EXTERNE/projet/pampa/Pampa_anglais.html">PAMPA</a>/IRISA)
+  <li> PFC, RN (Rice)
+  <li> PIPS, Parall&eacute;liseur Interproc&eacute;dural de Programmes Scientifiques (CRI/ENSMP)
+  <li> <a href=http://www.irisa.fr/EXTERNE/projet/pampa/PREPARE/prepare.html>Prepare</A> (Esprit Project/IRISA)
+  <li> PTRAN, PTRAN-2 (Watson Research Center/IBM)
+  <li> <a href="http://www.csrd.uiuc.edu/polaris/polaris.html">Polaris</a>
+(CSRD/UIUC)
   <li> Superb (Bonn)
   <li> <a href="http://suif.stanford.edu">SUIF</a> (Stanford)
-  <li> Tiny, Nascent (OGI)
-  <li> VFCS (ACPC/Vienna)
+  <li> Tiny, <a href="http://cse.ogi.edu/Sparse/nascent.html">Nascent</a> (OGI)
+  <li> <a href=http://www.par.univie.ac.at/project/vfcs.html>Vienna Fortran Compilation System (VFCS) </A> (University of Vienna)
   <li> ...
 </ul>
 
@@ -269,9 +300,9 @@ techniques. Here are a few:
 <ul>
 
   <li> M. Ancourt-Le Quellenec
-<em>G&eacuten&eacuteration automatique de code de transfert pour multiprocesseurs &agrave
-m&eacutemoires locales</em>.
-Th&egravese de doctorat de l'universit&eacute Pierre et Marie Curie,
+<em>G&eacute;n&eacute;ration automatique de code de transfert pour multiprocesseurs &agrave;
+m&eacute;moires locales</em>.
+Th&egrave;se de doctorat de l'universit&eacute; Pierre et Marie Curie,
 18 mars 1991, rapport A/200.
 
   <li> C. Ancourt, F. Coelho, F. Irigoin, R. Keryell,
@@ -290,21 +321,21 @@ Seventh Annual Workshop on Languages and Compilers for Parallel
 Computing, Ithaca (NY), August 1994
 
   <li> B. Apvrille-Creusillet,
-<em>R&eacutegions exactes et privatisation de tableaux</em>.
+<em>R&eacute;gions exactes et privatisation de tableaux</em>.
 Rapport de DEA, 30 Aou^t
 1994, TR E/185.
 
   <li> B. Baron,
-<em> Construction flexible et coh&eacuterente pour la compilation interproc&eacutedurale</em>,
+<em> Construction flexible et coh&eacute;rente pour la compilation interproc&eacute;durale</em>,
 Rapport interne EMP-CRI-E157, juillet 1991
 
   <li> B. Baron,
-<em>Maintien de la coh&eacuterence dans un compilateur-optimiseur 
-interproc&eacutedural</em>,
+<em>Maintien de la coh&eacute;rence dans un compilateur-optimiseur 
+interproc&eacute;dural</em>,
 Rapport de DEA, Juillet 1991, TR E/157.
 
   <li> B. Baron, F. Irigoin, P. Jouvelot,
-<em> Projet PIPS. Manuel utilisateur du parall&eacuteliseur batch</em>,
+<em> Projet PIPS. Manuel utilisateur du parall&eacute;liseur batch</em>,
 Rapport interne <a href="dret144/dret144.html">EMP-CRI-E144</a>, janvier 1991
 
   <li> P. Berthomier,
@@ -312,11 +343,11 @@ Rapport interne <a href="dret144/dret144.html">EMP-CRI-E144</a>, janvier 1991
 Rapport interne EMP-CRI-E130, septembre 1990
 
   <li> P. Chassany,
-<em> Les m&eacutethodes de parall&eacutelisation interproc&eacutedurales</em>,
+<em> Les m&eacute;thodes de parall&eacute;lisation interproc&eacute;durales</em>,
 Rapport interne EMP-CRI-E129, septembre 1990
 
   <li> F. Coelho,
-<em> Etude et r&eacutealisation d'un compilateur pour le <em> High
+<em> Etude et r&eacute;alisation d'un compilateur pour le <em> High
 Performance Fortran</em></em>,
 Rapport interne EMP-CRI-A238, juin 1993
 
@@ -331,27 +362,28 @@ Workshop on Languages and Compilers for Parallel
 Computing, LCPC'95, Colombus, OHIO, USA, 10-12 Août 1995 (also available as TR A/270).
 
   <li> F. Irigoin,
-<em> Partitionnement des boucles imbriqu&eacutees. Une technique 
+<em> Partitionnement des boucles imbriqu&eacute;es. Une technique 
 d'optimisation des programmes scientifiques</em>,
-Th&egravese de doctorat de l'universit&eacute Pierre et Marie Curie, juin 1987
+Th&egrave;se de doctorat de l'universit&eacute; Pierre et Marie Curie, juin 1987
 
   <li> F. Irigoin,
 <em> Code Generation for the Hyperplane Method and for Loop Interchange</em>,
 Rapport CAII-E102, octobre 1988
 
   <li> F. Irigoin, <em> Loop Reordering with Dependence Direction
-Vectors</em>, Journ&eacutees Firtech Syst&egravemes et
-T&eacutel&eacutematique Architectures Futures: Programmation
-parall&egravele et int&eacutegration VLSI, Paris, 9-10 novembre 1988
+Vectors</em>, Journ&eacute;es Firtech Syst&egrave;mes et
+T&eacute;l&eacute;matique Architectures Futures: Programmation
+parall&egrave;le et int&eacute;gration VLSI, Paris, 9-10 novembre 1988
 
   <li> F. Irigoin,
-<em> Projet PIPS: r&eacutesultat de la parall&eacutelisation interproc&eacutedurale</em>,
+<em> Projet PIPS: r&eacute;sultat de la parall&eacute;lisation interproc&eacute;durale</em>,
 Rapport EMP-CRI-E151, mars 1991
 
   <li> F. Irigoin,
 <em> Interprocedural Analyses for Programming Environments</em>,
 J.J. Dongarra and B. Tourancheau Eds, Elsevier,
-Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
+Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992.
+Also available as <a href="cnrs-nsf92/cnrs-nsf92.html">Tech. Report ???</a>.
 
   <li> F. Irigoin,
 <em> Performance, Portability and Implicit Parallelism</em>,
@@ -360,16 +392,16 @@ Workshop on Performance, Portability and Parallel Processing,
 Southampton, July 1993
 
   <li> F. Irigoin, 
-<em> Compilation pour machines parall&egraveles</em>,
-Habilitation a` diriger des recherches (Paris 6), novembre 1993
+<em> Compilation pour machines parall&egrave;les</em>,
+Habilitation &agrave; diriger des recherches (Paris 6), novembre 1993.
 
   <li> F. Irigoin, C. Ancourt,
 <em> Final Report on Software Caching for Simulated Global Memory</em>,
 PUMA ESPRIT 2701, Deliberable 6.5.1, Tech. Report EMP-CRI-E155, November 1991
 
   <li> F. Irigoin, C. Ancourt, 
-<em> Compilation pour machines &agrave m&eacutemoire r&eacutepartie</em>,
-Algorithmique Parall&egravele, Cosnard, Nivat, Robert Eds, Masson,
+<em> Compilation pour machines &agrave; m&eacute;moire r&eacute;partie</em>,
+Algorithmique Parall&egrave;le, Cosnard, Nivat, Robert Eds, Masson,
 Ecole de Printemps du LITP, mai 1992
 
   <li> F. Irigoin, C. Ancourt, 
@@ -378,21 +410,22 @@ Third International Workshop on Compilers for Parallel Computers, Vienne,
 July, 1992
 
   <li> F. Irigoin, P. Jouvelot, 
-<em> Projet PIPS: manuel d'utilisation du parall&eacuteliseur batch
+<em> Projet PIPS: manuel d'utilisation du parall&eacute;liseur batch
  (VERSION 1.0)</em>.
 15 Décembre 1990, <a href="dret146/dret146.html">TR E/144</a>.
 
   <li> F. Irigoin, P. Jouvelot, R. Triolet,
-<em> PIPS: Repr&eacutesentation Interm&eacutediaire</em>,
+<em> PIPS: Repr&eacute;sentation Interm&eacute;diaire</em>,
 documentation interne du projet PIPS, septembre 1988.
 New version, May 1992, <a href="ri/ri.html">TR E/166.</a>
 
   <li> F. Irigoin, P. Jouvelot, R. Triolet,  <em> Semantical
 Interprocedural Parallelization: An Overview of the PIPS Project</em>,
-1991 International Conference on Supercomputing, Cologne, June 1991
+1991 International Conference on Supercomputing, Cologne, June 1991.
+Also available as <a href="ics91/ics91.html">Tech. Report A/???.</a>
 
   <li> F. Irigoin, P. Jouvelot, R. Triolet,
-<em> Projet PIPS: environnement de d&eacuteveloppement version 1.0</em>
+<em> Projet PIPS: environnement de d&eacute;veloppement version 1.0</em>
 Décembre 1990, <a href="dret146/dret146.html">TR E/146</a>
 
   <li> F. Irigoin, R. Triolet,
@@ -420,17 +453,19 @@ Parallel and Distributed Algorithms, Bonas, France, October 3-6, 1988
  <li> P. Jouvelot, R. Triolet, <em> NewGen User Manual</em>. December
 1990, <a href="newgen-manual/newgen-manual.html">Tech. Report A/???.</a>
 
- <li> P. Jouvelot, R. Triolet, <em> NewGen: A Language-Independent
-Program Generator</em>. July 12, 1989, Tech. Report A/191.
+ <li> P. Jouvelot, R. Triolet, 
+<em> NewGen: A Language-Independent Program Generator</em>. 
+July 12, 1989, 
+<a href="newgen-paper/newgen-paper.html">Tech. Report A/191.</a>
 
   <li> A. Platonoff,
-<em> Calcul des effets des proc&eacutedures au moyen des r&eacutegions</em>,
+<em> Calcul des effets des proc&eacute;dures au moyen des r&eacute;gions</em>,
 Rapport interne EMP-CAII-I132, juin 1990
 
   <li> A. Platonoff,
-<em> Contribution &agrave la distribution automatique des donn&eacutees pour
-machines massivement parall&egraveles</em>.
-Th&egravese de doctorat de l'universit&eacute Pierre et Marie Curie, 
+<em> Contribution &agrave; la distribution automatique des donn&eacute;es pour
+machines massivement parall&egrave;les</em>.
+Th&egrave;se de doctorat de l'universit&eacute; Pierre et Marie Curie, 
 9 Mars 1995, rapport A/268.
 
   <li> A. Platonoff,
@@ -439,25 +474,25 @@ Th&egravese de doctorat de l'universit&eacute Pierre et Marie Curie,
 Malaga, Espagne, 26-30 Juin 1995 (also available as TR A/271).
 
   <li> R. Triolet,
-<em> Contribution &agrave la parall&eacutelisation automatique de programmes
-Fortran comportant des appels de proc&eacutedure</em>,
-Th&egravese de docteur-ing&eacutenieur, Universit&eacute Pierre et Marie Curie,
-d&eacutecembre 1984
+<em> Contribution &agrave; la parall&eacute;lisation automatique de programmes
+Fortran comportant des appels de proc&eacute;dure</em>,
+Th&egrave;se de docteur-ing&eacute;nieur, Universit&eacute; Pierre et Marie Curie,
+d&eacute;cembre 1984
 
   <li> R. Triolet,
 <em> Interprocedural Analysis Based Restructuring of Programs.</em>
-(Colloque International Algorithmes & Architectures Parall&egraveles -
+(Colloque International Algorithmes & Architectures Parall&egrave;les -
 International workshop on parallel algorithms & architectures,
 Centre International de Rencontres Mathématiques, Luminy, Marseille,
 14-18 Avril 1986), rapport A/172.
 
   <li> R. Triolet,
-<em> Analyse s&eacutemantique en vue de la parall&eacutelisation</em>.
-(Journ&eacutees Firtech Syst&egravemes et T&eacutel&eacutematique Architectures Futures: 
-Programmation parall&egravele et int&eacutegration VLSI, Paris, 9-10 Novembre 1988), rapport A/189.
+<em> Analyse s&eacute;mantique en vue de la parall&eacute;lisation</em>.
+(Journ&eacute;es Firtech Syst&egrave;mes et T&eacute;l&eacute;matique Architectures Futures: 
+Programmation parall&egrave;le et int&eacute;gration VLSI, Paris, 9-10 Novembre 1988), rapport A/189.
 
   <li> R. Triolet,
-<em>PIPSMAKE et PIPSDBM: Motivations et fonctionnalit&eacutes</em>.
+<em>PIPSMAKE et PIPSDBM: Motivations et fonctionnalit&eacute;s</em>.
 27 Septembre 1990, TR E/133.
 
   <li> R. Triolet, P. Feautrier, F. Irigoin, <em> Automatic
@@ -471,30 +506,30 @@ ACM SIGPLAN'86 Symposium on Compiler Construction, Hyatt Rickeys Hotel, Palo
 Alto, June 23-27, 1986
 
   <li> Y. Yang,
-<em> Evaluation exp&eacuterimentale de tests de d&facuteependances</em>,
-4ème Rencontre du Parall&eacutelisme, Lille, France,
+<em> Evaluation exp&eacute;rimentale de tests de d&eacute;pendances</em>,
+4ème Rencontre du Parall&eacute;lisme, Lille, France,
 18-20 mars 1992. Rapport A/214.
 
   <li> Y. Yang
-<em>R&eacuteordonnancement des boucles imbriqu&eacutees</em>, 
+<em>R&eacute;ordonnancement des boucles imbriqu&eacute;es</em>, 
 novembre 1992, TR E/162.
 
   <li> Y. Yang
-<em> Tests des d&eacutependances et transformations de programme</em>.
-Th&egravese de doctorat de l'universit&eacute Pierre et Marie Curie, 
+<em> Tests des d&eacute;pendances et transformations de programme</em>.
+Th&egrave;se de doctorat de l'universit&eacute; Pierre et Marie Curie, 
 15 Novembre 1993, rapport A/242.
 
   <li> L. Zhou
 <em> Complexity Estimation in the PIPS Parallel Programming Environment</em>.
 Proceedings of CONPAR92/VAPPV. Laboratoire de
-l'Informatique du Parall&eacutelisme, Ecole Normale Sup&eacuterieure de Lyon,
+l'Informatique du Parall&eacute;lisme, Ecole Normale Sup&eacute;rieure de Lyon,
 France, September 1-4, 1992. Rapport A/221.
 
   <li> L. Zhou
 <em> Analyse
-statique et dynamique de la complexit&eacute des programmes 
+statique et dynamique de la complexit&eacute; des programmes 
 scientifiques</em>.
-Th&egravese de doctorat de l'universit&eacute Pierre et Marie Curie, 
+Th&egrave;se de doctorat de l'universit&eacute; Pierre et Marie Curie, 
 14 Septembre 1994, rapport A/255.
 
 </ul>
