@@ -1,4 +1,4 @@
-/* $RCSfile: local-ri-util.c,v $ ($Date: 1995/07/20 18:40:41 $, )
+/* $RCSfile: local-ri-util.c,v $ ($Date: 1995/09/22 13:21:20 $, )
  * version $Revision$
  *
  * HPFC (c) Fabien Coelho May 1993
@@ -11,14 +11,13 @@ type t;
 {
     if(type_variable_p(t))
     {
-	variable
-	    v = type_variable(t);
+	variable v = type_variable(t);
 
-	return(MakeTypeVariable(variable_basic(v),
-				ldimensions_dup(variable_dimensions(v))));
+	return MakeTypeVariable(variable_basic(v),
+				ldimensions_dup(variable_dimensions(v)));
     }
     else
-	return(t); /* !!! means sharing */
+	return t; /* !!! means sharing */
 }
 
 /*  library functions...
@@ -36,23 +35,23 @@ entity e;
 
     if (!top_level_entity_p(e)) return(FALSE);
     for (s=fortran_library; *s!=(string) NULL; s++)
-	if (same_string_p(*s, name)) return(TRUE);
+	if (same_string_p(*s, name)) return TRUE;
 
-    return(FALSE); /* else not found */
+    return FALSE; /* else not found */
 }
 
 reference expression_to_reference(e)
 expression e;
 {
     syntax s = expression_syntax(e);
-    message_assert("reference expected", syntax_reference_p(s));
-    return(syntax_reference(s));
+    message_assert("reference", syntax_reference_p(s));
+    return syntax_reference(s);
 }
 
 entity expression_to_entity(e)
 expression e;
 {
-    return(reference_variable(expression_to_reference(e)));
+    return reference_variable(expression_to_reference(e));
 }
 
 list expression_list_to_entity_list(l)
@@ -60,7 +59,7 @@ list /* of expressions */ l;
 {
     list /* of entities */ n = NIL;
     MAP(EXPRESSION, e, n = CONS(ENTITY, expression_to_entity(e), n), l);
-    return(gen_nreverse(n));		 
+    return gen_nreverse(n);		 
 }
 
 list entity_list_to_expression_list(l)
@@ -68,7 +67,7 @@ list /* of entities */ l;
 {
     list /* of expressions */ n = NIL;
     MAP(EXPRESSION, e, n = CONS(EXPRESSION, entity_to_expression(e), n), l);
-    return(gen_nreverse(n));
+    return gen_nreverse(n);
 }
 
 /* that is all
