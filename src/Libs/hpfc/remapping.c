@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1996/12/24 15:24:26 $, ) 
+ * ($Date: 1996/12/30 15:51:38 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -899,9 +899,10 @@ generate_dynamic_liveness_for_primary(
     /* commented result
      */
     result = make_block_statement(ls);
-    statement_comments(result) = 
-	strdup(concatenate("! clean live set for ", 
-			   entity_local_name(primary), "\n", NULL));
+    if (ls)
+	statement_comments(result) = 
+	    strdup(concatenate("! clean live set for ", 
+			       entity_local_name(primary), "\n", NULL));
     return result;
 }
 
