@@ -1,8 +1,9 @@
 /*
- * HPFC module by Fabien COELHO
+ * HPFC module by Fabien COELHO,
+ *    moved to conversion on 15 May 94
  *
  * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ ($Date: 1994/04/11 17:01:24 $, ) version $Revision$, 
+ * $RCSfile: system_to_code.c,v $ ($Date: 1994/05/16 15:12:22 $, ) version $Revision$, 
  * got on %D%, %T%
  * $Id$
  */
@@ -148,7 +149,7 @@ bool is_lower;
 {
   int 
     len = 0,
-    sign = is_lower? +1: -1;
+    sign = is_lower? -1: +1;
   entity
     operator = is_lower? CreateIntrinsic("MAX"): CreateIntrinsic("MIN");
   Pcontrainte
@@ -157,18 +158,28 @@ bool is_lower;
     others = CONTRAINTE_UNDEFINED,
     c = CONTRAINTE_UNDEFINED;
   entity
-    divide = CreateIntrinsic("DIVIDE");
+    divide = hpfc_name_to_entity(IDIVIDE);
   expression
     result = expression_undefined;
   list
     le = NIL;
   
+  debug(5, "contrainte_to_loop_bound",
+	"computing %ser bound for variable %s\n",
+	(is_lower?"low":"upp"), entity_local_name((entity) var));
+
+  ifdebug(6)
+  {
+      fprintf(stderr, "[contrainte_to_loop_bound] constraints are:\n");
+      inegalites_fprint(stderr, *pc, entity_local_name);
+  }
+
   /* constraints to be considered are first put in goods or others.
    */
   for(c=*pc;
       c!=(Pcontrainte) NULL;
       c=c->succ)
-    if (sign*vect_coeff(c->vecteur, var)>=0)
+    if (sign*vect_coeff(var, c->vecteur)>0)
       new = contrainte_make(vect_dup(c->vecteur)),
       new->succ = goods,
       goods = new;
@@ -187,7 +198,7 @@ bool is_lower;
       c=c->succ)
     {
       Value 
-	val = vect_coeff(c->vecteur);
+	val = vect_coeff(var, c->vecteur);
       Pvecteur
 	v = vect_del_var(c->vecteur, var);
       expression
@@ -195,12 +206,15 @@ bool is_lower;
 
       pips_assert("contrainte_to_loop_bound", val!=0);
 
-      if (val<0) vect_chg_sgn(v), val=-val;
+      if (val>0) 
+	  vect_chg_sgn(v);
+      else
+	  val=-val;
 
       e = make_vecteur_expression(v);
       if (val!=1) e = MakeBinaryCall(divide, e, int_to_expression(val));
 
-      le = CONS(EXPRESSION, e, NIL);
+      le = CONS(EXPRESSION, e, le);
     }
 
   /*
@@ -220,54 +234,81 @@ bool is_lower;
 
 /*
  * sc is used to generate the loop nest bounds for variables vars.
- * the loop statement is returned, plus a pointer to the body statement.
+ * vars may be empty. the loop statement is returned.
+ *
+ * sc is not touched...
  */
-statement systeme_to_loop_nest(sc, vars, pinner)
+statement systeme_to_loop_nest(sc, vars, body)
 Psysteme sc;
 list vars;
-statement *pinner;
+statement body;
 {
-  Pcontrainte
-    c = sc_inegalites(sc);
-  list 
-    reverse = gen_nreverse(gen_copy_seq(vars));
-  statement 
-    inner = statement_undefined,
-    current = statement_undefined;
+    Psysteme
+	t = sc_dup(sc);
+    Pcontrainte
+	c = sc_inegalites(t);
+    list 
+	reverse = gen_nreverse(gen_copy_seq(vars));
+    statement 
+	current = body;
+    
+    pips_assert("Psysteme_to_loop_nest", (sc_nbre_egalites(t)==0));
 
-  pips_assert("Psysteme_to_loop_nest", 
-	      (sc_nbre_egalites(sc)==0) && (gen_length(vars)>0));
-
-  MAPL(ce,
-    {
-       Variable
-	 var = (Variable) ENTITY(CAR(ce));
-       range
+    sc_inegalites(t)=CONTRAINTE_UNDEFINED;
+    
+    MAPL(ce,
+     {
+	 Variable
+	     var = (Variable) ENTITY(CAR(ce));
+	 range
+	     rg = range_undefined;
+	 
+	 debug(5, "systeme_to_loop_nest",
+	       "variable %s loop\n", entity_name((entity) var));
+	 
 	 rg = make_range(contrainte_to_loop_bound(&c, var, TRUE),
 			 contrainte_to_loop_bound(&c, var, FALSE),
 			 int_to_expression(1));
-
-       current = 
-	 mere_statement
-	   (make_instruction
-	    (is_instruction_loop,
-	     make_loop((entity) var,
-		       rg, 
-		       current,
-		       entity_empty_label(),
-		       make_execution(is_execution_sequential, UU),
-		       NIL)));
-
-       if (statement_undefined_p(inner)) inner=current;
-    },
-       reverse);
-
-  gen_free_list(reverse);
-
-  *pinner=inner;
-  return(current);
+	 
+	 current = 
+	     make_stmt_of_instr
+		 (make_instruction
+		  (is_instruction_loop,
+		   make_loop((entity) var,
+			     rg, 
+			     current,
+			     entity_empty_label(),
+			     make_execution(is_execution_sequential, UU),
+			     NIL)));
+	 
+     },
+	 reverse);
+    
+    gen_free_list(reverse);
+    contraintes_free(c);
+    sc_rm(t);
+    
+    return(current);
 }
 
+/*
+ * statement generate_optional_if(sc, stat)
+ *
+ * if sc is Z^n then no if is required,
+ * if sc is empty, then statement is nop,
+ * else an if is required
+ */
+statement generate_optional_if(sc, stat)
+Psysteme sc;
+statement stat;
+{
+    if (sc_rn_p(sc)) return(stat);
+    if (sc_empty_p(sc)) return(make_empty_statement());
+
+    return(st_make_nice_test(Psysteme_to_expression(sc),
+			     CONS(STATEMENT, stat, NIL),
+			     NIL));
+}
 
 /*
  * that's all
