@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/10/05 11:32:27 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/03/19 14:36:50 $, )
  * version $Revision$
  *
  * Compiler
@@ -107,9 +107,10 @@ statement *hoststatp,*nodestatp;
 }
 
 static void 
-hpf_compile_call(stat, hoststatp, nodestatp)
-statement stat;
-statement *hoststatp,*nodestatp;
+hpf_compile_call(
+    statement stat,       /* compiled statement */
+    statement *hoststatp, /* returned host version */
+    statement *nodestatp) /* returned node version */
 {
     call c = instruction_call(statement_instruction(stat));
 
@@ -206,13 +207,41 @@ statement *hoststatp,*nodestatp;
      * assignment. Since I do not use the effects as I should, nothing is
      * done...
      */
+
+    /* temporary (?:-) hack 
+     */
+    if (TRUE)
+    {
+	list /* of expressions */
+	    leh=lUpdateExpr_but_distributed(host_module, call_arguments(c)),
+	    len=lUpdateExpr(node_module, call_arguments(c));
+	
+	pips_debug(7, "some references to distributed variable\n");
+
+	(*hoststatp)=MakeStatementLike(stat, is_instruction_call);
+	(*nodestatp)=MakeStatementLike(stat, is_instruction_call);
+	
+	instruction_call(statement_instruction((*hoststatp)))=
+	    make_call(call_function(c), leh);
+
+	instruction_call(statement_instruction((*nodestatp)))=
+	    make_call(call_function(c), len);
+
+	DEBUG_STAT(8, entity_name(host_module), *hoststatp);
+	DEBUG_STAT(8, entity_name(node_module), *nodestatp);
+
+	return;
+    }
+    
+
     hpfc_warning("not implemented yet\n");
 }
 
 static void 
-hpf_compile_unstructured(stat,hoststatp,nodestatp)
-statement stat;
-statement *hoststatp,*nodestatp;
+hpf_compile_unstructured(
+    statement stat,
+    statement *hoststatp,
+    statement *nodestatp)
 {
     instruction inst=statement_instruction(stat);
 
