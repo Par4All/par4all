@@ -41,7 +41,7 @@
 #include "properties.h"
 #include "semantics.h"
 #include "instrumentation.h"
-
+#include "transformations.h"
 
 #define ABC_COUNT "ARRAY_BOUND_CHECK_COUNT"
 
