@@ -70,7 +70,7 @@ string name;
 
 void make_close_program()
 {
-    return make_close_workspace();
+    make_close_workspace();
 }
 
 void make_close_workspace()
