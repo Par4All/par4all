@@ -80,6 +80,9 @@
 #define EQUIV_OPERATOR_NAME ".EQV."
 #define NON_EQUIV_OPERATOR_NAME ".NEQV."
 
+#define TRUE_OPERATOR_NAME ".TRUE."
+#define FALSE_OPERATOR_NAME ".FALSE."
+
 #define GREATER_OR_EQUAL_OPERATOR_NAME ".GE."
 #define GREATER_THAN_OPERATOR_NAME ".GT."
 #define LESS_OR_EQUAL_OPERATOR_NAME ".LE."
@@ -139,6 +142,11 @@
                                        ENTITY_NON_EQUAL_P(e) || \
                                        ENTITY_EQUIV_P(e) || \
                                        ENTITY_NON_EQUIV_P(e) )
+
+#define ENTITY_TRUE_P(e) (strcmp(entity_local_name(e), \
+				 TRUE_OPERATOR_NAME) == 0)
+#define ENTITY_FALSE_P(e) (strcmp(entity_local_name(e), \
+				 FALSE_OPERATOR_NAME) == 0)
 
 #define ENTITY_GREATER_OR_EQUAL_P(e) (strcmp(entity_local_name(e), \
 				   GREATER_OR_EQUAL_OPERATOR_NAME) == 0)
