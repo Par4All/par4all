@@ -28,4 +28,6 @@
 #define ICFG_DECOR_COMPLEXITIES 9
 #define ICFG_DECOR_TOTAL_PRECONDITIONS 10
 
+/*************written by Dat*************/
 typedef text get_text_function(list);
+/****************************************/
