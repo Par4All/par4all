@@ -1,13 +1,17 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/20 19:45:38 $, 
+# $Date: 1997/03/17 12:59:00 $, 
 
-MANS =	Delete.l \
+MANS =	Build \
+	Delete.l \
 	Display.l \
 	Init.l \
 	Perform.l \
+	Pips.l \
 	Select.l \
+	epips.l \
 	pips.l \
+	tpips.l \
 	wpips.l
 
 HTMS =	$(MANS:.l=.html)
