@@ -12,20 +12,23 @@
 #include "linear.h"
 
 #include "genC.h"
+#include "text.h"
 #include "ri.h"
 #include "complexity_ri.h"
 #include "database.h"     /* useful */
 #include "resources.h"    /* useful  */
+
 #include "ri-util.h"
 #include "pipsdbm.h"      /* useful */
-#include "text.h"
+
 #include "matrice.h"      /* useful */
-#include "complexity.h"
 #include "properties.h"
 #include "misc.h"
 #include "prettyprint.h"
 #include "text-util.h"
 #include "top-level.h"
+
+#include "complexity.h"
 
 static bool is_user_view;	/* print_code_complexities or print_source_complexities */
 static hash_table nts = hash_table_undefined;
