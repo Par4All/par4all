@@ -1,6 +1,6 @@
 /* Messages handling
  *
- * $RCSfile: messages.c,v $ ($Date: 1995/07/20 18:40:42 $, )
+ * $RCSfile: messages.c,v $ ($Date: 1995/09/15 15:54:19 $, )
  * version $Revision$
  * 
  * Fabien Coelho, August 1993
@@ -42,39 +42,25 @@ static message generate_one_message(array, li, lk, lv)
 entity array;
 list li, lk, lv;
 {
-    int
-	i   = 1,
-	len = gen_length(li);
-    list
-	lip  = li,
-	lkp  = lk,
-	lvp  = lv,
-	lr   = NIL,
-	ldom = NIL;
-    entity
-	newarray = load_new_node(array);
-    Pvecteur
-	procv = VECTEUR_NUL;
+    int i   = 1, len = gen_length(li);
+    list lip  = li, lkp  = lk, lvp  = lv, lr   = NIL, ldom = NIL;
+    entity newarray = load_new_node(array);
+    Pvecteur procv = VECTEUR_NUL;
     
     assert(len==gen_length(lk) && len==gen_length(lv));
 
     for ( ; i<=len ; i++, lip=CDR(lip), lkp=CDR(lkp), lvp=CDR(lvp))
     {
-	tag
-	    at = access_tag(INT(CAR(lkp)));
-	Pvecteur
-	    v  = PVECTOR(CAR(lvp));
-	expression
-	    indice = EXPRESSION(CAR(lip)); 
-	dimension
-	    newdim = FindIthDimension(newarray, i);
+	tag at = access_tag(INT(CAR(lkp)));
+	Pvecteur v  = (Pvecteur) PVECTOR(CAR(lvp));
+	expression indice = EXPRESSION(CAR(lip)); 
+	dimension newdim = FindIthDimension(newarray, i);
 	int
 	    arraylo = HpfcExpressionToInt(dimension_lower(newdim)),
 	    arrayup = HpfcExpressionToInt(dimension_upper(newdim));
 
-	debug(9, "generate_one_message",
-	      "array %s, dimension %d, access considered is %d\n",
-	      entity_local_name(newarray), i, at);
+	pips_debug(9, "array %s, dimension %d, access considered is %d\n",
+		   entity_local_name(newarray), i, at);
 
 	switch (at)
 	{
@@ -587,7 +573,7 @@ message m;
 	    (int) vect_coeff((Variable) i, v);
     }
 
-    (Pvecteur) message_neighbour(m) = vect_add(v, vect_new(TCST, t));
+    message_neighbour(m) = (gen_chunk*) vect_add(v, vect_new(TCST, t));
 
     return(m);
 }
@@ -601,7 +587,7 @@ list l;
 	result = CONS(MESSAGE, one_message_guards_and_neighbour(m), result),
 	l);
     
-    return(result);
+    return result;
 }
 
 
