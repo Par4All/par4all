@@ -24,17 +24,21 @@
 #include "arithmetique.h"
 
 /*
- * Le champ dimension donne le nombre de variables utilisees dans les egalites
- * et les inegalites, ou si l'on prefere, la dimension de l'espace dans
- * lequel est defini le polyedre correspondant. Le terme constant ne
- * fait pas partie de l'espace.
+ * Le champ dimension donne le nombre de variables utilisees dans 
+ * les egalites  et les inegalites, ou si l'on prefere, la dimension 
+ * de l'espace dans lequel est defini le polyedre correspondant. 
+ * Le terme constant ne fait pas partie de l'espace.
  *
  * La champ base contient tous les vecteurs de base, i.e. toutes les
- * variables apparaissant dans les egalites et les inegalites., y compris
- * le terme constant. La dimension de la base est donc superieure de 1 a la
- * dimension du systeme. Ce champ est utilise par des algorithmes comme
- * celui du test de faisabilite mais il n'est pas entretenu automatiquement.
- * Il faut penser a le regenerer avant de l'utiliser.
+ * variables apparaissant dans les egalites et les inegalites.
+ * Le terme constant ne fait pas partie de la base.  La taille  de la 
+ * base est donc egale a la  dimension du systeme. 
+ * Si certaines fonctions ajoutent temporairement le terme constant a la
+ * base, elles doivent l'oter apres traitement.
+ * Le champ base est utilise par des algorithmes comme  celui du test 
+ * de faisabilite mais il n'est pas entretenu automatiquement lors de 
+ * l'ajout de nouvelles contraintes. Il faut penser aux mises a jour. 
+ *
  */
 typedef struct Ssysteme { 
 	Pcontrainte egalites;
@@ -45,7 +49,7 @@ typedef struct Ssysteme {
 	Pbase base;
 	} *Psysteme,Ssysteme;
 
-/* MACROS */
+
 
 /* - Traitement des overflows :
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -114,8 +118,7 @@ typedef struct Ssysteme {
  * 
 */
 
-
-/* #define sc_print(sc,f) sc_fprint(stdout,sc,f) */
+/* MACROS */
 
 #define sc_nbre_egalites(psc) ((psc)->nb_eq)
 #define sc_nbre_inegalites(psc) ((psc)->nb_ineq)
