@@ -2,12 +2,6 @@
 # $RCSfile: config.makefile,v $ for hpfc scripts
 #
 
-CC=		$(PIPS_CC)
-CFLAGS=		$(PIPS_CFLAGS)
-CPPFLAGS=	$(PIPS_CPPFLAGS)
-LD=		$(PIPS_LD)
-LDFLAGS=	$(PIPS_LDFLAGS)
-
 SCRIPTS= 	hpfc \
 		hpfc_directives \
 		hpfc_add_includes \
