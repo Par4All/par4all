@@ -3,7 +3,7 @@
 #
 # SCCS stuff:
 #
-# $RCSfile: Pips,v $ ($Date: 1996/08/13 13:46:59 $) version $Revision$, got on %D%, %T%
+# $RCSfile: Pips,v $ ($Date: 1996/08/21 14:41:50 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 
@@ -69,7 +69,7 @@ fi
 
 
 # Check environment
-if [ -z "$PIPS_DIR" ]
+if [ -z "$PIPS_ROOT" ]
 then
   echo PIPS environment not set. >&2
   exit 1
