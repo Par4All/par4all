@@ -2,7 +2,7 @@ c
 c inclusions for run-time support functions
 c
 c $RCSfile: hpfc_commons.h,v $ version $Revision$
-c ($Date: 1995/09/27 17:08:01 $, )
+c ($Date: 1995/09/27 18:03:33 $, )
 c
 c
       include 'hpfc_parameters.h'
@@ -18,12 +18,14 @@ c
      $     NBOFARRAYS,
      $     NBOFTEMPLATES,
      $     NBOFPROCESSORS,
-     $     MAXSIZEOFPROCS 
+     $     MAXSIZEOFPROCS,
+     $     SIZEOFBUFFER
       common /hpfc_dynamic/ 
      $     NBOFARRAYS,
      $     NBOFTEMPLATES,
      $     NBOFPROCESSORS,
-     $     MAXSIZEOFPROCS 
+     $     MAXSIZEOFPROCS,
+     $     SIZEOFBUFFER
 c
 c that s all
 c
