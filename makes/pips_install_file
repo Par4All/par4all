@@ -4,8 +4,7 @@
 #
 # Fabien COELHO, 03/08/95
 #
-# $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/09/02 09:15:50 $, )
+# $Id$
 #
 
 RUN=':'
