@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compiler.c,v $
+ * Revision 1.53  1997/05/03 11:48:52  coelho
+ * *** empty log message ***
+ *
  * Revision 1.52  1997/03/20 10:19:38  coelho
  * RCS headers.
  *
@@ -584,6 +587,24 @@ hpf_compile_parallel_loop(
 
 }
 
+/* is there a parallel loop down s?
+ */
+static bool parallel_loop_found;
+static bool loop_flt(loop l)
+{
+    if (execution_parallel_p(loop_execution(l))) {
+	parallel_loop_found = TRUE;
+	gen_recurse_stop(NULL);
+    }
+    return !parallel_loop_found;
+} 
+static bool parallel_loop_in_stat_p(statement s)
+{
+    parallel_loop_found = FALSE;
+    gen_recurse(s, loop_domain, loop_flt, gen_null);
+    return parallel_loop_found;
+}
+
 static void 
 hpf_compile_loop(stat, hoststatp, nodestatp)
 statement stat;
@@ -642,7 +663,11 @@ statement *hoststatp, *nodestatp;
 	    else
 	    {
 		pips_debug(7, "overlap analysis is not ok...\n");
-		hpf_compile_parallel_loop(stat, hoststatp, nodestatp);
+
+		if (parallel_loop_in_stat_p(loop_body(the_loop)))
+		    hpf_compile_sequential_loop(stat, hoststatp, nodestatp);
+		else
+		    hpf_compile_parallel_loop(stat, hoststatp, nodestatp);
 	    }
 	}
 	else
