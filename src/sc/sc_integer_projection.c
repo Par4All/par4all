@@ -136,7 +136,7 @@ Variable v;
 								posit, negat, 
 								v,
 								&integer_comb_p,
-								NO_OFL_CTRL);
+								OFL_CTRL);
 	    if(!integer_comb_p) {
 		vect_rm(ineg->vecteur);
 		ineg->vecteur = vect_dup(negat->vecteur);
