@@ -162,10 +162,12 @@ void create_icon()
    
    Should add a help and version option.
 */
+
 void static
 wpips_parse_arguments(int argc,
                       char * argv[])
 {
+   extern int optind; /* the one of getopt (3) */
    int iarg = optind;
 
    while (iarg < argc) {
