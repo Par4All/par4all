@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/09/21 15:35:01 $, ) 
+ * ($Date: 1995/09/22 14:32:10 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -246,50 +246,6 @@ void fprint_entity_list(FILE *fp, list l);
 #define T_LIDp		"T_LIDp"
 #define INFO		"HPFC_INFO"
 #define BUFID		"HPFC_BUFID"
-
-/************************************************************** DIRECTIVES */
-
-/* Directive names encoding: HPF_PREFIX + one character.
- * This encoding is achieved thru a sed script that transforms directives 
- * into calls that can be parsed by the PIPS F77 parser. It's a hack but 
- * it greatly reduced the number of lines for directive analysis, and 
- * it allowed quite simply to figure out where the executable directives
- * are in the code.
- * However the syntax allowed in mapping directives is restricted to F77.
- */
-
-/* prefix for spacial directive calls
- */
-#define HPF_PREFIX		"HPFC"
-
-/* suffixies for encoded hpf keywords
- */
-#define BLOCK_SUFFIX		"K"
-#define CYCLIC_SUFFIX		"C"
-#define STAR_SUFFIX		"S"
-
-/* suffixes for HPF directives managed by HPFC
- */
-#define ALIGN_SUFFIX		"A"
-#define REALIGN_SUFFIX		"B"
-#define DISTRIBUTE_SUFFIX	"D"
-#define REDISTRIBUTE_SUFFIX	"E"
-#define INDEPENDENT_SUFFIX	"I"
-#define NEW_SUFFIX		"N"
-#define PROCESSORS_SUFFIX	"P"
-#define TEMPLATE_SUFFIX		"T"
-#define PURE_SUFFIX		"U"
-#define DYNAMIC_SUFFIX		"Y"
-
-/* suffixes for my own (FCD:-) directives.
- * these directives are used to instrument the code. 
- * must be used carefully. may be ignore with some properties.
- */
-#define SYNCHRO_SUFFIX		"1"
-#define TIMEON_SUFFIX		"2"
-#define TIMEOFF_SUFFIX		"3"
-#define SETBOOL_SUFFIX		"4"
-#define SETINT_SUFFIX		"5"
 
 /*************************************************************** PROPERTY */
 
