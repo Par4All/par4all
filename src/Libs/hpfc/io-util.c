@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-util.c,v $ ($Date: 1994/09/01 15:48:07 $, ) version $Revision$,
+ * $RCSfile: io-util.c,v $ ($Date: 1994/11/17 14:19:21 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -162,7 +162,7 @@ static statement hpfc_initsend()
      * 2 args to pvmfinitsend
      */
     return
-	(my_make_call_statement
+	(hpfc_make_call_statement
 	     (hpfc_name_to_entity(PVM_INITSEND), 
 	      CONS(EXPRESSION, MakeCharacterConstantExpression("PVMRAW"),
 	      CONS(EXPRESSION, entity_to_expression(hpfc_name_to_entity(BUFID)),
@@ -177,7 +177,7 @@ bool local;
      * 5 args to pvmfpack
      */
     return
-	(my_make_call_statement
+	(hpfc_make_call_statement
 	     (hpfc_name_to_entity(PVM_PACK),
 	      CONS(EXPRESSION, pvm_what_option_expression(array),
 	      CONS(EXPRESSION, reference_to_expression
@@ -203,7 +203,7 @@ bool local;
      */
 
     return
-	(my_make_call_statement
+	(hpfc_make_call_statement
 	     (hpfc_name_to_entity(PVM_UNPACK),
 	      CONS(EXPRESSION, pvm_what_option_expression(array),
 	      CONS(EXPRESSION, reference_to_expression
@@ -368,7 +368,7 @@ entity proc;
     statement
 	cmp_lid = hpfc_compute_lid(proc),
 	send =
-	    my_make_call_statement
+	    hpfc_make_call_statement
 		(pvm_send,
 		 CONS(EXPRESSION, 
 		      reference_to_expression
@@ -411,7 +411,7 @@ static statement hpfc_nsend()
 
     statement
 	send = 
-	    my_make_call_statement
+	    hpfc_make_call_statement
 		(pvm_send,
 		 CONS(EXPRESSION, entity_to_expression(htid),
 		 CONS(EXPRESSION, entity_to_expression(channel),
@@ -441,7 +441,7 @@ static statement hpfc_hcast()
 
     statement
 	st_cast = 
-	    my_make_call_statement
+	    hpfc_make_call_statement
 		(pvm_cast,
 		 CONS(EXPRESSION, entity_to_expression(nbtasks),
 		 CONS(EXPRESSION, entity_to_expression(nodetid),
@@ -473,7 +473,7 @@ entity proc;
     statement
 	cmp_lid = hpfc_compute_lid(proc),
 	recv =
-	    my_make_call_statement
+	    hpfc_make_call_statement
 		(pvm_recv,
 		 CONS(EXPRESSION, 
 		      reference_to_expression
@@ -517,7 +517,7 @@ bool cast;
 	pvm_rcv = hpfc_name_to_entity(PVM_RECV);
     statement
 	receive = 
-	    my_make_call_statement(pvm_rcv,
+	    hpfc_make_call_statement(pvm_rcv,
 				CONS(EXPRESSION, entity_to_expression(hosttid),
 				CONS(EXPRESSION, entity_to_expression(channel),
 				CONS(EXPRESSION, entity_to_expression(info),
