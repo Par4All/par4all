@@ -19,6 +19,11 @@
 
    Bugs:
   - intrinsics are not properly typed
+
+  $Log: bootstrap.c,v $
+  Revision 1.72  2002/06/10 12:00:37  irigoin
+  $Log$ added to keep track of changes
+
 */
 
 #include <stdio.h>
