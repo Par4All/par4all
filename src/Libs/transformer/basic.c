@@ -201,16 +201,23 @@ Pcontrainte eqs;
 bool transformer_consistency_p(t)
 transformer t;
 {
-    /* the relation should be consistent and any variable corresponding to an old value
-     * should appear in the argument list since an old value cannot (should not) be
-     * introduced unless the variable is changed and since every changed variable is
+    /* the relation should be consistent 
+     * and any variable corresponding to an old value
+     * should appear in the argument list since 
+     * an old value cannot (should not) be
+     * introduced unless the variable is changed and
+     * since every changed variable is
      * in the argument list.
+     *
+     * Apparently, a variable may appear as an argument but its old value
+     * does not have to appear in the basis if it is not required by
+     * the constraints. This does not seem very safe to me (FI, 13 Nov. 95)
      */
     Psysteme sc = (Psysteme) predicate_system(transformer_relation(t));
     list args = transformer_arguments(t);
     bool consistent = TRUE;
 
-    consistent = sc_consistent_p(sc);
+    consistent = sc_weak_consistent_p(sc);
 
     if(consistent) {
 	Pbase b = sc_base(sc);
@@ -226,7 +233,8 @@ transformer t;
 	}
     }
 
-    pips_assert("transformer_consistency_p", consistent);
+    /* FI: let the user react and print info before core dumping */
+    /* pips_assert("transformer_consistency_p", consistent); */
 
     return consistent;
 }
