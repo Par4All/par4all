@@ -55,7 +55,7 @@ int Current_index ;
 int Current_op ;
 
 int Current_start ;
-int Current_first ;
+/* int Current_first ; // tag global setting*/
 
 /* Warning: this table knows about the actual values used for AND_OP 
    and OR_OP. */
@@ -189,7 +189,7 @@ init()
     error_seen = 0 ;
     Current_index = -1 ;
     Current_start = -1 ;
-    Current_first = -1 ;
+    /* Current_first = -1 ; */
 }
 
 static int max_domain = -1 ;
