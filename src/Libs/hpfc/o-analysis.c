@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1995/12/19 15:52:36 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1995/12/20 16:44:14 $, )
  * version $Revision$
  */
 
@@ -15,9 +15,10 @@ static list lblocks = NIL, lloop  = NIL;
 
 GENERIC_LOCAL_MAPPING(variable_used, int, entity)
 
-/* Overlap_Analysis
- *
- * check conditions and compile...
+#define RETURN(x) \
+{ reset_hpfc_current_statement(); reset_current_loops(); return x;}
+
+/* check conditions and compile...
  */
 bool Overlap_Analysis(stat, pstat)
 statement stat, *pstat;
@@ -32,8 +33,6 @@ statement stat, *pstat;
     DEBUG_STAT(9, "considering statement", stat);
 
     set_hpfc_current_statement(stat);
-
-    reset_current_loops();   /* ??? should be on exit */
     set_current_loops(stat);
 
     lblocks = NIL,
@@ -65,7 +64,7 @@ statement stat, *pstat;
     {
 	debug(7, "Overlap_Analysis", 
 	      "returning FALSE because no ok distributed variable written\n");
-	return(FALSE);
+	RETURN(FALSE);
     }
 	
     
@@ -123,7 +122,7 @@ statement stat, *pstat;
 	gen_free_list(Wrt);
 	gen_free_list(lblocks);
 	gen_free_list(lloop);
-	return(FALSE);
+	RETURN(FALSE);
     }
 
     /* Now, we have the fellowing situation:
@@ -200,7 +199,7 @@ statement stat, *pstat;
 	gen_free_list(Rrt);
 	gen_free_list(lblocks);
 	gen_free_list(lloop);
-	return(FALSE);
+	RETURN(FALSE);
     }
 
     /* here is the situation now:
@@ -230,7 +229,7 @@ statement stat, *pstat;
     
     if (!generate_optimized_code_for_loop_nest
 	(innerbody, &newloopnest, Wa, Ra, Ro, lWa, lRa, lRo))
-	return(FALSE);
+	RETURN(FALSE);
 
     (*pstat) = 
 	make_block_statement
@@ -243,9 +242,7 @@ statement stat, *pstat;
 
     DEBUG_STAT(8, entity_name(node_module), *pstat);
 
-    reset_hpfc_current_statement();
-
-    return(TRUE);
+    RETURN(TRUE);
 }
 
 /* bool block_distributed_p(array)
