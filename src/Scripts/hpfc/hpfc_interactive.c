@@ -1,5 +1,5 @@
 /* $RCSfile: hpfc_interactive.c,v $ (version $Revision$)
- * $Date: 1995/08/10 11:42:44 $, 
+ * $Date: 1995/08/11 12:52:53 $, 
  *
  * interactive interface to hpfc,
  * based on the GNU READLINE library for interaction,
@@ -10,10 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
-
-extern int system();
-extern int fprintf();
-extern int chdir();
+#include <unistd.h>
 
 #include "readline.h"
 #include "history.h"
