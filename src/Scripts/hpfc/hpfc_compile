@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/03/28 11:32:49 $, 
+# $Date: 1995/04/13 11:56:49 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -151,9 +151,14 @@ $DEBUG "`type $PIPS`"
 eval $PIPS $FILES $PIPSARGS $PIPSPROP -m $MODULE $WORKSPACE \
 	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
 
+STATUS="$?"
 set +x
 
-STATUS="$?"
+[ "$STATUS" -eq 0 ] || 
+{
+  $VERBOSE "exiting - pips error"
+  exit $STATUS
+}
 
 [ "$NOINSTALL" ] ||
 {
