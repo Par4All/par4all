@@ -11,7 +11,8 @@ SCRIPTS= 	hpfc \
 		hpfc_compile \
 		hpfc_generate_init \
 		hpfc_delete \
-		hpfc_install
+		hpfc_install \
+		hpfc_llcmd
 
 FILES=
 SFILES=		hpfc_interactive.c
