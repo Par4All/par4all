@@ -88,6 +88,7 @@ print_code_or_source(string mod_name)
     text r = make_text(NIL);
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
+    string pp;
   
     string resource_name = strdup
 	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
@@ -100,8 +101,8 @@ print_code_or_source(string mod_name)
 		GRAPH_FILE_EXT : "",
 		NULL));
 
-    set_bool_property("PRETTYPRINT_PARALLEL", FALSE);
-    set_bool_property("PRETTYPRINT_SEQUENTIAL", TRUE);
+    pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
+    set_string_property(PRETTYPRINT_PARALLEL, "do");
 
     mod_stat = (statement)
 	db_get_memory_resource(is_user_view?
@@ -117,6 +118,7 @@ print_code_or_source(string mod_name)
     success = make_text_resource (mod_name, resource_name, file_ext, r);
 
     end_attachment_prettyprint();
+    set_string_property(PRETTYPRINT_PARALLEL, pp); free(pp);
 
     free(resource_name);
     free(file_ext);
@@ -126,47 +128,19 @@ print_code_or_source(string mod_name)
 
 /************************************************************ PIPSMAKE HOOKS */
 
-bool 
-print_parallelized90_code(string mod_name)
-{
-    bool success, f90_property = get_bool_property("PRETTYPRINT_FORTRAN90");
-
-    set_bool_property("PRETTYPRINT_FORTRAN90", TRUE);
-    success = print_parallelized_code(mod_name);
-    set_bool_property("PRETTYPRINT_FORTRAN90", f90_property);
-
-    return success;
-}
-
-bool 
-print_parallelized77_code(string mod_name)
-{
-    return print_parallelized_code(mod_name);
-}
-
-bool 
-print_parallelizedHPF_code(string module_name)
-{
-    bool ok, init;
-
-    init = get_bool_property("PRETTYPRINT_HPF");
-    set_bool_property("PRETTYPRINT_HPF", TRUE);
-    ok = print_parallelized_code(module_name);
-    set_bool_property("PRETTYPRINT_HPF", init);
-    
-    return ok;
-}
-
-bool 
-print_parallelized_code(string mod_name)
+static bool 
+print_parallelized_code(
+    string mod_name,
+    string style)
 {
     bool success = FALSE;
     text r = make_text(NIL);
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
+    string pp;
 
-    set_bool_property("PRETTYPRINT_PARALLEL", TRUE);
-    set_bool_property("PRETTYPRINT_SEQUENTIAL", FALSE);
+    pp = strdup(get_string_property(PRETTYPRINT_PARALLEL));
+    set_string_property(PRETTYPRINT_PARALLEL, style);
 
     begin_attachment_prettyprint();
     
@@ -184,10 +158,28 @@ print_parallelized_code(string mod_name)
     success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
 				  PARALLEL_FORTRAN_EXT, r);
     end_attachment_prettyprint();
- 
+    set_string_property(PRETTYPRINT_PARALLEL, pp); free(pp);
     return success;
 }
 
+
+bool 
+print_parallelized90_code(string mod_name)
+{
+    return print_parallelized_code(mod_name, "f90");
+}
+
+bool 
+print_parallelized77_code(string mod_name)
+{
+    return print_parallelized_code(mod_name, "doall");
+}
+
+bool 
+print_parallelizedHPF_code(string module_name)
+{
+    return print_parallelized_code(module_name, "hpf");
+}
 
 bool 
 print_code(string mod_name)
@@ -202,4 +194,3 @@ print_source(string mod_name)
   is_user_view = TRUE;
   return print_code_or_source(mod_name);
 }
-
