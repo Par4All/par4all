@@ -1,3 +1,16 @@
+/*
+ * $Id$
+ *
+ * Defines a static mapping from orderings to statements.
+ * must be initialize_ordering_to_statement, and afterwards
+ * reset_ordering_to_statement.
+ *
+ * $Log: ordering.c,v $
+ * Revision 1.10  1997/11/22 15:19:30  coelho
+ * cleaner. RCS headers. better asser message.
+ *
+ */
+
 #include <stdio.h>
 
 #include "genC.h"
@@ -13,40 +26,22 @@
  *
  * db_get_current_module() returns the module used in the request
  * to pipsmake and is usually different.
+ *
+ * It would be possible to expose a lower level interface to manage
+ * several ordering_to_statement hash tables
  */
 static hash_table OrderingToStatement = hash_table_undefined;
 
-/* It would be possible to expose a lower level interface to manage
- * several ordering_to_statement hash tables
- */
-
-static void rinitialize_ordering_to_statement(hash_table ots, statement s);
-
-static statement apply_ordering_to_statement(hash_table ots, int o);
-
-static hash_table set_ordering_to_statement(statement s);
-
-
-
-bool ordering_to_statement_initialized_p()
+bool 
+ordering_to_statement_initialized_p()
 {
     return OrderingToStatement != hash_table_undefined;
 }
 
-void initialize_ordering_to_statement(s)
-statement s;
+void 
+print_ordering_to_statement(void)
 {
-    /* FI: I do not like that automatic cleaning any more... */
-    if (OrderingToStatement != hash_table_undefined) {
-	reset_ordering_to_statement();
-    }
-
-    OrderingToStatement = set_ordering_to_statement(s);
-}
-
-void print_ordering_to_statement()
-{
-    HASH_MAP(ko,vs,{
+    HASH_MAP(ko, vs,{
 	int o = (int) ko;
 	statement s = (statement) vs;
 
@@ -56,42 +51,35 @@ void print_ordering_to_statement()
     },OrderingToStatement);
 }
 
-statement ordering_to_statement(o)
-int o;
+static statement 
+apply_ordering_to_statement(hash_table ots, int o)
 {
-    statement s = statement_undefined;
+    statement s;
+    pips_assert("defined hash table...",
+		ots != NULL && ots != hash_table_undefined);
 
-    s = apply_ordering_to_statement(OrderingToStatement, o);
+    if(o == STATEMENT_ORDERING_UNDEFINED)
+	pips_internal_error("Illegal ordering %d\n", o);
+
+    s = (statement) hash_get(ots, (char *) o);
+
+    if(s == statement_undefined) 
+	pips_internal_error("no statement for order %d=(%d,%d)\n",
+			    o, ORDERING_NUMBER(o), ORDERING_STATEMENT(o));
 
     return s;
 }
 
-
-
-static hash_table set_ordering_to_statement(s)
-statement s;
+statement 
+ordering_to_statement(int o)
 {
-    hash_table ots =  hash_table_make(hash_int, 101);
-
-    rinitialize_ordering_to_statement(ots, s);
-
-    return ots;
+    statement s;
+    s = apply_ordering_to_statement(OrderingToStatement, o);
+    return s;
 }
 
-void reset_ordering_to_statement()
-{
-    if (OrderingToStatement != hash_table_undefined) {
-	hash_table_clear(OrderingToStatement);
-	OrderingToStatement = hash_table_undefined;
-    }
-    else {
-	pips_error("reset_ordering_to_statement", "ill. undefined arg.\n");
-    }
-}
-
-static void rinitialize_ordering_to_statement(ots, s)
-hash_table ots;
-statement s;
+static void 
+rinitialize_ordering_to_statement(hash_table ots, statement s)
 {
     instruction i = statement_instruction(s);
 
@@ -136,27 +124,31 @@ statement s;
     }
 }
 
-static statement apply_ordering_to_statement(ots, o)
-hash_table ots;
-int o;
+static hash_table 
+set_ordering_to_statement(statement s)
 {
-    statement s;
+    hash_table ots =  hash_table_make(hash_int, 101);
+    rinitialize_ordering_to_statement(ots, s);
+    return ots;
+}
 
-    pips_assert("apply_ordering_to_statement", 
-		ots != NULL && ots != hash_table_undefined);
-
-    if(o == STATEMENT_ORDERING_UNDEFINED) {
-	pips_error("ordering_to_statement",
-		   "Illegal ordering %d\n",
-		   o);
+void 
+initialize_ordering_to_statement(statement s)
+{
+    /* FI: I do not like that automatic cleaning any more... */
+    if (OrderingToStatement != hash_table_undefined) {
+	reset_ordering_to_statement();
     }
 
-    s = (statement) hash_get(ots, (char *) o);
+    OrderingToStatement = set_ordering_to_statement(s);
+}
 
-    if(s == statement_undefined) {
-	pips_error("ordering_to_statement",
-		   "no statement for order %d=(%d,%d)\n",
-		   o, ORDERING_NUMBER(o), ORDERING_STATEMENT(o));
-    }
-    return s;
+void 
+reset_ordering_to_statement(void)
+{
+    pips_assert("hash table is defined", 
+		OrderingToStatement!=hash_table_undefined);
+
+    hash_table_clear(OrderingToStatement);
+    OrderingToStatement = hash_table_undefined;
 }
