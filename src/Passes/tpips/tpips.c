@@ -110,7 +110,7 @@ static struct t_completion_scheme completion_scheme[] =
 { GET_ENV, 	COMP_NONE, 	 COMP_NONE },
 { SET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { GET_PROP,     COMP_PROPERTY,   COMP_NONE },
-{ "info",       COMP_PROPERTY,   COMP_NONE },
+{ "info",       COMP_NONE,   	 COMP_NONE },
 { (char*)NULL,  COMP_NONE,       COMP_NONE }
 };
 
@@ -144,11 +144,8 @@ tpips_user_log(char *fmt, va_list args)
 }
 
 /* Tpips user request */
-
 static string 
-tpips_user_request(fmt, args)
-char *fmt;
-va_list args;
+tpips_user_request(string fmt, va_list args)
 {
     char * response;
 
@@ -171,9 +168,10 @@ va_list args;
 
 /* Tpips user error */
 
-static void tpips_user_error(char * calling_function_name,
-			     char * a_message_format,
-			     va_list *some_arguments)
+static void 
+tpips_user_error(string calling_function_name,
+		 string a_message_format,
+		 va_list *some_arguments)
 {
     /* extern jmp_buf pips_top_level; */
     jmp_buf * ljbp = 0;
@@ -187,7 +185,7 @@ static void tpips_user_error(char * calling_function_name,
    /* terminate PIPS request */
    if (get_bool_property("ABORT_ON_USER_ERROR")) {
        user_warning("tpips_user_error", "Abort on user error requested!\n");
-      abort();
+       abort();
    }
    else
        /* longjmp(pips_top_level, 2); */
@@ -199,9 +197,10 @@ static void tpips_user_error(char * calling_function_name,
  *  - $TPIPS_HISTORY (if any)
  *  - $HOME/"TPIPS_HISTORY"
  */
-static char *default_hist_file_name()
+static string 
+default_hist_file_name(void)
 {
-    char *home, *hist = getenv(TPIPS_HISTENV), *tmp;
+    string home, hist = getenv(TPIPS_HISTENV), tmp;
 
     if (hist) return hist;
 
@@ -215,7 +214,8 @@ static char *default_hist_file_name()
     return tmp;
 }
 
-static char * initialize_tpips_history()
+static string 
+initialize_tpips_history(void)
 {
     HIST_ENTRY * last_entry;
     char *file_name = default_hist_file_name();
@@ -234,58 +234,16 @@ static char * initialize_tpips_history()
     return last_entry ? last_entry->line : NULL ;
 }
 
-#define skip_blanks(str) \
-  while (*str && (*str==' ' || *str=='\t' || *str=='\n')) str++
-#define skip_nonblanks(str) \
-  while (*str && *str!=' ' && *str!='\t' && *str!='\n') str++
-
-static char *skip_first_word(char *line)
-{
-    skip_blanks(line);
-    skip_nonblanks(line);
-    skip_blanks(line);
-    return line;
-}
-
 /* Handlers
  */
-
-/* was set in the grammar, moved here as setenv.
- * motivation: the property lexer can be reused directly here.
- * from the gramar, it must be reimplemented by hand...
- * FC.
- */
-static void setproperty_handler(char * line)
-{
-    if (tpips_execution_mode) {
-	user_log("%s\n", line);
-	parse_properties_string(skip_first_word(line));
-    }
-}
-
-static void shell_handler(char * line)
-{
-    user_log("%s\n", line);
-    line = skip_first_word(line);
-    system(*line? line: "sh");
-}
-
-static void echo_handler(char * line)
-{
-    /* skip the key word and a blank character */
-    user_log("%s\n", line); 
-    line = skip_first_word(line);
-    fprintf(stdout,"%s\n",line);
-    fflush(stdout);
-}
-
 #define TP_HELP(prefix, simple, full)		\
   if (!*line || PREFIX_EQUAL_P(line, prefix)) {	\
       printf(simple); if (*line) printf(full);}
 
-static void help_handler(char * line)
+void 
+tpips_help(string line)
 {
-    line = skip_first_word(line);
+    skip_blanks(line);
 
     printf("\n");
     TP_HELP("readline",
@@ -450,6 +408,7 @@ static void help_handler(char * line)
     }
     
     printf("\n");
+    fflush(stdout);
 }
 
 void tpips_close(void)
@@ -471,29 +430,13 @@ void tpips_close(void)
     }
 }
 
-static void quit_handler(char * line)
-{
-    /* FI: cannot be done here because debug_on() was called
-       in another function. Fortunately, it does not matter. */
-    /* debug_off(); */
-    tpips_close();
-    exit(0);
-}
-
-/* fast exit...
- */
-static void exit_handler(char * line)
-{
-    /* tpips_close(); */
-    exit(0); 
-}
-
 /* in lex file
  */
 extern void tpips_set_line_to_parse(char*);
 extern char * tpips_get_line_to_parse(void);
 
-static void default_handler(char * line)
+static void 
+handle(string line)
 {
     tpips_set_line_to_parse(line);
 
@@ -503,37 +446,8 @@ static void default_handler(char * line)
 	tp_parse ();
     }
 
-    /* error if some characters are still here */
-    if (*tpips_get_line_to_parse()) {
- 	tp_error("syntax error: cannot parse the end of the line");
-    }
-}
-
-/***************************************** Handler for trivial functions ... */
-
-struct t_handler 
-{
-    char * name;
-    void (*function)(char *);
-} ;
-
-static struct t_handler handlers[] =
-{
-  { QUIT,		quit_handler },
-  { "exit",		exit_handler }, /* exit is a synonymous for quit */
-  { SET_PROP,   	setproperty_handler },
-  { "set ",		setproperty_handler }, /* compatibility */
-  { SHELL_ESCAPE, 	shell_handler },
-  { HELP,		help_handler },
-  { ECHO,		echo_handler },
-  { (char *) NULL, 	default_handler}
-};
-
-static void (*find_handler(char* line))(char *)
-{
-    struct t_handler * x = handlers;
-    while ((x->name) && !PREFIX_EQUAL_P(line, x->name)) x++;
-    return x->function;
+    fflush(stderr);
+    fflush(stdout);
 }
 
 /*************************************************************** DO THE JOB */
@@ -732,7 +646,7 @@ tpips_exec(char * line)
 	    tpips_init();
 	
 	sline = substitute_variables(line);
-	(find_handler(sline))(sline);
+	handle(sline);
 	free(sline), sline = (char*) NULL;
     }
 
@@ -848,7 +762,7 @@ tpips_main(int argc, char * argv[])
     pips_log_handler = tpips_user_log;
     parse_arguments(argc, argv);
     fprintf(stdout, "\n");	/* for Ctrl-D terminations */
-    quit_handler("quit");
+    tpips_close();
     return 0;			/* statement not reached ... */
 }
 
