@@ -1,27 +1,27 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/18 09:11:28 $ 
+# $Date: 1996/08/21 18:08:42 $ 
+#
 
-CPPFLAGS+=	$(WP65_ADDED_CPPFLAGS)
+CPPFLAGS+=	-D COMPILE_FOR_G77
 
-LOCAL_LIB=	libwp65runtime.a
+SCRIPTS = 	compile_wp65
 CFILES=		lance_wp65.c
+MFILE=		Makefile.compile_wp65
 
-SOURCES=	$(CONFIG_FILE) \
-		$(CFILES) \
-		compile_wp65 \
-		Makefile.compile_wp65
+SOURCES=	$(CFILES) $(SCRIPTS) $(MFILE)
 
-OFILES=	$(CFILES:.c=.o)
-# OFILES:= $(addprefix $(ARCH)/, $(CFILES))
+LOCAL_LIB=	$(PVM_ARCH)/libwp65runtime.a
+
+OFILES=	$(addprefix $(PVM_ARCH)/, $(CFILES:.c=.o))
 
 #
 # installation
 
-INSTALL_EXE_DIR=	$(PIPS_UTILDIR)
+INSTALL_LIB_DIR= $(INSTALL_RTM_DIR)/wp65/$(PVM_ARCH)
 
-INSTALL_FILE=	Makefile.compile_wp65
 INSTALL_LIB=	$(LOCAL_LIB)
-INSTALL_EXE=	compile_wp65
+INSTALL_RTM=	$(MFILE) $(SCRIPTS)
+INSTALL_SHR=	$(SCRIPTS)
 
 #
 # pvm headers:
@@ -31,21 +31,21 @@ CPPFLAGS+=	-I$(PVM_ROOT)/include
 # 
 # compilation and so.
 
-.SUFFIXES: .c .o
+$(PVM_ARCH)/%.o: %.c
+	$(COMPILE) $< -o $@
 
-all: $(LOCAL_LIB) .runable
+all: $(PVM_ARCH) $(LOCAL_LIB) .runable
 
-.runable: compile_wp65
-	chmod a+x compile_wp65
-	touch $@
+$(PVM_ARCH):; mkdir $@
 
 $(LOCAL_LIB):	$(OFILES)
 	$(AR) $(ARFLAGS) $(LOCAL_LIB) $(OFILES)
-	ranlib $(LOCAL_LIB)
+	$(RANLIB) $(LOCAL_LIB)
 
 clean-compiled: clean
-clean:
-	-$(RM) *~ *.o $(LOCAL_LIB)
+clean: local-clean
+local-clean:
+	-$(RM) *~ $(OFILES) $(LOCAL_LIB)
 
 # that is all
 #
