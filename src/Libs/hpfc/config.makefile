@@ -1,7 +1,8 @@
+# --------------------------------------------------------------------
 #
-# Hpfc Makefile, Fabien COELHO
+# Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/03/08 11:47:34 $) version $Revision$, got on %D%, %T%
+# $RCSfile: config.makefile,v $ ($Date: 1994/03/09 10:16:46 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 # The following macros define the value of commands that are used to
@@ -61,17 +62,17 @@ LIB_OBJECTS= y.tab.o scanner.o $(LIB_CFILES:.c=.o)
 # local-ri-util.o inits.o o-analysis.o align-checker.o messages.o \
 # overlap.o normalize.o guard.o ranges.o message-utils.o reduction.o
 
-todo: init .runables
+todo: init
 
 sccs_close:
 	@echo "closing the sccs session"
 	sccs delget `sccs tell -u`
 
-RUNABLES= Run RunHpfcTest add-includes filter-hpf
-
-.runables: $(RUNABLES)
-	-chmod ug+x $(RUNABLES)
-	touch .runables
+# RUNABLES= Run RunHpfcTest add-includes filter-hpf
+# 
+# .runables: $(RUNABLES)
+# 	-chmod ug+x $(RUNABLES)
+# 	touch .runables
 
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
 # filtred here.
@@ -130,3 +131,5 @@ tar:
 	compress -v hpfc.tar
 
 $(TARGET).h: toklex.h tokyacc.h keywtbl.h
+#
+# --------------------------------------------------------------------
