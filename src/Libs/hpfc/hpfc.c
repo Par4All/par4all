@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: hpfc.c,v $ ($Date: 1995/03/23 16:54:37 $, ) version $Revision$,
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/03/24 15:02:13 $, ) version $Revision$,
  * got on %D%, %T%
  */
  
@@ -189,9 +189,6 @@ reset_resources_for_module()
     reset_local_regions_map();
     reset_precondition_map();
 
-    /* reset_cumulated_effects_map(); 
-    reset_proper_effects_map(); */
-
     free_only_io_map();
     free_postcondition_map();
 
@@ -210,7 +207,13 @@ entity module;
     set_resources_for_module(module);
     s = get_current_module_statement();
 
-    NormalizeCommonVariables(module, s); /* ?????? hmmm... */
+    /* ??? This should not be done. The modified references are
+     * *not* taken into account by the subsequent phases, so I 
+     * have to swith again the entities, but it should not be 
+     * necessary. This is a bug to be investigated.
+     */
+    update_common_references_in_obj(s); /* ?????? hmmm... */
+    update_common_references_in_regions(); /* ?????? no! */
 
     make_host_and_node_modules(module);
 
