@@ -1,14 +1,14 @@
-/*
- * $Id$
- */
-
+/******************************************************************
+ *
+ *		     BOTTOM UP ARRAY RESIZING
+ *
+ *
+*******************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "genC.h"
-
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
@@ -28,7 +28,6 @@
 #include "effects-simple.h"
 #include "conversion.h"
 #include "text-util.h" /* for words_to_string*/
-
 #include "instrumentation.h"
 #include "transformations.h"
 
@@ -47,12 +46,8 @@ parameter_p(entity e)
     type_functional_p(entity_type(e));
 }
 
-
-
-/*
-  La valeur retournée est TRUE si la variable v est un parameter 
-  ou une variable common. Sinon, elle rend la valeur FALSE.
- */
+/*La valeur retournée est TRUE si la variable v est un parameter 
+  ou une variable common. Sinon, elle rend la valeur FALSE.*/
 
 static bool
 variable_is_param_common_p(entity e)
@@ -62,13 +57,9 @@ variable_is_param_common_p(entity e)
     return (FALSE);
 }
 
-
-
-/*
-  Rendre TRUE si la variable v n'est pas un parameter, ni une variable common
+/*Rendre TRUE si la variable v n'est pas un parameter, ni une variable common
   et v, v_phi ne sont pas identiques.
-  En vice-versa, retourner la valeur FALSE.
- */
+  En vice-versa, retourner la valeur FALSE.*/
 
 static bool
 variable_to_project_p(Variable v_phi, Variable v)
@@ -81,10 +72,7 @@ variable_to_project_p(Variable v_phi, Variable v)
   return FALSE;
 }
 
-
-
-
-boolean extract_constraint_on_var(Pvecteur p_var, Variable var, int val,  Pvecteur *ptmp)
+static boolean extract_constraint_on_var(Pvecteur p_var, Variable var, int val,  Pvecteur *ptmp)
 {
   boolean divisible=TRUE; 
   Pvecteur p_tmp = VECTEUR_NUL,pv;
@@ -112,14 +100,12 @@ boolean extract_constraint_on_var(Pvecteur p_var, Variable var, int val,  Pvecte
   }
 }
 
-/*
-  Traiter les égalités d'un système de contraintes ps.
+/* Traiter les égalités d'un système de contraintes ps.
   . Si la variable var apparaît dans ces égalités, *pe va contenir le vecteur
     définissant var. Ex. :
      Equation de la forme: k*var + q1*C1 + ... + p1*N1 + ... == 0
      *pe contient le vecteur : (-q1/k)*C1 + ... + (-p1/k)*N1
-  . Sinon, pe est nulle.
- */
+  . Sinon, pe est nulle. */
 
 static bool
 extract_constraint_from_equalitites(Psysteme ps, Variable var, Pvecteur *pe)
@@ -127,17 +113,13 @@ extract_constraint_from_equalitites(Psysteme ps, Variable var, Pvecteur *pe)
   Pcontrainte pc;
   Value v_phi = VALUE_ZERO;
   Pvecteur p_var = VECTEUR_NUL, ptmp= VECTEUR_NUL; 
-  boolean result=FALSE; 
- 
-  
+  boolean result=FALSE;   
   if (!SC_UNDEFINED_P(ps) && !CONTRAINTE_UNDEFINED_P(ps->egalites) 
       && CONTRAINTE_NULLE_P(ps->egalites))  {
     *pe = VECTEUR_NUL;
     return(FALSE);
   }
-
-  for (pc = ps->egalites; pc != NULL; pc = pc->succ) {
-    
+  for (pc = ps->egalites; pc != NULL; pc = pc->succ) {    
     /* équation de la forme: k*var + q1*C1 + ... + p1*N1 + ... == 0 */
     p_var = contrainte_vecteur(pc);
     v_phi = vect_coeff(var,p_var);
@@ -150,22 +132,15 @@ extract_constraint_from_equalitites(Psysteme ps, Variable var, Pvecteur *pe)
   return(FALSE);
 }
 
-
-
-
-/*
-  Simplifier le Pvecteur pv et extraire les parametres qui apparaissent dans pv.
-  Le Pvecteur résultat ne contient que les entiers et les variables commons.
- */
+/*Simplifier le Pvecteur pv et extraire les parametres qui apparaissent dans pv.
+  Le Pvecteur résultat ne contient que les entiers et les variables commons.*/
 static Pvecteur
 vect_partial_eval(Pvecteur pv)
 {
   Pvecteur v = VECTEUR_NUL, v_tmp = VECTEUR_NUL, v_p_tmp = VECTEUR_NUL;
   Value v_tcst = VALUE_ZERO;
-
   while (!VECTEUR_NUL_P(pv)) {
     Variable var = pv->var;
-
     if (var == TCST)
       v_tcst = value_plus(v_tcst, val_of(pv));
     else if (parameter_p((entity) var)) {
@@ -196,14 +171,10 @@ vect_partial_eval(Pvecteur pv)
     }
     else v_p_tmp->succ = v_tmp;
   }
-
   return (v);
 }
 
-
-
-/*
-  Faire la comparaison entre deux Pvecteurs basés sur le système des préconditions ps_prec.
+/* Faire la comparaison entre deux Pvecteurs basés sur le système des préconditions ps_prec.
   Cette fonction fait une combinaison sur 8 cas de la faisabilité d'un système des contraintes
   pour déterminer le Pvecteur supérieur et le Pvecteur inférieur.
   Ces 8 cas proviennent des 3 systèmes de contraintes :
@@ -228,9 +199,7 @@ vect_partial_eval(Pvecteur pv)
   
     a-/  VECTEUR_UNDEFINED  et  VECTEUR_UNDEFINED
     b-/  VECTEUR_UNDEFINED  et  VECTEUR_ONE (1)
-    c-/  VECTEUR_UNDEFINED  et  un vecteur quelconque sauf VECTEUR_ONE 
-
- */
+    c-/  VECTEUR_UNDEFINED  et  un vecteur quelconque sauf VECTEUR_ONE */
 static Pvecteur
 sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, boolean is_min)
 {
@@ -261,7 +230,6 @@ sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, boolean is_mi
 	return VECTEUR_UNDEFINED;
     }
   }
-
   else if ( VECTEUR_UNDEFINED_P(pv2) && !VECTEUR_UNDEFINED_P(pv1) ) { 
     if (!vect_equal(pv1, p_one)) {
       vect_rm(p_one);
@@ -274,16 +242,12 @@ sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, boolean is_mi
 	return VECTEUR_UNDEFINED;
     }
   }
-
   p1 = vect_partial_eval(pv1);
   p2 = vect_partial_eval(pv2);
   p_egal = vect_substract(p1, p2);
-
   if (VECTEUR_NUL_P(p_egal)) return(p1);
- 
 
   /* Creation des trois systemes */
-
   pvt=vect_dup(p_egal);
   pc_egal = contrainte_make(pvt);
   pt=sc_dup(ps_prec);
@@ -320,11 +284,9 @@ sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, boolean is_mi
     sc_free(ps_egal);
     sc_free(ps_inf);
     sc_free(ps_sup);
-   
     return VECTEUR_UNDEFINED;     
   }
   TRY {
-
     egal = !SC_UNDEFINED_P(ps_egal) && 
       sc_rational_feasibility_ofl_ctrl(ps_egal, OFL_CTRL, TRUE);
     inf =  !SC_UNDEFINED_P(ps_inf) && 
@@ -362,19 +324,14 @@ sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, boolean is_mi
 	pips_debug(8, "Non-determined\n");
 	return VECTEUR_UNDEFINED;     
       }
-    } 
-   
+    }    
   }
 }
 
-
-
-/*
-  Traiter les inégalités d'un système de contraintes.
+/*Traiter les inégalités d'un système de contraintes.
   Si la variable var apparaît dans les inégalités, cette fonction va retourner la borne inférieure et la borne supérieure
   de la variable var sous la forme de Pvecteur pmin et pmax. Sinon, la valeur retournée est FALSE et les Pvecteurs sont nuls.
-  Dans cette fonction, il y a des appels à la fonction sc_min_max_of_pvector() pour comparer deux vecteurs. 
- */
+  Dans cette fonction, il y a des appels à la fonction sc_min_max_of_pvector() pour comparer deux vecteurs. */
 
 static bool
 extract_constraint_from_inequalities(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *pe, Pvecteur *pmin, Pvecteur *pmax)
@@ -383,8 +340,6 @@ extract_constraint_from_inequalities(Psysteme ps, Variable var, Psysteme ps_prec
   Value v_phi = VALUE_ZERO;
   Pvecteur p_var = VECTEUR_NUL, ptmp = VECTEUR_NUL, p_max = VECTEUR_NUL, p_min = VECTEUR_NUL ; 
   boolean result;
- 
-
   p_max = *pe;
   if (VECTEUR_NUL_P(*pe)) 
     p_min = vect_new(TCST, VALUE_ONE);
@@ -395,8 +350,7 @@ extract_constraint_from_inequalities(Psysteme ps, Variable var, Psysteme ps_prec
     *pmax = p_max;
     *pmin = p_min;
     return(FALSE);
-  }
-  
+  }  
   for (pc = ps->inegalites; pc != NULL; pc = pc->succ) {
     p_var = contrainte_vecteur(pc);
     v_phi = vect_coeff(var,p_var);
@@ -410,24 +364,19 @@ extract_constraint_from_inequalities(Psysteme ps, Variable var, Psysteme ps_prec
       }
     }
   }
-  
   *pmax = p_max;
   *pmin = p_min;
-  
   return (TRUE);
 }
   
-
-/*
-  Cette fonction a été écrite pour déterminer les valeurs minimum et maximum d'une variable dans
+/*Cette fonction a été écrite pour déterminer les valeurs minimum et maximum d'une variable dans
   un système de contraintes, elle est donc la fonction principale du programme. 
   . La valeur retournée est FALSE si le système de contraintes est infaisable ou les valeurs min, max sont
     indéterminables. Et vice-versa, la valeur retournée est TRUE.
   . Les pointeurs pmin et pmax contiennent les valeurs des bornes supérieure et inférieure
     de la variable var dans le système de contraintes ps. Ces valeurs sont des Pvecteurs.
   Cette fonction contient les appels aux fonctions sc_egalites_of_variable() et sc_inegalites_of_variable()
-  pour traiter les égalités et les inégalités du système ps.  
-*/
+  pour traiter les égalités et les inégalités du système ps.  */
 static bool
 sc_min_max_of_variable(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *min, Pvecteur *max)
 {
@@ -451,15 +400,11 @@ sc_min_max_of_variable(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *mi
     return FALSE;
   
   if (SC_UNDEFINED_P(ps) || ( sc_nbre_inegalites(ps)==0  && sc_nbre_egalites(ps)==0))
-    return(FALSE);
- 
-  
+    return(FALSE);  
   ps_e = sc_dup(ps);
   ps_i = sc_dup(ps); 
-
   ok1 = extract_constraint_from_equalitites(ps_e, var, &pe);  
   ok2 = extract_constraint_from_inequalities(ps_i, var, ps_prec, &pe, min, max);
-
   if (ok2) {
     pips_debug(8, "The upper bound has been found\n");
     return (TRUE);
@@ -472,8 +417,7 @@ sc_min_max_of_variable(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *mi
 }
 
 static void bottom_up_adn_array_region(region reg, entity e, Psysteme pre)
-{
-  
+{  
   variable v = type_variable(entity_type(e));   
   list l_dims = variable_dimensions(v);
   int length = gen_length(l_dims);
@@ -481,7 +425,6 @@ static void bottom_up_adn_array_region(region reg, entity e, Psysteme pre)
   entity phi = make_phi_entity(length);
   expression upper = expression_undefined;
   Pvecteur min,max;
-
   if (!region_undefined_p(reg))
     {
       /* there are cases when there is no region for one array */
@@ -489,9 +432,7 @@ static void bottom_up_adn_array_region(region reg, entity e, Psysteme pre)
       if (sc_min_max_of_variable(ps, (Variable) phi, pre, &min, &max))
 	upper = Pvecteur_to_expression(max);
       sc_rm(ps);
-    }    
-  
-  
+    }      
   if (expression_undefined_p(upper))
     upper = make_unbounded_expression();   
   if (!unbounded_expression_p(upper))
@@ -500,10 +441,9 @@ static void bottom_up_adn_array_region(region reg, entity e, Psysteme pre)
   user_log("%s\t%s\t%s\t%s\t%d\t%s\t", PREFIX_DEC, 
 	   db_get_memory_resource(DBR_USER_FILE,current_mod,TRUE), 
 	   current_mod,entity_local_name(e),length,words_to_string(words_expression(upper)));  
-  my_print_array_declaration(e);
+  print_array_declaration(e);
   user_log("\n");
-  user_log("---------------------------------------------------------------------------------------\n");
-  
+  user_log("---------------------------------------------------------------------------------------\n");  
 }
 
 
@@ -512,7 +452,6 @@ static void bottom_up_adn_array_region(region reg, entity e, Psysteme pre)
 static region find_union_regions(list l_regions,entity e)
 {
   region reg = region_undefined;
-
   while (!ENDP(l_regions))
     {
       region re = REGION(CAR(l_regions));
@@ -552,18 +491,14 @@ bool array_resizing_bottom_up(char* mod_name)
 
   /* transformer mod_pre = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION, mod_name, TRUE);*/
  
-  current_mod = mod_name;
-  
+  current_mod = mod_name;  
   set_precondition_map((statement_mapping)
 		       db_get_memory_resource(DBR_PRECONDITIONS,mod_name,TRUE));
-
   set_rw_effects((statement_effects) 
       db_get_memory_resource(DBR_REGIONS, mod_name, TRUE));
-
-   regions_init(); 
-  debug_on("BOTTOM_UP_ARRAY_DECLARATION_NORMALIZATION_DEBUG_LEVEL");
-  debug(1," Begin bottom_up_array_declaration_normalization for %s\n", mod_name);
-
+  regions_init(); 
+  debug_on("ARRAY_RESIZING_BOTTOM_UP_DEBUG_LEVEL");
+  debug(1," Begin bottom up array resizing for %s\n", mod_name);
     l_regions = load_rw_effects_list(mod_stmt);  
 
   /* version la plus rapide mais perte des declarations locales
@@ -574,14 +509,12 @@ bool array_resizing_bottom_up(char* mod_name)
   */
   mod_pre = load_statement_precondition(mod_stmt);
   pre = predicate_system(transformer_relation(mod_pre));
-
   user_log("\n-------------------------------------------------------------------------------------\n");
   user_log("Prefix \tFile \tModule \tArray \tNdim \tNew declaration\tOld declaration\n");
   user_log("---------------------------------------------------------------------------------------\n");
   
   /* This version computes new upper bound for all kind of unnormalized array declarations
      Modification NN: for formal argument arrays only*/
-
   while (!ENDP(l_decl))
     {
       entity e = ENTITY(CAR(l_decl));
@@ -599,7 +532,7 @@ bool array_resizing_bottom_up(char* mod_name)
   user_log(" \n The total number of right array declarations : %d \n"
 	  ,number_of_right_array_declarations );
   
-  debug(1,"End bottom_up_array_declaration_normalization for %s\n", mod_name);
+  debug(1,"End bottom up array resizing for %s\n", mod_name);
   debug_off();  
   regions_end();
   reset_precondition_map();
