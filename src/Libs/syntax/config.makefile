@@ -2,10 +2,13 @@
 # -O2 is too much indeed for syntax, FC 09/06/94:-)
 # bof...
 ifeq ($(ARCH),SUN4)
-CFLAGS=	-Xc -g
+CFLAGS=	-g
 else
 CFLAGS=	-g -Wall -ansi
 endif
+
+# bison does not like this pips grammar for Fortran, it reports errors:-)
+YACC=yacc
 
 PARSER_SRC= 
 
