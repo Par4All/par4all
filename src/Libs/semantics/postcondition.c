@@ -1,7 +1,7 @@
 /*
  * by Fabien COELHO
  *
- * $RCSfile: postcondition.c,v $ ($Date: 1995/08/10 09:12:05 $, %U)
+ * $RCSfile: postcondition.c,v $ ($Date: 1995/08/10 09:14:17 $, %U)
  * version $Revision$,
  */
 
@@ -10,7 +10,6 @@
  
 #include <stdio.h>
 #include <string.h> 
-extern fprintf();
 
 /* Psystems stuff
  */
