@@ -160,6 +160,8 @@ typedef int Value;
 #define value_pdivision(ref,val) value_assign(ref,value_pdiv(ref,val))
 #define value_oppose(ref) value_assign(ref,value_uminus(ref))
 #define value_absolute(ref) value_assign(ref,value_abs(ref))
+#define value_minimum(ref,val) value_assign(ref,value_min(ref,val))
+#define value_maximum(ref,val) value_assign(ref,value_max(ref,val))
 
 /* unary operators on values
  */
