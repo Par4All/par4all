@@ -1,37 +1,42 @@
- /* pipsmake: call by need (make),
-  * rule selection (activate),
-  * explicit call (apply)
-  *
-  * Remi Triolet, Francois Irigoin, Pierre Jouvelot, Bruno Baron,
-  * Arnauld Leservot, Guillaume Oget
-  *
-  * Notes: 
+/* $RCSfile: pipsmake.c,v $ (version $Revision$)
+ * $Date: 1996/12/30 14:16:16 $, 
+ * pipsmake: call by need (make),
+ *
+ * rule selection (activate),
+ * explicit call (apply)
+ *
+ * Remi Triolet, Francois Irigoin, Pierre Jouvelot, Bruno Baron,
+ * Arnauld Leservot, Guillaume Oget
+ *
+ * Notes: 
+ *  - pismake uses some RI fields explicitly
+ *  - see Bruno Baron's DEA thesis for more details
+ *  - do not forget the difference between *virtual* resources like 
+ *    CALLERS.CODE and *real* resources like FOO.CODE; CALLERS is a 
+ *    variable (or a function) whose value depends on the current module; 
+ *    it is expanded into a list of real resources;
+ *    the variables are CALLEES, CALLERS, ALL and MODULE (the current module
+ *    itself);
+ *    these variables are used to implement top-down and bottom-up traversals
+ *    of the call tree; they make pipsmake different from make
+ *
+ *  - memoization added to make() to speed-up a sequence of interprocedural 
+ *  requests on real applications; a resource r is up-to-date if it already 
+ *  has been
+ *  proved up-to-date, or if all its arguments have been proved up-to-date and
+ *  all its arguments are in the database and all its arguments are
+ *  older than the requested resource r; this scheme is correct as soon as 
+ *  activate()
+ *  destroys the resources produced by the activated (and de-activated) rule
+ 
+ *  - include of an automatically generated builder_map
+ 
+ *  - explicit *recursive* destruction of obsolete resources by
+ *  activate() but not by apply(); beware! You cannot assume that all
+ *  resources in the database are consistent;
+ *
+ */
 
-  *  - pismake uses some RI fields explicitly
-
-  *  - see Bruno Baron's DEA thesis for more details
-
-  *  - do not forget the difference between *virtual* resources like CALLERS.CODE
-  *  and *real* resources like FOO.CODE; CALLERS is a variable (or a function) whose
-  *  value depends on the current module; it is expanded into a list of real resources;
-  *  the variables are CALLEES, CALLERS, ALL and MODULE (the current module itself);
-  *  these variables are used to implement top-down and bottom-up traversals
-  *  of the call tree; they make pipsmake different from make
-
-  *  - memoization added to make() to speed-up a sequence of interprocedural 
-  *  requests on real applications; a resource r is up-to-date if it already has been
-  *  proved up-to-date, or if all its arguments have been proved up-to-date and
-  *  all its arguments are in the database and all its arguments are
-  *  older than the requested resource r; this scheme is correct as soon as activate()
-  *  destroys the resources produced by the activated (and de-activated) rule
-
-  *  - include of an automatically generated builder_map
-
-  *  - explicit *recursive* destruction of obsolete resources by
-  *  activate() but not by apply(); beware! You cannot assume that all
-  *  resources in the database are consistent;
-  *
-  */
 #include <stdio.h>
 #include <sys/types.h>
 #include <string.h>
@@ -905,7 +910,7 @@ bool check_physical_resource_up_to_date(resource res)
   return result;
 }
 
-
+
 /* Delete from up_to_date all the resources of a given name */
 void delete_named_resources (rn)
 string rn;
@@ -923,9 +928,8 @@ string rn;
 	    string res_on = real_resource_owner_name((real_resource) res);
 
 	    if (same_string_p(rn, res_rn)) {
-		debug(5, "delete_named_resources",
-		      "resource %s(%s) deleted from up_to_date\n",
-		      res_rn, res_on);
+		pips_debug(5, "resource %s(%s) deleted from up_to_date\n",
+			   res_rn, res_on);
 		set_del_element (up_to_date_resources,
 				 up_to_date_resources,
 				 (char *) res);
@@ -933,7 +937,14 @@ string rn;
 	}, up_to_date_resources);
     }
 }
-
+
+void delete_all_resources(void)
+{
+    db_delete_all_resources();
+    set_free(up_to_date_resources);
+    up_to_date_resources = set_make(set_pointer);
+}
+
 string get_first_main_module()
 {
 
