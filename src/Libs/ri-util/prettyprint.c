@@ -1269,7 +1269,7 @@ int precedence;
     else 
 	pc = words_syntax(expression_syntax(obj));
 
-    return(pc);
+     return(pc);
 }
 
 cons *words_loop_range(obj)
@@ -1312,8 +1312,9 @@ reference obj;
     cons *pc = NIL;
     entity e = reference_variable(obj);
 
-    pc = CHAIN_SWORD(pc,entity_local_name(e));
-
+    pc = CHAIN_SWORD(pc, entity_local_name(e));
+    attach_something_to_last_word(pc, e);
+    
     if (reference_indices(obj) != NIL) {
 	pc = CHAIN_SWORD(pc,"(");
 	MAPL(pi, {
