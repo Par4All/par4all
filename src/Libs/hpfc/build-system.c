@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1996/02/15 14:17:43 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1996/03/01 15:52:03 $, ) 
  * version $Revision$
  */
 
@@ -141,20 +141,23 @@ Psysteme s;
 #define Psysteme_undefined_p(sc) SC_UNDEFINED_P(sc)
 #endif
 GENERIC_LOCAL_MAPPING(declaration_constraints, Psysteme, entity)
-GENERIC_LOCAL_MAPPING(hpf_constraints, Psysteme, entity)
+GENERIC_LOCAL_MAPPING(hpf_align_constraints, Psysteme, entity)
+GENERIC_LOCAL_MAPPING(hpf_distribute_constraints, Psysteme, entity)
 GENERIC_LOCAL_MAPPING(new_declaration_constraints, Psysteme, entity)
 
 void make_hpfc_current_mappings()
 {
     make_declaration_constraints_map();
-    make_hpf_constraints_map();
+    make_hpf_align_constraints_map();
+    make_hpf_distribute_constraints_map();
     make_new_declaration_constraints_map();
 }
 
 void free_hpfc_current_mappings()
 {
     free_declaration_constraints_map();
-    free_hpf_constraints_map();
+    free_hpf_align_constraints_map();
+    free_hpf_distribute_constraints_map();
     free_new_declaration_constraints_map();
 }
 
@@ -391,10 +394,8 @@ entity e;
 	    psi0 = HpfcExpressionToInt
 		(dimension_lower(entity_ith_dimension(proc, j))),
 	    proc_size = SizeOfIthDimension(proc, j);
-	style
-	    st = distribution_style(d);
-	Pvecteur
-	    v = VECTEUR_UNDEFINED;
+	style st = distribution_style(d);
+	Pvecteur v = VECTEUR_UNDEFINED;
 
 	/* -delta_j <= 0
 	 */
@@ -439,37 +440,34 @@ entity e;
     return(new_system);
 }
 
-static Psysteme hpfc_compute_entity_to_hpf_constraints(e)
-entity e;
+Psysteme entity_to_hpf_align_constraints(entity e)
 {
-    return(array_distributed_p(e) ?
-	   hpfc_compute_align_constraints(e) :
-	   hpfc_compute_distribute_constraints(e));
-}
+    Psysteme p = load_entity_hpf_align_constraints(e);
 
-/* entity_to_hpf_constraints(e)
- * entity e;
- *
- * demand driven computation of constraints. e may be an
- * array, then the alignment is computed, or a template,
- * for which the distribution are computed.
- */
-Psysteme entity_to_hpf_constraints(e)
-entity e;
-{
-    Psysteme 
-	p = load_entity_hpf_constraints(e);
-
-    pips_assert("template or distributed variable", entity_variable_p(e) &&
-		(array_distributed_p(e) || entity_template_p(e)));
+    pips_assert("distributed variable", array_distributed_p(e));
 
     if (Psysteme_undefined_p(p))
     {
-	p = hpfc_compute_entity_to_hpf_constraints(e);
-	store_entity_hpf_constraints(e, p);
+	p = hpfc_compute_align_constraints(e);
+	store_entity_hpf_align_constraints(e, p);
     }
 
-    return(p);
+    return p;
+}
+
+Psysteme entity_to_hpf_distribute_constraints(entity e)
+{
+    Psysteme p = load_entity_hpf_distribute_constraints(e);
+
+    pips_assert("template", entity_template_p(e));
+
+    if (Psysteme_undefined_p(p))
+    {
+	p = hpfc_compute_distribute_constraints(e);
+	store_entity_hpf_distribute_constraints(e, p);
+    }
+
+    return p;
 }
 
 /* effect entity_to_region(stat, ent, act)
@@ -477,13 +475,12 @@ entity e;
  *
  * gives the region of ent with action act in statement stat.
  */
-effect entity_to_region(stat, ent, act)
-statement stat;
-entity ent; 
-tag act;
+effect entity_to_region(
+    statement stat,
+    entity ent,
+    tag act)
 {
-    list
-	l = load_statement_local_regions(stat);
+    list l = load_statement_local_regions(stat);
 
     MAP(EFFECT, e,
 	if ((reference_variable(effect_reference(e))==ent) &&
@@ -493,14 +490,11 @@ tag act;
     return(effect_undefined);
 }
 
-/* ---------------------------------------------------
- *
- * NEW DECLARATIONS AS CONSTRAINTS IF POSSIBLE...
- *
- */
+/********************************************************* NEW DECLARATIONS */
 
-Psysteme hpfc_compute_entity_to_new_declaration(array)
-entity array;
+Psysteme 
+hpfc_compute_entity_to_new_declaration(
+    entity array)
 {
     int	dim = NumberOfDimension(array);
     Psysteme syst = sc_rn(NULL);
@@ -692,7 +686,7 @@ entity array;
      }
     
     sc_creer_base(syst);
-    return(syst);
+    return syst;
 }
 
 Psysteme entity_to_new_declaration(array)
@@ -708,36 +702,34 @@ entity array;
 	store_entity_new_declaration_constraints(array, p);
     }
 
-    return(p);
+    return p;
 }
 
-/* ------------------------------------------------------------
- * 
- *    PHIi == ALPHAi list
- *
- */
+/*********************************** REGION and ARRAY link: PHIi == ALPHAi */
 
-Psysteme generate_system_for_equal_variables(n, gen1, gen2)
-int n;
-entity (*gen1)(int), (*gen2)(int);
+Psysteme 
+generate_system_for_equal_variables(
+    int n,
+    entity (*gen1)(int),
+    entity (*gen2)(int))
 {
     Psysteme s = sc_rn(NULL);
 
     for(; n>0; n--)
-	sc_add_egalite
-	    (s, contrainte_make
+	sc_add_egalite(s, contrainte_make
 	     (vect_make(VECTEUR_NUL, gen1(n), 1, gen2(n), -1, TCST, 0)));
 
-    sc_creer_base(s); return(s);
+    sc_creer_base(s); return s;
 }
 
-Psysteme hpfc_unstutter_dummies(array)
-entity array;
+Psysteme 
+hpfc_unstutter_dummies(
+    entity array)
 {
     int ndim = variable_entity_dimension(array);
 
-    return(generate_system_for_equal_variables
-	   (ndim, get_ith_region_dummy, get_ith_array_dummy));
+    return generate_system_for_equal_variables
+	   (ndim, get_ith_region_dummy, get_ith_array_dummy);
 }
 
 /* Psysteme generate_system_for_variable(v)
@@ -752,8 +744,9 @@ entity array;
  *  - uses many functions that build and store systems...
  * bugs or features:
  */
-Psysteme generate_system_for_distributed_variable(v)
-entity v;
+Psysteme 
+generate_system_for_distributed_variable(
+    entity v)
 {
     Psysteme result = sc_rn(NULL);
     entity t, p;
@@ -766,8 +759,8 @@ entity v;
     result = sc_append(result, entity_to_declaration_constraints(v));
     result = sc_append(result, entity_to_declaration_constraints(t));
     result = sc_append(result, entity_to_declaration_constraints(p));
-    result = sc_append(result, entity_to_hpf_constraints(v));
-    result = sc_append(result, entity_to_hpf_constraints(t));
+    result = sc_append(result, entity_to_hpf_align_constraints(v));
+    result = sc_append(result, entity_to_hpf_distribute_constraints(t));
     result = sc_append(result, entity_to_new_declaration(v));
  
     base_rm(sc_base(result)), sc_base(result) = NULL, sc_creer_base(result);
