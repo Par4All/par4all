@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1995/09/07 11:12:53 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1995/09/07 14:00:17 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -36,8 +36,6 @@ c
       end
 c      
 c----------
-c
-include(`hpfc_lib_m4_macros')dnl
 c
 c macros to generate the code
 c
