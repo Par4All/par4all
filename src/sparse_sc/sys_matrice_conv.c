@@ -58,17 +58,17 @@ int m;
     Pbase pb;
     Pvecteur pv;
     int i,j;
-    int deno;
+    Value deno;
 
     deno = DENOMINATOR(AG);
     for (pc = sc->inegalites, i=1; i<=m; pc = pc->succ, i++)
 	for (pb = base_index, j=1; j<=n; pb = pb->succ, j++)
 	    vect_chg_coeff(&pc->vecteur, pb->var, ACCESS(AG,m,m-i+1,j));
-    if (deno>1)
+    if (value_gt(deno,VALUE_ONE))
 	for (pc = sc->inegalites, i=1; i<=m; pc = pc->succ, i++)
 	    for (pv = pc->vecteur; pv != NULL; pv = pv->succ)
 		if (base_find_variable(base_index,pv->var)==VARIABLE_UNDEFINED)
-		    pv->val *= deno;		    
+		    value_product(pv->val,deno);		    
 }
 
 
@@ -94,11 +94,9 @@ int m;
 void sc_to_matrices(ps,base_index,A,B,n,m)
 Psysteme ps;
 Pbase base_index;
-int A[];
-int B[];
+matrice A, B;
 int n,m;
 {
-
     int i,j;
     Pcontrainte eq;
     Pvecteur pv;
@@ -147,13 +145,14 @@ int n,m;
 void matrices_to_sc(ps,base_index,A,B,n,m)
 Psysteme ps;
 Pbase base_index;
-int A[],B[];
+matrice A,B;
 int n,m;
 {
     Pvecteur vect,pv=NULL;
     Pcontrainte cp,pc= NULL;
     Pbase b;
-    int i,j,cst,coeff,dena,denb;
+    int i,j;
+    Value cst,coeff,dena,denb;
     boolean trouve ;
 
     /* create the  variables */
@@ -166,13 +165,13 @@ int n,m;
 
     if (VECTEUR_NUL_P(ps->base)) {
 	Variable var = creat_new_var(ps);
-	ps->base = vect_new(var,1);
+	ps->base = vect_new(var,VALUE_ONE);
     }
 
     for (b = ps->base,i =2; i<= m; i++,b=b->succ)  
 	if (VECTEUR_NUL_P(b->succ)) {
 	    Variable var = creat_new_var(ps);
-	    b->succ = vect_new(var,1);
+	    b->succ = vect_new(var,VALUE_ONE);
 	}
 
    
@@ -184,17 +183,21 @@ int n,m;
 	cp = contrainte_new();
 
 	/* build the constant terme if it exists */
-	if ((cst = ACCESS(B,n,i,1)) != 0) {
-	    pv = vect_new(TCST,  dena * cst);
+	cst = ACCESS(B,n,i,1);
+	if (value_notzero_p(cst)) {
+	    pv = vect_new(TCST, value_mult(dena,cst));
 	    trouve = TRUE;
 	}
 
 	for (vect = ps->base,j=1;j<=m;vect=vect->succ,j++) {
-	    if ((coeff = ACCESS(A,n,i,j)) != 0)
+	    coeff = ACCESS(A,n,i,j);
+	    if (value_notzero_p(coeff))
 		if (trouve) 
-		    vect_chg_coeff(&pv, vecteur_var(vect),denb * coeff);
+		    vect_chg_coeff(&pv, vecteur_var(vect),
+				   value_mult(denb,coeff));
 		else {	/* build a new vecteur if there is not constant term */
-		    pv = vect_new(vecteur_var(vect), denb * coeff);
+		    pv = vect_new(vecteur_var(vect), 
+				  value_mult(denb,coeff));
 		    trouve = TRUE;
 		}
 	}
@@ -234,8 +237,8 @@ int n,m;
 void loop_sc_to_matrices(ps,index_base,const_base,A,B,n,m1,m2)
 Psysteme ps;
 Pbase index_base,const_base;
-int A[];
-int B[];
+matrice A;
+matrice B;
 int n,m1,m2;
 {
 
@@ -294,13 +297,14 @@ int n,m1,m2;
 void matrices_to_loop_sc(ps,index_base,const_base,A,B,n,m1,m2)
 Psysteme ps;
 Pbase index_base,const_base;
-int A[],B[];
+matrice A,B;
 int n,m1,m2;
 {
     Pvecteur vect,pv=NULL;
     Pcontrainte cp,pc= NULL;
     Pbase b;
-    int i,j,cst,coeff,dena,denb;
+    int i,j;
+    Value cst,coeff,dena,denb;
     boolean trouve ;
 
     /* create the  variables */
@@ -315,14 +319,14 @@ int n,m1,m2;
 
     if (VECTEUR_NUL_P(ps->base)) {
 	Variable var = creat_new_var(ps);
-	ps->base = vect_new(var,1);
+	ps->base = vect_new(var,VALUE_ONE);
 	ps->dimension++;
     }
 
     for (b = ps->base,i =2; i<= m1; i++,b=b->succ)  
 	if (VECTEUR_NUL_P(b->succ)) {
 	    Variable var = creat_new_var(ps);
-	    b->succ = vect_new(var,1);
+	    b->succ = vect_new(var,VALUE_ONE);
 	    ps->dimension++;
 	}
 
@@ -333,7 +337,7 @@ int n,m1,m2;
     for (b = ps->base,i =2; i<= m1+m2-1; i++,b=b->succ)  
 	if (VECTEUR_NUL_P(b->succ)) {
 	    Variable var = creat_new_var(ps);
-	    b->succ = vect_new(var,1);
+	    b->succ = vect_new(var,VALUE_ONE);
 	    ps->dimension++;
 	}
 
@@ -345,30 +349,36 @@ int n,m1,m2;
 	cp = contrainte_new();
 
 	/* build the constant terme if it exists */
-	if ((cst = ACCESS(B,n,i,m2)) != 0) {
-	    pv = vect_new(TCST,  dena * cst);
+	cst = ACCESS(B,n,i,m2);
+
+	if (value_notzero_p(cst)) {
+	    pv = vect_new(TCST,  value_mult(dena,cst));
 	    trouve = TRUE;
 	}
 
 
 	for (vect = ps->base,j=1;j<=m1;vect=vect->succ,j++) {
-	    if ((coeff = ACCESS(A,n,i,j)) != 0)
+	    coeff = ACCESS(A,n,i,j);
+	    if (value_notzero_p(coeff))
 		if (trouve) 
-		    vect_chg_coeff(&pv, vecteur_var(vect),denb * coeff);
+		    vect_chg_coeff(&pv, vecteur_var(vect),
+				   value_mult(denb,coeff));
 		else {			
 		    /* build a new vecteur if there is not constant term */
-		    pv = vect_new(vecteur_var(vect), denb * coeff);
+		    pv = vect_new(vecteur_var(vect), value_mult(denb,coeff));
 		    trouve = TRUE;
 		}
 	}
 
 	for (j=1;j<=m2-1;vect=vect->succ,j++) {
-	    if ((coeff = ACCESS(B,n,i,j)) != 0)
+	    coeff = ACCESS(B,n,i,j);
+	    if (value_notzero_p(coeff))
 		if (trouve) 
-		    vect_chg_coeff(&pv, vecteur_var(vect),denb * coeff);
+		    vect_chg_coeff(&pv, vecteur_var(vect),
+				   value_mult(denb,coeff));
 		else {			
 		    /* build a new vecteur if there is not constant term */
-		    pv = vect_new(vecteur_var(vect), denb * coeff);
+		    pv = vect_new(vecteur_var(vect), value_mult(denb,coeff));
 		    trouve = TRUE;
 		}
 	}
@@ -451,7 +461,8 @@ Pbase b;
 Pmatrix A, B;
 {
     Pcontrainte newpc = NULL;
-    int i, j, cst, coeff, dena, denb;
+    int i, j;
+    Value cst, coeff, dena, denb;
     int n = MATRIX_NB_LINES(A);
     int m = MATRIX_NB_COLUMNS(A);
 
@@ -466,18 +477,22 @@ Pmatrix A, B;
 	cp = contrainte_new();
 
 	/* build the constant terme if it is not null */
-	if ((cst = MATRIX_ELEM(B,i,1)) != 0) {
-	    pv = vect_new(TCST,  dena * cst);
+	cst = MATRIX_ELEM(B,i,1);
+	if (value_notzero_p(cst)) {
+	    pv = vect_new(TCST,  value_mult(dena,cst));
 	    found = TRUE;
 	}
 
 	for (vect = b,j=1;j<=m;vect=vect->succ,j++) {
-	    if ((coeff = MATRIX_ELEM(A,i,j)) != 0)
+	    coeff = MATRIX_ELEM(A,i,j);
+	    if (value_notzero_p(coeff))
 		if (found)
-		    vect_chg_coeff(&pv, vecteur_var(vect),denb * coeff);
+		    vect_chg_coeff(&pv, vecteur_var(vect),
+				   value_mult(denb,coeff));
 		else {
 		    /* build a new vecteur if there is a null constant term */
-		    pv = vect_new(vecteur_var(vect), denb * coeff);
+		    pv = vect_new(vecteur_var(vect), 
+				   value_mult(denb,coeff));
 		    found = TRUE;
 		}
 	}
@@ -566,7 +581,8 @@ Pmatrix A, B;
 {
     Pvecteur vect,pv=NULL;
     Pcontrainte cp,newpc= NULL;
-    int i,j,cst,coeff,dena,denb;
+    int i,j;
+    Value cst,coeff,dena,denb;
     boolean found ;
     int n = MATRIX_NB_LINES(A);
     int m1 = MATRIX_NB_COLUMNS(A);
@@ -579,30 +595,37 @@ Pmatrix A, B;
 	cp = contrainte_new();
 
 	/* build the constant terme if it exists */
-	if ((cst = MATRIX_ELEM(B,i,m2)) != 0) {
-	    pv = vect_new(TCST,  dena * cst);
+	cst = MATRIX_ELEM(B,i,m2);
+	if (value_notzero_p(cst)) {
+	    pv = vect_new(TCST,  value_mult(dena,cst));
 	    found = TRUE;
 	}
 
 	vect = base_union(index_base, const_base);
 	for (j=1;j<=m1;vect=vect->succ,j++) {
-	    if ((coeff = MATRIX_ELEM(A,i,j)) != 0)
+	    coeff = MATRIX_ELEM(A,i,j);
+	    if (value_notzero_p(coeff))
 		if (found)
-		    vect_chg_coeff(&pv, vecteur_var(vect),denb * coeff);
+		    vect_chg_coeff(&pv, vecteur_var(vect),
+				   value_mult(denb,coeff));
 		else {
 		    /* build a new vecteur if there is not constant term */
-		    pv = vect_new(vecteur_var(vect), denb * coeff);
+		    pv = vect_new(vecteur_var(vect), 
+				  value_mult(denb,coeff));
 		    found = TRUE;
 		}
 	}
 
 	for (j=1;j<=m2-1;vect=vect->succ,j++) {
-	    if ((coeff = MATRIX_ELEM(B,i,j)) != 0)
+	    coeff = MATRIX_ELEM(B,i,j);
+	    if (value_notzero_p(coeff))
 		if (found)
-		    vect_chg_coeff(&pv, vecteur_var(vect),denb * coeff);
+		    vect_chg_coeff(&pv, vecteur_var(vect),
+				   value_mult(denb,coeff));
 		else {
 		    /* build a new vecteur if there is not constant term */
-		    pv = vect_new(vecteur_var(vect), denb * coeff);
+		    pv = vect_new(vecteur_var(vect),
+				  value_mult(denb,coeff));
 		    found = TRUE;
 		}
 	}
