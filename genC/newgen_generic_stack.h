@@ -2,7 +2,7 @@
  * Fabien COELHO, 05/12/94
  * 
  * $RCSfile: newgen_generic_stack.h,v $ verison $Revision$
- * $Date: 1995/08/29 09:14:46 $, 
+ * $Date: 1996/09/21 15:33:06 $, 
  * got on %D%, %T%
  */
 
@@ -27,7 +27,7 @@ PREFIX bool name##_filter(type i)\
 { stack_push((char *)i, name##_stack);\
   return TRUE;}\
 PREFIX void name##_rewrite(type i)\
-{ (void) stack_pop(name##_stack);}\
+{ assert((type)stack_pop(name##_stack)==i);}\
 PREFIX type name##_replace(type i)\
 { return((type) stack_replace((char *)i, name##_stack));}\
 PREFIX type name##_pop()\
@@ -45,12 +45,12 @@ static void check_##name##_stack()\
   reset_##name##_stack();\
   make_##name##_stack();\
   assert(name##_empty_p());\
-  name##_push(item_1);\
+  name##_push((type) item_1);\
   assert((char *) name##_head()==item_1);\
-  name##_replace(item_2);\
+  name##_replace((type) item_2);\
   assert((char *) name##_pop()==item_2);\
-  assert(name##_filter(item_1));\
-  name##_rewrite(item_1);\
+  assert(name##_filter((type) item_1));\
+  name##_rewrite((type) item_1);\
   assert(name##_size()==0);\
   free_##name##_stack();\
   reset_##name##_stack();\
@@ -58,7 +58,7 @@ static void check_##name##_stack()\
 }
 
 #define DEFINE_LOCAL_STACK(name, type) DEFINE_STACK(static, name, type)
-#define DEFINE_GLOBAL_STACK(name, type) DEFINE_STACK(/**/, name, type)
+#define DEFINE_GLOBAL_STACK(name, type) DEFINE_STACK(auto, name, type)
 
 /*  That is all
  */
