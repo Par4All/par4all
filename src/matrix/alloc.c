@@ -1,7 +1,6 @@
  /* package matrix */
 
 #include <stdio.h>
-#include <sys/stdtypes.h> /*for debug with dbmalloc */
 #include <malloc.h>
 
 #include "assert.h"
@@ -10,7 +9,6 @@
 #include "arithmetique.h"
 
 #include "matrix.h"
-
 
 Pmatrix matrix_new(n,m)
 int n,m;
