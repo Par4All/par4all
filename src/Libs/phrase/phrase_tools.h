@@ -95,4 +95,12 @@ void replace_in_sequence_statement_with (statement old_stat,
 					 statement new_stat,
 					 statement root_stat);
 
+list references_for_regions (list l_regions);
+
+list union_references_for_regions (list l1, list l2);
+
+list intersection_references_for_regions (list l1, list l2);
+
+list differences_references_for_regions (list l1, list l2);
+
 #endif
