@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/14 18:39:10 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/15 10:28:14 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2332,15 +2332,21 @@ gen_chunk * obj;
     return FALSE;
 }
 
-/* manages EXTERNALS
+/* manages EXTERNALS and INLINABLES
  */
 static int
 allocated_memory_leaf_in( obj, bp )
 gen_chunk *obj ;
 struct gen_binding *bp ;
 {
-    if (IS_TABULATED(bp) ||
-	allocated_memory_already_seen_p(obj)) 
+    if (IS_INLINABLE(bp))
+    {
+	if (strcmp(bp->name, "string")==0)
+	    current_size += strlen(obj->s) + 1; /* under approximation! */
+	return !GO;
+    }
+
+    if (IS_TABULATED(bp) || allocated_memory_already_seen_p(obj)) 
 	return FALSE;
 
     if (IS_EXTERNAL(bp))
@@ -2366,18 +2372,13 @@ allocated_memory_obj_in(
 {
     struct gen_binding *bp = &Domains[quick_domain_index(obj)];
 
-    if (allocated_memory_already_seen_p(obj) ||
-	IS_TABULATED(&Domains[quick_domain_index(obj)]))
+    if (allocated_memory_already_seen_p(obj) ||	
+	IS_TABULATED(bp) || IS_INLINABLE(bp))
 	return !GO;
 
-    current_size += gen_size(bp);
-
-    if (IS_INLINABLE(bp))
-    {
-	if (strcmp(bp->name, "string")==0)
-	    current_size += strlen(obj->s) + 1; /* under approximation! */
-	return !GO;
-    }
+    /* gen size is quite slow. should precompute sizes...
+     */
+    current_size += gen_size(bp); 
 
     return GO;
 }
