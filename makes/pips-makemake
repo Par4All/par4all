@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/07 11:11:24 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/07 12:08:51 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -36,19 +36,19 @@ usage()
 MAKEFILE=Makefile
 CONFIG_FILE=config.makefile
 
-PIPSMAKEMAKE_OPTION=''
 DIRSIDE="$DEVEDIR"
-DIRTYPE=''
+DIRTYPE=`basename \`dirname \\\`pwd\\\`\``
 DIRS='.'
 ALL=''
+ALL_RULE_TARGET=''
 
 while getopts lpsrDPcah opt
 do
   case $opt in
-    l)	DIRTYPE='Lib' ; PIPSMAKEMAKE_OPTION='-l';;
-    p)	DIRTYPE='Passes' ; PIPSMAKEMAKE_OPTION='-p';;
-    s)  DIRTYPE='Scripts' ; PIPSMAKEMAKE_OPTION='-s';;
-    r)  DIRTYPE='Runtime' ; PIPSMAKEMAKE_OPTION='-r';;
+    l)	DIRTYPE='Lib' ;;
+    p)	DIRTYPE='Passes' ;;
+    s)  DIRTYPE='Scripts' ;;
+    r)  DIRTYPE='Runtime' ;;
     D)	DIRSIDE="$DEVEDIR" ;;
     P)	DIRSIDE="$PRODDIR/Src" ;;
     c)	DIRS='.';;
@@ -77,12 +77,14 @@ install_lib_dir=$LIBDIR
 install_exe_dir=$BINDIR
 
 case $DIRTYPE in
-  Lib) : ;;
-  Passes) : ;;
-  Scripts) install_file_dir=$UTILDIR ;
+  Lib) ALL_RULE_TARGET='lib$(TARGET).a' ;;
+  Passes) ALL_RULE_TARGET='$(TARGET)' ;;
+  Scripts) ALL_RULE_TARGET='.runable' ;
+           install_file_dir=$UTILDIR ;
            install_lib_dir=$UTILDIR ;
            install_exe_dir=$UTILDIR ;;
-  Runtime) install_file_dir=$EXTEDIR ;
+  Runtime) ALL_RULE_TARGET='' ;
+           install_file_dir=$EXTEDIR ;
            install_exe_dir=$EXTEDIR ;
            install_lib_dir=$EXTEDIR ;;
   *) usage 5 "unexpected directory type $DIRTYPE"
@@ -172,11 +174,8 @@ MAKEFILE=	$MAKEFILE
 # to override sun's default rule
 .SCCS_GET:
 
-check_os:
-	@if test -n "$(PIPS_CHECK_OS)"; \\
-	then echo "Cannot run make under this OS release"; \\
-	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
-	fi
+all: $ALL_RULE_TARGET
+
 #
 # begin of $CONFIG_FILE inclusion
 #
@@ -203,8 +202,19 @@ LIB_TARGET=	lib$(TARGET).a
 BIN_TARGET=	$(TARGET)
 INC_TARGET=	$(TARGET).h
 #
+INSTALL_FILE=	$(INC_TARGET)
+INSTALL_LIB=	$(LIB_TARGET)
+INSTALL_BIN=	`if [ $DIRTYPE = 'Passes' ] ; then echo '$(TARGET)' ; fi`
+#
 
 .INIT: $MAKEFILE check_os
+
+check_install:
+	@if test \`echo *.a | wc -w\` -gt 1 ; \\
+	then \\
+	  echo "install failed: additional local libraries prevent it" >&2;\\
+	  exit 1;\\
+	fi
 
 $(LIB_TARGET): $(LIB_OBJECTS) $(TARGET_OBJECTS)
 	$(RM) $(LIB_TARGET)
@@ -217,7 +227,10 @@ $(LIB_TARGET): $(LIB_OBJECTS) $(TARGET_OBJECTS)
 [ $DIRTYPE = 'Scripts' ] && cat >> $MAKEFILE <<%
 
 SOURCES=	$(SCRIPTS) $(FILES) $(SFILES) $(CONFIG_FILE)
-RUNS=		$(SCRIPTS) $(RFILES)
+INSTALL_FILE=	$(FILES)
+INSTALL_LIB=
+INSTALL_BIN=	$(SCRIPTS) $(RFILES)
+
 
 all: .runable
 
@@ -226,14 +239,8 @@ all: .runable
 	touch .runable
 
 check_install:
-	@echo ok
 
 .quick-install: .runable $(RFILES)
-	( cd $(INSTALL_EXE_DIR) ; $(RM) $(RUNS) )
-	cp $(RUNS) $(INSTALL_EXE_DIR)
-	( cd (INSTALL_FILE_DIR) ; $(RM) $(FILES) )
-	cp $(FILES) $(INSTALL_FILE_DIR)
-	touch .quick-install
 
 .INIT: $(MAKEFILE)
 
@@ -254,33 +261,13 @@ test: all
 	$(LINK) pips -lpips $(PIPS_LIBS)
 	@echo 
 
-WPIPS_DEVEDIR=$(DEVEDIR)/Passes/wpips
-
 wtest: all 
-	$(LINK) wpips -L$(OPENWINHOME)/lib -lwpips $(PIPS_LIBS)
+	$(LINK) wpips -static -L$(OPENWINHOME)/lib -lwpips $(PIPS_LIBS)	-lxview -lolgx -lX11
 	@echo 
 
 $(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
 	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS)
 	@echo 
-
-INSTALL_TARGETS= $(INC_TARGET) $(LIB_TARGET)
-
-check_install:
-	@if test \`echo *.a | wc -w\` -gt 1 ; \\
-	then \\
-	  echo "install failed: additional local libraries prevent it" >&2;\\
-	  exit 1;\\
-	fi
-
-# quick-install installs lib and so, so depends on these. FC
-# header installed only if different.
-# should avoid some recompilations if headers are not touched.
-.quick-install: $(INC_TARGET) $(LIB_TARGET)
-	@pips_install_file $(INC_TARGET) $(INSTALL_FILE_DIR)/$(INC_TARGET)
-	@pips_install_file $(LIB_TARGET) $(INSTALL_LIB_DIR)/$(LIB_TARGET) 
-	ranlib $(LIBDIR)/$(LIB_TARGET)
-	touch .quick-install
 
 $(LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
 	cp $(LIB_TARGET) $(LIBDIR)
@@ -310,23 +297,6 @@ INSTALL_TARGETS=	$(INC_TARGET) $(BIN_TARGET) $(LIB_TARGET)
 $(BIN_TARGET): $(INC_TARGET) $(LIB_TARGET)
 	$(LINK) $(BIN_TARGET) $(LIB_TARGET) $(TARGET_LIBS)
 
-check_install:
-	@touch _tmp_hack.a
-	@test \`echo *.a | wc -w\` -eq 1 || \\
-	{ \\
-	  echo "install failed: local libraries prevent it" >&2;\\
-	  $(RM) _tmp_hack.a ; \\
-	  exit 1;\\
-	}
-	@$(RM) _tmp_hack.a
-
-.quick-install: $(INSTALL_TARGETS) $(BINDIR)
-	@pips_install_file $(INC_TARGET) $(INSTALL_FILE_DIR)/$(INC_TARGET)
-	@pips_install_file $(LIB_TARGET) $(INSTALL_LIB_DIR)/$(LIB_TARGET)
-	ranlib $(INSTALL_LIB_DIR)/$(LIB_TARGET)
-	@pips_install_file $(BIN_TARGET) $(INSTALL_EXE_DIR)/$(BIN_TARGET)
-	touch .quick-install
-
 clean:
 	-$(RM) TAGS $(OBJECTS) $(BIN_TARGET) $(LIB_TARGET) \\
 		$(INC_TARGET) $(DERIVED_HEADERS) *.~[0-9]~
@@ -347,6 +317,12 @@ cat >> $MAKEFILE <<%
 $(TARGETDIR):
 	mkdir $(TARGETDIR)
 
+check_os:
+	@if test -n "$(PIPS_CHECK_OS)"; \\
+	then echo "Cannot run make under this OS release"; \\
+	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
+	fi
+
 # install installs sources, so depends on sources. FC
 # to insure the library is compiled before hand, a make is added.
 .install: $(SOURCES) 
@@ -360,6 +336,25 @@ $(TARGETDIR):
 	touch .install
 	$(MAKE) quick-install
 
+.quick-install: $(INSTALL_FILE) $(INSTALL_LIB) $(INSTALL_EXE)
+	[ "$(INSTALL_FILE)" ] && \\
+	{ \\
+	  ( cd $(INSTALL_FILE_DIR) ; $(RM) $(INSTALL_FILE) ) ;\\
+	  cp $(INSTALL_FILE) $(INSTALL_FILE_DIR) ;\\
+	}
+	[ "$(INSTALL_LIB)" ] && \\
+	{ \\
+	  ( cd $(INSTALL_LIB_DIR) ; $(RM) $(INSTALL_LIB) ) ;\\
+	  cp $(INSTALL_LIB) $(INSTALL_LIB_DIR) ;\\
+	  reanlib $(INSTALL_LIB) ;\\
+	}
+	[ "$(INSTALL_EXE)" ] && \\
+	{ \\
+	  ( cd $(INSTALL_EXE_DIR) ; $(RM) $(INSTALL_EXE) ) ;\\
+	  cp $(INSTALL_EXE) $(INSTALL_EXE_DIR) ;\\
+	}
+	touch .quick-install
+
 tar:
 	$(TAR) cf $(TARGET).tar $(SOURCES)
 	$(ZIP) $(TARGET).tar
@@ -368,7 +363,7 @@ install:  .install
 quick-install: .quick-install
 
 $MAKEFILE: $(CONFIG_FILE) $(UTILDIR)/pips-makemake
-	@pips-makemake $PIPSMAKEMAKE_OPTION
+	@pips-makemake
 
 %
 
