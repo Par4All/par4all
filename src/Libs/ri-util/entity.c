@@ -453,10 +453,10 @@ entity_basic_p(entity e, int basictag)
  */
 
 static string prefixes[] = {
-    COMMON_PREFIX,
-    BLOCKDATA_PREFIX,
+    "",
     MAIN_PREFIX,
-    ""
+    BLOCKDATA_PREFIX,
+    COMMON_PREFIX,
 };
 
 entity 
