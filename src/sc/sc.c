@@ -298,9 +298,9 @@ boolean sc_weak_consistent_p(Psysteme sc)
 					      
 
     if(weak_consistent) {
-	Pcontrainte eq = CONTRAINTE_UNDEFINED;
-	Pbase diagonale = BASE_UNDEFINED;
-	Pvecteur pv = VECTEUR_UNDEFINED;
+	Pcontrainte eq;
+	Pvecteur pv;
+	Pbase diagonale = BASE_NULLE;
 
 	for(eq = sc->egalites; eq!= NULL; eq=eq->succ) {
 	    for (pv = eq->vecteur;pv!= NULL;pv=pv->succ)
