@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/12 12:37:50 $, 
+# $Date: 1996/09/12 12:47:51 $, 
 #
 # (c) FC September 1996
 #
@@ -45,6 +45,7 @@ proc filldirlist { list dir } {
 #  - newdir: the incremental adjuntion to be appended
 #
 proc appenddir { dir newdir } {
+    if {$newdir == ""} { return $dir }
     if {$newdir != ".."} {
 	if {$dir != "/"} {
 	    return $dir/$newdir
