@@ -1,5 +1,5 @@
 c
-c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1994/12/22 17:01:13 $, )
+c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1994/12/23 08:40:36 $, )
 c version $Revision$
 c got on %D%, %T% 
 c
@@ -105,9 +105,10 @@ c
 c
       call hpfc_tdim(array, dim, template, tdim)
       last = (DIST(template, pdim, 2)
-     $     * (MYPOS(pdim, procs)-RANGEP(procs, pdim, 1)+1) - 1
+     $     * (n-RANGEP(procs, pdim, 1)+1) - 1
      $     + RANGET(template, tdim, 1)
      $     - ALIGN(array, tdim,  3)) / ALIGN(array, tdim, 2)
+      debug(`print *, procs, "[", pdim, "](", n,  ") last ", last')
       end
 c
 c computes the relative lid 
@@ -142,7 +143,7 @@ c
       integer nlb, nub, llb, pdim, procs, tdim, template
       integer glb, gub, glbd, gubd, p1, p2, last
 c
-      debug(`print *, "hpfc_shift array/dim: ", array, dim')
+      debug(`print *, "hpfc_shift array/dim/area: ", array, dim, lb, ub')
       call hpfc_tdim(array, dim, template, tdim)
       call hpfc_pdim(template, tdim, procs, pdim)
       call hpfc_loop_bounds(nlb, nub, llb, lb, ub, array, pdim)
@@ -198,7 +199,7 @@ define(`LIST_DECL_BOUNDS',`
 define(`LIST_SECTION',`
      $ rl$1, ru$1')dnl
 define(`LIST_NEW_SECTION',`
-     $ l($1), u($1)')dnl
+     $ l($1), u($1), 1')dnl
 define(`DO_LOOP',`
       do i$1 = l($1), u($1)')dnl
 define(`ENDDO_LOOP',`
@@ -262,7 +263,7 @@ c
       enddo
       do j=1, 2
          if (lid(j).eq.MYLID) then
-            debug(`print *, MYLID, "copying shift"')
+            debug(`print *, MYLID, " copying shift"')
 c
 c the SHIFT is local
 c         
@@ -272,7 +273,7 @@ REVERSE_REPLICATE(LEVEL,`DO_LOOP')
 SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
          else
             if (lid(j).gt.0) then
-               debug(`print *, MYLID, " sending shift"')
+               debug(`print *, MYLID, " sending shift to ", lid(j)')
 c
 c the SHIFT is to another processor
 c
@@ -300,7 +301,7 @@ c
 c
        do j=1, 2
           if (lid(j).gt.0.and.lid(j).ne.MYLID) then
-             debug(`print *, MYLID, " receiving shift"')
+             debug(`print *, MYLID, " receiving shift from ", lid(j)')
 c
 c the SHIFT is to another processor
 c
