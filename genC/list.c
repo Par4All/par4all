@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/03/08 14:43:40 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/03/13 15:05:56 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -498,6 +498,13 @@ list l ;
 	return( c ) ;
     }
     return( CAR( gen_nthcdr( n, l ))) ;
+}
+
+gen_chunk *gen_nthitem(n, l)
+int n;
+list l;
+{
+    return(CHUNK(CAR(gen_nthcdr(n, l))));
 }
 
 /* Sorts a list of gen_chunks in place, to avoid mallocs. 
