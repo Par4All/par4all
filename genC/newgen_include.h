@@ -89,11 +89,11 @@ extern gen_chunk *Read_chunk ;
 union domain {
   struct { /* EXTERNAL */
     int type ;
-    char *(*read)() ;
-    void (*write)() ;
-    void (*free)() ;
-    char *(*copy)() ;
-    int (*allocated_memory)();
+    void* (*read)(FILE*) ;
+    void (*write)(FILE*, void*) ;
+    void (*free)(void*) ;
+    void* (*copy)(void*) ;
+    int (*allocated_memory)(void*);
   } ex ;
   struct { /* BASIC */
     int type ;
