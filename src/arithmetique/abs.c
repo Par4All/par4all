@@ -3,7 +3,6 @@
 /*LINTLIBRARY*/
 
 #include <stdio.h>
-extern int fprintf();
 #include <values.h>
 #include <setjmp.h>
 
