@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/04/02 10:52:06 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/04/19 16:56:37 $, )
  * version $Revision$
  */
 
@@ -791,6 +791,43 @@ generate_io_collect_or_update(
     DEBUG_STAT(8, "Node", *psn);
 }
 
+/* add a local declaration for entity array on the host.
+ * if entity array is dynamic, then declaration based on the primary.
+ */
+static void 
+add_declaration_to_host_and_link(
+    entity array)
+{
+    entity primary, host_array;
+    storage s;
+    
+    if (dynamic_entity_p(array))
+    {
+	primary = load_primary_entity(array);
+	if (bound_new_host_p(primary)) /* already exists, just add the link */
+	{
+	    store_new_host_variable(load_new_host(primary), array);
+	    return;		
+	}
+    }
+    else 
+	primary = array;
+    
+    /* create the host entity
+     */
+    host_array = AddEntityToModule(primary, host_module);
+    store_new_host_variable(host_array, primary);
+    
+    if (primary!=array) /* second link if needed */
+	store_new_host_variable(host_array, array);
+
+    /* local, not passed as an argument
+     */
+    s = entity_storage(host_array);
+    if (storage_formal_p(s))
+	formal_offset(storage_formal(s)) = MAXINT;
+}
+
 /*   compile an io statement
  */
 void 
@@ -842,17 +879,7 @@ io_efficient_compile(
 	/* add array declaration on host if necessary
 	 */
 	if (array_distributed_p(array) && !bound_new_host_p(array))
-	{
-	    entity host_array = AddEntityToModule(array, host_module);
-	    storage s = entity_storage(host_array);
-	    store_new_host_variable(host_array, array);
-
-	    /* local, not passed as an argument
-	     */
-	    if (storage_formal_p(s))
-		formal_offset(storage_formal(s)) = MAXINT;
-
-	}
+	    add_declaration_to_host_and_link(array);
 	
 	/* collect data if necessary
 	 */
