@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1996/07/23 11:58:09 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1996/08/07 17:56:28 $, )
  * version $Revision$,
  */
 
@@ -410,9 +410,10 @@ string side;
 int dim;
 {
     char buffer[100]; /* ??? */
-    return strdup(sprintf(buffer, "%s_%s_%s%d",
-			  hpfc_main_entity_name(array),
-			  entity_local_name(array), side, dim));
+    sprintf(buffer, "%s_%s_%s%d",
+	    hpfc_main_entity_name(array),
+	    entity_local_name(array), side, dim);
+    return strdup(buffer);
 }
 
 entity 
