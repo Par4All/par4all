@@ -196,7 +196,7 @@ int ls;
 
     esv = make_entity(esv_name,
 		      type_undefined,	/* filled in the following */
-		      storage_undefined,	/* FI->LZ: certainly not ROM!!! */
+		      storage_undefined,	
 		      value_undefined ); /* filled in the following */
 
     /* generate the proper type; basic is preserved but the array is made
@@ -205,7 +205,6 @@ int ls;
     for( ; !ENDP(ldv); POP(ldv)) {
 	dimension d = DIMENSION(CAR(ldv));
 	int size = SizeOfDimension(d);
-
 	number_of_elements *= size;
     }
 
@@ -214,16 +213,17 @@ int ls;
 		       entity_name(esv), number_of_elements);
     }
 
-/* In two sprintf , -1 is added once seperately  by LZ
- * make_expression_1 takes the place of the make_expression_1
- * 12/11/91
- */
+     /* In two sprintf , -1 is added once seperately  by LZ
+      * make_expression_1 takes the place of the make_expression_1
+      * 12/11/91
+      */
     if(number_of_elements > 1) {
 	(void) sprintf(esvd_string,"%d", ls-1);
 	(void) strcpy(string_0,"0");
 	esvd1 = make_dimension(MakeIntegerConstantExpression(string_0),
 			       MakeIntegerConstantExpression(esvd_string));
 	(void) sprintf(esvd_string,"%d", (number_of_elements+ls*bn-1)/(ls*bn));
+	(void) strcpy(string_0,"0");
 	esvd2 = make_dimension(MakeIntegerConstantExpression(string_0),
 			       MakeIntegerConstantExpression(esvd_string));
 
