@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-util.c,v $ ($Date: 1994/06/03 14:14:47 $, ) version $Revision$,
+ * $RCSfile: io-util.c,v $ ($Date: 1994/09/01 15:48:07 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -66,7 +66,7 @@ entity proc;
 {
     int 
 	i=0,
-	procn = get_hpf_number(proc);
+	procn = load_entity_hpf_number(proc);
     expression /* ??? gonna be shared! */
 	proce = int_to_expression(procn);
     entity
@@ -261,7 +261,7 @@ entity proc;
 		make_call_expression
 		(cmp_lid,
 		 CONS(EXPRESSION, 
-		      int_to_expression(get_hpf_number(proc)),
+		      int_to_expression(load_entity_hpf_number(proc)),
 		      gen_nconc(hpfc_gen_n_vars_expr(get_ith_processor_dummy,
 						     ndim),
 				make_list_of_constant(0, 7-ndim))))));
