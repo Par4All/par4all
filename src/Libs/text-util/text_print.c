@@ -250,12 +250,12 @@ text t;
 string words_to_string(lw)
 cons *lw;
 {
-    static char buffer[1024];
+    static char buffer[2048];
 
     buffer[0] = '\0';
     MAPL(pw, {
 	string w = STRING(CAR(pw));
-	if (strlen(buffer)+strlen(w) > 1023) {
+	if (strlen(buffer)+strlen(w) > 2047) {
 	    fprintf(stderr, "[words_to_string] buffer too small\n");
 	    exit(1);
 	}
