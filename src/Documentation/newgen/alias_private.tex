@@ -1,0 +1,33 @@
+%%
+%% $Id$
+%%
+
+\documentclass{article}
+
+\usepackage{newgen_domain}
+
+\title{Alias Analysis}
+\author{Nga Nguyen}
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+\domain{import entity from "ri.newgen"}
+
+% These newgen data structure are used to propagate interprocedural alias
+% information. When a formal parameter is associated with a actual
+% variable by a certain call path, we assign the section and the offset of
+% the actual variable to the formal one. 
+
+% Lower and upper offsets are kept to give more information to the alias
+% check phase, but when the exact offset can be translated to the callee's
+% frame, we only keep this exact one. 
+
+% Call-site ordering is used to localize the call in the caller function. 
+
+\domain{call\_site = function:entity x ordering:int}
+\domain{alias_association = variable:entity x section:entity x lower\_offset:expression x upper\_offset:expression x call\_chain:call\_site*}
+\domain{alias\_associations = list:alias\_association*}
+
+\end{document}
