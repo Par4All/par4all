@@ -1209,6 +1209,28 @@ typing_function_RealDouble_to_RealDouble(call c, hash_table types)
     return copy_basic(b);    
 }
 static basic
+typing_function_RealDouble_to_Integer(call c, hash_table types)
+{
+    basic b;
+
+    entity function_called = call_function(c);
+
+    if(!arguments_are_RD(c, types))
+    {
+        // ERROR: Invalide of type
+        fprintf(stderr,"Intrinsic [%s]: Argument(s) is (are) not REAL ou DOUBLE\n", 
+		entity_name(function_called));
+	return make_basic_float(4); // Just for return a result
+    }
+    // Find the longest type amongs all arguments
+    b = basic_union_arguments(c, types);
+
+    // Typing all arguments to b if necessary
+    typing_arguments(c, types, b);
+
+    return make_basic_int(4);
+}
+static basic
 typing_function_RealDoubleComplex_to_RealDoubleComplex(call c, hash_table types)
 {
     basic b;
@@ -1341,46 +1363,217 @@ typing_no_value_intrinsic(call c, hash_table types)
 /********************************************************** SIMPLIFICATION DES EXPRESSIONS */
 /* Find the specific name from the specific argument
  */
-static string
-specific_name_of_intrinsic(string arg_int_name,
-			   string arg_real_name,
-			   string arg_double_name,
-			   string arg_complex_name,
-			   string arg_dcomplex_name,
-			   basic arg_basic)
-{
-    if (basic_int_p(arg_basic))
-	return arg_int_name;
-
-    if (basic_float_p(arg_basic) && basic_float(arg_basic) == 4)
-	return arg_real_name;
-    if (basic_float_p(arg_basic) && basic_float(arg_basic) == 8)
-	return arg_double_name;
-
-    if (basic_complex_p(arg_basic) && basic_complex(arg_basic) == 8)
-	return arg_complex_name;
-    if (basic_complex_p(arg_basic) && basic_complex(arg_basic) == 16)
-	return arg_dcomplex_name;
-
-    // ERROR
-    pips_internal_error("Unexpected basic: %s\n", basic_to_string(arg_basic));
-    return NULL;
-}
 
 typedef void (*switch_name_function)(call, hash_table);
 
+/***************************************************************************************** 
+ * Each intrinsic of name generic have a function for switching to the specific name
+ * correspondent with the argument
+ */
 static void
-switch_specific_sin(call c, hash_table types)
+switch_generic_to_specific(call c, hash_table types,
+			   string arg_int_name,
+			   string arg_real_name,
+			   string arg_double_name,
+			   string arg_complex_name,
+			   string arg_dcomplex_name)
 {
+    string specific_name = NULL;
     list args = call_arguments(c);
     basic arg_basic = GET_TYPE(types, EXPRESSION(CAR(args)));
-    string specific_name = specific_name_of_intrinsic(NULL,"SIN","DSIN", "CSIN", NULL, 
-						      arg_basic);
-    if(strcmp(specific_name, entity_local_name(call_function(c))) != 0)
+
+    if (basic_int_p(arg_basic))
+    {
+	specific_name = arg_int_name;
+    }
+    else if (basic_float_p(arg_basic) && basic_float(arg_basic) == 4)
+    {
+	specific_name = arg_real_name;
+    }
+    else if (basic_float_p(arg_basic) && basic_float(arg_basic) == 8)
+    {
+	specific_name = arg_double_name;
+    }
+    else if (basic_complex_p(arg_basic) && basic_complex(arg_basic) == 8)
+    {
+	specific_name = arg_complex_name;
+    }
+    else if (basic_complex_p(arg_basic) && basic_complex(arg_basic) == 16)
+    {
+	specific_name = arg_dcomplex_name;
+    }
+
+    // Modify the (function:entity) of the call c if necessary
+    // NOTE: If specific_name == NULL: Invalid argument or argument basic unknown
+    if(specific_name != NULL && 
+       strcmp(specific_name, entity_local_name(call_function(c))) != 0)
     {
 	call_function(c) = CreateIntrinsic(specific_name);
     }
 }
+
+// AINT
+static void
+switch_specific_aint(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "AINT", "DINT", NULL, NULL);
+}
+// ANINT
+static void
+switch_specific_anint(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "ANINT", "DNINT", NULL, NULL);
+}
+// NINT
+static void
+switch_specific_nint(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "NINT", "IDNINT", NULL, NULL);
+}
+// ABS
+static void
+switch_specific_abs(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       "IABS", "ABS", "DABS", "CABS", NULL);
+}
+// MOD
+static void
+switch_specific_mod(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       "MOD", "AMOD", "DMOD", NULL, NULL);
+}
+// SIGN
+static void
+switch_specific_sign(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       "ISIGN", "SIGN", "DSIGN", NULL, NULL);
+}
+// DIM
+static void
+switch_specific_dim(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       "IDIM", "DIM", "DDIM", NULL, NULL);
+}
+// MAX
+static void
+switch_specific_max(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       "MAX0", "AMAX1", "DMAX1", NULL, NULL);
+}
+// MIN
+static void
+switch_specific_min(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       "MIN0", "AMIN1", "DMIN1", NULL, NULL);
+}
+// SQRT
+static void
+switch_specific_sqrt(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "SQRT", "DSQRT", "CSQRT", NULL);
+}
+// EXP
+static void
+switch_specific_exp(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "EXP", "DEXP", "CEXP", NULL);
+}
+// LOG
+static void
+switch_specific_log(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "ALOG", "DLOG", "CLOG", NULL);
+}
+// LOG10
+static void
+switch_specific_log10(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "ALOG10", "DLOG10", NULL, NULL);
+}
+// SIN
+static void
+switch_specific_sin(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL,"SIN","DSIN", "CSIN", NULL);
+}
+// COS
+static void
+switch_specific_cos(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "COS", "DCOS", "CCOS", NULL);
+}
+// TAN
+static void
+switch_specific_tan(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "TAN", "DTAN", NULL, NULL);
+}
+// ASIN
+static void
+switch_specific_asin(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "ASIN", "DASIN", NULL, NULL);
+}
+// ACOS
+static void
+switch_specific_acos(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "ACOS", "DACOS", NULL, NULL);
+}
+// ATAN
+static void
+switch_specific_atan(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "ATAN", "DATAN", NULL, NULL);
+}
+// ATAN2
+static void
+switch_specific_atan2(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "ATAN2", "DATAN2", NULL, NULL);
+}
+// SINH
+static void
+switch_specific_sinh(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "SINH", "DSINH", NULL, NULL);
+}
+// COSH
+static void
+switch_specific_cosh(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "COSH", "DCOSH", NULL, NULL);
+}
+// TANH
+static void
+switch_specific_tanh(call c, hash_table types)
+{
+    switch_generic_to_specific(c, types,
+			       NULL, "TANH", "DTANH", NULL, NULL);
+}
+
 
 /*********************************************************************** INTRINSICS LIST */
 
@@ -1477,41 +1670,44 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
 
     {"ICHAR", 1, default_intrinsic_type, typing_function_char_to_int, 0},
     {"CHAR", 1, default_intrinsic_type, typing_function_int_to_char, 0},
-    {"AINT", 1, real_to_real_type, typing_function_real_to_real, 0},
+    {"AINT", 1, real_to_real_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_aint},
     {"DINT", 1, double_to_double_type, typing_function_double_to_double, 0},
-    {"ANINT", 1, real_to_real_type, typing_function_real_to_real, 0},
+    {"ANINT", 1, real_to_real_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_anint},
     {"DNINT", 1, double_to_double_type, typing_function_double_to_double, 0},
-    {"NINT", 1, real_to_integer_type, typing_function_real_to_int, 0},
+    {"NINT", 1, real_to_integer_type, 
+     typing_function_RealDouble_to_Integer, switch_specific_nint},
     {"IDNINT", 1, double_to_integer_type, typing_function_double_to_int, 0},
     {"IABS", 1, integer_to_integer_type, typing_function_int_to_int, 0},
     {"ABS", 1, real_to_real_type, 
-     typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal, 0},
+     typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal, switch_specific_abs},
     {"DABS", 1, double_to_double_type, typing_function_double_to_double, 0},
     {"CABS", 1, complex_to_real_type, typing_function_complex_to_real, 0},
     {"CDABS", 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
 
     {"MOD", 2, default_intrinsic_type, 
-     typing_function_IntegerRealDouble_to_IntegerRealDouble, 0},
+     typing_function_IntegerRealDouble_to_IntegerRealDouble, switch_specific_mod},
     {"AMOD", 2, real_to_real_type, typing_function_real_to_real, 0},
     {"DMOD", 2, double_to_double_type, typing_function_double_to_double, 0},
     {"ISIGN", 2, integer_to_integer_type, typing_function_int_to_int, 0},
     {"SIGN", 2, default_intrinsic_type, 
-     typing_function_IntegerRealDouble_to_IntegerRealDouble, 0},
+     typing_function_IntegerRealDouble_to_IntegerRealDouble, switch_specific_sign},
     {"DSIGN", 2, double_to_double_type, typing_function_double_to_double, 0},
     {"IDIM", 2, integer_to_integer_type, typing_function_int_to_int, 0},
     {"DIM", 2, default_intrinsic_type, 
-     typing_function_IntegerRealDouble_to_IntegerRealDouble, 0},
+     typing_function_IntegerRealDouble_to_IntegerRealDouble, switch_specific_dim},
     {"DDIM", 2, double_to_double_type, typing_function_double_to_double, 0},
     {"DPROD", 2, real_to_double_type, typing_function_real_to_double, 0},
     {"MAX", (INT_MAX), default_intrinsic_type, 
-     typing_function_IntegerRealDouble_to_IntegerRealDouble, 0},
+     typing_function_IntegerRealDouble_to_IntegerRealDouble, switch_specific_max},
     {"MAX0", (INT_MAX), integer_to_integer_type, typing_function_int_to_int, 0},
     {"AMAX1", (INT_MAX), real_to_real_type, typing_function_real_to_real, 0},
     {"DMAX1", (INT_MAX), double_to_double_type, typing_function_double_to_double, 0},
     {"AMAX0", (INT_MAX), integer_to_real_type, typing_function_int_to_real, 0},
     {"MAX1", (INT_MAX), real_to_integer_type, typing_function_real_to_int, 0},
     {"MIN", (INT_MAX), default_intrinsic_type, 
-     typing_function_IntegerRealDouble_to_IntegerRealDouble, 0},
+     typing_function_IntegerRealDouble_to_IntegerRealDouble, switch_specific_min},
     {"MIN0", (INT_MAX), integer_to_integer_type, typing_function_int_to_int, 0},
     {"AMIN1", (INT_MAX), real_to_real_type, typing_function_real_to_real, 0},
     {"DMIN1", (INT_MAX), double_to_double_type, typing_function_double_to_double, 0},
@@ -1524,20 +1720,21 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"CONJG", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
     {"DCONJG", 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
     {"SQRT", 1, default_intrinsic_type, 
-     typing_function_RealDoubleComplex_to_RealDoubleComplex, 0},
+     typing_function_RealDoubleComplex_to_RealDoubleComplex, switch_specific_sqrt},
     {"DSQRT", 1, double_to_double_type, typing_function_double_to_double, 0},
     {"CSQRT", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
 
     {"EXP", 1, default_intrinsic_type, 
-     typing_function_RealDoubleComplex_to_RealDoubleComplex, 0},
+     typing_function_RealDoubleComplex_to_RealDoubleComplex, switch_specific_exp},
     {"DEXP", 1, double_to_double_type, typing_function_double_to_double, 0},
     {"CEXP", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
     {"LOG", 1, default_intrinsic_type, 
-     typing_function_RealDoubleComplex_to_RealDoubleComplex, 0},
+     typing_function_RealDoubleComplex_to_RealDoubleComplex, switch_specific_log},
     {"ALOG", 1, real_to_real_type, typing_function_real_to_real, 0},
     {"DLOG", 1, double_to_double_type, typing_function_double_to_double, 0},
     {"CLOG", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-    {"LOG10", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble, 0},
+    {"LOG10", 1, default_intrinsic_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_log10},
     {"ALOG10", 1, real_to_real_type, typing_function_real_to_real, 0},
     {"DLOG10", 1, double_to_double_type, typing_function_double_to_double, 0},
     {"SIN", 1, default_intrinsic_type, 
@@ -1545,24 +1742,32 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {"DSIN", 1, double_to_double_type, typing_function_double_to_double, 0},
     {"CSIN", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
     {"COS", 1, default_intrinsic_type, 
-     typing_function_RealDoubleComplex_to_RealDoubleComplex, 0},
+     typing_function_RealDoubleComplex_to_RealDoubleComplex, switch_specific_cos},
     {"DCOS", 1, double_to_double_type, typing_function_double_to_double, 0},
     {"CCOS", 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
-    {"TAN", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble, 0},
+    {"TAN", 1, default_intrinsic_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_tan},
     {"DTAN", 1, double_to_double_type, typing_function_double_to_double, 0},
-    {"ASIN", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble, 0},
+    {"ASIN", 1, default_intrinsic_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_asin},
     {"DASIN", 1, double_to_double_type, typing_function_double_to_double, 0},
-    {"ACOS", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble, 0},
+    {"ACOS", 1, default_intrinsic_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_acos},
     {"DACOS", 1, double_to_double_type, typing_function_double_to_double, 0},
-    {"ATAN", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble, 0},
+    {"ATAN", 1, default_intrinsic_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_atan},
     {"DATAN", 1, double_to_double_type, typing_function_double_to_double, 0},
-    {"ATAN2", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble, 0},
+    {"ATAN2", 1, default_intrinsic_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_atan2},
     {"DATAN2", 1, double_to_double_type, typing_function_double_to_double, 0},
-    {"SINH", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble, 0},
+    {"SINH", 1, default_intrinsic_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_sinh},
     {"DSINH", 1, double_to_double_type, typing_function_double_to_double, 0},
-    {"COSH", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble, 0},
+    {"COSH", 1, default_intrinsic_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_cosh},
     {"DCOSH", 1, double_to_double_type, typing_function_double_to_double, 0},
-    {"TANH", 1, default_intrinsic_type, typing_function_RealDouble_to_RealDouble, 0},
+    {"TANH", 1, default_intrinsic_type, 
+     typing_function_RealDouble_to_RealDouble, switch_specific_tanh},
     {"DTANH", 1, double_to_double_type, typing_function_double_to_double, 0},
 
     {"LGE", 2, character_to_logical_type, typing_function_char_to_logical, 0},
@@ -1583,6 +1788,10 @@ multiply-add operators ( JZ - sept 98) */
     {NULL, 0, 0, 0, 0}
 };
 
+/***************************************************************************************** 
+ * Get the function for typing the specified intrinsic
+ *
+ */
 typing_function_t get_typing_function_for_intrinsic(string name)
 {
     static hash_table name_to_type_function = NULL;
@@ -1607,6 +1816,10 @@ typing_function_t get_typing_function_for_intrinsic(string name)
     
     return (typing_function_t) hash_get(name_to_type_function, name);
 }
+/***************************************************************************************** 
+ * Get the function for switching to specific name from generic name 
+ *
+ */
 switch_name_function get_switch_name_function_for_intrinsic(string name)
 {
     static hash_table name_to_switch_function = NULL;
