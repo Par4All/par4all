@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/08/10 13:30:45 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/08/10 17:02:50 $, )
  * version $Revision$
  */
  
@@ -447,6 +447,8 @@ void hpfc_close(string name)
     close_hpfc_status();
     db_unput_resources(DBR_HPFC_STATUS);            /* destroy hpfc status */
 
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_COMMONS, strdup(name), NO_FILE); /* fake */
+
     debug_off();
 }
 
@@ -468,7 +470,8 @@ void hpfc_install(string name)
     debug_on("HPFC_DEBUG_LEVEL");
     pips_debug(1, "considering program %s\n", name);
 
-    system(concatenate("$HPFC_TOOLS/hpfc_install -iob ", dir, NULL));
+    system(concatenate("$HPFC_TOOLS/hpfc_install -iob ", dir, 
+		       " -n ", name, NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, strdup(name), NO_FILE);
 
