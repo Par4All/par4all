@@ -4,7 +4,7 @@
 
 #include "local.h"
 
-extern current_module_entity;
+extern entity current_module_entity;
 
 /* This function checks if conflict c between vertices v1 and v2 should
 be ignored at level l. 
@@ -40,6 +40,7 @@ int l;
 	return(FALSE);
     }
 
+
     for (i = 1; i < l-enclosing; i++) {
 	if( !ENDP(loops1)) {
 	    loops1 = CDR(loops1);
@@ -53,10 +54,10 @@ int l;
 	fprintf(stderr, "\n[ignore_this_conflict] verifing the following conflit at level %d: \n",l);
 	fprintf(stderr, "\t%02d --> %02d ", statement_number(s1), statement_number(s2));
 	fprintf(stderr, "\t\tfrom ");
-	print_words(stderr, words_effect(conflict_source(c)));
+	print_words(stderr, (list) words_effect(conflict_source(c)));
 
 	fprintf(stderr, " to ");
-	print_words(stderr, words_effect(conflict_sink(c)));
+	print_words(stderr,  (list) words_effect(conflict_sink(c)));
 	fprintf(stderr, "\n");
     }
 
@@ -161,9 +162,9 @@ int level;
 					fprintf(stderr, "\t%02d --> %02d ", 
 						statement_number(s1), statement_number(s2));
 					fprintf(stderr, "\t\tfrom ");
-					print_words(stderr, words_effect(conflict_source(c)));
+					print_words(stderr, (list) words_effect(conflict_source(c)));
 					fprintf(stderr, " to ");
-					print_words(stderr, words_effect(conflict_sink(c)));
+					print_words(stderr,  (list) words_effect(conflict_sink(c)));
 					fprintf(stderr, "\n");
 				    }
 				    return(TRUE);
@@ -250,8 +251,37 @@ bool task_parallelize_p;
     return(s);
 }
 
+int statement_imbrication_level(statement st)
+{
+    list loops = load_statement_enclosing_loops(st);
+    return(gen_length(loops));
+}
 
+statement MakeNestOfStatementList(int l, int nbl,list *lst, list loops, list * block, 
+			 list * eblock, bool task_parallelize_p)
+{
+    statement stat = statement_undefined;
+    statement rst = statement_undefined;
+    extern int enclosing;
+   
+    debug_on("RICE_DEBUG_LEVEL");
+  
+    if (*lst !=NIL && nbl) {
+	if (gen_length(*lst)== 1)  
+	    rst = (STATEMENT(CAR(*lst))); 
+	else rst = make_block_statement(*lst);
+	if (nbl>=l-1)
+	    stat = MakeNestOfParallelLoops(l-1-enclosing,loops,rst, 
+					   task_parallelize_p);
+	else stat=rst;
+	*lst=NIL;
+	INSERT_AT_END(*block, *eblock, CONS(STATEMENT, stat, NIL));
+    }
 
+		
+    debug_off();
+    return(stat);
+}
 
 /* this function implements Kennedy's algorithm. */
 /* bb: task_parallelize_p is TRUE when we want to parallelize the loop, 
@@ -263,15 +293,15 @@ int l;
 bool task_parallelize_p;
 {
     list lst =NIL;
-    list loops = NIL; 
     cons *lsccs, *ps;
+    list loops=NIL;
+   
     cons *block = NIL, *eblock = NIL;
-    statement stat = statement_undefined;
+    statement stat = statement_undefined; 
     statement statb = statement_undefined;
     statement rst = statement_undefined;
-    int nbl = 0;
-    extern int enclosing;
-
+    int nbl =0;
+    
    debug_on("RICE_DEBUG_LEVEL");
 
     debug(9, "CodeGenerate", "Begin: starting at level %d ...\n", l); 
@@ -285,12 +315,19 @@ bool task_parallelize_p;
     for (ps = lsccs; ps != NULL; ps = CDR(ps)) {
 	scc s = SCC(CAR(ps));
 	stat = statement_undefined;
-	
-	if (get_bool_property("PARTIAL_DISTRIBUTION")) {
-	    /* statements that are independent are gathered 
-	       into the same doall loop */
-	    if (! strongly_connected_p(s, l)) {
-		set inner_region = scc_region(s);
+	if ( strongly_connected_p(s, l))  
+	    stat = ConnectedStatements(g, s, l, task_parallelize_p);
+	else {
+	    if (!get_bool_property("PARTIAL_DISTRIBUTION")) 
+		/* if s contains a single vertex and if this vertex is not 
+		   dependent upon itself, we generate a doall loop for it */
+		stat = IsolatedStatement(s, l, task_parallelize_p);
+	    else {
+		/* statements that are independent are gathered 
+		   into the same doall loop */
+		stat = IsolatedStatement(s, l, task_parallelize_p);
+		
+		/* set inner_region = scc_region(s);
 		if (contains_level_l_dependence(s,inner_region,l)) {
 		    stat = IsolatedStatement(s, l, task_parallelize_p);
 		    debug(9, "CodeGenerate", 
@@ -301,92 +338,53 @@ bool task_parallelize_p;
 		    vertex v = VERTEX(CAR(scc_vertices(s)));
 		    statement st = vertex_to_statement(v); 
 		    instruction sbody = statement_instruction(st);
-		    if (instruction_call_p(sbody) &&  
-			(strcmp(entity_local_name(call_function(instruction_call(sbody))), 
-				"CONTINUE") != 0))  { 
-			ifdebug(9) {
-			    debug(9,"CodeGenerate",
-				  "isolated comp. that does not contain"
-				  " dep.at Lev %d\n",
-					   l);
-			    print_statement(st);
+		    nbl = statement_imbrication_level(st);
+		    if (instruction_call_p(sbody) 
+			&& !instruction_continue_p(sbody))
+			if (nbl>=l-1)
+			    stat=IsolatedStatement(s, l, task_parallelize_p);
+			else { 
+			    loops = load_statement_enclosing_loops(st);
+			    lst = gen_nconc(lst, CONS(STATEMENT, st, NIL));
 			}
-			lst = gen_nconc(lst, CONS(STATEMENT, st, NIL));
-			loops = load_statement_enclosing_loops(st);
-			nbl =gen_length(loops);
-		    }
 		}
+		*/
 	    }
-	    else stat = ConnectedStatements(g, s, l, task_parallelize_p);
 	}
-	else {
-	    /* if s contains a single vertex and if this vertex is not 
-	       dependent upon itself, we generate a doall loop for it */
-	    if (! strongly_connected_p(s, l)) 
-		stat = IsolatedStatement(s, l, task_parallelize_p);
-	    else stat = ConnectedStatements(g, s, l, task_parallelize_p);
-	}
-	if (stat != statement_undefined) {
-	    /* In order to preserve the dependences, statements that have 
+	 
+	/* In order to preserve the dependences, statements that have 
 	       been collected should be generated before the isolated statement 
-	       that has just been detected */
-	    if (nbl) { 
-		if (nbl>=l) {
-		    if (gen_length(lst)== 1)  rst = (STATEMENT(CAR(lst)));
-		    else rst = make_block_statement(lst);
-		    statb = MakeNestOfParallelLoops(l-1-enclosing,loops,rst, 
-						    task_parallelize_p);
-		    INSERT_AT_END(block, eblock, CONS(STATEMENT, statb, NIL));
-		}
-		else  eblock =  block =  lst; 
-		nbl = 0; 
-	    }
-	    INSERT_AT_END(block, eblock, CONS(STATEMENT, stat, NIL));
+	    that has just been detected */
+	
+	if (stat != statement_undefined) {
 	    ifdebug(9) {
 		debug(9, "CodeGenerate", "generated statement:\n") ;
 		print_statement(stat);
+		
 	    }
+	    statb= MakeNestOfStatementList(l,nbl,&lst, loops, &block,&eblock,task_parallelize_p);
+	    INSERT_AT_END(block, eblock, CONS(STATEMENT, stat, NIL));
 	}
     }
-       
-    if (nbl) {  
-	if (nbl>=l) { 
-	    if (gen_length(lst)== 1)
-		rst = (STATEMENT(CAR(lst)));
-	    else 
-		rst = make_block_statement(lst);
-	    statb = MakeNestOfParallelLoops(l-1-enclosing, 
-					    loops, 
-					    rst, 
-					    task_parallelize_p);
-	    INSERT_AT_END(block, eblock, CONS(STATEMENT, statb, NIL));
-	}
-	else
-	    eblock = block = lst;
-	nbl = 0;
-    }
-
+    
+    statb =MakeNestOfStatementList(l,nbl,&lst, loops,&block,&eblock,task_parallelize_p); 
+   
     switch(gen_length(block)) {
     case 0:
-      rst = statement_undefined ;
-      break;
-    case 1:
-      rst = STATEMENT(CAR(block));
-      gen_free_list(block);
-      break;
+	rst = statement_undefined ;
+	break;
     default:
-      rst = make_block_statement(block);
+	rst = make_block_statement(block);
     }
-
+    
     ifdebug(8) { 
 	debug(8, "CodeGenerate", "Result:\n") ;
-
+	
 	if (rst==statement_undefined)  
 	    debug(8, "CodeGenerate", "No code to generate\n") ;
 	else
 	  print_statement(rst);
-
-	debug(8, "CodeGenerate", "Result:\n") ;
+	
     }
     debug_off();
     return(rst);
@@ -410,8 +408,7 @@ statement body;
     statement new_loop_s;
     list new_locals = NewLoopLocals(body, loop_locals(old_loop));
     instruction ibody = statement_instruction(body);  
-    entity module = get_current_module_entity();
-    char * module_name = entity_module_name(module);
+
 
     if (instruction_loop_p(ibody))
 	body = make_block_statement(CONS(STATEMENT,body,NIL));
@@ -419,41 +416,23 @@ statement body;
   
     if (rice_distribute_only)
 	seq_or_par = is_execution_sequential;
-
-    if (get_bool_property("PARTIAL_DISTRIBUTION")) {
-	entity looplabel =   make_new_label(module_name);
-	statement cs = make_continue_statement(looplabel);
-	if(instruction_block_p(ibody))
-	    (void) gen_nconc(instruction_block(ibody),
-			     CONS(STATEMENT, cs, NIL));
-	else {
-	    body = make_block_statement(CONS(STATEMENT, body,
-					     CONS(STATEMENT, cs, NIL)));
-	}
-	new_loop = make_loop(loop_index(old_loop), 
-			    loop_range(old_loop),
-			    body,
-			    looplabel, 
-			    make_execution(seq_or_par, UU), 
-			    new_locals);
-    }
-    else {  
-	new_loop = make_loop(loop_index(old_loop), 
-			     loop_range(old_loop), 
-			     body,
-			     entity_empty_label(),
-			     make_execution(seq_or_par, UU), 
-			     new_locals);
-    }
-   
+    
+    
+    new_loop = make_loop(loop_index(old_loop), 
+			 loop_range(old_loop), 
+			 body,
+			 entity_empty_label(),
+			 make_execution(seq_or_par, UU), 
+			 new_locals);
+    
     new_loop_s = make_statement(entity_empty_label(), 
-			  statement_number(old_loop_statement),
-			  STATEMENT_ORDERING_UNDEFINED,
-			  string_undefined,
-			  make_instruction(is_instruction_loop, new_loop));
-
+				statement_number(old_loop_statement),
+				STATEMENT_ORDERING_UNDEFINED,
+				string_undefined,
+				make_instruction(is_instruction_loop, new_loop));
+    
     ifdebug(8) {
-      debug(8, "MakeLoopAs", "New loop\n");
+	debug(8, "MakeLoopAs", "New loop\n");
       print_statement(new_loop_s);
     }
     
