@@ -278,7 +278,7 @@ transformer precond;
 list effects_list;
 {
     complexity comp = make_zero_complexity();
-
+    extern int default_is_inferior_pvarval(Pvecteur *, Pvecteur *);
     int block_length = gen_length( block );
     int i;
 
@@ -311,7 +311,7 @@ list effects_list;
 	    complexity_add(&comp, ctemp);
 	    
 	    pb = vect_dup(polynome_used_var(complexity_polynome(comp), 
-					    default_is_inferior_var));
+					    default_is_inferior_pvarval));
 	    
 	    for ( ; !VECTEUR_NUL_P(pb); pb = pb->succ) {
 		boolean mustbewritten;
