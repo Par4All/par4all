@@ -1,5 +1,5 @@
-/* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/09/26 13:53:20 $, 
+/*
+ * $Id$
  */
 
 #include <unistd.h>
@@ -15,25 +15,25 @@
 #include <math.h>
 
 /* Some silly AIX stuff: */
-#ifndef _AIX
-#include <alloca.h>
-#else
+#if defined(_AIX)
 #define _NO_PROTO
 /* signal definition is wrong: void (*signal(int, void (*)(int)))(int) */
+#else
+#include <alloca.h>
 #endif
+
 #include <signal.h>
 
 #include "gr.h"
 #include "xpomp_graphic.h"
 
 static int is_shm = 0;
-int _NO_PROC;
-int pc_depth[20] = {0};
+static int pc_depth[20] = {0};
 static int pc_no_graphic = 0;
 static char *display_name = 0;
 
 static struct sh_header *sh_h[20];
-int _NO_PROC;
+static int _NO_PROC;
 static int fildeftab[] = {
 	0,0,0,0,0,
 	0,0,0,0,0,
@@ -85,17 +85,20 @@ identify_wm()
 }
 
 
-#ifndef _AIX
+#if defined(_AIX)
+static void
+sigusr2(int sig,
+        int code,
+        struct sigcontext * scp)
+#elif defined(__linux)
+static void
+sigusr2(int sig)
+#else
 static void
 sigusr2(int sig,
         int code,
         struct sigcontext * scp,
         char * addr)
-#else
-static void
-sigusr2(int sig,
-        int code,
-        struct sigcontext * scp)
 #endif
 {
 }
