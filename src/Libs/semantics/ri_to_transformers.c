@@ -478,16 +478,38 @@ cons * ef; /* effects of t */
 	expression e = test_condition(t);
 	transformer tftwc;
 	transformer tffwc;
+	list ta = NIL;
+	list fa = NIL;
 
 	tftwc = transformer_dup(statement_to_transformer(st));
 	tffwc = transformer_dup(statement_to_transformer(sf));
 
-	tftwc = transformer_add_condition_information(tftwc,e,TRUE);
-	tffwc = transformer_add_condition_information(tffwc,e,FALSE);
+	/* Look for variables modified in one branch only */
+	ta = arguments_difference(transformer_arguments(tftwc),
+				  transformer_arguments(tffwc));
+	fa = arguments_difference(transformer_arguments(tffwc),
+				  transformer_arguments(tftwc));
+
+	MAPL(ca, {
+	    entity v = ENTITY(CAR(ca));
+
+	    tffwc = transformer_add_identity(tffwc, v);
+	}, ta);
+
+	MAPL(ca, {
+	    entity v = ENTITY(CAR(ca));
+
+	    tftwc = transformer_add_identity(tftwc, v);
+	}, fa);
+
+	tftwc = transformer_add_condition_information(tftwc, e, TRUE);
+	tffwc = transformer_add_condition_information(tffwc, e, FALSE);
 
 	tf = transformer_convex_hull(tftwc, tffwc);
 	transformer_free(tftwc);
 	transformer_free(tffwc);
+	free_arguments(ta);
+	free_arguments(fa);
     }
     else {
 	(void) statement_to_transformer(st);
@@ -499,7 +521,8 @@ cons * ef; /* effects of t */
     return tf;
 }
 
-transformer call_to_transformer(c, ef)
+transformer 
+call_to_transformer(c, ef)
 call c;
 cons * ef; /* effects of call c */
 {
@@ -1096,7 +1119,22 @@ list ef;
     return t_caller;
 }
 
-transformer modulo_to_transformer(e, expr)
+transformer
+transformer_add_identity(transformer tf, entity v)
+{
+    entity v_new = entity_to_new_value(v);
+    entity v_old = entity_to_old_value(v);
+    Pvecteur eq = vect_new((Variable) v_new, (Value) 1);
+
+    vect_add_elem(&eq, (Variable) v_old, (Value) -1);
+    tf = transformer_equality_add(tf, eq);
+    transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), v_new);
+
+    return tf;
+}
+
+transformer 
+modulo_to_transformer(e, expr)
 entity e;
 expression expr;
 {
