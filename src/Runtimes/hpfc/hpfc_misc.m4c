@@ -2,16 +2,8 @@
  * called from a Fortran subroutine. Plus some timer functions.
  * Portability based on pvm m4 macros.
  *
- * Problems when gcc/g77 used, the PVM macros are not okay...
- * two underscores instead of one should be added to the name
- * if there is an underscore in it....
- *
-_GNU(define(`FUNCTION',`$1__'))dnl
- *
- * also include functions for timings...
- *
  * $RCSfile: hpfc_misc.m4c,v $ version $Revision$
- * ($Date: 1995/12/01 11:52:47 $, )
+ * ($Date: 1996/09/07 16:56:17 $, )
  *
  * Fabien Coelho, 1993-1994-1995
  */
@@ -76,7 +68,7 @@ which_task(
  * Prints the hosts that compose the Parallel Virtual Machine.
  */
 void 
-FUNCTION(print_host_info) ARGS(`')
+FUNCTION(printhostinfo) ARGS(`')
 {
     int i, info, nhost, narch;
     struct pvmhostinfo *hostp;
@@ -100,7 +92,7 @@ FUNCTION(print_host_info) ARGS(`')
  * Called the the host. Prints the tasks and the machine they are running on.
  */
 void 
-FUNCTION(print_task_info) ARGS(`number, tids, hosttid')
+FUNCTION(printtaskinfo) ARGS(`number, tids, hosttid')
 int *number, *tids, *hosttid;
 {
     int i, info, nhost, narch, ntask;
@@ -155,7 +147,7 @@ static int timer_index=0;
 
 
 void
-FUNCTION(hpfc_timeon) ARGS(`')
+FUNCTION(hpfctimeon) ARGS(`')
 {
     assert(timer_index<TIMER_STACK_SIZE);
 
@@ -190,7 +182,7 @@ print_micros(long micros)
 #define MAX_COMMENT_LENGTH 63
 
 void 
-FUNCTION(hpfc_timeoff) ARGS(`STRING_ARG(comment)')
+FUNCTION(hpfctimeoff) ARGS(`STRING_ARG(comment)')
 STRING_ARG_DECL(comment);
 {
     char buffer[ MAX_COMMENT_LENGTH + 1 ];
