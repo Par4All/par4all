@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 2003/08/02 13:40:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2003/08/06 14:15:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2003/08/02 13:40:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2003/08/06 14:15:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -31,6 +31,9 @@ char vcid_control_control[] = "%A% ($Date: 2003/08/02 13:40:05 $, ) version $Rev
  * $Id$
  *
  * $Log: control.c,v $
+ * Revision 1.39  2003/08/06 14:15:55  nguyen
+ * Modify and add functions for C
+ *
  * Revision 1.38  2003/08/02 13:40:05  irigoin
  * Cosmetic changes to silence gcc
  *
@@ -69,6 +72,8 @@ char vcid_control_control[] = "%A% ($Date: 2003/08/02 13:40:05 $, ) version $Rev
 
 #include "constants.h"
 
+#include "c_syntax.h"
+
 #define LABEL_TABLES_SIZE 10
  
 /* UNREACHABLE is the hook used as a predecessor of statements that are  
@@ -88,7 +93,7 @@ static hash_table Label_statements;
 static hash_table Label_control;	
 
 
-#define MAKE_CONTINUE_STATEMENT() make_continue_statement(entity_undefined) 
+#define MAKE_CONTINUE_STATEMENT() get_bool_property("PRETTYPRINT_C_CODE")?MakeNullStatement(entity_empty_label()):make_continue_statement(entity_undefined) 
 
 
 
@@ -380,7 +385,7 @@ bool controlize(
 	break;
     case is_instruction_goto: {
 	string name = entity_name(statement_label(instruction_goto(i)));
-        statement nop = make_continue_statement(statement_label(st));
+        statement nop = get_bool_property("PRETTYPRINT_C_CODE")?MakeNullStatement(statement_label(st)):make_continue_statement(statement_label(st));
 
         statement_number(nop) = statement_number(st);
         statement_comments(nop) = statement_comments(st);
@@ -415,16 +420,11 @@ bool controlize(
 				      pred, succ, c_res, used_labels);
 	break;
     case is_instruction_forloop:
-      /* NN : Don't know what to do.
-	 Just to make controlizer pass for these kinds of statements*/
       controlized = controlize_forloop(st, instruction_forloop(i), 
 				       pred, succ, c_res, used_labels);
       break;
     case is_instruction_return:
       controlized =  TRUE;
-      break;
-    case is_instruction_multitest:
-      controlized = TRUE;
       break;
     default:
 	pips_error("controlize", 
@@ -519,11 +519,14 @@ statement loop_test(statement sl)
   else 
     lab = label_local_name(loop_label(l));
 
-  cs = strdup(concatenate(prev_comm,
-			  "C     DO loop ",
-			  lab,
-			  " with exit had to be desugared\n",
-			  NULL));
+  if (get_bool_property("PRETTYPRINT_C_CODE"))
+    cs = prev_comm;
+  else 
+    cs = strdup(concatenate(prev_comm,
+			    "C     DO loop ",
+			    lab,
+			    " with exit had to be desugared\n",
+			    NULL));
 
   ts = make_statement(entity_empty_label(), 
 		      statement_number(sl),
@@ -632,7 +635,7 @@ statement whileloop_test(statement sl)
     whileloop l = instruction_whileloop(statement_instruction(sl));
     statement ts = statement_undefined;
     string cs = string_undefined;
-    call c = make_call(entity_intrinsic(".NOT."),
+    call c = make_call(entity_intrinsic(get_bool_property("PRETTYPRINT_C_CODE")?"!":".NOT."),
 		       CONS(EXPRESSION,
 			    copy_expression(whileloop_condition(l)),
 			    NIL));
@@ -644,21 +647,26 @@ statement whileloop_test(statement sl)
     /* string prev_comm = empty_comments_p(csl)? "" : strdup(csl); */
     string prev_comm = empty_comments_p(csl)? strdup("") : strdup(csl);
 
-    if(entity_empty_label_p(whileloop_label(l))) {
-      cs = strdup(concatenate(prev_comm,
-			      "C     DO WHILE loop ",
-			      "with GO TO exit had to be desugared\n",
-			      NULL));
-    }
-    else {
-      string lab = label_local_name(whileloop_label(l));
-      cs = strdup(concatenate(prev_comm,
-			      "C     DO WHILE loop ",
-			      lab,
-			      " with GO TO exit had to be desugared\n",
-			      NULL));
-    }
-
+    if (get_bool_property("PRETTYPRINT_C_CODE"))
+      cs = prev_comm;
+    else 
+      {
+	if(entity_empty_label_p(whileloop_label(l))) { 
+	  cs = strdup(concatenate(prev_comm,
+				  "C     DO WHILE loop ",
+				  "with GO TO exit had to be desugared\n",
+				  NULL));
+	}
+	else {
+	  string lab = label_local_name(whileloop_label(l));
+	  cs = strdup(concatenate(prev_comm,
+				  "C     DO WHILE loop ",
+				  lab,
+				  " with GO TO exit had to be desugared\n",
+				  NULL));
+	}
+      }
+    
     ts = make_statement(entity_empty_label(), 
 			statement_number(sl),
 			STATEMENT_ORDERING_UNDEFINED,
@@ -674,6 +682,8 @@ statement whileloop_test(statement sl)
  *
  * Derived by FI from controlize_loop()
  */
+
+/* NN : What about other kind of whileloop, evaluation = after ?  */
 
 bool controlize_whileloop(st, l, pred, succ, c_res, used_labels)
 statement st;
@@ -761,38 +771,36 @@ hash_table used_labels;
     
     controlize(forloop_body(l), c_res, c_res, c_body, loop_used_labels);
 
-    if(covers_labels_p(forloop_body(l),loop_used_labels)) {
+    if (covers_labels_p(forloop_body(l),loop_used_labels)) {
       forloop new_l = make_forloop(forloop_initialization(l),
 				   forloop_condition(l),
 				   forloop_increment(l),
 				   control_statement(c_body));
-	
-	/* The edges between c_res and c_body, created by the above call to 
-	 * controlize are useless. The edge succ
-	 * from c_res to c_body is erased by the UPDATE_CONTROL macro.
-	 */
-	gen_remove(&control_successors(c_body), c_res);
-	gen_remove(&control_predecessors(c_body), c_res);
-	gen_remove(&control_predecessors(c_res), c_body);
-
-	UPDATE_CONTROL(c_res,
-		       make_statement(statement_label(st),
-				      statement_number(st),
-				      STATEMENT_ORDERING_UNDEFINED,
-				      statement_comments(st),
-				      make_instruction(is_instruction_forloop, 
-						       new_l),NIL,NULL),
-		       ADD_PRED(pred, c_res),
-		       ADD_SUCC(succ, c_res )) ;
-	controlized = FALSE;
+      
+      gen_remove(&control_successors(c_body), c_res);
+      gen_remove(&control_predecessors(c_body), c_res);
+      gen_remove(&control_predecessors(c_res), c_body);
+      
+      UPDATE_CONTROL(c_res,
+		     make_statement(statement_label(st),
+				    statement_number(st),
+				    STATEMENT_ORDERING_UNDEFINED,
+				    statement_comments(st),
+				    make_instruction(is_instruction_forloop, 
+						     new_l),NIL,NULL),
+		     ADD_PRED(pred, c_res),
+		     ADD_SUCC(succ, c_res )) ;
+      controlized = FALSE;
     }
     else 
-      pips_internal_error("Forloop with goto not implemented yet\n");
-    
+      {
+	/* NN : I do not know how to deal with this */
+	pips_internal_error("Forloop with goto not implemented yet\n");
+      }
     control_predecessors(succ) = ADD_PRED(c_res, succ);
     add_proper_successor_to_predecessor(pred, c_res);
     /* control_successors(pred) = ADD_SUCC(c_res, pred); */
-
+    
     ifdebug(5) check_control_coherency(c_res);
 
     union_used_labels( used_labels, loop_used_labels);
@@ -1231,8 +1239,7 @@ statement st;
 	    hash_put(Label_statements, name, (char *) sts);
 
 	if (! hash_defined_p(Label_control, name)) {
-	    statement new_st = 
-		    make_continue_statement(statement_label(st)) ;
+	    statement new_st = get_bool_property("PRETTYPRINT_C_CODE")?MakeNullStatement(statement_label(st)):make_continue_statement(statement_label(st)) ;
 	    control c = make_control( new_st, NIL, NIL);
 	    
 	    hash_put(Label_control, name, (char *)c);
