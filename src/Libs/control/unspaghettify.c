@@ -3,10 +3,10 @@
    Ronan Keryell, 1995.
    */
 
-/* 	%A% ($Date: 1995/09/20 14:48:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/04 15:51:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
- char vcid_unspaghettify[] = "%A% ($Date: 1995/09/20 14:48:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+ char vcid_unspaghettify[] = "%A% ($Date: 1995/10/04 15:51:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h> 
@@ -632,7 +632,7 @@ unspaghettify_statement(statement mod_stmt)
    CONTINUEs, unreachable code. Try to structure a little bit more and
    so on. */
 
-void
+bool
 unspaghettify(char * mod_name)  
 {
    statement mod_stmt;
@@ -666,4 +666,6 @@ unspaghettify(char * mod_name)
 
    debug(2,"unspaghettify", "done for %s\n", mod_name);
    debug_off();
+
+   return TRUE;
 }
