@@ -138,38 +138,53 @@ char *dir;
     return(NULL);
 }
 
-char *build_view_file(print_type)
-char *print_type;
+char *
+build_view_file(char * print_type)
 {
-    char *module_name = db_get_current_module_name();
+   char * module_name = db_get_current_module_name();
 
-    if(module_name != NULL) {
-	if ( safe_make(print_type, module_name) ) {
-	    char * file_name = db_get_file_resource(print_type, module_name, TRUE);
-	    return file_name;
-	}
-    }
-    else {
-	/* should be show_message */
-	user_log("No current module; select a module\n");
-    }
-    return NULL;
+   if(module_name != NULL) {
+      if ( safe_make(print_type, module_name) ) {
+         /* Allow some place for "/./" and other useless stuff: */
+         char file_name_in_database[MAXPATHLEN*2];
+           
+         char * file_name = db_get_file_resource(print_type, module_name, TRUE);
+         sprintf(file_name_in_database, "%s/%s",
+                 build_pgmwd(db_get_current_workspace_name()),
+                 file_name);
+            
+         return file_name_in_database;
+      }
+   }
+   else {
+      /* should be show_message */
+      user_log("No current module; select a module\n");
+   }
+   return NULL;
 }
 
-char *get_dont_build_view_file(print_type)
-char *print_type;
+char *
+get_dont_build_view_file(char * print_type)
 {
-    char *module_name = db_get_current_module_name();
+   char *module_name = db_get_current_module_name();
 
-    if(module_name != NULL) {
-	char * file_name = db_get_file_resource(print_type, module_name, TRUE);
-	return file_name;
-    }
-    else {
-	/* should be show_message */
-	user_log("No current module; select a module\n");
-    }
-    return NULL;
+   if(module_name != NULL) {
+      /* Allow some place for "/./" and other useless stuff: */
+      char file_name_in_database[MAXPATHLEN*2];
+           
+      char * file_name = db_get_file_resource(print_type, module_name, TRUE);
+
+      sprintf(file_name_in_database, "%s/%s",
+              build_pgmwd(db_get_current_workspace_name()),
+              file_name);
+            
+      return file_name_in_database;
+   }
+   else {
+      /* should be show_message */
+      user_log("No current module; select a module\n");
+   }
+   return NULL;
 }
 
 
