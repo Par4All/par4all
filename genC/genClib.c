@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/04/14 10:58:43 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/04/14 11:54:26 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -44,10 +44,10 @@ extern int max_tabulated_elements();
 extern gen_chunk *enter_tabulated_def();
 
 cons *Gen_cp_[ MAX_NESTED_CONS ] ;
-cons **gen_cp_ ; 
+cons **gen_cp_ = (cons**) NULL ; 
 
 gen_chunk Gen_hash_[ MAX_NESTED_HASH ] ;
-gen_chunk *gen_hash_ ; 
+gen_chunk *gen_hash_ = (gen_chunk*) NULL ; 
 
 /* GEN_TABULATED maps any bp->index to the tabulation table. TABULATED_BP is
  * the fake domain that helps writing tabulation tables. GEN_TABULATED_NAMES
