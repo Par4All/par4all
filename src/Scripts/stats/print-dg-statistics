@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Formattage sous latex de certaines des informations conservees optionnellement lors
-# du calcul du test de dependance
+# Formattage sous latex de certaines des informations conservees
+# optionnellement lors du calcul du test de dependance
 
 # Francois Irigoin, 28 mai 1993
 
@@ -41,7 +41,7 @@ done
 for dgoption in $dgoptions
 do
 	dependencetest=`echo $dgoption|sed s/resulttest//`
-#	cat $UTILDIR/dg-statistics.texheader >$workspace-$dgoption.tex
+#	cat $PIPS_UTILDIR/dg-statistics.texheader >$workspace-$dgoption.tex
 	cat >$workspace-$dgoption.tex <<EOF
 \batchmode
 
@@ -65,8 +65,8 @@ do
 \begin{tabular}{| l | r | r | r | r |} \hline
 Module & array pairs & self & independent & dependent \\\\ \hline
 EOF
-	awk -f $UTILDIR/dg-statistics.awk WORKSPACE=$workspace <$global.$dgoption >>$workspace-$dgoption.tex
-#	cat $UTILDIR/dg-statistics.textrailer >>$workspace-$dgoption.tex
+	awk -f $PIPS_UTILDIR/dg-statistics.awk WORKSPACE=$workspace <$global.$dgoption >>$workspace-$dgoption.tex
+#	cat $PIPS_UTILDIR/dg-statistics.textrailer >>$workspace-$dgoption.tex
 	cat >>$workspace-$dgoption.tex <<EOF
 \end{tabular}
 
