@@ -5,13 +5,16 @@
 
 AR	= gar
 ARFLAGS	= rv
-CC	= acc -temp=$(PIPS_HOME)/tmp
+CC	= acc -temp=$(pips_home)/tmp
 CFLAGS	= -g -fast -Xc
 CMKDEP	= -M
 # The SC3 acc compiler forget to define the sparc flag;
-CPPFLAGS= -Dsparc -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
+CPPFLAGS= -Dsparc -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include \
+	  -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC) -bsdmalloc
-LDFLAGS	= -fast -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(EXTERN_ROOT)/Lib/$(ARCH)
+LDFLAGS	= -fast -g \
+	  -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) \
+	  -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(EXTERN_ROOT)/Lib/$(ARCH)
 RANLIB	= granlib
 # lex broken for properties...
 # LEX	= lex
