@@ -1,17 +1,23 @@
-/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/05/05 15:33:08 $, )
+/* $RCSfile: newgen_generic_function.h,v $ ($Date: 1995/09/19 10:49:45 $, )
  * version $Revision$
  * got on %D%, %T%
  */
 
-#ifndef GENERIC_FUNCTION_INCLUDED
-#define GENERIC_FUNCTION_INCLUDED
+#ifndef NEWGEN_GENERIC_FUNCTION_INCLUDED
+#define NEWGEN_GENERIC_FUNCTION_INCLUDED
+
+/* some _hack to avoid warnings if some functions are not used 
+ */
 
 #define GENERIC_STATIC_OBJECT(PREFIX, name, type)\
 static type name = type##_undefined;\
 PREFIX bool name##_undefined_p() { return(name==type##_undefined);}\
 PREFIX void reset_##name() { name=type##_undefined;}\
 PREFIX void set_##name(o) type o; { name=o;}\
-PREFIX type get_##name() { return(name);}
+PREFIX type get_##name() { return(name);}\
+static int name##_generic_static_status_hack()\
+{ return (int) name##_undefined_p & (int) reset_##name & \
+      (int) name##_generic_static_status_hack;}
 
 #define GENERIC_STATIC_STATUS(PREFIX, name, type, init, close)\
 GENERIC_STATIC_OBJECT(PREFIX, name, type)\
@@ -49,13 +55,14 @@ PREFIX bool bound_##name##_p(k) type##_key_type k; \
  */
 #define GENERIC_LOCAL_FUNCTION(name, type)\
         GENERIC_FUNCTION(static, name, type)\
-static int name##_hack()\
-{ return((int) name##_undefined_p & (int) reset_##name & \
+static int name##_generic_local_function_hack()\
+{ return (int) name##_undefined_p & (int) reset_##name & \
 	 (int) set_##name & (int) get_##name & \
 	 (int) update_##name & (int) load_##name & \
-	 (int) bound_##name##_p & (int) delete_##name & (int) name##_hack);}
+	 (int) bound_##name##_p & (int) delete_##name & \
+         (int) name##_generic_local_function_hack;}
 
 #define GENERIC_GLOBAL_FUNCTION(name, type)\
         GENERIC_FUNCTION(/**/, name, type)
 
-#endif
+#endif /* NEWGEN_GENERIC_FUNCTION_INCLUDED */
