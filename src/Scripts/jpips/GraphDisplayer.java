@@ -97,5 +97,22 @@ public class GraphDisplayer extends Displayer
 	} 
 	return result;
     }
-
+  /** 
+    *@param file a file 
+    *@return true whether the specified file has daVinci extension 
+    */
+  public boolean controlgraphExtension(File file)
+    { 
+	String name = file.getName();
+	int index = name.indexOf(".");
+	boolean result=false;
+	if(index == -1) 
+	    return result;
+	String extension = name.substring(index+1);  
+	if(extension.endsWith("-graph"))
+	    result = true;
+	
+	return result;
+    }
+    
 }
