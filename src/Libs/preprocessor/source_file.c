@@ -468,7 +468,7 @@ bool process_user_file(
 
     if (cpp_processed_p)
     {
-	pips_debug(1, "file %s preprocessed thru cpp\n", file);
+	user_log("Preprocessing file %s\n", initial_file);
 	file = process_thru_cpp(initial_file);
     }
 
