@@ -1,8 +1,7 @@
 !
 !     Reductions management 
 !
-! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1997/05/29 15:46:20 $, )
+! $Id$
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -72,9 +71,6 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS')
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
       TYPE result
 SIMPLE_REPLICATE(LEVEL, `REDUCTION_NODE_DECL')
-      
-      print *,"in function nred" 
-
 !
 ! initiate with a valid value
 !
@@ -131,9 +127,6 @@ _CM5(`      include "cmmd_fort.h"')
       include "hpfc_commons.h"
       TYPE result(MAX MAX SIZE OF PROCS), final
       integer i
-      
-      print *," in function hred "
-      
 !
 ! get partial results
 !
@@ -149,9 +142,9 @@ ifelse(PVM_ARCH,`CM5',`dnl
          RECV CHANNELS(i) = RECV CHANNELS(i)+2',`dnl
          SENDER TID = NODE TIDS(i)
          SLID = i
-         print *, "get partial results from ", SENDERTID
+         debug(print *, "get partial results from ", SENDERTID)
          CALL HPFC RCVFR S(PVMTYPE, result(i))')
-         print *, "partial result received from", SENDERTID
+         debug(print *, "partial result received from", SENDERTID)
       enddo
 !
 ! compute final result
@@ -162,7 +155,7 @@ DISJUNCTION(``
       '  if (result(i) OPERATOR final) 
      &     final = result(i)',``
       '   final = final OPERATOR result(i)')
-      print *, "compute final result - final = ", final
+      debug(print *, "compute final result - final = ", final)
       enddo
 !
 ! send final result to nodes
@@ -170,7 +163,7 @@ DISJUNCTION(``
 ifelse(PVM_ARCH,`CM5',`dnl
       call CMMD_bc_from_host(final, M4_PVM_LENGTH(PVMTYPE))',`dnl 
       call HPFC HSNDTO A(PVMTYPE, final)')
-      print *, "send final result to nodes"
+      debug(print *, "send final result to nodes")
       build_name(hred,LEVEL,PVMTYPE,NAME) = final
       return
       end
