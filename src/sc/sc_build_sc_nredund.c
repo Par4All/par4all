@@ -14,7 +14,7 @@ jmp_buf overflow_error;
 *  sc and ineq are not modified by the function.
 */
  
-boolean ineq_redund_with_sc_p(sc,ineq)
+boolean ineq_redund_with_sc_p(sc, ineq)
 Psysteme sc;
 Pcontrainte ineq;
 {
@@ -24,6 +24,10 @@ Pcontrainte ineq;
 
     contrainte_reverse(ineg);
     sc_add_inegalite(ps,ineg);
+
+    base_rm(sc_base(sc));
+    sc_base(sc) = BASE_NULLE;
+    sc_creer_base(ps);
 
     /* test de sc_faisabilite avec la nouvelle inegalite      */
      if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,TRUE))
@@ -88,7 +92,9 @@ Psysteme s1, s2;
     for(c=sc_inegalites(s1);
 	c!=CONTRAINTE_UNDEFINED;
 	c=c->succ)
-	if (!ineq_redund_with_sc_p(s2, c))
+	/* could be inlined to avoid costly sc_dup inside ineq_redund_with_sc_p
+	 */
+	if (!ineq_redund_with_sc_p(s2, c)) 
 	    cnew = contrainte_dup(c),
 	    cnew->succ = in,
 	    in = cnew;
