@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/26 10:55:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/26 11:15:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/04/26 10:55:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/04/26 11:15:36 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -939,7 +939,7 @@ entity e;
 
     return(FALSE);
 }
-
+
 void 
 check_common_layouts(m)
 entity m;
@@ -951,49 +951,38 @@ entity m;
     decls = code_declarations(value_code(entity_initial(m)));
 
     ifdebug(1) {
-	(void) fprintf(stderr, "\nDeclarations for module %s\n\n",
-		       module_local_name(m));
-    }
+	pips_debug(1, "\nDeclarations for module %s\n", module_local_name(m));
 
-    /* List of implictly and explicitly declared variables, functions and areas */
-    if(ENDP(decls)) {
-	(void) fprintf(stderr, "* empty declaration list *\n\n");
-    }
-    else {
-	(void) fprintf(stderr, "Variable list:\n\n");
-    }
-    MAPL(ce, {
-	entity e = ENTITY(CAR(ce));
+    /* List of implictly and explicitly declared variables, 
+       functions and areas */
 
-	ifdebug(1) {
-	    (void) fprintf(stderr, "Declared entity %s\n", entity_name(e));
-	}
-    }, decls);
+	pips_debug(1, "%s\n", ENDP(decls)? 
+		   "* empty declaration list *\n\n": "Variable list:\n\n");
+
+	MAP(ENTITY, e, 
+	    fprintf(stderr, "Declared entity %s\n", entity_name(e)),
+	    decls);
 
     /* Structure of each area/common */
-    if(!ENDP(decls)) {
-	(void) fprintf(stderr, "\nLayouts for areas (commons):\n\n");
-    }
-    MAPL(ce, {
-	entity e = ENTITY(CAR(ce));
-
-	if(type_area_p(entity_type(e))) {
-	    ifdebug(1) {
-		print_common_layout(e);
-	    }
-	    if(update_common_layout(m, e)) {
+	if(!ENDP(decls)) {
+	    (void) fprintf(stderr, "\nLayouts for areas (commons):\n\n");
+	}
+	MAPL(ENTITY, e, {
+	    if(type_area_p(entity_type(e))) {
 		ifdebug(1) {
 		    print_common_layout(e);
 		}
+		if(update_common_layout(m, e)) {
+		    ifdebug(1) {
+		    print_common_layout(e);
+		    }
+		}
 	    }
-	}
-    }, decls);
+	}, decls);
 
-    ifdebug(1) {
 	(void) fprintf(stderr, "End of declarations for module %s\n\n",
 		       module_local_name(m));
     }
-
 }
 
 void 
