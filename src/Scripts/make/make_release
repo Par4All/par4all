@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/02 22:35:38 $, 
+# $Date: 1996/09/02 22:59:26 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -92,7 +92,7 @@ $verb taring...
 
 $tar $taropt $tmp.tar `sed '/OLD/d;/SCCS/d;/~/d' $tmp.list | sort -u`
 
-ls -l $tmp.tar 
+# ls -l $tmp.tar 
 
 $verb untaring in $trgt...
 cd $trgt || error 5 "cannot cd to $trgt"
