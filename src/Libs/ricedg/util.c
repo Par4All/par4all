@@ -146,12 +146,12 @@ graph mod_graph;
 		    int l1 = dl + apply_persistant_statement_to_int(s_to_l, s1);
 		    int l2 = dl + apply_persistant_statement_to_int(s_to_l, s2);
 
-		    fprintf(fd, "%d,%d ", l1, l2);
+		    fprintf(fd, "%d %d ", l1, l2);
 		    /*
-		    fprintf(fd, "%d,%d ", 
+		    fprintf(fd, "%d %d ", 
 		    statement_number(s1), statement_number(s2));
 		    */
-		    fprintf(fd, "%c,%c ", 
+		    fprintf(fd, "%c %c ", 
 			    action_read_p(effect_action(conflict_source(c)))? 'R' : 'W',
 			    action_read_p(effect_action(conflict_sink(c)))? 'R' : 'W');
 		    fprintf(fd, "<");
