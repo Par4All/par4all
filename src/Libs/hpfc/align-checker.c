@@ -422,7 +422,8 @@ int *pi1, *pi2;
 
     ifdebug(6)
 	{
-	    fprintf(stderr, "[affine_expression_of_loop_index_p]\nexpression:\n");
+	    fprintf(stderr, 
+		    "[affine_expression_of_loop_index_p]\nexpression:\n");
 	    print_expression(e);
 	}
 	    
@@ -482,8 +483,8 @@ int *pi;
 
     if (normalized_undefined_p(n)) 
     {
-	n = NormalizeExpression(e);
-	expression_normalized(e) = n;
+	n = NORMALIZE_EXPRESSION(e);
+	/* expression_normalized(e) = n; */
     }
 
     switch (normalized_tag(n))
