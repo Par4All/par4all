@@ -1,12 +1,18 @@
-/* Management of Reductions in hpfc
- *
- * Fabien Coelho, May 1993.
+/* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1995/04/10 18:49:45 $, 
+ * $Date: 1995/10/04 10:54:06 $, 
  */
 
 #include "defines-local.h"
+
+#include "control.h"
+#include "regions.h"
+#include "semantics.h"
+#include "effects.h"
+#include "conversion.h"
+
+/************************************************************** REDUCTIONS */
 
 #define MAX_REDUCTION 1
 #define MIN_REDUCTION 2
@@ -200,5 +206,693 @@ statement initial, *phost, *pnode;
     return(TRUE);
 }
 
-/*   that is all
+/******************************************************** SUB ARRAY SHIFTS */
+
+/* bool subarray_shift_p(s, pe, plvect)
+ * statement s;
+ * entity *pe;
+ * list *plvect;
+ *
+ * checks whether a loop nest is a subarray shift,
+ * that is a parallel loop nest with one assign in the body 
+ * which is a 1D shift of a locally constant value.
+ * returns false if this dimension is not distributed, because
+ * the overlap analysis will make a better job. 
+ * should also check that the accessed subarray is a section.
+ * and that it is a block distribution.
+ * ??? should also check for a 1 alignment
+ *
+ * the entity returned *pe is the shifted array 
+ * the list returned is the list of the vector shifts for each dimension
+ */
+
+#define expression_complex_p(e) \
+    (normalized_complex_p(expression_normalized(e)))
+
+void free_vector_list(l)
+list l;
+{
+    gen_map(vect_rm, l);
+    gen_free_list(l);
+}
+
+bool vecteur_nul_p(v)
+Pvecteur v;
+{
+    return VECTEUR_NUL_P(v) || (!v->succ && var_of(v)==TCST && val_of(v)==0);
+}
+
+bool max_one_phi_var_per_constraint(c)
+Pcontrainte c;
+{
+    for(; c; c=c->succ)
+	if (base_nb_phi(c->vecteur)>=2) return FALSE;
+
+    return TRUE;
+}
+
+/* returns TRUE is syst defines a rectangle on phi variables
+ */
+bool rectangular_region_p(syst)
+Psysteme syst;
+{
+    /*  this is an approximation, and the system should be normalized
+     *  for the result to be correct, I guess...
+     */
+    return max_one_phi_var_per_constraint(sc_egalites(syst)) &&
+	   max_one_phi_var_per_constraint(sc_inegalites(syst));
+}
+
+bool rectangular_must_region_p(var, s)
+entity var;
+statement s;
+{
+    list le = load_statement_local_regions(s);
+    
+    MAP(EFFECT, e,
+     {
+	 if (reference_variable(effect_reference(e)) == var)
+	 {
+	     if (!approximation_must_p(effect_approximation(e)) ||
+		 !rectangular_region_p(predicate_system
+			    (transformer_relation(effect_context(e)))))
+	     {
+		 debug(6, "rectangular_must_region_p", "FALSE\n");
+		 return FALSE;
+	     }
+	 }
+     },
+	 le);
+
+    debug(6, "rectangular_must_region_p", "TRUE\n");
+    return TRUE;
+}
+
+/* some static variables used for the detection...
+ */
+static bool subarray_shift_ok = TRUE;
+static entity array = entity_undefined;
+static list current_regions = NIL, lvect = NIL;
+
+static bool locally_constant_vector_p(Pvecteur v)
+{
+    for(; v!=NULL; v=v->succ)
+	if (var_of(v)!=TCST && written_effect_p((entity) var_of(v), 
+						current_regions))
+	    return FALSE;
+
+    return TRUE;
+}
+
+static bool subarray_shift_assignment_p(call c)
+{
+    list lhs_ind, rhs_ind, args = call_arguments(c);
+    expression
+	lhs = EXPRESSION(CAR(args)),
+	rhs = EXPRESSION(CAR(CDR(args)));
+    reference lhs_ref, rhs_ref;
+    bool shift_was_seen = FALSE;
+    int dim;
+
+    /*  LHS *must* be a reference
+     */ 
+    assert(expression_reference_p(lhs));
+
+    /* is RHS a reference?
+     */
+    if (!expression_reference_p(rhs)) return FALSE;
+
+    lhs_ref = syntax_reference(expression_syntax(lhs)),
+    rhs_ref = syntax_reference(expression_syntax(rhs));
+    array = reference_variable(lhs_ref);
+
+    /*  same array, and a block-distributed one ?
+     */
+    if (array!=reference_variable(rhs_ref) ||
+	!array_distributed_p(array) || 
+	!block_distributed_p(array))
+	return FALSE;
+    
+    lhs_ind = reference_indices(lhs_ref),
+    rhs_ind = reference_indices(rhs_ref);
+    
+    assert(gen_length(lhs_ind)==gen_length(rhs_ind));
+
+    /*  compute the difference of every indices, if possible.
+     */
+    for(;
+	!ENDP(lhs_ind);
+	lhs_ind=CDR(lhs_ind), rhs_ind=CDR(rhs_ind))
+    {
+	expression
+	    il = EXPRESSION(CAR(lhs_ind)),
+	    ir = EXPRESSION(CAR(rhs_ind));
+
+	if (expression_complex_p(il) || expression_complex_p(ir))
+	{
+	    free_vector_list(lvect), lvect = NIL;
+	    return FALSE;
+	}
+
+	/* else compute the difference */
+	lvect = 
+	    CONS(PVECTOR, (VECTOR)
+		 vect_substract(normalized_linear(expression_normalized(il)),
+				normalized_linear(expression_normalized(ir))),
+		 lvect);
+    }
+
+    lvect = gen_nreverse(lvect);
+
+    /* now checks for a constant shift on a distributed dimension
+     * and that's all.
+     * ??? I could deal with other constant shifts on non distributed dims
+     */
+    dim = 0;
+    MAPL(cv,
+     {
+	 Pvecteur v = (Pvecteur) PVECTOR(CAR(cv));
+	 int p;
+
+	 dim++;
+
+	 if (vecteur_nul_p(v)) continue;
+
+	 /* else the vector is not null
+	  */
+	 if (shift_was_seen || 
+	     !ith_dim_distributed_p(array, dim, &p) ||
+	     !locally_constant_vector_p(v))
+	 {
+	     debug(7, "subarray_shift_assignment_p",
+		   "false on array %s, dimension %d\n",
+		   entity_local_name(array), dim);
+	     free_vector_list(lvect);
+	     lvect = NIL;
+	     return FALSE;
+	 }
+
+	 shift_was_seen = TRUE;
+     },
+	 lvect);
+
+    return TRUE;
+}
+
+static bool instruction_filter(i)
+instruction i;
+{
+    switch(instruction_tag(i))
+    {
+    case is_instruction_loop:
+	subarray_shift_ok = subarray_shift_ok && 
+	    execution_parallel_p(loop_execution(instruction_loop(i)));
+	break;    
+    case is_instruction_call:
+	if (instruction_continue_p(i)) break;
+	if (instruction_assign_p(i))
+	    if (ref_to_dist_array_p(i))
+		if (array==entity_undefined)
+		{
+		    subarray_shift_ok = 
+			subarray_shift_assignment_p(instruction_call(i));
+		    break;
+		} 
+		else /* an assignment was already encountered */
+		{
+		    subarray_shift_ok = FALSE;
+		    break;
+		}
+	    else
+		/* private variable assigned in a parallel loop,
+		 * should not be significant.
+		 */
+		break;
+	/*  anything else is not welcome
+	 */
+	subarray_shift_ok = FALSE;
+	break;
+    case is_instruction_block:
+    case is_instruction_unstructured:
+	break;
+    case is_instruction_test:
+    case is_instruction_goto:
+	subarray_shift_ok = FALSE;
+    default:
+	pips_error("statement_filter", "unexpected instruction tag\n");
+    }
+
+    return subarray_shift_ok;
+}
+
+bool subarray_shift_p(s, pe, plvect)
+statement s;
+entity *pe;
+list *plvect;
+{
+    array = entity_undefined;
+    subarray_shift_ok = TRUE;
+    lvect = NIL;
+    current_regions = load_statement_local_regions(s);
+
+    gen_recurse(s,
+		instruction_domain,
+		instruction_filter,
+		gen_null);
+
+    subarray_shift_ok &= !entity_undefined_p(array) &&
+	rectangular_must_region_p(array, s);
+
+    if (subarray_shift_ok)
+	*pe = array,
+	*plvect = lvect;
+    else
+	free_vector_list(lvect), lvect = NIL;
+
+    current_regions = NIL;
+
+    return subarray_shift_ok;
+}
+
+/* generates the needed subroutine 
+ */
+static entity make_shift_subroutine(entity var)
+{
+    char buffer[100];
+    type t;
+    variable v;
+    int ndim;
+    
+    assert(!entity_undefined_p(var)); t = entity_type(var);
+    assert(type_variable_p(t)); v = type_variable(t);
+
+    ndim = gen_length(variable_dimensions(v));
+
+    (void) sprintf(buffer, "HPFC_SHIFT_%s_%d",
+		   pvm_what_options(variable_basic(v)),
+		   ndim);
+
+    return MakeRunTimeSupportSubroutine(buffer, ndim*4+4);
+}
+
+Psysteme get_read_effect_area(list le, entity var)
+{
+    MAP(EFFECT, e,
+     {
+	 if (action_read_p(effect_action(e)) &&
+	     reference_variable(effect_reference(e))==var)
+	     return predicate_system(transformer_relation(effect_context(e)));
+     },
+	 le);
+
+    return SC_UNDEFINED;
+}
+
+list make_rectangular_area(statement st, entity var)
+{
+    list l = NIL;
+    Psysteme
+	s = sc_dup(get_read_effect_area(load_statement_local_regions(st),
+					 var));
+    Pcontrainte	c, lower = CONTRAINTE_UNDEFINED, upper = CONTRAINTE_UNDEFINED;
+    Variable idx;
+    entity div = hpfc_name_to_entity(IDIVIDE);
+    int dim = gen_length(variable_dimensions(type_variable(entity_type(var))));
+
+    sc_transform_eg_in_ineg(s);
+    c = sc_inegalites(s);
+    sc_inegalites(s) = (Pcontrainte)NULL, 
+    sc_rm(s);
+
+    for(; dim>0; dim--)
+    {
+	idx = (Variable) get_ith_region_dummy(dim);
+
+	constraints_for_bounds(idx, &c, &lower, &upper);
+
+	l = CONS(EXPRESSION, constraints_to_loop_bound(lower, idx, TRUE, div),
+	    CONS(EXPRESSION, constraints_to_loop_bound(upper, idx, FALSE, div),
+		 l));
+
+	(void) contraintes_free(lower), lower=NULL;
+	(void) contraintes_free(upper), upper=NULL;
+    }
+
+    (void) contraintes_free(c);
+    
+    return l;
+}
+
+/* statement generate_subarray_shift(s, var, lshift)
+ * statement s;
+ * entity var;
+ * list lshift;
+ *
+ * generates a call to the runtime library shift subroutine
+ * for the given array, the given shift and the corresponding
+ * region in statement s.
+ * this function assumes that subarray_shift_p was true on s,
+ * and does not checks the conditions again.
+ */
+statement generate_subarray_shift(statement s, entity var, list lshift)
+{
+    entity subroutine = make_shift_subroutine(var);
+    int array_number = load_hpf_number(array), shifted_dim = 0;
+    expression shift = expression_undefined;
+    list ldecl = array_lower_upper_bounds_list(array), largs;
+    Pvecteur v;
+
+    /*  gets the shifted dimension and the shift
+     */
+    MAPL(cv,
+     {
+	 v = (Pvecteur) PVECTOR(CAR(cv));
+	 shifted_dim++;
+
+	 if (!vecteur_nul_p(v)) 
+	 {
+	     shift = make_vecteur_expression(v);
+	     break;
+	 }
+     },
+	 lshift);
+
+    assert(shift!=expression_undefined);
+    free_vector_list(lshift);
+    
+    /*  all the arguments
+     */
+    largs = 
+	CONS(EXPRESSION, entity_to_expression(array),
+	CONS(EXPRESSION, int_to_expression(array_number),
+	CONS(EXPRESSION, int_to_expression(shifted_dim),
+        CONS(EXPRESSION, shift,
+	     gen_nconc(ldecl, make_rectangular_area(s, var))))));
+
+    return hpfc_make_call_statement(subroutine, largs);
+}
+
+/************************************************************* FULL COPIES */
+
+/* tests whether a loop nest is a full copy loop nest, 
+ * i.e. it copies an array into another, both being aligned.
+ * ??? it should share some code with the subarray shift detection...
+ * ??? another quick hack for testing purposes (remappings).
+ */
+
+/* statement simple_statement(statement s)
+ *
+ * what: tells whether s is (after simplification) a simple statement, 
+ *       i.e. a call, and returns it (may be hidden by blocks and continues).
+ * how: recursion thru the IR.
+ * input: statement s
+ * output: returned statement, or NULL if not simple...
+ * side effects:
+ *  - uses some static data
+ * bugs or features:
+ */
+
+static statement simple_found;
+static bool ok;
+DEFINE_LOCAL_STACK(current_stmt, statement)
+
+static bool not_simple(gen_chunk * x)
+{
+    ok = FALSE;
+    gen_recurse_stop(NULL);
+    return FALSE;
+}
+
+static bool check_simple(call c)
+{
+    if (!same_string_p(entity_local_name(call_function(c)),
+		       CONTINUE_FUNCTION_NAME))
+    {
+	if (simple_found) 
+	{
+	    ok = FALSE;
+	    gen_recurse_stop(NULL);
+	}
+	else
+	    simple_found = current_stmt_head();
+    }
+
+    return FALSE;
+}
+
+statement simple_statement(statement s)
+{
+    ok = TRUE;
+    simple_found = (statement) NULL;
+    make_current_stmt_stack();
+
+    gen_multi_recurse
+	(s,
+	 statement_domain,  current_stmt_filter, current_stmt_rewrite,
+	 test_domain,       not_simple,          gen_null,
+	 loop_domain,       not_simple,          gen_null,
+	 call_domain,       check_simple,        gen_null,
+	 expression_domain, gen_false,           gen_null,
+	 NULL);
+
+    free_current_stmt_stack();
+
+    return (ok && simple_found) ? simple_found : NULL;
+}
+
+/* bool full_define_p (reference r, list ll)
+ *
+ * what: true if the loop nest ll fully scans r
+ * how: not very beautiful. 
+ * input: r and ll
+ * output: the boolean result
+ * side effects: none
+ * bugs or features:
+ */
+
+static loop find_loop(entity index, list /* of loops */ ll)
+{
+    MAP(LOOP, l, if (loop_index(l)==index) return l, ll);
+    return (loop) NULL; /* if not found */
+}
+
+bool full_define_p(reference r, list /* of loops */ ll)
+{
+    entity array = reference_variable(r);
+    list /* of expression */ li = reference_indices(r),
+         /* of dimension */ ld,
+         /* of entity */ lseen = NIL;
+    
+    assert(entity_variable_p(array));
+
+    ld = variable_dimensions(type_variable(entity_type(array)));
+    assert(gen_length(ll)==gen_length(ld));
+
+    /* checks that the indices are *simply* the loop indexes,
+     * and that the whole dimension is scanned. Also avoids (i,i)...
+     */
+    for(; li; POP(li), POP(ld))
+    {
+	syntax s = expression_syntax(EXPRESSION(CAR(li)));
+	entity index;
+	dimension dim;
+	range rg;
+	loop l;
+	expression inc;
+
+	if (!syntax_reference_p(s)) 
+	{
+	    gen_free_list(lseen);
+	    return FALSE;
+	}
+
+	index = reference_variable(syntax_reference(s));
+
+	if (gen_in_list_p(index, lseen))
+	{
+	    gen_free_list(lseen);
+	    return FALSE;
+	}
+
+	lseen = CONS(ENTITY, index, lseen);
+
+	l = find_loop(index, ll);
+	
+	if (!l) 
+	{
+	    gen_free_list(lseen);
+	    return FALSE;
+	}
+
+	/* checks that the loop range scans the whole dimension */
+
+	rg = loop_range(l);
+	inc = range_increment(rg);
+	dim = DIMENSION(CAR(ld));
+	
+	/* increment must be 1.
+	 * lowers and uppers must be equal.
+	 */
+	if (!integer_constant_expression_p(inc) ||
+	    integer_constant_expression_value(inc)!=1 ||
+	    !expression_equal_p(range_lower(rg), dimension_lower(dim)) ||
+	    !expression_equal_p(range_upper(rg), dimension_upper(dim)))
+	{
+	    gen_free_list(lseen);
+	    return FALSE;
+	}
+    }
+
+    gen_free_list(lseen);
+    return TRUE;
+}
+
+/* bool full_copy_p(statement s, reference * pleft, reference * pright)
+ *
+ * what: tells whether a loop nest is a 'full copy' one, that is it fully
+ *       define an array from another, with perfect alignment.
+ * how: pattern matching of what we are looking for...
+ * input: the statement
+ * output: the boolean result, plus both references.
+ * side effects:
+ *  - uses some static data
+ * bugs or features:
+ *  - pattern matching done this way os just a hack...
+ */
+#define XDEBUG(msg) \
+  pips_debug(6, "statement 0x%x: " msg "\n", (unsigned int) s)
+
+bool full_copy_p(statement s, reference * pleft, reference * pright)
+{
+    list /* of lists */ lb = NIL, l,
+         /* of loops */ ll = NIL,
+         /* of expressions */ la = NIL;
+    statement body = parallel_loop_nest_to_body(s, &lb, &ll), simple;
+    expression e;
+    reference left, right;
+    int len;
+
+    DEBUG_STAT(3, "considering statement", s);
+
+    /* the loop nest must be perfect... ??? should check for continues?
+     */
+    for (l=lb; l; POP(l)) 
+	if (gen_length(CONSP(CAR(l)))>1) 
+	    {
+		XDEBUG("non perfectly nested");
+		gen_free_list(lb), gen_free_list(ll); return FALSE;
+	    }
+
+    gen_free_list(lb), lb = NIL;
+
+    /* the body must be a simple assignment
+     */
+    simple = simple_statement(body);
+
+    if (!simple || !instruction_assign_p(statement_instruction(simple)))
+    { 
+	XDEBUG("body not simple"); gen_free_list(ll); return FALSE;
+    }
+
+    la = call_arguments(instruction_call(statement_instruction(simple)));
+    message_assert("2 arguments to assign", gen_length(la)==2);
+
+    left = expression_reference(EXPRESSION(CAR(la)));
+    e = EXPRESSION(CAR(CDR(la)));
+
+    if (!expression_reference_p(e))
+    {
+	XDEBUG("rhs not a reference"); gen_free_list(ll); return FALSE;
+    }
+
+    right = expression_reference(e);
+
+    /* compatible arities 
+     */
+    len = gen_length(ll); /* number of enclosing loops */
+
+    if (gen_length(reference_indices(left))!=len ||
+	gen_length(reference_indices(right))!=len)
+    {
+	XDEBUG("incompatible arities"); gen_free_list(ll); return FALSE;
+    }
+
+    /* the lhs should be fully defined by the loop nest...
+     * but it does not matter for the rhs!
+     */
+    if (!full_define_p(left, ll))
+    {
+	XDEBUG("lhs not fully defined"); gen_free_list(ll); return FALSE;
+    }
+
+    gen_free_list(ll); 
+
+    /* both lhs and rhs references must be aligned
+     */
+    if (!references_aligned_p(left, right))
+    {
+	XDEBUG("references not aligned"); return FALSE;
+    }
+
+    /* ??? should check the new declarations...
+     */
+
+    XDEBUG("ok");
+    *pleft = left;
+    *pright = right;
+    return TRUE;
+}
+
+/* statement generate_full_copy(reference left, reference right)
+ *
+ * what: copies directly right into left, that must conform...
+ * how: direct loop nest on local data
+ * input: both entities
+ * output: the returned statement
+ * side effects: 
+ * bugs or features:
+ *  - assumes that the references are ok, that is they come from
+ *    a full_copy_p execution.
+ *  - code generated based on the original entities. thus the 
+ *    code cleaning pass is trusted.
+ */
+statement generate_full_copy(reference left, reference right)
+{
+    statement body;
+    int ndim, i;
+    list /* of entity */ lindexes, l,
+         /* of dimension */ ld;
+    entity array = reference_variable(left), 
+           new_array = load_new_node(array);
+
+    ndim = gen_length(variable_dimensions(type_variable(entity_type(array))));
+
+    body = make_assign_statement(reference_to_expression(copy_reference(left)),
+			      reference_to_expression(copy_reference(right)));
+    
+    /* indexes are reused. bounds are taken from the node entity declaration.
+     */
+    lindexes = expression_list_to_entity_list(reference_indices(left));
+    ld = variable_dimensions(type_variable(entity_type(new_array)));
+
+    for(i=1, l=lindexes; i<=ndim; i++, POP(lindexes), POP(ld))
+    {
+	dimension d = DIMENSION(CAR(ld));
+
+	body = loop_to_statement(make_loop
+	   (ENTITY(CAR(lindexes)),
+	    make_range(copy_expression(dimension_lower(d)),
+		       copy_expression(dimension_upper(d)),
+		       int_to_expression(1)),
+	    body,
+	    entity_empty_label(),
+	    make_execution(is_execution_sequential, UU),
+	    NIL));
+    }
+
+    gen_free_list(l);
+    return body;    
+}
+
+/*    That is all
  */
