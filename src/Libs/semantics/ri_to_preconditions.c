@@ -419,11 +419,19 @@ transformer tfb;
 	}
 
 	if(incr!=0) {
-	    /* try to add the lower bound */
-	    add_index_bound_conditions(pre, i, lb, IS_LOWER_BOUND, tfb);
+	    if(simple_dead_loop_p(lb, ub)) {
+		transformer new_pre = transformer_empty();
 
-	    /* try to add the upper bound */
-	    add_index_bound_conditions(pre, i, ub, IS_UPPER_BOUND, tfb);
+		free_transformer(pre);
+		pre = new_pre;
+	    }
+	    else {
+		/* try to add the lower bound */
+		add_index_bound_conditions(pre, i, lb, IS_LOWER_BOUND, tfb);
+
+		/* try to add the upper bound */
+		add_index_bound_conditions(pre, i, ub, IS_UPPER_BOUND, tfb);
+	    }
 	}
 
     }
@@ -481,6 +489,41 @@ transformer tfb;
     return(pre);
 }
 
+bool simple_dead_loop_p(expression lower, expression upper)
+{
+    bool dead_loop_p = FALSE;
+    normalized n_lower = NORMALIZE_EXPRESSION(lower);
+    normalized n_upper = NORMALIZE_EXPRESSION(upper);
+
+    if(normalized_linear_p(n_upper) && normalized_linear_p(n_lower)) {
+	Pvecteur v_lower = normalized_linear(n_lower);
+	Pvecteur v_upper = normalized_linear(n_upper);
+
+	if(VECTEUR_NUL_P(v_lower)) {
+	    if (!VECTEUR_NUL_P(v_upper)) {
+		if(term_cst(v_upper)
+		   && VECTEUR_NUL_P(vecteur_succ(v_upper))) {
+		    dead_loop_p =  vecteur_val(v_upper) < 0;
+		}
+	    }
+	}
+	else if(VECTEUR_NUL_P(v_upper)) {
+	    if (!VECTEUR_NUL_P(v_lower)) {
+		if(term_cst(v_lower)
+		   && VECTEUR_NUL_P(vecteur_succ(v_lower))) {
+		    dead_loop_p =  vecteur_val(v_lower) > 0;
+		}
+	    }
+	}
+	else if(term_cst(v_upper) && term_cst(v_lower)
+	   && VECTEUR_NUL_P(vecteur_succ(v_upper))
+	   && VECTEUR_NUL_P(vecteur_succ(v_lower))) {
+	    dead_loop_p = vecteur_val(v_lower) > vecteur_val(v_upper);
+	}
+    }
+
+    return dead_loop_p;
+}
 
 
 transformer loop_to_postcondition(pre, l, tf)
@@ -510,8 +553,28 @@ transformer tf;
 	/* get rid of information related to variables modified in
 	   iterations of the loop body (including loop indices) */
 	preb = transformer_combine(preb, tf);
+
 	/* Triolet's good loop algorithm */
 	preb = add_good_loop_conditions(preb, l, tf);
+
+	/* It might be useful to normalize preb and to detect unfeasibility.
+	 * I choose not to do it because:
+	 *  - it almost never happens in user code
+	 *  - it's time consuming
+	 *  - when it happens in automatically generated code,
+	 *    dead code elimination is performed.
+	 *
+	 * So basically, I shift the burden from precondition computation
+	 * to dead code elimination. Dead loop testing must use a strong
+	 * feasibility test.
+	 *
+	 * If this decision is reversed, dead code elimination can be
+	 * speeded-up.
+	 *
+	 * Note that add_good_loop_conditions() can test trivial cases
+	 * automatically generated.
+	 */
+
 	/* propagate preconditions in the loop body */
 	(void) statement_to_postcondition(preb, s);
 
