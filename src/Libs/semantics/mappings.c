@@ -143,8 +143,7 @@ entity e;
 static void 
 add_intraprocedural_value_entities_unconditionally(entity e)
 {
-    debug(8,"add_interprocedural__value_entities_unconditionally",
-	  "for %s\n", entity_name(e));
+    pips_debug(8, "for %s\n", entity_name(e));
 	add_new_value(e);
 	add_local_old_value(e);
 	add_local_intermediate_value(e);
