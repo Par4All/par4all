@@ -693,14 +693,14 @@ out_effects_of_module_statement(statement module_stat)
     pips_debug(1,"begin\n");
     
     gen_multi_recurse(
-	module_stat, 
-	statement_domain, out_effects_statement_filter, out_effects_statement_leave,
-	sequence_domain, out_effects_from_block_to_statements, gen_null,
-	test_domain, out_effects_from_test_to_branches, gen_null,
-	loop_domain, out_effects_from_loop_to_body, gen_null,
-	unstructured_domain, out_effects_from_unstructured_to_nodes, gen_null,
-	call_domain, gen_false, gen_null, /* calls are treated in another phase */
-	NULL);     
+      module_stat, 
+  statement_domain, out_effects_statement_filter, out_effects_statement_leave,
+      sequence_domain, out_effects_from_block_to_statements, gen_null,
+      test_domain, out_effects_from_test_to_branches, gen_null,
+      loop_domain, out_effects_from_loop_to_body, gen_null,
+      unstructured_domain, out_effects_from_unstructured_to_nodes, gen_null,
+      call_domain, gen_false, gen_null, /* calls are treated in another phase*/
+      NULL);     
 
     pips_debug(1,"end\n");
     free_effects_private_current_stmt_stack();
@@ -744,9 +744,9 @@ out_effects_engine(char *module_name)
     set_rw_effects((*db_get_rw_effects_func)(module_name));
     set_invariant_rw_effects((*db_get_invariant_rw_effects_func)(module_name));
 
-    set_cumulated_in_effects( (*db_get_cumulated_in_effects_func)(module_name));
+    set_cumulated_in_effects((*db_get_cumulated_in_effects_func)(module_name));
     set_in_effects((*db_get_in_effects_func)(module_name));
-    set_invariant_in_effects((*db_get_invariant_in_effects_func) (module_name));
+    set_invariant_in_effects((*db_get_invariant_in_effects_func)(module_name));
 
     /* Get the out_summary_effects of the current module */
     l_sum_out = (*db_get_summary_out_effects_func)(module_name);
