@@ -203,8 +203,9 @@ char *mod_name;
     int i,j;
     graph chains;
     string dg_name;
-    printf("HERE");
     entity module = local_name_to_top_level_entity(mod_name);
+    
+    printf("HERE");
 
     debug_on("RICEDG_DEBUG_LEVEL");
     debug(1,"rice_dependence_graph", 
