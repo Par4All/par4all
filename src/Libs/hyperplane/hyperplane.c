@@ -1,8 +1,11 @@
 /* package hyperplane
  *
- * $Id*
+ * $Id$
  * 
  * $Log: hyperplane.c,v $
+ * Revision 1.8  1998/10/12 10:42:43  irigoin
+ * Typo in RCS variable
+ *
  * Revision 1.7  1998/10/09 15:49:46  irigoin
  * Reformatting + conversion from int to Value
  *
