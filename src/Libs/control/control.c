@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/10 20:14:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/10 20:44:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/04/10 20:14:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/04/10 20:44:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -186,8 +186,13 @@ statement st;
     cons *sts ;
 
     if( !empty_label_p(name) ) {
+	list new_sts;
 	sts = hash_get_default_empty_list(used_labels, name) ;
-	hash_put(used_labels, name, (char*) CONS(STATEMENT, st, sts)) ;
+	new_sts = CONS(STATEMENT, st, sts);
+	if (hash_defined_p(used_labels, name))
+	    hash_update(used_labels, name, (char*) new_sts);
+	else
+	    hash_put(used_labels, name, (char*) new_sts);
 	debug(5, "update_used_labels", "Reference to statement %d seen\n", 
 	      statement_number( st )) ;
     }
@@ -894,10 +899,12 @@ string name;
 statement st;
 {
     if(!empty_label_p(name)) {
-	cons *used =
-		(cons *)hash_get_default_empty_list(Label_statements, name);
-
-	hash_put(Label_statements, name, (char *)CONS(STATEMENT, st, used));
+	list used = (list) hash_get_default_empty_list(Label_statements, name);
+	list sts = CONS(STATEMENT, st, used);
+	if (hash_defined_p(Label_statements, name))
+	    hash_update(Label_statements, name, (char *) sts);
+	else
+	    hash_put(Label_statements, name, (char *) sts);
 
 	if( hash_get(Label_control, name)==HASH_UNDEFINED_VALUE ) {
 	    statement new_st = 
