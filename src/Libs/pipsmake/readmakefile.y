@@ -353,7 +353,7 @@ makefile open_makefile(string name)
     if ( pipsmakefile!=makefile_undefined ) {
 	    free_makefile(pipsmakefile);
 	    pipsmakefile= makefile_undefined;
-	    debug(1, "open_makefile", "current makefile errased\n");
+	    debug(1, "open_makefile", "current makefile erased\n");
 	}
 
     if ((fd = fopen(build_pgm_makefile(name), "r")) == (FILE *)NULL ) {
