@@ -68,9 +68,7 @@ fpips_usage(int ret)
 int /* non static to avoid a gcc warning if not called. */
 fpips_error(char * what, int argc, char ** argv)
 {
-    fprintf(stderr, 
-	    "[fpips] sorry, %s not available with " SOFT_ARCH "\n", what);
-
+    fprintf(stderr, "[fpips] sorry, %s not available (" SOFT_ARCH ")\n", what);
     return fpips_usage(1);
 }
 
@@ -93,14 +91,17 @@ name_end_p(char * name, char * ref)
 int 
 fpips_main(int argc, char **  argv)
 {
+    debug_on("FPIPS_DEBUG_LEVEL");
+    pips_debug(1, "considering %s for execution\n", argv[0]);
+    debug_off();
+
     if (argc<1) return TPIPS(argc, argv); /* should not happen */
 
     /* According to the shell or the debugger, the path may be
        complete or not... RK. */
     if (name_end_p(argv[0], "tpips")) return TPIPS(argc, argv);
     if (name_end_p(argv[0], "wpips")) return WPIPS(argc, argv);
-    if (name_end_p(argv[0], "/pips")
-	|| strcmp(argv[0], "pips") == 0)
+    if (name_end_p(argv[0], "/pips") || strcmp(argv[0], "pips") == 0)
 	return  PIPS(argc, argv);
 
     /* else look for the first option, if any.
