@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.16  1998/11/24 14:09:07  coelho
+ * strategies...
+ *
  * Revision 1.15  1998/11/24 13:01:42  zory
  * debug manipulations
  *
@@ -71,6 +74,34 @@
 
 #define DEBUG_NAME "TRANSFORMATION_OPTIMIZE_EXPRESSIONS_DEBUG_LEVEL"
 
+/****************************************************************** STRATEGY */
+
+/* this structure defines a strategy for eole.
+ */
+typedef struct
+{
+  string name;
+
+  /* HUFFMAN.
+   */
+  bool apply_balancing;
+  double (*huffman_cost)(expression);
+  bool huffman_mode;
+  
+  /* EOLE.
+   */
+  bool apply_eole;
+  string eole_strategy;
+
+  /* SIMPLIFY.
+   */
+  bool apply_simplify;
+
+} optimization_strategy, *poptimization_strategy;
+
+/* current strategy.
+ */
+static poptimization_strategy strategy = NULL;
 
 /********************************************************* INTERFACE TO EOLE */
 
@@ -298,6 +329,7 @@ get_eole_command
   return strdup(concatenate(get_string_property(EOLE), " ", 
 			    get_string_property(EOLE_FLAGS), " ", 
 			    get_string_property(EOLE_OPTIONS), 
+			    " -S ", strategy->eole_strategy,
 			    " -o ", in, " ", out, NULL));
 }
 
@@ -379,6 +411,10 @@ static double expression_gravity(expression e)
 static entity huffman_nary_operator = NULL;
 static entity huffman_binary_operator = NULL;
 static double (*huffman_cost)(expression) = NULL;
+/* TRUE:  Huffman.
+   FALSE: rateau.
+*/
+static boolean huffman_mode = TRUE;
 
 typedef struct
 {
@@ -408,20 +444,22 @@ debug_cost_expression_array(string s,
 			    int size)
 {
   int i;
-  pips_debug(3,"%s \n", s);
-  pips_debug(3," %d elements in cost_expression array \n", size);
+  pips_debug(9,"%s \n", s);
+  pips_debug(9," %d elements in cost_expression array \n", size);
 
   for (i=0; i<size; i++) {
-    pips_debug(3," - %d - expression : ", i); 
+    pips_debug(9," - %d - expression : ", i); 
     print_expression(tce[i].expr);
-    pips_debug(3,"\n - %d - cost : %f \n", i, tce[i].cost);
+    pips_debug(9,"\n - %d - cost : %f \n", i, tce[i].cost);
   }
 }
 
 /* build an cost_expression array from an expression list.
  */
 static cost_expression * 
-list_of_expressions_to_array(list /* of expression */ le)
+list_of_expressions_to_array(
+    list /* of expression */ le,
+    double (*cost)(expression))
 {
   int len = gen_length(le), i=0;
   cost_expression * tce = malloc(len * sizeof(cost_expression));
@@ -430,15 +468,14 @@ list_of_expressions_to_array(list /* of expression */ le)
   MAP(EXPRESSION, e, 
   {
     tce[i].expr = e;
-    tce[i].cost = huffman_cost(e);
+    tce[i].cost = cost(e);
     i++;
   },
     le);
 
   qsort(tce, len, sizeof(cost_expression), cost_expression_cmp);
 
-  ifdebug(3) 
-    debug_cost_expression_array("qsort output", tce, len);
+  ifdebug(3) debug_cost_expression_array("qsort output", tce, len);
 
   return tce;
 }
@@ -452,6 +489,14 @@ insert_sorted_into_array(cost_expression * tce, int n, cost_expression ce)
   while (i<n && ce.cost<tce[i].cost) i++; /* find where to insert. */
   while (n>=i) tce[n]=tce[n-1], n--;      /* shift tail. */
   tce[i] = ce;                            /* insert. */
+}
+
+/* simply insert.
+ */
+static void
+insert_last_into_array(cost_expression * tce, int n, cost_expression ce)
+{
+  tce[n] = ce;
 }
 
 /* apply huffman balancing algorithm if it is a call to 
@@ -481,7 +526,7 @@ static void call_rwt(call c)
     }
     /* else */
 
-    tce = list_of_expressions_to_array(args);
+    tce = list_of_expressions_to_array(args, huffman_cost);
     /* drop initial list: */
     gen_free_list(args), args = NIL, call_arguments(c) = NIL;
 
@@ -492,10 +537,10 @@ static void call_rwt(call c)
 			       tce[nargs-1].expr, tce[nargs-2].expr);
       ce.cost = huffman_cost(ce.expr);
 
-      insert_sorted_into_array(tce, nargs-2, ce);
+      if (huffman_mode)	insert_sorted_into_array(tce, nargs-2, ce);
+      else      	insert_last_into_array(tce,  nargs-2, ce);
 
-      ifdebug(3) 
-	debug_cost_expression_array("insert done", tce, nargs-1);
+      ifdebug(3) debug_cost_expression_array("insert done", tce, nargs-1);
 
       nargs--;
     }
@@ -507,7 +552,7 @@ static void call_rwt(call c)
     free(tce), tce = NULL;
   }
   else 
-    pips_debug(3,"non huffman operator : %s \n ", 
+    pips_debug(3,"non huffman operator : %s\n ", 
 	       entity_local_name(call_function(c)));
 }
 
@@ -519,11 +564,13 @@ build_binary_operators_with_huffman(
     statement s,
     entity nary_operator,
     entity binary_operator,
-    double (*cost)(expression))
+    double (*cost)(expression),
+    boolean mode)
 {
   huffman_nary_operator = nary_operator;
   huffman_binary_operator = binary_operator;
   huffman_cost = cost;
+  huffman_mode = mode;
 
   // debug !
   print_statement(s);
@@ -535,6 +582,7 @@ build_binary_operators_with_huffman(
   huffman_nary_operator = NULL;
   huffman_binary_operator = NULL;
   huffman_cost = NULL;  
+  huffman_mode = TRUE;
 }
 
 /* switch nary operators to binary ones.
@@ -554,8 +602,55 @@ switch_nary_to_binary(statement s)
    * for instance, defining -expression_gravity would build
    * the most unbalanced possible expression tree wrt WG.
    */
-  build_binary_operators_with_huffman(s, nplus, plus, expression_gravity);
-  build_binary_operators_with_huffman(s, nmult, mult, expression_gravity);
+  build_binary_operators_with_huffman
+    (s, nplus, plus, expression_gravity, TRUE);
+  build_binary_operators_with_huffman
+    (s, nmult, mult, expression_gravity, TRUE);
+}
+
+/***************************************************** PREDEFINED STRATEGIES */
+
+/* predefined optimization strategies.
+ */
+static optimization_strategy 
+  strategies[] = 
+{
+  { 
+    "P2SC", 
+    TRUE, expression_gravity, TRUE,
+    TRUE, "0",
+    TRUE
+  },
+  {
+    "R10K",
+    TRUE, expression_gravity, FALSE,
+    TRUE, "1",
+    TRUE
+  },
+
+  /* this one MUST be the last one! */
+  {
+    NULL, /* default similar to P2SC. */
+    TRUE, expression_gravity, TRUE,
+    TRUE, "0",
+    TRUE
+  }
+};
+
+static void set_current_optimization_strategy(void)
+{
+  string name = get_string_property("EOLE_OPTIMIZATION_STRATEGY");
+  for (strategy = strategies; strategy->name!=NULL; strategy++)
+  {
+    if (same_string_p(name, strategy->name))
+      return;
+  }
+  pips_user_warning("'%s' strategy not found, default assumed.\n", name);
+}
+
+static void reset_current_optimization_strategy(void)
+{
+  strategy = NULL;
 }
 
 
@@ -566,9 +661,6 @@ switch_nary_to_binary(statement s)
 bool optimize_expressions(string module_name)
 {
     statement s;
-    list /* of expression */ le, ln;
-
-    ln = NIL;
 
     debug_on(DEBUG_NAME);
 
@@ -577,6 +669,7 @@ bool optimize_expressions(string module_name)
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     set_current_module_statement((statement)
         db_get_memory_resource(DBR_CODE, module_name, TRUE));
+    set_current_optimization_strategy();
 
     s = get_current_module_statement();
 
@@ -592,54 +685,59 @@ bool optimize_expressions(string module_name)
 
     /* begin EOLE stuff
      */
-    le = get_list_of_rhs(s);
-    if (gen_length(le)) /* not empty list */
+    if (strategy->apply_eole)
     {
-      string in, out, cmd;
+      list /* of expression */ le, ln;
+      ln = NIL;
+      le = get_list_of_rhs(s);
 
-      /* create temporary files */
-      in = safe_new_tmp_file(IN_FILE_NAME);
-      out = safe_new_tmp_file(OUT_FILE_NAME);
-      
-      /* write informations in out file for EOLE */
-      write_to_eole(module_name, le, out);
+      if (gen_length(le)) /* not empty list */
+      {
+	string in, out, cmd;
+	
+	/* create temporary files */
+	in = safe_new_tmp_file(IN_FILE_NAME);
+	out = safe_new_tmp_file(OUT_FILE_NAME);
+	
+	/* write informations in out file for EOLE */
+	write_to_eole(module_name, le, out);
+	
+	/* run eole (Evaluation Optimization for Loops and Expressions) 
+	 * as a separate process.
+	 */
+	cmd = get_eole_command(in, out);
+	
+	pips_debug(2, "executing: %s\n", cmd);
+	
+	safe_system(cmd);
+	
+	/* read optimized expressions from eole */
+	ln = read_from_eole(module_name, in);
+	
+	/* replace the syntax values inside le by the syntax values from ln */
+	swap_syntax_in_expression(le, ln);
+	
+	/* must now free the useless expressions */
+	
+	
+	/* remove temorary files and free allocated memory.
+	 */
+	safe_unlink(out);
+	safe_unlink(in);
+	
+	/* free strings */
+	free(out), out = NULL;
+	free(in), in = NULL;
+	free(cmd), cmd = NULL;
+	
+      }
+      else 
+	pips_debug(3, "no expression for module %s\n", module_name);
 
-      /* run eole (Evaluation Optimization for Loops and Expressions) 
-       * as a separate process.
-       */
-      cmd = get_eole_command(in, out);
-
-      pips_debug(2, "executing: %s\n", cmd);
-      
-      safe_system(cmd);
-      
-      /* read optimized expressions from eole */
-      ln = read_from_eole(module_name, in);
-
-      /* replace the syntax values inside le by the syntax values from ln */
-      swap_syntax_in_expression(le, ln);
-
-      /* must now free the useless expressions */
-      
-
-      /* remove temorary files and free allocated memory.
-       */
-      safe_unlink(out);
-      safe_unlink(in);
-
-      /* free strings */
-      free(out), out = NULL;
-      free(in), in = NULL;
-      free(cmd), cmd = NULL;
-
+      /* free lists */
+      gen_free_list(ln);
+      gen_free_list(le);
     }
-    else 
-      pips_debug(3, "no expression for module %s\n", module_name);
-
-
-    /* free lists */
-    gen_free_list(ln);
-    gen_free_list(le);
 
     pips_debug(3,"EOLE transformations ... Done for module %s\n", module_name);
 
@@ -655,8 +753,12 @@ bool optimize_expressions(string module_name)
      */
     /* CSE/ICM + atom
      */
-    switch_nary_to_binary(s);
+    if (strategy->apply_balancing)
+      switch_nary_to_binary(s);
+
+    if (strategy->apply_simplify)
     optimize_simplify_patterns(s);
+
     /* others?
      */
 
@@ -666,6 +768,7 @@ bool optimize_expressions(string module_name)
 
     reset_current_module_entity();
     reset_current_module_statement();
+    reset_current_optimization_strategy();
 
     debug_off();
 
