@@ -1,6 +1,6 @@
 # PROJET PIPS: EXPLOITATION DE LA DOCUMENTATION
 # ---------------------------------------------
-# $RCSfile: old_documentation_makefile,v $ ($Date: 1996/02/23 14:58:51 $, )
+# $RCSfile: old_documentation_makefile,v $ ($Date: 1996/02/23 15:31:23 $, )
 # version $Revision$
 # got on %D%, %T%
 #
@@ -308,9 +308,9 @@ $(LIBDIR)/properties.rc: properties-rc.tex
 	$(UTILDIR)/filter_verbatim >> $(LIBDIR)/properties.rc
 
 pipsmake-rc: pipsmake-rc.tex
+	@echo making pipsmake-rc
 	@expand pipsmake-rc.tex | \
-	sed 's/ *$$//' | \
-	sed '/^alias /d' | \
+	sed 's/ *$$//;/^alias /d' | \
 	$(UTILDIR)/filter_verbatim | \
 	cat $(INCLUDEDIR)/auto.h - > pipsmake-rc
 
