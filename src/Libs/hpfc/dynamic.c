@@ -6,7 +6,7 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/05/05 16:51:09 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/05/05 19:04:59 $, )
  * version $Revision$
  */
 
@@ -552,21 +552,10 @@ entity old, new;
     close_ctrl_graph_travel();
 }
 
-/* void simplify_remapping_graph()
+/*------------------------------------------------------------------
  *
- * what: simplifies the current remapping graph.
- * how: remove unusefull (not used) remappings.
- * input: none.
- * output: none.
- * side effects:
- *  - the current remapping graph is used.
- *  - the current renamings are modified.
- * bugs or features:
- *  - ??? the convergence is not actually proved. 
- *    I guess it is ok only if the dynamic code is "static"...
- */
-
-/* To be put in Newgen.
+ *              REMAPPING GRAPH REMAPS "SIMPLIFICATION"
+ *
  */
 
 /* UNUSED PROPAGATION
@@ -576,6 +565,7 @@ entity old, new;
  * - reaching mappings (1 per array if static)
  * - leaving mappings (1 per remapped array)
  * - none propagated.
+ * C_a = static code (m), extended static code (m*r).
  */
 static void 
 initialize_reaching_propagation(s)
@@ -608,6 +598,7 @@ statement s;
 /* for statements in lc
  * - array is a reaching mapping
  * - if added, to be checked
+ * C_b = q
  */
 static list /* of statements */ 
 propagate_reaching_array(array, lc, ls)
@@ -635,6 +626,8 @@ list /* of statements */ ls;
     return(ls);
 }
 
+/* C_c = m*r*C_b
+ */
 static list /* of statements */ 
 propagate_all_unsused(s, ls)
 statement s;
@@ -668,6 +661,7 @@ list /* of statements */ ls;
 }
 
 /* {sh,c}ould be integrated in the mapping propagation phase ?
+ * C_d = m
  */
 static void remove_not_remapped_leavings(s)
 statement s;
@@ -703,7 +697,8 @@ statement s;
 /* A remapped from x and no reaching x ->
  * not from x, and no leaving x if remapped but not used...
  */
-
+/* C_e = q
+ */
 static bool reached_mapping_p(array, lc)
 entity array;
 list /* of controls */ lc;
@@ -718,18 +713,20 @@ list /* of controls */ lc;
     return(FALSE);
 }
 
+/* C_f = q
+ */
 static list /* of statements */
 add_successors(s, ls)
 statement s;
 list /* of statements */ ls;
 {
     list /* of controls */ lc = control_successors(load_remapping_graph(s));
-    
     MAPL(cc, ls = gen_once(control_statement(CONTROL(CAR(cc))), ls), lc);
-
     return(ls);
 }
 
+/* C_g = r (if tests all the remaps for the primary, but 1 if primaries).
+ */
 static void remove_from_entities(primary, es)
 entity primary;
 entities es;
@@ -748,6 +745,8 @@ entities es;
     gen_free_list(le);
 }
 
+/* C_h = m*C_g
+ */
 static void remove_unused_remappings(s)
 statement s;
 {
@@ -774,6 +773,8 @@ statement s;
     gen_free_list(le);
 }
 
+/* C_i = m*r*(C_e+C_f)
+ */
 static list /* of statements */
 kill_dead_remappings(s, ls)
 statement s;
@@ -788,8 +789,6 @@ list /* of statements */ ls;
                            lr = entities_list(load_remapped(s));
 
     if (s==get_current_module_statement()) return(ls); 
-
-    /* but I should clean the initial??? */
 
     MAPL(ce,
      {
@@ -816,6 +815,8 @@ list /* of statements */ ls;
     return(ls);
 }
 
+/* C_j = m*r
+ */
 static void regenerate_renamings(s)
 statement s;
 {
@@ -854,6 +855,8 @@ statement s;
     }
 }
 
+/* C_k = n
+ */
 static list /* of statements */ 
 list_of_remapping_statements()
 {
@@ -862,18 +865,12 @@ list_of_remapping_statements()
     return(l);
 }
 
-static void print_control_orderings(lc)
-list /* of controls */ lc;
+/* functions used for debug.
+ */
+static void print_control_ordering(c)
 {
-    int so;
-
-    MAPL(cc, 
-     {
-	 so = statement_ordering(control_statement(CONTROL(CAR(cc))));
-	 fprintf(stderr, "(%d,%d), ", 
-		 ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
-     },
-	 lc);
+    register int so = statement_ordering(control_statement(c));
+    fprintf(stderr, "(%d,%d), ", ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
 }
 
 static void dump_remapping_graph_info(s)
@@ -884,9 +881,9 @@ statement s;
     what_stat_debug(1, s);
 
     fprintf(stderr, "predecessors: ");
-    print_control_orderings(control_predecessors(c));
+    gen_map(print_control_ordering, control_predecessors(c));
     fprintf(stderr, "\nsuccessors: ");
-    print_control_orderings(control_successors(c));
+    gen_map(print_control_ordering, control_successors(c));
     fprintf(stderr, "\n");
 
     DEBUG_ELST(1, "remapped", entities_list(load_remapped(s)));
@@ -895,37 +892,48 @@ statement s;
     DEBUG_ELST(1, "leaving", entities_list(load_leaving_mappings(s)));
 }
 
-/* 
- * what:
- * how:
- * input:
- * output:
- * side effects:
- *  - 
- *  - 
+/* void simplify_remapping_graph()
+ *
+ * what: simplifies the remapping graph.
+ * how: propagate unused reaching mappings to the next remappings,
+ *      and remove unnecessary remappings.
+ * input: none.
+ * output: none.
+ * side effects: all is there!
+ *  - the remapping graph remappings are modified.
+ *  - some static structures are used.
+ *  - current module statement needed.
  * bugs or features:
+ *  - special treatment of the current module statement to model the 
+ *    initial mapping at the entry of the module. The initial mapping may
+ *    be modified by the algorithm if it is remapped before being used.
+ *  - ??? the convergence and correctness are to be proved.
+ *  - expected complexity: n vertices (small!), q nexts, m arrays, r remaps.
+ *    assumes fast sets instead of lists, with O(1) tests/add/del...
+ *    closure: O(n^2*vertex_operation) (if it is a simple propagation...)
+ *    map: O(n*vertex_operation)
+ *    C = n + n*m + n^2*m*r*q + n*m + n*m*r + n^2*m*r*q + n*m*r = O(n^2*m*r*q)
  */
 void simplify_remapping_graph()
 {
     list /* of statements */ ls = list_of_remapping_statements();
-    statement root = get_current_module_statement();
+    statement root = get_current_module_statement(); /* C_k */
 
-    what_stat_debug(3, root);
+    what_stat_debug(4, root);
 
-    gen_map(initialize_reaching_propagation, ls);
+    gen_map(initialize_reaching_propagation, ls); /* n*C_a */
 
-    ifdebug(2) gen_map(dump_remapping_graph_info, ls);
+    ifdebug(4) gen_map(dump_remapping_graph_info, ls);
 
-    gen_closure(propagate_all_unsused, ls);
-    gen_map(remove_not_remapped_leavings, ls);
+    gen_closure(propagate_all_unsused, ls);    /* n^2*C_c */
+    gen_map(remove_not_remapped_leavings, ls); /* n*C_d */
 
-    ifdebug(2) gen_map(dump_remapping_graph_info, ls);
+    ifdebug(4) gen_map(dump_remapping_graph_info, ls);
 
-    if (bound_remapped_p(root))
-	remove_unused_remappings(root);
-    gen_closure(kill_dead_remappings, ls);
+    if (bound_remapped_p(root))	remove_unused_remappings(root); /* n*C_h */
+    gen_closure(kill_dead_remappings, ls); /* n^2*C_i */
 
-    gen_map(regenerate_renamings, ls);
+    gen_map(regenerate_renamings, ls); /* n*C_j */
     gen_map(gen_free, load_renamings(root)),
     gen_free_list(load_renamings(root)), 
     (void) delete_renamings(root);
