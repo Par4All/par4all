@@ -13,7 +13,6 @@
 #include "complexity_ri.h"
 #include "database.h"
 
-#include "mapping.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"
