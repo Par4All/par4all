@@ -3,7 +3,7 @@ c Runtime Support Functions for the
 c High Performance Fortran Compiler
 c by Fabien COELHO.
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/09/19 18:22:46 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1995/09/20 19:26:08 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -1032,6 +1032,12 @@ _CM5(`      integer i')dnl
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
       call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
+
+      if (info.lt.0) then
+         call pvmfperror("initial broadcast", info)
+         call pvmfexit(info)
+         stop
+      endif
 
       call HPFC_INIT_COMMON_PROCS
       call HPFC_INIT_COMMON_BUFFER
