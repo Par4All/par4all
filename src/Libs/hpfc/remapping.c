@@ -7,6 +7,9 @@
  * ??? should drop the renaming domain?
  *
  * $Log: remapping.c,v $
+ * Revision 1.59  1997/07/21 14:00:08  keryell
+ * Replaced %x format by %p.
+ *
  * Revision 1.58  1997/05/24 11:03:41  coelho
  * lambda upper bound constraint added?
  *
@@ -1305,7 +1308,7 @@ remapping_compile(
     list /* of statements */ l = NIL;
     
     debug_on("HPFC_REMAPPING_DEBUG_LEVEL");
-    pips_debug(1, "dealing with statement 0x%x\n", (unsigned int) s);
+    pips_debug(1, "dealing with statement %p\n", s);
 
     sc_set_row_echelon_redundancy
 	(get_bool_property("HPFC_REDUNDANT_SYSTEMS_FOR_REMAPS"));
