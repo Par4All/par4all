@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/21 16:55:01 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1995/09/27 14:06:16 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -159,6 +159,14 @@ Shall we execute the instructions of just check the syntax
 
 \begin{verbatim}
 TPIPS_NO_EXECUTION_MODE      FALSE
+\end{verbatim}
+
+\subsection{WPips graphical interface}
+
+Wpips catch the XView error. For debug, it may be interesting to trap
+just when the error occurs instead of just display a warning :
+\begin{verbatim}
+ABORT_ON_WPIPS_XVIEW_ERROR FALSE
 \end{verbatim}
 
 \section{Analyses}
