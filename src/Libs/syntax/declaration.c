@@ -823,13 +823,19 @@ update_common_sizes()
 	    debug(1, "update_common_sizes",
 		       "set size %d for common %s\n", s, entity_name(c));
 	}
-	else if (area_size(ac) != s)
+	else if (area_size(ac) != s) {
+	    /* I'm afraid this wwarning might be printed because area_size is given
+	     * a wrong value by CurrentOffsetOfArea()
+	     */
 	    user_warning("update_common_sizes",
 			 "inconsistent size (%d and %d) for common /%s/ in %s\n"
 			 "Best results are obtained if all instances of a "
 			 "COMMON are declared the same way.\n",
 			 area_size(ac), s, module_local_name(c), 
 			 CurrentPackage);
+	    if(area_size(ac) < s)
+		area_size(ac) = s;
+	}
 	else {
 	    debug(1, "update_common_sizes",
 		       "reset size %d for common %s\n", s, entity_name(c));
@@ -1255,7 +1261,8 @@ print_common_layout(FILE * fd, entity c)
     list members = area_layout(type_area(entity_type(c)));
     list equiv_members = NIL;
 
-    (void) fprintf(fd,"\nLayout for common /%s/:\n", module_local_name(c));
+    (void) fprintf(fd,"\nLayout for common /%s/ of size %d:\n",
+		   module_local_name(c), area_size(type_area(entity_type(c))));
 
     if(ENDP(members)) {
 	(void) fprintf(fd, "\t* empty area *\n\n");
@@ -1322,6 +1329,8 @@ entity c;
      *  - variables appears in their declaration order
      *  - all variables that belong to the same module appear contiguously
      *    (i.e. declarations are concatenated on a module basis)
+     *  - variables wich are located in the common thru an EQUIVALENCE statement
+     *    are *not* (yet) in its layout
      */
 
     list members = area_layout(type_area(entity_type(c)));
@@ -1354,11 +1363,24 @@ entity c;
 	       ram_offset(storage_ram(entity_storage(current)))) {
 		ifdebug(1) {
 		    user_warning("update_common_layout", 
-				 "entity %s must have been typed after it was allocated in common %s\n",
-				 entity_local_name(previous), entity_local_name(c));
+				 "entity %s must have been typed after it was allocated in common /%s/\n",
+				 entity_local_name(previous), module_local_name(c));
 		}
 		ram_offset(storage_ram(entity_storage(current))) =
 		    ram_offset(storage_ram(entity_storage(previous)))+SizeOfArray(previous);
+
+		/* If c really is a common, check its size because it may have increased.
+		 * Note that decreases are not taken into account although they might
+		 * occur as well.
+		 */
+		if(top_level_entity_p(c)) {
+		    int s = common_to_size(c);
+		    int new_s = ram_offset(storage_ram(entity_storage(current)))
+			+SizeOfArray(current);
+		    if(s < new_s) {
+			(void) update_common_to_size(c, new_s);
+		    }
+		}
 		updated = TRUE;
 	    }
 
@@ -1430,6 +1452,9 @@ fprint_environment(FILE * fd, entity m)
 	    }
 	    else
 		pips_error("fprint_environment", "Ill. type %d\n", type_tag(tr));
+	}
+	else if(type_area_p(t)) {
+	    (void) fprintf(fd, "with size %d\n", area_size(type_area(t)));
 	}
 	else
 	    (void) fprintf(fd, "\n");
