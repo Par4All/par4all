@@ -31,23 +31,25 @@ bool rice_distribute_only;
 int enclosing = 0 ;
 
 
-void rice_unstructured(u,l)
+void rice_unstructured(u,l,codegen_fun)
 unstructured u ;
 int l ;
+statement (*codegen_fun)(statement, graph, set, int, bool);
 {
     cons *blocs = NIL ;
 
     CONTROL_MAP(c, {
-	statement st = rice_statement(control_statement(c),l);
+	statement st = rice_statement(control_statement(c),l,codegen_fun);
 	control_statement(c) = st;
     }, unstructured_control(u), blocs);
 
     gen_free_list( blocs );
 }
 
-statement rice_statement(stat,l)
+statement rice_statement(stat,l,codegen_fun)
 statement stat;
 int l ;
+statement (*codegen_fun)(statement, graph, set, int, bool);
 {
     instruction istat = statement_instruction(stat);
 
@@ -55,18 +57,18 @@ int l ;
       case is_instruction_block: {
 	  MAPL(pc, {
 	      statement st = STATEMENT(CAR(pc));
-	      STATEMENT(CAR(pc)) = rice_statement(st,l);
+	      STATEMENT(CAR(pc)) = rice_statement(st,l,codegen_fun);
 	  }, instruction_block(istat));
 	  break;
       }
       case is_instruction_test: {
 	  test obj_test = instruction_test(istat);
-	  test_true(obj_test) = rice_statement(test_true(obj_test),l);
-	  test_false(obj_test) = rice_statement(test_false(obj_test),l);
+	  test_true(obj_test) = rice_statement(test_true(obj_test),l,codegen_fun);
+	  test_false(obj_test) = rice_statement(test_false(obj_test),l,codegen_fun);
 	  break;
       }
       case is_instruction_loop: {
-	  stat = rice_loop(stat,l);
+	  stat = rice_loop(stat,l,codegen_fun);
 	  ifdebug(7){
 	      fprintf(stderr, "\nparalized loop :");
 	      if (statement_consistent_p((statement)stat))
@@ -80,7 +82,7 @@ int l ;
 	break;
       case is_instruction_unstructured: {
 	  unstructured obj_unstructured = instruction_unstructured(istat);
-	  rice_unstructured(obj_unstructured,l);
+	  rice_unstructured(obj_unstructured,l,codegen_fun);
 	  break;
       }
       default:
@@ -92,7 +94,10 @@ int l ;
 }
 
 statement 
-rice_loop(statement stat, int l)
+rice_loop(statement stat, 
+	  int l,
+	  statement (*codegen_fun)(statement, graph, set, int, bool)
+	  )
 {
     statement nstat;
     instruction istat = statement_instruction(stat);
@@ -118,7 +123,7 @@ rice_loop(statement stat, int l)
 
 	enclosing++ ;
 	loop_body(instruction_loop(istat)) = 
-	    rice_statement(loop_body(instruction_loop(istat)),l+1);
+	    rice_statement(loop_body(instruction_loop(istat)),l+1,codegen_fun);
 	enclosing-- ;
 	return(stat);
     }
@@ -134,7 +139,7 @@ rice_loop(statement stat, int l)
 	&& instruction_continue_p(statement_instruction(loop_body(instruction_loop(istat))))) 
 	    nstat = copy_statement(stat); 
 	else 
-	    nstat = CodeGenerate(dg, region, l, TRUE);
+	    nstat = codegen_fun(stat, dg, region, l, TRUE);
 	
     ifdebug(7){
 	pips_debug(7, "consistency checking for CodeGenerate output: ");
@@ -173,11 +178,13 @@ rice_loop(statement stat, int l)
 /*
  * RICE_DEBUG_LEVEL (properly?) included, FC 23/09/93
  */
-static bool
+bool
 do_it(
     string mod_name,
     bool distribute_p,
-    string what)
+    string what,
+    statement (*codegen_fun)(statement, graph, set, int, bool)
+    )
 {
     statement mod_stat = statement_undefined;
     /* In spite of its name, the new statement "mod_parallel_stat"
@@ -238,7 +245,7 @@ do_it(
 
     rice_distribute_only = distribute_p ;
     enclosing = 0;
-    rice_statement(mod_parallel_stat,1);   
+    rice_statement(mod_parallel_stat,1,codegen_fun);   
 
     /* Regenerate statement_ordering for the parallel code */
     reset_ordering_to_statement();
@@ -276,7 +283,7 @@ bool distributer(string mod_name)
 
     debug_on("RICE_DEBUG_LEVEL");
 
-    success = do_it( mod_name, TRUE, DBR_CODE ) ;
+    success = do_it( mod_name, TRUE, DBR_CODE, &CodeGenerate ) ;
 
     debug_off();  
     reset_current_module_entity();
@@ -290,7 +297,7 @@ static bool rice(string mod_name)
     entity module = local_name_to_top_level_entity(mod_name);
     set_current_module_entity(module);
 
-    success = do_it( mod_name, FALSE, DBR_PARALLELIZED_CODE);
+    success = do_it( mod_name, FALSE, DBR_PARALLELIZED_CODE, &CodeGenerate);
 
     reset_current_module_entity();
     return success;
