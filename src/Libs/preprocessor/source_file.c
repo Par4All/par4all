@@ -357,16 +357,16 @@ static void sort_file(string name)
 {
     FILE *f;
     char * lines[MAX_NLINES];
-    char line[LINE_LENGTH];
+    string line;
     int i=0;
 
     f=safe_fopen(name, "r");
-    while (fgets(line, LINE_LENGTH, f))
+    while ((line=read_line(f)))
     {
-	if (!zzz_file_p(sg)) /* drop zzz* files */
+	if (!zzz_file_p(line)) /* drop zzz* files */
 	{
 	    pips_assert("not too many lines", i<MAX_NLINES);
-            lines[i++]=strdup(sg);
+            lines[i++]=strdup(line);
 	}
     }
     safe_fclose(f, name);
@@ -391,11 +391,10 @@ static bool pips_split_file(string name, string tempfile)
 		     tempfile, "; /bin/rm -f zzz???.f", NULL));
 
     if(err==123)
-	user_warning("process_user_file",
-		     "File splitting interrupted by control-C\n");
+	pips_user_warning("File splitting interrupted by control-C\n");
     else if(err!=0)
-	pips_error("process_user_file",
-		   "Unexpected return code from pips-split: %d\n", err);
+	pips_internal_error("Unexpected return code from pips-split: %d\n", 
+			    err);
 
     return err;
 #else
