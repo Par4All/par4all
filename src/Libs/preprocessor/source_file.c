@@ -40,8 +40,6 @@
 
 #include "top-level.h"
 
-#define LINE_LENGTH 240
-
 #define skip_line_p(s) \
   ((*(s))=='\0' || (*(s))=='!' || (*(s))=='*' || (*(s))=='c' || (*(s))=='C')
 
@@ -174,6 +172,28 @@ get_dont_build_view_file(char * print_type)
 {
     return get_view_file(print_type, FALSE);
 }
+
+/********************************************************* PIPS SOURCE PATH */
+
+#define SRCPATH "PIPS_SRCPATH"
+
+string 
+pips_srcpath_append(string pathtoadd)
+{
+    string old_path, new_path;
+    old_path = getenv(SRCPATH);
+    old_path = strdup(old_path? old_path: "");
+    new_path = strdup(concatenate(SRCPATH "=", old_path, ":", pathtoadd, 0));
+    putenv(new_path);
+    return old_path;
+}
+
+void
+pips_srcpath_set(string path)
+{
+    putenv(strdup(concatenate(SRCPATH "=", path, 0)));
+}
+
 
 /*************************** MODULE PROCESSING (INCLUDES and IMPLICIT NONE) */
 
@@ -700,7 +720,7 @@ process_user_file(string file)
 
     /* the file is looked for in the pips source path.
      */
-    nfile = find_file_in_directories(file, getenv("PIPS_SRCPATH"));
+    nfile = find_file_in_directories(file, getenv(SRCPATH));
 
     if (!nfile)
     {
