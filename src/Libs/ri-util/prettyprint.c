@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.125  1998/11/27 13:52:36  irigoin
+ * words_substring_op() modified to cope with substrings of unbounded strings passed as
+ * formal parameters
+ *
  * Revision 1.124  1998/10/28 16:04:33  zory
  * prettyrpint for n-ary operators included
  * bug removed into fma prettyprint
@@ -212,7 +216,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.124 1998/10/28 16:04:33 zory Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.125 1998/11/27 13:52:36 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -539,7 +543,17 @@ words_substring_op(call obj, int precedence, bool leftmost)
     pc = CHAIN_SWORD(pc, "(");
     pc = gen_nconc(pc, words_subexpression(l, prec, TRUE));
     pc = CHAIN_SWORD(pc, ":");
-    pc = gen_nconc(pc, words_subexpression(u, prec, TRUE));
+
+    /* An unknown upper bound is encoded as a call to
+       UNBOUNDED_DIMENSION_NAME and nothing must be printed */
+    if(syntax_call_p(expression_syntax(u))) {
+	entity star = call_function(syntax_call(expression_syntax(u)));
+	if(star!=CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+	    pc = gen_nconc(pc, words_subexpression(u, prec, TRUE));
+    }
+    else {
+	pc = gen_nconc(pc, words_subexpression(u, prec, TRUE));
+    }
     pc = CHAIN_SWORD(pc, ")");
 
     return(pc);
