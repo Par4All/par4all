@@ -393,9 +393,10 @@ int *pv;
     return(FALSE);
 }    
 
-static normalized normalize_intrinsic(f, la)
-entity f;
-list la;
+static normalized 
+normalize_intrinsic(
+    entity f,
+    list la)
 {
     bool minus;
 	
@@ -404,10 +405,8 @@ list la;
 
     if (ENTITY_UNARY_MINUS_P(f))
     {
-	Pvecteur
-	    tmp = VECTEUR_NUL;
-	normalized 
-	    n = expression_normalized(EXPRESSION(CAR(la)));
+	Pvecteur tmp = VECTEUR_NUL;
+	normalized n = expression_normalized(EXPRESSION(CAR(la)));
 
 	return(normalized_complex_p(n) ?
 	       make_normalized(is_normalized_complex, UU) :
@@ -437,10 +436,9 @@ list la;
 	normalized
 	    n1 = expression_normalized(EXPRESSION(CAR(la))),
 	    n2 = expression_normalized(EXPRESSION(CAR(CDR(la))));
-	bool
-	    b1, b2;
-	int
-	    i1, i2;
+	bool b1, b2;
+	int i1, i2;
+	Pvecteur v;
 
 	if (normalized_complex_p(n1) || normalized_complex_p(n2))
 	    return(make_normalized(is_normalized_complex, UU));
@@ -450,16 +448,19 @@ list la;
 
 	if (! (b1 || b2)) return(make_normalized(is_normalized_complex, UU));
 
+	/* else multiply (caution: vect_multiply does not allocate...)
+	 */
+	v = vect_dup(b1 ? normalized_linear(n2) : normalized_linear(n1));
+
 	return(make_normalized(is_normalized_linear,
-	    vect_multiply(b1 ? normalized_linear(n2) : normalized_linear(n1), 
-			  b1 ? i1 : i2)));
+			       vect_multiply(v, b1 ? i1 : i2)));
     }
     /* else */
     return(make_normalized(is_normalized_complex, UU));
 }
 
-normalized normalize_constant(c)
-constant c;
+static normalized 
+normalize_constant(constant c)
 {
     return((constant_int_p(c)) ? 
 	   make_normalized(is_normalized_linear, 
@@ -467,8 +468,8 @@ constant c;
 	   make_normalized(is_normalized_complex, UU));
 }
 
-normalized normalize_reference(r)
-reference r;
+normalized 
+normalize_reference(reference r)
 {
     entity var = reference_variable(r);
 
@@ -479,8 +480,8 @@ reference r;
 	   make_normalized(is_normalized_complex, UU));
 }
 
-normalized normalize_call(c)
-call c;
+static normalized 
+normalize_call(call c)
 {
     normalized n = normalized_undefined;
     entity f = call_function(c);
@@ -509,8 +510,8 @@ call c;
     return(n);
 }
 
-static void normalize_all_expressions_rewrite(e)
-expression e;
+static void 
+norm_all_rewrite(expression e)
 {
     syntax s = expression_syntax(e);
     tag t = syntax_tag(s);
@@ -526,13 +527,10 @@ expression e;
 	     normalized_undefined);
 }
 
-void normalize_all_expressions_of(obj)
-chunk *obj;
+void 
+normalize_all_expressions_of(chunk *obj)
 {
-    gen_recurse(obj,
-		expression_domain,
-		gen_true,
-		normalize_all_expressions_rewrite);
+    gen_recurse(obj, expression_domain, gen_true, norm_all_rewrite);
 }
 
 /* --------------------------------------------------------------------- 
