@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/07/20 18:40:40 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/08/29 12:02:07 $, )
  * version $Revision$
  */
 
@@ -740,8 +740,7 @@ void get_entity_dimensions(e, dim, plow, pup)
 entity e;
 int dim, *plow, *pup;
 {
-    dimension
-	d = dimension_undefined;
+    dimension d = dimension_undefined;
 
     assert(entity_variable_p(e) && dim>0 && dim<=7);
 
