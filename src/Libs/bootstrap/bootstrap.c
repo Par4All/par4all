@@ -313,21 +313,16 @@ bool bootstrap(string workspace)
      */
     CreateAreas();
 
-    /*
-     * The current entity is unknown, but for a TOP-LEVEL:TOP-LEVEL
+    /* The current entity is unknown, but for a TOP-LEVEL:TOP-LEVEL
      * which is used to create the logical unit array for IO effects
      */
     CreateArrays();
 
-    /* DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(workspace), NULL); */
-    /* FI, Could also be:
-     *  DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(workspace), string_undefined);
-     */
-    /* DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(workspace), ""); */
     /* FI: I suppress the owner filed to make the database moveable */
     /* FI: I guess no pointers to the resource is passed because it
        is a tabulated NewGen field. */
-    DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, "", "");
+    /* FC: switched to string_undefined to avoid free coredump */
+    DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, "", string_undefined);
 
     return TRUE;
 }
