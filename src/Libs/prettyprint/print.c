@@ -82,10 +82,11 @@ char *mod_name;
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
 
-
     set_bool_property("PRETTYPRINT_PARALLEL", TRUE);
     set_bool_property("PRETTYPRINT_SEQUENTIAL", FALSE);
 
+    begin_attachment_prettyprint();
+    
     init_prettyprint(empty_text);
 
     mod_stat = (statement)
@@ -99,7 +100,8 @@ char *mod_name;
 
     success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
 				  PARALLEL_FORTRAN_EXT, r);
-
+    end_attachment_prettyprint();
+ 
     return success;
 }
 
@@ -126,8 +128,6 @@ char *mod_name;
     text r = make_text(NIL);
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
-    bool is_emacs_prettyprint =
-	get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES");
   
     string resource_name = strdup
 	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
@@ -145,10 +145,7 @@ char *mod_name;
     mod_stat = (statement)
 	db_get_memory_resource(is_user_view?DBR_PARSED_CODE:DBR_CODE, mod_name, TRUE);
 
-    if (is_emacs_prettyprint) {	
-	begin_attachment_prettyprint();
-	name_almost_everything_in_a_module(mod_stat);
-    }
+    begin_attachment_prettyprint();
     
     init_prettyprint(empty_text);
 
@@ -157,15 +154,13 @@ char *mod_name;
     debug_off();
     success = make_text_resource (mod_name, resource_name, file_ext, r);
 
-    if (is_emacs_prettyprint) {
-	end_attachment_prettyprint();
-	free_names_of_almost_everything_in_a_module();
-    }
-    
+    end_attachment_prettyprint();
+
     free(resource_name);
     free(file_ext);
     return success;
 }
+    
 
 bool make_text_resource(mod_name, res_name, file_ext, texte)
 char *mod_name;
