@@ -2,7 +2,7 @@
 # for debug, try:
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 17:24:37 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/08 17:37:26 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -55,7 +55,7 @@ do
     P)	DIRSIDE="$PIPS_SRCDIR" ;;
     c)	DIRS='.';;
     a)	ALL='1' ;;
-    h)  help ; exit 0 ;
+    h)  help ; exit 0 ;;
     *)	usage 2 "invalid option ($opt)" ;;
   esac
 done
