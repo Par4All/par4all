@@ -1386,17 +1386,27 @@ Ptsg *gs,*gsop;
  *                                                  list llv, s2_enc_loops)
  * input    : 
  *      reference r1, r2  : current array references;
- *      Psystem sc1, sc2  : context systems for r1 and r2;
+ *      Psystem sc1, sc2  : context systems for r1 and r2; they might be modified
+ *                          by normalization procedures
  *      Psystem *psc_dep  : pointer toward the dependence context systeme;
  *      list llv          : current loop nest variant list;
  *      list s2_enc_loops : statement s2 enclosing loops;
- * output   : FALSE if one of the initial systems is unfeasible after normalization;
- *            TRUE otherwise;
- * modifies : psc_dep points toward the dependence context system built from 
- *            sc1 and sc2. Dependence distance variables (di) are introduced
- *            in sc2, along with the dsi variables to take care of variables
- *            modified in the loop nest; unrelevant constraints are removed
- *            in order to make further manipulations easier.
+ *
+ * output  :
+ *      boolean           : FALSE if one of the initial systems is unfeasible after normalization;
+ *                          TRUE otherwise;
+ *      *psc_dep          : dependence system is the function value is TRUE;
+ *                          SC_EMPTY otherwise;
+ *
+ * side effects : 
+ *      psc_dep           : points toward the dependence context system built from 
+ *                          sc1 and sc2, r1 and r2. 
+ *                          Dependence distance variables (di) are introduced
+ *                          in sc2, along with the dsi variables to take care of variables in llv
+ *                          modified in the loop nest;
+ *                          unrelevant constraints are removed
+ *                          in order to make further manipulations easier.
+ *      sc1               : side_effect of sc_normalize()
  * comment  :
  */
 static boolean build_and_test_dependence_context(r1, r2, sc1, sc2, psc_dep, llv, 
@@ -1433,8 +1443,9 @@ list llv, s2_enc_loops;
 	    
 	    if (sc_normalize(sc1) == NULL) 
 	    {
+		*psc_dep = SC_EMPTY;
 		debug(4, "build_and_test_dependence_context", 
-		      "first initial normalized system not feasible\n");
+		      "first initial normalized system sc1 not feasible\n");
 		return(FALSE);
 	    }
 
@@ -1473,11 +1484,20 @@ list llv, s2_enc_loops;
 	    /* sc_tmp = sc2, but:
 	     * we keep only useful constraints in the predicate 
 	     * (To avoid overflow errors, and to make projections easier) 
+	     *
+	     * FI: I'm not sure this is correct. I'm afraid sc2 might
+	     * be unfeasible and become feasible due to a careless
+	     * elimination... It all depends on:
+	     *
+	     *     sc_restricted_to_variables_transitive_closure()
+	     *
+	     * There might be a better function for that purpose
 	     */
 	    Pbase variables = BASE_UNDEFINED;
 
 	    if (sc_normalize(sc2) == NULL) 
 	    {
+		*psc_dep = SC_EMPTY;
 		debug(4, "build_and_test_dependence_context", 
 		      "second initial normalized system not feasible\n");
 		return(FALSE);
@@ -1526,6 +1546,21 @@ list llv, s2_enc_loops;
 	{
 	    loop lo = statement_loop(STATEMENT(CAR(pc)));
 	    entity i2 = loop_index(lo);
+	    /* FI: a more powerful evaluation function for inc should be called
+	     * when preconditions are available. For instance, mdg could
+	     * be handled without having to partial_evaluate it
+	     *
+	     * It's not clear whether sc1 or sc2 should be used to
+	     * estimate a variable increment like N.
+	     *
+	     * It's not clear whether it's correct or not. You would like
+	     * N (or other variables in the increment expression) to be
+	     * constant within the loop nest.
+	     *
+	     * It would be better to know the precondition associated
+	     * to the corresponding loop statement, but the information
+	     * is lost in this low-level function.
+	     */
 	    inc = loop_increment_value(lo);
 	    if (inc != 0)  
 		sc_add_di(l, i2, sc_tmp, inc);
@@ -1538,7 +1573,7 @@ list llv, s2_enc_loops;
 	    sc_add_dsi(l,ENTITY(CAR(pc)),sc_tmp);
 	}
 
-	/* (sc_tmp is destroyed by sc_fusion) */
+	/* sc_tmp is  emptied and freer by sc_fusion() */
 	sc_dep = sc_fusion(sc_dep, sc_tmp);
     }
 
