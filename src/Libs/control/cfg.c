@@ -108,7 +108,7 @@ unstructured_consistency_p(unstructured u, bool assert_p)
 	}
     }
 
-    /* Since sequences are merged a unique node, if a node c1 has only one
+    /* Since sequences are merged into a unique node, if a node c1 has only one
      * successor c2, and if c2 has only one predecessor c3, c3 must be c1
      * and either c1 is the exit node which is impossible because there
      * would be no exit condition and the exit node would have a
@@ -123,23 +123,30 @@ unstructured_consistency_p(unstructured u, bool assert_p)
 	    statement s2 = control_statement(c2);
 
 	    if(gen_length(control_predecessors(c2))==1) {
-		control c3 = CONTROL(CAR(control_successors(c2)));
+		control c3 = CONTROL(CAR(control_predecessors(c2)));
 		if(c1!=c3) {
 		    consistency_p = FALSE;
-		    if(assert_p) 
+		    if(assert_p) {
+			(void) fprintf(stderr,
+				       "\nEntry node: %p\nExit node: %p\n"
+				       "c1 node: %p\nc2 node: %p\nc3 node: %p\n",
+				       entry_node, exit_node, c1, c2, c3);
+			display_linked_control_nodes(entry_node);
 			pips_assert("c3, the unique predecessor of the unique successor of c1, is c1",
 				    FALSE);
+		    }
 		}
 		else if(c2!=entry_node && !statement_test_p(s2)) {
 		    consistency_p = FALSE;
-		    (void) fprintf(stderr,
-				   "\nEntry node: %p\nExit node: %p\nc1 node: %p\nc2 node: %p\n\n",
-				   entry_node, exit_node, c1, c2);
-		    display_linked_control_nodes(entry_node);
-		    if(assert_p) 
+		    if(assert_p) {
+			(void) fprintf(stderr,
+				       "\nEntry node: %p\nExit node: %p\nc1 node: %p\nc2 node: %p\n\n",
+				       entry_node, exit_node, c1, c2);
+			display_linked_control_nodes(entry_node);
 			pips_assert("c2 is the unique successor of c1. "
 				    "c2 has c1 as unique predecessor. c2 must be the entry node",
 				    FALSE);
+		    }
 		}
 	    }
 
@@ -159,7 +166,16 @@ unstructured_while_p(unstructured u)
     control exit_node = unstructured_exit(u);
     bool while_p = FALSE;
 
+    ifdebug(5) {
+	debug(5, "unstructured_while_p", "Begin with graph\n");
+	(void) fprintf(stderr,
+		       "\nEntry node: %p\nExit node: %p\n\n",
+		       entry_node, exit_node);
+	display_linked_control_nodes(entry_node);
+    }
+
     /* Make sure that the unstructured has been "normalized" */
+    /* while_p = unstructured_consistency_p(u, TRUE); */
     while_p = unstructured_consistency_p(u, FALSE);
 
     /* An unstructured is a while loop if and only if the exit node
@@ -183,5 +199,11 @@ unstructured_while_p(unstructured u)
 	}
 	gen_free_list(succs);
     }
+    else {
+	while_p = FALSE;
+    }
+
+    debug(5, "unstructured_while_p", "End with while_p=%s\n", bool_to_string(while_p));
+
     return while_p;
 }
