@@ -92,7 +92,7 @@ static void
 help_notify(Menu menu,
             Menu_item menu_item)
 {
-   display_help((char *) xv_get(menu_item, MENU_STRING));
+   display_help((char *) xv_get(menu_item, MENU_CLIENT_DATA));
 }
 
 
@@ -121,10 +121,16 @@ create_help_menu()
                     MENU_TITLE_ITEM,
                     "The PIPS documentation",
                     MENU_GEN_PIN_WINDOW, main_frame, "Help Menu",
-                    MENU_ACTION_ITEM, "Few words about \"Workspace\"...",
-                    help_notify,
-                    MENU_ACTION_ITEM, "Few words about \"Module\"...",
-                    help_notify,
+                    MENU_ITEM,
+                    MENU_STRING, "Few words about \"Workspace\"...",
+                    MENU_CLIENT_DATA, strdup("Workspace"),
+                    MENU_NOTIFY_PROC, help_notify,
+                    NULL,
+                    MENU_ITEM,
+                    MENU_STRING, "Few words about \"Module\"...",
+                    MENU_CLIENT_DATA, strdup("Workspace"),
+                    MENU_NOTIFY_PROC, help_notify,
+                    NULL,
                     /* Just a separator: */
                     MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
                     NULL,
