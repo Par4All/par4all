@@ -149,7 +149,7 @@ int var, val;
 	result = NIL;
 
     if (ENDP(l)) 
-	return(CONS(PVECTOR, vect_new(var, val), NIL));
+	return(CONS(PVECTOR, vect_new((Variable) var, val), NIL));
 
     if ((var==0) || (val==0))
 	return(l);
@@ -164,8 +164,8 @@ int var, val;
 	 debug(9, "add_elem_to_list_of_Pvecteur",
 	       "size of vector %x is %d\n", (int) v, vect_size(v));
 
-	 vect_add_elem(&v, var, val);
-
+	 vect_add_elem(&v, (Variable) var, val);
+	 
 	 result = gen_nconc(result, CONS(PVECTOR, v, NIL));
      },
 	 l);
@@ -185,7 +185,7 @@ int dim;
 range r;
 {
     entity
-	newarray = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, array);
+	newarray = load_entity_node_new(array);
     dimension
 	d = FindIthDimension(newarray, dim);
     int
@@ -356,14 +356,15 @@ Pvecteur v;
 	bool
 	    distributed_dim = ith_dim_distributed_p(array, i, &procdim);
 	int 
-	    neighbour = ((distributed_dim)?((int) vect_coeff(procdim, v)):(0));
+	    neighbour = ((distributed_dim)?
+			 ((int) vect_coeff((Variable) procdim, v)):(0));
 	range
 	    r = RANGE(CAR(l));
 
 	if (neighbour!=0)
 	{
 	    entity
-		newarray = (entity) GET_ENTITY_MAPPING(oldtonewnodevar, array);
+		newarray = load_entity_node_new(array);
 	    dimension
 		nadim = FindIthDimension(newarray, i);
 	    expression
@@ -413,7 +414,7 @@ Pvecteur v;
 	range
 	    r = RANGE(CAR(l));
 	int
-	    neighbour = (int) vect_coeff(i, v);
+	    neighbour = (int) vect_coeff((Variable) i, v);
 
 	if (neighbour==0)
 	    domain = gen_nconc(domain, CONS(RANGE, r, NIL)); /* shared! */
