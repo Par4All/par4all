@@ -1,7 +1,7 @@
 dnl
 dnl GENERAL M4 MACROS
 dnl
-dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1994/09/16 17:04:29 $, )
+dnl $RCSfile: hpfc_lib_m4_macros,v $ ($Date: 1994/09/16 17:26:08 $, )
 dnl version $Revision$
 dnl got on %D%, %T%
 dnl
@@ -45,7 +45,7 @@ ifdef(`SYNC_EXIT',`define(`sync_exit',`$@')',`define(`sync_exit')')dnl
 dnl
 dnl ARCHITECTURES
 dnl
-include("hpfc_architecture_m4_macros")dnl
+include(`hpfc_architecture_m4_macros')dnl
 dnl
-dnl end of general m4 macros
+dnl END OF GENERAL M4 MACROS
 dnl
