@@ -114,9 +114,9 @@ typedef union gen_chunk {
 
 /* The implementation of tabulated domains */
 
-extern gen_chunk *Gen_tabulated_[] ;
 extern struct gen_binding Domains[], *Tabulated_bp ;
 
+/* never used I guess. FC 19/04/2000.
 #define TABULATED_MAP(_x,_code,_dom) \
 	{int _tabulated_map_i=0 ; \
 	 gen_chunk *_tabulated_map_t = Gen_tabulated_[Domains[_dom].index] ; \
@@ -125,6 +125,7 @@ extern struct gen_binding Domains[], *Tabulated_bp ;
 		if( (_x=(_tabulated_map_t+_tabulated_map_i)->p) != \
 		     gen_chunk_undefined ) \
 			_code ;}}
+*/
 
 /* The root of the gen_chunk read with READ_CHUNK. */
 
@@ -141,7 +142,7 @@ extern int gen_debug ;
 #define GEN_DBG_RECURSE 16
 
 #define GEN_DBG_TRAV \
-    (GEN_DBG_TRAV_LEAF|GEN_DBG_TRAV_SIMPLE|GEN_DBG_TRAV_OBJECT)
+       (GEN_DBG_TRAV_LEAF|GEN_DBG_TRAV_SIMPLE|GEN_DBG_TRAV_OBJECT)
 
 extern void gen_free GEN_PROTO(( gen_chunk * )) ;
 extern int gen_free_tabulated GEN_PROTO(( int )) ;
@@ -155,6 +156,7 @@ extern gen_chunk *gen_make_array GEN_PROTO(( int )) ;
 extern gen_chunk *gen_alloc GEN_PROTO((int, int, int, ...)) ; 
 extern char * alloc GEN_PROTO((int));
 
+/* exported type translation functions. */
 extern int gen_type_translation_old_to_actual GEN_PROTO((int));
 extern int gen_type_translation_actual_to_old GEN_PROTO((int));
 extern void gen_type_translation_reset GEN_PROTO((void));
