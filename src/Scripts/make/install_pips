@@ -1,0 +1,62 @@
+#! /bin/sh
+#
+
+error()
+{ ret=$1 ; shift ; echo "$@" >&2 ; exit $ret ; }
+
+test -d ./Pips   || error 2 "no Pips root"
+test -d ./Newgen || error 3 "no Newgen root"
+test -d ./Linear || error 4 "no Linear root"
+test -d ./Extern || errot 5 "no Extern root"
+
+PWD=`pwd`
+
+PIPS_ROOT=$PWD/Pips
+NEWGEN_ROOT=$PWD/Newgen
+LINEAR_ROOT=$PWD/Linear
+EXTERN_ROOT=$PWD/Extern
+
+PIPS_ARCH=`ls $PIPS_ROOT/Lib | head -1`
+
+test "$OPENWINHOME" || OPENWINHOME=/usr/openwin
+
+test -d $OPENWINHOME ||
+{
+   echo "openwin not found!"
+   echo "enter the directory"
+   read OPENWINHOME
+}
+
+added="\$PIPS_ROOT/Share:\$PIPS_ROOT/Bin/\$PIPS_ARCH
+
+{
+    echo "# automatically generated local pipsrc:"
+    echo "PIPS_ARCH=$PIPS_ARCH"
+    echo "PIPS_ROOT=$PIPS_ROOT"
+    echo "NEWGEN_ROOT=$NEWGEN_ROOT"
+    echo "LINEAR_ROOT=$LINEAR_ROOT"
+    echo "EXTERN_ROOT=$EXTERN_ROOT"
+    echo "OPENWINHOME=$OPENWINHOME"
+    echo "PATH=$added:\$PATH"
+    echo "export PIPS_ARCH PIPS_ROOT"
+    echo "export NEWGEN_ROOT LINEAR_ROOT EXTERN_ROOT"
+    echo "export OPENWINHOME"
+} > pipsrc.sh
+
+sed 's,\(.*\)=\(.*\),setenv \1 \2,;/^export/d;' pipsrc.sh > pipsrc.csh
+
+PATH=$added:$PATH
+
+#
+# should check for various executables
+# perl
+# fsplit
+# gmake
+# gm4
+# gsed
+# flex
+# bison
+# gcc
+# g77? f77?
+
+gmake link
