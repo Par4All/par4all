@@ -50,7 +50,8 @@ SRC_MACROS =	auto.h \
 		makefile_macros.CRAY-T3E \
 		makefile_macros.OSF1 \
 		makefile_macros.GNUOSF1 \
-		makefile_macros.OSF1-SHORT
+		makefile_macros.OSF1-SHORT \
+		makefile_macros.GNUSOL2LLPROF
 
 DDC_MACROS = 	define_libraries.make \
 		auto-dash.h \
