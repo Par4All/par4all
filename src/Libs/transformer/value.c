@@ -92,18 +92,19 @@
   * Assumptions:
   *  - toutes les valeurs et seulement les valeurs utilisees dans un module ont
   *    des noms dans value_to_name()
-  *  - toutes les variables dont les valeurs peuvent etre importees ont des entrees
-  *    dans les trois tables entity_to_xxx_value; l'information est apportee par
-  *    les effets qui ne prennent pas en compte tous les alias; l'aliasing est
-  *    traite par le biais de ces tables; le representant d'un ensemble de variables
-  *    alias est la variable visible dans le module courant (apparaissant la premire?)
-  *    ou a defaut, si aucune des variables de l'ensemble n'est visible dans le
-  *    module courant, n'importe laquelle d'entre elles (en fait la premiere qui 
-  *    apparait dans les effets interproceduraux); les variables qui sont seulement
+  *  - toutes les variables dont les valeurs peuvent etre importees ont des 
+  *    entrees dans les trois tables entity_to_xxx_value; l'information est 
+  *    apportee par les effets qui ne prennent pas en compte tous les alias; 
+  *    l'aliasing est traite par le biais de ces tables; le representant d'un 
+  *    ensemble de variables alias est la variable visible dans le module 
+  *    courant (apparaissant la premire?) ou a defaut, si aucune des variables
+  *    de l'ensemble n'est visible dans le module courant, n'importe laquelle
+  *    d'entre elles (en fait la premiere qui apparait dans les effets
+  *    interproceduraux); les variables qui sont seulement
   *    lues n'apparaissent que dans entity_to_new_value;
   *  - un summary_transformer importe peut etre difficile a imprimer
-  *  - le probleme des summary_preconditions n'est pas resolue par ces conventions
-  *    pour le moment (faute de repere absolu)
+  *  - le probleme des summary_preconditions n'est pas resolue par ces 
+  *    conventions pour le moment (faute de repere absolu)
   *
   * Francois Irigoin, 13 January 1994
   */
@@ -121,7 +122,7 @@
 #include "misc.h"
 
 #include "transformer.h"
-
+
 /* STATIC VARIABLES */
 
 /* Four global hash tables used to map scalar integer variable entities
@@ -130,13 +131,10 @@
  *
  * They prevent recursive calls.
  */
-static hash_table hash_entity_to_new_value = (hash_table) NULL;
-
-static hash_table hash_entity_to_old_value = (hash_table) NULL;
-
-static hash_table hash_entity_to_intermediate_value = (hash_table) NULL;
-
-static hash_table hash_value_to_name = (hash_table) NULL;
+static hash_table hash_entity_to_new_value = hash_table_undefined;
+static hash_table hash_entity_to_old_value = hash_table_undefined;
+static hash_table hash_entity_to_intermediate_value = hash_table_undefined;
+static hash_table hash_value_to_name = hash_table_undefined;
 
 /* Two counters used to assign meaningless value entities to local variables.
  * A special global prefix, SEMANTICS_MODULE_NAME, and two special local
@@ -144,7 +142,6 @@ static hash_table hash_value_to_name = (hash_table) NULL;
  */
 
 static int local_intermediate_value_counter = 0;
-
 static int local_old_value_counter = 0;
 
 void reset_value_counters()
@@ -152,7 +149,7 @@ void reset_value_counters()
     local_old_value_counter = 0;
     local_intermediate_value_counter = 0;
 }
-
+
 /* LOCAL VALUE ENTITY */
 
 /* static entity make_local_value_entity(int n, bool old): find or generate
@@ -279,7 +276,7 @@ entity global_new_value_to_global_old_value(entity v_new)
 					entity_domain);
     return v_old;
 }
-
+
 /* HASH TABLE USE */
 
 string external_value_name(e)
@@ -353,7 +350,9 @@ entity e;
 {
     /* is e variable whose value(s) (already) are analyzed?
      */
-    bool has =  hash_defined_p(hash_entity_to_new_value, (char *) e);
+    bool has = hash_table_undefined_p(hash_entity_to_new_value)?
+	       TRUE:  /* ??? reasonnable default for the prettyprinter. FC */
+               hash_defined_p(hash_entity_to_new_value, (char *) e);
     return has;
 }
 
@@ -431,16 +430,14 @@ void print_value_mappings()
 		       hash_entity_to_intermediate_value);
 }
 
-void allocate_value_mappings(n, o, i)
-int n;
-int o;
-int i;
+void allocate_value_mappings(int n, int o, int i)
 {
     pips_assert("allocate_value_mappings",
-		hash_entity_to_new_value == (hash_table) NULL &&
-		hash_entity_to_old_value == (hash_table) NULL &&
-		hash_entity_to_intermediate_value == (hash_table) NULL &&
-		hash_value_to_name == (hash_table) NULL);
+		hash_table_undefined_p(hash_entity_to_new_value) &&
+		hash_table_undefined_p(hash_entity_to_old_value) &&
+		hash_table_undefined_p(hash_entity_to_intermediate_value) &&
+		hash_table_undefined_p(hash_value_to_name));
+
     /* hash_warn_on_redefinition(); */
     hash_entity_to_new_value = hash_table_make(hash_pointer, n);
     hash_entity_to_old_value = hash_table_make(hash_pointer, o);
@@ -450,13 +447,22 @@ int i;
 	hash_table_make(hash_pointer, n + o + i);
 }
 
+void reset_value_mappings()
+{
+    hash_entity_to_new_value = hash_table_undefined;
+    hash_entity_to_old_value = hash_table_undefined;
+    hash_entity_to_intermediate_value = hash_table_undefined;
+    hash_value_to_name = hash_table_undefined;
+}
+
 void free_value_mappings()
 {
     /* free previous hash tables, desallocate names; this implies ALL
        value names were malloced and were not pointer to a ri part */
 
     /* the three tables are assumed to be allocated all together */
-    if(hash_entity_to_old_value != (hash_table) NULL) {
+    if (!hash_table_undefined_p(hash_entity_to_old_value))
+    {
 	/* free names in hash_value_to_name; the other two hash tables
 	   contain pointers to the entity tabulated domain and thus need
 	   no value freeing */
@@ -464,13 +470,11 @@ void free_value_mappings()
 	HASH_MAP(k, v, {free(v);}, hash_value_to_name);
 	/* free the three tables themselves */
 	hash_table_free(hash_entity_to_new_value);
-	hash_entity_to_new_value = (hash_table) NULL;
 	hash_table_free(hash_entity_to_old_value);
-	hash_entity_to_old_value = (hash_table) NULL;
 	hash_table_free(hash_entity_to_intermediate_value);
-	hash_entity_to_intermediate_value = (hash_table) NULL;
 	hash_table_free(hash_value_to_name);
-	hash_value_to_name = (hash_table) NULL;
+
+	reset_value_mappings();
     }
 }
 
@@ -819,7 +823,6 @@ entity n_val;
     return o_val;
 }
 
-
 entity value_alias(e)
 entity e;
 {
