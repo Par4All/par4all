@@ -2,7 +2,7 @@ c
 c Runtime Support Functions for the 
 c High Performance Fortran Compiler
 c
-c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/05/06 12:10:30 $, )
+c $RCSfile: hpfc_rtsupport.m4f,v $ ($Date: 1994/05/13 14:25:15 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -900,7 +900,7 @@ c
       subroutine HPFC_INIT_NODE()
       include 'fpvm3.h'
       include 'hpfc_commons.h'
-      integer i, bufid, info
+      integer i, bufid, info, inum
 
       call hpfc_check()
       call pvmfmytid(MYTID)
@@ -926,6 +926,9 @@ c
       print *, 'lid: ', MYLID, ' tid: ', MYTID
 c
 #endif
+
+      call pvmfjoingroup('hpfc_group', inum)
+
       end
 c
 c-----------------
@@ -960,7 +963,7 @@ c
       subroutine HPFC_INIT_HOST()
       include 'fpvm3.h'
       include 'hpfc_commons.h'
-      integer bufid, info
+      integer bufid, info, inum
       call hpfc_check()
       call pvmfmytid(MYTID)
       MYLID = 0
@@ -988,6 +991,8 @@ c
 
       call HPFC_INIT_COMMON_PROCS()
       call HPFC_INIT_COMMON_PARAM()
+
+      call pvmfjoingroup('hpfc_group', inum)
 
       end
 c
@@ -1084,6 +1089,17 @@ c
      $    ' new lower bound: ', nlb,' new upper bound: ', nub
 #endif
       end
+c
+c-----------------
+c
+c HPFC_SYNCHRO
+c
+	subroutine HPFC_SYNCHRO()
+	include 'fpvm3.h'
+	include 'hpfc_commons.h'
+	integer info
+	call pvmfbarrier('hpfc_group', NBOFTASKS+1, info)
+	end
 c
 c-----------------
 c
