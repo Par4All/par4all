@@ -32,21 +32,25 @@ Variable index;
     Pvecteur index_element;
     expression ex1,ex2,ex;
     entity div;
-    int coeff;
+    Value coeff;
 
-    /*search the couple (var,val) where  var is equal to index and extract it */
+    /*search the couple (var,val) where var is equal to index and extract it */
     pv = vect_dup(pc->vecteur);
     index_element = vect_elem(pv, index);
     vect_erase_var(&pv,index);
 
     coeff = index_element->val;
-    if (coeff > 0) 
+    if (value_pos_p(coeff)) 
 	vect_chg_sgn(pv);
-    else 
-	vect_add_elem(&pv,TCST,ABS(coeff)-1);
+    else
+    {
+	value_absolute(coeff);
+	vect_add_elem(&pv,TCST,value_minus(coeff,VALUE_ONE));
+    }
 
-    if(vect_size(pv)==1 && vecteur_var(pv)==TCST) {
-	vecteur_val(pv) = DIVIDE(vecteur_val(pv), ABS(coeff));
+    if(vect_size(pv)==1 && vecteur_var(pv)==TCST)
+    {
+	vecteur_val(pv) = value_pdiv(vecteur_val(pv), coeff);
 	return make_vecteur_expression(pv);
     }
 
@@ -55,29 +59,30 @@ Variable index;
 
     ex1 = make_vecteur_expression(pv); 
     
-    if (ABS(coeff) > 1){
+    if (value_gt(coeff,VALUE_ONE))
+    {
 	/* FI->YY: before generating a division, you should test if it could
 	   not be performed statically; you have to check if ex1 is not
 	   a constant expression, which is fairly easy since you still
 	   have its linear form, pv */
 	div = gen_find_tabulated("TOP-LEVEL:/",entity_domain);
-   
+	
 	pips_assert("make_contraitne_expression",div != entity_undefined);
-	ex2 = make_integer_constant_expression(ABS(coeff));
-
+	ex2 = make_integer_constant_expression(VALUE_TO_INT(coeff));
+	
 	ex = make_expression(make_syntax(is_syntax_call,
 					 make_call(div,
 						   CONS(EXPRESSION,ex1,
 							CONS(EXPRESSION,
 							     ex2,NIL)))
-					 ),normalized_undefined);	
+	    ),normalized_undefined);	
 	return(ex);
     }
     else 
 	return(ex1);
 
 }
-
+
 /* void make_bound_expression(variable index, Pbase base, Psysteme sc,
  * expression *lower, expression *upper)
  * make the  expression of the  lower and  upper bounds of  "index"
@@ -107,7 +112,8 @@ expression *upper;
 
     /*search constraints referencing "index" and create the list of 
       expressions for lower and upper bounds */
-    for (pc=sc->inegalites; pc!=NULL; pc=pc->succ) {
+    for (pc=sc->inegalites; pc!=NULL; pc=pc->succ) 
+    {
 	i = level_contrainte(pc, base);
 	debug(8,"make_bound_expression","level: %d\n",i);
 	if (ABS(i)==rank_index){	/* found */
@@ -124,7 +130,8 @@ expression *upper;
 	       or to the list of upper bounds*/
 	    if (i>0)
 		lu = CONS(EXPRESSION, ex, lu);
-	    else ll = CONS(EXPRESSION, ex, ll);
+	    else
+		ll = CONS(EXPRESSION, ex, ll);
 	}
     }
 
