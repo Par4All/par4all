@@ -65,15 +65,15 @@ install_macros: $(DDC_MACROS)
 	#
 	# installing makefile macros for pips/newgen/linear
 	#
-	$(COPY) $(MACROS) $(PIPS_INCLUDEDIR)
-	$(COPY) $(MACROS) $(NEWGEN_INCLUDEDIR)
-	$(COPY) $(MACROS) $(LINEAR_INCLUDEDIR)
+	$(COPY) $(MACROS) $(PIPS_ROOT)/Include
+	$(COPY) $(MACROS) $(NEWGEN_ROOT)/Include
+	$(COPY) $(MACROS) $(LINEAR_ROOT)/Include
 
 #
 # where to install forward makefiles
 
-SUBDIRS = . Src Lib Passes Scripts Runtime Documentation \
-	Src/Lib Src/Passes Src/Scripts Src/Runtime Src/Documentation
+SUBDIRS = . Src Libs Passes Scripts Runtimes Documentation \
+	Src/Libs Src/Passes Src/Scripts Src/Runtimes Src/Documentation
 
 DIRS= 	$(PIPS_ROOT) $(NEWGEN_ROOT) $(LINEAR_ROOT) \
 	$(PIPS_DEVEDIR) $(NEWGEN_DEVEDIR) $(LINEAR_DEVEDIR)
@@ -87,8 +87,6 @@ install_forward_makefiles:
 	    test ! -d $$d/$$s || \
 		{ echo "copying forward makefile to $$d/$$s"; \
 		$(COPY) forward_gnu_makefile $$d/$$s/Makefile; } ; done; done;\
-	$(RM) $(PIPS_ROOT)/Runtime/Makefile $(PIPS_ROOT)/Lib/Makefile \
-		$(NEWGEN_ROOT)/Lib/Makefile $(LINEAR_ROOT)/Lib/Makefile
 
 # that is all
 #
