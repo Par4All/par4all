@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1994/11/30 14:05:45 $, 
+# $Date: 1994/11/30 14:32:36 $, 
 # got on %D%, %T%
 #
 
@@ -19,9 +19,17 @@ unset HPFFILE MODULE WORKSPACE
 #
 # not very convincing. stdin is taken as stdout and stderr...
 
-STDOUT=`tty`
-[ "$STDOUT" = "not a tty" ] && STDOUT=/dev/null
+output_tty()
+{
+  if tty -s
+  then
+    tty
+  else
+    echo /dev/null
+  fi
+}
 
+STDOUT=`output_tty`
 STDERR="$STDOUT"
 
 #
@@ -34,7 +42,7 @@ STDERR="$STDOUT"
 usage()
 {
   cat <<-EOF
-	Usage: $script [-vDdhMqQ] [ -w ws ] [ -m mod ] [-n n | file[.f]]
+	Usage: $script [-vDdhMqs] [ -w ws ] [ -m mod ] [-n n | file[.f]]
 	  version is $Revision$
 	  -v: verbose
 	  -D: debug
@@ -42,7 +50,7 @@ usage()
 	  -h: help
 	  -M: make
 	  -q: quiet (stdout redirected)
-	  -Q: more quiet (stderr and stdout redirected)
+	  -s: silent (stderr redirected)
 	  -w ws: workspace ws
 	  -m mod: module mod
 	  -n n: source number n
@@ -61,15 +69,17 @@ debug()
   echo "$script: $@" 1>&2
 }
 
-while getopts vDdMqQn:hm:w: OPT
+while getopts vDdMqsn:hm:w: OPT
 do
   case $OPT in
     v) VERBOSE='verbose' ;;
-    D) DEBUG='debug' ;;
+    D) DEBUG='debug' ; 
+       STDOUT=`output_tty` ; 
+       STDERR="$STDOUT" ;;
     d) DELETE='Delete' ;;
     M) MAKE='gmake' ;;
     q) STDOUT='/dev/null' ;;
-    Q) STDERR='/dev/null' ; STDOUT='/dev/null' ;;
+    s) STDERR='/dev/null' ;;
     n) HPFFILE="$HPFC_DIR/Tests/hpftest$OPTARG.f" ;;
     m) MODULE="$OPTARG" ;;
     w) WORKSPACE="$OPTARG" ;;
@@ -99,13 +109,13 @@ ${INSTALL} -b $WORKSPACE.database -r $HPFFILE -i -t $WORKSPACE.hpfc -n $MODULE
 
 [ "$DELETE" = : ] ||
 {
-  $VERBOSE "Deleting $WORKSPACE workspace"
+  $VERBOSE "deleting $WORKSPACE workspace"
   $DELETE $WORKSPACE
 }
 
 [ "$MAKE" = : ] ||
 {
-  $VERBOSE "Making $WORKSPACE"
+  $VERBOSE "making $WORKSPACE"
   (cd $WORKSPACE.hpfc ; $MAKE all) > $STDOUT 2> $STDERR
 }
 
