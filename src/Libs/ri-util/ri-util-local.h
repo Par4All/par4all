@@ -249,5 +249,10 @@ entity get_ith_##lname##_dummy(int i)\
 entity get_ith_##lname##_prime(int i)\
     {return(get_ith_dummy(MODULE, NAME PRIME_LETTER_FOR_VARIABLES, i));}
 
+/* Constants for some ex-atomizer variable generation */
+#define TMP_ENT 1
+#define AUX_ENT 2
+#define DOUBLE_PRECISION_SIZE 8
+
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
