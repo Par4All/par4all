@@ -3,6 +3,12 @@
  * $Id$
  *
  * $Log: interprocedural.c,v $
+ * Revision 1.34  2002/03/14 15:16:33  irigoin
+ * call to pips_user_error() replaced by call to pips_user_warning() in
+ * add_formal_to_actual_bindings() when a typing problem is detected. If type
+ * are about compatible, binding equation is generated. If not, the parameter
+ * is ignored which is incorrect.
+ *
  * Revision 1.33  2001/07/19 17:51:33  irigoin
  * Mostly reformatting and systematic use of pips_debuf() instead of
  * debug(). Make real differences hard to catch:-(
@@ -272,22 +278,22 @@ same_analyzable_type_scalar_entity_list_p(list l)
   return result; 
 }
 
-/* add_formal_to_actual_bindings(call c, transformer pre):
+/* add_formal_to_actual_bindings(call c, transformer pre, entity caller):
  *
  * pre := pre  U  {f  = expr }
  *                  i       i
  * for all i such that formal f_i is an analyzable scalar variable and 
  * as far as expression expr_i is analyzable and of the same type
  */
-transformer add_formal_to_actual_bindings(call c, transformer pre)
+transformer add_formal_to_actual_bindings(call c, transformer pre, entity caller)
 {
   entity f = call_function(c);
   list pc = call_arguments(c);
   list formals = module_to_formal_analyzable_parameters(f);
   cons * ce;
 
-  pips_debug(6, "begin for call to %s pre=%p\n",
-	     module_local_name(f), pre);
+  pips_debug(6, "begin for call to %s from %s, pre=%p\n",
+	     module_local_name(f), module_local_name(caller), pre);
   ifdebug(6) dump_transformer(pre);
 
   pips_assert("f is a module", 
@@ -302,7 +308,9 @@ transformer add_formal_to_actual_bindings(call c, transformer pre)
     expression expr = find_ith_argument(pc, r);
 
     if(expr == expression_undefined)
-      pips_user_error("not enough args for formal parameter %s of rank %d\n",
+      pips_user_error("not enough args in call to %s from %s for formal parameter %s of rank %d\n",
+		      module_local_name(f),
+		      module_local_name(caller),
 		      entity_local_name(fp), r);
     else {
       /* type checking. You already know that fp is a scalar variable */
@@ -311,13 +319,14 @@ transformer add_formal_to_actual_bindings(call c, transformer pre)
       basic bexpr = basic_of_expression(expr);
 
       if(!basic_equal_p(bfp, bexpr)) {
-	pips_user_error("Type incompatibility (%s/%s) for formal parameter %s (rank %d)"
-			" in call to %s from %s\n",
-			basic_to_string(bfp), basic_to_string(bexpr),
-			entity_local_name(fp), r, entity_local_name(f),
-			get_current_module_entity());
+	pips_user_warning("Type incompatibility (%s/%s) for formal parameter %s (rank %d)"
+			  " in call to %s from %s\n",
+			  basic_to_string(bfp), basic_to_string(bexpr),
+			  entity_local_name(fp), r, module_local_name(f),
+			  module_local_name(caller));
       }
-      else {
+
+      if(basic_tag(bfp)==basic_tag(bexpr)) {
 	/* Do not care about side effects on expressions: this is used to map
 	   a caller precondition towards a callee summary precondition. */
 	entity fp_new = external_entity_to_new_value(fp);
@@ -333,6 +342,15 @@ transformer add_formal_to_actual_bindings(call c, transformer pre)
 	pre = transformer_safe_image_intersection(pre, t_expr);
 	free_transformer(t_expr);
        }
+      else {
+	/* ignore assocation */
+	pips_debug(6, "Full type incompatibility (%s/%s) for formal parameter %s (rank %d)"
+		   " in call to %s from %s\n"
+		   "Association ignored",
+		   basic_to_string(bfp), basic_to_string(bexpr),
+		   entity_local_name(fp), r, module_local_name(f),
+		   module_local_name(caller));
+      }
     }
   }
 
@@ -341,7 +359,8 @@ transformer add_formal_to_actual_bindings(call c, transformer pre)
   ifdebug(6) {
     pips_debug(6, "new pre=%p\n", pre);
     dump_transformer(pre);
-    pips_debug(6, "end for call to %s\n", module_local_name(f));
+    pips_debug(6, "end for call to %s from %s\n", module_local_name(f),
+	       module_local_name(caller));
   }
 
   return pre;
@@ -980,7 +999,7 @@ call c;
 	       entity_name(e));
     pre_callee = transformer_dup(pre);
     pre_callee = 
-      add_formal_to_actual_bindings(c, pre_callee);
+      add_formal_to_actual_bindings(c, pre_callee, get_current_module_entity());
     add_module_call_site_precondition(e, pre_callee);
     /* propagate precondition pre as summary precondition 
        of user functions */
@@ -1052,7 +1071,7 @@ call_site_to_module_precondition_text(
   module_to_value_mappings(caller);
 
   /* add to preconditions the links to the callee formal params */
-  caller_prec = add_formal_to_actual_bindings (c, caller_prec);
+  caller_prec = add_formal_to_actual_bindings (c, caller_prec, caller);
   /* transform the preconditions to make sense for the callee */
   call_site_prec = precondition_intra_to_inter (callee,
 						caller_prec,
@@ -1163,7 +1182,7 @@ static bool process_call(call c)
 
   /* add to call site preconditions the links to the callee formal params */
   caller_prec = add_formal_to_actual_bindings
-    (c, transformer_dup(current_precondition));
+    (c, transformer_dup(current_precondition), current_caller);
   ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
     pips_debug(PROCESS_CALL_DEBUG_LEVEL,
 	       "call site precondition in caller %s with bindings %p:\n",
