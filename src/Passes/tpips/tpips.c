@@ -118,7 +118,7 @@ static char *tp_help_topics[] =
 {
     "readline", "create","close","delete","echo","module","activate",
     "make","apply","display",SET_ENV, SET_PROP,GET_PROP,SHELL_ESCAPE,
-    CHANGE_DIR,QUIT,"source", HELP,"rule","resource","owner",
+    CHANGE_DIR,QUIT,"source", HELP,"rule","resource","owner", "remove",
     (char*)NULL
 };
 
@@ -246,89 +246,70 @@ tpips_help(string line)
     skip_blanks(line);
 
     printf("\n");
-    TP_HELP("readline",
-	    "* readline interaction facilities\n",
+    TP_HELP("readline", "* readline interaction facilities\n",
 	    "\ttry <tab><tab> for automatic completion\n"
 	    "\temacs-tyle editing capabilities (see man readline)\n")
-    TP_HELP("create",
-	 "create   <workspace-name> <file-name>...\n",
+    TP_HELP("create", "create   <workspace-name> <file-name>...\n",
 	 "\tcreate a new worspace from a list of fortran files\n"
 	 "\tfirst delete the workspace if it exists\n");
-    TP_HELP("open",
-	 "open     <workspace-name>\n",
+    TP_HELP("open", "open     <workspace-name>\n",
 	 "\topen an existing workspace\n");
-    TP_HELP("close",
-	 "close    <workspace-name>\n",
+    TP_HELP("close", "close    <workspace-name>\n",
 	 "\tclose an opened workspace\n");
-    TP_HELP("delete",
-	 "delete   <workspace-name>\n",
+    TP_HELP("delete", "delete   <workspace-name>\n",
 	 "\tdelete an existing workspace\n");
-    TP_HELP("module",
-	 "module   <module-name>\n",
+    TP_HELP("module", "module   <module-name>\n",
 	 "\tselect a module from an opened workspace\n");
-    TP_HELP("activate",
-	 "activate <rule-name>\n",
+    TP_HELP("activate", "activate <rule-name>\n",
 	 "\ttell a rule to be active\n");
-    TP_HELP("make",
-	 "make     <resourcename[(OWNER)]>\n",
+    TP_HELP("make", "make     <resourcename[(OWNER)]>\n",
 	 "\tbuild a resource\n"
 	 "\n\tExamples:\n\n"
 	 "\t\t make PRINTED_FILE\n"
 	 "\t\t make CALLGRAPH_FILE(my_module)\n"
 	 "\t\t make DG_FILE($ALL)\n"
 	 "\t\t make ICFG_FILE($CALLEES)\n\n");
-    TP_HELP("apply",
-	 "apply    <rulename[(OWNER)]>\n",
+    TP_HELP("apply", "apply    <rulename[(OWNER)]>\n",
 	 "\tmake the produced resources of a rule\n"
 	 "\n\tExamples:\n\n"
 	 "\t\t apply PRINT_SOURCE_WITH_REGIONS\n"
 	 "\t\t apply HPFC_CLOSE(my_module)"
 	 "\t\t apply PRINT_CODE($ALL)\n"
 	 "\t\t apply PRINT_ICFG($CALLEES)\n");
-    TP_HELP("display",
-	"display  <resourcename[(OWNER)]>\n",
+    TP_HELP("display", "display  <resourcename[(OWNER)]>\n",
 	 "\tprint a resource\n"
 	 "\n\tExamples:\n\n"
 	 "\t\t display PRINTED_FILE\n"
 	 "\t\t display CALLGRAPH_FILE(my_module)\n"
 	 "\t\t display DG_FILE($ALL)\n"
 	 "\t\t display ICFG_FILE($CALLEES)\n\n");
-    TP_HELP("cd",
-	 "cd       <dirname>\n",
+    TP_HELP("remove", "remove	<resourcename[(OWNER)]>\n",
+	    "\tremove a resource from the database.\n");
+    TP_HELP("cd", "cd       <dirname>\n",
 	 "\tchange directory\n");
     TP_HELP("pwd", "pwd\n", "\tprint current working directory\n");
-    TP_HELP("setenv",
-	 "setenv    <name>=<value>\n",
+    TP_HELP("setenv", "setenv    <name>=<value>\n",
 	 "\tchange environment\n");
-    TP_HELP("getenv",
-	  "getenv   <name>\n",
+    TP_HELP("getenv", "getenv   <name>\n",
 	    "\tprint from environment (echo ${<name>} also ok)\n");
-    TP_HELP("setproperty",
-	 "setproperty <name>=<value>\n",
+    TP_HELP("setproperty", "setproperty <name>=<value>\n",
 	 "\tchange property\n");
-    TP_HELP(GET_PROP,
-	 GET_PROP " <name>\n",
+    TP_HELP(GET_PROP, GET_PROP " <name>\n",
 	 "\t print property\n");
-    TP_HELP("echo",
-	 "echo     <string>\n",
+    TP_HELP("echo", "echo     <string>\n",
 	 "\tprint the string\n");
-    TP_HELP("quit",
-	 "quit\n",
+    TP_HELP("quit", "quit\n",
 	 "\texit tpips (you should close the workspace before\n");
-    TP_HELP("exit",
-	 "exit\n",
+    TP_HELP("exit", "exit\n",
 	 "\texit tpips quickly (rhough!)\n");
     TP_HELP("source", "source <filenames...>\n",
 	    "\tread tpips commands from files.\n");
-    TP_HELP("help",
-	 "help     [<help-item>]\n",
+    TP_HELP("help", "help     [<help-item>]\n",
 	 "\tprint a list of all the commands or a \"detailled\""
 	 " description of one\n");
-    TP_HELP("shell",
-	 "shell   [<shell-function>]\n",
+    TP_HELP("shell", "shell   [<shell-function>]\n",
 	 "\tallow shell functions call\n");
-    TP_HELP("owner",
-	"* owner : variable*\n",
+    TP_HELP("owner", "* owner : variable*\n",
 	 "\tList of available owners:\n"
 	 "\t\t$MODULE\n"
 	 "\t\t$ALL\n"
