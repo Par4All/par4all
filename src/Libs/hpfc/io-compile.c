@@ -1,7 +1,6 @@
-/*
- * HPFC module by Fabien COELHO
+/* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1995/09/22 13:29:12 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/10/03 17:00:17 $, )
  * version $Revision$
  */
 
@@ -12,6 +11,7 @@
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
+#include "conversion.h"
 
 /* Yi-Qing stuff
  */
@@ -20,36 +20,32 @@
 #include "rice.h"
 #include "ricedg.h"      
 
-/*----------------------------------------------------------------
- *
- * IO EFFICIENT COMPILATION
- */
-Psysteme statement_context(stat, move)
-statement stat;
-tag move;
+/************************************************* IO EFFICIENT COMPILATION */
+
+Psysteme 
+statement_context(
+    statement stat,
+    tag move)
 {
-    return(predicate_system(transformer_relation
+    return predicate_system(transformer_relation
 			    ((movement_collect_p(move)) ? 
 			     load_statement_precondition(stat) :
-			     load_statement_postcondition(stat)))); 
+			     load_statement_postcondition(stat))); 
 }
 
 /*   compile an io statement
  */
-void io_efficient_compile(stat, hp, np)
-statement stat, *hp, *np;
+void 
+io_efficient_compile(
+    statement stat, /* statement to compile */
+    statement *hp,  /* returned Host code */
+    statement *np)  /* returned Node code */ 
 {
     list
 	/* of effect */ entities = load_statement_local_regions(stat),
-	lh_collect = NIL,
-	lh_io = NIL,
-	lh_update = NIL,
-	ln_collect = NIL,
-	ln_io = NIL,
-	ln_update = NIL;
-    statement
-	sh = statement_undefined,
-	sn = statement_undefined;
+	lh_collect = NIL, lh_io = NIL, lh_update = NIL,
+	ln_collect = NIL, ln_io = NIL, ln_update = NIL;
+    statement sh, sn;
 
     debug_on("HPFC_IO_DEBUG_LEVEL");
     pips_debug(1, "compiling!\n");
@@ -57,65 +53,64 @@ statement stat, *hp, *np;
 	       gen_length(entities));
 
     MAP(EFFECT, e,
-     {
-	 entity array = reference_variable(effect_reference(e));
-	 action act = effect_action(e);
-	 approximation apr = effect_approximation(e);
-	 
-	 pips_debug(3, "array %s\n", entity_name(array));
-
-	 message_assert("avoid replicated array I/O", /* not implemented */
-			!(array_distributed_p(array) && replicated_p(array)));
-
-	 if ((!array_distributed_p(array)) && action_read_p(act)) 
-	 {
-	     pips_debug(7, "skipping array %s movements - none needed\n", 
-			entity_name(array));
-	     continue;
-	 }
-
-	 /* add array declaration on host if necessary
-	  */
-	 if (array_distributed_p(array) && !bound_new_host_p(array))
-	     store_new_host_variable(AddEntityToModule(array, host_module), 
-				     array);
-
-	 /* collect data if necessary
-	  */
-	 if (array_distributed_p(array) && 
-	     (action_read_p(act) || 
-	      (action_write_p(act) && 
-	       approximation_may_p(apr) && 
-	       !get_bool_property("HPFC_IGNORE_MAY_IN_IO"))))
-	 {
-	     generate_io_collect_or_update(array, stat, 
-					   is_movement_collect, 
+    {
+	entity array = reference_variable(effect_reference(e));
+	action act = effect_action(e);
+	approximation apr = effect_approximation(e);
+	
+	pips_debug(3, "array %s\n", entity_name(array));
+	
+	message_assert("avoid replicated array I/O", /* not implemented */
+		       !(array_distributed_p(array) && replicated_p(array)));
+	
+	if ((!array_distributed_p(array)) && action_read_p(act)) 
+	{
+	    pips_debug(7, "skipping array %s movements - none needed\n", 
+		       entity_name(array));
+	    continue;
+	}
+	
+	/* add array declaration on host if necessary
+	 */
+	if (array_distributed_p(array) && !bound_new_host_p(array))
+	    store_new_host_variable(AddEntityToModule(array, host_module), 
+				    array);
+	
+	/* collect data if necessary
+	 */
+	if (array_distributed_p(array) && 
+	    (action_read_p(act) || 
+	     (action_write_p(act) && 
+	      approximation_may_p(apr) && 
+	      !get_bool_property("HPFC_IGNORE_MAY_IN_IO"))))
+	{
+	    generate_io_collect_or_update(array, stat, 
+					  is_movement_collect, 
+					  action_tag(act), &sh, &sn);
+	    lh_collect = CONS(STATEMENT, sh, lh_collect);
+	    ln_collect = CONS(STATEMENT, sn, ln_collect);
+	}
+	
+	/* update data if necessary
+	 */
+	if (action_write_p(act))
+	{
+	    generate_io_collect_or_update(array, stat, 
+					  is_movement_update, 
 					   action_tag(act), &sh, &sn);
-	     lh_collect = CONS(STATEMENT, sh, lh_collect);
-	     ln_collect = CONS(STATEMENT, sn, ln_collect);
-	 }
-
-	 /* update data if necessary
-	  */
-	 if (action_write_p(act))
-	 {
-	     generate_io_collect_or_update(array, stat, 
-					   is_movement_update, 
-					   action_tag(act), &sh, &sn);
-	     lh_update = CONS(STATEMENT, sh, lh_update);
-	     ln_update = CONS(STATEMENT, sn, ln_update);
-	 }
-     },
-	 entities);
+	    lh_update = CONS(STATEMENT, sh, lh_update);
+	    ln_update = CONS(STATEMENT, sn, ln_update);
+	}
+    },
+	entities);
 
     lh_io =  CONS(STATEMENT, copy_statement(stat), NIL);
-
+    
     if (get_bool_property("HPFC_SYNCHRONIZE_IO"))
     {
 	/* could do it only for write statements
 	 */
-	entity
-	    synchro = hpfc_name_to_entity(SYNCHRO);
+	entity synchro = hpfc_name_to_entity(SYNCHRO);
 	
 	lh_io = CONS(STATEMENT, hpfc_make_call_statement(synchro, NIL), lh_io);
 	ln_io = CONS(STATEMENT, hpfc_make_call_statement(synchro, NIL), ln_io);
@@ -134,23 +129,29 @@ statement stat, *hp, *np;
     debug_off();
 }
 
-void hpfc_algorithm_row_echelon(syst, scanners, pcond, penum)
-Psysteme syst;
-list scanners;
-Psysteme *pcond, *penum;
+void
+hpfc_algorithm_row_echelon(
+    Psysteme syst,
+    list scanners,
+    Psysteme *pcond, 
+    Psysteme *penum)
 {
     Pbase base = entity_list_to_base(scanners);
     algorithm_row_echelon(syst, base, pcond, penum);
     base_rm(base);
 }
 
-void generate_io_collect_or_update(array, stat, move, act, psh, psn)
-entity array;
-statement stat;
-tag move, act;
-statement *psh, *psn;
+void 
+generate_io_collect_or_update(
+    entity array,
+    statement stat,
+    tag move, 
+    tag act,
+    statement *psh,
+    statement *psn)
 {
     Psysteme syst = generate_io_system(array, stat, move, act);
+    set_information_for_code_optimizations(syst);
 
     assert(entity_variable_p(array) && syst!=SC_UNDEFINED);
 
@@ -162,10 +163,7 @@ statement *psh, *psn;
 	 *   - scanner
 	 *   - deducable
 	 */
-	Psysteme
-	    proc_echelon = SC_UNDEFINED,
-	    tile_echelon = SC_UNDEFINED,
-	    condition = SC_UNDEFINED;
+	Psysteme proc_echelon, tile_echelon, condition;
 	list parameters = NIL, processors = NIL, scanners = NIL, rebuild = NIL;
 
 	/* Now we have a set of equations and inequations, and we are going
@@ -242,18 +240,21 @@ statement *psh, *psn;
 	}
     }
 
+    reset_information_for_code_optimizations();
+
     DEBUG_STAT(8, "Host", *psh);
     DEBUG_STAT(8, "Node", *psn);
 }
 
-/*
- * generates the Psystem for IOs inside the statement stat,
+/* generates the Psystem for IOs inside the statement stat,
  * that use entity ent which should be a variable.
  */
-Psysteme generate_io_system(array, stat, move, act)
-entity array;
-statement stat;
-tag move, act;
+Psysteme 
+generate_io_system(
+    entity array,
+    statement stat,
+    tag move,
+    tag act)
 {
     Psysteme result = SC_UNDEFINED;
 
@@ -274,25 +275,28 @@ tag move, act;
 
     DEBUG_SYST(2, concatenate("array ", entity_name(array), NULL), result);
 
-    return(result);
+    return result;
 }
 
-list make_list_of_dummy_variables(creation, number)
-entity (*creation)();
-int number;
+list /* of entity */
+make_list_of_dummy_variables(
+    entity (*creation)(),
+    int number)
 {
     list result = NIL;
 
     for(;number>0;number--)
 	result = CONS(ENTITY, creation(number), result);
 
-    return(result);
+    return result;
 }
 
-Psysteme generate_shared_io_system(array, stat, move, act)
-entity array;
-statement stat;
-tag move, act;
+Psysteme 
+generate_shared_io_system(
+    entity array,
+    statement stat,
+    tag move, 
+    tag act)
 {
     Psysteme
 	result = SC_UNDEFINED, /* ??? bug post with region */
@@ -325,13 +329,14 @@ tag move, act;
     
     DEBUG_SYST(6, concatenate("result for", entity_name(array), NULL), result);
     
-    return(result);
+    return result;
 }
 
-Psysteme generate_distributed_io_system(array, stat, move, act)
-entity array;
-statement stat;
-tag move, act;
+Psysteme generate_distributed_io_system(
+    entity array,
+    statement stat,
+    tag move, 
+    tag act)
 {
     Psysteme result = SC_UNDEFINED,
 	/*
@@ -374,49 +379,51 @@ tag move, act;
     return(result);
 }
 
-void remove_variables_if_possible(psyst, plvars)
-Psysteme *psyst;
-list *plvars;
+void 
+remove_variables_if_possible(
+    Psysteme *psyst,
+    list *plvars)
 {
     Psysteme syst = *psyst;
     list kept = NIL;
 
     MAP(ENTITY, e, 
-     {
-	 Variable var = (Variable) e;
-	 int coeff = -1;
+    {
+	Variable var = (Variable) e;
+	int coeff = -1;
+	
+	(void) contrainte_var_min_coeff(sc_egalites(syst), var, &coeff, FALSE);
+	
+	if (coeff==1)
+	{
+	    Pvecteur v = vect_new(var, 1);
+	    bool exact = TRUE;
+	    
+	    pips_debug(7, "removing variable %s\n", 
+		       entity_local_name((entity) var));
+	    
+	    sc_projection_along_variables_with_test_ofl_ctrl
+		(&syst, v, &exact, NO_OFL_CTRL);
 
-	 (void) contrainte_var_min_coeff(sc_egalites(syst), var, &coeff, FALSE);
-
-	 if (coeff==1)
-	 {
-	     Pvecteur v = vect_new(var, 1);
-	     bool exact = TRUE;
-	     
-	     pips_debug(7, "removing variable %s\n", 
-			entity_local_name((entity) var));
-	     
-	     sc_projection_along_variables_with_test_ofl_ctrl
-		 (&syst, v, &exact, NO_OFL_CTRL);
-
-	     assert(exact);
-	     vect_rm(v);
-	 }
-	 else
-	     kept = CONS(ENTITY, (entity) var, kept);
-     }, 
-	 *plvars);
+	    assert(exact);
+	    vect_rm(v);
+	}
+	else
+	    kept = CONS(ENTITY, (entity) var, kept);
+    }, 
+	*plvars);
     
     base_rm(sc_base(syst)), sc_base(syst) = BASE_NULLE, sc_creer_base(syst);
-
+    
     *psyst = syst;
     gen_free_list(*plvars), *plvars=kept;
 }
 
-Psysteme clean_shared_io_system(syst, array, move)
-Psysteme syst;
-entity array;
-tag move;
+Psysteme
+clean_shared_io_system(
+    Psysteme syst,
+    entity array,
+    tag move)
 {
     int	array_dim = NumberOfDimension(array);
     list keep = NIL, try_keep = NIL, remove = NIL,
@@ -472,18 +479,21 @@ tag move;
     return(syst);
 }
 
-void remove_variables_from_system(ps, plv)
-Psysteme *ps;
-list /* of entity (Variable) */ *plv;
+void 
+remove_variables_from_system(
+    Psysteme *ps,
+    list /* of entity (Variable) */ *plv)
 {
     MAP(ENTITY, e, sc_projection_along_variable_ofl_ctrl
 	(ps, (Variable) e, NO_OFL_CTRL), *plv);
     gen_free_list(*plv), *plv=NIL;
 }
 
-void clean_the_system(ps, plrm, pltry)
-Psysteme *ps;
-list /* of entities */ *plrm, *pltry;
+void 
+clean_the_system(
+    Psysteme *ps,
+    list /* of entities */ *plrm,
+    list *pltry)
 {
     remove_variables_from_system(ps, plrm);
     remove_variables_if_possible(ps, pltry);
@@ -492,10 +502,11 @@ list /* of entities */ *plrm, *pltry;
     base_rm(sc_base(*ps)), sc_base(*ps) = BASE_NULLE, sc_creer_base(*ps);
 }
 
-Psysteme clean_distributed_io_system(syst, array, move)
-Psysteme syst;
-entity array;
-tag move;
+Psysteme 
+clean_distributed_io_system(
+    Psysteme syst,
+    entity array,
+    tag move)
 {
     /* ??? what about the variables?
      * some are usefull, some are constants, and others should
@@ -521,9 +532,7 @@ tag move;
 	template_dim = NumberOfDimension(template),
 	processor_dim = NumberOfDimension(processor);
     list
-	keep = NIL,
-	try_keep = NIL,
-	remove = NIL,
+	keep = NIL, try_keep = NIL, remove = NIL,
 	try_remove = base_to_list(sc_base(syst));
 
     pips_debug(5, "array %s, movement %s\n", entity_local_name(array), 
@@ -591,23 +600,21 @@ tag move;
  * Other variables are (should be) the parameters, the processors,
  * and the variables to be used to scan polyhedron.
  */
-void put_variables_in_ordered_lists(psyst, array, 
-				    plparam, plproc, plscan,
-				    plrebuild)
-Psysteme *psyst;
-entity array;
-list *plparam, *plproc, *plscan, *plrebuild;
+void 
+put_variables_in_ordered_lists(
+    Psysteme *psyst,
+    entity array,
+    list *plparam,
+    list *plproc,
+    list *plscan,
+    list *plrebuild)
 {
-    int
-	processor_dim = (array_distributed_p(array) ?
+    int processor_dim = (array_distributed_p(array) ?
 	    NumberOfDimension(array_to_processors(array)) : 0 ),
 	dim = -1;
     list
 	all = base_to_list(sc_base(*psyst)),
-	lparam = NIL,
-	lproc = NIL,
-	lscan = NIL,
-	lrebuild = NIL;
+	lparam = NIL, lproc = NIL, lscan = NIL, lrebuild = NIL;
 
     gen_remove(&all, (entity) TCST); /* just in case */
 
@@ -685,12 +692,13 @@ list *plparam, *plproc, *plscan, *plrebuild;
  * returned. The variables that are not removed are returned as another
  * entity list, *pleftvars.
  */
-list simplify_deducable_variables(syst, vars, pleftvars)
-Psysteme syst;
-list vars, *pleftvars;
+list /* of expression */
+simplify_deducable_variables(
+    Psysteme syst,
+    list vars,
+    list *pleftvars)
 {
     list result = NIL;
-
     *pleftvars = NIL;
 
     MAP(ENTITY, dummy,
@@ -727,9 +735,10 @@ list vars, *pleftvars;
 
 /* output 7 entities created by creation if in list le
  */
-static list hpfc_order_specific_variables(le, creation)
-list le;
-entity (*creation)();
+static list /* of entity */
+hpfc_order_specific_variables(
+    list le,
+    entity (*creation)())
 {
     list result = NIL;
     int i;
@@ -750,9 +759,10 @@ entity (*creation)();
  * the input list of entities is ordered so that:
  * PSI_i's, GAMMA_i's, DELTA_i's, IOTA_i's, ALPHA_i's, LALPHA_i's...
  */
-list hpfc_order_variables(le, number_first)
-list le;
-bool number_first;
+list 
+hpfc_order_variables(
+    list le,
+    bool number_first)
 {
     list result = NIL;
 
@@ -809,11 +819,14 @@ bool number_first;
     return(result);
 }
 
-void hpfc_algorithm_tiling(syst, processors, scanners, 
-			   pcondition, pproc_echelon, ptile_echelon)
-Psysteme syst;
-list processors, scanners;
-Psysteme *pcondition, *pproc_echelon, *ptile_echelon;
+void 
+hpfc_algorithm_tiling(
+    Psysteme syst,
+    list processors, 
+    list scanners,
+    Psysteme *pcondition,
+    Psysteme *pproc_echelon,
+    Psysteme *ptile_echelon)
 {
     Pbase
 	outer = entity_list_to_base(processors),
@@ -858,10 +871,11 @@ list l;
  * redundent with pre/post conditions depending on when the movement is
  * done
  */
-void hpfc_simplify_condition(psc, stat, move)
-Psysteme *psc;
-statement stat;
-tag move;
+void 
+hpfc_simplify_condition(
+    Psysteme *psc,
+    statement stat,
+    tag move)
 {
     Psysteme
 	true = statement_context(stat, move),
