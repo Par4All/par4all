@@ -58,6 +58,8 @@ list_to_arg(list li,
    list l2=li;
    int index=0;
 
+   pips_user_warning("obsolete function, update to gen_array_t\n");
+
    pips_assert("not too long", gen_length(li)<ARGS_LENGTH);
 
    while(l2!=NIL) {
@@ -79,6 +81,8 @@ update_list_from_arg(
     char ** the_strings)
 {
     int i = 0;
+
+    pips_user_warning("obsolete function, update to gen_array_t\n");
     pips_assert("long enough", gen_length(l)<ARGS_LENGTH);
     MAPL(scons, STRING(CAR(scons)) = the_strings[i++], l);
 }
@@ -90,6 +94,8 @@ args_free(
     char *argv[])
 {
     int i;
+
+    pips_user_warning("obsolete function, update to gen_array_t\n");
     pips_assert("length ok", *pargc<ARGS_LENGTH);
 
     for (i = 0; i < *pargc; i++)
@@ -105,6 +111,8 @@ args_add(
     char *argv[],
     char *arg)
 {
+
+    pips_user_warning("obsolete function, update to gen_array_t\n");
     pips_assert("not too many", *pargc<ARGS_LENGTH);
     argv[*pargc] = arg;
     (*pargc) ++;
@@ -125,6 +133,8 @@ void
 args_sort(int argc,
           char *argv[])
 {
+
+   pips_user_warning("obsolete function, update to gen_array_t\n");
    qsort((char *) argv,
          argc,
          sizeof(char *),
