@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Delete,v $ (version $Revision$)
-# $Date: 1996/08/13 13:40:29 $, 
+# $Date: 1996/08/22 08:41:59 $, 
 #
 # Delete removes a list of workspaces whose names are provided
 # after the command, no matter which the current workspace is.
@@ -19,10 +19,13 @@ unset DEFAULT
 
 pips_current_program=${PIPS_CURRENT_PROGRAM:-.pipsprogram}
 
+verb()
+{ echo "$RCSfile: Delete,v $:" "$@" >&2 ; }
+
 if [ $# -eq 0 ] 
 then 
   DEFAULT=yes
-  echo "$RCSfile: Delete,v $: deleting all databases in $PWD"
+  verb "deleting all databases in $PWD"
   set *.database
 fi
 
@@ -35,12 +38,12 @@ do
   WS=`dirname $WS`/`basename $WS .database`.database
   if [ ! -d "$WS" ]
   then
-    echo $0: No such directory \`$WS\' >&2
+    verb "No such directory \`$WS\'"
     exit 2
   else
-    [ "$DEFAULT" ] && echo "Deleting $WS"
+    [ "$DEFAULT" ] && verb "Deleting $WS"
     /bin/rm -r $WS || {
-      echo Cannot remove $WS >/dev/tty
+      verb "Cannot remove $WS"
       exit 3
     }
   fi
