@@ -3,12 +3,11 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/10/05 11:32:29 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/12/19 15:52:34 $, )
  * version $Revision$
  */
 
 #include "defines-local.h"
-
 #include "effects.h"
 
 /* Predicates
@@ -76,10 +75,10 @@ bool replicated_p(entity e)
 
     pips_assert("distributed array", array_distributed_p(e));
 
-    a = load_entity_align(e);
+    a = load_hpf_alignment(e);
     la = align_alignment(a);    
     template = align_template(a);
-    d = load_entity_distribute(template);
+    d = load_hpf_distribution(template);
     ld = distribute_distribution(d);
     ntdim = NumberOfDimension(template);
 
@@ -118,9 +117,9 @@ entity p, a;
 int i;
 {
     int tdim;
-    align al = load_entity_align(a);
+    align al = load_hpf_alignment(a);
     entity t = align_template(al);
-    distribute d = load_entity_distribute(t);
+    distribute d = load_hpf_distribution(t);
     distribution di =
 	FindDistributionOfProcessorDim(distribute_distribution(d), i, &tdim);
     alignment ali = 
@@ -138,11 +137,11 @@ bool ith_dim_distributed_p(array, i, pprocdim)
 entity array;
 int i, *pprocdim;
 {
-    align       al = load_entity_align(array);
+    align       al = load_hpf_alignment(array);
     list       lal = align_alignment(al);
     alignment  alt = FindAlignmentOfDim(lal, i);
     entity template = align_template(al);
-    distribute dis = load_entity_distribute(template);
+    distribute dis = load_hpf_distribution(template);
     list ld = distribute_distribution(dis);
     distribution d;
 
@@ -449,7 +448,7 @@ template_dimension_of_array_dimension(
     align a;
     alignment al;
 
-    a = load_entity_align(array);
+    a = load_hpf_alignment(array);
     al = FindAlignmentOfDim(align_alignment(a), dim);
     
     return (al==alignment_undefined) ? -1 : alignment_templatedim(al);
@@ -472,7 +471,7 @@ DistributionParameterOfArrayDim(
     int *pprocdim)
 {
     entity template = array_to_template(array);
-    distribute d = load_entity_distribute(template);
+    distribute d = load_hpf_distribution(template);
     distribution
 	di = FindDistributionOfDim
 	    (distribute_distribution(d),
@@ -490,7 +489,7 @@ int processor_number(template, tdim, tcell, pprocdim)
 entity template;
 int tdim, tcell, *pprocdim; /* template dimension, template cell */
 {
-    distribute d = load_entity_distribute(template);
+    distribute d = load_hpf_distribution(template);
     list ld = distribute_distribution(d);
     entity procs = distribute_processors(d);
     distribution di = FindDistributionOfDim(ld, tdim, pprocdim);
@@ -597,7 +596,7 @@ void get_alignment(array, dim, ptdim, pa, pb)
 entity array;
 int dim, *ptdim, *pa, *pb;
 { 
-    align al = load_entity_align(array);
+    align al = load_hpf_alignment(array);
     alignment a;
     
     pips_assert("distributed array", array_distributed_p(array));
@@ -624,7 +623,7 @@ int dim, *ppdim, *pn;
 {
     distribution
         d = FindDistributionOfDim
-	    (distribute_distribution(load_entity_distribute(template)), 
+	    (distribute_distribution(load_hpf_distribution(template)), 
 				     dim, ppdim);
 
     *pn = (distribution_undefined_p(d) ?
@@ -712,8 +711,8 @@ references_aligned_p(reference r1, reference r2)
            e2 = reference_variable(r2);
     list /* of expression */ le1 = reference_indices(r1),
                              le2 = reference_indices(r2);
-    align a1 = load_entity_align(e1), 
-          a2 = load_entity_align(e2);
+    align a1 = load_hpf_alignment(e1), 
+          a2 = load_hpf_alignment(e2);
     int dim1 = 1, dim2;
     entity index;
 
