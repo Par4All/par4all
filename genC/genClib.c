@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 19:29:00 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 19:48:05 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2142,19 +2142,16 @@ int create_p ;
     int domain, index, max ;
     int i ;
     extern int allow_forward_ref ;
-    char buffer[ 1024 ] ;
 
     genread_in = file ;
     if( (i=genread_lex()) != READ_INT ) {
-	(void) sprintf( buffer, "%d", i ) ;
-	user( "Incorrect data for gen_read_tabulated: %s\n", buffer ) ;
+	user( "Incorrect data for gen_read_tabulated: %d\n", i ) ;
 	exit( 1 ) ;
     }
     domain = genread_lval.val ;
 
     if( (i=genread_lex()) != READ_INT ) {
-	(void) sprintf( buffer, "%d", i ) ;
-	user( "Incorrect second data for gen_read_tabulated: %s\n", buffer ) ;
+	user( "Incorrect second data for gen_read_tabulated: %d\n", i ) ;
 	exit( 1 ) ;
     }
     max = genread_lval.val ;
@@ -2162,9 +2159,8 @@ int create_p ;
     /* (void) fscanf( file, "%d %d", &domain, &max ) ; */
 
     if( max != max_tabulated_elements()) {
-	(void) sprintf(buffer, "Getting %d, expecting %d elements\n",
-		       max,  max_tabulated_elements()) ;
-	user( "gen_read_tabulated: %s\n", buffer ) ;
+	user( "gen_read_tabulated: Getting %d, expecting %d elements\n\n", 
+	       max,  max_tabulated_elements()) ;
 	if(max > max_tabulated_elements()) {
 	    user("Current limit (%d) can be redefined by setting environment "
 		 "variable NEWGEN_MAX_TABULATED_ELEMENTS\n",
@@ -2218,7 +2214,6 @@ gen_check( obj, t )
 gen_chunk *obj ;
 int t ;
 {
-    char buffer[ 1024 ] ;
     extern int max_domain_index() ;
     int max_index ;
 
@@ -2231,13 +2226,11 @@ int t ;
     message_assert("Improper domain_index", max_index >= 0 ) ;
 
     if( obj != gen_chunk_undefined && t != obj->i ) {
-	(void) sprintf( buffer, 
-		       "gen_check: Type clash (expecting %s, getting %s)\n",
-		       Domains[ t ].name, 
-		       (obj->i >= 0 && obj->i <= max_index ) ?
-		       Domains[ obj->i ].name :
-		       "???") ;
-	user( buffer, (char *)NULL ) ;
+	user("gen_check: Type clash (expecting %s, getting %s)\n",
+	     Domains[ t ].name, 
+	     (obj->i >= 0 && obj->i <= max_index ) ?
+	     Domains[ obj->i ].name :
+	     "???") ;
 	abort() ;
     }
     return( obj ) ;
@@ -2358,11 +2351,8 @@ check_sharing(p, type)
 char *p ;
 char *type ;
 {
-  static char msg[ 1024 ] ;
-
   if( hash_get( pointers, p ) != HASH_UNDEFINED_VALUE ) {
-    sprintf( msg, "Sharing of %s detected on 0x%x", type, (int) p ) ;
-    user( msg, (char *)NULL ) ;
+      user("Sharing of %s detected on 0x%x", type, (int) p ) ;
     longjmp( env, 1 ) ;
     /* NOTREACHED*/
   }
