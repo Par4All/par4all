@@ -41,15 +41,15 @@
    is the mudule's last callee.
 */
 
-list string_to_callees(module_name)
-string module_name;
+list 
+string_to_callees(string module_name)
 {
     callees cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,TRUE);
     return callees_callees(cl);
 }
 
-list entity_to_callees(mod)
-entity mod;
+list 
+entity_to_callees(entity mod)
 {
     list callees_list=NIL;
     string module_name = module_local_name(mod);
@@ -68,16 +68,16 @@ entity mod;
    callgraph_module_name(margin, module, fp)
 */
 
-void callgraph_module_name(margin, module, fp, decor_type)
-int margin;
-entity module;
-FILE *fp;
-int decor_type;
+static void
+callgraph_module_name(
+    entity module,
+    FILE * fp,
+    int decor_type)
 {
-    string module_name = module_local_name(module);
-
+    string module_name = module_local_name(module),
+	dir = db_get_current_workspace_directory();    
     text r = make_text(NIL);
-   
+
     switch (decor_type) {
     case CG_DECOR_NONE:
 	break;
@@ -106,47 +106,47 @@ int decor_type;
 	MERGE_TEXTS(r,get_text_out_regions(module_name));
 	break;
     default:
-	pips_error("callgraph_module_name",
-		   "unknown callgraph decoration for module %s\n",
-		   module_name);
+	pips_internal_error("unknown callgraph decoration for module %s\n",
+			    module_name);
     }
 
     print_text(fp, r);
-    (void) fprintf(fp,"%*s%s\n",margin,"", module_name);
+    fprintf(fp, "%s\n", module_name);
 
-    MAPL(pm,{
-	entity e = ENTITY(CAR(pm));
-	callgraph_module_name(margin + CALLGRAPH_INDENT,
-			      e,fp,decor_type);
-    }, entity_to_callees(module) );
+    MAP(ENTITY, e,
+    {
+	string n = entity_local_name(e);
+	string f = db_get_memory_resource(DBR_CALLGRAPH_FILE, n, TRUE);
+	string full = strdup(concatenate(dir, "/", f, 0));
+
+	safe_append(fp, full, CALLGRAPH_INDENT);
+
+	free(full);
+    }, 
+	entity_to_callees(module));
+
+    free(dir);
 }
     
-bool module_to_callgraph(module,decor_type)
-entity module;
-int decor_type;
+bool 
+module_to_callgraph(
+    entity module,
+    int decor_type)
 {
-    string module_name = module_local_name(module);
-    statement s = (statement)db_get_memory_resource(DBR_CODE,
-						    module_name, TRUE);
+    string name, dir, local, full;
+    FILE * fp;
 
-    if ( s == statement_undefined ) {
-	pips_error("module_to_callgraph","no statement for module %s\n",
-		   module_name);
-    } else {
-	FILE *fp;
-	string localfilename = strdup(concatenate(module_name, ".cg",  NULL));
-	string filename = 
-	    strdup(concatenate(db_get_current_workspace_directory(), 
-			       "/", localfilename,  NULL));
+    name = module_local_name(module);
+    local = db_build_file_resource_name(DBR_CALLGRAPH_FILE, name, ".cg");
+    dir = db_get_current_workspace_directory();
+    full = strdup(concatenate(dir, "/", local, 0));
+    free(dir);
 
-	fp = safe_fopen(filename, "w");
-	
-	callgraph_module_name(0, module, fp, decor_type);
-	
-	safe_fclose(fp, filename);
-	DB_PUT_FILE_RESOURCE(DBR_CALLGRAPH_FILE, 
-			     strdup(module_name), localfilename);
-	free(filename);
-    }
+    fp = safe_fopen(full, "w");
+    callgraph_module_name(module, fp, decor_type);
+    safe_fclose(fp, full);
+    free(full);
+    
+    DB_PUT_FILE_RESOURCE(DBR_CALLGRAPH_FILE, name, local);
     return TRUE;
 }
