@@ -2,6 +2,15 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.116  1998/03/24 09:34:41  irigoin
+ * Semantics of leftmost refined to distinguish between arithmetic
+ * expressions and general expressions since leftmost is used to decide if a
+ * unary minus requires parentheses or not. Basically, leftmost always
+ * remains TRUE as long as an arithmetic expression has not been entered.
+ * words_infix_binary_op() has been modified using the new constant
+ * MINIMAL_ARITHMETIC_PRECEDENCE. It is assumed that arithmetic operators
+ * have greater precedences than any other operator.
+ *
  * Revision 1.115  1998/03/19 16:27:28  irigoin
  * leftmost argument added to handle unary minuses in front of expressions
  *
@@ -170,7 +179,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.115 1998/03/19 16:27:28 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.116 1998/03/24 09:34:41 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -227,6 +236,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 /* operator precedences are in the [0,100] range */
 
 #define MAXIMAL_PRECEDENCE 100
+#define MINIMAL_ARITHMETIC_PRECEDENCE 19
 
 /* Define the markers used in the raw unstructured output when the
    PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH property is true: */
@@ -764,7 +774,8 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
     list pc = NIL;
     list args = call_arguments(obj);
     int prec = words_intrinsic_precedence(obj);
-    list we1 = words_subexpression(EXPRESSION(CAR(args)), prec, leftmost);
+    list we1 = words_subexpression(EXPRESSION(CAR(args)), prec, 
+				   precedence>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: TRUE);
     list we2;
 
     if ( strcmp(entity_local_name(call_function(obj)), "/") == 0 )
