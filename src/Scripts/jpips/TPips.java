@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: TPips.java,v $
+ * Revision 1.5  1998/07/03 08:14:37  coelho
+ * a little bit cleaner.
+ *
  * Revision 1.4  1998/07/02 15:03:34  coelho
  * synchronized sendCommand...
  *
@@ -75,8 +78,8 @@ public class TPips
   
 
   public final	String		execute = "tpips -jw",
-  				totpips = "to tpips   : ",
-				fromtpips = "from tpips : ",
+  				TO_TPIPS = "to tpips   : ",
+				FROM_TPIPS = "from tpips : ",
 				moduleMessage = "No modules selected!",
 				error = "Error";
 				
@@ -150,9 +153,9 @@ public class TPips
     {
       String s = replaceCommand(command);
       if(s == null) return null;
+      System.out.println(TO_TPIPS + s);
       out.println(s);
       out.flush();
-      System.out.println(totpips+s);
       return getResponse();
     }
     
@@ -168,7 +171,7 @@ public class TPips
     	  String s = in.readLine();
 	  while(s!=null)
 	    {
-              System.out.println(fromtpips+s);
+              System.out.println(FROM_TPIPS + s);
 	      StringTokenizer t = new StringTokenizer(s,SPACE,false);
 	      if(t.hasMoreTokens())
 	        {
@@ -176,7 +179,10 @@ public class TPips
                   if(response.equals(JPIPS))
 	            {
 	              response = t.nextToken();
-		      if(response.equals(DONE)) return result;
+		      if(response.equals(DONE)) 
+			{
+			  return result;
+			}
                       else if(response.equals(DIRECTORY))
                         {
 	                  result = t.nextToken(EOL).substring(1);
@@ -198,11 +204,10 @@ public class TPips
                         {
 			  String path = t.nextToken(EOL);
 			  if(path.substring(1,2).equals(DIR))
-			    path = path.substring(2);
-			  File f= new File(
-			    directory.getAbsolutePath()+path);
+			      path = path.substring(2);
+			  File f= new File(directory.getAbsolutePath()+path);
 			  System.out.println(f.getAbsolutePath());
-	                    textDisplayer.display(f,true,true);
+			  textDisplayer.display(f,true,true);
 	                }
 		      else if(response.equals(BEGIN_ERROR))
 		        {
