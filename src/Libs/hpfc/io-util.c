@@ -1,7 +1,7 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * $RCSfile: io-util.c,v $ ($Date: 1995/09/15 15:54:36 $, )
+ * $RCSfile: io-util.c,v $ ($Date: 1995/09/15 21:40:59 $, )
  * version $Revision$,
  */
 
@@ -33,7 +33,7 @@ boolean send;
 	(make_reference(nt, CONS(EXPRESSION, lid, NIL)));
     chn = reference_to_expression
 	(make_reference(nc, CONS(EXPRESSION, copy_expression(lid), NIL)));
-    cmp_lid = hpfc_compute_lid(ld, proc, get_ith_processor_dummy, FALSE, NULL);
+    cmp_lid = hpfc_compute_lid(ld, proc, get_ith_processor_dummy, NULL);
     msg = hpfc_message(tid, chn, send);
 
     return make_block_statement
