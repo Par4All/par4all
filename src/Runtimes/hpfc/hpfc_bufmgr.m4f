@@ -1,20 +1,31 @@
 c
 c $RCSfile: hpfc_bufmgr.m4f,v $ (version $Revision$)
-c $Date: 1995/09/15 15:57:03 $, 
+c $Date: 1995/09/27 16:53:01 $, 
+c
+c First routines to fake the pack/unpack of data.
+c The issue is to allow quite simply to measure the different
+c overheads in the enumaration/packing/message stuff.
+c Counts the number of calls, say for some statistics.
+c The the routines for doing the job...
 c
 define(`GENERIC_BUFFER_PACK',`dnl
 pushdef(`PVMTYPE',$1)dnl
-      subroutine build_name(PVMTYPE,HPFC_BUFPCK)()
+      subroutine build_name(PVMTYPE,hpfc_fake_bufpck)()
+      include "fpvm3.h"
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      SEND_NOT_INITIALIZED=.FALSE.
+      BUFINDEX=0
+      hpfc_fake_bufpck=hpfc_fake_bufpck+1
+      end
+      subroutine build_name(PVMTYPE,hpfc_bufpck)()
       integer info, bufid
       include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
-c
-c could use PVMINPLACE here ? if to be sent immediately yes!!!
-c
       if (SEND_NOT_INITIALIZED) then
          call pvmfinitsend(BUFFER_ENCODING, bufid)
-c        if (bufid.lt.0) print *, "pvm_initsend error"
+         debug(if (bufid.lt.0) print *, "pvm_initsend error")
          SEND_NOT_INITIALIZED=.FALSE.
       endif
       call pvmfpack(INTEGER4, BUFINDEX, 1, 1, info)
@@ -25,7 +36,19 @@ c        if (bufid.lt.0) print *, "pvm_initsend error"
 popdef(`PVMTYPE')')dnl
 define(`GENERIC_BUFFER_UPCK',`dnl
 pushdef(`PVMTYPE',$1)dnl
-      subroutine build_name(PVMTYPE,HPFC_BUFUPK)(lid)
+      subroutine build_name(PVMTYPE,hpfc_fake_bufupk)(lid)
+      integer lid
+      include "fpvm3.h"
+      include "hpfc_commons.h"
+      include "hpfc_includes.h"
+      if (RECEIVED_NOT_PERFORMED) then
+         RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
+         RECEIVED_NOT_PERFORMED = .FALSE.
+      endif
+      SIZEOFRECEIVEDBUFFER=build_name(PVMTYPE,BUFFSIZE)
+      hpfc_fake_bufupk=hpfc_fake_bufupk+1
+      end
+      subroutine build_name(PVMTYPE,hpfc_bufupk)(lid)
       integer lid
       integer info, bufid
       include "fpvm3.h"
