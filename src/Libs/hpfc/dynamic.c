@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/06/12 17:15:55 $, )
+ * ($Date: 1996/12/24 15:24:25 $, )
  */
 
 #include "defines-local.h"
@@ -27,11 +27,13 @@
  *   introduced to handle remappings.
  * - renamings: remappings associated to a statement.
  * - maybeuseful_mappings: to be kept for a statement. 
+ * - similar_mapping: copies with similar mappings...
  */
 GENERIC_GLOBAL_FUNCTION(dynamic_hpf, entity_entities)
 GENERIC_GLOBAL_FUNCTION(primary_entity, entitymap)
 GENERIC_GLOBAL_FUNCTION(renamings, statement_renamings)
 GENERIC_GLOBAL_FUNCTION(maybeuseful_mappings, statement_entities)
+GENERIC_GLOBAL_FUNCTION(similar_mapping, entitymap)
 
 entity safe_load_primary_entity(entity e)
 {
@@ -51,6 +53,7 @@ void init_dynamic_status()
     init_primary_entity();
     init_renamings();
     init_maybeuseful_mappings();
+    init_similar_mapping();
 }
 
 void reset_dynamic_status()
@@ -59,6 +62,7 @@ void reset_dynamic_status()
     reset_primary_entity();
     reset_renamings();
     reset_maybeuseful_mappings();
+    /* reset_similar_mapping(); */
 }
 
 dynamic_status get_dynamic_status()
@@ -67,6 +71,7 @@ dynamic_status get_dynamic_status()
 			       get_primary_entity(), 
 			       get_renamings(),
 			       get_maybeuseful_mappings());
+    /* get_similar_mapping() */
 }
 
 void set_dynamic_status(dynamic_status d)
@@ -75,6 +80,7 @@ void set_dynamic_status(dynamic_status d)
     set_primary_entity(dynamic_status_primary(d));
     set_renamings(dynamic_status_renamings(d));
     set_maybeuseful_mappings(dynamic_status_tokeep(d));
+    /* set_similar_mapping(...) */
 }
 
 void close_dynamic_status()
@@ -83,6 +89,7 @@ void close_dynamic_status()
     close_primary_entity();
     close_renamings();
     close_maybeuseful_mappings();
+    close_similar_mapping();
 }
 
 /*  a new dynamic entity is stored.
@@ -95,6 +102,8 @@ void set_entity_as_dynamic(entity e)
     {
 	store_dynamic_hpf(e, make_entities(CONS(ENTITY, e, NIL)));
 	store_primary_entity(e, e);
+
+	store_similar_mapping(e, e);
     }
     /* else the entity was already declared as dynamic... */
 }
@@ -115,14 +124,14 @@ static void add_dynamic_synonym(
     pips_debug(3, "%s as %s synonyms\n", entity_name(new_e), entity_name(e));
 
     pips_assert("dynamicity", dynamic_entity_p(e) && !dynamic_entity_p(new_e));
-
+    
     entities_list(es) = CONS(ENTITY, new_e, entities_list(es));
     store_dynamic_hpf(new_e, es);
     store_primary_entity(new_e, load_primary_entity(e));
+
 }
 
-/*   NEW ENTITIES FOR MANAGING DYNAMIC ARRAYS
- */
+/******************************** NEW ENTITIES FOR MANAGING DYNAMIC ARRAYS */
 
 /*  builds a synonym for entity e. The name is based on e, plus
  *  an underscore and a number added. May be used for templates and arrays.
@@ -153,9 +162,33 @@ static entity new_synonym_array(
     entity a,
     align al)
 {
+    bool similar_found = FALSE;
     entity new_a = new_synonym(a);
     set_array_as_distributed(new_a);
     store_hpf_alignment(new_a, al);
+
+    /* look for copies with similar mappings for latter update
+     */
+    MAP(ENTITY, e,
+    {
+	if (new_a!=e && array_distribution_similar_p(e, new_a))
+	{
+	    /* new_a -> init[e] for storage purposes 
+	     */
+	    pips_debug(8, "found similar: %s -> %s\n", 
+		       entity_name(new_a), entity_name(e));
+	    store_similar_mapping(new_a, load_similar_mapping(e));
+	    similar_found = TRUE;
+	    break;
+	}
+    },
+	entities_list(load_dynamic_hpf(new_a)));
+
+    if (!similar_found) store_similar_mapping(new_a, new_a);
+
+    /* ??? for final update after compilation! hummm....
+     */
+    store_new_node_variable(load_similar_mapping(new_a), new_a);
     return new_a;
 }
 
@@ -326,11 +359,7 @@ align new_align_with_template(
     return b;
 }
 
-/* entity template_synonym_distributed_as(temp, d)
- * entity temp;
- * distribute d;
- *
- * what: finds or creates a new entity distributed as needed.
+/* what: finds or creates a new entity distributed as needed.
  * input: an template (which *must* be dynamic) and a distribute
  * output: returns a template distributed as specified by d
  * side effects:
@@ -355,6 +384,128 @@ entity template_synonym_distributed_as(
     /*  else no compatible template does exist, so one must be created
      */
     return new_synonym_template(temp, d);
+}
+
+/******************************************************** SIMILAR MAPPPINGS */
+/* array_distribution_similar_p
+ *
+ * returns whether a1 and a2 are similar, i.e. even if 
+ * distributed differently, the resulting mapping is similar.
+ *
+ * e.g. align a1(i,j) with T(i,j), distribute T(*,block) 
+ * and  align a2(i,j) with T(j,i), distribute T(block,*)
+ *
+ * impact: the same area can be used for holding both array versions
+ * but the version number must be accurate.
+ */
+static bool
+same_distribution_p(distribution d1, distribution d2)
+{
+    return 
+	style_tag(distribution_style(d1))==style_tag(distribution_style(d2))
+	&& expression_equal_p(distribution_parameter(d1),
+			      distribution_parameter(d2));
+}
+
+#define RETAL(msg, res) \
+  { pips_debug(7, "%d because %s\n", res, msg); return res;}
+
+static bool 
+same_alignment_p(entity e1, entity t1, alignment a1, 
+		 entity e2, entity t2, alignment a2)
+{
+    int b1, l1, b2, l2;
+    bool b;
+
+    pips_debug(7, "considering %s[dim=%d] and %s[dim=%d]\n",
+	       entity_name(e1), alignment_arraydim(a1),
+	       entity_name(e2), alignment_arraydim(a2));
+
+    if (alignment_undefined_p(a1) || alignment_undefined_p(a1))
+    {
+        b=alignment_undefined_p(a1) && alignment_undefined_p(a1);
+	RETAL("some undefined", b);
+    }
+
+    /* compares the alignments if any 
+     */
+    if (alignment_arraydim(a1)!=alignment_arraydim(a2)) 
+	RETAL("diff. array dim", FALSE);
+
+    if (!expression_equal_p(alignment_rate(a1), alignment_rate(a2)))
+	RETAL("different rate", FALSE);
+
+    if (SizeOfIthDimension(t1, alignment_templatedim(a1))!=
+	SizeOfIthDimension(t2, alignment_templatedim(a2)))
+	RETAL("different template size", FALSE);
+
+    b1 = HpfcExpressionToInt(alignment_constant(a1));
+    b2 = HpfcExpressionToInt(alignment_constant(a2));
+    l1 = HpfcExpressionToInt
+	(dimension_lower(FindIthDimension(t1,alignment_templatedim(a1))));
+    l2 = HpfcExpressionToInt
+	(dimension_lower(FindIthDimension(t2,alignment_templatedim(a2))));
+
+    b=(b1-l1)==(b2-l2);
+    RETAL("shift", b);
+}
+
+#define RET(msg, what) \
+  { pips_debug(6, "not similar because %s\n", msg); return what;}
+
+bool 
+array_distribution_similar_p(entity a1, entity a2)
+{
+    align 
+	al1 = load_hpf_alignment(a1),
+	al2 = load_hpf_alignment(a2);
+    entity 
+	t1 = align_template(al1),
+	t2 = align_template(al2);
+    distribute 
+	d1 = load_hpf_distribution(t1),
+	d2 = load_hpf_distribution(t2);
+    entity
+	p1 = distribute_processors(d1),
+	p2 = distribute_processors(d2);
+    int i, td1, td2,
+	ndimdist = NumberOfDimension(p1);
+
+    pips_assert("same primary", 
+		load_primary_entity(a1)==load_primary_entity(a2));
+
+    pips_debug(6, "comparing %s and %s\n", entity_name(a1), entity_name(a2));
+
+    /* conformant processors 
+     */
+    if (!conformant_entities_p(p1, p2)) 
+	RET("different processors", FALSE);
+    
+    for (i=1; i<=ndimdist; i++) /* considering ith dim of proc */
+    {
+	/* conformant distributions
+	 */
+	distribution 
+	    x1 = FindDistributionOfProcessorDim
+	      (distribute_distribution(d1), i, &td1),
+	    x2 = FindDistributionOfProcessorDim
+	      (distribute_distribution(d2), i, &td2);
+	alignment at1, at2;
+	
+	if (!same_distribution_p(x1, x2)) 
+	    RET("different distribution", FALSE);
+
+	/* conformant alignments 
+	 */
+	at1 = FindAlignmentOfTemplateDim(align_alignment(al1), td1);
+	at2 = FindAlignmentOfTemplateDim(align_alignment(al2), td2);
+
+	if (!same_alignment_p(a1,t1,at1,a2,t2,at2)) 
+	    RET("different alignment", FALSE);
+    }
+
+    pips_debug(6, "similar distributions!\n");
+    return TRUE;
 }
 
 /**************************************************** MAPPING OF ARGUMENTS */
