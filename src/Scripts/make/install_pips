@@ -293,6 +293,9 @@ MANPATH="\${PIPS_ROOT}/Doc:\${MANPATH}"
 #
 # Other variables of interest (and their implicit default):
 #
+# PIPS_CPP (cpp)
+#  - what to use for preprocessing .F files.
+#   linux: gcc -E
 #
 # PIPS_COSTDIR (\${PIPS_ROOT}/Share/complexity_cost_tables)
 #  - where to find const tables for the complexity analysis
@@ -402,6 +405,7 @@ test ${uname_s} = Linux && cat >> pipsrc.tmp <<EOF
 #
 # fixes for Linux
 #
+PIPS_CPP='gcc -E'
 PIPS_PING='ping -c 1'
 PIPS_TAR='tar'
 PIPS_FLINT='g77 -c -Wall -Wimplicit'
