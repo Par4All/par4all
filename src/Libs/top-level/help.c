@@ -73,19 +73,20 @@ char *argv[];
 	/* should be show_message */
 	user_log("Could not open help file (%s)\n", help_file);
     }
-
-    while ((line = read_line(fd)) != NULL) {
-	if (strncmp(line, begin_string, begin_length) == 0 &&
-	    strcmp(line + begin_length + 1, topic) == 0) {
-	    selected = TRUE;
-	}
-	else if (strncmp(line, end_string, end_length) == 0) {
-	    if (selected)
-		break;
-	}
-	else {
-	    if (selected) {
-		args_add(pargc, argv, strdup(line));
+    else {
+	while ((line = read_line(fd)) != NULL) {
+	    if (strncmp(line, begin_string, begin_length) == 0 &&
+		strcmp(line + begin_length + 1, topic) == 0) {
+		selected = TRUE;
+	    }
+	    else if (strncmp(line, end_string, end_length) == 0) {
+		if (selected)
+		    break;
+	    }
+	    else {
+		if (selected) {
+		    args_add(pargc, argv, strdup(line));
+		}
 	    }
 	}
     }
