@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/09/07 14:27:23 $, )
+ * ($Date: 1996/09/20 18:46:17 $, )
  */
 
 #include "defines-local.h"
@@ -332,7 +332,7 @@ hpfc_fclose(
     safe_fclose(f, name);
 }
 
-#define strcat(prefix, suffix) strdup(concatenate(prefix, suffix, NULL))
+#define string_cat(prefix, suffix) strdup(concatenate(prefix, suffix, NULL))
 #define full_name(dir, name) concatenate(dir, "/", name, NULL)
 
 void 
@@ -348,10 +348,10 @@ put_generated_resources_for_common(entity common)
     prefix = entity_local_name(common);
     dir_name = db_get_current_workspace_directory();
     
-    host_name = strcat(prefix, "_host.h");
-    node_name = strcat(prefix, "_node.h");
-    parm_name = strcat(prefix, "_parameters.h");
-    init_name = strcat(prefix, "_init.h");
+    host_name = string_cat(prefix, "_host.h");
+    node_name = string_cat(prefix, "_node.h");
+    parm_name = string_cat(prefix, "_parameters.h");
+    init_name = string_cat(prefix, "_init.h");
 
     host_file = hpfc_fopen(full_name(dir_name, host_name));
     hpfc_print_common(host_file, host_module, host_common);
@@ -397,7 +397,7 @@ compile_a_special_io_function(entity module)
 
     file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
     dir_name = db_get_current_workspace_directory();
-    h_name = strcat(prefix, "_host.f");
+    h_name = string_cat(prefix, "_host.f");
 
     system(concatenate("cp ", dir_name, "/", file_name, " ", 
 		              dir_name, "/", h_name, NULL));
@@ -418,8 +418,8 @@ compile_a_pure_function(entity module)
     prefix = module_local_name(module);
     dir_name = db_get_current_workspace_directory();
     file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
-    h_name = strcat(prefix, "_host.f");
-    n_name = strcat(prefix, "_node.f");
+    h_name = string_cat(prefix, "_host.f");
+    n_name = string_cat(prefix, "_node.f");
 
     system(concatenate
        ("cp ", dir_name, "/", file_name, " ", dir_name, "/", h_name, " ; "
@@ -444,22 +444,22 @@ put_generated_resources_for_module(
     prefix = module_local_name(module);
     dir_name = db_get_current_workspace_directory();
 
-    host_name = strcat(prefix, "_host.f");
+    host_name = string_cat(prefix, "_host.f");
     host_file = hpfc_fopen(full_name(dir_name, host_name));
     hpfc_print_code(host_file, host_module, host_stat);
     hpfc_fclose(host_file, host_name);
 
-    node_name = strcat(prefix, "_node.f");
+    node_name = string_cat(prefix, "_node.f");
     node_file = hpfc_fopen(full_name(dir_name, node_name));
     hpfc_print_code(node_file, node_module, node_stat);
     hpfc_fclose(node_file, node_name);
 
-    parm_name = strcat(prefix, "_parameters.h");
+    parm_name = string_cat(prefix, "_parameters.h");
     parm_file = hpfc_fopen(full_name(dir_name, parm_name));
     create_parameters_h(parm_file, module);
     hpfc_fclose(parm_file, parm_name);
 
-    init_name = strcat(prefix, "_init.h");
+    init_name = string_cat(prefix, "_init.h");
     init_file = hpfc_fopen(full_name(dir_name, init_name));
     create_init_common_param_for_arrays(init_file, module);
     hpfc_fclose(init_file, init_name);
