@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: type.c,v $
+ * Revision 1.45  2003/06/19 07:25:23  nguyen
+ * Update calls to make_statement and make_variable with new RI for C
+ *
  * Revision 1.44  2003/05/20 09:01:37  irigoin
  * Update of basic_to_string() to fix bug for Francois Ferrand. Previous
  * message in version log is a mistake. It's also an update of basic_to_string().
@@ -105,7 +108,7 @@ MakeTypeVariable(b, ld)
 basic b;
 cons * ld;
 {
-    return(make_type(is_type_variable, make_variable(b, ld)));
+    return(make_type(is_type_variable, make_variable(b, ld,NIL)));
 }
 
 /* END_EOLE */
@@ -153,7 +156,7 @@ MakeTypeArray(b, ld)
 basic b;
 cons * ld;
 {
-    return(make_type(is_type_variable, make_variable(b, ld)));
+    return(make_type(is_type_variable, make_variable(b, ld,NIL)));
 }
 
 parameter 
@@ -332,7 +335,7 @@ type t2;
 type make_scalar_integer_type(int n)
 {
     type t = make_type(is_type_variable,
-		       make_variable(make_basic(is_basic_int, UUINT(n)), NIL));
+		       make_variable(make_basic(is_basic_int, UUINT(n)), NIL,NIL));
     return t;
 }
 
