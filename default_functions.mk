@@ -10,7 +10,8 @@ OBJS= $(SRCS:%.c=$(OBJDIR)/%.o)
 POLY_EXEC= $(SRCS:%.c=%.exec) 
 
 OBJDIR = $(ROOT)/$(OBJ_DIR)
-EXECDIR = $(ROOT)/bin/$(OBJ_DIR)
+#EXECDIR = $(ROOT)/bin/$(OBJ_DIR)
+EXECDIR = $(ROOT)/bin
 
 ############################################################## 
 ## Standard makefile variable for creating platform dependent object
@@ -123,7 +124,7 @@ document:
 ## Install/UnInstall rules
 ###########################################################
 # main target
-install:: install-static install-include install-exec install-man install-docs
+install:: install-static install-include install-man install-docs
 
 # not functional yet...
 #install-shared:
