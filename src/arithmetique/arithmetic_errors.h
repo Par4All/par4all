@@ -26,7 +26,8 @@ extern int  simplex_arithmetic_error;
    extern int or extern jmp_buf
 */
 
-#define DEBUG_GLOBAL_EXCEPTIONS
+/* set DEBUG_GLOBAL_EXCEPTIONS for debugging information
+ */
 
 #if defined(DEBUG_GLOBAL_EXCEPTIONS)
 #define exception_debug(msg, n, what) 			\
@@ -68,5 +69,5 @@ extern int  simplex_arithmetic_error;
 
 #define TRY else
 
-/* end of $RCSfile: arithmetic_errors.h,v $
+/* end of it.
  */
