@@ -251,6 +251,8 @@ string file;
     user_log("Splitting file    %s\n", file);
     cwd = strdup(get_cwd());
     chdir(database_directory(pgm));
+    /* chdir(database_directory(pgm)); */
+    chdir(db_get_current_workspace_directory());
     /* reverse sort because the list of modules is reversed later */
     /* if two modules have the same name, the first splitted wins
        and the other one is hidden by the call to "sed" since
