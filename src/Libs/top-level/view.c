@@ -14,6 +14,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
 #include "database.h"
