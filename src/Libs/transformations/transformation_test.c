@@ -2,6 +2,9 @@
   $Id$
 
   $Log: transformation_test.c,v $
+  Revision 1.3  1998/12/03 15:52:01  coelho
+  flattening added.
+
   Revision 1.2  1998/12/03 14:58:15  coelho
   cosmetics.
 
@@ -22,11 +25,15 @@
  */
 static void blind_loop_distribute(instruction l)
 {
-  if(instruction_loop_p(l)) {
+  if(instruction_loop_p(l)) 
+  {
     instruction b = statement_instruction(loop_body(instruction_loop(l)));
-    if(instruction_block_p(b) && gen_length(instruction_block(b)) > 1) {
-      list /* of statements */ ls = instruction_block(b), lls = NIL;
-      
+    flatten_block_if_necessary(b); /* avoid sequences of sequences. */
+
+    if(instruction_block_p(b) && gen_length(instruction_block(b)) > 1) 
+    {
+      list /* of statements */ lls = NIL, ls = instruction_block(b);
+
       loop_body(instruction_loop(l)) = statement_undefined; /* unlink body */
       
       MAP(STATEMENT, s, {
@@ -43,15 +50,6 @@ static void blind_loop_distribute(instruction l)
   }
 }
 
-/* distribute instruction l if it is a loop.
-   can be used on the way down the syntax tree.
- */
-static bool blind_loop_distribution_filter(instruction l)
-{
-  blind_loop_distribute(l);
-  return TRUE;
-}
-
 /* distribute any loop in module mod_name.
    implemented top-down. could be done bottom-up.
  */
@@ -66,15 +64,10 @@ bool blind_loop_distribution(char * mod_name)
   pips_debug(1, "begin for %s\n", mod_name);
   pips_assert("statement is consistent", statement_consistent_p(mod_stmt));
   
-  /* BOTTOM-UP
-     gen_recurse(mod_stmt, instruction_domain,
-     gen_true, blind_loop_distribution_rewrite);
-  */
-  
-  /* TOP-DOWN (loop distribution on the way down) */
-  gen_recurse(mod_stmt, instruction_domain,
-	      blind_loop_distribution_filter, gen_null);
-  
+  /* BOTTOM-UP. could be implemented TOP-DOWN. */
+  gen_recurse(mod_stmt, 
+	      instruction_domain, gen_true, blind_loop_distribute);
+
   /* Reorder the module because new statements have been generated. */
   module_reorder(mod_stmt);
   
