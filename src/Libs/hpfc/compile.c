@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/10/17 11:15:46 $, )
+ * ($Date: 1995/11/02 17:19:42 $, )
  */
 
 #include "defines-local.h"
@@ -17,8 +17,8 @@
 extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
 
 #define generate_file_name(filename, prefix, suffix)\
-  filename = strdup(concatenate(db_get_current_workspace_directory(),\
-				"/", prefix, suffix, NULL));
+  filename = catdup(db_get_current_workspace_directory(),\
+		    "/", prefix, suffix, NULL);
 
 #define add_warning(filename)\
    safe_system(concatenate("$HPFC_TOOLS/hpfc_add_warning ", filename, NULL));
