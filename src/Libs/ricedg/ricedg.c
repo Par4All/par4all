@@ -405,7 +405,7 @@ rdg_statement(statement stat)
       case is_instruction_loop:
 	rdg_loop(stat);
 	break;
-
+      case is_instruction_whileloop:
       case is_instruction_goto: 
       case is_instruction_call: 
 	break;
