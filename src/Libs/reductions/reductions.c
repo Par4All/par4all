@@ -300,7 +300,10 @@ static bool pr_call_flt(call c)
     reductions reds = load_proper_reductions(head);
     reduction red;
 
+    pips_debug(9, "considering call to %s\n", entity_name(call_function(c)));
+
     if (call_proper_reduction_p(head, c, &red))
+
 	/* direct proper reduction 
 	 */
 	reductions_list(reds) = 
