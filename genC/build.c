@@ -483,9 +483,7 @@ compile()
 
 /* GEN_WRITE_SPEC prints the Domains table in the given FILENAME. */
 
-void
-gen_write_spec( filename )
-char *filename ;
+void gen_write_spec(char * filename)
 {
     extern int fclose();
     FILE *id ;
@@ -504,18 +502,15 @@ char *filename ;
    the manipulation functions. */
 
 /*ARGSUSED*/
-int
-build( argc, argv )
-int argc ;
-char *argv[] ;
+int build(int argc, char * argv[])
 {
     init() ;
     genspec_parse() ;
     compile() ;
   
-    if( error_seen == 0 ) {
-	gencode( argv[ 1 ] ) ;
-	gen_write_spec( argv[ 2 ]) ;
+    if (error_seen == 0) {
+	gencode(argv[1]);
+	gen_write_spec(argv[2]);
 	return( 0 ) ;
     }
     return( 1 ) ;
@@ -523,16 +518,12 @@ char *argv[] ;
 
 /* ALLOC is an "iron-clad" version of malloc(3). */
 
-char *
-alloc( size )
-int size ;
+char * alloc(int size)
 {
-    char *p ;
-    /* char *malloc() ; */
+    char * p;
 
     if( (p=malloc( (unsigned)size )) == NULL && size != 0)
 	    fatal( "alloc: No more memory for %s bytes\n", itoa( size )) ;
   
-    return( p ) ;
+    return p;
 }
-
