@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/07/21 13:15:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/07/22 13:56:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 1997/07/21 13:15:15 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 1997/07/22 13:56:48 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -75,28 +75,6 @@ char * k;
     return (l == (list) HASH_UNDEFINED_VALUE)? NIL : l;
 }
 
-/* No longer used. RK */
-
-/* REMV removes a (unique) control X from the list L. */
-
-static cons * remv(x, l)
-control x;
-cons *l;
-{
-    cons *pred = NIL;
-    cons *elts = l;
-
-    for(; !ENDP(elts); pred = elts, elts = CDR(elts)) {
-	if(CONTROL(CAR(elts)) == x) {
-	    if(ENDP(pred)) {
-		return(CDR(elts));
-	    }
-	    CDR(pred) = CDR(elts);
-	    return(l);
-	}
-    }
-    return(l);
-}
 
 /* PUSHNEW pushes a control X on the list L if it's not here. */
 
