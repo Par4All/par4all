@@ -1,190 +1,87 @@
 c
 c everything about packing
 c
-c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/08/29 12:42:32 $, )
+c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/08/30 15:12:54 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
 c
 c
-define(build_name,`$1_$2_$3_$4')dnl
-define(PACKING1,`dnl
-pushdef(`PVMFUNCTION',$1)dnl
-pushdef(`NAME',$2)dnl
-pushdef(`TYPE',$3)dnl
-pushdef(`PVMTYPE',$4)dnl
+include(`m4_macros')dnl
 c
-c Packing one dimensional array
+c macros for code generation
 c
-      subroutine build_name(HPFC,NAME,PVMTYPE,1)(
+define(`LIST_DECL_BOUNDS',`
+     $ dl$1, du$1')dnl
+define(`LIST_SECTION',`
+     $ rl$1, ru$1, ri$1')dnl
+define(`DO_LOOP',`
+      do i$1 = rl$1, ru$1, ri$1')dnl
+define(`ENDDO_LOOP',`
+      enddo')dnl
+define(`ARRAY_DECL',`dl$1:du$1')dnl
+define(`INDEX_REF',`i$1')dnl
+define(`GENERIC_PACKING',`dnl
+pushdef(`LEVEL',$1)dnl
+pushdef(`PVMFUNCTION',$2)dnl
+pushdef(`NAME',$3)dnl
+pushdef(`TYPE',$4)dnl
+pushdef(`PVMTYPE',$5)dnl
+c
+c Packing LEVEL dimensional array
+c
+      subroutine build_name(HPFC,NAME,PVMTYPE,LEVEL)(
      $     array, 
-     $     dimlo1, dimup1,
-     $     rglo1, rgup1, rgin1)
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),
+COMMA_REPLICATE(LEVEL, `LIST_SECTION')
+     $)
       integer 
-     $     dimlo1, dimup1,
-     $     rglo1, rgup1, rgin1
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),
+COMMA_REPLICATE(LEVEL, `LIST_SECTION')
       TYPE
-     $     array(dimlo1:dimup1)  
+     $ array(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
       include ''`fpvm3.h''`
       include ''`hpfc_commons.h''`
       integer info  
-      integer i1  
-      do i1=rglo1, rgup1, rgin1  
+      integer COMMA_REPLICATE(LEVEL, `INDEX_REF')
+SIMPLE_REPLICATE(LEVEL, `DO_LOOP')
          call PVMFUNCTION
-     $        (PVMTYPE, array(i1), 1, 1, info)  
-      enddo  
+     $        (PVMTYPE,
+     $         array(COMMA_REPLICATE(LEVEL, `INDEX_REF')),
+     $         1, 1, info)  
+SIMPLE_REPLICATE(LEVEL, `ENDDO_LOOP')
       end  
 c
+popdef(`LEVEL')dnl
 popdef(`PVMFUNCTION')dnl
 popdef(`NAME')dnl
 popdef(`TYPE')dnl
 popdef(`PVMTYPE')dnl')dnl
-define(PACKING2,`dnl
-pushdef(`PVMFUNCTION',$1)dnl
-pushdef(`NAME',$2)dnl
-pushdef(`TYPE',$3)dnl
-pushdef(`PVMTYPE',$4)dnl
 c
-c Packing a 2 dimensional array
-c
-      subroutine build_name(HPFC,NAME,PVMTYPE,2)(
-     $     array, 
-     $     dimlo1, dimup1,
-     $     dimlo2, dimup2,
-     $     rglo1, rgup1, rgin1,
-     $     rglo2, rgup2, rgin2)
-      integer 
-     $     dimlo1, dimup1,
-     $     dimlo2, dimup2,
-     $     rglo1, rgup1, rgin1,
-     $     rglo2, rgup2, rgin2
-      TYPE
-     $     array(dimlo1:dimup1, dimlo2:dimup2)
-      include ''`fpvm3.h''`
-      include ''`hpfc_commons.h''`
-      integer info
-      integer i1, i2
-      do i1=rglo1, rgup1, rgin1
-         do i2=rglo2, rgup2, rgin2
-            call PVMFUNCTION
-     $           (PVMTYPE, array(i1, i2), 1, 1, info)
-         enddo
-      enddo
-      end
-c
-popdef(`PVMFUNCTION')dnl
-popdef(`NAME')dnl
-popdef(`TYPE')dnl
-popdef(`PVMTYPE')dnl')dnl
-define(PACKING3,`dnl
-pushdef(`PVMFUNCTION',$1)dnl
-pushdef(`NAME',$2)dnl
-pushdef(`TYPE',$3)dnl
-pushdef(`PVMTYPE',$4)dnl
-c
-c PAcking a 3 dimensional array
-c
-      subroutine build_name(HPFC,NAME,PVMTYPE,3)(
-     $     array, 
-     $     dimlo1, dimup1,
-     $     dimlo2, dimup2,
-     $     dimlo3, dimup3,
-     $     rglo1, rgup1, rgin1,
-     $     rglo2, rgup2, rgin2,
-     $     rglo3, rgup3, rgin3)
-      integer 
-     $     dimlo1, dimup1,
-     $     dimlo2, dimup2,
-     $     dimlo3, dimup3,
-     $     rglo1, rgup1, rgin1,
-     $     rglo2, rgup2, rgin2,
-     $     rglo3, rgup3, rgin3
-      TYPE
-     $     array(dimlo1:dimup1, dimlo2:dimup2, dimlo3:dimup3)
-      include ''`fpvm3.h''`
-      include ''`hpfc_commons.h''`
-      integer info
-      integer i1, i2, i3
-      do i1=rglo1, rgup1, rgin1
-         do i2=rglo2, rgup2, rgin2
-            do i3=rglo3, rgup3, rgin3
-               call PVMFUNCTION
-     $              (PVMTYPE, array(i1, i2, i3), 1, 1, info)
-            enddo
-         enddo
-      enddo
-      end
-c
-popdef(`PVMFUNCTION')dnl
-popdef(`NAME')dnl
-popdef(`TYPE')dnl
-popdef(`PVMTYPE')dnl')dnl
-define(PACKING4,`dnl
-pushdef(`PVMFUNCTION',$1)dnl
-pushdef(`NAME',$2)dnl
-pushdef(`TYPE',$3)dnl
-pushdef(`PVMTYPE',$4)dnl
-c
-c
-c
-      subroutine build_name(HPFC,NAME,PVMTYPE,4)(
-     $     array, 
-     $     dimlo1, dimup1,
-     $     dimlo2, dimup2,
-     $     dimlo3, dimup3,
-     $     dimlo4, dimup4,
-     $     rglo1, rgup1, rgin1,
-     $     rglo2, rgup2, rgin2,
-     $     rglo3, rgup3, rgin3,
-     $     rglo4, rgup4, rgin4)
-      integer 
-     $     dimlo1, dimup1,
-     $     dimlo2, dimup2,
-     $     dimlo3, dimup3,
-     $     dimlo4, dimup4,
-     $     rglo1, rgup1, rgin1,
-     $     rglo2, rgup2, rgin2,
-     $     rglo3, rgup3, rgin3,
-     $     rglo4, rgup4, rgin4
-      TYPE
-     $     array(dimlo1:dimup1, dimlo2:dimup2, 
-     $           dimlo3:dimup3, dimlo4:dimup4)
-      include ''`fpvm3.h''`
-      include ''`hpfc_commons.h''`
-      integer info
-      integer i1, i2, i3, i4
-      do i1=rglo1, rgup1, rgin1
-         do i2=rglo2, rgup2, rgin2
-            do i3=rglo3, rgup3, rgin3
-               do i4=rglo4, rgup4, rgin4
-                  call PVMFUNCTION
-     $                 (PVMTYPE, array(i1, i2, i3, i4), 1, 1, info)
-               enddo
-            enddo
-         enddo
-      enddo
-      end
-c
-popdef(`PVMFUNCTION')dnl
-popdef(`NAME')dnl
-popdef(`TYPE')dnl
-popdef(`PVMTYPE')dnl')dnl
-define(PACKING,`dnl
-PACKING$3(pvmfpack,PACK,$1,$2)
-PACKING$3(pvmfunpack,UNPACK,$1,$2)')dnl
-define(ALLPACK,`dnl
+define(ONE_PACKING,`
+GENERIC_PACKING($1,pvmfpack,PACK,$2,$3)
+GENERIC_PACKING($1,pvmfunpack,UNPACK,$2,$3)')dnl
+define(ALLPACK,`
 c ----------------------------------------
 c
 c Packing serie for type $1, pvm $2
 c
-PACKING($1,$2,1)
-PACKING($1,$2,2)
-PACKING($1,$2,3)
-PACKING($1,$2,4)
+ONE_PACKING(1,$1,$2)
+ONE_PACKING(2,$1,$2)
+ONE_PACKING(3,$1,$2)
+ONE_PACKING(4,$1,$2)
+ONE_PACKING(5,$1,$2)
+ONE_PACKING(6,$1,$2)
+ONE_PACKING(7,$1,$2)
 c')dnl
+c
+ALLPACK(byte,BYTE1)
+ALLPACK(integer*2,INTEGER2)
+ALLPACK(integer*4,INTEGER4)
 ALLPACK(real*4,REAL4)
 ALLPACK(real*8,REAL8)
-ALLPACK(integer*4,INTEGER4)
+ALLPACK(complex*8,COMPLEX8)
+ALLPACK(complex*16,COMPLEX16)
 c
-c that s all
+c that is all
 c
