@@ -180,6 +180,13 @@ to check object consistency when they are stored in the database, and to
 ? to check object consistency when they are stored or retrieved (in case
 an intermediate phase has corrupted some data structure unwillingly).
 
+what to do at the end when saving resources: It can also be set to "all".
+Note that it is managed from pipsmake.
+\begin{verbatim}
+PIPSDBM_RESOURCES_TO_DELETE "obsolete"
+\end{verbatim}
+
+
 \subsection{Top level control}
 
 Print a log of the session
