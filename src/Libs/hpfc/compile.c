@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/12/06 14:42:47 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/12/22 15:40:35 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -153,7 +153,7 @@ set_resources_for_module (string module_name)
      {
 	 entity callee = ENTITY(CAR(ce));
 
-	 pips_assert("set_resources_for_module", entity_module_p(callee));
+	 assert(entity_module_p(callee));
 
 	 if (!value_intrinsic_p(entity_initial(callee)) &&
 	     !hpfc_entity_reduction_p(callee) &&
@@ -619,8 +619,7 @@ make_host_and_node_modules (entity module)
 		var = gen_find_tabulated(var_name, entity_domain),
 		new = entity_undefined;
 
-	    pips_assert("make_host_and_node_modules",
-			!entity_undefined_p(var));
+	    assert(!entity_undefined_p(var));
 
 	    tmp_name = entity_local_name(host);
 	    new = find_or_create_scalar_entity(tmp_name, tmp_name, 
