@@ -18,11 +18,13 @@
  * a sequence. Things could be performed at the control graph level.
  *
  * An important issue is to only perform the substitution only if correct.
- * This is not really achieved at the time, because (at least) of the
- * typing issues: I = pi*2.7 ; Y = I ; results in Y = pi*2.7, and the
- * integer translation is forgotten.
+ * Thus conversions are inserted and if none is available, the propagation
+ * and substitution are not performed.
  *
  * $Log: forward_substitution.c,v $
+ * Revision 1.7  1998/04/01 13:22:02  coelho
+ * initial comment updated after bug fix.
+ *
  * Revision 1.6  1998/04/01 12:30:27  coelho
  * generic conversions are inserted if necessary, or the conversion is not
  * performed if no conversion function is available.
