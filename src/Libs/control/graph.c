@@ -2,7 +2,7 @@
  *
  *  (c) Fabien COELHO - march 1995
  *
- *  $RCSfile: graph.c,v $ ($Date: 1996/06/18 10:33:26 $, )
+ *  $RCSfile: graph.c,v $ ($Date: 1998/03/17 16:01:15 $, )
  *  version $Revision$
  */
 
@@ -34,9 +34,9 @@ void clean_ctrl_graph()
 {
     CONTROLMAP_MAP(s, c, 
       {
-	  debug(7, "clean_crtl_graph", "statement (%d,%d)\n", 
-		ORDERING_NUMBER(statement_ordering(s)),
-		ORDERING_STATEMENT(statement_ordering(s)));
+	  pips_debug(7, "statement (%d,%d)\n", 
+		     ORDERING_NUMBER(statement_ordering(s)),
+		     ORDERING_STATEMENT(statement_ordering(s)));
 
 	  control_statement(c) = statement_undefined;
 	  gen_free_list(control_successors(c)); 
@@ -54,19 +54,20 @@ void clean_ctrl_graph()
  *  last added put in first place. 
  *  this property is used for a depth first enumeration.
  */
-static void add_arrow_in_ctrl_graph(s1, s2)
-statement s1, s2;
+static void 
+add_arrow_in_ctrl_graph(statement s1, statement s2)
 {
     control 
 	c1 = load_ctrl_graph(s1), 
 	c2 = load_ctrl_graph(s2);
 
-    debug(7, "add_arrow_in_ctrl_graph",
-	  "(%d,%d) -> (%d,%d)\n", 
-	  ORDERING_NUMBER(statement_ordering(s1)),
-	  ORDERING_STATEMENT(statement_ordering(s1)),
-	  ORDERING_NUMBER(statement_ordering(s2)),
-	  ORDERING_STATEMENT(statement_ordering(s2)));
+    pips_debug(7, "(%d,%d:%d) -> (%d,%d;%d)\n", 
+	       ORDERING_NUMBER(statement_ordering(s1)),
+	       ORDERING_STATEMENT(statement_ordering(s1)),
+	       statement_number(s1),
+	       ORDERING_NUMBER(statement_ordering(s2)),
+	       ORDERING_STATEMENT(statement_ordering(s2)),
+	       statement_number(s2));
 
     control_successors(c1) = gen_once(c2, control_successors(c1));
     control_predecessors(c2) = gen_once(c1, control_predecessors(c2));
@@ -214,9 +215,10 @@ statement s;
 void build_full_ctrl_graph(s)
 statement s;
 {
-    debug(3, "build_full_ctrl_graph", "statement (%d,%d)\n", 
-	  ORDERING_NUMBER(statement_ordering(s)), 
-	  ORDERING_STATEMENT(statement_ordering(s)));
+    pips_debug(3, "statement (%d,%d:%d)\n", 
+	       ORDERING_NUMBER(statement_ordering(s)), 
+	       ORDERING_STATEMENT(statement_ordering(s)),
+	       statement_number(s));
 
     /*  first pass to initialize the ctrl_graph controls
      */
