@@ -29,8 +29,6 @@
 #include "misc.h"
 #include "text-util.h"
 #include "ri-util.h"
-#include "effects.h" /* for vect_debug() */
-
 
 /* includes pour system generateur */
 #include "ray_dte.h"
