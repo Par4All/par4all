@@ -159,7 +159,7 @@ Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP
 	      *($$+i) = cp->car;
 
 	    message_assert("all data copied", 
-			   !cp && (i==0 || (i==1 && Domains[$3].index>=0)));
+			   !cp && (i==0 || (i==1 && Domains[$3].tabulated)));
 
 	    if (i==1) ($$+1)->i = 0; /* tabulated number... */
 	    gen_free_list($4);
@@ -382,6 +382,8 @@ static gen_chunk * make_ref(int domain, gen_chunk * st)
     {
       cp = (gen_chunk*) alloc(sizeof(gen_chunk)*gen_size(domain));
       cp->i = domain;
+      (cp+1)->i = 0; /* no number yet */
+      (cp+2)->s = st->s; /* TAKEN! */
       cp = gen_do_enter_tabulated(domain, st->s, cp, TRUE);
     }
     else 
@@ -389,7 +391,11 @@ static gen_chunk * make_ref(int domain, gen_chunk * st)
       user("make_ref: forward references to %s prohibited\n", st->s) ;
     }
   }
+  else 
+  {
+    free(st->s);
+  }
 
-  free(st->s), free(st);
+  free(st);
   return cp;
 }
