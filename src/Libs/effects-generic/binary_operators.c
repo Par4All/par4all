@@ -170,75 +170,82 @@ proper_effects_contract(list l_effects)
  * output   : a list of effects, in which the selected elements have been 
  *            merged.
  * modifies : the input list.
- * comment  :
+ * comment  : the algorithm is in (n^2)/2...
+ * 
+ * we need "entity/action" -> consp to check for the
+ * condition in the second loop directly.
+ * or to simplify the hash management, two entity -> consp?
+ * a generic multi key combination hash would help.
  */
 list 
 proper_effects_combine(list l_effects, bool scalars_only_p)
 {
-    list base, current, pred;
-
-   ifdebug(6){
-       pips_debug(6, "proper effects: \n");
-       (*effects_prettyprint_func)(l_effects);	
-   } 
-
-    base = l_effects;
-    /* scan the list of effects */
-    while(!ENDP(base) )
-    {	
-	EFFECT(CAR(base))= (*proper_to_summary_effect_func)(EFFECT(CAR(base)));
-
-	/* scan the next elements to find effects combinable
-	 * with the effects of the base element.
-	 */
-	current = CDR(base);
-	pred = base;
-	while (!ENDP(current))
-	{
-	    effect eff_base = EFFECT(CAR(base));	    
-	    effect eff_current = EFFECT(CAR(current));
+  list base, current, pred;
+  
+  ifdebug(6) {
+    pips_debug(6, "proper effects: \n");
+    (*effects_prettyprint_func)(l_effects);	
+  } 
+  
+  base = l_effects;
+  /* scan the list of effects */
+  while(!ENDP(base))
+  {
+    /* the list is modified in place */
+    EFFECT(CAR(base))= (*proper_to_summary_effect_func)(EFFECT(CAR(base)));
+    
+    /* ARGH... 
+     * scan the next elements to find effects combinable
+     * with the effects of the base element.
+     */
+    current = CDR(base);
+    pred = base;
+    while (!ENDP(current))
+    {
+      effect eff_base = EFFECT(CAR(base));	    
+      effect eff_current = EFFECT(CAR(current));
+      
+      /* Both effects are about the same scalar variable, 
+	 with the same action 
+      */ 
+      if ((!scalars_only_p || effect_scalar_p(eff_base)) &&
+	  effects_same_action_p(eff_base, eff_current) )  
+      {
+	list tmp;
+	effect new_eff_base;
 	
-	    /* Both effects are about the same scalar variable, 
-	       with the same action 
-	       */ 
-	    if ((!scalars_only_p || effect_scalar_p(eff_base)) &&
-		effects_same_action_p(eff_base, eff_current) )  
-	    {
-		list tmp;
-		effect new_eff_base;
-
-		/* compute their union */
-		new_eff_base = (*effect_union_op)
-		    (eff_base,
-		     (*proper_to_summary_effect_func)(eff_current));
-
-		/* free the original effects: no memory leak */
-		free_effect(eff_base);
-		free_effect(eff_current);
-		
-		/* replace the base effect by the new effect */
-		EFFECT(CAR(base)) = new_eff_base;
-		
-		/* remove the current list element from the global list */
-		tmp = current;	    
-		current = CDR(current);
-		CDR(pred) = current;
-		free(tmp);	    
-	    }
-	    else
-	    {
-		pred = current;
-		current = CDR(current);
-	    }
-	}
-	base = CDR(base);
+	/* compute their union */
+	new_eff_base = (*effect_union_op)
+	  (eff_base, (*proper_to_summary_effect_func)(eff_current));
+	
+	/* free the original effects: no memory leak */
+	free_effect(eff_base);
+	free_effect(eff_current);
+	
+	/* replace the base effect by the new effect */
+	EFFECT(CAR(base)) = new_eff_base;
+	
+	/* remove the current list element from the global list */
+	tmp = current;	    
+	current = CDR(current);
+	CDR(pred) = current;
+	free(tmp);	    
+      }
+      else
+      {
+	pred = current;
+	current = CDR(current);
+      }
     }
+    base = CDR(base);
+  }
+  
+  ifdebug(6){
+    pips_debug(6, "summary effects: \n"); 
+    (*effects_prettyprint_func)(l_effects);	
+  }
 
-    ifdebug(6){
-	pips_debug(6, "summary effects: \n"); 
-       (*effects_prettyprint_func)(l_effects);	
-    }
-    return(l_effects);    
+  return l_effects;
 }
 
 
