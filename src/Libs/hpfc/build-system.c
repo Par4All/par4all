@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1994/12/27 19:46:41 $, ) version $Revision$,
+ * $RCSfile: build-system.c,v $ ($Date: 1995/03/10 09:19:09 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -20,18 +20,10 @@
 #include <string.h> 
 extern fprintf();
 
-/*
- * Psystems stuff
- */
-
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-
-/*
- * Newgen stuff
- */
 
 #include "genC.h"
 
@@ -39,22 +31,23 @@ extern fprintf();
 #include "hpf.h" 
 #include "hpf_private.h"
 
-/*
- * PIPS stuff
- */
-
 #include "ri-util.h" 
 #include "misc.h" 
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
 
-/* 
- * my own local includes
- */
-
 #include "hpfc.h"
 #include "defines-local.h"
+
+#define ALPHA_PREFIX "ALPHA"
+#define LALPHA_PREFIX "LALPHA"
+#define THETA_PREFIX "THETA"
+#define PSI_PREFIX "PSI"
+#define GAMMA_PREFIX "GAMMA"
+#define DELTA_PREFIX "DELTA"
+#define IOTA_PREFIX "IOTA"
+#define SIGMA_PREFIX "SIGMA"
 
 /*
  * Variables
@@ -123,17 +116,6 @@ void free_hpfc_current_mappings()
     free_declaration_constraints_map();
     free_hpf_constraints_map();
     free_new_declaration_constraints_map();
-}
-
-entity get_ith_dummy(prefix, suffix, i)
-string prefix, suffix;
-int i;
-{
-    char buffer[100];
-    
-    assert(i>=1 && i<=7);
-    (void) sprintf(buffer, "%s%d", suffix, i);
-    return(find_or_create_scalar_entity(buffer, prefix, is_basic_int));
 }
 
 /* ------------------------------------------------------------------
@@ -257,65 +239,36 @@ entity e;
  * HPF CONSTRAINTS GENERATION
  */
 
-entity get_ith_array_dummy(i)
-int i;
-{
-    return(get_ith_dummy(HPFC_PACKAGE, ALPHA_PREFIX, i));
-}
-
-entity get_ith_region_dummy(i)
-int i;
-{
-    return(get_ith_dummy(REGIONS_MODULE_NAME, PHI_PREFIX, i));
-}
-
-entity get_ith_template_dummy(i)
-int i;
-{
-    return(get_ith_dummy(HPFC_PACKAGE, THETA_PREFIX, i));
-}
-
-entity get_ith_processor_dummy(i)
-int i;
-{
-    return(get_ith_dummy(HPFC_PACKAGE, PSI_PREFIX, i));
-}
-
-entity get_ith_block_dummy(i)
-int i;
-{
-    return(get_ith_dummy(HPFC_PACKAGE, DELTA_PREFIX, i));
-}
-
-entity get_ith_cycle_dummy(i)
-int i;
-{
-    return(get_ith_dummy(HPFC_PACKAGE, GAMMA_PREFIX, i));
-}
-
-entity get_ith_local_dummy(i)
-int i;
-{
-    return(get_ith_dummy(HPFC_PACKAGE, LALPHA_PREFIX, i));
-}
-
-entity get_ith_shift_dummy(i)
-int i;
-{
-    return(get_ith_dummy(HPFC_PACKAGE, IOTA_PREFIX, i));
-}
-
-entity get_ith_auxiliary_dummy(i)
-int i;
-{
-    return(get_ith_dummy(HPFC_PACKAGE, SIGMA_PREFIX, i));
-}
-
 bool entity_hpfc_dummy_p(e)
 entity e;
 {
     return(!strcmp(entity_module_name(e), HPFC_PACKAGE));
 }
+
+entity get_ith_dummy(prefix, suffix, i)
+string prefix, suffix;
+int i;
+{
+    char buffer[100];
+    
+    assert(i>=1 && i<=7);
+    (void) sprintf(buffer, "%s%d", suffix, i);
+    return(find_or_create_scalar_entity(buffer, prefix, is_basic_int));
+}
+
+#define GET_DUMMY(MODULE,NAME,lname)\
+entity get_ith_##lname(int i)\
+{ return(get_ith_dummy(MODULE, NAME, i));}
+
+GET_DUMMY(REGIONS_MODULE_NAME, PHI_PREFIX, region_dummy);
+GET_DUMMY(HPFC_PACKAGE, ALPHA_PREFIX, array_dummy);
+GET_DUMMY(HPFC_PACKAGE, THETA_PREFIX, template_dummy);
+GET_DUMMY(HPFC_PACKAGE, PSI_PREFIX, processor_dummy);
+GET_DUMMY(HPFC_PACKAGE, DELTA_PREFIX, block_dummy);
+GET_DUMMY(HPFC_PACKAGE, GAMMA_PREFIX, cycle_dummy);
+GET_DUMMY(HPFC_PACKAGE, LALPHA_PREFIX, local_dummy);
+GET_DUMMY(HPFC_PACKAGE, IOTA_PREFIX, shift_dummy);
+GET_DUMMY(HPFC_PACKAGE, SIGMA_PREFIX, auxiliary_dummy);
 
 /*
  * Psysteme hpfc_compute_align_constraints(e)
