@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.26  1998/12/30 16:52:50  zory
+ * atomize transformations added in strategies
+ *
  * Revision 1.25  1998/12/09 09:51:47  zory
  * apply gen_nreverse to the list of indices to have i,j,k,.... in outermost
  * to inermost order
@@ -103,6 +106,10 @@
 
 #define DEBUG_NAME "TRANSFORMATION_OPTIMIZE_EXPRESSIONS_DEBUG_LEVEL"
 
+
+extern void 
+icm_cse_on_sequence(string, statement);
+
 /****************************************************************** STRATEGY */
 
 /* this structure defines a strategy for eole.
@@ -125,6 +132,11 @@ typedef struct
   /* SIMPLIFY.
    */
   bool apply_simplify;
+
+  /* GCM CSE 
+   */
+  bool apply_gcm_cse;
+
 
 } optimization_strategy, *poptimization_strategy;
 
@@ -237,7 +249,7 @@ get_list_of_rhs(statement s)
  */
 static void write_list_of_rhs(FILE * out, list /* of expressionwithlevel */ le)
 {
-  //reference astuce = make_reference(get_current_module_entity(), le);
+  /* reference astuce = make_reference(get_current_module_entity(), le);*/
   lexpressionwithlevel lewl = make_lexpressionwithlevel(le);
   write_lexpressionwithlevel(out, lewl);
   lexpressionwithlevel_list(lewl) = NIL;
@@ -814,19 +826,30 @@ static optimization_strategy
     /* name */ "P2SC", 
     /* huff */ TRUE, expression_gravity, TRUE,
     /* eole */ TRUE, "0",
-    /* simp */ TRUE
+    /* simp */ TRUE, 
+    /* gcm cse */ TRUE
+	       
   },
   {
     "test",
-    TRUE, expression_gravity, FALSE,
-    TRUE, "1",
+    FALSE, NULL, FALSE,
+    TRUE, "0",
+    FALSE, 
     TRUE
   },
   {
     "R10K",
     TRUE, expression_gravity_inv, FALSE,
     TRUE, "1",
+    TRUE, 
     TRUE
+  },
+  {
+    "EOLE",
+    FALSE, NULL, FALSE,
+    TRUE, "0",
+    FALSE, 
+    FALSE
   },
 
   /* this one MUST be the last one! */
@@ -834,6 +857,7 @@ static optimization_strategy
     NULL, /* default similar to P2SC. */
     TRUE, expression_gravity, TRUE,
     TRUE, "0",
+    TRUE, 
     TRUE
   }
 };
@@ -922,9 +946,13 @@ bool optimize_expressions(string module_name)
      */
     /* CSE/ICM + atom
      */
+
+    if (strategy->apply_gcm_cse)
+      icm_cse_on_sequence(module_name, s); 
+
     if (strategy->apply_balancing)
       switch_nary_to_binary(s);
-
+    
     if (strategy->apply_simplify)
       optimize_simplify_patterns(s);
 
