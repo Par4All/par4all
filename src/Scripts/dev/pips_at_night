@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/07/16 13:17:38 $, )
+# ($Date: 1996/07/19 10:51:34 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -12,6 +12,13 @@ test -r $HOME/.profile && . $HOME/.profile
 test "$PIPS_DIR" || . /projects/Pips/pipsrc.sh
 
 unset no_cleaning no_newgen no_linear no_pips no_validation
+
+if test -x /usr/openwin/bin/mail
+then 
+  mail=/usr/openwin/bin/mail
+else
+  mail=mail
+fi
 
 arch=.
 user=`whoami`
@@ -54,7 +61,7 @@ compile()
 	make-pips -$what -o $report -m $a ARCH=$a clean-compiled recompile
       done 
     } 2>&1 > /dev/null | 
-	mail -s "$script: $name recompile night report" $email
+	$mail -s "$script: $name recompile night report" $email
 }
 
 while getopts hvCNLPVc:a: OPT
@@ -86,6 +93,7 @@ $verbose date: `date`
 test "$no_cleaning" ||
 {
   $verbose deleting old workspaces...
+  $verbose date: `date`
   find ${PIPS_HOME}/Pips -name '*.database' -type d -mtime +7 -print | 
     xargs ${PIPS_UTILDIR}/Delete
 
@@ -97,18 +105,21 @@ test "$no_cleaning" ||
 test "$no_newgen" ||
 {
   $verbose recompiling NEWGEN - Production
+  $verbose date: `date`
   compile n newgen $report $arch
 }
 
 test "$no_linear" ||
 {
   $verbose recompiling LINEAR - Production
+  $verbose date: `date`
   compile l linear $report $arch
 }
 
 test "$no_pips" ||
 {
   $verbose recompiling PIPS - Production
+  $verbose date: `date`
   compile p pips $report $arch
 }
 
@@ -117,14 +128,18 @@ test "$no_newgen$no_linear$no_pips" -eq 111 ||
 {
   grep 'failed$' $report > $report.failed
   if test -z $report.failed ; then summary=SUCCEEDED; else summary=FAILED; fi
-  mail -s "$script: recompile $summary" $email < $report.failed
+  $mail -s "$script: recompile $summary" $email < $report.failed
   rm -f $report*
 }
 
 # Validate Pips
 test "$no_validation" || 
-{ $verbose Validating PIPS ; Validate -vti 50 -a ${email} ; }
+{
+  $verbose Validating PIPS
+  $verbose date: `date` 
+  Validate -vti 50 -a ${email}
+}
 
 $verbose date: `date`
 $verbose end of  $script for $email 
-} 2>&1 | mail -s "$script: night report" ${email}
+} 2>&1 | $mail -s "$script: night report" ${email}
