@@ -51,26 +51,29 @@ FWD_ROOT	= .
 FWD_OUT		=
 FWD_MKFLAGS	=
 
+la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
+
 # get local stuff if any.
 -include *.mk
-
-la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 
 # Forward any command to the specified directories (if any).
 # Report the result of the forward.
 .DEFAULT:
 	-@echo Making $@ in $(FWD_ROOT) >&2;\
-	if test "$@" = debug_forward_makefile ; then\
-	  echo "FWD_DIRS=$(FWD_DIRS)"; echo "FWD_MSG=$(FWD_MSG)";\
-	  echo "FWD_ROOT=$(FWD_ROOT)"; echo "FWD_REPORT=$(FWD_REPORT)";\
-	  echo "FWD_OUT=$(FWD_OUT)"; fi;\
+	if test "$@" = debug_forward_makefile ; \
+	then \
+	  echo "FWD_DIRS=$(FWD_DIRS)"; \
+	  echo "FWD_MSG=$(FWD_MSG)"; \
+	  echo "FWD_ROOT=$(FWD_ROOT)"; \
+	  echo "FWD_REPORT=$(FWD_REPORT)"; \
+	  echo "FWD_OUT=$(FWD_OUT)"; 
+	fi;\
 	for d in $(FWD_DIRS) ; do \
-	  if test -d $$d ; then \
+	  if test -d $$d ; \
+	  then \
 	    echo Forwarding $@ to $(FWD_ROOT)/$$d >&2 ;\
 	    if $(MAKE) -C $$d $(FWD_MKFLAGS) FWD_ROOT="$(FWD_ROOT)/$$d" $@ ;\
 	    then report=succeeded ; else report=failed ; fi ;\
 	    echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ $$report" $(FWD_REPORT);\
-	fi ; done $(FWD_OUT)
-
-# end of special forward makefile
-#
+	   fi ; \
+	 done $(FWD_OUT)
