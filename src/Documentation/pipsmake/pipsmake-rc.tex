@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.34  2004/03/25 16:17:58  hurbain
+%% Modified claire_printed_file
+%%
 %% Revision 1.33  2004/03/11 13:55:17  irigoin
 %% Phase/rule print_claire_code added, resource claire_printed_file added.
 %%
@@ -581,7 +584,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2004/03/11 13:55:17 $~$
+$~$Date: 2004/03/25 16:17:58 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -6850,9 +6853,13 @@ a subset of Fortran.
 \begin{verbatim}
 alias print_claire_code 'Claire Pretty-Printer'
 
+print_clairerough  > MODULE.clairerough
+                   < PROGRAM.entities
+                   < MODULE.code
+
 print_claire_code        > MODULE.claire_printed_file
         < PROGRAM.entities
-        < MODULE.code
+        < MODULE.clairerough
 \end{verbatim}
 
 
