@@ -13,7 +13,7 @@
 /* system includes */
 #include <stdio.h>
 #include <string.h>
-#include <stdargs.h>
+#include <stdarg.h>
 extern int      fprintf();
 extern int      vfprintf();
 
