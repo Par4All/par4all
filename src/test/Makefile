@@ -30,7 +30,7 @@ reserv: reserv.c
 	$(CC) $(CFLAGS)  -I$(INC) $(CPPFLAGS) \
 		-L$(LIB) $(LDFLAGS) $< -lgenC -o $@
 
-reserv: spec.h
+reserv: spec.h $(LIB)/libgenC.a
 
 run_test: reserv
 	reserv < newres.in ; 
