@@ -2,8 +2,11 @@
  *
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compiler-util.c,v $ ($Date: 1996/06/12 21:22:38 $, )
- * version $Revision$
+ * $Id$
+ * $Log: compiler-util.c,v $
+ * Revision 1.22  1997/03/20 10:19:06  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
