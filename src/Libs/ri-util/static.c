@@ -1,6 +1,16 @@
 /* static variables and related access functions concerning the current module
  *
  * Be'atrice Apvrille, august 27, 1993
+ *
+ * $Id$
+ *
+ * $Log: static.c,v $
+ * Revision 1.10  2002/07/22 17:17:24  irigoin
+ * A two-entry current_module_statement stack... Not glorious but enough to
+ * solve problems linked to alternate returns.
+ *
+ *
+ *
  */
 
 
@@ -72,16 +82,33 @@ get_current_module_name()
 /* used to retrieve the intraprocedural effects of the current module */
 
 static statement current_module_statement = statement_undefined;
+static statement stacked_current_module_statement = statement_undefined;
 
-void 
-set_current_module_statement(s)
-statement s;
+void set_current_module_statement(statement s)
 {
     pips_assert("The current module statement is undefined", 
 		current_module_statement == statement_undefined);
     pips_assert("The new module statement is not undefined", 
 		s != statement_undefined);
     current_module_statement = s;
+}
+
+void push_current_module_statement(statement s)
+{
+    pips_assert("The stacked_current module statement is undefined", 
+		stacked_current_module_statement == statement_undefined);
+    pips_assert("The new module statement is not undefined", 
+		s != statement_undefined);
+    stacked_current_module_statement = current_module_statement;
+    current_module_statement = s;
+}
+
+void pop_current_module_statement(void)
+{
+    pips_assert("The current module statement is undefined", 
+		current_module_statement != statement_undefined);
+    current_module_statement = stacked_current_module_statement;
+    stacked_current_module_statement = statement_undefined;
 }
 
 
@@ -108,4 +135,5 @@ void
 error_reset_current_module_statement()
 {
     current_module_statement = statement_undefined;
+    stacked_current_module_statement = statement_undefined;
 }
