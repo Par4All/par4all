@@ -718,7 +718,7 @@ i_module: TK_MODULE TK_NAME /* module name */ TK_ENDOFLINE
 	  
 	  if (tpips_execution_mode) {
 	    if (db_get_current_workspace_name()) {
-	      $$ = tp_set_current_module(strupper($2,$2));
+	      $$ = tp_set_current_module($2 /*strupper($2,$2)*/);
 	    } else {
 	      pips_user_error("No workspace open. Open or create one!\n");
 	      $$ = FALSE;
@@ -976,11 +976,11 @@ owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 	;
 
 list_of_owner_name: TK_NAME
-	{ $$ = gen_array_make(0); gen_array_append($$, strupper($1,$1)); }
+        { $$ = gen_array_make(0); gen_array_append($$, $1 /* strupper($1,$1)*/); }
 	| list_of_owner_name TK_NAME
-	    { gen_array_append($1, strupper($2,$2)); $$ = $1; }
+        { gen_array_append($1, $2 /* strupper($2,$2) */); $$ = $1; }
 	| list_of_owner_name TK_COMMA TK_NAME
-	    { gen_array_append($1, strupper($3,$3)); $$ = $1; }
+	{ gen_array_append($1, $3 /* strupper($3,$3) */); $$ = $1; }
 	;
 
 propname: TK_NAME
