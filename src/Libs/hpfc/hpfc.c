@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: hpfc.c,v $ ($Date: 1995/03/22 10:57:04 $, ) version $Revision$,
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/03/23 16:54:37 $, ) version $Revision$,
  * got on %D%, %T%
  */
  
@@ -50,14 +50,14 @@ GENERIC_STATIC_STATUS(/**/, the_commons, list, NIL, gen_free_list)
 void add_a_common(c)
 entity c;
 {
-    gen_once(c, the_commons);
+    the_commons = gen_once(c, the_commons);
 }
 
 static void compile_common(c)
 entity c;
 {
     declaration_with_overlaps_for_module(c);
-    clean_common_declaration(load_entity_host_new(c));
+    clean_common_declaration(load_new_host(c));
     put_generated_resources_for_common(c);
 }
 
@@ -69,6 +69,7 @@ entity c;
  */
 static void init_hpfc_status()
 {
+    init_entity_status();
     init_data_status();
     init_hpf_number_status();
     init_overlap_status();
@@ -77,6 +78,7 @@ static void init_hpfc_status()
 
 static void reset_hpfc_status()
 {
+    reset_entity_status();
     reset_data_status();
     reset_hpf_number_status();
     reset_overlap_status();
@@ -90,6 +92,7 @@ static void save_hpfc_status() /* GET them */
 	make_hpfc_status(get_overlap_status(),
 			 get_data_status(),
 			 get_hpf_number_status(),
+			 get_entity_status(),
 			 get_the_commons());    
 
     DB_PUT_MEMORY_RESOURCE(DBR_HPFC_STATUS, strdup(name), s);
@@ -103,6 +106,7 @@ static void load_hpfc_status() /* SET them */
     hpfc_status	s = (hpfc_status) 
 	db_get_resource(DBR_HPFC_STATUS, name, TRUE);
 
+    set_entity_status(hpfc_status_entity_status(s));
     set_overlap_status(hpfc_status_overlapsmap(s));
     set_data_status(hpfc_status_data_status(s));
     set_hpf_number_status(hpfc_status_numbers_status(s));
@@ -111,6 +115,7 @@ static void load_hpfc_status() /* SET them */
 
 static void close_hpfc_status()
 {
+    close_entity_status();
     close_data_status();
     close_hpf_number_status();
     close_overlap_status();
@@ -163,10 +168,10 @@ entity module;
 
     /*   OTHERS
      */
-    make_host_node_maps();
     make_hpfc_current_mappings();
-    make_referenced_variables_map();
 
+    /*  next in hpfc_init ???
+     */
     hpfc_init_run_time_entities();
 
     /*   STOP is to be translated into hpfc_{host,node}_end
@@ -184,16 +189,13 @@ reset_resources_for_module()
     reset_local_regions_map();
     reset_precondition_map();
 
-    /* ??? */
-    reset_cumulated_effects_map(); 
-    reset_proper_effects_map();
+    /* reset_cumulated_effects_map(); 
+    reset_proper_effects_map(); */
 
     free_only_io_map();
     free_postcondition_map();
 
-    free_host_node_maps();
     free_hpfc_current_mappings();
-    free_referenced_variables_map();
 }
 
 static void compile_module(module)
@@ -207,12 +209,15 @@ entity module;
      */
     set_resources_for_module(module);
     s = get_current_module_statement();
+
+    NormalizeCommonVariables(module, s); /* ?????? hmmm... */
+
     make_host_and_node_modules(module);
 
     /*   NORMALIZATIONS
      */
     NormalizeHpfDeclarations();
-    NormalizeCodeForHpfc_TMP(s);
+    NormalizeCodeForHpfc(s);
 
     /* here because the module was updated with some external declarations
      */
@@ -221,7 +226,7 @@ entity module;
     /*   ACTUAL COMPILATION
      */
     hpf_compiler(s, &host_stat, &node_stat);
-    
+
     if (entity_main_module_p(module))
 	add_pvm_init_and_end(&host_stat, &node_stat);
 
@@ -230,10 +235,12 @@ entity module;
     update_object_for_module(node_stat, node_module);
     update_object_for_module(entity_code(node_module), node_module);
     insure_declaration_coherency(node_module, node_stat);
-
+    kill_statement_number_and_ordering(node_stat);
+    
     update_object_for_module(host_stat, host_module);
     update_object_for_module(entity_code(host_module), host_module);
     insure_declaration_coherency(host_module, host_stat);
+    kill_statement_number_and_ordering(host_stat);
 
     /*   PUT IN DB
      */
@@ -253,13 +260,13 @@ entity module;
 /* the source code is transformed with hpfc_directives
  * into something that can be parsed with a standard f77 compiler.
  */
-void hpfc_directives_filter(name)
+void hpfc_filter(name)
 string name;
 {
     string file_name = db_get_resource(DBR_SOURCE_FILE, name, TRUE);
 
     debug_on("HPFC_DEBUG_LEVEL");
-    debug(1, "hpfc_directives_filter", "considering module %s\n", name);
+    debug(1, "hpfc_filter", "considering module %s\n", name);
 
     system(concatenate("mv ", file_name, " ", file_name, "- ; ",
 		       "$HPFC_TOOLS/hpfc_directives", 
@@ -286,6 +293,8 @@ string name;
     init_hpfc_status();
     (void) make_empty_program(HPFC_PACKAGE);
 
+    make_update_common_map(); /* ?????? */
+
     save_hpfc_status();
 
     debug_off();
@@ -300,22 +309,27 @@ string name;
     debug_on("HPFC_DEBUG_LEVEL");
     debug(1, "hpfc_directives", "considering module %s\n", name);
 
-    load_hpfc_status();
+    if (!hpfc_entity_reduction_p(module) &&
+	!hpf_directive_entity_p(module))
+    {
+	set_current_module_entity(module);
+	load_hpfc_status();
+	/* make_update_common_map(); */
+	
+	NormalizeCommonVariables(module, s); /* hmmm... */
+	build_full_ctrl_graph(s);
+	handle_hpf_directives(s);
 
-    make_update_common_map();
+	reset_ctrl_graph();            /* memory leak ??? */
+	/* free_update_common_map(); */
+	reset_current_module_entity();
 
-    NormalizeCommonVariables(module, s); /* hmmm... */
-    build_full_ctrl_graph(s);
-    handle_hpf_directives(s);
+	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(name), s);
 
-    free_update_common_map();
+	save_hpfc_status();
+    }
 
-    /* close_ctrl_graph(); */
-    reset_ctrl_graph();
-
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_DIRECTIVES, name, NO_FILE); /* fake */
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, s);
-    save_hpfc_status();
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_DIRECTIVES, strdup(name), NO_FILE); /* fake */
 
     debug_off();
 }
