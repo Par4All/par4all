@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1995/12/19 15:55:50 $, ) 
+ * ($Date: 1996/02/16 10:07:08 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -219,6 +219,7 @@ void fprint_entity_list(FILE *fp, list l);
 #define MYPOS		"MYPOS"
 #define MYLID		"MYLID"
 #define MSTATUS		"MSTATUS"  		/* remapping status */
+#define LIVEMAPPING	"LIVEMAPPING"
 #define NODETIDS	"NODETIDS"
 #define HOST_TID	"HOSTTID"
 #define NBTASKS		"MAXSIZEOFPROCS"
