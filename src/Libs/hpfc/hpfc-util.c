@@ -4,10 +4,8 @@
  *
  * Fabien Coelho, May 1993.
  *
- * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/22 10:56:57 $, ) version $Revision$,
- * got on %D%, %T%
- * $Id$
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/23 16:54:31 $, )
+ * version $Revision$,
  */
 
 #include <stdio.h>
@@ -180,10 +178,7 @@ int i, *pprocdim;
     return(!style_none_p(distribution_style(d)));
 }
 
-/*
- * MakeStatementLike 
- *
- * creates a new statement for the given module
+/* creates a new statement for the given module
  * that looks like the stat one, i.e. same (shared) comment, same 
  * label, and so on. The goto table is updated. The instruction
  * is also created. (is that really a good idea?)
@@ -203,11 +198,20 @@ int the_tag;
     return(newstat);
 }
 
+static void stmt_rwt(s)
+statement s;
+{
+    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+    statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
+}
 
-/*
- * DistArraysEffects
- *
- * effects' action in an expression are here supposed to be read one's
+void kill_statement_number_and_ordering(s)
+statement s;
+{
+    gen_recurse(s, statement_domain, gen_true, stmt_rwt);
+}
+
+/* effects' action in an expression are here supposed to be read one's
  * but that may not be correct?
  */
 list DistArraysEffects(expr)
@@ -409,24 +413,24 @@ entity e;
 	new_node = AddEntityToModule(e, node_module),
 	new_host = entity_undefined;
 
-    if (entity_node_new_undefined_p(e))
+    if (!bound_new_node_p(e))
 	store_new_node_variable(new_node, e);
     else
-	AddEntityToDeclarations(load_entity_node_new(e), node_module);
+	AddEntityToDeclarations(load_new_node(e), node_module);
     
     if (!array_distributed_p(e))
     {
 	new_host = AddEntityToModule(e, host_module);
 
-	if (entity_host_new_undefined_p(e))
+	if (!bound_new_host_p(e))
 	    store_new_host_variable(new_host, e),
 	    /* 
 	     * added because of some entity errors.
 	     */
-	    store_entity_host_new(new_node, new_host),
-	    store_entity_node_new(new_host, new_node); 
+	    store_new_host(new_node, new_host),
+	    store_new_node(new_host, new_node); 
 	else
-	    AddEntityToDeclarations(load_entity_host_new(e), host_module);
+	    AddEntityToDeclarations(load_new_host(e), host_module);
     }
 }
 
