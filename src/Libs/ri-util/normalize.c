@@ -284,7 +284,6 @@ normalized binary_to_normalized(list la, int op)
     return n;
 }
 
-
 bool EvalNormalized(n, pv)
 normalized n;
 int *pv;
@@ -292,7 +291,7 @@ int *pv;
     if (normalized_linear_p(n)) {
 	Pvecteur v = (Pvecteur) normalized_linear(n);
 	if (vect_size(v) == 1 && var_of(v) == TCST) {
-	    *pv = val_of(v);
+	    *pv = VALUE_TO_INT(val_of(v));
 	    return(TRUE);
 	}
     }
@@ -379,7 +378,7 @@ int *pv;
 	
 	if (var_of(v)==TCST && length==1) 
 	{
-	    *pv=val_of(v); 
+	    *pv=VALUE_TO_INT(val_of(v)); 
 	    return(TRUE);
 	}
 	
