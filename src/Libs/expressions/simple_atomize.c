@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1995/04/07 16:25:27 $, 
+ * $Date: 1995/04/21 23:18:35 $, 
  */
 
 #include <stdio.h>
@@ -200,6 +200,13 @@ reference r;
     return(FALSE);
 }
 
+static bool call_filter(c)
+call c;
+{
+    return(!same_string_p(entity_local_name(call_function(c)),
+                          IMPLIED_DO_NAME));
+}
+
 static bool test_filter(t)
 test t;
 {
@@ -234,6 +241,7 @@ statement stat;
 	 statement_domain, stat_filter, stat_rewrite, /* STATEMENT */
 	 reference_domain, ref_filter, gen_null,      /* REFERENCE */
 	 test_domain, test_filter, gen_null,          /* TEST */
+         call_domain, call_filter, gen_null,          /* CALL */
 	 NULL);
 }
 
