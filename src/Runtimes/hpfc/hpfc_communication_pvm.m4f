@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.11  1997/05/30 09:15:04  zory
+! *** empty log message ***
+!
 ! Revision 1.10  1997/05/29 16:10:20  coelho
 ! *** empty log message ***
 !
@@ -61,6 +64,8 @@
       include "hpfc_commons.h"
       integer messageid, length, tag, source, info
       call pvmfbufinfo(messageid, length, tag, source, info)
+      debug(`print *,"hpfc debug info", info, "length = ", length,  
+     $ "tag =", tag , "source = ", source ')
       if (info.lt.0) then
          call pvmfperror("hpfc message info", info)
          call HPFC TERMINATE TASK(info)
