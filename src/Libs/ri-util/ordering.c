@@ -113,7 +113,10 @@ int o;
 {
     statement s;
     s = (statement) hash_get(ots, (char *) o);
-    if(s == statement_undefined) pips_error("ordering_to_statement",
-					    "no statement for order %d\n",o);
+    if(s == statement_undefined) {
+	pips_error("ordering_to_statement",
+		   "no statement for order %d=(%d,%d)\n",
+		   o, ORDERING_NUMBER(o), ORDERING_STATEMENT(o));
+    }
     return s;
 }
