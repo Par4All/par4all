@@ -8,55 +8,7 @@
  * Comments :
  */
 
-/* Ansi includes 	*/
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-/* Newgen includes 	*/
-#include "genC.h"
-
-/* C3 includes 		*/
-#include "boolean.h"
-#include "arithmetique.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "ray_dte.h" 
-#include "sommet.h"
-#include "sg.h"
-#include "sc.h"
-#include "polyedre.h"
-#include "matrice.h"
-#include "matrix.h"
-#include "union.h"
-
-/* Pips includes 	*/
-#include "database.h"
-
-#include "dg.h"
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
-#include "ri.h"
-#include "paf_ri.h"
-#include "ri-util.h"
-#include "constants.h"
-#include "misc.h"
-#include "control.h"
-#include "text-util.h"
-#include "pipsdbm.h"
-#include "resources.h"
-#include "semantics.h"
-#include "static_controlize.h"
-#include "ricedg.h"
-#include "paf-util.h"
-
-#include "effects-generic.h"
-#include "effects-simple.h"
-
-#include "array_dfg.h"
-#include "pip.h"
+#include "local.h"
 
 /* Local defines */
 #define NEXT(cp) (((cp) == NIL) ? NIL : (cp)->cdr)
@@ -136,7 +88,7 @@ graph                   dup_dg;
     dest_st    = adg_vertex_to_statement(dest_ver);
     dest_succ  = vertex_successors( dest_ver );
     dest_nb    = dfg_vertex_label_statement
-	((statement) vertex_vertex_label( dest_ver ));
+	((dfg_vertex_label) vertex_vertex_label( dest_ver ));
     dest_order = adg_number_to_ordering( dest_nb );
     dest_stco  = (static_control) GET_STATEMENT_MAPPING(stco_map, dest_st);
     dest_loops = static_control_loops(  dest_stco );
@@ -165,7 +117,7 @@ graph                   dup_dg;
       ADD_ELEMENT_TO_LIST( ret_verl, VERTEX, ret_dest_ver );
     }
     else 
-	vertex_vertex_label_(ret_dest_ver) = newgen_vertex_label(ret_dest_dvl);
+	vertex_vertex_label(ret_dest_ver) = ret_dest_dvl;
 
 
 
