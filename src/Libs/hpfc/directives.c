@@ -2,7 +2,7 @@
  *
  * this file deals with HPF directives.
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/03/24 16:31:02 $, )
+ * $RCSfile: directives.c,v $ ($Date: 1995/03/24 16:51:24 $, )
  * version $Revision$,
  */
 
@@ -163,9 +163,7 @@ Value *prate, *pshift;
 
     /*   affine alignment case
      */
-    for(array_dim = 1;
-	!ENDP(align_src);
-	align_src=CDR(align_src), array_dim++)
+    for(array_dim = 1; !ENDP(align_src); POP(align_src), array_dim++)
     {
 	n = expression_normalized(EXPRESSION(CAR(align_src)));
 	if (normalized_linear_p(n))
@@ -211,9 +209,7 @@ reference alignee, temp;
 
     /*  each array dimension is looked for a possible alignment
      */
-    for(template_dim=1; 
-	!ENDP(align_sub); 
-	align_sub=CDR(align_sub), template_dim++)
+    for(template_dim=1; !ENDP(align_sub); POP(align_sub), template_dim++)
     {
 	if (alignment_p(align_src, EXPRESSION(CAR(align_sub)),
 			&array_dim, &rate, &shift))
@@ -448,7 +444,7 @@ list /* of expressions */ args;
 	    }
 	    /*  else general independent case
 	     */
-	    if (gen_find_eq(index, l)==index)
+	    if (gen_in_list_p(index, l))
 	    {
 		debug(3, "handle_independent_directive", 
 		      "parallel loop (%s)\n", entity_name(index));
