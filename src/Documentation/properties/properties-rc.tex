@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.162  2002/06/10 11:34:39  irigoin
+%% Update of comments about handling of alternate returns, property PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX added
+%%
 %% Revision 1.161  2002/06/05 09:41:09  nguyen
 %% Remove the property ARRAY_BOUND_CHECKING_FOR_DEBUGGING
 %% Replace by PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE that is used by all
@@ -195,7 +198,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2002/06/05 09:41:09 $~$
+$~$Date: 2002/06/10 11:34:39 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -641,24 +644,35 @@ Alternate returns are put among the obsolete Fortran features by the
 Fortran~90 standard. It is possible (1) to refuse them (option "NO"), or
 (2) to ignore them and to replace alternate returns by {\tt STOP} (option
 "STOP"), or (3) to substitute them by a semantically equivalent code based
-on return code values (option "RC"). Option (2) is useful if the alternate
-returns are used to propagate error conditions. Option (3) is useful to
-understand the impact of the alternate returns on the control flow graph
-and to maintain the code semantics.  By default, the first option is
-selected and alternate returns are refused.
+on return code values (option "RC" or option "HRC"). Option (2) is useful
+if the alternate returns are used to propagate error conditions. Option
+(3) is useful to understand the impact of the alternate returns on the
+control flow graph and to maintain the code semantics.  Option "RC" uses
+an additional parameter while option "HRC" uses a set of PIPS run-time
+functions to hide the set and get of the return code which make
+declaration regeneration less useful. By default, the
+first option is selected and alternate returns are refused.
 
 To produce an executable code, the declarations must be
 regenerated: see property \verb/PRETTYPRINT_ALL_DECLARATIONS/ in
-Section~\ref{subsubsection-declarations}. 
+Section~\ref{subsubsection-declarations}. This is not necessary with
+option "HRC". Fewer new declarations are needed if variable
+\verb/PARSER_RETURN_CODE_VARIABLE/ is implicitly integer
 
-With option (2), the code can still be executed if alternate returns are used only for
-errors and if no errors occur. It can also be analyzed to understand what
-the {\em normal} behavior is. For instance, OUT regions are more likely to
-be exact when exceptions and errors are ignored.
+With option (2), the code can still be executed if alternate returns are
+used only for errors and if no errors occur. It can also be analyzed to
+understand what the {\em normal} behavior is. For instance, OUT regions
+are more likely to be exact when exceptions and errors are ignored.
+
+Formal and actual label variables are replaced by string variables to
+preserve the parameter ordre and as much source information as possible.
+See \verb/PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX/ which is used to generate
+new variable names.
 
 \begin{verbatim}
 PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
 PARSER_RETURN_CODE_VARIABLE "PIPS_RETURN_CODE_"
+PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX "FORMAL_RETURN_LABEL_"
 \end{verbatim}
 
 \subsubsection{Assigned GO TO}
