@@ -934,7 +934,7 @@ MakeCallInst(
     instruction i = instruction_undefined;
     list ar = get_alternate_returns();
     list ap = add_actual_return_code(l);
-    type s = entity_storage(e);
+    storage s = entity_storage(e);
 
     if(!storage_undefined_p(s)) {
 	if(storage_formal_p(s)) {
