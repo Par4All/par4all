@@ -532,7 +532,8 @@ list regions_dynamic_elim(list l_reg)
 	case is_storage_ram:
 	{
 	    ram r = storage_ram(reg_s);
-	    if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r)))
+	    if (dynamic_area_p(ram_section(r)) || heap_area_p(ram_section(r))
+		|| stack_area_p(ram_section(r)))
 	    {
 		pips_debug(5, "dynamic or pointed var ignored (%s)\n", entity_name(reg_ent));
 		ignore_this_region = TRUE;
