@@ -33,17 +33,14 @@
 
 %{
 #include <stdio.h>
-extern int fprintf();
-extern int _filbuf();
-extern int _flsbuf();
+#include <stdlib.h>
 #include <string.h>
-extern char * getenv();
 #include "genC.h"
 #include "makefile.h"
 
 #include "misc.h"
 
-#include "constants.h"
+#include "top-level.h"
 #include "pipsmake.h"
 
 #include <sys/stdtypes.h>  /* for debug with dbmalloc */
@@ -236,6 +233,8 @@ makefile parse_makefile()
 {
     string default_pipsmake_rc_file;
 
+    debug_on("PIPSMAKE_DEBUG_LEVEL");
+
     if (pipsmakefile == makefile_undefined) {
 
 	if (((default_pipsmake_rc_file = getenv("DEFAULT_PIPSMAKE_RC_FILE")) == NULL) ||
@@ -252,6 +251,8 @@ makefile parse_makefile()
 	    fprint_makefile(stderr, pipsmakefile);
 	}
     }
+
+    debug_off();
 
     return(pipsmakefile);
 }
