@@ -39,6 +39,250 @@ statement s;
     return(TRUE);
 }
 
+/* static void add_common_aliases_for_this_region(entity func, region reg)
+ * input    : func is the called function and
+ *            reg is the region to translate (from an array in a common).
+ * output   : void
+ * modifies : this function performs
+ *            the backward translation: reg -> new_regions
+ *            and then for each new_reg in the new_regions list, it
+ *            performs the forward translation new_reg -> old_reg
+ *            and adds an alias pair <old_reg,new_reg>
+ *            to list_pairs
+ *            (if new_regions has only one element then old_reg = reg
+ *            and only one alias pair is created, otherwise
+ *            reg is the original callee region, new_reg is a caller
+ *            region corresponding to part of reg and old_reg
+ *            is the part of reg corresponding to new_reg
+ * comment  : the algorithm is the following
+ * 
+ * Scan the variables of the common that belong to the target function
+ * For each variable do
+ *     if it has elements in common with the variable of the initial region
+ *        if both variables have the same layout in the common
+ *           perform the translation using array_region-translation
+ *        else 
+ *           use the subscript values, and take into account the relative
+ *           offset of the variables in the common
+ *           add to the translated region the declaration system of the 
+ *           target variable to have a smaller region.
+ * until all the elements of the initial variable have been translated.
+ */
+
+/*****************************************************************************
+
+static list common_region_alias_formation(entity callee, region reg)
+{
+    list new_regions = NIL;
+    entity reg_ent = region_entity(reg);
+
+/* PROBLEME? get_current_module_entity returns CALLEE not CALLER? */
+    entity caller = get_current_module_entity();
+    entity source_func = callee;
+    entity target_func = caller;
+    entity entity_target_func = target_func;
+    entity ccommon;
+    list l_tmp, l_com_ent;
+    int reg_ent_size, total_size, reg_ent_begin_offset, reg_ent_end_offset;
+    region new_reg, old_reg;
+    boolean found = FALSE;
+    
+    ifdebug(5)
+    {
+	pips_debug(5,"input region: \n%s\n", region_to_string(reg));
+    }
+
+    /* If the entity is a top-level entity, no translation;
+     * It is the case for variables dexcribing I/O effects (LUNS).
+*** CHECK WHAT TO DO IN THE CASE OF ALIASES ***
+     */
+
+    if (top_level_entity_p(reg_ent))
+    {
+	pips_debug(5,"top-level entity.\n");	
+	new_reg = region_translation
+		    (reg, source_func, reference_undefined,
+		     reg_ent, target_func, reference_undefined,
+		     0, BACKWARD);
+	new_regions = CONS(EFFECT, new_reg, NIL);
+	return(new_regions);
+    }
+
+    if (io_entity_p(reg_ent)) {
+	pips_debug(5,"top-level entity.\n");	
+	new_reg = region_translation
+		    (reg, source_func, reference_undefined,
+		     reg_ent, target_func, reference_undefined,
+		     0, BACKWARD);
+	new_regions = CONS(EFFECT, new_reg, NIL);
+	return(new_regions);
+    }
+
+    ifdebug(6)
+    {
+	pips_debug(5, "target function: %s (local name: %s)\n",
+		   entity_name(target_func), module_local_name(target_func));
+    }
+
+    /* First, we search if the common is declared in the target function;
+     * if not,
+*** WHAT DO WE DO IN THE CASE OF ALIASES ? ***
+     * we have to deterministically choose an arbitrary function
+     * in which the common is declared. It will be our reference.
+     * By deterministically, I mean that this function shall be chosen whenever
+     * we try to translate from this common to a routine where it is not declared.
+     */
+    ccommon = ram_section(storage_ram(entity_storage(reg_ent)));
+    l_com_ent = area_layout(type_area(entity_type(ccommon)));
+
+    pips_debug(6, "common name: %s\n", entity_name(ccommon));
+
+    for( l_tmp = l_com_ent; !ENDP(l_tmp) && !found; l_tmp = CDR(l_tmp) )
+    {
+	entity com_ent = ENTITY(CAR(l_tmp));
+	if (strcmp(entity_module_name(com_ent),
+		   module_local_name(target_func)) == 0)
+	{
+	    found = TRUE;
+	}
+    }
+    
+    /* If common not declared in caller, use the subroutine of the first entity
+     * that appears in the common layout. (not really deterministic: I should
+     * take the first name in lexical order. BC.
+     */
+    if(!found)
+    {
+	entity ent = ENTITY(CAR(l_com_ent));	
+	entity_target_func =
+	    local_name_to_top_level_entity(module_name(entity_name(ent)));
+	ifdebug(6)
+	{
+	    pips_debug(6, "common not declared in caller,\n\t using %s declarations "
+		       "instead\n", entity_name(entity_target_func));
+	}
+    }
+
+    /* first, we calculate the offset and size of the region entity */
+    reg_ent_size = SizeOfArray(reg_ent);
+    reg_ent_begin_offset = ram_offset(storage_ram(entity_storage(reg_ent)));
+    reg_ent_end_offset = reg_ent_begin_offset + reg_ent_size - 1;
+
+    pips_debug(6, "\n\t reg_ent: size = %d, offset_begin = %d, offset_end = %d \n",
+	      reg_ent_size, reg_ent_begin_offset, reg_ent_end_offset); 
+
+    /* then, we perform the translation */
+    ccommon = ram_section(storage_ram(entity_storage(reg_ent)));
+    l_com_ent = area_layout(type_area(entity_type(ccommon)));
+    total_size = 0;
+
+    for(; !ENDP(l_com_ent) && (total_size < reg_ent_size); 
+	l_com_ent = CDR(l_com_ent)) 
+    {
+	entity new_ent = ENTITY(CAR(l_com_ent));
+	
+	pips_debug(6, "current entity: %s\n", entity_name(new_ent)); 
+
+	if (strcmp(module_name(entity_name(new_ent)),
+		   module_local_name(entity_target_func)) == 0)
+	{
+	    int new_ent_size = SizeOfArray(new_ent);
+	    int new_ent_begin_offset = 
+		ram_offset(storage_ram(entity_storage(new_ent)));
+	    int new_ent_end_offset = new_ent_begin_offset + new_ent_size - 1;
+
+	    pips_debug(6, "\n\t new_ent: size = %d, "
+		       "offset_begin = %d, offset_end = %d \n",
+		       new_ent_size, new_ent_begin_offset, new_ent_end_offset); 
+	    
+	    if ((new_ent_begin_offset <= reg_ent_end_offset) && 
+		(reg_ent_begin_offset <= new_ent_end_offset ))
+		/* these entities have elements in common */
+	    {
+		int offset = reg_ent_begin_offset - new_ent_begin_offset;
+		
+		new_reg = region_translation
+		    (reg, source_func, reference_undefined,
+		     new_ent, target_func, reference_undefined,
+		     (Value) offset, BACKWARD);
+
+		/* save context */
+		(entity) current_module = get_current_module_entity();
+		(list) l_args = get_arguments_to_eliminate();
+		reset_current_module_entity();
+		set_current_module_entity(caller);
+		set_forward_arguments_to_eliminate();
+
+		old_reg = region_translation
+		    (new_reg,
+		     target_func, reference_undefined, reg_ent,
+		     source_func, reference_undefined, (Value) -offset,
+		     FORWARD);
+
+		/* restore context */
+		reset_current_module_entity();
+		set_current_module_entity(current_module);
+		set_arguments_to_eliminate(l_args);
+
+		/* build alias pair and add to list_pairs */
+		list pair;
+
+		pair = CONS(EFFECT,region_dup(old_reg),NIL);
+		pair = gen_nconc(pair,CONS(EFFECT,new_reg,NIL));
+		list_pairs = gen_nconc(list_pairs,CONS(LIST,pair,NIL));
+
+    ifdebug(5)
+    {
+	pips_debug(5, "alias: \n");
+	print_regions(pair);
+    }
+
+		/* calculate total_size */
+		total_size += min (reg_ent_begin_offset,new_ent_end_offset) 
+		    - max(reg_ent_begin_offset, new_ent_begin_offset) + 1;
+	    }
+	}
+    }
+	
+}
+*****************************************************************************/
+
+
+
+/* static void
+ * add_common_aliases_for_this_call_site()
+ * input    : global variables: callee,list_regions_callee,list_pairs
+ * output   : void
+ * modifies : for each region in list_regions_callee which is a region of a
+ *            COMMON (declared in the callee), this function performs
+ *            the backward translation: callee_region -> real_regions
+ *            and then for each real_reg in the real_regions list, it
+ *            performs the forward translation real_reg -> part_callee_region
+ *            and adds an alias pair <part_callee_region,real_reg>
+ *            to list_pairs
+ */
+
+/*****************************************************************************
+
+static void
+add_common_aliases_for_this_call_site()
+{
+    list real_regions = NIL;
+
+    MAP(EFFECT, callee_region, 
+    {
+	/* we are only interested in regions concerning common variables. 
+	 * They are  the entities with a ram storage. They can not be dynamic
+         * variables, because these latter were eliminated of the code_regions
+         * (cf. region_of_module). */
+	if (storage_ram_p(entity_storage(region_entity(callee_region))))
+	    add_common_aliases_for_this_region(callee,callee_region);
+    },
+	list_regions_callee);
+}
+*****************************************************************************/
+
+
 /* static void
  * add_parameter_aliases_for_this_call_site(call call_site,transformer context)
  * input    : parameters: a call site and the calling context
@@ -127,46 +371,6 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
 }
 
 
-/* static void
- * add_common_aliases_for_this_call_site()
- * input    : global variables: callee,list_regions_callee,list_pairs
- * output   : void
- * modifies : for each region in list_regions_callee which is a region of a
- *            COMMON (declared in the callee), this function performs
- *            the backward translation: callee_region -> real_regions
- *            and then for each real_reg in the real_regions list, it
- *            adds an alias pair <callee_region,real_reg> to list_pairs
- */
-static void
-add_common_aliases_for_this_call_site()
-{
-    list real_regions = NIL;
-
-    MAP(EFFECT, callee_region, 
-    {
-	/* we are only interested in regions concerning common variables. 
-	 * They are  the entities with a ram storage. They can not be dynamic
-         * variables, because these latter were eliminated of the code_regions
-         * (cf. region_of_module). */
-	if (storage_ram_p(entity_storage(region_entity(callee_region))))
-	{
-	    real_regions = common_region_translation(callee, callee_region, BACKWARD);
-
-	    MAP(EFFECT, real_reg,
-		{
-		    list pair;
-
-		    pair = CONS(EFFECT,region_dup(callee_region),NIL);
-		    pair = gen_nconc(pair,CONS(EFFECT,real_reg,NIL));
-		    list_pairs = gen_nconc(list_pairs,CONS(LIST,pair,NIL));
-		},
-		    real_regions)
-	}
-    },
-	list_regions_callee);
-}
-
-
 static bool
 call_site_to_alias_pairs(call call_site)
 {
@@ -183,7 +387,7 @@ call_site_to_alias_pairs(call call_site)
     set_backward_arguments_to_eliminate(callee);
 
     add_parameter_aliases_for_this_call_site(call_site,context);
-    add_common_aliases_for_this_call_site();
+/*    add_common_aliases_for_this_call_site(); */
 
     reset_translation_context_sc();
     reset_arguments_to_eliminate();
