@@ -181,6 +181,13 @@ sub keep_for_output {
     $output_statement_buffer .= $string . "\\n";
 }
 
+
+
+
+#
+# Begin of the main script:
+#
+
 if ($ARGV[0] eq "-launch_daVinci") {
     $launch_daVinci = 1;
     shift;
@@ -193,6 +200,10 @@ $input_file_name = $ARGV[0];
 shift;
 ($output_file_name = $input_file_name) =~ s/-graph$/-daVinci/;
 
+
+if ($input_file_name !~ /\.daVinci$/) {
+    # The PIPS output is not already in daVinci format: preprocess it:
+    
 # First build a map of unstructured with unreachable exit:
 open(INPUT, "<$input_file_name") || die "Cannot open \"$input_file_name\".";
 while (<INPUT>) {
@@ -336,6 +347,8 @@ close INPUT || die "Cannot close \"$input_file_name\".";
 print OUTPUT "]\n";
 
 close OUTPUT || die "Cannot close \"$output_file_name\".";
+
+}
 
 # If we have been asked to launch a daVinci process to display the graph : */
 if ($launch_daVinci) {
