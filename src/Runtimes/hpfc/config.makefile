@@ -1,13 +1,11 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1997/01/03 15:09:22 $, )
+# ($Date: 1997/01/07 11:15:56 $, )
 #
 # depends on 
 # + PVM_ARCH 
 # + PVM_ROOT
 # + _HPFC_USE_PVMe_
-
-M4FLAGS+= -D _HPFC_DIMENSIONS_=3
 
 ifeq ($(PIPS_ARCH),.)
 RT_ARCH=$(PVM_ARCH)
@@ -22,6 +20,11 @@ M4FLAGS	+=	-D _HPFC_NO_BYTE1_ \
 		-D _HPFC_NO_INTEGER2_
 _HPFC_USE_GNU_ = 1
 endif
+
+PVM_ENCODING_OPTION =	PvmDataInPlace
+
+M4FLAGS+= -D _HPFC_DIMENSIONS_=3
+M4FLAGS+= -D _HPFC_ENCODING_=$(PVM_ENCODING_OPTION)
 
 M4FLAGS	+= -D _HPFC_DEMO_
 M4FLAGS	+= -D _HPFC_DIRECT_
@@ -160,6 +163,7 @@ M4FLAGS	+= 	-D _HPFC_NO_PVM_VERSION_ \
 		-D _HPFC_NO_INTEGER2_ \
 		-D _HPFC_NO_REAL4_ \
 		-D _HPFC_NO_COMPLEX8_
+PVM_ENCODING_OPTION =	PvmDataRaw
 endif
 
 #
