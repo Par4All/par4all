@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/11/02 17:19:42 $, )
+ * ($Date: 1995/11/17 12:00:53 $, )
  */
 
 #include "defines-local.h"
@@ -15,10 +15,6 @@
 #include "transformations.h"
 
 extern void AddEntityToDeclarations(entity e, entity f); /* in syntax.h */
-
-#define generate_file_name(filename, prefix, suffix)\
-  filename = catdup(db_get_current_workspace_directory(),\
-		    "/", prefix, suffix, NULL);
 
 #define add_warning(filename)\
    safe_system(concatenate("$HPFC_TOOLS/hpfc_add_warning ", filename, NULL));
@@ -182,6 +178,10 @@ init_host_and_node_entities (void)
     }
 }
 
+#define generate_file_name(prefix, suffix)\
+  strdup(concatenate(db_get_current_workspace_directory(),\
+		     "/", prefix, suffix, NULL))
+
 void 
 put_generated_resources_for_common (entity common)
 {
@@ -192,10 +192,10 @@ put_generated_resources_for_common (entity common)
 	node_common = load_new_node(common),
 	host_common = load_new_host(common);
     
-    generate_file_name(host_filename, prefix, "_host.h");
-    generate_file_name(node_filename, prefix, "_node.h");
-    generate_file_name(parm_filename, prefix, "_parameters.h");
-    generate_file_name(init_filename, prefix, "_init.h");
+    host_filename = generate_file_name(prefix, "_host.h");
+    node_filename = generate_file_name(prefix, "_node.h");
+    parm_filename = generate_file_name(prefix, "_parameters.h");
+    init_filename = generate_file_name(prefix, "_init.h");
 
     host_file = (FILE *) safe_fopen(host_filename, "w");
     hpfc_print_common(host_file, host_module, host_common);
@@ -245,11 +245,7 @@ statement stat, host_stat, node_stat;
 	host_filename, node_filename, parm_filename, init_filename;
     entity module = get_current_module_entity();
     
-    generate_file_name(host_filename, prefix, "_host.f");
-    generate_file_name(node_filename, prefix, "_node.f");
-    generate_file_name(parm_filename, prefix, "_parameters.h");
-    generate_file_name(init_filename, prefix, "_init.h");
-
+    host_filename = generate_file_name(prefix, "_host.f");
     host_file = (FILE *) safe_fopen(host_filename, "w");
     hpfc_print_code(host_file, host_module, host_stat);
     safe_fclose(host_file, host_filename);
@@ -260,6 +256,7 @@ statement stat, host_stat, node_stat;
 			    module_local_name(module),
 			    NIL));
 
+    node_filename = generate_file_name(prefix, "_node.f");
     node_file = (FILE *) safe_fopen(node_filename, "w");
     hpfc_print_code(node_file, node_module, node_stat);
     safe_fclose(node_file, node_filename);
@@ -270,11 +267,13 @@ statement stat, host_stat, node_stat;
 			    module_local_name(module),
 			    NIL));
 
+    parm_filename = generate_file_name(prefix, "_parameters.h");
     parm_file = (FILE *) safe_fopen(parm_filename, "w");
     create_parameters_h(parm_file, module);
     safe_fclose(parm_file, parm_filename);
     add_warning(parm_filename);
 
+    init_filename = generate_file_name(prefix, "_init.h");
     init_file = (FILE *) safe_fopen(init_filename, "w");
     create_init_common_param_for_arrays(init_file, module);
     safe_fclose(init_file, init_filename);
