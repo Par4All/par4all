@@ -19,11 +19,12 @@
  * Feb 21 1994
  */
 
+#define ALPHA_PREFIX "ALPHA"
+#define LALPHA_PREFIX "LALPHA"
 #define THETA_PREFIX "THETA"
 #define PSI_PREFIX "PSI"
 #define GAMMA_PREFIX "GAMMA"
 #define DELTA_PREFIX "DELTA"
-#define LPHI_PREFIX "LPHI"
 
 #define HPFC_PACKAGE "HPFC-PACKAGE"
 
