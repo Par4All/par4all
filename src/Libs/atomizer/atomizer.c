@@ -222,7 +222,6 @@ char *mod_name;
 {
     statement mod_stat;
     instruction mod_inst;
-    unstructured mod_u;
     entity module;
 
     debug_on("ATOMIZER_DEBUG_LEVEL");
@@ -247,10 +246,6 @@ char *mod_name;
 
 	mod_inst = statement_instruction(mod_stat);
 
-	if (! instruction_unstructured_p(mod_inst))
-	    pips_error("atomizer", "unstructured expected\n");
-	mod_u = instruction_unstructured(mod_inst);
-
 	initialize_global_variables(mod_name);
 
 	/* COMPUTATION */
@@ -258,13 +253,13 @@ char *mod_name;
 	/* All the expressions are put into a normal pattern : the NLCs in the
 	 * innermost parenthesis.
 	 */
-	normal_expression_of_unstructured(mod_u);
+	normal_expression_of_statement(mod_stat);
 
 	/* All the defs with no def-use dependence are removed. */
-	defs_elim_of_unstructured(mod_u, mod_dg);
+	defs_elim_of_statement(mod_stat, mod_dg);
 
 	/* Module is atomized. */
-	atomizer_of_unstructured(mod_u);
+	atomizer_of_statement(mod_stat, (Block *) NULL);
 
 	/* We reorder the module. It is necessary because new statements have been
 	 * generated. The reordering will permit to reuse the generated code for
