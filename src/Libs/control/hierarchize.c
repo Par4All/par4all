@@ -11,15 +11,20 @@
 #include <stdio.h> 
 #include <string.h> 
 
+#include "linear.h"
+
 #include "genC.h"
 #include "ri.h"
-#include "graph.h"
+
 #include "interval_graph.h"
+
 /* Instantiation of the interval graph: */
 typedef interval_vertex_label vertex_label;
 /* Since the arc are not used, just put a dummy type for arc_label. It
    will be initialized to interval_vertex_label_undefined anyway: */
 typedef interval_vertex_label arc_label;
+
+#include "graph.h"
 #include "ri-util.h"
 #include "misc.h"
 #include "control.h"
@@ -170,8 +175,8 @@ display_interval_graph(graph intervals)
 	pips_debug(0, "Interval %p, control nodes:\n", node);
 	display_address_of_control_nodes(interval_vertex_label_controls(vertex_vertex_label(node)));
 	pips_debug(0, "Interval predecessors:\n");
-	MAP(VERTEX, predecessor, {
-	    pips_debug(0, "\t%p\n", predecessor_vertex(predecessor));
+	MAP(SUCCESSOR, p, {
+	    pips_debug(0, "\t%p\n", predecessor_vertex(p));
 	}, vertex_predecessors(node));    
     }, graph_vertices(intervals));
 }
