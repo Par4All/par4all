@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1997/01/07 14:12:16 $, )
+! ($Date: 1997/01/13 19:12:27 $, )
 !
 !-----------------
 !
@@ -930,16 +930,17 @@ _CM5(
       integer info, inum
       logical host known
 
+      debug(print *, "[HPFC INIT MAIN] in")
 !
 ! GLOBAL INITS
 ! 
       call HPFC CHECK
 
+      NB OF TASKS = MAX SIZE OF PROCS
+
       HOST NODE MODEL = .false.
       SPAWN PERFORMED = .false.
       OUTSIDE SPAWN   = .false.
-
-      NB OF TASKS = MAX SIZE OF PROCS
 
       call HPFC INIT COMMON PARAM LIB
 
@@ -950,6 +951,10 @@ _CM5(
       _getpe(
 ! the CRAY T3D does not have spawn, but the spawning is automatic!
       call pvmfgetpe(MY TID, my rank)
+      debug(print *, "[HPFC INIT MAIN] getting pe ", MY TID, "-", my rank)
+! mouais...
+      MY TID = my rank
+      MY LID = my rank
       SPAWN PERFORMED = .true.
       OUTSIDE SPAWN = .true.
       host known = .true.
@@ -965,10 +970,11 @@ _CM5(
          stop
       end if
 
-      debug(print *, "group ", HPFC GROUP NAME, inum)
+      debug(print *, "[HPFC INIT MAIN] group ", HPFC GROUP NAME, inum)
 
       if (.not. host known) then
 ! decide which process is the host
+         debug(print *, "[HPFC INIT MAIN] choosing host")
          if (inum.eq.0) then
             MY LID = 0
             HOST TID = MY TID
@@ -995,6 +1001,8 @@ _CM5(
          SPAWN PERFORMED = .true.
          
       end if)
+
+      debug(print *, "[HPFC INIT MAIN] exiting")
 
       end
 ! 
@@ -1046,6 +1054,8 @@ _CM5(
       include "hpfc_commons.h"
       integer i, bufid, info, inum
 
+      debug(print *, "[HPFC INIT NODE] in tid:", MY TID)
+
       if (.not.OUTSIDE SPAWN) then
          call pvmfparent(HOST TID)
       end if
@@ -1057,23 +1067,36 @@ _CM5(
 
 ! receive from host global informations about the nodes implicated
 ! in this run.
+      _spawn(
       call pvmfrecv(HOST TID, 1, bufid)
       call pvmfunpack(INTEGER4, NODE TIDS, NB OF TASKS, 1, info)
+      debug(if (info.lt.0) then
+         call pvmfperror("[HPFC INIT NODE] node tids recv", info)
+         call pvmfexit(info)
+         stop
+      endif)
+
       do i=1, NB OF TASKS
          if (NODE TIDS(i).EQ.MYTID)
      $        MYLID = i
-      enddo
+      enddo)
+
+      _getpe(
+      do i=1, NB OF TASKS
+         NODE TIDS(i) = i
+      enddo)
+
+      debug(print *, "[HPFC INIT NODE] lid: ", MY LID, " tid: ", MYTID)
 
       do i=1, NB OF PROCESSORS
          call HPFC CMPPOS(i, MY LID, MY POS(1, i))
       enddo
 
-      debug(print *, "lid: ", MYLID, " tid: ", MYTID)
-
 !
 ! 1 sends node version key to host
 !
       if (MY LID.eq.1) then
+      debug(print *, "[HPFC INIT NODE] sending key to ", HOSTTID)
          call pvmfinitsend(PVMRAW, info)
          call pvmfpack(STRING, hpfc key, 64, 1, info)
          call pvmfsend(HOSTTID, 1, info)
@@ -1101,6 +1124,9 @@ _CM5(
 ! insures that all nodes joined the group and are there
 !
       call HPFC SYNCHRO
+
+      debug(print *, "[HPFC INIT NODE] out", MY LID)
+
       end
 !
 !-----------------
@@ -1187,6 +1213,8 @@ _direct(`'
       integer bufid, info, inum, i
       character*64 node key
 
+      debug(print *, "[HPFC INIT HOST] in ", MY LID)
+
       MYLID = 0
       HOSTTID = MYTID
 
@@ -1194,7 +1222,8 @@ _direct(`'
 
       _spawn(
       if (.not. SPAWN PERFORMED) then
-         debug(print *, "spawning ", NB OF TASKS, " ", NODE PROGRAM NAME)
+         debug(print *, "[HPFC INIT HOST] spawning ",
+     $        NB OF TASKS, " ", NODE PROGRAM NAME)
 
          call pvmfspawn(
      $        NODE PROGRAM NAME, 
@@ -1220,28 +1249,26 @@ _direct(`'
 
       _getpe(
 ! rather specific to CRAY T3D
+      debug(print *, "[HPFC INIT HOST] initializing NODE TIDS")
       do i=1, NB OF TASKS
          NODE TIDS(i)=i
       end do)
       
-      demo(
-      call print host info
-      if (HOST NODE MODEL) then 
-         write (unit=0,fmt=*) " -- host node model"
-      else
-         write (unit=0,fmt=*) " -- single main program"
-      end if
-      call print task info(NBOFTASKS, NODETIDS, HOSTTID))
-
+      _spawn(
+! if not T3D, the host sends the tids...
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(INTEGER4, NODETIDS, NBOFTASKS, 1, info)
-      call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
-
       debug(if (info.lt.0) then
-         call pvmfperror("initial broadcast", info)
+         call pvmfperror("initial pack", info)
          call pvmfexit(info)
          stop
       endif)
+      call pvmfmcast(NBOFTASKS, NODETIDS, 1, info)
+      debug(if (info.lt.0) then
+         call pvmfperror("initial mcast", info)
+         call pvmfexit(info)
+         stop
+      endif))
 
       call HPFC INIT COMMON PROCS
       call HPFC INIT COMMON BUFFER
@@ -1249,6 +1276,7 @@ _direct(`'
 ! check version of host and node
 ! to insure that both host and node where generated together...
 !
+      debug(print *, "[HPFC INIT HOST] receiving key")
       call pvmfrecv(NODETIDS(1), 1, bufid)
       call pvmfunpack(STRING, node key, 64, 1, info)
       if (node key.ne.hpfc key) then
@@ -1282,10 +1310,21 @@ _CM5(
 ! end of cm5 related initializations
 !)
 
+      demo(
+      call print host info
+      if (HOST NODE MODEL) then 
+         write (unit=0,fmt=*) " -- host node model"
+      else
+         write (unit=0,fmt=*) " -- single main program"
+      end if
+      call print task info(NBOFTASKS, NODETIDS, HOSTTID))
+
 !
 ! insures that all nodes joined the group...
 !
       call HPFC SYNCHRO
+
+      debug(print *, "[HPFC INIT HOST] out ", MY LID)
 
       end
 !
