@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.22  1998/11/26 10:22:26  coelho
+ * davinci expression dump into $database/$module directory.
+ *
  * Revision 1.21  1998/11/25 16:32:10  coelho
  * dump expressions in davinci format.
  *
@@ -814,13 +817,26 @@ static void reset_current_optimization_strategy(void)
 
 /************************************************** DAVINCI DUMP EXPRESSIONS */
 
-static void davinci_dump_expressions(string phase, statement s)
+#define GRAPH_PREFIX "optimize_expressions_"
+#define GRAPH_SUFFIX ".daVinci"
+
+static void davinci_dump_expressions(
+   string module_name, string phase, statement s)
 {
-  string filename = 
-    strdup(concatenate("optimize_expressions_", phase, ".daVinci", NULL));
-  FILE * out = safe_fopen(filename, "w");
+  string dir, filename;
+  FILE * out;
+
+  /* filename: $current.database/$module/$prefix_$phase.$suffix
+   */
+  dir = db_get_current_workspace_directory();
+  filename = strdup(concatenate
+      (dir, "/", module_name, "/", GRAPH_PREFIX, phase, GRAPH_SUFFIX, NULL));
+  free(dir), dir = NULL;
+
+  out = safe_fopen(filename, "w"); /* directory MUST exist */
   davinci_dump_all_expressions(out, s);
   safe_fclose(out, filename);
+
   free(filename), filename = NULL;
 }
 
@@ -847,7 +863,7 @@ bool optimize_expressions(string module_name)
     pips_assert("consistency checking before optimizations",
 		statement_consistent_p(s));
 
-    ifdebug(1) davinci_dump_expressions("initial", s);
+    ifdebug(1) davinci_dump_expressions(module_name, "initial", s);
 
     /* do something here.
      */
@@ -877,7 +893,7 @@ bool optimize_expressions(string module_name)
     pips_assert("consistency checking after optimizations",
 		statement_consistent_p(s));
 
-    ifdebug(1) davinci_dump_expressions("final", s);
+    ifdebug(1) davinci_dump_expressions(module_name, "final", s);
 
     /* return result to pipsdbm
      */
