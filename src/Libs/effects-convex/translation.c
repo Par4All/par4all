@@ -246,9 +246,9 @@ region_translation_statistics_close(char *mod_name, char *prefix)
     free(filename);
 }
 
-/*********************************************************************************/
-/* Local variables and functions to avoid multiple computations                  */
-/*********************************************************************************/
+/****************************************************************************/
+/* Local variables and functions to avoid multiple computations             */
+/****************************************************************************/
 
 static entity array_1, array_2;
 static reference ref_1, ref_2;
@@ -258,7 +258,6 @@ static int dim_1, dim_2;
 static Value size_elt_1, size_elt_2;
 static dimension dims_1[7], dims_2[7];
 static boolean dim_1_assumed, dim_2_assumed;
-
 
 static bool dims_array_init(entity array, dimension* dims, int dim_array)
 {
@@ -300,10 +299,33 @@ static bool dims_array_init(entity array, dimension* dims, int dim_array)
 	variable_dimensions(type_variable(entity_type(array))) 
 	);
 
-    return(dim_assumed);
+    return dim_assumed;
 }
 
-static void 
+#define IS_EG TRUE
+#define NOT_EG FALSE
+
+#define PHI_FIRST TRUE
+#define NOT_PHI_FIRST FALSE
+
+static Psysteme entity_assumed_declaration_sc(dimension* dims, int ndim)
+{
+    Psysteme sc = sc_new();
+    int dim;
+
+    for (dim=1; dim<=ndim; dim++)
+    {
+	sc_add_phi_equation(sc, dimension_lower(dims[dim-1]), 
+			    dim, NOT_EG, NOT_PHI_FIRST);
+	sc_add_phi_equation(sc, dimension_upper(dims[dim-1]), 
+			    dim, NOT_EG, PHI_FIRST);
+    }
+
+    return sc;
+}
+
+
+void 
 region_translation_init(entity ent_1, reference rf_1,
 			entity ent_2, reference rf_2,
 			Value offset_1_m_2)
@@ -312,7 +334,8 @@ region_translation_init(entity ent_1, reference rf_1,
     array_2 = ent_2;
     ref_1 = rf_1;
     ref_2 = rf_2;
-    reference_p = ! (reference_undefined_p(ref_1) && reference_undefined_p(ref_2));
+    reference_p = 
+      !(reference_undefined_p(ref_1) && reference_undefined_p(ref_2));
     offset = offset_1_m_2;
     
     dim_1 = NumberOfDimension(array_1);
@@ -404,13 +427,13 @@ static void region_translation_close()
     {
 	/* do not free the real declaration */
 	dimension_lower(dims_1[dim_1-1]) = expression_undefined;
-	gen_free(dims_1[dim_1-1]);
+	free_dimension(dims_1[dim_1-1]);
     }
     if (dim_2_assumed)
     {
 	/* do not free the real declaration */
 	dimension_lower(dims_2[dim_2-1]) = expression_undefined;
-	gen_free(dims_2[dim_2-1]);
+	free_dimension(dims_2[dim_2-1]);
     }
     
 }
@@ -587,7 +610,7 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
 	}
       
 	region_entity(reg_2) = entity_undefined;
-	gen_free(region_reference(reg_2));
+	free_reference(region_reference(reg_2));
 	region_reference(reg_2) = make_regions_psi_reference(array_2);
 	
 	if (statistics_p)
@@ -615,7 +638,6 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
 	psi_to_phi_region(reg_2);
 	debug_region_consistency(reg_2);
 	
-	
 	if (func_1 != func_2)
 	{
 	    if (statistics_p)
@@ -630,21 +652,35 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
 	    debug_region_consistency(reg_2);
 	}
 
-	/*??? identifier les cas ou` c'est vraiment utile */
 	if (!reference_p || backward_p == BACKWARD)
 	{
-	    region_sc_append_and_normalize
-		(reg_2, entity_declaration_sc(region_entity(reg_2)), 1);
-	    debug_region_consistency(reg_2);
+	  Psysteme sd;
+
+	  if (!storage_formal_p(entity_storage(region_entity(reg_2)))
+	      || get_bool_property("REGIONS_WITH_ARRAY_BOUNDS"))
+	  {
+	    sd = entity_declaration_sc(region_entity(reg_2));
+	  }
+	  else
+	  {
+	    /* last dim of formals to be ignored if equal?!
+	     * because of bug :
+	     *   SUB S1(X), X(1), CALL S2(X)     => Write X(1:1)...
+	     *   SUB S2(Y), Y(10) Y(1:10) = ...
+	     */
+	    sd = entity_assumed_declaration_sc(dims_2, dim_2);
+	  }
+
+	  region_sc_append_and_normalize(reg_2, sd, 1);
+	  debug_region_consistency(reg_2);
 	}
+
     }
     else
     {
 	reg_2 = entity_whole_region(array_2, region_action_tag(reg_1));
 	debug_region_consistency(reg_2);
-
     }
-
 
     ifdebug(1)
     {
@@ -657,9 +693,9 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
     return (reg_2);
 }
 
-/*********************************************************************************/
-/* INTERFACE FUNCTIONS TO AVOID MULTIPLE COMPUTATIONS                            */
-/*********************************************************************************/
+/*****************************************************************************/
+/* INTERFACE FUNCTIONS TO AVOID MULTIPLE COMPUTATIONS                        */
+/*****************************************************************************/
 
 /* System of constraints representing the relations between formal 
  * and actual parameters.
