@@ -1,7 +1,7 @@
 /*
  * $Id$
  * 
- * some dynamic char * array management.
+ * some dynamic void * array management.
  */
 
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 struct _gen_array_chunk_t {
     int size;
     int nitems;
-    char ** array;
+    void ** array;
 };
 
 gen_array_t
@@ -25,9 +25,9 @@ gen_array_make(int size)
     message_assert("array ok", a);
     a->size = size;
     a->nitems = 0; /* number of items stored */
-    a->array = (char**) malloc(sizeof(char*)*(a->size));
+    a->array = (void**) malloc(sizeof(void*)*(a->size));
     message_assert("malloc ok", a->array);
-    for (i=0; i<size; i++) a->array[i] = (char*) NULL;
+    for (i=0; i<size; i++) a->array[i] = (void*) NULL;
     return a;
 }
 
@@ -35,9 +35,9 @@ static void
 gen_array_resize(gen_array_t a)
 {
     int nsize = a->size+GEN_ARRAY_SIZE_INCREMENT, i;
-    a->array = (char**) realloc(a->array, sizeof(char*)*nsize);
+    a->array = (void**) realloc(a->array, sizeof(void*)*nsize);
     message_assert("realloc ok", a->array);
-    for (i=a->size; i<nsize; i++) a->array[i] = (char*) NULL;
+    for (i=a->size; i<nsize; i++) a->array[i] = (void*) NULL;
     a->size = nsize;
 }
 
@@ -58,7 +58,7 @@ gen_array_full_free(gen_array_t a)
 }
 
 void
-gen_array_addto(gen_array_t a, int i, char * what)
+gen_array_addto(gen_array_t a, int i, void * what)
 {
     if (i==a->size) gen_array_resize(a);
     message_assert("valid index", 0<=i && i<a->size);
@@ -68,26 +68,26 @@ gen_array_addto(gen_array_t a, int i, char * what)
 }
 
 void 
-gen_array_append(gen_array_t a, char * what)
+gen_array_append(gen_array_t a, void * what)
 {
     gen_array_addto(a, a->nitems, what);
 }
 
 void
-gen_array_dupaddto(gen_array_t a, int i, char * what)
+gen_array_dupaddto(gen_array_t a, int i, void * what)
 {
     gen_array_addto(a, i, strdup(what));
 }
 
 void
-gen_array_dupappend(gen_array_t a, char * what)
+gen_array_dupappend(gen_array_t a, void * what)
 {
     gen_array_append(a, strdup(what));
 }
 
 /* Observers...
  */
-char **
+void **
 gen_array_pointer(gen_array_t a)
 {
     return a->array;
@@ -105,7 +105,7 @@ gen_array_size(gen_array_t a)
     return a->size;
 }
 
-char *
+void *
 gen_array_item(gen_array_t a, int i)
 {
     message_assert("valid index", 0<=i && i<a->size);
@@ -117,13 +117,13 @@ gen_array_item(gen_array_t a, int i)
 static int 
 gen_array_cmp(const void * a1, const void * a2)
 {
-    return strcmp(* (char **) a1, * (char **) a2);
+    return strcmp(* (void **) a1, * (void **) a2);
 }
 
 void
 gen_array_sort(gen_array_t a)
 {
-   qsort(a->array, a->nitems, sizeof(char *), gen_array_cmp);
+   qsort(a->array, a->nitems, sizeof(void *), gen_array_cmp);
 }
 
 gen_array_t
