@@ -1,7 +1,11 @@
 #! /bin/sh
 #
-# $RCSfile: analyze_libraries,v $ (version $Revision$)
-# $Date: 1996/08/21 15:16:58 $, 
+# $Id$
+#
+# $Log: analyze_libraries,v $
+# Revision 1.4  1997/06/03 16:19:25  coelho
+# *** empty log message ***
+#
 #
 # create couples (function library) of uses and definitions for all libraries
 # used in PIPS (default option -a), including Linear and NewGen, or for
@@ -12,20 +16,17 @@
 USAGE="Usage: $0 [-p|a]"
 tmpdir=${PIPS_TEMPDIR:-/tmp}
 
-LIBS=
+LIBS="$PIPS_ROOT/Lib/$PIPS_ARCH/*.a $NEWGEN_ROOT/Lib/$PIPS_ARCH/*.a $LINEAR_ROOT/Lib/$PIPS_ARCH/*.a"
 
 while getopts ap opt
 do
   case $opt in
-    p)	LIBS="$PIPS_ROOT/Lib/*.a";;
-    a)	LIBS="$PIPS_ROOT/Lib/*.a $NEWGEN_ROOT/Lib/*.a $LINEAR_ROOT/Lib/*.a" ;;
+    p)	LIBS="$PIPS_ROOT/Lib/$PIPS_ARCH/*.a";;
+    a) ;;
     \?)	echo $USAGE >&2
 	exit 2;;
   esac
 done
-
-[ "$LIBS" ] || 
-    LIBS="$PIPS_ROOT/Lib/*.a $NEWGEN_ROOT/Lib/*.a $LINEAR_ROOT/Lib/*.a"
 
 nm -go $LIBS | fgrep " T " | sed 's/:.* / /;s/^\/.*\///' | 
 	awk '{ print $2 , $1}' | sort > $tmpdir/libs.d
