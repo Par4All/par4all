@@ -2,7 +2,7 @@
 !     Reductions management 
 !
 ! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1997/03/03 14:57:47 $, )
+! ($Date: 1997/03/03 15:00:31 $, )
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -230,7 +230,7 @@ pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
       TYPE val(size)
       integer i
       do i=1, size
-         val(i) = identity(NAME,val)
+         val(i) = identity(NAME,val(i))
       enddo
       end
       subroutine build_name(hpost,NAME,PVMTYPE)(val, size)
