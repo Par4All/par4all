@@ -383,6 +383,7 @@ i_activate:
 	    }
 
 	    if (execution_mode) {
+		user_log("Selecting rule: %s\n", $3);
 		activate ($3);
 		$$ = TRUE;
 	    }
