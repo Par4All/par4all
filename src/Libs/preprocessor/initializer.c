@@ -135,14 +135,13 @@ missing_file_initializer(string module_name)
 {
     boolean success_p = TRUE;
     entity m = local_name_to_top_level_entity(module_name);
-    string file_name = string_undefined, dir_name; /* in the workspace */
+    string file_name, dir_name, src_name, full_name, init_name, finit_name; 
     /* relative to the current directory */
-    string relative_file_name = string_undefined; 
     FILE * f;
     text stub;
     
     pips_user_warning("no source file for %s: synthetic code is generated\n",
-		      strdup(module_name));
+		      module_name);
 
     if(entity_undefined_p(m))
 	pips_internal_error("No entity defined for module %s although it must"
@@ -150,30 +149,58 @@ missing_file_initializer(string module_name)
     
     /* pips' current directory is just above the workspace
      */
-    file_name = strdup(concatenate(module_name, ".f", NULL));
+    file_name = strdup(concatenate(module_name, ".f", 0));
     file_name = strlower(file_name, file_name);
     dir_name = db_get_current_workspace_directory();
-    relative_file_name = strdup(concatenate(dir_name, "/", file_name, 0));
-    free(dir_name);
+    src_name = strdup(concatenate(WORKSPACE_TMP_SPACE, "/", file_name, 0));
+    full_name = strdup(concatenate(dir_name, "/", src_name, 0));
+    init_name = 
+      db_build_file_resource_name(DBR_INITIAL_FILE, module_name, ".f_initial");
+    finit_name = strdup(concatenate(dir_name, "/", init_name, 0));
 
+    /* builds the stub.
+     */
     stub = stub_text(m);
 
-    f = safe_fopen(relative_file_name, "w");
-    print_text(f, stub);
-    safe_fclose(f, relative_file_name);
-	
-    /* Update $ALL, the module list:
-     * In fact, ALL is evaluated dynamically using DBR_SOURCE_FILE.
-     * Do not do anything!
+    /* put it in the source file and link the initial file.
      */
-    
-    /* Add the new file as a file resource 
+    db_make_subdirectory(WORKSPACE_TMP_SPACE);
+    f = safe_fopen(full_name, "w");
+    print_text(f, stub);
+    safe_fclose(f, full_name);
+    safe_link(finit_name, full_name);
+
+    /* Add the new file as a file resource...
+     * should only put a new user file, I guess?
      */
     user_log("Registering synthesized file %s\n", file_name);
-    DB_PUT_FILE_RESOURCE(DBR_INITIAL_FILE, module_name, file_name);
-    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, strdup(file_name));
-    free(relative_file_name);
+    DB_PUT_FILE_RESOURCE(DBR_INITIAL_FILE, module_name, init_name);
+    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, src_name);
+
+    free(file_name), free(dir_name), free(full_name), free(finit_name);
     return success_p;
+}
+
+extern bool process_user_file(string); /* ??? in top-level */
+
+static bool
+ask_a_missing_file(string module)
+{
+    string file;
+    bool ok, cont;
+    
+    do {
+	file = user_request("please enter a file for module %s\n", module);
+	if (file)
+	    if (same_string_p(file, "generate"))
+		ok = missing_file_initializer(module);
+	    else
+		ok = process_user_file(file);
+	cont = file && !same_string_p(file, "quit") &&
+	    !db_resource_p(DBR_INITIAL_FILE, module);
+	if (file) free(file);
+    } while (cont);
+    return db_resource_p(DBR_INITIAL_FILE, module);
 }
 
 /* there is no real rule to produce source or user files; it was introduced
@@ -184,18 +211,20 @@ bool
 initializer(string module_name)
 {
     bool success_p = FALSE;
+    string missing = get_string_property("PREPROCESSOR_MISSING_FILE_HANDLING");
 
-    if(!get_bool_property("GENERATE_MISSING_SOURCE_FILES"))
-    {
-	/* FI: strdup a cause de problemes lies aux varargs */
-	pips_user_error("no source file for %s (%s might be an ENTRY point)\n",
-			module_name, module_name);
-	success_p = FALSE;
-    }
-    else 
-    {
+    if (same_string_p(missing, "error"))
+	pips_user_error("no source file for %s (might be an ENTRY point)\n"
+			"set PREPROCESSOR_MISSING_FILE_HANDLING"
+			" to \"query\" or \"generate\"...\n", module_name);
+    else if (same_string_p(missing, "generate")) 
 	success_p = missing_file_initializer(module_name);
-    }
+    else if (same_string_p(missing, "query"))
+	success_p = ask_a_missing_file(module_name);
+    else 
+	pips_user_error("invalid value of property "
+			" PREPROCESSOR_MISSING_FILE_HANDLING = \"%s\"",
+			missing);
 
     return success_p;
 }
