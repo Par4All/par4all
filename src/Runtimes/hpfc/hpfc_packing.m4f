@@ -1,7 +1,7 @@
 c
 c everything about packing
 c
-c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/09/07 11:01:43 $, )
+c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/09/08 10:48:25 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -31,25 +31,27 @@ c
 c Packing LEVEL dimensional array
 c
       subroutine build_name(HPFC,NAME,PVMTYPE,LEVEL)(
-     $     array, 
-COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),
+     $     array, dnl
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_SECTION')
      $)
-      integer 
-COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),
+      integer dnl
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_SECTION')
       TYPE
      $ array(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
       include "fpvm3.h"
       include "hpfc_commons.h"
-      integer info  
+      integer info, nitem
       integer COMMA_REPLICATE(LEVEL, `INDEX_REF')
-SIMPLE_REPLICATE(LEVEL, `DO_LOOP')
+      i1=rl1
+      nitem=(ru1-rl1+1)/ri1
+REVERSE_BUT_LAST_REPLICATE(LEVEL, `DO_LOOP')
          call PVMFUNCTION
      $        (PVMTYPE,
      $         array(COMMA_REPLICATE(LEVEL, `INDEX_REF')),
-     $         1, 1, info)  
-SIMPLE_REPLICATE(LEVEL, `ENDDO_LOOP')
+     $         nitem, ri1, info)  dnl
+SIMPLE_REPLICATE(eval(LEVEL - 1), `ENDDO_LOOP')
       end  
 c
 popdef(`LEVEL')dnl
