@@ -1824,7 +1824,7 @@ entity val;
 
     if(val == NULL) 
     {
-	pips_error("translate_global_value", "Trying to translate TCST\n");
+	pips_internal_error("Trying to translate TCST\n");
 	return;
     }
 
@@ -1860,16 +1860,23 @@ entity val;
 	     */
 	    return;
 	}
-	else 
-	    if(storage_formal_p(store)) 
-	    {
-		pips_debug(8, "formal %s is not translatable\n", entity_name(val));
-		return;
-	    }
-	    else
-		pips_error("translate_global_value", 
-			   "%s is not translatable: store tag %d\n",
-			   entity_name(val), storage_tag(store));
+	else if(storage_formal_p(store)) 
+	{
+	  pips_debug(8, "formal %s is not translatable\n", entity_name(val));
+	  return;
+	}
+	
+	/* FC 20010322: some obscure bug workaround... */
+	/* else if (storage_return_p(store))
+	{
+	  pips_debug(8, "return %s is not translatable?\n", entity_name(val));
+	  return;
+	  } */
+	else
+	{
+	  pips_internal_error("%s is not translatable: store tag %d\n",
+				entity_name(val), storage_tag(store));
+	}
     }
 
     r = storage_ram(store);
@@ -1974,8 +1981,7 @@ entity val;
 		Psysteme r = region_system(reg);
 
 		if(base_contains_variable_p(sc_base(r), (Variable) v_init))
-		    pips_error("translate_global_value",
-			       "Cannot find value %s\n",
+		    pips_internal_error("Cannot find value %s\n",
 			       strdup(
 				      concatenate(
 						  module_local_name(module),
