@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/09 17:59:03 $, 
+# $Date: 1997/09/08 15:14:56 $, 
 
 LIB_CFILES=	abs.c \
 		divide.c \
@@ -19,5 +19,9 @@ LIB_OBJECTS= $(LIB_CFILES:.c=.o)
 
 INSTALL_FILE=	$(OTHER_HEADERS)
  
+INSTALL_INC+=	$(OTHER_HEADERS)
+
+recompile: .quick-install
+
 # end of $RCSfile: config.makefile,v $
 #
