@@ -1,4 +1,5 @@
-\documentstyle{article}
+\documentclass[a4paper]{article}
+\usepackage{newgen_domain}
 
 %% not likely to be portable...
 %%\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
@@ -7,8 +8,6 @@
 \author{Ronan Keryell\\
                 \\
         CRI, E'cole des mines de Paris}
-
-\newcommand{\domain}[1]{\paragraph{{#1}}}
 
 \begin{document}
 
@@ -39,7 +38,7 @@ Here is what can be attached to a word:
 file and {\tt end} the position of its end.
 
 The various objects that can be attached:
-\domain{attachee = statement\_line\_number:int + persistent reference + persistent declaration:entity + type:string + persistent loop + persistent module\_head:entity + complementary\_sections:unit + complexities:unit + continuation\_conditions:unit + cumulated\_effects:unit + out\_regions:unit + preconditions:unit + privatized\_regions:unit + proper\_effects:unit + proper\_regions:unit + regions:unit + static\_control:unit + transformers:unit + decoration:unit + comment:unit}
+\domain{attachee = statement_line_number:int + persistent reference + persistent declaration:entity + type:string + persistent loop + persistent module_head:entity + complementary_sections:unit + complexities:unit + continuation_conditions:unit + cumulated_effects:unit + out_regions:unit + preconditions:unit + privatized_regions:unit + proper_effects:unit + proper_regions:unit + regions:unit + static_control:unit + transformers:unit + decoration:unit + comment:unit}
 
 Persistence is need because we do not want the RI to be broken when
 the attachments are freed.
@@ -52,7 +51,7 @@ the attachments are freed.
 %\domain{attachment_to_word = attachment->string}
 
 Each word can have a list of attachments:
-\domain{word\_to\_attachments = word\_pointer:int->attachments}
+\domain{word_to_attachments = word_pointer:int->attachments}
 
 \verb|word_pointer| is an {\tt int} instead of a {\tt string} since
 the address must be used instead of the string content. So it needs a
