@@ -508,6 +508,15 @@ variable_in_common_p(
 	!SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(v)))) ;
 }
 
+/* true if v appears in a SAVE statement */
+bool
+variable_static_p(entity v)
+{
+    return(type_variable_p(entity_type(v)) &&
+	   storage_ram_p(entity_storage(v)) &&
+	   static_area_p(ram_section(storage_ram(entity_storage(v)))));
+}
+
 bool
 variable_in_module_p(entity v,
                      entity m)
