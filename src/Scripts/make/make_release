@@ -1,12 +1,14 @@
 #! /bin/sh
 #
-# $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1997/04/15 11:07:08 $, 
+# $Id$
 #
 # (c) Fabien COELHO 1996
+#
 
 # creates a release, with sources / executables ???
 # namely a compressed tar file?
+
+script=`basename $0`
 
 unset name dirs root trgt oths edit files 
 tar=${PIPS_TAR:-gtar}
@@ -15,7 +17,7 @@ make=${PIPS_MAKE:-gmake}
 verb=:
 
 verbose()
-{ echo "$RCSfile: make_release,v $: $@" >&2;}
+{ echo "$script: $@" >&2;}
 
 error()
 { ret=$1; shift; verbose "$@"; exit $ret;}
@@ -24,8 +26,8 @@ usage()
 {
     ret=$1; shift
     cat <<-EOF
-	$RCSfile: make_release,v $ (version $Revision$): $@
-	usage: $RCSfile: make_release,v $ [options] dirs...
+	$script: $@
+	usage: $script [options] dirs...
 	 -h: print this help
 	 -v: verbose
 	 -e: edit list
@@ -65,7 +67,7 @@ test -d $trgt || mkdir $trgt || error 4 "cannot mkdir $trgt"
 #
 # tmp files
 
-tmp=$trgt/$RCSfile: make_release,v $.`whoami`.$$
+tmp=$trgt/$script.`whoami`.$$
 rm -f $tmp.*
 
 $verb in `pwd`
@@ -153,5 +155,5 @@ $verb done
 
 rm -f $tmp.*
 
-# end of $RCSfile: make_release,v $ 
+# end of it
 #
