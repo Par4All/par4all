@@ -81,7 +81,7 @@ Psysteme (*method)();
     Pbase b1;
     Pbase b2;
     Pbase b;
-    transformer t = transformer_identity();
+    transformer t = transformer_undefined;
 
 
     debug(1,"transformer_convex_hulls","begin\n");
@@ -94,43 +94,56 @@ Psysteme (*method)();
 	dump_transformer(t2) ;
     }
 
-    transformer_arguments(t) = 
-	arguments_union(transformer_arguments(t1), transformer_arguments(t2));
-
-    /* get relation fields */
-    r1 = (Psysteme) predicate_system(transformer_relation(t1));
-    r2 = (Psysteme) predicate_system(transformer_relation(t2));
-
-    /* update bases using their "union"; convex hull has to be computed 
-       relatively to ONE space */
-    b1 = r1->base;
-    b2 = r2->base;
-    b = base_union(b1, b2);
-    base_rm((Pvecteur) b1);
-    base_rm((Pvecteur) b2);
-    /* b is duplicated because it may be later freed by (*method)()
-     * FI->CA: To be changed when (*method)() is cleaned up
+    /* If one of the transformer is empty, you do not want to union
+     * the arguments
      */
-    sc_base(r1) = base_dup(b);
-    /* please, no sharing between Psysteme's */
-    sc_base(r2) = base_dup(b);
-    sc_dimension(r1) = base_dimension(b);
-    sc_dimension(r2) = sc_dimension(r1);
-
-    /* meet operation */
-    r = (* method)(r1, r2);
-    if(SC_EMPTY_P(r)) {
-	/* FI: this could be eliminated if SC_EMPTY was really usable; 27/5/93 */
-	/* and replaced by a SC_UNDEFINED_P() and pips_error() */
-	r = sc_empty(b);
+    if(transformer_empty_p(t1)) {
+	t = transformer_dup(t2);
+    }
+    else if(transformer_empty_p(t2)) {
+	t = transformer_dup(t1);
     }
     else {
-	base_rm(b);
-	b = BASE_NULLE;
+	t = transformer_identity();
+	transformer_arguments(t) = 
+	    arguments_union(transformer_arguments(t1),
+			    transformer_arguments(t2));
+
+	/* get relation fields */
+	r1 = (Psysteme) predicate_system(transformer_relation(t1));
+	r2 = (Psysteme) predicate_system(transformer_relation(t2));
+
+	/* update bases using their "union"; convex hull has to be computed 
+	   relatively to ONE space */
+	b1 = r1->base;
+	b2 = r2->base;
+	b = base_union(b1, b2);
+	base_rm((Pvecteur) b1);
+	base_rm((Pvecteur) b2);
+	/* b is duplicated because it may be later freed by (*method)()
+	 * FI->CA: To be changed when (*method)() is cleaned up
+	 */
+	sc_base(r1) = base_dup(b);
+	/* please, no sharing between Psysteme's */
+	sc_base(r2) = base_dup(b);
+	sc_dimension(r1) = base_dimension(b);
+	sc_dimension(r2) = sc_dimension(r1);
+
+	/* meet operation */
+	r = (* method)(r1, r2);
+	if(SC_EMPTY_P(r)) {
+	    /* FI: this could be eliminated if SC_EMPTY was really usable; 27/5/93 */
+	    /* and replaced by a SC_UNDEFINED_P() and pips_error() */
+	    r = sc_empty(b);
+	}
+	else {
+	    base_rm(b);
+	    b = BASE_NULLE;
+	}
+
+	predicate_system(transformer_relation(t)) = (char *) r;
+
     }
-
-    predicate_system(transformer_relation(t)) = (char *) r;
-
     ifdebug(1) {
 	(void) fprintf(stderr, "convex hull, t (%x):\n", (unsigned int) t);
 	dump_transformer(t) ;
