@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "misc.h"
 #include "ri.h"
@@ -394,7 +396,7 @@ intrinsic_entity_p(entity e)
 entity 
 entity_intrinsic(string name)
 {
-    entity e = gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
+    entity e = (entity) gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
 					        MODULE_SEP_STRING,
 					        name,
 					        NULL),
@@ -594,8 +596,8 @@ entity_ith_bounds(entity e, int i)
 {
     dimension d = entity_ith_dimension(e, i);
     syntax s = make_syntax(is_syntax_range,
-                           make_range(gen_copy_tree(dimension_lower(d)),
-                                      gen_copy_tree(dimension_upper(d)),
+                           make_range(copy_expression(dimension_lower(d)),
+                                      copy_expression(dimension_upper(d)),
                                       make_expression_1()));
     return(make_expression(s, normalized_undefined));
 }
