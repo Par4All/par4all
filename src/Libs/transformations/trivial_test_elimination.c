@@ -34,25 +34,23 @@ static int trivial_test_unstructured_removed;
 static void
 display_trivial_test_statistics()
 {
-  if (get_bool_property("TRIVIAL_TEST_DISPLAY_STATISTICS")) {	
-    int elimination_count = trivial_test_removed + trivial_test_unstructured_removed ;
-    if (elimination_count > 0) {
-      user_log("* %d trivial test part%s %s been discarded. *\n",
-	       elimination_count,
-	       elimination_count > 1 ? "s" : "",
-	       elimination_count > 1 ? "have" : "has");
-      user_log("Structured trivial tests: %d\n" ,
-	       trivial_test_removed);
-	  
-      user_log("Unstructured trivial tests: %d\n" ,
-	       trivial_test_unstructured_removed);
-      /* Display also the statistics about clean_up_sequences
-	 that is called in suppress_trivial_test: */
-      display_clean_up_sequences_statistics();
-    }
-    else
-      pips_debug(8, "There is not any trivial test in this program !\n");
+  int elimination_count = trivial_test_removed + trivial_test_unstructured_removed ;
+  if (elimination_count > 0) {
+    user_log("* %d trivial test part%s %s been discarded. *\n",
+	     elimination_count,
+	     elimination_count > 1 ? "s" : "",
+	     elimination_count > 1 ? "have" : "has");
+    user_log("Structured trivial tests: %d\n" ,
+	     trivial_test_removed);
+    
+    user_log("Unstructured trivial tests: %d\n" ,
+	     trivial_test_unstructured_removed);
+    /* Display also the statistics about clean_up_sequences
+       that is called in suppress_trivial_test: */
+    display_clean_up_sequences_statistics();
   }
+  else
+    pips_debug(8, "There is not any trivial test in this program !\n");
 }
 
 
