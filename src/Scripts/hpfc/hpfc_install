@@ -2,7 +2,7 @@
 #
 # Installation in directory...
 #
-# $RCSfile: hpfc_install,v $ ($Date: 1996/12/27 13:24:14 $, )
+# $RCSfile: hpfc_install,v $ ($Date: 1996/12/27 14:29:27 $, )
 # version $Revision$
 #
 
@@ -112,6 +112,8 @@ then
      $basedir/*_parameters.h \
      $basedir/*_init.h \
      $tdir
+
+  rm -f $tdir/_host.h $tdir/_node.h
 
   [ "$unsplit" ] && set $basedir/[a-z]*.f 
   [ "$reffiles" ] && set `echo "$reffiles" | cut -d " " -f 2`
