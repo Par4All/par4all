@@ -21,11 +21,16 @@
 
 #include "transformations.h"
 
-/* Statistic stuff: */
+
+/* Statistiques parametres */
 static int trivial_test_removed;
 static int trivial_test_unstructured_removed;
 
 
+
+/*
+  Afficher les résultats des statistiques de la Suppress Trivial Test.
+ */
 static void
 display_trivial_test_statistics()
 {
@@ -45,10 +50,16 @@ display_trivial_test_statistics()
 	 that is called in suppress_trivial_test: */
       display_clean_up_sequences_statistics();
     }
+    else
+      pips_debug(8, "There is not any trivial test in this program !\n");
   }
 }
 
 
+
+/*
+  Determiner l'expression inverse de l'expression e.
+ */
 static expression
 MakeInvertExpression(expression e)
 {
@@ -69,6 +80,7 @@ MakeInvertExpression(expression e)
       if (relational_expression_p(e)) {
 	normalized n1 = NORMALIZE_EXPRESSION(e1);
 	normalized n2 = NORMALIZE_EXPRESSION(e2);
+	pips_debug(8, "The expression %s is a relational expression\n", words_to_string(words_syntax(expression_syntax(e))));
 	  
 	if (normalized_linear_p(n1) && normalized_linear_p(n2)) {
 
@@ -93,6 +105,8 @@ MakeInvertExpression(expression e)
 	}
       }
       else if (logical_operator_expression_p(e)) {
+	pips_debug(8, "The expression %s is a logical expression\n", words_to_string(words_syntax(expression_syntax(e))));
+
 	if (ENTITY_NOT_P(op)) {
 	  tmpc = copy_expression(e1);
 	}
@@ -125,10 +139,17 @@ MakeInvertExpression(expression e)
 	  nc = copy_expression(tmpc);
       }
   }
+
   return (nc) ;
 }
 
 
+
+/*
+  Construire une nouvelle conditionelle instruction à partir de la conditionelle instruction vide
+  du statement s dans le cas elle est bien structurée ("structured instruction").
+  La conditionelle instruction vient d'être crée sera remplacer l'ancienne dans s.
+ */
 static void
 trivial_test_deal_with_test(statement s) 
 {  
@@ -147,6 +168,12 @@ trivial_test_deal_with_test(statement s)
 }
 
 
+
+/*
+  Cette fonction sera appelée dans le cas où la conditionelle instruction vide du statement s n'est
+  pas structurée ("unstructured instruction"). Donc, avant de la remplacer par une nouvelle conditionelle
+  instruction, il faut enlever tous les successeurs et predecesseurs correspondants de se control.
+ */
 static void
 trivial_test_deal_with_unstructured(persistant_statement_to_control m, statement s) 
 {
@@ -192,6 +219,7 @@ trivial_test_deal_with_unstructured(persistant_statement_to_control m, statement
 }
 
 
+
 static void
 trivial_test_statement_rewrite(statement s, persistant_statement_to_control m)
 {
@@ -211,11 +239,16 @@ trivial_test_statement_rewrite(statement s, persistant_statement_to_control m)
 
      t = instruction_test(i) ;
      true = test_true(t) ;
-     if (empty_statement_or_continue_p(true)) { 
-       if (bound_persistant_statement_to_control_p(m, s))
-	 trivial_test_deal_with_unstructured(m, s);        // unstructured case       
-       else 
-	 trivial_test_deal_with_test(s);        // structured case
+     if (empty_statement_or_continue_p(true)) {
+       pips_debug(8,"The branch TRUE of this test instruction is empty!\n");
+       if (bound_persistant_statement_to_control_p(m, s)) {
+	 pips_debug(8, "This instruction is unstructured instruction\n");
+	 trivial_test_deal_with_unstructured(m, s);        
+       }       
+       else { 
+	 pips_debug(8, "This instruction is structured instruction\n");
+	 trivial_test_deal_with_test(s);
+       }
      }
      break;
    }
@@ -232,6 +265,7 @@ trivial_test_statement_rewrite(statement s, persistant_statement_to_control m)
 }
 
 
+
 static bool store_mapping(control c, persistant_statement_to_control map)
 {
   extend_persistant_statement_to_control(map, control_statement(c), c);
@@ -239,7 +273,6 @@ static bool store_mapping(control c, persistant_statement_to_control map)
 }
 
 
-/* Suppress the test vide of the given module: */
 
 void
 suppress_trivial_test_statement(statement mod_stmt)
@@ -253,16 +286,18 @@ suppress_trivial_test_statement(statement mod_stmt)
 }
 
 
+
 /*
  * Trivial test elimination     
  * mod_name : MODule NAME, nom du programme Fortran
  * mod_stmt : MODule STateMenT
- */
 
+ * Elimination des branches de conditionnelles vides du programme en simplifiant et améliorant des 
+   expressions des tests logiques des conditionnelles dans le module mod_name.
+ */
 bool
 suppress_trivial_test(char * mod_name)  
 {
-  /* Get the true ressource, not a copy. */
   statement mod_stmt;
   set_current_module_entity(local_name_to_top_level_entity(mod_name));
   mod_stmt= (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
@@ -273,7 +308,7 @@ suppress_trivial_test(char * mod_name)
 
   ifdebug(1) {
       debug(1,"trivial_test_elimination", "Begin for %s\n", mod_name);
-      pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
+      pips_assert("Inconsistent statements ...", statement_consistent_p(mod_stmt));
   }
   
   trivial_test_removed = 0 ;
@@ -284,7 +319,6 @@ suppress_trivial_test(char * mod_name)
 
   debug_off();
 
-  /* Reorder the module, because new statements have been generated. */
   module_reorder(mod_stmt);
 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
@@ -295,7 +329,19 @@ suppress_trivial_test(char * mod_name)
   debug(1,"trivial_test_elimination", "End for %s\n", mod_name);
   
   ifdebug(1)
-      pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
+      pips_assert("Inconsistent statements ...", statement_consistent_p(mod_stmt));
   
   return TRUE;
 }
+
+
+
+
+
+
+
+
+
+
+
+
