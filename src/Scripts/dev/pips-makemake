@@ -4,6 +4,9 @@
 # $Id$
 #
 # $Log: pips-makemake,v $
+# Revision 1.320  1997/10/09 14:17:20  coelho
+# rm file before linking.
+#
 # Revision 1.319  1997/09/25 09:32:55  coelho
 # typos again...
 #
@@ -618,6 +621,7 @@ test: all
 	#
 	# building a local PIPS
 	#
+	\$(RM) \$(ARCH)/pips
 	\$(LINK) \$(ARCH)/pips \$(ROOT)/Lib/\$(ARCH)/\$(PIPS_MAIN) \\
 	    -lpips \$(PIPS_LIBS) 
 	@echo 
@@ -626,6 +630,7 @@ ttest: all
 	#
 	# building a local TPIPS
 	#
+	\$(RM) \$(ARCH)/tpips
 	\$(LINK) \$(ARCH)/tpips \$(ROOT)/Lib/\$(ARCH)/\$(TPIPS_MAIN) \\
 	    -ltpips \$(PIPS_LIBS) \$(TPIPS_ADDED_LIBS)
 	@echo 
@@ -634,6 +639,7 @@ wtest: all
 	#
 	# building a local WPIPS
 	#
+	\$(RM) \$(ARCH)/wpips
 	\$(LINK) \$(ARCH)/wpips \$(WPIPS_ADDED_LDFLAGS) \\
 	    \$(ROOT)/Lib/\$(ARCH)/\$(WPIPS_MAIN) \\
 	    -lwpips \$(PIPS_LIBS) \$(WPIPS_ADDED_LIBS)
@@ -643,6 +649,7 @@ ftest: all
 	#
 	# building a local Full PIPS
 	#
+	\$(RM) \$(ARCH)/fpips
 	\$(LINK) \$(ARCH)/fpips \$(FPIPS_ADDED_LDFLAGS) \\
 	    \$(ROOT)/Lib/\$(ARCH)/\$(FPIPS_MAIN) \\
 	    -lfpips \$(FPIPS_ADDED_LIBS) \\
