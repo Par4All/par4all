@@ -2,7 +2,7 @@
  * a set a functions to print the host and node status in PVM,
  * called from a Fortran subroutine.
  *
- * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1994/04/12 14:00:43 $, )
+ * $RCSfile: hpfc_misc.m4c,v $ ($Date: 1994/06/07 18:44:48 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -16,7 +16,7 @@ extern int fprintf();
 
 char *host_name(ti_host, nhost, hostp)
 int ti_host, nhost;
-struct hostinfo *hostp;
+struct pvmhostinfo *hostp;
 {
     int i;
 
@@ -29,12 +29,12 @@ struct hostinfo *hostp;
     return("name not found");
 }
 
-struct taskinfo which_task(ti_tid, ntask, taskp)
+struct pvmtaskinfo which_task(ti_tid, ntask, taskp)
 int ti_tid, ntask;
-struct taskinfo *taskp;
+struct pvmtaskinfo *taskp;
 {
-    static struct taskinfo
-	blup = {0, 0, 0, 0, "task not found"};
+    static struct pvmtaskinfo
+	blup = {0, 0, 0, 0, "task not found", 0};
 
     int i;
     for( i=0 ; i<ntask ; i++ )
@@ -54,7 +54,7 @@ void print_host_info_ ()
 	nhost,
 	narch;
 
-    struct hostinfo
+    struct pvmhostinfo
 	*hostp;
 
     info = pvm_config(&nhost, &narch, &hostp);
@@ -82,10 +82,10 @@ int *number, *tids, *hosttid;
 	narch,
 	ntask;
 
-    struct taskinfo
+    struct pvmtaskinfo
 	*taskp;
 
-    struct hostinfo
+    struct pvmhostinfo
 	*hostp;
     
     /* 
