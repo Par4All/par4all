@@ -8,6 +8,10 @@
   * $Id$
   *
   * $Log: convex_hull.c,v $
+  * Revision 1.19  2001/12/05 17:08:52  irigoin
+  * Normalization step added before call to convex hull. Seems to help for
+  * Validation/Semantics/ocean.f but not for Validation/Semantics/ocanea_fi2.f
+  *
   * Revision 1.18  2001/07/19 18:06:52  irigoin
   * Log of transformations added in header.
   *
@@ -194,6 +198,8 @@ transformer transformer_convex_hull(transformer t1, transformer t2)
   /* return transformer_convex_hulls(t1, t2, sc_enveloppe_chernikova); */
   /* return transformer_convex_hulls(t1, t2, sc_common_projection_convex_hull);
    */
+  t1 = transformer_normalize(t1, 4);
+  t2 = transformer_normalize(t2, 4);
   return transformer_convex_hulls(t1, t2, cute_convex_union);
 }
 
