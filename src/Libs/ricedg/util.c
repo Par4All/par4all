@@ -76,7 +76,7 @@ compute_ordering_to_dg_mapping(graph dependance_graph)
 
 
     static string dependence_graph_banner[8] = {
-	"\n ********* Dependence Graph (ill. option combination) *******\n",
+	"\n *********************** Use-Def Chains *********************\n",
 	"\n **************** Effective Dependence Graph ****************\n",
 	"\n ********* Dependence Graph (ill. option combination) *******\n",
 	"\n ********* Dependence Graph (ill. option combination) *******\n",
@@ -104,7 +104,7 @@ graph mod_graph;
 			("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES");
 
     fprintf(fd, "%s\n", dependence_graph_banner[banner_number]);
-  debug_on("RICEDG_DEBUG_LEVEL");
+    debug_on("RICEDG_DEBUG_LEVEL");
     for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {
 	vertex v1 = VERTEX(CAR(pv1));
 	statement s1 = vertex_to_statement(v1);
