@@ -595,18 +595,14 @@ check_fortran_syntax_before_pips(
 #define MAXNAMLEN (1024)
 #endif
 
-bool process_user_file(
-    string file)
+bool 
+process_user_file(string file)
 {
-    bool success_p = FALSE;
-    bool cpp_processed_p;
     FILE *fd;
-    char *cwd;
-    char buffer[MAXNAMLEN];
-    string abspath = NULL;
-    string initial_file = file;
+    bool success_p = FALSE, cpp_processed_p;
+    char *cwd, buffer[MAXNAMLEN];
+    string abspath = NULL, initial_file, tempfile = NULL, nfile;
     int err;
-    char *tempfile = NULL;
 
     static int number_of_files = 0;
     static int number_of_modules = 0;
@@ -614,25 +610,31 @@ bool process_user_file(
     number_of_files++;
     pips_debug(1, "file %s (number %d)\n", file, number_of_files);
 
+    /* the file is looked for in the pips source path.
+     */
+    nfile = find_file_in_directories(file, getenv("PIPS_SRCPATH"));
 
-    if (! file_exists_p(file)) {
+    if (!nfile) {
 	pips_user_warning("Cannot open file : %s\n", file);
 	return FALSE;
     }
 
+    initial_file = nfile;
+
     /* Fortran compiler.
      */
     if (pips_check_fortran()) 
-	check_fortran_syntax_before_pips(file);
+	check_fortran_syntax_before_pips(nfile);
 
     /* CPP
      */
-    cpp_processed_p = dot_F_file_p(file);
+    cpp_processed_p = dot_F_file_p(nfile);
 
     if (cpp_processed_p)
     {
 	user_log("Preprocessing file %s\n", initial_file);
-	file = process_thru_cpp(initial_file);
+	nfile = process_thru_cpp(initial_file);
+	
     }
 
     if (tempfile == NULL) {
@@ -641,23 +643,23 @@ bool process_user_file(
 
     /* the absolute path of file is calculated
      */
-    abspath = strdup((*file == '/') ? file : 
-		     concatenate(get_cwd(), "/", file, NULL));
+    abspath = strdup((*nfile == '/') ? nfile : 
+		     concatenate(get_cwd(), "/", nfile, NULL));
 
     set_real_file_dir(abspath);
 
     /* the new file is registered in the database
      */
-    user_log("Registering file %s\n", initial_file);
+    user_log("Registering file %s\n", file);
 
     /* FI: two problems here
-       - the successive calls to DB_PUT_FILE_RESOURCE erase each other...
-    */
+     * - the successive calls to DB_PUT_FILE_RESOURCE erase each other...
+     */
     DB_PUT_FILE_RESOURCE(DBR_USER_FILE, "", abspath);
 
     /* the new file is splitted according to Fortran standard */
 
-    user_log("Splitting file    %s\n", file);
+    user_log("Splitting file    %s\n", nfile);
 
     cwd = strdup(get_cwd());
     chdir(db_get_current_workspace_directory());
@@ -720,18 +722,17 @@ bool process_user_file(
 
     unlink(tempfile); tempfile = NULL;
 
-    if (cpp_processed_p) 
-    { 
-	unlink(file); /* remove .cpp_filtered file */
-	/* free(file); ??? */ 
+    if (cpp_processed_p) {
+	unlink(nfile); /* remove .cpp_filtered file */
+	free(initial_file);
     }
 
-    if(!success_p) {
-	user_warning("", "No module was found when splitting file %s.\n",
-		     abspath);
-    }
+    if(!success_p)
+	pips_user_warning("No module was found when splitting file %s.\n",
+			  abspath);
 
     reset_real_file_dir();
+    free(nfile);
 
     return success_p;
 }
