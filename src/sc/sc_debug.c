@@ -1,6 +1,5 @@
 /* package sc : $RCSfile: sc_debug.c,v $ version $Revision$
- * date: $Date: 1996/02/15 14:18:54 $, 
- * 
+ * date: $Date: 1996/08/08 14:45:44 $, 
  */
 
 #include <stdio.h>
@@ -31,4 +30,7 @@ void initialize_sc(char *(*var_to_string)(Variable))
     char * l = getenv(SC_DEBUG_LEVEL);
     if (l) set_sc_debug_level(atoi(l));
     default_variable_to_string = var_to_string;
+
+    ifscdebug(1)
+	fprintf(stderr, "[initialize_sc] Value: " LINEAR_VALUE_STRING "\n");
 }
