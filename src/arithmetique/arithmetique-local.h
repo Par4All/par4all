@@ -108,6 +108,7 @@ typedef int Value;
 
 #define int_to_value(i) ((Value)i)
 #define long_to_value(l) ((Value)l)
+#define float_to_value(f) ((Value)f)
 
 /* boolean operators on values
  */
