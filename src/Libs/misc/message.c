@@ -335,6 +335,23 @@ pips_assert_function(
 	(void) abort();
 }
 
+void
+user_irrecoverable_error(char * calling_function_name,
+			 char * a_message_format,
+			 ...)
+{
+   va_list some_arguments;
+   va_start(some_arguments, a_message_format);
+   /* print name of function causing error */
+   (void) fprintf(stderr, "user error in %s: ", calling_function_name);
+
+   /* print out remainder of message */
+   (void) vfprintf(stderr, a_message_format, some_arguments);
+
+   exit(1);
+   va_end(some_arguments);
+}
+
 /*
  *   that is all
  */
