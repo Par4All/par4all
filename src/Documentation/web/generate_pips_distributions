@@ -34,13 +34,13 @@ make_pips_release -CS -l -rszf linear_sources LINEAR || error 3 "ret $?"
 echo "Xpomp sources"
 move xpomp_sources
 make_pips_release -rz -D Doc/xpomp_manual.ps \
-	-D Include -w "-s Src/Runtimes/xpomp" -p -w -e xpomp_sources || 
+	-D Include -w "-s Src/Runtimes/xpomp" -p -w -e -f xpomp_sources || 
 	    error 4 "ret $?"
 
 echo "Hpfc Runtime sources"
 move hpfc_runtime
 make_pips_release -rz \
-	-D Include -w "-s Src/Runtimes/hpfc" -p -w -e hpfc_runtime ||
+	-D Include -w "-s Src/Runtimes/hpfc" -p -w -e -f hpfc_runtime ||
 		error 8 "ret $?"
 
 #
