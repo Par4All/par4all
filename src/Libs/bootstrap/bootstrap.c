@@ -303,18 +303,21 @@ void CreateIntrinsics()
     }
 }
 
-bool bootstrap(program)
-string program;
+bool bootstrap(string workspace)
 {
     CreateIntrinsics();
     CreateAreas();
     CreateArrays();
 
-    /* DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(program), NULL); */
+    /* DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(workspace), NULL); */
     /* FI, Could also be:
-     *  DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(program), string_undefined);
+     *  DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(workspace), string_undefined);
      */
-    DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(program), "");
+    /* DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, strdup(workspace), ""); */
+    /* FI: I suppress the owner filed to make the database moveable */
+    /* FI: I guess no pointers to the resource is passed because it
+       is a tabulated NewGen field. */
+    DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, "", "");
 
     return TRUE;
 }
