@@ -22,15 +22,25 @@
  * Note: sc_fusion() est considere comme obsolete; voir sc_intersection()
  * et sc_append().
  */
-Psysteme sc_fusion(s1,s2)
-Psysteme s1,s2;
+Psysteme sc_fusion(Psysteme s1, Psysteme s2)
 {
     Pcontrainte eq;
 
-    if (SC_UNDEFINED_P(s1) || sc_rn_p(s1)) 
-	return(s2);
-    if (SC_UNDEFINED_P(s2) || sc_rn_p(s2))
-	return(s1);
+    if (SC_UNDEFINED_P(s1))
+      return s2;
+
+    if (sc_rn_p(s1)) {
+      free(s2);
+      return s2;
+    }
+
+    if (SC_UNDEFINED_P(s2))
+      return s1;
+
+    if (sc_rn_p(s2)) {
+      free(s1);
+      return s1;
+    }
 
     if (s1->nb_eq != 0)
     {
@@ -58,7 +68,7 @@ Psysteme s1,s2;
 	s1->inegalites = s2->inegalites,
 	s1->nb_ineq = s2->nb_ineq;
 
-    free((char *)s2);
+    free(s2);
 
     return(s1);
 }
