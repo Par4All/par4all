@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/12 17:22:32 $, 
+# $Date: 1996/08/22 11:54:38 $, 
 
 YFLAGS+=	-d
 
@@ -34,6 +34,7 @@ pipsmake_yacc.c pipsmake_yacc.h: readmakefile.y
 	$(PARSE) readmakefile.y
 	sed 's/YY/PIPSMAKE_/g;s/yy/pipsmake_/g' y.tab.c > pipsmake_yacc.c
 	sed 's/YY/PIPSMAKE_/g;s/yy/pipsmake_/g' y.tab.h > pipsmake_yacc.h
+	$(RM) y.tab.[hc]
 
 .depend: $(DERIVED_CFILES)
 .header: $(DERIVED_HEADERS)
