@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/04/15 10:14:04 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/06/03 14:14:40 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -46,6 +46,7 @@ extern fprintf();
 #include "regions.h"
 #include "semantics.h"
 #include "effects.h"
+#include "properties.h"
 
 /* in paf-util.h: */
 list base_to_list(Pbase base);
@@ -73,11 +74,21 @@ void fprint_entity_list(FILE *fp, list l);
 
 #include "hpfc.h"
 #include "defines-local.h"
+/* #include "compiler_parameters.h" */
 
 /*----------------------------------------------------------------
  *
  * IO EFFICIENT COMPILATION
  */
+Psysteme statement_context(stat, move)
+statement stat;
+tag move;
+{
+    return(predicate_system(transformer_relation
+			    ((movement_collect_p(move)) ? 
+			     load_statement_precondition(stat) :
+			     load_statement_postcondition(stat)))); 
+}
 
 /*
  * bool io_efficient_compilable_p(stat)
@@ -98,43 +109,10 @@ statement stat;
 		load_statement_only_io(stat)==TRUE);
 
     /*
-     * ??? should be MUST if write and MAY if read?
-     * ??? and should consider any array, whether distributed or not?
-     * ??? to be improved soon...
+     * ok, no conditions are put here, what means that any statement that
+     * only contains I/O may be compiled efficiently, if the informations
+     * (especially regions) are not too bad.
      */
-    
-    MAPL(ce,
-     {
-	 effect
-	     e = EFFECT(CAR(ce));
-	 entity
-	     array = reference_variable(effect_reference(e));
-	 
-	 debug(5, "io_efficient_compilable_p", 
-	       "considering array %s\n", entity_local_name(array));
-	 
-	 if ((array_distributed_p(array)) &&
-	     (approximation_may_p(effect_approximation(e))))
-	 {
-	     debug(5, "io_efficient_compilable_p",
-		   "false on reference to %s in statement %d\n",
-		   entity_local_name(array), statement_number(stat));
-
-	     compilable = FALSE;
-	 }
-     },
-	 load_statement_local_regions(stat));
-
-    user_warning("io_efficient_compilable_p", 
-		 "only partially implemented, returning %d\n", compilable);
-
-    ifdebug(5)
-	if (compilable)
-	{
-	    fprintf(stderr, 
-	   "[io_efficient_compilable_p] io efficient compilable statement:\n");
-	    print_statement(stat);
-	}
 
     return(compilable);
 }
@@ -143,13 +121,20 @@ void io_efficient_compile(stat, hp, np)
 statement stat, *hp, *np;
 {
     list
-	entities = load_statement_local_regions(stat);
+	entities = load_statement_local_regions(stat),
+	lh_collect = NIL,
+	lh_io = NIL,
+	lh_update = NIL,
+	ln_collect = NIL,
+	ln_io = NIL,
+	ln_update = NIL;
+    statement
+	sh = statement_undefined,
+	sn = statement_undefined;
 
     debug_on("HPFC_IO_DEBUG_LEVEL");
     debug(1, "io_efficient_compile", "compiling!\n");
-
-    debug(2, "io_efficient_compile", 
-	  "statement 0x%x, %d arrays\n",
+    debug(2, "io_efficient_compile", "statement 0x%x, %d arrays\n",
 	  stat, gen_length(entities));
 
     /*
@@ -157,6 +142,7 @@ statement stat, *hp, *np;
      */
     if ENDP(entities)
     {
+	debug(5, "io_efficient_compile", "old stuff used\n");
 	hpfcompileIO(stat, hp, np);
 	return;
     }
@@ -167,41 +153,99 @@ statement stat, *hp, *np;
 	     e = EFFECT(CAR(ce));
 	 entity
 	     array = reference_variable(effect_reference(e));
-	 tag
-	     act = action_tag(effect_action(e));
-	 tag
-	     apr = approximation_tag(effect_approximation(e));	     
-	 bool
-	     dist = array_distributed_p(array);
-	 bool
-	     write = (act==is_action_write);
-	 bool
-	     may = (apr==is_approximation_may);
-	 statement
-	     sh = statement_undefined;
-	 statement
-	     sn = statement_undefined;
+	 action
+	     act = effect_action(e);
+	 approximation
+	     apr = effect_approximation(e);
 	 
 	 debug(3, "io_efficient_compile", 
 	       "array %s\n", entity_local_name(array));
 
-	 if ((!dist) && (!write)) continue;
+	 if (!array_distributed_p(array) && !action_write_p(act)) 
+	     continue;
 
-	 if (dist && (!write || (write && may)))
+	 /*
+	  * add array declaration on host if necessary
+	  */
+	 if (array_distributed_p(array) && 
+	     (load_entity_host_new(array) == (entity) HASH_UNDEFINED_VALUE))
+	     store_new_host_variable(AddEntityToModule(array, host_module), 
+				     array);
+
+	 /*
+	  * collect data if necessary
+	  */
+	 if (array_distributed_p(array) && 
+	     (action_read_p(act) || 
+	      (action_write_p(act) && 
+	       approximation_may_p(apr) && 
+	       !get_bool_property("HPFC_IGNORE_MAY_IN_IO"))))
+	 {
 	     generate_io_collect_or_update(array, stat, 
 					   is_movement_collect, 
-					   act, &sh, &sn);
+					   action_tag(act), &sh, &sn);
+	     lh_collect = CONS(STATEMENT, sh, lh_collect);
+	     ln_collect = CONS(STATEMENT, sn, ln_collect);
+	 }
 
-	 if (write)
+	 /*
+	  * update data if necessary
+	  */
+	 if (action_write_p(act))
+	 {
 	     generate_io_collect_or_update(array, stat, 
 					   is_movement_update, 
-					   act, &sh, &sn);
+					   action_tag(act), &sh, &sn);
+	     lh_update = CONS(STATEMENT, sh, lh_update);
+	     ln_update = CONS(STATEMENT, sn, ln_update);
+	 }
      },
 	 entities);
 
-    pips_error("io_efficient_compile", "not implemented yet\n");
+    lh_io =  CONS(STATEMENT, copy_statement(stat), NIL);
+
+    if (get_bool_property("HPFC_SYNCHRONIZE_IO"))
+    {
+	/*
+	 * could do it only for write statements
+	 */
+	entity
+	    synchro = hpfc_name_to_entity(SYNCHRO);
+	
+	lh_io = CONS(STATEMENT, my_make_call_statement(synchro, NIL), lh_io);
+	ln_io = CONS(STATEMENT, my_make_call_statement(synchro, NIL), ln_io);
+    }
+
+    *hp = make_block_statement(gen_nconc(lh_collect,
+			       gen_nconc(lh_io,
+			                 lh_update)));
+    *np = make_block_statement(gen_nconc(ln_collect,
+			       gen_nconc(ln_io,
+					 ln_update)));
+
+    ifdebug(9)
+    {
+	fprintf(stderr, "[io_efficient_compile] output:\n");
+	fprintf(stderr, "Host:\n");
+	print_statement(*hp);
+	fprintf(stderr, "Node:\n");
+	print_statement(*np);
+    }
 
     debug_off();
+}
+
+void hpfc_algorithm_row_echelon(syst, scanners, pcond, penum)
+Psysteme syst;
+list scanners;
+Psysteme *pcond, *penum;
+{
+    Pbase
+	base = entity_list_to_base(scanners);
+
+    algorithm_row_echelon(syst, base, pcond, penum);
+
+    base_rm(base);
 }
 
 void generate_io_collect_or_update(array, stat, move, act, psh, psn)
@@ -210,8 +254,17 @@ statement stat;
 tag move, act;
 statement *psh, *psn;
 {
-    pips_assert("generate_io_collect_or_update", entity_variable_p(array));
-    
+    Psysteme
+	syst = generate_io_system(array, stat, move, act);
+
+    pips_assert("generate_io_collect_or_update", 
+		entity_variable_p(array) && syst!=SC_UNDEFINED);
+
+
+    /* ifdebug(9)
+     *	 fprintf(stderr, "[generate_io_collect_or_update] syst\n"),
+     *	 sc_fprint(stderr, syst, entity_local_name);
+     */
 
     if (array_distributed_p(array))
     {
@@ -223,7 +276,6 @@ statement *psh, *psn;
 	 *   - deducable
 	 */
 	Psysteme
-	    syst = generate_io_system(array, stat, move, act),
 	    proc_echelon = SC_UNDEFINED,
 	    tile_echelon = SC_UNDEFINED,
 	    condition = SC_UNDEFINED;
@@ -233,39 +285,68 @@ statement *psh, *psn;
 	    scanners = NIL,
 	    rebuild = NIL;
 
-	pips_assert("generate_io_collect_or_update", syst!=SC_UNDEFINED);
-
 	/* Now we have a set of equations and inequations, and we are going
 	 * to organise a scanning of the data and the communications that 
 	 * are needed
 	 */
 
 	put_variables_in_ordered_lists
-	    (syst, array, &parameters, &processors, &scanners, &rebuild); 
+	    (&syst, array, &parameters, &processors, &scanners, &rebuild); 
+
 	hpfc_algorithm_tiling(syst, processors, scanners, 
 			      &condition, &proc_echelon, &tile_echelon);
 
-	
+	hpfc_simplify_condition(&condition, stat, move);
+
+	generate_io_statements_for_distributed_arrays
+	    (array, move, 
+	     condition, proc_echelon, tile_echelon,
+	     parameters, processors, scanners, rebuild,
+	     psh, psn);
     }
     else
     {
+	Psysteme
+	    row_echelon = SC_UNDEFINED,
+	    condition = SC_UNDEFINED;
+	list
+	    tmp = NIL,
+	    parameters = NIL,
+	    scanners = NIL,
+	    rebuild = NIL;
+
 	pips_assert("generate_io_collect_or_update", movement_update_p(move));
 
-	user_warning("generate_io_collect_or_update", 
-		     "shared arrays management not implemented yet\n");
+	put_variables_in_ordered_lists
+	    (&syst, array, &parameters, &tmp, &scanners, &rebuild);
+
+	pips_assert("generate_io_collect_or_update", ENDP(tmp));
+
+	hpfc_algorithm_row_echelon(syst, scanners, &condition, &row_echelon);
+
+	hpfc_simplify_condition(&condition, stat, move);
+
+	generate_io_statements_for_shared_arrays
+	    (array, move,
+	     condition, row_echelon,
+	     parameters, scanners, rebuild,
+	     psh, psn);
+    }
+
+    ifdebug(8)
+    {
+	fprintf(stderr, 
+		"[generate_io_collect_or_update] output:\n");
+	fprintf(stderr, "Host:\n");
+	print_statement(*psh);
+	fprintf(stderr, "Node:\n");
+	print_statement(*psn);
     }
 }
 
 /*
- * Psysteme generate_io_system(ent, stat)
- * entity ent;
- * statement stat;
- *
  * generates the Psystem for IOs inside the statement stat,
  * that use entity ent which should be a variable.
- *
- *
- *
  */
 Psysteme generate_io_system(array, stat, move, act)
 entity array;
@@ -279,14 +360,13 @@ tag move, act;
 
     if (array_distributed_p(array))
     {
-
 	result = generate_distributed_io_system(array, stat, move, act);
 	result = clean_distributed_io_system(result, array, move);
     }
     else
     {
-	user_warning("generate_io_system",
-		     "shared arrays management not implemented yet\n");
+	result = generate_shared_io_system(array, stat, move, act);
+	result = clean_shared_io_system(result, array, move);
     }
 
     /*
@@ -317,6 +397,76 @@ int number;
     return(result);
 }
 
+Psysteme generate_shared_io_system(array, stat, move, act)
+entity array;
+statement stat;
+tag move, act;
+{
+    Psysteme
+	result = SC_UNDEFINED, /* ??? bug post with region */
+	region = effect_system(entity_to_region(stat, array, act)), 
+	a_decl = entity_to_declaration_constraints(array),
+	stamme = hpfc_unstutter_dummies(array),
+	contxt = statement_context(stat, move); 
+    
+    pips_assert("generate_shared_io_system", !array_distributed_p(array));
+
+    result = sc_append(sc_rn(NULL), region);
+    result = sc_append(result, a_decl);
+    result = sc_append(result, stamme);
+    result = sc_append(result, contxt);
+    
+    ifdebug(8)
+    {
+	fprintf(stderr, 
+		"[generate_shared_io_system] whole system for array %s:\n",
+		entity_local_name(array));
+	fprintf(stderr, "Result:\n");
+	sc_fprint(stderr, result, entity_local_name);
+    }
+    
+    /*
+     * the noisy system is cleaned
+     * some variables are not used, they are removed here.
+     */
+    sc_nredund(&result);
+    base_rm(sc_base(result));
+    sc_base(result) = NULL;
+    sc_creer_base(result);
+    
+    /*
+     * DEBUG stuff: the systems are printed
+     */
+    ifdebug(7)
+    {
+	fprintf(stderr, 
+		"[generate_shared_io_system] systems for array %s:\n",
+		entity_local_name(array));
+	fprintf(stderr, "Region:\n");
+	sc_fprint(stderr, region, entity_local_name);
+	fprintf(stderr, "Array declaration:\n");
+	sc_fprint(stderr, a_decl, entity_local_name);
+	fprintf(stderr, "Unstammer:\n");
+	sc_fprint(stderr, stamme, entity_local_name);
+	fprintf(stderr, "Context:\n");
+	sc_fprint(stderr, contxt, entity_local_name);
+    }
+    
+    ifdebug(6)
+    {
+	fprintf(stderr, 
+	  "[generate_shared_io_system] resulting system for array %s:\n",
+		entity_local_name(array));
+	fprintf(stderr, "Result:\n");
+	sc_fprint(stderr, result, entity_local_name);
+    }
+ 
+    return(result);
+
+    
+
+}
+
 Psysteme generate_distributed_io_system(array, stat, move, act)
 entity array;
 statement stat;
@@ -341,11 +491,7 @@ tag move, act;
 	sdistr = entity_to_hpf_constraints(template),
 	sother = hpfc_compute_unicity_constraints(array), /* ??? */
 	stamme = hpfc_unstutter_dummies(array),
-	contxt = 
-	    predicate_system(transformer_relation
-			     ((movement_collect_p(move)) ? 
-			      load_statement_precondition(stat) :
-			      load_statement_postcondition(stat)));
+	contxt = statement_context(stat, move);
     
     /* ??? massive memory leak 
      */
@@ -373,7 +519,6 @@ tag move, act;
      * the noisy system is cleaned
      * some variables are not used, they are removed here.
      */
-    /* result = sc_elim_redond(result); */
     sc_nredund(&result);
     base_rm(sc_base(result));
     sc_base(result) = NULL;
@@ -421,6 +566,123 @@ tag move, act;
     return(result);
 }
 
+void remove_variables_if_possible(psyst, lvars)
+Psysteme *psyst;
+list lvars;
+{
+    Psysteme 
+	syst = *psyst;
+
+    MAPL(ce, 
+     {
+	 Variable
+	     var = (Variable) ENTITY(CAR(ce));
+	 int
+	     coeff = 0;
+	 
+	 /*
+	  * Yi-Qing Stuff in ricedg is used
+	  */
+	 if ((void) eq_v_min_coeff(sc_egalites(syst), var, &coeff), coeff==1)
+	 {
+	     Pvecteur
+		 v = vect_new(var, 1);
+	     
+	     debug(7, "remove_variables_if_possible", 
+		   "removing variable %s\n", 
+		   entity_local_name((entity) var));
+	     
+	     syst = sc_projection_optim_along_vecteur(syst, v);
+	     vect_rm(v);
+	 }
+     }, 
+	 lvars);
+
+    *psyst = syst;
+}
+
+Psysteme clean_shared_io_system(syst, array, move)
+Psysteme syst;
+entity array;
+tag move;
+{
+    int
+	array_dim = NumberOfDimension(array);
+    list
+	keep = NIL,
+	try_keep = NIL,
+	remove = NIL,
+	try_remove = base_to_list(sc_base(syst));
+
+    debug(5, "clean_shared_io_system", "array %s, movement %s\n",
+	  entity_local_name(array), 
+	  (movement_collect_p(move))?"collect":"update");
+
+    /* ALPHA_i's */
+    keep =
+	gen_nconc(make_list_of_dummy_variables
+		  (get_ith_array_dummy, array_dim), 
+		  keep);
+    
+    /* PHI_i's */
+    remove = 
+	gen_nconc(make_list_of_dummy_variables
+		  (get_ith_region_dummy, array_dim), 
+		  remove);
+
+    /* Keep parameters ! */
+    MAPL(ce,
+     {
+	 entity
+	     e = ENTITY(CAR(ce));
+	 string
+	     s = entity_module_name(e);
+
+	 if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
+	     keep = CONS(ENTITY, e, keep);
+     },
+	 try_remove);
+
+    /* others */
+    gen_remove(&try_remove, (chunk*) TCST);
+    MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, keep);
+    MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, try_keep);
+    MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, remove);
+    
+    /*
+     * Remove variables that have to be removed
+     */
+    MAPL(ce, {sc_projection(syst, (Variable) ENTITY(CAR(ce)));}, remove);
+    
+    /*
+     * Try to remove other unusefull variables
+     */
+    remove_variables_if_possible(&syst, try_remove);
+
+    /*
+     * the noisy system is cleaned
+     * some variables are not used, they are removed here.
+     */
+    sc_nredund(&syst);
+    base_rm(sc_base(syst));
+    sc_base(syst) = BASE_NULLE;
+    sc_creer_base(syst);
+
+    /*
+     * DEBUG
+     */
+    ifdebug(6)
+    {
+	fprintf(stderr, 
+	   "[clean_shared_io_system] resulting system for array %s:\n",
+		entity_local_name(array));
+	fprintf(stderr, "Result:\n");
+	sc_fprint(stderr, syst, entity_local_name);
+    }
+    
+    return(syst);
+}
+
 Psysteme clean_distributed_io_system(syst, array, move)
 Psysteme syst;
 entity array;
@@ -458,7 +720,7 @@ tag move;
 	remove = NIL,
 	try_remove = base_to_list(sc_base(syst));
 
-    debug(5, "clean_distributed_io_system", "array %s, action %s\n",
+    debug(5, "clean_distributed_io_system", "array %s, movement %s\n",
 	  entity_local_name(array), 
 	  (movement_collect_p(move))?"collect":"update");
 
@@ -487,19 +749,33 @@ tag move;
 	gen_nconc(make_list_of_dummy_variables
 		  (get_ith_array_dummy, array_dim), 
 		  keep);
-    
+
     /* LALPHA_i's */
     try_keep =
 	gen_nconc(make_list_of_dummy_variables
 		  (get_ith_local_dummy, array_dim), 
 		  try_keep);
     
+
+    /* Keep parameters ! */
+    MAPL(ce,
+     {
+	 entity
+	     e = ENTITY(CAR(ce));
+	 string
+	     s = entity_module_name(e);
+
+	 if (strcmp(s, HPFC_PACKAGE) && strcmp(s, REGIONS_MODULE_NAME))
+	     keep = CONS(ENTITY, e, keep);
+     },
+	 try_remove);
+
     /* others */
     gen_remove(&try_remove, (chunk*) TCST);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, try_keep);
     MAPL(ce, {gen_remove(&try_remove, ENTITY(CAR(ce)));}, remove);
-    
+
     /*
      * Remove variables that have to be removed
      */
@@ -508,38 +784,15 @@ tag move;
     /*
      * Try to remove other unusefull variables
      */
-    MAPL(ce, 
-     {
-	 Variable
-	     var = (Variable) ENTITY(CAR(ce));
-	 int
-	     coeff = 0;
-	 
-	 /*
-	  * Yi-Qing Stuff in ricedg is used
-	  */
-	 if ((void) eq_v_min_coeff(sc_egalites(syst), var, &coeff), coeff==1)
-	 {
-	     Pvecteur
-		 v = vect_new(var, 1);
-	     
-	     debug(7, "clean_distributed_io_system", "removing variable %s\n", 
-		   entity_local_name((entity) var));
-	     
-	     syst = sc_projection_optim_along_vecteur(syst, v);
-	     vect_rm(v);
-	 }
-     }, 
-	 try_remove);
+    remove_variables_if_possible(&syst, try_remove);
 
     /*
      * the noisy system is cleaned
      * some variables are not used, they are removed here.
      */
-    /* syst = sc_elim_redond(syst); */
     sc_nredund(&syst);
     base_rm(sc_base(syst));
-    sc_base(syst) = NULL;
+    sc_base(syst) = BASE_NULLE;
     sc_creer_base(syst);
 
     /*
@@ -571,20 +824,19 @@ tag move;
  * Other variables are (should be) the parameters, the processors,
  * and the variables to be used to scan polyhedron.
  */
-void put_variables_in_ordered_lists(syst, array, 
+void put_variables_in_ordered_lists(psyst, array, 
 				    plparam, plproc, plscan,
 				    plrebuild)
-Psysteme syst;
+Psysteme *psyst;
 entity array;
 list *plparam, *plproc, *plscan, *plrebuild;
 {
     int
-	processor_dim = 
-	    NumberOfDimension
-		(template_to_processors(array_to_template(array))),
+	processor_dim = (array_distributed_p(array) ?
+	    NumberOfDimension(array_to_processors(array)) : 0 ),
 	dim = -1;
     list
-	all = base_to_list(sc_base(syst)),
+	all = base_to_list(sc_base(*psyst)),
 	lparam = NIL,
 	lproc = NIL,
 	lscan = NIL,
@@ -626,7 +878,7 @@ list *plparam, *plproc, *plscan, *plrebuild;
      * scanners and deducables
      */
     lrebuild = 
-	simplify_deducable_variables(syst,
+	simplify_deducable_variables(*psyst,
 				     gen_nreverse(hpfc_order_variables(all)),
 				     &lscan);
 
@@ -670,17 +922,17 @@ list *plparam, *plproc, *plscan, *plrebuild;
     }
 
     /* syst = sc_elim_redond(syst); */
-    sc_nredund(&syst);
-    base_rm(sc_base(syst));
-    sc_base(syst) = NULL;
-    sc_creer_base(syst);
+
+    sc_nredund(psyst);
+    sc_base(*psyst) = (base_rm(sc_base(*psyst)), BASE_NULLE);
+    sc_creer_base(*psyst);
 
     ifdebug(4)
     {
 	fprintf(stderr, 
 		"[put_variables_in_ordered_lists] system for %s:\n",
 		entity_local_name(array));
-	sc_fprint(stderr, syst, entity_local_name);
+	sc_fprint(stderr, *psyst, entity_local_name);
     }
 }
 
@@ -811,6 +1063,12 @@ Psysteme *pcondition, *pproc_echelon, *ptile_echelon;
 	outer = entity_list_to_base(processors),
 	inner = entity_list_to_base(scanners);
 
+    ifdebug(8)
+	fprintf(stderr, "[hpfc_algorithm_tiling] initial system:\n"),
+	sc_fprint(stderr, syst, entity_local_name),
+	fprintf(stderr, "\n");
+	
+
     algorithm_tiling(syst, outer, inner, 
 		     pcondition, pproc_echelon, ptile_echelon);
 
@@ -853,6 +1111,23 @@ list l;
     return(result);
 }
 
+/* void hpfc_simplify_condition(psc, stat, move)
+ *
+ * remove conditions that are not usefull from *psc, i.e. that are
+ * redundent with pre/post conditions depending on when the movement is
+ * done
+ */
+void hpfc_simplify_condition(psc, stat, move)
+Psysteme *psc;
+statement stat;
+tag move;
+{
+    Psysteme
+	true = statement_context(stat, move),
+	cleared = non_redundent_subsystem(*psc, true);
+
+    *psc = (sc_rm(*psc), cleared);
+}
 
 /*
  * that's all
