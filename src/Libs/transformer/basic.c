@@ -217,16 +217,31 @@ transformer t;
     list args = transformer_arguments(t);
     bool consistent = TRUE;
 
+    /* The NewGen data structure must be fully defined */
     consistent = gen_defined_p(t);
 
+    /* The predicate must be weakly consistent. Every variable
+     * in the constraints must be in the basis (but not the other
+     * way round.
+     */
     consistent = consistent && sc_weak_consistent_p(sc);
 
+    /* If an old value appears in the predicate, the corresponding
+     * variable should be an argument of the transformer
+     */
     if(consistent) {
 	Pbase b = sc_base(sc);
 	Pbase t = BASE_UNDEFINED;
 
 	for( t = b; !BASE_UNDEFINED_P(t) && consistent; t = t->succ) {
 	    entity val = (entity) vecteur_var(t);
+	    /* FI: the next test is not safe because val can be
+	     * a global value not recognized in the current
+	     * context. old_value_entity_p() returns TRUE or FALSE
+	     * or pips_error.
+	     *
+	     * A general version of this routine is needed...
+	     */
 	    if(old_value_entity_p(val)) {
 		entity var = value_to_variable(val);
 
