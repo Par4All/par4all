@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/12/22 16:52:15 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/12/23 16:30:47 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -710,8 +710,8 @@ statement stat, *hoststatp, *nodestatp;
     entity
 	label=loop_label(the_loop),
 	index=loop_index(the_loop),
-	nindex=NewVariableForModule(node_module,index),
-	hindex=NewVariableForModule(host_module,index);
+	nindex=NewVariableForModule(node_module, index),
+	hindex=NewVariableForModule(host_module, index);
     expression
 	lower=range_lower(r),
 	upper=range_upper(r),
@@ -743,6 +743,12 @@ statement stat, *hoststatp, *nodestatp;
 		    make_execution(is_execution_sequential,UU),
 		    lNewVariableForModule(host_module,locals));
     }
+
+    ifdebug(8)
+    {
+	fprintf(stderr, "[hpfcompilesequentialloop] host stat:\n");
+	print_statement(*hoststatp);
+    }
     
     (*nodestatp)=MakeStatementLike(stat,
 				   is_instruction_loop,
@@ -756,6 +762,12 @@ statement stat, *hoststatp, *nodestatp;
 		  label,
 		  make_execution(is_execution_sequential,UU),
 		  lNewVariableForModule(node_module,locals));
+
+    ifdebug(8)
+    {
+	fprintf(stderr, "[hpfcompilesequentialloop] node stat:\n");
+	print_statement(*nodestatp);
+    }
 }
 
 
