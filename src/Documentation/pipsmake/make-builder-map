@@ -24,7 +24,7 @@ for func in $functions
 do
 #	echo $func
 	FUNC=`echo $func | tr a-z A-Z`
-	echo "extern void $func();" >>decl$$
+	echo "extern bool $func();" >>decl$$
 	echo "    { BUILDER_$FUNC, $func }," >>map$$
 done
 
