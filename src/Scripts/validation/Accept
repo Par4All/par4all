@@ -11,20 +11,16 @@
 # - cut used instead of awk
 # - theline variable added
 # - mv instead if ed used to update the results
+# - several files may be piped simultaneously
 #
 # SCCS Stuff:
-# $RCSfile: Accept,v $ ($Date: 1994/04/22 14:21:24 $, ) version $Revision$,
+# $RCSfile: Accept,v $ ($Date: 1994/07/15 19:23:53 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
 
-# tmp_mail=/tmp/accept.mail.$$
-# cat > $tmp_mail
-#  < $tmp_mail
-# sed '1,/^Validate Message:$/d' < $tmp_mail | \
-# sed -e "1,/${header}/d;s/^X//" | \
-# ed -s $result/$module
-# rm -f $tmp_mail
+header="Diff Commands for"
+pips_test_directory="$PIPSDIR/Tests/Validation"
 
 scriptname="`basename $0` ($Revision$)"
 
@@ -34,25 +30,26 @@ error()
   exit $1
 }
 
-pips_test_directory=/home/users/pips/Pips/Tests/Validation
-header="Diff Commands for"
 
-# here is the standard input considered
-theline=`sed -n "/^$header/p;/^$header/q"`
+sed -n "/^$header/p" |
+while read theline
+do
+  module=`echo $theline | cut -d' ' -f 4`
+  file=`echo $theline | cut -d' ' -f 6`
 
-module=`echo $theline | cut -d' ' -f 4`
-file=`echo $theline | cut -d' ' -f 6`
+  resultdir=`dirname $file`/`basename $file .f`.result
+  outfile=$resultdir/$module.out
+  reffile=$resultdir/$module
 
-resultdir=`dirname $file`/`basename $file .f`.result
-outfile=$resultdir/$module.out
-reffile=$resultdir/$module
+  [ -d $resultdir ] || error 1 "no $resultdir"
+  [ -f $outfile ] || error 2 "no $outfile"
 
-[ -d $resultdir ] || error 1 "no $resultdir"
-[ -f $outfile ] || error 2 "no $outfile"
+  echo "accepting for $file"
 
-rm -f $reffile
-mv $outfile $reffile
+  rm -f $reffile
+  mv $outfile $reffile
+done
 
 #
-# that's all
+# that is all
 #
