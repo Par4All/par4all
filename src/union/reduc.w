@@ -909,9 +909,11 @@ int   ofl_ctrl;
     C3_RETURN(IS_DJ, sl_append_system(NULL,sc_dup(systeme)));
 
   for( comp = in_pa->pcomp; comp != NULL; comp = comp->succ ) {
-    Psysteme ps = sc_dup(comp->psys);
-    if (ps == SC_UNDEFINED) 
+    Psysteme ps;
+    if (comp->psys == SC_UNDEFINED) 
       { sl_free(lcomp); C3_RETURN( IS_DJ, DJ_UNDEFINED ); }
+
+    ps = sc_dup(comp->psys);
 
     ps = sc_elim_redund_with_first_ofl_ctrl( systeme, ps, ofl_ctrl );
 
@@ -1140,7 +1142,7 @@ construit l'union des disjonctions {\tt dj1} et {\tt dj2} résultantes.
 if (pa1_filled) {
   /* take care of rule 2 */
   if (pa_full_p( pa2 )) pa1->psys = sc_dup( systeme );
-  else pa1->psys = sc_append( sc_dup(common_ps), systeme );
+  else pa1->psys = sc_safe_append( sc_dup(common_ps), systeme );
 
   C3_DEBUG("pa_path_to_few_disjunct", {
     fprintf(stderr, "pa1:\n");  
@@ -1155,7 +1157,7 @@ if (pa1_filled) {
 if (pa2_filled) {
   /* take care of rule 2 */
   if (pa_full_p( pa1 )) pa2->psys = sc_dup( systeme );
-  else pa2->psys = sc_append( sc_dup(common_ps_oppose), systeme );
+  else pa2->psys = sc_safe_append( sc_dup(common_ps_oppose), systeme );
 
   C3_DEBUG("pa_path_to_few_disjunct", {
     fprintf(stderr, "pa2:\n");  
