@@ -284,7 +284,7 @@ EndOfProcedure()
     parser_close_macros_support();
 
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, 
-			   strdup(module_local_name(CurrentFunction)), 
+			   module_local_name(CurrentFunction), 
 			   (char*) make_callees(called_modules));
     
     ifdebug(5) {
@@ -293,7 +293,7 @@ EndOfProcedure()
     }
 
     DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE, 
-			   strdup(module_local_name(CurrentFunction)), 
+			   module_local_name(CurrentFunction), 
 			   (char *)function_body);
 
     /* the current package is re-initialized */
@@ -303,7 +303,7 @@ EndOfProcedure()
     StaticArea = entity_undefined;
     reset_current_module_entity();
 
-    debug(8, "EndOfProcedure", "End for module %s\n", entity_name(CurrentFunction));
+    pips_debug(8, "End for module %s\n", entity_name(CurrentFunction));
 }
 
 
