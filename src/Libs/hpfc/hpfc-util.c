@@ -3,7 +3,7 @@
  *
  * Fabien Coelho, May 1993.
  *
- * $RCSfile: hpfc-util.c,v $ ($Date: 1996/04/02 14:35:28 $, )
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1996/04/02 14:58:57 $, )
  * version $Revision$
  */
 
@@ -771,7 +771,6 @@ references_aligned_p(reference r1, reference r2)
 
 /* removes IF (.TRUE.) THEN
  * and DO X=n, n
- * ??? memory leak...
  */
 
 DEFINE_LOCAL_STACK(current_stmt, statement)
@@ -785,6 +784,9 @@ static void test_rewrite(test t)
 
 	statement_instruction(current_stmt_head()) = 
 	    statement_instruction(test_true(t));
+
+	test_true(t) = statement_undefined;
+	free_test(t);
     }
     else if (ENTITY_FALSE_P(e))
     {	
@@ -792,6 +794,9 @@ static void test_rewrite(test t)
 
 	statement_instruction(current_stmt_head()) = 
 	    statement_instruction(test_false(t));
+
+	test_false(t) = statement_undefined;
+	free_test(t);
     }
 }
 
@@ -808,7 +813,10 @@ static void loop_rewrite(loop l)
 		         (entity_to_expression(loop_index(l)),
 			  copy_expression(range_lower(r))),
 	      CONS(STATEMENT, loop_body(l),
-		   NIL)));						    
+		   NIL)));
+
+	loop_body(l) = statement_undefined;
+	free_loop(l);
     }
 }
 
