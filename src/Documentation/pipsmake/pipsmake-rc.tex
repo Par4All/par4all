@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.33  2004/03/11 13:55:17  irigoin
+%% Phase/rule print_claire_code added, resource claire_printed_file added.
+%%
 %% Revision 1.32  2004/02/25 13:44:59  guerin
 %% Update pipsmake-rc definition for PHRASE_DISTRIBUTOR_CONTROL_CODE
 %%
@@ -578,7 +581,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2004/02/25 13:44:59 $~$
+$~$Date: 2004/03/11 13:55:17 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -6815,6 +6818,39 @@ be viewed as a Smalltalk pretty-printer of a subset of Fortran.
 alias print_code_smalltalk 'Smalltalk Pretty-Printer'
 
 print_code_smalltalk        > MODULE.smalltalk_code_file
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
+
+\subsection{Prettyprinter for CLAIRE}
+\label{subsection-prettyprinter-claire}
+\index{Prettyprinter Claire}
+\index{DREAM-UP}
+
+This pass is used for the DREAM-UP project. The internal representation of
+a C or Fortran program is dumped as CLAIRE objects, either DATA\_ARRAY or
+TASK. CLAIRE is an object-oriented language used to develop constraint
+solvers.
+
+The only type constructor is array. Basic types must be storable on a
+fixed number of bytes.
+
+The code structure must be a sequence of loop nests. Loops must be
+perfectly nested and parallel. Each loop body must be a single array
+assignment. The right-hand side expression must be a function call.
+
+If the input code does not meet these conditions, a user error is generated.
+
+%%@UserManualDocumentation: print_claire_code
+This pass is used in the DREAM-UP project for specification input and
+transformation. This function can be viewed as a CLAIRE pretty-printer of
+a subset of Fortran.
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+alias print_claire_code 'Claire Pretty-Printer'
+
+print_claire_code        > MODULE.claire_printed_file
         < PROGRAM.entities
         < MODULE.code
 \end{verbatim}
