@@ -18,7 +18,8 @@
 
 #include "transformer.h"
 
-transformer transformer_dup(t_in)
+transformer 
+transformer_dup(t_in)
 transformer t_in;
 {
     /* I should use gen_copy_tree but directly Psysteme is not yet properly
@@ -40,13 +41,15 @@ transformer t_in;
 }
 
 
-void transformer_free(t)
+void 
+transformer_free(t)
 transformer t;
 {
     free_transformer(t);
 }
 
-void old_transformer_free(t)
+void 
+old_transformer_free(t)
 transformer t;
 {
     /* I should use gen_free directly but Psysteme is not yet properly
@@ -67,7 +70,8 @@ transformer t;
     /* end of DRET demo */
 }
 
-transformer transformer_identity()
+transformer 
+transformer_identity()
 {
     /* return make_transformer(NIL, make_predicate(SC_RN)); */
     /* en fait, on voudrait initialiser a "liste de contraintes vide" */
@@ -76,13 +80,15 @@ transformer transformer_identity()
 						   CONTRAINTE_UNDEFINED))); 
 }
 
-transformer transformer_empty()
+transformer 
+transformer_empty()
 {
     return make_transformer(NIL,
 			    make_predicate(sc_empty(BASE_NULLE)));
 }
 
-bool transformer_identity_p(t)
+bool 
+transformer_identity_p(t)
 transformer t;
 {
     /* no variables are modified; no constraints exist on their values */
@@ -109,7 +115,8 @@ transformer t;
  * Pvecteur incr should not be used after a call to transformer_add_index
  * because it is shared by t and modified
  */
-transformer transformer_add_loop_index(t, i, incr)
+transformer 
+transformer_add_loop_index(t, i, incr)
 transformer t;
 entity i;
 Pvecteur incr;
@@ -133,15 +140,14 @@ Pvecteur incr;
     return t;
 }
 
-transformer transformer_constraint_add(tf, i, equality)
+transformer 
+transformer_constraint_add(tf, i, equality)
 transformer tf;
 Pvecteur i;
 bool equality;
 {
     Pcontrainte c;
     Psysteme sc; 
-    Pbase old_basis;
-    Pbase new_basis;
 
     pips_assert("transformer_constraint_add", tf != transformer_undefined
 		&& tf != (transformer) NULL);
@@ -156,40 +162,29 @@ bool equality;
     c = contrainte_make(i);
     sc = (Psysteme) predicate_system(transformer_relation(tf));
 
-    if(equality)
-	sc_add_egalite(sc,c)
-    else
-	sc_add_inegalite(sc,c)
-
-    /* maintain consistency, although it's expensive; how about a
-       sc_update_base function? Or a proper sc_add_inegalite function? */
-    old_basis = sc->base;
-    sc->base = (Pbase) VECTEUR_NUL;
-    sc_creer_base(sc);
-    new_basis = sc->base;
-    sc->base = base_union(old_basis, new_basis);
-    sc->dimension = base_dimension(sc->base);
-    base_rm(new_basis);
-    base_rm(old_basis);
+    sc = sc_constraint_add(sc, c, equality);
 
     return tf;
 }
 
-transformer transformer_inequality_add(tf, i)
+transformer 
+transformer_inequality_add(tf, i)
 transformer tf;
 Pvecteur i;
 {
     return transformer_constraint_add(tf, i, FALSE);
 }
 
-transformer transformer_equality_add(tf, i)
+transformer 
+transformer_equality_add(tf, i)
 transformer tf;
 Pvecteur i;
 {
     return transformer_constraint_add(tf, i, TRUE);
 }
 
-transformer transformer_equalities_add(tf, eqs)
+transformer 
+transformer_equalities_add(tf, eqs)
 transformer tf;
 Pcontrainte eqs;
 {
@@ -205,7 +200,8 @@ Pcontrainte eqs;
     return tf;
 }
 
-bool transformer_consistency_p(t)
+bool 
+transformer_consistency_p(t)
 transformer t;
 {
     /* the relation should be consistent 
@@ -235,6 +231,8 @@ transformer t;
      * way round.
      */
     consistent = consistent && sc_weak_consistent_p(sc);
+    if(!consistent)
+	debug(1, "transformer_consistency_p", "sc is not weekly consistent\n");
 
     /* If an old value appears in the predicate, the corresponding
      * variable should be an argument of the transformer
@@ -256,9 +254,17 @@ transformer t;
 		entity var = value_to_variable(val);
 
 		consistent = entity_is_argument_p(var, args);
+		if(!consistent)
+		    debug(1, "transformer_consistency_p",
+			  "Old value of % s in sc but not in arguments\n",
+			  entity_name(var));
 	    }
 	    /* The constant term should not appear in the basis */
-	    consistent = consistent && !term_cst(t);
+	    if(consistent) {
+		consistent = consistent && !term_cst(t);
+		if(!consistent)
+		    debug(1, "transformer_consistency_p", "TCST in sc basis\n");
+	    }
 	}
     }
 
@@ -267,6 +273,8 @@ transformer t;
 	MAP(ENTITY, e, {
 	    consistent = consistent && (e != (entity) TCST);
 	}, args);
+	if(!consistent)
+	    debug(1, "transformer_consistency_p", "TCST appears in arguments\n");
     }
 
     /* FI: let the user react and print info before core dumping */
