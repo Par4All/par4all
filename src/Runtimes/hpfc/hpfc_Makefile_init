@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1997/01/18 09:43:45 $, )
+# ($Date: 1997/01/18 11:51:29 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a NAME macro is expected somewhere...
@@ -182,10 +182,12 @@ STRIP	= :
 # QSUB...
 #
 all:	$(NAME).qsub
+main:	$(NAME).qsub
 endif
 
 # LoadLeveller...
 $(NAME).cmd:;	$(RT_DIR)/hpfc_llcmd -n $(NAME)
+# QNS...
 $(NAME).qsub:; $(RT_DIR)/hpfc_qsub $(NAME) > $@
 
 RUNTIME_LIBS	+= -lhpfcruntime
@@ -259,7 +261,7 @@ $(pvmbin)/%: % $(pvmbin); $(COPY) $< $@
 hostnode: host node
 host: $(HOST) 
 node: $(NODE)
-main: $(MAIN) $(NAME).qsub
+main: $(MAIN)
 out: $(RTEST)
 
 install_main: $(pvmbin)/$(MAIN)
