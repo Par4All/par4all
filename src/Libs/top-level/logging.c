@@ -3,6 +3,8 @@
 #include "genC.h"
 #include "misc.h"
 #include "database.h"
+#include "pipsdbm.h"
+#include "properties.h"
 
 #define LOG_FILE "LOGFILE"
 /* The log file is closed by default */
