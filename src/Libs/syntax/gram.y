@@ -48,6 +48,7 @@
   *  - remove complex constant detection because this conflicts with
   *    IO statements
   */
+
 %type <chain>	        latom
 %type <dimension>	dim_tableau
 %type <entity>		icon
@@ -133,8 +134,8 @@
 
 #include "syntax.h"
 
-/* should not appear! */
 extern int yylex(void);
+extern void yyerror(char *);
 
     /* local variables */
     int ici; /* to count control specifications in IO statements */
@@ -298,12 +299,12 @@ inst_spec: parameter_inst
 	| implicit_inst
 	| dimension_inst
 	| equivalence_inst
-	| common_inst
+	| full_common_inst
 	| type_inst
 	| external_inst
 	| intrinsic_inst
 	| save_inst
-	| data_inst
+	| full_data_inst
 	;
 
 inst_exec: format_inst
@@ -648,6 +649,7 @@ external_inst: TK_EXTERNAL global_entity_name
 	;
 
 type_inst: fortran_type declaration
+	{}
 	| type_inst TK_COMMA declaration
 	;
 
@@ -729,6 +731,10 @@ dim_tableau: expression
 	    }
 	;
 
+full_common_inst: common_inst
+	{}
+	;
+
 common_inst: common declaration
 	    { 
 		$$ = MakeCommon(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
@@ -806,6 +812,10 @@ dimension: TK_DIMENSION
 	    {
 		CurrentType = type_undefined;
 	    }
+	;
+
+full_data_inst: data_inst
+	    {}
 	;
 
 data_inst: TK_DATA ldatavar TK_SLASH ldataval TK_SLASH
