@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1995/10/10 11:38:18 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1995/12/19 15:52:36 $, )
  * version $Revision$,
  */
 
@@ -50,8 +50,8 @@ tag return_type;
 				 MakeOverloadedResult()));
 }
 
-expression pvm_what_option_expression(v)
-entity v;
+expression 
+pvm_what_option_expression(entity v)
 {
     pips_assert("variable", entity_variable_p(v));
 
@@ -171,20 +171,18 @@ reference ref;
 			  NIL));
 }
 
-/*
- * expr_compute_local_index
- *
- * new index computation formula, derived from the new declarations
+/* new index computation formula, derived from the new declarations
  * made for the given dimension.
  */
-expression expr_compute_local_index(array, dim, expr)
-entity array;
-int dim;
-expression expr;
+expression 
+expr_compute_local_index(
+    entity array,
+    int dim,
+    expression expr)
 {
     if (get_bool_property("HPFC_EXPAND_COMPUTE_LOCAL_INDEX"))
     {
-	tag newdecl = new_declaration(array, dim);
+	tag newdecl = new_declaration_tag(array, dim);
 	dimension the_dim = entity_ith_dimension(array, dim);
         
 	switch(newdecl)
@@ -193,19 +191,17 @@ expression expr;
 	    return(expr);
 	case is_hpf_newdecl_alpha:
 	{
-	    int
-		dl = HpfcExpressionToInt(dimension_lower(the_dim));
-	    expression
-		shift = int_to_expression(1 - dl);
+	    int	dl = HpfcExpressionToInt(dimension_lower(the_dim));
+	    expression shift = int_to_expression(1 - dl);
 	    
 	    return(MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME), 
 				  expr, shift));
 	}
 	case is_hpf_newdecl_beta:
 	{
-	    align a = load_entity_align(array);
+	    align a = load_hpf_alignment(array);
 	    entity template = align_template(a);
-	    distribute d = load_entity_distribute(template);
+	    distribute d = load_hpf_distribution(template);
 	    alignment al = FindAlignmentOfDim(align_alignment(a), dim);
 	    int tempdim = alignment_templatedim(al), procdim;
 	    dimension template_dim = FindIthDimension(template,tempdim);
