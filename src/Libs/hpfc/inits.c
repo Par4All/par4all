@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: inits.c,v $
+ * Revision 1.26  1998/04/14 20:36:02  coelho
+ * bug--
+ *
  * Revision 1.25  1998/04/02 20:36:09  irigoin
  * Call to NumberOfElements() replaced by call to element_number()
  *
@@ -292,18 +295,18 @@ entity module;
 	     case is_hpf_newdecl_delta:
 	     {
 		 int tdim = alignment_templatedim(a);
-		 int rate = HpfcExpressionToInt(alignment_rate(a));
-		 int cst  = HpfcExpressionToInt(alignment_constant(a));
-		 int param = HpfcExpressionToInt(distribution_parameter(d));
 		 int procdim = 0;
-		 int sc;
-		 int no;
-		 int shift;
-		 int chck;		      
 		 distribution
 		     d = FindDistributionOfDim(distribute_distribution(di), 
 					       tdim,
 					       &procdim);
+		 int rate = HpfcExpressionToInt(alignment_rate(a));
+		 int cst  = HpfcExpressionToInt(alignment_constant(a));
+		 int param = HpfcExpressionToInt(distribution_parameter(d));
+		 int sc;
+		 int no;
+		 int shift;
+		 int chck;		      
 		 dimension 
 		     templdim = FindIthDimension(template, tdim);
 		 entity
