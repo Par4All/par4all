@@ -43,6 +43,7 @@
 #include "resources.h"
 #include "ri-util.h"
 #include "text-util.h"     /* print_text */
+#include "effects.h"
 #include "misc.h"
 #include "constants.h"     /* IMPLIED_DO_NAME is defined there */
 #include "properties.h"    /* get_string_property is defined there */
