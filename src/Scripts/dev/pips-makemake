@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/08/13 17:20:20 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/08/20 17:27:42 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -36,7 +36,7 @@ help()
 	 - default:
  	   SOURCES
 	   SCRIPTS (runable files)
-	   INSTALL_{INC,LIB,BIN,DOC,SHR,UTL} files to be installed
+	   INSTALL_{INC,LIB,BIN,DOC,HTM,SHR,UTL} files to be installed
 	Many default macros are defined and may be overwritten.
 	Many rules are also defined.
 	END_OF_HELP
@@ -135,6 +135,7 @@ install_bin_dir='$(PIPS_ROOT)/Bin'
 install_src_dir='$(PIPS_ROOT)/Src'
 install_shr_dir='$(PIPS_ROOT)/Share'
 install_doc_dir='$(PIPS_ROOT)/Doc'
+install_htm_dir='$(PIPS_ROOT)/Doc/Html'
 install_rtm_dir='$(PIPS_ROOT)/Runtime' ;
 
 install_utl_dir='$(PIPS_UTILDIR)'
@@ -153,6 +154,7 @@ case $DIRTYPE in
            install_bin_dir='$(LINEAR_ROOT)/Bin' ;
            install_lib_dir='$(LINEAR_ROOT)/Lib' ;
 	   install_doc_dir='$(LINEAR_ROOT)/Doc' ;
+	   # install_htm_dir='$(LINEAR_ROOT)/Doc/Html' ;
 	   install_utl_dir='$(LINEAR_ROOT)/Share' ;
 	   install_shr_dir='$(LINEAR_ROOT)/Share';
 	   install_rtm_dir='$(LINEAR_ROOT)/Runtime' ;;
@@ -162,6 +164,7 @@ case $DIRTYPE in
            install_inc_dir='$(NEWGEN_ROOT)/Include' ;
            install_bin_dir='$(NEWGEN_ROOT)/Bin' ;
 	   install_doc_dir='$(NEWGEN_ROOT)/Doc' ;
+	   # install_htm_dir='$(NEWGEN_ROOT)/Doc/Html' ;
 	   install_utl_dir='$(NEWGEN_ROOT)/Share' ;
            install_lib_dir='$(NEWGEN_ROOT)/Lib' ;
 	   install_shr_dir='$(NEWGEN_ROOT)/Share' ;
@@ -182,7 +185,8 @@ dir_real_name=`basename $current_directory`
 dir_simple_name=`echo $dir_real_name | tr '-' '_'`
 
 # type sed
-target_dir=`echo "$current_directory" | sed 's,.*/Development/,,'`
+target_dir=`echo "$current_directory" | 
+    sed 's,.*/Development/,,;s,.*/Production/Src/,,;'`
 
 echo "Making $DIRTYPE $PART $MAKEFILE in $dir_real_name ($DIRSIDE $target_dir)"
 
@@ -233,6 +237,7 @@ ARCH=		$(PIPS_ARCH)
 INSTALL_INC_DIR= ${install_inc_dir}
 INSTALL_SHR_DIR= ${install_shr_dir}
 INSTALL_DOC_DIR= ${install_doc_dir}
+INSTALL_HTM_DIR= ${install_htm_dir}
 INSTALL_UTL_DIR= ${install_utl_dir}
 INSTALL_RTM_DIR= ${install_rtm_dir}
 INSTALL_LIB_DIR= ${install_lib_dir}/$(ARCH)
@@ -258,7 +263,8 @@ recompile: generate_makefile_if_necessary_and_possible
 #
 full-clean: clean clean-all-compiled
 clean-all-compiled: 
-	-for d in $(PIPS_ALL_ARCH) ; do \\
+	-for d in \`echo $(PIPS_ROOT)/Include/makefile_macros.* | \\
+		sed 's,[-_a-zA-z0-9/]*/makefile_macros\.,,g'\`; do \\
 	  test -d \$\$d && { \\
 	    echo "cleaning \$\$d"; \\
 	    $(RM) \$\$d/*.[oa] \$\$d/*pips Makefile.depend.\$\$d; \\
@@ -271,8 +277,10 @@ get:; sccs get SCCS
 # .PHONY is a gnu extension...
 .PHONY: install all depend header recompile clobber count info delta
 .PHONY: generate_makefile_if_necessary_and_possible
-# to override SUN's default rule
+# to override SUN/GNU default rule
 .SCCS_GET:
+# %:SCCS/s.%:
+.SUFFIXED: .tex .dvi .ps .c .h .o .w .a .html
 # .INIT is a SUN extension...
 .INIT: 
 check_install:
@@ -281,13 +289,14 @@ check_install:
 #
 $(ARCH):; mkdir $(ARCH)
 #
+include $(${PART}_ROOT)/Include/define_libraries
 include $(${PART}_ROOT)/Include/makefile_macros.$(ARCH)
 include $CONFIG_FILE
 #
 # prefixed objects:
 LIB_OBJECTS:=$(addprefix $(ARCH)/, $(LIB_OBJECTS))
 #
-# {C,CPP,LD,L,Y}opt macros allow to *add* things from the command line
+# {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
 # a typical interesting example is to put -pg in {C,LD}OPT
 #
@@ -306,6 +315,26 @@ PROTOIZE=	$(PROTO) $(PRFLAGS) -E "$(PREPROC)"
 $(ARCH)/%.o:	%.c 
 	$(COMPILE) \$< -o \$@
 #
+# if LATEX, MAKEIDX, LX2HTML or DVIPS are not avaible, 
+# the following rules would not prevent compilation...
+%.dvi: %.tex
+	touch \$*.ind
+	$(LATEX) \$<
+	test -f \$*.idx && { $(MAKEIDX) \$*.idx ; $(LATEX) \$< ; }
+	$(LATEX) \$<
+	touch \$@
+#
+%.ps: %.dvi
+	$(DVIPS) -o \$@ \$<
+	touch \$@
+#
+%.html: %.tex
+	$(RM) -r \$* \$@
+	mkdir \$*
+	$(LX2HTML) \$<
+	chmod -R a+r-wx \$*/*
+	chmod a+rx-w \$*
+	ln -s \$*/\$@ \$@
 # MISC
 .runable: $(SCRIPTS)
 	-[ "$(SCRIPTS)" ] && chmod a+rx $(SCRIPTS)
@@ -359,7 +388,7 @@ $(LIB_TARGET): $(LIB_OBJECTS) $(TARGET_OBJECTS)
 CFILES=		$(LIB_CFILES)
 OBJECTS=	$(LIB_OBJECTS)
 INCLUDES=	$(LIB_HEADERS)
-SOURCES+= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES) $(DOCS)
+SOURCES+= 	$(INCLUDES) $(CFILES) $(DOCS)
 #
 
 %
@@ -372,7 +401,7 @@ SOURCES+= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES) $(DOCS)
 CFILES=		$(MAIN).c $(LIB_CFILES)
 OBJECTS=	$(MAIN).o $(LIB_OBJECTS)
 INCLUDES=	$(LIB_HEADERS)
-SOURCES+= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES) $(DOCS)
+SOURCES+= 	$(INCLUDES) $(CFILES) $(DOCS)
 #
 
 test: all
@@ -427,14 +456,14 @@ INC_CFILES += $(LIB_CFILES)
 # a little bit rough...
 #
 $(ARCH)/$(TARGET): $(ARCH)/lib$(TARGET).a \\
-	$(PIPS_LIBDIR)/$(ARCH)/*.a \\
-	$(LINEAR_LIBDIR)/$(ARCH)/*.a \\
-	$(NEWGEN_LIBDIR)/$(ARCH)/*.a
+	$(PIPS_ROOT)/Lib/$(ARCH)/*.a \\
+	$(LINEAR_ROOT)/Lib/$(ARCH)/*.a \\
+	$(NEWGEN_ROOT)/Lib/$(ARCH)/*.a
 #
 CFILES=		$(LIB_CFILES)
 OBJECTS=	$(LIB_OBJECTS)
 INCLUDES=	$(LIB_HEADERS)
-SOURCES+= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES) $(DOCS)
+SOURCES+= 	$(INCLUDES) $(CFILES) $(DOCS)
 #
 
 $(PIPS_BINDIR):
@@ -452,6 +481,16 @@ clean: clean-compiled
 		$(DERIVED_FILES) *.~[0-9]~ core
 
 INC_CFILES += $(LIB_CFILES)
+
+%
+
+
+##############################################################################
+
+[ $DIRTYPE = 'Default' ] && cat >> $MAKEFILE <<% 
+
+clean:
+	$(RM) core *~
 
 %
 
@@ -504,6 +543,8 @@ recompile: $(PIPS_BINDIR)/$(BIN_TARGET)
 
 cat >> $MAKEFILE <<%
 
+ALL_SOURCES =	$(SOURCES) $(CONFIG_FILE)
+
 $(TARGET_DIR):
 	mkdir $(TARGET_DIR)
 
@@ -514,13 +555,14 @@ check_os:
 	fi
 
 .quick-install: $(INSTALL_INC) $(INSTALL_LIB) $(INSTALL_BIN) $(INSTALL_SHR) \
-	$(INSTALL_DOC) $(INSTALL_UTL) $(INSTALL_RTM) 
+	$(INSTALL_DOC) $(INSTALL_UTL) $(INSTALL_RTM) $(INSTALL_HTM) 
 	#
 	# installing files where needed
 	# 
 	# plain files
 	@pips_install_file -f $(INSTALL_INC_DIR) $(INSTALL_INC) 
 	@pips_install_file -f $(INSTALL_DOC_DIR) $(INSTALL_DOC) 
+	@pips_install_file -f $(INSTALL_HTM_DIR) $(INSTALL_HTM) 
 	@pips_install_file -f $(INSTALL_UTL_DIR) $(INSTALL_UTL) 
 	@pips_install_file -f $(INSTALL_SHR_DIR) $(INSTALL_SHR)
 	@pips_install_file -f $(INSTALL_RTM_DIR) $(INSTALL_RTM)
@@ -531,7 +573,7 @@ check_os:
 	touch .quick-install
 
 tar:
-	$(TAR) cf $(TARGET).tar $(SOURCES) Makefile
+	$(TAR) cf $(TARGET).tar $(ALL_SOURCES) Makefile
 	$(ZIP) $(TARGET).tar
 
 quick-install: .quick-install
@@ -548,7 +590,7 @@ generate_makefile_if_necessary_and_possible:
 		$(MAKE) $(GMKNODIR)  .makefile 
 
 count:
-	@wc -l $(SOURCES)
+	@wc -l $(ALL_SOURCES)
 
 #
 # some quick entries for SCCS:
@@ -570,7 +612,7 @@ delta:
 #
 # print out the files for a release...
 FWD_ROOT=.
-RELEASE+= $(SOURCES) $(DEDUCED_CFILES) $(DEDUCED_HEADERS) Makefile
+RELEASE+= $(ALL_SOURCES) $(DEDUCED_CFILES) $(DEDUCED_HEADERS) Makefile
 
 release:
 	@for f in $(RELEASE) ; do echo $(FWD_ROOT)/\$\$f ; done
@@ -591,13 +633,13 @@ check_sccs:
 
 # install installs sources, so depends on sources. FC
 # to insure the library is compiled before hand, a make is added.
-.install: $(SOURCES) check_install check_sccs
+.install: $(ALL_SOURCES) check_install check_sccs
 	$(MAKE) $(GMKNODIR) all $(TARGET_DIR) 
 	@echo ""; echo; echo -n "Description of changes: " ; \\
 	read comments ; \\
 	install_pips_sources \\
 		-rv -s \`pwd\` -t $(TARGET_DIR) -y "\$\$comments" \\
-		$(SOURCES)
+		$(ALL_SOURCES)
 	-@cd $(TARGET_DIR) ; pips-makemake $PIPSMKMK_OPTION -P
 	touch .install
 	$(MAKE) quick-install
@@ -608,7 +650,7 @@ install:  .install
 # diff between dev and prod sources:
 
 diff:
-	-@for f in $(SOURCES) ; \\
+	-@for f in $(ALL_SOURCES) ; \\
 	do \\
 	  echo "DIFFERENCES BETWEEN DEV AND PROD FOR \$\$f:" ; \\
 	  $(DIFF) \$\$f $(TARGET_DIR)/\$\$f ; \\
@@ -727,7 +769,7 @@ touch .makefile
 
 ### force dependence list generation
 rm -f $MAKEFILE.depend* .depend
-$PIPS_MAKE depend
+${PIPS_MAKE:-gmake} depend
 
 ### end good case
 echo
