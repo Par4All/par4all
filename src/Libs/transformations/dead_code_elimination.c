@@ -143,7 +143,7 @@ discard_statement_and_save_label_and_comment(statement s)
     statement_instruction(s) = make_instruction_block(NIL);
 
     /* Since the RI need to have no label on instruction block: */
-    fix_label_and_comment_in_empty_block(s);
+    fix_sequence_statement_attributes(s);
  
     return FALSE;
 }
@@ -190,7 +190,7 @@ remove_loop_statement(statement s, instruction i, loop l)
                                 CONS(STATEMENT, loop_body(l), NIL)));
   statement_label(as) = statement_label(s);
   statement_label(s) = entity_empty_label();
-  fix_label_and_comment_in_empty_block(s);
+  fix_sequence_statement_attributes(s);
 
   if (get_debug_level() >= 4) {
     print_text(stderr, text_statement(get_current_module_entity(), 0, s));
@@ -319,7 +319,7 @@ remove_dead_loop(statement s, instruction i, loop l)
 				NIL));
   statement_label(as) = statement_label(s);
   statement_label(s) = entity_empty_label();
-  fix_label_and_comment_in_empty_block(s);
+  fix_sequence_statement_attributes(s);
 
   ifdebug(9) {
       debug(9, "remove_dead_loop", "New value of statement\n");
@@ -361,7 +361,7 @@ remove_if_statement_according_to_write_effects(statement s,
    else {
       /* There is no write effect, the statement can be discarded: */
       statement_instruction(s) = make_instruction_block(NIL);
-      fix_label_and_comment_in_empty_block(s);
+      fix_sequence_statement_attributes(s);
       
       if (this_test_is_unstructured_p)
 	  dead_code_unstructured_if_removed++;
