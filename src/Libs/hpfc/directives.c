@@ -1,10 +1,8 @@
 /*
  * HPFC module by Fabien COELHO
  *
- * SCCS stuff:
- * $RCSfile: directives.c,v $ ($Date: 1995/03/13 11:56:31 $, ) version $Revision$,
- * got on %D%, %T%
- * $Id$
+ * $RCSfile: directives.c,v $ ($Date: 1995/03/22 10:57:05 $, )
+ * version $Revision$,
  */
 
 #include <stdio.h>
@@ -29,6 +27,7 @@ extern system();
 #include "pipsdbm.h"
 #include "resources.h"
 #include "bootstrap.h"
+#include "control.h"
 
 #include "hpfc.h"
 #include "defines-local.h"
@@ -48,16 +47,23 @@ extern type MakeTypeVoid();
  *   UTILITIES
  *
  */
+DEFINE_LOCAL_STACK(current_stmt, statement);
+
 /* recognize an hpf directive special entity.
  * (the prefix of which is HPF_PREFIX, as a convention)
  */
-static bool hpf_directive_entity_p(e)
+bool hpf_directive_string_p(s)
+string s;
+{
+    int len = strlen(HPF_PREFIX);
+    return(strncmp(HPF_PREFIX, s, len)==0);
+}
+
+bool hpf_directive_entity_p(e)
 entity e;
 {
-    string name = entity_local_name(e);
-    int len = strlen(HPF_PREFIX);
-
-    return(top_level_entity_p(e) && strncmp(HPF_PREFIX, name, len)==0);
+    return(top_level_entity_p(e) && 
+	   hpf_directive_string_p(entity_local_name(e)));
 }
 
 /* look for hpf directives thru the AST and handle them.
@@ -84,6 +90,22 @@ expression e;
     return(reference_variable(expression_to_reference(e)));
 }
 
+static list expression_list_to_entity_list(l)
+list /* of expressions */ l;
+{
+    list /* of entities */ n = NIL;
+
+    MAPL(ce,
+     {
+	 n = CONS(ENTITY, 
+		  expression_to_entity(EXPRESSION(CAR(ce))), 
+		  n);
+     },
+	 l);
+    
+    return(n);		 
+}
+
 static void switch_basic_type_to_overloaded(e)
 entity e;
 {
@@ -98,6 +120,8 @@ expression e;
     entity p = expression_to_entity(e);
     switch_basic_type_to_overloaded(p);
     set_processor(p);
+
+    debug(3, "new_processor", "entity is %s\n", entity_name(p));
 }
 
 static void new_template(e)
@@ -106,6 +130,8 @@ expression e;
     entity t = expression_to_entity(e);
     switch_basic_type_to_overloaded(t);
     set_template(t);
+
+    debug(3, "new_template", "entity is %s\n", entity_name(t));
 }
 
 /*-----------------------------------------------------------------
@@ -116,7 +142,7 @@ expression e;
  *  FALSE if the dimension is replicated. 
  */
 static bool alignment_p(align_src, subscript, padim, prate, pshift)
-list align_src;
+list /* of expressions */ align_src;
 expression subscript;
 int *padim;
 Value *prate, *pshift;
@@ -210,6 +236,7 @@ reference alignee, temp;
 	}
     }
     
+    set_array_as_distributed(array);
     store_entity_align(array, make_align(aligns, template));
 }
 
@@ -239,15 +266,15 @@ list *pl;
     message_assert("invalid distribution format", 
 		   hpf_directive_entity_p(function));
 
-    name = entity_local_name(e);
+    name = entity_local_name(function);
     
-    if (strcmp(name, HPF_PREFIX BLOCK_SUFFIX)==0)
+    if (same_string_p(name, HPF_PREFIX BLOCK_SUFFIX))
 	return(is_style_block);
     else 
-    if (strcmp(name, HPF_PREFIX CYCLIC_SUFFIX)==0)
+    if (same_string_p(name, HPF_PREFIX CYCLIC_SUFFIX))
 	return(is_style_cyclic);
     else
-    if (strcmp(name, HPF_PREFIX STAR_SUFFIX)==0)
+    if (same_string_p(name, HPF_PREFIX STAR_SUFFIX))
 	return(is_style_none);
     else
 	user_error("distribution_format", "invalid");
@@ -361,6 +388,8 @@ list args;
     assert(gen_length(args)>=2);
     template = expression_to_reference(EXPRESSION(CAR(last)));
 
+    normalize_all_expressions_of(i);
+
     for(; args!=last; args=CDR(args))
 	one_align_directive(expression_to_reference(EXPRESSION(CAR(args))), 
 			    template);
@@ -379,6 +408,8 @@ list args;
     assert(gen_length(args)>=2);
     proc = expression_to_reference(EXPRESSION(CAR(last)));
 
+    normalize_all_expressions_of(i);
+
     for(; args!=last; args=CDR(args))
        one_distribute_directive(expression_to_reference(EXPRESSION(CAR(args))), 
 				proc);
@@ -390,11 +421,64 @@ list args;
  *
  * namely INDEPENDENT and NEW directives.
  */
-static void handle_independent_directive(i, args)
-instruction i;
-list args;
+/* ??? I wait for the next statements in a particular order, what
+ * should not be necessary. Means I should deal with independent 
+ * directives on the PARSED_CODE rather than after the controlized.
+ */
+static void handle_independent_directive(i0, args)
+instruction i0;
+list /* of expressions */ args;
 {
+    list /* of entities */ l = expression_list_to_entity_list(args);
+    statement s;
+    instruction i;
+    loop o;
+    entity index;
+
+    debug(2, "handle_independent_directive", "%d index(es)\n", gen_length(l));
+
+    init_ctrl_graph_travel(current_stmt_head(), gen_true);
     
+    while(next_ctrl_graph_travel(&s))
+    {
+	i = statement_instruction(s);
+	
+	if (instruction_loop_p(i))  /* what we're looking for */
+	{
+	    o = instruction_loop(i);
+	    index = loop_index(o);
+
+	    if (ENDP(l)) /* simple independent case */
+	    {
+		debug(3, "handle_independent_directive", "parallel loop\n");
+
+		execution_tag(loop_execution(o)) = is_execution_parallel;
+		close_ctrl_graph_travel();
+		return;
+	    }
+	    /*  else general independent case
+	     */
+	    if (gen_find_eq(index, l)==index)
+	    {
+		debug(3, "handle_independent_directive", 
+		      "parallel loop (%s)\n", entity_name(index));
+
+		execution_tag(loop_execution(o)) = is_execution_parallel;
+		gen_remove(&l, index);
+
+		if (ENDP(l)) /* the end */
+		{
+		    close_ctrl_graph_travel();
+		    return;
+		}
+	    }
+	    /*  else I should not be here ???
+	     */
+	}
+    }
+    
+    pips_error("handle_independent_directive", "no loop!\n");
+    close_ctrl_graph_travel();
 }
 
 static void handle_new_directive(i, args)
@@ -501,10 +585,31 @@ instruction i;
     return(TRUE);
 }
 
+static bool stmt_filter(s)
+statement s;
+{
+    current_stmt_push(s);
+    return(TRUE);
+}
+
+static void stmt_rewrite(s)
+statement s;
+{
+    (void) current_stmt_pop();
+}
+
 void handle_hpf_directives(s)
 statement s;
 {
+    make_current_stmt_stack();
+
     gen_multi_recurse(s,
+		      /*
+		       *  STATEMENT
+		       */
+		      statement_domain,
+		      stmt_filter,
+		      stmt_rewrite,
 		      /*
 		       * INSTRUCTION (I don't want the calls in expressions)
 		       */
@@ -512,6 +617,9 @@ statement s;
 		      directive_filter,
 		      gen_null,
 		      NULL);
+
+    assert(current_stmt_empty_p());
+    free_current_stmt_stack();
 }
 
 /* that is all
