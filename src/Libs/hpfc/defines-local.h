@@ -3,6 +3,10 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.73  1998/06/03 08:36:26  zory
+ * remove conflicts between the compiler's function names and the ones
+ * defined in the run-time.
+ *
  * Revision 1.72  1998/04/14 16:28:27  coelho
  * cleaner header.
  *
@@ -168,14 +172,16 @@ void fprint_entity_list(FILE *fp, list l);
 #define SND_TO_O        "HPFC SNDTO O"
 #define SND_TO_OS       "HPFC SNDTO OS"
 #define SND_TO_OOS      "HPFC SNDTO OOS"
-#define SND_TO_HA       "HPFC SNDTO HA"
+/*#define SND_TO_HA       "HPFC SNDTO HA"*/
+#define SND_TO_HA       "HPFC NSNDTO HA"
 #define SND_TO_NO       "HPFC SNDTO NO"
 #define SND_TO_HNO      "HPFC SNDTO HNO"
 
 #define RCV_FR_S        "HPFC RCVFR S"
 #define RCV_FR_H        "HPFC RCVFR H"
 #define RCV_FR_C        "HPFC RCVFR C"
-#define RCV_FR_mCS      "HPFC RCVFR mCS"
+/*#define RCV_FR_mCS      "HPFC RCVFR mCS"*/
+#define RCV_FR_mCS      "HPFC RCVFR HNBCAST S"
 #define RCV_FR_mCH      "HPFC RCVFR mCH"
 
 #define CMP_COMPUTER    "HPFC CMPCOMPUTER"
