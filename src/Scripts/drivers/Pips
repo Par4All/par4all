@@ -3,7 +3,7 @@
 #
 # SCCS stuff:
 #
-# $RCSfile: Pips,v $ ($Date: 1994/03/18 14:50:22 $) version $Revision$, got on %D%, %T%
+# $RCSfile: Pips,v $ ($Date: 1994/03/21 18:22:55 $) version $Revision$, got on %D%, %T%
 # %A%
 #
 
@@ -144,7 +144,7 @@ else
   #
   # gnu test would allow [ ! -O $PGM.database ] 
   #
-  if [ ! "`find $PGM.database -prune -user \`logname\` -print`" ]
+  if [ ! "`find $PGM.database -prune -user \`whoami\` -print`" ]
   then
     echo WARNING: You are working on workspace \`$PGM\', created by another user. >&2
   fi
