@@ -33,6 +33,7 @@ typedef dg_vertex_label vertex_label;
 #include "semantics.h"
 #include "transformations.h"
 
+
 static graph dependence_graph;
 
 static hash_table matches = NULL;
@@ -75,11 +76,11 @@ match get_statement_match_of_kind(statement s, int kind)
    for( ; l!=NIL; l=CDR(l))
    {
       match m = MATCH(CAR(l));
-      if (m->type == kind)
+      if (match_type(m) == kind)
 	 return m;
    }
 
-   return NULL;
+   return match_undefined;
 }
 
 list get_statement_matching_types(statement s)
@@ -88,7 +89,7 @@ list get_statement_matching_types(statement s)
    list k = NIL;
 
    for( ; m != NIL; m = CDR(m))
-      k = CONS(INT, MATCH(CAR(m))->type, k);
+      k = CONS(INT, match_type(MATCH(CAR(m))), k);
 
    return k;
 }
