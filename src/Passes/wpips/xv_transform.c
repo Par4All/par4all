@@ -1,3 +1,8 @@
+/* 
+ * $RCSfile: xv_transform.c,v $ (version $Revision$)
+ * $Date: 1997/04/30 15:17:54 $, 
+ */
+
 #include <stdio.h>
 
 #include <sys/time.h>
@@ -5,6 +10,14 @@
 #include <xview/xview.h>
 #include <xview/panel.h>
 #include <xview/text.h>
+
+#if (defined(TEXT))
+#undef TEXT
+#endif
+
+#if (defined(TEXT_TYPE))
+#undef TEXT_TYPE
+#endif
 
 #include "genC.h"
 
