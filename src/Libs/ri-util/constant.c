@@ -1,5 +1,5 @@
 #include <stdio.h>
-extern int atoi(char * c);
+#include <stdlib.h>
 #include <string.h>
 #include <varargs.h>
 
