@@ -4,6 +4,9 @@
 %% PIPS faq
 %%
 %% $Log: faq.tex,v $
+%% Revision 1.5  1998/10/20 20:31:01  irigoin
+%% Section about automatic code optimization added after Martin Griebl's visit
+%%
 %% Revision 1.4  1998/07/27 15:06:47  irigoin
 %% URL updated for pipsmake-rc
 %%
@@ -109,7 +112,7 @@ not applied by default. The corresponding properties must be set (see \PROPERTIE
 
 \end{itemize}
 
-Formal functional are still unsupported ($Date: 1998/07/27 15:06:47 $) and the internal
+Formal functional are still unsupported ($Date: 1998/10/20 20:31:01 $) and the internal
 representation of DATA statements is unsatisfactory.
 
 \section{My include files are in a different directory}
@@ -219,7 +222,9 @@ the
 documentation).
 
 Default values for properties are defined in file
-\verb+$PIPS_ROOT/Share/properties.rc+. when \PIPS{} is installed. However,
+\verb+$PIPS_ROOT/Share/properties.rc+. 
+% $
+when \PIPS{} is installed. However,
 they can be modified in every directory by creating a local file called {\tt
   properties.rc}. Properties can also be modified dynamically with the
 most recent \PIPS user interfaces, \TPIPS{} and jpips.
@@ -234,6 +239,38 @@ It is hard to believe but not impossible. The most effective way to
 receive support is to {\tt tar} the current workspace and to mail it to
 {\tt pips-support@cri.ensmp.fr} after compression (e.g. gzip) and encoding
 (e.g. uudencode).
+
+\section{How can I optimize my code?}
+\index{Program transformation}
+\index{Code transformation}
+\index{Code optimization}
+
+\PIPS{} does not support {\em automatic} code optimization for any target. PIPS
+can apply automatically some loop transformations but none of these
+transformations is uniformly good for all pieces of code and for all
+target machines. So it is better to let the user decide what is good and
+to perform the transformation for him. This process is tedious but it can
+be replayed automatically with \TPIPS{}.
+
+For the time being, the legality of a transformation requested by the
+user is not checked with respect to dependencies.
+
+The loop transformations include loop interchange, loop unrolling, full
+unrolling, hyperplane method, tiling,... See \PIPSMAKERC{} for the
+exhaustive code transformation list.
+
+Some transformations are applied in a systematic way: the different
+parallelization phases, loop distribution (although it is not an
+optimizing transformation), statement atomization (because it is a
+pre-pass to some parallelization phase), forward subsitution (same reason)
+and scalar and array privatizations because they cannot degrade
+performance. Dead-code elimination and constant propagation also are
+performed systematically.
+
+The complexity analysis, which is automatic like all analyses because they
+cannot degrade performance, provides some static symbolic information
+about the impact of a given code transformation on the number of executed
+operations.
 
 \newpage
 
