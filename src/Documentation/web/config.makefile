@@ -11,7 +11,7 @@ HTMS =	index.html \
 	poly_meth.html \
 	regions.html \
 	summary_hpfc.html \
-	windows-interface.html \
+	window-interface.html \
 	wp65_summary.html
 
 SOURCES= $(HTMS)
