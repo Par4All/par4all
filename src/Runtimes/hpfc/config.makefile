@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.63  1997/07/03 10:59:49  zory
+# add mpi library manipulation
+#
 # Revision 1.62  1997/06/09 09:53:20  coelho
 # separate hpfc pvm lib.
 #
@@ -42,7 +45,7 @@ M4FLAGS+= -D _HPFC_ENCODING_=$(PVM_ENCODING_OPTION)
 
 M4FLAGS	+= -D _HPFC_DEMO_
 M4FLAGS	+= -D _HPFC_DIRECT_
-# M4FLAGS	+= -D _HPFC_DEBUG_
+#M4FLAGS	+= -D _HPFC_DEBUG_
 
 # the default on IBM is to use PVMe
 ifeq ($(PVM_ARCH),RS6K)
@@ -105,6 +108,7 @@ ifeq ($(PVM_ARCH),SUN4SOL2)
 CC	= cc
 CFLAGS	= -O2
 FC	= f77
+FLINKER = hf77
 FFLAGS	= -fast -u
 #
 endif
@@ -114,8 +118,10 @@ ifeq ($(PVM_ARCH),RS6K)
 # IBM compilers on RS6K/SPx...
 #
 FC	= xlf
+FLINKER = mpxlf
+PARADIR = /usr/lpp/ppe.poe
 # FFLAGS	= -O2 -u
-FFLAGS	= -O2 -qarch=pwr2 -qhot -u
+FFLAGS	= -O2 -qarch=pwr2 -qhot -u -I$(PARADIR)/include
 CC	= xlc
 CFLAGS	= -O2
 #
@@ -140,9 +146,9 @@ ifdef _HPFC_USE_GNU_
 #
 FC	= g77
 # -Wall -pedantic
-FFLAGS	= -O2 -pipe -ansi -Wall -Wimplicit 
+FFLAGS	= -O2 -pipe -ansi -Wall -Wimplicit
 CC	= gcc
-CFLAGS	= -O2 -pipe -ansi -Wall -pedantic
+CFLAGS	= -O2 -pipe -ansi -Wall -pedantic 
 CPPFLAGS= -D__USE_FIXED_PROTOTYPES__
 #
 endif
@@ -157,6 +163,8 @@ MOVE 	= mv
 
 pvminc	= $(PVM_ROOT)/include
 pvmconf	= $(PVM_ROOT)/conf
+mpiinc	= $(MPI_ROOT)/h
+
 
 ifdef _HPFC_USE_PVMe_
 #
@@ -164,6 +172,7 @@ ifdef _HPFC_USE_PVMe_
 # IBM puts includes in lib:-(
 pvminc	= $(PVM_ROOT)/lib
 pvmconf	= $(PVM3_ROOT)/conf
+mpiinc	= $(MPI_ROOT)/include
 #
 endif
 
@@ -191,26 +200,32 @@ endif
 M4COPT	+=	$(PVM_ARCH).m4
 
 PVM_HEADERS  =	pvm3.h fpvm3.h
+MPI_HEADERS  =  mpif.h
 LIB_M4FFILES = 	hpfc_packing.m4f \
 		hpfc_reductions.m4f \
 		hpfc_rtsupport.m4f \
 		hpfc_shift.m4f \
 		hpfc_bufmgr.m4f \
 		hpfc_broadcast.m4f \
-		hpfc_communication_pvm.m4f
-
-LIB_M4CFILES =	hpfc_misc.m4c
+		hpfc_communication_pvm.m4f \
+		hpfc_communication_mpi.m4f
+LIB_M4CFILES =	hpfc_misc_pvm.m4c \
+		hpfc_misc_mpi.m4c
 LIB_FFILES =	hpfc_check.f \
 		hpfc_main.f \
 		hpfc_main_host.f \
 		hpfc_main_node.f
-
 M4_HEADERS 	= hpfc_procs.m4h \
 		  hpfc_buffers.m4h \
 		  hpfc_parameters.m4h
 CORE_HEADERS	= hpfc_commons.h \
+		  hpfc_commons_pvm.h \
+		  hpfc_commons_mpi.h \
+		  hpfc_specific_pvm.h \
+		  hpfc_specific_mpi.h \
 		  hpfc_param.h \
 		  hpfc_globs.h \
+		  hpfc_types.h \
 		  hpfc_misc.h
 
 DDC_FFILES 	= $(LIB_M4FFILES:.m4f=.f)
@@ -300,12 +315,13 @@ all: $(RT_ARCH) $(PVM_HEADERS) $(DDC_HEADERS) $(DDC_CFILES) $(DDC_FFILES) \
 		$(LIB_OBJECTS) $(INSTALL_LIB)
 
 #
-# get pvm headers
+# get runtime headers
 #
 
 pvm3.h:	$(pvminc)/pvm3.h; $(COPY) $< $@
 fpvm3.h:$(pvminc)/fpvm3.h; $(COPY) $< $@
 $(PVM_ARCH).m4:; $(COPY) $(pvmconf)/$(PVM_ARCH).m4 $@
+mpif.h:	$(mpiinc)/mpif.h; $(COPY) $< $@
 
 #
 # HPFC RUNTIME
@@ -326,7 +342,7 @@ $(LIB_PVM_TARGET): $(PVM_HEADERS) $(LIB_HEADERS) $(LIB_PVM_OBJECTS)
 #
 # HPFC MPI
 #
-$(LIB_MPI_TARGET): $(PVM_HEADERS) $(LIB_HEADERS) $(LIB_MPI_OBJECTS) 
+$(LIB_MPI_TARGET): $(MPI_HEADERS) $(LIB_HEADERS) $(LIB_MPI_OBJECTS) 
 	$(RM) $@ ; \
 	$(ARCHIVE) $@ $(LIB_MPI_OBJECTS) ; \
 	$(RANLIB) $@
