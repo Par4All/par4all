@@ -144,7 +144,7 @@ prettyprint_dependence_graph(FILE * fd,
 			    fprintf(fd, " %d-%s",statement_number(s2),
 				    entity_local_name(call_function(instruction_call(statement_instruction(s2)))));
 			else  fprintf(fd, " %d",statement_number(s2));
-			     }
+		    }
 		    
 		}	
 		
