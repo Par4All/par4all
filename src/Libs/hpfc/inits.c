@@ -3,7 +3,7 @@
  * in this file there are functions to generate the 
  * run-time resolution parameters.
  *
- * $RCSfile: inits.c,v $ ($Date: 1995/10/04 14:48:59 $, )
+ * $RCSfile: inits.c,v $ ($Date: 1995/10/05 11:32:31 $, )
  * version $Revision$,
  */
 
@@ -56,8 +56,7 @@ entity module;
 	newarray = load_new_node(array);
 	andim  = NumberOfDimension(newarray);
 
-	debug(8, "create_parameters_h",
-	      "considering array %s (new is %s)\n",
+	pips_debug(8, "considering array %s (new is %s)\n",
 	      entity_name(array), entity_name(newarray));
 	
 	for (i=1 ; i<=andim ; i++)
@@ -93,7 +92,7 @@ int max_size_of_processors()
     {
 	variable a;
 	
-	assert(type_variable_p(entity_type(e)));
+	pips_assert("variable", type_variable_p(entity_type(e)));
 	a = type_variable(entity_type(e));
 	
 	current_max = max(current_max,
@@ -117,7 +116,7 @@ tag t;
     case is_hpf_newdecl_gamma: return 3;
     case is_hpf_newdecl_delta: return 4;
     default: 
-	pips_error("code_number", "unexpected hpf_newdecl tag %d\n", t);
+	pips_internal_error("unexpected hpf_newdecl tag %d\n", t);
     }
     
     return -1; /* just to avoid a gcc warning */
@@ -210,7 +209,8 @@ entity module;
 		 dimension 
 		     dim = FindIthDimension(template, tdim);
 		 
-		 assert(style_block_p(distribution_style(d)));
+		 pips_assert("block distribution",
+			     style_block_p(distribution_style(d)));
 		 
 		 rate = HpfcExpressionToInt(alignment_rate(a));
 		 shift = (HpfcExpressionToInt(alignment_constant(a)) -
@@ -245,7 +245,8 @@ entity module;
 		 entity
 		     proc = distribute_processors(di);
 		 
-		 assert(style_cyclic_p(distribution_style(d)));
+		 pips_assert("cyclic distribution",
+			     style_cyclic_p(distribution_style(d)));
 		 
 		 sc = param*SizeOfIthDimension(proc, procdim);
 		 shift = (HpfcExpressionToInt(alignment_constant(a)) -
@@ -286,7 +287,8 @@ entity module;
 		 entity
 		     proc = distribute_processors(di);
 		 
-		 assert(style_cyclic_p(distribution_style(d)));
+		 pips_assert("cyclic distribution",
+			     style_cyclic_p(distribution_style(d)));
 		 
 		 sc = param*SizeOfIthDimension(proc, procdim);
 		 shift = (cst - HpfcExpressionToInt(dimension_lower(templdim)));
@@ -312,9 +314,7 @@ entity module;
 		 break;
 	     }
 	     default:
-		 pips_error("create_init_common_param", 
-			    "unexpected new declaration tag (%d)\n",
-			    decl);
+		 pips_internal_error("unexpected decl. tag (%d)\n", decl);
 	     }
 	 }
 
@@ -419,8 +419,7 @@ FILE* file;
 		  procdim++;
 		  break;
 	      default:
-		  pips_error("create_init_common_param", 
-			     "unexpected style tag\n");
+		  pips_internal_error("unexpected style tag\n");
 		  break;
 	      }
 
