@@ -1,10 +1,9 @@
 c
-c Runtime Support Functions for the 
-c High Performance Fortran Compiler
+c Runtime Support Functions for the High Performance Fortran Compiler
 c by Fabien COELHO.
 c
 c $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-c ($Date: 1995/11/21 23:33:55 $, )
+c ($Date: 1995/12/01 11:40:02 $, )
 c
 c-----------------
 c
@@ -361,7 +360,7 @@ c
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
-      debug(print *, "sending to ", OLID)
+      debug(write (unit=0,fmt=*) "sending to ", OLID)
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
       call pvmfsend(OWNERTID, SENDCHANNELS(OLID), info)
@@ -423,7 +422,7 @@ c
          HPFC_PVMLENGTH=16
          return
       endif
-      print *, "[HPFC_PVMLENGTH] unexpected tag ", what
+      write (unit=0,fmt=*) "[HPFC_PVMLENGTH] unexpected tag ", what
       stop
       end
 c
@@ -449,7 +448,8 @@ c
      $           MCASTNODES,
      $           val,
      $           len)) then
-               print *, "[CM_SNDTO_A] send error ", MYLID, " to ", i
+               write (unit=0,fmt=*)
+     $              "[CM_SNDTO_A] send error ", MYLID, " to ", i
             endif
          endif
       enddo
@@ -473,7 +473,7 @@ c
      $     MCASTNODES,
      $     goal,
      $     len)) then
-         print *, "[CM_RCVFR_mCS] receive error on ", MYLID
+         write (unit=0,fmt=*) "[CM_RCVFR_mCS] receive error on ", MYLID
       endif
       MCASTNODES = MCASTNODES + 2
       end
@@ -489,12 +489,12 @@ c
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
-      debug(print *, "sending to all nodes")
+      debug(write (unit=0,fmt=*) "sending to all nodes")
       call pvmfinitsend(PVMRAW, bufid)
       call pvmfpack(what, val, 1, 1, info)
       call pvmfmcast(NBOFTASKS, NODETIDS, MCASTHOST, info)
       MCASTHOST = MCASTHOST + 2
-      debug(print *, "sent!")
+      debug(write (unit=0,fmt=*) "sent!")
       end
 c
 c-----------------
@@ -542,7 +542,7 @@ c
       integer lb(7), ub(7), indp(7), lid
       if (OREPLICATED) then
          do i=1, NODIMP(OPN)
-            debug(print *, "i = ", i, " index is ", OINDP(i))
+            debug(write (unit=0,fmt=*) "i = ", i, " index is ", OINDP(i))
             if (OINDP(i).EQ.INTFLAG) then
                lb(i) = RANGEP(OPN, i, 1)
                ub(i) = RANGEP(OPN, i, 2)
@@ -550,7 +550,7 @@ c
                lb(i) = OINDP(i)
                ub(i) = OINDP(i)
             endif
-            debug(print *, "bounds ", lb(i), ub(i))
+            debug(write (unit=0,fmt=*) "bounds ", lb(i), ub(i))
          enddo
          do i=(NODIMP(OPN)+1), 7
             lb(i) = 1
@@ -584,7 +584,7 @@ c
      $                             SENDCHANNELS(lid), 
      $                             info)
                               SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
-                              debug(print *, "sending to ", lid)
+                              debug(write (unit=0,fmt=*) "sending to ", lid)
                            enddo
                         enddo
                      enddo
@@ -611,7 +611,7 @@ c
       integer i1, i2, i3, i4, i5, i6, i7
       integer lb(7), ub(7), indp(7), lid
       do i=1, NODIMP(OPN)
-         debug(print *, "i = ", i, " index is ", OINDP(i))
+         debug(write (unit=0,fmt=*) "i = ", i, " index is ", OINDP(i))
          if (OINDP(i).EQ.INTFLAG) then
             lb(i) = RANGEP(OPN, i, 1)
             ub(i) = RANGEP(OPN, i, 2)
@@ -619,7 +619,7 @@ c
             lb(i) = OINDP(i)
             ub(i) = OINDP(i)
          endif
-         debug(print *, "bounds ", lb(i), ub(i))
+         debug(write (unit=0,fmt=*) "bounds ", lb(i), ub(i))
       enddo
       do i=(NODIMP(OPN)+1), 7
          lb(i) = 1
@@ -752,7 +752,7 @@ c
       call pvmfrecv(HOSTTID, HOSTCHANNEL, bufid)
       call pvmfunpack(what, goal, 1, 1, info)
       HOSTCHANNEL = HOSTCHANNEL + 2
-      debug(print *, MYLID, " receiving from host")
+      debug(write (unit=0,fmt=*) MYLID, " receiving from host")
       end
 c
 c-----------------
@@ -778,11 +778,11 @@ c
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer bufid, info
-      debug(print *, "receiving from host")
+      debug(write (unit=0,fmt=*) "receiving from host")
       call pvmfrecv(HOSTTID, MCASTHOST, bufid)
       call pvmfunpack(what, goal, 1, 1, info)
       MCASTHOST = MCASTHOST + 2
-      debug(print *, "received!")
+      debug(write (unit=0,fmt=*) "received!")
       end
 c
 c-----------------
@@ -926,7 +926,7 @@ c
       do i=1, NBOFPROCESSORS
          call HPFC_CMPPOS(i, MYLID, MYPOS(1, i))
       enddo
-      debug(print *, "lid: ", MYLID, " tid: ", MYTID)
+      debug(write (unit=0,fmt=*) "lid: ", MYLID, " tid: ", MYTID)
 
 _CM5(
 c
@@ -1007,10 +1007,11 @@ _direct(`'
       if (nhost.ge.NBOFTASKS) then
          call pvmfsetopt(PVMROUTE, PVMROUTEDIRECT, info)
       else
-         print *, "Warning: no direct route (not enough processors)..."
+         write (unit=0,fmt=*)
+     $        "Warning: no direct route (not enough processors)..."
       endif
       end
-)
+)dnl
 c
 c
 c-----------------
@@ -1037,8 +1038,8 @@ c
 
       call HPFC_INIT_COMMON_PARAM
 
-      debug(print *, "spawning ", NODE_PROGRAM_NAME
-      print *, "   on ", NBOFTASKS, " ", NODE_ARCHITECTURE)
+      debug(write (unit=0,fmt=*) "spawning ", NODE_PROGRAM_NAME
+      write (unit=0,fmt=*) "   on ", NBOFTASKS, " ", NODE_ARCHITECTURE)
 
       call pvmfspawn(
      $     NODE_PROGRAM_NAME, 
@@ -1196,10 +1197,12 @@ c
       subroutine HPFC_LOOP_BOUNDS(nlb, nub, llb, lb, ub, an, dp)
       integer nlb, nub, llb, lb, ub, an, dp
       include "hpfc_commons.h"
-      debug(print *, "HPFC_LOOP_BOUNDS ", lb, ub, " array ", an, dp)
+      debug(write (unit=0,fmt=*) 
+     $     "HPFC_LOOP_BOUNDS ", lb, ub, " array ", an, dp)
       call HPFC_REMOTE_LOOP_BOUNDS
      $     (nlb, nub, llb, lb, ub, an, dp, MYPOS(dp, TTOP(ATOT(an))))
-      debug(print *, "init lb: ", llb, " new lb: ", nlb, " new ub: ", nub)
+      debug(write (unit=0,fmt=*) 
+     $     "init lb: ", llb, " new lb: ", nlb, " new ub: ", nub)
       end
 c
 c-----------------
@@ -1210,14 +1213,15 @@ c
       include "fpvm3.h"
       include "hpfc_commons.h"
       integer info
-      debug(print *, "[hpfc_synchro] ", MYLID, " waiting ", NBOFTASKS+1)
+      debug(write (unit=0,fmt=*) 
+     $     "[hpfc_synchro] ", MYLID, " waiting ", NBOFTASKS+1)
       call pvmfbarrier(HPFC_GROUP_NAME, NBOFTASKS+1, info)
       if (info.lt.0) then
          call pvmfperror("hpfc_synchro", info)
          call pvmfexit(info)
          stop
       endif
-      debug(print *, "[hpfc_synchro] done")
+      debug(write (unit=0,fmt=*) "[hpfc_synchro] done")
       end
 c
 c-----------------
