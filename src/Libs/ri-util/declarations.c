@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.4  1997/11/10 10:22:59  coelho
+ * only declared equivalenced are prettyprinted...
+ *
  * Revision 1.3  1997/11/08 17:25:10  coelho
  * extension for cloning (name different from actual module)
  *
@@ -588,7 +591,8 @@ equivalent_entity_compare(entity *ent1, entity *ent2)
  * author   : bc.
  */
 static text
-text_equivalence_class(list /* of entities */ l_equiv)
+text_equivalence_class(
+    list /* of entities */ l_equiv)
 {
     text t_equiv = make_text(NIL);
     list lw = NIL;
@@ -598,7 +602,7 @@ text_equivalence_class(list /* of entities */ l_equiv)
     Value size1, size2, offset_end1;
     boolean first;
 
-    if (ENDP(l_equiv)) return(t_equiv);
+    if (gen_length(l_equiv)<=1) return t_equiv;
 
     /* FIRST, sort the list by increasing offset from the beginning of
        the memory suite. If two variables have the same offset, the longest 
@@ -741,10 +745,10 @@ text_equivalence_class(list /* of entities */ l_equiv)
 		    nlo = NORMALIZE_EXPRESSION(dimension_lower(dim));
 		    pvlo = normalized_linear(nlo);
 		    
-		    pips_assert("sg", vect_constant_p(pvlo));			
+		    pips_assert("sg", vect_constant_p(pvlo));
 		    pips_debug(EQUIV_DEBUG,
-			       "size=%d, rest=%d, offset=%d, lower_bound=%d\n",
-			       size, rest, offset, VALUE_TO_INT(val_of(pvlo)));
+			 "size=%d, rest=%d, offset=%d, lower_bound=%d\n",
+		          size, rest, offset, (int)VALUE_TO_INT(val_of(pvlo)));
 		    
 		    new_decl = VALUE_TO_INT(val_of(pvlo)) + rest;
 		    buffer[0] = '\0';
@@ -809,8 +813,7 @@ text_equivalences(
 
 	    ifdebug(EQUIV_DEBUG)
 	    {
-		pips_debug(1, "considering entity: %s\n", 
-			   entity_local_name(e));
+		pips_debug(1, "considering entity: %s\n",entity_local_name(e));
 		pips_debug(1, "shared variables:\n");
 		equiv_class_debug(l_shared);
 	    }
@@ -844,7 +847,8 @@ text_equivalences(
 		    }, l_shared);
 		    
 		    if (found) break;			    
-		}, equiv_classes);
+		},
+		    equiv_classes);
 		
 		if (found)
 		{
@@ -854,10 +858,10 @@ text_equivalences(
 		     */
 		    MAP(ENTITY, ent,
 		    {
-			if(!variable_in_list_p(ent, found_equiv_class))
+			if(!variable_in_list_p(ent, found_equiv_class) &&
+			    variable_in_list_p(ent, ldecl)) /* !!! */
 			    found_equiv_class =
-				gen_nconc(found_equiv_class,
-					  CONS(ENTITY, ent, NIL));
+				CONS(ENTITY, ent, found_equiv_class);
 		    }, l_shared)
 		}
 		else
@@ -869,27 +873,23 @@ text_equivalences(
 		     * l_shared. */
 		    MAP(ENTITY, shared_ent,
 		    {
-			if (!variable_in_list_p(shared_ent, l_tmp))
-			    l_tmp = gen_nconc(l_tmp,
-					      CONS(ENTITY, shared_ent,
-						   NIL));
+			if (!variable_in_list_p(shared_ent, l_tmp) &&
+			    variable_in_list_p(shared_ent, ldecl))
+			    /* !!! restricted to declared... */
+			    l_tmp = CONS(ENTITY, shared_ent, l_tmp);
 		    }, 
 			l_shared);
-		    equiv_classes =
-			gen_nconc(equiv_classes, CONS(LIST, l_tmp, NIL));
+		    equiv_classes = CONS(LIST, l_tmp, equiv_classes);
 		}
 	    }
 	}
-    }, ldecl);
+    },
+	ldecl);
     
     ifdebug(EQUIV_DEBUG)
     {
 	pips_debug(1, "final equivalence classes:\n");
-	MAP(LIST, equiv_class,
-	{
-	    equiv_class_debug(equiv_class);
-	},
-	    equiv_classes);	
+	MAP(LIST, equiv_class, equiv_class_debug(equiv_class), equiv_classes);
     }
 
     /* SECOND, PRETTYPRINT THEM */
