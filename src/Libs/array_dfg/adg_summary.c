@@ -9,57 +9,11 @@
  * Comments :
  */
 
-/* Ansi includes 	*/
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-/* Newgen includes 	*/
-#include "genC.h"
-
-/* C3 includes 		*/
-#include "boolean.h"
-#include "arithmetique.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "ray_dte.h" 
-#include "sommet.h"
-#include "sg.h"
-#include "sc.h"
-#include "polyedre.h"
-#include "matrice.h"
-#include "matrix.h"
-#include "union.h"
-
-/* Pips includes 	*/
-#include "database.h"
-#include "graph.h"
-#include "ri.h"
-#include "paf_ri.h"
-#include "dg.h"
-#include "ri-util.h"
-#include "constants.h"
-#include "misc.h"
-#include "control.h"
-#include "text-util.h"
-#include "pipsdbm.h"
-#include "resources.h"
-#include "semantics.h"
-#include "static_controlize.h"
-#include "ricedg.h"
-#include "paf-util.h"
-
-#include "effects-generic.h"
-#include "effects-simple.h"
-
-#include "array_dfg.h"
-#include "pip.h"
+#define GRAPH_IS_DG
+#include "local.h"
 
 /* Local defines */
 #define NEXT(cp) (((cp) == NIL) ? NIL : (cp)->cdr)
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
 
 /* Global variables */
 extern 	hash_table 		Gvertex_number_to_statement;
@@ -478,7 +432,7 @@ graph                   dup_dg;
        * Build the context and rename variables .
        */
       /* Get predicate that comes from an IF statement */
-      sou_pred = dfg_vertex_label_exec_domain( vertex_vertex_label( sou_v ));
+      sou_pred = dfg_vertex_label_exec_domain( (dfg_vertex_label)vertex_vertex_label( sou_v ));
       if (sou_pred != predicate_undefined) 
 	prov_ps = adg_sc_dup(predicate_system(sou_pred));
       
@@ -730,7 +684,7 @@ graph                   dup_dg;
       /* Build source Psysteme (IF and DO contraints).
        */
       /* Get predicate that comes from an IF statement */
-      sou_pred = dfg_vertex_label_exec_domain( vertex_vertex_label( sou_v ));
+      sou_pred = dfg_vertex_label_exec_domain( (dfg_vertex_label)vertex_vertex_label( sou_v ));
       if (sou_pred != predicate_undefined) {
 	sou_context = adg_sc_dup(predicate_system(sou_pred));
       }
