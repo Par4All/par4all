@@ -2450,7 +2450,8 @@ Polyhedron *SubConstraint(Value *Con,Polyhedron *Pol,unsigned NbMaxRays,int Pass
     
     /* Initialize the ray matrix with the rays of polyhedron 'Pol' */
     Ray->NbRows = NbRay;
-    Vector_Copy(Pol->Ray[0], Ray->p[0], NbRay * Dimension);   
+    if (NbRay)
+	Vector_Copy(Pol->Ray[0], Ray->p[0], NbRay * Dimension);   
     
     /* Create the saturation matrix from the constraint matrix 'mat' and */
     /* ray matrix 'Ray'.                                                 */
