@@ -126,7 +126,6 @@ c     Ronan.Keryell@cri.ensmp.fr
       real*4 image(X_data_array_size, Y_data_array_size)
       integer X_offset, Y_offset
       integer X_zoom_ratio, Y_zoom_ratio
-      integer status
       real*8 min_value, max_value
       integer status, x, y
 !ldf$ -u xpomp_show_real4
@@ -153,7 +152,6 @@ c     Ronan.Keryell@cri.ensmp.fr
       real*8 image(X_data_array_size, Y_data_array_size)
       integer X_offset, Y_offset
       integer X_zoom_ratio, Y_zoom_ratio
-      integer status
       real*8 min_value, max_value
       integer status, x, y
 !ldf$ -u xpomp_show_real8
