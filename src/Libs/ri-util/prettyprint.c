@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.147  2002/04/23 15:04:55  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.146  2002/04/23 15:02:09  phamdat
  * *** empty log message ***
  *
@@ -280,7 +283,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.146 2002/04/23 15:02:09 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.147 2002/04/23 15:04:55 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2236,7 +2239,9 @@ text_statement(
 	 but we might as well be dealing with some parsed_code */
 	pips_debug(1, "I unexpectedly bumped into dead code?\n");
     }
-
+    {
+    string filename = "/users/tmp/phamdat/textout";
+    FILE * my_file = safe_fopen(filename, "w");
     if (same_string_p(label, RETURN_LABEL_NAME)) 
     {
 	pips_assert("Statement with return label must be a return statement",
@@ -2257,6 +2262,10 @@ text_statement(
     {
 	temp = text_instruction(module, label, margin, i,
 				statement_number(stmt)) ;
+    }
+    print_text(my_file, temp);
+    safe_fclose(my_file, filename);
+    free(filename);
     }
 
     /* note about comments: they are duplicated here, but I'm pretty
