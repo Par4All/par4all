@@ -200,7 +200,7 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     effect current = EFFECT(CAR(cur));
     string n;
     tag a;
-    bool do_combine = FALSE;
+    bool may_combine, do_combine = FALSE;
     list do_combine_item = NIL;
     list next = CDR(cur); /* now, as 'cur' may be removed... */
 
@@ -208,9 +208,12 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     n = entity_name(effect_entity(current));
     a = effect_action_tag(current);
 
-    /* do we have to combine ? */
-    if (!scalars_only_p || effect_scalar_p(current))
+    /* may/do we have to combine ? */
+    may_combine = !scalars_only_p || effect_scalar_p(current);
+
+    if (may_combine)
     {
+      /* did we see it? */
       switch (a) {
       case is_action_write:
 	if (hash_defined_p(all_write_effects, n))
@@ -232,6 +235,8 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
 
     if (do_combine)
     {
+      /* YES, me must combine */
+
       effect base = EFFECT(CAR(do_combine_item));
       /* compute their union */
       effect combined = (*effect_union_op)(base, current);
@@ -250,16 +255,20 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     }
     else
     {
-      /* no, just store... */
+      /* NO, just store if needed... */
       EFFECT(CAR(cur)) = current;
-      switch (a) {
-      case is_action_write:
-	hash_put(all_write_effects, n, cur);
-	break;
-      case is_action_read:
-	hash_put(all_read_effects, n, cur);
-	break;
-      default: pips_internal_error("unexpected action tag %d", a);
+      if (may_combine)
+      {
+	/* if we do not combine. ONLY IF we test, we put... */
+	switch (a) {
+	case is_action_write:
+	  hash_put(all_write_effects, n, cur);
+	  break;
+	case is_action_read:
+	  hash_put(all_read_effects, n, cur);
+	  break;
+	default: pips_internal_error("unexpected action tag %d", a);
+	}
       }
       pred = cur;
     }
