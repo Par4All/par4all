@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/09/03 18:56:22 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/09/04 08:38:49 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -23,7 +23,7 @@ set -a
 NEWGEN_DIR=/projects/Newgen
 
 # the root location of where to find the newgen to use 
-NEWGEN_ROOT=${NEWGEN_DIR}/Production
+NEWGEN_ROOT="${NEWGEN_DIR}/Production"
 
 # development version of newgen
 NEWGEN_DEVEDIR="${NEWGEN_DIR}/Development"
@@ -228,7 +228,7 @@ TOOLPACK_DIR="$PIPS_HOME/Toolpack/toolpack1.2"
 
 EXTERN_ROOT="$PIPS_DIR/Externals"
 
-PATH="$PATH:$EXTERN_ROOT/Share:$EXTERN_ROOT/Bin:$EXTERN_ROOT/Utils"
+PATH="${PATH}:${EXTERN_ROOT}/Share:${EXTERN_ROOT}/Bin:${EXTERN_ROOT}/Utils"
 
 #
 #          ####   #       #####
@@ -242,8 +242,8 @@ PATH="$PATH:$EXTERN_ROOT/Share:$EXTERN_ROOT/Bin:$EXTERN_ROOT/Utils"
 
 # test `whoami` != coelho && {
 
-LINEARDIR=$LINEAR_DIR
-NEWGENDIR=$NEWGEN_DIR
+LINEARDIR="${LINEAR_DIR}"
+NEWGENDIR="${NEWGEN_DIR}"
 
 # empty string if make can be run in this environment
 # PIPS_CHECK_OS="`${PIPS_UTILDIR}/check_os`"
@@ -318,7 +318,7 @@ PIPS_LIBDIR="${PIPS_ROOT}/Lib"
 PIPS_SRCDIR="${PIPS_ROOT}/Src"
 
 # where Public software sources are stored
-PIPS_PUBLICDIR=${PIPS_SRCDIR}/Public
+PIPS_PUBLICDIR="${PIPS_SRCDIR}/Public"
 
 PIPS_RUNTIMEDIR="${PIPS_ROOT}/Runtime"
 
