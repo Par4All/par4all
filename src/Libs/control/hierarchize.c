@@ -399,6 +399,13 @@ gen_list_patch(list l,
      }, l);
 }
 
+void
+control_list_patch(list l,
+	       control c_old,
+	       control c_new)
+{
+    gen_list_patch(l, (gen_chunk *) c_old, (gen_chunk *) c_new);
+}
 
 /* Remove the first occurence of obj in list l: */
 void
@@ -436,7 +443,7 @@ transfer_control_predecessor(control old_node,
     /* Remove c as a predecessor of old_node: */
     gen_remove(&control_predecessors(old_node), c);
     /* Correct the reverse link c->old_node to c->new_node: */
-    gen_list_patch(control_successors(c), old_node, new_node);
+    control_list_patch(control_successors(c), old_node, new_node);
 }
 
 
@@ -457,7 +464,7 @@ transfer_control_successor(control old_node,
     /* Remove c as a successor of old_node: */
     gen_remove(&control_successors(old_node), c);
     /* Correct the reverse link c->old_node to c->new_node: */
-    gen_list_patch(control_predecessors(c), old_node, new_node);
+    control_list_patch(control_predecessors(c), old_node, new_node);
 }
 
 
@@ -501,8 +508,8 @@ replace_control_related_to_a_list(control old_node,
 	    /* Delete the old one. Use gen_remove_first() instead of
                gen_remove() to deal with double loops around a node
                (See hierarchy02.f in validation): */
-	    gen_remove_first(&control_successors(old_node), old_node);
-	    gen_remove_first(&control_predecessors(old_node), old_node);
+	    gen_remove_first(&control_successors(old_node), (gen_chunk *) old_node);
+	    gen_remove_first(&control_predecessors(old_node), (gen_chunk *) old_node);
 	}
     }, controls_to_change);
     gen_free_list(controls_to_change);
@@ -567,7 +574,7 @@ hierarchize_control_list(vertex interval,
 	gen_copy_seq(control_successors(entry_node));
     control_predecessors(new_entry_node) =
 	gen_copy_seq(control_predecessors(entry_node));
-    gen_list_patch(new_controls, entry_node, new_entry_node);
+    control_list_patch(new_controls, entry_node, new_entry_node);
     if (exit_node != control_undefined) {
 	control_successors(new_exit_node) =
 	    gen_copy_seq(control_successors(exit_node));
@@ -583,11 +590,11 @@ hierarchize_control_list(vertex interval,
 
     /* Correct the nodes to reflect the new nodes: */
     MAP(CONTROL, c, {
-	gen_list_patch(control_successors(c), entry_node, new_entry_node);
-	gen_list_patch(control_predecessors(c), entry_node, new_entry_node);
+	control_list_patch(control_successors(c), entry_node, new_entry_node);
+	control_list_patch(control_predecessors(c), entry_node, new_entry_node);
 	if (exit_node != control_undefined) {
-	    gen_list_patch(control_successors(c), exit_node, new_exit_node);
-	    gen_list_patch(control_predecessors(c), exit_node, new_exit_node);
+	    control_list_patch(control_successors(c), exit_node, new_exit_node);
+	    control_list_patch(control_predecessors(c), exit_node, new_exit_node);
 	}
     }, new_controls);
 
@@ -650,7 +657,7 @@ hierarchize_control_list(vertex interval,
 	if (exit_node != control_undefined)
 	    check_control_coherency(exit_node);
 	pips_assert("Control should be consistent from entry_node)...",
-		    gen_consistent_p(entry_node));
+		    control_consistent_p(entry_node));
     }
     pips_assert("new_exit_node cannot have a successor.",
 		control_successors(new_exit_node) == NIL);
@@ -751,6 +758,6 @@ control_graph_recursive_decomposition(unstructured u)
     }
     ifdebug(1)
 	pips_assert("Unstructured should be consistent here...",
-		    gen_consistent_p(u));
+		    unstructured_consistent_p(u));
     debug_off();
 }
