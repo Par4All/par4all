@@ -501,7 +501,7 @@ int maximize;
 	    /* polynome_rm(&(complexity_eval(c1))); */
 	    polynome_rm(&pt);
 	    /* (Ppolynome) complexity_eval(c1) = pp; */
-	    complexity_eval(c1) = pp;
+	    complexity_eval_(c1) = newgen_Ppolynome(pp);
 	    return (c1);
 	}
     }
