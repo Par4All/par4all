@@ -55,6 +55,12 @@ DEFINE_LOCAL_STACK(current_stmt, statement)
 /* FIFO list of integers, to keep track of parallel loops */
 static list l_parallel_loops = NIL;
 
+void coarse_grain_parallelization_error_handler()
+{
+    error_reset_current_stmt_stack();
+    l_parallel_loops = NIL;
+}
+
 /* This list is handled in normal order to allow FIFO (!= stack)*/
 static void set_l_parallel_loops()
 {
@@ -273,7 +279,7 @@ static bool whole_loop_dependence_test(loop l)
 	{
 	    conflict_source(c) = effect_undefined;
 	    conflict_sink(c) = effect_undefined;
-	    gen_free(c);
+	    free_conflict(c);
 	},
 	l_conflicts);
     gen_free_list(l_conflicts);
