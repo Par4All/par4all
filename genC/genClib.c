@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1996/06/11 10:05:22 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1996/06/15 13:02:01 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2970,7 +2970,8 @@ union domain *dp ;
 {
     int t;
 
-    return((*(current_mrc->decisions))[dp->se.element-Domains] &&
+    return(((*(current_mrc->decisions))[dp->se.element-Domains] ||
+	    (*(current_mrc->domains))[dp->se.element-Domains]) &&
 	   (!dp->se.persistant) &&               /* stay at a given level */
 	   ((t=dp->ba.type)==BASIS_DT ? TRUE :
 	     t==LIST_DT               ? obj->l != list_undefined :
@@ -3050,12 +3051,6 @@ void gen_multi_recurse(gen_chunk * obj, ...)
 	for(i=0, p_table=get_decision_table(domain); i<number_of_domains; i++)
 	    new_decision_table[i] |= (*p_table)[i];
     }
-
-    /* updates the decision table for entering list and so of visited domains 
-     * in the simple_in function
-     */
-    for (i=0; i<number_of_domains; i++)
-	if (new_domain_table[i]) new_decision_table[i]=TRUE;
     
     va_end(pvar);
 
