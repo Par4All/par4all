@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/11/29 11:26:00 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/12/01 14:52:54 $, )
  * version $Revision$
  */
  
@@ -114,6 +114,9 @@ add_remapping_as_used(
 }
 
 /*********************************************** COMPILER STATUS MANAGEMENT */
+
+/* ??? some memory leaks in the hpfc_status management...
+ */
 
 /* initialization of data that belongs to the hpf compiler status
  */
@@ -541,9 +544,11 @@ bool hpfc_close(string name)
 
     put_generated_resources_for_program(name);      /* global informations */
 
-    close_hpfc_status();
-    db_unput_resources(DBR_HPFC_STATUS);            /* destroy hpfc status */
-
+    /* not close, because it would free the memory and 
+     * pipsdbm will run into troubles when trying to free the resource...
+     */
+    reset_hpfc_status();
+    
     DB_PUT_FILE_RESOURCE(DBR_HPFC_COMMONS, strdup(name), NO_FILE); /* fake */
 
     debug_off();
