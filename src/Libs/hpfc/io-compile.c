@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/11/24 17:22:00 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/12/06 14:42:49 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -19,7 +19,6 @@ extern fprintf();
  * Psystems stuff
  */
 
-#include "types.h"
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
