@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: interprocedural.c,v $
+ * Revision 1.35  2003/07/24 10:48:54  irigoin
+ * Consistency bug in translate_global_value() fixed.
+ *
  * Revision 1.34  2002/03/14 15:16:33  irigoin
  * call to pips_user_error() replaced by call to pips_user_warning() in
  * add_formal_to_actual_bindings() when a typing problem is detected. If type
@@ -319,11 +322,11 @@ transformer add_formal_to_actual_bindings(call c, transformer pre, entity caller
       basic bexpr = basic_of_expression(expr);
 
       if(!basic_equal_p(bfp, bexpr)) {
-	pips_user_warning("Type incompatibility (%s/%s) for formal parameter %s (rank %d)"
-			  " in call to %s from %s\n",
+	pips_user_warning("Type incompatibility\n(%s/%s)\nfor formal parameter %s"
+			  " (rank %d)\nin call to %s from %s\n",
 			  basic_to_string(bfp), basic_to_string(bexpr),
-			  entity_local_name(fp), r, module_local_name(f),
-			  module_local_name(caller));
+			  entity_local_name(fp), r,
+			  module_local_name(f), module_local_name(caller));
       }
 
       if(basic_tag(bfp)==basic_tag(bexpr)) {
@@ -799,6 +802,19 @@ entity v;
       eq = contrainte_make(subst);
       sc_add_egalite(sc, eq);
 
+      if(entity_is_argument_p(v, transformer_arguments(tf))) {
+	entity v_old = global_new_value_to_global_old_value(v);
+	entity e_old = global_new_value_to_global_old_value(e);
+	Pvecteur subst_old = vect_new((Variable) v_old, (Value) 1);
+	Pcontrainte eq_old = CONTRAINTE_UNDEFINED;
+
+       args = CONS(ENTITY, v_old, args);
+
+       vect_add_elem(&subst_old, (Variable) e_old, (Value) -1);
+       eq_old = contrainte_make(subst_old);
+       sc_equation_add(sc, eq_old);
+      }
+
       pips_debug(7, "%s has already been translated into %s\n",
 		 entity_name(v), entity_name(e));
 
@@ -884,7 +900,12 @@ entity v;
       else {
 	pips_debug(7, "%s is translated into %s\n",
 		   entity_name(v), entity_name(e));
-	transformer_value_substitute(tf, v_init, e_init);
+	if(transformer_value_substitutable_p(tf, v_init, e_init))
+	  transformer_value_substitute(tf, v_init, e_init);
+	else {
+	  pips_user_error("Unsupported aliasing linked to %s and %s\n",
+			  entity_name(v_init), entity_name(e_init));
+	}
       }
     }
     else {
