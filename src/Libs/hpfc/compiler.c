@@ -1,7 +1,10 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1997/03/03 15:59:42 $, )
- * version $Revision$
+ * $Id$
+ * $Log: compiler.c,v $
+ * Revision 1.52  1997/03/20 10:19:38  coelho
+ * RCS headers.
+ *
  *
  * Compiler
  *
