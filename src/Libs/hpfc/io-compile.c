@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/12/30 16:49:13 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1995/01/06 14:24:53 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -210,8 +210,7 @@ Psysteme syst;
 list scanners;
 Psysteme *pcond, *penum;
 {
-    Pbase
-	base = entity_list_to_base(scanners);
+    Pbase base = entity_list_to_base(scanners);
 
     algorithm_row_echelon(syst, base, pcond, penum);
 
