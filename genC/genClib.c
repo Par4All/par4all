@@ -17,6 +17,12 @@
  *
  * The file has all the generic functions to manipulate C objects
  * implemented by gen_chunks (see genC.c).
+ *
+ * $Log: genClib.c,v $
+ * Revision 1.120  2003/06/19 14:42:16  irigoin
+ * Bug fix line 250, call to gen_alloc_component() in gen_alloc_constructed()
+ *
+ *
  */
 
 #include <stdio.h>
@@ -247,7 +253,7 @@ static void gen_alloc_constructed(va_list ap,
     for( dlp=dp->co.components, cpp=cp+data ;
 	 dlp != NULL ; 
 	 dlp=dlp->cdr, cpp++ ) {
-      gen_alloc_component( dlp->domain, cpp, &ap, gen_check ) ;
+      gen_alloc_component( dlp->domain, cpp, &ap, gen_check_p ) ;
     }
     break ;
   }
