@@ -5,7 +5,7 @@
 #
 
 LX2HTML	= latex2html
-L2HFLAGS= -link 8 -split 5
+L2HFLAGS= -link 8 -split 5 -local_icons
 LATEX	= latex
 BIBTEX	= bibtex
 RMAN	= rman
