@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: Wchangedir,v $ (version $Revision$)
-# $Date: 1996/09/16 09:03:30 $, 
+# $Date: 1997/04/30 10:58:24 $, 
 #
 # (c) Fabien COELHO, CRI, École des mines de Paris, September 1996.
 #     e-mail: coelho@cri.ensmp.fr
@@ -22,11 +22,13 @@ exit $?
 #
 
 # fills the list listbox with directories. links are followed...
-#  - list: the listbox window to be dealt with
+#  - dlist: the listbox window to be dealt with for directories
+#  - flist: idem for files
 #  - dir: the considered directory
 #
-proc filldirlist { list dir } {
-    $list delete 0 end
+proc filldirlist { dlist flist dir } {
+    $dlist delete 0 end
+    $flist delete 0 end
     set pwd [pwd]
     cd $dir
     foreach d [lsort [glob * .*]] {
@@ -38,12 +40,15 @@ proc filldirlist { list dir } {
 	    }
 	    # then append if is a directory
 	    if {[file isdirectory $d]} {
-		$list insert end $name
-	    }		
+		$dlist insert end $name
+	    } else {
+		$flist insert end $name
+	    }
 	}
     }
     cd $pwd
-    $list selection clear 0 end
+    $dlist selection clear 0 end
+    $flist selection clear 0 end
 }
 
 #
@@ -105,12 +110,14 @@ proc changedir { root currentdir } {
     frame $root.top 
     button $root.top.root -text "/" -borderwidth 3 -command {
 	set changedir_dir / 
-	filldirlist $changedir_root.list.dirs $changedir_dir
+	filldirlist $changedir_root.list.dirs $changedir_root.flist.files \
+	    $changedir_dir
         $changedir_root.direct.entry xview end
     }
     button $root.top.home -text "Home" -borderwidth 3  -command {
 	set changedir_dir $changedir_home; 
-	filldirlist $changedir_root.list.dirs $changedir_dir
+	filldirlist $changedir_root.list.dirs $changedir_root.flist.files \
+	    $changedir_dir
         $changedir_root.direct.entry xview end
     }
     button $root.top.okay -text "Ok" -borderwidth 3 -command {
@@ -140,7 +147,8 @@ proc changedir { root currentdir } {
     }
     # <Tab> updates the displayed list
     bind  $root.direct.entry <Tab> {
-	filldirlist $changedir_root.list.dirs $changedir_dir
+	filldirlist $changedir_root.list.dirs $changedir_root.flist.files \
+	    $changedir_dir
     }
     pack  $root.direct.lab -side left -padx 2 -pady 2 -ipadx 1 -ipady 1
     pack  $root.direct.entry -side left \
@@ -159,7 +167,7 @@ proc changedir { root currentdir } {
 	if {$i != ""} {
 	    set changedir_dir [appenddir $changedir_dir [%W get $i]]
 	    # update display
-	    filldirlist %W $changedir_dir
+	    filldirlist %W $changedir_root.flist.files $changedir_dir
 	    $changedir_root.direct.entry xview end
 	}
     }
@@ -168,13 +176,25 @@ proc changedir { root currentdir } {
     pack $root.list.scroll -side left -fill y -padx 2 -pady 2
 
     #
+    # list of files...
+    #
+    frame $root.flist
+    listbox $root.flist.files -relief raised -height 15 \
+	-yscrollcommand "$root.flist.scroll set" 
+    scrollbar $root.flist.scroll -command "$root.flist.files yview"
+    pack $root.flist.files -side left -fill both -expand true \
+	-padx 2 -pady 2 -ipadx 1 -ipady 1
+    pack $root.flist.scroll -side left -fill y -padx 2 -pady 2
+
+    #
     # full window (if resized, .list is expanded on x/y)
     #
     pack $root.top $root.direct -fill both 
     pack $root.list -fill both -expand true
+    pack $root.flist -fill both -expand true
 
     # set initial display
-    filldirlist $root.list.dirs $changedir_dir
+    filldirlist $root.list.dirs $root.flist.files $changedir_dir
     $root.direct.entry xview end
 
     # focus and interaction...
