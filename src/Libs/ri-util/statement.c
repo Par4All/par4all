@@ -79,8 +79,7 @@ static void loop_rwt(loop l)
 	nseq++;
 }
 
-void 
-number_of_sequential_and_parallel_loops(
+void number_of_sequential_and_parallel_loops(
     statement stat,
     int * pseq,
     int * ppar)
@@ -90,8 +89,7 @@ number_of_sequential_and_parallel_loops(
     *pseq=nseq, *ppar=npar;
 }
 
-void 
-print_number_of_loop_statistics(
+void print_number_of_loop_statistics(
     FILE * out,
     string msg,
     statement s)
@@ -99,6 +97,20 @@ print_number_of_loop_statistics(
     int seq, par;
     number_of_sequential_and_parallel_loops(s, &seq, &par);
     fprintf(out, "%s: %d seq loops, %d par loops\n", msg, seq, par);
+}
+
+/* print out the number of sequential versus parallel loops.
+ */
+void print_parallelization_statistics(
+    string module, /* the module name */
+    string msg,    /* an additional message */
+    statement s    /* the module statement to consider */)
+{
+    if (get_bool_property("PARALLELIZATION_STATISTICS"))
+    {
+	fprintf(stderr, "%s %s parallelization statistics", module, msg);
+	print_number_of_loop_statistics(stderr, "", s);
+    }
 }
 
 /****************************************************************************/
