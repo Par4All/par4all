@@ -121,11 +121,8 @@
 
 %{
 #include <stdio.h>
-extern int fprintf();
-extern int _filbuf();
-extern int _flsbuf();
 #include <string.h>
-extern int atoi();
+#include <stdlib.h>
 
 #include "genC.h"
 #include "parser_private.h"
