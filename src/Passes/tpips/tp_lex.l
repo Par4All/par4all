@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: tp_lex.l,v $
+ * Revision 1.38  1998/07/03 21:27:01  coelho
+ * check active token added.
+ *
  * Revision 1.37  1998/05/05 08:49:43  coelho
  * bye == quit
  *
@@ -135,6 +138,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 <KEY>help 		{ KEYWORD(TK_HELP); }
 <KEY>remove 		{ KEYWORD(TK_REMOVE); }
 <KEY>show 		{ KEYWORD(TK_SHOW); }
+<KEY>checkactive	{ KEYWORD(TK_CHECKACTIVE); }
 
 <KEY>setproperty	{ LITTERAL(TK_SET_PROPERTY); }
 <KEY>set		{ LITTERAL(TK_SET_PROPERTY); }
