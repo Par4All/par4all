@@ -55,7 +55,11 @@ LIB_OBJECTS= y.tab.o scanner.o $(LIB_CFILES:.c=.o)
 # local-ri-util.o inits.o o-analysis.o align-checker.o messages.o \
 # overlap.o normalize.o guard.o ranges.o message-utils.o reduction.o
 
-todo: init 
+todo: init
+
+sccs_close:
+	@echo "closing the sccs session"
+	sccs delget `sccs tell -u`
 
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
 # filtred here.
