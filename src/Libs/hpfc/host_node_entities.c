@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: host_node_entities.c,v $ ($Date: 1996/03/21 08:51:32 $, ) 
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1996/03/29 18:21:46 $, ) 
  * version $Revision$
  */
 
@@ -96,10 +96,15 @@ entity module;
 static bool (*bound_p)(entity) = gen_false;
 static entity (*load)(entity) = gen_identity;
 
-static void update_for_module_rewrite(pe)
-entity *pe;
+static void update_for_module_rewrite(
+    entity *pe)
 {
-    if (bound_p(*pe)) *pe = load(*pe);
+    if (bound_p(*pe)) 
+    {
+	entity n = load(*pe);
+	pips_debug(10, "%s -> %s\n", entity_name(*pe), entity_name(n));
+	*pe = n;
+    }
 }
 
 /* shift the references to the right variable, in the module
@@ -118,7 +123,7 @@ static void update_call_for_module_rewrite(call c)
 
 static void update_code_for_module_rewrite(code c)
 {
-    MAPL(ce, update_for_module_rewrite(&ENTITY(CAR(ce))), code_declarations(c));
+    MAPL(ce, update_for_module_rewrite(&ENTITY(CAR(ce))),code_declarations(c));
 }
 
 static void update_loop_for_module_rewrite(loop l)
@@ -140,11 +145,13 @@ void update_object_for_module(
 
     if (module==host_module)
     {
+	pips_debug(8, "for host\n");
 	bound_p = bound_new_host_p;
 	load = load_new_host;
     }
     else
     {
+	pips_debug(8, "for node\n");
 	bound_p = bound_new_node_p;
 	load = load_new_node;
     }
