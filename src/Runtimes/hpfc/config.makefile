@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.66  1997/09/22 08:37:00  zory
+# clean MPI_HEADERS
+#
 # Revision 1.65  1997/09/19 07:46:50  zory
 # mpif.h must be copied at the beginning ...
 #
@@ -395,7 +398,7 @@ hpfc_includes.h: $(LIB_M4FFILES:.m4f=.h)
 
 clean: local-clean
 local-clean: 
-	$(RM) *~ $(LIB_OBJECTS) $(PVM_HEADERS) \
+	$(RM) *~ $(LIB_OBJECTS) $(PVM_HEADERS) $(MPI_HEADERS)\
 		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) $(INSTALL_LIB)
 	test ! -d $(RT_ARCH) || rmdir $(RT_ARCH)
 
