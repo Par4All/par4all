@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1997/02/18 10:07:48 $, )
+ * ($Date: 1997/02/18 11:21:26 $, )
  */
 
 #include "defines-local.h"
@@ -236,9 +236,31 @@ check_for_similarity(
 void hpfc_check_for_similarities(list /* of entity */ le)
 {
     MAP(ENTITY, array,
-	MAPL(ca,
-	    check_for_similarity(ENTITY(CAR(ca)), CDR(ca)),
-	    entities_list(load_dynamic_hpf(array))),
+    {
+	list /* of entity */ 
+	    seens = CONS(ENTITY, array, NIL); /* similar bases */
+
+	pips_assert("is a primary!", primary_entity_p(array));
+
+	check_for_similarity(array, NIL);
+	
+	MAP(ENTITY, a,
+	{
+	    if (!gen_in_list_p(a, seens))
+	    {
+		entity similar;
+		check_for_similarity(a, seens);
+		similar = load_similar_mapping(a);
+		pips_debug(1, "%s similar to %s\n",
+			   entity_name(a), entity_name(similar));
+
+		seens = gen_once(similar, seens);
+	    }
+	},
+	    entities_list(load_dynamic_hpf(array)));
+
+	gen_free_list(seens);
+    },
 	le);
 }
 
@@ -540,6 +562,7 @@ array_distribution_similar_p(entity a1, entity a2)
     pips_debug(6, "comparing %s and %s\n", entity_name(a1), entity_name(a2));
 
     /* conformant processors 
+     * ??? could assume that P(1:1,1:n) is conformant to P'(1:n)?
      */
     if (!conformant_entities_p(p1, p2)) 
 	RET("different processors", FALSE);
@@ -554,19 +577,24 @@ array_distribution_similar_p(entity a1, entity a2)
 	    x2 = FindDistributionOfProcessorDim
 	      (distribute_distribution(d2), i, &td2);
 	alignment at1, at2;
+	int dsize = SizeOfIthDimension(p1,i);
 	
-	if (!same_distribution_p(x1, x2)) 
-	    RET("different distribution", FALSE);
+	/* if the size is 1, whatever the distribution it is ok! */
+	if (dsize!=1)
+	{
+	    if (!same_distribution_p(x1, x2)) 
+		RET("different distribution", FALSE);
+	    
+	    /* conformant alignments for that pe dim
+	     * !!! the HPF mapping "semantics" insure that the corresponding 
+	     * dimension is distributed!
+	     */
+	    at1 = FindAlignmentOfTemplateDim(align_alignment(al1), td1);
+	    at2 = FindAlignmentOfTemplateDim(align_alignment(al2), td2);
 
-	/* conformant alignments for that pe dim
-	 * !!! the HPF mapping "semantics" insure that the corresponding 
-	 * dimension is distributed!
-	 */
-	at1 = FindAlignmentOfTemplateDim(align_alignment(al1), td1);
-	at2 = FindAlignmentOfTemplateDim(align_alignment(al2), td2);
-
-	if (!same_alignment_p(a1,t1,at1,a2,t2,at2)) 
-	    RET("different alignment", FALSE);
+	    if (!same_alignment_p(a1,t1,at1,a2,t2,at2)) 
+		RET("different alignment", FALSE);
+	}
     }
 
     pips_debug(6, "similar distributions!\n");
@@ -1394,7 +1422,7 @@ void simplify_remapping_graph(void)
     if (bound_remapped_p(root))	remove_unused_remappings(root);
 
     gen_map(regenerate_renamings, ls);
-    update_root_special_renamings(root);
+    /* update_root_special_renamings(root); */
 
     gen_free_list(ls);
 }
