@@ -37,6 +37,8 @@ typedef long long Value;
 #define VALUE_CONST(val) (val##LL)
 #define VALUE_MIN LONG_LONG_MIN
 #define VALUE_MAX LONG_LONG_MAX
+#define VALUE_SQRT_MIN long_to_value(LONG_MIN) /* ??? assumes 32 bit long */
+#define VALUE_SQRT_MAX long_to_value(LONG_MAX)
 #define VALUE_ZERO 0LL
 #define VALUE_ONE  1LL
 #define VALUE_MONE -1LL
@@ -66,6 +68,7 @@ typedef long Value;
 #define VALUE_TO_DOUBLE(val) ((double)(val))
 /* end LINEAR_VALUE_IS_LONG
  */
+/*
 #elif defined(LINEAR_VALUE_IS_FLOAT)
 typedef float Value;
 #define VALUE_FMT "%f"
@@ -79,6 +82,7 @@ typedef float Value;
 #define VALUE_TO_INT(val) ((int)(val))
 #define VALUE_TO_FLOAT(val) ((float)(val))
 #define VALUE_TO_DOUBLE(val) ((double)(val))
+*/
 /* end LINEAR_VALUE_IS_FLOAT
  */
 /* the purpose of the chars version is to detect invalid assignments
@@ -138,31 +142,31 @@ typedef int Value;
 
 /* binary operators on values
  */
-#define value_plus(v1,v2)  ((v1)+(v2))
-#define value_div(v1,v2)   ((v1)/(v2))
-#define value_mod(v1,v2)   ((v1)%(v2))
-#define value_mult(v1,v2)  ((v1)*(v2))
-#define value_minus(v1,v2) ((v1)-(v2))
-#define value_pdiv(v1,v2)  (divide(v1,v2))
-#define value_pmod(v1,v2)  (modulo(v1,v2))
-#define value_min(v1,v2)   (value_le(v1,v2)? (v1): (v2))
-#define value_max(v1,v2)   (value_ge(v1,v2)? (v1): (v2))
+#define value_plus(v1,v2)  		((v1)+(v2))
+#define value_div(v1,v2)   		((v1)/(v2))
+#define value_mod(v1,v2)   		((v1)%(v2))
+#define value_direct_multiply(v1,v2)	((v1)*(v2)) /* direct! */
+#define value_minus(v1,v2) 		((v1)-(v2))
+#define value_pdiv(v1,v2)  		(divide(v1,v2))
+#define value_pmod(v1,v2)  		(modulo(v1,v2))
+#define value_min(v1,v2)   		(value_le(v1,v2)? (v1): (v2))
+#define value_max(v1,v2)   		(value_ge(v1,v2)? (v1): (v2))
 
 /* assigments
  */
-#define value_assign(ref,val) ref=(val)
-#define value_addto(ref,val) ref+=(val)
-#define value_increment(ref) ref++
-#define value_product(ref,val) ref*=(val)
-#define value_substract(ref,val) ref-=(val)
-#define value_decrement(ref) ref--
-#define value_division(ref,val) ref/=(val)
-#define value_modulus(ref,val) ref%=(val)
-#define value_pdivision(ref,val) value_assign(ref,value_pdiv(ref,val))
-#define value_oppose(ref) value_assign(ref,value_uminus(ref))
-#define value_absolute(ref) value_assign(ref,value_abs(ref))
-#define value_minimum(ref,val) value_assign(ref,value_min(ref,val))
-#define value_maximum(ref,val) value_assign(ref,value_max(ref,val))
+#define value_assign(ref,val) 		ref=(val)
+#define value_addto(ref,val) 		ref+=(val)
+#define value_increment(ref) 		ref++
+#define value_direct_product(ref,val)	ref*=(val) /* direct! */
+#define value_substract(ref,val) 	ref-=(val)
+#define value_decrement(ref) 		ref--
+#define value_division(ref,val) 	ref/=(val)
+#define value_modulus(ref,val) 		ref%=(val)
+#define value_pdivision(ref,val)	value_assign(ref,value_pdiv(ref,val))
+#define value_oppose(ref) 		value_assign(ref,value_uminus(ref))
+#define value_absolute(ref)		value_assign(ref,value_abs(ref))
+#define value_minimum(ref,val)		value_assign(ref,value_min(ref,val))
+#define value_maximum(ref,val)		value_assign(ref,value_max(ref,val))
 
 /* unary operators on values
  */
@@ -185,6 +189,48 @@ typedef int Value;
 #define value_notmax_p(val)   value_ne(val,VALUE_MAX)
 
 
+/************************************************* PROTECTED MULTIPLICATION */
+
+#include <setjmp.h>
+extern jmp_buf overflow_error;
+
+/* (|v| < MAX / |w|) => v*w is okay
+ */
+#define value_protected_hard_idiv_multiply(v,w,throw)		\
+  (value_zero_p(w) || value_zero_p(v)? VALUE_ZERO:		\
+   value_lt(value_abs(v),value_div(VALUE_MAX,value_abs(w)))?	\
+   value_direct_multiply(v,w): (throw, VALUE_NAN))
+
+/* is a software idiv is assumed, quick check performed first
+ */
+#if defined(LINEAR_VALUE_ASSUME_SOFTWARE_IDIV)
+#define value_protected_multiply(v,w,throw)				      \
+  (value_le(v,VALUE_SQRT_MAX) && value_le(w,VALUE_SQRT_MAX) &&		      \
+   value_ge(v,VALUE_SQRT_MIN) && value_ge(w,VALUE_SQRT_MIN)?		      \
+   value_direct_multiply(v,w): value_protected_hard_idiv_multiply(v,w,throw))
+#else
+#define value_protected_multiply(v,w,throw)		\
+   value_protected_hard_idiv_multiply(v,w,throw)
+#endif
+
+/* protected versions
+ */
+#define value_protected_mult(v,w) 				\
+    value_protected_multiply(v,w,longjmp(overflow_error,5))
+#define value_protected_product(v,w)		\
+    v=value_protected_mult(v,w)
+
+/* whether the default is protected or not 
+ */
+#if defined(LINEAR_VALUE_PROTECT_MULTIPLY)
+#define value_mult(v,w) value_protected_mult(v,w)
+#define value_product(v,w) value_protected_product(v,w)
+#else
+#define value_mult(v,w) value_direct_multiply(v,w)
+#define value_product(v,w) value_direct_product(v,w)
+#endif
+
+/******************************************************* STATIC VALUE DEBUG */
 
 /* LINEAR_VALUE_IS_CHARS is used for type checking.
  * some operations are not allowed on (char*), thus
@@ -240,6 +286,7 @@ typedef int Value;
 #undef value_decrement
 #define value_decrement(v) value_addto(v,VALUE_MONE)
 #endif
+
 
 /* valeur absolue
  */
