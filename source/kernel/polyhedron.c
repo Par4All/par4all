@@ -1930,6 +1930,9 @@ Polyhedron *Constraints2Polyhedron(Matrix *Constraints,unsigned NbMaxRays) {
     return 0;
   }
   
+  if (Dimension > NbMaxRays)
+    NbMaxRays = Dimension;
+    
   /* If there is no constraint in the constraint matrix, return universe */
   /* polyhderon.                                                         */
   if (Constraints->NbRows==0) {  
@@ -2227,6 +2230,9 @@ Polyhedron *AddConstraints(Value *Con,unsigned NbConstraints,Polyhedron *Pol,uns
     NbRay	= Pol->NbRays;
     NbCon      	= Pol->NbConstraints + NbConstraints;
     Dimension	= Pol->Dimension + 2;	/* Homogeneous Dimension + Status */
+
+    if (NbRay > NbMaxRays)
+      NbMaxRays = NbRay;
     
     Mat = Matrix_Alloc(NbCon, Dimension);
     if(!Mat) {
@@ -2418,6 +2424,9 @@ Polyhedron *SubConstraint(Value *Con,Polyhedron *Pol,unsigned NbMaxRays,int Pass
     NbCon     = Pol->NbConstraints;
     Dimension = Pol->Dimension+2;	/* Homogeneous Dimension + Status */
     NbEle1    = NbCon * Dimension;
+    
+    if (NbRay > NbMaxRays)
+      NbMaxRays = NbRay;
     
     Mat = Matrix_Alloc(NbCon + 1, Dimension);
     if(!Mat) {
@@ -2999,6 +3008,9 @@ static int SimplifyConstraints(Polyhedron *Pol1,Polyhedron *Pol2,unsigned *Filte
     NbCon         = NbCon1 + NbCon2;
     Dimension     = Pol1->Dimension+2;    /* Homogeneous Dimension + Status */
     NbEle1        = NbCon1*Dimension;
+
+    if (NbRay > NbMaxRays)
+      NbMaxRays = NbRay;
 
     /* Allocate space for constraint matrix 'Mat' */
     Mat = Matrix_Alloc(NbCon, Dimension);
