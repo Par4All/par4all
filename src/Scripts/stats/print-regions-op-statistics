@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Formattage sous latex de certaines des informations conservees optionnellement lors
-# du calcul des regions
+# Formattage sous latex de certaines des informations conservees
+# optionnellement lors du calcul des regions
 
 # Be'atrice Creusillet, Septembre 1994
 
@@ -98,7 +98,7 @@ then
 \begin{tabular}{| l | r | r | r | r | r | r |} \hline
 Module & nb & pot must & must res & ofl errors & hermite & hermite +  \\\\ \hline
 EOF
-	awk -f $UTILDIR/region-proj-param-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
+	awk -f $PIPS_UTILDIR/region-proj-param-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
 
 
 elif [ $optype = proj_var_op_stat ]
@@ -108,7 +108,7 @@ then
 \begin{tabular}{| l | r | r | r | r |} \hline
 Module & nb & pot must & must res & ofl errors  \\\\ \hline
 EOF
-	awk -f $UTILDIR/region-proj-var-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
+	awk -f $PIPS_UTILDIR/region-proj-var-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
 
 #
 
@@ -121,7 +121,7 @@ then
 \begin{tabular}{| l | r | r | r | r | r | r |} \hline
 Module & nb & must/must & must res & must/may & must res & sc\_rn \\\\ \hline
 EOF
-	awk -f $UTILDIR/region-umust-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
+	awk -f $PIPS_UTILDIR/region-umust-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
 
 #
 
@@ -134,7 +134,7 @@ else
 \begin{tabular}{| l | r | r | r |} \hline
 Module & invocation number &  pot. must results & must results   \\\\ \hline
 EOF
-	awk -f $UTILDIR/region-binary-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
+	awk -f $PIPS_UTILDIR/region-binary-op.awk WORKSPACE=$workspace <$global.$optype >>$workspace-$prefix.tex
 fi
 
 	cat >>$workspace-$prefix.tex <<EOF
