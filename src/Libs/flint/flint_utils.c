@@ -198,7 +198,7 @@ char           *flint_print_basic(b)
     static char    *strings_of_basic[] =
     {"int", "float", "logical", "overloaded",
     "complex", "string", "unknown tag"};
-    int             i;
+    int             i = -1;
 
     switch (basic_tag(b)) {
     case is_basic_int:{
