@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1994/11/17 13:36:45 $, ) version $Revision$, 
+# $RCSfile: pipsrc.ref,v $ ($Date: 1994/11/24 13:54:23 $, ) version $Revision$, 
 # got on %D%, %T%
 # $Id$
 #
@@ -86,7 +86,7 @@ RELEDIR="${PIPSDIR}/Release"
 DOCDIR="${PIPSDIR}/Documentation"
 
 # PVM directory
-PVMDIR="${RTSRCDIR}/pvm3"
+PVMDIR="${RTSRCDIR}/pvm3.3"
 
 # where manl directory is (Pb: cannot be derived to cshrc)
 # MANPATH="${MANPATH}${MANPATH:+:}${DOCDIR}"
