@@ -856,7 +856,14 @@ int db_delete_obsolete_resources(bool (*keep_p)(string, string))
     return ndeleted;
 }
 
-/* returns whether name is a valid module.
+/* returns whether name is a "valid" module?
+ *
+ * As FI points out to me (FC), it just means that the
+ * name has been used by some-one, some-where, some-time...
+ *
+ * It just checks that some, maybe empty, resource table is associated to 
+ * this name. The table may be created when resources are marked as
+ * required by pipsmake, and is never destroyed.
  */
 bool db_module_exists_p(string name)
 {
