@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1996/09/09 17:03:34 $, )
+! ($Date: 1996/09/14 14:17:35 $, )
 !
 !-----------------
 !
@@ -996,7 +996,7 @@ _CM5(
       end if
  
       _spawn(
-      debug(print *, "spawning ", MAIN PROGRAM NAME)
+      debug(print *, "spawning ", NB OF TASKS, " ", MAIN PROGRAM NAME)
       if (.not. SPAWN PERFORMED) then
          call pvmfspawn(
      $        MAIN PROGRAM NAME,
