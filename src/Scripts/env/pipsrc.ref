@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/28 22:03:00 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/06/29 10:21:13 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -101,7 +101,7 @@ PIPS_CFLAGS="-O2 -g -ansi -pedantic -Wall -mv8 -pipe"
 PIPS_CPPFLAGS="-D__USE_FIXED_PROTOTYPES__ -I${PIPS_INCLUDEDIR} -I${PIPS_EXTEDIR}"
 # PIPS_LD="cc"
 PIPS_LD="gcc"
-PIPS_LDFLAGS="-L. -L${PIPS_LIBDIR} -L${PIPS_EXTEDIR} -g"
+PIPS_LDFLAGS="-L. -L${PIPS_LIBDIR}/$(ARCH) -L${PIPS_EXTEDIR}/$(ARCH) -g"
 PIPS_LEX="lex"
 PIPS_LFLAGS=""
 PIPS_LINT="lint"
