@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 16:45:20 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/04/24 16:47:09 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -1477,6 +1477,10 @@ gen_free_tabulated(int domain)
     
     check_read_spec_performed();
 
+    /* since gen_free is reentrant and manages sharing globally
+     * with the following table, we just call it for each object
+     * and everything is fine. Well, I hope so. FC
+     */
     message_assert("not initialized", !free_already_seen);
     free_already_seen = hash_table_make(hash_pointer, 0);
 
