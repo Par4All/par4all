@@ -2,7 +2,7 @@ c
 c     Reductions management 
 c
 c $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-c ($Date: 1996/06/08 13:57:26 $, )
+c ($Date: 1996/09/07 16:06:57 $, )
 c
 c     it is supposed that the reduction is computed on a full
 c     array, which is nor replicated anyway. If used on a part,
@@ -15,7 +15,7 @@ c
 define(`REDUCTION_NODE_DECL',`
       integer ifelse(REDTYPE, logical, t$1`,') i$1, l$1, u$1, s$1, d$1')dnl
 define(`COMPUTE_LOCALIND',`
-      t$1 = HPFC_LOCALIND(an, $1, lo$1)')dnl
+      t$1 = HPFC LOCALIND(an, $1, lo$1)')dnl
 define(`LIST_DECL_BOUNDS',`
      & dl$1, du$1')dnl
 define(`LIST_RED_BOUNDS',`
@@ -26,8 +26,8 @@ define(`TEMPO_REF',`t$1')dnl
 define(`INDEX_REF',`i$1')dnl
 define(`ZERO_REF',`0')dnl
 define(`LOOP_BOUNDS_COMPUTATION',`
-      d$1 = HPFC_PROCDIM(an, $1)
-      CALL HPFC_LOOP_BOUNDS(l$1, u$1, s$1, lo$1, up$1, an, d$1)')dnl
+      d$1 = HPFC PROCDIM(an, $1)
+      CALL HPFC LOOP BOUNDS(l$1, u$1, s$1, lo$1, up$1, an, d$1)')dnl
 define(`DO_LOOP',`
       do i$1 = l$1, u$1')dnl
 define(`ENDDO_LOOP',`
@@ -77,15 +77,15 @@ c
 c initiate with a valid value
 c
 DISJUNCTION(``
-      'CALL HPFC_CMPOWNERS(an, 
+      'CALL HPFC CMPOWNERS(an, 
      $  COMMA_REPLICATE(LEVEL, `LOWER_REF'),
      $  COMMA_REPLICATE(TO7(LEVEL), `ZERO_REF'))
       if (HPFC_SENDERP()) then
 SIMPLE_REPLICATE(LEVEL, `COMPUTE_LOCALIND')
          result = a(COMMA_REPLICATE(LEVEL, `TEMPO_REF'))
-         call COM_PREFIX`'_SNDTO_A(PVMTYPE, result)
+         call COM_PREFIX SNDTO A(PVMTYPE, result)
       else
-         call COM_PREFIX`'_RCVFR_mCS(PVMTYPE, result)
+         call COM_PREFIX RCVFR mCS(PVMTYPE, result)
       endif',``
       'result = ifelse(NAME, `SUM', 0, NAME, `MULT', 1, dnl
                       FATAL_ERROR(`unexpected name'))')
@@ -107,8 +107,8 @@ c send partial result to host, and get the final result
 c
 ifelse(ARCHITECTURE,`CM5',`dnl
       if (0.ne.CMMD_send(
-     $     CM_HOST_ID,
-     $     HOSTCHANNEL,
+     $     CM HOST ID,
+     $     HOST CHANNEL,
      $     result,
      $     M4_PVM_LENGTH(PVMTYPE))) then
          write (unit=0, fmt=*) "hpfc reduction: send failed"
@@ -116,8 +116,8 @@ ifelse(ARCHITECTURE,`CM5',`dnl
       endif
       HOSTCHANNEL = HOSTCHANNEL+2
       call CMMD_receive_bc_from_host(result, M4_PVM_LENGTH(PVMTYPE))',`
-      call HPFC_SNDTO_H(PVMTYPE, result)
-      call HPFC_RCVFR_mCH(PVMTYPE, result)')
+      call HPFC SNDTO H(PVMTYPE, result)
+      call HPFC RCVFR mCH(PVMTYPE, result)')
       build_name(nred,LEVEL,PVMTYPE,NAME) = result
       return
       end
@@ -128,30 +128,30 @@ c
       include "fpvm3.h"
 _CM5(`      include "cmmd_fort.h"')
       include "hpfc_commons.h"
-      TYPE result(MAXMAXSIZEOFPROCS), final
+      TYPE result(MAX MAX SIZE OF PROCS), final
       integer i
 c
 c get partial results
 c
-      do i=1, MAXSIZEOFPROCS
+      do i=1, MAX SIZE OF PROCS
 ifelse(ARCHITECTURE,`CM5',`dnl
          if (0.ne.CMMD_receive(
-     $     CM_NODE_IDS(i),
-     $     RECVCHANNELS(i),
+     $     CM NODE IDS(i),
+     $     RECV CHANNELS(i),
      $     result(i),
      $     M4_PVM_LENGTH(PVMTYPE))) then
             write (unit=0, fmt=*)  "hpfc reduction: reveive failed"
          endif
-         RECVCHANNELS(i) = RECVCHANNELS(i)+2',`dnl
-         SENDERTID = NODETIDS(i)
+         RECV CHANNELS(i) = RECV CHANNELS(i)+2',`dnl
+         SENDER TID = NODE TIDS(i)
          SLID = i
-         CALL HPFC_RCVFR_S(PVMTYPE, result(i))')
+         CALL HPFC RCVFR S(PVMTYPE, result(i))')
       enddo
 c
 c compute final result
 c
       final = result(1)
-      do i=2, MAXSIZEOFPROCS
+      do i=2, MAX SIZE OF PROCS
 DISJUNCTION(``
       '  if (result(i) OPERATOR final) 
      &     final = result(i)',``
@@ -162,7 +162,7 @@ c send final result to nodes
 c      
 ifelse(ARCHITECTURE,`CM5',`dnl
       call CMMD_bc_from_host(final, M4_PVM_LENGTH(PVMTYPE))',`dnl 
-      call HPFC_HSNDTO_A(PVMTYPE, final)')
+      call HPFC HSNDTO A(PVMTYPE, final)')
       build_name(hred,LEVEL,PVMTYPE,NAME) = final
       return
       end
