@@ -24,7 +24,7 @@ YFLAGS=		$(PIPS_YFLAGS)
 # The following macros define your library.
 #
 # Name of the library without the .a suffix.
-TARGET= 	regions
+TARGET= 	continuation
 #
 # Name of the main program to test or use the library
 MAIN=		main
