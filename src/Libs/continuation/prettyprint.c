@@ -31,7 +31,7 @@
 #include "prettyprint.h"
 
 #include "transformer.h"
-#include "effects.h"
+#include "effects-generic.h"
 
 #include "semantics.h"
 #include "continuation.h"
