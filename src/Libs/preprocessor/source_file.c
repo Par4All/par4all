@@ -689,12 +689,6 @@ check_fortran_syntax_before_pips(
 			  file_name);
 }
 
-/* for Linux at least
- */
-#ifndef MAXNAMLEN
-#define MAXNAMLEN (1024)
-#endif
-
 /* (./foo.database/)name.f -> NAME
  * rather ugly. C lacks some substring manipulation functions...
  */
@@ -732,7 +726,7 @@ process_user_file(string file)
 
     if (!nfile)
     {
-	pips_user_warning("Cannot open file : %s\n", file);
+	pips_user_warning("Cannot open file: %s\n", file);
 	return FALSE;
     }
 
