@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/04/02 09:11:10 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/04/02 10:52:06 $, )
  * version $Revision$
  */
 
@@ -815,8 +815,8 @@ io_efficient_compile(
     if (hpfc_empty_statement_p(stat))
     {
 	pips_debug(3, "empty statement\n");
-	*hp = make_empty_statement();
-	*np = make_empty_statement();
+	*hp = copy_statement(stat);
+	*np = copy_statement(stat);
 	debug_off();
 	return;
     }
