@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1995/03/20 09:19:47 $, )
+ * $RCSfile: list.c,v $ ($Date: 1995/03/21 13:33:34 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -67,6 +67,7 @@
    . GEN_NTH returns the N-th (beginning at 0) car of L.
      CAR(L) = GEN_NTH(0,L).
    . GEN_SORT_LIST(L, compare) sorts L in place with compare (see man qsort)
+   . GEN_ONCE(item, l) add item to l if not already there.
 */
 
 #include <stdio.h>
@@ -491,6 +492,17 @@ int n;
 list l;
 {
     return(CAR(gen_nthcdr(n, l)));
+}
+
+list gen_once(item, l)
+gen_chunk *item;
+list l;
+{
+    list c;
+    for(c=l; c!=NIL; c=CDR(c))
+	if (CHUNK(CAR(c))==item) return(l);
+
+    return(CONS(CHUNK, item, l));
 }
 
 /* Sorts a list of gen_chunks in place, to avoid mallocs. 
