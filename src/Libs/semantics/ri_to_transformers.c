@@ -955,7 +955,7 @@ bool minmax;
 	    (void) vect_variable_rename(v,
 					(Variable) e,
 					(Variable) e_old);
-	    vect_add_elem(&v, e_new, -1);
+	    vect_add_elem(&v, (Variable) e_new, (Value) -1);
 
 	    if(minmax) {
 		v = vect_multiply(v, -1);
