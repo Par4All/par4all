@@ -1,7 +1,6 @@
-/*
- * HPFC module by Fabien COELHO
+/* HPFC module by Fabien COELHO
  *
- * $RCSfile: host_node_entities.c,v $ ($Date: 1995/09/15 15:54:42 $, ) 
+ * $RCSfile: host_node_entities.c,v $ ($Date: 1995/10/05 11:32:42 $, ) 
  * version $Revision$
  */
 
@@ -22,14 +21,14 @@ GENERIC_GLOBAL_FUNCTION(old_node, entitymap)
 void store_new_node_variable(new, old)
 entity new, old;
 {
-    assert(!entity_undefined_p(new) && !entity_undefined_p(old));
+    pips_assert("defined",!entity_undefined_p(new) && !entity_undefined_p(old));
     store_new_node(old, new), store_old_node(new, old);
 }
 
 void store_new_host_variable(new, old)
 entity new, old;
 {
-    assert(!entity_undefined_p(new) && !entity_undefined_p(old));
+    pips_assert("defined",!entity_undefined_p(new) && !entity_undefined_p(old));
     store_new_host(old, new), store_old_host(new, old);
 }
 
@@ -86,8 +85,8 @@ entity module;
     if (module==host_module) return(HOST_NAME);
     /* else
      */
-    pips_error("hpfc_module_suffix", "unexpected module\n");
-    return(string_undefined); /* to avoid a gcc warning */
+    pips_internal_error("unexpected module\n");
+    return string_undefined; /* to avoid a gcc warning */
 }
   
 
@@ -103,7 +102,7 @@ entity e;
     if (current_updated_module==host_module) return(bound_new_host_p(e));
     /* else
      */
-    pips_error("bound_p", "invalid current module\n");
+    pips_internal_error("invalid current module\n");
     return(FALSE);
 }
 
@@ -115,7 +114,7 @@ entity e;
     if (current_updated_module==host_module) return(load_new_host(e));
     /* else
      */
-    pips_error("load", "invalid current module\n");
+    pips_internal_error("invalid current module\n");
     return(FALSE);
 }
 
@@ -159,37 +158,18 @@ entity module;
 {
     entity saved = current_updated_module;
 
-    debug(8, "update_object_for_module", "updating (%s) 0x%x\n",
+    pips_debug(8, "updating (%s) 0x%x\n",
 	  gen_domain_name(gen_type(obj)), (unsigned int) obj);
 
     current_updated_module = module;
 
-    gen_multi_recurse(obj, 
-		      /* 
-		       *   REFERENCES
-		       */
-		      reference_domain, 
-		      gen_true, 
-		      update_reference_for_module_rewrite,
-		      /*
-		       *   LOOPS (indexes)
-		       */
-		      loop_domain,
-		      gen_true,
-		      update_loop_for_module_rewrite,
-		      /*
-		       *   CALLS
-		       */
-		      call_domain, 
-		      gen_true, 
-		      update_call_for_module_rewrite,
-		      /*
-		       *   CODES
-		       */
-		      code_domain,
-		      gen_true,
-		      update_code_for_module_rewrite,
-		      NULL);
+    gen_multi_recurse
+	(obj, 
+	 reference_domain, gen_true, update_reference_for_module_rewrite,
+	 loop_domain, gen_true, update_loop_for_module_rewrite,
+	 call_domain, gen_true, update_call_for_module_rewrite,
+	 code_domain, gen_true, update_code_for_module_rewrite,
+	 NULL);
 
     current_updated_module = saved;
 }
@@ -211,7 +191,7 @@ entity common;
     type t = entity_type(common);
     list l = NIL, lnew = NIL;
 
-    assert(type_area_p(t));
+    pips_assert("area", type_area_p(t));
 
     l = area_layout(type_area(t));
 
@@ -286,7 +266,7 @@ entity e;
 {
     entity saved = current_updated_module, result;
     current_updated_module = module;
-    assert(bound_p(e));
+    pips_assert("bound", bound_p(e));
     result = load(e);
     current_updated_module = saved;
     return(result);
