@@ -378,6 +378,8 @@ struct eformat partial_eval_call(expression exp, Psysteme ps, effects fx)
 	      ef = partial_eval_unary_operator(func, la, ps, fx);
 	  else if ((token = IsBinaryOperator(func)) > 0)
 	      ef = partial_eval_binary_operator(func, la, ps, fx);
+	  else if ((token = IsNaryOperator(func)) > 0 && gen_length(la)==2)
+	      ef = partial_eval_binary_operator(func, la, ps, fx);
 	  else {
 	      MAPL(le, {
 		  expression expr = EXPRESSION(CAR(le));
@@ -438,39 +440,87 @@ struct eformat partial_eval_unary_operator(entity func, cons *la, Psysteme ps, e
 }
 
 
-#define PLUS 1
-#define MINUS 2
-#define MULT 3
-#define DIV 4
-#define MOD 5
+#define PERFORM_ADDITION 1
+#define PERFORM_SUBTRACTION 2
+#define PERFORM_MULTIPLICATION 3
+#define PERFORM_DIVISION 4
+#define PERFORM_MODULO 5
+#define PERFORM_MINIMUM 6
+#define PERFORM_MAXIMUM 7
 
-struct eformat partial_eval_binary_operator(entity func, cons *la, Psysteme ps, effects fx)
+struct eformat partial_eval_mult_operator(expression *ep1,
+					  expression *ep2,
+					  Psysteme ps,
+					  effects fx)
 {
     struct eformat ef, ef1, ef2;
-    expression *ep1, *ep2;
-    int token= -1;
 
-    pips_assert("partial_eval_binary_operator", gen_length(la)==2);
-    ep1= &EXPRESSION(CAR(la));
-    ep2= &EXPRESSION(CAR(CDR(la)));
+	ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+	ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
 
-    if (strcmp(entity_local_name(func), MINUS_OPERATOR_NAME) == 0) {
-	token = MINUS;
-    }
-    if (strcmp(entity_local_name(func), PLUS_OPERATOR_NAME) == 0) {
-	token = PLUS;
-    }
-    if (strcmp(entity_local_name(func), MULTIPLY_OPERATOR_NAME) == 0) {
-	token = MULT;
-    }
-    if (strcmp(entity_local_name(func), DIVIDE_OPERATOR_NAME) == 0) {
-	token = DIV;
-    }
-    if (strcmp(entity_local_name(func), "MOD") == 0) {
-	token = MOD;
-    }
+	if(ef1.icoef==0 && ef2.icoef==0) {
+	    ef.icoef=0;
+	    ef.expr=expression_undefined;
+	    ef.ishift= ef1.ishift * ef2.ishift;
+	    ef.simpler= TRUE;
+	}
+	else if(ef1.icoef!=0 && ef2.icoef!=0) {
+	    if(ef2.icoef!=1 && ef2.ishift==0) {
+		expression *ep;
+		/* exchange ef1 and ef2 (see later) */
+		ef=ef2; ef2=ef1; ef1=ef; ef= eformat_undefined;
+		ep=ep2; ep2=ep1; ep1=ep;
+	    }
+	    if(ef1.icoef!=1 && ef1.ishift==0) {
+		ef.simpler= ef1.simpler;
+		ef.icoef= ef1.icoef;
+		regenerate_expression(&ef2, ep2);
+		ef.expr= MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+					ef1.expr, *ep2);
+		ef.ishift= 0;
+	    }
+	    else { /* cannot optimize */
+		regenerate_expression(&ef1, ep1);
+		regenerate_expression(&ef2, ep2);
+		
+		ef= eformat_undefined;
+	    }
+	}
+	else {
+	    if(ef2.icoef==0) {
+		expression *ep;
+		/* exchange ef1 and ef2 (see later) */
+		ef=ef2; ef2=ef1; ef1=ef; ef= eformat_undefined;
+		ep=ep2; ep2=ep1; ep1=ep;
+	    }
+	    /* here we know that ef1.ecoef==0 and ef2.ecoef!=0 */
+	    if(ef1.ishift==0) {
+		ef.icoef= 0;
+		ef.expr= expression_undefined;
+		ef.ishift= 0;
+		ef.simpler= TRUE;
+		regenerate_expression(&ef2, ep2);
+	    }
+	    else {
+		ef.icoef= ef1.ishift * ef2.icoef;
+		ef.expr= ef2.expr;
+		ef.ishift= ef1.ishift * ef2.ishift;
+		ef.simpler= (ef1.ishift==1 || ef2.icoef!=1 
+			     || ef1.simpler || ef2.simpler);
+	    }
+	}
 
-    if ( token==PLUS || token==MINUS ) {
+    return ef;
+}
+
+struct eformat partial_eval_plus_or_minus_operator(int token,
+						   expression *ep1,
+						   expression *ep2,
+						   Psysteme ps,
+						   effects fx)
+{
+    struct eformat ef, ef1, ef2;
+
 	ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
 	ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
 
@@ -479,8 +529,8 @@ struct eformat partial_eval_binary_operator(entity func, cons *la, Psysteme ps, 
 	   && (ef1.icoef<-1 || ef1.icoef>1) ) {
 	    /* factorize */
 	    ef.simpler=TRUE;
-	    if( (token==PLUS && ef1.icoef==ef2.icoef)
-	       || (token==MINUS && ef1.icoef==-ef2.icoef) ) {
+	    if( (token==PERFORM_ADDITION && ef1.icoef==ef2.icoef)
+	       || (token==PERFORM_SUBTRACTION && ef1.icoef==-ef2.icoef) ) {
 		/* addition */
 		ef.expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
 					ef1.expr, 
@@ -488,7 +538,7 @@ struct eformat partial_eval_binary_operator(entity func, cons *la, Psysteme ps, 
 		ef.icoef= ef1.icoef;
 	    }
 	    else if( (ef1.icoef>1)
-		    && (token==MINUS ? (ef2.icoef>0) : (ef2.icoef<0)) ) {
+		    && (token==PERFORM_SUBTRACTION ? (ef2.icoef>0) : (ef2.icoef<0)) ) {
 		/* substraction e1-e2 */
 		ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
 					ef1.expr, 
@@ -505,7 +555,7 @@ struct eformat partial_eval_binary_operator(entity func, cons *la, Psysteme ps, 
 	}
 	else if(ef1.icoef!=0 && ef2.icoef!=0) {
 	    int c1 = ef1.icoef;
-	    int c2 = (token==MINUS ? -ef2.icoef : ef2.icoef);
+	    int c2 = (token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
 	    expression e1= generate_monome((c1>0 ? c1: -c1), ef1.expr);
 	    expression e2= generate_monome((c2>0 ? c2: -c2), ef2.expr);
 	    /* generate without factorize */
@@ -531,7 +581,7 @@ struct eformat partial_eval_binary_operator(entity func, cons *la, Psysteme ps, 
 	    if(ef1.icoef==0) {
 		if(ef1.ishift==0) ef.simpler=TRUE;
 		ef.expr=ef2.expr;
-		ef.icoef=(token==MINUS ? -ef2.icoef : ef2.icoef);
+		ef.icoef=(token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
 	    }
 	    else {
 		if(ef2.ishift==0) ef.simpler=TRUE;
@@ -546,10 +596,321 @@ struct eformat partial_eval_binary_operator(entity func, cons *la, Psysteme ps, 
 	    /* simplify shifts */
 	    ef.simpler= TRUE;
 	}
-	ef.ishift= (token==MINUS ? 
+	ef.ishift= (token==PERFORM_SUBTRACTION ? 
+		    ef1.ishift-ef2.ishift : ef1.ishift+ef2.ishift);
+
+    return ef;
+}
+
+struct eformat partial_eval_plus_operator(expression *ep1,
+					  expression *ep2,
+					  Psysteme ps,
+					  effects fx)
+{
+    struct eformat ef;
+
+    ef = partial_eval_plus_or_minus_operator(PERFORM_ADDITION,
+					     ep1, ep2, ps, fx);
+
+    return ef;
+}
+
+struct eformat partial_eval_minus_operator(expression *ep1,
+					  expression *ep2,
+					  Psysteme ps,
+					  effects fx)
+{
+    struct eformat ef;
+
+    ef = partial_eval_plus_or_minus_operator(PERFORM_SUBTRACTION,
+					     ep1, ep2, ps, fx);
+
+    return ef;
+}
+
+struct eformat partial_eval_div_or_mod_operator(int token,
+						   expression *ep1,
+						   expression *ep2,
+						   Psysteme ps,
+						   effects fx)
+{
+    struct eformat ef, ef1, ef2;
+
+    ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+	ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
+
+	if( ef2.icoef==0 && ef2.ishift == 0 ) 
+	    user_error("partial_eval_binary_operator", 
+		       "division by zero!\n");
+	if( token==PERFORM_DIVISION && ef2.icoef==0 
+	   && (ef1.ishift % ef2.ishift)==0 
+	   && (ef1.icoef % ef2.ishift)==0 ) {
+	    /* integer division does NOT commute with in any */
+	    /* multiplication -> only performed if "exact" */
+	    ef.simpler= TRUE;
+	    ef.icoef= ef1.icoef / ef2.ishift;
+	    ef.ishift= ef1.ishift / ef2.ishift;
+	    ef.expr= ef1.expr;
+	}
+	else if(ef1.icoef==0 && ef2.icoef==0) {
+	    ef.simpler= TRUE;
+	    ef.icoef= 0;
+	    ef.expr= expression_undefined;
+	    if (token==PERFORM_DIVISION) { /* refer to Fortran77 chap 6.1.5 */
+		ef.ishift= FORTRAN_DIV(ef1.ishift, ef2.ishift);
+	    }
+	    else { /* tocken==PERFORM_MODULO */
+		ef.ishift= FORTRAN_MOD(ef1.ishift, ef2.ishift);
+	    }
+	}
+	else {
+	    regenerate_expression(&ef1, ep1);
+	    regenerate_expression(&ef2, ep2);
+	    ef= eformat_undefined;
+	}
+    return ef;
+}
+
+struct eformat partial_eval_div_operator(expression *ep1,
+					  expression *ep2,
+					  Psysteme ps,
+					  effects fx)
+{
+    struct eformat ef;
+
+    ef = partial_eval_div_or_mod_operator(PERFORM_DIVISION,
+					     ep1, ep2, ps, fx);
+
+    return ef;
+}
+
+struct eformat partial_eval_mod_operator(expression *ep1,
+					  expression *ep2,
+					  Psysteme ps,
+					  effects fx)
+{
+    struct eformat ef;
+
+    ef = partial_eval_div_or_mod_operator(PERFORM_MODULO,
+					     ep1, ep2, ps, fx);
+
+    return ef;
+}
+
+struct eformat partial_eval_min_or_max_operator(int token,
+						   expression *ep1,
+						   expression *ep2,
+						   Psysteme ps,
+						   effects fx)
+{
+    struct eformat ef, ef1, ef2;
+
+    ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+    ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
+
+    if( ef1.icoef == 0 && ef2.icoef == 0 ) {
+	ef.icoef = 0;
+	ef.ishift = (token==PERFORM_MAXIMUM)? MAX(ef1.ishift,ef2.ishift):
+	    MIN(ef1.ishift,ef2.ishift);
+	ef.expr = expression_undefined;
+	ef.simpler = TRUE;
+    }
+    else {
+	regenerate_expression(&ef1, ep1);
+	regenerate_expression(&ef2, ep2);
+	ef= eformat_undefined;
+    }
+
+    return ef;
+}
+
+struct eformat partial_eval_min_operator(expression *ep1,
+					  expression *ep2,
+					  Psysteme ps,
+					  effects fx)
+{
+    struct eformat ef;
+
+    ef = partial_eval_min_or_max_operator(PERFORM_MINIMUM,
+					     ep1, ep2, ps, fx);
+
+    return ef;
+}
+
+struct eformat partial_eval_max_operator(expression *ep1,
+					  expression *ep2,
+					  Psysteme ps,
+					  effects fx)
+{
+    struct eformat ef;
+
+    ef = partial_eval_min_or_max_operator(PERFORM_MAXIMUM,
+					  ep1, ep2, ps, fx);
+
+    return ef;
+}
+
+static struct perform_switch {
+    string operator_name;
+    struct eformat (*binary_operator)(expression *, expression *, Psysteme, effects);
+} binary_operator_switch[] = {
+    {PLUS_OPERATOR_NAME, partial_eval_plus_operator},
+    {MINUS_OPERATOR_NAME, partial_eval_minus_operator},
+    {MULTIPLY_OPERATOR_NAME, partial_eval_mult_operator},
+    {DIVIDE_OPERATOR_NAME, partial_eval_div_operator},
+    {MODULO_OPERATOR_NAME, partial_eval_mod_operator},
+    {MIN0_OPERATOR_NAME, partial_eval_min_operator},
+    {MAX0_OPERATOR_NAME, partial_eval_max_operator},
+    {0 , 0}
+};
+
+struct eformat partial_eval_binary_operator(entity func,
+						cons *la,
+						Psysteme ps,
+						effects fx)
+{
+    struct eformat ef;
+    expression *ep1, *ep2;
+    int i = 0;
+    struct eformat (*binary_partial_eval_operator)(expression *, 
+				      expression *, 
+				      Psysteme, 
+				      effects) = 0;
+
+    pips_assert("partial_eval_binary_operator", gen_length(la)==2);
+    ep1= &EXPRESSION(CAR(la));
+    ep2= &EXPRESSION(CAR(CDR(la)));
+
+    while (binary_operator_switch[i].operator_name!=NULL) {
+	if (strcmp(binary_operator_switch[i].operator_name,
+		   entity_local_name(func))==0) {
+	    binary_partial_eval_operator = 
+		binary_operator_switch[i].binary_operator;
+	    break;
+	}
+	i++;
+    }
+
+    if (binary_partial_eval_operator!=0)
+	ef = binary_partial_eval_operator (ep1, ep2, ps, fx);
+    else {
+	partial_eval_expression_and_regenerate(ep1, ps, fx);
+	partial_eval_expression_and_regenerate(ep2, ps, fx);
+	ef = eformat_undefined;
+    }
+
+    return ef;
+}
+
+struct eformat partial_eval_binary_operator_old(entity func,
+						cons *la,
+						Psysteme ps,
+						effects fx)
+{
+    struct eformat ef, ef1, ef2;
+    expression *ep1, *ep2;
+    int token= -1;
+
+    pips_assert("partial_eval_binary_operator", gen_length(la)==2);
+    ep1= &EXPRESSION(CAR(la));
+    ep2= &EXPRESSION(CAR(CDR(la)));
+
+    if (strcmp(entity_local_name(func), MINUS_OPERATOR_NAME) == 0) {
+	token = PERFORM_SUBTRACTION;
+    }
+    if (strcmp(entity_local_name(func), PLUS_OPERATOR_NAME) == 0) {
+	token = PERFORM_ADDITION;
+    }
+    if (strcmp(entity_local_name(func), MULTIPLY_OPERATOR_NAME) == 0) {
+	token = PERFORM_MULTIPLICATION;
+    }
+    if (strcmp(entity_local_name(func), DIVIDE_OPERATOR_NAME) == 0) {
+	token = PERFORM_DIVISION;
+    }
+    if (strcmp(entity_local_name(func), "MOD") == 0) {
+	token = PERFORM_MODULO;
+    }
+
+    if ( token==PERFORM_ADDITION || token==PERFORM_SUBTRACTION ) {
+	ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
+	ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
+
+	/* generate ef.icoef and ef.expr */
+	if( (ef1.icoef==ef2.icoef || ef1.icoef==-ef2.icoef)
+	   && (ef1.icoef<-1 || ef1.icoef>1) ) {
+	    /* factorize */
+	    ef.simpler=TRUE;
+	    if( (token==PERFORM_ADDITION && ef1.icoef==ef2.icoef)
+	       || (token==PERFORM_SUBTRACTION && ef1.icoef==-ef2.icoef) ) {
+		/* addition */
+		ef.expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+					ef1.expr, 
+					ef2.expr);
+		ef.icoef= ef1.icoef;
+	    }
+	    else if( (ef1.icoef>1)
+		    && (token==PERFORM_SUBTRACTION ? (ef2.icoef>0) : (ef2.icoef<0)) ) {
+		/* substraction e1-e2 */
+		ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+					ef1.expr, 
+					ef2.expr);
+		ef.icoef= ef1.icoef;
+	    }
+	    else {
+		/* substraction e2-e1 */
+		ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+					ef2.expr, 
+					ef1.expr);
+		ef.icoef= -ef1.icoef;
+	    }
+	}
+	else if(ef1.icoef!=0 && ef2.icoef!=0) {
+	    int c1 = ef1.icoef;
+	    int c2 = (token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
+	    expression e1= generate_monome((c1>0 ? c1: -c1), ef1.expr);
+	    expression e2= generate_monome((c2>0 ? c2: -c2), ef2.expr);
+	    /* generate without factorize */
+	    ef.simpler= (ef1.simpler || ef2.simpler); /* not precise ?? */
+	    if(c1*c2>0) {
+		ef.expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+					e1, e2);
+		ef.icoef= (c1>0 ? 1 : -1);
+	    }
+	    else if(c1>0) {
+		ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+					e1, e2);
+		ef.icoef= 1;
+	    }
+	    else {
+		ef.expr= MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+					e2, e1);
+		ef.icoef= 1;
+	    }
+	}
+	else {
+	    ef.simpler= (ef1.simpler || ef2.simpler);
+	    if(ef1.icoef==0) {
+		if(ef1.ishift==0) ef.simpler=TRUE;
+		ef.expr=ef2.expr;
+		ef.icoef=(token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
+	    }
+	    else {
+		if(ef2.ishift==0) ef.simpler=TRUE;
+		ef.expr=ef1.expr;
+		ef.icoef=ef1.icoef;
+	    }
+	}
+
+	/* generate ef.ishift */
+	if ( (ef1.icoef==0 || ef1.ishift!=0)
+	    && (ef2.icoef==0 || ef2.ishift!=0) ) {
+	    /* simplify shifts */
+	    ef.simpler= TRUE;
+	}
+	ef.ishift= (token==PERFORM_SUBTRACTION ? 
 		    ef1.ishift-ef2.ishift : ef1.ishift+ef2.ishift);
     }
-    else if( token==MULT ) {
+    else if( token==PERFORM_MULTIPLICATION ) {
 	ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
 	ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
 
@@ -605,14 +966,14 @@ struct eformat partial_eval_binary_operator(entity func, cons *la, Psysteme ps, 
 	    }
 	}
     }
-    else if(token==DIV || token==MOD) {
+    else if(token==PERFORM_DIVISION || token==PERFORM_MODULO) {
 	ef1 = partial_eval_expression_and_copy(*ep1, ps, fx);
 	ef2 = partial_eval_expression_and_copy(*ep2, ps, fx);
 
 	if( ef2.icoef==0 && ef2.ishift == 0 ) 
 	    user_error("partial_eval_binary_operator", 
 		       "division by zero!\n");
-	if( token==DIV && ef2.icoef==0 
+	if( token==PERFORM_DIVISION && ef2.icoef==0 
 	   && (ef1.ishift % ef2.ishift)==0 
 	   && (ef1.icoef % ef2.ishift)==0 ) {
 	    /* integer division does NOT commute with in any */
@@ -626,10 +987,10 @@ struct eformat partial_eval_binary_operator(entity func, cons *la, Psysteme ps, 
 	    ef.simpler= TRUE;
 	    ef.icoef= 0;
 	    ef.expr= expression_undefined;
-	    if (token==DIV) { /* refer to Fortran77 chap 6.1.5 */
+	    if (token==PERFORM_DIVISION) { /* refer to Fortran77 chap 6.1.5 */
 		ef.ishift= FORTRAN_DIV(ef1.ishift, ef2.ishift);
 	    }
-	    else { /* tocken==MOD */
+	    else { /* tocken==PERFORM_MODULO */
 		ef.ishift= FORTRAN_MOD(ef1.ishift, ef2.ishift);
 	    }
 	}
@@ -651,7 +1012,7 @@ struct eformat partial_eval_binary_operator(entity func, cons *la, Psysteme ps, 
  * optimized so that it can be called for any compatible ef and *ep;
  * result in *ep.
  */
-int regenerate_expression(struct eformat *efp, expression *ep)
+void regenerate_expression(struct eformat *efp, expression *ep)
 {
     if(eformat_equivalent_p(*efp,eformat_undefined)) {
 	/* nothing to do because expressions are the same */
