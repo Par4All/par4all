@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.17  1997/08/18 07:43:58  coelho
+# *_MAIN added.
+#
 # Revision 1.16  1997/08/05 14:27:17  coelho
 # switched to new generic effects.
 #
@@ -62,11 +65,18 @@ PIPS_X11_ADDED_LDFLAGS='-L$(X11_ROOT)/lib'
 PIPS_X11_ADDED_LIBS='-lX11'
 
 #
+# PIPS
+
+PIPS_MAIN='pips_main.o'
+
+#
 # WPIPS
 
 WPIPS_ADDED_CPPFLAGS='-I$(OPENWINHOME)/include -Iicons'
 WPIPS_ADDED_LIBS='-lxview -lolgx -lX11'
 WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib'
+
+WPIPS_MAIN='wpips_main.o'
 
 #
 # TPIPS
@@ -75,10 +85,12 @@ WPIPS_ADDED_LDFLAGS='-L$(OPENWINHOME)/lib'
 
 TPIPS_ADDED_LIBS='-lreadline -ltermcap'
 
+TPIPS_MAIN='tpips_main.o'
+
+#
+# FPIPS
+
+FPIPS_MAIN='fpips_main.o'
+
 # end of it!
 #
-
-
-
-
-
