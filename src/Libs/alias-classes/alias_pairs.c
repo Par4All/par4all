@@ -229,7 +229,7 @@ add_alias_pairs_for_this_caller( entity caller )
 
     caller_statement = get_current_module_statement();
 
- *  gen_multi_recurse(obj,
+/*  gen_multi_recurse(obj,
  *                   [domain, filter, rewrite,]*
  *                    NULL);
  *
@@ -237,7 +237,8 @@ add_alias_pairs_for_this_caller( entity caller )
  *  applies filter_i on encountered domain_i objects,
  *  if true, recurses down from the domain_i object, 
  *       and applies rewrite_i on exit from the object.
- 
+ */
+
     gen_multi_recurse(caller_statement,
 		      statement_domain,
 		      stmt_filter,
