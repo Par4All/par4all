@@ -193,7 +193,7 @@ int ofl_ctrl;
 void build_sc_nredund_1pass(ps)
 Psysteme *ps;
 {
-    return(build_sc_nredund_1pass_ofl_ctrl(ps,OFL_CTRL));
+    build_sc_nredund_1pass_ofl_ctrl(ps,OFL_CTRL);
 } 
 
 
@@ -229,7 +229,7 @@ void build_sc_nredund_2pass(Psysteme *psc)
     if (SC_UNDEFINED_P(*psc)) 
 	return;
     else
-	return(build_sc_nredund_2pass_ofl_ctrl(psc,OFL_CTRL));
+	build_sc_nredund_2pass_ofl_ctrl(psc, OFL_CTRL);
 }
 
 
