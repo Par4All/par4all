@@ -1,25 +1,27 @@
+/*
+  $Id$
 
+  $Log: TextDisplayer.java,v $
+  Revision 1.6  1998/10/17 12:20:33  coelho
+  indentation fixed.
+  Borders++.
 
-/** $Id$
-  * $Log: TextDisplayer.java,v $
-  * Revision 1.5  1998/10/17 09:53:01  coelho
-  * typo.
-  *
-  * Revision 1.4  1998/10/17 09:42:01  coelho
-  * frame title now includes the date (to check for recomputations).
-  * more comments.
-  *
-  * Revision 1.3  1998/10/16 13:58:55  coelho
-  * *** empty log message ***
-  *
-  * Revision 1.2  1998/06/30 15:03:02  didry
-  * manages a new panel
-  *
-  * Revision 1.1  1998/06/09 07:28:28  didry
-  * Initial revision
-  *
-  */
-
+  Revision 1.5  1998/10/17 09:53:01  coelho
+  typo.
+  
+  Revision 1.4  1998/10/17 09:42:01  coelho
+  frame title now includes the date (to check for recomputations).
+  more comments.
+  
+  Revision 1.3  1998/10/16 13:58:55  coelho
+  *** empty log message ***
+  
+  Revision 1.2  1998/06/30 15:03:02  didry
+  manages a new panel
+  
+  Revision 1.1  1998/06/09 07:28:28  didry
+  Initial revision
+*/
 
 package JPips;
 
@@ -121,23 +123,23 @@ public class TextDisplayer extends Displayer
     */
   public void display(String title, String text,
   		      boolean locked, boolean writable)
+  {
+    PTextFrame f = getFreeFrame();
+    if(f != null)
     {
-      PTextFrame f = getFreeFrame();
-      if(f != null)
-        {
-	  f.setTitle(title);
-	  f.ta.setText(text);
-	  f.panelButton.setText(title);
-	  f.locked = locked;
-	  f.writable = writable;
-	}
-      else
-        {
-          f = new PTextFrame(title, text, locked, writable);
-          register(f);
-          f.setVisible(true);
-	}
+      f.setTitle(title);
+      f.ta.setText(text);
+      f.panelButton.setText(title);
+      f.locked = locked;
+      f.writable = writable;
     }
+    else
+    {
+      f = new PTextFrame(title, text, locked, writable);
+      register(f);
+      f.setVisible(true);
+    }
+  }
 
 
   /** @return info from the specified file
@@ -251,64 +253,60 @@ public class TextDisplayer extends Displayer
   /** Updates the panel.
     */
   public void updatePanel()
+  {
+    panel.removeAll();
+    PPanel p = new PPanel(new GridBagLayout());
+    GridBagConstraints c = new GridBagConstraints();
+    c.gridx = 0;
+    c.insets = new Insets(0,0,0,0);
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.anchor = GridBagConstraints.NORTH;
+    for(int i=0; i<frameVector.size(); i++)
     {
-      panel.removeAll();
-      PPanel p = new PPanel(new GridBagLayout());
-      GridBagConstraints c = new GridBagConstraints();
-      c.gridx = 0;
-      c.insets = new Insets(0,0,0,0);
-      c.fill = GridBagConstraints.HORIZONTAL;
-      c.anchor = GridBagConstraints.NORTH;
-      for(int i=0; i<frameVector.size(); i++)
-        {
-	  c.gridy = i;
-          PTextFrame f = (PTextFrame)frameVector.elementAt(i);
-          p.add(f.panelButton,c);
-	}
-      PScrollPanel scrollPanel = new PScrollPanel((Component)p);
-      panel.add(scrollPanel);
-      frame.repaint();
-      frame.pack();
+      c.gridy = i;
+      PTextFrame f = (PTextFrame)frameVector.elementAt(i);
+      p.add(f.panelButton,c);
     }
+    PScrollPanel scrollPanel = new PScrollPanel((Component)p);
+    panel.add(scrollPanel);
+    frame.repaint();
+    frame.pack();
+  }
 
 
-/** A link between an extension and its representative string..
-  * @author Francois Didry
-  */
-static public class Extension
-{
-
-
-  public String		extension,	//extension 
-  			info;		//information about the extension
-
-
-  /** Sets the extension and its info..
-    */
-  public Extension(String extension, String info)
+  /** A link between an extension and its representative string..
+   * @author Francois Didry
+   */
+  static public class Extension
+  {
+    
+    
+    public String		extension,	//extension 
+      info;		//information about the extension
+    
+    
+    /** Sets the extension and its info..
+     */
+    public Extension(String extension, String info)
     {
       this.extension = extension;
       this.info = info;
     }
-
-
-  /** @return the extension.
-    */
-  public String getExtension()
+    
+    
+    /** @return the extension.
+     */
+    public String getExtension()
     {
       return extension;
     }
-
-
-  /** @return the info.
-    */
-  public String getInfo()
+    
+    
+    /** @return the info.
+     */
+    public String getInfo()
     {
       return info;
     }
-
-
-}
-
-
+  }
 }
