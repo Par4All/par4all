@@ -333,7 +333,7 @@ statement st;
 	  comment = (char*) malloc(64);
 	  sprintf(comment, "C  ");
 	  sprintf(comment, "%s %s", comment,
-		  words_to_string(words_call(ca, 0)));
+		  words_to_string(words_call(ca, 0, TRUE)));
 	  sprintf(comment, "%s\n", comment);
  
 	  stat = make_statement(entity_empty_label(),
