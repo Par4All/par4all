@@ -22,17 +22,23 @@ struct S
 struct S sol_space[SOL_SIZE];
 static int sol_free;
 
-Entier mod();
+Entier sol_mod();
 
-Entier pgcd(x,y)
+Entier sol_pgcd(x,y)
 Entier x, y;
 {Entier r;
  while(y)
-     {r = mod(x, y);
+     {r = sol_mod(x, y);
       x = y;
       y = r;
      }
  return(x>= 0? x : -x);
+}
+
+Entier sol_ppcm(Entier x, Entier y)
+{
+    Entier gcd = sol_pgcd(x, y), lcm = x * (y/gcd);
+    return lcm>=0 ? lcm: -lcm;
 }
 
 void sol_init()
@@ -166,7 +172,7 @@ int i;
                 for(j = 0; j<n; j++)
                    {i++; p++;
                     N = p->param1; D = p->param2;
-                    d = pgcd(N, D);
+                    d = sol_pgcd(N, D);
 	            if(d == D){putc(' ', foo);
 		               fprintf(foo, FORMAT, N/d);
 			       if(verbose>0){
@@ -205,7 +211,7 @@ int i;
 		if(verbose>0)fprintf(dump, ")\n");
 		break;
      case Val : N = p->param1; D = p->param2;
-                d = pgcd(N, D);
+                d = sol_pgcd(N, D);
 		if(d == D){putc(' ', foo);
 		           fprintf(foo, FORMAT, N/d);
 			   if(verbose>0)
