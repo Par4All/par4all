@@ -55,12 +55,22 @@ void ParserError(char * f, char * m)
     extern char sssbuf[];
     extern char * sssptr;
     extern int ssprevious;
+    entity mod = get_current_module_entity();
 
     sssptr = sssbuf;
 # define MMNEWLINE 10
     ssprevious = MMNEWLINE;
 
     ResetBlockStack();
+
+    /* Get rid of partly declared variables... */
+    if(mod!=entity_undefined) {
+	CleanLocalEntities(mod);
+	entity_type(mod) = type_undefined;
+	entity_storage(mod) = storage_undefined;
+	entity_initial(mod) = value_undefined;
+    }
+
     reset_current_module_entity();
     free(CurrentFN);
     CurrentFN = NULL;
