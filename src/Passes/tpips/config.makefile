@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/08 17:19:19 $, 
+# $Date: 1996/08/08 17:28:28 $, 
 
 LEX=		flex
 CPPFLAGS+=	-DFLEX_SCANNER
@@ -24,7 +24,7 @@ ana_lex_completed.l:	ana_lex.l \
 
 tp_lex.c: ana_lex_completed.l tp_yacc.h
 	$(SCAN) ana_lex_completed.l | \
-	sed -e '/^FILE *\*/s,=[^,;]*,,g;s/YY/TP_/g;s/yy/tp_/g' > tp_lex.c
+	sed '/^FILE *\*/s,=[^,;]*,,g;s/YY/TP_/g;s/yy/tp_/g' > tp_lex.c
 
 # on SunOS 4.1: yacc generates "extern char *malloc(), *realloc();"!
 # filtred here.
