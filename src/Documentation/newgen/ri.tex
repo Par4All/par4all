@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1997/07/24 11:18:39 $, 
+%% $Date: 1997/07/24 17:03:52 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,comment,newgen_domain}
@@ -9,7 +9,9 @@
 \makeindex
 
 \title{PIPS: Internal Representation of Fortran Code}
-\author{Fran\c{c}ois Irigoin \\
+\author{Fabien Coelho\\
+  B\'eatrice Creusillet\\
+  Fran\c{c}ois Irigoin \\
   Pierre Jouvelot \\
   Ronan Keryell \\
   Rémi Triolet\\
@@ -36,20 +38,22 @@ currently are translated into C or Common Lisp declarations and basic
 run-time support routines, such as \verb+make+, \verb+free+,... A
 basic understanding of Newgen declarations\footnote{If you edit this
   document, please remember that NewGen declarations introduced by
-  \expandafter\texttt{\string\domain} must fit on one line.} is
+  \expandafter\texttt{\string\domain} must fit on one line in the source
+  Latex file, although they may be printed on several lines by Latex.} is
 assumed throughout this document, but the notation is close enough to
 standard programming language to be interpreted by newcommers. For
 more information about NewGen see \cite{JT89,JT90}.
 
 This document is part of PIPS documentation and its Latex version is
-located in \verb+$PIPS_ROOT/Src/Documentation/newgen/ri.tex+ (\verb+ri+
+located in \verb+$PIPS_ROOT/Src/Documentation/newgen/ri.tex+\footnote{The
+  development version is located in \verb+$PIPS_DIR/Development/Documentation/newgen/ri.tex+.} (\verb+ri+
 stands for Internal Representation, {\em représentation interne} in
 French). It is used to generate a PIPS include file called
 \verb+$PIPS_ROOT/Include/ri.h+. The functions available to manipulate
 these data structures are grouped in library
 \verb+$PIPS_ROOT/Src/Libs/ri-util+. These functions are grouped in files
 according to the {\em main} type in their signatures. There is no partial order
-between types is used to build the internal representation, but they are
+between types used to build the internal representation, but they are
 clustered in a (hopefully) meaningful way.
 
 %%$
@@ -621,11 +625,10 @@ Le sous-domaine \verb/formal/ est réservé aux parame`tres formels des
 modules.
 \end{comment}
 
-Member {\tt rom} is used for all entities whose value cannot
-change. This set of entities includes modules, labels, intrinsic
-operators, symbolic values (defined by Fortran {\tt PARAMETER} statement
-or by the semantics analysis\footnote{Béatrice: How about $\phi$
-variables?}), numerical constant,...
+Member {\tt rom} is used for all entities whose value cannot change. This
+set of entities includes modules, labels, intrinsic operators, symbolic
+values (defined by Fortran {\tt PARAMETER} statement or by the semantics
+analysis or by the region analyses), numerical constant,...
 
 \begin{comment}
 Le sous-domaine \verb/rom/ est utilisé pour toutes les entités dont la
@@ -814,8 +817,7 @@ program, must be loaded before any piece of code can be loaded.
 Type {\tt code} only is used for declarations. Member {\tt declarations}
 contains a list of entities in the module scope. Local variables, formal
 parameters and commons are in this list. It also may contain symbolic
-constants, operators and intrinsics declared or referenced in the module
-(Fabien?).
+constants, operators and intrinsics declared or referenced in the module.
 
 \begin{comment}
 Le domaine \verb/code/ est utilisé
@@ -1075,6 +1077,14 @@ statement. The {\em persistant} pragma is needed to avoid freeing the
 statements when the mapping is freed. See NewGen documentation in
 \cite{JT90}.
 
+\paragraph{Mappings from statement to integer}
+
+\domain{persistant\_statement\_to\_statement = persistant statement -> int}
+{}
+
+Type {\tt persistant\_statement\_to\_int} is used for instance to
+associate line number to a statement.
+
 \subsection{Instruction}
 \label{subsection-instruction}
 \index{Instruction}
@@ -1130,7 +1140,7 @@ Several PIPS contributors have asked for a \verb/while/ construct.
 
 Type {\tt sequence} is self-explanatory. This is the standard sequence
 constructor. The empty sequence is used to represent an instruction with
-no effect, a NOP. See {\tt empty\_statement\_p()}.
+no effect, a {\tt NOP}. See {\tt empty\_statement\_p()}.
 
 Note that the statement owning the sequence cannot have information
 such as \verb|comment|, etc. on it. See~\ref{}
@@ -1282,10 +1292,17 @@ range} contains the lower and upper bounds, as well as the step. Field
 a sequence. Field {\tt label} is used for Fortran labelled DO loops. It
 is the label of the last statement in the loop body. Field {\tt
 execution} specifies if the loop should be executed sequentially or
-concurrently. Entities in the {\tt local} field are loop-private
+concurrently. Entities in the {\tt local}\index{Private} field are loop-private
 variables. They can be stack-allocated on body entrance and deallocated
 on exit. The read and write effects on these variables are not visible
-from outside the loop body.
+from outside the loop body. They can be privatized and their effects can
+be ignored when running the loop in parallel if each processor gets a
+private copy of it.
+
+This field should be factored out in the \verb/statement/ type in order
+to declare variables local to a block, as in C. However, the two levels,
+statement and instruction, would make coding more difficult.
+
 
 \begin{comment}
 Le domaine \verb/loop/ permet de représenter les boucles du type DO Fortran
@@ -1335,14 +1352,6 @@ Fortran~90 triplet construct is a range. See
 Section~\ref{section-expressions} for details about expressions. For
 loops, other ranges are {\em not} expected in bound and step expressions.
 
-Field /verb/locals/\index{Private} is used to declare variables whose life time is
-limited to the loop body. They can be privatized and their effects can
-be ignored when running the loop in parallel if each processor gets a
-private copy of it.
-
-This field should be factored out in the \verb/statement/ type in order
-to declare variables local to a block, as in C. However, the two levels,
-statement and instruction, would make coding more difficult.
 
 \subsubsection{While Loop}
 \label{subsubsection-whileloop}
@@ -1646,8 +1655,8 @@ useful to be able to encode pseudo-affine operators such as \verb+/+,
 \section{Memory Effects of Statements}
 \label{effects}
 
-Each statement read and write several memory locations to retrieve value
-stored and to store new values. Understanding the relationship between
+Each statement reads and writes several memory locations to retrieve 
+stored values and to store new values. Understanding the relationship between
 statements and memory is one of the many keys to restructure and
 parallelize programs. Several analyses provide different approximations
 of the statement effects on memory.
@@ -1686,10 +1695,12 @@ simulate later a control dependence by a data dependence (see
 PJ).  These effects are \verb/read/ effects on the loop bounds
 (variables used in loop bound expressions?). 
 
-Note also that \verb/read/ effects of loop indices are ignored because
-they always are not upward exposed. This is due to the {\em compound}
-nature of the PIPS \verb/DO/ construct. It if were decomposed into
-elementary parts, there would be no such surprising approximations.
+Note also that \verb/read/ effects of loop indices due to the
+incrementations are ignored because they are never upward exposed. This is
+due to the {\em compound} nature of the PIPS \verb/DO/ construct. It if
+were decomposed into elementary parts, there would be no such surprising
+approximations. Note that read effects which might be due to bound or
+increment expressions as in \verb/DO I = I, 10*I, I/ must be preserved.
 
 \subsection{Effects}
 \label{subsection-effects}
@@ -1770,7 +1781,7 @@ Field \verb/reference/ specifies which variables, scalar or array, is
 accessed. Attribute \verb/persistant/ is used because reference objects
 pointed to may be part of program statements. At least for simple
 effects. This attribute is not welcome for more advanced effects, such
-as regions, which use pseudo-references based on $PHI$ variables. Memory
+as regions, which use pseudo-references based on \verb/PHI/ variables. Memory
 allocation is difficult to manage when the persistant attribute is
 declared at the type level and not at the object level.
 
@@ -1788,7 +1799,9 @@ and field \verb/approximation/ is used to know if the reference, for
 simple effects, or the set of array elements defined by the
 \verb/context/, for array regions, is or not accessed for sure. For
 instance, a conditional is going to generate may effects, and a
-sequence, must effects.
+sequence, must effects\footnote{Needless to say, reality is much more
+  complex. This oversimplified statement only is written to support some
+  intuition about may and must information.}.
 
 \begin{comment}
 Le sous-domaine {\tt action} pre'cise si la
@@ -1841,8 +1854,8 @@ to a sub-array since a \verb/range/ can be used as subscript expression
 of a reference. This facility is used when the cumulated effects of a
 callee are translated into proper effects of the CALL site in the caller
 scope. For regions, field \verb/reference/ defines the accessed variable
-as well as pseudo-variables, known as $PHI$ variables. There is one
-$PHI$ variable per array dimension.
+as well as pseudo-variables, known as \ver/PHI/ variables. There is one
+\verb/PHI/ variable per array dimension.
 
 \begin{comment}
 Le sous-domaine {\tt reference} permet de pre'ciser qu'un effet n'a lieu que
@@ -1875,8 +1888,9 @@ whe ntranslating the summary effects of a callee into the caller's frame.
 {}
 
 Two kinds of memory effects are used in Bernstein parallelization
-conditions\cite{Bern66} and in other program transformation conditions:
-read and write.
+conditions \cite{Bern66} and in other program transformation conditions:
+read and write. \verb/IN/ regions are represented by \verb/read/ effects
+and \verb/OUT/ regions by \verb/write/ effects.
 
 \begin{comment}
 Deux types d'effets sont utilise's dans les conditions de Bernstein
@@ -1906,8 +1920,8 @@ y acce`dent et que d'autres n'y fassent pas re'fe'rence. Les effets
 calcule's sont alors de type {\tt may}.
 \end{comment}
 
-Sometimes, a simple statement, such as an assignment like {\tt I = 2},
-has a known effect. Here {\tt I} \verb/must/ be written. Such
+Sometimes, a simple statement, such as an assignment like {\tt J = 2},
+has a known effect. Here {\tt J} \verb/must/ be written. Such
 \verb/must/ effects can be used in {\em use/def chains} analysis to {\em
 kill} some scalar variables. A simple effect, proper, cumulated or
 summary, with a \verb/must/ attribute does not mean that the {\em whole}
@@ -2025,7 +2039,7 @@ Les transformers ne sont de'finis qu'apre`s une phase d'analyse se'mantique.
 {}
 
 Type \verb/predicate/ defines a relationship between values of integer
-variables and other integer entities such as $PHI$ variables (see
+variables and other integer entities such as \verb/PHI/ variables (see
 Section~\ref{subsection-psysteme} for external data type Psysteme). Its
 meaning depends on its use. It may be an invariant predicate, always
 true before a statement execution ({\em precondition}), or a predicate
@@ -2106,7 +2120,7 @@ Various mappings have been added. It was not possible to declare them
 with NewGen in 1988 and quite a few implicit mappings exist.
 
 NewGen data types can be walked with two generic iterators,
-\verb/gen_recurse()/ and \verb/gen_multi-recurse()/. These two iterators
+\verb/gen_recurse()/ and \verb/gen_multi_recurse()/. These two iterators
 have been added to NewGen. They are not systematically used.
 
 \newpage
