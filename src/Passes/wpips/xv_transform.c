@@ -26,8 +26,6 @@
 /* The transform menu: */
 Menu transform_menu;
 
-
-
 void
 apply_on_each_transform_item(void (* function_to_apply_on_each_menu_item)(Menu_item))
 {
@@ -37,7 +35,8 @@ apply_on_each_transform_item(void (* function_to_apply_on_each_menu_item)(Menu_i
       Menu_item menu_item = (Menu_item) xv_get(transform_menu,
                                                MENU_NTH_ITEM, i);
       /* Skip the title item: */
-      if (!(bool) xv_get(menu_item, MENU_TITLE))
+      if (!(bool) xv_get(menu_item, MENU_TITLE)
+          && xv_get(menu_item, MENU_NOTIFY_PROC) != NULL)
           function_to_apply_on_each_menu_item(menu_item);
    }
 }
@@ -117,6 +116,13 @@ transform_notify(Menu menu,
 void
 create_transform_menu()
 {
+   edit_menu_item = 
+      xv_create(NULL, MENUITEM, 
+                MENU_STRING, "Edit",
+                MENU_NOTIFY_PROC, edit_notify,
+                MENU_RELEASE,
+                NULL);
+   
    transform_menu =
       xv_create(XV_NULL, MENU_COMMAND_MENU, 
                 MENU_GEN_PIN_WINDOW, main_frame, "Transform Menu",
@@ -132,10 +138,14 @@ create_transform_menu()
                 MENU_ACTION_ITEM, STRIP_MINE_TRANSFORM, transform_notify,
                 MENU_ACTION_ITEM, UNROLL_TRANSFORM, transform_notify,
                 MENU_ACTION_ITEM, UNSPAGHETTIFY_TRANSFORM, transform_notify,
+                                 /* Just a separator: */
+                MENU_ITEM, MENU_STRING, "--------", MENU_INACTIVE, TRUE,
+                NULL,
+                MENU_APPEND_ITEM, edit_menu_item,
                 NULL);
 
    (void) xv_create(main_panel, PANEL_BUTTON,
-                    PANEL_LABEL_STRING, "Transform",
+                    PANEL_LABEL_STRING, "Transform/Edit",
                     PANEL_ITEM_MENU, transform_menu,
                     0);
 }
