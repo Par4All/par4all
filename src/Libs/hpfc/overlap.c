@@ -2,7 +2,7 @@
  * Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1995/03/23 16:54:35 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1995/03/28 16:24:41 $, )
  * version $Revision$
  */
 
@@ -21,7 +21,7 @@ extern int fprintf();
 #include "loop_normalize.h"
 #include "hpfc.h"
 
-GENERIC_GLOBAL_FUNCTION(overlap_status, overlapsmap, entity, list)
+GENERIC_GLOBAL_FUNCTION(overlap_status, overlapsmap);
 
 static void create_overlaps(e)
 entity e;
