@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/13 10:58:18 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/15 11:44:19 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -316,7 +316,7 @@ check_install:
 $(LIB_TARGET): $(LIB_OBJECTS) $(TARGET_OBJECTS)
 	$(RM) $(LIB_TARGET)
 	$(ARCHIVE) $(LIB_TARGET) $(LIB_OBJECTS) $(TARGET_OBJECTS)
-	-ranlib $(LIB_TARGET)
+	-$(RANLIB) $(LIB_TARGET)
 
 %
 
@@ -339,6 +339,8 @@ INSTALL_EXE+=	$(RFILES)
 	touch .runable
 
 .quick-install: .runable $(RFILES)
+
+clean-compiled:
 
 clean:
 	-$(RM) *~
@@ -402,9 +404,11 @@ clobber: clean
 
 [ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Linear' ] && cat >> $MAKEFILE <<% 
 #
-clean: generate_makefile_if_necessary_and_possible
-	-$(RM) TAGS $(OBJECTS) $(INC_TARGET) $(LIB_TARGET) \\
-		$(BIN_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
+clean-compiled:
+    $(RM) $(OBJECTS) $(LIB_TARGET) $(BIN_TARGET) 
+
+clean: generate_makefile_if_necessary_and_possible clean-compiled
+	-$(RM) TAGS $(BIN_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
 		$(DERIVED_FILES) *.~[0-9]~ $(LIB_IFILES)
 
 INC_CFILES = $(LIB_CFILES)
@@ -437,9 +441,11 @@ $(BIN_TARGET): $(INC_TARGET) $(LIB_TARGET)
 	$(LINK) $(BIN_TARGET) $(LIB_TARGET) $(TARGET_LIBS) $(PIPS_MALLOC)
 	@echo 
 
-clean:
-	-$(RM) TAGS $(OBJECTS) $(BIN_TARGET) $(LIB_TARGET) \\
-		$(INC_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
+clean-compiled:
+    $(RM) $(OBJECTS) $(LIB_TARGET) $(BIN_TARGET) 
+
+clean: clean-compiled
+	-$(RM) TAGS $(INC_TARGET) $(DERIVED_HEADERS) $(DERIVED_CFILES) \\
 		$(DERIVED_FILES) *.~[0-9]~
 
 INC_CFILES = $(LIB_CFILES)
