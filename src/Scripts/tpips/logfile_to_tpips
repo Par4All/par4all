@@ -14,6 +14,9 @@
 #
 
 WS=${1:?"Please give me the workspace name to work with"}
+WDIR=${WS}.database
+CAT=${PAGER:-cat}
+
 
 sed -n \
 -e 's/Registering file \(.*\)/create '$WS' \1/p' \
@@ -24,6 +27,7 @@ sed -n \
 -e 's/Request: build resource \(.*\) for module \(.*\)./display \1(\2)/p' \
 -e 's/Request: perform rule \(.*\) on module \(.*\)./apply \1(\2)/p' \
 -e 's/Options: phase \(.*\) (\(.*\)) set on./activate \2 # \1/p' \
+-e 's/HPFC View of "\(.*\)" done./shell '$CAT' '$WDIR'\/hpfc\/\1/p' \
 $WS.database/LOGFILE
 
 #end
