@@ -4,7 +4,7 @@
  * normalization of HPF declarations.
  *
  * $RCSfile: declarations.c,v $ version $Revision$
- * ($Date: 1996/03/20 20:31:57 $, )
+ * ($Date: 1996/03/21 15:56:05 $, )
  */
  
 #include "defines-local.h"
@@ -768,22 +768,41 @@ list l;
 
 	 pips_assert("variable", type_variable_p(entity_type(ent)));
 
-	 for (i=1 ; i<=ndim ; i++)
+	 if (storage_formal_p(entity_storage(ent)))
 	 {
-	     the_dim = entity_ith_dimension(ent, i);
-	     lower_overlap = get_overlap(oldent, i, 0);
-	     upper_overlap = get_overlap(oldent, i, 1);
-
-	     pips_debug(8, "%s(DIM=%d): -%d, +%d\n", 
-			entity_name(ent), i, lower_overlap, upper_overlap);
-
-	     if (lower_overlap!=0) 
-		 overlap_redefine_expression(&dimension_lower(the_dim),
-					     -lower_overlap);
+	     /* arguments are passed the declarations from outside
+	      */
+	     for (i=1 ; i<=ndim ; i++)
+	     {
+		 if (ith_dim_overlapable_p(oldent, i))
+		 {
+		     the_dim = entity_ith_dimension(ent, i); 
+		     dimension_lower(the_dim) = /* ??? memory leak */
+			hpfc_array_bound(ent, FALSE, i);
+		     dimension_upper(the_dim) = 
+			hpfc_array_bound(ent, TRUE, i);
+		 }
+	     }
+	 }
+	 else
+	 {
+	     for (i=1 ; i<=ndim ; i++)
+	     {
+		 the_dim = entity_ith_dimension(ent, i);
+		 lower_overlap = get_overlap(oldent, i, 0);
+		 upper_overlap = get_overlap(oldent, i, 1);
 		 
-	     if (upper_overlap!=0) 
-		 overlap_redefine_expression(&dimension_upper(the_dim),
-					     upper_overlap);
+		 pips_debug(8, "%s(DIM=%d): -%d, +%d\n", 
+			    entity_name(ent), i, lower_overlap, upper_overlap);
+		 
+		 if (lower_overlap!=0) 
+		     overlap_redefine_expression(&dimension_lower(the_dim),
+						 -lower_overlap);
+		 
+		 if (upper_overlap!=0) 
+		     overlap_redefine_expression(&dimension_upper(the_dim),
+						 upper_overlap);
+	     }
 	 }
      },
 	 l);
