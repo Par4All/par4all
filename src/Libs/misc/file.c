@@ -4,6 +4,7 @@
 
 #include <unistd.h>
 #include <stdlib.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -14,10 +15,6 @@
 
 #include <dirent.h>
 #include <setjmp.h>
-
-#ifndef __linux
-extern char * sys_errlist[];
-#endif
 
 #include "rxposix.h"
 
@@ -32,7 +29,7 @@ FILE * check_fopen(char * file, char * mode)
     if (fd==(FILE*)NULL)
     {
 	pips_user_warning("fopen failed on file \"%s\" (mode \"%s\")\n%s\n",
-			  file, mode, sys_errlist[errno]);
+			  file, mode, strerror(errno));
     }
     return fd;
 }
@@ -42,7 +39,7 @@ FILE * safe_fopen(char *filename, char *what)
     FILE * f;
     if((f = fopen( filename, what)) == (FILE *) NULL) {
 	pips_error("safe_fopen","fopen failed on file %s\n%s\n",
-		   filename, sys_errlist[errno]);
+		   filename, strerror(errno));
     }
     return(f);
 }
@@ -55,11 +52,11 @@ safe_fclose(FILE * stream, char *filename)
 	    user_irrecoverable_error("safe_fclose",
 				     "fclose failed on file %s (%s)\n",
 				     filename,
-				     sys_errlist[errno]);
+				     strerror(errno));
 	else
 	    pips_error("safe_fclose","fclose failed on file %s (%s)\n",
 		       filename,
-		       sys_errlist[errno]);
+		       strerror(errno));
     }
     return(0);
 }
@@ -70,7 +67,7 @@ safe_fflush(FILE * stream, char *filename)
     if(fflush(stream) == EOF) {
 	pips_error("safe_fflush","fflush failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(0);
 }
@@ -83,7 +80,7 @@ safe_freopen(char *filename, char *what, FILE * stream)
     if((f = freopen( filename, what, stream)) == (FILE *) NULL) {
 	pips_error("safe_freopen","freopen failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(f);
 }
@@ -94,7 +91,7 @@ safe_fseek(FILE * stream, long int offset, int wherefrom, char *filename)
     if( fseek( stream, offset, wherefrom) != 0) {
 	pips_error("safe_fseek","fseek failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(0);
 }
@@ -107,7 +104,7 @@ safe_ftell(FILE * stream, char *filename)
     if((pt == -1L) && (errno != 0)) {
 	pips_error("safe_ftell","ftell failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(pt);
 }
@@ -119,7 +116,7 @@ safe_rewind(FILE * stream, char *filename)
     if(errno != 0) {
 	pips_error("safe_rewind","rewind failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
 }
 
@@ -130,7 +127,7 @@ safe_fgetc(FILE * stream, char *filename)
     if((value = fgetc( stream)) == EOF) {
 	pips_error("safe_fgetc","fgetc failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(value);
 }
@@ -142,7 +139,7 @@ safe_getc(FILE * stream, char *filename)
     if((value = getc( stream)) == EOF ) {
 	pips_error("safe_getc","getc failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(value);
 }
@@ -156,7 +153,7 @@ FILE * stream;
     if (fgets( s, n, stream) == (char *) NULL) {
 	pips_error("safe_fgets","gets failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(s);
 }
@@ -169,7 +166,7 @@ char * filename;
     if(fputc( c, stream) == EOF) {
 	pips_error("safe_fputc","fputc failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(c);
 }
@@ -182,7 +179,7 @@ char * filename;
     if(putc( c, stream) == EOF) {
 	pips_error("safe_putc","putc failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(c);
 }
@@ -194,7 +191,7 @@ FILE * stream;
     if(fputs( s, stream) == EOF) {
 	pips_error("safe_fputs","fputs failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(1);
 }
@@ -208,7 +205,7 @@ FILE * stream;
     if(((int)fread(ptr, element_size, count, stream)) != count) {
 	pips_error("safe_fread","fread failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(count);
 }
@@ -222,7 +219,7 @@ FILE * stream;
     if(((int)fwrite(ptr, element_size, count, stream)) != count) {
 	pips_error("safe_fwrite","fwrite failed on file %s (%s)\n",
 		   filename,
-		   sys_errlist[errno]);
+		   strerror(errno));
     }
     return(count);
 }
@@ -297,7 +294,7 @@ list_files_in_directory(
     if (return_code == -1)
 	user_error("list_files_in_directory",
 		   "opendir() failed on directory \"%s\", %s.\n",
-		   dir,  sys_errlist[errno]);
+		   dir,  strerror(errno));
 }
 
 bool 
@@ -391,7 +388,7 @@ create_directory(char *name)
 
     if (mkdir(name, 0777) == -1) {
 	pips_user_warning("cannot create directory : %s (%s)\n",
-			  name, sys_errlist[errno]);
+			  name, strerror(errno));
 	success = FALSE;
     }
 
@@ -641,7 +638,7 @@ safe_system_substitute(char * what)
 
 /* SunOS forgets to declare this one.
  */
-extern char * mktemp(char *);
+/* extern char * mktemp(char *); */
 
 /* @return a new temporary file name, starting with "prefix".
  * the nme is freshly allocated.
@@ -650,5 +647,5 @@ char *
 safe_new_tmp_file(char * prefix)
 {
     string name = strdup(concatenate(prefix, ".XXXXXX", NULL));
-    return mktemp(name);
+    return mkstemp(name);
 }
