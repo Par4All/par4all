@@ -50,44 +50,163 @@ OPTEMPTY (([ \\t\\n])*)
 #define YY_INPUT(buf,result,max_size) \
 { \
  int c = tpips_lex_input(); \
- result = (c == '\0') ? YY_NULL : (buf[0] = c, 1); \
+ result = (c == '\\0') ? YY_NULL : (buf[0] = c, 1); \
 }
 
 #endif
 
 %}
 
-%s KEY FNAME WNAME RES PHASE PROP
+%s KEY FNAME WNAME RES PHASE PROP SVAL OWN
 
 %%
-<KEY>{OPTEMPTY}"open"     {BEGIN WNAME;return OPEN;}
-<KEY>{OPTEMPTY}"create"   {BEGIN WNAME;return CREATE;}
-<KEY>{OPTEMPTY}"close"    {BEGIN WNAME;return CLOSE;}
-<KEY>{OPTEMPTY}"delete"   {BEGIN WNAME;return DELETE;}
-<KEY>{OPTEMPTY}"module"   {BEGIN WNAME;return MODULE;}
-<KEY>{OPTEMPTY}"make"     {BEGIN RES;return MAKE;}
-<KEY>{OPTEMPTY}"apply"    {BEGIN PHASE;return APPLY;}
-<KEY>{OPTEMPTY}"display"  {BEGIN RES;return DISPLAY;}
-<KEY>{OPTEMPTY}"activate" {BEGIN PHASE;return ACTIVATE;}
-<KEY>{OPTEMPTY}"set"      {BEGIN PROP;return SET;}
-<KEY>{OPTEMPTY}"get"      {BEGIN PROP;return GET;}
-<KEY>{OPTEMPTY}"info"     {BEGIN WNAME;return INFO;}
-<KEY,FNAME,WNAME,RES,PHASE,PROP>{EMPTY}  {return SEPARATOR;}
-<FNAME>[/\\.0-9A-Za-z_-]+       {yylval.name = strdup(yytext);return FILE_NAME;}
-<WNAME>[0-9A-Za-z_-]+   {BEGIN FNAME;yylval.name =strdup(yytext);return WORKSPACE;}
-<RES,PHASE>\\)    {return CLOSEPAREN;}
-<RES,PHASE>\\(    {return OPENPAREN;}
-<RES,PHASE>\\,    {return COMMA;}
-<RES,PHASE>"$ALL"             {return OWNER_ALL;}
-<RES,PHASE>"$PROGRAM"         {return OWNER_PROGRAM;}
-<RES,PHASE>"$MAIN"            {return OWNER_MAIN;}
-<RES,PHASE>"$MODULE"          {return OWNER_MODULE;}
-<RES,PHASE>"$CALLERS"         {return OWNER_CALLERS;}
-<RES,PHASE>"$CALLEES"         {return OWNER_CALLEES;}
+<KEY>{OPTEMPTY}"open"	{
+							debug(8,"yylex","read token OPEN\\n");
+							BEGIN WNAME;
+							return OPEN;
+						}
+<KEY>{OPTEMPTY}"create"	{
+							debug(8,"yylex","read token CREATE\\n");
+							BEGIN WNAME;
+							return CREATE;
+						}
+<KEY>{OPTEMPTY}"close"	{
+							debug(8,"yylex","read token CLOSE\\n");
+							BEGIN WNAME;
+							return CLOSE;
+						}
+<KEY>{OPTEMPTY}"delete"	{
+							debug(8,"yylex","read token DELETE\\n");
+							BEGIN WNAME;
+							return DELETE;
+						}
+<KEY>{OPTEMPTY}"module"	{
+							debug(8,"yylex","read token MODULE\\n");
+							BEGIN WNAME;
+							return MODULE;
+						}
+<KEY>{OPTEMPTY}"make"	{
+							debug(8,"yylex","read token MAKE\\n");
+							BEGIN RES;
+							return MAKE;
+						}
+<KEY>{OPTEMPTY}"apply"	{
+							debug(8,"yylex","read token APPLY\\n");
+							BEGIN PHASE;
+							return APPLY;
+						}
+<KEY>{OPTEMPTY}"display" {
+							debug(8,"yylex","read token DISPLAY\\n");
+							BEGIN RES;
+							return DISPLAY;
+						}
+<KEY>{OPTEMPTY}"activate" {
+							debug(8,"yylex","read token ACTIVATE\\n");
+							BEGIN PHASE;
+							return ACTIVATE;
+						}
+<KEY>{OPTEMPTY}"set"	{
+							debug(8,"yylex","read token SET\\n");
+							BEGIN PROP;
+							return SET;
+						}
+<KEY>{OPTEMPTY}"get"	{
+							debug(8,"yylex","read token GET\\n");
+							BEGIN PROP;
+							return GET;
+						}
+<KEY>{OPTEMPTY}"info"   {
+							debug(8,"yylex","read token INFO\\n");
+							BEGIN WNAME;
+							return INFO;
+						}
+<KEY,FNAME,WNAME,RES,PHASE,PROP,SVAL,OWN>{EMPTY} {
+							debug(8,"yylex","read token SEPARATOR\\n");
+							return SEPARATOR;
+						}
+<FNAME>[/\\.0-9A-Za-z_-]+ {
+							debug(8,"yylex","read token FILE_NAME\\n");
+							yylval.name = strdup(yytext);
+							return FILE_NAME;
+						}
+<WNAME>[0-9A-Za-z_-]+	{
+							debug(8,"yylex","read token WORKSPACE\\n");
+							BEGIN FNAME;
+							yylval.name = strdup(yytext);
+							return WORKSPACE;
+						}
+<RES,PHASE>\\(			{
+							debug(8,"yylex","read token OPENPAREN\\n");
+							BEGIN OWN;
+							return OPENPAREN;
+						}
+<OWN>\\)				{
+							debug(8,"yylex","read token CLOSEPAREN\\n");
+							return CLOSEPAREN;
+						}
+<OWN>\\,				{
+							debug(8,"yylex","read token COMMA\\n");
+							return COMMA;
+						}
+<OWN>"$ALL"				{
+							debug(8,"yylex","read token OWNER_ALL\\n");
+							return OWNER_ALL;
+						}
+<OWN>"$PROGRAM"			{
+							debug(8,"yylex","read token OWNER_PROGRAM\\n");
+							return OWNER_PROGRAM;
+						}
+<OWN>"$MAIN"			{
+							debug(8,"yylex","read token OWNER_MAIN\\n");
+							return OWNER_MAIN;
+						}
+<OWN>"$MODULE"			{
+							debug(8,"yylex","read token OWNER_MODULE\\n");
+							return OWNER_MODULE;
+						}
+<OWN>"$CALLERS"			{
+							debug(8,"yylex","read token OWNER_CALLERS\\n");
+							return OWNER_CALLERS;
+						}
+<OWN>"$CALLEES"			{
+							debug(8,"yylex","read token OWNER_CALLEES\\n");
+							return OWNER_CALLEES;
+						}
 %%%%%%%%%%
-<RES,PHASE>[0-9A-Za-z_-]+      {yylval.name =strdup(yytext);return OWNER_NAME;}
-<KEY,PROP>[a-zA-Z0-9_]+        {return UNKNOWN_CHAR; /* actually it is chars ... */}
-<KEY,FNAME,WNAME,RES,PHASE,PROP>.          {return UNKNOWN_CHAR;}
+<OWN>[0-9A-Za-z_-]+		{
+							debug(8,"yylex","read token OWNER_NAME\\n");
+							yylval.name =strdup(yytext);
+							return OWNER_NAME;
+						}
+<KEY,PROP>[a-zA-Z0-9_]+ {
+							debug(8,"yylex","read token UNKNOWN_CHAR\\n");
+							return UNKNOWN_CHAR;
+							/* actually it is chars ... */
+							}
+<SVAL>"TRUE"			{
+							debug(8,"yylex","read token SETVALUE\\n");
+							yylval.name = strdup(yytext);
+							return SETVALUE;
+						}
+<SVAL>"FALSE"			{
+ 							debug(8,"yylex","read token SETVALUE\\n");
+							yylval.name = strdup(yytext);
+ 							return SETVALUE;
+						}
+<SVAL>[0-9]+			{
+							debug(8,"yylex","read token SETVALUE\\n");
+							yylval.name = strdup(yytext);
+							return SETVALUE;
+ 						}
+<SVAL>\\"[^\\"]*\\"		{
+							debug(8,"yylex","read token SETVALUE\\n");
+							yylval.name = strdup(yytext);
+							return SETVALUE;
+						}
+<KEY,FNAME,WNAME,RES,PHASE,PROP,OWN>. {
+							debug(8,"yylex","read token UNKNOWN_CHAR\\n");
+							return UNKNOWN_CHAR;
+						}
 %%
 
 yywrap()
