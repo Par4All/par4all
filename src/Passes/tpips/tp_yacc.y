@@ -292,24 +292,25 @@ i_make:
 	opt_sep_list
 	{
 	    bool result = TRUE;
-	    string save_current_module_name = 
-	      db_get_current_module_name() == NULL? 
-	      NULL : 
-	      strdup(db_get_current_module_name());
 
 	    debug(7,"yyparse","reduce rule i_make\n");
 
 	    if (tpips_execution_mode) {
+		string save_current_module_name = 
+		    db_get_current_module_name() == NULL? 
+		    NULL : strdup(db_get_current_module_name());
+
 		MAPL(e, {
 		    if (safe_make ($3.the_name, STRING(CAR(e))) == FALSE) {
 			result = FALSE;
 			break;
 		    }
 		}, $3.the_owners);
+
+		db_set_current_module_name(save_current_module_name);
+		if(save_current_module_name!=NULL)
+		    free(save_current_module_name);
 	    }
-	    db_set_current_module_name(save_current_module_name);
-	    if(save_current_module_name!=NULL)
-	      free(save_current_module_name);
 	    $$ = result;
 /*	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
@@ -325,29 +326,29 @@ i_apply:
 	{
 	    bool result = TRUE;
 	    /* keep track of the current module, if there is one */
-	    string save_current_module_name = 
-	      db_get_current_module_name() == NULL? 
-	      NULL : 
-	      strdup(db_get_current_module_name());
 
 	    debug(7,"yyparse","reduce rule i_apply\n");
 
-	    if(db_get_current_workspace()==database_undefined) {
-		user_error("apply", "Open or create a workspace first!\n");
-	    }
-
 	    if (tpips_execution_mode) {
+		string save_current_module_name = 
+		    db_get_current_module_name() == NULL? 
+		    NULL : strdup(db_get_current_module_name());
+
+		if(db_get_current_workspace()==database_undefined) {
+		    user_error("apply", "Open or create a workspace first!\n");
+		}
+	    
 		MAPL(e, {
 		    if (safe_apply ($3.the_name, STRING(CAR(e))) == FALSE) {
 			result = FALSE;
 			break;
 		    }
 		}, $3.the_owners);
+		/* restore the initial current module, if there was one */
+		db_set_current_module_name(save_current_module_name);
+		if(save_current_module_name!=NULL)
+		    free(save_current_module_name);
 	    }
-	    /* restore the initial current module, if there was one */
-	    db_set_current_module_name(save_current_module_name);
-	    if(save_current_module_name!=NULL)
-	      free(save_current_module_name);
 	    $$ = result;
 /*	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
@@ -361,19 +362,18 @@ i_display:
 	resource_id
 	opt_sep_list
 	{
-	    string save_current_module_name = 
-	      db_get_current_module_name() == NULL? 
-	      NULL : 
-	      strdup(db_get_current_module_name());
-
 	    debug(7,"yyparse","reduce rule i_display\n");
-
-	    if(db_get_current_workspace()==database_undefined) {
-		user_error("display", "Open or create a workspace first!\n");
-	    }
 
 	    if (tpips_execution_mode) {
 		string pager;
+		string save_current_module_name = 
+		    db_get_current_module_name() == NULL? 
+		    NULL : strdup(db_get_current_module_name());
+
+		if(db_get_current_workspace()==database_undefined) {
+		    user_error("display",
+			       "Open or create a workspace first!\n");
+		}
 
 		if ( (isatty(0)) || (!(pager = getenv("PAGER"))))
 		    pager = CAT_COMMAND;
@@ -391,11 +391,11 @@ i_display:
 		    safe_system(concatenate(pager, " ", file, NULL));
 
 		}, $3.the_owners);
-		$$ = TRUE;
+		db_set_current_module_name(save_current_module_name);
+		if(save_current_module_name!=NULL)
+		    free(save_current_module_name);
 	    }
-	    db_set_current_module_name(save_current_module_name);
-	    if(save_current_module_name!=NULL)
-	      free(save_current_module_name);
+	    $$ = TRUE;
 /*
 	    free ($3.the_name);
 	    gen_free_list ($3.the_owners);
@@ -410,12 +410,13 @@ i_activate:
 	opt_sep_list
 	{
 	    debug(7,"yyparse","reduce rule i_activate\n");
-
-	    if(db_get_current_workspace()==database_undefined) {
-		user_error("activate", "Open or create a workspace first!\n");
-	    }
-
 	    if (tpips_execution_mode) {
+
+		if(db_get_current_workspace()==database_undefined) {
+		    user_error("activate",
+			       "Open or create a workspace first!\n");
+		}
+		
 		user_log("Selecting rule: %s\n", $3);
 		activate ($3);
 		$$ = TRUE;
