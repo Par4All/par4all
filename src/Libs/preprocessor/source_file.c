@@ -267,15 +267,11 @@ insert_at(
     int i, len=strlen(line), shift=strlen(what);
     pips_assert("line large enough", len+shift<LINE_LENGTH);
 
-    fprintf(stderr, "** %s\n", line);
-
     for (i=len; i>=offset; i--)
 	line[i+shift]=line[i];
 
     for (shift--; shift>=0; shift--)
 	line[offset+shift]=what[shift];
-
-    fprintf(stderr, "++ %s\n", line);
 }
 
 static void
