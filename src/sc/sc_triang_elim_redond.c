@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 2000/11/21 17:31:24 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 2001/10/12 07:06:49 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -364,6 +364,9 @@ Pbase base_index;
  *             contraintes correspondantes (une positive et une negative).
  *             C'est la seule difference avec la fonction sc_elim_redond().
  *
+ *             contrainte_reverse() is used. Rational points may be added
+ *             by this procedure.
+ *
  * Yi-Qing YANG
  *
  * Modifications:
@@ -488,6 +491,8 @@ int n;
  * tries a triangular redundancy elimination on the n first constraints,
  * which *must all* deal with the same side of the same index.
  * if n is 0, nothing is done, but nothing is reported.
+ *
+ * contrainte_reverse() is used and rational points may be added
  */
 void sc_triang_elim_redund_n_first(s, n)
 Psysteme s;
