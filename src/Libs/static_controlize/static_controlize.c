@@ -412,7 +412,7 @@ char* mod_name;
 				       &Gcount_nlc);
 
 	/* The code has been modified, so the orderings are recomputed. */
- 	module_body_reorder( mod_stat );  
+ 	module_reorder( mod_stat );  
 	verify_structural_parameters(formal_integers,
 				     &Gscalar_written_forward);
 
