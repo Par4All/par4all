@@ -60,7 +60,7 @@ extern int  simplex_arithmetic_error;
 #define UNCATCH(what)						\
     (exception_pop(what), 					\
      global_exception_type[global_exception_index_decr]!=what?	\
-	print_exception_stack_error(2): 1)
+	(print_exception_stack_error(2), 0): 1)
 
 #define TRY else
 
