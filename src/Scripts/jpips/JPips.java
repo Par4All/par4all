@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: JPips.java,v $
+ * Revision 1.6  1998/10/30 15:43:57  ancourt
+ * graphdisplayer instance added
+ *
  * Revision 1.5  1998/10/17 12:21:09  coelho
  * indentation fixed.
  * colors fixed.
@@ -59,6 +62,7 @@ public class JPips
   
   public TPips		tpips;		// tpips instance
   public TextDisplayer 	textDisplayer;	// regulates the displayed windows
+  public GraphDisplayer graphDisplayer;
   public Vector		optionVector;	// contains the components for JPips
 			
   public PMenuBar	menu;		// menu of JPips
@@ -195,6 +199,8 @@ public class JPips
 	GridBagConstraints.NONE,GridBagConstraints.EAST,c);
     tpips.textDisplayer = textDisplayer;
     
+    graphDisplayer = new GraphDisplayer(frame);
+    tpips.graphDisplayer = graphDisplayer;
     //directory
     directoryManager = new DirectoryManager(frame, tpips);
     p = (PPanel)directoryManager.getComponent();
