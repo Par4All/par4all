@@ -25,6 +25,7 @@
 #define PSI_PREFIX "PSI"
 #define GAMMA_PREFIX "GAMMA"
 #define DELTA_PREFIX "DELTA"
+#define IOTA_PREFIX "IOTA"
 
 #define HPFC_PACKAGE "HPFC-PACKAGE"
 
