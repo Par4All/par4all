@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/07/24 11:00:33 $, 
+# $Date: 1996/07/24 11:05:24 $, 
 
 LIB_CFILES=	sc_alloc.c \
 	        sc_projection.c \
@@ -40,11 +40,11 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 LIB_OBJECTS= $(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o) 
 
 sc_lex.c: sc_lex.l
-	$(SCAN) $< | sed 's/YY/SC_/g;s/yy/sc_/g;' > $@
+	$(SCAN) $< | sed 's/YY/SYST_/g;s/yy/syst_/g;' > $@
 
 sc_gram.c y.tab.h: sc_gram.y
 	$(PARSE) -d $<
-	sed -e '/extern char \*malloc/d;s/YY/SC_/g;s/yy/sc_/g;' \
+	sed -e '/extern char \*malloc/d;s/YY/SYST_/g;s/yy/syst_/g;' \
 		y.tab.c > sc_gram.c
 	$(RM) y.tab.c
  
