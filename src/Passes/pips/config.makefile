@@ -1,4 +1,4 @@
-# Copyright (C) Ecole des Mines De Paris
+# Copyright (C) Ecole des Mines de Paris
 #               Centre d'Automatique et Informatique
 #               Section Informatique
 #
@@ -10,15 +10,8 @@
 # purpose or works at all, unless he says so in writing.
 #
 # The following macros define the value of commands that are used to
-# compile source code.
 #
-# you can add your own options behind pips default values.
-# 
-# example: CFLAGS= $(PIPS_CFLAGS) -DSYSTEM=BSD4.2
-#
-CFLAGS		+= -DLARGE_FONTS
-CPPFLAGS	+= -I$(OPENWINHOME)/include
-LDFLAGS		+= -L$(OPENWINHOME)/lib
+CPPFLAGS	+= -DLARGE_FONTS -DPIPS_ARCH=\"$(ARCH)\" 
 #
 # Source, header and object files used to build the target
 #
@@ -27,3 +20,4 @@ LIB_HEADERS=	pips-local.h
 LIB_OBJECTS=	$(LIB_CFILES:.c=.o)
 #
 TARGET_LIBS= 	$(PIPS_LIBS)
+#
