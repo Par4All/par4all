@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS stuff
- * $RCSfile: compiler.c,v $ ($Date: 1994/12/02 15:00:57 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1994/12/06 12:07:54 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -319,8 +319,7 @@ statement *hoststatp,*nodestatp;
     pips_assert("hpfcompilecall",
 		(instruction_call_p(statement_instruction(stat))));
 
-    debug(7,"hpfcompilecall", "function %s\n", 
-	  entity_name(call_function(c)));
+    debug(7,"hpfcompilecall", "function %s\n", entity_name(call_function(c)));
 
     /*
      * {"WRITE", (MAXINT)},
@@ -345,7 +344,7 @@ statement *hoststatp,*nodestatp;
      * no reference to distributed arrays...
      * the call is just translated into local objects.
      */
-    if (!call_ref_to_dist_array_p(c))
+    if (!ref_to_dist_array_p(c))
     {
 	list
 	    leh=lUpdateExpr(host_module,call_arguments(c)),
