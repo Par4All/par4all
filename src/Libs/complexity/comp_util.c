@@ -459,11 +459,12 @@ void init_cost_table()
     char *token, *comma, *file = malloc(80);
     float file_factor;
 
-    char *cost_dir = (char *)getenv("COSTDIR");
+    char *cost_dir = (char *)getenv("PIPS_COSTDIR");
     char *cost_table = strdup(get_string_property("COMPLEXITY_COST_TABLE"));
     char *cost_data = strdup(COST_DATA);
     char *tmp=malloc(20);
 
+    pips_assert("some directory", cost_dir!=NULL);
     token = strtok(cost_data, sep_chars);
 
     while (token != NULL) {
