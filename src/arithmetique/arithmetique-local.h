@@ -175,6 +175,11 @@ typedef int Value;
 #define value_one_p(val)      value_eq(val,VALUE_ONE)
 #define value_notone_p(val)   value_ne(val,VALUE_ONE)
 #define value_mone_p(val)     value_eq(val,VALUE_MONE)
+#define value_notmone_p(val)  value_ne(val,VALUE_MONE)
+#define value_min_p(val)      value_eq(val,VALUE_MIN)
+#define value_max_p(val)      value_eq(val,VALUE_MAX)
+#define value_notmin_p(val)   value_ne(val,VALUE_MIN)
+#define value_notmax_p(val)   value_ne(val,VALUE_MAX)
 
 /* LINEAR_VALUE_IS_CHARS is used for type checking.
  * some operations are not allowed on (char*), thus
