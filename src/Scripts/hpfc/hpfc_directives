@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/25 14:40:52 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/02/25 22:31:57 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -89,23 +89,18 @@ $RM -f $TMP.*
 # directive normalization.
 # FCD are simply translated into hpf-like prefixed directives
 # ??? maybe should I add some option to avoid this translation?
-# directive-origin are switched to ctrl-V
-# lower case letters for directives...
-# normalization of spaces...
 #
-$SED 's,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,\1,;
+$SED '# HPF and FC directive origins to Ctrl-V
+      s,^[Cc!\*][Hh][Pp][Ff]\$\(.\)[ 	]*,\1,;
       s,^[Cc!\*][Ff][Cc][Dd]\$\(.\)[ 	]*,\1,;
+      # switch to lower case letters
       //s,A,a,g;//s,B,b,g;//s,C,c,g;//s,D,d,g;
       //s,E,e,g;//s,F,f,g;//s,G,g,g;//s,H,h,g;
       //s,I,i,g;//s,J,j,g;//s,K,k,g;//s,L,l,g;
       //s,M,m,g;//s,N,n,g;//s,O,o,g;//s,P,p,g;
       //s,Q,q,g;//s,R,r,g;//s,S,s,g;//s,T,t,g;
       //s,U,u,g;//s,V,v,g;//s,W,w,g;//s,X,x,g;
-      //s,Y,y,g;//s,Z,z,g;//s,[ 	][ 	]*, ,g;
-      //s,\([0-9a-z]\) \([^0-9a-z]\),\1\2,g;
-      //s,\([^0-9a-z]\) \([0-9a-z]\),\1\2,g;
-      //s,\([^0-9a-z]\) \([^0-9a-z]\),\1\2,g;
-      //s,)with ,) with ,;//s,)onto ,) onto ,;' |
+      //s,Y,y,g;//s,Z,z,g;' |
 #
 # and continuation handling:
 # put the whole file on one line:-)
@@ -115,25 +110,32 @@ $TR '\012' '' |
 # then we can pattern-match on carriage returns!
 # remove not desired cr (& and 6 column styles)
 #
-$SED 's,&[ ]*., ,g;
-      s,[^ ], ,g' | 
+$SED 's,&[ 	]*., ,g;s, *[^ ], ,g' | 
 #
 # and back to a normal file
-# should be normalized again?
 #
 $TR '' '\012' | 
 #
 # massive pattern-matching transformations.
 # directives are switched to hpfc specials calls.
 #
-$SED '//s,\([\,(]\)block\([\,()]\),\1k\2,g
+$SED '# space normalization
+      //s,[ 	][ 	]*, ,g;
+      //s,\([0-9a-z]\) \([^0-9a-z]\),\1\2,g;
+      //s,\([^0-9a-z]\) \([0-9a-z]\),\1\2,g;
+      //s,\([^0-9a-z]\) \([^0-9a-z]\),\1\2,g;
+      //s,)with ,) with ,;
+      //s,)onto ,) onto ,;
+      # indirect reserved words: block, cyclic, *, nop
+      //s,\([\,(]\)block\([\,()]\),\1k\2,g
       //s,\([\,(]\)block\([\,()]\),\1k\2,g
       //s,k\([\,)]\),k()\1,g
       //s,\([\,(]\)cyclic\([\,()]\),\1c\2,g
       //s,\([\,(]\)cyclic\([\,()]\),\1c\2,g
       //s,c\([\,)]\),c(1)\1,g
       //s,\*\([\,)]\),s()\1,g
-      s,number_of_processors(),#,g
+      //s,number_of_processors(),#,g
+      # FC directives...
       s, synchro,      1,
       s, timeon,      2,
       s, timeoff,      3,
@@ -141,10 +143,12 @@ $SED '//s,\([\,(]\)block\([\,()]\),\1k\2,g
       s, setint,      5,
       s, local,      i(I_LOCAL)      do I_LOCAL = 0\, 0,
       s, endlocal,      enddo,
+      # HPF declaration directives
       s, dynamic \(.*\),      y(\1),
       s, pure \(.*\),      u(\1),
       s, template \(.*\),      logical \1      t(\1),
       s, processors \(.*\),      logical \1      p(\1),
+      # HPF mapping directives
       s, align \(.*\) with \(.*\),      a(\1\,\2),
       s, align with \(.*\)::\(.*\),      a(\2\,\1),
       s, realign \(.*\) with \(.*\),      b(\1\,\2),
@@ -155,12 +159,17 @@ $SED '//s,\([\,(]\)block\([\,()]\),\1k\2,g
       s, redistribute \(.*\) onto \(.*\),      e(\1\,\2),
       s, redistribute onto \(.*\)::\(.*\),      d(\2\,\1),
       s, redistribute \(.*\),      e(\1\,hpfcX),
-      s, \(.*\)\,new\((.*)\), \1 new\2,g
-      s, \(.*\)\,reduction\((.*)\), \1 reduction\2,g
-      s, \(.*\)\,independent\([^0-9a-z]*\)$, \1 independent\2,g
-      s, new,      n,
-      s, reduction,      r,
-      s, independent,      i,
+      # HPF parallelism directives
+      //s,\,new(, new(,g
+      //s,\,reduction(, reduction(,g
+      //s,\,independent\([(\,]\), independent\1,g
+      //s,\,independent *$, independent,
+      s, new,      n,g
+      s, reduction,      r,g
+      s, independent,      i,g
+      # on errors...
+      s,, syntax error:,
+      # switch to special hpfc functions...
       s,\([12345abdeintpryu]\),call hpfc\1,g
       s,\([ck#s]\),hpfc\1,g' | 
 #
@@ -218,11 +227,9 @@ $SED -n '$p'`
 LINE=${LAST_LINE:-$LINE}
 
 DEFAULT_USED=`$SED -n '/\,hpfcX)/p;/\,hpfcX)/q;' $TMP.0 $TMP.1`
-#STILL_SOME_DIRECTIVES=`$SED -n '//p;//q;' $TMP.0 $TMP.1`
 
 #
 # final output
-
 {
   $SED -n "1,$LINE p" $TMP.0
   #
@@ -251,12 +258,6 @@ $TR '' '\012'
 # clean temporary files
 
 $RM -f $TMP.*
-
-#
-# error if some directives where not analyzed
-
-#[ "$STILL_SOME_DIRECTIVES" ] && exit 1 ;
-exit 0
 
 # That is all
 #
