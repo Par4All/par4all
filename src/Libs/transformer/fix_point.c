@@ -256,7 +256,10 @@ transformer tf;
     int i = 0;
     Pbase t = BASE_UNDEFINED;
 
-    debug(8, "transformer_equality_fix_point", "begin\n");
+    ifdebug(8) {
+	debug(8, "transformer_equality_fix_point", "begin for transformer %p\n", tf);
+	fprint_transformer(stderr, tf, external_value_name);
+    }
  
     /* If the input transformer is not feasible, so is not its fixpoint
      * because the number of iterations may be zero which implies identity.
