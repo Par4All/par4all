@@ -4,6 +4,9 @@
  *
  */
 
+#warning the "matrice" library is obsolete! 
+#warning use the "matrix" library instead!
+
 /* Les matrices sont des matrices pleines, a coefficients rationnels.
  *
  * Les matrices sont representes par des tableaux d'entiers mono-dimensionnels
