@@ -1,17 +1,17 @@
-c
-c     Reductions management 
-c
-c $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-c ($Date: 1996/09/07 17:15:00 $, )
-c
-c     it is supposed that the reduction is computed on a full
-c     array, which is nor replicated anyway. If used on a part,
-c     should work, but I am not so sure.
-c
-c----------
-c
-c macros to generate the code
-c
+!
+!     Reductions management 
+!
+! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
+! ($Date: 1996/10/17 14:16:23 $, )
+!
+!     it is supposed that the reduction is computed on a full
+!     array, which is nor replicated anyway. If used on a part,
+!     should work, but I am not so sure.
+!
+!----------
+!
+! macros to generate the code
+!
 define(`REDUCTION_NODE_DECL',`
       integer ifelse(REDTYPE, logical, t$1`,') i$1, l$1, u$1, s$1, d$1')dnl
 define(`COMPUTE_LOCALIND',`
@@ -36,13 +36,13 @@ define(`DISJUNCTION',
 `ifelse(REDTYPE, logical, $1,
         REDTYPE, cumulate, $2,
         `errprint(m4: unexpected reduction type)')')dnl
-c
-c Generic reduction
-c
-c REDTYPE may be logical or cumulate
-c NAME may be MIN, MAX, SUM, MULT
-c LEVEL may be 1 to 7
-c
+!
+! Generic reduction
+!
+! REDTYPE may be logical or cumulate
+! NAME may be MIN, MAX, SUM, MULT
+! LEVEL may be 1 to 7
+!
 define(`GENERIC_REDUCTION',`dnl
 pushdef(`REDTYPE',$1)dnl
 pushdef(`LEVEL',$2)dnl
@@ -50,12 +50,12 @@ pushdef(`PVMTYPE',$3)dnl
 pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
 pushdef(`NAME',$4)dnl
 pushdef(`OPERATOR',$5)dnl
-c
-c    REDTYPE REDUCTION NAME FOR TYPE, LEVEL DIMENSIONS
-c
-c     
-c NODE PART
-c
+!
+!    REDTYPE REDUCTION NAME FOR TYPE, LEVEL DIMENSIONS
+!
+!     
+! NODE PART
+!
       TYPE function build_name(nred,LEVEL,PVMTYPE,NAME)(a, an, dnl
 COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
@@ -73,9 +73,9 @@ COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS')
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
       TYPE result
 SIMPLE_REPLICATE(LEVEL, `REDUCTION_NODE_DECL')
-c
-c initiate with a valid value
-c
+!
+! initiate with a valid value
+!
 DISJUNCTION(``
       'CALL HPFC CMPOWNERS(an, 
      $  COMMA_REPLICATE(LEVEL, `LOWER_REF'),
@@ -89,22 +89,22 @@ SIMPLE_REPLICATE(LEVEL, `COMPUTE_LOCALIND')
       endif',``
       'result = ifelse(NAME, `SUM', 0, NAME, `MULT', 1, dnl
                       FATAL_ERROR(`unexpected name'))')
-c
-c compute the loop bounds
-c
+!
+! compute the loop bounds
+!
 SIMPLE_REPLICATE(LEVEL, `LOOP_BOUNDS_COMPUTATION')
-c
-c local reduction
-c
+!
+! local reduction
+!
 REVERSE_REPLICATE(LEVEL, `DO_LOOP')
 DISJUNCTION(``
       'if (a(COMMA_REPLICATE(LEVEL, `INDEX_REF')) OPERATOR result) 
      &    result = a(COMMA_REPLICATE(LEVEL, `INDEX_REF'))',``
       'result = result OPERATOR  a(COMMA_REPLICATE(LEVEL, `INDEX_REF'))')
 SIMPLE_REPLICATE(LEVEL, `ENDDO_LOOP')
-c
-c send partial result to host, and get the final result
-c
+!
+! send partial result to host, and get the final result
+!
 ifelse(PVM_ARCH,`CM5',`dnl
       if (0.ne.CMMD_send(
      $     CM HOST ID,
@@ -121,18 +121,18 @@ ifelse(PVM_ARCH,`CM5',`dnl
       build_name(nred,LEVEL,PVMTYPE,NAME) = result
       return
       end
-c
-c HOST PART
-c
+!
+! HOST PART
+!
       TYPE function build_name(hred,LEVEL,PVMTYPE,NAME)()
       include "fpvm3.h"
 _CM5(`      include "cmmd_fort.h"')
       include "hpfc_commons.h"
       TYPE result(MAX MAX SIZE OF PROCS), final
       integer i
-c
-c get partial results
-c
+!
+! get partial results
+!
       do i=1, MAX SIZE OF PROCS
 ifelse(PVM_ARCH,`CM5',`dnl
          if (0.ne.CMMD_receive(
@@ -147,9 +147,9 @@ ifelse(PVM_ARCH,`CM5',`dnl
          SLID = i
          CALL HPFC RCVFR S(PVMTYPE, result(i))')
       enddo
-c
-c compute final result
-c
+!
+! compute final result
+!
       final = result(1)
       do i=2, MAX SIZE OF PROCS
 DISJUNCTION(``
@@ -157,18 +157,18 @@ DISJUNCTION(``
      &     final = result(i)',``
       '   final = final OPERATOR result(i)')
       enddo
-c
-c send final result to nodes 
-c      
+!
+! send final result to nodes 
+!      
 ifelse(PVM_ARCH,`CM5',`dnl
       call CMMD_bc_from_host(final, M4_PVM_LENGTH(PVMTYPE))',`dnl 
       call HPFC HSNDTO A(PVMTYPE, final)')
       build_name(hred,LEVEL,PVMTYPE,NAME) = final
       return
       end
-c
-c------------
-c
+!
+!------------
+!
 popdef(`REDTYPE')dnl
 popdef(`LEVEL')dnl
 popdef(`TYPE')dnl
@@ -178,13 +178,7 @@ popdef(`OPERATOR')dnl')dnl
 
 
 define(`SEVEN_DIMENSION',`
-GENERIC_REDUCTION($1, 1, $2, $3, $4)
-GENERIC_REDUCTION($1, 2, $2, $3, $4)
-GENERIC_REDUCTION($1, 3, $2, $3, $4)
-dnl GENERIC_REDUCTION($1, 4, $2, $3, $4)
-dnl GENERIC_REDUCTION($1, 5, $2, $3, $4)
-dnl GENERIC_REDUCTION($1, 6, $2, $3, $4)
-dnl GENERIC_REDUCTION($1, 7, $2, $3, $4)
+forloop(`_D_',1,_HPFC_DIMENSIONS_,`GENERIC_REDUCTION($1, _D_, $2, $3, $4)')
 ')dnl
 define(`LOGICAL_REDUCTION',`SEVEN_DIMENSION(logical, $1, $2, $3)')dnl
 define(`LOGICAL_REDUCTIONS',`
@@ -200,16 +194,16 @@ define(`REDUCTIONS',`
 LOGICAL_REDUCTIONS($1)
 dnl CUMULATE_REDUCTIONS($1)
 ')dnl
-c
-c All the reductions:
-c
-dnl REDUCTIONS(BYTE1)
-dnl REDUCTIONS(INTEGER2)
-REDUCTIONS(INTEGER4)
-REDUCTIONS(REAL4)
-REDUCTIONS(REAL8) 
-dnl CUMULATE_REDUCTIONS(COMPLEX8)
-dnl CUMULATE_REDUCTIONS(COMPLEX16)
+!
+! All the reductions:
+!
+ifdef(`_HPFC_NO_BYTE1_',,`REDUCTIONS(BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`REDUCTIONS(INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`REDUCTIONS(INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`REDUCTIONS(REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`REDUCTIONS(REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`REDUCTIONS(COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`REDUCTIONS(COMPLEX16)')
 
 dnl 
 dnl Runtime for the REDUCTION DIRECTIVE
@@ -222,10 +216,10 @@ define(`HPFC_REDUCTIONS',`dnl
 pushdef(`NAME',$1)dnl
 pushdef(`PVMTYPE',$2)dnl
 pushdef(`TYPE',m4_type_name(PVMTYPE))dnl
-c-----
-c
-c Functions for NAME reduction on TYPE scalars:
-c
+!-----
+!
+! Functions for NAME reduction on TYPE scalars:
+!
       subroutine build_name(hpre,NAME,PVMTYPE)(val)
       TYPE val
       end
@@ -239,16 +233,16 @@ c
       include "hpfc_commons.h"
       external pvm_opname(NAME)
       integer info
-c
-c performs the reduction to the host
-c
+!
+! performs the reduction to the host
+!
       call pvmfreduce(pvm_opname(NAME),
      x      val,1,PVMTYPE,MCAST HOST,HPFCGROUPNAME,0,info)
       MCAST HOST = MCAST HOST+2
 
-c
-c send final result to nodes 
-c      
+!
+! send final result to nodes 
+!      
       call HPFC HSNDTO A(PVMTYPE, val)
       end 
       subroutine build_name(npost,NAME,PVMTYPE)(val)
@@ -257,19 +251,19 @@ c
       include "hpfc_commons.h"
       external pvm_opname(NAME)
       integer info
-c
-c performs the reduction to the host
-c
+!
+! performs the reduction to the host
+!
       call pvmfreduce(pvm_opname(NAME),
      x      val,1,PVMTYPE,MCASTHOST,HPFCGROUPNAME,0,info)
       MCAST HOST=MCAST HOST+2
 
-c
-c get final result 
-c      
+!
+! get final result 
+!      
       call HPFC RCVFR mCH(PVMTYPE, val)
       end
-c
+!
 popdef(`NAME')dnl
 popdef(`PVMTYPE')dnl
 popdef(`TYPE')dnl')dnl
@@ -280,10 +274,14 @@ HPFC_REDUCTIONS(PROD,$1)
 HPFC_REDUCTIONS(MAX,$1)
 HPFC_REDUCTIONS(MIN,$1)')dnl
 dnl
-ALL_HPFC_REDUCTIONS(REAL4)
-ALL_HPFC_REDUCTIONS(REAL8)
-ALL_HPFC_REDUCTIONS(INTEGER4)
 
-c
-c that is all
-c
+ifdef(`_HPFC_NO_BYTE1_',,`ALL_HPFC_REDUCTIONS(BYTE1)')
+ifdef(`_HPFC_NO_INTEGER2_',,`ALL_HPFC_REDUCTIONS(INTEGER2)')
+ifdef(`_HPFC_NO_INTEGER4_',,`ALL_HPFC_REDUCTIONS(INTEGER4)')
+ifdef(`_HPFC_NO_REAL4_',,`ALL_HPFC_REDUCTIONS(REAL4)')
+ifdef(`_HPFC_NO_REAL8_',,`ALL_HPFC_REDUCTIONS(REAL8)')
+ifdef(`_HPFC_NO_COMPLEX8_',,`ALL_HPFC_REDUCTIONS(COMPLEX8)')
+ifdef(`_HPFC_NO_COMPLEX16_',,`ALL_HPFC_REDUCTIONS(COMPLEX16)')
+!
+! that is all
+!
