@@ -36,25 +36,27 @@ extern int Current_start, Current_first, Current_index ;
 %}
 
 %%
-external		{return( GRAM_EXTERNAL );}
-import                  {return( GRAM_IMPORT );}
-tabulated		{return( TABULATED );}
-from			{return( FROM );}
-persistant              {return( PERSISTANT );}
-persistent              {return( PERSISTANT );}
-\,			{return( COMMA );}
-\:			{return( COLUMN );}
-\;			{return( SEMI_COLUMN );}
-x			{return( AND );}
-\+			{return( OR );}
-"->"                    {return( ARROW );}
-\*			{return( STAR );}
-\[			{return( LB );}
-\]			{return( RB );}
-\{			{return( LR );}
-\}			{return( RR );}
-\"[_a-zA-Z0-9/\.~]+\"	{return( GRAM_FILE );}
-=			{return( EQUAL );}
+external		{return GRAM_EXTERNAL ;}
+import                  {return GRAM_IMPORT ;}
+tabulated		{return TABULATED ;}
+from			{return FROM ;}
+persistant              {return PERSISTANT ;}
+persistent              {return PERSISTANT ;}
+\,			{return COMMA ;}
+\:			{return COLUMN ;}
+\;			{return SEMI_COLUMN ;}
+x			{return AND ;}
+\+			{return OR ;}
+"->"                    {return ARROW ;}
+\*			{return STAR ;}
+\[			{return LB ;}
+\]			{return RB ;}
+\{			{return LR ;}
+\}			{return RR ;}
+\"[_a-zA-Z0-9/\.~]+\"	{ yylval.name = strdup(yytext+1);
+                          *(yylval.name+strlen(yytext)-2) = '\0';
+                          return GRAM_FILE ;}
+=			{return EQUAL ;}
 ^--NEWGEN-START\ [0-9]*\n {
                         Current_start = 
                              atoi( yytext+strlen( "--NEWGEN-START " )) ;
@@ -68,8 +70,8 @@ x			{return( AND );}
                              atoi( yytext+strlen( "--NEWGEN-INDEX " )) ;
                         }
 --.*\n			{}
-[_a-zA-Z][_a-zA-Z0-9]*	{return( IDENT );}
-[0-9]+                  {return( GRAM_INT );}
+[_a-zA-Z][_a-zA-Z0-9]*	{ yylval.name = strdup(yytext); return IDENT ;}
+[0-9]+                  { yylval.val = atoi(yytext); return GRAM_INT ;}
 [ \t\n]*		;
 %%
 
