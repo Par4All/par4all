@@ -47,6 +47,19 @@
 
 #define IS_UPPER(c) (isascii(c) && isupper(c))
 
+int
+SafeSizeOfArray(entity a)
+{
+    int s;
+
+    if(!SizeOfArray(a, &s)) {
+	user_warning("SafeSizeOfArray", "Varying size of array \"%s\"\n", entity_name(a));
+	ParserError("SafeSizeOfArray", "Fortran standard prohibit varying size array\n");
+    }
+
+    return s;
+}
+
 void 
 InitAreas()
 {
@@ -804,12 +817,12 @@ entity a, v;
 
     if(top_level_entity_p(a)) {
 	OldOffset = common_to_size(a);
-	(void) update_common_to_size(a, OldOffset+SizeOfArray(v));
+	(void) update_common_to_size(a, OldOffset+SafeSizeOfArray(v));
     }
     else {
 	/* the local areas are StaticArea and DynamicArea */
 	OldOffset = area_size(aa);
-	area_size(aa) = OldOffset+SizeOfArray(v);
+	area_size(aa) = OldOffset+SafeSizeOfArray(v);
     }
 
     area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
@@ -1323,7 +1336,7 @@ print_common_layout(FILE * fd, entity c)
 				   "\tVariable %s,\toffset = %d,\tsize = %d\n", 
 				   entity_name(m),
 				   ram_offset(storage_ram(entity_storage(m))),
-				   SizeOfArray(m));
+				   SafeSizeOfArray(m));
 	    }, 
 		members);
 	(void) fprintf(fd, "\n");
@@ -1352,7 +1365,7 @@ print_common_layout(FILE * fd, entity c)
 				   "\tVariable %s,\toffset = %d,\tsize = %d\n", 
 				   entity_name(m),
 				   ram_offset(storage_ram(entity_storage(m))),
-				   SizeOfArray(m));
+				   SafeSizeOfArray(m));
 		}, 
 		    equiv_members);
 	    (void) fprintf(fd, "\n");
@@ -1402,7 +1415,7 @@ entity c;
 	    if(!variable_in_module_p(current, m))
 		break;
 
-	    if(ram_offset(storage_ram(entity_storage(previous)))+SizeOfArray(previous) >
+	    if(ram_offset(storage_ram(entity_storage(previous)))+SafeSizeOfArray(previous) >
 	       ram_offset(storage_ram(entity_storage(current)))) {
 		ifdebug(1) {
 		    user_warning("update_common_layout", 
@@ -1410,7 +1423,7 @@ entity c;
 				 entity_local_name(previous), module_local_name(c));
 		}
 		ram_offset(storage_ram(entity_storage(current))) =
-		    ram_offset(storage_ram(entity_storage(previous)))+SizeOfArray(previous);
+		    ram_offset(storage_ram(entity_storage(previous)))+SafeSizeOfArray(previous);
 
 		/* If c really is a common, check its size because it may have increased.
 		 * Note that decreases are not taken into account although they might
@@ -1419,7 +1432,7 @@ entity c;
 		if(top_level_entity_p(c)) {
 		    int s = common_to_size(c);
 		    int new_s = ram_offset(storage_ram(entity_storage(current)))
-			+SizeOfArray(current);
+			+SafeSizeOfArray(current);
 		    if(s < new_s) {
 			(void) update_common_to_size(c, new_s);
 		    }
