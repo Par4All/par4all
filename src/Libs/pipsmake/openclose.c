@@ -32,33 +32,41 @@
 #include "pipsmake.h"
 #include "misc.h"
 
-extern makefile open_makefile();
+extern makefile open_makefile(void);
+extern void save_makefile(void);
 
-/* returns the program makefile file name */
-/* .pipsmake should be hidden in the .database
- * I move it to the .database
- * LZ 02/07/91
- * Next thing to do is to delete the prefix of .pipsmake
- * it's redundant. Done 04/07/91 
+/* returns the program makefile file name
  */
-char *
-build_pgm_makefile(char *n)
+#define PIPSMAKE_FILE "/pipsmake"
+string build_pgm_makefile(string n)
 {
     string dir_name = db_get_meta_data_directory(),
-	res = strdup(concatenate(dir_name, "/pipsmake", 0));
+	res = strdup(concatenate(dir_name, PIPSMAKE_FILE, 0));
     free(dir_name); return res;
 }
 
-string 
-make_open_workspace(string name)
+string  make_open_workspace(string name)
 {
-    if (db_open_workspace(name)) {
-	open_properties();
-	if (open_makefile(name) != makefile_undefined) {
-	    pips_debug(7, "makefile opened\n");
-	} else
-	    pips_user_warning("No special makefile for this workspace "
-			      "%s/%s.database\n", get_cwd(), name);
+    if (db_open_workspace(name)) 
+    {
+	if (open_properties())
+	{
+	    if (open_makefile(name) != makefile_undefined) 
+	    {
+		pips_debug(7, "makefile opened\n");
+	    }
+	    else
+	    {
+		/* should be an error? */
+		pips_user_warning("No special makefile for this workspace "
+				  "%s/%s.database\n", get_cwd(), name);
+	    }
+	}
+	else
+	{
+	    pips_user_warning("Cannot read properties...\n");
+	    db_close_workspace();
+	}
     } else
 	pips_user_warning("No workspace %s to open\n", name);
 
@@ -67,8 +75,7 @@ make_open_workspace(string name)
 
 /* FI->GO: could be in top-level, no?
  */
-bool 
-make_close_workspace(void)
+bool make_close_workspace(void)
 {
     bool res = TRUE;
     string name;
@@ -95,8 +102,7 @@ make_close_workspace(void)
 /* checkpoint the current workspace, i.e. save everything so
  * that it is possible to reopen it in case of failure. 
  */
-void
-checkpoint_workspace(void)
+void checkpoint_workspace(void)
 {
     if (db_get_current_workspace_name())
     {
