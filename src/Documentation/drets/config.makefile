@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/22 23:00:47 $, 
+# $Date: 1996/10/30 17:36:27 $, 
 #
 
 SOURCES=list_of_reports \
@@ -40,6 +40,11 @@ SOURCES=list_of_reports \
 	pips-2.ftex \
 	pips-org.fig \
 	pips-org.tex
+
+INSTALL_DOC=	dret133.ps dret105.ps
+INSTALL_HTM= 	dret133 dret105
+
+all: $(INSTALL_DOC) $(INSTALL_DOC:.ps=.html)
 
 # end of $RCSfile: config.makefile,v $
 #
