@@ -15,6 +15,7 @@ SCRIPTS = 	$(UTILS) \
 		order_libraries \
 		pips-experiment \
 		pips_at_night \
+		pips_at_night_at_cri \
 		remove_from_sccs_file
 
 SRC_MACROS =	auto.h \
