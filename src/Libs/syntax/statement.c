@@ -1,3 +1,9 @@
+/* 	%A% ($Date: 1997/02/03 22:27:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+
+#ifndef lint
+char vcid_syntax_statement[] = "%A% ($Date: 1997/02/03 22:27:54 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+#endif /* lint */
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -693,7 +699,6 @@ string l1, l2, l3;
 {
     expression e1, e2;
     statement s1, s2, s3, s;
-    /* instruction b1, b2, b3, b; */
     instruction ifarith = instruction_undefined;
 
     /* FI: Should be improved by testing equality between l1, l2 and l3
@@ -701,36 +706,75 @@ string l1, l2, l3;
      *  l1 == l2
      *  l2 == l3
      *  l1 == l3
+     * Plus, just in case, l1==l2==l3
      */
 
-    e1 = MakeBinaryCall(CreateIntrinsic(".LT."), 
-			e, MakeIntegerConstantExpression("0"));
-    e2 = MakeBinaryCall(CreateIntrinsic(".EQ."), 
-			e, MakeIntegerConstantExpression("0"));
+    if(strcmp(l1,l2)==0) {
+	if(strcmp(l2,l3)==0) {
+	    /* This must be quite unusual, but the variables in e have to be dereferenced
+	     * to respect the use-def chains, e may have side effects,...
+	     *
+	     * If the optimizer is very good, the absolute value of e 
+	     * should be checked positive?
+	     */
+	    e1 = MakeUnaryCall(CreateIntrinsic("ABS"), e);
+	    e2 = MakeBinaryCall(CreateIntrinsic(".GE."), 
+				e1, MakeIntegerConstantExpression("0"));
 
-    s1 = instruction_to_statement(MakeGotoInst(l1));
-    s2 = instruction_to_statement(MakeGotoInst(l2));
-    s3 = instruction_to_statement(MakeGotoInst(l3));
+	    s1 = instruction_to_statement(MakeGotoInst(l1));
+	    s2 = make_empty_block_statement();
 
-    /*
-    b1 = MakeEmptyInstructionBlock();
-    instruction_block(b1) = CONS(INSTRUCTION, s1, instruction_block(b1));
-    b2 = MakeEmptyInstructionBlock();
-    instruction_block(b2) = CONS(INSTRUCTION, s2, instruction_block(b2));
-    b3 = MakeEmptyInstructionBlock();
-    instruction_block(b3) = CONS(INSTRUCTION, s3, instruction_block(b3));
-    */
+	    ifarith = make_instruction(is_instruction_test, 
+				       make_test(e2,s1,s2));
+	}
+	else {
+	    e1 = MakeBinaryCall(CreateIntrinsic(".LE."), 
+				e, MakeIntegerConstantExpression("0"));
 
-    s = instruction_to_statement(make_instruction(is_instruction_test, 
-						  make_test(e2,s2,s3)));
-    statement_number(s) = look_at_next_statement_number();
+	    s1 = instruction_to_statement(MakeGotoInst(l1));
+	    s3 = instruction_to_statement(MakeGotoInst(l3));
 
-    /*
-    b = MakeEmptyInstructionBlock();
-    instruction_block(b) = CONS(INSTRUCTION, s, instruction_block(b));
-    */
+	    ifarith = make_instruction(is_instruction_test, 
+				       make_test(e1,s1,s3));
+	}
+    }
+    else if(strcmp(l1,l3)==0) {
+	e1 = MakeBinaryCall(CreateIntrinsic(".EQ."), 
+			    e, MakeIntegerConstantExpression("0"));
 
-    ifarith = make_instruction(is_instruction_test, make_test(e1,s1,s));
+	s1 = instruction_to_statement(MakeGotoInst(l1));
+	s2 = instruction_to_statement(MakeGotoInst(l2));
+
+	ifarith = make_instruction(is_instruction_test, 
+						      make_test(e1,s2,s1));
+    }
+    else if(strcmp(l2,l3)==0) {
+	e1 = MakeBinaryCall(CreateIntrinsic(".LT."), 
+			    e, MakeIntegerConstantExpression("0"));
+
+	s1 = instruction_to_statement(MakeGotoInst(l1));
+	s2 = instruction_to_statement(MakeGotoInst(l2));
+
+	ifarith = make_instruction(is_instruction_test, 
+				   make_test(e1,s1,s2));
+    }
+    else {
+	/* General case */
+	e1 = MakeBinaryCall(CreateIntrinsic(".LT."), 
+			    e, MakeIntegerConstantExpression("0"));
+	e2 = MakeBinaryCall(CreateIntrinsic(".EQ."), 
+			    e, MakeIntegerConstantExpression("0"));
+
+	s1 = instruction_to_statement(MakeGotoInst(l1));
+	s2 = instruction_to_statement(MakeGotoInst(l2));
+	s3 = instruction_to_statement(MakeGotoInst(l3));
+
+	s = instruction_to_statement(make_instruction(is_instruction_test, 
+						      make_test(e2,s2,s3)));
+	statement_number(s) = look_at_next_statement_number();
+
+	ifarith = make_instruction(is_instruction_test, make_test(e1,s1,s));
+    }
 
     return ifarith;
 }
