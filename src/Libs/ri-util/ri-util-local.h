@@ -95,73 +95,74 @@ typedef hash_table control_mapping;
 
 /*  special characters
  */
-#define MODULE_SEP ':'
-#define MODULE_SEP_STRING ":"
-#define LABEL_PREFIX "@"
-#define MAIN_PREFIX "%"
-#define COMMON_PREFIX "~"
-#define BLOCKDATA_PREFIX "&"
+#define MODULE_SEP 			':'
+
+#define MODULE_SEP_STRING 		":"
+#define LABEL_PREFIX 			"@"
+#define MAIN_PREFIX 			"%"
+#define COMMON_PREFIX 			"~"
+#define BLOCKDATA_PREFIX 		"&"
 
 /*  constant names
  */
-#define BLANK_COMMON_LOCAL_NAME "*BLANK*"
-#define DYNAMIC_AREA_LOCAL_NAME "*DYNAMIC*"
+#define BLANK_COMMON_LOCAL_NAME 	"*BLANK*"
+#define DYNAMIC_AREA_LOCAL_NAME 	"*DYNAMIC*"
+#define STATIC_AREA_LOCAL_NAME 		"*STATIC*"
+
 #define EMPTY_LABEL_NAME LABEL_PREFIX
-#define LIST_DIRECTED_FORMAT_NAME "LIST-DIRECTED"
-#define STATIC_AREA_LOCAL_NAME "*STATIC*"
+#define LIST_DIRECTED_FORMAT_NAME 	"LIST-DIRECTED"
 
+#define TOP_LEVEL_MODULE_NAME 		"TOP-LEVEL"
+#define UNBOUNDED_DIMENSION_NAME 	"UNBOUNDED-DIMENSION"
+#define IMPLIED_DO_NAME 		"IMPLIED-DO"
+#define RETURN_LABEL_NAME 		"00000"
 
-#define TOP_LEVEL_MODULE_NAME "TOP-LEVEL"
-#define UNBOUNDED_DIMENSION_NAME "UNBOUNDED-DIMENSION"
-#define IMPLIED_DO_NAME "IMPLIED-DO"
-#define RETURN_LABEL_NAME "00000"
-
-#define ASSIGN_OPERATOR_NAME "="
-#define PLUS_OPERATOR_NAME "+"
-#define MINUS_OPERATOR_NAME "-"
-#define UNARY_MINUS_OPERATOR_NAME "--"
-#define MULTIPLY_OPERATOR_NAME "*"
-#define DIVIDE_OPERATOR_NAME "/"
-#define POWER_OPERATOR_NAME "**"
-#define MODULO_OPERATOR_NAME "MOD"
-#define MIN_OPERATOR_NAME "MIN"
-#define MIN0_OPERATOR_NAME "MIN0"
-#define MAX_OPERATOR_NAME "MAX"
-#define MAX0_OPERATOR_NAME "MAX0"
+#define ASSIGN_OPERATOR_NAME 		"="
+#define PLUS_OPERATOR_NAME 		"+"
+#define MINUS_OPERATOR_NAME 		"-"
+#define UNARY_MINUS_OPERATOR_NAME 	"--"
+#define MULTIPLY_OPERATOR_NAME 		"*"
+#define DIVIDE_OPERATOR_NAME 		"/"
+#define POWER_OPERATOR_NAME 		"**"
+#define MODULO_OPERATOR_NAME 		"MOD"
+#define MIN_OPERATOR_NAME 		"MIN"
+#define MIN0_OPERATOR_NAME 		"MIN0"
+#define MAX_OPERATOR_NAME 		"MAX"
+#define MAX0_OPERATOR_NAME 		"MAX0"
 
 
 /* FI: intrinsics are defined at a third place after bootstrap and effects!
  *     I guess the name should be defined here and used in table(s) there
  */
 
-#define AND_OPERATOR_NAME ".AND."
-#define OR_OPERATOR_NAME ".OR."
-#define NOT_OPERATOR_NAME ".NOT."
-#define NON_EQUAL_OPERATOR_NAME ".NE."
-#define EQUIV_OPERATOR_NAME ".EQV."
-#define NON_EQUIV_OPERATOR_NAME ".NEQV."
+#define AND_OPERATOR_NAME 		".AND."
+#define OR_OPERATOR_NAME 		".OR."
+#define NOT_OPERATOR_NAME 		".NOT."
+#define NON_EQUAL_OPERATOR_NAME 	".NE."
+#define EQUIV_OPERATOR_NAME 		".EQV."
+#define NON_EQUIV_OPERATOR_NAME 	".NEQV."
 
-#define TRUE_OPERATOR_NAME ".TRUE."
-#define FALSE_OPERATOR_NAME ".FALSE."
+#define TRUE_OPERATOR_NAME 		".TRUE."
+#define FALSE_OPERATOR_NAME 		".FALSE."
 
-#define GREATER_OR_EQUAL_OPERATOR_NAME ".GE."
-#define GREATER_THAN_OPERATOR_NAME ".GT."
-#define LESS_OR_EQUAL_OPERATOR_NAME ".LE."
-#define LESS_THAN_OPERATOR_NAME ".LT."
-#define EQUAL_OPERATOR_NAME ".EQ."
+#define GREATER_OR_EQUAL_OPERATOR_NAME 	".GE."
+#define GREATER_THAN_OPERATOR_NAME 	".GT."
+#define LESS_OR_EQUAL_OPERATOR_NAME 	".LE."
+#define LESS_THAN_OPERATOR_NAME 	".LT."
+#define EQUAL_OPERATOR_NAME 		".EQ."
 
-#define CONTINUE_FUNCTION_NAME "CONTINUE"
-#define RETURN_FUNCTION_NAME "RETURN"
-#define STOP_FUNCTION_NAME "STOP"
-#define FORMAT_FUNCTION_NAME "FORMAT"
-#define SUBSTRING_FUNCTION_NAME "_SUBSTR"
-#define ASSIGN_SUBSTRING_FUNCTION_NAME "_ASSIGN_SUBSTR"
+#define CONTINUE_FUNCTION_NAME 		"CONTINUE"
+#define RETURN_FUNCTION_NAME 		"RETURN"
+#define STOP_FUNCTION_NAME 		"STOP"
+#define FORMAT_FUNCTION_NAME 		"FORMAT"
+#define SUBSTRING_FUNCTION_NAME 	"_SUBSTR"
+#define ASSIGN_SUBSTRING_FUNCTION_NAME 	"_ASSIGN_SUBSTR"
 
-#define MOD_INTRINSIC_NAME "MOD"
+#define MOD_INTRINSIC_NAME 		"MOD"
 
 /* moved from ricedg-local.h */
-#define LOOP_COUNTER_MODULE_NAME "LOOP-COUNTER"
-#define DI_VAR_MODULE_NAME "DI-VAR"
+#define LOOP_COUNTER_MODULE_NAME 	"LOOP-COUNTER"
+#define DI_VAR_MODULE_NAME 		"DI-VAR"
 
 /* macros */
 #define entity_an_operator_p(e,name) \
@@ -521,5 +522,5 @@ entity get_ith_##lname##_prime(int i)\
         list = _cm_list ; \
 }
 
-/* that is all for $RCSfile: ri-util-local.h,v $
+/* that is all for ri-util-local.h
  */
