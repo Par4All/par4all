@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: newgen.c,v $
+ * Revision 1.22  2003/06/16 15:35:57  coelho
+ * ++
+ *
  * Revision 1.21  2003/06/16 15:24:50  coelho
  * void*
  *
@@ -48,15 +51,15 @@ void initialize_newgen()
      * re-entry in newgen because of the graph stuff...
      */  
     gen_init_external(ARC_LABEL_NEWGEN_EXTERNAL, 
-		      (void* (*)()) gen_read, 
-		      (void (*)()) gen_write,
-		      (void (*)()) gen_free, 
-		      (void* (*)()) gen_copy_tree_with_sharing,
-		      (int (*)()) gen_allocated_memory);
+		      (void* (*)(FILE*,int(*)(void))) gen_read, 
+		      (void (*)(FILE*, void*)) gen_write,
+		      (void (*)(void*)) gen_free, 
+		      (void* (*)(void*)) gen_copy_tree_with_sharing,
+		      (int (*)(void*)) gen_allocated_memory);
 
     gen_init_external(VERTEX_LABEL_NEWGEN_EXTERNAL, 
-		      (void* (*)()) gen_read, 
-		      (void (*)()) gen_write,
+		      (void* (*)(FILE*,int(*)(void))) gen_read, 
+		      (void (*)(FILE*, void*)) gen_write,
 		      (void (*)()) gen_free, 
 		      (void* (*)()) gen_copy_tree_with_sharing,
 		      (int (*)()) gen_allocated_memory);
