@@ -770,7 +770,7 @@ bool assigned;
     (void) get_next_statement_number();
     ins = make_instruction_block(cs);
 
-    (void) gen_consistent_p(ins);
+    (void) instruction_consistent_p(ins);
 
     /* FatalError("parser", "computed goto statement prohibited\n"); */
 
@@ -999,7 +999,8 @@ string l;
 
     dovar = reference_variable(syntax_reference(s));
     reference_variable(syntax_reference(s)) = entity_undefined;
-    gen_free(s);
+    /* This free is not nice for the caller! Nor for the debugger. */
+    free_syntax(s);
 
     dolab = MakeLabel((strcmp(l, "BLOCKDO") == 0) ? "" : l);
 
@@ -1371,7 +1372,7 @@ make_check_io_statement(string n, expression u, entity l)
 				   make_test(c, b, make_empty_block_statement()));
   statement check = instruction_to_statement(t);
 
-  gen_consistent_p(check);
+  statement_consistent_p(check);
 
   return check;
 }
@@ -1479,7 +1480,7 @@ cons *lio;
       }
       ls = CONS(STATEMENT, MakeStatement(entity_empty_label(), io_call), ls);
       io = make_instruction(is_instruction_sequence, make_sequence(ls));
-      gen_consistent_p(io);
+      instruction_consistent_p(io);
     }
     
     return io;
