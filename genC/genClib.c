@@ -2220,31 +2220,30 @@ void gen_read_spec(char * spec, ...)
    of external types */
 
 void
-gen_init_external( which, read, write, free, copy, allocated_memory )
-int which ;
-char *(*read)() ;
-void (*write)() ;
-void (*free)() ;
-char *(*copy)() ;
-int (*allocated_memory)() ;
+gen_init_external(int which,
+		  void *(*read)(FILE*),
+		  void (*write)(FILE*, void*),
+		  void (*free)(void*) ;
+		  void *(*copy)(void*) ;
+		  int (*allocated_memory)(void*));
 {
-	struct gen_binding *bp = &Domains[ which ] ;
-	union domain *dp = bp->domain ;
-
-	if( dp->ba.type != EXTERNAL_DT ) {
-		user( "gen_init_external: %s isn't external\n", bp->name ) ;
-		return ;
-	}
-	if( dp->ex.read != NULL ) {
-		user( "gen_init_external: redefinition of %s skipped\n",
-		      bp->name ) ;
-		return ;
-	}
-	dp->ex.read = read ;
-	dp->ex.write = write ;
-	dp->ex.free = free ;
-	dp->ex.copy = copy ;
-	dp->ex.allocated_memory = allocated_memory ;
+  struct gen_binding *bp = &Domains[ which ] ;
+  union domain *dp = bp->domain ;
+  
+  if( dp->ba.type != EXTERNAL_DT ) {
+    user( "gen_init_external: %s isn't external\n", bp->name ) ;
+    return ;
+  }
+  if( dp->ex.read != NULL ) {
+    user( "gen_init_external: redefinition of %s skipped\n",
+	  bp->name ) ;
+    return ;
+  }
+  dp->ex.read = read ;
+  dp->ex.write = write ;
+  dp->ex.free = free ;
+  dp->ex.copy = copy ;
+  dp->ex.allocated_memory = allocated_memory ;
 }
 
 /********************************************************************** READ */
