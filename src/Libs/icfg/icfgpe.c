@@ -94,7 +94,7 @@ static text get_any_effects_text_flt(string module_name)
   
   debug_on("EFFECTS_DEBUG_LEVEL");
   
-  init_pretty_print(text_statement_any_effect_type_flt);
+  init_prettyprint(text_statement_any_effect_type_flt);
 
   MERGE_TEXTS(txt, text_module(module, module_stat));
   
