@@ -210,7 +210,7 @@ text_summary_any_effect_type(
 	if (pps->is_a_summary) {
 	    pips_debug(5, "considering resource %s\n", pps->name);
 	    MERGE_TEXTS(result, (*(pps->get_text))
-			(effects_effects(pps->resource)));
+			(effects_effects( (effects) pps->resource)));
 	}
     }
 
