@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/04/12 10:33:41 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/05/18 10:20:33 $, )
  * version $Revision$
  */
 
@@ -110,7 +110,7 @@ static int hash_chunk_rank() ;
 /* List of the prime numbers from 17 to 2^31-1 
  */
 static int prime_numbers_for_table_size[] = {
-    17,37,71,137,277,547,1091,2179,4357,8707,17417,
+    7,17,37,71,137,277,547,1091,2179,4357,8707,17417,
     34819,69653,139267,278543,557057,1114117,2228243,
     4456451,8912921,17825803,35651593,71303171,
     142606357,285212677,570425377,1140850699,
@@ -150,8 +150,7 @@ int size;
     hash_table htp;
     int *prime_list = &prime_numbers_for_table_size[0];
 
-    if (size<=0) size=HASH_DEFAULT_SIZE;
-    message_assert("size too small", size>1);
+    if (size<HASH_DEFAULT_SIZE) size=HASH_DEFAULT_SIZE - 1;
     /* get the next prime number in the table */
     GET_NEXT_HASH_TABLE_SIZE(size,prime_list);
 
