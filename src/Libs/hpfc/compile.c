@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/03/10 12:28:58 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/03/23 17:44:22 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -19,6 +19,12 @@ extern int fprintf();
 extern int vfprintf();
 extern int system();
 
+#include "types.h"
+#include "boolean.h"
+#include "vecteur.h"
+#include "contrainte.h"
+#include "sc.h"
+
 #include "genC.h"
 
 #include "ri.h"
@@ -30,6 +36,8 @@ extern int system();
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "resources.h"
+#include "effects.h"
+#include "regions.h"
 #include "hpfc.h"
 #include "defines-local.h"
 
@@ -47,7 +55,7 @@ char *module_name;
 {
     entity          
 	module = local_name_to_top_level_entity(module_name);
-    statement       
+    statement   
 	module_stat,
 	hoststat,
 	nodestat;
@@ -69,12 +77,21 @@ char *module_name;
     debug(3,"hpfcompile","module: %s\n",module_name);
 
     set_current_module_entity(module);
+    set_current_module_statement
+	((statement) db_get_memory_resource(DBR_CODE, module_name, FALSE));
+    set_cumulated_effects_map
+	((statement_mapping) 
+	 db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, FALSE));
+    set_proper_effects_map
+	((statement_mapping) 
+	 db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, FALSE));
+    set_local_regions_map
+	((statement_mapping)
+	 db_get_memory_resource(DBR_REGIONS, module_name, FALSE));
+
+    module_stat = get_current_module_statement();
+
     make_hpfc_current_mappings();
-
-/*    CurrentFunction = module;  is that not necessary any more? */
-    module_stat = (statement)
-	db_get_memory_resource(DBR_CODE, module_name, FALSE);
-
 
     /* what is to be done 
      * filter the source for the directives
@@ -131,8 +148,8 @@ char *module_name;
     hpfcompiler(module_stat, &hoststat, &nodestat);
     add_pvm_init_and_end(&hoststat, &nodestat);
 
-    DeduceGotos(hoststat,hostgotos);
-    DeduceGotos(nodestat,nodegotos);
+    DeduceGotos(hoststat, hostgotos);
+    DeduceGotos(nodestat, nodegotos);
     declaration_with_overlaps();
     close_overlap_management();
 
@@ -189,7 +206,13 @@ char *module_name;
 /*    DB_PUT_FILE_RESOURCE(DBR_xxx, strdup(module_name), filename);*/
     
     debug(4,"hpfcompile","end of procedure\n");
+
     reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_effects_map();
+    reset_proper_effects_map();
+    reset_local_regions_map();
+
     free_hpfc_current_mappings();
     debug_off();
 }
