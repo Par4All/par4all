@@ -6,6 +6,8 @@
  * - 16 nov 93, few changes (e.g. "test1" to "pip_in", etc.), AP
  * - 08 dec 93, creation of a new package named pip.
  * - 10 dec 93, new version of pip_solve : direct call to pip. AL
+ * - 31 jul 95, cleaning, pip_solve_min, pip_solve_max, old_pip_solve,
+ * old2_pip_solve, AP
  *
  * Documents:
  * Comments : file containing the functions that resolve a Parametric Integer
@@ -109,83 +111,75 @@ extern int ind_min_max;		/* Tag for MIN or MAX resolution */
  * parameters, with first the unknowns in order to allow us to catch them using
  * "nb_unknowns".
  */
-quast old_pip_solve(ps_dep, ps_context, nb_unknowns, min_or_max)
-Psysteme ps_dep, ps_context;
-int nb_unknowns;
-int min_or_max;
-{
-  extern quast quast_act;
-  extern Pbase base_var_ref, old_base_var, base_ref, old_base;
-  extern int ind_min_max;
+/* Obsolete, AP July 31st 95 :
+   
+   quast old_pip_solve(ps_dep, ps_context, nb_unknowns, min_or_max)
+   Psysteme ps_dep, ps_context;
+   int nb_unknowns;
+   int min_or_max;
+   {
+     extern quast quast_act;
+     extern Pbase base_var_ref, old_base_var, base_ref, old_base;
+     extern int ind_min_max;
+   
+     Pvecteur pvect;
+     int aux, n, i, res, infinite_num;
+     char *com = "essai";
+   
+     if(min_or_max == PIP_SOLVE_MIN) {
+				       ind_min_max = 0;
+				       infinite_num = -1;
+				     }
+     else {
+	    ps_dep = converti_psysmin_psysmax(ps_dep, nb_unknowns);
+	    ind_min_max = 1;
+	    infinite_num = vect_size((ps_dep)->base);
+	  }
+   
+     base_var_ref = base_dup((ps_dep)->base);
+     old_base_var = base_dup(base_var_ref);
+     for(i = 1, pvect = base_var_ref; i<nb_unknowns; i++) { pvect = pvect->succ; }
+     base_ref = pvect->succ;
+     pvect->succ = NULL;
+     old_base = base_dup(base_ref);
+   
+     if(! SC_EMPTY_P(ps_context))
+       ps_context->base = base_dup(base_ref);
+   
+     res = ecrit_probleme2(com, ps_dep, ps_context, nb_unknowns,
+			   infinite_num, vect_size(base_ref));
 
-  Pvecteur pvect;
-  int aux, n, i, res, infinite_num;
-  char *com = "essai";
+     n = 1;
+     while(n & 0xff) {
+		       int m;
+		       m = fork();
+		       while(m == -1) {
+					char answer;
+   
+					fprintf(stderr, "Fork failed for PIP\n\t Do you want to retry (y/n) ?\n");
+					scanf("%c\n", &answer);
+					if(answer == 'y')
+					  m = fork();
+					else
+					  exit(1);
+					fprintf(stderr, "\n");
+				      }
+		       if(m == 0) {
+				    execlp(PIP_BIN, PIP_BIN, PIP_OPTION, PIP_IN_FILE, PIP_OUT_FILE, (char *) 0);
+				  }
 
-  /* We set the environement for the kind of resolution desired (Min or Max) */
-  if(min_or_max == PIP_SOLVE_MIN) {
-    ind_min_max = 0;
-    infinite_num = -1;
-  }
-  else {
-    ps_dep = converti_psysmin_psysmax(ps_dep, nb_unknowns);
-    ind_min_max = 1;
-    infinite_num = vect_size((ps_dep)->base);
-  }
+		       wait(&n);
+		     }
 
-  /* Computation of the basis (unknowns and parameters) */
-  base_var_ref = base_dup((ps_dep)->base);
-  old_base_var = base_dup(base_var_ref);
-  for(i = 1, pvect = base_var_ref; i<nb_unknowns; i++) { pvect = pvect->succ; }
-  base_ref = pvect->succ;
-  pvect->succ = NULL;
-  old_base = base_dup(base_ref);
-
-  if(! SC_EMPTY_P(ps_context))
-    ps_context->base = base_dup(base_ref);
-
-  /* ps to fic */
-  res = ecrit_probleme2(com, ps_dep, ps_context, nb_unknowns,
-                        infinite_num, vect_size(base_ref));
-
-  /* Call to PIP solver : we create a new process which execute PIP */
-  n = 1;
-  while(n & 0xff) {
-    int m;
-    m = fork();
-    while(m == -1) {
-      char answer;
-
-      fprintf(stderr, "Fork failed for PIP\n\t Do you want to retry (y/n) ?\n");
-      scanf("%c\n", &answer);
-      if(answer == 'y')
-        m = fork();
-      else
-        exit(1);
-      fprintf(stderr, "\n");
-    }
-    if(m == 0) {
-      /* Here, it is the son process ; it executes the binary file PIP_BIN with
-       * three arguments PIP_OPTION, PIP_IN_FILE, PIP_OUT_FILE.
-       */
-      execlp(PIP_BIN, PIP_BIN, PIP_OPTION, PIP_IN_FILE, PIP_OUT_FILE, (char *) 0);
-    }
-
-    /* and all the following is the father process, which first waits until its
-     * son has finished.
-     */
-    wait(&n);
-  }
-
-  /* Parsing of the resulting file created by PIP. */
-  if((quayyin = fopen(PIP_OUT_FILE,"r")) == NULL) {
-    fprintf(stderr, "Cannot open file %s\n", PIP_OUT_FILE);
-    exit(1);
-  }
-  aux = quayyparse();
-
-  return(quast_act);
-}
+     if((quayyin = fopen(PIP_OUT_FILE,"r")) == NULL) {
+						       fprintf(stderr, "Cannot open file %s\n", PIP_OUT_FILE);
+						       exit(1);
+						     }
+     aux = quayyparse();
+   
+     return(quast_act);
+   }
+*/
 
 /*===========================================================================*/
 /* quast old2_pip_solve(Psysteme ps_dep, ps_context, int nb_unknowns,
@@ -206,18 +200,18 @@ int min_or_max;
  *
  * Call to PIP is direct : no input or output file are produced.
  */
+/* Obsolete, AP July 31st 95 :
+
 quast old2_pip_solve(ps_dep, ps_context, nb_unknowns, min_or_max)
 Psysteme ps_dep, ps_context;
 int nb_unknowns, min_or_max;
 {
-        /* FD variables */
         extern quast quast_act;
         extern Pbase base_var_ref, old_base_var, base_ref, old_base;
         extern int ind_min_max;
         Pvecteur pvect;
         int     i, infinite_num;
 
-        /* Pip variables */
         int     q, bigparm, ni, nvar, nq, non_vide, nparm, nc, p, xq;
         char*   g;
         Tableau *ineq, *context, *ctxt;
@@ -225,7 +219,6 @@ int nb_unknowns, min_or_max;
 
 	debug_on("PIP_DEBUG_LEVEL");
         debug(5, "pip_solve", "begin\n");
-        /* trace file */
         if (get_debug_level()>4) {
         	debug(5, "pip_solve", "Input Psysteme:\n");
                 fprint_psysteme( stderr, ps_dep );
@@ -234,12 +227,9 @@ int nb_unknowns, min_or_max;
                 fprintf(stderr, "Number of variables : %d\n", nb_unknowns);
         }
 
-	/* We remove the TCST from the base and we compute the value of
-           the dimension. AP, 28th july 95. */
 	vect_erase_var(&(ps_dep->base), (Variable) TCST);
 	ps_dep->dimension = vect_size((ps_dep)->base);
 
-        /* We set the env for the kind of resolution desired (Min or Max) */
         if(min_or_max == PIP_SOLVE_MIN) {
                 ind_min_max = 0;
                 infinite_num = -1;
@@ -247,8 +237,6 @@ int nb_unknowns, min_or_max;
         else {
                 ps_dep = converti_psysmin_psysmax(ps_dep, nb_unknowns);
 
-		/* We remove the TCST from the base and we compute the
-		   value of the dimension. AP, 28th july 95. */
 		vect_erase_var(&(ps_dep->base), (Variable) TCST);
 		ps_dep->dimension = vect_size((ps_dep)->base);
 
@@ -256,16 +244,13 @@ int nb_unknowns, min_or_max;
                 infinite_num = vect_size((ps_dep)->base);
         }
 
-        /* Computation of the basis (unknowns and parameters) 
-	 * base of ps_dep is the reference for all unknowns and parameters.
-	 */
         base_var_ref = base_dup((ps_dep)->base);
-        old_base_var = base_dup(base_var_ref);	/* Total base of ps_dep */
+        old_base_var = base_dup(base_var_ref); 
 
         for(i = 1, pvect = base_var_ref; i<nb_unknowns; i++)
                 { pvect = pvect->succ; }
-        base_ref = pvect->succ;			/* parameters of ps_dep */
-        pvect->succ = NULL;			/* base_var_ref : variables */
+        base_ref = pvect->succ;			
+        pvect->succ = NULL;			
         old_base = base_dup(base_ref);
 
         if(! SC_EMPTY_P(ps_context) ) {
@@ -273,7 +258,6 @@ int nb_unknowns, min_or_max;
                 ps_context->dimension = vect_size( base_ref );
         }
 
-        /* Set PIP variables. Comes from ecrit_probleme2 */
         nvar 	= nb_unknowns;
         nparm 	= ps_dep->dimension - nb_unknowns;
         ni 	= (ps_dep->nb_eq * 2) + ps_dep->nb_ineq;;
@@ -284,7 +268,6 @@ int nb_unknowns, min_or_max;
         debug(5, "pip_solve", "%d  %d  %d  %d  %d  %d\n",
                                 nvar, nparm, ni, nc, bigparm, nq );
 
-        /* Prepare to call PIP */
         limit 	= 0L;
         sol_init();
         tab_init();
@@ -297,7 +280,6 @@ int nb_unknowns, min_or_max;
         else context = NULL;
         xq = p = sol_hwm();
 
-        /* Verification de la non vacuite du contexte */
         if (nc) {
                 ctxt = expanser(context, nparm, nc, nparm+1, nparm, 0, 0);
                 traiter( ctxt, NULL, True, UN, nparm, 0, nc, 0, -1 );
@@ -309,7 +291,6 @@ int nb_unknowns, min_or_max;
                 traiter( ineq, context, nq, UN, nvar, nparm, ni, nc, bigparm );
                 q = sol_hwm();
                 init_new_base();
-                /* We read solution and put it in global quast_act */
                 while((xq = new_sol_edit(xq)) != q);
                 sol_reset(p);
         }
@@ -322,6 +303,8 @@ int nb_unknowns, min_or_max;
 	debug_off();
         return(quast_act);
 }
+*/
+
 
 /*=======================================================================*/
 /* quast pip_solve_min_with_big(Psysteme ps_dep, ps_context, int nb_unknowns,
@@ -687,23 +670,29 @@ Pvecteur	pv_unknowns;
 /* void pip_solve_min(Psysteme ps_dep, ps_context, int nb_unknowns):
  * Pip resolution for the minimum.
  */
-quast pip_solve_min(ps_dep, ps_context, nb_unknowns)
-Psysteme ps_dep, ps_context;
-int nb_unknowns;
-{
-	return(old2_pip_solve(ps_dep, ps_context, nb_unknowns, PIP_SOLVE_MIN));
-}
+/* Obsolete, AP July 31st 95 :
+   
+   quast pip_solve_min(ps_dep, ps_context, nb_unknowns)
+   Psysteme ps_dep, ps_context;
+   int nb_unknowns;
+   {
+     return(old2_pip_solve(ps_dep, ps_context, nb_unknowns, PIP_SOLVE_MIN));
+   }
+   */
 
 /*===================================================================*/
 /* void pip_solve_max(Psysteme ps_dep, ps_context, int nb_unknowns):
  * Pip resolution for the maximum.
  */
-quast pip_solve_max(ps_dep, ps_context, nb_unknowns)
-Psysteme ps_dep, ps_context;
-int nb_unknowns;
-{
-	return(old2_pip_solve(ps_dep, ps_context, nb_unknowns, PIP_SOLVE_MAX));
-}
+/* Obsolete, AP July 31st 95 :
+
+   quast pip_solve_max(ps_dep, ps_context, nb_unknowns)
+   Psysteme ps_dep, ps_context;
+   int nb_unknowns;
+   {
+   return(old2_pip_solve(ps_dep, ps_context, nb_unknowns, PIP_SOLVE_MAX));
+   }
+*/
 
 /*===================================================================*/
 
