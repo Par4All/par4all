@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ version $Revision$
-# ($Date: 1996/10/17 15:40:36 $, )
+# ($Date: 1996/10/19 11:11:16 $, )
 #
 # depends on 
 # + PVM_ARCH 
@@ -130,13 +130,13 @@ endif
 
 M4FLAGS += -D PVM_ARCH=$(PVM_ARCH) hpfc_lib_m4_macros
 
-COPY		= cp
-MOVE 		= mv
+COPY	= cp
+MOVE 	= mv
 
 #
 # I distinguish between PVM{3,e}_ROOT...
 
-pvminc		= $(PVM_ROOT)/include
+pvminc	= $(PVM_ROOT)/include
 pvmconf	= $(PVM_ROOT)/conf
 
 ifdef _HPFC_USE_PVMe_
@@ -166,7 +166,7 @@ endif
 
 M4COPT	+=	$(PVM_ARCH).m4
 
-PVM_HEADERS	= pvm3.h fpvm3.h
+PVM_HEADERS  =	pvm3.h fpvm3.h
 LIB_M4FFILES = 	hpfc_packing.m4f \
 		hpfc_reductions.m4f \
 		hpfc_rtsupport.m4f \
