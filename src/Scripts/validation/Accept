@@ -13,13 +13,13 @@
 # - several files may be piped simultaneously
 #
 # SCCS Stuff:
-# $RCSfile: Accept,v $ ($Date: 1996/09/24 14:54:22 $, ) version $Revision$,
+# $RCSfile: Accept,v $ ($Date: 1996/11/11 13:46:23 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
 
 header="Differences for"
-pips_test_directory="$PIPS_VALIDDIR"
+pips_test_directory="${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}"
 
 scriptname="`basename $0` ($Revision$)"
 
