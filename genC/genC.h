@@ -113,10 +113,6 @@ typedef union gen_chunk {
 #include "newgen_list.h"
 #include "newgen_stack.h"
 
-/* The implementation of tabulated domains */
-
-extern struct gen_binding Domains[], *Tabulated_bp ;
-
 /* never used I guess. FC 19/04/2000.
 #define TABULATED_MAP(_x,_code,_dom) \
 	{int _tabulated_map_i=0 ; \
@@ -127,10 +123,6 @@ extern struct gen_binding Domains[], *Tabulated_bp ;
 		     gen_chunk_undefined ) \
 			_code ;}}
 */
-
-/* The root of the gen_chunk read with READ_CHUNK. */
-
-extern gen_chunk *Read_chunk ;
 
 /* Function interface for user applications. */
 
