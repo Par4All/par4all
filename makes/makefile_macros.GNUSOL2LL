@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNUSOL2LL,v $ (version $Revision$)
-# $Date: 1996/09/02 13:44:23 $, 
+# $Date: 1996/09/02 17:35:05 $, 
 #
 # this file contains macro definitions 
 
@@ -8,10 +8,10 @@ AR	= ar
 ARFLAGS	= rv
 CC	= gcc
 CFLAGS	= -O2 -g -Wall -msupersparc -pipe
-CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -D__USE_FIXED_PROTOTYPES__ -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(PIPS_EXTEDIR)
+CPPFLAGS= -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -D__USE_FIXED_PROTOTYPES__ -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC) 
 # gdb comes with some readline lib... but different headers...
-LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L/$(PIPS_EXTEDIR)/SOL2
+LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L/$(EXTERN_ROOT)/Lib/$(ARCH)
 RANLIB	= ranlib
 LEX	= flex
 LFLAGS	= 
