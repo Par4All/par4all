@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.GNU,v $
+# Revision 1.34  1997/09/09 13:00:47  coelho
+# hop!
+#
 # Revision 1.33  1997/09/09 12:05:48  coelho
 # much factored out.
 #
@@ -20,10 +23,11 @@
 #
 # this file contains macro definitions 
 
-include makefile_macros.doc
-include makefile_macros.misc
-include makefile_macros.gnu
-include makefile_macros.flags
+include $(ROOT)/Include/makefile_macros.doc
+include $(ROOT)/Include/makefile_macros.misc
+include $(ROOT)/Include/makefile_macros.gnu
+include $(ROOT)/Include/makefile_macros.gnutools
+include $(ROOT)/Include/makefile_macros.flags
 
 # end of it!
 #
