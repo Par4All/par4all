@@ -261,14 +261,37 @@ transformer t;
 
 	for( t = b; !BASE_UNDEFINED_P(t) && consistent; t = t->succ) {
 	    entity val = (entity) vecteur_var(t);
+
+       /* test aliasing between arguments and relations
+          high cost testing */
+	    ifdebug(8) {      
+		MAP(ENTITY, e, {
+		    string emn =strdup(entity_module_name(e));
+		    consistent = consistent && 
+			(same_string_p(entity_local_name(e), 
+				       entity_local_name(val)) ? 
+			 same_string_p(emn,
+				       entity_module_name(val)) 
+			 : TRUE);
+		    free(emn);
+		}, args);
+		if(!consistent)
+		    pips_error("transformer_consistency_p", 
+			  "aliasing between arguments and basis \n");
+	    }
+	    
+
 	    /* FI: the next test is not safe because val can be
 	     * a global value not recognized in the current
 	     * context. old_value_entity_p() returns TRUE or FALSE
 	     * or pips_error.
 	     *
 	     * A general version of this routine is needed...
+	     * the return value of a function is not recognized as a 
+	     * global value by old_value_entity_p
 	     */
-	    if(old_value_entity_p(val)) {
+	    if( !storage_return_p(entity_storage(val))
+		&& old_value_entity_p(val)) {
 		entity var = value_to_variable(val);
 
 		consistent = entity_is_argument_p(var, args);
