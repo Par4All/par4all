@@ -16,6 +16,7 @@
 #include "genC.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "misc.h"
 
 #include "effects-generic.h"
 #include "effects-convex.h"
