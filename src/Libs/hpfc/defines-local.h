@@ -230,6 +230,7 @@ void fprint_entity_list(FILE *fp, list l);
 #define BUFID		"HPFC_BUFID"
 
 #define MYPOS		"MYPOS"
+#define MYLID		"MYLID"
 #define NODETIDS	"NODETIDS"
 #define HOST_TID	"HOSTTID"
 #define NBTASKS		"MAXSIZEOFPROCS"
