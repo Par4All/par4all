@@ -23,6 +23,9 @@
  $Id$
 
  $Log: bourdoncle.c,v $
+ Revision 1.5  2002/07/05 12:53:10  irigoin
+ Intermediate version with bug in update_successor_in_copy() for SemanticsPrivate/readin.f
+
  Revision 1.4  2002/07/02 17:50:48  irigoin
  Intermediate bugged version, checked in to keep track of the current state.
 
@@ -129,13 +132,15 @@ void free_meaningless_control(control c)
 }
 
 
-/* Check that a node is used as a test in a CFG. The associated statement must be a test, the number of successors must be two and the TRUE and FALSE branches must be empty. */
+/* Check that a node is used as a test in a CFG. The associated statement
+   must be a test, the number of successors must be two and the TRUE and
+   FALSE branches must be empty. */
 static bool control_test_p(control c)
 {
   bool test_p = FALSE;
   if(!meaningless_control_p(c)) {
     if(statement_test_p(control_statement(c))) {
-      if(gen_length(control_successors(c))==2) {
+      if(gen_length(control_successors(c))>=2) {
 	test t = statement_test(control_statement(c));
 	statement ts = test_true(t);
 	statement fs = test_false(t);
@@ -160,12 +165,20 @@ static void check_control_statement(control c)
            time. But a structured test used a non-deterministic node might
            very well have two successors or more. The assert below is too
            strong. */
+	/*
 	test t = statement_test(control_statement(c));
 	statement ts = test_true(t);
 	statement fs = test_false(t);
+	*/
+	/* Since some test statements are left structured and since
+           structure and unstructured test statements may be
+           non-deterministic here, nothing can be said. */
+	/*
 	pips_assert("The TRUE and FALSE branches must be empty",
 		    empty_statement_or_labelless_continue_p(ts)
 		    && empty_statement_or_labelless_continue_p(fs));
+	*/
+	;
       }
       else {
 	/* Non-deterministic environment */
@@ -184,6 +197,21 @@ static void check_control_statement(control c)
       */
       ;
     }
+  }
+  else {
+    ifdebug(4) {
+      /* A meaningless control can be shared in intermediate states */
+      }
+    else ifdebug(1){
+    /* It should not be shared, not only because memory management would
+       be impossible locally but also because gen_recurse() would follow
+       forbidden paths. */
+    pips_assert("A meaningless control has one and ony one predecessor",
+		gen_length(control_predecessors(c))==1);
+    pips_assert("A meaningless control has no successor",
+		gen_length(control_successors(c))==0);
+    }
+
   }
 }
 
@@ -232,30 +260,42 @@ static void print_unstructured(unstructured u)
 }
 
 /* Output CFG in daVinci format */
-static void davinci_print_control_node(control c, FILE * f)
+static void davinci_print_control_node(control c, FILE * f,
+				       bool entry_p,
+				       bool exit_p,
+				       bool fix_point_p)
 {
-  /*
-  fprintf(stderr,
-	  "ctr %p, %d preds, %d succs: %s", 
-          c,
-	  gen_length(control_predecessors(c)),
-	  gen_length(control_successors(c)),
-	  safe_statement_identification(control_statement(c)));
-  */
+  char attributes[256];
+  
+  /* The same node can be an entry and an exit node. */
+  attributes[0] = '\000';
+  if(entry_p) {
+    (void) strcpy(&attributes[0], ",a(\"BORDER\",\"double\")");
+  }
+  if(exit_p){
+    (void) strcat(&attributes[0], ",a(\"COLOR\",\"red\")");
+  }
+  if(fix_point_p){
+    (void) strcat(&attributes[0], ",a(\"FONTSTYLE\",\"bold_italic\")");
+  }
+  
   if(meaningless_control_p(c)) {
     fprintf(f, "l(\"%p\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"%p\")],\n\t[\n", c, c);
   }
   else if(control_test_p(c)) {
     int so = statement_ordering(control_statement(c));
-    fprintf(f, "l(\"%p\",n(\"\",[a(\"_GO\",\"rhombus\"),a(\"OBJECT\",\"%p\\n(%d,%d)\")],\n\t[\n", c, c,
-	    ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
+    fprintf(f,
+	    "l(\"%p\",n(\"\",[a(\"_GO\",\"rhombus\"),a(\"OBJECT\",\"%p\\n(%d,%d)\")%s],\n\t[\n",
+	    c, c,
+	    ORDERING_NUMBER(so), ORDERING_STATEMENT(so), attributes);
   }
   else {
     int so = statement_ordering(control_statement(c));
-    fprintf(f, "l(\"%p\",n(\"\",[a(\"OBJECT\",\"%p\\n(%d,%d)\")],\n\t[\n", c, c,
-	    ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
+    fprintf(f, "l(\"%p\",n(\"\",[a(\"OBJECT\",\"%p\\n(%d,%d)\")%s],\n\t[\n", c, c,
+	    ORDERING_NUMBER(so), ORDERING_STATEMENT(so), attributes);
   }
   
+  /* Declare arcs */
   MAPL(c_s, {
     control s = CONTROL(CAR(c_s));
     
@@ -290,35 +330,115 @@ static int control_cons_compare(list l1, list l2)
   return diff;
 }
 
+/* This counter is pre-incremented each time a new graph is stored to
+   generate a new file name. */
+static int davinci_count = 0;
+
+static void set_davinci_count()
+{
+  davinci_count = 0;
+}
+
 
 static void davinci_print_control_nodes(list l, string msg)
 {
-  static int count = 0;
   extern string itoa(int);
-  FILE * f = fopen(concatenate(get_current_module_name(),
-			       "-",
-			       itoa(count++),
-			       ".daVinci", NULL),
+  extern string db_get_current_workspace_directory(void);
+  string dn = db_get_current_workspace_directory();
+  FILE * f = safe_fopen(concatenate(dn, "/",
+				    get_current_module_name(), "/", 
+				    get_current_module_name(),
+				    "-",
+				    itoa(++davinci_count),
+				    ".daVinci", NULL),
 		   "w");
   list sl = gen_copy_seq(l);
 
+  free(dn);
   gen_sort_list(sl, control_cons_compare);
   
   fprintf(f, "[\n");
-  fprintf(f, "l(\"%s\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"%s\")],\n\t[])),\n",
-	  msg, msg);
+  fprintf(f, "l(\"%s\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"%s\\nSerial number for module %s: %d\")],\n\t[])),\n",
+	  msg, msg, get_current_module_name(), davinci_count);
+  /*
   fprintf(f, "l(\"%d\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"serial number: %d\")],\n\t[])),\n",
-	  count, count);
+	  davinci_count, davinci_count);
+  */
 
   MAPL(c_c, {
     control c = CONTROL(CAR(c_c));
     
-    davinci_print_control_node(c, f);
+    davinci_print_control_node(c, f, c==CONTROL(CAR(l)), FALSE, FALSE);
     fprintf(f, "%s\n", ENDP(CDR(c_c))? "" : ",");
   }, sl);
 
   fprintf(f, "]\n");
   gen_free_list(sl);
+  (void) safe_fclose(f, concatenate(get_current_module_name(),
+				    "-",
+				    itoa(davinci_count),
+				    ".daVinci", NULL));
+  
+}
+
+static void davinci_print_non_deterministic_unstructured
+(unstructured u, string msg, hash_table scc_map, hash_table ancestor_map)
+{
+  extern string itoa(int);
+  extern string db_get_current_workspace_directory(void);
+  string dn = db_get_current_workspace_directory();
+  FILE * f = safe_fopen(concatenate(dn, "/",
+				    get_current_module_name(), "/", 
+				    get_current_module_name(),
+				    "-",
+				    itoa(++davinci_count),
+				    ".daVinci", NULL),
+		   "w");
+  control entry_c = unstructured_control(u);
+  control exit_c = unstructured_exit(u);
+  list l = NIL;
+  list sl = list_undefined;
+  
+  free(dn);
+  forward_control_map_get_blocs(entry_c, &l);
+
+  if(!gen_in_list_p(exit_c, l)) {
+    pips_debug(1, "Exit node %p in unstructured %p is not reachable\n", exit_c, u);
+  }
+  
+  sl = gen_copy_seq(l);
+
+  gen_sort_list(sl, control_cons_compare);
+  
+  fprintf(f, "[\n");
+  fprintf(f, "l(\"%s\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"%s\\nSerial number for module %s: %d\")],\n\t[])),\n",
+	  msg, msg, get_current_module_name(), davinci_count);
+  /*
+  fprintf(f, "l(\"%d\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"serial number: %d\")],\n\t[])),\n",
+	  davinci_count, davinci_count);
+  */
+
+  MAPL(c_c, {
+    control c = CONTROL(CAR(c_c));
+    control a = control_undefined;
+
+    if((a = hash_get(ancestor_map, c))==HASH_UNDEFINED_VALUE)
+      a = c;
+    
+    davinci_print_control_node(c, f,
+			       c==entry_c,
+			       c==exit_c,
+			       hash_get(scc_map, (void*) a)!=HASH_UNDEFINED_VALUE);
+    fprintf(f, "%s\n", ENDP(CDR(c_c))? "" : ",");
+  }, sl);
+
+  fprintf(f, "]\n");
+  gen_free_list(sl);
+  (void) safe_fclose(f, concatenate(get_current_module_name(),
+				    "-",
+				    itoa(davinci_count),
+				    ".daVinci", NULL));
+  
 }
 
 static list embedding_control_list = NIL;
@@ -433,6 +553,139 @@ static list node_to_linked_nodes(control c)
   return l;
 }
 
+/* Take care of two problems: meaningless control nodes may end up shared
+   by effective nodes and they may end up uselessly numerous. */
+
+static int clean_up_control_test(control c)
+{
+  list succs = control_successors(c);
+  list t_succs = NIL; /* true branch successors */
+  list f_succs = NIL; /* false branch successors */
+  list e_succs = NIL; /* empty successors */
+  int ns = gen_length(succs);
+  int nts = 0;
+  int nfs = 0;
+  int nes = 0;
+  int nel = 0; /* Number of eliminations */
+  int rank = 0;
+  
+  pips_assert("A control test has at least two successors", ns>=2);
+  
+  /* Partition the successors */
+  MAP(CONTROL, s, 
+  {
+    rank++;
+    if(meaningless_control_p(s)) {
+      e_succs = CONS(CONTROL, s, e_succs);
+    }
+    else if(rank%2==1) {
+      t_succs = CONS(CONTROL, s, t_succs);
+    }
+    else {
+      f_succs = CONS(CONTROL, s, f_succs);
+    }
+  }
+      , succs);
+
+  nts = gen_length(t_succs);
+  nfs = gen_length(f_succs);
+  nes = gen_length(e_succs);
+  pips_assert("The rank of the last successors is the number of successors", rank==ns);
+  pips_assert("true, false and empty successors are a partition", ns==nts+nfs+nes);
+  
+  /* Rebuild the successor list if it can be useful */
+  if(nes > nts-nfs && nes > nfs-nts) {
+    list n_succs = NIL; /* new successor list */
+    list c_t_succs = t_succs;
+    list c_f_succs = f_succs;
+    list c_e_succs = e_succs;
+  
+    for(rank=1; rank <= nts || rank <= nfs; rank++) {
+      if(!ENDP(c_t_succs)) {
+	n_succs = CONS(CONTROL, CONTROL(CAR(c_t_succs)), n_succs);
+	POP(c_t_succs);
+      }
+      else {
+	pips_assert("The empty successor list is not empty", !ENDP(c_e_succs));
+	n_succs = CONS(CONTROL, CONTROL(CAR(c_e_succs)), n_succs);
+	POP(c_e_succs);
+      }
+      if(!ENDP(c_f_succs)) {
+	n_succs = CONS(CONTROL, CONTROL(CAR(c_f_succs)), n_succs);
+	POP(c_f_succs);
+      }
+      else {
+	pips_assert("The empty successor list is not empty", !ENDP(c_e_succs));
+	n_succs = CONS(CONTROL, CONTROL(CAR(c_e_succs)), n_succs);
+	POP(c_e_succs);
+      }
+    }
+    pips_assert("No more true successors", ENDP(c_t_succs));
+    pips_assert("No more false successors", ENDP(c_f_succs));
+    pips_assert("More true successors", !ENDP(c_e_succs));
+
+    nel = ns - gen_length(n_succs);
+    pips_assert("The successor list is reduced", nel>0);
+    
+    /* Courageously, free the remaining meaninless successors */
+    MAP(CONTROL, e, {
+      free_meaningless_control(e);
+    }, c_e_succs);
+    
+    /* Update the successor list of c */
+    gen_free_list(control_successors(c));
+    control_successors(c) = n_succs;
+  }
+  /* Free the partition lists */
+  gen_free_list(t_succs);
+  gen_free_list(f_succs);
+  gen_free_list(e_succs);
+
+  return nel;
+}
+
+static void clean_up_embedding_graph(control c)
+{
+  list el = node_to_linked_nodes(c);
+  int nor = 0; /* number of replications */
+  int nel = 0; /* number of eliminations */
+  
+  /* A meaningless control must have only one predecessor and no
+     successor. */
+  MAP(CONTROL, ec, {
+    if(meaningless_control_p(ec)) {
+      pips_assert("No successor", ENDP(control_successors(ec)));
+      
+      if(gen_length(control_predecessors(ec))>1) {
+	list c_pred = list_undefined;
+	
+	for(c_pred=CDR(control_predecessors(ec)); !ENDP(c_pred); POP(c_pred)) {
+	  control pred = CONTROL(CAR(c_pred));
+	  control new_ec = make_meaningless_control(CONS(CONTROL, pred, NIL), NIL);
+	  gen_list_patch(control_successors(pred), ec, new_ec);
+	  nor++;
+	}
+	gen_free_list(CDR(control_predecessors(ec)));
+	CDR(control_predecessors(ec)) = NIL;
+      }
+    }
+  }
+      , el);
+
+  /* A non-deterministic test does not need too many meaningless
+     successors. */
+  MAP(CONTROL, ec, {
+    if(control_test_p(ec)) {
+      nel += clean_up_control_test(ec);
+    }
+  }
+      , el);
+
+  gen_free_list(el);
+
+  pips_debug(2, "End: \n");
+}
+
 static void print_control_to_control_mapping(string message, hash_table map)
 {
   fprintf(stderr, "%s\n", message);
@@ -470,7 +723,8 @@ static control control_to_ancestor(control vertex, hash_table ancestor_map)
     ancestor = vertex;
   ifdebug(2) {
     /* This assert may be too strong, but all control nodes are copied
-       when entering bourdoncle partition which should make it correct. */
+       when just after entering bourdoncle_partition which should make it
+       correct. */
     pips_assert("ancestor really is an ancestor",
 		ancestor_control_p(ancestor_map, ancestor));
     }
@@ -831,7 +1085,7 @@ void intersect_successors_with_partition_complement(control c,
 {
   intersect_successors_with_partition_or_complement(c, partition, TRUE);
 }
-
+
 static void insert_non_deterministic_control_node(list succs,
 						  control pred,
 						  control new_c,
@@ -855,7 +1109,7 @@ static void insert_non_deterministic_control_node(list succs,
   gen_list_patch(control_predecessors(new_c), pred, cnop);
   }
 }
-
+
 /* Element ranks are strictly positive as for first, second, and so on. If
    item is not in l, 0 is returned. */
 static int gen_rank(void * item, list l)
@@ -906,7 +1160,7 @@ static void update_successors_of_predecessor(control pred, control new_c, contro
 					 CONS(CONTROL, new_c, NIL));
 
     ifdebug(8) {
-      pips_debug(8, "%s meaninless control node added. New successor list of pred %p:\n",
+      pips_debug(8, "%s meaningless control node added. New successor list of pred %p:\n",
 		 insert_p? "A" : "No", pred);
       print_control_nodes(control_successors(pred));
     }
@@ -928,7 +1182,7 @@ static void update_predecessors_of_successor(control succ, control new_c, contro
   
   control_predecessors(succ) = CONS(CONTROL, new_c, control_predecessors(succ));
 }
-
+
 /* Make new_c a successor of new_pred, the same way c is a successor of
    pred */
 static void update_successor_in_copy(control new_pred,
@@ -939,8 +1193,8 @@ static void update_successor_in_copy(control new_pred,
   list succ_c = list_undefined;
   list new_succ_c = list_undefined;
 
-  ifdebug(8) {
-    pips_debug(8, "Begin for new_pred=%p, pred=%p, c=%p, new_c=%p\n",
+  ifdebug(3) {
+    pips_debug(3, "Begin for new_pred=%p, pred=%p, c=%p, new_c=%p\n",
 	       new_pred, pred, c, new_c);
     print_control_node(new_pred);
     print_control_node(pred);
@@ -956,6 +1210,14 @@ static void update_successor_in_copy(control new_pred,
   pips_assert("pred is a predecessor of new_c",
 	      gen_in_list_p(pred, control_predecessors(new_c)));
 
+  if(gen_length(control_successors(pred))
+     != gen_length(control_successors(new_pred))) {
+    fprintf(stderr, "Uncompatible successor lists? pred=%p\n", pred);
+    print_control_node(pred);
+    fprintf(stderr, "Uncompatible successor lists? and new_pred=%p\n", new_pred);
+    print_control_node(new_pred);
+  }
+  
   /* Scan together both successor lists of the two predecessors to update
      the successor of the new predecessor */
   pips_assert("The two successor lists have same length",
@@ -990,7 +1252,7 @@ static void update_successor_in_copy(control new_pred,
     print_control_node(new_c);
   }
 }
-
+
 static void shallow_free_control(control c)
 {
   /* free_control() cannot be used because you do not want to free the
@@ -1057,12 +1319,10 @@ static list copy_successors(list succs)
 
   */
 
-static unstructured scc_to_dag(control d_root, list d_partition, hash_table ancestor_map)
+static unstructured scc_to_dag(control root, list partition, hash_table ancestor_map)
 {
   unstructured u = unstructured_undefined;
   control new_root = control_undefined;
-  control root = control_undefined;
-  list partition = list_undefined;
   hash_table replicated_input_controls = hash_table_make(hash_pointer, 0);
   hash_table replicated_output_controls = hash_table_make(hash_pointer, 0);
   bool stable_graph_p = FALSE;
@@ -1072,45 +1332,21 @@ static unstructured scc_to_dag(control d_root, list d_partition, hash_table ance
   char msg[200];
 
   ifdebug(3) {
-    pips_debug(3, "Begin for vertex %p and partition:\n", d_root);
-    print_control_nodes(d_partition);
-  }
-
-  /* Insert a non-deterministic node as cycle head if necessary */
-  if(control_test_p(d_root)) {
-    statement nop = make_continue_statement(entity_empty_label());
-    control cnop = make_control(nop,
-				control_predecessors(d_root),
-				CONS(CONTROL, d_root, NIL));
-
-    control_predecessors(d_root) = CONS(CONTROL, cnop, NIL);
-
-    /* Update predecessors of cnop */
-    MAP(CONTROL, pred, {
-      gen_list_patch(control_successors(pred), d_root, cnop);
-    }, control_predecessors(cnop));
-    
-    root = cnop;
-    partition = CONS(CONTROL, cnop, d_partition);
-
-    ifdebug(3) {
-      pips_debug(3, "Continue with updated vertex %p and partition:\n", root);
-      print_control_nodes(partition);
-    }
-  }
-  else {
-    partition = d_partition;
-    root = d_root;
+    pips_debug(3, "Begin for vertex %p and partition:\n", root);
+    print_control_nodes(partition);
   }
   
   while(!stable_graph_p) {
     int number = 0;
+    list c_c = list_undefined;
+
     stable_graph_p = TRUE;
     iteration++;
     
     /* Look for new input nodes in partition */
-    MAP(CONTROL, c, 
-    {
+    for(c_c = partition; !ENDP(c_c); POP(c_c)) {
+      control c = CONTROL(CAR(c_c));
+      
       if(c!=root && hash_get(replicated_input_controls, c)==HASH_UNDEFINED_VALUE) {
 	if(entry_control_p(c, partition)) {
 	  control new_c1 = control_undefined;
@@ -1170,9 +1406,8 @@ static unstructured scc_to_dag(control d_root, list d_partition, hash_table ance
 	}
       }
     }
-	, partition);
 
-    ifdebug(4) {
+    ifdebug(9) {
       if(number>0) {
 	pips_debug(4, "Embedding graph after replication"
 		   " of %d input control node(s) at iteration %d:\n",
@@ -1192,8 +1427,9 @@ static unstructured scc_to_dag(control d_root, list d_partition, hash_table ance
     
     /* Look for new output nodes */
     number = 0;
-    MAP(CONTROL, c, 
-    {
+    for(c_c = partition; !ENDP(c_c); POP(c_c)) {
+      control c = CONTROL(CAR(c_c));
+      
       if(c!=root && hash_get(replicated_output_controls, c)==HASH_UNDEFINED_VALUE) {
 	if(exit_control_p(c, partition)) {
 	  control new_c2 = control_undefined;
@@ -1255,9 +1491,8 @@ static unstructured scc_to_dag(control d_root, list d_partition, hash_table ance
 	}
       }
     }
-	, partition);
 
-    ifdebug(3) {
+    ifdebug(9) {
       if(number>0) {
 	pips_debug(3, "Embedding graph after replication"
 		   " of output control nodes at iteration %d:\n", iteration);
@@ -1273,6 +1508,8 @@ static unstructured scc_to_dag(control d_root, list d_partition, hash_table ance
     }
   }
 
+  clean_up_embedding_graph(root);
+  
   ifdebug(3) {
     if(number_out>0) {
       pips_assert("At least two iterations", iteration>1);
@@ -1384,11 +1621,6 @@ static unstructured scc_to_dag(control d_root, list d_partition, hash_table ance
     }
     
   }
-
-  if(d_root!=root) {
-      /* Side-effect on partition to update it in the caller */
-    partition = gen_nconc(partition, CONS(CONTROL, d_root, NIL));
-  }
   
   hash_table_free(replicated_input_controls);
   hash_table_free(replicated_output_controls);
@@ -1416,9 +1648,12 @@ unstructured bourdoncle_partition(unstructured u,
      scc represented as an unstructured */
   hash_table scc_map = hash_table_make(hash_pointer, 0);
   
+  set_davinci_count();
+
   ifdebug(2) {
     pips_debug(2, "Begin with unstructured:\n");
     print_unstructured(u);
+    davinci_print_non_deterministic_unstructured(u, "Initial unstructured", scc_map, ancestor_map);
   }
 
   make_vertex_stack();
@@ -1427,9 +1662,11 @@ unstructured bourdoncle_partition(unstructured u,
 
   new_u = unstructured_shallow_copy(u, ancestor_map);
 
-  ifdebug(3) {
+  ifdebug(8) {
     pips_debug(3, "Copied unstructured new_u:\n");
     print_unstructured(new_u);
+    davinci_print_non_deterministic_unstructured(u, "Copy of initial unstructured",
+						 scc_map, ancestor_map);
   }
       
 
@@ -1472,20 +1709,24 @@ unstructured bourdoncle_partition(unstructured u,
     pips_debug(2, "End with %d sets of cycles:\n", number_of_fix_points);
     number_of_fix_points = 0;
     HASH_MAP(h, uc, {
+      char msg[256];
+      
       number_of_fix_points++;
       fprintf(stderr, "Cycles associated to head=%p with unstructured=%p (fix point %d)\n",
 	      h, uc, number_of_fix_points);
+      sprintf(msg, "Cycles associated to head=%p\\n with unstructured=%p (fix point %d)",
+	      h, uc, number_of_fix_points);
       print_unstructured((unstructured) uc);
+      davinci_print_non_deterministic_unstructured((unstructured) uc, msg, scc_map, ancestor_map);
       fprintf(stderr, "\n");
     } , scc_map);
 
     /* We also need the final embedding graph... which might be lost? Or
        hanging from the first node in partition, the entry point, and hence from new_u. */
     pips_debug(2, "Final embedding graph:\n");
-    print_unstructured(new_u);
+    davinci_print_non_deterministic_unstructured(new_u, "Final embedding graph", scc_map, ancestor_map);
 
     pips_debug(2, "End. \n");
-    
   }
 
   *p_ancestor_map = ancestor_map;
@@ -1506,9 +1747,9 @@ static bool partition_successor_p(control b, control e, list partition)
   list not_seen = gen_copy_seq(partition);
   int length = 0;
 
-  pips_debug(8, "Begin with b=%p abd e=%p\n", b, e)
+  pips_debug(3, "Begin with b=%p abd e=%p\n", b, e)
 
-  ifdebug(8) {
+  ifdebug(3) {
     pips_assert("b is in partition", gen_in_list_p(b, partition));
     pips_assert("e is in partition", gen_in_list_p(e, partition));
     /* You might be interested in the existence of a cycle from b to b */
@@ -1519,11 +1760,11 @@ static bool partition_successor_p(control b, control e, list partition)
 
   while(!ENDP(preds)){
     length++;
-    pips_debug(8, "Iteration %d\n", length);
+    pips_debug(3, "Iteration %d\n", length);
     MAP(CONTROL, pred, {
-      pips_debug(8, "\tpred=%p\n", pred);
+      pips_debug(3, "\tpred=%p\n", pred);
       MAP(CONTROL, succ, {
-	pips_debug(8, "\t\tsucc=%p\n", succ);
+	pips_debug(3, "\t\tsucc=%p\n", succ);
 	if(succ==e) {
 	  path_p = TRUE;
 	  goto end;
@@ -1544,7 +1785,7 @@ static bool partition_successor_p(control b, control e, list partition)
   gen_free_list(preds);
   gen_free_list(succs);
 
-  pips_debug(8, "End: path_p=%s\n", bool_to_string(path_p));
+  pips_debug(3, "End: path_p=%s\n", bool_to_string(path_p));
   
   return path_p;
 }
@@ -1602,16 +1843,29 @@ static void update_partition(control root,
            cycle. */
 	eliminated = CONS(CONTROL, CONTROL(CAR(c_c)), eliminated);
 	break;
-      case 1: CONTROL(CAR(c_c)) = CONTROL(CAR(replacement_list));
+      case 1:
+	CONTROL(CAR(c_c)) = CONTROL(CAR(replacement_list));
+	gen_free_list(replacement_list);
 	break;
-      default: fprintf(stderr,
+      default:
+	/* Many possible replacements... Keep them all. */
+	CONTROL(CAR(c_c)) = CONTROL(CAR(replacement_list));
+	replacement_list = gen_nconc(replacement_list, CDR(c_c));
+	CDR(c_c) = CDR(replacement_list);
+	CDR(replacement_list) = NIL;
+	gen_free_list(replacement_list);
+	
+	/*
+	fprintf(stderr,
 		       "Too many replacement nodes (%d) in embedding nodes for node %p\n",
 		       gen_length(replacement_list), c);
+	print_control_node(c);
+	print_control_nodes(replacement_list);
 	pips_internal_error("Too many replacement nodes\n");
+	*/
 	break;
       }
       
-      gen_free_list(replacement_list);
     }
   }
        , partition);
@@ -1645,7 +1899,7 @@ static void update_partition(control root,
     }
     else {
       if(!partition_successor_p(c, root, partition)){
-	eliminated = CONS(CONTROL, c, eliminated);
+	eliminated = gen_once(c, eliminated);
       }
     }
   } , partition);
@@ -1693,6 +1947,7 @@ list bourdoncle_component(control vertex,
 			  hash_table scc_map)
 {
   list partition = NIL;
+  list b_partition = list_undefined; /* bourdoncle partition */
   unstructured u = unstructured_undefined;
   control vertex_ancestor = control_undefined;
   
@@ -1726,6 +1981,8 @@ list bourdoncle_component(control vertex,
 
      It might be better to recompute the smallest scc including
      vertex... */
+  b_partition = gen_copy_seq(partition);
+  
   update_partition(vertex, partition, ancestor_map);
   
   /* Update parent unstructured containing vertex and partition, remove
@@ -1740,8 +1997,10 @@ list bourdoncle_component(control vertex,
   hash_put(scc_map, vertex_ancestor, u);
 
   ifdebug(2) {
-    pips_debug(2, "End with partition: ");
+    pips_debug(2, "End with internal partition: ");
     print_control_nodes(partition);
+    pips_debug(2, "End with Bourdoncle partition: ");
+    print_control_nodes(b_partition);
     pips_debug(2, "End with new nodes:\n");
     /* Do not go down into nested unstructured */
     gen_multi_recurse(u, statement_domain, gen_false, gen_null,
@@ -1753,7 +2012,8 @@ list bourdoncle_component(control vertex,
     pips_debug(2, "End.\n");
   }
 
-  return partition;
+  gen_free_list(partition);
+  return b_partition;
 }
 
 
