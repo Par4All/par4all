@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.136  2000/04/05 08:16:47  coelho
+%% PARTIAL_EVAL stuff added.
+%%
 %% Revision 1.135  1999/08/05 13:04:19  zory
 %% multiply-add extraction removed from EOLE_FLAGS.
 %%
@@ -113,7 +116,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1999/08/05 13:04:19 $~$
+$~$Date: 2000/04/05 08:16:47 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1590,6 +1593,17 @@ EOLE            "newgen_eole"
 EOLE_FLAGS      "-nfd"
 EOLE_OPTIONS    ""
 EOLE_OPTIMIZATION_STRATEGY "P2SC"
+\end{verbatim}
+
+
+\subsection{Partial Evaluation}
+
+Partial evaluation includes constant propagation and partial evaluation of
+logical expressions. Two properties control what is to be done.
+
+\begin{verbatim}
+PARTIAL_EVAL_LOGICAL_EXPRESSIONS FALSE
+PARTIAL_EVAL_PROPAGATE_INTEGER_CONSTANTS TRUE
 \end{verbatim}
 
 
