@@ -47,7 +47,10 @@
 #include "static_controlize.h"
 #include "ricedg.h"
 #include "paf-util.h"
-#include "effects.h"
+
+#include "effects-generic.h"
+#include "effects-simple.h"
+
 #include "array_dfg.h"
 #include "pip.h"
 
