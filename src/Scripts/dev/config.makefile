@@ -16,7 +16,8 @@ SCRIPTS = 	pips-makemake \
 		pips_at_night \
 		remove_from_sccs_file
 
-MACROS	=	makefile_macros.. \
+MACROS	=	define_libraries \
+		makefile_macros.. \
 		makefile_macros.DEFAULT \
 		makefile_macros.GNU \
 		makefile_macros.SUN4 \
@@ -32,6 +33,13 @@ INSTALL_INC=	$(MACROS)
 SOURCES	=	$(SCRIPTS) $(MACROS) forward_gnu_makefile config.makefile
 
 quick-install: install_forward_makefiles install_macros 
+
+# bootstraping temporarily include files if needed...
+$(PIPS_ROOT)/Include/makefile_macros.$(ARCH):
+	touch $@
+
+$(PIPS_ROOT)/Include/define_libraries:
+	touch $@	
 
 install_macros:
 	#
