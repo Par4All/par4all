@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1995/04/13 11:56:49 $, 
+# $Date: 1995/04/22 14:39:19 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -69,7 +69,7 @@ usage()
 	  -w W: workspace W is used for pips and hpfc
 	  -m M: module M is compiled (should be the main)
 	  -n N: source number n
-	  -k K: keyword control (debug,demo|full,validate)
+	  -k K: keyword control (debug,demo,full,validate,void|none)
 	  file: source file
 	EOF
   exit ${1:-1}
@@ -96,12 +96,14 @@ do
     m) MODULE="$OPTARG" ;;
     w) WORKSPACE="$OPTARG" ;;
     k) case $OPTARG in
-	 demo|full)
-	     DELETE=Delete ;
+	 demo)
 	     STDERR='/dev/null' ;
 	     PIPSPROP='-1 HPFC_NO_WARNING -1 NO_USER_WARNING' ;
-	     VERBOSE='verbose' ;
+	     VERBOSE='verbose' ;;
+	 full)
+	     DELETE='Delete' ;
 	     MAKE='gmake' ;;
+	 void|none) : ;;
 	 validate) 
 	     DUMPFILES=':' ;
 	     NOINSTALL=':' ;
