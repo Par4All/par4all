@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/09/02 17:32:26 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/09/03 18:56:22 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -44,7 +44,7 @@ PATH="${PATH}:${NEWGEN_ROOT}/Share:${NEWGEN_ROOT}/Bin:${NEWGEN_ROOT}/Utils"
 LINEAR_DIR=/projects/C3/Linear
 
 # the version to use
-LINEAR_ROOT=${LINEAR_DIR}/Production
+LINEAR_ROOT="${LINEAR_DIR}/Production"
 
 # where is the development version
 LINEAR_DEVEDIR="${LINEAR_DIR}/Development"
@@ -79,8 +79,8 @@ PIPS_ARCH="."
 PIPS_ROOT="${PIPS_DIR}/Production"
 
 # man pages?
-MANPATH=${MANPATH}:${PIPS_ROOT}/Doc
-PATH=${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}
+MANPATH="${MANPATH}:${PIPS_ROOT}/Doc"
+PATH="${PATH}:${PIPS_ROOT}/Share:./${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}"
 
 ############################################################## COMPILING PIPS
 
@@ -102,13 +102,13 @@ PIPS_DEVEDIR="${PIPS_DIR}/Development"
 PIPS_UTILDIR="${PIPS_ROOT}/Utils"
 
 # other executables...
-PATH=${PATH}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
+PATH="${PATH}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc"
 
 
 ################################################################ TESTING PIPS
 
 # Validation directory
-PIPS_VALIDDIR=${PIPS_DIR}/Tests/Validation
+PIPS_VALIDDIR="${PIPS_DIR}/Tests/Validation"
 
 # hosts for Validate
 PIPS_HOSTS="chailly:episy:aiguebelette"
@@ -207,12 +207,12 @@ PVMDIR=${PIPS_HOME}/pvm3.3
 #
 # For the daVinci Graph Viewer/Editor :
 
-DAVINCI_DIR=${PIPS_HOME}/daVinci/daVinci_V1.4_solaris_1
-GRAPHEDITOR_DIRECTORY=${DAVINCI_DIR}/grapheditor
-DAVINCI_ICONDIR=${DAVINCI_DIR}/images
+DAVINCI_DIR="${PIPS_HOME}/daVinci/daVinci_V1.4_solaris_1"
+GRAPHEDITOR_DIRECTORY="${DAVINCI_DIR}/grapheditor"
+DAVINCI_ICONDIR="${DAVINCI_DIR}/images"
 
-MANPATH=${MANPATH}:${DAVINCI_DIR}/man
-PATH=${PATH}:${DAVINCI_DIR}
+MANPATH="${MANPATH}:${DAVINCI_DIR}/man"
+PATH="${PATH}:${DAVINCI_DIR}"
 
 # Toolpack is used for STF
 TOOLPACK_DIR="$PIPS_HOME/Toolpack/toolpack1.2"
