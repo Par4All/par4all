@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/12/17 10:53:08 $, 
+# $Date: 1996/12/17 14:30:40 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -12,9 +12,9 @@ INSTALL_SHR=	pipsmake.rc \
 DERIVED_INC=	resources.h \
 		phases.h \
 		builder_map.h \
-		epips_transform_menu_layout..el \
+		epips_transform_menu_layout.el \
 		wpips_transform_menu_layout.h \
-		epips_view_menu_layout..el \
+		epips_view_menu_layout.el \
 		wpips_view_menu_layout.h
 
 INSTALL_INC=	$(DERIVED_INC)
@@ -65,7 +65,7 @@ builder_map.h: pipsmake.rc
 	{ cat $(AUTO).h ; sh ./make-builder-map < $< ;} > $@
 
 
-epips_transform_menu_layout..el wpips_transform_menu_layout.h epips_view_menu_layout..el wpips_view_menu_layout.h:  pipsmake-rc.tex
+epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_layout.el wpips_view_menu_layout.h:  pipsmake-rc.tex
 	# 
 	# building menu layout files:
 	#
