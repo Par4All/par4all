@@ -8,7 +8,7 @@
  *
  * Fabien Coelho  August 93
  *
- * $RCSfile: align-checker.c,v $ ($Date: 1995/09/15 15:54:06 $, )
+ * $RCSfile: align-checker.c,v $ ($Date: 1995/10/05 11:32:23 $, )
  * version $Revision$
  */
 
@@ -361,7 +361,7 @@ int *pi;
     normalized
 	n = expression_normalized(e);
 
-    assert(!normalized_undefined_p(n));
+    pips_assert("normalized", !normalized_undefined_p(n));
 
     switch (normalized_tag(n))
     {
@@ -392,8 +392,7 @@ int *pi;
 	break;
     }
     default:
-	pips_error("shift_expression_of_loop_index_p",
-		   "unexpected normalized tag\n");
+	pips_internal_error("unexpected normalized tag\n");
 	break;
     }
     
@@ -411,17 +410,15 @@ expression e;
 entity *pe;
 int *pi1, *pi2;
 {
-    normalized
-	n = expression_normalized(e);
+    normalized n = expression_normalized(e);
 
     ifdebug(6)
-	{
-	    fprintf(stderr, 
-		    "[affine_expression_of_loop_index_p]\nexpression:\n");
-	    print_expression(e);
-	}
+    {
+	fprintf(stderr, "[affine_expression_of_loop_index_p]\nexpression:\n");
+	print_expression(e);
+    }
 	    
-    assert(!normalized_undefined_p(n));
+    pips_assert("normalized", !normalized_undefined_p(n));
 
     switch (normalized_tag(n))
     {
@@ -430,13 +427,10 @@ int *pi1, *pi2;
 	break;
     case is_normalized_linear:
     {
-	Pvecteur
-	    v = (Pvecteur) normalized_linear(n),
+	Pvecteur v = (Pvecteur) normalized_linear(n),
 	    vp = vect_del_var(v, TCST);
-	int
-	    s = vect_size(vp);
-	bool
-	    result;
+	int s = vect_size(vp);
+	bool result;
 
 	if (s!=1) return(FALSE);
 
@@ -453,8 +447,7 @@ int *pi1, *pi2;
 	break;
     }
     default:
-	pips_error("affine_expression_of_loop_index_p",
-		   "unexpected normalized tag\n");
+	pips_internal_error("unexpected normalized tag\n");
 	break;
     }
     
@@ -493,13 +486,10 @@ int *pi;
 	break;
     case is_normalized_linear:
     {
-	Pvecteur
-	    v = (Pvecteur) normalized_linear(n),
+	Pvecteur  v = (Pvecteur) normalized_linear(n),
 	    vp = vect_del_var(v, TCST);
-	int
-	    s = vect_size(vp);
-	bool
-	    result = (s==0);
+	int s = vect_size(vp);
+	bool result = (s==0);
 
 	vect_rm(vp);
 
@@ -510,18 +500,13 @@ int *pi;
 	break;
     }
     default:
-	pips_error("hpfc_integer_constant_expression_p",
-		   "unexpected normalized tag\n");
+	pips_internal_error("unexpected normalized tag\n");
 	break;
     }
     
     return(FALSE); /* just to avoid a gcc warning */
 }
 
-/*
- * expression nth_expression(n, l)
- *
- */
 expression nth_expression(n, l)
 int n;
 list l;
@@ -529,48 +514,34 @@ list l;
     return((n==0)?(EXPRESSION(CAR(l))):(nth_expression(n-1, CDR(l))));
 }
 
-/*
- * bool local_integer_constant_expression(e)
- * 
- * true is the expression is locally constant, that is in the whole loop nest,
+/* true is the expression is locally constant, that is in the whole loop nest,
  * the reference is not written.
  */
 bool local_integer_constant_expression(e)
 expression e;
 {
-    bool
-	result = FALSE;
-    syntax
-	s = expression_syntax(e);
+    bool result = FALSE;
+    syntax s = expression_syntax(e);
 
     if ((syntax_reference_p(s)) &&
 	(normalized_linear_p(expression_normalized(e))))
     {
-	entity
-	    ent = reference_variable(syntax_reference(s));
+	entity ent = reference_variable(syntax_reference(s));
 
 	result =
-	    (!effects_write_entity_p(get_hpfc_current_statement_effects(), ent));
+	  (!effects_write_entity_p(get_hpfc_current_statement_effects(), ent));
 
-	debug(7, "local_integer_constant_expression",
-	      "looking for effects on %s reference, result %d\n",
-	      entity_name(ent), result);
+	pips_debug(7, "looking for effects on %s reference, result %d\n",
+		   entity_name(ent), result);
     }
     
     return(result);
 }
 
-/*
- * hpfc current statement management
- * 
- * ??? could be put somewhere else..
+/* hmmm...
  */
-
-static statement 
-    hpfc_current_statement = statement_undefined;
-
-static list
-    hpfc_current_statement_effects = NIL;
+static statement hpfc_current_statement = statement_undefined;
+static list hpfc_current_statement_effects = NIL;
 
 void set_hpfc_current_statement(stat)
 statement stat;
@@ -581,12 +552,12 @@ statement stat;
 
 statement get_hpfc_current_statement()
 {
-    return(hpfc_current_statement);
+    return hpfc_current_statement;
 }
 
 list get_hpfc_current_statement_effects()
 {
-    return(hpfc_current_statement_effects);
+    return hpfc_current_statement_effects;
 }
 
 void reset_hpfc_current_statement()
