@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.28  2003/12/18 21:42:48  nguyen
+ * Remove the redundant blank in "OVERLOADED " for PIPS validation
+ *
  * Revision 1.27  2003/12/09 16:00:34  nguyen
  * Add () only to functions in C
  *
@@ -376,7 +379,7 @@ list words_basic(basic obj)
       case is_basic_overloaded:
 	{
 	  /* should be a user error ? */
-	  pc = CHAIN_SWORD(pc,"OVERLOADED ");
+	  pc = CHAIN_SWORD(pc,"OVERLOADED");
 	  break;
 	}
       case is_basic_complex:
