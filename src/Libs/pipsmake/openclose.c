@@ -68,7 +68,7 @@ string name;
     return db_get_current_workspace_name();
 }
 
-string make_close_program()
+void make_close_program()
 {
     return make_close_workspace();
 }
