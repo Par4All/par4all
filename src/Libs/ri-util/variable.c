@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: variable.c,v $
+ * Revision 1.44  2002/06/17 15:31:39  irigoin
+ * Functions added to manage alternate returns
+ *
  * Revision 1.43  2001/07/20 11:23:34  irigoin
  * Header created to keep an explicit track of the changes + reformatting of
  * all functions
@@ -22,6 +25,7 @@
 
 #include "ri-util.h"
 
+#include "properties.h"
 
 bool 
 variable_entity_p(entity e)
@@ -876,4 +880,100 @@ int kind;
     }
 
   return new_ent;
+}
+
+expression generate_string_for_alternate_return_argument(string i)
+{
+  expression e = expression_undefined;
+  char buffer[9];
+  
+  pips_assert("A label cannot be more than 5 character long", strlen(i)<=5);
+  buffer[0]='"';
+  buffer[1]='*';
+  buffer[2]=0;
+
+  strcat(&buffer[0], i);
+  
+  buffer[strlen(i)+2]='"';
+  buffer[strlen(i)+3]=0;
+
+  e = MakeCharacterConstantExpression(strdup(buffer));
+  
+  return e;
+}
+
+/* * (star) used as formal label parameter is replaced by a string
+   variable as suggested by Fabien Coelho. Its storage and initial value
+   are lated initialized by MakeFormalParameter(). */
+entity generate_pseudo_formal_variable_for_formal_label(string p, int l)
+{
+  entity fs = entity_undefined;
+  string lsp = get_string_property("PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX");
+  /* string lsp = "FORMAL_RETURN_LABEL_"; */
+  /* let's assume that there are fewer than 999 formal label arguments */
+  char buffer[4];
+  string sn = &buffer[0];
+  
+  pips_assert("No more than 999 alternate returns", l<999);
+  
+  sprintf(buffer, "%d", l);
+
+  /* Generate a variable of type CHARACTER*(*). See gram.y,
+     "lg_fortran_type:". It is postponed to MakeFormalParameter */
+  fs = make_entity(strdup(concatenate(p, MODULE_SEP_STRING, lsp, sn, NULL)),
+		   type_undefined,
+		   storage_undefined,
+		   value_undefined);
+
+  pips_debug(8, "Generate replacement for formal return label: %s\n",
+	     entity_name(fs));
+  
+  return fs;
+}
+
+bool formal_label_replacement_p(entity fp)
+{
+  bool replacement_p = FALSE;
+  
+  string fpn = entity_local_name(fp);
+  string lsp = get_string_property("PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX");
+  /* string lsp = "FORMAL_RETURN_LABEL_"; */
+
+  replacement_p = (strstr(fpn, lsp)==fpn);
+  
+  return replacement_p;
+}
+
+/* Assumes that eap is a call */
+bool actual_label_replacement_p(expression eap)
+{
+  bool replacement_p = FALSE;
+  string ls = entity_local_name(call_function(syntax_call(expression_syntax(eap))));
+  string p = ls+1;
+
+  replacement_p = (strlen(ls) >= 4
+    && *ls=='"' && *(ls+1)=='*' && *(ls+strlen(ls)-1)=='"');
+
+  if(replacement_p) {
+    for(p=ls+2; p<ls+strlen(ls)-1; p++) {
+      if(*p<'0'||*p>'9') {
+	replacement_p =FALSE;
+	break;
+      }
+    }
+  }
+  
+  return replacement_p;
+}
+
+bool call_contains_alternate_returns_p(call c)
+{
+  bool contains_p = FALSE;
+
+  MAP(EXPRESSION, arg, {
+    if((contains_p = actual_label_replacement_p(arg)))
+      break;
+  }, call_arguments(c));
+
+  return contains_p;
 }
