@@ -137,6 +137,9 @@ typedef struct Ssysteme {
  * parametre e n'est utilise qu'une fois ce qui permet d'eviter
  * des surprises en cas de e++ et autres effects de bords a chaque
  * evaluation de e; sc_add_egalite est donc plus sur que sc_add_eg
+ *
+ * If the system basis should be updated, use sc_constraint_add()
+ * and the two related function in sc_insert.c
  */
 #define sc_add_egalite(p,e) { Pcontrainte e_new= (e); \
                               e_new->succ=(p)->egalites; \
