@@ -250,9 +250,9 @@ default_user_error(char * calling_function_name,
    (void) vfprintf(stderr, a_message_format, * some_arguments);
 
    /* terminate PIPS request */
-   if (get_bool_property("ABORT_ON_USER_ERROR")) {
-      abort();
-   }
+   /* here is an issue: what if the user error was raised from properties */
+   if (get_bool_property("ABORT_ON_USER_ERROR")) 
+       abort();
    else {
       static int user_error_called = 0;
 
