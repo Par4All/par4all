@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/08/31 17:14:20 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/09/12 14:12:18 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -84,7 +84,7 @@ PATH=${PATH}:${PIPS_BINDIR}:${PIPS_UTILDIR}:/usr5/gnu/bin-sparc
 # PIPS default options for Unix software development tools
 #
 
-PIPS_AR="ar"
+PIPS_AR="/usr5/gnu/bin-sparc/ar"
 PIPS_ARFLAGS="rv"
 # PIPS_CC="cc"
 PIPS_CC="gcc"
@@ -106,6 +106,7 @@ PIPS_PROTOIZE="$PIPS_UTILDIR/cproto -vcf2"
 PIPS_ETAGS='/usr5/gnu/bin-sparc/etags'
 PIPS_TAR='gtar'
 PIPS_ZIP='gzip -v9'
+PIPS_DIFF='diff'
 		
 # file name in which pips current program is stored (for batch version).
 
