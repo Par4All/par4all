@@ -4,9 +4,6 @@
  *
  */
 
-#ifndef MATRIX_PACKAGE
-#define MATRIX_PACKAGE
-
 /* Les matrices sont des matrices pleines, a coeffcients rationnels.
  *
  * Les matrices sont representes par des tableaux d'entiers mono-dimensionnels
@@ -41,12 +38,11 @@
  */
 
 typedef struct Smatrix { 
-    int denominator; 
+    Value denominator; 
     int number_of_lines; 
     int number_of_columns; 
-    int * coefficients;
+    Value * coefficients;
     } * Pmatrix, Smatrix;
-
 
 #define MATRIX_UNDEFINED ((Pmatrix) NULL)
 
@@ -58,9 +54,12 @@ typedef struct Smatrix {
 /* int MATRIX_ELEM(int * matrix, int i, int j): acces a l'element (i,j)
  * de la matrice matrix.
  */
-#define MATRIX_ELEM(matrix,i,j) ((matrix)->coefficients[(((j)-1)*((matrix)->number_of_lines))+(i)])
+#define MATRIX_ELEM(matrix,i,j) \
+  ((matrix)->coefficients[(((j)-1)*((matrix)->number_of_lines))+(i)])
 
-/* int MATRIX_DENONIMATOR(matrix): acces au denominateur global d'une matrice matrix */
+/* int MATRIX_DENONIMATOR(matrix): acces au denominateur global 
+ * d'une matrice matrix 
+ */
 #define MATRIX_DENOMINATOR(matrix) ((matrix)->denominator)
 #define MATRIX_NB_LINES(matrix)  ((matrix)->number_of_lines)
 #define MATRIX_NB_COLUMNS(matrix)  ((matrix)->number_of_columns)
@@ -82,8 +81,5 @@ typedef struct Smatrix {
  * diagonal
  */
 #define SUB_MATRIX_ELEM(matrix,i,j,level) \
-    (matrix->coefficients[((j)-1+(level))*((matrix)->number_of_lines) + (i) + (level)])
-
-
-#endif /* MATRIX_PACKAGE */
-
+    (matrix->coefficients[((j)-1+(level))*\
+     ((matrix)->number_of_lines) + (i) + (level)])
