@@ -295,7 +295,7 @@ int l ;
 
     if ((region = distributable_loop(stat)) == set_undefined) {
 	user_warning("rice_loop", 
-		     "can't apply kennedy's algorithm on this loop");
+		     "Can't apply kennedy's algorithm on this loop\n");
 
 	enclosing++ ;
 	loop_body(instruction_loop(istat)) = 
