@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1997/04/10 17:35:30 $, 
+# $Date: 1997/04/10 17:50:23 $, 
 
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
@@ -56,7 +56,7 @@ printable_resources.h: resources.h
 	#
 	# building $@
 	#
-	sed /FILE/p $< | cat $(AUTO).h - > $@
+	sed '/define.*FILE/!d' $< | cat $(AUTO).h - > $@
 
 phases.h: pipsmake.rc
 	#
