@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/01/14 08:37:30 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/02/06 11:38:07 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -331,17 +331,30 @@ $VERBOSE "Modules: $MODULES"
 #
 # hosts to be used by the validation
 
+randomize()
+{
+    random -e `echo $1 | tr ':' ' ' | wc -w`
+    rand=`echo $?`
+    rand=`expr $rand + 1`
+    randp1=`expr $rand + 1`
+    nlist=`echo $1 | tr ':' '\012' | sed -n ${randp1},'$p'`:`echo $1 | tr ':' '\012' | sed -n "1,${rand}p"`
+    echo $nlist | tr ' \012' '::'
+}
+
 VALHOSTS=$hostname
 
-if [ "$parallel" ]
+if [ "$parallel" -a "$PIPS_HOSTS" ]
 then
-  VALHOSTS="$VALHOSTS:${PIPS_HOSTS:-chailly}"
+  VALHOSTS="$VALHOSTS:${PIPS_HOSTS}"
 fi
 
 $DEBUG2 " | VALHOSTS 1: $VALHOSTS"
 VALHOSTS=`unstammer $VALHOSTS`
 
 $DEBUG2 " | VALHOSTS 2: $VALHOSTS"
+VALHOSTS=`randomize $VALHOSTS`
+
+$DEBUG2 " | VALHOSTS 3: $VALHOSTS"
 VALHOSTS=`alive $VALHOSTS`
 
 $VERBOSE "Hosts: $VALHOSTS"
