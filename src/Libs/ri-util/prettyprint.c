@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.192  2002/04/26 14:41:26  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.191  2002/04/26 14:27:59  phamdat
  * *** empty log message ***
  *
@@ -415,7 +418,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.191 2002/04/26 14:27:59 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.192 2002/04/26 14:41:26 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2347,6 +2350,8 @@ text_instruction(
 /* Handles all statements but tests that are nodes of an unstructured.
  * Those are handled by text_control.
  */
+static bool found_filter = FALSE;
+
 text 
 text_statement(
     entity module,
@@ -2390,7 +2395,7 @@ text_statement(
     else
     {
 	temp = text_instruction(module, label, margin, i,
-				statement_number(stmt)) ;
+				statement_number(stmt));
     }
 
     /* note about comments: they are duplicated here, but I'm pretty
@@ -2406,9 +2411,15 @@ text_statement(
 						  strdup(comments)));
 	}
 	MERGE_TEXTS(r, temp);
+	found_filter = TRUE;
       } else {
-	free_text(t);
-	free_text(temp);
+	/********written by Dat********/
+	if (found_filter)
+	  MERGE_TEXTS(r, temp);
+	else {
+	  free_text(t);
+	  free_text(temp);
+	}
       }
       /**********************************/
       /*MERGE_TEXTS(r, init_text_statement(module, margin, stmt));
