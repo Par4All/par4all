@@ -375,7 +375,7 @@ text text_transformer(transformer tran)
 
 	}
       
-	close_current_line(crt_line, txt);
+	close_current_line(crt_line, txt, str_prefix);
     }
     
     if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
