@@ -204,9 +204,9 @@ static hash_table entity_to_size = hash_table_undefined;
 void set_entity_to_size()
 {
     if (entity_to_size != hash_table_undefined) {
-	user_warning("set_entity_to_size",
-		     "hash table should have been deallocated\n");
-	hash_table_clear(entity_to_size);
+	pips_error("set_entity_to_size",
+		   "hash table should have been deallocated\n");
+	/* hash_table_clear(entity_to_size); */
     }
 
     entity_to_size = hash_table_make(hash_pointer, 0);
@@ -215,11 +215,11 @@ void set_entity_to_size()
 void reset_entity_to_size()
 {
     if (entity_to_size == hash_table_undefined) {
-	user_warning("reset_entity_to_size",
-		     "hash table should have been allocated\n");
+	pips_error("reset_entity_to_size",
+		   "hash table should have been allocated\n");
     }
     else {
-	hash_table_clear(entity_to_size);
+	hash_table_free(entity_to_size);
 	entity_to_size = hash_table_undefined;
     }
 }
