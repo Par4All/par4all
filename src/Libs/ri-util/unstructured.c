@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/07/22 11:29:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/10/23 11:37:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/07/22 11:29:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/10/23 11:37:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /*
@@ -21,7 +21,6 @@ char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/07/22 11:29:53 $, ) v
 #include "misc.h"
 #include "properties.h"
 
-static list build_trail(list l, control c);
 static void decorate_trail(entity module, list trail, hash_table labels);
 static text text_trail(entity module, int margin, list trail, hash_table labels);
 static bool control_in_trail_p(list l, control c);
@@ -33,18 +32,19 @@ text
 text_unstructured(entity module,
                   string label,
                   int margin,
-                  unstructured u, int num)
+                  unstructured u,
+		  int num)
 {
     text r = make_text(NIL);
     hash_table labels = hash_table_make(hash_pointer, 0) ;
-    list trail = NIL;
-    control cexit = unstructured_exit(u) ;
-    control centry = unstructured_control(u) ;
 
     debug(2, "text_unstructured", "Begin for unstructured %p\n", u);
    
     ifdebug(3) {
 	list blocks = NIL;
+	control cexit = unstructured_exit(u) ;
+	control centry = unstructured_control(u) ;
+
 	fprintf(stderr,"Unstructured %p (%p, %p)\n", u, centry, cexit) ;
 	CONTROL_MAP( n, {
 	    statement st = control_statement(n) ;
@@ -80,31 +80,20 @@ text_unstructured(entity module,
 	    (r, module, label, margin, u, num);
     }
     else {
-	list pbeg, pend;
+	list trail = NIL;
 
 	if(get_bool_property("PRETTYPRINT_UNSTRUCTURED")) {
-	    pbeg = CHAIN_SWORD(NIL, "BEGIN UNSTRUCTURED");
-	    
-	    u = make_unformatted(strdup("C"), num, margin, pbeg);
+	    list pbeg = CHAIN_SWORD(NIL, "BEGIN UNSTRUCTURED");
+	    unformatted unf = make_unformatted(strdup("C"), num, margin, pbeg);
+
 	    ADD_SENTENCE_TO_TEXT(r, 
-				 make_sentence(is_sentence_unformatted, u));
+				 make_sentence(is_sentence_unformatted, unf));
 	}
 
 	/* build an arbitrary reverse trail of control nodes */
-	trail = build_trail(trail, centry);
+	trail = unstructured_to_trail(u);
 	debug(3, "text_unstructured", "Trail length: %d\n", gen_length(trail));
 
-	/* The exit node *must* be first (i.e. last) to reach the continuation
-	 * of the unstructured, or never reached (e.g. because the program loops
-	 * forever or stops in the unstructured).
-	 */
-	if(control_in_trail_p(trail, cexit)) {
-	    if(cexit!=CONTROL(CAR(trail))) {
-		gen_remove(&trail, cexit);
-		trail = CONS(CONTROL, cexit, trail);
-	    }
-	}
-      
 	trail = gen_nreverse(trail);
 
 	ifdebug(3)
@@ -121,12 +110,12 @@ text_unstructured(entity module,
 	MERGE_TEXTS(r, text_trail(module, margin, trail, labels));
 
 	if(get_bool_property("PRETTYPRINT_UNSTRUCTURED")) {
-	    pend = CHAIN_SWORD(NIL, "END UNSTRUCTURED");
-	    
-	    u = make_unformatted(strdup("C"), num, margin, pend);
+	    list pend = CHAIN_SWORD(NIL, "END UNSTRUCTURED");
+	    unformatted unf = make_unformatted(strdup("C"), num, margin, pend);
 	    ADD_SENTENCE_TO_TEXT(r, 
-				 make_sentence(is_sentence_unformatted, u));
+				 make_sentence(is_sentence_unformatted, unf));
 	}
+	gen_free_list(trail);
     }
 
     hash_table_free(labels) ;
@@ -139,10 +128,10 @@ text_unstructured(entity module,
 /* Any heuristics can be used to build the trail, depth or width first,
  * true or false branch first, lower statement numbering first or not,
  * sorted by statement numbering (but some statements have no number...).
- * No simple heuristics seems bullet proof.
+ * No simple heuristics seems to be bullet proof.
  *
  * The exit node must be last in the trace, or an extra node has to be added
- * to reach the continuation of the unstructured.
+ * to reach the continuation of the unstructured (see text_trail()).
  *
  * For CONS convenience, the list is built in reverse order (and reversed
  * by the caller).
@@ -218,6 +207,29 @@ build_trail(list l, control c)
 	}
     }
     return l;
+}
+
+list 
+unstructured_to_trail(unstructured u)
+{
+    list trail = NIL;
+    control centry = unstructured_control(u) ;
+    control cexit = unstructured_exit(u) ;
+
+    trail = build_trail(trail, centry);
+
+	/* The exit node *must* be first (i.e. last) to reach the continuation
+	 * of the unstructured, or never reached (e.g. because the program loops
+	 * forever or stops in the unstructured).
+	 */
+    if(control_in_trail_p(trail, cexit)) {
+	if(cexit!=CONTROL(CAR(trail))) {
+	    gen_remove(&trail, cexit);
+	    trail = CONS(CONTROL, cexit, trail);
+	}
+    }
+
+    return trail;
 }
 
 void 
