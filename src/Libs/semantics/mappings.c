@@ -269,17 +269,14 @@ bool readonly;
 }
 
 static void 
-allocate_module_value_mappings(m)
-entity m;
+allocate_module_value_mappings(entity m)
 {
     /* this routine tries to estimate the sizes of the hash tables,
        although the hashtable package has enlarging capability;
        its usefulness is limited... but keep at least hash table
        allocations! */
-    /* cons * module_intra_effects = 
-     * load_statement_cumulated_effects(code_statement(value_code(entity_initial(m))));
-     */
-    cons * module_intra_effects = load_module_intraprocedural_effects(m);
+    
+    list module_intra_effects = load_module_intraprocedural_effects(m);
     int old_value_number = 0;
     int intermediate_value_number = 0;
     int new_value_number = 0;
@@ -292,16 +289,17 @@ entity m;
        are ignored; some slack is added before allocating the hash
        tables; module_inter_effects are (should be) included into
        module_intra_effects */
-    MAPL(cef,
-     {entity e = 
-	  reference_variable(effect_reference(EFFECT(CAR(cef))));
-      action a = effect_action(EFFECT(CAR(cef)));
-      if(integer_scalar_entity_p(e))
-	  new_value_number++;
-      if(action_write_p(a))
-	  old_value_number++;
-      },
-	 module_intra_effects);
+    MAP(EFFECT, ef,
+    {
+	entity e = reference_variable(effect_reference(ef));
+	action a = effect_action(ef);
+	if(integer_scalar_entity_p(e))
+	    new_value_number++;
+	if(action_write_p(a))
+	    old_value_number++;
+    },
+	module_intra_effects);
+
     /* add 50 % slack for underestimation (some more slack will be added
        by the hash package */
     new_value_number *= 3; new_value_number /= 2;
@@ -312,10 +310,8 @@ entity m;
     /* overapproximate intermediate value number */
     intermediate_value_number = old_value_number;
 
-    debug(8,"allocate_module_value_mappings","old_value_number = %d\n",
-	  old_value_number);
-    debug(8,"allocate_module_value_mappings","new_value_number = %d\n",
-	  new_value_number);
+    pips_debug(8, "old_value_number = %d\n", old_value_number);
+    pips_debug(8, "new_value_number = %d\n", new_value_number);
 
     /* allocate hash tables */
     allocate_value_mappings(new_value_number, old_value_number,
