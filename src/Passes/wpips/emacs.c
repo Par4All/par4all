@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1997/04/11 13:06:30 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1997/04/30 00:28:10 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1997/04/11 13:06:30 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1997/04/30 00:28:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -286,7 +286,7 @@ epips_execute_and_display_something(char * view_label, char * module_name)
    if (module_selection_result)
       /* Display something only if an eventual module selection has
          been successful: */
-      wpips_execute_and_display_something(view_label);
+      wpips_execute_and_display_something_from_alias(view_label);
 }
 
 
