@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/03/29 18:21:24 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/04/02 10:53:37 $, )
  * version $Revision$
  *
  * Compiler
@@ -625,10 +625,7 @@ statement *hoststatp, *nodestatp;
     }
 }
 
-/* void hpf_compiler(stat, hoststatp, nodestatp)
- * statement stat, *hoststatp, *nodestatp;
- *
- * what: compile a statement intoi a host and SPMD node code.
+/* what: compile a statement into a host and SPMD node code.
  * how: double code rewriting in a recursive traversal of stat.
  * input: statement stat.
  * output: statements *hoststatp and *nodestatp
@@ -636,10 +633,13 @@ statement *hoststatp, *nodestatp;
  * bugs or features:
  *  - special care is made here of I/O and remappings.
  */
-void hpf_compiler(stat, hoststatp, nodestatp)
-statement stat, *hoststatp, *nodestatp;
+void 
+hpf_compiler(
+    statement stat,
+    statement *hoststatp,
+    statement *nodestatp)
 {
-    if (load_statement_only_io(stat)==TRUE) /* necessary */
+    if (load_statement_only_io(stat)==1) /* necessary */
     {
 	io_efficient_compile(stat,  hoststatp, nodestatp);
 	return;
