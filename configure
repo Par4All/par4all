@@ -4543,11 +4543,12 @@ echo "$as_me: error: Can't find $GMP_LIB/libgmp.so nor $GMP_LIB/libgmp.a nor $GM
 
 echo "Polylib will be built with " $LIBS_TO_BUILD "integer size"
 echo "---------------------------------------------------"
-echo "You can choose either:"
-echo "make:              to build the libs,  and build the executables"
-echo "make libs:         to build only the libraries"
-echo "make install-libs: to install them somewhere (default /usr/local)"
-echo "make install:      to build and install everything somewhere (default /usr/local)"
+echo "You can proceed with:"
+echo "make:              to build the libs"
+echo "make install       to install the libraries (default /usr/local)"
+echo "make execs:        to build the executables"
+echo "make tests:        to test the library"
+
 echo "---------------------------------------------------"
 
 
