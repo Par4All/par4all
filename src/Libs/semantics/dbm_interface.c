@@ -25,8 +25,6 @@
 
 #include "genC.h"
 #include "database.h"
-		      * typedef statement_mapping from genC.h
-		      * to ri-util.h; 23 Feb. 94 */
 
 #include "resources.h"
 #include "ri.h"
