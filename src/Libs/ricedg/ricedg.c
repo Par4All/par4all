@@ -25,45 +25,8 @@
  *    freed;
  *
  */
-#include <stdlib.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <values.h>
-#include <string.h>
 
-#include <setjmp.h>
-
-#include "genC.h"
-#include "text.h"
-#include "ri.h"
-#include "graph.h"
-#include "dg.h"
-#include "database.h"
-#include "makefile.h"
-
-#include "misc.h"
-#include "text-util.h"
-
-#include "ri-util.h" /* linear.h is included in */
-#include "control.h"
-#include "effects-generic.h"
-#include "effects-simple.h"
-#include "pipsdbm.h"
-#include "semantics.h"
-#include "pipsmake.h"
-
-#include "constants.h"
-#include "properties.h"
-#include "resources.h"
-
-/* includes pour system generateur */
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "polyedre.h"
-
-#include "ricedg.h" 
-
+#include "local.h"
 
 /* local variables */
 /*the variables for the statistics of test of dependence and parallelization */
@@ -105,11 +68,6 @@ boolean Finds2s1;
 
 
 int Nbrdo;
-
-
-/* instantiation of the dependence graph */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
 
 /* to map statements to execution contexts */
       /* Psysteme_undefined is not defined in sc.h; as Psysteme is external,
