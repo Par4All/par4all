@@ -94,6 +94,9 @@ va_list args;
 string (* pips_request_handler)(char *, va_list) = default_user_request;
 
 
+    /* The generic fonction to ask something to the user. Note that if
+       the user cancels his/her request,the empty string "" is
+       returned: */
 /* USER_REQUEST(format [, arg] ... ) */
 /*VARARGS1*/
 string user_request(char * a_message_format, ...)
