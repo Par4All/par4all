@@ -336,19 +336,14 @@ Pvecteur *pv1, *pv2;
 void Pvecteur_separate_on_sign(v, pvpos, pvneg)
 Pvecteur v, *pvpos, *pvneg;
 {
-    Pvecteur
-	vc = VECTEUR_NUL;
-    Value
-	val = (Value) 0;
-    Variable 
-	var = (Variable) NULL;
+    Pvecteur vc;
+    Value val;
+    Variable var;
 
     *pvneg = VECTEUR_NUL,
     *pvpos = VECTEUR_NUL;
 
-    for(vc=v;
-	vc!=VECTEUR_NUL;
-	vc=vc->succ)
+    for(vc=v; vc; vc=vc->succ)
     {
 	var = var_of(vc), 
 	val = val_of(vc);
