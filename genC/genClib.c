@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/08/10 11:34:05 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/08/28 17:29:57 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <varargs.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <setjmp.h>
 
@@ -291,22 +291,20 @@ int gen_check_p ;
 
 /*VARARGS*/
 gen_chunk *
-gen_alloc( va_alist )
-va_dcl
+gen_alloc(int size, int gen_check_p, int dom, ...)
 {
     va_list ap ;
     union domain *dp ;
     struct gen_binding *bp ;
     gen_chunk *cp ;
-    int gen_check_p ;
     int data ;
 
     check_read_spec_performed();
 
-    va_start( ap ) ;
-    cp = (gen_chunk *)alloc( va_arg( ap, int )) ;
-    gen_check_p = va_arg( ap, int ) ;
-    bp = &Domains[ cp->i = va_arg( ap, int ) ] ;
+    va_start(ap, dom);
+
+    cp = (gen_chunk *)alloc(size) ;
+    bp = &Domains[ cp->i = dom ] ;
     data = 1 + IS_TABULATED( bp );
 
     switch( (dp = bp->domain)->ba.type ) {
@@ -361,6 +359,7 @@ struct driver {
   if((obj)==gen_chunk_undefined) {(*(dr)->null)(bp) ; return ;}
 
 static void gen_trav_obj() ;
+static bool gen_trav_stop_recursion = FALSE; /* set to TRUE to stop... */
 
 /* GEN_TRAV_LEAF manages an OBJ value of type BP according to the current
    driver DR. A leaf is an object (inlined or not). */
@@ -371,6 +370,8 @@ struct gen_binding *bp ;
 gen_chunk *obj ;
 struct driver *dr ;
 {
+    if (gen_trav_stop_recursion) return;
+
     CHECK_NULL(obj, bp, dr) ;
 
     if (gen_debug & GEN_DBG_TRAV_LEAF)
@@ -389,6 +390,8 @@ struct driver *dr ;
 
     if( (*dr->leaf_in)(obj, bp))
     {
+	if (gen_trav_stop_recursion) return;
+
 	if( !IS_INLINABLE( bp ) && !IS_EXTERNAL( bp ))
 	{
 	    if (gen_debug & GEN_DBG_CHECK)
@@ -414,6 +417,8 @@ union domain *dp ;
 gen_chunk *obj ;
 struct driver *dr ;
 {
+    if (gen_trav_stop_recursion) return;
+
     CHECK_NULL(obj, (struct gen_binding *)NULL, dr);
 
     if( gen_debug & GEN_DBG_TRAV_SIMPLE ) 
@@ -459,7 +464,8 @@ struct driver *dr ;
 	default:
 	    fatal( "gen_trav_simple: Unknown type %s\n", itoa( dp->ba.type )) ;
 	}
-	
+
+	if (gen_trav_stop_recursion) return;
 	(*dr->simple_out)( obj, dp ) ;
     }
 
@@ -476,6 +482,8 @@ int i ;
 gen_chunk *obj ;
 struct driver *dr ;
 {
+    if (gen_trav_stop_recursion) return;
+
     gen_trav_leaf( bp, obj, dr ) ;
 }
 
@@ -491,7 +499,11 @@ struct gen_binding *bp ;
 union domain *dp ;
 int data ;
 {
-    struct domainlist *dlp = dp->co.components ;
+    struct domainlist *dlp;
+
+    if (gen_trav_stop_recursion) return;
+
+    dlp = dp->co.components ;
 
     switch(dp->co.op)
     {
@@ -500,8 +512,10 @@ int data ;
 	gen_chunk *cp ;
 
 	for(cp = obj+data ; dlp != NULL ; cp++, dlp = dlp->cdr)
+	{
 	    gen_trav_simple(dlp->domain, cp, dr) ;
-
+	    if (gen_trav_stop_recursion) return;
+	}
 	break ;
     }
     case OR_OP: 
@@ -526,7 +540,9 @@ int data ;
 	HASH_MAP(k, v, 
 	     {
 		 gen_trav_simple(dkeyp, (gen_chunk *) k, dr) ;
+		 if (gen_trav_stop_recursion) return;
 		 gen_trav_simple(dvalp, (gen_chunk *) v, dr) ;
+		 if (gen_trav_stop_recursion) return;		 
 	     }, 
 		 (obj+data)->h ) ;
 	break ;
@@ -541,6 +557,8 @@ gen_trav_obj( obj, dr )
      gen_chunk *obj ;
      struct driver *dr ;
 {
+    if (gen_trav_stop_recursion) return;
+
     CHECK_NULL(obj, (struct gen_binding *)NULL, dr);
 
     if ((*dr->obj_in)(obj, dr))
@@ -548,6 +566,8 @@ gen_trav_obj( obj, dr )
 	struct gen_binding *bp = &Domains[quick_domain_index(obj)] ;
 	union domain *dp = bp->domain ;
 	int data = 1+IS_TABULATED( bp ) ;
+
+	if (gen_trav_stop_recursion) return;
 
 	if( gen_debug & GEN_DBG_TRAV_OBJECT )
 	{
@@ -570,6 +590,8 @@ gen_trav_obj( obj, dr )
 	default:
 	    fatal( "gen_trav_obj: Unknown type %s\n", itoa(dp->ba.type));
 	}
+
+	if (gen_trav_stop_recursion) return;
 
 	(*dr->obj_out)(obj, bp, dr);
     }
@@ -1793,23 +1815,23 @@ static void init_gen_quick_recurse_tables();
 
 /*VARARGS0*/
 void
-gen_read_spec( va_alist )
-va_dcl
+gen_read_spec(char * spec, ...)
 {
     va_list ap ;
     extern FILE *zzin ;
-    char *spec ;
     gen_chunk **cpp ;
     struct gen_binding *bp ;
     char *mktemp(), *tmp ;
     extern int unlink();
 
-    va_start( ap ) ;
+    va_start(ap, spec) ;
+
     init() ;
     Read_spec_mode = 1 ;
     tmp = mktemp(strdup("/tmp/newgen.XXXXXX")) ;
 
-    while((spec = va_arg( ap, char *))) {
+    while(spec)
+    {
 	if( (zzin = fopen( tmp, "w" )) == NULL ) {
 	    user( "Cannot open temp spec file in write mode\n" ) ;
 	    return ;
@@ -1823,6 +1845,8 @@ va_dcl
 	}
 	zzparse() ;
 	fclose( zzin ) ;
+
+	spec = va_arg( ap, char *);
     }
     if( unlink( tmp )) {
 	fatal( "Cannot unlink tmp file %s\n", tmp ) ;
@@ -2645,13 +2669,17 @@ union domain *dp ;
 
 /*  tells the recursion not to go in this object
  *  This may be interesting when the recursion modifies
- *  the data visited structure.
+ *  the visited data structure.
+ *  if obj is NULL, the whole recursion is stopped !
  */
 void 
 gen_recurse_stop(obj)
 gen_chunk *obj;
 {
-    hash_put(current_mrc->seen, (char *)obj, (char *)TRUE);
+    if (obj)
+	hash_put(current_mrc->seen, (char *)obj, (char *)TRUE);
+    else
+	gen_trav_stop_recursion = TRUE;
 }
 
 /*  MULTI RECURSION FUNCTION
@@ -2668,33 +2696,19 @@ gen_chunk *obj;
  * ??? bug : you can't visit domain 0 if any... 
  * I can't remember what it is used for.
  */
-void gen_multi_recurse(va_alist)
-va_dcl
+void gen_multi_recurse(gen_chunk * obj, ...)
 {
     va_list pvar;
-    gen_chunk 
-	*obj = gen_chunk_undefined;
-    int 
-	i,
-	domain;
-    GenFilterTableType
-	new_filter_table;
-    GenRewriteTableType
-	new_rewrite_table;
-    GenDecisionTableType
-	new_decision_table,
-        new_domain_table,
-	*p_table;
-    struct multi_recurse
-	*saved_mrc,
-	new_mrc;
-    struct driver
-	dr;
+    int i, domain;
+    GenFilterTableType new_filter_table;
+    GenRewriteTableType new_rewrite_table;
+    GenDecisionTableType new_decision_table, new_domain_table, *p_table;
+    struct multi_recurse *saved_mrc, new_mrc;
+    struct driver dr;
 
     check_read_spec_performed();
 
-    va_start(pvar);
-    obj = va_arg(pvar, gen_chunk*);
+    va_start(pvar, obj);
 
     /*  the object must be a valid newgen object
      */
@@ -2747,7 +2761,9 @@ va_dcl
 
     /*  recurse!
      */
+    gen_trav_stop_recursion = FALSE;
     gen_trav_obj(obj, &dr);
+    gen_trav_stop_recursion = FALSE;
     
     /*  restore the previous context
      */
@@ -2758,6 +2774,11 @@ va_dcl
 /*  upward compatibility, old gen_recurse function syntax
  *  could be a define.
  */
+
+#ifdef gen_recurse 
+#undef gen_recurse
+#endif
+
 void 
 gen_recurse(obj, domain, filter, rewrite)
 gen_chunk *obj;
