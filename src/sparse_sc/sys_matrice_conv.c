@@ -1,11 +1,12 @@
-
 /* package sparse_sc: conversion de systemes representes par des matrices
  *                    pleines en systemes representes par des contraintes
  *                    creuses
  *
  * Corinne Ancourt
  */
-
+/*
+Matrice's format: A[0]=denominator.stock column to column
+*/
 #include <stdio.h>
 
 #include "boolean.h"
@@ -46,6 +47,7 @@ int m;
  * matrice AG, int n, int m)
  * replace the coefficients of the index variables in sc
  * by their new coefficients in the matrix AG[m,n].
+ * Modif: taken into account the order of system of constraints.
  */
 void matrice_index_sys(sc,base_index,AG,n,m)
 Psysteme sc;
@@ -63,7 +65,17 @@ int m;
     deno = DENOMINATOR(AG);
     for (pc = sc->inegalites, i=1; i<=m; pc = pc->succ, i++)
 	for (pb = base_index, j=1; j<=n; pb = pb->succ, j++)
-	    vect_chg_coeff(&pc->vecteur, pb->var, ACCESS(AG,m,m-i+1,j));
+
+	  /*	    vect_chg_coeff(&pc->vecteur, pb->var, ACCESS(AG,m,m-i+1,j));*/
+	  /* Obsolete code: 
+		* this old code was implemented assumming the order of system of constraints
+		* had changed because of _dup version. Thanks to _copy version, it's now straight.
+	   * However, there'll be an incompatiblity if exist some calls of this function 
+		* (which is already obsolete since it uses matrice instead of matrix) outside hyperplane.c. 
+		* changed by DN.
+		*/
+	  vect_chg_coeff(&pc->vecteur, pb->var, ACCESS(AG,m,i,j));
+
     if (value_gt(deno,VALUE_ONE))
 	for (pc = sc->inegalites, i=1; i<=m; pc = pc->succ, i++)
 	    for (pv = pc->vecteur; pv != NULL; pv = pv->succ)
