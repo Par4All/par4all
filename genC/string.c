@@ -21,14 +21,12 @@ contraire, la chaine resultat est padde avec des caracteres null.
 
 #include <stdlib.h>
 #include <stdio.h>
-/*
-extern int fprintf();
-extern char toupper(char c);
-*/
+#include <ctype.h>
+#include <memory.h>
+
 #include <stdarg.h>
 #include "string.h"
 #include "genC.h"
-#include <ctype.h>
 
 #include "misc.h"
 
@@ -112,32 +110,35 @@ concatenate(string next, ...)
 	buffer_size = BUFFER_SIZE_INCREMENT;
     }
 
-    /* now get the strings and concatenates them
+    /* now gets the strings and concatenates them
      */
     va_start(args, next);
     while (next)
     {
 	int len = strlen(next);
+
+	/* reallocates if needed
+	 */
 	if (current+len > buffer_size)
 	{
 	    int size = MAX(current+len, buffer_size+BUFFER_SIZE_INCREMENT);
 	    string new_buffer = (string) malloc(size);
 	    
-	    (void) strncpy(new_buffer, buffer, current);
+	    (void) memcpy(new_buffer, buffer, current);
 
 	    free(buffer); buffer = new_buffer, buffer_size = size;
 	}
 
-	(void) strncpy(&buffer[current], next, len);
+	(void) memcpy(&buffer[current], next, len);
 	current+=len;
 	
 	next = va_arg(args, string);
     }
-    buffer[current] = '\0' ;
     va_end(args);
 
-    /* returns the static buffer
+    /* returns the static null terminated buffer
      */
+    buffer[current] = '\0' ;
     return buffer;
 }
 
