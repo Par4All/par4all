@@ -434,12 +434,43 @@ static void region_translation_close()
 	dimension_lower(dims_2[dim_2-1]) = expression_undefined;
 	free_dimension(dims_2[dim_2-1]);
     }
-    
 }
 
-/*********************************************************************************/
-/* INTERFACE                                                                     */
-/*********************************************************************************/
+/********************************************************************** MISC */
+
+static bool some_phi_variable(Pcontrainte c)
+{
+  for (; c; c=c->succ)
+    if (vect_contains_phi_p(c->vecteur))
+      return TRUE;
+  return FALSE;
+}
+
+/* if we have a region like: <A(PHI)-EXACT-{}>
+ * it means that all *declared* elements are touched, although
+ * this is implicit. this occurs with io effects of "PRINT *, A".
+ * in such a case, the declaration constraints MUST be appended
+ * before the translation, otherwise the result might be false.
+ */
+static void append_declaration_sc_if_exact_without_constraints(region r)
+{
+  entity v = reference_variable(region_reference(r));
+  Psysteme s = region_system(r);
+
+  if (entity_scalar_p(v) || region_may_p(r)) return;
+  /* we have an exact array region */
+
+  pips_debug(3, "considering exact region of array %s\n", entity_name(v));
+  
+  if (!some_phi_variable(sc_egalites(s)) && 
+      !some_phi_variable(sc_inegalites(s)))
+  {
+    pips_debug(1, "appending declaration system\n");
+    region_sc_append(r, entity_declaration_sc(region_entity(r)), FALSE);
+  } 
+}
+
+/***************************************************************** INTERFACE */
 
 static void region_translation_of_predicate(region reg, entity to_func);
 static Psysteme array_translation_sc(bool *p_exact_translation_p);
@@ -544,7 +575,7 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
 				     region_action_tag(reg_1));
 	region_approximation_tag(reg_2) = region_approximation_tag(reg_1);
 	debug_off();
-	return(reg_2);
+	return reg_2;
     }
 	
     if (statistics_p)
@@ -579,18 +610,19 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
 	}
 	
 	reg_2 = region_dup(reg_1);
+
 	/* As soon as possible: This allows to use variable elimination 
          * without exactness tests when the translation is not exact.
 	 */
 	if (!exact_translation_p)
 	{
-	    pips_user_warning("bad reshaping between %s and %s. \n",
+	    pips_user_warning("bad reshaping between %s and %s.\n",
 			      entity_name(array_1), entity_name(array_2));
 	    region_approximation_tag(reg_2) = is_approximation_may;
 	}
 	
+	append_declaration_sc_if_exact_without_constraints(reg_2);
 	region_sc_append(reg_2, trans_sc, FALSE);  
-
 	
 	/* test to avoid the call to region_remove_beta_variables in most usual
 	 * cases
@@ -624,7 +656,6 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
 	    phi_elimination_stat.exact++;
 	}
 	debug_region_consistency(reg_2);
-
 
 	/* should be unnecessary */
 	trans_sc = region_system(reg_2); 
@@ -673,11 +704,11 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
 	  region_sc_append_and_normalize(reg_2, sd, 1);
 	  debug_region_consistency(reg_2);
 	}
-
     }
     else
     {
 	reg_2 = entity_whole_region(array_2, region_action_tag(reg_1));
+	append_declaration_sc_if_exact_without_constraints(reg_2);
 	debug_region_consistency(reg_2);
     }
 
@@ -689,7 +720,7 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
 
     region_translation_close();
     debug_off();
-    return (reg_2);
+    return reg_2;
 }
 
 /*****************************************************************************/
