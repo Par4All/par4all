@@ -2,10 +2,10 @@
    chooser. */
 
 
-/* 	%A% ($Date: 1995/11/28 00:49:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/11/29 13:38:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_directory_menu[] = "%A% ($Date: 1995/11/28 00:49:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_directory_menu[] = "%A% ($Date: 1995/11/29 13:38:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <xview/xview.h>
@@ -99,11 +99,12 @@ generate_a_directory_menu(char * directory)
    Menu menu;
    
    menu = xv_create(NULL, MENU,
-                    /* The string is *not* copied: */
+                    /* The string is *not* copied in MENU_TITLE_ITEM: */
                     MENU_TITLE_ITEM, strdup(directory),
                     /* and furthermore MENU_TITLE_ITEM is write
                        only, so add the info somewhere else: */
                     XV_KEY_DATA, MENU_PATH_DATA_HANDLER, strdup(directory),
+                    /* Add its own notifying procedure: */
                     MENU_NOTIFY_PROC, generate_a_directory_menu_notify,
                     NULL);
    debug(2, "generate_a_directory_menu", "menu = %#x (%s)\n",
@@ -168,9 +169,11 @@ generate_a_directory_menu(char * directory)
                if (((stat(complete_file_name, &buf) == 0) 
                     && (buf.st_mode & S_IFDIR))) {
                   /* Since a menu item cannot be selected as an item, add an
-                     plain item with the same name. Not beautyful
+                     plain item with the same name. Not beautiful
                      hack... :-( */
-                  xv_set(menu, MENU_APPEND_ITEM, menu_item, NULL);
+                  xv_set(menu,
+                         MENU_APPEND_ITEM, menu_item,
+                         NULL);
                   /* Now recreate another item that will be the submenu: */
                   menu_item =
                      xv_create(XV_NULL, MENUITEM,
@@ -179,9 +182,10 @@ generate_a_directory_menu(char * directory)
                                /* The strdup'ed string will also be
                                   freed when the menu is discarded: */
                                MENU_RELEASE_IMAGE,
+                               /* Put a right menu on each directory
+                                  entry: */
+                               MENU_GEN_PULLRIGHT, directory_gen_pullright,
                                NULL);
-                  /* Put a right menu on each directory entry: */
-                  xv_set(menu_item, MENU_GEN_PULLRIGHT, directory_gen_pullright, NULL);
                   debug(2, "generate_a_directory_menu", " menu_item = %#x (%s)\n",
                         menu_item, file_list[i]);
                }
