@@ -3,6 +3,9 @@
   * $Id$
   *
   * $Log: transformer.c,v $
+  * Revision 1.47  2002/03/11 09:28:42  irigoin
+  * calls to sc_normalize() replaced by calls to sc_normalize2()
+  *
   * Revision 1.46  2001/12/05 17:10:50  irigoin
   * Reformatting + transformer_inverse_apply() added for total precondition computation
   *
@@ -329,7 +332,7 @@ transformer transformer_combine(transformer t1, transformer t2)
 		
 	if (! sc_empty_p(r1)) {
 	  Pbase b = base_dup(sc_base(r1));
-	  r1 = sc_normalize(r1);
+	  r1 = sc_normalize2(r1);
 	  if(SC_EMPTY_P(r1)) 
 	    r1 = sc_empty(b);
 	  else
@@ -755,7 +758,7 @@ transformer_normalize(transformer t, int level)
 	  
 	case 4:
 	  vect_sort_in_place(&sc_base(r), varval_value_name_is_inferior_p);
-	  r = sc_normalize(r);
+	  r = sc_normalize2(r);
 	  break;
 	  
 	case 8:
