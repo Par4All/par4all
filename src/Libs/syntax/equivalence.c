@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/25 16:43:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/10/29 12:37:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 1997/09/25 16:43:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "%A% ($Date: 1997/10/29 12:37:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */
@@ -378,19 +378,42 @@ ComputeAddresses()
 		    }
 		}
 		else {
+		    area a = type_area(entity_type(sc));
+
 		    entity_storage(e) = 
 			    make_storage(is_storage_ram,
 					 (make_ram(get_current_module_entity(), 
 						   sc, adr, NIL)));
+		    /* Add e in sc'layout and check that sc's size
+		     * does not have to be increased as for:
+		     * COMMON /FOO/X
+		     * REAL Y(100)
+		     * EQUIVALENCE (X,Y)
+		     */
+		    pips_assert("Entity e is not yet in sc's layout", 
+				!entity_is_argument_p(e,area_layout(a)));
+		    area_layout(a) = gen_nconc(area_layout(a), CONS(ENTITY, e, NIL));
+
+		    /* If sc really is a common, check its size */
+		    if(top_level_entity_p(sc)) {
+			int s = common_to_size(sc);
+			int new_s = adr + SizeOfArray(e);
+			if(s < new_s) {
+			    (void) update_common_to_size(sc, new_s);
+			}
+		    }
 		}
 	    }
 
 	    if (sc == DynamicArea)
 		area_size(type_area(entity_type(sc))) += lc;
+
 	}
     }
-    /* we scan all variables and store in the dynamic area those with no
-       storage. */
+
+    /* All declared variables are scanned and stored in the dynamic area if their
+     * storage is still undefined.
+     */
 
     for (pcv = code_declarations(EntityCode(get_current_module_entity())); pcv != NIL;
 	 pcv = CDR(pcv)) {
