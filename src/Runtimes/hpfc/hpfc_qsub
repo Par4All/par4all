@@ -1,0 +1,26 @@
+#! /bin/sh
+#
+# $RCSfile: hpfc_qsub,v $ (version $Revision$)
+# $Date: 1997/01/16 18:28:32 $, 
+#
+# output a description file for qsub.
+
+npes=`sed -n 's,      parameter(REALMAXSIZEOFPROCS = \(.*\)),\1,p' 
+	global_parameters.h`
+npes=`expr $npes + 1`
+
+pwd=`pwd`
+
+cat <<-EOF
+	#QSUB -r ${1:-hpfc}
+	#QSUB -eo
+	#QSUB -l mpp_p=${npes}
+	#QSUB -l mpp_t=500
+	TARGET=cray-t3d
+	export TARGET
+	cd ${pwd}
+	${1}_main -npes ${npes} 2> run.err > run.out
+EOF
+
+# end of $RCSfile: hpfc_qsub,v $
+#
