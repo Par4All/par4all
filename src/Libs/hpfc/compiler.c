@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compiler.c,v $
+ * Revision 1.57  1997/09/13 12:57:58  coelho
+ * *** empty log message ***
+ *
  * Revision 1.56  1997/07/25 22:25:37  keryell
  * Avoid to put comments on sequences.
  *
@@ -470,7 +473,7 @@ statement stat, *hoststatp, *nodestatp;
     
     hpf_compiler(body, &hostbody, &nodebody);
     
-    if (hpfc_empty_statement_p(hostbody))
+    if (empty_code_p(hostbody))
     {
 	/* ??? memory leak, hostbody is lost whatever it was.
 	 */
