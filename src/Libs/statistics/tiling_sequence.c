@@ -1,7 +1,7 @@
  
 
 #include <stdio.h>
-#include "genC.h"
+#include "genC.h"    
 #include "linear.h"
 #include "ri.h"  
 #include "database.h"  
@@ -425,7 +425,8 @@ int tiling_sequence(string name)
   debug_on("STATISTICS_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", name);
   set_current_module_entity(local_name_to_top_level_entity(name));
- 
+  printf(" salutfddddddddddddddddddddddddddddddddddddddddddddd  \n");
+  /*
   initialize() ;
   
   stat = (statement) db_get_memory_resource(DBR_CODE, name, TRUE); 
@@ -465,7 +466,7 @@ int tiling_sequence(string name)
    free(nbr_perf_nest_loop_of_depth);
   free(filename);
   DB_PUT_FILE_RESOURCE(DBR_STATS_FILE, name, localfilename);
-  reset_current_module_entity();
+  reset_current_module_entity(); */
   
 pips_debug(1, "done.\n");
   debug_off();
