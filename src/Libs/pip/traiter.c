@@ -1,3 +1,9 @@
+/* 	$Id$	 */
+
+#ifndef lint
+static char vcid_pip_traiter[] = "$Id$";
+#endif /* lint */
+
 #include <stdio.h>
 #include "pip__type.h"
 #include "pip__sol.h"
@@ -238,7 +244,7 @@ int nvar, nparm, ni;
 	    if(z%D || z > 32767L * D)
 	        {fprintf(stderr, "%ld/Catastrophe en li %d co %d "
 			          ,cross_product, k, j);
-		 fprintf(stderr, FORMAT, z);
+		 fprintf(stderr, "%ld", z);
 		 fprintf(stderr, FORMAT, D);
 		 fprintf(stderr, "\n");
 	         exit(30);
