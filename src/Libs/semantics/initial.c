@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: initial.c,v $
+ * Revision 1.13  1998/04/14 21:25:21  coelho
+ * linear.h
+ *
  * Revision 1.12  1997/12/10 14:29:36  coelho
  * free text.
  *
@@ -46,6 +49,7 @@
 
 #include "genC.h"
 
+#include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 
