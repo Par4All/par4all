@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.116  1997/05/22 17:10:47  coelho
+# improved selection of arch.
+#
 # Revision 1.115  1997/05/22 17:01:34  coelho
 # *** empty log message ***
 #
@@ -97,10 +100,10 @@ PIPS_DIR=/projects/Pips
 
 # default architecture for building pips
 # the makefile_macros.$(PIPS_ARCH) file is used for compilers and options
-test ${uname_s} = SunOS -a "`expr ${uname_r} : '^5'`" = 1 && \
+test ${uname_s} = SunOS && expr ${uname_r} : '^5' > /dev/null && \
 	PIPS_ARCH="GNUSOL2LL"
 
-test ${uname_s} = SunOS -a "`expr ${uname_r} : '^4'`" = 1 && \
+test ${uname_s} = SunOS && expr ${uname_r} : '^4' > /dev/null && \
 	PIPS_ARCH="."
 
 test ${uname_s} = Linux && \
