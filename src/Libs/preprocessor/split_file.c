@@ -1,7 +1,7 @@
 /* $RCSfile: split_file.c,v $ (version $Revision$)
- * $Date: 1997/03/28 21:34:11 $, 
+ * $Date: 1997/04/11 20:30:01 $, 
  *
- * adapted from whta can be seen by FC 31/12/96
+ * adapted from what can be seen by FC 31/12/96
  * 
  * - static declarations; 
  * - main -> function; 
@@ -13,7 +13,12 @@
  * - tab in first columns...
  * - bang comments added
  * - bug name[20] overflow not checked in lname (20 -> 80)
+ * - hollerith constants conversion;-)
+ * - LINESIZE 80 -> 200...
  */
+
+static void hollerith(char *);
+#define LINESIZE 200
 
 /*
  * Copyright (c) 1983 The Regents of the University of California.
@@ -212,7 +217,6 @@ static int lend()
 static int lname(s)
 char *s;
 {
-#	define LINESIZE 80 
 	register char *ptr, *p;
 	char	line[LINESIZE], *iptr = line;
 
@@ -343,6 +347,8 @@ char *s, *m;
 	return (sp);
 }
 
+
+
 /*
 main(argc, argv)
 char **argv;
@@ -373,6 +379,7 @@ int fsplit(char * file_name, FILE *out)
 	nflag = 0;
 	rv = 0;
 	while (getline() > 0) {
+	    hollerith(buf); /* FC */
 		rv = 1;
 		fprintf(ofp, "%s", buf);
 		if (lend())		/* look for an 'end' statement */
@@ -427,5 +434,127 @@ int fsplit(char * file_name, FILE *out)
 	exit(2);
     }
     return 1;
+}
+
+
+/* ADDITION: basic Hollerith constants handling
+ * FC 11 Apr 1997
+ */
+
+#define isbegincomment(c) ((c)=='!' || (c)=='*' || (c)=='c' || (c)=='C')
+#define issquote(c) ((c)=='\'')
+#define isdquote(c) ((c)=='\"')
+#define ishH(c) ((c)=='h' || (c)=='H')
+#define char2int(c) ((int)((c)-'0'))
+
+/* global state
+ */
+static int in_squotes=0, in_dquotes=0, in_id=0;
+
+static int blank_line_p(char * line)
+{
+    if (!line) return 1;
+    while (*line)
+	if (!isspace(*line++))
+	    return 0;
+    return 1;
+}
+
+static void hollerith(char * line)
+{
+    int i,j;
+    
+    if (!line) {
+	in_squotes=0, in_dquotes=0, in_id=0; /* RESET */
+	return;
+    }
+
+    if (blank_line_p(line))
+	return;
+
+    if (isbegincomment(line[0]))
+	return;
+
+    i = (line[0]=='\t')? 1: 6; /* first column to analyze */
+    
+    for (j=0; j<i; j++)
+	if (!line[j]) return;
+
+    if (isspace(line[i-1]))
+	in_squotes=0, in_dquotes=0, in_id=0; /* RESET */
+
+    while (line[i])
+    {
+	if (!in_dquotes && issquote(line[i])) 
+	    in_squotes = !in_squotes, in_id=0;
+	if (!in_squotes && isdquote(line[i])) 
+	    in_dquotes = !in_dquotes, in_id=0;
+	if (!in_squotes && !in_dquotes)
+	{
+	    if (isalpha(line[i]))
+		in_id=1;
+	    else if (!isalnum(line[i]) && !isspace(line[i]))
+		in_id=0;
+	}
+
+	if (!in_squotes && !in_dquotes && !in_id && isdigit(line[i]))
+	{
+	    /* looks for [0-9 ]+[hH] 
+	     */
+	    int len=char2int(line[i]), ni=i;
+	    i++;
+	    
+	    while (line[i] && (isdigit(line[i]) || isspace(line[i])))
+	    {
+		if (isdigit(line[i]))
+		    len=10*len+char2int(line[i]);
+		i++;
+	    }
+
+	    if (!line[i]) return;
+	    
+	    if (ishH(line[i])) /* YEAH, here it is! */
+	    {
+		char tmp[200];
+		int k;
+
+		j=1;
+
+		tmp[0] = '\''; i++;
+		while (j<200 && line[i] && line[i]!='\n' && len>0)
+		{
+		    len--;
+		    if (line[i]=='\'')
+			tmp[j++]='\'';
+		    tmp[j++] = line[i++];
+		}
+		
+		tmp[j]='\'';
+
+		/* must insert tmp[<j] in line[ni..]
+		 * first, shift the line...
+		 */
+		
+		{
+		    int ll = strlen(line), shift = i-(ni+j+1);
+
+		    if (shift>0) /* to the left */
+			for (k=0; i+k<=ll; k++) 
+			    line[ni+j+1+k] = line[i+k];
+		    else /* to the right */
+			for (k=ll-i; k>=0; k--)
+			    line[ni+j+1+k] = line[i+k];
+		}
+
+		i=ni+j+1;
+
+		while(j>=0)
+		    line[ni+j]=tmp[j], j--;
+
+	    }
+	}
+	
+	i++;
+    }
 }
 
