@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.am,v 1.2 2004/07/01 18:36:52 verdoolaege Exp $
+# $Id: Makefile.am,v 1.3 2004/07/25 12:48:41 verdoolaege Exp $
 #
 
 OBJ_DIR = $(top_builddir)
@@ -28,6 +28,7 @@ EHRHART =  \
 	e7.in\
 	e8.in\
 	e9.in\
+	esum.in \
 	g12.in\
 	g13.in\
 	g14.in\
