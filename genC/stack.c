@@ -6,11 +6,12 @@
  * Could be integrated in Newgen as a building type (as lists, mappings...).
  * there is no actual need of such a type on the functional point of view.
  * I put it there since it may be much more efficient than lists.
+ * stack print out and read in functions would be needed. (direction problem).
  *
- * More thoughts needed. Iterator?
+ * More thoughts needed. 
  *
  * $RCSfile: stack.c,v $ version $Revision$
- * $Date: 1995/02/01 17:26:18 $, 
+ * $Date: 1995/02/02 18:18:25 $, 
  * got on %D%, %T%
  */
 
@@ -18,52 +19,110 @@
 extern int fprintf();
 #include "malloc.h"
 #include "newgen_assert.h"
-#include "newgen_types.h"
+#include "newgen_types.h" /* just for GEN_PROTO */
 #include "newgen_stack.h"
+
+/*
+ *   STACK STRUCTURES
+ *
+ */
 
 /* the stack bulks, that is arrays containing the elements
  */
-typedef struct _stack_bulk
+typedef struct __stack_bulk
 {
-  int n_item;                 /* next available item in the bulk */
-  int max_items;              /* the maximun number of items of this bulk */
-  char **items;               /* the items (only pointers at the moment) */
-  struct _stack_bulk *succ;   /* the next bulk */
+    int n_item;                 /* next available item in the bulk */
+    int max_items;              /* the maximun number of items of this bulk */
+    char **items;               /* the items (only pointers at the moment) */
+    struct __stack_bulk *succ;  /* the next bulk */
 }
-  _stack_bulk, *_stack_ptr;
+   _stack_bulk, *_stack_ptr;
 
 /*  the stack head
  */
 typedef struct __stack_head
 {
-  int size;        /* current number of elements in stack */
-  int type;        /* as BASIC, LIST, EXTERNAL, CHUNK, domain? */
-  int policy;      /* may be used to indicate an allocation policy */
-  int bulk_size;   /* reference bulk size for allocation */
-  int n_bulks;     /* number of allocated bulks */
-  int max_extent;  /* maximum extension of the stack */
-  _stack_ptr stack;/* bulks in use by the stack */
-  _stack_ptr avail;/* allocated bulks not in use */
+    int size;        /* current number of elements in stack */
+    int type;        /* as BASIC, LIST, EXTERNAL, CHUNK, domain? */
+    int policy;      /* may be used to indicate an allocation policy */
+    int bulk_size;   /* reference bulk size for allocation */
+    int n_bulks;     /* number of allocated bulks */
+    int max_extent;  /* maximum extension of the stack */
+    _stack_ptr stack;/* bulks in use by the stack */
+    _stack_ptr avail;/* allocated bulks not in use */
 }
-  _stack_head; /* and *stack */
+    _stack_head; /* and also *stack (in headers) */
 
 /*  usefull defines
  */
-
 #define STACK_PTR_NULL ((_stack_ptr) NULL)
-#define STACK_PTR_NULL_P(s) ((s)==STACK_PTR_NULL)
-
+#define STACK_PTR_NULL_P(x) ((x)==STACK_PTR_NULL)
 #define STACK_DEFAULT_SIZE 30
 
-/*  tools
+/*
+ *   STACK ITERATOR
+ *
  */
-static int number_of_bulks(x)
-_stack_ptr x;
+typedef struct __stack_iterator
 {
-    int n=0;
-    for(; !STACK_PTR_NULL_P(x); x=x->succ, n++);
-    return(n);
+    _stack_ptr bulk; /* current bulk */
+    int index;       /* current index in bulk */
 }
+    _stack_iterator; /* and also *stack_iterator (in headers) */
+
+#define STACK_ITERATOR_END_P(i) STACK_PTR_NULL_P(i->bulk)
+#define DEFINE_ITERATOR(i,blk,idx) i->bulk=(blk), i->index=(idx);
+#define UPDATE_ITERATOR(i) \
+  if (i->index==-1) \
+    i->bulk = i->bulk->succ, i->index = (i->bulk) ? (i->bulk->n_item)-1 : -1;
+
+stack_iterator stack_iterator_init(s)
+stack s;
+{
+    stack_iterator i=(stack_iterator) malloc(sizeof(_stack_iterator));
+
+    message_assert("null stack", !STACK_NULL_P(s));
+    message_assert("undefined stack", !stack_undefined_p(s));
+
+    if ((s->size)==0)
+	DEFINE_ITERATOR(i,STACK_PTR_NULL,-1)
+    else
+    {
+	DEFINE_ITERATOR(i,s->stack,(s->stack->n_item)-1);
+	UPDATE_ITERATOR(i);
+    }
+    
+    return(i);
+}
+
+char *stack_iterator_next(i)
+stack_iterator i;
+{
+    char *result;
+
+    assert(!STACK_ITERATOR_END_P(i));
+    result=(i->bulk->items)[(i->index)--];
+    UPDATE_ITERATOR(i);
+    
+    return(result);
+}
+
+int stack_iterator_end_p(i)
+stack_iterator i;
+{
+    return(STACK_ITERATOR_END_P(i));
+}
+
+void stack_iterator_clean(pi)
+stack_iterator *pi;
+{
+    free(*pi), *pi=(stack_iterator)NULL;
+}
+
+/*
+ *     STACK ALLOCATION
+ *
+ */
 
 /* allocates a bulk of size size
  */
@@ -97,7 +156,7 @@ stack s;
     else
     {
 	s->n_bulks++;
-	return(allocate_bulk((s->stack)->max_items));
+	return(allocate_bulk(s->bulk_size)); /* may depend from the policy? */
     }
 }
 
@@ -122,33 +181,8 @@ int type, size;
     return(s);
 }
 
-void stack_info(f, s)
-FILE *f;
-stack s;
-{
-    fprintf(f, "stack_info about stack 0x%x\n", (unsigned int) s);
-
-    if (STACK_NULL_P(s))
-    {
-	fprintf(f, " - is null\n");
-	return;
-    }
-    /* else */
-    if (stack_undefined_p(s))
-    {
-	fprintf(f, " - is undefined\n");
-	return;
-    }
-    /* else */
-    fprintf(f, " - type %d, size %d, max extent %d\n", 
-	    s->type, s->size, s->max_extent);
-    fprintf(f, " - bulks: %d in use, %d available\n",
-	    number_of_bulks(s->stack), number_of_bulks(s->avail));
-}
-
 /* FREEs the stack
  */
-
 static void free_bulk(x)
 _stack_ptr x;
 {
@@ -175,7 +209,9 @@ stack s;
     free(s);
 }
 
-/* MISC
+/* 
+ *    STACK MISCELLANEOUS
+ *
  */
 int stack_size(s)
 stack s;
@@ -184,12 +220,63 @@ stack s;
     return(s->size);
 }
 
-bool stack_empty_p(s)
+int stack_empty_p(s)
 stack s;
 {
     assert(!STACK_NULL_P(s) && !stack_undefined_p(s));
     return(s->size==0);
 }
+
+/*   APPLY f to all items of stack s;
+ */
+void stack_map(s, f)
+stack s;
+void (*f)();
+{
+    _stack_ptr x;
+    int i;
+
+    for(x=s->stack; x!=NULL; x=x->succ)
+	for(i=(x->n_item)-1; i>=0; i--)
+	    (*f)(x->items[i]);
+}
+
+static int number_of_bulks(x)
+_stack_ptr x;
+{
+    int n=0;
+    for(; !STACK_PTR_NULL_P(x); x=x->succ, n++);
+    return(n);
+}
+
+void stack_info(f, s)
+FILE *f;
+stack s;
+{
+    fprintf(f, "stack_info about stack 0x%x\n", (unsigned int) s);
+
+    if (STACK_NULL_P(s))
+    {
+	fprintf(f, " - is null\n");
+	return;
+    }
+    /* else */
+    if (stack_undefined_p(s))
+    {
+	fprintf(f, " - is undefined\n");
+	return;
+    }
+    /* else */
+    fprintf(f, " - type %d, size %d, max extent %d\n", 
+	    s->type, s->size, s->max_extent);
+    fprintf(f, " - bulks: %d in use, %d available\n",
+	    number_of_bulks(s->stack), number_of_bulks(s->avail));
+}
+
+/*
+ *     STACK USE
+ *
+ */
 
 /* PUSHes the item on stack s
  *
