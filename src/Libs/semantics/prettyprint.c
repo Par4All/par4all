@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/08/04 14:57:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/08 18:25:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/08/04 14:57:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1997/09/08 18:25:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
@@ -367,8 +367,8 @@ text text_transformer(transformer tran)
   text txt = make_text(NIL);
   boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
   string str_prefix;
-  static char crt_line[MAX_LINE_LENGTH];
-  static char aux_line[MAX_LINE_LENGTH];
+  char crt_line[MAX_LINE_LENGTH];
+  char aux_line[MAX_LINE_LENGTH];
   Pcontrainte peq;
   Psysteme ps;
   boolean first_line = TRUE;
