@@ -45,7 +45,8 @@
 \input{/usr/share/local/lib/tex/macroslocales/PageTitre.tex}
 \sloppy
 
-\PAR{}
+\section{Introduction}
+
 Ce rapport interme'diaire est consacre' a` la description de la
 repre'sentation interme'diaire que nous avons choisie pour stocker les
 programmes scientifiques qui seront soumis a` PIPS. Rappelons que ces
@@ -59,25 +60,25 @@ se'mantiquement e'quivalente a` son texte Fortran.
 Cette repre'sentation interme'diaire doit permettre d'effectuer
 facilement des transformations et des analyses de programmes.
 
-\PAR{}
+
 Le de'veloppement de PIPS est en partie  base' sur un outil de ge'nie
 logiciel que nous avons de'veloppe' au CAII. Cet outil s'appelle NewGen,
 il est pre'sente' dans la premie`re partie de ce rapport.
 
-\PAR{}
+
 La repre'sentation interme'diaire est de'crite dans la seconde partie. Nous
 expliquons notamment comment un programme Fortran est mappe' sur cette
 repre'sentation interme'diaire.
 
-\PAR{}
+
 La troisie`me partie de ce rapport est consacre'e a` l'analyse se'mantique.
 Nous y pre'sentons d'abord les objets utilise's pour re'soudre les e'quations
 aux polye`dres propres a` la me'thode de Cousot et Halbwachs, puis la
 structure de donne'es repre'sentant un tel syste`me d'e'quations pour un
 module quelconque.
 
-\SEC{Pre'sentation de NewGen}
-\SSE{Introduction}
+\section{Pre'sentation de NewGen}
+\subsection{Introduction}
 
 {\em NewGen} est un outil de ge'nie logiciel de'veloppe' au CAII pour
 faciliter l'e'criture de gros logiciels tels que PIPS. NewGen est
@@ -114,8 +115,8 @@ fonctions et de'finitions de types qui ont e'te' ge'ne're'es
 automatiquement. Les re'percussions sur le de'veloppement sont
 nombreuses.
 
-\PAR{Un langage plus riche}
-\PAR{}
+\paragraph{Un langage plus riche}
+
 Quel que soit le langage de de'veloppement utilise' (Lisp ou C), NewGen
 l'enrichit de nouvelles constructions: les fonctions de cre'ation,
 destruction et mise a` jour d'objets.
@@ -128,8 +129,8 @@ permet a` chacun de programmer plus vite, de comprendre plus facilement
 le code des autres, et de diminuer la quantite' de commentaires
 ne'cessaires.
 
-\PAR{Ve'rification dynamique de types}
-\PAR{}
+\paragraph{Ve'rification dynamique de types}
+
 Les fonctions de cre'ation, destruction et mise a` jour d'objets sont
 cre'e'es par NewGen de telle sorte qu'une ve'rification dynamique soit
 effectue'e. Par exemple, un appel a` la fonction \verb/employe_nom/ sur
@@ -139,27 +140,27 @@ aborte avec un message d'erreur.  Bien e'videmment, cette ve'rification
 dynamique est optionnelle, de sorte que les programmes corrects ne sont
 pas ralentis.
 
-\PAR{Communications inter-passes par fichiers}
-\PAR{}
+\paragraph{Communications inter-passes par fichiers}
+
 Les fonctions d'entre'es-sorties ge'ne're'es par NewGen permettent
 d'e'crire ou de lire sur fichier un objet aussi complique' qu'une
 repre'sentation interme'diaire de programme Fortran, a` l'aide d'{\em une}
 ligne de C ou de Lisp. Ceci a plusieurs conse'quences.
 
-\PAR{}
+
 Les gros logiciels tels que PIPS sont ge'ne'ralement constitue's de
 plusieurs passes. Il y a des de'pendances entre passes, par exemple quand
 une passe utilise les re'sultats d'une autre passe. Certaines passes
 sont obligatoires, d'autres sont optionnelles (comme par exemple la
 phase d'optimisation dans les compilateurs).
 
-\PAR{}
+
 L'organisation ge'ne'ralement adopte'e est celle ou` chaque passe est
 une proce'dure appele'e par un {\em ``driver''} que l'utilisateur
 commande soit de fac,on interactive soit par des lignes de contro^le
 dans le programme source, ou bien encore par des options de lancement.
 
-\PAR{}
+
 L'organisation choisie pour PIPS est radicalement diffe'rente. Gra^ce a`
 NewGen nous avons la possibilite' de rendre chaque passe inde'pendante:
 chaque passe lit un ou plusieurs fichiers de donne'es a` l'aide des
@@ -170,7 +171,7 @@ fonctions ge'ne're'es par NewGen prennent en compte ce genre de
 donne'es. Le driver n'est alors plus ne'cessaire, quelques script-shells
 suffisent.
 
-\PAR{}
+
 Avec une telle organisation, le de'veloppement est conside'rablement
 simplifie', car on est amene' a` de'velopper N petits logiciels pluto^t
 qu'un unique gros. La mise au point est plus simple, les temps de
@@ -179,22 +180,22 @@ tre`s facile d'utiliser plus d'un langage de programmation car un
 fichier de donne'es e'crit par une passe C peut e^tre lu par une passe
 Lisp, et ce {\em sans aucune modification du fichier ou des passes.}
 
-\SSE{De'finition des domaines NewGen}
+\subsection{De'finition des domaines NewGen}
 
-\PAR{}
+
 Les types de donne'es NewGen sont appele's des domaines, et la
 spe'cification d'une structure de donne'es NewGen est constitue'e d'une
 liste de de'finitions de domaines. Les de'finitions de donne'es peuvent
 e^tre re'cursives (ou cycliques), c'est a` dire qu'un domaine peut e^tre
 de'fini en fonction de lui-me^me, directement ou indirectement.
 
-\PAR{}
+
 Les domaines sont de'finis a` partir de deux constructeurs, l'union
 \verb/+/ et le produit \verb/x/, de deux ite'rateurs, le tableau
 \verb/[]/ et la liste \verb/*/, et enfin de domaines pre'de'finis qui
 correspondent a` peu pre`s aux types simples de C ou Lisp.
 
-\PAR{}
+
 A chaque domaine correspond un ensemble de valeurs qui sont les valeurs
 que peut prendre un objet de ce domaine. Ainsi, les valeurs du domaine
 pre'de'fini \verb/int/ sont les entiers relatifs de $\cal Z$. 
@@ -215,7 +216,7 @@ Les \verb/SDi/ sont appele's les sous-domaines de \verb/D/. Un
 sous-domaine peut e^tre un sous-domaine de base, un sous-domaine simple,
 un sous-domaine liste ou un sous-domaine tableau (voir plus loin).
 
-\PAR{}
+
 L'ensemble des valeurs de \verb/D/ est le produit carte'sien des
 ensembles de valeurs des sous-domaines \verb/SDi/.
 
@@ -230,7 +231,7 @@ D = SD1 + SD2 + ... + SDn ;
 
 De me^me, les \verb/SDi/ sont appele's les sous-domaines de \verb/D/. 
 
-\PAR{}
+
 L'ensemble des valeurs de \verb/D/ est l'union des ensembles de valeurs
 des sous-domaines \verb/SDi/.
 
@@ -245,20 +246,20 @@ ou` \verb/nom/ est le nom du sous-domaine et \verb/dpd/ est un domaine
 pre'-de'fini: \verb/unit/ , \verb/bool/ , \verb/char/ , \verb/string/ ,
 \verb/int/ et \verb/float/. 
 
-\PAR{}
+
 L'ensemble des valeurs d'un sous-domaine de base est e'gal a` l'ensemble
 des valeurs du domaine pre'-de'fini. Les types pre'-de'finis autres que
 \verb/unit/ ont des ensembles de valeurs qui de'pendent du langage
 utilise'. Par exemple, le sous-domaine \verb/float/ correspond aux
 nombres re'els.
 
-\PAR{}
+
 Le type pre'-de'fini \verb/unit/ a un ensemble de valeurs re'duit a` un
 e'le'ment, conventionnellement note' \verb%UU%. Ce type est utile avec le
 constructeur \verb/+/, dans le cas ou` le nom du sous-domaine a` lui
 seul porte toute l'information utile.
 
-\PAR{}
+
 Exemples:
 \begin{verbatim}
 employe = nom:string x age:int x salaire:float
@@ -279,11 +280,11 @@ re'fe'rences en avant sont admises) ou doit e^tre importe'e depuis un
 autre fichier par la commande \verb/import/. Il est possible d'e'crire
 \verb/nom/ a` la place de \verb/nom:nom/.
 
-\PAR{}
+
 L'ensemble des valeurs du sous-domaine \verb/nom/ est e'gal a` l'ensemble des
 valeurs du domaine \verb/dom/.
 
-\PAR{}
+
 Dans les exemples suivants, \verb/annee, mois, naissance, .../ sont des
 sous-domaines simples.
 
@@ -303,12 +304,12 @@ nom:dom*
 \end{verbatim}
 ou` \verb/nom:dom/ est un sous-domaine de base ou un sous-domaine simple.
 
-\PAR{}
+
 L'ensemble des valeurs du sous-domaine \verb/nom/ est e'gal aux listes a` ze'ro
 ou plus e'le'ments dont chaque e'le'ment a` une valeur dans l'ensemble
 des valeurs du domaine \verb/dom/.
 
-\PAR{}
+
 Dans les exemples suivants, \verb/args/ et \verb/block/ sont des
 sous-domaines listes.
 \begin{verbatim}
@@ -372,19 +373,19 @@ type        = statement:unit + area:int + array + functional +
 value       = code + symbolic + constant + intrinsic:unit + unknown:unit ;
 \end{verbatim}
 
-\PAR{}
+
 Certaines de'finitions sont simples a` comprendre. Par exemple, une
 variable Fortran est repre'sente'e par un objet de type \verb/array/, qui se
 compose d'un type de base \verb/basic/ et d'une liste de dimensions
 \verb/dimensions:dimension*/ (rappelons que \verb/basic/ est une
 abbre'viation de \verb/basic:basic/).
 
-\PAR{}
+
 Un programme \verb/pgm/ se compose d'une liste \verb/modules/ de
 fonctions, chaque fonction e'tant repre'sente'e par un objet de type
 \verb/entity/.
 
-\PAR{}
+
 Le mode de passage des parame`tres est un \verb/mode/ qui vaut soit
 \verb/value/ soit \verb/reference/.
 
@@ -395,7 +396,7 @@ l'imple'mentation de NewGen pour le langage C. Nous ne de'crirons pas
 NewGen-Lisp car cette seconde imple'mentation est tout a` fait
 similaire.
 
-\PAR{}
+
 Les fonctions que nous de'crivons dans la suite sont ge'ne're'es par
 NewGen-C lors de la compilation d'un fichier de spe'cifications. Ces
 fonctions sont accessibles depuis un programme C a` la condition
@@ -421,7 +422,7 @@ extern dom f() ;        /* definit une fonction f renvoyant
                            un objet de type dom */ 
 \end{verbatim}
 
-\PAR{}
+
 Exemples:
 \begin{verbatim}
 dimension d ;
@@ -437,11 +438,11 @@ sous-domaines dans la de'finition de \verb/dom/; chaque argument est un objet
 du sous-domaine concerne' que l'on veut stocker dans l'objet en cours de
 cre'ation. Les proble`mes d'allocation me'moire sont ge're's par Newgen-C.
 
-\PAR{}
+
 Une valeur spe'ciale \verb/dom_undefined/ existe pour chaque domaine
 \verb/dom/.
 
-\PAR{}
+
 Exemples
 \begin{verbatim}
 d = make_dimension(l,u) ;
@@ -464,7 +465,7 @@ Une fonction de cre'ation \verb/make_dom/ est ge'ne're'e pour chaque domaine uni
 Les e'tiquettes \verb/is_dom_sdom/ sont automatiquement cre'e'es par
 NewGen-C. 
 
-\PAR{}
+
 Exemples:
 \begin{verbatim}
 syntax s = make_syntax(is_syntax_call, make_call(f, args)) ; 
@@ -485,7 +486,7 @@ utilise'e en partie droite d'une affectation - pour acce'der a` la
 valeur du sous-domaine - ou en partie gauche - pour changer la valeur du
 sous-domaine.
 
-\PAR{}
+
 Exemples:
 \begin{verbatim}
 constant c = EvalExpr(dimension_upper(d)) ;  
@@ -500,17 +501,17 @@ stocke' dans un objet \verb/d/ de type \verb/dom/ ne'cessite de connai^tre le ty
 du sous-objet contenu dans \verb/d/.  La fonction \verb/or_tag/ permet de
 connai^tre ce type.
 
-\PAR{}
+
 Par exemple, la fonction \verb/or_tag/ applique'e a` l'objet \verb/v/ de type
 \verb/value/ cre'e' auparavant fournit la valeur \verb/is_value_constant/,
 c'est-a`-dire la valeur de l'e'tiquette passe'e en parame`tre au moment
 de la cre'ation de \verb/v/.
 
-\PAR{}
+
 Une fois le type connu gra^ce a` la fonction \verb/or_tag/ la fonction
 d'acce`s \verb/dom_sdom/ peut e^tre utilise'e comme pour les domaines produits.
 
-\PAR{}
+
 Exemple:
 \begin{verbatim}
 if (or_tag(v) == is_value_constant) {
@@ -523,13 +524,13 @@ if (or_tag(v) == is_value_constant) {
 }
 \end{verbatim}
 
-\PAR{}
+
 Le pre'dicat \verb/dom_sdom_p(x)/ est e'quivalent a`
 \verb/(or_tag(x)==is_dom_sdom)/ 
 et est de'fini pour chaque sous-domaine \verb/sdom/. Il permet de
 simplifier l'e'criture des programmes.
 
-\PAR{}
+
 Exemple:
 \begin{verbatim}
         if(value_constant_p(v) ) {
@@ -547,13 +548,13 @@ cellules que nous nommons \verb/cons/, par re'fe'rence a` Lisp. Une
 variable devant contenir une liste doit e^tre de'clare'e de type
 \verb/cons */.
 
-\PAR{}
+
 Un \verb/cons/ se compose d'un e'le'ment \verb/car/ permettant de
 stocker un objet \verb/d/ quel que soit le type de cet objet, et d'un
 e'le'ment \verb/cdr/ permettant de pointer vers une autre cellule
 \verb/cons/.
 
-\PAR{}
+
 Le type C de l'e'le'ment \verb/car/ est unique; appelons le
 \verb/chunk/. Comme cet e'le'ment est susceptible de contenir un objet de
 n'importe quel domaine, une fonction d'insertion/extraction \verb/DOM/
@@ -561,7 +562,7 @@ est construite par NewGen-C pour chaque domaine \verb/dom/. Cette macro
 permet de convertir un objet de type \verb/dom/ en un objet de type
 \verb/chunk/, {\em et re'ciproquement}.
 
-\PAR{}
+
 On ajoute un e'le'ment \verb/d/ de type \verb/dom/ a` une liste \verb/l/
 (\verb/l/ peut valoir \verb/NIL/) gra^ce a` la fonction \verb/CONS/ dont
 le type vaut \verb/cons*/ et qui prend 3 arguments:
@@ -574,7 +575,7 @@ le type vaut \verb/cons*/ et qui prend 3 arguments:
 La fonction \verb/CONS/ retourne en re'sultat la nouvelle liste, qui comporte
 l'e'le'ment en te^te de liste.\\
 
-\PAR{}
+
 Dans l'exemple suivant, \verb/f/ est une \verb/entity/, \verb/e1/ et
 \verb/e2/ des expressions:
 \begin{verbatim}
@@ -591,18 +592,18 @@ est le type de l'e'le'ment \verb/car/, c'est-a`-dire \verb/chunk/. Le
 re'sultat de \verb/CAR/ doit donc e^tre converti en un objet de type
 \verb/dom/ gra^ce a` la macro d'insertion-extraction \verb/DOM/.
 
-\PAR{}
+
 Exemple:
 \begin{verbatim}
 expression e = EXPRESSION(CAR(call_arguments(c))) ;
 \end{verbatim}
 
-\PAR{}
+
 La cellule suivant une cellule \verb/cons/ s'obtient par la fonction
 \verb/CDR/ de type \verb/cons*/. La fonction \verb/CDR/ peut e^tre
 utilise'e en partie gauche ou droite des affectations.
 
-\PAR{}
+
 Exemple:
 \begin{verbatim}
 cons * pc ;
@@ -622,7 +623,7 @@ e'le'ments de type \verb/chunk/. La macro d'insertion-extraction
 \verb/DOM/ doit donc encore e^tre utilise'e pour chaque acce`s au
 tableau.
 
-\PAR{}
+
 Exemple: soit la spe'cification suivante:
 
 \begin{verbatim}
@@ -659,7 +660,7 @@ chunk mat[N][N] ;
 Si \verb/d/ est un objet du domaine \verb/dom/, \verb/d/ peut e^tre e'crit sur fichier
 par un appel a` la fonction \verb/gen_write/.
 
-\PAR{}
+
 Cette fonction reconnai^t le type de \verb/d/ (\verb/dom/) gra^ce a` une
 information cache'e dans \verb/d/, et lui applique le traitement
 approprie'. Chaque sous-domaine est e'crit par un appel re'cursif a`
@@ -667,13 +668,13 @@ approprie'. Chaque sous-domaine est e'crit par un appel re'cursif a`
 pre'de'finis, pour lesquels la valeur est e'crite. La fonction
 \verb/gen_write/ ge`re les listes et les tableaux.
 
-\PAR{}
+
 Un objet e'crit sur fichier par \verb/gen_write/ peut e^tre lu par
 \verb/gen_read/. Un appel a` \verb/gen_read/ a pour effet de recre'er un
 objet \verb/d'/ de type \verb/dom/ identique a` l'objet initial \verb/d/
 aux adresses me'moire pre`s.
 
-\PAR{}
+
 Il peut arriver que deux objets partagent le me^me espace me'moire,
 comme par exemple dans le cas d'un graphe dont deux noeuds ont un me^me
 successeur. On parle alors de {\em sharing}. Un autre cas de sharing
@@ -683,12 +684,12 @@ ge're's par \verb/gen_write/ et \verb/gen_read/.  L'objet recre'e'
 \verb/d'/ par \verb/gen_read/ comportera le me^me sharing et les me^mes
 listes circulaires que \verb/d/.
 
-\PAR{}
+
 Un objet peut e^tre de'truit par \verb/gen_free/, fonction qui a le me^me
 comportement que \verb/gen_write/: tous les sous-domaines sont re'cursivement
 de'truits.
 
-\PAR{}
+
 Exemple: le parseur de pips a un programme principal e'quivalent a`:
 \begin{verbatim}
 {
@@ -747,18 +748,18 @@ notamment:
   donne'es peuvent e^tre inhibe's pour ame'liorer la rapidite' des parties
   du projet correctes.
 \end{itemize}
-\SEC{Description de la repre'sentation interme'diaire}
+\section{Description de la repre'sentation interme'diaire}
 
-\SSE{Principe ge'ne'raux}
+\subsection{Principe ge'ne'raux}
 
-\PAR{}
+
 Cette repre'sentation interme'diaire de programmes proce'duraux a e'te' de'finie
 pour traiter des programmes Fortran mais nous avons pris soin de nous
 appuyer sur les ide'es ge'ne'rales de la se'mantique de'notationnelle pour
 obtenir une repre'sentation a` la fois concise, solide, extensible et
 aussi inde'pendante de Fortran que possible.
 
-\PAR{}
+
 Cette repre'sentation interme'diaire ne vise pas a rendre compte de tous les
 proble`mes lie's aux traitements interproce'duraux qui seront effectue's
 dans le cadre du projet PIPS. Elle a pour but de repre'senter d'une
@@ -768,7 +769,7 @@ subroutine ou une function.
 La conservation de la se'mantique peut e^tre estime'e en essayant d'e'crire
 un interpre'teur Fortran base' sur cette repre'sentation.
 
-\PAR{}
+
 Il ne faut pas perdre de vue que cette repre'sentation interme'diaire, comme
 toute structure de donne'es, n'est que le squelette et que les
 proce'dures utilisant des informations issues d'elle ne verront en
@@ -777,14 +778,14 @@ s'y appliqueront (e'valuateur d'adresse, e'valuateur d'expression,
 etc...) et qui utiliseront e'ventuellement d'au\-tres structures de
 donne'es prive'es.
 
-\PAR{}
+
 Le pre'sent document repre'sente le re'sultat d'une premie`re phase.
 La repre'sentation interme'diaire sera ensuite augmente'e pour prendre en compte
 les besoins de l'analyse interproce'durale ou du calcul des de'pendances.
 
-\SSE{Spe'cification NewGen de la repre'sentation interme'diaire}
+\subsection{Spe'cification NewGen de la repre'sentation interme'diaire}
 
-\PAR{}
+
 Le fichier de spe'cifications NewGen de la ri est donne'e ci apre`s.  La
 liste de'finitions de domaines n'est pas donne'e dans un ordre logique,
 mais plus simplement par ordre alphabe'tique.
@@ -818,21 +819,21 @@ type        = statement:unit + area:int + array + functional +
 value       = code + symbolic + constant + intrinsic:unit + unknown:unit ;
 \end{verbatim}
 
-\SSE{Analyse de la repre'sentation interme'diaire}
+\subsection{Analyse de la repre'sentation interme'diaire}
 
-\PAR{}
+
 Dans cette section, nous allons montrer comment cette repre'sentation
 interme'diaire permet de repre'senter les diffe'rents objets manipule's par un
 programme Fortran.
 
-\SSS{Domaines}
+\subsubsection{Domaines}
 
-\PAR{}
+
 Nous allons tout d'abord examiner chaque domaine pour expliquer
 brie`vement a` quoi il sert.
 
-\PAR{Entity = name:string x type x storage x initial:value}
-\PAR{}
+\paragraph{Entity = name:string x type x storage x initial:value}
+
 Tout objet ayant un nom dans un programme Fortran est repre'sente' par
 une \verb/entity/. Un tel objet peut e^tre un module, une variable, un
 common, un ope'rateur, une constante, un label, etc. Pour chaque objet,
@@ -844,9 +845,9 @@ me'moire utilise' pour l'entite', et finalement, le sous-domaine
 terme valeur initiale a ici un sens assez large, puisqu'il s'agit par
 exemple du code pour les entite's repre'sentant des modules.
 
-\PAR{Type = statement:unit + area:int + array + functional +
+\paragraph{Type = statement:unit + area:int + array + functional +
 unknown:unit + void:unit} 
-\PAR{}
+
 Le domaine \verb/type/ repre'sente le type d'une entite'.  Le
 sous-domaine \verb/statement/ est utilise' pour les labels
 d'instruction.  Le sous-domaine \verb/area/ est utilise' pour les
@@ -857,34 +858,34 @@ fonctions, pour les subroutines et pour le programme principal.  Le
 sous-domaine \verb/void/ est utilise' pour le re'sultat d'une subroutine
 ou d'un programme principal.
 
-\PAR{Array = basic x dimensions:dimension*}
-\PAR{}
+\paragraph{Array = basic x dimensions:dimension*}
+
 Le domaine \verb/array/ repre'sente le type d'une variable.  Le
 sous-domaine \verb/basic/ donne le type Fortran de la variable.  Le
 sous-domaine \verb/dimensions/ donne la liste des dimensions de la variable.
 Un scalaire est un tableau de ze'ro dimension.
 
-\PAR{}
+
 Chaque dimension est une expression, qui n'est pas ne'cessairement
 constante dans le cas des tableaux formels. La constante pre'de'finie de
 nom '*D*' est utilise'e pour les tableaux de taille non de'finie
 (\verb/DIMENSION T(*)/).
 
-\PAR{Basic = int:int + float:int + logical:int + overloaded:unit + 
+\paragraph{Basic = int:int + float:int + logical:int + overloaded:unit + 
 complex:int + string:value}
-\PAR{}
+
 Le domaine \verb/basic/ permet de repre'senter un type Fortran tel que
 INTEGER ou REAL. La valeur de ce domaine donne la longueur en octets de
 la zone me'moire occuppe'e par une variable de ce type.
 
-\PAR{Dimension = lower:expression x upper:expression}
-\PAR{}
+\paragraph{Dimension = lower:expression x upper:expression}
+
 Le domaine \verb/dimension/ permet de repre'senter une dimension d'un
 tableau, c'est a` dire un couple borne infe'rieure -- sous-domaine
 \verb/lower/ -- borne supe'rieure -- sous-domaine \verb/upper/.
 
-\PAR{Functional = parameters:parameter* x result:type}
-\PAR{}
+\paragraph{Functional = parameters:parameter* x result:type}
+
 Le domaine \verb/functional/ repre'sente le type d'un module, c'est
 a` dire une fonction, une subroutine ou un programme principal. Le
 sous-domaine \verb/parameters/ donne le type et le mode de passage de chaque
@@ -892,47 +893,47 @@ parame`tre, et le sous-domaine \verb/result/ donne le type du re'sultat. Ce
 dernier type vaut \verb/void/ pour les subroutines et les programmes
 principaux. 
 
-\PAR{Parameter = type x mode}
-\PAR{}
+\paragraph{Parameter = type x mode}
+
 Le domaine \verb/parameter/ repre'sente le type et le mode de passage d'un
 parame`tre formel de module. 
 
-\PAR{Mode = value:unit + reference:unit}
-\PAR{}
+\paragraph{Mode = value:unit + reference:unit}
+
 Le domaine \verb/mode/ repre'sente le mode de passage d'un parame`tre
 formel de module. Le domaine contient un objet du domaine \verb/value/
 pour le mode de passage par valeur et \verb/reference/ pour le passage
 par adresse.
 
-\PAR{Storage = return:entity + ram + formal + rom:unit}
-\PAR{}
+\paragraph{Storage = return:entity + ram + formal + rom:unit}
+
 Le domaine \verb/storage/ permet de pre'ciser dans quelle zone de la me'moire
 est stocke'e une entite'. Il y a plusieurs zones, qui ne correspondent
 pas ne'cessairement a` la re'alite', c'est a` dire aux zones de me'moire
 qui seraient affecte'es par un compilateur.
 
-\PAR{}
+
 Le sous-domaine \verb/return/ permet de repre'senter les variables ayant
 pour nom le nom d'une fonction et auxquelles on affecte la valeur que la
 fonction doit retourner. L'entite' pointe'e par \verb/return/ est la
 fonction concerne'e.
 
-\PAR{}
+
 Le sous-domaine \verb/ram/ est reserve' aux variables ayant une adresse
 en me'moire. Il permet de pre'ciser dans quelle fonction et
 e'ventuellement dans quelle common ces variables ont e'te' de'clare'es.
 
-\PAR{}
+
 Le sous-domaine \verb/formal/ est re'serve' aux parame`tres formels des
 modules.
 
-\PAR{}
+
 Le sous-domaine \verb/rom/ est utilise' pour toutes les entite's dont la
 valeur n'est pas modifiable, telles que les fonctions, les labels, les
 ope'rateurs, etc.
 
-\PAR{Ram = function:entity x section:entity x offset:int}
-\PAR{}
+\paragraph{Ram = function:entity x section:entity x offset:int}
+
 Le domaine \verb/ram/ permet de pre'ciser la de'claration d'une
 variable. Le sous-domaine \verb/function/ indique dans quel module une
 entite' est de'clare'e. Le sous-domaine \verb/section/ indique dans
@@ -941,15 +942,15 @@ de'clare' et deux aires spe'ciales nomme'es \verb/_STATIC/ et
 \verb/_DYNAMIC/ pour les entite's locales. Enfin, le sous-domaine
 \verb/offset/ donne l'adresse dans l'aire de la variable.
 
-\PAR{Formal = function:entity x offset:int}
-\PAR{}
+\paragraph{Formal = function:entity x offset:int}
+
 Le domaine \verb/formal/ indique le module dans lequel un parame`tre formel
 est de'clare' gra^ce le sous-domaine \verb/function/, et le rang de ce
 parame`tre dans la liste des parame`tres gra^ce au sous-domaine \verb/offset/.
 
-\PAR{Value = code + instruction + symbolic + constant + intrinsic:unit + 
+\paragraph{Value = code + instruction + symbolic + constant + intrinsic:unit + 
 unknown:unit}
-\PAR{}
+
 Le domaine \verb/value/ permet de repre'senter les valeurs initiales des
 entite's. Le sous-domaine \verb/code/ est utilise' pour les entite's
 modules. Le sous-domaine \verb/symbolic/ est utilise'
@@ -960,37 +961,37 @@ ne de'pendent que du langage, telles que les intrinsics Fortran, les
 ope'rateurs, les instructions, etc. Enfin le sous-domaine
 \verb/unknown/ est utilise' pour les valeurs initiales inconnues.
 
-\PAR{Symbolic = expression x constant}
-\PAR{}
+\paragraph{Symbolic = expression x constant}
+
 Le domaine \verb/symbolic/ est utilise' pour repre'senter la valeur
-initiale d'une entite' constante symbolique, c'est a` dire les PARAMETER
+initiale d'une entite' constante symbolique, c'est a` dire les PAAMETER
 de Fortran ou les CONST de Pascal. Le sous-domaine \verb/expression/ permet
 de stocker l'expression qui a permis d'e'valuer la valeur initiale
 contenue dans le sous-domaine \verb/constant/. Le sous-domaine \verb/expression/
 n'est utile qui si on cherche a` reproduire un texte source fide`le.
 
-\PAR{Constant = int + litteral:unit}
-\PAR{}
+\paragraph{Constant = int + litteral:unit}
+
 Le domaine \verb/constant/ est utilise' pour repre'senter la valeur
 initiale des entite's constantes. Seules les entite's de type entier
 nous inte'ressent, ce qui explique qu'une constante puisse e^tre soit un
 \verb/int/ soit un \verb/litteral/ dont on ne garde pas la valeur (type unit).
 
-\PAR{Code = declarations:entity* x statement}
-\PAR{}
+\paragraph{Code = declarations:entity* x statement}
+
 Le domaine \verb/code/ est utilise' pour stocker le corps des modules. Le
 sous-domaine \verb/declarations/ contient une liste d'entite's qui sont les
 variables et commons de'clare's dans la fonction. Le sous-domaine
 \verb/statement/ contient la se'quence d'instructions du module.
 
-\PAR{Statement = label:entity x instruction}
-\PAR{}
+\paragraph{Statement = label:entity x instruction}
+
 Le domaine \verb/statement/ permet de repe'rer les instructions d'un module.
 Le sous-domaine \verb/label/ contient une entite' qui de'finit le label. Le
 sous-domaine \verb/instruction/ contient le corps de l'instruction.
 
-\PAR{Instruction = block:statement* + test + loop + goto:statement + call}
-\PAR{}
+\paragraph{Instruction = block:statement* + test + loop + goto:statement + call}
+
 Le domaine \verb/instruction/ permet de repre'senter les instructions
 d'un module. Une instruction peut e^tre un sous-domaine \verb/block/,
 c'est a` dire une liste de \verb/statement/, un sous-domaine \verb/test/
@@ -1002,8 +1003,8 @@ subroutine, entre'es-sorties, return, stop, etc. Toutes ces instructions
 sont repre'sente'es par des appels a` des fonctions pre'de'finies dont
 nous e'tudierons la nature plus loin.
 
-\PAR{Test = condition:expression x true:statement x false:statement}
-\PAR{}
+\paragraph{Test = condition:expression x true:statement x false:statement}
+
 Le domaine \verb/test/ permet de repre'senter toutes les instructions a` base
 de contro^le. Le sous-domaine \verb/condition/ contient l'expression a`
 tester, et les deux sous-domaines \verb/true/ et \verb/false/ contiennent les
@@ -1014,8 +1015,8 @@ a` l'exception de l'instruction \verb/DO/, est
 transforme'e en une combinaison se'mantiquement e'quivalente de \verb/test/s
 et de \verb/goto/s.
 
-\PAR{Loop = index:entity x range x body:statement x label:entity}
-\PAR{}
+\paragraph{Loop = index:entity x range x body:statement x label:entity}
+
 Le domaine \verb/loop/ permet de repre'senter les boucles du type DO Fortran
 ou FOR Pascal. Le sous-domaine \verb/index/ contient l'entite' indice de
 boucle, le sous-domaine \verb/range/ contient les bornes de la boucle, le
@@ -1023,15 +1024,15 @@ sous-domaine \verb/body/ contient le corps de la boucle, c'est a` dire un
 \verb/statement/, le sous-domaine \verb/label/ contient le label de fin de boucle,
 c'est a` dire une entite'.
 
-\PAR{Range = lower:expression x upper:expression x increment:expression}
-\PAR{}
+\paragraph{Range = lower:expression x upper:expression x increment:expression}
+
 Le domaine \verb/range/ permet de repre'senter les bornes des boucles DO
 Fortran. Il y a trois sous-domaines \verb/lower/, \verb/upper/ et \verb/increment/ de
 type \verb/expression/ qui sont respectivement la borne infe'rieure, la borne
 supe'rieure et l'incre'ment.
 
-\PAR{Call = function:entity x arguments:expression*}
-\PAR{}
+\paragraph{Call = function:entity x arguments:expression*}
+
 Le domaine \verb/call/ permet de repre'senter les appels de fonctions.
 Les fonctions jouent un ro^le important dans notre repre'sentation
 interme'diaire puisque les ope'rateurs et les instructions Fortran
@@ -1042,8 +1043,8 @@ Le sous-domaine \verb/function/ est une entite' qui de'finit la fonction
 appele'e. Le sous-domaine \verb/arguments/ est une liste de sous-domaines
 \verb/expression/ qui repre'sente les arguments d'appel de la fonction.
 
-\PAR{Expression = syntax}
-\PAR{}
+\paragraph{Expression = syntax}
+
 Le domaine \verb/expression/ permet de stocker les expressions.
 Pour l'instant, ce domaine ne se compose que d'un unique sous-domaine
 \verb/syntax/, mais nous pensons ajouter ulte'rieurement d'autres
@@ -1053,8 +1054,8 @@ un forme compile'e, peut-e^tre sous forme d'un vecteur.
 Le sous-domaine \verb/syntax/ contient l'expression avec la me^me
 structure que celle du code source.
 
-\PAR{Syntax = reference + range + call}
-\PAR{}
+\paragraph{Syntax = reference + range + call}
+
 Le domaine \verb/syntax/ permet de repre'senter les expressions telles
 qu'elles apparaissent dans le texte source du programme. Un
 \verb/syntax/ est soit une \verb/reference/ a` un e'le'ment de tableau
@@ -1064,24 +1065,24 @@ des fonctions pre'-de'finies), soit un \verb/range/, dans le cas des
 expressions bornes de boucles.
 
 
-\PAR{Re'fe'rence = variable:entity x indices:expression*}
-\PAR{}
+\paragraph{Re'fe'rence = variable:entity x indices:expression*}
+
 Le domaine \verb/reference/ est utilise' pour repre'senter une re'fe'rence a`
 un e'le'ment de tableau. Le sous-domaine \verb/variable/ contient une entite'
 de'finissant la variable re'fe'rence'e. Le sous-domaine \verb/indices/
 contient une liste expressions qui sont les indices de la re'fe'rence.
 
-\SSS{Objets du langage Fortran}
+\subsubsection{Objets du langage Fortran}
 
-\PAR{}
+
 Nous montrons a` pre'sent comment les diffe'rents objets manipule's dans
 un programme Fortran sont traduits dans notre repre'sentation interme'diaire.
 
-\PAR{Module}
-\PAR{}
+\paragraph{Module}
+
 Un module est un programme principal, une fonction ou une subroutine. 
 
-\PAR{}
+
 Un module est repre'sente' par une \verb/entity/ dont le \verb/name/ est le nom du
 module, le \verb/type/ est un \verb/functional/ qui indique le type des
 parame`tres formels et du re'sultat, le \verb/storage / vaut \verb/rom/ et le
@@ -1092,12 +1093,12 @@ retournent un \verb/void/. Les noms des modules sont pre'fixe's par des
 '\_' et le nom du programme principal est prefixe' par un '\_\_' pour le
 diffe'rencier d'une subroutine.
 
-\PAR{Commons et aires}
-\PAR{}
+\paragraph{Commons et aires}
+
 Une aire repre'sente une partie de la me'moire ou` sont range'es les
 variables. Les commons sont des aires (voir plus loin).
 
-\PAR{}
+
 Deux aires spe'ciales sont cre'e'es pour les variables qui
 n'appartiennent pas a` un common (variables locales). Ces deux aires
 sont des entite's qui ont pour \verb/name/ \verb/_STATIC/ et
@@ -1105,60 +1106,60 @@ sont des entite's qui ont pour \verb/name/ \verb/_STATIC/ et
 de l'aire, pour \verb/storage/ un \verb/rom/ et comme \verb/initial/ une
 \verb/value/ de type \verb/unknown/. 
 
-\PAR{}
+
 L'appartenance d'une variable ou d'un common a` l'une des ces deux aires
 spe'ciales indique si cette variable ou ce common est statique ou
 dynamique.
 
-\PAR{}
+
 Un common est repre'sente' par une \verb/entity/ dont le \verb/name/ est
 le nom du common, le \verb/type/ est un \verb/area/ qui donne la
 longueur du common en octets, le \verb/storage/ est un \verb/ram/ qui
 indique la fonction ou` le common est declare' (\verb/function/) et
 l'aire ou` le common est range' (\verb/section/)..
 
-\PAR{}
+
 Le nom des commons est pre'fixe' par un '\_', comme les autres
 identificateurs globaux.
 
-\PAR{Variables -- Ge'ne'ralite's}
-\PAR{}
+\paragraph{Variables -- Ge'ne'ralite's}
+
 Les variables scalaires sont traite'es comme des tableaux a` 0 dimension.
 
-\PAR{}
+
 Une variable est repre'sente'e par une \verb/entity/ dont le \verb/name/ est le
 nom de la variable. 
 
-\PAR{Variables -- Types}
-\PAR{}
+\paragraph{Variables -- Types}
+
 Le \verb/type/ d'une entite' ``variable{''} est un \verb/array/ qui donne le type
 fortran des e'le'ments (\verb/basic/), le nombre de dimensions (longueur de
 la liste \verb/dimensions/) et les bornes de chaque dimension.
 
-\PAR{Variables -- Allocation me'moire}
-\PAR{}
+\paragraph{Variables -- Allocation me'moire}
+
 Le \verb/storage/ d'une entite' ``variable re'sultat de fonction'' est un
 \verb/return/ qui indique la fonction contenant cette variable.
 
-\PAR{}
+
 Le \verb/storage/ d'une entite' ``variable parame`tre formel'' est un
 \verb/formal/ qui indique la fonction contenant ce parame`tre et le rang de
 ce parame`tre dans la liste des parame`tres formels.
 
-\PAR{}
+
 Le \verb/storage/ d'une entite' ``variable locale ou globale{''} est un \verb/ram/
 qui indique dans quelle fonction la variable est de'clare'e
 (\verb/function/), a` quelle aire (common ou aire spe'ciale) elle appartient
 (\verb/section/) et quelle est son adresse dans ce common (\verb/offset/).
 
-\PAR{Variable -- Valeur initiale}
-\PAR{}
+\paragraph{Variable -- Valeur initiale}
+
 Le \verb/initial/ d'une entite' ``variable{''} vaut \verb/unknown/ sauf
 si cette variable est de type entier et est initialise'e par data. Dans
 le cadre de la paralle'lisation, on ne s'inte'resse pas aux autres variables.
 
-\PAR{Constantes nume'riques et symboliques}
-\PAR{}
+\paragraph{Constantes nume'riques et symboliques}
+
 Les constantes sont conside're'es comme des fonctions. Elles sont donc
 repre'sente'es par des entite's dont le \verb/name/ est le nom de la
 constante (\verb/12/, \verb/13.56E12/, \verb/'*NOMBRE DE FACETTES:*'/, \verb/PI/, \verb/MAXITER/,
@@ -1167,8 +1168,8 @@ re'sultat qui donne le type de la constante, dont le \verb/storage/ est un
 \verb/rom/ et dont le \verb/initial/ est un \verb/constant/ pour les constantes
 nume'riques et un \verb/symbolic/ pour les constantes symboliques.
 
-\PAR{Ope'rateurs}
-\PAR{}
+\paragraph{Ope'rateurs}
+
 Les ope'rateurs Fortran sont conside're's comme des fonctions. Ils sont
 donc repre'sente's par des entite's dont le \verb/name/ est le nom de
 l'ope'rateur, et dont le \verb/type/ est un \verb/functional/ qui indique l'arite'
@@ -1177,20 +1178,20 @@ pas le type des parame`tres ou du re'sultat car le sous-domaine \verb/basic/
 vaut toujours \verb/overloaded/. Le storage d'un ope'rateur est un \verb/rom/ et
 son initial un \verb/intrinsic/.
 
-\PAR{Intrinsics}
-\PAR{}
+\paragraph{Intrinsics}
+
 Les intrinsics Fortran (MAX, MIN, ABS, etc.) sont traite's comme des
 ope'rateurs. 
 
-\PAR{Labels}
-\PAR{}
+\paragraph{Labels}
+
 Les labels sont repre'sente's par des entite's dont le \verb/name/ est
 le nom du label pre'fixe' par un '\verb/@/', dont le \verb/type/ vaut
 \verb/statement/, dont le \verb/storage/ vaut \verb/rom/ et dont le
 \verb/initial/ est une constante litterale.
 
-\PAR{Instructions simples}
-\PAR{}
+\paragraph{Instructions simples}
+
 Les instructions simples de Fortran telles que RETURN, CONTINUE, STOP,
 READ, WRITE, PAUSE, END, ... sont conside're'es comme des fonctions
 intrinse`ques.  Elles sont donc repre'sente'es par des entite's qui ont
@@ -1198,18 +1199,18 @@ les me^mes caracte'ristiques qu'un ope'rateur a` 0 parame`tre. On ne
 tient pas a jour le nombre de parame`tres car il ne sert a` peu pre`s a`
 rien et que de toute fac,on, il est variable.
 
-\PAR{}
+
 L'instruction PRINT est transforme'e en WRITE.
 
-\PAR{Instructions de contro^le}
-\PAR{}
+\paragraph{Instructions de contro^le}
+
 Toutes les instructions de contro^le du sous-Fortran que nous acceptons
 en entre'e, a` l'exception de l'instruction \verb/DO/, sont
 transforme'es {\em automatiquement} en se'quences e'quivalentes de tests
 a` deux branches (une vraie et une fausse), de branchements
 inconditionnels et de boucles do.
 
-\PAR{}
+
 \begin{verbatim}
       IF (I) 10, 20, 30
 \end{verbatim}
@@ -1226,7 +1227,7 @@ devient
       ENDIF
 \end{verbatim}
 
-\PAR{}
+
 \begin{verbatim}
       IF (I.GT.J) I = I-J
 \end{verbatim}
@@ -1239,13 +1240,13 @@ devient
       ENDIF
 \end{verbatim}
 
-\PAR{Arguments des instructions d'entre'es-sorties}
-\PAR{}
+\paragraph{Arguments des instructions d'entre'es-sorties}
+
 Les arguments des instructions d'entre'es-sorties sont soit des
 informations de contro^le (unite', format, longueur des enregistrements,
 etc.), soit des re'fe'rences a` lire ou des expressions a` e'crire. 
 
-\PAR{}
+
 Dans notre repre'sentation, les arguments des instructions
 d'entre'es-sorties sont des listes de couples d'expressions. La
 premie`re expression du couple est une constante chaine de caracte`res
@@ -1253,27 +1254,27 @@ qui indique la nature de l'argument qui apparaissait dans l'instruction
 Fortran (\verb/UNIT=/, \verb/FORMAT=/, \verb/RECL=/, ...). La seconde
 expression est la valeur de cet argument.
 
-\PAR{}
+
 Le dernier couple de la liste d'un READ ou d'un WRITE n'est pas un vrai
 couple: le premier e'le'ment est une expression constante qui vaut
 \verb/IOLIST=/, et le second e'le'ment est une liste d'expressions qui sont
 les re'fe'rences a` lire ou les expressions a` e'crire.
 
-\PAR{Boucles implicites}
-\PAR{}
+\paragraph{Boucles implicites}
+
 Les boucles do implicites dans les entre'es-sorties sont repre'sente'es
 par des appels a` un ope'rateur pre'de'fini (en fait une fonction) de
 nom \verb/IMPLIED-DO/, qui prend comme arguments une entite' qui de'finit
 l'indice de la boucle, une expression \verb/range/ qui de'finit les bornes de
 la boucle, et une liste d'expressions.
 
-\PAR{Formats}
-\PAR{}
+\paragraph{Formats}
+
 Les formats sont conserve's sous forme d'expressions constantes chaines
 de caracte`res. La constante de nom '*F*' est pre'de'finie pour les
 formats libres (list-directed).
 
-\PAR{}
+
 Voici un exemple d'instruction d'entre'es-sorties.
 \begin{verbatim}
       READ(2,'(5E16.6)') (IMD(I),I=1,NDOM), K
