@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1995/12/18 19:11:07 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1995/12/19 10:55:23 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -875,7 +875,7 @@ free_leaf_in( obj, bp )
 gen_chunk *obj ;
 struct gen_binding *bp ;
 {
-    return !IS_TABULATED(bp) && !free_already_seen_p(obj) ;
+    return !IS_TABULATED(bp)/* && !free_already_seen_p(obj) */; /* ??? */
 }
 
 /* FREE_LEAF_OUT manages external types. */
@@ -896,6 +896,7 @@ struct gen_binding *bp ;
 	}
 	return ;
     }
+    else
     if( IS_EXTERNAL( bp )) {
 	if( bp->domain->ex.free == NULL ) {
 	    user( "gen_free: uninitialized external type %s\n",
@@ -1140,21 +1141,29 @@ struct driver *dr ;
 
 /* Just check for defined simple domains. */
 
-static int copy_simple_in( obj, dp )
-gen_chunk *obj ;
-union domain *dp ;
+static int 
+copy_simple_in(
+    gen_chunk *obj,
+    union domain *dp)
 {
-    switch( dp->ba.type ) {
+    bool persistence = dp->ba.persistant;
+
+    /* persistent arcs are put as copy of themself... 
+     */
+    if (persistence)
+	copy_hput(copy_table, (char *) obj->p, (char *) obj->p);
+
+    switch(dp->ba.type) {
     case BASIS_DT:
-	return( GO) ;
+	return(!persistence);
     case LIST_DT:
-	return( obj->l != list_undefined ) ;
+	return(!persistence && obj->l!=list_undefined);
     case SET_DT:
-	return( obj->t != set_undefined ) ;
+	return(!persistence && obj->t!=set_undefined);
     case ARRAY_DT:
-	return( obj->p != array_undefined ) ;
+	return(!persistence && obj->p!=array_undefined);
     }
-    fatal( "copy_simple_in: unknown type %s\n", itoa( dp->ba.type )) ;
+    fatal("copy_simple_in: unknown type %s\n", itoa(dp->ba.type));
 
     return(-1); /* just to avoid a gcc warning */
 }
@@ -1275,7 +1284,8 @@ union domain *dp ;
    (according to the type DP). The components are copied by the recursive
    traversal functions */
 
-static void copy_simple_out(obj,dp)
+static void 
+copy_simple_out(obj,dp)
 gen_chunk *obj ;
 union domain *dp ;
 {
@@ -1345,7 +1355,7 @@ struct driver *dr ;
 	bool cp_domain = (COPYABLE_DOMAIN( dlp->domain )) ;
 	bool cp_codomain = (COPYABLE_DOMAIN( dlp->cdr->domain )) ;
 	
-	(new_obj+data)->h = hash_table_make( hash_table_type((obj+data)->h), 0) ;
+	(new_obj+data)->h = hash_table_make(hash_table_type((obj+data)->h), 0);
 
 	HASH_MAP( k, v, {
 	    k =  (cp_domain ? (char *)copy_hsearch( (gen_chunk *)k ) : k) ;
@@ -1359,8 +1369,8 @@ struct driver *dr ;
     }
 }
 
-
-static void copy_obj_out(obj,bp,dr)
+static void 
+copy_obj_out(obj,bp,dr)
 gen_chunk *obj ;
 struct gen_binding *bp ;
 struct driver *dr ;
@@ -1424,7 +1434,6 @@ gen_local_copy_tree(
     {	
 	pop_gen_trav_env() ;
 	hash_table_free(copy_table);
-	copy_table = (hash_table) NULL;
 	copy_table = old_copy_table;
     }
 
