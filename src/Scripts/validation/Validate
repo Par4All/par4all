@@ -1,0 +1,347 @@
+#! /bin/sh
+#
+# (parallel) validation, Fabien Coelho, March 1994
+#
+# SCCS Stuff:
+# $RCSfile: Validate,v $ ($Date: 1994/03/23 11:13:25 $, ), version $Revision$,
+# got on %D%, %T%
+# $Id$
+#
+
+#
+# get the environment if necessary
+
+[ "$PIPSDIR" ] || . /home/users/pips/Pips/pipsrc.sh
+
+#
+# should be in the environment
+
+# why does pwd sometimes return /home/users/pips on chailly?
+# sh and pwd are not very clever:-)
+
+REAL_PIPSHOME=`(cd $PIPSHOME/../pips;pwd)`
+
+#
+
+unset UPDATE VALIDOPT PERFORMANCE
+
+VALDIR="$PIPSDIR/Tests/Validation"
+VALID="$UTILDIR/validate"
+
+PING='/usr/etc/ping'
+MAIL='/usr/ucb/mail'
+DATE='/usr/bin/date'
+
+HOSTNAME=`hostname`
+USER=`whoami`
+PWD=`pwd`
+failed=""
+
+# defaults
+
+DEBUG=":"
+DEBUG2=":"
+VERBOSE=":"
+PARALLEL="1"
+
+#
+# functions
+
+debug()
+{
+  echo "$@" >&2
+}
+
+unstammer()
+{
+    unst_f1=""
+    unst_f2=""
+    unst_sep=${2:-:}
+    unst_counter=1;
+
+    for unst_f1 in `
+    for unst_f2 in \`echo "$1" | tr "$unst_sep" ' '\`
+    do
+      echo "$unst_counter	$unst_f2"
+      unst_counter=\`expr $unst_counter + 1\`
+    done | sort +1d -2 +0n -1 | uniq -1 | sort +0n -1 | cut -f 2 `
+    do
+      echo -n "$unst_sep$unst_f1"
+    done
+}
+
+#
+# keeps alive hosts from the list
+#
+alive()
+{
+  for v_host in `echo $1 | tr ':' ' '`
+  do
+    $PING $v_host > /dev/null 2>&1 && echo -n ":$v_host"
+  done
+}
+
+#
+# gives the pips to be run
+#
+which_pips()
+{
+  if [ -x pips ]
+  then 
+    echo $PWD/`ls -F pips`
+  else
+    type pips | sed 's,^pips is ,,'
+  fi
+}
+
+#
+# on errors
+#
+validate_usage()
+{
+  {
+    echo "Usage: $0 [-dsvpnhtuVD] [-r dir] [-l dir] [-x pips] [Modules]"
+    echo "   -d: debug"
+    echo "   -D: more debug"
+    echo "   -s: silent (default)"
+    echo "   -v: verbose"
+    echo "   -V: more verbose"
+    echo "   -p: parallel (default)"
+    echo "   -n: sequential"
+    echo "   -h: help"
+    echo "   -t: timing"
+    echo "   -u: update (default 30)"
+    echo "   -r dir: run directory (default .)"
+    echo "   -l dir: lock directory (default .)"
+    echo "   -x pips: pips to be used (default . then Production)"
+  } >&2
+  exit ${1:-1}
+}
+
+#
+# I'm not so happy of that function...
+# an allow null_glob_expansion would have been nicer
+#
+prefix_file_exists()
+{
+  $DEBUG2 " | in prefix_file_exists for $1"
+  test "`echo -n $1.* | tr -cs '*' ' '" = " *" || \
+  { echo "1" ; $DEBUG2 " | found" ; return;}
+  $DEBUG2 " | not found"
+}
+
+#
+# finds an availbale host
+#   waits for the termination of one run
+#   stores the result and
+#   gives the available hostname back
+#
+available_host()
+{
+  [ ! "`prefix_file_exists $WAITING`" ] && return 1
+  #
+  # waiting
+  #
+  while [ ! "`prefix_file_exists $RESULT`" ]
+  do
+    $DEBUG " | sleep" 
+    sleep ${UPDATE:-30}
+  done
+  #
+  # get the result, hostname and remove the lock files
+  #
+  ah_file=`echo -n $RESULT.* | tr ' ' '\012' | head -1`
+  failed="$failed-"`cat $ah_file`
+  ah_host=`basename $ah_file | cut -d. -f 5`
+  rm -f $WAITING.$ah_host $RESULT.$ah_host
+  #
+  # available host
+  #
+  $DEBUG2 " | available host found: $ah_host"
+  echo $ah_host
+}
+
+#
+# date taken for timing
+#
+local_date()
+{
+  $DATE +"%h %d %y, %T"
+}
+
+#
+# to avoid nfs problems
+#
+absolute_name()
+{
+  echo $1 | sed "s,^$REAL_PIPSHOME,$PIPSHOME,"
+}
+
+#
+# get options
+
+while getopts DVudtsvpnhr:l:x: opt
+do
+  case $opt in
+    d) DEBUG="debug" ;;
+    D) DEBUG="debug"; DEBUG2="debug";  VALIDOPT="$VALIDOPT -d" ;;
+    t) PERFORMANCE="begin `local_date`" ;;
+    v) VERBOSE="echo" ;;
+    V) VERBOSE="echo" ; VALIDOPT="$VALIDOPT -v";;
+    s) VERBOSE=":" ;;
+    p) PARALLEL="1" ;;
+    n) PARALLEL="" ;;
+    r) RUNDIR="$OPTARG" ;;
+    l) LOCKDIR="$OPTARG" ;;
+    x) pips_version="$OPTARG" ;;
+    h) validate_usage 0 ;;
+    u) UPDATE="$OPTARG" ;;
+    *) echo  ; validate_usage 1
+  esac
+done
+
+shift `expr $OPTIND - 1`
+
+#
+# some default cases
+
+RUNDIR=`absolute_name ${RUNDIR:-$PWD}`
+LOCKDIR=`absolute_name ${LOCKDIR:-$RUNDIR}`
+
+#
+# lock names
+
+WAITING="$LOCKDIR/.validate_waiting.$HOSTNAME.$$"
+RESULT="$LOCKDIR/.validate_result.$HOSTNAME.$$"
+
+#
+# the working directory
+
+cd $RUNDIR
+ 
+#
+# variables
+
+default_file="$VALDIR/defaults"
+default_test="default_test"
+subject="PIPS Validation Suite Report"
+pips_version=`absolute_name ${pips_version:-\`which_pips\`}`
+
+$DEBUG " | $USER on $HOSTNAME"
+$DEBUG2 " | real PIPSHOME: $REAL_PIPSHOME"
+
+#
+# modules to be checked by the validation
+
+case $# in
+  0) MODULES=`sed /#/d < $default_file | tr -s '\012' ' '` ;;
+  *) MODULES="$*"
+esac
+
+$DEBUG2 " | MODULES 1: $MODULES"
+MODULES=`unstammer "$MODULES" ' '`
+
+$VERBOSE "Modules: $MODULES"
+
+#
+# hosts to be used by the validation
+
+VALHOSTS=$HOSTNAME
+
+if [ "$PARALLEL" ]
+then
+  VALHOSTS="$VALHOSTS:${PIPS_HOSTS:-chailly:moret}"
+fi
+
+$DEBUG2 " | VALHOSTS 1: $VALHOSTS"
+VALHOSTS=`unstammer $VALHOSTS`
+
+$DEBUG2 " | VALHOSTS 2: $VALHOSTS"
+VALHOSTS=`alive $VALHOSTS`
+
+$VERBOSE "Hosts: $VALHOSTS"
+
+#
+# Sequential case
+
+[ ! "$PARALLEL" ] && \
+{
+  $VERBOSE "sequential validation"
+  $VERBOSE $VALID -r $RUNDIR $VALIDOPT $MODULES
+  exec $VALID -r $RUNDIR -x "$pips_version" -u  $VALIDOPT $MODULES
+}
+
+#
+# Parallel case
+
+$VERBOSE "parallel validation"
+$VERBOSE " - with $pips_version"
+$VERBOSE " - in $RUNDIR"
+
+$VERBOSE "creating initial locks"
+
+for h in `echo $VALHOSTS | tr ':' ' '`
+do
+  $DEBUG " | initial lock for $h"
+  touch $WAITING.$h $RESULT.$h
+done
+
+#
+
+$VERBOSE "validating modules"
+
+for m in $MODULES
+do
+  h=`available_host`
+  $VERBOSE " - validate $m on $h "
+  $DEBUG " | rsh $h \ "
+  $DEBUG " | $VALID \ "
+  $DEBUG " |   -r $RUNDIR \ "
+  $DEBUG " |   -l $RESULT \ "
+  $DEBUG " |   -x $pips_version \ "
+  $DEBUG " |   -u $VALIDOPT $m"
+  rsh $h $VALID -r $RUNDIR -l $RESULT -x "$pips_version" -u $VALIDOPT $m &
+  touch $WAITING.$h
+done
+
+#
+
+$VERBOSE "waiting for reports"
+
+while available_host ; do : ; done
+
+#
+#
+
+$VERBOSE "generating final report"
+
+$DEBUG2 " | failed 0: +$failed+"
+
+failed=`unstammer "$failed" '-'`
+
+$DEBUG " | failed : +$failed+"
+
+if [ "$failed" ]
+then
+  final="failed: [$failed]"
+else
+  final="succeeded"
+fi
+
+[ "$PERFORMANCE" ] && PERFORMANCE="$PERFORMANCE, end `local_date`"
+
+$MAIL -s "$subject" $USER <<%
+Your Validation Suite Test for
+
+$MODULES
+
+$final with $pips_version
+
+$PERFORMANCE
+
+In case of problems, contact <jouvelot@cri.ensmp.fr>
+%
+
+#
+# that's all
+#
