@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: messages.c,v $
+ * Revision 1.18  1997/07/25 22:25:56  keryell
+ * Avoid to put comments on sequences.
+ *
  * Revision 1.17  1997/03/20 10:23:02  coelho
  * RCS headers.
  *
@@ -663,7 +666,7 @@ bool bsend;
 	    neighbour>0 ? "+" : "-", abs(neighbour));
     buf += strlen(buf);
 
-    statement_comments(result) = strdup(buffer);
+    insert_comments_to_statement(result, buffer);
     return result;
 }
 
