@@ -1,9 +1,7 @@
 c
-c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1995/09/07 10:24:43 $, )
+c $RCSfile: hpfc_shift.m4f,v $ ($Date: 1995/09/07 14:01:03 $, )
 c version $Revision$
 c got on %D%, %T% 
-c
-include(`hpfc_lib_m4_macros')dnl
 c
 c
       subroutine hpfc_tdim(array, dim, template, tdim)
