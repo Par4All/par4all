@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.24  2004/12/20 13:27:03  hurbain
+   Debug
+
    Revision 1.23  2004/12/20 13:12:23  hurbain
    Still debugging
 
@@ -917,19 +920,7 @@ static string claire_loop_from_sequence(loop l, int task_number){
   expression incr_e = range_increment(loop_range(l));
   syntax incr_s = expression_syntax(incr_e);
 
-  if(!syntax_call_p(incr_s) || 
-     strcmp( entity_local_name(call_function(syntax_call(incr_s))), "1") != 0 ) {
-    pips_user_error("Loop increments must be constant \"1\".\n");
-  }
 
-  *taskname = strdup(concatenate("T_", int_to_string(task_number), NULL));
-  gen_array_append(tasks_names, taskname);
-  /* (re-)initialize task-scoped arrays*/
-  extern_indices_array = gen_array_make(0);
-  intern_indices_array = gen_array_make(0);
-  extern_upperbounds_array = gen_array_make(0);
-  intern_upperbounds_array = gen_array_make(0);
-  
   /* Initialize result string with the declaration of the task */
   string result = strdup(concatenate(*taskname, 
 				     " :: TASK(unitSpentTime = vartype!(1),"
@@ -940,6 +931,21 @@ static string claire_loop_from_sequence(loop l, int task_number){
   string * name = malloc(sizeof(string));
   string * up = malloc(sizeof(string));
   int u, low;
+  if(!syntax_call_p(incr_s) || 
+     strcmp( entity_local_name(call_function(syntax_call(incr_s))), "1") != 0 ) {
+    pips_user_error("Loop increments must be constant \"1\".\n");
+  }
+
+
+  *taskname = strdup(concatenate("T_", int_to_string(task_number), NULL));
+  gen_array_append(tasks_names, taskname);
+  /* (re-)initialize task-scoped arrays*/
+  extern_indices_array = gen_array_make(0);
+  intern_indices_array = gen_array_make(0);
+  extern_upperbounds_array = gen_array_make(0);
+  intern_upperbounds_array = gen_array_make(0);
+  
+
   *name = claire_entity_local_name(loop_index(l));
   u = atoi(claire_expression(range_upper(loop_range(l))));
   low = atoi(claire_expression(range_lower(loop_range(l))));
@@ -1067,12 +1073,13 @@ static string claire_sequence_from_task(sequence seq){
    and thus $stat is obligatory a sequence. */
 static string claire_tasks(statement stat){
   int j;
+  instruction i;
   string result = "tasks\n";
     if(statement_number(stat) < 0)
     {
       pips_user_error("statement error");
     }
-  instruction i = statement_instruction(stat);
+    i = statement_instruction(stat);
   tasks_names = gen_array_make(0);
   switch(instruction_tag(i)){
   case is_instruction_sequence:{
