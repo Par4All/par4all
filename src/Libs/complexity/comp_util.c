@@ -464,13 +464,16 @@ void init_cost_table()
     char *token, *comma, *file = malloc(80);
     float file_factor;
 
-    char *cost_dir = (char *)getenv("PIPS_COSTDIR");
+    char *cost_dir = strdup(getenv("PIPS_COSTDIR"));
     char *cost_table = strdup(get_string_property("COMPLEXITY_COST_TABLE"));
     char *cost_data = strdup(COST_DATA);
     char *tmp=malloc(20);
 
-    pips_assert("some directory and table",
-		cost_dir!=NULL && cost_table!=NULL);
+    if (!cost_dir) /* the default value: PIPS_ROOT/Share/complexity */
+	cost_dir = strdup(concatenate(getenv("PIPS_ROOT"),
+				      "/Share/complexity", NULL));
+
+    pips_assert("some directory and table", cost_dir && cost_table);
     token = strtok(cost_data, sep_chars);
 
     while (token != NULL) {
@@ -495,8 +498,10 @@ void init_cost_table()
 	load_cost_file(file, file_factor);
 	token = strtok(NULL, sep_chars);
     }
+
+    free(cost_dir);
 }
-
+
 /* 
  * Load (some) intrinsics costs from file "filename", 
  * multiplying them by "file_factor".
