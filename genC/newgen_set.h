@@ -62,5 +62,6 @@ extern set set_singleton GEN_PROTO(( set_type, char * )) ;
 extern set set_union GEN_PROTO(( set, set, set )) ;
 extern bool set_empty_p GEN_PROTO(( set )) ;
 extern void gen_set_closure GEN_PROTO(( void(*)(char*,set), set )) ;
+extern int set_own_allocated_memory GEN_PROTO((set));
 
 #endif
