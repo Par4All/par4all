@@ -239,6 +239,7 @@ void fprint_entity_list(FILE *fp, list l);
 
 #define MYPOS		"MYPOS"
 #define MYLID		"MYLID"
+#define MSTATUS		"MSTATUS"  		/* remapping status */
 #define NODETIDS	"NODETIDS"
 #define HOST_TID	"HOSTTID"
 #define NBTASKS		"MAXSIZEOFPROCS"
