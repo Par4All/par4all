@@ -1,4 +1,7 @@
 /* $Id$
+ *
+ * each full syntax looks for ENDOFLINE so as to check that the right
+ * number of arguments is matched.
  */
 
 %token OPEN
@@ -34,9 +37,10 @@
 
 %token NAME
 %token A_STRING
+%token ENDOFLINE
 
 %type <name>   NAME A_STRING propname phasename resourcename
-%type <status> line instruction
+%type <status> instruction
 %type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd
 %type <name> rulename filename 
@@ -80,6 +84,7 @@ extern bool tpips_execution_mode;
 
 #define YYERROR_VERBOSE 1 /* MUCH better error messages with bison */
 
+extern void tpips_set_line_to_parse(string);
 extern int yylex(void);
 extern void yyerror(char *);
 
@@ -96,7 +101,7 @@ free_owner_content(res_or_rule * pr)
 void 
 close_workspace_if_opened(void)
 {
-    if (db_get_current_workspace_name() != NULL)
+    if (db_get_current_workspace_name())
 	close_workspace();
 }
 
@@ -120,11 +125,8 @@ set_env(string var, string val)
 
 %%
 
-line:   instruction 
-    ;
-
 instruction:
-	  i_open
+	  i_open 
 	| i_create
   	| i_close
 	| i_delete
@@ -142,7 +144,7 @@ instruction:
 	| error {$$ = FALSE;}
 	;
 
-i_cd: CDIR NAME 
+i_cd: CDIR NAME ENDOFLINE
 	{
 	    user_log("cd %s\n", $2);
 	    if (chdir($2)) fprintf(stderr, "error while changing directory\n");
@@ -150,7 +152,7 @@ i_cd: CDIR NAME
 	}
 	;
 
-i_pwd: PWD
+i_pwd: PWD ENDOFLINE
 	{
 	    char pathname[MAXPATHLEN];
 	    fprintf(stdout, "current working directory: %s\n", 
@@ -158,7 +160,7 @@ i_pwd: PWD
 	}
 	;
 
-i_getenv: GET_ENVIRONMENT NAME
+i_getenv: GET_ENVIRONMENT NAME ENDOFLINE
 	{
 	    string val = getenv($2);
 	    user_log("getenv %s\n", $2);
@@ -168,13 +170,13 @@ i_getenv: GET_ENVIRONMENT NAME
 	}
 	;
 
-i_setenv: SET_ENVIRONMENT NAME NAME
+i_setenv: SET_ENVIRONMENT NAME NAME ENDOFLINE
 	{
 	    set_env($2, $3);
 	    user_log("setenv %s %s\n", $2, $3);
 	    free($2); free($3);
 	}
-	| SET_ENVIRONMENT NAME EQUAL NAME
+	| SET_ENVIRONMENT NAME EQUAL NAME ENDOFLINE
 	{
 	    set_env($2, $4);
 	    user_log("setenv %s %s\n", $2, $4);
@@ -182,7 +184,7 @@ i_setenv: SET_ENVIRONMENT NAME NAME
 	}
 	;
 
-i_open:	OPEN NAME 
+i_open:	OPEN NAME ENDOFLINE
 	{
 	    string main_module_name;
 
@@ -214,7 +216,8 @@ i_open:	OPEN NAME
 	}
 	;
 
-i_create: CREATE NAME /* workspace name */ filename_list /* fortran files */
+i_create: CREATE NAME /* workspace name */ 
+		filename_list /* fortran files */ ENDOFLINE
 	{
 	    string main_module_name;
 	    pips_debug(7,"reduce rule i_create\n");
@@ -259,7 +262,7 @@ i_create: CREATE NAME /* workspace name */ filename_list /* fortran files */
 	}
 	;
 
-i_close: CLOSE
+i_close: CLOSE ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_close\n");
 
@@ -278,7 +281,7 @@ i_close: CLOSE
 	}
 	;
 
-i_delete: DELETE NAME /* workspace name */
+i_delete: DELETE NAME /* workspace name */ ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_delete\n");
 
@@ -309,7 +312,7 @@ i_delete: DELETE NAME /* workspace name */
 	}
 	;
 
-i_module: MODULE NAME /* module name */
+i_module: MODULE NAME /* module name */ ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_module\n");
 
@@ -327,7 +330,7 @@ i_module: MODULE NAME /* module name */
 	}
 	;
 
-i_make:	MAKE resource_id
+i_make:	MAKE resource_id ENDOFLINE
 	{
 	    bool result = TRUE;
 	    pips_debug(7,"reduce rule i_make\n");
@@ -364,7 +367,7 @@ i_make:	MAKE resource_id
 	}
 	;
 
-i_apply: APPLY rule_id
+i_apply: APPLY rule_id ENDOFLINE
 	{
 	    bool result = TRUE;
 	    /* keep track of the current module, if there is one */
@@ -406,7 +409,7 @@ i_apply: APPLY rule_id
 	}
 	;
 
-i_display: DISPLAY resource_id
+i_display: DISPLAY resource_id ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_display\n");
 	    if (tpips_execution_mode) {
@@ -457,7 +460,7 @@ i_display: DISPLAY resource_id
 	}
 	;
 
-i_activate: ACTIVATE rulename
+i_activate: ACTIVATE rulename ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_activate\n");
 	    if (tpips_execution_mode) {
@@ -474,7 +477,7 @@ i_activate: ACTIVATE rulename
 	}
 	;
 
-i_get: GET_PROPERTY propname
+i_get: GET_PROPERTY propname ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_get (%s)\n", $2);
 	    
@@ -485,7 +488,7 @@ i_get: GET_PROPERTY propname
 	}
 	;
 
-i_source: SOURCE filename_list
+i_source: SOURCE filename_list ENDOFLINE
 	{
 	    int n = gen_array_nitems($2), i=0;
 	    for(; i<n; i++) { 
