@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/11/14 14:43:51 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/11/14 14:44:29 $, )
  * version $Revision$
  */
 
@@ -91,7 +91,6 @@ current_entity_is_updated_before_p(statement stat, entity current_entity)
 	},
 	list_in);
 
-    free_in_regions_map();
     return FALSE;
 }
 
