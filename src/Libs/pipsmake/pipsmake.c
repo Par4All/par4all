@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.65  1998/12/02 14:32:32  irigoin
+ * Function reset_static_phase_variables() added to improve error handlers such as catch_user_error()
+ *
  * Revision 1.64  1998/07/22 17:52:06  coelho
  * delete a resource as soon as it is found obsolete......
  *
@@ -92,6 +95,7 @@ static bool catch_user_error(bool (*f)(char *), string rname, string oname)
     bool success = FALSE;
 
     if(setjmp(pipsmake_jump_buffer)) {
+	reset_static_phase_variables();
 	success = FALSE;
     }
     else {
@@ -151,8 +155,35 @@ void reinit_make_cache_if_necessary(void)
 	reset_make_cache(), init_make_cache();
 }
 
+/* Static variables used by phases must be reset on error although
+   pipsmake does not know which ones are used. */
+void reset_static_phase_variables()
+{
+    extern void error_reset_current_module_entity(void);
+    extern void error_reset_current_module_statement(void);
+    extern void error_reset_rw_effects(void);
+    extern void error_reset_invariant_rw_effects(void);
+    extern void error_reset_proper_rw_effects(void);
+    extern void error_reset_cumulated_rw_effects(void);
+    extern void reset_transformer_map(void);
+    extern void error_reset_value_mappings(void);
 
-/* Apply an instanciated rule with a given ressource owner 
+    /* From ri-util/static.c */
+    error_reset_current_module_entity();
+    error_reset_current_module_statement();
+
+    /* Macro-generated resets */
+    error_reset_rw_effects();
+    error_reset_invariant_rw_effects();
+    error_reset_proper_rw_effects();
+    error_reset_cumulated_rw_effects();
+    reset_transformer_map();
+
+    /* Special cases */
+    error_reset_value_mappings();
+}
+
+/* Apply an instantiated rule with a given ressource owner 
  */
 
 static bool rmake(string, string);
@@ -1091,6 +1122,7 @@ static bool safe_do_something(
     {
 	/* global variables that have to be reset after user-error */
 	reset_make_cache();
+	reset_static_phase_variables();
 	retrieve_active_phases();
 	pips_user_warning("Request aborted in pipsmake: "
 			  "build %s %s for module %s.\n", 
