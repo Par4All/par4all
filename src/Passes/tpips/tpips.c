@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.118  2003/06/16 13:25:50  coelho
+ * is_quit
+ *
  * Revision 1.117  2002/04/24 10:01:49  coelho
  * initialization fixed for jpips I/O streams.
  * stdin and stdout are not constants under linux.
@@ -887,6 +890,12 @@ void tpips_help(string line)
     fflush(stdout);
 }
 
+static void close_workspace_if_opened(boolean is_quit)
+{
+    if (db_get_current_workspace_name())
+	close_workspace(is_quit);
+}
+
 void tpips_close(void)
 {
     /*   close history: truncate list and write history file
@@ -899,7 +908,7 @@ void tpips_close(void)
 	write_history(file_name);
     }    
 
-    close_workspace_if_opened();
+    close_workspace_if_opened(TRUE);
 
     if (logfile) {
 	safe_fclose (logfile, "the log file");
