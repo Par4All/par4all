@@ -1,5 +1,5 @@
 /* $RCSfile: sc_build_sc_nredund.c,v $ (version $Revision$)
- * $Date: 2001/10/11 14:57:25 $, 
+ * $Date: 2003/07/28 09:06:41 $, 
  */
 
 #include <stdio.h>
@@ -13,34 +13,47 @@
 
 /* This function returns TRUE if the inequation ineq is redundant for the
  * system ps and FALSE otherwise.
- * sc and ineq are not modified by the
- * function.
+ * sc and ineq are not modified by the function.
  *
  * Inequality ineq may not be redundant wrt ps for rational numbers and
  * nevertheless TRUE is returned if it is redundant wrt integer points.
  *
+ * A bug found here: if we have input sc==NULL with ineq=NULL, then we'll have to test the satisfiability
+ * of a sc that has a base null and an ineq (core dump): because in sc_add_inegalite, we test only if the 
+ * pointers (sc,ineg) are null.
+ * The encountered case is that the pointer not null but his all elements are null
+ * or except only one element. This means the constraint is not valid.
+ *
+ * DN 2/1/2003
+ * The same with eq_redund_with_sc_p 
+ * Modifs:
+ * - change _dup to _copy
+ * - correct the bug
  */
  
 boolean ineq_redund_with_sc_p(sc, ineq)
 Psysteme sc;
 Pcontrainte ineq;
 {
-    Psysteme ps= sc_dup(sc);
-    Pcontrainte ineg = contrainte_dup(ineq);
-    boolean result = FALSE;
+  Psysteme ps;
+  Pcontrainte ineg;
+  boolean result = FALSE;  
+ 
+  if (CONTRAINTE_NULLE_P(ineq)) {return FALSE;}//nothing to test
+  ps = sc_copy(sc);
+  ineg = contrainte_copy(ineq);
+    
+  sc_add_inegalite(ps,ineg);
 
-    contrainte_reverse(ineg);
-    sc_add_inegalite(ps,ineg);
+  base_rm(sc_base(ps));
+  sc_base(ps) = BASE_NULLE;
+  sc_creer_base(ps);
 
-    base_rm(sc_base(ps));
-    sc_base(ps) = BASE_NULLE;
-    sc_creer_base(ps);
-
-    /* test de sc_faisabilite avec la nouvelle inegalite      */
-     if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,TRUE))
-	result = TRUE;
-    sc_rm(ps);
-    return(result);
+  /* test de sc_faisabilite avec la nouvelle inegalite      */
+  if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,TRUE))
+    result = TRUE;
+  sc_rm(ps);
+  return(result);
 }
 
 
@@ -52,7 +65,6 @@ Pcontrainte ineq;
  *    OUT: returned boolean
  *
  * true if eq is redundant with sc
- *
  * (c) FC 16/05/94
  */
 boolean eq_redund_with_sc_p(sc, eq)
@@ -64,7 +76,7 @@ Pcontrainte eq;
     else
     {
 	Pcontrainte
-	    c = contrainte_dup(eq);
+	    c = contrainte_copy(eq);
 	boolean
 	    res = ineq_redund_with_sc_p(sc, (contrainte_chg_sgn(c), c));
 	contrainte_free(c);
@@ -99,10 +111,10 @@ Psysteme s1, s2;
     for(c=sc_inegalites(s1);
 	c!=CONTRAINTE_UNDEFINED;
 	c=c->succ)
-	/* could be inlined to avoid costly sc_dup inside ineq_redund_with_sc_p
+	/* could be inlined to avoid costly sc_copy inside ineq_redund_with_sc_p
 	 */
 	if (!ineq_redund_with_sc_p(s2, c)) 
-	    cnew = contrainte_dup(c),
+	    cnew = contrainte_copy(c),
 	    cnew->succ = in,
 	    in = cnew;
     
@@ -112,7 +124,7 @@ Psysteme s1, s2;
 	c!=CONTRAINTE_UNDEFINED;
 	c=c->succ)
 	if (!eq_redund_with_sc_p(s2, c))
-	    cnew = contrainte_dup(c),
+	    cnew = contrainte_copy(c),
 	    cnew->succ = eq,
 	    eq = cnew;
 
@@ -170,7 +182,7 @@ int ofl_ctrl;
 	return;
     }
 
-    sc->egalites = contraintes_dup(ps->egalites);
+    sc->egalites = contraintes_copy(ps->egalites);
     sc->nb_eq = ps->nb_eq;
  
     for (ineq = ps->inegalites;
@@ -181,12 +193,16 @@ int ofl_ctrl;
 	 ineq=ineq->succ) 
     {
 	ineg = contrainte_dup(ineq);
-	contrainte_reverse(ineg);
+	contrainte_reverse(ineg); 
 	
 	sc_add_inegalite(sc,ineg);
 
+//DN: I'd like to change call of _dup by _copy, which can speed up the operation (as _dup and _reverse 
+//do the same thing: copy and change the order). But I'm not sure that I understand why we need to call 
+//contrainte_reverse(ineg) as below. So I leave it as as before. It's no good at all
+
 	if (sc_rational_feasibility_ofl_ctrl(sc,ofl_ctrl,TRUE))
-	    contrainte_reverse(ineg);
+	    contrainte_reverse(ineg);		
 	else {
 	    sc->inegalites = sc->inegalites->succ;
 	    ineg->succ = NULL;
@@ -209,14 +225,14 @@ Psysteme *ps;
 
   if (!sc_rn_p(*ps) && !sc_empty_p(*ps))
     {
-      Pbase b = base_dup(sc_base(*ps));
+      Pbase b = base_copy(sc_base(*ps));
       //  *ps = sc_sort_constraints_simplest_first(*ps, b);
       build_sc_nredund_1pass(ps);
       if (*ps == SC_EMPTY)
 	*ps = sc_empty(b);
       else {
 	base_rm(sc_base(*ps)); 
-	(*ps)->base = base_dup(b);
+	(*ps)->base = base_copy(b);
       }
     }
 }
@@ -245,7 +261,7 @@ int ofl_ctrl;
   if (SC_UNDEFINED_P(ps) || sc_rn_p(ps) || sc_empty_p(ps))
     return;
   
-  b = base_dup(sc_base(ps)); /* save base */
+  b = base_copy(sc_base(ps)); /* save base */
   ps = sc_normalize(ps);
 
   if (SC_UNDEFINED_P(ps)) {
@@ -264,13 +280,13 @@ Psysteme *ps;
 
   if (!sc_rn_p(*ps) && !sc_empty_p(*ps))
     {
-      Pbase b = base_dup(sc_base(*ps));
+      Pbase b = base_copy(sc_base(*ps));
       build_sc_nredund_2pass(ps);
       if (*ps == SC_EMPTY)
 	*ps = sc_empty(b);
       else {
 	base_rm(sc_base(*ps)); 
-	(*ps)->base = base_dup(b);
+	(*ps)->base = base_copy(b);
       }
     }
 }
@@ -376,6 +392,9 @@ int *rank_max;
  * The rational set defined by ps may be enlarged by this procedure
  * because an integer constraint negation is used.
  *
+ * Modifs: 
+ *  - change _dup to _copy, did take care of call of _reverse.DN
+ *  - the parameters of contrainte_dup, _copy, _reverse are not changed like base_dup, so it's ok.
  */
 
 Psysteme build_integer_sc_nredund(ps,index_base,tab_info,loop_level,dim_h,n)
@@ -394,14 +413,14 @@ int n;
     Value coeff;
     int sign;
 
-    sc->base = base_dup(ps->base);
+    sc->base = base_copy(ps->base);
     sc->dimension = ps->dimension; 
-    sc->inegalites = contrainte_dup(ps->inegalites);
+    sc->inegalites = contrainte_copy(ps->inegalites);
     sc->nb_ineq +=1;
 
     for (eq = ps->egalites;
 	 !CONTRAINTE_UNDEFINED_P(eq); eq=eq->succ) {
-	Pcontrainte pc=contrainte_dup(eq);
+	Pcontrainte pc=contrainte_copy(eq);
 	sc_add_eg(sc,pc);
     }
 
@@ -410,7 +429,7 @@ int n;
 	for (pred = ps->inegalites,ineq = (ps->inegalites)->succ;
 	     !CONTRAINTE_UNDEFINED_P(ineq); ineq=ineq->succ) {
 
-	    Pcontrainte ineg = contrainte_dup(ineq);
+	    Pcontrainte ineg = contrainte_copy(ineq);
 	    sc_add_inegalite(sc,ineg);	    
 
 	    /* search the characteristics of the variable of higher rank in 
@@ -431,10 +450,10 @@ int n;
 		       eliminated (the rank of variable is greater the
 		       number of loops) */
 
-		    contrainte_reverse(ineg);
+		  //		    contrainte_reverse(ineg);
 		    CATCH(overflow_error) {
 			pred = pred->succ;
-			contrainte_reverse(ineg);
+			//			contrainte_reverse(ineg);
 		    }
 		    TRY {
 			/* test de sc_faisabilite avec la nouvelle 
@@ -457,7 +476,7 @@ int n;
 			}
 
 			else { pred = pred->succ;
-			       contrainte_reverse(ineg);
+			// contrainte_reverse(ineg);
 			   }
 			UNCATCH(overflow_error);
 		    }
@@ -492,12 +511,12 @@ Variable var;
     if (!CONTRAINTE_UNDEFINED_P(ineq1) && !CONTRAINTE_UNDEFINED_P(ineq2)) {
 	
 	if (value_pos_p(vect_coeff(var,ineq1->vecteur))) {	    
-	    posit = contrainte_dup(ineq1);
-	    negat = contrainte_dup(ineq2);
+	    posit = contrainte_copy(ineq1);
+	    negat = contrainte_copy(ineq2);
 	}
 	else  {
-	    posit = contrainte_dup(ineq2);
-	    negat = contrainte_dup(ineq1);
+	    posit = contrainte_copy(ineq2);
+	    negat = contrainte_copy(ineq1);
 	}
 	
 	CATCH(overflow_error)
