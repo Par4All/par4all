@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.28  2004/01/15 14:02:13  guerin
+%% Adding FULL_SPAGHETTIFY phase for PHRASE project
+%%
 %% Revision 1.27  2004/01/12 16:26:38  guerin
 %% Adding new phases for PHRASE project
 %%
@@ -77,7 +80,7 @@
 %% and Atomizer.
 %%
 %% Revision 1.6  2003/04/08 13:22:20  keryell
-%% Added simdizer for François Ferrand.
+%% Added simdizer for François Ferrand.
 %%
 %% Revision 1.5  2002/11/22 14:53:35  phamdat
 %% MODULE.preconditions added to input of impact_check
@@ -563,7 +566,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2004/01/12 16:26:38 $~$
+$~$Date: 2004/01/15 14:02:13 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -635,13 +638,13 @@ $~$Date: 2004/01/12 16:26:38 $~$
 \newcommand{\Display}{\htmladdnormallink{\texttt{Display}}{http://www.cri.ensmp.fr/pips/Display.html}}
 \newcommand{\Delete}{\htmladdnormallink{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
 
-%% Pour Béatrice :
+%% Pour Béatrice :
 \newcommand{\exact}[0]{{\tt EXACT}}
 \newcommand{\incluseg}{\subseteq}
 \newcommand{\phik}[1]{\ifmmode\phi_{#1}\else$\phi_{#1}$\fi}
 \newcommand{\must}[0]{{\tt MUST}}
 \newcommand{\may}[0]{{\tt MAY}}
-%%ÿUserManualDeclarations
+%%ÿUserManualDeclarations
 
 \externallabels{http://www.cri.ensmp.fr/pips/ri}{public_html/ri/labels.pl}
 
@@ -657,7 +660,7 @@ $~$Date: 2004/01/12 16:26:38 $~$
 
 %\begin{PipsExample}
 %petit essai
-%à mettre ailleurs ! @!#%!#&@*I#(**()\\$$ pour tester
+%à mettre ailleurs ! @!#%!#&@*I#(**()\\$$ pour tester
 %\end{PipsExample}
 
 %% The environment used to mark up the menus layout :
@@ -982,7 +985,7 @@ Also the \texttt{include} file preprocessing is not reversed.
 %%@UserManualDocumentation: unsplit
 Regeneration of user files. The various modules that where initialy stored in
 single file are appended together in a file with the same name.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 
 alias unsplit 'User files Regeneration'
@@ -1544,7 +1547,7 @@ If chains based on regions have been selected, the simplest dependence
 test must be used because regions carry more information than any kind
 of preconditions. Preconditions and loop bound information already are
 included in the region predicate.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for Use-Def Chains}
 
@@ -1585,7 +1588,7 @@ problem, proper effects of DO loops do not include the index read effect
 due to the loop incrementation.
 
 Artificial arcs are added to... (Pierre Jouvelot, help!).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 atomic_chains                   > MODULE.chains
@@ -1611,7 +1614,7 @@ dependence tests are likely to lack accuracy because a transitive check has
 been added by Be'atrice Creusillet to improve speed. The other tests could
 not improve the simplest test based on regions. Note that it is not fast
 anymore when coping with regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 region_chains                   > MODULE.chains
@@ -1636,7 +1639,7 @@ implemented in \PIPS{}.
 As for region-based chains (see
 Section~\ref{subsubsection-read-write-region-based-chains}), the
 simplest dependence test should be selected for best results.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 in_out_regions_chains           > MODULE.chains
@@ -1735,7 +1738,7 @@ The main contributors for the design and development of dependence
 analysis are R\'emi Triolet, Fran\c{c}ois Irigoin and Yi-qing
 Yang~\cite{Y93}. The code was improved by Corinne Ancourt and B\'eatrice
 Creusillet.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for Dependence Tests}
 \label{subsubsection-menu-for-dependence-tests}
@@ -1758,7 +1761,7 @@ Use subscript expressions only (unless regions were used to compute
 use-def chains, in which case regions are used instead). {\tt
   rice\_regions\_dependence\_graph} is a synonym for this rule, but emits a
 warning if {\tt region\_chains} is not selected. 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 rice_fast_dependence_graph      > MODULE.dg
@@ -1774,7 +1777,7 @@ rice_fast_dependence_graph      > MODULE.dg
 
 %%@UserManualDocumentation: rice_full_dependence_graph
 Use subscript expressions and loop bounds.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 rice_full_dependence_graph      > MODULE.dg
@@ -1791,7 +1794,7 @@ rice_full_dependence_graph      > MODULE.dg
 %%@UserManualDocumentation: rice_semantics_dependence_graph
 Uses subscript expressions and preconditions
 (see~\ref{subsection-semantics-analysis}).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 rice_semantics_dependence_graph > MODULE.dg
@@ -1809,7 +1812,7 @@ rice_semantics_dependence_graph > MODULE.dg
 %%@UserManualDocumentation: rice_regions_dependence_graph
 Synonym for {\tt rice\_fast\_dependence\_graph}, except that it emits a
 warning when {\tt region\_chains} is not selected.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 rice_regions_dependence_graph      > MODULE.dg
@@ -1900,7 +1903,7 @@ statements are accepted. Interprocedural algorithms use the
 
 Fast algorithms use a very primitive non-iterative fix-point algorithm
 (two possible version: flow sensitive or flow insensitive).  Full
-algorithms use a fix-point on vector subspace (i.e. à la K{\sc
+algorithms use a fix-point on vector subspace (i.e. à la K{\sc
   arr}~\cite{Karr76}) or a fix-point on polyhedra (i.e. H{\sc
   albwachs}/C{\sc ousot}~\cite{HC78}; implemented... but not connected
 as of Sept. 95).
@@ -1912,7 +1915,7 @@ are stored on and retrieved from disk by {\em pipsdbm}.
 
 Note: summary effects should not be used but the summary transformer is
 in fact computed along with the transformers (Francois Irigoin, 4 Sept. 90).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \paragraph{Menu for Transformers}
 
@@ -1929,7 +1932,7 @@ alias refine_transformers 'Refine Transformers'
 
 %%@UserManualDocumentation: transformers_intra_fast
 Build the fast intraprocedural transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 transformers_intra_fast         > MODULE.transformers
@@ -1944,7 +1947,7 @@ transformers_intra_fast         > MODULE.transformers
                 
 %%@UserManualDocumentation: transformers_intra_full
 Build the improved intraprocedural transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 transformers_intra_full         > MODULE.transformers
@@ -1959,7 +1962,7 @@ transformers_intra_full         > MODULE.transformers
 
 %%@UserManualDocumentation: transformers_inter_fast
 Build the fast interprocedural transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 transformers_inter_fast         > MODULE.transformers
@@ -1976,7 +1979,7 @@ transformers_inter_fast         > MODULE.transformers
 
 %%@UserManualDocumentation: transformers_inter_full
 Build the improved interprocedural transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 transformers_inter_full         > MODULE.transformers
@@ -1993,7 +1996,7 @@ transformers_inter_full         > MODULE.transformers
 
 %%@UserManualDocumentation: refine_transformers
 Rebuild the interprocedural transformers using interprocedural preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 refine_transformers         > MODULE.transformers
@@ -2121,7 +2124,7 @@ to obtain the best possible results.
 % option for transformers and preconditions is wrong because the last
 % increment of the index is not performed. Besides the exit condition is
 % not added (yet).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \paragraph{Menu for Preconditions}
 
@@ -2138,7 +2141,7 @@ alias preconditions_inter_full 'Full Inter-Procedural Analysis'
 %%@UserManualDocumentation: preconditions_intra
 Only build the preconditions in a module without any interprocedural
 propagation.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 preconditions_intra            > MODULE.preconditions
@@ -2159,7 +2162,7 @@ derived from its callers as initial state value and propagates it
 downwards in the module statement.
 
 The {\em fast} versions use no fix-point operations for loops.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 
 \begin{verbatim}
@@ -2184,7 +2187,7 @@ derived from its callers as initial state value and propagates it
 downwards in the module statement.
 
 The {\em full} versions use fix-point operations for loops.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 preconditions_inter_full        > MODULE.preconditions
@@ -2285,7 +2288,7 @@ Since these two options for transformer and total precondition computations are
 independent, \verb/transformer_full_inter/ and
 \verb/total_preconditions_inter/ must be both (independently) selected
 to obtain the best possible results.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \paragraph{Menu for Total Preconditions}
 
@@ -2301,7 +2304,7 @@ alias total_preconditions_inter 'Total Inter-Procedural Analysis'
 %%@UserManualDocumentation: preconditions_intra
 Only build the total preconditions in a module without any interprocedural
 propagation. No specific condition must be met when reaching a RETURN statement.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 total_preconditions_intra            > MODULE.total_preconditions
@@ -2320,7 +2323,7 @@ Option \verb+total_preconditions_inter+ uses the module own total postcondition
 derived from its callers as final state value and propagates it
 backwards in the module statement. This total module postcondition must be
 true when the RETURN statement is reached.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 
 \begin{verbatim}
@@ -2452,7 +2455,7 @@ can be used to see if program transformations are beneficial.
 
 Known bugs: tests and while loops are not correctly handled because a
 fixed probably of 0.5 is systematically assumed.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for Complexities}
 
@@ -2479,7 +2482,7 @@ processors.
 Uniform complexity tables contain a unit execution time for all basic
 operations. They nevertheless give interesting estimations for SPARC
 SS-10, especially for -O2/-O3 optimized code.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 uniform_complexities                    > MODULE.complexities
@@ -2496,7 +2499,7 @@ uniform_complexities                    > MODULE.complexities
 %%@UserManualDocumentation: summary_complexity
 Local variables are eliminated from the complexity associated to the top
 statement of a module in order to obtain the modules's summary complexity.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 summary_complexity              > MODULE.summary_complexity
@@ -2513,7 +2516,7 @@ summary_complexity              > MODULE.summary_complexity
 Tables for floating point complexity estimation are set to 0 for
 non-floating point operations, and to 1 for all floating point
 operations, including intrinsics like \texttt{SIN}.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 fp_complexities                    > MODULE.complexities
@@ -2525,7 +2528,7 @@ fp_complexities                    > MODULE.complexities
 %%@UserManualDocumentation: any_complexities
 This enables the default specification within the properties to
 be considered. 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 any_complexities                    > MODULE.complexities
@@ -2613,7 +2616,7 @@ the summary regions of the callee translated into the caller's name space, to
 which are merely appended the regions of the expressions passed as argument
 (no summarization for this step). 
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for Array Regions}
 
@@ -2630,7 +2633,7 @@ alias must_regions 'EXACT or MAY regions'
 
 %%@UserManualDocumentation: may_regions
 This function computes the \verb|MAY| regions in a module.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 may_regions                     > MODULE.regions
                                 > MODULE.proper_regions
@@ -2649,7 +2652,7 @@ may_regions                     > MODULE.regions
 
 %%@UserManualDocumentation: must_regions
 This function computes the \verb|MUST| regions in a module.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 must_regions                    > MODULE.regions
                                 > MODULE.proper_regions
@@ -2834,7 +2837,7 @@ alias print_alias_classes 'Alias Classes'
 %%@UserManualDocumentation: print_in_alias_pairs
 Display the dynamic alias pairs (formal region, actual region) for the IN
 regions of the module.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_in_alias_pairs > MODULE.alias_file
         < PROGRAM.entities
@@ -2845,7 +2848,7 @@ print_in_alias_pairs > MODULE.alias_file
 %%@UserManualDocumentation: print_out_alias_pairs
 Display the dynamic alias pairs (formal region, actual region) for the OUT
 regions of the module.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_out_alias_pairs > MODULE.alias_file
         < PROGRAM.entities
@@ -2855,7 +2858,7 @@ print_out_alias_pairs > MODULE.alias_file
 
 %%@UserManualDocumentation: print_alias_lists
 Display the transitive closure of the dynamic aliases for the module.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_alias_lists > MODULE.alias_file
         < PROGRAM.entities
@@ -2866,7 +2869,7 @@ print_alias_lists > MODULE.alias_file
 %%@UserManualDocumentation: print_alias_classes
 Display the dynamic alias equivalence classes for this module and those
 below it in the callgraph.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_alias_classes > MODULE.alias_file
         < PROGRAM.entities
@@ -2891,7 +2894,7 @@ A new type of array regions, from Manjunathaiah Muniyappa.
 
 %%@UserManualDocumentation complementary_sections
 This function computes the complementary sections in a module.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 complementary_sections > MODULE.compsec
         < PROGRAM.entities 
@@ -2964,7 +2967,7 @@ loops. This is true for pre-condition computation, dependence testing
 and so on... It is possible neither to re-analyze parallel code, nor to
 re-parse it (although it would be interesting to compute the complexity
 of a parallel code).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for Parallelization Algorithm Selection}
 
@@ -2990,7 +2993,7 @@ alias coarse_grain_parallelization 'Coarse Grain Parallelization'
 %%@UserManualDocumentation: rice_all_dependence
 Use A{\sc llen} \& K{\sc ennedy}'s algorithm and consider all
 dependences.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 rice_all_dependence             > MODULE.parallelized_code
@@ -3007,7 +3010,7 @@ account data flow dependences, a.k.a true dependences. It is of limited
 interest because transitive dependences are computed. It is not
 equivalent at all to performing array and scalar expansion based on direct
 dependence computation (Brandes, Feautrier, Pugh).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 rice_data_dependence            > MODULE.parallelized_code
@@ -3024,7 +3027,7 @@ selects one outermost parallel loop to use multiple processors and one
 innermost loop for the vector units. It uses Cray microtasking
 directives. Note that a prettyprinter option must also be selected independently (see
 Section~\ref{subsection-parallel-printed-files}).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 rice_cray                   > MODULE.parallelized_code
@@ -3048,7 +3051,7 @@ is estimated. The loop with maximal locality is chosen as innermost
 loop.
 
 This algorithm still is in the development stage. Do not use it!
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 nest_parallelization                    > MODULE.parallelized_code
@@ -3066,7 +3069,7 @@ does not atomize ``simple'' arguments (that is, arguments that are the
 sum of a reference and a constant). This is needed to be able to
 generate code that would potentially be efficient, whereas the
 original atomizer would most of the time generate unusable code.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias simd_atomizer 'SIMD Atomizer'
@@ -3080,7 +3083,7 @@ simd_atomizer                      > MODULE.code
 Function \verb+simdizer_auto_unroll+ tries to unroll the code for
 making the simdizing process more efficient. It thus tries to compute
 the optimal unroll factor, allowing to pack the most instructions together.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias simdizer_auto_unroll 'SIMD-Auto Unroll'
@@ -3097,7 +3100,7 @@ reduction statements operating on the same variable with the same
 operation are detected inside a loop body, each ``instance'' of the
 reduction is renamed, and some code is added before and after the loop
 to initialize the new variables and compute the final result.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias simd_remove_reductions 'SIMD Remove Reductions'
@@ -3112,7 +3115,7 @@ simd_remove_reductions      > MODULE.code
 %%@UserManualDocumentation: single_assignment
 This phase tries to minimize dependencies in the code by transforming
 it into single-assignment form.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias single_assignment 'Single Assignment Form'
@@ -3128,7 +3131,7 @@ Function \verb+simdizer+ is an attempt at generating SIMD code for SIMD
 multimedia instruction set such as MMX, SSE2, VIS,... This
 transformation performs the core vectorization, transforming sequences
 of similar statements into vector operations.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias simdizer 'Generate SIMD code'
@@ -3148,7 +3151,7 @@ algorithm based on array regions. It considers only one loop at a time, its
 body being abstracted by its invariant read and write regions. No loop
 distribution is performed, but any kind of loop body is acceptable
 whereas Allen\&Kennedy algorithm only copes with very simple loop bodies. 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 coarse_grain_parallelization > MODULE.parallelized_code
@@ -3361,7 +3364,7 @@ PHRASE-pragmas (written by the programmer) and a control file managing
 them. Those portions of code are intented, after transformations, to 
 be executed in reconfigurable logic (in PHRASE projects, reconfigurable 
 logic is synthetized with smalltalk code).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias phrase_distributor 'PHRASE Distributor'
@@ -3387,7 +3390,7 @@ phrase_distributor                      > MODULE.code
 A program transformation is a special phase which takes a code as
 input, modifies it, possibly using results from several different
 analyses, and puts back this modified code as result.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 %% This will be printed after the description of the transformations in
 %% the user manual:
@@ -3417,7 +3420,7 @@ User inputs are not well-integrated although a \verb+user_query+ rule
 and a \verb+string+ resource could easily be added. User interaction
 with a phase are performed directly without notifying {\em pipsmake} to be
 more flexible and to allow dialogues between a transformation and the user.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsection{Loop Transformations}
 
@@ -3435,7 +3438,7 @@ Distribute all the loops of the module.
 Allen \& Kennedy's algorithm~\cite{AK87} is used in both cases. The only
 difference is that \verb+distributer+ does not produce DOALL loops,
 but just distributes loops as much as possible.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias distributer 'Distribute Loops'
@@ -3462,7 +3465,7 @@ Labels in the body are deleted. To unroll nested loops, start with the
 innermost loop.
 
 This transformation always is legal.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias unroll 'Loop Unroll'
@@ -3481,7 +3484,7 @@ This is only useful for small loop ranges.
 
 Unrolling can be interactively applied and the user is requested a loop
 label. Or pragma can be inserted as comments for loops to be unrolled.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias full_unroll 'Full Loop Unroll (Interactive)'
@@ -3505,7 +3508,7 @@ full_unroll_pragma                   > MODULE.code
 Strip-mine requests a loop label and either a chunk size or a chunk number.
 Then it strip-mines the specified loop, if it is found. Note that the
 DO/ENDDO construct is not compatible with such local program transformations.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias strip_mine 'Strip Mining'
@@ -3525,7 +3528,7 @@ with this label and the inner-most one in the same loop nest, if such a
 loop nest exists.
 
 Presently, legality is not checked.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias loop_interchange 'Loop Interchange'
@@ -3544,7 +3547,7 @@ vector and applies the hyperplane method to the loop nest starting with this
 loop label, if such a loop nest exists.
 
 Presently, legality is not checked.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias loop_hyperplane 'Hyperplane Method'
@@ -3578,7 +3581,7 @@ that the loop nest is fully parallel.
 
 Jingling Xue published an advanced code generation algorithm for tiling in
 Parallel Processing Letters (htpp://cs.une.edu.au/~xue/pub.html).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias loop_tiling 'Tiling'
@@ -3618,7 +3621,7 @@ number. The normalization produces two assignment statements on the
 initial loop index. The first one (at the beginning of the loop body)
 assigns it to its value function of the new index and the second one
 (after the end of the loop) assigns it to its final value.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias loop_normalize 'Loop Normalize'
@@ -3647,7 +3650,7 @@ guard_elimination       > MODULE.code
 
 %%@UserManualDocumentation: tiling_sequence
 Tiling for sequences of loop nests
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 Youcef Bouchebaba's implementation of Tiling for sequences of loop nests  \ldots
   
@@ -3673,7 +3676,7 @@ tiling_sequence      > MODULE.code
 
 %%@UserManualDocumentation: invariant_code_motion
 This is a test to implement a invariant code motion. It doesn't work currently.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 invariant_code_motion             > MODULE.code
@@ -3695,7 +3698,7 @@ expressions such as bound checks by using informations given by
 precondition analyses.
 
 This transformation is implemented by NGUYEN Thi Viet Nga.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 
@@ -3758,7 +3761,7 @@ The \verb+suppress_dead_code+ phase also performs some {\em If
 
 This function was designed and implemented by Ronan K{\sc eryell}.
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias suppress_dead_code 'Dead Code Elimination'
@@ -3806,7 +3809,7 @@ transformation that identifies and removes such dead code is called dead
 code elimination. So in fact, Use-def elimination in PIPS is Dead code
 elimination ! 
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias use_def_elimination 'Use-Def elimination'
@@ -3859,7 +3862,7 @@ restructuring from \verb|restructure_control| to be added in the
 \texttt{controlizer} for example.
 
 This function was designed and implemented by Ronan K{\sc eryell}.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 %% Control Graph Restructuring
 \begin{verbatim}
 alias unspaghettify 'Unspaghettify the Control Graph'
@@ -3892,7 +3895,7 @@ controlled by the properties
 \end{itemize}
 to allow more or less destruction power !
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 %% Control Graph Restructuring
 \begin{verbatim}
 alias spaghettify 'Spaghettify the Control Graph'
@@ -3900,6 +3903,29 @@ alias spaghettify 'Spaghettify the Control Graph'
 
 \begin{verbatim}
 spaghettify          > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
+
+\paragraph{Full Spaghettify}
+\label{paragraph-full-spaghettify}
+
+%%@UserManualDocumentation: full_spaghettify
+The \texttt{spaghettifier} is used in context of PHRASE project while
+creating "Finite State Machine"-like code portions in order to synthetise
+them in reconfigurables units.
+
+This phases transforms all the module in a unique
+unstructured statement
+
+%%ÿUserManualDocumentation
+%% Control Graph Restructuring
+\begin{verbatim}
+alias full_spaghettify 'Spaghettify the Control Graph for the entire module'
+\end{verbatim}
+
+\begin{verbatim}
+full_spaghettify          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{verbatim}
@@ -3920,7 +3946,7 @@ by an interval graph partitioning method.
 Other restructuring methods are available in \PIPS{} with the TOOLPACK's
 restructurer (see
 Section~\ref{subsection-control-structure-normalization-stf}).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias restructure_control 'Restructure the Control Graph'
@@ -3950,7 +3976,7 @@ future.
 
 This transformation is now assumed redundant with respect to the native
 PIPS control restucturers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias stf 'Restructure with STF'
@@ -3969,7 +3995,7 @@ new test instruction is the condition correspondent to the branch FALSE of
 the test initial.
 
 This function was designed and implemented by Trinh Quoc Anh.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias suppress_trivial_test 'Trivial Test Elimination'
@@ -4014,7 +4040,7 @@ controlled by the property
 which control the fact that the same global variable (global to the
 current module) must be used for each FSMized statements.
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias fsm_generation 'FSM Generation'
@@ -4041,7 +4067,7 @@ values are associated to the different statements.
 To be efficient, phase \texttt{SPAGUETTIFY}\ref{paragraph-spaghettify}
 must be applied first !
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias full_fsm_generation 'Full FSM Generation'
@@ -4067,7 +4093,7 @@ new states where the portion of code to execute is smaller.
 Phase \texttt{FULL\_FSM\_GENERATION}\ref{paragraph-full-fsm-generation}
 must be applied first !
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias fsm_split_state 'FSM split state
@@ -4092,7 +4118,7 @@ them into a new state where the portion of code to execute is bigger.
 Phase \texttt{FULL\_FSM\_GENERATION}\ref{paragraph-full-fsm-generation}
 must be applied first !
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias fsm_merge_states 'FSM merge states
@@ -4143,7 +4169,7 @@ others passes of \PIPS{}.
 Atomizers are used to simplify the statement encountered by automatic
 distribution phases. For instance, indirect addressing like
 \verb/A(B(I)) = .../ is replaced by \verb/T=B(I);A(T) = .../.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \paragraph{General Atomizer}
 
@@ -4161,7 +4187,7 @@ atomizer                      > MODULE.code
 %%@UserManualDocumentation:  new_atomizer
 Here is a new version of the atomizer using a small atomizer from
 the HPF compiler (see Section~\ref{subsubsection-hpf-compiler}).
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 alias new_atomizer 'New Atomizer'
 new_atomizer                      > MODULE.code
@@ -4203,7 +4229,7 @@ name of this optimization should be Constant-Expression Evaluation or
 Constant Folding for integer values. This transformation produces well
 error message at compile time indicating potential error such as division
 by zero.  
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias partial_eval 'Partial Eval'
@@ -4287,7 +4313,7 @@ this phase.
 The current implementation is still shaky and does not handle well
 expressions of mixed types such as \verb|X+1| where \verb|1| is implictly
 promoted from integer to real.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 alias optimize_expressions 'Optimize Expressions'
 
@@ -4310,7 +4336,7 @@ prettyprint.
 
 %%@UserManualDocumentation: clean_declarations
 Clean the declarations of unused variables and commons and so.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 
 alias clean_declarations 'Clean Declarations'
@@ -4355,7 +4381,7 @@ computed with respect to the declarations in the calling procedures.
 It is  faster than the first one because array regions are not needed. 
 
 This phase is implemented by NGUYEN Thi Viet Nga.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias array_resizing_top_down 'Top Down Array Resizing'
@@ -4379,7 +4405,7 @@ dimension is calculated and then it will replace the 1 or *.
 
 This function is firstly implemented by Trinh Quoc Anh, and ameliorated by
 Corinne Ancourt, Nguyen Thi Viet Nga.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias array_resizing_bottom_up 'Bottom Up Array Resizing'
@@ -4433,7 +4459,7 @@ statement.
 
 This phase is always followed by the \verb/partial_redundancy_elimination/ for logical
 expression in order to reduce the number of bound checks.  
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias array_bound_check_bottom_up 'Elimination of Redundant Tests'
@@ -4475,7 +4501,7 @@ of this algorithm is that it permits to detect the sure bound violations
 or to tell that there is certainly no bound violation as soon as
 possible, thanks to the context given by preconditions and the top-down
 analyses. 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias array_bound_check_top_down 'Insertion of Unavoidable Tests'
@@ -4493,7 +4519,7 @@ This phase checks for out of bound error when passing arrays or array
 elements as arguments in procedure call. It ensures that there is no bound
 violation in every array access in the callee procedure, with respect to
 the array declarations in the caller procedure.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias array_bound_check_interprocedural 'Interprocedural Array Bound Checking'
@@ -4512,7 +4538,7 @@ We provide here a tool to calculate the number of dynamic bound checks
 from both initial and PIPS generated code.
 
 These transformations are implemented by NGUYEN Thi Viet Nga.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias array_bound_check_instrumentation 'Array Bound Checking Instrumentation'
@@ -4566,7 +4592,7 @@ path. Precise alias information are computed for both scalar and array
 variables. The analysis is called alias propagation.
 
 This analysis is implemented by NGUYEN Thi Viet Nga.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 
@@ -4605,7 +4631,7 @@ the code with tests that check the violation dynamically during
 execution of program. 
 
 This verification is implemented by NGUYEN Thi Viet Nga.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 % Attention : will we use the preconditions, regions, effects ? 
 % They are may be wrong 
@@ -4643,7 +4669,7 @@ we produce information in the resource MODULE.ubs to tell if the formal
 parameters of the called procedures have to be checked or not.  
  
 This verification is implemented by NGUYEN Thi Viet Nga.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias used_before_set 'Used Before Set'
@@ -4700,7 +4726,7 @@ Privatizer detects variables that are local to a loop nest and marks
 these variables as private. A variable is private to a loop if the
 values assigned to this variable inside the loop cannot reach a
 statement outside the loop body.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias privatize_module 'Privatize Scalars'
@@ -4742,12 +4768,12 @@ codes where variables are declared as {\tt SAVE}d to avoid allocations at
 each invocation of the routine. However, this prevents parallelization of
 the loop surrounding the calls. The function which performs this
 transformation is called \verb|declarations_privatizer|.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 
 %%@UserManualDocumentation: declarations_privatizer
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias array_privatizer 'Privatize Scalars & Arrays'
@@ -4799,7 +4825,7 @@ declarations_privatizer              > MODULE.code
 %%@UserManualDocumentation: freeze_variables
 Function \verb+freeze_variables+ produces code where variables 
 given by the user are frozen.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias freeze_variables 'Freeze Variables'
@@ -4825,7 +4851,7 @@ feature is low.
 
 %%@UserManualDocumentation: clone
 User assisted cloning.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 
 alias clone 'Manual Clone'
@@ -4840,7 +4866,7 @@ clone                   > CALLERS.code
 \end{verbatim}
 
 %%@UserManualDocumentation: clone_substitute
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias clone_substitute 'Manual Clone Substitution'
@@ -4860,7 +4886,7 @@ Cloning of a subroutine according to an integer scalar argument.
 The argument is specified thru integer property 
 \verb|TRANSFORMATION_CLONE_ON_ARGUMENT|. If set to $0$, a user request is
 performed. 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias clone_on_argument 'Clone On Argument'
@@ -4883,7 +4909,7 @@ clone_on_argument       > CALLERS.code
 This is plug to implement quickly a program transformation requested by a
 user. Currently, it is a full loop distribution suggested by Alain Darte
 to compare different implementations, namely Nestor and PIPS.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 alias transformation_test 'Transformation Test'
 
@@ -4932,7 +4958,7 @@ prettyprinter selected used to produce this file.
 
 Transformers and preconditions require cumulated effects to build the
 module value basis.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for User Views}
 
@@ -4958,7 +4984,7 @@ alias print_source_continuation_conditions 'With Continuation Conditions'
 
 %%@UserManualDocumentation: print_source
 Display the code without any decoration.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source         > MODULE.parsed_printed_file
@@ -4970,7 +4996,7 @@ print_source         > MODULE.parsed_printed_file
 
 %%@UserManualDocumentation: print_source_transformers
 Display the code decorated with the transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_transformers         > MODULE.parsed_printed_file
@@ -4986,7 +5012,7 @@ print_source_transformers         > MODULE.parsed_printed_file
 
 %%@UserManualDocumentation: print_source_preconditions
 Display the code decorated with the preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_preconditions        > MODULE.parsed_printed_file
@@ -5002,7 +5028,7 @@ print_source_preconditions        > MODULE.parsed_printed_file
 
 %%@UserManualDocumentation: print_source_total_preconditions
 Display the code decorated with the total preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_total_preconditions        > MODULE.parsed_printed_file
@@ -5018,7 +5044,7 @@ print_source_total_preconditions        > MODULE.parsed_printed_file
 
 %%@UserManualDocumentation: print_source_continuation_conditions
 Display the code decorated with the continuation conditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_continuation_conditions   > MODULE.parsed_printed_file
@@ -5035,7 +5061,7 @@ print_source_continuation_conditions   > MODULE.parsed_printed_file
 
 %%@UserManualDocumentation: print_source_regions
 Display the code decorated with the regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_regions              > MODULE.parsed_printed_file
@@ -5052,7 +5078,7 @@ print_source_regions              > MODULE.parsed_printed_file
 
 %%@UserManualDocumentation: print_source_in_regions
 Display the code decorated with the IN regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_in_regions              > MODULE.parsed_printed_file
@@ -5069,7 +5095,7 @@ print_source_in_regions              > MODULE.parsed_printed_file
 
 %%@UserManualDocumentation: print_source_out_regions
 Display the code decorated with the OUT regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_out_regions              > MODULE.parsed_printed_file
@@ -5088,7 +5114,7 @@ print_source_out_regions              > MODULE.parsed_printed_file
 
 %%@UserManualDocumentation: print_source_complexities
 Display the code decorated with the complexities.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_complexities         > MODULE.parsed_printed_file
@@ -5102,7 +5128,7 @@ print_source_complexities         > MODULE.parsed_printed_file
 
 %%@UserManualDocumentation: print_source_proper_effects
 Display the code decorated with the proper effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_proper_effects       > MODULE.parsed_printed_file
@@ -5115,7 +5141,7 @@ print_source_proper_effects       > MODULE.parsed_printed_file
 
 %%@UserManualDocumentation: print_source_cumulated_effects
 Display the code decorated with the cumulated effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_cumulated_effects    > MODULE.parsed_printed_file
@@ -5128,7 +5154,7 @@ print_source_cumulated_effects    > MODULE.parsed_printed_file
 \subsubsection{User View with IN Effects}
 %%@UserManualDocumentation: print_source_in_effects
 Display the code decorated with its IN effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_in_effects       > MODULE.parsed_printed_file
@@ -5141,7 +5167,7 @@ print_source_in_effects       > MODULE.parsed_printed_file
 \subsubsection{User View with OUT Effects}
 %%@UserManualDocumentation: print_source_out_effects
 Display the code decorated with its OUT effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_source_out_effects       > MODULE.parsed_printed_file
@@ -5165,7 +5191,7 @@ the printer used to produce this file.
 
 Transformers and preconditions (and regions?) require cumulated effects
 to build the module value basis.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for Sequential Views}
 
@@ -5202,7 +5228,7 @@ alias print_initial_precondition 'Initial Preconditions'
 
 %%@UserManualDocumentation: print_code
 Display the code without any decoration.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code                      > MODULE.printed_file
@@ -5214,7 +5240,7 @@ print_code                      > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_transformers
 Display the code decorated with the transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_transformers         > MODULE.printed_file
@@ -5242,7 +5268,7 @@ print_program_precondition  > PROGRAM.printed_file
 
 %%@UserManualDocumentation: print_code_complexities
 Display the code decorated with the complexities.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_complexities         > MODULE.printed_file
@@ -5256,7 +5282,7 @@ print_code_complexities         > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_preconditions
 Display the code decorated with the preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_preconditions        > MODULE.printed_file
@@ -5272,7 +5298,7 @@ print_code_preconditions        > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_preconditions
 Display the code decorated with the total preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_total_preconditions        > MODULE.printed_file
@@ -5288,7 +5314,7 @@ print_code_total_preconditions        > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_continuation_conditions
 Display the code decorated with the continuation preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_continuation_conditions   > MODULE.printed_file
@@ -5306,7 +5332,7 @@ print_code_continuation_conditions   > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_regions
 Display the code decorated with the regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_regions              > MODULE.printed_file
@@ -5323,7 +5349,7 @@ print_code_regions              > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_proper_regions
 Display the code decorated with the proper regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_proper_regions              > MODULE.printed_file
@@ -5340,7 +5366,7 @@ print_code_proper_regions              > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_in_regions
 Display the code decorated with the IN regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_in_regions              > MODULE.printed_file
@@ -5357,7 +5383,7 @@ print_code_in_regions              > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_out_regions
 Display the code decorated with the OUT regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_out_regions              > MODULE.printed_file
@@ -5374,7 +5400,7 @@ print_code_out_regions              > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_privatized_regions
 Display the code decorated with the privatized regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_privatized_regions       > MODULE.printed_file
@@ -5390,7 +5416,7 @@ print_code_privatized_regions       > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_complementary_sections
 Display the code decorated with complementary sections.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_complementary_sections > MODULE.printed_file
@@ -5407,7 +5433,7 @@ print_code_complementary_sections > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_proper_effects
 Display the code decorated with the proper effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_proper_effects       > MODULE.printed_file
@@ -5418,7 +5444,7 @@ print_code_proper_effects       > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_proper_references
 Display the code decorated with the proper references.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_proper_references       > MODULE.printed_file
@@ -5431,7 +5457,7 @@ print_code_proper_references       > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_cumulated_effects
 Display the code decorated with the cumulated effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_cumulated_effects    > MODULE.printed_file
@@ -5443,7 +5469,7 @@ print_code_cumulated_effects    > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_cumulated_references
 Display the code decorated with the cumulated references.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_cumulated_references    > MODULE.printed_file
@@ -5456,7 +5482,7 @@ print_code_cumulated_references    > MODULE.printed_file
 \subsubsection{Sequential View with IN Effects}
 %%@UserManualDocumentation: print_code_in_effects
 Display the code decorated with its IN effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_in_effects       > MODULE.printed_file
@@ -5469,7 +5495,7 @@ print_code_in_effects       > MODULE.printed_file
 \subsubsection{Sequential View with OUT Effects}
 %%@UserManualDocumentation: print_code_out_effects
 Display the code decorated with its OUT effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_out_effects       > MODULE.printed_file
@@ -5483,7 +5509,7 @@ print_code_out_effects       > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_proper_reductions
 Display the code decorated with the proper reductions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_proper_reductions > MODULE.printed_file
@@ -5496,7 +5522,7 @@ print_code_proper_reductions > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_cumulated_reductions
 Display the code decorated with the cumulated reductions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_cumulated_reductions > MODULE.printed_file
@@ -5511,7 +5537,7 @@ print_code_cumulated_reductions > MODULE.printed_file
 
 %%@UserManualDocumentation: print_code_static_control
 Display the code decorated with the static control.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_static_control       > MODULE.printed_file
@@ -5530,7 +5556,7 @@ example using the \PdaVinci{} program.
 The Fortran statements may be decorated with complexities,
 preconditions, transformers, regions,\ldots{} depending on the printer
 used to produce this file.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for Graph Views}
 
@@ -5553,7 +5579,7 @@ alias print_code_as_a_graph_cumulated_effects 'Graph with Statements & Cumulated
 
 %%@UserManualDocumentation: print_code_as_a_graph
 Display the code without any decoration.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_as_a_graph                      > MODULE.graph_printed_file
@@ -5565,7 +5591,7 @@ print_code_as_a_graph                      > MODULE.graph_printed_file
 
 %%@UserManualDocumentation: print_code_as_a_graph_transformers
 Display the code decorated with the transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_as_a_graph_transformers         > MODULE.graph_printed_file
@@ -5581,7 +5607,7 @@ print_code_as_a_graph_transformers         > MODULE.graph_printed_file
 
 %%@UserManualDocumentation: print_code_as_a_graph_complexities
 Display the code decorated with the complexities.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_as_a_graph_complexities         > MODULE.graph_printed_file
@@ -5595,7 +5621,7 @@ print_code_as_a_graph_complexities         > MODULE.graph_printed_file
 
 %%@UserManualDocumentation: print_code_as_a_graph_preconditions
 Display the code decorated with the preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_as_a_graph_preconditions        > MODULE.graph_printed_file
@@ -5611,7 +5637,7 @@ print_code_as_a_graph_preconditions        > MODULE.graph_printed_file
 
 %%@UserManualDocumentation: print_code_as_a_graph_preconditions
 Display the code decorated with the preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_as_a_graph_total_preconditions        > MODULE.graph_printed_file
@@ -5627,7 +5653,7 @@ print_code_as_a_graph_total_preconditions        > MODULE.graph_printed_file
 
 %%@UserManualDocumentation: print_code_as_a_graph_regions
 Display the code decorated with the regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_as_a_graph_regions              > MODULE.graph_printed_file
@@ -5644,7 +5670,7 @@ print_code_as_a_graph_regions              > MODULE.graph_printed_file
 
 %%@UserManualDocumentation: print_code_as_a_graph_in_regions
 Display the code decorated with the IN regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_as_a_graph_in_regions              > MODULE.graph_printed_file
@@ -5661,7 +5687,7 @@ print_code_as_a_graph_in_regions              > MODULE.graph_printed_file
 
 %%@UserManualDocumentation: print_code_as_a_graph_out_regions
 Display the code decorated with the OUT regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_as_a_graph_out_regions              > MODULE.graph_printed_file
@@ -5678,7 +5704,7 @@ print_code_as_a_graph_out_regions              > MODULE.graph_printed_file
 
 %%@UserManualDocumentation: print_code_as_a_graph_proper_effects
 Display the code decorated with the proper effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_as_a_graph_proper_effects       > MODULE.graph_printed_file
@@ -5691,7 +5717,7 @@ print_code_as_a_graph_proper_effects       > MODULE.graph_printed_file
 
 %%@UserManualDocumentation: print_code_as_a_graph_cumulated_effects
 Display the code decorated with the cumulated effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_code_as_a_graph_cumulated_effects    > MODULE.graph_printed_file
@@ -5718,7 +5744,7 @@ No one knows why there is no underscore between parallel and printed...
 The first function \verb+print_parallelized_code+ can compute either one
 depending on the property variable \verb+PRETTYPRINT_FORTRAN90+ (out of
 date). The result is stored in a file suffixed by \verb+.parf+.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for Parallel View}
 
@@ -5736,7 +5762,7 @@ alias print_parallelizedcray_code 'Fortran Cray'
 
 %%@UserManualDocumentation: print_parallelized77_code
 Output a Fortran-77 code extended with {\tt DOALL} parallel constructs.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_parallelized77_code       > MODULE.parallelprinted_file
@@ -5752,7 +5778,7 @@ print_parallelized77_code       > MODULE.parallelprinted_file
 
 %%@UserManualDocumentation: print_parallelizedHPF_code
 Output the code decorated with HPF or OMP directives.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_parallelizedHPF_code     > MODULE.parallelprinted_file
@@ -5768,7 +5794,7 @@ print_parallelizedOMP_code     > MODULE.parallelprinted_file
 
 %%@UserManualDocumentation: print_parallelized90_code
 Output the code with some Fortran-90 array construct style.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_parallelized90_code       > MODULE.parallelprinted_file
@@ -5782,7 +5808,7 @@ print_parallelized90_code       > MODULE.parallelprinted_file
 Output the code decorated with parallel Cray directives. Note that the
 Cray parallelization algorithm should have been used in order to match
 Cray directives for parallel vector processors.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_parallelizedcray_code     > MODULE.parallelprinted_file
@@ -5805,7 +5831,7 @@ Each module can be decorated by {\em summary} information computed by
 If one module has different callers, its sub call tree is replicated
 once for each caller. No fun, but how could we avoid it with a text
 output?
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 The resource defined in this section is \verb/callgraph_file/ (note the
 missing underscore between call and graph in callgraph...). This is a {\em
@@ -5842,7 +5868,7 @@ alias print_call_graph_with_out_regions 'Calls & Out regions'
 
 %%@UserManualDocumentation: print_call_graph
 To have the call graph without any decoration.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_call_graph                         > MODULE.callgraph_file
         < PROGRAM.entities
@@ -5854,7 +5880,7 @@ print_call_graph                         > MODULE.callgraph_file
 
 %%@UserManualDocumentation: print_call_graph_with_complexities
 To have the call graph decorated with the complexities.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_call_graph_with_complexities     > MODULE.callgraph_file
         < PROGRAM.entities
@@ -5868,7 +5894,7 @@ print_call_graph_with_complexities     > MODULE.callgraph_file
 
 %%@UserManualDocumentation: print_call_graph_with_preconditions
 To have the call graph decorated with the preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_call_graph_with_preconditions      > MODULE.callgraph_file
         < PROGRAM.entities
@@ -5884,7 +5910,7 @@ print_call_graph_with_preconditions      > MODULE.callgraph_file
 
 %%@UserManualDocumentation: print_call_graph_with_total_preconditions
 To have the call graph decorated with the total preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_call_graph_with_total_preconditions      > MODULE.callgraph_file
         < PROGRAM.entities
@@ -5900,7 +5926,7 @@ print_call_graph_with_total_preconditions      > MODULE.callgraph_file
 
 %%@UserManualDocumentation: print_call_graph_with_transformers
 To have the call graph decorated with the transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_call_graph_with_transformers       > MODULE.callgraph_file
         < PROGRAM.entities
@@ -5916,7 +5942,7 @@ print_call_graph_with_transformers       > MODULE.callgraph_file
 
 %%@UserManualDocumentation: print_call_graph_with_proper_effects
 To have the call graph decorated with the proper effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_call_graph_with_proper_effects     > MODULE.callgraph_file
         < PROGRAM.entities
@@ -5929,7 +5955,7 @@ print_call_graph_with_proper_effects     > MODULE.callgraph_file
 
 %%@UserManualDocumentation: print_call_graph_with_cumulated_effects
 To have the call graph decorated with the cumulated effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_call_graph_with_cumulated_effects  > MODULE.callgraph_file
         < PROGRAM.entities
@@ -5943,7 +5969,7 @@ print_call_graph_with_cumulated_effects  > MODULE.callgraph_file
 
 %%@UserManualDocumentation: print_call_graph_with_regions
 To have the call graph decorated with the regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_call_graph_with_regions            > MODULE.callgraph_file
         < PROGRAM.entities
@@ -5960,7 +5986,7 @@ print_call_graph_with_regions            > MODULE.callgraph_file
 
 %%@UserManualDocumentation: print_call_graph_with_in_regions
 To have the call graph decorated with the IN regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_call_graph_with_in_regions         > MODULE.callgraph_file
         < PROGRAM.entities
@@ -5977,7 +6003,7 @@ print_call_graph_with_in_regions         > MODULE.callgraph_file
 
 %%@UserManualDocumentation: print_call_graph_with_out_regions
 To have the call graph decorated with the OUT regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_call_graph_with_out_regions        > MODULE.callgraph_file
         < PROGRAM.entities
@@ -5995,7 +6021,7 @@ print_call_graph_with_out_regions        > MODULE.callgraph_file
 %%@UserManualDocumentation: dvicfg_file
 This is the file icfg with format of graph daVinci
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for DVICFG's}
 \begin{verbatim}
@@ -6007,7 +6033,7 @@ alias print_dvicfg_with_filtered_proper_effects 'Graphical Calls & Filtered prop
 \subsubsection{Minimal ICFG with graphical filtered Proper Effects}
 %%@UserManualDocumentation: print_dvicfg_with_filtered_proper_effects
 Display the ICFG graphically decorated with the write proper effects filtered for a variable.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_dvicfg_with_filtered_proper_effects           > MODULE.dvicfg_file
         < PROGRAM.entities
@@ -6032,7 +6058,7 @@ of \PIPS{} analyses.
 
 
 
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \subsubsection{Menu for ICFG's}
 
@@ -6082,7 +6108,7 @@ alias print_icfg_with_control_out_regions 'Calls & Control & Out regions'
 
 %%@UserManualDocumentation: print_icfg
 Display the plain ICFG, without any decoration.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg                      > MODULE.icfg_file
         < PROGRAM.entities
@@ -6094,7 +6120,7 @@ print_icfg                      > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_complexities
 Display the ICFG decorated with complexities.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_complexities            > MODULE.icfg_file
         < PROGRAM.entities
@@ -6110,7 +6136,7 @@ print_icfg_with_complexities            > MODULE.icfg_file
 Display the ICFG decorated with preconditions. They are expressed in the
 \emph{callee} name space to evaluate the interest of cloning, depending on
 the information available to the callee at a given call site.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_preconditions            > MODULE.icfg_file
         < PROGRAM.entities
@@ -6128,7 +6154,7 @@ print_icfg_with_preconditions            > MODULE.icfg_file
 Display the ICFG decorated with total preconditions. They are expressed in the
 \emph{callee} name space to evaluate the interest of cloning, depending on
 the information available to the callee at a given call site.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_total_preconditions            > MODULE.icfg_file
         < PROGRAM.entities
@@ -6144,7 +6170,7 @@ print_icfg_with_total_preconditions            > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_transformers
 Display the ICFG decorated with transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_transformers             > MODULE.icfg_file
         < PROGRAM.entities
@@ -6159,7 +6185,7 @@ print_icfg_with_transformers             > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_proper_effects
 Display the ICFG decorated with the proper effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_proper_effects           > MODULE.icfg_file
         < PROGRAM.entities
@@ -6171,7 +6197,7 @@ print_icfg_with_proper_effects           > MODULE.icfg_file
 \subsubsection{Minimal ICFG with filtered Proper Effects}
 %%@UserManualDocumentation: print_icfg_with_filtered_proper_effects
 Display the ICFG decorated with the write proper effects filtered for a variable.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_filtered_proper_effects           > MODULE.icfg_file
         < PROGRAM.entities
@@ -6185,7 +6211,7 @@ print_icfg_with_filtered_proper_effects           > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_cumulated_effects
 Display the ICFG decorated with cumulated effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_cumulated_effects        > MODULE.icfg_file
         < PROGRAM.entities
@@ -6199,7 +6225,7 @@ print_icfg_with_cumulated_effects        > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_regions
 Display the ICFG decorated with regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_regions                  > MODULE.icfg_file
         < PROGRAM.entities
@@ -6216,7 +6242,7 @@ print_icfg_with_regions                  > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_in_regions
 Display the ICFG decorated with IN regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_in_regions               > MODULE.icfg_file
         < PROGRAM.entities
@@ -6233,7 +6259,7 @@ print_icfg_with_in_regions               > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_out_regions
 Display the ICFG decorated with OUT regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_out_regions              > MODULE.icfg_file
         < PROGRAM.entities
@@ -6250,7 +6276,7 @@ print_icfg_with_out_regions              > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_loops 
 Display the plain ICFG with loops, without any decoration.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_loops                    > MODULE.icfg_file
         < PROGRAM.entities
@@ -6262,7 +6288,7 @@ print_icfg_with_loops                    > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_loops_complexities
 Display the ICFG decorated with loops and complexities.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_loops_complexities       > MODULE.icfg_file
         < PROGRAM.entities
@@ -6276,7 +6302,7 @@ print_icfg_with_loops_complexities       > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_loops_preconditions
 Display the ICFG decorated with preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_loops_preconditions      > MODULE.icfg_file
         < PROGRAM.entities
@@ -6291,7 +6317,7 @@ print_icfg_with_loops_preconditions      > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_loops_total_preconditions
 Display the ICFG decorated with total preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_loops_total_preconditions      > MODULE.icfg_file
         < PROGRAM.entities
@@ -6306,7 +6332,7 @@ print_icfg_with_loops_total_preconditions      > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_loops_transformers
 Display the ICFG decorated with transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_loops_transformers       > MODULE.icfg_file
         < PROGRAM.entities
@@ -6321,7 +6347,7 @@ print_icfg_with_loops_transformers       > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_loops_proper_effects
 Display the ICFG decorated with proper effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_loops_proper_effects     > MODULE.icfg_file
         < PROGRAM.entities
@@ -6334,7 +6360,7 @@ print_icfg_with_loops_proper_effects     > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_loops_cumulated_effects
 Display the ICFG decorated with cumulated effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_loops_cumulated_effects        > MODULE.icfg_file
         < PROGRAM.entities
@@ -6348,7 +6374,7 @@ print_icfg_with_loops_cumulated_effects        > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_loops_regions
 Display the ICFG decorated with regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_loops_regions            > MODULE.icfg_file
         < PROGRAM.entities
@@ -6365,7 +6391,7 @@ print_icfg_with_loops_regions            > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_loops_in_regions
 Display the ICFG decorated with IN regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_loops_in_regions         > MODULE.icfg_file
         < PROGRAM.entities
@@ -6382,7 +6408,7 @@ print_icfg_with_loops_in_regions         > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_loops_out_regions
 Display the ICFG decorated with the OUT regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_loops_out_regions        > MODULE.icfg_file
         < PROGRAM.entities
@@ -6399,7 +6425,7 @@ print_icfg_with_loops_out_regions        > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_control
 Display the plain ICFG with loops, without any decoration.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_control         > MODULE.icfg_file
         < PROGRAM.entities
@@ -6411,7 +6437,7 @@ print_icfg_with_control         > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_control_complexities
 Display the ICFG decorated with the complexities.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_control_complexities    > MODULE.icfg_file
         < PROGRAM.entities
@@ -6425,7 +6451,7 @@ print_icfg_with_control_complexities    > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_control_preconditions
 Display the ICFG decorated with the preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_control_preconditions   > MODULE.icfg_file
         < PROGRAM.entities
@@ -6440,7 +6466,7 @@ print_icfg_with_control_preconditions   > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_control_total_preconditions
 Display the ICFG decorated with the preconditions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_control_total_preconditions   > MODULE.icfg_file
         < PROGRAM.entities
@@ -6455,7 +6481,7 @@ print_icfg_with_control_total_preconditions   > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_control_transformers
 Display the ICFG decorated with the transformers.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_control_transformers    > MODULE.icfg_file
         < PROGRAM.entities
@@ -6470,7 +6496,7 @@ print_icfg_with_control_transformers    > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_control_proper_effects
 Display the ICFG decorated with the proper effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_control_proper_effects  > MODULE.icfg_file
         < PROGRAM.entities
@@ -6483,7 +6509,7 @@ print_icfg_with_control_proper_effects  > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_control_cumulated_effects
 Display the ICFG decorated with the cumulated effects.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_control_cumulated_effects   > MODULE.icfg_file
         < PROGRAM.entities
@@ -6497,7 +6523,7 @@ print_icfg_with_control_cumulated_effects   > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_control_regions
 Display the ICFG decorated with the regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_control_regions         > MODULE.icfg_file
         < PROGRAM.entities
@@ -6514,7 +6540,7 @@ print_icfg_with_control_regions         > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_control_in_regions
 Display the ICFG decorated with the IN regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_control_in_regions      > MODULE.icfg_file
         < PROGRAM.entities
@@ -6531,7 +6557,7 @@ print_icfg_with_control_in_regions      > MODULE.icfg_file
 
 %%@UserManualDocumentation: print_icfg_with_control_out_regions
 Display the ICFG decorated with the OUT regions.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 \begin{verbatim}
 print_icfg_with_control_out_regions     > MODULE.icfg_file
         < PROGRAM.entities
@@ -6554,7 +6580,7 @@ This file shows the dependence graph.
 
 Known bug: there is no precise relationship between the dependence graph
 seen by the parallelization algorithm selected and any of its view...
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 Two formats are available: the default format which includes
 dependence cone and a SRU format which packs all information about one
@@ -6587,7 +6613,7 @@ alias   impact_check                        'Check alias impact'
 %%@UserManualDocumentation: print_effective_dependence_graph
 Display dependence levels for loop-carried and non-loop-carried dependence
 arcs due to non-privatized variables. Do not display dependence cones.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_effective_dependence_graph          > MODULE.dg_file
@@ -6601,7 +6627,7 @@ print_effective_dependence_graph          > MODULE.dg_file
 %%@UserManualDocumentation: print_loop_carried_dependence_graph
 Display dependence levels for loop-carried dependence arcs only. Ignore
 arcs labeled by private variables and do not print dependence cones.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_loop_carried_dependence_graph          > MODULE.dg_file
@@ -6617,7 +6643,7 @@ Display dependence levels and dependence polyhedra/cones for all
 dependence arcs, whether they are loop carried or not, whether they are
 due to a private variable (and ignored by parallelization algorithms) or
 not. Dependence cones labeling arcs are printed too.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_whole_dependence_graph          > MODULE.dg_file
@@ -6630,7 +6656,7 @@ print_whole_dependence_graph          > MODULE.dg_file
 
 %%@UserManualDocumentation: print_filtered_dependence_graph
 Same as print\_whole\_dependence\_graph but it's filtered by some variables.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_filtered_dependence_graph          > MODULE.dg_file
@@ -6643,7 +6669,7 @@ print_filtered_dependence_graph          > MODULE.dg_file
 
 %%@UserManualDocumentation: print_filtered_dependence_daVinci_graph
 Same as print\_filtered\_dependence\_graph but its output is daVinci format.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_filtered_dependence_daVinci_graph          > MODULE.dvdg_file
@@ -6656,7 +6682,7 @@ print_filtered_dependence_daVinci_graph          > MODULE.dvdg_file
 
 %%@UserManualDocumentation: impact_check
 Check impact of alias on the dependance graphe
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 impact_check    > MODULE.code
@@ -6709,7 +6735,7 @@ logic (such as FPGAs or DataPaths).
 This pass is used in context of PHRASE project for synthetisation of 
 reconfigurable logic for a portion of initial code. This function can 
 be viewed as a Smalltalk pretty-printer of a subset of Fortran.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias print_code_smalltalk 'Smalltalk Pretty-Printer'
@@ -6725,7 +6751,7 @@ print_code_smalltalk        > MODULE.smalltalk_code_file
 \label{section-feautrier-methods}
 
 This part of \PIPS{} was implemented at Centre d'Etudes Atomiques,
-Limeil-Brévannes, by Benoît de Dinechin, Arnauld Leservot and Alexis
+Limeil-Brévannes, by Benoît de Dinechin, Arnauld Leservot and Alexis
 Platonoff.
 
 \subsection{Static Control Detection}
@@ -6744,7 +6770,7 @@ three informations are mapped on statements. Function
 is not specified here for implementation bug purpose.
 
 The definition of a static control program is given in~\cite{Fea91}.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 alias static_controlize 'Static Controlize'
@@ -6917,7 +6943,7 @@ alias print_parallelizedCRAFT_code 'CRAFT Fortran'
 Use the polyhedric method to parallelize the code and display the
 reindexed code in a CMF (parallel Fortran extension from TMC, Thinking
 Machine Corporation) style.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_parallelizedCMF_code       > MODULE.parallelprinted_file
@@ -6932,7 +6958,7 @@ print_parallelizedCMF_code       > MODULE.parallelprinted_file
 Use the polyhedric method to parallelize the code and display the
 reindexed code in a CRAFT (parallel Fortran used on the Cray T3 serie)
 style.
-%%ÿUserManualDocumentation
+%%ÿUserManualDocumentation
 
 \begin{verbatim}
 print_parallelizedCRAFT_code     > MODULE.parallelprinted_file
@@ -7107,7 +7133,7 @@ Seventh Annual Workshop on Languages and Compilers for Parallel
 Computing, Ithaca (NY), August 1994
 
   \bibitem{B91} B. Baron,
-{\em Construction flexible et cohérente pour la compilation interprocédurale},
+{\em Construction flexible et cohérente pour la compilation interprocédurale},
 Rapport interne EMP-CRI-E157, juillet 1991
 
   \bibitem{BIJ91} B. Baron, F. Irigoin, P. Jouvelot,
@@ -7123,16 +7149,16 @@ Rapport interne EMP-CRI-E130, septembre 1990
 Rapport interne EMP-CRI-E129, septembre 1990
 
   \bibitem{C93} F. Coelho,
-{\em Étude et réalisation d'un compilateur pour le {\em High
+{\em Étude et réalisation d'un compilateur pour le {\em High
 Performance Fortran}},
 Rapport interne EMP-CRI-A238, juin 1993
 
-  \bibitem{CI95} Béatrice Creusillet, François Irigoin, {\em
+  \bibitem{CI95} Béatrice Creusillet, François Irigoin, {\em
 Interprocedural Array Region Analyses}, Workshop on Languages and
 Compilers for Parallel Computing, LCPC'95, Colombus, OHIO, USA, 10-12
-Août 1995 (also available as TR A/270).
+Août 1995 (also available as TR A/270).
 
-\bibitem{CI96} Béatrice Creusillet, François Irigoin, {\em Interprocedural
+\bibitem{CI96} Béatrice Creusillet, François Irigoin, {\em Interprocedural
     Array Region Analyses}, International Journal on Parallel Programming
   (special issue on Languages and Compilers for Parallel Computing, LCPC'95),
   24(6), (also available as TR A/282).
@@ -7177,7 +7203,7 @@ Internal Representation of Fortran Code}, Technical Report E/166, May
   \bibitem{I87} F. Irigoin,
 {\em Partitionnement des boucles imbrique'es. Une tech\-nique 
 d'opti\-mi\-sation des programmes scientifiques},
-Thèse de doctorat de l'université Pierre et Marie Curie, juin 1987
+Thèse de doctorat de l'université Pierre et Marie Curie, juin 1987
 
   \bibitem{IT87a} F. Irigoin, R. Triolet,
 {\em Automatic DO-Loop Partitioning for Improving
@@ -7200,8 +7226,8 @@ January 13-15, pp. 319-329, 1988
 PUMA ESPRIT 2701, Deliberable 6.5.1, Tech. Report EMP-CRI-E155, November 1991
 
   \bibitem{IA92a} F. Irigoin, C. Ancourt, 
-{\em Compilation pour machines à mémoire répartie},
-Algorithmique Parallèle, Cosnard, Nivat, Robert Eds, Masson,
+{\em Compilation pour machines à mémoire répartie},
+Algorithmique Parallèle, Cosnard, Nivat, Robert Eds, Masson,
 Ecole de Printemps du LITP, mai 1992
 
   \bibitem{IA92b} F. Irigoin, C. Ancourt, 
@@ -7215,7 +7241,7 @@ J.J.~Dongarra and B.~Tourancheau Eds, Elsevier,
 Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
 
   \bibitem{I94} F. Irigoin, \& al.,
-{\em Projet PIPS. Environnement de développement},
+{\em Projet PIPS. Environnement de développement},
 Rapport interne EMP-CRI-E146, novembre 1994. This report is available
 on-line and regularly updated.
 
@@ -7234,12 +7260,12 @@ on-line and regularly updated.
   ISPRA Courses on Information Sciences 1986}, ISPRA, Kluwer Academic,
   1989
 
-\bibitem{Pla90} A. Platonoff, {\em Calcul des effets des procédures au
-  moyen des régions}, Rapport interne EMP-CAII-I132, juin 1990
+\bibitem{Pla90} A. Platonoff, {\em Calcul des effets des procédures au
+  moyen des régions}, Rapport interne EMP-CAII-I132, juin 1990
 
-\bibitem{Pla95a} A. Platonoff, {\em Contribution à la Distribution
-  Automatique des Données pour Machines Massivement Parallèles},
-  Thèse de doctorat de l'université Pierre et Marie Curie, 9 mars
+\bibitem{Pla95a} A. Platonoff, {\em Contribution à la Distribution
+  Automatique des Données pour Machines Massivement Parallèles},
+  Thèse de doctorat de l'université Pierre et Marie Curie, 9 mars
   1995.
 
 \bibitem{Pla95b} A. Platonoff, Automatic Data Distribution for Massively
@@ -7247,10 +7273,10 @@ on-line and regularly updated.
   Parallel Computers}, Malaga, Spain, June 1995.
 
   \bibitem{T84} R. Triolet,
-{\em Contribution à la parallélisation automatique de programmes
-Fortran comportant des appels de procédure},
-Thèse de docteur-ingénieur, Université Pierre et Marie Curie,
-décembre 1984
+{\em Contribution à la parallélisation automatique de programmes
+Fortran comportant des appels de procédure},
+Thèse de docteur-ingénieur, Université Pierre et Marie Curie,
+décembre 1984
 
   \bibitem{TIF86} R. Triolet, F. Irigoin, P. Feautrier,
 {\em Direct Parallelization of Call Statements},
@@ -7258,15 +7284,15 @@ ACM SIGPLAN'86 Symposium on Compiler Construction, Hyatt Rickeys Hotel, Palo
 Alto, June 23-27, 1986
 
   \bibitem{Y93} Y. Yang,
-{\em Tests des dépendances et transformations de programme},
-Thèse de doctorat de l'Université Pierre et Marie Curie, 
+{\em Tests des dépendances et transformations de programme},
+Thèse de doctorat de l'Université Pierre et Marie Curie, 
 15 Novembre 1993, rapport A/242.
 
   \bibitem{Z94} L. Zhou,
 {\em Analyse
-statique et dynamique de la complexité des programmes 
+statique et dynamique de la complexité des programmes 
 scientifiques},
-Thèse de doctorat de l'Université Pierre et Marie Curie, 
+Thèse de doctorat de l'Université Pierre et Marie Curie, 
 14 Septembre 1994, technical report A/255.
 
 \end{thebibliography}
