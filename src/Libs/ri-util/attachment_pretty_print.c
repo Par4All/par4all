@@ -10,6 +10,7 @@
 #include "properties.h"
 #include "word_attachment.h"
 
+enum {POSITION_UNDEFINED = -1};
 
 /* Mapping from an object to a name and from a name to an object: */
 static hash_table names_of_almost_everything_in_a_module = NULL;
@@ -94,7 +95,9 @@ begin_attachment_prettyprint()
       /*word_text_attachment_mapping = hash_table_make(hash_pointer, 0);*/
       /* Initialize the local mapings: */
       init_word_to_attachments_begin();
-      init_word_to_attachments_end();    
+      init_word_to_attachments_end();
+
+      /*name_almost_everything_in_a_module(mod_stat);*/
    }
 }
 
@@ -111,7 +114,9 @@ end_attachment_prettyprint()
       /* Should be OK since output_the_attachments_for_emacs() has
          already unlinked the attachment from
          ord_to_attachments_begin: */
-      close_word_to_attachments_end();    
+      close_word_to_attachments_end();
+      
+      /*free_names_of_almost_everything_in_a_module();*/
    }
 }
 
@@ -143,7 +148,9 @@ attach_to_word_list(string begin_word,
     if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {
 	/* We do not know the position of the attachement in the output
 	   file yet: */
-	attachment a = make_attachment(at, -1, -1);
+	attachment a = make_attachment(at,
+				       POSITION_UNDEFINED,
+				       POSITION_UNDEFINED);
 
 	debug_on("ATTACHMENT_DEBUG_LEVEL");
 	debug(6, "attach_to_word_list",
@@ -194,6 +201,17 @@ attach_to_sentence_up_to_end_of_text(sentence s,
 }
 
 
+/* Attach something to all a text: */
+static void
+attach_to_text(text t,
+	       attachee a)
+{
+    attach_to_sentence_list(SENTENCE(CAR(text_sentences(t))),
+			    SENTENCE(CAR(gen_last(text_sentences(t)))),
+			    a);
+}
+
+
 
 /* The user interface: */
 
@@ -215,8 +233,49 @@ sentence
 attach_head_to_sentence(sentence s,
 			entity module)
 {
-    attach_to_sentence(s, make_attachee(is_attachee_module_head, module));
+    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+	attach_to_sentence(s, make_attachee(is_attachee_module_head, module));
     return s;
+}
+
+
+/* Attach a reference: */
+void
+attach_reference_to_word_list(string begin_word,
+			      string end_word,
+			      reference r)
+{
+    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+	attach_to_word_list(begin_word,
+			    end_word,
+			    make_attachee(is_attachee_reference, r));
+}
+
+
+/* Attach a decoration: */
+void
+attach_decoration_to_text(text t)
+{
+    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+	attach_to_text(t, make_attachee(is_attachee_decoration, UU));
+}
+
+
+/* Attach a preconditions decoration: */
+void
+attach_preconditions_decoration_to_text(text t)
+{
+    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+	attach_to_text(t, make_attachee(is_attachee_preconditions, UU));
+}
+
+
+/* Attach a transformers decoration: */
+void
+attach_transformers_decoration_to_text(text t)
+{
+    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+	attach_to_text(t, make_attachee(is_attachee_transformers, UU));
 }
 
 
@@ -228,6 +287,10 @@ deal_with_sentence_word_begin(string a_word,
 {
     if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {	    
 	debug_on("ATTACHMENT_DEBUG_LEVEL");
+
+	debug(8, "deal_with_sentence_word_begin",
+	      "Looking for \"%s\" (%#x) at %d\n",
+	      a_word, a_word, position_in_the_output);
 
 	if (bound_word_to_attachments_begin_p((int) a_word)) {
 	    /* Well, this word is an attachment begin: */
@@ -262,12 +325,15 @@ deal_with_sentence_word_end(string a_word,
     if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES")) {	    
 	debug_on("ATTACHMENT_DEBUG_LEVEL");
 
+	debug(8, "deal_with_sentence_word_end",
+	      "Looking for \"%s\" (%#x) at %d\n",
+	      a_word, a_word, position_in_the_output);
+
 	if (bound_word_to_attachments_end_p((int) a_word)) {
 	    /* Well, this word is an attachment end: */
-	    list some_attachments =
-		attachments_attachment(load_word_to_attachments_end((int) a_word));
-	    debug(4, "deal_with_sentence_word_end", "end = %d:\n",
-		  position_in_the_output);
+	    list some_attachments = attachments_attachment(load_word_to_attachments_end((int) a_word));
+	    debug(4, "deal_with_sentence_word_end",
+		  "end = %d:\n", position_in_the_output);
 
 	    MAP(ATTACHMENT, an_attachment,
 		{
@@ -292,26 +358,28 @@ static bool
 output_an_attachment(attachment a)
 {
     attachee at = attachment_attachee(a);
+    int begin = attachment_begin(a);
+    int end = attachment_end(a);
     
-    pips_debug(5, "begin: %d, end: %d\n", attachment_begin(a),
-	       attachment_end(a));
-    
+    pips_debug(5, "begin: %d, end: %d, attachment %#x (attachee %#x)\n",
+	       begin, end, (unsigned int) a, (unsigned int) at);
+
+    pips_assert("begin and end should be initialized.",
+		begin != POSITION_UNDEFINED && end != POSITION_UNDEFINED);
+		
     /* Begin an Emacs Lisp properties: */
-    fprintf(local_output_file, "\n\t\t%d %d (",
-	    attachment_begin(a), attachment_end(a));
+    fprintf(local_output_file, "\n\t\t%d %d (", begin, end);
 
     switch(attachee_tag(at))
     {
-    case is_attachee_entity: 
+    case is_attachee_reference:
 	{	    
-	    entity e = attachee_entity(at);
-	    pips_debug(5, "\tentity %#x\n", (unsigned int) e);
+	    reference r = attachee_reference(at);
+	    pips_debug(5, "\tentity %#x\n", (unsigned int) r);
 	    /* Output the address as a string because Emacs cannot
                store 32-bit numbers: */
-	    fprintf(local_output_file, "epips-property-entity \"%#x\"",
-		    (unsigned int) e);
-
-	    fprintf(local_output_file, " face underline");
+	    fprintf(local_output_file, "face epips-face-reference epips-property-reference \"%#x\"",
+		    (unsigned int) r);
 	    break;
 	}
 	
@@ -320,12 +388,8 @@ output_an_attachment(attachment a)
 	    loop l = attachee_loop(at);
 	    pips_debug(5, "\tloop %#x\n", (unsigned int) l);
 	    if (execution_parallel_p(loop_execution(l)))
-		fprintf(local_output_file, "face epips-face-parallel-loop");
-
-	    /* Output the address as a string because Emacs cannot
-               store 32-bit numbers: */
-	    fprintf(local_output_file, "epips-property-loop \"%#x\"",
-		    (unsigned int) l);
+		fprintf(local_output_file, "face epips-face-parallel-loop epips-property-loop \"%#x\"",
+			(unsigned int) l);
 	    break;
 	}
 	
@@ -336,6 +400,30 @@ output_an_attachment(attachment a)
 	    fprintf(local_output_file,
 		    "face epips-face-module-head epips-module-head-name \"%s\"",
 		    module_local_name(head));
+	    break;
+	}
+
+    case is_attachee_decoration:
+	{
+	    pips_debug(5, "\tdecoration\n");
+	    fprintf(local_output_file,
+		    "face epips-face-decoration invisible epips-invisible-decoration");
+	    break;
+	}
+
+    case is_attachee_preconditions:
+	{
+	    pips_debug(5, "\tpreconditions\n");
+	    fprintf(local_output_file,
+		    "face epips-face-preconditions invisible epips-invisible-preconditions");
+	    break;
+	}
+
+    case is_attachee_transformers:
+	{
+	    pips_debug(5, "\ttransformers\n");
+	    fprintf(local_output_file,
+		    "face epips-face-transformers invisible epips-invisible-transformers");
 	    break;
 	}
 
