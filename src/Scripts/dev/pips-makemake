@@ -1,10 +1,8 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/06/14 17:26:05 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/02 14:33:22 $, )
 # version $Revision$
-# got on %D%, %T%
-# %A%
 
 # Automatic generation of Makefile for the PIPS project
 #
@@ -116,9 +114,12 @@
 # - Avoid installing SCCS directory that confuse the SCCS production directory!
 #	Ronan.Keryell@cri.ensmp.fr, 6/12/1994.
 # - install rely on install_pips_sources, which is a shell script, FC 09/12/94
-
-# Work around a bug with the C protoizer cproto that does not
-# understand ", ...", RK, 14/06/1995.
+# - Work around a bug with the C protoizer cproto that does not
+#   understand ", ...", RK, 14/06/1995.
+# - protection to avoid reading twice a header file, FC 02/08/95
+# - install and quick-install modified, idem.
+# - header en Makefile entry added, idem.
+# - Makefile added to special .INIT target, idem.
 #
 # wish:
 #
@@ -132,59 +133,60 @@ LIBRARY=""
 PASS=""
 PRODUCTION=""
 ALL=""
+PIPSMAKEMAKE_OPTION=''
 
 while getopts lpDPca opt
 do
-	case $opt in
-	l)	LIBRARY=TRUE;;
-	p)	PASS=Passes;;
-	D)	PRODUCTION="";;
-	P)	PRODUCTION=$PRODDIR/Src;;
-	c)	ALL="";;
-	a)	ALL=TRUE;;
-	\?)	echo $USAGE >&2
-		exit 2;;
-	esac
+  case $opt in
+    l)	LIBRARY=TRUE; PIPSMAKEMAKE_OPTION='-l';;
+    p)	PASS=Passes; PIPSMAKEMAKE_OPTION='-p';;
+    D)	PRODUCTION="";;
+    P)	PRODUCTION=$PRODDIR/Src;;
+    c)	ALL="";;
+    a)	ALL=TRUE;;
+    \?)	echo $USAGE >&2
+	exit 2;;
+  esac
 done
 shift `expr $OPTIND - 1`
 if [ $# -ge 1 ]
 then
-	echo $USAGE >&2
-	exit 2
+  echo $USAGE >&2
+  exit 2
 fi
 
 if [ \( -n "$LIBRARY" -a -n "$PASS" \) \
-    -o \( -z "$LIBRARY" -a -z "$PASS" \) ]
+  -o \( -z "$LIBRARY" -a -z "$PASS" \) ]
 then
-	echo $USAGE >&2
-	exit 2
+  echo $USAGE >&2
+  exit 2
 fi
 
 if [ -z "$ALL" ]
 then
-	DIRS="."
+  DIRS="."
 else
-	DIRS="${PRODUCTION:-$DEVEDIR}/${PASS:-Lib}/*"
+  DIRS="${PRODUCTION:-$DEVEDIR}/${PASS:-Lib}/*"
 fi
 
 
 ### main loop
 for dir in $DIRS
 do
-( cd $dir
-
-if [ ! -f $CONFIG_FILE ] ; then
-   echo "Error $0: cannot find $CONFIG_FILE in $dir; abandon" >&2
-else
-### good case
-echo make $MAKEFILE in $dir
-
-if [ -f $MAKEFILE ] ; then
-   cp $MAKEFILE $MAKEFILE.old
-   rm -f $MAKEFILE
-fi
-
-cat >> $MAKEFILE <<%
+  ( cd $dir
+  
+  if [ ! -f $CONFIG_FILE ] ; then
+    echo "Error $0: cannot find $CONFIG_FILE in $dir; abandon" >&2
+  else
+    ### good case
+    echo make $MAKEFILE in $dir
+    
+    if [ -f $MAKEFILE ] ; then
+      cp $MAKEFILE $MAKEFILE.old
+      rm -f $MAKEFILE
+    fi
+    
+    cat >> $MAKEFILE <<%
 #	---------------------------------------------------------------
 #	---------------------------------------------------------------
 #
@@ -247,7 +249,7 @@ TARGETDIR=	$(LIBSRCDIR)/$(TARGET)
 #
 all: $(LIB_TARGET)
 
-.INIT:
+.INIT: $MAKEFILE 
 	@if test -n "$(PIPS_CHECK_OS)"; \\
 	then echo "Cannot run make under this OS release"; \\
 	     echo "$(PIPS_CHECK_OS)"; exit 1; \\
@@ -283,7 +285,10 @@ $(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
 	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS)
 	@echo 
 
-install: $(INC_TARGET) $(LIB_TARGET)
+# install installs sources, so depends on sources. FC
+# to insure the library is compiled before hand, a make is added.
+install: $(SOURCES)
+	$(MAKE) $(INC_TARGET) $(LIB_TARGET)
 	@if test \`echo *.a | wc -w\` -gt 1 ; \\
 	then \\
 	  echo "install failed: additional local libraries prevent it" >&2;\\
@@ -296,12 +301,15 @@ install: $(INC_TARGET) $(LIB_TARGET)
 		$(SOURCES)
 	cp $(MAKEFILE) $(TARGETDIR)/Makefile
 	cd $(TARGETDIR) ; $(MAKE) depend
+	touch install
 	$(MAKE) quick-install
 
-quick-install:
+# quick-install installs lib and so, so depends on these. FC
+quick-install: $(INC_TARGET) $(LIB_TARGET)
 	cp -r $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
 	cp $(LIB_TARGET) $(LIBDIR)
 	ranlib $(LIBDIR)/$(LIB_TARGET)
+	touch quick-install
 
 $(LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
 	cp $(LIB_TARGET) $(LIBDIR)
@@ -338,7 +346,7 @@ TARGET_IFILES=	$(TARGET_CFILES:.c=.i)
 $(BIN_TARGET): $(OBJECTS) $(INC_TARGET)
 	$(LINK) $(BIN_TARGET) $(OBJECTS) $(TARGET_LIBS)
 
-install: $(INC_TARGET) $(BIN_TARGET)
+install: $(SOURCES) 
 	@touch _tmp_hack.a
 	@test \`echo *.a | wc -w\` -eq 1 || \\
 	{ \\
@@ -347,6 +355,7 @@ install: $(INC_TARGET) $(BIN_TARGET)
 	  exit 1;\\
 	}
 	@$(RM) _tmp_hack.a
+	$(MAKE) $(INC_TARGET) $(BIN_TARGET)
 	@echo ""; echo; echo -n "Description of changes: " ; \\
 	read comments ; 
 	install_pips_sources \
@@ -354,11 +363,13 @@ install: $(INC_TARGET) $(BIN_TARGET)
 		$(SOURCES)
 	cp $(MAKEFILE) $(TARGETDIR)/Makefile
 	cd $(TARGETDIR) ; $(MAKE) depend
+	touch install
 	$(MAKE) quick-install
 
-quick-install: $(BINDIR)
+quick-install: $(INC_TARGET) $(BIN_TARGET) $(BINDIR)
 	cp $(INC_TARGET) $(INCLUDEDIR)/$(INC_TARGET)
 	cp $(BIN_TARGET) $(BINDIR)
+	touch quick-install
 
 clean:
 	-$(RM) TAGS $(OBJECTS) $(BIN_TARGET) \\
@@ -393,18 +404,30 @@ $(TARGET)-local.h:
 	if [ ! -f $(TARGET)-local.h ] ; then touch $(TARGET)-local.h ; fi
 
 # Ici commence la partie parametree en lib/passe :
-# INC_IFILES=	$(INC_CFILES:.c=.i)
 
-#
+$MAKEFILE: $(CONFIG_FILE) $(UTILDIR)/pips-makemake
+	pips-makemake $PIPSMAKEMAKE_OPTION
+
 # Pour eviter trop de compilations, $(INC_TARGET) ne depend pas 
 #	de $(TARGET_CFILES) tout le temps :
 # Work around the /*...*/ for protoize with stdarg.h. RK, 14/06/1995.
-$(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
+# protection against multiple reads. FC, 02/08/95
+# header entry added to allow forcing the .h generation with make header
+# without having to touch the sources.
+header:
+	{ \\
+	echo "#ifndef "$(TARGET)"_header_included" ;\\
+	echo "#define "$(TARGET)"_header_included" ;\\
+	cat $(TARGET)-local.h ;\\
 	$(PROTOIZE)  $(INC_CFILES) \\
-		| sed -e 's|,[ 	]*/\*\.\.\.\*/|, ...|g' -e 's,int .*__builtin_va_alist.*\([,\)]\),\1,' \\
-		| cat $(TARGET)-local.h - > $(INC_TARGET).tmp
+		| sed 's|,[ 	]*/\*\.\.\.\*/|, ...|g;s,int .*__builtin_va_alist.*\([,\)]\),\1,' ;\\
+	echo "#endif" ; \\
+	} > $(INC_TARGET).tmp
 	mv $(INC_TARGET).tmp $(INC_TARGET)
 
+$(INC_TARGET): $(TARGET)-local.h $(PIPS_MAKE_DEPEND_CFILES)
+	$(MAKE) header
+	
 depend: $(INC_TARGET) production-depend $(MAKEFILE)
 # Relance une compilation de $(INC_TARGET) en rajoutant la dependance sur les
 #	fichiers C :
