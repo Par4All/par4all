@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1997/12/11 14:26:09 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 2000/11/21 17:31:24 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -572,6 +572,16 @@ Pbase indexes; /* outer to inner */
     free(info);
 
     return(s);
+}
+
+Psysteme sc_sort_constraints_simplest_first(ps, base_index)
+Psysteme ps;
+Pbase base_index;
+{
+    ps->inegalites = 
+	contrainte_sort(ps->inegalites, ps->base, base_index, FALSE, FALSE);
+
+    return(ps);
 }
 
 
