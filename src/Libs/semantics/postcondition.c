@@ -1,7 +1,7 @@
 /*
  * by Fabien COELHO
  *
- * $RCSfile: postcondition.c,v $ ($Date: 1995/08/10 09:15:03 $, )
+ * $RCSfile: postcondition.c,v $ ($Date: 1995/09/26 09:22:11 $, )
  * version $Revision$,
  */
 
@@ -41,7 +41,7 @@
  *
  */
 
-GENERIC_CURRENT_MAPPING(postcondition, transformer, statement);
+GENERIC_CURRENT_MAPPING(postcondition, transformer, statement)
 
 static statement_mapping
   current_precondition_map = hash_table_undefined,
