@@ -192,7 +192,10 @@ static void private_regions_of_module_loops(statement module_stat)
 static bool stmt_filter(s)
 statement s;
 {
+    pips_debug(1, "statement %03d\n", statement_number(s));
+    
     current_stmt_push(s);
+    pips_debug(1, "end\n");
     return(TRUE);
 }
 
