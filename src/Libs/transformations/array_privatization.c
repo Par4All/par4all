@@ -529,8 +529,8 @@ loop l;
 	}
     }
 
-    l_out_priv = RegionsEntitiesInfDifference(l_out_priv, regions_dup(l_cand),
-					      w_w_combinable_p);
+    l_out_priv = RegionsEntitiesIntersection(l_out_priv, regions_dup(l_cand),
+					     w_w_combinable_p);
         
     /* compute loop_locals from l_cand */
     if (store_as_loop_locals)
