@@ -24,6 +24,7 @@ sun4="chailly   /projects/Pips/Experiments"
 sol2="chailly99 /projects/Pips/Experiments2"
 i386="tirnanog  /projects/Pips/Experiments3"
 i586="loreto    /projects/Pips/Experiments3"
+i686="marseille /projects/Pips/Experiments3"
 
 #
 # FUNCTIONS
@@ -180,6 +181,10 @@ case ${job} in
     gnusol2ll)
 	${verb} "VALIDATE stuff (with necessary compilations)" ;
 	covalid ${sol2} GNUSOL2LL ;;
+
+    linuxi86ll)
+	${verb} "COMPILE stuff only for Linux I86 (Long long)" ;
+	compile ${i686} LINUXI86LL ;;
 
     debug)
 	${verb} "DEBUG stuff..." ;
