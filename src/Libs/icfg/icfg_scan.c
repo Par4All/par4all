@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "genC.h"
+#include "linear.h"
 #include "ri.h"
 #include "control.h"      /* CONTROL_MAP is defined there */
 #include "text.h"
