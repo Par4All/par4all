@@ -36,14 +36,16 @@ static string literal = (char*) NULL;
 static int literal_size = 0;
 static void append_to_literal(string s)
 {
-    int total = strlen(literal)+strlen(s);
+    int total;
 
     if (literal_size == 0) {
 	literal_size = 50;
 	literal = (char*) malloc(sizeof(char)*literal_size);
 	message_assert("malloc ok", literal);
+	literal[0]='\0';
     }
 
+    total = strlen(literal)+strlen(s);
     if (total > literal_size) {
 	literal_size = total+10;
 	literal = (char*) realloc(literal, sizeof(char)*literal_size);
