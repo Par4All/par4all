@@ -17,6 +17,9 @@
 #include "pipsdbm.h"
 #include "wpips.h"
 
+/* Include the label names: */
+#include "wpips-labels.h"
+
 #include "resources.h"
 #include "phases.h"
 
@@ -60,6 +63,9 @@ Menu_item menu_item;
 	else if (strcmp(label, ATOMIZER_TRANSFORM) == 0) {
 	    safe_apply(BUILDER_ATOMIZER, modulename);
 	}
+	else if (strcmp(label, NEW_ATOMIZER_TRANSFORM) == 0) {
+	    safe_apply(BUILDER_NEW_ATOMIZER, modulename);
+	}
 	else if (strcmp(label, REDUCTIONS_TRANSFORM) == 0) {
 	    safe_apply(BUILDER_REDUCTIONS, modulename);
 	}
@@ -83,6 +89,7 @@ void create_transform_menu()
 		     MENU_ACTION_ITEM, LOOP_INTERCHANGE_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, SUPPRESS_DEAD_CODE_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, ATOMIZER_TRANSFORM, transform_notify,
+		     MENU_ACTION_ITEM, NEW_ATOMIZER_TRANSFORM, transform_notify,
 		     MENU_ACTION_ITEM, REDUCTIONS_TRANSFORM, transform_notify,
 		     NULL);
 
