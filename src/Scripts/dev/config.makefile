@@ -14,7 +14,5 @@ SCRIPTS = 	pips-makemake \
 		order_libraries \
 		pips-experiment
 
-FILES =		
-
 # that is all
 #
