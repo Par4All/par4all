@@ -1,5 +1,5 @@
 #!/bin/sh
-libtoolize -c
+libtoolize -c --force
 aclocal
 automake -a -c --foreign
 autoconf
