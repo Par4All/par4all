@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.65  1997/09/18 13:47:06  zory
+# Quick mpi control added
+#
 # Revision 1.64  1997/07/21 14:29:29  zory
 # paradyn action added (link with the good files)
 #
@@ -68,6 +71,11 @@ help:
 	#   restart: restart pvm (useful when debugging) 
 	#   install_{mainpvm,hostnode}: 
 	#     copies executables to the pvm directory (where spawn find them)
+	#   mpi_start: start the MPI deamon
+	#   mpi_run: start the MPI version of your program (give the number of processors 
+	#               by setting the $(NBPROCS) variable)
+	#   mpi_reset: reset MPI (useful when debugging)
+	#   mpi_stop: stop the MPI deamon
 	#   paradyn: in order to link with the paradyn object files
 
 #
@@ -303,6 +311,61 @@ DEDUCED = $(PVM_HEADERS) $(MPI_HEADERS) $(RT_INIT) $(RT_SRC_FILES)
 # make is the target asked for by pipsmake for HPFC_MAKE
 
 make: $(DEDUCED) all pvm
+
+
+#
+# MPI Quick Control 
+
+
+# Starting MPI deamon
+ifeq ($(PVM_ARCH),SUN4SOL2)
+mpi_start:
+	lamboot -v $(MPI_ROOT)/boot/bhost.def
+endif
+
+ifeq ($(PVM_ARCH),RS6K)
+mpi_start:
+	@echo "mpi has been allready started"
+endif
+
+
+# Starting $(NAME)_mainmpi program (NBPROCS= to give the number of processor)	
+ifeq ($(PVM_ARCH),SUN4SOL2)
+mpi_run: $(MAINMPI)
+	@echo "**** Don't forget to specify the number of processors by setting NBPROCS ****"
+	mpirun -v -c $(NBPROCS) -s h $(NAME)_mainmpi
+endif
+
+ifeq ($(PVM_ARCH),RS6K)
+mpi_run: $(MAINMPI)
+	poe $(NAME)_mainmpi -procs $(NBPROCS)
+endif
+
+
+#Reset mpi environnement (useful when debugging)
+
+ifeq ($(PVM_ARCH),SUN4SOL2)	
+mpi_reset:
+	lamclean -v
+endif
+
+ifeq ($(PVM_ARCH),RS6K)
+mpi_reset:
+	@echo "not yet implemented"
+endif
+
+
+#stop the MPI deamon
+ifeq ($(PVM_ARCH),SUN4SOL2)	
+mpi_stop:
+	wipe -v $(MPI_ROOT)/boot/bhost.def 
+endif
+
+ifeq ($(PVM_ARCH),RS6K)
+mpi_stop:
+	@mpi "You can not stop MPI in the POE environnement!"
+endif
+
 
 #
 # PVM quick control
