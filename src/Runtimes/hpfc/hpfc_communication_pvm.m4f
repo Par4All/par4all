@@ -1,6 +1,9 @@
 ! $Id$
 !
 ! $Log: hpfc_communication_pvm.m4f,v $
+! Revision 1.9  1997/05/29 15:59:49  coelho
+! *** empty log message ***
+!
 ! Revision 1.8  1997/05/29 15:46:06  zory
 ! *** empty log message ***
 !
@@ -282,9 +285,8 @@
 !
       subroutine HPFC NCAST
       include "hpfc_commons.h"
-      integer bufid
       debug(print *, "ncast ", MY LID, " - ", MCAST HOST)
-      call pvmfrecv(HOST TID, MCAST HOST, bufid)
+      call pvmfrecv(HOST TID, MCAST HOST, BUFFER ID)
       MCAST HOST = MCAST HOST + 2
       debug(print *, "ncast done")
       end
