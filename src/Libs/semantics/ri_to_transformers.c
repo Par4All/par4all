@@ -292,10 +292,7 @@ loop_to_transformer(loop l, list e) /* effects of loop l */
 	     * new equations...
 	     */
 	    /* transformer ftf = transformer_equality_fix_point(tfb); */
-	    transformer ftf = 
-		get_bool_property("SEMANTICS_PATTERN_MATCHING_FIX_POINT")? 
-		transformer_pattern_fix_point(tfb)
-		: transformer_equality_fix_point(tfb);
+	    transformer ftf = (* transformer_fix_point_operator)(tfb);
 	    Psysteme fsc = predicate_system(transformer_relation(ftf));
 	    Psysteme sc = SC_UNDEFINED;
 	    Pcontrainte eq = CONTRAINTE_UNDEFINED;
@@ -447,8 +444,6 @@ whileloop_to_transformer(whileloop l, list e) /* effects of whileloop l */
 	 */
 	tfb = transformer_add_condition_information(tfb, cond, TRUE);
 
-	/* translation function? */
-
 	/* compute tfb's fix point according to pips flags */
 	if(pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
 	    tf = transformer_halbwachs_fix_point(tfb);
@@ -458,10 +453,7 @@ whileloop_to_transformer(whileloop l, list e) /* effects of whileloop l */
 	  tf = transformer_identity();
 	}
 	else {
-	    transformer ftf = 
-		get_bool_property("SEMANTICS_PATTERN_MATCHING_FIX_POINT")? 
-		transformer_pattern_fix_point(tfb)
-		: transformer_equality_fix_point(tfb);
+	    transformer ftf = (* transformer_fix_point_operator)(tfb);
 	    Psysteme fsc = predicate_system(transformer_relation(ftf));
 	    Psysteme sc = SC_UNDEFINED;
 	    
