@@ -68,6 +68,14 @@ entity e;
 }
 
 
+void AbortOfProcedure()
+{
+    /* get rid of ghost variable entities */
+    remove_ghost_variable_entities();
+
+    (void) ResetBlockStack() ;
+}
+
 /* this function is called when the parsing of a procedure is done. it
 performs a few calculations which cannot be done on the fly and write
 the internal representation of the CurrentFunction with a call to
