@@ -19,9 +19,10 @@ extern int     global_exception_type[MAX_STACKED_CONTEXTS];
 extern int     global_exception_index;
 extern int     global_exception_thrown;
 
-extern int overflow_error;
-extern int simplex_arithmetic_error;
-extern int user_exception_error;
+extern unsigned int overflow_error;
+extern unsigned int simplex_arithmetic_error;
+extern unsigned int user_exception_error;
+extern unsigned int any_exception_error;
 
 /* declaration of "exception"  to keep  2 potential types:
    extern int or extern jmp_buf
