@@ -9,6 +9,7 @@
 #include "genC.h"
 #include "database.h"
 #include "misc.h"
+#include "linear.h"
 #include "ri.h"
 
 #include "ri-util.h"
