@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/17 16:33:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/23 11:13:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_log[] = "%A% ($Date: 1995/10/17 16:33:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_log[] = "%A% ($Date: 1995/10/23 11:13:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -24,62 +24,12 @@ char vcid_xv_log[] = "%A% ($Date: 1995/10/17 16:33:51 $, ) version $Revision$, g
 #include "ri.h"
 #include "database.h"
 #include "pipsdbm.h"
+#include "top-level.h"
 
 #include "wpips.h"
 
 static Textsw log_textsw;
 static Menu_item open_front, clear, close;
-
-#define LOG_FILE "LOGFILE"
-/* Par de'faut, le fichier est ferme' : */
-static FILE *log_file = NULL;
-static char log_file_name[MAXPATHLEN];
-
-
-
-void
-close_log_file()
-{
-   if (log_file != NULL && get_bool_property("USER_LOG_P") == TRUE)
-      if (fclose(log_file) != 0) {
-         perror("close_log_file");
-         abort();
-      }
-   log_file = NULL;
-}
-
-
-void
-open_log_file()
-{
-   if (log_file != NULL)
-      close_log_file();
-
-   if (get_bool_property("USER_LOG_P") == TRUE) {
-      sprintf(log_file_name, "%s/%s",
-              database_directory(db_get_current_workspace()),
-              LOG_FILE);
-      
-      if ((log_file = fopen(log_file_name, "a")) == NULL) {
-         perror("open_log_file");
-         abort();
-      }
-   }
-}
-
-
-static void
-log_on_file(char chaine[])
-{
-   if (log_file != NULL && get_bool_property("USER_LOG_P") == TRUE) {
-      if (fprintf(log_file, "%s", chaine) <= 0) {
-         perror("log_on_file");
-         abort();
-      }
-      else
-         fflush(log_file);
-   }
-}
 
 
 void
@@ -202,12 +152,12 @@ wpips_user_log(string fmt, va_list args)
 {
    static char log_buffer[SMALL_BUFFER_LENGTH];
 
-   if(get_bool_property("USER_LOG_P")==FALSE)
-      return;
-
    (void) vsprintf(log_buffer, fmt, args);
 
    log_on_file(log_buffer);
+
+   if(get_bool_property("USER_LOG_P")==FALSE)
+      return;
 
    if (wpips_emacs_mode) 
       send_user_log_to_emacs(log_buffer);
