@@ -5,6 +5,9 @@
 # a shell wrapper for "JPips", the java-based pips interface.
 #
 # $Log: jpips,v $
+# Revision 1.9  1998/11/12 14:24:14  coelho
+# -e option added to be used by emacs.
+#
 # Revision 1.8  1998/11/12 14:21:53  ancourt
 # Tpips is a shell to 1
 #
@@ -34,11 +37,12 @@
 usage()
 {
     cat <<-EOF >&2
-	jpips [-m menu] [-h] [-n] [d]
+	jpips [-m menu] [-h] [-n] [-d] [-e]
 	-m menu: the type of menu that should be used (default: test)
 	-h: some help
 	-n: no console with jpips
 	-d: debug
+	-e: launched by emacs
 EOF
 }
 
@@ -58,13 +62,14 @@ java_root=${JAVA_ROOT:-/usr/local/jdk1.2beta4}
 jar=jpips.jar
 gif=DownArrow.gif
 
-while getopts m:hnd opt
+while getopts m:hnde opt
 do
     case ${opt} in
 	m) menu_type=$OPTARG ;;
 	h) usage ;;
 	n) forward="${forward} -n" ;;
-	d) props="-Djava.compiler=NONE";;
+	d) props="${props} -Djava.compiler=NONE";;
+	e) props="${props} -Djpips.emacs=true";;
 	*) error 1 "unexpected option ${opt}" ;;
     esac
 done
