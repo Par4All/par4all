@@ -152,14 +152,22 @@ void fprint_entity_list(FILE *fp, list l);
 
 /* debug macro
  */
-#define IFDBPRINT(n, func, module, stat)                            \
-    ifdebug(n)                                                      \
-    {                                                               \
-       fprintf(stderr,                                              \
-	       "[%s] %s statement:\n",                              \
-	       func,entity_name(module));                           \
-       print_text(stderr,text_statement(module,0,stat));            \
-    }
+#define DEBUG_STAT(D, W, S)\
+ ifdebug(D) fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W),\
+            print_statement(S);
+
+#define DEBUG_SYST(D, W, S)\
+ ifdebug(D) fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W),\
+            syst_debug(S);
+
+#define DEBUG_ELST(D, W, L)\
+ ifdebug(D) fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W),\
+            fprint_entity_list(stderr, L);
+
+#define DEBUG_BASE(D, W, B)\
+ ifdebug(D) fprintf(stderr, "[%s] %s:\n", __FUNCTION__, W),\
+            base_fprint(stderr, B, entity_local_name); fprintf(stderr, "\n");
+
 
 /* Efficient I/O tags
  */
