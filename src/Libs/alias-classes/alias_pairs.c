@@ -161,9 +161,9 @@ add_alias_pairs_for_this_call_site(call call_site)
     transformer context;
     list real_args;
 
-    pips_debug(9,"begin\n");
-
     if (call_function(call_site) != callee) return TRUE;
+
+    pips_debug(9,"begin\n");
 
     pips_debug(9,"try load_statement_precondition for statement %03d\n",statement_number(current_caller_stmt));
 
@@ -178,12 +178,6 @@ add_alias_pairs_for_this_call_site(call call_site)
     pips_debug(9,"try set_interprocedural_translation_context_sc\n");
 
     pips_debug(9,"\tfor callee %s\n",entity_name(callee));
-
-    ifdebug(1)
-	{
-	    pips_debug(1,"\tand args ");
-	    print_arguments(real_args);
-	}
 
     set_interprocedural_translation_context_sc(callee, real_args);
 
@@ -219,6 +213,8 @@ add_alias_pairs_for_this_caller( entity caller )
     pips_debug(9, "begin for caller: %s\n", caller_name);
     
     /* All we need to perform the translation */
+    regions_init();
+    get_in_out_regions_properties();
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, caller_name, TRUE) );
     set_cumulated_rw_effects((statement_effects)
@@ -228,6 +224,7 @@ add_alias_pairs_for_this_caller( entity caller )
         db_get_memory_resource(DBR_PRECONDITIONS, caller_name, TRUE));
 
     caller_statement = get_current_module_statement();
+
 
 /*  gen_multi_recurse(obj,
  *                   [domain, filter, rewrite,]*
