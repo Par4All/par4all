@@ -1,4 +1,7 @@
-/* FI: these values were taken from syntax/tokyacc.h but I do not 
+/* 
+ * $Id$
+ *
+ * FI: these values were taken from syntax/tokyacc.h but I do not 
  * think they matter.
  *
  * MOD was an initial exception. So are MINIMUM and MAXIMUM
@@ -24,3 +27,4 @@
 #define CONCAT     84
 #define MINIMUM 85
 #define MAXIMUM 86
+#define CAST 87
