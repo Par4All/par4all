@@ -334,3 +334,9 @@ effects_loop_normalize_nop(list l_eff, entity index, range r,
     return l_eff; 
 }
 
+list /* of nothing */
+db_get_empty_list(string name)
+{
+    pips_debug(5, "getting nothing for %s\n", name);
+    return NIL;
+}
