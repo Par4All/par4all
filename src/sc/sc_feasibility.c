@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1995/09/14 20:04:54 $, 
+ * date: $Date: 1995/09/14 20:05:26 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -33,8 +33,6 @@
 #include <setjmp.h>
 #include <assert.h>
 #include <malloc.h>
-
-extern int fprintf();
 
 #include "boolean.h"
 #include "arithmetique.h"
