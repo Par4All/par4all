@@ -57,18 +57,25 @@ expression e;
     return(result);
 }
 
-expression expression_dup(ex)
-expression ex;
+expression 
+expression_dup(expression ex)
 {
-    syntax s = expression_syntax(ex);
-    normalized n = expression_normalized(ex);
+    syntax s;
+    normalized n;
+
+    if (expression_undefined_p(ex))
+	return expression_undefined;
+
+    s = expression_syntax(ex);
+    n = expression_normalized(ex);
+
     return (n == normalized_undefined)?
 	make_expression(syntax_dup(s), normalized_undefined):
 	make_expression(syntax_dup(s), normalized_dup(n));
 }
 
-syntax syntax_dup(s)
-syntax s;
+syntax 
+syntax_dup(syntax s)
 {
     syntax new_s = syntax_undefined;
 
