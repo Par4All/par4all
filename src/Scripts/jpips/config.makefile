@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.17  1999/02/15 14:27:31  coelho
+# new java path.
+#
 # Revision 1.16  1998/11/12 17:38:32  coelho
 # typo--
 #
@@ -54,7 +57,7 @@
 #
 #
 
-jdk_dir	=	/usr/local/jdk1.2beta4
+jdk_dir	=	/usr/local/java1.2
 jdk_bin	=	$(jdk_dir)/bin
 jdk_lib	=	$(jdk_dir)/lib
 pkg_dir	= 	classes
