@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: io-util.c,v $ version $Revision$,
- * ($Date: 1996/07/23 15:08:26 $, )
+ * ($Date: 1996/10/18 18:38:49 $, )
  */
 
 #include "defines-local.h"
@@ -59,9 +59,14 @@ DEFINE_LOCAL_STACK(current_statement, statement)
 
 static void only_io_sequence(sequence q)
 {
-    int is_io=3;
-    if (!host_section_p(sequence_statements(q)))
+    int is_io;
+    if (host_section_p(sequence_statements(q)))
+	is_io=1;
+    else
+    {
+	is_io=3;
 	MAP(STATEMENT, s, is_io = (is_io & Load(s)), sequence_statements(q));
+    }
 
     pips_debug(5, "block 0x%x: %d\n", (unsigned int) q, is_io);
     Store(current_statement_head(), is_io);
