@@ -1,11 +1,15 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1997/02/18 10:42:05 $, ) 
+ * $Id$
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
  * ??? should drop the renaming domain?
+ *
+ * $Log: remapping.c,v $
+ * Revision 1.49  1997/03/20 10:25:44  coelho
+ * RCS headers.
+ *
  */
 
 #include "defines-local.h"
