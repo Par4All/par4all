@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/07 16:27:52 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1996/08/09 11:26:23 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -285,10 +285,6 @@ WP65_LIBRARY=$PIPS_EXTEDIR
 #
 # EXTERNAL softwares
 
-# headers are built for this ARCH. GNU because more ANSI than others
-# (the GNU makefile includes gnu libc for instance...)
-HEADER_ARCH="ARCH=GNU"
-
 # An absolute file name is necessary for LISP
 LISP=/usr/local/bin/cl
 
@@ -297,12 +293,10 @@ PVMDIR="${PIPS_PUBLICDIR}/pvm3.3"
 
 #
 # For the daVinci Graph Viewer/Editor :
-#
 
 DAVINCI_DIR=${PIPS_RTSRCDIR}/daVinci/daVinci_V1.4_solaris_1
 GRAPHEDITOR_DIRECTORY=${DAVINCI_DIR}/grapheditor
 DAVINCI_ICONDIR=${DAVINCI_DIR}/images
-
 MANPATH=${MANPATH}:${DAVINCI_DIR}/man
 PATH=${PATH}:${DAVINCI_DIR}
 
