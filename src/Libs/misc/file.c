@@ -32,7 +32,7 @@ int re_exec(char *);
 extern char * sys_errlist[];
 
 FILE * 
-safe_fopen(string filename, string what)
+safe_fopen(char *filename, char *what)
 {
     FILE * f;
     if((f = fopen( filename, what)) == (FILE *) NULL) {
@@ -43,7 +43,7 @@ safe_fopen(string filename, string what)
 }
 
 int 
-safe_fclose(FILE * stream, string filename)
+safe_fclose(FILE * stream, char *filename)
 {
     if(fclose(stream) == EOF) {
 	if(errno==ENOSPC)
@@ -60,7 +60,7 @@ safe_fclose(FILE * stream, string filename)
 }
 
 int 
-safe_fflush(FILE * stream, string filename)
+safe_fflush(FILE * stream, char *filename)
 {
     if(fflush(stream) == EOF) {
 	pips_error("safe_fflush","fflush failed on file %s (%s)\n",
@@ -71,7 +71,7 @@ safe_fflush(FILE * stream, string filename)
 }
 
 FILE * 
-safe_freopen(string filename, string what, FILE * stream)
+safe_freopen(char *filename, char *what, FILE * stream)
 {
     FILE *f;
 
@@ -84,7 +84,7 @@ safe_freopen(string filename, string what, FILE * stream)
 }
 
 int 
-safe_fseek(FILE * stream, long int offset, int wherefrom, string filename)
+safe_fseek(FILE * stream, long int offset, int wherefrom, char *filename)
 {
     if( fseek( stream, offset, wherefrom) != 0) {
 	pips_error("safe_fseek","fseek failed on file %s (%s)\n",
@@ -95,7 +95,7 @@ safe_fseek(FILE * stream, long int offset, int wherefrom, string filename)
 }
 
 long int 
-safe_ftell(FILE * stream, string filename)
+safe_ftell(FILE * stream, char *filename)
 {
     long int pt;
     pt = ftell( stream);
@@ -108,7 +108,7 @@ safe_ftell(FILE * stream, string filename)
 }
 
 void 
-safe_rewind(FILE * stream, string filename)
+safe_rewind(FILE * stream, char *filename)
 {
     rewind( stream );
     if(errno != 0) {
@@ -119,7 +119,7 @@ safe_rewind(FILE * stream, string filename)
 }
 
 int 
-safe_fgetc(FILE * stream, string filename)
+safe_fgetc(FILE * stream, char *filename)
 {
     int value;
     if((value = fgetc( stream)) == EOF) {
@@ -131,7 +131,7 @@ safe_fgetc(FILE * stream, string filename)
 }
 
 int 
-safe_getc(FILE * stream, string filename)
+safe_getc(FILE * stream, char *filename)
 {
     int value;
     if((value = getc( stream)) == EOF ) {
@@ -233,11 +233,11 @@ FILE * stream;
 int
 safe_list_files_in_directory(
     gen_array_t files, /* an allocated array */
-    string dir, /* the directory we're interested in */
-    string re, /* regular expression */
+    char *dir, /* the directory we're interested in */
+    char *re, /* regular expression */
     bool (*file_name_predicate)(string) /* condition to list a file */)
 {
-   string re_comp_message;
+   char *re_comp_message;
    DIR * dirp;
    struct dirent * dp;   
    int index = 0;
@@ -312,10 +312,10 @@ file_exists_p(char * name)
 /* returns the allocated nth path in colon-separated path list.
  */
 static string
-nth_path(string path_list, int n)
+nth_path(char *path_list, int n)
 {
     int len=0,i;
-    string result;
+    char *result;
     while (*path_list && n>0)
 	if (*path_list++==COLON) n--;
     if (!*path_list) return (string) NULL;
@@ -328,8 +328,8 @@ nth_path(string path_list, int n)
     return result;
 }
 
-static string 
-relative_name_if_necessary(string name)
+static char *
+relative_name_if_necessary(char *name)
 {
     if (name[0]=='/' || name[0]=='.') return strdup(name);
     else return strdup(concatenate("./", name, 0));
@@ -339,10 +339,10 @@ relative_name_if_necessary(string name)
  * with an additional path taken from colon-separated dir_path.
  * returns NULL if no file was found.
  */
-string 
-find_file_in_directories(string file_name, string dir_path)
+char *
+find_file_in_directories(char *file_name, char *dir_path)
 {
-    string path;
+    char *path;
     int n=0;
     pips_assert("some file name", file_name);
 
@@ -356,7 +356,7 @@ find_file_in_directories(string file_name, string dir_path)
      */
     while ((path=nth_path(dir_path, n++))) 
     {
-	string name = strdup(concatenate(path, "/", file_name, 0)), res=NULL;
+	char *name = strdup(concatenate(path, "/", file_name, 0)), *res=NULL;
 	free(path);
 	if (file_exists_p(name)) 
 	    res = relative_name_if_necessary(name);
@@ -393,7 +393,7 @@ create_directory(char *name)
 }
 
 bool 
-purge_directory(string name)
+purge_directory(char *name)
 {
     bool success = TRUE;
 
@@ -429,7 +429,8 @@ purge_directory(string name)
 
 /* returns the current working directory name.
  */
-char *get_cwd()
+char *
+get_cwd(void)
 {
     static char cwd[PATH_MAX]; /* argh */
     cwd[PATH_MAX-1] = '\0';
@@ -459,6 +460,28 @@ safe_readline(FILE * file)
     return res;
 }
 
+/* returns the file as an allocated string.
+ * \n is dropped at the time.
+ */
+char * 
+safe_readfile(FILE * file)
+{
+    char * line, * buf=NULL;
+    while ((line=safe_readline(file)))
+    {
+	if (buf) 
+	{
+	    buf = (char*) 
+		realloc(buf, sizeof(char)*(strlen(buf)+strlen(line)+2));
+	    strcat(buf, " ");
+	    strcat(buf, line);
+	    free(line);
+	}
+	else buf = line;
+    }
+    return buf;
+}
+
 void 
 safe_cat(FILE * out, FILE * in)
 {
@@ -471,7 +494,7 @@ safe_cat(FILE * out, FILE * in)
 void 
 safe_append(
     FILE * out        /* where to output the file content */, 
-    string file       /* the content of which is appended */, 
+    char *file        /* the content of which is appended */, 
     int margin        /* number of spaces for shifting */ ,
     bool but_comments /* do not shift F77 comment lines */)
 {
@@ -496,7 +519,7 @@ safe_append(
 }
 
 void
-safe_copy(string source, string target)
+safe_copy(char *source, char *target)
 {
     FILE * in, * out;
     in = safe_fopen(source, "r");
@@ -511,11 +534,11 @@ safe_copy(string source, string target)
    do. So define them and use another name for them: */
 /* /some/path/to/file.suffix -> file
  */
-string 
-pips_basename(string fullpath, string suffix)
+char *
+pips_basename(char *fullpath, char *suffix)
 {
     int len = strlen(fullpath)-1, i, j;
-    string result;
+    char *result;
     if (suffix) /* drop the suffix */
     {
 	int ls = strlen(suffix)-1, le = len;
@@ -533,10 +556,10 @@ pips_basename(string fullpath, string suffix)
 
 /* /some/path/to/file.suffix -> /some/path/to
  */
-string 
-pips_dirname(string fullpath)
+char *
+pips_dirname(char *fullpath)
 {
-    string result = strdup(fullpath);
+    char *result = strdup(fullpath);
     int len = strlen(result);
     while (result[--len]!='/' && len>=0);
     result[len] = '\0';
@@ -544,7 +567,7 @@ pips_dirname(string fullpath)
 }
 
 void
-safe_unlink(string file_name)
+safe_unlink(char *file_name)
 {
     if (unlink(file_name)) 
     {
@@ -554,7 +577,7 @@ safe_unlink(string file_name)
 }
 
 void
-safe_symlink(string topath, string frompath)
+safe_symlink(char *topath, char *frompath)
 {
     if (symlink(topath, frompath))
     {
@@ -564,11 +587,42 @@ safe_symlink(string topath, string frompath)
 }
 
 void
-safe_link(string topath, string frompath)
+safe_link(char *topath, char *frompath)
 {
     if (link(frompath, topath))
     {
 	perror("[safe_link] ");
 	pips_internal_error("link(%s,%s) failed\n", frompath, topath);
     }
+}
+
+char *
+safe_system_output(char * what)
+{
+    char * result;
+    FILE * in;
+
+    in = popen(what, "r");
+
+    if (in==NULL) {
+	perror("[safe_system_output] ");
+	pips_internal_error("popen failed: %s\n", what);
+    }
+
+    result = safe_readfile(in);
+
+    if (pclose(in)) {
+	perror("[safe_system_output] ");
+	pips_internal_error("pclose failed: %s\n", what);
+    }
+
+    return result;
+}
+
+/* returns what after variable, command and file substitutions.
+ */
+char *
+safe_system_substitute(char * what)
+{
+    return safe_system_output(concatenate("echo ", what, 0));
 }
