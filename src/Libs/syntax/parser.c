@@ -38,6 +38,7 @@ char *CurrentPackage = NULL;
    area is the only non-static area. */
 entity DynamicArea = entity_undefined;
 entity StaticArea = entity_undefined;
+entity HeapArea = entity_undefined;
 
 /* where the current instruction starts and ends. its label */
 int line_b_I, line_e_I, line_b_C, line_e_C;
@@ -122,6 +123,7 @@ ParserError(char * f, char * m)
     /* Too bad for memory leak... */
     DynamicArea = entity_undefined;
     StaticArea = entity_undefined;
+    HeapArea = entity_undefined;
     reset_common_size_map_on_error();
     parser_reset_all_reader_buffers();
     parser_reset_StmtHeap_buffer();
