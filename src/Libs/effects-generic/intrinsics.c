@@ -284,6 +284,13 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
     {SUBSTRING_FUNCTION_NAME,    substring_effect},
     {ASSIGN_SUBSTRING_FUNCTION_NAME, assign_substring_effects},
 
+    /* These operators are used within the OPTIMIZE transformation in
+       order to manipulate operators such as n-ary add and multiply or
+       multiply-add operators ( JZ - sept 98) */
+    {EOLE_SUM_OPERATOR_NAME,     no_write_effects },
+    {EOLE_PROD_OPERATOR_NAME,    no_write_effects },
+    {EOLE_FMA_OPERATOR_NAME,     no_write_effects },
+
     {NULL, 0}
 };
 
