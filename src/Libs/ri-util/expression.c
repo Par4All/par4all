@@ -745,7 +745,8 @@ expression e;
 
 /* predicates on references */
 
-bool array_reference_p(r)
+bool 
+array_reference_p(r)
 reference r;
 {
     /* two possible meanings:
@@ -758,6 +759,45 @@ reference r;
      */
 
     return reference_indices(r) != NIL;
+}
+
+/* If TRUE is returned, the two references cannot conflict unless array 
+ * bound declarations are violated. If FALSE is returned, the two references
+ * may conflict.
+ *
+ * TRUE is returned if the two references are array references and if
+ * the two references entities are equal and if at least one dimension
+ * can be used to desambiguate the two references using constant subscript
+ * expressions. This test is store independent and certainly does not
+ * replace a dependence test. It may beused to compute ude-def chains.
+ *
+ * If needed, an extra effort could be made for aliased arrays.
+ */
+
+bool
+references_do_not_conflict_p(reference r1, reference r2)
+{
+    bool do_not_conflict = FALSE;
+    entity v1 = reference_variable(r1);
+    entity v2 = reference_variable(r2);
+
+    if(v1==v2) {
+	list s1 = reference_indices(r1);
+	list s2 = reference_indices(r2);
+	if(!ENDP(s1) && gen_length(s1)==gen_length(s2)) {
+	    list cs1, cs2;
+	    for(cs1=s1, cs2=s2; !ENDP(cs1) && !do_not_conflict; POP(cs1), POP(cs2)) {
+		expression sub1 = EXPRESSION(CAR(cs1));
+		expression sub2 = EXPRESSION(CAR(cs2));
+		if(expression_constant_p(sub1) && expression_constant_p(sub2)) {
+		    /* FI: OK, it would be better to use their normalized forms */
+		    do_not_conflict = (expression_to_int(sub1)!=expression_to_int(sub2));
+		}
+	    }
+	}
+    }
+
+    return do_not_conflict;
 }
 
 /*
@@ -799,7 +839,8 @@ expression_list_to_conjonction(list l)
 /* bool expression_intrinsic_operation_p(expression exp): Returns TRUE
  * if "exp" is an expression with a call to an intrinsic operation.
  */
-bool expression_intrinsic_operation_p(exp)
+bool 
+expression_intrinsic_operation_p(exp)
 expression exp;
 {
     entity e;
@@ -816,7 +857,8 @@ expression exp;
 /* bool call_constant_p(call c): Returns TRUE if "c" is a call to a constant,
  * that is, a constant number or a symbolic constant.
  */
-bool call_constant_p(call c)
+bool 
+call_constant_p(call c)
 {
     value cv = entity_initial(call_function(c));
     return( (value_tag(cv) == is_value_constant) ||
@@ -852,7 +894,8 @@ bool call_constant_p(call c)
  *
  */
 /* rather use make_vecteur_expression which was already there */
-expression Pvecteur_to_expression(Pvecteur vect)
+expression 
+Pvecteur_to_expression(Pvecteur vect)
 {
     Pvecteur Vs;
     expression aux_exp, new_exp;
@@ -963,7 +1006,8 @@ expression_equal_integer_p(expression exp, int i)
  * Note: The function MakeBinaryCall() comes from Pips/.../syntax/expression.c
  *       The function make_integer_constant_expression() comes from ri-util.
  */
-expression make_op_exp(op_name, exp1, exp2)
+expression 
+make_op_exp(op_name, exp1, exp2)
 char *op_name;
 expression exp1, exp2;
 {
@@ -1074,7 +1118,8 @@ expression exp1, exp2;
  * Pvecteur_to_expression() is a function that rebuilds an expression
  * from a Pvecteur.
  */
-expression make_lin_op_exp(op_ent, exp1, exp2)
+expression 
+make_lin_op_exp(op_ent, exp1, exp2)
 entity op_ent;
 expression exp1, exp2;
 {
@@ -1107,12 +1152,14 @@ expression exp1, exp2;
  * This is very useful when you combine expressions. It prohibits
  * unnormalized expressions with normalized sub-expressions.
  */
-void unnormalize_expression(exp)
+void 
+unnormalize_expression(exp)
 expression exp;
 {
     syntax sy;
     
     debug( 9, "unnormalize_expression", "doing\n");
+    /* FI: memory leak... */
     expression_normalized(exp) = normalized_undefined;
     sy = expression_syntax(exp);
     
@@ -1143,7 +1190,8 @@ expression exp;
  *       upon an expression for which the function expression_constant_p()
  *       returns TRUE (See the commentary given for it).
  */
-int expression_to_int(exp)
+int 
+expression_to_int(exp)
 expression exp;
 {
     int rv = 0;
@@ -1175,7 +1223,8 @@ expression exp;
  * Note : A negative constant can be represented with a call to the unary
  *        minus intrinsic function upon a positive value.
  */
-bool expression_constant_p(exp)
+bool 
+expression_constant_p(exp)
 expression exp;
 {
     if(syntax_call_p(expression_syntax(exp)))
@@ -1197,7 +1246,7 @@ expression exp;
 
 /****************************************************** SAME EXPRESSION NAME */
 
-/* compare two entities for thir appearance point of view.
+/* compare two entities for their appearance point of view.
  * used for putting common in includes.
  */
 
