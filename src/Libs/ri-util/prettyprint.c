@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/11 13:48:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/06/12 16:42:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/11 13:48:19 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/12 16:42:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -32,7 +32,6 @@ char lib_ri_util_prettyprint_c_vcid[] = "%A% ($Date: 1996/06/11 13:48:19 $, ) ve
 #include "text.h"
 #include "text-util.h"
 #include "ri.h"
-#include "word_attachment.h"
 #include "ri-util.h"
 
 #include "misc.h"
@@ -724,6 +723,7 @@ loop obj;
 int n ;
 {
     list pc = NIL;
+    sentence first_sentence;
     unformatted u;
     text r = make_text(NIL);
     statement body = loop_body( obj ) ;
@@ -787,7 +787,7 @@ int n ;
     /* LOOP prologue.
      */
     pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
-
+    
     if(!structured_do && !doall_loop_p && !do_enddo_p) {
 	pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
     }
@@ -795,7 +795,7 @@ int n ;
     pc = CHAIN_SWORD(pc, " = ");
     pc = gen_nconc(pc, words_loop_range(loop_range(obj)));
     u = make_unformatted(strdup(label), n, margin, pc) ;
-    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
+    ADD_SENTENCE_TO_TEXT(r, first_sentence = make_sentence(is_sentence_unformatted, u));
 
     /* builds the PRIVATE scalar declaration if required
      */
@@ -823,6 +823,7 @@ int n ;
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
     }
 
+    attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj);
     return r;
 }
 
@@ -998,7 +999,8 @@ statement stat;
 
    if ( strcmp(s,"") == 0 
 	|| get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") ) {
-      ADD_SENTENCE_TO_TEXT(r, sentence_head(module));
+      ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(sentence_head(module),
+						      module));
       if (head_hook) 
 	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 						head_hook(module)));
@@ -1006,7 +1008,8 @@ statement stat;
       MERGE_TEXTS(r, text_declaration(module));
    }
    else {
-      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, s));
+      ADD_SENTENCE_TO_TEXT(r, attach_head_to_sentence(make_sentence(is_sentence_formatted, s),
+						      module));
    }
 
    if (stat != statement_undefined) {
