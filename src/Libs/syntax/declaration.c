@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.54  1998/10/13 20:33:15  irigoin
+ * Constant UNKOWN_RAM_OFFSET rewritten as UNKNOWN_RAM_OFFSET
+ *
  * Revision 1.53  1998/10/09 11:46:03  irigoin
  * Support for the *HEAP* area added in InitAreas() and in print_common_layout().
  *
@@ -171,7 +174,7 @@ entity e;
 					   CONS(ENTITY, e, NIL));
 		*/
 		ram_section(r) = StaticArea;
-		ram_offset(r) = UNKOWN_RAM_OFFSET; /* CurrentOffsetOfArea(StaticArea, e); */
+		ram_offset(r) = UNKNOWN_RAM_OFFSET; /* CurrentOffsetOfArea(StaticArea, e); */
 	    }
 	    else {
 		/* Not much can be said. Maybe it is redundant, but... */
@@ -200,7 +203,7 @@ entity e;
 				   StaticArea, 
 				   /* The type and dimensions are still unknown */
 				   /* CurrentOffsetOfArea(StaticArea ,e), */
-				   UNKOWN_RAM_OFFSET,
+				   UNKNOWN_RAM_OFFSET,
 				   NIL)));
     }
 }
@@ -324,7 +327,7 @@ AnalyzeData(list ldvr, list ldvl)
 		make_storage(is_storage_ram,
 			     (make_ram(get_current_module_entity(),
 				       StaticArea, 
-				       UNKOWN_RAM_OFFSET,
+				       UNKNOWN_RAM_OFFSET,
 				       NIL)));
 	}
 	else if(storage_ram_p(entity_storage(e))) {
