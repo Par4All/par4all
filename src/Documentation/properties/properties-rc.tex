@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.165  2002/06/12 09:50:51  irigoin
+%% Latex bug with underscores fixed
+%%
 %% Revision 1.164  2002/06/12 09:47:38  irigoin
 %% Comments added about PIPS run-time functions required to support the "HRC" value of property PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
 %%
@@ -204,7 +207,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2002/06/12 09:47:38 $~$
+$~$Date: 2002/06/12 09:50:51 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -706,13 +709,13 @@ Here is a possible implementation of the two PIPS run-time subroutines
 required by the hidden return code ("HRC") option:
 
 \begin{quote}
-      subroutine SET_I_PIPS_RETURN_CODE_(irc)\\
-      common /PIPS_RETURN_CODE_COMMON/irc_shared\\
-      irc_shared = irc\\
+      subroutine SET\_I\_PIPS\_RETURN\_CODE\_(irc)\\
+      common /PIPS\_RETURN\_CODE\_COMMON/irc\_shared\\
+      irc\_shared = irc\\
       end\\
-      subroutine GET_I_PIPS_RETURN_CODE_(irc)\\
-      common /PIPS_RETURN_CODE_COMMON/irc_shared\\
-      irc = irc_shared\\
+      subroutine GET\_I\_PIPS\_RETURN\_CODE\_(irc)\\
+      common /PIPS\_RETURN\_CODE\_COMMON/irc\_shared\\
+      irc = irc\_shared\\
       end
 \end{quote}
 
