@@ -32,7 +32,7 @@
 #include "pipsmake.h"
 #include "misc.h"
 
-extern makefile open_makefile(void);
+extern makefile open_makefile(string);
 extern void save_makefile(void);
 
 /* returns the program makefile file name
