@@ -12,7 +12,7 @@
 # - uses less instead of more to avoid extra-characters when Display is run in background
 
 USAGE="Usage: Display [-w wspace] [-m module] [-v] [-l] [-s] [pretty-print]"
-AVAILABLE_PRETTY_P="Available Pretty-prints: para77 para90 cray cmf craft adfg bdt plc code tran utran prec uprec comp regi inreg outreg prop cumu cg icfg icfgprec icfgcomp icfgl icfglprec icfglcomp icfgc icfgcprec icfgccomp dg wp65 bank flint dead"
+AVAILABLE_PRETTY_P="Available Pretty-prints: para77 para90 cray cmf craft adfg bdt plc code tran utran prec uprec comp regi inreg outreg prop cumu cg icfg icfgprec icfgcomp icfgl icfglprec icfglcomp icfgc icfgcprec icfgccomp dg edg lcdg wdg wp65 bank flint dead"
 
 MORE=less
 
@@ -156,7 +156,16 @@ case $PRETTY_P in
 	icfgccomp)	SELECT=PRINT_ICFG_WITH_CONTROL_COMPLEXITIES
 		EXT=.icfgc
 		RESOURCE=ICFG_FILE;;
-	dg)     SELECT=PRINT_RICE_SEMANTICS_DEPENDENCE_GRAPH
+	dg)     SELECT=PRINT_RICE_WHOLE_DEPENDENCE_GRAPH
+	        EXT=.dg
+                RESOURCE=DG_FILE;;
+	edg)     SELECT=PRINT_RICE_EFFECTIVE_DEPENDENCE_GRAPH
+	        EXT=.dg
+                RESOURCE=DG_FILE;;
+	lcdg)     SELECT=PRINT_RICE_LOOP_CARRIED_DEPENDENCE_GRAPH
+	        EXT=.dg
+                RESOURCE=DG_FILE;;
+	wdg)     SELECT=PRINT_RICE_WHOLE_DEPENDENCE_GRAPH
 	        EXT=.dg
                 RESOURCE=DG_FILE;;
 	wp65)	SELECT=RICE_FULL_DEPENDENCE_GRAPH
