@@ -94,7 +94,7 @@ Psysteme (*method)();
 	dump_transformer(t2) ;
     }
 
-    /* If one of the transformer is empty, you do not want to union
+    /* If one of the transformers is empty, you do not want to union
      * the arguments
      */
     if(transformer_empty_p(t1)) {
