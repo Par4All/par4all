@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_broadcast.m4f,v $ (version $Revision$)
-! $Date: 1997/01/07 11:48:51 $, 
+! $Date: 1997/05/26 09:23:09 $, 
 !
 ! management of broadcasts
 ! typical call: hpfc broadcast x(lid, [number, step]*x)
@@ -58,7 +58,7 @@ COMMA_REPLICATE(LEVEL,`LIST_INDEX_DECL')`'LEVEL_ZERO(,``,'')
 SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
       if (i`'LEVEL.ne.MYLID) then
          debug(print *, MY LID, " BRD to ", i`'LEVEL, SENDCHANNELS(i`'LEVEL))
-         call pvmfsend(NODETIDS(i`'LEVEL), 
+         call HPFC SEND(NODETIDS(i`'LEVEL), 
      $        SENDCHANNELS(i`'LEVEL), info)
          SENDCHANNELS(i`'LEVEL) = SENDCHANNELS(i`'LEVEL) + 2
          debug(print *, "BRD sent")
@@ -84,7 +84,7 @@ COMMA_REPLICATE(LEVEL,`LIST_INDEX_DECL')`'LEVEL_ZERO(,``,'')
 SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
       if (i`'LEVEL.ne.MYLID.and..not.HPFC TWIN P(an, i`'LEVEL)) then
          debug(print *, MY LID, " BRD to ", i`'LEVEL, SENDCHANNELS(i`'LEVEL))
-         call pvmfsend(NODETIDS(i`'LEVEL), 
+         call HPFC SEND(NODETIDS(i`'LEVEL), 
      $        SENDCHANNELS(i`'LEVEL), info)
          SENDCHANNELS(i`'LEVEL) = SENDCHANNELS(i`'LEVEL) + 2
          debug(print *, "BRD sent")
