@@ -578,7 +578,7 @@ effects_of_iolist(list exprs, tag act)
 	{
 	    syntax s = expression_syntax(exp);
 
-	    debug(6, "effects_of_io_list", "is_action_write");
+	    pips_debug(6, "is_action_write");
 	    /* pips_assert("effects_of_iolist", syntax_reference_p(s)); */
 	    if(syntax_reference_p(s))
 	      lep = generic_proper_effects_of_lhs(syntax_reference(s));
@@ -599,12 +599,12 @@ effects_of_iolist(list exprs, tag act)
 		lep = gen_nconc(lep, generic_proper_effects_of_expression(u));
 	      }
 	      else {
-		pips_error("effects_of_io_list", "Impossible memory write effect!");
+		pips_internal_error("Impossible memory write effect!");
 	      }
 	    }
 	}
 	else {	
-	    debug(6, "effects_of_io_elem", "is_action_read");
+	    pips_debug(6, "is_action_read");
 	    lep = generic_proper_effects_of_expression(exp);
 	}
     }
