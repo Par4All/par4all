@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <string.h>
+#include <setjmp.h>
+
 #include "genC.h"
 
 #include "ri.h"
@@ -59,6 +61,22 @@ static bool apply_without_reseting_up_to_date_resources();
 static bool up_date_without_reseting_up_to_date_p();
 static bool make_pre_transformation();
 static bool make_required();
+
+static bool catch_user_error(bool (*f)(char *), string oname)
+{
+    jmp_buf pipsmake_jump_buffer;
+    bool success = FALSE;
+
+    if(setjmp(pipsmake_jump_buffer)) {
+	success = FALSE;
+    }
+    else {
+	push_pips_context (&pipsmake_jump_buffer);
+	success = (*f)(oname);
+    }
+    pop_pips_context();
+    return success;
+}
 
 /*
  * Apply an instanciated rule with a given ressource owner 
@@ -110,9 +128,10 @@ rule ru;
 	    if (print_timing_p)
 		init_log_timers();
 
-	    status = (*pbm->builder_func)(oname);
+	    /* status = (*pbm->builder_func)(oname); */
+	    status = catch_user_error(pbm->builder_func, oname);
 	    /* GO to soon ... */
-	    status = TRUE;
+	    /* status = TRUE; */
 	       
 
 	    if (print_timing_p) {
@@ -157,6 +176,12 @@ rule ru;
  */
 static set up_to_date_resources = set_undefined;
 
+void reset_make_cache()
+{
+    set_free(up_to_date_resources);
+    up_to_date_resources = set_undefined;
+}
+
 bool make(rname, oname)
 string rname, oname;
 {
@@ -182,7 +207,10 @@ string rname, oname;
     set_free(up_to_date_resources);
     up_to_date_resources = set_undefined;
 
-    debug(1, "make", "%s(%s) - made\n", rname, oname);
+    if (status)
+	debug(1, "make", "%s(%s) - made\n", rname, oname);
+    else
+	debug(1, "make", "%s(%s) - could not be made\n", rname, oname);
     debug_off();
 
     return status;
@@ -228,10 +256,12 @@ string rname, oname;
 	       "pre-transformations and building required resources\n",
 	       rname,oname);
     } else {
+	bool success = FALSE;
 
 	/* we build the resource */
-	if (!apply_a_rule(oname, ru))
-	return FALSE;
+	success = apply_a_rule(oname, ru);
+	if (!success)
+	    return FALSE;
 
 	/* set up-to-date all the produced resources for that rule */
 	MAPL(prr, {
@@ -429,10 +459,12 @@ list lvr;
 	    callees called_modules;
 	    list lcallees;
 
-	    if (!rmake(DBR_CALLEES, oname))
-		pips_error ("build_real_resources",
-			    "unable to build callees for %s\n",
-			    oname);
+	    if (!rmake(DBR_CALLEES, oname)) {
+		/* FI: probably missing source code... */
+		user_error ("build_real_resources",
+			    "unable to build callees for %s\n%s\n",
+			    oname, "Some source code probably is missing!");
+	    }
 	    
 	    called_modules = (callees) 
 		db_get_memory_resource(DBR_CALLEES, oname, TRUE);
