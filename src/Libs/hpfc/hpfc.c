@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/09/04 18:08:10 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/09/13 14:25:06 $, )
  * version $Revision$
  */
  
@@ -161,7 +161,9 @@ static void set_resources_for_module(entity module)
      */
     only_io_mapping_initialize(get_current_module_statement());
     
-    reset_unique_numbers();
+    /*   NEW VARIABLES NEEDED
+     */
+    reset_unique_variable_numbers();
 
     /*   OTHERS
      */
