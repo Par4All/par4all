@@ -80,9 +80,9 @@ static gen_chunk *make_def(), *make_ref() ;
 %token READ_ARRAY_UNDEFINED
 
 %term READ_UNIT
-%term READ_CHAR
-%term READ_INT
-%term READ_FLOAT
+%term <c> READ_CHAR
+%term <val> READ_INT
+%term <d> READ_FLOAT
 %term READ_STRING
 
 %union {
@@ -248,13 +248,13 @@ Basis	: READ_UNIT 	{
 		$$.b = $2 ;
 		}
 	| READ_CHAR	{
-		$$.c = yylval.c ;
+		$$.c = $1 ;
 		}
 	| Int	{
 		$$.i = $1 ;
 		}
 	| READ_FLOAT {
-		$$.f = yylval.d ;
+		$$.f = $1 ;
 		}
 	| String {
 	        $$ = *$1 ;
@@ -274,7 +274,7 @@ Basis	: READ_UNIT 	{
 	;
 
 Int     : READ_INT   {
-  		$$ = yylval.val ;
+  		$$ = $1 ;
 		}
 	;
 
