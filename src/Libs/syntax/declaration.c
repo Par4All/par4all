@@ -42,7 +42,6 @@
 
 #define IS_UPPER(c) (isascii(c) && isupper(c))
 
-
 void InitAreas()
 {
     DynamicArea = FindOrCreateEntity(CurrentPackage, DYNAMIC_AREA_LOCAL_NAME);
