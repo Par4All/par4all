@@ -576,13 +576,13 @@ char        *(*in_fu)() ;
 
  
 extern  Psyslist  sl_yacc;  /* Psysteme construit par sl_gram.y */
-extern  FILE*     sl_in;   /* fichier lu par sl_lex.l          */
+extern  FILE*     slx_in;   /* fichier lu par sl_lex.l          */
 
 /* void sl_read(FILE*) reads a Psyslist */
 Psyslist  sl_read( nomfic )
 char*     nomfic;
 {
-  if ((sl_in = fopen(nomfic, "r")) == NULL) {
+  if ((slx_in = fopen(nomfic, "r")) == NULL) {
     (void) fprintf(stderr, "Ouverture du fichier %s impossible\n",nomfic);
     exit(4);
   }
