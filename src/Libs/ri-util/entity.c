@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.56  2004/02/20 13:55:39  nguyen
+ * Add function to test if an entity is declared as extern in a module or not
+ *
  * Revision 1.55  2003/12/05 17:08:03  nguyen
  * Handle entities whose scope is the compilation unit in C
  *
@@ -1050,4 +1053,20 @@ bool static_module_name_p(string name)
   /* An entity is a static module if its name contains the FILE_SEP_STRING
      but the last one is not the last character of the name string */
   return (!compilation_unit_p(name) && strstr(name, FILE_SEP_STRING) != NULL);
+}
+
+bool compilation_unit_entity_p(entity e)
+{
+  return compilation_unit_p(entity_name(e));
+}
+
+bool extern_entity_p(entity module, entity e)
+{
+  /* There are two cases for "extern" 
+     - The current module is a compilation unit and the entity is in the ram_shared list of 
+     the ram storage of the compilation unit.
+     - The current module is a normal function and the entity has a global scope.*/
+
+  return ((compilation_unit_entity_p(module) && gen_in_list_p(e,ram_shared(storage_ram(entity_storage(module)))))
+	  ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
 }
