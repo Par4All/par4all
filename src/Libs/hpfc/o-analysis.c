@@ -4,6 +4,9 @@
  *
  * $Id$
  * $Log: o-analysis.c,v $
+ * Revision 1.41  1997/08/04 14:03:31  coelho
+ * new generic includes.
+ *
  * Revision 1.40  1997/05/03 14:11:47  coelho
  * *** empty log message ***
  *
@@ -24,7 +27,7 @@
 #include "defines-local.h"
 #include "access_description.h"
 
-#include "effects.h"
+#include "effects-generic.h"
 
 static list lblocks = NIL, lloop  = NIL;
 
