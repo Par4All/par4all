@@ -721,7 +721,7 @@ epips-command-content contains the name of the file to display."
 		    (if (equal epips-command-name epips-hpfc-file-view-command-name)
 			(epips-sequential-view-command epips-command-name epips-command-content)
 		      (if (equal epips-command-name epips-ICFG-view-command-name)
-			  (epips-ICFG-or-graph-view-command epips-command-name epips-command-content)
+			  (epips-sequential-view-command epips-command-name epips-command-content)
 			(if (equal epips-command-name epips-parallel-view-command-name)
 			    (epips-sequential-view-command epips-command-name epips-command-content)
 			  (if (equal epips-command-name epips-placement-view-command-name)
