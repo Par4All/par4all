@@ -152,11 +152,8 @@ char *module_name;
     MERGE_TEXTS(txt, text_module(mod, is_user_view ? user_stat : mod_stat));
 
     close_prettyprint();
-
-    success = make_text_resource(module_name,
-				 resource_name,
-				 file_ext,
-				 txt);
+    success = make_text_resource_and_free
+	(module_name, resource_name, file_ext, txt);
     free(file_ext);
 
     if(is_user_view) {
