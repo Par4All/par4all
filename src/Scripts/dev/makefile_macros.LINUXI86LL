@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: makefile_macros.LINUXI86LL,v $
+# Revision 1.3  1997/05/12 16:00:18  coelho
+# *** empty log message ***
+#
 # Revision 1.2  1997/05/12 15:08:51  coelho
 # *** empty log message ***
 #
@@ -13,8 +16,10 @@
 
 include $(ROOT)/Include/makefile_macros.GNULL
 
-AR=ar
-RANLIB=ranlib
+CFLAGS	+=	-m486
+
+AR	=	ar
+RANLIB	=	ranlib
 
 # end of it!
 #
