@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.137  2000/04/19 11:00:04  quoc
+%% New property TRIVIAL_TEST_DISPLAY_STATISTICS added
+%%
 %% Revision 1.136  2000/04/05 08:16:47  coelho
 %% PARTIAL_EVAL stuff added.
 %%
@@ -116,7 +119,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2000/04/05 08:16:47 $~$
+$~$Date: 2000/04/19 11:00:04 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1453,6 +1456,19 @@ useless and removed in a program, this property is used to ask for
 statistics displaying:
 \begin{verbatim}
 DEAD_CODE_DISPLAY_STATISTICS TRUE
+\end{verbatim}
+
+
+
+\subsection{Trivial Test Elimination}
+\index{Dead Code}
+\index{DEAD\_CODE\_DISPLAY\_STATISTICS}
+
+Since it is useful to display statistics on what has been found
+useless and removed in a program, this property is used to ask for
+statistics displaying:
+\begin{verbatim}
+TRIVIAL_TEST_DISPLAY_STATISTICS TRUE
 \end{verbatim}
 
 
