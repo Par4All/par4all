@@ -128,10 +128,7 @@ rule ru;
 	    if (print_timing_p)
 		init_log_timers();
 
-	    /* status = (*pbm->builder_func)(oname); */
 	    status = catch_user_error(pbm->builder_func, oname);
-	    /* GO to soon ... */
-	    /* status = TRUE; */
 	       
 
 	    if (print_timing_p) {
@@ -151,6 +148,9 @@ rule ru;
 	    pips_malloc_debug();
 
 	    update_preserved_resources(oname, ru);
+
+	    if (run_pipsmake_callback() == FALSE)
+		return FALSE;
 
 	    if (interrupt_pipsmake_asap_p())
 		return FALSE;
