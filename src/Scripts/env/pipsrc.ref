@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: pipsrc.ref,v $
+# Revision 1.130  1997/11/25 17:15:23  coelho
+# calice -> calice1 on tirnanog.
+#
 # Revision 1.129  1997/11/19 14:38:34  coelho
 # tirnanog, the new linux machine is on the net.
 #
@@ -195,7 +198,7 @@ PIPS_CPP='gcc -E'
 # default is directly in a subdirectory
 
 PIPS_DIRECTORY_FOR_LINUXI86_BINARIES=/home/tirnanog/calice/pips/LINUXI86
-PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/home/tirnanog/calice/pips/LINUXI86LL
+PIPS_DIRECTORY_FOR_LINUXI86LL_BINARIES=/home/tirnanog/calice1/pips/LINUXI86LL
 PIPS_DIRECTORY_FOR_GNUSOL2LL_BINARIES=/home/recanati/baraque1/pips/GNUSOL2LL
 PIPS_DIRECTORY_FOR_SOL2LL_BINARIES=/home/recanati/baraque1/pips/SOL2LL
 
