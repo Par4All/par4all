@@ -317,6 +317,11 @@ expression e;
     return make_value(is_value_symbolic, s);
 }
 
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
+
 /* whether the given function is a constant expression, whatever the type.
  */
 bool 
@@ -328,3 +333,4 @@ expression_is_constant_p(expression e)
 	entity_constant_p(call_function(syntax_call(s))) : FALSE ;
     
 }
+/* END_EOLE */
