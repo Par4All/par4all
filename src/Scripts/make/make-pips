@@ -1,5 +1,11 @@
 #! /bin/sh
 #! /bin/sh -vx
+#
+# SCCS stuff:
+# $RCSfile: make-pips,v $ ($Date: 1994/11/18 11:47:08 $, )
+# version $Revision$
+# got on %D%, %T%
+#
 
 umask 2
 
