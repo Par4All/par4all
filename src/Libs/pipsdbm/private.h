@@ -24,3 +24,5 @@
 
 #include "database.h" /* for obsolete functions... */
 #include "pipsdbm.h"
+
+typedef void * db_void;
