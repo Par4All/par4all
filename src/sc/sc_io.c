@@ -13,7 +13,7 @@
 extern Psysteme ps_yacc;
 
  /* detection des erreurs de syntaxe par sc_gram.y */
-extern boolean syntax_error;
+extern boolean syst_syntax_error;
 
  /* fichier lu par sc_lex.l */
 extern FILE * syst_in;
@@ -93,7 +93,7 @@ Psysteme * ps;
     syst_parse();
     ps_yacc = sc_reversal(ps_yacc);
     *ps = ps_yacc;
-    return(!syntax_error);
+    return(!syst_syntax_error);
 }
 
 /* void sc_dump(Psysteme sc): impression d'un systeme
