@@ -1,7 +1,7 @@
 /* package arithmetic
  *
  * $RCSfile: io.c,v $ (version $Revision$)
- * $Date: 1996/07/13 15:55:25 $, 
+ * $Date: 1996/07/13 15:57:13 $, 
  */
 #include <stdio.h>
 #include <strings.h>
@@ -31,6 +31,11 @@ char * sprint_Value(char *s, Value v)
 void fscan_Value(FILE *f, Value *pv)
 {
     (void) fscanf(f, VALUE_FMT, pv);
+}
+
+void scan_Value(Value *pv)
+{
+    (void) scanf(VALUE_FMT, pv);
 }
 
 /* end of $RCSfile: io.c,v $
