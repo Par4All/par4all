@@ -118,7 +118,7 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
 			   STATEMENT_NUMBER_UNDEFINED,
 			   STATEMENT_ORDERING_UNDEFINED,
 			   string_undefined,
-			   make_instruction(is_instruction_loop, new_l));
+			   make_instruction(is_instruction_loop, new_l),NIL,NULL);
     ifdebug(9) {
 	(void) fprintf(stderr, "new inner loop");
 	print_text(stderr,text_statement(entity_undefined,0,new_s));
