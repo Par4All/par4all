@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1996/06/12 17:15:05 $, )
+ * ($Date: 1996/06/15 14:11:16 $, )
  */
 
 #include "defines-local.h"
@@ -74,7 +74,7 @@ GENERIC_STATIC_STATUS(/**/, the_dynamics, list, NIL, gen_free_list)
 
 void add_a_dynamic(entity c)
 {
-    the_dynamics = gen_once(c, the_dynamics);
+    the_dynamics_object = gen_once(c, the_dynamics_object);
 }
 
 /*  the local stack is used to retrieve the current statement while 
