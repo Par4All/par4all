@@ -558,24 +558,46 @@ void unroll(char *mod_name)
     /* Sets the current module to "mod_name". */
     /* current_module(local_name_to_top_level_entity(mod_name)); */
 
-    /* DBR_CODE will be changed: argument "pure" should take FALSE but this would be useless
-       since there is only *one* version of code; a new version will be put back in the
+    /* DBR_CODE will be changed: argument "pure" should take FALSE 
+       but this would be useless
+       since there is only *one* version of code; a new version 
+       will be put back in the
        data base after unrolling */
     mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
     mod_inst = statement_instruction(mod_stmt);
-    pips_assert("unroll", instruction_unstructured_p(mod_inst));
+    /* FI: not necessarily the case anymore */
+    if(!instruction_unstructured_p(mod_inst)) {
+	user_warning ("loop_unroll", "Non-standard instruction tag %d\n",
+		      instruction_tag (mod_inst));
+    }
+    /* pips_assert("unroll", instruction_unstructured_p(mod_inst)); */
     /* "unstructured expected\n"); */
 
-    /* go through unstructured and apply recursiv_loop_unroll */
-    CONTROL_MAP(ctl, {
-	statement st = control_statement(ctl);
+    switch (instruction_tag (mod_inst)) {
 
-	debug(5, "unroll", "will replace in statement %d\n",
-	      statement_number(st));
-	recursiv_loop_unroll(st, lb_ent, rate);	
-    }, unstructured_control(instruction_unstructured(mod_inst)), blocs);
+    case is_instruction_block:
+	MAP(STATEMENT, stmt, {recursiv_loop_unroll (stmt, lb_ent, rate);}, 
+	    instruction_block (mod_inst));
+	break;
 
-    gen_free_list(blocs);
+    case is_instruction_unstructured:
+
+	/* go through unstructured and apply recursiv_loop_unroll */
+	CONTROL_MAP(ctl, {
+	    statement st = control_statement(ctl);
+
+	    debug(5, "unroll", "will replace in statement %d\n",
+		  statement_number(st));
+	    recursiv_loop_unroll(st, lb_ent, rate);	
+	}, unstructured_control(instruction_unstructured(mod_inst)), blocs);
+	
+	gen_free_list(blocs);
+	break;
+
+    default:
+	user_warning ("loop_unroll", "Non-acceptable instruction tag %d\n",
+		      instruction_tag (mod_inst));
+    }
 
     /* Reorder the module, because new statements have been generated. */
     module_body_reorder(mod_stmt);
