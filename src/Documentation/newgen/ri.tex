@@ -1,5 +1,5 @@
 %% $RCSfile: ri.tex,v $ (version $Revision$)
-%% $Date: 1996/12/18 08:49:29 $, 
+%% $Date: 1996/12/26 11:29:03 $, 
 
 \documentclass[a4paper]{article}
 \usepackage{psfig,verbatim,newgen_domain}
@@ -915,7 +915,7 @@ Member {\tt number} contains an external number which is not used by
 PIPS. This number may be used as a statement identifier for debugging
 purposes or for user interaction. The default value is
 \verb+STATEMENT_NUMBER_UNDEFINED+. This number may be set explictly by
-the user (well do we really parse columns 73-80?) or implictly by the
+the user (Well do we really parse columns 73-80? No they are discarded!) or implictly by the
 parser. The parser uses the line number of the first line of the
 statement in the source file. Only executable Fortran statements are
 stored as statement and only them are used to define statement
@@ -997,12 +997,13 @@ ou de manie`re systématique avec les fonctions de parcours de NewGen,
 \fi
 
 Member {\tt comments} contains the comments associated to the statement
-in the source program. This string is used by the
-prettyprinter. Comments are associated to the {\em next} executable
-statement. For statements with no comments, this member receives a
-special value, \verb/string_undefined/. Comments associated to
-statements that may disappear during processing, such as CONTINUE,
-RETURN and GO~TO, may disappear themselves.
+in the source program. This string\footnote{To avoid problems with
+static buffers, a list of strings should have been used to store
+comments.} is used by the prettyprinter. Comments are associated to the
+{\em next} executable statement. For statements with no comments, this
+member receives a special value, \verb/string_undefined/. Comments
+associated to statements that may disappear during processing, such as
+CONTINUE, RETURN and GO~TO, may disappear too.
 
 \iffalse
 Le sous-domaine {\tt comments} contient le texte du commentaire associé
