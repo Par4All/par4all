@@ -203,15 +203,6 @@ extern int Current_index ;
 #define HASH_OFFSET 2
 #define HASH_SEPAR '|'
 
-/* translation tables */
-typedef struct 
-{
-  bool identity;
-  int old_to_actual[MAX_DOMAIN];
-  int actual_to_old[MAX_DOMAIN];
-} 
-  gen_type_translation_t, * gen_type_translation_p;
-
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
 
 /* External routines. */
