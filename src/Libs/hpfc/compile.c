@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/12/27 08:53:16 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/12/27 19:46:39 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -56,7 +56,7 @@ static list the_callees = NIL;
 static list the_commons = NIL;
 static list the_modules = NIL;
 
-GENERIC_CURRENT_MAPPING(hpfc_already_compiled, bool, entity);
+GENERIC_LOCAL_MAPPING(hpfc_already_compiled, bool, entity);
 
 static string 
 hpfc_find_a_not_compiled_module (void)
@@ -83,7 +83,7 @@ hpfc_find_a_not_compiled_module (void)
   system(concatenate("$HPFC_TOOLS/hpfc_add_warning ", filename, NULL));
 
 
-void 
+static void 
 reset_resources_for_module (string module_name)
 {
     debug(5, "reset_resources_for_module",
@@ -98,13 +98,179 @@ reset_resources_for_module (string module_name)
 
     free_only_io_map();
     free_postcondition_map();
-    free_host_gotos_map();
-    free_node_gotos_map();
 
     gen_free_list(the_callees), the_callees = NIL;
 }
+
+static string 
+hpfc_local_name (string name, string suffix)
+{
+    static char buffer[100]; /* should be enough */
+
+    return(sprintf(buffer, "%s_%s", name, suffix));
+}
+
+static string 
+hpfc_host_local_name (string name)
+{
+    return(hpfc_local_name(name, HOST_NAME));
+}
+
+static string 
+hpfc_node_local_name (string name)
+{
+    return(hpfc_local_name(name, NODE_NAME));
+}
+
+static void 
+make_host_and_node_modules (entity module)
+{
+    string
+	name = entity_local_name(module);
+    entity
+	host = entity_undefined,
+	node = entity_undefined;
+
+    if (!entity_node_new_undefined_p(module))
+	return;
+
+    if (entity_main_module_p(module))
+    {
+	host = make_empty_program(HOST_NAME);
+	node = make_empty_program(NODE_NAME);
+    }
+    else 
+    {
+	host = make_empty_subroutine(hpfc_host_local_name(name));
+	node = make_empty_subroutine(hpfc_node_local_name(name));
+
+	/*  Arity and result
+	 */
+	update_functional_as_model(host, module);
+	update_functional_as_model(node, module);
+
+	if (entity_function_p(module))
+	{
+	    /* then the variable corresponding to the function name
+	     * must be created for those new functions. The overloaded
+	     * basic is used to be sure that the variable will not be put 
+	     * in the declarations by the enforced coherency. 
+	     * ??? this issue could be managed by the coherency function ?
+	     */
+	    string
+		var_name = concatenate(name, MODULE_SEP_STRING, name, NULL),
+		tmp_name;
+	    entity
+		var = gen_find_tabulated(var_name, entity_domain),
+		new = entity_undefined;
+
+	    assert(!entity_undefined_p(var));
+
+	    tmp_name = entity_local_name(host);
+	    new = find_or_create_scalar_entity(tmp_name, tmp_name, 
+					       is_basic_overloaded);
+	    store_new_host_variable(new, var);
+
+	    tmp_name = entity_local_name(node);
+	    new = find_or_create_scalar_entity(tmp_name, tmp_name, 
+					       is_basic_overloaded);
+	    store_new_node_variable(new, var);
+	}		
+    }
+
+    /*  to allow the update of the call sites.
+     */
+    store_new_host_variable(host, module);
+    store_new_node_variable(node, module);
+}
+
+/*
+ * init_host_and_node_entities
+ *
+ * both host and node modules are initialized with the same
+ * declarations than the compiled module, but the distributed arrays
+ * declarations... which are not declared in the case of the host_module,
+ * and the declarations of which are modified in the node_module
+ * (call to NewDeclarationsOfDistributedArrays)...
+ */
+static void 
+init_host_and_node_entities (void)
+{
+    entity
+	current_module = get_current_module_entity();
+
+    host_module = load_entity_host_new(current_module);
+    node_module = load_entity_node_new(current_module);
+
+    /*  First, the commons are updated
+     */
+    MAPL(ce,
+     {
+	 entity 
+	     e = ENTITY(CAR(ce));
+	 type
+	     t = entity_type(e);
+
+	 if (type_area_p(t) && !SPECIAL_COMMON_P(e))
+	 {
+	     debug(3, "init_host_and_node_entities",    /* COMMONS */
+		   "considering common %s\n", entity_name(e));
+
+	     AddCommonToHostAndNodeModules(e); 
+
+	     if (gen_find_eq(e, the_commons)!=e)
+		 the_commons = CONS(ENTITY, e, the_commons);
+	 }
+     },
+	 entity_declarations(current_module)); 
+
+    /*   Then, the other entities
+     */
+    MAPL(ce,
+     {
+	 entity 
+	     e = ENTITY(CAR(ce));
+	 type
+	     t = entity_type(e);
+
+	 /* parameters are selected. I think they may be either
+	  * functional of variable (if declared...) FC 15/09/93
+	  */
+
+	 if ((type_variable_p(t)) ||                    /* VARIABLES */
+	     ((storage_rom_p(entity_storage(e))) &&
+	      (value_symbolic_p(entity_initial(e)))))
+	     AddEntityToHostAndNodeModules(e);
+	 else
+	 if (type_functional_p(t))                      /* PARAMETERS */
+	 {
+	     AddEntityToDeclarations(e, host_module);   
+	     AddEntityToDeclarations(e, node_module);
+	 }
+     },
+	 entity_declarations(current_module));
+    
+    NewDeclarationsOfDistributedArrays();    
+
+    ifdebug(3)
+    {
+	debug_off();
+	fprintf(stderr,"[init_host_and_node_entities]\n old declarations:\n");
+	print_text(stderr, text_declaration(current_module));
+
+	fprintf(stderr,"node_module:\n");
+	(void) gen_consistent_p(node_module);
+	print_text(stderr, text_declaration(node_module));
+
+	fprintf(stderr, "new declarations,\nhost_module:\n");
+	(void) gen_consistent_p(host_module);
+	print_text(stderr, text_declaration(host_module));
+
+	debug_on("HPFC_DEBUG_LEVEL");
+    }
+}
 		     
-void 
+static void 
 set_resources_for_module (string module_name)
 {
     entity
@@ -139,9 +305,6 @@ set_resources_for_module (string module_name)
      * Initialize mappings
      */
     only_io_mapping_initialize(get_current_module_statement());
-
-    make_host_gotos_map();
-    make_node_gotos_map();
 
     /*   CALLEES
      */
@@ -192,7 +355,7 @@ set_resources_for_module (string module_name)
 		       NIL));
 }
 
-void 
+static void 
 put_generated_resources_for_common (entity common)
 {
     FILE 
@@ -253,7 +416,7 @@ put_generated_resources_for_common (entity common)
     free(node_filename);
 }
 
-void 
+static void 
 put_generated_resources_for_module(stat, host_stat, node_stat)
 statement stat, host_stat, node_stat;
 {
@@ -324,7 +487,7 @@ statement stat, host_stat, node_stat;
     free(node_filename);
 }
 
-void 
+static void 
 put_generated_resources_for_program (program_name)
 string program_name;
 {
@@ -373,7 +536,7 @@ string program_name;
     free(init_filename);
 }
 
-void 
+static void 
 init_hpfc_for_program (void)
 {
     /* HPFC-PACKAGE is used to put dummy variables in, and other things
@@ -399,7 +562,7 @@ init_hpfc_for_program (void)
     make_update_common_map();
 }
 
-void 
+static void 
 close_hpfc_for_program (void)
 {
     gen_free_list(the_commons), the_commons = NIL;
@@ -419,7 +582,7 @@ close_hpfc_for_program (void)
     free_update_common_map();
 }
 
-void 
+static void 
 hpfcompile_common (string common_name)
 {
     entity 
@@ -432,7 +595,14 @@ hpfcompile_common (string common_name)
     store_entity_hpfc_already_compiled(common, TRUE);
 }
 
-void 
+static void 
+ReadHpfDir (string module_name)
+{
+    debug(8,"ReadHpfDir", "module: %s\n", module_name);
+    hpfcparser(module_name);    /* filter */
+}
+
+static void 
 hpfcompile_module (string module_name)
 {
     entity 
@@ -542,184 +712,5 @@ hpfcompile (char *module_name)
     debug_off();
 }
 
-/*
- * ReadHpfDir
+/*   That is all
  */
-void 
-ReadHpfDir (string module_name)
-{
-    debug(8,"ReadHpfDir", "module: %s\n", module_name);
-    
-    /* filter 
-     */
-    hpfcparser(module_name);
-    
-}
-
-static string 
-hpfc_local_name (string name, string suffix)
-{
-    static char buffer[100]; /* should be enough */
-
-    return(sprintf(buffer, "%s_%s", name, suffix));
-}
-
-string 
-hpfc_host_local_name (string name)
-{
-    return(hpfc_local_name(name, HOST_NAME));
-}
-
-string 
-hpfc_node_local_name (string name)
-{
-    return(hpfc_local_name(name, NODE_NAME));
-}
-
-void 
-make_host_and_node_modules (entity module)
-{
-    string
-	name = entity_local_name(module);
-    entity
-	host = entity_undefined,
-	node = entity_undefined;
-
-    if (!entity_node_new_undefined_p(module))
-	return;
-
-    if (entity_main_module_p(module))
-    {
-	host = make_empty_program(HOST_NAME);
-	node = make_empty_program(NODE_NAME);
-    }
-    else 
-    {
-	host = make_empty_subroutine(hpfc_host_local_name(name));
-	node = make_empty_subroutine(hpfc_node_local_name(name));
-
-	/*  Arity and result
-	 */
-	update_functional_as_model(host, module);
-	update_functional_as_model(node, module);
-
-	if (entity_function_p(module))
-	{
-	    /* then the variable corresponding to the function name
-	     * must be created for those new functions. The overloaded
-	     * basic is used to be sure that the variable will not be put 
-	     * in the declarations by the enforced coherency. 
-	     * ??? this issue could be managed by the coherency function ?
-	     */
-	    string
-		var_name = concatenate(name, MODULE_SEP_STRING, name, NULL),
-		tmp_name;
-	    entity
-		var = gen_find_tabulated(var_name, entity_domain),
-		new = entity_undefined;
-
-	    assert(!entity_undefined_p(var));
-
-	    tmp_name = entity_local_name(host);
-	    new = find_or_create_scalar_entity(tmp_name, tmp_name, 
-					       is_basic_overloaded);
-	    store_new_host_variable(new, var);
-
-	    tmp_name = entity_local_name(node);
-	    new = find_or_create_scalar_entity(tmp_name, tmp_name, 
-					       is_basic_overloaded);
-	    store_new_node_variable(new, var);
-	}		
-    }
-
-    /*  to allow the update of the call sites.
-     */
-    store_new_host_variable(host, module);
-    store_new_node_variable(node, module);
-}
-
-/*
- * init_host_and_node_entities
- *
- * both host and node modules are initialized with the same
- * declarations than the compiled module, but the distributed arrays
- * declarations... which are not declared in the case of the host_module,
- * and the declarations of which are modified in the node_module
- * (call to NewDeclarationsOfDistributedArrays)...
- */
-void 
-init_host_and_node_entities (void)
-{
-    entity
-	current_module = get_current_module_entity();
-
-    host_module = load_entity_host_new(current_module);
-    node_module = load_entity_node_new(current_module);
-
-    /*  First, the commons are updated
-     */
-    MAPL(ce,
-     {
-	 entity 
-	     e = ENTITY(CAR(ce));
-	 type
-	     t = entity_type(e);
-
-	 if (type_area_p(t) && !SPECIAL_COMMON_P(e))
-	 {
-	     debug(3, "init_host_and_node_entities",    /* COMMONS */
-		   "considering common %s\n", entity_name(e));
-
-	     AddCommonToHostAndNodeModules(e); 
-
-	     if (gen_find_eq(e, the_commons)!=e)
-		 the_commons = CONS(ENTITY, e, the_commons);
-	 }
-     },
-	 entity_declarations(current_module)); 
-
-    /*   Then, the other entities
-     */
-    MAPL(ce,
-     {
-	 entity 
-	     e = ENTITY(CAR(ce));
-	 type
-	     t = entity_type(e);
-
-	 /* parameters are selected. I think they may be either
-	  * functional of variable (if declared...) FC 15/09/93
-	  */
-
-	 if ((type_variable_p(t)) ||                    /* VARIABLES */
-	     ((storage_rom_p(entity_storage(e))) &&
-	      (value_symbolic_p(entity_initial(e)))))
-	     AddEntityToHostAndNodeModules(e);
-	 else
-	 if (type_functional_p(t))                      /* PARAMETERS */
-	 {
-	     AddEntityToDeclarations(e, host_module);   
-	     AddEntityToDeclarations(e, node_module);
-	 }
-     },
-	 entity_declarations(current_module));
-    
-    NewDeclarationsOfDistributedArrays();    
-
-    ifdebug(3)
-    {
-	debug_off();
-	fprintf(stderr,"[init_host_and_node_entities]\n old declarations:\n");
-	print_text(stderr, text_declaration(current_module));
-
-	fprintf(stderr,"node_module:\n");
-	(void) gen_consistent_p(node_module);
-	print_text(stderr, text_declaration(node_module));
-
-	fprintf(stderr, "new declarations,\nhost_module:\n");
-	(void) gen_consistent_p(host_module);
-	print_text(stderr, text_declaration(host_module));
-
-	debug_on("HPFC_DEBUG_LEVEL");
-    }
-}
