@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1996/06/11 13:27:33 $, 
+ * $Date: 1996/06/12 21:05:28 $, 
  */
 
 #include "defines-local.h"
@@ -530,52 +530,35 @@ static bool subarray_shift_assignment_p(call c)
     return TRUE;
 }
 
-static bool instruction_filter(i)
-instruction i;
+static bool loop_filter(loop l)
 {
-    switch(instruction_tag(i))
-    {
-    case is_instruction_loop:
-	subarray_shift_ok = subarray_shift_ok && 
-	    execution_parallel_p(loop_execution(instruction_loop(i)));
-	break;    
-    case is_instruction_call:
-	if (instruction_continue_p(i)) break;
-	if (instruction_assign_p(i))
-	    if (ref_to_dist_array_p(i))
-		if (array==entity_undefined)
-		{
-		    subarray_shift_ok = 
-			subarray_shift_assignment_p(instruction_call(i));
-		    break;
-		} 
-		else /* an assignment was already encountered */
-		{
-		    subarray_shift_ok = FALSE;
-		    break;
-		}
-	    else
-		/* private variable assigned in a parallel loop,
-		 * should not be significant.
-		 */
-		break;
-	/*  anything else is not welcome
-	 */
-	subarray_shift_ok = FALSE;
-	break;
-    case is_instruction_block:
-    case is_instruction_unstructured:
-	break;
-    case is_instruction_test:
-    case is_instruction_goto:
-	subarray_shift_ok = FALSE;
-	break;
-    default:
-	pips_internal_error("unexpected instruction tag (%d)\n", 
-			    instruction_tag(i));
-    }
+    return subarray_shift_ok = subarray_shift_ok && 
+	execution_parallel_p(loop_execution(l));
+}
 
-    return subarray_shift_ok;
+static bool call_filter(call c)
+{
+    entity e = call_function(c);
+
+    pips_debug(9, "function: %s\n", entity_name(e));
+
+    if (ENTITY_CONTINUE_P(e)) return FALSE;
+    if (ENTITY_ASSIGN_P(e)) 
+    {
+	if (ref_to_dist_array_p(c))
+	  subarray_shift_ok = subarray_shift_ok && 
+	    (entity_undefined_p(array))? subarray_shift_assignment_p(c): FALSE;
+	/* else: private variable assigned in a parallel loop, ok?! */
+    }
+    else
+	subarray_shift_ok = FALSE; 
+    
+    return FALSE;
+}
+
+static bool cannot_be_a_shift(gen_chunk* x)
+{
+    return subarray_shift_ok = FALSE;
 }
 
 bool subarray_shift_p(s, pe, plvect)
@@ -588,7 +571,14 @@ list *plvect;
     lvect = NIL;
     current_regions = load_statement_local_regions(s);
 
-    gen_recurse(s, instruction_domain, instruction_filter, gen_null);
+    DEBUG_STAT(8, "considering statement", s);
+
+    gen_multi_recurse(s,
+		      call_domain, call_filter, gen_null,
+		      loop_domain, loop_filter, gen_null,
+		      test_domain, cannot_be_a_shift, gen_null,
+		      expression_domain, gen_false, gen_null,
+		      NULL);
 
     subarray_shift_ok &= !entity_undefined_p(array) &&
 	rectangular_must_region_p(array, s);
@@ -598,9 +588,9 @@ list *plvect;
 	*plvect = lvect;
     else
 	free_vector_list(lvect), lvect = NIL;
-
     current_regions = NIL;
 
+    pips_debug(8, "returning %s\n", subarray_shift_ok? "TRUE": "FALSE");
     return subarray_shift_ok;
 }
 
