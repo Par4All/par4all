@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1997/01/07 14:11:43 $, )
+ * ($Date: 1997/03/19 16:00:43 $, )
  */
 
 #include "defines-local.h"
@@ -362,7 +362,7 @@ hpfc_head_hook(
 	 "      include \"" GLOBAL_PARAMETERS_H "\"\n"
 	 "      include \"hpfc_commons.h\"\n"
 	 "      include \"hpfc_includes.h\"\n"
-	 "      include \"", old_name(m, m), "_parameters.h\"\n", NULL));
+	 "      include \"", old_name(m, m), PARM_SUFFIX "\"\n", NULL));
 }
 
 /* to be used by the prettyprinter when dealing with a common.
@@ -374,9 +374,9 @@ hpfc_common_hook(
     entity common)
 {
     return strdup(concatenate
-        ("      include \"", old_name(module, common), "_parameters.h\"\n"
+        ("      include \"", old_name(module, common), PARM_SUFFIX "\"\n"
 	 "      include \"", old_name(module, common),  
-	 module==host_module ? "_host.h\"\n" : "_node.h\"\n", NULL));
+	 module==host_module ? HINC_SUFFIX "\"\n" : NINC_SUFFIX "\"\n", NULL));
 }
 
 void 
@@ -416,10 +416,10 @@ put_generated_resources_for_common(entity common)
     prefix = entity_local_name(common);
     dir_name = db_get_current_workspace_directory();
     
-    host_name = string_cat(prefix, "_host.h");
-    node_name = string_cat(prefix, "_node.h");
-    parm_name = string_cat(prefix, "_parameters.h");
-    init_name = string_cat(prefix, "_init.h");
+    host_name = string_cat(prefix, HINC_SUFFIX);
+    node_name = string_cat(prefix, NINC_SUFFIX);
+    parm_name = string_cat(prefix, PARM_SUFFIX);
+    init_name = string_cat(prefix, INIT_SUFFIX);
 
     host_file = hpfc_fopen(full_name(dir_name, host_name));
     hpfc_print_common(host_file, host_module, host_common);
@@ -465,7 +465,7 @@ compile_a_special_io_function(entity module)
 
     file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
     dir_name = db_get_current_workspace_directory();
-    h_name = string_cat(prefix, "_host.f");
+    h_name = string_cat(prefix, HOST_SUFFIX);
 
     system(concatenate("cp ", dir_name, "/", file_name, " ", 
 		              dir_name, "/", h_name, NULL));
@@ -481,20 +481,18 @@ compile_a_special_io_function(entity module)
 void
 compile_a_pure_function(entity module)
 {
-    string prefix, file_name, h_name, n_name, dir_name;
+    string prefix, file_name, hn_name, dir_name;
 
     prefix = module_local_name(module);
     dir_name = db_get_current_workspace_directory();
     file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
-    h_name = string_cat(prefix, "_host.f");
-    n_name = string_cat(prefix, "_node.f");
+    hn_name = string_cat(prefix, BOTH_SUFFIX);
 
     system(concatenate
-       ("cp ", dir_name, "/", file_name, " ", dir_name, "/", h_name, " ; "
-	"cp ", dir_name, "/", file_name, " ", dir_name, "/", n_name, NULL));
+       ("cp ", dir_name, "/", file_name, " ", dir_name, "/", hn_name, NULL));
 
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, prefix, h_name);
-    DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, n_name);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_HOST, prefix, hn_name);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, hn_name);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, prefix, NO_FILE);
     DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, prefix, NO_FILE);
 }
@@ -512,22 +510,22 @@ put_generated_resources_for_module(
     prefix = module_local_name(module);
     dir_name = db_get_current_workspace_directory();
 
-    host_name = string_cat(prefix, "_host.f");
+    host_name = string_cat(prefix, HOST_SUFFIX);
     host_file = hpfc_fopen(full_name(dir_name, host_name));
     hpfc_print_code(host_file, host_module, host_stat);
     hpfc_fclose(host_file, host_name);
 
-    node_name = string_cat(prefix, "_node.f");
+    node_name = string_cat(prefix, NODE_SUFFIX);
     node_file = hpfc_fopen(full_name(dir_name, node_name));
     hpfc_print_code(node_file, node_module, node_stat);
     hpfc_fclose(node_file, node_name);
 
-    parm_name = string_cat(prefix, "_parameters.h");
+    parm_name = string_cat(prefix, PARM_SUFFIX);
     parm_file = hpfc_fopen(full_name(dir_name, parm_name));
     create_parameters_h(parm_file, module);
     hpfc_fclose(parm_file, parm_name);
 
-    init_name = string_cat(prefix, "_init.h");
+    init_name = string_cat(prefix, INIT_SUFFIX);
     init_file = hpfc_fopen(full_name(dir_name, init_name));
     create_init_common_param_for_arrays(init_file, module);
     hpfc_fclose(init_file, init_name);
