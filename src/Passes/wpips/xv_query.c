@@ -8,8 +8,6 @@
 #include <xview/panel.h>
 #include <xview/text.h>
 
-#include <types.h>
-
 #include "xv_sizes.h"
 
 #include "genC.h"
