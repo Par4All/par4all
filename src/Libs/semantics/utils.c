@@ -205,8 +205,8 @@ check_range_wrt_precondition(range r, transformer p, bool check_empty)
 		}
 
 		/* s = sc_strong_normalize4(s, (char * (*)(Variable)) entity_local_name); */
-		s = sc_strong_normalize5(s, (char * (*)(Variable)) entity_local_name);
-
+		 s = sc_strong_normalize5(s, (char * (*)(Variable)) entity_local_name);
+		/*s = sc_elim_redund(s);*/
 		ifdebug(8) {
 		    debug(8, "check_range_wrt_precondition",
 			  "System after normalization:\n");
