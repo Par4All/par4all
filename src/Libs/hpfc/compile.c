@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1996/10/14 22:15:09 $, )
+ * ($Date: 1996/10/15 14:44:37 $, )
  */
 
 #include "defines-local.h"
@@ -609,6 +609,8 @@ static bool expression_flt(expression e)
 	/* ??? memory leak, but how to deal with effect references? */
 	expression_syntax(e) = 
 	    make_syntax(is_syntax_reference, make_reference(subs_v, NIL));
+	free_normalized(expression_normalized(e));
+	expression_normalized(e) = normalized_undefined;
 	return FALSE;
     }
     return TRUE;
@@ -623,13 +625,13 @@ static void substitute_and_create(statement s, entity v, expression e)
     }
 
     subs_v = v;
-    subs_e = e;
+    subs_e = copy_expression(e);
     gen_recurse(s, expression_domain, expression_flt, gen_null);
     
     i = loop_to_instruction
 	(make_loop(v, 
-		   make_range(copy_expression(e),
-			      copy_expression(e),
+		   make_range(copy_expression(subs_e),
+			      subs_e, /* the copy is reused! */
 			      int_to_expression(1)),
 		   instruction_to_statement(statement_instruction(s)),
 		   entity_empty_label(),
@@ -649,7 +651,7 @@ static bool loop_flt(loop l)
 	return TRUE;
 
     s = c_stmt_head();
-    loce = load_statement_cumulated_references(s); 
+    loce = effects_effects(load_cumulated_references(s)); 
 
     MAP(EFFECT, e,
     {
