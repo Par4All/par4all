@@ -905,9 +905,29 @@ int get_call_site_number()
 
 static bool memorize_precondition(statement s)
 {
+  bool go_down = FALSE;
+
+  if(statement_ordering(s)!=STATEMENT_ORDERING_UNDEFINED) {
+    /* There may be or not a precondition associated to
+     * this statement, depending on an intermediate disk
+     * storage. However, if the ordering of statement s
+     * is undefined, statement s is not reachable and the
+     * corresponding call site should be ignored, as well
+     * as call sites in statements controlled by s
+     */
     current_precondition = load_statement_semantic(s);
 
-    return TRUE;
+    pips_assert("memorize_precondition",
+		current_precondition!=transformer_undefined);
+
+    go_down = TRUE;
+  }
+  else {
+    current_precondition = transformer_undefined;
+    go_down = FALSE;
+  }
+
+  return go_down;
 }
 
 /* Update the current_summary_precondition, if necessary */
