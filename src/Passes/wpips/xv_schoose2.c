@@ -13,7 +13,6 @@
 #include <xview/xview.h>
 #include <xview/panel.h>
 #include <xview/text.h>
-#include <types.h>
 
 #include "genC.h"
 #include "misc.h"
