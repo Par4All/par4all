@@ -20,6 +20,51 @@
 
 #include "ri-util.h"
 
+/******************************************************* EMPTY STATEMENT */
+/* detects a statement with no special effect...
+ */ 
+
+static bool statement_is_empty;
+
+static bool cannot_be_empty(gen_chunk* x)
+{
+    statement_is_empty = FALSE;
+    gen_recurse_stop(NULL);
+    return FALSE;
+}
+
+static bool call_filter(call c)
+{
+    if (ENTITY_CONTINUE_P(call_function(c)))
+	return FALSE;
+    else
+	return cannot_be_empty(c);
+}
+
+bool 
+empty_code_p(statement s)
+{
+    if ((!s) || statement_undefined_p(s)) 
+	return TRUE;
+
+    statement_is_empty = TRUE;
+    gen_multi_recurse(s,
+		      call_domain, call_filter, gen_null,
+		      NULL);
+
+    pips_debug(3, "returning %d\n", statement_is_empty);
+
+    return statement_is_empty;
+}
+
+bool 
+empty_code_list_p(list l)
+{
+    MAP(STATEMENT, s, if (!empty_code_p(s)) return FALSE, l);
+    return TRUE;
+}
+
+
 bool
 empty_comments_p(string s)
 {
