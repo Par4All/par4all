@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1994/12/28 15:45:56 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1994/12/29 18:44:14 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2009,8 +2009,8 @@ int create_p ;
     return( domain ) ;
 }
 
-/* GEN_CHECK checks that the chunk received OBJ is of the appropriate TYPE. */ 
-
+/* GEN_CHECK checks that the chunk received OBJ is of the appropriate TYPE.
+ */ 
 chunk *
 gen_check( obj, t )
 chunk *obj ;
@@ -2018,7 +2018,8 @@ int t ;
 {
     char buffer[ 1024 ] ;
 
-    if( obj == NULL ) {
+    if( obj == NULL ) 
+    {
 	(void) user("gen_check: NULL pointer, expecting type %s\n",
 		    Domains[ t ].name) ;
 	abort() ;
@@ -2033,23 +2034,57 @@ int t ;
     return( obj ) ;
 }
 
+/* GEN_TYPE returns the domain number for the object in argument
+ * 
+ * FC 29/12/94
+ */
+int
+gen_type(obj)
+chunk *obj;
+{
+    int dom;
+
+    message_assert("no domain for NULL object", obj!=(chunk*)NULL);
+    message_assert("no domain for undefined object", !chunk_undefined_p(obj));
+
+    dom = obj->i; check_domain(dom);
+
+    return(dom);
+}
+
+/*  GEN_DOMAIN_NAME returns the domain name, and may be used for debug
+ *  purposes. It should be a valid domain name.
+ *  
+ *  FC 29/12/94
+ */
+char *gen_domain_name(t)
+int t;
+{
+    check_domain(t); return(Domains[t].name);
+}
+
 extern int error_seen ;
 
-/* GEN_CONSISTENT_P dynamically checks the type correctness of OBJ. */
+/*  used for consistence checking...
+ */
+static FILE *black_hole = NULL ;
+static void open_black_hole()
+{
+    if( black_hole == NULL ) 
+	if( (black_hole=fopen( "/dev/null", "r")) == NULL ) 
+	    fatal( "Cannot open /dev/null !", "" ) ; /* not reached */
+}
 
+/* GEN_CONSISTENT_P dynamically checks the type correctness of OBJ. 
+ */
 int
 gen_consistent_p( obj )
 chunk *obj ;
 {
-    static FILE *black_hole = NULL ;
     int old_gen_debug = gen_debug ;
 
-    if( black_hole == NULL ) {
-	if( (black_hole=fopen( "/dev/null", "r")) == NULL ) {
-	    fatal( "Cannot open /dev/null !", "" ) ;
-	    /*NOTREACHED*/
-	}
-    }
+    open_black_hole();
+
     error_seen = 0 ;
     gen_debug = GEN_DBG_CHECK ;
     gen_write( black_hole, obj ) ;
@@ -2057,8 +2092,8 @@ chunk *obj ;
     return( error_seen  == 0 ) ;
 }
 	    
-/* GEN_DEFINED_P checks that the OBJect is fully defined */
-
+/* GEN_DEFINED_P checks that the OBJect is fully defined 
+*/
 static void
 defined_null( bp )
 struct binding *bp ;
@@ -2076,16 +2111,10 @@ gen_defined_p( obj )
 chunk *obj ;
 {
     struct driver dr ;
-    static FILE *black_hole = NULL ;
 
     check_read_spec_performed();
+    open_black_hole();
 
-    if( black_hole == NULL ) {
-	if( (black_hole=fopen( "/dev/null", "r")) == NULL ) {
-	    fatal( "Cannot open /dev/null !", "" ) ;
-	    /*NOTREACHED*/
-	}
-    }
     error_seen = 0  ;
     dr.null = defined_null ;
     dr.leaf_out = gen_null ;
@@ -2250,7 +2279,7 @@ chunk *c;
  *   DecisionTables:
  *     DecisionTables[domain] is the decision table to scan domain.
  *     They are to be computed/set up after specifications' load.
- *     A demand driven approach can be implemented.
+ *     A demand driven approach is implemented.
  *
  */
 
@@ -2292,7 +2321,7 @@ int domain;
     GenDecisionTableType not_used;
     int i, j;
  
-    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+    if (gen_debug & GEN_DBG_RECURSE)
 	fprintf(stderr,
 		"[initialize_domain_DecisionTables] domain %s (%d)\n",
 		Domains[domain].name, domain);
@@ -2303,7 +2332,7 @@ int domain;
     /*   init with direct inclusions
      */
     for (i=0; i<number_of_domains; i++) 
-	DecisionTables[domain][i]=DirectDomainsTable[domain][i];
+	DecisionTables[domain][i] = DirectDomainsTable[domain][i];
 
     not_used[domain]=FALSE;
 
@@ -2330,7 +2359,7 @@ int domain;
 	if (*DecisionTables[i]!=decision_table_undefined)
 	{
 	    /* shorten */
-	    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	    if (gen_debug & GEN_DBG_RECURSE)
 	    fprintf(stderr, 
 		    " - shortening with already computed %s (%d)\n", 
 		    Domains[i].name, i);
@@ -2341,7 +2370,7 @@ int domain;
 	}
 	else
 	{
-	    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	    if (gen_debug & GEN_DBG_RECURSE)
 		fprintf(stderr, 
 			" - including %s (%d)\n", 
 			Domains[i].name, i);
@@ -2351,7 +2380,7 @@ int domain;
 	}
     }
 
-    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+    if (gen_debug & GEN_DBG_RECURSE)
 	fprintf(stderr, " - computed table is\n"),
 	print_decision_table(DecisionTables[domain]);
 }
@@ -2373,7 +2402,7 @@ union domain *dp;
     case LIST:
     case ARRAY:
     case SET:
-	if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	if (gen_debug & GEN_DBG_RECURSE)
 	    fprintf(stderr,
 		    " - setting %s (%d) contains %s (%d)\n",
 		    Domains[target].name, target,
@@ -2408,7 +2437,7 @@ initialize_DirectDomainsTable()
     {
 	struct binding *bp = &Domains[i];
 
-	if (gen_debug & GEN_DBG_QUICK_RECURSE)
+	if (gen_debug & GEN_DBG_RECURSE)
 	    fprintf(stderr, 
 		    "[initialized_DirectDomainsTable] analysing %s\n",
 		    bp->name);
@@ -2423,7 +2452,7 @@ initialize_DirectDomainsTable()
 	initialize_domain_DirectDomainsTable(i, bp->domain);
     }
 
-    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+    if (gen_debug & GEN_DBG_RECURSE)
 	for (i=0; i<number_of_domains; i++)
 	    fprintf(stderr, "[initialized_DirectDomainsTable] %s (%d)\n", 
 		    Domains[i].name, i),
@@ -2456,7 +2485,7 @@ init_gen_quick_recurse_tables()
 	    number_of_domains = i;
     number_of_domains++;
 
-    if (gen_debug & GEN_DBG_QUICK_RECURSE)
+    if (gen_debug & GEN_DBG_RECURSE)
 	fprintf(stderr, 
 		"[init_gen_quick_recurse_tables] %d domains\n",
 		number_of_domains);
@@ -2567,6 +2596,7 @@ struct driver *dr;
      * these features/bugs/limitations are compatible with gen_slow_recurse.
      *
      * FI told me that only persistant edges shouldn't be followed.
+     * it may mean that tabulated elements are always persistent?
      */
 	IS_TABULATED(&Domains[quick_domain_index(obj)]))
 	return(!GO);
