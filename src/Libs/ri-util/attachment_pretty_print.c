@@ -407,15 +407,16 @@ attach_proper_effects_decoration_to_text(text t)
 void
 attach_preconditions_decoration_to_text(text t)
 {
-    if (is_emacs_pretty_print_asked)
-	attach_to_text(t, make_attachee(is_attachee_preconditions, UU));
+  if (is_emacs_pretty_print_asked)
+    attach_to_text(t, make_attachee(is_attachee_preconditions, UU));
 }
 
 /* Attach a total preconditions decoration: */
 void
 attach_total_preconditions_decoration_to_text(text t)
 {
-  pips_assert("not implemented yet", FALSE);
+  if (is_emacs_pretty_print_asked)
+    pips_assert("not implemented yet", FALSE);
 }
 
 
@@ -423,8 +424,8 @@ attach_total_preconditions_decoration_to_text(text t)
 void
 attach_transformers_decoration_to_text(text t)
 {
-    if (is_emacs_pretty_print_asked)
-	attach_to_text(t, make_attachee(is_attachee_transformers, UU));
+  if (is_emacs_pretty_print_asked)
+    attach_to_text(t, make_attachee(is_attachee_transformers, UU));
 }
 
 
@@ -437,31 +438,31 @@ deal_with_attachment_boundary(char * a_character,
 			      attachments (* load_word_to_attachments_boundary)(void_star),
 			      bool (* bound_word_to_attachments_boundary_p)(void_star))
 {
-    debug(8, "deal_with_attachment_boundary",
-	  "Looking for \"%c\" (%p) at %d\n",
-	  *a_character,a_character, position_in_the_output);
+  debug(8, "deal_with_attachment_boundary",
+	"Looking for \"%c\" (%p) at %d\n",
+	*a_character,a_character, position_in_the_output);
 
-    if (bound_word_to_attachments_boundary_p(a_character)) {
-	/* Well, this word is an attachment boundary: */
-	list some_attachments =
-	    attachments_attachment(load_word_to_attachments_boundary(a_character));
-	MAP(ATTACHMENT, an_attachment,
-	    {
-		debug(4, "deal_with_attachment_boundary",
-		      "*** Found attachment = %p for \"%c\" (%p) at %d\n",
-		      an_attachment, *a_character,
-		      a_character, position_in_the_output);
+  if (bound_word_to_attachments_boundary_p(a_character)) {
+    /* Well, this word is an attachment boundary: */
+    list some_attachments =
+      attachments_attachment(load_word_to_attachments_boundary(a_character));
+    MAP(ATTACHMENT, an_attachment,
+    {
+      debug(4, "deal_with_attachment_boundary",
+	    "*** Found attachment = %p for \"%c\" (%p) at %d\n",
+	    an_attachment, *a_character,
+	    a_character, position_in_the_output);
 
-		/* Remind the position of the boundary of the
-		   attachment: */
-		if (load_word_to_attachments_boundary
-		    == load_word_to_attachments_begin)
-		    attachment_begin(an_attachment) = position_in_the_output;
-		else
-		    attachment_end(an_attachment) = position_in_the_output;
-	    },
-	    some_attachments);
-    };
+      /* Remind the position of the boundary of the
+	 attachment: */
+      if (load_word_to_attachments_boundary
+	  == load_word_to_attachments_begin)
+	attachment_begin(an_attachment) = position_in_the_output;
+      else
+	attachment_end(an_attachment) = position_in_the_output;
+    },
+	some_attachments);
+  };
 }
 
 
