@@ -2,6 +2,9 @@
  * $Id$
  * 
  * $Log: Pawt.java,v $
+ * Revision 1.3  1998/07/03 08:13:33  coelho
+ * simpler constructors. tips added to labels and buttons.
+ *
  * Revision 1.2  1998/06/30 17:35:33  coelho
  * abstarct wt for jpips.
  *
@@ -75,20 +78,32 @@ interface Pawt
         { super(name); this.command = command; this.tf = tf; }
     }
 
-  class PCheckBox extends java.awt.swing.JCheckBox
+  class PCheckBox 
+    extends java.awt.swing.JCheckBox
     {
       public String command,checking;
       public PCheckBoxMenuItem cbmi;
       public PTextFrame frame;
-      PCheckBox(String name){ super(name); }	
-      PCheckBox(String name,String command,String checking)
-        { super(name); this.command = command; this.checking = checking; }	
-      PCheckBox
-        (String name,String command,String checking,PCheckBoxMenuItem cbmi)
-        { super(name); this.command = command; this.checking = checking;
-	  this.cbmi = cbmi; }	
-      PCheckBox(String name,PTextFrame frame)
-        { super(name); this.frame = frame; }	
+      
+      PCheckBox(String name, String command, String checking, String tip, 
+		PCheckBoxMenuItem cbmi, PTextFrame frame)
+      { 
+	super(name); 
+	if (tip!=null) setToolTipText(tip);
+	this.command = command; 
+	this.checking = checking;
+	this.cbmi = cbmi; 
+	this.frame = frame;
+      }	
+
+      PCheckBox(String name)
+      { this(name, null, null, null, null, null); }
+      
+      PCheckBox(String name, String command, String checking, String tip)
+      { this(name, command, checking, tip, null, null); }
+
+      PCheckBox(String name, PTextFrame frame)
+      { this(name, null, null, null, null, frame); }
     }
 
   class PCheckBoxMenuItem extends java.awt.swing.JCheckBoxMenuItem
@@ -123,6 +138,7 @@ interface Pawt
       public PComboBox cob;
       public Object o;
       public PRadioButtonMenuItem rbmi;
+
       PRadioButtonMenuItem(String name){ super(name); }
       PRadioButtonMenuItem(String name, String command)
         { super(name); this.command = command; }
@@ -144,40 +160,58 @@ interface Pawt
     }
 
 
-  class PSeparator extends java.awt.swing.JSeparator
-    { PSeparator(){ super(); } }
+  class PSeparator 
+    extends java.awt.swing.JSeparator
+  { 
+    PSeparator(){ super(); } 
+  }
 
+  class PButton 
+    extends java.awt.swing.JButton
+  {
+    public String 	command;
+    public PTextField 	tf;
+    public PTextFrame 	frame;
 
-  class PButton extends java.awt.swing.JButton
-    {
-      public String command;
-      public PTextField tf;
-      public PTextFrame frame;
-      PButton(){ super(); }      
-      PButton(String name){ super(name); setMargin(new Insets(0,0,0,0)); }
-      PButton(String name, PTextFrame frame)
-        { super(name); setMargin(new Insets(0,0,0,0)); this.frame = frame; }
-      PButton(String name, String command)
-        { super(name); setMargin(new Insets(0,0,0,0)); this.command = command; }
-      PButton(String name, String command, PTextField tf)
-        { super(name); setMargin(new Insets(0,0,0,0)); this.command = command;
-	  this.tf = tf; }
-    }
+    PButton(String name, String command, String tip, 
+	    PTextField tf, PTextFrame frame)
+      { 
+	super(name); 
+	setMargin(new Insets(0,0,0,0));
+	if (tip!=null) setToolTipText(tip);
+	this.command = command;
+	this.tf = tf; 
+	this.frame = frame;
+      }
 
-    
-  class PLabel extends java.awt.swing.JLabel
-    {
-      PLabel(){ super(); }
-      PLabel(String s){ super(s); }
-    }
+    PButton(String name) 
+      { this(name, null, null, null, null); }
+    PButton(String name, PTextFrame frame) 
+      { this(name, null, null, null, frame); }
+    PButton(String name, String command) 
+      { this(name, command, null, null, null); }
+    PButton(String name, String command, String tip)
+      {	this(name, command, tip, null, null); }
+  }
 
+  class PLabel 
+    extends java.awt.swing.JLabel
+  {
+    PLabel(String s, String tip)
+      { 
+	super(s); 
+	if (tip!=null) setToolTipText(tip);
+      }
+
+    PLabel(String s) { this(s, null); }
+    PLabel() { super(); }
+  }
     
   class PTextField extends java.awt.swing.JTextField
     {
       PTextField(){ super(); }
       PTextField(String s){ super(s); }
     }
-
     
   class PList extends java.awt.swing.JList
     {
