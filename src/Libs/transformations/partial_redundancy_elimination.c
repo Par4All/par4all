@@ -1,11 +1,16 @@
+/******************************************************************
+ *
+ *          PARTIAL REDUNDANCY ELIMINATION
+ *
+ *
+*******************************************************************/
+
 #include <stdio.h>
 #include <string.h>
-
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
 #include "text.h"
-
 #include "text-util.h"
 #include "database.h"
 #include "resources.h"
@@ -20,7 +25,6 @@
 #include "transformations.h"
 
 /* Statistic variables: */
-
 static int number_of_simplified_expressions;
 static int number_of_simplified_assign_expressions;
 static int number_of_simplified_while_conditions;
@@ -99,10 +103,8 @@ static void display_partial_redundancy_elimination_statistics()
 /* should be moved to linear. FC.
  * returns whether ineq is redundant or not wrt prec.
  * how : first fast check, then actual feasibility.
- * default to feasible.
- */
-
-/* This function removes all the inequalities
+ * default to feasible
+   This function removes all the inequalities
    with big coefficient (> MAXCOEFFICIENT) in the system to avoid overflow */
 
 static boolean all_variables_in_precondition(Pvecteur v, Psysteme p)
@@ -152,11 +154,9 @@ boolean efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
   switch (sc_check_inequality_redundancy(contrainte_make(v), prec)) /* try fast check */
     {
     case 1: /* ok, feasible because ineq is redundant wrt prec*/
-      retour = TRUE;
-      break;
+      return TRUE;
     case 2: /* ok, system {prec + ineq} is infeasible */
-      retour = FALSE;
-      break;
+      return FALSE;
     case 0: /* no result, try slow version. default is feasible. */
       {
 	/* nofoverflows is used to save the number of overflows before the call
@@ -183,7 +183,6 @@ boolean efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
       
       /* if retour = TRUE : the system is feasible or there are overflows
 	 (our goal is to verify if retour is FALSE or not)
-	 
 	 if there are overflows (the value of nofoverflows will be changed), 
 	 we simplify the system and recalcul the feasibility*/
 	
@@ -219,7 +218,7 @@ boolean efficient_sc_check_inequality_feasibility(Pvecteur v, Psysteme prec)
 
 static expression partial_redundancy_elimination_expression(expression e, Psysteme prec)
 {
-  if (logical_expression_p(e))
+  if (relational_expression_p(e) || logical_operator_expression_p(e))
     { 
       /* Treat all possible cases :
 	 e1 < e2,  e1 <= e2, e1 >= e2, e1 > e2, e1.EQ.e2, e1.NE.e2
@@ -664,18 +663,6 @@ static void partial_redundancy_elimination_rwt(statement s, persistant_statement
 			//structured case
 			instruction new = statement_instruction(copy_statement(test_false(it)));
 			update_statement_instruction(s,new);	
-			
-			// try like suppress_dead_code
-			/*statement false = test_false(it);
-			test_false(it) = statement_undefined;
-			test_true(it) = statement_undefined;
-			statement_instruction(s) = make_instruction_block(NIL);
-			fix_sequence_statement_attributes(s);
-			statement_instruction(s) =
-			  make_instruction_block(CONS(STATEMENT,
-						      make_stmt_of_instr(statement_instruction(s)),
-						      CONS(STATEMENT,
-						      false, NIL)));*/
 		      }
 		  }
 		else 
@@ -709,17 +696,6 @@ static void partial_redundancy_elimination_rwt(statement s, persistant_statement
 			  //structured case 
 			  instruction new = statement_instruction(copy_statement(test_true(it)));
 			  update_statement_instruction(s,new);
-			  // try like suppress_dead_code
-			  /* statement true = test_true(it);
-			  test_true(it) = statement_undefined;
-			  test_false(it) = statement_undefined;
-			  statement_instruction(s) = make_instruction_block(NIL);
-			  fix_sequence_statement_attributes(s);
-			  statement_instruction(s) =
-			  make_instruction_block(CONS(STATEMENT,
-			  make_stmt_of_instr(statement_instruction(s)),
-			  CONS(STATEMENT,
-			  true, NIL)));*/
 			}	
 		    }
 		  else 
@@ -746,25 +722,19 @@ static void partial_redundancy_elimination_rwt(statement s, persistant_statement
 
 static bool store_mapping(control c, persistant_statement_to_control map)
 {
-  extend_persistant_statement_to_control(map,
-					 control_statement(c), 
-					 c);
+  extend_persistant_statement_to_control(map,control_statement(c),c);
   return TRUE;
 }
 
 static void partial_redundancy_elimination_statement (statement module_statement)
 {  
-  persistant_statement_to_control map;
-  
-  map = make_persistant_statement_to_control();
-  
+  persistant_statement_to_control map;  
+  map = make_persistant_statement_to_control();  
   gen_context_multi_recurse(module_statement, map,			   
 			    control_domain, store_mapping, gen_null,
 			    statement_domain, gen_true, partial_redundancy_elimination_rwt,
-			    NULL);
-  
+			    NULL);  
   free_persistant_statement_to_control(map);
-
 }
 
 bool partial_redundancy_elimination(char *module_name)
@@ -802,32 +772,25 @@ bool partial_redundancy_elimination(char *module_name)
   set_precondition_map((statement_mapping)
 		       db_get_memory_resource(DBR_PRECONDITIONS,
 					      module_name,
-					      TRUE));
-  
-  debug_on("PARTIAL_REDUNDANCY_ELIMINATION_DEBUG_LEVEL");
-	
+					      TRUE));  
+  debug_on("PARTIAL_REDUNDANCY_ELIMINATION_DEBUG_LEVEL");	
   ifdebug(1){
     debug(1, "Partial redundancy elimination for logical expressions","Begin for %s\n", module_name);
     pips_assert("Statement is consistent ...", statement_consistent_p(module_statement));
   }      
   initialize_partial_redundancy_elimination_statistics();
   partial_redundancy_elimination_statement(module_statement);
-  display_partial_redundancy_elimination_statistics();
-  
-  module_reorder(module_statement);
-  
+  display_partial_redundancy_elimination_statistics();  
+  module_reorder(module_statement);  
   ifdebug(1){
     pips_assert("Statement is consistent ...", statement_consistent_p(module_statement));
     debug(1, "Partial redundancy elimination","End for %s\n", module_name);
   }
-
-  debug_off(); 	
-  
+  debug_off(); 	  
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name),module_statement);
+  reset_ordering_to_statement();
   reset_precondition_map();
   reset_current_module_statement(); 
   reset_current_module_entity();
-
   return TRUE;
-
 }
