@@ -50,8 +50,11 @@
                           (basic_overloaded_p(b1) && basic_overloaded_p(b2)) ||\
                           (basic_undefined_p(b1) && basic_undefined_p(b2)))
 #define basic_compatible_p(b1, b2) (\
-                          (basic_complex_p(b1) && basic_complex_p(b2)) ||\
-                          (basic_compatible_simple_p(b1, b2)))
+                          (basic_numeric_p(b1) && basic_numeric_p(b2)) ||\
+                          (basic_string_p(b1) && basic_string_p(b2)) ||\
+                          (basic_logical_p(b1) && basic_logical_p(b2)) ||\
+                          (basic_overloaded_p(b1) && basic_overloaded_p(b2)) ||\
+                          (basic_undefined_p(b1) && basic_undefined_p(b2)))
 
 /* Working with hash_table of basic
  */
@@ -798,8 +801,8 @@ typing_function_argument_type_to_return_type(call c, hash_table types,
     if(!arguments_basic_compatible_with(c, types, from_type))
     {
         // ERROR: Invalide of type
-        fprintf(stderr,"Intrinsic [%s]: Arguments are not compatible with [%s]\n", 
-		entity_name(function_called), basic_to_string(from_type));
+        fprintf(stderr,"Intrinsic [%s]: Arguments are not compatible !!!\n", 
+		entity_name(function_called));
     }
     else
     {
@@ -932,6 +935,7 @@ typing_function_RealDouble_to_RealDouble(call c, hash_table types)
         // ERROR: Invalide of type
         fprintf(stderr,"Intrinsic [%s]: Arguments are not numeric\n", 
 		entity_name(function_called));
+	return make_basic_float(4); // Just for test
     }
     // Find the longest type amongs all arguments
     b = basic_union_arguments(c, types);
@@ -954,6 +958,7 @@ typing_function_RealDoubleComplex_to_RealDoubleComplex(call c, hash_table types)
         // ERROR: Invalide of type
         fprintf(stderr,"Intrinsic [%s]: Arguments are not numeric\n", 
 		entity_name(function_called));
+	return make_basic_float(4); // Just for test
     }
     // Find the longest type amongs all arguments
     b = basic_union_arguments(c, types);
@@ -976,6 +981,7 @@ typing_function_IntegerRealDouble_to_IntegerRealDouble(call c, hash_table types)
         // ERROR: Invalide of type
         fprintf(stderr,"Intrinsic [%s]: Arguments are not numeric\n", 
 		entity_name(function_called));
+	return make_basic_float(4); // Just for test
     }
     // Find the longest type amongs all arguments
     b = basic_union_arguments(c, types);
@@ -1004,17 +1010,18 @@ typing_function_IntegerRealDoubleComplex_to_IntegerRealDoubleReal(call c, hash_t
         // ERROR: Invalide of type
         fprintf(stderr,"Intrinsic [%s]: Arguments are not numeric\n", 
 		entity_name(function_called));
+	return make_basic_float(4); // Just for test
     }
     // Find the longest type amongs all arguments
     b = basic_union_arguments(c, types);
     // Find the nearest type between REAL and DOUBLE
-    b = type_nearest_IntegerRealDouble(b); 
+    b = type_nearest_IntegerRealDoubleComplex(b); 
     // Typing all arguments to b if necessary
     typing_arguments(c, types, b);
 
     if (basic_complex_p(b))
     {
-        b = make_basic_float(4); // REAL
+        b = make_basic_float(4); // CMPLX --> REAL
     }
     return copy_basic(b);
 }
