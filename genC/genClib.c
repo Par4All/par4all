@@ -15,7 +15,7 @@
 */
 
 
-/* $RCSfile: genClib.c,v $ ($Date: 1997/07/22 15:44:58 $, )
+/* $RCSfile: genClib.c,v $ ($Date: 1997/07/24 15:46:39 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -2647,9 +2647,30 @@ gen_allocated_memory(
  *  - when the filter is always yes
  *  - when it is false, to stop the recursion on some types
  */
-void gen_null(gen_chunk *p){}
-bool gen_true(gen_chunk *p){ return TRUE;}
-bool gen_false(gen_chunk *p){ return FALSE;}
+void
+gen_null(gen_chunk * p)
+{
+}
+
+bool
+gen_true(gen_chunk * p)
+{
+    return TRUE;
+}
+
+bool
+gen_false(gen_chunk * p)
+{
+    return FALSE;
+}
+
+gen_chunk *
+gen_identity(gen_chunk * x)
+{
+    return(x);
+}
+
+gen_chunk * gen_identity(gen_chunk *p){ return p;}
 void gen_core(gen_chunk *p){ abort();}
 
 /* GLOBAL VARIABLES: to deal with decision tables
