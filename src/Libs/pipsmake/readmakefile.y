@@ -1,8 +1,7 @@
 /* Some modifications are made to save the current makefile (s.a. files
  * pipsmake/readmakefile.y pipsmake.h )
  *
- * $RCSfile: readmakefile.y,v $ (version $Revision$)
- * $Date: 1997/08/25 16:39:00 $, 
+ * $Id$
  *
  * They only occure between following tags: 
  *
@@ -175,25 +174,18 @@ resource:	NAME
 %%
 
 void yyerror_lex_part(char *);
-
-int yyerror(s)
-char * s;
+int yyerror(char * s)
 {
     int c;
-    
     yyerror_lex_part(s);
     fprintf(stderr, "[readmakefile] unparsed text:\n");
-    while ((c = getc(yyin)) != EOF)
-	putc(c, stderr);
-    
+    while ((c = getc(yyin)) != EOF) putc(c, stderr);
     exit(1);
     return 1;
 }
 
-void fprint_virtual_resources(fd, dir, lrv)
-FILE *fd;
-string dir;
-list lrv;
+void 
+fprint_virtual_resources(FILE *fd, string dir, list lrv)
 {
     MAP(VIRTUAL_RESOURCE, vr,
     {
@@ -223,18 +215,14 @@ list lrv;
 	    fprintf(fd, "    %s select.%s\n", dir, n);
 	    break;
 	default:
-	    pips_internal_error("bad tag (%s)\n");
+	    pips_internal_error("bad owner tag (%d)\n", owner_tag(o));
 	}
     }, lrv);
 }
 
-void fprint_makefile(fd, m)
-FILE *fd;
-makefile m;
+void fprint_makefile(FILE *fd, makefile m)
 {
-    MAPL(pr, {
-	rule r = RULE(CAR(pr));
-
+    MAP(RULE, r, {
 	fprintf(fd, "%s\n", rule_phase(r));
 	fprint_virtual_resources(fd, "\t!", rule_pre_transformation(r));
 	fprint_virtual_resources(fd, "\t<", rule_required(r));
@@ -244,7 +232,7 @@ makefile m;
     }, makefile_rules(m));
 }
 		
-makefile parse_makefile()
+makefile parse_makefile(void)
 {
     string default_pipsmake_rc_file;
     extern int init_lex();
@@ -283,29 +271,24 @@ rule find_rule_by_phase(string pname)
 {
     makefile m = parse_makefile();
 
-    debug(9, "find_rule_by_phase", "searching rule for phase %s\n", pname);
+    pips_debug(9, "searching rule for phase %s\n", pname);
 
     /* walking thru rules */
-    MAPL(pr, {
-	rule r = RULE(CAR(pr));
+    MAP(RULE, r, 
+	if (same_string_p(rule_phase(r), pname)) return r, 
+	makefile_rules(m));
 
-	if (same_string_p(rule_phase(r), pname)) {
-	    return(r);
-	}
-    }, makefile_rules(m));
-
-    return(rule_undefined);
+    return rule_undefined;
 }
 
-void add_rule(r)
-rule r;
+void add_rule(rule r)
 {
     string pn = rule_phase(r);
     bool   active_phase = FALSE;
 
     /* Check resources produced by this rule */
-    MAPL(pvr, {
-	virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
+    MAP(VIRTUAL_RESOURCE, vr, 
+    {
 	string vrn = virtual_resource_name(vr);
 	string phase;
 
@@ -325,8 +308,8 @@ rule r;
 
     /* Check resources required for this rule if it is an active one */
     if (active_phase) {
-	MAPL(pvr, {
-	    virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
+	MAP(VIRTUAL_RESOURCE, vr, 
+	{
 	    string vrn = virtual_resource_name(vr);
 	    owner vro = virtual_resource_owner(vr);
 	    string phase;
@@ -337,8 +320,8 @@ rule r;
 		phase = hash_get(activated, vrn);
 		if (phase == HASH_UNDEFINED_VALUE) {
 		    user_warning( "add_rule",
-				 "%s: phase %s requires an undefined resource %s\n",
-				 PIPSMAKE_RC, pn, vrn);
+				  "%s: phase %s requires an undefined resource %s\n",
+				  PIPSMAKE_RC, pn, vrn);
 		}
 		/* If we use a resource, another function should have produced it */
 		else if (strcmp(phase, pn) == 0) {
@@ -357,7 +340,6 @@ rule r;
 					     CONS(RULE, r, NIL));
 }
 
-/**** Begin saved_makefile version ****/
 makefile open_makefile(string name)
 {
     FILE *fd;
@@ -382,25 +364,20 @@ makefile open_makefile(string name)
     free(mkf_name);
     return (pipsmakefile);
 }
-/**** End saved_makefile version ****/
 
-
-/**** Begin saved_makefile version ****/
-bool close_makefile(string name)
+void save_makefile(string name)
 {
-    bool status = TRUE;
-    FILE *fd;
     char * mkf_name = build_pgm_makefile(name);
-
-    fd = safe_fopen(mkf_name, "w");
+    FILE * fd = safe_fopen(mkf_name, "w");
     write_makefile(fd, pipsmakefile);
     safe_fclose(fd, mkf_name);
     pips_debug(1, "makefile written on %s\n", mkf_name);
-
-    free_makefile(pipsmakefile);
     free(mkf_name);
-    pipsmakefile = makefile_undefined;
-
-    return status;
 }
-/**** End saved_makefile version ****/
+
+bool close_makefile(string name)
+{
+    save_makefile(name);
+    free_makefile(pipsmakefile), pipsmakefile = makefile_undefined;
+    return TRUE;
+}
