@@ -149,11 +149,11 @@ terme	: const ident
 		{
 		    Value p = value_mult(fac,$1);
 		    if (cote==DROIT) {
-			value_add(b1, p);
-			value_sub(b2, p);
+			value_addto(b1, p);
+			value_substract(b2, p);
 		    } else {
-			value_sub(b1, p);
-			value_add(b2, p);
+			value_substract(b1, p);
+			value_addto(b2, p);
 		    }
 		}     
 	| ident
