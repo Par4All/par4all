@@ -699,8 +699,12 @@ transformer tf;
 	 * to Chernikova convex hull that core dumps:-(. 8  September 1993
 	 *
 	 * From a theoretical point of view, pref could always be computed.
+	 *
+	 * FI: removed because it is mathematically wrong in many cases;
+	 * the negation of the test condition is lost! I keep the structure
+	 * just in case another core dump occurs (25 April 1997).
 	 */
-	if(!empty_statement_p(sf)) {
+	if(!empty_statement_p(sf)||TRUE) {
 	    pref = precondition_add_condition_information(transformer_dup(pre),e,
 							  FALSE);
 	    /* transformer_normalize(pref, 3); */
