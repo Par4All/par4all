@@ -14,7 +14,8 @@
 /*LINTLIBRARY*/
 
 #include <stdio.h>
-
+#include <malloc.h>
+#include <assert.h>
 #include <string.h>
 #include <strings.h>
 
@@ -199,59 +200,65 @@ char *mult_symbol;
 {
     Pvecteur p;
     char t[99];
-    char *r, *s;
+    char *r = t;
+    char *s = NULL;
 
     if (VECTEUR_NUL_P(v))
-	;
+	strcpy (&t[0], "0");
+    else if (VECTEUR_NUL_P(b)) {
+	/* si la base est vide: affiche comme ca vient */
+	for (p = v; p != NULL; p = p->succ) {
+	    if (p->val==1) {
+		(void) sprintf(r, "%s", variable_name(p->var));
+		r = strchr(r, NULL);
+	    }
+	    else {
+		(void) sprintf(r, "%s^%d", variable_name(p->var), p->val);
+		    r = strchr(r, NULL);
+	    }
+	    if (p->succ != NULL) {
+		(void) sprintf(r, "%s", mult_symbol);
+		r = strchr(r, NULL);
+	    }
+	}
+    }
     else {
-	r = t;
-	if (VECTEUR_NUL_P(b)) {   /* si la base est vide: affiche comme ca vient */
-	    for (p = v; p != NULL; p = p->succ) {
-		if (p->val==1) {
-		    (void) sprintf(r, "%s", variable_name(p->var));
+	/* si la base n'est pas vide, affiche selon l'ordre 
+	 * qu'elle definit */
+	boolean first_var = TRUE;
+	Value exp;
+	for ( ; !VECTEUR_NUL_P(b); b = b->succ) {
+	    exp = vect_coeff(b->var, v);
+	    assert(exp!=0);
+	    
+	    if (!first_var) {
+		(void) sprintf(r, "%s", mult_symbol);
+		r = strchr(r, NULL);
+	    }
+	    else 
+		first_var = FALSE;
+	    
+	    if (exp > 0) {
+		if (exp==1) {
+		    (void) sprintf(r, "%s", variable_name(b->var));
 		    r = strchr(r, NULL);
 		}
 		else {
-		    (void) sprintf(r, "%s^%d", variable_name(p->var), p->val);
-		    r = strchr(r, NULL);
-		}
-		if (p->succ != NULL) {
-		    (void) sprintf(r, "%s", mult_symbol);
+		    (void) sprintf(r,"%s^%d", variable_name(b->var), exp);
 		    r = strchr(r, NULL);
 		}
 	    }
-	    
-	}
-	else { /* si la base n'est pas vide: affiche selon l'ordre qu'elle definit */
-	    boolean first_var = TRUE;
-	    Value exp;
-	    for ( ; !VECTEUR_NUL_P(b); b = b->succ) {
-		exp = vect_coeff(b->var, v);
-		if (!first_var && (exp != 0)) {
-		    (void) sprintf(r, "%s", mult_symbol);
-		    r = strchr(r, NULL);
-		}
-		if (exp>0) {
-		    if (exp==1) {
-			(void) sprintf(r, "%s", variable_name(b->var));
-			r = strchr(r, NULL);
-		    }
-		    else {
-			(void) sprintf(r,"%s^%d", variable_name(b->var), exp);
-			r = strchr(r, NULL);
-		    }
-		    first_var = FALSE;
-		}
-		else if (exp<0) {              /* inutile pour les polynomes */ 
-		    (void) sprintf(r, "%s^(%d)", variable_name(b->var), exp);
-		    first_var = FALSE;
-		    r = strchr(r, NULL);
-		}
+	    else /* exp < 0 */ {
+		/* inutile pour les polynomes */ 
+		(void) sprintf(r, "%s^(%d)", variable_name(b->var), exp);
+		first_var = FALSE;
+		r = strchr(r, NULL);
 	    }
 	}
-	s = strdup(t);
-	return (s);
     }
+    s = strdup(t);
+    assert(strlen(s)<99);
+    return s;
 }
 
 
