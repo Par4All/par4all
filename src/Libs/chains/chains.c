@@ -234,6 +234,9 @@ statement st ;
     case is_instruction_loop:
 	init_statement( loop_body( instruction_loop( i ))) ;
 	break ;
+    case is_instruction_whileloop:
+	init_statement(whileloop_body( instruction_whileloop( i ))) ;
+	break ;
     case is_instruction_goto: 
     case is_instruction_call:
 	break ;
@@ -437,6 +440,22 @@ statement st ;
 	mask_effects( ref, locals ) ;
     }
 }
+
+static void genkill_whileloop( l, st )
+whileloop l ;
+statement st ;
+{
+    statement b = whileloop_body( l ) ;
+    set gen = GEN( st ) ;
+    set ref = REF( st ) ;
+
+    genkill_statement( b ) ;
+    
+    set_union( gen, gen,  GEN( b )) ;
+    set_union( ref, ref, REF( b )) ;
+   
+}
+
 
 /* The Dragon book only deals with a sequence of two statements. 
    GENKILL_BLOCK generalizes to lists, via recursion. ST holds the being
@@ -535,6 +554,11 @@ statement st ;
 	l = instruction_loop(i);
 	genkill_loop( l, st );
 	break;
+    case is_instruction_whileloop: {
+	whileloop l = instruction_whileloop(i);
+	genkill_whileloop( l, st );
+	break;
+    }
     case is_instruction_unstructured:
 	genkill_unstructured( instruction_unstructured( i ), st ) ;
 	break ;
@@ -654,6 +678,24 @@ loop lo ;
     }
 }
 
+static void inout_whileloop( st, lo )
+statement st ;
+whileloop lo ;
+{
+    statement l = whileloop_body( lo ) ;
+    set diff = MAKE_STATEMENT_SET() ;
+
+    set_union( DEF_IN( l ), GEN( st ),
+	       set_difference( diff, DEF_IN( st ), KILL( st )));
+    set_free( diff ) ;
+    set_union( REF_IN( l ), REF_IN( st ), REF( st )) ;
+    inout_statement( l ) ;
+
+    set_union( DEF_OUT( st ), DEF_OUT( l ), DEF_IN( st )) ;
+    set_union( REF_OUT( st ), REF_OUT( l ), REF_IN( st )) ;
+  
+  
+}
 static void inout_call(statement st, call c)
 {
     set diff = MAKE_STATEMENT_SET() ;
@@ -743,8 +785,11 @@ statement st ;
     case is_instruction_loop:
 	inout_loop( st, instruction_loop( i )) ;
 	break ;
+    case is_instruction_whileloop:
+	inout_whileloop( st, instruction_whileloop( i )) ;
+	break ;
     case is_instruction_call:
-	inout_call( st, instruction_loop( i )) ;
+	inout_call( st, instruction_call( i )) ;
 	break ;
     case is_instruction_goto: 
 	pips_error( "inout_statement", "Unexpected tag %d\n", i ) ;
@@ -1003,6 +1048,9 @@ statement st ;
 	break ;
     case is_instruction_loop: 
 	usedef_statement( loop_body( instruction_loop( i ))) ;
+	break ;
+    case is_instruction_whileloop: 
+	usedef_statement( whileloop_body( instruction_whileloop( i ))) ;
 	break ;
     case is_instruction_call: 
     case is_instruction_goto: 
@@ -1273,6 +1321,7 @@ statement st;
     case is_instruction_block: 
     case is_instruction_test: 
     case is_instruction_loop: 
+    case is_instruction_whileloop: 
     case is_instruction_goto: 
     case is_instruction_unstructured:
 	le = load_proper_rw_effects_list(st);
