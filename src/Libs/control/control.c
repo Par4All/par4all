@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 2003/08/06 14:15:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 2003/12/04 16:41:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_control_control[] = "%A% ($Date: 2003/08/06 14:15:55 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "%A% ($Date: 2003/12/04 16:41:24 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 /* - control.c
@@ -31,6 +31,9 @@ char vcid_control_control[] = "%A% ($Date: 2003/08/06 14:15:55 $, ) version $Rev
  * $Id$
  *
  * $Log: control.c,v $
+ * Revision 1.40  2003/12/04 16:41:24  nguyen
+ * Handle forloop controlization
+ *
  * Revision 1.39  2003/08/06 14:15:55  nguyen
  * Modify and add functions for C
  *
@@ -93,7 +96,7 @@ static hash_table Label_statements;
 static hash_table Label_control;	
 
 
-#define MAKE_CONTINUE_STATEMENT() get_bool_property("PRETTYPRINT_C_CODE")?MakeNullStatement(entity_empty_label()):make_continue_statement(entity_undefined) 
+#define MAKE_CONTINUE_STATEMENT() make_continue_statement(entity_undefined) 
 
 
 
@@ -385,7 +388,7 @@ bool controlize(
 	break;
     case is_instruction_goto: {
 	string name = entity_name(statement_label(instruction_goto(i)));
-        statement nop = get_bool_property("PRETTYPRINT_C_CODE")?MakeNullStatement(statement_label(st)):make_continue_statement(statement_label(st));
+        statement nop = make_continue_statement(statement_label(st));
 
         statement_number(nop) = statement_number(st);
         statement_comments(nop) = statement_comments(st);
@@ -424,6 +427,9 @@ bool controlize(
 				       pred, succ, c_res, used_labels);
       break;
     case is_instruction_return:
+      controlized =  TRUE;
+      break;
+    case is_instruction_expression:
       controlized =  TRUE;
       break;
     default:
@@ -683,7 +689,7 @@ statement whileloop_test(statement sl)
  * Derived by FI from controlize_loop()
  */
 
-/* NN : What about other kind of whileloop, evaluation = after ?  */
+/* NN : What about other kind of whileloop, evaluation = after ? TO BE IMPLEMENTED   */
 
 bool controlize_whileloop(st, l, pred, succ, c_res, used_labels)
 statement st;
@@ -754,6 +760,47 @@ hash_table used_labels;
 }
 
 
+statement forloop_header(statement sl) 
+{
+  forloop l = instruction_forloop(statement_instruction(sl));
+  statement hs = instruction_to_statement(make_instruction_expression(forloop_initialization(l)));
+  statement_number(hs) = statement_number(sl);
+
+  return hs;
+}
+
+statement forloop_test(statement sl)
+{
+  forloop l = instruction_forloop(statement_instruction(sl));
+  call c =  make_call(entity_intrinsic("!"),
+		      CONS(EXPRESSION,
+			   copy_expression(forloop_condition(l)),
+			   NIL));
+  test t = make_test(make_expression(make_syntax(is_syntax_call, c),
+				     normalized_undefined), 
+		     MAKE_CONTINUE_STATEMENT(), 
+		     MAKE_CONTINUE_STATEMENT());
+  string csl = statement_comments(sl);
+  string cs = empty_comments_p(csl)? "" : strdup(csl);
+
+  statement ts = make_statement(entity_empty_label(), 
+				statement_number(sl),
+				STATEMENT_ORDERING_UNDEFINED,
+				cs,
+				make_instruction(is_instruction_test, t),NIL,NULL);
+  
+  return ts;
+}
+
+statement forloop_inc(statement sl)
+{
+  forloop l = instruction_forloop(statement_instruction(sl));
+  statement is = instruction_to_statement(make_instruction_expression(forloop_increment(l)));
+  statement_number(is) = statement_number(sl);
+  
+  return is;
+}
+
 bool controlize_forloop(st, l, pred, succ, c_res, used_labels)
 statement st;
 forloop l;
@@ -763,13 +810,15 @@ hash_table used_labels;
 {
     hash_table loop_used_labels = hash_table_make(hash_string, 0);
     control c_body = make_conditional_control(forloop_body(l));
+    control c_inc = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
+    control c_test = make_control(MAKE_CONTINUE_STATEMENT(), NIL, NIL);
     bool controlized = FALSE; /* To avoid gcc warning about possible
                                  non-initialization */
 
     pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	       st, pred, succ, c_res);
     
-    controlize(forloop_body(l), c_res, c_res, c_body, loop_used_labels);
+    controlize(forloop_body(l), c_test, c_inc, c_body, loop_used_labels);
 
     if (covers_labels_p(forloop_body(l),loop_used_labels)) {
       forloop new_l = make_forloop(forloop_initialization(l),
@@ -791,18 +840,35 @@ hash_table used_labels;
 		     ADD_PRED(pred, c_res),
 		     ADD_SUCC(succ, c_res )) ;
       controlized = FALSE;
+      control_predecessors(succ) = ADD_PRED(c_res, succ);
     }
     else 
       {
-	/* NN : I do not know how to deal with this */
-	pips_internal_error("Forloop with goto not implemented yet\n");
+	/* NN : I do not know how to deal with this, the following code does not always work 
+	   
+	   pips_internal_error("Forloop with goto not implemented yet\n");*/
+	
+	control_statement(c_test) = forloop_test(st);
+	control_predecessors(c_test) =
+	  CONS(CONTROL, c_res, CONS(CONTROL, c_inc, NIL)),
+	  control_successors(c_test) =
+	  CONS(CONTROL, succ, CONS(CONTROL, c_body, NIL));
+	control_statement(c_inc) = forloop_inc(st);
+	control_successors(c_inc) = CONS(CONTROL, c_test, NIL);
+	UPDATE_CONTROL(c_res,
+		       forloop_header(st),
+		       ADD_PRED(pred, c_res),
+		       CONS(CONTROL, c_test, NIL));
+	controlized = TRUE ;
+	control_predecessors(succ) = ADD_PRED(c_test, succ);
+	
+	
       }
-    control_predecessors(succ) = ADD_PRED(c_res, succ);
     add_proper_successor_to_predecessor(pred, c_res);
     /* control_successors(pred) = ADD_SUCC(c_res, pred); */
     
     ifdebug(5) check_control_coherency(c_res);
-
+    
     union_used_labels( used_labels, loop_used_labels);
     hash_table_free(loop_used_labels);
     
@@ -1239,7 +1305,7 @@ statement st;
 	    hash_put(Label_statements, name, (char *) sts);
 
 	if (! hash_defined_p(Label_control, name)) {
-	    statement new_st = get_bool_property("PRETTYPRINT_C_CODE")?MakeNullStatement(statement_label(st)):make_continue_statement(statement_label(st)) ;
+	    statement new_st = make_continue_statement(statement_label(st)) ;
 	    control c = make_control( new_st, NIL, NIL);
 	    
 	    hash_put(Label_control, name, (char *)c);
