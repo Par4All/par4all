@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.4  2004/03/25 09:09:29  pips
+   Removed pips error "not implemented yet." Hard to test with it ;)
+
    Revision 1.3  2004/03/24 16:02:03  hurbain
    First version for claire pretty printer. Currently only manages (maybe :p) arrays declarations.
 
@@ -1571,7 +1574,8 @@ bool print_claire_code(string module_name)
 {
   string crough, cpretty, dir, cmd;
 
-  pips_internal_error("Not implemented yet\n");
+  
+  /*pips_internal_error("Not implemented yet\n"); */
 
   crough = db_get_memory_resource(DBR_CROUGH, module_name, TRUE);
   cpretty = db_build_file_resource_name(DBR_C_PRINTED_FILE, module_name, CPRETTY);
