@@ -153,13 +153,10 @@ cons * args;
 	for (cea = args ; !ENDP(cea); POP(cea)) {
 	    entity e = ENTITY(CAR(cea));
 	    Pbase b = base_dup(sc_base(r));
-	    r = sc_projection(r, (Variable) e);
-	    if (r==SC_EMPTY) {
-		r = sc_empty(b);
-		sc_base_remove_variable(r,(Variable) e);
-	    }
-	    else {
-		sc_base_remove_variable(r,(Variable) e);
+	    sc_projection_along_variable_ofl_ctrl(&r,(Variable) e, NO_OFL_CTRL);
+	    sc_base_remove_variable(r,(Variable) e);
+	    if (!sc_empty_p(r))
+	    {
 		r = sc_elim_redund(r);
 		if (SC_EMPTY_P(r)) {
 		    r = sc_empty(b);
