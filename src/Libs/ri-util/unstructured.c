@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/01/31 19:35:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/04 18:31:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/01/31 19:35:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/02/04 18:31:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /*
@@ -17,8 +17,6 @@ char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/01/31 19:35:52 $, ) v
 #include "text-util.h"
 #include "ri.h"
 #include "ri-util.h"
-
-#include "control.h"
 
 #include "misc.h"
 #include "properties.h"
@@ -508,9 +506,8 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	/* A GOTO must be generated to reach the control successor */
 	l = control_to_label_name(succ, labels);
 	pips_assert("Must be labelled", l!= string_undefined);
-	ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module,
-						    margin,
-						    l));
+	ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
+						    margin, l, 0));
       }
       break;
     }
@@ -539,9 +536,18 @@ text_trail(entity module, int margin, list trail, hash_table labels)
       u = make_unformatted(NULL, statement_number(st), margin, pc) ;
 
       if( !empty_label_p( entity_name( statement_label( st )))) {
-	unformatted_label(u) = strdup(control_to_label_name(c, labels)) ;
+	  /*
+	  string ln = control_to_label_name(c, labels);
+	  if(string_undefined_p(ln)) {
+	      entity lab = statement_label(st);
+	      print_statement(st);
+	      pips_assert("c must have been encountered before", !string_undefined_p(ln));
+	      }
+	      unformatted_label(u) = strdup(ln);
+	      */
+	  unformatted_label(u) = strdup(label_local_name(statement_label(st)));
       }
-      s = make_sentence(is_sentence_unformatted,u) ;
+      s = make_sentence(is_sentence_unformatted, u) ;
       ADD_SENTENCE_TO_TEXT(r, s);
 
       /* Is there a textual successor? */
@@ -557,9 +563,9 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	    l = control_to_label_name(succ2, labels);
 	    pips_assert("Must be labelled", l!= string_undefined);
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module,
+	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
 							margin+INDENTATION,
-							l));
+							l, 0));
 	  }
 	}
 	else {
@@ -567,23 +573,23 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	    /* succ1 must be reached by GOTO */
 	    l = control_to_label_name(succ1, labels);
 	    pips_assert("Must be labelled", l!= string_undefined);
-	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module,
+	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
 							margin+INDENTATION,
-							l));
+							l, 0));
 	  }
 	  else {
 	    /* Both successors must be labelled */
 	    l = control_to_label_name(succ1, labels);
 	    pips_assert("Must be labelled", l!= string_undefined);
-	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module,
+	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
 							margin+INDENTATION,
-							l));
+							l, 0));
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
 	    l = control_to_label_name(succ2, labels);
 	    pips_assert("Must be labelled", l!= string_undefined);
-	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module,
+	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
 							margin+INDENTATION,
-							l));
+							l, 0));
 	  }
 	}
       }
@@ -593,15 +599,15 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 	pips_assert("succ1 before c", appears_first_in_trail(trail, succ2, c));
 	l = control_to_label_name(succ1, labels);
 	pips_assert("Must be labelled", l!= string_undefined);
-	ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module,
+	ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
 						    margin+INDENTATION,
-						    l));
+						    l, 0));
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
 	l = control_to_label_name(succ2, labels);
 	pips_assert("Must be labelled", l!= string_undefined);
-	ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module,
+	ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
 						    margin+INDENTATION,
-						    l));
+						    l, 0));
       }
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
       break;
