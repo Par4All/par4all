@@ -1,25 +1,28 @@
+/*
+  $Id$
 
+  $Log: Displayer.java,v $
+  Revision 1.3  1998/10/16 14:20:38  coelho
+  import fixed.
 
-/** $Id$
-  * $Log: Displayer.java,v $
-  * Revision 1.2  1998/06/30 14:57:56  didry
-  * do not manage the panel anymore
-  *
-  * Revision 1.1  1998/06/09 07:28:28  didry
-  * Initial revision
-  *
-  */
-
+  Revision 1.2  1998/06/30 14:57:56  didry
+  do not manage the panel anymore
+  
+  Revision 1.1  1998/06/09 07:28:28  didry
+  Initial revision
+  
+*/
 
 package JPips;
 
-
-import java.awt.swing.*;
 import java.io.*;
 import java.awt.*;
-import JPips.Pawt.*;
-import java.awt.swing.border.*;
 import java.util.*;
+
+import JPips.Pawt.*;
+
+import com.sun.java.swing.*;
+import com.sun.java.swing.border.*;
 
 
 /** A window manager.
@@ -28,12 +31,9 @@ import java.util.*;
   */
 abstract class Displayer implements JPipsComponent
 {
-
-
   public  Vector	frameVector;	//contains the displayed windows
   public  int		noWindows;	//number of displayed windows
   public  PPanel	panel;		//panel of the displayer
-
 
   /** Sets the number of displayed windows to 0.
     * Creates the displayer panel for JPips.
@@ -45,7 +45,6 @@ abstract class Displayer implements JPipsComponent
       buildPanel();
     }
   
-  
   /** Builds the panel for JPips.
     */
   public void buildPanel()
@@ -55,14 +54,12 @@ abstract class Displayer implements JPipsComponent
       panel.setBorder(new TitledBorder("Windows"));
     }
 
-
   /** Adds a window to the count.
     */
   public void incNoWindows()
     {
       noWindows++;
     }
-
 
   /** Removes a window from the count.
     */
@@ -71,7 +68,6 @@ abstract class Displayer implements JPipsComponent
       noWindows--;
     }
 
-
   /** @return the current number of windows
     */
   public int getNoWindows()
@@ -79,14 +75,12 @@ abstract class Displayer implements JPipsComponent
       return noWindows;
     }
 
-
   /** @return the displayer panel for JPips
     */
   public Component getComponent()
     {
       return panel;
     }
-
 
   abstract boolean display(File file, boolean locked, boolean writable);
 
@@ -98,6 +92,4 @@ abstract class Displayer implements JPipsComponent
   public void setActivated(boolean yes) {}
 
   public void reset() {}
-
-
 }
