@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/01/10 13:58:25 $, ) 
+# ($Date: 1997/01/13 21:17:27 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -99,6 +99,8 @@ usage()
     echo "  -y tpips: tpips to be used (idem)"
     echo "  -r dir: directory where to run (default .)"
     echo "  -i lines: max number of lines for sendig a full message"
+    echo "  -p file: properties.rc file"
+    echo "  -m file: pipsmake.rc file"
   } >&2
   exit ${1:-1}
 }
@@ -108,7 +110,7 @@ usage()
 
 unset FILES
 
-while getopts tuvsdhx:y:r:f:l:i:a: opt
+while getopts tuvsdhx:y:r:f:l:i:a:p:m: opt
 do
   case $opt in
     t) PERFORMANCE="begin: `date`" ;;
@@ -124,6 +126,8 @@ do
     h) usage 0 ;;
     i) MAX_NB_LINES="$OPTARG" ;;
     a) RUNNER="$OPTARG" ;;
+    p) PIPS_PROPERTIESRC="$OPTARG" ; export PIPS_PROPERTIESRC ;;
+    m) PIPS_PIPSMAKERC="$OPTARG" ; export PIPS_PIPSMAKERC ;;
     *) usage 1
   esac
 done
@@ -326,17 +330,17 @@ case $# in
   * ) 	aspects="$*" ;;
 esac
 
-if [ -f pipsmake.rc ] 
-then
-  report 2 "validate cannot be run with a local pipsmake.rc."
-  [ "$LOCKFILE" ] && echo "validate:$HOSTNAME" > $LOCKFILE.$HOSTNAME
-  exit 4
-elif [ -f properties.rc ]
-then
-  report 3 "validate cannot be run with a local properties.rc."
-  [ "$LOCKFILE" ] && echo "validate:$HOSTNAME" > $LOCKFILE.$HOSTNAME
-  exit 5
-fi
+# if [ -f pipsmake.rc ] 
+# then
+#   report 2 "validate cannot be run with a local pipsmake.rc."
+#   [ "$LOCKFILE" ] && echo "validate:$HOSTNAME" > $LOCKFILE.$HOSTNAME
+#   exit 4
+# elif [ -f properties.rc ]
+# then
+#   report 3 "validate cannot be run with a local properties.rc."
+#   [ "$LOCKFILE" ] && echo "validate:$HOSTNAME" > $LOCKFILE.$HOSTNAME
+#   exit 5
+# fi
 
 echo 0 > $errors 
 
