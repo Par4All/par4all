@@ -5,6 +5,9 @@
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
+  Revision 1.20  2003/08/18 09:55:09  coelho
+  get_exception_name added...
+
   Revision 1.19  2003/06/13 13:59:07  coelho
   const out.
 
@@ -66,6 +69,24 @@ unsigned int simplex_arithmetic_error = 2;
 unsigned int user_exception_error = 4;
 unsigned int parser_exception_error = 8;
 unsigned int timeout_error = 16;
+
+char * get_exception_name(unsigned int exception)
+{
+  if (exception==overflow_error)
+    return "overflow_error exception";
+  if (exception==simplex_arithmetic_error)
+    return "simplex_arithmetic_error exception";
+  if (exception==user_exception_error)
+    return "user_exception_error exception";
+  if (exception==parser_exception_error)
+    return "parser_exception_error exception";
+  if (exception==timeout_error)
+    return "timeout_error exception";
+
+  return "unknown or mixed exception";
+}
+
+/* catch all */
 unsigned int any_exception_error = ~0;
 
 /* keep track of last thrown exception for RETHROW()
