@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.110  1998/11/24 19:22:56  coelho
+ * automatic logging under jpips.
+ *
  * Revision 1.109  1998/10/28 18:18:25  coelho
  * missing \n added fpr jpips.
  *
@@ -162,13 +165,14 @@ extern void tp_restart( FILE * ); /* tp_lex.c */
 /*************************************************************** Some Macros */
 
 #define tpips_usage							\
-  "Usage: %s [-nscvh?jw] "						\
+  "Usage: %s [-nscvh?jwa] "						\
   "[-l logfile] [-r rcfile] [-e tpips-cmds] tpips-scripts\n"		\
   "\t-n: no execution mode. just to check a script for syntax errors\n"	\
   "\t-s: behaves like a shell. tpips commands simply extend a shell.\n"	\
   "\t-c: behaves like a command, not a shell (it is the default).\n"	\
   "\t-h: this help. (also -?)\n"					\
   "\t-v: display version and architecture informations.\n"		\
+  "\t-a: create a logfile automatically.\n"				\
   "\t-j: jpips special mode.\n"						\
   "\t-w: starts with a wrapper (jpips special again)...\n"		\
   "\t-l  logfile: log to logfile.\n"					\
@@ -872,6 +876,7 @@ void tpips_close(void)
     }    
 
     close_workspace_if_opened();
+
     if (logfile) {
 	safe_fclose (logfile, "the log file");
 	logfile = NULL;
@@ -1062,59 +1067,79 @@ static string default_tpipsrc(void)
 extern char *optarg;
 extern int optind;
 
+static void open_logfile(string filename, char opt)
+{
+  if (logfile)
+  {
+    fprintf(logfile, 
+	    "# logfile moved to %s by -%c tpips option\n", filename, opt);
+    safe_fclose(logfile, "the current log file");
+  }
+  logfile = safe_fopen(filename, "w");
+}
+
 static void parse_arguments(int argc, char * argv[])
 {
     int c;
     string tpipsrc = default_tpipsrc();
 
-    while ((c = getopt(argc, argv, "ne:l:h?vscr:jwx")) != -1) {
-	switch (c)
+    while ((c = getopt(argc, argv, "ane:l:h?vscr:jwx")) != -1)
+    {
+      switch (c)
+      {
+      case 'j':
+	jpips_is_running = TRUE;
+	/* -j => -a */
+      case 'a':
 	{
-	case 's':
-	    tpips_is_a_shell = TRUE;
-	    break;
-	case 'c':
-	    tpips_is_a_shell = FALSE;
-	    break;
-	case 'l':
-	    logfile = safe_fopen (optarg,"w");
-	    break;
-	case 'h':
-	case '?':
-	    fprintf (stderr, tpips_usage, argv[0]);
-	    return;
-	    break;
-	case 'n':
-	    tpips_execution_mode = FALSE;
-	    break;
-	case 'e':
-	    tpips_exec(optarg);
-	    break;
-	case 'v': 
-	    fprintf(stderr, "tpips: (ARCH=" SOFT_ARCH 
-		    ", DATE=" UTC_DATE ") %s\n", argv[0]);
-            break;
-	case 'r': 
-	    free(tpipsrc);
-	    tpipsrc = strdup(optarg);
-	    break;
-	case 'w':
-	    tpips_wrapper(); /* the wrapper process will never return */
-	    break;
-	case 'j':
-	    jpips_is_running = TRUE;
-	    break;
-	case 'x':
-	    /* tpips could start an xterm and redirect its stdin/stdout
-	     * on it under this option. not implemented yet.
-	     */
-	    break;
-	default: 
-	    fprintf(stderr, tpips_usage, argv[0]);
-	    exit(1);
+	  string filename = safe_new_tmp_file("tpips_session");
+	  fprintf(stderr, "tpips session logged in \"%s\"\n", filename);
+	  open_logfile(filename, c);
+	  free(filename);
+	  break;
 	}
+      case 's':
+	tpips_is_a_shell = TRUE;
+	break;
+      case 'c':
+	tpips_is_a_shell = FALSE;
+	break;
+      case 'l':
+	open_logfile(optarg, c);
+	break;
+      case 'h':
+      case '?':
+	fprintf (stderr, tpips_usage, argv[0]);
+	return;
+	break;
+      case 'n':
+	tpips_execution_mode = FALSE;
+	break;
+      case 'e':
+	tpips_exec(optarg);
+	break;
+      case 'v': 
+	fprintf(stderr, "tpips: (ARCH=" SOFT_ARCH 
+		", DATE=" UTC_DATE ") %s\n", argv[0]);
+	break;
+      case 'r': 
+	free(tpipsrc);
+	tpipsrc = strdup(optarg);
+	break;
+      case 'w':
+	tpips_wrapper(); /* the wrapper process will never return */
+	break;
+      case 'x':
+	/* tpips could start an xterm and redirect its stdin/stdout
+	 * on it under this option. not implemented yet.
+	 */
+	break;
+      default: 
+	fprintf(stderr, tpips_usage, argv[0]);
+	exit(1);
+      }
     }
-
+    
     /* sources ~/.tpipsrc or the like, if any.
      */
     if (tpipsrc)
