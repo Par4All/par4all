@@ -147,6 +147,8 @@ void update_options()
       }
    }
 
+   display_memory_usage();
+   
    debug_off();
 }
 
@@ -227,12 +229,11 @@ options_panel_notify(Panel_item item,
    options_select(aliased_phase);
 }
 
-void options_menu_notify(menu, menu_item)
-Menu menu;
-Menu_item menu_item;
+void
+options_menu_notify(Menu menu, Menu_item menu_item)
 {
-    string aliased_phase = (char *) xv_get(menu_item, MENU_STRING);
-	options_select(aliased_phase);
+   string aliased_phase = (char *) xv_get(menu_item, MENU_STRING);
+   options_select(aliased_phase);
 }
 
 
