@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.50  2002/06/13 12:06:02  irigoin
+ * Adaptation to new ri.newgen with field "initializations" in structure "code"
+ *
  * Revision 1.49  2002/05/02 15:32:54  coelho
  * module_local_name needed by eole.
  *
@@ -82,7 +85,7 @@ make_empty_module(
 			      make_functional(NIL, r)),
 		    MakeStorageRom(),
 		    make_value(is_value_code,
-			       make_code(NIL, strdup(""))));
+			       make_code(NIL, strdup(""), make_sequence(NIL))));
 
     name = module_local_name(e);
     DynamicArea = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
