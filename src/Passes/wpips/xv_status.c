@@ -181,13 +181,15 @@ create_status_subwindow()
    
    pips_icon_server_image = create_status_window_pips_image();
    
-   status_window_pips_image = xv_create(main_panel, PANEL_MESSAGE,
-                                        PANEL_LABEL_IMAGE,
-                                        pips_icon_server_image,
+   status_window_pips_image =
+      xv_create(main_panel, PANEL_BUTTON,
+                PANEL_LABEL_IMAGE,
+                pips_icon_server_image,
+                PANEL_NOTIFY_PROC, wpips_interrupt_pipsmake,
                                 /* Put the Pixmap above the Help button: */
-                                        XV_X, xv_get(quit_button, XV_X) + (xv_get(quit_button, XV_WIDTH) - xv_get(pips_icon_server_image, XV_WIDTH))/2,
-                                        XV_Y, xv_rows(main_panel, 3) + 10,
-                                        NULL);
+                XV_X, xv_get(quit_button, XV_X) + (xv_get(quit_button, XV_WIDTH) - xv_get(pips_icon_server_image, XV_WIDTH))/2,
+                XV_Y, xv_rows(main_panel, 3) + 10,
+                NULL);
    
    window_fit(main_panel);
    window_fit(main_frame);
