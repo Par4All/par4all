@@ -1,5 +1,5 @@
-/* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 2000/07/07 11:09:17 $, 
+/*
+ * $Id$
  */
 
 /* test du simplex : 
@@ -564,13 +564,13 @@ sc_simplexe_feasibility_ofl_ctrl(
       free(t); 
       free(nlle_colonne); 
       
-      if (ofl_ctrl == FWD_OFL_CTRL) 
-	THROW(overflow_error);
-      
       /* restore initial base */
       base_rm(sc_base(sc));
       sc_base(sc) = saved_base;
       sc_dimension(sc) = saved_dimension;
+      
+      if (ofl_ctrl == FWD_OFL_CTRL) 
+	THROW(overflow_error);
       
       return TRUE; /* default is feasible */
     }
