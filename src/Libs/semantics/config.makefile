@@ -28,8 +28,20 @@
 #    computed bottom up and preconditions top down on the call graph
 #    (no Fortran recursivity is expected)
 #
+# This initial distribution of C functions has been modified a lot to keep
+# the C file lengths reasonnable. The restructuring has not be completed
+# in July 2001.
+#
 # A main program, main.c, provides an easy way (i.e. dbxtool compatible) to try
-# semantic analysis and to test the library
+# semantic analysis and to test the library. it is now obsolete
+#
+# $Log: config.makefile,v $
+# Revision 1.8  2001/07/19 18:25:41  irigoin
+# New files added: expression.c and loop.c. Previously, unstructured.c had
+# been separated. The restructuring is not complete. Loop stuff is still in
+# ri_to_transformers.c and ri_to_preconditions.c. And so is interprocedural
+# stuff.
+#
 #
 # Source, header and object files used to build the library.
 # Do not include the main program source file.
@@ -44,7 +56,9 @@ LIB_CFILES=	misc.c \
 		postcondition.c \
 		utils.c \
 		initial.c \
-		unstructured.c
+		unstructured.c \
+		expression.c \
+		loop.c
 
 LIB_HEADERS=	semantics-local.h
 
