@@ -4,18 +4,19 @@
  */
 /**** Begin saved_makefile version ****/
 /**** End saved_makefile version ****/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
 #include <sys/types.h>
+
 /* Some modifications are made to save the current makefile (s.a. files
  * pipsmake/readmakefile.y pipsmake.h )
  * They only occure between following tags: 
  *
  * Bruno Baron
  */
-/**** Begin saved_makefile version ****/
-/**** End saved_makefile version ****/
+
 #include <string.h>
 #include <sys/param.h>
 
@@ -38,42 +39,46 @@ extern makefile open_makefile();
  * Next thing to do is to delete the prefix of .pipsmake
  * it's redundant. Done 04/07/91 
  */
-char *build_pgm_makefile(char *n)
+char *
+build_pgm_makefile(char *n)
 {
-    return strdup(concatenate(get_cwd(), "/", n, ".database", 
-			                 "/", "pipsmake", NULL));
+    string dir_name = db_get_meta_data_directory(),
+	res = strdup(concatenate(dir_name, "/pipsmake", 0));
+    free(dir_name); return res;
 }
 
-/**** End saved_makefile version ****/
-
-
-string make_open_workspace(name)
-string name;
+string 
+make_open_workspace(string name)
 {
-    if (open_makefile(name) == makefile_undefined)
-	user_warning("make_open_workspace", 
-		     "No special makefile for this workspace %s/%s.database\n", get_cwd(), name);
-    else
-	debug(7, "make_open_workspace", "makefile opened\n");
-
-    db_open_workspace(name);
+    if (db_open_workspace(name)) {
+	open_properties();
+	if (open_makefile(name) != makefile_undefined)
+	    pips_debug(7, "makefile opened\n");
+	else
+	    pips_user_warning("No special makefile for this workspace "
+			      "%s/%s.database\n", get_cwd(), name);
+    } else
+	pips_user_warning("No workspace %s to open\n", name);
 
     return db_get_current_workspace_name();
 }
 
 /* FI->GO: could be in top-level, no?
  */
-bool make_close_workspace()
+bool 
+make_close_workspace(void)
 {
     bool res = TRUE;
     string name;
 
-    res &= db_set_current_module_name(NULL);
+    if (db_get_current_module_name()) /* lazy... */
+	db_reset_current_module_name();
 
     /* dup because freed in db_close_workspace */
     name = strdup(db_get_current_workspace_name()); 
 
     res &= close_makefile(name);
+    close_properties();
     res &= db_close_workspace();
 
     if(res)
