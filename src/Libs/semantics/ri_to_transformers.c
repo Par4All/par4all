@@ -272,7 +272,7 @@ loop_to_transformer(loop l, list e) /* effects of loop l */
 	tfb = transformer_dup(statement_to_transformer(s));
 	/* it does not contain the loop index update
 	   the loop increment expression must be linear to find inductive 
-	   variables related to the loop index */
+	variables related to the loop index */
 	if(!VECTEUR_UNDEFINED_P(v_incr = expression_to_affine(incr))) {
 	    if(entity_has_values_p(i))
 		tfb = transformer_add_loop_index(tfb, i, v_incr);
@@ -293,95 +293,101 @@ loop_to_transformer(loop l, list e) /* effects of loop l */
 	     */
 	    /* transformer ftf = transformer_equality_fix_point(tfb); */
 	    transformer ftf = (* transformer_fix_point_operator)(tfb);
-	    Psysteme fsc = predicate_system(transformer_relation(ftf));
-	    Psysteme sc = SC_UNDEFINED;
-	    Pcontrainte eq = CONTRAINTE_UNDEFINED;
-	    normalized nlb = NORMALIZE_EXPRESSION(range_lower(r));
-	    Pbase new_b = BASE_UNDEFINED;
+
+	    if(*transformer_fix_point_operator==transformer_equality_fix_point) {
+		Psysteme fsc = predicate_system(transformer_relation(ftf));
+		Psysteme sc = SC_UNDEFINED;
+		Pcontrainte eq = CONTRAINTE_UNDEFINED;
+		normalized nlb = NORMALIZE_EXPRESSION(range_lower(r));
+		Pbase new_b = BASE_UNDEFINED;
 	    
-	    tf = effects_to_transformer(e);
-	    sc = (Psysteme) predicate_system(transformer_relation(tf));
+		tf = effects_to_transformer(e);
+		sc = (Psysteme) predicate_system(transformer_relation(tf));
 
-	    /* compute the basis for tf and ftf */
+		/* compute the basis for tf and ftf */
 
-	    /* FI: just in case.
-	     * I do not understand why sc_base(fsc) is not enough.
-	     * I do not understand why I used effects_to_transformer() instead
-	     * of transformer_indentity()...
-	     */
-	    new_b = base_union(sc_base(fsc), sc_base(sc));
-	    base_rm(sc_base(sc));
-	    sc_base(sc) = new_b;
-	    sc_dimension(sc) = base_dimension(new_b);
-
-	    /* add equations from ftf to tf */
-	    for(eq = sc_egalites(fsc); !CONTRAINTE_UNDEFINED_P(eq); ) {
-		Pcontrainte neq;
-
-		neq = eq->succ;
-		sc_add_egalite(sc, eq);
-		eq = neq;
-	    }
-
-	    /* add inequalities from ftf to tf */
-	    for(eq = sc_inegalites(fsc); !CONTRAINTE_UNDEFINED_P(eq); ) {
-		Pcontrainte neq;
-
-		neq = eq->succ;
-		sc_add_inegalite(sc, eq);
-		eq = neq;
-	    }
-
-	    /* FI: I hope that inequalities will be taken care of some day! */
-	    /* Well, in June 1997.. */
-
-	    sc_egalites(fsc) = CONTRAINTE_UNDEFINED;
-	    sc_inegalites(fsc) = CONTRAINTE_UNDEFINED;
-	    free_transformer(ftf);
-
-	    ifdebug(8) {
-		pips_debug(8, "intermediate fix-point tf=\n");
-		fprint_transformer(stderr, tf, external_value_name);
-	    }
-
-	    /* add initialization for the loop index variable */
-	    /* FI: this seems to be all wrong because a transformer cannot
-	     * state anything about its initial state...
-	     *
-	     * Also, sc basis should be updated!
-	     *
-	     * I change my mind: let's use the lower bound anyway since it
-	     * make sense as soon as i_init is eliminated in the transformer
-	     */
-	    if(entity_has_values_p(i) && normalized_linear_p(nlb)) {
-		Pvecteur v_lb = vect_dup(normalized_linear(nlb));
-		Pbase b_tmp, b_lb = make_base_from_vect(v_lb); 
-		entity i_init = entity_to_old_value(i);
-
-		vect_add_elem(&v_lb, (Variable) i_init, VALUE_MONE);
-		eq = contrainte_make(v_lb);
-		/* The new variables in eq must be added to sc; otherwise,
-		 * further consistency checks core dump. bc.
+		/* FI: just in case.
+		 * I do not understand why sc_base(fsc) is not enough.
+		 * I do not understand why I used effects_to_transformer() instead
+		 * of transformer_indentity()...
 		 */
-		/* sc_add_egalite(sc, eq); */
-		/* The call to sc_projection_with_eq frees eq */
-		sc = sc_projection_by_eq(sc, eq, (Variable) i_init);
-		b_tmp = sc_base(sc);
-		sc_base(sc) = base_union(b_tmp, b_lb);
-		sc_dimension(sc) = base_dimension(sc_base(sc));
-		base_rm(b_tmp);
-		base_rm(b_lb);
-		if(SC_RN_P(sc)) {
-		    /* FI: a NULL is not acceptable; I assume that we cannot
-		     * end up with a SC_EMPTY...
-		     */
-		    predicate_system_(transformer_relation(tf)) =
-			newgen_Psysteme
-			(sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED));
+		new_b = base_union(sc_base(fsc), sc_base(sc));
+		base_rm(sc_base(sc));
+		sc_base(sc) = new_b;
+		sc_dimension(sc) = base_dimension(new_b);
+
+		/* add equations from ftf to tf */
+		for(eq = sc_egalites(fsc); !CONTRAINTE_UNDEFINED_P(eq); ) {
+		    Pcontrainte neq;
+
+		    neq = eq->succ;
+		    sc_add_egalite(sc, eq);
+		    eq = neq;
 		}
-		else
-		    predicate_system_(transformer_relation(tf)) = 
-			newgen_Psysteme(sc);
+
+		/* add inequalities from ftf to tf */
+		for(eq = sc_inegalites(fsc); !CONTRAINTE_UNDEFINED_P(eq); ) {
+		    Pcontrainte neq;
+		    
+		    neq = eq->succ;
+		    sc_add_inegalite(sc, eq);
+		    eq = neq;
+		}
+
+		/* FI: I hope that inequalities will be taken care of some day! */
+		/* Well, in June 1997.. */
+
+		sc_egalites(fsc) = CONTRAINTE_UNDEFINED;
+		sc_inegalites(fsc) = CONTRAINTE_UNDEFINED;
+		free_transformer(ftf);
+
+		ifdebug(8) {
+		    pips_debug(8, "intermediate fix-point tf=\n");
+		    fprint_transformer(stderr, tf, external_value_name);
+		}
+
+		/* add initialization for the loop index variable */
+		/* FI: this seems to be all wrong because a transformer cannot
+		 * state anything about its initial state...
+		 *
+		 * Also, sc basis should be updated!
+		 *
+		 * I change my mind: let's use the lower bound anyway since it
+		 * make sense as soon as i_init is eliminated in the transformer
+		 */
+		if(entity_has_values_p(i) && normalized_linear_p(nlb)) {
+		    Pvecteur v_lb = vect_dup(normalized_linear(nlb));
+		    Pbase b_tmp, b_lb = make_base_from_vect(v_lb); 
+		    entity i_init = entity_to_old_value(i);
+
+		    vect_add_elem(&v_lb, (Variable) i_init, VALUE_MONE);
+		    eq = contrainte_make(v_lb);
+		    /* The new variables in eq must be added to sc; otherwise,
+		     * further consistency checks core dump. bc.
+		     */
+		    /* sc_add_egalite(sc, eq); */
+		    /* The call to sc_projection_with_eq frees eq */
+		    sc = sc_projection_by_eq(sc, eq, (Variable) i_init);
+		    b_tmp = sc_base(sc);
+		    sc_base(sc) = base_union(b_tmp, b_lb);
+		    sc_dimension(sc) = base_dimension(sc_base(sc));
+		    base_rm(b_tmp);
+		    base_rm(b_lb);
+		    if(SC_RN_P(sc)) {
+			/* FI: a NULL is not acceptable; I assume that we cannot
+			 * end up with a SC_EMPTY...
+			 */
+			predicate_system_(transformer_relation(tf)) =
+			    newgen_Psysteme
+			    (sc_make(CONTRAINTE_UNDEFINED, CONTRAINTE_UNDEFINED));
+		    }
+		    else
+			predicate_system_(transformer_relation(tf)) = 
+			    newgen_Psysteme(sc);
+		}
+	    }
+	    else {
+		tf = ftf;
 	    }
 
 	    ifdebug(8) {
@@ -396,12 +402,12 @@ loop_to_transformer(loop l, list e) /* effects of loop l */
 	   the loop transformer, we need a filtered out tf; only
 	   one hook is available in the ri..; let'a assume there
 	   are no private variables and that if they are privatizable
-	   they are not going to get in our way */
+	they are not going to get in our way */
     }
     else {
 	/* basic cheap version: do not use the loop body transformer and
 	   avoid fix-points; local variables do not have to be filtered out
-	   because this was already done while computing effects */
+	because this was already done while computing effects */
 
 	(void) statement_to_transformer(s);
 	tf = effects_to_transformer(e);
@@ -454,20 +460,26 @@ whileloop_to_transformer(whileloop l, list e) /* effects of whileloop l */
 	}
 	else {
 	    transformer ftf = (* transformer_fix_point_operator)(tfb);
-	    Psysteme fsc = predicate_system(transformer_relation(ftf));
-	    Psysteme sc = SC_UNDEFINED;
+
+	    if(*transformer_fix_point_operator==transformer_equality_fix_point) {
+		Psysteme fsc = predicate_system(transformer_relation(ftf));
+		Psysteme sc = SC_UNDEFINED;
 	    
-	    /* Dirty looking fix for a fix point computation error:
-	     * sometimes, the basis is restricted to a subset of
-	     * the integer scalar variables. Should be useless with proper
-	     * fixpoint opertors.
-	     */
-	    tf = effects_to_transformer(e);
-	    sc = (Psysteme) predicate_system(transformer_relation(tf));
+		/* Dirty looking fix for a fix point computation error:
+		 * sometimes, the basis is restricted to a subset of
+		 * the integer scalar variables. Should be useless with proper
+		 * fixpoint opertors.
+		 */
+		tf = effects_to_transformer(e);
+		sc = (Psysteme) predicate_system(transformer_relation(tf));
 
-	    sc = sc_append(sc, fsc);
+		sc = sc_append(sc, fsc);
 
-	    free_transformer(ftf);
+		free_transformer(ftf);
+	    }
+	    else {
+		tf = ftf;
+	    }
 
 	    ifdebug(8) {
 		pips_debug(8, "intermediate fix-point tf=\n");
