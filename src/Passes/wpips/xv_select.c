@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/17 16:34:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/23 11:14:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1995/10/17 16:34:47 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1995/10/23 11:14:33 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -506,7 +506,7 @@ end_create_workspace_notify(int * pargc,
    if (workspace_name_p(workspace_name_to_create)) {
       if (db_create_workspace(workspace_name_to_create)) {
          /* The create workspace has been successful: */
-         open_log_file();
+	  /* open_log_file(); */
          display_memory_usage();
          
          if (create_workspace(pargc, argv)) {
@@ -526,7 +526,8 @@ end_create_workspace_notify(int * pargc,
             return;
          }
          else
-            close_log_file();
+	     /* close_log_file(); */
+	     ;
       }
    }
    else
@@ -547,7 +548,7 @@ end_open_workspace_notify(string name)
    schoose_close();
 
    if ( open_workspace(name) ) {
-      open_log_file();
+       /* open_log_file(); */
       enable_workspace_close();
       show_workspace();
       select_a_module_by_default();
@@ -616,7 +617,7 @@ close_workspace_notify(Menu menu,
 
    if (return_value ) {
       /* The close has been successful: */
-      close_log_file();
+       /* close_log_file(); */
 
       edit_close_notify(menu, menu_item);
 
