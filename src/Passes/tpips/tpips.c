@@ -544,34 +544,34 @@ static char * get_next_line(char * prompt)
 {
 #define MAX_LINE_LENGTH  1024
     static char line[MAX_LINE_LENGTH];
-    
-    return use_readline? 
-	readline(prompt):
-	strdup(fgets(line, MAX_LINE_LENGTH, current_file));
+    char * tmp = use_readline? 
+	readline(prompt): fgets(line, MAX_LINE_LENGTH, current_file);
+
+    return tmp && !use_readline? strdup(tmp): tmp;
 }
 
 static char * tpips_read_a_line(void)
 {
-    char *logline;
+    char *line;
     int l;
 
-    logline = get_next_line(TPIPS_PROMPT);
+    line = get_next_line(TPIPS_PROMPT);
     
     /* handle backslash-style continuations
      */
-    while (l=strlen(logline), logline[l-1]==TPIPS_CONTINUATION_CHAR)
+    while (line && (l=strlen(line), line[l-1]==TPIPS_CONTINUATION_CHAR))
     {
 	char *tmp, *next = get_next_line(TPIPS_SECOND_PROMPT);
-	logline[l-1] = '\0';
-	tmp = strdup(concatenate(logline, next, NULL));
-	free(logline);
-	logline = tmp;
+	line[l-1] = '\0';
+	tmp = strdup(concatenate(line, next, NULL));
+	free(line);
+	line = tmp;
     }
 
-    if (logfile && logline)
-	fprintf(logfile,"%s\n",logline);
+    if (logfile && line)
+	fprintf(logfile,"%s\n",line);
 
-    return logline;
+    return line;
 }
 
 static void process_a_file()
