@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1994/04/14 18:21:07 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1994/04/15 09:09:09 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -74,6 +74,7 @@ sccs_close:
 y.tab.c: tokyacc.h gram.y
 	cat tokyacc.h gram.y > yacc.in
 	$(PARSE) -l yacc.in
+	$(RM) yacc.in
 	sed -e '/extern char \*malloc/d;s/YY/HH/g;s/yy/hh/g' y.tab.c | \
 	  grep -v "#line" > s.tab.c
 	mv s.tab.c y.tab.c
@@ -102,9 +103,9 @@ toklex.h: warning.h f77keywords hpfkeywords f77symboles
 
 tokyacc.h: warning.h f77keywords hpfkeywords f77symboles
 	cat f77keywords hpfkeywords f77symboles | \
-	  nl -s: | \
-	  cat warning.h - | \
-	  sed "s/\([^:]*\):\(.*\)/%token TK_\2 \1/" > tokyacc.h
+	nl -s: | \
+	cat warning.h - | \
+	sed "s/\([^:]*\):\(.*\)/%token TK_\2 \1/" > tokyacc.h
 
 depend: scanner.c y.tab.c
 
