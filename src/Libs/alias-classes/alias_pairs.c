@@ -154,36 +154,50 @@ add_parameter_aliases_for_this_call_site(call call_site, transformer context)
  * and list_pairs
  * modifies global var: list_pairs
  */
+
+/* originally:
 static bool
 add_alias_pairs_for_this_call_site(call call_site)
 {
     transformer context;
     list real_args;
+*/
 
+static bool
+add_alias_pairs_for_this_call_site(statement call_statement)
+{
+    transformer context;
+    list real_args;
+
+    pips_debug(9,"begin for call_statement %03d\n",statement_number(call_statement));
+
+    pips_debug(9,"try set call_site\n");
+
+    call call_site = instruction_call(statement_instruction(call_statement));
+
+    pips_debug(9,"test call_site\n");
 
     if (call_function(call_site) != callee) return TRUE;
 
-    pips_debug(9, "begin\n");
+    pips_debug(9,"ok, try load_statement_precondition\n\tfor statement %03d\n",statement_number(current_caller_stmt));
 
     context = load_statement_precondition(current_caller_stmt);
 
-    pips_debug(9,"for statement %03d\n",statement_number(current_caller_stmt));
-    
-    pips_debug(9,"\tgot context:\n\t%s\n",transformer_to_string(context));
+    pips_debug(9,"got context:\n\t%s\n",transformer_to_string(context));
+
+    pips_debug(9,"try call_arguments\n");
 
     real_args = call_arguments(call_site);
 
-    pips_debug(9,"done call_arguments\n");
-
-    set_interprocedural_translation_context_sc(callee, real_args);
-
-    pips_debug(9,"done set_interprocedural_translation_context_sc\n");
+    pips_debug(9,"try set_interprocedural_translation_context_sc\n");
 
     pips_debug(9,"\tfor callee %s\n",entity_name(callee));
 
-    set_backward_arguments_to_eliminate(callee);
+    set_interprocedural_translation_context_sc(callee, real_args);
 
-    pips_debug(9,"done set_backward_arguments_to_eliminate\n");
+    pips_debug(9,"try set_backward_arguments_to_eliminate\n");
+
+    set_backward_arguments_to_eliminate(callee);
 
     add_parameter_aliases_for_this_call_site(call_site,context);
 /*    add_common_aliases_for_this_call_site(); */
