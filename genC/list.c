@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1998/12/08 11:49:52 $, )
+ * $RCSfile: list.c,v $ ($Date: 1998/12/30 16:49:48 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -147,6 +147,40 @@ void gen_insert_after(void * no, void * o, list l)
     assert(!ENDP(obj_cons));
     CDR(obj_cons) = CONS(CHUNK, new_obj, CDR(obj_cons));
 }
+
+/* 
+   insert object "no" before object "o" in the list "l". Return the new
+   list.
+*/
+list gen_insert_before(void * no, void * o, list l)
+{
+  gen_chunk * new_obj = (gen_chunk*) no;
+  gen_chunk * obj = (gen_chunk*) o;
+  
+  list r = NIL; /* result   */
+  list c = l;   /* current  */
+  list p = NIL; /* previous */
+  
+  /* search obj in list */
+  for ( ; c!=NIL ; c=c->cdr) 
+    if ( CHUNK(CAR(c))==obj )
+      break;
+    else
+      p = c;
+
+  assert(!ENDP(c));
+
+  if (p) { /* obj is not the first object of the list */
+    CDR(p) = CONS(CHUNK, new_obj, CDR(p));
+    r = l;
+  }
+  else { /* obj is the first object */
+    r = CONS(CHUNK, new_obj, c); 
+  }
+  return r;
+}
+
+
 
 #define NEXT(cp) (((cp) == NIL) ? NIL : (cp)->cdr)
 
