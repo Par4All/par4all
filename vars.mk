@@ -25,11 +25,11 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.16 2002/08/29 17:56:59 loechner Exp $
+# $Id: vars.mk,v 1.17 2002/08/30 10:05:06 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
-VERSION = 5.09
+VERSION = 5.10
 
 # NOTE: Don't edit this file if it is called vars.mk, instead
 # edit vars.mk.in, which is read by configure
@@ -68,14 +68,12 @@ SHEXT  			= so
 
 # defines needed for arithmetic lib
 INT_AFLAGS = -DLINEAR_VALUE_IS_INT
-LONG_AFLAGS = -DLINEAR_VALUE_PROTECT_MULTIPLY 		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -DLINEAR_VALUE_IS_LONGLONG
+LONG_AFLAGS = -DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
 GMP_AFLAGS = -DGNUMP
 INT_BITS = 32
 LONG_BITS = 64
 GMP_BITS = gmp
 
-# Library type to construct
-LIBSTYPE_TO_BUILD = 
 # Library type to install
 INSTALL_LIB = install-static install-shared
 
@@ -106,14 +104,13 @@ DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
-EXEC_EXTRA_LIBS= -L${exec_prefix}/lib -lpolylib$(BITS) $(LIBS)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 
-LIBS_TO_BUILD = 32 64 gmp
-EXEC_TO_BUILD = 32 64 gmp
-BITS=32
-AFLAGS=-DLINEAR_VALUE_IS_INT
+LIBS_TO_BUILD = 64
+EXEC_TO_BUILD = 64
+BITS=64
+AFLAGS=-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV
 
 
 OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)

@@ -63,42 +63,20 @@ LIB_OBJECTS= $(CFILES:%.c=$(OBJ_DIR)/%.o)
 all::
 	@echo "---------------------------------------------------"
 	@echo "You can choose either:"
-	@echo "'make [all]' to build the libs,  and build the executables (default)."
+	@echo "'make [all]' to build the libs, and build the executables (default)."
 	@echo "'make libs' to build the libraries ($(LIBS_TO_BUILD))."
-	@echo "'make install-libs' to install  somewhere (in $(prefix))."
-	@echo "'make install' to build and install somewhere (in $(prefix))."
+	@echo "'make install-libs' to install libs (in $(prefix))."
+	@echo "'make install' to install (in $(prefix))."
 	@echo "---------------------------------------------------"
-all:: $(LIBS_TO_BUILD:%=%libs)
-#all:: $(LIBS_TO_BUILD:%=%install-libs)
+all:: libs
 all:: $(EXEC_TO_BUILD:%=%exec)
 	@echo "---------------------------------------------------"
 	@echo "Type 'make install' to install everything"
 	@echo "---------------------------------------------------"
 
-$(INT_BITS):
-	$(MAKE) "BITS=$(INT_BITS)" "AFLAGS=$(INT_AFLAGS)" default
-
-$(LONG_BITS):
-	$(MAKE) "BITS=$(LONG_BITS)" "AFLAGS=$(LONG_AFLAGS)" default
-
-$(GMP_BITS):
-	$(MAKE) "BITS=$(GMP_BITS)" "AFLAGS=$(GMP_AFLAGS)" default
-
-typecheck:
-	$(MAKE) "BITS=$(CHECK_BITS)" "AFLAGS=$(CHECK_AFLAGS)" default
-
-###########################################################
-## called from all : make lib, install it, and build executables
-###########################################################
-default:: libs
-	@echo "---------------------------------------------------"
-	@echo "Successfully built Library."
-	@echo "---------------------------------------------------"
-#default:: $(INSTALL_LIB)
-#	@echo "---------------------------------------------------"
-#	@echo "Successfully installed Library."
-#	@echo "---------------------------------------------------"
-default:: allexec
+$(INT_BITS) $(LONG_BITS) $(GMP_BITS):
+	$(MAKE) $@libs
+	$(MAKE) $@exec
 
 ###########################################################
 ## Install/UnInstall
@@ -137,7 +115,7 @@ install-include:
 	if [ ! -d "$(INCLUDEDIR)/polylib" ]; then \
 		echo "Creating '$(INCLUDEDIR)/polylib' directory"; \
 		$(mkinstalldirs) $(INCLUDEDIR)/polylib ;\
-	$(INSTALL_DATA) ./include/polylib/* $(INCLUDEDIR)/polylib ;\
+	$(INSTALL_DATA) ./include/polylib/*.h $(INCLUDEDIR)/polylib ;\
 	fi
 	
 install-man:
@@ -212,7 +190,10 @@ $(GMP_BITS)libs:
 
 
 # local targets
-mlibs: $(LIBSTYPE_TO_BUILD)
+mlibs: lib-static
+	@echo "---------------------------------------------------"
+	@echo "Successfully built $(BITS) Library."
+	@echo "---------------------------------------------------"
 # lib-shared lib-static
 
 lib-shared:: $(OBJ_DIR)
@@ -240,7 +221,7 @@ $(OBJ_DIR)/$(PSHARED): $(LIB_OBJECTS)
 ###########################################################
 # main target
 clean:
-	(cd $(ARITH_DIR) ; $(MAKE) "OBJ_DIR=$(OBJ_DIR)" clean)
+	(cd $(ARITH_DIR) ; $(MAKE) clean)
 	$(RM) -r Obj.*
 distclean: clean
 	$(RM) config.cache config.log config.status

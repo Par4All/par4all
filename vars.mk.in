@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk.in,v 1.3 2002/05/24 09:28:25 risset Exp $
+# $Id: vars.mk.in,v 1.4 2002/08/30 10:05:06 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -74,8 +74,6 @@ INT_BITS = @INT_BITS@
 LONG_BITS = @LONG_BITS@
 GMP_BITS = @GMP_BITS@
 
-# Library type to construct
-LIBSTYPE_TO_BUILD = @LIBSTYPE_TO_BUILD@
 # Library type to install
 INSTALL_LIB = @INSTALL_LIB@
 
@@ -106,7 +104,6 @@ DOCSDIR = $(INSTALLDIR)/doc/packages/polylib-$(VERSION)
 
 # When compiling the tests, we need to link additional libraries
 # include polylib
-EXEC_EXTRA_LIBS= @EXEC_EXTRA_LIBS@ $(LIBS)
 SHAREDLIB_FLAG          = @SHAREDLIB_FLAG@
 LDCONFIG = @LDCONFIG@
 

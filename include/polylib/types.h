@@ -38,7 +38,7 @@
 #define P_VALUE_FMT "%s "
 #elif defined(LINEAR_VALUE_IS_INT) 
 #define P_VALUE_FMT "%4d "
-#else  /* Default: GNUMP */
+#else  /* GNUMP */
 #define P_VALUE_FMT "%4s"
 #endif
 
@@ -68,9 +68,7 @@ typedef struct matrix {
   unsigned NbRows, NbColumns;
   Value **p;
   Value *p_Init;
-#ifdef GNUMP
-  int p_allocsize;	/* needed to free the memory allocated by mpz_init */
-#endif
+  int p_Init_size;	/* needed to free the memory allocated by mpz_init */
 } Matrix;
 
 typedef struct polyhedron { 

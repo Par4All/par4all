@@ -4,11 +4,6 @@
 
 /*********************** User defines ******************************/
 
-/* define this to always use gmp instead of trying C integers      */
-/* (if there is an overflow of C integers, gmp will be called      */
-/*  automatically, even when this is not defined)                  */
-/* #define USEALWAYSGMP */
-
 /* Print all overflow warnings, or just one per domain             */
 /* #define ALL_OVERFLOW_WARNINGS */
 

@@ -1660,16 +1660,11 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
     printf("\n");
   }
 #endif    
-#ifndef USEALWAYSGMP
   CATCH(overflow_error) {
-#endif /* USEALWAYSGMP */
-#ifndef GNUMP
     fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
     fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
     overflow_warning_flag = 0;
     assert(overflow_warning_flag);
-#endif  
-#ifndef USEALWAYSGMP
   }
   TRY {
     
@@ -1681,7 +1676,6 @@ Enumeration *Enumerate_NoParameters(Polyhedron *P,Polyhedron *C,Matrix *CT,Polyh
     res->EP.x.p = P_Enum(L,NULL,context,1,0,hdim-1,&tmp);
     UNCATCH(overflow_error);
   }
-#endif /* USEALWAYSGMP */
   
   Domain_Free(L);
   
@@ -1939,23 +1933,17 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *P,Polyhedron *C,unsigned MAXRAYS)
       /* Set context[hdim] = 1  (the constant) */
       value_set_si(context[hdim],1);
       
-#ifndef USEALWAYSGMP
       CATCH(overflow_error) {
-#endif /* USEALWAYSGMP */
-#ifndef GNUMP  /* GNUMP */
-	fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
-	fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
-	overflow_warning_flag = 0;
-	assert(overflow_warning_flag);
-#endif /* GNUMP */
-#ifndef USEALWAYSGMP		
+			fprintf(stderr,"Enumerate: arithmetic overflow error.\n");
+			fprintf(stderr,"You should rebuild PolyLib using GNU-MP or increasing the size of integers.\n");
+			overflow_warning_flag = 0;
+			assert(overflow_warning_flag);
 	
       }
       TRY {
-	res->EP.x.p = P_Enum(L,LQ,context,1,nb_param,dim,lcm);
-	UNCATCH(overflow_error);	
+			res->EP.x.p = P_Enum(L,LQ,context,1,nb_param,dim,lcm);
+			UNCATCH(overflow_error);	
       }
-#endif /* USEALWAYSGMP */
       
       for(i=0;i<=(hdim);i++)
 	value_clear(context[i]);

@@ -26,7 +26,7 @@ ac_help="$ac_help
 ac_help="$ac_help
  --enable-extra-suffix    Enable that the executables take an extra suffix depending on the library size"
 ac_help="$ac_help
- --enable-all-exec        Enable that the two sized libraries are used to build two executables of each, which take an extra suffix depending on the library (by default, only the long library is used)"
+ --enable-all-exec        Enable that all sized libraries are used to build the executables of each, which take an extra suffix depending on the library (by default, only the long library is used)"
 ac_help="$ac_help
  --enable-onlyshared      Enable that only a shared library is constructued"
 ac_help="$ac_help
@@ -541,7 +541,7 @@ fi
 
 
 
-VERSION=5.09
+VERSION=5.10
 
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
@@ -1515,40 +1515,38 @@ else
 fi
 
 
-INT_BITS=`expr $ac_cv_sizeof_long_int \* 8`
+INT_BITS=`expr $ac_cv_sizeof_int \* 8`
+INT_AFLAGS=-DLINEAR_VALUE_IS_INT
+
 LONG_BITS=`expr $ac_cv_sizeof_long_long_int \* 8`
+LONG_AFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
+			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+
 GMP_BITS=`expr gmp`
 GMP_AFLAGS="-DGNUMP"
 
 
 if test "$only_int_lib" = "yes"; then
-	INT_AFLAGS=-DLINEAR_VALUE_IS_INT
 	no_long=yes
 elif test "$only_longint_lib" = "yes"; then
+	INT_BITS=`expr $ac_cv_sizeof_long_int \* 8`
 	INT_AFLAGS="-DLINEAR_VALUE_IS_LONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
 			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
 	no_long=yes
 elif test "$only_longlongint_lib" = "yes"; then
-	LONG_AFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
-			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+	no_long=no
 elif test "$only_gmpint_lib" = "yes"; then
-	LONG_AFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
-			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+	no_long=no
 else
 
 
-INT_AFLAGS="-DLINEAR_VALUE_IS_INT"
 echo $ac_n "checking what the LONG representation is""... $ac_c" 1>&6
-echo "configure:1543: checking what the LONG representation is" >&5
-LONG_AFLAGS="-DLINEAR_VALUE_PROTECT_MULTIPLY \
-		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+echo "configure:1545: checking what the LONG representation is" >&5
 no_long=no
 if test "$ac_cv_sizeof_long_long_int" -gt "$ac_cv_sizeof_int"; then
-	LONG_AFLAGS="$LONG_AFLAGS -DLINEAR_VALUE_IS_LONGLONG"
 	LONG_BITS=`expr $ac_cv_sizeof_long_long_int \* 8`
 	echo "$ac_t""long long int, $LONG_BITS bits" 1>&6
 elif test "$ac_cv_sizeof_long_int" -gt "$ac_cv_sizeof_int"; then
-	LONG_AFLAGS="$LONG_AFLAGS -DLINEAR_VALUE_IS_LONG"
 	LONG_BITS=`expr $ac_cv_sizeof_long_int \* 8`
 	echo "$ac_t""long int, $LONG_BITS bits" 1>&6
 else
@@ -1562,18 +1560,11 @@ case "$target" in
 	   no_long=yes
 esac
 
-if test "$only_int_lib" = "yes"; then
+if test "$no_long" = "yes"; then
 	LIBS_TO_BUILD=$INT_BITS
 	EXEC_TO_BUILD=$INT_BITS
 	DEFAULT_INT_BITS=$INT_BITS
 	DEFAULT_AFLAGS=$INT_AFLAGS
-	LONG_BITS=none
-elif test "$only_longint_lib" = "yes"; then
-	LIBS_TO_BUILD=$INT_BITS
-	EXEC_TO_BUILD=$INT_BITS
-	DEFAULT_INT_BITS=$INT_BITS
-	DEFAULT_AFLAGS=$INT_AFLAGS
-	LONG_BITS=none
 elif test "$only_longlongint_lib" = "yes"; then
 	LIBS_TO_BUILD=$LONG_BITS
 	EXEC_TO_BUILD=$LONG_BITS
@@ -1584,17 +1575,13 @@ elif test "$only_gmpint_lib" = "yes"; then
 	EXEC_TO_BUILD=$GMP_BITS
 	DEFAULT_INT_BITS=$GMP_BITS
 	DEFAULT_AFLAGS=$GMP_AFLAGS
-elif test "$no_long" = "yes"; then
-	LIBS_TO_BUILD=$INT_BITS
-	EXEC_TO_BUILD=$INT_BITS
-	DEFAULT_INT_BITS=$INT_BITS
-	DEFAULT_AFLAGS=$INT_AFLAGS
-	LONG_BITS=none
+	usegmp=yes
 elif test "$allint_lib" = "yes"; then
 	LIBS_TO_BUILD="$INT_BITS $LONG_BITS $GMP_BITS"
-	EXEC_TO_BUILD="$INT_BITS $LONG_BITS $GMP_BITS"
+	EXEC_TO_BUILD="$LONG_BITS"
 	DEFAULT_INT_BITS=$INT_BITS
 	DEFAULT_AFLAGS=$INT_AFLAGS
+	usegmp=yes
 else
 	LIBS_TO_BUILD="$LONG_BITS"
 	EXEC_TO_BUILD="$LONG_BITS"
@@ -1627,13 +1614,12 @@ fi
 if test "${enable_all_exec+set}" = set; then
   enableval="$enable_all_exec"
    if test "$enableval" = yes; then
-		EXEC_TO_BUILD="$INT_BITS $LONG_BITS"
+		EXEC_TO_BUILD="$LIBS_TO_BUILD"
 		DEFAULT_INT_BITS=$INT_BITS
 		DEFAULT_AFLAGS=$INT_AFLAGS
 		EXEC_EXTRA_SUFFIX="\$(BITS)$EXEC_SUFFIX"
     fi  
 fi
-
 
 
 EXEC_EXTRA_LIBS="-lpolylib\$(BITS)"
@@ -1681,8 +1667,6 @@ fi
 
 
 
-echo $ac_n "checking whether to use GMP""... $ac_c" 1>&6
-echo "configure:1686: checking whether to use GMP" >&5
 # Check whether --with-libgmp or --without-libgmp was given.
 if test "${with_libgmp+set}" = set; then
   withval="$with_libgmp"
@@ -1692,29 +1676,28 @@ else
 fi
 
 
-GFLAGS="-DGNUMP"
-EHRHART_MP=
-MATRIX_MP=
 EXTRA_LIBS=
 EXTRA_INCLUDE=
 
-if test "x$gmp_package" = "xno"; then
-	echo "$ac_t""no" 1>&6
-else
-	if test "x$gmp_package" = "xyes"; then
-		ac_safe=`echo "gmp.h" | sed 'y%./+-%__p_%'`
+	echo $ac_n "checking for GMP""... $ac_c" 1>&6
+echo "configure:1684: checking for GMP" >&5
+	if test "x$gmp_package" = "xno"; then
+		echo "$ac_t""no" 1>&6
+	else
+		if test "x$gmp_package" = "xyes"; then
+			ac_safe=`echo "gmp.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for gmp.h""... $ac_c" 1>&6
-echo "configure:1708: checking for gmp.h" >&5
+echo "configure:1691: checking for gmp.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 1713 "configure"
+#line 1696 "configure"
 #include "confdefs.h"
 #include <gmp.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1718: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1701: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -1731,7 +1714,7 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   echo $ac_n "checking for main in -lgmp""... $ac_c" 1>&6
-echo "configure:1735: checking for main in -lgmp" >&5
+echo "configure:1718: checking for main in -lgmp" >&5
 ac_lib_var=`echo gmp'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1739,14 +1722,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lgmp  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 1743 "configure"
+#line 1726 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:1750: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1733: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -1761,10 +1744,7 @@ LIBS="$ac_save_LIBS"
 fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
-   GFLAGS="-DGNUMP"
-				  EHRHART_MP="ehrhart_mp.c"
-				  MATRIX_MP="matrix_mp.c"
-				  EXTRA_LIBS="-lgmp $EXTRA_LIBS"
+   EXTRA_LIBS="-lgmp $EXTRA_LIBS"
 else
   echo "$ac_t""no" 1>&6
 fi
@@ -1773,28 +1753,25 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-	else
-		GMP_DIR=$gmp_package
-		if test ! -d "$GMP_DIR"; then
-	    	{ echo "configure: error: Directory given for GMP Distribution is not a directory" 1>&2; exit 1; }
 		else
-			GMP_INC=$GMP_DIR/include
-			GMP_LIB=$GMP_DIR/lib
-			if test ! -f $GMP_INC/gmp.h; then
-		    	{ echo "configure: error: Can't find $GMP_INC/gmp.h" 1>&2; exit 1; }
-			elif test -f $GMP_LIB/libgmp.so -o -f $GMP_LIB/libgmp.a -o -f $GMP_LIB/libgmp.$SHEXT; then
-				GFLAGS="-DGNUMP"
-				EXTRA_INCLUDES="-I$GMP_INC"
-				EHRHART_MP="ehrhart_mp.c"
-				MATRIX_MP="matrix_mp.c"
-				EXTRA_LIBS="-L$GMP_LIB -lgmp $EXTRA_LIBS"
-				echo "$ac_t""yes" 1>&6
+				GMP_DIR=$gmp_package
+			if test ! -d "$GMP_DIR"; then
+	    		{ echo "configure: error: Directory given for GMP Distribution is not a directory" 1>&2; exit 1; }
 			else
-		    	{ echo "configure: error: Can't find $GMP_LIB/libgmp.so nor $GMP_LIB/libgmp.a nor $GMP_LIB/libgmp.$SHEXT" 1>&2; exit 1; }
+				GMP_INC=$GMP_DIR/include
+				GMP_LIB=$GMP_DIR/lib
+				if test ! -f $GMP_INC/gmp.h; then
+		    		{ echo "configure: error: Can't find $GMP_INC/gmp.h" 1>&2; exit 1; }
+				elif test -f $GMP_LIB/libgmp.so -o -f $GMP_LIB/libgmp.a -o -f $GMP_LIB/libgmp.$SHEXT; then
+					EXTRA_INCLUDES="-I$GMP_INC"
+					EXTRA_LIBS="-L$GMP_LIB -lgmp $EXTRA_LIBS"
+					echo "$ac_t""yes" 1>&6
+				else
+		    		{ echo "configure: error: Can't find $GMP_LIB/libgmp.so nor $GMP_LIB/libgmp.a nor $GMP_LIB/libgmp.$SHEXT" 1>&2; exit 1; }
+				fi
 			fi
 		fi
 	fi
-fi
 
 echo "Polylib will be built with " $LIBS_TO_BUILD "integer size" 
 echo "---------------------------------------------------"
@@ -1804,12 +1781,6 @@ echo "make libs:         to build only the libraries"
 echo "make install-libs: to install them somewhere (default /usr/local)"
 echo "make install:      to build and install everything somewhere (default /usr/local)"
 echo "---------------------------------------------------"
-
-
-
-
-
-
 
 
 
@@ -1969,7 +1940,6 @@ s%@LD@%$LD%g
 s%@SHEXT@%$SHEXT%g
 s%@SHAREDLIB_FLAG@%$SHAREDLIB_FLAG%g
 s%@INSTALL_LIB@%$INSTALL_LIB%g
-s%@LIBSTYPE_TO_BUILD@%$LIBSTYPE_TO_BUILD%g
 s%@LDCONFIG@%$LDCONFIG%g
 s%@LIBS_TO_BUILD@%$LIBS_TO_BUILD%g
 s%@EXEC_TO_BUILD@%$EXEC_TO_BUILD%g
@@ -1981,12 +1951,7 @@ s%@GMP_BITS@%$GMP_BITS%g
 s%@GMP_AFLAGS@%$GMP_AFLAGS%g
 s%@DEFAULT_INT_BITS@%$DEFAULT_INT_BITS%g
 s%@DEFAULT_AFLAGS@%$DEFAULT_AFLAGS%g
-s%@BITS@%$BITS%g
-s%@AFLAGS@%$AFLAGS%g
-s%@GFLAGS@%$GFLAGS%g
 s%@EXTRA_INCLUDES@%$EXTRA_INCLUDES%g
-s%@EHRHART_MP@%$EHRHART_MP%g
-s%@MATRIX_MP@%$MATRIX_MP%g
 s%@EXTRA_LIBS@%$EXTRA_LIBS%g
 s%@EXEC_EXTRA_SUFFIX@%$EXEC_EXTRA_SUFFIX%g
 s%@EXEC_EXTRA_LIBS@%$EXEC_EXTRA_LIBS%g
@@ -2102,13 +2067,6 @@ EOF
 chmod +x $CONFIG_STATUS
 rm -fr confdefs* $ac_clean_files
 test "$no_create" = yes || ${CONFIG_SHELL-/bin/sh} $CONFIG_STATUS || exit 1
-
-
-
-
-
-
-
 
 
 

@@ -33,7 +33,7 @@ define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 AC_INIT(include/polylib/polylib.h)
 
-VERSION=5.09
+VERSION=5.10
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_CANONICAL_SYSTEM 
@@ -125,43 +125,42 @@ AC_ARG_ENABLE(longlongint-lib,[ --enable-longlongint-lib Enable that only a long
 AC_ARG_ENABLE(gmpint-lib,[ --enable-gmpint-lib Enable that only a gmp int library is constructued], only_gmpint_lib=$enableval,only_gmpint_lib=no)
 AC_ARG_ENABLE(allint-lib,[ --enable-allint-lib Enable that 32, 64 and gmp int library is constructued], allint_lib=$enableval,allint_lib=no)
 
-INT_BITS=`expr $ac_cv_sizeof_long_int \* 8`
+INT_BITS=`expr $ac_cv_sizeof_int \* 8`
+INT_AFLAGS=-DLINEAR_VALUE_IS_INT
+
 LONG_BITS=`expr $ac_cv_sizeof_long_long_int \* 8`
+LONG_AFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
+			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+
 GMP_BITS=`expr gmp`
 GMP_AFLAGS="-DGNUMP"
 
 
 if test "$only_int_lib" = "yes"; then
-	INT_AFLAGS=-DLINEAR_VALUE_IS_INT
 	no_long=yes
 elif test "$only_longint_lib" = "yes"; then
+dnl /* type "long int" is built using INT_AFLAGS.
+	INT_BITS=`expr $ac_cv_sizeof_long_int \* 8`
 	INT_AFLAGS="-DLINEAR_VALUE_IS_LONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
 			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
 	no_long=yes
 elif test "$only_longlongint_lib" = "yes"; then
-	LONG_AFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
-			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+	no_long=no
 elif test "$only_gmpint_lib" = "yes"; then
-	LONG_AFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY\
-			-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
+	no_long=no
 else
 
 dnl /******************************************************************/
 dnl Check the size of the int's.
-dnl two sizes library can be constructed: size = INT or LONG.
+dnl three sizes library can be constructed: size = INT, LONG, or GMP.
 dnl have to compute [size]BITS and [size]AFLAGS
 
-INT_AFLAGS="-DLINEAR_VALUE_IS_INT"
 AC_MSG_CHECKING(what the LONG representation is)
-LONG_AFLAGS="-DLINEAR_VALUE_PROTECT_MULTIPLY \
-		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
 no_long=no
 if test "$ac_cv_sizeof_long_long_int" -gt "$ac_cv_sizeof_int"; then
-	LONG_AFLAGS="$LONG_AFLAGS -DLINEAR_VALUE_IS_LONGLONG"
 	LONG_BITS=`expr $ac_cv_sizeof_long_long_int \* 8`
 	AC_MSG_RESULT([long long int, $LONG_BITS bits])
 elif test "$ac_cv_sizeof_long_int" -gt "$ac_cv_sizeof_int"; then
-	LONG_AFLAGS="$LONG_AFLAGS -DLINEAR_VALUE_IS_LONG"
 	LONG_BITS=`expr $ac_cv_sizeof_long_int \* 8`
 	AC_MSG_RESULT([long int, $LONG_BITS bits])
 else
@@ -175,18 +174,11 @@ case "$target" in
 	   no_long=yes
 esac
 
-if test "$only_int_lib" = "yes"; then
+if test "$no_long" = "yes"; then
 	LIBS_TO_BUILD=$INT_BITS
 	EXEC_TO_BUILD=$INT_BITS
 	DEFAULT_INT_BITS=$INT_BITS
 	DEFAULT_AFLAGS=$INT_AFLAGS
-	LONG_BITS=none
-elif test "$only_longint_lib" = "yes"; then
-	LIBS_TO_BUILD=$INT_BITS
-	EXEC_TO_BUILD=$INT_BITS
-	DEFAULT_INT_BITS=$INT_BITS
-	DEFAULT_AFLAGS=$INT_AFLAGS
-	LONG_BITS=none
 elif test "$only_longlongint_lib" = "yes"; then
 	LIBS_TO_BUILD=$LONG_BITS
 	EXEC_TO_BUILD=$LONG_BITS
@@ -197,17 +189,13 @@ elif test "$only_gmpint_lib" = "yes"; then
 	EXEC_TO_BUILD=$GMP_BITS
 	DEFAULT_INT_BITS=$GMP_BITS
 	DEFAULT_AFLAGS=$GMP_AFLAGS
-elif test "$no_long" = "yes"; then
-	LIBS_TO_BUILD=$INT_BITS
-	EXEC_TO_BUILD=$INT_BITS
-	DEFAULT_INT_BITS=$INT_BITS
-	DEFAULT_AFLAGS=$INT_AFLAGS
-	LONG_BITS=none
+	usegmp=yes
 elif test "$allint_lib" = "yes"; then
 	LIBS_TO_BUILD="$INT_BITS $LONG_BITS $GMP_BITS"
-	EXEC_TO_BUILD="$INT_BITS $LONG_BITS $GMP_BITS"
+	EXEC_TO_BUILD="$LONG_BITS"
 	DEFAULT_INT_BITS=$INT_BITS
 	DEFAULT_AFLAGS=$INT_AFLAGS
+	usegmp=yes
 else
 	LIBS_TO_BUILD="$LONG_BITS"
 	EXEC_TO_BUILD="$LONG_BITS"
@@ -227,13 +215,12 @@ EXEC_EXTRA_SUFFIX=$EXEC_SUFFIX
 AC_ARG_ENABLE(extra-suffix,[ --enable-extra-suffix    Enable that the executables take an extra suffix depending on the library size],[ if test "$enableval" = yes; then
 		EXEC_EXTRA_SUFFIX="\$(BITS)$EXEC_SUFFIX"
     fi ] )
-AC_ARG_ENABLE(all-exec,[ --enable-all-exec        Enable that the two sized libraries are used to build two executables of each, which take an extra suffix depending on the library (by default, only the long library is used)],[ if test "$enableval" = yes; then
-		EXEC_TO_BUILD="$INT_BITS $LONG_BITS"
+AC_ARG_ENABLE(all-exec,[ --enable-all-exec        Enable that all sized libraries are used to build the executables of each, which take an extra suffix depending on the library (by default, only the long library is used)],[ if test "$enableval" = yes; then
+		EXEC_TO_BUILD="$LIBS_TO_BUILD"
 		DEFAULT_INT_BITS=$INT_BITS
 		DEFAULT_AFLAGS=$INT_AFLAGS
 		EXEC_EXTRA_SUFFIX="\$(BITS)$EXEC_SUFFIX"
     fi ] )
-
 
 dnl /*****************************************************************************/
 dnl install static/shared/none libraries (default : see below)
@@ -263,48 +250,41 @@ AC_ARG_WITH(ldconfig-cache, [ --with-ldconfig-cache=FILE Run ldconfig -C <FILE>]
 
 dnl /*****************************************************************************/
 dnl Check for GMP library
-AC_MSG_CHECKING(whether to use GMP)
 AC_ARG_WITH(libgmp, [ --with-libgmp            DIR Location of the GMP Distribution], gmp_package=$withval,gmp_package=yes)
 
-GFLAGS="-DGNUMP"
-EHRHART_MP=
-MATRIX_MP=
 EXTRA_LIBS=
 EXTRA_INCLUDE=
 
-if test "x$gmp_package" = "xno"; then
-	AC_MSG_RESULT(no)
-else
-	if test "x$gmp_package" = "xyes"; then
-		AC_CHECK_HEADER(gmp.h,
-			AC_CHECK_LIB(gmp,main,
-				[ GFLAGS="-DGNUMP"
-				  EHRHART_MP="ehrhart_mp.c"
-				  MATRIX_MP="matrix_mp.c"
-				  EXTRA_LIBS="-lgmp $EXTRA_LIBS"]))
+dnl if test "x$usegmp" = "xyes"; then
+	AC_MSG_CHECKING(for GMP)
+	if test "x$gmp_package" = "xno"; then
+		AC_MSG_RESULT(no)
 	else
-dnl Check if the GMP directory is a valid location
-		GMP_DIR=$gmp_package
-		if test ! -d "$GMP_DIR"; then
-	    	AC_ERROR(Directory given for GMP Distribution is not a directory)
+		if test "x$gmp_package" = "xyes"; then
+			AC_CHECK_HEADER(gmp.h,
+				AC_CHECK_LIB(gmp,main,
+					[ EXTRA_LIBS="-lgmp $EXTRA_LIBS"]))
 		else
-			GMP_INC=$GMP_DIR/include
-			GMP_LIB=$GMP_DIR/lib
-			if test ! -f $GMP_INC/gmp.h; then
-		    	AC_ERROR(Can't find $GMP_INC/gmp.h)
-			elif test -f $GMP_LIB/libgmp.so -o -f $GMP_LIB/libgmp.a -o -f $GMP_LIB/libgmp.$SHEXT; then
-				GFLAGS="-DGNUMP"
-				EXTRA_INCLUDES="-I$GMP_INC"
-				EHRHART_MP="ehrhart_mp.c"
-				MATRIX_MP="matrix_mp.c"
-				EXTRA_LIBS="-L$GMP_LIB -lgmp $EXTRA_LIBS"
-				AC_MSG_RESULT(yes)
+	dnl Check if the GMP directory is a valid location
+			GMP_DIR=$gmp_package
+			if test ! -d "$GMP_DIR"; then
+	    		AC_ERROR(Directory given for GMP Distribution is not a directory)
 			else
-		    	AC_ERROR(Can't find $GMP_LIB/libgmp.so nor $GMP_LIB/libgmp.a nor $GMP_LIB/libgmp.$SHEXT)
+				GMP_INC=$GMP_DIR/include
+				GMP_LIB=$GMP_DIR/lib
+				if test ! -f $GMP_INC/gmp.h; then
+		    		AC_ERROR(Can't find $GMP_INC/gmp.h)
+				elif test -f $GMP_LIB/libgmp.so -o -f $GMP_LIB/libgmp.a -o -f $GMP_LIB/libgmp.$SHEXT; then
+					EXTRA_INCLUDES="-I$GMP_INC"
+					EXTRA_LIBS="-L$GMP_LIB -lgmp $EXTRA_LIBS"
+					AC_MSG_RESULT(yes)
+				else
+		    		AC_ERROR(Can't find $GMP_LIB/libgmp.so nor $GMP_LIB/libgmp.a nor $GMP_LIB/libgmp.$SHEXT)
+				fi
 			fi
 		fi
 	fi
-fi
+dnl fi
 
 echo "Polylib will be built with " $LIBS_TO_BUILD "integer size" 
 echo "---------------------------------------------------"
@@ -323,7 +303,6 @@ AC_SUBST(SHEXT)
 AC_SUBST(SHAREDLIB_FLAG)
 AC_SUBST(LIBS)
 AC_SUBST(INSTALL_LIB)
-AC_SUBST(LIBSTYPE_TO_BUILD)
 AC_SUBST(LDCONFIG)
 
 dnl define variants of polylib to build
@@ -340,14 +319,9 @@ AC_SUBST(GMP_AFLAGS)
 
 AC_SUBST(DEFAULT_INT_BITS)
 AC_SUBST(DEFAULT_AFLAGS)
-AC_SUBST(BITS)
-AC_SUBST(AFLAGS)
 
 dnl Used with GMP is selected
-AC_SUBST(GFLAGS)
 AC_SUBST(EXTRA_INCLUDES)
-AC_SUBST(EHRHART_MP)
-AC_SUBST(MATRIX_MP)
 AC_SUBST(EXTRA_LIBS)
 
 AC_SUBST(EXEC_EXTRA_SUFFIX)
@@ -358,13 +332,6 @@ AC_SUBST(EXTRA_FLAGS)
 
 
 AC_OUTPUT(vars.mk)
-
-
-
-
-
-
-
 
 
 
