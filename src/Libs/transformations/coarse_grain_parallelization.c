@@ -369,6 +369,7 @@ coarse_grain_parallelization(string module_name)
     reset_current_module_statement();
     reset_cumulated_rw_effects();
     reset_invariant_rw_effects();
+    free_value_mappings();
     return(TRUE);
 }
 
