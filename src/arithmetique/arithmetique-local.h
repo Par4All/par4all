@@ -23,7 +23,13 @@
 /* to be included for _MIN and _MAX: #include <limits.h>
  */
 
-#ifdef VALUE_IS_LONGLONG
+/* default type for Value
+ */
+#ifndef LINEAR_VALUE
+#define LINEAR_VALUE LONG
+#endif
+
+#if (LINEAR_VALUE==LONGLONG)
 typedef long long Value;
 #define VALUE_FMT "%lld"
 #define VALUE_CONST(val) val##LL
@@ -39,7 +45,9 @@ typedef long long Value;
     ((long)(val>=(Value)LONG_MIN&&val<=(Value)LONG_MAX)?val:abort())
 #define VALUE_TO_INT(val) \
     ((int)(val>=(Value)INT_MIN&&val<=(Value)INT_MAX)?val:abort())
-#else
+#endif /* LONGLONG */
+
+#if (LINEAR_VALUE==LONG)
 typedef long Value;
 #define VALUE_FMT "%ld"
 #define VALUE_CONST(val) val##L
