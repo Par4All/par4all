@@ -1,8 +1,8 @@
 /* HPFC module by Fabien COELHO
  *
- * this file deals with HPF directives.
+ * these functions deal with HPF directives.
  *
- * $RCSfile: directives.c,v $ ($Date: 1995/03/24 16:51:24 $, )
+ * $RCSfile: directives.c,v $ ($Date: 1995/03/28 16:24:46 $, )
  * version $Revision$,
  */
 
@@ -228,8 +228,6 @@ reference alignee, temp;
 	  entity_name(array), entity_name(template));
 }
 
-
-
 /*-----------------------------------------------------------------
  * one DISTRIBUTE directive management
  */
@@ -284,8 +282,10 @@ reference distributee, proc;
 	ldist = NIL;
     tag format;
 
-    assert(ENDP(reference_indices(proc)));
+    assert(ENDP(reference_indices(proc))); /* no ... ONTO P(something) */
 
+    /* the template arguments are scanned to build the distribution
+     */
     for(; !ENDP(lformat); POP(lformat))
     {
 	format = distribution_format(EXPRESSION(CAR(lformat)), &largs);
@@ -329,7 +329,7 @@ reference distributee, proc;
 
 static void handle_unexpected_directive(f, args)
 entity f;
-list args;
+list /* of expressions */ args;
 {
     user_error("handle_hpf_directives", "unexpected hpf directive\n");
 }
@@ -338,8 +338,7 @@ list args;
  *
  * HPF OBJECTS DECLARATIONS
  *
- * namely TEMPLATE and PROCESSORS directives.
- * 
+ *   namely TEMPLATE and PROCESSORS directives.
  */
 static void handle_processors_directive(f, args)
 entity f;
@@ -359,8 +358,7 @@ list /* of expressions */ args;
  *
  * HPF STATIC MAPPING
  *
- * namely ALIGN and DISTRIBUTE directives.
- *
+ *   namely ALIGN and DISTRIBUTE directives.
  */
 static void handle_align_directive(f, args)
 entity f;
@@ -405,7 +403,7 @@ list args;
  *
  * HPF PARALLELISM DIRECTIVES
  *
- * namely INDEPENDENT and NEW directives.
+ *   namely INDEPENDENT and NEW directives.
  */
 /* ??? I wait for the next statements in a particular order, what
  * should not be necessary. Means I should deal with independent 
@@ -463,8 +461,8 @@ list /* of expressions */ args;
 	}
     }
     
-    pips_error("handle_independent_directive", "no loop!\n");
     close_ctrl_graph_travel();
+    pips_error("handle_independent_directive", "no loop!\n");
 }
 
 static void handle_new_directive(f, args)
@@ -505,7 +503,7 @@ list args;
  *
  * DIRECTIVE HANDLING
  *
- * find the handler for a given entity.
+ *   find the handler for a given entity.
  */
 struct DirectiveHandler 
 {
@@ -545,17 +543,18 @@ string name;
 static bool directive_filter(c)
 call c;
 {
-    entity e = call_function(c);
+    entity f = call_function(c);
     
-    if (hpf_directive_entity_p(e))
+    if (hpf_directive_entity_p(f))
     {
-	debug(8, "directive_filter", "hpfc entity is %s\n", entity_name(e));
-	/*
-	 * call the appropriate handler for the directive
+	debug(8, "directive_filter", "hpfc entity is %s\n", entity_name(f));
+
+	/* call the appropriate handler for the directive
 	 */
-	(directive_handler(entity_local_name(e)))
-	    (e, call_arguments(c));
+	(directive_handler(entity_local_name(f)))(f, call_arguments(c));
 	
+	/*  the directive is switched to a CONTINUE call.
+	 */
 	free_call(c);
 	instruction_call(statement_instruction(current_stmt_head())) = 
 	    make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME), NIL);
