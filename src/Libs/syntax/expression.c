@@ -1,8 +1,12 @@
-/* 	%A% ($Date: 1998/10/23 11:15:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
+/* 	%A% ($Date: 1998/11/27 13:55:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	
  *
  * $Id$
  *
  * $Log: expression.c,v $
+ * Revision 1.14  1998/11/27 13:55:34  irigoin
+ * MakeAtom() updated to take into account unbounded substrings of unbounded
+ * strings. A fornal parameter string may be unbounded and so may be a substring.
+ *
  * Revision 1.13  1998/10/23 11:15:44  irigoin
  * Bug fix in MakeAtom(): functional types were not always updated. See
  * type01, 02 and 03 in Validation/Syntax
@@ -11,7 +15,7 @@
  */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 1998/10/23 11:15:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "%A% ($Date: 1998/11/27 13:55:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -242,8 +246,19 @@ int HasParenthesis;
 		else
 		    fce = fc;
 
-		if(lc == expression_undefined)
-		    lce = int_to_expression(basic_type_size(bt));
+		if(lc == expression_undefined) {
+		    /* The upper bound may be unknown for formal
+                       parameters and for allocatable arrays and cannot be
+                       retrieved from the type declaration */
+		    value ub = basic_string(bt);
+
+		    if(value_unknown_p(ub)) {
+			lce = MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME));
+		    }
+		    else {
+			lce = int_to_expression(basic_type_size(bt));
+		    }
+		}
 		else
 		    lce = lc;
 
