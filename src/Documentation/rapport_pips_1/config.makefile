@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/21 12:58:23 $, 
+# $Date: 1996/08/21 12:58:46 $, 
 
 SOURCES=analyses.ftex \
 	benchmarks.ftex \
@@ -13,7 +13,7 @@ SOURCES=analyses.ftex \
 	rapport.ftex \
 	structures.ftex \
 	transformations.ftex \
-	utilitaires.ftex \
+	utilitaires.ftex
 
 dvi: rapport.dvi
 
