@@ -38,7 +38,6 @@
 #include "polyedre.h"
 
 #include "transformer.h"
-#include "flint.h"
 
 #include "pipsdbm.h"
 #include "resources.h"
