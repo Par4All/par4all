@@ -104,6 +104,7 @@ static int tpips_lex_input (void)
 <KEY>info		{ KEYWORD(INFO); }
 <KEY>cd 		{ KEYWORD(CDIR); }
 <KEY>pwd 		{ KEYWORD(PWD); }
+<KEY>source		{ KEYWORD(SOURCE); }
 
 \(			{ return OPENPAREN; }
 \)			{ return CLOSEPAREN; }
