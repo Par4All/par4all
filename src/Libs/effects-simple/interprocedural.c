@@ -673,7 +673,7 @@ summary_to_proper_effects(
     /* check the number of parameters */
     l_formals = module_formal_parameters(func);
     n_formals = gen_length(l_formals);
-    gen_free_list(l_formals), l_formals=NIL;
+   
 
     if (gen_length(args) < n_formals)
     {
@@ -681,18 +681,30 @@ summary_to_proper_effects(
 	 * if you move this as a user warning, the pips would drop
 	 * effects about unbounded formals... why not? FC.
 	 */
+        fprintf(stderr,"%d formal arguments for module %s:\n",
+		n_formals,module_local_name(func));
+	dump_arguments(l_formals);
+	fprintf(stderr,"%d actual arguments:\n",gen_length(args));
+	print_expressions(args);
 	pips_user_error("\nCall to module %s: "
 			  "insufficient number of actual arguments.\n",
 			  module_local_name(func));
     }
     else if (gen_length(args) > n_formals)
     {
-	/* This can be survived... */
+	/* This can be survived... */        
+      fprintf(stderr,"%d formal arguments for module%s:\n",
+	      n_formals,module_local_name(func));
+	dump_arguments(l_formals);
+	fprintf(stderr,"%d actual arguments:\n",gen_length(args));
+	print_expressions(args);
+
 	pips_user_warning("\nCall to module %s: "
 			  "too many actual arguments.\n",
 			  module_local_name(func));
     }
 
+    gen_free_list(l_formals), l_formals=NIL;
     /* effets of func on formal variables are translated */
     for (pc = args, ipc = 1; ! ENDP(pc) && ipc<=n_formals; pc = CDR(pc), ipc++)
     {
