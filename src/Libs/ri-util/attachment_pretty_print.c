@@ -411,6 +411,13 @@ attach_preconditions_decoration_to_text(text t)
 	attach_to_text(t, make_attachee(is_attachee_preconditions, UU));
 }
 
+/* Attach a total preconditions decoration: */
+void
+attach_preconditions_decoration_to_text(text t)
+{
+  pips_assert("not implemented yet", FALSE);
+}
+
 
 /* Attach a transformers decoration: */
 void
