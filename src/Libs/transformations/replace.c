@@ -224,7 +224,7 @@ void ReplaceReference(char *mod_name, reference ref, expression next_expr)
     gen_free_list(blocs);
 
     /* Reorder the module, because new statements have been generated. */
-    module_body_reorder(mod_stat);
+    module_reorder(mod_stat);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
 
