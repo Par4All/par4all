@@ -86,6 +86,12 @@ select_fix_point_operator()
     else {
 	transformer_fix_point_operator = transformer_basic_fix_point;
     }
+    /* This fix-point is not debugged nor used */
+    /*
+    if(pips_flag_p(SEMANTICS_INEQUALITY_INVARIANT)) {
+      tf = transformer_halbwachs_fix_point(tfb);
+    }
+    */
 }
 
 static void add_declaration_information(transformer pre, entity m, bool precondition_p)
@@ -207,9 +213,12 @@ bool preconditions_intra(char * module_name)
 
     set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
-    set_bool_property(SEMANTICS_FIX_POINT, FALSE);
-    select_fix_point_operator();
+    /* Maybe we should have an intra fast and an intra full as with other
+       semantics entries */
+    /* set_bool_property(SEMANTICS_FIX_POINT, FALSE); */
+    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    select_fix_point_operator();
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_preconditions(module_name);
@@ -220,8 +229,8 @@ bool preconditions_inter_fast(char * module_name)
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
     set_bool_property(SEMANTICS_FIX_POINT, FALSE);
-    select_fix_point_operator();
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    select_fix_point_operator();
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_preconditions(module_name);
@@ -232,8 +241,8 @@ bool preconditions_inter_full(char * module_name)
     set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
     set_bool_property(SEMANTICS_FIX_POINT, TRUE);
-    select_fix_point_operator();
     set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, FALSE);
+    select_fix_point_operator();
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
     return module_name_to_preconditions(module_name);
