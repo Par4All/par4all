@@ -194,6 +194,17 @@ typedef int Value;
 #include <setjmp.h>
 extern jmp_buf overflow_error;
 
+/* TRY/CATCH/THROW: macros with a C++ look and feel.
+ * CATCH(overflow_error) {
+ *   ...
+ * } TRY {
+ *   ... THROW(overflow_error) ...
+ * }
+ */
+#define CATCH(thrown) if (setjmp(thrown))
+#define TRY else
+#define THROW(thrown) longjmp(thrown,5)
+
 /* (|v| < MAX / |w|) => v*w is okay
  */
 #define value_protected_hard_idiv_multiply(v,w,throw)		\
@@ -216,7 +227,7 @@ extern jmp_buf overflow_error;
 /* protected versions
  */
 #define value_protected_mult(v,w) 				\
-    value_protected_multiply(v,w,longjmp(overflow_error,5))
+    value_protected_multiply(v,w,THROW(overflow_error))
 #define value_protected_product(v,w)		\
     v=value_protected_mult(v,w)
 
