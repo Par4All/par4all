@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/01/23 17:54:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 14:00:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char* vcid_ri_util_util_c = "%A% ($Date: 1997/01/23 17:54:56 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char* vcid_ri_util_util_c = "%A% ($Date: 1997/09/15 14:00:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -17,14 +17,16 @@ char* vcid_ri_util_util_c = "%A% ($Date: 1997/01/23 17:54:56 $, ) version $Revis
 
 /* functions on strings for entity names */
 
-string local_name(s)
+string 
+local_name(s)
 string s;
 {
     pips_assert("local_name", strchr(s, MODULE_SEP) != NULL);
     return(strchr(s, MODULE_SEP)+1);
 }
 
-string make_entity_fullname(module_name, local_name)
+string 
+make_entity_fullname(module_name, local_name)
 string module_name, local_name;
 {
     return(concatenate(module_name, 
@@ -33,31 +35,36 @@ string module_name, local_name;
 		       (char *) 0));
 }
 
-bool empty_local_label_name_p(s)
+bool 
+empty_local_label_name_p(s)
 string s;
 {
     return(strcmp(s, "") == 0);
 }
 
-bool return_local_label_name_p(s)
+bool 
+return_local_label_name_p(s)
 string s;
 {
     return(strcmp(s, RETURN_LABEL_NAME) == 0);
 }
 
-bool empty_label_p(s)
+bool
+empty_label_p(s)
 string s;
 {
     return(empty_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
 }
 
-bool return_label_p(s)
+bool 
+return_label_p(s)
 string s;
 {
     return(return_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
 }
 
-entity find_label_entity(module_name, label_local_name)
+entity 
+find_label_entity(module_name, label_local_name)
 string module_name, label_local_name;
 {
     string full = concatenate(module_name, MODULE_SEP_STRING, 
@@ -67,7 +74,8 @@ string module_name, label_local_name;
     return(gen_find_tabulated(full, entity_domain));
 }
 
-string module_name(s)
+string 
+module_name(s)
 string s;
 {
     static char local[MAXIMAL_MODULE_NAME_SIZE + 1];
@@ -83,7 +91,8 @@ string s;
     return(local);
 }
 
-string string_codefilename(s)
+string 
+string_codefilename(s)
 char *s;
 {
     return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
@@ -91,85 +100,98 @@ char *s;
 }
 
 /* generation des noms de fichiers */
-string module_codefilename(e)
+string 
+module_codefilename(e)
 entity e;
 {
     return(string_codefilename(entity_local_name(e)));
 }
 
-string string_par_codefilename(s)
+string 
+string_par_codefilename(s)
 char *s;
 {
     return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
 		       s, PARALLEL_CODE_EXT, NULL));
 }
 
-string module_par_codefilename(e)
+string 
+module_par_codefilename(e)
 entity e;
 {
     return(string_par_codefilename(entity_local_name(e)));
 }
 
-string string_fortranfilename(s)
+string 
+string_fortranfilename(s)
 char *s;
 {
     return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
 		       s, SEQUENTIAL_FORTRAN_EXT, NULL));
 }
 
-string module_fortranfilename(e)
+string 
+module_fortranfilename(e)
 entity e;
 {
     return(string_fortranfilename(entity_local_name(e)));
 }
 
-string string_par_fortranfilename(s)
+string 
+string_par_fortranfilename(s)
 char *s;
 {
     return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
 		       s, PARALLEL_FORTRAN_EXT, NULL));
 }
 
-string module_par_fortranfilename(e)
+string 
+module_par_fortranfilename(e)
 entity e;
 {
     return(string_par_fortranfilename(entity_local_name(e)));
 }
 
-string string_pp_fortranfilename(s)
+string 
+string_pp_fortranfilename(s)
 char *s;
 {
     return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
 		       s, PRETTYPRINT_FORTRAN_EXT, NULL));
 }
 
-string module_pp_fortranfilename(e)
+string 
+module_pp_fortranfilename(e)
 entity e;
 {
     return(string_pp_fortranfilename(entity_local_name(e)));
 }
 
-string string_predicat_fortranfilename(s)
+string 
+string_predicat_fortranfilename(s)
 char *s;
 {
     return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
 		       s, PREDICAT_FORTRAN_EXT, NULL));
 }
 
-string module_predicat_fortranfilename(e)
+string 
+module_predicat_fortranfilename(e)
 entity e;
 {
     return(string_predicat_fortranfilename(entity_local_name(e)));
 }
 
-string string_entitiesfilename(s)
+string 
+string_entitiesfilename(s)
 char *s;
 {
     return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
 		       s, ENTITIES_EXT, NULL));
 }
 
-string module_entitiesfilename(e)
+string 
+module_entitiesfilename(e)
 entity e;
 {
     return(string_entitiesfilename(entity_local_name(e)));
@@ -177,7 +199,8 @@ entity e;
 
 /* functions for expressions */
 
-expression make_entity_expression(e, inds)
+expression 
+make_entity_expression(e, inds)
 entity e;
 cons *inds;
 {
@@ -187,7 +210,8 @@ cons *inds;
 			   normalized_undefined));			    
 }
 
-string new_label_name(module)
+string 
+new_label_name(module)
 entity module;
 {
     static char name[ 64 ];
@@ -216,7 +240,8 @@ entity module;
     return(name);
 }
 	 
-entity find_ith_parameter(e, i)
+entity 
+find_ith_parameter(e, i)
 entity e;
 int i;
 {
@@ -246,7 +271,8 @@ int i;
 }
 
 /* returns TRUE if v is the ith formal parameter of function f */
-bool ith_parameter_p(f, v, i)
+bool 
+ith_parameter_p(f, v, i)
 entity f, v;
 int i;
 {
@@ -268,7 +294,8 @@ int i;
 }
 
 /* functions for effects */
-entity effect_entity(e)
+entity 
+effect_entity(e)
 effect e;
 {
     return(reference_variable(effect_reference(e)));
@@ -277,7 +304,8 @@ effect e;
 /* functions for references */
 
 /* returns the ith index of an array reference */
-expression reference_ith_index(ref, i)
+expression 
+reference_ith_index(ref, i)
 reference ref;
 int i;
 {
@@ -293,13 +321,15 @@ int i;
 
 /* functions for area */
 
-bool dynamic_area_p(aire)
+bool 
+dynamic_area_p(aire)
 entity aire;
 {
     return(strcmp(entity_local_name(aire), DYNAMIC_AREA_LOCAL_NAME) == 0);
 }
 
-bool static_area_p(aire)
+bool 
+static_area_p(aire)
 entity aire;
 {
     return(strcmp(entity_local_name(aire), STATIC_AREA_LOCAL_NAME) == 0);
