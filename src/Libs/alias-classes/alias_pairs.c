@@ -358,7 +358,7 @@ in_alias_pairs( string module_name )
 {
     list l_reg, l_pairs;
 
-    debug_on("ALIAS_DEBUG_LEVEL");
+    debug_on("ALIAS_PAIRS_DEBUG_LEVEL");
     pips_debug(4,"begin for module %s\n",module_name);
 
     /* we need the IN summary regions*/
@@ -395,7 +395,7 @@ out_alias_pairs( string module_name )
 {
     list l_reg, l_pairs;
 
-    debug_on("ALIAS_DEBUG_LEVEL");
+    debug_on("ALIAS_PAIRS_DEBUG_LEVEL");
     pips_debug(4,"begin for module %s\n",module_name);
 
     /* we need the OUT summary regions*/
