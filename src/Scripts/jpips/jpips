@@ -5,6 +5,9 @@
 # a shell wrapper for "JPips", the java-based pips interface.
 #
 # $Log: jpips,v $
+# Revision 1.6  1998/10/17 10:00:09  coelho
+# zip -> jar.
+#
 # Revision 1.5  1998/10/16 17:17:08  coelho
 # updated and fixes for 1.2b4
 #
@@ -46,7 +49,7 @@ unset jpips forward menu_type
 
 props="";
 java_root=${JAVA_ROOT:-/usr/local/jdk1.2beta4}
-zip=jpips.zip
+jar=jpips.jar
 gif=DownArrow.gif
 
 while getopts m:hnd opt
@@ -70,17 +73,17 @@ men=jpips_menus.${menu_type:-basic}
 #
 # which jpips.zip file
 
-if [ -f ${zip} ]
+if [ -f ${jar} ]
 then
-    jpips=${zip}
+    jpips=${jar}
 else
-    if [ -f ${PIPS_ROOT}/Share/${zip} ]
+    if [ -f ${PIPS_ROOT}/Share/${jar} ]
     then
-	jpips=${PIPS_ROOT}/Share/${zip}
+	jpips=${PIPS_ROOT}/Share/${jar}
     fi
 fi
 
-[ "$jpips" ] || error 2 "cannot find jpips.zip"
+[ "$jpips" ] || error 2 "cannot find jpips.jar"
 
 #
 # which DownArrow.gif file
