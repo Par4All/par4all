@@ -21,7 +21,9 @@ LIB_HEADERS=\
         newgen_generic_function.h \
         newgen_map.h \
         newgen_stack.h \
-	newgen_array.h \
+	newgen_array.h
+
+DERIVED_LIB_HEADERS	= \
 	newgen_string.h
 
 OTHER_HEADERS=\
@@ -33,7 +35,8 @@ OTHER_HEADERS=\
 
 DERIVED_HEADERS=\
 	genread.h \
-	genspec.h
+	genspec.h \
+	$(DERIVED_LIB_HEADERS)
 
 LIB_CFILES=\
         build.c \
@@ -64,7 +67,7 @@ LIB_OBJECTS= $(addprefix $(ARCH)/,$(LIB_CFILES:.c=.o) $(DERIVED_CFILES:.c=.o))
 
 SOURCES= $(LIB_HEADERS) $(LIB_CFILES) $(OTHER_HEADERS) $(OTHER_CFILES) 
 
-INSTALL_INC= $(LIB_HEADERS)
+INSTALL_INC= $(LIB_HEADERS) $(DERIVED_LIB_HEADERS)
 INSTALL_LIB= $(ARCH)/libgenC.a
 INSTALL_BIN= $(ARCH)/newC
 
@@ -72,6 +75,9 @@ $(LIB_OBJECTS): $(DERIVED_HEADERS)
 
 #
 # local rules
+
+newgen_%.h: %.c
+	$(PROTOIZE) $< > $@
 
 $(ARCH)/libgenC.a: $(LIB_OBJECTS)
 	$(RM) $@
