@@ -1,8 +1,13 @@
-#! /usr/local/bin/perl
+#! /bin/sh -- # -*- perl -*-
 #
 # $RCSfile: pips-deal-with-include,v $ (version $Revision$)
-# $Date: 1996/07/05 10:11:20 $, 
+# $Date: 1996/07/05 10:44:19 $, 
 #
+
+
+# Load perl according to the $PATH:
+eval "type perl | grep 'perl is' > /dev/null && exec perl -S $0 $* || echo Warning: Perl not found and thus $0 is not run! 1>&2; exit 0"
+    if $running_under_some_shell;
 
 sub debug {
     #printf STDERR @_;
@@ -48,4 +53,5 @@ while ($input >= 1) {
     &end_include;
 }
 
-system("mv $file_name $file_name.orig; mv $output_file_name $file_name");
+rename $file_name, $file_name.orig || die "rename $file_name, $file_name.orig failed";
+rename $output_file_name, $file_name || die "rename $file_name, $file_name.orig failed";
