@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/09/13 14:30:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/13 14:37:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-static char vcid[] = "%A% ($Date: 1995/09/13 14:30:02 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+static char vcid[] = "%A% ($Date: 1995/09/13 14:37:44 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1731,8 +1731,9 @@ int precedence;
     /* GO: Not anymore for UNIT=6 leave it ... */
     good_fmt = FALSE;
     good_unit = FALSE;
+    pio_write = pcio;
+
     if (strcmp(entity_local_name(call_function(obj)), "WRITE") == 0) {
-      pio_write = pcio;
       iolist_reached = FALSE;
       while ((pio_write != NIL) && (!iolist_reached)) {
 	syntax s = expression_syntax(EXPRESSION(CAR(pio_write)));
