@@ -157,24 +157,36 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
     set_current_module_entity(e_caller);
 
     if (l_effs_flt != NIL) {
-	MAP(EXPRESSION, exp, {
-	    syntax syn = expression_syntax(exp);
+
+        if (get_int_property(RW_FILTERED_EFFECTS) < READ_END) {//print the effects before all procedures
+	  
+	    MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
+	    /* do not display comments in the decoration */
+	    if (!string_undefined_p(statement_comments(current_stmt_head())))
+	        statement_comments(current_stmt_head())[0] = NULL;
+	    MERGE_TEXTS(t, text_statement(e_caller, 0, current_stmt_head()));
 	    
-	    if (syntax_reference_p(syn)) {
-	        entity var = reference_variable(syntax_reference(syn));
+	} else { //print the effects before only the last procedure
+      
+	    MAP(EXPRESSION, exp, {
+	        syntax syn = expression_syntax(exp);
+	    
+		if (syntax_reference_p(syn)) {
+		    entity var = reference_variable(syntax_reference(syn));
 		
-		MAP(ENTITY, e, {
-		    if (entity_conflict_p(e, var)) {
-		        MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
-			/* do not display comments in the decoration */
-			if (!string_undefined_p(statement_comments(current_stmt_head())))
-			    statement_comments(current_stmt_head())[0] = NULL;
-			MERGE_TEXTS(t, text_statement(e_caller, 0, current_stmt_head()));
-			break;
-		    }
-		}, list_vars_to_filter);
-	    }
-	}, call_arguments(c));
+		    MAP(ENTITY, e, {
+		        if (entity_conflict_p(e, var)) {
+			    MERGE_TEXTS(t, simple_rw_effects_to_text(l_effs_flt));
+			    /* do not display comments in the decoration */
+			    if (!string_undefined_p(statement_comments(current_stmt_head())))
+			        statement_comments(current_stmt_head())[0] = NULL;
+			    MERGE_TEXTS(t, text_statement(e_caller, 0, current_stmt_head()));
+			    break;
+			}
+		    }, list_vars_to_filter);
+		}
+	    }, call_arguments(c));
+	}
     }
 
     /* release the current module entity */
