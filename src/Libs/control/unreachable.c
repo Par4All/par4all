@@ -5,6 +5,9 @@
  * $Id$
  *
  * $Log: unreachable.c,v $
+ * Revision 1.4  1997/11/12 17:06:51  coelho
+ * 1 go to 1 fixed...
+ *
  * Revision 1.3  1997/11/12 12:07:58  coelho
  * new interface for Ronan to use it...
  *
@@ -51,7 +54,11 @@ control_propagate(control c)
 	continued = ctrue || cfalse;
     }
     else if (continued && len==1)
-	continued = control_propagate(CONTROL(CAR(lc)));
+    {
+	control cn = CONTROL(CAR(lc));
+	if (cn!=c) continued = control_propagate(cn);
+	else continued = FALSE; /* 1 GO TO 1 */
+    }
 
     return continued;
 }
