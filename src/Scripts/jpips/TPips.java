@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: TPips.java,v $
+ * Revision 1.10  1998/11/12 17:21:47  coelho
+ * emacs displayer added.
+ *
  * Revision 1.9  1998/10/30 15:36:22  ancourt
  * add an entry to display davinci graph
  *
@@ -63,8 +66,11 @@ public class TPips
   				inErr;		//input stream from tpips
 				
   public	Vector		optionVector;	//the options of jpips
+
   public	TextDisplayer	textDisplayer;	//textdisplayer instance
   public	GraphDisplayer	graphDisplayer;	//graphdisplayer instance
+  public        EmacsDisplayer  emacsDisplayer;
+
   public	PFrame		frame;		//frame of jpips
   public	File		directory;	//current directory
   
@@ -225,10 +231,15 @@ public class TPips
 		File f= new File(directory.getAbsolutePath()+path);
 		System.out.println(f.getAbsolutePath());
 		
-		 if (graphDisplayer.davinciExtension(f))
-		     graphDisplayer.display(f,true,true);
+		if (graphDisplayer.davinciExtension(f))
+		  graphDisplayer.display(f,true,true);
 		else 
+		{
+		  if (emacsDisplayer!=null)
+		    emacsDisplayer.display(f, true, true);
+		  else 
 		    textDisplayer.display(f,true,true);
+		}
 	      }
 	      else if(response.equals(BEGIN_ERROR))
 	      {
