@@ -19,13 +19,15 @@
 
 #include "genC.h"
 #include "misc.h"
-
 #include "ri.h"
-#include "graph.h"
+
+#include "matrice.h"
 #include "tiling.h"
 
-#include "arithmetique.h"
 #include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
 #include "ri-util.h"
 #include "text-util.h"
 #include "conversion.h"
