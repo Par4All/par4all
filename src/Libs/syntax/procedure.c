@@ -30,7 +30,7 @@ static statement function_body = statement_undefined;
 
 /*********************************************************** GHOST VARIABLES */
 
-/* list of potential local variables that turned out to be useless.
+/* list of potential local or top-level variables that turned out to be useless.
  */
 static list ghost_variable_entities = list_undefined;
 
@@ -59,13 +59,24 @@ remove_ghost_variable_entities()
 }
 
 void
-add_ghost_variable_entities(entity e)
+add_ghost_variable_entity(entity e)
 {
     pips_assert("defined list",	!list_undefined_p(ghost_variable_entities));
     ghost_variable_entities = arguments_add_entity(ghost_variable_entities, e);
 }
 
+/* It is possible to change one's mind and effectively use an entity which was
+ * previously assumed useless
+ */
+void
+reify_ghost_variable_entity(entity e)
+{
+    pips_assert("defined list",	!list_undefined_p(ghost_variable_entities));
+    if(entity_is_argument_p(e, ghost_variable_entities))
+	ghost_variable_entities = arguments_rm_entity(ghost_variable_entities, e);
+}
 
+
 /* this function is called each time a new procedure is encountered. */
 void 
 BeginingOfProcedure()
@@ -176,6 +187,10 @@ EndOfProcedure()
 
     debug(8, "EndOfProcedure", "Begin for module %s\n",
 	  entity_name(CurrentFunction));
+
+    uses_alternate_return(FALSE);
+    ResetReturnCodeVariable();
+    SubstituteAlternateReturns(FALSE);
 
     /* get rid of ghost variable entities */
     remove_ghost_variable_entities();
@@ -346,24 +361,52 @@ void
 MakeCurrentFunction(
     type t,
     int msf,
-    entity cf,
+    string cfn,
     list lfp)
 {
+    entity cf = entity_undefined; /* current function */
     instruction icf; /* the body of the current function */
-    entity result; /* the second entity */
+    entity result; /* the second entity, used to store the function result */
+    /* to split the entity name space between mains, commons, blockdatas and regular modules */
+    string prefix = string_undefined;
+    string fcfn = string_undefined; /* full current function name */
+    entity ce = entity_undefined; /* global entity with conflicting name */
 
-    /* checks that there is no such common
+    /* Check that there is no such common: This test is obsolete because
+     * the standard does not prohibit the use of the same name for a
+     * common and a function. However, it is not a good programming practice
      */
     if (gen_find_tabulated(concatenate
 	   (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
-	    COMMON_PREFIX, entity_local_name(cf), 0), 
+	    COMMON_PREFIX, cfn, 0), 
 			   entity_domain) != entity_undefined)
     {
-	pips_user_warning("Conflict for global name %s\n",
-			  entity_local_name(cf));
+	pips_user_warning("global name %s used for a module and for a common\n",
+			  cfn);
+	/*
 	ParserError("MakeCurrentFunction",
 		    "Name conflict between a "
 		    "subroutine and/or a function and/or a common\n");
+		    */
+    }
+
+    if(msf==TK_PROGRAM) {
+	prefix = MAIN_PREFIX;
+    }
+    else if(msf==TK_BLOCKDATA) {
+	prefix = BLOCKDATA_PREFIX;
+    }
+    else  {
+	prefix = "";
+    }
+    fcfn = strdup(concatenate(prefix, cfn, NULL));
+    cf = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, fcfn);
+    free(fcfn);
+    ce = global_name_to_entity(TOP_LEVEL_MODULE_NAME, cfn);
+    if(!entity_undefined_p(ce) && ce!=cf) {
+	user_warning("MakeCurrentFunction", "Global name %s used for a function or subroutine"
+		     " and for a %s\n", cfn, msf==TK_BLOCKDATA? "blockdata" : "main");
+	ParserError("MakeCurrentFunction", "Name conflict\n");
     }
 
     /* Let's hope cf is not an intrinsic */
@@ -395,64 +438,11 @@ MakeCurrentFunction(
     else {
 	if (t == type_undefined) {
 	    t = make_type(is_type_void, UU);
-	    if(msf == TK_PROGRAM) {
-		extern list arguments_add_entity(list a, entity e);
-		string main_name = 
-		  strdup(concatenate(MAIN_PREFIX, entity_local_name(cf),NULL));
-		entity fe = 
-		    FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, main_name);
-
-		free(main_name);
-
-		/* FI: I do not see how I could check that cf can safely
-		   be dumped; let's use an approximation... */
-		if(entity_initial(cf)==value_undefined) {
-		    debug(1, "MakeCurrentFunction",
-			  "current function %s re-declared as %s\n",
-			  entity_name(cf), entity_name(fe));
-		    add_ghost_variable_entities(cf);
-		    debug(1, "MakeCurrentFunction",
-			  "entity %s to be destroyed\n",
-			  entity_name(cf));
-		    cf = fe;
-		}
-		else {
-		    user_warning("MakeCurrentFunction",
-				 "Conflict for global name %s\n",
-				 entity_local_name(cf));
-		    ParserError("MakeCurrentFunction",
-				"Name conflict between a main and a "
-				"subroutine or a function or a common\n");
-		}
-	    }
-	    else if (msf == TK_BLOCKDATA)
-	    {
-		string bd_name = 
-		    strdup(concatenate(BLOCKDATA_PREFIX, 
-				       entity_local_name(cf), NULL));
-		/* to be dropped later on */
-		add_ghost_variable_entities(cf);
-		cf = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, bd_name);
-		free(bd_name);
-	    }
 	}
 	else {
+	    /* the intended result type t for a main or a subroutine should be undefined */
 	    FatalError("MakeCurrentFunction", "bad type\n");
 	}
-    }
-
-    /* Let's hope cf is not a common */
-    if(entity_initial(cf) != value_undefined
-       && ! (value_code_p(entity_initial(cf))
-	     || value_unknown_p(entity_initial(cf))
-	     || value_intrinsic_p(entity_initial(cf)))) {
-	pips_internal_error("Should have been trapped by the first test!\n");
-	user_warning("MakeCurrentFunction",
-		     "Conflict for global name %s\n",
-		     entity_local_name(cf));
-	ParserError("MakeCurrentFunction",
-		    "Name conflict between a "
-		    "subroutine and/or a function and/or a common\n");
     }
 
     /* clean up existing local entities in case of a recompilation */
@@ -490,8 +480,12 @@ MakeCurrentFunction(
     /* No common has yet been declared */
     initialize_common_size_map();
 
-    /* formal parameters are created */
-    ScanFormalParameters(lfp);
+    /* Formal parameters are created. Alternate returns can be ignored
+     * or substituted.
+     */
+    SubstituteAlternateReturns
+	(get_bool_property("PARSER_SUBSTITUTE_ALTERNATE_RETURNS"));
+    ScanFormalParameters(add_formal_return_code(lfp));
 
     if (msf == TK_FUNCTION) {
 	/* a result entity is created */
@@ -584,7 +578,7 @@ MakeExternalFunction(
 	     * PIPS also core dumps with ALOG(ALOG(X))... (8 July 1993) 
 	     */
 	    /* remove_variable_entity(e); */
-	    add_ghost_variable_entities(e);
+	    add_ghost_variable_entity(e);
 	    pips_debug(1, "entity %s to be destroyed\n", entity_name(e));
 
 	    if(r!=type_undefined) {
@@ -609,8 +603,13 @@ MakeExternalFunction(
 				entity_name(e), storage_tag(s));
 	}
     }
-    else
+    else {
+	/* e may have been created for a common declaration and put in the
+	 * ghost variable list
+	 */
+	reify_ghost_variable_entity(e);
 	fe = e;
+    }
 
     /* Assertion: fe is a (functional) global entity and the type of its 
        result is r */
@@ -702,15 +701,26 @@ MakeExternalFunction(
     return fe;
 }
 
-/* This function creates a formal parameter. fp is an entity, and nfp is
-its rank in the formal parameter list. */
+/* This function transforms an untyped entity into a formal parameter. 
+ * fp is an entity generated by FindOrCreateEntity() for instance,
+ * and nfp is its rank in the formal parameter list.
+ *
+ * A specific type is used for the return code variable which may be
+ * adde by the parser to handle alternate returns. See return.c
+ */
 
 void 
 MakeFormalParameter(entity fp, int nfp)
 {
     pips_assert("type is undefined", entity_type(fp) == type_undefined);
 
-    entity_type(fp) = ImplicitType(fp);
+    if(SubstituteAlternateReturnsP() && ReturnCodeVariableP(fp)) {
+	entity_type(fp) = MakeTypeVariable(make_basic(is_basic_int, 4), NIL);
+    }
+    else {
+	entity_type(fp) = ImplicitType(fp);
+    }
+
     entity_storage(fp) = 
 	make_storage(is_storage_formal, 
 		     make_formal(get_current_module_entity(), nfp));
