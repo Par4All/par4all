@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/26 11:16:42 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/28 18:05:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/04/26 11:16:42 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/04/28 18:05:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -269,7 +269,7 @@ cons *ldvr, *ldvl;
 	ParserError("AnalyzeData", "too few initializers\n");
     }
 }
-
+
 /* void DeclareVariable(e, t, d, s, v): update entity e description
  * as declaration statements are encountered. Examples of sequences:
  *
@@ -738,7 +738,9 @@ entity e;
 	t = MakeTypeVariable(make_basic(tag_implicit[i], v), NIL);
 	break;
     case is_basic_overloaded:
+	FatalError("ImplicitType", "Unsupported overloaded tag for basic\n");
     default:
+	FatalError("ImplicitType", "Illegal tag for basic\n");
     }
     /*
     return(MakeTypeVariable(make_basic(tag_implicit[i], int_implicit[i]), NIL));
@@ -939,6 +941,14 @@ entity e;
 
     return(FALSE);
 }
+
+/* 
+ * Check... and fix, if needed!
+ *
+ * Only user COMMONs are checked. The two implicit areas, DynamicArea and 
+ * StaticArea, have not been initialized yet (see ComputeAddress() and the
+ * calls in EndOfProcedure()).
+ */
 
 void 
 check_common_layouts(m)
@@ -953,8 +963,8 @@ entity m;
     ifdebug(1) {
 	pips_debug(1, "\nDeclarations for module %s\n", module_local_name(m));
 
-    /* List of implictly and explicitly declared variables, 
-       functions and areas */
+	/* List of implicitly and explicitly declared variables, 
+	   functions and areas */
 
 	pips_debug(1, "%s\n", ENDP(decls)? 
 		   "* empty declaration list *\n\n": "Variable list:\n\n");
@@ -963,26 +973,27 @@ entity m;
 	    fprintf(stderr, "Declared entity %s\n", entity_name(e)),
 	    decls);
 
-    /* Structure of each area/common */
+	/* Structure of each area/common */
 	if(!ENDP(decls)) {
 	    (void) fprintf(stderr, "\nLayouts for areas (commons):\n\n");
 	}
-	MAP(ENTITY, e, {
-	    if(type_area_p(entity_type(e))) {
+    }
+
+    MAP(ENTITY, e, {
+	if(type_area_p(entity_type(e))) {
+	    ifdebug(1) {
+		print_common_layout(e);
+	    }
+	    if(update_common_layout(m, e)) {
 		ifdebug(1) {
 		    print_common_layout(e);
 		}
-		if(update_common_layout(m, e)) {
-		    ifdebug(1) {
-		    print_common_layout(e);
-		    }
-		}
 	    }
-	}, decls);
+	}
+    }, decls);
 
-	(void) fprintf(stderr, "End of declarations for module %s\n\n",
-		       module_local_name(m));
-    }
+    pips_debug(1, "End of declarations for module %s\n\n",
+	       module_local_name(m));
 }
 
 void 
@@ -1002,7 +1013,7 @@ entity c;
 		 pips_assert("RAM storage",
 			     storage_ram_p(entity_storage(m)));
 		 (void) fprintf(stderr,
-				"\tVariable %s, offset = %d, size = %d\n", 
+				"\tVariable %s,\toffset = %d,\tsize = %d\n", 
 				entity_name(m),
 				ram_offset(storage_ram(entity_storage(m))),
 				SizeOfArray(m));
@@ -1068,4 +1079,77 @@ entity c;
     }
 
     return updated;
+}
+
+void 
+fprint_environment(FILE * fd, entity m)
+{
+    list decls = NIL;
+
+    pips_assert("fprint_environment", entity_module_p(m));
+
+    decls = code_declarations(value_code(entity_initial(m)));
+
+    (void) fprintf(fd, "\nDeclarations for module %s\n", 
+		   module_local_name(m));
+
+    /* List of implicitly and explicitly declared variables, 
+       functions and areas */
+
+    (void) fprintf(fd, "%s\n", ENDP(decls)? 
+		   "* empty declaration list *\n\n": "Variable list:\n\n");
+
+    MAP(ENTITY, e, {
+	type t = entity_type(e);
+
+	fprintf(fd, "Declared entity %s\twith type %s", entity_name(e), type_to_string(t));
+
+	if(type_variable_p(t))
+	    fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(t))));
+	else if(type_functional_p(t)) {
+	    functional f = type_functional(t);
+	    type tr = functional_result(f);
+
+	    MAPL(cp, {
+		parameter p = PARAMETER(CAR(cp));
+		type ta = parameter_type(p);
+
+		pips_assert("fprint_environment", type_variable_p(ta));
+		(void) fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(ta))));
+		if(!ENDP(cp->cdr))
+		    (void) fprintf(fd, " x ");
+	    },
+	    functional_parameters(f));
+
+	    if(ENDP(functional_parameters(f))) {
+		(void) fprintf(fd, " ()");
+	    }
+	    (void) fprintf(fd, " -> ");
+
+	    if(type_variable_p(tr))
+		(void) fprintf(fd, " %s\n", basic_to_string(variable_basic(type_variable(tr))));
+	    else if(type_void_p(tr))
+		(void) fprintf(fd, " %s\n", type_to_string(tr));
+	    else
+		pips_error("fprint_environment", "Ill. type %d\n", type_tag(tr));
+	}
+	else
+	    (void) fprintf(fd, "\n");
+	    },
+	decls);
+
+    /* Structure of each area/common */
+    if(!ENDP(decls)) {
+	(void) fprintf(fd, "\nLayouts for areas (commons):\n\n");
+    }
+
+    MAP(ENTITY, e, {
+	if(type_area_p(entity_type(e))) {
+	    print_common_layout(e);
+	}
+    }, 
+	decls);
+
+    (void) fprintf(fd, "End of declarations for module %s\n\n",
+		   module_local_name(m));
 }
