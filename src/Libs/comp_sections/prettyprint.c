@@ -4,7 +4,7 @@
 
 #include "all.h"
 #include "text-util.h"
-#include "prettyprint.h"
+/*#include "prettyprint.h"*/
 #include "top-level.h"
 
 /* {{{ banner */
