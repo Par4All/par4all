@@ -2,6 +2,11 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.8  2003/05/21 12:28:11  ferrand
+%% Remove unneeded dependence from Simdizer on MODULE.preconditions.
+%% Add a new phase for SIMD-optimized loop unrolling (loop unrolling with
+%% automatic calculation of "optimal" unroll factor).
+%%
 %% Revision 1.7  2003/04/11 14:47:13  ferrand
 %% Remove dependences from SIMDizer on the execution of Loop Distribution
 %% and Atomizer.
@@ -493,7 +498,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2003/04/11 14:47:13 $~$
+$~$Date: 2003/05/21 12:28:11 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2902,15 +2907,31 @@ nest_parallelization                    > MODULE.parallelized_code
 
 \subsubsection{SIMDizer for SIMD multimedia instruction set}
 
+%%@UserManualDocumentation: simdizer_auto_unroll
+Function \verb+simdizer_auto_unroll+ tries to unroll the code for
+making the simdizing process more efficient. It thus tries to compute
+the optimal unroll factor, allowing to pack the most instructions together.
+%%ÿUserManualDocumentation
+
+\begin{verbatim}
+alias simdizer_auto_unroll 'SIMD-Auto Unroll'
+
+simdizer_auto_unroll        > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{verbatim}
+
 %%@UserManualDocumentation: simdizer
 Function \verb+simdizer+ is an attempt at generating SIMD code for SIMD
 multimedia instruction set such as MMX, SSE2, VIS,...
 %%ÿUserManualDocumentation
 
 \begin{verbatim}
+alias simdizer 'Generate SIMD code'
+
 simdizer                    > MODULE.code
         < PROGRAM.entities 
-        < MODULE.code MODULE.dg MODULE.preconditions
+        < MODULE.code MODULE.dg
 \end{verbatim}
 
 
