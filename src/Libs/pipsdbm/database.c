@@ -465,13 +465,14 @@ db_delete_obsolete_resources(bool (*keep_p)(string, string))
     return ndeleted;
 }
 
-/***************************************************************** OBSOLETE */
-
-/* I'm not sure that these static arrays are that good;-) FC.
+/* returns an allocated array a with the sorted list of modules. 
+ * strings are duplicated.
  */
-bool
-db_get_module_list(int * nmodule, char * modules[])
+gen_array_t
+db_get_module_list(void)
 {
+    int index = 0;
+    gen_array_t a = gen_array_make(0);
     DB_OK;
 
     DB_RESOURCES_MAP(os, or, 
@@ -479,11 +480,10 @@ db_get_module_list(int * nmodule, char * modules[])
 	string on = db_symbol_name(os);
 	pips_debug(9, "considering %s -> %p\n", on, or);
 	if (!same_string_p(on, ""))
-	    args_add(nmodule, modules, strdup(on));
+	    gen_array_dupaddto(a, index++, on);
     },
 	get_pips_database());
 
-    /* Sort the module names: */
-    args_sort(*nmodule, modules);
-    return TRUE;
+    gen_array_sort(a);
+    return a;
 }
