@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/09/13 09:53:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/30 14:59:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1996/09/13 09:53:40 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1997/04/30 14:59:18 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -14,6 +14,14 @@ char vcid_xv_select[] = "%A% ($Date: 1996/09/13 09:53:40 $, ) version $Revision$
 #include <xview/panel.h>
 #include <xview/notice.h>
 #include <xview/text.h>
+
+#if (defined(TEXT))
+#undef TEXT
+#endif
+
+#if (defined(TEXT_TYPE))
+#undef TEXT_TYPE
+#endif
 
 #include "genC.h"
 #include "ri.h"
@@ -109,21 +117,22 @@ end_directory_text_notify(Panel_item text_item,
 void
 direct_change_directory()
 {
-    static char newdir[256];
+    char newdir[MAXPATHLEN];
     char * tmp = strdup("/tmp/wpips.dir.XXXXXX");
-    int i;
-    char c;
+    int i=0, c;
     FILE * tmph;
 
     (void) mktemp(tmp);
 
-    safe_system(concatenate("Wchangedir -- ", get_cwd(), " > ", tmp, NULL));
+    if (wpips_change_directory_inactive)
+	return; /* no cd in this state! */
+
+    safe_system(concatenate("Wchangedir -- ", get_cwd(), " > ", tmp, 0));
 
     tmph = safe_fopen(tmp, "r");
-    i=0;
-    while ((c=getc(tmph))!=EOF)
+    while ((c=getc(tmph))!=EOF && i<MAXPATHLEN)
 	newdir[i++]=c;
-    newdir[i-1]='\0'; /* last in \n */
+    newdir[i-1]='\0'; /* last was \n */
     safe_fclose(tmph, tmp);
 
     end_directory_notify(newdir);
