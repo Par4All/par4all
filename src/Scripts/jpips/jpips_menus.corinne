@@ -859,7 +859,7 @@ Apply a global transformation
 	..
 
 	Cloning on Argument values
-	capply CLONE_ON_ARGUMENT[$MODULES]x
+	capply CLONE_ON_ARGUMENT[$MODULES]
 	..
 
 #	STF
