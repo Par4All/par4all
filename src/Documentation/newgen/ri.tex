@@ -2,6 +2,11 @@
 %% $Id$
 %%
 %% $Log: ri.tex,v $
+%% Revision 1.65  2003/04/29 15:37:08  irigoin
+%% New field "unknown" added in constant to represent the constant value
+%% associated to a parameter via a constant expression of a type not
+%% evaluable (currently) by PIPS.
+%%
 %% Revision 1.64  2002/06/20 07:43:55  irigoin
 %% Comments about constant data type increased
 %%
@@ -812,7 +817,7 @@ source fide`le.
 \label{subsubsection-constant}
 \index{Constant}\index{DATA}\index{PARAMETER}
 
-\domain{Constant = int + litteral:unit + call:entity}
+\domain{Constant = int + litteral:unit + call:entity + unkown:unit}
 {}
 
 Type \texttt{constant} is used to represent the numerical or non-numerical
@@ -824,13 +829,20 @@ a \texttt{litteral} is chosen.
 
 For instance, a constant entity such as 123.45 has "123.45" as entity name
 and its initial \verb/value/ is a \verb/constant/ of type \verb/litteral/
-because its value is carried by its name. A floating point variable
-statically initialized with 123.45 as an initial value of type
-\verb/constant/ and of kind \verb/call/, since 123.45 is a nullary
-function.
+because its value is carried by its name. 
+
+A floating point variable statically initialized, as in a \verb/DATA/
+statement, with 123.45 has an initial value of type \verb/constant/ and of
+kind \verb/call/, since 123.45 is a nullary function.
 
 Logical constants are functions but they are also represented by integer 0
 and 1. The \verb/int/ kind of constant is used as for integer variables.
+
+Other values of other types, such as real and character strings, given by
+expressions in \verb/PARAMETER/ statements, are not cached in
+\verb/constant/ and are tracked as unknown value (see \verb/value/
+object). These values can be obtained by evaluating the associated
+expression in \verb/symbolic/.
 
 \section{Code, Statements and Instructions}
 \label{code}
