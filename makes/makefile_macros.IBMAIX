@@ -1,0 +1,53 @@
+#
+# $RCSfile: makefile_macros.IBMAIX,v $ (version $Revision$)
+# $Date: 1996/09/20 12:07:09 $, 
+#
+# this file contains macro definitions 
+
+#
+# for compiling:
+AR	= ar
+ARFLAGS	= rv
+CC	= xlc
+CFLAGS	= -O2 -g 
+CMKDEP	= -M
+CPPFLAGS= -I. -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include -I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
+LD	= $(CC) 
+LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) -L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) -L$(EXTERN_ROOT)/Lib/$(ARCH)
+FC	= xlf
+FFLAGS	= -g -O2 -u
+RANLIB	= ranlib
+
+#
+# tools for managing/generating code
+LEX	= flex
+LFLAGS	= 
+YACC	= bison
+YFLAGS	= -y
+LINT	= lint
+LINTFLAGS= -habxu
+PROTO	= cproto
+PRFLAGS	= -evcf2
+M4	= gm4
+M4FLAGS	=
+ETAGS	= etags
+
+#
+# tools for the documentation
+LX2HTML	= latex2html
+L2HFLAGS= -link 8 -split 5
+LATEX	= latex
+BIBTEX	= bibtex
+MAKEIDX	= makeindex
+DVIPS	= dvips
+NROFF	= nroff
+RMAN	= rman
+
+#
+# others
+TAR	= tar
+ZIP	= gzip -v9
+DIFF	= diff
+
+# end of makefile_macros..
+#
