@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/07 13:43:39 $, 
+ * $Date: 1996/08/07 13:59:55 $, 
  */
 
 /* test du simplex : 
@@ -541,7 +541,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 	}
 
 	/* I have noticed that when pips core dumps here, it is because
-	 * a setjmp(overflow_error) has been forgotten. bc.
+	 * a CATCH(overflow_error) has been forgotten. bc.
 	 */
 	for(i=0;i<(3 + NB_INEQ + NB_EQ + DIMENSION); i++)  
 	    free(t[i].colonne); 
