@@ -35,7 +35,9 @@ static bool cannot_be_empty(gen_chunk* x)
 
 static bool call_filter(call c)
 {
-    if (ENTITY_CONTINUE_P(call_function(c)))
+    entity e = call_function(c);
+    fprintf(stderr, "call to %s\n", entity_name(e));
+    if (ENTITY_CONTINUE_P(e) || ENTITY_RETURN_P(e))
 	return FALSE;
     else
 	return cannot_be_empty(c);
