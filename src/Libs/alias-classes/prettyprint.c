@@ -59,27 +59,39 @@ static text alias_pairs_text(string module_name,string resource_name)
 
     pips_debug(8,"hash table set up\n");
 
+    set_action_interpretation(ACTION_IN,ACTION_OUT);
+
     MAP(LIST,pair,
 	{
 	    pips_debug(9,"start 1st map\n");
 
 	    if (pair != (list) HASH_UNDEFINED_VALUE && pair != list_undefined) 
 	    {
+/* was
 		MAP(EFFECT, reg,
 		    {
-			pips_debug(9,"start 2nd map\n");
-
 			txt_reg = text_region(reg);
-
-			pips_debug(9,"done text_region\n");
-
 			MERGE_TEXTS(txt, text_region(reg));
-
-			pips_debug(9,"done MERGE_TEXTS\n");
 		    },
 			pair);
+			*/
 
-		pips_debug(9,"done 2nd map\n");
+		txt_reg = text_region(EFFECT(CAR(pair)));
+
+		pips_debug(9,"done text_region\n");
+
+		MERGE_TEXTS(txt,txt_reg);
+
+		pips_debug(9,"done MERGE_TEXTS\n");
+
+		ADD_SENTENCE_TO_TEXT(
+		    txt,
+		    make_sentence(
+			is_sentence_formatted,
+			strdup("can't print translation?\n"))
+		    );
+
+		pips_debug(9,"done ADD_SENTENCE_TO_TEXT\n");
 
 		ADD_SENTENCE_TO_TEXT(
 		    txt,
@@ -92,6 +104,8 @@ static text alias_pairs_text(string module_name,string resource_name)
 	    l_pairs);
 
     pips_debug(8,"made text\n");
+
+    reset_action_interpretation();
 
     reset_current_module_entity();
     reset_cumulated_rw_effects();
