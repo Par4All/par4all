@@ -1,7 +1,7 @@
 /* HPFC module, Fabien Coelho, May 1993.
  *
  * $RCSfile: special_cases.c,v $ (version $Revision$)
- * $Date: 1997/01/04 14:34:19 $, 
+ * $Date: 1997/01/22 18:58:01 $, 
  */
 
 #include "defines-local.h"
@@ -527,8 +527,8 @@ static bool subarray_shift_assignment_p(call c)
 
 static bool loop_filter(loop l)
 {
-    return subarray_shift_ok = subarray_shift_ok && 
-	execution_parallel_p(loop_execution(l));
+    int stride = HpfcExpressionToInt(range_increment(loop_range(l)));
+    return subarray_shift_ok = subarray_shift_ok && (stride==1 || stride==-1);
 }
 
 static bool call_filter(call c)
