@@ -5,7 +5,7 @@ c
 c (c) Fabien COELHO, 09/95
 c
 c $RCSfile: hpfc_stubs.f,v $ (version $Revision$)
-c ($Date: 1996/04/01 11:01:37 $, )
+c ($Date: 1996/04/01 11:31:22 $, )
 c     
 c synchronization 
       subroutine hpfc1()
