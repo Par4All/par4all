@@ -1,5 +1,13 @@
-/*
+/* Pot-pourri of utilities for the internal representation. Some functions could be moved
+ * to non-generic files such as entity.c.
+ *
  * $Id$
+ *
+ * $Log: util.c,v $
+ * Revision 1.12  1998/10/09 11:35:15  irigoin
+ * predicate heap_area_p() added
+ *
+ *
  */
 #include <stdio.h>
 #include <string.h>
@@ -332,6 +340,13 @@ static_area_p(aire)
 entity aire;
 {
     return(strcmp(entity_local_name(aire), STATIC_AREA_LOCAL_NAME) == 0);
+}
+
+bool 
+heap_area_p(aire)
+entity aire;
+{
+    return(strcmp(entity_local_name(aire), HEAP_AREA_LOCAL_NAME) == 0);
 }
 
 
