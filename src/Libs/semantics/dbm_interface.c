@@ -29,10 +29,11 @@ extern int fprintf();
 #include "mapping.h" /* FI: should be useless! Fabien has moved the
 		      * typedef statement_mapping from genC.h
 		      * to ri-util.h; 23 Feb. 94 */
-#include "pipsdbm.h"
+
 #include "resources.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "pipsdbm.h"
 #include "effects.h"
 
 #include "misc.h"
