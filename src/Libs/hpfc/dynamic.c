@@ -6,7 +6,7 @@
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
  *
- * $RCSfile: dynamic.c,v $ ($Date: 1995/04/18 12:08:27 $, )
+ * $RCSfile: dynamic.c,v $ ($Date: 1995/04/21 10:28:15 $, )
  * version $Revision$
  */
 
@@ -32,6 +32,8 @@
 GENERIC_GLOBAL_FUNCTION(dynamic_hpf, entity_entities);
 GENERIC_GLOBAL_FUNCTION(primary_entity, entitymap);
 GENERIC_GLOBAL_FUNCTION(renamings, statement_renamings);
+
+#define primary_entity_p(a) (a==load_primary_entity(a))
 
 /*   DYNAMIC STATUS
  */
@@ -168,7 +170,28 @@ distribute di;
 static bool same_distribute_p(d1, d2)
 distribute d1, d2;
 {
-    pips_error("same_distribute_p", "not implemented yet");
+    list /* of distributions */ l1 = distribute_distribution(d1),
+                                l2 = distribute_distribution(d2);
+
+    if (distribute_processors(d1)!=distribute_processors(d2)) return(FALSE);
+    
+    assert(gen_length(l1)==gen_length(l2));
+
+    for(; !ENDP(l1); POP(l1), POP(l2))
+    {
+	distribution i1 = DISTRIBUTION(CAR(l1)),
+	             i2 = DISTRIBUTION(CAR(l2));
+	style s1 = distribution_style(i1),
+	      s2 = distribution_style(i2);
+	tag t1 = style_tag(s1);
+
+	if (t1!=style_tag(s2)) return(FALSE);
+	if (t1!=is_style_none &&
+	    !expression_equal_p(distribution_parameter(i1),
+				distribution_parameter(i2)))
+	    return(FALSE);
+    }
+
     return(TRUE);
 }
 
@@ -250,6 +273,15 @@ align a;
     return(new_synonym_array(array, a));
 }
 
+align new_align_with_template(a, t)
+align a;
+entity t;
+{
+    align b = copy_align(a);
+    align_template(b) = t;
+    return(b);
+}
+
 /* entity template_synonym_distributed_as(temp, d)
  * entity temp;
  * distribute d;
@@ -285,11 +317,64 @@ distribute d;
     return(new_synonym_template(temp, d));
 }
 
-/* void propagate_array_synonym(s, old, new)
+/* list alive_arrays(s, t);
+ * statement s;
+ * entity t;
+ * 
+ * what: returns the list of alive arrays for statement s and template t.
+ * how: uses the alive_synonym, and computes the defaults.
+ * input: statement s and template t which are of interest.
+ * output: a list of entities which is allocated.
+ * side effects: none. 
+ */
+list /* of entities */ alive_arrays(s, t)
+statement s;
+entity t;
+{
+    entity array;
+    list /* of entities */ 
+	l = NIL,
+	lseens = NIL; /* primary entities already seen. just to tag them. */
+
+    assert(entity_template_p(t));
+
+    /*   first the alive list is scanned.
+     */
+    MAPL(ce,
+     {
+	 array = ENTITY(CAR(ce));
+	 
+	 if (align_template(load_entity_align(array))==t)
+	     l = CONS(ENTITY, array, l);
+
+	 lseens = CONS(ENTITY, load_primary_entity(array), l);
+     },
+	 entities_list(load_alive_synonym(s)));
+
+    /*   second the defaults are looked for. namely the primary entities.
+     */
+    MAPL(ce,
+     {
+	 array = ENTITY(CAR(ce));
+
+	 if (primary_entity_p(array) && !gen_in_list_p(array, lseens))
+	 {
+	     if (align_template(load_entity_align(array))==t)
+		 l = CONS(ENTITY, array, l);
+
+	     lseens = CONS(ENTITY, array, l);
+	 }
+     },
+	 list_of_distributed_arrays());
+
+    gen_free_list(lseens); return(l);
+}
+
+/* void propagate_synonym(s, old, new)
  * statement s;
  * entity old, new;
  *
- * what: propagates a new array synonym (old->new) from statement s.
+ * what: propagates a new array/template synonym (old->new) from statement s.
  * how: travels thru the control graph till the next remapping.
  * input: the starting statement, plus the two entities.
  * output: none.
@@ -306,6 +391,22 @@ GENERIC_GLOBAL_FUNCTION(alive_synonym, statement_entities);
 static entity 
     old_variable = entity_undefined,
     new_variable = entity_undefined;
+static bool array_propagation;
+
+static void add_alive_synonym(s, a)
+statement s;
+entity a;
+{
+    entities es;
+
+    /*   lazy initialization 
+     */
+    if (!bound_alive_synonym_p(s))
+	store_alive_synonym(s, make_entities(NIL));
+
+    es = load_alive_synonym(s);
+    entities_list(es) = gen_once(a, entities_list(es));
+}
 
 static void ref_rwt(r)
 reference r;
@@ -341,7 +442,7 @@ statement s;
 	call c = instruction_call(i);
 	entity fun = call_function(c);
 
-	if (realign_directive_p(fun))
+	if (realign_directive_p(fun) && array_propagation)
 	{
 	    MAPL(ce,
 	     {
@@ -359,26 +460,27 @@ statement s;
 	}
 	else if (redistribute_directive_p(fun))
 	{
-	    entity t = align_template(load_entity_align(new_variable));
-
+	    entity t = array_propagation ?
+		align_template(load_entity_align(new_variable)) : old_variable;
+	    expression e;
+		
 	    MAPL(ce,
 	     {
-		 if (expression_to_entity(EXPRESSION(CAR(ce)))==t)
-		 {
-		     /*  if the template t is redistributed...
-		      *  then the new_variable is the alive one.
-		      */
-		     entities es;
+		 e = EXPRESSION(CAR(ce));
 
-		     /*   lazy initialization 
-		      */
-		     if (!bound_alive_synonym_p(s))
-			 store_alive_synonym(s, make_entities(NIL));
+		 /*   if template t is redistributed...
+		  */
+		 if (expression_to_entity(e)==t)
+		 {
+		     if (array_propagation)
+			 /*  then the new_variable is the alive one.
+			  */
+			 add_alive_synonym(s, new_variable);
+		     else
+			 reference_variable
+			     (syntax_reference(expression_syntax(e))) = 
+				 new_variable;
 		     
-		     es = load_alive_synonym(s);
-		     entities_list(es) = 
-			 gen_once(new_variable, entities_list(es));
-	    
 		     return(FALSE);
 		 }
 	     },
@@ -389,7 +491,7 @@ statement s;
     }
 }
 
-void propagate_array_synonym(s, old, new)
+void propagate_synonym(s, old, new)
 statement s;
 entity old, new;
 {
@@ -398,7 +500,9 @@ entity old, new;
     debug(3, "propagate_array_synonym", "%s -> %s from statement 0x%x\n",
 	  entity_name(old), entity_name(new), (unsigned int) s);
 
-    old_variable = old, new_variable = new;
+    old_variable = old, new_variable = new, 
+    array_propagation = array_distributed_p(old);
+
     init_ctrl_graph_travel(s, continue_propagation_p);
 
     while (next_ctrl_graph_travel(&current))
