@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.9  1998/04/14 13:04:24  coelho
+ * linear.h
+ *
  * Revision 1.8  1997/12/04 12:34:08  coelho
  *  - words_basic: STRING*(n) -> CHARACTER*n
  *  - does not redeclare the function variable FOO:FOO.
@@ -34,6 +37,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "text.h"
