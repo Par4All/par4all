@@ -2,7 +2,7 @@
 #
 # SCCS Stuff:
 # $RCSfile: validate-sequential,v $ version $Revision$,
-# ($Date: 1997/05/02 09:00:18 $, ) 
+# ($Date: 1997/05/03 15:37:09 $, ) 
 #
 # A small Validation Suite test program for PIPS.
 #
@@ -262,7 +262,7 @@ test_aspect()
   (for file in ${FILES:-`ls $aspect/*.[fF]`} ; do
      name=`basename $file .f`
      name=`basename $name .F`
-     u_name=`echo $name | tr a-z A-Z`
+     u_name=`echo $name | tr [a-z] [A-Z]`
      program=$name
 
      test -r $aspect/$name.f -o -r $aspect/$name.F || 
