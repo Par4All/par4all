@@ -495,7 +495,8 @@ int i;
     char buffer[100]; 
     assert(i>=1 && i<=7);
     (void) sprintf(buffer, "%s%d", suffix, i);
-    return(find_or_create_scalar_entity(buffer, prefix, is_basic_int));
+
+    return find_or_create_scalar_entity(buffer, prefix, is_basic_int);
 }
 
 
