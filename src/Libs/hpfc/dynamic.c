@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/06/08 17:41:14 $, )
+ * ($Date: 1996/06/08 18:01:19 $, )
  */
 
 #include "defines-local.h"
@@ -252,18 +252,13 @@ bool conformant_templates_p(
     entity t1,
     entity t2)
 {
-    if (t1==t2 || conformant_entities_p(t1, t2))
+    if (t1==t2) 
 	return TRUE;
+    else if (!conformant_entities_p(t1, t2))
+	return FALSE;
     else
-    {
-	distribution
-	    d1 = load_hpf_distribution(t1),
-	    d2 = load_hpf_distribution(t2);
-
-	if (!same_distribute_p(d1, d2)) return FALSE;
-    }
-
-    return TRUE;
+	return same_distribute_p
+	    (load_hpf_distribution(t1), load_hpf_distribution(t2));
 }
 
 static bool same_align_p(
