@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/06/12 23:34:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/09 22:04:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/06/12 23:34:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_semantics_prettyprint[] = "%A% ($Date: 1996/07/09 22:04:20 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /* package semantics - prettyprint interface */
