@@ -18,6 +18,9 @@
 #include "regions.h"
 #include "semantics.h"
 
+#include "effects-convex-local.h"
+#include "union-local.h"
+
 #include "pipsdbm.h"
 #include "resources.h"
 
@@ -62,14 +65,14 @@ no_alias_for(region reg)
 static void
 make_alias_list_sub_region(region reg, string module_name)
 {
-    list alias_list;
+    list alias_list, l_pairs;
 */
     /* first, we are going to create a list of alias pairs */
     /* in the global var list_pairs */
 /*    list_pairs = NIL;
  */
     /* put reg in list of one element for call to alias_pairs */
-/*    alias_pairs( module_name, CONS(EFFECT,reg,NIL) );
+/*    l_pairs = alias_pairs( module_name, CONS(EFFECT,reg,NIL) );
  */
     /* turn list_pairs into an alias list */
 /*    alias_list = CONS(EFFECT,reg,NIL);
@@ -77,7 +80,7 @@ make_alias_list_sub_region(region reg, string module_name)
 	{
 	    alias_list = gen_nconc(alias_list,CDR(alias_pair));
 	},
-	list_pairs);
+	l_pairs);
     l_alias_lists = gen_nconc(l_alias_lists,CONS(LIST,alias_list,NIL));
 }
 */
@@ -86,7 +89,8 @@ make_alias_list_sub_region(region reg, string module_name)
 static void
 make_alias_list_if_sub_region(region reg, string module_name)
 {
-    Psysteme reg_sys, caller_reg_sys;
+    Psysteme reg_sys, alias_reg_sys;
+    region alias_reg;
 */
 /* if there is no alias for reg in this module */
 /*    if ( no_alias_for(reg) )
@@ -98,7 +102,7 @@ make_alias_list_if_sub_region(region reg, string module_name)
 		alias_reg = CAR(alias_list);
 		*/
 /* ... except for COMMON region alias_lists, do */
-/*		if ( !storage_ram_p(
+/*		if ( ! storage_ram_p(
 		    entity_storage(region_entity(alias_reg))
 		    ))
 		{
@@ -126,9 +130,11 @@ static void
 make_alias_lists_for_sub_regions(string module_name)
 {
     entity module_entity = local_name_to_top_level_entity(module_name);
+    callees module_callees;
+    list callee_alias_lists;
 */
     /* we need the callees of the current module  */
-/*    callees = (callees) db_get_memory_resource(DBR_CALLEES,
+/*    module_callees = (callees) db_get_memory_resource(DBR_CALLEES,
 					       module_name,
 					       TRUE);
 					       */
@@ -144,7 +150,7 @@ make_alias_lists_for_sub_regions(string module_name)
 	    {
 */
 /* don't treat COMMON regions */
-/*		if ( !storage_ram_p(
+/*		if ( ! storage_ram_p(
 		    entity_storage(region_entity(CAR(callee_alias_list)))
 		    ))
 		{
@@ -153,8 +159,7 @@ make_alias_lists_for_sub_regions(string module_name)
 /* for any alias in this module do */
 /*		    MAP(EFFECT, trans_reg,
 			{
-			    trans_entity = region_entity(trans_reg);
-			    if ( module_entity == trans_entity )
+			    if ( module_entity == region_entity(trans_reg) )
 */
 
 /* if it is a sub-region of an IN or OUT region of this module */
@@ -166,7 +171,7 @@ make_alias_lists_for_sub_regions(string module_name)
 	    },
 	    effects_classes_classes(callee_alias_lists));
 	},
-	callees_callees(callees));
+	callees_callees(module_callees));
 }
 */
 
@@ -190,10 +195,7 @@ add_pair_to_existing_list(alias_pair)
 	    {
 		result = TRUE;
 		alias_list = gen_nconc(alias_list,CDR(alias_pair));
-		l_alias_lists = CONS(EFFECTS,alias_list,CDR(rest_alias_lists));
-*/
-/* et retrouver les tetes! */
-/*	    }
+	    }
 	    rest_alias_lists = CDR(rest_alias_lists);
 	} while (rest_alias_lists != NIL && result == FALSE);
     return result;
@@ -215,8 +217,8 @@ alias_lists( string module_name )
     MAP(EFFECTS, alias_pair,
 	{
 	    if ( ! add_pair_to_existing_list(alias_pair) )
-		make_alias_list_from_pair(alias_pair);
-	},
+	    alias_lists = gen_nconc(alias_lists,CONS(LIST,alias_pair,NIL));
+		},
 	effects_classes_classes(alias_pairs));
 	*/
     /* make alias lists from the OUT_alias_pairs */
@@ -226,7 +228,7 @@ alias_lists( string module_name )
     MAP(EFFECTS, alias_pair,
 	{
 	    if ( ! add_pair_to_existing_list(alias_pair) )
-		make_alias_list_from_pair(alias_pair);
+	    alias_lists = gen_nconc(alias_lists,CONS(LIST,alias_pair,NIL));
 	},
 	effects_classes_classes(alias_pairs));
 	*/
