@@ -10,6 +10,10 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.54  2000/11/23 17:17:31  irigoin
+  * Function moved into unstructured.c, typing in debugging statement,
+  * consistency checks
+  *
   * Revision 1.53  2000/11/03 17:15:07  irigoin
   * Declarations and references are trusted or not. Better handling of unstructured.
   *
@@ -177,7 +181,7 @@ unstructured_to_transformers(unstructured u)
   list blocs = NIL ;
   control ct = unstructured_control(u) ;
   
-  pips_debug(8,"begin\n");
+  pips_debug(5,"begin\n");
   
   /* There is no need to compute transformers for unreachable code,
    * using CONTROL_MAP, but this may create storage and prettyprinter
@@ -190,87 +194,7 @@ unstructured_to_transformers(unstructured u)
   
   gen_free_list(blocs) ;
   
-  pips_debug(8,"end\n");
-}
-
-/* This function is also used when computing preconditions if the exit
-   node is not reached. It assumes that transformers for all statements in
-   the unstructured have already been computed. */
-transformer 
-unstructured_to_global_transformer(
-    unstructured u)
-{
-  /* Assume any reachable node is executed at each iteration. A fix-point
-     of the result can be used to approximate the node preconditions. Some
-     nodes can be discarded because they do not modify the store such as
-     IF statements (always) and CONTINUE statements (if they do not link
-     the entry and the exit nodes). */
-  
-  list nodes = NIL;
-  /* Entry node */
-  control entry_node = unstructured_control(u);
-  control exit_node = unstructured_exit(u);
-  transformer tf_u = transformer_empty();
-  transformer fp_tf_u = transformer_undefined;
-  
-  pips_debug(8,"begin\n");
-
-  FORWARD_CONTROL_MAP(c, {
-    statement st = control_statement(c);
-    /* transformer_convex_hull has side effects on its arguments:-( */
-    /* Should be fixed now, 29 June 2000 */
-    /* transformer tf_st = copy_transformer(load_statement_transformer(st)); */
-    transformer tf_st = load_statement_transformer(st);
-    transformer tf_old = tf_u;
-    
-    if(statement_test_p(st)) {
-      /* Any side effect? */
-      if(!ENDP(transformer_arguments(tf_st))) {
-	tf_u = transformer_convex_hull(tf_old, tf_st); /* test */
-	free_transformer(tf_old);
-      }
-    }
-    else {
-      if(continue_statement_p(st)) {
-	if(gen_find_eq(entry_node, control_predecessors(c))!=chunk_undefined
-	   && gen_find_eq(exit_node, control_successors(c))!=chunk_undefined) {
-	  tf_u = transformer_convex_hull(tf_old, tf_st); /* continue */
-	  free_transformer(tf_old);
-	}
-      }
-      else {
-	tf_u = transformer_convex_hull(tf_old, tf_st); /* other */
-	free_transformer(tf_old);
-      }
-    }
-    
-  }, entry_node, nodes) ;
-  
-  gen_free_list(nodes) ;
-  
-  /* fp_tf_u = transformer_derivative_fix_point(tf_u); */
-  /* Some of the fix-point operators are bugged because they drop part
-     of the basis. The problem was not fixed in the fix-point
-     computation but in whileloop handling:-(. The derivative version
-     should be ok. */
-  /* transformer_basic_fix_point() is not defined in fix_point.c:
-     dropping all constraints is correct!; Hence,
-     transformer_fix_point_operator is not initialized unless
-     SEMANTICS_FIX_POINT is set... and this is not the default option.  To
-     be redesigned... */
-  /* fp_tf_u = (*transformer_fix_point_operator)(tf_u); */
-  fp_tf_u = transformer_derivative_fix_point(tf_u);
-  
-  ifdebug(8) {
-    pips_debug(8,"Result for one step tf_u:\n");
-    print_transformer(tf_u);
-    pips_debug(8,"Result for fix-point fp_tf_u:\n");
-    print_transformer(fp_tf_u);
-  }
-  
-  pips_debug(8,"end\n");
-  
-  return fp_tf_u;
+  pips_debug(5,"end\n");
 }
 
 static transformer 
@@ -292,29 +216,13 @@ unstructured_to_transformer(unstructured u, list e) /* effects */
 	tf = transformer_dup(ctf);
     }
     else {
-      /* Do not try anything clever! God knows what may happen in
-	 unstructured code. Transformer tf is not computed recursively
-	 from its components but directly derived from effects e.
-	 Transformers associated to its components are then computed
-	 independently, hence the name unstructured_to_transformerS
-	 instead of unstructured_to_transformer */
-      statement exit = control_statement(unstructured_exit(u));
+     statement exit = control_statement(unstructured_exit(u));
       
       pips_debug(8,"complex: based on effects\n");
       
       unstructured_to_transformers(u);
       
-      /* if(load_statement_transformer(exit)!=transformer_undefined) { */
-	/* The exit node has been reached */
-	/* tf = effects_to_transformer(e); */
-	/* tf = unstructured_to_global_transformer(u); */
-      /* } */
-      /* else { */
-	/* Never ending loop in unstructured... unless a call to STOP
-	   occurs */
-	/* tf = transformer_empty(); */
-      /* } */
-      tf = unstructured_to_accurate_transformer(u);
+      tf = unstructured_to_accurate_transformer(u, e);
     }
 
     pips_debug(8,"end\n");
@@ -1011,7 +919,7 @@ user_call_to_transformer(
 	    pips_debug(8, "Transformer for callee %s:\n", 
 		       entity_local_name(f));
 	    dump_transformer(t_callee);
-	    sc_fprint(stderr, s, dump_value_name);
+	    sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
 	}
 
 	t_caller = transformer_dup(t_callee);
@@ -1137,7 +1045,7 @@ user_call_to_transformer(
 	debug(8, "user_call_to_transformer", 
 	      "After binding formal/real parameters\n");
 	dump_transformer(t_caller);
-	sc_fprint(stderr, s, dump_value_name);
+	sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
     }
 
     /* take care of global variables */
@@ -1900,6 +1808,10 @@ statement s;
 	    (void) print_transformer(t);
 	    dump_transformer(t);
 	    pips_internal_error("Inconsistent transformer detected\n");
+	}
+	ifdebug(1) {
+	  pips_assert("Transformer is internally consistent",
+		      transformer_internal_consistency_p(t));
 	}
 	store_statement_transformer(s, t);
     }
