@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # SCCS STuff
-# $RCSfile: make-tags,v $ ($Date: 1994/12/09 11:55:58 $, )
+# $RCSfile: make-tags,v $ ($Date: 1994/12/09 12:01:27 $, )
 # version $Revision$,
 # got on %D%, %T%
 # %A%
@@ -52,7 +52,7 @@ ${PIPS_ETAGS} -f ${TAGS} `cat ${FILES}` 2>/dev/null
 
 cp ${TAGS} ${PIPSDIR}/Tags/TAGS
 
-# rm -f ${TAGS} ${FILES}
+rm -f ${TAGS} ${FILES}
 (cd $LINEARDIR/Development; rm -f TAGS; make TAGS)
 cat ${HOME}/C3/Linear/Development/TAGS >>${PIPSDIR}/Tags/TAGS
 
