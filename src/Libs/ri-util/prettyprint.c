@@ -2,6 +2,10 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.88  1997/10/28 10:03:17  irigoin
+ * assert added in text_statement() about the statement with label
+ * "LABEL_RETURN_NAME"
+ *
  * Revision 1.87  1997/10/27 15:31:03  coelho
  * drop overloaded externals...
  *
@@ -78,7 +82,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.87 1997/10/27 15:31:03 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.88 1997/10/28 10:03:17 irigoin Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -2573,7 +2577,10 @@ text_statement(
     }
 
     if (strcmp(label, RETURN_LABEL_NAME) == 0) {
-	/* do not add a redundant RETURN before an END, unless required */
+	pips_assert("Statement with return label must be a return statement",
+		    return_statement_p(stmt));
+
+	/* do not add a redundant RETURN before an END, unless requested */
 	if(get_bool_property("PRETTYPRINT_FINAL_RETURN")
 	    || !last_statement_p(stmt)) {
 	    /*
@@ -2672,9 +2679,9 @@ find_last_statement(statement s)
 
     /* I had a lot of trouble writing the condition for this assert... */
     pips_assert("Last statement is either undefined or a call to return",
-		statement_undefined_p(last) /*let's give up: it's always safe */
+		statement_undefined_p(last) /* let's give up: it's always safe */
 		|| !block_statement_p(s) /* not a block: any kind of statement can be found */
-		||return_statement_p(last)); /* if a block, then a return */
+		|| return_statement_p(last)); /* if a block, then a return */
 
     return last;
 }
