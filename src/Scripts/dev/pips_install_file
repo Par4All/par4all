@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1996/08/21 14:57:49 $, )
+# ($Date: 1996/08/21 14:59:51 $, )
 #
 
 RUN=':'
@@ -39,7 +39,7 @@ shift
 [ -f $directory ] && usage 3 "$directory is not a directory"
 [ -d $directory ] || mkdir $directory
 
-$verb "installing in $directory"
+verb "installing in $directory"
 
 # test if different
 
