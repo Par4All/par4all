@@ -7,7 +7,7 @@
  * Fabien COELHO, Feb/Mar 94
  *
  * SCCS Stuff:
- * $RCSfile: build-system.c,v $ ($Date: 1995/09/08 12:55:48 $, ) 
+ * $RCSfile: build-system.c,v $ ($Date: 1995/09/15 15:54:08 $, ) 
  * version $Revision$
  */
 
@@ -82,21 +82,21 @@ entity e;
     return(same_string_p(entity_module_name(e), HPFC_PACKAGE));
 }
 
-GET_DUMMY_VARIABLE_ENTITY(REGIONS_MODULE_NAME,	PHI_PREFIX, 	region);
-GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	ALPHA_PREFIX, 	array);
-GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	THETA_PREFIX, 	template);
-GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	PSI_PREFIX, 	processor);
-GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	DELTA_PREFIX, 	block);
-GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	GAMMA_PREFIX, 	cycle);
-GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	LALPHA_PREFIX, 	local);
-GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	IOTA_PREFIX, 	shift);
-GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	SIGMA_PREFIX, 	auxiliary);
-GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE,		TMP_PREFIX,	temporary);
+GET_DUMMY_VARIABLE_ENTITY(REGIONS_MODULE_NAME,	PHI_PREFIX, 	region)
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	ALPHA_PREFIX, 	array)
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	THETA_PREFIX, 	template)
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	PSI_PREFIX, 	processor)
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	DELTA_PREFIX, 	block)
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	GAMMA_PREFIX, 	cycle)
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	LALPHA_PREFIX, 	local)
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	IOTA_PREFIX, 	shift)
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	SIGMA_PREFIX, 	auxiliary)
+GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE,		TMP_PREFIX,	temporary)
 
 /* shift dummy variables to prime variables.
  * systeme s is modified.
  */
-GENERIC_LOCAL_FUNCTION(dummy_to_prime, entitymap);
+GENERIC_LOCAL_FUNCTION(dummy_to_prime, entitymap)
 
 static void put_dummy_and_prime(gen1, gen2)
 entity (*gen1)(), (*gen2)();
@@ -147,9 +147,9 @@ Psysteme s;
 #define Psysteme_undefined SC_UNDEFINED
 #define Psysteme_undefined_p(sc) SC_UNDEFINED_P(sc)
 #endif
-GENERIC_LOCAL_MAPPING(declaration_constraints, Psysteme, entity);
-GENERIC_LOCAL_MAPPING(hpf_constraints, Psysteme, entity);
-GENERIC_LOCAL_MAPPING(new_declaration_constraints, Psysteme, entity);
+GENERIC_LOCAL_MAPPING(declaration_constraints, Psysteme, entity)
+GENERIC_LOCAL_MAPPING(hpf_constraints, Psysteme, entity)
+GENERIC_LOCAL_MAPPING(new_declaration_constraints, Psysteme, entity)
 
 void make_hpfc_current_mappings()
 {
