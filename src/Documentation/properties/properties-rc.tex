@@ -12,6 +12,10 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.169  2002/07/04 15:44:59  nguyen
+%% Add new property for array bound checking. Arrays in a common block are
+%% checked wrt the common size
+%%
 %% Revision 1.168  2002/07/03 09:14:48  irigoin
 %% Property SEMANTICS_ANALYZE_UNSTRUCTURED added with default value TRUE.
 %% Some provisional comments added for a ICFG property, RW_FILTERED_EFFECTS,
@@ -218,7 +222,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 2002/07/03 09:14:48 $~$
+$~$Date: 2002/07/04 15:44:59 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -2068,6 +2072,17 @@ these two case, but the meaning is not clear. To be changed ?
 \begin{verbatim}
 INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
 PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
+\end{verbatim}
+
+In practice, bound violations may often occur with arrays in a common block. The
+standard is violated, but programmers think that they are not dangerous
+because the allocated size of the common is not depassed.  
+The following property deals with this kind of bad programming practice. If the
+array is a common variable, it checks if the reference goes beyond the
+size of the common block or not. 
+
+\begin{verbatim}
+ARRAY_BOUND_CHECKING_WITH_ALLOCATION_SIZE FALSE
 \end{verbatim}
 
 \subsection{Alias Verification}
