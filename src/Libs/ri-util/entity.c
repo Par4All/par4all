@@ -319,7 +319,7 @@ top_level_entity_p(entity e)
      * The MODULE_SEP_STRING should be added to TOP_LEVEL_MODULE_NAME?
      *
      * To return FALSE quickly, TOP_LEVEL_MODULE_NAME should begin with
-     * a special character never appearing in standrad identifier, for
+     * a special character never appearing in standard identifiers, for
      * instance * (star).
      */
     /*
