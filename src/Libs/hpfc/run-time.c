@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1995/04/10 18:49:42 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1995/07/20 18:40:47 $, )
  * version $Revision$,
  */
 
@@ -402,10 +402,8 @@ bool bsend;
 
     larg = array_lower_upper_bounds_list(array);
 
-    MAPL(cr,
+    MAP(RANGE, r,
      {
-	 range r = RANGE(CAR(cr));
-
 	 larg = gen_nconc(larg,
 			  CONS(EXPRESSION, range_lower(r),
 			  CONS(EXPRESSION, range_upper(r),
