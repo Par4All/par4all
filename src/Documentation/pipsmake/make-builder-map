@@ -2,12 +2,17 @@
 
 # Derivation of builder_map.h from pipsmake.rc
 
+# By default (no argument), automatic declaration generation
+# Else, retrieve declarations in include files
+
 # Francois Irigoin, 8 October 1993
+
+REAL="$1"
 
 functions=`/lib/cpp $PIPS_LIBDIR/pipsmake.rc | grep '^[a-z]' | \
 		sed 's/ .*//' |	sort | uniq `
 
-# echo $functions
+# echo $functions >/dev/tty
 
 cat </dev/null >decl$$
 
@@ -24,7 +29,22 @@ for func in $functions
 do
 #	echo $func
 	FUNC=`echo $func | tr a-z A-Z`
-	echo "extern bool $func(char *);" >>decl$$
+	if [ -z "$REAL" ]
+	then
+#		echo "simple generation" >/dev/tty
+		echo "extern bool $func(char *);" >>decl$$
+	else
+#		echo "exact generation" >/dev/tty
+#		for include in `/bin/ls $PIPS_DEVEDIR/Lib`
+#		do
+#			echo grep command: >/dev/tty
+#			echo grep $func `echo $include|tr A-Z a-z`.h >/dev/tty
+#			echo grep command to be launched >/dev/tty
+#			grep $func `echo $include|tr A-Z a-z`.h >>decl$$
+#		done
+#		echo grep -w -h $func `/bin/ls $PIPS_DEVEDIR/Lib|tr A-Z a-z|sed -e "s;^;$PIPS_INCLUDEDIR/;;s/$/.h/"`
+		grep -w -h $func `/bin/ls $PIPS_DEVEDIR/Lib|tr A-Z a-z|sed -e "s;^;$PIPS_INCLUDEDIR/;;s/$/.h/"` | grep extern | grep ';$' >>decl$$
+	fi
 	echo "    { BUILDER_$FUNC, $func }," >>map$$
 done
 
@@ -33,6 +53,10 @@ cat >>map$$ <<EOF
     { NULL, NULL }
 };
 EOF
+
+# echo just before exiting
+
+# exit
 
 cat $PIPS_INCLUDEDIR/auto.h decl$$ map$$ >$PIPS_INCLUDEDIR/builder_map.h
 
