@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1997/09/08 19:25:35 $, 
+ * date: $Date: 1997/09/09 07:00:04 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -104,7 +104,8 @@ boolean ofl_res;
 	n_cont=0, n_ref=0;
     boolean 
 	ok = FALSE,
-	use_simplex = FALSE;
+	use_simplex = FALSE, 
+	catch_performed = FALSE;
 
     decision_data(sc_egalites(sc), &n_cont, &n_ref, 2);
     decision_data(sc_inegalites(sc), &n_cont, &n_ref, 1);
@@ -121,7 +122,9 @@ boolean ofl_res;
     {
     case OFL_CTRL :
 	ofl_ctrl = FWD_OFL_CTRL;
-	CATCH(overflow_error) {
+	catch_performed = TRUE;
+	CATCH(overflow_error) 
+	{
 	    ok = ofl_res;
 	    /* 
 	     *   PLEASE do not remove this warning.
@@ -135,18 +138,20 @@ boolean ofl_res;
 		    ofl_res ? "TRUE" : "FALSE");
 	    break;
 	}		
-    default: {
-	    if (use_simplex)
-	    {
-		ok = sc_simplexe_feasibility_ofl_ctrl(sc, ofl_ctrl);
-	    }
-	    else 
-	    {
-		ok = sc_fourier_motzkin_feasibility_ofl_ctrl(sc, integer_p, 
-							     ofl_ctrl);
-	    }
-	    UNCATCH(overflow_error);
+    default: 
+    {
+	if (use_simplex)
+	{
+	    ok = sc_simplexe_feasibility_ofl_ctrl(sc, ofl_ctrl);
 	}
+	else 
+	{
+	    ok = sc_fourier_motzkin_feasibility_ofl_ctrl(sc, integer_p, 
+							 ofl_ctrl);
+	}
+	if (catch_performed)
+	    UNCATCH(overflow_error);
+    }
     }
 
     return(ok);
