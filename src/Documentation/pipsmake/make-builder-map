@@ -1,40 +1,22 @@
 #!/bin/sh
 #
 # $RCSfile: make-builder-map,v $ (version $Revision$)
-# $Date: 1996/08/20 08:43:59 $, 
+# $Date: 1996/08/20 15:52:18 $, 
 
-# Derivation of builder_map.h from pipsmake.rc
+# Derivation of builder_map.h (stdout) from pipsmake.rc (stdin)
 
-# By default (no argument), automatic declaration generation
-# Else, retrieve declarations in include files
-# feature removed... automatic generation only.
-
-# Francois Irigoin, 8 October 1993
-
-# REAL="$1"
-
-functions=`/lib/cpp $PIPS_ROOT/Share/pipsmake.rc | grep '^[a-z]' | \
-		sed 's/ .*//' |	sort | uniq `
+functions=`/lib/cpp | grep '^[a-z]' | sed 's/ .*//' | sort -u`
 
 # echo $functions >/dev/tty
 
-cat >decl$$ <<EOF
-/*
- *         --------------------------------------------------------
- *         --------------------------------------------------------
- *
- *                                  WARNING
- *
- *                THIS FILE HAS BEEN AUTOMATICALLY GENERATED
- *
- *                             DO NOT MODIFY IT
- *
- *         --------------------------------------------------------
- *         --------------------------------------------------------
- */
-EOF
+cat auto.h 
 
-cat >map$$ <<EOF
+for f in $functions
+do
+    echo "extern bool $f(char *);"
+done
+
+cat <<EOF
 
 static struct builder_map {
     char *builder_name;
@@ -43,20 +25,19 @@ static struct builder_map {
 
 EOF
 
-for func in $functions
+for f in $functions
 do
   # echo $func
-  FUNC=`echo $func | tr a-z A-Z`
-  echo "extern bool $func(char *);" >>decl$$
-  echo "    { BUILDER_$FUNC, $func }," >>map$$
+  F=`echo $f | tr '[a-z]' '[A-Z]'`
+  echo "    { BUILDER_$F, $f },"
 done
 
-cat >>map$$ <<EOF
+cat <<EOF
 
     { NULL, NULL }
 };
 EOF
 
-cat $PIPS_ROOT/Include/auto.h decl$$ map$$ >$PIPS_ROOT/Include/builder_map.h
+# end of $RCSfile: make-builder-map,v $
+#
 
-/bin/rm -f decl$$ map$$
