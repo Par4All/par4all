@@ -1,5 +1,5 @@
 /* $RCSfile: perf_spy.c,v $ (version $Revision$)
- * $Date: 1995/12/27 11:45:08 $, .
+ * $Date: 1996/07/25 15:08:02 $, .
  *
  * functions to spy performances. 
  * I agree, -pg does a better job, but for page fault and related issues...
@@ -19,7 +19,7 @@ extern int getrusage(int, struct rusage*); /* not found in any header! */
 
 #define USAGE_STACK_SIZE 10
 static struct rusage usage_stack[USAGE_STACK_SIZE];
-static int index = 0; /* available bucket */
+static int stack_index = 0; /* available bucket */
 
 static void
 printf_time(
@@ -65,9 +65,9 @@ printf_usage_delta(
 void 
 push_performance_spy()
 {
-    message_assert("stack not full", index<USAGE_STACK_SIZE);
-    getrusage(RUSAGE_CHILDREN, &usage_stack[index++]);
-    getrusage(RUSAGE_SELF, &usage_stack[index++]);
+    message_assert("stack not full", stack_index<USAGE_STACK_SIZE);
+    getrusage(RUSAGE_CHILDREN, &usage_stack[stack_index++]);
+    getrusage(RUSAGE_SELF, &usage_stack[stack_index++]);
 }
 
 void 
@@ -76,14 +76,14 @@ pop_performance_spy(
     string msg)
 {
     struct rusage current;
-    message_assert("stack not empty", index>0);
+    message_assert("stack not empty", stack_index>0);
     fprintf(f, "[performance_spy] %s\n", msg);
 
     getrusage(RUSAGE_SELF, &current);
     fprintf(f, "self:\n");
-    printf_usage_delta(f, &usage_stack[--index], &current);
+    printf_usage_delta(f, &usage_stack[--stack_index], &current);
     fprintf(f, "children:\n");
     getrusage(RUSAGE_CHILDREN, &current);
-    printf_usage_delta(f, &usage_stack[--index], &current);
+    printf_usage_delta(f, &usage_stack[--stack_index], &current);
 }
 
