@@ -22,6 +22,7 @@
 <TEXT>CALLERS		{return CALLERS;}
 <TEXT>ALL		{return ALL;}
 <TEXT>SELECT		{return SELECT;}
+<TEXT>COMPILATION_UNIT	{return COMPILATION_UNIT;}
 <TEXT>\<		{return REQUIRED;}
 <TEXT>\>		{return PRODUCED;}
 <TEXT>\#		{return MODIFIED;}
