@@ -129,12 +129,21 @@ statement s;
 				    STATEMENT(CAR(gen_last(block))), 
 				    block);
 	}
-	else
-	    statement_instruction(cs) =
-		make_instruction_block(
-		 CONS(STATEMENT, s,
-		 CONS(STATEMENT, make_stmt_of_instr(statement_instruction(cs)),
-		      NIL)));
+	else {
+	  statement_instruction(cs) =
+	    make_instruction_block(CONS(STATEMENT, s,
+				   CONS(STATEMENT,
+					make_statement(statement_label(cs), 
+						       statement_number(cs),
+						       statement_ordering(cs),
+						       statement_comments(cs),
+						       statement_instruction(cs)),
+					NIL)));
+	  statement_label(cs) = entity_empty_label();
+	  statement_number(cs) = STATEMENT_NUMBER_UNDEFINED;
+	  statement_ordering(cs) = STATEMENT_ORDERING_UNDEFINED;
+	  statement_comments(cs) = empty_comments;
+	}
     }
 }
 
@@ -327,6 +336,11 @@ void atomize_as_required(
   bool (*while_decide)(whileloop, expression), /* whileloop */
   entity (*new)(entity, basic))
 {
+    ifdebug(5) {
+      pips_debug(5,
+		 "Statement at entry:\n");
+      print_statement(stat);
+    }
     make_current_statement_stack();
     make_current_control_stack();
     ref_atomize_decision = ref_decide;
@@ -346,6 +360,12 @@ void atomize_as_required(
     create_new_variable = NULL;
     free_current_statement_stack();
     free_current_control_stack();
+
+    ifdebug(5) {
+      pips_debug(5,
+		 "Statement at exit:\n");
+      print_statement(stat);
+    }
 }
 
 /*  that is all
