@@ -1,11 +1,10 @@
 #!/bin/sh
 #
-# $RCSfile: make-builder-map,v $ (version $Revision$)
-# $Date: 1996/09/02 10:24:43 $, 
-
+# $Id$
+#
 # Derivation of builder_map.h (stdout) from pipsmake.rc (stdin)
 
-functions=`/lib/cpp | grep '^[a-z]' | sed 's/ .*//' | sort -u`
+functions=`grep '^[a-z]' | sed 's/ .*//' | sort -u`
 
 # echo $functions >/dev/tty
 
