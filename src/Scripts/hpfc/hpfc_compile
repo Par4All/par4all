@@ -4,6 +4,9 @@
 #
 # $Id$
 # $Log: hpfc_compile,v $
+# Revision 1.52  1997/06/07 09:14:28  coelho
+# little fix.
+#
 # Revision 1.51  1997/06/07 09:11:19  coelho
 # -T time option added.
 #
@@ -87,7 +90,7 @@ usage()
 #
 # the keyword control enables a global control of the switches
 
-while getopts rtivxDdMqsn:hm:w:p:k: OPT
+while getopts rtTivxDdMqsn:hm:w:p:k: OPT
 do
   case $OPT in
     t) DUMPFILES='1' ;;
