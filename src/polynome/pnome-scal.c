@@ -178,7 +178,7 @@ Ppolynome pp;
     if (POLYNOME_UNDEFINED_P(pp)) 
 	return (POLYNOME_UNDEFINED);
     else {
-	Pmonome one = make_monome(1.0, TCST, (Value) 1);
+	Pmonome one = make_monome(1.0, TCST, VALUE_ONE);
 
 	polynome_monome_add(&pp, one);
 	monome_rm(&one);
@@ -198,7 +198,7 @@ Ppolynome pp;
     if (POLYNOME_UNDEFINED_P(pp)) 
 	return (POLYNOME_UNDEFINED);
     else {
-	Pmonome minus_one = make_monome(-1.0, TCST, (Value) 1);
+	Pmonome minus_one = make_monome(-1.0, TCST, VALUE_ONE);
 
 	polynome_monome_add(&pp, minus_one);
 	monome_rm(&minus_one);
