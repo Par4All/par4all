@@ -74,8 +74,6 @@ void
 fatal( fmt, msg )
 char *fmt, *msg ;
 {
-    extern int fprintf();
-
     if( error_seen == 0 ) {
 	(void)fprintf( stderr, "\nNewgen Fatal Error -- " ) ;
 	(void)fprintf( stderr, fmt, msg ) ;
@@ -90,8 +88,6 @@ void
 user( fmt, msg )
 char *fmt, *msg ;
 {
-    extern int fprintf();
-
     (void)fprintf( stderr, "\nNewgen User Error -- " ) ;
     (void)fprintf( stderr, fmt, msg ) ;
     error_seen++ ;
@@ -267,9 +263,6 @@ print_domainlist( out, l, op )
      struct domainlist *l ;
      int op ;
 {
-  extern int fprintf();
-  void print_domain() ;
-
   if( l == NULL )
     fatal( "print_domainlist: null", "" ) ;
 
@@ -285,8 +278,6 @@ print_persistant( out, dp )
 FILE *out ;
 union domain *dp ;
 {
-    extern int fprintf();
-
     if( dp->ba.persistant ) {
 	(void)fprintf( out, "persistant " ) ;
     }
@@ -301,8 +292,6 @@ print_domain( out, dp )
 FILE *out ;
 union domain *dp ;
 {
-    extern int fprintf();
-
     switch( dp->ba.type ) {
     case EXTERNAL:
 	break ;
@@ -357,7 +346,6 @@ void
 print_domains( out )
 FILE *out ;
 {
-    extern int fprintf();
     struct gen_binding *bp ;
     union domain *dp ;
 
