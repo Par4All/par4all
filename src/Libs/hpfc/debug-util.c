@@ -1,7 +1,7 @@
 /* this is a set of functions to help hpfc debugging
  *
  * $RCSfile: debug-util.c,v $ (version $Revision$)
- * $Date: 1996/03/01 13:00:17 $, 
+ * $Date: 1996/12/26 15:34:51 $, 
  *
  * Fabien Coelho, May 1993.
  */
@@ -159,67 +159,6 @@ void print_distributed_arrays()
 {
     (void) fprintf(stderr,"Distributed Arrays:\n");
     gen_map(print_entity_variable, list_of_distributed_arrays());
-}
-
-/* old name of obj while in module now.
- */
-static string 
-old_name(
-    entity module, /* module in which obj appears */
-    entity obj)    /* obj */
-{
-    return module_local_name
-        (module==host_module ? load_old_host(obj) : load_old_node(obj));
-}
-
-/* to be used by the prettyprinter at the head of a file.
- * inclusion of needed runtime headers.
- */
-static string
-hpfc_head_hook(
-    entity m) /* module */
-{
-    return strdup(concatenate
-        ("      include \"fpvm3.h\"\n"
-	 "      include \"real_parameters.h\"\n"
-	 "      include \"hpfc_commons.h\"\n"
-	 "      include \"hpfc_includes.h\"\n"
-	 "      include \"", old_name(m, m), "_parameters.h\"\n", NULL));
-}
-
-/* to be used by the prettyprinter when dealing with a common.
- * inclusion of the parameters and commons...
- */
-static string 
-hpfc_common_hook(
-    entity module,
-    entity common)
-{
-    return strdup(concatenate
-        ("      include \"", old_name(module, common), "_parameters.h\"\n"
-	 "      include \"", old_name(module, common),  
-	 module==host_module ? "_host.h\"\n" : "_node.h\"\n", NULL));
-}
-
-void hpfc_print_code(file, module, stat)
-FILE* file;
-entity module;
-statement stat;
-{
-    text t;
-    debug_on("PRETTYPRINT_DEBUG_LEVEL");
-
-    set_prettyprinter_head_hook(hpfc_head_hook);
-    set_prettyprinter_common_hook(hpfc_common_hook);
-
-    t = text_module(module, stat);
-    print_text(file, t);
-    /* free_text(t); */ /* ??? memory leak or core dump... */
-    
-    reset_prettyprinter_common_hook();
-    reset_prettyprinter_head_hook();
-
-    debug_off();
 }
 
 void hpfc_print_common(file, module, common)
