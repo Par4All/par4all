@@ -368,7 +368,7 @@ boolean ofl_res;
       if (n_cont_in >= 10) 
       {
 	method = SIMPLEX_METHOD;
-	if (n_cont_eq >= 10)
+	if (n_cont_eq >= 6)
 	  method |= PROJECT_EQ_METHOD;
       }
       else
