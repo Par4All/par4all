@@ -785,16 +785,8 @@ bootstrap(string workspace)
 					   MakeConstantLitteral()));
 
     /* FI: I suppress the owner filed to make the database moveable */
-    /* FI: I guess no pointers to the resource is passed because it
-       is a tabulated NewGen field. */
-    /* FC: switched to string_undefined to avoid free coredump */
-    /* FI: explicit character string to be consistent with pipsdbm/disk.c */
-    DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, "", strdup(SYMBOL_TABLE_STUB));
-#if 0
-    /* RK : No !!! */
-    /* FC: switched to entity_domain to please methods_io. */
+    /* FC: the content must be consistent with pipsdbm/methods.h */
     DB_PUT_MEMORY_RESOURCE(DBR_ENTITIES, "", (char*) entity_domain);
-#endif
     return TRUE;
 }
 
