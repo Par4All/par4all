@@ -1,12 +1,12 @@
 #
 # $RCSfile: makefile_macros.GNULL,v $ (version $Revision$)
-# $Date: 1996/07/15 22:21:08 $, 
+# $Date: 1996/07/16 11:16:30 $, 
 #
 # this file contains macro definitions 
 
 # the GNU libc is *required* because "%lld" is not supported on sunos4
 GLIBC	= /usr5/gnu/SPARC/glibc
-GCCDIR	= $(GCC_EXEC_PREFIX)/sparc-sun-sunos4.1.4/2.7.2.f.1
+GCCDIR	= $(GCC_EXEC_PREFIX)sparc-sun-sunos4.1.4/2.7.2.f.1
 
 AR	= gar
 ARFLAGS	= rv
