@@ -1,5 +1,5 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1995/04/04 08:23:46 $, 
+ * $Date: 1995/04/07 16:25:27 $, 
  */
 
 #include <stdio.h>
