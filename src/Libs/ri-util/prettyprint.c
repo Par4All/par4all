@@ -2,6 +2,11 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.120  1998/09/08 18:31:50  irigoin
+ * Several quick bug fixes. Not a really consistent state for the Fortran 90
+ * output but we want to make the Production version of PIPS consistent for
+ * most outputs.
+ *
  * Revision 1.119  1998/07/24 10:46:56  irigoin
  * Bug fix for unary minus
  *
@@ -188,7 +193,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.119 1998/07/24 10:46:56 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.120 1998/09/08 18:31:50 irigoin Exp $";
 #endif /* lint */
 
  /*
@@ -332,18 +337,35 @@ words_range(range obj)
     list pc = NIL ;
 
     /* if undefined I print a star, why not!? */
-    if (expression_undefined_p(range_lower(obj)))
-	return CONS(STRING, MAKE_SWORD("*"), NIL);
-    /* else */
-    pc = CHAIN_SWORD(pc,"(/I,I=");
-    pc = gen_nconc(pc, words_expression(range_lower(obj)));
-    pc = CHAIN_SWORD(pc,",");
-    pc = gen_nconc(pc, words_expression(range_upper(obj)));
-    pc = CHAIN_SWORD(pc,",");
-    pc = gen_nconc(pc, words_expression(range_increment(obj)));
-    pc = CHAIN_SWORD(pc,"/)") ;
+    if (expression_undefined_p(range_lower(obj))) {
+	pc = CONS(STRING, MAKE_SWORD("*"), NIL);
+    }
+    else {
+	/* FI: array constructor R433, p. 37 in Fortran 90 standard, can
+	   be used anywhere in arithmetic expressions whereas the triplet
+	   notation is restricted to subscript expressions. The triplet
+	   notation is used to define array sections (see R619, p. 64).
+	*/
+	/*
+	  pc = CHAIN_SWORD(pc,"(/ (I,I=");
+	  pc = gen_nconc(pc, words_expression(range_lower(obj)));
+	  pc = CHAIN_SWORD(pc,",");
+	  pc = gen_nconc(pc, words_expression(range_upper(obj)));
+	  pc = CHAIN_SWORD(pc,",");
+	  pc = gen_nconc(pc, words_expression(range_increment(obj)));
+	  pc = CHAIN_SWORD(pc,") /)") ;
+	*/
+	call c = syntax_call(expression_syntax(range_increment(obj)));
 
-    return(pc);
+	pc = gen_nconc(pc, words_expression(range_lower(obj)));
+	pc = CHAIN_SWORD(pc,":");
+	pc = gen_nconc(pc, words_expression(range_upper(obj)));
+	if(strcmp( entity_local_name(call_function(c)), "1") != 0) {
+	    pc = CHAIN_SWORD(pc,":");
+	    pc = gen_nconc(pc, words_expression(range_increment(obj)));
+	}
+    }
+    return pc;
 }
 
 /* exported for expression.c
