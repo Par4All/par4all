@@ -1,29 +1,53 @@
 #! /bin/sh
+# 
+# $RCSfile$ (version $Revision$)
 #
 # to regenerate the distribution files:
 #
 
-echo SunOS4 binary version
-make_pips_release -CB GNU -pe -rsz pips_GNU
+move()
+{ test -f $1 && mv $1 $1.old ; }
+
+#
+# SOURCES
+#
 
 echo all Sources (Pips, Newgen, Linear)
+move pips_sources
 make_pips_release -CS -pnle -rsz pips_sources
 
 echo Newgen Sources
+move newgen_sources
 make_pips_release -CS -n -rsz newgen_sources
 
 echo Linear Sources
+move linear_sources
 make_pips_release -CS -l -rsz linear_sources
 
 echo Xpomp Sources
+move xpomp_sources
 make_pips_release -rz -D Doc/xpomp_manual.ps \
 	-D Include -D Src/Runtimes/xpomp -p -w -e xpomp_sources
 
+
+#
+# BINARIES
+#
+
+echo SunOS4 binary version
+move pips_GNU
+make_pips_release -CB GNU -pe -rsz pips_GNU
+
 echo Solaris 2 binary version
+move pips_GNUSOL2LL
 make_pips_release -CB GNUSOL2LL -pe -rz pips_GNUSOL2LL
 
 echo Solaris 2 binary version, including Public softs (big!)
+move pips_Public_GNUSOL2LL
 make_pips_release -CB GNUSOL2LL -peP -rz pips_Public_GNUSOL2LL
 
 echo done
 
+chmod a+r *.tar.gz
+
+# that is all
