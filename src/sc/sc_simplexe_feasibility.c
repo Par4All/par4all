@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1997/07/17 20:45:01 $, 
+ * $Date: 1997/09/08 19:25:35 $, 
  */
 
 /* test du simplex : 
@@ -1283,6 +1283,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    free(t[i].colonne);
 	free(t);
 	free(nlle_colonne);
+	UNCATCH(simplex_arithmetic_error);
 	return (soluble) ;
 }     /* main */
 
