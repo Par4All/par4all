@@ -3,6 +3,9 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.67  1997/07/21 13:23:59  keryell
+ * Replaced %x format by %p.
+ *
  * Revision 1.66  1997/06/10 09:15:30  coelho
  * *** empty log message ***
  *
@@ -147,8 +150,8 @@ void fprint_entity_list(FILE *fp, list l);
 #define what_stat_debug(level, stat)\
  ifdebug(level) \
  { int so_ = statement_ordering(stat);\
-   pips_debug(level, "statement 0x%x (%d,%d)\n",\
-   (unsigned int) stat, ORDERING_NUMBER(so_), ORDERING_STATEMENT(so_));}
+   pips_debug(level, "statement %p (%d,%d)\n",\
+   stat, ORDERING_NUMBER(so_), ORDERING_STATEMENT(so_));}
 
 /* Efficient I/O tags
  */
