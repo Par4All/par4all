@@ -5,6 +5,9 @@
 # a shell wrapper for "JPips", the java-based pips interface.
 #
 # $Log: jpips,v $
+# Revision 1.2  1998/07/02 15:46:47  coelho
+# fix for -n option.
+#
 # Revision 1.1  1998/07/01 16:15:32  coelho
 # Initial revision
 #
@@ -14,7 +17,7 @@ usage()
 {
     cat <<-EOF >&2
 	jpips [-m menu] [-h] [-n]
-	-m menu: the type of menu that should be used \(default: test\)
+	-m menu: the type of menu that should be used (default: test)
 	-h: some help
 	-n: no console with jpips
 EOF
@@ -31,7 +34,7 @@ error()
 
 unset jpips forward menu_type
 
-while getopts m:h opt
+while getopts m:hn opt
 do
     case ${opt} in
 	m) menu_type=$OPTARG ;;
