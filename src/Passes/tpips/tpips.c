@@ -28,11 +28,14 @@
 
 /********************************************************** Static variables */
 
+bool tpips_execution_mode = TRUE;
+
 static bool use_readline;
 static FILE *logfile;
 static FILE * current_file;
 extern int tgetnum();
-static char *usage = "Usage: %s [-n] [-h] [-l logfilename] sourcefile...\n";
+static char *usage = 
+    "Usage: %s [-n] [-h/?] [-v] [-l logfilename] sourcefile...\n";
 
 /*************************************************************** Some Macros */
 
@@ -650,19 +653,24 @@ static void parse_arguments(int argc, char * argv[])
     extern char *optarg;
     extern int optind;
 
-    while ((c = getopt(argc, argv, "nl:h")) != -1)
+    while ((c = getopt(argc, argv, "nl:h?v")) != -1)
 	switch (c)
 	{
 	case 'l':
 	    logfile = safe_fopen (optarg,"w");
 	    break;
 	case 'h':
+	case '?':
 	    fprintf (stderr,usage, argv[0]);
 	    return;
 	    break;
 	case 'n':
-	    set_bool_property ("TPIPS_NO_EXECUTION_MODE", TRUE);
+	    /* set_bool_property ("TPIPS_NO_EXECUTION_MODE", TRUE); */
+	    tpips_execution_mode = FALSE;
 	    break;
+	case 'v': 
+	    fprintf(stderr, "tpips: (ARCH=%s) %s\n", SOFT_ARCH, argv[0]);
+            break;
 	}
 
     if (argc == optind ) {
