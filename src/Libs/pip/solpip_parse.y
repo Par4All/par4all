@@ -14,11 +14,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include "types.h"
 
 /* Newgen includes      */
 #include "genC.h"
-#include "list.h"
 
 /* C3 includes 		*/
 #include "boolean.h"
