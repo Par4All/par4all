@@ -696,34 +696,34 @@ basic b;
 basic 
 basic_of_expression(expression exp)
 {
-  syntax sy = expression_syntax(exp);
-  basic b = basic_undefined;
+    syntax sy = expression_syntax(exp);
+    basic b = basic_undefined;
 
-  debug(6, "basic_of_expression", "\n");
+    debug(6, "basic_of_expression", "\n");
 
-  switch(syntax_tag(sy)) {
-  case is_syntax_reference:
+    switch(syntax_tag(sy)) {
+    case is_syntax_reference:
     {
-      type exp_type = entity_type(reference_variable(syntax_reference(sy)));
+	type exp_type = entity_type(reference_variable(syntax_reference(sy)));
 
-      if (type_tag(exp_type) != is_type_variable)
-	pips_error("basic_of_expression", "Bad reference type tag");
-      b = copy_basic(variable_basic(type_variable(exp_type)));
-      break;
+	if (type_tag(exp_type) != is_type_variable)
+	    pips_error("basic_of_expression", "Bad reference type tag");
+	b = copy_basic(variable_basic(type_variable(exp_type)));
+	break;
     }
-  case is_syntax_call: 
-    b = basic_of_call(syntax_call(sy));
-    break;
-  case is_syntax_range: 
-    /* Well, let's assume range are well formed... */
-    b = basic_of_expression(range_lower(syntax_range(sy)));
-    break;
-  default: pips_error("basic_of_expression", "Bad syntax tag");
-    /* Never go there... */
-    b = make_basic(is_basic_overloaded, UUINT(4));
-  }
+    case is_syntax_call: 
+	b = basic_of_call(syntax_call(sy));
+	break;
+    case is_syntax_range: 
+	/* Well, let's assume range are well formed... */
+	b = basic_of_expression(range_lower(syntax_range(sy)));
+	break;
+    default: pips_error("basic_of_expression", "Bad syntax tag");
+	/* Never go there... */
+	b = make_basic(is_basic_overloaded, UUINT(4));
+    }
 
-  return b;
+    return b;
 }
 
 /* basic basic_of_call(call c): returns the basic of the result given by the
@@ -734,35 +734,35 @@ basic_of_expression(expression exp)
 basic 
 basic_of_call(call c)
 {
-  entity e = call_function(c);
-  tag t = value_tag(entity_initial(e));
-  basic b = basic_undefined;
+    entity e = call_function(c);
+    tag t = value_tag(entity_initial(e));
+    basic b = basic_undefined;
 
-  switch (t)
+    switch (t)
     {
     case is_value_code:
-      b = copy_basic(basic_of_external(c));
-      break;
+	b = copy_basic(basic_of_external(c));
+	break;
     case is_value_intrinsic: 
-      b = basic_of_intrinsic(c);
-      break;
+	b = basic_of_intrinsic(c);
+	break;
     case is_value_symbolic: 
 	/* b = make_basic(is_basic_overloaded, UU); */
-      b = copy_basic(basic_of_constant(c));
-      break;
+	b = copy_basic(basic_of_constant(c));
+	break;
     case is_value_constant:
-      b = copy_basic(basic_of_constant(c));
-      break;
+	b = copy_basic(basic_of_constant(c));
+	break;
     case is_value_unknown:
-      debug(1, "basic_of_call", "function %s has no initial value.\n"
-	    " Maybe it has not been parsed yet.\n",
-	    entity_name(e));
-      b = copy_basic(basic_of_external(c));
-      break;
+	debug(1, "basic_of_call", "function %s has no initial value.\n"
+	      " Maybe it has not been parsed yet.\n",
+	      entity_name(e));
+	b = copy_basic(basic_of_external(c));
+	break;
     default: pips_error("basic_of_call", "unknown tag %d\n", t);
-      /* Never go there... */
+	/* Never go there... */
     }
-  return b;
+    return b;
 }
 
 
@@ -775,19 +775,26 @@ basic_of_call(call c)
 basic 
 basic_of_external(call c)
 {
-  type call_type, return_type;
+    type return_type = type_undefined;
+    entity f = call_function(c);
+    basic b = basic_undefined;
+    type call_type = entity_type(f);
 
-  debug(7, "basic_of_call", "External call\n");
+    debug(7, "basic_of_call", "External call to %s\n", entity_name(f));
 
-  call_type = entity_type(call_function(c));
-  if (type_tag(call_type) != is_type_functional)
-    pips_error("basic_of_external", "Bad call type tag");
+    if (type_tag(call_type) != is_type_functional)
+	pips_error("basic_of_external", "Bad call type tag");
 
-  return_type = functional_result(type_functional(call_type));
-  if (type_tag(return_type) != is_type_variable)
-    pips_error("basic_of_external", "Bad return call type tag");
+    return_type = functional_result(type_functional(call_type));
 
-  return(variable_basic(type_variable(return_type)));
+    if (type_tag(return_type) != is_type_variable)
+	pips_error("basic_of_external", "Bad return call type tag");
+
+    b = (variable_basic(type_variable(return_type)));
+
+    debug(7, "basic_of_call", "Returned type is %s\n", basic_to_string(b));
+
+    return b;
 }
 
 /* basic basic_of_intrinsic(call c): returns the basic of the result given by
@@ -799,42 +806,42 @@ basic_of_external(call c)
 basic 
 basic_of_intrinsic(call c)
 {
-  basic rb;
-  entity call_func;
+    basic rb;
+    entity call_func;
 
-  debug(7, "basic_of_call", "Intrinsic call\n");
+    debug(7, "basic_of_call", "Intrinsic call\n");
 
-  call_func = call_function(c);
+    call_func = call_function(c);
 
-  if(ENTITY_LOGICAL_OPERATOR_P(call_func))
-    rb = make_basic(is_basic_logical, UUINT(4));
-  else
+    if(ENTITY_LOGICAL_OPERATOR_P(call_func))
+	rb = make_basic(is_basic_logical, UUINT(4));
+    else
     {
-      list call_args = call_arguments(c);
+	list call_args = call_arguments(c);
 
-      if (call_args == NIL) {
-	/* I don't know the type since there is no arguments !
-	   Bug encountered with a FMT=* in a PRINT.
-	   RK, 21/02/1994 : */
-	rb = make_basic(is_basic_overloaded, UU);
-	/* rb = make_basic(is_basic_int, 4); */
-      }
-      else {
-	expression arg1, arg2;
+	if (call_args == NIL) {
+	    /* I don't know the type since there is no arguments !
+	       Bug encountered with a FMT=* in a PRINT.
+	       RK, 21/02/1994 : */
+	    rb = make_basic(is_basic_overloaded, UU);
+	    /* rb = make_basic(is_basic_int, 4); */
+	}
+	else {
+	    expression arg1, arg2;
 
-	arg1 = EXPRESSION(CAR(call_args));
-	if(CDR(call_args) == NIL)
-	  rb = basic_of_expression(arg1);
-	else
-	  {
-	    arg2 = EXPRESSION(CAR(CDR(call_args)));
-	    rb = basic_union(arg1, arg2);
-	  }
+	    arg1 = EXPRESSION(CAR(call_args));
+	    if(CDR(call_args) == NIL)
+		rb = basic_of_expression(arg1);
+	    else
+	    {
+		arg2 = EXPRESSION(CAR(CDR(call_args)));
+		rb = basic_union(arg1, arg2);
+	    }
 
-      }
+	}
     }
 
-  return rb;
+    return rb;
 }
 
 /* basic basic_of_constant(call c): returns the basic of the call to a
@@ -845,21 +852,21 @@ basic_of_intrinsic(call c)
 basic 
 basic_of_constant(call c)
 {
-  type call_type, return_type;
+    type call_type, return_type;
 
-  debug(7, "basic_of_constant", "Constant call\n");
+    debug(7, "basic_of_constant", "Constant call\n");
 
-  call_type = entity_type(call_function(c));
+    call_type = entity_type(call_function(c));
 
-  if (type_tag(call_type) != is_type_functional)
-    pips_error("basic_of_constant", "Bad call type tag");
+    if (type_tag(call_type) != is_type_functional)
+	pips_error("basic_of_constant", "Bad call type tag");
 
-  return_type = functional_result(type_functional(call_type));
+    return_type = functional_result(type_functional(call_type));
 
-  if (type_tag(return_type) != is_type_variable)
-    pips_error("basic_of_constant", "Bad return call type tag");
+    if (type_tag(return_type) != is_type_variable)
+	pips_error("basic_of_constant", "Bad return call type tag");
 
-  return(variable_basic(type_variable(return_type)));
+    return(variable_basic(type_variable(return_type)));
 }
 
 /* basic basic_union(expression exp1 exp2): returns the basic of the
@@ -874,132 +881,132 @@ basic_of_constant(call c)
 basic 
 basic_union(expression exp1, expression exp2)
 {
-  basic b1 = basic_of_expression(exp1);
-  basic b2 = basic_of_expression(exp2);
-  basic b = basic_undefined;
+    basic b1 = basic_of_expression(exp1);
+    basic b2 = basic_of_expression(exp2);
+    basic b = basic_undefined;
 
-  /* FI: I do not believe this is correct for all intrinsics! */
+    /* FI: I do not believe this is correct for all intrinsics! */
 
-  debug(7, "basic_union", "Tags: tag exp1 = %d, tag exp2 = %d\n",
-	basic_tag(b1), basic_tag(b2));
+    debug(7, "basic_union", "Tags: tag exp1 = %d, tag exp2 = %d\n",
+	  basic_tag(b1), basic_tag(b2));
 
 
-  if(basic_overloaded_p(b2)) {
-    b = copy_basic(b2);
-  }
-  else {
-    switch(basic_tag(b1)) {
-
-    case is_basic_overloaded:
-      b = copy_basic(b1);
-      break;
-
-    case is_basic_string: 
-      if(basic_string_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
-
-	/* Type checking problem for ? : with gcc... */
-	if(s1>s2)
-	  b = copy_basic(b1);
-	else
-	  b = copy_basic(b2);
-      }
-      else
-	b = make_basic(is_basic_overloaded, UU);
-      break;
-
-    case is_basic_logical:
-      if(basic_logical_p(b2)) {
-	int s1 = basic_logical(b1);
-	int s2 = basic_logical(b2);
-
-	b = make_basic(is_basic_logical,UUINT(s1>s2?s1:s2));
-      }
-      else
-	b = make_basic(is_basic_overloaded, UU);
-      break;
-
-    case is_basic_complex:
-      if(basic_complex_p(b2) || basic_float_p(b2) || basic_int_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
-
-	b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
-      }
-      else
-	b = make_basic(is_basic_overloaded, UU);
-      break;
-
-    case is_basic_float:
-      if(basic_complex_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
-
-	b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
-      }
-      else if(basic_float_p(b2) || basic_int_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
-
-	b = make_basic(is_basic_float, UUINT(s1>s2?s1:s2));
-      }
-      else
-	b = make_basic(is_basic_overloaded, UU);
-      break;
-
-    case is_basic_int:
-      if(basic_complex_p(b2) || basic_float_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
-
-	b = make_basic(basic_tag(b2), UUINT(s1>s2?s1:s2));
-      }
-      else if(basic_int_p(b2)) {
-	int s1 = SizeOfElements(b1);
-	int s2 = SizeOfElements(b2);
-
-	b = make_basic(is_basic_int, UUINT(s1>s2?s1:s2));
-      }
-      else
-	b = make_basic(is_basic_overloaded, UU);
-      break;
-
-    default: pips_error("basic_union", "Ill. basic tag %d\n", basic_tag(b1));
+    if(basic_overloaded_p(b2)) {
+	b = copy_basic(b2);
     }
-  }
+    else {
+	switch(basic_tag(b1)) {
 
-  return b;
+	case is_basic_overloaded:
+	    b = copy_basic(b1);
+	    break;
 
-  /*
-    if( (t1 != is_basic_complex) && (t1 != is_basic_float) &&
-    (t1 != is_basic_int) && (t2 != is_basic_complex) &&
-    (t2 != is_basic_float) && (t2 != is_basic_int) )
-    pips_error("basic_union",
-    "Bad basic tag for expression in numerical function");
+	case is_basic_string: 
+	    if(basic_string_p(b2)) {
+		int s1 = SizeOfElements(b1);
+		int s2 = SizeOfElements(b2);
 
-    if(t1 == is_basic_complex)
-    return(b1);
-    if(t2 == is_basic_complex)
-    return(b2);
-    if(t1 == is_basic_float) {
-    if( (t2 != is_basic_float) ||
-    (basic_float(b1) == DOUBLE_PRECISION_SIZE) )
-    return(b1);
-    return(b2);
+		/* Type checking problem for ? : with gcc... */
+		if(s1>s2)
+		    b = copy_basic(b1);
+		else
+		    b = copy_basic(b2);
+	    }
+	    else
+		b = make_basic(is_basic_overloaded, UU);
+	    break;
+
+	case is_basic_logical:
+	    if(basic_logical_p(b2)) {
+		int s1 = basic_logical(b1);
+		int s2 = basic_logical(b2);
+
+		b = make_basic(is_basic_logical,UUINT(s1>s2?s1:s2));
+	    }
+	    else
+		b = make_basic(is_basic_overloaded, UU);
+	    break;
+
+	case is_basic_complex:
+	    if(basic_complex_p(b2) || basic_float_p(b2) || basic_int_p(b2)) {
+		int s1 = SizeOfElements(b1);
+		int s2 = SizeOfElements(b2);
+
+		b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
+	    }
+	    else
+		b = make_basic(is_basic_overloaded, UU);
+	    break;
+
+	case is_basic_float:
+	    if(basic_complex_p(b2)) {
+		int s1 = SizeOfElements(b1);
+		int s2 = SizeOfElements(b2);
+
+		b = make_basic(is_basic_complex, UUINT(s1>s2?s1:s2));
+	    }
+	    else if(basic_float_p(b2) || basic_int_p(b2)) {
+		int s1 = SizeOfElements(b1);
+		int s2 = SizeOfElements(b2);
+
+		b = make_basic(is_basic_float, UUINT(s1>s2?s1:s2));
+	    }
+	    else
+		b = make_basic(is_basic_overloaded, UU);
+	    break;
+
+	case is_basic_int:
+	    if(basic_complex_p(b2) || basic_float_p(b2)) {
+		int s1 = SizeOfElements(b1);
+		int s2 = SizeOfElements(b2);
+
+		b = make_basic(basic_tag(b2), UUINT(s1>s2?s1:s2));
+	    }
+	    else if(basic_int_p(b2)) {
+		int s1 = SizeOfElements(b1);
+		int s2 = SizeOfElements(b2);
+
+		b = make_basic(is_basic_int, UUINT(s1>s2?s1:s2));
+	    }
+	    else
+		b = make_basic(is_basic_overloaded, UU);
+	    break;
+
+	default: pips_error("basic_union", "Ill. basic tag %d\n", basic_tag(b1));
+	}
     }
-    if(t2 == is_basic_float)
-    return(b2);
-    return(b1);
+
+    return b;
+
+    /*
+      if( (t1 != is_basic_complex) && (t1 != is_basic_float) &&
+      (t1 != is_basic_int) && (t2 != is_basic_complex) &&
+      (t2 != is_basic_float) && (t2 != is_basic_int) )
+      pips_error("basic_union",
+      "Bad basic tag for expression in numerical function");
+
+      if(t1 == is_basic_complex)
+      return(b1);
+      if(t2 == is_basic_complex)
+      return(b2);
+      if(t1 == is_basic_float) {
+      if( (t2 != is_basic_float) ||
+      (basic_float(b1) == DOUBLE_PRECISION_SIZE) )
+      return(b1);
+      return(b2);
+      }
+      if(t2 == is_basic_float)
+      return(b2);
+      return(b1);
     */
 }
 
 bool 
 overloaded_type_p(type t)
 {
-  pips_assert("overloaded_type_p", type_variable_p(t));
+    pips_assert("overloaded_type_p", type_variable_p(t));
 
-  return basic_overloaded_p(variable_basic(type_variable(t)));
+    return basic_overloaded_p(variable_basic(type_variable(t)));
 }
 
 /* bool is_inferior_basic(basic1, basic2)
