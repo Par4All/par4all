@@ -32,6 +32,13 @@ typedef long long Value;
 #define VALUE_ZERO 0LL
 #define VALUE_ONE  1LL
 #define VALUE_MONE -1LL
+/* I cannot trust gcc for this...
+ * some faster checks with 0x7ffffff000 sg and so ? 
+ */
+#define VALUE_TO_LONG(val) \
+    ((long)(val>=(Value)LONG_MIN&&val<=(Value)LONG_MAX)?val:abort())
+#define VALUE_TO_INT(val) \
+    ((int)(val>=(Value)INT_MIN&&val<=(Value)INT_MAX)?val:abort())
 #else
 typedef long Value;
 #define VALUE_FMT "%ld"
@@ -41,6 +48,8 @@ typedef long Value;
 #define VALUE_ZERO 0L
 #define VALUE_ONE  1L
 #define VALUE_MONE -1L
+#define VALUE_TO_LONG(val) (val)
+#define VALUE_TO_INT(val) ((int)val)
 #endif
 
 #define VALUE_POS_P(val) (val>VALUE_ZERO)
