@@ -39,6 +39,11 @@
  *
  */
 
+#define sys_debug(level, msg, sc)			\
+    ifdebug(level) {					\
+	pips_debug(level, msg);				\
+	sc_fprint(stderr, sc, entity_local_name);	\
+    }
 
 Pbase build_image_base(
     boolean bank_code,
@@ -381,9 +386,7 @@ movement_computation(
 
     dim_h2 = vect_size(image_base);
 
-    ifdebug(2) {
-	pips_debug(2, "Domain before Projection :\n");
-	sc_fprint(stderr,sc_proj,entity_local_name);    }
+    sys_debug(2, "Domain before Projection :\n",sc_proj);
 
     /* Projection on each variable having unity coefficients in the system */
 
@@ -394,9 +397,8 @@ movement_computation(
 	    vect_chg_coeff(&lvar_coeff_nunit,vecteur_var(pv1),0);
 	}
     } 
-    ifdebug(2) {
-	pips_debug(2," After FM projection :\n");
-	sc_fprint(stderr,sc_proj,entity_local_name);    }
+
+    sys_debug(2, " After FM projection :\n", sc_proj);
 
     sc_proj->inegalites = contrainte_sort(sc_proj->inegalites, 
 					  sc_proj->base,  index_base,
@@ -422,27 +424,26 @@ movement_computation(
     }
     
     ifdebug(2) {
-	pips_debug(2," Before contrainte sort :\n");
-	sc_fprint(stderr,sc_proj,entity_local_name);   
+	sys_debug(2," Before contrainte sort :\n",sc_proj);
 	pips_debug(2," Base index :\n");
 	vect_fprint(stderr, index_base,entity_local_name);   
     }
     sc_proj->inegalites = contrainte_sort(sc_proj->inegalites, 
 					  sc_proj->base,  index_base,
 					  TRUE,FALSE); 
-    ifdebug(2) {
-	pips_debug(2," After  contrainte sort:\n");
-	sc_fprint(stderr,sc_proj,entity_local_name);    }
+
+    sys_debug(5," After  contrainte sort:\n",sc_proj);
 
     build_sc_nredund_1pass(&sc_proj);
-    ifdebug(2) {
-	pips_debug(2,"After Integer Projection :\n");
-	sc_fprint(stderr,sc_proj,entity_local_name);
-    }
+
+    sys_debug(5,"After Integer Projection :\n",sc_proj);
 
     /* Computation of sample constraints contraining only index variables 
      */
     sc_proj2 = sc_dup(sc_proj);
+
+    sys_debug(4, "sc_proj2 [dup] = \n", sc_proj2);
+
     if (vect_size(sc_image2->base) <= 11)  /* why 11? */
     {
 	for (pv1 = const_base2; pv1 != NULL; pv1 = pv1->succ)
@@ -450,37 +451,35 @@ movement_computation(
  
 	sc_proj = sc_projection_on_list_of_variables
 	    (sc_image2, image_base, lindex);
+	sys_debug(9, "sc_proj = \n", sc_proj);
+
 	sc_proj2 = sc_intersection(sc_proj2,sc_proj2,sc_proj);
+	sys_debug(4, "sc_proj2 [inter] = \n", sc_proj2);
+
 	sc_proj2 = sc_normalize(sc_proj2); 
+	sys_debug(4, "sc_proj2 [norm] = \n", sc_proj2);
+
+	sys_debug(9, "sc_image2 [minmax] = \n", sc_image2);
 	sc_minmax_of_variables(sc_image2,sc_proj2,const_base2);
+	sys_debug(4, "sc_proj2 [minmax] = \n", sc_proj2);
     }
     else				/*more restrictive system */
 	sc_minmax_of_variables(sc_image2,sc_proj2,image_base);
 
-    ifdebug(9) {
-	pips_debug(9, "sc_proj = \n");
-	sc_fprint(stderr, sc_proj, entity_local_name);
-    }
-
-    ifdebug(2) { 
-	pips_debug(2,"Iterat. Domain Before redundancy elimin.:\n");
-	sc_fprint(stderr,sc_proj2,entity_local_name); }
+    sys_debug(2, "Iterat. Domain Before redundancy elimin.:\n",sc_proj2);
     
     /* Elimination of redundant constraints for integer systems*/
 
-    sc_proj2->inegalites = contrainte_sort(sc_proj2->inegalites, 
-					   sc_proj2->base,  index_base, 
-					   FALSE,FALSE);
-    ifdebug(2) { 
-	pips_debug(2,"Iterat. Domain After 1rst sort:\n");
-	sc_fprint(stderr,sc_proj2,entity_local_name); }
+    sc_proj2->inegalites = 
+	contrainte_sort(sc_proj2->inegalites, 
+			sc_proj2->base,  index_base, 
+			FALSE,FALSE);
+
+    sys_debug(2,"Iterat. Domain After 1rst sort:\n",sc_proj2);
 
     sc_integer_projection_information(sc_proj2,index_base, sc_info,dim_h2,n);
     sc_proj2=build_integer_sc_nredund(sc_proj2,index_base,sc_info,1,dim_h2,n);  
-    ifdebug(2) {
-	pips_debug(2," After redundancy elimination :\n");
-	sc_fprint(stderr,sc_proj2,entity_local_name);
-    }
+    sys_debug(2," After redundancy elimination :\n",sc_proj2);
 
     for (i=1;i<=n;i++) 
 	list_of_systems[i] = sc_init_with_sc(sc_proj2);
@@ -605,7 +604,7 @@ int *n,*dim_h;
 	     vect_chg_coeff(&pv1,vecteur_var(pv),0),pv=pv->succ);
 	*const_base = pv1;
 	ifdebug(8) {
-	    (void) fprintf(stderr,"\n constant basis - sc_image_computation:");
+	    pips_debug(8,"\n constant basis - sc_image_computation:");
 	    base_fprint(stderr,*const_base, entity_local_name);
 	}
 
