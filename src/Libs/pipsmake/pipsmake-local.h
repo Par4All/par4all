@@ -2,5 +2,5 @@
 extern makefile parse_makefile();
 extern rule find_rule_by_phase(string pname);
 
-typedef bool (*pipsmake_callback_handler_type)();
+typedef bool (*pipsmake_callback_handler_type)(void);
 
