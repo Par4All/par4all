@@ -8,7 +8,9 @@ SCRIPTS = 	Validate \
 		bug-to-validate \
 		dir-to-validate
 
-FILES =		
+SOURCES	=	$(SCRIPTS) config.makefile
+
+INSTALL_UTL=	$(SCRIPTS)
 
 # that is all
 #
