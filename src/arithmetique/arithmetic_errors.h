@@ -1,12 +1,12 @@
-/* $RCSfile: arithmetic_errors.h,v $ (version $Revision$)
- * $Date: 1997/09/08 19:53:14 $, 
+/* 
+ * $Id$
  *
  * managing arithmetic errors...
  * detecting and managing arithmetic errors on Values should be
  * systematic. These macros gives a C++ look and feel to this
  * management. 
  *
- * (c) FC et CA , Sept 1997
+ * (c) CA et FC, Sept 1997
  */
 #include <setjmp.h>
 
@@ -26,6 +26,19 @@ extern int  simplex_arithmetic_error;
    extern int or extern jmp_buf
 */
 
+#define DEBUG_LINEAR_EXCEPTIONS
+
+#if defined(DEBUG_LINEAR_EXCEPTIONS)
+#define exception_debug(msg, what) 			\
+  fprintf(stderr, "%s %d (%s %s %d)\n", 		\
+	  msg, what, __FUNCTION__, __FILE__, __LINE__)
+#else
+#define exception_debug(msg, what) 1
+#endif
+
+#define exception_push(what) exception_debug("PUSH", what)
+#define exception_pop(what)  exception_pop("POP", what)
+
 #define EXCEPTION extern int
 
 #define global_exception_index_decr                                     \
@@ -36,15 +49,18 @@ extern int  simplex_arithmetic_error;
     (throw_exception(what))
 
 #define PUSH_AND_FORWARD_EXCEPTION(what)				\
-    (global_exception_index==MAX_STACKED_CONTEXTS?			\
+    (exception_push(what), 						\
+      global_exception_index==MAX_STACKED_CONTEXTS?			\
      (print_exception_stack_error(1),1):	                        \
      (global_exception_type[global_exception_index]=what,		\
       setjmp(global_exception_stack[global_exception_index++])))
 
 #define CATCH(what) if PUSH_AND_FORWARD_EXCEPTION(what)
 
-#define UNCATCH(what) \
-    (global_exception_type[global_exception_index_decr]==what)
+#define UNCATCH(what)						\
+    (exception_pop(what), 					\
+     global_exception_type[global_exception_index_decr]!=what?	\
+	print_exception_stack_error(2): 1)
 
 #define TRY else
 
