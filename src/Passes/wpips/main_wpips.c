@@ -7,9 +7,11 @@
  * FC.
  */
 
+extern char * pips_thanks(char *);
 extern int wpips_main(int, char**);
 
 int main(int argc, char ** argv)
 {
+    pips_thanks("wpips", argv[0]);
     return wpips_main(argc, argv);
 }
