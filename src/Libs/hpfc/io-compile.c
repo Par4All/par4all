@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: io-compile.c,v $ ($Date: 1996/11/14 14:36:40 $, )
+ * $RCSfile: io-compile.c,v $ ($Date: 1996/11/14 14:40:13 $, )
  * version $Revision$
  */
 
@@ -54,10 +54,15 @@ current_entity_is_used_later_p(statement stat, entity current_entity)
     MAP(EFFECT, current_effect,
 	{
 	    if (effect_variable(current_effect)==current_entity)
-		return TRUE;
+		{
+		    free_out_regions_map();
+		    return TRUE;
+		}
+	    
 	},
-	list_out);
-    
+	list_out);    
+
+    free_out_regions_map();
     return FALSE;
 }
 
@@ -87,10 +92,14 @@ current_entity_is_updated_before_p(statement stat, entity current_entity)
     MAP(EFFECT, current_effect,
 	{
 	    if (effect_variable(current_effect)==current_entity)
-		return TRUE;
+		{
+		    free_in_regions_map();
+		    return TRUE;
+		}
 	},
 	list_in);
-    
+
+    free_in_regions_map();
     return FALSE;
 }
 
