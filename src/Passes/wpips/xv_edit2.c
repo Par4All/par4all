@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/04/30 14:58:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/04/30 15:17:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_edit2[] = "%A% ($Date: 1997/04/30 14:58:52 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
+char vcid_xv_edit2[] = "%A% ($Date: 1997/04/30 15:17:53 $, ) version $Revision$, got on %D%, %T% [%P%].\n École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -479,7 +479,6 @@ void
 view_notify(Menu menu,
             Menu_item menu_item)
 {
-    wpips_view_menu_layout_line * current_view;
     /* Translate the menu string in a resource name: */
     char * label = (char *) xv_get(menu_item, MENU_STRING);
     wpips_execute_and_display_something_from_alias(label);
