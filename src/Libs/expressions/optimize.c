@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.5  1998/09/14 12:50:15  coelho
+ * more comments.
+ *
  * Revision 1.4  1998/09/14 12:34:11  coelho
  * added import from eole and substitution in module code.
  *
@@ -35,9 +38,16 @@
 
 #define DEBUG_NAME "TRANSFORMATION_OPTIMIZE_EXPRESSIONS_DEBUG_LEVEL"
 
+
+/********************************************************* INTERFACE TO EOLE */
+
 /* the list of right hand side expressions.
  */
 static list /* of expression */ rhs;
+
+/* the current list of loop indices for the expression (not used yet).
+ */
+static list /* of entity */ indices; 
 
 /* rhs expressions of assignments.
  */
@@ -76,6 +86,7 @@ get_list_of_rhs(statement s)
 }
 
 /* export a list of expression of the current module.
+ * done thru a convenient reference.
  */
 static void write_list_of_rhs(FILE * out, list /* of expression */ le)
 {
@@ -114,7 +125,8 @@ read_from_eole(string module, string file_name)
     
     fromeole = safe_fopen(file_name, "r");
 
-    /* read entites to create... 
+    /* read entities to create... 
+     * should use some newgen type to do so (to share buffers...)
      */
 
     astuce = read_reference(fromeole);
@@ -136,9 +148,11 @@ swap_syntax_in_expression(
 
     for(; lcode; lcode=CDR(lcode), lnew=CDR(lnew))
     {
-	expression 
-	    old = EXPRESSION(CAR(lcode)),
-	    new = EXPRESSION(CAR(lnew));
+	expression old, new;
+
+	old = EXPRESSION(CAR(lcode));
+	new = EXPRESSION(CAR(lnew));
+
 	syntax tmp = expression_syntax(old);
 	expression_syntax(old) = expression_syntax(new);
 	expression_syntax(new) = tmp;	
@@ -150,6 +164,9 @@ swap_syntax_in_expression(
 
 #define PIPS_EOLE	"newgen_eole"
 #define PIPS_EOLE_FLAGS	"-nfmd"
+
+
+/*************************************************** INTERFACE FROM PIPSMAKE */
 
 /* pipsmake interface.
  */
@@ -171,6 +188,12 @@ bool optimize_expressions(string module_name)
 
     /* do something here.
      */
+
+    /* Could perform more optimizations here...
+     */
+
+    /* begin EOLE stuff
+     */
     in = safe_new_tmp_file(IN_FILE_NAME);
     out = safe_new_tmp_file(OUT_FILE_NAME);
 
@@ -183,25 +206,30 @@ bool optimize_expressions(string module_name)
     cmd = strdup(concatenate(
 	PIPS_EOLE " " PIPS_EOLE_FLAGS " -o ", in, " ", out, NULL));
 
-    pips_debug(2, "executing %s\n", cmd);
+    pips_debug(2, "executing: %s\n", cmd);
+
     safe_system(cmd);
 
     ln = read_from_eole(module_name, in);
     swap_syntax_in_expression(le, ln);
-    gen_free_list(ln), ln=NIL;
 
-    /* remove temorary files.
+    /* remove temorary files and free allocated memory.
      */
     safe_unlink(out);
     safe_unlink(in);
+
+    gen_free_list(ln), ln=NIL;
     free(out), out = NULL;
     free(in), in = NULL;
     free(cmd), cmd = NULL;
 
-    /* Should perform more optimizations here...
+    /* end EOLE stuff.
      */
 
-    /* return result.
+    /* Could perform more optimizations here...
+     */
+
+    /* return result to pipsdbm
      */
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, s);
 
