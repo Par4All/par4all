@@ -1222,3 +1222,15 @@ transformer transformer_derivative_fix_point(transformer tf)
   
   return fix_tf;
 }
+
+/* Computation of a fix point: drop all constraints, remember which
+ * variables are changed.
+ *
+ */
+transformer transformer_basic_fix_point(transformer tf)
+{
+  transformer fix_tf = transformer_identity();
+  transformer_arguments(fix_tf) = gen_copy_seq(transformer_arguments(tf));
+
+  return fix_tf;
+}
