@@ -277,11 +277,20 @@ Int     : READ_INT   {
 
 String  : READ_STRING {
 		extern char literal[] ;
-		char *p = alloc( strlen( literal ) + 1) ;
-		gen_chunk *obj = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
+		gen_chunk *obj = (gen_chunk *)alloc(sizeof(gen_chunk));
+		char * p;
 
-		strcpy( p, literal ) ; 
-		literal[ 0 ] = '\0' ;
+		/* special management of string_undefined... FC. 12/95.
+		 */
+		if (disk_string_undefined_p(literal))
+		    p = string_undefined;
+		else
+		{
+		    p = alloc(strlen(literal)+1);
+		    strcpy(p, literal); 
+		}
+
+		literal[0] = '\0' ;
 		obj->s = p ;
 		$$ = obj ;
 	    }
