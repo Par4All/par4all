@@ -1,7 +1,7 @@
 c
 c COMMON /HPFC_PROCS/
 c
-c $RCSfile: hpfc_procs.m4h,v $ ($Date: 1994/09/05 15:56:38 $, )
+c $RCSfile: hpfc_procs.m4h,v $ ($Date: 1994/09/07 10:46:18 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -25,7 +25,9 @@ c
      $     MYLID, MYTID, HOSTTID, NODETIDS, NBOFTASKS, MYPOS,
      $     NODECHANNELS, HOSTCHANNEL,  MCASTHOST, MCASTNODES
       character*32 
-     $     NODE_PROGRAM_NAME, NODE_ARCHITECTURE
+     $     NODE_PROGRAM_NAME, 
+     $     NODE_ARCHITECTURE,
+     $     HPFC_GROUP_NAME
 c
 c
 c that s all
