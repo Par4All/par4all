@@ -513,7 +513,7 @@ Psysteme sc1,sc2;
     assert(!SC_UNDEFINED_P(sc1) && (sc_dimension(sc1) != 0));
     assert(!SC_UNDEFINED_P(sc2) && (sc_dimension(sc2) != 0));
     
-    ifscdebug(1) {
+    ifscdebug(7) {
 	fprintf(stderr, "[sc_convex_hull] considering:\n");
 	sc_default_dump(sc1);
 	sc_default_dump(sc2);
@@ -534,7 +534,7 @@ Psysteme sc1,sc2;
     a2 = Matrix_Alloc(nbrows2, nbcolumns2);
     sc_to_matrix(sc2,a2);
 
-    ifscdebug(2) {
+    ifscdebug(8) {
 	fprintf(stderr, "[sc_convex_hull]\na1 =");
 	Matrix_Print(stderr, "%4d",a1);
 	fprintf(stderr, "\na2 =");
@@ -546,7 +546,7 @@ Psysteme sc1,sc2;
     A2 = Constraints2Polyhedron(a2, 20000);
     Matrix_Free(a2);
 
-    ifscdebug(2) {
+    ifscdebug(8) {
 	fprintf(stderr, "[sc_convex_hull]\nA1 =");
 	Polyhedron_Print(stderr, "%4d",A1);
 	fprintf(stderr, "\nA2 =");
