@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/06/20 14:59:56 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/07/24 12:53:04 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -457,10 +457,17 @@ To print the dependence graph without the non-loop-carried dependences:
 PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
 \end{verbatim}
 
-Top print the dependence graph with the dependence cones:
+To print the dependence graph with the dependence cones:
 
 \begin{verbatim}
 PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES FALSE
+\end{verbatim}
+
+To print the dependence graph in a computer friendly format defined by
+Deborah Whitfield (SRU):
+
+\begin{verbatim}
+PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT FALSE
 \end{verbatim}
 
 \subsubsection{Optimization}
