@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 2000/04/19 14:01:36 $, )
+ * $RCSfile: list.c,v $ ($Date: 2000/07/05 08:42:40 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -399,24 +399,32 @@ list gen_last(list l)
     while (!ENDP(CDR(l))) l=CDR(l); /* else go to the last */
     return(l);
 }
-	
-void gen_remove(list * cpp, void * vo)
+
+static void gen_remove_from_list(list * pl, void * o, bool once)
 {
-    gen_chunk * obj = (gen_chunk*) vo;
+  list * pc = pl;
+  while (*pc)
+  {
+    if ((gen_chunk*) o == CHUNK(CAR(*pc)))
+    {
+      list tmp = *pc;
+      *pc = CDR(*pc);
+      free(tmp);
+      if (once) return;
+    }
+    else 
+      pc = &CDR(*pc);
+  }
+}
+	
+void gen_remove(list * cpp, void * o)
+{
+  gen_remove_from_list(cpp, o, FALSE);
+}
 
-    if( ENDP( *cpp )) {
-	return ;
-    }
-    if( obj == CHUNK( CAR( *cpp ))) {
-	cons *aux = *cpp ;
-
-	*cpp = CDR( *cpp ) ;
-	free( aux ) ;
-	gen_remove( cpp, obj ) ;
-    }
-    else {
-	gen_remove( &CDR( *cpp ), obj ) ;
-    }
+void gen_remove_once(list * pl, void * o)
+{
+  gen_remove_from_list(pl, o, TRUE);
 }
 
 /*  caution: the first item is 0!
