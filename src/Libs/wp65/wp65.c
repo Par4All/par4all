@@ -13,8 +13,17 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "boolean.h"
+#include "arithmetique.h"
+#include "vecteur.h"
+#include "contrainte.h"
+#include "sc.h"
+#include "ray_dte.h"
+#include "sommet.h"
+#include "polyedre.h"
+#include "sg.h"
+
 #include "genC.h"
-#include "misc.h"
 #include "ri.h"
 
 #include "graph.h"
@@ -22,6 +31,7 @@
 #include "database.h"
 #include "text.h"
 #include "dg.h"
+#include "misc.h"
 #include "properties.h"
 #include "arithmetique.h"
 #include "prettyprint.h"
