@@ -52,6 +52,8 @@
 #include "effects-simple.h"
 #include "conversion.h"
 
+#include "transformations.h"
+
 /* The following data structure is the context of top_down_abc:
    The read_marked_list marks if one bound of one array's dimension
    is tested or not, for the READ regions. 
