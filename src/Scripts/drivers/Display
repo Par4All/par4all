@@ -188,10 +188,9 @@ fi
 . $PIPS_CURRENT_PROGRAM
 
 
-uppercase () {
-tr a-z A-Z <<%
-$*
-%
+uppercase()
+{
+  echo "$*" | tr a-z A-Z 
 }
 
 if [ -n "$LAST" ]
