@@ -30,7 +30,8 @@ SRC_MACROS =	auto.h \
 		makefile_macros.SOL2LL \
 		makefile_macros.GPROF \
 		makefile_macros.IBMAIX \
-		makefile_macros.IBMAIXLL
+		makefile_macros.IBMAIXLL \
+		makefile_macros.CRAY-T3D
 
 DDC_MACROS = 	define_libraries.make \
 		auto-dash.h \
