@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1996/08/31 16:45:33 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1996/10/18 18:40:09 $, )
  * version $Revision$
  *
  * Compiler
@@ -659,6 +659,10 @@ hpf_compiler(
     list /* of hpfc_reduction */ lr = NIL;
 
     DEBUG_STAT(9, "stat is", stat);
+    pips_debug(9, "only io %d, remapping %d, reduction %d\n",
+	       load_statement_only_io(stat),
+	       bound_renamings_p(stat),
+	       bound_hpf_reductions_p(stat));
 
     if (load_statement_only_io(stat)==1) /* necessary */
     {
