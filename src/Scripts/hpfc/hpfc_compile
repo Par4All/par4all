@@ -3,13 +3,13 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/08/22 14:32:24 $, 
+# $Date: 1996/08/22 14:43:22 $, 
 
 sh=`basename $0`
 STATUS='0'
-VERBOSE=':'
+verbose=':'
 VERBOSEARG=
-DEBUG=':'
+debug=':'
 DEBUGARG=
 DELETE=':'
 MAKE=':'
@@ -26,12 +26,12 @@ rm -f $TMP.*
 #
 # functions
 
-verbose()
+verb()
 {
   echo "$sh: $@"
 }
 
-debug()
+deb()
 {
   echo "$sh: $@" >&2
 }
@@ -39,7 +39,7 @@ debug()
 default_module()
 {
   sed -n 's,^       *[Pp][Rr][Oo][Gg][Rr][Aa][Mm] \([^ ]*\),\1,p' $@ |
-  tr 'a-z' 'A-Z'
+  tr '[a-z]' '[A-Z]'
 }
 
 #
@@ -85,9 +85,9 @@ do
     i) NOINSTALL='1' ; HPFC='-p HPFC_CLOSE' ;;
     p) PIPS="$OPTARG" ;;
     r) REDIRECT=':' ;;
-    v) VERBOSE='verbose' ;;
-    x) VERBOSE=':' ;;
-    D) DEBUG='debug' ;;
+    v) verbose='verb' ;;
+    x) verbose=':' ;;
+    D) debug='deb' ;;
     d) DELETE='Delete' ;;
     M) MAKE='gmake' ;;
     q) STDOUT='/dev/null' ;;
@@ -99,7 +99,7 @@ do
 	 demo)
 	     STDERR='/dev/null' ;
 	     PIPSPROP='-1 HPFC_NO_WARNING -1 NO_USER_WARNING' ;
-	     VERBOSE='verbose' ;
+	     verbose='verb' ;
 	     HPFC='-p HPFC_INSTALL' ;;
 	 full)
 	     DELETE='Delete' ;
@@ -112,14 +112,14 @@ do
 	     DUMPFILES=':' ;
 	     NOINSTALL=':' ;
 	     REDIRECT=':' ;
-	     VERBOSE=':' ;
+	     verbose=':' ;
 	     DELETE='Delete' ;;
 	 debug)
 	     VERBOSEARG='-v'
 	     DEBUGARG='-d'
 	     PIPSPROP='-0 HPFC_NO_WARNING -0 NO_USER_WARNING -1 LOG_TIMINGS' ;
-	     VERBOSE='verbose' ;
-	     DEBUG='debug' ;
+	     verbose='verb' ;
+	     debug='deb' ;
 	     DELETE=':'	;
 	     REDIRECT=':' ;;
 	 *)  echo "no $OPTARG keyword" ;
@@ -149,25 +149,31 @@ FAKES="`egrep '^[Cc!\*][Ff][Cc][Dd]\\\$ [ 	]*([Ss][Yy][Nn][Cc][Hh][Rr][Oo]|[Tt][
 
 if [ "$FAKES" ] 
 then
-   $DEBUG "adding needed fake file"
-   HPFFILES="$HPFFILES $PIPS_ROOT/Runtime/hpfc/hpfc_fake.f"
+   $debug "adding needed fake file"
+   if [ -f ${HPFC_RUNTIME}/hpfc_fake.f ]
+   then 
+      fake="${HPFC_RUNTIME}/hpfc_fake.f"
+   else
+      fake="${PIPS_ROOT}/Runtime/hpfc/hpfc_fake.f"
+   fi
+   HPFFILES="$HPFFILES $fake"
 else
-   $DEBUG "no fake file needed"
+   $debug "no fake file needed"
 fi
 
-$VERBOSE "applying hpfc on file(s):"
+$verbose "applying hpfc on file(s):"
 for f in $HPFFILES
 do
-  $VERBOSE " - $f"
+  $verbose " - $f"
   FILES="$FILES -f $f"
 done
 
-$DEBUG "`type $PIPS`"
+$debug "`type $PIPS`"
 
 #
 # PIPS execution with possible redirections...
 
-[ "$DEBUG" != : ] && set -x
+[ "$debug" != : ] && set -x
 
 eval $PIPS $FILES $PIPSARGS $HPFC $PIPSPROP $TIMEPROP -m $MODULE $WORKSPACE \
 	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
@@ -177,13 +183,13 @@ set +x
 
 [ "$STATUS" -eq 0 ] || 
 {
-  $VERBOSE "exiting - pips error"
+  $verbose "exiting - pips error"
   exit $STATUS
 }
 
 [ "$NOINSTALL" ] ||
 {
-  $VERBOSE "installing generated codes"
+  $verbose "installing generated codes"
 
   [ -d $WORKSPACE.hpfc ] && rm -rf $WORKSPACE.hpfc
   mv  $WORKSPACE.database/hpfc $WORKSPACE.hpfc
@@ -191,7 +197,7 @@ set +x
 
 [ "$DUMPFILES" ] &&
 {
-  $VERBOSE "dumping generated files"
+  $verbose "dumping generated files"
 
   DBDIR=$WORKSPACE.database
 
@@ -218,19 +224,19 @@ set +x
   
 [ "$DELETE" = : ] ||
 {
-  $VERBOSE "deleting $WORKSPACE workspace"
+  $verbose "deleting $WORKSPACE workspace"
   $DELETE $WORKSPACE
 }
 
 [ "$MAKE" = : ] ||
 {
-  $VERBOSE "making $WORKSPACE"
+  $verbose "making $WORKSPACE"
   cd $WORKSPACE.hpfc
   eval $MAKE all \
   	${REDIRECT:+">&2"} ${STDOUT:+"> $STDOUT"} ${STDERR:+"2> $STDERR"}
 }
 
-$VERBOSE "done"
+$verbose "done"
 
 exit $STATUS
 
