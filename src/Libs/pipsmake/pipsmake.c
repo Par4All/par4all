@@ -1,5 +1,5 @@
 /* $RCSfile: pipsmake.c,v $ (version $Revision$)
- * $Date: 1997/09/25 14:16:15 $, 
+ * $Date: 1997/09/26 07:25:55 $, 
  * pipsmake: call by need (make),
  *
  * rule selection (activate),
@@ -207,35 +207,11 @@ void init_make_cache()
     up_to_date_resources = set_make(set_pointer);
 }
 
-void reinit_make_cache_if_necessary()
+void 
+reinit_make_cache_if_necessary()
 {
     if (!set_undefined_p(up_to_date_resources))
 	reset_make_cache(), init_make_cache();
-}
-
-static bool make(string rname, string oname)
-{
-    bool success_p = TRUE;
-
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
-    debug(1, "make", "%s(%s) - requested\n", rname, oname);
-
-    init_make_cache();
-
-    dont_interrupt_pipsmake_asap();
-    save_active_phases();
-
-    success_p = rmake(rname, oname);
-
-    reset_make_cache();
-    retrieve_active_phases();
-
-    pips_debug(1, "%s(%s) - %smade\n", 
-	       rname, oname, success_p? "": "could not be ");
-
-    debug_off();
-
-    return success_p;
 }
 
 static bool 
@@ -248,7 +224,7 @@ rmake(string rname, string oname)
 
     /* is it up to date ? */
     if (db_resource_p(rname, oname)) {
-	res = db_get_memory_resource(rname, oname, TRUE);
+	res = db_get_resource_id(rname, oname);
 	if(set_belong_p(up_to_date_resources, (char *) res)) {
 	    debug(5, "rmake", "resource %s(%s) found in up_to_date "
 		      "with time stamp %d\n",
@@ -260,9 +236,8 @@ rmake(string rname, string oname)
     }
     
     /* we look for the active rule to produce this resource */
-    if ((ru = find_rule_by_resource(rname)) == rule_undefined) {
-	pips_error("rmake", "could not find a rule for %s\n", rname);
-    }
+    if ((ru = find_rule_by_resource(rname)) == rule_undefined)
+	pips_internal_error("could not find a rule for %s\n", rname);
 
     /* we recursively make the pre transformations */
     if (!make_pre_transformation(oname, ru))
@@ -274,10 +249,9 @@ rmake(string rname, string oname)
 
     if (check_resource_up_to_date (rname, oname)) 
     {
-	debug (8,"rmake",
-	       "Resource %s(%s) becomes up-to-date after applying"
-	       "pre-transformations and building required resources\n",
-	       rname,oname);
+	pips_debug (8, "Resource %s(%s) becomes up-to-date after applying"
+		    "pre-transformations and building required resources\n",
+		    rname,oname);
     } else {
 	bool success = FALSE;
 
@@ -293,22 +267,43 @@ rmake(string rname, string oname)
 	    
 	    if (db_resource_p(rrrn, rron)) 
 	    {
-		res = db_get_memory_resource(rrrn, rron, TRUE);
-		debug(5, "rmake", "resource %s(%s) added to up_to_date "
-		      "with time stamp %d\n",
-		      rname, oname, db_time_of_resource(rrrn, rron));
+		res = db_get_resource_id(rrrn, rron);
+		pips_debug(5, "resource %s(%s) added to up_to_date "
+			   "with time stamp %d\n",
+			   rname, oname, db_time_of_resource(rrrn, rron));
 		set_add_element(up_to_date_resources, 
 				up_to_date_resources, res);
 	    }
 	    else {
-		pips_error("rmake", 
-			   "resource %s(%s) just built is not found!\n",
-			   rname,
-			   oname);
+		pips_internal_error("resource %s(%s) just built not found!\n",
+				    rname, oname);
 	    }
 	}, build_real_resources(oname, rule_produced(ru)));
     }
     return TRUE;
+}
+
+static bool 
+make(string rname, string oname)
+{
+    bool success_p = TRUE;
+
+    debug(1, "make", "%s(%s) - requested\n", rname, oname);
+
+    init_make_cache();
+
+    dont_interrupt_pipsmake_asap();
+    save_active_phases();
+
+    success_p = rmake(rname, oname);
+
+    reset_make_cache();
+    retrieve_active_phases();
+
+    pips_debug(1, "%s(%s) - %smade\n", 
+	       rname, oname, success_p? "": "could not be ");
+
+    return success_p;
 }
 
 /* Apply do NOT activate the rule applied. 
@@ -320,7 +315,8 @@ rmake(string rname, string oname)
  * Safe apply checks if the rule applied is activated and produces ressources 
  * that it requires (no transitive closure) --DB 8/96
  */
-static bool apply(string pname, string oname)
+static bool 
+apply(string pname, string oname)
 {
     bool success_p = TRUE;
 
@@ -775,9 +771,8 @@ check_physical_resource_up_to_date(string rname, string oname)
     if (res_in_modified_list_p == FALSE)
     {
 	if (!db_resource_p(rrrn, rron)) {
-	    debug(5, "check_resource_up_to_date",
-	    "resource %s(%s) is not there and not in the rule_modified list",
-		  rrrn, rron);
+	    pips_debug(5, "resource %s(%s) is not there "
+		       "and not in the rule_modified list", rrrn, rron);
 	    result = FALSE;
 	    break;
 	} else {
@@ -785,8 +780,7 @@ check_physical_resource_up_to_date(string rname, string oname)
 	    long rest;
 	    long respt;
 	    if (check_resource_up_to_date(rrrn, rron) == FALSE) {
-		debug(5, "check_resource_up_to_date",
-		      "resource %s(%s) is not up to date", rrrn, rron);
+		pips_debug(5, "resource %s(%s) is not up to date", rrrn, rron);
 		result = FALSE;
 		break;
 	    }
@@ -795,10 +789,9 @@ check_physical_resource_up_to_date(string rname, string oname)
 	    /* Check if the timestamp is OK */
 	    if (rest<respt)
 	    {
-		debug(5, "check_resource_up_to_date",
-		      "resource %s(%s) with time stamp %ld is newer "
-		      "than resource %s(%s) with time stamp %ld\n",
-		      rrrn, rron, respt, rname, oname, rest);
+		pips_debug(5, "resource %s(%s) with time stamp %ld is newer "
+			   "than resource %s(%s) with time stamp %ld\n",
+			   rrrn, rron, respt, rname, oname, rest);
 		result = FALSE;
 		break;
 	    }
@@ -810,10 +803,9 @@ check_physical_resource_up_to_date(string rname, string oname)
 
   /* If the resource is up to date then add it in the set */
   if (result == TRUE) {
-      debug(5, "check_resource_up_to_date",
-	    "resource %s(%s) added to up_to_date "
-	    "with time stamp %d\n",
-	    rname, oname, db_time_of_resource(rname, oname));
+      pips_debug(5, "resource %s(%s) added to up_to_date "
+		 "with time stamp %d\n",
+		 rname, oname, db_time_of_resource(rname, oname));
       set_add_element(up_to_date_resources, up_to_date_resources, res);
   }
   return result;
@@ -974,14 +966,16 @@ void do_resource_usage_check(string oname, rule ru)
     set_clear(res_write);
 }
 
-bool safe_make(res_n, module_n)
-string res_n, module_n;
+bool 
+safe_make(string res_n, string module_n)
 {
     jmp_buf long_jump_buffer;
     bool success = FALSE;
     bool print_timing_p = get_bool_property("LOG_TIMINGS");
     bool print_memory_usage_p = get_bool_property("LOG_MEMORY_USAGE");
     double initial_memory_size = 0.;
+
+    debug_on("PIPSMAKE_DEBUG_LEVEL");
 
     if(find_rule_by_resource(res_n) == rule_undefined) {
 	user_warning("safe_make", "Unkown resource \"%s\"\n", res_n);
@@ -1045,12 +1039,12 @@ string res_n, module_n;
 	}
     }
     pop_pips_context();
-
+    debug_off();
     return success;
 }
 
-bool safe_apply(phase_n, module_n)
-string phase_n, module_n;
+bool 
+safe_apply(string phase_n, string module_n)
 {
     jmp_buf long_jump_buffer;
     bool success = FALSE;
@@ -1058,6 +1052,8 @@ string phase_n, module_n;
     bool print_memory_usage_p = get_bool_property("LOG_MEMORY_USAGE");
     double initial_memory_size = 0.;
     rule r;
+
+    debug_on("PIPSMAKE_DEBUG_LEVEL");
 
     if ((r = find_rule_by_phase(phase_n)) == rule_undefined) {
 	pips_user_warning("Unkown phase/rule \"%s\" for %s\n", 
@@ -1130,12 +1126,6 @@ string phase_n, module_n;
 	}
     }
     pop_pips_context();
-
+    debug_off();
     return success;
 }
-
-
-
-
-
-
