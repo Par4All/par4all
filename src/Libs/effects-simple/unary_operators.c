@@ -43,16 +43,14 @@ effect
 reference_to_simple_effect(reference ref, action ac)
 {
 /* It shoulb be this one, but it does not work. Maybe there is a clash with
-   old uses of make_simple_effects. Or persistancy is not properly handled? - bc.
-   */
-/*    cell cell_ref = make_cell(is_cell_reference, copy_reference(ref)); */
-    cell cell_ref = make_cell(is_cell_preference, 
-			      make_preference(reference_dup(ref)));
-    approximation ap = make_approximation(is_approximation_must, UU);
-    effect eff;
-
-    eff = make_effect(cell_ref, ac, ap, make_descriptor(is_descriptor_none,UU));  
-    return(eff);
+   old uses of make_simple_effects. Or persistancy is not properly handled? 
+   - bc.
+*/
+  /* cell cell_ref = make_cell(is_cell_reference, copy_reference(ref)); */
+  cell cell_ref = make_cell(is_cell_preference, make_preference(ref));
+  approximation ap = make_approximation(is_approximation_must, UU);
+  effect eff = make_effect(cell_ref, ac, ap, make_descriptor_none());  
+  return eff;
 }
 
 /*********************************************************************************/
