@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/10 11:45:32 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/10 14:22:05 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -237,6 +237,10 @@ $(LIB_TARGET): $(LIB_OBJECTS) $(TARGET_OBJECTS)
 		\`lorder $(LIB_OBJECTS) $(TARGET_OBJECTS)| tsort\`
 	ranlib $(LIB_TARGET)
 
+$(PIPS_LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
+	cp $(LIB_TARGET) $(PIPS_LIBDIR)
+	ranlib $(PIPS_LIBDIR)/$(LIB_TARGET)
+
 %
 
 [ $DIRTYPE = 'Scripts' ] && cat >> $MAKEFILE <<%
@@ -281,10 +285,6 @@ ttest: $(LIB_TARGET)
 $(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
 	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS)
 	@echo 
-
-$(PIPS_LIBDIR)/$(LIB_TARGET): $(LIB_TARGET) 
-	cp $(LIB_TARGET) $(PIPS_LIBDIR)
-	ranlib $(PIPS_LIBDIR)/$(LIB_TARGET)
 
 clean:
 	-$(RM) TAGS $(OBJECTS) $(INC_TARGET) $(LIB_TARGET) \\
