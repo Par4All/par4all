@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_hash.h,v $ ($Date: 1995/03/17 17:11:31 $, )
+/* $RCSfile: newgen_hash.h,v $ ($Date: 1995/03/20 14:33:07 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -77,6 +77,7 @@ extern void hash_warn_on_redefinition GEN_PROTO(());
 extern void hash_dont_warn_on_redefinition GEN_PROTO(());
 extern char *hash_del GEN_PROTO((hash_table, char *));
 extern char *hash_get GEN_PROTO((hash_table, char *));
+extern bool hash_defined_p GEN_PROTO((hash_table, char *));
 extern void hash_put GEN_PROTO((hash_table, char *, char *));
 extern void hash_table_clear GEN_PROTO((hash_table));
 extern void hash_table_free GEN_PROTO((hash_table));
