@@ -34,8 +34,8 @@
 
 bool tpips_execution_mode = TRUE;
 
-static bool use_readline;
-static FILE *logfile;
+static bool use_readline = FALSE;
+static FILE * logfile;
 static FILE * current_file; /* current file being processed */
 
 extern int tgetnum();
@@ -68,8 +68,6 @@ static char * tpips_read_a_line(char *);
 
 /***************************************************** Some static variables */
 
-static char * line_to_parse;
-static char * line_parsed;
 static char ** current_completion_array;
 
 /****************************************** Parameter Completion definitions */
@@ -470,12 +468,8 @@ static void help_handler(char * line)
     printf("\n");
 }
 
-static void quit_handler(char * line)
+void tpips_close(void)
 {
-    /* FI: cannot be done here because debug_on() was called
-       in another function. Fortunately, it does not matter. */
-    /* debug_off(); */
-
     /*   close history: truncate list and write history file
      */
     if (use_readline)
@@ -491,40 +485,34 @@ static void quit_handler(char * line)
 	safe_fclose (logfile, "the log file");
 	logfile = NULL;
     }
+}
+
+static void quit_handler(char * line)
+{
+    /* FI: cannot be done here because debug_on() was called
+       in another function. Fortunately, it does not matter. */
+    /* debug_off(); */
+    tpips_close();
     exit(0);
 }
 
-static void set_line_to_parse(char * line)
-{
-    skip_blanks(line);
-
-    /* store line pointer */
-    line_parsed = line_to_parse = line;
-
-    /* cut line at the beginning of comments */
-    while (*line)
-    {
-	if ((*line) == TPIPS_COMMENT_PREFIX)
-	{
-	    *line = 0;
-	    break;
-	}
-	line++;
-    }
-}
+/* in lex file
+ */
+extern void tpips_set_line_to_parse(char*);
+extern char * tpips_get_line_to_parse(void);
 
 static void default_handler(char * line)
 {
-    set_line_to_parse(line);
+    tpips_set_line_to_parse(line);
 
     /* parse if non-null line */
-    if (*line_to_parse) {
+    if (*tpips_get_line_to_parse()) {
 	tp_init_lex ();
 	tp_parse ();
     }
 
     /* error if some characters are still here */
-    if (*line_to_parse) {
+    if (*tpips_get_line_to_parse()) {
  	tp_error("syntax error: cannot parse the end of the line");
     }
 }
@@ -709,14 +697,54 @@ static char * substitute_variables(char * line)
     return strdup(sbuffer);
 }
 
+static char * last = NULL;
+
+void tpips_exec(char * line)
+{
+    jmp_buf pips_top_level;
+
+    pips_debug(3, "considering line: %s\n", line? line: " --- empty ---");
+
+    if (setjmp(pips_top_level)) 
+    {
+	pips_debug(2, "restating tpips scanner\n");
+	tp_restart(tp_in);
+    }
+    else 
+    {
+	char * sline; /* after environment variable substitution */
+	
+	push_pips_context(&pips_top_level);
+	/*   add to history if not the same as the last one.
+	 */
+	if (use_readline &&
+	    (line && *line && ((last && strcmp(last, line)!=0) || (!last))) &&
+	    (strncmp (line,QUIT,strlen (QUIT))))
+	{
+	    add_history(line);
+	    last = strdup(line);
+	}
+
+	/*   call the appropriate handler.
+	 */
+	pips_debug(2, "restarting tpips scanner\n");
+	tp_restart(tp_in);
+	skip_blanks(line);
+	
+	sline = substitute_variables(line);
+	(find_handler(sline))(sline);
+	free(sline), sline = (char*) NULL;
+    }
+
+    pop_pips_context();
+}
+
 /* processing command line per line
  */
 static void process_a_file(void)
 {
-    char *last = NULL;
-    char *line;
-    jmp_buf pips_top_level;
     static readline_initialized = FALSE;
+    char * line;
 
     if ((use_readline) && (readline_initialized == FALSE))
     {
@@ -730,37 +758,7 @@ static void process_a_file(void)
     /*  interactive loop
      */
     while ((line = tpips_read_a_line(TPIPS_PRIMARY_PROMPT)))
-    {
-	pips_debug(3, "considering line: %s\n", line? line: " --- empty ---");
-	if (setjmp(pips_top_level)) {
-	    pips_debug(2, "restating tpips scanner\n");
-	    tp_restart(tp_in);
-	}
-	else {
-	    char * sline; /* after environment variable substitution */
-
-	    push_pips_context(&pips_top_level);
-	    /*   add to history if not the same as the last one.
-	     */
-	    if (use_readline &&
-	  (line && *line && ((last && strcmp(last, line)!=0) || (!last))) &&
-		(strncmp (line,QUIT,strlen (QUIT))))
-	    {
-		add_history(line);
-		last = strdup(line);
-	    }
-	    /*   calls the appropriate handler.
-	     */
-	    pips_debug(2, "restarting tpips scanner\n");
-	    tp_restart(tp_in);
-	    skip_blanks(line);
-
-	    sline = substitute_variables(line);
-	    (find_handler(sline))(sline);
-	    free(sline), sline = (char*) NULL;
-	}
-	pop_pips_context();
-    }
+	tpips_exec(line);
 }
 
 static void parse_arguments(int argc, char * argv[])
@@ -789,7 +787,7 @@ static void parse_arguments(int argc, char * argv[])
             break;
 	}
 
-    if (argc == optind ) {
+    if (argc == optind) {
 	use_readline = isatty(0);
 	pips_debug(1, "reading from stdin, which %s a tty\n",
 		   use_readline ? "is" : "is not");
@@ -824,12 +822,8 @@ static void parse_arguments(int argc, char * argv[])
     }
 }
 
-/* MAIN: interactive loop and history management.
- */
-int tpips_main(int argc, char * argv[])
+void tpips_init(void)
 {
-    debug_on("TPIPS_DEBUG_LEVEL");
-
     pips_checks();
 
     initialize_newgen();
@@ -837,9 +831,19 @@ int tpips_main(int argc, char * argv[])
     initialize_signal_catcher();
 
     set_bool_property("ABORT_ON_USER_ERROR", FALSE);
+
     pips_log_handler = tpips_user_log;
     pips_request_handler = tpips_user_request;
     pips_error_handler = tpips_user_error;
+}
+
+/* MAIN: interactive loop and history management.
+ */
+int tpips_main(int argc, char * argv[])
+{
+    debug_on("TPIPS_DEBUG_LEVEL");
+
+    tpips_init();
 
     parse_arguments(argc, argv);
 
@@ -848,27 +852,6 @@ int tpips_main(int argc, char * argv[])
     return 0;			/* statement not reached ... */
 }
 
-int tpips_lex_input ()
-{
-    char c = *line_to_parse;
-    pips_debug(9,"input char '%c'(0x%2x) from input\n", c, c);
-    if (c) line_to_parse++;
-    return (int) c;
-}
-
-void tpips_lex_unput(int c)
-{
-    pips_debug(9,"unput char '%c'(0x%2x)\n", c,c);
-    pips_assert("some place to unput a char", line_parsed<line_to_parse);
-
-    *(--line_to_parse) = (char) c;
-}
-
-void tpips_lex_print_pos(FILE* fout)
-{
-    fprintf(fout,"%s\n",line_parsed);
-    fprintf(fout,"%*s^\n",(int)((long) line_to_parse - (long)line_parsed),"");
-}
 
 /* Tell the GNU Readline library how to complete.  We want to try to complete
  * on command names if this is the first word in the line, or on filenames
