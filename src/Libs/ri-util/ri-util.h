@@ -733,8 +733,6 @@ extern void set_last_statement(statement /*s*/);
 extern void reset_last_statement(void);
 extern bool last_statement_p(statement /*s*/);
 extern text text_named_module(entity /*name*/, entity /*module*/, statement /*stat*/);
-extern void my_print(text /*t*/);
-extern text my_text_named_module(entity /*module*/, statement /*stat*/);
 extern text text_module(entity /*module*/, statement /*stat*/);
 extern void output_a_graph_view_of_the_unstructured_successors(text /*r*/, entity /*module*/, int /*margin*/, control /*c*/);
 extern bool output_a_graph_view_of_the_unstructured_from_a_control(text /*r*/, entity /*module*/, int /*margin*/, control /*begin_control*/, control /*exit_control*/);
