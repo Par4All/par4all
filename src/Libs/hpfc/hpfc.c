@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1995/10/09 17:14:19 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1995/10/22 12:00:53 $, )
  * version $Revision$
  */
  
@@ -597,6 +597,19 @@ bool hpfc_make(string name)
     safe_system(concatenate("cd ", dir, "/hpfc ; $HPFC_MAKE make &", NULL));
 
     DB_PUT_FILE_RESOURCE(DBR_HPFC_CONSTRUCTION, strdup(name), NO_FILE);
+
+    debug_off();
+    return TRUE;
+}
+
+bool hpfc_run(string name)
+{
+    string dir = db_get_current_workspace_directory();
+
+    debug_on("HPFC_DEBUG_LEVEL");
+    pips_debug(1, "considering program %s\n", name);
+
+    safe_system(concatenate("cd ", dir, "/hpfc ; $HPFC_MAKE run &", NULL));
 
     debug_off();
     return TRUE;
