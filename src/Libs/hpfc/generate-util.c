@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/09/18 13:23:30 $, ) 
+ * ($Date: 1995/09/19 18:33:31 $, ) 
  */
 
 #include "defines-local.h"
@@ -527,6 +527,8 @@ make_list_of_constant(
  *       T_LID=CMP_LID(pn, pi...)
  *
  * if array is not NULL, partial according to array.
+ * the offset is shifted as if proc dimensions were normalized,
+ * in order to match the runtime library hpfc_broadcast_* expectations.
  */
 statement 
 hpfc_compute_lid(
@@ -552,21 +554,31 @@ hpfc_compute_lid(
     {
 	int size;
 	Pcontrainte c;
+	Pvecteur v;
 	statement result;
 
 	c = full_linearization(proc, lid, &size, creation, FALSE, 1);
+	v = contrainte_vecteur(c);
 
 	if (array)
 	{
-	    /* remove distributed dimensions form the constraint
+	    /* remove distributed dimensions from the constraint
+	     * and normalize the partial system so that dims are 0:...
 	     */
 	    int npdim;
 	    assert(array && !entity_undefined_p(array));
 	    
 	    for(npdim = NumberOfDimension(proc); npdim; npdim--)
 		if (processors_dim_replicated_p(proc, array, npdim))
-		    vect_erase_var(&contrainte_vecteur(c), 
-				   (Variable)creation(npdim));
+		{
+		    Variable var = (Variable) creation(npdim);
+		    int low, up, cf;
+
+		    get_entity_dimensions(proc, npdim, &low, &up);
+		    cf = vect_coeff(var, v);
+		    vect_add_elem(&contrainte_vecteur(c), var, (Value) -cf);
+		    vect_add_elem(&contrainte_vecteur(c), TCST, (Value) cf*low);
+		}
 	}
 
 	result = Pvecteur_to_assign_statement(lid, contrainte_vecteur(c));
