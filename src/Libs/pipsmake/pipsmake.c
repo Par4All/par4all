@@ -31,10 +31,8 @@
   *
   */
 #include <stdio.h>
-extern int fprintf();
-/* #include <stdlib.h> */
 #include <sys/types.h>
-
+#include <string.h>
 #include "genC.h"
 
 #include "ri.h"
@@ -48,12 +46,12 @@ extern int fprintf();
 #include "resources.h"
 #include "phases.h"
 #include "builder_map.h"
+#include "properties.h"
 #include "pipsmake.h"
 
 /*
  * static functions 
  */
-static list build_real_resources();
 static void update_preserved_resources();
 static void rmake();
 static void apply_a_rule();
@@ -76,7 +74,8 @@ rule ru;
     string rname;
     string rowner;
     bool is_required;
-
+    bool print_timing_p = get_bool_property("LOG_TIMINGS");
+    bool check_res_use_p = get_bool_property("CHECK_RESOURCE_USAGE");
     if (interrupt_pipsmake_asap_p())
 	return;
 
@@ -86,8 +85,10 @@ rule ru;
 	is_required = FALSE;
 
 	MAPL (prrr, {
-	    if ((same_string_p (rname, real_resource_resource_name(REAL_RESOURCE(CAR(prrr))))) &&
-		(same_string_p (rowner, real_resource_owner_name(REAL_RESOURCE(CAR(prrr))))))
+	    if ((same_string_p
+		 (rname, real_resource_resource_name(REAL_RESOURCE(CAR(prrr))))) &&
+		(same_string_p
+		 (rowner, real_resource_owner_name(REAL_RESOURCE(CAR(prrr))))))
 	    {
 		is_required = TRUE;
 		break;
@@ -103,7 +104,29 @@ rule ru;
 
     for (pbm = builder_maps; pbm->builder_name != NULL; pbm++) {
 	if (same_string_p(pbm->builder_name, run)) {
+
+	    if (check_res_use_p)
+		init_resource_usage_check();
+
+	    if (print_timing_p)
+		init_log_timers();
+
 	    (*pbm->builder_func)(oname);
+	    
+
+	    if (print_timing_p) {
+		string time_with_io,io_time;
+
+		get_string_timers (&time_with_io, &io_time);
+
+		user_log ("                                 time       ");
+		user_log (time_with_io);
+		user_log ("                                 IO time    ");
+		user_log (io_time);
+	    }
+
+	    if (check_res_use_p)
+		do_resource_usage_check(oname, ru);
 
 	    pips_malloc_debug();
 
@@ -340,7 +363,7 @@ string rname;
  *
  * In spite of the name, no resource is actually built.
  */
-static list build_real_resources(oname, lvr)
+list build_real_resources(oname, lvr)
 string oname;
 list lvr;
 {
@@ -560,24 +583,9 @@ string oname;
 {
     list reals;
 
-    /* we build the list of preserved real_resources */
-    reals = build_real_resources(oname, rule_preserved(ru));
+    /* We increment the logical time (kept by pipsdbm) */
+    db_inc_logical_time();
 
-    /* we update the timestamps of these resources */
-    MAPL(prr, {
-	real_resource rr = REAL_RESOURCE(CAR(prr));
-
-	string rron = real_resource_owner_name(rr);
-	string rrrn = real_resource_resource_name(rr);
-
-	debug(3, "update_preserved_resources",
-	      "%s(%s) is preserved\n", rrrn, rron);
-
-	db_update_time(rrrn, rron);
-	
-    }, reals);
-
-    gen_free_list (reals);
     /* we build the list of modified real_resources */
     reals = build_real_resources(oname, rule_modified(ru));
 
@@ -770,21 +778,45 @@ string rn;
 
 string get_first_main_module()
 {
-    int nmodules = 0;
-    char *module_list[ARGS_LENGTH];
 
-    /* int i;*/
-    string mmn = string_undefined;
+#define MAX__LENGTH 256
+
+    static char name[MAX__LENGTH];
+    char tmpfile[MAX__LENGTH];
+    FILE *ftmp;
+    int status;
+
+    extern int system(char*);
+    extern int unlink(char*);
 
     debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-    /* Get the module list */
-    db_get_module_list(&nmodules, module_list);
-    if (!nmodules)
-	return NULL;
+    strncpy (tmpfile,".seekfirstmainmoduleXXXXXX",MAX__LENGTH);
 
-    mmn = module_list[nmodules - 1];
+    mktemp (tmpfile);
+    if (!(*tmpfile))
+	pips_error("get_first_main_module",
+		   "unable to make a temporary file\n");
+
+    system(concatenate
+	   ("sed -n -e \"s;^      program[ \t][ \t]*\\([0-9a-zA-Z-_]*\\).*$;\\1;p\" ",
+	    db_get_current_workspace_directory(),
+	    "/*.f | tr a-z A-Z > ",
+	    tmpfile,
+	    NULL));
+
+    if ((ftmp = fopen (tmpfile,"r")) != NULL)
+    {
+	status = fscanf (ftmp,"%s\n", name);
+	fclose (ftmp);
+	unlink (tmpfile);
+	if (status != 1)	/* bad item has been read */
+	    *name = '\0';
+    }
 
     debug_off ();
-    return mmn;
+
+    if (*name == '\0')
+	return string_undefined;
+    return name;
 }
