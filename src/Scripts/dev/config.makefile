@@ -31,6 +31,8 @@ forward:
 	$(COPY) forward_gnu_makefile ${PIPS_SRCDIR}/Passes/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_SRCDIR}/Scripts/Makefile
 	$(COPY) forward_gnu_makefile ${PIPS_SRCDIR}/Runtime/Makefile
+	$(COPY) forward_gnu_makefile ${NEWGEN_DEVEDIR}/Makefile
+	$(COPY) forward_gnu_makefile ${NEWGEN_SRCDIR}/Makefile
 
 # that is all
 #
