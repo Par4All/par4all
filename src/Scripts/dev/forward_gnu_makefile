@@ -1,5 +1,5 @@
 # $RCSfile: forward_gnu_makefile,v $ (version $Revision$)
-# $Date: 1996/08/12 19:15:44 $, 
+# $Date: 1996/09/02 14:47:20 $, 
 # (c) Fabien COELHO July 1996
 #
 # This makefile forwards make targets to sub-directories...
@@ -29,6 +29,8 @@
 # FWD_OUT:
 #   where to redirect the output. default is nothing (stderr/stdout).
 #   one can suggest "2>&1 > /dev/null" for keeking stderr on stdout.
+# FWD_MKFLAGS:
+#   additional flags for make
 #
 # These variables may be overwritten on the command line as
 # gmake FWD_DIRS="foo" FWD_MSG="argh!" FWD_REPORT="> /dev/null" FWD_ROOT=$PWD
@@ -46,6 +48,7 @@ FWD_MSG		=
 FWD_REPORT	= >&2
 FWD_ROOT	= .
 FWD_OUT		=
+FWD_MKFLAGS	=
 
 la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 
@@ -60,7 +63,7 @@ la_cible_par_defaut_si_aucune_n_est_precisee_sur_la_ligne_de_commande: all
 	for d in $(FWD_DIRS) ; do \
 	  if test -d $$d ; then \
 	    echo Forwarding $@ to $(FWD_ROOT)/$$d >&2 ;\
-	    if $(MAKE) -C $$d FWD_ROOT="$(FWD_ROOT)/$$d" $@ ;\
+	    if $(MAKE) -C $$d $(FWD_MKFLAGS) FWD_ROOT="$(FWD_ROOT)/$$d" $@ ;\
 	    then report=succeeded ; else report=failed ; fi ;\
 	    echo "$(FWD_MSG) $(FWD_ROOT)/$$d: $@ $$report" $(FWD_REPORT);\
 	fi ; done $(FWD_OUT)
