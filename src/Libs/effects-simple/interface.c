@@ -231,7 +231,7 @@ get_text_proper_effects(string module_name)
 				 DBR_PROPER_EFFECTS,
 				 string_undefined,
 				 FALSE);*/
-    t = get_any_effects_type_text(module_name, DBR_PROPER_EFFECTS, string_undefined, TRUE);
+    t = get_any_effect_type_text(module_name, DBR_PROPER_EFFECTS, string_undefined, TRUE);
     reset_methods_for_effects_prettyprint(module_name);
     return t;
 }
