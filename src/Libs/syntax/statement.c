@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/10 13:54:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/11 08:07:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_statement[] = "%A% ($Date: 1997/09/10 13:54:10 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_statement[] = "%A% ($Date: 1997/09/11 08:07:58 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -650,14 +650,12 @@ update_functional_type_with_actual_arguments(entity e, list l)
 
     if( ENDP(functional_parameters(ft))) {
 	for (pc = l; pc != NULL; pc = CDR(pc)) {
-
-	    parameter p = make_parameter(entity_type(reference_variable(syntax_reference(expression_syntax(EXPRESSION(CAR(pc)))))), 
+	    basic b = basic_of_expression(EXPRESSION(CAR(pc)));
+	    variable v = make_variable(b, NIL); 
+	    type t = make_type(is_type_variable, v);
+	    parameter p = make_parameter(t,
 					 MakeModeReference());
 
-	    /*
-	    parameter p = make_parameter(expression_to_type(EXPRESSION(CAR(pc))), 
-					 MakeModeReference());
-					 */
 	    functional_parameters(ft) = 
 		gen_nconc(functional_parameters(ft),
 			  CONS(PARAMETER, p, NIL));
@@ -673,12 +671,13 @@ update_functional_type_with_actual_arguments(entity e, list l)
 			 gen_length(functional_parameters(ft)), 
 			 gen_length(l), line_b_I, line_e_I);
 	}
-	else {
+	else if(get_bool_property("PARSER_TYPE_CHECK_CALL_SITES")) {
 	    for (pc = l, pc2 = functional_parameters(ft);
 		 pc != NULL && !ENDP(pc2);
 		 POP(pc), POP(pc2)) {
-
-		type at = entity_type(reference_variable(syntax_reference(expression_syntax(EXPRESSION(CAR(pc))))));
+		basic b = basic_of_expression(EXPRESSION(CAR(pc)));
+		variable v = make_variable(b, NIL); 
+		type at = make_type(is_type_variable, v);
 		type ft = parameter_type(PARAMETER(CAR(pc2)));
 
 		if(!type_equal_p(at, ft)) {
@@ -686,8 +685,10 @@ update_functional_type_with_actual_arguments(entity e, list l)
 				 "incompatible actual argument and type in call to %s\n"
 				 "between lines %d and %d. Current type is not updated\n",
 				 module_local_name(e), line_b_I, line_e_I);
+		    free_type(at);
 		    break;
 		}
+		free_type(at);
 	    }
 	}
     }
