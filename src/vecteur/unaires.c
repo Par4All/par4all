@@ -256,7 +256,7 @@ Pvecteur v;
  */
 void vect_sort_in_place(pv, compare)
 Pvecteur *pv;
-int (*compare)();
+int (*compare)(Pvecteur *, Pvecteur *);
 {
     int 
 	n = vect_size(*pv);
@@ -276,6 +276,8 @@ int (*compare)();
 
     /*  sort!
      */
+    /* FI: I do not know how to cast compare() properly */
+    /* qsort(table, n, sizeof(Pvecteur), int (* compare)()); */
     qsort(table, n, sizeof(Pvecteur), compare);
 
     /*  the vector is regenerated in order
@@ -299,7 +301,7 @@ int (*compare)();
  */
 Pvecteur vect_sort(v, compare)
 Pvecteur v;
-int (*compare)();
+int (*compare)(Pvecteur *, Pvecteur *);
 {
     Pvecteur
 	new = vect_dup(v);
