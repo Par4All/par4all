@@ -379,6 +379,7 @@ instruction:
 inst_spec: parameter_inst
 	| implicit_inst
 	| dimension_inst
+	| pointer_inst
 	| equivalence_inst
 	| common_inst {}
 	| type_inst
@@ -978,6 +979,39 @@ common_name: TK_CONCAT
 		$$ = NameToCommon($2);
 	    }
 	;
+
+pointer_inst: TK_POINTER TK_LPAR entity_name TK_COMMA entity_name decl_tableau TK_RPAR
+            {
+		/* It is assumed that decl_tableau can be ignored for EDF examples */
+		list dims = list_undefined;
+
+		if(!ENDP($6)) {
+		    /* A varying dimension is impossible in the dynamic area for address
+		     * computation. A heap area must be added.
+		     */
+
+		    dims = CONS(EXPRESSION,
+			 make_dimension(MakeIntegerConstantExpression("1"),
+					MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))),
+			 NIL);
+
+		    /* dims = $6; */
+		}
+		else {
+		    dims = $6;
+		}
+
+		pips_user_warning("SUN pointer declaration detected\n");
+		DeclareVariable($3, type_undefined, NIL, storage_undefined, value_undefined);
+		DeclareVariable($5, type_undefined, dims, 
+				make_storage(is_storage_ram,
+					     make_ram(get_current_module_entity(),
+						      HeapArea,
+						      UNKOWN_RAM_OFFSET,
+						      NIL)),
+				value_undefined);
+            }
+        ;
 
 equivalence_inst: TK_EQUIVALENCE lequivchain
 	;
