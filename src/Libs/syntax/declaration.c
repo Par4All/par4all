@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/09/15 12:24:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/15 14:29:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 12:24:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/15 14:29:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -609,6 +609,38 @@ update_common_to_size(entity a, int new_size)
 		       (char *) (new_size));
 }
 
+/* updates the common entity if necessary with the common prefix
+ */
+static entity
+make_common_entity(entity e)
+{
+    if (!entity_common_p(e))
+    {
+	entity c = find_or_create_entity(concatenate
+	   (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, COMMON_PREFIX, 
+	    entity_local_name(e), 0));
+
+	/* take care not to destroy some useful entity! */
+	if (value_undefined_p(entity_initial(e)) || !intrinsic_entity_p(e))
+	    add_ghost_variable_entities(e);
+
+	e = c;
+
+	if (type_undefined_p(entity_type(e)))
+	{
+	    entity_type(e) = make_type(is_type_area, make_area(0, NIL));
+            entity_storage(e) = 
+                make_storage(is_storage_ram, 
+                             (make_ram(get_current_module_entity(),
+                                       StaticArea, 0, NIL)));
+            entity_initial(e) = MakeValueUnknown();
+            AddEntityToDeclarations(e, get_current_module_entity());
+	}
+    }
+
+    return e;
+}
+
 /* MakeCommon:
  * This function creates a common block. pips creates static common
  * blocks. This is not true in the ANSI standard stricto sensu, but
@@ -619,73 +651,28 @@ update_common_to_size(entity a, int new_size)
  * is useful the first time.
  */
 entity 
-MakeCommon(e)
-entity e;
+MakeCommon(entity e)
 {
-    if (entity_type(e) == type_undefined) {
-	/* Is the common name conflicting with the program name? */
-	entity module =
-	    gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME,
-					   MODULE_SEP_STRING,
-					   MAIN_PREFIX,
-					   entity_local_name(e),
-					   (char *) NULL),
-			       entity_domain);
-	if(module == entity_undefined) {
-	    entity_type(e) = make_type(is_type_area, make_area(0, NIL));
-	    entity_storage(e) = 
-		make_storage(is_storage_ram, 
-			     (make_ram(get_current_module_entity(),
-				       StaticArea, 0, NIL)));
-	    entity_initial(e) = MakeValueUnknown();
-	    AddEntityToDeclarations(e, get_current_module_entity());
-	}
-	else {
-	    user_warning("MakeCommon", "Conflicting usage of %s\n",
-			 entity_local_name(e));
-	    ParserError("MakeCommon",
-			"Conflicting name between main and common\n");
-	}
-    }
-    else if(!type_area_p(entity_type(e))) {
-	/* FI: user_warning is used to display the conflicting name */
-	user_warning("MakeCommon",
-		     "name conflict for %s between common "
-		     "and %s %s entity.\n"
-		     "Please rename common /%s/ using a prefix (e.g. /C_%s/).\n",
-		     entity_name(e), 
-		     intrinsic_entity_p(e)? "intrinsic": "",
-		     type_to_string(entity_type(e)),
-		     entity_local_name(e),
-		     entity_local_name(e));
-	ParserError("MakeCommon",
-		    "Name conflict between common and variable or module or intrinsic\n");
-    }
-    else {
-	/* common e may already exist because it was encountered
-	 * in another module
-	 * but not have been registered as known by the current module.
-	 * It may also already exist because it was encountered in
-	 * the *same* module, but AddEntityToDeclarations() does not
-	 * duplicate declarations.
-	 */
-	AddEntityToDeclarations(e, get_current_module_entity());
-    }
+    e = make_common_entity(e);
 
-    /*
-    if(hash_get(common_size_map, (char *) e) == HASH_UNDEFINED_VALUE)
-	hash_put(common_size_map, (char *) e, (char *) 0);
-	*/
+    /* common e may already exist because it was encountered
+     * in another module
+     * but not have been registered as known by the current module.
+     * It may also already exist because it was encountered in
+     * the *same* module, but AddEntityToDeclarations() does not
+     * duplicate declarations.
+     */
+    AddEntityToDeclarations(e, get_current_module_entity());
+
     /* FI: for a while, common sizes were *always* reset to 0, even when
      * several common statements were encountered in the same module for
      * the same common. This did not matter because offsets in commons are
      * recomputed once variable types and dimensions are all known.
      */
-    if(!common_to_defined_size_p(e)) {
+    if(!common_to_defined_size_p(e))
 	set_common_to_size(e, 0);
-    }
 
-    return(e);
+    return e;
 }
 
 /* 
