@@ -96,22 +96,10 @@ int ofl_ctrl;
     return s;
 }
 
-Psysteme sc_enveloppe_chernikova(s1, s2)
-Psysteme s1, s2;
+Psysteme sc_enveloppe_chernikova(Psysteme s1, Psysteme s2)
 {
   return sc_enveloppe_chernikova_ofl_ctrl((s1), (s2), OFL_CTRL);
 } 
-
-void no_base_sort(Pbase *pbase)
-{
-    return;
-}
-
-Psysteme sc_common_projection_convex_hull(Psysteme s1, Psysteme s2)
-{
-  return sc_common_projection_convex_hull_with_base_ordering
-    (s1, s2, no_base_sort);
-}
 
 /* call chernikova with compatible base.
  */
@@ -148,6 +136,7 @@ static Psysteme actual_convex_union(Psysteme s1, Psysteme s2)
  * returns s1 v s2. 
  * s1 and s2 are not touched.
  * The bases should be minimum for best efficiency!
+ * otherwise useless columns are allocated and computed.
  * a common base is rebuilt in actual_convex_union.
  * other fast cases may be added?
  */
