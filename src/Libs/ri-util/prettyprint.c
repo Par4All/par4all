@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.117  1998/04/14 13:03:35  coelho
+ * cleaner.
+ *
  * Revision 1.116  1998/03/24 09:34:41  irigoin
  * Semantics of leftmost refined to distinguish between arithmetic
  * expressions and general expressions since leftmost is used to decide if a
@@ -179,7 +182,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.116 1998/03/24 09:34:41 irigoin Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.117 1998/04/14 13:03:35 coelho Exp $";
 #endif /* lint */
 
  /*
@@ -220,6 +223,8 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "linear.h"
 
 #include "genC.h"
 #include "text.h"
@@ -267,7 +272,7 @@ pp_style_p(string s)
 /********************************************************************* MISC */
 
 text empty_text(entity e, int m, statement s)
-{ return( make_text(NIL));}
+{ return make_text(NIL);}
 
 static text (*text_statement_hook)(entity, int, statement) = empty_text;
 
@@ -1042,11 +1047,11 @@ text_block(
 	return(r) ;
     }
 
-/* pips_assert("A block cannot be labelled\n", empty_local_label_name_p(label)) ; */
 
     if(!empty_local_label_name_p(label)) {
-	pips_error("text_block", "Illegal label \"%s\". Blocks cannot carry a label\n",
-		   label);
+	pips_internal_error("Illegal label \"%s\". "
+			    "Blocks cannot carry a label\n",
+			    label);
     }
     
     if (get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
@@ -1074,7 +1079,7 @@ text_block(
 	text_sentences(r) = 
 	    gen_nconc(text_sentences(r), text_sentences(t));
 	text_sentences(t) = NIL;
-	gen_free(t);
+	free_text(t);
     }
 
     if (!get_bool_property("PRETTYPRINT_FOR_FORESYS") &&
@@ -1267,7 +1272,7 @@ text_loop(
           text aux_r;
           if((aux_r = text_loop_cmf(module, label, margin, obj, n, NIL, NIL))
              != text_undefined) {
-            MERGE_TEXTS(r, aux_r);
+	      MERGE_TEXTS(r, aux_r);
             return(r) ;
           }
         }
@@ -1610,7 +1615,7 @@ text_instruction(
     instruction obj,
     int n)
 {
-    text r=text_undefined, text_block(), text_unstructured() ;
+    text r = text_undefined;
 
     if (instruction_block_p(obj)) {
 	r = text_block(module, label, margin, instruction_block(obj), n) ;
