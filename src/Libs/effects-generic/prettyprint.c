@@ -310,7 +310,7 @@ get_any_effects_text(
 text my_get_any_effects_text(string module_name)
 {
 entity module;
-    statement module_stat, user_stat = statement_undefined;
+    statement module_stat;
     text txt = make_text(NIL);
 
     /* current entity
@@ -337,8 +337,7 @@ entity module;
     /*MERGE_TEXTS(txt, text_summary_any_effect_type(module));*/
 
     /* then code with effects, using text_statement_any_effect_type */
-    MERGE_TEXTS(txt, text_module(module,
-				 is_user_view_p? user_stat : module_stat));
+    MERGE_TEXTS(txt, text_module(module, module_stat));
     
     close_prettyprint();
 
