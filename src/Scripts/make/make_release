@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: make_release,v $ (version $Revision$)
-# $Date: 1996/09/02 20:18:41 $, 
+# $Date: 1996/09/02 22:18:18 $, 
 #
 # (c) Fabien COELHO 1996
 
@@ -11,6 +11,7 @@
 script=$RCSfile: make_release,v $
 unset name dirs root trgt oths
 tar=${PIPS_TAR:-gtar}
+taropt=cf
 make=${PIPS_MAKE:-gmake}
 verb=:
 
@@ -41,7 +42,7 @@ while getopts hvr:s:t:d: opt
 do
     case $opt in
 	h) usage 0 "some help" ;;
-	v) verb=verbose ;;
+	v) verb=verbose ; taropt=cvf ;;
 	r) root=$OPTARG ;;
 	s) dirs="$dirs $OPTARG" ;;
 	t) trgt=$OPTARG ;;
@@ -59,7 +60,7 @@ test -d $trgt || mkdir $trgt || error 4 "cannot mkdir $trgt"
 #
 # tmp files
 
-tmp=$trgt/$script.`whoami`.$$
+tmp=$trgt/$RCSfile: make_release,v $.`whoami`.$$
 rm -f $tmp.*
 
 $verb in `pwd`
@@ -68,7 +69,7 @@ $verb in `pwd`
     # Sources
     for dir in $dirs 
     do
-	$verb "considering $dir -- source"
+	$verb "considering $dir (source)"
 	$make --no-print-directory -C $dir \
 	    FWD_MKFLAGS='--no-print-directory' FWD_ROOT="./$dir" release
 	find ./$dir -name 'Makefile' -print
@@ -77,23 +78,24 @@ $verb in `pwd`
     # Direct 
     for dir in $oths "$@"
     do
-	$verb "considering $dir -- direct"
+	$verb "considering $dir (direct)"
 	find ./$dir ! -type d -print
     done 
 
 } > $tmp.list
 
-sed '/OLD/d;/SCCS/d;/~/d' $tmp.list | 
-sort -u | 
-xargs $tar cvf $tmp.tar 
-
 #
 # target 
 
-cd $trgt || error 5 "cannot cd to $trgt"
-
 $verb copying files in $trgt
+$verb taring...
 
+$tar $taropt $tmp.tar `sed '/OLD/d;/SCCS/d;/~/d' $tmp.list | sort -u`
+
+ls -l $tmp.tar 
+
+$verb untaring in $trgt...
+cd $trgt || error 5 "cannot cd to $trgt"
 $tar xf $tmp.tar
 
 $verb done
