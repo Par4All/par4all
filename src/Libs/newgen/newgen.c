@@ -1,15 +1,17 @@
-/* %A% ($Date: 1996/06/15 12:08:13 $, ) 
+/* %A% ($Date: 1996/06/15 12:10:46 $, ) 
     version $Revision$, got on %D%, %T% [%P%].
    Copyright (c) - École des Mines de Paris Proprietary.  */
 
 #ifndef lint
-char top_level_newgen_c_vcid[] = "%A% ($Date: 1996/06/15 12:08:13 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char top_level_newgen_c_vcid[] = "%A% ($Date: 1996/06/15 12:10:46 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 #include <stdio.h>
 
 #include "genC.h"
 #include "specs.h"
 #include "all_newgen_headers.h"
+
+#include "ri-util.h"
 
 void initialize_newgen()
 {
