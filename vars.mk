@@ -25,7 +25,7 @@
 #                                        COPYRIGHTENDKEY
 #
 # Version identification:
-# $Id: vars.mk,v 1.10 2002/06/04 16:15:47 loechner Exp $
+# $Id: vars.mk,v 1.11 2002/08/12 13:11:27 loechner Exp $
 # Date of creation: 7/31/96
 # Author: Bart Kienhuis
 
@@ -49,7 +49,7 @@ BIN_INSTALL_DIR =	$(exec_prefix)/bin
 
 # c compiler flags and defines
 CC	             	= gcc
-CFLAGS                  = -g -O2
+CFLAGS                  = -g -O2 -Wall
 EXTRA_FLAGS             = 
 DEFINES         	=  -DSTDC_HEADERS=1 -DHAVE_LIMITS_H=1 -DHAVE_UNISTD_H=1 -DSIZEOF_INT=4 -DSIZEOF_LONG_INT=4 -DSIZEOF_LONG_LONG_INT=8  
 
@@ -110,10 +110,10 @@ EXEC_EXTRA_LIBS= -L$(OBJ_DIR) -lpolylib$(BITS) $(LIBS)
 SHAREDLIB_FLAG          = -shared
 LDCONFIG = ldconfig
 
-LIBS_TO_BUILD = 64
-EXEC_TO_BUILD = 64
-BITS=64
-AFLAGS=-DLINEAR_VALUE_PROTECT_MULTIPLY 		-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV -DLINEAR_VALUE_IS_LONGLONG
+LIBS_TO_BUILD = 32 64 gmp
+EXEC_TO_BUILD = 32 64 gmp
+BITS=32
+AFLAGS=-DLINEAR_VALUE_IS_INT
 
 
 OBJ_DIR = Obj.$(BITS).$(BUILD)-$(HOST)-$(OSTYPE)

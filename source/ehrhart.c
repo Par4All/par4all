@@ -1225,13 +1225,13 @@ static enode *P_Enum(Polyhedron *L,Polyhedron *LQ,Value *context,int pos,int nb_
     else {
       value_modulus(tmp,n,lcm_copy);
       if(value_notzero_p(tmp)) {
-	value_division(tmp,n,lcm_copy);
-	value_increment(tmp,tmp);
-	i = VALUE_TO_INT(tmp);
+		  value_division(tmp,n,lcm_copy);
+		  value_increment(tmp,tmp);
+		  i = VALUE_TO_INT(tmp);
       }
       else {
-	value_division(tmp,n,lcm_copy);
-	i =   VALUE_TO_INT(tmp);	/* ceiling of n/lcm */
+		  value_division(tmp,n,lcm_copy);
+		  i =   VALUE_TO_INT(tmp);	/* ceiling of n/lcm */
       }
     }
 

@@ -472,16 +472,16 @@ Value g,m1,m2;
 	    	           	    
 	               ne->x.p=new_enode(res->x.p->type,p, res->x.p->pos);
 	               for(i=0;i<p;i++)  {
-		              value_assign(ne->x.p->arr[i].d, res->x.p->arr[value_pmod(i,y)].d);
+		              value_assign(ne->x.p->arr[i].d, res->x.p->arr[i%y].d);
 		              if (value_notzero_p(ne->x.p->arr[i].d))   {
-			    value_assign(ne->x.p->arr[i].x.n, res->x.p->arr[value_pmod(i,y)].x.n);
+			    value_assign(ne->x.p->arr[i].x.n, res->x.p->arr[i%y].x.n);
 		              }
 		              else { 
-			          ne->x.p->arr[i].x.p =ecopy(res->x.p->arr[value_pmod(i,y)].x.p);
+			          ne->x.p->arr[i].x.p =ecopy(res->x.p->arr[i%y].x.p);
 		              }
 	               }
 	               for(i=0;i<p;i++)  {
-	                    new_eadd(&e1->x.p->arr[value_pmod(i,x)], &ne->x.p->arr[i]);
+	                    new_eadd(&e1->x.p->arr[i%x], &ne->x.p->arr[i]);
 	               }
       
 	               res=ne;
@@ -549,7 +549,7 @@ void ppcm(Value a, Value b, Value *r) {
 	Value g;
 	value_init(g); 
 	Gcd(a,b,&g);
-	value_multipy(*r,a,b);
+	value_multiply(*r,a,b);
 	value_division(*r,*r,g);
 } /* ppcm  */
 
@@ -721,48 +721,52 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
      AffConstraints(lp); 
      printf("##############################################################\n");
      
-	for (lp1=lp ; lp1; lp1=lp1->next)  {
+	for (lp1=lp ; lp1; lp1=lp1->next)
+	{
 		lp1next = lp1->next;
 		lp1->next = NULL;
 		en= Polyhedron_Enumerate(lp1, C, MAXRAYS);
 		lp1->next = lp1next;
 		sen= NULL;
 		for(e=en;e;e=e->next)
-				if(!Degenerate(e)) {
+			if(!Degenerate(e))
+			{
 				pr = (Enumeration  *)malloc(sizeof(Enumeration));
 				pr->EP=e->EP;     
 				pr->ValidityDomain=e->ValidityDomain;
 				pr->next=sen;
 				sen=pr;
-				}
+			}
 
-			if(sen!= NULL) {
+		if(sen!= NULL)
+		{
 			pu = (Polyhedron_union  *)malloc(sizeof(Polyhedron_union));
 			pu->pt=sen;
 			pu->next = Polun;
 			Polun = pu;
 		}
 	}
-	if(!Polun) {
+	if(!Polun)
+	{
 		fprintf(stdout,"      Error:  No Domain to enumerate\n");	
 		return ((Enumeration *) 0);
 	}
       
 	while(Polun->next != NULL)  {
-	res=NULL;
-	en1=Polun->pt;
-	en2=(Polun->next)->pt;
+		res=NULL;
+		en1=Polun->pt;
+		en2=(Polun->next)->pt;
 
-	        d1=DMUnion(en1, MAXRAYS);
+		d1=DMUnion(en1, MAXRAYS);
 		d2=DMUnion(en2, MAXRAYS);
-              
-		for(en1=Polun->pt;en1;en1=en1->next) {
-			
-		 for(en2=(Polun->next)->pt;en2;en2=en2->next) {	
-                    		    
-           d = DomainIntersection(en1->ValidityDomain,
-			  			en2->ValidityDomain,MAXRAYS);
-		      if( d && !emptyQ(d)&&!IncludeInRes(d,res,MAXRAYS))  {
+
+		for(en1=Polun->pt;en1;en1=en1->next)
+		{
+
+			for(en2=(Polun->next)->pt;en2;en2=en2->next)
+			{
+				d = DomainIntersection(en1->ValidityDomain,en2->ValidityDomain,MAXRAYS);
+				if( d && !emptyQ(d)&&!IncludeInRes(d,res,MAXRAYS))  {
 					evalue ev;
 					value_init(ev.d);
 					value_assign( ev.d, en2->EP.d );
@@ -777,41 +781,40 @@ Enumeration *Domain_Enumerate(Polyhedron *D, Polyhedron *C, unsigned MAXRAYS,cha
 					tmp->EP=ev;
 					tmp->next= res;
 					res=tmp;
-		      }
-	            
-		 }  
-		   d=DomainDifference(en1->ValidityDomain,d2 ,MAXRAYS);
-		    if( d && !emptyQ(d)&&!IncludeInRes(d,res,MAXRAYS))  {
-	         
-	              tmp = (Enumeration  *)malloc(sizeof(Enumeration));
-		      tmp->ValidityDomain =d;
+				}
+			}
+			d=DomainDifference(en1->ValidityDomain,d2 ,MAXRAYS);
+			if( d && !emptyQ(d)&&!IncludeInRes(d,res,MAXRAYS))
+			{
+				tmp = (Enumeration  *)malloc(sizeof(Enumeration));
+				tmp->ValidityDomain =d;
 
-		      tmp->EP=en1->EP;
-	              tmp->next= res;
-                      res=tmp;
-                    }
-		 
-               }
-	     for(en2=(Polun->next)->pt; en2; en2= en2->next) {
-	         d= DomainDifference(en2->ValidityDomain,d1,MAXRAYS);
-	          if( d && !emptyQ(d)&&!IncludeInRes(d,res,MAXRAYS) )  {
-	            tmp = (Enumeration  *)malloc(sizeof(Enumeration));
-	            tmp->ValidityDomain =d;
-	            tmp->EP=en2->EP;
-		    tmp->next= res;
-	            res=tmp;
-		  }
-	      
-	     }
+				tmp->EP=en1->EP;
+				tmp->next= res;
+				res=tmp;
+			}
+		}
+		for(en2=(Polun->next)->pt; en2; en2= en2->next)
+		{
+			d= DomainDifference(en2->ValidityDomain,d1,MAXRAYS);
+			if( d && !emptyQ(d)&&!IncludeInRes(d,res,MAXRAYS) )
+			{
+				tmp = (Enumeration  *)malloc(sizeof(Enumeration));
+				tmp->ValidityDomain =d;
+				tmp->EP=en2->EP;
+				tmp->next= res;
+				res=tmp;
+			}
+		}
 	    
-	         Polun->pt=res;
+		Polun->pt=res;
 	        		     
-	     Polun->next= (Polun->next)->next;
+		Polun->next= (Polun->next)->next;
 	}
 	res=Polun->pt;
 		
 	Remove_RedundantDomains(&res); 
-	 return(res);
+	return(res);
 }
 
 /* Enumeration of the image by T of domain D */
@@ -937,7 +940,7 @@ Enumeration *Polyhedron_Image_Enumerate(Polyhedron *D,  Polyhedron *C, Matrix *T
 		       polun=AddPolyToDomain(Polyhedron_Copy(pol),polun);
 		       Polyhedron_Free(pol);
 		       Vector_Free(NCont);
-				 vlaue_clear( val );
+				 value_clear( val );
 		    }
 	   }
 	  if(polun==NULL) { //  No constraint is added to input polyhedron

@@ -1534,6 +1534,12 @@ void Print_Domain(FILE *DST,Polyhedron *D,char **pname) {
     fprintf(DST, "\n" );
   }
   fprintf(DST, "\n");
+
+	if( D->next )
+	{
+		fprintf( DST, "UNION\n" );
+		Print_Domain( DST, D->next, pname );
+	}
   return;
 } /* Print_Domain */
 

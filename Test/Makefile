@@ -7,9 +7,9 @@
 # These may take a long time to compute...
 LONG_EHRHART_TESTS = g1 isnm2 c4 alex1
 
-# These do not pass in 32 bits mode without GMP: c3 e10 e11 e15 isnm
+# These do not pass in 32 bits mode without GMP: isnm
 # uncomment the following line if you are not running with GMP.
-#NOGMP = c3 e10 e11 e15 isnm
+NOGMP = isnm
 
 EHRHART_TESTS = $(filter-out $(LONG_EHRHART_TESTS) $(NOGMP),\
 	$(patsubst ehrhart/%.in,%,$(wildcard ehrhart/*.in)))

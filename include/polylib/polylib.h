@@ -25,6 +25,7 @@
 #include <polylib/param.h>
 #include <polylib/alpha.h>
 #include <polylib/ehrhart.h>
+#include <polylib/ext_ehrhart.h>
 #include <polylib/eval_ehrhart.h>
 #include <polylib/SolveDio.h>
 #include <polylib/Lattice.h>

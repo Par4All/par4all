@@ -24,6 +24,7 @@ PEXEC = \
 	disjoint_union_sep \
 	disjoint_union_adj \
 	ehrhart \
+	ehrhart_union\
 	verif_ehrhart\
 	Zpolytest\
 	example
@@ -366,10 +367,10 @@ $(OBJ_DIR)/ehrhart$(EXEC_EXTRA_SUFFIX): $(POLYLIB_SRC)/ehrhart.c \
 	$(CC) $(LDFLAGS) $(CFLAGS) -DEMAIN -DEP_EVALUATION  -o $@ \
 		$(EHRHART_MP:%=$(POLYLIB_SRC)/%) $(POLYLIB_SRC)/ehrhart.c \
 		$(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
-$(OBJ_DIR)/ext_ehrhart$(EXEC_EXTRA_SUFFIX): $(POLYLIB_SRC)/ext_ehrhart.c \
+$(OBJ_DIR)/ehrhart_union$(EXEC_EXTRA_SUFFIX): $(POLYLIB_SRC)/ehrhart_union.c \
 				$(LIB) $(PHEADERS)
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ \
-		$(EHRHART_MP:%=$(POLYLIB_SRC)/%) $(POLYLIB_SRC)/ehrhart.c \
+		$(EHRHART_MP:%=$(POLYLIB_SRC)/%) $(POLYLIB_SRC)/ehrhart_union.c \
 		$(EXEC_EXTRA_LIBS) $(EXTRA_LIBS)
 
 # verifies the ehrhart polynomial is correct

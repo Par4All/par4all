@@ -28,7 +28,7 @@ include ../vars.mk
 
 LIB_CFILES=  errors.c
 
-HEADERS=  	assert.h boolean.h arithmetic_errors.h arithmetique.h
+HEADERS=  	assert.h arithmetic_errors.h arithmetique.h
 
 LIB_OBJECTS= $(LIB_CFILES:%.c=$(OBJ_DIR)/%.o)
 

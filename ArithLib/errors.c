@@ -1,12 +1,15 @@
 /*
-  $Id: errors.c,v 1.1 2001/07/16 15:00:31 risset Exp $
+  $Id: errors.c,v 1.2 2002/08/12 13:11:27 loechner Exp $
 
   Exception management.
   See "arithmetic_errors.h".
 
   $Log: errors.c,v $
-  Revision 1.1  2001/07/16 15:00:31  risset
-  Initial revision
+  Revision 1.2  2002/08/12 13:11:27  loechner
+  union ehrhart, first complete version
+
+  Revision 1.1.1.1  2001/07/16 15:00:31  risset
+  initial import into CVS
 
   Revision 1.16  2000/10/27 13:26:03  ancourt
   exception_thrown -> linear_number_of_exception_thrown
@@ -48,7 +51,6 @@
 
 #include <stdio.h>
 
-#include "boolean.h"
 #include "arithmetique.h"
 
 /* global constants to designate exceptions.

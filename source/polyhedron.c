@@ -4115,7 +4115,7 @@ Polyhedron *DomainAddConstraints(Polyhedron *Pol,Matrix *Mat,unsigned NbMaxRays)
  *                   adjacent (they have their facets in common).
  *
  * WARNING: if all polyhedra are not of same geometrical dimension
- *          the result may be surprising (duplicates may appear).
+ *          duplicates may appear.
  */
 Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
 {
@@ -4316,13 +4316,19 @@ Polyhedron *Disjoint_Domain( Polyhedron *Pol, int flag, unsigned NbMaxRays )
 		if(reste)
 		{
 			if(emptyQ(reste))
+			{
 				Domain_Free( reste );
+				reste = NULL;
+			}
 			else
 			{
-				for( tmp=reste ; tmp->next ; tmp=tmp->next )
-					;
-				tmp->next = Result;
-				Result = reste;
+				Polyhedron *tnext;
+				for( tmp=reste ; tmp ; tmp=tnext )
+				{
+					tnext = tmp->next;
+					tmp->next = NULL;
+					Result = AddPolyToDomain(tmp, Result);
+				}
    		}
 		}
 	}
