@@ -23,8 +23,11 @@ generate code optimized for architectures supporting multimedia
 instruction sets, such as MMX, SSE or VIS.
 
 \domain{import entity from "ri.newgen"}
+{}
 \domain{import expression from "ri.newgen"}
+{}
 \domain{import statement from "ri.newgen"}
+{}
 
 \section*{Opcodes and opcode classes}
 
