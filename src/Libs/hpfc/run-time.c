@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1996/02/16 12:02:20 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1996/03/11 17:15:19 $, )
  * version $Revision$,
  */
 
@@ -536,6 +536,7 @@ static RunTimeSupportDescriptor RTSTable[] =
     { CMP_OWNERS, 	8, is_sub, no_basic, no_entity },
     { CMP_NEIGHBOUR, 	1, is_sub, no_basic, no_entity },
     { CMP_LID,		8, is_fun, no_basic, no_entity },
+    { TWIN_P,		2, is_fun, no_basic, no_entity },
     { CND_SENDERP, 	0, is_fun, no_basic, no_entity },
     { CND_OWNERP, 	0, is_fun, no_basic, no_entity },
     { CND_COMPUTERP, 	0, is_fun, no_basic, no_entity },
