@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: install_pips,v $ (version $Revision$)
-# $Date: 1996/09/10 16:30:24 $, 
+# $Date: 1996/09/10 16:31:24 $, 
 #
 # installation for pips softwares and automatic generation of pipsrc
 #
@@ -66,7 +66,7 @@ executable()
     if test "`type $1 | grep 'not found'`"
     then
 	warning "not found!"
-	verb "$@"
+	verb "--" "$@"
     else
 	echo "ok!"
     fi
@@ -77,13 +77,14 @@ environment()
 {
     var=$1
     comment=$2
+    shift 2
     verbn "looking for ""$""$var ($comment): "
     if test "`echo -n \\$$var`"
     then
 	echo "ok!"
     else
 	warning "not set!"
-	verb "$@"
+	verb "--" "$@"
     fi
 }
 
