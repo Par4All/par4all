@@ -34,6 +34,13 @@ Pvecteur *pv1, *pv2;
 			    (entity*)&var_of(*pv2));
 }
 
+/******************************************************************* SYSTEME */
+
+void sc_syst_debug(Psysteme s)
+{
+    sc_fprint(stderr, s, entity_local_name);
+}
+
 /******************************************** FOR PRETTYPRINTING CONSTRAINTS */
 
 void 
