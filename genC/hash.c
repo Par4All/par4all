@@ -41,13 +41,13 @@ struct __hash_entry {
 };
 
 struct __hash_table {
-    hash_key_type hash_type;
-    int hash_size;
-    int hash_entry_number;
-    int (*hash_rank)();
-    int (*hash_equal)();
-    hash_entry *hash_array;
-    int hash_size_limit;
+  hash_key_type hash_type; /* the type of keys... */
+  int hash_size;           /* size of actual array */
+  int hash_entry_number;   /* number of associations stored */
+  int (*hash_rank)();      /* how to compute rank for key */
+  int (*hash_equal)();     /* how to compare entries */
+  hash_entry *hash_array;  /* actual array */
+  int hash_size_limit;     /* number entry for which to reallocate */
 };
 
 #ifndef abs
@@ -79,7 +79,7 @@ struct __hash_table {
 /* Now we need the table size to be a prime number.
  * So we need to retrieve the next prime number in a list.
  */
-#define GET_NEXT_HASH_TABLE_SIZE(sz,pointer_to_table)			\
+#define GET_NEXT_HASH_TABLE_SIZE(sz, pointer_to_table)			\
 {									\
      while (*(pointer_to_table) <= (sz)) {				\
 	 message_assert("size too big ",				\
@@ -153,14 +153,14 @@ int size;
 
     if (size<HASH_DEFAULT_SIZE) size=HASH_DEFAULT_SIZE - 1;
     /* get the next prime number in the table */
-    GET_NEXT_HASH_TABLE_SIZE(size,prime_list);
+    GET_NEXT_HASH_TABLE_SIZE(size, prime_list);
 
-    htp = (hash_table) alloc(sizeof(struct __hash_table));
+    htp = (hash_table) malloc(sizeof(struct __hash_table));
     htp->hash_type = key_type;
     htp->hash_size = size;
     htp->hash_entry_number = 0;
     htp->hash_size_limit = HASH_SIZE_LIMIT(size);
-    htp->hash_array = (hash_entry_pointer) alloc(size*sizeof(hash_entry));
+    htp->hash_array = (hash_entry_pointer) malloc(size*sizeof(hash_entry));
 
     for (i = 0; i < size; i++) 
 	htp->hash_array[i].key = HASH_ENTRY_FREE;
@@ -221,8 +221,8 @@ hash_table htp;
 
 void hash_table_free(hash_table htp)
 {
-  free(htp->hash_array);
-  free(htp);
+  gen_free_area(htp->hash_array, htp->hash_size*sizeof(hash_entry));
+  gen_free_area(htp, sizeof(struct __hash_table));
 }
 
 /* This functions stores a couple (key,val) in the hash table pointed to
@@ -237,9 +237,7 @@ void hash_table_free(hash_table htp)
    assign HASH_UNDEFINED_VALUE, but they can always perform hash_del()
    to get the same result */
 
-void hash_put(htp, key, val)
-hash_table htp;
-void *key, *val;
+void hash_put(hash_table htp, void * key, void * val)
 {
     int rank;
     hash_entry_pointer hep;
@@ -398,11 +396,11 @@ hash_table htp;
 on file descriptor f, using functions key_to_string and value_to string
 to display the mapping. it is mostly useful when debugging programs. */
 
-void hash_table_fprintf(f, key_to_string, value_to_string, htp)
-FILE * f;
-char * (*key_to_string)();
-char * (*value_to_string)();
-hash_table htp;
+void hash_table_fprintf(
+    FILE * f, 
+    char *(*key_to_string)(),
+    char *(*value_to_string)(), 
+    hash_table htp)
 {
     int i;
 
@@ -439,7 +437,7 @@ hash_enlarge_table(hash_table htp)
     /* Get the next prime number in the table */
     GET_NEXT_HASH_TABLE_SIZE(htp->hash_size,prime_list);
     htp->hash_array = (hash_entry_pointer) 
-	alloc(htp->hash_size* sizeof(hash_entry));
+	malloc(htp->hash_size* sizeof(hash_entry));
     htp->hash_size_limit = HASH_SIZE_LIMIT(htp->hash_size);
 
     for (i = 0; i < htp->hash_size ; i++)
@@ -463,7 +461,7 @@ hash_enlarge_table(hash_table htp)
 	    htp->hash_array[rank] = he;
 	}
     }
-    free(old_array);
+    gen_free_area(old_array, old_size*sizeof(hash_entry));
 }
 
 static int hash_string_rank(void * key, int size)
@@ -676,7 +674,7 @@ void hash_map_put(hash_table h, void * k, void * v)
 
 void * hash_map_del(hash_table h, void * k)
 {
-  gen_chunk key, * oldkeychunk, *val;
+  gen_chunk key, * oldkeychunk, * val;
   void * result;
 
   key.e = k;
@@ -685,8 +683,12 @@ void * hash_map_del(hash_table h, void * k)
 		 val!=HASH_UNDEFINED_VALUE);
   result = val->e;
 
+  oldkeychunk->p = NEWGEN_FREED;
   free(oldkeychunk);
+
+  val->p = NEWGEN_FREED;
   free(val);
+
   return result;
 }
 
