@@ -52,7 +52,7 @@
 
 \domain{hpfc\_status = overlapsmap x data\_status x numbers\_status x entity\_status x commons:entity* x dynamic\_status x pures:entity* x ios:entity* x computed:remapping* x reductions:statement\_entities}
 
-\domain{reduction = \{ min , max , sum , prod \}}
+\domain{reduction = \{ min , max , sum , prod , and , or \}}
 \domain{hpfc\_reductions = initial:entity x replacement:entity x operator:reduction}
 
 \end{document}
