@@ -135,7 +135,7 @@ missing_file_initializer(string module_name)
 {
     boolean success_p = TRUE;
     entity m = local_name_to_top_level_entity(module_name);
-    string file_name = string_undefined; /* in the workspace */
+    string file_name = string_undefined, dir_name; /* in the workspace */
     /* relative to the current directory */
     string relative_file_name = string_undefined; 
     FILE * f;
@@ -152,9 +152,9 @@ missing_file_initializer(string module_name)
      */
     file_name = strdup(concatenate(module_name, ".f", NULL));
     file_name = strlower(file_name, file_name);
-    relative_file_name = strdup(concatenate(db_get_current_workspace_name(), 
-					    ".database", "/",
-					    file_name, NULL));
+    dir_name = db_get_current_workspace_directory();
+    relative_file_name = strdup(concatenate(dir_name, "/", file_name, 0));
+    free(dir_name);
 
     stub = stub_text(m);
 
@@ -170,7 +170,8 @@ missing_file_initializer(string module_name)
     /* Add the new file as a file resource 
      */
     user_log("Registering synthesized file %s\n", file_name);
-    DB_PUT_FILE_RESOURCE(DBR_SOURCE_FILE, strdup(module_name), file_name);
+    DB_PUT_FILE_RESOURCE(DBR_INITIAL_FILE, module_name, file_name);
+    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, strdup(file_name));
     free(relative_file_name);
     return success_p;
 }
