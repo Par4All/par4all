@@ -1,5 +1,7 @@
 #! /bin/sh
 #
+# $Id$
+#
 # to regenerate the distribution files:
 #
 
@@ -23,30 +25,41 @@ cd ${w}
 # SOURCES
 #
 
-echo "all sources [Pips (including Validation), Newgen, Linear]"
+echo "All sources [Newgen, Linear, Pips]"
 move pips_sources
-make_pips_release -CS -D Examples -F Validation/exportonly -pnle \
-    -rszf pips_sources PIPS || error 1 "ret $?"
+make_pips_release -SC -pnle -rzf pips_sources PIPS \
+	|| error 1 "ret $?"
+
+echo "Pips validation"
+move pips_valid
+make_pips_release -F Validation/exportonly -p -zf pips_valid PIPS \
+	|| error 2 "ret $?"
+
+# echo "Pips documentation"
+# move pips_docs
+# make_pips_release -D Doc -p -zf pips_docs PIPS || error 10 "ret $?"
 
 echo "Newgen sources"
 move newgen_sources
-make_pips_release -CS -n -rszf newgen_sources NEWGEN || error 2 "ret $?"
+make_pips_release -CS -n -rszf newgen_sources NEWGEN \
+	|| error 3 "ret $?"
 
 echo "Linear sources"
 move linear_sources
-make_pips_release -CS -l -rszf linear_sources LINEAR || error 3 "ret $?"
+make_pips_release -CS -l -rszf linear_sources LINEAR \
+	|| error 4 "ret $?"
 
 echo "Xpomp sources"
 move xpomp_sources
 make_pips_release -rz -D Doc/xpomp_manual.ps \
-	-D Include -w "-s Src/Runtimes/xpomp" -p -w -e xpomp_sources || 
-	    error 4 "ret $?"
+	-D Include -w "-s Src/Runtimes/xpomp" -p -w -e xpomp_sources \
+	    || error 5 "ret $?"
 
 echo "Hpfc Runtime sources"
 move hpfc_runtime
 make_pips_release -rz \
 	-D Include -w "-s Src/Runtimes/hpfc" -p -w -e hpfc_runtime ||
-		error 8 "ret $?"
+		error 6 "ret $?"
 
 #
 # BINARIES (not stripped?)
@@ -55,18 +68,18 @@ make_pips_release -rz \
 echo "SunOS4 binary version"
 move pips_GNUSOL1
 make_pips_release -XCB GNUSOL1 -D Examples -pe -rzf pips_GNUSOL1 PIPS || 
-	error 5 "ret $?"
+	error 7 "ret $?"
 
 echo "Solaris 2 binary version "
 move pips_GNUSOL2LL
 rsh recanati \
 make_pips_release -XCB GNUSOL2LL -d $w -D Examples -pe -rzf pips_GNUSOL2LL PIPS || 
-	error 6 "ret $?"
+	error 8 "ret $?"
 
 echo "Solaris 2 public softs (big!)"
 move public_GNUSOL2LL
 make_pips_release -P -rzf public_GNUSOL2LL PIPS ||
-	error 7 "ret $?"
+	error 9 "ret $?"
 
 # IBM AIX:
 # make_pips_release -XCB IBMAIX -D Examples -pe -rzf pips_IBMAIX PIPS
