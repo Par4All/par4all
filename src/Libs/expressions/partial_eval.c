@@ -833,22 +833,41 @@ void partial_eval(char *mod_name)
     init_use_preconditions(mod_name);
 
     mod_inst = statement_instruction(mod_stmt);
-    pips_assert("unroll", instruction_unstructured_p(mod_inst));
+    /* FI: not necessarily the case anymore */
+    if(!instruction_unstructured_p(mod_inst)) {
+	user_warning ("partial_eval", "Non-standard instruction tag %d\n",
+		      instruction_tag (mod_inst));
+    }
+    /* pips_assert("unroll", instruction_unstructured_p(mod_inst)); */
     /* "unstructured expected\n"); */
 
-    /* go through unstructured and apply recursiv_partial_eval */
-    CONTROL_MAP(ctl, {
-	statement st = control_statement(ctl);
+    switch (instruction_tag (mod_inst)) {
 
-	debug(5, "partial_eval", "will eval in statement number %d\n",
-	      statement_number(st));
+    case is_instruction_block:
+	MAP(STATEMENT, stmt, {recursiv_partial_eval (stmt);}, 
+	    instruction_block (mod_inst));
+	break;
 
-	recursiv_partial_eval(st);	
-    }, unstructured_control(instruction_unstructured(mod_inst)), blocs);
+    case is_instruction_unstructured:
+	/* go through unstructured and apply recursiv_partial_eval */
+	CONTROL_MAP(ctl, {
+	    statement st = control_statement(ctl);
 
-    gen_free_list(blocs);
+	    debug(5, "partial_eval", "will eval in statement number %d\n",
+		  statement_number(st));
 
-     /* Reorder the module, because new statements have been generated. */
+	    recursiv_partial_eval(st);	
+	}, unstructured_control(instruction_unstructured(mod_inst)), blocs);
+
+	gen_free_list(blocs);
+	break;
+ 
+    default:
+	user_warning ("partial_eval", "Non-acceptable instruction tag %d\n",
+		      instruction_tag (mod_inst));
+    }
+
+    /* Reorder the module, because new statements have been generated. */
     module_body_reorder(mod_stmt);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
