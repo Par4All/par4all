@@ -1,5 +1,5 @@
  /* $RCSfile: module.c,v $ (version $Revision$)
-  * $Date: 1997/02/04 18:22:30 $, 
+  * $Date: 1997/02/28 16:29:56 $, 
   */
 #include <stdio.h>
 #include <string.h>
@@ -396,6 +396,34 @@ get_declaration_comments(entity module)
     
     return make_sentence(is_sentence_formatted, extracted_comments);
 }
+
+/* list module_formal_parameters(entity func)
+ * input    : an entity representing a function.
+ * output   : the unsorted list (of entities) of parameters of the function "func".
+ * modifies : nothing.
+ * comment  : Made from "entity_to_formal_integer_parameters()" that considers 
+ *            only integer variables.
+ */
+list module_formal_parameters(entity func)
+{
+    list formals = NIL;
+    list decl = list_undefined;
+
+    pips_assert("func must be a module",entity_module_p(func));
+
+    decl = code_declarations(entity_code(func));
+    MAP(ENTITY, e, 
+     {
+	 if(storage_formal_p(entity_storage(e)))
+	     formals = CONS(ENTITY, e, formals);
+     },
+	 decl);
+    
+    return (formals);
+}
+
+
+
 
 /*
  *  that is all
