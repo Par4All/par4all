@@ -1,0 +1,8 @@
+# petit filtre pour afficher les Use-Def d'un workspace $1 
+# et d'une procedure $2
+# Sont filtres les autodependances
+
+sort -u $1.database/$2/$2.dg | sed '/^\([0-9]*\) \1 /d;/IO_EFFECTS/d' | sort -u > tmpdavinci1
+
+perl filtre.pl tmpdavinci1 > cg1.daVinci
+
