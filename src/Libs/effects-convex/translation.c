@@ -1852,26 +1852,29 @@ entity val;
     {
 	if(storage_rom_p(store)) 
 	{
-	    pips_debug(8, "%s is not translatable: store tag %d\n",
-		       entity_name(val), storage_tag(store));
-	    /* Should it be projected? No, this should occur later for xxxx#init
-	     * variables when the xxxx is translated. Or before if xxxx has been
-	     * translated 
-	     */
-	    return;
+	  pips_debug(8, "%s is not translatable: store tag %d\n",
+		     entity_name(val), storage_tag(store));
+	  /* Should it be projected? No, this should occur later for xxx#init
+	   * variables when the xxx is translated. Or before if xxx has been
+	   * translated 
+	   */
+	  return;
 	}
 	else if(storage_formal_p(store)) 
 	{
 	  pips_debug(8, "formal %s is not translatable\n", entity_name(val));
 	  return;
 	}
-	
-	/* FC 20010322: some obscure bug workaround... */
-	/* else if (storage_return_p(store))
+	/* FC 2001/03/22: some obscure bug workaround...
+	 * The 'return' of a function could be translated into the
+	 * assigned variable? well, it should be added anyway somewhere.
+	 */
+        else if (storage_return_p(store))
 	{
-	  pips_debug(8, "return %s is not translatable?\n", entity_name(val));
+	  pips_debug(8, "return %s does not need to be translated.\n", 
+		     entity_name(val));
 	  return;
-	  } */
+	} 
 	else
 	{
 	  pips_internal_error("%s is not translatable: store tag %d\n",
