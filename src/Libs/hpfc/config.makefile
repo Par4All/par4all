@@ -2,7 +2,7 @@
 #
 # Hpfc $RCSfile: config.makefile,v $, Fabien COELHO
 #
-# $RCSfile: config.makefile,v $ ($Date: 1995/03/10 09:19:11 $, ) version $Revision$,
+# $RCSfile: config.makefile,v $ ($Date: 1995/03/13 11:26:32 $, ) version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -44,6 +44,7 @@ PARSER_SRC=
 LIB_CFILES=	parser.c \
 		parser-util.c \
 		directives.c \
+		hpfc.c \
 		debug-util.c \
 		hpfc-util.c \
 		hpf_declarations.c \
