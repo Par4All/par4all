@@ -69,31 +69,36 @@ boolean print_bdt(module_name)
 
  char     *module_name;
 {
- FILE     *fd;
- char     *filename;
- bdt      b;
+  char *localfilename;
+  FILE        *fd;
+  char        *filename;
+  bdt the_bdt;
 
- debug_on( "PRINT_BDT_DEBUG_LEVEL" );
+  debug_on( "PRINT_BDT_DEBUG_LEVEL" );
 
- if (get_debug_level() > 1)
-     user_log("\n\n *** PRINTING BDT for %s\n", module_name);
+  if (get_debug_level() > 1)
+    user_log("\n\n *** PRINTING BDT for %s\n", module_name);
 
- b = (bdt) db_get_memory_resource(DBR_BDT, module_name, TRUE);
- filename = strdup(concatenate(db_get_current_workspace_directory(),
-                    "/", module_name, ".bdt_file", NULL));
+  the_bdt = db_get_memory_resource(DBR_BDT, module_name, TRUE);
 
- fd = safe_fopen(filename, "w");
- fprint_bdt(fd, b);
- safe_fclose(fd, filename);
-
- DB_PUT_FILE_RESOURCE(DBR_BDT_FILE, strdup(module_name), filename);
-
- if (get_debug_level() > 0)
-     fprintf(stderr, "\n\n *** PRINT_BDT DONE\n");
-
- debug_off();
-
- return(TRUE);
+  localfilename = strdup(concatenate(module_name, BDT_EXT, NULL));
+  filename = strdup(concatenate(db_get_current_workspace_directory(), 
+				"/", localfilename, NULL));
+  
+  fd = safe_fopen(filename, "w");
+  fprint_bdt(fd, the_bdt);
+  safe_fclose(fd, filename);
+  
+  DB_PUT_FILE_RESOURCE(DBR_BDT_FILE, strdup(module_name), localfilename);
+  
+  free(filename);
+  
+  if(get_debug_level() > 0)
+    fprintf(stderr, "\n\n *** PRINT_BDT DONE\n");
+  
+  debug_off();
+  
+  return(TRUE);
 }
 
 /*==================================================================*/
