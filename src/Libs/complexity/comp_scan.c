@@ -142,6 +142,7 @@ char *module_name;
     reset_complexity_map();
     reset_current_module_entity();
     reset_current_module_statement();
+    free_value_mappings();
 
     return TRUE;
 }
