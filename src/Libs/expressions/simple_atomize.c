@@ -155,14 +155,18 @@ statement atomize_this_expression(entity (*create)(entity, basic),
       entity newvar; 
       expression rhs;
       statement assign;
+      syntax ref;
 
       newvar = (*create)(get_current_module_entity(), bofe);
       rhs = make_expression(expression_syntax(e), normalized_undefined);
       normalize_all_expressions_of(rhs);
-      assign = make_assign_statement(entity_to_expression(newvar), rhs);
+
+      ref = make_syntax(is_syntax_reference, make_reference(newvar, NIL));
+
+      assign = make_assign_statement(
+        make_expression(copy_syntax(ref), normalized_undefined), rhs);
 	
-      expression_syntax(e) = make_syntax(is_syntax_reference, 
-					make_reference(newvar, NIL));
+      expression_syntax(e) = ref;
       return assign;
     }
   
