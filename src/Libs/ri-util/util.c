@@ -4,6 +4,9 @@
  * $Id$
  *
  * $Log: util.c,v $
+ * Revision 1.13  1998/11/05 09:27:50  zory
+ * EOLE tags for automatic function extraction added
+ *
  * Revision 1.12  1998/10/09 11:35:15  irigoin
  * predicate heap_area_p() added
  *
@@ -24,6 +27,10 @@
 
 /* functions on strings for entity names */
 
+/* BEGIN_EOLE */ /* - please do not remove this line */
+/* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
+   in the EOLE project (JZ - 11/98) */
+
 string 
 local_name(s)
 string s;
@@ -31,6 +38,8 @@ string s;
     pips_assert("some separator", strchr(s, MODULE_SEP) != NULL);
     return strchr(s, MODULE_SEP)+1;
 }
+
+/* END_EOLE */
 
 string 
 make_entity_fullname(module_name, local_name)
