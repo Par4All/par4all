@@ -139,13 +139,13 @@ end_attachment_prettyprint()
 				       a_char,			\
 				       a_mapping)		\
 if (bound_##a_mapping##_p(a_char)) {				\
-    attachments ats = load_##a_mapping((int) a_char);		\
+    attachments ats = load_##a_mapping(a_char);         	\
     list l = attachments_attachment(ats);			\
     l = CONS(ATTACHMENT, a, l);					\
     attachments_attachment(ats) = l;				\
 }								\
 else {								\
-    store_##a_mapping((int) a_char,				\
+    store_##a_mapping(a_char,	        			\
 		      make_attachments(CONS(ATTACHMENT,		\
 					    a,			\
 					    NIL)));		\
@@ -166,19 +166,19 @@ attach_to_character_region(char * begin_char,
 
     debug_on("ATTACHMENT_DEBUG_LEVEL");
     debug(6, "attach_to_character_region",
-	  "Attach attachment %#x (attachee %#x, tag %d) from \"%c\" (%#x) to \"%c\" (%#x)\n",
-	  (unsigned int) a, (unsigned int) at, attachee_tag(at),
-	  *begin_char, (unsigned int) begin_char,
-	  *end_char, (unsigned int) end_char);
+	  "Attach attachment %p (attachee %p, tag %d) from \"%c\" (%p) to \"%c\" (%p)\n",
+	  a, at, attachee_tag(at),
+	  *begin_char, begin_char,
+	  *end_char, end_char);
 
     /* Attach the begin to the first character: */
     ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
-				   (int) begin_char,
+				   begin_char,
 				   word_to_attachments_begin);
 
     /* Attach the end to the last character: */
     ADD_AN_ATTACHMENT_TO_A_MAPPING(a,
-				   (int) end_char,
+				   end_char,
 				   word_to_attachments_end);
     debug_off();
 }
@@ -192,10 +192,10 @@ attach_to_word_list(string begin_word,
 {
     debug_on("ATTACHMENT_DEBUG_LEVEL");
     debug(6, "attach_to_word_list",
-	  "Attach attachee %#x from \"%s\" (%#x) to \"%s\" (%#x)\n",
-	  (unsigned int) at,
-	  begin_word, (unsigned int) begin_word,
-	  end_word, (unsigned int) end_word);
+	  "Attach attachee %p from \"%s\" (%p) to \"%s\" (%p)\n",
+	  at,
+	  begin_word, begin_word,
+	  end_word, end_word);
 
     /* Attach from the first character of the first word up to the
        last character of the last word: */
@@ -414,19 +414,19 @@ deal_with_attachment_boundary(char * a_character,
 			      bool (* bound_word_to_attachments_boundary_p)(int))
 {
     debug(8, "deal_with_attachment_boundary",
-	  "Looking for \"%c\" (%#x) at %d\n",
-	  *a_character, (int) a_character, position_in_the_output);
+	  "Looking for \"%c\" (%p) at %d\n",
+	  *a_character,a_character, position_in_the_output);
 
-    if (bound_word_to_attachments_boundary_p((int) a_character)) {
+    if (bound_word_to_attachments_boundary_p(a_character)) {
 	/* Well, this word is an attachment boundary: */
 	list some_attachments =
-	    attachments_attachment(load_word_to_attachments_boundary((int) a_character));
+	    attachments_attachment(load_word_to_attachments_boundary(a_character));
 	MAP(ATTACHMENT, an_attachment,
 	    {
 		debug(4, "deal_with_attachment_boundary",
-		      "*** Found attachment = %#x for \"%c\" (%#x) at %d\n",
+		      "*** Found attachment = %p for \"%c\" (%p) at %d\n",
 		      an_attachment, *a_character,
-		      (int) a_character, position_in_the_output);
+		      a_character, position_in_the_output);
 
 		/* Remind the position of the boundary of the
 		   attachment: */
@@ -514,30 +514,30 @@ relocate_attachments(char * source,
 
     debug_on("ATTACHMENT_DEBUG_LEVEL");
 
-    pips_debug(5, "source = \"%s\" (%x), new_position = \"%s\" (%x)\n",
-	       source, (unsigned int) source,
-	       new_position, (unsigned int) new_position);
+    pips_debug(5, "source = \"%s\" (%p), new_position = \"%s\" (%p)\n",
+	       source, source,
+	       new_position, new_position);
     
     for(i = 0; i < source_length; i++) {
-	if (bound_word_to_attachments_begin_p((int) source + i)) {
-	    pips_debug(4, "Relocating begin of attachment from %x to %x\n",
-		       (unsigned int) source + i,
-		       (unsigned int) new_position + i);
+	if (bound_word_to_attachments_begin_p(source + i)) {
+	    pips_debug(4, "Relocating begin of attachment from %p to %p\n",
+		       source + i,
+		       new_position + i);
 	    pips_assert("There is already an attachment on the target",
-			!bound_word_to_attachments_begin_p((int) new_position + i));
-	    store_word_to_attachments_begin((int) new_position + i,
-					    load_word_to_attachments_begin((int) source + i));
-	    delete_word_to_attachments_begin((int) source + i);
+			!bound_word_to_attachments_begin_p(new_position + i));
+	    store_word_to_attachments_begin(new_position + i,
+					    load_word_to_attachments_begin(source + i));
+	    delete_word_to_attachments_begin(source + i);
 	}
-	if (bound_word_to_attachments_end_p((int) source + i)) {
-	    pips_debug(4, "Relocating end of attachment from %x to %x\n",
-		       (unsigned int) source + i,
-		       (unsigned int) new_position + i);
+	if (bound_word_to_attachments_end_p(source + i)) {
+	    pips_debug(4, "Relocating end of attachment from %p to %p\n",
+		       source + i,
+		       new_position + i);
 	    pips_assert("There is already an attachment on the target",
-			!bound_word_to_attachments_end_p((int) new_position + i));
-	    store_word_to_attachments_end((int) new_position + i,
-					  load_word_to_attachments_end((int) source + i));
-	    delete_word_to_attachments_end((int) source + i);
+			!bound_word_to_attachments_end_p(new_position + i));
+	    store_word_to_attachments_end(new_position + i,
+					  load_word_to_attachments_end(source + i));
+	    delete_word_to_attachments_end(source + i);
 	}
     }
     debug_off();
@@ -589,8 +589,8 @@ output_an_attachment(FILE * output_file,
     int begin = attachment_begin(a);
     int end = attachment_end(a);
     
-    pips_debug(5, "begin: %d, end: %d, attachment %#x (attachee %#x)\n",
-	       begin, end, (unsigned int) a, (unsigned int) at);
+    pips_debug(5, "begin: %d, end: %d, attachment %p (attachee %p)\n",
+	       begin, end, a, at);
 
     pips_assert("begin and end should be initialized.",
 		begin != POSITION_UNDEFINED && end != POSITION_UNDEFINED);
@@ -606,21 +606,21 @@ output_an_attachment(FILE * output_file,
     case is_attachee_reference:
 	{	    
 	    reference r = attachee_reference(at);
-	    pips_debug(5, "\treference %#x\n", (unsigned int) r);
+	    pips_debug(5, "\treference %p\n", r);
 	    /* Evaluate the keymap: */
-	    fprintf(output_file, "face epips-face-reference mouse-face epips-mouse-face-reference local-map ,epips-reference-keymap epips-property-reference \"%#x\" epips-property-reference-variable \"%#x\"",
-		    (unsigned int) r, (unsigned int) reference_variable(r));
+	    fprintf(output_file, "face epips-face-reference mouse-face epips-mouse-face-reference local-map ,epips-reference-keymap epips-property-reference \"%p\" epips-property-reference-variable \"%p\"",
+		    r, reference_variable(r));
 	    break;
 	}
 	
     case is_attachee_declaration:
 	{	    
 	    entity e = attachee_declaration(at);
-	    pips_debug(5, "\tdeclaration %#x\n", (unsigned int) e);
+	    pips_debug(5, "\tdeclaration %p\n", e);
 	    /* Output the address as a string because Emacs cannot
                store 32-bit numbers: */
-	    fprintf(output_file, "face epips-face-declaration epips-property-declaration \"%#x\"",
-		    (unsigned int) e);
+	    fprintf(output_file, "face epips-face-declaration epips-property-declaration \"%p\"",
+		    e);
 	    break;
 	}      
 	
@@ -635,18 +635,17 @@ output_an_attachment(FILE * output_file,
     case is_attachee_loop: 
   	{	    
  	    loop l = attachee_loop(at);
- 	    pips_debug(5, "\tloop %#x\n", (unsigned int) l);
+ 	    pips_debug(5, "\tloop %p\n", l);
  	    if (execution_parallel_p(loop_execution(l)))
  		fprintf(output_file, "face epips-face-parallel-loop ");
-	    fprintf(output_file, "epips-property-loop \"%#x\"",
-		    (unsigned int) l);
+	    fprintf(output_file, "epips-property-loop \"%p\"", l);
   	    break;
   	}
 	
     case is_attachee_module_head:
 	{
 	    entity head = attachee_module_head(at);
-	    pips_debug(5, "\tmodule_head %#x\n", (unsigned int) head);
+	    pips_debug(5, "\tmodule_head %p\n", head);
 	    fprintf(output_file,
 		    "face epips-face-module-head epips-module-head-name \"%s\"",
 		    module_local_name(head));
@@ -820,9 +819,7 @@ output_the_attachments_for_emacs(FILE * output_file)
 
     WORD_TO_ATTACHMENTS_MAP(word_pointer, attachment_list,
     {
-	pips_debug(6, "Key %#x, value %#x\n",
-		   (unsigned int) word_pointer,
-		   (unsigned int) attachment_list);
+	pips_debug(6, "Key %p, value %p\n", word_pointer, attachment_list);
 	/* Unlink the attachment from
 	   attachments to avoid double free
 	   later since referenced both by
