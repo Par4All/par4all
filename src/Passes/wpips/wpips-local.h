@@ -64,6 +64,8 @@ wpips_transform_menu_layout_line;
 
 /* Define the menu separator: */
 #define WPIPS_MENU_SEPARATOR MENU_ITEM, MENU_STRING, "", MENU_INACTIVE, TRUE, NULL
+/* How it is specified in the layout .h: */
+#define WPIPS_MENU_SEPARATOR_ID ""
 
 /* Here are the X ressource stuff: */
 /* The Log Window: */
