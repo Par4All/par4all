@@ -17,9 +17,11 @@
 #include "contrainte.h"
 #include "sc.h"
 
+/*
 #include "sommet.h"
 #include "ray_dte.h"
 #include "sg.h"
+*/
 
 #include "polyedre.h"
 
@@ -114,7 +116,7 @@ int ofl_ctrl;
     Psysteme s = SC_UNDEFINED;
     boolean catch_performed = FALSE;
     /* mem_spy_begin(); */
-   
+
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
 
     switch (ofl_ctrl) 
@@ -138,9 +140,8 @@ int ofl_ctrl;
 	    if (SC_RN_P(s2) || sc_rn_p(s2) || sc_dimension(s2)==0
 		|| sc_empty_p(s1) || !sc_faisabilite_ofl(s1)) 
 	    {
-		Psysteme sc2 = sc_dup(s2); 
+		Psysteme sc2 = sc_dup(s2);
 		sc2 = sc_elim_redond(sc2);
-		if (SC_UNDEFINED_P(sc2)) printf(" S2 UNDEFINED\n");
 		s = SC_UNDEFINED_P(sc2)? sc_empty(base_dup(sc_base(s2))): 
 		    sc2;
 	    }
@@ -149,8 +150,7 @@ int ofl_ctrl;
 		    || sc_empty_p(s2) || !sc_faisabilite_ofl(s2)) 
 		{
 		    Psysteme sc1 = sc_dup(s1);
-		    sc1 = sc_elim_redond(sc1); 
-		    if (SC_UNDEFINED_P(sc1)) printf(" S1 UNDEFINED\n");
+		    sc1 = sc_elim_redond(sc1);
 		    s = SC_UNDEFINED_P(sc1)? 
 			sc_empty(base_dup(sc_base(s1))): sc1;
 		}
@@ -171,8 +171,7 @@ int ofl_ctrl;
 Psysteme sc_enveloppe_chernikova(s1, s2)
 Psysteme s1, s2;
 {
-
-    return(sc_enveloppe_chernikova_ofl_ctrl((s1), (s2), OFL_CTRL));
+  return sc_enveloppe_chernikova_ofl_ctrl((s1), (s2), OFL_CTRL);
 } 
 
 
@@ -196,10 +195,11 @@ Psysteme s1, s2;
  *
  * Francois Irigoin, 9 August 1992
  *
- * Note: This algorithm is simply wrong. Let s1 = {i==1, i==2} and s2 = {i==3, i==2}.
- * Constraint i==2 can be removed. The convex hull of i==1 and i==3 is 1 <= i <= 3.
+ * Note: This algorithm is simply wrong.
+ * Let s1 = {i==1, i==2} and s2 = {i==3, i==2}.
+ * Constraint i==2 can be removed. 
+ * The convex hull of i==1 and i==3 is 1 <= i <= 3.
  * Its intersection with i == 2 is i == 2.
- * 
  */
 /*
 Psysteme sc_fast_convex_hull(s1, s2)
@@ -302,7 +302,10 @@ Psysteme s2;
  * Return h
  *
  * Francois Irigoin, 9 August 1992
+ *
+ * Note: as false as above. 
  */
+/*
 Psysteme sc_fast_enveloppe_chernikova_ofl_ctrl(s1, s2, ofl_ctrl)
 Psysteme s1;
 Psysteme s2;
@@ -318,13 +321,6 @@ int ofl_ctrl;
     extern char * dump_value_name();
 
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
-
-    /* 
-    (void) fprintf(stderr, "sc_fast_enveloppe_chernikova: begin\ns1:\n");
-    sc_fprint(stderr, s1, dump_value_name);
-    (void) fprintf(stderr, "s2:\n");
-    sc_fprint(stderr, s2, dump_value_name);
-    */
 
     for(eq = sc_egalites(s1); !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
 	if(egalite_in_liste(eq, sc_egalites(s2))) {
@@ -381,21 +377,7 @@ int ofl_ctrl;
     sc_base(s0) = base_union(sc_base(s1), sc_base(s2));
     sc_dimension(s0) = vect_size(s0->base);
 
-    /*
-    (void) fprintf(stderr, "sc_fast_enveloppe_chernikova: new systems\ns1p:\n");
-    sc_fprint(stderr, s1p, dump_value_name);
-    (void) fprintf(stderr, "s2p:\n");
-    sc_fprint(stderr, s2p, dump_value_name);
-    (void) fprintf(stderr, "s0:\n");
-    sc_fprint(stderr, s0, dump_value_name);
-    */
-
     hp = sc_enveloppe_chernikova_ofl_ctrl(s1p, s2p, ofl_ctrl);
-
-    /*
-    (void) fprintf(stderr, "sc_fast_enveloppe_chernikova: small enveloppe\nhp:\n");
-    sc_fprint(stderr, hp, dump_value_name);
-    */
 
     hp = sc_safe_append(hp, s0);
 
@@ -403,14 +385,9 @@ int ofl_ctrl;
     sc_rm(s1p);
     sc_rm(s2p);
 
-    /*
-    (void) fprintf(stderr, "sc_fast_enveloppe_chernikova: end\nreturn hp:\n");
-    sc_fprint(stderr, hp, dump_value_name);
-    */
-
     return hp;
 }
-
+*/
 
 /* Psysteme sc_common_projection_convex_hull(Psysteme s1, Psysteme s2):
  *
@@ -433,7 +410,8 @@ int ofl_ctrl;
  *
  * Note:  it would be better to compute the convex hull of eq1 and eq2 using 
  * an Hermite form
- * 
+ *
+ * Note: missing -1 coeff...
  */
 Psysteme
 sc_common_projection_convex_hull_with_base_ordering
@@ -444,10 +422,7 @@ sc_common_projection_convex_hull_with_base_ordering
     Psysteme s1p = sc_dup(s1);
     Psysteme s2p = sc_dup(s2);
     Psysteme hp = SC_UNDEFINED;
-    Psysteme s1pp = SC_UNDEFINED;
-    Psysteme s2pp = SC_UNDEFINED;
-    Pcontrainte eq,leq;
-    Pcontrainte listeq = contraintes_dup(sc_egalites(s1p));
+    Pcontrainte eq;
     Pbase b;
     int d;
     boolean feasible_p = TRUE;
@@ -456,16 +431,16 @@ sc_common_projection_convex_hull_with_base_ordering
 
     assert(!SC_UNDEFINED_P(s1) && !SC_UNDEFINED_P(s2));
 
-    /* */
+    /* 
     ifdebug {
     (void) fprintf(stderr, "sc_common_projection_convex_hull: begin\ns1:\n");
     sc_dump(s1);
     (void) fprintf(stderr, "s2:\n");
     sc_dump(s2);
     }
-    /* */
+    */
 
-    for(eq = listeq; !CONTRAINTE_UNDEFINED_P(eq) && feasible_p; eq = eq->succ) {
+    for(eq = sc_egalites(s1p); !CONTRAINTE_UNDEFINED_P(eq) && feasible_p; eq = eq->succ) {
 	if(egalite_in_liste(eq, sc_egalites(s2p))) {
 	    if(egalite_normalize(eq)) {
 		if(CONTRAINTE_NULLE_P(eq)) {
@@ -481,7 +456,7 @@ sc_common_projection_convex_hull_with_base_ordering
 		    /* Keep eq in s0 */
 
 		    new_eq = contrainte_dup(eq);
-		   
+		    sc_add_egalite(s0, new_eq);
 
 		    /* Use eq to eliminate a variable */
 
@@ -504,39 +479,13 @@ sc_common_projection_convex_hull_with_base_ordering
 		     * use a copy!
 		     */
 		    def = contrainte_dup(eq);
-		    s1pp = sc_dup(s1p);
-		    s2pp = sc_dup(s2p);
-
-		    CATCH(overflow_error) {
-		      contrainte_rm(new_eq);
-		      sc_rm(s1pp);
-		      sc_rm(s2pp);
-		      contrainte_rm(def);
-		    }
-		    TRY { 
-		    
-		      s1pp = 
+		    s1p = 
 			sc_simple_variable_substitution_with_eq_ofl_ctrl
-			(s1pp, def, v, NO_OFL_CTRL);
-		      s2pp = 
+			    (s1p, def, v, NO_OFL_CTRL);
+		    s2p = 
 			sc_simple_variable_substitution_with_eq_ofl_ctrl
-			(s2pp, def, v, NO_OFL_CTRL);
- 
-		      for (leq = listeq; !CONTRAINTE_UNDEFINED_P(leq);
-			  leq = contrainte_succ(leq)) {
-			(void) contrainte_subst_ofl_ctrl(v, def, leq, TRUE, NO_OFL_CTRL);
-		      }
-
-		      sc_rm(s1p);
-		      sc_rm(s2p);
-		      s1p = s1pp;
-		      s2p = s2pp;
-		      contrainte_rm(def); 
-		      sc_add_egalite(s0, new_eq);
-		      UNCATCH(overflow_error);
-		    }
-		    
-		
+			    (s2p, def, v, NO_OFL_CTRL);
+		    contrainte_rm(def);
 		}
 	    }
 	    else {
@@ -547,18 +496,16 @@ sc_common_projection_convex_hull_with_base_ordering
 	}
     }
 
-    contraintes_free(listeq);
-
     /* Keep track of the full bases for the convex hull */
     sc_base(s0) = base_union(sc_base(s1), sc_base(s2));
     sc_dimension(s0) = vect_size(s0->base);
 
-    /* */
+    /* 
     ifdebug {
     (void) fprintf(stderr, "sc_common_projection_convex_hull: common equalities\ns1p:\n");
     sc_dump(s0);
     }
-    /* */
+    */
 
     feasible_p1 = feasible_p && !SC_EMPTY_P(s1p = sc_normalize(s1p));
     feasible_p2= !SC_EMPTY_P(s2p = sc_normalize(s2p));
@@ -583,23 +530,23 @@ sc_common_projection_convex_hull_with_base_ordering
 	sc_base(s2p) = b;
 	sc_dimension(s2p) = d;
 
-	/* */
+	/*
 	ifdebug {
 	(void) fprintf(stderr, "sc_common_projection_convex_hull: new systems\ns1p:\n");
 	sc_dump(s1p);
 	(void) fprintf(stderr, "s2p:\n");
 	sc_dump(s2p);
         }
-	/* */
+	 */
 
 	hp = sc_enveloppe_chernikova_ofl_ctrl(s1p, s2p, OFL_CTRL);
 
-	/* */
+	/*
 	ifdebug {
 	(void) fprintf(stderr, "sc_common_projection_convex_hull: small enveloppe\nhp:\n");
 	sc_dump(hp);
         }
-	/* */
+	 */
 
 	hp = sc_safe_append(hp, s0);
 
@@ -640,25 +587,74 @@ sc_common_projection_convex_hull_with_base_ordering
     sc_rm(s1p);
     sc_rm(s2p);
 
-    /* */
-    ifdebug {
-    (void) fprintf(stderr, "sc_common_projection_convex_hull: end\nreturn hp:\n");
-    sc_dump(hp);
-    }
-    /* */
-
     return hp;
 }
 
-void
-no_base_sort(Pbase *pbase)
+void no_base_sort(Pbase *pbase)
 {
     return;
 }
 
-Psysteme 
-sc_common_projection_convex_hull(Psysteme s1, Psysteme s2)
+Psysteme sc_common_projection_convex_hull(Psysteme s1, Psysteme s2)
 {
-    return
-	(sc_common_projection_convex_hull_with_base_ordering(s1, s2, no_base_sort));
+  return sc_common_projection_convex_hull_with_base_ordering
+    (s1, s2, no_base_sort);
+}
+
+/* call chernikova with compatible base.
+ */
+static Psysteme actual_convex_union(Psysteme s1, Psysteme s2)
+{
+  Psysteme s;
+
+  /* same common base! */
+  Pbase b1 = sc_base(s1), b2 = sc_base(s2), bu = base_union(b1, b2);
+  int d1 = sc_dimension(s1), d2 = sc_dimension(s2), du = vect_size(bu);
+
+  sc_base(s1) = bu;
+  sc_dimension(s1) = du;
+  sc_base(s2) = bu;
+  sc_dimension(s2) = du;
+
+  /* call chernikova directly.
+     sc_common_projection_convex_hull improvements have already been included.
+  */
+  s = sc_enveloppe_chernikova(s1, s2);
+
+  /* restaure initial base */
+  sc_base(s1) = b1;
+  sc_dimension(s1) = d1;
+  sc_base(s2) = b2;
+  sc_dimension(s2) = d2;
+
+  base_rm(bu);
+
+  return s;
+}
+
+/* implements FC basic idea of simple fast cases...
+ * returns s1 v s2. 
+ * s1 and s2 are not touched.
+ * The bases should be minimum for best efficiency!
+ * a common base is rebuilt in actual_convex_union.
+ * other fast cases may be added?
+ */
+Psysteme elementary_convex_union(Psysteme s1, Psysteme s2)
+{
+  if (sc_empty_p(s1) || sc_empty_p(s2))
+    return sc_empty(base_union(sc_base(s1), sc_base(s2)));
+  
+  if (sc_rn_p(s1) || sc_rn_p(s2) || 
+      !vect_common_variables_p(sc_base(s1), sc_base(s2)))
+    return sc_rn(base_union(sc_base(s1), sc_base(s2)));
+
+  /*
+  if (sc_dimension(s1)==1 && sc_dimension(s2)==1 && 
+      sc_base(s1)->var == sc_base(s2)->var)
+  {
+    // fast computation...
+  }
+  */
+
+  return actual_convex_union(s1, s2);
 }
