@@ -124,7 +124,7 @@ Polyhedron *PDomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRa
 } /* PDomainDifference */
 
 /* 
- * Return 1 if matrix 'Mat' is full ranked, otherwise return 0. 
+ * Return 1 if matrix 'Mat' is full column ranked, otherwise return 0. 
  */  
 static int TestRank(Matrix *Mat) {
   
@@ -268,6 +268,7 @@ static SatMatrix   *Sat;       /* Saturation Matrix (row=constraint, col=ray)*/
 static int *egalite;	       /* Bool vector marking constraints in m-face  */
 static Matrix *Xi, *Pi;	       /* Xi and Pi */
 static Matrix *PiTest;	       /* Matrix used to test if Pi is full ranked? */
+static Matrix *CTest;
 static Matrix *PiInv;	       /* Matrix inverse Pi, with the last col of   */
 			       /* each line = denominator of the line       */
 static Matrix *RaysDi;	       /* Constraint matrix for computing Di */
@@ -642,16 +643,41 @@ fprintf(stderr,"new_mf = ");
 	/* optimization : at least m_dim+1 rays must be saturated to add this constraint */
 	if (c>m_dim )
 	{
-		/* if this constraint does not change anything do not decrement nb_un
-		   (it's a redundant equality). */
-		if( c==count_sat(mf) )
+		int redundant = 0;
+
+                egalite[pos]=1;		/* Try it with the pos-th constraint */
+
+		/* If this constraint does not change anything,
+		 * it is redundant with respect to the selected
+		 * equalities and the remaining inequalities.
+		 * Check whether it is redundant with respect
+		 * to just the selected equalities.
+		 */
+		if( c==count_sat(mf) ) {
+		    int i, c, j;
+
+		    for (i = 0, c = 0; i < D->NbConstraints; ++i) {
+			if (egalite[i] == 0)
+			    continue;
+			for (j = 0; j < D->Dimension+1; ++j)
+			    value_assign(CTest->p[j][c], 
+					 D->Constraint[i][j+1]);
+			++c;
+		    }
+		    CTest->NbColumns = c;
+#ifdef DEBUGPP41
+		    Matrix_Print(stderr,P_VALUE_FMT,CTest);
+#endif
+		    redundant = !TestRank(CTest);
+		}
+
+		/* Do not decrement nb_un if equality is redundant. */
+		if( redundant )
 		{
-			egalite[pos]=1;		/* Try it with the pos-th constraint */
 		   scan_m_face(pos+1,nb_un,D,new_mf);
 		}
 		else
 		{
-		   egalite[pos]=1;		/* Try it with the pos-th constraint */
 		   scan_m_face(pos+1,nb_un-1,D,new_mf);
 		}
 	}
@@ -1153,6 +1179,7 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   Xi     = Matrix_Alloc(n+1,m+1);
   Pi     = Matrix_Alloc(m+1,m+1);
   PiTest = Matrix_Alloc(m+1,m+1);
+  CTest  = Matrix_Alloc(D->Dimension+1,D->NbConstraints);
   PiInv  = Matrix_Alloc(m+1,m+2);
   RaysDi = Matrix_Alloc(D1->NbRays,m+2);
   m_dim = m;
@@ -1178,6 +1205,7 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
   Matrix_Free(RaysDi);
   Matrix_Free(PiInv);
   Matrix_Free(PiTest);
+  Matrix_Free(CTest);
   Matrix_Free(Pi);
   Matrix_Free(Xi);
   free(egalite);
