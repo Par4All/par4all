@@ -22,8 +22,8 @@
 %}
 
 %%
-<TEXT>VAR			{ RETURN(VAR); }
-<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { yylval.Variable = (Variable) strdup(yytext);
+<TEXT>VAR			{ RETURN(VAR); } 
+<TEXT>[A-Za-z_]['A-Za-z0-9_:#]* { yylval.Variable = (Variable) strdup(yytext); /*'*/
                                   RETURN(IDENT); }
 <TEXT>[0-9]*			{ sscan_Value(yytext,&yylval.Value);
                                   RETURN(CONSTANTE); }
@@ -41,7 +41,7 @@
 <TEXT>"#"                       {BEGIN COMMENT;}
 <COMMENT>\n                     {BEGIN TEXT;}
 <COMMENT>[^\n]*         ;
-%%
+%% 
 
 #ifdef FLEX_SCANNER
 int yyinput()
@@ -60,7 +60,8 @@ int yywrap(void)
  
 void sc_init_lex(void)
 {
-        BEGIN TEXT;
+    /*yyrestart(); */
+    BEGIN TEXT;
 }
 
 extern boolean yysyntax_error;
