@@ -229,7 +229,7 @@ void dbll_save_resource(string rname, string oname, void * p)
 {
     methods * m;
     FILE * f;
-    pips_debug(7, "saving resource %s of %s\n", rname, oname);
+    pips_debug(7, "saving resource %s[%s]\n", rname, oname);
 
     dbll_current_module = oname;
     m = get_methods(rname);
@@ -249,7 +249,7 @@ void * dbll_load_resource(string rname, string oname)
     methods * m;
     FILE * f;
     void * p = NULL;
-    pips_debug(7, "loading resource %s of %s\n", rname, oname);
+    pips_debug(7, "loading resource %s[%s]\n", rname, oname);
 
     dbll_current_module = oname;
     m = get_methods(rname);
@@ -266,7 +266,7 @@ void * dbll_load_resource(string rname, string oname)
 void dbll_free_resource(string rname, string oname, void * p)
 {
     methods * m; 
-    pips_debug(7, "freeing resource %s of %s\n", rname, oname);
+    pips_debug(7, "freeing resource %s[%s]\n", rname, oname);
     m = get_methods(rname);
     m->free_function(p);
 }
@@ -274,7 +274,7 @@ void dbll_free_resource(string rname, string oname, void * p)
 bool dbll_check_resource(string rname, string oname, void * p)
 {
     methods * m;
-    pips_debug(7, "checking resource %s of %s\n", rname, oname);
+    pips_debug(7, "checking resource %s[%s]\n", rname, oname);
     m = get_methods(rname);
     return m->check_function(p);
 }
