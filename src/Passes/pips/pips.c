@@ -152,6 +152,7 @@ int
 pips_main(int argc, char ** argv)
 {
     bool success = TRUE;
+    pips_thanks("pips");
     pips_checks();
     initialize_newgen();
     initialize_sc((char*(*)(Variable)) entity_local_name); 
