@@ -50,31 +50,37 @@ same_reg_ignore_action(region reg1, region reg2)
 
     pips_debug(4,"begin\n");
 
-/*
-	    ifdebug(9)
-		{
-		    pips_debug(9,"compare:\n\t");
-		    print_region(reg1);
-		    pips_debug(9,"with:\n\t");
-		    print_region(reg2);
-		}
-		*/
-
     if (effect_undefined_p(reg1) || effect_undefined_p(reg2)) return result;
 
     if (effect_entity(reg1) == effect_entity(reg2))
     {
+/*	pips_debug(1,"same entity\n"); */
+
 	if (effect_approximation_tag(reg1) == 
 		effect_approximation_tag(reg2))
 	    {
+/*		pips_debug(1,"same approx\n"); */
+
+	    ifdebug(1)
+		{
+		    set_action_interpretation(ACTION_IN,ACTION_OUT);
+		    pips_debug(1,"compare:\n\t");
+		    print_region(reg1);
+		    pips_debug(1,"with:\n\t");
+		    print_region(reg2);
+		    reset_action_interpretation();
+		}
+
 		reg1_sys = region_system(reg1);
 		reg2_sys = region_system(reg2);
 		if ( sc_equal_p_ofl(reg1_sys,reg2_sys) )
 		{
 		    result = TRUE;
 
-		    pips_debug(4,"same region\n");
+		    pips_debug(1,"same region\n");
 		}
+		else
+		    pips_debug(1,"not same region\n");
 	    }
 	}
     pips_debug(4,"end\n");
@@ -98,10 +104,12 @@ member(region reg, list reg_list)
 /*
 	    ifdebug(9)
 		{
+		    set_action_interpretation(ACTION_IN,ACTION_OUT);
 		    pips_debug(9,"test if:\n\t");
 		    print_region(reg);
 		    pips_debug(9,"is in:\n\t");
 		    print_inout_regions(reg_list);
+		    reset_action_interpretation();
 		}
 		*/
 
@@ -139,16 +147,17 @@ append_reg_if_not_present(list reg_list, region reg)
 /*
   ifdebug(9)
   {
+		    set_action_interpretation(ACTION_IN,ACTION_OUT);
   pips_debug(9,"add:\n\t");
   print_region(reg);
   pips_debug(9,"to:\n\t");
   print_inout_regions(reg_list);
+		    reset_action_interpretation();
   }
 */
 
     if (!member(reg,reg_list))
-	new_reg_list = gen_nconc(reg_list,
-				 CONS(EFFECT,region_dup(reg),NIL));
+	new_reg_list = gen_nconc(reg_list,CONS(EFFECT,reg,NIL));
     else
 	new_reg_list = reg_list;
 
@@ -171,7 +180,9 @@ add_unmatched_alias_pairs()
     MAP(LIST,alias_pair,
 	{
 	    l_alias_lists =
-		CONS(EFFECTS,make_effects(alias_pair),l_alias_lists);
+		CONS(EFFECTS,
+		     make_effects(regions_dup(alias_pair)),
+		     l_alias_lists);
 	},unmatched_alias_pairs);
 
     pips_debug(4,"end\n");
@@ -209,7 +220,7 @@ compare_matched_alias_pairs(bool result,
 		l_alias_lists =
 		    CONS(EFFECTS,
 			 make_effects(gen_nconc(regions_dup(callee_alias_list),
-						CDR(alias_pair))),
+						regions_dup(CDR(alias_pair)))),
 			 l_alias_lists);
 		result = TRUE;
 	    }
@@ -264,7 +275,7 @@ compare_unmatched_alias_pairs(region alias_list_reg, list callee_alias_list)
 		l_alias_lists =
 		    CONS(EFFECTS,
 			 make_effects(gen_nconc(regions_dup(callee_alias_list),
-						CDR(alias_pair))),
+						regions_dup(CDR(alias_pair)))),
 			 l_alias_lists);
 		matched_alias_pairs =
 		    CONS(LIST,alias_pair,matched_alias_pairs);
@@ -379,7 +390,7 @@ alias_lists( string module_name )
     debug_on("ALIAS_LISTS_DEBUG_LEVEL");
     pips_debug(4,"begin for module %s\n",module_name);
 
-    ifdebug(9)
+    ifdebug(1)
 	{
 	    /* ATTENTION: we have to do ALL this
 	     * just to call print_inout_regions for debug !!
@@ -433,8 +444,7 @@ alias_lists( string module_name )
 
     MAP(EFFECTS, alias_pair_effects,
 	{
-	    list alias_pair =
-		regions_dup(effects_effects(alias_pair_effects));
+	    list alias_pair = effects_effects(alias_pair_effects);
 
 	    ifdebug(9)
 		{
@@ -458,8 +468,7 @@ alias_lists( string module_name )
 
     MAP(EFFECTS, alias_pair_effects,
 	{
-	    list alias_pair =
-		regions_dup(effects_effects(alias_pair_effects));
+	    list alias_pair = effects_effects(alias_pair_effects);
 
 	    ifdebug(9)
 		{
@@ -521,7 +530,7 @@ alias_lists( string module_name )
 			   strdup(module_name),
 			   (char*) make_effects_classes(l_alias_lists));    
 
-    ifdebug(9)
+    ifdebug(1)
 	{
 	    free_value_mappings();
 	    reset_current_module_statement();
