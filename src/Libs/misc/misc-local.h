@@ -15,6 +15,8 @@
 #define pips_debug pips_debug_function
 #endif
 
+#define pips_assert(f, p) pips_assert_function((f), (p), __LINE__, __FILE__)
+
 #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
 
 /* Constant used to dimension arrays in wpips and pipsmake */
