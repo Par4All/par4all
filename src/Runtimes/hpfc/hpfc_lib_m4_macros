@@ -1,0 +1,30 @@
+c
+c general m4 macros
+c
+c this macro builds a name from its arguments, separated by _
+c
+define(`build_name',dnl
+`ifelse($#,0,,$#,1,``$1'',``$1_''`build_name(shift($@))')')dnl
+c
+c this for macro is taken as is from the documentation
+c
+define(`forloop',
+       `pushdef(`$1', `$2')_forloop(`$1', `$2', `$3', `$4')popdef(`$1')')dnl
+define(`_forloop',
+       `$4`'ifelse($1, `$3', ,
+       `define(`$1', incr($1))_forloop(`$1', `$2', `$3', `$4')')')dnl
+c
+c replicate macros definition
+c
+define(`SIMPLE_REPLICATE',`dnl
+ifelse($1, 0, ,`forloop(`_I_', 1, $1, `$2(_I_)')')')dnl
+define(`COMMA_REPLICATE',dnl
+`ifelse($1, 0, ,dnl
+`forloop(`_I_', 1, $1, `ifelse(_I_, 1, `$2(_I_)',`,$2(_I_)')')')')dnl
+c
+c TO7 definition
+c
+define(`TO7',`eval(7-$1)')dnl
+c
+c end of general m4 macros
+c
