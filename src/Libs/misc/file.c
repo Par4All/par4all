@@ -1,5 +1,5 @@
 /* $RCSfile: file.c,v $ (version $Revision$)
- * $Date: 1997/09/30 06:56:14 $, 
+ * $Date: 1997/10/02 06:15:15 $, 
  */
 
 #include <unistd.h>
@@ -309,20 +309,18 @@ bool file_exists_p(char * name)
 
 bool create_directory(char *name)
 {
-    bool success;
+    bool success = TRUE;
 
     if (directory_exists_p(name)) {
-	pips_error("create_directory", "existing directory : %s\n", name);
+	pips_internal_error("existing directory : %s\n", name);
     }
 
     if (mkdir(name, 0777) == -1) {
-	user_warning("create_directory", "cannot create directory : %s\n (%s)",
-		     name, sys_errlist[errno]);
+	pips_user_warning("cannot create directory : %s (%s)\n",
+			  name, sys_errlist[errno]);
 	success = FALSE;
     }
-    else {
-	success = TRUE;
-    }
+
     return success;
 }
 
