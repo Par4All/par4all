@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/07/12 10:40:32 $, )
+# ($Date: 1996/07/12 10:52:17 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -21,7 +21,7 @@ verbose=:
 
 verb()
 {
-    echo "$script" "$@"
+    echo "$script: $@" >&2
 }
 
 usage()
@@ -29,7 +29,7 @@ usage()
     ret=$1
     shift
     cat <<-EOF
-	$script (version $Revision$) - "$@"
+	$script (version $Revision$) - $@
 	  -h: this help
 	  -v: verbose
 	  -c arch: compile for arch (may be a list, default is .)
@@ -69,7 +69,7 @@ do
 done
 
 report=/tmp/${script}.${user}.$$
-rm -f ${report}
+rm -f ${report}*
 
 #
 # do the job
@@ -110,9 +110,10 @@ test "$no_pips" ||
 # summary
 test "$no_newgen$no_linear$no_pips" -eq 111 ||
 {
-  grep 'failed$' $report |
-  mail -s "$script: recompile night report summary" $email 
-  rm -f $report
+  grep 'failed$' $report > $report.failed
+  if test -z $report.failed ; then summary=SUCCEEDED; else summary=FAILED; fi
+  mail -s "$script: recompile $summary" $email < $report.failed
+  rm -f $report*
 }
 
 # Validate Pips
