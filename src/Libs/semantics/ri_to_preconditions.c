@@ -119,51 +119,88 @@ block_to_postcondition(
     return post;
 }
 
-static void 
+static transformer
 unstructured_to_postconditions(
     transformer pre,
     transformer pre_first,
     unstructured u)
 {
-    cons *blocs = NIL ;
-    control ct = unstructured_control(u) ;
-    transformer c_pre = transformer_undefined;
-    transformer post = transformer_undefined;
+  list nodes = NIL ;
+  control entry_node = unstructured_control(u) ;
+  control exit_node = unstructured_exit(u) ;
+  transformer c_pre = transformer_undefined;
+  transformer post = transformer_undefined;
+  transformer exit_post = transformer_undefined;
 
-    debug(8,"unstructured_to_postconditions","begin\n");
+  debug(8,"unstructured_to_postconditions","begin\n");
 
-    /* SHARING! Every statement gets a pointer to the same precondition!
-     * I do not know if it's good or not but beware the bugs!!!
-     */
-    /* FI: changed to make free_transformer_mapping possible without 
-     * testing sharing.
-     *
-     * pre and pre_first can or not be used depending on the
-     * unstructured structure. They are always duplicated and
-     * the caller has to take care of their de-allocation.
-     */
-    CONTROL_MAP(c, {
-	statement st = control_statement(c) ;
-	if(c==ct && ENDP(control_predecessors(c)) && statement_test_p(st)) {
-	    /* special case for the first node if it has no predecessor */
-	    /* and if it is a test, as it always should, at least if */
-	    /* unspaghettify has been applied... */
-	    /* this is pretty useless and should be generalized to the
-	       DAG part of the CFG */
-	    c_pre = transformer_dup(pre_first);
-	    post = statement_to_postcondition(c_pre, st);
-	    transformer_free(post);
+  /* SHARING! Every statement gets a pointer to the same precondition!
+   * I do not know if it's good or not but beware the bugs!!!
+   */
+  /* FI: changed to make free_transformer_mapping possible without 
+   * testing sharing.
+   *
+   * pre and pre_first can or not be used depending on the
+   * unstructured structure. They are always duplicated and
+   * the caller has to take care of their de-allocation.
+   */
+  CONTROL_MAP(c, {
+    statement st = control_statement(c) ;
+    if(c==entry_node && ENDP(control_predecessors(c)) && statement_test_p(st)) {
+      /* special case for the first node if it has no predecessor */
+      /* and if it is a test, as it always should, at least if */
+      /* unspaghettify has been applied... */
+      /* this is pretty useless and should be generalized to the
+	 DAG part of the CFG */
+      c_pre = transformer_dup(pre_first);
+      post = statement_to_postcondition(c_pre, st);
+      transformer_free(post);
+    }
+    else {
+      transformer c_pre_m = transformer_undefined;
+
+      c_pre = transformer_dup(pre);
+      c_pre_m = c_pre;
+
+      /* refine the precondition if the node has only one
+	 predecessor and if this predecessor is a test and if the
+	 test can be exploited */
+      if(gen_length(control_predecessors(c))==1 && c!=entry_node) {
+	control prev_c = CONTROL(CAR(control_predecessors(c)));
+	statement prev_st = control_statement(prev_c);
+
+	if(statement_test_p(prev_st)) {
+	  /* the condition is TRUE if c is the first successor of prev_c */
+	  bool true_false = (c==(CONTROL(CAR(control_successors(prev_c)))));
+	  expression e = test_condition(statement_test(prev_st));
+
+	  c_pre_m = precondition_add_condition_information(c_pre, e, true_false);
+	  /* If the free is performed, core dump guaranteed on some
+             examples: see unclear comments about the previously called
+             function:-( */
+	  /* free_transformer(c_pre); */
 	}
-	else {
-	    c_pre = transformer_dup(pre);
-	    post = statement_to_postcondition(c_pre, st);
-	    transformer_free(post);
-	}
-    }, ct, blocs) ;
+      }
 
-    gen_free_list(blocs) ;
+      post = statement_to_postcondition(c_pre_m, st);
+      if(c==exit_node) {
+	exit_post = post;
+      }
+      else {
+	transformer_free(post);
+      }
+    }
+  }, entry_node, nodes);
 
-    debug(8,"unstructured_to_postconditions","end\n");
+  gen_free_list(nodes) ;
+
+  ifdebug(8) {
+    debug(8,"unstructured_to_postconditions","exit postcondition:\n");
+    (void) print_transformer(exit_post) ;
+  }
+  debug(8,"unstructured_to_postconditions","end\n");
+
+  return exit_post;
 }
 
 static transformer 
@@ -197,12 +234,23 @@ unstructured_to_postcondition(
 	   Preconditions associated to its components are then computed
 	   independently, hence the name unstructured_to_postconditionS
 	   instead of unstructured_to_postcondition */
-	/* propagate as precondition an invariant for the whole 
-	   unstructured u */
-	transformer pre_u = 
-	    invariant_wrt_transformer(pre,tf);
+	/* propagate as precondition an invariant for the whole
+	   unstructured u assuming that all nodes in the CFG are fully
+	   connected, unless tf is not feasible because the unstructured
+	   is never exited or exited thru a call to STOP which invalidates
+	   the previous assumption. */
+      transformer tf_u = transformer_undefined;
+      transformer pre_u = transformer_undefined;
+
 	debug(8,"unstructured_to_postcondition",
 	      "complex: based on transformer\n");
+	if(transformer_empty_p(tf)) {
+	  tf_u = unstructured_to_global_transformer(u);
+	}
+	else {
+	  tf_u = tf;
+	}
+	pre_u = invariant_wrt_transformer(pre, tf_u);
 	ifdebug(8) {
 	  debug(8,"unstructured_to_postcondition",
 	      "filtered precondition pre_u:\n");
@@ -213,8 +261,10 @@ unstructured_to_postcondition(
 	/* FI: euh... why? According to comments about transformer_apply()
 	 * neither arguments are modified...
 	 */
-	(void) unstructured_to_postconditions(pre_u, pre, u) ;
-	post = transformer_apply(transformer_dup(tf), pre);
+	post = unstructured_to_postconditions(pre_u, pre, u) ;
+	if(transformer_undefined_p(post)) {
+	  post = transformer_apply(transformer_dup(tf), pre);
+	}
 	transformer_free(pre_u);
     }
 
