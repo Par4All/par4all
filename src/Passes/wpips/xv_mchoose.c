@@ -1,8 +1,5 @@
-/* 	%A% ($Date: 1997/05/13 09:59:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
-
-#ifndef lint
-char vcid_xv_mchoose[] = "%A% ($Date: 1997/05/13 09:59:49 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
-#endif /* lint */
+/* $Id$
+ */
 
 /* Multiple choices handling */
 
@@ -22,7 +19,7 @@ char vcid_xv_mchoose[] = "%A% ($Date: 1997/05/13 09:59:49 $, ) version $Revision
 
 static Panel_item mchoices, choices, ok, cancel, help;
 
-static void (*apply_on_mchoices)(int *, char **) = NULL;
+static void (*apply_on_mchoices)(gen_array_t) = NULL;
 static void (*cancel_on_mchoices)(void) = NULL;
 
 static void mchoose_help_notify(item, event)
@@ -32,72 +29,72 @@ Event *event;
     display_help("MultipleChoice");
 }
 
-
 void static
-mchoose_ok_notify(Panel_item item,
-                  Event * event)
+mchoose_ok_notify(
+    Panel_item item,
+    Event * event)
 {
-   char * mchoices_args[ARGS_LENGTH];
-   char * buffer, * mchoices_notify_buffer;
-   int mchoices_length = 0;
-   int i, nchoices, len;
-   int item_is_in_the_list = FALSE;
-   char * p;
+    gen_array_t mchoices_args = gen_array_make(0);
+    char * buffer, * mchoices_notify_buffer;
+    int mchoices_length = 0;
+    int i, nchoices, len;
+    int item_is_in_the_list = FALSE;
+    char * p;
+    
+    nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, NULL);
+    mchoices_length = 0;
 
-   nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, NULL);
-   mchoices_length = 0;
-
-   mchoices_notify_buffer = strdup((char *) xv_get(mchoices, PANEL_VALUE));
-   /* Upperbound size for the scanf buffer: */
-   buffer = (char *) malloc(strlen(mchoices_notify_buffer) + 1);
-   
-   p = mchoices_notify_buffer;
-   while(sscanf(p, "%s%n", buffer, &len) == 1) {
-      args_add(&mchoices_length, mchoices_args, strdup(buffer));
-      item_is_in_the_list = FALSE;
-      for(i = 0; i < nchoices; i++)
-         if (strcmp((char *)xv_get(choices, PANEL_LIST_STRING, i), buffer) == 0) {
-            item_is_in_the_list = TRUE;
-            break;
-         }
-      if (item_is_in_the_list == FALSE)
-         break;
+    mchoices_notify_buffer = strdup((char *) xv_get(mchoices, PANEL_VALUE));
+    /* Upperbound size for the scanf buffer: */
+    buffer = (char *) malloc(strlen(mchoices_notify_buffer) + 1);
+    
+    p = mchoices_notify_buffer;
+    while(sscanf(p, "%s%n", buffer, &len) == 1) {
+	gen_array_dupaddto(mchoices_args, mchoices_length++, buffer);
+	item_is_in_the_list = FALSE;
+	for(i = 0; i < nchoices; i++)
+	    if (strcmp((char *)
+		       xv_get(choices, PANEL_LIST_STRING, i), buffer) == 0) {
+		item_is_in_the_list = TRUE;
+		break;
+	    }
+	if (item_is_in_the_list == FALSE)
+	    break;
       p += len;
-   }
-
-   free(mchoices_notify_buffer);
-   free(buffer);
-   
-   /*	At least on item selected, and in the list.
+    }
+    
+    free(mchoices_notify_buffer);
+    free(buffer);
+    
+    /*	At least on item selected, and in the list.
         RK, 21/05/1993.
-	*/
-   if (mchoices_length == 0 || item_is_in_the_list == FALSE) {
-      char *s;
-      s = mchoices_length == 0 ? "You have to select at least 1 item!" :
-         "You have selected an item not in the choice list!";
-      args_free(&mchoices_length, mchoices_args);
-      prompt_user(s);
-      return;
-   }
-
-   hide_window(mchoose_frame);
-
-   /* The OK button becomes inactive through RETURN: */
-   xv_set(mchoose_panel, PANEL_DEFAULT_ITEM, NULL, NULL);
-   xv_set(mchoices, PANEL_NOTIFY_PROC, NULL);
-
-   (*apply_on_mchoices)(&mchoices_length, mchoices_args);
-
-   args_free(&mchoices_length, mchoices_args);
-
-   /* Delay the graphics transformations. RK, 21/05/1993. */
-
-   /* Delete all the rows, ie nchoices rows from row 0: */
-   xv_set(choices,
-          PANEL_LIST_DELETE_ROWS, 0, nchoices,
-          NULL);
-
-   xv_set(mchoices, PANEL_VALUE, "", NULL);
+    */
+    if (mchoices_length == 0 || item_is_in_the_list == FALSE) {
+	char *s;
+	s = mchoices_length == 0 ? "You have to select at least 1 item!" :
+	    "You have selected an item not in the choice list!";
+	gen_array_full_free(mchoices_args);
+	prompt_user(s);
+	return;
+    }
+    
+    hide_window(mchoose_frame);
+    
+    /* The OK button becomes inactive through RETURN: */
+    xv_set(mchoose_panel, PANEL_DEFAULT_ITEM, NULL, NULL);
+    xv_set(mchoices, PANEL_NOTIFY_PROC, NULL);
+    
+    (*apply_on_mchoices)(mchoices_args);
+    gen_array_full_free(mchoices_args);
+    
+    /* Delay the graphics transformations. RK, 21/05/1993. */
+    
+    /* Delete all the rows, ie nchoices rows from row 0: */
+    xv_set(choices,
+	   PANEL_LIST_DELETE_ROWS, 0, nchoices,
+	   NULL);
+    
+    xv_set(mchoices, PANEL_VALUE, "", NULL);
 }
 
 
@@ -128,7 +125,7 @@ mchoose_cancel_notify(Panel_item item,
 void static
 mchoose_frame_done_proc(Frame frame)
 {
-   mchoose_cancel_notify(NULL, NULL);
+   mchoose_cancel_notify((Panel_item)NULL, (Event*)NULL);
 }
 
 
@@ -219,7 +216,9 @@ mchoose_de_select_all_notify(Panel_item item,
 		NULL);
 
     /* Update the "Current choices": */
-    (void) mchoose_notify(NULL, NULL, NULL, PANEL_LIST_OP_SELECT, NULL, NULL);
+    (void) mchoose_notify((Panel_item)NULL, NULL, 
+			  (Xv_opaque)NULL, PANEL_LIST_OP_SELECT, 
+			  (Event*) NULL, 0);
 
     /* Next time we press this button, do the opposite: */
     select_all_when_press_this_button = !select_all_when_press_this_button;
@@ -228,13 +227,11 @@ mchoose_de_select_all_notify(Panel_item item,
 
 void
 mchoose(char * title,
-        int argc,
-        char * argv[],
-        void (*function_ok)(int *, char **),
+	gen_array_t array,
+        void (*function_ok)(gen_array_t),
         void (*function_cancel)(void))
 {
-   int i;
-   int nchoices;
+   int i, nchoices, argc = gen_array_nitems(array);
 
    apply_on_mchoices = function_ok;
    cancel_on_mchoices = function_cancel;
@@ -250,7 +247,8 @@ mchoose(char * title,
           NULL);
 
    for (i = 0; i < argc; i++) {
-      xv_set(choices, PANEL_LIST_STRING, i, argv[i], NULL);
+       string mn = gen_array_item(array, i);
+       xv_set(choices, PANEL_LIST_STRING, i, mn, NULL);
    }
 
    unhide_window(mchoose_frame);
