@@ -14,6 +14,8 @@
 #include "ri.h"
 #include "top-level.h"
 #include "database.h"
+#include "makefile.h"
+#include "pipsmake.h"
 #include "pipsdbm.h"
 #include "wpips.h"
 
@@ -22,6 +24,20 @@
 
 #include "resources.h"
 #include "phases.h"
+
+wpips_transform_menu_layout_line wpips_transform_menu_layout[] = {
+#include "wpips_transform_menu_layout.h"
+   /* No more transformations */
+   {
+      NULL, NULL
+   }
+};
+
+
+/* To pass arguments to execute_safe_apply_outside_the_notifyer(): */
+string static execute_safe_apply_outside_the_notifyer_transformation_name_to_apply = NULL;
+string static execute_safe_apply_outside_the_notifyer_module_name = NULL;
+
 
 /* The transform menu: */
 Menu transform_menu;
@@ -57,65 +73,59 @@ enable_transform_selection()
 
 
 void
+execute_safe_apply_outside_the_notifyer()
+{
+   (void) safe_apply(execute_safe_apply_outside_the_notifyer_transformation_name_to_apply, execute_safe_apply_outside_the_notifyer_module_name);
+   free(execute_safe_apply_outside_the_notifyer_transformation_name_to_apply);
+   free(execute_safe_apply_outside_the_notifyer_module_name);   
+   display_memory_usage();
+}
+
+
+void static
+safe_apply_outside_the_notifyer(string transformation_name_to_apply,
+                                string module_name)
+{
+   execute_safe_apply_outside_the_notifyer_transformation_name_to_apply =
+      strdup(transformation_name_to_apply);
+   execute_safe_apply_outside_the_notifyer_module_name =
+      strdup(module_name);
+   /* Ask to execute the execute_safe_apply_outside_the_notifyer(): */
+   execute_main_loop_command(WPIPS_SAFE_APPLY);
+   /* I guess the function above does not return... */
+}
+
+ 
+void static
 transform_notify(Menu menu,
                  Menu_item menu_item)
 {
-   char *label = (char *) xv_get(menu_item, MENU_STRING);
+   char * label = (char *) xv_get(menu_item, MENU_STRING);
 
-   char *modulename = db_get_current_module_name();
+   char * modulename = db_get_current_module_name();
 
    /* FI: borrowed from edit_notify() */
    if (modulename == NULL) {
       prompt_user("No module selected");
-      return;
    }
-
-   if (modulename != NULL) {
-      if (strcmp(label, PRIVATIZE_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_PRIVATIZE_MODULE, modulename);
-      }
-      else if (strcmp(label, DISTRIBUTE_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_DISTRIBUTER, modulename);
-      }
-      else if (strcmp(label, PARTIAL_EVAL_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_PARTIAL_EVAL, modulename);
-      }
-      else if (strcmp(label, FULL_UNROLL_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_FULL_UNROLL, modulename);
-      }
-      else if (strcmp(label, UNROLL_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_UNROLL, modulename);
-      }
-      else if (strcmp(label,STRIP_MINE_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_STRIP_MINE, modulename);
-      }
-      else if (strcmp(label,LOOP_INTERCHANGE_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_LOOP_INTERCHANGE, modulename);
-      }
-      else if (strcmp(label,LOOP_NORMALIZE_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_LOOP_NORMALIZE, modulename);
-      }
-      else if (strcmp(label, SUPPRESS_DEAD_CODE_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_SUPPRESS_DEAD_CODE, modulename);
-      }
-      else if (strcmp(label, UNSPAGHETTIFY_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_UNSPAGHETTIFY, modulename);
-      }
-      else if (strcmp(label, ATOMIZER_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_ATOMIZER, modulename);
-      }
-      else if (strcmp(label, NEW_ATOMIZER_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_NEW_ATOMIZER, modulename);
-      }
-      else if (strcmp(label, REDUCTIONS_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_REDUCTIONS, modulename);
-      }
-      else if (strcmp(label, STF_TRANSFORM) == 0) {
-         (void) safe_apply(BUILDER_STF, modulename);
-      }
-      else {
-         pips_error("transform_notify", "Bad choice");
-      }
+   else {
+      wpips_transform_menu_layout_line * current_transformation;
+   
+      /* Find the transformation to apply: */
+      for (current_transformation = &wpips_transform_menu_layout[0];
+           current_transformation->menu_entry_string != NULL;
+           current_transformation++)
+         if (strcmp(label, current_transformation->menu_entry_string) == 0)
+            break;
+      
+      if (current_transformation->menu_entry_string != NULL)
+         /* Apply the transformation: */
+         safe_apply_outside_the_notifyer(current_transformation->transformation_name_to_apply, modulename);
+      /* I guess the function above does not return... */
+      else
+         pips_error("transform_notify",
+                    "What is this \"%s\" entry you ask for?",
+                    label);
    }
 
    display_memory_usage();
@@ -125,6 +135,8 @@ transform_notify(Menu menu,
 void
 create_transform_menu()
 {
+   wpips_transform_menu_layout_line * current_transformation;
+   
    edit_menu_item = 
       xv_create(NULL, MENUITEM, 
                 MENU_STRING, "Edit",
@@ -136,24 +148,23 @@ create_transform_menu()
       xv_create(XV_NULL, MENU_COMMAND_MENU, 
                 MENU_GEN_PIN_WINDOW, main_frame, "Transform Menu",
                 MENU_TITLE_ITEM, "Apply a program transformation to a module ",
-                MENU_ACTION_ITEM, ATOMIZER_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, SUPPRESS_DEAD_CODE_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, DISTRIBUTE_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, LOOP_INTERCHANGE_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, LOOP_NORMALIZE_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, NEW_ATOMIZER_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, PARTIAL_EVAL_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, PRIVATIZE_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, REDUCTIONS_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, STF_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, STRIP_MINE_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, UNROLL_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, FULL_UNROLL_TRANSFORM, transform_notify,
-                MENU_ACTION_ITEM, UNSPAGHETTIFY_TRANSFORM, transform_notify,
-                                 /* Just a separator: */
-                WPIPS_MENU_SEPARATOR,
-                MENU_APPEND_ITEM, edit_menu_item,
                 NULL);
+   
+   /* Now add all the transformation entries: */
+   for (current_transformation = &wpips_transform_menu_layout[0];
+        current_transformation->menu_entry_string != NULL;
+        current_transformation++)
+      xv_set(transform_menu,
+             MENU_ACTION_ITEM, current_transformation->menu_entry_string,
+             transform_notify,
+             NULL);
+
+   /* Add the Edit entry as the last one: */
+   xv_set(transform_menu,
+                                /* Just a separator: */
+          WPIPS_MENU_SEPARATOR,
+          MENU_APPEND_ITEM, edit_menu_item,
+          NULL);
 
    (void) xv_create(main_panel, PANEL_BUTTON,
                     PANEL_LABEL_STRING, "Transform/Edit",
