@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: defines-local.h,v $ ($Date: 1994/11/25 10:39:55 $, ) version $Revision$, got on %D%, %T%
+ * $RCSfile: defines-local.h,v $ ($Date: 1995/03/14 14:43:19 $, ) version $Revision$, got on %D%, %T%
  * $Id$
  */
 
@@ -62,22 +62,6 @@
 #define HPFFLOATPREFIX 		"F_"
 #define HPFLOGICALPREFIX 	"L_"
 #define HPFCOMPLEXPREFIX	"C_"
-
-/*
- * new declaration management
- */
-#define NEW_DECLARATION_UNDEFINED -1
-#define NO_NEW_DECLARATION      0
-#define ALPHA_NEW_DECLARATION   1
-#define BETA_NEW_DECLARATION    2
-#define GAMMA_NEW_DECLARATION   3
-#define DELTA_NEW_DECLARATION   4
-
-#define no_new_declaration_p(i)  (i==NO_NEW_DECLARATION)
-#define declaration_alpha_p(i)   (i==ALPHA_NEW_DECLARATION)
-#define declaration_beta_p(i)    (i==BETA_NEW_DECLARATION)
-#define declaration_gamma_p(i)   (i==GAMMA_NEW_DECLARATION)
-#define declaration_delta_p(i)	 (i==DELTA_NEW_DECLARATION)
 
 /*
  * IO Management
@@ -238,7 +222,7 @@
  */
 
 #define local_index_is_different_p(array, dim) \
-  (new_declaration(array, dim)!=NO_NEW_DECLARATION)
+  (new_declaration(array, dim)!=is_hpf_newdecl_none)
 
 #define FindArrayDimAlignmentOfArray(array, dim) \
   (FindAlignmentOfDim(align_alignment(load_entity_align(array)), dim))
