@@ -2,7 +2,7 @@
  * Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
  *
- * $RCSfile: overlap.c,v $ ($Date: 1995/03/14 18:34:31 $, )
+ * $RCSfile: overlap.c,v $ ($Date: 1995/03/22 10:57:01 $, )
  * version $Revision$
  * got on %D%, %T%
  * $Id$
@@ -23,22 +23,7 @@ extern int fprintf();
 #include "loop_normalize.h"
 #include "hpfc.h"
 
-/* could be
- * GENERIC_GLOBAL_FUNCTION(overlap_management, overlapsmap)
- */
-
-GENERIC_CURRENT_MAPPING(overlaps, overlaps, entity);
-
-void init_overlap_management()
-{
-    make_overlaps_map();
-}
-
-void close_overlap_management()
-{
-    /* ??? memory leak */
-    free_overlaps_map();
-}
+GENERIC_GLOBAL_FUNCTION(overlap_status, overlapsmap, entity, list)
 
 static void create_overlaps(e)
 entity e;
@@ -51,7 +36,10 @@ entity e;
 
     n = gen_length(variable_dimensions(type_variable(t)));
     for(; n>=1; n--) o = CONS(OVERLAP, make_overlap(0, 0), o);
-    store_entity_overlaps(e, make_overlaps(o));
+
+    store_overlap_status(e, o);
+
+    assert(bound_overlap_status_p(e));
 }
 
 /* set_overlap(ent, dim, side, width)
@@ -69,8 +57,8 @@ int dim, side, width;
 
     assert(dim>0);
 
-    if (entity_overlaps_undefined_p(ent)) create_overlaps(ent);
-    o = OVERLAP(gen_nth(dim-1, overlaps_dimensions(load_entity_overlaps(ent))));
+    if (!bound_overlap_status_p(ent)) create_overlaps(ent);
+    o = OVERLAP(gen_nth(dim-1, load_overlap_status(ent)));
 
     if (side) /* upper */
     {
@@ -97,8 +85,10 @@ int dim, side;
 
     assert(dim>0);
 
-    if (entity_overlaps_undefined_p(ent)) create_overlaps(ent);
-    o = OVERLAP(gen_nth(dim-1, overlaps_dimensions(load_entity_overlaps(ent))));
+    if (!bound_overlap_status_p(ent)) create_overlaps(ent);
+    assert(bound_overlap_status_p(ent));
+
+    o = OVERLAP(gen_nth(dim-1, load_overlap_status(ent)));
     return(side ? overlap_upper(o) : overlap_lower(o));
 }
 
