@@ -9,10 +9,13 @@
  * by Remi to deal with source and user files as with any other kind
  * of resources
  */
-void initializer(module_name)
+bool initializer(module_name)
 string module_name;
 {
     /* FI: strdup a cause de problemes lies aux varargs */
-    user_error("initializer", "no source file for %s (%s might be an ENTRY point)\n",
+    user_error("initializer", "no source file for %s "
+	       "(%s might be an ENTRY point)\n",
 	       strdup(module_name), strdup(module_name), 0);
+
+    return FALSE;
 }
