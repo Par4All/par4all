@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1996/07/02 16:48:57 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1996/07/12 15:35:35 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1996/07/02 16:48:57 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1996/07/12 15:35:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -25,6 +25,7 @@ char vcid_emacs[] = "%A% ($Date: 1996/07/02 16:48:57 $, ) version $Revision$, go
 #include "misc.h"
 #include "ri.h"
 #include "database.h"
+#include "ri-util.h"
 #include "pipsdbm.h"
 #include "properties.h"
 
@@ -40,6 +41,7 @@ bool wpips_emacs_mode = 0;
 
 /* The title of the commands used by the emacs interface: */
 
+static char EMACS_AVAILABLE_MODULES_NAME[] = "AVAILABLE_MODULES";
 static char EMACS_MODULE_NAME[] = "MODULE_NAME";
 static char EMACS_PROMPT_USER[] = "PROMPT_USER";
 static char EMACS_SEQUENTIAL_VIEW[] = "Sequential View";
@@ -99,6 +101,36 @@ void
 send_module_name_to_emacs(char * some_text)
 {
    send_command_to_emacs(EMACS_MODULE_NAME, some_text);
+}
+
+
+/* Tell Emacs about what are the modules available in the current
+   workspace, if any: */
+void
+send_the_names_of_the_available_modules_to_emacs(void)
+{
+    if (wpips_emacs_mode) {
+	int i;
+	char * module_list[ARGS_LENGTH];
+	int  module_list_length = 0;
+	char * module_string_list_string = strdup("(");
+   
+	if (db_get_current_workspace_name() != NULL) {
+	    db_get_module_list(&module_list_length, module_list);
+	    for(i = 0; i < module_list_length; i++) {
+		char * new_module_string_list_string =
+		    strdup(concatenate(module_string_list_string,
+				       "\"", module_list[i], "\" ",
+				       NULL));
+		free(module_string_list_string);
+		module_string_list_string = new_module_string_list_string;
+	    }
+	}
+	send_command_to_emacs(EMACS_AVAILABLE_MODULES_NAME,
+			      concatenate(module_string_list_string,
+					 ")", NULL));
+	free(module_string_list_string);
+    }
 }
 
 
