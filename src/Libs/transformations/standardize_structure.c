@@ -3,6 +3,10 @@
  *
  * Guillaume Oget
  */
+/* mkstemp, system */
+#include <stdlib.h>
+/* unlink */
+#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -41,14 +45,10 @@ stf(char *mod_name)
     int status;
     string wdn = db_get_current_workspace_directory();
 
-    extern int system(char*);
-    extern int unlink(char*);
-    extern char* mktemp(char*);
-
     debug_on("STF_DEBUG_LEVEL");
 
     strncpy (tmpfile,".stf-workspace-outputXXXXXX",MAX__LENGTH - 1);
-    mktemp (tmpfile);
+    mkstemp (tmpfile);
 
     debug (9,"stf", "temporary filename for output %s\n", tmpfile);
 
