@@ -202,11 +202,20 @@ statement st1, st2;
 	return( ORDERING_STATEMENT(o1) < ORDERING_STATEMENT(o2));
 }
 
+/* Statement classes induced from instruction type 
+ *
+ * Naming conflict between English, block_statement_p(), and NewGen convention
+ * isntruction_loop_p()
+ */
+
+/* See also macro statement_block_p() */
 bool 
-statement_loop_p(s)
-statement s;
+block_statement_p(statement s)
 {
-    return(instruction_loop_p(statement_instruction(s)));
+    instruction i = statement_instruction(s);
+    bool r = instruction_sequence_p(i);
+
+    return r;
 }
 
 bool 
@@ -215,7 +224,20 @@ statement_test_p(statement s)
     return(instruction_test_p(statement_instruction(s)));
 }
 
-/* This function should not be used ! */
+bool 
+statement_loop_p(s)
+statement s;
+{
+    return(instruction_loop_p(statement_instruction(s)));
+}
+
+bool 
+unstructured_statement_p(statement s)
+{
+    return(instruction_unstructured_p(statement_instruction(s)));
+}
+
+/* This function should not be used ! See continue_statement_p() */
 bool
 statement_continue_p(s)
 statement s;
