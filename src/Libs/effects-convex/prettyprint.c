@@ -116,7 +116,7 @@ text_region(effect reg)
     ls = foresys? words_reference(r): effect_words_reference(r);
 
     MAP(STRING, s, append(s), ls);
-    gen_map(free, ls); gen_free_list(ls); ls = NIL;
+    gen_free_string_list(ls); ls = NIL;
 
     /* ACTION and APPROXIMATION
      */
