@@ -281,10 +281,12 @@ string s;
 
 
 
-/* this function makes a statement. l is the label and i the
+/* This function makes a statement. l is the label and i the
  * instruction. we make sure that the label is not declared twice.
  *
- * GO TO statement are numbered like other statements although they
+ * Comments are added by LinkInstToCurrentBlock().
+ *
+ * GO TO statements are numbered like other statements although they
  * are destroyed by the controlizer. To be changed.
  */
 
@@ -436,8 +438,26 @@ bool number_it;
       }
     }
 
-    if (iPrevComm != 0 && !instruction_block_p(i)) {
-	statement_comments(s) = strdup(PrevComm);
+    if (iPrevComm != 0) {
+	if(instruction_block_p(i)) {
+	    statement fs = statement_undefined;
+
+	    /* Only desugared constructs such as computed go to or IO with
+	     * error handling should produce blocks. Such blocks should be
+	     * non-empty and not commented.
+	     */
+	    pips_assert("The block is non empty", !ENDP(instruction_block(i)));
+
+	    fs = STATEMENT(CAR(instruction_block(i)));
+
+	    pips_assert("The first statement has no comments",
+			statement_comments(fs) == empty_comments);
+
+	    statement_comments(fs) = strdup(PrevComm);
+	}
+	else {
+	    statement_comments(s) = strdup(PrevComm);
+	}
 	PrevComm[0] = '\0';
 	iPrevComm = 0;
     }
@@ -1333,14 +1353,39 @@ expression e1, e2, e3, e4;
 				      l)));
 }
 
-/* Are we in the declaration or in the executable part? */
+/* Are we in the declaration or in the executable part?
+ * Have we seen a FORMAT statement before an executable statement?
+ * For more explanation, see check_first_statement() below.
+ */
 
 static int seen = FALSE;
+static int format_seen = FALSE;
+static int declaration_lines = -1;
+
+/* Well, some constant defined in reader.c
+ * and not deserving a promotion in syntax-local.h
+ */
+#define UNDEF (-2)
 
 void 
 reset_first_statement()
 {
     seen = FALSE;
+    format_seen = FALSE;
+    declaration_lines = -1;
+}
+
+void
+set_first_format_statement()
+{
+    if(!format_seen && !seen) {
+	format_seen = TRUE;
+	reset_statement_number();
+	/* declaration_lines = line_b_I-1; */
+	    debug(8, "set_first_format_statement", "line_b_C=%d, line_b_I=%d\n",
+		  line_b_C, line_b_I);
+	declaration_lines = (line_b_C!=UNDEF)?line_b_C-1:line_b_I-1;
+    }
 }
 
 bool
@@ -1349,16 +1394,40 @@ first_executable_statement_seen()
     return seen;
 }
 
+bool
+first_format_statement_seen()
+{
+    return format_seen;
+}
+
 void
 check_in_declarations()
 {
-    if(first_executable_statement_seen()) {
+    if(seen) {
 	ParserError("Syntax", 
 		    "Declaration appears after executable statement");
     }
+    else if(format_seen && !seen) {
+	/* A FORMAT statement has been found in the middle of the declarations */
+	if(!get_bool_property("PRETTYPRINT_ALL_DECLARATIONS")) {
+	    pips_user_warning("FORMAT statement within declarations. In order to "
+			      "analyze this code, "
+			      "please set property PRETTYPRINT_ALL_DECLARATIONS "
+			      "or move this FORMAT down in executable code.\n");
+	    ParserError("Syntax", "Source cannot be parsed with current properties");
+	}
+    }
 }
 
-/* This function is called when the first executable statement is encountered */
+/* This function is called each time an executable statement is encountered
+ * but is effective the first time only.
+ *
+ * It mainly copies the declaration text in the symbol table because it is
+ * impossible (very difficult) to reproduce it in a user-friendly manner.
+ *
+ * The declaration text stops at the first executable statement or at the first
+ * FORMAT statement.
+ */
 void 
 check_first_statement()
 {
@@ -1384,6 +1453,13 @@ check_first_statement()
 	
 	/* we must read the input file from the begining and up to the 
 	   line_b_I-1 th line, and the texte read must be stored in buffer */
+
+	if(!format_seen) {
+	    /* declaration_lines = line_b_I-1; */
+	    debug(8, "check_first_statement", "line_b_C=%d, line_b_I=%d\n",
+		  line_b_C, line_b_I);
+	    declaration_lines = (line_b_C!=UNDEF)?line_b_C-1:line_b_I-1;
+	}
 
 	fd = safe_fopen(CurrentFN, "r");
 	while ((c = getc(fd)) != EOF) {
@@ -1446,7 +1522,7 @@ check_first_statement()
 		line_start = FALSE;
 	    }
 
-	    if (cpt == line_b_I-1)
+	    if (cpt == declaration_lines)
 		break;
 	}
 	safe_fclose(fd, CurrentFN);
@@ -1458,8 +1534,11 @@ check_first_statement()
 
 	/* kill the first statement's comment because it's already
 	   included in the declaration text */
+	/* FI: I'd rather keep them together! */
+	/*
 	PrevComm[0] = '\0';
 	iPrevComm = 0;
+	*/
 	/*
 	Comm[0] = '\0';
 	iComm = 0;
@@ -1485,6 +1564,7 @@ check_first_statement()
 	 * SaveChains();
 	 */
 
-	reset_statement_number();
+	if(!format_seen)
+	    reset_statement_number();
     }
 }
