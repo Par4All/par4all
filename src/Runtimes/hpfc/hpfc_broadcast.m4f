@@ -1,15 +1,15 @@
-c
-c $RCSfile: hpfc_broadcast.m4f,v $ (version $Revision$)
-c $Date: 1996/09/14 17:58:52 $, 
-c
-c management of broadcasts
-c typical call: hpfc broadcast x(lid, [number, step]*x)
-c broadcast the current message to the described set of pe.
-c fake version added...
-c special guarded version for remappings:
-c typical call: hpfc remapbrd x(an, lid, [number, step]*x)
-c   where an is the source array arrangement of the remapping.
-c
+!
+! $RCSfile: hpfc_broadcast.m4f,v $ (version $Revision$)
+! $Date: 1996/10/17 13:50:38 $, 
+!
+! management of broadcasts
+! typical call: hpfc broadcast x(lid, [number, step]*x)
+! broadcast the current message to the described set of pe.
+! fake version added...
+! special guarded version for remappings:
+! typical call: hpfc remapbrd x(an, lid, [number, step]*x)
+!   where an is the source array arrangement of the remapping.
+!
 define(`LIST_DECL_AREA',`
      $     n$1, s$1')dnl
 define(`LIST_INDEX_DECL',`
@@ -18,9 +18,9 @@ define(`DO_LOOP',`
       do i$1 = i`'eval($1 - 1), i`'eval($1 - 1)+(n$1-1)*s$1, s$1')dnl
 define(`ENDDO_LOOP',`
       enddo')dnl
-c
-c broadcast function
-c
+!
+! broadcast function
+!
 define(`GENERIC_BROADCAST',`
 pushdef(`LEVEL',$1)dnl
 !
@@ -95,14 +95,8 @@ SIMPLE_REPLICATE(LEVEL,`DO_LOOP')
 SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
       debug(print *, "[hpfc remapbrd LEVEL] done")
       end')dnl
-GENERIC_BROADCAST(0)
-GENERIC_BROADCAST(1)
-GENERIC_BROADCAST(2)
-GENERIC_BROADCAST(3)
-dnl GENERIC_BROADCAST(4)
-dnl GENERIC_BROADCAST(5)
-dnl GENERIC_BROADCAST(6)
-dnl GENERIC_BROADCAST(7)
-c
-c that is all
-c
+
+forloop(`_D_',1,_HPFC_DIMENSIONS_,`GENERIC_BROADCAST(_D_)')
+!
+! that is all
+!
