@@ -205,3 +205,14 @@ expression e;
 
     return(make_value(is_value_symbolic, s));
 }
+
+/* whether the given function is a constant expression, whatever the type.
+ */
+bool expression_is_constant_p(expression e)
+{
+    syntax s = expression_syntax(e);
+
+    return syntax_call_p(s) ? 
+	entity_constant_p(call_function(syntax_call(s))) : FALSE ;
+    
+}
