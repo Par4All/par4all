@@ -92,10 +92,11 @@ debug()
 
 #
 # echos the pips to be run
+# ok, only look for a binary, not the wrapper shell script, hence the PATH.
 
 which_executable()
 {
-  PATH="${PWD}/${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}:${PWD}:${PATH}" \
+  PATH="${PWD}/${PIPS_ARCH}:${PIPS_ROOT}/Bin/${PIPS_ARCH}:${PWD}:." \
     type $1 | sed "s,.* is ,,"
 }
 
