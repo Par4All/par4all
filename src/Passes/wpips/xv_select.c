@@ -79,55 +79,56 @@ Menu_item menu_item;
 
 
 success continue_create_program_notify(name)
-char *name;
+     char *name;
 {
-    char *fortran_list[ARGS_LENGTH];
+  char *fortran_list[ARGS_LENGTH];
     int  fortran_list_length = 0;
-    extern jmp_buf pips_top_level;
+  extern jmp_buf pips_top_level;
 
 
     if( setjmp(pips_top_level) ) {
-	xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
+      xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
 	xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
-	return(FALSE);
+      return(FALSE);
     }
     else {
-	xv_set(create_pgm, MENU_INACTIVE, TRUE, 0);
-	xv_set(open_pgm, MENU_INACTIVE, TRUE, 0);
+      xv_set(create_pgm, MENU_INACTIVE, TRUE, 0);
+      xv_set(open_pgm, MENU_INACTIVE, TRUE, 0);
 
-	pips_get_fortran_list(&fortran_list_length, fortran_list);
+      pips_get_fortran_list(&fortran_list_length, fortran_list);
 
-	if (fortran_list_length == 0) {
-	    prompt_user("No Fortran files in this directory");
-	    longjmp(pips_top_level, 1);
-	}
-	else {
-			/* Code added to confirm for a database destruction before
-				opening a database with the same name.
-					RK 18/05/1993. */
-		if (workspace_exists_p(name))
-		{
-			int result;
-			result = notice_prompt(xv_find(main_frame, WINDOW, 0),
-				NULL,
-				NOTICE_MESSAGE_STRINGS,
-				"The database", name, "already exists!",
-				"Do you really want to remove it?",
-				NULL,
-				NOTICE_BUTTON_YES,  "Yes, remove the database",
-				NOTICE_BUTTON_NO,   "No, cancel",
-				NULL);
-			if (result == NOTICE_NO)
-				return(FALSE);
-		}
+      if (fortran_list_length == 0) {
+	prompt_user("No Fortran files in this directory");
+	longjmp(pips_top_level, 1);
+      }
+      else {
+	/* Code added to confirm for a database destruction before
+	   opening a database with the same name.
+	   RK 18/05/1993. */
+	if (workspace_exists_p(name))
+	  {
+	    int result;
+	    result = notice_prompt(xv_find(main_frame, WINDOW, 0),
+				   NULL,
+				   NOTICE_MESSAGE_STRINGS,
+				   "The database", name, "already exists!",
+				   "Do you really want to remove it?",
+				   NULL,
+				   NOTICE_BUTTON_YES,  "Yes, remove the database",
+				   NOTICE_BUTTON_NO,   "No, cancel",
+				   NULL);
+	    if (result == NOTICE_NO)
+	      return(FALSE);
+	  }
 
-	    db_create_program(name);
-	    mchoose("Create Workspace", 
-		    fortran_list_length, fortran_list, 
-		    end_create_program_notify);
-	    args_free(&fortran_list_length, fortran_list);
-	    return(TRUE);
-	}
+	db_create_program(name);
+	open_log_file();
+	mchoose("Create Workspace", 
+		fortran_list_length, fortran_list, 
+		end_create_program_notify);
+	args_free(&fortran_list_length, fortran_list);
+	return(TRUE);
+      }
     }
 }
 
@@ -147,19 +148,20 @@ char *argv[];
 
 
 void end_open_program_notify(name)
-string name;
+     string name;
 {
     schoose_close();
 
     if ( open_program(name) ) {
-	xv_set(close_pgm, MENU_INACTIVE, FALSE, 0);
-	xv_set(module_item, MENU_INACTIVE, FALSE, 0);
-	show_program();
-	show_module();
+      open_log_file();
+      xv_set(close_pgm, MENU_INACTIVE, FALSE, 0);
+      xv_set(module_item, MENU_INACTIVE, FALSE, 0);
+      show_program();
+      show_module();
     }
     else {
-	xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
-	xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
+      xv_set(create_pgm, MENU_INACTIVE, FALSE, 0);
+      xv_set(open_pgm, MENU_INACTIVE, FALSE, 0);
     }
 }
 
