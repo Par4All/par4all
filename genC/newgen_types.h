@@ -49,7 +49,7 @@ typedef int unit ;
 
 union domain ;
 struct inlinable ;
-struct binding {
+struct gen_binding {
   char *name ;
   int compiled ;
   int index ;
