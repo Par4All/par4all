@@ -1,4 +1,7 @@
-/* package convex effects :  Be'atrice Creusillet 5/97
+/*
+ * $Id$
+ *
+ *  package convex effects :  Be'atrice Creusillet 5/97
  *
  * File: methods.c
  * ~~~~~~~~~~~~~~~
@@ -31,195 +34,16 @@
 
 /******************************************************* PIPSDBM INTERFACES */
 
-static statement_effects
-db_get_convex_proper_rw_regions(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_PROPER_REGIONS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_convex_proper_rw_regions(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_PROPER_REGIONS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-static statement_effects
-db_get_convex_rw_regions(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_REGIONS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_convex_rw_regions(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_REGIONS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-static statement_effects
-db_get_convex_invariant_rw_regions(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_INV_REGIONS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_convex_invariant_rw_regions(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_INV_REGIONS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-
-static list
-db_get_convex_summary_rw_regions(char *mod_name)
-{
-    list l_res = NIL;
-    
-    l_res = effects_to_list(
-	(effects) db_get_memory_resource(DBR_SUMMARY_REGIONS, mod_name, TRUE));
-    return l_res;
-}
-
-static void
-db_put_convex_summary_rw_regions(char *mod_name, list l_eff)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_REGIONS,
-			   strdup(mod_name),
-			   (char *) list_to_effects(l_eff));
-}
-
-static statement_effects
-db_get_convex_in_regions(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_IN_REGIONS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_convex_in_regions(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_IN_REGIONS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-static statement_effects
-db_get_convex_invariant_in_regions(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_INV_IN_REGIONS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_convex_invariant_in_regions(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_INV_IN_REGIONS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-static statement_effects
-db_get_convex_cumulated_in_regions(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_CUMULATED_IN_REGIONS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_convex_cumulated_in_regions(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_CUMULATED_IN_REGIONS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-
-static list
-db_get_convex_summary_in_regions(char *mod_name)
-{
-    list l_res = NIL;
-    
-    l_res = effects_to_list(
-     (effects) db_get_memory_resource(DBR_IN_SUMMARY_REGIONS, mod_name, TRUE));
-    return l_res;
-}
-
-static void
-db_put_convex_summary_in_regions(char *mod_name, list l_eff)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_IN_SUMMARY_REGIONS,
-			   strdup(mod_name),
-			   (char *) list_to_effects(l_eff));
-}
-
-static statement_effects
-db_get_convex_out_regions(char *mod_name)
-{
-    statement_effects eff_map;
-    
-    eff_map =
-	(statement_effects) db_get_memory_resource(DBR_OUT_REGIONS,
-						   mod_name, TRUE);
-    return(eff_map);
-}
-
-static void
-db_put_convex_out_regions(char *mod_name, statement_effects eff_map)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_OUT_REGIONS,
-			   strdup(mod_name),
-			   (char *) eff_map);
-}
-
-
-static list
-db_get_convex_summary_out_regions(char *mod_name)
-{
-    list l_res = NIL;
-    
-    l_res = effects_to_list(
-    (effects) db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS, mod_name, TRUE));
-    return l_res;
-}
-
-static void
-db_put_convex_summary_out_regions(char *mod_name, list l_eff)
-{
-    DB_PUT_MEMORY_RESOURCE(DBR_OUT_SUMMARY_REGIONS,
-			   strdup(mod_name),
-			   (char *) list_to_effects(l_eff));
-}
+DB_GETPUT_SE(convex_proper_rw_regions, PROPER_REGIONS)
+DB_GETPUT_SE(convex_rw_regions, REGIONS)
+DB_GETPUT_SE(convex_invariant_rw_regions, INV_REGIONS)
+DB_GETPUT_LS(convex_summary_rw_regions, SUMMARY_REGIONS)
+DB_GETPUT_SE(convex_in_regions, IN_REGIONS)
+DB_GETPUT_SE(convex_invariant_in_regions, INV_IN_REGIONS)
+DB_GETPUT_SE(convex_cumulated_in_regions, CUMULATED_IN_REGIONS)
+DB_GETPUT_LS(convex_summary_in_regions, IN_SUMMARY_REGIONS)
+DB_GETPUT_SE(convex_out_regions, OUT_REGIONS)
+DB_GETPUT_LS(convex_summary_out_regions, OUT_SUMMARY_REGIONS)
 
 
 /******************************************************************* SET... */
