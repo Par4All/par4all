@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.64  2001/07/19 12:47:05  irigoin
+ * Function DeclarePointer() added
+ *
  * Revision 1.63  2001/07/19 09:44:11  coelho
  * entity_undefined is used as a tag not to handle data substring initialisations.
  *
@@ -490,6 +493,65 @@ AnalyzeData(list ldvr, list ldvl)
 	(datavar_nbelements(DATAVAR(CAR(pcr))) != 0 || CDR(pcr) != NIL)) {
       ParserError("AnalyzeData", "too few initializers\n");
     }
+}
+
+void DeclarePointer(entity ptr, entity pointed_array, list decl_dims)
+{
+  /* It is assumed that decl_tableau can be ignored for EDF examples */
+  list dims = list_undefined;
+
+  if(!ENDP(decl_dims)) {
+    /* A varying dimension is impossible in the dynamic area for address
+     * computation. A heap area must be added.
+     */
+
+    dims = CONS(EXPRESSION,
+		make_dimension(MakeIntegerConstantExpression("1"),
+			       MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))),
+		NIL);
+
+    /* dims = decl_dims; */
+  }
+  else {
+    dims = decl_dims;
+  }
+
+  pips_user_warning("SUN pointer declaration detected. Integer type used.\n");
+  /* No specific type for SUN pointers */
+  if(type_undefined_p(entity_type(ptr))) {
+    DeclareVariable(ptr, MakeTypeVariable(MakeBasic(is_basic_int), NIL),
+		    NIL, storage_undefined, value_undefined);
+  }
+  else if(implicit_type_p(ptr)) {
+    DeclareVariable(ptr, MakeTypeVariable(MakeBasic(is_basic_int), NIL),
+		    NIL, storage_undefined, value_undefined);
+  }
+  else {
+    type tp = entity_type(ptr);
+
+    if(type_variable_p(tp)
+       && basic_int_p(variable_basic(type_variable(tp)))) {
+      /* EDF code contains several declaration for a unique pointer */
+      pips_user_warning("%s %s between lines %d and % d\n",
+			"Redefinition of pointer",
+			entity_local_name(ptr), line_b_I, line_e_I);
+
+    }
+    else {
+      pips_user_warning("DeclareVariable",
+			"%s %s between lines %d and % d\n",
+			"Redefinition of type for entity",
+			entity_local_name(ptr), line_b_I, line_e_I);
+      ParserError("Syntax", "Conflicting type declarations\n");
+    }
+  }
+  DeclareVariable(pointed_array, type_undefined, dims, 
+		  make_storage(is_storage_ram,
+			       make_ram(get_current_module_entity(),
+					HeapArea,
+					UNKNOWN_RAM_OFFSET,
+					NIL)),
+		  value_undefined);
 }
 
 /* type_equal_p -> same_basic_and_scalar_p in latter... FC.
