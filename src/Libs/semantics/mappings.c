@@ -334,7 +334,9 @@ entity m;
  *
  * reset_current_module_statement();
  * reset_cumulated_rw_effects();
- * reset_current_module_entity(); */
+ * reset_current_module_entity(); 
+ * free_value_mappings();
+ */
 void 
 module_to_value_mappings(m)
 entity m;
@@ -347,7 +349,7 @@ entity m;
 
     pips_assert("m is a module", entity_module_p(m));
 
-    free_value_mappings();
+    /* free_value_mappings(); */
 
     allocate_module_value_mappings(m);
 
