@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May 1993
  *
- * $RCSfile: compiler-util.c,v $ ($Date: 1995/10/04 19:29:09 $, )
+ * $RCSfile: compiler-util.c,v $ ($Date: 1995/10/05 11:32:22 $, )
  * version $Revision$
  */
 
@@ -25,8 +25,7 @@ statement stat;
 bool hpfc_empty_statement_list_p(l)
 list l;
 {
-    return(ENDP(l) ?
-	   TRUE :
+    return(ENDP(l) ? TRUE :
 	   hpfc_empty_statement_p(STATEMENT(CAR(l))) && 
 	   hpfc_empty_statement_list_p(CDR(l)));
 }
@@ -35,11 +34,11 @@ void update_control_lists(c, map)
 control c;
 control_mapping map;
 {
-    control
-	cprime = (control) GET_CONTROL_MAPPING(map, c);
+    control cprime = (control) GET_CONTROL_MAPPING(map, c);
 
-    assert(control_predecessors(cprime)==NIL &&
-	   control_successors(cprime)==NIL);
+    pips_assert("empty lists for cprime"
+		control_predecessors(cprime)==NIL &&
+		control_successors(cprime)==NIL);
 
     control_predecessors(cprime) = 
 	updated_control_list(control_predecessors(c), map);
@@ -58,8 +57,9 @@ control_mapping map;
      {
 	 new_c = (control) GET_CONTROL_MAPPING(map, current);
 
-	 assert(!control_undefined_p(current) ||
-		!control_undefined_p(new_c));
+	 pips_assert("defined",
+		     !control_undefined_p(current) ||
+		     !control_undefined_p(new_c));
 
 	 lc_result = CONS(CONTROL, new_c, lc_result);
      },
@@ -155,7 +155,7 @@ syntax syn;
 {
     list l = NIL;
 
-    assert(syntax_reference_p(syn));
+    pips_assert("reference", syntax_reference_p(syn));
 
     MAP(EXPRESSION, e,
      {
@@ -167,14 +167,14 @@ syntax syn;
 	     l = CONS(SYNTAX, s, l);
 	     break;
 	 case is_syntax_range:
-	     pips_error("IndicesOfRef","don't konw what to do with a range\n");
+	     pips_internal_error("don't konw what to do with a range\n");
 	     break;
 	 case is_syntax_call:
 	     /*     ??? could check that the given call is a constant.
 	      */
 	     break;
 	 default:
-	     pips_error("IndicesOfRef","unexpected syntax tag\n");
+	     pips_internal_error("unexpected syntax tag\n");
 	 }	 
      },
 	 reference_indices(syntax_reference(syn)));
@@ -240,7 +240,7 @@ list lsyn;
 {
     list result = NIL;
 
-    assert(ENDP(syntax_list) && ENDP(found_definitions));
+    pips_assert("empty lists", ENDP(syntax_list) && ENDP(found_definitions));
 
     syntax_list = lsyn;
 
@@ -335,8 +335,7 @@ instruction i;
 	    return;
 
 	if (n_loops-n_levels!=1)
-	    pips_error("inst_rewrite",
-		       "block within a block encountered\n");
+	    pips_internal_error("block within a block encountered\n");
 
 	n_levels++, blocks = CONS(CONSP, instruction_block(i), blocks);
 
@@ -357,9 +356,8 @@ instruction i;
 	break;
     }
     default: /* consistent with inst_filter */
-	pips_error("inst_rewrite",
-		   "unexpected instruction tag (%d)\n",
-		   instruction_tag(i));
+	pips_internal_error("unexpected instruction tag (%d)\n",
+			    instruction_tag(i));
     }
 }
 
@@ -371,14 +369,14 @@ list *pblocks, *ploops;
     blocks=NIL, n_levels=0;
     inner_body=statement_undefined;
 
-    assert(instruction_loop_p(statement_instruction(loop_nest)));
+    pips_assert("loop", instruction_loop_p(statement_instruction(loop_nest)));
 
     gen_recurse(loop_nest,
 		instruction_domain,
 		inst_filter,
 		inst_rewrite);
     
-    assert(n_loops!=0 && (n_loops-n_levels==1));
+    pips_assert("loops found", n_loops!=0 && (n_loops-n_levels==1));
 
     *pblocks=CONS(CONSP, NIL, blocks); /* nothing was done for the first ! */
     *ploops=loops;
@@ -386,16 +384,12 @@ list *pblocks, *ploops;
     return(inner_body);
 }
 
-/*------------------------------------------------------------------------
- *
- *   CURRENT LOOPS
- *
- *   management of a list of current loops. very burk ???
- *
+/************************************************************ CURRENT LOOPS */
+
+/*   management of a list of current loops. very burk ???
  */
 
-static list 
-  current_loop_list=NIL;
+static list current_loop_list=NIL;
 
 static void set_current_loops_rewrite(l)
 loop l;
@@ -406,12 +400,9 @@ loop l;
 void set_current_loops(obj)
 statement obj;
 {
-    assert(current_loop_list==NIL);
+    pips_assert("no current loop", current_loop_list==NIL);
 
-    gen_recurse(obj,
-		loop_domain,
-		gen_true,
-		set_current_loops_rewrite);
+    gen_recurse(obj, loop_domain, gen_true, set_current_loops_rewrite);
 }
 
 void reset_current_loops()
@@ -423,21 +414,17 @@ void reset_current_loops()
 bool entity_loop_index_p(e)
 entity e;
 {
-    MAP(LOOP, l,
-	if (e == loop_index(l)) return(TRUE),
-	current_loop_list);
-
-    return(FALSE);
+    MAP(LOOP, l, if (e == loop_index(l)) return(TRUE), current_loop_list);
+    return FALSE;
 }
 
 range loop_index_to_range(index)
 entity index;
 {
-    MAP(LOOP, l,
-	if (loop_index(l)==index) return(loop_range(l)),
+    MAP(LOOP, l, if (loop_index(l)==index) return(loop_range(l)),
 	current_loop_list);
     
-    return(range_undefined);
+    return range_undefined;
 }
 
 /* that is all
