@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/07/22 15:10:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/09/04 15:43:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_syntax_declaration[] = "%A% ($Date: 1997/07/22 15:10:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_declaration[] = "%A% ($Date: 1997/09/04 15:43:43 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -526,6 +526,17 @@ reset_common_size_map_on_error()
    }
 }
 
+bool
+common_to_defined_size_p(entity a)
+{
+    bool defined = FALSE;
+
+    defined = ( (hash_get(common_size_map,(char *) a))
+	!= HASH_UNDEFINED_VALUE );
+
+    return defined;
+}
+
 int
 common_to_size(entity a)
 {
@@ -559,6 +570,10 @@ update_common_to_size(entity a, int new_size)
  * This function creates a common block. pips creates static common
  * blocks. This is not true in the ANSI standard stricto sensu, but
  * true in most implementations.
+ *
+ * A common declaration can be made out of several common statements.
+ * MakeCommon() is called for each common statement, although it only
+ * is useful the first time.
  */
 entity 
 MakeCommon(e)
@@ -593,15 +608,23 @@ entity e;
 	/* FI: user_warning is used to display the conflicting name */
 	user_warning("MakeCommon",
 		     "name conflict for %s between common "
-		     "and entity (tag=%d)\n",
-		     entity_name(e), type_tag(entity_type(e)));
+		     "and %s %s entity.\n"
+		     "Please rename common /%s/ using a prefix (e.g. /C_%s/).\n",
+		     entity_name(e), 
+		     intrinsic_entity_p(e)? "intrinsic": "",
+		     type_to_string(entity_type(e)),
+		     entity_local_name(e),
+		     entity_local_name(e));
 	ParserError("MakeCommon",
-		    "name conflict between common and variable or module\n");
+		    "Name conflict between common and variable or module or intrinsic\n");
     }
     else {
 	/* common e may already exist because it was encountered
 	 * in another module
-	 * but not have been registered as known by the current module
+	 * but not have been registered as known by the current module.
+	 * It may also already exist because it was encountered in
+	 * the *same* module, but AddEntityToDeclarations() does not
+	 * duplicate declarations.
 	 */
 	AddEntityToDeclarations(e, get_current_module_entity());
     }
@@ -610,7 +633,14 @@ entity e;
     if(hash_get(common_size_map, (char *) e) == HASH_UNDEFINED_VALUE)
 	hash_put(common_size_map, (char *) e, (char *) 0);
 	*/
-    set_common_to_size(e, 0);
+    /* FI: for a while, common sizes were *always* reset to 0, even when
+     * several common statements were encountered in the same module for
+     * the same common. This did not matter because offsets in commons are
+     * recomputed once variable types and dimensions are all known.
+     */
+    if(!common_to_defined_size_p(e)) {
+	set_common_to_size(e, 0);
+    }
 
     return(e);
 }
@@ -678,9 +708,19 @@ entity a, v;
 void 
 update_common_sizes()
 {
+    list commons = NIL;
+
     HASH_MAP(k, v,{
 	entity c = (entity) k;
-	int s = (int) v;
+
+	commons = arguments_add_entity(commons, c);
+    },
+	common_size_map);
+
+    sort_list_of_entities(commons);
+
+    MAP(ENTITY, c, {
+	int s = common_to_size(c);
 	type tc = entity_type(c);
 	area ac = type_area(tc);
 
@@ -692,12 +732,6 @@ update_common_sizes()
 		       "set size %d for common %s\n", s, entity_name(c));
 	}
 	else if (area_size(ac) != s)
-/*	    user_warning("update_common_sizes",
-		       "inconsistent size (%d and %d) for common %s in %s\n",
-		       area_size(ac), s, entity_name(c), 
-		       CurrentPackage);
-		       ParserError("update_common_sizes", "
-*/
 	    user_warning("update_common_sizes",
 			 "inconsistent size (%d and %d) for common %s in %s\n"
 			 "Best results are obtained if all instances of a "
@@ -709,9 +743,11 @@ update_common_sizes()
 		       "reset size %d for common %s\n", s, entity_name(c));
 	}
     },
-	     common_size_map);
+	     commons);
     /* Postpone the resetting because DynamicArea is updated till the EndOfProcedure() */
     /* reset_common_size_map(); */
+
+    gen_free_list(commons);
 }
 
 /* local variables for implicit type implementation */
@@ -919,7 +955,10 @@ reference r;
 
     for (idim = 0, pid = 1, o = 0; pi != NULL; idim++, pi = CDR(pi)) {
 	iindex = ExpressionToInt(EXPRESSION(CAR(pi)));
-	ilowerbound = ValueOfIthLowerBound((reference_variable(r)), idim);
+	ilowerbound = ValueOfIthLowerBound((reference_variable(r)), idim+1);
+	/* Use a trick to retrieve the size in bytes of one array element
+	 * and use the size of the previous dimension
+	 */
 	pid *= SizeOfIthDimension((reference_variable(r)), idim);
 	o += ((iindex-ilowerbound)*pid);
     }
@@ -939,6 +978,8 @@ int i;
     cons * pc;
 
     pips_assert("ValueOfIthLowerBound", type_variable_p(entity_type(e)));
+
+    pips_assert("ValueOfIthLowerBound", i >= 1 && i <= 7);
 
     pc = variable_dimensions(type_variable(entity_type(e)));
 
@@ -1009,10 +1050,13 @@ check_common_layouts(m)
 entity m;
 {
     list decls = NIL;
+    list sorted_decls = NIL;
 
     pips_assert("check_common_layouts", entity_module_p(m));
 
     decls = code_declarations(value_code(entity_initial(m)));
+    sorted_decls = gen_append(decls, NIL);
+    sort_list_of_entities(sorted_decls);
 
     ifdebug(1) {
 	pips_debug(1, "\nDeclarations for module %s\n", module_local_name(m));
@@ -1025,7 +1069,7 @@ entity m;
 
 	MAP(ENTITY, e, 
 	    fprintf(stderr, "Declared entity %s\n", entity_name(e)),
-	    decls);
+	    sorted_decls);
 
 	/* Structure of each area/common */
 	if(!ENDP(decls)) {
@@ -1044,7 +1088,9 @@ entity m;
 		}
 	    }
 	}
-    }, decls);
+    }, sorted_decls);
+
+    gen_free_list(sorted_decls);
 
     pips_debug(1, "End of declarations for module %s\n\n",
 	       module_local_name(m));
@@ -1055,25 +1101,62 @@ print_common_layout(c)
 entity c;
 {
     list members = area_layout(type_area(entity_type(c)));
+    list equiv_members = NIL;
 
     (void) fprintf(stderr,"\nLayout for common %s:\n", entity_name(c));
 
     if(ENDP(members)) {
-	(void) fprintf(stderr, "* empty area *\n\n");
+	(void) fprintf(stderr, "\t* empty area *\n\n");
     }
     else {
+	/* Look for variables declared in this common by *some* procedures
+	 * which declares it. The procedures involved depend on the ordering
+	 * of the parser steps by pipsmake and the user. Maybe, the list should
+	 * be filtered and restricted to the current module
+	 */
 	MAP(ENTITY, m, 
-	     {
-		 pips_assert("RAM storage",
-			     storage_ram_p(entity_storage(m)));
-		 (void) fprintf(stderr,
-				"\tVariable %s,\toffset = %d,\tsize = %d\n", 
-				entity_name(m),
-				ram_offset(storage_ram(entity_storage(m))),
-				SizeOfArray(m));
-	     }, 
-		 members);
+	    {
+		pips_assert("RAM storage",
+			    storage_ram_p(entity_storage(m)));
+		(void) fprintf(stderr,
+			       "\tVariable %s,\toffset = %d,\tsize = %d\n", 
+			       entity_name(m),
+			       ram_offset(storage_ram(entity_storage(m))),
+			       SizeOfArray(m));
+	    }, 
+		members);
 	(void) fprintf(stderr, "\n");
+
+	/* Look for variables aliased with a variable in this common */
+	MAP(ENTITY, m, 
+	    {
+		list equiv = ram_shared(storage_ram(entity_storage(m)));
+
+		equiv_members = arguments_union(equiv_members, equiv);
+	    }, 
+		members);
+
+	if(!ENDP(equiv_members)){
+
+	    equiv_members = arguments_difference(equiv_members, members);
+	    sort_list_of_entities(equiv_members);
+
+	    (void) fprintf(stderr, "\tVariables aliased to this common:\n");
+
+	    MAP(ENTITY, m, 
+		{
+		    pips_assert("RAM storage",
+				storage_ram_p(entity_storage(m)));
+		    (void) fprintf(stderr,
+				   "\tVariable %s,\toffset = %d,\tsize = %d\n", 
+				   entity_name(m),
+				   ram_offset(storage_ram(entity_storage(m))),
+				   SizeOfArray(m));
+		}, 
+		    equiv_members);
+	    (void) fprintf(stderr, "\n");
+	    gen_free_list(equiv_members);
+	}
     }
 }
 
