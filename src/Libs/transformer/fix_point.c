@@ -1213,6 +1213,7 @@ transformer_derivative_fix_point(transformer tf)
     ifdebug(8) {
 	debug(8, "transformer_derivative_fix_point", "fix-point fix_tf=\n");
 	fprint_transformer(stderr, fix_tf, external_value_name);
+	transformer_consistency_p(fix_tf);
 	debug(8, "transformer_pattern_fix_point", "end\n");
     }
 
