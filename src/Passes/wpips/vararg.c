@@ -2,7 +2,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#define SMALL_BUFFER_LENGTH 256
+#define SMALL_BUFFER_LENGTH 2560
 
 /*VARARGS0*/
 void
