@@ -390,7 +390,9 @@ int allow_ref ;
        (gen_chunk *)HASH_UNDEFINED_VALUE ) {
 	
 	/* redefinitions of tabulated should not be allowed...
+	 * but you cannot be user it is a redefinition if allow_ref
 	 */
+      if(!allow_ref)
 	(void) fprintf(stderr, "[make_%s] warning: %s redefined\n", 
 		       Domains[domain].name, id);
 
