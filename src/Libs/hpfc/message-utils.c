@@ -2,6 +2,9 @@
  * 
  * $Id$
  * $Log: message-utils.c,v $
+ * Revision 1.20  1998/03/17 15:42:00  coelho
+ * warnings--.
+ *
  * Revision 1.19  1997/05/03 11:52:10  coelho
  * *** empty log message ***
  *
@@ -200,9 +203,9 @@ range r;
      */
     if (! (hpfc_integer_constant_expression_p(range_lower(r), &lo) &&
 	   hpfc_integer_constant_expression_p(range_upper(r), &up)))
-	return(FALSE); 
+	return FALSE; 
     else
-	return(lo > up);
+	return lo>up;
 }
 
 char *sprint_lrange(str, l)
@@ -230,9 +233,7 @@ list l;
     return str;
 }
 
-char *sprint_range(str, r)
-string str;
-range r;
+char *sprint_range(string str, range r)
 {
     int lo, up, in;
     bool
@@ -243,10 +244,12 @@ range r;
     if (blo && bup && bin)
     {
 	if (in==1)
+	{
 	    if (lo==up)
 		sprintf(str, "%d", lo);
 	    else
 		sprintf(str, "%d:%d", lo, up);
+	}
 	else
 	    sprintf(str, "%d:%d:%d", lo, up, in);
     }
