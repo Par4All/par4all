@@ -40,7 +40,7 @@ $DOCDIR/manl/Delete.l
 .BR pips (1),
 .BR Init (1),
 .BR Build (1),
-.BR Perform (1),
+.BR Perform (1), 
 .BR Pips (1),
 .BR Select (1),
 .BR Display (1)
