@@ -3,7 +3,7 @@
  * Portability based on pvm m4 macros.
  *
  * $RCSfile: hpfc_misc.m4c,v $ version $Revision$
- * ($Date: 1997/01/14 16:28:56 $, )
+ * ($Date: 1997/01/18 16:34:23 $, )
  *
  * Fabien Coelho, 1993-1994-1995-1996
  */
@@ -181,6 +181,22 @@ print_micros(long micros)
 }
 
 #define MAX_COMMENT_LENGTH 63
+
+void
+FUNCTION(hpfctell) ARGS(`STRING_ARG(comment)') /* `' */
+STRING_ARG_DECL(comment);
+{
+    char buffer[ MAX_COMMENT_LENGTH + 1 ];
+    int i;
+    
+    /* copy the comment in the buffer to ensure there is a NULL at the end.
+     */  
+    for (i=0; i<MAX_COMMENT_LENGTH && i<STRING_LEN(comment); i++)
+	buffer[i] = STRING_PTR(comment)[i];
+    buffer[i]='\0';
+
+    fprintf(ifdef(`USE_PVMe',stdout,stderr), "[hpfctell] %s\n", buffer);
+}/* `' */
 
 void 
 FUNCTION(hpfctimeoff) ARGS(`STRING_ARG(comment)') /* `' */
