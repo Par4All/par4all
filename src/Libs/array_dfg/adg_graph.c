@@ -884,21 +884,19 @@ effect eff;
      SC_UNDEFINED was used instead of transformer_undefined in
      contexts for scalar variables (8 August 1992) */
   effect ne;
-  transformer tf = effect_context(eff);
+  Psysteme sc = effect_system(eff);
   
-  if(tf == transformer_undefined) {
-    ne = make_effect(effect_reference(eff),
-		     effect_action(eff),
-		     effect_approximation(eff),
-		     transformer_undefined);
+  if(sc == SC_UNDEFINED) {
+    ne = make_simple_effect(effect_reference(eff),
+			    effect_action(eff),
+			    effect_approximation(eff));
   }
   else {
-    Psysteme sc = (Psysteme) predicate_system(transformer_relation(tf));
     pips_assert("effect_dup", ! SC_UNDEFINED_P(sc));
-    ne = make_effect(effect_reference(eff),
-		     effect_action(eff),
-		     effect_approximation(eff),
-		     transformer_dup(tf));
+    ne = make_convex_effect(effect_reference(eff),
+			    effect_action(eff),
+			    effect_approximation(eff),
+			    sc);
   }
   return ne;
 }
