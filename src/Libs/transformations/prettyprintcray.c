@@ -11,7 +11,8 @@
 #include "properties.h"
 #include "text-util.h"
 #include "ri-util.h"
-#include "effects.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 #include "pipsdbm.h"
 #include "prettyprint.h"
 
@@ -28,22 +29,15 @@ bool same_entity_name_p(entity e1, entity e2)
 
 bool entity_in_list(entity ent, cons *ent_l)
 {
-    MAPL(ce, {
-	entity e = ENTITY(CAR(ce));
-
-/*	if (same_entity_name_p(ent, e) && !same_entity_p(ent, e)) {
-	    debug(3, "entity_in_list", "Same name, but no sharing\n");
-	}
-	if (same_entity_name_p(ent, e)) {
-*/
+    MAP(ENTITY, e, {
 	if (same_entity_p(ent, e)) {
 	    debug(9, "entity_in_list", "entity %s found\n",
 		  entity_local_name(ent));
-	    return(TRUE);
+	    return TRUE;
 	}
     }, ent_l);
 
-    return(FALSE);
+    return FALSE;
 }
 
 /* returns l1 after elements of l2 but not of l1 have been appended to l1. */
