@@ -24,6 +24,7 @@
 #include "genC.h"
 
 #include "linear.h"
+#include "linear.h"
 #include "ri.h"
 #include "graph.h"
 #include "tiling.h"
