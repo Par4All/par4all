@@ -474,5 +474,18 @@ entity get_ith_##lname##_prime(int i)\
 #define DEFAULT_LOGICAL_TYPE_SIZE (4)
 #define DEFAULT_CHARACTER_TYPE_SIZE (1)
 
+/* Implicit variables to handle IO effetcs */
+
+/* package name for io routines */
+#define IO_EFFECTS_PACKAGE_NAME "__IO_EFFECTS"
+/* array of Logical UNits; it is more or less handled as the current file pointer */
+#define IO_EFFECTS_ARRAY_NAME "LUNS"
+/* array of end of file codes */
+#define IO_EOF_ARRAY_NAME "END_LUNS"
+/* array of error codes for LUNs */
+#define IO_ERROR_ARRAY_NAME "ERR_LUNS"
+/* size of the unit specifier */
+#define IO_EFFECTS_UNIT_SPECIFIER_LENGTH 4
+
 /* that is all for $RCSfile: ri-util-local.h,v $
  */
