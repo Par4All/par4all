@@ -25,7 +25,7 @@ float factor;
 	if (factor == 0)
 	    polynome_rm(ppp);   /* returns *ppp pointing to POLYNOME_NUL */
 	else
-	    for(curpp = *ppp; curpp != NIL; curpp = polynome_succ(curpp))
+	    for(curpp = *ppp; curpp != POLYNOME_NUL; curpp = polynome_succ(curpp))
 		monome_coeff(polynome_monome(curpp)) *= factor;
     }
 }
@@ -44,7 +44,7 @@ float factor;
 	if (factor == 0)
 	    pp = polynome_free(pp);
 	else
-	    for(curpp = pp; curpp != NIL; curpp = polynome_succ(curpp))
+	    for(curpp = pp; curpp != POLYNOME_NUL; curpp = polynome_succ(curpp))
 		monome_coeff(polynome_monome(curpp)) *= factor;
     }
     return pp;
