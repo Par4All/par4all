@@ -417,5 +417,7 @@ Pvecteur v;
 	    !in_base;
 	base = vect_add_variable(base,vecteur_var(v));
     }
+    vect_rm(base);
+    base = (Pvecteur) NULL;
     return(consistent);
 }
