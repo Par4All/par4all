@@ -1966,8 +1966,9 @@ write_tabulated_leaf_in(
     if( number >= 0 ) 
     {
       int type_number = gen_type_translation_actual_to_old(bp-Domains);
-      fputci('D', type_number, user_file);
-      write_string("\"", (obj->p+HASH_OFFSET)->s, "\" ", "_", "!");
+      /* putc('D', user_file); */
+       fputci('D', type_number, user_file);
+       write_string("\"", (obj->p+HASH_OFFSET)->s, "\" ", "_", "!"); 
       
       /* once written the domain number sign is inverted,
        * to tag the object has been written, so that
@@ -2218,7 +2219,7 @@ static gtt_p gtt_read(string filename)
       }
       else
       {
-	fprintf(stderr, "warning, domain \"%s\" (%d) not found",
+	fprintf(stderr, "warning, domain \"%s\" (%d) not found\n",
 		items[i].name, items[i].number);
       }
     }
