@@ -36,8 +36,6 @@
 #include "semantics.h"
 #include "continuation.h"
 
-extern void qsort();
-
 #define PREC_FORESYS_PREFIX "C$PREC"
 #define TRAN_FORESYS_PREFIX "C$TRAN"
 #define FORESYS_CONTINUATION_PREFIX "C$&"
