@@ -1,6 +1,6 @@
 /* Fabien Coelho, May 1993
  *
- * $RCSfile: compiler.c,v $ ($Date: 1995/08/01 10:06:09 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1995/08/28 15:00:34 $, )
  * version $Revision$
  *
  * Compiler
@@ -476,10 +476,10 @@ statement *hoststatp, *nodestatp;
 
     if (execution_parallel_p(loop_execution(the_loop)))
     {
-	entity var=entity_undefined;
+	entity var, right;
 	list l=NIL;
-	bool
-	    is_sh = subarray_shift_p(stat, &var, &l),
+	bool is_shift = subarray_shift_p(stat, &var, &l),
+	     is_full_copy = full_copy_p(stat, &var, &right),
 	    /* 
 	     * should verify that only listed in labels and distributed
 	     * entities are defined inside the body of the loop
@@ -488,14 +488,21 @@ statement *hoststatp, *nodestatp;
 	    in_in = indirections_inside_statement_p(stat);
 	
 	debug(5, "hpf_compile_loop", "condition results: sh %d, aa %d, in %d\n",
-	      is_sh, at_ac, in_in);
+	      is_shift, at_ac, in_in);
 
-	if (is_sh)
+	if (is_full_copy)
 	{
-	    debug(4, "hpf_compile_loop", "shift detected\n");
+	    pips_debug(4, "full copy detected\n");
+
+	    *nodestatp = generate_full_copy(var, right);
+	    *hoststatp = make_empty_statement();
+	}
+	else if (is_shift)
+	{
+	    pips_debug(4, "shift detected\n");
 	    
 	    *nodestatp = generate_subarray_shift(stat, var, l);
-	    *hoststatp = make_continue_statement(entity_empty_label());
+	    *hoststatp = make_empty_statement();
 	}
 	else if (at_ac && !in_in)
 	{
