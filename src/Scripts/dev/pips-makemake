@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.309  1997/08/19 10:49:53  coelho
+# preliminary java rules added.
+#
 # Revision 1.308  1997/08/19 07:29:25  coelho
 # binary links to be ok for relative links.
 #
@@ -424,6 +427,9 @@ ifneq (\$(ARCH),.)
 %.o: \$(ARCH)/%.o
 %.a: \$(ARCH)/%.a
 endif
+# Java:
+%.class: %.java; javac $<
+%.h: %.class; javah -jni $*
 # C:
 \$(ARCH)/%.o: %.c ; \$(COMPILE) \$< -o \$@
 # Fortran 77:
@@ -658,17 +664,19 @@ $verbose "specific to Passes"
 CFILES	 =	\$(LIB_CFILES)
 OBJECTS	 =	\$(LIB_OBJECTS)
 INCLUDES =	\$(LIB_HEADERS)
-MAIN	 =      \$(ARCH)/\$(LIB_MAIN:.c=.o)
 SOURCES  += 	\$(INCLUDES) \$(CFILES) \$(DOCS) \$(LIB_MAIN)
-#
-INSTALL_LIB +=	\$(MAIN)
-#
 
-\$(PIPS_BINDIR):; mkdir \$(PIPS_BINDIR)
+# jpips does not have a C main.
+ifneq (\$(LIB_MAIN),)
+MAIN	 =      \$(ARCH)/\$(LIB_MAIN:.c=.o)
+INSTALL_LIB +=	\$(MAIN)
 
 \$(BIN_TARGET): \$(INC_TARGET) \$(MAIN) \$(LIB_TARGET)
 	\$(LINK) \$(BIN_TARGET) \$(MAIN) \$(LIB_TARGET) \$(TARGET_LIBS)
 	@echo 
+endif
+
+\$(PIPS_BINDIR):; mkdir \$(PIPS_BINDIR)
 
 clean-compiled:
 	\$(RM) \$(OBJECTS) \$(MAIN) \$(LIB_TARGET) \$(BIN_TARGET) 
