@@ -13,8 +13,8 @@
 
 \section*{Introduction}
 
-This report present the data structures used to attach some
-information to some word of text, mainly to use in the hypertext Emacs
+This report present the data structures used to attach
+informations to some word of text, mainly to use in the hypertext Emacs
 interface.
 
 \domain{import entity from "ri.newgen"}
@@ -24,10 +24,8 @@ interface.
 
 Are only a list of {\tt attachment}s:
 
-\domain{attachments = persistent attachment*}
+\domain{attachments = attachment*}
 
-{\tt attachment} is persistent because an attachment is referenced
-twice.
 
 \section{Attachment}
 
@@ -41,7 +39,7 @@ file and {\tt end} the position of its end.
 The various objects that can be attached:
 \domain{attachee = persistent entity + unknown:unit}
 
-Persistance is need because we do not want the RI to be broken when
+Persistence is need because we do not want the RI to be broken when
 the attachments are freed.
 
 \section{The mapping used to attach various internal informations}
