@@ -431,6 +431,16 @@ expression e;
     }
 }
 
+void print_expressions(list le)
+{
+
+  MAP(EXPRESSION, e , {
+    print_expression(e);
+      },
+    le);
+
+}
+
 void print_syntax(s)
 syntax s;
 {
