@@ -1704,6 +1704,35 @@ switch_specific_tanh(expression exp, type_context_p context)
 			     NULL, "TANH", "DTANH", NULL, NULL);
 }
 
+/* forward declarations */
+static void simplification_complex(expression, type_context_p);
+static void simplification_dcomplex(expression, type_context_p);
+
+static void 
+switch_specific_cmplx(expression exp, type_context_p context)
+{
+  if (get_bool_property("TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS"))
+  {
+    pips_assert("expression is a call", expression_call_p(exp));
+    call_function(syntax_call(expression_syntax(exp))) = 
+      CreateIntrinsic("CMPLX");
+  }
+  simplification_complex(exp, context);
+}
+
+static void 
+switch_specific_dcmplx(expression exp, type_context_p context)
+{
+  if (get_bool_property("TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS") &&
+      TC_DCOMPLEX)
+  {
+    pips_assert("expression is a call", expression_call_p(exp));
+    call_function(syntax_call(expression_syntax(exp))) = 
+      CreateIntrinsic("DCMPLX");
+  }
+  simplification_dcomplex(exp, context);
+}
+
 /***************************** SIMPLIFICATION THE CONVERSION CALL *************
  * e.g: INT(INT(R)) -> INT(R)
  *      INT(2.9) -> 2
@@ -1901,9 +1930,9 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] =
   
   /* (0.,1.) -> switched to a function call... */
   { IMPLIED_COMPLEX_NAME, 2, overloaded_to_complex_type, 
-    typing_function_constant_complex, 0},
+    typing_function_constant_complex, switch_specific_cmplx },
   { IMPLIED_DCOMPLEX_NAME, 2, overloaded_to_doublecomplex_type, 
-    typing_function_constant_dcomplex, 0},
+    typing_function_constant_dcomplex, switch_specific_dcmplx },
   
   {"ICHAR", 1, default_intrinsic_type, typing_function_char_to_int, 0},
   {"CHAR", 1, default_intrinsic_type, typing_function_int_to_char, 0},
