@@ -102,7 +102,8 @@ char *module_name;
  * FLINT_MESSAGE(fonction, format [, arg] ... ) string fonction, format;
  */
 
-void            flint_message(va_alist) va_dcl
+void flint_message(va_alist) 
+va_dcl
 {
     va_list         args;
     char           *fmt;
@@ -137,7 +138,9 @@ void            flint_message(va_alist) va_dcl
 }
 /*************************************************************/
 /* Same as flint_message but without the function name       */
-void            flint_message_2(va_alist) va_dcl
+
+void flint_message_2(va_alist) 
+va_dcl
 {
     va_list         args;
     char           *fmt;
