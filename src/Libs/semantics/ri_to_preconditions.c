@@ -1063,8 +1063,8 @@ bool upwards;
 	    transformer preb = pre;
 	    Pvecteur va = vect_substract(v2, v1);
 	    Pvecteur vb = vect_substract(v1, v2);
-	    vect_add_elem(&va, TCST, 1);
-	    vect_add_elem(&vb, TCST, 1);
+	    vect_add_elem(&va, TCST, VALUE_ONE);
+	    vect_add_elem(&vb, TCST, VALUE_ONE);
 	    /* FI: I think that this should be programmed (see comment above)
 	     * but I'm waiting for a bug to occur... (6 July 1993)
 	     *
@@ -1084,7 +1084,7 @@ bool upwards;
 		 (ENTITY_LESS_OR_EQUAL_P(relop) && !veracity)) {
 	    /* v2 - v1 + 1 <= 0 */
 	    Pvecteur v = vect_substract(v2, v1);
-	    vect_add_elem(&v, TCST, 1);
+	    vect_add_elem(&v, TCST, VALUE_ONE);
 	    if(upwards) {
 		upwards_vect_rename(v, pre);
 	    }
@@ -1112,7 +1112,7 @@ bool upwards;
 		 (ENTITY_LESS_THAN_P(relop) && veracity)) {
 	    /* v1 - v2 + 1 <= 0 */
 	    Pvecteur v = vect_substract(v1, v2);
-	    vect_add_elem(&v, TCST, 1);
+	    vect_add_elem(&v, TCST, VALUE_ONE);
 	    if(upwards) {
 		upwards_vect_rename(v, pre);
 	    }
@@ -1134,7 +1134,7 @@ bool upwards;
 
     return newpre;
 }
-
+
 transformer data_to_precondition(m)
 entity m;
 {
@@ -1167,8 +1167,8 @@ entity m;
 	  int int_val = constant_int(value_constant(val));
 	  if(entity_has_values_p(e)
 	     && !base_contains_variable_p(b, (Variable) e)) {
-	      Pvecteur v = vect_new((Variable) e, 1);
-	      vect_add_elem(&v, TCST, -int_val);
+	      Pvecteur v = vect_new((Variable) e, VALUE_ONE);
+	      vect_add_elem(&v, TCST, int_to_value(-int_val));
 	      pre = transformer_equality_add(pre, v);
 	      b = vect_add_variable(b, (Variable) e);
 	  }}},
