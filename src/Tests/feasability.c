@@ -1,5 +1,5 @@
 /* $RCSfile: feasability.c,v $ (version $Revision$)
- * $Date: 1996/08/09 12:49:52 $, 
+ * $Date: 1996/08/09 12:50:59 $, 
  */
 
 #include <stdio.h>
@@ -18,7 +18,7 @@ test_system(Psysteme sc)
     CATCH(overflow_error) 
 	fprintf(stdout, "*** Arithmetic error occured in simplex\n");
     TRY
-	if (sc_feasibility(sc, FALSE, OFL_CTRL, TRUE))
+	if (sc_feasibility_ofl_ctrl(sc, FALSE, OFL_CTRL, TRUE))
 	    printf("Systeme faisable (soluble) en rationnels\n") ;
 	else
 	    printf("Systeme insoluble\n");
