@@ -6,7 +6,7 @@
  * to deal with them in HPFC.
  *
  * $RCSfile: dynamic.c,v $ version $Revision$
- * ($Date: 1996/02/16 12:02:18 $, )
+ * ($Date: 1996/02/16 15:02:45 $, )
  */
 
 #include "defines-local.h"
@@ -232,7 +232,9 @@ static bool same_align_p(
     list /* of alignments */ l1 = align_alignment(a1),
                              l2 = align_alignment(a2);
 
-    if (align_template(a1)!=align_template(a2)) return FALSE;
+    if ((align_template(a1)!=align_template(a2)) ||
+	(gen_length(l1)!=gen_length(l2))) 
+	return FALSE;
 
     MAP(ALIGNMENT, a,
 	if (!same_alignment_in_list_p(a, l2)) return FALSE,
@@ -519,6 +521,8 @@ continue_propagation_p(statement s)
 
 	if (realign_directive_p(fun) && array_propagation)
 	{
+	    entity primary = safe_load_primary_entity(old_variable);
+
 	    DEBUG_STAT(8, "realign directive", s);
 
 	    MAP(EXPRESSION, e,
@@ -529,11 +533,11 @@ continue_propagation_p(statement s)
 		if (entity_template_p(var)) /* up to the template, stop */
 		    return TRUE;
 		
-		if (safe_load_primary_entity(var)==old_variable)
+		if (safe_load_primary_entity(var)==primary)
 		{
 		    /*  the variable is realigned.
 		     */
-		    reference_variable(r) = new_variable;
+		    add_alive_synonym(s, new_variable);
 		    add_as_a_closing_statement(s);
 		    return FALSE;
 		}
