@@ -137,14 +137,14 @@ install-include:
 	if [ ! -d "$(INCLUDEDIR)/polylib" ]; then \
 		echo "Creating '$(INCLUDEDIR)/polylib' directory"; \
 		$(mkinstalldirs) $(INCLUDEDIR)/polylib ;\
-	fi
 	$(INSTALL_DATA) ./include/polylib/* $(INCLUDEDIR)/polylib ;\
-
+	fi
+	
 install-man:
 # to be done...
 install-docs:
 	$(mkinstalldirs) $(DOCSDIR)
-	$(INSTALL_DATA) doc/* $(DOCSDIR)/
+	$(INSTALL_DATA) doc/*.gz $(DOCSDIR)/
 	$(mkinstalldirs) $(DOCSDIR)/examples/ehrhart
 	$(INSTALL_DATA) Test/ehrhart/*.in $(DOCSDIR)/examples/ehrhart
 
