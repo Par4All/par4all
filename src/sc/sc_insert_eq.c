@@ -70,7 +70,7 @@ Pcontrainte ineq;
     sc->nb_ineq ++;
 }
 
-/* The basis of the constraint system is updated */
+/* The basis of the constraint system is updated. If not, see sc_add_egalite() */
 Psysteme
 sc_equation_add(Psysteme sc, Pcontrainte c)
 {
