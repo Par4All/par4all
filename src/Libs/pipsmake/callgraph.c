@@ -47,16 +47,16 @@ bool callgraph(string name)
 	MAP(STRING, module_called, 
 	{
 	    callees c;
+	    int r = 0;
 	    bool found = FALSE;
 
 	    GEN_ARRAY_MAP(rname, 
-			  if (same_string_p(module_called, rname))
-			  { found = TRUE; break; },
+			  if (same_string_p(module_called, rname)) 
+			  { found = TRUE; break; } else r++,
 			  modules);
 
-	    if(!found)
-		pips_user_error("no source file for module %s\n", 
-				module_called);
+	    if(!found) pips_user_error("no source file for module %s\n", 
+				       module_called);
 
 	    c = (callees) gen_array_item(module_callers, r);
 	    callees_callees(c) =
