@@ -555,6 +555,9 @@ Psysteme sc1,sc2;
     } else  if (A2->NbRays == 0) {
 	a= Polyhedron2Constraints(A1); 
     } else {
+	int i1p;
+	int cpp;
+
 	Dimension = A1->Dimension+2;
 	a = Matrix_Alloc(A1->NbRays + A2->NbRays,Dimension);
 
@@ -562,35 +565,101 @@ Psysteme sc1,sc2;
 	   l'union de ces contraintes dans un meme format 
 	   Line , Ray , vertex */
 	cp = 0;
-	i1 = 0; i2 = 0;
+	i1 = 0;
+	i2 = 0;
 	while (i1 < A1->NbRays && A1->Ray[i1][0] ==0) {
 	    for (j=0; j < Dimension ; j++)
 		a->p[cp][j] = A1->Ray[i1][j]; 
 	    cp++; i1++; 
 	}
+	/*
+	while (i2 < A2->NbRays && A2->Ray[i2][0] ==0) {
+	    boolean equal_rays = FALSE;
+	    for(i1p = 0, cpp=0; i1p < A1->NbRays && A1->Ray[i1p][0] ==0
+		&& !equal_rays; i1p++, cpp++) {
+		equal_rays = TRUE;
+		for (j=0 ; j < Dimension && equal_rays ; j++) {
+		    equal_rays = (a->p[cpp][j] == A2->Ray[i2][j]);
+		}
+	    }
+	    if(!equal_rays) {
+		for (j=0 ; j < Dimension ; j++) 
+		    a->p[cp][j] = A2->Ray[i2][j];
+		cp++; i2++; }
+	}
+	*/
 	while (i2 < A2->NbRays && A2->Ray[i2][0] ==0) {
 	    for (j=0 ; j < Dimension ; j++) 
 		a->p[cp][j] = A2->Ray[i2][j];
-	    cp++; i2++; }
+	    cp++; i2++;
+	}
+
+	i1p = i1;
+	cpp = cp;
 	while (i1 < A1->NbRays && A1->Ray[i1][0] ==1 
 	       && A1->Ray[i1][Dimension-1]==0) {
 	    for (j=0; j < Dimension ; j++) 
 		a->p[cp][j] = A1->Ray[i1][j]; 
 	    cp++; i1++; 
 	}
-	while (i2 < A2->NbRays && A2->Ray[i2][0] ==1 
+
+	/*
+	while (i2 < A2->NbRays && A2->Ray[i2][0] == 1 
+	       && A2->Ray[i2][Dimension-1]==0) {
+	    boolean equal_rays = FALSE;
+	    for(; i1p < A1->NbRays && A1->Ray[i1p][0] == 1 
+		&& A1->Ray[i1p][Dimension-1]==0
+		&& !equal_rays; i1p++, cpp++) {
+		equal_rays = TRUE;
+		for (j=0 ; j < Dimension && equal_rays ; j++) {
+		    equal_rays = (a->p[cpp][j] == A2->Ray[i2][j]);
+		}
+	    }
+
+	    if(!equal_rays) {
+		for (j=0; j < Dimension ; j++) 
+		    a->p[cp][j] = A2->Ray[i2][j]; 
+		cp++; i2++;
+	    }
+	}
+	*/
+	while (i2 < A2->NbRays && A2->Ray[i2][0] == 1 
 	       && A2->Ray[i2][Dimension-1]==0) {
 	    for (j=0; j < Dimension ; j++) 
 		a->p[cp][j] = A2->Ray[i2][j]; 
 	    cp++; i2++;
 	}
-	while (i1 < A1->NbRays && A1->Ray[i1][0] ==1 
+
+	i1p = i1;
+	cpp = cp;
+	while (i1 < A1->NbRays && A1->Ray[i1][0] == 1 
 	       && A1->Ray[i1][Dimension-1]!= 0) {
 	    for (j=0; j < Dimension ; j++)  
 		a->p[cp][j] = A1->Ray[i1][j]; 
 	    cp++; i1++; 
 	}
-	while (i2 < A2->NbRays && A2->Ray[i2][0] ==1 
+	/*
+	while (i2 < A2->NbRays && A2->Ray[i2][0] == 1 
+	       && A2->Ray[i2][Dimension-1]!=0) {
+
+	    boolean equal_rays = FALSE;
+	    for(; i1p < A1->NbRays && A1->Ray[i1p][0] == 1 
+		&& A1->Ray[i1p][Dimension-1]!=0
+		&& !equal_rays; i1p++, cpp++) {
+		equal_rays = TRUE;
+		for (j=0 ; j < Dimension && equal_rays ; j++) {
+		    equal_rays = (a->p[cpp][j] == A2->Ray[i2][j]);
+		}
+	    }
+
+	    if(!equal_rays) {
+		for (j=0; j < Dimension ; j++)  
+		    a->p[cp][j] = A2->Ray[i2][j]; 
+		cp++;  i2++;
+	    }
+	}
+	*/
+	while (i2 < A2->NbRays && A2->Ray[i2][0] == 1 
 	       && A2->Ray[i2][Dimension-1]!=0) {
 	    for (j=0; j < Dimension ; j++)  
 		a->p[cp][j] = A2->Ray[i2][j]; 
