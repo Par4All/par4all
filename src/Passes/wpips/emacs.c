@@ -1,8 +1,8 @@
-/* 	%A% ($Date: 1997/09/30 06:56:37 $, ) version $Revision$, got on %D%, %T% [%P%].
+/* 	%A% ($Date: 1997/11/13 16:17:09 $, ) version $Revision$, got on %D%, %T% [%P%].
         Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_emacs[] = "%A% ($Date: 1997/09/30 06:56:37 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_emacs[] = "%A% ($Date: 1997/11/13 16:17:09 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 
@@ -13,7 +13,7 @@ char vcid_emacs[] = "%A% ($Date: 1997/09/30 06:56:37 $, ) version $Revision$, go
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <string.h>
+#include <strings.h>
 
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -121,7 +121,7 @@ send_the_names_of_the_available_modules_to_emacs(void)
    
 	if (db_get_current_workspace_name() != NULL) {
 	    gen_array_t modules = db_get_module_list();
-	    int  module_list_length = gen_array_nitems(modules), i;
+	    int module_list_length = gen_array_nitems(modules), i;
 	    for(i = 0; i < module_list_length; i++) {
 		char * new_module_string_list_string =
 		    strdup(concatenate(module_string_list_string,
@@ -129,8 +129,8 @@ send_the_names_of_the_available_modules_to_emacs(void)
 				       NULL));
 		free(module_string_list_string);
 		module_string_list_string = new_module_string_list_string;
-		gen_array_full_free(modules);
 	    }
+	    gen_array_full_free(modules);
 	}
 	send_command_to_emacs(EMACS_AVAILABLE_MODULES_NAME,
 			      concatenate(module_string_list_string,
@@ -309,7 +309,7 @@ epips_execute_command(char * command_buffer)
    char * command_name, * command_content;
    
    /* Separate the command name from the content with a ":" : */
-   char * separator_index = (char*) index(command_buffer, ':');
+   char * separator_index = (char *) index(command_buffer, ':');
    debug(2, "epips_execute_command", "Command: \"%s\"\n", command_buffer);
 
    if (separator_index == NULL) {
