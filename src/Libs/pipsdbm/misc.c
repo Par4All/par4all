@@ -25,18 +25,20 @@
 static bool flag_interrupt_pipsmake_asap = FALSE;
 
 void interrupt_pipsmake_asap()
-{flag_interrupt_pipsmake_asap=TRUE;}
+{
+    flag_interrupt_pipsmake_asap = TRUE;
+}
 
 void dont_interrupt_pipsmake_asap()
-{flag_interrupt_pipsmake_asap=FALSE;}
+{
+    flag_interrupt_pipsmake_asap = FALSE;
+}
 
 bool interrupt_pipsmake_asap_p()
 {
-    if (signal_occured()) {
-	flag_interrupt_pipsmake_asap = TRUE;
-	accounting_signal();
-    }
-    return flag_interrupt_pipsmake_asap;
+    bool res = flag_interrupt_pipsmake_asap;
+    flag_interrupt_pipsmake_asap = FALSE;
+    return res;
 }
 
 extern int gettimeofday();
