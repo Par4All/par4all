@@ -149,6 +149,8 @@ $debug "report=$report"
 # Do the job and send reports
 
 {
+    $debug "within the script body"
+
     $verbose "Starting $user/$host"
     
     #
@@ -214,7 +216,6 @@ $debug "report=$report"
 	grep 'failed$' $report > $report.failed && summary=FAILED
 	$mail -s "$script: compile ${msg} ($arch): ${summary}" $email \
 	    < $report.failed > /dev/null 2>&1
-	rm -f $report*
     }
 
     #
@@ -233,8 +234,8 @@ $debug "report=$report"
 #
 # send the report...
 
-$mail -s "$script: report" ${email} < $report.output
 test $debug = : || cat $report.output
+$mail -s "$script: report" ${email} < $report.output
 
 rm -f $report*
 
