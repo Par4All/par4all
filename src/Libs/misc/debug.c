@@ -123,3 +123,32 @@ va_dcl
 
     va_end(args);
 }
+
+/* pips_debug is a nice macro that depends on gcc to generate the
+ * function name and to handle a variable number of arguments.
+ * if these feature are not available, it will be this function.
+ * the function name won't be available. FC May 95.
+ */
+void pips_debug_function(va_alist)
+va_dcl
+{
+    va_list args;
+    char *fmt;
+    int l;
+
+    if (the_current_debug_level == 0)
+	    return;
+
+    va_start(args);
+    l = va_arg(args, int);
+    if (l > the_current_debug_level) return;
+
+    (void) fprintf(stderr, "[unknown] ");
+    fmt = va_arg(args, char *);
+    (void) vfprintf(stderr, fmt, args);
+
+    va_end(args);
+}
+
+/* is that all? :-)
+ */
