@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: optimize.c,v $
+ * Revision 1.32  1999/05/28 12:57:58  coelho
+ * missing break fixed.
+ *
  * Revision 1.31  1999/05/28 12:04:43  coelho
  * nary pattern simplifies added.
  *
@@ -601,33 +604,33 @@ static void call_nary_rwt(call c)
   nden = gen_length(denominator);
   nnum = gen_length(numerator);
 
-  if (!nden)
+  switch (nden)
   {
+  case 0: /* nothing to change */
     gen_free_list(denominator);
     gen_free_list(numerator);
     return;
-  }
-
-  /* some denominator */
-  if (nden==1)
-  {
+  case 1:
     eden = EXPRESSION(CAR(denominator));
     gen_free_list(denominator);
-  }
-  else
-  {
+    break;
+  default:
     eden = call_to_expression(make_call(multiply, denominator));
+    break;
   }
 
   switch (nnum) 
   {
   case 0:
     enu = int_to_expression(1);
+    break;
   case 1:
     enu = EXPRESSION(CAR(numerator));
     gen_free_list(numerator);
+    break;
   default:
     enu = call_to_expression(make_call(multiply, numerator));
+    break;
   }
 
   call_function(c) = divide;
