@@ -1,5 +1,5 @@
 /* $RCSfile: prettyprint.c,v $ (version $Revision$)
- * $Date: 1996/06/17 11:32:50 $, 
+ * $Date: 1996/06/17 17:43:47 $, 
  *
  * (pretty)print of reductions.
  *
@@ -19,9 +19,33 @@
 #define PROP_DECO "proper reductions"
 #define CUMU_DECO "cumulated reductions"
 
+/****************************************************** STATIC INFORMATION */
+
 GENERIC_LOCAL_FUNCTION(printed_reductions, pstatement_reductions)
 static string reduction_decoration = NULL;
 
+/************************************************************* BASIC WORDS */
+
+/* generates a short note to tell about the type of the statement
+ * being decorated.
+ */
+static string note_for_statement(statement s)
+{
+    instruction i = statement_instruction(s);
+    switch (instruction_tag(i))
+    {
+    case is_instruction_sequence: return "seq  ";
+    case is_instruction_loop: return "loop ";
+    case is_instruction_test: return "test ";
+    case is_instruction_call: return "call ";
+    case is_instruction_unstructured: return "unst ";
+    default: pips_internal_error("unexpected instruction tag");
+    }
+    return "";
+}
+
+/* returns a (static) string describing the tag t reduction
+ */
 string reduction_operator_tag_name(tag t)
 {
     switch(t)
@@ -56,6 +80,9 @@ static list /* of string */ words_reduction(reduction r)
 	   CONS(STRING, strdup("],"), NIL))));
 }
 
+/* allocates and returns a list of string with note ahead if not empty.
+ * it describes the reductions in rs.
+ */
 static list /* of string */ words_reductions(string note, reductions rs)
 {
     list /* of string */ ls = NIL;
@@ -66,21 +93,13 @@ static list /* of string */ words_reductions(string note, reductions rs)
     return ls? CONS(STRING, strdup(note), ls): NIL;
 }
 
-static string note_for_statement(statement s)
-{
-    instruction i = statement_instruction(s);
-    switch (instruction_tag(i))
-    {
-    case is_instruction_sequence: return "seq  ";
-    case is_instruction_loop: return "loop ";
-    case is_instruction_test: return "test ";
-    case is_instruction_call: return "call ";
-    case is_instruction_unstructured: return "unst ";
-    default: pips_internal_error("unexpected instruction tag");
-    }
-    return "";
-}
+/************************************************* REDUCTION PRETTY PRINT */
 
+/* function to allocate and returns a text, passed to the prettyprinter
+ * uses some static variables:
+ * - printed_reductions function
+ * - 
+ */
 static text text_reductions(entity module, int margin, statement s)
 {
     text t;
@@ -99,6 +118,8 @@ static text text_reductions(entity module, int margin, statement s)
     return t;
 }
 
+/* returns a reduction-decorated text for statement s
+ */
 static text text_code_reductions(statement s)
 {
     text t;
@@ -110,14 +131,22 @@ static text text_code_reductions(statement s)
     return t;
 }
 
+/* handles the required prettyprint
+ * ??? what about summary reductions? 
+ * should be pprinted with cumulated regions. 
+ */
 static void 
-print_reductions(
+print_any_reductions(
     string module_name, 
     string resource_name, 
     string decoration_name,
     string file_suffix)
 {
     text t;
+
+    debug_on("REDUCTIONS_DEBUG_LEVEL");
+    pips_debug(1, "considering module %s for %s\n", 
+	       module_name, decoration_name);
 
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     set_printed_reductions((pstatement_reductions) 
@@ -128,7 +157,8 @@ print_reductions(
 
     t = text_code_reductions(get_current_module_statement());
     (void) make_text_resource(module_name, DBR_PRINTED_FILE, file_suffix, t);
-    /* some bug some where not investigated yet
+
+    /* ??? some bug some not investigated yet, memory leak...
      * free_text(t); results in a coredup much latter on.
      */
 
@@ -136,32 +166,23 @@ print_reductions(
     reset_current_module_statement();
     reset_printed_reductions();
     reduction_decoration = NULL;
-}
-    
-
-bool print_code_proper_reductions(string module_name)
-{
-    debug_on("REDUCTIONS_DEBUG_LEVEL");
-    pips_debug(1, "considering module %s\n", module_name);
-
-    print_reductions(module_name, DBR_PROPER_REDUCTIONS, 
-		     PROP_DECO, PROP_SUFFIX);
 
     debug_off();
     return TRUE;
+}
+    
+/* Handlers for PIPSMAKE
+ */
+bool print_code_proper_reductions(string module_name)
+{
+    print_any_reductions(module_name, DBR_PROPER_REDUCTIONS, 
+			 PROP_DECO, PROP_SUFFIX);
 }
 
 bool print_code_cumulated_reductions(string module_name)
 {
-    debug_on("REDUCTIONS_DEBUG_LEVEL");
-    pips_debug(1, "considering module %s\n", module_name);
-
-    print_reductions(module_name, DBR_CUMULATED_REDUCTIONS, 
-		     CUMU_DECO, CUMU_SUFFIX);
-			      
-
-    debug_off();
-    return TRUE;
+    print_any_reductions(module_name, DBR_CUMULATED_REDUCTIONS, 
+			 CUMU_DECO, CUMU_SUFFIX);
 }
 
 /* end of $RCSfile: prettyprint.c,v $
