@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <malloc.h>
+/* #include <malloc.h> in genC.h */
 	
 #include "genC.h"
 #include "misc.h"
