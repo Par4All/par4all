@@ -11,8 +11,17 @@
 
 #include <stdio.h>
 
+#include "boolean.h"
+#include "arithmetique.h"
+#include "vecteur.h"
+#include "contrainte.h"
+#include "sc.h"
+#include "ray_dte.h"
+#include "sommet.h"
+#include "polyedre.h"
+#include "sg.h"
+
 #include "genC.h"
-#include "misc.h"
 
 #include "ri.h"
 #include "graph.h"
@@ -20,6 +29,8 @@
 #include "database.h"
 #include "text.h"
 #include "dg.h"
+
+#include "misc.h"
 #include "properties.h"
 #include "arithmetique.h"
 #include "prettyprint.h"
@@ -34,7 +45,7 @@
 #include "wp65.h"
 
 extern Psysteme loop_iteration_domaine_to_sc();
-
+
 void find_iteration_domain(s, sc, basis, nested_level,
                                     list_statement_block, inst)
 statement s;
@@ -60,7 +71,7 @@ instruction * inst;
 }
 
 
-
+
 void compute_iteration_domain(list_loop_statement,sc,basis)
 list  list_loop_statement;
 Psysteme *sc; 
