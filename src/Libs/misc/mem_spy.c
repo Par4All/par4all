@@ -60,9 +60,13 @@ static MemSpyStack cumul_size_stack = NULL;
 */
 static int MemSpyUsed = 0;
 
+/* To control verbosity */
+static int verbosity = 2;
 
-void mem_spy_init()
+void mem_spy_init(int v)
 {
+    assert(0<=v && v<=2);
+    verbosity = v;
     MemSpyUsed = 1;
     current_size_stack = (MemSpyStack) malloc(sizeof(*current_size_stack));
     current_size_stack->index = -1;
@@ -80,6 +84,7 @@ void mem_spy_reset()
 	if (cumul_size_stack != NULL)
 	    free(cumul_size_stack);	    
     }
+    verbosity = 2;
 }
 
 void mem_spy_begin()
@@ -126,15 +131,19 @@ char * s;
 	diff = current_end - current_begin;
 	proper = diff - cumul; 
 	
-	/* Prettyprint the results */
-	for (i=0; i<=current_size_stack->index; i++)
-	    fprintf(stderr, "  ");
+	if(verbosity==2 ||
+	   (verbosity==1 && diff !=0) ||
+	   (verbosity==0 && proper != 0)) {
+	    /* Prettyprint the results */
+	    for (i=0; i<=current_size_stack->index; i++)
+		fprintf(stderr, "  ");
 
-	fprintf(stderr, "MEM_SPY "
-		"[%s] begin: %10.3fMB end: %10.3fMB diff: %10.3fMB "
-		"proper: %10.3fMB\n",
-		s, current_begin, current_end, diff, proper);
-    
+	    fprintf(stderr, "MEM_SPY "
+		    "[%s] begin: %10.3fMB end: %10.3fMB diff: %10.3fMB "
+		    "proper: %10.3fMB\n",
+		    s, current_begin, current_end, diff, proper);
+	}
+
 	/* Add the consumed memory size to the previous level cumulated
          * memory size of nested guarded code fragments.
 	 */
@@ -142,6 +151,3 @@ char * s;
 	    cumul_size_stack->elt[cumul_size_stack->index] += diff;
     }
 }
-
-
-
