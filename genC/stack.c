@@ -7,10 +7,10 @@
  * there is no actual need of such a type on the functional point of view.
  * I put it there since it may be much more efficient than lists.
  *
- * More thoughts needed. I should had an iterator...
+ * More thoughts needed. Iterator?
  *
  * $RCSfile: stack.c,v $ version $Revision$
- * $Date: 1995/02/01 10:59:09 $, 
+ * $Date: 1995/02/01 17:26:18 $, 
  * got on %D%, %T%
  */
 
@@ -19,6 +19,7 @@ extern int fprintf();
 #include "malloc.h"
 #include "newgen_assert.h"
 #include "newgen_types.h"
+#include "newgen_stack.h"
 
 /* the stack bulks, that is arrays containing the elements
  */
@@ -35,15 +36,16 @@ typedef struct _stack_bulk
  */
 typedef struct __stack_head
 {
-  int size;
-  int type; /* as BASIC, LIST, EXTERNAL, CHUNK and so on */
-  int max_extent;
-  _stack_ptr stack;
-  _stack_ptr available;
+  int size;        /* current number of elements in stack */
+  int type;        /* as BASIC, LIST, EXTERNAL, CHUNK, domain? */
+  int policy;      /* may be used to indicate an allocation policy */
+  int bulk_size;   /* reference bulk size for allocation */
+  int n_bulks;     /* number of allocated bulks */
+  int max_extent;  /* maximum extension of the stack */
+  _stack_ptr stack;/* bulks in use by the stack */
+  _stack_ptr avail;/* allocated bulks not in use */
 }
   _stack_head; /* and *stack */
-
-#include "newgen_stack.h"
 
 /*  usefull defines
  */
@@ -84,16 +86,19 @@ int size;
 static _stack_ptr find_or_allocate(s)
 stack s;
 {
-    if (!STACK_PTR_NULL_P(s->available))
+    if (!STACK_PTR_NULL_P(s->avail))
     {
-	_stack_ptr x = s->available;
+	_stack_ptr x = s->avail;
 
-	s->available = (s->available)->succ;
+	s->avail = (s->avail)->succ;
 	x->succ = STACK_PTR_NULL; /*  clean the bulk to be returned */
 	return(x);
     }
     else
+    {
+	s->n_bulks++;
 	return(allocate_bulk((s->stack)->max_items));
+    }
 }
 
 /* ALLOCATEs a new stack of type
@@ -107,9 +112,12 @@ int type, size;
 
     s->size = 0;
     s->type = type;
+    s->policy = (-1); /* not used */
+    s->bulk_size = size;
     s->max_extent = 0;
+    s->n_bulks = 0;
     s->stack = allocate_bulk(size);
-    s->available = STACK_PTR_NULL;
+    s->avail = STACK_PTR_NULL;
  
     return(s);
 }
@@ -135,7 +143,7 @@ stack s;
     fprintf(f, " - type %d, size %d, max extent %d\n", 
 	    s->type, s->size, s->max_extent);
     fprintf(f, " - bulks: %d in use, %d available\n",
-	    number_of_bulks(s->stack), number_of_bulks(s->available));
+	    number_of_bulks(s->stack), number_of_bulks(s->avail));
 }
 
 /* FREEs the stack
@@ -163,7 +171,7 @@ void stack_free(s)
 stack s;
 {
     free_bulks(s->stack), s->stack=STACK_PTR_NULL;
-    free_bulks(s->available), s->available=STACK_PTR_NULL;
+    free_bulks(s->avail), s->avail=STACK_PTR_NULL;
     free(s);
 }
 
@@ -227,7 +235,7 @@ stack s;
     {
 	_stack_ptr saved = x->succ;
 
-	x->succ = s->available, s->available = x;
+	x->succ = s->avail, s->avail = x;
 	s->stack = saved, x = saved;
     }
 
@@ -247,7 +255,6 @@ stack s;
     _stack_ptr x = s->stack;
 
     if (x->n_item==0) x = x->succ;
-
     assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
 
     /*   HEAD
@@ -261,9 +268,17 @@ char *stack_replace(item, s)
 char *item;
 stack s;
 {
-    char *old = stack_pop(s);
+    _stack_ptr x = s->stack;
+    char *old;
 
-    stack_push(item, s);
+    if (x->n_item==0) x = x->succ;
+    assert(!STACK_PTR_NULL_P(x) && x->n_item>0);
+
+    /*    REPLACE
+     */
+    old = x->items[(x->n_item)-1],
+    x->items[(x->n_item)-1] = item;
+
     return(old);
 }
 
