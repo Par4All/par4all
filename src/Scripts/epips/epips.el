@@ -18,7 +18,7 @@
 ;;; The faces used to display various informations. Use the
 ;;; hilit-lookup-face-create function from hilit19.el:
 ;; To have hilit-lookup-face-create at least:
-(require 'hilit19)
+;; (require 'hilit19)
 
 (if (x-display-color-p)
     (progn
