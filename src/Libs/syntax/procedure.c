@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.66  2003/06/19 07:38:19  nguyen
+ * Update calls to make_statement and make_variable with new RI for C
+ *
  * Revision 1.65  2003/06/05 09:17:05  irigoin
  * Guard calls to CleanLocalEntities() in MakeCurrentFunction() to reduce the
  * execution time for large source code. The global symbol table was
@@ -2003,7 +2006,8 @@ ProcessEntry(
 				 MAKE_ORDERING(0,1),
 				 empty_comments,
 				 make_instruction(is_instruction_unstructured,
-						  control_graph(es)));
+						  control_graph(es)),
+			         NIL,NULL);
     unspaghettify_statement(ces);
 
     /* Compute an external representation of entry statement es for entry e.
@@ -2473,7 +2477,7 @@ MakeFormalParameter(
     entity_type(fp) = make_type(is_type_variable, 
 				make_variable(make_basic(is_basic_string, 
 							 MakeValueUnknown()),
-					      NIL));
+					      NIL,NIL));
   }
   else if(SubstituteAlternateReturnsP() && ReturnCodeVariableP(fp)) {
     entity_type(fp) = MakeTypeVariable(make_basic(is_basic_int, (void *) 4), NIL);
