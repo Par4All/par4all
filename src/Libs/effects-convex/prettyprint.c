@@ -32,10 +32,7 @@
 #include "resources.h"
 #include "prettyprint.h"
 
-#define REGION_BUFFER_SIZE 2048
-
 #define REGION_FORESYS_PREFIX "C$REG"
-#define PIPS_NORMAL_PREFIX "C"
 
 /* char * pips_region_user_name(entity ent)
  * output   : the name of entity.
@@ -68,96 +65,6 @@ pips_region_user_name(entity ent)
     return name;
 }
 
-
-/* static string region_sc_to_string(string s, Psysteme ps)
- * input    : a string buffer and a region predicate
- * output   : the string buffer filled with a character string representing the
- *            predicate.
- * modifies : nothing.
- * comment  : ps is supposed to be sorted in such a way that in equalities and 
- *            inequalities constraints containing phi variables come first.
- *            equalities with phi variables are printed first, and then 
- *            inequalities with phi variables, and then equalities and 
- *            inequalities with no phi variables.
- */
-string
-region_sc_to_string(string s, Psysteme ps)
-{
-    Pcontrainte peg, pineg;
-    boolean a_la_fortran = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-    bool first = TRUE;
-    int passe ;
-    
-    if (ps == NULL) 
-    {
-	(void) sprintf(s+strlen(s),"SC_UNDEFINED");
-	return(s);
-    }
-
-    peg = ps->egalites;
-    pineg = ps->inegalites;
-
-    if (!a_la_fortran)
-	(void) sprintf(s+strlen(s), "{");
-
-    for(passe = 1; passe <= 2; passe++) {
-	bool phis = (passe == 1);
-
-	for (;(peg!=NULL) &&
-		 ((!phis) || (phis && vect_contains_phi_p(peg->vecteur))); 
-	     peg=peg->succ) 
-	{
-	    if(first)
-		first = FALSE;
-	    else
-		switch (a_la_fortran) {
-		case FALSE :
-		    (void) sprintf(s+strlen(s),", ");
-		    break;
-		case TRUE : 
-		    (void) sprintf(s+strlen(s),".AND.");
-		    break;
-		}
-	    if (a_la_fortran)
-		(void) sprintf(s+strlen(s),"(");
-	    egalite_sprint_format(s,peg,pips_region_user_name, a_la_fortran);
-	    if (a_la_fortran)
-		(void) sprintf(s+strlen(s),")");
-	}
-	
-	for (;
-	     (pineg!=NULL) && ((!phis) || 
-			       (phis && vect_contains_phi_p(pineg->vecteur))); 
-	     pineg=pineg->succ) {
-	    if(first)
-	    first = FALSE;
-	    else
-		switch (a_la_fortran) {
-		case FALSE :
-		    (void) sprintf(s+strlen(s),", ");
-		    break;
-		case TRUE : 
-		    (void) sprintf(s+strlen(s),".AND.");
-		    break;
-		}
-	    if (a_la_fortran)
-		(void) sprintf(s+strlen(s),"(");
-	    inegalite_sprint_format(s,pineg, pips_region_user_name, 
-				    a_la_fortran);
-	    if (a_la_fortran)
-		(void) sprintf(s+strlen(s),")");
-	}
-    
-    }
-    
-    if (!a_la_fortran)
-	(void) strcat(s,"}");
-
-    return(s);
-}
-
-
-
 /* list words_region(effect reg)
  * input    : a region.
  * output   : a list of strings representing the region.
@@ -170,63 +77,18 @@ region_sc_to_string(string s, Psysteme ps)
 list
 words_region(region reg)
 {
-    static char buffer[REGION_BUFFER_SIZE];
-    
-    list pc = NIL;
-    reference r = effect_reference(reg);
-    action ac = effect_action(reg);
-    approximation ap = effect_approximation(reg);
-    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-    Psysteme sc = region_system(reg);
-
-    buffer[0] = '\0';
-
-    if(!region_empty_p(reg) && !region_rn_p(reg))
-    {
-	Pbase sorted_base = region_sorted_base_dup(reg);
-	Psysteme sc = sc_dup(region_system(reg));
-	
-      /* sorts in such a way that constraints with phi variables come first */
-	region_sc_sort(sc, sorted_base);
-
-	strcat(buffer, "-");	
-	region_sc_to_string(buffer, sc);
-	sc_rm(sc);
-	base_rm(sorted_base);
-
-    }
-    else
-    {
-	strcat(buffer, "-");	
-	region_sc_to_string(buffer, sc);
-    }
-    pips_assert("words_region", strlen(buffer) < REGION_BUFFER_SIZE );
-
-    if (foresys)
-    {
-      pc = gen_nconc(pc, words_reference(r));
-      pc = CHAIN_SWORD(pc, ", RGSTAT(");
-      pc = CHAIN_SWORD(pc, action_read_p(ac) ? "R," : "W,");
-      pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "MAY), " : "EXACT), ");
-      pc = CHAIN_SWORD(pc, buffer);
-    }
-    else /* PIPS prettyprint */
-    {
-	pc = CHAIN_SWORD(pc, "<");
-	pc = gen_nconc(pc, effect_words_reference(r));
-	pc = CHAIN_SWORD(pc, "-");
-	pc = CHAIN_SWORD(pc, action_interpretation(action_tag(ac)));
-	pc = CHAIN_SWORD(pc, approximation_may_p(ap) ? "-MAY" : "-EXACT");
-	pc = CHAIN_SWORD(pc, buffer);
-	pc = CHAIN_SWORD(pc, ">");
-    }
-
-    return pc;
+    pips_internal_error("implementation dropped\n");
+    return NIL;
 }
 
+string
+region_sc_to_string(string s, Psysteme ps)
+{
+    pips_internal_error("implementation dropped\n");
+    return string_undefined;
+}
 
-
-
+#define append(s) add_to_current_line(line_buffer, s, str_prefix, t_reg)
 
 /* text text_region(effect reg)
  * input    : a region
@@ -237,30 +99,79 @@ words_region(region reg)
 text 
 text_region(effect reg)
 {
-    text t_reg = make_text(NIL);
+    text t_reg;
     boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
-    string str_prefix;
+    string str_prefix = foresys? 
+	FORESYS_CONTINUATION_PREFIX: PIPS_COMMENT_CONTINUATION;
+    char line_buffer[MAX_LINE_LENGTH];
+    reference r;
+    action ac;
+    approximation ap;
+    Psysteme sc;
+    Pbase sorted_base;
+    list /* of string */ ls;
 
+    if(effect_undefined_p(reg))
+    {
+	user_log("[text_region] unexpected effect undefined\n");
+	return make_text(make_sentence(is_sentence_formatted,
+	   strdup(concatenate(str_prefix, "<REGION_UNDEFINED>\n", 0))));
+    }
+    /* else the effect is defined...
+     */
+
+    /* PREFIX
+     */
+    t_reg = make_text(NIL);
+    strcpy(line_buffer, foresys? REGION_FORESYS_PREFIX: PIPS_COMMENT_PREFIX);
+    if (!foresys) append("  <");
+
+    /* REFERENCE
+     */
+    r = effect_reference(reg);
+    ls = foresys? words_reference(r): effect_words_reference(r);
+
+    MAP(STRING, s, append(s), ls);
+    gen_map(free, ls); gen_free_list(ls); ls = NIL;
+
+    /* ACTION and APPROXIMATION
+     */
+    ac = effect_action(reg);
+    ap = effect_approximation(reg);
+	
     if (foresys)
-	str_prefix = REGION_FORESYS_PREFIX;
-    else
-	str_prefix = PIPS_NORMAL_PREFIX;
-    
-    if(reg == effect_undefined)
     {
-	ADD_SENTENCE_TO_TEXT(t_reg, 
-			     make_pred_commentary_sentence
-			     (strdup("<REGION_UNDEFINED>"),
-			      str_prefix));
-	user_log("[region_to_string] unexpected effect undefined\n");
+	append(", RGSTAT(");
+	append(action_read_p(ac) ? "R," : "W,");
+	append(approximation_may_p(ap) ? "MAY), " : "EXACT), ");
     }
-    else
+    else /* PIPS prettyprint */
     {
-	gen_free(t_reg);
-	t_reg = words_predicate_to_commentary(words_region(reg), str_prefix);
+	append("-");
+	append(action_interpretation(action_tag(ac)));
+	append(approximation_may_p(ap) ? "-MAY" : "-EXACT");
+	append("-");
     }
 
-    return(t_reg);   
+    /* SYSTEM
+     * sorts in such a way that constraints with phi variables come first.
+     */
+    sorted_base = region_sorted_base_dup(reg);
+    sc = sc_dup(region_system(reg));
+    region_sc_sort(sc, sorted_base);
+
+    system_sorted_text_format(line_buffer, str_prefix, t_reg, sc, 
+	       pips_region_user_name, vect_contains_phi_p, foresys);
+
+    sc_rm(sc);
+    base_rm(sorted_base);
+
+    /* CLOSE 
+     */
+    if (!foresys) append(">");
+    close_current_line(line_buffer, t_reg);
+
+    return t_reg;   
 }
 
 
