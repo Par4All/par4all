@@ -93,19 +93,18 @@ boolean ofl_res;
  * LOW LEVEL FUNCTIONS 
  */
 
-/*****duong - set timeout with signal and alarm*****/
 #ifdef FILTERING
 
 static void 
 filtering_catch_alarm_FM (int sig)
 {  
-  alarm(0); //clear the alarm
+  alarm(0);
   FM_timeout = TRUE;
 }
 static void 
 filtering_catch_alarm_J (int sig)
 {  
-  alarm(0); //clear the alarm
+  alarm(0);
   J_timeout = TRUE;
 }
 static void
@@ -115,6 +114,7 @@ filtering_catch_alarm_S (int sig)
   S_timeout = TRUE;
 }
 #endif
+
 /*  just a test to improve the Simplex/FM decision.
  * c is a list of constraints, equalities or inequalities
  * pc is the number of constraints in the list
@@ -122,9 +122,8 @@ filtering_catch_alarm_S (int sig)
  * magnitude is the biggest coefficent in the system
  * pc, pv and magnitude MUST be initialized. They are multiplied by weight.
  *
- * Modif: (this function were not in use, but may be needed in the futur)
- *        can get the magnitude of the sc (the biggest coefficent)
- *        should be called from anywhere, for the filters = remove static DN:25/02/03
+ * Modif: 
+ *        Become public, used by filters
  */
 void
 decision_data(c, pc, pv, magnitude, weight)
@@ -312,7 +311,7 @@ static boolean sc_fm_project_variables
 	break;
       }
     }    
-  }//of while    
+  }
    base_rm(b);
    return faisable;
 }
@@ -322,14 +321,18 @@ static boolean sc_fm_project_variables
 #define FM_METHOD 13
 #define JANUS_METHOD 14
 #define ALL_METHOD 15
-// We can add other heuristic if we need in an easy way.
-//Note: FM is not good for big sc, but good enough for small sc.
-//Simplex build a tableau, so it's not good for small sc. 
-#define HEURISTIC1 1 //Keep the old heuristic of Fabien.
-#define HEURISTIC2 2 //Replace Simplex by Janus in heuristic 1
-#define HEURISTIC3 3 //Only for experiment. Test successtively 3 methods to see the coherence
-#define HEURISTIC4 4 //The best?: (Linear Simplex vs Janus) try to use the method that succeeded recently. If failed than turn to another. Rely on the fact that the sc are similar. [optional?] : If the 2 methods fail, then call FM. This can solve many sc, in fact. 
-static int method_used = 0;//means LINEAR_SIMPLEX :-)
+
+/* We can add other heuristic if we need in an easy way.
+ * Note: FM is not good for big sc, but good enough for small sc.
+ * Simplex build a tableau, so it's not good for small sc
+ */
+
+#define HEURISTIC1 1 /* Keep the old heuristic of FC */
+#define HEURISTIC2 2 /* Replace Simplex by Janus in heuristic 1 */
+#define HEURISTIC3 3 /* Only for experiment. Test successtively 3 methods to see the coherence */
+#define HEURISTIC4 4 /* The best?: (Linear Simplex vs Janus) try to use the method that succeeded recently. If failed than turn to another. Rely on the fact that the sc are similar. [optional?] : If the 2 methods fail, then call FM. This can solve many sc, in fact. */
+
+static int method_used = 0; /* means LINEAR_SIMPLEX :-) */
 
 static boolean internal_sc_feasibility
 (Psysteme sc, int heuristic, boolean int_p, int ofl_ctrl)
@@ -340,11 +343,11 @@ static boolean internal_sc_feasibility
 
  feasibility_sc_counter ++;
   
-  //We can put the size filters here! filtering timeout is integrated in the methods themself
-  //size filtering: dimension,number_constraints, density, magnitude
+ /* We can put the size filters here! filtering timeout is integrated in the methods themself
+  * size filtering: dimension,number_constraints, density, magnitude */
 
 #ifdef FILTERING
-   //Begin size filters
+ /*Begin size filters*/
   
   if (TRUE) {
     int dimens; int nb_cont_eq = 0; int nb_ref_eq = 0; int nb_cont_in = 0; int nb_ref_in = 0;
@@ -371,7 +374,7 @@ static boolean internal_sc_feasibility
     }
   }
   
-  //End size filters
+  /*End size filters*/
 #endif
 
   switch(heuristic) {
@@ -381,10 +384,10 @@ static boolean internal_sc_feasibility
       n_var = sc->dimension; value_assign(magnitude,VALUE_ZERO);
       decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, &magnitude, 1);
       decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, &magnitude, 1);
-      // HEURISTIC1
-      //  if nb_ineg >= 10 and nb_eg < 6 then use LSimplex (replace n eg by 2n ineg) 
-      //  if nb_ineg >= 10 and nb_eg >= 6 then project eg and use LSimplex
-      //  if nb_ineg < 10 then use FM
+      /* HEURISTIC1
+       *  if nb_ineg >= 10 and nb_eg < 6 then use LSimplex (replace n eg by 2n ineg) 
+       *  if nb_ineg >= 10 and nb_eg >= 6 then project eg and use LSimplex
+       *  if nb_ineg < 10 then use FM */
 
       if (n_cont_in >= 10) {	
 	if (n_cont_eq >= 6) {method=LINEAR_SIMPLEX_PROJECT_EQ_METHOD;}
@@ -416,7 +419,7 @@ static boolean internal_sc_feasibility
       method = ALL_METHOD;
       break; 
     }
-  case (HEURISTIC4) : //test by FM one more time here? That helps in some cases!
+  case (HEURISTIC4):
     {
       method=0, n_var =0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
       n_var = sc->dimension; value_assign(magnitude,VALUE_ZERO);
@@ -425,11 +428,11 @@ static boolean internal_sc_feasibility
  
       CATCH(overflow_error) {
 
-	//	ifscdebug(5) {fprintf(stderr,"nb_exceptions af %d\n",linear_number_of_exception_thrown);}
+	/*	ifscdebug(5) {fprintf(stderr,"nb_exceptions af %d\n",linear_number_of_exception_thrown);}*/
 
 	if (n_cont_in >= 10) {
 	  if (method_used==JANUS_METHOD) {
-	    method_used = 0;//LINEAR_SIMPLEX
+	    method_used = 0;/*LINEAR_SIMPLEX*/
 	    ifscdebug(5) {fprintf(stderr,"J failes so change to LS ...");}
 	    if (n_cont_eq>=6) {	      
 	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,TRUE,int_p,ofl_ctrl);
@@ -445,12 +448,12 @@ static boolean internal_sc_feasibility
 	    ifscdebug(5) {fprintf(stderr," ...Passed\n");}
 	    linear_number_of_exception_thrown--; 
 	  }
-	  //	  ok = sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl(sc,int_p,ofl_ctrl);
+	  /*	  ok = sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl(sc,int_p,ofl_ctrl);*/
 	} else {
 	  ifscdebug(5) {fprintf(stderr,"\nFM fail with small sc => bug??? ...");}
 	  if (method_used == JANUS_METHOD) {
 	    ok = sc_janus_feasibility_ofl_ctrl_timeout_ctrl(sc,ofl_ctrl);
-	    //Janus
+	    /*Janus*/
 	  }else {	    
 	    if (n_cont_eq>=6) {	      
 	      ok = sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl(sc,TRUE,int_p,ofl_ctrl);
@@ -474,25 +477,21 @@ static boolean internal_sc_feasibility
 	    }
 	  }
 	}else{
-	  //FM
+	  /*FM*/
 	  ok = sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl(sc,int_p,ofl_ctrl);
 	}
 	UNCATCH(overflow_error);    
-      }//of TRY
+      }/*of TRY*/
       
       break;
     }
 
-  default: //use heuristic1
+  default: /*use heuristic1*/
     {
       method=0, n_var =0, n_cont_eq = 0, n_ref_eq = 0, n_cont_in = 0, n_ref_in = 0;
       n_var = sc->dimension; value_assign(magnitude,VALUE_ZERO);
       decision_data(sc_egalites(sc), &n_cont_eq, &n_ref_eq, &magnitude, 1);
       decision_data(sc_inegalites(sc), &n_cont_in, &n_ref_in, &magnitude, 1);
-      // HEURISTIC1
-      //  if nb_ineg >= 10 and nb_eg < 6 then use Simplex (replace n eg by 2n ineg) 
-      //  if nb_ineg >= 10 and nb_eg >= 6 then project eg and use Simplex
-      //  if nb_ineg < 10 then use FM
 
       if (n_cont_in >= 10) {	
 	if (n_cont_eq >= 6) {method=LINEAR_SIMPLEX_PROJECT_EQ_METHOD;}
@@ -503,9 +502,9 @@ static boolean internal_sc_feasibility
       break;
     }
   
-  }//of switch heuristic
+  }/*of switch heuristic*/
 
-  // fprintf(stderr, "in=%d eq=%d method=%d magnitude=", n_cont_in, n_cont_eq, method);print_Value(magnitude);
+  /* fprintf(stderr, "in=%d eq=%d method=%d magnitude=", n_cont_in, n_cont_eq, method);print_Value(magnitude);*/
 
   switch(method){
   
@@ -528,17 +527,17 @@ static boolean internal_sc_feasibility
     {
       ok = sc_janus_feasibility_ofl_ctrl_timeout_ctrl(sc,ofl_ctrl);
       break;
-    }//end of case JANUS 
+    }
   case (ALL_METHOD):
     {
 
       boolean okS = TRUE,okJ = TRUE,okFM = TRUE;
       CATCH(overflow_error) {
 	ifscdebug(5) {
-	  fprintf(stderr,"WARNING: Janus or Simplex failed. Let's go with FM\n");
+	  fprintf(stderr,"Janus or Simplex failed. Let's go with FM\n");
 	}
 	okFM = sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl(sc,int_p,ofl_ctrl);
-	ok = okFM;// the most reliable???
+	ok = okFM;
       }
       TRY {
 	if (n_cont_eq >= 10) {
@@ -552,11 +551,11 @@ static boolean internal_sc_feasibility
       
 	ifscdebug(5) {
 	  if (okS != okFM) {
-	    fprintf(stderr,"WARNING: okS %d != okFM %d\n",okS,okFM);
+	    fprintf(stderr,"\n[internal_sc_feasibility]: okS %d != okFM %d\n",okS,okFM);
 	    sc_default_dump(sc);
 	  }
 	  if (okJ != okFM) {
-	    fprintf(stderr,"WARNING: okJ %d != okFM %d\n",okJ,okFM);
+	    fprintf(stderr,"\n[internal_sc_feasibility]: okJ %d != okFM %d\n",okJ,okFM);
 	    sc_default_dump(sc);
 	  }
 	  assert(okS == okFM);
@@ -569,12 +568,11 @@ static boolean internal_sc_feasibility
     }  
   default:
     {
-      //rien faire      
-      //ifscdebug(5){fprintf(stderr,"methoddefault");assert(FALSE);}
+      /*rien faire*/
        break;
     }
 
-  }//of switch method
+  }/*of switch method*/
 
   return ok;
 }
@@ -603,13 +601,13 @@ boolean ofl_res;
   if (sc_rn_p(sc)) {
     ifscdebug(5) {
       fprintf(stderr,"\n sc_rn is given to sc_feasibility_ofl_ctrl : return TRUE");
-    }// this should be treated somewhere else -> faster
+    }/* this should be treated somewhere else -> faster */
     return TRUE;
   }
   if (sc_empty_p(sc)) {
     ifscdebug(5) {
       fprintf(stderr,"\n sc_empty is given to sc_feasibility_ofl_ctrl : return FALSE");
-    }// this should be treated somewhere else -> faster
+    }/*this should be treated somewhere else -> faster*/
     return FALSE;
   }
 
@@ -634,11 +632,13 @@ boolean ofl_res;
       break;
       }		
   default: {
-      //What we need to do here: choose a method or a heuristic predifined by a variable of environment
-      //and catch an overflow exception if it happens DN240203
-      heuristic = SWITCH_HEURISTIC_FLAG;//default, heuristic flag is 0         
-      ok = internal_sc_feasibility(sc, heuristic, integer_p, ofl_ctrl);
-    }
+    /* What we need to do here: 
+     * choose a method or a heuristic predifined by a variable of environment
+     * and catch an overflow exception if it happens DN240203 */
+
+    heuristic = SWITCH_HEURISTIC_FLAG;/* By default, heuristic flag is 0 */
+    ok = internal_sc_feasibility(sc, heuristic, integer_p, ofl_ctrl);
+  }
   }  
   
   if (catch_performed)
@@ -674,12 +674,12 @@ int ofl_ctrl;
   boolean faisable = TRUE;
 
   CATCH(any_exception_error) {
-    // maybe timeout_error or overflow_error
+    /* maybe timeout_error or overflow_error*/
     if (ofl_ctrl == FWD_OFL_CTRL) {
-	RETHROW(); //rethrow whatever the exception is
+      RETHROW(); /*rethrow whatever the exception is*/
     } else {
-      fprintf(stderr,"\nWARNING [sc_fourier_motzkin_feasibility_ofl_ctrl] without OFL_CTRL => RETURN TRUE\n");
-      return TRUE;// default is feasible
+      fprintf(stderr,"\n[sc_fourier_motzkin_feasibility_ofl_ctrl] without OFL_CTRL => RETURN TRUE\n");
+      return TRUE;/* default is feasible*/
     }
   }
  
@@ -690,7 +690,6 @@ int ofl_ctrl;
       fprintf(stderr, "[sc_fourier_motzkin_feasibility_ofl_ctrl] system:\n");
       sc_fprint(stderr, s, default_variable_to_string);
     }
-
   
   s = sc_elim_double_constraints(s);
 
@@ -703,8 +702,8 @@ int ofl_ctrl;
 
     faisable = sc_fm_project_variables(&s, integer_p, FALSE, ofl_ctrl);
 
-      sc_rm(s); //should remove the copy of the sc.
-      s = NULL;
+    sc_rm(s); /*should remove the copy of the sc.*/
+    s = NULL;
 
   }
   else 
@@ -732,7 +731,6 @@ int ofl_ctrl;
 
     ifscdebug(5) {
       fprintf(stderr,"sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl fails");
-      //      sc_default_dump(sc);
     }
 
 #ifdef FILTERING
@@ -743,12 +741,13 @@ int ofl_ctrl;
     }
 #endif
 
-    //if (w) sc_rm(w);
+    if (w) sc_rm(w);
+
     if (ofl_ctrl==FWD_OFL_CTRL) {
-      linear_number_of_exception_thrown -=2;//there r 2 exceptions here!
-      THROW(overflow_error);//need to handle numberofexception somewhere
+      linear_number_of_exception_thrown -=2;/* there r 2 exceptions here! */
+      THROW(overflow_error);
     } else {
-      fprintf(stderr,"\nWARNING [sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
+      fprintf(stderr,"\n[sc_fourier_motzkin_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
       return TRUE;
     }    
   }
@@ -757,7 +756,6 @@ int ofl_ctrl;
     w = sc_copy(sc);
 
 #ifdef FILTERING
-    //start the alarm
     if (FILTERING_TIMEOUT_FM) {
       signal(SIGALRM, filtering_catch_alarm_FM);
       alarm(FILTERING_TIMEOUT_FM);
@@ -780,9 +778,9 @@ int ofl_ctrl;
     }
 #endif
 
-  }//of TRY
+  }
 
-  //  if (w) sc_rm(w);  //sc_fourier_motzkin_feasibility_ctrl_ofl has freed the memory. base
+  /*  if (w) sc_rm(w);  sc_fourier_motzkin_feasibility_ctrl_ofl has freed the memory. base */
     
   UNCATCH(any_exception_error);
 
@@ -804,8 +802,7 @@ int ofl_ctrl;
   CATCH(any_exception_error) {
 
     ifscdebug(5) {
-	fprintf(stderr,"sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl fails");
-	//      sc_default_dump(sc);
+	fprintf(stderr,"\n[sc_simplexe_feasibility_ofl_ctrl_timeout_ctrl] fails");
     }
   
 #ifdef FILTERING
@@ -819,11 +816,11 @@ int ofl_ctrl;
 
     if (w) sc_rm(w);
     if (ofl_ctrl == FWD_OFL_CTRL) {
-      linear_number_of_exception_thrown -=2;//there r 2 exceptions here!
-      THROW(overflow_error);//need to handle numberofexception somewhere
+      linear_number_of_exception_thrown -=2;/*there r 2 exceptions here!*/
+      THROW(overflow_error);
     } else {
-      fprintf(stderr,"\nWARNING [sc_simplex_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
-      return TRUE;// default is feasible
+      fprintf(stderr,"\n[sc_simplex_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
+      return TRUE;/* default is feasible*/
     }
   }
   TRY {      
@@ -854,7 +851,7 @@ int ofl_ctrl;
     }
 #endif
      
-  }//of TRY  
+  }
 
   if (w) sc_rm(w);    
   UNCATCH(any_exception_error);
@@ -870,21 +867,21 @@ boolean ofl_ctrl;
   Psysteme w = NULL;
   int ok=0;
 
-  //DN: We should be sure that the sc is not null in the sc_feasibility_ofl_ctrl, but for direct call of Janus ... 
+  /*DN: We should be sure that the sc is not null in the sc_feasibility_ofl_ctrl, but for direct calls of Janus ...*/
   if (sc) {
     if (sc->dimension == 0) return TRUE;
   }
   else return TRUE;
 
-  //sc_empty_p is filtered, (sc_fix is called), so there's no other reason for janus to fail ...
-  //maybe a sc_not_easy_to_see_empty
-  // TODO aware of vectors of one element: 0 <= 1.
+  /* sc_empty_p is filtered, (sc_fix is called), so there's no other reason for janus to fail ...
+   * maybe a sc_not_easy_to_see_empty */
+   /* TODO aware of vectors of one element: 0 <= 1. 
+    * treating it here is better than in Janus */
 
   CATCH(any_exception_error) {
 
     ifscdebug(5) {
-      fprintf(stderr,"sc_janus_feasibility_ofl_ctrl_timeout_ctrl fails");
-      //      sc_default_dump(sc);
+      fprintf(stderr,"\n[sc_janus_feasibility_ofl_ctrl_timeout_ctrl] fails");
     }
 
 #ifdef FILTERING
@@ -897,8 +894,8 @@ boolean ofl_ctrl;
 #endif
 
     if (w) sc_rm(w);
-    linear_number_of_exception_thrown -=1;//there r 2 exceptions here!
-    THROW(overflow_error);//need to handle number of exceptions somewhere
+    linear_number_of_exception_thrown -=1;/*there r 2 exceptions here!*/
+    THROW(overflow_error);
   }
   TRY { 
     if (sc) {w = sc_copy(sc);}
@@ -908,7 +905,6 @@ boolean ofl_ctrl;
     if (w) {
 
 #ifdef FILTERING
-      //start the alarm
       if (FILTERING_TIMEOUT_JANUS) {
 	signal(SIGALRM, filtering_catch_alarm_J);
 	alarm(FILTERING_TIMEOUT_JANUS);
@@ -916,7 +912,7 @@ boolean ofl_ctrl;
       }
 #endif
  
-      ok = sc_janus_feasibility(w); //sc_janus_feasibility returns type int, not boolean
+      ok = sc_janus_feasibility(w); /*sc_janus_feasibility returns type int, not boolean*/
 
 #ifdef FILTERING
       if (FILTERING_TIMEOUT_JANUS) {
@@ -930,17 +926,17 @@ boolean ofl_ctrl;
 
     } else return TRUE;
     
-  }//of TRY
+  }
 
   UNCATCH(any_exception_error);
 
   if (ok<3) {    
-    // result found
+    /* result found*/
     if (w) sc_rm(w);
     if (ok > 0) return TRUE;
     else return FALSE;
   } else {
-    // result not found
+    /* result not found*/
     ifscdebug(5) {
       if (ok ==7) fprintf(stderr,"TRIED JANUS BUT OVERFLOW !!\n");
       if (ok ==6) fprintf(stderr,"TRIED JANUS BUT BUG OF PROGRAMMATION IN JANUS !!\n");
@@ -948,14 +944,14 @@ boolean ofl_ctrl;
       if (ok ==4) fprintf(stderr,"TRIED JANUS BUT ARRAY OUT OF BOUNDARY !!\n");
       if (ok ==3) fprintf(stderr,"TRIED JANUS BUT NUMBER OF PIVOTAGE TOO BIG, MIGHT BOUCLE !!\n");
       if (ok ==8) fprintf(stderr,"TRIED JANUS BUT pivot anormally small !!\n");
-      if (ok ==9) fprintf(stderr,"Janus is not ready for this system of constraints !!\n");//DN20112002
+      if (ok ==9) fprintf(stderr,"Janus is not ready for this system of constraints !!\n");
     }
     if (w) sc_rm(w);
     if (ofl_ctrl == FWD_OFL_CTRL) {
       THROW(overflow_error);
     } else {
-      fprintf(stderr,"\nWARNING [sc_janus_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
-      return TRUE;// default is feasible
+      fprintf(stderr,"\n[sc_janus_feasibility_ofl_ctrl_timeout_ctrl] without OFL_CTRL => RETURN TRUE\n");
+      return TRUE;/* default is feasible*/
     }
   }
   return(ok);
