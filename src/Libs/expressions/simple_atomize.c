@@ -1,10 +1,9 @@
 /* $RCSfile: simple_atomize.c,v $ ($Revision$)
- * $Date: 1995/05/22 08:56:24 $, 
+ * $Date: 1995/08/10 10:23:45 $, 
  */
 
 #include <stdio.h>
 #include <string.h>
-extern int fprintf();
 
 #include "genC.h"
 
