@@ -31,6 +31,8 @@ bool controlizer(string module_name)
   parsed_mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
   module_stat =  copy_statement(parsed_mod_stat) ;
     
+  debug_on("CONTROL_DEBUG_LEVEL");
+
   /* *module_stat can be re-used because control_graph reallocates
      statements; do not show that to any student!
      statement_instruction(module_stat) =
@@ -80,6 +82,8 @@ bool controlizer(string module_name)
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
     
     reset_current_module_entity();
+
+    debug_off();
 
     return TRUE;
 }
