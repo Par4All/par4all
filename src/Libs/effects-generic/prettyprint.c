@@ -355,8 +355,8 @@ list /* of string */ effect_words_reference(reference obj)
     list pc = NIL;
     string begin_attachment;
     entity e = reference_variable(obj);
-    printf("%s\n",entity_and_common_name(e));
-    printf("%s\n",entity_minimal_name(e));
+    printf("HERE COMMON NAME: %s\n",entity_and_common_name(e));
+    printf("HERE MINIMAL NAME: %s\n",entity_minimal_name(e));
    
     if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")  
 	&& entity_in_common_p(e)) {
