@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: declarations.c,v $
+ * Revision 1.15  2002/03/08 10:11:23  irigoin
+ * checks with stack_area_p() added for StackArea management
+ *
  * Revision 1.14  2000/05/12 15:02:24  coelho
  * comments added.
  *
@@ -318,7 +321,7 @@ sentence_area(entity e, entity module, bool pp_dimensions)
     list pc = NIL, entities = NIL;
 
     /* FI: POINTER declarations should be generated for the heap area */
-    if (dynamic_area_p(e) || heap_area_p(e)) /* shouldn't get in? */
+    if (dynamic_area_p(e) || heap_area_p(e) || stack_area_p(e)) /* shouldn't get in? */
 	return sentence_undefined;
 
     assert(type_area_p(te));
@@ -1074,7 +1077,7 @@ text_entity_declaration(
 	    before = CONS(SENTENCE, sentence_basic_declaration(e), before);
 	    before = CONS(SENTENCE, sentence_external(e), before);
 	}
-	else if (area_p && !dynamic_area_p(e) && !heap_area_p(e) && !empty_static_area_p(e))
+	else if (area_p && !dynamic_area_p(e) && !heap_area_p(e) && !stack_area_p(e) && !empty_static_area_p(e))
 	{
 	    /*            AREAS: COMMONS and SAVEs
 	     */	     
