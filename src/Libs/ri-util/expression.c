@@ -176,7 +176,7 @@ expression e;
 
 bool expression_in_list_p(expression e, list le)
 {
-  MAP(EXPRESSION, f, if (expression_equal_p(e,f)) return TRUE, le);
+  MAP(EXPRESSION, f, if (same_expression_p(e,f)) return TRUE, le);
   return FALSE;
 }
 
@@ -279,9 +279,12 @@ int trivial_expression_p(expression e)
       list args = call_arguments(syntax_call(expression_syntax(e)));
       expression e1 =  EXPRESSION(CAR(args));
       expression e2 = EXPRESSION(CAR(CDR(args)));
-      normalized n1 = NORMALIZE_EXPRESSION(e1);
-      normalized n2 = NORMALIZE_EXPRESSION(e2);
-      entity op = call_function(syntax_call(expression_syntax(e)));
+      normalized n1,n2;
+      entity op;
+      if (expression_undefined_p(e1) ||expression_undefined_p(e2) ) return 0;
+      n1 = NORMALIZE_EXPRESSION(e1);
+      n2 = NORMALIZE_EXPRESSION(e2);
+      op = call_function(syntax_call(expression_syntax(e)));
      
       ifdebug(3) {
 	fprintf(stderr, "Normalizes of  expression:");
@@ -713,11 +716,20 @@ bool expression_equal_p(e1, e2)
 expression e1;
 expression e2;
 {
-    /* let's assume that every expression has a correct syntax component */
-    syntax s1 = expression_syntax(e1);
-    syntax s2 = expression_syntax(e2);
+  syntax s1, s2;
+  
+  /* Add expression_undefined tests to avoid segmentation fault */
 
-    return syntax_equal_p(s1, s2);
+  if (expression_undefined_p(e1) && expression_undefined_p(e2))
+    return TRUE;
+  if (expression_undefined_p(e1) || expression_undefined_p(e2))
+    return FALSE;
+
+  /* let's assume that every expression has a correct syntax component */
+  s1 = expression_syntax(e1);
+  s2 = expression_syntax(e2);
+
+  return syntax_equal_p(s1, s2);
 }
 
 bool 
