@@ -10,6 +10,9 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
+/* #include <values.h> */
+#include <limits.h>
+#include <setjmp.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -17,9 +20,6 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-
-#include <values.h>
-#include <setjmp.h>
 
 extern jmp_buf overflow_error;
 
@@ -80,7 +80,7 @@ else{long GDEN,AD,BD;AD=A.den,BD=B.den; \
 			 if (nbvariables ++ >= MAX_VAR) abort(); }
 
 
-#define MULTOFL(RES,A,B) {if ((B==0) || (ABS(A)<MAXINT/ABS(B))) RES=A*B; else longjmp(overflow_error3, 5);}
+#define MULTOFL(RES,A,B) {if ((B==0) || (ABS(A)<INT_MAX/ABS(B))) RES=A*B; else longjmp(overflow_error3, 5);}
 #define SIMPLOFL(A,B) {if(A!=1 && B!=1){long I1,J1,K;I1=A,J1=B;if(!J1)longjmp(overflow_error3,6);while((K=I1%J1)!=0) I1=J1,J1=K;if(!J1)longjmp(overflow_error3,6); A=A/J1; B=B/J1;if(B<0)A=-A,B=-B;}}
 #define GOFL(J1,A,B) {long I1,K;if(B>1){I1=A,J1=B;if(!J1)longjmp(overflow_error3,6);while((K=I1%J1)!=0)I1=J1,J1=K;if(J1<0)J1=-J1;}else J1=B;}
 #define SIMPLIFIEOFL(FRAC) SIMPLOFL(FRAC.num,FRAC.den)
@@ -644,13 +644,13 @@ int sc_simplexe_feasibility_ofl_ctrl(Psysteme sc, int ofl_ctrl) {
 			printfrac(objectif[1]) ; printf("\n") ;}
 	    if ( (ofl_ctrl == FWD_OFL_CTRL) && 
 		((t[0].colonne[0].den && 
-		 (ABS(objectif[0].num) > ((MAXINT)/ABS(t[0].colonne[0].den)))) 
+		 (ABS(objectif[0].num) > ((INT_MAX)/ABS(t[0].colonne[0].den)))) 
 		|| (t[0].colonne[0].num && 
-		 (ABS(objectif[0].den) > MAXINT/ABS(t[0].colonne[0].num)))
+		 (ABS(objectif[0].den) > INT_MAX/ABS(t[0].colonne[0].num)))
 		|| (t[1].colonne[0].den &&
-		    (ABS(objectif[1].num) > MAXINT/ABS(t[1].colonne[0].den))) ||
+		    (ABS(objectif[1].num) > INT_MAX/ABS(t[1].colonne[0].den))) ||
 		(t[0].colonne[0].num && 
-		 (ABS(objectif[0].den) > MAXINT/ABS(t[0].colonne[0].num))))) 
+		 (ABS(objectif[0].den) > INT_MAX/ABS(t[0].colonne[0].num))))) 
 		longjmp(overflow_error3,5);
 	    
 	    if(EGAL(objectif[0],t[0].colonne[0]) &&
@@ -684,10 +684,10 @@ DIV(rapport2,((i1<t[1].taille&&t[jj].colonne[i].numero==t[1].colonne[i1].numero)
     
 
   if ( (ofl_ctrl == FWD_OFL_CTRL) && 
-      ((min2.den && (ABS(rapport2.num) > MAXINT/ABS(min2.den))) || 
-	(min1.den && (ABS(rapport1.num) > MAXINT/ABS(min1.den))) ||
-	(min2.num && (ABS(rapport2.den) > MAXINT/ABS(min2.num))) ||
-	(min1.num && (ABS(rapport1.den) > MAXINT/ABS(min1.num)))))
+      ((min2.den && (ABS(rapport2.num) > INT_MAX/ABS(min2.den))) || 
+	(min1.den && (ABS(rapport1.num) > INT_MAX/ABS(min1.den))) ||
+	(min2.num && (ABS(rapport2.den) > INT_MAX/ABS(min2.num))) ||
+	(min1.num && (ABS(rapport1.den) > INT_MAX/ABS(min1.num)))))
       longjmp(overflow_error3,5);
 
       if(INF(rapport2,min2)||(EGAL(rapport2,min2)&&INF(rapport1,min1))){
