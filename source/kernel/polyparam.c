@@ -1054,6 +1054,8 @@ Param_Polyhedron *Find_m_faces(Polyhedron **Di,Polyhedron *C,int keep_dom,int wo
     *CT = PreElim_Columns(CEq1,p,ref,CEqualities->Dimension);
     D2 = Elim_Columns(D1,CEq1,p,ref);
     C2 = Elim_Columns(C1,CEq1,p,ref);
+    if (p)
+      free(p);
     free(ref);
     
 #ifdef DEBUGPP3
