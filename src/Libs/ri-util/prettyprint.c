@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.167  2002/04/25 13:00:16  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.166  2002/04/25 12:41:37  phamdat
  * *** empty log message ***
  *
@@ -339,19 +342,8 @@
  *
  */
 
-/**************written by Dat*********************/
-void my_print(text t)
-{
-  string filename = "/users/tmp/phamdat/textout";
-  FILE * my_file = safe_fopen(filename, "w");
-  print_text(my_file, t);
-  safe_fclose(my_file, filename);
-  free(filename);
-}
-/*************************************************/
-
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.166 2002/04/25 12:41:37 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.167 2002/04/25 13:00:16 phamdat Exp $";
 #endif /* lint */
 
  /*
