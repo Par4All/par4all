@@ -36,8 +36,7 @@ transformer t_in;
 	(cons *) gen_copy_seq(transformer_arguments(t_in));
     sc = (Psysteme) predicate_system(transformer_relation(t_in));
     pips_assert("transformer_dup", !SC_UNDEFINED_P(sc));
-    predicate_system_(transformer_relation(t_out)) = 
-	(char *) sc_dup(sc);
+    predicate_system_(transformer_relation(t_out)) = sc_dup(sc);
 
     return t_out;
 }
@@ -62,7 +61,7 @@ transformer t;
 
     s = (Psysteme) predicate_system(transformer_relation(t));
     sc_rm(s);
-    predicate_system_(transformer_relation(t)) = (char *) SC_UNDEFINED;
+    predicate_system_(transformer_relation(t)) = SC_UNDEFINED;
     /* gen_free should stop before trying to free a Psysteme and
        won't free entities in arguments because they are tabulated */
     /* commented out for DRET demo */
@@ -125,19 +124,17 @@ Pvecteur incr;
 {
     /* Psysteme * ps = 
        &((Psysteme) predicate_system(transformer_relation(t))); */
-    Psysteme psyst = (Psysteme) predicate_system(transformer_relation(t));
-    Psysteme * ps = &psyst; 
+    Psysteme psyst = predicate_system(transformer_relation(t));
     entity i_old;
 
-    transformer_arguments(t) = arguments_add_entity(transformer_arguments(t),
-						    i);
+    transformer_arguments(t) = arguments_add_entity(transformer_arguments(t), i);
     i_old = entity_to_old_value(i);
-    (* ps)->base = vect_add_variable((*ps)->base, (Variable) i);
-    (* ps)->base = vect_add_variable((*ps)->base, (Variable) i_old);
-    (* ps)->dimension = vect_size((* ps)->base);
+    psyst->base = vect_add_variable(psyst->base, (Variable) i);
+    psyst->base = vect_add_variable(psyst->base, (Variable) i_old);
+    psyst->dimension = vect_size(psyst->base);
     vect_chg_coeff(&incr, (Variable) i, -1);
     vect_chg_coeff(&incr, (Variable) i_old, 1);
-    sc_add_egalite(*ps, contrainte_make(incr));
+    psyst = sc_equation_add(psyst, contrainte_make(incr));
 
     return t;
 }
