@@ -899,22 +899,9 @@ Ptsg *gs,*gsop;
     case DG_FAST :
     {
 	/* use region information if some is available */
-	descriptor d1 = effect_descriptor(e1);
-	descriptor d2 = effect_descriptor(e1);
+	sc1 = effect_system(e1);
+	sc2 = effect_system(e2);
 	
-	if(descriptor_convex_p(d1)) {
-	    sc1 = descriptor_convex(d1);
-	}
-	else {
-	    sc1 = SC_UNDEFINED;
-	}
-	
-	if(descriptor_convex_p(d2)) {
-	    sc1 = descriptor_convex(d2);
-	}
-	else {
-	    sc2 = SC_UNDEFINED;
-	}
 	break;
     }
 
