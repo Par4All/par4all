@@ -2,7 +2,7 @@
  *
  *  (c) Fabien COELHO - march 1995
  *
- *  $RCSfile: graph.c,v $ ($Date: 1995/09/04 11:22:37 $, )
+ *  $RCSfile: graph.c,v $ ($Date: 1995/09/15 22:04:13 $, )
  *  version $Revision$
  */
 
@@ -24,7 +24,7 @@
 
 /* global mapping from statements to their control in the full control graph
  */
-GENERIC_GLOBAL_FUNCTION(ctrl_graph, controlmap);
+GENERIC_GLOBAL_FUNCTION(ctrl_graph, controlmap)
 
 /* the crtl_graph is freed by hand, because the default behavior is
  * not convenient for my purpose. I would have needed a persistant
@@ -263,8 +263,8 @@ string name;
  * - the mapping stores the already stacked statements
  * - decision function...
  */
-DEFINE_LOCAL_STACK(to_see, statement);
-GENERIC_LOCAL_MAPPING(stacked, bool, statement);
+DEFINE_LOCAL_STACK(to_see, statement)
+GENERIC_LOCAL_MAPPING(stacked, bool, statement)
 static bool (*travel_decision)();
 
 static void push_if_necessary(s)
