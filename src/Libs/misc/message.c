@@ -107,7 +107,7 @@ string user_request(char * a_message_format, ...)
 
    va_start(some_arguments, a_message_format);
    str = (* pips_request_handler)(a_message_format, some_arguments);
-   va_end(args);
+   va_end(some_arguments);
    return(str);
 }
 
