@@ -63,6 +63,8 @@
 
 extern expression 
 insert_cast(basic cast, basic from, expression exp, type_context_p);
+extern expression
+cast_constant(expression exp_constant, basic to_basic, type_context_p context);
 
 void 
 CreateAreas()
@@ -865,7 +867,7 @@ arguments_are_logical(call c, hash_table types)
  * Verification if all the arguments are compatible
  * PDSon: If #arguments <=1, I return true
  */
-static bool
+bool
 arguments_are_compatible(call c, hash_table types)
 {
   basic b1, b2;
@@ -918,36 +920,6 @@ typing_arguments(call c, type_context_p context, basic b)
 
 /***************************************************************************** 
  *                           TYPING THE INTRINSIC FUNCTIONS
- * Typing assignment statement (=)
- */
-static basic
-typing_assignment(call c, type_context_p context)
-{
-  basic b1, b2;
-  list args = call_arguments(c);
-  
-  if(!arguments_are_compatible(c, context->types))
-  {
-    add_one_line_of_comment((statement) stack_head(context->stats), 
-			    "Arguments of assignement '%s' are not compatible", 
-			    entity_local_name(call_function(c))); 
-    /* Count the number of errors */
-    context->number_of_error++;
-    /* Just for return a result */
-    return make_basic_float(4); 
-  }
-  
-  b1 = GET_TYPE(context->types, EXPRESSION(CAR(args)));
-  b2 = GET_TYPE(context->types, EXPRESSION(CAR(CDR(args))));
-  if (!basic_equal_p(b1, b2))
-  {
-    EXPRESSION(CAR(CDR(args))) = 
-      insert_cast(b1, b2, EXPRESSION(CAR(CDR(args))), context);
-  }
-  
-  return copy_basic(b1);    
-}
-/***************************************************************************** 
  * Typing arithmetic operator (+, -, --, *, /), except **
  */
 static basic
@@ -1166,109 +1138,146 @@ typing_function_argument_type_to_return_type(call c, type_context_p context,
 static basic
 typing_function_int_to_int(call c, type_context_p context)
 {
-  basic type_INT = make_basic_int(4);
-  return typing_function_argument_type_to_return_type(c, context, 
-						      type_INT, type_INT);
+  basic result, type_INT = make_basic_int(4);
+  result = typing_function_argument_type_to_return_type(c, context, 
+						     type_INT, type_INT);
+  free_basic(type_INT);
+  return result;
 }
 static basic
 typing_function_real_to_real(call c, type_context_p context)
 {
-  basic type_REAL = make_basic_float(4);
-  return typing_function_argument_type_to_return_type(c, context, 
-						      type_REAL, type_REAL);
+  basic result, type_REAL = make_basic_float(4);
+  result = typing_function_argument_type_to_return_type(c, context, 
+							type_REAL, type_REAL);
+  free_basic(type_REAL);
+  return result;
 }
 static basic
 typing_function_double_to_double(call c, type_context_p context)
 {
-  basic type_DBLE = make_basic_float(8);
-  return typing_function_argument_type_to_return_type(c, context, 
+  basic result, type_DBLE = make_basic_float(8);
+  result = typing_function_argument_type_to_return_type(c, context, 
 						      type_DBLE, type_DBLE);
+  free_basic(type_DBLE);
+  return result;
 }
 static basic
 typing_function_complex_to_complex(call c, type_context_p context)
 {
-  basic type_CMPLX = make_basic_complex(8);
-  return typing_function_argument_type_to_return_type(c, context, 
+  basic result, type_CMPLX = make_basic_complex(8);
+  result = typing_function_argument_type_to_return_type(c, context, 
 						      type_CMPLX, type_CMPLX);
+  free_basic(type_CMPLX);
+  return result;
 }
 static basic
 typing_function_dcomplex_to_dcomplex(call c, type_context_p context)
 {
-  basic type_DCMPLX = make_basic_complex(16);
-  return typing_function_argument_type_to_return_type(c, context, type_DCMPLX,
+  basic result, type_DCMPLX = make_basic_complex(16);
+  result = typing_function_argument_type_to_return_type(c, context, type_DCMPLX,
 						      type_DCMPLX);
+  free_basic(type_DCMPLX);
+  return result;
 }
 static basic
 typing_function_char_to_int(call c, type_context_p context)
 {
-  basic type_INT = make_basic_int(4);
+  basic result, type_INT = make_basic_int(4);
   basic type_CHAR = make_basic(is_basic_string, value_undefined);
-  return typing_function_argument_type_to_return_type(c, context, type_CHAR, 
+  result = typing_function_argument_type_to_return_type(c, context, type_CHAR, 
 						      type_INT);
+  free_basic(type_INT);
+  free_basic(type_CHAR);
+  return result;
 }
 static basic
 typing_function_int_to_char(call c, type_context_p context)
 {
-  basic type_INT = make_basic_int(4);
+  basic result, type_INT = make_basic_int(4);
   basic type_CHAR = make_basic(is_basic_string, value_undefined);
-  return typing_function_argument_type_to_return_type(c, context, type_INT, 
+  result = typing_function_argument_type_to_return_type(c, context, type_INT, 
 						      type_CHAR);
+  free_basic(type_INT);
+  free_basic(type_CHAR);
+  return result;
 }
 static basic
 typing_function_real_to_int(call c, type_context_p context)
 {
-  basic type_INT = make_basic_int(4);
+  basic result, type_INT = make_basic_int(4);
   basic type_REAL = make_basic_float(4);
-  return typing_function_argument_type_to_return_type(c, context, type_REAL,
+  result = typing_function_argument_type_to_return_type(c, context, type_REAL,
 						      type_INT);
+  free_basic(type_INT);
+  free_basic(type_REAL);
+  return result;
 }
 static basic
 typing_function_int_to_real(call c, type_context_p context)
 {
-  basic type_INT = make_basic_int(4);
+  basic result, type_INT = make_basic_int(4);
   basic type_REAL = make_basic_float(4);
-  return typing_function_argument_type_to_return_type(c, context, type_INT, 
+  result = typing_function_argument_type_to_return_type(c, context, type_INT, 
 						      type_REAL);
+  free_basic(type_INT);
+  free_basic(type_REAL);
+  return result;
 }
 static basic
 typing_function_double_to_int(call c, type_context_p context)
 {
-  basic type_INT = make_basic_int(4);
+  basic result, type_INT = make_basic_int(4);
   basic type_DBLE = make_basic_float(8);
-  return typing_function_argument_type_to_return_type(c, context, type_DBLE, 
+  result = typing_function_argument_type_to_return_type(c, context, type_DBLE, 
 						      type_INT);
+  free_basic(type_INT);
+  free_basic(type_DBLE);
+  return result;
 }
 static basic
 typing_function_real_to_double(call c, type_context_p context)
 {
-  basic type_REAL = make_basic_float(4);
+  basic result, type_REAL = make_basic_float(4);
   basic type_DBLE = make_basic_float(8);
-  return typing_function_argument_type_to_return_type(c, context, type_REAL, 
+  result = typing_function_argument_type_to_return_type(c, context, type_REAL, 
 						      type_DBLE);
+  free_basic(type_REAL);
+  free_basic(type_DBLE);
+  return result;
 }
 static basic
 typing_function_complex_to_real(call c, type_context_p context)
 {
-  basic type_REAL = make_basic_float(4);
+  basic result, type_REAL = make_basic_float(4);
   basic type_CMPLX = make_basic_complex(8);
-  return typing_function_argument_type_to_return_type(c, context, type_CMPLX, 
+  result = typing_function_argument_type_to_return_type(c, context, type_CMPLX, 
 						      type_REAL);
+  free_basic(type_REAL);
+  free_basic(type_CMPLX);
+  return result;
 }
 static basic
 typing_function_dcomplex_to_double(call c, type_context_p context)
 {
-  basic type_DBLE = make_basic_float(8);
+  basic result, type_DBLE = make_basic_float(8);
   basic type_DCMPLX = make_basic_complex(16);
-  return typing_function_argument_type_to_return_type(c, context, type_DCMPLX,
+  result = typing_function_argument_type_to_return_type(c, context, type_DCMPLX,
 						      type_DBLE);
+  free_basic(type_DBLE);
+  free_basic(type_DCMPLX);
+  return result;
 }
 static basic
 typing_function_char_to_logical(call c, type_context_p context)
 {
-  basic type_LOGICAL = make_basic_logical(4);
+  basic result, type_LOGICAL = make_basic_logical(4);
   basic type_CHAR = make_basic(is_basic_string, value_undefined);
-  return typing_function_argument_type_to_return_type(c, context, type_CHAR, 
+  result = typing_function_argument_type_to_return_type(c, context, type_CHAR, 
 						      type_LOGICAL);
+  free_basic(type_LOGICAL);
+  free_basic(type_CHAR);
+  return result;
 }
 
 /***************************************************************************** 
@@ -1431,31 +1440,42 @@ typing_function_conversion_to_numeric(call c, type_context_p context,
 static basic
 typing_function_conversion_to_integer(call c, type_context_p context)
 {
-  return typing_function_conversion_to_numeric(c, context, make_basic_int(4));
+  basic result, b = make_basic_int(4);
+  result = typing_function_conversion_to_numeric(c, context, b);
+  free_basic(b);
+  return result;
 }
 static basic
 typing_function_conversion_to_real(call c, type_context_p context)
 {
-  return typing_function_conversion_to_numeric(c, context, 
-					       make_basic_float(4));
+  basic result, b =  make_basic_float(4);
+  result = typing_function_conversion_to_numeric(c, context, b);
+  free_basic(b);
+  return result;
 }
 static basic
 typing_function_conversion_to_double(call c, type_context_p context)
 {
-  return typing_function_conversion_to_numeric(c, context, 
-					       make_basic_float(8));
+  basic result, b =  make_basic_float(8);
+  result = typing_function_conversion_to_numeric(c, context, b);
+  free_basic(b);
+  return result;
 }
 static basic
 typing_function_conversion_to_complex(call c, type_context_p context)
 {
-    return typing_function_conversion_to_numeric(c, context, 
-						 make_basic_complex(8));
+  basic result, b =  make_basic_complex(8);
+  result = typing_function_conversion_to_numeric(c, context, b);
+  free_basic(b);
+  return result;
 }
 static basic
 typing_function_conversion_to_dcomplex(call c, type_context_p context)
 {
-  return typing_function_conversion_to_numeric(c, context, 
-					       make_basic_complex(16));
+  basic result, b =  make_basic_complex(16);
+  result = typing_function_conversion_to_numeric(c, context, b);
+  free_basic(b);
+  return result;
 }
 /* CMPLX_ */
 static basic
@@ -1507,17 +1527,22 @@ typing_function_constant_dcomplex(call c, type_context_p context)
  * specific name correspondent with the argument
  */
 static void
-switch_generic_to_specific(call c, type_context_p context,
+switch_generic_to_specific(expression exp, type_context_p context,
 			   string arg_int_name,
 			   string arg_real_name,
 			   string arg_double_name,
 			   string arg_complex_name,
 			   string arg_dcomplex_name)
 {
+  call c;
+  list args;
+  basic arg_basic;
   string specific_name = NULL;
-  entity fc = call_function(c);
-  list args = call_arguments(c);
-  basic arg_basic = GET_TYPE(context->types, EXPRESSION(CAR(args)));
+  /* Here, expression_syntax(exp) is always a call */
+  syntax s = expression_syntax(exp);
+  c = syntax_call(s);  
+  args = call_arguments(c);
+  arg_basic = GET_TYPE(context->types, EXPRESSION(CAR(args)));
   
   if (basic_int_p(arg_basic))
   {
@@ -1544,10 +1569,9 @@ switch_generic_to_specific(call c, type_context_p context,
    * NOTE: If specific_name == NULL: Invalid argument or argument basic unknown
    */
   if(specific_name != NULL && 
-     strcmp(specific_name, entity_local_name(fc)) != 0)
+     strcmp(specific_name, entity_local_name(call_function(c))) != 0)
   {
     call_function(c) = CreateIntrinsic(specific_name);
-    /* ERROR if: free_entity(fc); */
     
     /* Count number of simplifications */
     context->number_of_simplication++;
@@ -1556,170 +1580,261 @@ switch_generic_to_specific(call c, type_context_p context,
 
 /* AINT */
 static void
-switch_specific_aint(call c, type_context_p context)
+switch_specific_aint(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "AINT", "DINT", NULL, NULL);
 }
 /* ANINT */
 static void
-switch_specific_anint(call c, type_context_p context)
+switch_specific_anint(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "ANINT", "DNINT", NULL, NULL);
 }
 /* NINT */
 static void
-switch_specific_nint(call c, type_context_p context)
+switch_specific_nint(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "NINT", "IDNINT", NULL, NULL);
 }
 /* ABS */
 static void
-switch_specific_abs(call c, type_context_p context)
+switch_specific_abs(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     "IABS", "ABS", "DABS", "CABS", NULL);
 }
 /* MOD */
 static void
-switch_specific_mod(call c, type_context_p context)
+switch_specific_mod(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     "MOD", "AMOD", "DMOD", NULL, NULL);
 }
 /* SIGN */
 static void
-switch_specific_sign(call c, type_context_p context)
+switch_specific_sign(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     "ISIGN", "SIGN", "DSIGN", NULL, NULL);
 }
 /* DIM */
 static void
-switch_specific_dim(call c, type_context_p context)
+switch_specific_dim(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     "IDIM", "DIM", "DDIM", NULL, NULL);
 }
 /* MAX */
 static void
-switch_specific_max(call c, type_context_p context)
+switch_specific_max(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     "MAX0", "AMAX1", "DMAX1", NULL, NULL);
 }
 /* MIN */
 static void
-switch_specific_min(call c, type_context_p context)
+switch_specific_min(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     "MIN0", "AMIN1", "DMIN1", NULL, NULL);
 }
 /* SQRT */
 static void
-switch_specific_sqrt(call c, type_context_p context)
+switch_specific_sqrt(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "SQRT", "DSQRT", "CSQRT", NULL);
 }
 /* EXP */
 static void
-switch_specific_exp(call c, type_context_p context)
+switch_specific_exp(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "EXP", "DEXP", "CEXP", NULL);
 }
 /* LOG */
 static void
-switch_specific_log(call c, type_context_p context)
+switch_specific_log(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "ALOG", "DLOG", "CLOG", NULL);
 }
 /* LOG10 */
 static void
-switch_specific_log10(call c, type_context_p context)
+switch_specific_log10(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "ALOG10", "DLOG10", NULL, NULL);
 }
 /* SIN */
 static void
-switch_specific_sin(call c, type_context_p context)
+switch_specific_sin(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL,"SIN","DSIN", "CSIN", NULL);
 }
 /* COS */
 static void
-switch_specific_cos(call c, type_context_p context)
+switch_specific_cos(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "COS", "DCOS", "CCOS", NULL);
 }
 /* TAN */
 static void
-switch_specific_tan(call c, type_context_p context)
+switch_specific_tan(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "TAN", "DTAN", NULL, NULL);
 }
 /* ASIN */
 static void
-switch_specific_asin(call c, type_context_p context)
+switch_specific_asin(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "ASIN", "DASIN", NULL, NULL);
 }
 /* ACOS */
 static void
-switch_specific_acos(call c, type_context_p context)
+switch_specific_acos(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "ACOS", "DACOS", NULL, NULL);
 }
 /* ATAN */
 static void
-switch_specific_atan(call c, type_context_p context)
+switch_specific_atan(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "ATAN", "DATAN", NULL, NULL);
 }
 /* ATAN2 */
 static void
-switch_specific_atan2(call c, type_context_p context)
+switch_specific_atan2(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "ATAN2", "DATAN2", NULL, NULL);
 }
 /* SINH */
 static void
-switch_specific_sinh(call c, type_context_p context)
+switch_specific_sinh(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "SINH", "DSINH", NULL, NULL);
 }
 /* COSH */
 static void
-switch_specific_cosh(call c, type_context_p context)
+switch_specific_cosh(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "COSH", "DCOSH", NULL, NULL);
 }
 /* TANH */
 static void
-switch_specific_tanh(call c, type_context_p context)
+switch_specific_tanh(expression exp, type_context_p context)
 {
-  switch_generic_to_specific(c, context,
+  switch_generic_to_specific(exp, context,
 			     NULL, "TANH", "DTANH", NULL, NULL);
 }
 
-/********************************* SIMPLIFICATION THE CONVERSION *************
+/***************************** SIMPLIFICATION THE CONVERSION CALL *************
  * e.g: INT(INT(R)) -> INT(R)
  *      INT(2.9) -> 2
+ *      INT(I) -> I
  */
+static void
+simplification_conversion(expression exp, basic to_basic,
+			  type_context_p context)
+{
+  syntax s_arg;
+  expression arg, exp_tmp;
+  basic b;
+  call c = syntax_call(expression_syntax(exp));
+  arg = EXPRESSION(CAR(call_arguments(c)));
+  s_arg = expression_syntax(arg);
+  /* e.g: INT(I) -> I */
+  if (syntax_reference_p(s_arg) &&
+      basic_equal_p(to_basic, 
+		    entity_basic(reference_variable(syntax_reference(s_arg)))))
+  {
+    exp_tmp = copy_expression(arg);
+    free_syntax(expression_syntax(exp));
+    free_normalized(expression_normalized(exp));
+    expression_syntax(exp) = 
+      copy_syntax(expression_syntax(exp_tmp));
+    expression_normalized(exp) = 
+      copy_normalized(expression_normalized(exp_tmp));
+    free_expression(exp_tmp);
+    context->number_of_simplication++;
+  }
+  else if(syntax_call_p(s_arg))
+  {
+    b = GET_TYPE(context->types, arg);
+    /* e.g: INT(INT(R)) -> INT(R) */
+    if (basic_equal_p(b, to_basic))
+    {
+      exp_tmp = copy_expression(arg);
+      free_syntax(expression_syntax(exp));
+      free_normalized(expression_normalized(exp));
+      expression_syntax(exp) = 
+	copy_syntax(expression_syntax(exp_tmp));
+      expression_normalized(exp) = 
+	copy_normalized(expression_normalized(exp_tmp));
+      free_expression(exp_tmp);
+    }
+    /* Cast constant if necessary */
+    /* e.g: INT(2.9) -> 2 */
+    else if ((exp_tmp = cast_constant(arg, to_basic, context)) != NULL)
+    {
+      free_syntax(expression_syntax(exp));
+      free_normalized(expression_normalized(exp));
+      expression_syntax(exp) = 
+	copy_syntax(expression_syntax(exp_tmp));
+      expression_normalized(exp) = 
+	copy_normalized(expression_normalized(exp_tmp));
+      free_expression(exp_tmp);
+    }
+  }
+}
+
+static void
+simplification_int(expression exp, type_context_p context)
+{
+  basic b = make_basic_int(4);
+  simplification_conversion(exp, b, context);
+  free_basic(b);
+}
+static void
+simplification_real(expression exp, type_context_p context)
+{
+  basic b = make_basic_float(4);
+  simplification_conversion(exp, b, context);
+  free_basic(b);
+}
+static void
+simplification_double(expression exp, type_context_p context)
+{
+  basic b = make_basic_float(8);
+  simplification_conversion(exp, b, context);
+  free_basic(b);
+}
+static void
+simplification_complex(expression exp, type_context_p context)
+{
+  basic b = make_basic_complex(8);
+  simplification_conversion(exp, b, context);
+  free_basic(b);
+}
+static void
+simplification_dcomplex(expression exp, type_context_p context)
+{
+  basic b = make_basic_complex(16);
+  simplification_conversion(exp, b, context);
+  free_basic(b);
+}
 
 /******************************************************** INTRINSICS LIST */
 
@@ -1751,7 +1866,7 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
   {"--", 1, default_intrinsic_type, typing_arithmetic_operator, 0},
   {"**", 2, default_intrinsic_type, typing_power_operator, 0},
   
-  {"=", 2, default_intrinsic_type, typing_assignment, 0},
+  {"=", 2, default_intrinsic_type, 0, 0},
   
   {".EQV.", 2, overloaded_to_logical_type, typing_logical_operator, 0},
   {".NEQV.", 2, overloaded_to_logical_type, typing_logical_operator, 0},
@@ -1793,23 +1908,28 @@ static IntrinsicDescriptor IntrinsicDescriptorTable[] = {
   {"END", 0, default_intrinsic_type, 0, 0},
   
   {"INT", 1, overloaded_to_integer_type, 
-   typing_function_conversion_to_integer, 0},
-  {"IFIX", 1, real_to_integer_type, typing_function_real_to_int, 0},
-  {"IDINT", 1, double_to_integer_type, typing_function_double_to_int, 0},
-  {"REAL", 1, overloaded_to_real_type, typing_function_conversion_to_real, 0},
-  {"FLOAT", 1, overloaded_to_real_type, typing_function_conversion_to_real, 0},
+   typing_function_conversion_to_integer, simplification_int},
+  {"IFIX", 1, real_to_integer_type, typing_function_real_to_int, 
+   simplification_int},
+  {"IDINT", 1, double_to_integer_type, typing_function_double_to_int, 
+   simplification_int},
+  {"REAL", 1, overloaded_to_real_type, typing_function_conversion_to_real, 
+   simplification_real},
+  {"FLOAT", 1, overloaded_to_real_type, typing_function_conversion_to_real, 
+   simplification_real},
   {"DFLOAT", 1, overloaded_to_double_type, 
-   typing_function_conversion_to_real, 0},
-  {"SNGL", 1, overloaded_to_real_type, typing_function_conversion_to_real, 0},
+   typing_function_conversion_to_double, simplification_double},
+  {"SNGL", 1, overloaded_to_real_type, typing_function_conversion_to_real, 
+   simplification_real},
   {"DBLE", 1, overloaded_to_double_type, 
-   typing_function_conversion_to_double, 0},
+   typing_function_conversion_to_double, simplification_double},
   {"DREAL", 1, overloaded_to_double_type, 
-   typing_function_conversion_to_double, 0}, /* Arnauld Leservot, code CEA */
+   typing_function_conversion_to_double, simplification_double}, /* Arnauld Leservot, code CEA */
   {"CMPLX", (INT_MAX), overloaded_to_complex_type, 
-   typing_function_conversion_to_complex, 0},
+   typing_function_conversion_to_complex, simplification_complex},
   
   {"DCMPLX", (INT_MAX), overloaded_to_doublecomplex_type, 
-   typing_function_conversion_to_dcomplex, 0},
+   typing_function_conversion_to_dcomplex, simplification_dcomplex},
   
   /* (0.,1.) -> switched to a function call...
    */
