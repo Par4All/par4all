@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: generate-util.c,v $ version $Revision$
- * ($Date: 1995/09/22 13:16:18 $, ) 
+ * ($Date: 1995/10/05 11:32:41 $, ) 
  */
 
 #include "defines-local.h"
@@ -69,7 +69,7 @@ hpfc_gen_n_vars_expr(
     int number)
 {
     list result = NIL;
-    assert(number>=0 && number<=7);
+    pips_assert("valid dimension number", number>=0 && number<=7);
 
     for(; number>0; number--)
 	result = CONS(EXPRESSION, entity_to_expression(creation(number)),
@@ -515,7 +515,7 @@ make_list_of_constant(
 {
     list l=NIL;
 
-    assert(number>=0);
+    pips_assert("valid number", number>=0);
     for(; number; number--)
 	l = CONS(EXPRESSION, int_to_expression(val), l);
 
@@ -542,7 +542,7 @@ hpfc_compute_lid(
 	int ndim = NumberOfDimension(proc);
 	entity cmp_lid = hpfc_name_to_entity(CMP_LID);
 
-	message_assert("implemented", !array);
+	pips_assert("implemented", !array);
 	
 	return make_assign_statement(entity_to_expression(lid),
 	  make_call_expression
@@ -566,7 +566,7 @@ hpfc_compute_lid(
 	     * and normalize the partial system so that dims are 0:...
 	     */
 	    int npdim;
-	    assert(array && !entity_undefined_p(array));
+	    pips_assert("defined", array && !entity_undefined_p(array));
 	    
 	    for(npdim = NumberOfDimension(proc); npdim; npdim--)
 		if (processors_dim_replicated_p(proc, array, npdim))
