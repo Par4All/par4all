@@ -1,8 +1,9 @@
-/* $Id$
+/*
+ * $Id$
  */
 
 typedef struct {
-    list /* of string */ the_owners;
+    gen_array_t the_owners;
     string the_name;
 } res_or_rule;
 
