@@ -7,6 +7,9 @@
  *
  * $Id$
  * $Log: dynamic.c,v $
+ * Revision 1.49  1997/07/25 22:28:56  keryell
+ * Avoid to put comments on sequences.
+ *
  * Revision 1.48  1997/07/21 15:24:53  keryell
  * Forgotten '"'.
  *
@@ -756,7 +759,10 @@ hpfc_translate_call_with_distributed_args(
 
 	statement_instruction(s) = 
 	    make_instruction_block(gen_nconc(lpre, lpos));
-
+	/* Do not forget to move forbidden information associated with
+	   block: */
+	fix_sequence_statement_attributes(s);	
+	
 	DEBUG_STAT(3, "out", s);
     }
 }
