@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1996/06/15 18:31:15 $, 
+ * $Date: 1996/06/15 18:32:11 $, 
  *
  * utilities for reductions.
  *
@@ -242,8 +242,8 @@ update_compatible_reduction(
 	    if (!update_reduction_under_effect(*pr, e))
 	    {
 		free_reduction(*pr); *pr=NULL;
-		return FALSE,
-	    }
+		return FALSE;
+	    },
 	    le);
     }
     else
