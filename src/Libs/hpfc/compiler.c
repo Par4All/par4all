@@ -1,6 +1,6 @@
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $RCSfile: compiler.c,v $ ($Date: 1997/02/18 10:07:49 $, )
+ * $RCSfile: compiler.c,v $ ($Date: 1997/03/03 15:59:42 $, )
  * version $Revision$
  *
  * Compiler
@@ -527,8 +527,11 @@ statement body, *hoststatp, *nodestatp;
     gen_free_list(lr), lr=NIL;
 }
 
-static void hpf_compile_parallel_loop(stat, hoststatp, nodestatp)
-statement stat, *hoststatp, *nodestatp;
+static void 
+hpf_compile_parallel_loop(
+    statement stat,
+    statement *hoststatp,
+    statement *nodestatp)
 {
     loop the_loop = statement_loop(stat);
     statement s, nodebody, body = loop_body(the_loop);
@@ -542,28 +545,40 @@ statement stat, *hoststatp, *nodestatp;
 	lower = range_lower(r),
 	upper = range_upper(r),
 	increment = range_increment(r);
-    
-    pips_assert("parallel loop",
-		execution_parallel_p(loop_execution(the_loop)));
+    list lw=NIL, lr=NIL;
 
-    if ((instruction_loop_p(bodyinst)) &&
-	(execution_parallel_p(loop_execution(instruction_loop(bodyinst)))))
-	hpf_compile_parallel_loop(body, &s, &nodebody);
-    else
-	hpf_compile_parallel_body(body, &s, &nodebody);
+    FindRefToDistArrayInStatement(stat, &lw, &lr);
     
-    (*hoststatp) = make_continue_statement(entity_undefined);
-    (*nodestatp) = MakeStatementLike(stat, is_instruction_loop);
+    if (lw||lr) 
+    {
+	pips_assert("parallel loop",
+		    execution_parallel_p(loop_execution(the_loop)));
+	
+	if ((instruction_loop_p(bodyinst)) &&
+	    (execution_parallel_p(loop_execution(instruction_loop(bodyinst)))))
+	    hpf_compile_parallel_loop(body, &s, &nodebody);
+	else
+	    hpf_compile_parallel_body(body, &s, &nodebody);
+    
+	(*hoststatp) = make_continue_statement(entity_undefined);
+	(*nodestatp) = MakeStatementLike(stat, is_instruction_loop);
+	
+	instruction_loop(statement_instruction(*nodestatp))=
+	    make_loop(nindex,
+		      make_range(UpdateExpressionForModule(node_module,lower),
+				 UpdateExpressionForModule(node_module,upper),
+			   UpdateExpressionForModule(node_module,increment)),
+		      nodebody,
+		      label,
+		      make_execution(is_execution_sequential,UU),
+		      NULL);
+    } else {
+	(*hoststatp) = copy_statement(stat);
+	(*nodestatp) = copy_statement(stat);
+    }
 
-    instruction_loop(statement_instruction(*nodestatp))=
-	make_loop(nindex,
-		  make_range(UpdateExpressionForModule(node_module,lower),
-			     UpdateExpressionForModule(node_module,upper),
-			     UpdateExpressionForModule(node_module,increment)),
-		  nodebody,
-		  label,
-		  make_execution(is_execution_sequential,UU),
-		  NULL);
+    gen_free_list(lw), gen_free_list(lr);
+
 }
 
 static void 
