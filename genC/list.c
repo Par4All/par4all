@@ -15,7 +15,7 @@
 */
 
 /* SCCS stuff:
- * $RCSfile: list.c,v $ ($Date: 1997/04/24 19:29:02 $, )
+ * $RCSfile: list.c,v $ ($Date: 1997/07/24 15:47:14 $, )
  * version $Revision$
  * got on %D%, %T%
  */
@@ -273,12 +273,6 @@ gen_chunk *gen_car(l)
 list l;
 {
     return(CHUNK(CAR(l)));
-}
-
-gen_chunk *gen_identity(x)
-gen_chunk *x;
-{
-    return(x);
 }
 
 gen_chunk *gen_find_if(test, pc, extract)
