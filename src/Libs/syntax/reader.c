@@ -115,14 +115,17 @@
  * declarations de variables externes locales
  */
 
-/*********************************************************** COMMENT BUFFER */
+/*********************************************************** COMMENT BUFFERS */
 
-/* le buffer contenant le commentaire courant, l'indice courant.
+/* Comm contains the comments for the current statement in ReadStmt().
+ * PrevComm contains the comments for the previous statement in ReadStmt(),
+ * which is currently being parsed.
+ * CurrComm contains the comments attached to the current line in Realine()
  */
 
 #define INITIAL_BUFFER_SIZE (128)
-char * Comm = NULL, * PrevComm = NULL;
-int iComm = 0, iPrevComm = 0;
+char * Comm = NULL, * PrevComm = NULL, * CurrComm;
+int iComm = 0, iPrevComm = 0, iCurrComm = 0;
 static int CommSize = 0;
 
 /* lazy initialization of the comment buffer
@@ -135,7 +138,8 @@ init_comment_buffers(void)
     CommSize = INITIAL_BUFFER_SIZE;
     Comm = (char*) malloc(CommSize);
     PrevComm = (char*) malloc(CommSize);
-    pips_assert("malloc ok", Comm && PrevComm);
+    CurrComm = (char*) malloc(CommSize);
+    pips_assert("malloc ok", Comm && PrevComm && CurrComm);
 }
 
 static void
@@ -146,7 +150,8 @@ resize_comment_buffers(void)
     CommSize*=2;
     Comm = (char*) realloc(Comm, CommSize);
     PrevComm = (char*) realloc(PrevComm, CommSize);
-    pips_assert("realloc ok", Comm && PrevComm);
+    CurrComm = (char*) realloc(CurrComm, CommSize);
+    pips_assert("realloc ok", Comm && PrevComm && CurrComm);
 }
 
 
@@ -265,6 +270,7 @@ parser_reset_all_reader_buffers(void)
 {
     iLine = 0, lLine = 0;
     iStmt = 0, lStmt = 0;
+    iCurrComm = 0;
     iComm = 0;
     iPrevComm = 0;
     i_getchar = UNDEF, l_getchar = UNDEF;
@@ -592,10 +598,10 @@ GetChar(FILE * fp)
 	    if (l_getchar>getchar_buffer_size-20) /* large for expansion */
 		resize_getchar_buffer();
 
-	  if(first_column) {
-	    in_comment = (strchr(START_COMMENT_LINE, (char) c)!= NULL);
-	    first_column = FALSE;
-	  }
+	    if(first_column) {
+		in_comment = (strchr(START_COMMENT_LINE, (char) c)!= NULL);
+		first_column = FALSE;
+	    }
 
 	    /* Fortran has a limited character set. See standard section 3.1.
 	       This cannot be handled here as you do not know if you are
@@ -714,51 +720,34 @@ ReadLine(FILE * fp)
 
     init_line_buffer();
 
-    /* on lit le label et le caractere de continuation de la premiere
-     * ligne non vide et non ligne de commentaire.
-     *
-     * Modification:
-     *  - an empty line is assumed to be a comment line
-     */
-
-    if(iComm!=0) {
-	Comm[iComm] = '\0';
-	(void) strcpy(PrevComm, Comm);
-	iPrevComm = iComm;
-	iComm = 0;
-	Comm[0] = '\0';
-    }
-    else {
-	iPrevComm = iComm;
-	PrevComm[0] = '\0';
-    }
-
+    /* Read all comment lines you can */
     while (strchr(START_COMMENT_LINE,(c = GetChar(fp))) != NULL) {
 	if (tmp_b_C == UNDEF)
-	    tmp_b_C = LineNumber;
+	    tmp_b_C = (c=='\n')?LineNumber-1:LineNumber;
 
 	ifdebug(8) {
 	    if(c=='\n')
-		debug(8, "ReadLine", "Empty comment line detected\n");
+		debug(8, "ReadLine",
+		      "Empty comment line detected at line %d "
+		      "for comment starting at line %d\n",
+		      LineNumber-1, tmp_b_C);
 	}
 
 	while(c!=EOF) {
-	    if (iComm >= CommSize-2)
+	    if (iCurrComm >= CommSize-2)
 		resize_comment_buffers();
-	    Comm[iComm++] = c;
+	    CurrComm[iCurrComm++] = c;
 	    if(c=='\n') break;
 	    c = GetChar(fp);
 	}
     }
 
-    Comm[iComm] = '\0';
-    pips_debug(7, "comment: (%d) --%s--\n", iComm, Comm);
+    CurrComm[iCurrComm] = '\0';
+
+    pips_debug(7, "comment CurrComm: (%d) --%s--\n", iCurrComm, CurrComm);
 
     if (c != EOF) {
-	/*
-	 * on lit les 5 caracteres du label, et le caractere de
-	 * continuation.
-	 */
+	/* Read label */
 	for (i = 0; i < 5; i++) {
 	    if (c != ' ') {
 		if (isdigit(c)) {
@@ -782,21 +771,52 @@ ReadLine(FILE * fp)
 	else
 	    strcpy(tmp_lab_I, "");
 
+	/* Check continuation character */
 	TypeOfLine = (c != ' ' && c!= '0') ? CONTINUATION_LINE : FIRST_LINE;
 
+	/* Keep track of the first and last comment lines and of the first and
+	 * last statement lines. These two intervals may intersect.
+	 *
+	 * Append current comment CurrComm to Comm if it is a continuation. Save Comm
+	 * in PrevComm and CurrComm in Comm if it is a first statement line.
+	 */
 	if (TypeOfLine == FIRST_LINE) {
+	    if(iComm!=0) {
+		Comm[iComm] = '\0';
+		(void) strcpy(PrevComm, Comm);
+		Comm[0] = '\0';
+	    }
+	    else {
+		PrevComm[0] = '\0';
+	    }
+	    iPrevComm = iComm;
+
+	    (void) strcpy(Comm, CurrComm);
+	    iComm = iCurrComm;
+	    iCurrComm = 0;
+	    CurrComm[0] = '\0';
+
 	    if (tmp_b_C != UNDEF)
 		tmp_e_C = LineNumber - 1;
 	    tmp_b_I = LineNumber;
 	}
-	else {
-	    tmp_b_C = tmp_e_C = UNDEF;
+	else if (TypeOfLine == CONTINUATION_LINE){
+	    if (iCurrComm+iComm >= CommSize-2)
+		resize_comment_buffers();
+	    (void) strcat(Comm, CurrComm);
+	    iComm += iCurrComm;
+	    iCurrComm = 0;
+	    CurrComm[0] = '\0';
+
+	    /* FI: this is all wrong */
+	    /* Why destroy comments because there are continuation lines? */
+	    /* tmp_b_C = tmp_e_C = UNDEF; */
 	}
 
-	/*
-	 * dans tous les cas on lit jusqu'au newline en sautant les
-	 * blancs.
-	 */
+	pips_debug(7, "comment Comm: (%d) --%s--\n", iComm, Comm);
+	pips_debug(7, "comment PrevComm: (%d) --%s--\n", iPrevComm, PrevComm);
+
+	/* Read the rest of the line, skipping SPACEs but handling string constants */
 
 	while ((c = GetChar(fp)) != '\n') {
 	    if (c == '\'' || c == '"') {
@@ -845,6 +865,16 @@ ReadLine(FILE * fp)
 	if (tmp_b_C != UNDEF)
 	    tmp_e_C = LineNumber - 1;
 	tmp_b_I = LineNumber;
+
+	if(iComm!=0) {
+	    Comm[iComm] = '\0';
+	    (void) strcpy(PrevComm, Comm);
+	    Comm[0] = '\0';
+	}
+	else {
+	    PrevComm[0] = '\0';
+	}
+	iPrevComm = iComm;
     }
 
     /* debug(9, "ReadLine", "Aggregation of continuation lines: '%s'\n", Line); */
@@ -884,6 +914,14 @@ ReadStmt(FILE * fp)
 		ParserError("ReadStmt",
 		  "[scanner] incorrect continuation line as first line\n");
 	    }
+	    else if (TypeOfLine == FIRST_LINE) {
+		/* It would be nice to move the current comments from
+		 * Comm to PrevComm, but it is just too late because of
+		 * the repeat until control structure down: ReadLine()
+		 * has already been called and read the first line of
+		 * the next statement. Hence, CurrComm is needed.
+		 */
+	    }
 	    else if (TypeOfLine == EOF_LINE) {
 		result = EOF;
 	    }
@@ -914,7 +952,7 @@ ReadStmt(FILE * fp)
 		
 	if (TypeOfLine == EOF_LINE)
 	    EofSeen = TRUE;
-			
+
 	result = 1;
 
 	/* pips_debug(7, "stmt: (%d) --%s--\n", lStmt, Stmt); */
