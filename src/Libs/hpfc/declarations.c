@@ -5,6 +5,9 @@
  *
  * $Id$
  * $Log: declarations.c,v $
+ * Revision 1.18  1997/10/30 17:09:31  coelho
+ * comes with old var instead of new... ???
+ *
  * Revision 1.17  1997/08/04 13:54:03  coelho
  * new generic effects incldues.
  *
@@ -815,16 +818,18 @@ list l;
 	 l);
 }
 
-void declaration_with_overlaps_for_module(module)
-entity  module;
+void 
+declaration_with_overlaps_for_module(entity  module)
 {
     list l = list_of_distributed_arrays_for_module(module);
-
     declaration_with_overlaps(l);
     gen_free_list(l);
 }
 
-static void update_overlaps_of(entity u, entity v)
+static void 
+update_overlaps_of(
+    entity u /* distributed variable in the caller */, 
+    entity v /* formal parameter in the callee */)
 {
     int ndim = NumberOfDimension(v);
 
@@ -839,20 +844,28 @@ static void update_overlaps_of(entity u, entity v)
     }
 }
 
+/* the overlaps of the actual parameters are updated according
+ * to the formal requirements. 
+ */
 void 
 update_overlaps_in_caller(
-    entity fun,                  /* the function */
-    list /* of expression */ le) /* call arguments in the initial code */
+    entity fun,                 /* the function */
+    list /* of expression */ le /* call arguments in the initial code */)
 {
     int len = gen_length(le), i;
-
     for (i=1; i<=len; i++, POP(le))
     {
 	entity v = find_ith_parameter(fun, i);
 	if (array_distributed_p(v))
 	{
-	    entity u = expression_to_entity(EXPRESSION(CAR(le)));
-	    update_overlaps_of(load_old_node(u), v);
+	    expression e = EXPRESSION(CAR(le));
+	    entity u = expression_to_entity(e), nu;
+	    pips_assert("bounded to a new var", bound_new_node_p(u));
+	    nu = load_new_node(u);
+	    pips_debug(5, "call to %s, %s (%s) -> %s\n", 
+		       entity_name(fun), entity_name(u), 
+		       entity_name(nu), entity_name(v));
+	    update_overlaps_of(u, v);
 	}
 
     }
