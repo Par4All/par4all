@@ -2,7 +2,7 @@
  * local definitions
  * 
  * SCCS stuff:
- * $RCSfile: hpfc-local.h,v $ ($Date: 1994/12/28 08:23:24 $, )
+ * $RCSfile: hpfc-local.h,v $ ($Date: 1995/02/27 18:35:16 $, )
  * version $Revision$,
  * got on %D%, %T%
  * $Id$
@@ -18,21 +18,6 @@
 #include "hpf.h"
 #include "hpf_private.h"
 #include "message.h"
-
-/*
- * prefixes to be used for the variables used in the Psystems
- *
- * Feb 21 1994
- */
-
-#define ALPHA_PREFIX "ALPHA"
-#define LALPHA_PREFIX "LALPHA"
-#define THETA_PREFIX "THETA"
-#define PSI_PREFIX "PSI"
-#define GAMMA_PREFIX "GAMMA"
-#define DELTA_PREFIX "DELTA"
-#define IOTA_PREFIX "IOTA"
-#define SIGMA_PREFIX "SIGMA"
 
 #define HPFC_PACKAGE "HPFC-PACKAGE"
 
