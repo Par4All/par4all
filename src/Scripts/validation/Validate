@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/11/13 07:58:42 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/01/13 21:22:37 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -245,6 +245,25 @@ do
 done
 
 shift `expr $OPTIND - 1`
+
+################################################################## Properties
+
+if [ "$PIPS_PROPERTIESRC" ]
+then
+    VALIDOPT="$VALIDOPT -p $PIPS_PROPERTIESRC"
+else
+    test -f ./properties.rc && VALIDOPT="$VALIDOPT -p $PWD/properties.rc"
+fi
+
+#################################################################### PipsMake
+
+if [ "$PIPS_PIPSMAKERC" ]
+then
+    VALIDOPT="$VALIDOPT -p $PIPS_PIPSMAKERC"
+else
+    test -f ./pipsmake.rc && VALIDOPT="$VALIDOPT -m $PWD/pipsmake.rc"
+fi
+
 
 #
 # some default cases
