@@ -82,3 +82,6 @@ longtest:
 # Make the 'javadoc' style documentation
 document:
 	$(DOXYGEN) $(srcdir)/polylib.doxygen
+
+dist-hook:
+	rm -rf `find $(distdir)/doc -name CVS`
