@@ -1,5 +1,5 @@
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/21 11:27:06 $, 
+# $Date: 1996/08/21 11:31:29 $, 
 #
 # Newgen documention
 
@@ -22,7 +22,7 @@ dvi: $(PS:.ps=.dvi)
 clean: local-clean
 
 local-clean:
-	$(RM) -r $(INSTALL_DOC) $(INSTALL_HTM)
+	$(RM) -r $(INSTALL_DOC) $(INSTALL_HTM) *.dvi
 
 # end of $RCSfile: config.makefile,v $
 #
