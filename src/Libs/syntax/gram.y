@@ -205,9 +205,17 @@ static datavar MakeDataVar(syntax s, range r)
     e = reference_variable(ref);
 
     if (r == range_undefined) {
-	if(reference_indices(ref)==NIL)
-	    d = make_datavar(e, 
-    NumberOfElements(variable_dimensions(type_variable(entity_type(e)))));
+	if(reference_indices(ref)==NIL) {
+	    int ne = 0;
+
+	    if(!NumberOfElements(variable_dimensions(type_variable(entity_type(e))),
+				 &ne)) {
+		user_warning("MakeDataVar", "Varying size of array \"%s\"\n", entity_name(e));
+		ParserError("MakeDataVar", "Fortran standard prohibit varying size array\n");
+	    }
+
+	    d = make_datavar(e, ne);
+	}
 	else
 	    d = make_datavar(e, 1);
     }
