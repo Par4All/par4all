@@ -421,7 +421,7 @@ parse_arguments(int argc, char * argv[])
 
     current_file_name = argv[1];
     safe_fclose(stdin, "stdin !");
-    (void) safe_freopen(argv[1], "r", 0);
+    (void) safe_freopen(argv[1], "r", stdin);
     use_readline = FALSE;
 
     pips_debug(1, "reading from file %s\n", current_file_name);
