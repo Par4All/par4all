@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.DEFAULT,v $ (version $Revision$)
-# $Date: 1996/07/11 13:14:20 $, 
+# $Date: 1996/07/15 11:44:57 $, 
 #
 # this file contains macro definitions 
 
@@ -11,6 +11,7 @@ CFLAGS	= -O -g
 CPPFLAGS= -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR)
 LD	= $(CC)
 LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH)
+RANLIB	= ranlib
 LEX	= lex
 LFLAGS	=
 FC	= f77
