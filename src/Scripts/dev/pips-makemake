@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.286  1997/05/23 12:43:45  coelho
+# *** empty log message ***
+#
 # Revision 1.285  1997/05/23 12:41:11  coelho
 # *** empty log message ***
 #
@@ -233,8 +236,6 @@ cat >> $MAKEFILE <<%
 #
 #		  This makefile has been automatically generated
 #
-#                        ($RCSfile: pips-makemake,v $ version $Revision$)
-#
 #			       Do not modify it
 #
 #        You can modify the file $CONFIG_FILE in the same directory
@@ -246,6 +247,8 @@ cat >> $MAKEFILE <<%
 #               Centre de Recherche en Informatique
 #
 # This file is part of PIPS
+#
+# $Id$
 #
 # PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
 # WARRANTY.  No author or distributor accepts responsibility to anyone for
