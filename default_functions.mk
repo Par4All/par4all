@@ -159,8 +159,8 @@ install-include:
 	if [ ! -d "$(INCLUDEDIR)/polylib" ]; then \
 		echo "Creating '$(INCLUDEDIR)/polylib' directory"; \
 		$(mkinstalldirs) $(INCLUDEDIR)/polylib ;\
-	$(INSTALL_DATA) ./include/polylib/*.h $(INCLUDEDIR)/polylib ;\
 	fi
+	$(INSTALL_DATA) ./include/polylib/*.h $(INCLUDEDIR)/polylib ;\
 
 install-man:
 # to be done...
@@ -173,7 +173,7 @@ install-docs:
 
 install-exec: $(POLY_EXEC)
 	$(mkinstalldirs) $(BINDIR)
-	$(INSTALL) $(ROOT)/bin/$(OBJ_DIR)/*.exe $(BINDIR)
+	$(INSTALL) $(ROOT)/bin/*.exe $(BINDIR)
 
 # Get the Platform dependent VARIABLES
 include $(ROOT)/vars.mk
