@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1996/03/20 17:43:47 $, ) 
+ * ($Date: 1996/06/15 14:27:02 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -36,6 +36,7 @@
 #include "database.h"
 #include "hpf.h"
 #include "hpf_private.h"
+#include "reductions_private.h"
 #include "message.h"
 #include "properties.h"
 
