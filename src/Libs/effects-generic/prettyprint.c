@@ -11,13 +11,15 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "genC.h"
 #include "linear.h"
+
+#include "genC.h"
+
+#include "text.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "misc.h"
 #include "top-level.h"
-#include "text.h"
 
 #include "database.h"
 #include "resources.h"
