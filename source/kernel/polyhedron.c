@@ -3484,6 +3484,8 @@ Polyhedron *DomainDifference(Polyhedron *Pol1,Polyhedron *Pol2,unsigned NbMaxRay
 	d = AddPolyToDomain (p3, d);
       }
     }
+    if (p2 != Pol2)
+	Domain_Free(Pol1);
     Pol1 = d;
     d = (Polyhedron *)0;
   }
