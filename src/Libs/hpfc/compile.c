@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: compile.c,v $
+ * Revision 1.76  1999/05/25 13:00:50  coelho
+ * type fixed.
+ *
  * Revision 1.75  1998/12/30 13:12:28  zory
  * call to atomize_as_required extended to accept new parameters
  *
@@ -650,12 +653,9 @@ static bool hpfc_decision(reference r, expression e)
 	   !expression_simple_nondist_p(e);
 }
 
-entity 
-hpfc_new_variable(
-    entity module,
-    tag t)
+entity hpfc_new_variable(entity module, basic b)
 {
-    return make_new_scalar_variable(module, MakeBasic(t));
+    return make_new_scalar_variable(module, copy_basic(b));
 }
 
 
@@ -836,7 +836,7 @@ static bool loop_flt(loop l)
 		    !expression_integer_constant_p(x))
 		{
 		    n = hpfc_new_variable(get_current_module_entity(),
-					  is_basic_int);
+					  MakeBasic(is_basic_int));
 		    substitute_and_create(s, n, x);
 		    lsubs = CONS(ENTITY, n, lsubs);
 		}
