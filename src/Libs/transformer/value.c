@@ -455,6 +455,18 @@ print_value_mappings()
 }
 
 void 
+test_mapping_entry_consistency()
+{
+    int nbo,nbi;
+    pips_assert("consistent mapping entry number", 
+		((nbo= hash_table_entry_count(hash_entity_to_old_value)) 
+		 == (nbi= hash_table_entry_count(hash_entity_to_intermediate_value))) 
+		&& ( hash_table_entry_count(hash_value_to_name) >=
+		    hash_table_entry_count(hash_entity_to_new_value) 
+		    + nbo +nbi));
+}
+
+void 
 allocate_value_mappings(int n, int o, int i)
 {
     pips_assert("undefined mappings for allocation",
@@ -516,6 +528,7 @@ entity e;
     string new_value_name = 
 	strdup(concatenate(entity_name(e), NEW_VALUE_SUFFIX, 
 			   (char *) NULL));
+    debug(8,"add_new_value_name","begin: for %s\n", entity_name(e));
     if(hash_get(hash_value_to_name, (char *) e) == HASH_UNDEFINED_VALUE)
 	hash_put(hash_value_to_name, (char *) e, (char *) new_value_name);
     else
@@ -526,6 +539,7 @@ void
 add_new_value(e)
 entity e;
 {
+    debug(8,"add_new_value","begin: for %s\n", entity_name(e));
     if(hash_get(hash_entity_to_new_value, (char *) e)
        == HASH_UNDEFINED_VALUE) {
 	hash_put(hash_entity_to_new_value, (char *) e, (char *) e);
@@ -539,9 +553,11 @@ entity e;
 entity a;
 {
     entity v = entity_undefined;
-
-    pips_assert("add_new_alias_valued", (hash_get(hash_entity_to_new_value, (char *) e)
-       == HASH_UNDEFINED_VALUE));
+    debug(8,"add_new_alias_value","begin: for %s and %s\n",
+      entity_name(e),entity_name(a));
+    pips_assert("add_new_alias_valued", 
+		(hash_get(hash_entity_to_new_value, (char *) e)
+		 == HASH_UNDEFINED_VALUE));
 
     v = entity_to_new_value(a);
 
