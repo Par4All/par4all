@@ -4,6 +4,9 @@
 #ifndef _STDARG_H
 #include <stdarg.h>
 #endif
+#ifndef _STDLIB_H
+#include <stdlib.h>
+#endif
 #include <setjmp.h>
 
 /* Measurement type for mem_spy.c */
