@@ -580,6 +580,9 @@ list le; /* list of entities */
 }
 
 /* transformer invariant_wrt_transformer(transformer p, transformer tf):
+ * Assume that tf is a fix-point operator.
+ *
+ * Old version:
  * keep the invariant part of predicat p wrt tf in a VERY crude way;
  * old and new values related to an entity modified by tf are discarded
  * by projection, regardless of the way they are modified; information
@@ -593,22 +596,29 @@ list le; /* list of entities */
  * Be careful if tf is not feasible because the result is p itself which may not
  * be what you expect.
  *
- * p is not modified
+ * p is not modified.
  */
 transformer 
 invariant_wrt_transformer(p, tf)
 transformer p;
 transformer tf;
 {
-    transformer rtf = args_to_transformer(transformer_arguments(tf));
-    transformer inv = transformer_apply(rtf, p);
+  transformer inv = transformer_undefined;
+  transformer fptf = transformer_undefined;
 
-    free_transformer(rtf);
+  if(FALSE) {
+    fptf = args_to_transformer(transformer_arguments(tf));
+  }
+  else {
+    fptf = transformer_derivative_fix_point(tf);
+  }
+
+    inv = transformer_apply(tf, p);
 
     return inv;
 }
 
-/*transformer transformer_value_substitute(transformer t,
+/* transformer transformer_value_substitute(transformer t,
  *                                         entity e1, entity e2):
  * if e2 does not appear in t initially:
  *    replaces occurences of value e1 by value e2 in transformer t's arguments
