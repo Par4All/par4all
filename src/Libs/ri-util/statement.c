@@ -1431,9 +1431,6 @@ insert_comments_to_statement(statement s,
 void
 fix_sequence_statement_attributes(statement s) 
 {
-    list instructions;
-    statement continue_s;
-   
     pips_assert("Should be an instruction block...",
 		instruction_block_p(statement_instruction(s)));
 
@@ -1441,21 +1438,32 @@ fix_sequence_statement_attributes(statement s)
 	/* The statement block has no label and no comment: just do
            nothing. */
 	statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-	return;
     }
-    /* There are some informations we need to keep: just add a
-       CONTINUE to keep them: */
-    instructions = instruction_block(statement_instruction(s));
+    else {
+	/* There are some informations we need to keep: just add a
+	   CONTINUE to keep them: */
+	list instructions;
+	statement continue_s;
+	string label_name = 
+	    entity_local_name(statement_label(s)) + strlen(LABEL_PREFIX);
+   
+	instructions = instruction_block(statement_instruction(s));
 
-    continue_s = make_continue_statement(statement_label(s));
-    statement_label(s) = entity_empty_label();
-    statement_comments(continue_s) = statement_comments(s);
-    statement_comments(s) = string_undefined;
-    statement_number(continue_s) = statement_number(s);
-    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+	if (strcmp(label_name, RETURN_LABEL_NAME) == 0)
+	    /* This the label of a RETURN, do not forward it: */
+	    continue_s = make_continue_statement(entity_empty_label());
+	else
+	    continue_s = make_continue_statement(statement_label(s));
+	
+	statement_label(s) = entity_empty_label();
+	statement_comments(continue_s) = statement_comments(s);
+	statement_comments(s) = string_undefined;
+	statement_number(continue_s) = statement_number(s);
+	statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
 
-    instructions = CONS(STATEMENT, continue_s, instructions);
-    instruction_block(statement_instruction(s)) = instructions;
+	instructions = CONS(STATEMENT, continue_s, instructions);
+	instruction_block(statement_instruction(s)) = instructions;
+    }
 }
 
 
