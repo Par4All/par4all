@@ -52,16 +52,16 @@
     </ul>
   <li> similar structures, for each tile: 
     <ul>
-      <li> the banks send data that are received by the processors 
+      <li> banks to  processors communications
 	(soft. cache prefetch) 
-      <li> the processors perform the computations
-      <li> the processors send the computed data to the banks
+      <li> computations on processors
+      <li> processors to banks communications
 	(soft. cache flush)
     </ul>
   <li> main difficulties:
     <ul>
       <li> data needed for one tile are often apart on different banks
-      <li> correctness requires that only needed data are communicated
+      <li> memory coherency requires that only needed data are communicated
       <li> thus complex code with guards may be generated for communications
       <li> local allocation and addressing to be chosen on the processors
     </ul>
