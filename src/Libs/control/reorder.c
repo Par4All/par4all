@@ -66,6 +66,12 @@ int un, sn;
       case is_instruction_call:
 	debug(5, "statement_reorder", "goto or call\n");
 	break;
+      case is_instruction_forloop:
+        debug(5, "statement_reorder", "forloop\n");
+	break;
+      case is_instruction_multitest:
+	debug(5, "statement_reorder", "multitest\n");
+	break;
       case is_instruction_unstructured: 
 	debug(5, "statement_reorder", "unstructured\n");
 	unstructured_reorder(instruction_unstructured(i));
