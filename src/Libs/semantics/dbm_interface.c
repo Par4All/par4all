@@ -20,6 +20,14 @@
   * Be'atrice Apvrille, August 1993
   */
 
+/* $Id$
+ * 
+ * $Log: dbm_interface.c,v $
+ * Revision 1.40  2001/10/22 16:22:38  irigoin
+ * refine_transformers() added
+ *
+ */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -198,6 +206,21 @@ bool transformers_inter_full(char * module_name)
     return module_name_to_transformers(module_name);
 }
 
+/* Transformer recomputation cannot be of real use unless an
+   interprocedural analysis is performed. For intraprocedural analyses,
+   using property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT is
+   sufficient. */
+bool refine_transformers(char * module_name)
+{
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+    select_fix_point_operator();
+    set_bool_property(SEMANTICS_STDOUT, FALSE);
+    /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
+    return module_name_to_transformers_in_context(module_name);
+}
+
 bool summary_transformer(char * module_name)
 {
     /* there is a choice: do nothing and leave the effective computation
@@ -335,16 +358,42 @@ bool summary_precondition(char * module_name)
       t = transformer_identity();
     } else {
       /* try to eliminate (some) redundancy at a reasonnable cost */
-      t = transformer_normalize(t, 2);
+      /* t = transformer_normalize(t, 2); */
+
+      /* what cost? */
+      t = transformer_normalize(t, 7);
+
       /* Corinne's best one... for YPENT2 in ARC2D, but be ready to pay
 	 the price! And in case an overflow occurs, you may loose a lot of
 	 accuracy without any control. */
       /* t = transformer_normalize(t, 8); */
+
       /* No consistency check possible here because value_mappings are
 	 not available */
       /* pips_assert("The summary precondition is consistent",
 	 transformer_consistency_p(t));*/
     }
+
+  /* Add declaration information: arrays cannot be empty (Fortran
+   * standard, Section 5.1.2)
+   *
+   * It does not seem to be a good idea for the semantics of
+   * SUMMARY_PRECONDITION. It seems better to have this information in the
+   * summary transformer as an input validity condition.
+   *
+   */
+  if(FALSE && get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
+    set_current_module_statement(
+	(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
+    set_cumulated_rw_effects((statement_effects) 
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+    module_to_value_mappings( get_current_module_entity() );
+    transformer_add_declaration_information(t,
+					    get_current_module_entity());
+    reset_cumulated_rw_effects();
+    reset_current_module_statement();
+    free_value_mappings();
+  }
 
   DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
 			 module_name, (char * )t);
@@ -369,10 +418,12 @@ bool summary_precondition(char * module_name)
  * compute a transformer for each statement of a module with a given
  * name; compute also the global transformer for the module
  */
-bool module_name_to_transformers(char *module_name)
+bool generic_module_name_to_transformers(char *module_name, bool in_context)
 {
-    transformer t_intra;
-    transformer t_inter;
+    transformer t_intra = transformer_undefined;
+    transformer t_inter = transformer_undefined;
+    /* intraprocedural preconditions: proper declarations */
+    transformer mod_pre = transformer_undefined;
     list e_inter;
 
     debug_on(SEMANTICS_DEBUG_LEVEL);
@@ -402,14 +453,44 @@ bool module_name_to_transformers(char *module_name)
     /* compute the basis related to module m */
     module_to_value_mappings( get_current_module_entity() );
 
-    /* compute intraprocedural transformer */
-    t_intra = statement_to_transformer( get_current_module_statement() );
+    /* In the main module, transformers can be computed in context of the
+       initial values */
+    if(entity_main_module_p(get_current_module_entity())
+       && get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) 
+    {
+      if (get_bool_property(SEMANTICS_INTERPROCEDURAL)) 
+      {
+	mod_pre = (transformer)
+	  db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE);
+	if(transformer_empty_p(mod_pre)) {
+	  pips_user_warning(
+	     "Initial preconditions are not consistent.\n"
+	     " The Fortran standard rules about variable initialization"
+	     " with DATA statements are likely to be violated.\n"
+	     "set property PARSER_ACCEPT_ANSI_EXTENSIONS to false\n"
+	     "and CHECK_FORTRAN_SYNTAX_BEFORE_PIPS to true.\n");
+	}
+      }
+      else
+	mod_pre = data_to_precondition(get_current_module_entity());
+    }
+    else if(in_context) {
+      mod_pre = 
+	transformer_dup(load_summary_precondition(get_current_module_entity()));
+    }
+    else
+      mod_pre = transformer_identity();
 
     /* Add declaration information: arrays cannot be empty (Fortran
        standard, Section 5.1.2) */
     if(get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
-        transformer_add_declaration_information(t_intra, get_current_module_entity());
+        transformer_add_declaration_information(mod_pre,
+						get_current_module_entity());
     }
+
+    /* compute intraprocedural transformer */
+    t_intra = statement_to_transformer(get_current_module_statement(), mod_pre);
+    free_transformer(mod_pre);
 
     DB_PUT_MEMORY_RESOURCE(DBR_TRANSFORMERS, module_name, 
 			   (char*) get_transformer_map() );  
@@ -443,7 +524,29 @@ bool module_name_to_transformers(char *module_name)
 
     return TRUE;
 }
+bool module_name_to_transformers_in_context(char *module_name)
+{
+  bool rc = FALSE;
+  bool save_prop = get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT");
 
+  if(!save_prop) {
+    pips_user_warning("Although property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT"
+		      " is not set, it is used because it is necessary for this "
+		      "recomputation to be useful\n");
+    set_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT", TRUE);
+  }
+
+  rc = generic_module_name_to_transformers(module_name, TRUE);
+
+  set_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT", save_prop);
+  return rc;
+}
+bool module_name_to_transformers(char *module_name)
+{
+  bool rc = FALSE;
+  rc = generic_module_name_to_transformers(module_name, FALSE);
+  return rc;
+}
 
 /* resource module_name_to_preconditions(char * module_name):
  * compute a transformer for each statement of a module with a given
@@ -554,9 +657,8 @@ bool module_name_to_preconditions(char *module_name)
 	       or because no information is available;
 	       maybe, every module precondition should be initialized
 	       to a neutral value? */
-	    user_warning("module_to_postcondition",
-			 "no interprocedural module precondition for %s\n",
-			 entity_local_name(get_current_module_entity() ));
+	    pips_user_warning("no interprocedural module precondition for %s\n",
+			      entity_local_name(get_current_module_entity() ));
 	    ;
 	}
 	else {
