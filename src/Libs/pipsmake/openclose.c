@@ -4,7 +4,9 @@
  */
 /**** Begin saved_makefile version ****/
 /**** End saved_makefile version ****/
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <sys/types.h>
 /* Some modifications are made to save the current makefile (s.a. files
  * pipsmake/readmakefile.y pipsmake.h )
