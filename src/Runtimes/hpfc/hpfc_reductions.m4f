@@ -2,7 +2,7 @@
 !     Reductions management 
 !
 ! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1996/10/17 14:45:07 $, )
+! ($Date: 1996/10/17 14:46:34 $, )
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -174,7 +174,7 @@ popdef(`LEVEL')dnl
 popdef(`TYPE')dnl
 popdef(`PVMTYPE')dnl
 popdef(`NAME')dnl
-popdef(`OPERATOR')dnl')dnl
+popdef(`OPERATOR')')dnl
 
 
 define(`SEVEN_DIMENSION',`
