@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: tpips.c,v $
+ * Revision 1.111  2000/02/29 10:28:36  coelho
+ * hop !
+ *
  * Revision 1.110  1998/11/24 19:22:56  coelho
  * automatic logging under jpips.
  *
@@ -318,7 +321,7 @@ struct t_completion_scheme
 static struct t_completion_scheme completion_scheme[] =
 {
 { SHELL_ESCAPE, COMP_FILENAME,   COMP_FILENAME },
-{ "source",	COMP_FILENAME,   COMP_FILENAME },
+{ TPIPS_SOURCE,	COMP_FILENAME,   COMP_FILENAME },
 { CHANGE_DIR,   COMP_FILENAME,   COMP_NONE },
 { QUIT,         COMP_NONE,       COMP_NONE },
 { "checkpoint", COMP_NONE,       COMP_NONE },
@@ -1012,6 +1015,7 @@ void tpips_exec(char * line)
 	if (!tpips_init_done &&
 	    strncmp(line, SET_ENV, strlen(SET_ENV))!=0 &&
 	    strncmp(line, GET_ENV, strlen(GET_ENV))!=0 &&
+	    strncmp(line, TPIPS_SOURCE, strncmp(TPIPS_SOURCE))!=0 &&
 	    !blank_or_comment_line_p(line))
 	    tpips_init();
 	
