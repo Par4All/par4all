@@ -1,6 +1,4 @@
 #! /bin/sh
-# 
-# $Id$
 #
 # to regenerate the distribution files:
 #
@@ -48,13 +46,13 @@ make_pips_release -rz \
 #
 
 echo "SunOS4 binary version"
-move pips_GNU
-make_pips_release -CB GNU -D Examples -pe -rszf pips_GNU PIPS || 
+move pips_GNUSOL1
+make_pips_release -XCB GNUSOL1 -D Examples -pe -rszf pips_GNUSOL1 PIPS || 
 	error 5 "ret $?"
 
 echo "Solaris 2 binary version "
 move pips_GNUSOL2LL
-make_pips_release -CB GNUSOL2LL -D Examples -pe -rzf pips_GNUSOL2LL PIPS || 
+make_pips_release -XCB GNUSOL2LL -D Examples -pe -rzf pips_GNUSOL2LL PIPS || 
 	error 6 "ret $?"
 
 echo "Solaris 2 public softs (big!)"
@@ -62,7 +60,8 @@ move public_GNUSOL2LL
 make_pips_release -P -rzf public_GNUSOL2LL PIPS ||
 	error 7 "ret $?"
 
-# make_pips_release -CB IBMAIX -D Examples -pe -rzf pips_IBMAIX PIPS
+# make_pips_release -XCB IBMAIX -D Examples -pe -rzf pips_IBMAIX PIPS
+# make_pips_release -XCB LINUXI86 -D Examples -pe -rzf pips_LINUXI86 PIPS
 
 echo done
 
