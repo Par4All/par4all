@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/10/06 11:04:29 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/12/18 16:22:20 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -312,21 +312,21 @@ SOURCES= 	$(CONFIG_FILE) $(INCLUDES) $(CFILES) $(DOCS)
 #
 
 test: $(LIB_TARGET)
-	$(LINK) pips -lpips $(PIPS_LIBS)
+	$(LINK) pips -lpips $(PIPS_LIBS) $(PIPS_MALLOC)
 	@echo 
 
 wtest: $(LIB_TARGET) 
 	$(LINK) wpips $(WPIPS_ADDED_LDFLAGS) -lwpips \\
-		$(PIPS_LIBS) $(WPIPS_ADDED_LIBS)
+		$(PIPS_LIBS) $(PIPS_MALLOC) $(WPIPS_ADDED_LIBS)
 	@echo 
 
 ttest: $(LIB_TARGET)
-	$(LINK) tpips -ltpips $(PIPS_LIBS) $(TPIPS_ADDED_LIBS)
+	$(LINK) tpips -ltpips $(PIPS_LIBS) $(PIPS_MALLOC) $(TPIPS_ADDED_LIBS)
 	@echo 
 
 # obsolete rule I guess. test is better. FC.
 $(BIN_TARGET): $(LIB_TARGET) $(MAIN).o
-	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS)
+	$(LINK) $(TARGET) $(MAIN).o $(LIB_TARGET) $(PIPS_LIBS) $(PIPS_MALLOC)
 	@echo 
 
 clean:
@@ -359,7 +359,7 @@ $(PIPS_BINDIR):
 	mkdir $(PIPS_BINDIR)
 
 $(BIN_TARGET): $(INC_TARGET) $(LIB_TARGET)
-	$(LINK) $(BIN_TARGET) $(LIB_TARGET) $(TARGET_LIBS)
+	$(LINK) $(BIN_TARGET) $(LIB_TARGET) $(TARGET_LIBS) $(PIPS_MALLOC)
 	@echo 
 
 clean:
