@@ -598,16 +598,9 @@ hierarchize_control_list(vertex interval,
     unlink_2_control_nodes(new_exit_node, new_entry_node);
     
     /* Detach the old unstructured from the new one: */
-	pips_debug(0, "control_successors(entry_node)");
-    display_address_of_control_nodes(control_successors(entry_node));
     gen_list_and_not(&control_successors(entry_node), new_controls);
-	pips_debug(0, "control_successors(entry_node)");
-    display_address_of_control_nodes(control_successors(entry_node));
-	pips_debug(0, "control_predecessors(entry_node)");
-    display_address_of_control_nodes(control_predecessors(entry_node));
     gen_list_and_not(&control_predecessors(entry_node), new_controls);	
-	pips_debug(0, "control_predecessors(entry_node)");
-    display_address_of_control_nodes(control_predecessors(entry_node));
+
     /* Unlink an eventual loop around entry_node that has been
        captured anyway in the new unstructured: */
     unlink_2_control_nodes(entry_node, entry_node);
