@@ -9,7 +9,7 @@
 
 # Bug: interruptions should be caught to run "discard"
 
-USAGE="Usage: $0 module"
+USAGE="Usage: $0 module.f"
 
 if [ $# -eq 0 ]
 then
@@ -18,7 +18,10 @@ fi
 
 source=$1
 
-stf $source >$source$$ 2>$source.$$.log
+if stf $source >$source$$ 2>$source.$$.log
+then
+	exit 3
+fi
 
 if grep '_.TOOLPACK' $source.$$.log
 then
