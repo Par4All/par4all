@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/12 10:31:30 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/22 15:36:30 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -11,7 +11,7 @@
 #
 # get the environment if necessary
 
-[ "$PIPS_DIR" ] || . /projects/Pips/pipsrc.sh
+[ "$PIPS_ROOT" ] || . /projects/Pips/pipsrc.sh
 
 #
 # should be in the environment
@@ -141,7 +141,7 @@ EOF
 prefix_file_exists()
 {
   $DEBUG2 " | in prefix_file_exists for $1"
-  test "`echo -n $1.* | tr -cs '*' ' '" = " *" || \
+  test "`echo -n $1.* | tr -cs '*' ' '`" = " *" || \
   { echo "1" ; $DEBUG2 " | found" ; return;}
   $DEBUG2 " | not found"
 }
