@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/23 13:42:06 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/25 09:13:51 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -62,8 +62,8 @@
 # local/endlocal (hack for localized computations, cannot be nested)
 # _u: pure  // it is not a directive in HPF, but an attribute...
 # _1: synchro
-# _2: timeon
-# _3: timeoff
+# _2: time (was timeon)
+# _3: end time (was timeoff)
 # _4: setbool // to change the compiler global behavior...
 # _5: setint  // dangerous and added for validation purposes...
 # _6: io      // declares an io function (host call only...)
@@ -163,14 +163,17 @@ $SED '#
       # FC directives and hacks...
       #
       s, synchro,1,
-      s, timeon,2,
-      s, timeoff,3,
+      s, time,2,
+      s, end[ 	]*time,3,
       s, setbool,4,
       s, setint,5,
       s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
       s, end *local,      enddo,
       s, io\(.*\),6(\1),
       s, kill\(.*\),8(\1),
+      # obsolescent:
+      s, timeon,2,
+      s, timeoff,3,
       #
       # host section: hack to build blocks...
       #
