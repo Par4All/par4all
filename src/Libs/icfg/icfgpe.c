@@ -29,7 +29,9 @@ typedef struct
   string name;
   gen_chunk * resource;
   get_text_function get_text;
-} 
+} icfgpeprint_stuff, * p_icfgpeprint_stuff;
+
+static list lp;
 
 text get_any_effect_type_text_flt(string module_name, string resource_name, entity e_flt)
 {
