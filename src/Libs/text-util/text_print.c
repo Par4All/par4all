@@ -291,3 +291,62 @@ dump_words(list lw)
 {
     print_words(stderr, lw);
 }
+
+
+/********************************************************************* DEBUG */
+
+static void 
+debug_word(string w)
+{
+    fprintf(stderr, "# string--%s--\n", w);
+}
+
+void
+debug_words(list /* of string */ l)
+{
+    gen_map(debug_word, l);
+}
+
+static void
+debug_formatted(string s)
+{
+    fprintf(stderr, "# formatted\n%s\n# end formatted\n", s);
+}
+
+static void 
+debug_unformatted(unformatted u)
+{
+    fprintf(stderr, "# unformatted\n# label %s, %d, %d\n",
+	    unformatted_label(u), unformatted_number(u), 
+	    unformatted_extra_margin(u));
+    debug_words(unformatted_words(u));
+    fprintf(stderr, "# end unformatted\n");
+}
+
+void 
+debug_sentence(sentence s)
+{
+    fprintf(stderr, "# sentence\n");
+    switch (sentence_tag(s))
+    {
+    case is_sentence_formatted: 
+	debug_formatted(sentence_formatted(s)); 
+	break;
+    case is_sentence_unformatted: 
+	debug_unformatted(sentence_unformatted(s)); 
+	break;
+    default:
+	pips_internal_error("unexpected sentence tag %d\n", sentence_tag(s));
+    }
+	
+    fprintf(stderr,"# end sentence\n");
+}
+
+void 
+debug_text(text t)
+{
+    fprintf(stderr, "# text\n");
+    gen_map(debug_sentence, text_sentences(t));
+    fprintf(stderr,"# end text\n");
+    
+}
