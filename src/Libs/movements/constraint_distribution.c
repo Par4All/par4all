@@ -80,13 +80,14 @@ Psysteme *sc_neg,*sc_pos,sc_test;
 			   "higher_rank" could be eliminated from the 
 			   two constraints ineq and ineq->succ in order 
 			   to obtain a new constraint on the variable "var" */
-			int left_rank,right_rank,
-			left_coeff,right_coeff;
+			int left_rank,right_rank;
+			Value left_coeff,right_coeff;
 			Variable left_var, right_var;
 		
-			constraint_integer_combination(index_base,ineq,ineq->succ,higher_rank,
-						       &right_var,&right_rank,&right_coeff,
-						       &left_var,&left_rank,&left_coeff);
+			constraint_integer_combination
+			    (index_base,ineq,ineq->succ,higher_rank,
+			     &right_var, &right_rank, &right_coeff,
+			     &left_var, &left_rank, &left_coeff);
 	
 			/* the two constraints ineq and ineq->succ are added to 
 			   the end of the system */
@@ -150,7 +151,8 @@ int sc_info[][3];
 {
     Pcontrainte pc1,pc2;
     int rank,rank_hr,rank_pc1,rank_pc2;
-    int coeff1,coeff2,sign1,sign2,i;
+    Value coeff1,coeff2;
+    int sign1,sign2,i;
     Variable var_hr;
     Psysteme sc2 = sc_init_with_sc(sc);
 
@@ -171,21 +173,22 @@ int sc_info[][3];
 	    }
 	    else {
 		var_hr = variable_of_rank(index_base,rank_hr);
-		rank_pc1 = rank_of_variable(index_base,
-					    search_var_of_higher_rank(pc1->vecteur,
-								      index_base,
-								      var_hr));
-
+		rank_pc1 = rank_of_variable
+		    (index_base,
+		     search_var_of_higher_rank(pc1->vecteur,
+					       index_base,
+					       var_hr));
+		
 		coeff1 = vect_coeff(var_hr,pc1->vecteur);
-		sign1 = (coeff1 >0)? 1 :-1;
+		sign1 = value_sign(coeff1);
 		for (pc2 = pc1; !CONTRAINTE_UNDEFINED_P(pc2); 
 		     pc2= pc2->succ) {
 		    coeff2 = vect_coeff(var_hr,pc2->vecteur);
-		    sign2 = (coeff2 >0) ? 1:-1;	
-		    if (coeff2 !=0 && sign1 == -sign2 
+		    sign2 = value_sign(coeff2);	
+		    if (value_notzero_p(coeff2) && sign1 == -sign2 
 			&& !bound_redund_with_sc_p(sc2,pc1,pc2,var_hr)) {
 			/* this condition is TRUE if the combination of the 
-			   two constraints pc1 and pc2 is not redundant for the 
+			   two constraints pc1 and pc2 is not redundant for the  
 			   system. Then the two constraints are added to the 
 			   system of the variable of higher rank */
 
