@@ -28,10 +28,14 @@
 static bool CHECK = FALSE;
 static bool PRINT_OUT = FALSE;
 static FILE *fp;
+static string caller_name;
 
-/* temporary file for testing entity_to_callees 
-   should be deleted when entity_to_callees is correct
-*/
+void print_module_icfg(entity module)
+{
+    caller_name = "";
+    module_to_icfg(0, module);
+}
+
 void module_to_icfg(margin, module)
 int margin;
 entity module;
@@ -63,8 +67,19 @@ entity module;
 	    MERGE_TEXTS(r,get_text_transformers(module_name));
 	    break;
 	case ICFG_DECOR_PRECONDITIONS:
+	{
+	    /*
+	       list ef = load_summary_effects(module);
+	       transformer p = (transformer) db_get_memory_resource
+	       (DBR_SUMMARY_PRECONDITION,
+	       module_name,
+	       FALSE);
+	       
+	       p = precondition_intra_to_inter (module, p, ef);
+	       */
 	    MERGE_TEXTS(r,get_text_preconditions(module_name));
 	    break;
+	}
 	case ICFG_DECOR_PROPER_EFFECTS:
 	    MERGE_TEXTS(r,get_text_proper_effects(module_name));
 	    break;
@@ -229,9 +244,10 @@ int margin;
 call call_instr;
 {
     entity module = call_function(call_instr);
+    string module_name = module_local_name(module);
 
     if (get_bool_property(ICFG_DEBUG))
-	fprintf(fp,"/call %s", module_local_name(module));
+	fprintf(fp,"/call %s", module_name);
 
     MAPL(pa, {
 	 expression_to_icfg(margin, EXPRESSION(CAR(pa))); },
@@ -241,8 +257,19 @@ call call_instr;
 	if ( CHECK ) {
 	    PRINT_OUT = TRUE;
 	    return;
+	} else {
+	    
+	    /*
+	       list ef = load_summary_effects(module);
+	       transformer p = (transformer) db_get_memory_resource
+	       (DBR_PRECONDITIONS,
+	       module_name,
+	       FALSE);
+	       p = precondition_intra_to_inter (module, p, ef);
+	       */
+	    
+	    module_to_icfg(margin, module);
 	}
-	module_to_icfg(margin, module);
     }
 }
 
