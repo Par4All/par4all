@@ -25,7 +25,7 @@ gen_array_make(int size)
     message_assert("array ok", a);
     a->size = size;
     a->nitems = 0; /* number of items stored */
-    a->array = (void**) malloc(sizeof(void*)*(a->size));
+    a->array = (void**) malloc(size*sizeof(void*));
     message_assert("malloc ok", a->array);
     for (i=0; i<size; i++) a->array[i] = (void*) NULL;
     return a;
@@ -38,26 +38,28 @@ gen_array_resize(gen_array_t a, int min)
   int nsize = ((min%N)==0)?min:((int)(min/N) +1)*N;
   int i;
   /* int nsize = a->size+GEN_ARRAY_SIZE_INCREMENT, i;*/
-  a->array = (void**) realloc(a->array, sizeof(void*)*nsize);
+  a->array = (void**) realloc(a->array, nsize*sizeof(void*));
   message_assert("realloc ok", a->array);
-  for (i=a->size; i<nsize; i++) a->array[i] = (void*) NULL;
+  for (i=a->size; i<nsize; i++) 
+    a->array[i] = (void*) NULL;
   a->size = nsize;
 }
 
 void
 gen_array_free(gen_array_t a)
 {
-    free(a->array);
-    free(a);
+  gen_free_area(a->array, a->size*sizeof(void*));
+  gen_free_area((void**)a, sizeof(struct _gen_array_chunk_t));
 }
 
 void 
 gen_array_full_free(gen_array_t a)
 {
-    int i;
-    for (i=0; i<a->size; i++)
-	if (a->array[i]) free(a->array[i]);
-    gen_array_free(a);
+  int i;
+  for (i=0; i<a->size; i++)
+    if (a->array[i])
+      free(a->array[i]); /* what is it? */
+  gen_array_free(a);
 }
 
 void
