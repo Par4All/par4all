@@ -2,81 +2,46 @@
  * Fabien COELHO, 05/12/94
  * 
  * $RCSfile: newgen_generic_stack.h,v $ verison $Revision$
- * $Date: 1995/02/03 10:10:24 $, 
+ * $Date: 1995/08/29 09:14:46 $, 
  * got on %D%, %T%
  */
 
 #define DEFINE_STACK(PREFIX, name, type) \
-\
 static stack name##_stack = stack_undefined; \
-\
 PREFIX void make_##name##_stack() \
-{\
-  assert(name##_stack==stack_undefined);\
-  name##_stack = stack_make(type##_domain, 0, 0);\
-}\
-\
+{ assert(name##_stack==stack_undefined);\
+  name##_stack = stack_make(type##_domain, 0, 0);}\
 PREFIX void free_##name##_stack() \
-{\
-  stack_free(&name##_stack); \
-  name##_stack = stack_undefined; \
-}\
-\
+{ stack_free(&name##_stack); \
+  name##_stack = stack_undefined;}\
 PREFIX stack get_##name##_stack() \
-{\
-  return(name##_stack);\
-}\
-\
-PREFIX void set_##name##_stack(s) \
-stack s; \
-{\
-  assert(name##_stack==stack_undefined);\
-  name##_stack = s;\
-}\
-\
+{ return(name##_stack);}\
+PREFIX void set_##name##_stack(stack s) \
+{ assert(name##_stack==stack_undefined);\
+  name##_stack = s;}\
 PREFIX void reset_##name##_stack()\
-{\
-  name##_stack = stack_undefined; \
-}\
-\
-PREFIX void name##_push(i)\
-type i;\
-{\
-  stack_push((char *)i, name##_stack);\
-}\
-PREFIX type name##_replace(i)\
-type i;\
-{\
-  return((type) stack_replace((char *)i, name##_stack));\
-}\
-\
+{ name##_stack = stack_undefined;}\
+PREFIX void name##_push(type i)\
+{ stack_push((char *)i, name##_stack);}\
+PREFIX bool name##_filter(type i)\
+{ stack_push((char *)i, name##_stack);\
+  return TRUE;}\
+PREFIX void name##_rewrite(type i)\
+{ (void) stack_pop(name##_stack);}\
+PREFIX type name##_replace(type i)\
+{ return((type) stack_replace((char *)i, name##_stack));}\
 PREFIX type name##_pop()\
-{\
-  return((type) stack_pop(name##_stack));\
-}\
-\
+{ return((type) stack_pop(name##_stack));}\
 PREFIX type name##_head()\
-{\
-  return((type) stack_head(name##_stack));\
-}\
-\
+{ return((type) stack_head(name##_stack));}\
 PREFIX bool name##_empty_p()\
-{\
-  return(stack_empty_p(name##_stack));\
-}\
-\
+{ return(stack_empty_p(name##_stack));}\
 PREFIX int name##_size()\
-{\
-  return(stack_size(name##_stack));\
-}\
-\
+{ return(stack_size(name##_stack));}\
 static void check_##name##_stack()\
-{\
-  stack s = get_##name##_stack();\
-  char\
-     *item_1 = (char *) check_##name##_stack,\
-     *item_2 = (char *) get_##name##_stack;\
-  \
+{ stack s = get_##name##_stack();\
+  char *item_1 = (char *) check_##name##_stack,\
+       *item_2 = (char *) get_##name##_stack;\
   reset_##name##_stack();\
   make_##name##_stack();\
   assert(name##_empty_p());\
@@ -84,6 +49,8 @@ static void check_##name##_stack()\
   assert((char *) name##_head()==item_1);\
   name##_replace(item_2);\
   assert((char *) name##_pop()==item_2);\
+  assert(name##_filter(item_1));\
+  name##_rewrite(item_1);\
   assert(name##_size()==0);\
   free_##name##_stack();\
   reset_##name##_stack();\
