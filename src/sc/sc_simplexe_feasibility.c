@@ -1,5 +1,5 @@
 /* $RCSfile: sc_simplexe_feasibility.c,v $ (version $Revision$)
- * $Date: 1996/08/05 15:35:31 $, 
+ * $Date: 1996/08/06 11:59:08 $, 
  */
 
 /* test du simplex : ce test s'appelle par :
@@ -121,25 +121,31 @@ static int NB_INEQ = 0;
  *   divides by gcd(a,b) and returns with b>0
  * note that there should be no arithmetic exceptions within this macro:
  * (well, only uminus may have trouble for VALUE_MIN...)
+ * ??? a==0 ? 
  */
-#define SIMPL(a,b) 							 \
-{tag("SIMPL")								 \
-     if (value_zero_p(a)) b=VALUE_ONE; 					 \
-     else								 \
-	 if (value_notone_p(a) && value_notone_p(b))			 \
-	 {								 \
-	     Value i=a, j=b, k;						 \
-	     while (value_notzero_p(k=value_mod(i,j)))			 \
-		 i=j, j=k;						 \
-	     value_division(a,j), value_division(b,j);			 \
-	     if (value_neg_p(b))					 \
-		 value_oppose(a), value_oppose(b);			 \
-	 }								 \
+#define SIMPL(a,b)					\
+{							\
+    if (value_notone_p(b) && value_notone_p(a) && 	\
+	value_notmone_p(b) && value_notmone_p(a))	\
+    {							\
+	register Value i=a, j=b, k;			\
+	while (value_notzero_p(k=value_mod(i,j)))	\
+	    i=j, j=k;					\
+	value_division(a,j), value_division(b,j);	\
+    }							\
+    if (value_neg_p(b))					\
+	value_oppose(a), value_oppose(b);		\
 }
 
 /* SIMPLIFIE normalizes fraction f
  */
-#define SIMPLIFIE(f) { tag("SIMPLIFIE") SIMPL(f.num,f.den)}
+#define SIMPLIFIE(f) 				\
+{tag("SIMPLIFIE") 				\
+     if (value_zero_p(f.num))			\
+	 f.den = VALUE_ONE;			\
+     else					\
+	 SIMPL(f.num,f.den);			\
+}
 
 #define AFF(x,y) {x.num=y.num; x.den=y.den;} /* x=y should be ok:-) */
 #define INV(x,y) {x.num=y.den; x.den=y.num;} /* x=1/y */
@@ -234,10 +240,6 @@ static int NB_INEQ = 0;
     DEBUG3(fprintf(stdout, " = "); printfrac(X); fprintf(stdout, "\n"));      \
 }
 
-#define pivot_debug_macro(what)						\
-  DEBUG2({ printf(what);printfrac(A);printfrac(B);			\
-           printfrac(C);printfrac(D);printf(" \n");printfrac(X);})
-
 /* computes X = A - B*C/D, trying to avoid arithmetic exceptions...
  */
 #define FULL_PIVOT_MACRO_SIOUX(X,A,B,C,D,mult) 				\
@@ -252,7 +254,6 @@ static int NB_INEQ = 0;
     u.num = mult(u.num,w.num); /* u*=w */				\
     u.den = mult(u.den,w.den);						\
     SUB_MACRO(X,A,u,mult);						\
-    pivot_debug_macro("");						\
 }
 
 /* computes X = A - B*C/D, but does not try to avoid arithmetic exceptions
@@ -261,8 +262,8 @@ static int NB_INEQ = 0;
 {									  \
     Value v; tag("FULL_PIVOT_DIRECT")					  \
     X.num = mult(A.num,B.den);						  \
-    X.num = mult(X.den,C.den);						  \
-    X.num = mult(X.den,D.num);						  \
+    X.num = mult(X.num,C.den);						  \
+    X.num = mult(X.num,D.num);						  \
     v = mult(A.den,B.num);						  \
     v = mult(v,C.num);							  \
     v = mult(v,D.den);							  \
@@ -281,7 +282,7 @@ static int NB_INEQ = 0;
 #define FULL_PIVOT_MACRO(X,A,B,C,D,mult)				\
 { tag("FULL_PIVOT")							\
     if (direct_p(A.den) && direct_p(B.den) &&				\
-	direct_p(C.den) && direct_p(D.num))				\
+	direct_p(C.den) && direct_p(value_abs(D.num)))			\
     {									\
 	FULL_PIVOT_MACRO_DIRECT(X,A,B,C,D,mult);			\
     }									\
@@ -299,7 +300,6 @@ static int NB_INEQ = 0;
     MUL_MACRO(u,B,C,mult); /* u=simplify(b*c) */	\
     DIV_MACRO(X,u,D,mult); /* x=simplify(u/d) */	\
     value_oppose(X.num);   /* x=-x */			\
-    pivot_debug_macro("++ ");				\
 }
 
 #define PARTIAL_PIVOT_MACRO_DIRECT(X,B,C,D,mult)	\
@@ -330,7 +330,7 @@ static int NB_INEQ = 0;
  */
 #define PIVOT_MACRO(X,A,B,C,D,mult)					      \
 {									      \
-    DEBUG2(fprintf(stdout, "pivot on: ");				      \
+    DEBUG3(fprintf(stdout, "pivot on: ");				      \
 	   printfrac(A); printfrac(B); printfrac(C); printfrac(D));	      \
    if (value_zero_p(A.num))/* a==0? */					      \
    {									      \
@@ -353,7 +353,7 @@ static int NB_INEQ = 0;
 	  }								      \
 	  else /* well, we must compute the full formula! */		      \
 	      { FULL_PIVOT_MACRO(X,A,B,C,D,mult);}			      \
-    DEBUG2(fprintf(stdout, " = "); printfrac(X); fprintf(stdout, "\n"));      \
+    DEBUG3(fprintf(stdout, " = "); printfrac(X); fprintf(stdout, "\n"));      \
 }
 
 /* multiplies two Values of no arithmetic overflow, or throw exception.
@@ -426,36 +426,19 @@ static void printfrac(frac x) {
     printf("/"); print_Value(x.den);
 }
 
-static void dump_tableau(char *msg, tableau *t,int colonnes) {
+static void 
+dump_tableau(char *msg, tableau *t,int colonnes) {
     int i,j, k, w;
     int max=0;
     for(i=0;i<colonnes;i++) 
       if(t[i].colonne[t[i].taille-1].numero>max)
 	  max=t[i].colonne[t[i].taille-1].numero ; 
-    printf("Tableau (%s): %d colonnes  %d lignes\n",
-	   msg,colonnes,max) ;
-    printf("%d Variables  visibles :\n",colonnes-2) ;
-    for(i=0;i<colonnes-2;i++) printf("%7d",variables[i]) ;
+    printf("\nTableau (%s): %d colonnes  %d lignes\n",msg,colonnes,max) ;
+    printf("%d Variables  visibles :",colonnes-2) ;
+    for(i=0;i<colonnes-2;i++) printf(" %d",variables[i]) ;
+    printf("\n%d Variables cachees :",nbvariables);
+    for(i=0;i<nbvariables;i++) printf(" %d",variablescachees[i]) ;
     printf("\n") ;
-    printf("%d Variables cachees :\n",nbvariables);
-    for(i=0;i<nbvariables;i++) printf("%7d",variablescachees[i]) ;
-    printf("\n") ;
-
-    /* DEBUG(
-    for(i=0;i<colonnes;i++) {
-	if(t[i].existe != 0) {
-	    printf("Colonne %d Existe=%d Taille=%d\n",i,
-		   t[i].existe,t[i].taille) ;
-	    for(j=0 ; j<t[i].taille ; j++) {
-		printf("ligne %d valeur", t[i].colonne[j].numero);
-		printfrac(t[i].colonne[j]);
-		printf("\n");
-	    }
-	}
-    }
-	); */  /* DEBUG */
-	
-    printf("Nb lignes: %d\n", max);
     for(j=0;j<=max;j++) {
 	printf("\nLigne %d ",j) ;
 	for(i=0;i<colonnes;i++) {
@@ -466,7 +449,7 @@ static void dump_tableau(char *msg, tableau *t,int colonnes) {
 	    if(w!=0)printfrac(frac0) ;
 	}
     }
-    printf("\n");
+    printf("\n\n");
 } /* dump_tableau */
 
 
@@ -525,7 +508,8 @@ sc_simplexe_feasibility_ofl_ctrl(
      * "eg" : tableau a "nb_eq" lignes et "dimension"+2 colonnes.
      */
     
-    DEBUG(fprintf(stdout, "\n\n IN sc_simplexe_feasibility_ofl_ctrl:\n"));
+    DEBUG(fprintf(stdout, "\n\n IN sc_simplexe_feasibility_ofl_ctrl:\n");
+          sc_fprint(stdout, sc, default_variable_to_string));
 
     /* the input Psysteme must be consistent; this is not the best way to
      * do this; array bound checks should be added instead in proper places;
@@ -657,6 +641,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         t[i].taille = 1 ;
         t[i].colonne[0].numero = 0 ;
         t[i].colonne[0].num = VALUE_ZERO ;
+	t[i].colonne[0].den = VALUE_ONE ;
     }
     nbvariables= 0 ;
     /* Initialisation de l'objectif */
@@ -664,7 +649,7 @@ sc_simplexe_feasibility_ofl_ctrl(
     for(i=0;i<=1;i++) 
 	objectif[i].num=VALUE_ZERO, objectif[i].den=VALUE_ONE;
 	
-    DEBUG(dump_hashtable(hashtable);)
+    DEBUG2(dump_hashtable(hashtable);)
 	
     /* Entree des inegalites dans la table */
     
@@ -682,7 +667,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 		    valeur = value_uminus(pv->val) ; /* val terme const */
 	    
 	    for(pv=pc->vecteur ; pv !=0 ; pv=pv->succ) {
-		if(vect_coeff(pv->var,sc_base(sc))) {
+		if(value_notzero_p(vect_coeff(pv->var,sc_base(sc)))) {
 		    h = hash((Variable)  pv->var) ; trouve=0 ;
 		    while (hashtable[h].nom != 0)  {
 			if (hashtable[h].nom==pv->var) {
@@ -715,16 +700,17 @@ sc_simplexe_feasibility_ofl_ctrl(
 		    t[NUMERO].taille++ ;
 		}
 	    }
+
 	    /* Creation de variable d'ecart ? */
 	    if(value_neg_p(poidsM) ||
 	       (value_zero_p(poidsM) && value_neg_p(valeur))) {
-		DEBUG(dump_tableau("cre var ec", t, compteur);)
+		DEBUG1(dump_tableau("cre var ec", t, compteur);)
 		i=compteur++ ;
 		CREVARVISIBLE ;
 		t[i].existe = 1 ; t[i].taille = 2 ;
 		t[i].colonne[0].num = VALUE_ONE ;
 		t[i].colonne[0].den = VALUE_ONE ;
-		DEBUG(printf("ligne ecart = %ld, colonne %ld\n",ligne,i);)
+		DEBUG1(printf("ligne ecart = %ld, colonne %ld\n",ligne,i);)
 		t[i].colonne[1].numero = ligne ;
 		t[i].colonne[1].num = VALUE_MONE ;
 		t[i].colonne[1].den = VALUE_ONE ;
@@ -733,6 +719,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 		value_addto(objectif[0].num,valeur) ; 
 		value_addto(objectif[1].num,poidsM) ;
 	    }
+
 	    /* Mise a jour des colonnes 0 et 1 */
 	    t[0].colonne[t[0].taille].numero = ligne ;
 	    t[0].colonne[t[0].taille].den = VALUE_ONE ;
@@ -747,14 +734,14 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    t[1].taille++ ;
 	    /* Creation d'une colonne cachee */
 	    CREVARCACHEE ;
-	    DEBUG(dump_tableau("cre col cach", t, compteur);)
+	    DEBUG1(dump_tableau("cre col cach", t, compteur);)
 		}
 	else
 	    ligne--;
     }
 
-    DEBUG(dump_hashtable(hashtable));
-    DEBUG1(dump_tableau("avant sol prov", t, compteur));
+    DEBUG1(dump_hashtable(hashtable));
+    DEBUG(dump_tableau("avant sol prov", t, compteur));
     
     /* NON IMPLEMENTE' */
     
@@ -847,7 +834,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         t[1].taille++ ;
 	/* Creation d'une colonne cachee */
         CREVARCACHEE ;
-	DEBUG(dump_tableau("cre col cach 2", t, compteur));
+	DEBUG1(dump_tableau("cre col cach 2", t, compteur));
     }
     
     for(pc=sc->egalites ; pc!=0; pc=pc->succ, ligne++)
@@ -927,7 +914,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         t[1].taille++ ;
 	/* Creation d'une colonne cachee */
         CREVARCACHEE ;
-	DEBUG(dump_tableau("cre col cach 3", t, compteur));
+	DEBUG1(dump_tableau("cre col cach 3", t, compteur));
     }
     
     /* FIN DE SOLUTION PROVISOIRE */
@@ -973,12 +960,15 @@ sc_simplexe_feasibility_ofl_ctrl(
     nlle_colonne=(frac *) malloc((4 + 2*NB_EQ + NB_INEQ)*sizeof(frac)) ;
     while(1) {
 
-        /*  Recherche d'un nombre negatif 1ere ligne  */
+        /*  Recherche d'un nombre negatif 1ere ligne  
+	 */
         for(j=2, jj= -1 ;j<compteur;j++)
             if(t[j].existe && NEGATIF(t[j].colonne[0]))
-            {  jj=j ; break ;
-	   }
-        /*  Terminaison  */
+            {
+		jj=j ; break ;
+	    }
+        
+	/*  Terminaison  */
         if(jj == -1) { 
 	    boolean cond;
             DEBUG1({
@@ -1007,8 +997,11 @@ sc_simplexe_feasibility_ofl_ctrl(
 	    }
 	    DEBUG1(printf("fin\n"));
         }
+
 	DEBUG(printf("1 : jj= %ld\n",jj);
 	      dump_tableau("avant ch pivot", t, compteur));
+
+	DEBUG(min1.num = 32700; min1.den=1; min2=min1);
 	
         /*  Recherche de la ligne de pivot  
 	 *  si ii==-1, pas encore trouve, min{1,2} non valides...
@@ -1017,7 +1010,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         {
 	    boolean cond;
 
-	    DEBUG(fprintf(stdout, "itering i{,0,1} = %ld %ld %ld\n", 
+	    DEBUG1(fprintf(stdout, "itering i{,0,1} = %ld %ld %ld\n", 
 			  i, i0, i1));
 
             if(((i0<t[0].taille && t[jj].colonne[i].numero <= 
@@ -1043,10 +1036,10 @@ sc_simplexe_feasibility_ofl_ctrl(
 		    }
 		    else {
 			DIV(rapport1,f1,f2);
-			DIV(rapport2,f1,f2);
+			DIV(rapport2,f3,f2);
 		    }
     
-		    DEBUG(fprintf(stdout, "rapports:");
+		    DEBUG1(fprintf(stdout, "rapports:");
 			  printfrac(rapport1);
 			  printfrac(min1);
 			  printfrac(rapport2);
@@ -1065,7 +1058,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 				(EGAL(rapport2,min2) && 
 				 INF(rapport1,min1));
 		    
-		    DEBUG(fprintf(stdout, "%d\n", cond));
+		    DEBUG1(fprintf(stdout, "%d\n", cond));
 
 		    if (cond) {
 			AFF(min1,rapport1) ;
@@ -1078,18 +1071,19 @@ sc_simplexe_feasibility_ofl_ctrl(
 		i++ ;
 	    }
 	    else {
-		if(i0<t[0].taille && 
+		if(i0<t[0].taille && /* it may skip over */
 		   t[jj].colonne[i].numero> t[0].colonne[i0].numero) i0++ ;
 		if(i1<t[1].taille && 
 		   t[jj].colonne[i].numero > t[1].colonne[i1].numero) i1++ ;
 	    }
 	    
-	    DEBUG(printf("i=%ld i0=%ld i1=%ld   %d %d %d\n",
+	    DEBUG1(printf("i=%ld i0=%ld i1=%ld   %d %d %d\n",
 			 i,i0,i1,
-			 t[jj].colonne[i].numero,
-			 t[0].colonne[i0].numero,
-			 t[1].colonne[i1].numero));
+			 i<t[jj].taille? t[jj].colonne[i].numero: -1,
+			 i0<t[0].taille? t[0].colonne[i0].numero: -1,
+			 i1<t[1].taille? t[1].colonne[i1].numero: -1));
         }
+
         /* Cas d'impossibilite'  */
 	if(ii==-1) {
 	    DEBUG1(dump_tableau("sol infinie", t, compteur);
@@ -1120,14 +1114,15 @@ sc_simplexe_feasibility_ofl_ctrl(
          *     qui remplacera la colonne j,
          *  cc = element (colonne j, ligne ii)
          */
-	DEBUG2(printf("Pivoter %ld %ld\n",ii,jj) ;);
+	DEBUG(printf("Pivoter %ld %ld\n",ii,jj));
         
 	/* Remplir la derniere colonne temporaire de t
 	 *   qui contient un 1 en position ligne ii
 	 */
         t[compteur].taille = 2 ;
+	t[compteur].colonne[0].numero = 0 ;
         t[compteur].colonne[0].num = VALUE_ZERO ;
-        t[compteur].colonne[0].numero = 0 ;
+	t[compteur].colonne[0].den = VALUE_ONE ;
         t[compteur].colonne[1].numero = ii;
         t[compteur].colonne[1].num = VALUE_ONE ;
         t[compteur].colonne[1].den = VALUE_ONE ;
@@ -1145,16 +1140,18 @@ sc_simplexe_feasibility_ofl_ctrl(
 		    else if(t[j].colonne[i].numero>ii)
                     {cc.num= VALUE_ZERO ; cc.den=VALUE_ONE ; break ; }
 		for(i=0,i1=0;i<t[j].taille || i1<t[jj].taille ;) {
+
+		    DEBUG2(printf("k=%ld, j=%ld, i=%ld i1=%ld\n",k,j,i,i1);
+			   printf("fractions: ");
+			   printfrac(t[j].colonne[i]) ;
+			   printfrac(t[jj].colonne[i1]) ;
+			   printfrac(cc);
+			   printfrac(pivot));
+		    
 		    if(i<t[j].taille &&  
 		       i1<t[jj].taille && 
 		       t[j].colonne[i].numero == t[jj].colonne[i1].numero) 
 		    {   
-			DEBUG(printf("k=%ld, j=%ld, i=%ld i1=%ld\n",k,j,i,i1);
-			      printfrac(t[j].colonne[i]) ;
-			      printfrac(t[jj].colonne[i1]) ;
-			      printfrac(cc);
-			      printfrac(pivot););
-
 			if(t[j].colonne[i].numero == ii) {
 			    AFF(nlle_colonne[k],t[j].colonne[i]);
 			} else {
@@ -1168,14 +1165,12 @@ sc_simplexe_feasibility_ofl_ctrl(
 				PIVOT((*n), (*a), (*b), cc, pivot);
 			    }
 			}
+			
 			if(i==0||nlle_colonne[k].num!=0) {
 			    nlle_colonne[k].numero = t[j].colonne[i].numero ;
-			    DEBUG(printfrac(nlle_colonne[k]) ;
-				  printf(" ligne numero %d ", 
-					 nlle_colonne[k].numero) ;
-				  printf("\n") ;);
 			    k++ ;
 			}
+
 			i++ ; i1++ ;
 		    }
 		    else
@@ -1183,17 +1178,21 @@ sc_simplexe_feasibility_ofl_ctrl(
 			   (i1<t[jj].taille && 
 			    t[j].colonne[i].numero > t[jj].colonne[i1].numero))
 			{  
-			    DEBUG(printf("t[j].colonne[i].numero > "
-					 "t[jj].colonne[i1].numero , "
-					 "k=%ld, j=%ld, i=%ld i1=%ld\n",
-					 k,j,i,i1);
-				  printf("j = %ld  t[j].taille=%d , "
-					 "t[jj].taille=%d\n",
-					 j,t[j].taille,t[jj].taille);
-				  printf("t[j].colonne[i].numero=%d , "
-					 "t[jj].colonne[i1].numero=%d\n",
-					  t[j].colonne[i].numero,
-					 t[jj].colonne[i1].numero););
+			    DEBUG1(
+				if (i<t[j].taille) 
+				{
+				    printf("t[j].colonne[i].numero > "
+					   "t[jj].colonne[i1].numero , "
+					   "k=%ld, j=%ld, i=%ld i1=%ld\n",
+					   k,j,i,i1);
+				    printf("j = %ld  t[j].taille=%d , "
+					   "t[jj].taille=%d\n",
+					   j,t[j].taille,t[jj].taille);
+				    printf("t[j].colonne[i].numero=%d , "
+					   "t[jj].colonne[i1].numero=%d\n",
+					   t[j].colonne[i].numero,
+					   t[jj].colonne[i1].numero);
+				});
 
                         /* 0 en colonne j  ligne t[jj].colonne[i1].numero */
 			    if(t[jj].colonne[i1].numero == ii) {
@@ -1215,38 +1214,37 @@ sc_simplexe_feasibility_ofl_ctrl(
 			    {
 				nlle_colonne[k].numero = 
 				    t[jj].colonne[i1].numero ;
-				DEBUG(printfrac(nlle_colonne[k]);
-				      printf(" ligne numero %d ",
-					     nlle_colonne[k].numero);
-				      printf("\n"););
 				k++ ;
 			    }
 			    if(i1<t[jj].taille) i1++ ; else i++ ;
 			}
-			else
-			    if(i1>=t[jj].taille || 
-			       t[j].colonne[i].numero < 
-			       t[jj].colonne[i1].numero)
-			    {
-				/* 0 en col jj, ligne t[j].colonne[i].numero */
-				DEBUG(printf("t[j].colonne[i].numero < "
-					     "t[jj].colonne[i1].numero , "
-					     "k=%ld, j=%ld, i=%ld i1=%ld\n",
-					     k,j,i,i1);
-				      printf("j = %ld  t[j].taille=%d , "
-					     "t[jj].taille=%d\n",
-					     j,t[j].taille,t[jj].taille););
-				AFF(nlle_colonne[k],t[j].colonne[i]) ;
-				DEBUG(printfrac(nlle_colonne[k]));
-				if(i==0||nlle_colonne[k].num!=0) {
-				    nlle_colonne[k].numero = 
-					t[j].colonne[i].numero ;
-				    DEBUG(printf(" ligne numero %d \n", 
-						 nlle_colonne[k].numero));
-				    k++ ;
-				}
-				if(i<t[j].taille) i++ ; else i1++ ;
+			else if(i1>=t[jj].taille || 
+				t[j].colonne[i].numero < 
+				t[jj].colonne[i1].numero)
+			{
+			    /* 0 en col jj, ligne t[j].colonne[i].numero */
+			    DEBUG2(printf("t[j].colonne[i].numero < "
+					  "t[jj].colonne[i1].numero , "
+					  "k=%ld, j=%ld, i=%ld i1=%ld\n",
+					  k,j,i,i1);
+				   printf("j = %ld  t[j].taille=%d , "
+					  "t[jj].taille=%d\n",
+					  j,t[j].taille,t[jj].taille););
+			    AFF(nlle_colonne[k],t[j].colonne[i]) ;
+			    if(i==0||nlle_colonne[k].num!=0) {
+				nlle_colonne[k].numero = 
+				    t[j].colonne[i].numero ;
+				k++ ;
 			    }
+			    if(i<t[j].taille) i++ ; else i1++ ;
+			}
+			else
+			    DEBUG2(printf(" ??? "));
+
+		    DEBUG2(printf(" -> ");
+			   printfrac(nlle_colonne[k-1]);
+			   printf(" [ligne numero %d]\n", 
+				  nlle_colonne[k-1].numero));
 
 		}
 		if(j==compteur) w = jj ; else w = j ;
