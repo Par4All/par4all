@@ -5,7 +5,11 @@
 SCRIPTS = 	pips-makemake \
 		install_pips_sources \
 		make-tags \
-		pips_install_file
+		pips_install_file \
+		analyze_libraries \
+		clean-pips \
+		grep_libraries \
+		search-pips
 
 FILES =		
 
