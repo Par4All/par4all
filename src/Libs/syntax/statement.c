@@ -1,5 +1,10 @@
 /*
  * $Id$
+ *
+ * $Log: statement.c,v $
+ * Revision 1.44  1998/10/07 15:58:08  irigoin
+ * RCS logging added
+ *
  */
 
 #include <stdlib.h>
