@@ -2,6 +2,9 @@
  *
  * $Id$
  * $Log: special_cases.c,v $
+ * Revision 1.27  1997/09/13 12:58:41  coelho
+ * *** empty log message ***
+ *
  * Revision 1.26  1997/08/04 14:05:02  coelho
  * convex also needed.
  *
@@ -902,7 +905,7 @@ number_of_non_empty_statements(
     list /* of statement */ ls)
 {
     int n = 0;
-    MAP(STATEMENT, s, if (!hpfc_empty_statement_p(s)) n++, ls);
+    MAP(STATEMENT, s, if (!empty_code_p(s)) n++, ls);
     return n;
 }
 
