@@ -26,7 +26,7 @@ on the pretty-print of the results.
 .\"
 .SH OPTIONS
 .TP
-.B \-w
+.B \-w 
 .I wspace
 is the name of the workspace on which applies 
 .B Display.
