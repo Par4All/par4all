@@ -249,7 +249,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.235 2003/09/05 14:29:54 nguyen Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.236 2003/12/05 17:05:45 nguyen Exp $";
 #endif /* lint */
 
  /*
@@ -324,6 +324,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 bool is_fortran = TRUE;
 static list words_cast(cast obj);
 static list words_sizeofexpression(sizeofexpression obj);
+static list words_subscript(subscript s);
 static text text_forloop(entity module,string label,int margin,forloop obj,int n);
 
 /******************************************************************* STYLES */
@@ -598,7 +599,7 @@ words_regular_call(call obj, bool is_a_subroutine)
   /* the implied complex operator is hidden... [D]CMPLX_(x,y) -> (x,y)
    */
   if (!ENTITY_IMPLIED_CMPLX_P(f) && !ENTITY_IMPLIED_DCMPLX_P(f))
-    pc = CHAIN_SWORD(pc, entity_local_name(f));
+    pc = CHAIN_SWORD(pc, entity_user_name(f));
 
   /* The corresponding formal parameter cannot be checked by
      formal_label_replacement_p() because the called modules may not have
@@ -656,7 +657,7 @@ words_regular_call(call obj, bool is_a_subroutine)
     pc = CHAIN_SWORD(pc, ")");
   }
   else if(!type_void_p(functional_result(type_functional(t))) ||
-	  !is_a_subroutine) {
+	  !is_a_subroutine || !is_fortran) {
     pc = CHAIN_SWORD(pc, "()");
   }
 
@@ -669,7 +670,7 @@ static list
 words_genuine_regular_call(call obj, bool is_a_subroutine)
 {
   list pc = words_regular_call(obj, is_a_subroutine);
-  
+
   if (call_arguments(obj) != NIL) {
     /* The call is not used to code a constant: */
     entity f = call_function(obj);
@@ -767,15 +768,19 @@ words_nullary_op(call obj, int precedence, bool leftmost)
     entity func = call_function(obj);
     string fname = entity_local_name(func);
 
-    if(same_string_p(fname,NULL_STATEMENT_INTRINSIC))
+    if(same_string_p(fname,CONTINUE_FUNCTION_NAME))
       fname = "";
+
+    if(same_string_p(fname,RETURN_FUNCTION_NAME))
+      pc = CHAIN_SWORD(pc, "return");
+    else 
+      pc = CHAIN_SWORD(pc, fname);
     
-    pc = CHAIN_SWORD(pc, fname);
-    
-    /* STOP and PAUSE may have 0 or 1 argument */
+    /* STOP and PAUSE and RETURN in C may have 0 or 1 argument */
     if(gen_length(args)==1) {
       if(same_string_p(fname,STOP_FUNCTION_NAME)
-	 || same_string_p(fname,PAUSE_FUNCTION_NAME)) {
+	 || same_string_p(fname,PAUSE_FUNCTION_NAME)
+	 || same_string_p(fname,RETURN_FUNCTION_NAME)) {
 	expression e = EXPRESSION(CAR(args));
 	pc = CHAIN_SWORD(pc, " ");
 	pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE));
@@ -1129,7 +1134,8 @@ words_goto_label(string tlabel)
 	pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
     }
     else {
-      pc = CHAIN_SWORD(pc, strdup(is_fortran?"GOTO ":"goto "));
+      /* In C, a label cannot begin with a number so "l" is added for this case*/
+      pc = CHAIN_SWORD(pc, strdup(is_fortran?"GOTO ":(isdigit(tlabel[0])?"goto l":"goto ")));
       pc = CHAIN_SWORD(pc, tlabel);
       if (!is_fortran)
 	pc = CHAIN_SWORD(pc, ";");
@@ -1352,15 +1358,19 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
       fun = "+";
     if ( strcmp(fun, "-C") == 0 )
       fun = "-";
+    if ( strcmp(fun, "&bitand") == 0 )
+      fun = "&";
     
     if ( prec < precedence )
-	pc = CHAIN_SWORD(pc, "(");
+      pc = CHAIN_SWORD(pc, "(");
     pc = gen_nconc(pc, we1);
+    pc = CHAIN_SWORD(pc, " ");
     pc = CHAIN_SWORD(pc, strdup(fun));
+    pc = CHAIN_SWORD(pc, " ");
     pc = gen_nconc(pc, we2);
     if ( prec < precedence )
-	pc = CHAIN_SWORD(pc, ")");
-
+      pc = CHAIN_SWORD(pc, ")");
+    
     return(pc);
 }
 
@@ -1505,9 +1515,6 @@ multiply-add operators ( JZ - sept 98) */
     {"&=", words_assign_op, 1 },
     {"^=", words_assign_op, 1 },
     {"|=", words_assign_op, 1 },
-
-    {NULL_STATEMENT_INTRINSIC, words_nullary_op, 0},
-
     {NULL, null, 0}
 };
 
@@ -1519,9 +1526,10 @@ words_intrinsic_call(call obj, int precedence, bool leftmost)
     struct intrinsic_handler *p = tab_intrinsic_handler;
     char *n = entity_local_name(call_function(obj));
 
+    
     while (p->name != NULL) {
 	if (strcmp(p->name, n) == 0) {
-	    return((*(p->f))(obj, precedence, leftmost));
+	  return((*(p->f))(obj, precedence, leftmost));
 	}
 	p++;
     }
@@ -1592,6 +1600,12 @@ words_syntax(syntax obj)
       break;
     case is_syntax_sizeofexpression:
       pc = words_sizeofexpression(syntax_sizeofexpression(obj));
+      break;
+    case is_syntax_subscript:
+      pc = words_subscript(syntax_subscript(obj));
+      break;
+    case is_syntax_application:
+      pc = words_application(syntax_application(obj));
       break;
     default: 
       pips_internal_error("unexpected tag");
@@ -2162,6 +2176,8 @@ text_logical_if(
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
     pc = CHAIN_SWORD(pc, ") ");
     pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE));
+    if (!is_fortran) 
+      pc = CHAIN_SWORD(pc, ";");
     ADD_SENTENCE_TO_TEXT(r, 
 			 make_sentence(is_sentence_unformatted, 
 				       make_unformatted(strdup(label), n, 
@@ -2191,7 +2207,7 @@ text_block_if(
 							margin, pc)));
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
 				  test_true(obj)));
-    
+  
     test_false_obj = test_false(obj);
     if(statement_undefined_p(test_false_obj)){
 	pips_error("text_test","undefined statement\n");
@@ -2207,14 +2223,14 @@ text_block_if(
 	(statement_continue_p(test_false_obj)
 	 && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
       {
-	if (is_fortran)
+	if (is_fortran) 
 	  {
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
 	  }
-	else 
+	else
 	  {
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
+	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {"));
 	  }
 	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
 				      test_false_obj));
@@ -2286,6 +2302,8 @@ text_block_ifthen(
 							margin, pc)));
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
 				  test_true(obj)));
+    if (!is_fortran) 
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
     return(r);
 }
 
@@ -2310,18 +2328,12 @@ text_block_else(
 	(statement_continue_p(stmt)
 	 && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
       {
-	if (is_fortran)
-	  {
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-	  }
-	else 
-	  {
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {" ));
-	  }
-	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt));
-    }
-
+	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,is_fortran?"ELSE":"else {"));
+	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt)); 
+	if (!is_fortran) 
+	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
+      }
+    
     return r;
 }
 
@@ -2343,15 +2355,23 @@ text_block_elseif(
 				  test_true(obj)));
 				  */
 
-    pc = CHAIN_SWORD(pc, "ELSEIF (");
+    if (!is_fortran)
+      {
+	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {"));
+	margin = margin + INDENTATION;
+      }
+    pc = CHAIN_SWORD(pc, is_fortran?"ELSEIF (":"if (");
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
-    pc = CHAIN_SWORD(pc, ") THEN");
+    pc = CHAIN_SWORD(pc, is_fortran?") THEN":") {");
     ADD_SENTENCE_TO_TEXT(r, 
 			 make_sentence(is_sentence_unformatted, 
 				       make_unformatted(strdup(label), n, 
 							margin, pc)));
-
+    
     MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, tb));
+
+    if (!is_fortran) 
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
 
     if(statement_test_p(fb) 
        && empty_comments_p(statement_comments(fb))
@@ -2364,7 +2384,7 @@ text_block_elseif(
     else {
 	MERGE_TEXTS(r, text_block_else(module, label, margin, fb, n));
     }
-    
+
     return(r);
 }
 
@@ -2501,6 +2521,15 @@ text_instruction(
   case is_instruction_forloop:
     {
       r = text_forloop(module, label, margin, instruction_forloop(obj), n);
+      break;
+    }
+  case is_instruction_expression:
+    {
+      list pc = words_expression(instruction_expression(obj));
+      unformatted u;
+      pc = CHAIN_SWORD(pc,";");
+      u = make_unformatted(strdup(label), n, margin, pc) ;
+      r = make_text(CONS(SENTENCE,make_sentence(is_sentence_unformatted, u),NIL));
       break;
     }
   default:
@@ -2755,9 +2784,10 @@ text_named_module(
   else
     {
       /* C prettyprinter */
-      if (strstr(entity_name(name),FILE_SEP_STRING) == NULL)
+      pips_debug(3,"Prettyprint function %s\n",entity_name(name));
+      if (!compilation_unit_p(entity_name(name)))
 	{
-	  /* No need to print header if the current module is a compilation unit*/
+	  /* Print function header if the current module is not a compilation unit*/
 	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name), module)); 
 	  ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(0,"{"));
 	}
@@ -2944,6 +2974,44 @@ static list words_sizeofexpression(sizeofexpression obj)
   return pc;
 } 
 
+static list words_subscript(subscript s)
+{
+  list pc = NIL;
+  expression a = subscript_array(s);
+  list lexp = subscript_indices(s);
+  bool first = TRUE;
+  pc = gen_nconc(pc, words_expression(a));
+  pc = CHAIN_SWORD(pc,"[");
+  MAP(EXPRESSION,exp,
+  {
+    if (!first) 
+      pc = CHAIN_SWORD(pc,",");
+    pc = gen_nconc(pc, words_expression(exp));
+    first = FALSE;
+  },lexp);
+  pc = CHAIN_SWORD(pc,"]");
+  return pc;
+}
+
+static list words_application(application a)
+{
+  list pc = NIL;
+  expression f = application_function(a);
+  list lexp = application_arguments(a);
+  bool first = TRUE;
+  pc = gen_nconc(pc, words_expression(f));
+  pc = CHAIN_SWORD(pc,"(");
+  MAP(EXPRESSION,exp,
+  {
+    if (!first) 
+      pc = CHAIN_SWORD(pc,",");
+    pc = gen_nconc(pc, words_expression(exp));
+    first = FALSE;
+  },lexp);
+  pc = CHAIN_SWORD(pc,")");
+  return pc;
+}
+
 static text text_forloop(entity module,string label,int margin,forloop obj,int n)
 {
     list pc = NIL;
@@ -2952,7 +3020,8 @@ static text text_forloop(entity module,string label,int margin,forloop obj,int n
     statement body = forloop_body(obj) ;
    
     pc = CHAIN_SWORD(pc,"for (");
-    pc = gen_nconc(pc, words_expression(forloop_initialization(obj)));
+    if (!expression_undefined_p(forloop_initialization(obj)))
+      pc = gen_nconc(pc, words_expression(forloop_initialization(obj)));
     pc = CHAIN_SWORD(pc,";");
     pc = gen_nconc(pc, words_expression(forloop_condition(obj)));
     pc = CHAIN_SWORD(pc,";");
