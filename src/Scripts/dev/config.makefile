@@ -14,9 +14,9 @@ SCRIPTS = 	pips-makemake \
 		order_libraries \
 		pips-experiment \
 		pips_at_night \
-		forward_gnu_makefile \
 		remove_from_sccs_file
 
+FILES=		forward_gnu_makefile
 COPY=	cp -f
 
 forward: 
