@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "genC.h"
-#include "list.h"
+
 #include "ri.h"
 #include "text.h"
 #include "text-util.h"
