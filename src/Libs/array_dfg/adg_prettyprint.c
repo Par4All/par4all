@@ -66,6 +66,108 @@ typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;
 
 
+/*=======================================================================*/
+/* list adg_vertices_of_same_number( (list) l_ver)              AP 4/10/95
+ *
+ * Input: A list of vertices.
+ *
+ * Output: A list of triples with a vertex number, the corresponding
+ * statement number and its count.
+ *
+ * This function scans all the vertices and try to find those that point
+ * to the same statement. If it finds one such statement pointed by at
+ * least two vertices, then it constructs a triple for each such vertex.
+ */
+list adg_vertices_of_same_number(l_ver)
+list l_ver;
+{
+  list result = NIL, lv, l_num = NIL, l_count = NIL, ll, lc, lr, llr;
+  int sn, vn, count;
+  bool found;
+
+  debug(9, "adg_vertices_of_same_number", "doing \n");
+
+  for(lv = l_ver; !ENDP(lv); POP(lv)) {
+    vertex v = VERTEX(CAR(lv));
+
+    vn = vertex_int_stmt(v);
+    if(vn != ENTRY_ORDER) {
+      found = FALSE;
+      sn = statement_number(adg_vertex_to_statement(v));
+      count = 1;
+      for(ll = l_num, lc = l_count; !ENDP(ll) && (!found); POP(ll),
+	  POP(lc)) {
+	if(sn == INT(CAR(ll))){
+	  found = TRUE;
+	  count = ++(INT(CAR(lc)));
+	}
+      }
+      /* Add the triple (vn, sn, count) */
+      result = gen_nconc(result, CONS(LIST, CONS(INT, vn, CONS(INT, sn,
+							       CONS(INT,
+								    count,
+								    NIL))),
+				      NIL));
+      if(! found) {
+	/* This number has not been encountered yet, so it's
+	   registered. */
+	l_num = gen_nconc(l_num, CONS(INT, sn, NIL));
+	l_count = gen_nconc(l_count, CONS(INT, 1, NIL));
+      }
+    }
+  }
+
+ fprintf(stderr, "LIST OF TRIPLES BEFORE ELIM :\n");
+  for(ll = result; !ENDP(ll);  POP(ll)) {
+    int vn, sn, count;
+    vn = INT(CAR(LIST(CAR(ll))));
+    sn = INT(CAR(CDR(LIST(CAR(ll)))));
+    count = INT(CAR(CDR(CDR(LIST(CAR(ll))))));
+    fprintf(stderr, ", (%d, %d, %d)", vn, sn, count);
+  }
+ fprintf(stderr, "\n");
+  for(ll = l_num, lc = l_count; !ENDP(ll); POP(ll), POP(lc)) {
+    int sn, count;
+    count = INT(CAR(lc));
+    sn = INT(CAR(ll));
+    fprintf(stderr, ", (%d, %d)", sn, count);
+  }
+ fprintf(stderr, "\n");
+
+  for(ll = l_num, lc = l_count; !ENDP(ll); POP(ll), POP(lc)) {
+    count = INT(CAR(lc));
+    if(count == 1) {
+      sn = INT(CAR(ll));
+      found = FALSE;
+      llr = NIL;
+      for(lr = result; !ENDP(lr) && !found; POP(lr)) {
+	if(sn == INT(CAR(CDR(LIST(CAR(lr)))))) {
+	  found = TRUE;
+	  if(llr == NIL)
+	    result = CDR(result);
+	  else
+	    CDR(llr) = CDR(lr);
+	}
+	else
+	  llr = lr;
+      }
+    }
+  }
+
+ fprintf(stderr, "LIST OF TRIPLES AFTER ELIM :\n");
+  for(ll = result; !ENDP(ll);  POP(ll)) {
+    int vn, sn, count;
+    vn = INT(CAR(LIST(CAR(ll))));
+    sn = INT(CAR(CDR(LIST(CAR(ll)))));
+    count = INT(CAR(CDR(CDR(LIST(CAR(ll))))));
+    fprintf(stderr, ", (%d, %d, %d)", vn, sn, count);
+  }
+ fprintf(stderr, "\n");
+
+  return(result);
+}
+
+
 /*============================================================================*/
 /* void fprint_dfg(FILE *fp, graph obj): prints in the file "fp" the Data
  * Flow Graph "obj".
@@ -74,10 +176,15 @@ void fprint_dfg(fp, obj)
 FILE *fp;
 graph obj;
 {
- list nodes_l, su_l, df_l;
+ list nodes_l, su_l, df_l, l_vn_count, ll;
  predicate exec_dom;
- int source_stmt, sink_stmt;
+ int source_stmt, sink_stmt, sn, count, vn;
  statement stmt;
+ bool found;
+
+ /* This function returns the list of triples with a vertex number, the
+    corresponding statement number and its count. */
+ l_vn_count = adg_vertices_of_same_number(graph_vertices(obj));
 
  fprintf(fp,"\n Array Data Flow Graph:\n");
  fprintf(fp,"=======================\n");
@@ -94,7 +201,21 @@ graph obj;
     }
     else {
       stmt = adg_vertex_to_statement(crt_v);
-      fprintf(fp,"\nINS_%d:\n******\n", statement_number(stmt));
+      sn = statement_number(stmt);
+
+      found = FALSE;
+      count = 0;
+      for(ll = l_vn_count; !ENDP(ll) && !found;  POP(ll)) {
+	vn = INT(CAR(LIST(CAR(ll))));
+	if(vn == source_stmt) {
+	  found = TRUE;
+	  count = INT(CAR(CDR(CDR(LIST(CAR(ll))))));
+	}
+      }
+      if(found)
+	fprintf(fp,"\nINS_%d_%d:\n********\n", sn, count);
+      else
+	fprintf(fp,"\nINS_%d:\n******\n", sn);
     }
 
     if(exec_dom != predicate_undefined) {
@@ -116,8 +237,19 @@ graph obj;
        sink_stmt = vertex_int_stmt(successor_vertex(su));
        df_l = dfg_arc_label_dataflows((dfg_arc_label) successor_arc_label(su));
 
+       found = FALSE;
+       count = 0;
+       for(ll = l_vn_count; !ENDP(ll) && !found;  POP(ll)) {
+	 vn = INT(CAR(LIST(CAR(ll))));
+	 if(vn == sink_stmt) {
+	   found  = TRUE;
+	   count = INT(CAR(CDR(CDR(LIST(CAR(ll))))));
+	 }
+       }
+
        for( ; df_l != NIL; df_l = CDR(df_l))
-          fprint_dataflow(fp, statement_number(stmt), DATAFLOW(CAR(df_l)));
+          fprint_dataflow(fp, statement_number(stmt), DATAFLOW(CAR(df_l)),
+			  count);
 
        fprintf(fp, "\n");
       }
