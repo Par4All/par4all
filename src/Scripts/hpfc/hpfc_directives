@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/05 13:31:52 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1996/04/10 17:00:08 $, )
 # version $Revision$
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
@@ -68,8 +68,8 @@
 # _3: timeoff
 # _4: setbool // to change the compiler global behavior...
 # _5: setint  // dangerous and added for validation purposes...
-# _6: io/host // declares an io function (host call only...)
-# _7: begin/end io/host // io/host section...
+# _6: io      // declares an io function (host call only...)
+# _7: host/end host // host section...
 #
 # (_ is hpfc)
 #
@@ -166,17 +166,13 @@ $SED '#
       s, timeoff,3,
       s, setbool,4,
       s, setint,5,
-      s, begin *local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
       s, local\(.*\),i(I_LOCAL)\1do I_LOCAL = 0\, 0,
       s, end *local,      enddo,
       s, io\(.*\),6(\1),
-      s, host\(.*\),6(\1),
       #
-      # io/host section: hack to build blocks...
+      # host section: hack to build blocks...
       #
-      s, begin *io,      if (.true.) then7if (.true.) then,
-      s, begin *host,      if (.true.) then7if (.true.) then,
-      s, end *io,      endifendif,
+      s, host,      if (.true.) then7if (.true.) then,
       s, end *host,      endifendif,
       # io args shoud look like calls for pips
       /6(/s,\,,()\,,g;
