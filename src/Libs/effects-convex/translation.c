@@ -39,8 +39,9 @@
 #include "semantics.h"
 #include "text.h"
 #include "transformer.h"
-#include "effects.h"
-#include "regions.h"
+
+#include "effects-generic.h"
+#include "effects-convex.h"
 
 /* from syntax.h */
 extern entity CreateIntrinsic(string /*name*/);
