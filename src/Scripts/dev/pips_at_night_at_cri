@@ -7,6 +7,9 @@
 # architectures and machines. 
 #
 # $Log: pips_at_night_at_cri,v $
+# Revision 1.23  2003/05/22 14:48:51  irigoin
+# champeaux et /tmp selected as main validation environment for sol2
+#
 # Revision 1.22  2002/06/13 11:42:24  irigoin
 # compilation of GNUSOL2LLPROF in gnusol2ll added for Duong
 #
@@ -26,7 +29,7 @@ add=
 # main machines for each os.
 
 sun4="chailly   /projects/Pips/Experiments"
-sol2="chailly99 /projects/Pips/Experiments2"
+sol2="champeaux /tmp"
 i386="tirnanog  /projects/Pips/Experiments3"
 i586="loreto    /projects/Pips/Experiments3"
 i686="marseille /projects/Pips/Experiments3"
