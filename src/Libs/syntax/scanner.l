@@ -161,13 +161,13 @@ DCON (({MANT}|{UICON}){DEXP}?)
 				return(TK_DCON); 
 			}
 
-\'([^\']|(\'\'))*\'	{
+\'([^\']|(\'\')|(\\\'))*\'	{
 				pips_debug(9, "TK_SCON %s %d\n",
                                            yytext, yyleng);
                                 yylval.string = strdup(yytext);
 				return(TK_SCON);
 			}
-\"([^\"]|(\"\"))*\"	{
+\"([^\"]|(\"\")|(\\\"))*\"	{
 				pips_debug(9, "TK_SCON %s %d\n",
                                            yytext, yyleng);
                                 yylval.string = strdup(yytext);
