@@ -7,14 +7,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-#include <sys/stdtypes.h>  /* for debug with dbmalloc */
-#include "malloc.h"
 
 extern char yytext[]; /* dialogue avec l'analyseur lexical */
 
