@@ -7,6 +7,13 @@
  * update_props() .
  *
  * $Log: source_file.c,v $
+ * Revision 1.108  2003/09/04 15:44:08  irigoin
+ * Deletion of static functions insert_at(), add_continuation_if_needed(),
+ * try_this_one(), handle_complex_constants() and CONTINUATION define. They
+ * were probably used when when Fabien tried to preprocess Fortran complex constants
+ * wich are not parsed by PIPS. Detection of resource name conflicts added in
+ * process_user_file().
+ *
  * Revision 1.107  2003/09/04 11:16:33  coelho
  * test return status of fpp...
  *
@@ -288,80 +295,6 @@ static regex_t
     complex_cst2_rx,
     dcomplex_cst_rx,
     dcomplex_cst2_rx;
-
-static void
-insert_at(string * line, /* string to be modified, may be reallocated */
-	  int offset, /* where to insert */
-	  string what /* to be inserted */)
-{
-    int i, len=strlen(*line), shift=strlen(what);
-    *line = (char*) realloc(*line, sizeof(char)*(len+shift+1));
-    if (!*line) pips_internal_error("realloc failed\n");
-
-    for (i=len; i>=offset; i--)
-	(*line)[i+shift]=(*line)[i];
-
-    for (shift--; shift>=0; shift--)
-	(*line)[offset+shift]=what[shift];
-}
-
-#define CONTINUATION "\n     x "
-
-static void add_continuation_if_needed(string * line)
-{
-    int len = strlen(*line);
-    if (len<=73) return; /* nothing to do */
-    /* else let us truncate */
-    {
-	int i = 71;
-	while (i>5 && (isalnum((int) (*line)[i]) || (*line)[i]=='_')) 
-	    i--;
-	pips_assert("still in line", i>5);
-	insert_at(line, i, CONTINUATION);
-    }
-}
-
-/* return if modified
- */
-static bool try_this_one(
-    regex_t * prx, 
-    string * line,
-    string replacement, 
-    bool was_modified)
-{
-    bool modified = FALSE;
-    regmatch_t matches[2]; /* matched strings */
-
-    while (!regexec(prx, *line, 2, matches, 0)) {
-	if (!was_modified && !modified && strlen(*line)>73) {
-	    pips_user_warning("line truncated in complex constant handling");
-	    (*line)[72] = '\n', (*line)[73] = '\0';
-	}
-	modified = TRUE;
-	insert_at(line, matches[1].rm_so, replacement);
-    }
-    
-    return modified;
-}
-
-/* an assigned goto may look like "goto l, (10,20)",
- * and we wish not to consider (10,20) as a complex constant...
- */
-/*
-static void handle_complex_constants(string * line)
-{
-    bool diff = FALSE;
-
-    if (!regexec(&some_goto_rx, *line, 0, NULL, 0)) return;
-
-    diff |= try_this_one(&complex_cst_rx, line, IMPLIED_COMPLEX_NAME, diff);
-    diff |= try_this_one(&complex_cst2_rx, line, IMPLIED_COMPLEX_NAME, diff);
-    diff |= try_this_one(&dcomplex_cst_rx, line, IMPLIED_DCOMPLEX_NAME, diff);
-    diff |= try_this_one(&dcomplex_cst2_rx, line, IMPLIED_DCOMPLEX_NAME, diff);
-
-    if (diff) add_continuation_if_needed(line);
-}
-*/
 
 /* tries several path for a file to include...
  * first rely on $PIPS_SRCPATH, then other directories.
@@ -953,6 +886,7 @@ bool process_user_file(string file)
 
   static int number_of_files = 0;
   static int number_of_modules = 0;
+  static int resource_name_conflicts = 0;
 
   number_of_files++;
   pips_debug(1, "file %s (number %d)\n", file, number_of_files);
@@ -1022,7 +956,7 @@ bool process_user_file(string file)
    * The file_list allows split to communicate with this function.
    */
   fd = safe_fopen(file_list, "r");
-  while ((a_line = safe_readline(fd))) 
+  while ((a_line = safe_readline(fd)) && resource_name_conflicts == 0) 
     {
       string mod_name = NULL, res_name = NULL, abs_res, file_name;
       list modules = NIL;
@@ -1050,6 +984,8 @@ bool process_user_file(string file)
 
 	if (!renamed)
 	  {
+	    FILE * rf = NULL;
+
 	    if(dot_c_file_p(nfile)) {
 	      res_name = db_build_file_resource_name
 		(DBR_C_SOURCE_FILE, mod_name, ".c");
@@ -1061,6 +997,17 @@ bool process_user_file(string file)
 	    
 	    abs_res = strdup(concatenate(dir_name, "/", res_name, 0));
 		
+	    if((rf = fopen(abs_res, "r"))!=NULL) { /* Resource name
+                                                      conflict */
+	      string ofile = db_get_memory_resource(DBR_USER_FILE, mod_name, TRUE);
+
+	      fclose(rf);
+	      pips_user_warning("Duplicate module name \"%s\" from files \"%s\" and \"%s\".\n",
+				res_name, ofile, nfile);
+	      resource_name_conflicts++;
+	      break;
+	    }
+
 	    if (rename(file_name, abs_res))
 	      {
 		perror("process_user_file");
@@ -1113,5 +1060,7 @@ bool process_user_file(string file)
   }
   free(nfile);
 
-  return TRUE; /* well, returns ok whether modules were found or not. */
+  return resource_name_conflicts==0; /* well, returns ok whether modules
+                                        were found or not, but do not
+                                        accept name conflicts. */
 }
