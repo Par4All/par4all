@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.82  1997/09/19 17:33:57  coelho
+ * SAVE & dims fixed again...
+ *
  * Revision 1.81  1997/09/19 17:17:06  coelho
  * SAVE and dimensions
  *
@@ -60,7 +63,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.81 1997/09/19 17:17:06 coelho Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.82 1997/09/19 17:33:57 coelho Exp $";
 #endif /* lint */
  /*
   * Prettyprint all kinds of ri related data structures
@@ -1056,6 +1059,13 @@ sentence_variable(entity e)
 			 make_unformatted(NULL, 0, 0, pc)));
 }
 
+static bool
+empty_static_area_p(entity e)
+{
+    if (!static_area_p(e)) return FALSE;
+    return ENDP(area_layout(type_area(entity_type(e))));
+}
+
 /*  special management of empty commons added.
  *  this may happen in the hpfc generated code.
  */
@@ -1732,7 +1742,7 @@ text_entity_declaration(entity module, list ldecl)
 		before = CONS(SENTENCE, sentence_external(e), before);
 	    }
 	 }
-	else if (area_p && !dynamic_area_p(e))
+	else if (area_p && !dynamic_area_p(e) && !empty_static_area_p(e))
 	{
 	    /*            AREAS: COMMONS and SAVEs
 	     */	     
