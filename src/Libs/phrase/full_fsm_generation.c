@@ -31,8 +31,6 @@ typedef dg_vertex_label vertex_label;
 
 #include "fsm_generation.h"
 
-static graph dependence_graph;
-
 /*********************************************************
  * Phase main
  *********************************************************/
@@ -51,12 +49,15 @@ bool full_fsm_generation(string module_name)
   
   set_current_module_statement(stat);
   set_current_module_entity(local_name_to_top_level_entity(module_name));
-  dependence_graph = 
-    (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
   
   debug_on("FSM_GENERATION_DEBUG_LEVEL");
+
   /* Now do the job */
-  
+
+  /* In fact, there is nothing to do because this phase is the 
+   * succession of the two phases FULL_SPAGHETTIFY and FSM_GENERATION
+   */
+
   pips_assert("Statement is consistent after FULL_FSM_GENERATION", 
 	       statement_consistent_p(stat));
   
