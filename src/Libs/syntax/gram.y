@@ -362,9 +362,8 @@ io_inst:  io_keyword io_f_u_id
 		    FatalError("Syntax","Illegal use of WRITE");
 		case TK_READ:
 		case TK_PRINT:
-		    std = ($1 == TK_PRINT) ?
-			MakeIntegerConstantExpression("6") :
-			    MakeIntegerConstantExpression("5");
+		    std = MakeNullaryCall(CreateIntrinsic
+					  (LIST_DIRECTED_FORMAT_NAME));
 		    unite = MakeCharacterConstantExpression("UNIT=");
 		    format = MakeCharacterConstantExpression("FMT=");
 
@@ -402,9 +401,8 @@ io_inst:  io_keyword io_f_u_id
 		    FatalError("Syntax","Illegal use of WRITE");
 		case TK_READ:
 		case TK_PRINT:
-		    std = ($1 == TK_PRINT) ?
-			MakeIntegerConstantExpression("6") :
-			    MakeIntegerConstantExpression("5");
+		    std = MakeNullaryCall(CreateIntrinsic
+					  (LIST_DIRECTED_FORMAT_NAME));
 		    unite = MakeCharacterConstantExpression("UNIT=");
 		    format = MakeCharacterConstantExpression("FMT=");
 
