@@ -1,7 +1,7 @@
 /* HPFC module by Fabien COELHO
  *
  * $RCSfile: remapping.c,v $ version $Revision$
- * ($Date: 1995/06/09 16:53:19 $, ) 
+ * ($Date: 1995/07/11 22:10:42 $, ) 
  *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
@@ -74,13 +74,33 @@ entity (*create_var)(/* int */);
     return(contrainte_make(v));
 }
 
-static Psysteme generate_work_sharing_system(src, trg)
+/* lambda = Psi'_D / |Psi_R|
+ */
+/*
+static statement
+compute_lambda(src, trg)
+entity src, trg;
+{
+    entity idiv = hpfc_name_to_entity(HPFC_DIVIDE),
+           lambda = get_ith_temporary_dummy(3);
+    Pcontrainte p1, p2;
+    int s1, s2;
+
+    p1 = partial_linearization(src, FALSE, NULL, &s1, get_ith_processor_dummy);
+    p2 = partial_linearization(src, TRUE, NULL, &s2, get_ith_processor_prime);
+    
+    
+}
+*/
+
+static Psysteme 
+generate_work_sharing_system(src, trg)
 entity src, trg;
 {
     entity psi_r = get_ith_temporary_dummy(1),
            psi_d = get_ith_temporary_dummy(2),
            delta = get_ith_temporary_dummy(3);
-    int size_r, size_d, block_size;
+    int size_r, size_d;
     Psysteme sharing = sc_new();
 
     sc_add_egalite(sharing, partial_linearization(src, FALSE, psi_r, &size_r, 
@@ -88,26 +108,34 @@ entity src, trg;
     sc_add_egalite(sharing, partial_linearization(trg, TRUE, psi_d, &size_d,
 						  get_ith_processor_prime));
     
-    block_size = ((size_d-1)/size_r)+1 ;
-
-    /* psi_d = block_size * psi_r + delta
+    /* psi_d = psi_r + |psi_r| delta
      */
     sc_add_egalite(sharing, contrainte_make(vect_make(VECTEUR_NUL, 
 						      psi_d, -1, 
-						      psi_r, block_size,
-						      delta, 1)));
+						      psi_r, 1,
+						      delta, size_r)));
 
-    /* 0 <= delta < block_size
-     */
-    sc_add_inegalite(sharing, contrainte_make
-		     (vect_make(VECTEUR_NUL, delta, -1, TCST, 0)));
-    sc_add_inegalite(sharing, contrainte_make
-		     (vect_make(VECTEUR_NUL, delta, 1, TCST, 1-block_size)));
+    if (size_d >= size_r)
+    {
+	/* 0 <= delta (there are cycles)
+	 */
+	sc_add_inegalite(sharing, contrainte_make
+			 (vect_make(VECTEUR_NUL, delta, -1, TCST, 0)));
+    }
+    else
+    {
+	/* delta == 0
+	 */
+	sc_add_egalite(sharing, contrainte_make(vect_new((Variable) delta, 1)));
+    }
 
-    return(sharing);
+    sc_creer_base(sharing);
+
+    return sharing;
 }
 
-static Psysteme generate_remapping_system(src, trg)
+static Psysteme 
+generate_remapping_system(src, trg)
 entity src, trg;
 {
     int ndim = variable_entity_dimension(src);
@@ -179,7 +207,8 @@ list *pl, 	/* P */
 
     /*    corresponding equations generated in the sharing system
      */
-    add_to_list_of_vars(*plrm, get_ith_temporary_dummy, 3);
+    add_to_list_of_vars(*plrm, get_ith_temporary_dummy, 2);
+    
 
     /*    Replicated dimensions associated variables must be removed.
      *    A nicer approach would have been not to generate them, but
@@ -204,7 +233,9 @@ list *pl, 	/* P */
 
     /*   others.
      */
-    *plo = base_to_list(sc_base(s)), gen_remove(plo, (entity) TCST);
+    *plo = base_to_list(sc_base(s)); 
+    gen_remove(plo, (entity) TCST);
+
     MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *pl);
     MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *plp);
     MAPL(ce, gen_remove(plo, ENTITY(CAR(ce))), *plrm);
@@ -219,6 +250,7 @@ list *pl, 	/* P */
 }
 
 /* to be generated:
+ * ??? the Proc cycle should be deduce directly in some case...
  *
  *   PSI_i's definitions
  *   [ IF (I AM IN S(PSI_i)) THEN ]
@@ -371,12 +403,18 @@ list /* of entity */ ldiff;
     return(systeme_to_loop_nest(sr, ldiff, body, hpfc_name_to_entity(IDIVIDE)));
 }
 
+/* in the following functions tag t controls the code generation, 
+ * depending of what is to be generated (send, receive, copy, broadcast)...
+ * tag t may have the following values:
+ */
+
 #define COPY 0
 #define SEND 1
 #define RECV 2
 #define DIFF 3
 
-static statement pre(t, lid)
+static statement 
+pre(t, lid)
 int t;
 entity lid;
 {
@@ -386,7 +424,8 @@ entity lid;
 	   statement_undefined);
 }
 
-static statement in(t, src, trg, create_src, create_trg)
+static statement 
+in(t, src, trg, create_src, create_trg)
 int t;
 entity src, trg;
 entity (*create_src)(), (*create_trg)();
@@ -399,7 +438,8 @@ entity (*create_src)(), (*create_trg)();
 	   statement_undefined);
 }
 
-static statement post(t, lid, proc, sr, ldiff)
+static statement 
+post(t, lid, proc, sr, ldiff)
 int t;
 entity lid, proc;
 Psysteme sr;
@@ -450,40 +490,45 @@ Psysteme *pwith, *pwithout;
 }
 
 static statement
-generate_remapping_code(src, trg, procs, locals, l, lp, ll, ldiff, ld)
+generate_remapping_code(src, trg, procs, locals, l, lp, ll, ldiff, ld, dist_p)
 entity src, trg;
 Psysteme procs, locals;
 list /* of entities */ l, lp, ll, ldiff, /* of expressions */ ld;
+bool dist_p; /* true if must take care of lambda */
 {
     entity lid = hpfc_name_to_entity(T_LID),
            p_src = array_to_processors(src),
-           p_trg = array_to_processors(trg);
-    statement remap_copy, remap_recv, send, recv, cont, result;
+           p_trg = array_to_processors(trg),
+           lambda = get_ith_temporary_dummy(3);
+    statement rp_copy, rp_recv, send, recv, cont, result;
 
-    remap_copy = 
-	remapping_stats(0, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
-    remap_recv = 
-	remapping_stats(2, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
+    pips_debug(3, "%s taking care of processor cyclic distribution\n", 
+	       dist_p ? "actually" : "not");
+
+    rp_copy = remapping_stats(0, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
+    rp_recv = remapping_stats(2, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
+
+    if (dist_p) lp = CONS(ENTITY, lambda, lp);
 
     /* the send is different for diffusions
      */
     if (ENDP(ldiff))
     {
-	statement remap_send;
+	statement rp_send;
 
-	remap_send =
+	rp_send =
 	    remapping_stats(1, locals, SC_EMPTY, ll, NIL, ld, lid, src, trg);
     
 	send = processor_loop
 	    (procs, l, lp, p_src, p_trg, lid,
 	     get_ith_processor_dummy, get_ith_processor_prime,
-	     if_different_pe(lid, remap_send, make_empty_statement()), FALSE);
+	     if_different_pe(lid, rp_send, make_empty_statement()), FALSE);
     }
     else
     {
 	Pbase b = entity_list_to_base(ldiff);
 	list lpproc = gen_copy_seq(lp);
-	statement remap_diff;
+	statement rp_diff;
 	Psysteme 
 	    sd /* distributed */, 
 	    sr /* replicated */;
@@ -495,21 +540,29 @@ list /* of entities */ l, lp, ll, ldiff, /* of expressions */ ld;
 	sc_separate_on_vars(procs, b, &sr, &sd);
 	base_rm(b);
 
-	remap_diff = 
+	rp_diff = 
 	    remapping_stats(3, locals, sr, ll, ldiff, ld, lid, src, trg);
 
 	send = processor_loop
 	    (sd, l, lpproc, p_src, p_trg, NULL,
 	     get_ith_processor_dummy, get_ith_processor_prime,
-	     remap_diff, FALSE);
+	     rp_diff, FALSE);
 
 	gen_free_list(lpproc); sc_rm(sd); sc_rm(sr);
+    }
+
+    if (dist_p) 
+    {
+	gen_remove(&lp, lambda);
+	l = gen_nconc(l, CONS(ENTITY, lambda, NIL)); /* ??? to be deduced */
     }
 
     recv = processor_loop
 	(procs, lp, l, p_trg, p_src, lid,
 	 get_ith_processor_prime, get_ith_processor_dummy,
-	 if_different_pe(lid, remap_recv, remap_copy), TRUE);
+	 if_different_pe(lid, rp_recv, rp_copy), TRUE);
+
+    if (dist_p) gen_remove(&l, lambda);
 
     cont = make_empty_statement();
 
@@ -539,6 +592,8 @@ entity src, trg;
 {
     Psysteme p, proc, enume;
     statement s;
+    entity lambda = get_ith_temporary_dummy(3) ; /* P cycle */
+    bool proc_distribution_p;
     list /* of entities */ l, lp, ll, lrm, ld, lo, left, scanners,
          /* of expressions */ lddc;
 
@@ -553,6 +608,13 @@ entity src, trg;
     clean_the_system(&p, &lrm, &lo);
     lddc = simplify_deducable_variables(p, ll, &left);
     gen_free_list(ll);
+    
+    /* the P cycle ?
+     */
+    proc_distribution_p = gen_in_list_p(lambda, lo);
+
+    if (proc_distribution_p) gen_remove(&lo, lambda);
+
     scanners = gen_nconc(lo, left);
 
     DEBUG_SYST(4, "cleaned system", p);
@@ -568,8 +630,8 @@ entity src, trg;
 
     /*   generates the code.
      */
-    s = generate_remapping_code(src, trg, proc, enume, 
-                                l, lp, scanners, ld, lddc);
+    s = generate_remapping_code
+	(src, trg, proc, enume, l, lp, scanners, ld, lddc, proc_distribution_p);
 
     /*   clean.
      */
