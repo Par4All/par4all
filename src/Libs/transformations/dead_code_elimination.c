@@ -604,7 +604,8 @@ dead_statement_rewrite(statement s)
           end of the function: */
        break;
 
-   case is_instruction_loop:
+   case is_instruction_loop:   
+   case is_instruction_whileloop:
        break;
     
    case is_instruction_test: 
