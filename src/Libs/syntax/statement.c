@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: statement.c,v $
+ * Revision 1.49  1998/12/14 13:34:11  coelho
+ * macro are better detected.
+ *
  * Revision 1.48  1998/11/27 14:59:38  irigoin
  * MakeIoInstA() is reformatted and modified because UNIT is not a mandatory
  * field for INQUIRE.
@@ -862,11 +865,13 @@ MakeAssignInst(syntax l, expression e)
        }
        else
        {
-	   if(syntax_call_p(l)) 
+	   if (syntax_call_p(l) && 
+	     !value_symbolic_p(entity_initial(call_function(syntax_call(l)))))
 	   {
 	       if (get_bool_property("PARSER_EXPAND_STATEMENT_FUNCTIONS"))
 	       {
-		   /* Let us keep the statement function definition somewhere. */
+		   /* Let us keep the statement function definition somewhere.
+		    */
 		   /* Preserve the current comments as well as the information
 		      about the macro substitution */
 		   statement stmt1 = make_continue_statement(entity_empty_label());
