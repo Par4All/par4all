@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: define_libraries.sh,v $
+# Revision 1.22  1997/08/22 07:11:23  coelho
+# forgotten '
+#
 # Revision 1.21  1997/08/19 14:58:33  coelho
 # FPIPS_... variables added.
 #
@@ -108,7 +111,7 @@ WPIPS_MAIN='main_wpips.o'
 # FPIPS
 
 FPIPS_ADDED_CPPFLAGS='$(WPIPS_ADDED_CPPFLAGS)'
-FPIPS_ADDED_LDFLAGS='$(WPIPS_ADDED_LDFLAGS)
+FPIPS_ADDED_LDFLAGS='$(WPIPS_ADDED_LDFLAGS)'
 FPIPS_ADDED_LIBS='-lpips -ltpips -lwpips $(TPIPS_ADDED_LIBS) $(WPIPS_ADDED_LIBS)'
 
 FPIPS_MAIN='main_fpips.o'
