@@ -4,7 +4,7 @@
  *
  * SCCS stuff:
  * $RCSfile: system_to_code.c,v $ version $Revision$, 
- * ($Date: 1997/04/19 12:08:28 $, ) 
+ * ($Date: 1997/08/04 13:46:12 $, ) 
  */
 
 /* Standard includes
@@ -37,7 +37,6 @@
 #include "control.h"
 #include "regions.h"
 #include "semantics.h"
-#include "effects.h"
 
 #include "conversion.h"
 
