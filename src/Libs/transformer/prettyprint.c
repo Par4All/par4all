@@ -10,6 +10,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.11  2003/07/24 08:53:06  irigoin
+ * Arguments now used in obsolete functions to avoid compiler warnings
+ *
  * Revision 1.10  2003/07/24 08:38:32  irigoin
  * generic_value_name() made a little bit more robust
  *
@@ -42,20 +45,20 @@
 
 string transformer_to_string(transformer tf)
 {
-    pips_internal_error("not implemenented anymore\n");
+    pips_internal_error("not implemenented anymore, tf=%p\n", tf);
     return string_undefined;
 }
 
 string precondition_to_string(pre)
 transformer pre;
 {
-    pips_internal_error("not implemenented anymore\n");
+    pips_internal_error("not implemenented anymore, pre=%p\n", pre);
     return string_undefined;
 }
 
 string arguments_to_string(string s, list args)
 {
-    pips_internal_error("not implemenented anymore\n");
+    pips_internal_error("not implemenented anymore, s=\"%s\", args=%p\n", s, args);
     return string_undefined;
 }
 
@@ -65,7 +68,7 @@ relation_to_string(
     Psysteme ps,
     char * (*variable_name)(entity))
 {
-    pips_internal_error("not implemenented anymore\n");
+    pips_internal_error("not implemenented anymore, s=\"%s\", ps=%p, variable_name=%p\n", s, ps, variable_name);
     return string_undefined;
 }
 
