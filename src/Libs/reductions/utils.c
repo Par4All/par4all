@@ -1,5 +1,5 @@
 /* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1997/04/16 11:45:05 $, 
+ * $Date: 1997/07/18 15:25:37 $, 
  *
  * utilities for reductions.
  *
@@ -497,7 +497,7 @@ equal_reference_in_expression_p(
 		      NULL);
 
     *pfound = fsr_found;
-    return (bool)fsr_found && fsr_okay;
+    return (fsr_found != NULL) && fsr_okay;
 }
 
 /******************************************************** NO OTHER EFFECTS */
@@ -548,8 +548,7 @@ call_proper_reduction_p(
     tag op;
     bool comm;
 
-    pips_debug(7, "call to %s (0x%x)\n", 
-	       entity_name(call_function(c)), (unsigned int) s);
+    pips_debug(7, "call to %s (%#p)\n", entity_name(call_function(c)), s);
 
     if (!ENTITY_ASSIGN_P(call_function(c))) 
 	return FALSE;
@@ -580,7 +579,7 @@ call_proper_reduction_p(
      */
     if (!equal_reference_in_expression_p(lhs, erhs, op, &other))
 	return FALSE;
-    pips_debug(8, "matching reference found (0x%x)\n", (unsigned int) other);
+    pips_debug(8, "matching reference found (%#p)\n", other);
     
     /* there should be no extract effects on the reduced variable
      */
