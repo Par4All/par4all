@@ -1,5 +1,5 @@
 /* package sc : $RCSfile: sc_feasibility.c,v $ version $Revision$
- * date: $Date: 1996/08/07 13:41:36 $, 
+ * date: $Date: 1996/08/07 14:00:37 $, 
  * got on %D%, %T%
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * 
@@ -30,7 +30,6 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <setjmp.h>
 #include <assert.h>
 #include <malloc.h>
 
@@ -40,8 +39,6 @@
 #include "contrainte.h"
 #include "sc.h"
 #include "sc-private.h"
-
-extern jmp_buf overflow_error;
 
 /* 
  * INTERFACES
@@ -280,7 +277,7 @@ Pbase b;
  *  Psysteme s    : systeme lineaire 
  *
  * Le controle de l'overflow est effectue et traite par le retour 
- * du contexte correspondant au dernier setjmp(overflow_error) effectue.
+ * du contexte correspondant au dernier CATCH(overflow_error) effectue.
  */
 boolean 
 sc_fourier_motzkin_feasibility_ofl_ctrl(s, integer_p, ofl_ctrl)
