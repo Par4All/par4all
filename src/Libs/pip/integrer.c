@@ -3,6 +3,17 @@
 #include "tab.h"
 extern long int cross_product, limit;
 
+extern int fprintf();
+extern int fflush();
+extern sscanf();
+
+extern Entier pgcd();
+extern void sol_new();
+extern void sol_div();
+extern void sol_forme();
+extern void sol_val();
+extern int llog();
+
 Entier mod(x, y)
 Entier x, y;
 {Entier r;
@@ -34,7 +45,6 @@ int *pnvar, *pnparm, *pni, *pnc;
 int D;
 {int ncol = *pnvar+*pnparm+1;
  int nligne = *pnvar + *pni;
- int nparm = *pnparm;
  Entier coupure[MAXCOL];
  int i, j, k, ff;
  Entier x, d;
