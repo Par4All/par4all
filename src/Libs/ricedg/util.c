@@ -61,7 +61,7 @@ compute_ordering_to_dg_mapping(graph dependance_graph)
        a_vertex,
        {
           debug(7, "compute_ordering_to_dg_mapping",
-                "\tSuccessor list: %#p for statement ordering %#p\n", 
+                "\tSuccessor list: %p for statement ordering %p\n", 
                 vertex_successors(a_vertex),
                 dg_vertex_label_statement(vertex_vertex_label(a_vertex)));
 
