@@ -4,7 +4,7 @@
  * Fabien Coelho, May 1993
  *
  * SCCS Stuff:
- * $RCSfile: compile.c,v $ ($Date: 1994/11/28 14:45:01 $) version $Revision$, got on %D%, %T%
+ * $RCSfile: compile.c,v $ ($Date: 1994/12/06 14:42:47 $) version $Revision$, got on %D%, %T%
  * %A%
  */
 
@@ -19,7 +19,6 @@ extern int fprintf();
 extern int vfprintf();
 extern int system();
 
-#include "types.h"
 #include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
