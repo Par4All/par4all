@@ -1,39 +1,39 @@
 
 
 add[3] {
-	simd_add8: 8,8;
-	simd_add4: 4,16;
-	simd_add2: 2,32;
+	SIMD_ADD8: 8,8;
+	SIMD_ADD4: 4,16;
+	SIMD_ADD2: 2,32;
 }
 
 multiply[3] {
-	simd_mul8: 8,8;
-	simd_mul4: 4,16;
-	simd_mul2: 2,32;
+	SIMD_MUL8: 8,8;
+	SIMD_MUL4: 4,16;
+	SIMD_MUL2: 2,32;
 }
 
 divide[3] {
-	simd_div8: 8,8;
-	simd_div4: 4,16;
-	simd_div2: 2,32;
+	SIMD_DIV8: 8,8;
+	SIMD_DIV4: 4,16;
+	SIMD_DIV2: 2,32;
 }
 
 substract[3] {
-	simd_sub8: 8,8;
-	simd_sub4: 4,16;
-	simd_sub2: 2,32;
+	SIMD_SUB8: 8,8;
+	SIMD_SUB4: 4,16;
+	SIMD_SUB2: 2,32;
 }
 
 assign[2] {
-	simd_mov: 8,8;
-	simd_mov: 4,16;
-	simd_mov: 2,32;
+	SIMD_MOV: 8,8;
+	SIMD_MOV: 4,16;
+	SIMD_MOV: 2,32;
 }
 
 oppose[2] {
-	simd_opp8: 8,8;
-	simd_opp4: 4,16;
-	simd_opp2: 2,32;
+	SIMD_OPP8: 8,8;
+	SIMD_OPP4: 4,16;
+	SIMD_OPP2: 2,32;
 }
 
 
