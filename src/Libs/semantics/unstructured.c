@@ -61,6 +61,9 @@
   * $Id$
   *
   * $Log: unstructured.c,v $
+  * Revision 1.8  2001/10/22 15:47:27  irigoin
+  * New interface to cope with transformers computed using preconditions
+  *
   * Revision 1.7  2001/07/19 17:59:56  irigoin
   * Improved debugging messages. Bug fix for Validation/tilt.f and tilt3.f:
   * secondary_entries were not passed down or computed correcty and internal
@@ -415,13 +418,15 @@ static transformer load_predecessor_postcondition_or_test_condition
     else {
       /* True branch of a test */
       expression e = test_condition(statement_test(stmt));
-      post = precondition_add_condition_information(post, e, TRUE);
+      post = precondition_add_condition_information(post, e,
+						    transformer_undefined, TRUE);
     }
   }
   else {
     /* Must be the false branch of a test */
     expression e = test_condition(statement_test(stmt));
-    post = precondition_add_condition_information(post, e, FALSE);
+    post = precondition_add_condition_information(post, e,
+						  transformer_undefined, FALSE);
   }
 
   return post;
@@ -513,7 +518,7 @@ static bool process_unreachable_node(control c,
       /* Careful, this may have been done earlier by the CONTROL_MAP in
          unstructured_to_transformers() */
       if(transformer_undefined_p(load_statement_transformer(s))) {
-	(void) statement_to_transformer(s);
+	(void) statement_to_transformer(s, transformer_undefined);
       }
       post = transformer_empty();
     }
@@ -542,7 +547,7 @@ static bool process_unreachable_node(control c,
   else if(!postcondition_p
 	  && transformer_undefined_p(load_statement_transformer(s))) {
     /* Problem with SHALLOW in SWIM */
-    (void) statement_to_transformer(s);
+    (void) statement_to_transformer(s, transformer_undefined);
 
     pips_user_warning("After restructuration (?),"
 		      " transformer for unexpected unreachable node:%s",
@@ -1496,6 +1501,8 @@ static void subcycle_to_postconditions(list cycle,
   list tail = list_undefined;
   transformer pre = transformer_undefined;
 
+  pips_assert("to please the compiler", secondary_entries==secondary_entries);
+
   pips_debug(5, "Begin for head %s", 
 	     statement_identification(control_statement(h)));
 
@@ -1677,10 +1684,10 @@ static void process_cycle_in_scc(list scc, list cycle, transformer pre_entry,
       }
 
       if(cnext==CONTROL(CAR(control_successors(c)))) {
-	tfp = transformer_add_condition_information(tfp, e, TRUE);
+	tfp = transformer_add_condition_information(tfp, e, transformer_undefined, TRUE);
       }
       else {
-	tfp = transformer_add_condition_information(tfp, e, FALSE);
+	tfp = transformer_add_condition_information(tfp, e, transformer_undefined, FALSE);
       }
     }
   }, cycle);
@@ -2165,6 +2172,8 @@ transformer unstructured_to_accurate_postconditions_or_transformer
     statement_mapping smap;
   } context = { postcondition_p, control_postcondition_map };
 
+  pips_assert("to please the compiler", pre_u==pre_u);
+
   ifdebug(2) {
     pips_debug(2, "Begin for %s for nodes:\n",
 	       postcondition_p? "postconditions" : "transformer");
@@ -2334,12 +2343,10 @@ unstructured_to_postconditions(
 	  /* the condition is TRUE if c is the first successor of prev_c */
 	  bool true_false = (c==(CONTROL(CAR(control_successors(prev_c)))));
 	  expression e = test_condition(statement_test(prev_st));
+	  transformer context = transformer_range(pre);
 
-	  c_pre_m = precondition_add_condition_information(c_pre, e, true_false);
-	  /* If the free is performed, core dump guaranteed on some
-             examples: see unclear comments about the previously called
-             function:-( */
-	  /* free_transformer(c_pre); */
+	  c_pre_m = precondition_add_condition_information(c_pre, e, context, true_false);
+	  free_transformer(context);
 	}
       }
 
@@ -2412,7 +2419,7 @@ static void unreachable_node_to_transformer(control c)
   if(transformer_undefined_p(load_statement_transformer(s))) {
     pips_user_warning("After restructuration, unexpected unreachable node:%s",
 		      statement_identification(s));
-    (void) statement_to_transformer(s);
+    (void) statement_to_transformer(s, transformer_undefined);
   }
 }
 
@@ -2498,12 +2505,15 @@ unstructured_to_global_transformer(
 }
 
 /* It is assumed that all transformers for nodes in u have already been computed */
-transformer unstructured_to_accurate_transformer(unstructured u, list e)
+transformer unstructured_to_accurate_transformer(unstructured u, transformer pre, list e)
 {
   transformer tf = transformer_undefined;
   list succs = NIL;
   control head = unstructured_control(u);
   control tail = unstructured_exit(u);
+
+  /* pre should be used */
+  pips_assert("to please the compiler", pre==pre);
 
   forward_control_map_get_blocs(head, &succs);
 
