@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1996/07/12 15:45:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1996/07/26 14:19:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_select[] = "%A% ($Date: 1996/07/12 15:45:17 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_select[] = "%A% ($Date: 1996/07/26 14:19:05 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdio.h>
@@ -514,46 +514,51 @@ void
 end_create_workspace_notify(int * pargc,
                             char * argv[])
 {
-   /* Is the name a valid workspace name? */
-   if (workspace_name_p(workspace_name_to_create)) {
-      if (db_create_workspace(workspace_name_to_create)) {
-         /* The create workspace has been successful: */
-	  /* open_log_file(); */
-         display_memory_usage();
+    /* If the user click quickly on OK, be sure
+       end_create_workspace_notify() is not reentrant by verifying
+       something as not been opened already: */
+    if (db_get_current_workspace_name() == NULL) {
+	/* Is the name a valid workspace name? */
+	if (workspace_name_p(workspace_name_to_create)) {
+	    if (db_create_workspace(workspace_name_to_create)) {
+		/* The create workspace has been successful: */
+		/* open_log_file(); */
+		display_memory_usage();
          
-         if (create_workspace(pargc, argv)) {
-            /* The processing of user files has been successful: */
-            enable_workspace_close();
+		if (create_workspace(pargc, argv)) {
+		    /* The processing of user files has been successful: */
+		    enable_workspace_close();
 
-            show_workspace();
-            select_a_module_by_default();
-            enable_module_selection();
-            disable_change_directory();
+		    show_workspace();
+		    select_a_module_by_default();
+		    enable_module_selection();
+		    disable_change_directory();
             
-            enable_workspace_create_or_open();
-            enable_workspace_delete_or_open();
+		    enable_workspace_create_or_open();
+		    enable_workspace_delete_or_open();
 
-	    /* Tell Emacs the new module list: */
-	    send_the_names_of_the_available_modules_to_emacs();
+		    /* Tell Emacs the new module list: */
+		    send_the_names_of_the_available_modules_to_emacs();
 
-            display_memory_usage();
+		    display_memory_usage();
          
-            return;
-         }
-         else
-	     /* close_log_file(); */
-	     ;
-      }
-   }
-   else
-      user_prompt_not_a_valid_workspace_name(workspace_name_to_create);
+		    return;
+		}
+		else
+		    /* close_log_file(); */
+		    ;
+	    }
+	}
+	else
+	    user_prompt_not_a_valid_workspace_name(workspace_name_to_create);
 
-   /* The creation failed: */
-   enable_change_directory();
-   enable_workspace_create_or_open();
-   enable_workspace_delete_or_open();
+	/* The creation failed: */
+	enable_change_directory();
+	enable_workspace_create_or_open();
+	enable_workspace_delete_or_open();
    
-   display_memory_usage();
+	display_memory_usage();
+    }
 }
 
 
