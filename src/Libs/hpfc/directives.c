@@ -5,7 +5,7 @@
  * I'm definitely happy with this. FC.
  *
  * $RCSfile: directives.c,v $ version $Revision$,
- * ($Date: 1995/10/18 13:13:25 $, )
+ * ($Date: 1995/10/22 12:00:54 $, )
  */
 
 #include "defines-local.h"
@@ -115,6 +115,24 @@ static void new_dynamic(expression e)
     pips_debug(3, "entity is %s\n", entity_name(a));
 }
 
+/* array is to be seen as a template. aligned to itself...
+ */
+static void array_as_template(entity array)
+{
+    int ndim = NumberOfDimension(array);
+    list /* of alignment */ l = NIL;
+
+    set_array_as_distributed(array);
+    set_template(array);
+
+    for(; ndim>0; ndim--)
+        l = CONS(ALIGNMENT, make_alignment(ndim, ndim,
+                                           Value_to_expression(1),
+                                           Value_to_expression(0)), l);
+
+    store_entity_align(array, make_align(l, array));
+}
+
 /* one simple ALIGN directive is handled.
  * retrieve the alignment from references array and template
  */
@@ -192,6 +210,9 @@ extract_the_align(reference alignee,
            array = reference_variable(alignee);
     int array_dim, template_dim, tndim, andim;
     Value rate, shift;
+
+    if (!entity_template_p(template))
+        array_as_template(template);
 
     pips_user_assert("align with a template", entity_template_p(template));
     tndim = NumberOfDimension(template);
@@ -378,6 +399,9 @@ extract_the_distribute(reference distributee, reference proc)
 	/* of distributions */ ldist = NIL;
     int npdim, ntdim;
     tag format;
+
+    if (!entity_template_p(template))
+        array_as_template(template);
 
     ntdim = NumberOfDimension(template);
     npdim = NumberOfDimension(processor);
