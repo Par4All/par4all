@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: procedure.c,v $
+ * Revision 1.57  1998/12/24 13:45:19  irigoin
+ * Bug fixes in MaKeEntry() to handle cases when a call site to the entry has been encountered before the entry is parsed
+ *
  * Revision 1.56  1998/12/18 19:48:37  irigoin
  * Function CreateIntrinsic() moved in ri-util/entity.c
  *
@@ -756,12 +759,18 @@ MakeCurrentFunction(
 	}
     }
 
-    /* clean up existing local entities in case of a recompilation */
+    /* Clean up existing local entities in case of a recompilation. */
     CleanLocalEntities(cf);
 
-    /* the parameters part of cf's functional type is not created
-       because the type of formal parameters is not known. this is done by
-       UpdateFunctionalType. */
+    /* The parameters part of cf's functional type is not created because
+       the types of formal parameters are not known yet. This is performed
+       later by UpdateFunctionalType().
+
+       If a call to the function has been encountered before, it's already
+       typed. However, this information is discarded.  */
+    if(!type_undefined_p(entity_type(cf))) {
+	free_type(entity_type(cf));
+    }
     entity_type(cf) = make_type(is_type_functional, make_functional(NIL, t));
 
     /* a function has a rom storage */
@@ -1114,9 +1123,9 @@ MakeEntry(
 	 * if not.
 	 */
 	/* Too early: StaticArea is not defined yet. Postpone to ProcessEntry.
-	if(area_size(type_area(entity_type(StaticArea)))!=0) {
-	    MakeEntryCommon(cm, StaticArea);
-	}
+	   if(area_size(type_area(entity_type(StaticArea)))!=0) {
+	   MakeEntryCommon(cm, StaticArea);
+	   }
 	*/
     }
 
@@ -1139,6 +1148,13 @@ MakeEntry(
 
     lefp = TranslateEntryFormals(fe, lfp);
     UpdateFormalStorages(fe, lefp);
+
+    /* Entry fe may have been encountered earlier and typed from the
+       parameter list */
+    if(!type_undefined_p(entity_type(fe))) {
+	free_type(entity_type(fe));
+	entity_type(fe) = type_undefined;
+    }
     TypeFunctionalEntity(fe, rt);
     UpdateFunctionalType(fe, lefp);
 
@@ -1158,17 +1174,24 @@ MakeEntry(
 	value val = entity_initial(fe);
 	code c = code_undefined;
 
-	pips_assert("value is code", value_code_p(val));
-	c = value_code(entity_initial(fe));
-	if(code_undefined_p(c)) {
-	    value_code(entity_initial(fe)) = make_code(lefp, strdup(""));
-	}
-	else if(ENDP(code_declarations(c))) {
-	    /* Should now be the normal case... */
-	    code_declarations(c) = lefp;
+	if(value_unknown_p(val)) {
+	    /* A call site for fe has been encountered in another module */
+	    entity_initial(fe) = make_value(is_value_code,
+					    make_code(lefp, strdup("")));
 	}
 	else {
-	    pips_error("MakeEntry", "Code should not (yet) be defined for entry fe...");
+	    pips_assert("value is code", value_code_p(val));
+	    c = value_code(entity_initial(fe));
+	    if(code_undefined_p(c)) {
+		value_code(entity_initial(fe)) = make_code(lefp, strdup(""));
+	    }
+	    else if(ENDP(code_declarations(c))) {
+		/* Should now be the normal case... */
+		code_declarations(c) = lefp;
+	    }
+	    else {
+		pips_error("MakeEntry", "Code should not (yet) be defined for entry fe...");
+	    }
 	}
     }
 
@@ -1197,9 +1220,9 @@ MakeEntry(
 	    if(!IsEffectiveFormalParameterP(fp)) {
 		/* Remove it from the declaration list */
 		/*
-		entity_declarations(cm) = 
-		    arguments_rm_entity(entity_declarations(cm), fp);
-		    */
+		  entity_declarations(cm) = 
+		  arguments_rm_entity(entity_declarations(cm), fp);
+		*/
 		if(entity_is_argument_p(fp,entity_declarations(cm))) {
 		    debug(1, "MakeEntry", "Entity %s removed from declarations for %s\n",
 			  entity_name(fp), module_local_name(cm));
@@ -1215,9 +1238,9 @@ MakeEntry(
     AddEntryEntity(fe);
 
     ifdebug(2) {
-      (void) fprintf(stderr, "Declarations of formal parameters for entry %s:\n",
-		     entity_name(fe));
-      dump_arguments(entity_declarations(fe));
+	(void) fprintf(stderr, "Declarations of formal parameters for entry %s:\n",
+		       entity_name(fe));
+	dump_arguments(entity_declarations(fe));
     }
 
     debug(1, "MakeEntry", "End for entry %s\n", entity_name(fe));
