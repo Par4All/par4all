@@ -3,7 +3,7 @@
 ! by Fabien COELHO.
 !
 ! $RCSfile: hpfc_rtsupport.m4f,v $ version $Revision$
-! ($Date: 1996/09/07 16:39:33 $, )
+! ($Date: 1996/09/07 16:58:29 $, )
 !
 !-----------------
 !
@@ -1001,7 +1001,7 @@ _CM5(
          call pvmfspawn(
      $        MAIN PROGRAM NAME,
      $        PVM ARCH,
-     $        NODE ARCHITECTURE,
+     $        NODEARCHITECTURE,
      $        NB OF TASKS,
      $        NODE TIDS,
      $        info)
@@ -1208,12 +1208,12 @@ _direct(`'
 
       _spawn(
       debug(write (unit=0,fmt=*) "spawning ", NODE PROGRAM NAME
-      write (unit=0,fmt=*) "   on ", NBOFTASKS, " ", NODE ARCHITECTURE)
+      write (unit=0,fmt=*) "   on ", NBOFTASKS, " ", NODEARCHITECTURE)
 
       call pvmfspawn(
      $     NODE PROGRAM NAME, 
      $     PVMARCH, 
-     $     NODE ARCHITECTURE, 
+     $     NODEARCHITECTURE, 
      $     NBOFTASKS, 
      $     NODETIDS, 
      $     info)
