@@ -29,7 +29,7 @@ print_transformer(transformer tf)
 transformer
 fprint_transformer(FILE * fd,
 		   transformer tf,
-		   char * (*value_name)())
+		   char * (*value_name)(entity))
 {
     /* print_transformer returns an int to be compatible with the debug()
        function; however, debug being a function and not a macro, its
