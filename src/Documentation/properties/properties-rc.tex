@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1994/08/22 11:06:45 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1994/11/09 14:50:15 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -231,7 +231,13 @@ PRETTYPRINT_FOR_FORESYS FALSE
 Whether to regenerate the commons in the declarations or not.
 
 \begin{verbatim}
-PRETTYPRINT_COMMONS YES
+PRETTYPRINT_COMMONS TRUE
+\end{verbatim}
+
+To deal specifically with the prettyprint for hpfc
+
+\begin{verbatim}
+PRETTYPRINT_HPFC FALSE
 \end{verbatim}
 
 \section{Semantic Analysis}
@@ -482,6 +488,12 @@ DISJUNCT_REGIONS FALSE
 \begin{verbatim}
 DISJUNCT_IN_OUT_REGIONS FALSE
 \end{verbatim}
+
+
+\begin{verbatim}
+REGIONS_OP_STATISTICS FALSE
+\end{verbatim}
+
 
 \section{Static Complexity Evaluation}
 
