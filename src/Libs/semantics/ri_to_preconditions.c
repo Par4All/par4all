@@ -142,9 +142,9 @@ statement s;
 	    int so = statement_ordering(s);
 	    (void) fprintf(stderr, "statement %03d (%d,%d), precondition %x end:\n",
 			   statement_number(s), ORDERING_NUMBER(so), ORDERING_STATEMENT(so),
-			   (unsigned int) load_statement_precondition(s));
-	    (void) print_transformer(load_statement_precondition(s));
-	    pips_error("statement_to_postcondition", "Non-consistent precondition\n");
+			   (unsigned int) pre);
+	    (void) print_transformer(pre);
+	    pips_error("statement_to_postcondition", "Non-consistent precondition after update\n");
 	}
 
 	/* store the precondition in the ri */
@@ -372,6 +372,73 @@ unstructured u ;
     debug(8,"unstructured_to_postconditions","end\n");
 }
 
+transformer
+add_loop_skip_condition(transformer pre, loop l)
+{
+    /* It is assumed that loop l is not entered */
+    range r = loop_range(l);
+    expression e_lb = range_lower(r);
+    expression e_ub = range_upper(r);
+    expression e_incr = range_increment(r);
+    normalized n_lb = NORMALIZE_EXPRESSION(e_lb);
+    normalized n_ub = NORMALIZE_EXPRESSION(e_ub);
+    int incr = 0;
+    int incr_lb = 0;
+    int incr_ub = 0;
+
+    debug(8,"add_loop_skip_condition","begin\n");
+
+    /* is the loop increment numerically known? Is its sign known? */
+    expression_and_precondition_to_integer_interval(e_incr, pre, &incr_lb, &incr_ub);
+
+    if(incr_lb==incr_ub) {
+	if(incr_lb==0) {
+	    user_error("add_loop_skip_condition", "Illegal null increment\n");
+	}
+	else
+	    incr = incr_lb;
+    }
+    else if(incr_lb>=1) {
+	incr = 1;
+    }
+    else if(incr_ub<=-1) {
+	incr = -1;
+    }
+    else
+	incr = 0;
+
+    /* incr == 0 is used below as a give-up condition */
+
+    /* find the real upper and lower bounds */
+    if(incr<0) {
+	/* exchange bounds */
+	n_lb = NORMALIZE_EXPRESSION(e_ub);
+	n_ub = NORMALIZE_EXPRESSION(e_lb);
+    }
+
+    if(incr!=0 && normalized_linear_p(n_lb) && normalized_linear_p(n_ub)) {
+	/* ub < lb, i.e. ub + lb + 1 <= 0 */
+	Pvecteur v_ub = (Pvecteur) normalized_linear(n_ub);
+	Pvecteur v_lb = (Pvecteur) normalized_linear(n_lb);
+	Pvecteur v = vect_substract(v_ub, v_lb);
+
+	vect_add_elem(&v, TCST, (Value) 1);
+	pre = transformer_inequality_add(pre, v);
+
+	ifdebug(8) {
+	    debug(8,"add_loop_skip_condition","Skip condition:\n");
+	    vect_fprint(stderr, v, external_value_name);
+	}
+    }
+    else {
+	debug(8,"add_loop_skip_condition","increment sign unknown or non-affine bound\n");
+    }
+
+    debug(8,"add_loop_skip_condition","end\n");
+
+    return pre;
+}
+
 transformer 
 add_good_loop_conditions(pre, l, tf)
 transformer pre;
@@ -414,51 +481,33 @@ transformer tfb;
     expression lb = range_lower(r);
     expression ub = range_upper(r);
     expression e_incr = range_increment(r);
-    Pvecteur v_incr = VECTEUR_UNDEFINED;
     int incr = 0;
-    Value vi;
-    normalized n;
+    int incr_lb = 0;
+    int incr_ub = 0;
 
     debug(8,"add_index_range_conditions","begin\n");
 
     if(entity_has_values_p(i)) {
 
-	/* is the loop increment numerically known? */
-	n = NORMALIZE_EXPRESSION(e_incr);
-	if(normalized_linear_p(n)) {
-	    v_incr = (Pvecteur) normalized_linear(n);
-	    if(vect_constant_p(v_incr)) {
-		pips_assert("add_good_loop_conditions",!VECTEUR_NUL_P(v_incr));
-		vi =vect_coeff(TCST, v_incr);
-		incr = VALUE_TO_INT(vi);
-	    }
-	    else if(vect_size(v_incr) == 1) {
-		/* if incr not numerically known, try the context...
-		   Thanks to KM:-) */
-		Psysteme s = sc_dup((Psysteme) 
-		     predicate_system(transformer_relation(pre)));
-		Value mininc = VALUE_ZERO, maxinc = VALUE_ZERO;
-		entity e_incr = (entity) vecteur_var(v_incr);
+	/* is the loop increment numerically known? Is its sign known? */
+	expression_and_precondition_to_integer_interval(e_incr, pre, &incr_lb, &incr_ub);
 
-		if(sc_minmax_of_variable(s, (Variable) e_incr, 
-					 &mininc, &maxinc)) {
-		    /* debug(8, "add_index_range_preconditions",
-		       "mininc = % d, maxinc = %d\n",
-			  mininc, maxinc); */
-		    if(value_pos_p(mininc))
-			incr = 1;
-		    else if(value_neg_p(maxinc))
-			incr = -1;
-		    else
-			incr = 0;
-		}
-		else {
-		    user_warning("add_index_range_conditions", 
-				 "dead code detected\n");
-		    incr = 0;
-		}
+	if(incr_lb==incr_ub) {
+	    if(incr_lb==0) {
+		user_error("add_index_range_conditions", "Illegal null increment\n");
 	    }
+	    else
+		incr = incr_lb;
 	}
+	else if(incr_lb>=1) {
+	    incr = 1;
+	}
+	else if(incr_ub<=-1) {
+	    incr = -1;
+	}
+	else
+	    incr = 0;
+
 	/* incr == 0 is used below as a give-up condition */
 
 
@@ -498,48 +547,240 @@ expression bound;
 int lower_or_upper;
 transformer tfb; 
 {
-    
     normalized n = NORMALIZE_EXPRESSION(bound);
+    /* tfb does not take into account the index incrementation */
+    transformer t_iter = transformer_dup(tfb);
+
+    /* It is assumed on entry that index has values recognized 
+     * by the semantics analysis
+     */
+    /* pips_assert("add_index_bound_conditions", entity_has_values_p(index)); */
+
+    transformer_arguments(t_iter) = 
+	arguments_add_entity(transformer_arguments(t_iter), index);
 
     if(normalized_linear_p(n)) {
-	Pvecteur v = vect_dup((Pvecteur) normalized_linear(n));
-
-		/* check that v is not affected by tfb:
-		 * N = 10
-		 * DO I = 1, N
-		 *   N = 1
-		 *   {1<=I<=N} !wrong!
-		 *   T(I) = 0.
-		 * ENDDO
-		 * and make sure that aliasings (I,J) and (I,X) are correctly handled
-		 */
-
-		/* Achtung: value_mappings_compatible_vector_p() has a side
-		 * effect on its argument; it has to be evaluated before
-		 * the second half of the test else effects would be wrongly
-		 * interpreted in case of equivalences 
-		 */
-
-	if(value_mappings_compatible_vector_p(v) &&
-	   !transformer_affect_linear_p(tfb,v)) {
-	    if (lower_or_upper == IS_LOWER_BOUND)
-		vect_add_elem(&v,
-		    (Variable) entity_to_new_value(index), VALUE_MONE);
-	    else{
-		vect_chg_sgn(v);
-		vect_add_elem(&v, 
-		    (Variable) entity_to_new_value(index), VALUE_ONE);
-	    }
-	    pre = transformer_inequality_add(pre, v);
-	}
-	else{
-	    vect_rm(v);
-	    v = VECTEUR_UNDEFINED;
-	}	
+	Pvecteur v_bound = (Pvecteur) normalized_linear(n);
+	add_affine_bound_conditions(pre, index, v_bound, lower_or_upper, t_iter);
     }
+
+    free_transformer(t_iter);
     return(pre);
 }
 
+transformer 
+add_affine_bound_conditions(transformer pre, 
+			    entity index,
+			    Pvecteur v_bound, 
+			    bool lower_or_upper,
+			    transformer tfb)
+{
+    Pvecteur v = vect_dup(v_bound);
+
+    /* check that v is not affected by tfb:
+     * N = 10
+     * DO I = 1, N
+     *   N = 1
+     *   {1<=I<=N} !wrong!
+     *   T(I) = 0.
+     * ENDDO
+     * and make sure that aliasings (I,J) and (I,X) are correctly handled
+     */
+
+    /* Achtung: value_mappings_compatible_vector_p() has a side
+     * effect on its argument; it has to be evaluated before
+     * the second half of the test else effects would be wrongly
+     * interpreted in case of equivalences 
+     */
+
+    if(value_mappings_compatible_vector_p(v) &&
+       !transformer_affect_linear_p(tfb,v)) {
+	if (lower_or_upper == IS_LOWER_BOUND)
+	    vect_add_elem(&v,
+			  (Variable) entity_to_new_value(index), VALUE_MONE);
+	else{
+	    vect_chg_sgn(v);
+	    vect_add_elem(&v, 
+			  (Variable) entity_to_new_value(index), VALUE_ONE);
+	}
+	pre = transformer_inequality_add(pre, v);
+    }
+    else{
+	vect_rm(v);
+	v = VECTEUR_UNDEFINED;
+    }	
+    return pre;
+}
+
+transformer
+add_loop_index_initialization(transformer pre, loop l)
+{
+    entity i = loop_index(l);
+    expression init = range_lower(loop_range(l));
+    transformer post = transformer_undefined;
+    transformer t_init = transformer_undefined;
+    list lef = proper_effects_of_expression(init);
+
+    t_init = expression_to_transformer(i, init, lef);
+    if(t_init==transformer_undefined)
+	t_init = effects_to_transformer(lef);
+    post = transformer_apply(t_init, pre);
+
+    transformer_free(t_init);
+
+    return post;
+}
+
+/* The exit value is known if
+ *  - the loop index is an analyzed integer scalar variable
+ *    real index are standard-compliant, integer index can be equivalenced to
+ *    a real variable,...
+ *  - the increment is affine (non-necessary assumption made: it is affine if the
+ *    increment sign is known)
+ *  - the increment sign is known
+ *  - the body and loop initialization execution does not modify 
+ *    the value of the upper bound
+ *  - the upper bound is affine (?)
+ *
+ * Affine increments can be handled when their signs only are known. 
+ *
+ * For instance, for increment==k:
+ *  i >= ub
+ *  i-k <= ub-1
+ *
+ * Note the simplification when k==1.
+ *
+ * But, first of all, the value of the loop index in post must be
+ * incremented. This changes its relationship with induction variables.
+ *
+ * Most tests here are redundant because this function is only called if it has
+ * been proved that the loop was executed which implies that the upper and
+ * lower bounds are affine, that the increment is affine and that the
+ * increment sign is known.
+ */
+transformer
+add_loop_index_exit_value(transformer post, /* postcondition of the last iteration */
+			  loop l,           /* loop to process */
+			  transformer pre,  /* precondition on loop entrance */
+			  list lbe          /* list of loop body effects */ )
+{
+    entity i = loop_index(l);
+    expression e_incr = range_increment(loop_range(l));
+    normalized n_incr = NORMALIZE_EXPRESSION(e_incr);
+    expression e_ub = range_upper(loop_range(l));
+    normalized n_ub = NORMALIZE_EXPRESSION(e_ub);
+    transformer t_incr = transformer_undefined;
+    transformer t_body = load_statement_transformer(loop_body(l));
+    list li = CONS(ENTITY, i, NIL);
+    int ub_inc = 0;
+    int lb_inc = 0;
+
+    ifdebug(8) {
+	debug(8, "add_loop_index_exit_value", "begin with post:\n");
+	(void) print_transformer(post);
+    }
+
+    if(!entity_has_values_p(i)) {
+	ifdebug(8) {
+	    debug(8, "add_loop_index_exit_value", "give up because %s has no values:\n",
+		  entity_local_name(i));
+	    debug(8, "add_loop_index_exit_value", "end with post:\n");
+	    (void) print_transformer(post);
+	}
+	return post;
+    }
+
+    expression_and_precondition_to_integer_interval(e_incr, pre, &lb_inc, &ub_inc);
+
+    /* This part should be useless because post really is a loop postcondition.
+     * There should be no need for an index incrementation or anything.
+     * It is used to recover some of the fix-point failures:-(
+     *
+     * In fact, it may be useful. The loop transformer and its invariant are
+     * computed without knowledge about the number of iteration, which may be
+     * zero. By adding one execution of the loop body and the index incrementation,
+     * we change b* into b+ which should add effective information.
+     */
+    if(normalized_linear_p(n_incr)) {
+	Pvecteur v_incr = (Pvecteur) normalized_linear(n_incr);
+	t_incr = affine_increment_to_transformer(i, v_incr);
+    }
+    else {
+	t_incr = transformer_undefined;
+    }
+    if(t_incr==transformer_undefined)
+	t_incr = args_to_transformer(li);
+    post = transformer_apply(t_body, post);
+    post = transformer_apply(t_incr, post);
+    transformer_free(t_incr);
+
+    ifdebug(8) {
+	debug(8, "add_loop_index_exit_value", "post after index incrementation:\n");
+	(void) print_transformer(post);
+    }
+
+    if(normalized_linear_p(n_ub)) {
+	if(lb_inc >= 1 || ub_inc <= -1) {
+	    Pvecteur v_ub = (Pvecteur) normalized_linear(n_ub);
+	    Pvecteur v_incr = (Pvecteur) normalized_linear(n_incr);
+	    Pvecteur v_i = vect_new((Variable) i, (Value) 1);
+	    Pvecteur c1 = VECTEUR_UNDEFINED;
+	    Pvecteur c2 = VECTEUR_UNDEFINED;
+
+	    pips_assert("add_loop_index_exit_value", normalized_linear_p(n_incr));
+	    if(lb_inc>=1) {
+		/* v_i - v_incr <= v_ub < v_i
+		 * or:
+		 * i - v_incr - v_ub <= 0, v_ub - v_i + 1 <= 0
+		 */
+		c1 = vect_substract(v_i, v_incr);
+		c2 = vect_substract(v_ub, v_i);
+
+		c1 = vect_cl(c1, (Value) -1, v_ub);
+		vect_add_elem(&c2, (Variable) TCST, (Value) 1);
+	    }
+	    else if(ub_inc<=-1) {
+		/* v_i - v_incr >= v_ub > v_i 
+		 *
+		 * or:
+		 * - i + v_incr + v_ub <= 0, - v_ub + v_i + 1 <= 0
+		 */
+		c1 = vect_substract(v_incr, v_i);
+		c2 = vect_substract(v_i, v_ub);
+
+		c1 = vect_cl(c1, (Value) 1, v_ub);
+		vect_add_elem(&c2, (Variable) TCST, (Value) 1);
+	    }
+	    else {
+		/* should never happen! */
+		pips_assert("add_loop_index_exit_value", TRUE);
+	    }
+	    transformer_inequality_add(post, c1);
+	    transformer_inequality_add(post, c2);
+
+	    ifdebug(8) {
+		debug(8, "add_loop_index_exit_value", "post with exit conditions:\n");
+		(void) print_transformer(post);
+	    }
+	}
+	else {
+	    debug(8, "add_loop_index_exit_value",
+		  "post is unchanged because the increment sign is unknown\n");
+	}
+    }
+    else {
+	debug(8, "add_loop_index_exit_value",
+	      "post is unchanged because the upper bound is not affine\n");
+    }
+
+    ifdebug(8) {
+	debug(8, "add_loop_index_exit_value", "end: post:\n");
+	(void) print_transformer(post);
+    }
+
+    return post;
+}
+
 bool 
 simple_dead_loop_p(expression lower, expression upper)
 {
@@ -587,6 +828,7 @@ transformer tf;
 {
     transformer post = transformer_undefined;
     statement s = loop_body(l);
+    range r = loop_range(l);
 
     debug(8,"loop_to_postcondition","begin\n");
 
@@ -604,8 +846,14 @@ transformer tf;
 	/* preb = precondition for loop body; includes a lousy fix-point */
 	transformer preb = transformer_dup(pre);
 
-	/* get rid of information related to variables modified in
-	   iterations of the loop body (including loop indices) */
+	/* Get rid of information related to variables modified in
+	 * iterations of the loop body (including loop indices).
+	 *
+	 * Apparently, the loop index incrementation is not in tf...
+	 * according to a test with DO I = I, N
+	 * although it should be... according to the caller of this function
+	 * and the display of loop transformers!
+	 */
 	preb = transformer_combine(preb, tf);
 
 	/* Triolet's good loop algorithm */
@@ -627,17 +875,83 @@ transformer tf;
 	 *
 	 * Note that add_good_loop_conditions() can test trivial cases
 	 * automatically generated.
+	 *
+	 * Decision reverted: Francois Irigoin, 4 June 1997
 	 */
-
-	/* propagate preconditions in the loop body */
-	(void) statement_to_postcondition(preb, s);
 
 	/* FI: this is not correct when an invariant is found; we should add one
 	 * more incrementation of I (to modify the output of the invariant and
 	 * express the fact that the loop bound is no more true, at least when
 	 * the increment is one. 6 July 1993
+	 *
+	 * Note 1: this comments was wrong! See Validation/Semantics/induc1.f
+	 * Note 2: but the result was wrong anyway because it assumed that at
+	 * least one iteration always was performed.
+	 * Note 3: This is fixed by reverting the above decision.
 	 */
-	post = transformer_apply(tf, pre);
+	if(empty_range_wrt_precondition_p(r, pre)) {
+	    debug(8, "loop_to_postcondition", "The loop is never executed\n");
+
+	    /* propagate an impossible precondition in the loop body */
+	    (void) statement_to_postcondition(transformer_empty(), s);
+	    /* The loop body precondition is not useful any longer */
+	    free_transformer(preb);
+	    post = transformer_dup(pre);
+	    post = add_loop_index_initialization(post, l);
+	}
+	else if(non_empty_range_wrt_precondition_p(r, pre)) {
+	    debug(8, "loop_to_postcondition", "The loop certainly is executed\n");
+
+	    /* propagate preconditions in the loop body */
+	    (void) statement_to_postcondition(preb, s);
+
+	    post = transformer_apply(tf, pre);
+	    /* The loop body effects should be passed as fourth argument
+	     * to check that the value of the upper bound expression is
+	     * not modified when the body is executed. But it is not available
+	     * and it is not yet used by ad_loop_index_exit_value()!
+	     */
+	    post = add_loop_index_exit_value(post, l, pre, NIL);
+	}
+	else {
+	    /* First version: OK, but could be better! */
+	    /* transformer postloop = transformer_apply(tf, pre); */
+	    /* pre must be copied because sc_convex_hull updates is arguments
+	     * and may make them inconsistent when the two bases are merged
+	     * to perform the convex hull in a common vector space
+	     */
+	    /*
+	    transformer preloop = transformer_dup(pre);
+	    debug(8, "loop_to_postcondition", "The loop may be executed or not\n");
+
+	    post = transformer_convex_hull(postloop, preloop);
+	    transformer_free(postloop);
+	    transformer_free(preloop);
+	    */
+
+	    /* Second version: assume it is empty or non-empty and perform
+	     * the convex hull of both
+	     * (should be checked on Validation/Semantics/induc1.f)
+	     */
+	    transformer post_ne = transformer_dup(pre);
+	    transformer post_al = transformer_apply(tf, pre);
+
+	    debug(8, "loop_to_postcondition", "The loop may be executed or not\n");
+
+	    /* propagate preconditions in the loop body */
+	    (void) statement_to_postcondition(preb, s);
+
+	    /* We should add (when possible) the non-entry condition in post_ne!
+	     * For instance, DO I = 1, N leads to N <= 0
+	     */
+	    post_ne = add_loop_skip_condition(post_ne, l);
+
+	    post_ne = add_loop_index_initialization(post_ne, l);
+	    post_al = add_loop_index_exit_value(post_al, l, pre, NIL);
+	    post = transformer_convex_hull(post_ne, post_al);
+	    transformer_free(post_ne);
+	    transformer_free(post_al);
+	}
 
 	/* FI: Cannot be freed because it was stored for statement s:
 	   transformer_free(preb);
@@ -647,7 +961,7 @@ transformer tf;
     }
 
     ifdebug(8) {
-	(void) fprintf(stderr,"%s: %s\n","loop_to_postcondition",
+	(void) fprintf(stderr,"%s: %s\n","[loop_to_postcondition]",
 		       "resultat post =");
 	(void) print_transformer(post);
     }
