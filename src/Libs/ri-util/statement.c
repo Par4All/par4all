@@ -123,20 +123,46 @@ bool statement_test_p(statement s)
 }
 
 /* This function should not be used ! */
-bool statement_continue_p(s)
+bool
+statement_continue_p(s)
 statement s;
 {
     return continue_statement_p(s);
 }
 
-bool unlabelled_statement_p(st)
+bool
+unlabelled_statement_p(st)
 statement st;
 {
     return(entity_empty_label_p(statement_label(st)));
 }
 
+bool
+nop_statement_p(statement s)
+{
+    /* NOP statements are useful to fill in empty test branches.
+     * The definition of NOP in PIPS has changed over the years.
+     * A NOP statement is an empty block. Like blocks, it cannot be
+     * labelled nor commented. It has no statement number because it
+     * is invisible to users.
+     *
+     * Dangling comments, like labels, are attached to CONTINUE statements.
+     *
+     * Note 1: blocks are now called "sequences"
+     * Note 2: see also empty_statement_p()
+     */
+    bool nop = FALSE;
+    instruction i = statement_instruction(s);
 
-/* The following macros could be a little bit factorized... */
+    if(instruction_block_p(i) && ENDP(instruction_block(i))) {
+	pips_assert("No label!", entity_empty_label_p(statement_label(s)));
+	pips_assert("No comments", empty_comments_p(statement_comments(s)));
+	pips_assert("No statement number", statement_number(s) == STATEMENT_NUMBER_UNDEFINED);
+	nop = TRUE;
+    }
+
+    return nop;
+}
 
 /* Return true if the statement is an empty instruction block without
    label or a continue without label or a recursive combination of
@@ -394,6 +420,18 @@ statement make_block_statement_with_stop()
     return b;
 }
 
+statement
+make_nop_statement()
+{
+    /* Attention: this function and the next one produce the same result,
+     * but they are not semantically equivalent. An empty block may be
+     * defined to be filled in, not to be used as a NOP statement.
+     */
+    statement s = make_empty_block_statement();
+
+    return s;
+}
+
 statement make_empty_block_statement()
 {
     statement b;
@@ -570,6 +608,14 @@ statement s;
     pips_assert("statement_call", statement_call_p(s));
 
     return(instruction_call(statement_instruction(s)));
+}
+
+list statement_block(s)
+statement s;
+{
+    pips_assert("statement_block", statement_block_p(s));
+
+    return(instruction_block(statement_instruction(s)));
 }
 
 /* predicates on instructions */
