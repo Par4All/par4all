@@ -302,7 +302,7 @@ Psysteme ps;
 
     if (!sc_rn_p(ps) && !sc_empty_p(ps))
     {
-	Pbase ps_base = base_dup(sc_base(ps));	
+	Pbase ps_base = base_copy(sc_base(ps));	
 	ps = sc_normalize(ps);
 	if (ps == SC_EMPTY)
 	    ps = sc_empty(ps_base);
@@ -379,7 +379,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
     Psysteme new_ps = SC_UNDEFINED;
     Psysteme proj_ps = SC_UNDEFINED;
     boolean feasible_p = TRUE;
-    Psysteme ps_backup = sc_dup(ps);
+    Psysteme ps_backup = sc_copy(ps);
     /*
     fprintf(stderr, "[sc_strong_normalize]: Begin\n");
     */
@@ -411,18 +411,18 @@ Psysteme sc_strong_normalize_and_check_feasibility
 		    /* We need an exact copy of ps to have equalities
 		     * and inqualities in the very same order
 		     */
-		    new_ps = sc_dup(ps);
-		    proj_ps = sc_dup(new_ps);
+		    new_ps = sc_copy(ps);
+		    proj_ps = sc_copy(new_ps);
 		    sc_rm(new_ps);
 		    new_ps = sc_make(NULL, NULL);
 		    
 		    /*
 		      fprintf(stderr, "[sc_strong_normalize]: Input system %x\n",
 		      (unsigned int) ps);
-		      sc_dump(ps);
+		      sc_default_dump(ps);
 		      fprintf(stderr, "[sc_strong_normalize]: Copy system %x\n",
 		      (unsigned int) ps);
-		      sc_dump(proj_ps);
+		      sc_default_dump(proj_ps);
 		    */
 		    
 		    /* Solve the equalities */
@@ -445,7 +445,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 				Variable v = TCST;
 				Pvecteur pv;
 				
-				new_eq = contrainte_dup(eq);
+				new_eq = contrainte_copy(eq);
 				sc_add_egalite(new_ps, new_eq);
 				/* use proj_eq to eliminate a variable */
 				
@@ -482,7 +482,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 				/* proj_eq itself is going to be modified in proj_ps.
 				 * use a copy!
 				 */
-				def = contrainte_dup(proj_eq);
+				def = contrainte_copy(proj_eq);
 				proj_ps = 
 				    sc_simple_variable_substitution_with_eq_ofl_ctrl
 				    (proj_ps, def, v, NO_OFL_CTRL);
@@ -503,13 +503,13 @@ Psysteme sc_strong_normalize_and_check_feasibility
 			  "Print the three systems at each elimination step:\n");
 			  fprintf(stderr, "[sc_strong_normalize]: Input system %x\n",
 			  (unsigned int) ps);
-			  sc_dump(ps);
+			  sc_default_dump(ps);
 			  fprintf(stderr, "[sc_strong_normalize]: Copy system %x\n",
 			  (unsigned int) proj_ps);
-			  sc_dump(proj_ps);
+			  sc_default_dump(proj_ps);
 			  fprintf(stderr, "[sc_strong_normalize]: New system %x\n",
 			  (unsigned int) new_ps);
-			  sc_dump(new_ps);
+			  sc_default_dump(new_ps);
 			*/
 			
 			proj_eq = next_proj_eq;
@@ -535,7 +535,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 				i = sc_check_inequality_redundancy(proj_ineq, proj_ps);
 				if(i==0) {
 				    /* keep ineq */
-				    new_ineq = contrainte_dup(ineq);
+				    new_ineq = contrainte_copy(ineq);
 				    sc_add_inegalite(new_ps, new_ineq);
 				}
 				else if(i==1) {
@@ -566,13 +566,13 @@ Psysteme sc_strong_normalize_and_check_feasibility
 		      "Print the three systems after inequality normalization:\n");
 		      fprintf(stderr, "[sc_strong_normalize]: Input system %x\n",
 		      (unsigned int) ps);
-		      sc_dump(ps);
+		      sc_default_dump(ps);
 		      fprintf(stderr, "[sc_strong_normalize]: Copy system %x\n",
 		      (unsigned int) proj_ps);
-		      sc_dump(proj_ps);
+		      sc_default_dump(proj_ps);
 		      fprintf(stderr, "[sc_strong_normalize]: New system %x\n",
 		      (unsigned int) new_ps);
-		      sc_dump(new_ps);
+		      sc_default_dump(new_ps);
 		    */
 		    
 		    /* Check redundancy between residual inequalities */
@@ -624,7 +624,7 @@ Psysteme sc_strong_normalize_and_check_feasibility
 	    /*
 	      fprintf(stderr, "[sc_strong_normalize]: Final value of new system %x:\n",
 	      (unsigned int) new_ps);
-	      sc_dump(new_ps);
+	      sc_default_dump(new_ps);
 	      fprintf(stderr, "[sc_strong_normalize]: End\n");
 	    */
 	
@@ -661,7 +661,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
     Psysteme new_ps = sc_make(NULL, NULL);
     boolean feasible_p = TRUE;
 
-    Psysteme ps_backup = sc_dup(ps);
+    Psysteme ps_backup = sc_copy(ps);
     CATCH(overflow_error) 
 	{
 	    /* CA */
@@ -686,7 +686,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 				"[sc_strong_normalize2]: After call to sc_normalize\n");
 			fprintf(stderr, "[sc_strong_normalize2]: Input system %p\n",
 				ps);
-			sc_dump(ps);
+			sc_default_dump(ps);
 		    }
 		    
 		    /* Solve the equalities */
@@ -708,7 +708,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 				Pvecteur pv;
 				
 				/* keep eq */
-				new_eq = contrainte_dup(eq);
+				new_eq = contrainte_copy(eq);
 				sc_add_egalite(new_ps, new_eq);
 				
 				/* use eq to eliminate a variable */
@@ -745,7 +745,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 				/* eq itself is going to be modified in ps.
 				 * use a copy!
 				 */
-				def = contrainte_dup(eq);
+				def = contrainte_copy(eq);
 				ps = 
 				    sc_simple_variable_substitution_with_eq_ofl_ctrl
 				    (ps, def, v, NO_OFL_CTRL);
@@ -766,10 +766,10 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 				    "Print the two systems at each elimination step:\n");
 			    fprintf(stderr, "[sc_strong_normalize2]: Input system %p\n",
 				    ps);
-			    sc_dump(ps);
+			    sc_default_dump(ps);
 			    fprintf(stderr, "[sc_strong_normalize2]: New system %p\n",
 				    new_ps);
-			    sc_dump(new_ps);
+			    sc_default_dump(new_ps);
 			}
 			
 		    }
@@ -784,10 +784,10 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 				"Print the three systems after inequality normalization:\n");
 			fprintf(stderr, "[sc_strong_normalize2]: Input system %p\n",
 				ps);
-			sc_dump(ps);
+			sc_default_dump(ps);
 			fprintf(stderr, "[sc_strong_normalize2]: New system %p\n",
 				new_ps);
-			sc_dump(new_ps);
+			sc_default_dump(new_ps);
 		    }
 		}
 		else {
@@ -813,7 +813,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 	    }
 	    else {
 		base_rm(sc_base(new_ps));
-		sc_base(new_ps) = base_dup(sc_base(ps));
+		sc_base(new_ps) = base_copy(sc_base(ps));
 		sc_dimension(new_ps) = sc_dimension(ps);
 		/* copy projected inequalities left in ps */
 		new_ps = sc_safe_append(new_ps, ps);
@@ -827,7 +827,7 @@ Psysteme sc_strong_normalize2(Psysteme ps)
 		fprintf(stderr,
 			"[sc_strong_normalize2]: Final value of new system %p:\n",
 			new_ps);
-		sc_dump(new_ps);
+		sc_default_dump(new_ps);
 		fprintf(stderr, "[sc_strong_normalize2]: End\n");
 	    }
 	UNCATCH(overflow_error);
@@ -900,7 +900,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
   Psysteme new_ps = sc_make(NULL, NULL);
   boolean feasible_p = TRUE;
 
-  Psysteme ps_backup = sc_dup(ps);
+  Psysteme ps_backup = sc_copy(ps);
   CATCH(overflow_error) 
     {
       /* CA */
@@ -913,7 +913,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 	fprintf(stderr, 
 		"[sc_strong_normalize_and_check_feasibility2]"
 		" Input system %p\n", ps);
-	sc_dump(ps);
+	sc_default_dump(ps);
       }
 	    
       if(SC_UNDEFINED_P(ps)) {
@@ -944,7 +944,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 	  fprintf(stderr,
 		  "[sc_strong_normalize_and_check_feasibility2]"
 		  " Input system after normalization %p\n", ps);
-	  sc_dump(ps);
+	  sc_default_dump(ps);
 	}
 		
 		
@@ -987,7 +987,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 		  Pvecteur pv;
 				    
 		  /* keep eq */
-		  new_eq = contrainte_dup(eq);
+		  new_eq = contrainte_copy(eq);
 		  sc_add_egalite(new_ps, new_eq);
 				    
 		  /* use eq to eliminate a variable */
@@ -1025,7 +1025,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 		  /* eq itself is going to be modified in ps.
 		   * use a copy!
 		   */
-		  def = contrainte_dup(eq);
+		  def = contrainte_copy(eq);
 		  ps = 
 		    sc_simple_variable_substitution_with_eq_ofl_ctrl
 		    (ps, def, v, NO_OFL_CTRL);
@@ -1063,10 +1063,10 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 	      "Print the two systems at each elimination step:\n");
 	      fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %x\n",
 	      (unsigned int) ps);
-	      sc_dump(ps);
+	      sc_default_dump(ps);
 	      fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: New system %x\n",
 	      (unsigned int) new_ps);
-	      sc_dump(new_ps);
+	      sc_default_dump(new_ps);
 	      }
 	    */
 			
@@ -1084,10 +1084,10 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 		    "Print the two systems at each nvar=%d step:\n", nvar);
 	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %p\n",
 		    ps);
-	    sc_dump(ps);
+	    sc_default_dump(ps);
 	    fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: New system %p\n",
 		    new_ps);
-	    sc_dump(new_ps);
+	    sc_default_dump(new_ps);
 	  }
 	}
 	sc_elim_empty_constraints(new_ps,TRUE);
@@ -1105,10 +1105,10 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 		  "Print the three systems after inequality normalization:\n");
 	  fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: Input system %p\n",
 		  ps);
-	  sc_dump(ps);
+	  sc_default_dump(ps);
 	  fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: New system %p\n",
 		  new_ps);
-	  sc_dump(new_ps);
+	  sc_default_dump(new_ps);
 	}
       }
 	    
@@ -1118,7 +1118,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
       }
       else {
 	base_rm(sc_base(new_ps));
-	sc_base(new_ps) = base_dup(sc_base(ps));
+	sc_base(new_ps) = base_copy(sc_base(ps));
 	sc_dimension(new_ps) = sc_dimension(ps);
 	/* copy projected inequalities left in ps */
 	new_ps = sc_safe_append(new_ps, ps);
@@ -1128,11 +1128,11 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 	  fprintf(stderr, 
 		  "[sc_strong_normalize_and_check_feasibility2]: "
 		  "Input system %p\n", ps);
-	  sc_dump(ps);
+	  sc_default_dump(ps);
 	  fprintf(stderr, 
 		  "[sc_strong_normalize_and_check_feasibility2]: "
 		  "New system %p\n", new_ps);
-	  sc_dump(new_ps);
+	  sc_default_dump(new_ps);
 	  /* assert(sc_weak_consistent_p(new_ps)); */
 	  assert(FALSE);
 	}
@@ -1145,7 +1145,7 @@ Psysteme sc_strong_normalize_and_check_feasibility2
 	  fprintf(stderr,
 		  "[sc_strong_normalize_and_check_feasibility2]: Final value of new system %p:\n",
 		  new_ps);
-	  sc_dump(new_ps);
+	  sc_default_dump(new_ps);
 	  fprintf(stderr, "[sc_strong_normalize_and_check_feasibility2]: End\n");
 	}
 	    
