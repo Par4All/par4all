@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/11/30 14:42:29 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/11/30 15:00:21 $, )
 # version $Revision$, 
 #
 # Reference file for PIPS environment variables.
@@ -205,14 +205,16 @@ HPFC_FFLAGS='-fast -O3 -u'
 #         #    #  #       #####   #####
 #
 
-# could be acc -O -g, f77 -g -U -u -C 
+# was:
+# acc -O -g
+# f77 -g -U -u -C 
 
-WP65_CC='gcc'
-WP65_CFLAGS='-O2 -g -Wall -D__USE_FIXED_PROTOTYPES__' 
-WP65_CPPFLAGS='-D COMPILE_FOR_G77'
+WP65_CC="$PIPS_CC"
+WP65_CFLAGS="$PIPS_CFLAGS"
+WP65_CPPFLAGS="-D COMPILE_FOR_G77 $PIPS_CPPFLAGS"
 
 WP65_FC='g77'
-WP65_FFLAGS='-O2 -g'
+WP65_FFLAGS='-O2 -g -pipe'
 
 # can be changed to $PIPS_DEVEDIR/Runtime/wp65 to link with dev...
 WP65_LIBRARY=$PIPS_EXTEDIR
