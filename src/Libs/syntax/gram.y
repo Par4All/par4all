@@ -179,7 +179,7 @@ static dataval MakeDataVal(expression n, expression c)
     }
     cc = value_constant(vc);
     value_constant(vc) = constant_undefined;
-    gen_free(vc);
+    free_value(vc);
 
     return make_dataval(cc, in);
 }
@@ -1213,7 +1213,7 @@ fortran_type: fortran_basic_type lg_fortran_type
                 {
 		    free_value($2);
 		    $2 = make_value(is_value_constant,
-		       make_constant(is_constant_int, CurrentTypeSize));
+		       make_constant(is_constant_int, (void *) CurrentTypeSize));
 		}
 
 		$$ = CurrentType = MakeFortranType($1, $2);
@@ -1275,7 +1275,8 @@ lg_fortran_type:
 	| TK_STAR ival
 	    {
 		    $$ = make_value(is_value_constant, 
-				    make_constant(is_constant_int,$2));
+				    make_constant(is_constant_int,
+						  (void *) $2));
 	    }
 	;
 
