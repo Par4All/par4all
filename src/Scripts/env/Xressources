@@ -1,0 +1,33 @@
+!
+! Add some stuff to have a coherent WPips behaviour:
+!
+OpenWindows.Beep:	always
+OpenWindows.ColorTracksInputFocus:	true
+OpenWindows.DragRightDistance:	10
+OpenWindows.EdgeMoveThreshold:	100
+OpenWindows.FocusLenience:      True
+OpenWindows.MultiClickTimeout:	5
+OpenWindows.PPositionCompat:	true
+OpenWindows.PopupJumpCursor:	True
+OpenWindows.ScrollbarPlacement:	left
+OpenWindows.SelectDisplaysMenu:	False
+OpenWindows.ServerGrabs:	False
+OpenWindows.SetInput:	followmouse
+OpenWindows.Use3DFrames:	true
+OpenWindows.Use3DResize:	true
+OpenWindows.WindowColor:	LightSteelBlue1
+*KeyboardCommands: full
+*FocusLenience:      True
+*SetInput:	followmouse
+*Input: True
+Text.AutoIndent:	True
+Text.InsertMakesCaretVisible:	Always
+Text.TabWidth:	4
+Text.Retained:	Yes
+Text.DisplayControlChars:	True
+! Attention ! Cette place est allouée en dur dès le départ ! :-(
+Text.MaxDocumentSize:	1000000
+Text.againLimit: 50
+*stringConversionWarnings:	on
+*boldFont:	-*-lucidatypewriter-bold-r-*-*-14-*-*-*-*-*-*-*
+*font:  -*-lucidatypewriter-medium-r-*-*-14-*-*-*-*-*-*-*
