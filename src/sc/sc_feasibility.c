@@ -268,15 +268,15 @@ static boolean sc_fm_project_variables
 #define NO_PROJ_METHOD		0
 
 static boolean internal_sc_feasibility
-  (Psysteme sc, int method, boolean integer_p, int ofl_ctrl)
+  (Psysteme sc, int method, boolean int_p, int ofl_ctrl)
 {
-  Psysteme sw = NULL;
+  Psysteme w = NULL;
   boolean ok = TRUE;
 
-  if (method & PROJECT_EQ_METHOD)
+  if ((method & PROJECT_EQ_METHOD))
   {
-    sw = sc_dup(sc);
-    ok = sc_fm_project_variables(sw, integer_p, TRUE, ofl_ctrl);
+    w = sc_dup(sc);
+    ok = sc_fm_project_variables(w, integer_p, TRUE, ofl_ctrl);
   }
 
   /* maybe the S/FM should be chosen again as #ref has changed... */
@@ -284,16 +284,15 @@ static boolean internal_sc_feasibility
   {
     if (method & SIMPLEX_METHOD)
     {
-      ok = sc_simplexe_feasibility_ofl_ctrl(sw? sw: sc, ofl_ctrl);
+      ok = sc_simplexe_feasibility_ofl_ctrl(w? w: sc, ofl_ctrl);
     }
     else 
     {
-      ok = sc_fourier_motzkin_feasibility_ofl_ctrl
-	(sw? sw: sc, integer_p, ofl_ctrl);
+      ok = sc_fourier_motzkin_feasibility_ofl_ctrl(w? w: sc, int_p, ofl_ctrl);
     }
   }
   
-  if (sw) sc_rm(sw);
+  if (w) sc_rm(w);
 
   return ok;
 }
@@ -366,11 +365,10 @@ boolean ofl_res;
 		     (n_cont_in>=10 && n_ref_in>2*n_cont_in));
 		     (use_simplex && n_cont_eq >= 20) => proj */
       
-      if (n_cont_in >= NB_CONSTRAINTS_MAX_FOR_FM ||
-	  (n_cont_in>=10 && n_ref_in>2*n_cont_in))
+      if (n_cont_in >= 10) 
       {
 	method = SIMPLEX_METHOD;
-	if (n_cont_eq >= 20)
+	if (n_cont_eq >= 10)
 	  method &= PROJECT_EQ_METHOD;
       }
       else
@@ -389,7 +387,7 @@ boolean ofl_res;
 
 	/* STATS 
 	   get_string_timers(&t1, &t2);
-	   fprintf(stderr, "FEASIBILITY %d %d %d %d %d %d %s",
+	   fprintf(stderr, "FEAS %d %d %d %d %d %d %s",
 	   n_cont_eq, n_ref_eq, n_cont_in, n_ref_in, method, ok, t1); } */
 
     }
