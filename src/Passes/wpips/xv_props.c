@@ -10,6 +10,7 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "top-level.h"
 #include "graph.h"
 #include "makefile.h"
 #include "database.h"
@@ -81,7 +82,6 @@ void
 apply_on_each_option_item(void (* function_to_apply_on_each_menu_item)(Menu_item),
                           void (* function_to_apply_on_each_panel_item)(Panel_item))
 {
-   Menu_item menu_item;
    int i;
    
    /* Walk through items of menu_options */
@@ -273,7 +273,9 @@ char *aliased_phase;
          debug_on("WPIPS_DEBUG_LEVEL");
          activate(phase);
          debug_off();
-         user_log("Options: phase %s set on.\n", aliased_phase);
+         user_log("Options: phase %s (%s) set on.\n",
+                  aliased_phase,
+                  phase);
       }
    }
    /* To have the options panel consistent with the real phase set :
@@ -520,6 +522,56 @@ build_options_menu_and_panel(Menu menu_options,
    {
       Panel_item option_item;
       char * option_item_label;
+      Panel_item panel_item;
+
+      PANEL_EACH_ITEM(options_panel, option_item)
+         if ((Panel_item_type) xv_get(option_item, PANEL_ITEM_CLASS) ==
+             PANEL_CHOICE_ITEM) {
+            Menu_item view_menu_item;
+            
+            option_item_label = (char *) xv_get(option_item,
+                                                PANEL_LABEL_STRING);
+
+            /* Find if the View menu has an item with the same value: */
+            view_menu_item =
+               (Menu_item) xv_find(view_menu, MENUITEM,
+                                   MENU_STRING, option_item_label,
+                                /* Do not create the menu item if it
+                                   does not exist: */
+                                   XV_AUTO_CREATE, FALSE,
+                                   NULL);
+            if (view_menu_item != XV_NULL) {
+               /* OK, there is also a View menu with the same name. */
+               xv_create(options_panel, PANEL_BUTTON,
+                         PANEL_NOTIFY_PROC, options_panel_to_view_menu_gateway,
+                         PANEL_LABEL_STRING, option_item_label,
+                         XV_X, xv_get(option_item, XV_X),
+                         XV_Y, xv_get(option_item, XV_Y),
+                         NULL);
+
+               xv_set(option_item,
+                      PANEL_LABEL_STRING, NULL,
+                      PANEL_LABEL_WIDTH, 0,
+                      PANEL_VALUE_X, xv_get(option_item, PANEL_VALUE_X),
+                      NULL);
+            }
+            else {
+               /* Shift a little bit the PANEL_LABEL to align with
+                  other text of the menu buttons: */
+               xv_set(option_item,
+                      PANEL_VALUE_X, xv_get(option_item, PANEL_VALUE_X),
+                      PANEL_LABEL_X, xv_get(option_item, PANEL_LABEL_X) + 8,
+                      NULL);
+               
+            }          
+         }
+      PANEL_END_EACH
+         }
+   
+#if 0
+   {
+      Panel_item option_item;
+      char * option_item_label;
       Panel_item * the_option_panel_items;
       int number_of_options_to_link_with_the_view_menu;
       int i = 0;
@@ -578,41 +630,43 @@ build_options_menu_and_panel(Menu menu_options,
                       NULL);
             }
          }
+#endif
 }
 
 
 
-void build_aliases()
+void
+build_aliases()
 {
-    char buffer[128];
-    char true_name[128], alias_name[128];
-    FILE *fd;
-    char * wpips_rc = WPIPS_RC;
+   char buffer[128];
+   char true_name[128], alias_name[128];
+   FILE *fd;
+   char * wpips_rc = WPIPS_RC;
 
-    aliases = hash_table_make(hash_string, 0);
+   aliases = hash_table_make(hash_string, 0);
 
-    if(wpips_rc == NULL)
-		user_error("build_aliases", "Shell variable LIBDIR is undefined. Have you run pipsrc?\n",
-		   0 );
-    fd = safe_fopen(wpips_rc, "r");
+   if (wpips_rc == NULL)
+      user_error("build_aliases", "Shell variable LIBDIR is undefined. Have you run pipsrc?\n",
+                 0 );
+   fd = safe_fopen(wpips_rc, "r");
 
-    while (fgets(buffer, 128, fd) != NULL) {
-	if (buffer[0] == '-')
-	    continue;
+   while (fgets(buffer, 128, fd) != NULL) {
+      if (buffer[0] == '-')
+         continue;
 
-	sscanf(buffer, "alias%s '%[^']", true_name, alias_name);
+      sscanf(buffer, "alias%s '%[^']", true_name, alias_name);
 
-	if (hash_get(aliases, alias_name) != HASH_UNDEFINED_VALUE) {
-	    pips_error("build_aliases", "Aliases must not be ambiguous\n");
-	}
-	else {
-	    char upper[128];
+      if (hash_get(aliases, alias_name) != HASH_UNDEFINED_VALUE) {
+         pips_error("build_aliases", "Aliases must not be ambiguous\n");
+      }
+      else {
+         char upper[128];
 
-	    hash_put(aliases, 
-		     strdup(alias_name), 
-		     strdup(strupper(upper, true_name)));
-	}
-    }
+         hash_put(aliases, 
+                  strdup(alias_name), 
+                  strdup(strupper(upper, true_name)));
+      }
+   }
 }
 
 void
@@ -649,7 +703,7 @@ create_options_menu_and_window()
                                      NULL);
 
    options_menu = (Menu) xv_create(XV_NULL, MENU_COMMAND_MENU,
-                                   MENU_TITLE_ITEM, "Selecting PIPS Options",
+                                   MENU_TITLE_ITEM, "Selecting PIPS Options ",
                                    MENU_GEN_PIN_WINDOW, main_frame, "Options Menu",
                                    MENU_ITEM,
                                    MENU_STRING, display_options_panel,
@@ -665,10 +719,6 @@ create_options_menu_and_window()
                     PANEL_ITEM_MENU, options_menu,
                     NULL);
 
-   /* The window fit is done now in build_options_menu_and_panel() to
-      leave unchanged the overlay buttons. */
-   /*
    window_fit(options_panel);
    window_fit(options_frame);
-   */
 }
