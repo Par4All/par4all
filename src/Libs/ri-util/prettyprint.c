@@ -2,6 +2,9 @@
  * $Id$
  *
  * $Log: prettyprint.c,v $
+ * Revision 1.171  2002/04/25 13:55:57  phamdat
+ * *** empty log message ***
+ *
  * Revision 1.170  2002/04/25 13:51:34  phamdat
  * *** empty log message ***
  *
@@ -352,7 +355,7 @@
  */
 
 #ifndef lint
-char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.170 2002/04/25 13:51:34 phamdat Exp $";
+char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/ri-util/RCS/prettyprint.c,v 1.171 2002/04/25 13:55:57 phamdat Exp $";
 #endif /* lint */
 
  /*
@@ -2525,6 +2528,7 @@ text_named_module(
 }
 
 /**************written by Dat*********************/
+static
 void my_print(text t)
 {
   string filename = "/users/tmp/phamdat/textout";
