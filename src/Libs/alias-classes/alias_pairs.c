@@ -166,10 +166,24 @@ add_alias_pairs_for_this_call_site(call call_site)
     pips_debug(9, "begin\n");
 
     context = load_statement_precondition(current_caller_stmt);
+
+    pips_debug(9,"for statement %03d\n",statement_number(current_caller_stmt));
+    
+    pips_debug(9,"\tgot context:\n\t%s\n",tranformer_to_string(context));
+
     real_args = call_arguments(call_site);
 
+    pips_debug(9,"done call_arguments\n");
+
     set_interprocedural_translation_context_sc(callee, real_args);
+
+    pips_debug(9,"done set_interprocedural_translation_context_sc\n");
+
+    pips_debug(9,"\tfor callee %s\n",entity_name(callee));
+
     set_backward_arguments_to_eliminate(callee);
+
+    pips_debug(9,"done set_backward_arguments_to_eliminate\n");
 
     add_parameter_aliases_for_this_call_site(call_site,context);
 /*    add_common_aliases_for_this_call_site(); */
