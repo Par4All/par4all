@@ -1,5 +1,5 @@
 /* $RCSfile: reductions.c,v $ (version $Revision$)
- * $Date: 1996/06/15 18:30:33 $, 
+ * $Date: 1996/06/17 16:20:29 $, 
  *
  * detection of simple reductions.
  * debug driven by REDUCTIONS_DEBUG_LEVEL
@@ -180,38 +180,32 @@ build_reduction_of_variable(
     list /* of statement */ ls,
     reduction *pr)
 {
-    *pr = NULL; /* starting point */
+    *pr = make_reduction
+	(reference_undefined,
+	 make_reduction_operator(is_reduction_operator_none, UU),
+	 NIL);
     
     if (!update_compatible_reduction
 	(pr, var, load_statement_proper_effects(node),
 	 load_proper_reductions(node)))
+    {
+	free_reduction(*pr);
 	return FALSE;
+    }
 
     MAP(STATEMENT, s,
+    {
 	if (!update_compatible_reduction
 	    (pr, var, load_statement_cumulated_effects(s), 
 	     load_cumulated_reductions(s)))
-	    return FALSE,
+	{
+	    free_reduction(*pr);
+	    return FALSE;
+	}
+    },
 	ls);
 
     return TRUE;
-}
-
-static reductions
-build_reductions_of_variables(
-    list /* of entity */ le,
-    statement node,
-    list /* of statement */ ls)
-{
-    list /* of reduction */ lr=NIL;
-    reduction r;
-
-    MAP(ENTITY, var,
-	if (build_reduction_of_variable(var, node, ls, &r))
-	    lr = CONS(REDUCTION, r, lr),
-	le);
-
-    return make_reductions(lr); /* gonna be of node */
 }
 
 static void 
@@ -220,9 +214,20 @@ build_reductions_of_statement(
     list /* of statement */ ls)
 {
     list /* of entity */ le;
+    list /* of reduction */ lr=NIL;
+    reduction r;
+
+    /* list of candidates */
     le = list_of_reduced_variables(node, ls);
-    store_cumulated_reductions
-	(node, build_reductions_of_variables(le, node, ls));
+
+    /* for each candidate, extract the reduction if any */
+    MAP(ENTITY, var,
+	if (build_reduction_of_variable(var, node, ls, &r))
+	    lr = CONS(REDUCTION, r, lr),
+	le);
+
+    /* store the result */
+    store_cumulated_reductions(node, make_reductions(lr)); 
     gen_free_list(le);
 }
 
