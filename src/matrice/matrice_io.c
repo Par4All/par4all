@@ -1,7 +1,6 @@
   /* package matrice */
 
 #include <stdio.h>
-#include <sys/stdtypes.h> /*for debug with dbmalloc */
 #include <malloc.h>
 
 #include "assert.h"
@@ -10,6 +9,24 @@
 #include "arithmetique.h"
 
 #include "matrice.h"
+
+/* void pr_quot(FILE * f, int a, int b): print quotient a/b in a sensible way,
+ * i.e. add a space in front of positive number to compensate for the
+ * minus sign of negative number
+ *
+ * FI: a quoi sert le parametre b? A quoi sert la variable d? =>ARGSUSED
+ */
+static void pr_quot(f,a,b)
+FILE * f;
+Value a;
+Value b;
+{
+    if (value_pos_p(a))
+	fprintf(f, " ");
+    fprintf(f, " ");
+    fprint_Value(f, a);
+    fprintf(f, " ");
+}
 
 /* void matrice_fprint(File * f, matrice a,n,m): print an (nxm) rational matrix
  *
@@ -23,7 +40,7 @@ int	m;			/* row size */
 {
     int	loop1,loop2;
 
-    assert(DENOMINATOR(a)!=0);
+    assert(value_notzero_p(DENOMINATOR(a)));
 
     (void) fprintf(f,"\n\n");
 
@@ -32,7 +49,9 @@ int	m;			/* row size */
 	    pr_quot(f, ACCESS(a,n,loop1,loop2), DENOMINATOR(a));
 	(void) fprintf(f,"\n\n");
     }
-    (void) fprintf(f," ......denominator = %d\n",DENOMINATOR(a));
+    (void) fprintf(f," ......denominator = ");
+    fprint_Value(f,DENOMINATOR(a));
+    fprintf(f, "\n");
 }
 
 /* void matrice_print(matrice a, int n, int m): print an (nxm) rational matrix
@@ -87,34 +106,16 @@ int * m;			/* row size */
     *a = matrice_new(*n,*m); 
 
     /* read denominator */
-    n_read = fscanf(f," %d",&(DENOMINATOR(*a)));
+    n_read = fscan_Value(f,&(DENOMINATOR(*a)));
     assert(n_read == 1);
     /* necessaires pour eviter les divisions par zero */
-    assert(DENOMINATOR(*a)!=0);
+    assert(value_notzero_p(DENOMINATOR(*a)));
     /* pour "normaliser" un peu les representations */
-    assert(DENOMINATOR(*a) > 0);
+    assert(value_pos_p(DENOMINATOR(*a)));
 
     for(r = 1; r <= *n; r++) 
 	for(c = 1; c <= *m; c++) {
-	    n_read = fscanf(f," %d",&ACCESS(*a,*n,r,c));
+	    n_read = fscan_Value(f,&ACCESS(*a,*n,r,c));
 	    assert(n_read == 1);
 	}
-}
-
-/* void pr_quot(FILE * f, int a, int b): print quotient a/b in a sensible way,
- * i.e. add a space in front of positive number to compensate for the
- * minus sign of negative number
- *
- * FI: a quoi sert le parametre b? A quoi sert la variable d? =>ARGSUSED
- */
-/*ARGSUSED*/
-void pr_quot(f,a,b)
-FILE * f;
-int a;
-int b;
-{	
-    if (a < 0) 
-	(void) fprintf(f," %d ",a);
-    else 
-	(void) fprintf(f,"  %d ",a);
 }
