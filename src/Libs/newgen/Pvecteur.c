@@ -142,7 +142,7 @@ Pvecteur_to_assign_statement(
     vcopy = vect_dup(v);
 	
     if (coef) vect_erase_var(&vcopy, (Variable) var);
-    if (coef==1) vect_chg_sgn(v);
+    if (coef==1) vect_chg_sgn(vcopy);
 	
     result = make_assign_statement(entity_to_expression(var),
 				   make_vecteur_expression(vcopy));
