@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1997/02/04 18:31:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1997/02/05 21:31:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/02/04 18:31:35 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char lib_ri_util_unstructured_c_vcid[] = "%A% ($Date: 1997/02/05 21:31:39 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
  /*
@@ -35,108 +35,108 @@ text_unstructured(entity module,
                   int margin,
                   unstructured u, int num)
 {
-  text r = make_text(NIL);
-  hash_table labels = hash_table_make(hash_pointer, 0) ;
-  list trail = NIL;
-  control cexit = unstructured_exit(u) ;
-  control centry = unstructured_control(u) ;
+    text r = make_text(NIL);
+    hash_table labels = hash_table_make(hash_pointer, 0) ;
+    list trail = NIL;
+    control cexit = unstructured_exit(u) ;
+    control centry = unstructured_control(u) ;
 
-  debug(2, "text_unstructured", "Begin for unstructured %x\n",
-	(unsigned int) u);
+    debug(2, "text_unstructured", "Begin for unstructured %x\n",
+	  (unsigned int) u);
    
-  ifdebug(3) {
-    list blocks = NIL;
-    fprintf(stderr,"Unstructured %x (%x, %x)\n", 
-	    (unsigned int) u, (unsigned int) centry, (unsigned int) cexit ) ;
-    CONTROL_MAP( n, {
-      statement st = control_statement(n) ;
+    ifdebug(3) {
+	list blocks = NIL;
+	fprintf(stderr,"Unstructured %x (%x, %x)\n", 
+		(unsigned int) u, (unsigned int) centry, (unsigned int) cexit ) ;
+	CONTROL_MAP( n, {
+	    statement st = control_statement(n) ;
 
-      /*
-      fprintf(stderr, "\n%*sNode %x (%s)\n--\n", margin, "", 
+	    /*
+	      fprintf(stderr, "\n%*sNode %x (%s)\n--\n", margin, "", 
 	      (unsigned int) n, control_to_label_name(n, labels)) ;
 	      */
-      fprintf(stderr, "\n%*sNode %x (%s)\n--\n", margin, "", 
-	      (unsigned int) n, statement_identification(st));
-      ifdebug(9)
-	print_text(stderr, text_statement(module,margin,st));
-      fprintf(stderr, "--\n%*sPreds:", margin, "");
-      MAPL(ps,{
-	int so = statement_ordering(control_statement(CONTROL(CAR(ps))));
-	fprintf(stderr,"%x (%d,%d), ", (unsigned int) CONTROL(CAR(ps)),
-		ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
-      }, control_predecessors(n));
-      fprintf(stderr, "\n%*sSuccs:", margin, "") ;
-      MAPL(ss,{
-	int so = statement_ordering(control_statement(CONTROL(CAR(ss))));
-	fprintf(stderr,"%x (%d,%d), ", (unsigned int) CONTROL(CAR(ss)),
-		ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
-      }, control_successors(n));
-      fprintf(stderr, "\n\n") ;
-    }, centry , blocks) ;
-    gen_free_list(blocks);
-  }
+	    fprintf(stderr, "\n%*sNode %x (%s)\n--\n", margin, "", 
+		    (unsigned int) n, statement_identification(st));
+	    ifdebug(9)
+		print_text(stderr, text_statement(module,margin,st));
+	    fprintf(stderr, "--\n%*sPreds:", margin, "");
+	    MAPL(ps,{
+		int so = statement_ordering(control_statement(CONTROL(CAR(ps))));
+		fprintf(stderr,"%x (%d,%d), ", (unsigned int) CONTROL(CAR(ps)),
+			ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
+	    }, control_predecessors(n));
+	    fprintf(stderr, "\n%*sSuccs:", margin, "") ;
+	    MAPL(ss,{
+		int so = statement_ordering(control_statement(CONTROL(CAR(ss))));
+		fprintf(stderr,"%x (%d,%d), ", (unsigned int) CONTROL(CAR(ss)),
+			ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
+	    }, control_successors(n));
+	    fprintf(stderr, "\n\n") ;
+	}, centry , blocks) ;
+	gen_free_list(blocks);
+    }
 
-  if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH"))
+    if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH"))
     {
-      output_a_graph_view_of_the_unstructured
-	(r, module, label, margin, u, num);
+	output_a_graph_view_of_the_unstructured
+	    (r, module, label, margin, u, num);
     }
-  else {
-    list pbeg, pend;
+    else {
+	list pbeg, pend;
 
-    if(get_bool_property("PRETTYPRINT_UNSTRUCTURED")) {
-      pbeg = CHAIN_SWORD(NIL, "BEGIN UNSTRUCTURED");
+	if(get_bool_property("PRETTYPRINT_UNSTRUCTURED")) {
+	    pbeg = CHAIN_SWORD(NIL, "BEGIN UNSTRUCTURED");
 	    
-      u = make_unformatted(strdup("C"), num, margin, pbeg);
-      ADD_SENTENCE_TO_TEXT(r, 
-			   make_sentence(is_sentence_unformatted, u));
-    }
+	    u = make_unformatted(strdup("C"), num, margin, pbeg);
+	    ADD_SENTENCE_TO_TEXT(r, 
+				 make_sentence(is_sentence_unformatted, u));
+	}
 
-    /* build an arbitrary reverse trail of control nodes */
-    trail = build_trail(trail, centry);
-    debug(3, "text_unstructured", "Trail length: %d\n", gen_length(trail));
+	/* build an arbitrary reverse trail of control nodes */
+	trail = build_trail(trail, centry);
+	debug(3, "text_unstructured", "Trail length: %d\n", gen_length(trail));
 
-    /* The exit node *must* be first (i.e. last) to reach the continuation
-     * of the unstructured, or never reached (e.g. because the program loops
-     * forever or stops in the unstructured).
-     */
-    if(control_in_trail_p(trail, cexit)) {
-      if(cexit!=CONTROL(CAR(trail))) {
-	gen_remove(&trail, cexit);
-	trail = CONS(CONTROL, cexit, trail);
-      }
-    }
+	/* The exit node *must* be first (i.e. last) to reach the continuation
+	 * of the unstructured, or never reached (e.g. because the program loops
+	 * forever or stops in the unstructured).
+	 */
+	if(control_in_trail_p(trail, cexit)) {
+	    if(cexit!=CONTROL(CAR(trail))) {
+		gen_remove(&trail, cexit);
+		trail = CONS(CONTROL, cexit, trail);
+	    }
+	}
       
-    trail = gen_nreverse(trail);
+	trail = gen_nreverse(trail);
 
-    ifdebug(3)
-      dump_trail(trail);
+	ifdebug(3)
+	    dump_trail(trail);
 
-    /* decorate control nodes with labels when necessary */
-    decorate_trail(module, trail, labels);
+	/* decorate control nodes with labels when necessary */
+	decorate_trail(module, trail, labels);
 
-    ifdebug(3)
-      dump_control_to_label_name(labels);
+	ifdebug(3)
+	    dump_control_to_label_name(labels);
 
-    /* generate text with labels and goto's */
+	/* generate text with labels and goto's */
 
-    MERGE_TEXTS(r, text_trail(module, margin, trail, labels));
+	MERGE_TEXTS(r, text_trail(module, margin, trail, labels));
 
-    if(get_bool_property("PRETTYPRINT_UNSTRUCTURED")) {
-      pend = CHAIN_SWORD(NIL, "END UNSTRUCTURED");
+	if(get_bool_property("PRETTYPRINT_UNSTRUCTURED")) {
+	    pend = CHAIN_SWORD(NIL, "END UNSTRUCTURED");
 	    
-      u = make_unformatted(strdup("C"), num, margin, pend);
-      ADD_SENTENCE_TO_TEXT(r, 
-			   make_sentence(is_sentence_unformatted, u));
+	    u = make_unformatted(strdup("C"), num, margin, pend);
+	    ADD_SENTENCE_TO_TEXT(r, 
+				 make_sentence(is_sentence_unformatted, u));
+	}
     }
-  }
 
-  hash_table_free(labels) ;
+    hash_table_free(labels) ;
 
-  debug(2, "text_unstructured", "End for unstructured %x\n",
-	(unsigned int) u);
+    debug(2, "text_unstructured", "End for unstructured %x\n",
+	  (unsigned int) u);
 
-  return(r) ;
+    return(r) ;
 }
 
 /* Any heuristics can be used to build the trail, depth or width first,
@@ -153,89 +153,90 @@ text_unstructured(entity module,
 static list
 build_trail(list l, control c)
 {
-  control succ = control_undefined;
-  int nsucc = 0;
+    control succ = control_undefined;
+    int nsucc = 0;
 
-  if(check_io_statement_p(control_statement(c)) &&
-     !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
-    /* Do not add this artificial node to the trail, follow the left
-     * successors only
-     */
-    pips_assert("Must be a test statement",
-		instruction_test_p(statement_instruction(control_statement(c))));
-    debug(3, "build_trail", "Skipping IO check %s",
-	  statement_identification(control_statement(c)));
-    succ = CONTROL(CAR(CDR(control_successors(c))));
-    debug(3, "build_trail", "False Successor: %s",
-	      statement_identification(control_statement(succ)));
-    l = build_trail(l, succ);
-    succ = CONTROL(CAR(control_successors(c)));
-    debug(3, "build_trail", "True Successor: %s",
-	      statement_identification(control_statement(succ)));
-    l = build_trail(l, succ);
-  }
-  else {
-
-    nsucc = gen_length(control_successors(c));
-
-    debug(3, "build_trail", "for %s with %d successors\n",
-	  statement_identification(control_statement(c)),
-	  nsucc);
-    ifdebug(3) {
-      int i = 1;
-      MAPL(cs, {
-	statement ss = control_statement(CONTROL(CAR(cs)));
-	debug(3, "build_trail", "Successor %d: %s",
-	      i++, statement_identification(ss));
-      }, control_successors(c));
-    }
-    
-    /* Add c to the trail if not already in */
-    if(!control_in_trail_p(l, c)) {
-      debug(3, "build_trail", "Add to trail %s",
-	    statement_identification(control_statement(c)));
-      l = CONS(CONTROL,c,l);
-      switch(nsucc) {
-      case 0:
-	break;
-      case 1:
-	succ = CONTROL(CAR(control_successors(c)));
-	l = build_trail(l, succ);
-	break;
-      case 2:
-	/* Follow the false branch in depth first, assuming that IF GOTO's 
-	 * mainly handle exceptions */
+    if(check_io_statement_p(control_statement(c)) &&
+       !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) {
+	/* Do not add this artificial node to the trail, follow the left
+	 * successors only
+	 */
+	pips_assert("Must be a test statement",
+		    instruction_test_p(statement_instruction(control_statement(c))));
+	debug(3, "build_trail", "Skipping IO check %s",
+	      statement_identification(control_statement(c)));
 	succ = CONTROL(CAR(CDR(control_successors(c))));
+	debug(3, "build_trail", "False Successor: %s",
+	      statement_identification(control_statement(succ)));
 	l = build_trail(l, succ);
 	succ = CONTROL(CAR(control_successors(c)));
+	debug(3, "build_trail", "True Successor: %s",
+	      statement_identification(control_statement(succ)));
 	l = build_trail(l, succ);
-	break;
-      default:
-	pips_error("build_trail", "Too many successors (%d) for a control node\n",
-		   nsucc);
-      }
     }
     else {
-      debug(3, "build_trail", "Already in trail %s",
-	    statement_identification(control_statement(c)));
+
+	nsucc = gen_length(control_successors(c));
+
+	debug(3, "build_trail", "for %s with %d successors\n",
+	      statement_identification(control_statement(c)),
+	      nsucc);
+	ifdebug(3) {
+	    int i = 1;
+	    MAPL(cs, {
+		statement ss = control_statement(CONTROL(CAR(cs)));
+		debug(3, "build_trail", "Successor %d: %s",
+		      i++, statement_identification(ss));
+	    }, control_successors(c));
+	}
+    
+	/* Add c to the trail if not already in */
+	if(!control_in_trail_p(l, c)) {
+	    debug(3, "build_trail", "Add to trail %s",
+		  statement_identification(control_statement(c)));
+	    l = CONS(CONTROL,c,l);
+	    switch(nsucc) {
+	    case 0:
+		break;
+	    case 1:
+		succ = CONTROL(CAR(control_successors(c)));
+		l = build_trail(l, succ);
+		break;
+	    case 2:
+		/* Follow the false branch in depth first, assuming that IF GOTO's 
+		 * mainly handle exceptions */
+		succ = CONTROL(CAR(CDR(control_successors(c))));
+		l = build_trail(l, succ);
+		succ = CONTROL(CAR(control_successors(c)));
+		l = build_trail(l, succ);
+		break;
+	    default:
+		pips_error("build_trail", "Too many successors (%d) for a control node\n",
+			   nsucc);
+	    }
+	}
+	else {
+	    debug(3, "build_trail", "Already in trail %s",
+		  statement_identification(control_statement(c)));
+	}
     }
-  }
-  return l;
+    return l;
 }
 
-void dump_trail(list trail)
+void 
+dump_trail(list trail)
 {
-  if(ENDP(trail)) {
-    fprintf(stderr, "[dump_trail] trail is empty\n");
-  }
-  else {
-    fprintf(stderr, "[dump_trail] begin\n");
-    MAPL(cc, {
-      statement s = control_statement(CONTROL(CAR(cc)));
-      fprintf(stderr, "[dump_trail] %s", statement_identification(s));
-    }, trail);
-    fprintf(stderr, "[dump_trail] end\n");
-  }
+    if(ENDP(trail)) {
+	fprintf(stderr, "[dump_trail] trail is empty\n");
+    }
+    else {
+	fprintf(stderr, "[dump_trail] begin\n");
+	MAPL(cc, {
+	    statement s = control_statement(CONTROL(CAR(cc)));
+	    fprintf(stderr, "[dump_trail] %s", statement_identification(s));
+	}, trail);
+	fprintf(stderr, "[dump_trail] end\n");
+    }
 }
 
 /* OK, a hash table could be used, as Pierre used too... but the order
@@ -245,107 +246,107 @@ void dump_trail(list trail)
 static bool
 control_in_trail_p(list l, control c)
 {
-  bool found = gen_find_eq(c, l) != gen_chunk_undefined;
-  return found;
+    bool found = gen_find_eq(c, l) != gen_chunk_undefined;
+    return found;
 }
 
 static void
 decorate_trail(entity module, list trail, hash_table labels)
 {
-  list cc = NIL;
+    list cc = NIL;
 
-  pips_assert("trail cannot be empty", !ENDP(trail));
+    pips_assert("trail cannot be empty", !ENDP(trail));
 
-  for(cc=trail; !ENDP(cc); POP(cc)) {
-    control c = CONTROL(CAR(cc));
-    int nsucc = gen_length(control_successors(c));
+    for(cc=trail; !ENDP(cc); POP(cc)) {
+	control c = CONTROL(CAR(cc));
+	int nsucc = gen_length(control_successors(c));
 
-    debug(3, "decorate_trail", "Processing statement %s with %d successors\n",
-	  statement_identification(control_statement(c)), nsucc);
+	debug(3, "decorate_trail", "Processing statement %s with %d successors\n",
+	      statement_identification(control_statement(c)), nsucc);
 
-    switch(nsucc) {
-    case 0:
-      /* No need for a label, it must be the exit node... Should be asserted
-       * The exit node may have two successors
-       */
-      break;
-    case 1: {
-      control succ = CONTROL(CAR(control_successors(c)));
-      /* If the statement "really" has a continuation (e.g. not a STOP
-       * or a RETURN
-       */
-      if(statement_does_return(control_statement(c)) &&
-	 !(check_io_statement_p(control_statement(succ)) &&
-	   !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS"))) {
-	if(!ENDP(CDR(cc))) {
-	  control tsucc = CONTROL(CAR(CDR(cc)));
-	  if(tsucc==succ) {
-	    /* the control successor is the textual successor */
+	switch(nsucc) {
+	case 0:
+	    /* No need for a label, it must be the exit node... Should be asserted
+	     * The exit node may have two successors
+	     */
 	    break;
-	  }
+	case 1: {
+	    control succ = CONTROL(CAR(control_successors(c)));
+	    /* If the statement "really" has a continuation (e.g. not a STOP
+	     * or a RETURN
+	     */
+	    if(statement_does_return(control_statement(c)) &&
+	       !(check_io_statement_p(control_statement(succ)) &&
+		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS"))) {
+		if(!ENDP(CDR(cc))) {
+		    control tsucc = CONTROL(CAR(CDR(cc)));
+		    if(tsucc==succ) {
+			/* the control successor is the textual successor */
+			break;
+		    }
+		}
+		/* A label must be associated with the control successor */
+		pips_assert("Successor must be in trail",
+			    control_in_trail_p(trail, succ));
+		set_control_to_label(module, succ, labels);
+	    }
+	    break;
 	}
-	/* A label must be associated with the control successor */
-	pips_assert("Successor must be in trail",
-		    control_in_trail_p(trail, succ));
-	set_control_to_label(module, succ, labels);
-      }
-      break;
-    }
-    case 2: {
-      control succ1 = CONTROL(CAR(control_successors(c)));
-      control succ2 = CONTROL(CAR(CDR(control_successors(c))));
+	case 2: {
+	    control succ1 = CONTROL(CAR(control_successors(c)));
+	    control succ2 = CONTROL(CAR(CDR(control_successors(c))));
 
-      debug(3, "decorate_trail", "Successor 1 %s",
-	  statement_identification(control_statement(succ1)));
-      debug(3, "decorate_trail", "Successor 2 %s",
-	  statement_identification(control_statement(succ2)));
+	    debug(3, "decorate_trail", "Successor 1 %s",
+		  statement_identification(control_statement(succ1)));
+	    debug(3, "decorate_trail", "Successor 2 %s",
+		  statement_identification(control_statement(succ2)));
 
-      /* Is there a textual successor? */
-      if(!ENDP(CDR(cc))) {
-	control tsucc = CONTROL(CAR(CDR(cc)));
-	if(tsucc==succ1) {
-	  if(tsucc==succ2) {
-	    /* This may happen after restructuring */
-	    ;
-	  }
-	  else {
-	    /* succ2 must be labelled */
-	    pips_assert("Successor 2 must be in trail",
-			control_in_trail_p(trail, succ2));
-	    set_control_to_label(module, succ2, labels);
-	  }
+	    /* Is there a textual successor? */
+	    if(!ENDP(CDR(cc))) {
+		control tsucc = CONTROL(CAR(CDR(cc)));
+		if(tsucc==succ1) {
+		    if(tsucc==succ2) {
+			/* This may happen after restructuring */
+			;
+		    }
+		    else {
+			/* succ2 must be labelled */
+			pips_assert("Successor 2 must be in trail",
+				    control_in_trail_p(trail, succ2));
+			set_control_to_label(module, succ2, labels);
+		    }
+		}
+		else {
+		    if(tsucc==succ2) {
+			/* succ1 must be labelled */
+			pips_assert("Successor 1 must be in trail",
+				    control_in_trail_p(trail, succ1));
+			set_control_to_label(module, succ1, labels);
+		    }
+		    else {
+			/* Both successors must be labelled */
+			pips_assert("Successor 1 must be in trail",
+				    control_in_trail_p(trail, succ1));
+			set_control_to_label(module, succ1, labels);
+			pips_assert("Successor 2 must be in trail",
+				    control_in_trail_p(trail, succ2));
+			set_control_to_label(module, succ2, labels);
+		    }
+		}
+	    }
+	    else {
+		/* Both successors must be textual predecessors */
+		pips_assert("succ1 before c", appears_first_in_trail(trail, succ1, c));
+		pips_assert("succ2 before c", appears_first_in_trail(trail, succ2, c));
+		set_control_to_label(module, succ1, labels);
+		set_control_to_label(module, succ2, labels);
+	    }
+	    break;
 	}
-	else {
-	  if(tsucc==succ2) {
-	    /* succ1 must be labelled */
-	    pips_assert("Successor 1 must be in trail",
-			control_in_trail_p(trail, succ1));
-	    set_control_to_label(module, succ1, labels);
-	  }
-	  else {
-	    /* Both successors must be labelled */
-	    pips_assert("Successor 1 must be in trail",
-			control_in_trail_p(trail, succ1));
-	    set_control_to_label(module, succ1, labels);
-	    pips_assert("Successor 2 must be in trail",
-			control_in_trail_p(trail, succ2));
-	    set_control_to_label(module, succ2, labels);
-	  }
+	default:
+	    pips_internal_error("Too many successors for a control node\n");
 	}
-      }
-      else {
-	/* Both successors must be textual predecessors */
-	pips_assert("succ1 before c", appears_first_in_trail(trail, succ1, c));
-	pips_assert("succ2 before c", appears_first_in_trail(trail, succ2, c));
-	set_control_to_label(module, succ1, labels);
-	set_control_to_label(module, succ2, labels);
-      }
-      break;
     }
-    default:
-      pips_internal_error("Too many successors for a control node\n");
-    }
-  }
 }
 
 /* returns TRUE if c1 is encountered before c2 in trail, or if c1 == c2
@@ -355,23 +356,23 @@ decorate_trail(entity module, list trail, hash_table labels)
 static bool
 appears_first_in_trail(list trail, control c1, control c2)
 {
-  bool first = FALSE;
-  control c = control_undefined;
+    bool first = FALSE;
+    control c = control_undefined;
 
-  MAPL(cc, {
-    c = CONTROL(CAR(cc));
+    MAPL(cc, {
+	c = CONTROL(CAR(cc));
 
-    if(c==c1) {
-      first = TRUE;
-      break;
-    }
-    else if(c==c2) {
-      first = FALSE;
-      break;
-    }
-  }, trail);
-  pips_assert("At least one control should appear in trail", c==c1 || c==c2);
-  return first;
+	if(c==c1) {
+	    first = TRUE;
+	    break;
+	}
+	else if(c==c2) {
+	    first = FALSE;
+	    break;
+	}
+    }, trail);
+    pips_assert("At least one control should appear in trail", c==c1 || c==c2);
+    return first;
 }
 
 
@@ -420,7 +421,7 @@ control_to_label_name(control c, hash_table h)
     if ((l = hash_get(h, (char *) c)) == HASH_UNDEFINED_VALUE) {
 	debug(3, "control_to_label_name", "Retrieves no label for stmt %s\n",
 	      statement_identification(st));
-      l = string_undefined;
+	l = string_undefined;
     }
     else {
 	debug(3, "control_to_label_name", "Retrieves label %s for stmt %s\n",
@@ -435,187 +436,197 @@ control_to_label_name(control c, hash_table h)
 void
 dump_control_to_label_name(hash_table h)
 {
-  int i = 0;
+    int i = 0;
 
-  fprintf(stderr,"[dump_control_to_label_name] Begin\n");
-  HASH_MAP(c,l,{
-    fprintf(stderr, "Label %s -> %s", l,
-	    statement_identification(control_statement((control) c)));
-    i++;
-  }, h);
-  fprintf(stderr,"[dump_control_to_label_name] %d labels, end\n", i);
+    fprintf(stderr,"[dump_control_to_label_name] Begin\n");
+    HASH_MAP(c,l,{
+	fprintf(stderr, "Label %s -> %s", l,
+		statement_identification(control_statement((control) c)));
+	i++;
+    }, h);
+    fprintf(stderr,"[dump_control_to_label_name] %d labels, end\n", i);
 }
 
 static text
 text_trail(entity module, int margin, list trail, hash_table labels)
 {
-  list cc = NIL;
-  text r = make_text(NIL);
+    list cc = NIL;
+    text r = make_text(NIL);
 
-  pips_assert("trail cannot be empty", !ENDP(trail));
+    pips_assert("trail cannot be empty", !ENDP(trail));
 
-  for(cc=trail; !ENDP(cc); POP(cc)) {
-    control c = CONTROL(CAR(cc));
-    string l = string_undefined;
-    int nsucc = gen_length(control_successors(c));
-    statement st = control_statement(c);
+    for(cc=trail; !ENDP(cc); POP(cc)) {
+	control c = CONTROL(CAR(cc));
+	string l = string_undefined;
+	int nsucc = gen_length(control_successors(c));
+	statement st = control_statement(c);
 
-    debug(3, "text_trail", "Processing statement %s",
-	  statement_identification(st));
+	debug(3, "text_trail", "Processing statement %s",
+	      statement_identification(st));
 
-    /* Is a label needed? */
-    if((l=control_to_label_name(c, labels))!=string_undefined) {
-      if(strcmp(l, label_local_name(statement_to_label(control_statement(c))))
-	 != 0) {
-	list pc = CHAIN_SWORD(NIL,"CONTINUE") ;
-	sentence s = make_sentence(is_sentence_unformatted,
-				   make_unformatted(NULL, 0, margin, pc)) ;
-	unformatted_label(sentence_unformatted(s)) = l ;
-	ADD_SENTENCE_TO_TEXT(r, s);    
-	debug(3, "text_trail", "Label %s generated for stmt %s\n",
-	      l, statement_identification(control_statement(c)));
-      }
-    }
+	/* Is a label needed? */
+	if((l=control_to_label_name(c, labels))!=string_undefined) {
+	    if(strcmp(l, label_local_name(statement_to_label(control_statement(c))))
+	       != 0) {
+		list pc = CHAIN_SWORD(NIL,"CONTINUE") ;
+		sentence s = make_sentence(is_sentence_unformatted,
+					   make_unformatted(NULL, 0, margin, pc)) ;
+		unformatted_label(sentence_unformatted(s)) = l ;
+		ADD_SENTENCE_TO_TEXT(r, s);    
+		debug(3, "text_trail", "Label %s generated for stmt %s\n",
+		      l, statement_identification(control_statement(c)));
+	    }
+	}
 
-    /* Perform the very same tests as in decorate_trail()
-     * The successor may have a label but not need a GOTO to be reached.
-     */
+	/* Perform the very same tests as in decorate_trail()
+	 * The successor may have a label but not need a GOTO to be reached.
+	 */
 
-    switch(nsucc) {
-    case 0:
-      MERGE_TEXTS(r, text_statement(module, margin, st));
-      break;
-    case 1: {
-      control succ = CONTROL(CAR(control_successors(c)));
-
-      MERGE_TEXTS(r, text_statement(module, margin, st));
-
-      /* If the statement "really" has a continuation (e.g. not a STOP
-       * or a RETURN
-       */
-      if(statement_does_return(st) &&
-	 !(check_io_statement_p(control_statement(succ)) &&
-	   !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) ) {
-	if(!ENDP(CDR(cc))) {
-	  control tsucc = CONTROL(CAR(CDR(cc)));
-	  if(tsucc==succ) {
-	    /* the control successor is the textual successor */
+	switch(nsucc) {
+	case 0:
+	    MERGE_TEXTS(r, text_statement(module, margin, st));
 	    break;
-	  }
+	case 1: {
+	    control succ = CONTROL(CAR(control_successors(c)));
+
+	    MERGE_TEXTS(r, text_statement(module, margin, st));
+
+	    /* If the statement "really" has a continuation (e.g. not a STOP
+	     * or a RETURN
+	     */
+	    if(statement_does_return(st) &&
+	       !(check_io_statement_p(control_statement(succ)) &&
+		 !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS")) ) {
+		if(!ENDP(CDR(cc))) {
+		    control tsucc = CONTROL(CAR(CDR(cc)));
+		    if(tsucc==succ) {
+			/* the control successor is the textual successor */
+			break;
+		    }
+		}
+		/* A GOTO must be generated to reach the control successor */
+		l = control_to_label_name(succ, labels);
+		pips_assert("Must be labelled", l!= string_undefined);
+		ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
+							    margin, l, 0));
+	    }
+	    break;
 	}
-	/* A GOTO must be generated to reach the control successor */
-	l = control_to_label_name(succ, labels);
-	pips_assert("Must be labelled", l!= string_undefined);
-	ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
-						    margin, l, 0));
-      }
-      break;
-    }
-    case 2: {
-      control succ1 = CONTROL(CAR(control_successors(c)));
-      control succ2 = CONTROL(CAR(CDR(control_successors(c))));
-      instruction i = statement_instruction(st);
-      test t = test_undefined;
-      unformatted u = unformatted_undefined;
-      list pc = NIL;
-      sentence s = sentence_undefined;
-      string comments = statement_comments(st);
+	case 2: {
+	    control succ1 = CONTROL(CAR(control_successors(c)));
+	    control succ2 = CONTROL(CAR(CDR(control_successors(c))));
+	    instruction i = statement_instruction(st);
+	    test t = test_undefined;
+	    unformatted u = unformatted_undefined;
+	    list pc = NIL;
+	    sentence s = sentence_undefined;
+	    string comments = statement_comments(st);
+	    text r1 = make_text(NIL);
+	    bool no_endif = FALSE;
 
-      pips_assert("text_control", instruction_test_p(i));
+	    pips_assert("text_control", instruction_test_p(i));
 
-      MERGE_TEXTS(r, init_text_statement(module, margin, st)) ;
-      if (! string_undefined_p(comments)) {
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
-					      comments));
-      }
+	    MERGE_TEXTS(r, init_text_statement(module, margin, st)) ;
+	    if (! string_undefined_p(comments)) {
+		ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+						      comments));
+	    }
 
-      pc = CHAIN_SWORD(NIL, "IF (");
-      t = instruction_test(i);
-      pc = gen_nconc(pc, words_expression(test_condition(t)));
-      pc = CHAIN_SWORD(pc, ") THEN");
-      u = make_unformatted(NULL, statement_number(st), margin, pc) ;
+	    pc = CHAIN_SWORD(NIL, "IF (");
+	    t = instruction_test(i);
+	    pc = gen_nconc(pc, words_expression(test_condition(t)));
 
-      if( !empty_label_p( entity_name( statement_label( st )))) {
-	  /*
-	  string ln = control_to_label_name(c, labels);
-	  if(string_undefined_p(ln)) {
-	      entity lab = statement_label(st);
-	      print_statement(st);
-	      pips_assert("c must have been encountered before", !string_undefined_p(ln));
-	      }
-	      unformatted_label(u) = strdup(ln);
-	      */
-	  unformatted_label(u) = strdup(label_local_name(statement_label(st)));
-      }
-      s = make_sentence(is_sentence_unformatted, u) ;
-      ADD_SENTENCE_TO_TEXT(r, s);
+	    /* Is there a textual successor? */
+	    if(!ENDP(CDR(cc))) {
+		control tsucc = CONTROL(CAR(CDR(cc)));
+		if(tsucc==succ1) {
+		    if(tsucc==succ2) {
+			/* This may happen after restructuring */
+			;
+		    }
+		    else {
+			/* succ2 must be reached by GOTO */
+			l = control_to_label_name(succ2, labels);
+			pips_assert("Must be labelled", l!= string_undefined);
+			ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
+								     margin+INDENTATION,
+								     l, 0));
+		    }
+		}
+		else {
+		    if(tsucc==succ2) {
+			/* succ1 must be reached by GOTO */
+			l = control_to_label_name(succ1, labels);
+			pips_assert("Must be labelled", l!= string_undefined);
+			no_endif = TRUE;
+		    }
+		    else {
+			/* Both successors must be labelled */
+			l = control_to_label_name(succ1, labels);
+			pips_assert("Must be labelled", l!= string_undefined);
+			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
+								     margin+INDENTATION,
+								     l, 0));
+			ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+			l = control_to_label_name(succ2, labels);
+			pips_assert("Must be labelled", l!= string_undefined);
+			ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
+								     margin+INDENTATION,
+								     l, 0));
+		    }
+		}
+	    }
+	    else {
+		/* Both successors must be textual predecessors */
+		pips_assert("succ1 before c", appears_first_in_trail(trail, succ1, c));
+		pips_assert("succ1 before c", appears_first_in_trail(trail, succ2, c));
+		l = control_to_label_name(succ1, labels);
+		pips_assert("Must be labelled", l!= string_undefined);
+		ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
+							     margin+INDENTATION,
+							     l, 0));
+		ADD_SENTENCE_TO_TEXT(r1, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
+		l = control_to_label_name(succ2, labels);
+		pips_assert("Must be labelled", l!= string_undefined);
+		ADD_SENTENCE_TO_TEXT(r1, sentence_goto_label(module, NULL,
+							     margin+INDENTATION,
+							     l, 0));
+	    }
 
-      /* Is there a textual successor? */
-      if(!ENDP(CDR(cc))) {
-	control tsucc = CONTROL(CAR(CDR(cc)));
-	if(tsucc==succ1) {
-	  if(tsucc==succ2) {
-	    /* This may happen after restructuring */
-	    ;
-	  }
-	  else {
-	    /* succ2 must be reached by GOTO */
-	    l = control_to_label_name(succ2, labels);
-	    pips_assert("Must be labelled", l!= string_undefined);
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
-							margin+INDENTATION,
-							l, 0));
-	  }
+	    if(no_endif) {
+		pc = CHAIN_SWORD(pc, ") ");
+		pc = gen_nconc(pc, words_goto_label(l));
+	    }
+	    else {
+		pc = CHAIN_SWORD(pc, ") THEN");
+	    }
+	    u = make_unformatted(NULL, statement_number(st), margin, pc) ;
+
+	    if( !empty_label_p( entity_name( statement_label( st )))) {
+		/*
+		  string ln = control_to_label_name(c, labels);
+		  if(string_undefined_p(ln)) {
+		  entity lab = statement_label(st);
+		  print_statement(st);
+		  pips_assert("c must have been encountered before", !string_undefined_p(ln));
+		  }
+		  unformatted_label(u) = strdup(ln);
+		  */
+		unformatted_label(u) = strdup(label_local_name(statement_label(st)));
+	    }
+
+	    s = make_sentence(is_sentence_unformatted, u) ;
+	    ADD_SENTENCE_TO_TEXT(r, s);
+	    MERGE_TEXTS(r, r1);
+	    if(!no_endif)
+		ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
+	    break;
 	}
-	else {
-	  if(tsucc==succ2) {
-	    /* succ1 must be reached by GOTO */
-	    l = control_to_label_name(succ1, labels);
-	    pips_assert("Must be labelled", l!= string_undefined);
-	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
-							margin+INDENTATION,
-							l, 0));
-	  }
-	  else {
-	    /* Both successors must be labelled */
-	    l = control_to_label_name(succ1, labels);
-	    pips_assert("Must be labelled", l!= string_undefined);
-	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
-							margin+INDENTATION,
-							l, 0));
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-	    l = control_to_label_name(succ2, labels);
-	    pips_assert("Must be labelled", l!= string_undefined);
-	    ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
-							margin+INDENTATION,
-							l, 0));
-	  }
+	default:
+	    pips_internal_error("Too many successors for a control node\n");
 	}
-      }
-      else {
-	/* Both successors must be textual predecessors */
-	pips_assert("succ1 before c", appears_first_in_trail(trail, succ1, c));
-	pips_assert("succ1 before c", appears_first_in_trail(trail, succ2, c));
-	l = control_to_label_name(succ1, labels);
-	pips_assert("Must be labelled", l!= string_undefined);
-	ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
-						    margin+INDENTATION,
-						    l, 0));
-	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
-	l = control_to_label_name(succ2, labels);
-	pips_assert("Must be labelled", l!= string_undefined);
-	ADD_SENTENCE_TO_TEXT(r, sentence_goto_label(module, NULL,
-						    margin+INDENTATION,
-						    l, 0));
-      }
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
-      break;
     }
-    default:
-      pips_internal_error("Too many successors for a control node\n");
-    }
-  }
 
-  return r;
+    return r;
 }
