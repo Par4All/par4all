@@ -2,11 +2,8 @@
 # $Id$
 # 
 # $Log: makefile_macros.GNULL,v $
-# Revision 1.25  1997/05/12 16:15:07  coelho
-# *** empty log message ***
-#
-# Revision 1.24  1997/05/12 15:59:30  coelho
-# *** empty log message ***
+# Revision 1.26  1997/09/09 13:03:05  coelho
+# hop!
 #
 # Revision 1.23  1997/03/26 17:28:48  coelho
 # simplified.
@@ -14,16 +11,15 @@
 #
 # this file contains macro definitions 
 
-include $(ROOT)/Include/makefile_macros.GNU
+include $(ROOT)/Include/makefile_macros.doc
+include $(ROOT)/Include/makefile_macros.misc
+include $(ROOT)/Include/makefile_macros.gnu
+include $(ROOT)/Include/makefile_macros.gnutools
+include $(ROOT)/Include/makefile_macros.ll
+include $(ROOT)/Include/makefile_macros.flags
 
 # -ansi -petantic-errors and long long int is not a good idea.
-
-CFLAGS=-g -O2 -Wall -pipe
-
-CPPFLAGS+= \
-	-DLINEAR_VALUE_IS_LONGLONG \
-	-DLINEAR_VALUE_PROTECT_MULTIPLY \
-	-DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV 
+CANSI=
 
 # end of it!
 #
