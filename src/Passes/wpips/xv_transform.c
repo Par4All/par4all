@@ -23,6 +23,38 @@
 #include "resources.h"
 #include "phases.h"
 
+/* The transform menu: */
+Menu transform_menu;
+
+
+
+void
+apply_on_each_transform_item(void (* function_to_apply_on_each_menu_item)(Menu_item))
+{
+   int i;
+   /* Walk through items of  */
+   for (i = (int) xv_get(transform_menu, MENU_NITEMS); i > 0; i--) {
+      Menu_item menu_item = (Menu_item) xv_get(transform_menu,
+                                               MENU_NTH_ITEM, i);
+
+      function_to_apply_on_each_menu_item(menu_item);
+   }
+}
+
+
+void
+disable_transform_selection()
+{
+   apply_on_each_transform_item(disable_menu_item);
+}
+
+
+void
+enable_transform_selection()
+{
+   apply_on_each_transform_item(enable_menu_item);
+}
+
 
 void
 transform_notify(Menu menu,
@@ -84,9 +116,7 @@ transform_notify(Menu menu,
 void
 create_transform_menu()
 {
-   Menu menu;
-
-   menu = xv_create(XV_NULL, MENU_COMMAND_MENU, 
+   transform_menu = xv_create(XV_NULL, MENU_COMMAND_MENU, 
                     MENU_GEN_PIN_WINDOW, main_frame, "Transform Menu",
                     MENU_ACTION_ITEM, ATOMIZER_TRANSFORM, transform_notify,
                     MENU_ACTION_ITEM, SUPPRESS_DEAD_CODE_TRANSFORM, transform_notify,
@@ -103,6 +133,6 @@ create_transform_menu()
 
    (void) xv_create(main_panel, PANEL_BUTTON,
                     PANEL_LABEL_STRING, "Transform",
-                    PANEL_ITEM_MENU, menu,
+                    PANEL_ITEM_MENU, transform_menu,
                     0);
 }
