@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:13:54 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1996/08/12 09:16:40 $, ), version $Revision$,
 # got on %D%, %T%
 # $Id$
 #
@@ -25,9 +25,9 @@ REAL_PIPSHOME=`(cd $PIPS_HOME/../pips;pwd)`
 
 script=`basename $0`
 
-unset update VALIDOPT PERFORMANCE
+unset VALIDOPT PERFORMANCE
 
-VALDIR="$PIPS_VALIDDIR"
+vdir="$PIPS_VALIDDIR"
 VALID="$PIPS_UTILDIR/validate-sequential"
 
 ping='/usr/etc/ping'
@@ -43,7 +43,9 @@ PWD=`pwd`
 DEBUG=":"
 DEBUG2=":"
 VERBOSE=":"
-PARALLEL="1"
+parallel="1"
+# time between sub-validation return checks.
+update=30 
 
 #
 # functions
@@ -120,7 +122,6 @@ validate_usage()
 	  -n: sequential
 	  -t: timing
 	  -a adress: mail sent to (defaut "$user" for you:-)
-	  -u xx: update time (default 30)
 	  -r dir: run directory (default .)
 	  -i lines: max number of lines for sending a full message
 	  -l dir: lock directory (default .)
@@ -161,7 +162,7 @@ available_host()
   while [ ! "`prefix_file_exists $RESULT`" ]
   do
     $DEBUG " | sleep" 
-    sleep ${update:-30}
+    sleep $update
   done
   #
   # get the result, hostname and remove the lock files
@@ -222,7 +223,7 @@ send_validate()
 #
 # get options
 
-while getopts DVudtsvpnhr:l:x:y:i:a: opt
+while getopts DVdtsvpnhr:l:x:y:i:a: opt
 do
   case $opt in
     d) DEBUG="debug" ;;
@@ -232,14 +233,13 @@ do
     V) VERBOSE='verbose' ; VALIDOPT="$VALIDOPT -v";;
     i) VALIDOPT="$VALIDOPT -i $OPTARG" ;;
     s) VERBOSE=':' ;;
-    p) PARALLEL="1" ;;
-    n) PARALLEL="" ;;
+    p) parallel="1" ;;
+    n) parallel="" ;;
     r) RUNDIR="$OPTARG" ;;
     l) LOCKDIR="$OPTARG" ;;
     x) pips_version="$OPTARG" ;;
     y) tpips_version="$OPTARG" ;;
     h) validate_usage 0 ;;
-    u) update="$OPTARG" ;;
     a) user="$OPTARG" ; VALIDOPT="$VALIDOPT -a $user" ;;
     *) echo  ; validate_usage 1
   esac
@@ -269,11 +269,11 @@ cd $RUNDIR
 #
 # variables
 
-if test -r $VALDIR/defaults.$PIPS_ARCH
+if test -r $vdir/defaults.$PIPS_ARCH
 then
-    default_file="$VALDIR/defaults.$PIPS_ARCH"
+    default_file="$vdir/defaults.$PIPS_ARCH"
 else
-    default_file="$VALDIR/defaults"
+    default_file="$vdir/defaults"
 fi
 
 default_test="default_test"
@@ -307,7 +307,7 @@ $VERBOSE "Modules: $MODULES"
 
 VALHOSTS=$hostname
 
-if [ "$PARALLEL" ]
+if [ "$parallel" ]
 then
   VALHOSTS="$VALHOSTS:${PIPS_HOSTS:-chailly}"
 fi
@@ -323,7 +323,7 @@ $VERBOSE "Hosts: $VALHOSTS"
 #
 # Sequential case
 
-[ ! "$PARALLEL" ] && \
+[ ! "$parallel" ] && \
 {
   $VERBOSE "sequential validation"
 
