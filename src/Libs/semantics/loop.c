@@ -3,6 +3,10 @@
   * $Id$
   *
   * $Log: loop.c,v $
+  * Revision 1.7  2003/07/24 10:50:49  irigoin
+  * Minor changes, compiler warnings avoided, bug fix for preference vs
+  * reference in cell when macro effect_reference() is used.
+  *
   * Revision 1.6  2003/07/12 16:46:07  irigoin
   * Temporary version, with unsatisfactory implementation of loop_initialization_to_transformer()
   *
@@ -751,7 +755,10 @@ transformer loop_bound_evaluation_to_transformer(loop l, transformer pre)
    lower bound expression and and new allocated effect for the loop index
    definition. It turns out to be very heavy, because cells must be of
    kind preference to be usable by several functions because macro
-   effect_reference() expects so without testing it. */
+   effect_reference() expects so without testing it.
+
+   However, it is also difficult to add a variable to the transformer t_init
+   because of aliasing. So let's stick to the initial implementation. */
 transformer loop_initialization_to_transformer(loop l, transformer pre)
 {
   effect init_e = make_effect(make_cell(is_cell_preference,
@@ -789,7 +796,7 @@ transformer loop_initialization_to_transformer(loop l, transformer pre)
 
   gen_free_list(el);
   /* free_effects() is not enough, because it is a persistant reference */
-  free_reference();
+  free_reference(preference_reference(cell_preference(effect_cell(init_e))));
   free_effect(init_e);
   free_transformer(r_pre);
 
@@ -1318,10 +1325,10 @@ transformer loop_to_postcondition(
 
       ifdebug(8) {
 	(void) fprintf(stderr,"%s: %s\n","[loop_to_postcondition]",
-		       "Never executed: post_ne =");
+		       "Never executed: post_ne %p =");
 	(void) print_transformer(post_ne);
 	(void) fprintf(stderr,"%s: %s\n","[loop_to_postcondition]",
-		       "Always executed: post_al =");
+		       "Always executed: post_al %p = ");
 	(void) print_transformer(post_al);
       }
       post = transformer_convex_hull(post_ne, post_al);
@@ -1560,7 +1567,7 @@ transformer whileloop_to_total_precondition(
   statement s = whileloop_body(l);
   expression c = whileloop_condition(l);
 
-  pips_assert("not implemented yet", FALSE);
+  pips_assert("not implemented yet", FALSE && t_post==t_post);
 
   pips_debug(8,"begin\n");
 
@@ -1587,9 +1594,9 @@ transformer whileloop_to_total_precondition(
     }
     else if(true_condition_wrt_precondition_p(c, context)) {
       /* At least one iteration is executed. The transformer of
-       * the loop body is useful.
+       * the loop body is not useful!
        */
-      transformer tb = load_statement_transformer(s);
+      /* transformer tb = load_statement_transformer(s); */
       transformer ntl = transformer_undefined;
 
       pips_debug(8, "The loop certainly is executed\n");
