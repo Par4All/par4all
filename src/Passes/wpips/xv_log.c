@@ -1,7 +1,7 @@
-/* 	%A% ($Date: 1995/10/09 15:05:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/10/17 16:33:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 #ifndef lint
-char vcid_xv_log[] = "%A% ($Date: 1995/10/09 15:05:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_xv_log[] = "%A% ($Date: 1995/10/17 16:33:51 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
@@ -186,7 +186,9 @@ wpips_user_warning_message(char warning_buffer[])
       send_user_warning_to_emacs(warning_buffer);
    else {
       insert_something_in_the_wpips_log_window(warning_buffer);
-      unhide_window(log_frame);
+      /* Franc,ois said a warning is not important enough...
+         unhide_window(log_frame);
+         */
    }
    
    show_message(warning_buffer);
