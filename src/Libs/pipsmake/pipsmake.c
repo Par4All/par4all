@@ -9,6 +9,9 @@
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
  * $Log: pipsmake.c,v $
+ * Revision 1.64  1998/07/22 17:52:06  coelho
+ * delete a resource as soon as it is found obsolete......
+ *
  * Revision 1.63  1998/07/22 11:45:16  coelho
  * comment about potential coredump.
  *
@@ -847,12 +850,25 @@ static bool check_physical_resource_up_to_date(string rname, string oname)
   gen_full_free_list (reals);
 
   /* If the resource is up to date then add it in the set */
-  if (result == TRUE) {
+  if (result == TRUE) 
+  {
       pips_debug(5, "resource %s(%s) added to up_to_date "
 		 "with time stamp %d\n",
 		 rname, oname, db_time_of_resource(rname, oname));
       set_add_element(up_to_date_resources, up_to_date_resources, res);
   }
+  else
+  {
+      /* well, if it is not okay, let us delete it!???
+       * okay, this might be done later, but in some case it is not.
+       * I'm not really sure this is the right fix, but at least it avoids 
+       * a coredump after touching some internal file (.f_initial) and
+       * requesting the PRINTED_FILE for it.
+       * FC, 22/07/1998
+       */
+      db_delete_resource(rname, oname);
+  }
+  
   return result;
 }
 
@@ -861,7 +877,8 @@ int delete_obsolete_resources(void)
     int ndeleted;
     bool cache_off = set_undefined_p(up_to_date_resources);
     if (cache_off) init_make_cache();
-    ndeleted =db_delete_obsolete_resources(check_physical_resource_up_to_date);
+    ndeleted =
+	db_delete_obsolete_resources(check_physical_resource_up_to_date);
     if (cache_off) reset_make_cache();
     return ndeleted;
 }
