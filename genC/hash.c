@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: hash.c,v $ ($Date: 1995/04/06 17:54:39 $, )
+/* $RCSfile: hash.c,v $ ($Date: 1995/04/12 10:33:41 $, )
  * version $Revision$
  */
 
@@ -27,6 +27,29 @@ extern int fprintf();
 #include "newgen_include.h"
 #include "newgen_hash.h"
 extern int cfree();
+
+/* Some predefined values for the key 
+ */
+
+#define HASH_ENTRY_FREE (char *) 0
+#define HASH_ENTRY_FREE_FOR_PUT (char *) -1
+
+typedef struct __hash_entry hash_entry;
+
+struct __hash_entry {
+    char *key;
+    char *val;
+};
+
+struct __hash_table {
+    hash_key_type hash_type;
+    int hash_size;
+    int hash_entry_number;
+    int (*hash_rank)();
+    int (*hash_equal)();
+    hash_entry *hash_array;
+    int hash_size_limit;
+};
 
 #define abs(v) (((v) > 0) ? (v) : (-(v)))
 
@@ -132,7 +155,7 @@ int size;
     /* get the next prime number in the table */
     GET_NEXT_HASH_TABLE_SIZE(size,prime_list);
 
-    htp = (hash_table) alloc(sizeof(struct hash_table));
+    htp = (hash_table) alloc(sizeof(struct __hash_table));
     htp->hash_type = key_type;
     htp->hash_size = size;
     htp->hash_entry_number = 0;
@@ -210,10 +233,11 @@ hash_table htp;
    and if hash_warn_on_redefintion was requested, hash_put complains but
    replace the old value by the new one. This is a potential source for a
    memory leak. If the value to store is HASH_UNDEFINED_VALUE or if the key
-   is HASH_ENTRY_FREE or HASH_ENTRY_FREE_FOR_INPUT, hash_put aborts. The restrictions on the key
-   should be avoided by changing the implementation. The undefined value
-   should be user-definable. It might be argued that users should be free
-   to assign HASH_UNDEFINED_VALUE, but they can always perform hash_del()
+   is HASH_ENTRY_FREE or HASH_ENTRY_FREE_FOR_INPUT, hash_put
+   aborts. The restrictions on the key should be avoided by changing
+   the implementation. The undefined value should be
+   user-definable. It might be argued that users should be free to
+   assign HASH_UNDEFINED_VALUE, but they can always perform hash_del()
    to get the same result */
 
 void hash_put(htp, key, val)
@@ -227,7 +251,8 @@ char *key, *val;
     if (htp->hash_entry_number+1 >= (htp->hash_size_limit)) 
 	hash_enlarge_table(htp);
 
-    message_assert("illegal input key", key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
+    message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
+		   key!=HASH_ENTRY_FREE_FOR_PUT);
     message_assert("illegal input value", val!=HASH_UNDEFINED_VALUE);
 
     hep = hash_find_entry(htp, key, &rank, hash_put_op);
@@ -260,7 +285,8 @@ char *key;
     
     hep = hash_find_entry(htp, key, &rank, hash_del_op);
     
-    message_assert("illegal input key", key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
+    message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
+		   key!=HASH_ENTRY_FREE_FOR_PUT);
 
     if (hep->key != HASH_ENTRY_FREE && hep->key != HASH_ENTRY_FREE_FOR_PUT) {
 	val = hep->val;
@@ -284,7 +310,8 @@ char *key;
     hash_entry_pointer hep;
     int n;
 
-    message_assert("illegal input key", key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
+    message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
+		   key!=HASH_ENTRY_FREE_FOR_PUT);
 
     hep = hash_find_entry(htp, key, &n, hash_get_op);
     
@@ -310,7 +337,8 @@ char *key, *val;
     hash_entry_pointer hep;
     int n;
 
-    message_assert("illegal input key", key!=HASH_ENTRY_FREE && key!=HASH_ENTRY_FREE_FOR_PUT);
+    message_assert("illegal input key", key!=HASH_ENTRY_FREE &&
+		   key!=HASH_ENTRY_FREE_FOR_PUT);
     hep = hash_find_entry(htp, key, &n, hash_get_op);
     message_assert("no previous entry", htp->hash_equal(hep->key, key));
     
@@ -389,7 +417,7 @@ hash_table htp;
 }
 
 /* function to enlarge the hash_table htp.
- * the new size will be first number in the array prime_numbers_for_table_size[]
+ * the new size will be first number in the array prime_numbers_for_table_size
  * that will be greater or equal to the actual size 
  */
 
@@ -566,7 +594,8 @@ hash_operation operation;
 	if (he.key == HASH_ENTRY_FREE_FOR_PUT && operation == hash_put_op)
 	    break;
 
-	if (he.key != HASH_ENTRY_FREE_FOR_PUT && (*(htp->hash_equal))(he.key, key))
+	if (he.key != HASH_ENTRY_FREE_FOR_PUT &&
+	    (*(htp->hash_equal))(he.key, key))
 	    break;
 
 	/* GO: it is not anymore the next slot
@@ -608,20 +637,35 @@ hash_table htp;
     return htp->hash_type;
 }
 
-hash_entry_pointer hash_table_array(htp)
+/*
+ * This function allows a hash_table scanning
+ * First you give a NULL hentryp and get the key and val
+ * After you give the previous hentryp and so on
+ * at the end NULL is returned
+ */
+
+hash_entry_pointer hash_table_scan(htp, hentryp, pkey, pval)
 hash_table htp;
-{
-    return htp->hash_array;
-}
-
-char *hash_entry_key(hentryp)
 hash_entry_pointer hentryp;
+char **pkey;
+char **pval;
 {
-    return hentryp->key;
-}
+    hash_entry_pointer hend = htp->hash_array + htp->hash_size;
 
-char *hash_entry_val(hentryp)
-hash_entry_pointer hentryp;
-{
-    return hentryp->val;
+    if (!hentryp)
+	hentryp = htp->hash_array;
+
+    while (hentryp < hend)
+    {
+	char *key = hentryp->key;
+
+	if ((key !=HASH_ENTRY_FREE) && (key !=HASH_ENTRY_FREE_FOR_PUT))
+	{
+	    *pkey = key;
+	    *pval = hentryp->val;
+	    return hentryp + 1;
+	}
+	hentryp++;
+    }
+    return NULL;
 }
