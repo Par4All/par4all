@@ -5,7 +5,7 @@
 # Fabien COELHO, 03/08/95
 #
 # $RCSfile: pips_install_file,v $ (version $Revision$)
-# ($Date: 1995/08/07 13:48:36 $, )
+# ($Date: 1995/08/07 13:50:53 $, )
 #
 
 RUN=':'
@@ -28,7 +28,7 @@ done
 
 shift `expr $OPTIND - 1`
 
-[ $# -lt 2 ] || usage 2 "invalid number of arguments"
+[ $# -lt 1 ] || usage 2 "invalid number of arguments"
 directory=$1
 shift
 [ -d $directory ] || usage 3 "$directory is not a directory"
