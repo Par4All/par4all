@@ -191,7 +191,7 @@
 
 /* The resource DBR_NEW_DECLARATIONS is used by top_down_array_resizing*/
 
-{ DBR_SMALLTALK_CODE,		STRING_METHODS },
+{ DBR_SMALLTALK_CODE_FILE,      STRING_METHODS },
   /* used for PRINT_CODE_SMALLTALK pass */
 
 /* PROGRAM
