@@ -55,12 +55,6 @@ new_atomizer_func_decide(call c, expression e)
 }
 
 
-static bool
-new_atomizer_test_decide(expression e)
-{
-   return(TRUE);
-}
-
 /*
 static entity
 new_atomizer_create_a_new_entity(entity module_entity, tag variable_type)
@@ -94,7 +88,7 @@ boolean new_atomizer(char * mod_name)
    atomize_as_required(mod_stat,
                        new_atomizer_expr_decide,
                        new_atomizer_func_decide,
-                       new_atomizer_test_decide,
+                       gen_false,
 		       gen_false, /* range */
 		       gen_false, /* whileloop */
                        /*new_atomizer_create_a_new_entity*/
