@@ -1,5 +1,8 @@
 /* $id$
    $Log: c_parser.c,v $
+   Revision 1.3  2003/08/06 14:12:55  nguyen
+   Upgraded version of C parser
+
    Revision 1.2  2003/08/04 14:20:08  nguyen
    Preliminary version of the C parser
 
@@ -26,6 +29,9 @@
 #include "makefile.h"
 
 #include "pipsdbm.h"
+
+/* To avoid warnings */
+extern char *strdup(const char *s1);
 
 statement ModuleStatement = statement_undefined;
   
@@ -108,6 +114,15 @@ static bool actual_c_parser(string module_name, string dbr_file)
 
     debug_on("C_SYNTAX_DEBUG_LEVEL");
  
+    if (strstr(module_name,FILE_SEP_STRING) != NULL)
+      {
+	/* Special case : compilation unit module */
+	MakeCurrentSourceFileEntity(module_name);
+      }
+
+    /* I do not know to put this where to avoid repeated creations*/
+    MakeTopLevelEntity(); 
+
     /* yacc parser is called */
     c_in = safe_fopen(file_name, "r");
     c_parse();
@@ -128,6 +143,10 @@ static bool actual_c_parser(string module_name, string dbr_file)
 			   module_name, 
 			   (char *) make_callees(NIL));
     /* Should generate a list of callees called_modules */
+
+    if (strstr(module_name,FILE_SEP_STRING) != NULL)
+      ResetCurrentSourceFileEntity();
+
     free(file_name);
     file_name = NULL;
     reset_keyword_typedef_table();
@@ -144,12 +163,3 @@ bool c_parser_tmp(string module_name)
 {
   return actual_c_parser(module_name,DBR_SOURCE_FILE);
 }
-
-
-
-
-
-
-
-
-
