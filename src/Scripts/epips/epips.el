@@ -825,10 +825,12 @@
 
 (defun epips-all-the-buffers ()
   "Return all the buffers used by EPips"
-  (concat
-   epips-process-buffer
-   epips-xtree-input-buffer
-   epips-buffers)
+  (append
+   (list epips-process-buffer)
+   epips-buffers
+   (if (boundp 'epips-xtree-input-buffer)
+       epips-xtree-input-buffer)
+   )
 )
 
 
