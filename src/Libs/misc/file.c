@@ -205,7 +205,7 @@ int element_size;
 int count;
 FILE * stream;
 {
-    if(fread(ptr, element_size, count, stream) != count) {
+    if(((int)fread(ptr, element_size, count, stream)) != count) {
 	pips_error("safe_fread","fread failed on file %s (%s)\n",
 		   filename,
 		   sys_errlist[errno]);
@@ -219,7 +219,7 @@ int element_size;
 int count;
 FILE * stream;
 {
-    if(fwrite(ptr, element_size, count, stream) != count) {
+    if(((int)fwrite(ptr, element_size, count, stream)) != count) {
 	pips_error("safe_fwrite","fwrite failed on file %s (%s)\n",
 		   filename,
 		   sys_errlist[errno]);
@@ -637,4 +637,18 @@ char *
 safe_system_substitute(char * what)
 {
     return safe_system_output(concatenate("echo ", what, 0));
+}
+
+/* SunOS forgets to declare this one.
+ */
+extern char * mktemp(char *);
+
+/* @return a new temporary file name, starting with "prefix".
+ * the nme is freshly allocated.
+ */
+char * 
+safe_new_tmp_file(char * prefix)
+{
+    string name = strdup(concatenate(prefix, ".XXXXXX", NULL));
+    return mktemp(name);
 }
