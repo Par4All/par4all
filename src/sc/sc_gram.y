@@ -22,18 +22,16 @@ Psysteme ps_yacc;
 boolean syntax_error;
 
 Value valcst;
-
-short int fac;        /* facteur multiplicatif suivant qu'on analyse un terme*/
+Value fac;        /* facteur multiplicatif suivant qu'on analyse un terme*/
                       /* introduit par un moins (-1) ou par un plus (1) */
 
 int sens;       /* indique le sens de l'inegalite
-                         sens = -1  ==> l'operateur est soit > ,soit >=,
-                         sens = 1   ==> l'operateur est soit <, soit <=   */
+		   sens = -1  ==> l'operateur est soit > ,soit >=,
+		   sens = 1   ==> l'operateur est soit <, soit <=   */
 short int cote; /* booleen indiquant quel membre est en cours d'analyse*/
 
-long int b1, b2; /* element du vecteur colonne du systeme donne par l'analyse*/
-	               /* d'une contrainte */
-
+Value b1, b2; /* element du vecteur colonne du systeme donne par l'analyse*/
+              /* d'une contrainte */
 
 Pcontrainte eq;   /* pointeur sur l'egalite ou l'inegalite
                                 courante */
@@ -113,15 +111,16 @@ eq	: debeq multi_membre op membre fin_mult_membre feq
 	;
 
 debeq	:
-		{       fac = 1;
-                        sens = 1;
-			cote = GAUCHE;
-			b1 = 0;
-                        b2 = 0;
-                        operat = 0;
-                        cp = NULL;
-                        eq = contrainte_new();
-        		}
+        {
+	    fac = VALUE_ONE;
+	    sens = 1;
+	    cote = GAUCHE;
+	    b1 = 0;
+	    b2 = 0;
+	    operat = 0;
+	    cp = NULL;
+	    eq = contrainte_new();
+	}
 	;
 
 feq     :{ 
@@ -131,35 +130,41 @@ feq     :{
         ;
 
 membre	: addop terme 
-	| { fac = 1;} terme
+	| { fac = VALUE_ONE;} terme
 	| membre addop terme
 	;
 
 terme	: const ident 
-		{
-			fac *=((cote == GAUCHE) ? 1 : -1);
-                        /* ajout du couple (ident,const) a la contrainte 
-                           courante                                     */
-                        vect_add_elem(&(eq->vecteur),$2,fac*$1);
-                        /* duplication du couple (ident,const)
-                           de la combinaison lineaire traitee           */ 
-                        if (operat)
-                            vect_add_elem(&cp,(Variable) $2,-fac*$1);
-                }
+        {
+	    if (cote==DROIT) fac = value_uminus(fac);
+	    /* ajout du couple (ident,const) a la contrainte courante */
+	    vect_add_elem(&(eq->vecteur),$2,value_mult(fac,$1));
+	    /* duplication du couple (ident,const)
+	       de la combinaison lineaire traitee           */ 
+	    if (operat)
+		vect_add_elem(&cp,(Variable) $2,
+			      value_uminus(value_mult(fac,$1)));
+	}
 	| const
 		{
-			b1 += ((cote == DROIT) ? fac*$1 : -fac*$1);
-                        b2 += ((cote == DROIT) ? -fac*$1 : fac*$1);
-                        }     
+		    Value p = value_mult(fac,$1);
+		    if (cote==DROIT) {
+			value_add(b1, p);
+			value_sub(b2, p);
+		    } else {
+			value_sub(b1, p);
+			value_add(b2, p);
+		    }
+		}     
 	| ident
 		{
-		        fac *= ((cote == GAUCHE) ? 1 :-1 );
-                        /* ajout du couple (ident,1) a la contrainte courante */
-                        vect_add_elem (&(eq->vecteur),(Variable) $1,fac);
-                        /* duplication du couple (ident,1) de la
-                           combinaison lineaire traitee                    */
-                        if (operat)
-				vect_add_elem(&cp,(Variable) $1,-fac);
+		    if (cote==DROIT) fac = value_uminus(fac);
+		    /* ajout du couple (ident,1) a la contrainte courante */
+		    vect_add_elem (&(eq->vecteur),(Variable) $1,fac);
+		    /* duplication du couple (ident,1) de la
+		       combinaison lineaire traitee                    */
+		    if (operat)
+			vect_add_elem(&cp,(Variable) $1,value_uminus(fac));
 		}
 	;
 
@@ -190,38 +195,38 @@ op	: INF
                   sens = 1;
                   operat = OPINF;
                   cp = NULL;
-                  b2 = 0; }
+                  b2 = VALUE_ZERO; }
 	| INFEGAL
 		{ cote = DROIT; 
                   sens = 1;
                   operat = OPINFEGAL;
                   cp = NULL;
-                  b2 = 0;}
+                  b2 = VALUE_ZERO;}
 	| EGAL
 		{ cote = DROIT; 
                   sens = 1;
                   operat = OPEGAL; 
                   cp = NULL;
-                  b2 = 0;
+                  b2 = VALUE_ZERO;
                  }
 	| SUP
 		{ cote = DROIT; 
                   sens = -1;
                   operat = OPSUP; 
                   cp = NULL;
-                  b2 = 0;}
+                  b2 = VALUE_ZERO;}
 	| SUPEGAL
 		{ cote = DROIT;	
                   sens = -1;
                   operat = OPSUPEGAL;
                   cp = NULL;
-                  b2 = 0;}
-	;
+                  b2 = VALUE_ZERO;}
+;
 
 addop	: PLUS
-		{ fac = 1; }
+        { fac = VALUE_ONE; }
 	| MOINS
-		{ fac = -1; }
+        { fac = VALUE_MONE; }
 	;
 
 multi_membre : membre
@@ -230,12 +235,12 @@ multi_membre : membre
 
 fin_mult_membre :
                   {
-                       vect_add_elem(&(eq->vecteur),TCST,-b1);
+                       vect_add_elem(&(eq->vecteur),TCST,value_uminus(b1));
 			switch (operat) 
                         {
 			case OPINF:
                                 creer_ineg(ps_yacc,eq,sens);
-                                vect_add_elem(&(eq->vecteur),TCST,1);
+                                vect_add_elem(&(eq->vecteur),TCST,VALUE_ONE);
 				break;
 			case OPINFEGAL:
                                 creer_ineg(ps_yacc,eq,sens);
@@ -245,7 +250,7 @@ fin_mult_membre :
 				break;
 			case OPSUP:
 				creer_ineg(ps_yacc,eq,sens);
-                                vect_add_elem (&(eq->vecteur),TCST,1);
+                                vect_add_elem (&(eq->vecteur),TCST,VALUE_ONE);
                                 break;
 			case OPEGAL:
                                 creer_eg(ps_yacc,eq);
