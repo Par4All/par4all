@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/08/12 10:22:56 $, )
+# ($Date: 1996/08/12 10:48:01 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -161,7 +161,7 @@ $debug report=$report
 
 	$verbose - Removing generated files in Production...
 	msg="${msg}C"
-        MAKE nlp cleaning $report clean .
+        MAKE nlp cleaning $report full-clean .
     }
 
     #
@@ -173,7 +173,7 @@ $debug report=$report
     } || {
 	$verbose "Compiling Newgen/Production"
 	msg="${msg}N"
-	MAKE n newgen $report "clean-compiled recompile" $arch
+	MAKE n newgen $report "clean recompile" $arch
     }
     
     # 2: LINEAR
@@ -182,7 +182,7 @@ $debug report=$report
     } || {
 	$verbose "Compiling Linear/Production"
 	msg="${msg}L"
-	MAKE l linear $report "clean-compiled recompile" $arch
+	MAKE l linear $report "clean recompile" $arch
     }
 
     # 3: PIPS
@@ -191,7 +191,7 @@ $debug report=$report
     } || {
 	$verbose "Compiling Pips/Production"
 	msg="${msg}P"
-	MAKE p pips $report "clean-compiled recompile" $arch
+	MAKE p pips $report "clean recompile" $arch
     }
 
     # 4: SUMMARY
