@@ -1,46 +1,51 @@
 c
 c $RCSfile: hpfc_bufmgr.m4f,v $ (version $Revision$)
-c $Date: 1995/09/12 13:47:51 $, 
+c $Date: 1995/09/15 15:57:03 $, 
 c
-define(`GENERIC_BUFFER_SEND',`
+define(`GENERIC_BUFFER_PACK',`dnl
 pushdef(`PVMTYPE',$1)dnl
-      subroutine build_name(HPFC,PVMTYPE,BUFSND)(
-     $   lid)
-      integer lid
+      subroutine build_name(PVMTYPE,HPFC_BUFPCK)()
       integer info, bufid
       include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
 c
-c could use PvmDataInPlace here ?
+c could use PVMINPLACE here ? if to be sent immediately yes!!!
 c
-      call pvmfinitsend(PVMRAW, bufid)
+      if (SEND_NOT_INITIALIZED) then
+         call pvmfinitsend(BUFFER_ENCODING, bufid)
+c        if (bufid.lt.0) print *, "pvm_initsend error"
+         SEND_NOT_INITIALIZED=.FALSE.
+      endif
       call pvmfpack(INTEGER4, BUFINDEX, 1, 1, info)
-      call pvmfpack(PVMTYPE, 
-     $     build_name(PVMTYPE,BUFF),
+      call pvmfpack(PVMTYPE, build_name(PVMTYPE,BUFF),
      $     BUFINDEX, 1, info)
-      call pvmfsend(NODETIDS(lid), SENDCHANNELS(lid), info)
-      SENDCHANNELS(lid) = SENDCHANNELS(lid) + 2
-      end')
-define(`GENERIC_BUFFER_RECV',`
+      BUFINDEX=0
+      end
+popdef(`PVMTYPE')')dnl
+define(`GENERIC_BUFFER_UPCK',`dnl
 pushdef(`PVMTYPE',$1)dnl
-      subroutine build_name(HPFC,PVMTYPE,BUFRCV)(
-     $   lid)
+      subroutine build_name(PVMTYPE,HPFC_BUFUPK)(lid)
       integer lid
       integer info, bufid
       include "fpvm3.h"
       include "hpfc_commons.h"
       include "hpfc_includes.h"
-      call pvmfrecv(NODETIDS(lid), RECVCHANNELS(lid), bufid)
-      RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
+      if (RECEIVED_NOT_PERFORMED) then
+         debug(`print *, "RCV from ", lid, RECVCHANNELS(lid)')
+         call pvmfrecv(NODETIDS(lid), RECVCHANNELS(lid), bufid)
+         RECVCHANNELS(lid) = RECVCHANNELS(lid) + 2
+         RECEIVED_NOT_PERFORMED = .FALSE.
+         debug(`print *, "RCV done"')
+      endif
       call pvmfunpack(INTEGER4, SIZEOFRECEIVEDBUFFER, 1, 1, info)
-      call pvmfunpack(PVMTYPE, 
-     $     build_name(PVMTYPE,BUFF),
+      call pvmfunpack(PVMTYPE, build_name(PVMTYPE,BUFF),
      $     SIZEOFRECEIVEDBUFFER, 1, info)
-      end')
+      end
+popdef(`PVMTYPE')')dnl
 define(`GENERIC_BUFFER',`
-GENERIC_BUFFER_SEND($1)
-GENERIC_BUFFER_RECV($1)')
+GENERIC_BUFFER_PACK($1)
+GENERIC_BUFFER_UPCK($1)')
 dnl GENERIC_BUFFER(BYTE1)
 dnl GENERIC_BUFFER(INTEGER2)
 GENERIC_BUFFER(INTEGER4)
