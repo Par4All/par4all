@@ -134,6 +134,8 @@ void normalize_wp65_code(statement stat)
 			indirection_test,    /* reference test */
 			gen_false,           /* function call test */
 			gen_false,           /* test condition test */
+			gen_false,           /* range arguments test */
+			gen_false,           /* whileloop condition test */
 			build_new_variable); /* new variable */
 }
 
