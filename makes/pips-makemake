@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/11 18:21:13 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/11 18:26:14 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -543,11 +543,11 @@ delta:
 [ "$production" ] && cat >> $MAKEFILE <<EOF
 #
 #
-FWD_RELATIVE=.
+FWD_ROOT=.
 
 release:
 	@for f in $(SOURCES) $(DEDUCED_CFILES) $(DEDUCED_HEADERS) \\
-	    Makefile config.makefile ; do echo $(FWD_RELATIVE)/$$f ; done
+	    Makefile config.makefile ; do echo $(FWD_ROOT)/$$f ; done
 	    
 EOF
 
