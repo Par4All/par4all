@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "linear.h"
+
 #include "genC.h"
 #include "misc.h"
 #include "ri.h"
@@ -105,16 +107,16 @@ make_constant_entity(
 	if (bt == is_basic_string) {
 	    be = make_basic(bt, (make_value(is_value_constant, 
 					    (make_constant(is_constant_int, 
-							   strlen(name))))));
+					      (void*) strlen(name))))));
 	}
 	else {
-	    be = make_basic(bt, size);
+	    be = make_basic(bt, (void*) size);
 	}
 
 	fe = make_functional(NIL, MakeTypeVariable(be, NIL));
 
 	if (bt == is_basic_int)
-		ce = make_constant(is_constant_int, atoi(name));
+		ce = make_constant(is_constant_int, (void*) atoi(name));
 	else
 	    ce = MakeConstantLitteral();
 
@@ -250,9 +252,9 @@ expression e;
     s = make_symbolic(e, value_constant(v));
 
     value_constant(v) = constant_undefined;
-    gen_free(v);
+    free_value(v);
 
-    return(make_value(is_value_symbolic, s));
+    return make_value(is_value_symbolic, s);
 }
 
 /* whether the given function is a constant expression, whatever the type.
