@@ -93,7 +93,7 @@ constraints.  */
 Psysteme sc_safe_elim_redund(ps)
 Psysteme ps;
 {
-  Pbase b = base_dup(sc_base(ps));
+  Pbase b = base_copy(sc_base(ps));
 
   /* if (SC_UNDEFINED_P(ps)) return(ps); */
 
