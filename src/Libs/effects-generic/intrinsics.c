@@ -561,8 +561,7 @@ io_effects(entity e, list args)
 		    pips_error("io_effects", "Which logical unit?\n");
 	    }
 
-	    indices = gen_nconc(indices,
-				CONS(EXPRESSION, unit, NIL));
+	    indices = gen_nconc(indices, CONS(EXPRESSION, unit, NIL));
 
 	    private_io_entity = global_name_to_entity
 		(IO_EFFECTS_PACKAGE_NAME,
@@ -570,7 +569,7 @@ io_effects(entity e, list args)
 
 	    pips_assert("io_effects", private_io_entity != entity_undefined);
 
-	    ref = make_reference(private_io_entity,indices);
+	    ref = make_reference(private_io_entity, indices);
 	    le = gen_nconc(le, generic_proper_effects_of_reference(ref));
 	    le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
 	}	
@@ -609,7 +608,6 @@ effects_of_ioelem(expression exp, tag act)
 static list
 effects_of_iolist(list exprs, tag act)
 {
-    list le = NIL;
     list lep = NIL;
     expression exp = EXPRESSION(CAR(exprs));
 
@@ -654,11 +652,9 @@ effects_of_iolist(list exprs, tag act)
 	}
     }
 
-    le = gen_nconc(le, lep);
-
     pips_debug(5, "end\n");
 
-    return(le);
+    return lep;
 }
 
 /* an implied do is a call to an intrinsic function named IMPLIED-DO;
@@ -757,59 +753,60 @@ effects_of_implied_do(expression exp, tag act)
     effects_private_current_context_push(local_context);
     
     MAP(EXPRESSION, expr, 
-	{ 
-	    syntax s = expression_syntax(expr);
-	    
-	    if (syntax_reference_p(s))
-		if (act == is_action_write) 
-		    lep = generic_proper_effects_of_lhs(syntax_reference(s));
-		else
-		    lep = generic_proper_effects_of_expression(expr);
-	    else
-		if (syntax_range_p(s))
-		    lep = generic_proper_effects_of_range(syntax_range(s));
-		else
-		    /* syntax_call_p(s) is true here */
-		    if (expression_implied_do_p(expr))
-			lep = effects_of_implied_do(expr, act);
-		    else
-			lep = generic_r_proper_effects_of_call(syntax_call(s));
-	    	    
-	    /* indices are removed from effects because this is a loop */
-	    lr = NIL;
-	    MAP(EFFECT, eff,
-		{	     
-		    if (effect_entity(eff) != index)
-			lr =  effects_add_effect(lr, eff);
-		    else if(act==is_action_write /* This is a read */
-			    && action_write_p(effect_action(eff))) {
-		      pips_user_error("Index %s in implied DO is read. "
-				      "Standard violation, see Section 12.8.2.3\n",
-				      entity_local_name(index));
-		    }
-		    else
-		    {
-			debug(5, "effects_of_implied_do", "index removed");
-			free_effect(eff);
-		    }
-		}, lep);
-	    gen_free_list(lep);
-	    le = gen_nconc(le, lr);	    
-	}, CDR(CDR(args)));
+    { 
+      syntax s = expression_syntax(expr);
+      
+      if (syntax_reference_p(s))
+	if (act == is_action_write) 
+	  lep = generic_proper_effects_of_lhs(syntax_reference(s));
+	else
+	  lep = generic_proper_effects_of_expression(expr);
+      else
+	if (syntax_range_p(s))
+	  lep = generic_proper_effects_of_range(syntax_range(s));
+	else
+	  /* syntax_call_p(s) is true here */
+	  if (expression_implied_do_p(expr))
+	    lep = effects_of_implied_do(expr, act);
+	  else
+	    lep = generic_r_proper_effects_of_call(syntax_call(s));
+      
+      /* indices are removed from effects because this is a loop */
+      lr = NIL;
+      MAP(EFFECT, eff,
+      {
+	if (effect_entity(eff) != index)
+	  lr =  CONS(EFFECT, eff, lr);
+	else if(act==is_action_write /* This is a read */
+		&& action_write_p(effect_action(eff))) {
+	  pips_user_error("Index %s in implied DO is read. "
+			  "Standard violation, see Section 12.8.2.3\n",
+			  entity_local_name(index));
+	}
+	else
+	{
+	  debug(5, "effects_of_implied_do", "index removed");
+	  free_effect(eff);
+	}
+      }, lep);
+      gen_free_list(lep);
+      lr = gen_nreverse(lr); /* preserve initial order??? */
+      le = gen_nconc(le, lr);	    
+    }, CDR(CDR(args)));
     
-
+    
     (*effects_union_over_range_op)(le, 
 				   index, 
 				   r, descriptor_undefined);
-
+    
     ifdebug(6) {
-	pips_debug(6, "effects:\n");
-	(*effects_prettyprint_func)(le);
-	fprintf(stderr, "\n");
+      pips_debug(6, "effects:\n");
+      (*effects_prettyprint_func)(le);
+      fprintf(stderr, "\n");
     }
     
     effects_private_current_context_pop();
     pips_debug(5, "end\n");
-
-    return(le);
+    
+    return le;
 }
