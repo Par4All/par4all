@@ -1,5 +1,5 @@
 /* $RCSfile: cgraphic.m4c,v $ (version $Revision$)
- * $Date: 1996/09/04 11:50:05 $, 
+ * $Date: 1996/09/06 10:54:23 $, 
  */
 
 #include <unistd.h>
@@ -78,7 +78,10 @@ identify_wm()
 }
 
 static void
-sigusr2()
+sigusr2(int sig,
+	int code,
+	struct sigcontext * scp,
+	char * addr)
 {
 }
 
@@ -231,10 +234,10 @@ int pc_basic_opendisplay(int X,
 			argv[argc++] = display_name;
 		}
 		argv[argc++] = 0;
-		signal(SIGUSR2,sigusr2);
+		(void) signal(SIGUSR2, sigusr2);
 
 		/* fork! */
-		switch(id = vfork()) {
+		switch(id = fork()) {
 		case -1 :
 		    fprintf(stderr,"unsuccessfull fork!\n");
 		    return 0;
@@ -427,7 +430,7 @@ pc_basic_scroll(XPOMP_display screen,
 int 
 pc_basic_setcolor(screen,red,green,blue)
 int screen;
-unsigned char *red,*green,*blue;
+unsigned char *red, *green, *blue;
 {
 	struct sh_header *sh;
 	char *p;
@@ -438,9 +441,9 @@ unsigned char *red,*green,*blue;
 		pc_basic_wait_lock(screen);
 		sh->flag = GR_SET_COLOR;
 		p = (char *) (sh+1);
-		memcpy(p,red,256);
-		memcpy(p+256,green,256);
-		memcpy(p+512,blue,256);
+		memcpy(p, (char *) red, 256);
+		memcpy(p+256, (char *) green, 256);
+		memcpy(p+512, (char *) blue, 256);
 		pc_basic_flush(sh);
 	}
 	return 0;
@@ -631,7 +634,7 @@ XPOMP_flash(XPOMP_display screen,
 	return -1;
 
     p = pc_basic_get_buf(screen,0);
-    memcpy(p, data_array, X_data_array_size*Y_data_array_size);
+    memcpy(p, (char *) data_array, X_data_array_size*Y_data_array_size);
     new_pc_basic_buf(screen, data_array,
 		     X_data_array_size,
 		     Y_data_array_size,
@@ -667,8 +670,8 @@ XPOMP_show_##TYPE(XPOMP_display screen,					\
 									\
     if (min_value == 0 && max_value == 0) {				\
 	/* Automatic color scaling: */					\
-	min_value = HUGE;						\
-	max_value = -HUGE;						\
+	min_value = HUGE_VAL;						\
+	max_value = -HUGE_VAL;						\
 	for(i = 0; i <= X_data_array_size*X_data_array_size; i++) {	\
 	    if (data_array[i] > max_value)				\
 		max_value = data_array[i];				\
