@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/07/29 11:29:21 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/07/29 14:58:53 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -257,7 +257,9 @@ recompile: generate_makefile_if_necessary_and_possible
 clean-all-compiled:
 	for d in $(PIPS_ALL_ARCH) ; do \\
 	  echo "cleaning \$\$d"; $(RM) \$\$d/*.o \$\$d/*.a ; done
-
+#
+get:
+	sccs get SCCS
 # .PHONY is a gnu extension...
 .PHONY: install all depend header recompile clobber count info delta
 .PHONY: generate_makefile_if_necessary_and_possible
