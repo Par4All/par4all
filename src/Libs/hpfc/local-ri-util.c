@@ -1,5 +1,8 @@
-/* $RCSfile: local-ri-util.c,v $ ($Date: 1996/03/01 12:04:35 $, )
- * version $Revision$
+/* $Id$
+ * $Log: local-ri-util.c,v $
+ * Revision 1.15  1997/03/20 10:20:58  coelho
+ * RCS headers.
+ *
  *
  * HPFC (c) Fabien Coelho May 1993
  */
