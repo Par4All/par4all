@@ -5,7 +5,7 @@
  * Fabien Coelho, May 1993.
  *
  * SCCS stuff:
- * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/14 18:50:28 $, ) version $Revision$,
+ * $RCSfile: hpfc-util.c,v $ ($Date: 1995/03/22 10:56:57 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -23,6 +23,7 @@ extern int fprintf();
 
 #include "ri-util.h"
 #include "misc.h"
+#include "properties.h"
 #include "effects.h"
 #include "hpfc.h"
 #include "defines-local.h"
@@ -819,6 +820,18 @@ int dim, *plow, *pup;
     d = entity_ith_dimension(e, dim),
     *plow = ExpressionToInt(dimension_lower(d)),
     *pup = ExpressionToInt(dimension_upper(d));
+}
+
+void hpfc_warning(va_alist)
+va_dcl
+{
+    if (!get_bool_property("HPFC_NO_WARNING"))
+    {
+	va_list args;
+	va_start(args);
+	user_warning(& args);
+	va_end(args);
+    }
 }
 
 /*   that is all
