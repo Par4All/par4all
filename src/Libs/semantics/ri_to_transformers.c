@@ -10,6 +10,9 @@
   * $Id$
   *
   * $Log: ri_to_transformers.c,v $
+  * Revision 1.52  2000/07/20 14:29:42  coelho
+  * cleaner.
+  *
   * Revision 1.51  2000/07/20 14:25:26  coelho
   * leaks--
   *
@@ -143,7 +146,7 @@ block_to_transformer(list b)
     transformer stf = transformer_undefined;
     list l = b;
 
-    debug(8,"block_to_transformer","begin\n");
+    pips_debug(8,"begin\n");
 
     if(ENDP(l))
 	btf = transformer_identity();
@@ -155,13 +158,13 @@ block_to_transformer(list b)
 	    s = STATEMENT(CAR(l));
 	    stf = statement_to_transformer(s);
 	    btf = transformer_combine(btf, stf);
-	    ifdebug(1) {
-		(void) transformer_consistency_p(btf);
-	    }
+	    ifdebug(1) 
+	      pips_assert("consistent transformer", 
+			  transformer_consistency_p(btf));
 	}
     }
 
-    debug(8, "block_to_transformer", "end\n");
+    pips_debug(8, "end\n");
     return btf;
 }
 
@@ -199,69 +202,72 @@ unstructured_to_global_transformer(
      nodes can be discarded because they do not modify the store such as
      IF statements (always) and CONTINUE statements (if they do not link
      the entry and the exit nodes). */
+  
+  list nodes = NIL;
+  /* Entry node */
+  control entry_node = unstructured_control(u);
+  control exit_node = unstructured_exit(u);
+  transformer tf_u = transformer_empty();
+  transformer fp_tf_u = transformer_undefined;
+  
+  pips_debug(8,"begin\n");
 
-    cons *nodes = NIL;
-    /* Entry node */
-    control entry_node = unstructured_control(u);
-    control exit_node = unstructured_exit(u);
-    transformer tf_u = transformer_empty();
-    transformer fp_tf_u = transformer_undefined;
-
-    debug(8,"unstructured_to_global_transformer","begin\n");
-
-    FORWARD_CONTROL_MAP(c, {
-	statement st = control_statement(c);
-	/* transformer_convex_hull has side effects on its arguments:-( */
-	/* Should be fixed now, 29 June 2000 */
-	/* transformer tf_st = copy_transformer(load_statement_transformer(st)); */
-	transformer tf_st = load_statement_transformer(st);
-	transformer tf_old = tf_u;
-
-	if(statement_test_p(st)) {
-	  /* Any side effect? */
-	  if(!ENDP(transformer_arguments(tf_st))) {
-	    tf_u = transformer_convex_hull(tf_old, tf_st); /* test */
-	      free_transformer(tf_old);
-	  }
+  FORWARD_CONTROL_MAP(c, {
+    statement st = control_statement(c);
+    /* transformer_convex_hull has side effects on its arguments:-( */
+    /* Should be fixed now, 29 June 2000 */
+    /* transformer tf_st = copy_transformer(load_statement_transformer(st)); */
+    transformer tf_st = load_statement_transformer(st);
+    transformer tf_old = tf_u;
+    
+    if(statement_test_p(st)) {
+      /* Any side effect? */
+      if(!ENDP(transformer_arguments(tf_st))) {
+	tf_u = transformer_convex_hull(tf_old, tf_st); /* test */
+	free_transformer(tf_old);
+      }
+    }
+    else {
+      if(continue_statement_p(st)) {
+	if(gen_find_eq(entry_node, control_predecessors(c))!=chunk_undefined
+	   && gen_find_eq(exit_node, control_successors(c))!=chunk_undefined) {
+	  tf_u = transformer_convex_hull(tf_old, tf_st); /* continue */
+	  free_transformer(tf_old);
 	}
-	else {
-	  if(continue_statement_p(st)) {
-	    if(gen_find_eq(entry_node, control_predecessors(c))!=chunk_undefined
-	       && gen_find_eq(exit_node, control_successors(c))!=chunk_undefined) {
-	      tf_u = transformer_convex_hull(tf_old, tf_st); /* continue */
-	      free_transformer(tf_old);
-	    }
-	  }
-	  else {
-	    tf_u = transformer_convex_hull(tf_old, tf_st); /* other */
-	    free_transformer(tf_old);
-	  }
-	}
-
-    }, entry_node, nodes) ;
-
-    gen_free_list(nodes) ;
-
-    /* fp_tf_u = transformer_derivative_fix_point(tf_u); */
-    /* Some of the fix-point operators are bugged because they drop part
-       of the basis. The problem was not fixed in the fix-point
-       computation but in whileloop handling:-(. The derivative version
-       should be ok. */
-    /* transformer_basic_fix_point() is not defined in fix_point.c:
-    dropping all constraints is correct!; Hence,
-    transformer_fix_point_operator is not initialized unless
-    SEMANTICS_FIX_POINT is set... and this is not the default option.  To
-    be redesigned... */
-    /* fp_tf_u = (*transformer_fix_point_operator)(tf_u); */
-    fp_tf_u = transformer_derivative_fix_point(tf_u);
-
-    debug(8,"unstructured_to_global_transformer","Result for one step tf_u:\n");
-    ifdebug(8) (void) print_transformer(tf_u);
-    debug(8,"unstructured_to_global_transformer","Result for fix-point fp_tf_u:\n");
-    ifdebug(8) (void) print_transformer(fp_tf_u);
-    debug(8,"unstructured_to_global_transformer","end\n");
-
-    return fp_tf_u;
+      }
+      else {
+	tf_u = transformer_convex_hull(tf_old, tf_st); /* other */
+	free_transformer(tf_old);
+      }
+    }
+    
+  }, entry_node, nodes) ;
+  
+  gen_free_list(nodes) ;
+  
+  /* fp_tf_u = transformer_derivative_fix_point(tf_u); */
+  /* Some of the fix-point operators are bugged because they drop part
+     of the basis. The problem was not fixed in the fix-point
+     computation but in whileloop handling:-(. The derivative version
+     should be ok. */
+  /* transformer_basic_fix_point() is not defined in fix_point.c:
+     dropping all constraints is correct!; Hence,
+     transformer_fix_point_operator is not initialized unless
+     SEMANTICS_FIX_POINT is set... and this is not the default option.  To
+     be redesigned... */
+  /* fp_tf_u = (*transformer_fix_point_operator)(tf_u); */
+  fp_tf_u = transformer_derivative_fix_point(tf_u);
+  
+  ifdebug(8) {
+    pips_debug(8,"Result for one step tf_u:\n");
+    print_transformer(tf_u);
+    pips_debug(8,"Result for fix-point fp_tf_u:\n");
+    print_transformer(fp_tf_u);
+  }
+  
+  pips_debug(8,"end\n");
+  
+  return fp_tf_u;
 }
 
 static transformer 
