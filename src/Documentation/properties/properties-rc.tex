@@ -12,6 +12,9 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.118  1998/03/10 14:18:55  irigoin
+%% New property added, CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS.
+%%
 %% Revision 1.117  1998/03/05 14:32:24  irigoin
 %% New property added: PARSER_SUBSTITUTE_ASSIGNED_GOTO FALSE
 %%
@@ -55,7 +58,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/03/05 14:32:24 $~$
+$~$Date: 1998/03/10 14:18:55 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -415,13 +418,14 @@ PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
 \index{Return (Alternate)}
 
 Alternate returns are put among the obsolete Fortran features by the
-Fortran~90 standard. It is possible (1) to refuse them, or (2) to ignore
-them and (3) to replace alternate returns by {\tt STOP}, or to substitute
-them by a semantically equivalent code based on return code values. Option
-(2) is useful if the alternate returns are used to propagate error
-conditions. Option (3) is useful to understand the impact of the alternate
-returns on the control flow graph and to maintain the code semantics.
-By default, the first option is selected and alternate returns are refused.
+Fortran~90 standard. It is possible (1) to refuse them (option "NO"), or
+(2) to ignore them and to replace alternate returns by {\tt STOP} (option
+"STOP"), or (3) to substitute them by a semantically equivalent code based
+on return code values (option "RC"). Option (2) is useful if the alternate
+returns are used to propagate error conditions. Option (3) is useful to
+understand the impact of the alternate returns on the control flow graph
+and to maintain the code semantics.  By default, the first option is
+selected and alternate returns are refused.
 
 To produce an executable code, the declarations must be
 regenerated: see property \verb/PRETTYPRINT_ALL_DECLARATIONS/ in
@@ -516,6 +520,8 @@ UNSPAGHETTIFY_IN_CONTROLIZER   TRUE
 \index{Def-Def Chains}
 \index{Use-Use Chains}
 
+\subsubsection{Add use-use Chains}
+
 It is possible to put use-use dependence arcs in the dependence graph.
 This is useful for estimation of cache memory traffic and of
 communication for distributed memory machine (e.g. you can parallelize
@@ -531,6 +537,8 @@ hard to interprete. It is useful to print the dependence graph.
 \begin{verbatim}
 KEEP_READ_READ_DEPENDENCE FALSE
 \end{verbatim}
+
+\subsubsection{Remove Some Chains}
 
 It is possible to mask effects on local variables in loop bodies. This
 is dangerous with current version of Allen \& Kennedy which assumes that
@@ -552,10 +560,20 @@ spurious def-use dependence arcs are taken into account.
 CHAINS_DATAFLOW_DEPENDENCE_ONLY FALSE
 \end{verbatim}
 
-The last two properties are not consistent with PIPS current development
+These last two properties are not consistent with PIPS current development
 (1995/96). It is assumed that {\em all} dependence arcs are present in the
 dependence graph. Phases using the latter should be able to filter out
 irrelevant arcs, e.g. pertaining to privatized variables.
+
+\subsubsection{Disambiguation Test}
+
+The default disambiguation test is based on variables names. Array and
+scalar variables are handled in the same way. However it is possible to
+refine the chain graph by using {\em constant} subscript expressions.
+
+\begin{verbatim}
+CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS FALSE
+\end{verbatim}
 
 \subsection{Effects}
 \index{Effects (Memory)}
