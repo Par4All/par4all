@@ -1,4 +1,4 @@
-/* 	%A% ($Date: 1995/09/05 15:16:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
+/* 	%A% ($Date: 1995/09/06 17:52:34 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.	 */
 
 /*#define REGULAR_VERSION "Regular Version"
   #define PARALLEL_VERSION "Parallel Version"
@@ -26,6 +26,7 @@
 #define DISTRIBUTE_TRANSFORM "Distribute"
 #define PARTIAL_EVAL_TRANSFORM "Partial Eval"
 #define UNROLL_TRANSFORM "Loop Unroll"
+#define FULL_UNROLL_TRANSFORM "Full Loop Unroll"
 #define STRIP_MINE_TRANSFORM "Strip Mining"
 #define LOOP_INTERCHANGE_TRANSFORM "Loop Interchange"
 #define SUPPRESS_DEAD_CODE_TRANSFORM "Dead Code Elimination"
