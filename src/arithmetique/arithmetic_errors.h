@@ -9,6 +9,9 @@
  * (c) CA et FC, Sept 1997
  *
  * $Log: arithmetic_errors.h,v $
+ * Revision 1.20  1998/10/24 14:32:45  coelho
+ * simpler macros.
+ *
  * Revision 1.19  1998/10/24 09:22:47  coelho
  * size update.
  *
@@ -16,68 +19,44 @@
  * const added to constants.
  *
  */
+
+#if !defined(LINEAR_ARITHMETIC_ERROR_INCLUDED)
+#define LINEAR_ARITHMETIC_ERROR_INCLUDED
+
 #include <setjmp.h>
 
 /* the index points to the first available chunck for a new context...
  */
-
-#define MAX_STACKED_CONTEXTS 40
-extern jmp_buf global_exception_stack[MAX_STACKED_CONTEXTS];
-extern int     global_exception_type[MAX_STACKED_CONTEXTS];
-extern int     global_exception_index;
-extern int     global_exception_thrown;
-
 extern const unsigned int overflow_error;
 extern const unsigned int simplex_arithmetic_error;
 extern const unsigned int user_exception_error;
 extern const unsigned int any_exception_error;
 
-/* declaration of "exception"  to keep  2 potential types:
-   extern int or extern jmp_buf
-*/
+/* use gnu cpp '__FUNCTION__' extension if possible.
+ */
+#if defined(__GNUC__)
+#define __CURRENT_FUNCTION_NAME__ __FUNCTION__
+#else
+#define __CURRENT_FUNCTION_NAME__ "<unknown>"
+#endif
 
 /* set DEBUG_GLOBAL_EXCEPTIONS for debugging information
  */
+#define EXCEPTION extern const unsigned int
 
-#if defined(DEBUG_GLOBAL_EXCEPTIONS)
-#define exception_debug(msg, n, what) 			\
-  fprintf(stderr, "%s %d - %d (%s %s %d)\n", 		\
-      msg, what, n, __FUNCTION__, __FILE__, __LINE__),
-#else
-#define exception_debug(msg, n, what) 
-#endif
+#define THROW(what) (throw_exception(what))
 
-#define exception_debug_push(what) \
-  exception_debug("PUSH ", global_exception_index, what)
-#define exception_debug_pop(what) \
-  exception_debug("POP  ", global_exception_index-1, what)
-#define exception_debug_throw(what) \
-  exception_debug("THROW", global_exception_index-1, what)
-
-#define EXCEPTION extern unsigned int
-
-#define global_exception_index_decr                                     \
-    (global_exception_index > 0 ? --global_exception_index:             \
-     (print_exception_stack_error(0),1))
-
-#define THROW(what) \
-    (exception_debug_throw(what) throw_exception(what))
-
-#define PUSH_AND_FORWARD_EXCEPTION(what)				\
-    (exception_debug_push(what) 					\
-      global_exception_index==MAX_STACKED_CONTEXTS?			\
-     (print_exception_stack_error(1),1):	                        \
-     (global_exception_type[global_exception_index]=what,		\
-      setjmp(global_exception_stack[global_exception_index++])))
-
-#define CATCH(what) if PUSH_AND_FORWARD_EXCEPTION(what)
+#define CATCH(what) 							\
+   if (setjmp(*push_exception_on_stack(what, __CURRENT_FUNCTION_NAME__,	\
+				     __FILE__, __LINE__)))
 
 #define UNCATCH(what)						\
-    (exception_debug_pop(what) 					\
-     global_exception_type[global_exception_index_decr]!=what?	\
-	(print_exception_stack_error(2), 0): 1)
+     (pop_exception_from_stack(what, __CURRENT_FUNCTION_NAME__,	\
+			       __FILE__, __LINE__))
 
 #define TRY else
+
+#endif /* LINEAR_ARITHMETIC_ERROR_INCLUDED */
 
 /* end of it.
  */
