@@ -1021,6 +1021,18 @@ Special commands:
   "Launching the WPips process..."
   )
 
+
+(defun epips-launch-alone ()
+  "Act as epips but discard the current buffer after the wpips start-up.
+Used by the epips shell script to run EPips as a stand alone Emacs."
+  (let
+      ((the-current-frame (window-frame (get-buffer-window (current-buffer)))))
+    (epips)
+    (delete-frame the-current-frame)
+    )
+  )
+
+
 (defun epips-mode (no-possible-disable-yet)
   "For EPips acting as a minor mode, add this function.
 But since I cannot see what quitting the minor mode epips means,
