@@ -27,6 +27,8 @@
 #include "regions.h"
 #include "transformer.h"
 #include "semantics.h"
+#include "complexity_ri.h"
+#include "complexity.h"
 
 #include "callgraph.h"
 
@@ -112,6 +114,9 @@ int decor_type;
     switch (decor_type) {
     case CG_DECOR_NONE:
 	break;
+    case CG_DECOR_COMPLEXITIES:
+	MERGE_TEXTS(r,get_text_complexities(module_name));
+	break;
     case CG_DECOR_TRANSFORMERS:
 	MERGE_TEXTS(r,get_text_transformers(module_name));
 	break;
@@ -156,16 +161,15 @@ int decor_type;
     string module_name = module_local_name(module);
     statement s = (statement)db_get_memory_resource(DBR_CODE,
 						    module_name, TRUE);
-    string filename;
-    FILE *fp;
 
     if ( s == statement_undefined ) {
 	pips_error("module_to_callgraph","no statement for module %s\n",
 		   module_name);
     } else {
-
-	filename = strdup(concatenate(db_get_current_program_directory(), 
-				      "/", module_name, ".cg",  NULL));
+	FILE *fp;
+	string localfilename = strdup(concatenate(module_name, ".cg",  NULL));
+	string filename = strdup(concatenate(db_get_current_workspace_directory(), 
+				      "/", localfilename,  NULL));
 
 	fp = safe_fopen(filename, "w");
 
@@ -173,7 +177,8 @@ int decor_type;
 
 	safe_fclose(fp, filename);
 	DB_PUT_FILE_RESOURCE(DBR_CALLGRAPH_FILE, 
-			     strdup(module_name), filename);
+			     strdup(module_name), localfilename);
+	free(filename);
     }
     return TRUE;
 }
