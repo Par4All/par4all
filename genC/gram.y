@@ -21,10 +21,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "malloc.h"
+
+#include "genC.h"
 #include "newgen_include.h"
 
 #define YYERROR_VERBOSE 1 /* better error messages by bison */
+
+extern int yyinput(void);
+extern void yyerror(char*);
+extern int check_not_keyword(char *); /* in build.c */
 
 #define YYMAXDEPTH 300
 
@@ -339,7 +344,7 @@ Name	: IDENT	{
 
 /* Syntax error routines called by yacc. */
 
-int yyerror( s )
+void yyerror( s )
 char *s ;
 {
   int c;
