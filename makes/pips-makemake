@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1996/09/20 17:00:04 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1996/09/20 17:14:09 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -269,6 +269,8 @@ MOVE	= mv -f
 GMKNODIR= --no-print-directory
 INSTALL = pips_install_file
 INSTSRC = install_pips_sources
+TMPFILE = .tmp
+DEPFILE = \$(TMPFILE)
 #
 # default targets...
 all: generate_makefile_if_necessary_and_possible
@@ -855,9 +857,11 @@ $MAKEFILE.depend.\$(ARCH):
 	# may need the derived files
 	test ! "\$(DERIVED_CFILES)" || \$(MAKE) \$(GMKNODIR) \$(DERIVED_CFILES)
 	# now it's okay fo building all the dependences.
+	# well, the how depends on the compiler...:-(
 	test ! "\$(CFILES)\$(DERIVED_CFILES)" || \\
-	        \$(MAKEDEP) \$(CFILES) \$(DERIVED_CFILES) |\\
-		sed 's,^\(.*\.o:\),\$\$(ARCH)/\1,' > \$@
+	{ \$(MAKEDEP) \$(CFILES) \$(DERIVED_CFILES) > \$(TMPFILE) ; \\
+	  sed 's,^\(.*\.o:\),\$\$(ARCH)/\1,' \$(DEPFILE) > \$@ ; \\
+	  \$(RM) \$(TMPFILE) ; }
 
 #
 # dependences are stored in another file which is simply included.
