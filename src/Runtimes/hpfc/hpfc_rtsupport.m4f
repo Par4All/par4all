@@ -1248,7 +1248,85 @@ _direct(`'
       HPFC PROCESSOR DIM = ip
       return
       end
+
+!--------------------  HPFC HCAST  -----------------
 !
-!-----------------
+! The host send a message to every node.
+!
+      subroutine HPFC HCAST
+      include "hpfc_commons.h"
+      integer info
+      debug(print *, "hcast - ", MCAST HOST)
+      call HPFC BCAST ROOT(MAX SIZE OF PROCS, NODE TIDS(1), MCAST HOST,
+     $     info)
+      MCAST HOST = MCAST HOST + 2
+      debug(print *, "hcast done")
+      end
+
+!--------------------  HPFC NCAST  -----------------
+!
+! every node receive a broadcast from host.
+!
+      subroutine HPFC NCAST
+      include "hpfc_commons.h"
+      debug(print *, "ncast ", MY LID, " - ", MCAST HOST)
+      call HPFC BCAST RECV(HOST LID, MCAST HOST, BUFFER ID)
+      MCAST HOST = MCAST HOST + 2
+      debug(print *, "ncast done")
+      end
+
+!-------------------- HPFC SND TO HOST   -----------------
+!
+! a node sends a message to host
+!
+      subroutine HPFC SND TO HOST
+      include "hpfc_commons.h"
+      integer info
+      debug(print *, "snd to host ", MYLID, " - ", HOST SND CHANNEL)
+      call HPFC SEND(HOST LID, HOST SND CHANNEL, info)
+      HOST SND CHANNEL = HOST SND CHANNEL+2
+      debug(print *, "snd to host done")
+      end
+
+!-------------------- HPFC RCV FROM HOST  -----------------
+!
+! a node receive a message from host
+!
+      subroutine HPFC RCV FROM HOST
+      include "hpfc_commons.h"
+      debug(print *, "rcv from host ", MY LID, " - ", HOST RCV CHANNEL)
+      call HPFC RECEIVE(HOST LID, HOST RCV CHANNEL, 
+     $     BUFFER ID)
+      HOST RCV CHANNEL = HOST RCV CHANNEL+2
+      debug(print *, "rcv from host done")
+      end
+
+!--------------------  HPFC SND TO NODE  -----------------
+!
+! the host sends a message from a node
+!
+      subroutine HPFC SND TO NODE(lid)
+      include "hpfc_commons.h"
+      integer lid
+      integer info
+      debug(print *, "snd to node ", lid, " - ", SEND CHANNELS(lid))
+      call HPFC SEND(lid, SEND CHANNELS(lid), info)
+      SEND CHANNELS(lid) = SEND CHANNELS(lid)+2
+      debug(print *, "snd to node done")
+      end
+
+!--------------------  HPFC RCV FROM NODE  -----------------
+!
+! the host receive a message from a node
+!
+      subroutine HPFC RCV FROM NODE(lid)
+      include "hpfc_commons.h"
+      integer lid
+      debug(print *, "rcv from node ", lid, " - ", RECV CHANNELS(lid))
+      call HPFC RECEIVE(lid, RECV CHANNELS(lid), BUFFER ID)
+      RECV CHANNELS(lid) = RECV CHANNELS(lid)+2
+      debug(print *, "rcv from node done")
+      end
+!
 !
 !
