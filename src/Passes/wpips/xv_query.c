@@ -19,38 +19,40 @@ static Panel_item query_pad;
 static Panel_item query_cancel_button;
 
 static char *query_help_topic;
-static success (*apply_on_query)();
+static success (*apply_on_query)(char *);
 
-void start_query(window_title, query_title, help_topic, ok_func, cancel_func)
-     char *window_title, *query_title, *help_topic;
-     success (*ok_func)();
-     success (*cancel_func)(Panel_item, Event *);
+void
+start_query(char * window_title,
+            char * query_title,
+            char * help_topic,
+            success (* ok_func)(char *),
+            void (* cancel_func)(Panel_item, Event *))
 {
-  xv_set(query_frame, FRAME_LABEL, window_title, NULL);
-  /*	     PANEL_NOTIFY_PROC, cancel_query_notify, */
+   xv_set(query_frame, FRAME_LABEL, window_title, NULL);
+   /*	     PANEL_NOTIFY_PROC, cancel_query_notify, */
 
-  xv_set(query_cancel_button, PANEL_NOTIFY_PROC, cancel_func,
-	 NULL);
+   xv_set(query_cancel_button, PANEL_NOTIFY_PROC, cancel_func,
+          NULL);
 
-  xv_set(query_pad, PANEL_LABEL_STRING, query_title, NULL);
+   xv_set(query_pad, PANEL_LABEL_STRING, query_title, NULL);
 
-  xv_set(query_pad, PANEL_VALUE, "", NULL);
+   xv_set(query_pad, PANEL_VALUE, "", NULL);
 
-  query_help_topic = help_topic;
+   query_help_topic = help_topic;
 
-  apply_on_query = ok_func;
+   apply_on_query = ok_func;
 
-  unhide_window(query_frame);
+   unhide_window(query_frame);
 
-  /* move the pointer to the center of the query window */
-  pointer_in_center_of_frame(query_frame);
+   /* move the pointer to the center of the query window */
+   pointer_in_center_of_frame(query_frame);
 
-  /* Valide le focus sur l'entrée : */
-  /* J'ai l'impression que le code pre'ce'dent est pluto^t obsole`te... RK. */
-  /* Mais pourquoi cela ne marche pas ??? */
-  win_set_kbd_focus(query_frame, xv_get(query_panel, XV_XID));
-  /* xv_set(query_xwindow , WIN_SET_FOCUS, NULL); */
-  xv_set(query_panel, PANEL_CARET_ITEM, query_pad, NULL);
+   /* Valide le focus sur l'entrée : */
+   /* J'ai l'impression que le code pre'ce'dent est pluto^t obsole`te... RK. */
+   /* Mais pourquoi cela ne marche pas ??? */
+   win_set_kbd_focus(query_frame, xv_get(query_panel, XV_XID));
+   /* xv_set(query_xwindow , WIN_SET_FOCUS, NULL); */
+   xv_set(query_panel, PANEL_CARET_ITEM, query_pad, NULL);
 }
 
 void query_canvas_event_proc(window, event)
@@ -128,11 +130,11 @@ Event *event;
 }
 
 /* Ne fait rien d'autre que de fermer la fene^tre... */
-void cancel_query_notify(item, event)
-Panel_item item;
-Event *event;
+void
+cancel_query_notify(Panel_item item
+                    , Event * event)
 {
-    hide_window(query_frame);
+   hide_window(query_frame);
 }
 
 void create_query_window()
