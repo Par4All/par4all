@@ -2,7 +2,7 @@
  *
  * Fabien Coelho, May and June 1993
  *
- * $RCSfile: run-time.c,v $ ($Date: 1995/07/20 18:40:47 $, )
+ * $RCSfile: run-time.c,v $ ($Date: 1995/08/30 14:34:20 $, )
  * version $Revision$,
  */
 
@@ -21,13 +21,11 @@ entity MakeRunTimeSupportSubroutine(local_name, number_of_arguments)
 string local_name;
 int number_of_arguments;
 {
-    string 
-	full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
-				MODULE_SEP_STRING, local_name, NULL);
-    entity
-	e = gen_find_tabulated(full_name, entity_domain);
+    string full_name = concatenate(TOP_LEVEL_MODULE_NAME, 
+				   MODULE_SEP_STRING, local_name, NULL);
+    entity e = gen_find_tabulated(full_name, entity_domain);
 
-    return((e==entity_undefined) ? make_empty_module(full_name) : e);
+    return (e==entity_undefined) ? make_empty_module(full_name) : e;
 }
 
 /* entity MakeRunTimeSupportFunction
@@ -41,11 +39,11 @@ string local_name;
 int number_of_arguments;
 tag return_type;
 {
-    return(MakeExternalFunction(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
+    return MakeExternalFunction(FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
 						   local_name),
 				(return_type==is_basic_int ? /* ??? rough */
 				 MakeIntegerResult() :
-				 MakeOverloadedResult())));
+				 MakeOverloadedResult()));
 }
 
 expression pvm_what_option_expression(v)
@@ -132,10 +130,10 @@ entity f;
 reference r;
 {
     return
-	(hpfc_make_call_statement(f,
+	 hpfc_make_call_statement(f,
 	   CONS(EXPRESSION, pvm_what_option_expression(reference_variable(r)),
 	   CONS(EXPRESSION, reference_to_expression(r),
-		NIL))));
+		NIL)));
 }
 
 /******************************************************************************/
@@ -151,23 +149,21 @@ reference ref;
 {
     if (get_bool_property("HPFC_EXPAND_COMPUTE_COMPUTER"))
     {
-	list 
-	    linds = reference_indices(ref),
-	    largs = make_list_of_constant(0, 7-gen_length(linds));
-	int
-	    narray = load_hpf_number(reference_variable(ref));
+	list linds = reference_indices(ref),
+	     largs = make_list_of_constant(0, 7-gen_length(linds));
+	int narray = load_hpf_number(reference_variable(ref));
 	
 	largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), 
 			       NIL),
 			  gen_nconc(lUpdateExpr(node_module, linds), largs));
 	
-	return(hpfc_make_call_statement(hpfc_name_to_entity(CMP_COMPUTER), 
-				      largs));
+	return hpfc_make_call_statement(hpfc_name_to_entity(CMP_COMPUTER), 
+				      largs);
     }
     else
-	return(hpfc_make_call_statement(hpfc_name_to_entity(CMP_COMPUTER),
+	return hpfc_make_call_statement(hpfc_name_to_entity(CMP_COMPUTER),
 		     CONS(EXPRESSION, reference_to_expression(ref),
-			  NIL)));
+			  NIL));
 }
 
 /*
@@ -178,22 +174,20 @@ reference ref;
 {
     if (get_bool_property("HPFC_EXPAND_COMPUTE_OWNER"))
     {
-	list 
-	    linds = reference_indices(ref),
-	    largs = make_list_of_constant(0, 7-gen_length(linds));
-	int
-	    narray = load_hpf_number(reference_variable(ref));
+	list linds = reference_indices(ref),
+	     largs = make_list_of_constant(0, 7-gen_length(linds));
+	int narray = load_hpf_number(reference_variable(ref));
 	
 	largs = gen_nconc(CONS(EXPRESSION, int_to_expression(narray), NIL),
 			  gen_nconc(lUpdateExpr(node_module,  linds), largs));
 	
-	return(hpfc_make_call_statement(hpfc_name_to_entity(CMP_OWNERS), 
-				      largs));
+	return hpfc_make_call_statement(hpfc_name_to_entity(CMP_OWNERS), 
+				      largs);
     }
     else
-	return(hpfc_make_call_statement(hpfc_name_to_entity(CMP_OWNERS),
+	return hpfc_make_call_statement(hpfc_name_to_entity(CMP_OWNERS),
 		     CONS(EXPRESSION, reference_to_expression(ref),
-			  NIL)));
+			  NIL));
 }
 
 /*
@@ -228,19 +222,12 @@ expression expr;
 	}
 	case is_hpf_newdecl_beta:
 	{
-	    align
-		a = load_entity_align(array);
-	    entity
-		template = align_template(a);
-	    distribute
-		d = load_entity_distribute(template);
-	    alignment
-		al = FindAlignmentOfDim(align_alignment(a), dim);
-	    int
-		tempdim = alignment_templatedim(al),
-		procdim;
-	    dimension
-		template_dim = FindIthDimension(template,tempdim);
+	    align a = load_entity_align(array);
+	    entity template = align_template(a);
+	    distribute d = load_entity_distribute(template);
+	    alignment al = FindAlignmentOfDim(align_alignment(a), dim);
+	    int tempdim = alignment_templatedim(al), procdim;
+	    dimension template_dim = FindIthDimension(template,tempdim);
 	    distribution
 		di = FindDistributionOfDim(distribute_distribution(d), 
 					   tempdim, 
@@ -248,10 +235,7 @@ expression expr;
 	    expression
 		parameter = distribution_parameter(di),
 		rate = alignment_rate(al),
-		prod,
-		t1,
-		the_mod,
-		t2;
+		prod, t1, the_mod, t2;
 	    int
 		iabsrate = abs(HpfcExpressionToInt(rate)),
 		ishift = (HpfcExpressionToInt(alignment_constant(al)) - 
@@ -329,42 +313,30 @@ expression expr;
 
 /******************************************************************************/
 
-/*
- * statement hpfc_make_call_statement(e, l) 
+/* statement hpfc_make_call_statement(e, l) 
  * generate a call statement to function e, with expression list l 
  * as an argument. 
  */
-statement hpfc_make_call_statement(e, l)
-entity e;
-list l;
+statement hpfc_make_call_statement(entity e, list l)
 {
     assert(!entity_undefined_p(e));
 
-    return(make_stmt_of_instr(make_instruction(is_instruction_call,
-					       make_call(e, l))));
+    return make_stmt_of_instr(make_instruction(is_instruction_call,
+					       make_call(e, l)));
 }
 
-/*
- * void add_pvm_init_and_end(phs, pns)
- */
-void add_pvm_init_and_end(phs, pns)
-statement *phs, *pns;
-{
-    (*phs) = make_block_statement(CONS(STATEMENT,
-				       st_init_host(),
-				       CONS(STATEMENT,
-					    (*phs),
-					    CONS(STATEMENT,
-						 st_host_end(),
-						 NIL))));
 
-    (*pns) = make_block_statement(CONS(STATEMENT,
-				       st_init_node(),
-				       CONS(STATEMENT,
-					    (*pns),
-					    CONS(STATEMENT,
-						 st_node_end(),
-						 NIL))));
+void add_pvm_init_and_end(statement *phs, statement *pns)
+{
+    (*phs) = make_block_statement(CONS(STATEMENT, st_init_host(),
+				  CONS(STATEMENT, (*phs),
+				  CONS(STATEMENT, st_host_end(),
+				       NIL))));
+
+    (*pns) = make_block_statement(CONS(STATEMENT, st_init_node(),
+				  CONS(STATEMENT, (*pns),
+				  CONS(STATEMENT, st_node_end(),
+				       NIL))));
 
 }
 
@@ -373,13 +345,11 @@ statement *phs, *pns;
  *
  * call to the runtime support function HPFC_CMPNEIGHBOUR(d)
  */
-statement st_compute_neighbour(d)
-int d;
+statement st_compute_neighbour(int d)
 {
-    return(hpfc_make_call_statement(hpfc_name_to_entity(CMP_NEIGHBOUR), 
-				  CONS(EXPRESSION,
-				       int_to_expression(d),
-				       NIL)));
+    return hpfc_make_call_statement(hpfc_name_to_entity(CMP_NEIGHBOUR), 
+				  CONS(EXPRESSION, int_to_expression(d),
+				       NIL));
 }
 
 /*
@@ -393,10 +363,8 @@ entity array;
 list content;
 bool bsend;
 {
-    int
-	len = gen_length(content);
-    list
-	larg = NIL;
+    int len = gen_length(content);
+    list larg = NIL;
 
     assert(len==NumberOfDimension(array) && (len<=4) && (len>=1));
 
@@ -420,29 +388,25 @@ bool bsend;
      * array, dim [lower, upper]*len, range [lower, upper, increment]*len
      */
 
-    return(hpfc_make_call_statement
+    return hpfc_make_call_statement
 	   (make_packing_function("HPFC", 
 				  len, 
 				  bsend, 
 				  entity_basic(array), 
 				  1+5*len),
-	    larg));
+	    larg);
 
 }
 
 /* returns the entity to which e is attached,
  * that is first a common, then a function...
  */
-entity hpfc_main_entity(e)
-entity e;
+entity hpfc_main_entity(entity e)
 {
-    storage
-	s = entity_storage(e);
-    bool
-	in_common = entity_in_common_p(e),
-	in_ram = storage_ram_p(s);
-    ram 
-	r = (in_ram ? storage_ram(s) : ram_undefined);
+    storage s = entity_storage(e);
+    bool in_common = entity_in_common_p(e),
+	 in_ram = storage_ram_p(s);
+    ram r = (in_ram ? storage_ram(s) : ram_undefined);
 
     assert(!storage_rom_p(s));
 
@@ -454,14 +418,12 @@ entity e;
 
 /* returns the name of the entity e belongs too (common, function...)
  */
-string hpfc_main_entity_name(e)
-entity e;
+string hpfc_main_entity_name(entity e)
 {
     return(module_local_name(hpfc_main_entity(e)));
 }
 
-/*
- * string bound_parameter_name(array, side, dim)
+/* string bound_parameter_name(array, side, dim)
  *
  * returns a name for the bound of the declaration 
  * of array array, side side and dimension dim.
@@ -473,75 +435,53 @@ int dim;
 {
     char buffer[100];
 
-    return(strdup(sprintf(buffer, "%s_%s_%s%d",
+    return strdup(sprintf(buffer, "%s_%s_%s%d",
 			  hpfc_main_entity_name(array),
 			  entity_local_name(array),
 			  side,
-			  dim)));
+			  dim));
 }
 
-/*
- * list array_lower_bounds_list(array)
- */
-list array_lower_bounds_list(array)
-entity array;
+expression 
+hpfc_array_bound(entity array, int dim, string what)
 {
-    int
-	i = -1,
-	ndim = NumberOfDimension(array);
-    list
-	result = NIL;
+    char *bf = bound_parameter_name(array, what, dim);
+    expression e = MakeCharacterConstantExpression(bf);
+    free(bf);
+    return e;
+}
+
+list /* of expressions */
+array_bounds_list(entity array, string what)
+{
+    int	i = -1,	ndim = NumberOfDimension(array);
+    list result = NIL;
 
     for (i=ndim ; i>=1 ; i--)
-    {
-	char
-	    *buf = bound_parameter_name(array, LOWER, i);
+	result = CONS(EXPRESSION, hpfc_array_bound(array, i, what), result);
 
-	result = 
-	    CONS(EXPRESSION,
-		 MakeCharacterConstantExpression(buf),
-		 result);
-
-	free(buf);
-    }
-
-    return(result);
+    return result;
 }
 
-/*
- * list array_lower_upper_bounds_list(array)
- */
-list array_lower_upper_bounds_list(array)
-entity array;
+list /* of expressions */
+array_lower_upper_bounds_list(entity array)
 {
-    int
-	i = -1,
-	ndim = NumberOfDimension(array);
-    list
-	result = NIL;
+    list /* of expression */ lb = array_bounds_list(array, LOWER),
+    			     lu = array_bounds_list(array, UPPER),
+    			     l = lb, lnb, lnu;
 
-    for (i=ndim ; i>=1 ; i--)
-    {
-	char
-	    *lbuf = bound_parameter_name(array, LOWER, i),
-	    *ubuf = bound_parameter_name(array, UPPER, i);
+    if (!l) return NIL;
+    
+    /* interleave both lists (just for fun:-)
+     */
+    for(lnb=CDR(lb), lnu=CDR(lu); lb; 
+	CDR(lb)=lu, CDR(lu)=lnb, 
+	lb=lnb, lnb=lnb?CDR(lnb):NIL, lu=lnu, lnu=lnu?CDR(lnu):NIL);
 
-	result = 
-	    CONS(EXPRESSION,
-		 MakeCharacterConstantExpression(lbuf),
-	    CONS(EXPRESSION,
-		 MakeCharacterConstantExpression(ubuf),
-		 result));
-
-	free(ubuf);
-	free(lbuf);
-    }
-
-    return(result);
+    return l;
 }
-	
-/*
- * entity make_packing_function(prefix, ndim, kind, base, nargs)
+
+/* entity make_packing_function(prefix, ndim, kind, base, nargs)
  *
  * find or create an entity for the packing function...
  */
@@ -552,9 +492,7 @@ bool kind;
 basic base;
 int nargs;
 {
-    char 
-	buffer[100],
-	*buf = buffer;
+    char buffer[100], *buf = buffer;
 
     buf += strlen(sprintf(buf, "%s_%s_%s_%d", 
 			  prefix, 
