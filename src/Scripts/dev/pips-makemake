@@ -1,7 +1,7 @@
 #! /bin/sh
 # for debug, try: /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/09/21 18:51:02 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/09/25 12:54:46 $, )
 # version $Revision$
 #
 # Automatic generation of Makefile for the PIPS project
@@ -227,6 +227,7 @@ SHELL=		/bin/sh
 
 #
 all: $ALL_RULE_TARGET
+recompile: depend header all
 # to override sun's default rule
 .SCCS_GET:
 .INIT: $(MAKEFILE)
@@ -391,11 +392,6 @@ recompile: $(PIPS_BINDIR)/$(BIN_TARGET)
 
 %
 
-[ $DIRSIDE = $PIPS_DEVEDIR ] &&
-cat >> $MAKEFILE <<%
-recompile: header all
-%
-
 ###
 #
 # Common to all: installation and Makefile generation
@@ -424,10 +420,11 @@ tar:
 
 quick-install: .quick-install
 
-$MAKEFILE: .makefile
+$MAKEFILE: 
+	-@[ -x $(PIPS_UTILDIR)/pips-makemake ] && $(MAKE) .makefile
 
-.makefile:
-	-@[ -x $(PIPS_UTILDIR)/pips-makemake ] && $(PIPS_UTILDIR)/pips-makemake
+.makefile: $(PIPS_UTILDIR)/pips-makemake
+	$(PIPS_UTILDIR)/pips-makemake
 	touch .makefile
 
 count:
@@ -507,8 +504,8 @@ $(INC_TARGET): $(TARGET)-local.h
 	mv $(INC_TARGET).tmp $(INC_TARGET)
 	touch .header
 
+# checks for the header file, and build if necessary...
 header: .header
-	# checks for the header file, and build if necessary...
 	-[ -f $(TARGET).h ] || { $(RM) .header ; $(MAKE) .header ; }
 
 # indirect depend bacause I do not trust make for the inclusion of
@@ -532,9 +529,9 @@ touch .makefile
 [ $DIRTYPE = 'Lib' -o $DIRTYPE = 'Passes' ] &&
 {
   touch $MAKEFILE.depend
+  rm -f .depend
   make -f $MAKEFILE depend
 }
-
 
 ### end good case
 
