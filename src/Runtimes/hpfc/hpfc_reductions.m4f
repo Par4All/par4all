@@ -1,7 +1,7 @@
 c
 c     Reductions management 
 c
-c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1995/09/07 14:00:17 $, )
+c $RCSfile: hpfc_reductions.m4f,v $ ($Date: 1995/09/26 22:07:11 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -93,11 +93,12 @@ _CM5(`      include "cmmd_fort.h"')
       include "hpfc_rtsupport.h"
       external HPFC_PROCDIM
       integer HPFC_PROCDIM
+      integer
+COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS')
       TYPE 
      $ a(COMMA_REPLICATE(LEVEL, `ARRAY_DECL'))
       integer 
      &    an, dnl
-COMMA_REPLICATE(LEVEL, `LIST_DECL_BOUNDS'),dnl
 COMMA_REPLICATE(LEVEL, `LIST_RED_BOUNDS')
       TYPE result
 SIMPLE_REPLICATE(LEVEL, `REDUCTION_NODE_DECL')
