@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * $RCSfile: defines-local.h,v $ version $Revision$
- * ($Date: 1996/02/29 19:05:22 $, ) 
+ * ($Date: 1996/03/11 17:14:24 $, ) 
  */
 
 /* Most includes are centralized here.
@@ -157,6 +157,8 @@ void fprint_entity_list(FILE *fp, list l);
 #define CMP_NEIGHBOUR   "HPFC_CMPNEIGHBOUR"
 #define CMP_LID		"HPFC_CMPLID"
 
+#define TWIN_P		"HPFC_TWIN_P"
+
 #define CND_SENDERP     "HPFC_SENDERP"
 #define CND_OWNERP      "HPFC_OWNERP"
 #define CND_COMPUTERP   "HPFC_COMPUTERP"
@@ -184,6 +186,7 @@ void fprint_entity_list(FILE *fp, list l);
 #define BUFUPK		"_HPFC_BUFUPK"
 
 #define BROADCAST	"HPFC_BROADCAST_"
+#define GUARDED_BRD	"HPFC_REMAPBRD_"
 
 /* special FCD calls.
  */
