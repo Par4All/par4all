@@ -1,12 +1,16 @@
 #! /bin/sh
 #
-# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/01 09:52:27 $, )
+# $RCSfile: hpfc_directives,v $ ($Date: 1995/03/01 10:32:43 $, )
 # version $Revision$
 # got on %D%, %T%
 #
 # Filter to switch from hpf directives to subroutine calls to be parsed
 # by a Fortran 77 parser. I guess some perl or awk might be much nicer
-# and more efficient, but I'm not very good at it:-)
+# and more efficient, but I'm not very good at it:-) Looks like an exercice
+# of style, "yes I can do it with seds and trs";-) It may be thought as
+# clever or stupid:-)
+# Only one subroutine or function should be put in the pipe. 
+# ??? I do not deal with "R E A L" like Fortran lexical problems.
 #
 # FC 02/95.
 #
@@ -44,11 +48,12 @@
 SED=sed
 TR=tr
 RM=rm
+BASENAME=basename
 
 #
 # temporary files prefix
 
-SCRIPT=`basename $0`
+SCRIPT=`$BASENAME $0`
 
 TMP=/tmp/$SCRIPT.$$
 $RM -f $TMP.*
@@ -90,7 +95,7 @@ $SED '/^chpf\$/s,[Bb][Ll][Oo][Cc][Kk],_k,g
       s,^      _i\,,      _i()\,,
       s,^      _i(\([^)]*\))[ 	]*\,[ 	]*[Nn][Ee][Ww]\(.*\),      _i(\1)      _n\2,
       s,_\([abdeintpy]\),call hpfc\1,g
-      s,_\([cko]\),hpfc\1,g' |
+      s,_\([ck]\),hpfc\1,g' |
 #
 # handles multi lines breaking (independent with new...)
 #
@@ -107,42 +112,43 @@ $SED "/^      call hpfc[adptdy]/w $TMP.1
 # line before which the static directives will be inserted
 # i.e. last line of the declarations.
 #
-# first, find the last declaration line
+# first, find the last declaration line 
+# (program and subroutine needed if none!)
 
-LAST_DECLARATION_LINE=`
+LINE=`
 $SED -n '/^ .... [ 	]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr][ 	\*]/=
          /^ .... [ 	]*[Rr][Ee][Aa][Ll][ 	\*]/=
+         /^ .... [ 	]*[Ss][Tt][Rr][Ii][Nn][Gg][ 	\*]/=
          /^ .... [ 	]*[Ss][Uu][Bb][Rr][Oo][Uu][Tt][Ii][Nn][Ee][ 	\*]/=
          /^ .... [ 	]*[Pp][Rr][Oo][Gg][Rr][Aa][Mm][ 	\*]/=
          /^ .... [ 	]*[Ll][Oo][Gg][Ii][Cc][Aa][Ll][ 	\*]/=
          /^ .... [ 	]*[Cc][Oo][Mm][Pp][Ll][Ee][Xx][ 	\*]/=
          /^ .... [ 	]*[Bb][Yy][Tt][Ee][ 	\*]/=' $TMP.0 | 
-         $SED -n '$p'`
-
-LINE=`expr $LAST_DECLARATION_LINE + 1`
+$SED -n '$p'`
 
 #
 # then deal with continuations if any.
+# comments and blank lines are also skipped, or why should I not ?
 
 LAST_LINE=`
 $SED -n "1,$LINE b
-         s/^\( .... .*[^ 	].*\)/\1/
-         t nocont
-         =
-         b
-         : nocont
-         q" $TMP.0 | $SED -n '$p'`
-
+         s,^\( ....[^ ]\),\1,
+         s,^\([^ ]\),\1,
+         s,^\([ 	]*\)\$,\1,
+         t cont
+         q
+         : cont
+         =" $TMP.0 | 
+$SED -n '$p'`
 
 LINE=${LAST_LINE:-$LINE}
 
 #
 # final output
 
-$SED "$LINE,\$d" $TMP.0
+$SED -n "1,$LINE p" $TMP.0
 $SED -n p $TMP.1
-$SED -n "$LINE,\$p" $TMP.0
-
+$SED "1,$LINE d" $TMP.0
 
 #
 # clean temporary files
