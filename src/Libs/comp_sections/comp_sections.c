@@ -35,7 +35,7 @@ bool complementary_sections(char *module_name)
     return(TRUE);
 }
 
-bool print_complementary_sections(char *module_name)
+bool print_code_complementary_sections(char *module_name)
 {
     return(TRUE);
 }
