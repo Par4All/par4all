@@ -7,6 +7,10 @@
  * generated, they should also be stored there. 
  * 
  * $Log: unsplit.c,v $
+ * Revision 1.10  2003/12/22 15:58:16  irigoin
+ * Bug fix in unsplit() to support several successive calls to unsplit for
+ * the same workspace.
+ *
  * Revision 1.9  2003/12/19 17:42:16  irigoin
  * unsplit() extended to cope with preprocessed file such as .F and .c
  * files. In .F case, initial file name is not exactly regenerated since
@@ -125,13 +129,25 @@ unsplit(string name)
     string summary_full_name;
     string dir_name;
     FILE * summary;
+    int nfiles = 0; /* Number of preexisting files in src_dir */
 
     pips_assert("unused argument", name==name);
+
+    debug_on("UNSPLIT_DEBUG_LEVEL");
 
     user_files = hash_table_make(hash_string, 2*n);
 
     dir_name = db_get_current_workspace_directory();
     summary_full_name = strdup(concatenate(dir_name, "/", summary_name, 0));
+
+    /* Get rid of previous unsplitted files */
+
+    if ((nfiles = safe_system_no_abort_no_warning
+	 (concatenate("i=`ls  ", src_dir, " | wc -l`; export i; exit $i ", NULL)))>0) {
+      int failure = 0;
+      if ((failure = safe_system_no_abort(concatenate("/bin/rm ", src_dir, "/*",  NULL))))
+	pips_user_warning("exit code for /bin/rm is %d\n", failure);
+    }
 
     summary = safe_fopen(summary_full_name, "w");
     fprintf(summary, "! module / file\n");
@@ -172,8 +188,11 @@ unsplit(string name)
     hash_table_free(user_files);
     user_files = hash_table_undefined;
 
+    debug_off();
+
     /* kind of a pseudo resource...
      */
     DB_PUT_FILE_RESOURCE(DBR_USER_FILE, PROGRAM_RESOURCE_OWNER, summary_name);
+
     return TRUE;
 }
