@@ -1,0 +1,26 @@
+dnl
+dnl $RCSfile: hpfc_architecture_m4_macros,v $ ($Date: 1994/09/16 17:03:49 $, )
+dnl version $Revision$
+dnl got on %D%, %T%
+dnl
+dnl DEFAULT ARCHITECTURE
+dnl
+ifdef(`ARCHITECTURE',,`define(`ARCHITECTURE',`syscmd(pvmgetarch)')')dnl
+dnl
+dnl MACHINE TYPE
+dnl
+define(`MIMD')dnl
+define(`NETWORK')dnl
+dnl
+ifelse(ARCHITECTURE,`CM5', `define(`MIMD',`$@')',
+       ARCHITECTURE,`PGON',`define(`MIMD',`$@')')dnl
+ifelse(ARCHITECTURE,`SUN4',`define(`NETWORK',`$@')')dnl
+dnl
+dnl PECULIAR DEFINITIONS
+dnl 
+ifelse(ARCHITECTURE,`SUN4',`define(`SUN4',`$@')',`define(`SUN4')')dnl
+ifelse(ARCHITECTURE,`PGON',`define(`PGON',`$@')',`define(`PGON')')dnl
+ifelse(ARCHITECTURE,`CM5',`define(`CM5',`$@')',`define(`CM5')')dnl
+dnl
+dnl THAT IS ALL
+dnl
