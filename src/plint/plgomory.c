@@ -37,11 +37,11 @@ Variable var;
 {
     Psommet ps1 = NULL;
     Pvecteur pv1,pv2;
-    double d1;
-    int in1,b0;
-    int lambda = 1;
+    Value in1;
+    Value b0;
+    Value lambda = VALUE_ONE;
     int sgn_op= 1;
-    int d =1;
+    Value d = VALUE_ONE;
 
 #ifdef TRACE
     printf(" ** Gomory - ajout d'une eq. verifiant les cond. de Gomory \n");
@@ -50,46 +50,54 @@ Variable var;
     if (eq != NULL && var != NULL)
     {
 	/* calcul du determinant D	*/
-	int p1 = ABS(vect_coeff(var,eq->vecteur));
-	int p2 = ABS(vect_pgcd_all(eq->vecteur));
+	Value p1, p2,tmp;
+	p1 = vect_coeff(var,eq->vecteur);
+	value_absolute(p1);
+	p2 =vect_pgcd_all(eq->vecteur);
+	value_absolute(p2);
 
-	d = p1/p2;
+	d = value_div(p1,p2);
 
 	/* calcul de la coupe de Gomory	*/
 	ps1= (Psommet)MALLOC(sizeof(Ssommet),SOMMET,"gomory_trait_eq");
 	ps1->eq_sat = (int *)MALLOC(sizeof(int),INTEGER,"gomory_trait_eq");
 	pv1 = vect_dup(eq->vecteur);
-	ps1->denominateur = 1;
+	ps1->denominateur = VALUE_ONE;
 	*(ps1->eq_sat) = -1;
 	ps1->succ = NULL;
-	vect_chg_coeff(&pv1,var,0);
+	vect_chg_coeff(&pv1,var,VALUE_ZERO);
 	ps1->vecteur = pv1;
-	sgn_op = (vect_coeff(var,eq->vecteur) <0)? (1):(- 1);
-	if (d!=0) {
+	tmp = vect_coeff(var,eq->vecteur);
+	sgn_op = -value_sign(tmp);
+	if (value_notzero_p(d)) {
 	    for (pv2=pv1;pv2 != NULL; pv2= pv2->succ) {
-		pv2->val = ((sgn_op * pv2->val) % d);
-		if (pv2->val < 0)
-		    pv2->val += d;
+		if (sgn_op==-1)
+		    value_oppose(pv2->val);
+		value_modulus(pv2->val,d);
+		if (value_neg_p(pv2->val))
+		    value_addto(pv2->val,d);
 	    }
 	}
-	b0 = ABS(vect_coeff(TCST,pv1));
+	b0 = vect_coeff(TCST,pv1);
+	value_absolute(b0);
 
 	/* calcul de lambda = coefficient multiplicateur permettant
 	   d'obtenir la coupe optimale		*/
 
-	if (b0 != 0) {
-	    d1 =(double)d/(double)b0;
-	    in1 = d/b0;
-
-	    lambda = (d1 == in1) ? (in1-1) : in1;
-	    if (lambda == 0) 
-		lambda = 1;
+	if (value_notzero_p(b0)) {
+	    in1 = value_div(d,b0);
+	    lambda = value_zero_p(value_mod(d,b0))? (in1-1) : in1;
+	    if (value_zero_p(lambda)) 
+		lambda = VALUE_ONE;
 	}
 
 	/* optimisation de la coupe de Gomory	*/
-	if (lambda >1)
+	if (value_gt(lambda,VALUE_ONE))
 	    for (pv2 = pv1;pv2!= NULL; pv2=pv2->succ)
-		pv2->val =(lambda *pv2->val) % d;
+	    {
+		value_product(pv2->val,lambda);
+		value_modulus(pv2->val,d);
+	    }
 
 	vect_chg_sgn(pv1);
 
@@ -124,8 +132,8 @@ Variable *var;
     Psommet eq=NULL;
     Psommet result= NULL;
     int nb_som1 = nb_som;
-    int a;
-    int max =0;
+    Value a;
+    Value max = VALUE_ZERO;
     Variable v1 = NULL;
     boolean borne = TRUE;
 
@@ -135,22 +143,24 @@ Variable *var;
     *var = NULL;
 
     for (eq = *sys ;eq != NULL && borne; eq=eq->succ) {
-	int b0,den2;
+	Value b0,den2;
 
-	if (borne = test_borne(eq)) {
-	    if ((v1 = find_vbase(eq,lvbase)) !=  NULL) {
+	if ((borne = test_borne(eq))) {
+	    if (((v1 = find_vbase(eq,lvbase))) !=  NULL) {
 		den2 = vect_coeff(v1,eq->vecteur);
-		b0 = -vect_coeff(TCST,eq->vecteur);
+		b0 = value_uminus(vect_coeff(TCST,eq->vecteur));
 
 		/* on a trouve une variable de base non entiere   */
 		/* on choisit celle de plus grand denominateur     */
 
-		if ((b0 % den2) != 0) { 
-		    int p1=eq->denominateur;
-		    int p2 = ABS(b0);
-		    int p3 = pgcd(p2,p1);
+		if (value_notzero_p(value_mod(b0,den2))) { 
+		    Value p1=eq->denominateur;
+		    Value p2 = value_abs(b0);
+		    Value p3 = pgcd(p2,p1);
 
-		    if ((a =ABS(p1/p3)) >max) {
+		    a = value_div(p1,p3);
+		    value_absolute(a);
+		    if (value_gt(a,max)) {
 			max = a;
 			*var = v1;
 			*no_som = nb_som1;
@@ -168,7 +178,7 @@ Variable *var;
 	    *sys = NULL;
 	}
     }
-    if (max != 0)
+    if (value_notzero_p(max))
 	return (result);
     else
 	return (NULL);
