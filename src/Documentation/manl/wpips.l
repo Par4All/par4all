@@ -14,7 +14,7 @@ wpips [
 [\-files
 .IR source_files ]].\|.\|. 
 .\"
-.SH DESCRIPTION
+.SH DESCRIPTION 
 
 PIPS (Paralleliseur Interprocedural de Programmes Scientifiques) is a
 research project from the computer science research center (CRI) at Ecole
