@@ -18,9 +18,10 @@
 #include "regions.h"
 #include "semantics.h"
 
+/* commented out for compilation - bc - beware, it seems dangerous */
 #include "effects-convex-local.h"
 #include "union-local.h"
-
+*/
 #include "pipsdbm.h"
 #include "resources.h"
 
