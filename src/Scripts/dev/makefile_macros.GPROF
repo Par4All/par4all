@@ -1,6 +1,5 @@
 #
-# $RCSfile: makefile_macros.GPROF,v $ (version $Revision$)
-# $Date: 1996/08/22 18:44:26 $, 
+# $Id$
 #
 
 include $(ROOT)/Include/makefile_macros.GNU
@@ -8,5 +7,5 @@ include $(ROOT)/Include/makefile_macros.GNU
 CFLAGS	+= -pg
 LDFLAGS	+= -pg
 
-# end of $RCSfile: makefile_macros.GPROF,v $
+# end of it.
 #
