@@ -108,64 +108,75 @@ last_comma_or_clopar(string s)
 
 void
 add_to_current_line(
-    string crt_line,     /* current line being processed */
-    string add_string,   /* string to add to this line */
+    string buffer,       /* current line being processed */
+    string append,       /* string to add to this line */
     string continuation, /* prefix when breaking a line */
     text txt             /* where to append completed lines */)
 {
-    int lcrt_line, ladd_string;
+    int lbuffer, lappend;
+    lbuffer = strlen(buffer);
 
-    lcrt_line = strlen(crt_line);
-    ladd_string = strlen(add_string);
+    /* spacial case: appends a sole "," on end of line... */
+    if (same_string_p(append, ", ") && lbuffer+3==MAX_LINE_LENGTH) 
+	append = ",";
 
-    if (lcrt_line + ladd_string + 2 > MAX_LINE_LENGTH) /* 2 = strlen("\n\0") */
+    lappend = strlen(append);
+
+    if (lbuffer + lappend + 2 > MAX_LINE_LENGTH) /* 2 = strlen("\n\0") */
     {   
 	/* cannot append the string. must go next line.
 	 */
 	bool divide;
 	char tmp[MAX_LINE_LENGTH];
-	int last_cut = last_comma_or_clopar(crt_line);
+	int last_cut = last_comma_or_clopar(buffer);
 
 	divide = (last_cut > 0)
-	    && (last_cut != lcrt_line-1) 
-	    &&  (lcrt_line - last_cut + ladd_string < MAX_LINE_LENGTH - 2);
+	    && (last_cut != lbuffer-1) 
+	    &&  (lbuffer - last_cut + lappend < MAX_LINE_LENGTH - 2);
 
 	if (divide) 
 	{
 	    int nl_cut = last_cut;
-	    if (crt_line[last_cut+1]==' ') nl_cut++;
-	    strcpy(tmp, crt_line+nl_cut+1); /* save the end of the line */
-	    crt_line[last_cut+1] = '\0';    /* trunc! */
+	    while (buffer[nl_cut+1]==' ') nl_cut++;
+	    strcpy(tmp, buffer+nl_cut+1); /* save the end of the line */
+	    buffer[last_cut+1] = '\0';    /* trunc! */
 	}
 	
 	/* happend new line. */
-	strcat(crt_line, LINE_SUFFIX);
+	strcat(buffer, LINE_SUFFIX);
 	ADD_SENTENCE_TO_TEXT
-	    (txt, make_sentence(is_sentence_formatted, strdup(crt_line)));
+	    (txt, make_sentence(is_sentence_formatted, strdup(buffer)));
 
 	/* now regenerate the beginning of the line */
-	strcpy(crt_line, continuation);
-	if (divide) strcat(crt_line, tmp); /* get back saved part */
+	strcpy(buffer, continuation);
+	if (divide) strcat(buffer, tmp); /* get back saved part */
     }
 
-    if (strlen(crt_line) + ladd_string + 2 > MAX_LINE_LENGTH)
+    if (strlen(buffer) + lappend + 2 > MAX_LINE_LENGTH)
 	/* this shouldn't happen. 
+	 * it can occur if lappend+lcontinuation is too large.
 	 */
 	pips_internal_error("something got wrong...");
 
-    strcat(crt_line, add_string);
+    /* special case: do not append spaces to simple continuations.
+     */
+    if (same_string_p(append, " ") && same_string_p(buffer, continuation))
+	return;
+
+    strcat(buffer, append);
 }
 
 void
 close_current_line(
-    string crt_line,
+    string buffer,
     text txt)
 {
-    if (strlen(crt_line)!=0)
+    if (strlen(buffer)!=0) /* do not append an empty line to text */
     {
-	strcat(crt_line, LINE_SUFFIX); /* should be large enough. */
+	pips_assert("buffer large enough", strlen(buffer)+1<MAX_LINE_LENGTH);
+	strcat(buffer, LINE_SUFFIX);
 	ADD_SENTENCE_TO_TEXT
-	    (txt, make_sentence(is_sentence_formatted, strdup(crt_line)));
-	crt_line[0] = '\0';
+	    (txt, make_sentence(is_sentence_formatted, strdup(buffer)));
+	buffer[0] = '\0';
     }
 }
