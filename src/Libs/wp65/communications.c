@@ -9,7 +9,6 @@
 
 #include "genC.h"
 #include "ri.h"
-#include "hash.h"
 #include "misc.h"
 #include "graph.h"
 #include "tiling.h"
