@@ -86,12 +86,7 @@ static gen_chunk *make_def(), *make_ref() ;
 %token READ_LIST_UNDEFINED
 %token READ_SET_UNDEFINED
 %token READ_ARRAY_UNDEFINED
-
-%term READ_UNIT
-%term <c> READ_CHAR
-%term <val> READ_INT
-%term <d> READ_FLOAT
-%term READ_STRING
+%token READ_STRING
 
 %union {
   gen_chunk chunk ;
@@ -103,6 +98,11 @@ static gen_chunk *make_def(), *make_ref() ;
   char c;
 }
 
+%term READ_UNIT
+%term <c> READ_CHAR
+%term <val> READ_INT
+%term <d> READ_FLOAT
+%type <s> READ_STRING
 %type <chunk> Data Basis 
 %type <chunkp> Chunk String
 %type <consp> Sparse_Datas Datas
@@ -231,8 +231,8 @@ Data	: Basis	{
 		cons *cp ;
 
 		for( cp = gen_nreverse($2) ; cp != NULL ; cp=cp->cdr->cdr ) {
-			gen_chunk *k = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
-			gen_chunk *v = (gen_chunk *)alloc( sizeof( gen_chunk )) ;
+			gen_chunk *k = (gen_chunk *)alloc(sizeof(gen_chunk));
+			gen_chunk *v = (gen_chunk *)alloc(sizeof(gen_chunk));
 	
 			*k = CAR(  cp ) ;
 			*v = CAR( CDR( cp )) ;
@@ -287,21 +287,17 @@ Int     : READ_INT   {
 	;
 
 String  : READ_STRING {
-		extern char literal[] ;
 		gen_chunk *obj = (gen_chunk *)alloc(sizeof(gen_chunk));
 		char * p;
 
 		/* special management of string_undefined... FC. 12/95.
 		 */
-		if (disk_string_undefined_p(literal))
+		if (disk_string_undefined_p($1)) {
+		    free($1);
 		    p = string_undefined;
-		else
-		{
-		    p = alloc(strlen(literal)+1);
-		    strcpy(p, literal); 
-		}
+		} else
+		    p = $1;
 
-		literal[0] = '\0' ;
 		obj->s = p ;
 		$$ = obj ;
 	    }
