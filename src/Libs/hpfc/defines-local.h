@@ -3,6 +3,9 @@
  *
  * $Id$
  * $Log: defines-local.h,v $
+ * Revision 1.63  1997/04/07 09:46:40  coelho
+ * DEBUG_MTRX macro added
+ *
  * Revision 1.62  1997/03/19 15:59:19  coelho
  * *** empty log message ***
  *
@@ -122,6 +125,7 @@ void fprint_entity_list(FILE *fp, list l);
  */
 #define GEN_DEBUG(D, W, P) ifdebug(D) { pips_debug(D, "%s:\n", W); P;}
 
+#define DEBUG_MTRX(D, W, M) GEN_DEBUG(D, W, matrix_fprint(stderr, M))
 #define DEBUG_STAT(D, W, S) GEN_DEBUG(D, W, print_statement(S))
 #define DEBUG_CODE(D, W, M, S) GEN_DEBUG(D, W, hpfc_print_code(stderr, M, S))
 #define DEBUG_SYST(D, W, S) GEN_DEBUG(D, W, syst_debug(S))
