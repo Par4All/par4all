@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.276  1997/03/28 07:13:52  coelho
+# SOFT_ARCH better defined?
+#
 # Revision 1.275  1997/03/26 13:49:18  coelho
 # $(ECHO) in comments interpretaed on AIX.
 #
@@ -326,7 +329,7 @@ include \$(ROOT)/Include/makefile_macros.\$(ARCH)
 include \$(CONFIG)
 #
 # The software architecture (compilers and options...) used.
-CPPFLAGS += -DSOFT_ARCH=\"\$(ARCH)\"
+CPPFLAGS += -DSOFT_ARCH='"\$(ARCH)"'
 #
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
