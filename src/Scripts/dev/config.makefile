@@ -35,7 +35,7 @@ DDC_MACROS = 	define_libraries.make \
 
 MACROS	=	$(DDC_MACROS) $(SRC_MACROS) 
 
-COPY	=	cp -f
+COPY	=	cp
 
 INSTALL_UTL=	$(SCRIPTS)
 INSTALL_INC=	$(MACROS)
