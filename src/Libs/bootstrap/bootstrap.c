@@ -253,7 +253,7 @@ overloaded_to_doublecomplex_type(int n)
     type t = type_undefined;
     functional ft = functional_undefined;
 
-    ft = make_functional(NIL, MakeDoubleComplexResult());
+    ft = make_functional(NIL, MakeDoublecomplexResult());
     functional_parameters(ft) = 
 	make_parameter_list(n, MakeOverloadedParameter);
     t = make_type(is_type_functional, ft);
