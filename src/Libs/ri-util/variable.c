@@ -475,6 +475,38 @@ make_float_constant_entity(float c)
   return ce;
 }
 
+/* entity make_double_constant_entity(double c)
+ * make entity for double constant c
+ */
+entity 
+make_double_constant_entity(double c)
+{
+  entity ce;
+  char buffer[100];
+  string cn;
+  sprintf(buffer, "%f", c);
+
+  cn = strdup(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, buffer, NULL));
+  ce = gen_find_entity(cn);
+
+  if (ce==entity_undefined) {		/* make entity for the constant c */ 
+    functional cf = 
+      make_functional(NIL, 
+		      make_type(is_type_variable, 
+				make_variable(make_basic(is_basic_float,
+							 (void*)sizeof(double)),
+					      NIL)));
+    type ct = make_type(is_type_functional, cf);
+    ce = make_entity(cn, ct, MakeStorageRom(),
+		     make_value(is_value_constant, 
+				make_constant(is_constant_litteral, UU)));
+  }
+  else 
+    free(cn);
+  
+  return ce;
+}
+
 
 
 /* 
