@@ -91,9 +91,23 @@ static int tpips_lex_input (void)
 
 %}
 
-%s KEY FNAME WNAME RES PHASE PROP SVAL OWN
+%s KEY FNAME WNAME RES PHASE PROP SVAL OWN ID
 
 %%
+<KEY>{OPTEMPTY}"setenv" {
+    pips_debug(8, "read token SETENV");
+    BEGIN ID;
+    return SET_ENVIRONMENT;
+}
+<KEY>{OPTEMPTY}"setenv" {
+    pips_debug(8, "read token GETENV");
+    BEGIN ID;
+    return GET_ENVIRONMENT;
+}
+<ID>[a-zA-Z0-9_]+	{
+    yylval.name = strdup(yytext);
+    return IDENT;
+}
 <KEY>{OPTEMPTY}"open" {
     pips_debug(8,"read token OPEN\n");
     BEGIN WNAME;
