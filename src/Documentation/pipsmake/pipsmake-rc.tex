@@ -2,6 +2,9 @@
 %% $Id$
 %%
 %% $Log: pipsmake-rc.tex,v $
+%% Revision 1.29  2004/01/29 15:20:23  guerin
+%% New pipsmake-rc definition for FULL_FSM_GENERATION
+%%
 %% Revision 1.28  2004/01/15 14:02:13  guerin
 %% Adding FULL_SPAGHETTIFY phase for PHRASE project
 %%
@@ -566,7 +569,7 @@
         77305 Fontainebleau Cedex \\
         France \\}
 \date{
-$~$Date: 2004/01/15 14:02:13 $~$
+$~$Date: 2004/01/29 15:20:23 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -3885,6 +3888,8 @@ them in reconfigurables units.
 This phases transforms structured code portions (eg. loops) in
 unstructured statements.
 
+The \texttt{SPAGHETTIFIER} transforms the module in a unstructured code with hierarchical unstructured portion of code corresponding to old strutures.
+
 To add flexibility, the behavior of \texttt{spaghettifier} is
 controlled by the properties 
 \begin{itemize}
@@ -3916,7 +3921,14 @@ creating "Finite State Machine"-like code portions in order to synthetise
 them in reconfigurables units.
 
 This phases transforms all the module in a unique
-unstructured statement
+unstructured statement. 
+
+Where as the \texttt{SPAGHETTIFIER} transforms the module in a unstructured
+code with hierarchical unstructured portion of code corresponding to
+old strutures, the \texttt{FULL\_SPAGHETTIFIER} transform the code in a SEQUENCE
+statement with a beginning statement, a UNIQUE and FLATTENIZED
+unstructured (all the unstructured and sequences are flattened), and a
+final statement.
 
 %%ÿUserManualDocumentation
 %% Control Graph Restructuring
@@ -4064,8 +4076,10 @@ This phase transform all the module in a FSM-like code, which is a
 WHILE-LOOP statement controlled by a state variable, whose different
 values are associated to the different statements.
 
-To be efficient, phase \texttt{SPAGUETTIFY}\ref{paragraph-spaghettify}
-must be applied first !
+In fact, this phase is the succession of the 2 phases
+\texttt{FULL\_SPAGHETTIFY}\ref{paragraph-full-spaghettify} and
+\texttt{FSM\_GENERATION}\ref{paragraph-fsm-generation}
+
 
 %%ÿUserManualDocumentation
 
@@ -4074,6 +4088,8 @@ alias full_fsm_generation 'Full FSM Generation'
 
 full_fsm_generation   > MODULE.code
                       > PROGRAM.entities
+        ! MODULE.full_spaghettify
+        ! MODULE.fsm_generation
         < PROGRAM.entities
         < MODULE.code
 \end{verbatim}
@@ -4090,8 +4106,8 @@ state variable for the finite state machine.
 This phase transform a state of a FSM-like statement and split it into n
 new states where the portion of code to execute is smaller.
 
-Phase \texttt{FULL\_FSM\_GENERATION}\ref{paragraph-full-fsm-generation}
-must be applied first !
+NB: Phase \texttt{FULL\_SPAGHETTIFY}\ref{paragraph-full-spaghettify}
+must have been applied first !
 
 %%ÿUserManualDocumentation
 
@@ -4115,8 +4131,8 @@ state variable for the finite state machine.
 This phase transform 2 or more states of a FSM-like statement and merge
 them into a new state where the portion of code to execute is bigger.
 
-Phase \texttt{FULL\_FSM\_GENERATION}\ref{paragraph-full-fsm-generation}
-must be applied first !
+NB: Phase \texttt{FULL\_SPAGHETTIFY}\ref{paragraph-full-spaghettify}
+must have been applied first !
 
 %%ÿUserManualDocumentation
 
