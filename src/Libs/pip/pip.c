@@ -93,13 +93,6 @@ extern Pbase base_var_ref,	/* Base of the unknowns */
 	     old_base;		/* Base of the parameters */
 extern int ind_min_max;		/* Tag for MIN or MAX resolution */
 
-
-/* Internal variables 	*/
-Pvecteur vect_for_sort;	/* Useful for the sorting of the variables in the
-			 * system's Pvecteur.  */
-
-
-
 /*===========================================================================*/
 /* quast old_pip_solve(Psysteme ps_dep, ps_context, int nb_unknowns,
  *		   int min_or_max): Pip resolution.
@@ -702,28 +695,26 @@ int nb_unknowns;
 }
 
 /*===================================================================*/
-/* boolean is_first_var(Variable v1, v2): returns TRUE if "v1" is
- * placed before "v2" in the global Pvecteur "vect_for_sort". Else, it
- * returns FALSE.
+
+/* Useful for the sorting of the variables in the system's Pvecteur.  
+*/
+static Pbase base_for_sort = (Pbase)NULL;
+
+/* function for qsort. 
+ * rank_of_variable returns 0 for TCST, hence the strange return
  */
-boolean is_first_var(v1, v2)
-Variable v1, v2;
+static int compare_variables_in_base(pv1, pv2)
+Pvecteur *pv1, *pv2;
 {
-  extern Pvecteur vect_for_sort;
+    int 
+	rank_1 = rank_of_variable(base_for_sort, var_of(*pv1)),
+	rank_2 = rank_of_variable(base_for_sort, var_of(*pv2));
 
-  Pvecteur pv;
-  int result = 0;
+    message_assert("variable not in global vector", rank_1>=0 && rank_2>=0);
 
-  for (pv = vect_for_sort; (pv != NULL) && (result == 0); pv = pv->succ) {
-    if(variable_equal(v1, pv->var))
-      result = 1;
-    else if(variable_equal(v2, pv->var))
-      result = 2;
-  }
-  if( (result != 1) && (result != 2) )
-    user_error("is_first_var", "Var are not in the global vect\n");
-
-  return( (result == 1) ? TRUE : FALSE );
+    /* TCST must be last, but given as 0
+     */ 
+    return((rank_1==0 || rank_2==0) ? rank_1-rank_2 : rank_2-rank_1);
 }
 
 /*===================================================================*/
@@ -733,41 +724,26 @@ Variable v1, v2;
  * is done, this new base becomes the basis of this system.
  *
  * "pv" MUST contain all the variables that appear in "ps".
- * "pv" DOES NOT HAVE TO contain TCST, but we need TCST for sorting
- * purpose; then we add TCST at the end of our new base and remove
- * it before assigning it to the basis of the system.
+ * "pv" DOES NOT HAVE TO contain TCST.
+ *
+ * modified by FC, 29/12/94.
+ * I removed the vect_tri call and the associated memory leaks.
+ * sc_vect_sort called instead.
+ * maybe the sc base is lost? It depends whether it is pv or not,
+ * and what is done with pv by the caller. I would suggest a base_rm.
  */
 void sort_psysteme(ps, pv)
 Psysteme ps;
 Pvecteur pv;
 {
-  extern Pvecteur vect_for_sort;
+    if(SC_EMPTY_P(ps))	return;
 
-  Pcontrainte assert;
-  Pbase new_base = base_dup(pv);
+    base_for_sort = base_dup(pv);
+    sc_vect_sort(ps, compare_variables_in_base);
 
-  if(SC_EMPTY_P(ps))
-    return;
-
-  if(vect_coeff(TCST, new_base) == 0) {
-    Pvecteur apv;
-    for(apv = new_base; apv->succ != NULL; apv = apv->succ) {};
-    apv->succ = vect_new(TCST, 1);
-  }
-  vect_for_sort = new_base;
-
-  for(assert = ps->egalites; assert != NULL; assert = assert->succ) {
-    assert->vecteur = vect_tri(assert->vecteur, is_first_var);
-  }
-  for(assert = ps->inegalites; assert != NULL; assert = assert->succ) {
-    assert->vecteur = vect_tri(assert->vecteur, is_first_var);
-  }
-  vect_erase_var(&new_base, TCST);
-  ps->dimension = base_dimension(new_base);
-  ps->base = (Pbase) new_base;
+    ps->dimension = base_dimension(base_for_sort);
+    ps->base = base_for_sort;
+    base_for_sort = (Pbase)NULL;
 }
 
-
-
 /*************************************************************************/
-
