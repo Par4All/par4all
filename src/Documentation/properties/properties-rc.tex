@@ -1,6 +1,6 @@
 % PIPS Project
 %
-% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/29 00:15:13 $, )
+% $RCSfile: properties-rc.tex,v $ ($Date: 1997/01/30 21:32:46 $, )
 % version $Revision$
 % got on %D%, %T%
 % $Id$
@@ -191,6 +191,14 @@ if some characters are encountered in this comment field.
 PARSER_WARN_FOR_COLUMNS_73_80   TRUE
 \end{verbatim}
 
+The PIPS implementation of Allen\&Kennedy algorithm cannot cope with
+labelled DO loops because the loop, and hence its label, may be
+replicated if the loop is distributed. The parser can generate an extra
+CONTINUE statement to carry the label and have a label-free loop.
+
+\begin{verbatim}
+PARSER_SIMPLIFY_LABELLED_LOOPS FALSE
+\end{verbatim}
 
 \subsection{Controlizer}
 
