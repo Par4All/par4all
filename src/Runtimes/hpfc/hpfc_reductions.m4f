@@ -2,7 +2,7 @@
 !     Reductions management 
 !
 ! $RCSfile: hpfc_reductions.m4f,v $ version $Revision$
-! ($Date: 1996/10/18 21:42:21 $, )
+! ($Date: 1996/10/18 22:16:42 $, )
 !
 !     it is supposed that the reduction is computed on a full
 !     array, which is nor replicated anyway. If used on a part,
@@ -108,13 +108,13 @@ SIMPLE_REPLICATE(LEVEL, `ENDDO_LOOP')
 ifelse(PVM_ARCH,`CM5',`dnl
       if (0.ne.CMMD_send(
      $     CM HOST ID,
-     $     HOST CHANNEL,
+     $     HOST SND CHANNEL,
      $     result,
      $     M4_PVM_LENGTH(PVMTYPE))) then
          write (unit=0, fmt=*) "hpfc reduction: send failed"
          stop
       endif
-      HOSTCHANNEL = HOSTCHANNEL+2
+      HOST SND CHANNEL = HOST SND CHANNEL+2
       call CMMD_receive_bc_from_host(result, M4_PVM_LENGTH(PVMTYPE))',`
       call HPFC SNDTO H(PVMTYPE, result)
       call HPFC RCVFR mCH(PVMTYPE, result)')
