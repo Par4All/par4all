@@ -1,7 +1,7 @@
 /* HPFC by Fabien Coelho, May 1993 and later...
  *
  * $RCSfile: compile.c,v $ version $Revision$
- * ($Date: 1995/12/29 15:33:31 $, )
+ * ($Date: 1996/02/29 19:05:20 $, )
  */
 
 #include "defines-local.h"
@@ -50,7 +50,7 @@ make_host_and_node_modules (entity module)
 	host = make_empty_program(HOST_NAME);
 	node = make_empty_program(NODE_NAME);
     }
-    else 
+    else
     {
 	host = make_empty_subroutine(hpfc_host_local_name(name));
 	node = make_empty_subroutine(hpfc_node_local_name(name));
@@ -244,6 +244,51 @@ put_generated_resources_for_common (entity common)
     free(init_filename),
     free(host_filename),
     free(node_filename);
+}
+
+/* just copied for the host
+ */
+void
+compile_a_special_io_function(entity module)
+{
+    string prefix, file_name, new_name;
+
+    prefix = module_local_name(get_current_module_entity());
+    file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
+    new_name = generate_file_name(prefix, "_host.f");
+
+    system(concatenate("cp ", file_name, " ", new_name, NULL));
+
+    /* just fake for pipsmake... */
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, prefix, NO_FILE);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_NODE, prefix, NO_FILE);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, prefix, NO_FILE);
+
+    store_new_host_variable(module, module);
+    store_new_node_variable(entity_intrinsic(CONTINUE_FUNCTION_NAME), module);
+}
+
+/* copied for both host and node... 
+ */
+void
+compile_a_pure_function(entity module)
+{
+    string prefix, file_name, h_name, n_name;
+
+    prefix = module_local_name(get_current_module_entity());
+    file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
+    h_name = generate_file_name(prefix, "_host.f");
+    n_name = generate_file_name(prefix, "_node.f");
+
+    system(concatenate("cp ", file_name, " ", h_name, " ; "
+		       "cp ", file_name, " ", n_name, NULL));
+
+    /* just fake for pipsmake... */
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_PARAMETERS, prefix, NO_FILE);
+    DB_PUT_FILE_RESOURCE(DBR_HPFC_RTINIT, prefix, NO_FILE);
+
+    store_new_host_variable(module, module);
+    store_new_node_variable(module, module);
 }
 
 void 
