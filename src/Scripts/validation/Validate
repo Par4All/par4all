@@ -3,7 +3,7 @@
 # (parallel) validation, Fabien Coelho, March 1994
 #
 # SCCS Stuff:
-# $RCSfile: Validate,v $ ($Date: 1997/05/03 16:23:12 $, ), version $Revision$,
+# $RCSfile: Validate,v $ ($Date: 1997/05/03 16:33:34 $, ), version $Revision$,
 #
 
 #
@@ -28,12 +28,15 @@ else
   REAL_PIPSHOME=
 fi
 
+echo "--$REAL_PIPSHOME--$PIPS_HOME--"
+
 #
 # to avoid nfs problems
 #
 absolute_name()
 {
-  echo $1 | sed "s,^$REAL_PIPSHOME,$PIPS_HOME,"
+  echo $1 | sed "s,^${REAL_PIPSHOME},${PIPS_HOME},;
+                 s,^${PIPS_HOME}/Pips/Production,${PIPS_ROOT},"
 }
 
 ping=${PIPS_PING:-ping}
