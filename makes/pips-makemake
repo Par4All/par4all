@@ -3,6 +3,9 @@
 #
 # $Id$
 # $Log: pips-makemake,v $
+# Revision 1.272  1997/03/19 16:58:06  coelho
+# rlog options cannot be collated
+#
 # Revision 1.271  1997/03/11 19:11:30  coelho
 # RCS and SCCS compatible as a transition...
 #
@@ -745,8 +748,8 @@ check_sccs:
 	@[ -d SCCS -a ! "\`sccs tell\`" ] || \\
 	{ echo; echo "sccs files being edited, cannot install"; echo; \\
 	  exit 1;}
-	@[ -d RCS -a ! "\`rlog -LR RCS/*\`" ] || \\
-	{ echo; echo "sccs files being edited, cannot install"; echo; \\
+	@[ -d RCS -a ! "\`rlog -L -R RCS/*\`" ] || \\
+	{ echo; echo "RCS files being edited, cannot install"; echo; \\
 	  exit 1;}
 
 # install installs sources, so depends on sources. FC
