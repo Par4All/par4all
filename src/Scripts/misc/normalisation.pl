@@ -2,8 +2,7 @@
 #
 # $Id$
 #
-# (c) Fabien COELHO septembre 2000, Ecole des mines de Paris.
-#
+
 # Script pour mettre a jour les declarations fortran en fonction
 # des bornes trouvees par PIPS. Ajoute eventuellement des includes.
 #
@@ -13,14 +12,16 @@ use Getopt::Long;
 $opt_directory = '';
 $opt_suffix = 'old';
 $opt_help = '';
+$opt_control = '';
 
-GetOptions("directory=s", "suffix=s", "help")
+GetOptions("directory=s", "suffix=s", "control:s", "help")
     or die $!;
 
 if ($opt_help) {
     print STDERR
-	"Usage: normalisation.pl [-d dir] [-s suf] [-h] Logfile\n" .
+	"Usage: normalisation.pl [-d dir] [-s suf] [-h] [-c] Logfile\n" .
 	"\t-d dir: directory of sources\n" .
+	"\t-c [comments]: use sccs\n" .
 	"\t-s suffix: suffix for old file (default 'old')\n" .
 	"\t-h: this help\n" .
 	"format: prefixed tab-separated list\n" .
@@ -73,12 +74,13 @@ while (<>)
 	
 	# read file 
 	if ($current_file) {
-	    # print "OPENING $current_file\n";
-	    
+
+	    print STDERR "OPENED $current_file\n";	
+
 	    open FILE, "< $current_file"
 		or die "cannot open file $current_file for reading ($!)";
 	    @fortran = <FILE>;
-	    close FILE or die $!;
+	    close FILE or die $!;  
 	} else {
 	    @fortran = ();
 	}
@@ -182,15 +184,26 @@ sub save
 	    while (-f "$old_file.$i") { $i++; }
 	    $old_file .= $i;
 	}
-	
 	# rename initial file
 	rename "$current_file", "$old_file"
-	    or die "cannot rename file $current_file ($!)";
-	# save to initial file
+	    or die "cannot rename file $current_file as $old_file ($!)";
+
+	if ($opt_control) {
+	    print STDERR "SCCS EDIT $current_file\n";	
+	    system("sccs edit $current_file")
+		and die "canNOT sccs edit $current_file ($!)\n";
+	}
+
+	unlink $current_file;
 	open FILE, "> $current_file"
-	    or die "cannot open file $current_file for saving ($!)";
+	    or die "cannot open file $current_file for saving ($!)"; 
 	print FILE @fortran;
 	close FILE or die $!;
+	
+	if ($opt_control) {
+	    system("sccs delget -y'$opt_control' $current_file") 
+		and die "cannot sccs delget -y'$opt_control' $current_file ($!)\n";
+	}
     }
 }
 
