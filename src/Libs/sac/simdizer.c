@@ -32,7 +32,7 @@ typedef dg_vertex_label vertex_label;
 #include "ricedg.h"
 #include "semantics.h"
 #include "transformations.h"
-
+#include "control.h"
 
 static graph dependence_graph;
 
