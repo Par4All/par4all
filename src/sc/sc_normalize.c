@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "boolean.h"
 #include "arithmetique.h"
@@ -82,7 +83,7 @@ Psysteme ps;
 }
 
 /*
- * ??? could be improve by rewriting *_elim_redond so that only
+ * ??? could be improved by rewriting *_elim_redond so that only
  * (in)eq may be removed?
  *
  * FC 02/11/94
@@ -162,4 +163,273 @@ Psysteme ps;
 	    return sc_empty(ps_base);
 	else return(ps);
     }
+}
+
+/* Psysteme sc_strong_normalize(Psysteme ps)
+ *
+ * Apply sc_normalize first. The solve the equations in a copy
+ * of ps and propagate in equations and inequations.
+ *
+ * Flag as redundant equations 0 == 0 and inequalities 0 <= k
+ * with k a positive integer constant when they appear.
+ *
+ * Flag the system as non feasible if any equation 0 == k or any inequality
+ * 0 <= -k with k a strictly positive constant appears.
+ *
+ * Then, we'll have to deal with remaining inequalities...
+ *
+ * Argument ps is not modified by side-effect but it is freed for
+ * backward compatability. SC_EMPTY is returned for
+ * backward compatability.
+ *
+ * The code is difficult to understand because a sparse representation
+ * is used. proj_ps is initially an exact copy of ps, with the same constraints
+ * in the same order. The one-to-one relationship between constraints
+ * must be maintained when proj_ps is modified. This makes it impossible to
+ * use most routines available in Linear.
+ *
+ * Note: this is a redundancy elimination algorithm a bit too strong
+ * for sc_normalize.c...
+ */
+Psysteme sc_strong_normalize(Psysteme ps)
+{
+    Psysteme new_ps = SC_UNDEFINED;
+    Psysteme proj_ps = SC_UNDEFINED;
+    boolean feasible_p = TRUE;
+
+    /*
+    fprintf(stderr, "[sc_strong_normalize]: Begin\n");
+    */
+
+    if(!SC_UNDEFINED_P(ps)) {
+	if(!SC_EMPTY_P(ps = sc_normalize(ps))) {
+	    Pcontrainte eq = CONTRAINTE_UNDEFINED;
+	    Pcontrainte ineq = CONTRAINTE_UNDEFINED;
+	    Pcontrainte proj_eq = CONTRAINTE_UNDEFINED;
+	    Pcontrainte next_proj_eq = CONTRAINTE_UNDEFINED;
+	    Pcontrainte proj_ineq = CONTRAINTE_UNDEFINED;
+	    Pcontrainte new_eq = CONTRAINTE_UNDEFINED;
+	    Pcontrainte new_ineq = CONTRAINTE_UNDEFINED;
+
+	    /*
+	    fprintf(stderr,
+		    "[sc_strong_normalize]: After call to sc_normalize\n");
+		    */
+
+	    /* We need an exact copy of ps to have equalities
+	     * and inqualities in the very same order
+	     */
+	    new_ps = sc_dup(ps);
+	    proj_ps = sc_dup(new_ps);
+	    sc_rm(new_ps);
+	    new_ps = sc_make(NULL, NULL);
+
+	    /*
+	    fprintf(stderr, "[sc_strong_normalize]: Input system %x\n",
+		    (unsigned int) ps);
+	    sc_dump(ps);
+	    fprintf(stderr, "[sc_strong_normalize]: Copy system %x\n",
+		    (unsigned int) ps);
+	    sc_dump(proj_ps);
+	    */
+
+	    /* Solve the equalities */
+	    for(proj_eq = sc_egalites(proj_ps),
+		eq = sc_egalites(ps); 
+		!CONTRAINTE_UNDEFINED_P(proj_eq);
+		eq = contrainte_succ(eq)) {
+
+		/* proj_eq might suffer in the substitution... */
+		next_proj_eq = contrainte_succ(proj_eq);
+
+		if(egalite_normalize(proj_eq)) {
+		    if(CONTRAINTE_NULLE_P(proj_eq)) {
+			/* eq is redundant */
+			;
+		    }
+		    else {
+			Pcontrainte def = CONTRAINTE_UNDEFINED;
+			/* keep eq */
+			Variable v = TCST;
+			Pvecteur pv;
+
+			new_eq = contrainte_dup(eq);
+			sc_add_egalite(new_ps, new_eq);
+			/* use proj_eq to eliminate a variable */
+
+			/* Let's use a variable with coefficient 1 if
+			 * possible
+			 */
+			for( pv = contrainte_vecteur(proj_eq);
+			    !VECTEUR_NUL_P(pv);
+			    pv = vecteur_succ(pv)) {
+			    if(!term_cst(pv)) {
+				v = vecteur_var(pv);
+				if(vecteur_val(pv)==1) {
+				    break;
+				}
+			    }
+			}
+			assert(v!=TCST);
+
+			/* A softer substitution is needed in order to
+			 * preserve the relationship between ps and proj_ps
+			 */ 
+			/*
+			if(sc_empty_p(proj_ps =
+				      sc_variable_substitution_with_eq_ofl_ctrl
+			    (proj_ps, proj_eq, v, NO_OFL_CTRL))) {
+			    feasible_p = FALSE;
+			    break;
+			}
+			else {
+			    ;
+			}
+			*/
+
+			/* proj_eq itself is going to be modified in proj_ps.
+			 * use a copy!
+			 */
+			def = contrainte_dup(proj_eq);
+			proj_ps = 
+			    sc_simple_variable_substitution_with_eq_ofl_ctrl
+			    (proj_ps, def, v, NO_OFL_CTRL);
+			contrainte_rm(def);
+			/*
+			   int contrainte_subst_ofl_ctrl(v,def,c,eq_p, ofl_ctrl)
+			   */
+		    }
+		}
+		else {
+		    /* The system is not feasible. Stop */
+		    feasible_p = FALSE;
+		    break;
+		}
+
+		/*
+		fprintf(stderr,
+			"Print the three systems at each elimination step:\n");
+		fprintf(stderr, "[sc_strong_normalize]: Input system %x\n",
+			(unsigned int) ps);
+		sc_dump(ps);
+		fprintf(stderr, "[sc_strong_normalize]: Copy system %x\n",
+			(unsigned int) proj_ps);
+		sc_dump(proj_ps);
+		fprintf(stderr, "[sc_strong_normalize]: New system %x\n",
+			(unsigned int) new_ps);
+		sc_dump(new_ps);
+		*/
+
+		proj_eq = next_proj_eq;
+	    }
+	    assert(!feasible_p ||
+		   (CONTRAINTE_UNDEFINED_P(eq) && CONTRAINTE_UNDEFINED_P(ineq)));
+
+	    /* Check the inequalities */
+	    for(proj_ineq = sc_inegalites(proj_ps),
+		ineq = sc_inegalites(ps);
+		 feasible_p && !CONTRAINTE_UNDEFINED_P(proj_ineq);
+		proj_ineq = contrainte_succ(proj_ineq),
+		ineq = contrainte_succ(ineq)) {
+
+		if(inegalite_normalize(proj_ineq)) {
+		    if(contrainte_constante_p(proj_ineq)
+		       && contrainte_verifiee(proj_ineq, FALSE)) {
+			/* ineq is redundant */
+			;
+		    }
+		    else {
+			int i;
+			i = sc_check_inequality_redundancy(proj_ineq, proj_ps);
+			if(i==0) {
+			    /* keep ineq */
+			    new_ineq = contrainte_dup(ineq);
+			    sc_add_inegalite(new_ps, new_ineq);
+			}
+			else if(i==1) {
+			    /* ineq is redundant with another inequality:
+			     * destroy ineq to avoid the mutual elimination of
+			     * two identical constraints
+			     */
+			    eq_set_vect_nul(proj_ineq);
+			}
+			else if(i==2) {
+			    feasible_p = FALSE;
+			    break;
+			}
+			else {
+			    assert(FALSE);
+			}
+		    }
+		}
+		else {
+		    /* The system is not feasible. Stop */
+		    feasible_p = FALSE;
+		    break;
+		}
+	    }
+
+	    /*
+	    fprintf(stderr,
+		    "Print the three systems after inequality normalization:\n");
+	    fprintf(stderr, "[sc_strong_normalize]: Input system %x\n",
+		    (unsigned int) ps);
+	    sc_dump(ps);
+	    fprintf(stderr, "[sc_strong_normalize]: Copy system %x\n",
+		    (unsigned int) proj_ps);
+	    sc_dump(proj_ps);
+	    fprintf(stderr, "[sc_strong_normalize]: New system %x\n",
+		    (unsigned int) new_ps);
+	    sc_dump(new_ps);
+	    */
+
+	    /* Check redundancy between residual inequalities */
+
+	    /* sc_elim_simple_redund_with_ineq(ps,ineg) */
+    
+	    /* Well, sc_normalize should not be able to do much here! */
+	    /*
+	    new_ps = sc_normalize(new_ps);
+	    feasible_p = (!SC_EMPTY_P(new_ps));
+	    */
+	}
+	else {
+	    /*
+	    fprintf(stderr,
+		    "[sc_strong_normalize]:"
+		    " Non-feasibility detected by sc_normalize\n");
+		    */
+	    feasible_p = FALSE;
+	}
+    }
+    else {
+	/*
+	fprintf(stderr,
+		"[sc_strong_normalize]: Empty system as input\n");
+		*/
+	feasible_p = FALSE;
+    }
+
+    if(!feasible_p) {
+	sc_rm(new_ps);
+	new_ps = SC_EMPTY;
+    }
+    else {
+	sc_base(new_ps) = sc_base(ps);
+	sc_base(ps) = BASE_UNDEFINED;
+	sc_dimension(new_ps) = sc_dimension(ps);
+	assert(sc_weak_consistent_p(new_ps));
+    }
+
+    sc_rm(proj_ps);
+    sc_rm(ps);
+
+    /*
+    fprintf(stderr, "[sc_strong_normalize]: Final value of new system %x:\n",
+	    (unsigned int) new_ps);
+    sc_dump(new_ps);
+    fprintf(stderr, "[sc_strong_normalize]: End\n");
+    */
+
+    return new_ps;
 }
