@@ -24,64 +24,72 @@
  *    inegalites 0 <= -k quand k est une constante numerique entiere
  *    strictement positive (Francois Irigoin, 15 novembre 1995)
  */
-boolean contrainte_normalize(c,is_egalite)
-Pcontrainte c;
-boolean is_egalite;
+boolean contrainte_normalize(
+    Pcontrainte c,
+    boolean is_egalite)
 {
     /* is_c_norm: si is_egalite=TRUE, equation faisable */
     boolean is_c_norm = TRUE; 
     /* pgcd des termes non constant de c */
-    int a;
+    Value a;
     /* modulo(abs(b0),a) */
-    int nb0 = 0;
+    Value nb0 = VALUE_ZERO;
 
-    if(c!=NULL && (c->vecteur != NULL) 
-	&& (a = vect_pgcd_except(c->vecteur,TCST)) != 0) {
-	Pvecteur v;
+    if(c!=NULL && (c->vecteur != NULL))
+    {
+	a = vect_pgcd_except(c->vecteur,TCST);
+	if (value_notzero_p(a)) {
+	    Pvecteur v;
+	    
+	    nb0 = value_abs(vect_coeff(TCST,c->vecteur));
+	    nb0 = value_mod(nb0,a);
 
-	nb0 = ABS(vect_coeff(TCST,c->vecteur)) % a;
-
-	if (is_egalite)	{
-	    if (nb0 == 0) {
-		(void) vect_div(c->vecteur,ABS(a));
-		/* si le coefficient du terme constant est inferieur a ABS(a),
-		 * on va obtenir un couple (TCST,coeff) avec un coefficient 
-		 * qui vaut 0, ceci est contraire a nos conventions
+	    if (is_egalite)	{
+		if (value_zero_p(nb0)) {
+		    (void) vect_div(c->vecteur,value_abs(a));
+		    
+		    /* si le coefficient du terme constant est inferieur 
+		     * a ABS(a), on va obtenir un couple (TCST,coeff) avec 
+		     * un coefficient qui vaut 0, ceci est contraire a nos 
+		     * conventions
+		     */
+		    c->vecteur = vect_clean(c->vecteur);
+		}
+		else 
+		    is_c_norm= FALSE;
+	    }
+	    
+	    else {
+		vect_chg_coeff(&(c->vecteur), TCST,
+			       value_uminus(vect_coeff(TCST, c->vecteur)));
+		(void) vect_div(c->vecteur,value_abs(a));
+		c->vecteur= vect_clean(c->vecteur);
+		vect_chg_coeff(&(c->vecteur), TCST, 
+			       value_uminus(vect_coeff(TCST, c->vecteur)));
+		/* mise a jour du resultat de la division C
+		 * if ( b0 < 0 && nb0 > 0)
+		 *	vect_add_elem(&(c->vecteur),0,-1);
+		 * On n'en a plus besoin parce que vect_div utilise la
+		 * division a reste toujours positif dont on a besoin
 		 */
-		c->vecteur = vect_clean(c->vecteur);
 	    }
-	    else 
-		is_c_norm= FALSE;
-	}
-
-	else {
-	    vect_chg_coeff(&(c->vecteur), TCST, -vect_coeff(TCST, c->vecteur));
-	    (void) vect_div(c->vecteur,ABS(a));
-	    c->vecteur= vect_clean(c->vecteur);
-	    vect_chg_coeff(&(c->vecteur), TCST, -vect_coeff(TCST, c->vecteur));
-	    /* mise a jour du resultat de la division C
-	     * if ( b0 < 0 && nb0 > 0)
-	     *	vect_add_elem(&(c->vecteur),0,-1);
-	     * On n'en a plus besoin parce que vect_div utilise la
-	     * division a reste toujours positif dont on a besoin
-	     */
-	}
-	v=c->vecteur;
-	if(is_c_norm
-	   && !VECTEUR_NUL_P(v)
-	   && (vect_size(v) == 1)
-	   && term_cst(v)) {
-
-	    if(is_egalite) {
-		assert(vecteur_val(v) != 0);
-		is_c_norm = FALSE;
-	    }
-	    else { /* is_inegalite */
-		is_c_norm = (vecteur_val(v) <= 0) ;
+	    v=c->vecteur;
+	    if(is_c_norm
+	       && !VECTEUR_NUL_P(v)
+	       && (vect_size(v) == 1)
+	       && term_cst(v)) {
+		if(is_egalite) {
+		    assert(value_notzero_p(vecteur_val(v)));
+		    is_c_norm = FALSE;
+		}
+		else { /* is_inegalite */
+		    is_c_norm = value_negz_p(vecteur_val(v)) ;
+		}
 	    }
 	}
     }
-    return (is_c_norm);
+    
+    return is_c_norm;
 }
 
 /* boolean egalite_normalize(Pcontrainte eg): reduction d'une equation
