@@ -1,7 +1,12 @@
 #!/bin/sh
-
-# to derive the C-Shell version of pipsrc.sh
-# 09/09/92:	cleaned the sed script [PJ]
+#
+# SCCS Stuff
+# $RCSfile: make-pipsrc.sh,v $ ($Date: 1994/03/11 10:59:11 $) version $Revision$, got on %D%, %T%
+# %A%
+#
+# to derive the Shell version of pipsrc.ref
+# Adapted from x.csh, Fabien COELHO 11/03/94
+#
 
 # do not use environment variables such as $PIPSDIR!
 DIR=`pwd`
@@ -15,23 +20,27 @@ fi
 
 cd ..
 
-cat > pipsrc.csh <<!
-#	   --------------------------------------------------------
-#	   --------------------------------------------------------
-#
-#				    WARNING
-#
-#		  THIS FILE HAS BEEN AUTOMATICALLY GENERATED
-#
-#			       DO NOT MODIFY IT
-#
-#		  COMMENTS ARE AVAILABLE IN FILE 'pipsrc.sh'
-#
-#	   --------------------------------------------------------
-#	   --------------------------------------------------------
-!
+{
+  cat <<-!
+	#	   --------------------------------------------------------
+	#	   --------------------------------------------------------
+	#
+	#				    WARNING
+	#
+	#		  THIS FILE HAS BEEN AUTOMATICALLY GENERATED
+	#
+	#			       DO NOT MODIFY IT
+	#
+	#	   --------------------------------------------------------
+	#	   --------------------------------------------------------
+	!
 
-sed '/^[ 	]*[A-Za-z_]*=/!d
-     s/\([A-Za-z_]*\)=/setenv \1 /' < pipsrc.sh >> pipsrc.csh
+   cat pipsrc.ref
 
-echo 'rehash' >> pipsrc.csh
+   echo export `sed -n -e '/^[^#]*=/s/\([^ \t]*\)[ \t]*=.*/\1/p' pipsrc.ref | sort -u | tr '\012' ' '` 
+
+} > pipsrc.sh
+
+#
+# that's all
+#
