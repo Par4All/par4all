@@ -1,4 +1,4 @@
-# $RCSfile: pipsrc.ref,v $ ($Date: 1995/03/20 09:14:05 $, )
+# $RCSfile: pipsrc.ref,v $ ($Date: 1995/03/28 08:47:15 $, )
 # version $Revision$, 
 # got on %D%, %T%
 # $Id$
@@ -154,6 +154,9 @@ HPFC_DIR=$DEVEDIR/Lib/hpfc
 HPFC_INCLUDE=$EXTEDIR
 HPFC_LIBS=$EXTEDIR
 HPFC_TOOLS=$UTILDIR
+
+HPFC_SED=/usr5/gnu/bin-sparc/sed
+HPFC_TR=/bin/tr
 
 #
 # that is all
