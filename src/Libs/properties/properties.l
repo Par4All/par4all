@@ -83,9 +83,9 @@ FALSE			{return(TFALSE);}
 [0-9]+       		{return(TNUMB);}
 [-_a-zA-Z][-_a-zA-Z0-9]* {return(TIDENT);}
 \"[^\"]*\"		{/*"*/return(TSTRING);}
-^[ \t]*#.*$		/* comments are skipped. */
-[ \t\n]*		/* blanks are skipped. */
-=			/* ignore an = */
+^[ \t]*#.*$		{/* comments are skipped. */}
+[ \t\n]*		{/* blanks are skipped. */}
+=			{/* ignore an = */}
 .                       { fprintf(stderr, "skipping unexpected char %c (%d)\n",
 				  *yytext, *yytext);
 			}
