@@ -1,6 +1,6 @@
 #
 # $RCSfile: hpfc_Makefile_init,v $ version $Revision$
-# ($Date: 1996/12/27 13:32:07 $, )
+# ($Date: 1996/12/27 13:38:56 $, )
 #
 # This is the initial makefile for HPFC compilation
 # a TARGET macro is expected somewhere...
@@ -72,7 +72,9 @@ endif
 # source files from the runtime needed to compile a spmd program
 RT_SRC_FILES =	hpfc_check.f \
 		hpfc_*.h \
-		hpfc_main*.f \
+		hpfc_main.f \
+		hpfc_main_host.f \
+		hpfc_main_node.f \
 		hpfc_architecture_m4_macros
 
 # the default is to use the same compilers and options as the library.
@@ -276,7 +278,7 @@ diff: $(RUNABLES) install pvm
 # Headers
 
 $(RT_SRC_FILES):
-	$(COPY) $(addprefix $(RT_SRC_FILES)/,$(RT_SRC_FILES)) .
+	$(COPY) $(addprefix $(RT_DIR)/,$(RT_SRC_FILES)) .
 
 pvm3.h:	$(pvminc)/pvm3.h
 	$(COPY) $(pvminc)/pvm3.h .
