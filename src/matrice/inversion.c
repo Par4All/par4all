@@ -1,7 +1,6 @@
  /* package matrice */
 
 #include <stdio.h>
-#include <sys/stdtypes.h> /*for debug with dbmalloc */
 #include <malloc.h>
 
 #include "assert.h"
@@ -31,7 +30,7 @@ int n;
 boolean infer;
 {
     int i, j;
-    int x;
+    Value x;
 
     /* test de l'unimodularite et de la trangularite de u */
     assert(matrice_triangulaire_unimodulaire_p(u,n,infer));
@@ -41,7 +40,7 @@ boolean infer;
 	for (i=n; i>=1;i--)
 	    for (j=i-1; j>=1; j--){
 		x = ACCESS(u,n,i,j);
-		if (x != 0)
+		if (value_notzero_p(x))
 		   matrice_soustraction_colonne(inv_u,n,n,j,i,x); 
 	    }
     }
@@ -49,7 +48,7 @@ boolean infer;
 	for (i=1; i<=n; i++)
 	    for(j=i+1; j<=n; j++){
 		x = ACCESS(u,n,i,j);
-		if (x != 0)
+		if (value_notzero_p(x))
 		    matrice_soustraction_colonne(inv_u,n,n,j,i,x);
 	    }
     }
@@ -70,14 +69,14 @@ matrice s;
 matrice inv_s;
 int n;
 {
-    int d, d1; 
-    int gcd, lcm;
+    Value d, d1; 
+    Value gcd, lcm;
     int i;
 
     /* tests des preconditions */
     assert(matrice_diagonale_p(s,n,n));
     assert(matrice_hermite_rank(s,n,n)==n);
-    assert(DENOMINATOR(s)>0);
+    assert(value_pos_p(DENOMINATOR(s)));
 
     matrice_nulle(inv_s,n,n);
     /* calcul de la ppcm(s[1,1],s[2,2],...s[n,n]) */
@@ -87,10 +86,12 @@ int n;
     
     d = DENOMINATOR(s);
     gcd = pgcd_slow(lcm,d);
-    d1 = d / gcd;
-    for (i=1; i<=n; i++)
-	ACCESS(inv_s,n,i,i) = d1 * (lcm / ACCESS(s,n,i,i));
-    DENOMINATOR(inv_s) = lcm / gcd;
+    d1 = value_div(d,gcd);
+    for (i=1; i<=n; i++) {
+	Value tmp = value_div(lcm,ACCESS(s,n,i,i));
+	ACCESS(inv_s,n,i,i) = value_mult(d1,tmp);
+    }
+    DENOMINATOR(inv_s) = value_div(lcm,gcd);
 }
     
 /* void matrice_triangulaire_inversion(matrice h, matrice inv_h, int n,boolean infer)
@@ -114,63 +115,67 @@ matrice inv_h;
 int n;
 boolean infer;
 {
-    int deno,deno1;                    /* denominateur */
-    int determinant,sous_determinant;  /* determinant */
-    int gcd;
+    Value deno,deno1;                    /* denominateur */
+    Value determinant,sous_determinant;  /* determinant */
+    Value gcd;
     int i,j;
-    int aij[2];
-    
+    Value aij[2];
+    register Value a;
+
     /* tests des preconditions */
     assert(matrice_triangulaire_p(h,n,n,infer));
     assert(matrice_hermite_rank(h,n,n)==n);
-    assert(DENOMINATOR(h)>0);
+    assert(value_pos_p(DENOMINATOR(h)));
 
     matrice_nulle(inv_h,n,n);
     deno = DENOMINATOR(h);
     deno1 = deno;
-    DENOMINATOR(h) = 1;
+    DENOMINATOR(h) = VALUE_ONE;
     /* calcul du determinant de h */
-    determinant = 1;
-    for (i= 1; i<=n; i++)
-	determinant *= ACCESS(h,n,i,i);
+    determinant = VALUE_ONE;
+    for (i= 1; i<=n; i++){
+	a = ACCESS(h,n,i,i);
+	value_product(determinant,a);
+    }
     /* calcul du denominateur de inv_h */
     gcd = pgcd_slow(deno1,determinant);
-    if (gcd !=1){
-	deno1 /= gcd;
-	determinant /= gcd;
+    if (value_notone_p(gcd)){
+	value_division(deno1,gcd);
+	value_division(determinant,gcd);
     }
-    if (determinant<0){
-	deno1 *= -1; 
-	determinant *= -1;
+    if (value_neg_p(determinant)){
+	value_oppose(deno1); 
+	value_oppose(determinant);
     }
     DENOMINATOR(inv_h) = determinant;
     /* calcul des sous_determinants des Aii */
     for (i=1; i<=n; i++){
-	sous_determinant = 1;
+	sous_determinant = VALUE_ONE;
 	for (j=1; j<=n; j++)
-	    if (j != i)
-	    sous_determinant *= ACCESS(h,n,j,j);
-	ACCESS(inv_h,n,i,i) = sous_determinant * deno1;
+	    if (j != i) {
+		a = ACCESS(h,n,j,j);
+		value_product(sous_determinant,a) ;
+	    }
+	ACCESS(inv_h,n,i,i) = value_mult(sous_determinant,deno1);
     }
     /* calcul des sous_determinants des Aij (i<j) */
-    switch(infer) {
-    case TRUE:
+    if (infer) {
 	for (i=1; i<=n; i++)
 	    for(j=i+1; j<=n;j++){
 		matrice_sous_determinant(h,n,i,j,aij);
-		assert(aij[0] == 1);
-		ACCESS(inv_h,n,j,i) = aij[1] * deno1;
+		assert(aij[0] == VALUE_ONE);
+		ACCESS(inv_h,n,j,i) = value_mult(aij[1],deno1);
 	    }
-	break;
-    case FALSE:
+    }
+    else {
 	for (i=1; i<=n; i++)
 	    for(j=1; j<i; j++){
 		matrice_sous_determinant(h,n,i,j,aij);
-		assert(aij[0] == 1);
-		ACCESS(inv_h,n,j,i) = aij[1] * deno1;
+		assert(aij[0] == VALUE_ONE);
+		ACCESS(inv_h,n,j,i) = value_mult(aij[1],deno1);
 	    }
-	break;
-   }
+    }
+    
     DENOMINATOR(h) = deno;
 }
 
@@ -196,14 +201,14 @@ int n;
     matrice h = matrice_new(n,n);
     matrice inv_h = matrice_new(n,n);
     matrice temp = matrice_new(n,n);
-    int deno;
-    int det_p, det_q; /* ne utilise pas */
+    Value deno;
+    Value det_p, det_q; /* ne utilise pas */
 
     /* test */
-    assert(DENOMINATOR(a)>0);
+    assert(value_pos_p(DENOMINATOR(a)));
 
     deno = DENOMINATOR(a);
-    DENOMINATOR(a) = 1;
+    DENOMINATOR(a) = VALUE_ONE;
     matrice_hermite(a,n,n,p,h,q,&det_p,&det_q);
     DENOMINATOR(a) = deno;
     if ( matrice_hermite_rank(h,n,n) == n){
@@ -241,10 +246,10 @@ int n;
     matrice h_u = matrice_new(n,n);
     matrice inv_h_u = matrice_new(n,n);
     matrice temp = matrice_new(n,n);
-    int det_p,det_q;  /* ne utilise pas */
+    Value det_p,det_q;  /* ne utilise pas */
    
     /* test */
-    assert(DENOMINATOR(u)==1);
+    assert(value_one_p(DENOMINATOR(u)));
 
     matrice_hermite(u,n,n,p,h_u,q,&det_p,&det_q);
     assert(matrice_triangulaire_unimodulaire_p(h_u,n,TRUE));
