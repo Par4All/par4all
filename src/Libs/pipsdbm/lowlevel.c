@@ -128,6 +128,7 @@ string
 db_build_file_resource_name(string rname, string oname, string suffix)
 {
     if (same_string_p(oname, "")) oname = DEFAULT_OWNER_NAME;
+    free(db_get_directory_name_for_module(oname));/* mkdir as a side effect. */
     return strdup(concatenate(oname, "/", oname, suffix, 0));
 }
 
