@@ -284,3 +284,28 @@ free_static_control_mapping(statement_mapping map)
 
     FREE_STATEMENT_MAPPING(map);
 }
+
+/* Functions to read and write declarations resouce, which is a hash table 
+   whose key and value are string (keyword/typedef and TK_keyword/TK_typedef)*/
+
+void declarations_write(FILE * f, hash_table h)
+{
+  HASH_MAP(k,v,
+  {
+    fprintf(f, "%s\n", (char *) k);
+    fprintf(f, "%d\n", v);
+  },h);
+}
+
+
+hash_table declarations_read(FILE * f) 
+{
+  hash_table result = hash_table_make(hash_string,0);
+  int c;
+  while (c = getc(f) && c != EOF)
+    {
+      hash_put(result,(char*)safe_readline(f),(char*)safe_readline(f));
+    }
+  return result;
+}
+
