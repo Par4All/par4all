@@ -44,7 +44,8 @@ align a;
 {
     (void) fprintf(stderr,"aligned\n");
     gen_map(print_alignment, align_alignment(a));
-    (void) fprintf(stderr, "to template %s\n\n", entity_name(align_template(a)));
+    (void) fprintf(stderr, "to template %s\n\n",
+		   entity_name(align_template(a)));
 }
 
 void print_alignment(a)
@@ -164,23 +165,6 @@ void print_distributed_arrays()
     gen_map(print_entity_variable, list_of_distributed_arrays());
 }
 
-/*
- * for debug purposes:-)
- */
-void DebugPrintCode(l,module,stat)
-int l;
-entity module;
-statement stat;
-{
-    ifdebug(l)
-    {
-	hpfc_print_code(stderr, module, stat);
-    }
-}
-
-/*
- * hpfc_print_code
- */
 void hpfc_print_code(file, module, stat)
 FILE* file;
 entity module;
@@ -214,8 +198,7 @@ void hpfc_print_file(file, file_name)
 FILE* file;
 string file_name;
 {
-    FILE 
-	*source;
+    FILE *source;
     extern int _filbuf();
     extern int _flsbuf();
 
@@ -229,15 +212,11 @@ string file_name;
     fprintf(file, "---------------------\n");
 }
 
-/*
- * void fprint_range(file, r)
- */
 void fprint_range(file, r)
 FILE* file;
 range r;
 {
-    int
-	lo, up, in;
+    int lo, up, in;
     bool
 	blo = hpfc_integer_constant_expression_p(range_lower(r), &lo),
 	bup = hpfc_integer_constant_expression_p(range_upper(r), &up),
@@ -257,20 +236,15 @@ range r;
 	fprintf(file, "X");
 }
 
-/*
- * void fprint_lrange(file, l)
- */
 void fprint_lrange(file, l)
 FILE* file;
 list l;
 {
-    bool
-	firstrange = TRUE;
+    bool firstrange = TRUE;
 
     MAPL(cr,
      {
-	 range
-	     r = RANGE(CAR(cr));
+	 range r = RANGE(CAR(cr));
 
 	 if (!firstrange)
 	     (void) fprintf(file, ", ");
@@ -281,9 +255,6 @@ list l;
 	 l);
 }
 
-/*
- * fprint_message()
- */
 void fprint_message(file, m)
 FILE* file;
 message m;
@@ -298,9 +269,6 @@ message m;
     (void) fprintf(file, "\n");
 }
 
-/*
- * void fprint_lmessage(file, l)
- */
 void fprint_lmessage(file, l)
 FILE* file;
 list l;
@@ -308,12 +276,8 @@ list l;
     if (ENDP(l))
 	fprintf(file, "message list is empty\n");
     else
-	MAPL(cm,
-	 {
-	     fprint_message(file, MESSAGE(CAR(cm)));
-	 },
-	     l);
+	MAPL(cm, fprint_message(file, MESSAGE(CAR(cm))), l);
 }
 
-/*  that's all
+/*  that is all
  */
