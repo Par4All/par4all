@@ -1,7 +1,7 @@
 c
 c everything about packing
 c
-c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/12/22 16:59:26 $, )
+c $RCSfile: hpfc_packing.m4f,v $ ($Date: 1994/12/22 16:59:54 $, )
 c version $Revision$
 c got on %D%, %T%
 c $Id$
@@ -71,7 +71,7 @@ c
 ONE_PACKING(1,$1,$2)
 ONE_PACKING(2,$1,$2)
 ONE_PACKING(3,$1,$2)
-ONE _PACKING(4,$1,$2)
+ONE_PACKING(4,$1,$2)
 c ONE _PACKING(5,$1,$2)
 c ONE _PACKING(6,$1,$2)
 c ONE _PACKING(7,$1,$2)
