@@ -8,6 +8,9 @@
     $Id$
 
     $Log: statement.c,v $
+    Revision 1.69  2002/06/27 14:42:51  irigoin
+    Function safe_print_statement() added, make_call_statement() reformatted.
+
     Revision 1.68  2002/06/10 15:17:50  irigoin
     function safe_statement_identification() added
 
@@ -769,10 +772,10 @@ MakeUnaryCall(f, a)
 entity f;
 expression a;
 {
-    call c =  make_call(f, CONS(EXPRESSION, a, NIL));
+  call c =  make_call(f, CONS(EXPRESSION, a, NIL));
 
-    return(make_expression(make_syntax(is_syntax_call, c),
-			   normalized_undefined));
+  return(make_expression(make_syntax(is_syntax_call, c),
+			 normalized_undefined));
 }
 
 
@@ -783,25 +786,25 @@ list args;
 entity l; /* label, default entity_undefined */
 string c; /* comments, default empty_comments (was: "" (was: string_undefined)) */
 {
-    entity called_function;
-    statement cs;
+  entity called_function;
+  statement cs;
 
-    called_function = entity_intrinsic(function_name);
+  called_function = entity_intrinsic(function_name);
 
-    l = (l==entity_undefined)? entity_empty_label() : l;
-    cs = make_statement(l,
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  c,
-			  make_instruction(is_instruction_call,
-					   make_call(called_function,args)));
+  l = (l==entity_undefined)? entity_empty_label() : l;
+  cs = make_statement(l,
+		      STATEMENT_NUMBER_UNDEFINED,
+		      STATEMENT_ORDERING_UNDEFINED,
+		      c,
+		      make_instruction(is_instruction_call,
+				       make_call(called_function,args)));
 
-    ifdebug(8) {
-	pips_debug(8, "cs is\n");
-	print_statement(cs);
-    }
+  ifdebug(8) {
+    pips_debug(8, "cs is\n");
+    safe_print_statement(cs);
+  }
 
-    return cs;
+  return cs;
 }
 
 /* */
@@ -1012,13 +1015,25 @@ set r;
 
 /* (the text is not freed, massive memory leak:-) 
  */ 
-void 
-print_statement(statement s)
+void print_statement(statement s)
 {
-    debug_on("TEXT_DEBUG_LEVEL");
-    print_text(stderr, text_statement(entity_undefined,0,s));
-    debug_off();
+  debug_on("TEXT_DEBUG_LEVEL");
+  print_text(stderr, text_statement(entity_undefined,0,s));
+  debug_off();
 }
+void safe_print_statement(statement s)
+{
+  if(continue_statement_p(s)
+     && entity_return_label_p(statement_label(s))) {
+    /* The return label only can be associated to a RETURN call,
+       however the controlizer does not follow this consistency
+       rule. */
+    fprintf(stderr, "%s\n", statement_identification(s));
+  }
+  else
+    print_statement(s);
+}
+
 
 /* Mapping from statement number to statement 
  *
@@ -2158,20 +2173,53 @@ void add_one_line_of_comment(statement s, string format, ...)
       fprintf(stderr, ERROR_PREFIX "%s\n", buffer);
   }
 }
+
+static bool find_implicit_goto(statement s, list * tl)
+{
+  bool found = FALSE;
+  
+  if(statement_call_p(s)) {
+    call c = instruction_call(statement_instruction(s));
+    entity f = call_function(c);
+
+    if(ENTITY_WRITE_P(f) || ENTITY_READ_P(f) || ENTITY_OPEN_P(f) || ENTITY_CLOSE_P(f)) {
+      list ce = list_undefined;
+    
+      for(ce = call_arguments(c); !ENDP(ce); ce = CDR(CDR(ce))) {
+	expression e = EXPRESSION(CAR(ce));
+	entity f1 = call_function(syntax_call(expression_syntax(e)));
+      
+	pips_assert("expression e must be a call", expression_call_p(e));
+      
+	if (strcmp(entity_local_name(f1), "ERR=") == 0 || 
+	    strcmp(entity_local_name(f1), "END=") == 0) {
+	  expression ne = EXPRESSION(CAR(CDR(ce))); /* Next Expression */
+	  entity l = call_function(syntax_call(expression_syntax(ne)));
+      
+	  pips_assert("expression ne must be a call", expression_call_p(ne));
+	  pips_assert("l is a label", entity_label_p(l));
+	  
+	  *tl = CONS(ENTITY, l, *tl);
+	}
+      }
+    }
+    /* No need to go down in call statements */
+    found = TRUE;
+  }
+  
+  return !found;
+}
+
+/* Look for labels appearing in END= or ERR= IO clauses and allocate a
+   label list. */
+list statement_to_implicit_target_labels(statement s)
+{
+  list ll = NIL; /* Label List */
+   
+  gen_context_recurse(s, (void *) &ll,statement_domain, find_implicit_goto, gen_null);
+  
+  return ll;
+}
 
 
 /* That's all folks */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
