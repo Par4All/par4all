@@ -1,7 +1,7 @@
 #! /bin/sh
 #! /bin/sh -vx
 #
-# $RCSfile: pips-makemake,v $ ($Date: 1995/08/02 14:33:22 $, )
+# $RCSfile: pips-makemake,v $ ($Date: 1995/08/02 15:05:08 $, )
 # version $Revision$
 
 # Automatic generation of Makefile for the PIPS project
@@ -180,6 +180,9 @@ do
   else
     ### good case
     echo make $MAKEFILE in $dir
+    
+    # needed because of f.. - in directory names...
+    dirname=`basename $PWD | sed 's,\-,_,g'`
     
     if [ -f $MAKEFILE ] ; then
       cp $MAKEFILE $MAKEFILE.old
@@ -416,8 +419,8 @@ $MAKEFILE: $(CONFIG_FILE) $(UTILDIR)/pips-makemake
 # without having to touch the sources.
 header:
 	{ \\
-	echo "#ifndef "$(TARGET)"_header_included" ;\\
-	echo "#define "$(TARGET)"_header_included" ;\\
+	echo "#ifndef ${dirname}_header_included" ;\\
+	echo "#define ${dirname}_header_included" ;\\
 	cat $(TARGET)-local.h ;\\
 	$(PROTOIZE)  $(INC_CFILES) \\
 		| sed 's|,[ 	]*/\*\.\.\.\*/|, ...|g;s,int .*__builtin_va_alist.*\([,\)]\),\1,' ;\\
