@@ -4,6 +4,9 @@
 # JPips is a java interface to tpips. It is based on swing.
 #
 # $Log: config.makefile,v $
+# Revision 1.15  1998/11/12 17:33:01  coelho
+# more menus.
+#
 # Revision 1.14  1998/11/12 17:21:20  coelho
 # EmacsDisplayer added.
 #
@@ -84,7 +87,9 @@ J_FILES	=	\
 		JPips.java 
 
 MENUS	=	jpips_menus.test \
-		jpips_menus.basic
+		jpips_menus.basic \
+		jpips_menus.corinne \
+		jpips_menus.developper
 
 GIF	=	DownArrow.gif
 
