@@ -375,10 +375,8 @@ bool privatize_module(char *mod_name)
 	statement st = 
 	    ordering_to_statement(dg_vertex_label_statement(vl));
 	       
-	MAPL( fs, {
-	    effect f = EFFECT( CAR( fs )) ;
+	MAP(EFFECT, f, {
 	    entity e = effect_entity( f ) ;
-
 	    if( action_write_p( effect_action( f ))) {
 		try_privatize( v, st, f, e ) ;
 	    }
@@ -390,7 +388,7 @@ bool privatize_module(char *mod_name)
     sort_all_loop_locals(mod_stat);
 
     debug_off();
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stat);
 
     reset_current_module_entity();
     reset_current_module_statement();
