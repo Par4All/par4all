@@ -2,6 +2,9 @@
 # $Id$
 #
 # $Log: makefile_macros.IBMAIX,v $
+# Revision 1.14  1997/09/09 13:22:57  coelho
+# shorten.
+#
 # Revision 1.13  1997/08/19 14:57:35  coelho
 # fixes for IBM AIX (no wpips, no wpips in fpips).
 #
@@ -20,58 +23,21 @@
 #
 # for compiling:
 
-AR	= ar
-ARFLAGS	= rv
-CC	= cc
+include $(ROOT)/Include/makefile_macros.DEFAULT
+
 # ansi required for newgen (otherwise __STDC__ or __STRICT_ANSI__ not def).
 CANSI	= -qlanglvl=ansi 
+
 # -ma to allow alloca():
 CFLAGS	= -g -O2 -qmaxmem=8192 -qfullpath -ma 
+
 # if -E is ommitted, the file is *compiled*:-(
 CMKDEP	= -E -M
-CPPFLAGS = 	-I. \
-		-I$(NEWGEN_ROOT)/Include \
-		-I$(LINEAR_ROOT)/Include \
-		-I$(PIPS_ROOT)/Include \
-		-I$(EXTERN_ROOT)/Include
-LD	= $(CC)
+
 # -lbsd added so signal work:
-LDFLAGS	= -g 	-L./$(ARCH) \
-		-L$(NEWGEN_ROOT)/Lib/$(ARCH) \
-		-L$(LINEAR_ROOT)/Lib/$(ARCH) \
-		-L$(PIPS_ROOT)/Lib/$(ARCH) \
-		-L$(EXTERN_ROOT)/Lib/$(ARCH) \
-		-lbsd
-FC	= f77
+LDFLAGS	+= -lbsd
+
 FFLAGS	= -g -O2 -u
-RANLIB	= ranlib
-
-#
-# tools for managing/generating code
-
-LEX	= flex
-LFLAGS	= 
-YACC	= bison
-YFLAGS	= -y
-LINT	= lint
-LINTFLAGS = -habxu
-PROTO	= cproto
-PRFLAGS	= -evcf2
-M4	= gm4
-M4FLAGS	=
-ETAGS	= etags
-
-#
-# tools for the documentation
-
-LX2HTML	= latex2html
-L2HFLAGS = -link 8 -split 5
-LATEX	= latex
-BIBTEX	= bibtex
-MAKEIDX	= makeindex
-DVIPS	= dvips
-NROFF	= nroff
-RMAN	= rman
 
 #
 # others
