@@ -24,7 +24,9 @@
   -- entity_local_name is replaced by module_local_name. LZ 230993
 */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <string.h>
 
 #include "genC.h"
