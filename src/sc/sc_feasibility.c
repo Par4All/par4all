@@ -369,12 +369,14 @@ boolean ofl_res;
       {
 	method = SIMPLEX_METHOD;
 	if (n_cont_eq >= 10)
-	  method &= PROJECT_EQ_METHOD;
+	  method |= PROJECT_EQ_METHOD;
       }
       else
       {
 	method = FM_METHOD;
       }
+
+      /* fprintf(stderr, "in=%d eq=%d method=%d\n", n_cont_in, n_cont_eq, method);*/
 
       /* STATS
 	 extern void init_log_timers(void);
