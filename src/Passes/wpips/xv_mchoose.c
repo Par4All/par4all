@@ -109,7 +109,7 @@ Event *event;
     while (nchoices--) {
 	if ((int) xv_get(choices, PANEL_LIST_SELECTED, nchoices) == TRUE) {
 	    strcat(mchoices_notify_buffer,
-			xv_get(choices, PANEL_LIST_STRING, nchoices));
+			(char *) xv_get(choices, PANEL_LIST_STRING, nchoices));
 	    strcat(mchoices_notify_buffer, " ");
 	}
     }
@@ -125,26 +125,29 @@ int argc;
 char *argv[];
 void (*f)();
 {
-    int i;
-    int nchoices;
+  int i;
+  int nchoices;
 
-    apply_on_mchoices = f;
-    mchoices_notify_buffer[0] = '\0';
+  apply_on_mchoices = f;
+  mchoices_notify_buffer[0] = '\0';
 
-    xv_set(mchoose_frame, FRAME_LABEL, title, 0);
+  xv_set(mchoose_frame, FRAME_LABEL, title, 0);
 
-    /* reset the choice set to empty */
-    nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
+  /* reset the choice set to empty */
+  nchoices = (int) xv_get(choices, PANEL_LIST_NROWS, 0);
 
-    for (i = 0; i < nchoices; i++) {
-	xv_set(choices, PANEL_LIST_DELETE, 0, 0);
-    }
+  for (i = 0; i < nchoices; i++) {
+    xv_set(choices, PANEL_LIST_DELETE, 0, 0);
+  }
 
-    for (i = 0; i < argc; i++) {
-	xv_set(choices, PANEL_LIST_STRING, i, argv[i], 0);
-    }
+  for (i = 0; i < argc; i++) {
+    xv_set(choices, PANEL_LIST_STRING, i, argv[i], 0);
+  }
 
-    unhide_window(mchoose_frame);
+  unhide_window(mchoose_frame);
+
+  /* move the pointer to the center of the query window */
+  pointer_in_center_of_frame(mchoose_frame);
 }
 
 
