@@ -18,6 +18,14 @@
 
 #include "ri-util.h"
 
+bool
+empty_comments_p(string s)
+{
+  /* Could be replaced by a macro. See macro empty_comment */
+  pips_assert("comments cannot be NULL", s!=NULL);
+  return (s == NULL || string_undefined_p(s));
+}
+
 /* PREDICATES ON STATEMENTS */
 
 bool empty_statement_p(st)
@@ -190,7 +198,8 @@ empty_statement_or_continue_without_comment_p(statement st)
    instruction i;
    string the_comments = statement_comments(st);
 
-   if (!(the_comments == NULL || string_undefined_p(the_comments)))
+   /* The very last condition should be sufficient */
+   if (!empty_comments_p(the_comments))
        return FALSE;
 
    if (!entity_empty_label_p(statement_label(st)))
@@ -307,7 +316,7 @@ statement make_empty_statement()
     return(make_statement(entity_empty_label(), 
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED, 
-			  string_undefined,
+			  empty_comments,
 			  make_instruction_block(NIL)));
 }
 
@@ -319,7 +328,7 @@ instruction instr;
     return(make_statement(entity_empty_label(), 
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED, 
-			  string_undefined,
+			  empty_comments,
 			  instr));
 }
 
@@ -367,14 +376,14 @@ statement make_block_statement_with_stop()
     stop = make_statement(entity_empty_label(),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
-			  string_undefined,
+			  empty_comments,
 			  make_instruction(is_instruction_call,
 					   make_call(stop_function,NIL)));
 
     b = make_statement(entity_empty_label(),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
-			  string_undefined,
+			  empty_comments,
 			  make_instruction_block(CONS(STATEMENT, stop, NIL)));
 
     ifdebug(8) {
@@ -402,7 +411,7 @@ list body;
     b = make_statement(entity_empty_label(),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
-			  string_undefined,
+			  empty_comments,
 			  make_instruction_block(body));
 
     return b;
@@ -421,8 +430,9 @@ instruction make_instruction_block(list statements)
 
 statement make_return_statement()
 {
+  /* The special RETURN label should be used, shouldn't it? */
     return make_call_statement(RETURN_FUNCTION_NAME, NIL, 
-			       entity_undefined, string_undefined);
+			       entity_undefined, empty_comments);
 }
 
 
@@ -440,7 +450,7 @@ statement make_continue_statement(l)
 entity l;
 {
     return make_call_statement(CONTINUE_FUNCTION_NAME, NIL, l, 
-			       string_undefined);
+			       empty_comments);
 }
 
 
@@ -480,7 +490,7 @@ statement make_call_statement(function_name, args, l, c)
 string function_name;
 list args;
 entity l; /* label, default entity_undefined */
-string c; /* comments, default string_undefined */
+string c; /* comments, default empty_comments (was: "" (was: string_undefined)) */
 {
     entity called_function;
     statement cs;
@@ -856,7 +866,7 @@ statement s_old;
     l_body = make_statement(entity_empty_label(),
 			    STATEMENT_NUMBER_UNDEFINED,
 			    STATEMENT_ORDERING_UNDEFINED,
-			    string_undefined,
+			    empty_comments,
 			make_instruction_block(CONS(STATEMENT,state_l,NIL)));
 
     return(l_body);
@@ -947,7 +957,7 @@ bool
 statement_with_empty_comment_p(statement s)
 {
     string the_comments = statement_comments(s);
-    return the_comments == NULL || string_undefined_p(the_comments);
+    return empty_comments_p(the_comments);
 }
 
 
@@ -957,14 +967,14 @@ static string gather_all_comments_of_a_statement_string;
 static bool 
 gather_all_comments_of_a_statement_filter(statement s)
 {
-    string the_comments = statement_comments(s);
-    if (the_comments != NULL && !string_undefined_p(the_comments)) {
-	string old = gather_all_comments_of_a_statement_string;
-	gather_all_comments_of_a_statement_string =
-	    strdup(concatenate(old, the_comments, NULL));
-	free(old);
-    }
-    return TRUE;
+  string the_comments = statement_comments(s);
+  if (!empty_comments_p(the_comments)) {
+    string old = gather_all_comments_of_a_statement_string;
+    gather_all_comments_of_a_statement_string =
+      strdup(concatenate(old, the_comments, NULL));
+    free(old);
+  }
+  return TRUE;
 }
 
 
@@ -990,11 +1000,11 @@ append_comments_to_statement(statement s,
 {
     string old = statement_comments(s);
     
-    if (the_comments == NULL || string_undefined_p(the_comments))
+    if (empty_comments_p(the_comments))
 	/* Nothing to add... */
 	return;
     
-    if (old == NULL || string_undefined_p(old))
+    if (empty_comments_p(old))
 	/* There is no comment yet: */
 	statement_comments(s) = strdup(the_comments);
     else {
@@ -1011,12 +1021,12 @@ insert_comments_to_statement(statement s,
 {
     string old = statement_comments(s);
 
-    if (the_comments == NULL || string_undefined_p(the_comments))
+    if (empty_comments_p(the_comments))
 	/* Nothing to add... */
 	return;
     
-    if (old == NULL || string_undefined_p(old))
-	/* There is no comment yet: */
+    if (empty_comments_p(old))
+	/* There are no comments yet: */
 	statement_comments(s) = strdup(the_comments);
     else {
 	statement_comments(s) = strdup(concatenate(the_comments, old, NULL));
