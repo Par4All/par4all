@@ -68,4 +68,4 @@ typedef struct fract{long num, den, numero ; } frac ;
 
 typedef struct col{int taille, existe ; frac *colonne ;} tableau ;
 
-#endif ARITHMETIQUE_PACKAGE
+#endif /* ARITHMETIQUE_PACKAGE */
