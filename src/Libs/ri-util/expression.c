@@ -170,6 +170,57 @@ expression e;
 {
     return(syntax_reference_p(expression_syntax(e)));
 }
+/* This function returns TRUE, if there exists an equal expression in the list
+ *                       FALSE, otherwise 
+*/
+
+bool expression_in_list_p(expression e, list le)
+{
+  MAP(EXPRESSION, f, if (expression_equal_p(e,f)) return TRUE, le);
+  return FALSE;
+}
+
+/* This function returns TRUE if we can affirm that the expression is always TRUE
+ *                       FALSE, otherwise
+*/
+
+bool trivial_expression_p(expression e)
+{
+  list args;
+  expression e1,e2;
+  normalized n1,n2;
+  Pvecteur v1,v2,v;
+
+  if (expression_call_p(e))
+    {
+      /* If e is a binary call expression*/
+      args = call_arguments(syntax_call(expression_syntax(e)));
+      e1 =  EXPRESSION(CAR(args));
+      e2 = EXPRESSION(CAR(CDR(args)));
+      n1 = NORMALIZE_EXPRESSION(e1);
+      n2 = NORMALIZE_EXPRESSION(e2);
+
+      if (normalized_linear_p(n1) && normalized_linear_p(n2))
+	{
+	  v1 = normalized_linear(n1);
+	  v2 = normalized_linear(n2);
+
+	  v = vect_substract(v1,v2);
+
+	  if (vect_constant_p(v))
+	    {
+	      if (VECTEUR_NUL_P(v) || value_negz_p(val_of(v))) 
+		return TRUE;
+	      return FALSE;
+	    }	
+	  return FALSE;
+	}
+      return FALSE;
+    }
+    
+   return FALSE;
+}
+
 
 bool expression_implied_do_p(e)
 expression e ;
@@ -1465,3 +1516,89 @@ void davinci_dump_all_expressions(FILE * out, statement s)
   gen_recurse(s, expression_domain, expr_flt, gen_null);
   out_flt = NULL;
 }
+
+/*-------------------------------------------------------------------------------------------------
+
+  This function replaces all the occurences of an old entity in the expression exp by the new entity. 
+  It returns the expression modified.  
+  I think we  can write this function by using gen_context_multi_recurse  ... To do .... NN
+    
+-------------------------------------------------------------------------------------------------*/
+expression substitute_entity_in_expression(entity old, entity new, expression e)
+{
+  syntax s;
+  tag t;
+  call c;
+  range ra;
+  reference re;
+  list args,tempargs= NIL;
+  expression retour = copy_expression(e), exp,temp,low,up,inc;
+
+  s = expression_syntax(e);
+  t = syntax_tag(s);
+  switch (t){ 
+  case is_syntax_call:  
+    {
+      c = syntax_call(s);      
+      args = call_arguments(c);
+      while (!ENDP(args))
+	{
+	  exp = EXPRESSION(CAR(args));
+	  temp = substitute_entity_in_expression(old,new,exp);
+	  tempargs = gen_nconc(tempargs,CONS(EXPRESSION,temp,NIL));
+	  args = CDR(args);
+	}
+      
+      call_arguments(syntax_call(expression_syntax(retour))) = tempargs;
+
+      if (same_entity_p(call_function(c),old))
+	call_function(syntax_call(expression_syntax(retour))) = new;
+      else 
+	call_function(syntax_call(expression_syntax(retour))) = call_function(c);
+
+      break;
+    }
+  case is_syntax_reference:
+    { 
+      re = syntax_reference(s);      
+      args = reference_indices(re);
+      while (!ENDP(args))
+	{
+	  exp = EXPRESSION(CAR(args));
+	  temp = substitute_entity_in_expression(old,new,exp);
+	  tempargs = gen_nconc(tempargs,CONS(EXPRESSION,temp,NIL));
+	  args = CDR(args);
+	}
+      
+      reference_indices(syntax_reference(expression_syntax(retour))) = tempargs;
+
+      if (same_entity_p(reference_variable(re),old))
+	reference_variable(syntax_reference(expression_syntax(retour))) = new;
+      else 
+	reference_variable(syntax_reference(expression_syntax(retour))) = reference_variable(re);
+
+      break;
+    }
+  case is_syntax_range:
+    {
+      ra = syntax_range(s);  
+      low = range_lower(ra);
+      range_lower(syntax_range(expression_syntax(retour))) = substitute_entity_in_expression(old,new,low);
+  
+      up = range_upper(ra);
+      range_upper(syntax_range(expression_syntax(retour))) = substitute_entity_in_expression(old,new,up);
+
+   
+      inc = range_increment(ra);
+      range_increment(syntax_range(expression_syntax(retour))) = substitute_entity_in_expression(old,new,inc);
+  
+      break;
+	    
+    }
+  }
+
+  return retour;
+}
+
+
+    
