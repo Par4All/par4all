@@ -3,6 +3,9 @@
  * $Id$
  *
  * $Log: entity.c,v $
+ * Revision 1.48  2002/03/08 10:12:35  irigoin
+ * StackArea management adedd in common_members_of_module()
+ *
  * Revision 1.47  2000/12/01 10:40:09  coelho
  * re debug...
  *
@@ -728,6 +731,9 @@ common_members_of_module(
 	    int size = 0;
 
 	    if(heap_area_p(ram_section(r))) {
+		size = 0;
+	    }
+	    else if(stack_area_p(ram_section(r))) {
 		size = 0;
 	    }
 	    else {
