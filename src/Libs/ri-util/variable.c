@@ -555,10 +555,12 @@ bool
 variable_in_module_p(entity v,
                      entity m)
 {
-   bool in_module_1 = strcmp(module_local_name(m), entity_module_name(v)) == 0;
-   bool in_module_2 = entity_is_argument_p(v, code_declarations(value_code(entity_initial(m))));
+   bool in_module_1 = 
+       strcmp(module_local_name(m), entity_module_name(v)) == 0;
+   bool in_module_2 = 
+    entity_is_argument_p(v, code_declarations(value_code(entity_initial(m))));
 
-   pips_assert ("variable_in_module_p", in_module_1==in_module_2);
+   pips_assert ("both coherency",  in_module_1==in_module_2);
 
    return in_module_1;
 }
