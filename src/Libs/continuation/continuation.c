@@ -105,6 +105,7 @@ bool continuation_conditions(char *module_name)
     reset_cumulated_rw_effects();
     reset_must_continuation_map();
     reset_may_continuation_map();
+    free_value_mappings();
 
     return(TRUE);
 }
