@@ -1,6 +1,6 @@
 #
 # $RCSfile: makefile_macros.GNU,v $ (version $Revision$)
-# $Date: 1996/07/15 14:01:55 $, 
+# $Date: 1996/07/15 14:12:19 $, 
 #
 # this file contains macro definitions 
 
@@ -8,7 +8,7 @@ AR	= gar
 ARFLAGS	= rv
 CC	= gcc
 CFLAGS	= -O2 -g -ansi -pedantic -Wall -msupersparc -pipe
-CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -I/usr5/gnu/SPARC/include -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR)
+CPPFLAGS= -D__USE_FIXED_PROTOTYPES__ -nostdinc -I/usr5/gnu/SPARC/include -I$(NEWGEN_INCLUDEDIR) -I$(LINEAR_INCLUDEDIR) -I$(PIPS_INCLUDEDIR) -I$(PIPS_EXTEDIR)
 LD	= $(CC) 
 LDFLAGS	= -g -nostdlib /usr5/gnu/SPARC/lib/crt0.o -L/usr5/gnu/SPARC/lib -L./$(ARCH) -L$(PIPS_LIBDIR)/$(ARCH) -L$(NEWGEN_LIBDIR)/$(ARCH) -L$(LINEAR_LIBDIR)/$(ARCH) -L$(PIPS_EXTEDIR)/$(ARCH) -lc -lgcc
 RANLIB	= granlib
