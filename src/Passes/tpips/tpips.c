@@ -173,6 +173,7 @@ static char * initialize_tpips_history()
  */
 void cdir_handler(char * line)
 {
+    user_log("%s\n", line);
     if (chdir(line+strlen(CHANGE_DIR)))
 	fprintf(stderr, "error while changing directory\n");
 }
@@ -182,8 +183,10 @@ void shell_handler(char * line)
     line += strlen(SHELL_ESCAPE);
     while ((*line ==' ') || (*line == '\t'))
 	line++;
-    if (*line)
+    if (*line) {
+	user_log("shell %s\n", line);
 	system(line);
+    }
     else
 	system("sh");
 }
@@ -191,6 +194,7 @@ void shell_handler(char * line)
 void echo_handler(char * line)
 {
     /* skip the key word and a blank character */
+    user_log("%s\n", line);
     line += strlen(ECHO) + 1;
     fprintf(stdout,"%s\n",line);
     fflush(stdout);
