@@ -1,6 +1,6 @@
 !
 ! $RCSfile: hpfc_shift.m4f,v $ version $Revision$
-! ($Date: 1997/05/29 13:55:22 $, )
+! ($Date: 1997/05/29 16:30:00 $, )
 !
 !
       subroutine hpfc tdim(array, dim, template, tdim)
@@ -14,8 +14,8 @@
       do i=1, NODIMT(template)
          if (ALIGN(array,i,1).eq.dim) tdim=i
       enddo
-      debug(write (unit=0, fmt=*)
-     $     "[hpfc tdim] ", array, dim, template, tdim)
+      debug(`write (unit=0, fmt=*)
+     $     "[hpfc tdim] ", array, dim, template, tdim')
       end
 !
 !
@@ -30,8 +30,8 @@
       do i=1, NODIMP(procs)
          if (DIST(template,i,1).eq.tdim) pdim=i
       enddo
-      debug(write (unit=0, fmt=*)
-     $     "[hpfc pdim] ", template, tdim, procs, pdim)
+      debug(`write (unit=0, fmt=*)
+     $     "[hpfc pdim] ", template, tdim, procs, pdim')
       end
 !
 !
@@ -107,8 +107,8 @@
      $     * (n-RANGEP(procs, pdim, 1)+1) - 1
      $     + RANGET(template, tdim, 1)
      $     - ALIGN(array, tdim,  3)) / ALIGN(array, tdim, 2)
-      debug(write (unit=0, fmt=*) "[hpfc tdim] ",
-     $     procs, "[", pdim, "](", n,  ") last ", last)
+      debug(`write (unit=0, fmt=*) "[hpfc tdim] ",
+     $     procs, "[", pdim, "](", n,  ") last ", last')
       end
 !
 ! computes the relative lid 
@@ -145,8 +145,8 @@
       integer nlb, nub, llb, pdim, procs, tdim, template
       integer glb, gub, glbd, gubd, p1, p2, last
 !
-      debug(write (unit=0, fmt=*)
-     $     "[hpfcshift] array/dim/area: ", array, dim, lb, ub)
+      debug(`write (unit=0, fmt=*)
+     $     "[hpfcshift] array/dim/area: ", array, dim, lb, ub')
       call hpfc tdim(array, dim, template, tdim)
       call hpfc pdim(template, tdim, procs, pdim)
       call hpfc loop bounds(nlb, nub, llb, lb, ub, array, pdim)
@@ -269,8 +269,8 @@ SIMPLE_REPLICATE(LEVEL,`INIT_TABLE')dnl
       ui=u(dim)
       do j=1, 2
          if (lid(j).ne.MY LID.and.lid(j).gt.0) then
-            debug(write (unit=0, fmt=*)
-     $           MYLID, " sending Shift to ", lid(j))
+            debug(`write (unit=0, fmt=*)
+     $           MYLID, " sending Shift to ", lid(j)')
 !
 ! the SHIFT is to another processor
 !
@@ -321,8 +321,8 @@ SIMPLE_REPLICATE(LEVEL,`ENDDO_LOOP')
 !
        do j=1, 2
           if (lid(j).gt.0.and.lid(j).ne.MY LID) then
-             debug(write (unit=0, fmt=*) 
-     $            MY LID, " receiving Shift from ", lid(j))
+             debug(`write (unit=0, fmt=*) 
+     $            MY LID, " receiving Shift from ", lid(j)')
 !
 ! the SHIFT is to another processor
 !
