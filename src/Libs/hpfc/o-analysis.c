@@ -2,7 +2,7 @@
  * 
  * Fabien Coelho, August 1993
  *
- * $RCSfile: o-analysis.c,v $ ($Date: 1996/06/08 10:53:19 $, )
+ * $RCSfile: o-analysis.c,v $ ($Date: 1996/06/08 15:30:38 $, )
  * version $Revision$
  */
 
@@ -855,6 +855,7 @@ generate_optimized_code_for_loop_nest(
 { gen_free_list(Wa); gen_free_list(lWa); gen_free_list(Ra);\
   gen_free_list(lRa); gen_free_list(Ro); gen_free_list(lRo);\
   gen_free_list(Rrt); gen_free_list(lblocks); gen_free_list(lloop);\
+  gen_free_list(W); gen_free_list(R); gen_free_list(lw); gen_free_list(lr);\
   reset_hpfc_current_statement(); reset_current_loops(); return x;}
 
 /* check conditions and compile...
@@ -899,7 +900,6 @@ statement stat, *pstat;
     },
 	lw);
 
-    gen_free_list(lw);
     if (W) /* ok distributed variable written ! */
     {
 	the_computer_syntax = choose_one_syntax_in_references_list(&W);
@@ -922,9 +922,14 @@ statement stat, *pstat;
 	},
 	    lr);
 
-	the_computer_syntax = choose_one_syntax_in_references_list(&R);
-	the_computer_reference = syntax_reference(the_computer_syntax);
-	Ra = CONS(SYNTAX, the_computer_syntax, NIL);
+	if (R) 
+	{
+	    the_computer_syntax = choose_one_syntax_in_references_list(&R);
+	    the_computer_reference = syntax_reference(the_computer_syntax);
+	    Ra = CONS(SYNTAX, the_computer_syntax, NIL);
+	}
+	else
+	    RETURN(FALSE);       
     }
 
     if (!align_check(the_computer_reference,
