@@ -1858,6 +1858,24 @@ Enumeration *Polyhedron_Enumerate(Polyhedron *Pi,Polyhedron *C,unsigned MAXRAYS,
     
     return(Enumerate_NoParameters(P,C,NULL,NULL,MAXRAYS,param_name));  
   }
+  if(nb_param == dim) {
+    res = (Enumeration *)malloc(sizeof(Enumeration));
+    res->next = 0;
+    res->ValidityDomain = DomainIntersection(P,C,MAXRAYS);
+    value_init(res->EP.d);
+    value_init(res->EP.x.n);
+    value_set_si(res->EP.d,1);
+    value_set_si(res->EP.x.n,1);
+    if( param_name ) {
+      fprintf(stdout,"---------------------------------------\n");
+      fprintf(stdout,"Domain:\n");
+      Print_Domain(stdout,res->ValidityDomain, param_name);
+      fprintf(stdout,"\nEhrhart Polynomial:\n");
+      print_evalue(stdout,&res->EP,param_name);
+      fprintf(stdout, "\n");
+    }
+    return res;
+  }
   PP = Polyhedron2Param_SimplifiedDomain(&P,C,MAXRAYS,&CEq,&CT);
   if(!PP) {
 	if( param_name )
