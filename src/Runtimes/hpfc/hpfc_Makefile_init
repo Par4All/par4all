@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: hpfc_Makefile_init,v $
+# Revision 1.60  1997/05/16 14:26:36  coelho
+# LINUX case added.
+#
 # Revision 1.59  1997/05/03 17:10:23  coelho
 # diff does not need host and node executables, main and out are enough.
 #
@@ -110,7 +113,7 @@ RT_SRC_FILES =	hpfc_check.f \
 include $(RT_DIR)/$(RT_ARCH)/compilers.make
 
 #
-# PVM arch dependent settings
+# PVM architexture dependent settings
 
 ifeq ($(PVM_ARCH),CM5)
 MIMD = 1
@@ -148,6 +151,10 @@ ifeq ($(PVM_ARCH),RS6K)
 NETWORK = 1
 # bsd helps with signals (e.g. if xpomp is used)
 FFLAGS	+= -lbsd
+endif
+
+ifeq ($(PVM_ARCH),LINUX)
+NETWORK = 1
 endif
 
 #
