@@ -2,6 +2,9 @@
   * $Id$
   *
   * $Log: module.c,v $
+  * Revision 1.29  1997/11/29 13:29:47  coelho
+  * fix to close on dependent parameters.
+  *
   * Revision 1.28  1997/11/22 17:09:00  coelho
   * global and local referenced entities are maintained separately...
   *
@@ -224,22 +227,27 @@ store_this_entity(entity var)
     }
 }
 
+/* it is an EXTERNAL or a PARAMETER */
+static bool
+declarable_function_p(entity f)
+{
+    type t = entity_type(f);
+    value v = entity_initial(f);
+    storage s = entity_storage(f);
+
+    return type_functional_p(t) && 
+	(((value_code_p(v) || value_unknown_p(v) /* not parsed callee */) && 
+	 storage_rom_p(s) && 
+	 !type_void_p(functional_result(type_functional(t)))) ||
+	 value_symbolic_p(v));
+}
+
 static void
 store_a_call_function(call c)
 {
     entity called = call_function(c);
-    type t = entity_type(called);
-    value v = entity_initial(called);
-    storage s = entity_storage(called);
-
     pips_debug(5, "call to %s\n", entity_name(called));
-
-    if (type_functional_p(t) && 
-	(((value_code_p(v) || value_unknown_p(v) /* not parsed callee */) && 
-	 storage_rom_p(s) && 
-	 !type_void_p(functional_result(type_functional(t)))) ||
-	 value_symbolic_p(v)))
-	store_this_entity(called); /* it is an EXTERNAL or a PARAMETER */
+    if (declarable_function_p(called)) store_this_entity(called);
 }
 
 static void 
@@ -257,13 +265,63 @@ store_the_loop_index(loop l)
 static void
 mark_referenced_entities(gen_chunk * p)
 {
-    gen_multi_recurse(
-	p,
+    gen_multi_recurse(p,
 	call_domain, gen_true, store_a_call_function,
 	reference_domain, gen_true, store_a_referenced_variable,
 	loop_domain, gen_true, store_the_loop_index,
 	NULL);    
 }
+
+/*************************************************** UPDATE DECLARATION LIST */
+/* this part is not really convincing. it is just a fix to add
+ * dependent parameters and perform a transitive closure...
+ */
+static void update_new_declaration_list(entity, list *);
+static list * current_new_declaration = NULL;
+static void new_decl_call(call c)
+{
+    entity called = call_function(c);
+    if (declarable_function_p(called))
+	update_new_declaration_list(called, current_new_declaration);
+}
+static void new_decl_ref(reference r)
+{
+    update_new_declaration_list(reference_variable(r), 
+				current_new_declaration);
+}
+
+static void
+recursive_update_new_decls(gen_chunk * p, list * pl)
+{
+    gen_multi_recurse(p,
+		      call_domain, gen_true, new_decl_call,
+		      reference_domain, gen_true, new_decl_ref,
+		      NULL);
+}
+
+static void
+update_new_declaration_list(
+    entity var,
+    list /* of entity */ *pl)
+{
+    value v = entity_initial(var);
+    if (bound_declared_variables_p(var)) return; /* already there */
+    /* else let us add it.
+     */
+    *pl = CONS(ENTITY, var, *pl);
+    store_or_update_declared_variables(var, TRUE);
+
+    if (value_symbolic_p(v))
+    {
+	/* recursively add dependent parameters... 
+	 * maybe the transitive closure could be computed more cleanly?
+	 */
+	current_new_declaration = pl;
+	recursive_update_new_decls(symbolic_expression(value_symbolic(v)), pl);
+    }
+}
+
+/******************************************************** EXTERNAL INTERFACE */
 
 void 
 insure_global_declaration_coherency(
@@ -286,14 +344,15 @@ insure_global_declaration_coherency(
     pips_debug(3, "tagging references\n");
     mark_referenced_entities(stat);
 
-    /* formal arguments are considered as referenced.
+    /* formal arguments are considered as referenced!
      */
     MAP(ENTITY, var, 
 	if (storage_formal_p(entity_storage(var)))
 	    store_this_entity(var),
 	decl);
 
-    /* common variables with associated data are considered referenced.
+    /* common variables with associated data are considered referenced,
+     * because the DATA must not be dropped.
      */
     MAP(ENTITY, var,
     { 
@@ -307,7 +366,7 @@ insure_global_declaration_coherency(
     },
 	decl);
 
-    /* checks each declared variable for a reference
+    /* checks each declared variable for a reference.
      */
     MAP(ENTITY, var,
     {
@@ -316,8 +375,7 @@ insure_global_declaration_coherency(
 	{
 	    pips_debug(3, "declared %s referenced, kept\n",
 		       entity_name(var));
-	    new_decl = CONS(ENTITY, var, new_decl);
-	    store_or_update_declared_variables(var, TRUE);
+	    update_new_declaration_list(var, &new_decl);
 	    if (entity_variable_p(var))
 		mark_referenced_entities(entity_type(var));
 	}
@@ -329,20 +387,22 @@ insure_global_declaration_coherency(
     },
 	 decl);
 
-    /* checks each referenced variable for a declaration 
+    /* checks each referenced variable for a declaration.
      */
     MAP(ENTITY, var,
     {
 	if (!bound_declared_variables_p(var))
 	{
 	    pips_debug(3, "referenced %s added\n", entity_name(var));
-	    new_decl = CONS(ENTITY, var, new_decl);
-	    store_declared_variables(var, TRUE);
+	    update_new_declaration_list(var, &new_decl);
 	}
     },
 	referenced_variables_list);
 
-    gen_sort_list(new_decl, compare_entities); /* sorted for determinism */
+    /* sorted for determinism... however it breaks parameter dependencies,
+     * that will have to be insured latter on.
+     */
+    gen_sort_list(new_decl, compare_entities);
     entity_declarations(module) = new_decl;
 
     ifdebug(2) {
