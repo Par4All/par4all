@@ -1,6 +1,6 @@
 /* HPFC module by Fabien COELHO
  *
- * $RCSfile: hpfc.c,v $ ($Date: 1996/10/15 14:44:45 $, )
+ * $RCSfile: hpfc.c,v $ ($Date: 1996/10/15 18:11:02 $, )
  * version $Revision$
  */
  
@@ -633,6 +633,10 @@ bool hpfc_compile(string name)
 	store_new_host_variable(module, module);
 	store_new_node_variable(module, module);
     }
+
+    /* ??? */
+    /* db_unput_a_resource(DBR_PROPER_REFERENCES, name); */
+    db_unput_a_resource(DBR_CUMULATED_REFERENCES, name);
 
     reset_current_module_entity();
     save_hpfc_status();
