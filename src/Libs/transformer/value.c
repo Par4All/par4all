@@ -160,6 +160,9 @@
   * $Id$
   *
   * $Log: value.c,v $
+  * Revision 1.26  2003/07/24 08:54:49  irigoin
+  * useless argument used to avoid a useless compiler warning.
+  *
   * Revision 1.25  2003/07/24 08:47:21  irigoin
   * Function hash_value_to_name_undefined_p() added to be able to use some
   * semantics and transformer functions when the mappings are not available,
@@ -466,7 +469,7 @@ bool global_new_value_p(entity e)
      strcmp(suf, NEW_VALUE_SUFFIX) == 0;
   */
 
-  pips_assert("global_new_value", new == FALSE);
+  pips_assert("global_new_value", new == FALSE && e==e);
 
   return new;
 }
