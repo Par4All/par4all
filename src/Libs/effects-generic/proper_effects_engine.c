@@ -34,9 +34,7 @@
 #include "effects-generic.h"
 
 
-/*********************************************************************************/
-/* TO CONTRACT PROPER EFFECTS                                                    */
-/*********************************************************************************/
+/************************************************ TO CONTRACT PROPER EFFECTS */
 
 static contract_p = TRUE;
 
@@ -46,9 +44,7 @@ set_contracted_proper_effects(bool b)
     contract_p = b;
 }
 
-/*********************************************************************************/
-/* LOCAL STACK FOR LOOP RANGE EFFECTS                                            */
-/*********************************************************************************/
+/**************************************** LOCAL STACK FOR LOOP RANGE EFFECTS */
 
 /* Effects on loop ranges have to be added to inner statements to model 
  * control dependances (see loop filter for PUSH).
@@ -257,7 +253,8 @@ generic_proper_effects_of_external(entity func, list args)
 
     if (! entity_module_p(func)) 
     {
-	pips_error("proper_effects_of_external", "%s: bad function\n", func_name);
+	pips_error("proper_effects_of_external", 
+		   "%s: bad function\n", func_name);
     }
     else 
     {
