@@ -9,6 +9,9 @@
                             < MODULE.code
 
    $Log: claire_prettyprinter.c,v $
+   Revision 1.25  2005/02/14 09:13:20  hurbain
+   *** empty log message ***
+
    Revision 1.24  2004/12/20 13:27:03  hurbain
    Debug
 
@@ -258,7 +261,7 @@ static string claire_reference(reference r)
   string result = strdup(EMPTY), old, svar;
   MAP(EXPRESSION, e, 
   {
-    string s = claire_expression(e);
+    string s = strdup(claire_expression(e));
     
     old = result;
     result = strdup(concatenate(old, OPENBRACKET, s, CLOSEBRACKET, NULL));
@@ -363,7 +366,7 @@ static string this_entity_clairedeclaration(entity var)
     {
       variable v = type_variable(t);  
       string sd;
-      sd = claire_dim_string(variable_dimensions(v), name);
+      sd = strdup(claire_dim_string(variable_dimensions(v), name));
     
       result = strdup(concatenate(result, sd, NULL));
       break;
@@ -408,8 +411,8 @@ claire_declarations(entity module,
     debug(2, "\n Prettyprinter declaration for variable :",claire_entity_local_name(var));   
     if (consider_this_entity(var))
       {
-	string old = result;
-	string svar = this_entity_clairedeclaration(var);
+	string old = strdup(result);
+	string svar = strdup(this_entity_clairedeclaration(var));
 	result = strdup(concatenate(old, !first && !lastsep? separator: "",
 				    svar, lastsep? separator: "", NULL));
 	free(old);
@@ -760,7 +763,7 @@ static string claire_call_from_loopnest(call c, int task_number){
   string first_result = "";
   bool first = TRUE;
   bool input_provided = FALSE, output_provided = FALSE;
-  string name = claire_entity_local_name(called);
+  string name = strdup(claire_entity_local_name(called));
 
   if(!same_string_p(name, "="))
     pips_user_error("Only assignation allowed here.\n");
@@ -873,7 +876,8 @@ static call claire_loop_from_loop(loop l, string * result, int task_number){
 
   u = atoi(claire_expression(range_upper(loop_range(l))));
   low = atoi(claire_expression(range_lower(loop_range(l))));
-  *up = strdup(int_to_string(u - low));
+  printf("%i %i\n", u, low);
+  *up = strdup(int_to_string(u - low+1));
 	       //*up = claire_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
   *claire_name = claire_entity_local_name(loop_index(l));
   if( (*claire_name)[0] == 'M'){
@@ -922,9 +926,7 @@ static string claire_loop_from_sequence(loop l, int task_number){
 
 
   /* Initialize result string with the declaration of the task */
-  string result = strdup(concatenate(*taskname, 
-				     " :: TASK(unitSpentTime = vartype!(1),"
-				     NL, TAB, "exLoopNest = LOOPNEST(deep = ", NULL));
+  string result;
 
   instruction ins = statement_instruction(s);
   list li = statement_declarations(s);
@@ -938,6 +940,9 @@ static string claire_loop_from_sequence(loop l, int task_number){
 
 
   *taskname = strdup(concatenate("T_", int_to_string(task_number), NULL));
+  result = strdup(concatenate(*taskname, 
+			      " :: TASK(unitSpentTime = vartype!(1),"
+			      NL, TAB, "exLoopNest = LOOPNEST(deep = ", NULL));
   gen_array_append(tasks_names, taskname);
   /* (re-)initialize task-scoped arrays*/
   extern_indices_array = gen_array_make(0);
@@ -949,7 +954,7 @@ static string claire_loop_from_sequence(loop l, int task_number){
   *name = claire_entity_local_name(loop_index(l));
   u = atoi(claire_expression(range_upper(loop_range(l))));
   low = atoi(claire_expression(range_lower(loop_range(l))));
-  *up = strdup(int_to_string(u - low));
+  *up = strdup(int_to_string(u - low+1));
   //*up = claire_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
 
   if((*name)[0] == 'M'){
@@ -1051,8 +1056,8 @@ static string claire_sequence_from_task(sequence seq){
   int task_number = 0;
   MAP(STATEMENT, s,
   {
-    string oldresult = result;
-    string current = claire_statement_from_sequence(s, task_number);
+    string oldresult = strdup(result);
+    string current = strdup(claire_statement_from_sequence(s, task_number));
 
     if(strlen(current)==0) {
       free(current);
@@ -1075,9 +1080,9 @@ static string claire_tasks(statement stat){
   int j;
   instruction i;
   string result = "tasks\n";
-    if(statement_number(stat) < 0)
+    if(statement_undefined_p(stat))
     {
-      pips_user_error("statement error");
+      pips_internal_error("statement error");
     }
     i = statement_instruction(stat);
   tasks_names = gen_array_make(0);
@@ -1152,6 +1157,10 @@ bool print_claire_code(string module_name)
   filename = strdup(concatenate(dir, "/", claire, NULL));
   stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
+  if(statement_undefined_p(stat))
+    {
+      pips_internal_error("No statement for module %s\n", module_name);
+    }
   set_current_module_entity(module);
   set_current_module_statement(stat);
 
