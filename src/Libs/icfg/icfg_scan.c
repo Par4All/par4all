@@ -175,8 +175,6 @@ static void call_filter(call c)
 	append_icfg_file (r, callee_name);
 	/* store it to the statement mapping */
 	update_statement_icfg (current_stmt_head(), r);
-
-	pips_debug(9, "text %sdefined\n", r==text_undefined ? "un" : "");
     }
     return;
 }
@@ -263,10 +261,9 @@ static void instruction_rewrite (instruction i)
     {
 	pips_debug (5,"dealing with a block, appending texts\n");
 
-	MAPL(pm, {   
-	    statement s = STATEMENT(CAR(pm));
-	    MERGE_TEXTS(t, (text) load_statement_icfg (s));
-	}, instruction_block (i));
+	MAP(STATEMENT, s, 
+	    MERGE_TEXTS(t, load_statement_icfg(s)),
+	    instruction_block(i));
 
 	/* store it to the statement mapping */
 	update_statement_icfg (current_stmt_head (), t);
@@ -284,7 +281,7 @@ static void instruction_rewrite (instruction i)
 	   I do not know if it's good or not but beware the bugs!!! */
 	CONTROL_MAP(c, {
 	    statement st = control_statement(c) ;
-	    MERGE_TEXTS(t, (text) load_statement_icfg (st));
+	    MERGE_TEXTS(t, load_statement_icfg (st));
 	}, ct, blocs) ;
 	
 	gen_free_list(blocs) ;
