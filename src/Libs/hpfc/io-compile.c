@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/06/07 12:02:17 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/09/01 15:47:56 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -162,14 +162,14 @@ statement stat, *hp, *np;
 	     apr = effect_approximation(e);
 	 
 	 debug(3, "io_efficient_compile", 
-	       "array %s\n", entity_local_name(array));
+	       "array %s\n", entity_name(array));
 
 	 if ((!array_distributed_p(array)) && action_read_p(act)) 
 	 {
 	     debug(7, 
 		   "io_efficient_compile", 
 		   "skipping array %s movements - none needed\n", 
-		   entity_local_name(array));
+		   entity_name(array));
 	     continue;
 	 }
 
@@ -888,7 +888,8 @@ list *plparam, *plproc, *plscan, *plrebuild;
      */
     lrebuild = 
 	simplify_deducable_variables(*psyst,
-				     gen_nreverse(hpfc_order_variables(all)),
+				     gen_nreverse(hpfc_order_variables(all,
+								       TRUE)),
 				     &lscan);
 
     /*
@@ -993,56 +994,9 @@ list vars, *pleftvars;
     return(result);
 }
 
-
-/*
- * list hpfc_order_variables(list)
- *
- * the input list of entities is ordered so that:
- * PSI_i's, GAMMA_i's, DELTA_i's, IOTA_i's, ALPHA_i's, LALPHA_i's...
+/* output 7 entities created by creation if in list le
  */
-list hpfc_order_variables(le)
-list le;
-{
-    list
-	result = NIL;
-
-    result = 
-	gen_nconc(result,
-		  hpfc_order_specific_variables
-		  (le, get_ith_processor_dummy));
-
-    result = 
-	gen_nconc(result,
-		  hpfc_order_specific_variables
-		  (le, get_ith_cycle_dummy));
-
-    result = 
-	gen_nconc(result,
-		  hpfc_order_specific_variables
-		  (le, get_ith_block_dummy));
-
-    result = 
-	gen_nconc(result,
-		  hpfc_order_specific_variables
-		  (le, get_ith_shift_dummy));
-
-    result = 
-	gen_nconc(result,
-		  hpfc_order_specific_variables
-		  (le, get_ith_array_dummy));
-
-    result = 
-	gen_nconc(result,
-		  hpfc_order_specific_variables
-		  (le, get_ith_local_dummy));
-
-    pips_assert("hpfc_order_variables",
-		gen_length(result)==gen_length(le));
-    
-    return(result);
-}
-
-list hpfc_order_specific_variables(le, creation)
+static list hpfc_order_specific_variables(le, creation)
 list le;
 entity (*creation)();
 {
@@ -1059,6 +1013,79 @@ entity (*creation)();
 	    result = CONS(ENTITY, dummy, result);
     }
 
+    return(result);
+}
+
+/*
+ * list hpfc_order_variables(list)
+ *
+ * the input list of entities is ordered so that:
+ * PSI_i's, GAMMA_i's, DELTA_i's, IOTA_i's, ALPHA_i's, LALPHA_i's...
+ */
+list hpfc_order_variables(le, number_first)
+list le;
+bool number_first;
+{
+    list
+	result = NIL;
+
+    result = 
+	gen_nconc(result,
+		  hpfc_order_specific_variables
+		  (le, get_ith_processor_dummy));
+    
+    if (number_first)
+    {
+	int i;
+	list l = NIL, lr = NIL;
+
+	for (i=7; i>0; i--)
+	    l = CONS(ENTITY, get_ith_array_dummy(i),
+		CONS(ENTITY, get_ith_shift_dummy(i),
+		CONS(ENTITY, get_ith_block_dummy(i),
+		CONS(ENTITY, get_ith_cycle_dummy(i),
+		       l))));
+
+	MAPL(ce,
+	 {
+	     entity e = ENTITY(CAR(ce));
+
+	     if (gen_find_eq(e, le)==e) 
+		 lr = CONS(ENTITY, e, lr); /* reverse! */
+	 },
+	     l);
+
+	gen_free_list(l);
+	result = gen_nconc(result, lr);
+    }
+    else
+    {
+	result = 
+	    gen_nconc(result,
+		      hpfc_order_specific_variables(le, get_ith_cycle_dummy));
+	
+	result = 
+	    gen_nconc(result,
+		      hpfc_order_specific_variables(le, get_ith_block_dummy));
+	
+	result = 
+	    gen_nconc(result,
+		      hpfc_order_specific_variables(le, get_ith_shift_dummy));
+	
+	result = 
+	    gen_nconc(result,
+		      hpfc_order_specific_variables(le, get_ith_array_dummy));
+    }
+
+    result = 
+	gen_nconc(result,
+		  hpfc_order_specific_variables(le, get_ith_local_dummy));
+
+    pips_assert("hpfc_order_variables",
+		gen_length(result)==gen_length(le));
+
+    
+    
     return(result);
 }
 
