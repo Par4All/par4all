@@ -175,8 +175,13 @@ pips_main(int argc, char ** argv)
 	/* Initialize workspace
 	 */
 	if (gen_array_nitems(source_files)>0) {
-	    db_create_workspace(wspace);
-	    create_workspace(source_files);
+	    if(db_create_workspace(wspace)) {
+		create_workspace(source_files);
+	    }
+	    else {
+		user_log("Cannot create workspace %s!\n", wspace);
+		exit(1);
+	    }
 	} else {
 	    /* Workspace must be opened */
 	    if (!open_workspace(wspace)) {
