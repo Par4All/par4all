@@ -82,6 +82,7 @@ echo:; @echo $(ECHO)
 
 $(ARCH)/%.o: %.c ; $(COMPILE) $< -o $@
 $(ARCH)/%.o: %.f ; $(F77CMP) $< -o $@
+$(ARCH)/%.o: $(ARCH)
 
 %.class: %.java; $(JAVAC) $<
 %.h: %.class; $(JNI) $*
@@ -151,13 +152,20 @@ clean: arch-clean
 arch-clean:; -$(RMDIR) $(ARCH)
 
 # multiphase compilation
-phase4: install_rtm
-phase5: install_htm 
+phase1:
+phase2:
+phase3:
+#phase4: install_rtm
+#phase5: install_htm 
+
+ifdef LIB_OBJECTS
+$(LIB_OBJECTS): $(ARCH)
+endif # LIB_OBJECTS
 
 # includes
 ifdef INC_TARGET
 INSTALL_INC	+=   $(INC_TARGET)
-endif
+endif # INC_TARGET
 
 ifdef INSTALL_INC
 phase1: install_inc
@@ -171,10 +179,12 @@ endif # INSTALL_INC
 # libraries
 ifdef LIB_TARGET
 INSTALL_LIB	+=   $(LIB_TARGET)
-endif
+endif # LIB_TARGET
 
 ifdef INSTALL_LIB
 phase2:	install_lib
+
+$(INSTALL_LIB): $(ARCH)
 
 $(LIB.d):; $(MKDIR) $(LIB.d)
 
@@ -185,10 +195,12 @@ endif # INSTALL_LIB
 # binaries
 ifdef BIN_TARGET
 INSTALL_BIN	+=   $(BIN_TARGET)
-endif
+endif # BIN_TARGET
 
 ifdef INSTALL_BIN
 phase2: install_bin
+
+$(INSTALL_BIN): $(ARCH)
 
 $(BIN.d):; $(MKDIR) $(BIN.d)
 
