@@ -1,4 +1,4 @@
-/* $RCSfile: generate.c,v $ ($Date: 1995/04/21 14:50:06 $, )
+/* $RCSfile: generate.c,v $ ($Date: 1995/07/20 18:40:39 $, )
  * version $Revision$
  * 
  * Fabien Coelho, May 1993
@@ -51,11 +51,10 @@ list *lhp, *lnp;
 
     /* generation of the code 
      */ 
-    MAPL(cs,
+    MAP(SYNTAX, s,
      { 	 
 	 list lhost; 	 
 	 list lnode;
- 	 syntax s = SYNTAX(CAR(cs));
  	 	
 	 debug(8, "generate_c1_beta", "considering reference to %s\n", 	
 	       entity_name(reference_variable(syntax_reference(s))));
@@ -150,12 +149,10 @@ list *lhp, *lnp;
     /*
      * generation of the code to get the necessary values... 
      */
-    MAPL(cs, 
+    MAP(SYNTAX, s, 
      { 	 
 	 list lnotcomp;
  	 list lcomp;
- 	 syntax
-	     s = SYNTAX(CAR(cs)); 	 	
 
 	 debug(8, "generate_c1_alpha", "considering reference to %s\n",  	
 	       entity_name(reference_variable(syntax_reference(s))));
@@ -451,8 +448,7 @@ list *lsp, *lindsp;
     }
 
     debug(8, "generate_compute_local_indices", "result:\n");
-    MAPL(cs, DEBUG_STAT(8, entity_name(node_module), STATEMENT(CAR(cs))),
-	 (*lsp));
+    MAP(STATEMENT, s, DEBUG_STAT(8, entity_name(node_module), s), (*lsp));
 	      
 }
 
@@ -587,14 +583,10 @@ list *lstatp, lw, lr;
     comp = SYNTAX(CAR(lw));
     statcc = st_compute_current_computer(syntax_reference(comp));
 
-    MAPL(cs,
+    MAP(SYNTAX, s,
      {
-	 syntax
-	     s = SYNTAX(CAR(cs));
-	 list
-	     lco = NIL;
-	 list
-	     lnotco = NIL;
+	 list lco = NIL;
+	 list lnotco = NIL;
 
 	 generate_read_of_ref_for_computer(s, &lco, &lnotco);
 
@@ -603,11 +595,10 @@ list *lstatp, lw, lr;
      },
 	 lr);
 
-    MAPL(cs,
+    MAP(SYNTAX, s,
      {
 	 list lco = NIL;
 	 list lnotco = NIL;
-	 syntax s = SYNTAX(CAR(cs));
 	 reference r = syntax_reference(s);
 	 entity var = reference_variable(r);
 	 entity temp = NewTemporaryVariable(get_current_module_entity(),
@@ -670,9 +661,7 @@ list *lstatp, lw, lr;
 
     ifdebug(8)
     {
-	MAPL(cs,
-	     DEBUG_STAT(8, entity_name(node_module), STATEMENT(CAR(cs))),
-	     lcompw);
+	MAP(STATEMENT, s, DEBUG_STAT(8, entity_name(node_module), s), lcompw);
     }
 
     debug(6, "generate_parallel_body", 
@@ -681,9 +670,8 @@ list *lstatp, lw, lr;
 
     ifdebug(8)
     {
-	MAPL(cs,
-	     DEBUG_STAT(8, entity_name(node_module),STATEMENT(CAR(cs))),
-	     lnotcompw);
+	MAP(STATEMENT, s, DEBUG_STAT(8, entity_name(node_module), s),
+	    lnotcompw);
     }
 
     statbody = UpdateStatementForModule(node_module, body);
@@ -703,9 +691,7 @@ list *lstatp, lw, lr;
     ifdebug(6)
     {
 	debug(6, "generate_parallel_body", "final statement:\n");
-	MAPL(cs,
-	     DEBUG_STAT(6, entity_name(node_module),STATEMENT(CAR(cs))),
-	     (*lstatp));
+	MAP(STATEMENT, s, DEBUG_STAT(6, entity_name(node_module),s), (*lstatp));
     }
 }
 
