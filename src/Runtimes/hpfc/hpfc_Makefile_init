@@ -1,12 +1,12 @@
 #
-# $RCSfile: hpfc_Makefile_init,v $ ($Date: 1995/09/19 17:59:15 $, )
+# $RCSfile: hpfc_Makefile_init,v $ ($Date: 1995/09/19 18:01:59 $, )
 # version $Revision$
 # got on %D%, %T%
 #
 
 MAKEFILE = Makefile
-INCLUDED = Makefile.include
 HPFC_MAKEFILE = hpfc_Makefile
+INCLUDED = hpfc_Makefile.include
 MOVE = mv
 M4 = $(HPFC_M4)
 
@@ -14,11 +14,12 @@ M4 = $(HPFC_M4)
 
 all:
 
-$(MAKEFILE): $(HPFC_MAKEFILE)
+$(INCLUDED): $(HPFC_MAKEFILE)
 	$(M4) -D ARCHITECTURE=$(PVM_ARCH) hpfc_architecture_m4_macros \
-		$(HPFC_MAKEFILE) >> $(INCLUDED)
+		$(HPFC_MAKEFILE) > $(INCLUDED)
 
 #
+
 include $(INCLUDED)
 
 #
