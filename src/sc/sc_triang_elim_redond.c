@@ -1,7 +1,7 @@
  /* package sc
   *
   * SCCS stuff:
-  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1996/09/20 18:09:00 $, )
+  * $RCSfile: sc_triang_elim_redond.c,v $ ($Date: 1997/10/23 13:54:19 $, )
   * version $Revision$
   * got on %D%, %T%
   */
@@ -40,13 +40,15 @@ static void set_info_for_compare(base, sort_base, inner_first, complex_first)
 Pbase base, sort_base;
 boolean inner_first, complex_first;
 {
+    Pbase btmp=BASE_NULLE;
     assert(BASE_NULLE_P(rbase_for_compare) &&
 	   BASE_NULLE_P(others_for_compare));
 
     /* the base is reversed! inner indexes first!!
      */
     rbase_for_compare  = base_normalize(base_reversal(sort_base));
-    others_for_compare =  base_normalize(base_difference(base, sort_base));
+    btmp = base_difference(base, sort_base);
+    others_for_compare =  base_normalize(btmp);
     inner_for_compare = inner_first;
     complex_for_compare = complex_first;
 }
@@ -108,12 +110,12 @@ Pvecteur v;
       int result = (e);\
       fprintf(stderr, "[compare_the_constraints]\n");\
       vect_debug(v1); vect_debug(v2);\
-      fprintf(stderr, "%s\n", result==0 ? "=" : result>0 ? ">" : "<"); \
+      fprintf(stderr, "%s\n", result==0 ? "=" : (result>0 ? ">" : "<")); \
       return(result);\
 }
 
-#define RETURN_HARDER(b) return(complex_for_compare ? (b) : -(b))
-#define RETURN_ORDER(b) return(inner_for_compare ? (b) : -(b))
+#define RETURN_HARDER(b) RESULT(complex_for_compare ? (b) : -(b))
+#define RETURN_ORDER(b) RESULT(inner_for_compare ? (b) : -(b))
 #define same_sign_p(v,w) ((value_neg_p(v) && value_neg_p(w)) || \
 			  (value_pos_p(v) && value_pos_p(w)))
 
@@ -131,8 +133,8 @@ Pcontrainte *pc1, *pc2;
     Pbase b, high=NULL;
 
     /*  for each inner first indexes,
-     *  the first constraint with a null coeff while the other one is non null
-     *  is the simplest.
+     *  the first constraint with a null coeff while the other one is non 
+     *  null is the simplest.
      */
     for (i=1, b=rbase_for_compare; !BASE_NULLE_P(b); i++, b=b->succ)
     {
@@ -146,9 +148,9 @@ Pcontrainte *pc1, *pc2;
 
 	if (null_1 ^ null_2) 
 	    if (irank==0)
-		RETURN_ORDER(value_compare(null_1,null_2));
+	    { RETURN_ORDER(value_compare(null_1,null_2));}
 	    else
-		RETURN_HARDER(value_compare(null_1,null_2));
+	    { RETURN_HARDER(value_compare(null_1,null_2));} 
 
 	if (irank==0 && (!null_1||!null_2)) 
 	    val=val_1, val_p=val_2, irank=i, high=b;
