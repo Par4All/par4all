@@ -30,12 +30,12 @@
 
 #include "wp65.h"
 
-int offset_dim1 =0;
-int offset_dim2 =0;
+static Value offset_dim1 = VALUE_ZERO;
+static Value offset_dim2 = VALUE_ZERO;
 
 static entity tile_indice_entity1;
 static boolean ref_in_statement1;
-static int var_minmax = 0;
+static Value var_minmax = VALUE_ZERO;
 static Variable var_to_evaluate;
 
 static void ref_found_p(reference ref)
@@ -64,7 +64,7 @@ static void eval_var(reference ref)
     expression expr1 = expression_undefined; 
     expression expr2 = expression_undefined;
     cons *expr=NIL;
-    int coeff =0;
+    Value coeff = VALUE_ZERO;
     boolean debut=TRUE;
     ind1 = reference_indices(ref);
     
@@ -77,9 +77,11 @@ static void eval_var(reference ref)
 	      Pvecteur pv1 = (Pvecteur) normalized_linear(norm1); 
 	      fprintf(stderr,"\n expression->vecteur:");
 		  vect_fprint(stderr,pv1,entity_local_name);
-	      if ((coeff = vect_coeff(var_to_evaluate,pv1))!=0) {
-		  vect_chg_coeff(&pv1,var_to_evaluate,0);
-		  vect_add_elem(&pv1,TCST,var_minmax*coeff);
+	      if (value_notzero_p(coeff = vect_coeff(var_to_evaluate,pv1)))
+	      {
+		  vect_chg_coeff(&pv1,var_to_evaluate,VALUE_ZERO);
+		  vect_add_elem(&pv1,TCST,
+				value_mult(var_minmax,coeff));
 		  fprintf(stderr,"\n nouvelle expression:");
 		  vect_fprint(stderr,pv1,entity_local_name);
 		  expr2 = make_vecteur_expression(pv1);
@@ -213,7 +215,8 @@ int first_parallel_level,last_parallel_level;
     int td = base_dimension(tile_basis_in_tile_basis);
     int l,t;
     int keep_indice[10]; 
-    int min,max,first_indice;  
+    Value min,max;
+    int first_indice;  
     debug(8,"make_scanning_over_tiles", "begin for module %s\n",
 	  module_local_name(module));
 
@@ -288,7 +291,7 @@ int first_parallel_level,last_parallel_level;
 			      &min,
 			      &max); 
 	ind = (entity) variable_of_rank(tile_basis_in_tile_basis, t);
-	if ( min==max && !reference_in_statement_p(s,ind)) { 
+	if ( value_eq(min,max) && !reference_in_statement_p(s,ind)) { 
 	    fprintf(stderr,"indice de tuile inutile %d, %s\n",t,
 		    entity_local_name(ind));
 	    keep_indice[t] = FALSE;
@@ -578,16 +581,11 @@ int first_parallel_level,last_parallel_level;
 
     /* test pour optimiser le nid de boucles genere */
     for (t =id; t >= 1; t--) {
-	int min,max; 
+	Value min,max; 
 	Variable var = variable_of_rank(local_basis, t);
 	
 	Psysteme sctmp = sc_dup(ordered_tile_domain);
 	sc_minmax_of_variable(sctmp,var,&min,&max); 
-	
-	/* if ( min==max) { 
-	    fprintf(stderr,"remplacement de %s par %d \n",entity_local_name((entity) var),min);
-	    eval_variable_in_statement(module, s,var,min);
-	} */
     }
 
 
@@ -978,7 +976,7 @@ Pbase *new_index_base;
 {
     cons * expr;
 
- Psysteme sc_array_function = sc_new();
+    Psysteme sc_array_function = sc_new();
     Psysteme sc2;
     Pcontrainte pc,pc3=NULL;
     Pvecteur pv,pv1,pv2,pv3;
@@ -987,7 +985,7 @@ Pbase *new_index_base;
     reference r;
     cons * ind; 
     Variable var=VARIABLE_UNDEFINED;
-    int cst;
+    Value cst = VALUE_ZERO;
     Pcontrainte pc1,pc2;
     expression expr1;
 
@@ -1055,13 +1053,13 @@ Pbase *new_index_base;
 	    pv1 = (Pvecteur) normalized_linear(norm);
 	    pv3 = vect_substract(pv1,pc2->vecteur);
 	    if (vect_size(pv3) == 1) {
-		if ((cst=vecteur_val(pv3))) {
+		if (value_notzero_p(cst=vecteur_val(pv3))) {
 		    if (!new_variable) {
 			new_variable = TRUE;
 			var = sc_add_new_variable_name(module,
 						    sc_array_function);
 		    
-			vect_chg_coeff(&pv_sup,var,1);
+			vect_chg_coeff(&pv_sup,var,VALUE_ONE);
 		    }
 		    vect_chg_coeff(&pc->vecteur,var,cst);
 		}
@@ -1105,8 +1103,6 @@ Pbase *new_index_base;
     return(sc_array_function);
 }
 
-
-
 static void initialize_offsets(list lt)
 {
     list ltmp = LIST(CAR(lt));
@@ -1115,6 +1111,7 @@ static void initialize_offsets(list lt)
     expression expr1 = EXPRESSION(CAR(lind));
     normalized norm = (normalized) NORMALIZE_EXPRESSION(expr1);
     Pvecteur  pv1 = (Pvecteur) normalized_linear(norm);
+
     offset_dim1 =  vect_coeff(TCST,pv1);
     if (CDR(lind) != NIL) { 
 	expr1 = EXPRESSION(CAR(CDR(lind)));
@@ -1442,12 +1439,13 @@ Pbase member;
     int d = base_dimension(origin);
     matrice IP = matrice_new(d,d);
     Pcontrainte c1;
-    int i, j, k;
+    int i, j;
+    Value k;
 
     debug(8,"tile_membership", "begin\n");
 
     pips_assert("tile_membership", d == base_dimension(member)); 
-    pips_assert("tile_membership", DENOMINATOR(P) == 1);
+    pips_assert("tile_membership", value_one_p(DENOMINATOR(P)));
 
     ifdebug(8) {
 	(void) fprintf(stderr,"Partitioning matrix P:\n");
@@ -1471,7 +1469,7 @@ Pbase member;
 	for ( j=1; j<=d; j++) {
 	    vect_add_elem(&contrainte_vecteur(c), 
 			  variable_of_rank(member,i),
-			  -ACCESS(IP, d, j, i));
+			  value_uminus(ACCESS(IP, d, j, i)));
 	    vect_add_elem(&contrainte_vecteur(c), 
 			  variable_of_rank(origin,i),
 			  ACCESS(IP, d, j, i));
@@ -1479,7 +1477,7 @@ Pbase member;
         sc_add_inegalite(m, c);
 	c1 = contrainte_dup(c);
 	contrainte_chg_sgn(c1);
-	vect_add_elem(&contrainte_vecteur(c1), TCST, -(k-1));
+	vect_add_elem(&contrainte_vecteur(c1), TCST, value_minus(VALUE_ONE,k));
 	sc_add_inegalite(m, c1);
     }
 
