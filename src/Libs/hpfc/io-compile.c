@@ -2,7 +2,7 @@
  * HPFC module by Fabien COELHO
  *
  * SCCS stuff:
- * $RCSfile: io-compile.c,v $ ($Date: 1994/12/22 16:52:23 $, ) version $Revision$,
+ * $RCSfile: io-compile.c,v $ ($Date: 1994/12/28 09:17:05 $, ) version $Revision$,
  * got on %D%, %T%
  * $Id$
  */
@@ -89,32 +89,8 @@ tag move;
 			     load_statement_postcondition(stat)))); 
 }
 
-/*
- * bool io_efficient_compilable_p(stat)
- * statement stat;
- *
- * checks for the compilability of the statement.
- *
+/*   compile an io statement
  */
-bool io_efficient_compilable_p(stat)
-statement stat;
-{
-    bool
-	compilable = TRUE;
-
-    debug(4, "io_efficient_compilable_p", "statement 0x%x\n", stat);
-
-    assert(load_statement_only_io(stat)==TRUE);
-
-    /*
-     * ok, no conditions are put here, what means that any statement that
-     * only contains I/O may be compiled efficiently, if the informations
-     * (especially regions) are not too bad.
-     */
-
-    return(compilable);
-}
-
 void io_efficient_compile(stat, hp, np)
 statement stat, *hp, *np;
 {
@@ -134,19 +110,6 @@ statement stat, *hp, *np;
     debug(1, "io_efficient_compile", "compiling!\n");
     debug(2, "io_efficient_compile", "statement 0x%x, %d arrays\n",
 	  stat, gen_length(entities));
-
-    /*
-     * no array to deal with: the old function should work!
-     * not needed!
-     */
-    /*
-    if ENDP(entities)
-    {
-	debug(5, "io_efficient_compile", "old stuff used\n");
-	hpfcompileIO(stat, hp, np);
-	return;
-    }
-    */
 
     MAPL(ce,
      {
