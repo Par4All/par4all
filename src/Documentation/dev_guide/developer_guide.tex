@@ -1,6 +1,6 @@
 %
 %% $RCSfile: developer_guide.tex,v $ (version $Revision$)
-%% $Date: 1996/08/26 12:47:06 $, 
+%% $Date: 1996/10/15 18:16:29 $, 
 % PIPS development environment documentation; translated and updated from 
 % dret146.f.tex
 %
@@ -42,17 +42,18 @@
 \newpage
 \section*{Introduction}
 
-This document aims at presenting PIPS' development environment. It is not
-linearly organized: PIPS is made of several, sometimes interdependent,
-components.  This paper thus begins with a presentation of PIPS directories.
-Then the shell environment is described. The next two chapters are devoted
-to two external tools on which PIPS relies: NewGen and the linear library.
+This document aims at presenting PIPS' development environment. It is
+not linearly organized: PIPS is made of several, sometimes
+interdependent, components.  This paper thus begins with a
+presentation of PIPS directories.  Then the shell environment is
+described. The next two chapters are devoted to two external tools on
+which PIPS relies: NewGen and the linear library.
 Section~\ref{sec:makefiles} will then present PIPS' make file policy.
-Sections~\ref{sec:library_internal_organization}and~\ref{sec:pass_organization}
-are devoted to PIPS libraries and passes. The next section briefly describes
-some conventions usually respected when developing in PIPS\@. The last two
-sections describe the {\em bug policy\/} of PIPS and some save and restore
-information.
+Sections~\ref{sec:library_internal_organization}
+and~\ref{sec:pass_organization} are devoted to PIPS libraries and
+passes. The next section briefly describes some conventions usually
+respected when developing in PIPS\@. The last two sections describe
+the {\em bug policy\/} of PIPS and some save and restore information.
 
 This manual is not exhaustive. You can add your own sections and update
 existing ones if you find missing or erroneous information.
@@ -79,7 +80,7 @@ root of PIPS current version, and \verb+$PIPS_ARCH+.
 
 It holds the current architecture. if not set \verb+.+ (dot) is
 assumed. A PIPS
-architecture is to be understand not as strictly as a computer
+architecture is to be understood not as strictly as a computer
 architecture. It simply a set of tools (compilers, linkers, but also
 compiler options\ldots) to be used for compiling PIPS. Thus you can have
 several pips architectures that compile and run on a very same machine.
@@ -151,8 +152,8 @@ passes. You can find the following subdirectories:
 \subsubsection{Bin}
 
 Pips current binaries that can be executed. These binaries include
-\texttt+pips+ (the main program), \texttt+tpips+ (the same program with a
-interactive interface based on the readline library) and \texttt+wpips+
+\texttt{pips} (the main program), \texttt{tpips} (the same program with a
+interactive interface based on the readline library) and \texttt{wpips}
 (the window interface). It also includes other architecture-dependent
 executables. Binaries for different architectures can be stored in
 different sub-directories depending on the value of \verb+$PIPS_ARCH+ %%$
@@ -161,7 +162,7 @@ Section~\ref{sec:shell}.
     
 \subsubsection{Share}
 
-non architecture-dependent executables needed or used by pips. They
+Non architecture-dependent executables needed or used by pips. They
 include shell (sh and csh), sed, awk, perl and lisp scripts! Examples:
 \begin{itemize}
 \item  \verb+Init, Select, Perform, Display, Pips+:
@@ -202,7 +203,8 @@ Html documentation of PIPS. Some real html files, and some generated from
 \subsubsection{Runtime}
 
 Environments needed for executing pips-compiled files.  Namely
-\texttt{hpfc} and \texttt{wp65} use a PVM-based runtime.  This directory
+\texttt{hpfc} and \texttt{wp65} use a PVM-based runtime and also
+\texttt{xPOMP} the graphical user programming interface.  This directory
 includes the files needed for executing the generated files (as header and
 make files or compiled libraries), but not necessarily the corresponding
 sources.
@@ -479,6 +481,26 @@ In the future, {\tt gdb} macros compatible with Newgen generated C macros
 will be provided. (Well, we just need GNU people to add interactive macros
 to gdb and then we will provide the macros:-)
 
+Any way, with the Emacs debugger mode some keyboard accelerators can
+be defined such as:
+\begin{verbatim}
+(add-hook 'gdb-mode-hook
+ (function
+  (lambda ()
+   (gud-def gud-affiche-domain-pointe "p Domains[%e->i]" "d"
+            "Display the domain (that is its type) of the NewGen object.")
+   (gud-def gud-affiche-nom-entite "p (%e+2)->s" "e"
+            "Display the name of an entity.")
+   (gud-def gud-affiche-expression "p print_expression(%e)" "E"
+            "Display an expression.")
+   (gud-def gud-affiche-statement "p print_statement(%e)" "S"
+            "Print a statement.")
+  )
+ )
+)
+\end{verbatim}
+In such a way, typing \verb|^C ^A S| with the cursor on a variable of
+type statement will ask gdb to display this statement.
 
 
 \section{Linear library}
@@ -488,9 +510,10 @@ The linear library is also independent from PIPS. Its development was funded
 by the French organization CNRS.
 
 
-Its root directory is \verb+/projects/C3/Linear/+ (\verb+$LINEAR_DIR+). This
-directory is further divided into similarily to Pips and Newgen.
-Thus there are Production (\verb+$LINEAR_ROOT+) and Development directories. 
+Its root directory is \verb+/projects/C3/Linear/+
+(\verb+$LINEAR_DIR+). This directory is further divided into
+similarily to Pips and Newgen.  Thus there are Production
+(\verb+$LINEAR_ROOT+) and Development directories.
 \verb+$LINEAR_ARCH+ (which defaults to \verb+$PIPS_ARCH+ and \verb|.|
 (dot)) can be used for building the library.
 
@@ -849,16 +872,16 @@ myphase > MODULE.myres
 \begin{verbatim}
 DBR_MYRES,    
 \end{verbatim}
-    in the array {\tt load\_order[]} which defins the order in which the
+    in the array {\tt load\_order[]} which defines the order in which the
     resources must be unloaded when a module is closed (see the user manual).
     
   \item Update the file {\tt methods\_io.c} by adding the following line to
     the array {\tt method\_map[]}:
 \begin{verbatim}
-{DBR_MYRES,(chunk *(*)()) undefined\_method, 
-           undefined\_method,
-           undefined\_method, 
-           (bool (*)()) undefined\_check},
+{DBR_MYRES,(chunk *(*)()) undefined_method, 
+           undefined_method,
+           undefined_method, 
+           (bool (*)()) undefined_check},
 \end{verbatim}
     The arguments are the reading, writing, freeing and consitency testing
     functions for the resource. Here they are undefined. But if the resource
