@@ -7,65 +7,12 @@
  * Comments :
  */
 
-
-/* Ansi includes        */
-#include <stdlib.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <string.h>
-
-/* Newgen includes      */
-#include "genC.h"
-
-/* C3 includes          */
-#include "boolean.h"
-#include "arithmetique.h"
-#include "vecteur.h"
-#include "contrainte.h"
-#include "ray_dte.h"
-#include "sommet.h"
-#include "sg.h"
-#include "sc.h"
-#include "polyedre.h"
-#include "matrice.h"
-#include "matrix.h"
-#include "union.h"
-
-/* Pips includes        */
-#include "graph.h"
-#include "database.h"
-#include "ri.h"
-#include "paf_ri.h"
-#include "ri-util.h"
-#include "constants.h"
-#include "misc.h"
-#include "control.h"
-#include "text.h"
-#include "text-util.h"
-#include "transformer.h"
-#include "semantics.h"
-
-#include "effects-generic.h"
-#include "effects-simple.h"
-#include "effects-convex.h"
-
-#include "pipsdbm.h"
-#include "resources.h"
-#include "static_controlize.h"
-#include "dg.h"
-#include "ricedg.h"
-#include "misc.h"
-#include "paf-util.h"
-#include "array_dfg.h"
+#define GRAPH_IS_DG
+#include "local.h"
 
 #define IS_INEG 0
 #define IS_EG 1
 #define IS_VEC 2
-
-/* Local defines */
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
 
 /*============================================================================*/
 /* void fprint_dfg(FILE *fp, graph obj): prints in the file "fp" the Data
