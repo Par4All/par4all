@@ -14,7 +14,7 @@
 
 */
 
-/* $RCSfile: newgen_list.h,v $ ($Date: 1995/09/16 21:42:41 $, )
+/* $RCSfile: newgen_list.h,v $ ($Date: 1995/10/02 13:52:35 $, )
  * version $Revision$
  * got on %D%, %T%
  *
@@ -68,10 +68,12 @@ IN_STACK(gen_cp_, &Gen_cp_[MAX_NESTED_CONS], \
 	{cons* _map_list_cp = (_l) ; \
 	for(;!ENDP(_map_list_cp);POP(_map_list_cp)) _code;}
 
-#define MAP(_map_CASTER, _map_chunkp, _map_code, _map_list) \
-{ list _map_chunkp##_consp = (_map_list); gen_chunk * _map_chunkp;\
-  for(; !ENDP(_map_chunkp##_consp); POP(_map_chunkp##_consp))\
-  { _map_chunkp = _map_CASTER(CAR(_map_chunkp##_consp)); _map_code; }}
+/* MAP(TYPE, var, code, list)
+ */
+#define MAP(_map_CASTER, _map_item, _map_code, _map_list) \
+{ list _map_item##_list = (_map_list); _map_CASTER##_TYPE _map_item;\
+  for(; _map_item##_list; POP(_map_item##_list))\
+  { _map_item = _map_CASTER(CAR(_map_item##_list)); _map_code; }}
 
 /* Fonctions de list.c 
  */
