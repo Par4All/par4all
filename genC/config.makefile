@@ -1,6 +1,6 @@
 #
 # $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/08 11:48:36 $, 
+# $Date: 1996/08/08 16:26:01 $, 
 #
 # Newgen should be quite particular...
 
