@@ -102,13 +102,18 @@ int (*compare)();
 }
 
 /* SORT a Psysteme according to sort_base and compare (given to qsort).
- * Both vectors and constraints are sorted. The only expected property
+ * Each constraint is first sorted according to the compare function.
+ * Then list of constraints are sorted. 
+ *
+ * The only expected property
  * is that two calls to this function with the same system (whatever its
  * order) and same sort_base that covers all variables and same compare
  * function should give the same result. 
  *
- * the function is quite peculiar and the order is relevant for some
+ * The function is quite peculiar and the order is relevant for some
  * code generation issues... 
+ *
+ * Fabien Coelho
  */
 void sc_sort(
     Psysteme sc,
@@ -122,6 +127,28 @@ void sc_sort(
 	contrainte_sort(sc->egalites, sc->base, sort_base, TRUE, TRUE);
 }
 
+/* Minimize first the lexico-graphic weight of each constraint according to
+ * the comparison function "compare", and then sort the list of equalities
+ * and inequalities by increasing lexico-graphic weight.
+ *
+ * Francois Irigoin
+ */
+void sc_lexicographic_sort(
+    Psysteme sc,
+    int (*compare)(Pvecteur*, Pvecteur*))
+{
+    if (sc==NULL || sc_empty_p(sc) || sc_rn_p(sc)) 
+	return;
+
+    /* sort the system basis and each constraint */
+    vect_sort_in_place(&(sc->base), compare);
+    contrainte_vect_sort(sc_egalites(sc), compare);
+    contrainte_vect_sort(sc_inegalites(sc), compare);
+
+    /* sort equalities and inequalities */
+    sc->egalites = constraints_lexicographic_sort(sc->egalites, compare);
+    sc->inegalites = constraints_lexicographic_sort(sc->inegalites, compare);
+}
 
 /*   That is all
  */
