@@ -32,6 +32,9 @@
  *    to prevent this;
  *
  * $Log: declaration.c,v $
+ * Revision 1.55  1998/10/15 06:37:09  irigoin
+ * Consistency check between layout and ram section added in print_common_layout()
+ *
  * Revision 1.54  1998/10/13 20:33:15  irigoin
  * Constant UNKOWN_RAM_OFFSET rewritten as UNKNOWN_RAM_OFFSET
  *
@@ -1486,6 +1489,14 @@ print_common_layout(FILE * fd, entity c, bool debug_p)
 			    storage_ram_p(entity_storage(m)));
 		if(ram_function(storage_ram(entity_storage(m)))==mod) {
 		    int s;
+
+		    /* Consistency check between the area layout and the ram section */
+		    if(ram_section(storage_ram(entity_storage(m)))!=c) {
+			pips_error("print_common_layout",
+				   "Variable %s declared in area %s but allocated in area %s\n",
+				   entity_local_name(m), entity_module_name(c),
+				   entity_module_name(ram_section(storage_ram(entity_storage(m)))));
+		    }
 
 		    if(!SizeOfArray(m, &s)) {
 			if(ram_section(storage_ram(entity_storage(m)))==HeapArea) {
