@@ -2,6 +2,9 @@
 # $Id$
 # 
 # $Log: config.makefile,v $
+# Revision 1.59  1997/05/30 09:32:20  coelho
+# *** empty log message ***
+#
 # Revision 1.58  1997/05/29 15:07:31  coelho
 # adapted to t3e.
 #
@@ -26,11 +29,7 @@
 # + PVM_ROOT
 # + _HPFC_USE_PVMe_
 
-ifeq ($(PIPS_ARCH),.)
-RT_ARCH=$(PVM_ARCH)
-else
-RT_ARCH=$(PVM_ARCH)-$(PIPS_ARCH)
-endif
+RT_ARCH=$(PIPS_ARCH)/$(PVM_ARCH)
 
 #
 # additional defs for m4
@@ -255,7 +254,7 @@ MKI_TARGET = $(RT_ARCH)/compilers.make
 
 # $(LIBOBJECTS) $(LIB_TARGET): $(RT_ARCH)
 
-$(RT_ARCH):; mkdir $@
+$(RT_ARCH): $(PIPS_ARCH) ; mkdir $@
 
 #
 # Installation:
