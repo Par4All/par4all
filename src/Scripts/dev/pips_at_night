@@ -1,7 +1,7 @@
 #! /bin/sh
 #
 # $RCSfile: pips_at_night,v $ version $Revision$
-# ($Date: 1996/08/12 08:41:07 $, )
+# ($Date: 1996/08/12 08:45:11 $, )
 # (c) Fabien COELHO July 1996
 # 
 # what to do at night...
@@ -124,7 +124,7 @@ shift `expr $OPTIND - 1`
 # Do the job and send reports
 
 {
-    $verbose "Starting $email/$host"
+    $verbose "Starting $user/$host"
     
     #
     # CLEANING
@@ -202,7 +202,7 @@ shift `expr $OPTIND - 1`
 	Validate -vti 50 -a ${email}
     }
 
-    $verbose "Ending $email/$host"
+    $verbose "Ending $user/$host"
 } 2>&1 | $mail -s "$script: report" ${email}
 
 # That is all!
