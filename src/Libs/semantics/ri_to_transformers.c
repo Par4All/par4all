@@ -67,6 +67,15 @@ statement s;
     /* it would be nicer to control warning_on_redefinition */
     if (t == transformer_undefined) {
 	t = instruction_to_transformer(i, e);
+	if(!transformer_consistency_p(t)) {
+	    int so = statement_ordering(s);
+	    (void) fprintf(stderr, "statement %03d (%d,%d):\n",
+			   statement_number(s),
+			   ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
+	    (void) print_transformer(load_statement_transformer(s));
+	    pips_error("statement_to_transformer",
+		       "Inconsistent transformer detected\n");
+	}
 	store_statement_transformer(s, t);
     }
     else 
@@ -145,6 +154,9 @@ cons * b;
 	for (POP(b) ; !ENDP(b); POP(b)) {
 	    s = STATEMENT(CAR(b));
 	    tf = transformer_combine(tf, statement_to_transformer(s));
+	    ifdebug(1) {
+		(void) transformer_consistency_p(tf);
+	    }
 	}
     }
 
@@ -251,7 +263,13 @@ unstructured u ;
     debug(8,"unstructured_to_transformers","end\n");
 }
 
-
+/* The transformer associated to a DO loop does not include the exit 
+ * condition because it is used to compute the precondition for any 
+ * loop iteration.
+ *
+ * There is only one attachment for the unbounded transformer and
+ * for the bounded one.
+ */
 
 transformer loop_to_transformer(l, e)
 loop l;
@@ -299,10 +317,23 @@ cons * e; /* effects of loop l */
 	    Psysteme sc = SC_UNDEFINED;
 	    Pcontrainte eq = CONTRAINTE_UNDEFINED;
 	    normalized nlb = NORMALIZE_EXPRESSION(range_lower(r));
+	    Pbase new_b = BASE_UNDEFINED;
 	    
 	    tf = effects_to_transformer(e);
-	    /* add equations from ftf */
 	    sc = (Psysteme) predicate_system(transformer_relation(tf));
+
+	    /* compute the basis for tf and ftf */
+
+	    /* FI: just in case. I do not understand why sc_base(fsc) is not enough.
+	     * I do not understand why I used effects_to_transformer() instead
+	     * of transformer_indentity()...
+	     */
+	    new_b = base_union(sc_base(fsc), sc_base(sc));
+	    base_rm(sc_base(sc));
+	    sc_base(sc) = new_b;
+	    sc_dimension(sc) = base_dimension(new_b);
+
+	    /* add equations from ftf to tf */
 	    for(eq = sc_egalites(fsc); !CONTRAINTE_UNDEFINED_P(eq); ) {
 		Pcontrainte neq;
 
@@ -310,6 +341,8 @@ cons * e; /* effects of loop l */
 		sc_add_egalite(sc, eq);
 		eq = neq;
 	    }
+
+	    /* FI" I hope that inequalities will be taken care of some day! */
 
 	    sc_egalites(fsc) = CONTRAINTE_UNDEFINED;
 	    free_transformer(ftf);
@@ -529,9 +562,25 @@ cons * ef; /* effects of assign */
 	entity e = (entity) vecteur_var(vlhs);
 
 	if(entity_has_values_p(e) && integer_scalar_entity_p(e)) {
-	    /* check that all read effects are on integer scalar entities */
+	    /* FI: the initial version was conservative because
+	     * only affine scalar integer assignments were processed
+	     * precisely. But non-affine operators and calls to user defined
+	     * functions can also bring some information as soon as
+	     * *some* integer read or write effect exists
+	     */
+	    /* check that *all* read effects are on integer scalar entities */
+	    /*
 	    if(integer_scalar_read_effects_p(ef)) {
-		tf = expression_to_transformer(e, rhs);
+		tf = expression_to_transformer(e, rhs, ef);
+	    }
+	    */
+	    /* Check that *some* read or write effects are on integer 
+	     * scalar entities. This is almost always true... Let's hope
+	     * expression_to_transformer() returns quickly for array
+	     * expressions used to initialize a scalar integer entity.
+	     */
+	    if(some_integer_scalar_read_or_write_effects_p(ef)) {
+		tf = expression_to_transformer(e, rhs, ef);
 	    }
 	}
     }
@@ -545,7 +594,7 @@ cons * ef; /* effects of assign */
     return tf;
 }
 
-/* transformer expression_to_transformer(entity e, expression expr):
+/* transformer expression_to_transformer(entity e, expression expr, list ef):
  * returns a transformer abstracting the effect of assignment e = expr
  * if entity e and entities referenced in expr are accepted for
  * semantics analysis anf if expr is affine; else returns
@@ -563,9 +612,10 @@ cons * ef; /* effects of assign */
  *  - MOD and / added for very special cases (but not as general as it should be)
  *    FI, 25/05/93
  */
-transformer expression_to_transformer(e, expr)
+transformer expression_to_transformer(e, expr, ef)
 entity e;
 expression expr;
+list ef;
 {
     transformer tf = transformer_undefined;
 
@@ -624,11 +674,50 @@ expression expr;
 	else if(max0_expression_p(expr)) {
 	    tf = max0_to_transformer(e, expr);
 	}
+	else if(user_function_call_p(expr)) {
+	    /* FI: I need effects ef here to use user_call_to_transformer()
+	     * although the general idea was to return an undefined transformer
+	     * on failure rather than a transformer derived from effects
+	     */
+	    tf = user_function_call_to_transformer(e, expr, ef);
+	}
 	else {
 	    vect_rm(ve);
 	}
     }
     return tf;
+}
+
+transformer user_function_call_to_transformer(entity e, expression expr,
+					      list ef)
+{
+    syntax s = expression_syntax(expr);
+    call c = syntax_call(s);
+    entity f = call_function(c);
+    list pc = call_arguments(c);
+    transformer t_caller = transformer_undefined;
+    basic rbt = basic_of_call(c);
+
+    pips_assert("user_function_call_to_transformer", syntax_call_p(s));
+
+    if(basic_int_p(rbt)) {
+	string fn = module_local_name(f);
+	entity rv = global_name_to_entity(fn, fn);
+
+	pips_assert("user_function_call_to_transformer",
+		    !entity_undefined_p(rv));
+
+	t_caller = user_call_to_transformer(f, pc, ef);
+
+	/* FI: e is added in arguments because user_call_to_transformer()
+	 * uses effects to make sure arrays and non scalar integer variables
+	 * impact is taken into account
+	 */
+	(void) arguments_rm_entity(transformer_arguments(t_caller), e);
+
+	t_caller = transformer_value_substitute(t_caller, rv, e);
+    }
+    return t_caller;
 }
 
 transformer transformer_intra_to_inter(tf, le)
@@ -652,10 +741,13 @@ cons * le;
     /* build a list of arguments to suppress */
     /* FI: I do not understand anymore why corresponding old values do not have
      * to be suppressed too (6 July 1993)
+     *
+     * FI: because only read arguments are eliminated, non? (12 November 1995)
      */
     MAPL(ca, 
      {entity e = ENTITY(CAR(ca));
-      if(!effects_write_entity_p(le, e))
+      if(!effects_write_entity_p(le, e) &&
+	       !storage_return_p(entity_storage(e))) 
 	  lost_args = arguments_add_entity(lost_args, e);
      },
     old_args);
@@ -682,7 +774,11 @@ cons * le;
 	if(e != (entity) TCST) {
 	    entity v = value_to_variable(e);
 
-	    if( ! effects_read_or_write_entity_p(le, v)) {
+	    /* Variables with no impact on the caller world are eliminated.
+	     * However, the return value associated to a function is preserved.
+	     */
+	    if( ! effects_read_or_write_entity_p(le, v) &&
+	       !storage_return_p(entity_storage(v))) {
 		lost_args = arguments_add_entity(lost_args, e);
 	    }
 	}
