@@ -42,9 +42,6 @@
 
 static bool is_user_view;	/* print_code or print_source */
 
-/* Are we working for emacs or not ? */
-extern bool is_emacs_prettyprint;
-
 bool print_parallelized90_code(mod_name)
 char *mod_name;
 {
@@ -126,15 +123,22 @@ char *mod_name;
 bool
 emacs_print_code(char *mod_name)
 {
-  bool success;
+    bool success;
+    /*
+       is_emacs_prettyprint = TRUE;
+       is_attachment_prettyprint = TRUE;
+       */
+    set_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES", TRUE);
+  
+    success = print_code(mod_name);
 
-  is_emacs_prettyprint = TRUE;
-  is_attachment_prettyprint = TRUE;
-  success = print_code(mod_name);
-  is_emacs_prettyprint = FALSE;  
-  is_attachment_prettyprint = FALSE;  
+    set_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES", FALSE);
+    /*
+       is_emacs_prettyprint = FALSE;  
+       is_attachment_prettyprint = FALSE;  
+       */
 
-  return success;
+    return success;
 }
 
 
@@ -145,6 +149,9 @@ char *mod_name;
     text r = make_text(NIL);
     entity module = local_name_to_top_level_entity(mod_name);
     statement mod_stat;
+    bool is_emacs_prettyprint =
+	get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES");
+  
     string resource_name = strdup
 	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
 	    DBR_GRAPH_PRINTED_FILE
@@ -157,19 +164,29 @@ char *mod_name;
 		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? GRAPH_FILE_EXT : "",
 		NULL));
 
-
     set_bool_property("PRETTYPRINT_PARALLEL", FALSE);
     set_bool_property("PRETTYPRINT_SEQUENTIAL", TRUE);
 
-    init_prettyprint(empty_text);
-
     mod_stat = (statement)
 	db_get_memory_resource(is_user_view?DBR_PARSED_CODE:DBR_CODE, mod_name, TRUE);
+
+    if (is_emacs_prettyprint) {	
+	begin_attachment_prettyprint();
+	name_almost_everything_in_a_module(mod_stat);
+    }
+    
+    init_prettyprint(empty_text);
 
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
     MERGE_TEXTS(r, text_module(module,mod_stat));
     debug_off();
     success = make_text_resource (mod_name, resource_name, file_ext, r);
+
+    if (is_emacs_prettyprint) {
+	end_attachment_prettyprint();
+	free_names_of_almost_everything_in_a_module();
+    }
+    
     free(resource_name);
     free(file_ext);
     return success;
@@ -192,10 +209,18 @@ text texte;
 
     fd = safe_fopen(filename, "w");
 
+    /* Add the attachment if necessary: */
+    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+	init_output_the_attachments_for_emacs(fd);
+    
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
     print_text(fd, texte);
     debug_off();
 
+    /* Add the attachment if necessary: */
+    if (get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+	output_the_attachments_for_emacs(fd);
+    
     safe_fclose(fd, filename);
 
     DB_PUT_FILE_RESOURCE(strdup(res_name), strdup(mod_name), localfilename);
