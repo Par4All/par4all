@@ -3,7 +3,7 @@
 # HPFC driver, Fabien COELHO
 #
 # $RCSfile: hpfc_compile,v $ version $Revision$
-# $Date: 1996/10/25 21:16:26 $, 
+# $Date: 1996/10/25 21:24:42 $, 
 
 sh=`basename $0`
 STATUS='0'
@@ -174,19 +174,21 @@ stubs="`eval echo $stubs`"
 $debug "stubs: $stubs"
 
 # looks for the specified stubs file in
-# (1) direct (2) $PIPS_ROOT/Share
+# (1) ./ (2) $PIPS_ROOT/Share
+# prefers preprocessed versions (.direct) to .f
 
 for s in $stubs
 do
-    if test -f $s 
-    then 
-	HPFFILES="$HPFFILES $s"
-    else
-	if test -f $PIPS_ROOT/Share/$s
-	then
-	    HPFFILES="$HPFFILES $PIPS_ROOT/Share/$s"
-	fi
-    fi
+    x=`basename $s .f`
+    NOTDONE=1
+    for f in $x.direct $s $PIPS_ROOT/Share/$x.direct $PIPS_ROOT/Share/$s
+    do
+	test -f $f -a "$NOTDONE" && {
+	    HPFFILES="$HPFFILES $f"
+	    NOTDONE=
+	}
+    done
+    test "$NOTDONE" && echo "warning: stub $s not found"
 done
 
 #
