@@ -12,6 +12,11 @@
 %% Modifications
 %%
 %% $Log: properties-rc.tex,v $
+%% Revision 1.122  1998/06/05 07:06:31  irigoin
+%% comments added because I could not find the way to prettyprint all
+%% CONTINUE statements: the property of interest is a more extensive property
+%% called PRETTYPRINT_ALL_LABELS.
+%%
 %% Revision 1.121  1998/05/08 14:49:12  irigoin
 %% Property SEMANTICS_FILTERED_PRECONDITIONS added
 %%
@@ -67,7 +72,7 @@
         France \\}
 % \date{\today (Initial version: October 1991)}
 \date{
-$~$Date: 1998/05/08 14:49:12 $~$
+$~$Date: 1998/06/05 07:06:31 $~$
 }
 
 % \addtolength{\textwidth}{72pt}
@@ -1499,9 +1504,16 @@ Print statement ordering information (false by default):
 PRETTYPRINT_STATEMENT_ORDERING FALSE
 \end{verbatim}
 
-Print code with DO label and CONTINUE instead of DO-ENDDO. If FALSE, all
-useless CONTINUE statements are NOT prettyprinted (ie. all those in
-structured parts of the code). Warning: case TRUE, generated code may be
+The next property controls the print out of DO loops and CONTINUE
+statement. The code may be prettyprinted with DO label and CONTINUE
+instead of DO-ENDDO, as well as with other useless CONTINUE (This property
+encompasses a virtual \verb/PRETTYPRINT_ALL_CONTINUE_STATEMENTS/). If set
+to FALSE, the default option, all useless CONTINUE statements are NOT
+prettyprinted (ie. all those in structured parts of the code). This mostly
+is a debugging option useful to understand better what is in the internal
+representation.
+
+\paragraph{Warning:} if set to TRUE, generated code may be
 wrong after some code transformations like distribution...
 
 \begin{verbatim}
