@@ -50,8 +50,12 @@ int warn_on_ref_without_def_in_read_tabulated = FALSE;
 
 gen_chunk *Read_chunk ;
 
-/* The SHARED_TABLE maps a shared pointer number to its gen_chunk pointer value. */
-
+/* The SHARED_TABLE 
+ * maps a shared pointer number to its gen_chunk pointer value.
+ * warning: big hack.
+ */
+static int shared_number;
+static int shared_size;
 static gen_chunk ** shared_table ;
 
 /* The GEN_TABULATED_NAMES hash table maps ids to index in the table of
@@ -61,11 +65,12 @@ static gen_chunk ** shared_table ;
 
 /* Management of forward references in read */
 
-int newgen_allow_forward_ref = FALSE ;
+int newgen_allow_forward_ref = FALSE;
 
 static void * read_external(int);
 static gen_chunk * make_def(gen_chunk *);
 static gen_chunk * make_ref(int, gen_chunk *);
+static gen_chunk * chunk_for_domain(int);
 
 %}
 
@@ -120,7 +125,15 @@ Read	: Nb_of_shared_pointers Contents
 	;
 
 Nb_of_shared_pointers 
-  	: Int { shared_table = (gen_chunk **)alloc($1*sizeof(gen_chunk*)); }
+  	: Int
+        { 
+	  int i;
+	  shared_number = 0;
+	  shared_size = $1;
+	  shared_table = (gen_chunk **)alloc($1*sizeof(gen_chunk*)); 
+	  for (i=0; i<shared_size; i++)
+	    shared_table[i] = gen_chunk_undefined;
+        }
 	;
 
 Contents: Chunk { $$ = $1; }
@@ -134,18 +147,13 @@ Contents: Chunk { $$ = $1; }
 
 Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP 
           {
-	    int i, size;
+	    int i, size = gen_size($3);
 	    cons *cp ;
 
-	    assert($3>=0 && $3<MAX_DOMAIN);
-	    size = gen_size($3);
-
-	    $$ = (gen_chunk *)alloc(size*sizeof(gen_chunk));
-
-	    /* chunck is shared. */
-	    if ($1) shared_table[$1-1] = $$;
-
-	    /* copy contents... */
+	    /* see HACK bellow. */
+	    $$ = $1? shared_table[$1-1]: chunk_for_domain($3);
+	    
+	    /* copy contents. */
 	    $$->i = $3;
 	    for(i=size-1, cp=$4; i>0 && cp; i--, cp=cp->cdr)
 	      *($$+i) = cp->car;
@@ -158,12 +166,25 @@ Chunk 	: Shared_chunk CHUNK_BEGIN Type Datas RP
 	  }
 	;
 
-Shared_chunk
-	: LB Int { $$ = $2; }
-	|        { $$ = 0; }
+Shared_chunk /* see HACK bellow */
+	: LB Int { $$ = shared_number = $2; }
+	|        { $$ = shared_number = 0; }
 	;
 
-Type	: Int { $$ = gen_type_translation_old_to_actual($1); }
+Type	: Int 
+        { 
+	  $$ = gen_type_translation_old_to_actual($1); 
+
+	  /* HACK: the first type after a  shared handles allocation.
+	   * it MUST be performed here so that references to this
+	   * can be valid even if its parsing is not finished yet.
+	   */
+	  if (shared_number) 
+	  {
+	    shared_table[shared_number-1] = chunk_for_domain($$);
+	    shared_number = 0;
+	  }
+	}
 	;
 
 Datas	: Datas Data { $$ = CONS( CHUNK, $2.p, $1 ); }
@@ -172,7 +193,7 @@ Datas	: Datas Data { $$ = CONS( CHUNK, $2.p, $1 ); }
 
 Sparse_Datas: Sparse_Datas Int Data { /* index, value */
 	        $$ = CONS(CONSP, CONS(INT, $2, CONS(CHUNK, $3.p, NIL)), $1);
-		}
+        }
 	| { $$ = NIL; }
 	;
 
@@ -235,7 +256,12 @@ Data	: Basis	{ $$ = $1; }
 		$$.h = h ;
 		}
 	| Chunk { $$.p = $1 ; }
-	| SHARED_POINTER Int { $$.p = shared_table[$2-1]; }
+	| SHARED_POINTER Int 
+        {
+	  message_assert("shared is defined", 
+			 shared_table[$2-1]!=gen_chunk_undefined);
+	  $$.p = shared_table[$2-1];
+	}
 	;
   
 Basis	: READ_UNIT { $$.u = 1; }
@@ -246,7 +272,7 @@ Basis	: READ_UNIT { $$.u = 1; }
 	| String { $$ = *$1 ; }
  	| READ_EXTERNAL Int { $$.s = (char*) read_external($2); }
 	| READ_DEF Chunk { $$.p = make_def($2); }
-	| READ_REF Type String { $$.p = make_ref($2, $3) ; }
+	| READ_REF Type String { $$.p = make_ref($2, $3); }
 	| READ_NULL { $$.p = gen_chunk_undefined ; }
 	;
 
@@ -260,6 +286,15 @@ String  : READ_STRING {
 	    }
 		    
 %%
+
+static gen_chunk * chunk_for_domain(int domain)
+{
+  gen_chunk * cp;
+  check_domain(domain);
+  cp = (gen_chunk*) alloc(sizeof(gen_chunk)*gen_size(domain));
+  cp->i = domain;
+  return cp;
+}
 
 /* YYERROR manages a syntax error while reading an object. */
 
