@@ -22,7 +22,7 @@
 /* START of PIPSMAKE.RC generated aprt */
 
 /*
-  reductioInfo = persistant reduction x count:int x persistant vector:entity
+  reductionInfo = persistent reduction x count:int x persistent vector:entity
  */
 typedef struct {
       reduction _reductionInfo_reduction_;
@@ -42,6 +42,11 @@ static reductionInfo make_reductionInfo(reduction r, int c, entity v)
    reductionInfo_count(ri) = c;
    reductionInfo_vector(ri) = v;
    return ri;
+}
+
+static void free_reductionInfo(reductionInfo ri)
+{
+   free(ri);
 }
 
 /* END of PIPSMAKE.RC generated aprt */
@@ -435,8 +440,11 @@ static void reductions_rewrite(statement s)
       s = generate_compact(ri);
       if (s != statement_undefined)
 	 compacts = CONS(STATEMENT, s, compacts);
+
+      free_reductionInfo(ri);
    },
        reductions);
+   gen_free_list(reductions);
 
    statement_instruction(s) = make_instruction_sequence(make_sequence(
       gen_concatenate(preludes, 
@@ -449,8 +457,6 @@ static void reductions_rewrite(statement s)
    statement_comments(s) = empty_comments;
    statement_declarations(s) = NIL;
    statement_decls_text(s) = string_undefined;
-
-   gen_full_free_list(reductions);
 }
 
 bool simd_remove_reductions(char * mod_name)
