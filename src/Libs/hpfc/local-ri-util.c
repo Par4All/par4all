@@ -1,4 +1,4 @@
-/* $RCSfile: local-ri-util.c,v $ ($Date: 1995/09/22 13:21:20 $, )
+/* $RCSfile: local-ri-util.c,v $ ($Date: 1996/03/01 12:04:35 $, )
  * version $Revision$
  *
  * HPFC (c) Fabien Coelho May 1993
@@ -48,10 +48,24 @@ expression e;
     return syntax_reference(s);
 }
 
+/* just returns the entity of an expression... 
+ */
 entity expression_to_entity(e)
 expression e;
 {
-    return reference_variable(expression_to_reference(e));
+    syntax s = expression_syntax(e);
+
+    switch (syntax_tag(s))
+    {
+    case is_syntax_call:
+	return call_function(syntax_call(s));
+    case is_syntax_reference:
+	return reference_variable(syntax_reference(s));
+    case is_syntax_range:
+    default: 
+	pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
+	return entity_undefined; 
+    }
 }
 
 list expression_list_to_entity_list(l)
